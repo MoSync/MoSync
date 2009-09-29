@@ -1,0 +1,8 @@
+//.res R_TILESET
+//.tileset "tileset.png", 16, 16
+
+//.res R_TILEMAP
+//.tilemap "tilemap.bin", 1, 1
+
+.res R_MOTRIX
+.image "tileset.png"

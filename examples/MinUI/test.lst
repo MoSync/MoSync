@@ -1,0 +1,5 @@
+.res R_IMAGE_1
+.image "icon.png"
+
+.res R_IMAGE_2
+.image "icon2.png"

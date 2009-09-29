@@ -1,0 +1,12 @@
+.res RES_FONT
+.ubin
+.include "font2.mof"
+
+.res RES_IMAGE
+.image "../../3dLines/ball.png"
+
+.res RES_SKIN_BLUE
+.image "blueskin.png"
+
+.res RES_SKIN_BLACK
+.image "blackskin.png"

@@ -1,0 +1,10 @@
+.res FOO
+.placeholder
+
+.res R_LOGO
+.image "logo.png"
+
+.res R_SPRITE
+.image "ball.png"
+
+.eof

@@ -1,0 +1,11 @@
+.res RES_STORE
+.placeholder
+
+/*
+.res RES_LOGO
+.ubin
+.include "MoSync.sketch"
+*/
+
+.res RES_BACKBUFFER
+.placeholder

@@ -1,0 +1,31 @@
+.res BRICK1
+.image "brick_1.png"
+
+.res BRICK2
+.image "brick_2.png"
+
+.res BRICK3
+.image "brick_3.png"
+
+.res BRICK4
+.image "brick_4.png"
+
+.res BRICK5
+.image "brick_5.png"
+
+.res BRICK6
+.image "brick_6.png"
+
+.res BRICK7
+.image "brick_7.png"
+
+.res MOTRIS_LOGO
+.image "motris_logo.png"
+
+//.res MOTRIS_HIGH_SCORE
+//.placeholder
+.res MOTRIS_SETTINGS
+.placeholder
+
+.res MOTRIS_HIGH_SCORE_FILE
+.placeholder

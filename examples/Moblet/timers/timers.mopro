@@ -1,0 +1,28 @@
+<Project name="Moblet_timers">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value="false"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="false"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value="true"/>
+		<Property name="Wall" value="true"/>
+		<Property name="Wextra" value=""/>
+		<Property name="S60v2UID" value="0x0EB569CD"/>
+		<Property name="S60v3UID" value="0xE03A4F1C"/>
+		<Property name="additionalIncludeDirectories" value=""/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value="MAUtil.lib"/>
+		<Property name="extraCmd" value="-O2"/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="main.cpp"/>
+</Project>

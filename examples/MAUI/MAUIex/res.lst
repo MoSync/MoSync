@@ -1,0 +1,31 @@
+.res RES_FONT
+.bin
+.include "pretty.mof"
+
+.res RES_SELECTED
+.image "background_tile_sel.png"
+
+.res RES_UNSELECTED
+.image "background_tile_unsel.png"
+
+.res RES_IMAGE
+.image "image.png"
+
+.res RES_ICONS_START
+.image "icon1.png"
+.res
+.image "icon2.png"
+.res
+.image "icon3.png"
+.res
+.image "icon4.png"
+.res
+.image "icon5.png"
+.res
+.image "icon6.png"
+.res
+.image "icon7.png"
+.res
+.image "icon8.png"
+.res RES_ICONS_END
+.image "icon9.png"

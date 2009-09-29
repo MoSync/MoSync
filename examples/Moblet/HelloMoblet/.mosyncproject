@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+<target-profile device="Emulator" vendor="MobileSorcery"/>
+<criteria/>
+<properties>
+<property key="Werror" value="true"/>
+<property key="screenHeight" value="320"/>
+<property key="build.prefs:extra.link.sw" value="-xerr"/>
+<property key="Wall" value="true"/>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
+<property key="build.prefs:ignore.default.library.paths" value="false"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0AE508C2"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xE28B5292"/>
+<property key="screenWidth" value="240"/>
+<property key="build.prefs:ignore.default.include.paths" value="false"/>
+<property key="build.prefs:ignore.default.libraries" value="false"/>
+<property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:gcc.switches" value="-O0"/>
+<property key="build.prefs:project.type" value="app"/>
+</properties>
+</project>

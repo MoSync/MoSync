@@ -1,0 +1,3 @@
+.res FILESYSTEM
+.ubin 
+.include "anotherworld.bun"
