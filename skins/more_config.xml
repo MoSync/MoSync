@@ -1,0 +1,24 @@
+<skins>
+	<skin model="default" vendor="default" screenX="18" screenY="44" screenW="240" screenH="320" selectedImage="mophone2.png" unselectedImage="mophone.png">
+		<key code="MAK_1" x="54" y="451" w="55" h="23" />
+		<key code="MAK_2" x="110" y="451" w="55" h="23" />
+		<key code="MAK_3" x="166" y="451" w="55" h="23" />
+		<key code="MAK_4" x="54" y="476" w="55" h="23" />
+		<key code="MAK_5" x="110" y="476" w="55" h="23" />
+		<key code="MAK_6" x="166" y="476" w="55" h="23" />
+		<key code="MAK_7" x="54" y="501" w="55" h="23" />
+		<key code="MAK_8" x="110" y="501" w="55" h="23" />
+		<key code="MAK_9" x="166" y="501" w="55" h="23" />
+		<key code="MAK_STAR" x="54" y="526" w="55" h="23" />
+		<key code="MAK_0" x="110" y="526" w="55" h="23" />
+		<key code="MAK_HASH" x="166" y="526" w="55" h="23" />
+		<key code="MAK_UP" x="132" y="369" w="20" h="20" />
+		<key code="MAK_RIGHT" x="159" y="399" w="10" h="20" />
+		<key code="MAK_DOWN" x="132" y="426" w="12" h="10" />
+		<key code="MAK_LEFT" x="107" y="399" w="10" h="20" />
+		<key code="MAK_SOFTLEFT" x="32" y="378" w="80" h="23" />
+		<key code="MAK_SOFTRIGHT" x="164" y="378" w="80" h="23" />
+		<key code="MAK_FIRE" x="120" y="387" w="36" h="36" />
+		<key code="MAK_CLEAR" x="222" y="500" w="26" h="60" />
+	</skin>
+</skins>

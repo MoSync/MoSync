@@ -1,0 +1,1 @@
+A project that uses the MAUtil::Moblet class, which provides an event-driven framework for developing your MoSync application.

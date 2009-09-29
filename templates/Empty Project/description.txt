@@ -1,0 +1,1 @@
+An empty project with standard settings but no files.

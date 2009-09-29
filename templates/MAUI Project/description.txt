@@ -1,0 +1,1 @@
+A Moblet project with stub code for using MAUI, the graphical user interface library.

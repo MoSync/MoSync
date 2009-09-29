@@ -1,0 +1,1 @@
+A MoSync C project with a main file and stub code.

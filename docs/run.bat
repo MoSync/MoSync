@@ -1,0 +1,2 @@
+call gendox.bat
+pause
