@@ -1,0 +1,5 @@
+#include "MAUIQueryResult.h"
+
+class MAUIDataProvider {
+	virtual MAUIQueryResult* query(char* q);
+};

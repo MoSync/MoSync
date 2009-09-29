@@ -1,0 +1,80 @@
+<Project name="MAStdD">
+	<Configuration>
+		<Property name="configType" value="lib"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value="false"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="true"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="true"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value="true"/>
+		<Property name="Wall" value="true"/>
+		<Property name="Wextra" value="true"/>
+		<Property name="S60v2UID" value="0x046670E1"/>
+		<Property name="S60v3UID" value="0xE949043B"/>
+		<Property name="additionalIncludeDirectories" value=".;../"/>
+		<Property name="outputPath" value="%MOSYNCDIR%\lib\pipe\MAStdD.lib"/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value=""/>
+		<Property name="extraCmd" value="-O0 -DMOSYNCDEBUG"/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="e_log.c"/>
+	<Folder name="libsubc++">
+		<File path="..\libsupc++\del_opnt.cc"/>
+		<File path="..\libsupc++\del_opvnt.cc"/>
+		<File path="..\libsupc++\new_opnt.cc"/>
+		<File path="..\libsupc++\new_opvnt.cc"/>
+	</Folder>
+	<File path="strtod.c"/>
+	<File path=".\crtlib.s"/>
+	<File path=".\conprint.c"/>
+	<File path=".\conprint.h"/>
+	<File path=".\ma.c"/>
+	<File path=".\ma.h"/>
+	<File path=".\MAAPI.h"/>
+	<File path=".\maarg.h"/>
+	<File path=".\macpp.cpp"/>
+	<File path=".\mactype.c"/>
+	<File path=".\mactype.h"/>
+	<File path=".\madmath.c"/>
+	<File path=".\madmath.h"/>
+	<File path=".\maheap.c"/>
+	<File path=".\maheap.h"/>
+	<File path=".\mastdlib.c"/>
+	<File path=".\mastdlib.h"/>
+	<File path=".\mastring.c"/>
+	<File path=".\mastring.h"/>
+	<File path=".\matask.c"/>
+	<File path=".\matask.h"/>
+	<File path=".\mavsprintf.c"/>
+	<File path=".\mavsprintf.h"/>
+	<File path=".\maxtoa.c"/>
+	<File path=".\maxtoa.h"/>
+	<File path=".\stdio.h"/>
+	<File path=".\matime.c"/>
+	<File path=".\matime.h"/>
+	<File path="modf.c"/>
+	<File path="maassert.h"/>
+	<File path="maassert.c"/>
+	<File path="s_ceil.c"/>
+	<File path="s_floor.c"/>
+	<File path="e_pow.c"/>
+	<File path="s_atan.c"/>
+	<File path="e_asin.c"/>
+	<File path="e_acos.c"/>
+	<File path="e_atan2.c"/>
+	<File path="math_private.h"/>
+	<File path="strtoul.c"/>
+	<File path="strtoull.c"/>
+	<File path="s_frexp.c"/>
+	<File path="maint64.c"/>
+	<File path="tlsf.h"/>
+	<File path="tlsf.c"/>
+</Project>
