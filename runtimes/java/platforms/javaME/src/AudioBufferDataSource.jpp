@@ -1,0 +1,194 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "generated\IX_AUDIOBUFFER_CONSTS.h"
+#include "helpers.h"
+
+import javax.microedition.media.protocol.*;
+import javax.microedition.media.*;
+import java.io.*;
+
+class AudioBufferDataSource extends DataSource {
+#define PVF(func) public final void func() { DEBUG_SOUND("ABDS." + #func + "()\n"); }
+	PVF(connect);
+	PVF(disconnect);
+	PVF(start);
+	PVF(stop);
+
+	//public String getLocator() {
+	//	BIG_PHAT_ERROR;
+	//}
+	public Control getControl(java.lang.String controlType) {
+		BIG_PHAT_ERROR;
+		//return null;
+	}
+	public Control[] getControls() {
+		BIG_PHAT_ERROR;
+		//return new Control[0];
+	}
+
+	public String getContentType() {
+		return "audio/x-wav";
+	}
+
+	public SourceStream[] getStreams() {
+		return mStreams;
+	}
+
+	private SourceStream[] mStreams = new SourceStream[1];
+
+	AudioBufferDataSource(Syscall syscall, int[] mem, int address, int bufferSize,
+		int fmt, int sampleRate, int numChannels)
+		throws IOException
+	{
+		super("foo");
+		mStreams[0] = new AudioBufferSourceStream(syscall, mem, address, bufferSize,
+			fmt, sampleRate, numChannels);
+	}
+	public final void ready() {
+		((AudioBufferSourceStream)mStreams[0]).ready();
+	}
+
+static class AudioBufferSourceStream implements SourceStream {
+	private final byte[] mBuffer;
+	private final int mAddress;
+	//private final int[] mem_ds;
+	private final Syscall mSyscall;
+	private final byte[] mHeader;
+	private long mTotalPos;
+	private int mSrcPos;
+	private byte[] mSrc;
+
+	AudioBufferSourceStream(Syscall syscall, int[] mem_ds, int address, int bufferSize,
+		int fmt, int sampleRate, int numChannels)
+		throws IOException
+	{
+		MYASSERT((bufferSize % 4) == 0);
+		mSyscall = syscall;
+		mAddress = address;
+
+		int bytesPerSample;
+		switch(fmt) {
+		case AUDIO_FMT_S8:
+		case AUDIO_FMT_U8:
+			bytesPerSample = 1;
+			break;
+		case AUDIO_FMT_S16:
+		case AUDIO_FMT_U16:
+			bytesPerSample = 2;
+			break;
+		default:
+			BIG_PHAT_ERROR;
+		}
+
+		mHeader = new byte[44];
+		RefByteArrayOutputStream ho = new RefByteArrayOutputStream(mHeader, 0);
+		ho.write("RIFF".getBytes());
+		ho.writeLeInt(0x7FFFFFFF);	//max len
+		ho.write("WAVEfmt ".getBytes());
+		ho.writeLeInt(16);	//fmt chunk len
+		ho.writeLeShort((short)1);	//PCM format
+		ho.writeLeShort((short)numChannels);
+		ho.writeLeInt(sampleRate);
+		ho.writeLeInt(sampleRate * bytesPerSample * numChannels);	//bytes per second
+		ho.writeLeShort((short)(bytesPerSample * numChannels));
+		ho.writeLeShort((short)(bytesPerSample * 8));	//bits per sample
+		ho.write("data".getBytes());
+		ho.writeLeInt(0x7FFFFFFF);
+
+		mBuffer = new byte[bufferSize];
+
+		mSrcPos = 0;
+		mSrc = mHeader;
+	}
+
+	synchronized public final int read(byte[] b, int off, int len) {
+		//DEBUG_SOUND("ABDS.read("+b.length+", "+off+", "+len+")\n");
+		if(mSrcPos == mSrc.length) {	//out of data
+			//fetch more
+			if(mSrc == mHeader) {
+				//if the header is finished, switch to the buffer
+				mSrc = mBuffer;
+				mSrcPos = mSrc.length;
+			}
+			//wait for the program to fill the buffer.
+			sendEvent();
+			while(true) {
+				try {
+					DEBUG_SOUND("ABDS.wait()\n");
+					wait();
+					//only if the wait was not interrupted, but properly notified, will the loop end.
+					DEBUG_SOUND("ABDS.wait completed!\n");
+					break;
+				} catch(InterruptedException e) {
+					PRINT_STACK_TRACE;
+				}
+			}
+			DEBUG_ASSERT(mSrcPos == 0);
+		}
+		int actual = MIN(len, mSrc.length - mSrcPos);
+		//DEBUG_ALWAYS(new String(mSrc, mSrcPos, actual) + "\n");
+		System.arraycopy(mSrc, mSrcPos, b, off, actual);
+		mSrcPos += actual;
+		mTotalPos += actual;
+		return actual;
+	}
+
+	private final void sendEvent() {
+		//DEBUG_SOUND("sendEvent\n");
+		int[] event = new int[1];
+		EI_TYPE = EVENT_TYPE_AUDIOBUFFER_FILL;
+		mSyscall.mCanvas.postEvent(event);
+	}
+
+	public final synchronized void ready() {
+		MYASSERT(mSrcPos == mBuffer.length);
+		mSrcPos = 0;
+		mSyscall.readMemBytes(mBuffer, mAddress, 0, mBuffer.length);
+		DEBUG_SOUND("ABDS.notify()\n");
+		notify();
+	}
+
+	//simple functions
+	public final ContentDescriptor getContentDescriptor() {
+		return new ContentDescriptor("audio/x-wav");
+	}
+	public final long getContentLength() {
+		return Long.MAX_VALUE;
+	}
+	public final int getSeekType() {
+		return NOT_SEEKABLE;
+	}
+	public final int getTransferSize() {
+		return mBuffer.length;
+	}
+	public final long seek(long where) {
+		BIG_PHAT_ERROR;
+	}
+	public final long tell() {
+		return mTotalPos;
+	}
+	public Control getControl(java.lang.String controlType) {
+		BIG_PHAT_ERROR;
+		//return null;
+	}
+	public Control[] getControls() {
+		BIG_PHAT_ERROR;
+		//return new Control[0];
+	}
+}
+}

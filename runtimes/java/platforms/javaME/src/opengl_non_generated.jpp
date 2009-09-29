@@ -1,0 +1,208 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+public int mOpenglStringsPointers[];
+
+public String[] readOpenglStrings() {
+	String[] strings = new String[4];
+	strings[0] = gl.glGetString(GL10.GL_VENDOR);
+	strings[1] = gl.glGetString(GL10.GL_RENDERER);
+	strings[2] = gl.glGetString(GL10.GL_VERSION);
+	strings[3] = gl.glGetString(GL10.GL_EXTENSIONS);
+
+	// maybe verify that no string is null
+	return strings;
+}
+
+private EGL11 egl; // OpenGL ES link from Java
+private GL11 gl; // for calling JOGL-ES
+private EGLDisplay eglDisplay;
+private EGLContext eglContext; // the OpenGL ES state
+private EGLSurface eglWinSurface; // for on-screen rendering
+
+int maGLInit() {
+	// initialize OpenGL ES
+	egl = (EGL11) EGLContext.getEGL();
+	if (egl == null) {
+		System.out.println("Error: could not initialize OpenGL ES");
+		return 0;
+	}
+	// initialize the OpenGL ES connection to the display
+	eglDisplay = egl.eglGetDisplay(EGL11.EGL_DEFAULT_DISPLAY);
+	if (eglDisplay == null) {
+		System.out.println("Error: no connection to display");
+		return 0;
+	}
+	int[] majorMinor = new int[2];
+	if (!egl.eglInitialize(eglDisplay, majorMinor)) {
+		System.out.println("Error: could not initialize display");
+		return 0;
+	}
+	System.out.println("EGL version: " + majorMinor[0] +
+		"." + majorMinor[1]);
+	// determine the number of available configurations
+	int[] numConfigs = new int[1];
+	egl.eglGetConfigs(eglDisplay, null, 0, numConfigs);
+	if (numConfigs[0] < 1) {
+		System.out.println("Error: no configurations found");
+		return 0;
+	}
+	// specify an 8/8/8 RGB configuration
+	int configAttributes[] = {
+		EGL11.EGL_RED_SIZE, 8, 
+		EGL11.EGL_GREEN_SIZE, 8,
+		EGL11.EGL_BLUE_SIZE, 8, // RGB
+		EGL11.EGL_ALPHA_SIZE, 0, // no alpha necessary
+		EGL11.EGL_DEPTH_SIZE, 16, // use a 16-bit z-buffer
+		EGL11.EGL_SURFACE_TYPE, EGL11.EGL_WINDOW_BIT,
+		// use a window buffer
+		EGL11.EGL_NONE
+	};
+	// use the first matching configuration
+	EGLConfig eglConfigs[] = new EGLConfig[numConfigs[0]];
+	if (!egl.eglChooseConfig(eglDisplay, configAttributes, eglConfigs,
+		eglConfigs.length, numConfigs)) {
+			System.out.println("Error: could not find a suitable config");
+			return 0;
+	}
+	EGLConfig eglConfig = eglConfigs[0];
+	/* initialize the OpenGL ES rendering state (the context)
+	with the display and configuration */
+	eglContext = egl.eglCreateContext(eglDisplay, eglConfig,
+		EGL11.EGL_NO_CONTEXT, null);
+	if (eglContext == null) {
+		System.out.println("Error: could not create rendering state");
+		return 0;
+	}
+	// initialize 2D and 3D graphics:
+	gl = (GL11) eglContext.getGL(); // 3D
+	if (gl == null) {
+		System.out.println("Error: could not create a 3D context");
+		return 0;
+	}
+	// set drawing surface to be a window for on-screen rendering
+	eglWinSurface =
+		egl.eglCreateWindowSurface(eglDisplay, eglConfig, mGraphics, null);
+	if (eglWinSurface == null) {
+		System.out.println("Error: no drawing surface window");
+		return 0;
+	}
+	// bind the display, drawing surface, and context to this thread
+	if (!egl.eglMakeCurrent(eglDisplay, eglWinSurface,
+		eglWinSurface, eglContext)){
+			System.out.println("Error: could not make the context current");
+			return 0;
+	}
+	return 1; // everything worked!
+}
+
+int maGLClose() {
+	if ((egl == null) || (eglDisplay == null))
+		return 0;
+	// disconnect the display, drawing surface, and context
+	// from this thread
+	egl.eglMakeCurrent(eglDisplay, EGL11.EGL_NO_SURFACE,
+	EGL10.EGL_NO_SURFACE, EGL11.EGL_NO_CONTEXT);
+	// delete the context
+	if (eglContext != null)
+		egl.eglDestroyContext(eglDisplay, eglContext);
+	// delete the drawing surface
+	if (eglWinSurface != null)
+		egl.eglDestroySurface(eglDisplay, eglWinSurface);
+	// break the OpenGL ES connection to the display
+	egl.eglTerminate(eglDisplay);
+
+	return 1;
+}
+
+int maGLWaitNative() {
+	return egl.eglWaitNative(EGL11.EGL_CORE_NATIVE_ENGINE, mGraphics)==true?1:0;
+}
+
+int maGLWaitGL() {
+	return egl.eglWaitGL()==true?1:0;
+}
+
+int glGetStringTemp(int name) {
+	return mOpenglStringsPointers[name&0x00ff];
+}
+
+void copyToBufferAligned(ByteBuffer buf, int dst, int src, int size)
+{
+	int[] mem_ds = CORE.mMem_ds;
+	if(BYTEPART(src)==0 && BYTEPART(dst)==0) {
+		IntBuffer ibuf = buf.asIntBuffer();
+		ibuf.put(mem_ds, src>>2, size>>2);
+		dst += size & ~3;
+		src += size & ~3;
+		size &= 3;
+	} 
+	while(size-- != 0) {
+		byte b;
+		RBYTE(src++, b);
+		buf.put(dst++, b);
+	}
+}
+
+void copyFromBufferAligned(ByteBuffer buf, int dst, int src, int size)
+{
+	int[] mem_ds = CORE.mMem_ds;
+	if(BYTEPART(src)==0 && BYTEPART(dst)==0) {
+		IntBuffer ibuf = buf.asIntBuffer();
+		ibuf.get(mem_ds, dst>>2, size>>2);
+		dst += size & ~3;
+		src += size & ~3;
+		size &= 3;
+	} 
+	while(size-- != 0) {
+		byte b;
+		b = buf.get(src++);
+		WBYTE(dst++, b);
+	}
+}
+
+// creates a direct buffer of data at 'ptr' of size 'size'
+// must be aligned on a 4-byte boundary
+int maGLCreateBuffer(int placeholder, int src, int size) {
+	if(size>0) {
+		ByteBuffer buf = ByteBuffer.allocateDirect(size);
+		if(src!=0){
+			copyToBufferAligned(buf, 0, src, size);
+		}
+		addResource(placeholder, buf);
+		return 1;
+	}
+	return 0;
+}
+
+int maGLWriteBuffer(int placeholder, int src, int offset, int size) {
+	if(src!=0 && size>0) {
+		ByteBuffer buf = (ByteBuffer)getResource(placeholder);
+		copyToBufferAligned(buf, offset, src, size);
+		return 1;
+	}
+	return 0;
+}
+
+int maGLReadBuffer(int placeholder, int dst, int offset, int size) {
+	if(dst!=0 && size>0) {
+		ByteBuffer buf = (ByteBuffer)getResource(placeholder);
+		copyFromBufferAligned(buf, dst, offset, size);
+		return 1;
+	}
+	return 0;
+}

@@ -1,0 +1,48 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+
+import javax.microedition.midlet.MIDlet;
+import javax.microedition.lcdui.game.GameCanvas;
+import javax.microedition.lcdui.Graphics;
+import java.io.*;
+
+interface MoSync {
+	Object getResource(int handle);
+	void setResource(int handle, Object o);
+	void addResource(int handle, Object o);
+	boolean isResourceInFlux(int handle);
+
+	//always returns the same object.
+	int[] getMemory();
+	GameCanvas getCanvas();
+	MIDlet getMidlet();
+	ThreadPool getThreadPool();
+
+	//returns the current draw target, set by calling maSetDrawTarget().
+	Graphics getGraphics();
+
+	//TODO: document event format
+	void postEvent(int[] event);
+
+#ifndef MA_PROF_SUPPORT_CLDC_10
+	double readDouble(int address);
+	void writeDouble(int address, double d);
+#endif
+	void writeMemStream(Address dst, InputStream in, int count) throws Exception;
+}

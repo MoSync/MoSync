@@ -1,0 +1,478 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+/******************************************************************************/
+/* MoSync GDB Stub                                                            */
+/* (c) 2007 Mobile Sorcery													  */
+/* This is used to compile the GDB debug version of the mosync runtime.		  */
+/******************************************************************************/
+
+#include "config_platform.h"
+
+#ifdef GDB_DEBUG
+
+import javax.microedition.io.*;
+import java.io.*;
+
+#include "core_helpers.h"
+#include "GdbStub.h"
+
+#define CORE mCore
+
+final class StringSplitter {
+	static final String[] split(String str, String what) {
+		int count = 1;
+		int i = 0;
+		while(i < str.length()) {
+			if(str.startsWith(what, i) == true) {
+				count++;
+				i += what.length();
+			} else {
+				i++;
+			}
+		}
+		String ret[] = new String[count];
+		int start = 0;
+		for(i = 0; i < count; i++) {
+			int end = str.indexOf(what, start);
+			if(end == -1) {
+				end = str.length();
+			}
+
+			ret[i] = str.substring(start, end);
+
+			start = end + what.length();
+		}
+
+		return ret;
+	}
+}
+
+final public class GdbStub /* implements Runnable */ {
+	// Connections from and to the GDB host.
+	private SocketConnection conn;
+	private ServerSocketConnection scn;
+	private InputStream in;
+	private OutputStream out;
+
+	// Used to store the input data and output data.
+	StringBuffer inputBuffer = new StringBuffer();
+	StringBuffer outputBuffer = new StringBuffer();
+	// Reference to the core, used to retrieve and write memory/registers and such.
+	Core mCore;
+
+	// Is the execution of the program breaked or not.
+	boolean breaked = false;	
+
+	// Map from integer to a hexadecimal ASCII character.
+	static final char hexChars[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+	static final int MAX_NACKS = 0;
+
+	public GdbStub(Core core) {
+		mCore = core;
+	}
+
+	final String getByteString(byte b) {
+		StringBuffer ret = new StringBuffer();
+		for(int i = 4; i >= 0; i-=4) {
+			ret.append(hexChars[((b>>i)&0xf)]);
+		}
+		return ret.toString();
+	}
+
+	final String getShortString(short b) {
+		StringBuffer ret = new StringBuffer();
+		for(int i = 12; i >= 0; i-=4) {
+			ret.append(hexChars[((b>>i)&0xf)]);
+		}
+		return ret.toString();
+	}
+
+	final String getIntString(int b) {
+		StringBuffer ret = new StringBuffer();
+		for(int i = 28; i >= 0; i-=4) {
+			ret.append(hexChars[((b>>i)&0xf)]);
+		}
+		return ret.toString();
+	}	
+
+	public final void setupDebugConnection() throws Exception {
+		scn = (ServerSocketConnection) Connector.open("socket://:50000");
+		System.out.println("Setup GDB Server with address: " +
+			scn.getLocalAddress() + ":" + scn.getLocalPort());
+		System.out.println("Waiting for GDB client to connect...");
+		conn = (SocketConnection) scn.acceptAndOpen();
+
+		in = conn.openInputStream();
+		out = conn.openOutputStream();
+		System.out.println("Connection to GDB client established!");		
+	}
+
+	public final void closeDebugConnection() throws Exception {
+		in.close();
+		out.close();
+		conn.close();
+		scn.close();		
+	}
+
+	final void putDebugChar(int c) throws Exception {
+		out.write((byte)c);
+	}
+
+	final int getDebugChar() throws Exception {
+		return in.read();
+	}
+
+	final void putDebugChars(byte []c) throws Exception {
+		out.write(c);
+	}
+
+	final void transmissionNAK() throws Exception {
+		System.out.println("GDB transmission: NAK.");
+		putDebugChar('-');
+	}
+
+	final void transmissionACK() throws Exception {
+		System.out.println("GDB transmission: ACK.");
+		putDebugChar('+');
+	}
+
+	// we arrive here when a trap occurs in the mosync program
+	public final void exceptionHandler(int exception) throws Exception {
+		breaked = true;
+		System.out.println("Exception " + exception + " occured.");
+
+		outputBuffer.setLength(0);
+		outputBuffer.append("S00");
+		putPacket();
+
+		waitForRemote();
+	}
+
+	public final void exitHandler(int code) throws Exception {
+		outputBuffer.setLength(0);
+		outputBuffer.append("W");
+		outputBuffer.append(Integer.toHexString((code>>4)&0xf));
+		outputBuffer.append(Integer.toHexString((code)&0xf));
+		putPacket();
+	}
+
+	public final void waitForRemote() throws Exception {
+		breaked = true;
+		while(breaked == true) {
+			int b = getDebugChar();
+			if(b == -1) {
+				throw new IOException("Read error in putPacket()");
+			}
+			if(b != '+') {	//ignore extra Acks.
+				if(b != '$') {
+					throw new IOException("Bad byte: '" + (char)b + "' (" + b + ")");
+				}
+				if(!doPacket())
+					break;
+			}
+		}
+	}
+
+	// Required commands follows:
+	final boolean readRegisters() {
+		for(int i = 0; i < mCore.mRegs.length; i++) {
+			outputBuffer.append(getIntString(mCore.mRegs[i]));
+		}
+		outputBuffer.append(getIntString(mCore.mIP));
+		return true;
+	}
+
+	final boolean writeRegisters() {
+		int i;
+		for(i = 0; i < mCore.mRegs.length; i++) {
+			mCore.mRegs[i] = Integer.parseInt(inputBuffer.toString().substring(i<<3, (i<<2)+8), 16);
+		}
+		mCore.mIP = Integer.parseInt(inputBuffer.toString().substring(i<<3, (i<<2)+8), 16);
+		return true;
+	}
+
+	final boolean readMemory() {
+		int[] mem_ds = CORE.mMem_ds;
+		String args[] = StringSplitter.split(inputBuffer.toString(), ",");
+		int address = Integer.parseInt(args[0], 16);
+		int length = Integer.parseInt(args[1], 16);
+		byte b;
+		boolean code = (address & INSTRUCTION_MEMORY_START) != 0;
+		if(code)
+			address &= ADDRESS_MASK;
+		for(int i = 0; i < length; i++) {
+			if(code)
+				b = CORE.mMem_cs[address];
+			else
+				RBYTE_BASE(address, b, byte);
+			address++;
+			outputBuffer.append(getByteString(b));
+		}
+		return true;
+	}
+
+	final boolean writeMemory() {
+		int[] mem_ds = CORE.mMem_ds;
+		String args[] = StringSplitter.split(inputBuffer.toString(), ",");
+		String args2[] = StringSplitter.split(args[1], ":");
+		// args[0] == address, args2[0] == length, args2[1] == memory
+		int address = Integer.parseInt(args[0], 16);
+		int length = Integer.parseInt(args2[0], 16);
+		boolean code = (address & INSTRUCTION_MEMORY_START) != 0;
+		if(code)
+			address &= ADDRESS_MASK;
+		for(int i = 0; i < length; i++) {
+			String s = args2[1].substring(i<<1, (i<<1)+2);
+			int b = Integer.parseInt(s, 16);
+			System.out.println("Writing byte " + b + " (from '" + s + "') to " +
+				(code ? "code" : "data") + " memory @ 0x" + Integer.toHexString(address));
+			if(code)
+				CORE.mMem_cs[address] = (byte)b;
+			else
+				WBYTE_RAW(address, b);
+			address++;
+		}
+		outputBuffer.append("OK");
+
+		return true;
+	}
+
+	final boolean continueExec() {
+		breaked = false;		
+		String address = inputBuffer.toString();
+		if(address.length() != 0) {
+			CORE.mIP = Integer.parseInt(address, 16);
+		}
+		System.out.println("Continuing @ 0x" + Integer.toHexString(CORE.mIP) +
+			". opcode: " + CORE.mMem_cs[CORE.mIP]);
+		return true;
+	}
+
+	final boolean stepExec() throws Exception {
+		//overwrite next instruction... but where tf is it?
+		//The debugger would know. maybe it can handle a step.
+		//yeah... but what about a branch? no go there. we really need a proper Step function.
+		System.out.println("Stepping @ 0x" + Integer.toHexString(CORE.mIP) +
+			". opcode: " + CORE.mMem_cs[CORE.mIP]);
+		CORE.mIP = CORE.step();
+		System.out.println("Stepped to 0x" + Integer.toHexString(CORE.mIP));
+		return true;
+	}
+
+	// Optional commands follows:
+	final boolean lastSignal() {
+		return true;
+	}
+
+	final boolean readRegister() {
+		return true;
+	}
+
+	final boolean writeRegister() {
+		return true;
+	}
+
+	final boolean killRequest() {
+		return true;
+	}
+
+	final boolean toggleDebug() {
+		return true;
+	}
+
+	final boolean reset() {
+		return true;
+	}
+
+	final boolean search() {
+		return true;
+	}
+
+	final boolean generalSet() {
+		return true;
+	}
+
+	final boolean generalQuery() {
+		return true;
+	}
+
+	final boolean sectionOffsetsQuery() {
+		return true;
+	}
+
+	final boolean consoleOutput() {
+		return true;
+	}
+
+	final boolean defaultResponse() {
+		return false;
+	}
+
+	// Select and execute command:
+	final boolean executeCommand() throws Exception {
+		char instruction = inputBuffer.charAt(0);
+		inputBuffer.deleteCharAt(0);
+
+		System.out.println("GDB instruction " + instruction + " was sent from the client.");
+
+		switch(instruction) {
+
+			// required
+		case 'g': return readRegisters();
+		case 'G': return writeRegisters();
+		case 'm': return readMemory();
+		case 'M': return writeMemory();
+		case 'c': return continueExec();
+		case 's': return stepExec();
+
+			// optional;
+
+#if 0
+		case 'p': return readRegister();		
+		case 'P': return writeRegister();			
+		case '?': return lastSignal();
+		case 'k': return killRequest();
+		case 'd': return toggleDebug();
+		case 'r': return reset();
+		case 't': return search();
+		case 'q': 
+			{
+				if((inputBuffer.toString()).startsWith("Offsets") == true) {
+					return sectionOffsetsQuery();
+				} else {
+					return generalQuery();
+				}
+			}
+			case 'Q' return generalSet();
+				case 'O' return consoleOutput();
+#endif	//0
+
+		default:
+			//return defaultResponse();
+			//throw new Exception("Unknown GDB instruction '" + instruction + "'");
+			putPacket();	//empty packet means "not supported".
+			outputBuffer.setLength(0);
+			inputBuffer.setLength(0);
+			return true;
+		}
+	}
+
+	final void getPacket() throws Exception {
+		boolean finished = false;
+
+finished_label:
+		while(finished == false) {
+			while(true) {
+				int calculatedChecksum = 0;
+				int b;		
+				inputBuffer.setLength(0);	
+
+				// read data
+				while((b = getDebugChar()) != '#') {
+					if((b == -1)) {
+						break;
+					}
+					else {
+						calculatedChecksum += b;
+					}
+					inputBuffer.append((char)b);
+				}
+
+				// read checksum
+				int cs[] = new int[2];
+				if((cs[0] = getDebugChar()) == -1) {break;}
+				if((cs[1] = getDebugChar()) == -1) {break;}
+				int checksum = (Character.digit((char)cs[0], 16)<<4) | (Character.digit((char) cs[1], 16));
+
+				if((calculatedChecksum&0xff) != checksum) {
+					break;
+				}
+				System.out.print("Got packet!");
+				System.out.println("check sum: " + checksum);
+				finished = true;
+				break finished_label;
+			}
+			transmissionNAK();
+		}
+
+		System.out.println("packet data: " + inputBuffer.toString());		
+	}
+
+	final void putPacket() throws Exception {
+		int calculatedChecksum = 0;
+		int b;
+		String output = outputBuffer.toString();
+		System.out.println("putting packet with data: " + output);
+		calculatedChecksum = 0;
+		for(int i = 0; i < output.length(); i++) {
+			calculatedChecksum += output.charAt(i) & 0xff;
+		}
+
+		outputBuffer.insert(0, "$");
+		outputBuffer.append("#" + 
+			Integer.toHexString((calculatedChecksum>>4)&0xf) + 
+			Integer.toHexString((calculatedChecksum)&0xf));
+
+		byte outArray[] = outputBuffer.toString().getBytes();
+		System.out.println("putting packet: " + outputBuffer.toString());
+		int nacks = 0;
+		do {
+			for(int i = 0; i < outArray.length; i++) {
+				putDebugChar(outArray[i]);
+			}
+			int c = getDebugChar();
+			System.out.println("Response: "+(char)c+" ("+c+")");
+			if(c == '+')
+				return;
+			else if(c == -1) {
+				throw new IOException("Read error in putPacket()");
+			} else if(c == '-') {
+				nacks++;
+				if(nacks > MAX_NACKS)
+					throw new IOException("Too many NAKs in putPacket()");
+				System.out.println("NAK in putPacket(). re-transmitting.");
+			} else if(c == '$') {
+				doPacket();
+			} else {
+				throw new IOException("Bad ack: '" + (char)c + "' (" + c + ")");
+			}
+		} while(true);
+	}
+
+	// Read and execute command and send reply.
+	final boolean doPacket() throws Exception {
+		outputBuffer.setLength(0);
+		inputBuffer.setLength(0);
+
+		getPacket();
+		transmissionACK();
+
+		if(executeCommand() == false) {
+			// command arguments or command were wrong somehow.
+			//transmissionNAK();
+			return false;
+		}
+
+		if(outputBuffer.length() > 0)
+			putPacket();
+
+		return true;
+	}
+}
+
+#endif	//GDB_DEBUG

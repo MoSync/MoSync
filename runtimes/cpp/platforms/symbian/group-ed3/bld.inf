@@ -1,0 +1,10 @@
+PRJ_PLATFORMS
+WINSCW GCCE
+
+PRJ_EXPORTS
+
+PRJ_MMPFILES
+
+gnumakefile icons_scalable_dc.mk
+
+MoSync.mmp

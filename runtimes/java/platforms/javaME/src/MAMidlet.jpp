@@ -1,0 +1,248 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+import javax.microedition.midlet.MIDlet;
+import javax.microedition.lcdui.*;
+import javax.microedition.rms.*;
+import javax.microedition.io.*;
+import java.io.*;
+
+#include "helpers.h"
+#include "generated\MAAPI_consts.h"
+
+public final class MAMidlet extends MIDlet {
+	MainCanvas mCanvas;
+	Thread mThread;
+	private boolean mNotifyDestroyed = true;
+	static MAMidlet self;	//used by WorkerThread
+
+#if defined(BLUETOOTH_LOG) || defined(TCP_LOG) || defined(PUBLIC_DEBUG)
+	static PrintStream out;
+
+	private static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
+		StreamConnection sc = (StreamConnection)Connector.open(url, Connector.WRITE);
+		return new PrintStream(sc.openOutputStream());
+	}
+#endif
+
+	public MAMidlet() throws Throwable {
+		try {
+			self = this;
+#if defined(BLUETOOTH_LOG) && defined(TCP_LOG)
+#error double definition
+#endif
+#ifdef BLUETOOTH_LOG
+			out = makeConnectionPrintStream("btspp://0011679cd93c:2");	//MS-FREDRIK
+			out.println("Hello World!");
+			out.flush();
+#endif
+#ifdef TCP_LOG
+			out = makeConnectionPrintStream("socket://130.237.3.118:1717");	//MS-FREDRIK
+#endif
+
+#ifdef PUBLIC_DEBUG
+			InputStream is = getClass().getResourceAsStream("debug.url");
+			if(is!=null) {
+				byte[] b = new byte[is.available()];
+				is.read(b);
+				String debugUrl = new String(b);
+				out = makeConnectionPrintStream(debugUrl);
+			}
+#endif
+			mCanvas = new MainCanvas(this);
+
+			mThread = new Thread(mCanvas);
+			/*DUMP(Thread.activeCount());
+			DUMP(Thread.currentThread().getPriority());
+			DUMP(mThread.getPriority());
+			DUMP(Thread.MAX_PRIORITY);
+			DUMP(Thread.MIN_PRIORITY);
+			DUMP(Thread.NORM_PRIORITY);*/
+			//should improve Close Button response times on hardware, but I don't think it does.
+			mThread.setPriority(Thread.MIN_PRIORITY);//Thread.NORM_PRIORITY - 1);
+
+			/*String[] stores = RecordStore.listRecordStores();
+			DEBUG_ALWAYS(""+stores.length+" stores\n");
+			for(int i=0; i<stores.length; i++) {
+			DEBUG_ALWAYS(""+i+": "+stores[i]+"\n");
+			}*/
+			/*RecordStore store = RecordStore.openRecordStore("test", true);
+			DUMP(store.getSize());
+			DUMP(store.getSizeAvailable());
+			DUMP(store.getVersion());
+			DUMP(store.getNumRecords());
+			DUMP(store.getNextRecordID());
+			DUMP(store.getLastModified());*/
+		} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+			if(mCanvas != null)
+				programError("Loading error", e);
+			else
+				throw e;
+		}
+	}
+
+	private boolean mStarted = false;
+
+	public final void startApp() {
+		try {
+			if(mCanvas != null) {
+				if(!mStarted) {
+#ifdef MOSYNC_COMMERCIAL
+					mCanvas.createCore();
+					mCanvas.initDisplay();
+#else	//non-commercial
+					mCanvas.startupAlert();
+#endif
+					mStarted = true;
+				} else {	//back from Pause
+					int[] event = new int[1];
+					EI_TYPE = EVENT_TYPE_FOCUS_GAINED;
+					mCanvas.postEvent(event);
+				}
+			}
+		} catch (Exception e) {
+			PRINT_STACK_TRACE;
+			//BIG_PHAT_ERROR;
+			programError("Starting error", e);
+		} finally {
+			DEBUG_ALWAYS("MAMidlet.startApp() ends\n");
+		}
+	}
+
+	public final void pauseApp() {
+		try {
+			//mCanvas.stop();
+			int[] event = new int[1];
+			EI_TYPE = EVENT_TYPE_FOCUS_LOST;
+			mCanvas.postEvent(event);
+			notifyPaused();
+		} catch (Exception e) {
+			PRINT_STACK_TRACE;
+			//BIG_PHAT_ERROR;
+			programError("Pausing error", e);
+		} finally {
+			DEBUG_ALWAYS("MAMidlet.pauseApp() ends\n");
+		}
+	}
+
+	public final void destroyApp(boolean unconditional) {
+		try {
+			DEBUG_ALWAYS("MAMidlet.destroyApp\n");
+			mNotifyDestroyed = false;
+			if(mCanvas.mCore != null) {
+#ifndef MOSYNC_STATIC_JAVA
+				mCanvas.mReload = false;
+#endif
+				mCanvas.setClose();
+				synchronized(mThread) {
+					long startTime = System.currentTimeMillis();
+					mThread.wait(EVENT_CLOSE_TIMEOUT);
+					if(System.currentTimeMillis() - startTime >= EVENT_CLOSE_TIMEOUT) {
+						programError("Timeout."/*+Integer.toHexString(mCanvas.mCore.IP)*/);
+						//Set IP to illegal value, in order to provoke an Exception.
+						//mCanvas.mCore.IP = mCanvas.mCore.mem_cs.length;
+					}
+				}
+
+				if(mCanvas.mCore != null) {
+					mCanvas.mCore.interrupt();
+				}
+
+				mThread.join();	//if we don't join the mThread, on some platforms, the midlet won't close.
+			}
+			this.destruct();
+		} catch (Exception e) {
+			PRINT_STACK_TRACE;
+			//BIG_PHAT_ERROR;
+			programError("Destructive error", e);
+		} finally {
+			notifyDestroyed();
+			DEBUG_ALWAYS("MAMidlet.destroyApp() ends\n");
+		}
+	}
+
+	private boolean destructing = false;
+
+	public final void destruct() {
+		DEBUG_ALWAYS("MAMidlet.destruct()\n");
+
+		if(destructing) {
+			DEBUG_ALWAYS("MAMidlet.already_destructing\n");
+			return;
+		}
+		destructing = true;
+
+		try {
+			//why do this?
+			//DEBUG_ALWAYS("Display.getDisplay(this).setCurrent()\n");
+			//Display.getDisplay(this).setCurrent(null);
+			//DEBUG_ALWAYS("Display.getDisplay(this).setCurrent() done\n");
+
+			MYASSERT(mCanvas != null);
+			if(mCanvas.mCore != null) {
+				DEBUG_ALWAYS("mCanvas.mCore.destruct()\n");
+				mCanvas.mCore.destruct();
+				mCanvas.mCore = null;
+			}
+			DEBUG_ALWAYS("mCanvas.mTimer.cancel()\n");
+			mCanvas.mTimer.cancel();
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+		} finally {
+			if(mNotifyDestroyed) {
+				DEBUG_ALWAYS("notifyDestroyed()\n");
+				notifyDestroyed();
+			}
+			DEBUG_ALWAYS("MAMidlet.destruct() ends\n");
+		}
+	}
+
+	public final void programError(String message) {
+		DEBUG_ALWAYS("programError \"" + message + "\"\n");
+#ifdef PUBLIC_DEBUG
+		int ip = -1;
+		if(mCanvas.mCore != null)
+		{
+			if(mCanvas.mCore.mMem_cs != null)
+			{
+				ip = mCanvas.mCore.mIP;
+			}
+		}
+		MAPanicReport pr = new MAPanicReport();
+		pr.writePanicReport(REPORT_EXCEPTION, 0, message, ip);
+#endif
+		mCanvas.SetAlert("Program Error", message);
+	}
+
+	public final void programError(String message, Throwable e) {
+#ifdef PUBLIC_DEBUG
+		int ip = -1;
+		if(mCanvas.mCore != null)
+		{
+			if(mCanvas.mCore.mMem_cs != null)
+			{
+				ip = mCanvas.mCore.mIP;
+			}
+		}
+		MAPanicReport pr = new MAPanicReport();
+		pr.writePanicReport(REPORT_EXCEPTION, 0, message, ip);
+#endif
+		DEBUG_ALWAYS("programError \"" + message + "\"\n");
+		mCanvas.SetAlert("Program Error", message, e);
+	}
+}

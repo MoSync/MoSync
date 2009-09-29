@@ -1,0 +1,540 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "generated/core_consts.h"
+#include "helpers.h"
+#include "core_helpers.h"
+//#include "asm_config.h"
+
+import java.io.*;
+
+#define CORE this
+
+#ifdef GDB_DEBUG
+#include "GdbStub.h"
+#endif
+
+final public class Core {
+	STATIC int mMem_ds[];
+	STATIC int mMEM_DS_SIZE;
+
+	Syscall mSyscall;
+	MainCanvas mCanvas;
+	
+#ifdef GDB_DEBUG
+	GdbStub mGdbStub;
+#endif
+
+	//***************************************************************************
+	// Common
+	//***************************************************************************
+
+	public final void destruct() throws Exception {
+		mSyscall.destruct();
+		
+#ifdef GDB_DEBUG
+		mGdbStub.closeDebugConnection();
+#endif
+	}
+
+	//***************************************************************************
+	//Memory access
+	//***************************************************************************
+#ifdef DEBUG_MEMORY
+#ifdef MOSYNC_STATIC_JAVA
+#define DEBUG_ALWAYS_IP(a) DEBUG_ALWAYS(a +"\n")
+#else
+#define DEBUG_ALWAYS_IP(a) DEBUG_ALWAYS(a + " @ IP 0x"+Integer.toHexString(mIP)+"\n")
+#endif
+
+	final byte rbyte(int addr) THE {
+		if(addr > (mMEM_DS_SIZE-1) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: rbyte out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		int shift = BYTEPART(addr) << 3;
+		return (byte)((mMem_ds[INTPART(addr)] >> shift) & 0x0ff);
+	}
+
+	final void wbyte(int addr, byte b) THE {
+		if(addr > (mMEM_DS_SIZE-1) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: wbyte out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		int shift = BYTEPART(addr) << 3;
+		mMem_ds[INTPART(addr)] = (mMem_ds[INTPART(addr)] & ~(0x000000ff << shift)) |
+			((((int)b) & 0x0ff) << shift);
+	}
+
+	final int rint(int addr) THE {
+		if(addr > (mMEM_DS_SIZE-4) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: rint out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		if(BYTEPART(addr) != 0) {
+			DEBUG_ALWAYS_IP("ERROR: rint alignment error (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		return mMem_ds[INTPART(addr)];
+	}
+
+	final void wint(int addr, int i) THE {
+		if(addr > (mMEM_DS_SIZE-4) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: wint out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		if(BYTEPART(addr) != 0) {
+			DEBUG_ALWAYS_IP("ERROR: wint alignment error (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		mMem_ds[INTPART(addr)] = i;
+	}
+
+	final short rshort(int addr) THE {
+		if(addr > (mMEM_DS_SIZE-2) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: rshort out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		if((addr & 1) != 0) {
+			DEBUG_ALWAYS_IP("ERROR: rshort alignment error (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		int shift = BYTEPART(addr) << 3;
+		return (short)((mMem_ds[INTPART(addr)] >> shift) & (0xffff));
+	}
+
+	final void wshort(int addr, short s) THE {
+		if(addr > (mMEM_DS_SIZE-2) || addr < 0) {
+			DEBUG_ALWAYS_IP("ERROR: wshort out of bounds (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		if((addr & 1) != 0) {
+			DEBUG_ALWAYS_IP("ERROR: WSHORT alignment error (0x"+Integer.toHexString(addr)+")");
+			BIG_PHAT_ERROR;
+		}
+		int shift = BYTEPART(addr) << 3;
+		mMem_ds[INTPART(addr)] = (mMem_ds[INTPART(addr)] & ~(0x0000ffff << shift)) |
+			((((int)s) & (0xffff)) << shift);
+	}
+#endif	//DEBUG_MEMORY
+
+	//***************************************************************************
+	// Static
+	//***************************************************************************
+
+#ifdef MOSYNC_STATIC_JAVA
+	StaticCode mStaticCode = new StaticCode();
+	int Head_AppCode;
+
+	public Core(MainCanvas aCanvas, String resname) throws Exception {
+		mMem_ds = mStaticCode.mem_ds;
+		mMEM_DS_SIZE = mMem_ds.length;
+		Head_AppCode = 0;
+		mCanvas = aCanvas;
+		mSyscall = new Syscall(this, aCanvas);
+		DEBUG_ASSERT(mSyscall != null);
+
+		InputStream resources = getClass().getResourceAsStream(resname);
+		if(resources == null) {
+			mSyscall.LoadResourcesFromStream(null, null);
+		} else {
+			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(resources);
+			mSyscall.LoadResourcesFromStream(llis, resname);
+			llis.close();
+		}
+	}
+
+	public void run() throws Exception {
+		mStaticCode.run(mSyscall);
+	}
+
+	public void interrupt() {
+		//won't work 100%. example MoSync code: while(1);
+		mStaticCode.mem_ds = null;
+		mStaticCode.syscall = null;
+	}
+#else
+	//***************************************************************************
+	// Dynamic
+	//***************************************************************************
+
+#define _MA_HEAD(m)\
+	m(int, Magic)\
+	m(int, CodeLen)\
+	m(int, DataLen)\
+ 	m(int, DataSize)\
+	m(int, StackSize)\
+	m(int, HeapSize)\
+ 	m(int, AppCode)\
+	m(int, AppID)\
+ 	m(int, EntryPoint)\
+	m(int, IntLen)\
+
+#define DEFINE_HEAD_VAR(type, name) STATIC type Head_##name;
+	_MA_HEAD(DEFINE_HEAD_VAR);
+
+	//all member variables have 'm' prefix and (sorta) camel case.
+	STATIC byte mMem_cs[];
+	STATIC int mMem_cp[];
+	
+	STATIC int mRegs[];
+
+	STATIC int mIP;
+	STATIC boolean mVM_Yield;
+#ifndef PHONE_RELEASE
+	STATIC public int mInstCount = 0;
+#endif
+	//public long mEndTime;
+
+#ifdef PUBLIC_DEBUG
+	int mLastSyscall = INVALID_SYSCALL_NUMBER;
+#endif
+
+	public Core(MainCanvas aCanvas, String modname, String resname) throws Exception {
+		mCanvas = aCanvas;
+		mSyscall = new Syscall(this, aCanvas);
+		DEBUG_ASSERT(mSyscall != null);
+
+		{
+			LittleEndianDataInputStream llis =
+				new LittleEndianDataInputStream(getClass().getResourceAsStream(modname));
+			LoadVMApp(llis);
+			llis.close();
+		}
+
+		InputStream resources = getClass().getResourceAsStream(resname);
+		if(resources == null) {
+			mSyscall.LoadResourcesFromStream(null, null);
+		} else {
+			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(resources);
+			mSyscall.LoadResourcesFromStream(llis, resname);
+			llis.close();
+		}
+	}
+
+	public Core(MainCanvas aCanvas, InputStream programStream) throws Exception {
+		mCanvas = aCanvas;
+		mSyscall = new Syscall(this, aCanvas);
+
+		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
+		LoadVMApp(file);
+		if(file.available()==0) {
+			mSyscall.LoadResourcesFromStream(null, null);		
+		} else {
+			mSyscall.LoadResourcesFromStream(file, null);
+		}
+	}
+
+	//***************************************************************************
+	//Initialization
+	//***************************************************************************
+
+	final int nextPowerOf2(int min, int x) {	//arguments are assumed to be positive
+		int i = min;
+		while(i < x) {
+			i <<= 1;		
+		}
+		return i;
+	}
+
+	final void GenConstTable() {
+#ifdef REGS_128
+		int n, p;
+		int mask;
+		int[] regs = mRegs;
+
+		p = 32;
+
+		for (n=1;n<17;n++)
+		{
+			regs[p++] = n;
+			regs[p++] = -n;
+		}
+
+		mask = 0x20;
+
+		for (n=0;n<32-5;n++)
+		{
+			regs[p++] = mask-1;
+			regs[p++] = mask;
+			mask <<= 1;
+		}
+
+		mask = 0x10;
+
+		for (n=0;n<10;n++)
+		{
+			regs[p++] = mask ^ 0xffffffff;
+			mask <<= 1;
+		}
+#else	//256
+		int n;
+		for(n=0;n<32;n++)
+			regs[n] = 0;
+		for(n=1;n<49;n++) {
+			regs[n + 31] = n;
+			regs[n + 79] = -n;
+		}
+		for(n=128;n<256;n++) {
+			int mask = 0x01;
+			int m;
+			for(m=0;m<(n & 0x1f);m++) {
+				mask <<= 1;
+				if((n & 0x40) != 0)
+					mask |= 0x01;
+			}
+			if((n & 0x20) != 0)
+				mask ^= 0xffffffff;
+			regs[n] =  mask;
+		}
+#endif
+	}
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
+	int mCustomEventPointer;
+#endif
+	int mCustomMemPointer;
+
+	final void LoadVMApp(LittleEndianDataInputStream file) throws Exception {
+		InitVM();
+		LoadVM(file);
+		int[] regs = mRegs;
+
+		mCustomMemPointer = mMEM_DS_SIZE;
+
+#ifdef MA_PROF_SUPPORT_OPENGL_ES
+		/*
+		mSyscall.maGLInit();
+		String [] openglStrings = mSyscall.readOpenglStrings();
+		Syscall.maGLClose();
+
+		int totalOpenglStringSize = 0;
+		for(int i = 0; i < openglStrings.length; i++) totalOpenglStringSize += openglStrings[i].length()+1;
+		mSyscall.mOpenglStringsPointers = new int[openglStrings.length];
+		mCustomMemPointer -= totalOpenglStringSize;
+		int ptr = mCustomMemPointer;
+		for(int i = 0; i < openglStrings.length; i++) {
+			mSyscall.mOpenglStringsPointers[i] = ptr;
+			for(int j = 0; j < openglStrings[i].length(); j++) {
+				wbyte(ptr++, (byte)openglStrings[i].charAt(j));
+			}
+			wbyte(ptr++, (byte)0);
+		}
+		*/
+#endif
+
+		// Init regs + IP
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
+		//allocate space for location event structs
+		mCustomEventPointer = mCustomMemPointer - 36;
+		regs[REG_sp] = mCustomEventPointer - 16;
+#else
+		regs[REG_sp] = mCustomMemPointer - 16;
+#endif
+		regs[REG_i0] = mMEM_DS_SIZE;
+		regs[REG_i1] = Head_StackSize;
+		regs[REG_i2] = Head_HeapSize;
+		DDUMP(Head_EntryPoint);
+		mIP = Head_EntryPoint;
+	}
+
+	final void InitVM()
+#ifdef GDB_DEBUG
+		throws Exception
+#endif 
+	{
+		mVM_Yield = false;
+
+		//unneccesary in Java; arrays are zeroed by default
+		/*PMemZero(mem_cs, sizeof(mem_cs));
+		PMemZero(mem_ds, sizeof(mem_ds));
+		PMemZero(mem_cp, sizeof(mem_cp));*/
+
+		int[] regs = mRegs = new int[NREGS];
+
+		GenConstTable();
+
+#ifdef _DEBUG
+		DEBUG("Regs:\n");
+		for(int i=0; i<NREGS; i++) {
+			DEBUG(""+i+": 0x"+Integer.toHexString(regs[i])+"("+regs[i]+")\n");
+		}
+		DEBUG("\n");
+#endif
+
+#ifdef GDB_DEBUG
+		mGdbStub = new GdbStub(this);
+		mGdbStub.setupDebugConnection();
+#endif 
+	}
+
+	void LoadVM(LittleEndianDataInputStream file) throws Exception {
+		try {
+			if(file.available() == 0) {
+				BIG_PHAT_ERROR;
+			}
+
+#define HEAD_READ_VAR(type, name) Head_##name = file.CAP_##type(read)();\
+	DDUMP(Head_##name);
+
+			DEBUG_LOAD("Load Header\n");
+			_MA_HEAD(HEAD_READ_VAR);
+
+			if(Head_Magic != 0x5844414d) {	//MADX
+				DEBUG_ALWAYS("Magic error: 0x"+Integer.toHexString(Head_Magic)+" should be 0x5844414d\n");
+				BIG_PHAT_ERROR;
+			}
+
+			DEBUG_LOAD("Load Code ("+Head_CodeLen+" bytes)\n");
+			DEBUG_ASSERT(Head_CodeLen > 0);
+			mMem_cs = new byte[Head_CodeLen];
+			file.readFully(mMem_cs);
+
+			mMEM_DS_SIZE = nextPowerOf2(64*1024, Head_DataSize);
+			DUMP(mMEM_DS_SIZE);
+			MYASSERT((mMEM_DS_SIZE & 3) == 0);	
+	
+			int[] mem_ds = mMem_ds = new int[mMEM_DS_SIZE >> 2];
+
+			DEBUG_LOAD("Load Data ("+Head_DataLen+" bytes)\n");
+			if(Head_DataLen > 0) {
+				/*int nDataInts = Head_DataLen / 4;
+				if(nDataInts * 4 != Head_DataLen) {
+				DEBUG_ALWAYS("WARNING: Data section length is unaligned ("+Head_DataLen+")\n");
+				BIG_PHAT_ERROR;
+				}*/
+				int intpart = INTPART(Head_DataLen);
+				for(int i=0; i<intpart; i++) { // Load data
+					mem_ds[i] = file.readInt();
+				}
+				for(int i=0; i<BYTEPART(Head_DataLen); i++) {
+					WBYTE((intpart << 2) + i, (byte)file.read());
+				}
+			}
+
+			DEBUG_LOAD("Load Constants ("+Head_IntLen+" ints)\n");
+			int[] mem_cp = mMem_cp = new int[Head_IntLen];
+			if(Head_IntLen > 0) {
+				for(int i=0; i<Head_IntLen; i++) { // Load constant pool
+					mem_cp[i] = file.readInt();
+				}
+			}
+
+			DEBUG("Constant pool ("+Head_IntLen+" entries):\n");
+			for(int i=0; i<Head_IntLen; i++) {
+				DEBUG(""+i+": 0x"+Integer.toHexString(mem_cp[i])+"("+mem_cp[i]+")\n");
+			}
+			DEBUG("\n");
+
+		} catch(IOException e) {
+			PRINT_STACK_TRACE;
+			BIG_PHAT_ERROR;
+		}
+	}
+
+	//***************************************************************************
+	//Misc
+	//***************************************************************************
+
+	void yield() {
+		mVM_Yield = true;
+		Thread.yield();
+	}
+
+	/*boolean timeToClose() {
+		if(G_CLOSING)
+			if(System.currentTimeMillis() >= mEndTime) {
+				mCanvas.SetExit(-1);
+				return true;
+			}
+		return false;
+	}*/
+
+	//***************************************************************************
+	//Syscalls
+	//***************************************************************************
+#include "syscall_converters.h"
+
+	double ints2double(int hiw, int low) {
+		//DEBUG_SC("("+hiw+","+low+")->");
+		//DEBUG_SC("("+UINT(low)+")");
+		long l = (((long)hiw) << 32) | UINT(low);
+		double d = Double.longBitsToDouble(l);
+		debug_double(l, d);
+		return d;
+	}
+
+	final void InvokeSysCall(int type) throws Exception {
+		int[] regs = mRegs;
+#ifdef PUBLIC_DEBUG
+		mLastSyscall = type;
+#endif
+
+#define CALL_SYSCALL(name) mSyscall.name
+#define MACString Address
+#define CMACString Address
+#define MAOUT(type) Address
+#define MAIN(type) type
+		switch(type) {
+#include "generated/invoke_syscall_java.h"
+		default:  //bad syscall
+			LOGSC("\tno syscall default("+type+")\n");
+			BIG_PHAT_ERROR;
+		}
+	}
+
+#define EXEC_NAME run
+#define EXEC_LOOP while(true)
+#define EXEC_RETURN
+#include "core_run.h"
+#undef EXEC_NAME
+#undef EXEC_LOOP
+#undef EXEC_RETURN
+
+#ifdef GDB_DEBUG
+#define EXEC_NAME step
+#define EXEC_LOOP
+#define EXEC_RETURN return IP;
+#include "core_run.h"
+#undef EXEC_NAME
+#undef EXEC_LOOP
+#undef EXEC_RETURN
+#endif	//GDB_DEBUG
+
+	public static void bytefill(byte[] array, byte value) {
+		int len = array.length;
+		if (len > 0)
+			array[0] = value;
+		for (int i = 1; i < len; i += i)
+			System.arraycopy(array, 0, array, i, ((len - i) < i) ? (len - i) : i);
+	}
+
+	public void interrupt() {
+		//set all instructions to ENDOP
+		bytefill(mMem_cs, (byte)ENDOP);
+	}
+#endif	//MOSYNC_STATIC_JAVA
+}
+
+#ifdef MOSYNC_STATIC_JAVA
+final class StaticCode
+{
+	int __dbl_high;
+	Syscall syscall;
+	int mem_ds[];
+	void run(Syscall s) {}
+}
+#endif

@@ -1,0 +1,528 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+import java.io.*;
+
+// this will be a PngWriter stream to support creation of emulating raw 
+// image data as a png as a workaround for a bug mostly found on sony 
+// ericsson devices.
+
+// the minimal png looks as follows (chunks): 
+// | IHDR | IDAT | IEND |
+// IHDR: information about the image
+// IDAT: image data packed using zlib deflate method 
+// (so bascially a zlib stream).
+// IEND: just an empty end-chunk
+
+// a zlib stream looks as follows:
+// first 2 byte header with information about the stream
+// then blocks follows where each block begins with three bits 
+// (flags) describing the block, each block can be at most
+// 32768 bytes large (which is what I use). an uncompressed block
+// use the first byte for flags (where only three bits are used).
+ 
+#include "helpers.h"
+#include "core_helpers.h" 
+#define CORE mCore
+  
+#define DBG_PRINT(x) System.out.println(x)
+  
+final class ChecksumCalculator {
+
+   /* Table of CRCs of all 8-bit messages. */
+   private static long crc_table[] = new long[256];
+   
+   /* Flag: has the table been computed? Initially false. */
+   private static boolean crc_table_computed = false;
+   
+   /* Make the table for a fast CRC. */
+   private static final void make_crc_table()
+   {
+	if(crc_table_computed == true) return;
+	crc_table_computed = true;
+	
+     long c;
+     int n, k;
+   
+     for (n = 0; n < 256; n++) {
+       c = (long) n;
+       for (k = 0; k < 8; k++) {
+         if ((c & 1) != 0)
+           c = (long) 0xedb88320 ^ (c >>> 1);
+         else
+           c = c >>> 1;
+       }
+       crc_table[n] = c;
+     }
+   }
+   
+   /* Update a running CRC with the bytes buf[0..len-1]--the CRC
+      should be initialized to all 1's, and the transmitted value
+      is the 1's complement of the final running CRC (see the
+      crc() routine below)). */
+   
+	public static final long update_crc(long crc, int offset, byte buf[],
+                            int len)
+   {
+     long c = crc;
+     int n;
+   
+     if (!crc_table_computed)
+       make_crc_table();
+     for (n = offset; n < len; n++) {
+       c = crc_table[(int)((c ^ (long)buf[n]) & (long)0xff)] ^ (c >>> 8);
+     }
+     return c;
+   }
+   
+   /* Return the CRC of the bytes buf[0..len-1]. */
+   public static final long crc(byte buf[], int offset, int len)
+   {
+     return update_crc(0xffffffff, offset, buf, len) ^ 0xffffffff;
+   }	
+   
+   public static final long update_crc(long c, byte val) {
+     int n;
+   
+     if (!crc_table_computed)
+       make_crc_table();
+      
+     c = crc_table[(int)((c ^ (long)val) & (long)0xff)] ^ (c >>> 8);
+
+     return c;   
+   }
+}
+
+final class PngStream extends InputStream {
+	private int imageSize;
+	private int imageSizeBytes;
+	private int totalFileSize;
+	private int pos = 0;
+	
+	private int memory[];
+	private int imageOffset;
+	
+	private int curImageOffset = 0;
+	private int chunkChange = 0;
+		
+	private static final int	CHUNK_Size = 12;
+	private static final int	IHDR_Size = 25;
+	private static final int	IDAT_HDR_Size = 8;
+		
+	static final int			IDAT_Zlib_HDR_Size = 2;
+	private static final int	IEND_Size = 12;
+	
+	private int					IDAT_Size;
+	private static int			IDAT_Start, 
+								IHDR_Start, 
+								IEND_Start;
+	private static int			IDAT_End, 
+								IHDR_End, 
+								IEND_End;
+								
+	private byte				[]IHDR_Data;
+	private byte				[]IDAT_Data; // except crc
+	private byte				[]IDAT_ZLib_HDR;
+	private int					IDAT_ZLib_NumBlocks;
+	private int					IDAT_ZLib_Adler_Checksum;
+	private int					IDAT_Crc;
+
+	private byte				[]IEND_Data;
+
+	private int					actualImageSize;	
+	private int					actualZlibCompressedImageSize;
+	
+	private int					width,
+								height;
+	
+	private Core				mCore;
+		
+	#define BASE 65521 /* largest prime smaller than 65536 */
+	
+    final long update_adler32(long adler, byte val)
+    {
+      long s1 = adler & 0xffff;
+      long s2 = (adler >>> 16) & 0xffff;
+      int n;
+      
+      s1 = (s1 + val) % BASE;
+      s2 = (s2 + s1)  % BASE;
+
+      return (s2 << 16) + s1;
+    }		
+		
+	final int calculateAdlerChecksum() {
+		int mem_ds[] = CORE.mMem_ds;       
+		long adler = 1;
+		int memoryPtr = imageOffset;
+		for(int y = 0; y < height; y++) {
+			// first calculate adler for scanline filter type
+			adler = update_adler32(adler, (byte)0);
+			for(int x = 0; x < width<<2; x++) {
+				byte ret;
+				RBYTE(memoryPtr, ret);
+				adler = update_adler32(adler, ret);
+				memoryPtr++;
+			}
+		}
+		return (int)adler;
+	}
+	
+	final int calculateIDATChecksum() {
+		int mem_ds[] = CORE.mMem_ds;
+		long crc = 0xffffffff;
+		
+		for(int i = 4; i < IDAT_HDR_Size; i++) {
+			crc = ChecksumCalculator.update_crc(crc, IDAT_Data[i]);
+		}
+		
+		for(int i = 0; i < IDAT_Zlib_HDR_Size; i++) {
+			crc = ChecksumCalculator.update_crc(crc, IDAT_ZLib_HDR[i]);		
+		}
+		
+		int memoryPtr = imageOffset;
+		int bytePtr = 0;
+		for(int y = 0; y < height; y++) {
+			// if start of block calculate checksum for block header		
+			if((bytePtr%32768) == 0){ 
+				int BFINAL = 0, BTYPE = 0;
+				if(bytePtr+32768>=actualZlibCompressedImageSize) {
+					BFINAL = 1; // this is the final block.
+				}
+				crc = ChecksumCalculator.update_crc(crc, (byte)((BFINAL&0x1)|((BTYPE&0x3)<<2)));
+			}
+			
+			// first calculate adler for scanline filter type
+			crc = ChecksumCalculator.update_crc(crc, (byte)0);
+			bytePtr++;
+			
+			for(int x = 0; x < width<<2; x++) {
+				// if start of block calculate checksum for block header					
+				if((bytePtr%32768) == 0){ 
+					int BFINAL = 0, BTYPE = 0;
+					if(bytePtr+32768>=actualZlibCompressedImageSize) {
+						BFINAL = 1; // this is the final block.
+					}
+					crc = ChecksumCalculator.update_crc(crc, (byte)((BFINAL&0x1)|((BTYPE&0x3)<<2)));
+				}			
+				byte ret;
+				RBYTE(memoryPtr, ret);
+				crc = ChecksumCalculator.update_crc(crc, ret);
+				memoryPtr++;
+				bytePtr++;
+			}
+		}		
+		
+		byte checksum[] = new byte[4];
+		writeInt(checksum, 0, IDAT_ZLib_Adler_Checksum);
+		crc = ChecksumCalculator.update_crc(crc, checksum[0]);
+		crc = ChecksumCalculator.update_crc(crc, checksum[1]);
+		crc = ChecksumCalculator.update_crc(crc, checksum[2]);
+		crc = ChecksumCalculator.update_crc(crc, checksum[3]);	
+		
+		crc ^= 0xffffffff;
+		
+		return (int)crc;									
+	}
+		
+	final void writeShort(byte []mem, int ofs, short val) {
+		mem[ofs+0] = (byte)((val&0xff00)>>8);
+		mem[ofs+1] = (byte)(val&0x00ff);
+	}
+	
+	final void writeInt(byte []mem, int ofs, int val) {
+		mem[ofs+0] = (byte)((val&0xff000000)>>24);
+		mem[ofs+1] = (byte)((val&0x00ff0000)>>16);
+		mem[ofs+2] = (byte)((val&0x0000ff00)>>8);
+		mem[ofs+3] = (byte)(val&0x000000ff);		
+	}
+	
+	PngStream(Core core, int imageOffset, int width, int height) {
+		this.mCore = core;
+		this.imageOffset = curImageOffset = imageOffset;
+		this.width = width;
+		this.height = height;
+		
+		imageSize = width*height;
+		imageSizeBytes = imageSize*4;
+				
+		// calculate actual IDAT_Size (each scan line 
+		// has a byte describing the filter type for that scan line)
+		actualImageSize = (height + imageSizeBytes);
+
+		// 1 byte for scanline filtering type and 
+		// 1 byte for compression block flags
+		// each block is width+1 bytes big
+		IDAT_ZLib_NumBlocks = ((actualImageSize)/32767) + 1;
+		actualZlibCompressedImageSize = IDAT_ZLib_NumBlocks*32768;
+		IDAT_Size = CHUNK_Size + 
+					IDAT_Zlib_HDR_Size + 
+					actualZlibCompressedImageSize; 
+
+		totalFileSize = IHDR_Size + IDAT_Size + IEND_Size; // IHDR+IDAT+IEND
+		DBG_PRINT("totalFileSize: " + totalFileSize);
+		
+		IHDR_Start	= 0;
+		IHDR_End	= IHDR_Start+IHDR_Size;
+		IDAT_Start	= IHDR_End;
+		IDAT_End	= IDAT_Start+IDAT_Size;
+		IEND_Start	= IDAT_End;
+		IEND_End	= IEND_Start+IEND_Size;
+		DBG_PRINT("IHDR_Start: " + IHDR_Start);
+		DBG_PRINT("IHDR_End: " + IHDR_End);
+		DBG_PRINT("IDAT_Start: " + IDAT_Start);
+		DBG_PRINT("IDAT_End: " + IDAT_End);
+		DBG_PRINT("IEND_Start: " + IEND_Start);
+		DBG_PRINT("IEND_End: " + IEND_End);
+									
+		//-----------------------------------------------------------------------		
+		// write IHDR
+		IHDR_Data	= new byte[IHDR_Size];
+
+		// write length of data
+		writeInt(IHDR_Data, 0, IHDR_Size-CHUNK_Size); 
+		DBG_PRINT("IHDR length: " + (IHDR_Size-CHUNK_Size));
+					
+		// write type
+		IHDR_Data[4] = 'I'; 
+		IHDR_Data[5] = 'H'; 
+		IHDR_Data[6] = 'D'; 
+		IHDR_Data[7] = 'R'; 
+		
+		// write width and height
+		writeInt(IHDR_Data, 8, width);
+		writeInt(IHDR_Data, 12, height);
+		DBG_PRINT("IHDR width: " + width);	
+		DBG_PRINT("IHDR height: " + height);	
+				
+		// write flags
+		IHDR_Data[16] = 8;			// bit depth
+		IHDR_Data[17] = 0x2|0x4;	// color used + alpha
+		IHDR_Data[18] = 0;			// compression method: deflate with sliding window
+		IHDR_Data[19] = 0;			// filter method: none
+		IHDR_Data[20] = 0;			// interlace method: none
+		
+		// write crc
+		int crc = (int)ChecksumCalculator.crc(IHDR_Data, 4, 17);
+		writeInt(IHDR_Data, 21, crc);	
+		DBG_PRINT("IHDR crc: " + crc);	
+				
+		//-----------------------------------------------------------------------
+		// write IDAT
+		
+		IDAT_Data =	  new byte [IDAT_HDR_Size]; // excluding crc and data
+		IDAT_ZLib_HDR = new byte[IDAT_Zlib_HDR_Size]; // the 2 bytes of the zlib stream header
+	
+		// write length of data
+		writeInt(IDAT_Data, 0, IDAT_Size-CHUNK_Size); 
+		DBG_PRINT("IDAT length: " + (IDAT_Size-CHUNK_Size));	
+				
+		// write type
+		IDAT_Data[4] = 'I'; 
+		IDAT_Data[5] = 'D'; 
+		IDAT_Data[6] = 'A'; 
+		IDAT_Data[7] = 'T'; 	
+	
+		
+		//-----------------------------------------------------------------------	
+		// write IDAT_Zlib_HDR
+	
+		// write CMF
+		int CM = 8;
+		int CINFO = 7;
+		IDAT_ZLib_HDR[0] = (byte)(((CM&0x7)<<4)|(CINFO&0x7));
+		
+		// write FLG (skip FDICT and FLEVEL)
+		int FDICT = (0&0x1)<<5;
+		int FLEVEL = (0&0x3)<<6;
+		int FLAG = FDICT+FLEVEL;
+		int FCHECK = 0;
+		for(int i = 0; i < 32; i++) {
+			int temp = IDAT_ZLib_HDR[0]*256 + (FDICT|FLEVEL|i);
+			if(temp%31 == 0) {
+				FCHECK = i;
+				break;
+			}
+		}
+		IDAT_ZLib_HDR[1] = (byte)(FDICT|FLEVEL|FCHECK);
+		
+		IDAT_ZLib_Adler_Checksum = calculateAdlerChecksum();
+		IDAT_Crc	= calculateIDATChecksum();		
+		//-----------------------------------------------------------------------		
+		// write IEND
+		IEND_Data	= new byte[IEND_Size];
+			
+		// write length of data
+		writeInt(IEND_Data, 0, IEND_Size-CHUNK_Size); 
+		DBG_PRINT("IEND length: " + (IEND_Size-CHUNK_Size));	
+			
+		// write type
+		IEND_Data[4] = 'I'; 
+		IEND_Data[5] = 'E'; 
+		IEND_Data[6] = 'N'; 
+		IEND_Data[7] = 'D';
+		
+		// write crc
+		crc = (int)ChecksumCalculator.crc(IEND_Data, 4, 4);
+		writeInt(IEND_Data, 8, crc);
+		DBG_PRINT("IEND crc: " + crc);		
+	}
+	
+	public final int available() {
+		int a = totalFileSize - pos;
+		//MYASSERT(a>=0);
+		if(a<0) a = 0;
+		return a;
+	}
+	
+	public final void close() throws IOException {
+		throw new IOException("Mark not supported!");
+	}
+	
+	public final void mark(int readLimit) {
+	}	
+	
+	public final void reset() throws IOException {
+		throw new IOException("Mark not supported!");
+	}	
+	
+	public final boolean markSupported() {
+		return false;
+	}
+	
+	private static final int IHDR = 0;
+	private static final int IDAT = 1;
+	private static final int IEND = 2;
+		
+	private int chunkPos = -1;
+	private int currentChunk = -1;
+	private int imagePos = 0;
+	
+	public final int read() throws IOException {
+		int mem_ds[] = CORE.mMem_ds;
+		//DBG_PRINT("entering read");
+		//DBG_PRINT("chunkPos: " + chunkPos + ", pos: " + pos);
+
+		if(pos >= totalFileSize)
+			return -1;
+	
+		//DBG_PRINT("file not finished");
+				
+		if(pos >= chunkChange) {
+			if(pos >= IHDR_Start && pos < IHDR_End) {
+				DBG_PRINT("in IHDR");				
+				chunkChange		= IHDR_End;
+				chunkPos		= pos - IHDR_Start;
+				currentChunk	= IHDR;
+			} else 		
+			if(pos >= IDAT_Start && pos < IDAT_End) {
+				DBG_PRINT("in IDAT");	
+				chunkChange		= IDAT_End;
+				chunkPos		= pos - IDAT_Start;
+				currentChunk	= IDAT;
+			} else 
+			if(pos >= IEND_Start && pos < IEND_End) {
+				DBG_PRINT("in IEND");	
+				chunkChange		= IEND_End;
+				chunkPos		= pos - IEND_Start;
+				currentChunk	= IEND;
+			} else
+			if(pos >= IEND_End) {
+				// end of stream
+				return -1;
+			}
+			if(chunkPos != 0) {
+				DBG_PRINT("WRONG!!!!");
+				// something went terribly wrong;
+				throw new IOException("Something went wrong when reading the png.");
+			}
+		}
+		
+		int ret = 0;
+		//DBG_PRINT("chunkPos: " + chunkPos + ", pos: " + pos);
+		switch(currentChunk) {
+			case IHDR:
+					ret = IHDR_Data[chunkPos];
+					//DBG_PRINT("IHDR read: " + Integer.toHexString(ret));				
+				break;
+			case IDAT:			
+				if(chunkPos<IDAT_Zlib_HDR_Size) {
+					ret = IDAT_ZLib_HDR[chunkPos];		
+					//DBG_PRINT("IDAT read: " + Integer.toHexString(ret));				
+					break;
+				} 
+				
+				int currentBlockPos = ((chunkPos-4)%(32768));
+				
+				if(currentBlockPos == 0) {
+					// write deflate header
+					int BFINAL = 0; // not the final block.
+					int BTYPE = 0;	// compression type = 0 (uncompressed).
+					
+					// start of block + maximum block-size + zlib header + adler-32 checksum
+					if(pos+32768>=actualZlibCompressedImageSize) {
+						BFINAL = 1; // this is the final block.
+					}
+					
+					ret = (BFINAL&0x1)|((BTYPE&0x3)<<2);
+				} else {
+					//currentBlockPos-=1;
+					// write uncompressed image data
+					RBYTE(imageOffset+imagePos, ret);
+					imagePos++;
+				}
+				//DBG_PRINT("IDAT read: " + Integer.toHexString(ret));
+				break;				
+			case IEND:	
+					ret = IEND_Data[chunkPos];		
+					//DBG_PRINT("IEND read: " + Integer.toHexString(ret));			
+				break;
+		}
+	
+		chunkPos++;
+		pos++;
+						
+		return ret;
+	}
+	public final int read(byte[] b) throws IOException {
+		return read(b, 0, b.length);
+	}
+	public final int read(byte[] b, int off, int len) throws IOException {
+		int trueLen = MIN(available(), len);
+		if(trueLen <= 0)
+			return -1;
+
+		for(int i = off; i < off+trueLen; i++) {
+			int r = read();
+			if(r == -1) return -1;
+			b[i] = (byte) r;
+		}
+		
+		pos += trueLen;	
+		
+		return trueLen;
+	}
+	/*
+	public final long skip(long n) throws IOException {
+		long trueN = MIN(available(), n);
+		if(trueN < 0)
+			throw new IOException("LimitedLengthInputStream.skip(long)");
+		pos += trueN;
+		return trueN;
+	}
+	*/
+}

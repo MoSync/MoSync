@@ -1,0 +1,80 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+
+import java.io.*;
+
+final class RefByteArrayOutputStream extends OutputStream {
+	private byte[] buf;
+	private final int offset;
+	private int pos;
+	RefByteArrayOutputStream(byte[] aref, int _offset) {
+		buf = aref;
+		offset = _offset;
+		pos = 0;
+		if(offset < 0)
+			throw new IllegalArgumentException(IN_FILE_ON_LINE_STRING);
+	}
+	public final void write(int b) throws IOException {
+		if(offset + pos >= buf.length)
+			throw new EOFException("RefByteArrayOutputStream.write(int)");
+		buf[offset + pos] = (byte)b;
+		pos++;
+	}
+	public final void write(byte[] b, int off, int len) throws IOException {
+		if(off < 0 || len < 0)
+			throw new IllegalArgumentException(IN_FILE_ON_LINE_STRING);
+		if(offset + pos + len > buf.length)
+			throw new EOFException("RefByteArrayOutputStream.write(byte[], int, int)");
+		System.arraycopy(b, off, buf, offset + pos, len);
+		pos += len;
+	}
+
+	//for Pcm2WavInputStream
+	public final void writeLeShort(short v) throws IOException
+	{
+		if(offset + pos + 2 > buf.length)
+			throw new EOFException("RefByteArrayOutputStream.writeLeShort");
+		buf[offset + pos++] = (byte) v;
+		buf[offset + pos++] = (byte) (v >> 8);
+	}
+
+	public final void writeLeInt(int v) throws IOException
+	{
+		if(offset + pos + 4 > buf.length)
+			throw new EOFException("RefByteArrayOutputStream.writeLeInt");
+		buf[offset + pos++] = (byte) v;
+		buf[offset + pos++] = (byte) (v >> 8);
+		buf[offset + pos++] = (byte) (v >> 16);
+		buf[offset + pos++] = (byte) (v >> 24);
+	}
+
+	public final void writeLeLong(long v) throws IOException
+	{
+		if(offset + pos + 8 > buf.length)
+			throw new EOFException("RefByteArrayOutputStream.writeLeLong");
+		buf[offset + pos++] = (byte) v;
+		buf[offset + pos++] = (byte) (v >> 8);
+		buf[offset + pos++] = (byte) (v >> 16);
+		buf[offset + pos++] = (byte) (v >> 24);
+		buf[offset + pos++] = (byte) (v >> 32);
+		buf[offset + pos++] = (byte) (v >> 40);
+		buf[offset + pos++] = (byte) (v >> 48);
+		buf[offset + pos++] = (byte) (v >> 56);
+	}
+}

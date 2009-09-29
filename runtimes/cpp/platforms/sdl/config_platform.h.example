@@ -1,0 +1,53 @@
+#ifndef CONFIG_SDL_H
+#define CONFIG_SDL_H
+
+#ifdef CONFIG_H
+#error Only one config file allowed per compilation unit!
+#endif
+#define CONFIG_H
+
+#define __SDL__
+
+//#define ENABLE_DEBUGGER
+
+#define LOGGING_ENABLED
+
+#define UPDATE_IP
+
+#define FAKE_CALL_STACK
+
+#define INSTRUCTION_PROFILING
+
+#define RESOURCE_MEMORY_LIMIT
+
+#define GDB_DEBUG
+
+//#define DEBUGGING_MODE
+
+//#define CORE_DEBUGGING_MODE	//very slow
+
+#define MEMORY_PROTECTION
+
+//also defined by DEBUGGING_MODE, CORE_DEBUGGING_MODE and SYSCALL_DEBUGGING_MODE
+#define MEMORY_DEBUG
+#define TRANSLATE_PANICS
+
+//also defined by CORE_DEBUGGING_MODE
+//#define SYSCALL_DEBUGGING_MODE
+#define MINIMUM_SYSCALL_ID 0
+#define MAX_SYSCALL_ID 127
+
+// use to slow down vm core (only used in MoRE)
+//#define USE_DELAY
+//#define DELAY_MIPS 0.05
+//#define DELAY_BATCH 1
+//#define DELAY_BATCH_TIME (1000.0*(DELAY_BATCH/((DELAY_MIPS) * 1000000.0)))
+
+//#define SOCKET_DEBUGGING_MODE
+//#define GRAPHICS_DEBUGGING_MODE
+//#define AUDIO_DEBUGGING_MODE
+//#define BLUETOOTH_DEBUGGING_MODE
+
+
+
+#endif	//CONFIG_SDL_H

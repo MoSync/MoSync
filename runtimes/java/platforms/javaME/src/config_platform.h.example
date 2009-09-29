@@ -1,0 +1,57 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with MoSync; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+//#define PHONE_RELEASE
+
+#define PUBLIC_DEBUG
+
+//#define OLD_MEMCPY
+//#define SEGMENTED_DATA
+
+//#define _DEBUG	//very slow
+#define DEBUG_MEMORY	//defined by _DEBUG
+//#define DEBUG_SYSCALLS	//defined by _DEBUG
+
+//#define GDB_DEBUG
+//#define BLUETOOTH_LOG	//send debug output over Bluetooth
+//#define TCP_LOG	//send debug output over TCP/IP
+
+//#define CONN_PANIC	//makes the conn system panic instead of return errors
+
+//#define SPLASH_SCREEN
+//#define MOSYNC_COMMERCIAL	//controls nag text
+
+//#define BFE_EXCEPTION
+
+//#define MOSYNC_STATIC_JAVA	//disables Core, uses class files compiled by pipe-tool.
+//#define MOSYNC_SUPPORT_EXTENSIONS
+//#define MOSYNC_OLD_IDL
+
+#define MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
+
+//#define MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
+//#define MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+//#define MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI
+#define MA_PROF_SUPPORT_VIDEO_STREAMING
+//#define MA_PROF_SUPPORT_OPENGL_ES
+#define MA_PROF_SUPPORT_STYLUS
+//#define MA_PROF_SUPPORT_CLDC_10
+//#define MA_PROF_BUG_BACKLIGHTFLASHES
+//#define MA_PROF_BUG_MICROEMU
+
+//#define MA_SUPPORT_RECORD
+//#define MA_IX_CONNSERVER

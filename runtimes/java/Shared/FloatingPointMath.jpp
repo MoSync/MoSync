@@ -1,0 +1,309 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#define LTD(x) Double.longBitsToDouble(x)
+#define DTL(x) Double.doubleToLongBits(x)	
+#define ITF(x) Float.intBitsToFloat(x)
+#define FTI(x) Float.floatToIntBits(x)
+
+#ifdef MA_PROF_SUPPORT_CLDC_10	
+	// used for storing the doubles/floats when doing the arithmetical operations
+	// so we don't need to allocate them for each operation.
+	Real tempRealA = new Real();
+	Real tempRealB = new Real();
+#endif
+
+#ifdef MA_PROF_SUPPORT_CLDC_10
+	SYSCALL(long) __adddf3(long al, long bl) {
+		tempRealA.assignDoubleBits(al);
+		tempRealB.assignDoubleBits(bl);
+		tempRealA.add(tempRealB);
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) __subdf3(long al, long bl) {
+		tempRealA.assignDoubleBits(al);
+		tempRealB.assignDoubleBits(bl);
+		tempRealA.sub(tempRealB);
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) __muldf3(long al, long bl) {
+		tempRealA.assignDoubleBits(al);
+		tempRealB.assignDoubleBits(bl);
+		tempRealA.mul(tempRealB);
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) __divdf3(long al, long bl) THE {
+		tempRealB.assignDoubleBits(bl);
+		if(tempRealB.isZero() == true)
+			BIG_PHAT_ERROR;			
+		tempRealA.assignDoubleBits(al);
+		tempRealA.div(tempRealB);
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) __negdf2(long al) {
+		tempRealA.assignDoubleBits(al);	
+		tempRealA.neg();
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(int) __fixdfsi(long al) {
+		tempRealA.assignDoubleBits(al);	
+		return tempRealA.toInteger();
+	}
+
+	SYSCALL(long) STATIC_SYSCALL(__floatsidf)(int af) {
+		tempRealA.assign(af);		
+		return tempRealA.toDoubleBits();
+	}	
+
+	SYSCALL(int) dcmp(long al, long bl) {
+		tempRealA.assignDoubleBits(al);
+		tempRealB.assignDoubleBits(bl);		
+		if(tempRealA.lessThan(tempRealB) == true) return -1;
+		else if(tempRealA.equalTo(tempRealB) == true) return 0;
+		else return 1;
+	}
+
+	SYSCALL(long) STATIC_SYSCALL(f2d)(int fi) {
+		tempRealA.assignFloatBits(fi);	
+		return tempRealA.toDoubleBits();
+	}
+
+	SYSCALL(long) sin(long xl) {
+		tempRealA.assignDoubleBits(xl);
+		tempRealA.sin();	
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) cos(long xl) {
+		tempRealA.assignDoubleBits(xl);
+		tempRealA.cos();	
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) tan(long xl) {
+		tempRealA.assignDoubleBits(xl);
+		tempRealA.tan();	
+		return tempRealA.toDoubleBits();
+	}
+	
+	SYSCALL(long) sqrt(long xl) {
+		tempRealA.assignDoubleBits(xl);
+		tempRealA.sqrt();	
+		return tempRealA.toDoubleBits();
+	}
+	
+#else /* MA_PROF_SUPPORT_CLDC11 */
+	SYSCALL(long) __adddf3(long al, long bl) {
+		double a = LTD(al);
+		double b = LTD(bl);
+		return DTL(a+b);
+	}
+	
+	SYSCALL(long) __subdf3(long al, long bl) {
+		double a = LTD(al);
+		double b = LTD(bl);	
+		return DTL(a-b);
+	}
+	
+	SYSCALL(long) __muldf3(long al, long bl) {
+		double a = LTD(al);
+		double b = LTD(bl);		
+		return DTL(a*b);
+	}
+	
+	SYSCALL(long) __divdf3(long al, long bl) THE {
+		double b = LTD(bl);		
+		if(b == 0)
+			BIG_PHAT_ERROR; // return DTL(Double.NaN);
+		double a = LTD(al);	
+		return DTL(a/b);
+	}
+	
+	SYSCALL(long) __negdf2(long al) {
+		double a = LTD(al);	
+		return DTL(-a);
+	}
+	
+	SYSCALL(int) __fixdfsi(long al) {
+		double a = LTD(al);	
+		return (int)a;
+	}
+	
+	SYSCALL(long) STATIC_SYSCALL(__floatsidf)(int a) {
+		return DTL((double)a);
+	}
+	
+	SYSCALL(int) dcmp(long al, long bl) {
+		double a = LTD(al);
+		double b = LTD(bl);	
+		if(a > b)
+			return 1;
+		else if(a == b)
+			return 0;
+		else	//a < b
+			return -1;
+	}
+
+	SYSCALL(long) STATIC_SYSCALL(f2d)(int fi) {
+		float f = ITF(fi);
+		return DTL((double)f);
+	}
+
+	SYSCALL(long) sin(long xl) {
+		double x = LTD(xl);	
+		return DTL(Math.sin(x));
+	}
+	
+	SYSCALL(long) cos(long xl) {
+		double x = LTD(xl);		
+		return DTL(Math.cos(x));
+	}
+	
+	SYSCALL(long) tan(long xl) {
+		double x = LTD(xl);		
+		return DTL(Math.tan(x));
+	}
+	
+	SYSCALL(long) sqrt(long xl) {
+		double x = LTD(xl);	
+		return DTL(Math.sqrt(x));
+	}
+	
+#endif /* MA_PROF_SUPPORT_CLDC11 */
+
+#ifdef MA_PROF_SUPPORT_CLDC_10
+	SYSCALL(int) __addsf3(int al, int bl) {
+		tempRealA.assignFloatBits(al);
+		tempRealB.assignFloatBits(bl);
+		tempRealA.add(tempRealB);
+		return tempRealA.toFloatBits();
+	}
+	
+	SYSCALL(int) __subsf3(int al, int bl) {
+		tempRealA.assignFloatBits(al);
+		tempRealB.assignFloatBits(bl);
+		tempRealA.sub(tempRealB);
+		return tempRealA.toFloatBits();
+	}
+	
+	SYSCALL(int) __mulsf3(int al, int bl) {
+		tempRealA.assignFloatBits(al);
+		tempRealB.assignFloatBits(bl);
+		tempRealA.mul(tempRealB);
+		return tempRealA.toFloatBits();
+	}
+	
+	SYSCALL(int) __divsf3(int al, int bl) THE {
+		tempRealB.assignFloatBits(bl);
+		if(tempRealB.isZero() == true)
+			BIG_PHAT_ERROR;			
+		tempRealA.assignFloatBits(al);
+		tempRealA.div(tempRealB);
+		return tempRealA.toFloatBits();
+	}
+	
+	SYSCALL(int) __negsf2(int al) {
+		tempRealA.assignFloatBits(al);	
+		tempRealA.neg();
+		return tempRealA.toFloatBits();
+	}
+	
+	SYSCALL(int) __fixsfsi(int al) {
+		tempRealA.assignFloatBits(al);	
+		return tempRealA.toInteger();
+	}
+
+	SYSCALL(int) __floatsisf(int af) {
+		tempRealA.assign(af);		
+		return tempRealA.toFloatBits();
+	}	
+
+	SYSCALL(int) fcmp(int al, int bl) {
+		tempRealA.assignFloatBits(al);
+		tempRealB.assignFloatBits(bl);		
+		if(tempRealA.lessThan(tempRealB) == true) return -1;
+		else if(tempRealA.equalTo(tempRealB) == true) return 0;
+		else return 1;
+	}	
+
+	SYSCALL(int) d2f(long fi) {
+		tempRealA.assignDoubleBits(fi);
+		return tempRealA.toFloatBits();
+	}
+
+#else /* MA_PROF_SUPPORT_CLDC11 */		
+	SYSCALL(int) __addsf3(int al, int bl) {
+		float a = ITF(al);
+		float b = ITF(bl);
+		return FTI(a+b);
+	}
+	
+	SYSCALL(int) __subsf3(int al, int bl) {
+		float a = ITF(al);
+		float b = ITF(bl);	
+		return FTI(a-b);
+	}
+	
+	SYSCALL(int) __mulsf3(int al, int bl) {
+		float a = ITF(al);
+		float b = ITF(bl);		
+		return FTI(a*b);
+	}
+	
+	SYSCALL(int) __divsf3(int al, int bl) THE {
+		float b = ITF(bl);		
+		if(b == 0)
+			BIG_PHAT_ERROR; // return DTL(Double.NaN);
+		float a = ITF(al);	
+		return FTI(a/b);
+	}
+	
+	SYSCALL(int) __negsf2(int al) {
+		float a = ITF(al);	
+		return FTI(-a);
+	}
+	
+	SYSCALL(int) __fixsfsi(int al) {
+		float a = ITF(al);	
+		return (int)a;
+	}
+	
+	SYSCALL(int) __floatsisf(int a) {
+		return FTI((float)a);
+	}
+
+	SYSCALL(int) d2f(long fi) {
+		double f = LTD(fi);
+		return FTI((float)f);
+	}
+
+	SYSCALL(int) fcmp(int al, int bl) {
+		float a = ITF(al);
+		float b = ITF(bl);	
+		if(a > b)
+			return 1;
+		else if(a == b)
+			return 0;
+		else	//a < b
+			return -1;
+	}	
+#endif /* MA_PROF_SUPPORT_CLDC11 */

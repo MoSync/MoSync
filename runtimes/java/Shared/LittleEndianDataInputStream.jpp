@@ -1,0 +1,141 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+
+import java.io.*;
+
+final class LittleEndianDataInputStream extends InputStream {
+	private DataInputStream stream;
+	private int pos = 0;
+	public LittleEndianDataInputStream(InputStream a) throws IOException {
+		a.available();
+		stream = new DataInputStream(a);
+	}
+
+#define FULL(type, name) type name
+#define NAMEONLY(type, name) name
+#define RETURN_int return
+#define RETURN_long return
+#define RETURN_boolean return
+#define RETURN_void
+#define OVERLOAD(rtype, name, args, throws...) public final rtype name(args(FULL)) throws {\
+	RETURN_##rtype stream.name(args(NAMEONLY)); }
+#define VOID_ARGS(m)
+	//OVERLOAD(int, read, VOID_ARGS, throws IOException);
+	OVERLOAD(int, available, VOID_ARGS, throws IOException);
+	OVERLOAD(void, close, VOID_ARGS, throws IOException);
+#define MARK_ARGS(m) m(int, readlimit)
+	OVERLOAD(void, mark, MARK_ARGS);
+	OVERLOAD(boolean, markSupported, VOID_ARGS);
+	OVERLOAD(void, reset, VOID_ARGS, throws IOException);
+
+	public final int tell() {
+		return pos;
+	}
+
+	//-------------------------POS CONTROLLING (UNIT) FUNCTIONS-------------------
+	public final int read() throws IOException {
+		int res = stream.read();
+		if(res >= 0)
+			pos++;
+		return res;
+	}
+	public final int skipBytes(int n) throws IOException {
+		int res = stream.skipBytes(n);
+		if(res > 0)
+			pos += res;
+		return res;
+	}
+	public final int read(byte[] b) throws IOException {
+		int res = stream.read(b);
+		if(res > 0)
+			pos += res;
+		return res;
+	}
+	public final int read(byte[] b, int off, int len) throws IOException {
+		int res = stream.read(b, off, len);
+		if(res > 0)
+			pos += res;
+		return res;
+	}
+	public final int readUnsignedByte() throws IOException {
+		int res = stream.readUnsignedByte();
+		pos++;
+		return res;
+	}
+	public final void readFully(byte[] b) throws IOException {
+		stream.readFully(b);
+		pos += b.length;
+	}
+
+	//--------------------------COMBINATION FUNCTIONS-----------------------------
+
+	public final int readInt() throws IOException {
+		int d = read();
+		int c = read();
+		int b = read();
+		int a = read();
+		return (a << 24) | ((b & 0xff) << 16) |
+			((c & 0xff) << 8) | (d & 0xff);
+	}
+	public final short readShort() throws IOException {
+		int d = read();
+		int c = read();
+		return (short)(((c & 0xff) << 8) | (d & 0xff));
+	}
+	public final int readUnsignedShort() throws IOException {
+		int d = read();
+		int c = read();
+		return (((c & 0xff) << 8) | (d & 0xff));
+	}
+
+	public final int readVarUnsignedInt() throws IOException {
+		int res = 0, nBytes=0;
+		while(true) {
+			int b = readUnsignedByte();
+			res |= (b & 0x7f) << (nBytes*7);
+			if(b > 0x7f)
+				break;
+			nBytes++;
+			if(nBytes >= 4) {
+				BIG_PHAT_ERROR;
+			}
+		}
+		return res;
+	}
+	public final int readVarSignedInt() throws IOException {
+		int res = 0, nBytes=0;
+		int b = readUnsignedByte();
+		res |= (b & 0x7e) >> 1;
+		boolean sign = (b & 1) != 0;
+		nBytes++;
+		while(b <= 0x7f) {
+			b = readUnsignedByte();
+			res |= (b & 0x7f) << ((nBytes*7) - 1);
+			if(b > 0x7f)
+				break;
+			nBytes++;
+			if(nBytes >= 4) {
+				BIG_PHAT_ERROR;
+			}
+		}
+		if(sign)
+			res = -res;
+		return res;
+	}
+}

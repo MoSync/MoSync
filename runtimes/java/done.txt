@@ -1,0 +1,14 @@
+10:15 2006-05-05
+Directly after first checkin, remove all old commented out code and check in again. Call it cleanup.
+16:25 2006-05-09
+Too late.
+
+15:52 2006-10-04
+The BinaryInterface to R/W resources needs serious optimization. Maybe a stream could be used.
+12:20 2006-10-31
+Done.
+
+16:53 2007-01-26
+Media resources.
+11:01 2007-03-23
+Done by Niklas.

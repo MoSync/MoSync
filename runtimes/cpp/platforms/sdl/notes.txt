@@ -1,0 +1,2 @@
+16:20 2007-05-14
+Do not use SDL_SetTimer. It conflicts with SDL_AddTimer.

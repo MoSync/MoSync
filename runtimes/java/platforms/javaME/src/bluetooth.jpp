@@ -1,0 +1,356 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "bluetooth.h"
+
+//***************************************************************************
+//Device discovery
+//***************************************************************************
+
+SYSCALL(void) maBtStartDeviceDiscovery(int names) throws Exception {
+	DEBUG_BT("maBtStartDeviceDiscovery\n");
+	MYASSERT(!mBtDiscoveryInProgress);
+	mBtDiscoveryInProgress = true;
+	mBtQue.removeAllElements();
+	mBtNextIndex = 0;
+	mBtNames = names != 0;
+	if(mBtDA == null)
+		mBtDA = LocalDevice.getLocalDevice().getDiscoveryAgent();
+	if(!mBtDA.startInquiry(DiscoveryAgent.GIAC, this)) {
+		BtPostState(CONNERR_GENERIC);
+	}
+}
+
+SYSCALL(int) maBtGetNewDevice(Address dst) {
+	if(mBtQue.size() == mBtNextIndex)
+		return 0;
+
+	BtDevice d = (BtDevice)mBtQue.elementAt(mBtNextIndex++);
+	int[] mem_ds = CORE.mMem_ds;
+
+	try {
+		if(mBtNames) {
+			writeNameToMemory(RINT(dst), RINT(dst + 4), d.name);
+			WINT(dst + 8, d.name.length());
+		}
+		writeBtAddressToMemory(d.address, dst + 12);
+		if(d.name == null)
+			return 1;
+		else
+			return d.name.length();
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
+		BIG_PHAT_ERROR;
+	}
+}
+
+private final void writeNameToMemory(Address dst, int nameBufSize, final String name) throws IOException {
+	int[] mem_ds = CORE.mMem_ds;
+	int writelen = 0;
+	if(name != null) {
+		byte[] nameBytes = name.getBytes();
+		writelen = MIN(nameBytes.length, nameBufSize - 1);
+#ifdef OLD_MEMCPY
+		writeMemStream(dst, new ByteArrayInputStream(nameBytes), writelen);
+#else
+		writeMemBytes(dst, nameBytes, 0, writelen);
+#endif
+	}
+	WBYTE(dst + writelen, (byte)0);
+}
+
+private final void writeBtAddressToMemory(String bta, Address a) {
+	//convert address string to bytes
+	byte[] address = new byte[BTADDR_LEN];
+	for(int i=0; i<BTADDR_LEN; i++) {
+		address[i] = (byte) Integer.parseInt(bta.substring(i*2, i*2+2), 16);
+	}
+	setMemBytes(a, address);
+}
+
+public final void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+	BtDevice d = new BtDevice();
+	d.address = btDevice.getBluetoothAddress();
+	if(mBtNames) {
+		try {
+			d.name = btDevice.getFriendlyName(false);
+		} catch(IOException e) {
+			PRINT_STACK_TRACE;
+			//BIG_PHAT_ERROR;
+		}
+	}
+	DEBUG_BT("deviceDiscovered: "+d.address+"("+d.name+")\n"+
+		"Major: "+HEX(cod.getMajorDeviceClass())+"\n"+
+		"Minor: "+HEX(cod.getMinorDeviceClass())+"\n"+
+		"Service: "+HEX(cod.getServiceClasses())+"\n");
+
+	mBtQue.addElement(d);
+	BtPostState(0);
+}
+
+public final void inquiryCompleted(int discType) {
+	DEBUG_BT("inquiryCompleted "+discType+"\n");
+	mBtDiscoveryInProgress = false;
+	if(discType == INQUIRY_ERROR) {
+		BtPostState(CONNERR_GENERIC);
+	} else {
+		BtPostState(1);
+	}
+}
+
+private final void BtPostState(int state) {
+	int[] event = new int[2];
+	EI_TYPE = EVENT_TYPE_BT;
+	EI_STATE = state;
+	mCanvas.postEvent(event);
+}
+
+//***************************************************************************
+//Service discovery
+//***************************************************************************
+
+SYSCALL(void) maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception {
+	DEBUG_BT("maBtStartServiceDiscovery\n");
+	MYASSERT(!mBtDiscoveryInProgress);
+	mBtDiscoveryInProgress = true;
+	UUID[] uuidSet = { new UUID(MAUUID2String(uuid), false) };
+	mBtQue.removeAllElements();
+	mBtNextIndex = 0;
+	if(mBtDA == null)
+		mBtDA = LocalDevice.getLocalDevice().getDiscoveryAgent();
+	// 0x0100 is the attrubute for the service name element
+	// in the service record
+	int[] attrSet = {0x0100};
+	MyRemoteDevice mrd = new MyRemoteDevice(btaddr2String(dev));
+	MYASSERT(attrSet != null);
+	MYASSERT(uuidSet != null);
+	MYASSERT(this != null);
+	MYASSERT(mrd != null);
+	int id = mBtDA.searchServices(attrSet, uuidSet, mrd, this);
+	DEBUG_BT(" ID: "+id+"\n");
+}
+
+final String MAUUID2String(Address uuid) {
+	int[] mem_ds = CORE.mMem_ds;
+	DEBUG_TEMP("MAUUID2String\n");
+	String s = Hex0(RINT(uuid)) + Hex0(RINT(uuid + 4)) +
+		Hex0(RINT(uuid + 8)) + Hex0(RINT(uuid + 12));
+	DEBUG_TEMP(" "+s+"\n");
+	return s;
+}
+
+final String btaddr2String(Address a) {
+	int[] mem_ds = CORE.mMem_ds;
+	DEBUG_TEMP("btaddr2String\n");
+	StringBuffer sb = new StringBuffer(12);
+	for(int i=0; i<6; i++) {
+		int b;
+		String s;
+		RBYTE_BASE(a+i, b, int);
+		//DEBUG_TEMP(Integer.toString(i)+": "+Integer.toHexString(b)+"\n");
+		s = Integer.toHexString((b >> 4) & 0xf);
+		//DEBUG_TEMP(" "+s+"\n");
+		sb.append(s);
+		s = Integer.toHexString(b & 0xf);
+		//DEBUG_TEMP(" "+s+"\n");
+		sb.append(s);
+	}
+	String s = new String(sb);
+	DEBUG_TEMP(" "+s+"\n");
+	return s;
+}
+
+SYSCALL(int) maBtGetNewService(Address dst) throws Exception {
+	if(mBtQue.size() == mBtNextIndex)
+		return 0;
+
+	BtService s = (BtService)mBtQue.elementAt(mBtNextIndex++);
+	int[] mem_ds = CORE.mMem_ds;
+
+	WINT(dst, s.port);
+	writeUUIDsToMemory(RINT(dst + 12), s.uuids);
+	if(s.name != null) {
+		writeNameToMemory(RINT(dst + 4), RINT(dst + 8), s.name);
+	}
+	return 1;
+}
+SYSCALL(int) maBtGetNextServiceSize(Address dst) throws Exception {
+	if(mBtQue.size() == mBtNextIndex)
+		return 0;
+
+	BtService s = (BtService)mBtQue.elementAt(mBtNextIndex);
+	int[] mem_ds = CORE.mMem_ds;
+
+	WINT(dst, (s.name == null) ? -1 : (s.name.length() + 1));
+	WINT(dst + 4, s.uuids.size());
+	return 1;
+}
+
+private final void writeUUIDsToMemory(Address dst, Vector uuids) throws Exception {
+	//DEBUG_TEMP("writeUUIDsToMemory\n");
+	int[] mem_ds = CORE.mMem_ds;
+	for(int i=0; i<uuids.size(); i++) {
+		UUID u = (UUID)uuids.elementAt(i);
+		int i1, i2, i3, i4;
+		String s = u.toString();
+		if(s.length() < 8*3) {
+			i1 = 0;
+		} else {
+			String ss = s.substring(0, s.length() - (8*3));
+			//DEBUG_TEMP(" 1 "+ss+"\n");
+			i1 = (int)Long.parseLong(ss, 16);
+		}
+		WINT(dst, i1);
+		dst += 4;
+
+		if(s.length() < 8*2) {
+			i2 = 0;
+		} else {
+			String ss = s.substring(MAX(s.length() - (8*3), 0), s.length() - (8*2));
+			//DEBUG_TEMP(" 2 "+ss+"\n");
+			i2 = (int)Long.parseLong(ss, 16);
+		}
+		WINT(dst, i2);
+		dst += 4;
+
+		if(s.length() < 8) {
+			i3 = 0;
+		} else {
+			String ss = s.substring(MAX(s.length() - (8*2), 0), s.length() - 8);
+			//DEBUG_TEMP(" 3 "+ss+"\n");
+			i3 = (int)Long.parseLong(ss, 16);
+		}
+		WINT(dst, i3);
+		dst += 4;
+
+		String ss = s.substring(MAX(s.length() - 8, 0), s.length());
+		//DEBUG_TEMP(" 4 "+ss+"\n");
+		i4 = (int)Long.parseLong(ss, 16);
+		WINT(dst, i4);
+		dst += 4;
+	}
+}
+
+public final void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+	//transID should be the same as the ID returned by searchServices,
+	//but I'm not gonna ASSERT it for now.
+	DEBUG_BT("servicesDiscovered "+transID+"\n");
+	for(int i=0; i<servRecord.length; i++) {
+		ServiceRecord sr = servRecord[i];
+		String url = sr.getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
+		DEBUG_BT(url+"\n");
+
+		{
+			int[] ids = sr.getAttributeIDs();
+			DEBUG_TEMP("nIDs: "+ids.length+"\n");
+			for(int j=0; j<ids.length; j++) {
+				DEBUG_TEMP(" 0x"+Integer.toHexString(ids[j])+"\n");
+			}
+		}
+
+		//create service struct, add to que, FinishWait.
+
+		BtService s = new BtService();
+		s.address = sr.getHostDevice().getBluetoothAddress();
+
+		//btspp://xxxxxxxxxxxx:<port>
+		s.port = Integer.parseInt(url.substring(21, url.indexOf(';', 21)));	
+		MYASSERT(s.port > 0 && s.port <= 30);
+
+		//UUIDs
+		s.uuids = new Vector();
+
+#define ServiceClassIDList 1
+#define ServiceID 3
+#define ProtocolDescriptorList 4
+#define BrowseGroupList 5
+		handleDatSeqUUID(s, sr, ServiceClassIDList);
+
+		{	//handleServiceID(s, sr);
+			DEBUG_TEMP("handleServiceID\n");
+			DataElement d = sr.getAttributeValue(ServiceID);
+			DEBUG_TEMP(" "+d+"\n");
+			if(d != null)
+				s.uuids.addElement((UUID)d.getValue());
+		}
+
+		handlePDL(s, sr);
+		handleDatSeqUUID(s, sr, BrowseGroupList);
+
+		//hack, will return null for some services that may actually have a name.
+		{
+			DataElement d = sr.getAttributeValue(0x100);
+			if(d == null)
+				s.name = null;
+			else
+				s.name = (String)d.getValue();
+		}
+
+		mBtQue.addElement(s);
+		BtPostState(0);
+	}
+}
+
+private final void handleDatSeqUUID(BtService s, ServiceRecord sr, int attrID) {
+	DEBUG_TEMP("handleDatSeqUUID\n");
+	DataElement d = sr.getAttributeValue(attrID);
+	if(d == null)
+		return;
+	Object o = d.getValue();
+	DEBUG_TEMP(""+o+"\n");
+	Enumeration e = (Enumeration)o;
+	while(e.hasMoreElements()) {
+		o = e.nextElement();
+		DEBUG_TEMP(" "+o+"\n");
+		d = (DataElement)o;
+		o = d.getValue();
+		DEBUG_TEMP("  "+CanonicalString(o)+"\n");
+		//Java doesn't need the conversion here, but it's a good check.
+		s.uuids.addElement((UUID)o);
+	}
+}
+private final void handlePDL(BtService s, ServiceRecord sr) {
+	DEBUG_TEMP("handlePDL\n");
+	Object o = sr.getAttributeValue(ProtocolDescriptorList).getValue();
+	DEBUG_TEMP(""+o.toString()+"\n");
+	Enumeration e1 = (Enumeration)o;
+	int i=0;
+	while(e1.hasMoreElements()) {
+		DEBUG_BT(" "+i+"\n");
+		i++;
+		o = e1.nextElement();
+		DEBUG_TEMP(" "+o.toString()+"\n");
+		Enumeration e2 = (Enumeration)((DataElement)o).getValue();
+		int j=0;
+		while(e2.hasMoreElements()) {
+			o = e2.nextElement();
+			DEBUG_TEMP("  "+o.toString()+"\n");
+			DataElement d = (DataElement)o;
+			DEBUG_BT(" "+j+": type "+d.getDataType()+"\n");
+			if(d.getDataType() == DataElement.UUID) {
+				s.uuids.addElement((UUID)d.getValue());
+			}
+			j++;
+		}
+	}
+}
+
+public final void serviceSearchCompleted(int transID, int respCode) {
+	DEBUG_BT("serviceSearchCompleted "+transID+" "+respCode+"\n");
+	mBtDiscoveryInProgress = false;
+	BtPostState(1 + mBtQue.size());
+}

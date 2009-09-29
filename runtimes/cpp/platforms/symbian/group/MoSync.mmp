@@ -1,0 +1,16 @@
+TARGET            MoSync.app
+TARGETTYPE        app
+UID               0x100039CE 0x20015BDC
+TARGETPATH        \system\apps\mosync
+
+SOURCEPATH        ..\data
+RESOURCE          MoSync.rss
+RESOURCE          MoSync_caption.rss
+
+#include "..\MoSync-base.mmp"
+
+SOURCEPATH        ..\src
+SOURCE            RCondVar.cpp
+SOURCE            CSmsHandler.cpp
+
+AIF               MoSync.aif ..\aif MoSyncAif.rss

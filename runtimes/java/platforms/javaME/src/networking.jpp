@@ -1,0 +1,269 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "networking.h"
+
+NETSYSCALL(MAHandle) maConnect(final String url) {
+	DEBUG_CONN("Connect "+mConnNextHandle+" "+url+"\n");
+	if(mConnections.size() >= CONN_MAX)
+		return CONNERR_MAX;
+#ifdef MA_IX_CONNSERVER
+	if(url.startsWith("socket://:") || url.equals("socket://") ||
+		url.startsWith("btspp://localhost:"))
+	{
+		MAServerConn mac = new MAServerConn(mConnNextHandle);
+		try {
+			mac.notifier = (StreamConnectionNotifier)Connector.open(url);
+		} catch(IOException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_GENERIC;
+		}
+		mConnections.put(new Integer(mConnNextHandle), mac);
+		return mConnNextHandle++;
+	}
+#endif	//MA_IX_CONNSERVER
+	MAStreamConn mac = new MAStreamConn(mConnNextHandle);
+	mConnections.put(new Integer(mConnNextHandle), mac);
+	mac.state |= CONNOP_CONNECT;
+	mThreadPool.execute(new Connect(mac, url));
+	return mConnNextHandle++;
+}
+
+#ifdef MA_IX_CONNSERVER
+NETSYSCALL(int) maAccept(MAHandle serv) {
+	MAServerConn mac = (MAServerConn)mConnections.get(new Integer(serv));
+	MYASSERT((mac.state & CONNOP_ACCEPT) == 0);
+	MYASSERT(mac.notifier != null);
+	mac.state |= CONNOP_ACCEPT;
+	mThreadPool.execute(new Accept(mac));
+	return 1;
+}
+#endif	//MA_IX_CONNSERVER
+
+NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
+	DEBUG_CONN("GCA " + conn + " " + addr + "\n");
+	int[] mem_ds = CORE.mMem_ds;
+	if(conn == HANDLE_LOCAL) {
+		int family = RINT(addr);
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
+		if(family == CONN_FAMILY_BT) {
+			LocalDevice ld = LocalDevice.getLocalDevice();
+			writeBtAddressToMemory(ld.getBluetoothAddress(), addr + 8);
+			return 1;
+		} else
+#endif
+		{
+			return CONNERR_INTERNAL;	//TODO: implement for TCP/IP
+		}
+	}
+	MAConn mac = (MAConn)mConnections.get(new Integer(conn));
+	if(mac instanceof MAStreamConn) {
+		MAStreamConn masc = (MAStreamConn)mac;
+		if(masc.conn instanceof SocketConnection) {
+			//todo: implement
+			return CONNERR_INTERNAL;
+		}
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
+		//check bluetooth
+		try {
+			RemoteDevice rd = RemoteDevice.getRemoteDevice(masc.conn);
+			WINT(addr, CONN_FAMILY_BT);
+			WINT(addr + 4, 0);	//port unavailable
+			writeBtAddressToMemory(rd.getBluetoothAddress(), addr + 8);
+			return 1;
+		} catch(IllegalArgumentException e) {	//not bluetooth
+			PRINT_STACK_TRACE;
+		}
+#ifdef MA_IX_CONNSERVER
+	} else if(mac instanceof MAServerConn) {
+		MAServerConn masc = (MAServerConn)mac;
+		MYASSERT(masc.notifier != null);
+		//if bluetooth
+		//we only have bluetooth servers for now.
+		{
+			LocalDevice ld = LocalDevice.getLocalDevice();
+			ServiceRecord sr = ld.getRecord(masc.notifier);
+			String curl = sr.getConnectionURL(0, false);
+			DEBUG_CONN(curl + "\n");
+			int port = Integer.parseInt(curl.substring(21, curl.indexOf(';', 21)));	
+			MYASSERT(port > 0 && port <= 30);
+			DEBUG_CONN("port: " + port + "\n");
+
+			WINT(addr, CONN_FAMILY_BT);
+			WINT(addr + 4, port);
+			writeBtAddressToMemory(ld.getBluetoothAddress(), addr + 8);
+			return 1;
+		}
+#endif	//MA_IX_CONNSERVER
+#endif	//MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
+	}
+	return CONNERR_INTERNAL;
+}
+
+
+NETSYSCALL(void) maConnClose(MAHandle conn) throws Exception {
+	DEBUG_CONN("ConnClose "+conn+"\n");
+	Integer key = new Integer(conn);
+	MAConn mac = (MAConn)mConnections.get(key);
+	mac.close();
+	mConnections.remove(key);
+}
+
+NETSYSCALL(void) maConnRead(MAHandle conn, Address dst, int size) {
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	DEBUG_TEMP("CR\n");
+	MYASSERT((mac.state & CONNOP_READ) == 0);
+	MYASSERT(mac.in != null);
+	mac.state |= CONNOP_READ;
+	mThreadPool.execute(new ConnRead(mac, dst, size));
+}
+
+final MAStreamConn setupWrite(MAHandle conn) throws IOException {
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	MYASSERT((mac.state & CONNOP_WRITE) == 0);
+	if(mac.conn instanceof HttpConnection) {
+		HttpConnection http = (HttpConnection)mac.conn;
+		if(http.getRequestMethod().equals(HttpConnection.POST) && mac.httpState == HTTPS_SETUP) {
+			MYASSERT(mac.out == null);
+			mac.out = mac.conn.openOutputStream();
+			mac.httpState = HTTPS_WRITING;
+		}
+	}
+	MYASSERT(mac.out != null);
+	return mac;
+}
+
+NETSYSCALL(void) maConnWrite(MAHandle conn, Address src, int size) throws IOException {
+	MAStreamConn mac = setupWrite(conn);
+
+	mac.state |= CONNOP_WRITE;
+	mThreadPool.execute(new ConnWrite(mac, src, size));
+}
+
+NETSYSCALL(void) maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) {
+	MYASSERT(offset >= 0);
+	MYASSERT(size > 0);
+	MYASSERT(offset + size > 0);
+
+	Binary bin = (Binary)getResource(data);
+	MYASSERT(bin.size() >= offset + size);
+
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	MYASSERT((mac.state & CONNOP_READ) == 0);
+	MYASSERT(mac.in != null);
+
+	setResource(data, mFlux);
+	mac.state |= CONNOP_READ;
+	mThreadPool.execute(new ConnReadToData(mac, bin, data, offset, size));
+}
+
+NETSYSCALL(void) maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size) throws IOException {
+	MYASSERT(offset >= 0);
+	MYASSERT(size > 0);
+	MYASSERT(offset + size > 0);
+
+	BinaryInterface bi = (BinaryInterface)getResource(data);
+	MYASSERT(bi.size() >= offset + size);
+
+	MAStreamConn mac = setupWrite(conn);
+
+	setResource(data, mFlux);
+	mac.state |= CONNOP_WRITE;
+	mThreadPool.execute(new ConnWriteFromData(mac, bi, data, offset, size));
+}
+
+NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
+	DEBUG_CONN("HttpCreate "+mConnNextHandle+" "+url+"\n");
+	if(mConnections.size() >= CONN_MAX)
+		return CONNERR_MAX;
+	int rw;
+	String methString;
+	switch(method) {
+	case HTTP_GET:
+		rw = Connector.READ;
+		methString = HttpConnection.GET;
+		break;
+	case HTTP_POST:
+		rw = Connector.READ_WRITE;
+		methString = HttpConnection.POST;
+		break;
+	case HTTP_HEAD:
+		rw = 0;	//uncertain if this works
+		methString = HttpConnection.HEAD;
+		break;
+	default:
+		BIG_PHAT_ERROR;
+	}
+	HttpConnection http;
+	try {
+		http = (HttpConnection)Connector.open(url, rw, true);
+		http.setRequestMethod(methString);
+	} catch(SecurityException e) {
+		PRINT_STACK_TRACE;
+		return CONNERR_FORBIDDEN;
+	}
+	MAStreamConn mac = new MAStreamConn(mConnNextHandle);
+	mac.conn = http;
+	DEBUG_ASSERT(mac.httpState == HTTPS_NULL);
+	mac.httpState = HTTPS_SETUP;
+	mConnections.put(new Integer(mConnNextHandle), mac);
+	return mConnNextHandle++;
+}
+
+NETSYSCALL(void) maHttpSetRequestHeader(MAHandle conn, String key, String value)
+throws Exception
+{
+	DEBUG_CONN("HttpSetRequestHeader "+conn+" "+key+" "+value+"\n");
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	HttpConnection http = (HttpConnection)mac.conn;
+	MYASSERT(mac.httpState == HTTPS_SETUP);
+	http.setRequestProperty(key, value);
+}
+
+NETSYSCALL(int) maHttpGetResponseHeader(MAHandle conn, String key, Address buffer, int bufSize)
+throws Exception
+{
+	DEBUG_CONN("HttpGetResponseHeader "+conn+" "+key+"\n");
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	HttpConnection http = (HttpConnection)mac.conn;
+	MYASSERT(mac.httpState == HTTPS_FINISHED);
+	final String value = http.getHeaderField(key);
+	DEBUG_CONN(" "+value+"\n");
+	if(value == null)
+		return CONNERR_NOHEADER;
+	return writeStringBuf(value, buffer, bufSize);
+}
+
+NETSYSCALL(void) maHttpFinish(MAHandle conn) {
+	MAStreamConn mac = (MAStreamConn)mConnections.get(new Integer(conn));
+	MYASSERT(mac.state == 0);
+	MYASSERT(mac.httpState == HTTPS_SETUP || mac.httpState == HTTPS_WRITING);
+	mac.state = CONNOP_FINISH;
+	mac.httpState = HTTPS_FINISHING;
+	mThreadPool.execute(new HttpFinish(mac));
+}
+
+NETSYSCALL(void) initNetworking() {
+}
+
+NETSYSCALL(void) destructNetworking() throws Exception {
+	Enumeration e = mConnections.elements();
+	while(e.hasMoreElements()) {
+		MAConn mac = (MAConn)e.nextElement();
+		mac.close();
+	}
+}

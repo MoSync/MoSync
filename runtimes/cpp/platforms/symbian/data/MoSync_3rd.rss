@@ -1,0 +1,36 @@
+NAME MOSR // 4-letter ID, unique resource identifier for the application
+
+#include <eikon.rh>
+#include <eikon.rsg>
+#include <avkon.rh>
+#include <avkon.rsg>
+#include "MoSync.hrh"
+
+RESOURCE RSS_SIGNATURE { } // Needs to be left empty
+
+RESOURCE TBUF r_default_document_name { buf=""; }
+
+RESOURCE EIK_APP_INFO {
+	//menubar = r_menubar_1;
+	cba = R_AVKON_SOFTKEYS_EXIT;
+	//status_pane = r_status_pane_null;
+	//cba = R_AVKON_SOFTKEYS_EMPTY;
+}
+
+/*RESOURCE STATUS_PANE_APP_MODEL r_status_pane_null
+{
+	layout= R_AVKON_STATUS_PANE_LAYOUT_EMPTY;
+}*/
+
+#include <appinfo.rh>
+
+RESOURCE LOCALISABLE_APP_INFO r_mosync_app_info {
+	short_caption = "MoSync";
+	//view_list = { };
+	caption_and_icon =
+	CAPTION_AND_ICON_INFO {
+		caption = "MoSync";
+		number_of_icons = 1;
+		icon_file = "\\resource\\apps\\E7654321_icon.mif";
+	};
+}

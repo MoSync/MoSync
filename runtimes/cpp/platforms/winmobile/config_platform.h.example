@@ -1,0 +1,41 @@
+#ifndef CONFIG_WINMOBILE_H
+#define CONFIG_WINMOBILE_H
+
+#ifdef CONFIG_H
+#error Only one config file allowed per compilation unit!
+#endif
+#define CONFIG_H
+
+#define __WINMOBILE__
+
+#define PUBLIC_DEBUG
+//#define MOSYNC_COMMERCIAL
+
+//#define USE_ARM_RECOMPILER
+
+
+#define LOGGING_ENABLED
+
+//#define DEBUGGING_MODE
+
+//#define CORE_DEBUGGING_MODE	//very slow
+
+//also defined by DEBUGGING_MODE and CORE_DEBUGGING_MODE
+#define MEMORY_DEBUG
+
+//also defined by CORE_DEBUGGING_MODE
+//#define SYSCALL_DEBUGGING_MODE
+
+// use to slow down vm core (only used in MoRE)
+//#define USE_DELAY
+//#define DELAY_MIPS 0.05
+//#define DELAY_BATCH 1
+//#define DELAY_BATCH_TIME (1000.0*(DELAY_BATCH/((DELAY_MIPS) * 1000000.0)))
+
+//#define SOCKET_DEBUGGING_MODE
+//#define GRAPHICS_DEBUGGING_MODE
+//#define AUDIO_DEBUGGING_MODE
+//#define BLUETOOTH_DEBUGGING_MODE
+
+
+#endif CONFIG_WINMOBILE_H

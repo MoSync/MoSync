@@ -1,0 +1,218 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+
+import java.io.*;
+import java.util.Vector;
+
+final public class Binary extends BinaryInterface {
+#ifdef SEGMENTED_DATA
+	private Vector mArrs = new Vector(1);
+	private int mSize;
+
+	Binary(byte[] data) {
+		mArrs.addElement(data);
+		mSize = data.length;
+	}
+	final int size() {
+		return mSize;
+	}
+	final void add(byte[] data) {
+		mArrs.addElement(data);
+		mSize += data.length;
+	}
+	final InputStream getInputStream() {
+		return new BinaryInputStream();
+	}
+	//reads between 1 and \a size bytes from \a src to this Binary, starting at \a offset.
+	//returns the number of bytes read.
+	final int read(InputStream src, int offset, int size) throws IOException {
+		//find index of array containing offset.
+		//since it's likely peoply will write to the end of the Binary, we'll start there.
+		if(offset < 0 || size <= 0 || offset >= mSize || offset + size >= mSize)
+			throw new IndexOutOfBoundsException();
+		int arrIndex = mArrs.size();
+		byte[] arr = null;
+		int arrOffset = mSize;
+		while(arrOffset > offset) {
+			arrIndex--;
+			arr = (byte[])mArrs.elementAt(arrIndex);
+			arrOffset -= arr.length;
+		}
+
+		int localOffset = offset - arrOffset;
+		int localAvail = arr.length - localOffset;
+		return src.read(arr, localOffset, MIN(size, localAvail));
+	}
+
+	//writes exactly \a size bytes to \a dst from this Binary, starting at \a offset.
+	final void write(OutputStream dst, int offset, int size) throws IOException {
+		if(offset < 0 || size <= 0 || offset >= mSize || offset + size >= mSize)
+			throw new IndexOutOfBoundsException();
+		//find index of array containing offset.
+		//I have no idea which part is likely to be read most.
+		//let's start at the beginning this time.
+		int arrIndex = 0;
+		byte[] arr = (byte[])mArrs.elementAt(arrIndex);
+		int arrOffset = 0;
+		while(arrOffset + arr.length < offset) {
+			arrOffset += arr.length;
+			arrIndex++;
+			arr = (byte[])mArrs.elementAt(arrIndex);
+		}
+
+		int rem = size;
+		int localOffset = offset - arrOffset;
+		int localAvail = arr.length - localOffset;
+		while(true) {
+			if(rem > localAvail) {
+				dst.write(arr, localOffset, localAvail);
+				rem -= localAvail;
+				arrIndex++;
+				arr = (byte[])mArrs.elementAt(arrIndex);
+				localOffset = 0;
+				localAvail = arr.length;
+			} else {
+				dst.write(arr, localOffset, rem);
+				break;
+			}
+		}
+	}
+
+
+	class BinaryInputStream extends InputStream {
+		private int iArrIndex = 0;
+		private int iPos = 0;
+		private int iFullPos = 0;
+
+		private int iMarkArrIndex = 0;
+		private int iMarkPos = 0;
+		private int iMarkFullPos = 0;
+
+		public final int read() {
+			byte[] arr;
+			while(true) {
+				if(iArrIndex == mArrs.size())
+					return -1;	//EOF
+				arr = (byte[])mArrs.elementAt(iArrIndex);
+				if(iPos == arr.length) {
+					iArrIndex++;
+					iPos = 0;
+				} else {
+					break;
+				}
+			}
+			iFullPos++;
+			return arr[iPos++];
+		}
+
+		public final int available() {
+			return mSize - iFullPos;
+		}
+
+		public final boolean markSupported() {
+			return true;
+		}
+		public final void mark(int readlimit) {
+			iMarkArrIndex = iArrIndex;
+			iMarkPos = iPos;
+			iMarkFullPos = iFullPos;
+		}
+		public final void reset() {
+			iArrIndex = iMarkArrIndex;
+			iPos = iMarkPos;
+			iFullPos = iMarkFullPos;
+		}
+
+		public final long skip(long ln) {
+			int n = (int)ln;
+			if(n <= 0)
+				return 0;
+			int rem = n;
+			byte[] arr;
+			while(rem > 0) {
+				if(iArrIndex == mArrs.size())
+					return n - rem;	//EOF
+				arr = (byte[])mArrs.elementAt(iArrIndex);
+				int avail = arr.length - iPos;
+				if(rem < avail) {
+					iPos += rem;
+					iFullPos += rem;
+					break;
+				}
+				rem -= avail;
+				iFullPos += avail;
+				iPos = 0;
+				iArrIndex++;
+			}
+			return n;
+		}
+
+		public final int read(byte[] b) {
+			return read(b, 0, b.length);
+		}
+		public final int read(byte[] b, int off, int len) {
+			if(len < 0)
+				throw new IndexOutOfBoundsException();
+			int rem = len;
+			byte[] arr;
+			while(rem > 0) {
+				if(iArrIndex == mArrs.size()) {
+					if(len == rem)
+						return -1;	//EOF
+					else
+						return len - rem;
+				}
+				arr = (byte[])mArrs.elementAt(iArrIndex);
+				int avail = arr.length - iPos;
+				if(rem < avail) {
+					System.arraycopy(arr, iPos, b, off, rem);
+					iPos += rem;
+					iFullPos += rem;
+					break;
+				}
+				System.arraycopy(arr, iPos, b, off, avail);
+				rem -= avail;
+				iFullPos += avail;
+				iPos = 0;
+				iArrIndex++;
+			}
+			return len;
+		}
+	}
+
+#else
+
+	byte[] arr;
+
+	Binary(byte[] input) {
+		arr = input;
+	}
+	final int size() {
+		return arr.length;
+	}
+	final InputStream getInputStream() {
+		return new ByteArrayInputStream(arr);
+	}
+#ifdef OLD_MEMCPY
+	final OutputStream getOutputStream(int offset) {
+		return new RefByteArrayOutputStream(arr, offset);
+	}
+#endif
+#endif
+}

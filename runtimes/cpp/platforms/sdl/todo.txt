@@ -1,0 +1,14 @@
+15:15 2007-05-09
+Accept dropped files. Use the following:
+DragAcceptFiles
+SDL_GetWMInfo
+SDL_SysWMEvent
+SDL_EventState
+WM_DROPFILES
+
+12:09 2007-09-21
+Generalize
+SDL_Surface* Syscall::loadImage(MemStream& s);
+into
+SDL_Surface* Syscall::loadImage(Stream& s);
+using SDL_RWFromStream.

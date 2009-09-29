@@ -1,0 +1,78 @@
+10:52 2006-05-10
+Try making the data section a byte array, accessed by a ByteArrayDataIOStream. Might speed stuff up.
+10:54 2006-12-06
+Or not...
+
+10:40 2006-05-22
+1281 ms without var-int
+1266 with
+
+11:07 2006-10-06
+read/writeMemBytes() can be optimized by writing ints instead of bytes wherever possible.
+
+16:43 2006-10-19
+Hashmap for sockets!
+
+12:19 2006-10-31
+Optimize loading of RT_IMAGE with LimitedLengthInputStream.
+
+14:54 2006-11-17
+Optimize ConnRead.
+
+15:23 2006-11-23
+Create an optimized int FIFO Queue for use with BufferedKeyEvents.
+16:31 2006-11-23
+Let it be a circular buffer, avoiding memcpys and allocs.
+
+16:21 2007-01-02
+Bugtest: setClipForFullScreenNeeded @ SE K700(ic)
+Bugfix & test: fullScreenInPaint @ SE Z1010, P900, P908, P910(ica), Motorola A1000
+	SE Z1010 does not display the bug; unfixed version works well.
+Low priority, Bugfix & test: BluetoothRfcommInputStream @ Nokia 6670, 9300, 6260, 7610, 6620, 6600, 9500
+Low priority, Bugcheck: MaxCommunnicationVolume @ Samsung SGH-E720
+Bugfix & test: inaccessibleFirstRow @ Samsung E710, E715, P400, E105, X450, X427, SGH-E700
+Bugfix & test: losesFullScreen @ Samsung SGH-D500
+
+16:47 2007-01-02
+Bugs the MoSync developer needs to be aware of:
+maxUrlLength @ Samsung SGH-E720
+inaccessibleFirstRow @ Samsung E710, E715, P400, E105, X450, X427, SGH-E700
+	Results in an odd screen size.
+
+16:50 2007-01-02
+Bugs we will need to be aware of in a possible future:
+needsNokiaUiForSystemAlerts
+drawRgbOrigin @ SE K800i, Mylo, W900(i), W800, Z1010, P900, K700(ic), P910(ica), Samsung SGH-D900
+	Only appears when using Graphics.translate(), which we don't.
+
+11:11 2007-01-17
+Many key events at the same time will cause the latter events to be lagged. I don't know if this is a bug in J2ME itself, SE's implementation, or the MoSync runtime.
+
+17:50 2007-01-31
+Very weird bug when trying to run a re-downloaded program in OtaLoad.
+14:59 2007-03-27
+Probably due to IDL differences.
+
+15:00 2007-03-27
+Concatenate "program" and "resources" for java packages to enable some improvement of splash-screen post-loading code.
+
+14:02 2007-06-11
+Subclasses cost extra, since they get a reference to their parent object by default in Java. Move subclasses that don't need to be subs out into their own files.
+
+11:33 2007-06-25
+Get rid of as many NEWs as possible. For example, make static seekable streams in BinaryInterface.
+11:34 2007-06-25
+Prioritize things that are run a lot. BinaryInterface isn't called upon all that often, in a well-designed program.
+
+11:06 2007-05-14
+System.getProperty ("microedition.platform");
+Class.forName("com.nokia.mid.ui.FullCanvas");
+
+10:40 2007-12-19
+Use In/outputStream.close() a bit more... than nothing. :)
+
+18:00 2008-07-28
+Static java: fix exit and error handling.
+
+12:33 2009-04-15
+Use Bluetooth system properties to allow for more asynchronous discovery. eg. "bluetooth.sd.trans.max".

@@ -1,0 +1,76 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+import java.io.*;
+
+#include "helpers.h"
+
+//A pass-through InputStream that works just like its source, except it logs everything.
+final class LoggingInputStream extends InputStream {
+	private InputStream mStream;
+	private int mCount = 0;
+#define MARK_SIZE (1024*1024)
+	private int mLastMark = MARK_SIZE;
+
+	LoggingInputStream(InputStream in) {
+		mStream = in;
+		DEBUG_ALWAYS("LoggingInputStream created from " + in.toString() + "\n");
+	}
+	public final int available() throws IOException {
+		DEBUG_ALWAYS("available: " + mStream.available() + "\n");
+		return mStream.available();
+	}
+	public final void close() throws IOException {
+		DEBUG_ALWAYS("close()\n");
+		mStream.close();
+	}
+	public final void mark(int readLimit) {
+		DEBUG_ALWAYS("mark: " + readLimit + "\n");
+		mStream.mark(readLimit);
+	}	
+	public final void reset() throws IOException {
+		DEBUG_ALWAYS("reset()\n");
+		mStream.reset();
+	}	
+	public final boolean markSupported() {
+		DEBUG_ALWAYS("markSupported: " + mStream.markSupported() + "\n");
+		return mStream.markSupported();
+	}
+	public final int read() throws IOException {
+		DEBUG_ALWAYS("read()\n");
+		mCount++;
+		return mStream.read();
+	}
+	public final int read(byte[] b) throws IOException {
+		DEBUG_ALWAYS("read(" + b.length + ")\n");
+		mCount += b.length;
+		return mStream.read(b);
+	}
+	public final int read(byte[] b, int off, int len) throws IOException {
+		DEBUG_ALWAYS("read(" + b.length + ", " + off + ", " + len + ")\n");
+		if(mCount > mLastMark) {
+			DEBUG_ALWAYS(mLastMark + " bytes read\n");
+			mLastMark += MARK_SIZE;
+		}
+		mCount += len;
+		return mStream.read(b, off, len);
+	}
+	public final long skip(long n) throws IOException {
+		DEBUG_ALWAYS("skip(" + n + ")\n");
+		return mStream.skip(n);
+	}
+}	//LoggingInputStream

@@ -1,0 +1,98 @@
+12:21 2006-10-18
+Make bloody sure that all address-using functions validate mem range!
+
+13:57 2006-10-18
+There are many, more or less conflicting, error management systems in use. See about reducing them.
+
+13:55 2006-10-30
+Use Symbian 9 high-performance timer for GetMilliSecondCount.
+
+10:33 2007-01-19
+Important discussion point:
+A Symbian application has its UID hardcoded, so only one version of our Symbian runtime can be installed on any one device. Thus, we can't simply embed MoSync application files into our SIS file and hope it works.
+
+An alternative approach is to make the MoSync runtime a Symbian DLL, and provide source code for a small Launcher application, which would have the MoSync programmer's app embedded, and a unique ID. It would still have to be signed, though, and I'm unsure how SymbianSigned test houses would react to such a Launcher.
+
+13:22 2007-02-02
+Merge uncommited MoSyncR modifications!
+
+18:25 2007-02-16
+Copy log file to C:\data for easy PC access.
+10:58 2007-05-08
+Now logging directly there.
+
+17:51 2007-03-23
+Better Vibra control using 3rd ed. API.
+
+13:51 2007-03-26
+Get documentation regarding BABILE_Params. For example, meaning and bounds of values for BABIL_PARM_VOLUME are completely unknown.
+10:59 2007-05-08
+Volume is "not implemented", but this point remains for PITCH and SPEED.
+
+11:25 2007-06-28
+Instead of always allocating new ConnOps for each operation, maybe we could have Connection-static ConnOps. Would use a bit more memory, but the lessened memory fragmentation may be worth it.
+This is not gonna be implemented any time in the forseeable future. :}
+
+14:32 2007-08-09
+Bluetooth service discovery may report duplicate UUIDs. A fix is possible, but low priority.
+15:19 2007-08-09
+This happens to other platforms as well. We can ignore it for now.
+
+10:42 2007-09-05
+Advanced grahics syscalls.
+
+10:43 2006-12-06
+Fix Sound.
+16:42 2006-12-12
+Multi-channel should be stable, but requires testing. mp3 loading remains a problem to research.
+16:16 2006-12-14
+Multi-channel gives fatal error. Loading is asynchronous; SoundGetLength() gives <0 until load is complete.
+Clearly, another approach is required. The constantly playing buffer, manually mixed from our channels (which are manually decoded) seems like the way to go. Research should be done into decoders available on S60 platforms.
+10:22 2006-12-27
+There's an extension to the vanilla 3rd ed. SDK which enables use of more of the multimedia libraries, including decoders which should handle mp3.
+10:42 2007-09-05
+Sound.
+11:50 2007-09-10
+Got single sound working. Umedia can't be streamed from disk yet because of Symbian's idiotic implementation of MDataSource. I mean, what's the use of having an interface if you don't allow (in practice) new implementations of it?
+11:53 2007-09-10
+For proper streaming support, we're gonna have to bypass the entire MMFController system and use MMFCodecs and AudioOutputStream directly. To use hardware codecs, a MIME-to-FourCC map will be needed. Unfortunately, such a map can't be constructed dynamically, although you can get the FourCC code of any sound that has already been loaded. This means that if new hardware codecs are added, we will need to add support for them manually.
+
+10:42 2007-09-05
+2nd Edition re-support.
+14:41 2007-10-08
+Connections seem unstable under heavy load. See testProgram conn-torture.
+
+10:42 2007-09-05
+Hide the icon.
+10:43 2007-09-05
+Seems impossible to do with an EXE on 3rd ed. Might be possible with an app DLL on 2nd ed, but a library DLL would work on both platforms.
+13:57 2007-09-25
+As an easier thing, Make MoSync icon run latest program, or have a launcher that lists all installed MoSync apps.
+
+10:44 2007-09-05
+Advanced shutdown of apps that aren't well-behaved (don't yield).
+10:45 2007-09-05
+Put VM execution in own thread and mutex-protect dangerous syscalls.
+10:46 2007-09-05
+Will facilitate future native multi-threading. Recompiler is irrelevant.
+
+14:56 2007-09-06
+Create dynamic keymap to get away from the unsafe scancodes. Use TEventCodes EEventKey and EEventKeyUp.
+
+11:40 2007-10-09
+Get rid of auto-created files in root dir on 2nd ed. hardware.
+
+12:04 2007-10-09
+Fix softkeys. Test on both editions' hardware.
+
+11:53 2007-10-19
+TDblQue is evil piece of unstable krap. Replace.
+
+09:32 2008-06-12
+Two streaming video seeks after each other, so close that the LOADING_START event has not yet occurred, makes the second seek fail, and places the stream into an unstable state. Delay seeks until loading starts.
+
+12:26 2008-07-25
+Custom events allocate memory, even though their data should fit in the EVENT struct. Modify the runtime's EVENT so that custom events can use it directly, like the CONN event.
+
+14:34 2008-08-20
+To deal with Reload functionality, all active objects must handle leaves in their RunL functions. Main among these are the networking systems.

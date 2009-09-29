@@ -1,0 +1,36 @@
+#include <iostream>
+#include "threadfactory.hpp"
+
+class Class1
+{
+public:
+    void test ( int p1, char * p2 );
+};
+
+void Class1::test ( int p1, char * p2 )
+{
+    std::cout << p1 << std::endl;
+    std::cout << p2 << std::endl;
+}
+
+void test ( double p1 )
+{
+    std::cout << p1 << std::endl;
+}
+
+
+
+void test ( void )
+{
+    Class1*                 o = new Class1( );
+    Base::Thread::Thread*   t1 = Base::Thread::ThreadFactory::getInstance( )->createThread( );
+    Base::Thread::Thread*   t2 = Base::Thread::ThreadFactory::getInstance( )->createThread( );
+
+    // Start threads
+    t1->start( Base::Thread::bind( &Class1::test, o, (int)1, (char *)"Hello" ) );
+    t2->start( Base::Thread::bind( test, (double)2.0 ) );
+    
+    // Join them
+    t1->join( );
+    t2->join( );
+}

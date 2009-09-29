@@ -1,0 +1,83 @@
+13:11 2006-12-29
+CMMF mp3 codec cofiguration documentation:
+
+RArray<TInt> configParams;
+
+// This setup converts audio to 16000Hz 16 bit mono PCM
+configParams.Append(1); // stereo to mono switch (TRUE(1) or default FALSE(0))
+configParams.Append(0); // decode left or right channel (1 left, 2 right, 0 default all)
+configParams.Append(1); // decimation factor (2, 4 or default 1)
+configParams.Append(1); // error concealment level (0 none, default 1)
+configParams.Append(16); // resolution of PCM samples (default 16 bits)
+configParams.Append(16000); //Output sampling frequency
+
+TUid codecId = TUid::Uid(KMmfUidControllerAudio);
+iOCodec2->ConfigureL(codecId, (TDesC8&) configParams);
+
+
+12:10 2007-03-16
+Bluetooth discovery sequence. Tabs denote asynchronicity, arrows are direct calls.
+The double arrow (<=>) denotes a call to a pre-defined function.
+The star (*) denotes possibly multiple calls.
+Double arrow (-->>) is an indirect call.
+
+maBtStartDiscovery() -> gBtResolver.GetByAddress()
+	BtSyncCallbackL() -> BtRunL()
+	-> BtRun2L() -> gBtDevice.sdpa->NextRecordRequestL()
+			NextRecordRequestComplete()
+			-> NrrcL()
+			-> sdpa->AttributeRequestL()
+				AttributeRequestResult(*) -> AcceptVisitorL() -->> VisitAttributeValueL(*)
+				AttributeRequestComplete() -> sdpa->NextRecordRequestL()
+					NextRecordRequestComplete(<=>)
+	-> gBtResolver.Next()
+		BtSyncCallbackL(<=>)
+
+
+13:42 2007-05-07
+proposed error report:
+Calling BABILE_setSetting(gBabileObj, BABIL_PARM_VOLUME, x) or BABILE_setSetting(gBabileObj, BABIL_PARM_VOLUMERATIO, x) with varying values on x from 0 to 100 gives no perceptible change in output volume. Since we have no documentation on these settings, we wonder if this is the intended effect.
+13:43 2007-05-07
+since default volume is 16000... :}
+17:52 2007-05-07
+No it ain't. VOLUME(RATIO) returns -21 (NOT_IMPLEMENTED). Not a problem, since we can use Symbian's built-in volume control.
+But Speed and Pitch remains to be tested.
+
+11:29 2007-07-16
+Symbian's use of priorities are confusing. There are at least three different sets of priorities, but they all use a signed, "0==normal" model. The known priority sets are: Thread, CActive and Mda. Programmers should take care to use the correct priority set.
+
+11:48 2007-07-16
+http://wiki.forum.nokia.com/index.php/DOs_and_DON%27Ts_of_Symbian_C%2B%2B
+There are things in here we should implement in our code.
+
+12:02 2007-09-14
+http://www.jhauser.us/arithmetic/SoftFloat.html
+
+11:37 2007-09-28
+FILERUN is disabled on my N73. I think we can safely assume that this happens on such a majority of 3rd edition devices that the technique is not worth looking into more.
+
+13:49 2007-09-28
+EXE and _reg.RSC files are different depending on UID. Some changes are obvious and can be easily patched. Some are obscure. Accurate file format descriptions for the two formats are necessary.
+
+11:46 2008-03-17
+Code line length maximum: 90 characters.
+
+16:22 2008-08-21
+Symbian Panics reported with the recompiler active:
+KERN-EXEC 3
+KERN-EXEC 40
+
+12:02 2008-08-25
+Suggest test recompiler with testProgram hello.c first. Then use t6, 3dLines and test_boot.
+
+
+17:54 2009-01-09
+Functions which require Symbian Signing:
+Location API (only on 3rd ed baseline and FP1. Supposed to be moved to User-grantable in FP2.) (Location)
+CellID (ReadDeviceData)
+IMSI (ReadDeviceData)
+List other installed applications (ReadDeviceData)
+
+IMEI does NOT require any capabilities, according to docs.
+
+I plan to write a server to provide access to these functions to ordinary MoSync programs. ProtServ should be used, as we'll have access to that capability.

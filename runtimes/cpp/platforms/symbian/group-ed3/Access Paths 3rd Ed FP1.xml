@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<?codewarrior exportversion="1.0" ideversion="5.5" ?>
+
+<!DOCTYPE EXPORTEDPANEL [
+<!ELEMENT EXPORTEDPANEL (NAME, (SETTINGLIST|VALUE))>
+<!ELEMENT SETTINGLIST (SETTING+)>
+<!ELEMENT SETTING (NAME?, (VALUE|(SETTING+)))>
+<!ELEMENT NAME (#PCDATA)>
+<!ELEMENT VALUE (#PCDATA)>
+]>
+
+<EXPORTEDPANEL>
+    <NAME>Access Paths</NAME>
+    <SETTINGLIST>
+        <SETTING><NAME>AlwaysSearchUserPaths</NAME><VALUE>true</VALUE></SETTING>
+        <SETTING><NAME>InterpretDOSAndUnixPaths</NAME><VALUE>false</VALUE></SETTING>
+        <SETTING><NAME>RequireFrameworkStyleIncludes</NAME><VALUE>false</VALUE></SETTING>
+        <SETTING><NAME>SourceRelativeIncludes</NAME><VALUE>false</VALUE></SETTING>
+        <SETTING><NAME>UserSearchPaths</NAME>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\inc</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE></VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\src</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\..\..\base</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\..\..\core</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\..\..\..\..\intlibs\helpers</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+        </SETTING>
+        <SETTING><NAME>SystemSearchPaths</NAME>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>EPOC32\include</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>EPOC32\include\libc</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>C:\Symbian\8.0a\S60_2nd_FP2\BABILE\PBL_SYMBIAN_Series60_1_0_SDK_V30306\includes</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Absolute</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>EPOC32\RELEASE\ARMV5\UREL</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>EPOC32\RELEASE\ARMV5\LIB</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>epoc32\include\gcce</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>epoc32\include\variant</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>s60 S60_3rd_FP1</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>C:\Program\CSL Arm Toolchain\bin\..\lib\gcc\arm-none-symbianelf\3.4.3\include</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Absolute</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\..\..\..\..\intlibs</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+            <SETTING>
+                <SETTING><NAME>SearchPath</NAME>
+                    <SETTING><NAME>Path</NAME><VALUE>..\..\..</VALUE></SETTING>
+                    <SETTING><NAME>PathFormat</NAME><VALUE>Windows</VALUE></SETTING>
+                    <SETTING><NAME>PathRoot</NAME><VALUE>Project</VALUE></SETTING>
+                </SETTING>
+                <SETTING><NAME>Recursive</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>FrameworkPath</NAME><VALUE>false</VALUE></SETTING>
+                <SETTING><NAME>HostFlags</NAME><VALUE>All</VALUE></SETTING>
+            </SETTING>
+        </SETTING>
+    </SETTINGLIST>
+</EXPORTEDPANEL>

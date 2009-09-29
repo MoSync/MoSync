@@ -1,0 +1,78 @@
+
+LANG SC
+
+SYSTEMINCLUDE	\epoc32\include
+SYSTEMINCLUDE	\epoc32\include\libc
+USERINCLUDE	inc
+USERINCLUDE	..\..\base
+USERINCLUDE	..\..\core\Recompiler
+USERINCLUDE	..\..\..\..\intlibs\helpers
+
+SYSTEMINCLUDE	..\..\core
+SYSTEMINCLUDE	inc
+SYSTEMINCLUDE	..\..\..\..\intlibs
+SYSTEMINCLUDE	..\..
+SYSTEMINCLUDE	..\..\..\..\libs
+
+SOURCEPATH        src
+SOURCE            Application.cpp
+SOURCE            Document.cpp
+SOURCE            AppUi.cpp
+SOURCE            AppView.cpp
+SOURCE            DirScrAccEng.cpp
+SOURCE            symbian_helpers.cpp
+SOURCE            SyscallImpl.cpp
+SOURCE            FileImpl.cpp
+SOURCE            netImpl.cpp
+SOURCE            hashmap.cpp
+SOURCE            sound.cpp
+SOURCE            bluetooth.cpp
+SOURCE            guido.cpp
+SOURCE            wlanImpl.cpp
+
+SOURCEPATH ..\..\..\..\intlibs\net
+SOURCE            net.cpp
+
+SOURCEPATH ..\..\core
+SOURCE            core.cpp
+SOURCE            disassembler.cpp
+
+SOURCEPATH ..\..\core\Recompiler
+SOURCE            ArmAssembler.cpp
+SOURCE            ArmRecompiler.cpp
+SOURCE            Recompiler.cpp
+
+SOURCEPATH ..\..\base
+SOURCE            Syscall.cpp
+SOURCE            Stream.cpp
+SOURCE            MemStream.cpp
+SOURCE            FileStream.cpp
+SOURCE            tile.cpp
+
+LIBRARY           euser.lib
+LIBRARY           apparc.lib
+LIBRARY           cone.lib
+LIBRARY           eikcore.lib
+LIBRARY           avkon.lib
+LIBRARY	ws32.lib
+LIBRARY efsrv.lib
+LIBRARY bafl.lib
+//LIBRARY estlib.lib
+LIBRARY esock.lib
+LIBRARY hal.lib
+LIBRARY fbscli.lib
+LIBRARY bluetooth.lib
+LIBRARY bitgdi.lib
+LIBRARY sdpdatabase.lib
+LIBRARY commdb.lib
+LIBRARY sdpagent.lib
+LIBRARY ImageConversion.lib
+LIBRARY mmfcontrollerframework.lib
+LIBRARY mediaclientaudio.lib
+LIBRARY VibraCtrl.lib
+LIBRARY apgrfx.lib
+LIBRARY smcm.lib msgs.lib mtur.lib gsmu.lib
+LIBRARY mediaclientaudiostream.lib 
+LIBRARY mediaclientvideo.lib
+LIBRARY Lbs.lib
+LIBRARY insock.lib

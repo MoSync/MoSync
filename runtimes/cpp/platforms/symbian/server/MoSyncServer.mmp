@@ -1,0 +1,30 @@
+// MoSyncServer.mmp
+//
+// Created: 01/09/09
+// Copyright (c) Mobile Sorcery. All rights reserved.
+//
+
+// using relative paths for sourcepath and user includes
+
+TARGET		MoSyncServer.exe
+TARGETTYPE	exe
+UID		0x100039CE 0x20022A9D
+VENDORID	0
+CAPABILITY	ReadDeviceData Location
+EPOCSTACKSIZE	0x10000
+
+
+SOURCEPATH	.
+SOURCE		MoSyncServer.cpp
+SOURCE		GetNetworkInfo.cpp
+SOURCE		ActiveEnder.cpp
+SOURCE		Log.cpp
+SOURCE		Location.cpp
+
+USERINCLUDE	.
+SYSTEMINCLUDE	\Epoc32\include
+
+LIBRARY		euser.lib
+LIBRARY		etel3rdparty.lib
+LIBRARY		efsrv.lib
+LIBRARY		Lbs.lib

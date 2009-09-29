@@ -1,0 +1,32 @@
+TARGET MoSync2.exe
+TARGETTYPE exe
+UID 0x100039CE 0xE7654321
+VENDORID 0
+CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices	//none
+EPOCSTACKSIZE 0x10000
+
+START RESOURCE ..\data\MoSync_3rd.rss
+HEADER
+TARGETPATH resource\apps
+END //RESOURCE
+
+START RESOURCE	..\data\MoSync_reg.rss
+#ifdef WINSCW
+TARGETPATH	\private\10003a3f\apps
+#else
+TARGETPATH	\private\10003a3f\import\apps
+#endif	//WINSCW
+END //RESOURCE
+
+#include "..\MoSync-base.mmp"
+
+SOURCEPATH ..\src
+SOURCE RSendAs_SMS.cpp
+SOURCE Client.cpp
+
+LIBRARY gdi.lib
+LIBRARY ecom.lib
+LIBRARY etel3rdparty.lib
+LIBRARY mmfstandardcustomcommands.lib
+LIBRARY sendas2.lib
+

@@ -1,0 +1,10 @@
+// BLD.INF
+//
+// Created: 01/09/09
+// Author:  
+// Copyright (c) Mobile Sorcery. All rights reserved.
+//
+
+PRJ_MMPFILES
+
+MoSyncServer.mmp

@@ -1,0 +1,39 @@
+TARGET MoSync2.exe
+TARGETTYPE exe
+UID 0x100039CE 0xE7654321
+VENDORID 0
+CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices	//none
+EPOCSTACKSIZE 0x5000
+
+START RESOURCE ..\data\MoSync_3rd.rss
+HEADER
+TARGETPATH resource\apps
+END //RESOURCE
+
+START RESOURCE	..\data\MoSync_reg.rss
+#ifdef WINSCW
+TARGETPATH	\private\10003a3f\apps
+#else
+TARGETPATH	\private\10003a3f\import\apps
+#endif	//WINSCW
+END //RESOURCE
+
+SYSTEMINCLUDE	\Symbian\9.2\S60_3rd_FP1\BABILE\PBL3.03.09_SYMBIAN_S60V3\includes
+
+#include "..\MoSync-base.mmp"
+
+SOURCEPATH ..\src
+SOURCE RSendAs_SMS.cpp
+SOURCE Client.cpp
+
+LIBRARY gdi.lib
+LIBRARY babile_20009c8b.lib
+//LIBRARY babile_2000725c.lib
+LIBRARY ecom.lib
+LIBRARY etel3rdparty.lib
+LIBRARY mmfstandardcustomcommands.lib
+LIBRARY sendas2.lib
+LIBRARY estlib.lib
+
+SOURCEPATH ..\..\..\..\..\testPrograms
+SOURCE hello.cpp

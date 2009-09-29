@@ -1,0 +1,156 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+
+import java.io.*;
+
+final class BufferlessPipedInputStream extends InputStream {
+	byte[] mSrc = null;
+	int mPos;	//position in the source from which we can read
+	int mLen = 0;	//number of bytes we can read
+	BufferlessPipedOutputStream mOut;
+
+	public void setOut(BufferlessPipedOutputStream out) {
+		mOut = out;
+	}
+
+	//we should probably implement available() and close()
+
+	//bad
+	public int read() {
+		DEBUG_TEMP("BPIS.read(int)\n");
+		BIG_PHAT_ERROR;
+	}
+
+	public int read(byte[] dst) {
+		return read(dst, 0, dst.length);
+	}
+
+	public int read(byte[] dst, int off, int len) {
+		DEBUG_TEMP("BPIS.read()\n");
+		synchronized(this) {
+			if (mLen == 0) {
+				mOut.mDst = dst;
+				mOut.mPos = off;
+				mOut.mLen = len;
+				do {
+					try {
+						//DEBUG_TEMP("r wait\n");
+						this.wait();	//mOut will update its len on write
+						//DEBUG_TEMP("r waited\n");
+					} catch(InterruptedException e) {
+						PRINT_STACK_TRACE;
+					}
+				} while (mOut.mLen == len);
+				int result = len - mOut.mLen;
+				mOut.mDst = null;
+				mOut.mLen = 0;
+				return result;
+			} else {
+				int curLen = MIN(mLen, len);
+				System.arraycopy(mSrc, mPos, dst, off, curLen);
+				mPos += curLen;
+				mLen -= curLen;	//this is where we update our len on read
+				this.notify();
+				return curLen;
+			}
+		}
+	}
+}
+
+final class BufferlessPipedOutputStream extends OutputStream {
+	byte[] mDst = null;	//null if other end of pipe is not waiting on a read
+	int mPos;	//position in the dst at which we can write
+	int mLen = 0;	//number of bytes we can write
+	BufferlessPipedInputStream mIn;
+
+	public void setIn(BufferlessPipedInputStream in) {
+		mIn = in;
+	}
+
+	public void flush() {
+		DEBUG_TEMP("BPOS.flush()\n");
+	}
+
+	public void close() {
+		DEBUG_TEMP("BPOS.close()\n");
+		mIn.mOut = null;
+	}
+
+	//bad
+	public void write(int b) {
+		DEBUG_TEMP("BPOS.write(int)\n");
+		BIG_PHAT_ERROR;
+	}
+
+	public void write(byte[] src) {
+		DEBUG_TEMP("BPOS.write(b)\n");
+		write(src, 0, src.length);
+	}
+
+	public void write(byte[] src, int off, int len) {
+		DEBUG_TEMP("BPOS.write(bii)\n");
+		try {
+		synchronized(mIn) {
+			if (mLen != 0) {
+				int curLen = MIN(mLen, len);
+				System.arraycopy(src, mPos, mDst, off, curLen);
+				mPos += curLen;
+				mLen -= curLen;	//this is where we update our len on write
+				len -= curLen;
+				mIn.notify();
+			}
+			if (len != 0) {	//if not all was written
+				mIn.mSrc = src;
+				mIn.mPos = off;
+				mIn.mLen = len;
+				do {
+					try {
+						//DEBUG_TEMP("w wait\n");
+						mIn.wait();	//mInn will update its len on read
+						//DEBUG_TEMP("w waited\n");
+					} catch(InterruptedException e) {
+						PRINT_STACK_TRACE;
+					}
+				} while (mIn.mLen != 0);	//wait until they've read everything
+				mIn.mSrc = null;
+				mIn.mLen = 0;
+			}
+		}
+		} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+		}
+	}
+}
+
+#if 0
+//maybe get rid of this and just sync on one of the streams
+//or make the streams private subclasses (not static) and sync on super
+final class Pipe {
+	private BufferlessPipedInputStream mIn = new BufferlessPipedInputStream(this);
+	private BufferlessPipedOutputStream mOut = new BufferlessPipedOutputStream(this);
+
+	Pipe() {
+		mIn.mOut = mOut;
+		mOut.mIn = mIn;
+	}
+
+	public InputStream getIn() { return mIn; }
+	public OutputStream getOut() { return mOut; }
+}
+#endif

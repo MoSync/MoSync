@@ -1,0 +1,9 @@
+
+SYSTEMINCLUDE	\Symbian\9.2\S60_3rd_FP1\babile2
+SYSTEMINCLUDE	\Symbian\9.2\S60_3rd_FP1\babile2\babile
+
+#include "..\MoSync.mmp"
+
+LIBRARY estlib.lib
+//LIBRARY babile_20009c8b.lib
+LIBRARY babile_2000725c.lib

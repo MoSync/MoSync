@@ -1,0 +1,673 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+#include "syscall_helpers.h"
+#include "config_platform.h"
+#include "generated\MAAPI_consts.h"
+
+import javax.microedition.lcdui.game.GameCanvas;
+import javax.microedition.lcdui.*;
+import java.io.*;
+import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public final class MainCanvas extends GameCanvas implements Runnable, CommandListener {
+
+	public MAMidlet mMidlet;
+	public Core mCore;
+	private boolean mStop, mDestroy;
+
+#ifndef MOSYNC_STATIC_JAVA
+	private InputStream mRecreate = null;
+	public boolean mReload = false;
+#endif
+
+	/*//circular-type FIFO
+	int mEventTypeBuffer[] = new int[EVENT_BUFFER_SIZE];
+	Object mEventDataBuffer[] = new Object[EVENT_BUFFER_SIZE];
+	int mEventEnd = 0, mEventStart = 0;*/
+
+	private Vector mEventBuffer = new Vector(EVENT_BUFFER_SIZE);
+
+	private boolean mEventOverflow = false;
+	public boolean mClosing = false;
+	private int mWaitSequence = 0;
+	Timer mTimer = new Timer();
+
+	private int	mKeyState = 0;
+	
+	private Alert mErrorAlert;
+#ifndef MOSYNC_COMMERCIAL
+	private Alert mStartupAlert;
+#endif
+
+#ifdef SPLASH_SCREEN
+#include "splash.h"
+	private boolean mInSplash = true;
+#endif	//SPLASH_SCREEN
+
+	MainCanvas(MAMidlet aMidlet) throws Exception {
+		super(false);	
+		mMidlet = aMidlet;		
+#ifdef SPLASH_SCREEN
+		InputStream is = new ByteArrayInputStream(splash);
+		mCore = new Core(this, is);
+		is.close();
+#endif	//SPLASH_SCREEN
+	}
+
+	public final void createCore() throws Exception {
+#ifdef MOSYNC_STATIC_JAVA
+		mCore = new Core(this, "resources");
+#else
+		mCore = new Core(this, "program", "resources");
+#endif
+	}
+
+#ifndef MOSYNC_STATIC_JAVA
+	private final void reload() throws Exception {
+		mReload = false;
+		mStop = false;
+		mCore.destruct();
+		mCore = null;
+		createCore();
+		mCore.mSyscall.init();
+		Graphics g = mCore.mSyscall.mGraphics;
+		g.setClip(0, 0, getWidth(), getHeight());
+		g.setColor(0);
+		g.fillRect(0,0, g.getClipWidth(), g.getClipHeight());
+	}
+#endif
+
+#ifdef MA_PROF_BUG_MICROEMU
+	public void paint(Graphics g) {
+		//System.out.println("paint: " + g.toString() + ", " + mBackbuffer.toString());
+		if(mBackbuffer != null)
+			g.drawImage(mBackbuffer, 0, 0, 0);
+	}
+
+	Image mBackbuffer = null;
+	public Graphics getGraphics() {
+		return mBackbuffer.getGraphics();
+	}
+	public void flushGraphics() {
+		repaint();
+	}
+#endif
+
+	//private boolean firstRun = true;
+	public final void run() {
+		try {
+			//if(firstRun)
+			{
+				int w = getWidth();
+				int h = getHeight();
+				DEBUG_ASSERT(mCore != null);
+				DEBUG_ASSERT(mCore.mSyscall != null);
+				DEBUG_ASSERT(mCore.mSyscall.mGraphics != null);
+				mCore.mSyscall.mClipLeft = 0;
+				mCore.mSyscall.mClipTop = 0;
+				mCore.mSyscall.mClipWidth = w;
+				mCore.mSyscall.mClipHeight = h;
+				DEBUG_ALWAYS("size: " + w + ", " + h + "\n");
+				mCore.mSyscall.mGraphics.setClip(0, 0, w, h);	//required for some stupid phones
+				mCore.mSyscall.mGraphics.setColor(0);
+				mCore.mSyscall.mGraphics.fillRect(0, 0, w, h);
+				//firstRun = false;
+
+#ifdef GDB_DEBUG
+				mCore.mGdbStub.waitForRemote();
+#endif
+			}
+#ifdef MOSYNC_STATIC_JAVA
+			mStop = mDestroy = false;
+			mCore.run();
+#else
+			while(true) {
+				try {
+					DEBUG_ALWAYS("mainLoop start\n");
+					mStop = mDestroy = false;
+#ifndef PHONE_RELEASE
+					mCore.mInstCount = 0;
+#endif
+					long startTime = System.currentTimeMillis();
+					while(!mStop) {
+						mCore.mIP = mCore.run();
+					}
+					long time = System.currentTimeMillis() - startTime;
+					if(time == 0) time++;
+
+#ifdef MA_PROF_SUPPORT_CLDC_10				
+					DEBUG_ALWAYS(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+						((mCore.mInstCount) / time)+" KIPS\n");
+#else				
+					DEBUG_ALWAYS(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+						(((double)mCore.mInstCount) / time)+" KIPS\n");
+#endif
+
+					synchronized(this) {
+						if(mDestroy) {
+							DEBUG_ALWAYS("mDestroy\n");
+#ifdef SPLASH_SCREEN
+							if(mInSplash) {
+								mInSplash = false;
+								mCore.destruct();
+								mCore = null;
+								mCore = new Core(this, "program", "resources");
+								mCore.mSyscall.init();
+								mDestroy = false;
+							} else {
+#endif	//SPLASH_SCREEN
+								if(mReload) {
+									reload();
+									continue;
+								} else {
+									mMidlet.destruct();
+									DEBUG_ALWAYS("mDestroy done\n");
+									return;
+								}
+#ifdef SPLASH_SCREEN
+							}
+							DEBUG_ALWAYS("mDestroy done\n");
+#endif	//SPLASH_SCREEN
+						} else if(mRecreate != null) {
+							mCore.destruct();
+							mCore = null;
+							mCore = new Core(this, mRecreate);
+							mCore.mSyscall.init();
+							mRecreate.close();
+							mRecreate = null;
+							continue;
+						}
+
+						if(mEventBuffer.size() == 0 || mErrorAlert != null) {
+							DEBUG_ALWAYS("wait()\n");
+							this.wait();
+							DEBUG_ALWAYS("wait() done\n");
+						}
+						if(mCore == null) {
+							DEBUG_TEMP("mCore null, returning.\n");
+							return;
+						}	//if
+					}	//synchronized
+				} catch(Throwable e) {
+					if(mReload) {
+						PRINT_STACK_TRACE;
+						reload();
+					} else {
+						throw e;
+					}
+				}
+			}	//while
+#endif	//MOSYNC_STATIC_JAVA
+		} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+#ifdef MOSYNC_STATIC_JAVA
+			//I'm uncertain about mDestroy
+			if(mDestroy) {
+				mMidlet.destruct();
+				return;
+			}
+			if(e.getMessage() != null) if(e.getMessage().equals(STATIC_EXCEPTION_STRING)) {
+				mMidlet.destruct();
+				return;
+			}
+#endif
+			handleRuntimeException(e);
+		} finally {
+			DEBUG_ALWAYS("MainCanvas.run() ends\n");
+		}
+	}
+
+	private void handleRuntimeException(Throwable e) {
+		if(mCore == null) {
+			mMidlet.programError("Loading error: " + formatThrowable(e));
+		} else {
+			mMidlet.programError(formatThrowable(e));
+		}
+	}
+
+	private String formatThrowable(Throwable e) {
+		//cut out important parts of Exception string
+		String ex;
+		/*if(e instanceof BigPhatError) {
+			ex = "MoSync Panic";
+		} else*/ {
+#if defined(CONN_PANIC) || defined(PUBLIC_DEBUG)
+			ex = e.toString();
+#else
+			String es = e.getClass().getName();//toString();
+			int dotIndex = es.lastIndexOf('.');
+			DUMP(dotIndex);
+			if(dotIndex >= 0 && es.length() > dotIndex) {
+				ex = es.substring(dotIndex + 1);
+			} else {
+				ex = es;
+			}
+			int exIndex = ex.indexOf("Exception");
+			if(exIndex > 1) {
+				es = null;
+				if(ex.length() > exIndex + 9) {
+					es = ex.substring(exIndex + 9);
+				}
+				ex = ex.substring(0, exIndex);
+				if(es != null)
+					ex += es;
+			}
+#endif
+		}
+		if(mCore == null)
+			return ex;
+
+		byte[] appCode = new byte[4];
+		for(int i=0; i<4; i++) {
+			appCode[i] = (byte)(mCore.Head_AppCode >> ((3-i)*8));
+		}
+
+		//space is here because some devices don't handle '\n'
+		return ex + "\n " +
+#if defined(PUBLIC_DEBUG) && !defined(MOSYNC_STATIC_JAVA)
+			//TODO: check to see if running
+			(SYSCALL_NUMBER_IS_VALID(mCore.mLastSyscall) ?
+			("s" + Integer.toString(mCore.mLastSyscall)) : "") +
+			".i" + Integer.toHexString(mCore.mIP) + "." + 
+#endif
+			new String(appCode);
+	}
+
+	private final int convertKeyCode(int keyCode) {
+#define CONVERT_NUM(k) if(keyCode == Canvas.KEY_NUM##k) return MAK_##k;
+#define CONVERT_OTHER(k) if(keyCode == Canvas.KEY_##k) return MAK_##k;
+#define CONVERT_GAC(k) if(action == Canvas.k) return MAK_##k;
+#define CONVERT_CUSTOM(mak, kc) if(keyCode == kc) return MAK_##mak;
+
+		NUMBER_KEYS(CONVERT_NUM);
+		OTHER_KEYS(CONVERT_OTHER);
+
+		try {
+			int action = getGameAction(keyCode);
+			ACTION_KEYS(CONVERT_GAC);
+		} catch(IllegalArgumentException e) {
+			PRINT_STACK_TRACE;
+		}
+
+		CUSTOM_KEYS(CONVERT_CUSTOM);
+
+		return 0;
+	}
+
+	private final int convertKeyBit(int keyCode) {
+#define CONVERTB_NUM(k) if(keyCode == Canvas.KEY_NUM##k) return MAKB_##k;
+#define CONVERTB_OTHER(k) if(keyCode == Canvas.KEY_##k) return MAKB_##k;
+#define CONVERTB_GAC(k) if(action == Canvas.k) return MAKB_##k;
+#define CONVERTB_CUSTOM(mak, kc) if(keyCode == kc) return MAKB_##mak;
+
+		NUMBER_KEYS(CONVERTB_NUM);
+		OTHER_KEYS(CONVERTB_OTHER);
+
+		try {
+			int action = getGameAction(keyCode);
+			ACTION_KEYS(CONVERTB_GAC);
+		} catch(IllegalArgumentException e) {
+			PRINT_STACK_TRACE;
+		}
+
+		CUSTOM_KEYS(CONVERTB_CUSTOM);
+
+		return 0;
+	}
+		
+	private final void handleKeyEvent(int keyCode, boolean released) {
+#ifdef PUBLIC_DEBUG
+		try {
+#endif
+			int mak = convertKeyCode(keyCode);
+			if(mak != 0) {
+				int[] event = new int[2];
+				if(released == true) {
+					mKeyState &= ~convertKeyBit(keyCode);
+				} else {
+					mKeyState |= convertKeyBit(keyCode);				
+				}
+
+				EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
+				EI_KEY = mak;
+				postEvent(event);
+			}
+#ifdef PUBLIC_DEBUG
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			MAMidlet.self.programError("Key error", e);
+		}
+#endif
+	}
+
+	synchronized public final void postEvent(int[] event) {
+		//DEBUG_TEMP("postEvent\n");
+		if(!mEventOverflow) {
+			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				mEventOverflow = true;
+				mEventBuffer.removeAllElements();
+				DEBUG("EventBuffer overflow!\n");
+			}
+			mEventBuffer.addElement(event);
+		}
+		FinishWait();
+		//DEBUG_TEMP("postEvent done\n");
+	}
+
+	public int getKeys() {
+		return mKeyState;
+	}
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+	protected final void pointerPressed(int x, int y) {
+		DEBUG_TEMP("pointerPressed "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+	
+	protected final void pointerReleased(int x, int y) {
+		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);	
+	}
+	
+	protected final void pointerDragged(int x, int y) {
+		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+#endif	//MA_PROF_SUPPORT_STYLUS
+		
+	synchronized protected final void keyPressed(int keyCode) {
+		DEBUG_KEYS("keyPressed "+keyCode+"\n");
+		handleKeyEvent(keyCode, false);
+	}
+	synchronized protected final void keyReleased(int keyCode) {
+		DEBUG_KEYS("keyReleased "+keyCode+"\n");
+		handleKeyEvent(keyCode, true);
+	}
+
+	synchronized public final int[] getEvent() {
+		//DEBUG_TEMP("getEvent\n");
+		if(!mClosing)
+			mEventOverflow = false;
+		if(mEventBuffer.isEmpty()) {
+			//DEBUG_TEMP("getEvent null\n");
+			return null;
+		}
+		int[] event = (int[]) mEventBuffer.firstElement();
+		mEventBuffer.removeElementAt(0);
+		//DEBUG_TEMP("getEvent done\n");
+		return event;
+	}
+
+#ifdef MOSYNC_STATIC_JAVA
+	synchronized public final void Wait(int timeout) {
+		if(mEventBuffer.size() > 0)
+			return;
+		try {
+			this.wait(timeout);
+		} catch(InterruptedException e) {
+			IN_FILE_ON_LINE;
+			PRINT_STACK_TRACE;
+		}
+	}
+	synchronized private final void FinishWait() {
+		this.notify();
+	}
+#else
+	public final void stop() {
+		mStop = true;
+	}
+
+	class WaitTask extends TimerTask {
+		private final int mSequence;
+		WaitTask(int sequence) {
+			mSequence = sequence;
+		}
+		public final void run() {
+			DEBUG_ALWAYS("WaitTask.run(), seq "+mSequence+"\n");
+			if(mSequence != mWaitSequence)
+				return;
+			FinishWait();
+		}
+	}
+
+	synchronized public final void Wait(int timeout) {
+		//DEBUG_ALWAYS("Wait "+timeout+"\n");
+		if(mEventBuffer.size() > 0)
+			return;
+		YIELD;
+		if(timeout > 0) {
+			DEBUG_ALWAYS(" seq "+mWaitSequence+"\n");
+			mTimer.schedule(new WaitTask(mWaitSequence), timeout);
+		}
+		stop();
+	}
+	synchronized private final void FinishWait() {
+		if(!mStop)
+			return;
+		mStop = false;
+		//DEBUG_ALWAYS("FinishWait\n");
+		try {
+			mWaitSequence++;
+			DEBUG_TEMP("notify()\n");
+			this.notify();
+		} catch(Exception e) {
+			IN_FILE_ON_LINE;
+			PRINT_STACK_TRACE;
+		}
+		//DEBUG_TEMP("FinishWait done\n");
+	}
+#endif	//MOSYNC_STATIC_JAVA
+
+	synchronized public final void setClose() {
+		mEventOverflow = mClosing = true;
+		//mCore.mEndTime = System.currentTimeMillis() + EVENT_CLOSE_TIMEOUT;
+		int[] event = new int[1];
+		EI_TYPE = EVENT_TYPE_CLOSE;
+		mEventBuffer.addElement(event);
+		FinishWait();
+		DEBUG_ALWAYS("setClose done\n");
+	}
+
+	public final void SetAlert(String title, String message, Throwable e){
+		SetAlert(title, message + "\n" + formatThrowable(e));
+	}
+
+
+	//calls MAMidlet.destruct() after dialog is dismissed.
+	public final void SetAlert(String title, String message) {
+		DEBUG_ALWAYS("Alert(\""+title+"\", \""+message+"\")\n");
+		if(mErrorAlert != null)
+			return;
+
+#ifdef MOSYNC_STATIC_JAVA
+		mDestroy = true;
+		if(mCore != null)
+			mCore.interrupt();
+#else
+		if(mReload) {
+			DEBUG_ALWAYS("mReload\n");
+			//reload original program
+			stop();
+			return;
+		}
+		stop();
+#endif
+
+		//show the message before we exit
+		Display d = Display.getDisplay(mMidlet);
+		//FIXME: Alert title should be application name
+		mErrorAlert = new Alert(title, message, null, AlertType.ERROR);
+		mErrorAlert.setTimeout(Alert.FOREVER);
+		mErrorAlert.setCommandListener(this);
+		d.setCurrent(mErrorAlert);
+#ifdef GDB_DEBUG
+		DEBUG_ALWAYS("stub active\n");
+		if(mCore != null) {
+			GdbStub g = mCore.mGdbStub;
+			if(g != null) {
+				try {
+					g.waitForRemote();
+				} catch(Exception e) {
+					PRINT_STACK_TRACE;
+					DEBUG_ALWAYS("exception in stub!\n");
+				}
+			}
+		}
+#endif
+	}
+
+#ifndef MOSYNC_COMMERCIAL
+#define COMMERCIAL_TIMEOUT 1000	//should be moved to IDL.
+	public final void startupAlert() throws Exception {
+		DEBUG_ALWAYS("Startup Alert\n");
+		Display d = Display.getDisplay(mMidlet);
+		mStartupAlert = new Alert("", "mosync non-commercial", null, AlertType.INFO);
+		mStartupAlert.setTimeout(COMMERCIAL_TIMEOUT);
+		mStartupAlert.setCommandListener(this);
+		d.setCurrent(mStartupAlert);
+		long startTime = System.currentTimeMillis();
+
+#if 0
+		//Thread.sleep(2000);
+		DEBUG_ALWAYS("time: " + (System.currentTimeMillis() - startTime) + "\n");
+		while(System.currentTimeMillis() < startTime + 2000);
+		DEBUG_ALWAYS("time: " + (System.currentTimeMillis() - startTime) + "\n");
+#endif
+
+		createCore();
+
+		long loadTime = System.currentTimeMillis();
+		DEBUG_ALWAYS("load time: " + (loadTime - startTime) + " ms\n");
+		if(loadTime - startTime > COMMERCIAL_TIMEOUT) {
+			DEBUG_ALWAYS("exeeded timeout\n");
+			commandAction(null, mStartupAlert);
+		}
+	}
+#endif
+
+	synchronized public final void commandAction(Command c, Displayable d) {
+		DEBUG_ALWAYS("commandAction " + d + "\n");
+		//always the Alert's DISMISS command
+		try {
+#ifndef MOSYNC_COMMERCIAL
+			if(d == mStartupAlert) {
+				if(mCore != null) {
+					mStartupAlert = null;
+					initDisplay();
+				}
+			} else
+#endif
+			{	//errorAlert
+				DEBUG_TEMP("notify()\n");
+				this.notify();
+				mMidlet.destruct();
+			}
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+		}
+	}
+
+	//these two are only called from inside the thread
+	public final void SetExit(int reason) {
+		DEBUG_ALWAYS("Exit "+reason+"\n");
+		mDestroy = true;
+#ifndef MOSYNC_STATIC_JAVA
+		stop();
+#endif
+	}
+
+#ifndef MOSYNC_STATIC_JAVA
+	//this is called from a yielding syscall
+	public final void recreate(InputStream programStream, boolean reload) {
+		mRecreate = programStream;
+		mReload = reload || mReload;
+		stop();
+	}
+#endif
+
+#ifndef MA_PROF_BUG_MICROEMU
+	public final Graphics getGraphics() {
+		return super.getGraphics();
+	}
+#endif
+
+	public void initDisplay() {
+		DEBUG_ALWAYS("initDisplay()\n");
+		mSCState = 1;
+		//should cause Canvas.sizeChanged asynchronously!
+		setFullScreenMode(true);
+		Display.getDisplay(mMidlet).setCurrent(this);
+		//must, if this is to work
+#ifdef MA_PROF_BUG_NO_SIZECHANGED
+		initAndStart();
+#endif
+	}
+
+	private final void initAndStart() {
+		try {
+			mSCState = 0;
+			mCore.mSyscall.init();
+			mMidlet.mThread.start();
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			handleRuntimeException(e);
+		}
+	}
+
+	//ugly hacks
+	public boolean mReadyToInit = false;
+	public int mSCState = 0;
+
+//#if defined(MA_PROF_BUG_MICROEMU) || !defined(PHONE_RELEASE)
+	protected final void sizeChanged(int w, int h) {
+		DEBUG_ALWAYS("sizeChanged " + w + " " + h + "\n");
+		try {
+#ifdef MA_PROF_BUG_MICROEMU
+			mBackbuffer = Image.createImage(getWidth(), getHeight());
+#endif	//MA_PROF_BUG_MICROEMU
+			mReadyToInit = true;
+
+			DEBUG_ALWAYS("mSCState: " + mSCState + "\n");
+			if(mSCState == 1) {
+				DEBUG_ALWAYS("sC->\n");
+				//test
+				initAndStart();
+				return;
+			}
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			handleRuntimeException(e);
+		}
+	}
+//#endif
+}

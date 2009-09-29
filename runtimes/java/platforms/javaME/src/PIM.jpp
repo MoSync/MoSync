@@ -1,0 +1,327 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+enum INT_PIM_FIELD
+{
+	ADDR=1,
+	ADDR_COUNTRY,
+	ADDR_EXTRA,
+	ADDR_LOCALITY,
+	ADDR_POBOX,
+	ADDR_POSTALCODE,
+	ADDR_REGION,
+	ADDR_STREET,
+	ALARM,
+	ATTR_ASST,
+	ATTR_AUTO,
+	ATTR_FAX,
+	ATTR_HOME,
+	ATTR_MOBILE,
+	ATTR_OTHER,
+	ATTR_PAGER,
+	ATTR_PREFERRED,
+	ATTR_SMS,
+	ATTR_WORK,
+	BIRTHDAY,
+	CLASS,
+	CLASS_CONFIDENTIAL,
+	CLASS_PRIVATE,
+	CLASS_PUBLIC,
+	COMPLETED,
+	COMPLETION_DATE,
+	DUE,
+	EMAIL,
+	END,
+	FORMATTED_ADDR,
+	FORMATTED_NAME,
+	LOCATION,
+	NAME,
+	NAME_FAMILY,
+	NAME_GIVEN,
+	NAME_OTHER,
+	NAME_PREFIX,
+	NAME_SUFFIX,
+	NICKNAME,
+	NOTE,
+	ORG,
+	PHOTO,
+	PHOTO_URL,
+	PRIORITY,
+	PUBLIC_KEY,
+	PUBLIC_KEY_STRING,
+	REVISION,
+	START,
+	SUMMARY,
+	TEL,
+	TITLE,
+	UID,
+	URL,
+	ATTR_NONE = 255;
+}
+
+#define CONVERT_PIM_FIELD(fieldName) if(field == item.fieldName) {return INT_PIM_FIELD.fieldName;}
+
+int convertPIMFieldToInt(PIMItem item, int field)
+{
+	CONVERT_PIM_FIELD(ADDR);
+	CONVERT_PIM_FIELD(ADDR_COUNTRY);
+	CONVERT_PIM_FIELD(ADDR_EXTRA);
+	CONVERT_PIM_FIELD(ADDR_LOCALITY);
+	CONVERT_PIM_FIELD(ADDR_POBOX);
+	CONVERT_PIM_FIELD(ADDR_POSTALCODE);
+	CONVERT_PIM_FIELD(ADDR_REGION);
+	CONVERT_PIM_FIELD(ADDR_STREET);
+	CONVERT_PIM_FIELD(ALARM);
+	CONVERT_PIM_FIELD(ATTR_ASST);
+	CONVERT_PIM_FIELD(ATTR_AUTO);
+	CONVERT_PIM_FIELD(ATTR_FAX);
+	CONVERT_PIM_FIELD(ATTR_HOME);
+	CONVERT_PIM_FIELD(ATTR_MOBILE);
+	CONVERT_PIM_FIELD(ATTR_OTHER);
+	CONVERT_PIM_FIELD(ATTR_PAGER);
+	CONVERT_PIM_FIELD(ATTR_PREFERRED);
+	CONVERT_PIM_FIELD(ATTR_SMS);
+	CONVERT_PIM_FIELD(ATTR_WORK);
+	CONVERT_PIM_FIELD(BIRTHDAY);
+	CONVERT_PIM_FIELD(CLASS);
+	CONVERT_PIM_FIELD(CLASS_CONFIDENTIAL);
+	CONVERT_PIM_FIELD(CLASS_PRIVATE);
+	CONVERT_PIM_FIELD(CLASS_PUBLIC);
+	CONVERT_PIM_FIELD(COMPLETED);
+	CONVERT_PIM_FIELD(COMPLETION_DATE);
+	CONVERT_PIM_FIELD(DUE);
+	CONVERT_PIM_FIELD(EMAIL);
+	CONVERT_PIM_FIELD(END);
+	CONVERT_PIM_FIELD(FORMATTED_ADDR);
+	CONVERT_PIM_FIELD(FORMATTED_NAME);
+	CONVERT_PIM_FIELD(LOCATION);
+	CONVERT_PIM_FIELD(NAME);
+	CONVERT_PIM_FIELD(NAME_FAMILY);
+	CONVERT_PIM_FIELD(NAME_GIVEN);
+	CONVERT_PIM_FIELD(NAME_OTHER);
+	CONVERT_PIM_FIELD(NAME_PREFIX);
+	CONVERT_PIM_FIELD(NAME_SUFFIX);
+	CONVERT_PIM_FIELD(NICKNAME);
+	CONVERT_PIM_FIELD(NOTE);
+	CONVERT_PIM_FIELD(ORG);
+	CONVERT_PIM_FIELD(PHOTO);
+	CONVERT_PIM_FIELD(PHOTO_URL);
+	CONVERT_PIM_FIELD(PRIORITY,
+	CONVERT_PIM_FIELD(PUBLIC_KEY);
+	CONVERT_PIM_FIELD(PUBLIC_KEY_STRING);
+	CONVERT_PIM_FIELD(REVISION);
+	CONVERT_PIM_FIELD(START);
+	CONVERT_PIM_FIELD(SUMMARY);
+	CONVERT_PIM_FIELD(TEL);
+	CONVERT_PIM_FIELD(TITLE);
+	CONVERT_PIM_FIELD(UID);
+	CONVERT_PIM_FIELD(URL);
+	CONVERT_PIM_FIELD(ATTR_NONE);
+}
+
+byte[] resizePIMItems(byte[] ba, int minimumRequestedSize)
+{
+	int newSize = ba.size*2;
+	if(newSize<minimumRequestedSize) newSize = minimumRequestedSize*2;
+
+	byte[] newba = new byte[newSize];
+	for(int i=0; i<ba.size; i++) newba[i] = ba[i];
+	return newba;
+}
+
+#define STORE_PIM_STRING_ARRAY_FIELD(fieldFamily, fieldName) \
+	if(item.isSupportedArrayElement(Contact.fieldFamily, Contact.fieldName)) \
+	{ if(names[fieldName] != null) \
+		{ int t = convertPIMFieldToInt(item, Contact.fieldName); \
+			byte[] str = names[fieldName].getBytes(); \
+			byte[] newBuffer = new byte[nameBuffer.size+str.size+2]; \
+			int p = nameBuffer.size; \
+			for(int i = 0; i < p; i++) newBuffer[i] = nameBuffer[i]; \
+			newBuffer[p++] = (byte)t; \
+			for (int i = 1; i < (str.size+1); i ++) newBuffer[p++] = str[i]; \
+			newBuffer[p++] = 0; \
+			nameBuffer = newBuffer;}}
+
+byte[] collectPIMNameItems(PIMItem item, String[] names)
+{
+	byte[] nameBuffer;
+	STORE_PIM_STRING_ARRAY_FIELD(NAME, NAME_FAMILY);
+	STORE_PIM_STRING_ARRAY_FIELD(NAME, NAME_GIVEN);
+	STORE_PIM_STRING_ARRAY_FIELD(NAME, NAME_OTHER);
+    STORE_PIM_STRING_ARRAY_FIELD(NAME, NAME_PREFIX);
+	STORE_PIM_STRING_ARRAY_FIELD(NAME, NAME_SUFFIX);
+	return nameBuffer;
+}
+
+byte[] collectPIMAddressItems(PIMItem item, String[] names)
+{
+	byte[] nameBuffer;
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_COUNTRY);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_EXTRA);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_LOCALITY);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_POBOX);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_POSTALCODE);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_REGION);
+	STORE_PIM_STRING_ARRAY_FIELD(ADDR, ADDR_STREET);
+	return nameBuffer;
+}
+
+byte[] collectPIMItems(PIMList pimList)
+{
+	byte[] pimBuffer = new byte[2048];
+	int p = 0;
+	for (Enumeration item = contacts.items() ; item.hasMoreElements() ;)
+	{    
+		byte type = (byte)contacts.getFieldDataType(field);
+		pimBuffer[p++] = type;
+		int[] fields = item.getFields();
+		for (int i = 0; i < fields.size, i++)
+		{
+			int field = fields[i];
+			for (int j = 0; j < item.countValues(field); j++)
+			{
+				int attributes = item.getAttributes(field, j);
+				int pimInt = convertPIMFieldToInt(item, field);
+				if(type == INT)
+				{
+					int intData = item.getInt(field, j);
+					if((p+4)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+4));
+
+					pimBuffer[p++]=(byte)(value >>> 24);
+					pimBuffer[p++]=(byte)(value >>> 16);
+					pimBuffer[p++]=(byte)(value >>> 8);
+					pimBuffer[p++]=(byte)value};
+				}
+				else if(type == BINARY)
+				{
+					byte[] binaryData = item.getBinary(field, j);
+					if((p+4+binaryData.size)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+4+binaryData.size));
+
+					int binarySize = binaryData.size;
+					pimBuffer[p++]=(byte)(binarySize >>> 24);
+					pimBuffer[p++]=(byte)(binarySize >>> 16);
+					pimBuffer[p++]=(byte)(binarySize >>> 8);
+					pimBuffer[p++]=(byte)binarySize};
+
+					for(int i = 0; i < binaryData.size; i++) pimBuffer[p+i] = binaryData[i];
+					p += binaryData.size;
+				}
+				else if(type == BOOLEAN)
+				{
+					boolean boolData = item.getBoolean(field, j);
+					if((p+1)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+1));
+
+					if(boolData == true) pimBuffer[p++] = (1;
+					else pimBuffer[p++] = 0;
+				}
+				else if(type == DATE)
+				{
+					long dateData = item.getDate(field, j);
+					if((p+8)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+8));
+
+					pimBuffer[p++]=(byte)(value >>> 56);
+					pimBuffer[p++]=(byte)(value >>> 48);
+					pimBuffer[p++]=(byte)(value >>> 40);
+					pimBuffer[p++]=(byte)(value >>> 32)};
+					pimBuffer[p++]=(byte)(value >>> 24);
+					pimBuffer[p++]=(byte)(value >>> 16);
+					pimBuffer[p++]=(byte)(value >>> 8);
+					pimBuffer[p++]=(byte)value};
+				}
+				else if(type == STRING_ARRAY)
+				{
+					String[] stringArrayData = item.getStringArray(field, j);
+					byte[] stringArrayBuffer;
+					if(pimInt == INT_PIM_FIELD.NAME) stringArrayBuffer = collectPIMNameItems(item, stringArrayData);
+					if(pimInt == INT_PIM_FIELD.ADDR) stringArrayBuffer = collectPIMAddressItems(item, stringArrayData);
+
+					if(stringArrayBuffer != 0)
+					{
+						if((p+1+stringArrayBuffer.size)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+1+stringArrayBuffer.size));
+						for(int i = 0; i < stringArrayBuffer.size; i++) pimBuffer[p+i] = stringArrayBuffer[i];
+						p += stringArrayBuffer.size;
+						pimBuffer[p++] = 0;
+					}
+				}
+				else if(type == STRING)
+				{
+					String stringData = item.getString(field, j);
+					byte[] str = stringData.getBytes();
+					if((p+1+str.size)>=pimBuffer.size) pimBuffer = resizePIMItems(pimBuffer, (p+1+str.size));
+					for(int i = 0; i < str.size; i++) pimBuffer[p+i] = str[i];
+					p += str.size;
+					pimBuffer[p++] = 0;
+
+				}
+			}
+		}
+	}
+	return pimBuffer;
+}
+
+enum PIM_TYPES
+{
+	PIM_CONTACTS,
+	PIM_EVENTS,
+	PIM_TODOS;
+}
+
+byte[] getPIMContacts()
+{
+	PIM pim = PIM.getInstance();
+	ContactList contacts;
+	try {
+		contacts = (ContactList) pim.openPIMList(PIM.CONTACT_LIST, PIM.READ_ONLY);
+	} catch(Exception e) {
+		return 0;
+	}
+	return collectPIMItems(contacts);
+}
+
+byte[] getPIMEvents()
+{
+	PIM pim = PIM.getInstance();
+	EventList events;
+	try {
+		events = (EventList) pim.openPIMList(PIM.EVENT_LIST, PIM.READ_ONLY);
+	} catch(Exception e) {
+		return 0;
+	}
+	return collectPIMItems(events);
+}
+
+byte[] getPIMToDos()
+{
+	PIM pim = PIM.getInstance();
+	ToDoList todos;
+	try {
+		todos = (ToDoList) pim.openPIMList(PIM.TODO_LIST, PIM.READ_ONLY);
+	} catch(Exception e) {
+		return 0;
+	}
+	return collectPIMItems(todos);
+}
+
+MAHandle maGetPIMData(int pimType)
+{
+	MAHandle handle = maCreatePlaceholder();
+	byte[] pimBuffer;
+	if(pimType == PIM_CONTACTS) pimBuffer = getPIMContacts();
+	if(pimType == PIM_EVENTS) pimBuffer = collectPIMEvents();
+	if(pimType == PIM_TODOS) pimBuffer = collectPIMToDos();
+	return pimBuffer;
+}

@@ -1,0 +1,91 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+#include "generated\MAAPI_consts.h"
+
+import javax.microedition.rms.*;
+import java.io.*;
+import java.lang.String;
+import java.util.Date;
+
+public class MAPanicReport
+{
+	int runtimeId;
+	int reportType;
+	int time;
+	int ip;
+	int code;
+	String string;
+
+	public void writePanicReport(int reportType, int panicCode, String panicString, int panicIP)
+	{
+		ip = -1;
+
+		runtimeId = RUNTIME_JAVA;
+		reportType = reportType;
+
+		Date d = new Date();
+		time = (int)(d.getTime() / 1000);
+
+		code = panicCode;
+		string = panicString;
+
+		byte[] bdata;
+		try {
+			bdata = persist();
+		} catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+			return;
+		}
+
+		// Store the panic report in the rms
+		try {
+			RecordStore store = RecordStore.openRecordStore("panic.report", true);
+			store.addRecord(bdata, 0, bdata.length);
+			store.closeRecordStore();
+		} catch(RecordStoreNotFoundException e) {
+			PRINT_STACK_TRACE;
+			return;
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			return;
+		}
+
+	}
+
+	/*
+	Send the data to a byte array thru a data stream
+	*/
+	public byte[] persist() throws IOException {
+		ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+		DataOutputStream dataOutputStream = new DataOutputStream( byteArrayStream );
+
+		dataOutputStream.writeInt(runtimeId);
+		dataOutputStream.writeInt(reportType);
+		dataOutputStream.writeInt(time);
+		dataOutputStream.writeInt(ip);
+		dataOutputStream.writeInt(code);
+		dataOutputStream.writeChars(string);
+		dataOutputStream.writeByte(0);
+		dataOutputStream.flush();
+
+		return byteArrayStream.toByteArray();
+	}
+
+}
