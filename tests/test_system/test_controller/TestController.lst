@@ -1,0 +1,17 @@
+.res PANIC_REP
+.placeholder
+
+.res RES_STORE
+.placeholder
+
+.res TEST_LIST
+.placeholder
+
+.res TEST_NO
+.placeholder
+
+.res RUN_MODE
+.placeholder
+
+.res TEST_RES
+.placeholder

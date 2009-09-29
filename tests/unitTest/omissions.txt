@@ -1,0 +1,4 @@
+Things that aren't currently tested by this program:
+* pixel perfection - checked in a few cases of basicGfx, but it's known to not be reliable.
+* clipping - partial test on triangles only.
+* maGetKeys() - only key events so far.

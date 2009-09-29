@@ -1,0 +1,22 @@
+.res SERVER_DATA
+.ubin
+.include "server_data.bin"
+
+.res CLIENT_DATA
+.ubin
+.include "client_data.bin"
+
+.res CLIENT_PNG_TEST
+.ubin
+.include "png_test.png"
+
+.res RES_MP3
+.media "audio/mpeg", "mobilesorcery2.mp3"
+//.media "audio/x-wav", "mobilesorcery2.wav"
+
+.res RES_BINTEST
+.bin
+.word 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+
+.res RES_PLACEHOLDER
+.placeholder
