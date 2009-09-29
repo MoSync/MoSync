@@ -1,0 +1,1 @@
+start /B /BELOWNORMAL build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\wtk2 c:\Program\Java\jdk1.6.0_04\bin 2>&1 | tee log.txt

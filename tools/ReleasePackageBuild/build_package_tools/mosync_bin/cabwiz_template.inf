@@ -1,0 +1,45 @@
+[Version]
+Signature="$Windows NT$"
+Provider="Mobile Sorcery"
+CESignature="$Windows CE$"
+
+[CEStrings]
+AppName="%NAME%"
+InstallDir=%CE1%\%AppName%
+
+[Strings]
+Manufacturer="Mobile Sorcery"
+
+[CEDevice]
+VersionMin=4.0
+VersionMax=6.99
+BuildMax=0xE0000000
+
+[DefaultInstall]
+CEShortcuts=Shortcuts
+CopyFiles=Files.Common1
+
+[SourceDisksNames]
+1=,"MoRE",,"%RUNTIMEDIR%"
+2=,"program",,"%OUTPUTDIR%"
+
+[SourceDisksFiles]
+"MoRE-winmobile%D%.exe"=1
+"program"=2
+#ifdef HAVE_RESOURCES
+"resources"=2
+#endif
+
+[DestinationDirs]
+Shortcuts=0,%CE11%
+Files.Common1=0,"%InstallDir%"
+
+[Files.Common1]
+"%AppName%.exe","MoRE-winmobile%D%.exe",,0
+"program","program",,0
+#ifdef HAVE_RESOURCES
+"resources","resources",,0
+#endif
+
+[Shortcuts]
+%NAME%,0,%AppName%.exe

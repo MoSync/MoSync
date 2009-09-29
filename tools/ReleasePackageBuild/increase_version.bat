@@ -1,0 +1,2 @@
+set /a MOSYNC_REVISION=%MOSYNC_REVISION%+1
+echo %MOSYNC_REVISION%> \mb\version.txt

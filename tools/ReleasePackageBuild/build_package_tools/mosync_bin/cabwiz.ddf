@@ -1,0 +1,29 @@
+;
+; cabwiz.ddf
+;
+; Template directive file to create the CAB file
+;
+
+.Set Cabinet=ON
+.Set Compress=OFF
+.Set CabinetFileCountThreshold=0    ; no files per cabinet threshold
+.Set FolderFileCountThreshold=0     ; no files per folder threshold
+.Set FolderSizeThreshold=0          ; no folder size threshold
+.Set MaxCabinetSize=0               ; no max size for the cabinet
+.Set MaxDiskFileCount=0
+.Set MaxDiskSize=0
+.Set ReservePerCabinetSize=0        ; for web signing
+.Set ReservePerDataBlockSize=0
+.Set ReservePerFolderSize=0
+.Set UniqueFiles=OFF
+
+.Set DiskDirectory1=.
+.Set DiskLabel1=Setup
+
+;
+; to be filled out by the CABWIZ.exe program
+;.Set InfFileName=
+;.Set RptFileName=
+;.Set CabinetName1=
+;
+; followed by the list of files
