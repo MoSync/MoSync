@@ -1,0 +1,11 @@
+.res SYSTEM_FONT
+.image "font6x8a.png"
+
+.res R_ITEM
+.image "item.png"
+
+.res R_LOGO
+.image "cnn.png"
+
+.res R_BACK
+.image "cnnback.png"

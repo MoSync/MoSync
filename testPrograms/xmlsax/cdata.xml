@@ -1,0 +1,39 @@
+<script>
+<script2>
+<![CDATA[hellote]]>
+
+<![CDATA[
+function matchwo(a,b)
+{
+if (a < b && a < 0) then
+   {
+   return 1
+   }
+else
+   {
+   return 0
+   }
+}]]>
+</script2>
+
+chardata1
+
+<Bajs />
+
+<![CDATA[
+function matchwo(a,b)
+{
+if (a < b && a < 0) then
+   {
+   return 1
+   }
+else
+   {
+   return 0
+   }
+}
+]]>
+
+chardata3
+
+</script>

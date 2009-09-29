@@ -1,0 +1,38 @@
+
+.debug 1
+.list 0
+
+.res blueball
+.image "blueball3.png"
+.res back
+.image "bluegradient.png"
+.res scoopex
+.image "scoopex.png"
+
+.res	tiles1
+.extension 7
+.half 16, 16
+.include "tileset.png"
+
+.res	map1
+.extension 8
+.half 8, 8
+
+.half 1, 2, 3, 4, 5, 7, 8, 9
+.half 1, 2, 3, 4, 5, 7, 8, 9
+.half 1, 2, 21, 22, 21, 22, 8, 9
+.half 1, 2, 3, 4, 5, 21, 8, 9
+.half 1, 2, 3, 4, 5, 7, 8, 9
+.half 1, 2, 3, 4, 5, 7, 8, 9
+.half 1, 2, 3, 4, 5, 7, 8, 9
+.half 1, 2, 3, 4, 5, 7, 8, 9
+
+.res font1
+.image "testfont.png"
+
+.res font2
+.image "FNT_8X8.png"
+
+.res music1
+.bin
+.include "bajs.mp3"

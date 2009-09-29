@@ -1,0 +1,3 @@
+.res RES_BUNDLE
+.ubin
+.include "mafs_test.bun"

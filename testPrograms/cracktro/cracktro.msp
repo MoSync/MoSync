@@ -1,0 +1,33 @@
+<Project name="cracktro">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value="false"/>
+		<Property name="ignoreDefaultIncludeDirectories" value=""/>
+		<Property name="ignoreDefaultLibraryDirectories" value=""/>
+		<Property name="ignoreDefaultLibraries" value=""/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value="true"/>
+		<Property name="Wall" value="true"/>
+		<Property name="Wextra" value="true"/>
+		<Property name="S60v2UID" value="0x099C5D23"/>
+		<Property name="S60v3UID" value=""/>
+		<Property name="additional include directories" value="%MOSYNCDIR%/include"/>
+		<Property name="additionalDependencies" value=""/>
+		<Property name="additionalLibraryDirectories" value="%MOSYNCDIR%/lib/pipe"/>
+		<Property name="additionalIncludeDirectories" value=""/>
+		<Property name="extraCmd" value=""/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+		<Property name="icon" value=""/>
+	</Configuration>
+	<Criteria>
+		<Has feature="JavaPackage/bluetooth"/>
+		<Constant op="GT" name="ScreenSize/X,pixels" value="180" allowUndefined="true"/>
+	</Criteria>
+	<File path=".\cracktro.c"/>
+	<File path=".\cracktro.lst"/>
+</Project>

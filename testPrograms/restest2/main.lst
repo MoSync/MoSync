@@ -1,0 +1,27 @@
+.res //redcircle
+//.image "restest2/redcircle.png"
+.image "restest2/rainbow.png"
+
+.res //greencircle
+//.image "restest2/greencircle.png"
+.image "restest2/krap.png"
+
+.res N_IMAGES//turqthegimp
+.image "restest2/turqthegimp.png"
+
+.res RESNAME
+.bin
+.string "Circles"
+
+.res DATA
+.placeholder
+
+.res R_SOUND
+.bin
+.include "restest2/2.mp3"
+
+/*.res R_MUSIC
+.bin
+.include "2.mp3"*/
+
+.end

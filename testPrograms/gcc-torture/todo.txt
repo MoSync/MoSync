@@ -1,0 +1,5 @@
+10:47 2008-11-10
+Swap failure and success files; 1 <-> 0
+To make it easier to find failures, as they will be at the top of the alphabetical file list.
+18:34 2008-11-10
+Done.

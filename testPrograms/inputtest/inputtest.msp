@@ -1,0 +1,33 @@
+<Project name="inputtest">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="176"/>
+		<Property name="screenHeight" value="208"/>
+		<Property name="deadCodeElim" value="false"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="false"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value=""/>
+		<Property name="Wall" value=""/>
+		<Property name="Wextra" value=""/>
+		<Property name="S60v2UID" value="0x0F10251D"/>
+		<Property name="S60v3UID" value=""/>
+		<Property name="additionalIncludeDirectories" value="C:\projects\MoSync\libs"/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value="MAUtil.lib"/>
+		<Property name="extraCmd" value=""/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value="-xerr -heapsize=512000 -datasize=1024000"/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="..\..\libs\MAUI\Font.cpp"/>
+	<File path="..\..\libs\MAUI\Font.h"/>
+	<File path="inputtest.lst"/>
+	<File path="Test.cpp"/>
+	<File path="..\..\libs\MAUtil\CharInput.c"/>
+	<File path="..\..\libs\MAUtil\CharInput.h"/>
+</Project>

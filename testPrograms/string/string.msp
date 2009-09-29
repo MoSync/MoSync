@@ -1,0 +1,28 @@
+<Project name="string.msp">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value=""/>
+		<Property name="ignoreDefaultIncludeDirectories" value=""/>
+		<Property name="ignoreDefaultLibraryDirectories" value=""/>
+		<Property name="ignoreDefaultLibraries" value=""/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value="true"/>
+		<Property name="Wall" value="true"/>
+		<Property name="Wextra" value="true"/>
+		<Property name="S60v2UID" value="0x0A4E25D3"/>
+		<Property name="S60v3UID" value="0xE9940841"/>
+		<Property name="additionalIncludeDirectories" value=""/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value="MAUtil.lib"/>
+		<Property name="extraCmd" value=""/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="main.cpp"/>
+</Project>

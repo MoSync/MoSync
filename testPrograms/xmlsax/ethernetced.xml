@@ -1,0 +1,2114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+        CommDB Settings File
+        Copyright (c) 2003-2004, Symbian Ltd.
+        All Rights Reserved
+-->
+<CommDB:Config xmlns="SymbianOS.Generic.Comms-Infras.CommDB"
+               xmlns:CommDB="SymbianOS.Generic.Comms-Infras.CommDB"
+               xmlns:xlink="http://www.w3.org/1999/xlink"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="SymbianOS.Generic.Comms-Infras.CommDB CommDB.xsd">
+
+<InformationTable>
+</InformationTable>
+
+<NetworkTable>
+    <Network operation="add">
+        <Name>Intranet</Name>
+    </Network>
+    <Network operation="add">
+        <Name>mRouter</Name>
+    </Network>
+</NetworkTable>
+
+<IAPTable>
+    <IAP operation="add">
+        <Name>NT RAS with Null Modem</Name>
+        <IAPService>DialOutISP.NT RAS</IAPService>
+        <IAPBearer>ModemBearer.Null Modem 115200bps</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>CSD IAP PlaceHolder01</Name>
+        <IAPService>DialOutISP.ISP01</IAPService>
+        <IAPBearer>ModemBearer.Null Modem 115200bps</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>CSD IAP PlaceHolder02</Name>
+        <IAPService>DialOutISP.ISP02</IAPService>
+        <IAPBearer>ModemBearer.Null Modem 115200bps</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>GPRS IAP PlaceHolder01</Name>
+        <IAPService>OutgoingGPRS.GPRS01</IAPService>
+        <IAPBearer>ModemBearer.GPRS Ericsson R520m/T68i via Serial</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Mobile</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>GPRS IAP PlaceHolder02</Name>
+        <IAPService>OutgoingGPRS.GPRS02</IAPService>
+        <IAPBearer>ModemBearer.GPRS Ericsson R520m/T68i via Serial</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Mobile</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Ethernet No Daemon Static IP</Name>
+        <IAPService>LANService.Ethernet No Daemon</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Incorrect ethernet setup 1</Name>
+        <IAPService>LANService.Ethernet Bad Daemon</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.mRouter</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Incorrect ethernet setup 2</Name>
+        <IAPService>LANService.Ethernet Static IP</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.mRouter</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Ethernet with Daemon Static IP</Name>
+        <IAPService>LANService.Ethernet Static IP</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Incorrect ethernet setup 3</Name>
+        <IAPService>LANService.Ethernet</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.mRouter</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+    <IAP operation="add">
+        <Name>Ethernet with Daemon Dynamic IP</Name>
+        <IAPService>LANService.Ethernet</IAPService>
+        <IAPBearer>LANBearer.EKA1 Emulator Ethernet</IAPBearer>
+        <IAPNetwork>Network.Intranet</IAPNetwork>
+        <IAPNetworkWeighting>0</IAPNetworkWeighting>
+        <LocationRef>Location.Office</LocationRef>
+    </IAP>
+</IAPTable>
+
+<ModemBearerTable>
+    <ModemBearer operation="template">
+        <Name>Default Modem</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>0</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>Null Modem 115200bps</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>US Robotics Sportster</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>57600</Rate>
+        <Handshaking>244</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>AFTERDIALUNTILANSWER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT&amp;F1</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT&amp;d2</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>Dacom Surfer</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>57600</Rate>
+        <Handshaking>244</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>AFTERDIALUNTILANSWER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT&amp;F</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT&amp;d2</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>GSM Mobile Phone via Infrared</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>IRCOMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>IRCOMM</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>196</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>17</XonChar>
+        <XoffChar>19</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>ATZ</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>GSM Mobile Phone via Serial</Name>
+        <Agent>CSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>19200</Rate>
+        <Handshaking>196</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>17</XonChar>
+        <XoffChar>19</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>ATZ</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>GPRS Ericsson R520m via IR</Name>
+        <Agent>PSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>IRCOMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>IRCOMM</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>17</XonChar>
+        <XoffChar>19</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>ATZ</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>GPRS Ericsson R520m/T68i via Serial</Name>
+        <Agent>PSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>19200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>17</XonChar>
+        <XoffChar>19</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>ATZ</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <IspInitString>*99***1#</IspInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>GPRS Motorola Mobile Phone via Serial</Name>
+        <Agent>PSD.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>57600</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>17</XonChar>
+        <XoffChar>19</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>ATZ</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>WinTunnel Modem</Name>
+        <Agent>null.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::6</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>180</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>30</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>60</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>mRouterWinsBearer</Name>
+        <Agent>mRouterAgent.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>WINS::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>WINSCSY</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>9999</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>180</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>30</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>mRouterRs232Bearer</Name>
+        <Agent>mRouterAgent.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>COMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECUART</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>9999</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>180</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>30</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>mRouterIrBearer</Name>
+        <Agent>mRouterAgent.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>IRCOMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>IRCOMM</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>9999</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>180</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>30</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>mRouterBtBearer</Name>
+        <Agent>mRouterAgent.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>BTCOMM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>BTCOMM</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>9999</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>180</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>30</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+    <ModemBearer operation="add">
+        <Name>mRouterUsbBearer</Name>
+        <Agent>mRouterAgent.agt</Agent>
+        <IfName>PPP</IfName>
+        <PortName>ACM::0</PortName>
+        <TSYName>MM</TSYName>
+        <CSYName>ECACM</CSYName>
+        <DataBits>8</DataBits>
+        <StopBits>1</StopBits>
+        <Parity>NONE</Parity>
+        <Rate>115200</Rate>
+        <Handshaking>4</Handshaking>
+        <SpecialRate>0</SpecialRate>
+        <XonChar>0</XonChar>
+        <XoffChar>0</XoffChar>
+        <FaxClassPref>AUTO</FaxClassPref>
+        <SpeakerPref>NEVER</SpeakerPref>
+        <SpeakerVolPref>QUIET</SpeakerVolPref>
+        <ModemInitString>AT</ModemInitString>
+        <DataInitString>AT</DataInitString>
+        <FaxInitString>AT</FaxInitString>
+        <DialPauseLength>S8=</DialPauseLength>
+        <SpeakerVolContorlLow>L0</SpeakerVolContorlLow>
+        <SpeakerVolControlMedium>L1</SpeakerVolControlMedium>
+        <SpeakerVolControlHigh>L2</SpeakerVolControlHigh>
+        <SpeakerAlwaysOff>M0</SpeakerAlwaysOff>
+        <SpeakerOnUntilCarrier>M1</SpeakerOnUntilCarrier>
+        <SpeakerAlwaysOn>M2</SpeakerAlwaysOn>
+        <SpeakerOnAfterUntilCarrier>M3</SpeakerOnAfterUntilCarrier>
+        <DialToneWaitModifier>W</DialToneWaitModifier>
+        <CallProgress1>X1</CallProgress1>
+        <CallProgress2>X2</CallProgress2>
+        <CallProgress3>X3</CallProgress3>
+        <CallProgress4>X4</CallProgress4>
+        <EchoOff>E0</EchoOff>
+        <VerboseText>V1</VerboseText>
+        <QuietOff>Q0</QuietOff>
+        <QuietOn>Q1</QuietOn>
+        <DialCommandStateModifier>;</DialCommandStateModifier>
+        <OnLine>O</OnLine>
+        <ResetConfiguration>Z</ResetConfiguration>
+        <ReturnToFactoryDefs>&amp;F</ReturnToFactoryDefs>
+        <DCDOnDuringLink>&amp;C1</DCDOnDuringLink>
+        <DTRHangUp>&amp;D2</DTRHangUp>
+        <DSRAlwaysOn>&amp;S0</DSRAlwaysOn>
+        <RTSCTSHandshake>&amp;K3</RTSCTSHandshake>
+        <XonXoffHandshake>&amp;K4</XonXoffHandshake>
+        <EscapeCharacter>+</EscapeCharacter>
+        <EscapeGuardPeriod>S12</EscapeGuardPeriod>
+        <NoDialTone>NO DIAL TONE</NoDialTone>
+        <Busy>BUSY</Busy>
+        <NoAnswer>NO ANSWER</NoAnswer>
+        <Carrier>CARRIER</Carrier>
+        <Connect>CONNECT</Connect>
+        <CompressionClass5>COMPRESSION:CLASS 5</CompressionClass5>
+        <CompressionV42bis>COMPRESSION:V.42 bis</CompressionV42bis>
+        <CompressionNone>COMPRESSION:NONE</CompressionNone>
+        <ProtocolLAPD>PROTOCOL:LAPD</ProtocolLAPD>
+        <ProtocolALT>PROTOCOL:ALT</ProtocolALT>
+        <ProtocolALTCELLULAR>PROTOCOL:ALT-CELLULAR</ProtocolALTCELLULAR>
+        <ProtocolNone>PROTOCOL:NONE</ProtocolNone>
+        <MessageCentreNumber>+44123456789</MessageCentreNumber>
+        <MessageValidityPeriod>1440</MessageValidityPeriod>
+        <MessageDeliveryReport>FALSE</MessageDeliveryReport>
+        <MinimumSignalLevel>9905</MinimumSignalLevel>
+        <LastSocketActivityTimeout>9999</LastSocketActivityTimeout>
+        <LastSessionClosedTimeout>180</LastSessionClosedTimeout>
+        <LastSocketClosedTimeout>30</LastSocketClosedTimeout>
+        <SIRSettings>0</SIRSettings>
+        <CommRole>0</CommRole>
+    </ModemBearer>
+</ModemBearerTable>
+
+<LANBearerTable>
+    <LANBearer operation="add">
+	<Name>EKA1 Target Ethernet</Name>
+	<Agent>nullagt.agt</Agent>
+	<IfName>ethint</IfName>
+	<LDDFilename>ethercard</LDDFilename>
+	<LDDName>EtherCard</LDDName>
+	<PDDFilename>EtherSmc</PDDFilename>
+	<PDDName>EtherCard.Smc</PDDName>
+	<PacketDriverName>EtherPkt.drv</PacketDriverName>
+	<LastSocketActivityTimeout>-1</LastSocketActivityTimeout>
+	<LastSessionClosedTimeout>-1</LastSessionClosedTimeout>
+	<LastSocketClosedTimeout>-1</LastSocketClosedTimeout>
+    </LANBearer>
+
+    <LANBearer operation="add">
+	<Name>EKA2 Target Ethernet</Name>
+	<Agent>nullagt.agt</Agent>
+	<IfName>ethint</IfName>
+	<LDDFilename>enet</LDDFilename>
+	<LDDName>Ethernet</LDDName>
+	<PDDFilename>ethernet</PDDFilename>
+	<PDDName>Ethernet.Assabet</PDDName>
+	<PacketDriverName>EtherPkt.drv</PacketDriverName>
+	<LastSocketActivityTimeout>-1</LastSocketActivityTimeout>
+	<LastSessionClosedTimeout>-1</LastSessionClosedTimeout>
+	<LastSocketClosedTimeout>-1</LastSocketClosedTimeout>
+    </LANBearer>
+
+    <LANBearer operation="add">
+	<Name>EKA1 Emulator Ethernet</Name>
+	<Agent>nullagt.agt</Agent>
+	<IfName>ethint</IfName>
+	<LDDFilename>ethercard</LDDFilename>
+	<LDDName>Ethercard</LDDName>
+	<PDDFilename>etherwins</PDDFilename>
+	<PDDName>Ethercard.wins</PDDName>
+	<PacketDriverName>EtherPkt.drv</PacketDriverName>
+	<LastSocketActivityTimeout>-1</LastSocketActivityTimeout>
+	<LastSessionClosedTimeout>-1</LastSessionClosedTimeout>
+	<LastSocketClosedTimeout>-1</LastSocketClosedTimeout>
+    </LANBearer>
+
+    <LANBearer operation="add">
+	<Name>EKA2 Emulator Ethernet</Name>
+	<Agent>nullagt.agt</Agent>
+	<IfName>ethint</IfName>
+	<LDDFilename>enet</LDDFilename>
+	<LDDName>=Ethernet</LDDName>
+	<PDDFilename>ethernet</PDDFilename>
+	<PDDName>Ethernet.Wins</PDDName>
+	<PacketDriverName>EtherPkt.drv</PacketDriverName>
+	<LastSocketActivityTimeout>-1</LastSocketActivityTimeout>
+	<LastSessionClosedTimeout>-1</LastSessionClosedTimeout>
+	<LastSocketClosedTimeout>-1</LastSocketClosedTimeout>
+    </LANBearer>
+</LANBearerTable>
+
+<LANServiceTable>
+    <LANService operation="add">
+        <Name>Ethernet</Name>
+        <IfNetworks>ip</IfNetworks>
+        <IpNetMask>255.255.255.0</IpNetMask>
+        <IpGateway>10.32.194.254</IpGateway>
+        <IpAddr>10.32.194.251</IpAddr>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <IpNameServer1>194.72.6.51</IpNameServer1>
+        <IpNameServer2>194.72.6.52</IpNameServer2>
+        <ConfigDaemonManagerName>ConfigDaemonManager</ConfigDaemonManagerName>
+        <ConfigDaemonName>DhcpServ</ConfigDaemonName>
+    </LANService>
+    <LANService operation="add">
+        <Name>Ethernet Static IP</Name>
+        <IfNetworks>ip</IfNetworks>
+        <IpNetMask>255.255.255.0</IpNetMask>
+        <IpGateway>192.168.20.2</IpGateway>
+        <IpAddr>192.168.20.13</IpAddr>
+        <IpAddrFromServer>FALSE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <IpNameServer1>194.72.6.51</IpNameServer1>
+        <IpNameServer2>194.72.6.52</IpNameServer2>
+        <ConfigDaemonManagerName>ConfigDaemonManager</ConfigDaemonManagerName>
+        <ConfigDaemonName>DhcpServ</ConfigDaemonName>
+    </LANService>
+    <LANService operation="add">
+        <Name>Ethernet Bad Daemon</Name>
+        <IfNetworks>ip</IfNetworks>
+        <IpNetMask>255.255.255.0</IpNetMask>
+        <IpGateway>10.32.194.254</IpGateway>
+        <IpAddr>10.32.194.251</IpAddr>
+        <IpAddrFromServer>FALSE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <IpNameServer1>194.72.6.51</IpNameServer1>
+        <IpNameServer2>194.72.6.52</IpNameServer2>
+        <ConfigDaemonManagerName>NonExistingServ</ConfigDaemonManagerName>
+        <ConfigDaemonName>NonExistingServ</ConfigDaemonName>
+    </LANService>
+    <LANService operation="add">
+        <Name>Ethernet No Daemon</Name>
+        <IfNetworks>ip</IfNetworks>
+        <IpNetMask>255.255.255.0</IpNetMask>
+        <IpGateway>10.32.194.254</IpGateway>
+        <IpAddr>10.32.194.251</IpAddr>
+        <IpAddrFromServer>FALSE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <IpNameServer1>194.72.6.51</IpNameServer1>
+        <IpNameServer2>194.72.6.52</IpNameServer2>
+    </LANService>
+</LANServiceTable>
+
+<DialInISPTable>
+    <DialInISP operation="template">
+        <Name>Default Dial In ISP</Name>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>Default Dial In ISP</Description>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <UseEdge>FALSE</UseEdge>
+    </DialInISP>
+    <DialInISP operation="add">
+        <Name>Dial In ISP01</Name>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>Dial In ISP01</Description>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <UseEdge>FALSE</UseEdge>
+    </DialInISP>
+</DialInISPTable>
+
+<DialOutISPTable>
+    <DialOutISP operation="template">
+        <Name>Default Dial Out ISP</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>TRUE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>Default Dial Out ISP</Description>
+        <DefaultTelNum>Default Dial Out ISP</DefaultTelNum>
+        <LoginName>TRUE</LoginName>
+        <LoginPass>TRUE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>FALSE</IfNetworks>
+        <IfAuthName>TRUE</IfAuthName>
+        <IfAuthPass>TRUE</IfAuthPass>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>NT RAS</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>TRUE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>Test</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginScript>CHARMAP \[windows-1252\]\nLOOP 10\n{\nSEND &quot;CLIENT&quot;+&lt;0x0d&gt;\nWAIT 3\n{\n&quot;SERVER&quot; OK\n}\n}\nEXIT KErrNoAnswer$\n\nOK:\nEXIT\n</LoginScript>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>RasUser</IfAuthName>
+        <IfAuthPass>pass</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>ISP01</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>PlaceHolder for ISP01</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>xxx</IfAuthName>
+        <IfAuthPass>yyy</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>ISP02</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>PlaceHolder for ISP02</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>xxx</IfAuthName>
+        <IfAuthPass>yyy</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>ISP03</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>PlaceHolder for ISP03</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>xxx</IfAuthName>
+        <IfAuthPass>yyy</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>ISP04</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>PlaceHolder for ISP04</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>xxx</IfAuthName>
+        <IfAuthPass>yyy</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>ISP05</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>TRUE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>PlaceHolder for ISP05</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>xxx</IfAuthName>
+        <IfAuthPass>yyy</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+    <DialOutISP operation="add">
+        <Name>mRouterDialOutIsp</Name>
+        <DialResolution>TRUE</DialResolution>
+        <UseLoginScript>FALSE</UseLoginScript>
+        <PromptForLogin>FALSE</PromptForLogin>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <Description>mRouterDialOutIsp</Description>
+        <Type>INTERNETONLY</Type>
+        <DefaultTelNum>INTERNETONLY</DefaultTelNum>
+        <LoginName>FALSE</LoginName>
+        <LoginPass>FALSE</LoginPass>
+        <DisplayPCT>FALSE</DisplayPCT>
+        <IfParams>FALSE</IfParams>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>IfAuthPass=</IfAuthName>
+        <IfAuthPass>AuthRetries=0</IfAuthPass>
+        <AuthRetries>0</AuthRetries>
+        <IfCallbackEnabled>FALSE</IfCallbackEnabled>
+        <CallbackTimeout>0</CallbackTimeout>
+        <IpAddr>TRUE</IpAddr>
+        <IpNetMask>TRUE</IpNetMask>
+        <IpGateway>TRUE</IpGateway>
+        <IpNameServer1>TRUE</IpNameServer1>
+        <IpNameServer2>TRUE</IpNameServer2>
+        <EnableIPHeaderComp>FALSE</EnableIPHeaderComp>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <EnableSWComp>FALSE</EnableSWComp>
+        <BearerService>0</BearerService>
+        <BearerProtocol>UNSPECIFIED</BearerProtocol>
+        <RlpVersion>0</RlpVersion>
+        <IwfToMs>0</IwfToMs>
+        <MsToIwf>0</MsToIwf>
+        <AckTimer>0</AckTimer>
+        <RetransmissionAttempts>0</RetransmissionAttempts>
+        <ResequencePeriod>0</ResequencePeriod>
+        <V42Compression>0</V42Compression>
+        <V42Codewords>0</V42Codewords>
+        <V42MaxLength>0</V42MaxLength>
+        <Asymmetry>0</Asymmetry>
+        <UserInitUpgrade>FALSE</UserInitUpgrade>
+        <UseEdge>FALSE</UseEdge>
+    </DialOutISP>
+</DialOutISPTable>
+
+<AgentLookupTable>
+</AgentLookupTable>
+
+<CDMA2000PacketServiceTable>
+    <CDMA2000PacketService operation="add">
+        <Name>test name cdma2000</Name>
+        <IwfName>Test2000</IwfName>
+        <ServiceOption>HIGHSPEEDCDMA2000DATA</ServiceOption>
+        <PdpType>IPV4</PdpType>
+        <ReqFwdPriority>PRIORITY04</ReqFwdPriority>
+        <ReqRevPriority>PRIORITY04</ReqRevPriority>
+        <ReqFwdBitrate>32KBPS</ReqFwdBitrate>
+        <ReqRevBitrate>32KBPS</ReqRevBitrate>
+        <ReqFwdLoss>LOSS1</ReqFwdLoss>
+        <ReqRevLoss>LOSS1</ReqRevLoss>
+        <ReqFwdMaxdelay>40MS</ReqFwdMaxdelay>
+        <ReqRevMaxdelay>40MS</ReqRevMaxdelay>
+        <MinFwdBitrate>32KBPS</MinFwdBitrate>
+        <MinRevBitrate>32KBPS</MinRevBitrate>
+        <AccptFwdLoss>LOSS2</AccptFwdLoss>
+        <AccptRevLoss>LOSS2</AccptRevLoss>
+        <AccptFwdMaxdelay>120MS</AccptFwdMaxdelay>
+        <AccptRevMaxdelay>120MS</AccptRevMaxdelay>
+        <DataCompression>FALSE</DataCompression>
+        <HeaderCompression>FALSE</HeaderCompression>
+        <AnonymousAccess>FALSE</AnonymousAccess>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>RasUser</IfAuthName>
+        <IfAuthPass>pass</IfAuthPass>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <AuthRetries>1</AuthRetries>
+        <IpNetMask>0.255.255.255</IpNetMask>
+        <IpGateway>10.0.0.1</IpGateway>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <EnableLCPExtension>TRUE</EnableLCPExtension>
+        <DisablePlainTextAuth>TRUE</DisablePlainTextAuth>
+        <ApType>2</ApType>
+        <QosWarningTimeout>1000000</QosWarningTimeout>
+        <RlpMode>TRANSPARENT</RlpMode>
+        <CDMAMobileIP>FALSE</CDMAMobileIP>
+        <CDMAMobileIPTimeout>10000000</CDMAMobileIPTimeout>
+    </CDMA2000PacketService>
+</CDMA2000PacketServiceTable>
+
+<DefaultCDMA2000Table>
+</DefaultCDMA2000Table>
+
+<ChargecardTable>
+    <Chargecard operation="add">
+        <Name>Dummy BT Chargecard</Name>
+        <AccountNumber>144,12345678</AccountNumber>
+        <Pin>0000</Pin>
+        <LocalRule>HG</LocalRule>
+        <NatRule>HFG</NatRule>
+        <IntlRule>HEFG</IntlRule>
+    </Chargecard>
+    <Chargecard operation="add">
+        <Name>Dummy Mercury Chargecard</Name>
+        <AccountNumber>0500800800,,12345678</AccountNumber>
+        <Pin>****</Pin>
+        <LocalRule>HG</LocalRule>
+        <NatRule>J,K,0FG</NatRule>
+        <IntlRule>HEFG</IntlRule>
+    </Chargecard>
+</ChargecardTable>
+
+<ConnectionPreferencesTable>
+    <ConnectionPreferences operation="add">
+        <Name>ConnectionPreferencesTable1</Name>
+        <Ranking>0</Ranking>
+        <Direction>OUTGOING</Direction>
+        <DialogPref>DONOTPROMPT</DialogPref>
+        <BearerSet>LAN</BearerSet>
+        <IAPRef>IAP.Ethernet with Daemon Dynamic IP</IAPRef>
+    </ConnectionPreferences>
+    <ConnectionPreferences operation="add">
+        <Name>ConnectionPreferencesTable2</Name>
+        <Ranking>1</Ranking>
+        <Direction>OUTGOING</Direction>
+        <DialogPref>PROMPT</DialogPref>
+        <BearerSet>LAN</BearerSet>
+        <IAPRef>IAP.Ethernet with Daemon Dynamic IP</IAPRef>
+    </ConnectionPreferences>
+</ConnectionPreferencesTable>
+
+<GlobalSettingsTable>
+    <GlobalSettings operation="add">
+        <Name>GlobalSettingsTable1</Name>
+        <WAPAccess>WAPAccessPoint.Default Dial In ISP</WAPAccess>
+        <RedialAttempts>3</RedialAttempts>
+        <SmsBearer>WAPSMSBearer.WAPSMSBearerTable1</SmsBearer>
+        <SmsReceiveMode>2</SmsReceiveMode>
+        <GPRSAttachMode>1</GPRSAttachMode>
+        <AcceptIncomingGprs>1</AcceptIncomingGprs>
+        <ConnectionAttempts>2</ConnectionAttempts>
+        <ModemForDataAndFax>2</ModemForDataAndFax>
+        <ModemForPhoneServicesAndSMS>2</ModemForPhoneServicesAndSMS>
+        <LocationForDataAndFax>Location.Office</LocationForDataAndFax>
+        <LocationForPhoneServicesAndSMS>Location.Office</LocationForPhoneServicesAndSMS>
+        <GPRSClassCBearer>GSM</GPRSClassCBearer>
+        <DefaultNetwork>Network.Intranet</DefaultNetwork>
+        <BearerAvailabilityCheckTSY>mm</BearerAvailabilityCheckTSY>
+    </GlobalSettings>
+</GlobalSettingsTable>
+
+<IncomingGPRSTable>
+    <IncomingGPRS operation="add">
+        <Name>Incoming GPRS Settings PlaceHolder</Name>
+        <APN>Test</APN>
+        <PDPType>IPV4</PDPType>
+        <PDPAddress>0.0.0.0</PDPAddress>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>TRUE</IpDNSAddrFromServer>
+        <ReqPrecedence>1</ReqPrecedence>
+        <ReqDelay>1</ReqDelay>
+        <ReqReliability>1</ReqReliability>
+        <ReqPeakThroughput>1</ReqPeakThroughput>
+        <ReqMeanThroughput>1</ReqMeanThroughput>
+        <MinPrecedence>1</MinPrecedence>
+        <MinDelay>1</MinDelay>
+        <MinReliability>1</MinReliability>
+        <MinPeakThroughput>1</MinPeakThroughput>
+        <MinMeanThroughput>1</MinMeanThroughput>
+        <DataCompression>FALSE</DataCompression>
+        <HeaderCompression>FALSE</HeaderCompression>
+        <AnonymousAccess>FALSE</AnonymousAccess>
+        <IfNetworks>ip</IfNetworks>
+        <IfAuthName>RasUser</IfAuthName>
+        <IfAuthPass>pass</IfAuthPass>
+        <AuthRetries>1</AuthRetries>
+        <IpNameServer1>0.0.0.0</IpNameServer1>
+        <IpNameServer2>0.0.0.0</IpNameServer2>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <GprsUseEdge>FALSE</GprsUseEdge>
+    </IncomingGPRS>
+</IncomingGPRSTable>
+
+<OutgoingGPRSTable>
+    <OutgoingGPRS operation="add">
+        <Name>GPRS01</Name>
+        <APN>gprs01APNPlaceHolder</APN>
+        <PDPType>IPV4</PDPType>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>FALSE</IpDNSAddrFromServer>
+        <ReqPrecedence>0</ReqPrecedence>
+        <ReqDelay>0</ReqDelay>
+        <ReqReliability>0</ReqReliability>
+        <ReqPeakThroughput>0</ReqPeakThroughput>
+        <ReqMeanThroughput>0</ReqMeanThroughput>
+        <MinPrecedence>0</MinPrecedence>
+        <MinDelay>0</MinDelay>
+        <MinReliability>0</MinReliability>
+        <MinPeakThroughput>0</MinPeakThroughput>
+        <MinMeanThroughput>0</MinMeanThroughput>
+        <DataCompression>FALSE</DataCompression>
+        <HeaderCompression>FALSE</HeaderCompression>
+        <AnonymousAccess>FALSE</AnonymousAccess>
+        <IfNetworks>ip</IfNetworks>
+        <AuthRetries>1</AuthRetries>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <GprsUseEdge>FALSE</GprsUseEdge>
+        <GprsAccessPointType>0</GprsAccessPointType>
+        <QosWarningTimeout>0</QosWarningTimeout>
+    </OutgoingGPRS>
+    <OutgoingGPRS operation="add">
+        <Name>GPRS02</Name>
+        <APN>gprs02APNPlaceHolder</APN>
+        <PDPType>IPV4</PDPType>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>FALSE</IpDNSAddrFromServer>
+        <ReqPrecedence>0</ReqPrecedence>
+        <ReqDelay>0</ReqDelay>
+        <ReqReliability>0</ReqReliability>
+        <ReqPeakThroughput>0</ReqPeakThroughput>
+        <ReqMeanThroughput>0</ReqMeanThroughput>
+        <MinPrecedence>0</MinPrecedence>
+        <MinDelay>0</MinDelay>
+        <MinReliability>0</MinReliability>
+        <MinPeakThroughput>0</MinPeakThroughput>
+        <MinMeanThroughput>0</MinMeanThroughput>
+        <DataCompression>FALSE</DataCompression>
+        <HeaderCompression>FALSE</HeaderCompression>
+        <AnonymousAccess>FALSE</AnonymousAccess>
+        <IfNetworks>ip</IfNetworks>
+        <AuthRetries>1</AuthRetries>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <GprsUseEdge>FALSE</GprsUseEdge>
+        <GprsAccessPointType>0</GprsAccessPointType>
+        <QosWarningTimeout>0</QosWarningTimeout>
+    </OutgoingGPRS>
+    <OutgoingGPRS operation="add">
+        <Name>GPRS03</Name>
+        <APN>gprs03APNPlaceHolder</APN>
+        <PDPType>IPV4</PDPType>
+        <IfPromptForAuth>FALSE</IfPromptForAuth>
+        <IpAddrFromServer>TRUE</IpAddrFromServer>
+        <IpDNSAddrFromServer>FALSE</IpDNSAddrFromServer>
+        <ReqPrecedence>0</ReqPrecedence>
+        <ReqDelay>0</ReqDelay>
+        <ReqReliability>0</ReqReliability>
+        <ReqPeakThroughput>0</ReqPeakThroughput>
+        <ReqMeanThroughput>0</ReqMeanThroughput>
+        <MinPrecedence>0</MinPrecedence>
+        <MinDelay>0</MinDelay>
+        <MinReliability>0</MinReliability>
+        <MinPeakThroughput>0</MinPeakThroughput>
+        <MinMeanThroughput>0</MinMeanThroughput>
+        <DataCompression>FALSE</DataCompression>
+        <HeaderCompression>FALSE</HeaderCompression>
+        <AnonymousAccess>FALSE</AnonymousAccess>
+        <IfNetworks>ip</IfNetworks>
+        <AuthRetries>1</AuthRetries>
+        <EnableLCPExtension>FALSE</EnableLCPExtension>
+        <DisablePlainTextAuth>FALSE</DisablePlainTextAuth>
+        <GprsUseEdge>FALSE</GprsUseEdge>
+        <GprsAccessPointType>0</GprsAccessPointType>
+        <QosWarningTimeout>0</QosWarningTimeout>
+    </OutgoingGPRS>
+</OutgoingGPRSTable>
+
+<DefaultGPRSTable>
+    <DefaultGPRS operation="add">
+        <Name>Dummy Default GPRS Settings</Name>
+        <APN>Access point name</APN>
+        <PDPType>IPV6</PDPType>
+        <PDPAddress>www.wid.com</PDPAddress>
+        <Usage>1</Usage>
+        <Precedence>1</Precedence>
+        <Delay>1</Delay>
+        <Reliability>1</Reliability>
+        <PeakThroughput>1</PeakThroughput>
+        <MeanThroughput>1</MeanThroughput>
+        <MinPrecedence>1</MinPrecedence>
+        <MinDelay>1</MinDelay>
+        <MinReliability>1</MinReliability>
+        <MinPeakThroughput>1</MinPeakThroughput>
+        <MinMeanThroughput>1</MinMeanThroughput>
+        <DataCompression>TRUE</DataCompression>
+        <HeaderCompression>TRUE</HeaderCompression>
+        <GprsUseEdge>FALSE</GprsUseEdge>
+        <AnonymousAccess>TRUE</AnonymousAccess>
+    </DefaultGPRS>
+</DefaultGPRSTable>
+
+<ProxyTable>
+    <Proxy operation="add">
+        <Name>ProxyTable1</Name>
+        <ISPRef>DialOutISP.NT RAS</ISPRef>
+        <UseProxyServer>TRUE</UseProxyServer>
+        <ProtocolName>http</ProtocolName>
+        <ProxyServerName>www.dummyproxy.com</ProxyServerName>
+        <PortNumber>80</PortNumber>
+        <Exceptions>www.dummyproxy.com/exception</Exceptions>
+    </Proxy>
+</ProxyTable>
+
+<LocationTable>
+    <Location operation="template">
+        <Name>Default Location</Name>
+        <Mobile>TRUE</Mobile>
+        <UsePulseDial>FALSE</UsePulseDial>
+        <WaitForDialTone>FALSE</WaitForDialTone>
+        <PauseAfterDialout>0</PauseAfterDialout>
+        <IntlPrefixCode>+</IntlPrefixCode>
+        <NatPrefixCode>0</NatPrefixCode>
+        <NatCode>44</NatCode>
+        <AreaCode>44</AreaCode>
+        <DialOutCode>44</DialOutCode>
+        <DisableCallWaitingCode>44</DisableCallWaitingCode>
+    </Location>
+    <Location operation="add">
+        <Name>Office</Name>
+        <Mobile>FALSE</Mobile>
+        <UsePulseDial>FALSE</UsePulseDial>
+        <WaitForDialTone>FALSE</WaitForDialTone>
+        <PauseAfterDialout>0</PauseAfterDialout>
+        <IntlPrefixCode>00</IntlPrefixCode>
+        <NatPrefixCode>0</NatPrefixCode>
+        <NatCode>44</NatCode>
+        <AreaCode>171</AreaCode>
+        <DialOutCode>9,</DialOutCode>
+        <DisableCallWaitingCode>9,</DisableCallWaitingCode>
+    </Location>
+    <Location operation="add">
+        <Name>Office Direct Dial</Name>
+        <Mobile>FALSE</Mobile>
+        <UsePulseDial>FALSE</UsePulseDial>
+        <WaitForDialTone>FALSE</WaitForDialTone>
+        <PauseAfterDialout>0</PauseAfterDialout>
+        <IntlPrefixCode>00</IntlPrefixCode>
+        <NatPrefixCode>0</NatPrefixCode>
+        <NatCode>44</NatCode>
+        <AreaCode>171</AreaCode>
+        <DialOutCode>171</DialOutCode>
+        <DisableCallWaitingCode>171</DisableCallWaitingCode>
+    </Location>
+    <Location operation="add">
+        <Name>Mobile</Name>
+        <Mobile>TRUE</Mobile>
+        <UsePulseDial>FALSE</UsePulseDial>
+        <WaitForDialTone>FALSE</WaitForDialTone>
+        <PauseAfterDialout>0</PauseAfterDialout>
+        <IntlPrefixCode>+</IntlPrefixCode>
+        <NatPrefixCode>0</NatPrefixCode>
+        <NatCode>44</NatCode>
+        <AreaCode>44</AreaCode>
+        <DialOutCode>44</DialOutCode>
+        <DisableCallWaitingCode>44</DisableCallWaitingCode>
+    </Location>
+    <Location operation="add">
+        <Name>Home</Name>
+        <Mobile>FALSE</Mobile>
+        <UsePulseDial>TRUE</UsePulseDial>
+        <WaitForDialTone>TRUE</WaitForDialTone>
+        <PauseAfterDialout>0</PauseAfterDialout>
+        <IntlPrefixCode>00</IntlPrefixCode>
+        <NatPrefixCode>0</NatPrefixCode>
+        <NatCode>44</NatCode>
+        <AreaCode>181</AreaCode>
+        <DialOutCode>181</DialOutCode>
+        <DisableCallWaitingCode>181</DisableCallWaitingCode>
+    </Location>
+</LocationTable>
+
+<SecureSocketTable>
+    <SecureSocket operation="add">
+        <Name>SecureSocketTable1</Name>
+        <ProtocolName>ssl3.0</ProtocolName>
+        <ProtoLibrary>ssladaptor.dll</ProtoLibrary>
+    </SecureSocket>
+    <SecureSocket operation="add">
+        <Name>SecureSocketTable2</Name>
+        <ProtocolName>tls1.0</ProtocolName>
+        <ProtoLibrary>ssladaptor.dll</ProtoLibrary>
+    </SecureSocket>
+</SecureSocketTable>
+
+<BTDeviceTable>
+</BTDeviceTable>
+
+<BTPersistTable>
+</BTPersistTable>
+
+<BTSecurityTable>
+</BTSecurityTable>
+
+<BTDefaultTable>
+</BTDefaultTable>
+
+<WAPAccessPointTable>
+    <WAPAccessPoint operation="template">
+        <Name>Default Dial In ISP</Name>
+        <CurrentBearer>WAPIPBearer</CurrentBearer>
+    </WAPAccessPoint>
+    <WAPAccessPoint operation="add">
+        <Name>Dummy WAP Settings</Name>
+        <CurrentBearer>WAPIPBearer</CurrentBearer>
+        <StartPage>www.wapstart.com</StartPage>
+    </WAPAccessPoint>
+</WAPAccessPointTable>
+
+<WAPIPBearerTable>
+    <WAPIPBearer operation="template">
+        <Name>WAPIPBearerTable1</Name>
+        <AccessPoint>WAPAccessPoint.-1</AccessPoint>
+        <GatewayAddress>0</GatewayAddress>
+        <WSPOption>CONNECTIONLESS</WSPOption>
+        <Security>FALSE</Security>
+        <IAPRef>IAP.-1</IAPRef>
+        <ProxyPortNumber>0</ProxyPortNumber>
+        <ProxyLogin>0</ProxyLogin>
+        <ProxyPassword>0</ProxyPassword>
+    </WAPIPBearer>
+    <WAPIPBearer operation="add">
+        <Name>WAPIPBearerTable2</Name>
+        <AccessPoint>WAPAccessPoint.Dummy WAP Settings</AccessPoint>
+        <GatewayAddress>www.wapgateway.com</GatewayAddress>
+        <WSPOption>CONNECTIONORIENTED</WSPOption>
+        <Security>FALSE</Security>
+        <IAPRef>IAP.CSD IAP PlaceHolder01</IAPRef>
+        <ProxyPortNumber>1</ProxyPortNumber>
+        <ProxyLogin>1</ProxyLogin>
+        <ProxyPassword>1</ProxyPassword>
+    </WAPIPBearer>
+</WAPIPBearerTable>
+
+<WAPSMSBearerTable>
+    <WAPSMSBearer operation="template">
+        <Name>WAPSMSBearerTable1</Name>
+        <AccessPoint>WAPAccessPoint.-1</AccessPoint>
+        <GatewayAddress>0</GatewayAddress>
+        <WSPOption>CONNECTIONLESS</WSPOption>
+        <Security>FALSE</Security>
+        <ServiceCentreAddress>0</ServiceCentreAddress>
+    </WAPSMSBearer>
+    <WAPSMSBearer operation="add">
+        <Name>WAPSMSBearerTable2</Name>
+        <AccessPoint>WAPAccessPoint.Dummy WAP Settings</AccessPoint>
+        <GatewayAddress>+4412345678901</GatewayAddress>
+        <WSPOption>CONNECTIONORIENTED</WSPOption>
+        <Security>FALSE</Security>
+        <ServiceCentreAddress>+442071234567</ServiceCentreAddress>
+    </WAPSMSBearer>
+</WAPSMSBearerTable>
+
+<VirtualBearerTable>
+</VirtualBearerTable>
+
+<VpnServiceTable>
+</VpnServiceTable>
+
+
+</CommDB:Config>

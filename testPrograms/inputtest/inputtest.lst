@@ -1,0 +1,11 @@
+.res FONT
+.image "font_00.png"
+.res FONT_METRICS
+.bin
+.include "font.fnt"
+
+//.res FONT
+//.image "font2_00.png"
+//.res FONT_METRICS
+//.bin
+//.include "font2.fnt"

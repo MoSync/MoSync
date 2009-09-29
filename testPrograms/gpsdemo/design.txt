@@ -1,0 +1,13 @@
+10:53 2006-04-07
+We start with a white pixel in origo. The white pixel is our current position. Older positions start at green (current) and range to red via blue. A pixel is one m^2. When we walk outside the screen, the screen shifts to put the white pixel on an edge. There is no scaling, though there is logging, to allow for complete route reconstruction on a less-restricted turing machine. ;)
+10:57 2006-04-07
+The first version will not shift the screen.
+
+10:27 2006-04-11
+The gradient must work so that the first pixel is pure green and the last pixel is pure red.
+15:21 2006-04-11
+Gradient accidentally got reversed, and I think it's better that way, 'cause there's more of a difference between from white with red than green.
+
+15:23 2006-04-11
+Proposal, goal: make the current point more easily visible.
+Proposal, method: make it bigger, like 3x3 pixels.

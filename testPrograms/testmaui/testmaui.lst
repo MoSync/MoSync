@@ -1,0 +1,32 @@
+.res FONT
+.image "font_00.png"
+.res FONT_METRICS
+.bin
+.include "font.fnt"
+
+//.res FONT
+//.image "font2_00.png"
+//.res FONT_METRICS
+//.bin
+//.include "font2.fnt"
+
+.res BACK
+.image "back.png"
+
+.res BACK2
+.image "back2.png"
+
+.res IMG1
+.image "image1.png"
+
+.res IMG2
+.image "image2.png"
+
+.res IMG3
+.image "image3.png"
+
+.res IMG4
+.image "image4.png"
+
+.res LOGO
+.image "logo.png"

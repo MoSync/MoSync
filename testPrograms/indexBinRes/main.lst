@@ -1,0 +1,6 @@
+.res R_MEH
+.bin
+
+.index ZERO
+.string "Hello World"
+.index ONE

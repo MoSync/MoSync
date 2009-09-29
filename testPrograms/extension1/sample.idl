@@ -1,0 +1,132 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+/**
+* Sample comment.
+*/
+interface Sample {
+
+	constset int EVENT_TYPE_ {
+		/// timer comment
+		TIMER = 18;
+	}
+
+	/** mx timer
+	*/
+	struct MX_TIMER {
+		/// handle
+		Handle h;
+		/** mx timer
+		*/
+		int i;
+	}
+
+	union TEST1 {
+		Handle h;
+		int i;
+		float f;
+		Extent e;
+	}
+
+	union TEST2 {
+		MX_TIMER t;
+		double d;
+	}
+
+	struct TEST3 {
+		int x;
+		union {
+			float f;
+			Handle h;
+			MX_TIMER t;
+		}
+	}
+
+	//should fail
+	/*union TEST4 {
+		int x;
+		union {
+			float f;
+			double d;
+		}
+	}*/
+
+	struct TEST5 {
+		int* ip;
+		int ia[5];
+	}
+
+	//should fail
+	/*struct TEST6 {
+		const int* cip;
+	}*/
+
+	/// t5i
+	void mxStruct5(in TEST5 t5);
+
+	/// t5o
+	void mxStruct5o(out TEST5 t5);
+
+	//should fail
+	//TEST5 mxStruct5r();
+
+	/*
+	* Causes \link #EVENT_TYPE_TIMER timer events \endlink every \a period milliseconds,
+	* until mxStopTimer() is called.
+	*/
+	//void mxStartTimer(in int period);
+
+	/*
+	* Stops the generation of timer events.
+	*/
+	//void mxStopTimer();
+
+	/**
+	* Creates a data object of the specified size. Its initial contents are undefined.
+	*/
+	void mxCreateData(in Handle placeholder, in int size);
+
+	/**
+	* Returns the size of a data object.
+	*/
+	int mxGetDataSize(in Handle data);
+
+	/*
+	* Reads a size bytes from a data object, starting at a offset, into memory.
+	* Warning: do not attempt to read zero bytes, or out of bounds;
+	* it is not supported and will result in a MoSync Panic.
+	*/
+	//void mxReadData(in Handle data, out MAAddress dst, in int offset, in int len);
+
+	/**
+	* Destroys an object of any type. The handle becomes a placeholder.
+	*/
+	void mxDestroyObject(in Handle handle);
+
+	double mxTest1();
+	double mxTest2(in int meh);
+	double mxTest3(in double d);
+	double mxTest4(out double d);
+	double mxTest5(out double d, in double d2);
+	double mxTest6(in double d, out double d2);
+	double mxTest7(in int meh, out double d2);
+	double mxTest8(in int meh, in double d2);
+	double mxTest9(in int meh, out double d2, in double d3);
+	//double mxTestA(in int meh, out double d2, out double d3);	//should fail, due to insufficient argument slots
+	double mxTestB(in int meh, in double d2, in double d3);
+	int mxTestC(in int meh, out double d2, in double d3);
+}

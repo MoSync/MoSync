@@ -1,0 +1,127 @@
+/* !! Important Info !! */
+
+// Note. the ResFile type has been removed, binary is now used instead,
+// desc below.
+
+// C++ Line comments work
+/* C style comments too */
+
+// Resource type constants, it handles enums
+ 
+.enum
+{
+	ResType_null = 0,
+	ResType_PlaceHolder,
+	ResType_Image,
+	ResType_Sprite,
+	ResType_Binary
+}
+
+// debugging and info
+
+.info 1				// Switch on info
+.debug 1			// Switch on debug info
+
+// Create a UBIN
+.res R_UBIN
+.ubin
+.cstring "Testink"
+
+/*.res R_UBIN_IMG
+.ubin
+.include "ci.png"*/
+
+.res R_IMG_PLACEHOLDER
+.placeholder
+
+// Create an Image resource
+
+.res image1
+.image "testimage.png"	//Bad file path; base path should be path of .lst, not of resource compiler
+
+// Create an File resource
+
+.res afile
+.ubin
+.include "testfile.dat"
+
+// Create an sprite resource
+
+.res sprite1
+.sprite image1, /* XY */ 0, 0, 10, 10,  5,  5
+
+
+/*.res tileset1	//unusable except as source for tilemap
+.tileset "image.png", 16, 16	//w/h of the tile
+
+.res tilemap1
+.tilemap tileset1, 3, 3		//w/h of the map, in tiles
+.tile 11,1,1,1,1,2,4,54,4	//must match w/h of the map, rescomp error otherwise.*/
+
+
+// Create an binary resource
+
+.res							// note resource has no name
+.ubin							// say binary
+
+.string "The buck"
+.fill 8, '?'					// fill memory
+.string "stops here!!!"			// strings with esc codes
+.byte 1,2,3,4					// bytes
+.half 5,6,7,8					// shorts
+.word 9,10,11,12				// ints
+
+.include "testimage.png"		// Include binary
+
+// !!! NEW STUFF !!!
+
+// This is a new type for testing
+
+.res testtype1
+.extension 99							// The extended type
+.varint 1,256,16384						// some unsigned variable ints
+.varsint 1,256,16384, -1,-256,-16384	// some signed variable ints
+
+
+//.end							// done
+
+/* More info
+--------------
+
+Binary formats:
+
+Header:
+
+MAGIC	'MARS'			// Mobile Author Resource System
+VarInt	ResEntries		// The amount of resources (not null)
+VarInt	AllResSize		// Size of all the resource data (not header, not last null)
+
+Individule resources:
+
+
+// Sprites
+
+Byte		Type
+VarInt		ResSize
+Short 		img_index,x,y,w,h,cx,cy 
+
+// Image
+
+Byte		Type
+VarInt		ResSize = n
+char 		image[n]
+
+// Placeholder
+
+Byte		Type
+VarInt		ResSize = 0
+
+// Binary
+
+Byte		Type
+VarInt		ResSize = n
+char 		data[n]
+
+
+
+*/

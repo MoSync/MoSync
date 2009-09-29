@@ -1,0 +1,29 @@
+<Project name="WinMobileTest">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value="true"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="false"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value=""/>
+		<Property name="Wall" value=""/>
+		<Property name="Wextra" value=""/>
+		<Property name="S60v2UID" value="0x0C3C25E0"/>
+		<Property name="S60v3UID" value="0xEF906526"/>
+		<Property name="additionalIncludeDirectories" value="$(MOSYNCDIR)/include"/>
+		<Property name="additionalDependencies" value="MAUtil.lib MAUI.lib"/>
+		<Property name="additionalLibraryDirectories" value="../../../lib/w32/"/>
+		<Property name="extraCmd" value=""/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path=".\main.cpp"/>
+	<File path=".\WinMobileTest.lst"/>
+</Project>

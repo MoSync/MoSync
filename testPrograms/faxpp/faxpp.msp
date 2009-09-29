@@ -1,0 +1,60 @@
+<Project name="faxpp">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="640"/>
+		<Property name="screenHeight" value="480"/>
+		<Property name="deadCodeElim" value="false"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="false"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value=""/>
+		<Property name="Wall" value=""/>
+		<Property name="Wextra" value=""/>
+		<Property name="S60v2UID" value="0x011A2514"/>
+		<Property name="S60v3UID" value=""/>
+		<Property name="additionalIncludeDirectories" value="faxpp-0.2\include"/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value=""/>
+		<Property name="extraCmd" value=""/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value=""/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="faxpp-0.2\src\attr_states.h"/>
+	<File path="faxpp-0.2\src\buffer.c"/>
+	<File path="faxpp-0.2\src\buffer.h"/>
+	<File path="faxpp-0.2\src\cdata.c"/>
+	<File path="faxpp-0.2\src\char_classes.c"/>
+	<File path="faxpp-0.2\src\char_classes.h"/>
+	<File path="faxpp-0.2\src\comment.c"/>
+	<File path="faxpp-0.2\src\element.c"/>
+	<File path="faxpp-0.2\src\element_states.h"/>
+	<File path="faxpp-0.2\src\error.c"/>
+	<File path="faxpp-0.2\src\event.c"/>
+	<File path="faxpp-0.2\src\pi.c"/>
+	<File path="faxpp-0.2\src\reference.c"/>
+	<File path="faxpp-0.2\src\token.c"/>
+	<File path="faxpp-0.2\src\tokenizer_states.c"/>
+	<File path="faxpp-0.2\src\tokenizer_states.h"/>
+	<File path="faxpp-0.2\src\transcode.c"/>
+	<File path="faxpp-0.2\src\xml_parser.c"/>
+	<File path="faxpp-0.2\src\xml_parser.h"/>
+	<File path="faxpp-0.2\src\xml_tokenizer.c"/>
+	<File path="faxpp-0.2\src\xml_tokenizer.h"/>
+	<File path="faxpp-0.2\src\xmldecl.c"/>
+	<File path="faxpp-0.2\include\faxpp\error.h"/>
+	<File path="faxpp-0.2\include\faxpp\event.h"/>
+	<File path="faxpp-0.2\include\faxpp\parser.h"/>
+	<File path="faxpp-0.2\include\faxpp\text.h"/>
+	<File path="faxpp-0.2\include\faxpp\token.h"/>
+	<File path="faxpp-0.2\include\faxpp\tokenizer.h"/>
+	<File path="faxpp-0.2\include\faxpp\transcode.h"/>
+	<File path="sax_parser.c"/>
+	<File path="sax_parser.h"/>
+	<File path="sax_parser_test.c"/>
+	<File path="res.lst"/>
+</Project>

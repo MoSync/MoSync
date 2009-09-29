@@ -1,0 +1,1 @@
+c:\MoSync\bin\xgcc -save-temps -v -o "C:\mosync-trunk\libs\MAStd\Output\mastring.s" -S -g -Werror -Wextra -Wwrite-strings -O2 "C:\mosync-trunk\libs\MAStd\.\mastring.c" -I"C:\mosync-trunk\libs\MAStd" -I"C:\mosync-trunk\libs\" -I"c:\MoSync\profiles\vendors\MobileSorcery\Emulator"

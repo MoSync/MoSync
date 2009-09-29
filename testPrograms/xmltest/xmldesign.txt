@@ -1,0 +1,19 @@
+10:55 2006-04-18
+Ditch all unknown attributes (none are known at this time). Ditch all unknown tags.
+
+12:45 2006-04-18
+Todo: add endPtr check everywhere.
+
+14:24 2006-04-20
+This topic will list assumptions made in the implementation. First and foremost is that the XML document is assumed to be valid, according to the Gui-do schema.
+12:04 2006-04-20
+Are XML tags case-sensitive? Current implementations assumes they are.
+14:23 2006-04-20
+Assumption: no coordinate in Points is exactly zero(0).
+14:50 2006-04-20
+What is the maximum number of points in a Points tag? Current implementation assumes 32, biggest number seen so far is 17.
+
+14:08 2006-04-25
+For proper pronounciation, add dashes to all location names with suffixes like "-torget", "-gata", "-gatan", "-vägen", "-brinken", "-allén", "-backen", "-leden", "-motet", "-gränden", "-gränd", "-parken", "-lunden", "-platsen", osv.
+14:21 2006-04-25
+Be ware of other concatenated words as well.

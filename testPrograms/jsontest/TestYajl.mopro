@@ -1,0 +1,42 @@
+<Project name="TestYajl">
+	<Configuration>
+		<Property name="configType" value="app"/>
+		<Property name="screenWidth" value="240"/>
+		<Property name="screenHeight" value="320"/>
+		<Property name="deadCodeElim" value="true"/>
+		<Property name="ignoreDefaultIncludeDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraryDirectories" value="false"/>
+		<Property name="ignoreDefaultLibraries" value="false"/>
+		<Property name="targetVendor" value="MobileSorcery"/>
+		<Property name="targetDevice" value="Emulator"/>
+		<Property name="Werror" value="true"/>
+		<Property name="Wall" value="true"/>
+		<Property name="Wextra" value=""/>
+		<Property name="S60v2UID" value="0x096D57F1"/>
+		<Property name="S60v3UID" value="0xE7100234"/>
+		<Property name="additionalIncludeDirectories" value=""/>
+		<Property name="additionalLibraryDirectories" value=""/>
+		<Property name="additionalDependencies" value="MAUtil.lib"/>
+		<Property name="extraCmd" value="-O2"/>
+		<Property name="extraResourcer" value=""/>
+		<Property name="extraLinker" value="-xerr"/>
+		<Property name="debug" value=""/>
+	</Configuration>
+	<Criteria>
+	</Criteria>
+	<File path="main.cpp"/>
+	<Folder name="yajl">
+		<File path="yajl\yajl_lex.h"/>
+		<File path="yajl\yajl_parser.c"/>
+		<File path="yajl\yajl_parser.h"/>
+		<File path="yajl\yajl.c"/>
+		<File path="yajl\yajl_buf.c"/>
+		<File path="yajl\yajl_buf.h"/>
+		<File path="yajl\yajl_lex.c"/>
+		<File path="yajl\yajl_encode.c"/>
+		<File path="yajl\yajl_encode.h"/>
+	</Folder>
+	<File path="JSONParser.h"/>
+	<File path="JSONParser.cpp"/>
+	<File path="Jaiku.h"/>
+</Project>

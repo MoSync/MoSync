@@ -1,0 +1,15 @@
+.res
+.image "restest2/greencircle.png"
+
+.res
+.image "restest2/sun.png"
+
+.res
+.extension 6	//skip
+//.skip
+
+.res RESNAME
+.bin
+.string "Sky"
+
+.end

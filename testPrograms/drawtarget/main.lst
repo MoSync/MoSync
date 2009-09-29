@@ -1,0 +1,7 @@
+.res TIMG
+.placeholder
+
+.res SIMG
+.image "restest2/turqthegimp.png"
+
+.end

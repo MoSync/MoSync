@@ -1,0 +1,1 @@
+pipe-tool  -R Output\resources  main.lst

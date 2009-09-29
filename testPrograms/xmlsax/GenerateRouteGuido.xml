@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Route>
+  <Traversals>
+    <Traversal>
+      <Edges>
+        <Edge>
+          <EdgeID>4697</EdgeID>
+          <Length>7.94</Length>
+          <Points>101028.54 80927.86 101029.27 80935.76</Points>
+          <Name />
+          <Features>
+            <Feature>
+              <Type>3</Type>
+              <Priority>1</Priority>
+              <Say>Startpunkt . Du guidas mot din slutdestination  LINDSTEDTSVÄGEN 30. Gå mot  LINDSTEDTSVÄGEN 30. </Say>
+              <Extent>
+                <Position>0</Position>
+                <LateralDistance>0</LateralDistance>
+                <Radius>0</Radius>
+                <LateralPosition>Mitt</LateralPosition>
+              </Extent>
+            </Feature>
+            <Feature>
+              <Type>3</Type>
+              <Priority>1</Priority>
+              <Say>Vägval: sväng höger in på .</Say>
+              <Extent>
+                <Position>7.94</Position>
+                <LateralDistance>0</LateralDistance>
+                <Radius>0</Radius>
+                <LateralPosition>Mitt</LateralPosition>
+              </Extent>
+            </Feature>
+          </Features>
+        </Edge>
+        <Edge>
+          <EdgeID>6613</EdgeID>
+          <Length>43.62</Length>
+          <Points>101029.25 80935.76 101071.23 80933.64 101072.74 80934.11</Points>
+          <Name />
+          <Features>
+            <Feature>
+              <Type>3</Type>
+              <Priority>1</Priority>
+              <Say>Vägval: sväng höger in på .</Say>
+              <Extent>
+                <Position>43.62</Position>
+                <LateralDistance>0</LateralDistance>
+                <Radius>0</Radius>
+                <LateralPosition>Mitt</LateralPosition>
+              </Extent>
+            </Feature>
+          </Features>
+        </Edge>
+        <Edge>
+          <EdgeID>15246</EdgeID>
+          <Length>311.36</Length>
+          <Points>101072.74 80934.11 101076.17 80928.62 101075.81 80914.18 101068.59 80834.79 101064.63 80805.56 101061.74 80795.3 101050.56 80766.79 101031.45 80720.24 101013.77 80677.65 101007.28 80659.61 101005.48 80649.14 101002.77 80635.69</Points>
+          <Name />
+          <Features>
+            <Feature>
+              <Type>3</Type>
+              <Priority>1</Priority>
+              <Say>Vägval: sväng vänster in på .</Say>
+              <Extent>
+                <Position>311.36</Position>
+                <LateralDistance>0</LateralDistance>
+                <Radius>0</Radius>
+                <LateralPosition>Mitt</LateralPosition>
+              </Extent>
+            </Feature>
+          </Features>
+        </Edge>
+        <Edge>
+          <EdgeID>4914</EdgeID>
+          <Length>376.05</Length>
+          <Points>101002.77 80635.69 101010.9 80637.19 101017.24 80636.71 101082.7 80609.97 101086.23 80609.33 101089.6 80609.49 101091.84 80609.97 101096.17 80612.21 101099.54 80615.26 101104.19 80624.56 101113.57 80644.04 101130.09 80676.92 101135.22 80684.45 101140.67 80689.42 101147.32 80692.15 101155.66 80694.15 101161.52 80697.04 101164.64 80701.45 101175.39 80731.36 101178.03 80734.8 101181.24 80737.29 101184.18 80740.24 101186.02 80744.09 101185.86 80747.62 101184.34 80751.31 101181.69 80755 101175.81 80758.34 101150.47 80767.16 101090.52 80791.64</Points>
+          <Name />
+          <Features>
+            <Feature>
+              <Type>3</Type>
+              <Priority>1</Priority>
+              <Say>Du är framme vid din slutdestination  LINDSTEDTSVÄGEN 30. </Say>
+              <Extent>
+                <Position>376.05</Position>
+                <LateralDistance>0</LateralDistance>
+                <Radius>0</Radius>
+                <LateralPosition>Mitt</LateralPosition>
+              </Extent>
+            </Feature>
+          </Features>
+        </Edge>
+      </Edges>
+    </Traversal>
+  </Traversals>
+</Route>

@@ -1,0 +1,37 @@
+15:50 2006-03-03
+Bug: first function in the file is considered main, regardless of its name.
+
+11:20 2006-04-06
+Problem: floating-point operators are allowed by the compiler but caught by the assembler, making it difficult to find the error.
+11:06 2006-04-07
+This concerns automatic conversions too.
+
+15:18 2006-04-06
+Bug: it can happen that 4-byte words are not 4-byte aligned, making the s60 vm crash when accessing them.
+15:28 2006-04-06
+Workaround: change all "align 2" to "align 4" in the .S file.
+13:10 2006-04-19
+We should specify that all words in PIPE must be aligned.
+
+13:10 2006-04-19
+The assembler doesn't handle escape sequences properly. For example, "a\"b" becomes "a\0b".
+
+11:09 2006-04-21
+shared/misc.c/atoi() has overflow bugs. fix it.
+
+16:22 2006-04-21
+shared/print.c/d2a() has a rounding bug. fix it.
+
+16:53 2006-05-10
+Compiler requires main to return int. It should require it to return void instead, since MA main should never return.
+10:56 2006-05-15
+Alternatively, returning from main could invoke Exit().
+
+15:59 2006-05-16
+Bug in resource compiler: a .lst file with no .res, only a .end, will produce an invalid resource of type 0.
+
+13:28 2006-06-09
+Problem in assembler: static, uninitialized variables cause an error. static consts are ok, I think static initialized are also ok.
+
+13:58 2007-02-09
+Write program to text pixel-perfectness of plot, line and rect drawing functions.

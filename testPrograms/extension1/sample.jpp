@@ -1,0 +1,122 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "MX_SAMPLE_CONSTS.H"
+#include "helpers.h"
+
+import java.io.InputStream;
+//import com.example.Timer;
+
+class SampleExtension /*implements TimerListener*/ {
+	MoSync mMoSync;
+	//Timer mTimer;
+
+	SampleExtension(MoSync m) {
+		mMoSync = m;
+	}
+
+	void destruct() {}
+
+	/*void mxStartTimer(int period) {
+		mTimer = new Timer(period);
+	}
+
+	void timerEvent() {
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_TIMER;
+		mMoSync.postEvent(event);
+	}
+
+	void mxStopTimer() {
+		if(mTimer != null) {
+			mTimer.stop();
+			mTimer = null;
+		}
+	}*/
+
+
+	void mxStruct5(Address t5) {
+	}
+
+	void mxStruct5o(Address t5) {
+	}
+
+
+	void mxCreateData(Handle placeholder, int size) {
+		mMoSync.addResource(placeholder, new Binary(new byte[size]));
+	}
+
+	void mxDestroyObject(Handle handle) {
+		if(mMoSync.getResource(handle) != null) {
+			MYASSERT(!mMoSync.isResourceInFlux(handle));
+			mMoSync.setResource(handle, null);
+		}
+	}
+
+	int mxGetDataSize(Handle data) {
+		BinaryInterface bi = (BinaryInterface)mMoSync.getResource(data);
+		return bi.size();
+	}
+
+	void mxReadData(Handle data, Address dst, int offset, int size) throws Exception {
+		BinaryInterface bi = (BinaryInterface)mMoSync.getResource(data);
+		{
+			InputStream in = bi.getInputStream();
+			if(in.skip(offset) != offset) {
+				BIG_PHAT_ERROR;
+			}
+			mMoSync.writeMemStream(dst, in, size);
+			in.close();
+		}
+	}
+
+	double mxTest1() {
+		return 42.42;
+	}
+	double mxTest2(int meh) {
+		return meh;
+	}
+	double mxTest3(double d) {
+		return d;
+	}
+	double mxTest4(Address dblAddr) {
+		mMoSync.writeDouble(dblAddr, Double.NaN);
+		return Double.POSITIVE_INFINITY;
+	}
+	double mxTest5(Address dblAddr, double d2) {
+		return 5;
+	}
+	double mxTest6(double d, Address dblAddr) {
+		return 6;
+	}
+	double mxTest7(int meh, Address dblAddr) {
+		return 7;
+	}
+	double mxTest8(int meh, double d2) {
+		return 8;
+	}
+	double mxTest9(int meh, Address dblAddr, double d3) {
+		return 9;
+	}
+	//double mxTestA(int meh, Address dblAddr, out double d3);	//should fail, due to insufficient argument slots
+	double mxTestB(int meh, double d2, double d3) {
+		return 11;
+	}
+	int mxTestC(int meh, Address dblAddr, double d3) {
+		return 12;
+	}
+}

@@ -1,0 +1,10 @@
+15:51 2008-09-03
+Test with more complicated XML documents. We want CDATA first, then predefined entities, UTF8.
+
+15:01 2008-09-05
+CDATA is done. next up: utf8.
+18:24 2008-09-08
+And entities.
+
+18:24 2008-09-08
+Todo: option to skip whitespace from data callbacks. Might be useful for speed in xml documents with lots of whitespace.

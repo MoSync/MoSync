@@ -1,0 +1,40 @@
+// Part 2
+// --------------------------------------------------------------------------------------------
+.res R_PART2_BKG
+.image "data/part2_bkg.png"
+
+.res R_PLANET1_START
+.image "data/planet1_zoom1.png"
+.res
+.image "data/planet1_zoom2.png"
+.res
+.image "data/planet1_zoom3.png"
+.res R_PLANET1_END
+.image "data/planet1_zoom4.png"
+
+.res R_PLANET2_START
+.image "data/planet2_zoom1.png"
+.res
+.image "data/planet2_zoom2.png"
+.res
+.image "data/planet2_zoom3.png"
+.res R_PLANET2_END
+.image "data/planet2_zoom4.png"
+
+.res R_PLANET3_START
+.image "data/planet3_zoom1.png"
+.res
+.image "data/planet3_zoom2.png"
+.res
+.image "data/planet3_zoom3.png"
+.res R_PLANET3_END
+.image "data/planet3_zoom4.png"
+
+.res R_PLANET4_START
+.image "data/planet4_zoom1.png"
+.res
+.image "data/planet4_zoom2.png"
+.res
+.image "data/planet4_zoom3.png"
+.res R_PLANET4_END
+.image "data/planet4_zoom4.png"

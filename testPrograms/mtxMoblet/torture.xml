@@ -1,0 +1,158 @@
+﻿<?xml encoding="something else" ?>
+<e a="" b="v"/>
+  <?xml encoding="UTF-8"?><!----><c></c><d/><c><d/></c>
+<e a="" b="v"/>
+
+åäö
+
+<?xml encoding="something else" ?>
+
+åäö
+
+&quot;
+&amp;
+&apos;
+&lt;
+&gt;
+&nbsp;
+&iexcl;
+&cent;
+&pound;
+&curren;
+&yen;
+&brvbar;
+&sect;
+&uml;
+&copy;
+&ordf;
+&laquo;
+&not;
+&shy;
+&reg;
+&macr;
+&deg;
+&plusmn;
+&sup2;
+&sup3;
+&acute;
+&micro;
+&para;
+&middot;
+&cedil;
+&sup1;
+&ordm;
+&raquo;
+&frac14;
+&frac12;
+&frac34;
+&iquest;
+&Agrave;
+&Aacute;
+&Acirc;
+&Atilde;
+&Auml;
+&Aring;
+&AElig;
+&Ccedil;
+&Egrave;
+&Eacute;
+&Ecirc;
+&Euml;
+&Igrave;
+&Iacute;
+&Icirc;
+&Iuml;
+&ETH;
+&Ntilde;
+&Ograve;
+&Oacute;
+&Ocirc;
+&Otilde;
+&Ouml;
+&times;
+&Oslash;
+&Ugrave;
+&Uacute;
+&Ucirc;
+&Uuml;
+&Yacute;
+&THORN;
+&szlig;
+&agrave;
+&aacute;
+&acirc;
+&atilde;
+&auml;
+&aring;
+&aelig;
+&ccedil;
+&egrave;
+&eacute;
+&ecirc;
+&euml;
+&igrave;
+&iacute;
+&icirc;
+&iuml;
+&eth;
+&ntilde;
+&ograve;
+&oacute;
+&ocirc;
+&otilde;
+&ouml;
+&divide;
+&oslash;
+&ugrave;
+&uacute;
+&ucirc;
+&uuml;
+&yacute;
+&thorn;
+&yuml;
+
+<![CDATA[[ ] ]] ]> more cdata ]]>
+
+<e a="" b="v"/>
+<!----->
+<f/>
+<!-- - -->
+<g/>
+<!-- -- -->
+<h/>
+<!------>
+<i/>
+<!--
+<device>
+	<cap a="b" v="C-S-D-A" />
+</device>
+-->
+<j 	
+/>
+
+	<!--
+	<device>
+		<identifier>Motorola/A1200</identifier>
+		<features>doubleBuffering, hasCamera, hasPointerEvents</features>
+		<capability name="OS" value="Linux"/>
+		<capability name="JavaPlatform" value="MIDP/2.0, JTWI/1.0"/>
+		<capability name="JavaConfiguration" value="CLDC/1.1"/>
+		<capability name="JavaPackage" value="pdaapi, btapi, mmapi, wmapi1.0, wmapi2.0, webservice, m3g"/>
+		<capability name="JavaProtocol" value="udp, http, https, serial, socket, secure socket"/>
+		<capability name="ScreenSize" value="240x320"/>
+		<capability name="FullCanvasSize" value="240x320"/>
+		<capability name="BitsPerPixel" value="18"/>
+		<capability name="HeapSize" value="2 MB"/>
+		<capability name="StorageSize" value="8 MB"/>
+		<capability name="MaxRecordStoreSize" value="1 MB"/>
+		<capability name="MaxSockets" value="10"/>
+		<capability name="ImageFormat" value="png, jpeg, bmp, gif"/>
+		<capability name="SoundFormat" value="midi, wav, mp3, aac, aac+, eaac+, realaudio, ra8, amr"/>
+		<capability name="CameraResolution" value="2 MP"/>
+		<capability name="Region" value="EMEA, Asia"/>
+		<capability name="AnnouncementDate" value="2006-10-30"/>
+		<capability name="Emulator.Class" value="MotorolaEmulatorM3" />
+		<capability name="Emulator.Skin" value="MOTOMING_A1200_A1200i_A1200r.props" />
+	</device>
+	--> 
+

@@ -1,0 +1,5 @@
+.res R_RUBY_EXAMPLE
+.bin
+//.include "syscalls.rb"
+//.include "test.rb"
+.include "london.rb"

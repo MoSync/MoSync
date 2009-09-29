@@ -1,0 +1,24 @@
+16:41 2006-11-06
+XML Entities.
+16:16 2006-11-10
+Done.
+
+13:35 2006-11-07
+Keep position (line and column) of last successfully scanned object, for use in debugging.
+14:21 2006-11-14
+Done.
+
+12:31 2006-11-08
+Ignore PI:s and comments!
+12:18 2006-11-09
+Done.
+
+16:32 2006-11-08
+Convert UTF-8 to Latin-1!
+14:21 2006-11-14
+Done.
+
+13:44 2006-11-13
+CDATA sections!
+14:21 2006-11-14
+Done.

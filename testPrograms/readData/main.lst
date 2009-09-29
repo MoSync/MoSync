@@ -1,0 +1,7 @@
+.res
+.bin
+.include "data.bin"
+
+.res
+.ubin
+.include "data.bin"

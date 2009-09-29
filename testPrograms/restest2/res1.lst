@@ -1,0 +1,15 @@
+.res
+.image "restest2/redcircle.png"
+
+.res
+.image "restest2/pepper.png"
+
+.res
+.extension 6	//skip
+//.skip
+
+.res RESNAME
+.bin
+.string "Ground"
+
+.end

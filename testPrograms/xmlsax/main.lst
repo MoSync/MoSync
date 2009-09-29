@@ -1,0 +1,17 @@
+.res R_XML0
+.bin
+.include "C:\\ma\\gcc\\xmlsax\\ethernetced.xml"
+
+.res R_XML1
+.bin
+.include "C:\\ma\\gcc\\xmlsax\\cdata.xml"
+
+.res R_XML2
+.bin
+.include "C:\\ma\\gcc\\xmlsax\\xmlsax.vcproj.xml"
+
+.res R_XML3
+.bin
+.include "C:\\ma\\gcc\\xmlsax\\GenerateRouteGuido.xml"
+
+.end
