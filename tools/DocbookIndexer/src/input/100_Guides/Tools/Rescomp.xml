@@ -1,0 +1,87 @@
+<document title="Resource compiler" author="Niklas" area="tools" keyword="">
+<section id="resintro" title="Introduction">
+<![CDATA[
+MoSync uses a special file with the extension .lst to describe which external resources to include in an application. When compiling a MoSync application this file is compiled to a single binary file called 'resources' (both program and resources are combined to a program.comb file also for easy downloading and execution of a program over the internet). This resource file is loaded on application startup and all resources are made ready to be used by the MoSync API syscalls. There are different ways of defining resources to make MoSync aware of the resource types and ensure type safety when using the resources. All paths in a resource file are relative to the MoSync project directory. The following sections will describe some of the ways of defining resources - for more information see: [[rescomp.pdf|Resource compiler (PDF)]]
+\\
+\\
+]]>
+</section>
+<section id="resadding" title="Adding a resource file">
+<![CDATA[
+First, select "File -> New -> Other":
+\\
+\\
+{{images\Resources_lst_1.png}}
+\\
+\\
+You will be presented with the "new" wizard dialog. Expand the "MoSync" folder and select "MoSync Resource File":
+\\
+\\
+{{images\Resources_lst_2.png}}
+\\
+\\
+Finally, enter a filename for your resource file:
+\\
+\\
+{{images\Resources_lst_3.png}}
+\\
+\\
+A resource is declared by using the .res statement. Optionally you can add a resource name which may be used anywhere in the code to identify the resource. These names will be used to generate a header file with preprocessor definitions, mapping the name to a numeric id, i.e. a MoSync handle. To make use of the resource it is convenient to include the MAHeaders.h file and use the symbolic names instead of the actual numbers.
+\\
+Example:
+[code filename="res.lst"]
+.res R_MYRESOURCE
+[/code]
+]]>
+</section>
+
+<section id="binres" title="Binary resources">
+<![CDATA[
+Using this resource type any binary data can be stored in a resource for access in MoSync. There's two types of binary resources: standard binary resources (.bin) and unloaded binary resources (.ubin). Standard binary resources will be loaded into memory directly at startup while unloaded binary resources will be kept on permanent storage. Standard binary resources can be read from and written to while unloaded binary resources only can be read from. Note that all changes made to the binary resource will be discarded whenever the application is closed as the memory will be discarded. The use of unloaded binary resources saves memory while sacrificing speed, as it usually is slower to do reads from the permanent storage. 
+\\
+Example:
+[code filename="res.lst"]
+.res R_MY_DATA
+.bin 
+.include "my_data.bin"
+[/code]
+]]>
+</section>
+
+<section id="imgres" title="Image resources">
+<![CDATA[
+Image resources should be used for loading images from standard image formats. At application start the resource loader will automatically decode images and make them ready to use with the image related syscalls. Different phones support different image formats and sizes. Future MoSync versions will solve this by making it possible to customize what resources to bundle with a specific device or a group of devices in a project. This isn't possible right now, so to be sure that the images can be loaded, you should use png images as we've made sure that png images always can be loaded.
+\\
+Example:
+[code filename="res.lst"]
+.res R_PRETTY_IMAGE
+.image "pretty_image.png"
+[/code]
+]]>
+</section>
+
+<section id="medres" title="Media resources">
+<![CDATA[
+The media resource is the resource type used for audio. Similar to the binary resource, there's two types of media resources - standard media resources (.media) and unloaded media resources (.umedia). With standard media resources, the audio will be loaded, and sometimes decoded, to memory. With unloaded media resources the sound will be streamed from disk to the extent possible. Some devices cannot stream from disk and will load the whole sound to memory anyway due to limitations in the underlying platform. The media resource statement is followed by a string of the mime-type and then the path to the file that should be included. 
+\\
+\\
+Common supported mime-types are:
+* audio/mpeg - for mp3 audio
+* audio/x-wav - for Microsoft's wave audio format (note: this is the only format supported on windows mobile devices for now)
+* audio/basic - for Sun's au format
+\\
+Example:
+[code filename="res.lst"]
+.res R_MUSIC
+.umedia "audio/mpeg", "songs/song.mp3"
+[/code]
+]]>
+</section>
+
+<section id="plares" title="Placeholders">
+<![CDATA[
+The Placeholder is a type of resource that may be used to create new resources programatically. Several syscalls such as maCreateDrawableImage and maCreateData must be passed a placeholder. This placeholder can then be used to identify the dynamically created resource. Note that there is also support to dynamically create placeholders using the maCreatePlaceholder syscall. Also, any resource that is destroyed at runtime becomes a placeholder.
+]]>
+</section>
+
+</document>

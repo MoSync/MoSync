@@ -1,0 +1,15 @@
+digraph CommFlow
+{
+	user -> command;
+	command -> user;
+	command -> sendPacket;
+	sendPacket -> stub;
+	stub -> recvAck -> sendPacket -> command;
+	stub -> reply -> command;
+	reply -> sendAck;
+	stub -> asyncMsg -> user;
+	asyncMsg -> sendAck;
+	sendAck -> stub;
+
+	{rank=same; stub user}
+}

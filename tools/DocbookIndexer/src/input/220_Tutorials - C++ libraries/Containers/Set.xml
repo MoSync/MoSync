@@ -1,0 +1,72 @@
+<document title="The Set class" author="Shiv" area="Containers" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+	Sets are a kind of associative containers that stores unique elements, and in which the elements themselves are the keys.
+
+Associative containers are containers especially designed to be efficient accessing its elements by their key (unlike sequence containers, which are more efficient accessing elements by their relative or absolute position).
+
+Internally, the elements in a set are always sorted from lower to higher following a specific strict weak ordering criterion set on container construction.
+
+Sets are typically implemented as binary search trees.
+
+Therefore, the main characteristics of set as an associative container are:
+
+    * Unique element values: no two elements in the set can compare equal to each other.
+	
+    * The element value is the key itself. 
+	
+    * Elements follow a strict weak ordering at all times.
+	
+	
+]]>
+</section>
+<section id="memberDocumentation" title="Member Function Documentation">
+<![CDATA[
+
+    **iterator MAUtil::Set< T >::begin()**//
+	
+  	Returns an iterator pointing to the first element of the Vector.//
+
+
+    **iterator MAUtil::Set< T >::end()**//
+	
+  	Returns an iterator pointing beyond the last element of the Vector.//
+	
+	**bool MAUtil::Set< T >::add(const T &object)**//
+	
+  	Add an object to this set.//
+	
+Returns:
+    True if object is new to this set, false otherwise.// 
+
+	**bool MAUtil::Set< T >::remove(const T &object)**//
+	
+	Removes from this set the object that is equal to the specified object. Invalidates all iterators.//
+	
+Returns:
+    true if object existed in this set, false otherwise.// 
+
+	**void MAUtil::Set< T >::remove(iterator  	itr)**//
+	
+	Removes the element pointer to by itr. Invalidates all iterators.//
+
+	**void MAUtil::Set< T >::clear()**//  	
+	
+	Removes all elements.//
+
+    **int MAUtil::Set< T >::size()// 
+	
+Returns:
+    The number of elements in the set.  
+]]>
+</section>
+
+<section id="furtherReading" title="Further information">
+<![CDATA[
+  The Vector class is throughly documented in the reference documentation. Also, the sourcecode is available in **$MOSYNCDIR/include/MAUtil/Set.h** in your MoSync package.
+]]>
+</section>
+
+
+
+</document>

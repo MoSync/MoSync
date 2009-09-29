@@ -1,0 +1,118 @@
+<document title="MTXML in C++" author="Fredrik" area="XML" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+There is a C++ wrapper for the C-based parser MTXml. It can be used in many ways, but perhaps the most useful is coupling it to a Connection, which can allow the CPU-intensive parsing to be split up into more than one call, spreading the load over time and improving the application UI's response time. Below is an example of how to implement such an **XmlConnection**.
+]]>
+</section>
+
+<section id="ex" title="Example">
+<![CDATA[
+xmlconnection.h
+[code filename="XmlConnection.h"]
+#ifndef XMLCONNECTION_H
+#define XMLCONNECTION_H
+ 
+#include <MAUtil/Connection.h>
+#include <MTXml/MTXml.h>
+ 
+class XCListener {
+public:
+	// Called when there is a connection error. Parsing stops.
+	virtual void xcConnError(int code) = 0;
+};
+ 
+class XmlConnection : private MAUtil::ConnectionListener, Mtx::MtxListener {
+public:
+	XmlConnection();
+ 
+	// Inits an Mtx::Context, sets itself as ConnectionListener,
+	// starts recieving data, which is passed on to the XML parser.
+	// Callbacks from the parser are passed on to the XmlListener.
+	//
+	// The connection must be ready to recieve data, which means that you
+	// must have recieved either of two callbacks:
+	// MAUtil::ConnectionListener::connectFinished() or
+	// MAUtil::HttpConnectionListener::httpFinished().
+	//
+	// You also must not have a read() or recv() operation active.
+	void parse(MAUtil::Connection* conn, XCListener* xc, Mtx::XmlListener* xml);
+ 
+	// Stops parsing and closes the connection.
+	// \see mtxStop().
+	void stop();
+ 
+	// see mtxProcess().
+	int process(char* data);
+ 
+private:
+	Mtx::Context mContext;
+	MAUtil::Connection* mConn;
+	XCListener* mXc;
+	char mBuffer[1024];
+	char* mPtr;
+ 
+	void mtxDataRemains(const char* data, int len);
+	void connRecvFinished(MAUtil::Connection* conn, int result);
+};
+ 
+#endif	//XMLCONNECTION_H
+[/code]
+\\
+\\
+xmlconnection.cpp
+[code filename="XmlConnection.cpp"]
+#include "XmlConnection.h"
+ 
+XmlConnection::XmlConnection() : mConn(NULL) {}
+ 
+void XmlConnection::parse(MAUtil::Connection* conn, XCListener* xc, Mtx::XmlListener* xml) {
+	mConn = conn;
+	mXc = xc;
+	mContext.init(this, xml);
+	mConn->setListener(this);
+ 
+	mPtr = mBuffer;
+	mConn->recv(mBuffer, sizeof(mBuffer)-1);
+}
+ 
+void XmlConnection::connRecvFinished(MAUtil::Connection* conn, int result) {
+	MAASSERT(conn == mConn);
+	if(result < 0) {
+		mXc->xcConnError(result);
+		return;
+	}
+ 
+	mPtr[result] = 0;
+	mPtr = mBuffer;
+	bool stopped = mContext.feed(mBuffer);
+	if(!stopped) {	//parsing may have been interrupted by stop().
+		mConn->recv(mPtr, sizeof(mBuffer) - 1 - (mPtr - mBuffer));
+	}
+}
+ 
+void XmlConnection::mtxDataRemains(const char* data, int len) {
+	if(mBuffer != data) {
+		memcpy(mBuffer, data, len);
+	}
+	mPtr = mBuffer + len;
+}
+ 
+void XmlConnection::stop() {
+	if(mConn != NULL)
+		mConn->close();
+	mContext.stop();
+}
+ 
+int XmlConnection::process(char* data) {
+	return mContext.process(data);
+}
+[/code]
+\\
+\\
+The trick here is using a static buffer to recieve data, pass it to the parser, have the parser pass the standard XML events to the application, and handle **mtxDataRemains()**. Any remaining data is copied to the front of the buffer, and the next **recv()** starts writing where the remaining data ends.
+\\
+\\
+This is streaming XML. :)
+]]>
+</section>
+</document>

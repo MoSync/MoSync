@@ -1,0 +1,9 @@
+-target-select sim
+20-break-insert c:/mosync-trunk/examples/MinUI/MinUI.cpp:599
+-exec-continue
+-test-wait
+23-stack-info-depth
+24-stack-list-frames 0 5
+25-data-list-changed-registers
+26-stack-select-frame 1
+27-stack-list-arguments 0 1 1

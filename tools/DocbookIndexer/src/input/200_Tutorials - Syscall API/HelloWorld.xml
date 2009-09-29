@@ -1,0 +1,47 @@
+<document title="Hello world in C" author="Patrick" area="Syscalls" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+Traditionally, a hello world application will print a string and then exit immediately. However,
+since such console-type applications are quite uncommon on mobile devices, we will extend our
+example to provide an event loop to keep the application running until the user presses '0'. 
+ 
+We will also handle so-called 'close events'. These events are generated when a user attempts to
+forcibly terminate the application in a platform-dependent manner, commonly using a task manager
+application. The purpose of the event is to notify the application that it will be closed down
+very shortly (the exact amount of time being platform-dependent), and should be handled by a
+well-behaved application by performing emergency shutdown operations, such as saving critical data.
+ 
+Information about how to build, run and test the application can be found in the user guide.
+
+[code filename="hello.c"]
+#include <ma.h> // the standard MoSync header
+#include <conprint.h> // provides printf()
+
+int MAMain() {
+    printf("Hello world\n");
+    // Declare a MoSync event struct.
+    MAEvent e;
+    while(1) {
+        // Wait for an event
+        maWait(0);
+        // Store the latest event in the event struct.
+        maGetEvent(&e);
+        // determine wether it's a key press.
+        if(e.type == EVENT_TYPE_KEY_PRESSED) {
+            // ...and wether it was the '0' key.
+            if(e.key == MAK_0) {
+                // ...in which case we exit.
+                maExit(0);
+            }
+        }
+        else if(e.type == EVENT_TYPE_CLOSE) {
+            // ...and also if we get a close event.
+            maExit(0);
+        }
+    }
+    return 0;
+}
+[/code]
+]]>
+</section> 
+</document>

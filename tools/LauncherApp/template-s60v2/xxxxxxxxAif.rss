@@ -1,0 +1,11 @@
+#include <aiftool.rh>
+
+RESOURCE AIF_DATA {
+	//
+	app_uid=0x%s;
+	num_icons=0;
+	hidden=KAppNotHidden;
+	embeddability=KAppNotEmbeddable;
+	newfile=KAppDoesNotSupportNewFile;
+	launch=KAppLaunchInBackground;
+}

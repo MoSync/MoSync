@@ -1,0 +1,17 @@
+NAME LAPP // 4-letter ID, unique resource identifier for the application
+
+#include <eikon.rh>
+#include <eikon.rsg>
+#include <avkon.rh>
+#include <avkon.rsg>
+
+RESOURCE RSS_SIGNATURE { } // Needs to be left empty
+
+RESOURCE TBUF r_default_document_name { buf=""; }
+
+RESOURCE EIK_APP_INFO {
+	//menubar = r_menubar_1;
+	cba = R_AVKON_SOFTKEYS_EXIT;
+	//status_pane = r_status_pane_null;
+	//cba = R_AVKON_SOFTKEYS_EMPTY;
+}

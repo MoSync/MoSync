@@ -1,0 +1,70 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#ifndef _EXPRESSION_H_
+#define _EXPRESSION_H_
+
+#include <vector>
+#include <string>
+#include <map>
+#include "ParseException.h"
+#include "Token.h"
+#include "Value.h"
+#include "expression_tree.h"
+#include "old_expr.h"
+
+class ExpressionTreeNode;
+class ExpressionTree;
+
+namespace ExpressionCommon {
+	void loadMemory(int addr, int len);
+	void error(const char *msg);
+};
+
+namespace ExpressionParser {
+	ExpressionTree* parse(const char *expr);
+};
+
+class ExpressionTree {
+public:
+	ExpressionTree(const char *expression);
+	~ExpressionTree();
+
+	Value evaluate();
+
+	void addSymbol(const std::string& name);
+	void setSymbol(const std::string& name, const SYM& sym);
+	const SYM& getSymbol(const std::string& name);
+	std::map<std::string, SYM>& getSymbols();
+	void setRoot(ExpressionTreeNode *root);
+	ExpressionTreeNode* getRoot();
+	const char *getExpression();
+
+private:
+	std::map<std::string, SYM> mSymbols;
+	std::string mExpression;
+	ExpressionTreeNode* mRoot;
+};
+
+// err!=NULL on error, describing the error.
+typedef void (*ExpressionCallback)(const Value* value, const char *err);
+void stackEvaluateExpression(const std::string& expr, int frameAddr, ExpressionCallback cb);
+void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback cb);
+std::string getType(const TypeBase* tb, bool complex);
+std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt);
+
+#endif /* _EXPRESSION_H_ */

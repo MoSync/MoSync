@@ -1,0 +1,7 @@
+-target-select sim
+-break-insert _Z4postv
+-exec-continue
+-test-wait
+-var-create - * sinTable
+-var-create - * &(sinTable)
+-var-set-format var1 hexadecimal

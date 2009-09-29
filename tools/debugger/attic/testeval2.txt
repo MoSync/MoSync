@@ -1,0 +1,5 @@
+-target-select remote localhost:50000
+-break-insert _Z14initTrigTablesv
+-exec-continue
+-test-wait
+-data-evaluate-expression sinTable

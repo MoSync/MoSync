@@ -1,0 +1,28 @@
+<document title="Dictionary" author="Fredrik" area="" keyword="">
+<section id="intro" title="MoSync terminology">
+  <![CDATA[
+MoSync introduces a few new terms, and uses others in a new way. Here they are explained. 	
+
+=== **Device** ===
+A model of machine that can execute arbitrary programs.
+=== **Platform** ===
+  An operating system, or version thereof, that is used by one or more devices. Examples include J2ME, Series 60 and Windows Mobile.
+=== **Runtime** ===
+An implementation of MoSync. Platforms supported by MoSync have different runtimes.
+=== **Syscall** ===
+System Call - a function that is implemented, in code native to each platform, by the MoSync runtime.
+=== **Handle** ===
+An identifier to an object managed by the runtime. There are different types of handles, not interchangable.
+=== **Resource / object** ===
+A piece of data managed by the runtime. Types include Image, Media (sound/video) and Data (aka Binary). Each resource is identified by a Handle. The words "resource" and "object" are used interchangably in MoSync's documentation.
+
+Resources can be compiled with the rest of the program and loaded at startup. They can also be created and destroyed at runtime.
+=== **Placeholder** ===
+A resource handle that doesn't identify any resource. It is used in the creation of new resources.
+=== **Event** ===
+MoSync Events deliver notification of keypresses, stylus movements and the results of asynchronous operations like networking and Bluetooth scans.
+=== **Connection** ===
+A serial connection to a remote machine, identified by a Handle. There are different types of connections, including TCP, HTTP and Bluetooth.
+  ]]>
+</section>
+</document>

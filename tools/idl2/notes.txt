@@ -1,0 +1,34 @@
+
+10:07 2007-03-01
+IDL format documentation, W3C style:
+
+? means zero or one.
++ means one ore more.
+* means zero or more.
+'' denotes literals.
+#x denotes single characters, in hexadecimal.
+
+
+InterfaceDefinition ::= 'interface' S Name S? '{' Declaration* S? '}'
+
+S ::= (#x20 | #x9 | #xD | #xA)+
+Name ::= (Letter | '_') NameChar*
+NameChar ::= Letter | Digit | '_'
+Letter ::= ['A' - 'Z'] | ['a' - 'z']
+Digit ::= ['0' - '9']
+
+Declaration ::= Function | ConstSet | Ioctl
+
+Function ::= S? ReturnType S Name S? '(' Arguments? S? ');'
+BaseType ::= 'int' | 'Handle' | 'double' | 'Extent'
+ReturnType ::= 'void' | BaseType
+Arguments ::= Argument (',' Argument)*
+Argument ::= S? ('in' | 'out') S ArgumentType S Name
+ArgumentType ::= BaseType | 'String' | 'Address' | 'MAPoint2d' | 'MARect' | 'MABtService'
+
+ConstSet ::= S? 'constset' S BaseType S Name S? '{' Const* S? '}'
+Const ::= S? Name S? '=' S? NameChar+ S? ';'
+
+Ioctl ::= S? 'ioctl' S Name S? '{' IoctlDecl* S? '}'
+IoctlDecl ::= Function | Ifdef
+Ifdef ::= S? '#showifdef' S Name S Function* '#endif'

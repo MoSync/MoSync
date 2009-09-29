@@ -1,0 +1,78 @@
+<document title="Using the MTXML parser" author="Fredrik" area="XML" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+MoSync's Tiny XML parser provides an efficient, callback-based way of parsing XML files.
+\\
+\\
+MTXml has a SAX-like interface, and is re-entrant: it can start with just the beginning of an XML document and request additional data when needed.
+\\
+\\
+MTXml can handle most XML 1.0 and 1.1 documents. However, in the interests of performance, MTXml is not a conforming XML processor, as defined by the W3C Recommendation. It does not validate documents, and it only checks a few of the well-formed-ness criteria. It even ignores some "fatal errors". Still, it should properly parse a well-formed document.
+\\
+\\
+There are two modes of parsing. One, **mtxFeedProcess()**, is slower, and converts standard entities and UTF-8 characters to Latin-1 before passing them to the application. The other, **mtxFeed()**, is faster, and passes such characters without conversion. If you know which parts of your document need conversion and which ones don't, you can do the conversion manually, using **mtxProcess()**.
+]]>
+</section>
+<section id="ex" title="Example">
+<![CDATA[
+Here's a minimal C program that uses MTXml.
+[code filename="mtxml.c"]
+#include <MTXml/MTXml.h>
+#include <conprint.h>
+#include <maassert.h>
+ 
+static void tagStart(MTXContext* context, const char* name, int len) {
+	printf("s %i: \"%s\"\n", len, name);
+}
+static void tagAttr(MTXContext* context, const char* attrName, const char* attrValue) {
+	printf("a \"%s\": \"%s\"\n", attrName, attrValue);
+}
+static void tagData(MTXContext* context, const char* data, int len) {
+	printf("d %i: \"%s\"\n", len, data);
+}
+static void tagEnd(MTXContext* context, const char* name, int len) {
+	printf("e %i: \"%s\"\n", len, name);
+}
+static void dataRemains(MTXContext* context, const char* data, int len) {
+	printf("r %i: \"%s\"\n", len, data);
+}
+static void parseError(MTXContext* context) {
+	printf("parseError\n");
+}
+static void emptyTagEnd(MTXContext* context) {
+	printf("emptyTagEnd\n");
+}
+ 
+extern char gDocument[];
+ 
+int MAMain() {
+	MTXContext c;
+
+	printf("Hello World!\n");
+ 
+	c.tagStart = tagStart;
+	c.tagAttr = tagAttr;
+	c.tagData = tagData;
+	c.tagEnd = tagEnd;
+	c.dataRemains = dataRemains;
+	c.parseError = parseError;
+	c.emptyTagEnd = emptyTagEnd;
+	c.unicodeCharacter = mtxBasicUnicodeConvert;
+	mtxStart(&c);
+	mtxFeed(&c, gDocument);
+ 
+	FREEZE;
+}
+[/code]
+\\
+\\
+**tagStart()** is called when an XML tag starts. **tagAttr()** is called for each attribute of a tag. **tagData()** may be called multiple times, to handle pieces of character data inside a tag. **tagEnd()** is called at the end of each tag. However, if the tag is empty (looks like this: ''&lt;someTag/&gt;''), **emptyTagEnd()** is called instead of **tagEnd()**.
+\\
+\\
+**parseError()** is called if the parser encounters something it cannot parse. When that happens, parsing stops and should not be restarted.
+\\
+\\
+**dataRemains()** is called if the parser encounters a partial object at the end of the buffer supplied to it. The application should copy that part to the beginning of the buffer and fill the buffer with more data, so that the object may be fully parsed later. In this example, we have a complete XML document available (the external variable **gDocument**), so **dataRemains()** is not called.
+]]>
+</section>
+</document>

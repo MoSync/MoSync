@@ -1,0 +1,19 @@
+14:06 2008-08-15
+*_reg.rsc format:
+
+8 bytes magic
+8 bytes UIDs
+16 bytes magic
+8 bytes name (ascii hex representation of primary UID)
+8 bytes magic
+resource\apps\
+8 bytes name
+25 bytes magic
+
+
+16:43 2008-08-18
+For 3rd edition runtime exe hacking to work, one must do the following:
+*Compile with:  abld build gcce urel
+*Use a UID in the E range. The A range will somehow optimize away the cleartext UID that we need.
+
+Then it works with logging both on and off. I haven't tested other configs like guido or wifi, but I'm optimistic that those should work as well. We'll certainly find out if they don't, once we try to install them.

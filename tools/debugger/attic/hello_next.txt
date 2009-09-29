@@ -1,0 +1,13 @@
+-target-select sim
+-break-insert hello.c:12
+-exec-continue
+-test-wait
+-exec-next-instruction
+-test-wait
+-exec-next-instruction
+-test-wait
+-exec-next-instruction
+-test-wait
+-exec-next-instruction
+-test-wait
+-exec-next-instruction

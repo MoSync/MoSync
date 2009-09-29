@@ -1,0 +1,2 @@
+call run.bat
+pause

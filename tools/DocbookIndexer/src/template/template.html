@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+	<title></title>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="copyright" content="MobileSorcery | © 2004-2008 All Rights Reserved" />
+	<meta name="description" content="MoSync is a tightly integrated collection of tools for mobile development across multiple platforms. It includes a compiler targeting the efficient MoSync architecture and a multitude of runtimes to execute MoSync applications on a variety of platforms." />
+	<meta name="keywords" content="Mobile Sorcery,Mobile Development,Porting Solutions,Mobile Content Deployment,Mobile Phone Applications,Mobile Application Development,BREW Development,J2ME Development,Windows Mobile Development,Symbian Development" />
+	<meta name="robots" content="index,follow" />
+	<meta name="DC.title" content="MoSync | Mobile development made easy" />
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+	<!--<style type="text/css" media="all">@import "css/code.css";</style>-->
+	
+	<!--CSS-->
+	<link rel="stylesheet" type="text/css" href="css/code.css" />
+	<link rel="stylesheet" type="text/css" href="css/global.css" />
+	
+	<!--Character Encoding-->
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	
+	<!-- REQUIRED SCRIPTS AND STYLES -->
+	<link rel="stylesheet" type="text/css" href="menu/tree_component.css" />
+	<script type="text/javascript" src="menu/jquery.js"></script>
+	<script type="text/javascript" src="menu/jquery.listen.js"></script>
+	<script type="text/javascript" src="menu/tree_component.js"></script>
+	
+	
+	<!-- FileTree -->
+	<script type="text/javascript" >
+	
+	var state = 0;
+	//jstree
+	$(function() { 
+		tree1 = new tree_component(); tree1.init($("#sidebar")); 
+	}); 
+	
+	
+	/*
+	function expand(ulelement, id) {
+		//alert(id);
+		frames['contents'].ddtreemenu.flatten("treemenu1", "contact");
+		frames['contents'].ddtreemenu.expandSubTree("treemenu1", ulelement);
+	}
+*/
+
+	function expand() {
+		state = 0;
+		var url = location.href;
+		var file = url.substring(url.lastIndexOf("/")+1, url.length);
+		var file = "#"+file.substring(0, file.lastIndexOf(".")) + "List";
+		$(file).addClass('open');
+		$(file).removeClass('closed');
+		$(file).parents().addClass('open');
+		$(file).parents().removeClass('closed');
+
+	}
+	
+	function loadParent(url) {
+		if ( state == 0) {
+			location.href = url;
+		}
+		state++;
+		if(state>1) state = 0;
+	}
+	
+	</script>
+</head>
+
+<body onload="expand()">
+
+<!--[if !IE]>
+<script type="text/javascript">
+document.onresize = alertSize;
+</script>
+<![endif]-->
+
+<!--[if IE]>
+<script type="text/javascript">
+window.onresize = alertSize;
+</script>
+<![endif]-->
+
+	<!--Main Container - Centers Everything-->
+	<div id="mainContainer">
+		<!--Sidebar-->
+		<div id="sidebar">
+			<div>
+     					<%menu%>
+				<div class="clear">
+				</div>
+			</div>
+		</div> <!--  end of sidebar -->
+		
+		
+		<!--Main Content-->
+		<div id="mainContent">
+			<!--Header-->
+			<div id="header">
+				<div class="top">
+				</div>
+				<div class="bottom">
+					<!--Nav-->
+					<!--				<ul id="nav">
+							<li id="navHome"><a href="index.html">Getting started</a></li>
+						<li id="navWork"><a href="#">Reference</a></li>
+						<li id="navServices"><a href="#">Tutorials</a></li>
+						<li id="navContact"><a href="#">Guides</a></li>
+						<li id="navFAQ"><a href="#">FAQ</a></li>
+					</ul> -->
+				</div>
+						<div class="clear">
+						</div>
+			</div> <!--  end of div header -->
+			
+				<!--Inner Content-->
+				<div id="innerContent">
+					<div id="navTrail">
+						<p><%navpath%></p>
+					</div>
+					
+					<div id="mediumcontent">
+						<div id="content">
+							<h1 class="maintitle"><%title%></h1>     
+							<h1 class="author"><%author%></h1>  
+							<%content%><!--Clear-->
+						</div> <!--  end of content -->
+						<div class="clear">
+						</div>
+					</div> <!--  end of medium content -->
+				</div> <!-- end of innerContent -->
+				<!--Clear-->
+				<div class="clear">
+				</div>
+			
+			
+			<!--Clear-->
+			<div class="clear">
+			</div>
+			
+			<!--Footer-->
+			<div id="footer">
+	        	<p>MobileSorcery | © 2004-2008 All Rights Reserved</p>
+			</div>
+			<!--Clear-->
+			<div class="clear">
+			</div>
+		</div> <!-- end of mainContent -->
+		
+			<!--Clear-->
+			<div class="clear">
+			</div>
+	</div> <!--  end of mainContenter -->
+</body>
+</html>
+

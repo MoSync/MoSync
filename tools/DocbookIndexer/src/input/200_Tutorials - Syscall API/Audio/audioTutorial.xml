@@ -1,0 +1,150 @@
+<document title="Audio" author="Anders Malm" area="Syscalls" keyword="audio">
+
+<section id="AudioIntroduction" title="Introduction">
+<![CDATA[
+In this tutorial you will learn how to play audio files in your applications. Audio is provided to the sound api as a media resource. A media resource is just a standard binary or unloaded binary resource with a null-terminated mime-string in the beginning. These can either be created dynamically using maCreateData or in a resource file using the .media or .umedia directive.  Due to limitations in the platform-provided api:s we've introduced a set of restrictions - For the time being it's not possible to play mp3 files on windows mobile phone and the api only supports playing of one sound at a time. If you want to make sure that all MoSync supported devices will be able to play your resources it is recommended that you use <em>wav</em> files. 
+]]>
+</section>
+
+<section id="AudioStep1" title="Step 1 : Initializing">
+<![CDATA[
+To add a resource to your application you first add a resource list file, <em>res.lst</em> to your project.
+\\
+For using a mp3 file resource, add these lines to the resource list file:
+[code filename="reslst.h"]
+.res RES_AUDIO
+.media "audio/mpeg", "song.mp3"
+[/code]
+\\
+and for a wav file resource, add these:
+[code]
+.res RES_AUDIO
+.media "audio/x-wav", "song.wav"
+[/code]
+\\
+To add a resource you must first define the name of the resource.
+This name needs to be unique since it will later be used in your code as a handle to that resource.
+Then you must define what type it has and where the actual file is placed.
+All resources in a <em>res.lst</em> will then be packed together in a resource file.
+\\
+To be able to use your resources you must the add this include statement:
+[usesnippet id="maheaders"]
+\\
+The file <em>MAHeaders.h</em> is created by the resource compiler so don't modify it!
+In this file all your resources are defined using the same name as you gave your resource.
+]]>
+</section>
+
+<section id="AudioStep2" title="Step 2 : Playing audio">
+<![CDATA[
+To play a sound you use the <em>maSoundPlay</em> function.
+[code]
+maSoundPlay(RES_SOUND);
+[/code]
+Just provide the correct resource and the audio file will start playing immediatly if successful.
+If the function returns any negative value it means that it failed.
+\\
+\\
+If you, for some reason, wish to stop playing the sound you just use the <em>maSoundStop</em> function.
+[usesnippet id="stop"]
+\\
+\\
+If you wish to restart the sound you can use this:
+[usesnippet id="restart"]
+First you can check if your sound is still playing. If so, you can stop it before playing it again.
+<em>maSoundStart</em> always plays the sound from the beginning.
+\\
+\\
+Audio volume in MoSync is defined as values between 0 and 100, where 100 is the maximum volume.
+To get the volume you use:
+[usesnippet id="getvolume"]
+and to set the volume you use:
+[usesnippet id="setvolume"]
+]]>
+</section>
+
+
+<section id="AudioSourceCode" title="Example Source Code">
+<![CDATA[ 
+[code filename="audio.cpp"]
+#include <MAUtil/Moblet.h>
+
+[snippet id="maheaders"]
+#include "MAHeaders.h"
+[/snippet]
+
+using namespace MAUtil;
+
+class MyMoblet : public Moblet {
+public:
+    MyMoblet();
+    void keyPressEvent(int keyCode);
+
+    void setVolume(int change);
+};
+
+MyMoblet::MyMoblet() {
+	MAExtent e = maGetScrSize();
+
+	maSetColor(0x0);
+	maFillRect(0, 0, EXTENT_X(e), EXTENT_Y(e));
+
+	maSetColor(0xffffff);
+	maDrawText(0,0, "Press 5 to restart sound");
+	maDrawText(0,10, "Press 8 to stop sound");
+	maDrawText(0,20, "Press 7 to decrease volume ");
+	maDrawText(0,30, "Press 9 to increase volume ");
+	maUpdateScreen();
+	
+	if(maSoundPlay(RES_AUDIO, 0, maGetDataSize(RES_AUDIO)) < 0)
+		maPanic(0,"error playing sound!");
+}
+
+void MyMoblet::setVolume(int change)
+{
+[snippet id="getvolume"]
+	int volume = maSoundGetVolume();
+[/snippet]
+	volume += change;
+	if(volume<0) volume = 0;
+	else if(volume>100) volume = 100;
+[snippet id="setvolume"]	
+	maSoundSetVolume(volume);
+[/snippet]
+}
+
+void MyMoblet::keyPressEvent(int keyCode) {
+	switch(keyCode) {
+		case MAK_0:
+			maExit(0);
+			break;
+		case MAK_8:
+[snippet id="stop"]		
+			maSoundStop();
+[/snippet]
+			break;
+		case MAK_5:
+[snippet id="restart"]		
+			if(maSoundIsPlaying())
+				maSoundStop();
+			maSoundPlay(RES_AUDIO, 0, maGetDataSize(RES_AUDIO));
+[/snippet]			
+			break;
+		case MAK_7:
+			setVolume(-10);
+			break;
+		case MAK_9:
+			setVolume(10);
+			break;
+	}
+}
+
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+};
+[/code]
+]]>
+</section> 
+
+</document>

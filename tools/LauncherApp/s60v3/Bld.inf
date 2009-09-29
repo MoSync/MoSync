@@ -1,0 +1,10 @@
+// BLD.INF
+
+PRJ_PLATFORMS
+DEFAULT
+
+PRJ_MMPFILES
+
+//gnumakefile icons_scalable_dc.mk
+
+LauncherApp.mmp

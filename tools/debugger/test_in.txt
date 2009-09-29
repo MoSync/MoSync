@@ -1,0 +1,5 @@
+-gdb-version
+-file-exec-and-symbols Sld.tab
+-target-select remote localhost:50000
+-break-insert MAMain
+-exec-continue

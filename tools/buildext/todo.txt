@@ -1,0 +1,43 @@
+11:02 2008-08-04
+Support for CLDC 1.0 floats.
+
+
+
+14:28 2008-08-05
+IDL syntax description, W3C style:
+
+? means zero or one.
++ means one ore more.
+* means zero or more.
+'' denotes literals.
+[ - ] denotes a range of characters.
+#x denotes hexadecimal characters.
+() denotes a group.
+| means "or".
+
+InterfaceDefinition ::= 'interface' S Name S? '{' Declaration* S? '}'
+
+S ::= (#x20 | #x9 | #xD | #xA)+
+Name ::= (Letter | '_') NameChar*
+NameChar ::= Letter | Digit | '_'
+Letter ::= ['A' - 'Z'] | ['a' - 'z']
+Digit ::= ['0' - '9']
+Star ::= '*'
+
+Declaration ::= Function | ConstSet | Struct
+
+Function ::= S? ReturnType S Name S? '(' Arguments? S? ');'
+BaseType ::= 'int' | 'Handle' | 'double' | 'Extent'
+ReturnType ::= 'void' | BaseType
+Arguments ::= Argument (',' Argument)*
+Argument ::= S? ('in' | 'out') S ArgumentType S Name
+ArgumentType ::= BaseType | 'MAString' | 'MAAddress'
+
+ConstSet ::= S? 'constset' S BaseType S Name S? '{' Const* S? '}'
+Const ::= S? Name S? '=' S? NameChar+ S? ';'
+
+Struct ::= S? ('struct' | 'union') S Name S? '{' Member* S? '}'
+Member ::= (PlainOldData | AnonymousUnion)
+PlainOldData ::= S? PodType S Name S? ';'
+PodType ::= Name Star?
+AnonymousUnion ::= S? 'union' S? '{' PlainOldData* S? '}'

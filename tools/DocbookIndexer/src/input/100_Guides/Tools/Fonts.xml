@@ -1,0 +1,107 @@
+<document title="Font tools" author="Niklas" area="tools" keyword="">
+<section id="font intro" title="Introduction">
+<![CDATA[
+MAUI::Font is a used for drawing texts using bitmap fonts. This class requires bitmap fonts in a specific format called ''mof''. The required tools for creating such fonts are included in the MoSync package - BMFont in <MoSync directory>/bin/BMFont and mof.exe in <MoSync directory>/bin.
+
+In this guide we will first create a bitmap font using the BMFont tool and the convert it into a mof-file. We will then make a MoSync project in which we add the mof-file as a resource. The resource will then be used to create a MAUI::Font instance and draw some text with. We begin by making a new directory for our project called fonttest in the MoSync project directory.
+]]>
+</section>
+
+<section id="fontbuilding" title="Building the font">
+<![CDATA[
+With the BMFont tool you can render any existing truetype font as a bitmap font. First you need to set some settings, most importantly that the charset should be OEM->ANSI instead of Unicode, the bitmap image (textures) should be saved as png and that the font descriptor should be saved in a binary format. 
+\\
+{{images/mauifont_bmfont_setup.png}}
+\\
+Then make sure that the characters we want in our font are selected. If you want all characters press "Edit->(Un)Select All Chars". We can now press "Options->Visualize" to see what our bitmap font exactly will look like. 
+\\
+{{images/mauifont_bmfont_visualize.png}}
+\\
+Next we will save our font to our ''fonttest'' project directory. Go to "Options->Save bitmap font as". Save it as an ''fnt''-file.
+\\
+{{images/mauifont_bmfont_saveas.png}}
+]]>
+</section>
+
+<section id="fontconverting" title="Converting the font">
+<![CDATA[
+Now we open a console window and go to our project directory. First veritfy that the font you saved is there. There will be two files, one ''png''-file and one ''fnt''-file. Using the ''mof''-tool you can convert this data into a ''mof''-file which is a format usable by MAUI::Font.
+\\
+{{images/mauifont_mof.png}}
+\\
+Optionally you can add the -fontColor <hex value on the form aarrggbb or rrggbb> to set the color of the font, default is white.
+]]>
+</section>
+
+<section id="fontusing" title="Using the font">
+<![CDATA[
+The resulting ''mof''-file can be added to your MoSync project as a binary resource and passed to the constructor of MAUI::Font to 
+create a runtime instance of the font. To draw text using the font, use one of the methods ''drawString'' or ''drawBoundedString''. 
+The ''drawBoundedString'' method features linebreaking and is therefore slower, so it is recommended to use ''drawString'' when possible.
+\\
+\\
+We'll show this by making a simple example. 
+\\
+\\
+Start Eclipse and create a new project called fonttest. Make it a Moblet project. Also, in the project's build settings, add MAUI.lib to Additional Libraries.
+\\
+\\
+Begin by adding a new resource file called ''res.lst'' with the contents:
+\\
+\\
+[code filename="res.lst"]
+.res R_FONT
+.bin
+.include "myfont.mof"
+[/code]
+\\
+In the source file, add the inclusion of ''MAUI/Font.h''.
+\\
+\\
+[code filename="fonttest.cpp"]
+#include <MAUtil/Moblet.h>
+#include <MAUI/Font.h>
+#include "MAHeaders.h"
+[/code]
+\\
+Also add the inclusion of ''MAHeaders.h'' which will be generated from the compiled resource file, containing the handles to the resources in the resource file.
+\\
+In the code we will begin by adding an instance of ''MAUI::Font'' as a member to the Moblet. We will also make sure it is initialized with a handle to our font resource.
+\\
+\\
+[code filename="fonttest.cpp"]
+using namespace MAUtil;
+
+class MyMoblet : public Moblet {
+private:
+	MAUI::Font font;
+public:
+    MyMoblet() : font(R_FONT) {
+    }
+[/code]
+\\
+Finally we use the font to draw a text whenever the user presses a key.
+\\
+\\
+[code]
+    void keyPressEvent(int keyCode) {
+    	font.drawString("Hello world!", 2, 2);
+    	maUpdateScreen();
+    }
+
+    void keyReleaseEvent(int keyCode) {
+        // todo: handle key releases
+    }
+};
+
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+};
+[/code]
+
+]]>
+</section>
+
+
+</document>

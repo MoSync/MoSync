@@ -1,0 +1,9 @@
+-target-select sim
+-break-insert endless/endless.c:9
+-exec-continue
+-test-wait
+-exec-step
+-test-wait
+-exec-step
+-test-wait
+-exec-step

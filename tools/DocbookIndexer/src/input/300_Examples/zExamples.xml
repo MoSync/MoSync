@@ -1,0 +1,87 @@
+<document title="Examples" author="The MoSync team" area="Examples" keyword="">
+
+<section id="ex" title="">
+<![CDATA[
+Many examples have been written to show off the different features of MoSync. They can all be found in the 'examples' directory of your MoSync installation.
+]]>
+</section>
+
+<section id="ex1" title="3dLines">
+<![CDATA[
+An animated logotype. Features: graphics and key input
+]]>
+</section>
+
+<section id="ex2" title="AdvGraphics">
+<![CDATA[
+A demo that constructs multi-colored, transparent balls. Features: advanced graphics.
+]]>
+</section>
+
+<section id="ex3" title="Debugging">
+<![CDATA[
+This example shows how to use the debug logging and User Panic functions in MoSync. It outputs data to MoBuild, if run through that system, and to a file, but not to the screen.
+]]>
+</section>
+
+<section id="ex4" title="MAStx">
+<![CDATA[
+A console-based program showing off heap management, printf and double-precision floating point mathematics.
+]]>
+</section>
+
+<section id="ex5" title="MAUIex">
+<![CDATA[
+An example showing off our GUI library, MAUI.
+]]>
+</section>
+
+<section id="ex6" title="Moblet">
+<![CDATA[
+Four examples that show how to use the event management framework, Moblet.
+]]>
+</section>
+
+<section id="ex7" title="MoSketch">
+<![CDATA[
+An Etch-a-Sketch analogue. Features: Permanent storage, Close event handling.
+]]>
+</section>
+
+
+<section id="ex8" title="MoSound">
+<![CDATA[
+Simply plays a sound.
+]]>
+</section>
+
+<section id="ex9" title="MoTooth">
+<![CDATA[
+Scans the nearby area for Bluetooth devices and services, stores the results in a database, displays a list of services and connects to one of them. Features: Bluetooth discovery and connections, permanent storage.
+]]>
+</section>
+
+<section id="ex10" title="Motris">
+<![CDATA[
+A clone of the game Tetris. Features: graphics, permanent storage, HTTP connections.
+]]>
+</section>
+
+<section id="ex11" title="Motrix">
+<![CDATA[
+A graphical demo that uses tilemaps to draw a rain of letters and symbols.
+]]>
+</section>
+
+<section id="ex12" title="OtaLoad">
+<![CDATA[
+Downloads over the air, caches and runs another MoSync application. Features: permanent storage, HTTP connections, dynamic code loading.
+]]>
+</section>
+
+<section id="ex13" title="Tiles">
+<![CDATA[
+An interactive graphical demo. Features: tilemaps.
+]]>
+</section>
+</document>

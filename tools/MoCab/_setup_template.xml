@@ -1,0 +1,54 @@
+<wap-provisioningdoc>
+<characteristic type="Install">
+<parm name="InstallPhase" value="install" />
+<parm name="OSVersionMin" value="4.2" />
+<parm name="OSVersionMax" value="10.0" />
+<parm name="BuildNumberMin" value="0" />
+<parm name="BuildNumberMax" value="-536870912" />
+<parm name="AppName" value="%INSERTNAMEHERE%" />
+<parm name="InstallDir" value="%CE1%\%INSERTNAMEHERE%" translation="install" />
+<parm name="NumDirs" value="2" />
+<parm name="NumFiles" value="4" />
+<parm name="NumRegKeys" value="0" />
+<parm name="NumRegVals" value="0" />
+<parm name="NumShortcuts" value="1" />
+</characteristic>
+
+<characteristic type="FileOperation">
+
+<characteristic type="%CE11%" translation="install">
+<characteristic type="MakeDir" />
+<characteristic type="%INSERTNAMEHERE%.lnk" translation="install">
+<characteristic type="Shortcut">
+<parm name="Source" value="%InstallDir%\%INSERTNAMEHERE%.exe" translation="install" />
+</characteristic>
+</characteristic>
+</characteristic>
+
+<characteristic type="%InstallDir%" translation="install">
+<characteristic type="MakeDir" />
+
+<characteristic type="%INSERTNAMEHERE%.exe" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="MoRE-winmobile.exe" />
+</characteristic>
+</characteristic>
+
+<characteristic type="program" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="program" />
+</characteristic>
+</characteristic>
+
+#ifdef HAVE_RESOURCES
+<characteristic type="resources" translation="install">
+<characteristic type="Extract">
+<parm name="Source" value="resources" />
+</characteristic>
+</characteristic>
+#endif
+
+</characteristic>
+
+</characteristic>
+</wap-provisioningdoc>

@@ -1,0 +1,33 @@
+NAME LAPP // 4-letter ID, local to the application
+
+#include <eikon.rh>
+#include <eikon.rsg>
+#include <avkon.rh>
+#include <avkon.rsg>
+
+RESOURCE RSS_SIGNATURE { } // Needs to be left empty
+
+RESOURCE TBUF r_default_document_name { buf=""; }
+
+RESOURCE EIK_APP_INFO {
+	//menubar = r_menubar_1;
+	cba = R_AVKON_SOFTKEYS_EXIT;
+	//status_pane = r_status_pane_null;
+	//cba = R_AVKON_SOFTKEYS_EMPTY;
+}
+
+//#ifdef __SERIES60_3X__
+#include <appinfo.rh>
+
+RESOURCE LOCALISABLE_APP_INFO r_launcher_app_info {
+	short_caption = "%s";
+	//view_list = { };
+	caption_and_icon =
+	CAPTION_AND_ICON_INFO {
+		caption = "%s";
+		number_of_icons = 0;
+	};
+}
+
+//#endif	//__SERIES60_3X__
+

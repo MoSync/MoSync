@@ -1,0 +1,270 @@
+<document title="Http Connection Tutorial" author="Anders Malm" area="Connection" keyword="http">
+
+<section id="Conn1Intro" title="Introduction">
+ <![CDATA[
+This tutorial will show you the basics of http connections in MoSync.
+You will see how easy it is to write applications which can access http based information.
+You will also see how easy it is to stream information over http.
+This example is written from a Moblet template. 
+]]>
+</section>
+
+<section id="Conn1Initialize" title="Step 1 : Initializing">
+<![CDATA[
+\\
+[usesnippet id="inc"]
+\\
+<em>connection.h</em> is included to provide the basic connection functionallity.
+\\
+<em>mastlib.h</em> is included to add the atoi function which converts the contents of an array to an int.
+\\
+<em>conprint.h</em> adds the printf function which writes text to the screen as a simple console.
+\\
+<em>CONNECTION_BUFFER_SIZE</em> defines the size of the buffer in which data is collected.
+\\
+[usesnippet id="classdef"]
+\\
+To provide the functionallity we inherit function declarations from the <em>HttpConnectionListener</em> class.
+\\
+[usesnippet id="dec"]
+\\
+The <em>httpFinished</em> function is a callback which is called whenever a http connection is initiated and we can recieve a response.
+When we use the <em>recv</em> function for the http connection <em>connRecvFinished</em> is called everytime a new chunk of data is recieved.
+If we use the <em>read</em> function instead, the <em>connReadFinished</em> function will be called when the read is done.
+More about these functions later in this tutorial.
+\\
+[usesnippet id="prvdec"]
+\\
+mHttp is a <em>MAUtil::HttpConnection</em> object which represents the actual connection.
+Each one of these may only handle one connection at the time so to enable multiple connections we need to define multiple <em>HttpConnection</em> objects.
+Always make sure that a connection is closed before connecting to it again.
+\\
+[usesnippet id="cons"]
+\\
+The constructor sets itself as the listener for the <em>HttpConnection</em> object so that the callbacks declared in <em>MyMoblet</em> will be used.
+\\
+[usesnippet id="log"]
+\\
+In our entry point, MAMain we initilizes the console and enables logging.
+This means that everything that everything that we send to the console is also logged in a log file.
+If you handle large amount of data and would want to output information to verify behaviours of your application this will help you.
+This file is located in the <em>Output</em> folder of your project and is called <em>log.txt</em>.
+\\
+]]>
+</section>
+
+<section id="Conn1ConnectionAndResponses" title="Step 2 : Connections and responses">
+<![CDATA[
+Too initiate an http connection we call the <em>create</em> function of the <em>HttpConnection</em> object. 
+All you need to provide is the url and if you need to use <em>GET</em> or <em>POST</em>.
+In this example we send a <em>POST</em> request to a server.
+\\
+[usesnippet id="create"]
+\\
+If the <em>create</em> function returns a value below zero this means that it have failed for some reason.
+Please check the api references for all the possible return values.
+It's only possible to have one active connection on each <em>HttpConnection</em> object.
+Due to this we must make sure that we don't try to reconnect an active connection.
+If the <em>create</em> call was successful we can now set request headers.
+Since we don't need it we can call the <em>finish</em> function directly.
+\\
+When we have a connection with the server the callback function <em>httpFinished</em> will be called.
+\\
+[usesnippet id="response"]
+\\
+First we checks for the "content-length" response header, if it's not found we will recieve an <em>CONNERR_NOHEADER</em> response.
+If it's found we recieves the actual content length as an char array of numbers.
+It's then converted it to an int using the <em>atoi</em> function. 
+\\
+[usesnippet id="getresponse"]
+\\
+If we don't have any content length or it's larger then our recieving buffer we can't just read all the data.
+We have to read multiple times until we reaches the end.
+This is done by calling the <em>recv</em> function of the <em>HttpConnection</em> object.
+\\
+If we know the content length and the recieving data fits inside the buffer we can read it all directly.
+This is done by using the <em>read</em> function in <em>HttpConnection</em>. 
+\\
+The difference between the two is that <em>recv</em> specifies the total amount of bytes which it can recieve while <em>read</em> specifies the number of bytes it shall read.
+Each of these methods has its own callback functions.
+Depending on the function you use <em>connRecvFinished</em> or <em>connReadFinished</em> callback functions will be called.
+\\
+[usesnippet id="read"]
+\\
+The <em>connReadFinished</em> callback function first check if the result is not negative. 
+A negative result means an error might have happened.
+Check the return value against the api documentation.
+Positive results means that data was recieved.
+The connection shall be closed manually now since no more data will be received on this connection.
+\\
+[usesnippet id="recv"]
+\\
+The <em>connRecvFinished</em> callback function works a little bit different.
+If the reslut is positive we have recieved that amout of bytes.
+If so we can't close the connection since more data will be recieved.
+If it's negative we must check if it's <em>CONNERR_CLOSED</em>.
+<em>CONNERR_CLOSED</em> doesn't need to be an error.
+Usually it means that the sending server has sent its data and closed the connection to verify the reciever about it.
+When a negative value is returned the connection shall be closed.
+]]>
+</section>		
+
+<section id="Conn1WhatDidWeLearnThen" title="What Did We Learn Then?">
+<![CDATA[
+\\
+In this tutorial we have had a look at how easy it is to access http information and also stream such information to your application.
+With this basic knowledge you will easily build your applications which will use web based information.
+\\
+For further information also read the socket tutorial and the tutorial concerning the Downloader.
+\\
+
+]]>
+</section>
+
+<section id="Conn1Source" title="Example Source Code">
+<![CDATA[
+\\
+[code filename="httpconn.cpp"]
+#include <MAUtil/Moblet.h>
+[snippet id="inc"]
+#include <mautil/connection.h>
+#include <mastdlib.h>
+#include <conprint.h>
+
+#define CONNECTION_BUFFER_SIZE 1024
+[/snippet]
+
+[snippet id="classdef"]
+class MyMoblet : public MAUtil::Moblet, private MAUtil::HttpConnectionListener
+[/snippet]
+{
+public:
+	MyMoblet();
+[snippet id="dec"]	
+	void httpFinished(MAUtil::HttpConnection *conn, int result);
+	void connRecvFinished(MAUtil::Connection *conn, int result);
+	void connReadFinished(MAUtil::Connection *conn, int result);
+[/snippet]
+	void keyPressEvent(int keyCode);
+
+private:
+	void initiateConnection(const char* url);
+[snippet id="prvdec"]
+	char mBuffer[CONNECTION_BUFFER_SIZE];
+	MAUtil::HttpConnection mHttp;
+[/snippet]
+	bool mIsConnected;
+};
+
+[snippet id="cons"]
+MyMoblet::MyMoblet() : mHttp(this)
+[/snippet]
+					, mIsConnected(false)
+{
+	printf("http connection tutorial.\n");
+	printf("press softkeys to send http requests.\n");
+	printf("press 0 to exit\n");
+}
+
+// connect to the given url if not other connection is active
+void MyMoblet::initiateConnection(const char* url) {
+	if(mIsConnected) {
+		printf("already connected\n..");
+		return;
+	}
+	printf("\nconnecting to %s", url);
+[snippet id="create"]	
+	int res = mHttp.create(url, HTTP_POST);
+	if(res < 0) {
+		printf("unable to connect - %i\n", res);
+	} else {
+		mHttp.finish();
+		mIsConnected = true;
+	}
+[/snippet]
+}
+
+void MyMoblet::httpFinished(MAUtil::HttpConnection* http, int result) {
+	printf("HTTP %i\n", result);
+[snippet id="response"]	
+	MAUtil::String contentLengthStr;
+	int responseBytes = mHttp.getResponseHeader("content-length", &contentLengthStr);
+
+	int contentLength = 0;
+	if(responseBytes == CONNERR_NOHEADER)
+		printf("no content-length response header\n");
+	else {
+		printf("content-length : %s\n", contentLengthStr.c_str());
+		contentLength = atoi(contentLengthStr.c_str());
+	}
+[/snippet]
+[snippet id="getresponse"]
+	if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
+		printf("Receive in chunks..\n");
+		mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);
+	} else {
+		mBuffer[contentLength] = 0;
+		mHttp.read(mBuffer, contentLength);
+	}
+[/snippet]	
+}
+
+void MyMoblet::connReadFinished(MAUtil::Connection* conn, int result) {
+[snippet id="read"]
+	if(result >= 0)
+		printf("connReadFinished %i\n", result);
+	else
+		printf("connection error %i\n", result);
+	mHttp.close();
+[/snippet]	
+	mIsConnected = false;
+}
+
+void MyMoblet::connRecvFinished(MAUtil::Connection * conn, int result){
+[snippet id="recv"]
+	if(result >= 0) {
+		printf("connRecvFinished %i\n", result);
+		mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);
+		return;
+	}
+	else if(result == CONNERR_CLOSED) {
+		printf("Receive finished!\n");
+	} else {
+		printf("connection error %i\n", result);
+	}
+	mHttp.close();
+[/snippet]
+	mIsConnected = false;
+}
+
+// Press 0 to exit. Soft left and soft right will initiate new connections
+void MyMoblet::keyPressEvent(int keyCode) {
+	switch(keyCode) {
+	
+	case MAK_0:
+		maExit(0);
+		break;
+		
+	case MAK_SOFTLEFT:
+		initiateConnection("http://www.example.com/");
+		break;
+
+	case MAK_SOFTRIGHT:
+		initiateConnection("http://www.mosync.com/");
+		break;
+	}
+}
+
+extern "C" int MAMain() {
+[snippet id="log"]
+	InitConsole();
+	gConsoleLogging = 1;
+[/snippet]
+	MAUtil::Moblet::run(new MyMoblet());
+}
+[/code]
+\\
+]]>
+</section>
+
+</document>

@@ -1,0 +1,2383 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+/** \file maapi.h
+* \brief The MoSync API is a general compact API with a small footprint.
+
+
+* With this API it should be possible to do most things, although,
+* there may still be some functionality missing. If you
+* would like a specific function added, please do send us a
+* <a href="mailto:info@mobilesorcery.com">mail</a>.
+
+* In future versions of MoSync an extension API will be provided
+* that will allow you to create your own custom syscalls.
+
+
+* Some Caveats:
+*
+
+* The Runtime expects alignment rules to be followed.
+* Writing or reading to unaligned memory will cause a MoSync Panic.
+
+* Some functions may also cause a panic if they are passed incorrect parameters.
+* A complete reference of these panics can be found <a href="../panics.html">here</a>.
+
+* The codepage for functions that use strings is platform-dependent beyond 7-bit ASCII.
+* Most use Latin-1, but you should still be wary.
+
+
+* Additional notes:
+
+
+* There are different types of handles: Connection, Store and Resource.
+* They are all represented as positive signed integers.
+* When a handle is passed to a function, it must have the proper type.
+
+* Each MoSync program has a Resource array. It is acccessed and manipulated by certain
+*  syscalls, but it cannot be accessed directly.
+* Each resource (aka Object) is represented by a
+* handle. There are different types of resources, for example
+* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, but
+* just a handle which you can use to construct new objects dynamically.
+* Resources can also be defined at compile time, by using MoSync's resource compiler.
+* Placeholders can either be defined at compile time using a resource compiler directive
+* or created dynamically at runtime using maCreatePlaceholder().
+* See the tutorials, examples and the resource compiler reference documentation for more
+* information.
+
+* There is an event queue which contains keypad events and results from asynchronous operations.
+* Use maWait() and maGetEvent() to handle it.
+
+* There are different types of connection operations.
+* For each connection, only one of each type of operation may be active at the same time.
+*/
+
+interface MAAPI {
+
+	typedef char* MAString;
+	typedef void* MAAddress;
+	typedef int MAHandle;
+	typedef int MAExtent;
+	typedef unsigned char byte;
+	typedef unsigned short ushort;
+	typedef unsigned int uint;
+	typedef unsigned long ulong;
+
+	/// Returns the height of an MAExtent.
+#define EXTENT_Y(e) ((short)(e))
+
+	/// Returns the width of an MAExtent.
+#define EXTENT_X(e) ((short)((e) >> 16))
+
+	/// Creates an MAExtent.
+#define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
+
+	/**
+	* Sets \a size bytes, starting at \a dst, to the specified value, interpreted as an unsigned char.
+	* \returns \a dst.
+	*/
+	MAAddress memset(out MAAddress dst, in int val, in ulong size);
+
+	/**
+	* Copies the values of \a size bytes from the location pointed by \a src directly to the memory
+	* block pointed by \a dst.
+	*
+	* The underlying type of the objects pointed by both the source and destination pointers are
+	* irrelevant for this function; The result is a binary copy of the data.
+	*
+	* The function does not check for any terminating null character in source - it always copies
+	* exactly \a size bytes.
+	*
+	* To avoid overflows, the size of the arrays pointed by both the destination and source
+	* parameters, shall be at least \a size bytes, and should not overlap (for overlapping memory
+	* blocks, memmove() is a safe approach).
+	* \returns \a dst.
+	*/
+	MAAddress memcpy(out MAAddress dst, in MAAddress src, in ulong size);
+
+	/**
+	* Compares the C string \a str1 to the C string \a str2.
+	*
+	* This function starts comparing the first character of each string.
+	* If they are equal to each other, it continues with the following pairs until the
+	* characters differ or until a terminanting null-character is reached.
+	*
+	* \returns An integral value indicating the relationship between the strings:
+	* A zero value indicates that both strings are equal.
+	* A value greater than zero indicates that the first character that does not match
+	* has a greater value in \a str1 than in \a str2. A value less than zero indicates the opposite.
+	*/
+	int strcmp(in MAString str1, in MAString str2);
+
+	/**
+	* Copies the C string pointed by \a src into the array pointed by \a dst,
+	* including the terminating null character.
+	*
+	* To avoid overflows, the size of the array pointed by \a dst shall be long
+	* enough to contain the same C string as \a src (including the terminating null
+	* character), and should not overlap in memory with \a src.
+	* \returns \a dst.
+	*/
+	MAString strcpy(out NCString dst, in NCString src);
+
+	/**
+	* Returns \a a + \a b.
+	*/
+	double __adddf3(in double a, in double b);
+	/**
+	* Returns \a a - \a b.
+	*/
+	double __subdf3(in double a, in double b);
+	/**
+	* Returns \a a * \a b.
+	*/
+	double __muldf3(in double a, in double b);
+	/**
+	* Returns \a a / \a b.
+	* If \a b == 0, a <a href="../panics.html">MoSync Panic</a> is thrown.
+	*/
+	double __divdf3(in double a, in double b);
+	/**
+	* Returns -\a a.
+	*/
+	double __negdf2(in double a);
+	/**
+	* Returns the integer part of \a a.
+	*/
+	int __fixdfsi(in double a);
+	/**
+	* Returns the double representation of \a a.
+	*/
+	double __floatsidf(in int a);
+	/**
+	* Returns the double representation of \a a.
+	*/
+	double f2d(in float a);
+	/**
+	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
+	* If either argument is Not a Number, the result is undefined.
+	*/
+	int dcmp(in double a, in double b); 
+
+
+	/**
+	* Returns \a a + \a b.
+	*/
+	float __addsf3(in float a, in float b);
+	/**
+	* Returns \a a - \a b.
+	*/
+	float __subsf3(in float a, in float b);
+	/**
+	* Returns \a a * \a b.
+	*/
+	float __mulsf3(in float a, in float b);
+	/**
+	* Returns \a a / \a b.
+	* If \a b == 0, a <a href="../panics.html">MoSync Panic</a> is thrown.
+	*/
+	float __divsf3(in float a, in float b);
+	/**
+	* Returns -\a a.
+	*/
+	float __negsf2(in float a);
+	/**
+	* Returns the integer part of \a a.
+	*/
+	int __fixsfsi(in float a);
+	/**
+	* Returns the float representation of \a a.
+	*/
+	float __floatsisf(in int a);
+	/**
+	* Returns the double representation of \a a.
+	*/
+	float d2f(in double a);
+	/**
+	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
+	* If either argument is Not a Number, the result is undefined.
+	*/
+	int fcmp(in float a, in float b); 
+
+	/**
+	* Returns the sine of \a x.
+	* \param x An angle in radians.
+	*/
+	double sin(in double x);
+	/**
+	* Returns the cosine of \a x.
+	* \param x An angle in radians.
+	*/
+	double cos(in double x);
+	/**
+	* Returns the tangent of \a x.
+	* \param x An angle in radians.
+	*/
+	double tan(in double x);
+	/**
+	* Returns the square root of \a x.
+	*/
+	double sqrt(in double x);
+
+	/**
+	 * A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
+	 */
+	struct MAPoint2d {
+		int x;
+		int y;
+	}
+
+	/**
+	 * A structure representing a rectangle, with 'left' and 'top' being the x and y coordinate of the top-left corner. 
+	 * And width and height being the dimensions of the rectangle.
+	 */
+	struct MARect {
+		int left;
+		int top;
+		int width;
+		int height;
+	}
+
+	/**
+	* Sets the color used by drawing functions. Returns previous color. Initial color is 0 (black).
+	* \param rgb A color in RGB8 format (0xRRGGBB). The top byte is ignored.
+	*/
+	int maSetColor(in int rgb);
+	
+	/**
+	* Sets the clipping rectangle for the current draw target.
+	* The screen and every drawable image each maintains a clipping rectangle.
+	* Drawing operations have no effect outside the clipping rectangle.
+	* The default clipping rectangle covers the entire draw target, so that
+	* clipping occurs at the draw target's edges.
+	*/
+	void maSetClipRect(in int left, in int top, in int width, in int height);
+	
+	/**
+	* Returns the clipping rectangle for the current draw target.
+	*/
+	void maGetClipRect(out MARect out);
+
+	/**
+	* Draws a single pixel using the current color.
+	*/
+	void maPlot(in int posX, in int posY);
+	/**
+	* Draws a line using the current color.
+	*/
+	void maLine(in int startX, in int startY, in int endX, in int endY);
+	/**
+	* Draws a filled rectangle using the current color.
+	* Width and height must be greater than zero.
+	*/
+	void maFillRect(in int left, in int top, in int width, in int height);
+	/**
+	* Draws a filled triangle strip using the current color.
+	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
+	* vertices of the strip.
+	* \param count The count of vertices in the strip. Must be at least 3.
+	*/
+	void maFillTriangleStrip(in MAPoint2d points, in int count);
+	/**
+	* Draws a filled triangle fan using the current color.
+	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
+	* vertices of the fan.
+	* \param count The count of vertices in the fan. Must be at least 3.
+	*/
+	void maFillTriangleFan(in MAPoint2d points, in int count);
+	/**
+	* Returns the size in pixels of text as it would appear on-screen.
+	*/
+	MAExtent maGetTextSize(in MAString str);
+
+	/**
+	* Draws text using the current color.
+	*/
+	void maDrawText(in int left, in int top, in MAString str);
+
+	/**
+	* Copies the back buffer to the physical screen.
+	*/
+	void maUpdateScreen();
+
+	/**
+	* Normally, a phone's backlight turns itself off after
+	* a few seconds of the user not pressing any keys.
+	* To avoid this behaviour, call this function periodically.
+	* As the timeout period is different for every device, and sometimes even user-configurable,
+	* it's recommended that you call this function at least once every 500 milliseconds
+	* to ensure that the light stays on at all times.
+	*/
+	void maResetBacklight();
+
+	/**
+	* Returns the screen size.
+	*/
+	MAExtent maGetScrSize();
+
+	/**
+	* Draws an image.
+	* It it placed on the draw target with the top left corner according to the parameters.
+	*/
+	void maDrawImage(in MAHandle image, in int left, in int top);
+
+	/**
+	* Draws an image.
+	* The source is an array of ints that represent pixels in XRGB format.
+	* \param dstPoint The top-left point on the draw target.
+	* \param src The address to the source image.
+	* \param srcRect The portion of the source image to be drawn.
+	* \param scanlength The width, in pixels, of the image represented by the source array.
+	*/
+	void maDrawRGB(in MAPoint2d dstPoint, in MAAddress src, in MARect srcRect, in int scanlength);
+
+	constset int TRANS_ {
+		/// The image is copied unchanged.
+		NONE = 0;
+		/// The image is rotated clockwise by 90 degrees.
+		ROT90 = 5;
+		/// The image is rotated clockwise by 180 degrees.
+		ROT180 = 3;
+		/// The image is rotated clockwise by 270 degrees.
+		ROT270 = 6;
+		/// The image is reflected about its vertical center.
+		MIRROR = 2;
+		/// The image is reflected about its vertical center, then rotated clockwise by 90 degrees.
+		MIRROR_ROT90 = 7;
+		/// The image is reflected about its vertical center, then rotated clockwise by 180 degrees.
+		MIRROR_ROT180 = 1;
+		/// The image is reflected about its vertical center, then rotated clockwise by 270 degrees.
+		MIRROR_ROT270 = 4;
+	}
+
+	/**
+	* Draws a portion of an image using a transformation.
+	* \param image The source image. 
+	* \param srcRect The portion of the source image to be drawn.
+	* Must not exceed the bounds of the source image.
+	* \param dstPoint The top-left point on the draw target.
+	* \param transformMode One of the \link #TRANS_NONE TRANS \endlink constants.
+	* \see maDrawImage
+	*/
+	void maDrawImageRegion(in MAHandle image, in MARect srcRect, in MAPoint2d dstPoint,
+		in int transformMode);
+
+	/**
+	* Returns the size of an image.
+	*/
+	MAExtent maGetImageSize(in MAHandle image);
+
+	/**
+	* Copies an image into an array of ints that represent pixels in ARGB format.
+	* The destination rectangle is defined as { 0,0, \a srcRect.width, \a srcRect.height }.
+	* Parts of the destination array that are outside the destination rectangle are not modified.
+	* If \a srcRect is outside the bounds of the source image,
+	* or if \a srcRect.width is greater than \a scanlength, a MoSync Panic is thrown.
+	* \param image The handle to the source image.
+	* \param dst The address of the destination array.
+	* \param scanlength The width of the image, in pixels, represented by the destination array.
+	* \param srcRect The portion of the source image to be copied.
+	*/
+	void maGetImageData(in MAHandle image, out MAAddress dst, in MARect srcRect, in int scanlength);
+
+	/**
+	* Sets the current draw target.
+	* The handle must be a drawable image or #HANDLE_SCREEN, which represents the back buffer.
+	* The initial draw target is the back buffer.
+	* If an image is set as draw target, its object handle goes into flux, which prevents
+	* its destruction or use as a source in maDrawImage. When a different draw target is set,
+	* the image's handle is restored. Returns the the previously set draw target.
+	* \see maCreateDrawableImage()
+	*/
+	//Graphics.copyArea could be used to allow an image to be drawn to itself.
+	MAHandle maSetDrawTarget(in MAHandle image);
+
+	constset int HANDLE_ {
+		/// This handle refers to the back buffer, which is initially black.
+		SCREEN = 0;
+
+		LOCAL = 0;
+	}
+
+	/**
+	 * Finds the label resource with the specified \a name and returns its index.
+	 * If it is not found, -1 is returned.
+	 */
+	int maFindLabel(in MAString name);
+
+	constset int RES_ {
+		OUT_OF_MEMORY = -1;
+		BAD_INPUT = -2;
+		OK = 1;
+	}
+
+	/**
+	* Creates an image object using encoded data from a data object.
+	* All platforms support the PNG format. Some platforms may also support JPEG and/or GIF.
+	* \param placeholder The placeholder for the image object that is to be created.
+	* \param data The data object that holds the encoded data.
+	* \param offset The offset in the data object where the encoded data begins.
+	* \param size The size in bytes of the encoded data.
+	* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY or #RES_BAD_INPUT if failed.
+	*/
+	int maCreateImageFromData(in MAHandle placeholder, in MAHandle data, in int offset, in int size);
+
+	/**
+	* Creates an image object using raw ARGB data.
+	* \param placeholder The placeholder for the image object that is to be created.
+	* \param src Address of the raw data. 4 bytes per pixel, format 0xAARRGGBB.
+	* \param size The size in pixels of the image, constructed using the EXTENT() macro.
+	* \param alpha Non-zero if the resulting image should have an alpha channel, zero otherwise.
+	* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
+	*/
+	int maCreateImageRaw(in MAHandle placeholder, in MAAddress src, in MAExtent size, in int alpha);
+
+	/**
+	* Creates a drawable image of the specified size. A drawable image has no alpha channel,
+	* which is to say, no transparency.
+	* Its initial contents are undefined, so you should draw onto the entire surface to
+	* be sure what will happen when you draw this image onto something else.
+	* \param placeholder The resource handle of the new image.
+	* \param width Width, in pixels, of the new image. Must be \> 0.
+	* \param height Height, in pixels, of the new image. Must be \> 0.
+	* \see maSetDrawTarget()
+	* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
+	*/
+	int maCreateDrawableImage(in MAHandle placeholder, in int width, in int height);
+
+	/**
+	* Creates a data object of the specified \a size, in bytes. Its initial contents are undefined.
+	* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
+	*/
+	int maCreateData(in MAHandle placeholder, in int size);
+
+	/**
+	*	Creates a new placeholder and returns the handle to it.
+	*/
+	MAHandle maCreatePlaceholder();
+
+	/**
+	* Destroys an object of any type. The handle becomes a placeholder.
+	*/
+	void maDestroyObject(in MAHandle handle);
+
+	/**
+	* Returns the size, in bytes, of a data object.
+	*/
+	int maGetDataSize(in MAHandle data);
+	/**
+	* Reads \a size bytes from a data object, starting at \a offset,
+	* into memory pointed to by \a dst.
+	* \warning Do not attempt to read zero bytes or out of bounds;
+	* it is not supported and will result in a MoSync Panic.
+	*/
+	void maReadData(in MAHandle data, out MAAddress dst, in int offset, in int size);
+	/**
+	* Writes \a size bytes to a data object, starting at \a offset,
+	* from memory pointed to by \a src.
+	*/
+	void maWriteData(in MAHandle data, in MAAddress src, in int offset, in int size);
+
+	/**
+	* Parameters for the maCopyData() function.
+	*/
+	struct MACopyData {
+		MAHandle dst;
+		int dstOffset;
+		MAHandle src;
+		int srcOffset;
+		int size;
+	}
+	/**
+	* Copies \a size bytes from data object \a src to \a dst, at the specified offsets.
+	*/
+	void maCopyData(in MACopyData params);
+
+	constset int MAS_ {
+		CREATE_IF_NECESSARY = 1;
+		//SHARED 2
+		//SHARED_WRITE 4
+	}
+
+	constset int STERR_ {
+		/// Generic error.
+		GENERIC = -2;
+		/// The storage medium is full.
+		FULL = -3;
+		/// The store does not exist.
+		NONEXISTENT = -5;
+	}
+
+	/**
+	* Opens a permanent data store, optionally creates one if it doesn't exist already.
+	* 
+	* Returns a Store MAHandle on success.
+	* Returns #STERR_NONEXISTENT if !(flags & #MAS_CREATE_IF_NECESSARY) and the store does not exist.
+	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
+	* for another reason.
+	*
+	* \param name The name of the store. A store name must have between 1 and 32 characters,
+	* inclusive, and must not contain any of the following characters: "\\:;?*'
+	* \param flags A combination of \link #MAS_CREATE_IF_NECESSARY MAS \endlink flags, or zero.
+	*/
+	MAHandle maOpenStore(in MAString name, in int flags);
+	/**
+	* Writes the contents of a data object to a store. Destroys any data currently in the store.
+	* Returns \> 0 on success, #STERR_FULL if the storage system is full,
+	* or another \link #STERR_GENERIC STERR \endlink code if the write failed for another reason.
+	* \param store The store to write to.
+	* \param data The data object to read from.
+	*/
+	int maWriteStore(in MAHandle store, in MAHandle data);
+	/**
+	* Creates a data object and copies the contents of a store to it.
+	* Use maGetDataSize to get the size of the data.
+	* \param store The store to read from.
+	* \param placeholder The placeholder handle where a data object will be created.
+	* \returns RES_OK if succeded and RES_OUT_OF_MEMORY if failed.
+	*/
+	int maReadStore(in MAHandle store, in MAHandle placeholder);
+	/**
+	* Closes a store. Also removes that store if \a remove is non-zero.
+	*/
+	void maCloseStore(in MAHandle store, in int remove);
+
+	constset int CONNERR_ {
+		/// Generic error.
+		GENERIC = -2;
+		/// The maximum number of open connections allowed has been reached.
+		MAX = -3;
+		/// DNS resolution error.
+		DNS = -4;
+		/// Internal error. Please report any occurrences to Mobile Sorcery.
+		INTERNAL = -5;
+
+		/** \brief The connection was closed by the remote peer.
+		*
+		* Happens when HTTP servers finish sending data.
+		*/
+		CLOSED = -6;
+
+		/// You attempted to write to a read-only connection.
+		READONLY = -7;
+		/// The OS does not trust you enough to let you open this connection.
+		FORBIDDEN = -8;
+		/// No operation has been started yet.
+		UNINITIALIZED = -9;
+		/// The Content-Length header could not be found.
+		CONLEN = -10;
+		/// You supplied a malformed URL.
+		URL = -11;
+		/// The protocol is not available.
+		UNAVAILABLE = -12;
+		/// You canceled the operation.
+		CANCELED = -13;
+		/// The server gave an invalid response.
+		PROTOCOL = -14;
+		/// The network connection could not be established.
+		NETWORK = -15;
+		/// The requested header could not be found.
+		NOHEADER = -16;
+
+		/**
+		* If you wish to share the CONNERR codespace,
+		* use values below this for your own error codes.
+		*/
+		USER = -1000000;	
+	}
+	constset int CONNOP_ {
+		READ = 1;
+		WRITE = 2;
+		CONNECT = 5;	//READ | WRITE | 4
+		FINISH = 11;	//READ | WRITE | 8
+#if IX_CONNSERVER
+		ACCEPT = 16;
+#endif
+	}
+	constset int CONN_ {
+		/// The maximum number of open connections allowed.
+		MAX = 32;
+	}
+
+	/**
+	* Asynchronously opens a connection using the specified URL.
+	* A URL takes the following form:
+	* <tt>\<protocol\>://\<address\>[:\<port\>]\<parameters\></tt>\n
+	* The following protocols are supported:
+	*
+	* <tt>socket</tt>, which is TCP and has no parameters.
+	*
+	* <tt>ssl</tt>, which is an encrypted TCP connection. It has no parameters.
+	*
+	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
+	* it defaults to port 80.
+	* Its parameters is the document path (for example, "/index.html").
+	* Writing to a http connection is not allowed.
+	*
+	* <tt>https</tt>, which is an encrypted HTTP GET. It has the same parameters as <tt>http</tt>.
+	*
+	* <tt>btspp</tt>, which is Bluetooth Serial Port and has no parameters.
+	*\n
+	*\n
+	* For the <tt>socket</tt> and <tt>http</tt> protocols, \a \<address\> can be either a decimal,
+	* dot-delimited (.) IPv4 address or a standard Domain Name,
+	* while \a \<port\> is a decimal number from 1 to 65535.
+	*
+	* In the <tt>socket</tt> protocol, certain ports are protected on certain platforms and
+	* cannot be used, most notably port 80 on J2ME. In this case, use http instead.
+	*
+	* On a few devices, using ports numbered below 1024 may cause system crashes.
+	* Therefore, it is advisable to use ports above 1024 if you can choose.
+	*
+	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
+	* \<port\> is a decimal number from 1 to 30.
+	*
+	* Example TCP url: <tt>socket://www.example.com:23</tt>
+	*
+	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
+	*
+	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
+	*
+	*
+	* To find Bluetooth addresses, use the Bluetooth discovery API. See maBtStartDeviceDiscovery().
+	*
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_CONNECT.
+	*
+	* The success value is \> 0. For the <tt>http</tt> protocol,
+	* the success value is the HTTP response code.
+	*
+	*
+	* When you're done with the connection, maConnClose() must be called to free
+	* the resources associated with the handle. This must be done even if
+	* the connect operation failed.
+	*
+	* There is a limit of #CONN_MAX open connection handles at any time, so if you keep
+	* opening connections without closing them, you'll eventually recieve the
+	* #CONNERR_MAX error code instead of new connection handles.
+	*
+	*
+	* \returns The connecting handle \>0, or one of the \link #CONNERR_GENERIC CONNERR \endlink values.
+	* \see maGetEvent
+	*
+	* \warning At this time, encrypted connections are supported only on Java runtimes.
+	*/
+	MAHandle maConnect(in MAString url);
+
+	/**
+	* Closes a connection, freeing any resources associated with the handle.
+	*
+	* Cancels any active operations on the connection.
+	* Such operations will finish with #CONNERR_CANCELED.
+	*/
+	void maConnClose(in MAHandle conn);
+
+	/**
+	* Asynchronously reads at least one and at most \a size bytes from a connection to memory.
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_READ.
+	* The success value is the number of bytes read.
+	*
+	* \see maGetEvent
+	*/
+	void maConnRead(in MAHandle conn, out MAAddress dst, in int size);
+
+	/**
+	* Asynchronously writes \a size bytes to a connection from memory.
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_WRITE.
+	* The success value is \> 0.
+	*
+	* \see maGetEvent
+	*/
+	void maConnWrite(in MAHandle conn, in MAAddress src, in int size);
+
+	/**
+	* Asynchronously reads at least one and at most \a size bytes from a connection to
+	* a data object, starting at the specified offset.
+	* During the read, the data object being written to will be in flux.
+	* Any attempt to access it will result in a Panic.
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_READ.
+	* The success value is is the number of bytes read.
+	*
+	* \see maGetEvent
+	*/
+	void maConnReadToData(in MAHandle conn, in MAHandle data, in int offset, in int size);
+
+	/**
+	* Asynchronously writes \a size bytes to a connection from a data object,
+	* starting at the specified offset.
+	* During the write, the data object being read from will be in flux.
+	* Any attempt to access it will result in a Panic.
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_WRITE.
+	* The success value is \> 0.
+	*
+	* \see maGetEvent
+	*/
+	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
+
+	/**
+	* An address for the TCP/IPv4 protocol.
+	*/
+	struct MAConnAddrInet4 {
+		int addr;
+		int port;
+	}
+
+	constset int BTADDR_ {
+		LEN = 6;
+	}
+
+	/**
+	* A Bluetooth device address.
+	*/
+	struct MABtAddr {
+		byte a[BTADDR_LEN];
+	}
+
+
+	/**
+	* An address for the Bluetooth Serial Port protocol.
+	*/
+	struct MAConnAddrBt {
+		int port;
+		MABtAddr addr;
+	}
+
+	constset int CONN_FAMILY_ {
+		INET4 = 1;
+		BT = 2;
+	}
+
+	struct MAConnAddr {
+		/// One of the CONN_FAMILY constants
+		int family;
+		union {
+			MAConnAddrInet4 inet4;
+			MAConnAddrBt bt;
+		}
+	}
+
+	/**
+	* Retrieves the address of a connection. On server connections,
+	* you'll get the local address. On normal connections, you'll get the remote address.
+	*
+	* You can pass #HANDLE_LOCAL to retrieve the local address.
+	* In that case, you must set MAConnAddr::family before calling this function,
+	* to tell it which address to retrieve. Also, the port member is not set.
+	*
+	* \returns \< 0 on error.
+	*/
+	int maConnGetAddr(in MAHandle conn, out MAConnAddr addr);
+
+	constset int HTTP_ {
+		GET = 1;
+		POST = 2;
+		HEAD = 3;
+	}
+
+	/**
+	* Creates an unfinished HTTP/1.0 connection. You cannot read from this connection
+	* until it's been Finished. Before then, you can set request headers. After,
+	* you can get response headers.
+
+	* POST connections are special; they let you write to the connection before
+	* it's Finished. The first write causes the underlying TCP connection to be
+	* established and request headers transmitted. After the first write has
+	* begun, you may no longer set request headers.
+
+	* \param url An HTTP or HTTPS URL. See maConnect() for the exact form.
+	* \param method #HTTP_GET, #HTTP_POST or #HTTP_HEAD.
+	* \returns An unfinished HTTP connection handle \>0, or a
+	* \link #CONNERR_GENERIC CONNERR \endlink value.
+	* \see maHttpFinish
+	*/
+	MAHandle maHttpCreate(in MAString url, in int method);
+
+	/**
+	* Sets a request header of an HTTP connection.
+	*
+	* Overwrites any existing header with the same key. The keys is case-insensitive.
+	*
+	* If the connection's method is #HTTP_POST, it must not have been written to.
+	* \param conn An unfinished HTTP connection handle.
+	* \param key The name of the header.
+	* \param value The new value of the header.
+	*/
+	void maHttpSetRequestHeader(in MAHandle conn, in MAString key, in MAString value);
+
+	/**
+	* Stores an HTTP response header in the specified buffer.
+	* The buffer may be too small to contain the header and the terminating zero;
+	* in that case, the buffer will not be filled
+	* and you should create a bigger buffer and call this function again.
+	* \param conn A finished HTTP connection handle.
+	* \param key The name of the header. Case-insensitive.
+	* \param buffer A string buffer.
+	* \param bufSize The size of the buffer, in bytes.
+	* \returns The length of the header value, excluding the terminating zero, or
+	* #CONNERR_NOHEADER if the header doesn't exist.
+	*/
+	int maHttpGetResponseHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
+
+
+	//not needed yet
+	//int maHttpGetResponseMessage(in MAHandle conn, out MAString buffer, in int bufSize);
+	//int maHttpGetRequestHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
+
+
+	/**
+	* Asynchronously finishes an HTTP connection. This entails making the
+	* underlying TCP connection and sending request headers, unless that has
+	* already been done by a #HTTP_POST write, and recieving the response headers.
+	*
+	* The result of the operation will be delivered in a CONN event, with
+	* MAConnEventData::opType set to #CONNOP_FINISH.
+	* The success value is the HTTP response code.
+	*
+	* \param conn An unfinished HTTP connection handle.
+	* \see maGetEvent
+	*/
+	void maHttpFinish(in MAHandle conn);
+
+	/**
+	* Loads a new object array from the a data object. The old object array is overwritten,
+	* except where the new array has SKIP objects. In those cases, the old objects are saved.
+	* Returns zero on error, \>0 on success. On error, the old object array remains unchanged.
+	* \param data The data object containing new resources, in the format of a MoSync
+	* compiled resource file.
+	* \note There must not be any UBIN objects in the new array,
+	* except those of the old array that were SKIP'd.
+	*/
+	int maLoadResources(in MAHandle data);
+
+	/**
+	* Loads a new program from the a data object, closes the running program, and starts the new one.
+	* The format of the data object is a MoSync program file concatenated with a resource file.
+	* If this function returns, there was an error.
+	*
+	* \param data The data object containing the new program.
+	* \param reload If non-zero, the original program will be reloaded after the new program has
+	* exited. If zero, MoSync will exit when the loaded program exists, unless that program,
+	* or one of its sub-programs, calls this function with \a reload set to non-zero.
+	*
+	* \note A program that was loaded with this function cannot be reloaded; instead, it will
+	* always be the very first program in the chain that is reloaded.
+	* \note The stored reload flag is or'd with the one provided to each call to this function.
+	* It is also reset when the reload occurs.
+	* \note Thus, if one program loads another with reload on, and the loaded program loads another
+	* with reload off, the original program will still be reloaded when the last one exits.
+	* Should the original program decide to exit after being reloaded, it will not be reloaded again.
+	*
+	* \note The \link #EVENT_TYPE_CLOSE close event \endlink will disable the reload mechanism.
+	*/
+	void maLoadProgram(in MAHandle data, in int reload);
+
+	constset int MAK_ {	//MobileAuthor Keys
+
+		// start of ascii mapped key codes
+
+		UNKNOWN			= 0;
+		FIRST			= 0;
+		BACKSPACE		= 8;
+		TAB				= 9;
+		CLEAR			= 12;
+		RETURN			= 13;
+		PAUSE			= 19;
+		ESCAPE			= 27;
+		SPACE			= 32;
+		EXCLAIM			= 33;
+		QUOTEDBL		= 34;
+		POUND			= 35;
+		HASH			= 35;
+		GRID			= 35;
+		DOLLAR			= 36;
+		AMPERSAND		= 38;
+		QUOTE			= 39;
+		LEFTPAREN		= 40;
+		RIGHTPAREN		= 41;
+		ASTERISK		= 42;
+		STAR			= 42;
+		PLUS			= 43;
+		COMMA			= 44;
+		MINUS			= 45;
+		PERIOD			= 46;
+		SLASH			= 47;
+
+		//Warning: do not disrupt the sequence of number keys!
+		0				= 48;
+		1				= 49;
+		2				= 50;
+		3				= 51;
+		4				= 52;
+		5				= 53;
+		6				= 54;
+		7				= 55;
+		8				= 56;
+		9				= 57;
+
+		COLON			= 58;
+		SEMICOLON		= 59;
+		LESS			= 60;
+		EQUALS			= 61;
+		GREATER			= 62;
+		QUESTION		= 63;
+		AT				= 64;
+
+		LEFTBRACKET		= 91;
+		BACKSLASH		= 92;
+		RIGHTBRACKET	= 93;
+		CARET			= 94;
+		UNDERSCORE		= 95;
+		BACKQUOTE		= 96;
+
+		// lower case ascii codes
+
+		A				= 97;
+		B				= 98;
+		C				= 99;
+		D				= 100;
+		E				= 101;
+		F				= 102;
+		G				= 103;
+		H				= 104;
+		I				= 105;
+		J				= 106;
+		K				= 107;
+		L				= 108;
+		M				= 109;
+		N				= 110;
+		O				= 111;
+		P				= 112;
+		Q				= 113;
+		R				= 114;
+		S				= 115;
+		T				= 116;
+		U				= 117;
+		V				= 118;
+		W				= 119;
+		X				= 120;
+		Y				= 121;
+		Z				= 122;
+
+		// eof lower case ascii codes
+
+		DELETE			= 127;
+
+		// eof ascii mapped key codes
+
+		// Numeric keypad
+		//Warning: do not disrupt the sequence of number keys!
+		KP0				= 256;
+		KP1				= 257;
+		KP2				= 258;
+		KP3				= 259;
+		KP4				= 260;
+		KP5				= 261;
+		KP6				= 262;
+		KP7				= 263;
+		KP8				= 264;
+		KP9				= 265;
+
+		KP_PERIOD		= 266;
+		KP_DIVIDE		= 267;
+		KP_MULTIPLY		= 268;
+		KP_MINUS		= 269;
+		KP_PLUS			= 270;
+		KP_ENTER		= 271;
+		KP_EQUALS		= 272;
+
+		UP				= 273;
+		DOWN			= 274;
+		RIGHT			= 275;
+		LEFT			= 276;
+		INSERT			= 277;
+		HOME			= 278;
+		END				= 279;
+		PAGEUP			= 280;
+		PAGEDOWN		= 281;
+
+		FIRE			= 284;
+		SOFTLEFT		= 285;
+		SOFTRIGHT		= 286;
+
+		PEN				= 291;
+
+		RSHIFT			= 303;
+		LSHIFT			= 304;
+		RCTRL			= 305;
+		LCTRL			= 306;
+		RALT			= 307;
+		LALT			= 308;
+	}
+
+	constset int MAKB_ { // Key Bits
+		LEFT		= 0x00001;
+		UP			= 0x00002;
+		RIGHT		= 0x00004;
+		DOWN		= 0x00008;
+		FIRE		= 0x00010;
+		SOFTLEFT	= 0x00020;
+		SOFTRIGHT	= 0x00040;
+
+		//Warning: do not disrupt the sequence of number keys!
+		0			= 0x00080;
+		1			= 0x00100;
+		2			= 0x00200;
+		3			= 0x00400;
+		4			= 0x00800;
+		5			= 0x01000;
+		6			= 0x02000;
+		7			= 0x04000;
+		8			= 0x08000;
+		9			= 0x10000;
+
+		ASTERISK	= 0x20000;
+		STAR		= 0x20000;
+		HASH		= 0x40000;
+		POUND		= 0x40000;
+		GRID		= 0x40000;
+		CLEAR		= 0x80000;
+	}
+
+	/**
+	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the current
+	* key state.
+	*/
+	int maGetKeys();
+
+	constset int EVENT_ {
+		BUFFER_SIZE = 128;
+		/// In milliseconds
+		CLOSE_TIMEOUT = 2000;
+	}
+	constset int EVENT_TYPE_ {
+		/**
+		* This event is posted when the operating system sends MoSync a command to exit.
+		* Causes include the OS shutting down and OS-controlled user commands.
+		* \see maGetEvent()
+		*/
+		CLOSE = 1;
+
+		KEY_PRESSED = 2;
+		KEY_RELEASED = 3;
+		/// Connection
+		CONN = 4;
+		/// Bluetooth discovery
+		BT = 5;
+#if IX_GUIDO
+		/// Has MAEvent::key be the identifier for the TTS session, as returned by maStartSpeaking().
+		TTS = 6;
+#endif	//IX_GUIDO
+#if IX_WLAN
+		/// Uses MAEvent::state.
+		WLAN = 7;
+#endif	//IX_WLAN
+
+		POINTER_PRESSED = 8;
+		POINTER_RELEASED = 9;
+		POINTER_DRAGGED = 10;
+
+#if IX_CALL
+		/// Has MAEvent::state be one of the \link CALLSTATE \endlink constants.
+		CALL = 11;
+#endif	//IX_CALL
+
+		/**
+		 * While MoSync doesn't have focus, no key events will arrive and the screen will not be updated.
+		 * If the keypad is locked, no application will have focus.
+		 * \see maLockKeypad
+		 */
+		FOCUS_LOST = 13;
+		FOCUS_GAINED = 14;
+
+#if IX_STREAMING
+		/**
+		* Has MAEvent::data point to a MAStreamEventData.
+		*/
+		STREAM = 15;
+#endif	//IX_STREAMING
+//#if IX_LOCATION
+		/// Has MAEvent::data point to an MALocation.
+		LOCATION = 16;
+
+		/// MAEvent::state is one of the \link #MA_LPS_AVAILABLE MA_LPS \endlink constants.
+		LOCATION_PROVIDER = 17;
+//#endif	//IX_LOCATION
+#if IX_AUDIOBUFFER
+		/// MAEvent::state is \> 0 when the audio stream is waiting for more data,
+		/// or \< 0 on error.
+		AUDIOBUFFER_FILL = 18;
+#endif
+	}
+
+	struct MAConnEventData {
+		/// The handle to the connection associated with the event.
+		MAHandle handle;
+		/// One of the \link #CONNOP_READ CONNOP \endlink constants.
+		int opType;
+		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
+		int result;
+	}
+
+	struct MAEvent {
+		/**
+		* One of the \link #EVENT_TYPE_CLOSE EVENT_TYPE \endlink constants.
+		*/
+		int type;
+		union {
+			/**
+			* In KEY events, this will be one of the \link #MAK_UNKNOWN MAK \endlink constants.
+			*/
+			int key;
+
+			/**
+			 * In POINTER events, this will be the location of the pointer.
+			 */
+			MAPoint2d point;
+
+			/**
+			* In \link #EVENT_TYPE_BT BT \endlink events, this will be a value \>= 0 or
+			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
+			*/
+			int state;
+
+			/**
+			* Valid only in CONN events.
+			*/
+			MAConnEventData conn;
+
+			/**
+			* Used by custom events. See invididual event descriptions.
+			*/
+			void* data;
+		}
+	}
+
+	/**
+	* There is a FIFO buffer that contains up to #EVENT_BUFFER_SIZE events.
+	* Each event has a type. Some types have additional data.
+	*
+	* This function retrieves the next event, unless the queue is empty.
+	* Use maWait() to wait until more events are available.
+	* \param event Pointer to an MAEvent struct that will be filled with the next event.
+	*
+	* When the \link #EVENT_TYPE_CLOSE Close event \endlink is posted,
+	* you must call maExit as soon as possible, or
+	* your program will be forcibly terminated. The timeout is device-dependent, but
+	* never longer than #EVENT_CLOSE_TIMEOUT milliseconds.
+	*
+	* After the Close event has been posted, most syscalls will stop working,
+	* returning default values and doing nothing.
+	* Only the following groups of functions are guaranteed to remain operational:
+	* Memory management, math, Resource management, Store, time, logging, maExit() and maPanic().
+	*
+	* \note Not all platforms have the capability to generate a Close event.
+	* You must always provide another way for the user to exit your application.
+	*
+	* \returns \> 0 on success, or zero if the buffer is empty.
+	*/
+	int maGetEvent(out MAEvent event);
+
+	/**
+	* Suspends execution until there is an event in the buffer,
+	* or \a timeout milliseconds have passed. A timeout <= 0 is considered infinite.
+	* Timer accuracy is platform-specific, but should be better than 20 ms.
+	*
+	* Use this function rather than idle loops to save CPU/battery power.
+	* \see maGetEvent()
+	*/
+	void maWait(in int timeout);
+
+	/**
+	* Returns the number of seconds that have passed since
+	* 00:00:00, Jan 1st, 1970, UTC, according to the device clock.
+	*/
+	int maTime();
+	/**
+	* Returns the number of seconds that have passed since
+	* 00:00:00, Jan 1st, 1970, local time, according to the device clock.
+	*/
+	int maLocalTime();
+	/**
+	* Returns the number of milliseconds that has passed since some platform-specific point in time.
+	* Accuracy is platform-specific, but should be better than 20 ms.
+	*/
+	int maGetMilliSecondCount();
+
+	/**
+	* Returns an approximation to the amount of memory currently available for
+	* allocating new objects, measured in bytes.
+	*
+	* There may be more memory available than reported by this function. Conversely,
+	* in the time between calling this function and allocating an object, another program
+	* may have allocated an object of its own, decreasing the available memory.
+	*
+	* The amount of memory required to allocate any specific object is device-dependent.
+	*
+	* When using this function to determine whether or not to allocate an object, always
+	* leave some memory alone for use by the system,
+	* preferably about 10% of the device's total memory, as reported by maTotalObjectMemory().
+	*/
+	int maFreeObjectMemory();
+
+	/**
+	* Returns the total amount of memory available to MoSync, measured in bytes.
+	* May change over time, even as the program is running.
+	*/
+	int maTotalObjectMemory();
+
+	/**
+	* Switches on the vibrator for the requested number of milliseconds,
+	* or switches it off if the requested duration is zero.
+	* A call to this function will override the previous call.
+	* Returns non-zero if the operation was allowed, zero if it wasn't.\n
+	* \n
+	* On devices which has no vibrator, this function will always return zero.
+	* The user may turn vibration off in phone settings. In that case, calling this function
+	* with a duration of zero may return non-zero, but a non-zero duration will return zero.
+	* In any case, the only way to conclusively determine if vibration is currently supported
+	* or not is to call this function with a duration of at least 1(one) ms.
+	*/
+	int maVibrate(in int ms);
+
+	/**
+	* Shuts down the system. This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	*/
+	noreturn maExit(in int result);
+
+	/**
+	* Displays a message to the user, then shuts down the system.
+	* This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	* \param message The message should be short, not more than 40 characters,
+	* to ensure its visibility on all screen sizes.
+	* \see MAPanicReport
+	*/
+	noreturn maPanic(in int result, in MAString message);
+
+	constset int RUNTIME_ {
+		/// The MoSync Reference Environment, also known as the Emulator.
+		MORE = 1;
+		/// J2ME
+		JAVA = 2;
+		/// Symbian
+		SYMBIAN = 3;
+		/// Windows CE, also known as Windows Mobile.
+		WINCE = 4;
+	}
+
+	constset int REPORT_ {
+		/// Caused by a MoSync Panic. MAPanicReport::code is the panic code.
+		PANIC = 1;
+		/// Caused by a native exception. MAPanicReport::string describes the exception.
+		EXCEPTION = 2;
+		/// Caused by a platform-specific error. MAPanicReport::code is valid.
+		PLATFORM_CODE = 3;
+		/// Caused by a call to maPanic(). MAPanicReport::code and MAPanicReport::string are the
+		/// parameters from the call.
+		USER_PANIC = 4;
+		/// Caused by the Close event timeout. Neither code or string are valid.
+		TIMEOUT = 5;
+	}
+
+	/**
+	* Describes a MoSync Panic or other unrecoverable error.
+	* In MoSync Debug builds, when such an error occurs, the runtime writes
+	* an instance of this structure to a Store named "panic.report".
+	*
+	* The length of that instance may be greater than sizeof(MAPanicReport),
+	* because of the variable-length string that may appear at its end.
+	* The member \a string can, then, be longer that the one byte that is declared.
+	*
+	* To properly read an instance of this struct from a store, you should allocate a
+	* chunk of memory whose size is equal to the size of the store, then read the entire store
+	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point it
+	* to the chunk. Then you can read normally, using that pointer.
+	*
+	* \see maOpenStore()
+	* \see maPanic()
+	* \see malloc()
+	*/
+	struct MAPanicReport {
+		/// The type of MoSync runtime that wrote the report. A \link #RUNTIME_MORE RUNTIME \endlink constant.
+		int runtimeId;
+		/**
+		* The type report. Specifies whether the members \a code and \a string are valid.
+		* A \link #REPORT_PANIC REPORT \endlink constant.
+		*/
+		int reportType;
+		/// The time the report was generated. The format is unix time. \see maTime()
+		int time;
+		/**
+		* The value of the MoSync instruction pointer at the time the report was generated.
+		* \< 0 if the MoSync core was inaccessible.
+		*/
+		int ip;
+
+		int code;
+		char string[1];
+	}
+
+
+	// Tile API functions
+	/**
+	* Creates a tile layer with a reference to the tile set with the bitmap \a tileResource
+	* and a copy of the tile map \a mapResource. \a layerSizeX and \a layerSizeY sets the number of tiles 
+	* in each dimension of the tile layer. The tile map is copied to the tile layer and clipped to the 
+	* size of the layer. If the tile map resource is smaller than the requested tile layer the empty tile
+	* map elements of the layer will be filled with zeroes.
+	* Returns a handle to the tile layer.
+	*/
+	MAHandle maInitLayer(in MAHandle tileResource, in MAHandle mapResource, in int layerSizeX, in int layerSizeY);
+	
+	/**
+	* Disposes the specified tile layer, making its handle become a placeholder.
+	*/
+	void maDisposeLayer(in MAHandle layer);
+
+	/**
+	* Copies the tile map resource \a srcMapResource to the specified tile layer.
+	* \a destX and \a destY are the top-left destination coordinates.
+	*/
+	void maSetMap(in MAHandle layer, in MAHandle srcMapResource, in int destX, in int destY);
+	
+	/**
+	* Changes the tile set used for \a layer to \a tileResources.
+	*/
+	void maChangeTileSet(in MAHandle layer, in MAHandle tileResource);
+
+	/**
+	* Draws the \a layer using the top-left coordinates \a offsetX and \a offsetY.
+	*/
+	void maDrawLayer(in MAHandle layer, in int offsetX, in int offsetY);
+
+	/**
+	* Sets a single tile of the map used by \a layer to \a tileNumber
+	* at the coordinates \a x and \a y.
+	*/
+	void maSetTile(in MAHandle layer, in int x, in int y, in int tileNumber);
+
+
+	/**
+	* Starts playing a sound.
+	*
+	* The sound data is formatted as follows: <mime type><null terminator byte><encoded data>.
+	*
+	* The .media directive in the MoSync resource compiler creates this formatting.
+	*
+	* If you download or generate sound clips dynamically, you'll have to take care
+	* of the formatting yourself, or use a library that does it for you,
+	* for example MAUtil::AudioDownloader.
+	*
+	* To play .media resources, use offset 0 and maGetDataSize().
+	*
+	* Do not touch the resource while it's playing, or there will be... trouble.
+	*
+	* \returns \>= 0 on success and \< 0 on failure.
+	*
+	* \param sound_res The data object in which the sound is stored.
+	* \param offset The offset in the data object where the sound is stored.
+	* \param size The size of the sound data.
+	*/
+	//TODO: make the sound resource go into flux while playing.
+	int maSoundPlay(in MAHandle sound_res, in int offset, in int size);
+
+	/**
+	* Stops the sound and rewinds it.
+	*/
+	void maSoundStop();
+
+	/**
+	* Returns \> 0 if sound is playing, zero if it's not.
+	*/
+	int maSoundIsPlaying();
+
+	/**
+	* Returns the volume, in the range 0-100, used by the sound engine.
+	* The initial volume is 100.
+	*/
+	int maSoundGetVolume();
+
+	/**
+	* Sets the volume, which is a value in the range 0-100. All other values will be clamped
+	* to the allowed range.
+	*/
+	void maSoundSetVolume(in int vol);
+
+
+	/**
+	* Invokes an extension function. Normally you don't call this function directly.
+	*/
+	int maInvokeExtension(in int function, in int a, in int b, in int c);
+
+	/**
+	* These functions are available only on certain platforms.
+	* Returns -1 if the function is not available.
+	*/
+	ioctl maIOCtl {
+
+#if IX_RESOURCE_TYPES
+	constset int RT_ {  //WARNING: must match the resource compiler.
+		PLACEHOLDER = 1;
+		IMAGE = 2;
+		SPRITE = 3;
+		BINARY = 4;
+		UBIN = 5;
+		SKIP = 6;
+		TILESET = 7;
+		TILEMAP = 8;
+		LABEL = 9;
+		FLUX = 127;
+	}
+#endif	//IX_RESOURCE_TYPES
+
+		/**
+		* Compares the runtime's interface version with yours,
+		* using a hash of the interface's contents.
+		*
+		* If the versions do not match, a MoSync Panic is generated.
+		*
+		* This function returns the runtime's hash. However, if there is
+		* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
+		* your version of the header files, causing a different function than this to be called.
+		*
+		* The hash appears as a 32-bit random number, so it is very unlikely that the return
+		* value from any other function is the same as the runtime's hash.
+		*
+		* Therefore, you should always compare the return value from this function to your hash
+		* and exit your program, preferably using maPanic(), if they don't match.
+		*
+		* \param hash Your hash. Pass #MAIDL_HASH.
+		* \returns The runtime's hash.
+		*/
+		int maCheckInterfaceVersion(in int hash);
+
+		/**
+		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
+		 */
+		int maReportCallStack();
+
+		/**
+		 * Protects a piece of the data memory.
+		 * Any attempt to write to that piece of memory will raise a panic.
+		 * \param 'start' The start address of the memory piece to protect.
+		 * \param 'length' The length of the memory piece to protect.
+		 */
+		void maProtectMemory(in MAAddress start, in int length);
+
+		/**
+		 * Unprotects a piece of the data memory.
+		 * \param 'start' The start address of the memory piece to unprotect.
+		 * \param 'length' The length of the memory piece to unprotect.
+		 */
+		void maUnprotectMemory(in MAAddress start, in int length);
+
+		/**
+		 * Toggles memory protection.
+		 * \param 'enable' If 1 turns on memory protection, if 0 turns of memory protection.
+		 */
+		void maSetMemoryProtection(in int enable);
+
+
+		/**
+		 * Returns if memory protection is enabled or not.
+		 * \returns '1' if memory protection is turned on, '0' if it is turned off.
+		 */
+		int maGetMemoryProtection();
+
+
+		/**
+		* Returns the percentage of battery power remaining. This is an integer between 0 and 100.
+		* Currently only available on some Symbian and Windows Mobile phones.
+		*/
+		int maGetBatteryCharge();
+
+#if IX_GUIDO
+		/**
+		* Starts reading a text using TextToSpeech. If TTS is already active,
+		* the old text is aborted.
+		*
+		* The system copies the text; it doesn't have to be kept in memory
+		* for the duration of the speech.
+		*
+		* Only the Gui-Do platform supports TTS.
+		*
+		* \warning Bug: Do not call this immediately when the program starts.
+		* The sound stream takes some time to initialize,
+		* and if this is called before the initialization is done,
+		* an Unhandled Symbian Error (-11) will occur.
+		*
+		* \returns A unique identifier for the TTS session.
+		* TTS events will have a copy of this identifier.
+		*/
+		int maStartSpeaking(in MAString text);
+		/**
+		* Aborts TTS.
+		*/
+		int maStopSpeaking();
+		/**
+		* Returns \> 0 if TTS is active, zero otherwise.
+		*/
+		int maIsSpeaking();
+		/**
+		* Sets the volume of TTS. Returns the previous volume.
+		* The volume ranges from 0 to 100. Illegal input values will be capped.
+		* The default volume is 100.
+		*/
+		int maSetSpeechVolume(in int volume);
+
+		/**
+		* I'm guessting these range from 0 to 100, but I'm not sure.
+		* Try-see if the original values reflect anything interesting.
+		*/
+		int maSetSpeechSpeed(in int speed);
+		int maSetSpeechPitch(in int pitch);
+
+		/**
+		* Returns the hyperbolic sine of x.
+		* \param x An angle in radians.
+		*/
+		double sinh(in double x);
+		/**
+		* Returns the hyperbolic cosine of x.
+		* \param x An angle in radians.
+		*/
+		double cosh(in double x);
+		/**
+		* Returns the hyperbolic arc tangent of x.
+		*/
+		double atanh(in double x);
+#endif	//IX_GUIDO
+
+		/**
+		* Calls on the operating system to lock the phone's keypad.
+		* Returns \> 0 if successful.
+		*/
+		int maLockKeypad();
+		/**
+		* Calls on the operating system to unlock the phone's keypad.
+		* Returns \> 0 if successful.
+		*/
+		int maUnlockKeypad();
+		/**
+		* Returns \> 0 if the phone's keypad is locked by the operating system, zero otherwise.
+		*/
+		int maKeypadIsLocked();
+
+		/**
+		* Writes data to the MoSync system log file.
+		* Useful only for debugging purposes.
+		*/
+		int maWriteLog(in MAAddress src, in int size);
+
+		/** @name Bluetooth discovery
+		* These structures and functions are used for asynchronous device and service discovery.
+		* Only one operation may be active at a time.
+
+		* When a device or service is found, its information is stored in internal buffers
+		* for later retrieval by maBtGetNewDevice() or maBtGetNewService(), then a BT event is generated.
+		* A BT event is also generated when the operation is complete.
+		* Returns the state of the Bluetooth Discovery operation.
+
+		* A BT event contains the state of the Bluetooth Discovery operation.
+		* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
+		* 0 while still working and
+		* ((number of devices/services found) + 1) on success.
+
+		* The buffers are cleared when the respective operation is started, so any devices or services
+		* left over in the buffers from an earlier operation will be lost.
+		*/
+		
+		/**@{*/
+
+		/**
+		* Information about a Bluetooth device.
+		*/
+		struct MABtDevice {
+			///in (pointer), out (buffer)
+			char* name;
+			///in, the length of the buffer pointed to by a name.
+			int nameBufSize;
+			///out, the length of the name, excluding the terminating zero.
+			int actualNameLength;
+			///out
+			MABtAddr address;
+		}
+
+		/**
+		* A Universally Unique Identifier.
+		*/
+		struct MAUUID {
+			int i[4];
+		}
+
+		/**
+		* Information about a MABtService object.
+		*/
+		struct MABtServiceSize {
+			/**
+			* The buffer size neccesary to contain the full name,
+			* or <0 if the service has no name.
+			*/
+			int nameBufSize;
+			/**
+			* The number of UUIDs associated with the service.
+			*/
+			int nUuids;
+		}
+
+		/**
+		* Information about a Bluetooth service.
+		*/
+		struct MABtService {
+			/**
+			* The port number for the service.
+			* \see maConnect()
+			*/
+			int port;
+			/**
+			* Pointer to a buffer that recieves the service's human-readable name.
+			*/
+			char* name;
+			/**
+			* The size of the buffer being pointed to by \a name.
+			*/
+			int nameBufSize;
+			/**
+			* Pointer to a buffer that recieves the UUIDs associated with the service.
+			* The buffer must be large enough to contain the number of UUIDs reported
+			* by the last call to maBtGetNextServiceSize().
+			*/
+			MAUUID* uuids;
+		}
+
+		/**
+		* Starts a device discovery operation.
+
+		* \param names Set this to non-zero to retrieve the names of remote devices.
+		* This takes extra time, so set it to zero for faster scanning.
+
+		* \note On Windows, due to a bug in the Microsoft Bluetooth stack,
+		* newly discovered devices may appear without names.
+		* Re-scanning should make the devices' names appear properly.
+		* A workaround is planned for a future release of MoSync.
+
+		* \see maBtGetNewDevice
+		* \see EVENT_TYPE_BT
+		*/
+		int maBtStartDeviceDiscovery(in int names);
+
+		/**
+		* Fills an MABtDevice structure with information about a device.
+		* Removes the data from an internal queue filled by maBtStartDeviceDiscovery().
+		*
+		* If the \a names parameter of maBtStartDeviceDiscovery() was zero,
+		* all members of \a d except \a address are ignored and unchanged.
+		*
+		* The space needed to store the device name and its terminating zero
+		* may be greater than a nameBufSize. In that case, the copy is truncated.
+		* The maximum length of a device name according to the Bluetooth 2.0 specification
+		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
+		* don't provide buffers larger than what your application has a use for.
+		*
+		* \returns 1 if successful, zero if the queue is empty.
+		*/
+		int maBtGetNewDevice(out MABtDevice d);
+
+		/**
+		* Starts a service discovery operation.
+		* Takes a device address and the UUID of the service class to search for.
+		* For example, pass #RFCOMM_PROTOCOL_MAUUID and you'll get all connectable services.
+		* Pass #SerialPort_Service_MAUUID and you'll get only that service.
+		* \see maBtGetNextServiceSize
+		* \see maBtGetNewService
+		* \see EVENT_TYPE_BT
+		*/
+		int maBtStartServiceDiscovery(in MABtAddr address, in MAUUID uuid);
+
+		/**
+		* Fills an MABtServiceSize structure with meta-data about the next service.
+		* Does not remove the service from the queue.
+		* \returns \> 0 on success, or zero if the queue is empty.
+		* \see maBtStartServiceDiscovery
+		* \see maBtGetNewService
+		*/
+		int maBtGetNextServiceSize(out MABtServiceSize dst);
+
+		/**
+		* Fills an MABtService structure with information about the next service.
+		* Removes the data from the internal queue filled by maBtStartServiceDiscovery().
+		* \returns \> 0 on success, or zero if the queue is empty.
+		* \see maBtGetNextServiceSize
+		*/
+		int maBtGetNewService(out MABtService dst);
+
+		/**@}*/
+
+#if IX_WLAN
+		constset int WLAN_ADDR_ {
+			LEN = 6;
+		}
+
+		struct MAWlanAddr {
+			byte a[WLAN_ADDR_LEN];
+		}
+
+		struct MAWlanAp {
+			/// out
+			MAWlanAddr address;
+			/// in(ptr), out(content)
+			char* name;
+			/// in
+			int nameBufSize;
+			/// out. dBm?
+			int signalStrength;
+		}
+
+		/**
+		* Causes EVENT_TYPE_WLAN. Returns \<0 on failure.
+		* WLAN events' status are \>0 when the discovery is complete,
+		* 0 when it's still going on, \<0 on error.
+		*/
+		int maWlanStartDiscovery();
+
+		/// Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
+		int maWlanGetNewAp(out MAWlanAp dst);
+#endif	//IX_WLAN
+
+//#if IX_LOCATION
+		/**
+		* Only if \a state equals #MA_LOC_QUALIFIED do the other members contain valid data.
+		*
+		* Coordinates are in the WGS84 datum.
+		*
+		* The horizontal accuracy is the RMS (root mean square) of east accuracy
+		* (latitudinal error in meters, 1-sigma standard deviation), north accuracy
+		* (longitudinal error in meters, 1-sigma).
+		*
+		* The vertical accuracy is in meters in vertical direction
+		* (orthogonal to ellipsoid surface, 1-sigma standard deviation).
+		*
+		* Accuracy values may be NaN, if accuracy is unknown.
+		*
+		* \see maLocationStart()
+		*/
+		struct MALocation {
+			/**
+			* The validity of the coordinates.
+			* One of the \link #MA_LOC_NONE MA_LOC \endlink constants.
+			*/
+			int state;
+			/*	//disabled
+			* The time at which the location was collected.
+			* This is the number of seconds that have passed since
+			* 00:00:00, Jan 1st, 1970, local time.
+			*/
+			//int time;
+			/*	//disabled
+			* The millisecond component of \a time.
+			*/
+			//int timeMillis;
+
+			double lat;
+			double lon;
+			double horzAcc;
+			double vertAcc;
+		}
+
+		constset int MA_LOC_ {
+			NONE = 1;
+			INVALID = 2;
+			UNQUALIFIED = 3;
+			QUALIFIED = 4;
+		}
+
+		constset int MA_LPS_ {
+			/**
+			* Availability status code: the location provider is available.
+			*/
+			AVAILABLE = 1;
+
+			/**
+			* Availability status code: the location provider is temporarily unavailable.
+			* Temporary unavailability means that the method is unavailable due to reasons
+			* that can be expected to possibly change in the future and the provider to
+			* become available. An example is not being able to receive the signal because
+			* the signal used by the location method is currently being obstructed,
+			* e.g. when deep inside a building for satellite based methods.
+			* However, a very short transient obstruction of the signal should not cause
+			* the provider to toggle quickly between TEMPORARILY_UNAVAILABLE and AVAILABLE.
+			*/
+			TEMPORARILY_UNAVAILABLE = 2;
+
+			/**
+			* Availability status code: the location provider is out of service.
+			* Being out of service means that the method is unavailable and the implementation
+			* is not able to expect that this situation would change in the near future.
+			* An example is when using a location method implemented in an external device and
+			* the external device is detached.
+			*/
+			OUT_OF_SERVICE = 3;
+		}
+
+		/**
+		* Starts collecting location information.
+		* Does nothing if collection is already active.
+		* May cause a system popup asking for the user's permission.
+		*
+		* \link #EVENT_TYPE_LOCATION LOCATION events \endlink will be generated as the
+		* estimated location is updated.
+		*
+		* \link #EVENT_TYPE_LOCATION_PROVIDER LOCATION_PROVIDER events \endlink will be generated
+		* when the location provider state changes.
+		*
+		* \returns \> 0 on success.
+		*
+		* \note <b>The location API is experimental, not fully tested.
+		* It may not work as advertised.</b>
+		*
+		* In particular, it is unsupported on Symbian runtimes and on the MoSync Emulator.
+		* Implementation details are likely to change in the future.
+		*/
+		int maLocationStart();
+
+		/**
+		* Stops collecting location information, and stops generating events.
+		* Does nothing if collection is not active.
+		*
+		* \note Events that are generated before this function returns
+		* may remain in the event queue afterwards.
+		*/
+		int maLocationStop();
+
+		/*
+		/**
+		* Stores a new location in the specified struct.
+		* \returns 1 on success, 0 if there is no new location, \<0 on failure.
+		*/
+		//int maGetLocation(out MALocation loc);
+//#endif	//IX_LOCATION
+
+		/**
+		* Requests that the operating system handle (for example, display or install) the indicated URL.
+		*
+		* If the platform has the appropriate capabilities and resources available,
+		* it SHOULD bring the appropriate application to the foreground and let the user
+		* interact with the content, while keeping the MoSync application running in the background.
+		* If the platform does not have appropriate capabilities or resources available,
+		* it MAY wait to handle the request until after the MoSync application exits.
+		* In this case, when the requesting MoSync application exits, the platform MUST then bring
+		* the appropriate application (if one exists) to the foreground to let the user
+		* interact with the content.
+		*
+		* The URL can be of the form <tt>http://\<address\></tt>, in which case the usual response is
+		* to launch the built-in web browser.
+		*
+		* The URL can also be of the form <tt>tel:\<number\></tt>, in which case the request is
+		* interpreted as a request to initiate a voice call to the specified number.
+		*
+		* If the URL refers to a packaged application
+		* (a .JAR file on Java platforms, .SIS on Symbian or .CAB on Windows Mobile),
+		* the request is interpreted as a request to install that application.
+		*
+		* The application being requested can be an update of the calling application.
+		* In that case, the calling application must always exit before the request can be processed.
+		*
+		* \param url The URL for the platform to load.
+		* An empty string or NULL cancels any pending requests.
+		*
+		* \returns \> 0 if maExit() must be called before the request can be processed.
+		* 0 if the request is being processed.
+		* \< 0 if the request could not be processed.
+		* Specifically, the error code #IOCTL_UNAVAILABLE means that the protocol
+		* of the request is not supported on the platform.
+		*/
+		int maPlatformRequest(in MAString url);
+
+#if IX_FILE
+/*
+		
+		* Stores the name of a root file system in \a nameBuf.
+		* Call this function repeatedly with increasing values for \a index
+		* to enumerate all file systems. Every file system name ends with a slash ('/').
+		*
+		* The buffer may be too small to contain the name; in that case, the buffer will not be filled
+		* and you should create a bigger buffer and call this function again.
+		* You may call this function with NULL and 0 to simply retrieve the length of the name.
+		*
+		* \returns If the file system exists, the length of the name. 0 otherwise.
+		* \< 0 on error.
+		*/
+		//int maFileSystem(in int index, out MAString nameBuf, in int bufSize);
+
+		//see JSR 75 for docs
+		int maFileCreate(in MAHandle fConn);
+		int maFileDelete(in MAHandle fConn);
+		int maFileSize(in MAHandle fConn);
+		int maFileAvailableSpace(in MAHandle fConn);
+		int maFileTotalSpace(in MAHandle fConn);
+		int maFileDate(in MAHandle fConn);
+		int maFileRename(in MAHandle fConn, in MAString newName);
+		int maFileTruncate(in MAHandle fConn, in int offset);
+
+		/**
+		* Creates a listing of names of files and directories, or file systems.
+		* Call maFileListNext() repeatedly to retrieve the names.
+		*
+		* \param path The full path to a directory, or the empty string,
+		* which specifies that root file systems should be listed.
+		* \param filter A string to match names with. May include an asterisk ('*') wildcard
+		* to represent 0 or more characters. Ignored if \a path is empty.
+		*
+		* \returns A File Listing handle, or \< 0 on error.
+		*/
+		int maFileListStart(in MAString path, in MAString filter);
+
+		/**
+		* The buffer may be too small to contain the name and the terminating zero;
+		* in that case, the internal list pointer remains unchanged,
+		* the buffer will not be filled
+		* and you should allocate a bigger buffer and call this function again.
+		* You may call this function with NULL and 0 to simply retrieve the length of the name.
+		*
+		* \returns The length of the name, excluding the terminating zero,
+		* or 0 if there are no more files, or \< 0 on error.
+		*/
+		int maFileListNext(in MAHandle list, out MAString nameBuf, in int bufSize);
+
+		/**
+		* Closes a file listing, freeing its resources.
+		*
+		* \returns 0 on success.
+		*/
+		int maFileListClose(in MAHandle list);
+
+		constset int FLERR_ {
+			GENERIC = -2;
+			NOTFOUND = -3;
+			FORBIDDEN = -4;
+		}
+
+		//maybe add support for "hidden" files
+
+		//possible C++ library functions
+		//getURL()
+		//isDir()
+		//getName()
+		//getPath()
+#endif	//IX_FILE
+
+		/**
+		* Sends a text SMS. Since this may cost money for the user,
+		* some platforms ask the user for permission,
+		* by displaying a modal Yes/No message box.
+		*
+		* \param dst The phone number to send the message to.
+		* \param msg The message to send. Only printable 7-bit ASCII characters are guaranteed
+		* to arrive unaltered. 8-bit Latin-1 characters should work in most cases.
+		*
+		* \returns 0 on success. A \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on error.
+		* #CONNERR_FORBIDDEN if the user denied permission.
+		*
+		* \note Will create a text file on PC platforms, instead of sending anything.
+		*/
+		int maSendTextSMS(in MAString dst, in MAString msg);
+		//int maSendBinarySMS(in MAString dst, in Address msg, in int len);
+
+#if IX_RECORD
+		//These functions are all synchronous,
+		//although the handles can be used with asynchronous maConnRead().
+
+		//returns a read-only connection handle. use it with maConnRead(), maRecordStart(), maRecordPause() and maConnClose().
+		int maRecordSetup();
+
+		//extension proposal:
+		//in int type (audio, video, a/v, photo),
+		//in int format (type-dependant. PCM, AMR, MP3, AAC; H.263; JPEG)
+
+		//Note: since the size of data generated is usually unknown,
+		//if one wants to write the data to a binary resource,
+		//segmented binaries are required if any semblance of performance is to be upheld.
+		//See wiki/MoSyncTodo for info on segmented binaries.
+
+
+		//creates an image, using data from the phone's camera.
+		//move this to a camera api?
+		//int maRecordSnap(in MAHandle placeholder);	//in ? config (size, zoom, et al)
+
+
+		//causes the connection to fill with data over time.
+		//if it's not read quickly enough, data will be lost or the system will crash.
+		int maRecordStart(in MAHandle rec);
+
+		int maRecordPause(in MAHandle rec);
+#endif	//IX_RECORD_AUDIO
+
+#if IX_CELLID
+		//Stores current cell id in *cellId.
+		//returns the negated Symbian error code. 0 on success.
+
+		struct MACellInfo {
+			/**
+			* Mobile Country Code. Identifies the country whose cellular network the phone
+			* is connected to.
+			*/
+			char mcc[4];
+			/**
+			* Mobile Network Code. Identifies the network operator
+			* in the country specified by the MCC.
+			*/
+			char mnc[8];
+			/**
+			* Location Area Code. Identifies a geographic area within the cellular network
+			* specified by the MCC and MNC.
+			*/
+			int lac;
+			/**
+			* Cell ID. Identifies the base station the phone is connected to,
+			* within the cellular network specified by the MCC and MNC.
+			* \note While a phone may be in range of several base stations at any time,
+			* only one of those base stations controls the connection between the phone and
+			* the network. That is the base station reported here.
+			*/
+			int cellId;
+		}
+
+		/**
+		* Retrieves the current cellular network information
+		* If the phone is offline or otherwise has no signal, this function will fail.
+		* \param pInfo A pointer to a struct which will recieve the information.
+		* \returns 0 if successful. \< 0 otherwise.
+		*/
+		int maGetCellInfo(out MACellInfo pInfo);
+#endif	//IX_CELLID
+
+#if IX_CALL
+		//TODO: document these states.
+		constset int CALLSTATE_ {
+			UNKNOWN = 0;
+			IDLE = 1;
+			DIALLING = 2;
+			RINGING = 3;
+			ANSWERING = 4;
+			CONNECTING = 5;
+			CONNECTED = 6;
+			RECONNECTPENDING = 7;
+			DISCONNECTING = 8;
+			HOLD = 9;
+			TRANSFERRING = 10;
+			TRANSFERALERTING = 11;
+		}
+
+		/**
+		* Starts dialing a voice call.
+		* Returns 0 on successful beginning of dial, or \< 0 on error,
+		* like a call already in progress.
+		* Causes CALL events.
+		* \param phoneNumber Max length: 100.
+		*/
+		int maCallDial(in MAString phoneNumber);
+
+		/**
+		* Starts answering a voice call. The call state must be #CALLSTATE_RINGING.
+		* Returns 0 on successful initialization of the answering process,
+		* or \< 0 on error, like if the line is not ringing.
+		* Causes CALL events.
+		* \note The line state may change while this function is being called. Therefore,
+		* it may fail even if you haven't recieved a new CALL event.
+		*/
+		int maCallAnswer();
+
+		/**
+		* Starts hanging up a voice call, if a call is in progress.
+		* Returns 0 if no call is in progress, or on successful beginning of hangup.
+		* Returns \< 0 on error.
+		* Can cause CALL events.
+		*/
+		int maCallHangup();
+#endif	//IX_CALL
+
+#if IX_STREAMING
+		/**
+		* Starts playing sound streamed from the specified connection.
+		* The connection is made inaccessible for ordinary operations.
+		* Causes STREAM events when the state of the streaming changes.
+		* The connection is closed when the sound stops.
+		* \returns \> 0 on successful start, \< 0 on error.
+		* \param conn A readable connection, opened with maConnect() or maHttpCreate().
+		* HTTP connections must be Finished to be readable.
+		* \param mimeType The MIME type of the sound stream.
+		* It can sometimes be retrieved from the HTTP "Content-Type" header.
+		*/
+		int maSoundPlayConn(in MAHandle conn, in MAString mimeType);
+
+		//TODO: when streaming goes public, make this part of the union instead of custom.
+		struct MAStreamEventData {
+			/// One of the \link #STREAMEVENT_OPEN_COMPLETE STREAMEVENT \endlink constants.
+			int event;
+			/// The stream associated with the event.
+			MAHandle stream;
+
+			/**
+			* Positive values denote progress. Negative values denote errors. Zero is not used.
+			* \todo Define all possible values. They're currently platform-specific.
+			*/
+			int result;
+		}
+
+		//TODO: equalize over all platforms
+		constset int STREAMEVENT_ {
+			/// A connection to the streaming server has been established.
+			OPEN_COMPLETE = 1;
+			/// After this event, you can retrieve information about the stream.
+			PREPARE_COMPLETE = 2;
+			/// The stream reached its end.
+			PLAY_COMPLETE = 3;
+			/// Also known as buffering.
+			LOADING_STARTED = 4;
+			/// After this event, the stream is actually playing.
+			LOADING_COMPLETE = 5;
+			UNKNOWN_EVENT = 6;
+		}
+
+		/**
+		* Top-left corner, auto-starts playing.
+		* Causes \link #EVENT_TYPE_STREAM STREAM \endlink events.
+		* Only one stream is allowed at a time.
+		* \param url An RTSP url.
+		* \returns A Stream MAHandle \>0, if successful in starting the operation.
+		* #IOCTL_UNAVAILABLE if the function is unavailable. \<= -2 on other errors.
+		* \todo Define error codes.
+		*/
+		MAHandle maStreamVideoStart(in MAString url);
+
+		/**
+		* Returns the size, in pixels, of the video stream. \<0 if the length cannot be determined.
+		*
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		*/
+		MAExtent maStreamVideoSize(in MAHandle stream);
+
+		/**
+		* Sets the screen rectangle that the video stream should be shown in.
+		* The default rectangle is in the top-left corner of the screen,
+		* and has the same size as the source video.
+		*
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		*
+		* If the video is playing when you call this function, the picture frame may go black
+		* for a second while the system reorders itself.
+		*
+		* Whether the video is stretched or clipped to fit in the specified rectangle
+		* depends on the combination platform/codec.
+		* There should be a list; we don't have one yet.
+		* Symbian always stretches.
+		* I suspect most Java platforms stretches too, but I'm not sure.
+		*
+		* \returns #IOCTL_UNAVAILABLE if the function is unavailable. \<= -2 on other errors.
+		*/
+		int maStreamVideoSetFrame(in MAHandle stream, in MARect rect);
+
+		/**
+		* Returns the length of the stream, in milliseconds. \<0 if the length cannot be determined.
+		*
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		*/
+		int maStreamLength(in MAHandle stream);
+
+		/**
+		* Returns the current playing time position of the stream, in milliseconds.
+		* Returns \<0 if the position cannot be determined.
+		*
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		*/
+		int maStreamPos(in MAHandle stream);
+
+		/**
+		* Sets the playing time position in the stream.
+		* The provided position is clamped to the length of the stream.
+		* For some platform/media combinations, setting the position is not very accurate.
+		* The return value will indicate the actual position set.
+		*
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		*
+		* \param stream A valid stream handle.
+		* \param pos A position, in milliseconds.
+		* \returns \<0 on error.
+		*/
+		int maStreamSetPos(in MAHandle stream, in int pos);
+
+		/**
+		* Pauses the stream. Does nothing if the stream is already paused.
+		*/
+		int maStreamPause(in MAHandle stream);
+
+		/**
+		* Resumes the stream. Does nothing if the stream is already playing.
+		*/
+		int maStreamResume(in MAHandle stream);
+
+		/**
+		* Closes the stream, releasing resources and rendering the handle invalid.
+		*/
+		int maStreamClose(in MAHandle stream);
+#endif	//IX_STREAMING
+
+#if IX_OPENGL_ES
+#include "opengl_generated.idl"
+#include "opengl_non_generated.idl"
+#endif
+
+		/**
+		* A structure containing information about the native framebuffer, 
+		* with things like color format and resolution. The 'sizeInBytes' field is 
+		* the amount of bytes that should be used to allocate the offscreen framebuffer 
+		* (a backbuffer). 
+		*/
+		struct MAFrameBufferInfo {
+			int sizeInBytes;         // The size in bytes of the frame buffer, is calculated as width*pitch.
+			int bytesPerPixel;       // The amount of bytes per pixel.
+			int bitsPerPixel;        // The amount of bits per pixel.
+			int redMask;             // The mask representing the bits occupied of the red color component in a pixel.
+			int redShift;            // The index of the lowest significant bit of the red color component.
+			int redBits;             // The amount of bits for the red color component.
+			int greenMask;           // The mask representing the bits occupied of the green color component in a pixel.
+			int greenShift;          // The index of the lowest significant bit of the green color component.
+			int greenBits;           // The amount of bits for the green color component.
+			int blueMask;            // The mask representing the bits occupied of the blue color component in a pixel.
+			int blueShift;           // The index of the lowest significant bit of the blue color component.
+			int blueBits;            // The amount of bits for the blue color component.
+			int width;               // The width of the screen in pixels.
+			int height;              // The height of the screen in pixels.
+			int pitch;               // The pitch of the screen in byes, i.e. the amount of bytes to offset in order to step one scanline.
+			int supportsGfxSyscalls; // If 1, standard graphic syscalls can by used to draw to the custom framebuffer, otherwise not.
+		}
+
+		/**
+		 * Get frame buffer info. Use info.sizeInBytes to allocate memory for framebuffer.
+		 * \param info A pointer to an MAFrameBufferInfo structure, which the information will be written to.
+		 * \returns \<=0 on error.
+		 */
+		int maFrameBufferGetInfo(out MAFrameBufferInfo info);
+
+		/**
+		 * Pass a pointer to your framebuffer here. Each time an maUpdateScreen is performed, 
+		 * this piece of memory will be copied to the actual screen memory. 
+		 * \param data A pointer to the custom framebuffer.
+		 * \returns \<=0 on error.
+		 */
+		int maFrameBufferInit(in MAAddress data);
+
+		/**
+		 * Close the framebuffer. The graphics sub-system will be set to use the standard framebuffer.
+		 * \returns \<=0 on error.
+		 */
+		int maFrameBufferClose();
+
+#if IX_AUDIOBUFFER
+		constset int AUDIO_FMT_ {
+			S8 = 1;
+			S16 = 2;
+			U8 = 3;
+			U16 = 4;
+		}
+
+		struct MAAudioBufferInfo {
+			int fmt;	//one of the AUDIO_FMT constants
+			int sampleRate;	//in hertz
+			int numChannels;
+			int bufferSize;	//in bytes?
+			MAAddress buffer;	//should be const void*
+		}
+
+		// returns 1.
+		// should cause #EVENT_TYPE_AUDIOBUFFER_FILL when the system is ready to accept sound data.
+		// Check MAEvent::state to see if the system failed.
+		int maAudioBufferInit(in MAAudioBufferInfo info);
+
+		/*
+		* Call these functions in series after you have got the #EVENT_TYPE_AUDIOBUFFER_FILL event and filled your buffer.
+		* Note: eventhough you aren't going to fill the buffer
+		*/
+		// returns 1.
+		int maAudioBufferReady();
+
+		// returns 1.
+		int maAudioBufferClose();
+#endif
+
+#if IX_CONNSERVER
+		/**
+		* Asynchronously accepts and opens a remote connection to a service.
+		*
+		* When a connection is accepted, a CONN event with #CONNOP_ACCEPT will be generated.
+		* If the accept was successful, MAConnEventData::result will be a handle to the new,
+		* normal connection. MAConnEventData::handle will be the server connection specified
+		* in the call to this function.
+		*
+		* To accept another connection after such an event, call this function again.
+		*
+		* \param serv A server connection, opened with maConnect.
+		* \returns \< 0 on error.
+		* \see maConnect
+		* \see maGetEvent
+		*/
+		int maAccept(in MAHandle serv);
+
+#endif	//IX_CONNSERVER
+
+		/**
+		* Sends the application to the background, unless it's already there.
+		* \note Only available on multi-tasking operating systems.
+		* \note Experimental function, only available on Symbian.
+		*/
+		int maSendToBackground();
+
+		/**
+		* Brings the application to the foreground, unless it's already there.
+		* \note Only available on multi-tasking operating systems.
+		* \note Experimental function, only available on Symbian.
+		*/
+		int maBringToForeground();
+
+#if IX_SEGMENTED_DATA
+		/**
+		* Increases the size of a data object.
+		* \note There is no way to decrease the size of a data object.
+		* However, you can destroy it.
+		* \returns RES_OK if succeded and RES_OUT_OF_MEMORY if failed.
+		* \see maDestroyObject()
+		* \see maCreateData()
+		* \see maGetDataSize()
+		*/
+		int maAddDataSize(in MAHandle data, in int size);
+#endif	//IX_SEGMENTED_DATA
+	}
+	constset int IOCTL_ {
+		UNAVAILABLE = -1;
+	}
+}

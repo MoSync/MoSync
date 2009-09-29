@@ -1,0 +1,13 @@
+-target-select sim
+-break-insert endless/endless.c:9
+-exec-continue
+-test-wait
+-var-create - * counter
+-var-create - * c2
+-exec-continue
+-test-wait
+-var-update var0
+-var-update 1 *
+-exec-continue
+-test-wait
+-var-update 2 *

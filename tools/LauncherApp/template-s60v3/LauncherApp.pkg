@@ -1,0 +1,29 @@
+; LauncherApp.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"%s"},(%s),1,2,0, TYPE=SA
+
+;Localised Vendor name
+%%{"%s"}
+
+;Unique Vendor name
+:"%s"
+
+;Supports S60 3rd Edition
+[0x101F7961], 0, 0, 0, {"S60ProductID"};
+
+;Requires the MoSync Runtime
+@"%s",(0xA0006FC7)
+
+;Files to install
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\release\gcce\urel\%s.exe" -"!:\sys\bin\%s.exe"
+"%s" -"!:\resource\apps\%s.comb"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\z\resource\apps\%s.RSC" -"!:\resource\apps\%s.rsc"
+;"%s_icon.mif" -"!:\resource\apps\%s_icon.mif"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\Z\private\10003a3f\import\apps\%s_reg.RSC" -"!:\private\10003a3f\import\apps\%s_reg.rsc"
+
+;required for application to be covered by backup/restore facility 
+;"backup_registration.xml" -"!:\private\%s\backup_registration.xml"

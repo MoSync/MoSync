@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Gui defaultFont="arialFont">
+  <Font id="arialFont" type="arial" size="18" color="00ff00"/>
+  <Font id="verdanaFont" type="verdana" size="25" color="ff00ff"/>
+
+  <Screen id="MainScreen">
+	<Layout id="MyLayout" gridXSize="1" gridYSize="2" autoSizeX="true" autoSizeY="true">
+		<ListBox id="MyListBox" autoSize="true" orientation="LBO_HORIZONTAL">
+			<Label font="arialFont" caption="test" autoSizeX="true" paddingLeft="10" paddingRight="10" backColor="0x1144aa"/>
+			<Image src="image.png"/>
+		</ListBox>
+    <Label font="verdanaFont" id="MyLabel" backColor="0x000044" caption="outside"/>
+	</Layout>
+  </Screen>
+ 
+</Gui>

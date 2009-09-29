@@ -1,0 +1,106 @@
+<document title="Clipping and draw targets" author="Patrick Broman" area="Graphics" keyword="graphics, clipping, draw targets, targets, clip rectangle">
+
+<section id="clipping_drawtargets_intro" title="">
+<![CDATA[
+MoSync graphics operations are always performed to a "draw target". By default, this draw target is the screen, but you can create images that can be drawn to, using maCreateDrawableImage(). These mutable images behave exactly like any other images, and can be used with maDrawImage() or maDrawImageRegion() - the only difference is that they can't be transparent. Also, all drawing operations respect the "clip rectangle", which is a rectangular portion of the screen that is affected by drawing operations. By default, the clipping rectangle is the whole screen.
+]]>
+</section>
+
+<section id="clipping_drawtargets_dt" title="Draw targets">
+<![CDATA[
+To create an image you can draw to, you must have a placeholder resource to use.
+Either you can put one in the resource file for your application (see tutorial about resources), or you can create one dynamically at run time.
+We will demostrate how to create one dynamically:
+[usesnippet id="placeholder"]
+
+Then, to create the drawable image:
+[usesnippet id="createimage"]
+
+This will have created a 32x32 pixels drawable image. Now, to set the draw target to be this image:
+[usesnippet id="settarget"]
+
+This function returns the previously set target, and it might be a good idea to save that information.
+However, if you know that the previous target was the screen, you can just use the constant HANDLE_SCREEN to set it back:
+[usesnippet id="settargethandle"]
+
+]]>
+</section>
+
+<section id="clipping_drawtargets_clipping" title="Clipping"><![CDATA[
+Clipping allows you to limit the part of the screen that can be drawn to.
+This might be useful when implementing graphical user interfaces, games or anything involving window-like behavior.
+Clipping rectangles are per draw target - that is, the screen and every drawable image has one.
+Consequently, you must take care to set the appropriate draw target using setDrawTarget() before specifying its clipping rectangle:
+[code filename="clipstrash.h"]
+maSetDrawTarget(myPlaceholder);
+maSetClipRect(0,0,16,16);
+[/code]
+To retrieve the current clip rect:
+[code]
+MARect myRect;
+maGetClipRect(&myRect);
+[/code]
+]]></section>
+
+<section id="clipping_drawtargets_example" title="An example"><![CDATA[
+[code filename="clippingdrawtarget.cpp"]
+#include <MAUtil/Moblet.h>
+#include <MAUtil/String.h>
+#include <mastdlib.h>
+
+using namespace MAUtil;
+
+#define BORDER 40
+
+class MyMoblet : public Moblet {
+public:
+    MyMoblet() {
+    	MAExtent scrSize = maGetScrSize();
+    	int width  = EXTENT_X(scrSize);
+    	int height = EXTENT_Y(scrSize);
+[snippet id="placeholder"]		
+		MAHandle myPlaceholder = maCreatePlaceholder();
+[/snippet]
+[snippet id="createimage"]
+		maCreateDrawableImage(myPlaceholder, 32, 32);
+[/snippet]
+[snippet id="settarget"]
+    	maSetDrawTarget(myPlaceholder);
+[/snippet]
+		// Fill with blue
+    	maSetColor(0x0000ff);
+    	maFillRect(0, 0, 32, 32);
+    	maSetColor(0xff00);
+    	// draw green triangle
+    	maLine(0,10,10,0);
+		maLine(0,0,0,10);
+		maLine(0,0,10,0);
+		
+[snippet id="settargethandle"]
+		maSetDrawTarget(HANDLE_SCREEN);
+[/snippet]
+		maSetClipRect(BORDER,BORDER,width-BORDER*2, height-BORDER*2);
+		// Draw purple background
+		maSetColor(0xff00ff);
+		maFillRect(0,0, 200, 200);
+
+		for(int i = 0; i < 10; i++) {
+			maDrawImage(myPlaceholder, i*40, i*40);
+		}
+		// Draw white text
+		maSetColor(0xffffff);
+		maDrawText(0,BORDER, "This text is also clipped");
+
+		maUpdateScreen();
+    }
+};
+
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+};
+
+[/code]
+]]></section>
+
+</document>

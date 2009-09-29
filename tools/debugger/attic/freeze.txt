@@ -1,0 +1,52 @@
+from the user's perspective:
+sitting on the line before a breakpoint, perform -exec-step. MDB becomes unresponsive.
+
+from MDB's perspective:
+step command is sent to stub. no reply.
+
+from the stub's perspective:
+step command is recieved. no reply is sent.
+
+Isolated Cause:
+The step command handler calls CPU::step, which, running the breakpoint instruction, sends a breakpoint-hit message to MDB and then waits to resume.
+
+MDB doesn't see the bpHit message because it's still waiting for the ack on the step command.
+
+Remedy:
+--------- Breakpoint instructions should be ignored during step().
+NO! That causes the instruction overwritten by the breakpoint to be skipped, resulting in undefined behaviour.
+
+New remedy:
+MDB' exec-skip must check to see if the skipped instruction is a breakpoint, and if so, temporarily restore it.
+
+
+17:26 2009-06-18
+In the quest to get panics to work inside step(), there's another freeze:
+MDB perspective:
+<- step
+-> ack
+<- getRegs
+-> stopped
+<- ack
+# here we should get an ack for the getRegs, but it doesn't arrive. presumably something went wrong when we sent the getRegs first.
+# this is what should happen:
+-> ack
+-> regs
+<- ack
+
+17:38 2009-06-18
+Super shite: handleInput() isn't complete, so the input buffer is in an unknown state.
+Maybe use waitForRemote() to hack in the step execution to the main thread.
+
+17:06 2009-06-26
+Now that we understand that 'step' is asynchronous, we can fix our conversation:
+<- step
+-> ack
+# debugger waits...
+-> stopped
+<- ack
+<- getRegs
+-> ack
+-> regs
+<- ack
+# and we're done

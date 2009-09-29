@@ -1,0 +1,34 @@
+
+TARGET        E1223344.exe
+TARGETTYPE    EXE
+UID           0x100039CE 0xE1223344
+
+CAPABILITY    NONE
+
+SOURCEPATH    ..
+SOURCE        LauncherApp.cpp
+
+
+SOURCEPATH    .
+
+START RESOURCE E1223344.rss
+HEADER
+TARGETPATH resource\apps
+END //RESOURCE
+
+START RESOURCE	E1223344_reg.rss
+#ifdef WINSCW
+TARGETPATH	\private\10003a3f\apps
+#else
+TARGETPATH	\private\10003a3f\import\apps
+#endif	//WINSCW
+END //RESOURCE
+
+
+SYSTEMINCLUDE \epoc32\include
+
+LIBRARY       euser.lib
+LIBRARY       apgrfx.lib
+LIBRARY       efsrv.lib
+LIBRARY       bafl.lib
+LIBRARY       apparc.lib

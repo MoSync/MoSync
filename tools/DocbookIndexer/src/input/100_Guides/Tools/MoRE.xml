@@ -1,0 +1,59 @@
+<document title="MoRE - the emulator" author="Patrick" area="tools" keyword="">
+<section id="moreintro" title="Introduction">
+<![CDATA[
+The MoRE (MoSync Runtime Environment) emulator provides a reference implementation
+of MoSync for the PC. It acts as a virtual machine directly executing MoSync bytecode. 
+However, it's not only a compilant MoSync implementation - it's the actual reference 
+implementation that all the real device platforms are required to conform to!
+\\
+\\
+MoRE can be controlled either by pressing the keys on the graphical phone, or using a
+number of keyboard shortcuts:
+\\
+{{images\MoRE_diagram.png}}
+
+MoRE doesn't emulate any phone in particular, but its behavior when exeuting MoSync
+application reflects that of the target device. For instance, the screen dimensions vary
+according to those of the target device.
+
+MoRE communicates with the MoSync IDE, sending call stacks, panics, and other useful
+data to be presented in the console window.
+
+MoRE can be controlled either by pressing the graphical buttons and keys, or by using
+PC keyboard shortcuts:
+]]>
+</section>
+
+<section id="profiles" title="Using profiles">
+<![CDATA[
+When a target device is selected in the IDE, MoRE is configured to reflect the properties
+of that device. Currently, the only supported property is the screen size. You can manually
+override the screen size setting by clicking the arrow next to the "play" button in the toolbar,
+and selecting "Run Configurations":
+
+{{images\MoRE_screensize.png}}
+]]>
+</section>
+
+<section id="debugging" title="Debugging">
+<![CDATA[
+When a MoSync application terminates because of a panic, a call stack is transmitted to the
+output console in the IDE:
+\\
+{{images\MoRE_callstack.png}}
+\\
+The call stack shows you all the stack frames that were active when the application terminated,
+and you can click on each line to go to the corresponding source file and line. This is the format of such lines:
+
+[code filename="dummy.h"]
+IP:<instruction pointer>: <path to source file>:<line number in source file>
+[/code]
+
+
+
+If the panic involved MoSync libraries that you do not have the source code to, those lines will not be clickable.
+]]>
+</section>
+
+
+</document>

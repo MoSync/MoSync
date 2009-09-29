@@ -1,0 +1,17 @@
+; MoSync.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"t6"},(0x01223344),1,2,0
+
+;Supports Series 60 v2.0
+(0x101F7960), 0, 0, 0, {"Series60ProductID"}
+
+;
+"c:\Symbian\8.1a\S60_2nd_FP3\epoc32\release\armi\urel\01223344.APP"-"!:\system\apps\01223344\01223344.app"
+"c:\Symbian\8.1a\S60_2nd_FP3\epoc32\data\z\system\apps\01223344\01223344.rsc"-"!:\system\apps\01223344\01223344.rsc"
+"c:\Symbian\8.1a\S60_2nd_FP3\epoc32\data\z\system\apps\01223344\01223344_caption.rsc"-"!:\system\apps\01223344\01223344_caption.rsc"
+;"c:\Symbian\8.1a\S60_2nd_FP3\epoc32\data\z\system\apps\01223344\01223344.aif"-"!:\system\apps\01223344\01223344.aif"
+"\MoSync\output\program.comb"-"!:\system\apps\01223344\program.comb"

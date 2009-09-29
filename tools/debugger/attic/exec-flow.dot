@@ -1,0 +1,34 @@
+digraph ExecFlow
+{
+	//dashed lines are conditional.
+	//dotted lines are function pointers.
+
+	exec_continue -> stepGetRegisters;
+	sStepDoneCallback -> continueStepDone [style=dotted];
+	continueStepDone -> running;
+	sExecFunction -> continueStepDone [style=dotted];
+
+	stepGetRegisters -> stepBpWriteOrig [style=dashed];
+	stepGetRegisters -> sExecFunction [style=dashed];
+	stepBpWriteOrig -> stepBpStep;
+	stepBpStep -> sStepDoneCallback;
+
+	stepStep -> sStepDoneCallback;
+
+	exec_step_instruction -> stepGetRegisters;
+	sStepDoneCallback -> stepInstDone [style=dotted];
+	sExecFunction -> stepStep [style=dotted];
+	stepInstDone -> stepStop;
+
+	exec_step -> stepSourceGetRegisters;
+	stepSourceGetRegisters -> stepGetRegisters;
+	sExecFunction -> stepStep [style=dotted];
+	sStepDoneCallback -> stepSourceDone [style=dotted];
+	sStepDoneCallback -> stepInstDone [style=dotted];
+	stepSourceDone -> stepSourceGetRegisters2;
+	stepSourceGetRegisters2 -> stepStop [style=dashed];
+	stepSourceGetRegisters2 -> stepGetRegisters [style=dashed];
+	stepSourceGetRegisters2 -> stepStop [style=dashed];
+
+	{rank=same; exec_continue exec_step_instruction exec_step}
+}

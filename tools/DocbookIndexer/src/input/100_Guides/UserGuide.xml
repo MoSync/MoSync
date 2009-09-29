@@ -1,0 +1,838 @@
+<document title="User Guide" author="Niklas Nummelin, Anders Malm, Aaron Chan, Patrick Broman, Ruiwen Chua" area="" keyword="">
+<section id="AboutMoSync" title="About MoSync">
+  <![CDATA[
+MoSync is a tool from Mobile Sorcery that enables mobile developers to rapidly and easily create applications for a wide range of mobile devices without having to worry about porting issues.
+Thanks to an advanced and constantly updated device profiling system, MoSync ensures that the same code can be built to run on a multitude of mobile platforms and devices.
+With MoSync, the developer can finally concentrate on creating quality products and services that will be able to reach virtually any mobile device.
+MoSync aims to fill the gap currently present in the mobile development world and unify the fragmented market faced by developers when dealing with porting their applications to the diverse range of mobile devices, across both platforms and models.  
+  ]]>
+</section>
+
+<section id="AboutMS" title="About Mobile Sorcery">
+  <![CDATA[
+Mobile Sorcery is a software development house that generates and develops tools for the mobile industry.
+Our tools are designed to enable faster, easier and more cost efficient development of mobile applications and content.  
+  ]]>
+</section>
+
+<section id="SystemRequirements" title="System Requirements">
+  <![CDATA[
+Microsoft Windows XP or Vista (tested and works on Windows 7 beta 1)
+\\
+100MB free harddrive space.
+\\
+Java SE Runtime Environment (JRE) 6 installed.
+  ]]>
+</section>
+
+<section id="GettingMoSync" title="Getting MoSync">
+  <![CDATA[
+You can download MoSync from our website, http://www.mosync.com .
+\\
+You are strongly encouraged to register an account to receive latest product updates, additional profile database and tips from our developers.
+You may register for an account for free through the MoSync IDE. Read the next section for instructions on how to install and register MoSync.
+]]>
+</section>
+
+<section id="Installation" title="Installing MoSync">
+<![CDATA[
+Before installing MoSync you will need to download and install the <em>Java SE Runtime Environment</em> which can be found at, http://java.sun.com/javase/downloads/index.jsp .
+\\
+After you have retrived the MoSync installer, double-click the installer icon to begin the installation.
+Just wait while the installer configures itself. First the the unpacker needs to unpack the files which will be installed.
+\\
+{{images\userguide_install_1.png}}
+\\
+The MoSync package splash-screen, if you see this the package was succesfully unpacked.
+\\
+{{images\userguide_install_2.png}}
+\\
+Read the MoSync License Agreement. Agree to it if you would like to proceed with the installation.
+\\
+{{images\userguide_install_3.png}}
+\\
+Select the components you wish to install. Note that there isn't any options for the MoSync package, everything needs to be installed.
+\\
+{{images\userguide_install_4.png}}
+\\
+Select where you would like MoSync to be installed. Please note that MoSync needs to be installed to a directory which is not containing any spaces in its path. 
+\\
+{{images\userguide_install_5.png}}
+\\
+If you have a previously uninstalled copy of MoSync you will get this warning. Please follow the instruction and make a copy of your project files if they are inside the MoSync installation folder.
+Even if they shouldn't be removed it's better to be safe than sorry.
+\\
+{{images\userguide_install_6.png}}
+\\
+If you had a previous installation it will first be removed. Now MoSync is installed on your computer. Please wait for the installation to complete.
+\\
+{{images\userguide_install_7.png}}
+\\
+MoSync is now installed. Press Finish to end the installer. Please note that the 'Open Documentation.' checkbox is set as default.
+\\
+{{images\userguide_install_8.png}}
+\\
+=== The first time you Launch the MoSync IDE ===
+
+Congratulations, you have just installed MoSync which we hope you will like as much as we do.
+If you choose to have a desktop shortcut you can now use that, it's called MoSync.
+Otherwise you can use the shortcut in the startmenu.
+It's in the folder 'MoSync' and is named 'MoSync IDE'.
+If you choose to install without shortcuts the file is called 'mosync.exe' and is placed in the 'eclipse' folder in the root of the installation, default is C:\MoSync.
+When you start it you should see this splash-screen.
+\\
+{{images\userguide_start_1.png}}
+\\
+The MoSync IDE wants to know where you would like to have your Workspace.
+This is where your projects, by default, will be stored.
+If you wish to use the same Workspace for all your projects you can set the checkbox, 'Use this as the default and do not ask again', and you will not be asked the next time you start MoSync.
+\\
+{{images\userguide_start_2.png}}
+\\
+MoSync IDE is now loading, just wait for it to finish.
+\\
+{{images\userguide_start_3.png}}
+\\
+The MoSync IDE is now loaded.
+\\
+{{images\userguide_start_4.png}}
+\\
+Everytime you start the MoSync IDE it will ask you to register until you have.
+It won't cost you anything and the benefit of registering is that you will get access to the latest device profile updates.
+Everytime you start the MoSync IDE and have a working network connection it will also check for updates.
+This can be disabled when you register.
+Note that if you disable automatic updates you can miss important updates and fixes.
+Insert your name and a valid e-mail address, press 'OK' to proceed.
+\\
+{{images\userguide_start_5.png}}
+\\
+An e-mail with your registration code will be sent directly to the specified address.
+If you don't recieve the registration e-mail, your e-mail provider's spam filter might have blocked it.
+If that is the case, just check your spam mail for it.
+\\
+{{images\userguide_start_6.png}}
+\\
+Copy the Registration Confimation Code from the e-mail and click the 'Update profile database' shown below.
+\\
+{{images\userguide_start_7.png}}
+\\
+Paste the Registration Confirmation Code into the textbox and click 'OK'.
+\\
+{{images\userguide_start_8.png}}
+\\
+If you recieve this message it means that you already have the latest profile database. 
+\\
+{{images\userguide_start_9.png}}
+\\
+When you recieve an update you will see this screen. Again, we strongly encourage you to accept all updates since they will provide both updates and fixes.
+\\
+{{images\userguide_start_10.png}}
+\\
+]]>
+</section>
+
+<section id="HelpandSupport" title="Help and Support">
+	<![CDATA[
+For now, MoSync support will be provided mainly through the MoSync forums.
+In the MoSync forums, you'll find the latest announcements regarding MoSync, along with FAQs, and Tutorials to get you started using MoSync.
+Also, you are able to submit Bug Reports and/or Feature Requests.
+And, if you write a really cool application in MoSync and would like to share it with the community, check out the Code Swapping section.
+\\
+MoSync Homepage http://www.mosync.com/ 
+\\
+MoSync Forums http://www.mosync.com/forum/ 
+]]>
+</section>
+
+<section id="UsingMoSync" title="Using MoSync">
+  <![CDATA[
+The default way of developing MoSync applications is to use the bundled MoSync IDE. All tutorials and examples can be built using this this.
+If you prefer other tools while developing we also provide our deprecated tool MoBuild, which exists as both a command-line and graphical tool taking care of all the building and packaging while you can use any text editor you like.
+There is also the possibility to use Microsoft Visual Studio C++ for building applications, which will be shown in the appendix.
+It's even possible to install MinGW with 'make' and build your applications from command-line.
+  ]]>
+</section>
+
+<section id="WritingMoSyncApplications" title="Writing MoSync Applications">
+  <![CDATA[
+MoSync applications are written in ANSI C/C++ to ensure a minimal learning curve for existing developers.
+To be able to port an application to a wide set of phones MoSync relies on it's specialized MoSync libraries.
+Since these are not exactly the same as the Standard C/C++ libraries you can't always just use existing C/C++ code in MoSync without porting it.
+The benefit is that you only has to do this once to be able to run it on almost all mobile phones.
+  
+=== Create a new project ===
+To build a new project you have two options.
+Choose 'new' and then 'project' from the File menu or you can right-click the 'Project Explorer' and choose 'new' and then 'project'.
+\\
+{{images\userguide_using_1.png}}
+\\
+Expand the MoSync option. Here we can either import an older MoBuild project or choose to create a new 'MoSync Project'.
+\\
+Choose the later and press 'Next'.
+\\
+{{images\userguide_using_2.png}}
+\\
+Choose a name for your project and press 'Next'. In this demonstration we will use the name, 'HelloWorld'.
+\\
+{{images\userguide_using_3.png}}
+\\
+In the MoSync IDE we provide you with three different project templates.
+  - **MoSync C Project** These are standard C projects. A main file with stub code will be generated.
+  - **MAUI** These are Moblet projects using MAUI, MoSync API User Interface, which is the Graphical User Interface used in MoSync. The project files and stub code are generated.
+  - **Moblet** These are C++ based event-driven applications using the Moblet class. A Moblet project is created with stub code.
+
+
+In this demonstration we will use the **Moblet**. Choose that and click 'Finish'.
+\\
+{{images\userguide_using_4.png}}
+\\
+Your new project should now be created and loaded in the MoSync IDE.
+It's possible to run this template program by pressing the play button. The program will then be compiled and executed in the MoSync emulator.
+\\
+{{images\userguide_using_5.png}}
+\\
+=== Writing your first hello world ===
+
+Copy and replace this code or add it manually to the moblet.cpp file in the newly created project.
+\\
+[code filename="moblet.cpp"]
+#include <MAUtil/Moblet.h>
+
+using namespace MAUtil;
+
+class MyMoblet : public Moblet {
+public:
+    MyMoblet() {
+[snippet id="draw"]
+        maSetColor(0xFFFFFF);
+        maDrawText(0, 32, "Hello World!");
+        maUpdateScreen();
+[/snippet]
+    }
+
+    void keyPressEvent(int keyCode) {
+[snippet id="key"]
+        if(keyCode == MAK_0)
+			maExit(0);
+[/snippet]
+    }
+
+    void keyReleaseEvent(int keyCode) {
+        // todo: handle key releases
+    }
+};
+
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+};
+[/code]
+\\
+In the constructor of the **MyMoblet** class the following three lines has been added:
+[usesnippet id="draw"]
+\\
+The first line sets the color to white. 0xFFFFFF represents full intensity for red, green and blue.
+If you're not familiar with this way of representing colors you will find more information about it in the graphics tutorial.\\
+The second line renders the text "Hello World!" to the backbuffer on the coordinates x=0 and y=32. Because it is drawin to a backbuffer the text will not be visible directly.\\
+The third lines renders the contents of the back buffer to the screen. If you forget to add the **maUpdateScreen** function to your program you will only have a black screen.\\
+\\
+In the function **keyPressEvent** this following two lines has been added:
+[usesnippet id="key"]
+\\
+This function gets notifications when a key has been pressed down. As you can see there is also a skeleton for a function that gets notified when a key is released.
+This first line checks if the pressed key was **MAK_0** which is the 0(zero) button on your phone. If that's correct the second line is executed which exits the Moblet.\\
+Read more about Moblets in the **Development models** section of this document.\\
+\\
+Now press the play button (or ctrl-f11) to save, build and execute the project. If you get errors, please verify that your code looks exactly like the one above here.
+\\
+{{images\userguide_using_6.png}}
+\\
+Congratulations, you have now compiled and executed your first MoSync program!
+  ]]>
+</section>
+
+<section id="UsingDeviceProfiles" title="Using Device Profiles">
+  <![CDATA[
+MoSync comes with a comprehensive set of device profiles to help developers deploy their applications to the widest possible range of mobile devices.
+These profiles define the characteristics and capabilities of each individual mobile device and are used during build time to dynamically tailor the application for each device.
+Each device profile holds device information such as the screen size, memory capacity, and available features, such as Bluetooth
+\\
+{{images/userguide_profiles_1.png}}
+\\
+There is three different filter options available. 
+{{images/userguide_profiles_2.png}}
+\\
+The first option is <em>Vendor/Device</em>. Here it's possible to choose which vendor and/or devices you want to include or exclude from your profiles. 
+{{images/userguide_profiles_3.png}}
+\\
+The second option is <em>Feature/Bug</em>. Here it's possible to include and exclude devices according to the features and bugs that exist on the devices.
+It's also possible to select device OS's here.
+{{images/userguide_profiles_4.png}}
+\\
+The third option is <em>Device Constant Condition</em>. These are constant values set in all devices. This includes screen sizes and the available heap size of devices.
+{{images/userguide_profiles_5.png}}
+\\
+By adding multiple filter criteria you can select the devices that satisfy the requirements for your application.
+If you click on one of your selected criteria you can either <em>remove</em> it or <em>edit</em> it with the buttons above it.
+{{images/userguide_profiles_6.png}}
+\\
+It's possible to define a phone as a target phone.
+This way the emulator will use the profile information which the selected target device has. This is done by double-clicking the device in the device list.
+{{images/userguide_profiles_7.png}}
+\\
+It's also possible to right-click a device in the list and choose it as a target device.
+Here you can also view the profile information for the device. It's the header file which MoSync will use when it builds the application.
+{{images/userguide_profiles_8.png}}
+\\
+To access device profile definitions in your C/C++ code, write this:
+\\
+[code filename="dummy.h"]
+#include <maprofile.h>
+[/code]
+\\
+Useful profile definitions include <em>MA_PROF_STRING_VENDOR</em> and <em>MA_PROF_STRING_DEVICE</em>, which are the names of the device and its vendor. 
+For writing vendor- or device-specific code, <em>MA_PROF_VENDOR_*</em> and <em>MA_PROF_DEVICE_*</em> definitions are also available.
+For example <em>MA_PROF_VENDOR_NOKIA</em> and <em>MA_PROF_DEVICE_6630</em>.
+\\
+<em>MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH</em> is defined if and only if the device supports Bluetooth.
+\\
+<em>MA_PROF_CONST_SCREENSIZE_X</em>, <em>MA_PROF_CONST_SCREENSIZE_Y</em> are defined as integers that describe the screen size in pixels.
+<em>MA_PROF_CONST_BITSPERPIXEL</em> describes the color depth.
+ 
+  ]]>
+</section>  
+
+<section id="BuildApplications" title="Build Applications">
+  <![CDATA[
+By default the automatic build feature of the MoSync IDE is turned off.
+This feature enables automatical building of the project as soon as a file in the project is saved.
+If you would want this behaviour you can of course turn it on.
+The setting is in the <em>Project</em> menu and is called <em>Build Automatically</em>.
+If you wish to rebuild everything you can select <em>Clean..</em> in the <em>Project</em> menu.
+{{images/userguide_build_1.png}}
+\\
+When <em>Build Automatically</em> is turned off, you will get two ways of building your applications.
+You can use the <em>Build Project</em> function in the <em>Project</em> menu.
+{{images/userguide_build_2.png}}
+\\
+You can also right-click your project in the <em>Project Explorer</em> and choose <em>Build Project</em>.
+It's also possible to <em>Clean</em> from there now as well.
+Finally a build is always forced when the play button is press to run the program in the emulator.
+The left menu is the one with <em>Build Automatically</em> enabled and the right is when it's disabled.
+\\
+{{images/userguide_build_3.png}}
+  ]]>
+</section>  
+
+<section id="Finalize" title="Finalize Application for all platforms">
+  <![CDATA[
+In MoSync you have the possibility to build for multiple devices at once, which we refer to as "finalizing the application".
+Just click the <em>Finalizer</em> tab, located to the right of the <em>Device Profiles</em>.
+{{images/userguide_finalize_1.png}}
+\\
+When you press the <em>Propagate</em> button a build script is generated based on the devices listed in the Device Profiles tab.
+The script is editable so you can make changes such as adding and removing devices manually to it.
+{{images/userguide_finalize_2.png}}
+\\
+To build the application just press the <em>Finalize</em> button.
+Bear in mind that this opeartion can take a lot of time depending on the of devices and the size of your project. A progress bar will indicate the building progress.
+{{images/userguide_finalize_3.png}}
+\\
+The built files are placed in a directory called <em>FinalOutput</em> in your project folder.
+Each device package will be placed in a directory hierarchy sorted by vendor and model.
+  ]]>
+</section>  
+
+<section id="SendToDevice" title="Send application to device">
+  <![CDATA[
+It's also possible to directly send an application to a device for testing.
+This requires that both the computer and the device have bluetooth and that they are enabled.
+Also make sure that the device is set to be discoverable so that the computer may find it.
+\\
+{{images/userguide_send_1.png}}
+\\
+Press the 'Select Target Phone' button and make sure that you press the left region of the button, the one with the telephone and the magnifying glass on.
+Select your device in the 'Select Bluetooth Device' window that pop ups. If no error dialogs is shown the connection was successfull.
+\\
+{{images/userguide_send_2.png}}
+\\
+After you have connected to a device it will be possible to select that device by clicking the right part of the button, the one with the arrow.
+This is convinient if you are sending files to more than one device since sending to multiple devices at the same time isn't supported.
+\\
+\\
+When you have a connection with your device you are now able to send you application directly to it. 
+First you must make sure that you have set your device profile to the target device or to a similar device profile to the target device.
+If you have selected a wrong target profile, your application might not be able to install on the device or have unintended behaviours.
+\\
+{{images/userguide_send_3.png}}
+\\
+Now you can send the application to your device by pressing the 'Send To Target Device' button. How the actual installation on the device works is platform and device specific.
+If you are not sure how this is done or where your application is located after installation, consult the user manual for your device.
+
+  ]]>
+</section>  
+
+<section id="DevelopmentModels" title="Development models">
+  <![CDATA[
+=== Introduction === 
+The MoSync C/C++ environment supports several application development models. We call them the "classic procedural", "event driven, object oriented" and "full GUI-based". Which one to choose when developing an application depends both on the type of application and personal preference.
+
+=== Classic procedural ===
+Using the classic procedural approach means you start out with an empty main function, and implement your own main loop, including all of the event handling.
+\\
+**Advantages**
+  - * Offers full control of the program flow.
+  - * Provides ultimate flexibility in the design of the application.
+  - * Supports programming in pure C, without C++.
+  - * Resembles popular, procedural frameworks.
+\\
+**Disadvantages**
+  - * All the burden of constructing well-behaved, resource efficient applications is on the programmer.
+  - * Sometimes requires the programmer to reinvent the wheel.
+  - * Might be unintuitive to people with a OOP background.
+\\
+**When to use**
+  - * Your application requires full control of the program flow and events.
+  - * You want to implement your own higher-level layer on top.
+  - * You prefer C over C++.
+  - * You're porting existing code to MoSync.
+\\
+=== Event driven, object oriented ===
+This approach is embodied in the use of the MAUtil::Moblet class. Inheriting it lets you implement functions such as keyPressEvent() instead of explicitly implementing an event loop yourself, while providing TimerListeners and IdleListeners to facilitate execution of code outside of responding to events.
+\\
+**Advantages**
+  - * Takes care of boilerplate event handling correctly.
+  - * Provides higher-level abstraction of program flow.
+  - * Produces well-behaved, resource efficient programs by default.
+  - * Resembles popular, event driven frameworks.
+\\
+**Disadvantages**
+  - * Imposes a predefined application lifecycle model.
+  - * Migh be awkward for frame-based applications such as games.
+  - * Requires use of C++.
+\\
+**Use when**
+  - * Most of the time when the GUI based approach below is overkill.
+\\
+=== Full GUI based ===
+Using the MAUI library, you gain access to a variety of ready-made widgets such as labels, list boxes, text edit boxes, images and layouts. You add logic by registering different types of listeners with the widgets, thus responding to higher-level events than with Moblets - things like selection changes, slider position changes etc.
+\\
+**Advantages**
+  - * Allows rapid development of GUI applications.
+  - * Reduces program flow programming to responding to GUI events.
+\\
+**Disadvantages**
+  - * Imposes a predefined UI model.
+  - * Requries familiarity with the MAUI library.
+  - * Requires use of C++.
+\\
+**Use when**
+  - * Whenever you're developing a reasonably traditional GUI application.
+  - * When radically cutting development time outweighs full customizability.
+  ]]>
+</section>  
+
+<section id="Developingclassic" title="Developing classic, procedural applications">
+  <![CDATA[
+When developing applications with this model, you have full control of - and responsibility for - how the application behaves. Therefore, it is important to understand how to correctly implement a MoSync event loop. There three most important points to consider are:
+  - * Checking for events often enough. The MoSync event queue is not infinite, so if you don't check often enough you might miss events.
+  - * Using maWait() rather than busy-waiting, to conserve CPU usage and battery power.
+  - * Responding to and handling the close event. After a close event is posted, your application will be forcibly terminated within a short period of time. However, your application should voluntarily exit as soon as possible, having saved any important data. Note that after the close event has been posted, no further events will be posted and most syscalls will have no effect. See the syscall reference for further information on this topic.
+\\
+**Example 1. A simple example of a well-behaved application**
+\\
+[code filename="ex1.c"]
+#include <ma.h>
+
+int MAMain() {
+
+    // Application initialization goes here
+
+    for(;;) {
+        MAEvent e;
+	// Wait until we have an event
+        maWait(0);	
+        // Process all events that have occured
+        while(maGetEvent(&e)) {
+            if(e.type == EVENT_TYPE_CLOSE) {
+                // do cleanup
+                maExit(0);
+            }
+            else if(e.type == EVENT_TYPE_KEY_PRESSED) {
+                // It's good practice to always provide one key
+                // to exit the application.
+                if(e.key == MAK_0) {
+                    // do cleanup
+                    maExit(0);
+                }
+                // handle other key presses
+            }
+        }
+    }
+    return 0;	
+}
+[/code]
+\\
+This example only checks for key presses, but note that results of asynchronous operations are also passed as events and should be handled similarily. See the syscall reference for more information.
+\\
+Working with connections in classic applications involves responding to events whose type is <em>EVENT_TYPE_CONN</em>. Connection operations are executed asynchronously, and these events are the way in which your application is notified of their progress, results and termination.
+\\
+\\
+**Example 2. A simple example of a classic application using connections**
+\\
+[code filename="ex2.c"]
+#include <maapi.h>
+#include <conprint.h>
+
+int MAMain() {
+  char buffer[160];
+
+  // Application initialization goes here.
+  InitConsole();
+  gConsoleLogging = 1;
+
+  // Create a connection.
+  printf("Connecting...\n");
+  MAHandle conn = maConnect("http://www.example.com/");  // Will cause a CONNECT event.
+
+  // The event loop.
+  for(;;) {
+    MAEvent e;
+    // Wait until we have an event.
+    maWait(0);  
+    // Process all events that have occured.
+    while(maGetEvent(&e)) {
+      if(e.type == EVENT_TYPE_CLOSE) {
+        maExit(0);
+      }
+      else if(e.type == EVENT_TYPE_KEY_PRESSED) {
+        if(e.key == MAK_0)
+          maExit(0);
+      }
+      else if(e.type == EVENT_TYPE_CONN) {
+        if(e.conn.opType == CONNOP_CONNECT) {
+          // The Connect operation is complete.
+          if(e.conn.result < 0) {
+            printf("Connect error %i\n", e.conn.result);
+            // Close the connection, freeing resources.
+            maConnClose(conn);
+          } else {
+            printf("HTTP result %i\n", e.conn.result);
+            // Start reading data.
+            maConnRead(conn, buffer, sizeof(buffer) - 1);  // Will cause a CONN READ event.
+          }
+        } else if(e.conn.opType == CONNOP_READ) {
+          // The Read operation is complete.
+          if(e.conn.result == CONNERR_CLOSED) {
+            printf("Connection closed.\n");
+            maConnClose(conn);
+          } else if(e.conn.result < 0) {
+            printf("Read error %i\n", e.conn.result);
+            maConnClose(conn);
+          } else {
+            printf("Read %i bytes:\n", e.conn.result);
+            // Zero-terminate buffer.
+            buffer[e.conn.result] = 0;
+            PrintConsole(buffer);
+            // Read more data.
+            maConnRead(conn, buffer, sizeof(buffer) - 1);
+          }
+        }
+      }
+    }
+  }
+  return 0;
+}
+[/code]
+  ]]>
+</section> 
+
+<section id="Developingeventdriven" title="Developing event driven, object oriented applications">
+  <![CDATA[
+The //MAUtil::Moblet// class takes care of the application main loop for you. All you need to do is subclass it and implement virtual functions to respond to the events.
+\\
+**Example 3. A basic Moblet application**
+\\
+[code filename="ex3.cpp"]
+#include <MAUtil/Moblet.h>
+
+using namespace MAUtil;
+
+class MyMoblet : public Moblet {
+public:
+    MyMoblet() {
+        // Application initialization 
+	}
+
+    void keyPressEvent(int keyCode) {
+        // Handle key presses here
+    }
+
+    void keyReleaseEvent(int keyCode) {
+        // Handle key releases here
+    }
+
+private:
+};
+
+// Since this is a C++ program, the main function
+// needs to be declared extern "C"
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+}
+[/code]
+\\
+The static function //Moblet::run()// implements the actual event loop. When it gets events, it distributes them to all registered listeners. The Moblet, being both a <em>KeyListener</em> and a <em>CloseListener</em>, will recieve these event types. It is recommended to handle other event types by letting your moblet inherit the corresponding listener types, such as <em>BluetoothListener</em> and <em>ConnectionListener</em>.
+\\
+Working with connections in Moblet-based applications invloves using the <em>ConnectionListener</em> interface. You inherit the class and implement the <em>connEvent()</em> function. You can use one listener for several connections, but each connection can only be associated with one listener. Once the events are received, you should process them in the same way as in the classic model.
+\\
+\\
+**Example 4. A simple example of a moblet application using connections**
+\\
+[code filename="ex4.cpp"]
+#include <conprint.h>
+#include <MAUtil/Moblet.h>
+
+using namespace MAUtil;
+
+class ConnMoblet : public Moblet, public ConnListener {
+private:
+  // Variables survive past individual function calls.
+  char mBuffer[160];
+  MAHandle mConn;
+
+public:
+  ConnMoblet() {
+    // Application initialization goes here.
+    InitConsole();
+    gConsoleLogging = 1;
+
+    // Create a connection.
+    printf("Connecting...\n");
+    mConn = maConnect("http://www.example.com/");  // Will cause a CONNECT event.
+    // Register for events.
+    setConnListener(mConn, this);
+  }
+
+  void closeConn() {
+    maConnClose(mConn);
+    removeConnListener(mConn);
+  }
+
+  void connEvent(const MAConnEventData& data) {
+    if(data.opType == CONNOP_CONNECT) {
+      // The Connect operation is complete.
+      if(data.result < 0) {
+        printf("Connect error %i\n", data.result);
+        closeConn();
+      } else {
+        printf("HTTP result %i\n", data.result);
+        // Start reading data.
+        maConnRead(mConn, mBuffer, sizeof(mBuffer) - 1);  // Will cause a CONN READ event.
+      }
+    } else if(data.opType == CONNOP_READ) {
+      // The Read operation is complete.
+      if(data.result == CONNERR_CLOSED) {
+        printf("Connection closed.\n");
+        closeConn();
+      } else if(data.result < 0) {
+        printf("Read error %i\n", data.result);
+        closeConn();
+      } else {
+        printf("Read %i bytes:\n", data.result);
+        // Zero-terminate buffer, so it can be printed.
+        mBuffer[data.result] = 0;
+        PrintConsole(mBuffer);
+        // Read more data.
+        maConnRead(mConn, mBuffer, sizeof(mBuffer) - 1);
+      }
+    }
+  }
+
+  void keyPressEvent(int keyCode) {
+    if(keyCode == MAK_0)
+      maExit(0);
+  }
+};
+
+extern "C" int MAMain() {
+  Moblet::run(new ConnMoblet());
+}
+[/code]
+  ]]>
+</section> 
+  
+<section id="DevelopingusingMAUI" title="Developing an application using MAUI">
+  <![CDATA[
+MAUI development is based on the Moblet system. So in order to create an application, you first need to make a moblet as in the previous example. The fundamental building block of a MAUI application is called //MAUI::Screen//. Each screen has their own root widget. Each time <em>show()</em> is called on a screen that screen is shown and all the others are hidden. When a screen is shown, it means that the root widget of that screen is made active. It can often be very useful to group your application into several screens in order to give your program a logical structure. When a screen is shown, key events are sent to that screen only. When a screen is hidden, each widget that belongs to it is disabled. This normally means that any timer events etc. are unregistered.
+\\
+\\
+**Example 5. A simple example of a well-behaved application**
+\\
+[code filename="ex5.cpp"]
+#include <MAUtil/Moblet.h>
+#include <MAUI/Screen.h>
+#include <MAUI/Label.h>
+#include "MAHeaders.h"
+
+using namespace MAUtil;
+using namespace MAUI;
+
+class MyScreen : public Screen {
+public:
+  MyScreen() {
+    label = new Label(
+      0,                // set the top-left corner
+      0,                // to be in the top-left corner of the lcd display.
+
+      0,                // the width and height are set to the width and height of the lcd display 
+      0,                // automatically for the root widget in a screen.
+
+      NULL,             // this widget has no parent widget 
+
+      "Hello World!",   // the caption of the label
+
+      0,                // use background color 0 (black)
+
+      new Font(MY_FONT) // create a new instance of the font stored as the 
+                        // resource MY_FONT and set the font of the label to that font.
+    );
+
+    setMain(label); // set the root widget to be the label we just created
+  }
+
+  void keyPressEvent(int key) {
+    if(key == MAK_0) {
+      maExit(0); // exit the application when key 0 has been pressed
+    }
+  }
+     
+private:
+  Label *label;
+};
+
+class MyMoblet : public Moblet {
+public:
+  MyMoblet() {
+    myScreen = new MyScreen();
+    myScreen->show();
+  }
+
+private:
+  MyScreen *myScreen;
+};
+
+// Since this is a C++ program, the main function
+// needs to be declared extern "C"
+extern "C" int MAMain() {
+  Moblet::run(new MyMoblet());
+}
+[/code]
+  ]]>
+</section> 
+
+<section id="AppendixVisualStudio" title="Appendix 1 - Using Visual Studio with MoSync">
+  <![CDATA[
+There is also the possibility to use MoSync with Visual Studio.
+All functionality concerning building for mobile devices will be lost this way.
+The gain is that you will be able to use the debugger in visual studio since MoSync, for the time being, lacks a debugger.
+\\
+\\
+**Please note that it's only possible to use <em>Visual Studio 2005</em> for the moment!**
+\\
+\\
+The Visual Studio Express Edition 2005 can be downloaded from Microsoft's website without any charge [[http://www.microsoft.com/express/2005/|here]].
+\\
+You will also need to download the <em>Windows Platform SDK</em> from [[http://www.microsoft.com/downloads/details.aspx?FamilyId=A55B6B43-E24F-4EA3-A93E-40C0EC4F68E5&displaylang=en|here]].
+\\
+\\
+=== Setting up Visual Studio ===
+\\
+If you haven't installed Visual Studio 2005 you will need to install it first. 
+\\
+Also check so that you have installed the Platform SDK.
+\\
+{{images/userguide_vs_1.png}}
+\\
+First we need to add the correct search paths to Visual Studio. Choose <em>Options</em> from the <em>Tools</em> menu. 
+\\
+{{images/userguide_vs_2.png}}
+\\
+Expand <em>Projects and Solutions</em> and choose <em>VC++ Directories</em>.
+Add the search path for the <em>MoSync</em> library files as shown.
+\\
+{{images/userguide_vs_4.png}}
+\\
+Choose 'Include Files' and add the path for MoSync include files.
+\\
+\\
+**If you use the Visual Studio 2005 Express edition you will need to follow these steps before closing the dialog**
+\\
+\\
+To be able to build you will also need to add the following search paths for the Windows Platform SDK:
+\\
+\\
+- To executable files
+	- C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Bin
+\\
+- To include files
+	- C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Include
+\\
+- To library files
+	- C:\Program Files\Microsoft Platform SDK for Windows Server 2003 R2\Lib
+\\
+Now you have added all the correct search paths so that Visual Studio will be able to build your applications.
+\\
+\\
+Close the <em>Options</em> window by pressing the <em>OK</em> button at the bottom.
+\\
+\\
+Now you just have to make one more adjustment before you will be able to create new projects.
+Inside the directory <em>C:\Program Files\Microsoft Visual Studio 8\VC\VCProjectDefaults</em> you will need to edit the file <em>corewin_express.vsprops</em>.
+\\
+Locate the following string:
+\\
+	**AdditionalDependencies="kernel32.lib"**
+\\
+You will need to change that line to:
+\\
+	**AdditionalDependencies="kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib"**
+\\
+\\
+More information about this can be found at msdn.microsoft.com, [[http://msdn.microsoft.com/en-us/vstudio/aa700755.aspx|here]].
+\\
+\\
+=== How to configure a MoSync project in Visual C++ ===
+\\
+Start with a Win32 project.
+\\
+\\
+ - In the Application Wizard, in Application Settings, select Empty Project.
+		- Add a C/C++ file. This allows you to access C/C++ project properties.
+\\
+ - In Project Properties:
+		-  Select All Configurations.
+\\
+ - In General:
+		- Change Output Directory from $(SolutionDir) to $(ProjectDir).
+		- Change Character Set to Not Set.
+\\
+ - In C/C++, General:
+		- Set Detect 64-bit Portability Issues to No.
+		- Optional but Recommended: Set Treat Warnings As Errors to Yes.
+\\
+ - In Linker, add the libraries needed (mosynclib.lib and MAStd.lib are required) Input:
+		- Set Additional Dependencies to mosynclib.lib MAStd.lib MAUtil.lib MAUI.lib
+\\
+ - In Linker, System:
+		- Set SubSystem to Windows.
+\\
+=== Building and debugging an application ===
+\\
+If you build and run your project, the MoSync emulator will start with your project running in it. You will also be able to debug your application using the Visual Studio debugger so you are able to set breakpoints and single step through your code. Note that the program is compiled as pure x86 code, so the execution envionment may be more forgiving to badly behaved code.
+\\
+\\
+  ]]>
+</section> 
+
+</document>

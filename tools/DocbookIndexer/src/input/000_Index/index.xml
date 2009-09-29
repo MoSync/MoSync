@@ -1,0 +1,55 @@
+<document title="MoSync Documentation Index" author="Fredrik" area="index" keyword="">
+
+<section id="intro" title="Introduction">
+<![CDATA[
+The MoSync documentation is divided into two major sections: These guides and tutorials,
+and the [[html/index.html|reference documentation]], which is a separate unit.
+You'll find the guides in the menu on the left side of the screen.
+\\
+\\
+]]>
+</section>
+
+
+<section id="reference" title="Reference documentation">
+<![CDATA[
+**[[html/api_areas.html|API areas]]**\\
+An overview of all syscalls and libraries.\\
+\\
+**[[html/maapi_8h.html|Syscalls]]**\\
+The lowest-level functions of MoSync. Includes graphics, sound, communication, user input and permanent storage.\\
+\\
+**[[html/index.html|Libraries]]**\\
+MAStd: Standard libraries. Includes malloc/free, string manipulation and a rudimentary text output console.\\
+\\
+MAUtil: C++ utility libraries. Includes templates Vector, Set and Map, class String,
+a base class for Reference Counting, a text input system.
+Also there is Moblet, an easy-to-use wrapper around the MoSync event system.\\
+\\
+MAUI: A C++ GUI library. Features bitmap fonts and hierarchical, skinned widgets:
+labels, listboxes, edit boxes and layouts.\\
+\\
+MTXml: A SAX-like, streaming XML parser with both C and C++ interfaces.\\
+\\
+MAFS: A standard C file stream implementation.\\
+\\
+**[[panics.html|Panics]]**\\
+When an unrecoverable error occurs in the MoSync runtime, a Panic message appears.
+This reference shows what they mean.\\
+\\
+**[[rescomp.pdf|Resource compiler (PDF)]]**\\
+This file describes the format of MoSync resource (.lst) files.\\
+\\
+]]>
+</section>
+
+
+<section id="externals" title="External links">
+<![CDATA[
+**[[http://www.mosync.com/forum/|MoSync Forum]]**\\
+Discuss MoSync with the developers and other users.\\
+]]>
+</section>
+
+</document>
+

@@ -1,0 +1,6 @@
+-data-evaluate-expression c
+^done,value="{a = 3, b = 7}"
+(gdb) 
+-var-create - * c
+^done,name="var1",numchild="2",value="{...}",type="C"
+(gdb) 

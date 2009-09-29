@@ -1,0 +1,97 @@
+<document title="Using the Downloader class" author="Niklas, Patrick" area="Networking" keyword="">
+<section id="intro" title="Introduction">
+  <![CDATA[
+  
+ 
+The MAUtil::Downloader class provides a simple mechanism for downloading data to resources. It requires the application to use the Moblet framework. The download is performed asynchronously, with a listener interface providing progress and completion notification.
+
+The first step involved in using a downloader is actually creating one:
+[code filename="dummy.h"]
+	Downloader* d = new Downloader();
+[/code]
+
+Once a ''Downloader'' is created, you must register a listener so that you can be notified of the progress and completion of the download:
+
+[usesnippet id="add"]
+
+In many cases, your download listener will be implemented by the class that creates and invokes the downloader, which is why we use ''this'' as the listener pointer.
+
+Now, everything is set up and we can begin downloading:
+
+[usesnippet id="begin"]
+
+Passing 0 as the placeholder parameter causes the downloader to a create a resource object to store the downloaded data. In many cases, if you are performing multiple downloads, it is a good idea to create a placeholder beforehand and reuse it multiple times.
+
+  ]]>
+</section>
+
+<section id="example" title="An example application">
+  <![CDATA[
+This is a very basic application using the downloader class:
+
+[code filename="down.cpp"]
+#include <MAUtil/Moblet.h>
+#include <MAUtil/Downloader.h>
+#include <conprint.h>
+ 
+using namespace MAUtil;
+ 
+#define URL "http://www.google.se/intl/en_com/images/logo_plain.png"
+ 
+class MyMoblet : public Moblet, public DownloadListener {
+public:
+	MyMoblet() {
+[snippet id="add"]
+        d.addDownloadListener(this);
+[/snippet]
+[snippet id="begin"]
+        d.beginDownloading(URL, 0);
+[/snippet]
+        printf("Started downloading\n");
+    }
+
+    void notifyProgress(Downloader* downloader, int downloadedBytes, int totalBytes) {
+        printf("Progress: %d\%", 100*downloadedBytes/totalBytes);
+    }
+
+    void finishedDownloading(Downloader* downloader, MAHandle data) {
+        printf("Download finished.\n");
+    }
+
+    void downloadCancelled(Downloader* downloader) {
+        printf("Download cancelled.\n");
+    }
+    void error(Downloader* downloader, int code) {
+        printf("Downloader error: %d\n", code);
+    }
+private:
+    Downloader d;
+};
+ 
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+};
+[/code]
+\\
+This Moblet implements the ''DownloadListener'' interface. Proper error handling has been omitted for clarity. The return value of ''beginDownloading()'' should be checked, and the implementation of the ''error()'' function should compare the ''code'' parameter to known error types, as described in the reference documentation for the ''Downloader'' class.
+
+  ]]>
+</section>
+
+<section id="spec" title="Specialized downloaders">
+  <![CDATA[
+Two specialized classes derived from Downloader are provided - ''ImageDownloader'' and ''AudioDownloader''. They extend the Downloader functionality by handling conversion to the correct resource type internally, so that the image or sound can be directly displayed or played.
+
+Using these classes works almost identically with the basic downloader - the main difference is the type of resource that is created. Also, the AudioDownloader has an additional mime-type parameter in its ''beginDownloading()'' function.
+[code filename="dummy.h"]
+audioDownloader.beginDownloading(
+  "http://http.de.scene.org/pub/music/groups/mono/mp3/sushi-brother-lionfish.mp3",
+  0,
+  "audio/mpeg"
+);  
+[/code]
+  ]]>
+</section>
+
+</document>

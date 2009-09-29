@@ -1,0 +1,56 @@
+<document title="The Map class" author="Shiv" area="Containers" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+	**Maps** are a kind of associative containers that stores elements formed by the combination of a key value and a mapped value.
+
+In a map, the key value is generally used to uniquely identify the element, while the mapped value is some sort of value associated to this key. Types of key and mapped value may differ. For example, a typical example of a map is a telephone guide where the name is the key and the telephone number is the mapped value.
+
+Internally, the elements in the map are sorted from lower to higher key value following a specific strict weak ordering criterion set on construction.
+
+As associative containers, they are especially designed to be efficient accessing its elements by their key (unlike sequence containers, which are more efficient accessing elements by their relative or absolute position).
+
+Therefore, the main characteristics of a map as an associative container are:
+
+    * Unique key values: no two elements in the map have keys that compare equal to each other.
+	
+    * Each element is composed of a key and a mapped value. 
+	
+    * Elements follow a strict weak ordering at all times. 
+	
+	In the **MoSync** implementation,  The cost for looking up a value is O(n) comparisons, where n is the number of entries in the map. As such, it is best suited for use with a small numbers of keys/values. Larger dictionaries should be implemented using a proper hash-based implementation. 
+	
+]]>
+</section>
+<section id="memberDocumentation" title="Member Function Documentation">
+<![CDATA[
+   **void MAUtil::Map< KeyType, ValueType >::clear()**// 
+   
+      Removes all entries from the **Map**//
+	  
+   **ValueType& MAUtil::Map< KeyType, ValueType >::operator[](const KeyType &key)**//
+   
+      Returns the value of the entry with the given key. If the key doesn't exist an entry will be created with the given key. If the value type is a primitive type the value will be uninitialzed. If the value type is a class the default constructor will be used.//
+	  
+   **ValueType* MAUtil::Map< KeyType, ValueType >::get(const KeyType &key)**//
+   
+      Returns a pointer to the value associated with the specified key, or NULL if the key is not in the **Map**.//
+	  
+   **const Vector<KeyType>& MAUtil::Map< KeyType, ValueType >::getKeySet()**//	
+   
+      Returns a const reference to the Vector containing all the keys in the **Map**.//
+	  
+   **void MAUtil::Map< KeyType, ValueType >::remove(const KeyType &key)**//
+   
+      Removes the entry specified by key, if it exists.// 
+]]>
+</section>
+
+<section id="furtherReading" title="Further information">
+<![CDATA[
+  The Vector class is throughly documented in the reference documentation. Also, the sourcecode is available in **$MOSYNCDIR/include/MAUtil/Map.h** in your MoSync package.
+]]>
+</section>
+
+
+
+</document>

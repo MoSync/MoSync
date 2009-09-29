@@ -1,0 +1,87 @@
+<document title="The Framebuffer API" author="Niklas, Patrick" area="Graphics" keyword="">
+<section id="intro" title="Introduction">
+  <![CDATA[
+  The Framebuffer API provides an API for overriding the backbuffer of MoSync. In order to use this API, the program should use ''maFrameBufferGetInfo'' to fill a structure containing such information as the native pixel format and screensize of the underlying system. These parameters should then in turn be used to allocate memory for a backbuffer. The custom backbuffer is enabled by using the ''maFrameBufferInit'' syscall. By using ''maFrameBufferClose'', the overridden backbuffer is disabled. In order to make a program pixel format and screensize independent, actual drawing should be done using the information retrieved by using the syscall ''maFrameBufferGetInfo''. Increased performance may be gained by using different code paths for different bit depths and creating optimized innerloops.
+  ]]>
+</section>
+
+<section id="example" title="Example">
+  <![CDATA[
+  
+		To illustrate how the API is used we're going to do a simple example. We will implement a function to plot a pixel using a desired color. Be aware that, usually when doing a program using direct pixel access, the backbuffer is traversed linearly, hence a pixel plotting routine may be very inefficent.
+  
+		First we include the standard MoSync API header file and create a forward reference to the ''plotPixel'' function.
+		
+[code filename="fb.cpp"]
+		#include <ma.h>
+		void plotPixel(MAFrameBufferInfo *fbi, byte *backbuffer, int x, int y, int color);
+[/code]
+		
+		Then we begin creating our ''MAMain''. The framebuffer is initialized as previously explained. Information is retrieved by filling an instance of a ''MAFrameBufferInfo'' structure, called ''info'' with information and then allocate ''info.sizeInBytes'' amount of memory for our backbuffer. The backbuffer is then enabled using ''maFrameBufferInit''.
+		
+[code]
+		int MAMain() {
+			MAFrameBufferInfo info;
+			maFrameBufferGetInfo(&info);
+			byte *backbuffer = new byte[info.sizeInBytes];
+			maFrameBufferInit(backbuffer);
+[/code]
+		
+		We then begin doing actual drawing.
+		
+		First we clear the screen to black using memset. As black is usually mapped to 0 on all pixel formats we may do this using a memset on the backbuffer.
+[code]
+			memset(backbuffer, 0, info.sizeInBytes);			
+[/code]
+		
+		Then we plot the actual pixel using our ''plotPixel'' routine. We must pass our ''MAFrameBufferInfo'' struct, a pointer to the backbuffer, the x and y coordinate and the color on the form 0x00rrggbb (same form as used by maSetColor).
+[code]
+			plotPixel(&info, backbuffer, info.width/2, info.height/2, 0xffff00);	
+[/code]
+		
+		Then we copy the backbuffer to the screen by calling ''maUpdateScreen'' and wait for a keypress or close event.
+[code]
+			maUpdateScreen();
+			while(true) {
+				MAEvent e;
+				while(maGetEvent(&e)) {
+					if(e.type == EVENT_TYPE_CLOSE ||
+						e.type == EVENT_TYPE_KEY_PRESSED) {
+						maExit(0);
+					}
+				}
+			}	
+[/code]
+		
+	
+		Finally we disable our custom backbuffer by calling the syscall ''maFrameBufferClose''. This isn't necessary as it is done automatically when the system is shut down, but is done just to illustrate how it is used.
+[code]
+			maFrameBufferClose();
+		}
+[/code]
+		
+		Now we're going to explain how to implement the ''plotPixel'' function. 
+		
+		A pixel may be stored using different amount of bytes for different bit depths. For instance 16-bit color normally uses 2 bytes per pixel and 24/32-bit color uses 4 bytes per pixel. Each color component is represented by a set of bits of these bytes. For 32-bit color modes each color component is usually a byte or 8 bits, but for 16-bit color modes a common setup is 5 bits for red, 6 bits for green and 5 bits for blue. This information is located in the ''MAFrameBufferInfo'' struct. 
+		
+The ''plotPixel'' function begins by extracting the color components from the ''color'' argument and converts them to the right bit depth.
+[code]
+		void plotPixel(MAFrameBufferInfo *fbi, byte *backbuffer, int x, int y, int color) {
+			int r = ((color>>16)&0xff)>>(8-fbi->redBits);
+			int g = ((color>>8)&0xff)>>(8-fbi->greenBits);
+			int b = ((color)&0xff)>>(8-fbi->blueBits);
+[/code]
+		
+Then we make a switch-statement that depends on the amount of bytes per pixel, so that we may work with the backbuffer using the the correct data type. First we need to find the scan line by multiplying the y-coordinate with the pitch of the screen (the actual width of the backbuffer). Then we type cast the reference pointing at the beginning of the scan line to the correct data type and index it using the x-coordinate to find the correct pixel. Finally encode the color components using the framebuffer information.
+
+[code]
+			switch(fbi->bytesPerPixel) {
+				case 2: ((short*)&backbuffer[y*fbi->pitch])[x] = (r<<fbi->redShift)|(g<<fbi->greenShift)|(b<<fbi->blueShift);
+				case 4: ((int*)&backbuffer[y*fbi->pitch])[x] = (r<<fbi->redShift)|(g<<fbi->greenShift)|(b<<fbi->blueShift);
+			}
+		}
+[/code]
+  ]]>
+</section>
+
+</document>

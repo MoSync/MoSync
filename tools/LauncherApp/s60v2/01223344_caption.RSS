@@ -1,0 +1,7 @@
+//For 2nd edition
+
+#include <apcaptionfile.rh>
+RESOURCE CAPTION_DATA {
+	caption="t6";
+	shortcaption="t6";
+}

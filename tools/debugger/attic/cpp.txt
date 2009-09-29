@@ -1,0 +1,13 @@
+-target-select sim
+-break-insert _ZN1A4funcEv
+-exec-continue
+-test-wait
+-stack-list-frames
+-stack-list-frames
+-exec-next
+-test-wait
+-stack-list-frames
+-stack-list-frames
+-data-evaluate-expression *((this)+0)@1
+-data-evaluate-expression this
+-data-evaluate-expression &this

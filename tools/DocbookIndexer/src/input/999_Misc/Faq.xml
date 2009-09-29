@@ -1,0 +1,51 @@
+<document title="Frequently Asked Questions" author="Niklas" area="" keyword="">
+<section id="intro" title="">
+  <![CDATA[
+This section contains answers to some of the most frequently asked questions about the MoSync development suite.
+  ]]>
+</section>
+
+<section id="panics" title="Panics">
+<![CDATA[
+**If I get the user panic "malloc failed", what should I do?**
+\\
+This usually means that you have run out of memory and the amount of memory allocated for the heap needs to be increased. Bear in mind that the default heap size in a MoSync program is only 16k.
+
+This can be done by specifying some extra linker settings. Go to "Project Properties->MoSync Project->Build Settings->Compiler Flags->Extra Linker Switches". You can use three switches - "-datasize", "-heapsize" and "-stacksize". These values must be chosen so they conform to the following rule:
+
+* datasize must be greater than the sum of heapsize and stacksize and the application's statically allocated memory.
+
+Since there's no easy way of knowing the exact size of the statically allocated memory, a good rule of thumb is to use the following relation: **-datasize=n heapsize=n/2**, for instance **-datasize=1024000 -heapsize=512000**.
+
+Note that different devices have different amounts of memory available. If you specify a datasize that's greater than the available amount of memory on the device, your program will fail to execute.
+\\
+\\
+**What does panic with code X mean?**
+\\
+See the [[panics.html|panic documentation]].
+\\
+\\
+**My application is suffering from random crashes / panics.**
+\\
+This can obviously happen because of many reasons, but common solutions are:
+* Turning off the still work-in-progress "Dead Code Elimination" (Project Settings->MoSync Project->Compiler Flags->Activate Dead Code Elimination)
+* Changing the optimization level, i.e. changing the -OX flag of gcc (Project Settings->MoSync Project->Compiler Flags->Additional GCC Switches)
+\\
+]]>
+</section>
+
+<section id="general" title="General">
+  <![CDATA[
+**I'm missing feature X.**
+\\
+We will constantly be trying to develop and publish updates to the MoSync SDK. Feature suggestions are always welcome and can either be put on the [[http://www.mosync.com/forum|MoSync message board]]in the "Feature Requests" forum or mailed to us at info@mobilesorcery.com.
+\\
+\\
+**I've noticed different behaviour of my application on different phones.**
+\\
+MoSync strives to provide as consistent behaviour as possible across all devices. However, there are essential differences that can't be handled automatically - screen sizes, performance characteristics and availability of hardware features are only a few examples. Additionally, there may always be bugs that can't be fixed or that we haven't found yet. Whenever you observe inconsistent behaviour on a device, we would greatly appreciate being informed, so that we may attempt to fix it.
+]]>
+</section>
+
+ 
+</document>

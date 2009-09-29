@@ -1,0 +1,26 @@
+; LauncherApp.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"t6"},(0xE1223344),1,2,0, TYPE=SA
+
+;Localised Vendor name
+%{"Your Company"}
+
+;Unique Vendor name
+:"Your Company"
+
+;Supports S60 3rd Edition
+[0x101F7961], 0, 0, 0, {"S60ProductID"};
+
+;Files to install
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\release\gcce\urel\E1223344.exe" -"!:\sys\bin\E1223344.exe"
+"\MoSync\output\program.comb" -"!:\resource\apps\E1223344.comb"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\z\resource\apps\E1223344.RSC" -"!:\resource\apps\E1223344.rsc"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\z\resource\apps\E1223344_icon.mif" -"!:\resource\apps\E1223344_icon.mif"
+"\Symbian\9.2\S60_3rd_FP1\Epoc32\data\Z\private\10003a3f\import\apps\E1223344_reg.RSC" -"!:\private\10003a3f\import\apps\E1223344_reg.rsc"
+
+;required for application to be covered by backup/restore facility 
+;"backup_registration.xml" -"!:\private\E1223344\backup_registration.xml"

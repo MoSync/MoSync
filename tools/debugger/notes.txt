@@ -1,0 +1,101 @@
+14:21 2009-04-02
+problem: in case of inlines or templates,
+a linenum may actually correspond to multiple addresses.
+in that case, the breakpoint should be set onto all those addresses.
+for now, we just use one address. it's easier.
+
+however, we still have a different problem.
+multiple breakpoints may point to the same address (yes, it's many-to-many).
+Since we set breakpoints by writing memory directly,
+a second breakpoint may save the breakpoint instruction set by the first,
+instead of the original instruction.
+then, if the first is deleted before the second, when the second is deleted,
+it will not restore the original instruction.
+
+we must have a map of broken addresses and their reference count.
+
+11:30 2009-04-14
+The MoSync stack grows downward. The stack is briefly, at the start of every function, unstable, at which point it cannot be parsed.
+
+However, at every other point in a program, the Frame Register (fr) points to the bottom of the previous stack frame, and the Stack Pointer (sp) points to the top of the current frame.
+
+At (fr-4) is the Return Address of the current frame, which is the address in the previous frame that the current function will return to.
+At (fr-8) is the Frame Pointer of the previous frame. This allows you to parse the next frame, like a linked list. A Frame Pointer value of zero denotes the end of the stack.
+
+
+16:45 2009-05-13
+Unusual types to test, stand-alone and in combination:
+* Bitfields
+* Structs
+* Unions
+* Enums
+* C++ classes with multiple virtual inheritance
+* floats
+* doubles
+* longlongs
+* Pointers to member
+* Incomplete types (ex. 'struct foo; foo* ptr;')
+
+13:38 2009-05-14
+Unusual code structures to test:
+* Variables in function sub-scopes
+* Functions defined in the body of another function (GCC extension)
+
+* Check the rest of the GCC extensions.
+
+
+12:42 2009-05-26
+A note about simultaneous packets and acks:
+The stub and debugger may, under rare circumstances, send a packet to each other at the same time, so that they will recieve the other's packet before the ack for their own packet. The debugger can handle this, but the stub could, before the asynchronous read upgrade, not. This has now been rectified, although the situation remains untested.
+
+Since the situation is timing-based, a test cannot be perfectly repeatable. The simplest way to do it would probably be to have the debugger rapid-fire simple query packets to the stub. A multi-core CPU may reveal the situation more easily than a single-core.
+
+
+11:13 2009-06-16
+I've seen two different problems. In one, a command issued while a breakpoint-hit handler is querying the stub causes an assertion failure. In the other, an exec-step to a breakpoint causes the stub to stop responding.
+
+
+12:11 2009-08-26
+Stack layout:
+fr - 8: next fr
+fr - 4: return address
+fr - 0 and upwards: local variables
+
+Note that while function prologues are executed, the value of the frame register (fr) is undefined. Attempting to trace the stack at that time will result in faulty data.
+
+13:37 2009-08-26
+DLABs are not available. Prologues are now assumed to be the code between the function entrypoint and the function's second SLD entry.
+
+When setting breakpoints targeted at a function, or stepping into a function using exec-step, MDB should break not at the function's entrypoint, but at the end of the prologue. This will ensure that the stack appears in order, as long as the user does not command -exec-*-instruction.
+
+13:46 2009-08-26
+TODO: remove all reads from code memory, since we now have a local copy of the program file.
+
+14:20 2009-08-26
+TODO, optimization: change vectors to sets in sld.cpp, for faster lookup.
+
+15:57 2009-09-24
+N_LBRAC and N_RBRAC works thusly:
+They always appear in pairs. They may be nested.
+When they appear inside a function, they define the scope of variables.
+The variables so defined appear BEFORE the LBRAC. Thus, the pattern is:
+
+FunctionDefinition: 'N_FUN' FunctionBody*
+FunctionBody: (Variable | Scope)
+Variable: ('N_RSYM' | 'N_LSYM')
+Scope: Variable* 'N_LBRAC' Scope* 'N_RBRAC'
+
+Where * means "zero or more".
+BRAC values are instruction address offsets from the beginning of the function.
+
+18:03 2009-09-24
+Parsing of BRACs should follow this pattern:
+N_FUN appears; a "current function" is set.
+Variables appear; they are added to the function, without scope.
+LBRAC appears; a BRAC stack is initialized and scopeless Variables are coupled to this level of the stack.
+more Variables appear; they are added to the function, without scope.
+another LBRAC appears; it is coupled to the new, scopeless Variables.
+RBRAC appears; it is used to finish off the Variables coupled to the top level of the stack. The stack is popped.
+more Variables and LBRACs may appear, repeating the pattern.
+the last RBRAC appears; it sets the scope end for the first Variables.
+if a new function appears without the BRAC stack being empty, it is an error.

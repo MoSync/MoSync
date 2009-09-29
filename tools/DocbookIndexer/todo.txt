@@ -1,0 +1,2 @@
+10:16 2008-12-08
+Make all code follow our coding conventions. Fails I've seen include member variable names and indentation tabs.

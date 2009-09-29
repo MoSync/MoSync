@@ -1,0 +1,46 @@
+09:22 2009-06-17
+execution is stopped.
+Normal flow of events:
+user commands -exec-step.
+:begin
+-> step
+<- ack
+-> getRegs
+<- ack
+<- regs
+-> ack
+maybe goto :begin
+output end-stepping-range
+
+original error: failed _ASSERT(sAckCallback == NULL) in sendPacket()
+execution is running.
+abnormal flow:
+<- stopped
+-> ack
+-> getRegs	# by breakpointHit() or equivalent
+user commands whatever, like read-memory
+-> getMem	# breaks here with the original error
+
+to reproduce:
+-break-insert endless/endless.c:9
+-exec-continue
+-test-wait
+-exec-step
+-test-wait
+-exec-step
+-test-wait
+-exec-step
+
+
+corrected flow:
+-> getRegs
+user command halted until stub connection is idle
+<- ack
+<- regs
+-> ack
+# stub connection is now idle
+-> getMem	# user command resumed
+<- ack
+<- data
+-> ack
+output data	# hooray

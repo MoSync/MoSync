@@ -1,0 +1,105 @@
+<document title="The Vector class" author="Patrick" area="Containers" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+	The **MAUtil::Vector** class provides a generic, dynamically resizeable container similar to **std::vector**
+	in the STL or Java's **ArrayList**. It provides many of the same familiar operations. Here's an example
+	of a few of the supported operations:
+	
+	[code filename="vec.h"]
+	// Create a vector of integers.
+	Vector<int> numbers;
+	// Fill it with multiples of two.
+	for(int i = 0; i < 10; i++)
+		numbers.add(i*2);
+	// insert another number
+	numbers.insert(2, 66);
+	// iterate through the vector using the 
+	// Vector_each macro, printing each element.
+	Vector_each(int, i, numbers) {
+		// The iterator needs to be dereferenced.
+		printf("numbers[i]: %d", *i);
+	}
+	// iterate through the vector using the 
+	// [] operator, printing each element.
+	for(int i = 0; i < numbers.size(); i++) {
+		printf("numbers[i]: %d", numbers[i]);
+	}
+	[/code]
+	
+	
+]]>
+</section>
+<section id="sizeCap" title="Size and capacity">
+<![CDATA[
+	There's an important distinction between the //size// and //capacity// of a **Vector**. Vectors grow dynamically to accomodate additional elements that are added to them. When an element is added, exceeding the current capacity, the //capacity// is doubled. However, the //size// only increases by one. This snippet demonstrates the behaviour:
+	
+[code]
+	for(int i = 0; i < 10; i++) {
+		numbers.add(i);
+		printf("Size: %d  Capacity: %d", numbers.size(), numbers.capacity());
+	}
+[/code]
+\\
+The output looks like this:
+[code]
+	Size: 1  Capacity: 4
+	Size: 2  Capacity: 4
+	Size: 3  Capacity: 4
+	Size: 4  Capacity: 8
+	Size: 5  Capacity: 8	
+	Size: 6  Capacity: 8
+	Size: 7  Capacity: 8
+	Size: 8  Capacity: 16
+	Size: 9  Capacity: 16
+	Size: 10  Capacity: 16
+[/code]
+\\
+In this case, the memory used to store the Vector elements is reallocated twice, each time requiring all the elements to be copied to the newly allocated memory location.
+\\
+It is possible to **reserve()** a certain capacity, which is useful in cases when the number of elements to add is known beforehand (but not at compile time) in order to avoid superfluous reallocations:
+
+[code]
+	numbers.reserve(11);
+	for(int i = 0; i < 10; i++) {
+		numbers.add(i);
+		printf("Size: %d  Capacity: %d", numbers.size(), numbers.capacity());
+	}
+[/code]
+\\
+The output looks like this:
+[code]
+	Size: 1  Capacity: 11
+	Size: 2  Capacity: 11
+	Size: 3  Capacity: 11
+	Size: 4  Capacity: 11
+	Size: 5  Capacity: 11	
+	Size: 6  Capacity: 11
+	Size: 7  Capacity: 11
+	Size: 8  Capacity: 11
+	Size: 9  Capacity: 11
+	Size: 10  Capacity: 11
+[/code]
+\\
+  **Note**
+\\
+  ((Most functions that somehow manipulate the size of the vector do not affect the capacity if the new size
+  is smaller than the previous. Do not assume that resize(0) will free up memory if the Vector previously contained thousands of elements.))
+]]>
+</section>
+
+<section id="iterStore" title="Internal storage and iterators">
+<![CDATA[
+	The elements of a **Vector** are stored linearly in an array. This means that they can be accessed using pointers. There is a function **pointer()** which returns a **T*** pointer to the internal storage array. There are also two types of //typedef//ed iterators, one regular and one const. These map directly to **T*** pointers as well. 
+]]>
+</section>
+
+<section id="furtherReading" title="Further information">
+<![CDATA[
+  The Vector class is throughly documented in the reference documentation. Also, the sourcecode is available in **$MOSYNCDIR/include/MAUtil/Vector.h** in your MoSync package.
+]]>
+</section>
+
+
+
+</document>
+  

@@ -1,0 +1,20 @@
+TARGET            %s.app
+TARGETTYPE        app
+UID               0x100039CE 0x%s
+TARGETPATH        \system\apps\%s
+
+SOURCEPATH        .
+RESOURCE          %s.rss
+RESOURCE          %s_caption.rss
+
+AIF               %s.aif . %sAif.rss
+
+SOURCEPATH    .
+SOURCE        LauncherApp.cpp
+SOURCE        Application.cpp
+
+SYSTEMINCLUDE \epoc32\include
+
+LIBRARY apgrfx.lib
+LIBRARY euser.lib apparc.lib cone.lib eikcore.lib 
+LIBRARY eikcoctl.lib

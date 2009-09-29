@@ -1,0 +1,114 @@
+<document title="Graphics primitives" author="Patrick" area="Graphics" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+MoSync provides a number of primitive graphics operations at the syscall level. These are:
+
+[code filename="dummy.h"]
+int 	maSetColor (int rgb);
+void 	maSetClipRect (int left, int top, int width, int height);
+void 	maGetClipRect (MARect *out);
+void 	maPlot (int posX, int posY);
+void 	maLine (int startX, int startY, int endX, int endY);
+void 	maFillRect (int left, int top, int width, int height);
+void 	maFillTriangleStrip (const MAPoint2d *points, int count);
+void 	maFillTriangleFan (const MAPoint2d *points, int count);
+void 	maDrawText (int left, int top, const char *str);
+[/code]
+
+The ''maSetColor()'' function sets a "current color" which will be used by any subsequent primitive operations. The ''maSetClipRect()''
+and ''maGetClipRect()'' functions are used to either define or query a rectangular area of the screen that is affected by graphics
+operations. The rest of the functions each draw a primitive. All functions deal with coordinates in one way or another, and these
+coordinates are pixels coordinates with the origin located at the top-left corner of the screen. The positive x axis goes from left
+to right, while the positive y axis goes from top to bottom:
+
+{{images/gfx_syscalls_coords.png}}
+]]>
+</section>
+<section id="plot" title="Plotting pixels">
+<![CDATA[
+The ''maPlot()'' function is used to plot individual pixels at given coordinates using the current color:
+[code filename="dummy.h"]
+maSetColor(0x00ff00); // set the current color to a bright green
+maPlot(10, 10); // plot a pixel at 10, 10
+maUpdateScreen(); // update the screen.
+[/code]
+]]>
+</section>
+<section id="line" title="Drawing lines">
+<![CDATA[
+The ''maLine()'' function is used to draw a line between two pairs of coordinates using the current color:
+[code filename="dummy.h"]
+maSetColor(0x00ff00); // set the current color to a bright green
+maLine(10, 10, 50, 50); // draw a line from (10,10) to (50, 50)
+maUpdateScreen(); // update the screen.
+[/code]
+]]>
+</section>
+<section id="rect" title="Filling rectangles">
+<![CDATA[
+The ''maFillRect()'' function is used to fill a rectangle between with a given top-left corner, width and height.
+[code filename="dummy.h"]
+maSetColor(0x00ff00); // set the current color to a bright green
+maFillRect(10, 10, 50, 50); // draw a rectangle between (10, 10) and (60, 60).
+maUpdateScreen(); // update the screen.
+[/code]
+]]>
+</section>
+<section id="strip" title="Drawing triangle strips">
+<![CDATA[
+Triangle strips are an efficient way of drawing several triangles that share common vertices, since those
+vertices do not need to be repeated. The following image illustrates such a triangle strip, consisting of
+triangles 1,2,3,4 and vertices A,B,C,D,E,F:
+
+{{images/gfx_syscalls_tristrip.png}}
+
+The ''maFillTriangleStrip()'' function is used to fill a rectangle between {10, 10} and {40, 40} using a triangle
+strip.
+[code filename="dummy.h"]
+maSetColor(0x00ff00); // set the current color to a bright green
+MAPoint2d points[] = {
+  {10, 10}, {40, 10}, {10, 40}, {40, 40}
+};
+maFillTriangleStrip(points, 4);
+maUpdateScreen(); // update the screen.
+[/code]
+]]>
+
+</section>
+
+<section id="fan" title="Drawing triangle fans">
+<![CDATA[
+A triangle fan is a primitive in computer graphics that saves on storage and processing time. It describes a set of connected triangles that share one central vertex. If N is the number of triangles in the fan, the number of vertices describing it is N+2. This is a considerable improvement over the 3N vertices that are necessary to describe the triangles separately:
+{{images/gfx_syscalls_trifan.png}}
+The ''maFillTriangleFan()'' function is used here to draw a hexagon.
+[code filename="dummy.h"]
+MAPoint2d points[8];
+points[0].x = points[0].y = 40;
+points[7].x = points[7].y = 40;
+for(int i = 0; i < 7; i++) {
+	float t = 2*M_PI*i / 6.0;
+	points[i+1].x = 40 + 30*cos(t);
+	points[i+1].y = 40 + 30*sin(t);
+}
+maSetColor(0xff00ff);
+maFillTriangleFan(points, 8);
+maUpdateScreen();
+[/code]
+]]>
+</section>
+
+<section id="text" title="Drawing text">
+<![CDATA[
+The ''maDrawText()'' function is used to render text using a device-dependent font. It is useful for things like debug printouts or simplier UI:s. For consistent, flexible fonts, have a look at
+the MAUtil::Font class - see **[[Fonts.html|Font tools]]**.
+[code filename="dummy.h"]
+maSetColor(0x00ff00); // set the current color to a bright green
+maDrawText(10, 10, "Hello world!");
+maUpdateScreen(); // update the screen.
+[/code]
+]]>
+</section>
+
+
+
+</document>

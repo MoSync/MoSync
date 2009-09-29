@@ -1,0 +1,6 @@
+-target-select sim
+-break-insert c:/mosync/Projects/MinUI/MinUI.cpp:605
+-exec-continue
+-test-wait
+-stack-list-frames
+-stack-list-locals 2

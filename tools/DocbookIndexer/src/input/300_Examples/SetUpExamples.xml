@@ -1,0 +1,45 @@
+<document title="Building and running examples" author="Anders Malm" area="Examples" keyword="">
+
+<section id="setup" title="Create a new workspace">
+<![CDATA[
+The first thing you will need is to create a new workspace for the examples.
+\\
+{{images/example_ws_1.png}}
+\\
+From the <em>File</em> menu, choose <em>Other...</em> from <em>Switch Workspace</em>.
+\\
+{{images/example_ws_2.png}}
+\\
+Provide the location of the examples folder.
+If you installed MoSync to its default location this should be <em>c:\MoSync\examples</em>. 
+When you press <em>OK</em> the MoSync IDE will restart.
+The examples folder will now be setup to act as a workspace. 
+]]>
+</section>
+
+<section id="import" title="Import examples">
+<![CDATA[
+When the MoSync IDE has restarted you will notice that there aren't any projects added.
+Right click inside the <em>Project Explorer</em> window.
+\\
+{{images/example_ws_3.png}}
+\\
+Choose <em>import</em> from the popup menu.
+\\
+{{images/example_ws_4.png}}
+\\
+From the <em>general</em> group choose <em>Existing Projects into Workspace</em>, press <em>Next</em>.
+\\
+{{images/example_ws_5.png}}
+\\
+Set the <em>Select root directory</em> so that it points to the examples folder.
+The list of available projects at the given location will automaticlly be populated.
+Press <em>Finish</em> to import all the examples into your workspace.
+\\
+{{images/example_ws_6.png}}
+\\
+Now you can study, modify and run the examples.
+]]>
+</section>
+
+</document>

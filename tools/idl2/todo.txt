@@ -1,0 +1,16 @@
+14:57 2006-03-27
+add bitfield struct, to replace unsafe constsets.
+
+12:35 2006-12-15
+Fix argument orders in Draw* so they match.
+
+15:32 2007-02-15
+Add IOCTLset.
+
+15:21 2008-08-11
+There is some code duplication in comment formatting and IX control.
+Also in top-level parsing, between parseInterface and parseIoctl.
+
+09:31 2008-11-13
+The hash code is over-sensitive; it differentiates between interfaces that should be interoperable.
+One concrete fix: ignore the internal-ness of IOCTLs.

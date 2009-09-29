@@ -1,0 +1,7 @@
+; ErrRd.pkg - Enables leave/panic dialogs
+&EN
+#{"ErrRd"}, (0xe1e444d0), 1, 0, 0
+%{"Forum Nokia"}
+:"Forum Nokia"
+[0x101F7961], 0, 0, 0, {"Series60ProductID"}
+"ErrRd.pkg"-"c:\resource\errrd"

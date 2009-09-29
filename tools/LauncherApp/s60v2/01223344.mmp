@@ -1,0 +1,29 @@
+TARGET            01223344.app
+TARGETTYPE        app
+UID               0x100039CE 0x01223344
+TARGETPATH        \system\apps\01223344
+
+SOURCEPATH        .
+RESOURCE          01223344.rss
+RESOURCE          01223344_caption.rss
+
+// AIF               01223344.aif . 01223344Aif.rss
+
+SOURCEPATH    ..
+SOURCE        LauncherApp.cpp
+
+SOURCEPATH    .
+SOURCE        Application.cpp
+
+SYSTEMINCLUDE \epoc32\include
+
+/*LIBRARY       euser.lib
+LIBRARY       apgrfx.lib
+LIBRARY       efsrv.lib
+LIBRARY       bafl.lib
+LIBRARY       apparc.lib*/
+
+LIBRARY       apgrfx.lib
+
+LIBRARY euser.lib apparc.lib cone.lib eikcore.lib 
+LIBRARY eikcoctl.lib efsrv.lib
