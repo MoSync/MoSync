@@ -26,11 +26,12 @@ $settings = {
 		:have_sp2003 => true,
 		:have_winmobile => true,
 
-		:java_source => "..\..\runtimes\java",
-		:symbian_source => "..\..\runtimes\cpp\platforms\symbian\src",
-		:wince_source => "..\..\runtimes\cpp\platforms\winmobile",
+		:java_source => "..\\..\\runtimes\\java\\",
+		:symbian_source => "..\\..\\runtimes\\cpp\\platforms\\symbian\\src\\",
+		:wince_source => "..\\..\\runtimes\\cpp\platforms\\winmobile\\",
 		
-		:javame_sdk => "C:\SonyEricsson\JavaME_SDK_CLDC\WTK2\lib",
+		:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\WTK2\\lib",
 
-		:build_commerical => true
+		:build_commercial => true,
+		:use_arm_recompiler => true,
 	}
