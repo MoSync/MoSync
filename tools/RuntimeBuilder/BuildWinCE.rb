@@ -18,31 +18,19 @@ require 'ftools'
 
 class RuntimeBuilder 
 
-	def build_wince(runtime_dir, mode, version) 
-		if (mode=="debug") 
-			debug = "D"
-		else
-			debug = ""
-		end
+	def build_wince(runtime_dir, debug, version) 
+		puts (debug=="D")?"Building debug.":"Building release."
 		
-		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		configFileDest = $SETTINGS[:wince_source] + "config_platform.h"	
-		configFileDestExist = File.exist? configFileDest
-		configFileSrc = runtime_dir + "config" + debug + ".h"
-		if (File.exist? configFileSrc) == false
-			puts configFileSrc + " missing."
+		config_file_dest = $SETTINGS[:wince_source] + "config_platform.h"	
+		config_file_src = runtime_dir + "config" + debug + ".h"
+		if !File.exist? config_file_src
+			puts config_file_src + " missing."
 			return
 		end
 	
-		if configFileDestExist == true
-			configBakFile = $SETTINGS[:wince_source] + "config_platform.h.bak"
-			if File.exist? configBakFile
-				File.delete configBakFile
-			end
-			File.copy(configFileDest, configBakFile)
-		end
-		
-		File.copy(configFileSrc, configFileDest)
+		backup_file(config_file_dest)
+	
+		File.copy(config_file_src, config_file_dest)
 		
 		if (version == "sp2003")
 			configuration = "Smartphone 2003 (ARMV4)"
@@ -52,34 +40,26 @@ class RuntimeBuilder
 		
 		system("build_wince.bat \"" + $SETTINGS[:wince_source] + "\" \"Release|" + configuration + "\"")
 		
-		exeFileSrc = $SETTINGS[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
-		exeFileDest = runtime_dir + "MoRE-winmobile" + debug + ".exe" 
+		exe_file_src = $SETTINGS[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
+		exe_file_dest = runtime_dir + "MoRE-winmobile" + debug + ".exe" 
 		
-		if File.exist? exeFileSrc
-			File.copy(exeFileSrc, exeFileDest)
+		if File.exist? exe_file_src
+			File.copy(exe_file_src, exe_file_dest)
 		else
 			puts "Build failed."
 		end
 		
-		
-		
-		
 		# Restore config_platform.h
-		if configFileDestExist == true
-			File.copy(configBakFile, configFileDest)
-			File.delete configBakFile
-		else
-			File.delete configFileDest
-		end
+		revert_backupped_file(config_file_dest)
 	end
 
 	def sp2003(runtime_dir)
-		build_wince(runtime_dir, "release", "sp2003")
-		build_wince(runtime_dir, "debug", "sp2003")	
+		build_wince(runtime_dir, "", "sp2003")
+		build_wince(runtime_dir, "D", "sp2003")	
 	end
 
 	def wm5(runtime_dir)
-		build_wince(runtime_dir, "release", "wm5")
-		build_wince(runtime_dir, "debug", "wm5")	
+		build_wince(runtime_dir, "", "wm5")
+		build_wince(runtime_dir, "D", "wm5")	
 	end
 end

@@ -16,13 +16,35 @@
 
 # usage: ruby RuntimeBuilder.rb <Settings.rb file> <platform> <runtime directory (containing config.h)>
 
+def backup_file(file)
+	bak = file + ".bak"
+	if File.exist? bak
+		File.delete bak
+	end
+	
+	if !File.exist? file
+		return
+	end
+	
+	File.copy(file, bak)
+end
+
+def revert_backupped_file(file)
+	bak = file + ".bak"
+
+	if File.exist? bak	
+		File.copy(bak, file)
+		File.delete bak
+	end
+end
+
 class RuntimeBuilder 	
 	def method_missing(method, *args) 
 		puts "RuntimeBuilder failed: invalid platform " + method.to_s
 	end
 
 	def build(platform, runtime_dir)		
-		puts "building " + platform
+		puts "Building " + platform
 		send(platform, runtime_dir)
 	end
 end
