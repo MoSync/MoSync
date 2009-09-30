@@ -26,18 +26,23 @@ class RuntimeBuilder
 		end
 		
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		configFile = $settings[:wince_source] + "config_platform.h"	
-		configFileExist = File.exist? configFile
+		configFileDest = $settings[:wince_source] + "config_platform.h"	
+		configFileDestExist = File.exist? configFileDest
+		configFileSrc = runtime_dir + "config" + debug + ".h"
+		if (File.exist? configFileSrc) == false
+			puts configFileSrc + " missing."
+			return
+		end
 	
-		if configFileExist == true
+		if configFileDestExist == true
 			configBakFile = $settings[:wince_source] + "config_platform.h.bak"
 			if File.exist? configBakFile
 				File.delete configBakFile
 			end
-			File.copy(configFile, configBakFile)
+			File.copy(configFileDest, configBakFile)
 		end
 		
-		File.copy(runtime_dir + "config" + debug + ".h", configFile)
+		File.copy(configFileSrc, configFileDest)
 		
 		if (version == "sp2003")
 			configuration = "Smartphone 2003 (ARMV4)"
@@ -47,13 +52,24 @@ class RuntimeBuilder
 		
 		system("build_wince.bat \"" + $settings[:wince_source] + "\" \"Release|" + configuration + "\"")
 		
-		File.copy($settings[:wince_source] + configuration + "/Release/MoRE-winmobile.exe",
-		runtime_dir + "MoRE-winmobile" + debug + ".exe")
+		exeFileSrc = $settings[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
+		exeFileDest = runtime_dir + "MoRE-winmobile" + debug + ".exe" 
+		
+		if File.exist? exeFileSrc
+			File.copy(exeFileSrc, exeFileDest)
+		else
+			puts "Build failed."
+		end
+		
+		
+		
 		
 		# Restore config_platform.h
-		if configFileExist == true
-			File.copy(configBakFile, configFile)
+		if configFileDestExist == true
+			File.copy(configBakFile, configFileDest)
 			File.delete configBakFile
+		else
+			File.delete configFileDest
 		end
 	end
 

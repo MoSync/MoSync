@@ -28,9 +28,9 @@ $settings = {
 
 		:java_source => "../../runtimes/java/",
 		:symbian_source => "../../runtimes/cpp/platforms/symbian/src/",
-		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/MoRE-winmobile/",
 		
-		:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\WTK2\\lib",
+		:javame_sdk => "C:/SonyEricsson/JavaME_SDK_CLDC/WTK2/lib/",
 
 		:build_commercial => true,
 		:use_arm_recompiler => true,
