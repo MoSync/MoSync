@@ -110,22 +110,15 @@ int main() {
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
-		_mkdir("../../runtimes/java/shared/generated");
+		_mkdir("../../runtimes/java/Shared/generated");
 
 		runCommand("cp Output/maapi.h ../../libs/MAStd");
 		runCommand("cp Output/asm_config.lst " + MOSYNCDIR + "/bin/");
 
-		//runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/source/");
-		runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/shared/generated/");
-
-		//runCommand("cp Output/syscall_static_java.h ../../runtimes/java/source/");
-		runCommand("cp Output/syscall_static_java.h ../../runtimes/java/shared/generated/");
-
-		//runCommand("cp Output/core_consts.h ../../runtimes/java/source/");
-		runCommand("cp Output/core_consts.h ../../runtimes/java/shared/generated/");
-
-		//runCommand("cp Output/MAAPI_consts.h ../../runtimes/java/source/");
-		runCommand("cp Output/MAAPI_consts.h ../../runtimes/java/shared/generated/");
+		runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/Shared/generated/");
+		runCommand("cp Output/syscall_static_java.h ../../runtimes/java/Shared/generated/");
+		runCommand("cp Output/core_consts.h ../../runtimes/java/Shared/generated/");
+		runCommand("cp Output/MAAPI_consts.h ../../runtimes/java/Shared/generated/");
 
 		runCommand("cp Output/cpp_defs.h ../../intlibs/helpers/");
 		runCommand("cp Output/cpp_maapi.h ../../intlibs/helpers/");
@@ -142,8 +135,7 @@ int main() {
 		for(size_t i=0; i<ixs.size(); i++) {
 			runCommand("cp Output/CPP_" + ixs[i] + ".h ../../intlibs/helpers/");
 			runCommand("cp Output/" + ixs[i] + ".h ../../libs/MAStd/");
-			//runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/source/");
-			runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/shared/generated/");
+			runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/Shared/generated/");
 		}
 #endif
 		return 0;
