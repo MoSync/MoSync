@@ -14,6 +14,8 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require 'settings'
+
 require 'ftools'
 require 'fileutils'
 			
@@ -32,20 +34,47 @@ class RuntimeBuilder
 	end
 	
 	def preprocessJavaFile(srcFile, srcDir, platformDir, outputDir, platformDefine)
+	
 #		String jtmpFile = srcFile.replaceAll(".jpp", ".jtmp");
 #		System.out.println(jtmpFile);
+		jtmpFile = srcFile.gsub(/.jpp$/, ".jtmp")
+		
 #		String javaFile = srcFile.replaceAll(".jpp", ".java");
 #		System.out.println(javaFile);
+		javaFile = srcFile.gsub(/.jpp$/, ".java")
+		
 #		exec("xgcc -x c -E -o " + outputDir + jtmpFile + " -D" + platformDefine + " -I" + javaSourceDir + "shared " +
 #		    " -I" + javaSourceDir + platformDir + " " + srcDir + srcFile +
 #			" 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"",
 #			true);
+
 #		exec("sed \"s/^# /\\/\\//\" < " + outputDir + jtmpFile + " > " + outputDir + javaFile, true);
+	end
+
+	def preprocessSharedJavaFiles(outputDir, platformDir, platformDefine)
+#		String sharedSrcDir = javaSourceDir + "shared\\";
+		sharedSrc = $settings[:java_source] + "\\shared";
+#		File f = new File(sharedSrcDir);
+
+#		String files[] = f.list();
+#		for (int i = 0; i < files.length; i++)
+#		{
+#			if (files[i].equals("BigPhatError.jpp") || files[i].equals("Binary.jpp") ||
+#				files[i].equals("BinaryInterface.jpp") || files[i].equals("Core.jpp") ||
+#				files[i].equals("LimitedLengthInputStream.jpp") || files[i].equals("LittleEndianDataInputStream.jpp") ||
+#				files[i].equals("ThreadPool.jpp") || files[i].equals("UBin.jpp") || 
+#				files[i].equals("RefByteArrayOutputStream.jpp") || files[i].equals("Tilemap.jpp") || 
+#				files[i].equals("Tileset.jpp") || files[i].equals("ImageCache.jpp") || 
+#				files[i].equals("MAPanicReport.jpp"))
+#			{
+#				preprocessJavaFile(files[i], sharedSrcDir, platformDir, outputDir, platformDefine);
+#			}
+#		}
 
 	end
 	
 	def javameBuilder(runtime_dir, cldc10)
-		javaMESource = javaSource.concat "/platforms/JavaME/src"
+		javaMESource = $setting[:java_source] + "/platforms/JavaME/src"
 	
 		# Check if its CLCD10
 		
@@ -71,6 +100,7 @@ class RuntimeBuilder
 		File.copy( runtime_dir + "config.h", configFile)
 		
 		# Preprocess all the shared java files and store result in temporary location
+		preprocessSharedJavaFiles(temp_dir, javaMESource, "_JavaME");
 		
 		# Preprocess all the platform dependant java files and store result in temporary location
 		
@@ -94,7 +124,3 @@ class RuntimeBuilder
 	end
 	
 end
-
-rbuild = RuntimeBuilder.new
-rbuild.javame("D:/MoSync/profiles/runtimes/java/1");
-#puts Dir.entries("..//.")
