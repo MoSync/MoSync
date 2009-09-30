@@ -21,10 +21,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 #define BIG_PHAT_ERROR maPanic(0, "eeeerrrorr")
 
+#if 0
 inline int abs(int x) {
 	if(x<0) return -x;
 	else return x;
 }
+#endif
 
 inline long fp_ceil(long x) {
 	x += 0xffff;

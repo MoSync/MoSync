@@ -1,5 +1,5 @@
 
-task :default => ["../idl2/opengl_generated.idl", "../../runtimes/java/source/opengl_invoke_generated.jpp",
+task :default => ["../idl2/opengl_generated.idl", "../../runtimes/java/shared/generated/opengl_invoke_generated.jpp",
 	"../../libs/MAStd/GLES/magl_functions.h"]
 	
 GENFILES = Rake::Task[:default].prerequisites.collect {|path|

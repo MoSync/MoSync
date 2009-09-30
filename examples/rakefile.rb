@@ -20,9 +20,7 @@ SUBDIRS = ["3dLines",
            "MoTris",
            "MoTrix",
            "OtaLoad",
-           "Tiles",
-	   "QuakeMDLWireframe",
-           "QuakeMDLBenchmark"]
+           "Tiles"]
 #TODO: MoRaw
 
 require "../build_rules/subdirs_mosync.rb"

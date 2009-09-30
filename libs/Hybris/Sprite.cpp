@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Sprite.h"
 
 namespace Hybris {
-		Sprite::Sprite(int id, int sizeX, int sizeY, int numFrames, Handle image) : 
+		Sprite::Sprite(int id, int sizeX, int sizeY, int numFrames, MAHandle image) : 
 			id(id), 
 			sizeX(sizeX),
 			sizeY(sizeY),
@@ -29,7 +29,7 @@ namespace Hybris {
 		void Sprite::draw(int x, int y, int frame) {
 			if(frame<0 || frame>=numFrames) return;
 			
-			Extent imageSize = maGetImageSize(image);
+			MAExtent imageSize = maGetImageSize(image);
 			int tx = (sizeX*frame)%(EXTENT_X(imageSize));
 			int ty = ((sizeX*frame)/(EXTENT_X(imageSize)))*sizeY;
 			MARect rect = {tx, ty, sizeX, sizeY};

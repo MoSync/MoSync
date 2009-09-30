@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class PrintFunctor {
 public:
+	virtual ~PrintFunctor() {}
 	virtual int operator()(const char* fmt, ...) = 0;
 };
 
@@ -57,6 +58,7 @@ public:
 	};
 
 	TypeBase(int s, bool simple, Type tt) : size(s), isSimpleValue(simple), type(tt) {}
+	virtual ~TypeBase() {}
 
 	const int size;
 	const bool isSimpleValue;

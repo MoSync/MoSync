@@ -28,7 +28,7 @@ using namespace MoSyncError;
 using namespace Bluetooth;
 #include <MAUtil/mauuid.h>
 
-static int str2ba(const char* str, btaddr_t* bda);
+static int str2ba(const char* str, MABtAddr* bda);
 
 #ifdef _DEBUG
 #define DEBUG_GETCH printf("press a key\n"); _getch()
@@ -40,7 +40,7 @@ int dummy = __COUNTER__;
 
 void myCallback();
 
-Handle gSearchHandle;
+MAHandle gSearchHandle;
 bool gSearching;
 
 const char* FileNameFromPath(const char* path) {
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 		return __COUNTER__;
 	}
 
-	btaddr_t address;
+	MABtAddr address;
 	TEST_NZ(str2ba(argv[1], &address));
 
 	MABtInit();
@@ -106,7 +106,7 @@ void myCallback() {
 	printf("Service done.\n");
 }
 
-int str2ba(const char* str, btaddr_t *bta) {
+int str2ba(const char* str, MABtAddr *bta) {
 	int ai[6];	//address ints
 	if(6 != sscanf_s(str, "%2x%2x%2x%2x%2x%2x", &ai[0], &ai[1], &ai[2], &ai[3], &ai[4], &ai[5])) {
 		return CONNERR_URL;

@@ -41,7 +41,7 @@ int main2() {
 	MAUUID uuid = {{ 1,2,3,4 }};
 	BtSppConnection* conn;
 	int port;
-	ConnAddr addr;
+	MAConnAddr addr;
 
 	Bluetooth::MABtInit();
 

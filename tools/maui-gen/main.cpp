@@ -44,7 +44,7 @@ map<string, string> gImages;
 int gWidgetID = 0;
 string integerToString(int i) {
 	char temp[16];
-	itoa(i, temp, 10);
+	sprintf(temp, "%i", i);
 	return temp;
 }
 
@@ -80,10 +80,9 @@ struct WidgetNode {
 void printWidgetTree(WidgetNode *root, int level=0) {
 	for(int i = 0; i < level; i++) printf(" ");
 	printf("%s\n", root->widgetType.c_str());
-	for(int i = 0; i < root->children.size(); i++) {
+	for(size_t i = 0; i < root->children.size(); i++) {
 		printWidgetTree(root->children[i], level+1)	;
 	}
-
 }
 
 void error(const char *why) {
@@ -93,7 +92,7 @@ void error(const char *why) {
 void findUniqueWidgetTypes(fstream& stream, WidgetNode *root, set<string> &widgetTypes) {
 	if(root->widgetType!="Gui" && root->widgetType!="root")
 		widgetTypes.insert(root->widgetType);
-	for(int i = 0; i < root->children.size(); i++)
+	for(size_t i = 0; i < root->children.size(); i++)
 		findUniqueWidgetTypes(stream, root->children[i], widgetTypes); 
 }
 
@@ -106,7 +105,7 @@ void generateIncludeDirectives(fstream& stream, WidgetNode *root) {
 }
 
 void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
-	size_t index, index2;
+	size_t index;
 	while((index=templateFile.find(whatToReplace))!=string::npos) {
 		int endOfReplacement = index+whatToReplace.length();
 		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
@@ -356,7 +355,7 @@ public:
 
 	void generate(fstream &stream, WidgetNode *node, int level=0) {
 		emit(stream, node);
-		for(int i = 0; i < node->children.size(); i++) { 
+		for(size_t i = 0; i < node->children.size(); i++) { 
 			generate(stream, node->children[i], level+1);
 		}	
 	}
@@ -403,7 +402,7 @@ end(void *data, const char *el) {
 string generateScreenArguments(WidgetNode *root, bool useNamespace=false) {
 	string arguments = "";
 	const vector<WidgetNode*> &screens = root->children;
-	for(int i = 0; i < screens.size(); i++) {
+	for(size_t i = 0; i < screens.size(); i++) {
 		if(screens[i]->widgetType != "Screen") continue;
 		if(useNamespace)
 			arguments += "MAUI::";
@@ -416,7 +415,7 @@ string generateScreenArguments(WidgetNode *root, bool useNamespace=false) {
 string generateScreenInitializerList(WidgetNode *root) {
 	string initializerList = "";
 	const vector<WidgetNode*> &screens = root->children;
-	for(int i = 0; i < screens.size(); i++) {
+	for(size_t i = 0; i < screens.size(); i++) {
 		if(screens[i]->widgetType != "Screen") continue;
 		initializerList += screens[i]->attributes["id"] + "(" + screens[i]->attributes["id"] + ")";
 		if(i!=screens.size()-1) initializerList += ",";

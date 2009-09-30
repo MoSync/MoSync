@@ -6,7 +6,7 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"
 
 if(HOST == "win32") then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/winIconInject", "tools/makesis-2.0.0", "tools/makesis-4"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4"]
 else
 	INTLIB_PLATFORM = HOST
 	PLATFORM_TOOLS = []

@@ -121,6 +121,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				OutputFile="$(MOSYNCDIR)\lib\w32\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

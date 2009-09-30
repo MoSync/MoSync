@@ -23,13 +23,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Hybris {
 	class Sprite {
 	public:
-		Sprite(int id, int sizeX, int sizeY, int numFrames, Handle image);
+		Sprite(int id, int sizeX, int sizeY, int numFrames, MAHandle image);
 		void draw(int x, int y, int frame);
 		int getId();
 		int getWidth();
 		int getHeight();
 	private:
-		Handle image;
+		MAHandle image;
 		int id;
 		int sizeX;
 		int sizeY;
