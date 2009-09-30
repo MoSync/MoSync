@@ -14,7 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-$settings = {
+$SETTINGS = {
 		:build_javame => true,
 		:build_s60v2 => true,
 		:build_s60v3 => true,

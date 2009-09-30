@@ -49,7 +49,7 @@ class RuntimeBuilder
 
 	def preprocessSharedJavaFiles(outputDir, platformDir, platformDefine)
 #		String sharedSrcDir = javaSourceDir + "shared\\";
-		sharedSrc = $settings[:java_source] + "\\shared";
+		sharedSrc = $SETTINGS[:java_source] + "\\shared";
 #		File f = new File(sharedSrcDir);
 		Dir.foreach("testdir") {|x| puts "Got #{x}" }
 #		String files[] = f.list();

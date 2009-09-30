@@ -26,7 +26,7 @@ class RuntimeBuilder
 		end
 		
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		configFileDest = $settings[:wince_source] + "config_platform.h"	
+		configFileDest = $SETTINGS[:wince_source] + "config_platform.h"	
 		configFileDestExist = File.exist? configFileDest
 		configFileSrc = runtime_dir + "config" + debug + ".h"
 		if (File.exist? configFileSrc) == false
@@ -35,7 +35,7 @@ class RuntimeBuilder
 		end
 	
 		if configFileDestExist == true
-			configBakFile = $settings[:wince_source] + "config_platform.h.bak"
+			configBakFile = $SETTINGS[:wince_source] + "config_platform.h.bak"
 			if File.exist? configBakFile
 				File.delete configBakFile
 			end
@@ -50,9 +50,9 @@ class RuntimeBuilder
 			configuration = "Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
 		end
 		
-		system("build_wince.bat \"" + $settings[:wince_source] + "\" \"Release|" + configuration + "\"")
+		system("build_wince.bat \"" + $SETTINGS[:wince_source] + "\" \"Release|" + configuration + "\"")
 		
-		exeFileSrc = $settings[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
+		exeFileSrc = $SETTINGS[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
 		exeFileDest = runtime_dir + "MoRE-winmobile" + debug + ".exe" 
 		
 		if File.exist? exeFileSrc
