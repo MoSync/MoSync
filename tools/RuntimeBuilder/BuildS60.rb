@@ -14,8 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-class runtimeBuilder
-
+class RuntimeBuilder
 	def s60v2(runtime_dir)
 
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
@@ -35,5 +34,4 @@ class runtimeBuilder
 		# Copy the result to the runtime dir
 	
 	end
-
 end

@@ -19,41 +19,51 @@ require 'ftools'
 class RuntimeBuilder 
 
 	def build_wince(runtime_dir, mode, version) 
-		D = (mode=="debug") ? "D" : "";
+		if (mode=="debug") 
+			debug = "D"
+		else
+			debug = ""
+		end
 		
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		configBakFile = settings[:wince_source] + "/config_platform.h.bak"
-		configFile = settings[:wince_source] + "/config_platform.h"
-		
-		if File.exist? configBakFile
-			File.delete configBakFile
+		configFile = $settings[:wince_source] + "config_platform.h"	
+		configFileExist = File.exist? configFile
+	
+		if configFileExist == true
+			configBakFile = $settings[:wince_source] + "config_platform.h.bak"
+			if File.exist? configBakFile
+				File.delete configBakFile
+			end
+			File.copy(configFile, configBakFile)
 		end
-		File.copy(configFile, configBakFile)
-		File.copy( runtime_dir + "config" + D + ".h", configFile)
 		
-		if (version == "sp2003") {
+		File.copy(runtime_dir + "config" + debug + ".h", configFile)
+		
+		if (version == "sp2003")
 			configuration = "Smartphone 2003 (ARMV4)"
 		else
 			configuration = "Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
 		end
 		
-		system("build_wince.bat \"" + winceSourceDir + "\" \"Release|" + configuration + "\"")
+		system("build_wince.bat \"" + $settings[:wince_source] + "\" \"Release|" + configuration + "\"")
 		
-		File.copy(settings[:wince_source] + configuration + "\\Release\\MoRE-winmobile.exe",
-		runtime_dir + "MoRE-winmobile" + D + ".exe")
+		File.copy($settings[:wince_source] + configuration + "/Release/MoRE-winmobile.exe",
+		runtime_dir + "MoRE-winmobile" + debug + ".exe")
 		
 		# Restore config_platform.h
-		File.copy(configBakFile, configFile)
-		File.delete configBakFile	
+		if configFileExist == true
+			File.copy(configBakFile, configFile)
+			File.delete configBakFile
+		end
 	end
 
 	def sp2003(runtime_dir)
-		build_wince(runtime_dir, "release" "sp2003")
+		build_wince(runtime_dir, "release", "sp2003")
 		build_wince(runtime_dir, "debug", "sp2003")	
 	end
 
 	def wm5(runtime_dir)
-		build_wince(runtime_dir, "release" "wm5")
+		build_wince(runtime_dir, "release", "wm5")
 		build_wince(runtime_dir, "debug", "wm5")	
 	end
 end

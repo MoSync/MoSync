@@ -21,9 +21,9 @@ class RuntimeBuilder
 		puts "RuntimeBuilder failed: invalid platform " + method.to_s
 	end
 
-	def build(platform, mode, runtime_dir)		
+	def build(platform, runtime_dir)		
 		puts "building " + platform
-		send(platform, mode, runtime_dir)
+		send(platform, runtime_dir)
 	end
 end
 
