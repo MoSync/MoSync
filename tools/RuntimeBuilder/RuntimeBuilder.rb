@@ -21,17 +21,16 @@ class RuntimeBuilder
 		puts "RuntimeBuilder failed: invalid platform " + method.to_s
 	end
 
-	def build(platform, runtime_dir)		
+	def build(platform, mode, runtime_dir)		
 		puts "building " + platform
-		send(platform, runtime_dir)
+		send(platform, mode, runtime_dir)
 	end
-
 end
 
 require ARGV[0]
-include "BuildJavaME.rb"
-include "BuildS60.rb"
-include "BuildWinCE.rb"
+require "BuildJavaME.rb"
+require "BuildS60.rb"
+require "BuildWinCE.rb"
 
 runtime_builder = RuntimeBuilder.new
 runtime_builder.build(ARGV[1], ARGV[2])
