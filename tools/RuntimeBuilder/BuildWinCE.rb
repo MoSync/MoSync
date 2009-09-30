@@ -19,7 +19,7 @@ require 'ftools'
 class RuntimeBuilder 
 
 	def build_wince(runtime_dir, debug, version) 
-		puts (debug=="D")?"Building debug.":"Building release."
+		puts (debug=="D")? "Building debug.":"Building release."
 		
 		config_file_dest = $SETTINGS[:wince_source] + "config_platform.h"	
 		config_file_src = runtime_dir + "config" + debug + ".h"

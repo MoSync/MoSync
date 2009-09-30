@@ -17,7 +17,7 @@
 class RuntimeBuilder
 
 	def build_symbian(runtime_dir, debug, version) 
-		puts (debug=="D")?"Building debug.":"Building release."
+		puts (debug=="D")? "Building debug.":"Building release."
 	
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = runtime_dir + "config" + debug + ".h"
@@ -46,21 +46,21 @@ class RuntimeBuilder
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/";
 			sis_dir = $SETTINGS[:symbian_source] + "sis/";
-			app_file = epoc_dir + "release\\armi\\urel\\MoSync.app"
+			app_file = epoc_dir + "release/armi/urel/MoSync.app"
 			
 			if(!File.exist? app_file) 
 				puts "Build failed."
 				return
 			end			
 			
-			File.copy(app_file, runtime_dir + "\\MoSync" + debug + ".app")
-			File.copy(epoc_dir + "data\\z\\system\\apps\\MoSync\\MoSync.rsc", runtime_dir + "\\MoSync.rsc")
-			File.copy(epoc_dir +"data\\z\\system\\apps\\MoSync\\MoSync_caption.rsc", runtime_dir + "\\MoSync_caption.rsc")
+			File.copy(app_file, runtime_dir + "MoSync" + debug + ".app")
+			File.copy(epoc_dir + "data/z/system/apps/MoSync/MoSync.rsc", runtime_dir + "/MoSync.rsc")
+			File.copy(epoc_dir +"data/z/system/apps/MoSync/MoSync_caption.rsc", runtime_dir + "MoSync_caption.rsc")
 			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")			
 		else
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = $SETTINGS[:symbian_source] + "sis-ed3/"		
-			exe_file = epoc_dir + "release\\gcce\\urel\\MoSync2.exe"
+			exe_file = epoc_dir + "release/gcce/urel/MoSync2.exe"
 			
 			if(!File.exist? exe_file) 
 				puts "Build failed."
@@ -68,8 +68,8 @@ class RuntimeBuilder
 			end
 		
 			File.copy(exe_file, runtime_dir + "MoSync" + debug + ".exe")
-			File.copy(epoc_dir + "data\\z\\resource\\apps\\MoSync_3rd.RSC", runtime_dir + "MoSync.RSC")
-			File.copy(epoc_dir +"data\\z\\private\\10003a3f\\import\\apps\\MoSync_reg.RSC", runtime_dir + "MoSync_reg.RSC")
+			File.copy(epoc_dir + "data/z/resource/apps/MoSync_3rd.RSC", runtime_dir + "MoSync.RSC")
+			File.copy(epoc_dir +"data/z/private/10003a3f/import/apps/MoSync_reg.RSC", runtime_dir + "MoSync_reg.RSC")
 			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")
 		end
 		
