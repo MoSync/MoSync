@@ -38,7 +38,14 @@ def revert_backupped_file(file)
 	end
 end
 
-class RuntimeBuilder 	
+class RuntimeBuilder
+	def system(str)
+		if $SETTINGS[:log_system_calls]
+			puts str
+		end
+		Kernel.system(str)
+	end
+	
 	def method_missing(method, *args) 
 		puts "RuntimeBuilder failed: invalid platform " + method.to_s
 	end

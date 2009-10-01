@@ -14,70 +14,66 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require 'settings'
-
 require 'ftools'
 require 'fileutils'
 			
 class RuntimeBuilder 
-	
 	def javame(runtime_dir)
-		javameBuilder(runtime_dir, false);
+		javameBuilder(runtime_dir, false, "release");
+		javameBuilder(runtime_dir, false, "debug");
 	end
 	
 	def javamecldc10(runtime_dir)
-		javameBuilder(runtime_dir, true);
+		javameBuilder(runtime_dir, true, "release");
+		javameBuilder(runtime_dir, true, "debug");
 	end
 	
-	def preprocessJavaFile(srcFile, srcDir, platformDir, outputDir, platformDefine)
-	
-#		String jtmpFile = srcFile.replaceAll(".jpp", ".jtmp");
-#		System.out.println(jtmpFile);
-		jtmpFile = srcFile.gsub(/.jpp$/, ".jtmp")
+	def preprocess_java_file(src_file, src_dir, platform_dir, output_dir, platform_define)
+		jtmp_file = src_file.gsub(/.jpp$/, ".jtmp")		
+		java_file = src_file.gsub(/.jpp$/, ".java")
 		
-#		String javaFile = srcFile.replaceAll(".jpp", ".java");
-#		System.out.println(javaFile);
-		javaFile = srcFile.gsub(/.jpp$/, ".java")
+		puts "Processing " + java_file
 		
-#		exec("xgcc -x c -E -o " + outputDir + jtmpFile + " -D" + platformDefine + " -I" + javaSourceDir + "shared " +
-#		    " -I" + javaSourceDir + platformDir + " " + srcDir + srcFile +
-#			" 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"",
-#			true);
-
-#		exec("sed \"s/^# /\\/\\//\" < " + outputDir + jtmpFile + " > " + outputDir + javaFile, true);
+		# Preprocess the jpp file into a jtmp file, sed fixes the output if any
+		system("xgcc -x c -E -o " + output_dir + jtmp_file + " -D" + platform_define + " -I" + $SETTINGS[:java_source] +
+		     "shared " + " -I" + platform_dir + " " + src_dir  + src_file + 
+			 " 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
+		
+		# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
+		system("sed \"s/^# /\\/\\//\" < " + output_dir  + jtmp_file + " > " + output_dir + java_file);
 	end
 
-	def preprocessSharedJavaFiles(outputDir, platformDir, platformDefine)
-#		String sharedSrcDir = javaSourceDir + "shared\\";
-		sharedSrc = $SETTINGS[:java_source] + "\\shared";
-#		File f = new File(sharedSrcDir);
-		Dir.foreach("testdir") {|x| puts "Got #{x}" }
-#		String files[] = f.list();
-#		for (int i = 0; i < files.length; i++)
-#		{
-#			if (files[i].equals("BigPhatError.jpp") || files[i].equals("Binary.jpp") ||
-#				files[i].equals("BinaryInterface.jpp") || files[i].equals("Core.jpp") ||
-#				files[i].equals("LimitedLengthInputStream.jpp") || files[i].equals("LittleEndianDataInputStream.jpp") ||
-#				files[i].equals("ThreadPool.jpp") || files[i].equals("UBin.jpp") || 
-#				files[i].equals("RefByteArrayOutputStream.jpp") || files[i].equals("Tilemap.jpp") || 
-#				files[i].equals("Tileset.jpp") || files[i].equals("ImageCache.jpp") || 
-#				files[i].equals("MAPanicReport.jpp"))
-#			{
-#				preprocessJavaFile(files[i], sharedSrcDir, platformDir, outputDir, platformDefine);
-#			}
-#		}
+	def preprocess_shared_java_files(output_dir, platform_dir, platform_define)
+		shared_src = $SETTINGS[:java_source] + "shared/";
 
+		Dir.foreach(shared_src) {|x| 
+			if (x == "BigPhatError.jpp" || x == "Binary.jpp" || x == "BinaryInterface.jpp" || x == "Core.jpp" ||
+				x == "LimitedLengthInputStream.jpp" || x == "LittleEndianDataInputStream.jpp" || x == "ThreadPool.jpp" || 
+				x == "UBin.jpp" || x == "RefByteArrayOutputStream.jpp" || x == "Tilemap.jpp" || x == "Tileset.jpp" ||
+				x == "ImageCache.jpp" || x == "MAPanicReport.jpp" )
+				preprocess_java_file(x, shared_src, platform_dir, output_dir, platform_define)
+			end
+		}
 	end
 	
-	def javameBuilder(runtime_dir, cldc10)
-		javaMESource = $setting[:java_source] + "/platforms/JavaME/src"
-	
-		# Check if its CLCD10
+	def javameBuilder(runtime_dir, cldc10, mode)
+		if (mode=="debug") 
+			debug = "D"
+		else
+			debug = ""
+		end
 		
-		# Set up dirs in temporary location
-		temp_dir = runtime_dir + "/temp"
-		if File.exist?(temp_dir)
-			if !File.directory?(temp_dir)
+		if !File.exist? runtime_dir + "config" + debug + ".h"
+			puts "\nWARNING! - " + runtime_dir + "config" + debug + ".h doesn't exist.. skipping this runtime!\n\n"
+			return
+		end
+		
+		java_me_source = $SETTINGS[:java_source] + "platforms/JavaME/src"
+		
+		# Set up temporary dir
+		temp_dir = runtime_dir + "temp/"
+		if File.exist? temp_dir
+			if !File.directory? temp_dir
 				File.delete temp_dir # oops, it was a file. This is strange, just delete it
 			else
 				FileUtils.rm_rf temp_dir # delete everything in it and itself
@@ -85,88 +81,120 @@ class RuntimeBuilder
 		end
 		Dir.mkdir(temp_dir); # No such directory/file.. create a temp directory
 		
-		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		configBakFile = javaMESource + "/config_platform.h.bak"
-		configFile = javaMESource + "/config_platform.h"
+		# Set up class dir
+		class_dir = runtime_dir + "class/"
+		if File.exist? class_dir
+			if !File.directory? class_dir
+				File.delete class_dir # oops, it was a file. This is strange, just delete it
+			else
+				FileUtils.rm_rf class_dir # delete everything in it and itself
+			end
+		end
+		Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 		
-		if File.exist? configBakFile
-			File.delete configBakFile
+		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
+		config_bak_file = java_me_source + "/config_platform.h.bak"
+		config_file = java_me_source + "/config_platform.h"
+		
+		if File.exist? config_bak_file
+			File.delete config_bak_file
 		end
-		if File.exist? configFile
-			File.copy(configFile, configBakFile)
+		if File.exist? config_file
+			File.copy(config_file, config_bak_file)
 		end
-		File.copy( runtime_dir + "config.h", configFile)
+		File.copy( runtime_dir + "config" + debug + ".h", config_file)
 		
 		# Preprocess all the shared java files and store result in temporary location
-		preprocessSharedJavaFiles(temp_dir, javaMESource, "_JavaME");
+		preprocess_shared_java_files(temp_dir, java_me_source, "_JavaME");
 		
 		# Preprocess all the platform dependant java files and store result in temporary location
+		Dir.foreach(java_me_source) {|x| 
+			if (x == "MainCanvas.jpp" || x == "MAMidlet.jpp" || x == "Syscall.jpp" || x == "Core.jpp" ||
+				(x == "Real.jpp" && cldc10))
+				preprocess_java_file(x, java_me_source+"/", java_me_source, temp_dir, "_JavaME")
+			end
+		}
 		
 		# Restore config_platform.h
-		if File.exist? configBakFile
-			File.copy(configBakFile, configFile)
-			File.delete configBakFile
+		if File.exist? config_bak_file
+			File.copy(config_bak_file, config_file)
+			File.delete config_bak_file
 		end	
 	
+		java_me_sdk = $SETTINGS[:javame_sdk]
+	
 		# Compile Java source
-#		exec("javac -source 1.4 -target 1.4 " + " -d " + classDir + " -classpath " + classDir +
-#			" -bootclasspath " +
-#			javaMESdkDir + "j2melib\\jsr082.jar;" +
-#			javaMESdkDir + "j2melib\\cldcapi11.jar;" +
-#			javaMESdkDir + "j2melib\\midpapi20.jar;" +
-#			javaMESdkDir + "j2melib\\wma20.jar;" +
-#			javaMESdkDir + "j2melib\\jsr179.jar " + " " +
-#			tempDir + "*.java", true);
+		puts "Compiling java source.."
+		system("javac -source 1.4 -target 1.4 " + " -d " + class_dir + " -classpath " + class_dir +
+			" -bootclasspath " +
+			java_me_sdk + "j2melib/jsr082.jar;" +
+			java_me_sdk + "j2melib/cldcapi11.jar;" +
+			java_me_sdk + "j2melib/midpapi20.jar;" +
+			java_me_sdk + "j2melib/wma20.jar;" +
+			java_me_sdk + "j2melib/jsr179.jar " + " " +
+			temp_dir + "*.java");
 			
 		# Generate Manifest file
-#		DataOutputStream dos = new DataOutputStream(new FileOutputStream(tempDir + "\\manifest.mf"));
-#		writeDosCompatibleString(dos, "MIDlet-1: MoSyncRuntime" + vmInfo.number +
-#			" , MoSyncRuntime" + vmInfo.number + ".png, MAMidlet\n");
-#		writeDosCompatibleString(dos, "MIDlet-Name: MAMidlet\n");
-#		writeDosCompatibleString(dos, "MIDlet-Vendor: Mobile Sorcery\n");
-#		writeDosCompatibleString(dos, "MIDlet-Version: 1.0\n");
-#		writeDosCompatibleString(dos, "MicroEdition-Configuration: CLDC-1.1\n");
-#		writeDosCompatibleString(dos, "MicroEdition-Profile: MIDP-2.0\n");
-#		dos.close();
+		puts "Generating manifest file.."
+		runtime_number = runtime_dir.split('/')[-1] # extract which runtime number it is from the path
+		File.open(temp_dir + "manifest.mf", "w")  do |infile|
+			infile.puts("MIDlet-1: MoSyncRuntime" + runtime_number + " , MoSyncRuntime" + runtime_number + ".png, MAMidlet\n")
+			infile.puts("MIDlet-Name: MAMidlet\n");
+			infile.puts("MIDlet-Vendor: Mobile Sorcery\n");
+			infile.puts("MIDlet-Version: 1.0\n");
+			infile.puts("MicroEdition-Configuration: CLDC-1.1\n");
+			infile.puts("MicroEdition-Profile: MIDP-2.0\n");
+		end
 		
 		# Build jar file
-#		exec("jar cfm " +
-#		runtimeDir + "MoSyncRuntimeTemp.jar " +
-#		tempDir + "manifest.mf " +
-#		"-C " + classDir + " .", true);
+		puts "Building jar file.."
+		dos_class_dir = class_dir.gsub(/\//, "\\") # fixes the slashes so that the jar file gets it right
+		system("jar cfm " + runtime_dir + "MoSyncRuntimeTemp.jar " + temp_dir + "manifest.mf " + "-C " + dos_class_dir + " .");
+		
+		if !File.exist? runtime_dir + "MoSyncRuntimeTemp.jar"
+			puts "\nFATAL ERROR! - Unable to build jar file, check previous output for errors!\n\n"
+			return
+		end
 		
 		# Obfuscate java binaries
-#		exec("java " +
-#		"-jar " + javaMESdkDir + "bin\\proguard.jar " +
-#		"-injars " + runtimeDir + "MoSyncRuntimeTemp.jar " +
-#		"-libraryjars " + javaMESdkDir + "j2melib\\cldcapi11.jar " +
-#		"-libraryjars " + javaMESdkDir + "j2melib\\midpapi20.jar " +
-#		"-libraryjars " + javaMESdkDir + "j2melib\\jsr082.jar " +
-#		"-libraryjars " + javaMESdkDir + "j2melib\\jsr179.jar " +
-#		"-libraryjars " + javaMESdkDir + "j2melib\\wma20.jar " +
-#		"-dontusemixedcaseclassnames " +
-#		"-outjars " + runtimeDir + "MoSyncRuntimeObfuscated.jar " +
-#		"-keep public class MAMidlet", true);
+		puts "Obfuscating java binaries.."
+		system("java " +
+		"-jar " + java_me_sdk + "bin/proguard.jar " +
+		"-injars " + runtime_dir + "MoSyncRuntimeTemp.jar " +
+		"-libraryjars " + java_me_sdk + "j2melib/cldcapi11.jar " +
+		"-libraryjars " + java_me_sdk + "j2melib/midpapi20.jar " +
+		"-libraryjars " + java_me_sdk + "j2melib/jsr082.jar " +
+		"-libraryjars " + java_me_sdk + "j2melib/jsr179.jar " +
+		"-libraryjars " + java_me_sdk + "j2melib/wma20.jar " +
+		"-dontusemixedcaseclassnames " +
+		"-outjars " + runtime_dir + "MoSyncRuntimeObfuscated.jar " +
+		"-keep public class MAMidlet");
 		
-#		String D = debug ? "D" : "";
-#		exec("move " + runtimeDir + "MoSyncRuntimeObfuscated.jar " + runtimeDir +
-#			"MoSyncRuntime" + D + ".jar ", true);
+		File.copy(runtime_dir + "MoSyncRuntimeObfuscated.jar", runtime_dir + "MoSyncRuntime" + debug + ".jar" )
 		
 		# Preverify java binaries
-#		exec(javaMESdkDir + "bin\\" + "preverify " +
-#			//				"-d " + preverifiedClassDir + " " +
-#		"-d " + runtimeDir.substring(0, runtimeDir.length() - 1) + " " +
-#		"-classpath " +
-#			//				runtimeDir + "MoSyncRuntimeObfuscated.jar" +
-#		javaMESdkDir + "j2melib\\jsr082.jar;" +
-#		javaMESdkDir + "j2melib\\cldcapi11.jar;" +
-#		javaMESdkDir + "j2melib\\midpapi20.jar;" +
-#		javaMESdkDir + "j2melib\\jsr179.jar;" +
-#		javaMESdkDir + "j2melib\\wma20.jar " +
-#		runtimeDir + "MoSyncRuntime" + D + ".jar", true);
+		puts "Preverifying java binaries.."
+		system(java_me_sdk + "bin/" + "preverify " +
+		"-d " + runtime_dir[0..-2] + " " +
+		"-classpath " +
+		java_me_sdk + "j2melib/jsr082.jar;" +
+		java_me_sdk + "j2melib/cldcapi11.jar;" +
+		java_me_sdk + "j2melib/midpapi20.jar;" +
+		java_me_sdk + "j2melib/jsr179.jar;" +
+		java_me_sdk + "j2melib/wma20.jar " +
+		runtime_dir + "MoSyncRuntime" + debug + ".jar")
 		
 		# Clean and delete all the temporary folders
 		FileUtils.rm_rf temp_dir
+		FileUtils.rm_rf class_dir
+		File.delete(runtime_dir + "MoSyncRuntimeObfuscated.jar")
+		File.delete(runtime_dir + "MoSyncRuntimeTemp.jar")
+		
+		if !File.exist? runtime_dir + "MoSyncRuntime" + debug + ".jar"
+			puts "\nFATAL ERROR! - No jar file built, check previous output for errors!\n\n"
+		else
+			puts "\nFINISHED! - " + runtime_dir + "MoSyncRuntime" + debug + ".jar was succesfully generated!\n\n"
+		end
 		
 	end
 	
