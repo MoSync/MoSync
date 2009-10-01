@@ -26,25 +26,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CI_RELEASED 0
 #define CI_PRESSED 1
 
-static StartTimerCallback startTimerCallback = 0;
-static StopTimerCallback stopTimerCallback = 0;
+static StartTimerCallback sStartTimerCallback = 0;
+static StopTimerCallback sStopTimerCallback = 0;
 
-static CharCallback characterChangedCallback = 0;
-static CharCallback characterDeployedCallback = 0;
-static void* characterChangedUserData = 0;
-static void* characterDeployedUserData = 0;
+static CharCallback sCharacterChangedCallback = 0;
+static CharCallback sCharacterDeployedCallback = 0;
+static void* sCharacterChangedUserData = 0;
+static void* sCharacterDeployedUserData = 0;
 
-static int currentCharMapIndex = 0;
-static int currentCharMapListIndex = 0;
+static int sCurrentCharMapIndex = 0;
+static int sCurrentCharMapListIndex = 0;
 
-static int currentMode = CI_INACTIVE;
-static int currentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
+static int sCurrentMode = CI_INACTIVE;
+static int sCurrentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
 
 void CharInput_Reset() {
-	currentCharMapIndex = 0;
-	currentCharMapListIndex = 0;
-	currentMode = CI_INACTIVE;
-	currentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
+	sCurrentCharMapIndex = 0;
+	sCurrentCharMapListIndex = 0;
+	sCurrentMode = CI_INACTIVE;
+	sCurrentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
 }
 
 #if defined(NOKIA)
@@ -88,13 +88,13 @@ static char getChar(int charMode) {
 	char c;
 	switch(charMode) {
 		case CI_MODE_CHAR_MODE_LOWERCASE:
-			c = charMapLowerCase[currentCharMapIndex][currentCharMapListIndex];
+			c = charMapLowerCase[sCurrentCharMapIndex][sCurrentCharMapListIndex];
 			break;
 		case CI_MODE_CHAR_MODE_UPPERCASE:
-			c = charMapUpperCase[currentCharMapIndex][currentCharMapListIndex];
+			c = charMapUpperCase[sCurrentCharMapIndex][sCurrentCharMapListIndex];
 			break;
 		case CI_MODE_CHAR_MODE_NUMBERS:
-			c = numMap[currentCharMapIndex];
+			c = numMap[sCurrentCharMapIndex];
 			break;
 		default:
 			c = 0;
@@ -103,37 +103,37 @@ static char getChar(int charMode) {
 }
 
 static void CharInput_ShortPress(void) {
-	if(stopTimerCallback)
-		stopTimerCallback();
+	if(sStopTimerCallback)
+		sStopTimerCallback();
 
-	if(currentMode == CI_INACTIVE) return;
+	if(sCurrentMode == CI_INACTIVE) return;
 
-	if(characterDeployedCallback)
-		characterDeployedCallback(getChar(currentCharMode), characterDeployedUserData);
-	currentMode = CI_INACTIVE;
+	if(sCharacterDeployedCallback)
+		sCharacterDeployedCallback(getChar(sCurrentCharMode), sCharacterDeployedUserData);
+	sCurrentMode = CI_INACTIVE;
 }
 
 static void CharInput_LongPress(void) {
-	if(stopTimerCallback)
-		stopTimerCallback();
+	if(sStopTimerCallback)
+		sStopTimerCallback();
 
-	if(currentMode == CI_INACTIVE) return;
+	if(sCurrentMode == CI_INACTIVE) return;
 
-	if(characterDeployedCallback)
-		characterDeployedCallback(getChar(CI_MODE_CHAR_MODE_NUMBERS), characterDeployedUserData);
-	currentMode = CI_INACTIVE;
+	if(sCharacterDeployedCallback)
+		sCharacterDeployedCallback(getChar(CI_MODE_CHAR_MODE_NUMBERS), sCharacterDeployedUserData);
+	sCurrentMode = CI_INACTIVE;
 }
 
 void CharInput_setMode(int charMode) {
-	currentCharMode = charMode;
+	sCurrentCharMode = charMode;
 }
 
 int CharInput_getMode() {
-	return currentCharMode; 
+	return sCurrentCharMode; 
 }
 
 void CharInput_Pressed(int keyCode) {
-	int newCharMapIndex = currentCharMapIndex;
+	int newCharMapIndex = sCurrentCharMapIndex;
 	switch(keyCode) {
 		case MAK_0:
 			newCharMapIndex = 10;
@@ -157,60 +157,60 @@ void CharInput_Pressed(int keyCode) {
 			return;
 	}
 
-	if(currentMode == CI_ACTIVE && newCharMapIndex == currentCharMapIndex) {
-		currentCharMapListIndex++;
-		if(getChar(currentCharMode) == 0) {
-			currentCharMapListIndex = 0;
+	if(sCurrentMode == CI_ACTIVE && newCharMapIndex == sCurrentCharMapIndex) {
+		sCurrentCharMapListIndex++;
+		if(getChar(sCurrentCharMode) == 0) {
+			sCurrentCharMapListIndex = 0;
 		}
 	} else {
-		if(currentMode == CI_ACTIVE) {
-			if(characterDeployedCallback)
-				characterDeployedCallback(getChar(currentCharMode), characterDeployedUserData);
+		if(sCurrentMode == CI_ACTIVE) {
+			if(sCharacterDeployedCallback)
+				sCharacterDeployedCallback(getChar(sCurrentCharMode), sCharacterDeployedUserData);
 		}
 
-		currentCharMapListIndex = 0;
-		currentCharMapIndex = newCharMapIndex;
+		sCurrentCharMapListIndex = 0;
+		sCurrentCharMapIndex = newCharMapIndex;
 	}
 
-	if(characterChangedCallback)
-		characterChangedCallback(getChar(currentCharMode), characterChangedUserData);
+	if(sCharacterChangedCallback)
+		sCharacterChangedCallback(getChar(sCurrentCharMode), sCharacterChangedUserData);
 
-	currentMode = CI_ACTIVE;
+	sCurrentMode = CI_ACTIVE;
 
-	if(stopTimerCallback)
-		stopTimerCallback();
-	if(startTimerCallback)
-		startTimerCallback(CharInput_LongPress, CI_LONG_PRESS_TIME);
+	if(sStopTimerCallback)
+		sStopTimerCallback();
+	if(sStartTimerCallback)
+		sStartTimerCallback(CharInput_LongPress, CI_LONG_PRESS_TIME);
 }
 
 void CharInput_Released(int keyCode) {
-	if(stopTimerCallback)
-		stopTimerCallback();
-	if(startTimerCallback)
-		startTimerCallback(CharInput_ShortPress, CI_SHORT_PRESS_TIME);
+	if(sStopTimerCallback)
+		sStopTimerCallback();
+	if(sStartTimerCallback)
+		sStartTimerCallback(CharInput_ShortPress, CI_SHORT_PRESS_TIME);
 }
 
 void CharInput_RegisterTimerCallback(StartTimerCallback startCallback, StopTimerCallback stopCallback) {
-	startTimerCallback = startCallback;
-	stopTimerCallback = stopCallback;
+	sStartTimerCallback = startCallback;
+	sStopTimerCallback = stopCallback;
 }
 
 void CharInput_RegisterCharacterChangedCallback(CharCallback callback, void *userData) {
-	characterChangedUserData = userData;
-	characterChangedCallback = callback;
+	sCharacterChangedUserData = userData;
+	sCharacterChangedCallback = callback;
 }
 
 void CharInput_RegisterCharacterDeployedCallback(CharCallback callback, void *userData) {
-	characterDeployedUserData = userData;
-	characterDeployedCallback = callback;
+	sCharacterDeployedUserData = userData;
+	sCharacterDeployedCallback = callback;
 }
 
 const char* CharInput_getCurrentCharList() {
-	return (const char*) charMapUpperCase[currentCharMapIndex];
+	return (const char*) charMapUpperCase[sCurrentCharMapIndex];
 }
 
 int CharInput_getCurrentCharListIndex() {
-	return currentCharMapListIndex;
+	return sCurrentCharMapListIndex;
 }
 
 void CharInput_ForceDeployment() {
