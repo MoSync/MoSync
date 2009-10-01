@@ -28,9 +28,6 @@ class RuntimeBuilder
 		backup_file(config_file_dest)
 		File.copy(config_file_src, config_file_dest)
 		
-		puts Dir.entries runtime_dir
-		puts Dir.entries $SETTINGS[:symbian_source] + "inc"
-		
 		if version == "s60v2"
 			group_dir = $SETTINGS[:symbian_source] + "group"
 			default = "@S60_2nd_FP3:com.nokia.series60"
