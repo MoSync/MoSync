@@ -72,8 +72,8 @@ namespace MAUtil {
 		sd = getEmptyData();
 	}
 
-	String::String(int capacity) {
-		sd = new StringData(capacity);
+	String::String(int aCapacity) {
+		sd = new StringData(aCapacity);
 		resize(0);
 	}
 
