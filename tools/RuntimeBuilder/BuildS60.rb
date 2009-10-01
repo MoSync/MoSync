@@ -26,21 +26,31 @@ class RuntimeBuilder
 			return
 		end		
 		backup_file(config_file_dest)
-
+		File.copy(config_file_src, config_file_dest)
+		
+		puts Dir.entries runtime_dir
+		puts Dir.entries $SETTINGS[:symbian_source] + "inc"
+		
 		if version == "s60v2"
 			group_dir = $SETTINGS[:symbian_source] + "group"
 			default = "@S60_2nd_FP3:com.nokia.series60"
+			symbian_system = "armi"
 		else
 			group_dir = $SETTINGS[:symbian_source] + "group-ed3"
-			default = "@S60_3rd_FP1:com.nokia.s60"		
+			default = "@S60_3rd_FP1:com.nokia.s60"
+			symbian_system = "gcce"			
 		end
 		
+		# store the current dir and change to the group dir
 		cwd = Dir.pwd
 		Dir.chdir group_dir
+		
 		system("devices -setdefault " + default)
 		system("bldmake bldfiles");
-		system("abld clean armi urel");
-		system("abld build armi urel");		
+		system("call abld clean " + symbian_system + " urel");
+		system("call abld build " + symbian_system + " urel");		
+		
+		# go back to the initial directory
 		Dir.chdir cwd
 		
 		if version == "s60v2"
