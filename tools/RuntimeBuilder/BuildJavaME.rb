@@ -92,15 +92,8 @@ class RuntimeBuilder
 		Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 		
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		config_bak_file = "#{java_me_source}/config_platform.h.bak"
-		config_file = "#{java_me_source}/config_platform.h"
-		
-		if File.exist? config_bak_file
-			File.delete config_bak_file
-		end
-		if File.exist? config_file
-			File.copy(config_file, config_bak_file)
-		end
+		config_file = "#{java_me_source}/config_platform.h"		
+		backup_file config_file
 		File.copy( "#{runtime_dir}config#{debug}.h", config_file)
 		
 		# Preprocess all the shared java files and store result in temporary location
@@ -115,10 +108,7 @@ class RuntimeBuilder
 		}
 		
 		# Restore config_platform.h
-		if File.exist? config_bak_file
-			File.copy(config_bak_file, config_file)
-			File.delete config_bak_file
-		end	
+		revert_backupped_file config_file
 	
 		java_me_sdk = $SETTINGS[:javame_sdk]
 	
