@@ -1,5 +1,6 @@
 require 'ftools'
 require 'sqlite3'
+require 'set'
 
 RELEVANT_CAPS = [
 	'ScreenSize_x',
@@ -11,7 +12,18 @@ RELEVANT_CAPS = [
 	'HeapSize',
 	'MaxJarSize',
 	'JavaPackage',
-	'OS'
+	'OS',
+]
+
+JAVA_RELEVANT_THINGS = [
+		'MA_PROF_SUPPORT_JAVAPACKAGE_BTAPI',
+		'MA_PROF_BUG_BACKLIGHTFLASHES',
+		'MA_PROF_BUG_MICROEMU',
+		'MA_PROF_SUPPORT_FRAMEBUFFER_32BIT',
+		'MA_PROF_SUPPORT_STYLUS',
+		'MA_PROF_SUPPORT_CLDC_10',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI'
 ]
 
 CAP_TYPES = {
@@ -29,35 +41,121 @@ CAP_TYPES = {
 		'JavaPackage',
 		'OS'
 	]
-#	:bug => [
-#		'BACKLIGHTFLASHES'
-#	]
 }
 
-JAVAPACKAGE_SUPPORT = [
-		'BTAPI',
-#		'MA_PROF_BUG_BACKLIGHTFLASHES',
-#		'MA_PROF_BUG_MICROEMU',
-#		'MA_PROF_SUPPORT_FRAMEBUFFER_32BIT',
-#		'MA_PROF_SUPPORT_STYLUS',
-#		'MA_PROF_SUPPORT_CLDC_10',
-		'LOCATIONAPI',
-		'WMAPI'
-]
+
+
+# This class is a representation of a device, used
+# to construct a number of sets of devices
+#
+#
+#
+
+$bpp = Set.new
+
+class Device
+	#include Comparable
+	attr_accessor :platform, :caps
+	def initialize(platform)
+		@platform = platform
+		@caps = {}
+	end
+
+	def cmp other
+		#puts "in cmp!!!"
+		if(@platform != other.platform) then
+			raise "HAVOK!"
+		end
+		if(@platform == "JavaME") then
+			[
+				'MA_PROF_SUPPORT_JAVAPACKAGE_BTAPI',
+				'MA_PROF_BUG_BACKLIGHTFLASHES',
+				'MA_PROF_BUG_MICROEMU',
+				'MA_PROF_SUPPORT_STYLUS',
+				'MA_PROF_SUPPORT_CLDC_10',
+				'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
+				'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI'
+			].each do |cap|
+				if(@caps[cap] == nil || other.caps[cap] == nil) then
+					if(@caps[cap] == nil && other.caps[cap] == nil) then
+						same = true
+					else
+						return false
+					end
+				else 
+					same = (@caps[cap] == other.caps[cap])
+				end
+				#puts "comparing cap #{cap}, src = #{@caps[cap]}, dst = #{other.caps[cap]}, equal? = #{same}"
+				if(!same) then
+					return false
+				end
+			end
+			return true
+		elsif(@platform == "wm5" || @platform == "sp2003" || @platform == "s60v3")
+			true
+		elsif(@platform == "s60v2")
+			#return ((@caps["BitsPerPixel"].to_i > 16) != (other.caps["BitsPerPixel"].to_i > 16))
+			if(@caps["BitsPerPixel"] == nil || other.caps["BitsPerPixel"] == nil) then
+				if(@caps["BitsPerPixel"] == nil && other.caps["BitsPerPixel"] == nil) then
+					return true;
+				else
+					return false
+				end
+			end
+			if((@caps["BitsPerPixel"].to_i > 16) && (other.caps["BitsPerPixel"].to_i > 16)) then
+				return true
+			elsif((@caps["BitsPerPixel"].to_i <= 16) && (other.caps["BitsPerPixel"].to_i <= 16)) then
+				return true
+			else
+				return false
+			end
+		end
+	end
+end
 
 filename = ARGV[0]
 #destdir = ARGV[1]
 bitmap = {}
 
+devices = {
+	:wm5    => [],
+	:sp2003 => [],
+	:s60v2  => [],
+	:s60v3  => [],
+	:JavaME => []
+}
+
+class Array
+	def add_device(d)
+		self.each do |e|
+			if(e.cmp d) then
+				return
+			end
+		end
+		self << d
+	end
+end
+
+
 puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
+
+device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
+			   " devicecapvalue ON devicecapvalue.capvalue=capvalue.id INNER JOIN" <<
+			   " cap ON devicecapvalue.cap=cap.id AND cap.name=? AND" <<
+			   " devicecapvalue.device=?");
+			   
 File.makedirs "output"
 #db.execute( "select name from vendor" ) do |vendor|
-	db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
+db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 	puts vendor
 	File.makedirs "output/#{vendor}"
-	db.execute("SELECT device.id, device.name FROM device, vendor WHERE" <<
-		       " vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
+	db.execute("SELECT device.id, device.name, platform.name FROM device, vendor " <<
+		"INNER JOIN platformversion ON device.platformversion = platformversion.id " <<
+		"INNER JOIN platform ON platformversion.platform = platform.id " <<
+		"WHERE vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
+		#puts "device: #{device[1]}, platform: #{device[2]}"
+		dev_obj = Device.new(device[2].to_s)
 		seen_defines = []
 		device_path = "output/#{vendor}/#{device[1]}"
 		File.makedirs device_path
@@ -69,42 +167,50 @@ File.makedirs "output"
 			profile.puts "MA_PROF_VENDOR_#{vendor[0].upcase}"
 			profile.puts "MA_PROF_DEVICE_#{device[1].upcase}"
 			profile.puts
+			start_time = Time.now
 			RELEVANT_CAPS.each do |cap|
-				db.execute(
-					"SELECT capvalue.value from capvalue INNER JOIN" <<
-					" devicecapvalue ON devicecapvalue.capvalue=capvalue.id INNER JOIN" <<
-					" cap ON devicecapvalue.cap=cap.id AND cap.name=\"#{cap}\" AND" <<
-					" devicecapvalue.device=#{device[0]}" 
+				device_query.bind_params(cap.to_s, device[0].to_s);
+				device_query.execute(
 				) do |value|
-					cap_type = "ERROR"
 					if(CAP_TYPES[:constant].include? cap)
-						def_name = "MA_PROF_CONST_#{cap.upcase}"
-						def_str = "#define #{def_name} #{value.to_s.upcase}"
-						#puts "current def_name: #{def_name}"
-						#puts "seen_defines: #{seen_defines.inspect}"
-						if(!(seen_defines.include? def_name)) then
-							seen_defines << def_name
-							profile.puts def_str
+						value.each do |v|
+							def_name = "MA_PROF_CONST_#{cap.upcase}"
+							#puts "assigning cap name : #{def_name} => #{v.to_s.upcase}"
+							dev_obj.caps[def_name] = "#{v.to_s.upcase}"
+							def_str = "#define #{def_name} #{v.to_s.upcase}"
+							if(!(seen_defines.include? def_name)) then
+								seen_defines << def_name
+								profile.puts def_str
+							end
 						end
 					elsif(CAP_TYPES[:supports].include? cap)
 						value.each do |v|
-							v.upcase!
+							v.to_s.upcase!
 							def_name = "MA_PROF_SUPPORT_#{cap.upcase}"
-							def_str = "#define #{def_name}_#{v}"
-							#puts "current def_name: #{def_name}"
-							#puts "seen_defines: #{seen_defines.inspect}"
 							if(!(seen_defines.include? def_name)) then
 								if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
 									seen_defines << def_name
 								end
+								#puts "assigning cap name 2: #{def_name}_#{v.to_s.upcase} => <empty string>"
+								dev_obj.caps["#{def_name}_#{v.to_s.upcase}"] = "";
+								def_str = "#define #{def_name}_#{v.to_s.upcase}"
 								profile.puts def_str
 							end
 						end
 					end
 				end
 			end
+			end_time = Time.now
+			#puts "Query took: #{(end_time - start_time)}"
 			profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 		end
+		$bpp.add dev_obj.caps["BitsPerPixel"].to_i	
+		devices[device[2].to_sym].add_device dev_obj
+
 	end
+	devices.each do |platform, devs|
+		puts "#{platform} has #{devs.size} devices!"
+	end
+	puts $bpp.to_s	
 end
 
