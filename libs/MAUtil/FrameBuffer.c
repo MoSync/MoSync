@@ -23,67 +23,67 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "FrameBuffer.h"
 
-static MAPoint2d scalerSizes[10];
-static byte *frameBuffer;
-static MAFrameBufferInfo frameBufferInfo;
-static int gOrientation;
-static int gFlags;
-static int gXOffset;
-static int gYOffset;
-static int gScalerIndex;
+static MAPoint2d sScalerSizes[10];
+static byte *sFrameBuffer;
+static MAFrameBufferInfo sFrameBufferInfo;
+static int sOrientation;
+static int sFlags;
+static int sXOffset;
+static int sYOffset;
+static int sScalerIndex;
 
 typedef struct Color_t { byte r, g, b; } Color;
-static Color realPal[256];
-static int pal[256];
-static int weighted[16*16]; // only used in 4 bpp mode.
+static Color sRealPal[256];
+static int sPal[256];
+static int sWeighted[16*16]; // only used in 4 bpp mode.
 
 typedef void (*ScalerFunc)(unsigned char *pixel, int pitchx, int pitchy, short x, short y, short w, short h, const byte *buf, int pitch);
-ScalerFunc gScalerFunc = NULL;
+ScalerFunc sScalerFunc = NULL;
 
 void chooseScaler();
 
 void FrameBuffer_init(int w, int h, int orientation, int flags) {
-	scalerSizes[0].y = w>>1;
-	scalerSizes[0].x = h>>1;
-	scalerSizes[1].y = w;
-	scalerSizes[1].x = h;
-	scalerSizes[2].y = w<<1;
-	scalerSizes[2].x = h<<1;
-	scalerSizes[3].y = 0;
-	scalerSizes[3].x = 0;
-	gOrientation = orientation;
-	gFlags = flags;
+	sScalerSizes[0].y = w>>1;
+	sScalerSizes[0].x = h>>1;
+	sScalerSizes[1].y = w;
+	sScalerSizes[1].x = h;
+	sScalerSizes[2].y = w<<1;
+	sScalerSizes[2].x = h<<1;
+	sScalerSizes[3].y = 0;
+	sScalerSizes[3].x = 0;
+	sOrientation = orientation;
+	sFlags = flags;
 
-	if(!frameBuffer) {
-		int res = maFrameBufferGetInfo(&frameBufferInfo);
+	if(!sFrameBuffer) {
+		int res = maFrameBufferGetInfo(&sFrameBufferInfo);
 		if(res < 0)
 			maPanic(res, "Framebuffer info failure!");
-		frameBuffer = (byte*)malloc(frameBufferInfo.sizeInBytes);
-		res = maFrameBufferInit(frameBuffer);
+		sFrameBuffer = (byte*)malloc(sFrameBufferInfo.sizeInBytes);
+		res = maFrameBufferInit(sFrameBuffer);
 		if(res < 0)
 			maPanic(res, "Framebuffer init failure!");
 	}
 
-	memset(frameBuffer, 0, frameBufferInfo.sizeInBytes);
+	memset(sFrameBuffer, 0, sFrameBufferInfo.sizeInBytes);
 
 	chooseScaler();
 }
 
 void FrameBuffer_setOrientation(int orientation) {
 	orientation&=0x3;
-	gOrientation = orientation;
+	sOrientation = orientation;
 	chooseScaler();
 
 }
 
 int FrameBuffer_getOrientation() {
-	return gOrientation;
+	return sOrientation;
 }
 
 void FrameBuffer_close() {
 	maFrameBufferClose();
-	if(frameBuffer) free(frameBuffer);
-	frameBuffer = 0;
+	if(sFrameBuffer) free(sFrameBuffer);
+	sFrameBuffer = 0;
 }
 
 void FrameBuffer_setPalette(int startDst, int startSrc, int num, const byte *src, int flags) {
@@ -98,31 +98,31 @@ void FrameBuffer_setPalette(int startDst, int startSrc, int num, const byte *src
 		}
 		*/
 		if(flags & FLAG_RGB666) {
-			realPal[i].r = (src[sIndex+0]<<2)|(src[sIndex+0]&0x3); //c[0];
-			realPal[i].g = (src[sIndex+1]<<2)|(src[sIndex+1]&0x3); //c[1];
-			realPal[i].b = (src[sIndex+2]<<2)|(src[sIndex+2]&0x3); //c[2];
+			sRealPal[i].r = (src[sIndex+0]<<2)|(src[sIndex+0]&0x3); //c[0];
+			sRealPal[i].g = (src[sIndex+1]<<2)|(src[sIndex+1]&0x3); //c[1];
+			sRealPal[i].b = (src[sIndex+2]<<2)|(src[sIndex+2]&0x3); //c[2];
 		} else {
-			realPal[i].r = src[sIndex+0]; //c[0];
-			realPal[i].g = src[sIndex+1]; //c[1];
-			realPal[i].b = src[sIndex+2]; //c[2];
+			sRealPal[i].r = src[sIndex+0]; //c[0];
+			sRealPal[i].g = src[sIndex+1]; //c[1];
+			sRealPal[i].b = src[sIndex+2]; //c[2];
 		}
 		sIndex+=3;
 
-		pal[i] =
-		(((int)realPal[i].r>>(8-frameBufferInfo.redBits))<<frameBufferInfo.redShift) |
-		(((int)realPal[i].g>>(8-frameBufferInfo.greenBits))<<frameBufferInfo.greenShift) |
-		(((int)realPal[i].b>>(8-frameBufferInfo.blueBits))<<frameBufferInfo.blueShift);
+		sPal[i] =
+		(((int)sRealPal[i].r>>(8-sFrameBufferInfo.redBits))<<sFrameBufferInfo.redShift) |
+		(((int)sRealPal[i].g>>(8-sFrameBufferInfo.greenBits))<<sFrameBufferInfo.greenShift) |
+		(((int)sRealPal[i].b>>(8-sFrameBufferInfo.blueBits))<<sFrameBufferInfo.blueShift);
 	}
 	
-		// build weighted palette.
-	if(gFlags&FLAG_4BPP) {
+		// build sWeighted palette.
+	if(sFlags&FLAG_4BPP) {
 		for (i = startDst; i < startDst + num; ++i) {
 			for(j = i; j < startDst+num; j++) {
-				weighted[(i<<4)|j] =
-				(((int)((realPal[i].r+realPal[j].r)>>1)>>(8-frameBufferInfo.redBits))<<frameBufferInfo.redShift) |
-				(((int)((realPal[i].g+realPal[j].g)>>1)>>(8-frameBufferInfo.greenBits))<<frameBufferInfo.greenShift)|
-				(((int)((realPal[i].b+realPal[j].b)>>1)>>(8-frameBufferInfo.blueBits))<<frameBufferInfo.blueShift);
-				weighted[(j<<4)|i] = weighted[(i<<4)|j];
+				sWeighted[(i<<4)|j] =
+				(((int)((sRealPal[i].r+sRealPal[j].r)>>1)>>(8-sFrameBufferInfo.redBits))<<sFrameBufferInfo.redShift) |
+				(((int)((sRealPal[i].g+sRealPal[j].g)>>1)>>(8-sFrameBufferInfo.greenBits))<<sFrameBufferInfo.greenShift)|
+				(((int)((sRealPal[i].b+sRealPal[j].b)>>1)>>(8-sFrameBufferInfo.blueBits))<<sFrameBufferInfo.blueShift);
+				sWeighted[(j<<4)|i] = sWeighted[(i<<4)|j];
 			}
 		}
 	}	
@@ -135,13 +135,13 @@ void FrameBuffer_setPaletteEntry(int i, int r, int g, int b, int flags) {
 
 void FrameBuffer_getPaletteEntry(int i, byte *dst, int flags) {
 	if(flags & FLAG_RGB666) {
-		dst[0] = realPal[i].r>>2;
-		dst[1] = realPal[i].g>>2;
-		dst[2] = realPal[i].b>>2;
+		dst[0] = sRealPal[i].r>>2;
+		dst[1] = sRealPal[i].g>>2;
+		dst[2] = sRealPal[i].b>>2;
 	} else {
-		dst[0] = realPal[i].r;
-		dst[1] = realPal[i].g;
-		dst[2] = realPal[i].b;
+		dst[0] = sRealPal[i].r;
+		dst[1] = sRealPal[i].g;
+		dst[2] = sRealPal[i].b;
 	}
 }
 
@@ -149,14 +149,14 @@ static void pixelHalf_4bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 	int i;
 	w>>=1;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		h>>=1;
 		pitch<<=1;
 		while (h--) {
 			short *scan = (short *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = weighted[*(buf + i)];
+				*scan = sWeighted[*(buf + i)];
 				scan+=mopitch;
 			}
 			y++;
@@ -164,14 +164,14 @@ static void pixelHalf_4bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		h>>=1;
 		pitch<<=1;
 		while (h--) {
 			int *scan = (int *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = weighted[*(buf + i)];
+				*scan = sWeighted[*(buf + i)];
 				scan+=mopitch;
 			}
 			y++;
@@ -185,16 +185,16 @@ static void pixelDirect_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 	int i;
 	w>>=1;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		while (h--) {
 			short *scan = (short *)pixel;
 			for (i = 0; i < w; ++i) {
 				byte p1 = *(buf + i) >> 4;
 				byte p2 = *(buf + i) & 0xF;
-				*scan = pal[p1];
+				*scan = sPal[p1];
 				scan+=mopitch;
-				*scan = pal[p2];
+				*scan = sPal[p2];
 				scan+=mopitch;
 			}
 			y++;
@@ -202,16 +202,16 @@ static void pixelDirect_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		while (h--) {
 			int *scan = (int *)pixel;
 			for (i = 0; i < w; ++i) {
 				byte p1 = *(buf + i) >> 4;
 				byte p2 = *(buf + i) & 0xF;
-				*scan = pal[p1];
+				*scan = sPal[p1];
 				scan+=mopitch;
-				*scan = pal[p2];
+				*scan = sPal[p2];
 				scan+=mopitch;
 			}
 			y++;
@@ -225,7 +225,7 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 	int i;
 	w>>=1;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		while (h--) {
 			short *scan_upper = (short *)(pixel);
@@ -234,13 +234,13 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				byte p1 = *(buf + i) >> 4;
 				byte p2 = *(buf + i) & 0xF;
 
-				*scan_upper = *scan_lower = pal[p1];
+				*scan_upper = *scan_lower = sPal[p1];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p1];
+				*scan_upper = *scan_lower = sPal[p1];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p2];
+				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p2];
+				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
 			y++;
@@ -248,7 +248,7 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		while (h--) {
 			int *scan_upper = (int *)(pixel);
@@ -257,13 +257,13 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				byte p1 = *(buf + i) >> 4;
 				byte p2 = *(buf + i) & 0xF;
 
-				*scan_upper = *scan_lower = pal[p1];
+				*scan_upper = *scan_lower = sPal[p1];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p1];
+				*scan_upper = *scan_lower = sPal[p1];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p2];
+				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
-				*scan_upper = *scan_lower = pal[p2];
+				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
 			y++;
@@ -277,14 +277,14 @@ static void pixelHalf_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 	int i;
 	w>>=1;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		h>>=1;
 		pitch<<=1;
 		while (h--) {
 			short *scan = (short *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = pal[*(buf + i*2)];
+				*scan = sPal[*(buf + i*2)];
 				scan+=mopitch;
 			}
 			y++;
@@ -292,14 +292,14 @@ static void pixelHalf_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		h>>=1;
 		pitch<<=1;
 		while (h--) {
 			int *scan = (int *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = pal[*(buf + i*2)];
+				*scan = sPal[*(buf + i*2)];
 				scan+=mopitch;
 			}
 			y++;
@@ -312,12 +312,12 @@ static void pixelHalf_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 static void pixelDirect_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x, short y, short w, short h, const byte *buf, int pitch) {
 	int i;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		while (h--) {
 			short *scan = (short *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = pal[*(buf + i)];
+				*scan = sPal[*(buf + i)];
 				scan+=mopitch;
 			}
 			y++;
@@ -325,12 +325,12 @@ static void pixelDirect_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		while (h--) {
 			int *scan = (int *)pixel;
 			for (i = 0; i < w; ++i) {
-				*scan = pal[*(buf + i)];
+				*scan = sPal[*(buf + i)];
 				scan+=mopitch;
 			}
 			y++;
@@ -344,13 +344,13 @@ static void pixelDouble_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 	int i;
 	//w>>=1;
 	buf += y * pitch + x;
-	if(frameBufferInfo.bitsPerPixel>8 && frameBufferInfo.bitsPerPixel<=16) {
+	if(sFrameBufferInfo.bitsPerPixel>8 && sFrameBufferInfo.bitsPerPixel<=16) {
 		int mopitch = pitchy>>1;
 		while (h--) {
 			short *scan_upper = (short *)(pixel);
 			short *scan_lower = (short *)(pixel+pitchx);
 			for (i = 0; i < w; ++i) {
-				short col = pal[*(buf + i)];
+				short col = sPal[*(buf + i)];
 				*scan_upper = *scan_lower = col;
 				scan_upper+=mopitch; scan_lower+=mopitch;
 				*scan_upper = *scan_lower = col;
@@ -361,13 +361,13 @@ static void pixelDouble_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 			buf += pitch;
 		}
 	}
-	else if(frameBufferInfo.bitsPerPixel>16 && frameBufferInfo.bitsPerPixel<=32) {
+	else if(sFrameBufferInfo.bitsPerPixel>16 && sFrameBufferInfo.bitsPerPixel<=32) {
 		int mopitch = pitchy>>2;
 		while (h--) {
 			int *scan_upper = (int *)(pixel);
 			int *scan_lower = (int *)(pixel+pitchx);
 			for (i = 0; i < w; ++i) {
-				int col = pal[*(buf + i)];
+				int col = sPal[*(buf + i)];
 				*scan_upper = *scan_lower = col;
 				scan_upper+=mopitch; scan_lower+=mopitch;
 				*scan_upper = *scan_lower = col;
@@ -383,39 +383,39 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 	unsigned char *pixel = 0;
 	int pitchx = 0, pitchy = 0;
 	int dx, dy;
-	if(gScalerIndex == 0) { dstx>>=1; dsty>>=1; }
-	if(gScalerIndex == 2) { dstx<<=1; dsty<<=1; }
+	if(sScalerIndex == 0) { dstx>>=1; dsty>>=1; }
+	if(sScalerIndex == 2) { dstx<<=1; dsty<<=1; }
 	
-	switch(gOrientation) {
+	switch(sOrientation) {
 	case ORIENTATION_0:
-		dx = (gXOffset+scalerSizes[gScalerIndex].x-1);
-		dy = gYOffset;
-		pitchx = -frameBufferInfo.bytesPerPixel;
-		pitchy = frameBufferInfo.pitch;
+		dx = (sXOffset+sScalerSizes[sScalerIndex].x-1);
+		dy = sYOffset;
+		pitchx = -sFrameBufferInfo.bytesPerPixel;
+		pitchy = sFrameBufferInfo.pitch;
 		dx += -dsty;
 		dy += dstx;						
 		break;
 	case ORIENTATION_90:
-		dx = (gXOffset+scalerSizes[gScalerIndex].y-1);
-		dy = (gYOffset+scalerSizes[gScalerIndex].x-1);
-		pitchx = -frameBufferInfo.pitch;
-		pitchy = -frameBufferInfo.bytesPerPixel;				
+		dx = (sXOffset+sScalerSizes[sScalerIndex].y-1);
+		dy = (sYOffset+sScalerSizes[sScalerIndex].x-1);
+		pitchx = -sFrameBufferInfo.pitch;
+		pitchy = -sFrameBufferInfo.bytesPerPixel;				
 		dx += -dstx;
 		dy += -dsty;				
 		break;
 	case ORIENTATION_180:	
-		dx = (gXOffset);
-		dy = (gYOffset+scalerSizes[gScalerIndex].y-1);
-		pitchx = frameBufferInfo.bytesPerPixel;
-		pitchy = -frameBufferInfo.pitch;
+		dx = (sXOffset);
+		dy = (sYOffset+sScalerSizes[sScalerIndex].y-1);
+		pitchx = sFrameBufferInfo.bytesPerPixel;
+		pitchy = -sFrameBufferInfo.pitch;
 		dx += dsty;
 		dy += -dstx;					
 		break;
 	case ORIENTATION_270:
-		dx = (gXOffset);
-		dy = (gYOffset);				
-		pitchx = frameBufferInfo.pitch;
-		pitchy = frameBufferInfo.bytesPerPixel;
+		dx = (sXOffset);
+		dy = (sYOffset);				
+		pitchx = sFrameBufferInfo.pitch;
+		pitchy = sFrameBufferInfo.bytesPerPixel;
 		dx += dstx;
 		dy += dsty;	
 		break;
@@ -423,55 +423,55 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 		PANIC_MESSAGE("bad orientation");
 	}
 	
-	pixel = (unsigned char*)&frameBuffer[dx*frameBufferInfo.bytesPerPixel+dy*frameBufferInfo.pitch];
+	pixel = (unsigned char*)&sFrameBuffer[dx*sFrameBufferInfo.bytesPerPixel+dy*sFrameBufferInfo.pitch];
 
-	srand((int)gScalerFunc);;
-	gScalerFunc(pixel, pitchx, pitchy, x, y, w, h, buf, pitch);
+	srand((int)sScalerFunc);;
+	sScalerFunc(pixel, pitchx, pitchy, x, y, w, h, buf, pitch);
 }
 
 void chooseScaler() {
 	int scaler = 0;
-	const MAPoint2d* size = scalerSizes;
+	const MAPoint2d* size = sScalerSizes;
 	int bestScaler = -1;
-	if(gOrientation == ORIENTATION_0 || gOrientation == ORIENTATION_180) {
+	if(sOrientation == ORIENTATION_0 || sOrientation == ORIENTATION_180) {
 		while(size->x!=0) {
-			if(size->x <= frameBufferInfo.width && size->y <= frameBufferInfo.height) {
+			if(size->x <= sFrameBufferInfo.width && size->y <= sFrameBufferInfo.height) {
 				bestScaler = scaler;
 			}
 			scaler++;
 			size++;
 		}
 		scaler = bestScaler;
-		gXOffset = ((frameBufferInfo.width)-scalerSizes[scaler].x)>>1;
-		gYOffset = ((frameBufferInfo.height)-scalerSizes[scaler].y)>>1;
+		sXOffset = ((sFrameBufferInfo.width)-sScalerSizes[scaler].x)>>1;
+		sYOffset = ((sFrameBufferInfo.height)-sScalerSizes[scaler].y)>>1;
 	} else {
 		while(size->x!=0) {
-			if(size->y <= frameBufferInfo.width && size->x <= frameBufferInfo.height) {
+			if(size->y <= sFrameBufferInfo.width && size->x <= sFrameBufferInfo.height) {
 				bestScaler = scaler;
 			}
 			scaler++;
 			size++;
 		}
 		scaler = bestScaler;
-		gXOffset = ((frameBufferInfo.width)-scalerSizes[scaler].y)>>1;
-		gYOffset = ((frameBufferInfo.height)-scalerSizes[scaler].x)>>1;
+		sXOffset = ((sFrameBufferInfo.width)-sScalerSizes[scaler].y)>>1;
+		sYOffset = ((sFrameBufferInfo.height)-sScalerSizes[scaler].x)>>1;
 	}
 
-	if(gFlags & FLAG_4BPP) {
+	if(sFlags & FLAG_4BPP) {
 		switch(scaler) {
-			case 0: gScalerFunc = pixelHalf_4bpp; break;
-			case 1: gScalerFunc = pixelDirect_4bpp; break;
-			case 2: gScalerFunc = pixelDouble_4bpp; break;
+			case 0: sScalerFunc = pixelHalf_4bpp; break;
+			case 1: sScalerFunc = pixelDirect_4bpp; break;
+			case 2: sScalerFunc = pixelDouble_4bpp; break;
 		}
 	} else {
 		switch(scaler) {
-			case 0: gScalerFunc = pixelHalf_8bpp; break;
-			case 1: gScalerFunc = pixelDirect_8bpp; break;
-			case 2: gScalerFunc = pixelDouble_8bpp; break;
+			case 0: sScalerFunc = pixelHalf_8bpp; break;
+			case 1: sScalerFunc = pixelDirect_8bpp; break;
+			case 2: sScalerFunc = pixelDouble_8bpp; break;
 		}
 	}
 
-	gScalerIndex = scaler;
+	sScalerIndex = scaler;
 }
 
 int FrameBuffer_getArrowKeyForOrientation(int mak) {
@@ -481,7 +481,7 @@ int FrameBuffer_getArrowKeyForOrientation(int mak) {
 	if(mak == MAK_RIGHT) mask|=2;
 	if(mak == MAK_DOWN) mask|=4;
 	if(mak == MAK_LEFT) mask|=8;
-	for(i = 0; i < gOrientation; i++) {
+	for(i = 0; i < sOrientation; i++) {
 		if(mask&0x1) mask|=1<<4;
 		mask>>=1;
 	}
