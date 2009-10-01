@@ -55,14 +55,14 @@ namespace MAUI {
 		void drawWidget();
 		void runTimerEvent();
 
-		BOOL loop;
-		int currentFrame;
-		int msPf;
-		int frameHeight;
-		int numFrames;
-		int direction;
-		MAHandle resource;
-		MAExtent resSize;
+		BOOL mLoop;
+		int mCurrentFrame;
+		int mMsPf;
+		int mFrameHeight;
+		int mNumFrames;
+		int mDirection;
+		MAHandle mResource;
+		MAExtent mResSize;
 	};
 
 }

@@ -27,27 +27,27 @@ namespace MAUI {
 
 	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget *parent) :
 		Widget(x, y, width, height, parent),
-		loop(true),
-		currentFrame(0),
-		msPf(50),
-		frameHeight(32),
-		numFrames(5),
-		direction(0), 
-		resource(0) {
-			start();
-		
+		mLoop(true),
+		mCurrentFrame(0),
+		mMsPf(50),
+		mFrameHeight(32),
+		mNumFrames(5),
+		mDirection(0), 
+		mResource(0)
+	{
+		start();
 	}
 
 
 	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget* parent, MAHandle res) 
 		: Widget(x, y, width, height, parent),
-		loop(true),
-		currentFrame(0),
-		msPf(50),
-		frameHeight(32),
-		numFrames(5),
-		direction(0),
-	    resource(res)
+		mLoop(true),
+		mCurrentFrame(0),
+		mMsPf(50),
+		mFrameHeight(32),
+		mNumFrames(5),
+		mDirection(0),
+	    mResource(res)
 		
 	{ 
 		setResource(res);
@@ -55,34 +55,34 @@ namespace MAUI {
 	}
 
 	void AnimatedImage::drawWidget() {
-		if(resource) {
+		if(mResource) {
 			// void maDrawImageRegion(MAHandle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode);
 			MARect srcRect;
 			srcRect.left  = 0;
-			srcRect.width = EXTENT_X(resSize);
-			srcRect.top   = currentFrame * paddedBounds.height; 
+			srcRect.width = EXTENT_X(mResSize);
+			srcRect.top   = mCurrentFrame * paddedBounds.height; 
 			srcRect.height = paddedBounds.height;
 			//MAPoint2d destPoint = {paddedBounds.x, paddedBounds.y};
 			MAPoint2d destPoint = {0, 0};
 
 			//maDrawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
-			Gfx_drawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
+			Gfx_drawImageRegion(mResource, &srcRect, &destPoint, TRANS_NONE);
 		}
 	}
 
 	void AnimatedImage::setResource(MAHandle res) {
-		resource = res;
+		mResource = res;
 		if(res == 0) return;
-		resSize = maGetImageSize(res);
+		mResSize = maGetImageSize(res);
 	}
 
 	MAHandle AnimatedImage::getResource() const {
-		return resource;
+		return mResource;
 	}
 
 	void AnimatedImage::start() {
 		//MAUtil::Environment::getEnvironment().addIdleListener(this);
-		MAUtil::Environment::getEnvironment().addTimer(this, msPf, -1);		
+		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);		
 	}
 
 	void AnimatedImage::stop() {
@@ -91,61 +91,61 @@ namespace MAUI {
 	
 	void AnimatedImage::stepForward() {
 		//printf("stepping fwd (%d)!!!\n", currentFrame);
-		currentFrame++;
-		if(loop) {
-			if(numFrames)
-				currentFrame %= numFrames;
+		mCurrentFrame++;
+		if(mLoop) {
+			if(mNumFrames)
+				mCurrentFrame %= mNumFrames;
 			else
-				currentFrame = 0;
+				mCurrentFrame = 0;
 		}
 		else
-			if(currentFrame >= numFrames)
-				currentFrame = numFrames - 1;
+			if(mCurrentFrame >= mNumFrames)
+				mCurrentFrame = mNumFrames - 1;
 	}
 
 	void AnimatedImage::stepBack() {
 		//printf("stepping back!!!\n");
-		currentFrame--;
-		if(currentFrame < 0)
+		mCurrentFrame--;
+		if(mCurrentFrame < 0)
 		{
-			if(loop)
-				currentFrame = numFrames - currentFrame;
+			if(mLoop)
+				mCurrentFrame = mNumFrames - mCurrentFrame;
 			else
-				currentFrame = 0;
+				mCurrentFrame = 0;
 		}
 
-		if(numFrames)
-			currentFrame %= numFrames;
+		if(mNumFrames)
+			mCurrentFrame %= mNumFrames;
 		else
-			currentFrame = 0;
+			mCurrentFrame = 0;
 	}
 
 	void AnimatedImage::setFrameHeight(int height) {
-		this->bounds.width = EXTENT_X(resSize);
-		this->setWidth(this->bounds.width);
-		this->bounds.height = height;
-		this->setHeight(height);
+		bounds.width = EXTENT_X(mResSize);
+		setWidth(bounds.width);
+		bounds.height = height;
+		setHeight(height);
 	}
 
 	void AnimatedImage::setNumFrames(int numFrames) {
-		this->numFrames = numFrames;
+		mNumFrames = numFrames;
 	}
 
 	void AnimatedImage::setFps(int fps) {
 		if(fps) 
-			msPf = 1000/fps;
+			mMsPf = 1000/fps;
 		else
-			msPf = 0;
+			mMsPf = 0;
 		stop();
 		start();
 	}
 	
 	void AnimatedImage::setFrame(int frame) {
-		currentFrame = frame;
+		mCurrentFrame = frame;
 	}
 
 	void AnimatedImage::setDirection(int dir) {
-		direction = dir;
+		mDirection = dir;
 	}
 
 	void AnimatedImage::runTimerEvent() {
