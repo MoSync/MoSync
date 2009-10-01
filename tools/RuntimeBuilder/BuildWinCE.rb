@@ -24,7 +24,7 @@ class RuntimeBuilder
 		config_file_dest = $SETTINGS[:wince_source] + "config_platform.h"	
 		config_file_src = runtime_dir + "config" + debug + ".h"
 		if !File.exist? config_file_src
-			puts config_file_src + " missing."
+			puts "\nWARNING! - " + config_file_src + " doesn't exist.. skipping this runtime!\n\n"
 			return
 		end
 	
@@ -46,7 +46,7 @@ class RuntimeBuilder
 		if File.exist? exe_file_src
 			File.copy(exe_file_src, exe_file_dest)
 		else
-			puts "Build failed."
+			puts "\nFATAL ERROR! - No exe file built, check previous output for errors!\n\n"
 		end
 		
 		# Restore config_platform.h

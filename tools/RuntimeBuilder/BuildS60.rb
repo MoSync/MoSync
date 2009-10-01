@@ -16,13 +16,17 @@
 
 class RuntimeBuilder
 
-	def build_symbian(runtime_dir, debug, version) 
-		puts (debug=="D")? "Building debug.":"Building release."
+	def build_symbian(runtime_dir, version, mode) 
+		if (mode=="debug") 
+			debug = "D"
+		else
+			debug = ""
+		end
 	
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = runtime_dir + "config" + debug + ".h"
 		if !File.exist? config_file_src
-			puts config_file_src + " missing."
+			puts "\nWARNING! - " + config_file_src + " doesn't exist.. skipping this runtime!\n\n"
 			return
 		end		
 		backup_file(config_file_dest)
@@ -42,6 +46,7 @@ class RuntimeBuilder
 		cwd = Dir.pwd
 		Dir.chdir group_dir
 		
+		# call the build functions
 		system("devices -setdefault " + default)
 		system("bldmake bldfiles");
 		system("call abld clean " + symbian_system + " urel");
@@ -56,40 +61,47 @@ class RuntimeBuilder
 			app_file = epoc_dir + "release/armi/urel/MoSync.app"
 			
 			if(!File.exist? app_file) 
-				puts "Build failed."
+				puts "FATAL ERROR! - S60 2nd build failed."
 				return
 			end			
 			
+			# Copy all the generated files to it's runtime folder
 			File.copy(app_file, runtime_dir + "MoSync" + debug + ".app")
 			File.copy(epoc_dir + "data/z/system/apps/MoSync/MoSync.rsc", runtime_dir + "/MoSync.rsc")
 			File.copy(epoc_dir +"data/z/system/apps/MoSync/MoSync_caption.rsc", runtime_dir + "MoSync_caption.rsc")
 			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")			
+			
+			puts "\nFINISHED! - " + runtime_dir + "MoSync" + debug + ".app, and other runtime files was succesfully generated!\n\n"
 		else
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = $SETTINGS[:symbian_source] + "sis-ed3/"		
 			exe_file = epoc_dir + "release/gcce/urel/MoSync2.exe"
 			
 			if(!File.exist? exe_file) 
-				puts "Build failed."
+				puts "FATAL ERROR! - S60 3rd build failed."
 				return
 			end
 		
+			# Copy all the generated files to it's runtime folder
 			File.copy(exe_file, runtime_dir + "MoSync" + debug + ".exe")
 			File.copy(epoc_dir + "data/z/resource/apps/MoSync_3rd.RSC", runtime_dir + "MoSync.RSC")
 			File.copy(epoc_dir +"data/z/private/10003a3f/import/apps/MoSync_reg.RSC", runtime_dir + "MoSync_reg.RSC")
 			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")
+			
+			puts "\nFINISHED! - " + runtime_dir + "MoSync" + debug + ".exe, and other runtime files was succesfully generated!\n\n"
 		end
 		
 		revert_backupped_file(config_file_dest)
+		
 	end
 
 	def s60v2(runtime_dir)	
-		build_symbian(runtime_dir, "", "s60v2")
-		build_symbian(runtime_dir, "D", "s60v2")	
+		build_symbian(runtime_dir, "s60v2", "release")
+		build_symbian(runtime_dir, "s60v2", "debug")	
 	end
 	
 	def s60v3(runtime_dir)
-		build_symbian(runtime_dir, "", "s60v3")
-		build_symbian(runtime_dir, "D", "s60v3")
+		build_symbian(runtime_dir, "s60v3", "release")
+		build_symbian(runtime_dir, "s60v3", "debug")
 	end
 end
