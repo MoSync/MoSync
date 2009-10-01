@@ -51,22 +51,22 @@ class RuntimeBuilder
 	end
 		
 	def method_missing(method, *args) 
-		puts "\nFATAL ERROR: invalid platform " + method.to_s
+		puts "\nFATAL ERROR: invalid platform #{method.to_s}"
 	end
 
 	def build(platform, runtime_dir)
 		
 		modes = [ 	
-					["release", runtime_dir + "config.h"],
-					["debug", runtime_dir + "configD.h"]	
+					["release", "#{runtime_dir}config.h"],
+					["debug", "#{runtime_dir}configD.h"]	
 				]
 		
 		modes.each do |mode|
 			if File.exist? mode[1]
-				puts "Building " + mode[0] + " runtime for " + platform
+				puts "Building #{mode[0]} runtime for #{platform}"
 				send(platform, runtime_dir, mode[0])
 			else
-				puts "WARNING: Skipping build. No config file for " + platform + " "  + mode[0] + " runtime "				
+				puts "WARNING: Skipping build. No config file for #{platform} #{mode[0]} runtime."				
 			end
 		end
 	end

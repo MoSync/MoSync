@@ -28,7 +28,7 @@ $SETTINGS = {
 
 		:java_source => "../../runtimes/java/",
 		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
-		:wince_source => "../../runtimes/cpp/platforms/winmobile/MoRE-winmobile/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
 		
 		:javame_sdk => "C:/SonyEricsson/JavaME_SDK_CLDC/OnDeviceDebug/",
 

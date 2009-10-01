@@ -21,11 +21,13 @@ class RuntimeBuilder
 	def build_wince(runtime_dir, mode, version) 
 		debug = (mode == "debug") ? "D" : "";
 	
-		config_file_dest = $SETTINGS[:wince_source] + "config_platform.h"	
-		config_file_src = runtime_dir + "config" + debug + ".h"
+		src_folder = "#{$SETTINGS[:wince_source]}MoRE-winmobile/"
+		puts "src folder : " + src_folder;
+	
+		config_file_dest = "#{$SETTINGS[:wince_source]}config_platform.h"	
+		config_file_src = "#{runtime_dir}config#{debug}.h"
 	
 		backup_file(config_file_dest)
-	
 		File.copy(config_file_src, config_file_dest)
 		
 		if (version == "sp2003")
@@ -34,13 +36,14 @@ class RuntimeBuilder
 			configuration = "Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
 		end
 		
-		system("build_wince.bat \"" + $SETTINGS[:wince_source] + "\" \"Release|" + configuration + "\"")
+		system("build_wince.bat \"#{src_folder}\" \"Release|#{configuration}\"")
 		
-		exe_file_src = $SETTINGS[:wince_source] + configuration + "/Release/MoRE-winmobile.exe"
-		exe_file_dest = runtime_dir + "MoRE-winmobile" + debug + ".exe" 
+		exe_file_src = "#{src_folder}#{configuration}/Release/MoRE-winmobile.exe"
+		exe_file_dest = "#{runtime_dir}MoRE-winmobile#{debug}.exe" 
 		
 		if File.exist? exe_file_src
 			File.copy(exe_file_src, exe_file_dest)
+			puts "\nFINISHED! - #{exe_file_dest} was succesfully generated!\n\n"
 		else
 			puts "\nFATAL ERROR! - No exe file built, check previous output for errors!\n\n"
 		end

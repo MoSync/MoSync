@@ -26,11 +26,11 @@ class RuntimeBuilder
 		File.copy(config_file_src, config_file_dest)
 		
 		if version == "s60v2"
-			group_dir = $SETTINGS[:symbian_source] + "group"
+			group_dir = "#{$SETTINGS[:symbian_source]}group"
 			default = "@S60_2nd_FP3:com.nokia.series60"
 			symbian_system = "armi"
 		else
-			group_dir = $SETTINGS[:symbian_source] + "group-ed3"
+			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3"
 			default = "@S60_3rd_FP1:com.nokia.s60"
 			symbian_system = "gcce"			
 		end
@@ -59,16 +59,16 @@ class RuntimeBuilder
 			end			
 			
 			# Copy all the generated files to it's runtime folder
-			File.copy(app_file, runtime_dir + "MoSync" + debug + ".app")
-			File.copy(epoc_dir + "data/z/system/apps/MoSync/MoSync.rsc", runtime_dir + "/MoSync.rsc")
-			File.copy(epoc_dir +"data/z/system/apps/MoSync/MoSync_caption.rsc", runtime_dir + "MoSync_caption.rsc")
-			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")			
+			File.copy(app_file, "#{runtime_dir}MoSync#{debug}.app")
+			File.copy("#{epoc_dir}data/z/system/apps/MoSync/MoSync.rsc", "#{runtime_dir}/MoSync.rsc")
+			File.copy("#{epoc_dir}data/z/system/apps/MoSync/MoSync_caption.rsc", "#{runtime_dir}MoSync_caption.rsc")
+			File.copy("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")			
 			
-			puts "\nFINISHED! - " + runtime_dir + "MoSync" + debug + ".app, and other runtime files was succesfully generated!\n\n"
+			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.app, and other runtime files was succesfully generated!\n\n"
 		else
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
-			sis_dir = $SETTINGS[:symbian_source] + "sis-ed3/"		
-			exe_file = epoc_dir + "release/gcce/urel/MoSync2.exe"
+			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"		
+			exe_file = "#{epoc_dir}release/gcce/urel/MoSync2.exe"
 			
 			if(!File.exist? exe_file) 
 				puts "FATAL ERROR! - S60 3rd build failed."
@@ -76,12 +76,12 @@ class RuntimeBuilder
 			end
 		
 			# Copy all the generated files to it's runtime folder
-			File.copy(exe_file, runtime_dir + "MoSync" + debug + ".exe")
-			File.copy(epoc_dir + "data/z/resource/apps/MoSync_3rd.RSC", runtime_dir + "MoSync.RSC")
-			File.copy(epoc_dir +"data/z/private/10003a3f/import/apps/MoSync_reg.RSC", runtime_dir + "MoSync_reg.RSC")
-			File.copy(sis_dir + "MoSync-template.pkg", runtime_dir + "MoSync-template.pkg")
+			File.copy(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
+			File.copy("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")
+			File.copy("#{epoc_dir}data/z/private/10003a3f/import/apps/MoSync_reg.RSC", "#{runtime_dir}MoSync_reg.RSC")
+			File.copy("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			
-			puts "\nFINISHED! - " + runtime_dir + "MoSync" + debug + ".exe, and other runtime files was succesfully generated!\n\n"
+			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
 		end
 		
 		revert_backupped_file(config_file_dest)
