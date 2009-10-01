@@ -17,16 +17,12 @@
 class RuntimeBuilder
 
 	def build_symbian(runtime_dir, version, mode) 
-		if (mode=="debug") 
-			debug = "D"
-		else
-			debug = ""
-		end
+		debug = (mode == "debug") ? "D" : "";
 	
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
-		config_file_src = runtime_dir + "config" + debug + ".h"
+		config_file_src = "#{runtime_dir}config#{debug}.h"
 		if !File.exist? config_file_src
-			puts "\nWARNING! - " + config_file_src + " doesn't exist.. skipping this runtime!\n\n"
+			puts "\nWARNING! - #{config_file_src} doesn't exist.. skipping this runtime!\n\n"
 			return
 		end		
 		backup_file(config_file_dest)
@@ -47,18 +43,18 @@ class RuntimeBuilder
 		Dir.chdir group_dir
 		
 		# call the build functions
-		system("devices -setdefault " + default)
+		system("devices -setdefault #{default}")
 		system("bldmake bldfiles");
-		system("call abld clean " + symbian_system + " urel");
-		system("call abld build " + symbian_system + " urel");		
+		system("call abld clean #{symbian_system} urel");
+		system("call abld build #{symbian_system} urel");		
 		
 		# go back to the initial directory
 		Dir.chdir cwd
 		
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/";
-			sis_dir = $SETTINGS[:symbian_source] + "sis/";
-			app_file = epoc_dir + "release/armi/urel/MoSync.app"
+			sis_dir = "#{$SETTINGS[:symbian_source]}sis/";
+			app_file = "#{epoc_dir}release/armi/urel/MoSync.app"
 			
 			if(!File.exist? app_file) 
 				puts "FATAL ERROR! - S60 2nd build failed."
