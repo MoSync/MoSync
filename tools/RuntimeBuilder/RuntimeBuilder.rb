@@ -39,20 +39,36 @@ def revert_backupped_file(file)
 end
 
 class RuntimeBuilder
-	def system(str)
-		if $SETTINGS[:verbose]
+	def log(str) 
+		if ($SETTINGS[:verbose])
 			puts str
-		end
-		Kernel.system(str)
-	end
-	
-	def method_missing(method, *args) 
-		puts "RuntimeBuilder failed: invalid platform " + method.to_s
+		end	
 	end
 
-	def build(platform, runtime_dir)		
-		puts "Building " + platform
-		send(platform, runtime_dir)
+	def system(str)
+		log(str)
+		Kernel.system(str)
+	end
+		
+	def method_missing(method, *args) 
+		puts "\nFATAL ERROR: invalid platform " + method.to_s
+	end
+
+	def build(platform, runtime_dir)
+		
+		modes = [ 	
+					["release", runtime_dir + "config.h"],
+					["debug", runtime_dir + "configD.h"]	
+				]
+		
+		modes.each do |mode|
+			if File.exist? mode[1]
+				puts "Building " + mode[0] + " runtime for " + platform
+				send(platform, runtime_dir, mode[0])
+			else
+				puts "WARNING: Skipping build. No config file for " + platform + " "  + mode[0] + " runtime "				
+			end
+		end
 	end
 end
 

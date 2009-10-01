@@ -18,15 +18,11 @@ require 'ftools'
 
 class RuntimeBuilder 
 
-	def build_wince(runtime_dir, debug, version) 
-		puts (debug=="D")? "Building debug.":"Building release."
-		
+	def build_wince(runtime_dir, mode, version) 
+		debug = (mode == "debug") ? "D" : "";
+	
 		config_file_dest = $SETTINGS[:wince_source] + "config_platform.h"	
 		config_file_src = runtime_dir + "config" + debug + ".h"
-		if !File.exist? config_file_src
-			puts "\nWARNING! - " + config_file_src + " doesn't exist.. skipping this runtime!\n\n"
-			return
-		end
 	
 		backup_file(config_file_dest)
 	
@@ -53,13 +49,11 @@ class RuntimeBuilder
 		revert_backupped_file(config_file_dest)
 	end
 
-	def sp2003(runtime_dir)
-		build_wince(runtime_dir, "", "sp2003")
-		build_wince(runtime_dir, "D", "sp2003")	
+	def sp2003(runtime_dir, mode)
+		build_wince(runtime_dir, mode, "sp2003")
 	end
 
-	def wm5(runtime_dir)
-		build_wince(runtime_dir, "", "wm5")
-		build_wince(runtime_dir, "D", "wm5")	
+	def wm5(runtime_dir, mode)
+		build_wince(runtime_dir, mode, "wm5")
 	end
 end

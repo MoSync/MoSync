@@ -18,14 +18,12 @@ require 'ftools'
 require 'fileutils'
 			
 class RuntimeBuilder 
-	def javame(runtime_dir)
-		javameBuilder(runtime_dir, false, "release");
-		javameBuilder(runtime_dir, false, "debug");
+	def javame(runtime_dir, mode)
+		javameBuilder(runtime_dir, mode, false)
 	end
 	
-	def javamecldc10(runtime_dir)
-		javameBuilder(runtime_dir, true, "release");
-		javameBuilder(runtime_dir, true, "debug");
+	def javamecldc10(runtime_dir, mode)
+		javameBuilder(runtime_dir, mode, true)
 	end
 	
 	def preprocess_java_file(src_file, src_dir, platform_dir, output_dir, platform_define)
@@ -55,17 +53,8 @@ class RuntimeBuilder
 		}
 	end
 	
-	def javameBuilder(runtime_dir, cldc10, mode)
-		if (mode=="debug") 
-			debug = "D"
-		else
-			debug = ""
-		end
-		
-		if !File.exist? "#{runtime_dir}config#{debug}.h"
-			puts "\nWARNING! - #{runtime_dir}config#{debug}.h doesn't exist.. skipping this runtime!\n\n"
-			return
-		end
+	def javameBuilder(runtime_dir, mode, cldc10)
+		debug = (mode=="debug") ? "D" : ""
 		
 		java_me_source = "#{$SETTINGS[:java_source]}platforms/JavaME/src"
 		

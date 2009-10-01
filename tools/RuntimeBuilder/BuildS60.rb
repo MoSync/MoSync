@@ -16,15 +16,12 @@
 
 class RuntimeBuilder
 
-	def build_symbian(runtime_dir, version, mode) 
+	def build_symbian(runtime_dir, mode, version) 
 		debug = (mode == "debug") ? "D" : "";
 	
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = "#{runtime_dir}config#{debug}.h"
-		if !File.exist? config_file_src
-			puts "\nWARNING! - #{config_file_src} doesn't exist.. skipping this runtime!\n\n"
-			return
-		end		
+	
 		backup_file(config_file_dest)
 		File.copy(config_file_src, config_file_dest)
 		
@@ -91,13 +88,11 @@ class RuntimeBuilder
 		
 	end
 
-	def s60v2(runtime_dir)	
-		build_symbian(runtime_dir, "s60v2", "release")
-		build_symbian(runtime_dir, "s60v2", "debug")	
+	def s60v2(runtime_dir, mode)	
+		build_symbian(runtime_dir, mode, "s60v2")
 	end
 	
-	def s60v3(runtime_dir)
-		build_symbian(runtime_dir, "s60v3", "release")
-		build_symbian(runtime_dir, "s60v3", "debug")
+	def s60v3(runtime_dir, mode)
+		build_symbian(runtime_dir, mode, "s60v3")
 	end
 end
