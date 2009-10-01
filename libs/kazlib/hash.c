@@ -21,6 +21,7 @@
 #ifdef MAPIP
 #include <mastdlib.h>
 #include <limits.h>
+#include <maheap.h>
 #include <maassert.h>
 #define assert MAASSERT
 #else

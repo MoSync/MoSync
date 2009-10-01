@@ -46,7 +46,7 @@ public:
 
 #define STRINGIZE(s) #s
 #define COPY(s) s
-
+#if 0	//unfinished
 		const char* testStrings[] = {
 				TEST_DOUBLES(STRINGIZE)
 		};
@@ -55,9 +55,10 @@ public:
 				TEST_DOUBLES(COPY)
 		};
 
-		for(int i = 0; i < sizeof(testStrings)/sizeof(testStrings[0]); i++) {
+		for(size_t i = 0; i < sizeof(testStrings)/sizeof(testStrings[0]); i++) {
 
 		}
+#endif
 	}
 
 	void start() {

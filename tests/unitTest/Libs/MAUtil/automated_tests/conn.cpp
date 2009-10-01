@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Connection.h>
 #include <conprint.h>
 #include "common.h"
-#include "maheaders.h"
+#include "MAHeaders.h"
 #include "conn_common.h"
 
 //HTTP: use all known headers. add in a bunch of random ones too.

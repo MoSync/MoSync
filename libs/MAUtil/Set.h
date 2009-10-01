@@ -43,15 +43,6 @@ public:
 	}
 };
 
-#if 0	//may be unneeded if Set itself is specialized
-//generic specialization for pointers
-template<class T> class Less<T*> {
-	static bool operator()(const T* a, const T* b) {
-		return *a < *b;
-	}
-};
-#endif
-
 //******************************************************************************
 // Pair
 //******************************************************************************
@@ -65,23 +56,47 @@ template<class F, class S> struct Pair {
 // Set
 //******************************************************************************
 
+/** \brief Thin template sorted Set.
+*
+* The Set is a data storage mechanism that stores unique values.
+* The Set is sorted, by a method selectable by the user.
+* It has fairly fast insert, erase and lookup operations. (O(log n), specifically.)
+* It has an Iterator, which allows you to access all elements in order.
+*
+* This particular implementation is built on top of kazlib's dictionary system,
+* which makes it quite small, even when used with multiple data types.
+*/
 template<class Key, class Comp=Comparator<Key> >
 class Set {
 public:
 	//typedefs
+	/** Internal. */
 	struct DictNode : dnode_t {
 		Key key;
 	};
 
+	/**
+	* An Iterator is bound to a specific Set object.
+	* The Iterator can point to a specific element in that Set, or at Set::end(),
+	* which is "beyond" the last element of the Set.
+	* If the iterator points at Set::end(), attempting to access the element
+	* will cause a crash.
+	*/
 	class Iterator {
 	public:
 		Key& operator*();
 		Key* operator->();
+	
+		/**
+		* Causes the Iterator to point to the next element in the Set to which it is bound.
+		* If the Iterator points to Set::end(), this operation will cause a crash.
+		*/
 		Iterator& operator++();
 
 		/**
+		* Causes the Iterator to point to the previous element in the Set to which it is bound.
 		* \note If the iterator points to the first node,
-		* decrementing it will cause it to point to Set::end().
+		* this operation will cause it to point to Set::end().
 		*/
 		Iterator& operator--();
 
@@ -98,17 +113,50 @@ public:
 	};
 
 	//constructors
+	/// Constructs an empty Set.
 	Set();
+	/// Constructs a copy of another Set. All elements are also copied.
 	Set(const Set&);
+	/// The destructor deletes all elements.
 	~Set();
 
 	//methods
+	/**
+	* Inserts a new value into the Set.
+	*
+	* Returns a Pair. The Pair's first element is true if the value was indeed inserted.
+	* The Pair's second element is an Iterator that points to the element in the Set.
+	*
+	* An element which compares equal to the new one may already be present in the set;
+	* in that case, this operation does nothing, and the iterator returned will point to the old element.
+	*/
 	Pair<bool, Iterator> insert(const Key&);
+	/**
+	* Searches the Set for a specified Key. The returned Iterator points to the element matching the Key
+	* if one was found, or to Set::end() if not.
+	*/
 	Iterator find(const Key&);
+	/**
+	* Deletes an element, matching the specified Key, from the Set.
+	* Returns true if an element was erased, or false if there was no element matching the Key.
+	*/
 	bool erase(const Key&);
+	/**
+	* Returns an Iterator pointing to the first element in the Set.
+	*/
 	Iterator begin();
+	/**
+	* Returns an Iterator pointing to a place beyond the last element of the Set.
+	* This Iterator is often used for comparison with other Iterators.
+	*/
 	Iterator end();
+	/**
+	* Returns the number of elements in the Set.
+	*/
 	size_t size() const;
+	/**
+	* Deletes all elements.
+	*/
 	void clear();
 
 protected:
@@ -131,4 +179,4 @@ protected:
 
 }	//MAUtil
 
-#endif SET_H
+#endif	//SET_H

@@ -150,6 +150,10 @@ public:
 		assert("Set::erase()", s.erase("bar"));
 		assert("Set::erase()", s.size() == 2);
 
+		//copy constuctor
+		MAUtil::Set<MAUtil::String> copy(s);
+		assert("Set::Set(Set)", copy.size() == 2);
+		
 		//clear
 		s.clear();
 		assert("Set::clear()", s.size() == 0);

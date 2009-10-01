@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 
 #include "common.h"
-#include "maheaders.h"
+#include "MAHeaders.h"
 
 class SoundCase : public KeyBaseCase {
 public:

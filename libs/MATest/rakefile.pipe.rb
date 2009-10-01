@@ -9,13 +9,9 @@ BD = "../.."
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = ["."]
-EXTRA_SOURCEFILES = ["../kazlib/dict.c", "../kazlib/hash.c"]
-IGNORED_FILES = ["DomParser.cpp", "XML.cpp", "XML_stack.cpp", "XMLDataProvider.cpp",
-	"XPathTokenizer.cpp", "Stream_utf8.cpp", "Stream_conn.cpp", "HashMap.cpp"]
-IGNORED_HEADERS = IGNORED_FILES.collect {|f| f.ext(".h")} + ["XML_int.h", "Stream_int.h", "StreamBuf.h"]
-
-LIBNAME = "mautil"
-INSTALL_INCDIR = "MAUtil"
+EXTRA_CFLAGS = " -Wno-shadow"
+LIBNAME = "matest"
+INSTALL_INCDIR = "MATest"
 
 #---------------------------------------------------------------------------------
 # actual build rules

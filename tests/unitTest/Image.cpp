@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 #define BIG_PHAT_ERROR maPanic(0, "eeeerrrorr")
 
-#if 0
+#ifdef MAPIP
 inline int abs(int x) {
 	if(x<0) return -x;
 	else return x;
