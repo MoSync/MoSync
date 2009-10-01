@@ -15,42 +15,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef SET_H
-#define SET_H
+#ifndef _SE_MSAB_MAUTIL_SET_H_
+#define _SE_MSAB_MAUTIL_SET_H_
 
 #include <maassert.h>
 #include <kazlib/dict.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
+#include "collection_common.h"
 
 namespace MAUtil {
-
-//******************************************************************************
-// Comparator
-//******************************************************************************
-
-template<class T> class Comparator {
-public:
-	static int Compare(const T& a, const T& b) {
-		if(a < b)
-			return -1;
-		else if(a == b)
-			return 0;
-		else
-			return 1;
-	}
-};
-
-//******************************************************************************
-// Pair
-//******************************************************************************
-
-template<class F, class S> struct Pair {
-	F first;
-	S second;
-};
 
 //******************************************************************************
 // Set
@@ -213,4 +185,4 @@ protected:
 
 }	//MAUtil
 
-#endif	//SET_H
+#endif	//_SE_MSAB_MAUTIL_SET_H_

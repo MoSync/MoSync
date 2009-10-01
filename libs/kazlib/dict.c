@@ -576,9 +576,9 @@ dnode_t* dict_insert(dict_t *dict, dnode_t *node, const void *key)
 		}
 #endif
 		if (result < 0)
-			where = where->left;
+		where = where->left;
 		else
-			where = where->right;
+		where = where->right;
 	}
 
 	assert (where == nil);
@@ -1303,38 +1303,38 @@ static void construct(dict_t *d)
 			break;
 
 		switch (in[0]) {
-			case '?':
-				puts(help);
+		case '?':
+			puts(help);
+			break;
+		case 'p':
+			prompt = 1;
+			break;
+		case 'q':
+			done = 1;
+			break;
+		case 'a':
+			if (tokenize(in+1, &tok1, &tok2, (char **) 0) != 2) {
+				puts("what?");
 				break;
-			case 'p':
-				prompt = 1;
-				break;
-			case 'q':
-				done = 1;
-				break;
-			case 'a':
-				if (tokenize(in+1, &tok1, &tok2, (char **) 0) != 2) {
-					puts("what?");
-					break;
-				}
-				key = dupstring(tok1);
-				val = dupstring(tok2);
-				dn = dnode_create(val);
+			}
+			key = dupstring(tok1);
+			val = dupstring(tok2);
+			dn = dnode_create(val);
 
-				if (!key || !val || !dn) {
-					puts("out of memory");
-					free((void *) key);
-					free(val);
-					if (dn)
-						dnode_destroy(dn);
-				}
+			if (!key || !val || !dn) {
+				puts("out of memory");
+				free((void *) key);
+				free(val);
+				if (dn)
+					dnode_destroy(dn);
+			}
 
-				dict_load_next(&dl, dn, key);
-				break;
-			default:
-				putchar('?');
-				putchar('\n');
-				break;
+			dict_load_next(&dl, dn, key);
+			break;
+		default:
+			putchar('?');
+			putchar('\n');
+			break;
 		}
 	}
 
@@ -1433,15 +1433,15 @@ int main(void)
 			}
 			dn = 0;
 			switch (in[0]) {
-		case 'l':
-			dn = dict_lookup(d, tok1);
-			break;
-		case '(':
-			dn = dict_lower_bound(d, tok1);
-			break;
-		case ')':
-			dn = dict_upper_bound(d, tok1);
-			break;
+			case 'l':
+				dn = dict_lookup(d, tok1);
+				break;
+			case '(':
+				dn = dict_lower_bound(d, tok1);
+				break;
+			case ')':
+				dn = dict_upper_bound(d, tok1);
+				break;
 			}
 			if (!dn) {
 				puts("lookup failed");

@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef SET_H
+#ifndef _SE_MSAB_MAUTIL_SET_H_
 #error Don't include this file directly.
 #endif
 

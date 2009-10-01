@@ -307,11 +307,19 @@
 			Name="Types"
 			>
 			<File
+				RelativePath=".\collection_common.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Geometry.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Geometry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HashMap.h"
 				>
 			</File>
 			<File
