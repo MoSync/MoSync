@@ -354,9 +354,10 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 
 		// Make sure this enum was a function
 
-		if (Final_Pass)
-			if (!EnumIsFunction())
-				Warning("Warning: call targets a non-function\n");
+		//FIXME
+		//if (Final_Pass)
+			//if (!EnumIsFunction())
+				//Warning("Warning: call targets a non-function\n");
 
 		ArraySet(&CallArray, CodeIP, (int) GetLastSymbolRef());
 
@@ -390,9 +391,10 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 
 		// Make sure this enum was a function
 
-		if (Final_Pass)
-			if (!EnumIsFunction())
-				Warning("Warning: call targets a non-function\n");
+		//FIXME
+		//if (Final_Pass)
+			//if (!EnumIsFunction())
+				//Warning("Warning: call targets a non-function\n");
 
 		ArraySet(&CallArray, CodeIP, (int) GetLastSymbolRef());
 

@@ -72,6 +72,7 @@ public:
 	//typedefs
 	/** Internal. */
 	struct DictNode : dnode_t {
+		DictNode();
 		Key key;
 	};
 
@@ -82,6 +83,7 @@ public:
 	* If the iterator points at Set::end(), attempting to access the element
 	* will cause a crash.
 	*/
+	//TODO: postfix operators
 	class Iterator {
 	public:
 		Key& operator*();
@@ -112,11 +114,38 @@ public:
 		friend class Set;
 	};
 
+	/**
+	* A ConstIterator is just like an ordinary Iterator, except
+	* all its methods and return values are const.
+	*/
+	class ConstIterator {
+	public:
+		const Key& operator*() const;
+		const Key* operator->() const;
+	
+		ConstIterator& operator++();
+		ConstIterator& operator--();
+
+		bool operator==(const ConstIterator&) const;
+		bool operator!=(const ConstIterator&) const;
+
+		ConstIterator& operator=(const ConstIterator&);
+		ConstIterator(const ConstIterator&);
+		ConstIterator(const Iterator&);
+	protected:
+		const DictNode* mNode;
+		const dict_t* mDict;
+		ConstIterator(const dict_t*);
+		friend class Set;
+	};
+
 	//constructors
 	/// Constructs an empty Set.
 	Set();
 	/// Constructs a copy of another Set. All elements are also copied.
 	Set(const Set&);
+	/// Clears this Set, then copies the other Set to this one.
+	Set& operator=(const Set&);
 	/// The destructor deletes all elements.
 	~Set();
 
@@ -136,6 +165,7 @@ public:
 	* if one was found, or to Set::end() if not.
 	*/
 	Iterator find(const Key&);
+	ConstIterator find(const Key&) const;
 	/**
 	* Deletes an element, matching the specified Key, from the Set.
 	* Returns true if an element was erased, or false if there was no element matching the Key.
@@ -145,11 +175,13 @@ public:
 	* Returns an Iterator pointing to the first element in the Set.
 	*/
 	Iterator begin();
+	ConstIterator begin() const;
 	/**
 	* Returns an Iterator pointing to a place beyond the last element of the Set.
 	* This Iterator is often used for comparison with other Iterators.
 	*/
 	Iterator end();
+	ConstIterator end() const;
 	/**
 	* Returns the number of elements in the Set.
 	*/
@@ -173,6 +205,8 @@ protected:
 	static dnode_t* alloc(void*) { return new DictNode; }
 	static void free(dnode_t* node, void*) { delete (DictNode*)node; }
 	static int compare(const void*, const void*);
+
+	void init();
 };
 
 #include "Set_impl.h"

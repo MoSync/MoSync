@@ -146,6 +146,25 @@ public:
 		assert("Set::Iterator--", itr != s.end());
 		assert("Set::Iterator", itr->size() == 3);
 
+		//const iterator
+		MAUtil::Set<MAUtil::String>::ConstIterator citr = s.find("bar");
+		assert("cSet::find()", citr != s.end());
+		assert("cSet::find()", *citr == "bar");
+
+		citr = s.begin();
+		assert("cSet::begin()", citr != s.end());
+		assert("cSet::Iterator", *citr == "bar");
+		++citr;
+		assert("cSet::Iterator", *citr == "baz");
+		++citr;
+		assert("cSet::Iterator", *citr == "foo");
+		++citr;
+		assert("cSet::Iterator", citr == s.end());
+
+		--citr;
+		assert("cSet::Iterator--", citr != s.end());
+		assert("cSet::Iterator", citr->size() == 3);
+
 		//erase
 		assert("Set::erase()", s.erase("bar"));
 		assert("Set::erase()", s.size() == 2);
@@ -160,6 +179,10 @@ public:
 		itr = s.find("baz");
 		assert("Set::clear()", itr == s.end());
 		assert("Set::clear()", s.begin() == s.end());
+
+		//assignment operator
+		s = copy;
+		assert("Set::operator=()", s.size() == 2);
 	}
 
 	void map() {
