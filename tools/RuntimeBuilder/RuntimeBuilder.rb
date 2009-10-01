@@ -40,7 +40,7 @@ end
 
 class RuntimeBuilder
 	def system(str)
-		if $SETTINGS[:log_system_calls]
+		if $SETTINGS[:verbose]
 			puts str
 		end
 		Kernel.system(str)

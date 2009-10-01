@@ -138,18 +138,18 @@ class RuntimeBuilder
 		puts "Generating manifest file.."
 		runtime_number = runtime_dir.split('/')[-1] # extract which runtime number it is from the path
 		File.open(temp_dir + "manifest.mf", "w")  do |infile|
-			infile.puts("MIDlet-1: MoSyncRuntime" + runtime_number + " , MoSyncRuntime" + runtime_number + ".png, MAMidlet\n")
-			infile.puts("MIDlet-Name: MAMidlet\n");
-			infile.puts("MIDlet-Vendor: Mobile Sorcery\n");
-			infile.puts("MIDlet-Version: 1.0\n");
-			infile.puts("MicroEdition-Configuration: CLDC-1.1\n");
-			infile.puts("MicroEdition-Profile: MIDP-2.0\n");
+			infile.puts "MIDlet-1: MoSyncRuntime" + runtime_number + " , MoSyncRuntime" + runtime_number + ".png, MAMidlet\n"
+			infile.puts "MIDlet-Name: MAMidlet\n"
+			infile.puts "MIDlet-Vendor: Mobile Sorcery\n"
+			infile.puts "MIDlet-Version: 1.0\n"
+			infile.puts "MicroEdition-Configuration: CLDC-1.1\n"
+			infile.puts "MicroEdition-Profile: MIDP-2.0\n"
 		end
 		
 		# Build jar file
 		puts "Building jar file.."
 		dos_class_dir = class_dir.gsub(/\//, "\\") # fixes the slashes so that the jar file gets it right
-		system("jar cfm " + runtime_dir + "MoSyncRuntimeTemp.jar " + temp_dir + "manifest.mf " + "-C " + dos_class_dir + " .");
+		system("jar cfm " + runtime_dir + "MoSyncRuntimeTemp.jar " + temp_dir + "manifest.mf " + "-C " + dos_class_dir + " .")
 		
 		if !File.exist? runtime_dir + "MoSyncRuntimeTemp.jar"
 			puts "\nFATAL ERROR! - Unable to build jar file, check previous output for errors!\n\n"
@@ -187,8 +187,8 @@ class RuntimeBuilder
 		# Clean and delete all the temporary folders
 		FileUtils.rm_rf temp_dir
 		FileUtils.rm_rf class_dir
-		File.delete(runtime_dir + "MoSyncRuntimeObfuscated.jar")
-		File.delete(runtime_dir + "MoSyncRuntimeTemp.jar")
+		File.delete runtime_dir + "MoSyncRuntimeObfuscated.jar"
+		File.delete runtime_dir + "MoSyncRuntimeTemp.jar"
 		
 		if !File.exist? runtime_dir + "MoSyncRuntime" + debug + ".jar"
 			puts "\nFATAL ERROR! - No jar file built, check previous output for errors!\n\n"
