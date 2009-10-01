@@ -13,6 +13,9 @@ RELEVANT_CAPS = [
 	'MaxJarSize',
 	'JavaPackage',
 	'OS',
+	
+	'features',
+	'JavaConfiguration'
 ]
 
 JAVA_RELEVANT_THINGS = [
@@ -49,8 +52,6 @@ CAP_TYPES = {
 #
 #
 #
-
-$bpp = Set.new
 
 class Device
 	#include Comparable
@@ -128,6 +129,12 @@ class Array
 	end
 end
 
+class String
+	def format
+		return gsub(/[\-\.\s]/, "_").upcase();
+	end
+end
+
 puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
 
@@ -154,8 +161,8 @@ db.execute( "select name from vendor" ) do |vendor|
 			profile.puts
 			profile.puts "MA_PROF_STRING_VENDOR \"#{vendor}\""
 			profile.puts "MA_PROF_STRING_DEVICE \"#{device[1]}\""
-			profile.puts "MA_PROF_VENDOR_#{vendor[0].upcase}"
-			profile.puts "MA_PROF_DEVICE_#{device[1].upcase}"
+			profile.puts "MA_PROF_VENDOR_#{vendor[0].format}"
+			profile.puts "MA_PROF_DEVICE_#{device[1].format}"
 			profile.puts
 			RELEVANT_CAPS.each do |cap|
 				device_query.bind_params(cap.to_s, device[0].to_s);
@@ -163,9 +170,9 @@ db.execute( "select name from vendor" ) do |vendor|
 				) do |value|
 					if(CAP_TYPES[:constant].include? cap)
 						value.each do |v|
-							def_name = "MA_PROF_CONST_#{cap.upcase}"
+							def_name = "MA_PROF_CONST_#{cap.format}"
 							dev_obj.caps[def_name] = "#{v.to_s.upcase}"
-							def_str = "#define #{def_name} #{v.to_s.upcase}"
+							def_str = "#define #{def_name} #{v.to_s.format}"
 							if(!(seen_defines.include? def_name)) then
 								seen_defines << def_name
 								profile.puts def_str
@@ -173,14 +180,42 @@ db.execute( "select name from vendor" ) do |vendor|
 						end
 					elsif(CAP_TYPES[:supports].include? cap)
 						value.each do |v|
-							v.to_s.upcase!
-							def_name = "MA_PROF_SUPPORT_#{cap.upcase}"
+							if(cap == "OS")
+								os_name = v.to_s.downcase 
+								if((os_name.include? "motorola") ||
+									(os_name.include? "blackberry"))
+								dev_obj.caps["MA_PROF_BUG_BACKLIGHTFLASHES"] = "TRUE";
+								def_str = "#define MA_PROF_BUG_BACKLIGHTFLASHES"
+								profile.puts def_str						
+								end
+							end
+							
+							def_name = "MA_PROF_SUPPORT_#{cap.format}"
 							if(!(seen_defines.include? def_name)) then
 								if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
 									seen_defines << def_name
 								end
-								dev_obj.caps["#{def_name}_#{v.to_s.upcase}"] = "TRUE";
-								def_str = "#define #{def_name}_#{v.to_s.upcase}"
+								dev_obj.caps["#{def_name}_#{v.to_s.format}"] = "TRUE";
+								def_str = "#define #{def_name}_#{v.to_s.format}"
+								profile.puts def_str
+							end
+						end
+					elsif(cap == "features")
+						value.each do |v|
+							#puts v.to_s
+							if v.to_s == "hasPointerEvents"
+								dev_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
+								def_str = "#define MA_PROF_SUPPORT_STYLUS"
+								profile.puts def_str							elsif v.to_s == "isVirtual"
+								## should not generate this profile......
+							end
+						end
+					elsif(cap == "JavaConfiguration")
+						value.each do |v|
+							if (v.to_s == "CLDC/1.0" ||
+								v.to_s == "CLDC/1.0.4")
+								dev_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = "TRUE";
+								def_str = "#define MA_PROF_SUPPORT_CLDC_10"
 								profile.puts def_str
 							end
 						end
@@ -189,18 +224,16 @@ db.execute( "select name from vendor" ) do |vendor|
 			end
 			profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 		end
-		$bpp.add dev_obj.caps["BitsPerPixel"].to_i	
 		devices[device[2].to_sym].add_device dev_obj
 
 	end
-	puts $bpp.to_s	
 end
 	devices.each do |platform, devs|
 		puts "#{platform} has #{devs.size} devices!"
 	end
-	devices[:JavaME].each do |device|
-		puts "\ndevice:"
-		device.caps.each do |define, value|
-			puts "#{define} = #{value}" 
-		end
-	end
+#	devices[:JavaME].each do |device|
+#		puts "\ndevice:"
+#		device.caps.each do |define, value|
+#			puts "#{define} = #{value}" 
+#		end
+#	end
