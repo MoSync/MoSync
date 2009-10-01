@@ -19,7 +19,6 @@ JAVA_RELEVANT_THINGS = [
 		'MA_PROF_SUPPORT_JAVAPACKAGE_BTAPI',
 		'MA_PROF_BUG_BACKLIGHTFLASHES',
 		'MA_PROF_BUG_MICROEMU',
-		'MA_PROF_SUPPORT_FRAMEBUFFER_32BIT',
 		'MA_PROF_SUPPORT_STYLUS',
 		'MA_PROF_SUPPORT_CLDC_10',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
@@ -76,17 +75,7 @@ class Device
 				'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
 				'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI'
 			].each do |cap|
-				if(@caps[cap] == nil || other.caps[cap] == nil) then
-					if(@caps[cap] == nil && other.caps[cap] == nil) then
-						same = true
-					else
-						return false
-					end
-				else 
-					same = (@caps[cap] == other.caps[cap])
-				end
-				#puts "comparing cap #{cap}, src = #{@caps[cap]}, dst = #{other.caps[cap]}, equal? = #{same}"
-				if(!same) then
+				if(@caps.has_key?(cap) != other.caps.has_key?(cap)) then
 					return false
 				end
 			end
@@ -127,6 +116,9 @@ devices = {
 
 class Array
 	def add_device(d)
+#		JAVA_RELEVANT_THINGS.each do |t|
+			#puts "d: #{t} : '#{d.caps[t]}'"
+#		end
 		self.each do |e|
 			if(e.cmp d) then
 				return
@@ -145,15 +137,14 @@ device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
 			   " devicecapvalue.device=?");
 			   
 File.makedirs "output"
-#db.execute( "select name from vendor" ) do |vendor|
-db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
+db.execute( "select name from vendor" ) do |vendor|
+#db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 	puts vendor
 	File.makedirs "output/#{vendor}"
 	db.execute("SELECT device.id, device.name, platform.name FROM device, vendor " <<
 		"INNER JOIN platformversion ON device.platformversion = platformversion.id " <<
 		"INNER JOIN platform ON platformversion.platform = platform.id " <<
 		"WHERE vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
-		#puts "device: #{device[1]}, platform: #{device[2]}"
 		dev_obj = Device.new(device[2].to_s)
 		seen_defines = []
 		device_path = "output/#{vendor}/#{device[1]}"
@@ -166,7 +157,6 @@ db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 			profile.puts "MA_PROF_VENDOR_#{vendor[0].upcase}"
 			profile.puts "MA_PROF_DEVICE_#{device[1].upcase}"
 			profile.puts
-			start_time = Time.now
 			RELEVANT_CAPS.each do |cap|
 				device_query.bind_params(cap.to_s, device[0].to_s);
 				device_query.execute(
@@ -174,9 +164,6 @@ db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 					if(CAP_TYPES[:constant].include? cap)
 						value.each do |v|
 							def_name = "MA_PROF_CONST_#{cap.upcase}"
-							if(def_name == "MA_PROF_CONST_BITSPERPIXEL") then
-								puts "assigning cap name : #{def_name} => #{v.to_s.upcase}"
-							end
 							dev_obj.caps[def_name] = "#{v.to_s.upcase}"
 							def_str = "#define #{def_name} #{v.to_s.upcase}"
 							if(!(seen_defines.include? def_name)) then
@@ -192,8 +179,7 @@ db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 								if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
 									seen_defines << def_name
 								end
-								#puts "assigning cap name 2: #{def_name}_#{v.to_s.upcase} => <empty string>"
-								dev_obj.caps["#{def_name}_#{v.to_s.upcase}"] = "";
+								dev_obj.caps["#{def_name}_#{v.to_s.upcase}"] = "TRUE";
 								def_str = "#define #{def_name}_#{v.to_s.upcase}"
 								profile.puts def_str
 							end
@@ -201,17 +187,20 @@ db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 					end
 				end
 			end
-			end_time = Time.now
-			#puts "Query took: #{(end_time - start_time)}"
 			profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 		end
 		$bpp.add dev_obj.caps["BitsPerPixel"].to_i	
 		devices[device[2].to_sym].add_device dev_obj
 
 	end
+	puts $bpp.to_s	
+end
 	devices.each do |platform, devs|
 		puts "#{platform} has #{devs.size} devices!"
 	end
-	puts $bpp.to_s	
-end
-
+	devices[:JavaME].each do |device|
+		puts "\ndevice:"
+		device.caps.each do |define, value|
+			puts "#{define} = #{value}" 
+		end
+	end
