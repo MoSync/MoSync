@@ -2,5 +2,5 @@
 
 call setsymbian.bat
 call setwince.bat
-set MOSYNCPOLISH_HAVE=%MOSYNCPOLISH_HAVE% -arm-recompiler
+set MOSYNC_HAVE=%MOSYNC_HAVE% -arm-recompiler
 call run.bat
