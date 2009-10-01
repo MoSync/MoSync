@@ -21,21 +21,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MA_CLIP_STACK_DEPTH 128
 #define MA_TRANSFORM_STACK_DEPTH 128
 
-static MARect clipStack[MA_CLIP_STACK_DEPTH];
-static int clipStackPtr = -1;
-static MAPoint2d transformStack[MA_TRANSFORM_STACK_DEPTH];
-static int transformStackPtr = -1;
+static MARect sClipStack[MA_CLIP_STACK_DEPTH];
+static int sClipStackPtr = -1;
+static MAPoint2d sTransformStack[MA_TRANSFORM_STACK_DEPTH];
+static int sTransformStackPtr = -1;
 
-static MAPoint2d currentOffset = {0, 0};
+static MAPoint2d sCurrentOffset = {0, 0};
 
 #define PUSH_EMPTY_CLIPRECT Gfx_pushClipRect(0,0,0,0)
 #define false 0
 #define true 1
 
 static void _Gfx_init() {
-	if(clipStackPtr < 0)
+	if(sClipStackPtr < 0)
 		Gfx_clearClipRect();
-	if(transformStackPtr < 0)
+	if(sTransformStackPtr < 0)
 		Gfx_clearMatrix();
 }
 
@@ -44,12 +44,12 @@ static void _Gfx_init() {
 **/
 void Gfx_clearClipRect() {
 	MAExtent s = maGetScrSize();
-	clipStackPtr = 0;
+	sClipStackPtr = 0;
 	maSetClipRect(0,0,EXTENT_X(s),EXTENT_Y(s));
-	clipStack[0].left = 0;
-	clipStack[0].top = 0;
-	clipStack[0].width = EXTENT_X(s);
-	clipStack[0].height = EXTENT_Y(s);
+	sClipStack[0].left = 0;
+	sClipStack[0].top = 0;
+	sClipStack[0].width = EXTENT_X(s);
+	sClipStack[0].height = EXTENT_Y(s);
 }
 
 /** Sets the clip rect to the content of the top of the stack without changing the stack.  
@@ -58,12 +58,12 @@ void Gfx_clearClipRect() {
 BOOL Gfx_restoreClipRect() {
 	_Gfx_init();
 	maSetClipRect(
-		clipStack[clipStackPtr].left, 
-		clipStack[clipStackPtr].top, 
-		clipStack[clipStackPtr].width, 
-		clipStack[clipStackPtr].height 
+		sClipStack[sClipStackPtr].left, 
+		sClipStack[sClipStackPtr].top, 
+		sClipStack[sClipStackPtr].width, 
+		sClipStack[sClipStackPtr].height 
 		);
-	if(clipStack[clipStackPtr].width>0 && clipStack[clipStackPtr].height>0) return TRUE;
+	if(sClipStack[sClipStackPtr].width>0 && sClipStack[sClipStackPtr].height>0) return TRUE;
 	else return FALSE;
 }
 
@@ -72,19 +72,19 @@ BOOL Gfx_restoreClipRect() {
 **/
 BOOL Gfx_pushClipRect(int left, int top, int width, int height) {
 	_Gfx_init();
-	if(clipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
+	if(sClipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Clip stack overflow");
 		return FALSE;
 	}
-	left+=currentOffset.x; top+=currentOffset.y;
+	left+=sCurrentOffset.x; top+=sCurrentOffset.y;
 	maSetClipRect(left, top, width, height);
 	
-	clipStackPtr++;
-	clipStack[clipStackPtr].left   = left; 
-	clipStack[clipStackPtr].top    = top; 
-	clipStack[clipStackPtr].width  = width; 
-	clipStack[clipStackPtr].height = height; 		
-	if(clipStack[clipStackPtr].width>0 && clipStack[clipStackPtr].height>0) return TRUE;
+	sClipStackPtr++;
+	sClipStack[sClipStackPtr].left   = left; 
+	sClipStack[sClipStackPtr].top    = top; 
+	sClipStack[sClipStackPtr].width  = width; 
+	sClipStack[sClipStackPtr].height = height; 		
+	if(sClipStack[sClipStackPtr].width>0 && sClipStack[sClipStackPtr].height>0) return TRUE;
 	else return FALSE;
 }
 
@@ -97,14 +97,14 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 	int pWidth;
 	int pHeight;
 	_Gfx_init();
-	pLeft = clipStack[clipStackPtr].left;
-	pTop = clipStack[clipStackPtr].top;
-	pWidth = clipStack[clipStackPtr].width;
-	pHeight = clipStack[clipStackPtr].height;
+	pLeft = sClipStack[sClipStackPtr].left;
+	pTop = sClipStack[sClipStackPtr].top;
+	pWidth = sClipStack[sClipStackPtr].width;
+	pHeight = sClipStack[sClipStackPtr].height;
 	
-	left+=currentOffset.x; top+=currentOffset.y;
+	left+=sCurrentOffset.x; top+=sCurrentOffset.y;
 
-	if(clipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
+	if(sClipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Clip stack overflow");
 		return FALSE;
 	}
@@ -162,13 +162,13 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 
 	maSetClipRect(left, top, width, height);
 	
-	clipStackPtr++;
-	clipStack[clipStackPtr].left   = left; 
-	clipStack[clipStackPtr].top    = top; 
-	clipStack[clipStackPtr].width  = width; 
-	clipStack[clipStackPtr].height = height; 		
+	sClipStackPtr++;
+	sClipStack[sClipStackPtr].left   = left; 
+	sClipStack[sClipStackPtr].top    = top; 
+	sClipStack[sClipStackPtr].width  = width; 
+	sClipStack[sClipStackPtr].height = height; 		
 	
-	if(clipStack[clipStackPtr].width>0 && clipStack[clipStackPtr].height>0) return TRUE;
+	if(sClipStack[sClipStackPtr].width>0 && sClipStack[sClipStackPtr].height>0) return TRUE;
 	else return FALSE;
 
 }
@@ -179,17 +179,17 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
    **/
 BOOL Gfx_popClipRect() {
 	_Gfx_init();
-	clipStackPtr--;
-	if(clipStackPtr <= -1) {
-		clipStackPtr = -1;
+	sClipStackPtr--;
+	if(sClipStackPtr <= -1) {
+		sClipStackPtr = -1;
 		return FALSE;
 	} else maSetClipRect(	
-		clipStack[clipStackPtr].left, 
-		clipStack[clipStackPtr].top, 
-		clipStack[clipStackPtr].width, 
-		clipStack[clipStackPtr].height);
+		sClipStack[sClipStackPtr].left, 
+		sClipStack[sClipStackPtr].top, 
+		sClipStack[sClipStackPtr].width, 
+		sClipStack[sClipStackPtr].height);
 
-	if(clipStack[clipStackPtr].width>0 && clipStack[clipStackPtr].height>0) return TRUE;
+	if(sClipStack[sClipStackPtr].width>0 && sClipStack[sClipStackPtr].height>0) return TRUE;
 	else return FALSE;
 }
 
@@ -197,43 +197,43 @@ BOOL Gfx_popClipRect() {
   * Clears the transform stack.
   **/
 void Gfx_clearMatrix() {
-	transformStackPtr = 0;
-	currentOffset.x = 0;
-	currentOffset.y = 0;
-	transformStack[0].x = 0;
-	transformStack[0].y = 0;
+	sTransformStackPtr = 0;
+	sCurrentOffset.x = 0;
+	sCurrentOffset.y = 0;
+	sTransformStack[0].x = 0;
+	sTransformStack[0].y = 0;
 }
 
 /** Pushes the current transform on the stack **/
 void Gfx_pushMatrix() {
 	_Gfx_init();
-	if(transformStackPtr >= MA_TRANSFORM_STACK_DEPTH-1) {
+	if(sTransformStackPtr >= MA_TRANSFORM_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Transform stack overflow");
 		return;
 	}
 
 	//maSetClipRect(left, top, width, height);
-	transformStackPtr++;
-	transformStack[transformStackPtr] = currentOffset;
+	sTransformStackPtr++;
+	sTransformStack[sTransformStackPtr] = sCurrentOffset;
 }
 /** Pops the previous transform off the stack **/
 void Gfx_popMatrix() {
 	_Gfx_init();
-	if(transformStackPtr < 0) {
+	if(sTransformStackPtr < 0) {
 		PANIC_MESSAGE("Transform stack underflow");
 		return;
 	}
-	transformStackPtr--;
-	currentOffset = transformStack[transformStackPtr];
+	sTransformStackPtr--;
+	sCurrentOffset = sTransformStack[sTransformStackPtr];
 }
 /** Translates the current transform by x,y **/
 void Gfx_translate(int x, int y) {
-	currentOffset.x += x;
-	currentOffset.y += y;
+	sCurrentOffset.x += x;
+	sCurrentOffset.y += y;
 }
 
 MAPoint2d Gfx_getTranslation() {
-	return currentOffset;
+	return sCurrentOffset;
 }
 
 
@@ -252,41 +252,41 @@ BOOL Gfx_popRect() {
 
 /** Plots a pixel with the current color at x, y with respect to the current transform **/
 void Gfx_plot(int x, int y) {
-	maPlot(currentOffset.x + x, currentOffset.y + y);
+	maPlot(sCurrentOffset.x + x, sCurrentOffset.y + y);
 }
 /** Draws a line with the current color from x1,  y1 to x2, y2 with respect to the current transform **/
 void Gfx_line(int x1, int y1, int x2, int y2) {
-	maLine(currentOffset.x + x1, currentOffset.y + y1, currentOffset.x + x2, currentOffset.y + y2);
+	maLine(sCurrentOffset.x + x1, sCurrentOffset.y + y1, sCurrentOffset.x + x2, sCurrentOffset.y + y2);
 }
 /** Draws a line with the current color from x1,  y1 to x2, y2 with respect to the current transform **/
 void Gfx_fillRect(int left, int top, int width, int height) {
 	maFillRect(
-		currentOffset.x + left,
-		currentOffset.y + top,
+		sCurrentOffset.x + left,
+		sCurrentOffset.y + top,
 		width,
 		height
 	);
 }
 
 void Gfx_drawText(int left, int top, const char* text) {
-	maDrawText(currentOffset.x + left, currentOffset.y + top, text);
+	maDrawText(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
 }
 
 void Gfx_drawImage(MAHandle image, int left, int top) {
-	maDrawImage(image, currentOffset.x + left, currentOffset.y + top);
+	maDrawImage(image, sCurrentOffset.x + left, sCurrentOffset.y + top);
 }
 
 void Gfx_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength) {
 	MAPoint2d p = *dstPoint;
-	p.x += currentOffset.x;
-	p.y += currentOffset.y;
+	p.x += sCurrentOffset.x;
+	p.y += sCurrentOffset.y;
 	
 	maDrawRGB(&p, src, srcRect, scanlength);
 }
 
 void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode) {
 	MAPoint2d p = *dstPoint;
-	p.x += currentOffset.x;
-	p.y += currentOffset.y;
+	p.x += sCurrentOffset.x;
+	p.y += sCurrentOffset.y;
 	maDrawImageRegion(image, srcRect, &p, transformMode);
 }
