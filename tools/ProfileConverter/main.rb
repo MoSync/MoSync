@@ -95,16 +95,16 @@ class Device
 			true
 		elsif(@platform == "s60v2")
 			#return ((@caps["BitsPerPixel"].to_i > 16) != (other.caps["BitsPerPixel"].to_i > 16))
-			if(@caps["BitsPerPixel"] == nil || other.caps["BitsPerPixel"] == nil) then
-				if(@caps["BitsPerPixel"] == nil && other.caps["BitsPerPixel"] == nil) then
+			if(@caps["MA_PROF_CONST_BITSPERPIXEL"] == nil || other.caps["MA_PROF_CONST_BITSPERPIXEL"] == nil) then
+				if(@caps["MA_PROF_CONST_BITSPERPIXEL"] == nil && other.caps["MA_PROF_CONST_BITSPERPIXEL"] == nil) then
 					return true;
 				else
 					return false
 				end
 			end
-			if((@caps["BitsPerPixel"].to_i > 16) && (other.caps["BitsPerPixel"].to_i > 16)) then
+			if((@caps["MA_PROF_CONST_BITSPERPIXEL"].to_i > 16) && (other.caps["MA_PROF_CONST_BITSPERPIXEL"].to_i > 16)) then
 				return true
-			elsif((@caps["BitsPerPixel"].to_i <= 16) && (other.caps["BitsPerPixel"].to_i <= 16)) then
+			elsif((@caps["MA_PROF_CONST_BITSPERPIXEL"].to_i <= 16) && (other.caps["MA_PROF_CONST_BITSPERPIXEL"].to_i <= 16)) then
 				return true
 			else
 				return false
@@ -135,7 +135,6 @@ class Array
 		self << d
 	end
 end
-
 
 puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
@@ -175,7 +174,9 @@ db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 					if(CAP_TYPES[:constant].include? cap)
 						value.each do |v|
 							def_name = "MA_PROF_CONST_#{cap.upcase}"
-							#puts "assigning cap name : #{def_name} => #{v.to_s.upcase}"
+							if(def_name == "MA_PROF_CONST_BITSPERPIXEL") then
+								puts "assigning cap name : #{def_name} => #{v.to_s.upcase}"
+							end
 							dev_obj.caps[def_name] = "#{v.to_s.upcase}"
 							def_str = "#define #{def_name} #{v.to_s.upcase}"
 							if(!(seen_defines.include? def_name)) then
