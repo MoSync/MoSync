@@ -78,4 +78,4 @@ require "BuildS60.rb"
 require "BuildWinCE.rb"
 
 runtime_builder = RuntimeBuilder.new
-runtime_builder.build(ARGV[1], ARGV[2])
+runtime_builder.build(ARGV[1].downcase, ARGV[2])
