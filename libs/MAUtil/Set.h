@@ -40,13 +40,14 @@ namespace MAUtil {
 */
 template<class Key, class Comp=Comparator<Key> >
 class Set {
-public:
-	//typedefs
+protected:
 	/** Internal. */
 	struct DictNode : dnode_t {
 		DictNode();
 		Key key;
 	};
+public:
+	class ConstIterator;
 
 	/**
 	* An Iterator is bound to a specific Set object.
@@ -54,6 +55,7 @@ public:
 	* which is "beyond" the last element of the Set.
 	* If the iterator points at Set::end(), attempting to access the element
 	* will cause a crash.
+	* The Iterator is bidirectional; it can move backwards or forwards through the Set.
 	*/
 	//TODO: postfix operators
 	class Iterator {
@@ -84,6 +86,7 @@ public:
 		dict_t* mDict;
 		Iterator(dict_t*);
 		friend class Set;
+		friend class ConstIterator;
 	};
 
 	/**
@@ -131,7 +134,7 @@ public:
 	* An element which compares equal to the new one may already be present in the set;
 	* in that case, this operation does nothing, and the iterator returned will point to the old element.
 	*/
-	Pair<bool, Iterator> insert(const Key&);
+	Pair<Iterator, bool> insert(const Key&);//TODO
 	/**
 	* Searches the Set for a specified Key. The returned Iterator points to the element matching the Key
 	* if one was found, or to Set::end() if not.
@@ -143,6 +146,8 @@ public:
 	* Returns true if an element was erased, or false if there was no element matching the Key.
 	*/
 	bool erase(const Key&);
+	
+	void erase(Iterator);//TODO
 	/**
 	* Returns an Iterator pointing to the first element in the Set.
 	*/
@@ -150,7 +155,7 @@ public:
 	ConstIterator begin() const;
 	/**
 	* Returns an Iterator pointing to a place beyond the last element of the Set.
-	* This Iterator is often used for comparison with other Iterators.
+	* This Iterator is often used to determine when another Iterator has reached its end.
 	*/
 	Iterator end();
 	ConstIterator end() const;
