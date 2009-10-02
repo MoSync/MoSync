@@ -823,7 +823,7 @@ hashcount_t hash_size(hash_t *hash)
 	return hash->nchains;
 }
 
-static hash_val_t hash_fun_default(const void *key)
+hash_val_t hash_fun_default(const void *key)
 {
 	static unsigned long randbox[] = {
 		0x49848f1bU, 0xe6255dbaU, 0x36da5bdcU, 0x47bf94e9U,

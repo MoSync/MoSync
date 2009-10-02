@@ -22,13 +22,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <kazlib/hash.h>
 #include "collection_common.h"
 
-//namespace MAUtil {
+namespace MAUtil {
+
+//Template hash function declaration.
+//Note that there is no default implementation.
+template<class Key> hash_val_t THashFunction(const Key&);
+
+//We can have specializations for all the common types.
+//But we'll start with just these few.
+
+template<> hash_val_t THashFunction(const String&);
+template<> hash_val_t THashFunction(const int&);
 
 /** \brief Thin template HashMap.
 *
 * The HashMap is a data storage mechanism that stores unique keys,
 * and a value associated with each key.
-* It has very fast insert, erase and lookup operations. (O(???), specifically.) // probably near constant time
+*
+* It has very fast insert, erase and lookup operations,
+* assuming a good hash function is being used. For a perfect hash function
+* (which generally doesn't exist), lookups and erases take constant time,
+* while inserts run in constant time amortized over O(n).
+*
 * It has an Iterator, which allows you to access all elements.
 * The HashMap is not sorted. For each iteration, you will get an undefined,
 * semi-random order of elements.
@@ -81,7 +96,7 @@ public:
 	
 	typedef hash_val_t (*HashFunction)(const Key&);
 	
-	HashMap(HashFunction hf = NULL);
+	HashMap(HashFunction hf = &THashFunction<Key>);
 	HashMap(const HashMap&);
 	HashMap& operator=(const HashMap);
 	~HashMap();
@@ -101,16 +116,18 @@ public:
 	
 protected:
 	hast_t mHash;
+	HashFunction mHashFunction;
 
 	static hnode_t* alloc(void*) { return new HashNode; }
 	static void free(hnode_t* node, void*) { delete (HashNode*)node; }
 	static int compare(const void*, const void*);
+	//static hash_val_t hash(const void*);
 
 	void init();
 };
 
 #include "HashMap_impl.h"
 
-//}	//MAUtil
+}	//MAUtil
 
 #endif	//_SE_MSAB_MAUTIL_HASHMAP_H_

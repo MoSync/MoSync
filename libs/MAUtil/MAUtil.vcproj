@@ -323,6 +323,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HashMap_impl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\List.h"
 				>
 			</File>

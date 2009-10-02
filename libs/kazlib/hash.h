@@ -233,6 +233,8 @@ extern void hnode_destroy(hnode_t *);
 #define hnode_put(N, V) ((N)->hash_data = (V))
 #endif
 
+hash_val_t hash_fun_default(const void *);
+
 #ifdef __cplusplus
 }
 #endif
