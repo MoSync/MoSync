@@ -129,10 +129,11 @@ static hash_val_t compute_mask(hashcount_t size)
 
 static void clear_table(hash_t *hash)
 {
-	hash_val_t i;
+	/*hash_val_t i;
 
 	for (i = 0; i < hash->nchains; i++)
-		hash->table[i] = NULL;
+		hash->table[i] = NULL;*/
+	memset(hash->table, 0, hash->nchains * sizeof(hnode_t*));
 }
 
 /*
@@ -560,7 +561,7 @@ hnode_t* hash_clone_insert(hash_t *hash, hnode_t *node)
 	assert (hash_val_t_bit != 0);
 	assert (hash->nodecount < hash->maxcount);	/* 1 */
 	//assert (hash_lookup(hash, node->key) == NULL);	/* 2 */
-	oldNode = hash_lookup(hash, node->key);
+	oldNode = hash_lookup_hkey(hash, node->key, node->hash_hkey);
 	if(oldNode != NULL) {	/* 2 */
 		return oldNode;
 	}
@@ -595,10 +596,16 @@ hnode_t* hash_clone_insert(hash_t *hash, hnode_t *node)
 
 hnode_t *hash_lookup(hash_t *hash, const void *key)
 {
-	hash_val_t hkey, chain;
+	hash_val_t hkey;
+	hkey = hash->function(key);		/* 1 */
+	return hash_lookup_hkey(hash, key, hkey);
+}
+
+hnode_t *hash_lookup_hkey(hash_t *hash, const void *key, hash_val_t hkey)
+{
+	hash_val_t chain;
 	hnode_t *nptr;
 
-	hkey = hash->function(key);		/* 1 */
 	chain = hkey & hash->mask;		/* 2 */
 
 	for (nptr = hash->table[chain]; nptr; nptr = nptr->next) {	/* 3 */

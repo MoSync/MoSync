@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maheap.h>
 #include <kazlib/hash.h>
 #include "collection_common.h"
+#include "String.h"
 
 namespace MAUtil {
 
@@ -52,7 +53,7 @@ template<> hash_val_t THashFunction(const int&);
 * This particular implementation is built on top of kazlib's hash table system,
 * which makes it quite small, even when used with multiple data types.
 */
-template<class Key, class Value, class Comp=Comparator<Key> >
+template<class Key, class Value>
 class HashMap {
 public:
 	typedef Pair<Key, Value> PairKV;
@@ -116,13 +117,17 @@ public:
 		ConstIterator(const Iterator&);
 	protected:
 		hscan_t mScan;
-		ConstIterator(hscan_t*);
+		ConstIterator();
 		friend class HashMap;
 	};
 
 	typedef hash_val_t (*HashFunction)(const Key&);
+	typedef int (*CompareFunction)(const Key&, const Key&);
 
-	HashMap(HashFunction hf = &THashFunction<Key>, int init_bits = 6);
+	HashMap(HashFunction hf = &THashFunction<Key>,
+		CompareFunction cf = &Compare<Key>,
+		int init_bits = 6);
+
 	HashMap(const HashMap&);
 	HashMap& operator=(const HashMap&);
 	~HashMap();
@@ -160,8 +165,6 @@ protected:
 
 	static hnode_t* alloc(void*) { return new HashNode; }
 	static void free(hnode_t* node, void*) { delete (HashNode*)node; }
-	static int compare(const void*, const void*);
-	//static hash_val_t hash(const void*);
 
 	void init();
 };

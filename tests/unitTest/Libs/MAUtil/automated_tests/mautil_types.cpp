@@ -78,36 +78,36 @@ public:
 	}
 
 	void string() {
-		String str = "test";
+		MAUtil::String str = "test";
 		assert("String::==", str == "test");
 		assert("String::!=", str != "fest");
-		assert("String::<", !(str < "fest") && (String("fest") < str));
-		assert("String::>", !(String("fest") > str) && (str > "fest"));
+		assert("String::<", !(str < "fest") && (MAUtil::String("fest") < str));
+		assert("String::>", !(MAUtil::String("fest") > str) && (str > "fest"));
 		assert("String::<=", str <= "test" && str <= "west");
 		assert("String::>=", str >= "test" && str >= "fest");
 		assert("String::+", (str + "ing") == "testing");
 		str+="ing";
 		assert("String::+=", str == "testing");
-		assert("String::find()", str.find("ing") == 4 && str.find("1") == String::npos);
+		assert("String::find()", str.find("ing") == 4 && str.find("1") == MAUtil::String::npos);
 		str+=" string";
-		assert("String::findLastOf()", str.findLastOf('g') == 13 && str.findLastOf('1') == String::npos);
-		assert("String::findFirstOf()", str.findFirstOf('g') == 6 && str.findFirstOf('1') == String::npos);
+		assert("String::findLastOf()", str.findLastOf('g') == 13 && str.findLastOf('1') == MAUtil::String::npos);
+		assert("String::findFirstOf()", str.findFirstOf('g') == 6 && str.findFirstOf('1') == MAUtil::String::npos);
 		assert("String::findFirstNotOf()", str.findFirstNotOf('t') == 1 && str.findFirstNotOf('1') == 0);
-		str.insert(7, " ");
-		assert("String::insert(string)", str == "testing  string");
+		str.insert(7, " MAUtil::");
+		assert("String::insert(string)", str == "testing MAUtil:: string");
 
 		str.remove(16, 2);
-		assert("String::remove()", str == "testing tring");
+		assert("String::remove()", str == "testing MAUtil::tring");
 
 		str.insert(16, 'S');
-		assert("String::insert(char)", str == "testing String");
+		assert("String::insert(char)", str == "testing MAUtil::String");
 
 		assert("String::substr()", str.substr(8, 6) == "MAUtil");
 
 		assert("String::size(), length()", str.size() == 22 && str.length() == 22);
 
 		str.reserve(32);
-		assert("String::reserve()", str == "testing String" && str.size() == 22);
+		assert("String::reserve()", str == "testing MAUtil::String" && str.size() == 22);
 		assert("String::capacity()", str.capacity() == 32);
 
 		str.clear();
@@ -209,30 +209,26 @@ public:
 		HashMap<String, String>::Iterator itr = m.find("bar");
 		assert("HashMap::find()", itr != m.end());
 		assert("HashMap::find()", itr->first == "bar");
+		assert("HashMap::find()", itr->second == "B4R");
 
 		//iterate
 		itr = m.begin();
 		assert("HashMap::begin()", itr != m.end());
-		assert("HashMap::Iterator", itr->first == "bar");
 		++itr;
-		assert("HashMap::Iterator", itr->first == "baz");
 		++itr;
-		assert("HashMap::Iterator", itr->first == "foo");
 		++itr;
 		assert("HashMap::Iterator", itr == m.end());
 
 		//const iterator
-		HashMap<String, String>::ConstIterator citr = m.find("bar");
+		HashMap<String, String>::ConstIterator citr = m.find("baz");
 		assert("cHashMap::find()", citr != m.end());
-		assert("cHashMap::find()", citr->first == "bar");
+		assert("cHashMap::find()", citr->first == "baz");
+		assert("cHashMap::find()", citr->second == "B4Z");
 
 		citr = m.begin();
 		assert("cHashMap::begin()", citr != m.end());
-		assert("cHashMap::Iterator", citr->first == "bar");
 		++citr;
-		assert("cHashMap::Iterator", citr->first == "baz");
 		++citr;
-		assert("cHashMap::Iterator", citr->first == "foo");
 		++citr;
 		assert("cHashMap::Iterator", citr == m.end());
 
@@ -245,7 +241,7 @@ public:
 		assert("HashMap::HashMap(HashMap)", copy.size() == 2);
 		
 		//erase by iterator
-		assert("HashMap::erase(Iterator)", m.erase(m.find("baz")));
+		m.erase(m.find("baz"));
 		assert("HashMap::erase(Iterator)", m.size() == 1);
 
 		//clear

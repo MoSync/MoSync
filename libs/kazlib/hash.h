@@ -197,6 +197,7 @@ extern hash_t *hash_init(hash_t *, hashcount_t, hash_comp_t,
 extern hnode_t* hash_insert(hash_t *, hnode_t *, const void *);
 extern hnode_t* hash_clone_insert(hash_t *hash, hnode_t *node);
 extern hnode_t *hash_lookup(hash_t *, const void *);
+extern hnode_t *hash_lookup_hkey(hash_t *hash, const void *key, hash_val_t hkey);
 extern hnode_t *hash_delete(hash_t *, hnode_t *);
 extern int hash_alloc_insert(hash_t *, const void *, void *);
 extern void hash_delete_free(hash_t *, hnode_t *);

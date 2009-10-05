@@ -23,11 +23,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // THashFunction
 //******************************************************************************
 
-template<> hash_val_t THashFunction(const String& s) {
+template<> hash_val_t THashFunction<String>(const String& s) {
 	return hash_fun_default(s.c_str());
 }
 
-template<> hash_val_t THashFunction(const int& data) {
+template<> hash_val_t THashFunction<int>(const int& data) {
 	int key = data;
 	key = key + ~(key << 15); // key = key - (key << 15) - 1;
 	key = key ^ (key >> 10);
@@ -42,40 +42,45 @@ template<> hash_val_t THashFunction(const int& data) {
 // HashMap
 //******************************************************************************
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::HashNode::HashNode() {
+template<class Key, class Value>
+HashMap<Key, Value>::HashNode::HashNode() {
 	memset((hnode_t*)this, 0, sizeof(hnode_t));
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::HashMap(HashFunction hf, int init_bits) {
+template<class Key, class Value>
+HashMap<Key, Value>::HashMap(HashFunction hf, CompareFunction cf, int init_bits) {
 	int init_size = 1 << init_bits;
 	hnode_t** table = (hnode_t**)malloc(sizeof(hnode_t*) * init_size);
-	hash_init(&mHash, HASHCOUNT_T_MAX, &compare, (hash_fun_t)hf, table, init_size);
+	hash_init(&mHash, HASHCOUNT_T_MAX, (hash_comp_t)cf, (hash_fun_t)hf, table, init_size);
 	mHash.hash_dynamic = 1;
+	mHash.hash_highmark = init_size * 2;
+	mHash.hash_lowmark = init_size / 2;
 	hash_set_allocator(&mHash, &alloc, &free, this);
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::HashMap(const HashMap& o) {
-	mHash.hash_table = NULL;	//setup for clear()
-	clear();
+template<class Key, class Value>
+HashMap<Key, Value>::HashMap(const HashMap& o) {
+	//setup for clear()
+	mHash.hash_table = NULL;
+	mHash.hash_nchains = 0;
 	operator=(o);
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>& HashMap<Key, Value, Comp>::operator=(const HashMap& o) {
+template<class Key, class Value>
+HashMap<Key, Value>& HashMap<Key, Value>::operator=(const HashMap& o) {
 	clear();
+	::free(mHash.hash_table);
 	mHash = o.mHash;
-	mHash.hash_table = (hnode_t**)malloc(sizeof(hnode_t*) * mHash.hash_nchains);
+	mHash.hash_table = (hnode_t**)calloc(mHash.hash_nchains, sizeof(hnode_t*));
+	mHash.hash_nodecount = 0;
 	for(hashcount_t i=0; i<mHash.hash_nchains; i++) {
-		mHash.hash_table[i] = o.mHash.hash_table[i];
-		if(o.mHash.hash_table[i] == NULL) {
+		const HashNode* oldNode = (HashNode*)o.mHash.hash_table[i];
+		if(oldNode == NULL) {
 			mHash.hash_table[i] = NULL;
 		} else {
-			const HashNode* oldNode = (HashNode*)o.mHash.hash_table[i];
 			while(oldNode) {
 				HashNode* newNode = new HashNode(*oldNode);
+				newNode->hash_key = &newNode->data.first;
 				hash_clone_insert(&mHash, newNode);
 				oldNode = (HashNode*)oldNode->hash_next;
 			}
@@ -84,23 +89,20 @@ HashMap<Key, Value, Comp>& HashMap<Key, Value, Comp>::operator=(const HashMap& o
 	return *this;
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::~HashMap() {
+template<class Key, class Value>
+HashMap<Key, Value>::~HashMap() {
 	clear();
+	::free(mHash.hash_table);
 }
 
-template<class Key, class Value, class Comp>
-void HashMap<Key, Value, Comp>::clear() {
-	if(mHash.hash_table) {
-		hash_free_nodes_noclear(&mHash);
-		::free(mHash.hash_table);
-		mHash.hash_table = NULL;
-	}
+template<class Key, class Value>
+void HashMap<Key, Value>::clear() {
+	hash_free_nodes(&mHash);
 }
 
-template<class Key, class Value, class Comp>
-Pair<typename HashMap<Key, Value, Comp>::Iterator, bool>
-HashMap<Key, Value, Comp>::insert(const Key& key, const Value& value) {
+template<class Key, class Value>
+Pair<typename HashMap<Key, Value>::Iterator, bool>
+HashMap<Key, Value>::insert(const Key& key, const Value& value) {
 	Pair<Iterator, bool> pair = { Iterator(), false };
 	HashNode* newNode = new HashNode();
 	newNode->data.first = key;
@@ -108,6 +110,7 @@ HashMap<Key, Value, Comp>::insert(const Key& key, const Value& value) {
 	if(resNode == NULL) {	//success
 		pair.second = true;
 		hash_scan_init(&pair.first.mScan, &mHash, newNode);
+		newNode->data.second = value;
 	} else {	//this key was already in the table
 		pair.second = false;
 		hash_scan_init(&pair.first.mScan, &mHash, resNode);
@@ -115,22 +118,24 @@ HashMap<Key, Value, Comp>::insert(const Key& key, const Value& value) {
 	return pair;
 }
 
-template<class Key, class Value, class Comp>
-typename HashMap<Key, Value, Comp>::Iterator HashMap<Key, Value, Comp>::find(const Key& key) {
+template<class Key, class Value>
+typename HashMap<Key, Value>::Iterator
+HashMap<Key, Value>::find(const Key& key) {
 	Iterator itr;
 	hnode_t* node = hash_lookup(&mHash, &key);
 	hash_scan_init(&itr.mScan, &mHash, node);
 	return itr;
 }
 
-template<class Key, class Value, class Comp>
-typename HashMap<Key, Value, Comp>::ConstIterator HashMap<Key, Value, Comp>::find(const Key& key) const {
+template<class Key, class Value>
+typename HashMap<Key, Value>::ConstIterator
+HashMap<Key, Value>::find(const Key& key) const {
 	//call the non-const function. it's safe, promise :)
 	return ((HashMap*)this)->find(key);
 }
 
-template<class Key, class Value, class Comp>
-bool HashMap<Key, Value, Comp>::erase(const Key& key) {
+template<class Key, class Value>
+bool HashMap<Key, Value>::erase(const Key& key) {
 	hnode_t* node = hash_lookup(&mHash, &key);
 	if(node == NULL)
 		return false;
@@ -138,42 +143,155 @@ bool HashMap<Key, Value, Comp>::erase(const Key& key) {
 	return true;
 }
 
-template<class Key, class Value, class Comp>
-void HashMap<Key, Value, Comp>::erase(Iterator itr) {
+template<class Key, class Value>
+void HashMap<Key, Value>::erase(Iterator itr) {
 	hash_scan_delete(&mHash, itr.mScan.hash_next);
 }
 
-template<class Key, class Value, class Comp>
-size_t HashMap<Key, Value, Comp>::size() const {
+template<class Key, class Value>
+size_t HashMap<Key, Value>::size() const {
 	return hash_count(&mHash);
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::Iterator HashMap<Key, Value, Comp>::begin() {
+template<class Key, class Value>
+typename HashMap<Key, Value>::Iterator HashMap<Key, Value>::begin() {
 	Iterator itr;
 	hash_scan_begin(&itr.mScan, &mHash);
 	return itr;
 }
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::ConstIterator HashMap<Key, Value, Comp>::begin() const {
+template<class Key, class Value>
+typename HashMap<Key, Value>::ConstIterator HashMap<Key, Value>::begin() const {
 	ConstIterator itr;
 	hash_scan_begin(&itr.mScan, &mHash);
 	return itr;
 }
 
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::Iterator HashMap<Key, Value, Comp>::end() {
+template<class Key, class Value>
+typename HashMap<Key, Value>::Iterator HashMap<Key, Value>::end() {
 	Iterator itr;
+	itr.mScan.hash_table = &mHash;
+	itr.mScan.hash_next = NULL;
+	return itr;
 }
-template<class Key, class Value, class Comp>
-HashMap<Key, Value, Comp>::ConstIterator HashMap<Key, Value, Comp>::end() const;
+template<class Key, class Value>
+typename HashMap<Key, Value>::ConstIterator HashMap<Key, Value>::end() const {
+	ConstIterator itr;
+	itr.mScan.hash_table = &mHash;
+	itr.mScan.hash_next = NULL;
+	return itr;
+}
 
-
+template<class Key, class Value>
+Value& HashMap<Key, Value>::operator[](const Key& key) {
+	HashNode* node = (HashNode*)hash_lookup(&mHash, &key);
+	if(node == NULL) {
+		node = new HashNode();
+		node->data.first = key;
+		hash_insert(&mHash, node, &node->data.first);
+	}
+	return node->data.second;
+}
 
 //******************************************************************************
 // Iterator
 //******************************************************************************
 
+template<class Key, class Value>
+HashMap<Key, Value>::Iterator::Iterator() {
+}
+
+template<class Key, class Value>
+HashMap<Key, Value>::Iterator::Iterator(const Iterator& o) : mScan(o.mScan) {
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::Iterator&
+HashMap<Key, Value>::Iterator::operator=(const Iterator& o) {
+	mScan = o.mScan;
+	return *this;
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::PairKV&
+HashMap<Key, Value>::Iterator::operator*() {
+	MAASSERT(mScan.hash_next != NULL);
+	return ((HashNode*)mScan.hash_next)->data;
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::PairKV*
+HashMap<Key, Value>::Iterator::operator->() {
+	MAASSERT(mScan.hash_next != NULL);
+	return &((HashNode*)mScan.hash_next)->data;
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::Iterator&
+HashMap<Key, Value>::Iterator::operator++() {
+	hash_scan_next(&mScan);
+	return *this;
+}
+
+template<class Key, class Value>
+bool HashMap<Key, Value>::Iterator::operator==(const Iterator& o) const {
+	return mScan.hash_next == o.mScan.hash_next;
+}
+
+template<class Key, class Value>
+bool HashMap<Key, Value>::Iterator::operator!=(const Iterator& o) const {
+	return mScan.hash_next != o.mScan.hash_next;
+}
+
 //******************************************************************************
 // ConstIterator
 //******************************************************************************
+
+template<class Key, class Value>
+HashMap<Key, Value>::ConstIterator::ConstIterator() {
+}
+
+template<class Key, class Value>
+HashMap<Key, Value>::ConstIterator::ConstIterator(const ConstIterator& o) : mScan(o.mScan) {
+}
+
+template<class Key, class Value>
+HashMap<Key, Value>::ConstIterator::ConstIterator(const Iterator& o) : mScan(o.mScan) {
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::ConstIterator&
+HashMap<Key, Value>::ConstIterator::operator=(const ConstIterator& o) {
+	mScan = o.mScan;
+	return *this;
+}
+
+template<class Key, class Value>
+const typename HashMap<Key, Value>::PairKV&
+HashMap<Key, Value>::ConstIterator::operator*() const {
+	MAASSERT(mScan.hash_next != NULL);
+	return ((HashNode*)mScan.hash_next)->data;
+}
+
+template<class Key, class Value>
+const typename HashMap<Key, Value>::PairKV*
+HashMap<Key, Value>::ConstIterator::operator->() const {
+	MAASSERT(mScan.hash_next != NULL);
+	return &((HashNode*)mScan.hash_next)->data;
+}
+
+template<class Key, class Value>
+typename HashMap<Key, Value>::ConstIterator&
+HashMap<Key, Value>::ConstIterator::operator++() {
+	hash_scan_next(&mScan);
+	return *this;
+}
+
+template<class Key, class Value>
+bool HashMap<Key, Value>::ConstIterator::operator==(const ConstIterator& o) const {
+	return mScan.hash_next == o.mScan.hash_next;
+}
+
+template<class Key, class Value>
+bool HashMap<Key, Value>::ConstIterator::operator!=(const ConstIterator& o) const {
+	return mScan.hash_next != o.mScan.hash_next;
+}

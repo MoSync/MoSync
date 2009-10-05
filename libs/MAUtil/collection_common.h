@@ -28,6 +28,7 @@ namespace MAUtil {
 // Comparator
 //******************************************************************************
 
+//TODO: remove
 template<class T> class Comparator {
 public:
 	static int Compare(const T& a, const T& b) {
@@ -39,6 +40,15 @@ public:
 			return 1;
 	}
 };
+
+template<class T> int Compare(const T& a, const T& b) {
+	if(a < b)
+		return -1;
+	else if(a == b)
+		return 0;
+	else
+		return 1;
+}
 
 //******************************************************************************
 // Pair
