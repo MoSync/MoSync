@@ -41,22 +41,24 @@ class RuntimeBuilder
 		exe_file_src = "#{src_folder}#{configuration}/Release/MoRE-winmobile.exe"
 		exe_file_dest = "#{runtime_dir}MoRE-winmobile#{debug}.exe" 
 		
+		# Restore config_platform.h
+		revert_backupped_file(config_file_dest)
+		
 		if File.exist? exe_file_src
 			File.copy(exe_file_src, exe_file_dest)
 			puts "\nFINISHED! - #{exe_file_dest} was succesfully generated!\n\n"
+			return 0
 		else
 			puts "\nFATAL ERROR! - No exe file built, check previous output for errors!\n\n"
+			return 1
 		end
-		
-		# Restore config_platform.h
-		revert_backupped_file(config_file_dest)
 	end
 
 	def sp2003(runtime_dir, mode)
-		build_wince(runtime_dir, mode, "sp2003")
+		return build_wince(runtime_dir, mode, "sp2003")
 	end
 
 	def wm5(runtime_dir, mode)
-		build_wince(runtime_dir, mode, "wm5")
+		return build_wince(runtime_dir, mode, "wm5")
 	end
 end

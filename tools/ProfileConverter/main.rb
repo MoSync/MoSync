@@ -133,7 +133,7 @@ runtimes = {
 	:sp2003 => [],
 	:s60v2  => [],
 	:s60v3  => [],
-	:JavaME => []
+	:JavaME => [],
 }
 
 class Array
@@ -316,22 +316,21 @@ runtimes.each do |platform_name, platform|
 		Dir.chdir "../RuntimeBuilder/"
 		
 		if(runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10")
-			system ("ruby RuntimeBuilder.rb Settings.rb javamecldc10 ../ProfileConverter/profiles/runtimes/#{runtime_dir}")	
+			success = system("ruby RuntimeBuilder.rb Settings.rb javamecldc10 ../ProfileConverter/profiles/runtimes/#{runtime_dir}")	
 		else
-			system ("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
+			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
 		end
-		
-		error = ENV['ERRORLEVEL'] 
 		
 		Dir.chdir cwd
 
-		if(error)
-			exit(error)
+		if(!success)
+			exit(1)
 		end
 		
 		id = id + 1
 	end
 end
+exit(0)
 
 #	runtimes[:JavaME].each do |device|
 #		puts "\ndevice:"

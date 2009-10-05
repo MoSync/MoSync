@@ -19,11 +19,11 @@ require 'fileutils'
 			
 class RuntimeBuilder 
 	def javame(runtime_dir, mode)
-		javameBuilder(runtime_dir, mode, false)
+		return javameBuilder(runtime_dir, mode, false)
 	end
 	
 	def javamecldc10(runtime_dir, mode)
-		javameBuilder(runtime_dir, mode, true)
+		return javameBuilder(runtime_dir, mode, true)
 	end
 	
 	def preprocess_java_file(src_file, src_dir, platform_dir, output_dir, platform_define)
@@ -155,10 +155,11 @@ class RuntimeBuilder
 		
 		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.jar"
 			puts "\nFATAL ERROR! - No jar file built, check previous output for errors!\n\n"
+			return 1
 		else
 			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.jar was succesfully generated!\n\n"
+			return 0
 		end
-		
 	end
 	
 end

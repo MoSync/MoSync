@@ -45,6 +45,9 @@ class RuntimeBuilder
 		system("call abld clean #{symbian_system} urel");
 		system("call abld build #{symbian_system} urel");		
 		
+		# revert initial config file
+		revert_backupped_file(config_file_dest)
+		
 		# go back to the initial directory
 		Dir.chdir cwd
 		
@@ -55,7 +58,7 @@ class RuntimeBuilder
 			
 			if(!File.exist? app_file) 
 				puts "FATAL ERROR! - S60 2nd build failed."
-				return
+				return 1
 			end			
 			
 			# Copy all the generated files to it's runtime folder
@@ -65,6 +68,7 @@ class RuntimeBuilder
 			File.copy("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")			
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.app, and other runtime files was succesfully generated!\n\n"
+			return 0
 		else
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"		
@@ -72,7 +76,7 @@ class RuntimeBuilder
 			
 			if(!File.exist? exe_file) 
 				puts "FATAL ERROR! - S60 3rd build failed."
-				return
+				return 1
 			end
 		
 			# Copy all the generated files to it's runtime folder
@@ -82,17 +86,15 @@ class RuntimeBuilder
 			File.copy("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
+			return 0
 		end
-		
-		revert_backupped_file(config_file_dest)
-		
 	end
 
 	def s60v2(runtime_dir, mode)	
-		build_symbian(runtime_dir, mode, "s60v2")
+		return build_symbian(runtime_dir, mode, "s60v2")
 	end
 	
 	def s60v3(runtime_dir, mode)
-		build_symbian(runtime_dir, mode, "s60v3")
+		return build_symbian(runtime_dir, mode, "s60v3")
 	end
 end

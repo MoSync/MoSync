@@ -64,7 +64,10 @@ class RuntimeBuilder
 		modes.each do |mode|
 			if File.exist? mode[1]
 				puts "Building #{mode[0]} runtime for #{platform}"
-				send(platform, runtime_dir, mode[0])
+				error = send(platform, runtime_dir, mode[0])
+				if(error != 0)
+					exit(error)
+				end
 			else
 				puts "WARNING: Skipping build. No config file for #{platform} #{mode[0]} runtime."				
 			end
