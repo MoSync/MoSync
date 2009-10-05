@@ -278,7 +278,13 @@ runtimes.each do |platform_name, platform|
 		
 		cwd = Dir.pwd
 		Dir.chdir "../RuntimeBuilder/"
-		system ("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
+		
+		if(runtime.has_key? "MA_PROF_SUPPORT_CLDC_10")
+			system ("ruby RuntimeBuilder.rb Settings.rb javamecldc10 ../ProfileConverter/profiles/runtimes/#{runtime_dir}")	
+		else
+			system ("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
+		end
+		
 		Dir.chdir cwd
 				
 		id = id + 1
