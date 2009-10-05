@@ -218,8 +218,6 @@ int main(int argc, char **argv)
 				);
 	}
 
-	char *outName = 0;
-
 	for(int i = 1; i < argc; i++) {
 		if(strcmp(argv[i], "-in")==0) {
 			i++;
@@ -230,12 +228,17 @@ int main(int argc, char **argv)
 			inFiles.push_back(argv[i]);
 		}
 		else if(strcmp(argv[i], "-out")==0) {
+			if(outFile) {
+				printf("cannot have multiple out files.");
+				return 1;
+			}
+
 			i++;
 			if(i>=argc) {
 				printf("not enough parameters for -out");			
 				return 1;
 			}
-			outName = argv[i];
+			outFile = fopen(argv[i], "wb");
 		}
 		else if(strcmp(argv[i], "-toUpper")==0) {
 			changeCase = 1;
