@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _SE_MSAB_MAUTIL_HASHMAP_H_
 
 #include <maassert.h>
+#include <maheap.h>
 #include <kazlib/hash.h>
 #include "collection_common.h"
 
@@ -53,12 +54,12 @@ template<> hash_val_t THashFunction(const int&);
 */
 template<class Key, class Value, class Comp=Comparator<Key> >
 class HashMap {
+public:
+	typedef Pair<Key, Value> PairKV;
 protected:
-	class HashNode : hnode_t {
-	public:
+	struct HashNode : hnode_t {
 		HashNode();
-		Key k;
-		Value v;
+		PairKV data;
 	};
 public:
 	class ConstIterator;
@@ -73,9 +74,10 @@ public:
 	*/
 	//TODO: postfix operator
 	class Iterator {
-		Key& operator*();
-		Key* operator->();
-	
+	public:
+		PairKV& operator*();
+		PairKV* operator->();
+
 		/**
 		* Causes the Iterator to point to the next element in the HashMap to which it is bound.
 		* If the Iterator points to HashMap::end(), this operation will cause a crash.
@@ -89,21 +91,46 @@ public:
 		Iterator(const Iterator&);
 	protected:
 		hscan_t mScan;
-		Iterator(hscan_t*);
+		Iterator();
 		friend class HashMap;
 		friend class ConstIterator;
 	};
-	
+
+	/**
+	* A ConstIterator is just like an ordinary Iterator, except
+	* all its methods and return values are const.
+	*/
+	class ConstIterator {
+	public:
+		const PairKV& operator*() const;
+		const PairKV* operator->() const;
+
+		ConstIterator& operator++();
+		ConstIterator& operator--();
+
+		bool operator==(const ConstIterator&) const;
+		bool operator!=(const ConstIterator&) const;
+
+		ConstIterator& operator=(const ConstIterator&);
+		ConstIterator(const ConstIterator&);
+		ConstIterator(const Iterator&);
+	protected:
+		hscan_t mScan;
+		ConstIterator(hscan_t*);
+		friend class HashMap;
+	};
+
 	typedef hash_val_t (*HashFunction)(const Key&);
-	
-	HashMap(HashFunction hf = &THashFunction<Key>);
+
+	HashMap(HashFunction hf = &THashFunction<Key>, int init_bits = 6);
 	HashMap(const HashMap&);
-	HashMap& operator=(const HashMap);
+	HashMap& operator=(const HashMap&);
 	~HashMap();
-	
-	Pair<Iterator, bool> insert(Key, Value);
-	Iterator find(Key);
-	bool erase(Key);
+
+	Pair<Iterator, bool> insert(const Key&, const Value&);
+	Iterator find(const Key&);
+	ConstIterator find(const Key&) const;
+	bool erase(const Key&);
 	void erase(Iterator);
 	size_t size() const;
 	void clear();
@@ -113,9 +140,22 @@ public:
 
 	Iterator end();
 	ConstIterator end() const;
-	
+
+	/**
+	* The square bracket operator returns a reference to the Value
+	* corresponding to the specified Key.
+	*
+	* If the Key doesn't yet exist in the HashMap, it will be inserted
+	* with a default Value.
+	*
+	* There is no const variant of this function, because each call might
+	* potentially modify the HashMap by inserting a new key.
+	* Use find() if you have a const HashMap.
+	*/
+	Value& operator[](const Key&);
+
 protected:
-	hast_t mHash;
+	hash_t mHash;
 	HashFunction mHashFunction;
 
 	static hnode_t* alloc(void*) { return new HashNode; }

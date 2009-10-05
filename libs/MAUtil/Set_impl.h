@@ -77,19 +77,19 @@ void Set<Key, Comp>::clear() {
 }
 
 template<class Key, class Comp>
-Pair<bool, class Set<Key, Comp>::Iterator> Set<Key, Comp>::insert(const Key& key) {
-	Pair<bool, Iterator> pair = { false, Iterator(&mDict) };
+Pair<class Set<Key, Comp>::Iterator, bool> Set<Key, Comp>::insert(const Key& key) {
+	Pair<Iterator, bool> pair = { Iterator(&mDict), false };
 	DictNode* newNode = new DictNode;
 	dnode_init(newNode, NULL);
 	newNode->key = key;
 	DictNode* res = (DictNode*)dict_insert(&mDict, newNode, &newNode->key);
 	if(res != NULL) {	//insert->dupe
 		delete newNode;
-		pair.first = false;
-		pair.second.mNode = res;
+		pair.first.mNode = res;
+		pair.second = false;
 	} else {	//insert successful
-		pair.first = true;
-		pair.second.mNode = newNode;
+		pair.first.mNode = newNode;
+		pair.second = true;
 	}
 	return pair;
 }

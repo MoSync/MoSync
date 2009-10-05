@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include <MAUtil/Set.h>
 #include <MAUtil/Map.h>
+#include <MAUtil/HashMap.h>
 #include <conprint.h>
 
 #include "common.h"
@@ -26,6 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TEST_CAPACITY 16
 
 static const int srcData[] = {1, 2, 3};
+
+using namespace MAUtil;
 
 class MAUtilTypesTest : public MATest::TestCase {
 public:
@@ -35,6 +38,7 @@ public:
 		vector();
 		string();
 		set();
+		hashMap();
 		map();
 		/*
 		list();
@@ -44,7 +48,7 @@ public:
 	}
 
 	void vector() {
-		MAUtil::Vector<int> v(TEST_CAPACITY);
+		Vector<int> v(TEST_CAPACITY);
 		assert("Vector::capacity()", v.capacity() == TEST_CAPACITY);
 
 		v.add(4);
@@ -74,36 +78,36 @@ public:
 	}
 
 	void string() {
-		MAUtil::String str = "test";
+		String str = "test";
 		assert("String::==", str == "test");
 		assert("String::!=", str != "fest");
-		assert("String::<", !(str < "fest") && (MAUtil::String("fest") < str));
-		assert("String::>", !(MAUtil::String("fest") > str) && (str > "fest"));
+		assert("String::<", !(str < "fest") && (String("fest") < str));
+		assert("String::>", !(String("fest") > str) && (str > "fest"));
 		assert("String::<=", str <= "test" && str <= "west");
 		assert("String::>=", str >= "test" && str >= "fest");
 		assert("String::+", (str + "ing") == "testing");
 		str+="ing";
 		assert("String::+=", str == "testing");
-		assert("String::find()", str.find("ing") == 4 && str.find("1") == MAUtil::String::npos);
+		assert("String::find()", str.find("ing") == 4 && str.find("1") == String::npos);
 		str+=" string";
-		assert("String::findLastOf()", str.findLastOf('g') == 13 && str.findLastOf('1') == MAUtil::String::npos);
-		assert("String::findFirstOf()", str.findFirstOf('g') == 6 && str.findFirstOf('1') == MAUtil::String::npos);
+		assert("String::findLastOf()", str.findLastOf('g') == 13 && str.findLastOf('1') == String::npos);
+		assert("String::findFirstOf()", str.findFirstOf('g') == 6 && str.findFirstOf('1') == String::npos);
 		assert("String::findFirstNotOf()", str.findFirstNotOf('t') == 1 && str.findFirstNotOf('1') == 0);
-		str.insert(7, " MAUtil::");
-		assert("String::insert(string)", str == "testing MAUtil:: string");
+		str.insert(7, " ");
+		assert("String::insert(string)", str == "testing  string");
 
 		str.remove(16, 2);
-		assert("String::remove()", str == "testing MAUtil::tring");
+		assert("String::remove()", str == "testing tring");
 
 		str.insert(16, 'S');
-		assert("String::insert(char)", str == "testing MAUtil::String");
+		assert("String::insert(char)", str == "testing String");
 
 		assert("String::substr()", str.substr(8, 6) == "MAUtil");
 
 		assert("String::size(), length()", str.size() == 22 && str.length() == 22);
 
 		str.reserve(32);
-		assert("String::reserve()", str == "testing MAUtil::String" && str.size() == 22);
+		assert("String::reserve()", str == "testing String" && str.size() == 22);
 		assert("String::capacity()", str.capacity() == 32);
 
 		str.clear();
@@ -111,22 +115,22 @@ public:
 	}
 
 	void set() {
-		MAUtil::Set<MAUtil::String> s;
+		Set<String> s;
 
 		//insert
-		assert("Set::insert()", s.insert("foo").first);
-		assert("Set::insert()", s.insert("bar").first);
-		assert("Set::insert()", s.insert("baz").first);
+		assert("Set::insert()", s.insert("foo").second);
+		assert("Set::insert()", s.insert("bar").second);
+		assert("Set::insert()", s.insert("baz").second);
 		assert("Set::size()", s.size() == 3);
 
 		//dupe insert
-		Pair<bool, MAUtil::Set<MAUtil::String>::Iterator> res = s.insert("foo");
-		assert("Set::insert()", !res.first);
-		assert("Set::insert()", res.second != s.end());
-		assert("Set::insert()", *res.second == "foo");
+		Pair<Set<String>::Iterator, bool> res = s.insert("foo");
+		assert("Set::insert()", !res.second);
+		assert("Set::insert()", res.first != s.end());
+		assert("Set::insert()", *res.first == "foo");
 
 		//find
-		MAUtil::Set<MAUtil::String>::Iterator itr = s.find("bar");
+		Set<String>::Iterator itr = s.find("bar");
 		assert("Set::find()", itr != s.end());
 		assert("Set::find()", *itr == "bar");
 
@@ -147,7 +151,7 @@ public:
 		assert("Set::Iterator", itr->size() == 3);
 
 		//const iterator
-		MAUtil::Set<MAUtil::String>::ConstIterator citr = s.find("bar");
+		Set<String>::ConstIterator citr = s.find("bar");
 		assert("cSet::find()", citr != s.end());
 		assert("cSet::find()", *citr == "bar");
 
@@ -170,7 +174,7 @@ public:
 		assert("Set::erase()", s.size() == 2);
 
 		//copy constuctor
-		MAUtil::Set<MAUtil::String> copy(s);
+		Set<String> copy(s);
 		assert("Set::Set(Set)", copy.size() == 2);
 		
 		//clear
@@ -184,13 +188,88 @@ public:
 		s = copy;
 		assert("Set::operator=()", s.size() == 2);
 	}
+	
+	void hashMap() {
+		HashMap<String, String> m;
+
+		//insert
+		assert("HashMap::insert()", m.insert("foo", "F00").second);
+		assert("HashMap::insert()", m.insert("bar", "B4R").second);
+		assert("HashMap::insert()", m.insert("baz", "B4Z").second);
+		assert("HashMap::size()", m.size() == 3);
+
+		//dupe insert
+		Pair<HashMap<String, String>::Iterator, bool> res = m.insert("foo", "whatev");
+		assert("HashMap::insert()", !res.second);
+		assert("HashMap::insert()", res.first != m.end());
+		assert("HashMap::insert()", res.first->first == "foo");
+		assert("HashMap::insert()", res.first->second == "F00");
+
+		//find
+		HashMap<String, String>::Iterator itr = m.find("bar");
+		assert("HashMap::find()", itr != m.end());
+		assert("HashMap::find()", itr->first == "bar");
+
+		//iterate
+		itr = m.begin();
+		assert("HashMap::begin()", itr != m.end());
+		assert("HashMap::Iterator", itr->first == "bar");
+		++itr;
+		assert("HashMap::Iterator", itr->first == "baz");
+		++itr;
+		assert("HashMap::Iterator", itr->first == "foo");
+		++itr;
+		assert("HashMap::Iterator", itr == m.end());
+
+		//const iterator
+		HashMap<String, String>::ConstIterator citr = m.find("bar");
+		assert("cHashMap::find()", citr != m.end());
+		assert("cHashMap::find()", citr->first == "bar");
+
+		citr = m.begin();
+		assert("cHashMap::begin()", citr != m.end());
+		assert("cHashMap::Iterator", citr->first == "bar");
+		++citr;
+		assert("cHashMap::Iterator", citr->first == "baz");
+		++citr;
+		assert("cHashMap::Iterator", citr->first == "foo");
+		++citr;
+		assert("cHashMap::Iterator", citr == m.end());
+
+		//erase
+		assert("HashMap::erase()", m.erase("bar"));
+		assert("HashMap::erase()", m.size() == 2);
+
+		//copy constuctor
+		HashMap<String, String> copy(m);
+		assert("HashMap::HashMap(HashMap)", copy.size() == 2);
+		
+		//erase by iterator
+		assert("HashMap::erase(Iterator)", m.erase(m.find("baz")));
+		assert("HashMap::erase(Iterator)", m.size() == 1);
+
+		//clear
+		m.clear();
+		assert("HashMap::clear()", m.size() == 0);
+		itr = m.find("baz");
+		assert("HashMap::clear()", itr == m.end());
+		assert("HashMap::clear()", m.begin() == m.end());
+
+		//assignment operator
+		m = copy;
+		assert("HashMap::operator=", m.size() == 2);
+		
+		//square bracket operator
+		m["norg"] = "N07G";
+		assert("HashMap::operator[]", m["foo"] == "F00");
+	}
 
 	void map() {
-		MAUtil::Map<MAUtil::String, MAUtil::String> m;
+		Map<String, String> m;
 		m["Abraham"] = "Lincoln";
 		m["Benjamin"] = "Franklin";
 		m["George"] = "Washington";
-		const MAUtil::Vector<MAUtil::String>& keys = m.getKeySet();
+		const Vector<String>& keys = m.getKeySet();
 		assert("Map::getKeySet().size()", keys.size()==3);
 		assert("Map::getKeySet()",
 				keys[0] == "Abraham" &&
@@ -198,7 +277,7 @@ public:
 				keys[2] == "George"
 		);
 
-		MAUtil::String* s = m.get("Benjamin");
+		String* s = m.get("Benjamin");
 		assert("Map::get()!=NULL", s!=NULL && *s=="Franklin");
 		s = m.get("Edgar");
 		assert("Map::get()==NULL", s==NULL);

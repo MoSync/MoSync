@@ -146,8 +146,15 @@ public:
 	* Returns true if an element was erased, or false if there was no element matching the Key.
 	*/
 	bool erase(const Key&);
-	
-	void erase(Iterator);//TODO
+
+	/**
+	* Deletes an element, pointed to by the specified Iterator.
+	* The Iterator is invalidated, so if you want to continue iterating through the Set,
+	* you must use a different Iterator instance.
+	* \warning If the Iterator is bound to a different Set, or if it
+	* points to end(), the system will crash.
+	*/
+	void erase(Iterator);
 	/**
 	* Returns an Iterator pointing to the first element in the Set.
 	*/

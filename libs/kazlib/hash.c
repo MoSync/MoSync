@@ -16,6 +16,8 @@
 *
 * $Id: hash.c,v 1.36.2.11 2000/11/13 01:36:45 kaz Exp $
 * $Name: kazlib_1_20 $
+*
+* Modified by Fredrik Eldh <fredrik.eldh@mobilesorcery.com>, 03/10/2009.
 */
 
 #ifdef MAPIP
@@ -66,7 +68,6 @@ static const char rcsid[] = "$Id: hash.c,v 1.36.2.11 2000/11/13 01:36:45 kaz Exp
 
 static hnode_t *hnode_alloc(void *context);
 static void hnode_free(hnode_t *node, void *context);
-static hash_val_t hash_fun_default(const void *key);
 static int hash_comp_default(const void *key1, const void *key2);
 
 int hash_val_t_bit;
@@ -298,7 +299,7 @@ static void shrink_table(hash_t *hash)
 */
 
 hash_t *hash_create(hashcount_t maxcount, hash_comp_t compfun,
-										hash_fun_t hashfun)
+	hash_fun_t hashfun)
 {
 	hash_t *hash;
 
@@ -337,7 +338,7 @@ hash_t *hash_create(hashcount_t maxcount, hash_comp_t compfun,
 */
 
 void hash_set_allocator(hash_t *hash, hnode_alloc_t al,
-												hnode_free_t fr, void *context)
+	hnode_free_t fr, void *context)
 {
 	assert (hash_count(hash) == 0);
 	assert ((al == 0 && fr == 0) || (al != 0 && fr != 0));
@@ -354,6 +355,12 @@ void hash_set_allocator(hash_t *hash, hnode_alloc_t al,
 
 void hash_free_nodes(hash_t *hash)
 {
+	hash_free_nodes_noclear(hash);
+	clear_table(hash);
+}
+
+void hash_free_nodes_noclear(hash_t *hash)
+{
 	hscan_t hs;
 	hnode_t *node;
 	hash_scan_begin(&hs, hash);
@@ -362,7 +369,6 @@ void hash_free_nodes(hash_t *hash)
 		hash->freenode(node, hash->context);
 	}
 	hash->nodecount = 0;
-	clear_table(hash);
 }
 
 /*
@@ -405,8 +411,7 @@ void hash_destroy(hash_t *hash)
 */
 
 hash_t *hash_init(hash_t *hash, hashcount_t maxcount,
-									hash_comp_t compfun, hash_fun_t hashfun, hnode_t **table,
-									hashcount_t nchains)
+	hash_comp_t compfun, hash_fun_t hashfun, hnode_t **table, hashcount_t nchains)
 {
 	if (hash_val_t_bit == 0)	/* 1 */
 		compute_bits();
@@ -457,6 +462,18 @@ void hash_scan_begin(hscan_t *scan, hash_t *hash)
 	} else {			/* 3 */
 		scan->next = NULL;
 	}
+}
+
+/*
+* Initialize a hash scanner so it points to the specified hash and node.
+* Assumes that node is inserted into hash.
+*/
+void hash_scan_init(hscan_t* scan, hash_t* hash, hnode_t* node) {
+	scan->table = hash;
+	if(node != NULL) {
+		scan->chain = node->hkey & hash->mask;
+	}
+	scan->next = node;
 }
 
 /*
@@ -524,28 +541,42 @@ hnode_t *hash_scan_next(hscan_t *scan)
 *    where N is the base 2 logarithm of the size of the hash table. 
 */
 
-void hash_insert(hash_t *hash, hnode_t *node, const void *key)
+hnode_t* hash_insert(hash_t *hash, hnode_t *node, const void *key)
 {
-	hash_val_t hkey, chain;
+	assert (node->next == NULL);
+
+	node->hkey = hash->function(key);
+	node->key = key;
+
+	return hash_clone_insert(hash, node);
+}
+
+// Insert a node whose hash key is already initialized.
+hnode_t* hash_clone_insert(hash_t *hash, hnode_t *node)
+{
+	hash_val_t chain;
+	hnode_t* oldNode;
 
 	assert (hash_val_t_bit != 0);
-	assert (node->next == NULL);
 	assert (hash->nodecount < hash->maxcount);	/* 1 */
-	assert (hash_lookup(hash, key) == NULL);	/* 2 */
+	//assert (hash_lookup(hash, node->key) == NULL);	/* 2 */
+	oldNode = hash_lookup(hash, node->key);
+	if(oldNode != NULL) {	/* 2 */
+		return oldNode;
+	}
 
 	if (hash->dynamic && hash->nodecount >= hash->highmark)	/* 3 */
 		grow_table(hash);
 
-	hkey = hash->function(key);
-	chain = hkey & hash->mask;	/* 4 */
+	chain = node->hkey & hash->mask;	/* 4 */
 
-	node->key = key;
-	node->hkey = hkey;
 	node->next = hash->table[chain];
 	hash->table[chain] = node;
 	hash->nodecount++;
 
 	assert (hash_verify(hash));
+	
+	return NULL;
 }
 
 /*

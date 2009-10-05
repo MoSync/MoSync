@@ -17,7 +17,7 @@
 * $Id: dict.c,v 1.40.2.7 2000/11/13 01:36:44 kaz Exp $
 * $Name: kazlib_1_20 $
 *
-* Modified dupe management, by Fredrik Eldh, 26/09/2009.
+* Modified dupe management, by Fredrik Eldh <fredrik.eldh@mobilesorcery.com>, 26/09/2009.
 */
 
 #ifdef MAPIP
@@ -567,18 +567,13 @@ dnode_t* dict_insert(dict_t *dict, dnode_t *node, const void *key)
 	while (where != nil) {
 		parent = where;
 		result = dict->compare(key, where->key);
-#if 0	//modification
-		/* trap attempts at duplicate key insertion unless it's explicitly allowed */
-		assert (dict->dupes || result != 0);
-#else
 		if(result == 0 && !dict->dupes) {	//key already exists in dict, and we don't allow dupes
 			return where;
 		}
-#endif
 		if (result < 0)
-		where = where->left;
+			where = where->left;
 		else
-		where = where->right;
+			where = where->right;
 	}
 
 	assert (where == nil);
