@@ -121,6 +121,10 @@ end
 
 
 filename = ARGV[0]
+if filename.class == NilClass
+	filename = "profiles.db"
+end
+sql_filename = "profiles.sql"
 #destdir = ARGV[1]
 bitmap = {}
 
@@ -153,8 +157,40 @@ class String
 	end
 end
 
+if !File.exist? sql_filename
+	puts "FATAL ERROR!! File '#{sql_filename} missing. Unable to build runtimes."
+	return
+end
+
+# We start from scratch
+if File.exist? filename
+	File.delete filename
+end
+
+# Create database file
 puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
+
+#sql_line = ""
+
+# Create database from SQL file
+puts "Create database from SQL file"
+File.open(sql_filename, "r") do |infile|
+	while (line = infile.gets)
+		if(line.length != 1)
+			#puts line
+			if !line.empty?
+				#sql_line << line
+				db.execute line
+			end
+		end	
+	end
+end
+
+#puts "Send batch of SQL to SQLite3.."
+#db.execute_batch sql_line
+
+puts "Generate all capability permutations"
 
 device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
 			   " devicecapvalue ON devicecapvalue.capvalue=capvalue.id INNER JOIN" <<
