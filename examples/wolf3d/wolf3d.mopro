@@ -16,10 +16,10 @@
 		<Property name="S60v3UID" value="0xE353098E"/>
 		<Property name="additionalIncludeDirectories" value=""/>
 		<Property name="additionalLibraryDirectories" value=""/>
-		<Property name="additionalDependencies" value="MAFS.lib"/>
+		<Property name="additionalDependencies" value="MAUtil.lib;MAFS.lib"/>
 		<Property name="extraCmd" value="-O2"/>
 		<Property name="extraResourcer" value=""/>
-		<Property name="extraLinker" value="--datasize=2048000 -heapsize=1024000"/>
+		<Property name="extraLinker" value="-datasize=2048000 -heapsize=1024000"/>
 		<Property name="debug" value=""/>
 		<Property name="icon" value=""/>
 	</Configuration>

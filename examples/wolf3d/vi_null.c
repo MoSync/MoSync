@@ -63,7 +63,7 @@ void VW_UpdateScreen()
 	FrameBuffer_copyRect(0, 0, 320, 200, 0, 0, gfxbuf, 320);
 	maResetBacklight();
 	maUpdateScreen();
-	INL_Update();
+	//INL_Update();
 }
 
 /*
@@ -307,7 +307,7 @@ static int XKeysymToScancode(unsigned int keysym)
 
 void INL_Update()
 {
-	EVENT event;
+	MAEvent event;
 	while (maGetEvent(&event)) {
 			switch(event.type) {
 				case EVENT_TYPE_POINTER_PRESSED:
@@ -320,6 +320,7 @@ void INL_Update()
 				case EVENT_TYPE_KEY_PRESSED:
 					if(event.key == MAK_1) {
 						FrameBuffer_setOrientation(gOrientation++);
+						VW_UpdateScreen();
 						break;
 					}
 					keyboard_handler(XKeysymToScancode(event.key), 1);
@@ -334,6 +335,7 @@ void INL_Update()
 					break;
 			}
 	}
+	VW_UpdateScreen();
 }
 
 void IN_GetMouseDelta(int *dx, int *dy)

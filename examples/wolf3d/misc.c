@@ -270,16 +270,17 @@ void CloseWrite(int fp)
 
 int WriteSeek(int fp, int offset, int whence)
 {
+	if(fp==-1) return-1;
 	//return lseek(fp, offset, whence);
 	//return fseek((FILE*)fp, offset, whence);
 	if(!fseek((FILE*)fp, offset, whence)) return offset;
-	else return !offset;
+	else return -1;
 }
 
 int WritePos(int fp)
 {
-	//return lseek(fp, 0, SEEK_CUR);
-	return fseek((FILE*)fp, 0, SEEK_CUR);
+	if(fp==-1) return -1;
+	return ftell((FILE*)fp);
 }
 
 int WriteInt8(int fp, int8_t d)
@@ -305,7 +306,7 @@ int WriteInt32(int fp, int32_t d)
 int WriteBytes(int fp, const byte *d, int len)
 {
 	//return write(fp, (const char *)d, len);
-	return fwrite(d, len, 1, (FILE*)fp);
+	return fwrite(d, 1, len, (FILE*)fp);
 }
 
 
@@ -327,9 +328,10 @@ void CloseRead(int fp)
 
 int ReadSeek(int fp, int offset, int whence)
 {
+	if(fp==-1) return-1;
 	//return lseek(fp, offset, whence);
 	if(!fseek((FILE*)fp, offset, whence)) return offset;
-	else return !offset;
+	else return -1;
 }
 
 int ReadLength(int fp)
@@ -370,5 +372,5 @@ int32_t ReadInt32(int fp)
 int ReadBytes(int fp, byte *d, int len)
 {
 	//return read(fp, (char *) d, len);
-	return fread(d, len, 1, (FILE*)fp);
+	return fread(d, 1, len, (FILE*)fp);
 }

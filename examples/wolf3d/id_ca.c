@@ -736,7 +736,6 @@ void MM_Shutdown()
 void MM_GetPtr(memptr *baseptr, unsigned long size)
 {
 	/* add some sort of linked list for purging */
-	printf("size: %d", size);
 	*baseptr = malloc(size);
 }
 
@@ -771,8 +770,13 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		Quit("PML_ReadFromFile: Null pointer");
 	if (!offset)
 		Quit("PML_ReadFromFile: Zero offset");
+
+	lprintfln("seeking from: %d", PageFile);
+
 	if (ReadSeek(PageFile, offset, SEEK_SET) != offset)
 	{
+		lprintfln("seeked from: %d", PageFile);
+
 		// PageFile not accessale.. create a new
 		char fname[13];
 		int tempFile;
@@ -793,6 +797,8 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		return;
 
 	}
+	lprintfln("reading from: %d, offset: %d, ReadLength: %d, length: %d", PageFile, offset, ReadLength(PageFile), length);
+
 	if (ReadBytes(PageFile, buf, length) != length)
 		Quit("PML_ReadFromFile: Read failed");
 }
