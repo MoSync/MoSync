@@ -321,8 +321,14 @@ runtimes.each do |platform_name, platform|
 			system ("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
 		end
 		
+		error = ENV['ERRORLEVEL'] 
+		
 		Dir.chdir cwd
-				
+
+		if(error)
+			exit(error)
+		end
+		
 		id = id + 1
 	end
 end
