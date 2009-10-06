@@ -9,12 +9,11 @@ BD = "../.."
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = ["."]
-EXTRA_SOURCEFILES = ["../kazlib/dict.c", "../kazlib/hash.c"]
-IGNORED_FILES = ["DomParser.cpp", "XML.cpp", "XML_stack.cpp", "XMLDataProvider.cpp",
-	"XPathTokenizer.cpp", "Stream_utf8.cpp", "Stream_conn.cpp", "HashMap.cpp"]
-EXTRA_CXXFLAGS = " -fno-exceptions"
+EXTRA_CFLAGS = " -Wno-shadow"	#TODO, low-prio: enable -Wshadow
+IGNORED_FILES = []
 
-DLLNAME = "mautil"
+LOCAL_DLLS = ["mautil"]
+DLLNAME = "matest"
 
 #---------------------------------------------------------------------------------
 # actual build rules

@@ -38,6 +38,7 @@ public:
 	}
 };
 
+void addSoundTests(TestSuite* suite);
 void addSoundTests(TestSuite* suite) {
 	suite->addTestCase(new SoundCase());
 }

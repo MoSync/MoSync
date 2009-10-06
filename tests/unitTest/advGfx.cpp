@@ -24,6 +24,7 @@ void maDrawRGBTest();
 void maCreateImageFromDataTest();
 void maGetImageDataTest();
 
+void addAdvGfxTests(TestSuite* suite);
 void addAdvGfxTests(TestSuite* suite) {
 	suite->addTestCase(new TemplateCase<maCreateImageRawTest>("maCreateImageRaw test"));
 	suite->addTestCase(new TemplateCase<maDrawRGBTest>("maDrawRGB test"));

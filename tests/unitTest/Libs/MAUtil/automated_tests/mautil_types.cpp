@@ -288,6 +288,7 @@ public:
 	}
 };
 
+void addMAUtilTypeTests(MATest::TestSuite* suite);
 void addMAUtilTypeTests(MATest::TestSuite* suite) {
 	suite->addTestCase(new MAUtilTypesTest);
 }

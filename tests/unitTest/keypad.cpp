@@ -53,6 +53,7 @@ private:
 	int mPressed, mReleased;
 };
 
+void addKeypadTests(TestSuite* suite);
 void addKeypadTests(TestSuite* suite) {
 	suite->addTestCase(new KeyCase(MAK_FIRE, "fire"));
 	suite->addTestCase(new KeyCase(MAK_UP, "up"));

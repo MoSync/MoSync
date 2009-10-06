@@ -77,6 +77,7 @@ public:
 	}
 };
 
+void addStoreTests(TestSuite* suite);
 void addStoreTests(TestSuite* suite) {
 	suite->addTestCase(new StoreCase);
 }

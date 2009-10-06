@@ -166,6 +166,7 @@ public:
 
 };
 
+void addMathTests(TestSuite* suite);
 void addMathTests(TestSuite* suite) {
 	suite->addTestCase(new MathTestCase());
 }

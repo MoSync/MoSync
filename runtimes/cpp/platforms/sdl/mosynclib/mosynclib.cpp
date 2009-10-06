@@ -41,6 +41,9 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain) {
 	const char *resourceFile = "resources";
 	bool resChanged = false;
 	Syscall::STARTUP_SETTINGS settings;
+	settings.model = "default";
+	settings.vendor = "default";
+	settings.iconPath = NULL;
 	int width=0, height=0;
 
 	for(int i = 1; i < argc; i++) {
@@ -111,11 +114,11 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 
 void Base::Syscall::VM_Yield() {
 }
-
+/*
 SYSCALL(void, maLoadProgram(Handle data, int reload)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 }
-
+*/
 void MoSyncError::addRuntimeSpecificPanicInfo(char* ptr, bool newLines) {
 }
 

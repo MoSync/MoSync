@@ -271,6 +271,7 @@ public:
 	}
 };
 
+void addConnTests(TestSuite* suite);
 void addConnTests(TestSuite* suite) {
 	suite->addTestCase(new SingleSocketCase);
 	suite->addTestCase(new SingleHttpGetCase);

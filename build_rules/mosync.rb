@@ -71,3 +71,7 @@ task :native do
 	dir_res()
 	(task :default).invoke
 end
+
+task :runn => :native do
+	sh "cd #{BUILDDIR} && ./#{EXENAME}"
+end

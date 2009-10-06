@@ -19,11 +19,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <matime.h>
 #include "common.h"
 
+void localTime();
 void localTime() {
 	printf("Local time:\n");
 	printf("%s\n", sprint_time(maLocalTime()));
 }
 
+void utcTime();
 void utcTime() {
 	printf("UTC time:\n");
 	printf("%s\n", sprint_time(maTime()));
@@ -78,6 +80,7 @@ private:
 	int mStartTime;
 };
 
+void addTimeTests(TestSuite* suite);
 void addTimeTests(TestSuite* suite) {
 	suite->addTestCase(new MaWaitCase);
 	suite->addTestCase(new MobletTimerCase);

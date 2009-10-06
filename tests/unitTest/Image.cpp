@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Image.h"
 #include <ma.h>
+#include <mastdlib.h>
 
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 #define BIG_PHAT_ERROR maPanic(0, "eeeerrrorr")
@@ -56,7 +57,7 @@ enum ClipResult  {
 	B_IN = 3,
 };
 
-ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
+static ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
 	if(a.y<top && b.y<top) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.y>=top && b.y<top)) {
@@ -75,7 +76,7 @@ ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
 	return clipResult;
 }
 
-ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
+static ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
 	if(a.y>bottom && b.y>bottom) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.y<=bottom && b.y>bottom)) {
@@ -94,7 +95,7 @@ ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
 	return clipResult;
 }
 
-ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
+static ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
 	if(a.x<left && b.x<left) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.x>=left && b.x<left)) {
@@ -113,7 +114,7 @@ ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
 	return clipResult;
 }
 
-ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
+static ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
 	if(a.x>right && b.x>right) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.x<=right && b.x>right)) {
@@ -613,7 +614,7 @@ void Image::drawPoint(int posX, int posY, int color) {
 	}
 }
 
-bool clipLine(Point &a, Point &b, int left, int right, int top, int bottom) {
+static bool clipLine(Point &a, Point &b, int left, int right, int top, int bottom) {
 	left<<=16;
 	right<<=16;
 	top<<=16;

@@ -54,6 +54,7 @@ private:
 	MAUtil::Downloader mDown;
 };
 
+void addDownloaderTests(MATest::TestSuite* suite);
 void addDownloaderTests(MATest::TestSuite* suite) {
 	suite->addTestCase(new DownloaderTest);
 }

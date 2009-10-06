@@ -83,7 +83,7 @@ public:
 
 };
 
-
+void addMemTests(TestSuite* suite);
 void addMemTests(TestSuite* suite) {
 	suite->addTestCase(new MemTestCase());
 }

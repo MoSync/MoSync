@@ -123,7 +123,7 @@ public:
 
 };
 
-
+void addResTests(TestSuite* suite);
 void addResTests(TestSuite* suite) {
 	suite->addTestCase(new ResTestCase());
 }

@@ -51,6 +51,7 @@ void framebuffer_malloc_handler(int size);
 	((((col)&0x0000ff00)>>(8-(fi.greenShift-(8-fi.greenBits))))&fi.greenMask) | \
 	((((col)&0x000000ff)>>(0-(fi.blueShift-(8-fi.blueBits))))&fi.blueMask)
 
+void addFramebufferTests(TestSuite* suite);
 void addFramebufferTests(TestSuite* suite) {
 	suite->addTestCase(new FramebufferTest);
 }

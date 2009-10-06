@@ -216,13 +216,15 @@ namespace MAUI {
 		if(mustRebuild) rebuild();
 	}
 
-	void drawRect(int x1, int y1, int x2, int y2, int col) {
+#if 0
+	static void drawRect(int x1, int y1, int x2, int y2, int col) {
 		maSetColor(0x00ff00);
 		maLine(x1, y1, x2, y1);
 		maLine(x2, y1, x2, y2);
 		maLine(x1, y1, x1, y2);
 		maLine(x1, y2, x2, y2);		
 	}
+#endif
 
 	void ListBox::draw(bool forceDraw) {
 		//Engine& engine = Engine::getSingleton();

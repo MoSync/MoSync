@@ -154,8 +154,8 @@ public:
 
 };
 
+void addSystemTests(TestSuite* suite);
 void addSystemTests(TestSuite* suite) {
-
 	suite->addTestCase(new ResetBacklightCase("maResetBacklightTest"));
 	suite->addTestCase(new KeyLockCase("maLockKeypadTest"));
 	suite->addTestCase(new VibrateCase("maVibrateTest"));

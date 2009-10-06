@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #ifndef _SE_MSAB_MAUTIL_HASHMAP_H_
-#error Don't include this file directly.
+#error Do not include this file directly.
 #endif
 
 //******************************************************************************

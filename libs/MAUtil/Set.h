@@ -38,7 +38,7 @@ namespace MAUtil {
 * This particular implementation is built on top of kazlib's dictionary system,
 * which makes it quite small, even when used with multiple data types.
 */
-template<class Key, class Comp=Comparator<Key> >
+template<class Key>
 class Set {
 protected:
 	/** Internal. */
@@ -114,9 +114,11 @@ public:
 		friend class Set;
 	};
 
+	typedef int (*CompareFunction)(const Key&, const Key&);
+
 	//constructors
 	/// Constructs an empty Set.
-	Set();
+	Set(CompareFunction cf = &Compare<Key>);
 	/// Constructs a copy of another Set. All elements are also copied.
 	Set(const Set&);
 	/// Clears this Set, then copies the other Set to this one.
@@ -188,9 +190,8 @@ protected:
 
 	static dnode_t* alloc(void*) { return new DictNode; }
 	static void free(dnode_t* node, void*) { delete (DictNode*)node; }
-	static int compare(const void*, const void*);
 
-	void init();
+	void init(CompareFunction);
 };
 
 #include "Set_impl.h"

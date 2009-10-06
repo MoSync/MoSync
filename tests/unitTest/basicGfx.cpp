@@ -25,6 +25,7 @@ void drawTriangles();
 void drawTrianglesClip();
 void drawText();
 
+void addBasicGfxTests(TestSuite* suite);
 void addBasicGfxTests(TestSuite* suite) {
 	suite->addTestCase(new TemplateCase<drawColorRects>("color"));
 	suite->addTestCase(new TemplateCase<plot>("plot"));

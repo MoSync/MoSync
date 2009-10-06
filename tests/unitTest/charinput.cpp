@@ -138,6 +138,7 @@ private:
 	MAExtent mExtent;
 };
 
+void addCharInputTests(TestSuite* suite);
 void addCharInputTests(TestSuite* suite) {
 	suite->addTestCase(new CharInputTest("mobile", "CharInput"));
 }

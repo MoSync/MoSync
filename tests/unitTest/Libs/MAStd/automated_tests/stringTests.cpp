@@ -74,6 +74,7 @@ public:
 
 };
 
+void addStringTests(TestSuite* suite);
 void addStringTests(TestSuite* suite) {
 	suite->addTestCase(new StringTestCase());
 }
