@@ -317,7 +317,13 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], ['PHONE_RELEASE'])
-		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], ['PUBLIC_DEBUG'])
+
+		debug_defines = ["PUBLIC_DEBUG"]
+
+		if(platform_name == "sp2003" || platform_name == "wm5" || platform_name == "s60v2" || platform_name == "s60v3")
+			debug_defines << "USE_ARM_RECOMPILER"
+
+		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
 		
 		cwd = Dir.pwd
 		Dir.chdir "../RuntimeBuilder/"
