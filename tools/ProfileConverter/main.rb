@@ -190,7 +190,7 @@ end
 #puts "Send batch of SQL to SQLite3.."
 #db.execute_batch sql_line
 
-puts "BE PATIENT! Generating all capability permutations!"
+puts "Generating all capability permutations!"
 
 device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
 			   " devicecapvalue ON devicecapvalue.capvalue=capvalue.id INNER JOIN" <<

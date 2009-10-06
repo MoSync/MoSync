@@ -160,6 +160,7 @@ class RuntimeBuilder
 			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.jar was succesfully generated!\n\n"
 			return 0
 		end
+		return 0
 	end
 	
 end
