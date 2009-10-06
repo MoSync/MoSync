@@ -66,7 +66,7 @@ end
 
 task :native do
 	require "#{BD}/build_rules/defaults.rb"
-	EXETARGET = "#{BUILDDIR}#{EXENAME}"
+	EXETARGET = "#{BUILDDIR}#{EXENAME}#{EXE_FILE_ENDING}"
 	require "#{BD}/build_rules/native_mosync.rb"
 	dir_res()
 	(task :default).invoke

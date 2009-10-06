@@ -15,6 +15,7 @@
 # 02111-1307, USA.
 
 require "#{BD}/build_rules/error.rb"
+require "#{BD}/build_rules/util.rb"
 
 MOSYNCDIR = ENV['MOSYNCDIR']
 
@@ -62,6 +63,8 @@ else
 	error("Unknown platform: #{UNAME}")
 end
 
+default(:PIPE_ONLY, false)
+
 if(!PIPE_ONLY)
 	GCC_VERSION = (open("|gcc --version").readline().split(/ /))[2]
 	GCC_IS_V4 = (GCC_VERSION[0] >= "4"[0])
@@ -73,4 +76,12 @@ if(!PIPE_ONLY)
 	#warning("GCC version: #{GCC_VERSION}")
 	#warning("GCC_IS_V4: #{GCC_IS_V4}")
 	#warning("GCC_IS_V43: #{GCC_IS_V43}")
+end
+
+if(HOST == "win32") then
+	DLL_FILE_ENDING = '.dll'
+	EXE_FILE_ENDING = '.exe'
+else
+	DLL_FILE_ENDING = '.so'
+	EXE_FILE_ENDING = ''
 end

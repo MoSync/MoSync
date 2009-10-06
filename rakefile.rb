@@ -20,7 +20,7 @@ MAIN_DIRS = ["tools/protobuild",
 	"intlibs/net",
 	"intlibs/stabs",
 	"runtimes/cpp/platforms/sdl",
-	#"runtimes/cpp/platforms/sdl/mosynclib",
+	"runtimes/cpp/platforms/sdl/mosynclib",
 	"runtimes/cpp/platforms/sdl/MoRE",
 	"tools/FontGenerator",
 	"tools/PanicDoc"

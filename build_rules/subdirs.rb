@@ -15,10 +15,10 @@
 # 02111-1307, USA.
 
 if(defined?(RAKEFILES) == nil) then
-	RAKEFILES = [""]
+	RAKEFILES = []
 end
 
-RAKEFLAGS = RAKEFILES.collect {|rf| if(rf.length > 0) then " -f #{rf}" else "" end }
+RAKEFLAGS = RAKEFILES.collect {|rf| " -f #{rf}" }
 
 task :default do
 	SUBDIRS.each do |dir| RAKEFLAGS.each do |rf|

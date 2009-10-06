@@ -16,7 +16,9 @@
 
 BUILDDIR_BASE = "build/pipe/"
 
-PIPE_ONLY = true
+require "#{BD}/build_rules/util.rb"
+
+default(:PIPE_ONLY, true)
 
 require "#{BD}/build_rules/defaults.rb"
 require "#{BD}/build_rules/host.rb"

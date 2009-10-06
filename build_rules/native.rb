@@ -23,16 +23,12 @@ MACHDEP = " -D" + HOST.upcase +
 if(HOST == "win32") then
 	INTRA_INCLUDES = ["#{BD}/tools/ReleasePackageBuild/build_package_tools/include"]
 	LIB_OBJECTS = CUSTOM_LIBS.collect do |lib| "#{BD}/tools/ReleasePackageBuild/build_package_tools/lib/#{lib}" end
-	DLL_FILE_ENDING = '.dll'
-	EXE_FILE_ENDING = '.exe'
 else
 	INTRA_INCLUDES = []
 	LIB_OBJECTS = []
-	DLL_FILE_ENDING = '.so'
-	EXE_FILE_ENDING = ''
 end
 
-INCLUDE_DIRS = [".", "#{BD}/intlibs", "#{BD}/intlibs/helpers", "#{BD}/libs"] +
+INCLUDE_DIRS = ["#{BD}/intlibs", "#{BD}/intlibs/helpers", "#{BD}/libs"] +
 	((defined?(MOSYNC) == nil) ? [] : ["#{BD}/libs/MAStd"]) + INTRA_INCLUDES + EXTRA_INCLUDES
 
 GCC4_WARNINGS = " -Wvariadic-macros -Wmissing-include-dirs -Wstrict-overflow=0"
@@ -63,12 +59,19 @@ INTRA_CXXFLAGS = ((defined?(MOSYNC) == nil) ? " -fexceptions" : " -fno-exception
 
 INTRA_OBJECTS = LOCAL_LIBS.collect do |lib| "#{BUILDPATH}lib#{lib}.a" end +
 	(LOCAL_DLLS + ((defined?(MOSYNC) == nil) ? [] : ["mosync", "mastd"])).collect do
-		|dll| File.expand_path("#{BUILDPATH}lib#{dll}#{DLL_FILE_ENDING}") end + LIB_OBJECTS
+		|dll| File.expand_path("#{BUILDPATH}lib#{dll}#{DLL_FILE_ENDING}") end +
+	LIB_OBJECTS + ((defined?(MOSYNC) == nil) ? [] : ["#{BUILDPATH}mosyncmain.o"])
+
+if(HOST == "win32") then
+	PRE_LINKFLAGS = " -Wl,--enable-auto-import"
+else
+	PRE_LINKFLAGS = ""
+end
 
 INTRA_EXEFLAGS = (LIBRARIES.collect do |lib| " -l#{lib}" end).to_s
 
 def build_exe(t)
-	sh "g++ #{t.prerequisites}#{EXEFLAGS} -o #{t.name}"
+	sh "g++#{PRE_LINKFLAGS} #{t.prerequisites}#{EXEFLAGS} -o #{t.name}"
 end
 
 def build_lib(t)
@@ -76,7 +79,7 @@ def build_lib(t)
 end
 
 def build_dll(t)
-	sh "g++ #{t.prerequisites}#{DLLFLAGS} -o #{t.name}"
+	sh "g++#{PRE_LINKFLAGS} #{t.prerequisites}#{DLLFLAGS} -o #{t.name}"
 end
 
 if(defined?(LIBNAME) != nil) then

@@ -7,7 +7,7 @@ require "#{BD}/build_rules/host.rb"
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = []
-EXTRA_SOURCEFILES = ["mosynclib.cpp", "mosyncmain.cpp"]
+EXTRA_SOURCEFILES = ["mosynclib.cpp"]
 EXTRA_INCLUDES = ["#{BD}/runtimes/cpp/base", ".."]
 
 LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net"]
@@ -23,9 +23,9 @@ else
 		SOUND_LIB = []
 
 		if ( HOST_PLATFORM != "moblin" )
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ "
+			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__"
 		else
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__ "
+			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__"
 		end
 
 		IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
@@ -43,3 +43,11 @@ DLLNAME = "mosync"
 #---------------------------------------------------------------------------------
 
 require "#{BD}/build_rules/native.rb"
+
+declare_compile_task("mosyncmain.cpp", method(:build_cpp))
+MOSYNCMAIN_O = "#{BUILDDIR}mosyncmain.o"
+OTARGET = "#{BD}/#{BUILDDIR}mosyncmain.o"
+file OTARGET => MOSYNCMAIN_O do
+	sh "cp #{MOSYNCMAIN_O} #{OTARGET}"
+end
+task :default => OTARGET

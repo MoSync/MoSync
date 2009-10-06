@@ -10,6 +10,7 @@ BD = "../.."
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = [".", "Libs/MAStd/automated_tests", "Libs/MAUtil/automated_tests"]
+EXTRA_INCLUDES = ["."]
 EXTRA_CFLAGS = " -Wno-shadow"
 
 LOCAL_DLLS = ["mautil", "matest"]

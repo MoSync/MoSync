@@ -36,7 +36,7 @@ extern "C" {
 #define _TIME_H	//to avoid conflicting types for time_t
 #endif	
 
-#ifndef _WIN32
+#ifndef _MSC_VER
 typedef int time_t;
 #endif
 
