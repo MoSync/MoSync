@@ -22,7 +22,8 @@
 #include <maarg.h>
 #include <madmath.h>
 #include <maheap.h>
-#define log10(x) (x) // todo: fixme
+
+#define log10(x) (log(x) / M_LN10)
 
 #include "fmopl.h"
 

@@ -1859,8 +1859,7 @@ namespace Base {
 	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
-			src->close();
-			delete src;
+			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
 		}
 		src = new BufferAudioSource(ainfo, fillBufferCallback);
 		AudioEngine::getChannel(1)->setAudioSource(src);
@@ -1876,7 +1875,10 @@ namespace Base {
 
 	static int maAudioBufferClose() {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
-		if(src!=NULL) delete src;
+		if(src!=NULL) {
+			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
+		}
+
 		AudioEngine::getChannel(1)->setAudioSource(NULL);
 		return 1;
 	}

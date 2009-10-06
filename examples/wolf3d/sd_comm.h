@@ -41,4 +41,7 @@ void UpdateSoundLoc(fixed x, fixed y, int angle);
 extern int DigiMap[];
 void InitDigiMap();
 
+
+void AudioBufferFill();
+
 #endif

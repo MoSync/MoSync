@@ -13,6 +13,8 @@ int gOrientation;
 extern void keyboard_handler(int code, int press);
 extern boolean InternalKeyboard[NumCodes];
 
+#include <IX_AUDIOBUFFER.h>
+
 /*
 ==========================
 =
@@ -329,7 +331,10 @@ void INL_Update()
 					keyboard_handler(XKeysymToScancode(event.key), 0);
 					break;
 				case EVENT_TYPE_CLOSE:
-					maExit(0);
+					Quit(NULL);
+					break;
+				case EVENT_TYPE_AUDIOBUFFER_FILL:
+					AudioBufferFill();
 					break;
 				default:
 					break;

@@ -771,12 +771,8 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 	if (!offset)
 		Quit("PML_ReadFromFile: Zero offset");
 
-	lprintfln("seeking from: %d", PageFile);
-
 	if (ReadSeek(PageFile, offset, SEEK_SET) != offset)
 	{
-		lprintfln("seeked from: %d", PageFile);
-
 		// PageFile not accessale.. create a new
 		char fname[13];
 		int tempFile;
@@ -797,7 +793,6 @@ static void PML_ReadFromFile(byte *buf, long offset, word length)
 		return;
 
 	}
-	lprintfln("reading from: %d, offset: %d, ReadLength: %d, length: %d", PageFile, offset, ReadLength(PageFile), length);
 
 	if (ReadBytes(PageFile, buf, length) != length)
 		Quit("PML_ReadFromFile: Read failed");
