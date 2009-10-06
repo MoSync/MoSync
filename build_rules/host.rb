@@ -62,12 +62,13 @@ else
 	error("Unknown platform: #{UNAME}")
 end
 
-GCC_VERSION = (open("|gcc --version").readline().split(/ /))[2]
+GCC_VERSION = (open("|xgcc --version").readline().split(/ /))[2]
 GCC_IS_V4 = (GCC_VERSION[0] >= "4"[0])
 GCC_IS_V43 = (GCC_IS_V4 && (GCC_VERSION[2] >= "3"[0]))
 
 # debugging
 #warning("Platform: #{HOST}")
+
 #warning("GCC version: #{GCC_VERSION}")
 #warning("GCC_IS_V4: #{GCC_IS_V4}")
 #warning("GCC_IS_V43: #{GCC_IS_V43}")
