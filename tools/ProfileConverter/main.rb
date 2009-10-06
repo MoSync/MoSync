@@ -120,12 +120,19 @@ def write_config_h(runtime, file, relevant_defines, extra_defines)
 end
 
 
-filename = ARGV[0]
-if filename.class == NilClass
-	filename = "profiles.db"
-end
+filename = "profiles.db"
 sql_filename = "profiles.sql"
-#destdir = ARGV[1]
+
+output_root = "profiles/"
+build_root = "../ProfileConverter/"
+dest_dir = ARGV[0]
+if dest_dir.class != NilClass
+	output_root = "#{dest_dir}/"
+	build_root = ""
+end
+
+puts "rootdir :  #{output_root}"
+
 bitmap = {}
 
 runtimes = {
@@ -196,8 +203,8 @@ device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
 			   " devicecapvalue ON devicecapvalue.capvalue=capvalue.id INNER JOIN" <<
 			   " cap ON devicecapvalue.cap=cap.id AND cap.name=? AND" <<
 			   " devicecapvalue.device=?");
-VENDOR_DIR = "profiles/vendors"
-RUNTIME_DIR = "profiles/runtimes"
+VENDOR_DIR = "#{output_root}vendors"
+RUNTIME_DIR = "#{output_root}runtimes"
 File.makedirs VENDOR_DIR
 File.makedirs RUNTIME_DIR
 db.execute( "select name from vendor" ) do |vendor|
@@ -315,10 +322,12 @@ runtimes.each do |platform_name, platform|
 		cwd = Dir.pwd
 		Dir.chdir "../RuntimeBuilder/"
 		
+		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
+		
 		if(runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10")
-			success = system("ruby RuntimeBuilder.rb Settings.rb javamecldc10 ../ProfileConverter/profiles/runtimes/#{runtime_dir}")	
+			success = system("ruby RuntimeBuilder.rb Settings.rb javamecldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
 		else
-			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} ../ProfileConverter/profiles/runtimes/#{runtime_dir}")
+			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
 		end
 		
 		Dir.chdir cwd
