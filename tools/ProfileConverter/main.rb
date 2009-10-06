@@ -324,6 +324,7 @@ runtimes.each do |platform_name, platform|
 		Dir.chdir cwd
 
 		if(!success)
+			puts "Building one of the runtimes failed."
 			exit(1)
 		end
 		
