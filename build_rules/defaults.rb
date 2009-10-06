@@ -36,6 +36,7 @@ default(:CUSTOM_LIBS, [])
 default(:BUILDDIR_BASE, "build/")
 default(:EXTRA_HEADERFILES, [])
 default(:IGNORED_HEADERS, [])
+default(:PIPE_ONLY, false)
 
 if(CONFIG == "debug") then
 	BUILDDIR = BUILDDIR_BASE + "debug/"

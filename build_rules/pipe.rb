@@ -16,6 +16,8 @@
 
 BUILDDIR_BASE = "build/pipe/"
 
+PIPE_ONLY = true
+
 require "#{BD}/build_rules/defaults.rb"
 require "#{BD}/build_rules/host.rb"
 require "#{BD}/build_rules/mosync_common.rb"
