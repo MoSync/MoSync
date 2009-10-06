@@ -317,7 +317,7 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		release_defines = ['PHONE_RELEASE']
-		if(platform_name == "sp2003" || platform_name == "wm5" || platform_name == "s60v2" || platform_name == "s60v3")
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :s60v2 || platform_name == :s60v3)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		
@@ -329,7 +329,7 @@ runtimes.each do |platform_name, platform|
 		
 		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		
-		if(platform_name == "JavaME" && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
+		if(platform_name == :JavaME && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
 			success = system("ruby RuntimeBuilder.rb Settings.rb javamecldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
 		else
 			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
