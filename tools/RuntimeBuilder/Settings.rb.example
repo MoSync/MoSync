@@ -35,5 +35,5 @@ $SETTINGS = {
 		:build_commercial => true,
 		:use_arm_recompiler => true,
 		
-		:verbose => true,
+		:verbose => false,
 	}
