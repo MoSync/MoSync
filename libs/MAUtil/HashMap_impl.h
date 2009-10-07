@@ -43,12 +43,12 @@ template<> hash_val_t THashFunction<int>(const int& data) {
 //******************************************************************************
 
 template<class Key, class Value>
-HashMap<Key, Value>::HashNode::HashNode() {
+MAUtil::HashMap<Key, Value>::HashNode::HashNode() {
 	memset((hnode_t*)this, 0, sizeof(hnode_t));
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::HashMap(HashFunction hf, CompareFunction cf, int init_bits) {
+MAUtil::HashMap<Key, Value>::HashMap(HashFunction hf, CompareFunction cf, int init_bits) {
 	int init_size = 1 << init_bits;
 	hnode_t** table = (hnode_t**)malloc(sizeof(hnode_t*) * init_size);
 	hash_init(&mHash, HASHCOUNT_T_MAX, (hash_comp_t)cf, (hash_fun_t)hf, table, init_size);
@@ -59,7 +59,7 @@ HashMap<Key, Value>::HashMap(HashFunction hf, CompareFunction cf, int init_bits)
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::HashMap(const HashMap& o) {
+MAUtil::HashMap<Key, Value>::HashMap(const HashMap& o) {
 	//setup for clear()
 	mHash.hash_table = NULL;
 	mHash.hash_nchains = 0;
@@ -67,7 +67,7 @@ HashMap<Key, Value>::HashMap(const HashMap& o) {
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>& HashMap<Key, Value>::operator=(const HashMap& o) {
+MAUtil::HashMap<Key, Value>& MAUtil::HashMap<Key, Value>::operator=(const HashMap& o) {
 	clear();
 	::free(mHash.hash_table);
 	mHash = o.mHash;
@@ -90,19 +90,19 @@ HashMap<Key, Value>& HashMap<Key, Value>::operator=(const HashMap& o) {
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::~HashMap() {
+MAUtil::HashMap<Key, Value>::~HashMap() {
 	clear();
 	::free(mHash.hash_table);
 }
 
 template<class Key, class Value>
-void HashMap<Key, Value>::clear() {
+void MAUtil::HashMap<Key, Value>::clear() {
 	hash_free_nodes(&mHash);
 }
 
 template<class Key, class Value>
-Pair<typename HashMap<Key, Value>::Iterator, bool>
-HashMap<Key, Value>::insert(const Key& key, const Value& value) {
+Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
+MAUtil::HashMap<Key, Value>::insert(const Key& key, const Value& value) {
 	Pair<Iterator, bool> pair = { Iterator(), false };
 	HashNode* newNode = new HashNode();
 	newNode->data.first = key;
@@ -119,8 +119,8 @@ HashMap<Key, Value>::insert(const Key& key, const Value& value) {
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::Iterator
-HashMap<Key, Value>::find(const Key& key) {
+typename MAUtil::HashMap<Key, Value>::Iterator
+MAUtil::HashMap<Key, Value>::find(const Key& key) {
 	Iterator itr;
 	hnode_t* node = hash_lookup(&mHash, &key);
 	hash_scan_init(&itr.mScan, &mHash, node);
@@ -128,14 +128,14 @@ HashMap<Key, Value>::find(const Key& key) {
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::ConstIterator
-HashMap<Key, Value>::find(const Key& key) const {
+typename MAUtil::HashMap<Key, Value>::ConstIterator
+MAUtil::HashMap<Key, Value>::find(const Key& key) const {
 	//call the non-const function. it's safe, promise :)
 	return ((HashMap*)this)->find(key);
 }
 
 template<class Key, class Value>
-bool HashMap<Key, Value>::erase(const Key& key) {
+bool MAUtil::HashMap<Key, Value>::erase(const Key& key) {
 	hnode_t* node = hash_lookup(&mHash, &key);
 	if(node == NULL)
 		return false;
@@ -144,37 +144,37 @@ bool HashMap<Key, Value>::erase(const Key& key) {
 }
 
 template<class Key, class Value>
-void HashMap<Key, Value>::erase(Iterator itr) {
+void MAUtil::HashMap<Key, Value>::erase(Iterator itr) {
 	hash_scan_delete(&mHash, itr.mScan.hash_next);
 }
 
 template<class Key, class Value>
-size_t HashMap<Key, Value>::size() const {
+size_t MAUtil::HashMap<Key, Value>::size() const {
 	return hash_count(&mHash);
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::Iterator HashMap<Key, Value>::begin() {
+typename MAUtil::HashMap<Key, Value>::Iterator MAUtil::HashMap<Key, Value>::begin() {
 	Iterator itr;
 	hash_scan_begin(&itr.mScan, &mHash);
 	return itr;
 }
 template<class Key, class Value>
-typename HashMap<Key, Value>::ConstIterator HashMap<Key, Value>::begin() const {
+typename MAUtil::HashMap<Key, Value>::ConstIterator MAUtil::HashMap<Key, Value>::begin() const {
 	ConstIterator itr;
 	hash_scan_begin(&itr.mScan, &mHash);
 	return itr;
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::Iterator HashMap<Key, Value>::end() {
+typename MAUtil::HashMap<Key, Value>::Iterator MAUtil::HashMap<Key, Value>::end() {
 	Iterator itr;
 	itr.mScan.hash_table = &mHash;
 	itr.mScan.hash_next = NULL;
 	return itr;
 }
 template<class Key, class Value>
-typename HashMap<Key, Value>::ConstIterator HashMap<Key, Value>::end() const {
+typename MAUtil::HashMap<Key, Value>::ConstIterator MAUtil::HashMap<Key, Value>::end() const {
 	ConstIterator itr;
 	itr.mScan.hash_table = &mHash;
 	itr.mScan.hash_next = NULL;
@@ -182,7 +182,7 @@ typename HashMap<Key, Value>::ConstIterator HashMap<Key, Value>::end() const {
 }
 
 template<class Key, class Value>
-Value& HashMap<Key, Value>::operator[](const Key& key) {
+Value& MAUtil::HashMap<Key, Value>::operator[](const Key& key) {
 	HashNode* node = (HashNode*)hash_lookup(&mHash, &key);
 	if(node == NULL) {
 		node = new HashNode();
@@ -197,48 +197,48 @@ Value& HashMap<Key, Value>::operator[](const Key& key) {
 //******************************************************************************
 
 template<class Key, class Value>
-HashMap<Key, Value>::Iterator::Iterator() {
+MAUtil::HashMap<Key, Value>::Iterator::Iterator() {
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::Iterator::Iterator(const Iterator& o) : mScan(o.mScan) {
+MAUtil::HashMap<Key, Value>::Iterator::Iterator(const Iterator& o) : mScan(o.mScan) {
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::Iterator&
-HashMap<Key, Value>::Iterator::operator=(const Iterator& o) {
+typename MAUtil::HashMap<Key, Value>::Iterator&
+MAUtil::HashMap<Key, Value>::Iterator::operator=(const Iterator& o) {
 	mScan = o.mScan;
 	return *this;
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::PairKV&
-HashMap<Key, Value>::Iterator::operator*() {
+typename MAUtil::HashMap<Key, Value>::PairKV&
+MAUtil::HashMap<Key, Value>::Iterator::operator*() {
 	MAASSERT(mScan.hash_next != NULL);
 	return ((HashNode*)mScan.hash_next)->data;
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::PairKV*
-HashMap<Key, Value>::Iterator::operator->() {
+typename MAUtil::HashMap<Key, Value>::PairKV*
+MAUtil::HashMap<Key, Value>::Iterator::operator->() {
 	MAASSERT(mScan.hash_next != NULL);
 	return &((HashNode*)mScan.hash_next)->data;
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::Iterator&
-HashMap<Key, Value>::Iterator::operator++() {
+typename MAUtil::HashMap<Key, Value>::Iterator&
+MAUtil::HashMap<Key, Value>::Iterator::operator++() {
 	hash_scan_next(&mScan);
 	return *this;
 }
 
 template<class Key, class Value>
-bool HashMap<Key, Value>::Iterator::operator==(const Iterator& o) const {
+bool MAUtil::HashMap<Key, Value>::Iterator::operator==(const Iterator& o) const {
 	return mScan.hash_next == o.mScan.hash_next;
 }
 
 template<class Key, class Value>
-bool HashMap<Key, Value>::Iterator::operator!=(const Iterator& o) const {
+bool MAUtil::HashMap<Key, Value>::Iterator::operator!=(const Iterator& o) const {
 	return mScan.hash_next != o.mScan.hash_next;
 }
 
@@ -247,51 +247,51 @@ bool HashMap<Key, Value>::Iterator::operator!=(const Iterator& o) const {
 //******************************************************************************
 
 template<class Key, class Value>
-HashMap<Key, Value>::ConstIterator::ConstIterator() {
+MAUtil::HashMap<Key, Value>::ConstIterator::ConstIterator() {
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::ConstIterator::ConstIterator(const ConstIterator& o) : mScan(o.mScan) {
+MAUtil::HashMap<Key, Value>::ConstIterator::ConstIterator(const ConstIterator& o) : mScan(o.mScan) {
 }
 
 template<class Key, class Value>
-HashMap<Key, Value>::ConstIterator::ConstIterator(const Iterator& o) : mScan(o.mScan) {
+MAUtil::HashMap<Key, Value>::ConstIterator::ConstIterator(const Iterator& o) : mScan(o.mScan) {
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::ConstIterator&
-HashMap<Key, Value>::ConstIterator::operator=(const ConstIterator& o) {
+typename MAUtil::HashMap<Key, Value>::ConstIterator&
+MAUtil::HashMap<Key, Value>::ConstIterator::operator=(const ConstIterator& o) {
 	mScan = o.mScan;
 	return *this;
 }
 
 template<class Key, class Value>
-const typename HashMap<Key, Value>::PairKV&
-HashMap<Key, Value>::ConstIterator::operator*() const {
+const typename MAUtil::HashMap<Key, Value>::PairKV&
+MAUtil::HashMap<Key, Value>::ConstIterator::operator*() const {
 	MAASSERT(mScan.hash_next != NULL);
 	return ((HashNode*)mScan.hash_next)->data;
 }
 
 template<class Key, class Value>
-const typename HashMap<Key, Value>::PairKV*
-HashMap<Key, Value>::ConstIterator::operator->() const {
+const typename MAUtil::HashMap<Key, Value>::PairKV*
+MAUtil::HashMap<Key, Value>::ConstIterator::operator->() const {
 	MAASSERT(mScan.hash_next != NULL);
 	return &((HashNode*)mScan.hash_next)->data;
 }
 
 template<class Key, class Value>
-typename HashMap<Key, Value>::ConstIterator&
-HashMap<Key, Value>::ConstIterator::operator++() {
+typename MAUtil::HashMap<Key, Value>::ConstIterator&
+MAUtil::HashMap<Key, Value>::ConstIterator::operator++() {
 	hash_scan_next(&mScan);
 	return *this;
 }
 
 template<class Key, class Value>
-bool HashMap<Key, Value>::ConstIterator::operator==(const ConstIterator& o) const {
+bool MAUtil::HashMap<Key, Value>::ConstIterator::operator==(const ConstIterator& o) const {
 	return mScan.hash_next == o.mScan.hash_next;
 }
 
 template<class Key, class Value>
-bool HashMap<Key, Value>::ConstIterator::operator!=(const ConstIterator& o) const {
+bool MAUtil::HashMap<Key, Value>::ConstIterator::operator!=(const ConstIterator& o) const {
 	return mScan.hash_next != o.mScan.hash_next;
 }

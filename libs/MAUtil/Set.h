@@ -130,16 +130,17 @@ public:
 	/**
 	* Inserts a new value into the Set.
 	*
-	* Returns a Pair. The Pair's first element is true if the value was indeed inserted.
-	* The Pair's second element is an Iterator that points to the element in the Set.
+	* Returns a Pair. The Pair's second element is true if the value was indeed inserted.
+	* The Pair's first element is an Iterator that points to the element in the Set.
 	*
-	* An element which compares equal to the new one may already be present in the set;
-	* in that case, this operation does nothing, and the iterator returned will point to the old element.
+	* An element which compares equal to the new one may already be present in the Set;
+	* in that case, this operation does nothing, and the Iterator returned will point to
+	* the old element.
 	*/
 	Pair<Iterator, bool> insert(const Key&);//TODO
 	/**
-	* Searches the Set for a specified Key. The returned Iterator points to the element matching the Key
-	* if one was found, or to Set::end() if not.
+	* Searches the Set for a specified Key. The returned Iterator points to
+	* the element matching the Key if one was found, or to Set::end() if not.
 	*/
 	Iterator find(const Key&);
 	ConstIterator find(const Key&) const;
@@ -194,8 +195,8 @@ protected:
 	void init(CompareFunction);
 };
 
-#include "Set_impl.h"
-
 }	//MAUtil
+
+#include "Set_impl.h"
 
 #endif	//_SE_MSAB_MAUTIL_SET_H_

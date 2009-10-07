@@ -28,6 +28,11 @@ namespace MAUtil {
 // Comparator
 //******************************************************************************
 
+/**
+* Returns -1 if \a a \< \a b,
+* 0 if \a a == \a b
+* and 1 if \a a \> \a b.
+*/
 template<class T> int Compare(const T& a, const T& b) {
 	if(a < b)
 		return -1;

@@ -24,29 +24,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //******************************************************************************
 
 template<class Key>
-Set<Key>::DictNode::DictNode() {
+MAUtil::Set<Key>::DictNode::DictNode() {
 	memset((dnode_t*)this, 0, sizeof(dnode_t));
 }
 
 template<class Key>
-void Set<Key>::init(CompareFunction cf) {
+void MAUtil::Set<Key>::init(CompareFunction cf) {
 	dict_init(&mDict, DICTCOUNT_T_MAX, (dict_comp_t)cf);
 	dict_set_allocator(&mDict, &alloc, &free, this);
 }
 
 template<class Key>
-Set<Key>::Set(CompareFunction cf) {
+MAUtil::Set<Key>::Set(CompareFunction cf) {
 	init(cf);
 }
 
 template<class Key>
-Set<Key>::Set(const Set& o) {
+MAUtil::Set<Key>::Set(const Set& o) {
 	init((CompareFunction)o.mDict.dict_compare);
 	operator=(o);
 }
 
 template<class Key>
-Set<Key>& Set<Key>::operator=(const Set& o) {
+MAUtil::Set<Key>& MAUtil::Set<Key>::operator=(const Set& o) {
 	clear();
 	dict_load_t load;
 	dict_load_begin(&load, &mDict);
@@ -62,17 +62,17 @@ Set<Key>& Set<Key>::operator=(const Set& o) {
 }
 
 template<class Key>
-Set<Key>::~Set() {
+MAUtil::Set<Key>::~Set() {
 	clear();
 }
 
 template<class Key>
-void Set<Key>::clear() {
+void MAUtil::Set<Key>::clear() {
 	dict_free_nodes(&mDict);
 }
 
 template<class Key>
-Pair<class Set<Key>::Iterator, bool> Set<Key>::insert(const Key& key) {
+Pair<class MAUtil::Set<Key>::Iterator, bool> MAUtil::Set<Key>::insert(const Key& key) {
 	Pair<Iterator, bool> pair = { Iterator(&mDict), false };
 	DictNode* newNode = new DictNode;
 	dnode_init(newNode, NULL);
@@ -90,40 +90,40 @@ Pair<class Set<Key>::Iterator, bool> Set<Key>::insert(const Key& key) {
 }
 
 template<class Key>
-typename Set<Key>::Iterator Set<Key>::begin() {
+typename MAUtil::Set<Key>::Iterator MAUtil::Set<Key>::begin() {
 	Iterator itr(&mDict);
 	itr.mNode = (DictNode*)dict_first(&mDict);
 	return itr;
 }
 
 template<class Key>
-typename Set<Key>::ConstIterator Set<Key>::begin() const {
+typename MAUtil::Set<Key>::ConstIterator MAUtil::Set<Key>::begin() const {
 	ConstIterator itr(&mDict);
 	itr.mNode = (DictNode*)dict_first((dict_t*)&mDict);
 	return itr;
 }
 
 template<class Key>
-typename Set<Key>::Iterator Set<Key>::end() {
+typename MAUtil::Set<Key>::Iterator MAUtil::Set<Key>::end() {
 	Iterator itr(&mDict);
 	itr.mNode = NULL;
 	return itr;
 }
 
 template<class Key>
-typename Set<Key>::ConstIterator Set<Key>::end() const {
+typename MAUtil::Set<Key>::ConstIterator MAUtil::Set<Key>::end() const {
 	ConstIterator itr(&mDict);
 	itr.mNode = NULL;
 	return itr;
 }
 
 template<class Key>
-size_t Set<Key>::size() const {
+size_t MAUtil::Set<Key>::size() const {
 	return dict_count(&mDict);
 }
 
 template<class Key>
-bool Set<Key>::erase(const Key& key) {
+bool MAUtil::Set<Key>::erase(const Key& key) {
 	dnode_t* node = dict_lookup(&mDict, &key);
 	if(node == NULL)
 		return false;
@@ -132,14 +132,14 @@ bool Set<Key>::erase(const Key& key) {
 }
 
 template<class Key>
-typename Set<Key>::Iterator Set<Key>::find(const Key& key) {
+typename MAUtil::Set<Key>::Iterator MAUtil::Set<Key>::find(const Key& key) {
 	Iterator itr(&mDict);
 	itr.mNode = (DictNode*)dict_lookup(&mDict, &key);
 	return itr;
 }
 
 template<class Key>
-typename Set<Key>::ConstIterator Set<Key>::find(const Key& key) const {
+typename MAUtil::Set<Key>::ConstIterator MAUtil::Set<Key>::find(const Key& key) const {
 	ConstIterator itr(&mDict);
 	itr.mNode = (DictNode*)dict_lookup(&mDict, &key);
 	return itr;
@@ -150,40 +150,40 @@ typename Set<Key>::ConstIterator Set<Key>::find(const Key& key) const {
 //******************************************************************************
 
 template<class Key>
-Set<Key>::Iterator::Iterator(dict_t* dict) : mNode(NULL), mDict(dict) {}
+MAUtil::Set<Key>::Iterator::Iterator(dict_t* dict) : mNode(NULL), mDict(dict) {}
 
 template<class Key>
-Set<Key>::Iterator::Iterator(const Iterator& o) : mNode(o.mNode), mDict(o.mDict) {}
+MAUtil::Set<Key>::Iterator::Iterator(const Iterator& o) : mNode(o.mNode), mDict(o.mDict) {}
 
 template<class Key>
-typename Set<Key>::Iterator&
-Set<Key>::Iterator::operator=(const typename Set<Key>::Iterator& o) {
+typename MAUtil::Set<Key>::Iterator&
+MAUtil::Set<Key>::Iterator::operator=(const Iterator& o) {
 	mNode = o.mNode;
 	mDict = o.mDict;
 	return *this;
 }
 
 template<class Key>
-Key& Set<Key>::Iterator::operator*() {
+Key& MAUtil::Set<Key>::Iterator::operator*() {
 	MAASSERT(mNode != NULL);
 	return mNode->key;
 }
 
 template<class Key>
-Key* Set<Key>::Iterator::operator->() {
+Key* MAUtil::Set<Key>::Iterator::operator->() {
 	MAASSERT(mNode != NULL);
 	return &mNode->key;
 }
 
 template<class Key>
-typename Set<Key>::Iterator& Set<Key>::Iterator::operator++() {
+typename MAUtil::Set<Key>::Iterator& MAUtil::Set<Key>::Iterator::operator++() {
 	MAASSERT(mNode != NULL);
 	mNode = (DictNode*)dict_next(mDict, mNode);
 	return *this;
 }
 
 template<class Key>
-typename Set<Key>::Iterator& Set<Key>::Iterator::operator--() {
+typename MAUtil::Set<Key>::Iterator& MAUtil::Set<Key>::Iterator::operator--() {
 	if(mNode == NULL) {
 		mNode = (DictNode*)dict_last(mDict);
 		MAASSERT(mNode != NULL);
@@ -193,12 +193,12 @@ typename Set<Key>::Iterator& Set<Key>::Iterator::operator--() {
 }
 
 template<class Key>
-bool Set<Key>::Iterator::operator==(const Iterator& o) const {
+bool MAUtil::Set<Key>::Iterator::operator==(const Iterator& o) const {
 	return mNode == o.mNode;
 }
 
 template<class Key>
-bool Set<Key>::Iterator::operator!=(const Iterator& o) const {
+bool MAUtil::Set<Key>::Iterator::operator!=(const Iterator& o) const {
 	return mNode != o.mNode;
 }
 
@@ -207,46 +207,46 @@ bool Set<Key>::Iterator::operator!=(const Iterator& o) const {
 //******************************************************************************
 
 template<class Key>
-Set<Key>::ConstIterator::ConstIterator(const dict_t* dict) :
+MAUtil::Set<Key>::ConstIterator::ConstIterator(const dict_t* dict) :
 mNode(NULL), mDict(dict) {}
 
 template<class Key>
-Set<Key>::ConstIterator::ConstIterator(const ConstIterator& o) :
+MAUtil::Set<Key>::ConstIterator::ConstIterator(const ConstIterator& o) :
 mNode(o.mNode), mDict(o.mDict) {}
 
 template<class Key>
-Set<Key>::ConstIterator::ConstIterator(const Iterator& o) :
+MAUtil::Set<Key>::ConstIterator::ConstIterator(const Iterator& o) :
 mNode(o.mNode), mDict(o.mDict) {}
 
 template<class Key>
-typename Set<Key>::ConstIterator&
-Set<Key>::ConstIterator::operator=(const typename Set<Key>::ConstIterator& o) {
+typename MAUtil::Set<Key>::ConstIterator&
+MAUtil::Set<Key>::ConstIterator::operator=(const ConstIterator& o) {
 	mNode = o.mNode;
 	mDict = o.mDict;
 	return *this;
 }
 
 template<class Key>
-const Key& Set<Key>::ConstIterator::operator*() const {
+const Key& MAUtil::Set<Key>::ConstIterator::operator*() const {
 	MAASSERT(mNode != NULL);
 	return mNode->key;
 }
 
 template<class Key>
-const Key* Set<Key>::ConstIterator::operator->() const {
+const Key* MAUtil::Set<Key>::ConstIterator::operator->() const {
 	MAASSERT(mNode != NULL);
 	return &mNode->key;
 }
 
 template<class Key>
-typename Set<Key>::ConstIterator& Set<Key>::ConstIterator::operator++() {
+typename MAUtil::Set<Key>::ConstIterator& MAUtil::Set<Key>::ConstIterator::operator++() {
 	MAASSERT(mNode != NULL);
 	mNode = (DictNode*)dict_next((dict_t*)mDict, (DictNode*)mNode);
 	return *this;
 }
 
 template<class Key>
-typename Set<Key>::ConstIterator& Set<Key>::ConstIterator::operator--() {
+typename MAUtil::Set<Key>::ConstIterator& MAUtil::Set<Key>::ConstIterator::operator--() {
 	if(mNode == NULL) {
 		mNode = (DictNode*)dict_last((dict_t*)mDict);
 		MAASSERT(mNode != NULL);
@@ -256,11 +256,11 @@ typename Set<Key>::ConstIterator& Set<Key>::ConstIterator::operator--() {
 }
 
 template<class Key>
-bool Set<Key>::ConstIterator::operator==(const ConstIterator& o) const {
+bool MAUtil::Set<Key>::ConstIterator::operator==(const ConstIterator& o) const {
 	return mNode == o.mNode;
 }
 
 template<class Key>
-bool Set<Key>::ConstIterator::operator!=(const ConstIterator& o) const {
+bool MAUtil::Set<Key>::ConstIterator::operator!=(const ConstIterator& o) const {
 	return mNode != o.mNode;
 }

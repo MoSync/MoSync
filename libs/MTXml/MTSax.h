@@ -307,7 +307,7 @@ public:
 	/**
 	 * \return \c true if this parser context is initialized, otherwise \c false.
 	 */
-    bool isStarted(void) const;
+	bool isStarted(void) const;
 private:
 	static void encoding(MTXSaxContext* context, const char* value);
 	static void startElement(MTXSaxContext* context, const char* name, const char** attributes);

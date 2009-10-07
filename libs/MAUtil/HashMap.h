@@ -124,25 +124,75 @@ public:
 	typedef hash_val_t (*HashFunction)(const Key&);
 	typedef int (*CompareFunction)(const Key&, const Key&);
 
+	/**
+	* Constructs an empty HashMap.
+	* \param hf The hash function.
+	* \param cf The compare function.
+	* \param init_bits The intial size of the hash table is 2 to the power of this number.
+	* While the table grows and shrinks dynamically, it is possible to optimize
+	* if you're doing a known number of insertions directly after constructing the
+	* HashMap.
+	*/
 	HashMap(HashFunction hf = &THashFunction<Key>,
 		CompareFunction cf = &Compare<Key>,
 		int init_bits = 6);
 
+	/// Constructs a copy of another HashMap. All elements are also copied.
 	HashMap(const HashMap&);
+	/// Clears this HashMap, then copies the other HashMap to this one.
 	HashMap& operator=(const HashMap&);
+	/// The destructor deletes all elements.
 	~HashMap();
 
+	/**
+	* Inserts a new value into the HashMap.
+	*
+	* Returns a Pair. The Pair's second element is true if the value was indeed inserted.
+	* The Pair's first element is an Iterator that points to the element in the HashMap.
+	*
+	* An element which compares equal to the new one may already be present in the HashMap;
+	* in that case, this operation does nothing, and the Iterator returned will point to
+	* the old element.
+	*/
 	Pair<Iterator, bool> insert(const Key&, const Value&);
+	/**
+	* Searches the HashMap for a specified Key. The returned Iterator points to
+	* the element matching the Key if one was found, or to HashMap::end() if not.
+	*/
 	Iterator find(const Key&);
 	ConstIterator find(const Key&) const;
+	/**
+	* Deletes an element, matching the specified Key, from the HashMap.
+	* Returns true if an element was erased, or false if there was no element matching the Key.
+	*/
 	bool erase(const Key&);
+	/**
+	* Deletes an element, pointed to by the specified Iterator.
+	* The Iterator is invalidated, so if you want to continue iterating through the HashMap,
+	* you must use a different Iterator instance.
+	* \warning If the Iterator is bound to a different HashMap, or if it
+	* points to end(), the system will crash.
+	*/
 	void erase(Iterator);
+	/**
+	* Returns the number of elements in the HashMap.
+	*/
 	size_t size() const;
+	/**
+	* Deletes all elements.
+	*/
 	void clear();
 
+	/**
+	* Returns an Iterator pointing to the first element in the HashMap.
+	*/
 	Iterator begin();
 	ConstIterator begin() const;
 
+	/**
+	* Returns an Iterator pointing to a place beyond the last element of the HashMap.
+	* This Iterator is often used to determine when another Iterator has reached its end.
+	*/
 	Iterator end();
 	ConstIterator end() const;
 
@@ -169,8 +219,8 @@ protected:
 	void init();
 };
 
-#include "HashMap_impl.h"
-
 }	//MAUtil
+
+#include "HashMap_impl.h"
 
 #endif	//_SE_MSAB_MAUTIL_HASHMAP_H_
