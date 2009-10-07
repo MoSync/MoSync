@@ -1,48 +1,33 @@
-MOSYNC NON-COMMERCIAL SOFTWARE LICENSE AGREEMENT AND LIMITED WARRANTY
-IMPORTANT - READ BEFORE COPYING, INSTALLING OR USING.
+Copyright (C) 2009 Mobile Sorcery AB
 
-LICENSE.
+This program is free software; you can redistribute it and/or modifyit under the terms of the GNU General Public License as published bythe Free Software Foundation; version 2 of the License.
+This program is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public Licensealong with this program; if not, write to the Free SoftwareFoundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Do not install MoSync non-commercial development package and any associated materials (collectively, the "Software") until you have carefully read the following terms and conditions. The term "Software" shall also include any upgrades, modified versions or updates of the Software licensed to you by Mobile Sorcery AB (the "Vendor"). By installing or using the Software, you agree to the terms of this Agreement.
+Licenses for third party libraries and applications included in the
+Software are also located in the docs/licenses subdirectory of your installation
+directory.
 
-The Vendor grants to you a non-exclusive right to use this software program in accordance with the terms contained in this license. You agree to allow this Software to store small amounts of information necessary to protect the software against unauthorized use, and you acknowledge that Vendor will not disclose any information related to removing or overcoming such anti-piracy information stored in your system at any time.
+lgpl.txt covers SDL, SDL_Image, SDL_Sound, SDL_Prim, SDL_ttf, SDL_Netand part of makesis-4.
 
-IF YOU DO NOT AGREE TO THE TERMS OF THIS AGREEMENT, DO NOT USE THIS SOFTWARE. PROMPTLY REMOVE IT FROM YOUR COMPUTER.
+gpl.txt covers Cygwin and GCC.
 
-1.  You may not rent or sell any part of the Software.
-2.  You may not reverse engineer, decompile, or disassemble the Software.
-3.  You may not remove the Vendors copyrights or brand logos from the application(s) derived or created with this software.
-4.  This software is for non-commercial use, you or any third party may not in any way directly or indirectly sell or profit from the application(s) derived or created with this non-commercial software.
+freeimage-license.txt covers FreeImage.
 
-PRODUCT EVALUATION (Applies only to Commercial Users)
+expat-license.txt covers Expat.
 
-To use this software for commercial evaluation, you must be registered as a commercial user at 'www.mosync.com', the period of evaluation shall be limited in duration to thirty (30) days following the date after installation of the software, the Vendor shall have no obligation to provide technical support, maintenance, updates or other support for the Software.
+info-zip-license.txt covers Info-Zip.
 
-OWNERSHIP OF SOFTWARE AND COPYRIGHTS.
+modf-license.txt covers the modf function in MAStd, as well as acos,
 
-Title to all copies of the Software remains with Mobile Sorcery AB. The Software is copyrighted and protected by the laws of the Sweden and other countries, and international treaty provisions. You may not remove any copyright notices from the Software or derived software applications. Mobile Sorcery AB may make changes to the Software, or to items referenced therein, at any time without notice, but is not obligated to support or update the Software. 
+asin, atan2, log, pow, atan, ceil, floor and frexp.
 
-EXCLUSION OF WARRANTIES.
+strtod-license.txt covert the strtod function in MAStd.
 
-THE  SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY EXPRESS OR IMPLIED WARRANTY OF ANY KIND INCLUDING WARRANTIES OF MERCHANTABILITY,  NONINFRINGEMENT, OR FITNESS FOR A PARTICULAR PURPOSE. 
+Permission from the author has been given for Angelcode BMFont.
 
-THIS SOFTWARE AND ACCOMPANYING DOCUMENTATION (INCLUDING INSTRUCTIONS FOR USE) ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, FURTHER, THE VENDOR DOES NOT WARRANT, GUARANTEE, OR MAKE ANY REPRESENTATIONS REGARDING THE USE, OR THE 
-RESULTS OF USE, OF THE SOFTWARE OR DOCUMENTATION IN TERMS OF CORRECTNESS, ACCURACY, RELIABILITY, CURRENTNESS, OR OTHERWISE. THE ENTIRE RISK AS TO THE RESULTS AND PERFORMANCE OF THE SOFTWARE IS ASSUMED BY YOU. IF THE SOFTWARE OR WRITTEN MATERIALS ARE DEFECTIVE, YOU, AND NOT VENDOR OR ITS DEALERS, DISTRIBUTORS, AGENTS, OR EMPLOYEES, ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+symbian-example-license.txt covers makesis-2.0.0 and part of makesis-4.
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, VENDOR PROVIDES THIS SOFTWARE WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED,  INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+apache-license-1.1.txt covers part of makesis-4.
 
-LIMITATION OF LIABILITY.
-
-IN NO EVENT SHALL THE VENDOR BE LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, LOST PROFITS, BUSINESS INTERRUPTION, OR LOST INFORMATION) ARISING OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF THE VENDOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. SOME JURISDICTIONS PROHIBIT EXCLUSION OR LIMITATION OF LIABILITY FOR IMPLIED WARRANTIES OR CONSEQUENTIAL OR INCIDENTAL DAMAGES, SO THE ABOVE LIMITATION MAY NOT APPLY TO YOU. YOU MAY ALSO HAVE OTHER LEGAL RIGHTS THAT VARY FROM JURISDICTION TO JURISDICTION.
-
-This License shall be governed and construed in accordance with the laws of Sweden and shall benefit the Vendor, its successors and assigns. Any claim or dispute between you and the Vendor or against any agent, employee, successor or assign of the Vendor, whether related to this Agreement or otherwise, and any claim or dispute related to this Agreement or the relationship or duties contemplated under this Agreement, including the validity of this arbitration clause, shall be resolved by binding arbitration by the mutual agreement of the parties by an independent arbitrator located in Stockholm Sweden. Any award of the arbitrator(s) shall be subject to the jurisdiction of the courts of Stockholm Sweden.
-
-Vendor has no obligation to release a commercial version of the Software.
- 
-TERMINATION OF THIS AGREEMENT.
-
-Mobile Sorcery may terminate this Agreement at any time, whether you violate the terms of this agreement or not. Upon termination, you will immediately uninstall/remove the Software from your computer.
-
-OTHER LICENSES
-
-Licenses for third party libraries and applications included in the Software are located in the docs/licenses subdirectory of your installation directory.
+apache-license-2.0.txt covers the AMR decoder, gsm_amr.
