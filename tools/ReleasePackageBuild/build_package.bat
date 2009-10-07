@@ -125,7 +125,7 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
 
-call build-mosync.bat
+call build-mosync.bat release
 @IF NOT errorlevel 0 goto TOOL_ERROR
 
 @echo.
