@@ -340,7 +340,7 @@ void INL_Update()
 					break;
 			}
 	}
-	VW_UpdateScreen();
+	//VW_UpdateScreen();
 }
 
 void IN_GetMouseDelta(int *dx, int *dy)

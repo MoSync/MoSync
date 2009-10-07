@@ -89,7 +89,7 @@ static boolean SPHack;
 #define SAMPLERATE 11025
 #define SAMPLES_PER_UPDATE ((64*SAMPLERATE)/44100)
 
-static short int sndbuf[4096];
+static short int sndbuf[2048];
 static short int musbuf[(sizeof(sndbuf)/sizeof(sndbuf[0]))/2];
 
 #ifdef ARM_WINCE
@@ -279,7 +279,7 @@ static void *SoundThread(void *data)
 						if (snd < -32768)
 							snd = -32768;
 						sndbuf[i+0] = snd;
-						samp = (SoundData[(SoundPlayPos >> 16)] << 8)^0x8000;
+						//samp = (SoundData[(SoundPlayPos >> 16)] << 8)^0x8000;
 						snd = samp*(16-R)/32+musbuf[i/2];
 						//snd = (((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))*(16-R)>>5)+musbuf[i/2];
 						if (snd > 32767)
@@ -289,16 +289,19 @@ static void *SoundThread(void *data)
 						sndbuf[i+1] = snd;
 					} else {
 						snd = (((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))>>2)+musbuf[i/2];
+
 						if (snd > 32767)
 							snd = 32767;
 						if (snd < -32768)
 							snd = -32768;
 						sndbuf[i+0] = snd;
+						/*
 						snd = (((signed short)((SoundData[(SoundPlayPos >> 16)] << 8)^0x8000))>>2)+musbuf[i/2];
 						if (snd > 32767)
 							snd = 32767;
 						if (snd < -32768)
 							snd = -32768;
+						*/
 						sndbuf[i+1] = snd;
 					}
 					SoundPlayPos += (7000 << 16) / SAMPLERATE; //10402; /* 7000 / 44100 * 65536 */
