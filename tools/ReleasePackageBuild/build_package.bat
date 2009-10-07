@@ -466,13 +466,6 @@ call gendox.bat
 @echo.
 
 @echo ------------------------------------------------
-@echo Building MoBuild
-@echo ------------------------------------------------
-@cd %ORIGINAL_PATH%
-@call build_mobuild.bat %3
-@echo.
-
-@echo ------------------------------------------------
 @echo Building examples (Win32)
 @echo ------------------------------------------------
 @xcopy %MOSYNC_TRUNK%\examples %MOSYNC_EXAMPLES_PATH% /e /y
