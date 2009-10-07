@@ -1,3 +1,20 @@
+REM Copyright (C) 2009 Mobile Sorcery AB
+
+REM This program is free software; you can redistribute it and/or modify it under
+REM the terms of the GNU General Public License, version 2, as published by
+REM the Free Software Foundation.
+
+REM This program is distributed in the hope that it will be useful,
+REM but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+REM or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+REM for more details.
+
+REM You should have received a copy of the GNU General Public License
+REM along with this program; see the file COPYING.  If not, write to the Free
+REM Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+REM 02111-1307, USA.
+
+
 @echo build_package.bat
 @echo.
 
@@ -125,8 +142,8 @@ echo on
 
 @mkdir %ECLIPSE_TRUNK%\temp
 @unzip buildresult\I.MoSync\MoSync-win32.win32.x86.zip -d %ECLIPSE_TRUNK%\temp
-@xcopy %ECLIPSE_TRUNK%\temp\mosync %MOSYNC_ECLIPSE_PATH% /T /E
-@del /S /Q %ECLIPSE_TRUNK%\temp\mosync
+xcopy %ECLIPSE_TRUNK%\temp\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
+del /S /Q %ECLIPSE_TRUNK%\temp\mosync
 
 @IF NOT errorlevel 0 goto TOOL_ERROR
 
