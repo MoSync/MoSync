@@ -72,7 +72,7 @@ void MAUtil::Set<Key>::clear() {
 }
 
 template<class Key>
-Pair<class MAUtil::Set<Key>::Iterator, bool> MAUtil::Set<Key>::insert(const Key& key) {
+MAUtil::Pair<class MAUtil::Set<Key>::Iterator, bool> MAUtil::Set<Key>::insert(const Key& key) {
 	Pair<Iterator, bool> pair = { Iterator(&mDict), false };
 	DictNode* newNode = new DictNode;
 	dnode_init(newNode, NULL);

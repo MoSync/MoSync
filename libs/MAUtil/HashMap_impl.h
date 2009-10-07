@@ -23,11 +23,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // THashFunction
 //******************************************************************************
 
-template<> hash_val_t THashFunction<String>(const String& s) {
+template<> hash_val_t MAUtil::THashFunction<MAUtil::String>(const MAUtil::String& s) {
 	return hash_fun_default(s.c_str());
 }
 
-template<> hash_val_t THashFunction<int>(const int& data) {
+template<> hash_val_t MAUtil::THashFunction<int>(const int& data) {
 	int key = data;
 	key = key + ~(key << 15); // key = key - (key << 15) - 1;
 	key = key ^ (key >> 10);
@@ -101,7 +101,7 @@ void MAUtil::HashMap<Key, Value>::clear() {
 }
 
 template<class Key, class Value>
-Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
+MAUtil::Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
 MAUtil::HashMap<Key, Value>::insert(const Key& key, const Value& value) {
 	Pair<Iterator, bool> pair = { Iterator(), false };
 	HashNode* newNode = new HashNode();
