@@ -9,6 +9,7 @@ BD = "../.."
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = ["."]
+EXTRA_INCLUDES = ["."]
 IGNORED_FILES = ["e_acos.c", "e_asin.c", "e_atan2.c", "e_pow.c", "matask.c", "modf.c",
 	"s_atan.c", "s_ceil.c", "s_floor.c", "s_frexp.c", "maint64.c", "e_log.c",
 	"strtod.c", "macpp.cpp", "MemoryPool.c"]

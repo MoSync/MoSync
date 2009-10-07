@@ -8,7 +8,7 @@ require "#{BD}/build_rules/host.rb"
 #---------------------------------------------------------------------------------
 SOURCES = [".", "./thread", "../../base", "../../base/thread"]
 IGNORED_FILES = ["Image.cpp", "audio.cpp"]
-COMMON_INCLUDES = ["#{BD}/runtimes/cpp/base"]
+COMMON_INCLUDES = [".", "#{BD}/runtimes/cpp/base"]
 COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]
 SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal",
 	"Syscall.cpp" => " -Wno-float-equal"}
