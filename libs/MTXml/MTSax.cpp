@@ -180,9 +180,11 @@ void mtxSaxStart(MTXSaxContext* context)
 	context->attrBuf = NULL;
 	context->attrBufSize = 0;
 	context->attrBufUsed = 0;
-	context->attrIndex = NULL;
-	context->attrIndexSize = 0;
 	context->attrCount = 0;
+
+	/* The attribute index always needs room at least for a NULL pair */
+	context->attrIndexSize = 2;
+	context->attrIndex = (const char**) malloc(context->attrIndexSize * sizeof(char*));
 }
 
 bool mtxSaxFeed(MTXSaxContext* context, char* data)
