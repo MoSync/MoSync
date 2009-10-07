@@ -45,7 +45,7 @@ The constructor sets itself as the listener for the <em>HttpConnection</em> obje
 \\
 [usesnippet id="log"]
 \\
-In our entry point, MAMain we initilizes the console and enables logging.
+In our entry point, MAMain we initialize the console and enables logging.
 This means that everything that everything that we send to the console is also logged in a log file.
 If you handle large amount of data and would want to output information to verify behaviours of your application this will help you.
 This file is located in the <em>Output</em> folder of your project and is called <em>log.txt</em>.
