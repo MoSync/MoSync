@@ -13,6 +13,7 @@ SOURCES = ["."]
 EXTRA_CFLAGS = " -Wno-shadow"
 
 LOCAL_DLLS = ["mautil", "maui"]
+PIPEFLAGS = " -datasize=256000 -heapsize=128000 -stacksize=16000"
 EXENAME	= "mauiex"
 
 #---------------------------------------------------------------------------------
