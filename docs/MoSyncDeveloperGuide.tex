@@ -1,0 +1,260 @@
+\documentclass {article}
+
+\usepackage[latin1]{inputenc}
+%\usepackage[swedish]{babel}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+\title{MoSync Developer Guide}
+
+\author{Patrick Broman \and Fredrik Eldh}
+
+\begin{document}
+\maketitle
+%\thispagestyle{empty}
+%\newpage
+
+%\tableofcontents
+%\thispagestyle{empty}
+%\newpage
+
+\setcounter{page}{1}
+\pagestyle{fancy}
+
+\section{Why?}
+
+These coding conventions are established in order to provide a consistent
+experience for developers using MoSync.
+
+Coding conventions are arbitrary by nature, but these are largely inspired by
+and derived from existing ones in numerous well-known programming environments
+such as Java and SDL. As such, they shouldn't come across as exotic to any moderatly
+experienced programmer.
+
+
+\section{Source code format}
+
+\subsection{Naming}
+
+\subsubsection{Definitions}
+
+\begin{itemize}
+
+\item \textbf{Pascal case} -- words are concatenated by capitalizing the first 
+character of each word including the first word. Examples include 
+\verb|PascalCase|, \verb|CoffeeMachine| and \verb|PriorityMessageDispatcher|.
+
+\item \textbf{Camel case} -- words are concatenated by capitalizing the first character 
+of each word except the first one, which remains in lowercase. 
+Examples include \verb|getAbstractSchemaMapper|, \verb|doStuff| and \verb|invokeSyscall|.
+
+\item \textbf{Macro case} -- words are written in all uppercase 
+concatenated using underscore characters. 
+Examples include \verb|EXTENT_X|, \verb|SOCKET_MAX| and \verb|MAK_DOWN|.
+
+\end{itemize}
+
+\subsubsection{Types}
+
+Non-primitive types (structures, enums etc.) and typedef:ed primitive types are named 
+using a variation of Pascal case with an added \verb|MA| prefix. Names of struct tags 
+are constructed by adding a \verb|_t| to the struct:s typedef:ed name. Examples:
+
+\begin{verbatim}
+typedef int* MAIntPtr;
+typedef struct MAPoint2d_t { int x,y; } MAPoint2d;
+\end{verbatim}
+
+\subsubsection{Variables}
+
+Local variables, struct members and function parameters are in camel case. Examples:
+
+\begin{verbatim}
+srcMapResource, tileWidth, dstTopLeft, transformMode.
+\end{verbatim}
+
+\subsubsection{Class member variables}
+
+Class member variables are in camel case, but with the 'm' prefix to denote membership. Examples:
+
+\begin{verbatim}
+mSrcMapResource, mTileWidth, mDstTopLeft, mTransformMode.
+\end{verbatim}
+
+\subsubsection{Static variables}
+
+Static variables, class members or not, are in camel case, but with the 's' prefix to denote staticness. Example:
+
+\begin{verbatim}
+sCurrentScreen.
+\end{verbatim}
+
+\subsubsection{Global variables}
+
+Global variables, are in camel case, but with the 'g' prefix. Example:
+
+\begin{verbatim}
+gCore.
+\end{verbatim}
+
+\subsubsection{Preprocessor macros}
+
+Macros are written in ... (drumroll) ... macro case.
+
+\subsubsection{Global variables}
+
+..are bad, bad, bad. But if we really need to use them, we name them using camel case with a 'g' for prefix. Examples: gVeryBigBuffer, gVideoMemPtr.
+
+\subsubsection{Syscalls}
+
+Syscalls are named using camel case where the first "word" is always "ma". Only actual Syscalls and IOCTLs are named this way. Examples:
+
+\begin{verbatim}
+void maDisposeLayer(Handle layer);
+void maSetMap(Handle layer, Handle srcMapResource, int destX, int destY);
+\end{verbatim}
+
+\subsubsection{Library functions}
+
+Library functions which are directly associated with the manipulation of some complex datatype (such as a struct) should be prefixed with the name of the type followed by an underscore, then the function name in camel case. Examples: 
+
+\begin{verbatim} 
+MAVec3_normalize(MAVec3* v);
+MARect_containsPoint(const MAVec3* v, const MAPoint2d* p);
+\end{verbatim}
+
+Library functions which are not directly and strongly related to a datatype should be prefixed with an identifying name for the library, which should always contain an initial 'MA'. Examples: 
+
+\begin{verbatim}
+MAMath_solveLinearSystem();
+MAInet_sendMail();
+\end{verbatim}
+
+\begin{verbatim} 
+class PrettyClass
+\end{verbatim}
+
+Classes use 'CamelCase'.
+
+\begin{verbatim} 
+enum PrettyEnum
+\end{verbatim}
+
+Enumerations are defined the same way as classes. Their values are defined in all-uppercase, like macros.
+
+\begin{verbatim} 
+int Class::getSomething()
+bool Class::isSomething()
+\end{verbatim}
+
+Getters always begin with 'get', with the exception of boolean getters, where they begin with 'is'.
+
+\begin{verbatim} 
+int Class::methodsBeginWithSmallLetterAndThenUseCamelCase()
+int ::functionsToo()
+int variablesToo;
+\end{verbatim}
+
+The definition speaks for itself.
+
+\begin{verbatim} 
+void Class::setSomething(int s)
+void Class::setSomething(bool s=true)
+\end{verbatim}
+
+Setters always begin with 'set'. The boolean setters should always default to true if a default value should be available.
+
+\setlength{\parskip}{12pt}
+\setlength{\parindent}{0pt}
+
+\subsection{Indents and spaces}
+
+Inconsistent use of indents, tabs and spaces is a problem in much the same way as inconsistent naming is. Most text editors have the neccesary options. For example, in Visual Studio, go \verb|Tools->Options->Text Editor->C/C++->Tabs|. The following should apply to all MoSync code:
+
+One level of indention equals one tab. A tab is defined as the ASCII character \verb|\t|. The actual screen size of the indents can thus be set by and for each user with no ill effects for others.
+
+Do not use tabs to make tables, like this:
+\begin{verbatim} 
+longTypeName  var1;
+int           var2;
+\end{verbatim}
+It may look nice on your screen, but with different tab sizes, things will go wrong.
+
+\subsection{Line breaks}
+Many legacy coding standards enforce a line-length limit of 80 characters. Today, this is a bit archaic, but it is still a good idea to restrain oneself to, say, 100-120 columns
+
+\subsection{Error handling}
+
+The preferred way to check for bad input by the programmer is to use the macro \verb|PANIC_MESSAGE|, or the shortcut \verb|ASSERT_MSG|. \verb|MAASSERT| should only be used for internal debugging, because if a user of a library sees an \verb|MAASSERT| message, he will not understand it.
+
+Exceptional situations, such as communication failure or bad input by the end user, should always be passed onto the application program, which should know how to handle the error.
+
+
+\subsection{Singletons vs namespaces}
+
+C++ Namespaces can be used instead of class singletons in some cases. Namespaces make for more efficient code because they do away with the \verb|this| pointer. They also allow you to hide more of the implementation, as you don't need to declare the class' member variables in a public \verb|.h| file. They instead become static variables, declared in the implementation \verb|.cpp| file.
+
+
+\subsection{Using namespaces}
+
+In C++ library header files, the keyphrase "using namespace" must not be used. The user of the library must be able to choose which namespaces, if any, to use.
+
+\section{Design patterns}
+\subsection{Syscalls and extensions}
+Syscalls and extensions constitute the lowest-level APIs available in MoSync. They are typically directly mapped to underlying platform features, and are also subject to a number of restrictions. 
+
+
+\subsubsection{Interface restrictions}
+These restrictions are as follows:
+
+\begin{itemize}
+	\item The number of parameters is limited to four. If more information must be passed, struct pointers can be used.
+	\item Parameters cannot be function pointers. If a notification mechanism is required, one is required to make use of (custom) events.
+	\item The only allowed parameter types are primitive IDL types (see IDL documentation) and IDL structs that actually are declared in the relevant IDL file.
+	\item The only allowed return types are primitive IDL types.
+	\item MoSync memory cannot be allocated within syscalls, other than in the specific case of built-in or custom events.
+\end{itemize}
+
+\subsection{General design guidelines}
+
+\subsection{Syscalls that manipulate objects/resources}
+Allocation, manipulation and deallocation of native objects (resources) is typically implemented by means of Handles. Typically, there is an maCreateX() function, which takes a placeholder handle to represent the allocated native object. Subsequent access to this object is provided through other syscalls that accept handles as their first parameter. Finally, all objects are destroyed using maDestroyObject(). As an example, these are some functions that create and manipulate images:
+
+\begin{verbatim}
+	void maCreateImageFromData(
+		in Handle placeholder, 
+		in Handle data, 
+		in int offset, 
+		in int size
+  );
+  void maCreateImageRaw(
+  	in Handle placeholder, 
+  	in MAAddress src, 
+  	in Extent size, 
+  	in int alpha
+  );
+  void maDrawImage(
+  	in Handle image, 
+  	in int left, 
+  	in int top
+  );
+  void maDrawImageRegion(
+  	in Handle image, 
+  	in MARect srcRect, 
+  	in MAPoint2d dstPoint,
+  	in int transformMode
+  );
+\end{verbatim}
+
+
+\subsubsection{Asynchronous operations}
+
+Since MoSync doesn't support user-created threads, it is important to provide asynchronous interfaces to time-consuming native functionality such as network communication. Since syscalls can't accept function pointers, the central MoSync event system is used to provide progress notification. A few built-in event types are provided in the EVENT struct, but there's also a void* provided that can be used for custom events.
+
+\subsection{Libraries / frameworks}
+
+\subsubsection{C or C++ ?}
+One of the first decisions to make when implementing a MoSync library is whether it should be written in C or C++. The basic reasoning is that MoSync should be equally attractive to developers programming in either language. So, 
+
+
+\end{document}
