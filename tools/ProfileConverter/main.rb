@@ -338,7 +338,6 @@ File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
 		def_file.puts line[1]
 	end
 end	
-exit(0)
 
 runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"

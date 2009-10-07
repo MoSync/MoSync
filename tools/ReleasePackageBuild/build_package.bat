@@ -561,10 +561,6 @@ ren %MOSYNCDIR%\MoSyncSetup.exe MoSyncSetup.exe
 @del %MOSYNC_PATH%\license.txt
 @echo.
 
-@echo ------------------------------------------------
-@echo Building profile packets.
-@echo ------------------------------------------------
-
 :END_BUILD
 
 @FOR /F "TOKENS=1* DELIMS= " %%A IN ('DATE/T') DO @SET DATE=%%B
