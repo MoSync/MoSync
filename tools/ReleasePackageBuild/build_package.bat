@@ -14,15 +14,14 @@ REM along with this program; see the file COPYING.  If not, write to the Free
 REM Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 REM 02111-1307, USA.
 
-
 @echo build_package.bat
 @echo.
 
 @IF "%1" == "" goto error
-@IF "%2" == "" goto error
+
 @goto START
 :error
-REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\wtk2 c:\Program\j2sdk1.6.0_04\bin 2>&1 | tee log.txt [/NOJAVA] [/SKIP]
+REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1 | tee log.txt [/NOJAVA] [/SKIP]
 @goto TOOL_ERROR
 :START
 
@@ -33,8 +32,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\wtk2 c
 @goto TOOL_ERROR
 :START2
 
-@SET J2MESDKDIR=%1
-@SET JAVA_SDK_BIN=%2
+@SET JAVAMESDKDIR=%1
 
 @SET LANG=EN
 
@@ -66,7 +64,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\wtk2 c
 @SET MOSYNC_PROFILES_PATH=%MOSYNC_PATH%\profiles
 @SET MOSYNC_TRUNK=%MOSYNC_RELEASE_BUILD_PATH%\mosync-trunk
 
-@IF "%3" == "/SKIP" goto MKDIRS
+@IF "%2" == "/SKIP" goto MKDIRS
 
 @IF EXIST %MOSYNC_PATH% rmdir /s /q %MOSYNC_PATH%
 
@@ -109,7 +107,7 @@ set
 sed -v
 @echo.
 
-@IF "%3" == "/SKIP" goto COPY
+@IF "%2" == "/SKIP" goto COPY
 
 cd %ORIGINAL_PATH%
 
@@ -140,11 +138,7 @@ echo on
 
 @del /S /Q %MOSYNC_ECLIPSE_PATH%
 
-@mkdir %ECLIPSE_TRUNK%\temp
-@unzip buildresult\I.MoSync\MoSync-win32.win32.x86.zip -d %ECLIPSE_TRUNK%\temp
-xcopy %ECLIPSE_TRUNK%\temp\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
-del /S /Q %ECLIPSE_TRUNK%\temp\mosync
-
+xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
 @IF NOT errorlevel 0 goto TOOL_ERROR
 
 :COPY

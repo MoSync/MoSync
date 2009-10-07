@@ -33,7 +33,7 @@ class RuntimeBuilder
 		puts "Processing " + java_file
 		
 		# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-		system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{$SETTINGS[:java_source]}shared -I#{platform_dir}" +
+		system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{ENV['JAVAMESDKDIR']}shared -I#{platform_dir}" +
 		       " #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 		
 		# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
@@ -41,7 +41,7 @@ class RuntimeBuilder
 	end
 
 	def preprocess_shared_java_files(output_dir, platform_dir, platform_define)
-		shared_src = "#{$SETTINGS[:java_source]}shared/";
+		shared_src = "#{ENV['JAVAMESDKDIR']}shared/";
 
 		Dir.foreach(shared_src) {|x| 
 			if (x == "BigPhatError.jpp" || x == "Binary.jpp" || x == "BinaryInterface.jpp" || x == "Core.jpp" ||
@@ -56,7 +56,12 @@ class RuntimeBuilder
 	def javameBuilder(runtime_dir, mode, cldc10)
 		debug = (mode=="debug") ? "D" : ""
 		
-		java_me_source = "#{$SETTINGS[:java_source]}platforms/JavaME/src"
+		if ENV['JAVAMESDKDIR'] == nil
+			puts "Environment variable JAVAMESDKDIR not set with JavaME SDK path.. unable to build!"
+			return 1
+		end
+		
+		java_me_source = "#{ENV['JAVAMESDKDIR']}platforms/JavaME/src"
 		
 		# Set up temporary dir
 		temp_dir = "#{runtime_dir}temp/"
@@ -99,7 +104,7 @@ class RuntimeBuilder
 		# Restore config_platform.h
 		revert_backupped_file config_file
 	
-		java_me_sdk = $SETTINGS[:javame_sdk]
+		java_me_sdk = ENV['JAVAMESDKDIR']
 	
 		# Compile Java source
 		puts "Compiling java source.."

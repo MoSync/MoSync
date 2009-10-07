@@ -339,6 +339,30 @@ File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
 	end
 end	
 
+#Add MobileSorcery/Emulator
+File.makedirs "#{VENDOR_DIR}/MobileSorcery"
+File.copy( "icons/msIcon.png", "#{VENDOR_DIR}/MobileSorcery/icon.png")
+File.makedirs "#{VENDOR_DIR}/MobileSorcery/Emulator"
+File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/runtime.txt", 'w') { |f|
+	f.puts "profiles\\runtimes\\java\\3"
+}
+File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/maprofile.h", 'w') { |f|
+	f.puts "#ifndef _MSAB_PROF_H_\n"
+	f.puts "#define _MSAB_PROF_H_\n\n"
+	f.puts "#define MA_PROF_STRING_VENDOR \"MobileSorcery\"\n"
+	f.puts "#define MA_PROF_STRING_DEVICE \"Emulator\"\n"
+	f.puts "#define MA_PROF_VENDOR_MOBILESORCERY\n"
+	f.puts "#define MA_PROF_DEVICE_EMULATOR\n"
+	f.puts "#define MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI\n"
+	f.puts "#define MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH\n"
+	f.puts "#define MA_PROF_CONST_SCREENSIZE_X 240\n"
+	f.puts "#define MA_PROF_CONST_SCREENSIZE_Y 320\n"
+	f.puts "#define MA_PROF_SUPPORT_STYLUS\n\n"
+	f.puts "#endif /* _MSAB_PROF_H_ */"
+}
+#End MobileSorcery/Emulator
+
+
 runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
 end
