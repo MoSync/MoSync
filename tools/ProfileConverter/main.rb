@@ -68,7 +68,7 @@ CAP_TYPES = {
 		@name, @vendor = name, vendor
 	end
  end
-
+ 
 class Runtime
 	attr_accessor :platform, :caps, :devices
 	def initialize(platform)
@@ -207,10 +207,18 @@ VENDOR_DIR = "#{output_root}vendors"
 RUNTIME_DIR = "#{output_root}runtimes"
 File.makedirs VENDOR_DIR
 File.makedirs RUNTIME_DIR
+definitions = {}
+
 db.execute( "select name from vendor" ) do |vendor|
 #db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 	puts vendor
 	File.makedirs "#{VENDOR_DIR}/#{vendor}"
+	
+	icon_path = "icons/#{vendor.to_s.downcase}Icon.png"
+	if File.exist? icon_path
+		File.copy( icon_path, "#{VENDOR_DIR}/#{vendor}/icon.png")
+	end
+	
 	db.execute("SELECT device.id, device.name, platform.name FROM device, vendor " <<
 		"INNER JOIN platformversion ON device.platformversion = platformversion.id " <<
 		"INNER JOIN platform ON platformversion.platform = platform.id " <<
@@ -236,6 +244,28 @@ db.execute( "select name from vendor" ) do |vendor|
 							def_name = "MA_PROF_CONST_#{cap.format}"
 							rt_obj.caps[def_name] = "#{v.to_s.upcase}"
 							def_str = "#define #{def_name} #{v.to_s.format}"
+							#puts "constant : #{def_name} - #{v.to_s} (#{cap})"
+						
+							if(def_name == "MA_PROF_CONST_STORAGESIZE")
+								definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
+							elsif(def_name == "MA_PROF_CONST_SCREENSIZE_Y")
+								definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_Y,ScreenSize/Y,pixels"
+							elsif(def_name == "MA_PROF_CONST_SCREENSIZE_X")
+								definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_X,ScreenSize/X,pixels"
+							elsif(def_name == "MA_PROF_CONST_MAXJARSIZE")
+								definitions[def_name] = "MA_PROF_CONST_MAXJARSIZE,MaxJarSize,bytes"
+							elsif(def_name == "MA_PROF_CONST_ICONSIZE_Y")
+								definitions[def_name] = "MA_PROF_CONST_ICONSIZE_Y,IconSize/Y,pixels"
+							elsif(def_name == "MA_PROF_CONST_ICONSIZE_X")
+								definitions[def_name] = "MA_PROF_CONST_ICONSIZE_X,IconSize/X,pixels"
+							elsif(def_name == "MA_PROF_CONST_HEAPSIZE")
+								definitions[def_name] = "MA_PROF_CONST_HEAPSIZE,HeapSize,bytes"
+							elsif(def_name == "MA_PROF_CONST_BITSPERPIXEL")
+								definitions[def_name] = "MA_PROF_CONST_BITSPERPIXEL,BitsPerPixel,bits"
+							else
+								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name},#{cap}/#{v.to_s}"
+							end
+							
 							if(rt_obj.platform=="s60v2" && def_name == "MA_PROF_CONST_BITSPERPIXEL")
 								if(rt_obj.caps[def_name].to_i > 16)
 									rt_obj.caps["MA_PROF_SUPPORT_FRAMEBUFFER_32BIT"] = "TRUE"
@@ -257,12 +287,16 @@ db.execute( "select name from vendor" ) do |vendor|
 								end
 								rt_obj.caps["#{def_name}_#{v.to_s.format}"] = "TRUE";
 								def_str = "#define #{def_name}_#{v.to_s.format}"
+								#puts "support : #{def_name} - #{v.to_s} (#{cap})"
+								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name}_#{v.to_s.format},#{cap}/#{v.to_s}"							
 								profile.puts def_str
 							end
 						end
 					elsif(cap == "Bugs")
 						value.each do |v|
 							def_name = "MA_PROF_BUG_#{v.to_s.format}"
+							#puts "bug : #{def_name} - #{v.to_s} (#{cap})"
+							definitions[def_name] = "#{def_name},#{cap}/#{v.to_s}"							
 							rt_obj.caps[def_name] = "TRUE";
 							profile.puts "#define #{def_name}"
 						end
@@ -270,6 +304,7 @@ db.execute( "select name from vendor" ) do |vendor|
 						value.each do |v|
 							#puts v.to_s
 							if v.to_s == "hasPointerEvents"
+								definitions["MA_PROF_SUPPORT_STYLUS"] = "MA_PROF_SUPPORT_STYLUS,Support/Stylus"							
 								rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
 								def_str = "#define MA_PROF_SUPPORT_STYLUS"
 								profile.puts def_str							
@@ -282,6 +317,8 @@ db.execute( "select name from vendor" ) do |vendor|
 							if (v.to_s == "CLDC/1.0" ||
 								v.to_s == "CLDC/1.0.4")
 								rt_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = "TRUE";
+								definitions["MA_PROF_SUPPORT_CLDC_10"] = "MA_PROF_SUPPORT_CLDC_10,Support/Cldc1.0"							
+									
 								def_str = "#define MA_PROF_SUPPORT_CLDC_10"
 								profile.puts def_str
 							end
@@ -293,9 +330,15 @@ db.execute( "select name from vendor" ) do |vendor|
 		end
 		runtime = runtimes[device[2].to_sym].add_runtime rt_obj
 		runtime.devices << Device.new(device[1], vendor)
-
 	end
 end
+
+File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
+	definitions.each do |line|
+		def_file.puts line[1]
+	end
+end	
+exit(0)
 
 runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
