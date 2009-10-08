@@ -56,11 +56,6 @@ class RuntimeBuilder
 
 	def build(platform, runtime_dir)
 		
-		if !File.exist? "Settings.rb"
-			puts "Creates the Settings.rb file"
-			File.copy("Settings.rb.example", "Settings.rb")
-		end
- 		
 		modes = [ 	
 					["release", "#{runtime_dir}config.h"],
 					["debug", "#{runtime_dir}configD.h"]	
@@ -78,6 +73,11 @@ class RuntimeBuilder
 			end
 		end
 	end
+end
+
+if !File.exist? "Settings.rb"
+	puts "Creates the Settings.rb file"
+	File.copy("Settings.rb.example", "Settings.rb")
 end
 
 require ARGV[0]
