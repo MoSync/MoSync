@@ -75,6 +75,8 @@ class RuntimeBuilder
 	end
 end
 
+require 'ftools'
+
 if !File.exist? "Settings.rb"
 	puts "Creates the Settings.rb file"
 	File.copy("Settings.rb.example", "Settings.rb")
