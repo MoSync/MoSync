@@ -123,24 +123,15 @@ void DisplayConsole()
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 void PrintConsole(const char *str)
 {
-	int pos = 0, len = strlen(str);
+	int pos = 0;
 	char* line;
 
 	if (gConsoleLogging)
 	{
-#define PCMSG "PrintConsole: "
-#define CLBUFSIZE 512
-		static const char pc[] = PCMSG;
-		static char msg[CLBUFSIZE] = PCMSG;
-		int logLen = sizeof(pc)-1 + len;
-		memcpy(msg + sizeof(pc)-1, str, len);
-		if(str[len-1] != '\n')
-			msg[logLen++] = '\n';
-		if(logLen > CLBUFSIZE) {
-			maWriteLog(pc, sizeof(pc)-1);
-			maPanic(1, "ConsoleLogging buffer overrun!");
-		}
-		maWriteLog(msg, logLen);
+        static char message[] = "PrintConsole: ";
+
+		maWriteLog(message, strlen(message));
+		maWriteLog(str, strlen(str));
 	}
 
 	if (!sConsole.initialized)
