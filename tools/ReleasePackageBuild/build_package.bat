@@ -579,3 +579,5 @@ ren %MOSYNCDIR%\MoSyncSetup.exe MoSyncSetup.exe
 @echo a tool related error occured.
 
 :END
+
+cd %ORIGINAL_PATH%
