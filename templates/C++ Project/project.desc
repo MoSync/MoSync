@@ -1,0 +1,9 @@
+id = project.cpp
+name = MoSync C++ Project
+description = A MoSync C++ project with a main file and stub code.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib

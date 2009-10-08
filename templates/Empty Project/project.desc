@@ -1,0 +1,6 @@
+id = project.empty
+name = Empty MoSync Project
+description = An empty project with standard settings but no files.
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib

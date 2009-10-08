@@ -1,0 +1,9 @@
+id = project.maui
+name = MoSync MAUI Project
+description = A Moblet project with stub code for using MAUI, the graphical user interface library.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib,MAUI.lib

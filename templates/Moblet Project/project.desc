@@ -1,0 +1,9 @@
+id = project.moblet
+name = MoSync Moblet Project
+description = A project that uses the MAUtil::Moblet class, which provides an event-driven framework for developing your MoSync application.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib
