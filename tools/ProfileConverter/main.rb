@@ -178,24 +178,18 @@ end
 puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
 
-#sql_line = ""
-
 # Create database from SQL file
 puts "Create database from SQL file"
 File.open(sql_filename, "r") do |infile|
 	while (line = infile.gets)
 		if(line.length != 1)
-			#puts line
 			if !line.empty?
-				#sql_line << line
 				db.execute line
 			end
 		end	
 	end
 end
 
-#puts "Send batch of SQL to SQLite3.."
-#db.execute_batch sql_line
 
 puts "Generating all capability permutations!"
 
@@ -210,7 +204,6 @@ File.makedirs RUNTIME_DIR
 definitions = {}
 
 db.execute( "select name from vendor" ) do |vendor|
-#db.execute( "select name from vendor where name='Nokia'" ) do |vendor|
 	puts vendor
 	File.makedirs "#{VENDOR_DIR}/#{vendor}"
 	
@@ -244,7 +237,6 @@ db.execute( "select name from vendor" ) do |vendor|
 							def_name = "MA_PROF_CONST_#{cap.format}"
 							rt_obj.caps[def_name] = "#{v.to_s.upcase}"
 							def_str = "#define #{def_name} #{v.to_s.format}"
-							#puts "constant : #{def_name} - #{v.to_s} (#{cap})"
 						
 							if(def_name == "MA_PROF_CONST_STORAGESIZE")
 								definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
@@ -287,7 +279,6 @@ db.execute( "select name from vendor" ) do |vendor|
 								end
 								rt_obj.caps["#{def_name}_#{v.to_s.format}"] = "TRUE";
 								def_str = "#define #{def_name}_#{v.to_s.format}"
-								#puts "support : #{def_name} - #{v.to_s} (#{cap})"
 								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name}_#{v.to_s.format},#{cap}/#{v.to_s}"							
 								profile.puts def_str
 							end
@@ -295,7 +286,6 @@ db.execute( "select name from vendor" ) do |vendor|
 					elsif(cap == "Bugs")
 						value.each do |v|
 							def_name = "MA_PROF_BUG_#{v.to_s.format}"
-							#puts "bug : #{def_name} - #{v.to_s} (#{cap})"
 							definitions[def_name] = "#{def_name},#{cap}/#{v.to_s}"							
 							rt_obj.caps[def_name] = "TRUE";
 							profile.puts "#define #{def_name}"
@@ -344,7 +334,7 @@ File.makedirs "#{VENDOR_DIR}/MobileSorcery"
 File.copy( "icons/msIcon.png", "#{VENDOR_DIR}/MobileSorcery/icon.png")
 File.makedirs "#{VENDOR_DIR}/MobileSorcery/Emulator"
 File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/runtime.txt", 'w') { |f|
-	f.puts "profiles\\runtimes\\java\\3"
+	f.puts "profiles\\runtimes\\JavaME\\3"
 }
 File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/maprofile.h", 'w') { |f|
 	f.puts "#ifndef _MSAB_PROF_H_\n"
