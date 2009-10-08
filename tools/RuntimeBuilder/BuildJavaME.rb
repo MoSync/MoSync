@@ -18,11 +18,11 @@ require 'ftools'
 require 'fileutils'
 			
 class RuntimeBuilder 
-	def javame(runtime_dir, mode)
+	def java(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, false)
 	end
 	
-	def javamecldc10(runtime_dir, mode)
+	def javacldc10(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, true)
 	end
 	

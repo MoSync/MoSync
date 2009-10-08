@@ -21,7 +21,7 @@ RELEVANT_CAPS = [
 
 RELEVANT_DEFINES = {
 
-	:JavaME => [
+	:java => [
 		'MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH',
 		'MA_PROF_BUG_BACKLIGHTFLASHES',
 		'MA_PROF_BUG_MICROEMU',
@@ -140,7 +140,7 @@ runtimes = {
 	:sp2003 => [],
 	:s60v2  => [],
 	:s60v3  => [],
-	:JavaME => [],
+	:java => [],
 }
 
 class Array
@@ -216,6 +216,9 @@ db.execute( "select name from vendor" ) do |vendor|
 		"INNER JOIN platformversion ON device.platformversion = platformversion.id " <<
 		"INNER JOIN platform ON platformversion.platform = platform.id " <<
 		"WHERE vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
+		if device[2] == "JavaME"
+			device[2] = "java"
+		end
 		rt_obj = Runtime.new(device[2].to_s)
 		seen_defines = []
 		device_path = "#{VENDOR_DIR}/#{vendor}/#{device[1]}"
@@ -329,30 +332,6 @@ File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
 	end
 end	
 
-#Add MobileSorcery/Emulator
-File.makedirs "#{VENDOR_DIR}/MobileSorcery"
-File.copy( "icons/msIcon.png", "#{VENDOR_DIR}/MobileSorcery/icon.png")
-File.makedirs "#{VENDOR_DIR}/MobileSorcery/Emulator"
-File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/runtime.txt", 'w') { |f|
-	f.puts "profiles\\runtimes\\JavaME\\3"
-}
-File.open("#{VENDOR_DIR}/MobileSorcery/Emulator/maprofile.h", 'w') { |f|
-	f.puts "#ifndef _MSAB_PROF_H_\n"
-	f.puts "#define _MSAB_PROF_H_\n\n"
-	f.puts "#define MA_PROF_STRING_VENDOR \"MobileSorcery\"\n"
-	f.puts "#define MA_PROF_STRING_DEVICE \"Emulator\"\n"
-	f.puts "#define MA_PROF_VENDOR_MOBILESORCERY\n"
-	f.puts "#define MA_PROF_DEVICE_EMULATOR\n"
-	f.puts "#define MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI\n"
-	f.puts "#define MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH\n"
-	f.puts "#define MA_PROF_CONST_SCREENSIZE_X 240\n"
-	f.puts "#define MA_PROF_CONST_SCREENSIZE_Y 320\n"
-	f.puts "#define MA_PROF_SUPPORT_STYLUS\n\n"
-	f.puts "#endif /* _MSAB_PROF_H_ */"
-}
-#End MobileSorcery/Emulator
-
-
 runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
 end
@@ -385,8 +364,8 @@ runtimes.each do |platform_name, platform|
 		
 		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		
-		if(platform_name == :JavaME && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
-			success = system("ruby RuntimeBuilder.rb Settings.rb javamecldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
+		if(platform_name == :java && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
+			success = system("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
 		else
 			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
 		end
