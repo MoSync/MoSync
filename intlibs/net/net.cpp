@@ -43,8 +43,7 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 	if(len >= (int)sizeof("HTTP/x.x xxx") - 1) if(sstrcmp(line, protocolSlash) == 0) {
 		//const char* line = baseLine + sizeof("HTTP/") - 1;
 		int pos = sizeof("HTTP/") - 1;
-		if (isdigit(line[pos++]) && line[pos++] == '.' &&
-			isdigit(line[pos++]) && line[pos++] == ' ')
+		if(isdigit(line[pos++])) if(line[pos++] == '.') if(isdigit(line[pos++]))	if(line[pos++] == ' ')
 		{
 			//check status-code
 			const char* code = line + pos;
