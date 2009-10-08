@@ -395,8 +395,13 @@ int ProtocolConnection::readLine(const char*& lineP) {
 
 		//something clever could be done here when we want to support arbitrarily large headers.
 		if(mPos == sizeof(mBuffer)) {
-			LOG("header buffer full!\n");
-			return CONNERR_INTERNAL;
+			if(startPos == 0) {
+				LOG("header buffer full!\n");
+				return CONNERR_INTERNAL;
+			}
+			int size = mPos - startPos;
+			memcpy(mBuffer, mBuffer + startPos, size);
+			mPos = size;
 		}
 
 		int res;
