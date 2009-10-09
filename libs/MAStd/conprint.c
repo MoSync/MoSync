@@ -79,7 +79,7 @@ static void FeedLine()
 }
 
 void InitConsole()
-{	
+{
 	int i;
 
 	sConsole.screenSize = maGetScrSize();
@@ -114,7 +114,7 @@ void DisplayConsole()
 	for (n = 0;  n < sConsole.height;  n++)
 	{
 		index = (n + sConsole.firstLine) % sConsole.height;
-		maDrawText(0, n * sConsole.fontHeight, sConsole.lines[index].line); 
+		maDrawText(0, n * sConsole.fontHeight, sConsole.lines[index].line);
 	}
 
 	maUpdateScreen();
@@ -123,15 +123,21 @@ void DisplayConsole()
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
 void PrintConsole(const char *str)
 {
-	int pos = 0;
+	int length, pos = 0;
 	char* line;
 
 	if (gConsoleLogging)
 	{
-        static char message[] = "PrintConsole: ";
+		static char prefix[] = "PrintConsole: ";
+		maWriteLog(prefix, strlen(prefix));
 
-		maWriteLog(message, strlen(message));
-		maWriteLog(str, strlen(str));
+		length = strlen(str);
+		if (length > 0)
+		{
+			maWriteLog(str, length);
+			if (str[length - 1] != '\n')
+				maWriteLog("\n", 1);
+		}
 	}
 
 	if (!sConsole.initialized)
@@ -180,7 +186,7 @@ int vprintf(const char *fmt, va_list args)
 {
 	char buf[PRINTF_BUFSIZE];
 	int len;
-	
+
 	buf[0] = 0;
 
 	len = vsprintf(buf, fmt, args);
@@ -199,7 +205,7 @@ int printf(const char *fmt, ...)
 {
 	va_list args;
 	int len;
-	
+
 	va_start(args, fmt);
 	len = vprintf(fmt, args);
 	va_end(args);
