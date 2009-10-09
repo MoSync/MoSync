@@ -22,7 +22,10 @@ require 'RMagick'
 $KCODE = "UTF8"
 
 HEADER_TEXT = 'MoSync mobile development SDK'
-version = 'Developer build'
+
+version = []
+version << 'Developer build'
+version << 'Unknown'
 
 PLATFORMS = [
 	'Java ME MIDP 2',
@@ -34,8 +37,12 @@ PLATFORMS = [
 	'Windows Mobile 6.0'
 ]
 
+index = 0
 File.open('\mb\revision', 'r') do |f|
-	version = f.read
+	while (line = f.gets)
+		version[index] = line
+		index = index + 1
+	end
 end
 
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
@@ -54,13 +61,22 @@ header.annotate(img, 271, 200, 275, 110, HEADER_TEXT) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img, 271, 340, 275, 130, "Version #{version}" ) do
+header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
 	self.font = 'Verdana'
 	self.pointsize = 14
 	self.font_weight = Magick::LighterWeight
 	self.fill = 'white'
 	self.gravity = Magick::NorthWestGravity
 end
+
+# header.annotate(img, 271, 340, 550, 5, "R#{version[1].strip}" ) do
+	# self.font = 'Verdana'
+	# self.pointsize = 10
+	# self.font_weight = Magick::LighterWeight
+	# self.fill = 'white'
+	# self.gravity = Magick::NorthWestGravity
+# end
+
 
 platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do 
 	self.size = "300x200"
