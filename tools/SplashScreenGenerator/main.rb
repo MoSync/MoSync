@@ -23,9 +23,7 @@ $KCODE = "UTF8"
 
 HEADER_TEXT = 'MoSync mobile development SDK'
 
-version = []
-version << 'Developer build'
-version << 'Unknown'
+version = ['Developer build', 'Unknown']
 
 PLATFORMS = [
 	'Java ME MIDP 2',
@@ -50,6 +48,7 @@ COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " +
 			"logo are trademarks of Mobile Sorcery AB."
 
 img = Magick::Image.read('template.png').first
+img2 = Magick::Image.read('template_installer.png').first
 
 header = Magick::Draw.new
 
@@ -69,14 +68,13 @@ header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision
 	self.gravity = Magick::NorthWestGravity
 end
 
-# header.annotate(img, 271, 340, 550, 5, "R#{version[1].strip}" ) do
-	# self.font = 'Verdana'
-	# self.pointsize = 10
-	# self.font_weight = Magick::LighterWeight
-	# self.fill = 'white'
-	# self.gravity = Magick::NorthWestGravity
-# end
-
+header.annotate(img2, 271, 340, 180, 260, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+	self.font = 'Verdana'
+	self.pointsize = 12
+	self.font_weight = Magick::LighterWeight
+	self.fill = 'white'
+	self.gravity = Magick::NorthWestGravity
+end
 
 platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do 
 	self.size = "300x200"
@@ -96,4 +94,5 @@ img = img.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
 img = img.composite(copyright.first, 134, 350, Magick::ScreenCompositeOp)
 
 img.write('splash.bmp')
+img2.write('installer_splash.bmp')
 
