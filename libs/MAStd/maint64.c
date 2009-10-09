@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <ma.h>
+#include "ma.h"
 
 // Functions are intrinsic, no prototypes needed.
 // See http://gcc.gnu.org/onlinedocs/gccint/Integer-library-routines.html
