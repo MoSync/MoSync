@@ -60,7 +60,9 @@ INTRA_CXXFLAGS = ((defined?(MOSYNC) == nil) ? " -fexceptions" : " -fno-exception
 INTRA_OBJECTS = LOCAL_LIBS.collect do |lib| "#{BUILDPATH}lib#{lib}.a" end +
 	(LOCAL_DLLS + ((defined?(MOSYNC) == nil) ? [] : ["mosync", "mastd"])).collect do
 		|dll| File.expand_path("#{BUILDPATH}lib#{dll}#{DLL_FILE_ENDING}") end +
-	LIB_OBJECTS + ((defined?(MOSYNC) == nil) ? [] : ["#{BUILDPATH}mosyncmain.o"])
+	LIB_OBJECTS
+
+EXE_OBJECTS = ((defined?(MOSYNC) == nil) ? [] : ["#{BUILDPATH}mosyncmain.o"])
 
 if(HOST == "win32") then
 	PRE_LINKFLAGS = " -Wl,--enable-auto-import"
@@ -115,7 +117,7 @@ if(defined?(EXENAME) != nil && defined?(EXETARGET) == nil) then
 end
 
 if(defined?(EXETARGET) != nil) then
-	myTask = file EXETARGET => OBJECTS do |t|
+	myTask = file EXETARGET => OBJECTS + EXE_OBJECTS do |t|
 		build_exe(t)
 	end
 	task :default => myTask
