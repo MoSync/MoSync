@@ -174,7 +174,7 @@ getOnWithIt:
   Call WriteEnvStr
 
 ; register icon
-  ${registerExtension} "$INSTDIR\bin\MoBuildGUI.exe" ".mopro" "MoSync Project File" "$INSTDIR\bin\gfx\mopro_icon.ico,0"
+  ;${registerExtension} "$INSTDIR\bin\MoBuildGUI.exe" ".mopro" "MoSync Project File" "$INSTDIR\bin\gfx\mopro_icon.ico,0"
 
 SectionEnd
 
@@ -203,7 +203,7 @@ Section "Start Menu Shortcuts" StartMenu
 
   CreateDirectory "$SMPROGRAMS\MoSync"
   CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 0
-  CreateShortCut "$SMPROGRAMS\MoSync\MoBuild.lnk" "$INSTDIR\bin\MobuildGUI.exe" "" "$INSTDIR\bin\MobuildGUI.exe" 0
+  ;CreateShortCut "$SMPROGRAMS\MoSync\MoBuild.lnk" "$INSTDIR\bin\MobuildGUI.exe" "" "$INSTDIR\bin\MobuildGUI.exe" 0
   CreateShortCut "$SMPROGRAMS\MoSync\Documentation.lnk" "$INSTDIR\docs\index.html" "" "$INSTDIR\docs\index.html" 0
   CreateShortCut "$SMPROGRAMS\MoSync\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 0
