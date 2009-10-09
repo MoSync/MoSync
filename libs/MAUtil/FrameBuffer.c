@@ -43,14 +43,14 @@ ScalerFunc sScalerFunc = NULL;
 void chooseScaler();
 
 void FrameBuffer_init(int w, int h, int orientation, int flags) {
-	sScalerSizes[0].y = w>>1;
-	sScalerSizes[0].x = h>>1;
-	sScalerSizes[1].y = w;
-	sScalerSizes[1].x = h;
-	sScalerSizes[2].y = w<<1;
-	sScalerSizes[2].x = h<<1;
-	sScalerSizes[3].y = 0;
+	sScalerSizes[0].x = w>>1;
+	sScalerSizes[0].y = h>>1;
+	sScalerSizes[1].x = w;
+	sScalerSizes[1].y = h;
+	sScalerSizes[2].x = w<<1;
+	sScalerSizes[2].y = h<<1;
 	sScalerSizes[3].x = 0;
+	sScalerSizes[3].y = 0;
 	sOrientation = orientation;
 	sFlags = flags;
 
@@ -388,36 +388,36 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 	
 	switch(sOrientation) {
 	case ORIENTATION_0:
-		dx = (sXOffset+sScalerSizes[sScalerIndex].x-1);
-		dy = sYOffset;
-		pitchx = -sFrameBufferInfo.bytesPerPixel;
-		pitchy = sFrameBufferInfo.pitch;
-		dx += -dsty;
-		dy += dstx;						
-		break;
-	case ORIENTATION_90:
-		dx = (sXOffset+sScalerSizes[sScalerIndex].y-1);
-		dy = (sYOffset+sScalerSizes[sScalerIndex].x-1);
-		pitchx = -sFrameBufferInfo.pitch;
-		pitchy = -sFrameBufferInfo.bytesPerPixel;				
-		dx += -dstx;
-		dy += -dsty;				
-		break;
-	case ORIENTATION_180:	
-		dx = (sXOffset);
-		dy = (sYOffset+sScalerSizes[sScalerIndex].y-1);
-		pitchx = sFrameBufferInfo.bytesPerPixel;
-		pitchy = -sFrameBufferInfo.pitch;
-		dx += dsty;
-		dy += -dstx;					
-		break;
-	case ORIENTATION_270:
 		dx = (sXOffset);
 		dy = (sYOffset);				
 		pitchx = sFrameBufferInfo.pitch;
 		pitchy = sFrameBufferInfo.bytesPerPixel;
 		dx += dstx;
 		dy += dsty;	
+		break;
+	case ORIENTATION_90:
+		dx = (sXOffset+sScalerSizes[sScalerIndex].y-1);
+		dy = sYOffset;
+		pitchx = -sFrameBufferInfo.bytesPerPixel;
+		pitchy = sFrameBufferInfo.pitch;
+		dx += -dsty;
+		dy += dstx;						
+		break;
+	case ORIENTATION_180:
+		dx = (sXOffset+sScalerSizes[sScalerIndex].x-1);
+		dy = (sYOffset+sScalerSizes[sScalerIndex].y-1);
+		pitchx = -sFrameBufferInfo.pitch;
+		pitchy = -sFrameBufferInfo.bytesPerPixel;				
+		dx += -dstx;
+		dy += -dsty;				
+		break;
+	case ORIENTATION_270:	
+		dx = (sXOffset);
+		dy = (sYOffset+sScalerSizes[sScalerIndex].x-1);
+		pitchx = sFrameBufferInfo.bytesPerPixel;
+		pitchy = -sFrameBufferInfo.pitch;
+		dx += dsty;
+		dy += -dstx;					
 		break;
 	default:
 		PANIC_MESSAGE("bad orientation");
@@ -474,20 +474,30 @@ void chooseScaler() {
 	sScalerIndex = scaler;
 }
 
-int FrameBuffer_getArrowKeyForOrientation(int mak) {
+int FrameBuffer_getArrowKeyForOrientationInitial(int mak, int initial) {
 	int i;
 	int mask = 0;
 	if(mak == MAK_UP) mask|=1;
 	if(mak == MAK_RIGHT) mask|=2;
 	if(mak == MAK_DOWN) mask|=4;
 	if(mak == MAK_LEFT) mask|=8;
-	for(i = 0; i < sOrientation; i++) {
+	for(i = initial; i < sOrientation; i++) {
 		if(mask&0x1) mask|=1<<4;
 		mask>>=1;
 	}
+	/*
 	if(mask&1) return MAK_LEFT;
 	if(mask&2) return MAK_UP;
 	if(mask&4) return MAK_RIGHT;
 	if(mask&8) return MAK_DOWN;
+	*/
+	if(mask&1) return MAK_UP;
+	if(mask&2) return MAK_RIGHT;
+	if(mask&4) return MAK_DOWN;
+	if(mask&8) return MAK_LEFT;
 	else return 0;
+}
+
+int FrameBuffer_getArrowKeyForOrientation(int mak) {
+	return FrameBuffer_getArrowKeyForOrientationInitial(mak, 0);
 }

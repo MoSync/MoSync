@@ -112,7 +112,7 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
  * \param mak The mak keycode of the arrow key.
  */
 int FrameBuffer_getArrowKeyForOrientation(int mak);
-
+int FrameBuffer_getArrowKeyForOrientationInitial(int mak, int initial);
 
 #ifdef __cplusplus
 }

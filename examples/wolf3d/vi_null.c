@@ -139,7 +139,8 @@ void INL_Update()
 static int XKeysymToScancode(unsigned int keysym)
 {
 	if(keysym == MAK_UP || keysym == MAK_DOWN || keysym == MAK_LEFT || keysym == MAK_RIGHT) {
-		keysym = FrameBuffer_getArrowKeyForOrientation(keysym);
+//		keysym = FrameBuffer_getArrowKeyForOrientationInitial(keysym, -3); // for the htc device with a rotated frame buffer.
+		keysym = FrameBuffer_getArrowKeyForOrientationInitial(keysym, 0);
 	}
 
 	switch (keysym) {
@@ -151,7 +152,10 @@ static int XKeysymToScancode(unsigned int keysym)
 		case MAK_0:
 			return sc_Escape;
 		//case SDLK_SPACE:
+		case MAK_RETURN:
+		case MAK_BACKSPACE:
 		case MAK_SOFTLEFT:
+		case MAK_SPACE:
 			return sc_Space;
 //		case SDLK_BACKSPACE:
 //			return sc_BackSpace;
