@@ -60,8 +60,6 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 					if(line[pos] == ' ') {
 						//read reason-phrase
 						pos++;
-						//error; line isn't zero-terminated.
-						//LOGS("HTTP %i %s\n", responseCode, line + pos);
 #ifdef SOCKET_DEBUGGING_MODE
 						LOG("%s %i ", protocolSlash, responseCode);
 						LOGBIN(line + pos, len - pos);

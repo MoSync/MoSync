@@ -84,6 +84,7 @@ public:
 		* If the Iterator points to HashMap::end(), this operation will cause a crash.
 		*/
 		Iterator& operator++();
+		Iterator operator++(int);
 
 		bool operator==(const Iterator&) const;
 		bool operator!=(const Iterator&) const;
@@ -107,7 +108,7 @@ public:
 		const PairKV* operator->() const;
 
 		ConstIterator& operator++();
-		ConstIterator& operator--();
+		ConstIterator operator++(int);
 
 		bool operator==(const ConstIterator&) const;
 		bool operator!=(const ConstIterator&) const;

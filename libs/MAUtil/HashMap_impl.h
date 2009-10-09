@@ -233,6 +233,14 @@ MAUtil::HashMap<Key, Value>::Iterator::operator++() {
 }
 
 template<class Key, class Value>
+typename MAUtil::HashMap<Key, Value>::Iterator
+MAUtil::HashMap<Key, Value>::Iterator::operator++(int) {
+	Iterator old = *this;
+	++*this;
+	return old;
+}
+
+template<class Key, class Value>
 bool MAUtil::HashMap<Key, Value>::Iterator::operator==(const Iterator& o) const {
 	return mScan.hash_next == o.mScan.hash_next;
 }
@@ -284,6 +292,14 @@ typename MAUtil::HashMap<Key, Value>::ConstIterator&
 MAUtil::HashMap<Key, Value>::ConstIterator::operator++() {
 	hash_scan_next(&mScan);
 	return *this;
+}
+
+template<class Key, class Value>
+typename MAUtil::HashMap<Key, Value>::ConstIterator
+MAUtil::HashMap<Key, Value>::ConstIterator::operator++(int) {
+	ConstIterator old = *this;
+	++*this;
+	return old;
 }
 
 template<class Key, class Value>

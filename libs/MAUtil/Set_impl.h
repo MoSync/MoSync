@@ -183,13 +183,28 @@ typename MAUtil::Set<Key>::Iterator& MAUtil::Set<Key>::Iterator::operator++() {
 }
 
 template<class Key>
+typename MAUtil::Set<Key>::Iterator MAUtil::Set<Key>::Iterator::operator++(int) {
+	Iterator old = *this;
+	++*this;
+	return old;
+}
+
+template<class Key>
 typename MAUtil::Set<Key>::Iterator& MAUtil::Set<Key>::Iterator::operator--() {
 	if(mNode == NULL) {
 		mNode = (DictNode*)dict_last(mDict);
 		MAASSERT(mNode != NULL);
+		return *this;
 	}
 	mNode = (DictNode*)dict_prev(mDict, mNode);
 	return *this;
+}
+
+template<class Key>
+typename MAUtil::Set<Key>::Iterator MAUtil::Set<Key>::Iterator::operator--(int) {
+	Iterator old = *this;
+	--*this;
+	return old;
 }
 
 template<class Key>
@@ -246,13 +261,28 @@ typename MAUtil::Set<Key>::ConstIterator& MAUtil::Set<Key>::ConstIterator::opera
 }
 
 template<class Key>
+typename MAUtil::Set<Key>::ConstIterator MAUtil::Set<Key>::ConstIterator::operator++(int) {
+	ConstIterator old = *this;
+	++*this;
+	return old;
+}
+
+template<class Key>
 typename MAUtil::Set<Key>::ConstIterator& MAUtil::Set<Key>::ConstIterator::operator--() {
 	if(mNode == NULL) {
 		mNode = (DictNode*)dict_last((dict_t*)mDict);
 		MAASSERT(mNode != NULL);
+		return *this;
 	}
 	mNode = (DictNode*)dict_prev((dict_t*)mDict, (DictNode*)mNode);
 	return *this;
+}
+
+template<class Key>
+typename MAUtil::Set<Key>::ConstIterator MAUtil::Set<Key>::ConstIterator::operator--(int) {
+	ConstIterator old = *this;
+	--*this;
+	return old;
 }
 
 template<class Key>

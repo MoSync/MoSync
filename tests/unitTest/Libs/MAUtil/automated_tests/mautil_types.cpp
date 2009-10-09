@@ -148,6 +148,12 @@ public:
 		//iterator
 		--itr;
 		assert("Set::Iterator--", itr != s.end());
+		itr--;
+		itr++;
+		itr++;
+		assert("Set::Iterator++", itr == s.end());
+		itr--;
+		assert("Set::Iterator--", itr != s.end());
 		assert("Set::Iterator", itr->size() == 3);
 
 		//const iterator
@@ -166,6 +172,12 @@ public:
 		assert("cSet::Iterator", citr == s.end());
 
 		--citr;
+		assert("cSet::Iterator--", citr != s.end());
+		citr--;
+		citr++;
+		citr++;
+		assert("cSet::Iterator++", citr == s.end());
+		citr--;
 		assert("cSet::Iterator--", citr != s.end());
 		assert("cSet::Iterator", citr->size() == 3);
 
@@ -215,7 +227,7 @@ public:
 		itr = m.begin();
 		assert("HashMap::begin()", itr != m.end());
 		++itr;
-		++itr;
+		itr++;
 		++itr;
 		assert("HashMap::Iterator", itr == m.end());
 
@@ -228,7 +240,7 @@ public:
 		citr = m.begin();
 		assert("cHashMap::begin()", citr != m.end());
 		++citr;
-		++citr;
+		citr++;
 		++citr;
 		assert("cHashMap::Iterator", citr == m.end());
 

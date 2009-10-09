@@ -68,6 +68,7 @@ public:
 		* If the Iterator points to Set::end(), this operation will cause a crash.
 		*/
 		Iterator& operator++();
+		Iterator operator++(int);
 
 		/**
 		* Causes the Iterator to point to the previous element in the Set to which it is bound.
@@ -75,6 +76,7 @@ public:
 		* this operation will cause it to point to Set::end().
 		*/
 		Iterator& operator--();
+		Iterator operator--(int);
 
 		bool operator==(const Iterator&) const;
 		bool operator!=(const Iterator&) const;
@@ -99,7 +101,9 @@ public:
 		const Key* operator->() const;
 	
 		ConstIterator& operator++();
+		ConstIterator operator++(int);
 		ConstIterator& operator--();
+		ConstIterator operator--(int);
 
 		bool operator==(const ConstIterator&) const;
 		bool operator!=(const ConstIterator&) const;
