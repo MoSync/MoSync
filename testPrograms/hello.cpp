@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <maassert.h>
 
+int array[128];
+
 struct Base {
 	int a;
 	void run() {
@@ -40,7 +42,9 @@ int MAMain() {
 	maUpdateScreen();
 	
 	i.a = 2;
-	
+	i.b[0] = 2.341;
+	i.b[1] = 3.14159;
+
 	i.run();
 	add(1, 2);
 

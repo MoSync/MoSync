@@ -1,7 +1,10 @@
 -target-select sim
--break-insert _Z4postv
+-break-insert _Z3adddi
 -exec-continue
 -test-wait
--var-create - * sinTable
--var-create - * &(sinTable)
+-var-create - * array
+-var-create - * i
 -var-set-format var1 hexadecimal
+-var-list-children var1
+-var-evaluate-expression var1.Base
+-var-list-children var1.Base

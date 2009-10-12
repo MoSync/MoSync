@@ -122,6 +122,7 @@ struct Variable {
 	Expression* exp;
 	vector<Variable> children;
 	TypeBase::PrintFormat printFormat;
+	bool mHasCreatedChildren;
 
 	void addArray(const char* dataAdress, const ArrayType *arrayType);
 	void addStruct(const char* dataAdress, const StructType *arrayType);
@@ -167,8 +168,13 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	std::string value = ""; 
 	this->exp->updateData(value, type, arrayType->isSimpleValue);
 
-	if(!dataAdress) return;
 	children.resize(arrayType->mLength);
+	if(!dataAdress) { 
+		mHasCreatedChildren = false;
+		return; 
+	}
+	mHasCreatedChildren = true;
+
 
 	for(int i = 0; i < arrayType->mLength; i++) {
 		Variable& var = children[i];
@@ -215,11 +221,14 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	this->exp->updateData(value, type, simpleType);
 
-	if(!dataAdress) return;
 	children.resize(1);
+	if(!dataAdress) { 
+		mHasCreatedChildren = false;	
+		return; 
+	}
+	mHasCreatedChildren = true;
 
 	Variable& var = children[0];
-
 	{
 		StringPrintFunctor spf;
 		spf("%s.%d", name.c_str(), 0);
@@ -232,7 +241,6 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	}
 
 	sVariableMap[var.name] = &var;
-
 	if(deref->type == TypeBase::eArray) {
 		var.addArray(NULL, (ArrayType*)deref);
 	} else if(deref->type == TypeBase::eStruct) {
@@ -270,9 +278,14 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	std::string type = getType(structType, false);
 	std::string value = ""; 
 	this->exp->updateData(value, type, structType->isSimpleValue);
-	if(!dataAdress) return;
 
 	children.resize(bases.size()+dataMembers.size());
+	if(!dataAdress) { 
+		mHasCreatedChildren = false;
+		return; 
+	}
+	mHasCreatedChildren = true;
+
 
 	for(size_t i = 0; i < bases.size(); i++) {
 		const TypeBase* deref = bases[i].type;
@@ -282,7 +295,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			string type = getType(deref, false);
 
 			StringPrintFunctor spf;
-			spf("%s.%s", name.c_str(),  type.c_str());
+			spf("%s.%s", name.c_str(),  ((StructType*)deref)->mName.c_str());
 			var.name = spf.getString();
 			spf.reset();
 
@@ -291,6 +304,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			spf.reset();
 		}
 
+		sVariableMap[var.name] = &var;
+
 		var.addStruct(NULL, (StructType*)deref);
 	}
 
@@ -298,7 +313,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type;
 
-		Variable& var = children[i];
+		Variable& var = children[bases.size()+i];
 		{
 			string type = getType(deref, false);
 
@@ -311,6 +326,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
 		}
+		sVariableMap[var.name] = &var;
 
 		if(deref->type == TypeBase::eArray) {
 			var.addArray(NULL, (ArrayType*)deref);
@@ -599,9 +615,10 @@ static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
 		Variable *v = sUpdateQueue.back();
 		sUpdateQueue.pop();
-		for(size_t i = 0; i < v->children.size(); i++) {
-			sUpdateQueue.push(&v->children[i]);
-		}
+		if(v->mHasCreatedChildren)
+			for(size_t i = 0; i < v->children.size(); i++) {
+				sUpdateQueue.push(&v->children[i]);
+			}
 		sVar = v;
 		v->exp->update(Callback::varEEUpdate);
 		return;

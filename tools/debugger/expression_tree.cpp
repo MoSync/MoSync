@@ -42,6 +42,17 @@ CastNode::~CastNode() {
 	mChild->deleteRef();
 }
 
+bool isBase(const TypeBase* base, const TypeBase* what) {
+	if(base == what) return true;
+	const StructType* sbase = (const StructType*)base;
+	const std::vector<BaseClass>& bases = sbase->getBases();
+	for(int i = 0; i < bases.size(); i++) {
+		bool ret = isBase(bases[i].type, what);
+		if(ret) return true;
+	}
+	return false;
+}
+
 #define CAST_ELEM(type, id) case Builtin::##e##id: return Value((type)a);
 Value CastNode::evaluate() {
 	Value a = mChild->evaluate();
@@ -59,9 +70,19 @@ Value CastNode::evaluate() {
 		newSym.type = mTypeBase;
 		ret.setSymbol(newSym);
 		return ret;
-	} else {
-		throw ParseException("Unsupported cast.");
-	}
+	} else if(mTypeBase->type == TypeBase::eStruct) {
+		const SYM& cast = a.getSymbol();
+		if(isBase(cast.type, mTypeBase)) {
+			SYM newSym;
+			newSym.address = cast.address;
+			newSym.symType = eVariable;
+			newSym.type = mTypeBase;
+			a.setSymbol(newSym);
+			return a;
+		} 
+	} 
+	
+	throw ParseException("Unsupported cast.");
 }
 
 TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mToken(t) {
