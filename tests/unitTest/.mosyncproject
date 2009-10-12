@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-<target-profile device="XDAII" vendor="Qtek"/>
+<target-profile device="Emulator" vendor="MobileSorcery"/>
 <criteria/>
 <properties>
-<property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:extra.link.sw" value="-datasize=1024000 -stacksize=128000 -heapsize=512000"/>
+<property key="build.prefs:extra.res.sw" value=""/>
 <property key="template.id" value="Moblet"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib,MATest.lib, MAFS.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
-<property key="build.prefs:additional.include.paths" value="."/>
 <property key="build.prefs:project.type" value=""/>
+<property key="build.prefs:additional.include.paths" value="."/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 </properties>
 </project>

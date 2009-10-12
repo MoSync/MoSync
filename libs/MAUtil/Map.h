@@ -16,219 +16,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Map.h
-* \brief A generic map/dictionary class.
+* \brief Thin template sorted Map.
 */
 
 #ifndef _SE_MSAB_MAUTIL_MAP_H_
 #define _SE_MSAB_MAUTIL_MAP_H_
 
-#include "Vector.h"
-
-#ifndef NULL
-#define NULL 0
-#endif
+#include <maassert.h>
+#include <kazlib/dict.h>
+#include "collection_common.h"
 
 namespace MAUtil {
-	/** \brief A generic map/dictionary class.
-	*
-	* The cost for looking up a value is O(n) comparisons, where
-	* n is the number of entries in the map. As such, it is best suited for use with a small numbers of
-	* keys/values. Larger dictionaries should be implemented using a proper hash-based implementation.
-	*/
-	template<typename KeyType, typename ValueType> class Map {
-	public:
-		/**
-		* A structure to hold the entries of the Map class.
-		*/
-		struct MapNode {
-			MapNode(const KeyType &key, const ValueType &value)
-				: key(key), value(value), next(0), prev(0)
-			{
-			}
 
-			KeyType key;
-			ValueType value;
-			MapNode *next;
-			MapNode *prev;
-		};
+template<class Key, class Value>
+class Map : public Dictionary<Key, Pair<Key, Value> > {
+public:
+	typedef Pair<Key, Value> PairKV;
+	typedef Dictionary<Key, PairKV> D;
+	typedef typename D::DictNode DN;
 
-		/**
-		* Creates an empty Map.
-		*/
-		Map() : head(0), tail(0) {
+	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, &PairKV::first) {}
+	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {
+		PairKV pkv = { key, value };
+		return D::insert(pkv);
+	}
+	Value& operator[](const Key& key) {
+		DN* node = (DN*)dict_lookup(&this->mDict, &key);
+		if(node == NULL) {
+			node = new DN();
+			node->data.first = key;
+			dict_insert(&this->mDict, node, &(node->data.*(this->mKeyPtr)));
 		}
+		return node->data.second;
+	}
+};
 
-		/**
-		* Removes all entries from the Map.
-		*/
-		void clear() {
-			keys.clear();
-			if(head) {
-				MapNode *it = head;
-				MapNode *temp;
-				do {
-					temp = it->next;
-					delete it;
-					it = temp;
-				} while(it);
-			}
-			head = 0;
-		}
-
-		virtual ~Map() {
-			clear();
-		}
-
-		Map& operator =(const Map& m) {
-			clear();
-			for(int i = 0; i < m.keys.size(); i++) {
-				const ValueType* v = m.get(m.keys[i]);
-				(*this)[m.keys[i]] = *v;
-			}
-			return *this;
-		}
-
-		Map(const Map& m) : head(0), tail(0) {
-			(*this)=m;
-		}
-
-		/** Returns the value of the entry with the given key. If the key doesn't exist
-		an entry will be created with the given key. If the value type is a primitive
-		type the value will be uninitialzed. If the value type is a class the default
-		constructor will be used.
-		**/
-		ValueType& operator[](const KeyType& key) {
-			{
-/*
-				MapNode* node = getNode(key);
-				if(node)
-					return node->value;
-*/
-				ValueType *value = get(key);
-				if(value) return *value;
-			}
-			ValueType val;
-			MapNode* oldTail = tail;
-			tail = new MapNode(key, val);
-			keys.add(key);
-			if(!head)
-			{
-				head = tail;
-			} else {
-				oldTail->next = tail;
-				tail->prev = oldTail;
-			}
-
-			return tail->value;
-		}
-
-		/**
-		* Returns a pointer to the value associated with the specified \a key,
-		* or NULL if the key is not in the Map.
-		*/
-		ValueType* get(const KeyType& key) {
-			templateVector_each(KeyType, i, keys) {
-				if(*i == key) {
-					MapNode* node = getNode(key);
-					if(node)
-						return &node->value;
-				}
-			}
-			return NULL;
-		}
-
-		/**
-		* Returns a pointer to the value associated with the specified \a key,
-		* or NULL if the key is not in the Map.
-		*/
-		const ValueType* get(const KeyType& key) const {
-			templateVector_each_const(KeyType, i, keys) {
-				if(*i == key) {
-					const MapNode* node = getNode(key);
-					if(node)
-						return &node->value;
-				}
-			}
-			return NULL;
-		}
-
-
-		/**
-		* Returns a const reference to the Vector containing all the keys in the
-		* Map.
-		*/
-		const Vector<KeyType>& getKeySet() const {
-			return keys;
-		}
-
-		/**
-		* Removes the entry specified by \a key, if it exists.
-		*/
-		void remove(const KeyType& key) {
-			MapNode *it = head;
-
-			templateVector_each(KeyType, i, keys) {
-				if(*i == key) {
-					keys.remove(i);
-
-					//find node
-					MapNode* node = it;//getNode(key);
-					if(node) {
-						//unlink
-						//if node == head, head = next.
-						if(node == head)
-							head = node->next;
-						//if node == tail, tail = prev.
-						if(node == tail)
-							tail = node->prev;
-						//if next, next->prev = prev.
-						if(node->next)
-							node->next->prev = node->prev;
-						//if prev, prev->next = next.
-						if(node->prev)
-							node->prev->next = node->next;
-
-						//delete
-						delete node;
-					}
-
-					return;
-				}
-				it = it->next;
-			}
-		}
-
-	protected:
-		MapNode *head;
-		MapNode *tail;
-		Vector<KeyType> keys;
-
-		MapNode* getNode(const KeyType& key) {
-			if(head) {
-				MapNode *it = head;
-				while(it) {
-					if(it->key == key) {
-						return it;
-					}
-					it = it->next;
-				}
-			}
-			return NULL;
-		}
-
-		const MapNode* getNode(const KeyType& key) const {
-			if(head) {
-				const MapNode *it = head;
-				while(it) {
-					if(it->key == key) {
-						return it;
-					}
-					it = it->next;
-				}
-			}
-			return NULL;
-		}
-	};
 }
 
 #endif

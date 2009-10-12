@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file HashMap.h
+* \brief Thin template HashMap.
+*/
+
 #ifndef _SE_MSAB_MAUTIL_HASHMAP_H_
 #define _SE_MSAB_MAUTIL_HASHMAP_H_
 
@@ -73,7 +77,6 @@ public:
 	* will cause a crash.
 	* This Iterator is unidirectional; it can only move forwards through the HashMap.
 	*/
-	//TODO: postfix operator
 	class Iterator {
 	public:
 		PairKV& operator*();
@@ -146,7 +149,7 @@ public:
 	~HashMap();
 
 	/**
-	* Inserts a new value into the HashMap.
+	* Inserts a new key into the HashMap.
 	*
 	* Returns a Pair. The Pair's second element is true if the value was indeed inserted.
 	* The Pair's first element is an Iterator that points to the element in the HashMap.

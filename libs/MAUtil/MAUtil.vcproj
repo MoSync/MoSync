@@ -311,6 +311,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Dictionary.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Dictionary_impl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Geometry.cpp"
 				>
 			</File>
@@ -344,10 +352,6 @@
 			</File>
 			<File
 				RelativePath=".\Set.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Set_impl.h"
 				>
 			</File>
 			<File

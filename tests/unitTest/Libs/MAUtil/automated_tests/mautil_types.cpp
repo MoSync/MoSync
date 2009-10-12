@@ -274,29 +274,40 @@ public:
 
 	void map() {
 		Map<String, String> m;
+
+		//operator[] and insert
 		m["Abraham"] = "Lincoln";
 		m["Benjamin"] = "Franklin";
-		m["George"] = "Washington";
-		const Vector<String>& keys = m.getKeySet();
-		assert("Map::getKeySet().size()", keys.size()==3);
-		assert("Map::getKeySet()",
-				keys[0] == "Abraham" &&
-				keys[1] == "Benjamin" &&
-				keys[2] == "George"
-		);
+		m.insert("George", "Washington");
+		assert("Map::size()", m.size() == 3);
 
-		String* s = m.get("Benjamin");
-		assert("Map::get()!=NULL", s!=NULL && *s=="Franklin");
-		s = m.get("Edgar");
-		assert("Map::get()==NULL", s==NULL);
+		//iterate
+		{
+			Map<String, String>::ConstIterator itr = m.begin();
+			assert("Map::begin()", itr->first == "Abraham" && itr->second == "Lincoln");
+			++itr;
+			assert("Map::ConstIterator()", itr->first == "Benjamin" && itr->second == "Franklin");
+			itr++;
+			assert("Map::ConstIterator()", itr->first == "George" && itr->second == "Washington");
+			itr++;
+			assert("Map::end()", itr == m.end());
+		}
 
-		m.remove("Benjamin");
-		s = m.get("Benjamin");
-		assert("Map::remove()", s==NULL);
+		//find
+		Map<String, String>::Iterator itr = m.find("Benjamin");
+		assert("Map::find()", itr != m.end() && itr->second == "Franklin");
+		itr = m.find("Edgar");
+		assert("Map::find()", itr == m.end());
 
+		//erase
+		m.erase("Benjamin");
+		itr = m.find("Benjamin");
+		assert("Map::erase()", itr == m.end());
+
+		//clear
 		m.clear();
-		s = m.get("Abraham");
-		assert("Map::clear()", keys.size()==0 && s==NULL);
+		itr = m.find("Abraham");
+		assert("Map::clear()", m.size()==0 && itr == m.end());
 	}
 };
 
