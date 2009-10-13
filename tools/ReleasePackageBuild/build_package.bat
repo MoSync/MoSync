@@ -64,9 +64,8 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @SET MOSYNC_PROFILES_PATH=%MOSYNC_PATH%\profiles
 @SET MOSYNC_TRUNK=%MOSYNC_RELEASE_BUILD_PATH%\mosync-trunk
 
-@REM We fix this path since one of the tools needs the C:\ in the path
 cd %MOSYNC_PATH%
-@SET MOSYNCDIR=%CD%
+@SET FULLPATH_MOSYNCDIR=%CD%
 cd %ORIGINAL_PATH%
 
 @IF "%2" == "/SKIP" goto MKDIRS
