@@ -224,6 +224,7 @@ void exec_step(const string& args) {
 	//source line, any line.
 	sStepRunning = false;
 	sStepSourceRegisterCallback = Callback::stepGetRegisters;
+	sTempBreakpointCallback = Callback::stepSourceDone;
 	StubConnection::getRegisters(Callback::stepSourceGetRegisters);
 }
 

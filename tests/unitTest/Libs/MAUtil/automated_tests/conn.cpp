@@ -145,11 +145,13 @@ static const int snHeaders = sizeof(sHeaders) / sizeof(PAIR);
 class SingleHttpPostCase : public TestCase, public HttpConnectionListener {
 private:
 	HttpConnection mHttp;
-	char mReadBuffer[DATA_SIZE];
-	char mClientData[DATA_SIZE];
+	char* mReadBuffer;
+	char* mClientData;
+	const int mMultiple;
 public:
-	SingleHttpPostCase() : TestCase("singlePost"), mHttp(this) {
-		maReadData(CLIENT_DATA, mClientData, 0, DATA_SIZE);
+	SingleHttpPostCase(int multiple) : TestCase("singlePost"), mReadBuffer(NULL),
+		mClientData(NULL), mHttp(this), mMultiple(multiple)
+	{
 	}
 
 	void fail() {
@@ -165,18 +167,28 @@ public:
 			fail();
 			return;
 		}
+		//allocate source data
+		mClientData = new char[mMultiple * DATA_SIZE];
+		for(int i=0; i<mMultiple; i++) {
+			maReadData(CLIENT_DATA, mClientData + (i * DATA_SIZE), 0, DATA_SIZE);
+		}
+
 		//set a bunch of headers
 		for(int i=0; i<snHeaders; i++) {
 			mHttp.setRequestHeader(sHeaders[i].key, sHeaders[i].value);
 		}
 		char buffer[64];
-		sprintf(buffer, "%i", DATA_SIZE);
+		sprintf(buffer, "%i", DATA_SIZE * mMultiple);
 		mHttp.setRequestHeader("Content-Length", buffer);
 		//write some data
-		mHttp.write(mClientData, DATA_SIZE);
+		mHttp.write(mClientData, DATA_SIZE * mMultiple);
 	}
 	void close() {
 		mHttp.close();
+		delete mClientData;
+		mClientData = NULL;
+		delete mReadBuffer;
+		mReadBuffer = NULL;
 	}
 
 	//HttpConnectionListener
@@ -209,8 +221,10 @@ public:
 			}
 		}
 
+		mReadBuffer = new char[DATA_SIZE * mMultiple];
+
 		//read the response body
-		mHttp.read(mReadBuffer, DATA_SIZE);
+		mHttp.read(mReadBuffer, DATA_SIZE * mMultiple);
 	}
 	virtual void connReadFinished(Connection*, int result) {
 		printf("Read %i\n", result);
@@ -218,7 +232,7 @@ public:
 			fail();
 			return;
 		}
-		assert(name, memcmp(mReadBuffer, mClientData, DATA_SIZE) == 0);
+		assert(name, memcmp(mReadBuffer, mClientData, DATA_SIZE * mMultiple) == 0);
 		suite->runNextCase();
 	}
 };
@@ -350,6 +364,7 @@ void addConnTests(TestSuite* suite);
 void addConnTests(TestSuite* suite) {
 	//suite->addTestCase(new SingleSocketCase);
 	//suite->addTestCase(new SingleHttpGetCase);
-	suite->addTestCase(new SingleHttpPostCase);
-	suite->addTestCase(new HttpPostSizeCase);
+	for(int i=0; i<5; i++) {
+		suite->addTestCase(new SingleHttpPostCase(1 << i));
+	}
 }

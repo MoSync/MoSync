@@ -1769,7 +1769,6 @@ interface MAAPI {
 		int maWlanGetNewAp(out MAWlanAp dst);
 #endif	//IX_WLAN
 
-//#if IX_LOCATION
 		/**
 		* Only if \a state equals #MA_LOC_QUALIFIED do the other members contain valid data.
 		*
@@ -1873,14 +1872,6 @@ interface MAAPI {
 		* may remain in the event queue afterwards.
 		*/
 		int maLocationStop();
-
-		/*
-		/**
-		* Stores a new location in the specified struct.
-		* \returns 1 on success, 0 if there is no new location, \<0 on failure.
-		*/
-		//int maGetLocation(out MALocation loc);
-//#endif	//IX_LOCATION
 
 		/**
 		* Requests that the operating system handle (for example, display or install) the indicated URL.

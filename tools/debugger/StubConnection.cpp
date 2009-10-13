@@ -299,6 +299,7 @@ static bool readMemoryPacket(const char* data, int len) {
 //******************************************************************************
 
 void StubConnection::writeMemory(int dst, const void* src, int len, AckCallback cb) {
+	_ASSERT(cb != NULL);
 	sWriteMemoryCallback = cb;
 	Smartie<char> buffer(new char[32 + len * 2]);
 	char* ptr = buffer();
