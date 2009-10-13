@@ -639,7 +639,7 @@ interface MAAPI {
 	* while \a \<port\> is a decimal number from 1 to 65535.
 	*
 	* In the <tt>socket</tt> protocol, certain ports are protected on certain platforms and
-	* cannot be used, most notably port 80 on J2ME. In this case, use http instead.
+	* cannot be used, most notably port 80 on Java ME. In this case, use http instead.
 	*
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
@@ -1282,7 +1282,7 @@ interface MAAPI {
 	constset int RUNTIME_ {
 		/// The MoSync Reference Environment, also known as the Emulator.
 		MORE = 1;
-		/// J2ME
+		/// Java ME
 		JAVA = 2;
 		/// Symbian
 		SYMBIAN = 3;
@@ -1311,7 +1311,7 @@ interface MAAPI {
 	*
 	* The length of that instance may be greater than sizeof(MAPanicReport),
 	* because of the variable-length string that may appear at its end.
-	* The member \a string can, then, be longer that the one byte that is declared.
+	* The member \a string can, then, be longer than the one byte that is declared.
 	*
 	* To properly read an instance of this struct from a store, you should allocate a
 	* chunk of memory whose size is equal to the size of the store, then read the entire store

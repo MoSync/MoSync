@@ -32,8 +32,10 @@ template<class Key, class Value>
 class Map : public Dictionary<Key, Pair<Key, Value> > {
 public:
 	typedef Pair<Key, Value> PairKV;
+protected:
 	typedef Dictionary<Key, PairKV> D;
 	typedef typename D::DictNode DN;
+public:
 
 	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, &PairKV::first) {}
 	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {

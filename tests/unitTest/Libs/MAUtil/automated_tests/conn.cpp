@@ -40,11 +40,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //try to write/read from all of them at once.
 
 #define BT_HOST "0080984474c8"	//TDK @ MS-FREDRIK
-#define IP_HOST "msdev.mine.nu"	//"localhost" //
+#define IP_HOST "192.168.0.173"	//"localhost"	//
 
 #define SOCKET_URL(port) ("socket://" IP_HOST ":" + integerToString(port)).c_str()
 #define HTTP_GET_URL(port) ("http://" IP_HOST ":" +integerToString(port)+ "/server_data.bin").c_str()
-#define HTTP_POST_URL(port) ("http://" IP_HOST ":" +integerToString(port)+ "/postTest").c_str()
+#define HTTP_POST_URL ("http://" IP_HOST ":5004/post")
 #define BT_URL(port) ("btspp://" BT_HOST ":" +integerToString(port)).c_str()
 
 #ifdef _MSC_VER
@@ -132,21 +132,96 @@ public:
 	}
 };
 
-#if 0
-class HttpPostCase : public TestCase, public ConnectionListener {
+struct PAIR {
+	const char* key, *value;
+};
+static const PAIR sHeaders[] = {	//I suppose we should test all known header keys here
+	{"foo", "bar"},
+	{"w00t", "b4k4"},
+	{"Cookie", "WAAAGH!"}
+};
+static const int snHeaders = sizeof(sHeaders) / sizeof(PAIR);
+
+class SingleHttpPostCase : public TestCase, public HttpConnectionListener {
 private:
 	HttpConnection mHttp;
 	char mReadBuffer[DATA_SIZE];
 	char mClientData[DATA_SIZE];
 public:
+	SingleHttpPostCase() : TestCase("singlePost"), mHttp(this) {
+		maReadData(CLIENT_DATA, mClientData, 0, DATA_SIZE);
+	}
 
+	void fail() {
+		assert(name, false);
+		suite->runNextCase();
+	}
+
+	//TestCase
 	void start() {
-		mHttp.create(HTTP_POST_URL(HTTP_PORT), HTTP_POST);
-		//set up a bunch of headers
-		//expect another bunch of headers from the server
+		int res = mHttp.create(HTTP_POST_URL, HTTP_POST);
+		if(res <= 0) {
+			printf("create %i\n", res);
+			fail();
+			return;
+		}
+		//set a bunch of headers
+		for(int i=0; i<snHeaders; i++) {
+			mHttp.setRequestHeader(sHeaders[i].key, sHeaders[i].value);
+		}
+		char buffer[64];
+		sprintf(buffer, "%i", DATA_SIZE);
+		mHttp.setRequestHeader("Content-Length", buffer);
+		//write some data
+		mHttp.write(mClientData, DATA_SIZE);
+	}
+	void close() {
+		mHttp.close();
+	}
+
+	//HttpConnectionListener
+	virtual void connWriteFinished(Connection*, int result) {
+		printf("Write %i\n", result);
+		if(result <= 0) {
+			fail();
+			return;
+		}
+		//our POST is complete. ask for the response.
+		mHttp.finish();
+	}
+	virtual void httpFinished(HttpConnection*, int result) {
+		printf("Finish %i\n", result);
+		if(result < 200 || result >= 300) {
+			fail();
+			return;
+		}
+		//check the response headers
+		for(int i=0; i<snHeaders; i++) {
+			String str;
+			result = mHttp.getResponseHeader(sHeaders[i].key, &str);
+			if(result < 0) {
+				fail();
+				return;
+			}
+			if(strcmp(str.c_str(), sHeaders[i].value) != 0) {
+				fail();
+				return;
+			}
+		}
+
+		//read the response body
+		mHttp.read(mReadBuffer, DATA_SIZE);
+	}
+	virtual void connReadFinished(Connection*, int result) {
+		printf("Read %i\n", result);
+		if(result <= 0) {
+			fail();
+			return;
+		}
+		assert(name, memcmp(mReadBuffer, mClientData, DATA_SIZE) == 0);
+		suite->runNextCase();
 	}
 };
-#endif
 
 class SingleSocketCase : public TestCase, public ConnectionListener {
 private:
@@ -273,6 +348,8 @@ public:
 
 void addConnTests(TestSuite* suite);
 void addConnTests(TestSuite* suite) {
-	suite->addTestCase(new SingleSocketCase);
-	suite->addTestCase(new SingleHttpGetCase);
+	//suite->addTestCase(new SingleSocketCase);
+	//suite->addTestCase(new SingleHttpGetCase);
+	suite->addTestCase(new SingleHttpPostCase);
+	suite->addTestCase(new HttpPostSizeCase);
 }

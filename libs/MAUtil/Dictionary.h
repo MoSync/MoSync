@@ -41,6 +41,9 @@ namespace MAUtil {
 *
 * This particular implementation is built on top of kazlib's dictionary system,
 * which makes it quite small, even when used with multiple data types.
+*
+* This class is not meant to be instantiated directly.
+* It is the base class for Set and Map.
 */
 template<class Key, class Storage>
 class Dictionary {

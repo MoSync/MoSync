@@ -63,7 +63,7 @@ public:
 		// automated tests
 #ifdef USE_AUTOMATED_TESTS
 		addMAUtilTypeTests(&mSuite);
-		//addConnTests(&mSuite);
+		addConnTests(&mSuite);
 		addDownloaderTests(&mSuite);	//right softkey press may be used during test; release is then passed to next test, failing it.
 #endif
 #ifdef USE_INTERACTIVE_TESTS
