@@ -288,28 +288,6 @@ Release\idl2.exe
 
 
 @echo ------------------------------------------------
-@echo Building docs.
-@echo ------------------------------------------------
-:DOCS
-
-cd %ORIGINAL_PATH%
-call build_docs.bat
-
-@xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
-
-@cd %MOSYNC_TRUNK%\docs\
-@echo on
-
-call gendox.bat
-
-@cd %ORIGINAL_PATH%
-@echo.
-
-@cd %MOSYNC_RELEASE_BUILD_PATH%
-
-
-@echo ------------------------------------------------
 @echo Building internal libraries:
 @echo ------------------------------------------------
 
@@ -476,6 +454,27 @@ call gendox.bat
 
 @REM Remove files that shouldn't be in the release
 @del /s /q %MOSYNC_EXAMPLES_PATH%\Makefile* %MOSYNC_EXAMPLES_PATH%\*.bat %MOSYNC_EXAMPLES_PATH%\*.2008.vcproj
+
+@echo ------------------------------------------------
+@echo Building docs.
+@echo ------------------------------------------------
+:DOCS
+
+cd %ORIGINAL_PATH%
+call build_docs.bat
+
+@xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
+@cd %MOSYNC_TRUNK%\docs\
+@echo on
+
+call gendox.bat
+
+@cd %ORIGINAL_PATH%
+@echo.
+
+@cd %MOSYNC_RELEASE_BUILD_PATH%
 
 @echo ------------------------------------------------
 @echo Building runtimes.
