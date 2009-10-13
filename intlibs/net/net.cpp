@@ -400,6 +400,7 @@ int ProtocolConnection::readLine(const char*& lineP) {
 			int size = mPos - startPos;
 			memcpy(mBuffer, mBuffer + startPos, size);
 			mPos = size;
+			startPos = 0;
 		}
 
 		int res;
