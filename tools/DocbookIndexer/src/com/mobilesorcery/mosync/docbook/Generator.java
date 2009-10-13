@@ -172,7 +172,11 @@ abstract class Generator {
 			File file = new File(entry.getKey());
 			if(!file.getName().endsWith(".h")) {
 				//compile file, standard MoSync settings
-				String mosyncdir = System.getenv("MOSYNCDIR");
+				String mosyncdir = System.getenv("FULLPATH_MOSYNCDIR");
+				
+				if(mosyncdir == null)
+					mosyncdir = System.getenv("MOSYNCDIR");
+				
 				String cmd = mosyncdir + "/bin/xgcc -g -S \"" +
 					file.getAbsolutePath() + "\" -I" + mosyncdir + "/include";
 				if (exec(cmd, true, null) != 0)
