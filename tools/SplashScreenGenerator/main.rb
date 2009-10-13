@@ -93,6 +93,6 @@ end
 img = img.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
 img = img.composite(copyright.first, 134, 350, Magick::ScreenCompositeOp)
 
-img.write('splash.bmp')
-img2.write('installer_splash.bmp')
+img.write('bmp3:splash.bmp')
+img2.write('bmp3:installer_splash.bmp')
 
