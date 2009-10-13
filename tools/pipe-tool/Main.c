@@ -653,7 +653,7 @@ int main(int argc,char *argv[])
 
 static void usage ()
 {
-	printf ("PIPE-TOOL Copyright 2007-2008 Mobile Sorcery AB\n");
+	printf ("pipe-tool Copyright 2007-2009 Mobile Sorcery AB\n");
 	printf("Version 1.5 " __DATE__ " " __TIME__ "\n\n");
 	printf("\n\
 Usage: pipe-tool <mode> [options] outfile infile1 [infile2 ...]\n\
@@ -924,7 +924,7 @@ extern char * FilePtr;
 
 void MainAsm(char *input, char *output)
 { 
-	printf("pipe-tool Copyright 2007-2008 Mobile Sorcery AB\n");
+	printf("pipe-tool Copyright 2007-2009 Mobile Sorcery AB\n");
 
 	Stabs_Init();
 
@@ -997,7 +997,7 @@ void MainAsm(char *input, char *output)
 
 void MainRes(char *input, char *output)
 {		
-  	if (AsmMsg) printf("Resource Compiler Copyright 2007 Mobile Sorcery AB\n\n");
+  	if (AsmMsg) printf("Resource Compiler Copyright 2007-2009 Mobile Sorcery AB\n\n");
 
 	FileTop = FilePtr = input;
 
