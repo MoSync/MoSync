@@ -305,8 +305,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 		}
 
 		sVariableMap[var.name] = &var;
-
-		var.addStruct(NULL, (StructType*)deref);
+		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref);
 	}
 
 	
@@ -336,7 +335,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			var.addPointer(NULL, (PointerType*)deref);
 		} else {
 			value = "";
-			if(dataAdress) value = getValue(deref, dataAdress+(i*dataMembers[i].offsetBits>>3), var.printFormat);
+			if(dataAdress) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 

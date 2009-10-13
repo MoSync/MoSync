@@ -29,6 +29,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
+const char* getVisibilityString(Visibility vis) {
+	switch(vis) {
+		case ePrivate: return "private";
+		case eProtected: return "protected";
+		case ePublic: return "public";
+		default: return "";
+	}
+}
+
 StringPrintFunctor::StringPrintFunctor() : mPos(0), mString(NULL), mStringSize(0) {
 	resizeString(16);
 }
@@ -156,14 +165,20 @@ StructType::StructType(int s, const std::string& name)
 void StructType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
 	pf("{");
 	const byte* bp = (byte*)data;
-	//TODO: add base classes
+
+	for(size_t i=0; i<mBases.size(); i++) {
+		pf("<%s> = ", ((StructType*)mBases[i].type)->mName.c_str());
+		((StructType*)mBases[i].type)->printMI(pf, ((char*)data)+mBases[i].offset, fmt);
+		pf(", ");
+	}
+
 	//TODO: add static data members
 	for(size_t i=0; i<mDataMembers.size(); i++) {
 		if(i != 0)
-			pf(",");
+			pf(", ");
 		const DataMember& m(mDataMembers[i]);
 		if(m.name.size() > 0)
-			pf("%s=", m.name.c_str());
+			pf("%s = ", m.name.c_str());
 		DEBUG_ASSERT(m.offsetBits % 8 == 0);
 		m.type->printMI(pf, bp + m.offsetBits / 8, fmt);
 	}
@@ -180,8 +195,16 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 	}
 	pf("}");
 #endif
-	pf("struct %s", mName.c_str());
 	if(complex) {
+		pf("struct %s", mName.c_str());
+		
+		if(mBases.size()) pf(" : ");
+
+		for(size_t i=0; i<mBases.size(); i++) {
+			pf("public %s", ((StructType*)mBases[i].type)->mName.c_str());
+			if(i!=mBases.size()-1) pf(", ");
+		}
+
 		pf(" {\n");
 		for(size_t i=0; i<mDataMembers.size(); i++) {
 			//original GDB ptype uses "    ".
@@ -194,7 +217,12 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 			}
 			pf(";\n");
 		}
+
+		//TODO: add static data members
+
 		pf("}");
+	} else {
+		pf("%s", mName.c_str());
 	}
 }
 
