@@ -4,7 +4,7 @@
 -test-wait
 -var-create - * array
 -var-create - * i
--var-set-format var1 hexadecimal
--var-list-children var1
--var-evaluate-expression var1.Base
--var-list-children var1.Base
+-var-create - * ii
+-var-list-children var2
+-var-list-children var2.0
+-var-list-children var2.0.Base

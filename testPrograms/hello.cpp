@@ -22,15 +22,19 @@ int array[128];
 
 struct Base {
 	int a;
-	void run() {
+	virtual void run() {
 	}
 };
 
 struct Inherited : public Base {
 	float b[2];
+
+	void run() {
+	}
 };
 
 Inherited i;
+Inherited *ii = &i;
 
 double add(double a, int b) {
 	return a + b;

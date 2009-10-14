@@ -47,7 +47,7 @@ bool isBase(const TypeBase* base, const TypeBase* what) {
 	const StructType* sbase = (const StructType*)base;
 	const std::vector<BaseClass>& bases = sbase->getBases();
 	for(int i = 0; i < bases.size(); i++) {
-		bool ret = isBase(bases[i].type, what);
+		bool ret = isBase(bases[i].type->resolve(), what);
 		if(ret) return true;
 	}
 	return false;
@@ -72,7 +72,7 @@ Value CastNode::evaluate() {
 		return ret;
 	} else if(mTypeBase->type == TypeBase::eStruct) {
 		const SYM& cast = a.getSymbol();
-		if(isBase(cast.type, mTypeBase)) {
+		if(isBase(cast.type->resolve(), mTypeBase)) {
 			SYM newSym;
 			newSym.address = cast.address;
 			newSym.symType = eVariable;
@@ -395,10 +395,8 @@ void DotNode::recursiveSearch(const std::string& ident, StructType *s, SearchRes
 	*/
 
 	for(size_t i = 0; i < bases.size(); i++) {
-		//if(bases[i].visibility != ePrivate) {
 		recursiveSearch(ident, (StructType*)bases[i].type, res, bases[i].offset);
 		if(res->found == true) return;
-		//}
 	}
 }
 

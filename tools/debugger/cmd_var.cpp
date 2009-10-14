@@ -288,7 +288,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 
 	for(size_t i = 0; i < bases.size(); i++) {
-		const TypeBase* deref = bases[i].type;
+		const TypeBase* deref = bases[i].type->resolve();
 
 		Variable& var = children[i];
 		{
@@ -310,7 +310,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
-		const TypeBase* deref = dataMembers[i].type;
+		const TypeBase* deref = dataMembers[i].type->resolve();
 
 		Variable& var = children[bases.size()+i];
 		{
@@ -404,7 +404,8 @@ void Expression::update(ExpressionCallback ecb) {
 
 	sExp = this;
 
-	if(mIsValid) { sUpdateCallback(); return; }
+	// TODO: urgah, this optimization doesn't work just yet?
+	//if(mIsValid) { sUpdateCallback(); return; }
 
 	//asynchronous
 	//problematic; either calls the callback or error().
