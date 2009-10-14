@@ -14,4 +14,4 @@ del output\*.html
 del output\*.xml
 copy maheaders.txt maheaders.h
 java com.mobilesorcery.mosync.docbook.DocParser %2
-cd ..
+@REM cd ..

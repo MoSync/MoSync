@@ -18,7 +18,7 @@ REM sh -c ./gendox.sh 2>&1 | tee log.txt
 
 cd ..\libs
 
-call copyHeaders.bat
+REM call copyHeaders.bat
 
 copy Doxyfile %MOSYNCDIR%\include\
 cd %MOSYNCDIR%\include\

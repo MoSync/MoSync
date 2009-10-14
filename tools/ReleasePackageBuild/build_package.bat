@@ -360,6 +360,12 @@ Release\idl2.exe
 @IF NOT errorlevel 0 goto TOOL_ERROR
 @echo.
 
+@echo ------------------------------------------------
+@echo Copy include files:
+@echo ------------------------------------------------
+
+@cd %MOSYNC_TRUNK%\libs
+@call copyHeaders.bat
 
 @echo ------------------------------------------------
 @echo Building MoSync libraries for Windows:
@@ -460,6 +466,12 @@ Release\idl2.exe
 @echo ------------------------------------------------
 :DOCS
 
+cd %ORIGINAL_PATH%
+call build_docs.bat
+
+@xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
 @cd %MOSYNC_TRUNK%\docs\
 @echo on
 
@@ -467,12 +479,6 @@ call gendox.bat
 
 @cd %ORIGINAL_PATH%
 @echo.
-
-cd %ORIGINAL_PATH%
-call build_docs.bat
-
-@xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
 
 @cd %MOSYNC_RELEASE_BUILD_PATH%
 
