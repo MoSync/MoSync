@@ -1,0 +1,31 @@
+/*Elements Developed by Ben Henschel*/
+/*External Links*/
+
+/*External Link - adds a little external link icon to all of your external links*/
+a[href^="http:"] {background: url(/images/elementsImages/externalLink.gif) no-repeat right top; padding-right:10px;}
+
+/*IMPORTANT: Reset your internal links that use absolute URLS by replacing yoursite.com with your site's URL, below*/
+a[href^="http://www.yoursite.com"], a[href^="http://yoursite.com"] {background-image:none !important; padding-right:0px;}
+
+/*Use on external links that are images or have background colors/borders...when ever you dont want an icon to appear*/
+.exempt {background-image:none !important; padding:0px;}
+
+/*This method does not work for IE6 or IE7 (big surpise) you can add the class .external to a few of your important external links so they work in IE6/7 if you wish. IE will just ignore these rules so there are now worries.*/
+.external {background: url(/images/elementsImages/externalLink.gif) no-repeat right top; padding-right:10px;}
+
+/*Email Links - adds small email icon to all mailto links*/
+a[href^="mailto:"] {background: url(/images/elementsImages/email_link.png) no-repeat right top; padding-right:22px; padding-bottom:5px;}
+
+/*AIM Links - adds small IM icon to all aim:goim?screenname=username links*/
+a[href^="aim:"] {background: url(/images/elementsImages/group.png) no-repeat right top; padding-right:22px; padding-bottom:5px;}
+
+/*PDF Links - adds a small PDF icon to all PDF links*/
+a[href$=".pdf"] {background: url(/images/elementsImages/page_pdf.png) no-repeat right top; padding-right:22px; padding-bottom:5px;}
+
+/*DOC Links - adds a small word doc icon to all word document links*/
+a[href$=".doc"] {background: url(/images/elementsImages/page_word.png) no-repeat right top; padding-right:22px; padding-bottom:5px;}
+
+/*RSS Links - adds a small Feed icon to all RSS feed links*/
+a[href$=".rss"], a[href$=".rdf"] {background: url(/images/elementsImages/feed.png) no-repeat right top; padding-right:22px; padding-bottom:5px;}
+
+

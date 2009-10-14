@@ -1,0 +1,352 @@
+
+/*----------------------------------------
+Name: global.css
+Developed by:
+Date Created:
+Last Updated:
+Copyright:
+----------------------------------------*/
+
+/* Imports
+----------------------------------------*/
+@import url("reset.css");
+@import url("externalLinks.css");
+
+
+/* Elements
+----------------------------------------*/
+body
+{
+	background-color: #929292;
+	//background-image:url('../images/background.png');
+	background-repeat:no-repeat;
+	background-attachment:fixed;
+	background-position:center;
+	margin: 0 auto;
+}
+
+body, p, td, th
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:.775em;
+	line-height:1.5em;
+	color:#000000;
+}
+
+li
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:1em;
+	line-height:1.5em;
+	color:#000000;
+}
+
+
+p
+{
+	margin: 0 0 1em 0;
+}
+
+/*--- Link Styles ---*/
+a:link, a:visited
+{
+	color:#20acc5;
+	text-decoration:none;
+}
+
+a:hover, a:active
+{
+	color:#50ddff;
+}
+
+img
+{
+	border: 0px;
+}
+
+h1
+{
+	color:#000;
+	font-size:1.225em;
+}
+
+
+h2
+{
+	color:#535353;
+	font-size:1.2em;
+}
+
+h3
+{
+	color:#535353;
+	font-size:1em;
+}
+
+h4
+{
+	color:#535353;
+	font-size:1em;
+}
+
+h5
+{
+	color:#535353;
+	font-size:1em;
+}
+
+h6
+{
+	color:#535353;
+	font-size:1em;
+}
+
+ul
+{
+	margin-left:10px;
+	list-style-type:none;
+}
+
+ol
+{
+	margin-left:25px;
+
+}
+
+blockquote	{margin: 0 0 18px 18px; color:#666666; font-style: italic;}
+strong		{font-weight:bold;}
+em		{font-style:italic;}
+
+/* Standard Definitions
+----------------------------------------*/
+.left 		{float:left;}
+.right 		{float:right;}
+.clearThis 	{clear:both;}
+.small		{font-size:.625em;}
+.large		{font-size:1em;}
+.soft		{color:#D3D3D3;}
+.hide		{display:none;}
+p.last		{margin-bottom:0px;}
+
+
+#mainContainer
+{
+	width:100%;
+	height: 100%;
+	margin: 0px auto;
+	background-color: #141414;
+	text-align: left;
+}
+
+/* Header
+----------------------------------------*/
+#header
+{
+	width:100%;
+	height:76px;
+	vertical-align: top;
+	background-image: url(../images/header.png);
+	background-repeat: no-repeat;
+	background-color: #000;
+}
+
+
+#header .top {
+	height:72px;
+}
+
+#header .bottom {
+	height:28px;
+}
+
+
+	/* Nav
+	----------------------------------------*/
+	ul#nav
+	{
+		float: right;
+		margin-right: 10px;
+	}
+
+	ul#nav li {
+		float:left;
+		list-style-type:none;
+		margin-left:10px;
+		display: block;
+		font-size: 12px;
+	}
+
+	ul#nav li a {
+		text-decoration: none;
+		color: #999999;
+	}
+
+	ul#nav li a:hover, a:active {
+		color: #ff7f00;
+	}
+
+
+	/* Image Replacement
+	----------------------------------------*/
+	//ul#nav li a {/*Set to height of image*/ height:20px; display:block; text-indent:-9999px; outline:none;}
+
+	/*Include all of your links with unique IDs. Use the correct path to the image and set the width of each image*/
+/*
+	li#navHome a		{background-image: url(images/nav/home.png); width:75px;}
+	li#navWork a		{background-image: url(images/nav/work.png); width:70px;}
+	li#navServices a	{background-image: url(images/nav/services.png); width:68px;}
+	li#navContact a		{background-image: url(images/nav/contact.png); width:55px;}
+*/
+	/* CSS Rollover (Sprites) - Advanced Users!
+	----------------------------------------*/
+
+	/*Each link must have a unique ID - Include all of your links here - Remove if not using!*/
+	//li#navHome a:hover, li#navWork a:hover, li#navServices a:hover, li#navContact a:hover {background-position:0 -20px; /*Set to height of image !must be negative!*/}
+
+/* Main Content
+----------------------------------------*/
+#mainContent
+{
+	width: 81.9%;
+	height: 100%;
+	background: #eeeeee;
+	float: left;
+	position: relative;
+	left: 18%;
+	/*min-height: 80px; */
+}
+
+/* Sidebar
+----------------------------------------*/
+#sidebar
+{
+	float: left;
+	height: 100%;
+	width: 18%;
+	overflow: auto;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	background-color: #f5f5f5;
+}
+
+#sidebar div
+{
+	width: 92%;
+}
+
+.document-node {
+	color: #00bfff;
+	text-decoration: underline;
+	font-weight:bold;
+	font-size: 12px;
+}
+
+.section-node {
+	color: #00bfff;
+	text-decoration: none;
+	font-weight:normal;
+	font-size: 10px;
+}
+
+
+
+#contents 
+{	
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+}
+
+#navTrail
+{
+	width: 100%;
+	height: 31px;
+	background-image: url(../images/mudtrail_bg.png);
+}
+
+#navTrail p {
+	text-align: left;
+	vertical-align: middle;
+	margin-left: 10px;
+	font-size: 12px;
+}
+
+#innerContent
+{
+	width: 100%;
+	background-color:#ffffff;
+	float: left;
+	border-left: 1px solid #141414;
+	//min-height: 700px;
+}
+
+#mediumcontent {
+}
+
+#content {
+	margin-left: 40px;
+	margin-right: 40px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#content p{
+	font-size: 12px;
+}
+
+
+#content h1 {
+	font-weight: 900;
+}
+
+.author {
+	font-weight: normal;
+	font-size: 10px;
+	color: #777;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	
+}
+
+.maintitle {
+	font-size: 24px;
+	color: #000;
+}
+
+
+.title {
+	font-size: 16px;
+	color: #000;
+}
+
+
+
+
+
+
+/* Footer
+----------------------------------------*/
+#footer
+{
+	width:100%;
+	height:20px;
+	background-color: #000;
+}
+
+#footer p
+{
+	font-size:.825em;
+	color: #fff;
+	text-align: center;
+}
+
+
+/* Clear
+----------------------------------------*/
+.clear
+{
+	clear:both;
+}
+
+

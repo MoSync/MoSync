@@ -1,0 +1,108 @@
+/* $Id: layout.css,v 1.5.2.1 2007/01/17 05:28:41 jjeff Exp $ */
+
+/**
+*  LAYOUT STYLES
+*
+*  Define CSS classes to create a table-free,
+*  3-column, 2-column, or single column layout 
+*  depending on whether blocks are enabled in the 
+*  left or right columns.
+*/
+
+/**
+ * Layout
+ */
+
+#container {
+  margin: 0 auto;
+  /*padding: 0 20px;*/
+  max-width: 1270px;
+}
+
+/* With 3 columns, require a minimum width of 1000px to ensure there is enough horizontal space. */
+body.both-sidebars {
+  /*min-width: 980px;*/
+}
+/* With 2 columsn, require a minimum width of 800px. */
+body.sidebar-left, body.sidebar-right {
+  /*min-width: 780px;*/
+}
+
+/* We must define 100% width to avoid the body being too narrow for near-empty pages */
+#main {
+  float: left;
+  width: 100%;
+}
+
+/* So we move the #main container over the sidebars to compensate */
+body.sidebar-left #main {
+  margin-left: -210px;
+}
+body.sidebar-right #main {
+  margin-right: -210px;
+}
+body.both-sidebars #main {
+  margin: 0 -210px;
+}
+
+#squeeze {
+  position: relative;
+  padding: 0 1em;
+}
+
+/* And add blanks left and right for the sidebars to fill */
+body.sidebar-left #squeeze {
+  margin-left: 210px;
+}
+body.sidebar-right #squeeze {
+  margin-right: 210px;
+}
+body.both-sidebars #squeeze {
+  margin: 0 210px;
+}
+
+/* We ensure the sidebars are still clickable using z-index */
+#container .sidebar {
+  margin: 0 0 5em;
+  width: 210px;
+  float: left;
+  z-index: 2;
+  position: relative;
+}
+
+#container .sidebar .block {
+  margin: 0 0 1.5em 0;
+}
+
+#sidebar-left .block {
+  padding: 0 15px 0 0px;
+}
+
+#sidebar-right .block {
+  padding: 0 0px 0 15px;
+}
+
+.block .content {
+  margin: 0.5em 0;
+}
+
+#footer {
+  float: none;
+  clear: both;
+  margin: 4em 0 -3em;
+}
+
+
+/*
+body.sidebar-left  #footer {
+  margin-left: -210px;
+}
+
+body.sidebar-right #footer {
+  margin-right: -210px;
+}
+
+body.both-sidebars #footer {
+  margin: 0 -210px;
+}
+

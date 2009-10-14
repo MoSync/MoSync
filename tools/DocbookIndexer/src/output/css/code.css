@@ -1,0 +1,34 @@
+.cpp_preproc {
+color: #3f4f5f;
+}
+.cpp_operator {
+color: rgb(0,124,31);
+}
+.cpp_doxygen_comment {
+color: rgb(0,127,0); /*background-color: rgb(247,247,247);*/ font-style: italic;
+}
+.cpp_plain {
+color: rgb(0,0,0);
+}
+.cpp_comment {
+color: rgb(0,127,0); /*background-color: rgb(247,247,247);*/
+}
+.cpp_doxygen_tag {
+color: rgb(0,127,0); /*background-color: rgb(247,247,247);*/ font-style: italic; font-weight: bold;
+}
+.cpp_separator {
+color: rgb(0,100,255);
+}
+.code {
+color: rgb(0,0,0); font-family: monospace; font-size: 12px; white-space: nowrap;
+background-color: rgb(255,255,230);
+}
+.cpp_keyword {
+color: rgb(100,100,100); font-weight: bold;
+}
+.cpp_literal {
+color: rgb(255,80,0);
+}
+.cpp_type {
+color: rgb(0,100,100);
+}
