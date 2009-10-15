@@ -1,0 +1,5 @@
+-target-select sim
+-break-insert c:/mosync-trunk/examples/3dLines/main.cpp:95
+-exec-continue
+-test-wait
+-exec-step

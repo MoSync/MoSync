@@ -1,0 +1,104 @@
+HACKING MOSYNC
+
+This is a developer's guide to the internals of MoSync.
+
+MoSync is a collection of over 30 different programs and libraries. Together they form a cross-platform Software Development Kit that targets cellphones and other handheld computers.
+
+
+Platforms:
+There are three different kinds of platforms that MoSync cares about: Source, Host and Target.
+
+Target platforms are those that can run programs compiled with MoSync. They do so through Runtimes. Currently, these include Java ME, Symbian (2nd and 3rd editions), Windows Mobile (4.0 and newer), Moblin GNU/Linux, Ubuntu and Microsoft Windows (2000 and newer). Possible new target platforms include Android and Apple iPhone.
+
+Source platforms are those which can compile MoSync itself. Currently, these include Microsoft Windows and, partially, GNU/Linux. Compiling all parts of MoSync is difficult, and will become more so as new platforms are added. Already the Symbian and Windows Mobile runtimes can be compiled only on Windows, the Moblin runtime on GNU/Linux, and if the iPhone target platform is added, MacOSX will have to be added into the mix.
+
+Host platforms are those that can run the MoSync SDK and use it to compile programs for the Target platforms. Currently, this mirrors the Source platform situation, but it should be possible to make it run on Windows and GNU/Linux as well as MacOSX.
+
+
+Quick overview of a MoSync programs' build process:
+The main components are GCC (compiler), pipe-tool (linker), Eclipse (IDE).
+
+MoSync programs are written in C/C++, compiled using GCC v3.4.6 with a custom back-end, assembled and linked by our custom program "pipe-tool", and finally packaged with one of our runtimes to produce an installable binary.
+
+When building for testing in the Reference Environment, the packaging step is skipped.
+
+
+Parts:
+MoSync is composed of many parts. This list is sorted by type, then name. It skips some unused parts.
+Copyright Mobile Sorcery AB, except where noted.
+
+* Internal libraries: Code which is used when compiling other parts of MoSync, but is not present on Host systems, except as linked and unavailable object code.
+ * bluetooth: Cross-platform Bluetooth API. Currently supports the following Bluetooth stacks: Microsoft and bluez(Linux).
+ * helpers: Basic type declarations, error handling, logging.
+ * filelist: Simple, cross-platform API for scanning directories. Supports wildcard matching.
+ * gsm_amr: AMR audio codec. Supports both narrowband and wideband formats. Copyright 2008 PacketVideo, Apache License 2.0.
+ * idl-common: Parses the MoSync Interface Definition Language. Also provides some output functions. Integrated with the MoSync IDL compiler.
+ * net: Partial, cross-platform API for TCP and HTTP-like protocols. Runs on top of GNU libc or Winsock2, depending on source platform.
+ * stabs: Parses GCC debug information in text format. Integrated with the MoSync Debugger.
+ * sqlite: Lightweight SQL database engine. The author disclaims copyright.
+
+* MoSync libraries: Used when making MoSync programs, these libs are themselves written using MoSync. They carry the MA prefix.
+ * kazlib: Linked list, dictionary and hash map, all written in C.
+ * MAFS: C standard file streams, built on top of MoSync. Does not access the native file system directly.
+ * MAStd: Partial implementation of the C standard library, with a few extras.
+ * MATest: C++ Unit test framework.
+ * MAUI: C++ GUI widgets.
+ * MAUtil: C++ utilities. Event-based application framework, string class, template collection classes and more.
+ * MinUI: More C++ GUI widgets. Unfinished.
+ * MTXml: SAX-style XML parser. C and C++ interfaces.
+
+* Runtimes: Implementations of the MoSync Syscall API, as well as the Core used to execute compiled MoSync programs.
+ * Java
+  * Java ME
+  * An Android port is planned.
+ * C++
+  * Base: Shared code.
+  * Core
+  * Platforms
+   * Symbian
+   * SDL: Used on Windows and GNU/Linux.
+   * Windows Mobile
+
+* Tools: stand-alone programs. Most are available on Host systems.
+ * buildext: IDL compiler for runtime extensions. Somewhat out of date.
+ * Bundle: File archiver, for use with the library MAFS.
+ * debugger: The MoSync Debugger, MDB. Due to our specialized assembler/linker, the GNU debugger would not work with MoSync. So we wrote our own. It uses the GDB/MI protocol and serves as a back-end to Eclipse's GUI debugger.
+ * DocbookIndexer: Custom documentation compiler. Has nothing to do with Docbook (anymore).
+ * FontGenerator: Together with a separate tool called Angelcode, produces compiled bitmap fonts for use with the library MAUI.
+ * icon-injector: Injects an icon into a compiled MoSync application. Used in the packaging process.
+ * idl2: IDL compiler. Contains the MoSync Syscall API definition. Outputs header files for all target platforms.
+ * makesis-2.0.0: Symbian SIS file compiler, 2nd edition. Copyright 1997-1999 Symbian Ltd. Symbian Example Source Code license.
+ * makesis-4: Symbian SIS file compiler, 3rd edition. Copyright 2007 Martin Storsjö, GNU LGPL 2.1.
+ * mobex: Sends a file to a remote device using Bluetooth OBEX PUSH.
+ * PanicDoc: Compiles a list of MoSync Panic messages, for use in the custom documentation compiler.
+ * pipe-tool: Assembler, linker, optimizer, script engine and resource compiler. Is there anything this program cannot do?
+ * ProfileConverter: Builds runtimes and creates a file tree of device profiles, using a SQL database for input.
+ * protobuild: C function prototype generator. Used by pipe-tool.
+ * ReleasePackageBuild: Builds complete MoSync packages, for installation onto Host systems. The directory also includes some binaries used in the installation process.
+ * RuntimeBuilder: Builds individual runtimes. Used by ProfileConverter.
+
+ 
+Compiling:
+There are several ways to compile MoSync. Each gives different results. I name them Visual C++, Rake and Package.
+
+Rake is available on both GNU/Linux and Windows.
+It compiles the internal libs, some tools, the SDL runtime and the examples. The main rakefile does all of this automatically.
+
+We use Microsoft Visual C++ 2005, Service Pack 1.
+It can compile nearly everything, except the Symbian and Java runtimes. However, one must compile and run the IDL compiler manually first.
+
+Package: See the guide to building a MoSync release package <TODO: whatever it's called. link?>
+
+
+Prerequisites:
+For Windows, see the release package guide.
+
+For GNU/Linux, you will need the following packages (tested on Ubuntu 8.04, 8.10 and 9.04):
+<TODO>
+
+
+Languages:
+Most of MoSync is written in C/C++. Some parts are written in Ruby, and a few are written in Java.
+
+
+End of File
