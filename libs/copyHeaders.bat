@@ -44,3 +44,8 @@ copy *.h "%MOSYNCDIR%\include\MAUI\"
 set DELHEAD=MAUI
 call private_headers.bat ..\delete_header.bat
 cd ..
+
+cd kazlib
+mkdir "%MOSYNCDIR%\include\kazlib"
+copy *.h "%MOSYNCDIR%\include\kazlib\"
+cd ..
