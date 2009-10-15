@@ -143,6 +143,9 @@ Stand-alone programs. Most are available on Host systems.
  * FontGenerator: Together with a separate tool called Angelcode, produces
    compiled bitmap fonts for use with the library MAUI.
 
+ * GLWrapperGenerator: Experimental tool for realizing OpenGL support in 
+   MoSync, by generating idl-code and runtime-code from OpenGL headers.
+
  * icon-injector: Injects an icon into a compiled MoSync application. Used in
    the packaging process.
 
