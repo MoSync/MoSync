@@ -8,6 +8,7 @@
 <property key="template.id" value="Moblet"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib,MATest.lib, MAFS.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
+<property key="dependency.strategy" value="0"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="build.prefs:additional.include.paths" value="."/>
 <property key="build.prefs:gcc.warnings" value="0"/>

@@ -509,24 +509,8 @@ cd %MOSYNC_TRUNK%\libs
 del %MOSYNC_INCLUDE_PATH%\IX_*.h
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@rmdir /s /q %MOSYNC_INCLUDE_PATH%\MATest
-del %MOSYNC_LIB_MOSYNC_PATH%\MATest.lib
-
 @rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
 
-
-goto COPY_TEMPLATES
-
-@echo ------------------------------------------------
-@echo Building PIPE examples
-@echo ------------------------------------------------
-@cd %ORIGINAL_PATH%
-@call build_examples.bat
-@IF NOT %MA_ERRORLEVEL%==0 goto TOOL_ERROR
-@echo.
-
-
-:COPY_TEMPLATES
 
 @echo ------------------------------------------------
 @echo Copying MoBuild templates
