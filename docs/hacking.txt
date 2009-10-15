@@ -191,6 +191,30 @@ Rake is available on both GNU/Linux and Windows. It compiles the internal
 libs, some tools, the SDL runtime and the examples. The main rakefile does all
 of this automatically.
 
+Work-in-progress build description for GNU/Linux and other Unix-like systems:
+
+ * Make sure you have installed all the packages listed in the Prerequisites
+   section, or equivalent packages.
+
+ * <TODO: Describe the build process for the compiler.>
+
+ * Make a bin/ directory in the root of the MoSync source tree.
+
+ * Copy the xgcc, cc1, cc1plus and cpp binaries into bin/ .
+
+ * Copy the tools/ReleasePackageBuild/build_package_tools/mosync_bin/maspec.fon
+   file into bin/ . This is the font used by MoRE and it needs it to be there.
+
+ * Set the MOSYNCDIR environment variable to the root of the source tree. If
+   this isn't set properly, the build system will become very confused.
+
+ * Make sure that the bin/ directory is in your PATH.
+
+ * Run 'rake'.
+
+ * The MoSync Reference Environment should now be built. To test your build,
+   enter the directory of any example and run 'rake run'.
+
 Visual C++
 ----------
 
@@ -219,6 +243,8 @@ For GNU/Linux, you will need the following packages (tested on Ubuntu 8.04,
  * libsdl-sound1.2-dev
  * libsdl-ttf2.0-dev
  * libsdl1.2-dev
+ * ruby
+ * rake
  * <TODO: Complete this list.>
 
 
