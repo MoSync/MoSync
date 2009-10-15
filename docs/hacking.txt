@@ -24,12 +24,12 @@ include Microsoft Windows and, partially, GNU/Linux. Compiling all parts of
 MoSync is difficult, and will become more so as new platforms are added.
 Already the Symbian and Windows Mobile runtimes can be compiled only on
 Windows, the Moblin runtime on GNU/Linux, and if the iPhone target platform is
-added, MacOSX will have to be added into the mix.
+added, Mac OS X will have to be added into the mix.
 
 Host platforms are those that can run the MoSync SDK and use it to compile
 programs for the Target platforms. Currently, this mirrors the Source platform
 situation, but it should be possible to make it run on Windows and GNU/Linux as
-well as MacOSX.
+well as Mac OS X.
 
 
 Building MoSync programs
@@ -51,7 +51,7 @@ Parts of MoSync
 ===============
 
 MoSync is composed of many parts. This list is sorted by type, then name. It
-skips some unused parts.  Copyright Mobile Sorcery AB, except where noted.
+skips some unused parts. Copyright Mobile Sorcery AB, except where noted.
 
 Internal libraries
 ------------------
@@ -120,7 +120,8 @@ C++
  * Core
  * Platforms
    - Symbian
-   - SDL: Used on Windows and GNU/Linux.
+   - SDL
+     * The MoSync Reference Environment (MoRE). Runs on Windows and GNU/Linux.
    - Windows Mobile
 
 Tools
