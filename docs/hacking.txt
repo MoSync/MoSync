@@ -51,7 +51,7 @@ Parts of MoSync
 ===============
 
 MoSync is composed of many parts. This list is sorted by type, then name. It
-skips some unused parts. Copyright Mobile Sorcery AB, except where noted.
+skips some unused parts.
 
 Internal libraries
 ------------------
@@ -68,7 +68,6 @@ Host systems, except as linked and unavailable object code.
    wildcard matching.
 
  * gsm_amr: AMR audio codec. Supports both narrowband and wideband formats.
-   Copyright 2008 PacketVideo, Apache License 2.0.
 
  * idl-common: Parses the MoSync Interface Definition Language. Also provides
    some output functions. Integrated with the MoSync IDL compiler.
@@ -79,7 +78,7 @@ Host systems, except as linked and unavailable object code.
  * stabs: Parses GCC debug information in text format. Integrated with the
    MoSync Debugger.
 
- * sqlite: Lightweight SQL database engine. The author disclaims copyright.
+ * sqlite: Lightweight SQL database engine.
 
 MoSync libraries
 ----------------
@@ -152,11 +151,9 @@ Stand-alone programs. Most are available on Host systems.
  * idl2: IDL compiler. Contains the MoSync Syscall API definition. Outputs
    header files for all target platforms.
 
- * makesis-2.0.0: Symbian SIS file compiler, 2nd edition. Copyright 1997-1999
-   Symbian Ltd. Symbian Example Source Code license.
+ * makesis-2.0.0: Symbian SIS file compiler, 2nd edition.
 
- * makesis-4: Symbian SIS file compiler, 3rd edition. Copyright 2007 Martin
-   Storsjö, GNU LGPL 2.1.
+ * makesis-4: Symbian SIS file compiler, 3rd edition.
 
  * mobex: Sends a file to a remote device using Bluetooth OBEX PUSH.
 
