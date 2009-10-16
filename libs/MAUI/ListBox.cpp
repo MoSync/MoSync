@@ -167,7 +167,7 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	bool ListBox::listFrontOutsideBounds() {
+	bool ListBox::listFrontOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:
 			for(int i = 0; i < children.size(); i++) {
@@ -189,7 +189,7 @@ namespace MAUI {
 		return false;
 	}
 
-	bool ListBox::listBackOutsideBounds() {
+	bool ListBox::listBackOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:
 			for(int i = 0; i < children.size(); i++) {
@@ -209,6 +209,10 @@ namespace MAUI {
 			break;
 		}
 		return false;
+	}
+
+	int ListBox::getScrollOffset() const {
+		return yOffset>>16;
 	}
 
 	void ListBox::update() {

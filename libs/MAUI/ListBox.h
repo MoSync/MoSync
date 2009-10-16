@@ -131,11 +131,13 @@ namespace MAUI {
 		void setHeight(int h);
 
 		/** Returns true if child widgets is outside of the front of the list. */
-		bool listFrontOutsideBounds();
+		bool listFrontOutsideBounds() const;
 
 		/** Returns true if child widgets is outside of the back of the list. */
-		bool listBackOutsideBounds();
+		bool listBackOutsideBounds() const;
 
+		/** Returns the listboxes' current scroll offset in pixels. */
+		int getScrollOffset() const;
 
 
 	protected:
