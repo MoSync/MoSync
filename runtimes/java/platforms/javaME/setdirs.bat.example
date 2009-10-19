@@ -1,2 +1,2 @@
 set TARGETDIR="C:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\WTK2\apps\JavaVM"
-set JAVAMESOURCEROOT="C:\Code\MoSyncPublic\MoSync\trunk\runtimes\java\platforms\javaME"
+set JAVASOURCEROOT="C:\Code\MoSync\trunk\runtimes\java"
