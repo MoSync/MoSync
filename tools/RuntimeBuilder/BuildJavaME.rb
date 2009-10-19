@@ -56,9 +56,11 @@ class RuntimeBuilder
 	def javameBuilder(runtime_dir, mode, cldc10)
 		debug = (mode=="debug") ? "D" : ""
 		
-		if ENV['JAVAMESDKDIR'] == nil
-			puts "Environment variable JAVAMESDKDIR not set with JavaME SDK path.. unable to build!"
-			return 1
+		# temporary fix... 
+		java_me_sdk = "D:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\"
+		
+		if ENV['JAVAMESDKDIR'] != nil
+			java_me_sdk = ENV['JAVAMESDKDIR']
 		end
 		
 		java_me_source = "#{$SETTINGS[:java_source]}platforms/JavaME/src"
@@ -103,8 +105,6 @@ class RuntimeBuilder
 		
 		# Restore config_platform.h
 		revert_backupped_file config_file
-	
-		java_me_sdk = ENV['JAVAMESDKDIR']
 	
 		# Compile Java source
 		puts "Compiling java source.."

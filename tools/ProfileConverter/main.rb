@@ -352,12 +352,15 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		release_defines = ['PHONE_RELEASE']
+		release_defines << "MOSYNC_COMMERCIAL";
 		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :s60v2 || platform_name == :s60v3)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
-		
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
-		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], ["PUBLIC_DEBUG"])
+		
+		debug_defines = ['PUBLIC_DEBUG']
+		debug_defines << "MOSYNC_COMMERCIAL";
+		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
 		
 		cwd = Dir.pwd
 		Dir.chdir "../RuntimeBuilder/"
@@ -365,8 +368,10 @@ runtimes.each do |platform_name, platform|
 		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		
 		if(platform_name == :java && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
+			puts("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
 			success = system("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
 		else
+			puts("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
 			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
 		end
 		

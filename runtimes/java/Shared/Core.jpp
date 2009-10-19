@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifdef _android
+package com.mosync.java.android;
+#endif
+
 #include "generated/core_consts.h"
 #include "helpers.h"
 #include "core_helpers.h"
@@ -33,7 +37,14 @@ final public class Core {
 	STATIC int mMEM_DS_SIZE;
 
 	Syscall mSyscall;
+
+#ifdef _JavaME
 	MainCanvas mCanvas;
+#elif defined(_android)
+	SurfaceHolder mSurfaceHolder;
+#else
+#error Bad Java platform!
+#endif
 	
 #ifdef GDB_DEBUG
 	GdbStub mGdbStub;
@@ -140,12 +151,19 @@ final public class Core {
 	StaticCode mStaticCode = new StaticCode();
 	int Head_AppCode;
 
+#ifdef _JavaME
 	public Core(MainCanvas aCanvas, String resname) throws Exception {
+		mCanvas = aCanvas;
+		mSyscall = new Syscall(this, aCanvas);
+#elif defined(_android)
+	public Core(SurfaceHolder surfaceHolder, String resname) throws Exception {
+		mSurfaceHolder = surfaceHolder;
+		mSyscall = new Syscall(this, mSurfaceHolder);
+#endif
 		mMem_ds = mStaticCode.mem_ds;
 		mMEM_DS_SIZE = mMem_ds.length;
 		Head_AppCode = 0;
-		mCanvas = aCanvas;
-		mSyscall = new Syscall(this, aCanvas);
+		
 		DEBUG_ASSERT(mSyscall != null);
 
 		InputStream resources = getClass().getResourceAsStream(resname);
@@ -204,9 +222,16 @@ final public class Core {
 	int mLastSyscall = INVALID_SYSCALL_NUMBER;
 #endif
 
+#ifdef _JavaME
 	public Core(MainCanvas aCanvas, String modname, String resname) throws Exception {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
+#elif defined(_android)
+	public Core(SurfaceHolder surfaceHolder, String modname, String resname) throws Exception {
+		mSurfaceHolder = surfaceHolder;
+		mSyscall = new Syscall(this, mSurfaceHolder);
+#endif
+
 		DEBUG_ASSERT(mSyscall != null);
 
 		{
@@ -226,10 +251,15 @@ final public class Core {
 		}
 	}
 
+#ifdef _JavaME
 	public Core(MainCanvas aCanvas, InputStream programStream) throws Exception {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
-
+#elif defined(_android)
+	public Core(SurfaceHolder surfaceHolder, InputStream programStream) throws Exception {
+		mSurfaceHolder = surfaceHolder;
+		mSyscall = new Syscall(this, surfaceHolder);
+#endif
 		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
 		LoadVMApp(file);
 		if(file.available()==0) {

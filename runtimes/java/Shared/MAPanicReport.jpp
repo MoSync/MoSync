@@ -15,10 +15,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifdef _android
+package com.mosync.java.android;
+#endif
+
 #include "helpers.h"
 #include "generated\MAAPI_consts.h"
 
+#ifdef _JavaME
 import javax.microedition.rms.*;
+#if 0
+import javax.microedition.io.*;
+import javax.microedition.io.file.*;
+#endif //0
+#elif defined(_android)
+import android.content
+#endif
+
 import java.io.*;
 import java.lang.String;
 import java.util.Date;
@@ -32,7 +45,11 @@ public class MAPanicReport
 	int code;
 	String string;
 
+#ifdef _JavaME
 	public void writePanicReport(int reportType, int panicCode, String panicString, int panicIP)
+#elif defined(_android)
+	public void writePanicReport( Context context, int reportType, int panicCode, String panicString, int panicIP)
+#endif
 	{
 		ip = -1;
 
@@ -53,7 +70,7 @@ public class MAPanicReport
 			PRINT_STACK_TRACE;
 			return;
 		}
-
+#ifdef _JavaME
 		// Store the panic report in the rms
 		try {
 			RecordStore store = RecordStore.openRecordStore("panic.report", true);
@@ -61,11 +78,38 @@ public class MAPanicReport
 			store.closeRecordStore();
 		} catch(RecordStoreNotFoundException e) {
 			PRINT_STACK_TRACE;
-			return;
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
-			return;
 		}
+#if 0
+		try {
+			FileConnection filecon = (FileConnection) Connector.open("file:///SDCard/panic.report");
+			if(!filecon.exists()) {
+				filecon.create();
+			}
+			OutputStream os = filecon.openOutputStream();
+			os.write(bdata, 0, bdata.length);
+			os.close();
+			filecon.close();
+		} catch(IOException ioe) {
+			PRINT_STACK_TRACE;
+		}
+#endif	//0
+#elif defined(_android)
+		// Write the panic retport as a file on the device
+		try {
+			FileOutputStream fos = context.openFileOutput("panic.report", 0);
+			fos.write(bdata);
+			fos.close();
+		} catch(FileNotFoundException fe) {
+			PRINT_STACK_TRACE;
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+		}
+#else
+#error Bad Java platform!
+#endif
+		return;
 
 	}
 

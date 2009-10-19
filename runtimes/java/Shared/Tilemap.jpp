@@ -17,6 +17,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // .tilemap tilexsize, tileysize, mapwidth, mapheight, mapdata
 
+#ifdef _android
+package com.mosync.java.android;
+#endif
+
 #include "helpers.h"
 
 final public class Tilemap {
