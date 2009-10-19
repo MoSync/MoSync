@@ -343,6 +343,9 @@ VMLOOP_LABEL
 			if(mGdbOn && mGdbSignal != eStep) {
 				mGdbSignal = eBreakpoint;
 			} else {
+				//if mGdbOn, the debugger tried to step on a breakpoint.
+				//it shouldn't do that, because the core can't handle it.
+				//it should have overwritten the breakpoint opcode with the original.
 				DEBIG_PHAT_ERROR;
 			}
 		} EOP;

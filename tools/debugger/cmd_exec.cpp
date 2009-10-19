@@ -204,6 +204,8 @@ void exec_next(const string& args) {
 	int len = callLen(r.pc);
 	if(len > 0) {
 		skipCallBreak(r.pc + len);
+	} else if(nextInstrIsBreak()) {
+		skipBreak();
 	}
 	op(sourceNexti);
 	op(stepStop);
