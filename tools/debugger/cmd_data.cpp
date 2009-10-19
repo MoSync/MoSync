@@ -53,9 +53,7 @@ static void disassemble_range(const byte* ip, int maxLen, int maxLines,
 	const byte* mem_cs, const int* mem_cp, drCallback, functionLookupCallback);
 
 namespace Callback {
-	static void register_values(const Registers&);
 	static void read_memory();
-	static void changed_registers(const Registers&);
 	static void disasm(const char* inst, const byte* ip);
 }
 
@@ -67,7 +65,7 @@ static struct READ_MEM_PARAMS {
 } sRMP;
 static Array<byte> sReadMemBuf(0);
 
-static Registers sRegData;
+static Registers sOldReg;
 static bool sListVal[N_GPR];
 static bool sDisasmFirst, sDisasmMix;
 static bool sDisasmUnfinished;
@@ -121,10 +119,9 @@ void data_list_register_values(const string& args) {
 		error("Unsupported format");
 		return;
 	}
-	StubConnection::getRegisters(Callback::register_values);
-}
+	
+	NEED_REG;
 
-static void Callback::register_values(const Registers& r) {
 	oprintDone();
 	oprintf(",register-values=[");
 	bool first = true;
@@ -223,16 +220,14 @@ void data_list_register_names(const string& args) {
 //lists the numbers of the registers whose content has changed since the last
 //call to this function.
 void data_list_changed_registers(const string& args) {
-	StubConnection::getRegisters(Callback::changed_registers);
-}
+	NEED_REG;
 
-static void Callback::changed_registers(const Registers& r) {
 	oprintDone();
 	oprintf(",register-names=[");
 	int num = 0;
 	for(int i=0; i<N_GPR; i++) {
-		if(sRegData.gpr[i] != r.gpr[i]) {
-			sRegData.gpr[i] = r.gpr[i];
+		if(sOldReg.gpr[i] != r.gpr[i]) {
+			sOldReg.gpr[i] = r.gpr[i];
 			if(num != 0)
 				oprintf(",");
 			oprintf("\"%i\"", i);

@@ -93,7 +93,8 @@ void Callback::see() {
 		if(!parseArgRegName(sExpr.substr(1), &ri))
 			return;
 		char buf[32];
-		sprintf(buf, "%i", gReg.gpr[ri]);
+		ASSERT_REG;
+		sprintf(buf, "%i", r.gpr[ri]);
 		sEECallback("int", buf, true);
 		return;
 	} else if(beginsWith(sExpr, "sizeof(")) {	//sizeof
@@ -122,7 +123,8 @@ static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallbac
 	} else if(lv->storageClass == eRegister) {
 		const RegisterVariable* rv = (RegisterVariable*)lv;
 		sym.type = rv->dataType;
-		sym.address = &gReg.gpr[rv->reg];
+		ASSERT_REG;
+		sym.address = &r.gpr[rv->reg];
 	} else if(lv->storageClass == eStatic) {
 		DEBIG_PHAT_ERROR;	//todo
 	} else {

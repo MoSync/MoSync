@@ -49,10 +49,10 @@ typedef std::map<int, Breakpoint> BreakpointMap;	//key: bp-number
 //todo: make value into a vector. maybe combine with InstructionMap.
 typedef std::map<int, int> BreakpointAddressMap;	//key: address. value: bp-number
 
-static const byte BREAKPOINT_INSTRUCTION = 55;	//warning for hardcode
+static const byte BREAKPOINT_OPCODE = 55;	//warning for hardcode
 
 struct TempBreakpoint {
-	void (*callback)(const Registers&);	//NULL if invalid.
+	void (*callback)();	//NULL if invalid.
 	int address;
 	byte orig;
 };

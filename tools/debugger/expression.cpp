@@ -321,7 +321,8 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 				} else {
 
 					LineMapping lm;
-					if(!mapIpEx(gReg.pc, lm))
+					ASSERT_REG;
+					if(!mapIpEx(r.pc, lm))
 						ExpressionCommon::error("Could not map ip.");
 					typeInfo = stabsFindTypeByName(t.toString(), lm.file + 1);
 
@@ -656,6 +657,7 @@ void symbolLoaded(const SYM& sym) {
 }
 
 void errorCallback() {
+	//TODO: set error state, so thread knows not to continue?
 	sSemaphore.post();
 	setErrorCallback(NULL);
 }

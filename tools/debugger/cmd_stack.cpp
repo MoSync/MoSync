@@ -51,7 +51,6 @@ void console_whatis(const string& args);
 void console_ptype(const string& args);
 
 namespace Callback {
-	static void lsGetRegisters(const Registers&);
 	static void lsReadMem();
 	static void sid();
 	static void slf();
@@ -60,7 +59,6 @@ namespace Callback {
 	static void sll();
 	static void ssf();
 	static void dee(const Value* value, const char *err);
-	static void threadInfo(const Registers&);
 	static void print_type(const Value* value, const char *err);
 }
 
@@ -69,13 +67,10 @@ static void oprintFrameArgs(const FRAME& frame);
 static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame);
 
 
-//static int sMemSize = 0;
-//char* sMemBuf = NULL;
-static Registers sReg;
 static size_t sCurrentFrameIndex;	//todo: should be invalidated when program runs.
 static vector<FRAME> sFrames;
-static void (*sLsCallback)();
 static size_t sFrameRequest;
+static void (*sLsCallback)();
 static PrintValueSimplicity sPrintValueSimplicity;
 static int sInfoDepthMax;
 static int sLowFrame, sHighFrame;
@@ -83,8 +78,6 @@ static string sToken;
 
 const size_t& gCurrentFrameIndex(sCurrentFrameIndex);
 const std::vector<FRAME>& gFrames(sFrames);
-//const CharP& gMemBuf(gMemBuf);
-const Registers& gReg(sReg);
 
 //******************************************************************************
 // continue/stop
@@ -103,12 +96,9 @@ void loadStack(void (*cb)()) {
 		cb();
 		return;
 	}
-	sLsCallback = cb;
-	StubConnection::getRegisters(Callback::lsGetRegisters);
-}
 
-static void Callback::lsGetRegisters(const Registers& r) {
-	sReg = r;
+	NEED_REG;
+
 	u32 stackLow = r.gpr[REG_fr] - 8;
 	u32 stackHi = gMemSize;
 	if(stackLow >= stackHi) {	//strictly insufficient. todo: improve.
@@ -120,22 +110,25 @@ static void Callback::lsGetRegisters(const Registers& r) {
 		frame.pc = r.pc;
 		frame.pointer = r.gpr[REG_fr];
 		sFrames.push_back(frame);
-		sLsCallback();
+		cb();
 		return;
 	}
+
+	sLsCallback = cb;
 	int offset = MIN(stackLow, r.gpr[REG_sp]);
 	StubConnection::readMemory(gMemBuf + offset, offset, stackHi - offset,
 		Callback::lsReadMem);
 }
 
 static void Callback::lsReadMem() {
+	ASSERT_REG;
 	u32 stackHi = gMemSize;
-	u32 stackLow = sReg.gpr[REG_fr] - 8;
-	u32 sp = sReg.gpr[REG_sp];
-	u32 framePtr = sReg.gpr[REG_fr];
-	u32 retAddr = sReg.gpr[REG_rt];	//initial value is ignored
+	u32 stackLow = r.gpr[REG_fr] - 8;
+	u32 sp = r.gpr[REG_sp];
+	u32 framePtr = r.gpr[REG_fr];
+	u32 retAddr = r.gpr[REG_rt];	//initial value is ignored
 	int offset = MIN(stackLow, sp);
-	int pc = sReg.pc;
+	int pc = r.pc;
 	uint level = 0;
 
 	const int nWords = (stackHi - stackLow) / 4;
@@ -325,8 +318,9 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 			oprintf("%s", getValue(sv->dataType, &gMemBuf[frame.pointer + sv->offset],
 				TypeBase::eNatural).c_str());
 		} else if(lv->storageClass == eRegister) {
+			ASSERT_REG;
 			const RegisterVariable* rv = (RegisterVariable*)lv;
-			oprintf("%s", getValue(rv->dataType, &sReg.gpr[rv->reg],
+			oprintf("%s", getValue(rv->dataType, &r.gpr[rv->reg],
 				TypeBase::eNatural).c_str());
 		} else if(lv->storageClass == eStatic) {
 			DEBIG_PHAT_ERROR;	//todo
@@ -401,9 +395,10 @@ void stack_info_frame(const string& args) {
 }
 
 void Callback::sif() {
+	ASSERT_REG;
 	int pc;
 	if(sCurrentFrameIndex == 0) {
-		pc = sReg.pc;
+		pc = r.pc;
 	} else if(sCurrentFrameIndex >= sFrames.size()) {
 		error("Stack broken, cannot see selected frame.");
 		return;
@@ -457,17 +452,12 @@ void thread_info(const string& args) {
 	if(StubConnection::isRunning()) {
 		thread_info_print_start();
 		oprintf("running\"");
-		thread_info_print_end();
-		commandComplete();
 	} else {
-		StubConnection::getRegisters(Callback::threadInfo);
+		NEED_REG;
+		thread_info_print_start();
+		oprintf("stopped\",frame={");
+		oprintFrame(r.pc);
 	}
-}
-
-static void Callback::threadInfo(const Registers& r) {
-	thread_info_print_start();
-	oprintf("stopped\",frame={");
-	oprintFrame(r.pc);
 	thread_info_print_end();
 	commandComplete();
 }

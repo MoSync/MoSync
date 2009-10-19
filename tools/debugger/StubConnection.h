@@ -29,14 +29,24 @@ struct Registers {
 	u32 pc;
 };
 
+const Registers& getReg();
+const bool isRegValid();
+
+#define NEED_REG \
+	if(!isRegValid()) { error("Inferior is not ready"); return; }\
+	const Registers& r(getReg());
+
+#define ASSERT_REG \
+	_ASSERT(isRegValid());\
+	const Registers& r(getReg());
+
 //handles errors internally.
 namespace StubConnection {
 	typedef void (*AckCallback)();
-	typedef void (*RegCallback)(const Registers& r);
 
 	void addContinueListener(AckCallback);
 
-	bool connect(const std::string& hostname, u16 port);	//synchronous
+	void connect(const std::string& hostname, u16 port, AckCallback);
 
 	void handleUnexpectedPacket(const char* data, int len);
 
@@ -44,12 +54,11 @@ namespace StubConnection {
 	void step(AckCallback);
 	void interrupt();
 
-	void getRegisters(RegCallback);
-
 	void readMemory(void* dst, int src, int len, AckCallback);
 
 	//src may be freed after this function returns
-	void writeMemory(int dst, const void* src, int len, AckCallback);
+	void writeCodeMemory(int dst, const void* src, int len, AckCallback);
+	void writeDataMemory(int dst, const void* src, int len, AckCallback);
 
 	bool isRunning();
 	bool isIdle();

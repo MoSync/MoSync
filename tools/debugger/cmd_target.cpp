@@ -36,7 +36,7 @@ HANDLE gSimProcess;
 #endif
 
 namespace Callback {
-	void connected(const Registers& r);
+	static void connected();
 }
 
 static void remote_connect(const vector<string>& argv);
@@ -144,15 +144,14 @@ static void remote_connect(const vector<string>& argv) {
 		}
 	}
 
-	//connect, synchronously
-	if(!StubConnection::connect(host, atoi(portStr + 1)))	//reports any errors
-		return;
-
-	//get address from stub
-	StubConnection::getRegisters(Callback::connected);
+	//connect, asynchronously
+	StubConnection::connect(host, atoi(portStr + 1), Callback::connected);
 }
 
-void Callback::connected(const Registers& r) {
+static void Callback::connected() {
+	//get address from stub
+	ASSERT_REG;
+
 	const char* fname = mapFunction(r.pc);
 	oprintToken();
 	oprintf("^connected,addr=\"0x%08x\",func=\"%s\",args=[]\n", r.pc, fname ? fname : "??");

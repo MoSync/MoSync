@@ -40,7 +40,5 @@ typedef char* CharP;
 
 extern const size_t& gCurrentFrameIndex;
 extern const std::vector<FRAME>& gFrames;
-//extern const CharP& gMemBuf;
-extern const Registers& gReg;
 
 #endif	//CMD_STACK_H

@@ -224,8 +224,8 @@ static void insertBpInstruction(int address, void (*cb)()) {
 		sInstructions[address].orig = gMemCs[address];
 	}
 	sInstructions[sInsertingBreakpoint.address].refCount++;
-	StubConnection::writeMemory(sInsertingBreakpoint.address + INSTRUCTION_MEMORY_START,
-		&BREAKPOINT_INSTRUCTION, 1, sInsertBpInstructionCallback);
+	StubConnection::writeCodeMemory(sInsertingBreakpoint.address,
+		&BREAKPOINT_OPCODE, 1, sInsertBpInstructionCallback);
 }
 
 void Callback::insert_done() {
@@ -255,12 +255,10 @@ void StubConnection::breakpointHit() {
 	//oprintf("*stopped,reason=\"breakpoint-hit\"\n");
 	LOG("breakpointHit\n");
 	//find the breakpoint and extract frame information
-	StubConnection::getRegisters(Callback::breakpointRegs);
-}
+	ASSERT_REG;
 
-static void Callback::breakpointRegs(const Registers& r) {
 	if(gTempBreakpoint.callback != NULL && r.pc == gTempBreakpoint.address) {
-		gTempBreakpoint.callback(r);
+		gTempBreakpoint.callback();
 		return;
 	}
 
@@ -349,7 +347,7 @@ static void Callback::bpRestore() {
 	sBpRestoreQueue.pop();
 	InstructionMap::iterator ii = sInstructions.find(address);
 	_ASSERT(ii != sInstructions.end());
-	StubConnection::writeMemory(address + INSTRUCTION_MEMORY_START,
+	StubConnection::writeCodeMemory(address,
 		&ii->second.orig, 1, Callback::bpRestore);
 	sInstructions.erase(ii);
 }

@@ -64,7 +64,8 @@ Value::Value(const std::string& value) {
 		int ri;
 		if(!parseArgRegName(value.substr(1), &ri))
 			throw ParseException("Couldn't parse register name");
-		this->Int = gReg.gpr[ri];
+		ASSERT_REG;
+		this->Int = r.gpr[ri];
 		mPrimitiveType = Builtin::eInt;
 	} else if(value.find_first_of("x")!=std::string::npos) {
 		this->Int = 0;

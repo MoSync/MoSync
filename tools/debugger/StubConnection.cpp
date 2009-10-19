@@ -24,10 +24,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/smartie.h"
 
 #include "GdbCommon.h"
+#include "CoreCommon.h"
 
 #include "StubConnection.h"
 #include "StubConnLow.h"
 #include "helpers.h"
+#include "OpHandler.h"
 
 #include "memory.h"
 
@@ -37,7 +39,6 @@ using namespace std;
 // statics
 //******************************************************************************
 
-static StubConnection::RegCallback sGetRegistersCallback;
 static StubConnection::AckCallback sReadMemoryCallback;
 static int sReadMemoryLen;
 static byte* sReadMemoryDst;
@@ -48,6 +49,15 @@ static bool sRunning = false;
 static Registers sCachedReg;
 static bool sCachedRegValid = false;
 static bool sIdle = true;
+static Functor sFunctor = { NULL, 0, false };
+
+//globals
+const Registers& getReg() {
+	return sCachedReg;
+}
+const bool isRegValid() {
+	return sCachedRegValid;
+}
 
 static void stepAck();
 static void getRegistersAck();
@@ -60,6 +70,7 @@ static bool writeMemoryPacket(const char* data, int len);
 static bool asyncPacket(const char* data, int len);
 
 static void cacheContinue();
+static void getRegisters();
 
 static void unIdle();
 static void setIdle();
@@ -84,13 +95,19 @@ bool StubConnection::isRunning() {
 	return sRunning || !isIdle();
 }
 
-bool StubConnection::connect(const std::string& hostname, u16 port) {
+void StubConnection::connect(const std::string& hostname, u16 port, AckCallback cb) {
 	static bool first = true;
 	if(first) {
 		addContinueListener(cacheContinue);
 		first = false;
 	}
-	return StubConnLow::connect(hostname, port);
+	bool res = StubConnLow::connect(hostname, port);	//reports any errors that may occur
+	if(!res)
+		return;
+
+	sFunctor.f = cb;
+	sFunctor.hasParam = false;
+	getRegisters();
 }
 
 void StubConnection::handleUnexpectedPacket(const char* data, int len) {
@@ -169,23 +186,32 @@ static bool asyncPacket(const char* data, int len) {
 	//todo: fix code dupes
 	if(strcmp(data, "S01") == 0) {	//breakpoint
 		sRunning = false;
-		StubConnection::breakpointHit();
+		sFunctor.f = StubConnection::breakpointHit;
+		sFunctor.hasParam = false;
+		getRegisters();
 		return true;
 	}
 	if(strcmp(data, "S02") == 0) {	//interrupt
 		sRunning = false;
-		StubConnection::interruptHit();
+		sFunctor.f = StubConnection::interruptHit;
+		sFunctor.hasParam = false;
+		getRegisters();
 		return true;
 	}
 	if(strcmp(data, "S03") == 0) {	//step
 		sRunning = false;
-		StubConnection::stepHit();
+		sFunctor.f = StubConnection::stepHit;
+		sFunctor.hasParam = false;
+		getRegisters();
 		return true;
 	}
 	if(data[0] == 'W') {	//exit
 		sRunning = false;
 		int code = strtoul(data + 1, NULL, 16);
-		StubConnection::exitHit(code);
+		sFunctor.f = StubConnection::exitHit;
+		sFunctor.p = code;
+		sFunctor.hasParam = true;
+		getRegisters();
 		return true;
 	}
 	return false;
@@ -195,16 +221,12 @@ static bool asyncPacket(const char* data, int len) {
 // getRegisters
 //******************************************************************************
 
-void StubConnection::getRegisters(RegCallback cb) {
+static void getRegisters() {
+	_ASSERT(!sCachedRegValid);
 	if(sRunning) {
 		error("Inferior is running");
 		return;
 	}
-	if(sCachedRegValid) {
-		cb(sCachedReg);
-		return;
-	}
-	sGetRegistersCallback = cb;
 	unIdle();
 	StubConnLow::sendPacket("g", getRegistersAck);
 }
@@ -240,7 +262,12 @@ static bool getRegistersPacket(const char* data, int len) {
 	}
 	sCachedRegValid = true;
 	setIdle();
-	sGetRegistersCallback(sCachedReg);
+	_ASSERT(sFunctor.f != NULL);
+	if(sFunctor.hasParam)
+		((ifptr)sFunctor.f)(sFunctor.p);
+	else
+		((vfptr)sFunctor.f)();
+	sFunctor.f = NULL;
 	return true;
 }
 
@@ -298,11 +325,12 @@ static bool readMemoryPacket(const char* data, int len) {
 // writeMemory
 //******************************************************************************
 
-void StubConnection::writeMemory(int dst, const void* src, int len, AckCallback cb) {
+void StubConnection::writeCodeMemory(int dst, const void* src, int len, AckCallback cb) {
 	_ASSERT(cb != NULL);
 	sWriteMemoryCallback = cb;
 	Smartie<char> buffer(new char[32 + len * 2]);
 	char* ptr = buffer();
+	dst += INSTRUCTION_MEMORY_START;
 	ptr += sprintf(ptr, "M%X,%X:", dst, len);
 	for(int i=0; i<len; i++) {
 		ptr += sprintf(ptr, "%02X", ((byte*)src)[i]);

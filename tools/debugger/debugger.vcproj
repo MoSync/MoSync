@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="debugger"
 	ProjectGUID="{2DA2D2D5-182A-43B6-9519-8434BF5EDCCE}"
 	RootNamespace="debugger"
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
+				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
+				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -428,6 +428,10 @@
 		</File>
 		<File
 			RelativePath=".\old_expr.h"
+			>
+		</File>
+		<File
+			RelativePath=".\opHandler.h"
 			>
 		</File>
 		<File
