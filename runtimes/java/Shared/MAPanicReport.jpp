@@ -29,7 +29,7 @@ import javax.microedition.io.*;
 import javax.microedition.io.file.*;
 #endif //0
 #elif defined(_android)
-import android.content
+import android.content.*;
 #endif
 
 import java.io.*;

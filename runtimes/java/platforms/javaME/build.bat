@@ -18,35 +18,29 @@ call cleardir build
 echo Preprocessing...
 @REM echo on
 
-call process ../../shared Core 1
-call process src Syscall 2
-call process src MAMidlet 3
-call process src MainCanvas 4
-call process ../../shared BigPhatError 5
-call process ../../shared Tilemap 6
-call process ../../shared Tileset 7
-call process ../../shared LittleEndianDataInputStream 8
-call process ../../shared LimitedLengthInputStream 9
-call process ../../shared BinaryInterface 10
-call process ../../shared Binary 11
-call process ../../shared UBin 12
-call process ../../shared RefByteArrayOutputStream 13
-call process ../../shared ThreadPool 14
-call process ../../shared GdbStub 15
-call process src PngStream 16
-call process ../../shared ImageCache 17
-call process ../../shared BufferlessPipeStream 18
-call process ../../shared LoggingInputStream 19
-call process ../../shared ImageCache 20
-call process ../../shared BufferlessPipeStream 21
-call process src MoSync 22
-call process src ExtensionHandler 23
-call process ../../shared MAPanicReport 24
-@REM call process src AudioBufferInputStream
-@REM call process src Pcm2WavInputStream
-call process src AudioBufferDataSource 25
+call process ../../shared BigPhatError 1
+call process ../../shared Binary 2
+call process ../../shared BinaryInterface 3
+call process ../../shared Core 4
+call process ../../shared LimitedLengthInputStream 5
+call process ../../shared LittleEndianDataInputStream 6
+call process ../../shared ThreadPool 7
+call process ../../shared UBin 8
+call process ../../shared RefByteArrayOutputStream 9
+call process ../../shared Tilemap 10
+call process ../../shared Tileset 11
+call process ../../shared ImageCache 12
+call process ../../shared MAPanicReport 13
 
-@REM temporary
-call process src Real 26
+call process src Syscall 14
+call process src MAMidlet 15
+call process src MainCanvas 16
+call process src PngStream 17
+call process src MoSync 18
+call process src ExtensionHandler 19
+call process src AudioBufferDataSource 20
+call process src Real 21
+@REM call process src AudioBufferInputStream 22
+@REM call process src Pcm2WavInputStream 23
 
 :END

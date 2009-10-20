@@ -85,7 +85,9 @@ final class WorkerThread extends Thread {
 			}
 		} catch(Throwable e) {
 			PRINT_STACK_TRACE;
+#ifdef _JavaME
 			MAMidlet.self.programError("Asynchronous error", e);
+#endif
 		}
 	}
 

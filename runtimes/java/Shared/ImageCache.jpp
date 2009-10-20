@@ -17,13 +17,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef _android
 package com.mosync.java.android;
+
+import android.graphics.Bitmap;
+#elif defined(_JavaME)
+import javax.microedition.lcdui.*;
 #endif
 
-import javax.microedition.lcdui.*;
-
 final class ImageCache {
+#ifdef _JavaME
 	Image i;
 	Graphics g;
 
 	ImageCache(Image im) { i = im; }
+#elif defined(_android)
+	Bitmap i;
+	
+	ImageCache(Bitmap im) { i = im; }
+#endif
 }

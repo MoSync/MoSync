@@ -1002,7 +1002,7 @@ public
 
 	SYSCALL(void) maDrawText(int left, int top, final String str) {
 		DEBUG("DrawText "+str+"\n");
-		//TODO: handle Polish bug drawStringOver200Chars
+		//TODO: handle bug drawStringOver200Chars
 		mGraphics.drawString(str, left, top, Graphics.TOP|Graphics.LEFT);
 	}
 

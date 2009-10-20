@@ -17,6 +17,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef _android
 package com.mosync.java.android;
+
+import android.content.res.Resources;
+import android.util.Log;
+import android.view.View;
+import android.view.SurfaceView;
+import android.view.SurfaceHolder;
 #endif
 
 #include "generated/core_consts.h"
@@ -269,6 +275,32 @@ final public class Core {
 		}
 	}
 
+#ifdef _android
+	public Core(SurfaceHolder surfaceHolder, InputStream programStream, InputStream resourceStream) throws Exception {
+		mSurfaceHolder = surfaceHolder;
+		mSyscall = new Syscall(this, surfaceHolder);
+
+		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
+		LoadVMApp(file);
+		if(file.available()==0) {
+			mSyscall.LoadResourcesFromStream(null, null);
+		} else {
+			mSyscall.LoadResourcesFromStream(file, null);
+		}
+		
+		file = new LittleEndianDataInputStream(resourceStream);
+		if(file.available()==0) {
+			mSyscall.LoadResourcesFromStream(null, null);
+		} else {
+			mSyscall.LoadResourcesFromStream(file, null);
+		}
+		
+		
+		mSyscall.init();
+	}
+#endif
+
+
 	//***************************************************************************
 	//Initialization
 	//***************************************************************************
@@ -492,6 +524,13 @@ final public class Core {
 			}
 		return false;
 	}*/
+
+#ifdef _android
+	public void resizeScreen(int width, int height)
+	{
+		mSyscall.resizeScreen(width, height);
+	}
+#endif
 
 	//***************************************************************************
 	//Syscalls

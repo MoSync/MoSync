@@ -22,7 +22,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef PUBLIC_DEBUG
 #define IN_FILE_ON_LINE_STRING (__FILE__+":"+__LINE__)
 #else
+#ifdef _JavaME
 #define IN_FILE_ON_LINE_STRING (null)
+#elif defined(_android)
+#define IN_FILE_ON_LINE_STRING ""
+#endif //_JavaME
 #endif	//PUBLIC_DEBUG
 #define PRINT_STACK_TRACE
 #define DEBUG_ASSERT(a)

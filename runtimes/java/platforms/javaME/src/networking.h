@@ -290,7 +290,7 @@ class ConnRead implements Runnable {
 	}
 
 	public final void run() {
-		//TODO: handle Polish bug BluetoothRfcommInputStream?
+		//TODO: handle bug BluetoothRfcommInputStream?
 		byte[] bytes = new byte[size];
 		int res;
 		try {
