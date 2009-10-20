@@ -90,6 +90,8 @@ void CAppView::ConstructL()
 		*(CCoeEnv::Static()->ScreenDevice()), Window());
 	LOGD("AVC1\n");
 
+	EnableDragEvents();
+
 	iEventBuffer.SetLengthL(EVENT_BUFFER_SIZE);
 
 	ActivateL();  // Activate the window, which makes it ready to be drawn
@@ -453,6 +455,31 @@ void CAppView::CCloseTimer::RunL() {
 	writePanicReport(REPORT_TIMEOUT, 0);
 #endif
 	ShowAknErrorNoteThenExitL(KCloseMessage);
+}
+
+//***************************************************************************
+//Pointer events
+//***************************************************************************
+
+void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
+	LOG("PE %i %ix%i\n", pe.iType, pe.iPosition.iX, pe.iPosition.iY);
+	MAEvent e;
+	switch(pe.iType) {
+	case TPointerEvent::EButton1Down:
+		e.type = EVENT_TYPE_POINTER_PRESSED;
+		break;
+	case TPointerEvent::EButton1Up:
+		e.type = EVENT_TYPE_POINTER_RELEASED;
+		break;
+	case TPointerEvent::EDrag:
+		e.type = EVENT_TYPE_POINTER_DRAGGED;
+		break;
+	default:
+		return;
+	}
+	e.point.x = pe.iPosition.iX;
+	e.point.y = pe.iPosition.iY;
+	AddEvent(e);
 }
 
 //***************************************************************************

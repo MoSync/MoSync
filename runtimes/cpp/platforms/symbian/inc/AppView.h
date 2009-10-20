@@ -71,6 +71,7 @@ public:
 	//CCoeControl
 public:
 	TKeyResponse OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aType);
+	void HandlePointerEventL(const TPointerEvent&);
 protected:
 	void FocusChanged(TDrawNow aDrawNow);
 
