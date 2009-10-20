@@ -412,6 +412,7 @@ void GetOper()
 
 	TestOp("==",2)
 	TestOp("!=",2)
+	TestOp("!",1)
 
 	TestOp("=",1)
 

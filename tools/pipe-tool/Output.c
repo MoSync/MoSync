@@ -283,7 +283,7 @@ void Error(int flag, char *Template, ...)
 {
 	char 	tbuf[1280];
 	va_list	args;
-	char *DebegFilePtr = FilePtr;
+//	char *DebugFilePtr = FilePtr;
 	
 	va_start(args,Template);
 	vsprintf(tbuf,Template,args);
