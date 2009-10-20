@@ -87,7 +87,7 @@ public:
     **/
 
 	void keyReleaseEvent(int keyCode) {
-		printf("%d keys have been released", ++numKeyReleases);
+		printf("%d keys have been released\n", ++numKeyReleases);
 	}
 
 private:
