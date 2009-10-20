@@ -26,6 +26,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //***************************************
 //	   ZLib helpers
 //***************************************
+
+#ifdef USE_ZLIB
+
 static 
 DWORD ZLibCompress ( BYTE *target,
                      DWORD target_size,
@@ -65,6 +68,8 @@ DWORD ZLibUncompress( BYTE *target,
 
 	return 0;
 }
+
+#endif
 
 //***************************************
 //	   Basic Memory Management for PC
@@ -360,11 +365,20 @@ int AddSourceFile(char *FileName, int local_scope)
 			}
 
 			// Decompress data
-						
+
+#ifdef USE_ZLIB					
 			len = ZLibUncompress( &SourceTop[SourceIdx],
 									thisObj.dsize,
 									memptr,
 									thisObj.csize);
+
+#else
+			len = FreeImage_ZLibUncompress( &SourceTop[SourceIdx],
+											thisObj.dsize,
+											memptr,
+											thisObj.csize);
+
+#endif
 
 			if (len != thisObj.dsize)
 				return 0;
@@ -632,7 +646,12 @@ int WriteLibrarian(char *outfile)
 		return 0;
 
 	thisObj.dsize = SourceIdx;
+
+#ifdef USE_ZLIB
 	thisObj.csize = ZLibCompress((unsigned char *) cptr, SourceIdx * 2, (unsigned char *) SourceTop, SourceIdx);
+#else
+	thisObj.csize = FreeImage_ZLibCompress((unsigned char *) cptr, 0x40000, (unsigned char *) SourceTop, SourceIdx);
+#endif
 
 	if (thisObj.csize)
 	{

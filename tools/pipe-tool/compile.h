@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //			This code is based on the GameTasker v2.0 Module System
 //*********************************************************************************************
 
+//#define USE_ZLIB
 
 //***************************************
 //			  Includes
@@ -34,8 +35,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ctype.h>
 #include <stdarg.h>
 #include <setjmp.h>
+
+#ifdef USE_ZLIB
 #include <zlib.h>
-#include <FreeImage.h>
+#else
+#include "FreeImage.h"
+#endif
 
 #ifndef _MSC_VER
 #include <unistd.h>
