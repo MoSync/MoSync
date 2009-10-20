@@ -109,6 +109,8 @@ void ResourceComp()
 
 	while(1)
 	{
+		SkipWhiteSpace();
+
 		Line++;
 	
 		if (EndComp)
@@ -136,7 +138,10 @@ void ResourceComp()
 		}
 */
 		if (ResourceCommands())
+		{
+			SkipWhiteSpace();
 			continue;
+		}
 	}
 
 	FilePtr = FPtr;
@@ -893,6 +898,23 @@ short ResourceCommands()
 
 	if (QToken(".set"))
 	{
+/*
+*TODO*
+		if (QToken("$"))
+		{
+			char VarName[256];
+			
+			// Accept a string
+
+			GetName();							// Get the new type Name
+			strcpy(VarName, Name);			
+			NeedToken("=");
+			GetStringName(128);
+
+			printf("string set %s = '%s'\n", VarName, Name);
+			return 1;
+		}
+*/
 		GetName();							// Get the new type Name	
 		NeedToken("=");
 		RedefENum(Name, GetExpression());	

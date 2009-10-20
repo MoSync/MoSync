@@ -395,7 +395,7 @@ void GetOper()
 	TestOpChar('*', "*");
 	TestOpChar('%', "%");
 	TestOpChar('^', "^");
-	TestOpChar('!', "!");
+//	TestOpChar('!', "!");
 	TestOpChar('~', "~");
 	TestOpChar('?', "?");
 
@@ -411,9 +411,9 @@ void GetOper()
 	TestOp("<",1)
 
 	TestOp("==",2)
-	TestOp("=",1)
-
 	TestOp("!=",2)
+
+	TestOp("=",1)
 
 	TestOp("&&",2)
 	TestOp("&",1)
