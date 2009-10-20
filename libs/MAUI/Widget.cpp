@@ -136,13 +136,12 @@ namespace MAUI {
 		//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
 		//	bounds.width, bounds.height);
 		
+		Gfx_pushMatrix();
 		Gfx_translate(relX, relY);
 		BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
 		
 		if(res) 
 		{
-			Gfx_pushMatrix();
-
 			if(isDirty() || forceDraw) 
 			{
 				if(shouldDrawBackground) 
@@ -156,22 +155,19 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
 
 			if(res) {
-				Gfx_pushMatrix();
 
 				if(isDirty() || forceDraw) 
 					drawWidget();
 				Vector_each(Widget*, it, children)
 					(*it)->draw();	
 
-				Gfx_popMatrix();
 			}
 
 			//engine.popClipRect();
-			Gfx_popMatrix();
 			Gfx_popClipRect();
 			setDirty(false);
 		}
-
+		Gfx_popMatrix();
 		//engine.popClipRect();
 		Gfx_popClipRect();
 	}

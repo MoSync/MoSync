@@ -222,7 +222,7 @@ namespace MAUI {
 
 #if 0
 	static void drawRect(int x1, int y1, int x2, int y2, int col) {
-		maSetColor(0x00ff00);
+		maSetColor(col);
 		maLine(x1, y1, x2, y1);
 		maLine(x2, y1, x2, y2);
 		maLine(x1, y1, x1, y2);
@@ -247,13 +247,12 @@ namespace MAUI {
 
 			//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
 			//bounds.width, bounds.height);
+			Gfx_pushMatrix();
 			Gfx_translate(relX, relY);
+				
 			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
 
 			if(res) {
-			
-				Gfx_pushMatrix();
-
 				if(isDirty() && shouldDrawBackground) {
 					drawBackground();
 				}
@@ -262,33 +261,30 @@ namespace MAUI {
 				//paddedBounds.width, paddedBounds.height);	
 				Gfx_translate(paddingLeft, paddingTop);
 				res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
-				
+
 				Gfx_translate(0, (yOffset>>16));
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
 				{	
-					Gfx_pushMatrix();
 					for(i = 0; i < children.size(); i++)
 					{
 						Rect p = children[i]->getBounds();
 						Point rp = children[i]->getPosition();
-						/*
 						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) && 
 							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
 							(translation.x+rp.x+p.width)>paddedBounds.x &&
 							(translation.y+rp.y+p.height)>paddedBounds.y)
-						*/
 							children[i]->draw();
 					}
-					Gfx_popMatrix();
 				}
-				Gfx_popMatrix();
+
 				//engine.popClipRect();
 				Gfx_popClipRect();
 			}
 			setDirty(false);
 
 			//engine.popClipRect();
+			Gfx_popMatrix();
 			Gfx_popClipRect();
 		} else if(orientation == LBO_HORIZONTAL) {
 			//int x = paddedBounds.x+(yOffset>>16);
@@ -303,13 +299,12 @@ namespace MAUI {
 			//printf("numWidgets: %d\n", size);
 
 			//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y, bounds.width, bounds.height);	
+			Gfx_pushMatrix();	
 			Gfx_translate(relX, relY);
 			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);	
 
 			if(res) 
 			{
-				Gfx_pushMatrix();
-
 				if(isDirty() && shouldDrawBackground) {
 					drawBackground();
 				}
@@ -323,27 +318,25 @@ namespace MAUI {
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
 				{
-					Gfx_pushMatrix();
+
 					for(i = 0; i < children.size(); i++)
 					{
 						Rect p = children[i]->getBounds();
 						Point rp = children[i]->getPosition();
-						/*
 						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) &&
 							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
 							(translation.x+rp.x+p.width)>paddedBounds.x &&
 							(translation.y+rp.y+p.height)>paddedBounds.y)
-							*/
 							children[i]->draw();	
 					}
-					Gfx_popMatrix();
 				}
 				setDirty(false);
 
 				//engine.popClipRect();
-				Gfx_popMatrix();
 				Gfx_popClipRect();
 			}
+	
+			Gfx_popMatrix();
 			//engine.popClipRect();
 			Gfx_popClipRect();
 		}

@@ -223,8 +223,8 @@ void Gfx_popMatrix() {
 		PANIC_MESSAGE("Transform stack underflow");
 		return;
 	}
-	sTransformStackPtr--;
 	sCurrentOffset = sTransformStack[sTransformStackPtr];
+	sTransformStackPtr--;
 }
 /** Translates the current transform by x,y **/
 void Gfx_translate(int x, int y) {
