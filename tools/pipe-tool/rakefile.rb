@@ -8,7 +8,7 @@ require "#{BD}/build_rules/host.rb"
 #---------------------------------------------------------------------------------
 SOURCES = ["."]
 IGNORED_FILES =	["Emu.c", "BrewRebuild.c", "Peeper.c", "JavaCodeGen.c", "disas.c"]
-EXTRA_CFLAGS = " -Wno-shadow -Wno-write-strings -Wno-unused-function -Wno-multichar -D_CRT_SECURE_NO_DEPRECATE"
+EXTRA_CFLAGS = " -Wno-shadow -Wno-write-strings -Wno-unused-function -Wno-multichar -D_CRT_SECURE_NO_DEPRECATE -DUSE_ZLIB"
 LIBRARIES = ["z"]
 if(HOST == "win32") then
 	EXETARGET = "#{MOSYNCDIR}/bin/pipe-tool.exe"
