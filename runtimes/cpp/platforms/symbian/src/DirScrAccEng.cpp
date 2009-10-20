@@ -29,12 +29,20 @@ _LIT(KDirScrAccTxt, "DirectScreenAccess");
 class TMyDrawBuf {
 public:
 	TMyDrawBuf(CFbsBitmap& aDrawSurface) : mDS(aDrawSurface) {
+#ifdef __S60_50__	//5th edition
+		mDS.BeginDataAccess();
+#else	//2nd or 3rd edition
 		mDS.LockHeap();
+#endif
 		mPtr = (Pixel*)mDS.DataAddress();
 	}
 	operator Pixel*() { return mPtr; }
 	~TMyDrawBuf() {
+#ifdef __S60_50__	//5th edition
+		mDS.EndDataAccess();
+#else	//2nd or 3rd edition
 		mDS.UnlockHeap();
+#endif
 	}
 private:
 	CFbsBitmap& mDS;
@@ -138,7 +146,9 @@ void CDirScrAccEng::SetColor(int argb) {
 		((argb & 0x0000ff) << 16);
 #endif
 
-#ifdef __SERIES60_3X__
+#ifdef __S60_50__
+	gCurrentConvertedColor = argb | 0xFF000000;	//test
+#elif defined(__SERIES60_3X__)
 	gCurrentConvertedColor = argb & 0xFFFFFF;
 #elif defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT)
 	gCurrentConvertedColor = argb;

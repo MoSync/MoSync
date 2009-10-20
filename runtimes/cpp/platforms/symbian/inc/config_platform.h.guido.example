@@ -7,7 +7,7 @@
 #define CONFIG_H
 
 
-#define PHONE_RELEASE	//undef to read program and resources from C:/data/
+//#define PHONE_RELEASE	//undef to read program and resources from C:/data/
 #define MOSYNC_COMMERCIAL	//controls nag text
 #define PUBLIC_DEBUG
 

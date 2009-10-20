@@ -9,7 +9,7 @@
 #define __SYMBIAN__
 
 //#define PHONE_RELEASE	//undef to read program and resources from C:/data/
-//#define MOSYNC_COMMERCIAL	//controls nag text
+#define MOSYNC_COMMERCIAL	//controls nag text
 #define PUBLIC_DEBUG
 
 //#define MA_PROF_SUPPORT_FRAMEBUFFER_32BIT 

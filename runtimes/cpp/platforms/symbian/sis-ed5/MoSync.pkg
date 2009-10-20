@@ -1,0 +1,25 @@
+; MoSync.pkg
+;
+;Language - standard language definitions
+&EN
+
+; standard SIS file header
+#{"MoSync"},(0xE7654321),1,2,0, TYPE=SA
+
+;Localised Vendor name
+%{"Mobile Sorcery"}
+
+;Unique Vendor name
+:"Mobile Sorcery"
+
+;Supports S60 5th Edition
+[0x1028315F], 0, 0, 0, {"Series60ProductID"}
+
+;Files to install
+"\Symbian\s60v5\S60_5th_Edition_SDK_v1.0\epoc32\data\z\resource\apps\MoSync_3rd.RSC" -"!:\resource\apps\E7654321.rsc"
+"\Symbian\s60v5\S60_5th_Edition_SDK_v1.0\epoc32\data\z\resource\apps\MoSync_icon.mif" -"!:\resource\apps\E7654321_icon.mif"
+"\Symbian\s60v5\S60_5th_Edition_SDK_v1.0\epoc32\data\z\private\10003a3f\import\apps\MoSync_reg.RSC" -"!:\private\10003a3f\import\apps\E7654321_reg.rsc"
+"\Symbian\s60v5\S60_5th_Edition_SDK_v1.0\epoc32\release\gcce\urel\MoSync2.exe" -"!:\sys\bin\E7654321.exe"
+
+;required for application to be covered by backup/restore facility 
+;	"backup_registration.xml" -"!:\private\E7654321\backup_registration.xml"
