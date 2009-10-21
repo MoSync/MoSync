@@ -34,7 +34,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG)
 #define DEBUG_ALWAYS(a) MAMidlet.out.print(a); MAMidlet.out.flush()
 #else
+#ifdef _JaveME
 #define DEBUG_ALWAYS(a) System.out.print(a)
+#elif defined(_android)
+#define DEBUG_ALWAYS(a) Log.i("DEBUG MESSAGE",a)
+#endif //_JavaME
 #endif	//BLUETOOTH_LOG
 #define PRINT_STACK_TRACE \
 	DEBUG_ALWAYS("Stack trace " + IN_FILE_ON_LINE_STRING + "\n"); \

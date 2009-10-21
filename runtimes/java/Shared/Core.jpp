@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
+import android.content.Context;
 #endif
 
 #include "generated/core_consts.h"
@@ -47,7 +48,8 @@ final public class Core {
 #ifdef _JavaME
 	MainCanvas mCanvas;
 #elif defined(_android)
-	SurfaceHolder mSurfaceHolder;
+	Context mContext;
+	MoSyncView mMoSyncView;
 #else
 #error Bad Java platform!
 #endif
@@ -162,9 +164,9 @@ final public class Core {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
 #elif defined(_android)
-	public Core(SurfaceHolder surfaceHolder, String resname) throws Exception {
-		mSurfaceHolder = surfaceHolder;
-		mSyscall = new Syscall(this, mSurfaceHolder);
+	public Core(MoSyncView view, String resname) throws Exception {
+		mMoSyncView = view;
+		mSyscall = new Syscall(this, mMoSyncView);
 #endif
 		mMem_ds = mStaticCode.mem_ds;
 		mMEM_DS_SIZE = mMem_ds.length;
@@ -233,9 +235,9 @@ final public class Core {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
 #elif defined(_android)
-	public Core(SurfaceHolder surfaceHolder, String modname, String resname) throws Exception {
-		mSurfaceHolder = surfaceHolder;
-		mSyscall = new Syscall(this, mSurfaceHolder);
+	public Core(MoSyncView view, String modname, String resname) throws Exception {
+		mMoSyncView = view;
+		mSyscall = new Syscall(this, mMoSyncView);
 #endif
 
 		DEBUG_ASSERT(mSyscall != null);
@@ -262,9 +264,9 @@ final public class Core {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
 #elif defined(_android)
-	public Core(SurfaceHolder surfaceHolder, InputStream programStream) throws Exception {
-		mSurfaceHolder = surfaceHolder;
-		mSyscall = new Syscall(this, surfaceHolder);
+	public Core(MoSyncView view, InputStream programStream) throws Exception {
+		mMoSyncView = view;
+		mSyscall = new Syscall(this, mMoSyncView);
 #endif
 		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
 		LoadVMApp(file);
@@ -276,9 +278,9 @@ final public class Core {
 	}
 
 #ifdef _android
-	public Core(SurfaceHolder surfaceHolder, InputStream programStream, InputStream resourceStream) throws Exception {
-		mSurfaceHolder = surfaceHolder;
-		mSyscall = new Syscall(this, surfaceHolder);
+	public Core(MoSyncView view, InputStream programStream, InputStream resourceStream) throws Exception {
+		mMoSyncView = view;
+		mSyscall = new Syscall(this, mMoSyncView);
 
 		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
 		LoadVMApp(file);
@@ -530,6 +532,7 @@ final public class Core {
 	{
 		mSyscall.resizeScreen(width, height);
 	}
+
 #endif
 
 	//***************************************************************************

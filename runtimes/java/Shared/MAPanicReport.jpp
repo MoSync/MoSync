@@ -29,6 +29,7 @@ import javax.microedition.io.*;
 import javax.microedition.io.file.*;
 #endif //0
 #elif defined(_android)
+import android.util.Log;
 import android.content.*;
 #endif
 
@@ -101,7 +102,7 @@ public class MAPanicReport
 			FileOutputStream fos = context.openFileOutput("panic.report", 0);
 			fos.write(bdata);
 			fos.close();
-		} catch(FileNotFoundException fe) {
+		} catch(FileNotFoundException e) {
 			PRINT_STACK_TRACE;
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
