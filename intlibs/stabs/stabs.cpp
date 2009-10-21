@@ -62,9 +62,9 @@ Function* gLastFunction = NULL;
 static bool sLoaded = false;
 static stack<int> sBracStack;
 
-void addFile(int file) {
-	addTypeFile(file);
-	addSymbolFile(file);
+void addFile(int file,const std::string& fileName) {
+	addTypeFile(file, fileName);
+	addSymbolFile(file, fileName);
 }
 
 bool loadStabs(const char* sld, const char* stabs) {
@@ -158,7 +158,8 @@ static bool parseFile(Tuple t, char* text) {
 	t.a++;
 	//LOG("\nnew file: %i %s\n", t.a, text);
 	gCurrentFile = t.a;
-	addFile(gCurrentFile);
+
+	addFile(gCurrentFile, text);
 	return true;
 }
 

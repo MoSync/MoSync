@@ -20,6 +20,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 extern int gCurrentFile;
 
-void addFile(int file);
+void addFile(int file, const std::string& fileName);
 
 #endif	//STABS_FILE_H

@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stabs_type.h"
 
 //must call before adding any types for that file
-void addTypeFile(int file);
+void addTypeFile(int file, const std::string& fileName);
 
 void addType(const Type&);
 

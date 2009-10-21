@@ -32,10 +32,15 @@ using namespace std;
 
 //static set<Type> sTypeSet;
 static vector<set<Type> > sTypeSets;
+static vector<std::string> sTypeFiles;
 
-void addTypeFile(int file) {
-	if(file >= (int)sTypeSets.size())
+void addTypeFile(int file, const std::string& fileName) {
+	if(file >= (int)sTypeSets.size()) {
 		sTypeSets.resize(file + 1);
+		sTypeFiles.resize(file + 1);
+	}
+
+	sTypeFiles[file] = fileName;
 }
 
 void addType(const Type& s) {

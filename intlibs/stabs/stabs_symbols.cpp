@@ -56,7 +56,7 @@ typedef set<Symbol*, symbol_p_scope_name_less> SymbolScopeSet;
 static SymbolSet sVariableSet, sFunctionSet;
 static SymbolScopeSet sSymbolScopeSet;
 
-void addSymbolFile(int file) {
+void addSymbolFile(int file, const std::string& fileName) {
 }
 
 static void addSymbol(SymbolSet& ss, Symbol* s) {

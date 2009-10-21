@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stabs_symbol.h"
 
 //must call before adding any symbols for that file
-void addSymbolFile(int file);
+void addSymbolFile(int file, const std::string& fileName);
 
 void addFunction(Symbol* s);
 void addVariable(Symbol* s);
