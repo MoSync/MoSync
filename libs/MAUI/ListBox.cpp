@@ -163,6 +163,8 @@ namespace MAUI {
 			}
 			*/
 		}
+		if(children.size() == 1)
+			child->setSelected(true);
 
 		requestRepaint();
 	}
