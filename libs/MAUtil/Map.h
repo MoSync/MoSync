@@ -22,9 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_MAUTIL_MAP_H_
 #define _SE_MSAB_MAUTIL_MAP_H_
 
-#include <maassert.h>
-#include <kazlib/dict.h>
-#include "collection_common.h"
+#include "Dictionary.h"
 
 namespace MAUtil {
 
