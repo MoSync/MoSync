@@ -458,6 +458,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\parseheaders.c"
+			>
+		</File>
+		<File
 			RelativePath=".\profiles.c"
 			>
 		</File>

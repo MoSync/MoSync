@@ -29,43 +29,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef USE_ZLIB
 
-static 
-DWORD ZLibCompress ( BYTE *target,
-                     DWORD target_size,
-                     BYTE *source,
-                     DWORD source_size )
+static unsigned long ZLibCompress(unsigned char *target, unsigned long target_size,
+	unsigned char *source, unsigned long source_size)
 {
-    uLongf dest_len = (uLongf)target_size;
-
-    int zerr = compress( (Bytef *)target, &dest_len, (Bytef *)source, (uLong)source_size );
-	switch ( zerr )
+	uLongf dest_len = (uLongf)target_size;
+	int zerr = compress(target, &dest_len, source, (uLong)source_size);
+	switch(zerr)
 	{
-		case Z_MEM_ERROR:	// not enough memory
-		case Z_BUF_ERROR:	// not enough room in the output buffer
-			return 0;
-		case Z_OK:
-			return dest_len;
+	case Z_MEM_ERROR:	// not enough memory
+	case Z_BUF_ERROR:	// not enough room in the output buffer
+		return 0;
+	case Z_OK:
+		return dest_len;
 	}
-
 	return 0;
 }
 
-DWORD ZLibUncompress( BYTE *target,
-                      DWORD target_size,
-                      BYTE *source,
-                      DWORD source_size )
+static unsigned long ZLibUncompress(unsigned char *target, unsigned long target_size,
+	unsigned char *source, unsigned long source_size)
 {
-    uLongf dest_len = (uLongf)target_size;
-    int zerr = uncompress( (Bytef *)target, &dest_len, (Bytef *)source, (uLong)source_size );
-	switch ( zerr )
+	uLongf dest_len = (uLongf)target_size;
+	int zerr = uncompress(target, &dest_len, source, (uLong)source_size);
+	switch(zerr)
 	{
-		case Z_MEM_ERROR:	// not enough memory
-		case Z_BUF_ERROR:	// not enough room in the output buffer
-			return 0;
-		case Z_OK:
-			return dest_len;
+	case Z_MEM_ERROR:	// not enough memory
+	case Z_BUF_ERROR:	// not enough room in the output buffer
+		return 0;
+	case Z_OK:
+		return dest_len;
 	}
-
 	return 0;
 }
 
@@ -648,9 +640,9 @@ int WriteLibrarian(char *outfile)
 	thisObj.dsize = SourceIdx;
 
 #ifdef USE_ZLIB
-	thisObj.csize = ZLibCompress((unsigned char *) cptr, SourceIdx * 2, (unsigned char *) SourceTop, SourceIdx);
+	thisObj.csize = ZLibCompress(cptr, SourceIdx * 2, SourceTop, SourceIdx);
 #else
-	thisObj.csize = FreeImage_ZLibCompress((unsigned char *) cptr, 0x40000, (unsigned char *) SourceTop, SourceIdx);
+	thisObj.csize = FreeImage_ZLibCompress(cptr, 0x40000, SourceTop, SourceIdx);
 #endif
 
 	if (thisObj.csize)

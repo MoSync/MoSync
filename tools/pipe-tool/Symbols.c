@@ -665,7 +665,7 @@ SYMBOL * RedefENum(char *ThisName,int Value)
 
 	// Build string
 	
-	itoa(Value, str, 10);
+	sprintf(str, "%i", Value);
 	
 	// see if the symbols exists
 	
