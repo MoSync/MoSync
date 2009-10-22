@@ -46,6 +46,24 @@ struct linemap_file_line_less
 	}
 };
 
+struct funcmap_start_less
+	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
+{
+	bool operator()(const FuncMapping* const& l, const FuncMapping* const& r) const
+	{
+		return l->start < r->start;
+	}
+};
+
+struct funcmap_name_less
+	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
+{
+	bool operator()(const FuncMapping* const& l, const FuncMapping* const& r) const
+	{
+		return l->name < r->name;
+	}
+};
+
 static Vector<FileMapping> gFiles;
 
 static std::set<LineMapping> sLineSet;	//maps addresses to lines
@@ -56,14 +74,19 @@ static std::set<LineMapping> sLineSet;	//maps addresses to lines
 typedef std::set<LineMapping, linemap_file_line_less> AddressSet;
 static AddressSet gAddressSet;
 
-//TODO: make into a set, for faster lookup.
-static Vector<FuncMapping> gFuncMap;
+typedef set<FuncMapping*, funcmap_start_less> FuncMapAddr;
+static FuncMapAddr sFuncMapAddr;
+
+//should probably be a hash set, for fastest lookup
+typedef set<FuncMapping*, funcmap_name_less> FuncMapName;
+static FuncMapName sFuncMapName;
 
 struct VarMapping {
 	int scope;
 	int start;
 	String name;
 };
+//TODO: make into a set, for faster lookup.
 Vector<VarMapping> gVarMap;
 
 
@@ -90,17 +113,22 @@ static bool readLine(char* dst, int maxLen, File& file) {
 	return true;
 }
 
-
 const FuncMapping* mapFunctionEx(int ip) {
-	for(size_t i=0; i<gFuncMap.size(); i++) {
-		FuncMapping& fm(gFuncMap[i]);
-		if(ip > fm.stop)
-			continue;
-		if(ip >= fm.start)
-			return &fm;
+	FuncMapping temp;
+	temp.start = ip;
+	FuncMapAddr::const_iterator itr = sFuncMapAddr.lower_bound(&temp);
+	if(itr == sFuncMapAddr.end())
 		return NULL;
+	if((*itr)->start > ip) {
+		if(itr == sFuncMapAddr.begin())
+			return NULL;
+		itr--;
 	}
-	return NULL;
+	DEBUG_ASSERT((*itr)->start <= ip);
+	if((*itr)->stop >= ip)
+		return *itr;
+	else
+		return NULL;
 }
 
 const char* mapFunction(int ip) {
@@ -117,6 +145,7 @@ int mapFunctionStart(int ip) {
 	return fm->start;
 }
 
+#if 0
 int mapFunction(const char* name) {
 	for(size_t i=0; i<gFuncMap.size(); i++) {
 		FuncMapping& fm(gFuncMap[i]);
@@ -124,6 +153,16 @@ int mapFunction(const char* name) {
 			return fm.start;
 	}
 	return -1;
+}
+#endif
+int mapFunction(const char* name) {
+	FuncMapping temp;
+	temp.name = name;
+	FuncMapName::const_iterator itr = sFuncMapName.find(&temp);
+	if(itr == sFuncMapName.end())
+		return -1;
+	else
+		return (*itr)->start;
 }
 
 int mapVariable(const char* name, int scope) {
@@ -148,7 +187,13 @@ int nextSldEntry(int address) {
 }
 
 void clearSLD() {
-	gFuncMap.clear();
+	FuncMapAddr::iterator itr = sFuncMapAddr.begin();
+	while(itr != sFuncMapAddr.end()) {
+		delete *itr;
+		itr++;
+	}
+	sFuncMapAddr.clear();
+	sFuncMapName.clear();
 	sLineSet.clear();
 	gAddressSet.clear();
 	gFiles.clear();
@@ -220,7 +265,6 @@ bool loadSLD(const char* filename) {
 	FAILIF(strcmp(buffer, "FUNCTIONS") != 0);
 	//_ZN12CustomScreenC2EPN4MAUI6ScreenE 00000000,000000d7
 	int lastStop = -1;
-	std::string mangledNames;
 	while(1) {
 		TEST(readLine(buffer, BUFSIZE, file));
 		FuncMapping fm;
@@ -235,13 +279,13 @@ bool loadSLD(const char* filename) {
 			FAIL;
 		}
 		lastStop = fm.stop;
-		//fm.name = buffer;
+		FuncMapping* fmp = new FuncMapping(fm);
 		if(buffer[0] == '_')
-			mangledNames += buffer + 1;	//skip the extra '_'.
+			fmp->name = buffer + 1;	//skip the extra '_'.
 		else
-			mangledNames += buffer;
-		mangledNames += '\n';
-		gFuncMap.push_back(fm);
+			fmp->name = buffer;
+		sFuncMapAddr.insert(fmp);
+		sFuncMapName.insert(fmp);
 	}
 
 	//read variable map
@@ -270,8 +314,14 @@ bool loadSLD(const char* filename) {
 	}
 
 	//demangle function names, all at once
+	std::string mangledNames;
 	std::string demangledNames;
 	std::string mosyncDir = getenv("MOSYNCDIR");
+
+	for(FuncMapAddr::iterator itr = sFuncMapAddr.begin(); itr != sFuncMapAddr.end(); itr++) {
+		mangledNames += (*itr)->name;
+		mangledNames += "\n";
+	}
 	int res = execDoublePipe((mosyncDir + "/bin/c++filt").c_str(), mangledNames, demangledNames);
 	if(res != 0) {
 		LOG("Error calling c++filt: %i\n", res);
@@ -279,7 +329,7 @@ bool loadSLD(const char* filename) {
 	}
 	//parse demangled names
 	size_t pos = 0;
-	for(size_t i=0; i<gFuncMap.size(); i++) {
+	for(FuncMapAddr::iterator itr = sFuncMapAddr.begin(); itr != sFuncMapAddr.end(); itr++) {
 		size_t nextEOL = demangledNames.find('\n', pos);
 		DEBUG_ASSERT(nextEOL != std::string::npos);
 #ifdef WIN32
@@ -287,7 +337,7 @@ bool loadSLD(const char* filename) {
 #else
 #define EXTRA_EOL 0
 #endif
-		gFuncMap[i].name = demangledNames.substr(pos, nextEOL - (pos + EXTRA_EOL)).c_str();
+		(*itr)->name = demangledNames.substr(pos, nextEOL - (pos + EXTRA_EOL)).c_str();
 		pos = nextEOL + 1;
 	}
 	return true;
