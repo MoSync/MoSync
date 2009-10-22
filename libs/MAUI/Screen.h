@@ -45,23 +45,27 @@ namespace MAUI {
 		/** keylistener implementation to overload when inheriting 
 		  * your own screens.
 		  **/
-		virtual void keyPressEvent(int keyCode) {}
+		virtual void keyPressEvent(int keyCode);
 		/** keylistener implementation to overload when inheriting 
-		  * your own screens.
+		  * your own screens. By default, it will route the events
+		  * to its main widget.
 		  **/
-		virtual void keyReleaseEvent(int keyCode) {}
+		virtual void keyReleaseEvent(int keyCode);
 		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
+		  * your own screens. By default, it will route the events
+		  * to its main widget.
 		  **/
-		virtual void pointerPressEvent(MAPoint2d point) {}
+		virtual void pointerPressEvent(MAPoint2d point);
 		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
+		  * your own screens. By default, it will route the events
+		  * to its main widget.
 		  **/
-		virtual void pointerReleaseEvent(MAPoint2d point) {}
+		virtual void pointerReleaseEvent(MAPoint2d point);
 		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
+		  * your own screens. By default, it will route the events
+		  * to its main widget.
 		  **/
-		virtual void pointerMoveEvent(MAPoint2d point) {}
+		virtual void pointerMoveEvent(MAPoint2d point);
 
 		/**
 		* Does not delete the main Widget.
@@ -69,8 +73,8 @@ namespace MAUI {
 		~Screen();
 	protected:
 		virtual void hide();
-		static Screen* currentScreen;
-		Widget* main;
+		static Screen* sCurrentScreen;
+		Widget* mMain;
 	};
 
 }

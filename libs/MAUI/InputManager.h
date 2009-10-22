@@ -42,22 +42,22 @@ namespace MAUI {
 
 	class InputManager {
 	public:
-		virtual void keyPressed(int key) = 0;
-		virtual void keyReleased(int key) = 0;
-		virtual void pointerPressed(int x, int y) = 0;
-		virtual void pointerReleased(int x, int y) = 0;
-		virtual void pointerMoved(int x, int y) = 0;
+		virtual void keyPressed(int keyCode) = 0;
+		virtual void keyReleased(int keyCode) = 0;
+		virtual void pointerPressed(MAPoint2d p) = 0;
+		virtual void pointerReleased(MAPoint2d p) = 0;
+		virtual void pointerMoved(MAPoint2d p) = 0;
 	protected:
 		Widget* mWidget;
 	};
 	
 	class DefaultInputManager : public InputManager {
 	public:
-		void keyPressed(int key);
-		void keyReleased(int key);
-		void pointerPressed(int x, int y);
-		void pointerReleased(int x, int y);
-		void pointerMoved(int x, int y);
+		void keyPressed(int keyCode);
+		void keyReleased(int keyCode);
+		void pointerPressed(MAPoint2d p);
+		void pointerReleased(MAPoint2d p);
+		void pointerMoved(MAPoint2d p);
 	};
 }
 

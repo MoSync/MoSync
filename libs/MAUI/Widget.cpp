@@ -44,6 +44,7 @@ namespace MAUI {
 			shouldDrawBackground(true),
 			selected(false),
 			enabled(true),
+			mInputManager(0),
 			paddingLeft(0),
 			paddingTop(0),
 			paddingBottom(0),
@@ -356,6 +357,11 @@ namespace MAUI {
 		return widgetListeners;
 	}
 
+	void Widget::setInputManager(InputManager* inputManager) {
+		mInputManager = inputManager;
+	}
+
+
 	void Widget::trigger() {
 		Vector_each(WidgetListener*, wl, widgetListeners) {
 			(*wl)->triggered(this);
@@ -448,4 +454,24 @@ namespace MAUI {
 		else if(name == "y") this->setPosition(getPosition().x, stringToInteger(value));
 		else maPanic(0, "MAUI::Widget wrong parameter");
 	}
+
+	void Widget::keyPressed(int keyCode) {
+		lprintfln("Widget::keyPressed()");
+		if(mInputManager) mInputManager->keyPressed(keyCode);
+	}
+	void Widget::keyReleased(int keyCode) {
+		lprintfln("mInputManager: %x", mInputManager);
+		if(mInputManager) mInputManager->keyReleased(keyCode);
+	}
+	void Widget::pointerPressed(MAPoint2d p) {
+		if(mInputManager) mInputManager->pointerPressed(p);
+	}
+	void Widget::pointerReleased(MAPoint2d p) {
+		if(mInputManager) mInputManager->pointerReleased(p);
+	}
+	void Widget::pointerMoved(MAPoint2d p) {
+		if(mInputManager) mInputManager->pointerMoved(p);
+
+	}
+
 }

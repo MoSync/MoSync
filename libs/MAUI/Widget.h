@@ -326,6 +326,17 @@ namespace MAUI {
 
 		virtual void setParameter(const String& name, const String& value);
 		
+		/** Handles key presses by invoking the widget's inputmanager **/
+		virtual void keyPressed(int keyCode);
+		/** Handles key releases by invoking the widget's inputmanager **/
+		virtual void keyReleased(int keyCode);
+		/** Handles pointer presses by invoking the widget's inputmanager **/
+		virtual void pointerPressed(MAPoint2d p);
+		/** Handles pointer releases by invoking the widget's inputmanager **/
+		virtual void pointerReleased(MAPoint2d p);
+		/** Handles pointer movements by invoking the widget's inputmanager **/
+		virtual void pointerMoved(MAPoint2d p);
+
 		/**
 		 *	Deletes all children.
 		 */ 

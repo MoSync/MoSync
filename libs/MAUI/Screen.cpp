@@ -22,46 +22,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Screen* Screen::currentScreen = NULL;
+	Screen* Screen::sCurrentScreen = NULL;
 	
-	Screen::Screen() : main(0) {
+	Screen::Screen() : mMain(0) {
 		hide();
 	}
 	
 	void Screen::show() {
-		//printf("showing screen!\n");
+		lprintfln("showing screen!\n");
 		
-		if(!main) {
+		if(!mMain) {
 			return;
 		}
 
-		if(currentScreen) currentScreen->hide();
-		currentScreen = this;
-		Engine::getSingleton().setMain(main);
-		main->setEnabled(true);
-		main->setDirty(true);
+		if(sCurrentScreen) sCurrentScreen->hide();
+		sCurrentScreen = this;
+		Engine::getSingleton().setMain(mMain);
+		mMain->setEnabled(true);
+		mMain->setDirty(true);
 		//printf("Requesting UI update...!\n");
 		Engine::getSingleton().requestUIUpdate();
+
+		lprintfln("adding self to environment!\n");
 		Environment::getEnvironment().addKeyListener(this);
 		Environment::getEnvironment().addPointerListener(this);
 	}
 	
 	
 	void Screen::setMain(Widget* main) {
+		lprintfln("Screen::setMain(%x)", main);
 		MAExtent scrSize = maGetScrSize();
-		this->main = main;
-		if(!main) return;
-		main->setPosition(0,0);
-		main->setWidth(EXTENT_X(scrSize));
-		main->setHeight(EXTENT_Y(scrSize));
+		this->mMain = main;
+		if(!mMain) return;
+		mMain->setPosition(0,0);
+		mMain->setWidth(EXTENT_X(scrSize));
+		mMain->setHeight(EXTENT_Y(scrSize));
 		Environment& env = Environment::getEnvironment();
-		if(!env.isKeyListener(this))
-			main->setEnabled(false);
+		if(!env.isKeyListener(this)) {
+			mMain->setEnabled(false);
+		}
 	}
 
 
 	Widget* Screen::getMain() {
-		return main;
+		return mMain;
 	}
 
 	void Screen::hide() {
@@ -71,9 +75,34 @@ namespace MAUI {
 			env.removeKeyListener(this);
 		if(env.isPointerListener(this))
 			env.removePointerListener(this);
-		if(main)
-			main->setEnabled(false);
+		if(mMain)
+			mMain->setEnabled(false);
 	}
+
+	void Screen::keyPressEvent(int keyCode) {
+		lprintfln("Screen::keyPressed()");
+		mMain->keyPressed(keyCode);
+	}
+
+	void Screen::keyReleaseEvent(int keyCode) {
+		lprintfln("Screen::keyReleaseEvent() 1");
+		lprintfln("mMain: %x", mMain);
+		mMain->keyReleased(keyCode);
+		lprintfln("Screen::keyReleaseEvent() 2");
+	}
+
+	void Screen::pointerPressEvent(MAPoint2d point) {
+		mMain->pointerPressed(point);
+	}
+
+	void Screen::pointerReleaseEvent(MAPoint2d point) {
+		mMain->pointerReleased(point);
+	}
+
+	void Screen::pointerMoveEvent(MAPoint2d point) {
+		mMain->pointerMoved(point);
+	}
+
 
 	Screen::~Screen() {
 		/*if(this == currentScreen)
