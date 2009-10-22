@@ -66,5 +66,6 @@ void stackEvaluateExpression(const std::string& expr, int frameAddr, ExpressionC
 void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback cb);
 std::string getType(const TypeBase* tb, bool complex);
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt);
+const TypeBase* findTypeByNameAndPC(const std::string& t);
 
 #endif /* _EXPRESSION_H_ */

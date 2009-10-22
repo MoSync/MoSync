@@ -125,7 +125,6 @@ map<string, Command> sCommands;
 	m("-var-update", var_update)\
 	m("-test-wait", test_wait)\
 
-
 #define DECLARE_FUNCTION(cmd, func) void func(const string&);
 COMMANDS(DECLARE_FUNCTION);
 

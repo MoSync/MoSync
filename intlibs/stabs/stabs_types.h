@@ -29,6 +29,7 @@ void addType(const Type&);
 const TypeBase* findTypeByTuple(Tuple);
 const TypeBase* findTypeByTupleAndFile(Tuple t, int file);
 
+const TypeBase* findTypeByNameAndFileGlobal(const std::string& name, int scope);
 const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope);
 
 void clearTypes();

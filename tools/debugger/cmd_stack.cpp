@@ -468,18 +468,7 @@ void thread_info(const string& args) {
 
 static bool sComplex;
 
-static void console_print_type(const string& args, bool complex) {
-	sComplex = complex;
-	stackEvaluateExpression(args, -1, Callback::print_type);
-}
-
-static void Callback::print_type(const Value* value, const char *err) {
-	//handle EOL in type string. See GDB. Replace with "\"\n~\"".
-	if(err) {
-		error("%s", err);
-		return;
-	} 
-	string type = getType(value->getSymbol().type, sComplex);
+void print_type_from_type(const std::string& type) {
 	oprintf("~\"type = ");//%s\"\n", type);
 	const char* t = type.c_str();
 	while(*t) {
@@ -492,6 +481,26 @@ static void Callback::print_type(const Value* value, const char *err) {
 	oprintf("\\n\"\n");
 	oprintDoneLn();
 	commandComplete();
+}
+
+static void console_print_type(const string& args, bool complex) {
+	sComplex = complex;
+	const TypeBase *typeBase = findTypeByNameAndPC(args);
+	if(typeBase) {
+		print_type_from_type(getType(typeBase->resolve(), sComplex));
+	} else {
+		stackEvaluateExpression(args, -1, Callback::print_type);
+	}
+}
+
+static void Callback::print_type(const Value* value, const char *err) {
+	//handle EOL in type string. See GDB. Replace with "\"\n~\"".
+	if(err) {
+		error("%s", err);
+		return;
+	} 
+	string type = getType(value->getSymbol().type->resolve(), sComplex);
+	print_type_from_type(type);
 }
 
 void console_whatis(const string& args) {

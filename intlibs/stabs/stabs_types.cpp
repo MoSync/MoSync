@@ -57,10 +57,7 @@ const Type* stabsFindTypeByName(const std::string& name, int scope) {
 	return NULL;
 }
 
-const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope) {
-	const TypeBase* t = findTypeByTupleAndFile(tuple, scope);
-	if(t) return t;
-
+const TypeBase* findTypeByNameAndFileGlobal(const std::string& name, int scope) {
 	const Type* type = stabsFindTypeByName(name, scope);
 	if(type) return type->type;
 
@@ -81,6 +78,14 @@ const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tup
 
 	if(!type) return NULL;
 	return type->type;
+}
+
+
+const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope) {
+	const TypeBase* t = findTypeByTupleAndFile(tuple, scope);
+	if(t) return t;
+
+	return findTypeByNameAndFileGlobal(name, scope);
 }
 
 const TypeBase* findTypeByTuple(Tuple t) {

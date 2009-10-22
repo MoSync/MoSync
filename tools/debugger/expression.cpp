@@ -247,6 +247,14 @@ std::string sTypes[] = {
 
 std::set<std::string> sTypeSet = std::set<std::string>(sTypes, sTypes + (sizeof(sTypes)/sizeof(std::string)));
 
+const TypeBase* findTypeByNameAndPC(const std::string& t) {
+	LineMapping lm;
+	ASSERT_REG;
+	if(!mapIpEx(r.pc, lm))
+		return NULL;
+	return findTypeByNameAndFileGlobal(t, lm.file + 1);
+}
+
 ExpressionTreeNode* ExpressionParser::castExpression() {
 	const char *expr = mExpr;
 	//return unaryExpression();
@@ -263,7 +271,7 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 		int numStars = 0;
 
 		TypeBase::Type type = TypeBase::eUnknown; 
-		const Type *typeInfo = NULL;
+		const TypeBase *typeInfo = NULL;
 
 		while(1) {
 			if(accept(TOKEN_CONST)) {
@@ -320,18 +328,14 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 					type = TypeBase::eBuiltin;
 				} else {
 
-					LineMapping lm;
-					ASSERT_REG;
-					if(!mapIpEx(r.pc, lm))
-						ExpressionCommon::error("Could not map ip.");
-					typeInfo = stabsFindTypeByName(t.toString(), lm.file + 1);
+					typeInfo = findTypeByNameAndPC(t.toString());
 
 					if(typeInfo) {
 						if(type != TypeBase::eUnknown) {
-							if(type != typeInfo->type->type)
+							if(type != typeInfo->type)
 								ExpressionCommon::error("Invalid type specifier");
 						} else {
-							type = typeInfo->type->type;
+							type = typeInfo->type;
 						}
 					}
 				}
@@ -378,7 +382,7 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 				} else {
 					//const Type* typeInfo = stabsFindTypeByName(t.toString(), 0);
 					if(typeInfo) {
-						typeBase = typeInfo->type;
+						typeBase = typeInfo;
 					} else
 						ExpressionCommon::error("Missing type");
 				}

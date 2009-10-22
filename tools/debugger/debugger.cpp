@@ -87,6 +87,16 @@ void oputc(int c) {
 
 static MoSyncThread sRemoteReadThread, sUserInputThread;
 
+#ifdef _MSC_VER
+#ifdef _DEBUG
+#define COMMAND_LOGGING_ENABLED
+#endif
+#endif
+
+#ifdef COMMAND_LOGGING_ENABLED
+FILE *gCommandLog;
+#endif
+
 static const char* sUsageString =
 "usage: mdb [options]\n"
 "\n"
@@ -128,6 +138,13 @@ static const char* sUsageString =
 int main(int argc, char** argv) {
 #ifdef LOGGING_ENABLED
 	InitLog("mdb_log.txt");
+#endif
+#ifdef COMMAND_LOGGING_ENABLED
+	gCommandLog = fopen("mdb_commands.txt", "w");
+	if(!gCommandLog) {
+		eprintf("Could not open command logging output file.\n");
+		return 1;
+	}
 #endif
 	for(int i=0; i<argc; i++) {
 		LOG("%s ", argv[i]);
@@ -306,6 +323,12 @@ void commandComplete() {
 
 static void executeCommand(const string& line) {
 	LOG("Command: %s\n", line.c_str());
+
+#ifdef COMMAND_LOGGING_ENABLED
+	fprintf(gCommandLog, "%s\n", line.c_str());
+	fflush(gCommandLog);
+#endif
+
 	size_t offset = 0;
 	if(isdigit(line[0])) {	//we've got a token
 		offset = line.find('-');
