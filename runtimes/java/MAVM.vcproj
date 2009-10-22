@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="JavaME"
 	ProjectGUID="{0430165F-29A5-4143-93B8-8BFC6A4BFE65}"
 	RootNamespace="MAVM"
@@ -27,32 +27,11 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="build.bat"
+				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;build.bat"
 				ReBuildCommandLine=""
 				CleanCommandLine=""
 				Output=""
 				PreprocessorDefinitions="WIN32;_DEBUG"
-				IncludeSearchPath=""
-				ForcedIncludes=""
-				AssemblySearchPath=""
-				ForcedUsingAssemblies=""
-				CompileAsManaged=""
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="0"
-			BuildLogFile="build\BuildLog.htm"
-			>
-			<Tool
-				Name="VCNMakeTool"
-				BuildCommandLine="build.bat"
-				ReBuildCommandLine=""
-				CleanCommandLine=""
-				Output=""
-				PreprocessorDefinitions="WIN32;NDEBUG"
 				IncludeSearchPath=""
 				ForcedIncludes=""
 				AssemblySearchPath=""
@@ -94,6 +73,27 @@
 				AdditionalFiles=""
 			/>
 			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="0"
+			BuildLogFile="build\BuildLog.htm"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="build.bat"
+				ReBuildCommandLine=""
+				CleanCommandLine=""
+				Output=""
+				PreprocessorDefinitions="WIN32;NDEBUG"
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
 			/>
 		</Configuration>
 		<Configuration

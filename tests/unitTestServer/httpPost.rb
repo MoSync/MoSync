@@ -10,7 +10,13 @@ class EchoServlet < HTTPServlet::AbstractServlet
 		#resp.header = req.header	#can't; resp doesn't have a header member.
 		#instead, we do this:
 		req.header.each_pair { |key, value|
-			resp[key] = value
+			#if(key != "Transfer-Encoding" && key != "User-Agent" && key != "Content-Length") then
+			if(key.include? "-") then
+				puts "Skipping header '#{key}'"
+			else
+				puts "Reflecting header '#{key}'"
+				resp[key] = value
+			end
 		}
 
 		resp.body = req.body
@@ -18,8 +24,8 @@ class EchoServlet < HTTPServlet::AbstractServlet
 end
 
 def start_webrick(config = {})
-	# always listen on port 8080
-	config.update(:Port => 8080)
+	# always listen on port x
+	config.update(:Port => 5004)
 	server = HTTPServer.new(config)
 	yield server if block_given?
 	['INT', 'TERM'].each {|signal|
@@ -33,3 +39,4 @@ end
 start_webrick(
 #:Logger => debug_logger, :AccessLog => debug_logger
 ) {|server| server.mount('/post', EchoServlet) }
+

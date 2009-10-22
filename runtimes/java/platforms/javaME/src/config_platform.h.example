@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define CONN_PANIC	//makes the conn system panic instead of return errors
 
 //#define SPLASH_SCREEN
-//#define MOSYNC_COMMERCIAL	//controls nag text
+#define MOSYNC_COMMERCIAL	//controls nag text
 
 //#define BFE_EXCEPTION
 

@@ -12,6 +12,7 @@ BD = "../.."
 SOURCES = [".", "Libs/MAStd/automated_tests", "Libs/MAUtil/automated_tests"]
 EXTRA_INCLUDES = ["."]
 EXTRA_CFLAGS = " -Wno-shadow"
+PIPEFLAGS = " -datasize=1024000 -stacksize=128000 -heapsize=512000"
 
 LOCAL_DLLS = ["mautil", "matest"]
 EXENAME	= "unitTest"

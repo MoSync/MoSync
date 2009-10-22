@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //try to write/read from all of them at once.
 
 #define BT_HOST "0080984474c8"	//TDK @ MS-FREDRIK
-#define IP_HOST "192.168.0.173"	//"localhost"	//
+#define IP_HOST "modev.mine.nu" //"192.168.0.173"	//"localhost"	//
 
 #define SOCKET_URL(port) ("socket://" IP_HOST ":" + integerToString(port)).c_str()
 #define HTTP_GET_URL(port) ("http://" IP_HOST ":" +integerToString(port)+ "/server_data.bin").c_str()
@@ -149,8 +149,8 @@ private:
 	char* mClientData;
 	const int mMultiple;
 public:
-	SingleHttpPostCase(int multiple) : TestCase("singlePost"), mReadBuffer(NULL),
-		mClientData(NULL), mHttp(this), mMultiple(multiple)
+	SingleHttpPostCase(int multiple) : TestCase("singlePost"), mHttp(this),
+		mReadBuffer(NULL), mClientData(NULL), mMultiple(multiple)
 	{
 	}
 

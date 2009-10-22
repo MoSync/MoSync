@@ -34,10 +34,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG)
 #define DEBUG_ALWAYS(a) MAMidlet.out.print(a); MAMidlet.out.flush()
 #else
-#ifdef _JaveME
+#ifdef _JavaME
 #define DEBUG_ALWAYS(a) System.out.print(a)
 #elif defined(_android)
 #define DEBUG_ALWAYS(a) Log.i("DEBUG MESSAGE",a)
+#else
+#error Unknown platform!
 #endif //_JavaME
 #endif	//BLUETOOTH_LOG
 #define PRINT_STACK_TRACE \
