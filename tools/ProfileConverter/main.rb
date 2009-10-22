@@ -226,10 +226,10 @@ db.execute( "select name from vendor" ) do |vendor|
 		File.open("#{device_path}/maprofile.h", 'w') do |profile|  
 			profile.puts "#ifndef _MSAB_PROF_H_\n#define _MSAB_PROF_H_"
 			profile.puts
-			profile.puts "MA_PROF_STRING_VENDOR \"#{vendor}\""
-			profile.puts "MA_PROF_STRING_DEVICE \"#{device[1]}\""
-			profile.puts "MA_PROF_VENDOR_#{vendor[0].format}"
-			profile.puts "MA_PROF_DEVICE_#{device[1].format}"
+			profile.puts "#define MA_PROF_STRING_VENDOR \"#{vendor}\""
+			profile.puts "#define MA_PROF_STRING_DEVICE \"#{device[1]}\""
+			profile.puts "#define MA_PROF_VENDOR_#{vendor[0].format}"
+			profile.puts "#define MA_PROF_DEVICE_#{device[1].format}"
 			profile.puts
 			RELEVANT_CAPS.each do |cap|
 				device_query.bind_params(cap.to_s, device[0].to_s);
