@@ -411,6 +411,13 @@ static void checkLastFunctionIntegrity() {
 	if(gLastFunction == NULL)
 		return;
 	for(size_t i=0; i<gLastFunction->locals.size(); i++) {
-		gLastFunction->locals[i].contains(0);
+		ScopedVariable& sv(gLastFunction->locals[i]);
+		if(sv.start == -1 && sv.end == -1) {	//can happen if there are no BRACs
+			sv.start = gLastFunction->address;
+			const FuncMapping* fm = mapFunctionEx(gLastFunction->address);
+			DEBUG_ASSERT(fm != NULL);
+			sv.end = fm->stop;
+		}
+		sv.contains(0);
 	}
 }

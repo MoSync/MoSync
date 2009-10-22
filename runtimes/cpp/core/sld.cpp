@@ -56,6 +56,7 @@ static std::set<LineMapping> sLineSet;	//maps addresses to lines
 typedef std::set<LineMapping, linemap_file_line_less> AddressSet;
 static AddressSet gAddressSet;
 
+//TODO: make into a set, for faster lookup.
 static Vector<FuncMapping> gFuncMap;
 
 struct VarMapping {
