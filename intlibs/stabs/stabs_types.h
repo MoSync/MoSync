@@ -29,6 +29,8 @@ void addType(const Type&);
 const TypeBase* findTypeByTuple(Tuple);
 const TypeBase* findTypeByTupleAndFile(Tuple t, int file);
 
+const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope);
+
 void clearTypes();
 
 #endif	//STABS_TYPES_H

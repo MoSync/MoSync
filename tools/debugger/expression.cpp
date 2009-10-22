@@ -618,28 +618,26 @@ int evaluateThread(void* data) {
 	evnt->err = NULL;
 	try {
 		sReturnValue = sExpressionTree->evaluate();
+
+		const TypeBase* deref = NULL;	
+		if(sReturnValue.getType()==TypeBase::eArray) {
+			deref = (const ArrayType*)sReturnValue.getSymbol().type;
+		} else if(sReturnValue.getType()==TypeBase::ePointer) {
+			deref = sReturnValue.getSymbol().type->deref()->resolve();
+			int addr = (int)sReturnValue;
+			if(addr<=0 || addr>gMemSize) {
+				deref = NULL;
+				sErrorStr = "Invalid pointer.";
+			}
+		}
+
+		if(deref)
+			ExpressionCommon::loadMemory((int)sReturnValue, deref->size);
+
 	} catch(ParseException& e) {
-		//sExpressionParser.printExpressionCommon::error(e);
 		sErrorStr = e.what();
 		evnt->err = sErrorStr.c_str();
 	}
-	//printf("value=\"%f\", type=\"%s\"\n", (float)sReturnValue, Value::primitiveTypeStringMap[sReturnValue.getType()]);
-	//sym.type->printMI(sPrintfPtr, sReturnValue.getDataAddress());
-	
-	const TypeBase* deref = NULL;	
-	if(sReturnValue.getType()==TypeBase::eArray) {
-		deref = (const ArrayType*)sReturnValue.getSymbol().type;
-	} else if(sReturnValue.getType()==TypeBase::ePointer) {
-		deref = sReturnValue.getSymbol().type->deref()->resolve();
-		int addr = (int)sReturnValue;
-		if(addr<=0 || addr>gMemSize) {
-			deref = NULL;
-			sErrorStr = "Invalid pointer.";
-		}
-	}
-
-	if(deref)
-		ExpressionCommon::loadMemory((int)sReturnValue, deref->size);
 
 	evnt->type = DebuggerEvent::eExpressionEvaluated;
 	evnt->erv = &sReturnValue;
@@ -690,17 +688,6 @@ void stackLoaded() {
 	sSymbolIter = sExpressionTree->getSymbols().begin();
 	loadSymbol();
 }
-
-/*
-void  ExpressionParser::setExpression(const char *expr) {
-	mExprString = expr;
-	mExpr = mExprString.c_str();
-}
-
-const char* ExpressionParser::getExpression() {
-	return mExprString.c_str();
-}
-*/
 
 void ExpressionTree::setRoot(ExpressionTreeNode *root) {
 	mRoot = root;

@@ -203,7 +203,7 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 		if(mBases.size()) pf(" : ");
 
 		for(size_t i=0; i<mBases.size(); i++) {
-			pf("public %s", ((StructType*)mBases[i].type)->mName.c_str());
+			pf("public %s", ((StructType*)mBases[i].type->resolve())->mName.c_str());
 			if(i!=mBases.size()-1) pf(", ");
 		}
 
@@ -337,6 +337,12 @@ void EnumType::printTypeMI(printfPtr pf, bool complex) const {
 
 CrossReferenceType::CrossReferenceType(Tuple id, const char *name) :
 DelayedType(id), mName(name) {}
+
+const TypeBase* CrossReferenceType::resolve() const {
+	return findTypeByNameAndTupleAndFileGlobal(mName, mId, mFile);
+}
+
+
 
 #if 0
 void StructCrossReferenceType::printMI(printfPtr, const void*, TypeBase::PrintFormat pf) const {

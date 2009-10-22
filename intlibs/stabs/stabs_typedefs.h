@@ -31,7 +31,7 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
-	const TypeBase* resolve() const;
+	virtual const TypeBase* resolve() const;
 
 	/// Deallocates all recorded objects.
 	static void freeAll();
@@ -195,6 +195,7 @@ protected:
 class CrossReferenceType : public DelayedType {
 public:
 	CrossReferenceType(Tuple, const char* name);
+	const TypeBase* resolve() const;
 
 	const std::string mName;
 protected:

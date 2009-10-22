@@ -57,6 +57,32 @@ const Type* stabsFindTypeByName(const std::string& name, int scope) {
 	return NULL;
 }
 
+const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope) {
+	const TypeBase* t = findTypeByTupleAndFile(tuple, scope);
+	if(t) return t;
+
+	const Type* type = stabsFindTypeByName(name, scope);
+	if(type) return type->type;
+
+	// okay we didn't find it in the local scope, let's
+	// search through all scopes. If we get multiple hits
+	// we have an error..
+	for(size_t i = 0; i < sTypeSets.size(); i++) {
+		LOG("Searching through type set of %s for type definition of %s\n", sTypeFiles[i].c_str(), name.c_str());
+		const Type* type2 = stabsFindTypeByName(name, i);
+		if(type2)  {
+			if(type) {
+				LOG("Multiple instances of type %s found.", name.c_str());
+				return NULL;
+			}
+			type = type2;
+		}
+	}
+
+	if(!type) return NULL;
+	return type->type;
+}
+
 const TypeBase* findTypeByTuple(Tuple t) {
 	return findTypeByTupleAndFile(t, gCurrentFile);
 }
