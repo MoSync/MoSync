@@ -518,11 +518,19 @@ int main(int argc,char *argv[])
 		ExitApp(1);
 	}
 
+
+	if (!ArgLink && !ArgDumpFile && !ArgCustomConfig)
+	{
+		// Add users defines
+		
+		AddLibrarian("defines.lst", 0);
+	}
+
 	if (!ArgLink && !ArgRes && !ArgDumpFile && !ArgCustomConfig)
 	{
-		// Add users keys
+		// Add users defines
 		
-		AddLibrarian("user_keys.txt", 0);
+		//AddLibrarian("defines.lst", 0);
 
 		if (ArgUseMasterDump == 0)			// if the input is a master dump don't load config_asm
 		{

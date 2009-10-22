@@ -1060,6 +1060,17 @@ void Identifier(EVAL *Part1)
 			break;		
 		}
 
+		// Strings
+		
+		if (*FilePtr == '$')
+		{
+			FilePtr++;			
+			GetIdentifier(Part1);
+			break;
+		}
+
+
+
 		Error(Error_Skip, "Unknown Operator '%s'",ThisOp);
 		ExitApp(1);
 	}
@@ -1099,11 +1110,10 @@ extern int ArgRes;
 void GetIdentifier(EVAL *Part1)
 {
 	char	*ThisLabel;
-//	int		Global = 0;
 	int		scope;
 	
 	SYMBOL	*sym;
-	
+		
 	ThisLabel = GetSym();
 	
 	// Set default scope
@@ -1237,6 +1247,48 @@ void GetIdentifier(EVAL *Part1)
 
 	//----------------------------------------
 	//		Symbols in script mode
+	//----------------------------------------
+
+	sym = FindSymbolsOld(ThisLabel,section_Script,section_Script);
+	
+	if (sym)
+	{
+		Part1->Value = sym->Value;
+		return;
+	}
+
+	//----------------------------------------
+	// 		error unresolved external
+	//----------------------------------------
+	
+	// fake it in pass1
+
+	if (Pass == 1)
+	{	
+		Part1->Sym = 0;
+		Part1->Value = 0;
+		Part1->Type = EXP_numeric;
+		ExpResolved = -1;
+		return;
+	}
+
+	doCannotEvaluate(ThisLabel);
+}
+
+
+//****************************************
+// 		  Get String Identifiers
+//****************************************
+
+void GetIdentifierString(EVAL *Part1)
+{
+	char	*ThisLabel;
+	SYMBOL	*sym;
+		
+	ThisLabel = GetSym();
+	
+	//----------------------------------------
+	//		  Strings script mode
 	//----------------------------------------
 
 	sym = FindSymbolsOld(ThisLabel,section_Script,section_Script);

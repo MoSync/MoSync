@@ -891,6 +891,16 @@ short ResourceCommands()
 		return 1;
 	}
 
+//------------------------------------
+//
+//------------------------------------
+
+	if (QToken(".parseheader"))
+	{
+		GetStringName(128);
+		ReadAndParseHeaders(Name);
+		return 1;
+	}
 
 //------------------------------------
 // Other directives
@@ -898,8 +908,6 @@ short ResourceCommands()
 
 	if (QToken(".set"))
 	{
-/*
-*TODO*
 		if (QToken("$"))
 		{
 			char VarName[256];
@@ -912,9 +920,11 @@ short ResourceCommands()
 			GetStringName(128);
 
 			printf("string set %s = '%s'\n", VarName, Name);
+			
+			RedefENumString(VarName, Name);
 			return 1;
 		}
-*/
+
 		GetName();							// Get the new type Name	
 		NeedToken("=");
 		RedefENum(Name, GetExpression());	
@@ -1015,6 +1025,45 @@ short ResourceCommands()
 	if (QToken(".if"))
 	{
 		if (!GetExpression())
+		{
+			if (NextToken("{"))
+			{
+				SkipPair('{','}');
+			}
+		}
+		return 1;
+	}
+
+//------------------------------------
+//
+//------------------------------------
+
+	if (QToken(".ifdef"))
+	{
+		GetName();							// Get the new type Name
+		SkipWhiteSpace();
+		
+		if (!SymbolExists(Name, section_Script, -1))
+		{
+			if (NextToken("{"))
+			{
+				SkipPair('{','}');
+			}
+		}
+		return 1;
+	}
+
+
+//------------------------------------
+//
+//------------------------------------
+
+	if (QToken(".ifndef"))
+	{
+		GetName();							// Get the new type Name	
+		SkipWhiteSpace();
+		
+		if (SymbolExists(Name, section_Script, -1))
 		{
 			if (NextToken("{"))
 			{

@@ -13,6 +13,7 @@ VarPool.c
 SysCall.c
 rescomp.c
 profiles.c
+parseheaders.c
 Librarian.c
 AnalyseCode.c
 CodeTools.c

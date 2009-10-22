@@ -451,7 +451,7 @@ enum
 typedef struct SYMBOL
 {
 	char	*Name;			// Symbol name in Symbol buffer
-	char	*Interface;		// Syscall interface string
+	char	*Interface;		// Syscall interface string (used in script as a string ptr)
 	int		Type;			// Symbol type
 	int		Value;
 	int		EndIP;

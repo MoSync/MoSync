@@ -84,6 +84,7 @@ int InitSymbolTable(void)
 		Sym->Params		= 0;
 		Sym->RetType	= 0;
 		Sym->LabelEnum	= 0;
+		Sym->Interface	= 0;
 		Sym++;
 	}
 	while(--n);
@@ -660,6 +661,13 @@ SYMBOL * RedefENum(char *ThisName,int Value)
 {
 	SYMBOL	sym;
 	SYMBOL	*theSym;
+	char	str[32];
+
+	// Build string
+	
+	itoa(Value, str, 10);
+	
+	// see if the symbols exists
 	
 	theSym = FindSymbolsOld(ThisName,section_Script,section_Script);
 	
@@ -668,7 +676,7 @@ SYMBOL * RedefENum(char *ThisName,int Value)
 		// Allow redefinition
 		
 		theSym->Value = Value;
-
+		theSym->Interface = CreateRedefString(str, theSym->Interface);
 		return theSym;
 	}
 
@@ -676,9 +684,111 @@ SYMBOL * RedefENum(char *ThisName,int Value)
 	sym.Type		= 0;
 	sym.Value		= Value;
 	sym.LocalScope	= 0;
-//	sym.Extern		= 0;
+	sym.Interface	= CreateRedefString(str, 0);
 
 	return	StoreSymbol(&sym,ThisName);
+}
+
+//****************************************
+//			Declare a type
+//****************************************
+
+SYMBOL * RedefENumString(char *ThisName, char *str)
+{
+	SYMBOL	sym;
+	SYMBOL	*theSym;
+	
+	theSym = FindSymbolsOld(ThisName,section_Script,section_Script);
+	
+	if (theSym)
+	{
+		// Allow redefinition
+		
+		theSym->Interface = CreateRedefString(str, theSym->Interface);
+
+		if (isdigit(*str))
+			theSym->Value = atoi(str);
+
+		return theSym;
+	}
+	
+	// Create new string
+
+	sym.Section		= section_Script;
+	sym.Type		= 0;
+	sym.Value		= 0;
+	sym.LocalScope	= 0;
+	sym.Interface	= CreateRedefString(str, 0);
+
+	if (isdigit(*str))
+		sym.Value = atoi(str);
+	
+	return	StoreSymbol(&sym,ThisName);
+}
+
+//****************************************
+//	  Create and Redefine String
+//****************************************
+
+char * CreateRedefString(char *str, char *ref)
+{
+	char *newstr;
+
+	int newlen = strlen(str) + 1;
+	int reflen;
+	
+	// New strings don't have a previous reference, so create new
+
+	if (!ref)
+	{
+		newstr = NewPtr(strlen(str) + 1);
+
+		// if we could'nt allocate return the old ref
+
+		if (!newstr)
+		{
+			Error(Error_Fatal, "Could'nt allocate string");
+			return ref;
+		}
+
+		strcpy(newstr, str);		
+		return newstr;
+	}
+	
+	// Must be an existing ref
+	
+	reflen = strlen(ref) + 1;		// get the current allocated length
+
+	// Do we have a large enough string already ?
+	
+	if (reflen >= newlen)
+	{
+		// We don't need to reallocate becuase the existing
+		// space is big enough
+		
+		strcpy(ref, str);
+		return ref;
+	}
+
+	// ok, we need to reallocate
+
+	newstr = NewPtr(strlen(str) + 1);
+
+	// if we could'nt allocate return the old ref
+
+	if (!newstr)
+	{
+		Error(Error_Fatal, "Could'nt allocate string");
+		return ref;
+	}
+	
+	strcpy(newstr, str);
+
+	// Delete the old ref
+
+	DisposePtr(ref);
+	
+	return newstr;
 }
 
 //****************************************
