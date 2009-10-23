@@ -1061,7 +1061,7 @@ public
 	SYSCALL(void) maResetBacklight() {
 		long currentTime = System.currentTimeMillis();
 		if(currentTime >= backlightResetTime) {
-			Display.getDisplay(mCanvas.mMidlet).flashBacklight(500);
+			mCanvas.mDisplay.flashBacklight(500);
 			backlightResetTime = currentTime + 500;
 		}
 	}
@@ -1714,7 +1714,7 @@ public
 	}
 
 	SYSCALL(int) maVibrate(int duration) {
-		return Display.getDisplay(mCanvas.mMidlet).vibrate(duration) ? 1 : 0;
+		return mCanvas.mDisplay.vibrate(duration) ? 1 : 0;
 	}
 
 	SYSCALL(int) maPlatformRequest(String url) {
@@ -1902,6 +1902,11 @@ public
 		case maIOCtl_maAddDataSize:
 			return maAddDataSize(a, b);
 #endif
+
+		case maIOCtl_maSendToBackground:
+			return maSendToBackground();
+		case maIOCtl_maBringToForeground:
+			return maBringToForeground();
 
 		default:
 			return IOCTL_UNAVAILABLE;
@@ -2457,4 +2462,15 @@ public
 	}
 #endif
 
+
+	int maSendToBackground() {
+		mCanvas.mDisplay.setCurrent(null);
+		return 0;
+	}
+
+	int maBringToForeground() {
+		mCanvas.mDisplay.setCurrent(mCanvas);
+		//maybe we need to set full screen again? maybe not.
+		return 0;
+	}
 }

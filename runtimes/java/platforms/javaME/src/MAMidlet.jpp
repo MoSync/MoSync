@@ -188,11 +188,6 @@ public final class MAMidlet extends MIDlet {
 		destructing = true;
 
 		try {
-			//why do this?
-			//DEBUG_ALWAYS("Display.getDisplay(this).setCurrent()\n");
-			//Display.getDisplay(this).setCurrent(null);
-			//DEBUG_ALWAYS("Display.getDisplay(this).setCurrent() done\n");
-
 			MYASSERT(mCanvas != null);
 			if(mCanvas.mCore != null) {
 				DEBUG_ALWAYS("mCanvas.mCore.destruct()\n");

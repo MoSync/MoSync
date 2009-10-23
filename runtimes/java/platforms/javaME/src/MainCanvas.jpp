@@ -62,9 +62,12 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	private boolean mInSplash = true;
 #endif	//SPLASH_SCREEN
 
+	public Display mDisplay;
+
 	MainCanvas(MAMidlet aMidlet) throws Exception {
 		super(false);	
-		mMidlet = aMidlet;		
+		mMidlet = aMidlet;
+		mDisplay = Display.getDisplay(mMidlet);
 #ifdef SPLASH_SCREEN
 		InputStream is = new ByteArrayInputStream(splash);
 		mCore = new Core(this, is);
@@ -524,12 +527,11 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #endif
 
 		//show the message before we exit
-		Display d = Display.getDisplay(mMidlet);
 		//FIXME: Alert title should be application name
 		mErrorAlert = new Alert(title, message, null, AlertType.ERROR);
 		mErrorAlert.setTimeout(Alert.FOREVER);
 		mErrorAlert.setCommandListener(this);
-		d.setCurrent(mErrorAlert);
+		mDisplay.setCurrent(mErrorAlert);
 #ifdef GDB_DEBUG
 		DEBUG_ALWAYS("stub active\n");
 		if(mCore != null) {
@@ -550,11 +552,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #define COMMERCIAL_TIMEOUT 1000	//should be moved to IDL.
 	public final void startupAlert() throws Exception {
 		DEBUG_ALWAYS("Startup Alert\n");
-		Display d = Display.getDisplay(mMidlet);
 		mStartupAlert = new Alert("", "mosync non-commercial", null, AlertType.INFO);
 		mStartupAlert.setTimeout(COMMERCIAL_TIMEOUT);
 		mStartupAlert.setCommandListener(this);
-		d.setCurrent(mStartupAlert);
+		mDisplay.setCurrent(mStartupAlert);
 		long startTime = System.currentTimeMillis();
 
 #if 0
@@ -626,7 +627,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		mSCState = 1;
 		//should cause Canvas.sizeChanged asynchronously!
 		setFullScreenMode(true);
-		Display.getDisplay(mMidlet).setCurrent(this);
+		mDisplay.setCurrent(this);
 		//must, if this is to work
 #ifdef MA_PROF_BUG_NO_SIZECHANGED
 		initAndStart();
@@ -670,4 +671,16 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		}
 	}
 //#endif
+
+	protected void hideNotify() {
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_LOST;
+		postEvent(event);
+	}
+
+	protected void showNotify() {
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		postEvent(event);
+	}
 }

@@ -21,8 +21,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 
 class MyMoblet : public Moblet, TimerListener, FocusListener {
+private:
+	int mStartTime;
 public:
 	MyMoblet() {
+		mStartTime = maGetMilliSecondCount();
 		printf("Hello World!\n");
 		printf("Press 5 to hide for a few seconds.\n");
 		addFocusListener(this);
@@ -31,21 +34,24 @@ public:
 	void keyPressEvent(int keyCode) {
 		if(keyCode == MAK_5) {
 			int res = maSendToBackground();
-			printf("stb %i\n", res);
+			printf("stb %i @ %i ms\n", res, maGetMilliSecondCount() - mStartTime);
 			addTimer(this, 5000, 1);
+		}
+		if(keyCode == MAK_0) {
+			close();
 		}
 	}
 
 	void runTimerEvent() {
 		int res = maBringToForeground();
-		printf("btf %i\n", res);
+		printf("btf %i @ %i ms\n", res, maGetMilliSecondCount() - mStartTime);
 	}
 
 	void focusLost() {
-		printf("focusLost\n");
+		printf("focusLost @ %i ms\n", maGetMilliSecondCount() - mStartTime);
 	}
 	void focusGained() {
-		printf("focusGained\n");
+		printf("focusGained @ %i ms\n", maGetMilliSecondCount() - mStartTime);
 	}
 };
 
