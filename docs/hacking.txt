@@ -205,7 +205,7 @@ Work-in-progress build description for GNU/Linux and other Unix-like systems:
  * Set the MOSYNCDIR environment variable to the root of the source tree. If
    this isn't set properly, the build system will become very confused.
 
- * Make sure that the bin/ directory is in your PATH.
+ * Make sure that the directory $MOSYNCDIR/bin is in your PATH.
 
  * Run 'rake'.
 
