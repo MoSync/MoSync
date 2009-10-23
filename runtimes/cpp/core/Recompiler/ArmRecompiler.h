@@ -109,7 +109,8 @@ AA::Register PIPE_TO_ARM_MAP(AA::Register temp) { assm.MOV_imm32(temp, (int) mPi
 }
 // Symbian can't recompile using any of the following registers AA::R9, AA::R10, AA::SP, AA::LR, AA::IP 
 
-#define NUM_STATICALLY_ALLOCATED_REGISTERS 5
+#define NUM_STATICALLY_ALLOCATED_REGISTERS 0
+//#define NUM_STATICALLY_ALLOCATED_REGISTERS 5
 
 #define loadEnvironmentRegisters(x)
 #endif
