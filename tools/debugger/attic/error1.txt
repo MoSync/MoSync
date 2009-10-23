@@ -1,0 +1,24 @@
+322-gdb-set confirm off
+323-gdb-set width 0
+324-gdb-set height 0
+325-interpreter-exec console echo
+326-target-select sim
+327-thread-info
+328-data-list-register-names
+329-break-insert C:/MoSync/examples/3dLines/main.cpp:108
+330-break-insert C:/MoSync/examples/3dLines/main.cpp:97
+331-exec-continue
+332-test-wait
+333-thread-info
+334-stack-info-depth
+335-stack-list-frames 0 2
+336-data-list-changed-registers
+337-var-create - * obj
+338 ptype LineObject *
+339 ptype obj
+340-var-evaluate-expression var0
+341-var-list-children var0
+342-var-info-expression var0
+343 ptype LineObject
+344-var-evaluate-expression var0.0
+345-var-list-children var0.0
