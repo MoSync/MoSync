@@ -30,7 +30,9 @@ typedef unsigned int uint32;
 
 //#define DEBUG_DISASM
 
+#ifdef _WIN32
 #define USE_ENVIRONMENT_REGISTERS
+#endif
 
 #ifdef DEBUG_DISASM
 #define AVMPLUS_VERBOSE
@@ -61,7 +63,7 @@ namespace MoSync {
 
 	protected:
 
-#ifdef SYMBIAN
+#ifdef __SYMBIAN32__
 		RChunk mChunk;
 		RHeap* mHeap;
 #endif
@@ -103,15 +105,11 @@ AA::Register PIPE_TO_ARM_MAP(AA::Register temp) { assm.MOV_imm32(temp, (int) mPi
 	AA::R5,\
 	AA::R6,\
 	AA::R7,\
-	AA::R8,\
-	AA::R9,\
-	AA::R10,\
-	AA::SP,\
-	AA::LR,\
-	AA::IP \
+	AA::R8 \
 }
-//#define NUM_STATICALLY_ALLOCATED_REGISTERS 0
-#define NUM_STATICALLY_ALLOCATED_REGISTERS 10
+// Symbian can't recompile using any of the following registers AA::R9, AA::R10, AA::SP, AA::LR, AA::IP 
+
+#define NUM_STATICALLY_ALLOCATED_REGISTERS 5
 
 #define loadEnvironmentRegisters(x)
 #endif

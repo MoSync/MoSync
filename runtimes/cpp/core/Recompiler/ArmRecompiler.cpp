@@ -147,7 +147,7 @@ using namespace Core;
 //#endif
 
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
-	#ifdef SYMBIAN
+	#ifdef __SYMBIAN32__
 		//return new (ELeave) byte[size];
 		//return User::AllocL(size);
 		if(mHeap == NULL) {
@@ -168,7 +168,7 @@ using namespace Core;
 	}
 
 	void MoSync::ArmRecompiler::freeCodeMemory(void *addr) {
-	#ifdef SYMBIAN
+#ifdef __SYMBIAN32__
 		//delete (byte*)addr;
 		//User::Free(addr);
 		LOG("freeCode 0x%08x\n", addr);
@@ -179,7 +179,7 @@ using namespace Core;
 	}
 
 	void MoSync::ArmRecompiler::flushInstructionCache(void *addr, int len) {
-	#ifdef SYMBIAN
+	#ifdef __SYMBIAN32__
 	#ifndef __SERIES60_3X__
 		// Adjust start and len to page boundaries
 		addr = (void*) ((int)addr & ~0xFFF);
@@ -962,7 +962,7 @@ namespace MoSync {
 
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
-#ifdef SYMBIAN
+#ifdef __SYMBIAN32__
 		mHeap = NULL;
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
@@ -1158,11 +1158,11 @@ namespace MoSync {
 		mPipeToArmInstMap = NULL;
 		entryPoint.mipStart = NULL;
 
-	#ifdef SYMBIAN
+	#ifdef __SYMBIAN32__
 		//mHeap = NULL;
 	#endif
 		mPipeToArmInstMap = new
-	#ifdef SYMBIAN
+	#ifdef __SYMBIAN32__
 		(ELeave)
 	#endif
 		AA::MDInstruction[mEnvironment.codeSize];
@@ -1213,7 +1213,7 @@ namespace MoSync {
 			freeCodeMemory(entryPoint.mipStart);
 			entryPoint.mipStart = NULL;
 		}
-	#ifdef SYMBIAN
+	#ifdef __SYMBIAN32__
 		LOG("if(mHeap != NULL)\n");
 		if(mHeap != NULL) {
 			LOG("heapClose\n");
