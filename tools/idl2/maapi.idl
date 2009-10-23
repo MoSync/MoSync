@@ -2343,15 +2343,15 @@ interface MAAPI {
 
 		/**
 		* Sends the application to the background, unless it's already there.
+		* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_LOST \endlink event.
 		* \note Only available on multi-tasking operating systems.
-		* \note Experimental function, only available on Symbian.
 		*/
 		int maSendToBackground();
 
 		/**
 		* Brings the application to the foreground, unless it's already there.
+		* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_GAINED \endlink event.
 		* \note Only available on multi-tasking operating systems.
-		* \note Experimental function, only available on Symbian.
 		*/
 		int maBringToForeground();
 
@@ -2360,7 +2360,7 @@ interface MAAPI {
 		* Increases the size of a data object.
 		* \note There is no way to decrease the size of a data object.
 		* However, you can destroy it.
-		* \returns RES_OK if succeded and RES_OUT_OF_MEMORY if failed.
+		* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
 		* \see maDestroyObject()
 		* \see maCreateData()
 		* \see maGetDataSize()

@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
+#include <SDL/SDL_syswm.h>
 //#include <SDL/SDL_ffmpeg.h>
 #include <string>
 #include <map>
@@ -125,6 +126,9 @@ namespace Base {
 
 	static void MAHandleKeyEventMAK(int mak, bool pressed);
 	static void MAHandleKeyEvent(int sdlk, bool pressed);
+
+	static int maSendToBackground();
+	static int maBringToForeground();
 
 //********************************************************************
 
@@ -547,43 +551,15 @@ namespace Base {
 		pr.ip = Base::getRuntimeIp();
 	}
 
-#ifdef WIN32
-	struct WINDOW_INFO {
-		HWND hWnd;
-		HANDLE hThread;
-	};
-
-	BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam) {
-		WINDOW_INFO* pInfo = (WINDOW_INFO*)lParam;
-		DWORD processId;
-		DWORD threadId = GetWindowThreadProcessId(hwnd, &processId);
-		if(processId == GetCurrentProcessId()) {
-			pInfo->hWnd = hwnd;
-			pInfo->hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threadId);
-			if(pInfo->hThread)
-				SetLastError(0);
-			return FALSE;
-		}
-		return TRUE;
-	}
-
-	//Returns the first top-level window created by the current process that can be found.
-	static int GetFirstCurrentProcessWindow(WINDOW_INFO* pInfo) {
-		pInfo->hWnd = NULL;
-		pInfo->hThread = NULL;
-		EnumWindows(MyEnumWindowsProc, (LPARAM)&pInfo);
-		TEST_NZ(GetLastError());
-		return 1;
-	}
-#endif
-
 	static void MoSyncMessageBox(const char* msg, const char* title) {
 		if(!gShowScreen)
 			return;
 #ifdef WIN32
-		Base::WINDOW_INFO info;
-		Base::GetFirstCurrentProcessWindow(&info);
-		MessageBox(info.hWnd, msg, title, MB_ICONERROR);
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		if(!SDL_GetWMInfo(&info))
+			info.window = NULL;
+		MessageBox(info.window, msg, title, MB_ICONERROR);
 #elif defined(LINUX)
 		GtkWidget* dialog = gtk_message_dialog_new (NULL,
 			GTK_DIALOG_DESTROY_WITH_PARENT,
@@ -763,9 +739,15 @@ namespace Base {
 		}
 
 #ifdef WIN32
-		WINDOW_INFO info;
-		GetFirstCurrentProcessWindow(&info);
-		SuspendThread(info.hThread);
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		HANDLE hThread = NULL;
+		if(SDL_GetWMInfo(&info)) {
+			DWORD processId;
+			DWORD threadId = GetWindowThreadProcessId(info.window, &processId);
+			hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threadId);
+		}
+		SuspendThread(hThread);
 		MoSyncMessageBox(
 			"The application failed to respond to the Close Event and will be terminated.",
 			"MoSync Panic");
@@ -2044,7 +2026,12 @@ namespace Base {
 			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
 		//case maIOCtl_maStartVideoStream:
 			//return maStartVideoStream(SYSCALL_THIS->GetValidatedStr(a));
-		
+
+		case maIOCtl_maSendToBackground:
+			return maSendToBackground();
+		case maIOCtl_maBringToForeground:
+			return maBringToForeground();
+
 		case maIOCtl_maFrameBufferGetInfo:
 			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
 		case maIOCtl_maFrameBufferInit:
@@ -2222,6 +2209,38 @@ namespace Base {
 		str += "\n";
 		bool res = file.write(str.c_str(), str.size());
 		return res ? 0 : CONNERR_GENERIC;
+	}
+
+	static int Base::maSendToBackground() {
+#ifdef WIN32
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		if(SDL_GetWMInfo(&info)) {
+			return ShowWindow(info.window, SW_MINIMIZE);
+		} else {
+			return -2;
+		}
+#elif defined(LINUX)
+		BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+#else
+#error Unknown platform!
+#endif
+	}
+
+	static int Base::maBringToForeground() {
+#ifdef WIN32
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		if(SDL_GetWMInfo(&info)) {
+			return ShowWindow(info.window, SW_RESTORE);
+		} else {
+			return -2;
+		}
+#elif defined(LINUX)
+		BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+#else
+#error Unknown platform!
+#endif
 	}
 
 void MoSyncExit(int r) {

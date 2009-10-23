@@ -42,6 +42,12 @@ public:
 		}
 	}
 
+	void keyReleaseEvent(int keyCode) {
+		if(keyCode == MAK_5) {
+			printf("r5 @ %i ms\n", maGetMilliSecondCount() - mStartTime);
+		}
+	}
+
 	void runTimerEvent() {
 		int res = maBringToForeground();
 		printf("btf %i @ %i ms\n", res, maGetMilliSecondCount() - mStartTime);
