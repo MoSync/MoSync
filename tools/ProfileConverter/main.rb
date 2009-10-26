@@ -352,10 +352,11 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		release_defines = ['PHONE_RELEASE']
-		release_defines << "MOSYNC_COMMERCIAL";
-#		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :s60v2 || platform_name == :s60v3)
-#			release_defines << "USE_ARM_RECOMPILER"
-#		end
+		release_defines << "MOSYNC_COMMERCIAL"
+		#release_defines << "LOGGING_ENABLED"
+		if(platform_name == :sp2003 || platform_name == :wm5)# || platform_name == :s60v2 || platform_name == :s60v3)
+			release_defines << "USE_ARM_RECOMPILER"
+		end
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
 		
 		debug_defines = ['PUBLIC_DEBUG']

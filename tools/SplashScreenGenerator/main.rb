@@ -43,6 +43,12 @@ File.open('\mb\revision', 'r') do |f|
 	end
 end
 
+buildNightly = true
+nightly = ENV['NIGHTLY']
+if nightly.class != NilClass
+	buildNightly = false
+end
+
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
             "Mobile Sorcery, the Mobile Sorcery logo, MoSync and the MoSync " + 
 			"logo are trademarks of Mobile Sorcery AB."
@@ -60,22 +66,40 @@ header.annotate(img, 271, 200, 275, 110, HEADER_TEXT) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
-	self.font = 'Verdana'
-	self.pointsize = 14
-	self.font_weight = Magick::LighterWeight
-	self.fill = 'white'
-	self.gravity = Magick::NorthWestGravity
-end
+if(buildNightly)
+	header.annotate(img, 271, 340, 275, 130, "Nightly Build r#{version[1].strip}" ) do
+		self.font = 'Verdana'
+		self.pointsize = 14
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
 
-header.annotate(img2, 271, 340, 180, 260, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
-	self.font = 'Verdana'
-	self.pointsize = 12
-	self.font_weight = Magick::LighterWeight
-	self.fill = 'white'
-	self.gravity = Magick::NorthWestGravity
-end
+	header.annotate(img2, 271, 340, 180, 260, "Nightly Build r#{version[1].strip}" ) do
+		self.font = 'Verdana'
+		self.pointsize = 12
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+else
+	header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+		self.font = 'Verdana'
+		self.pointsize = 14
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
 
+	header.annotate(img2, 271, 340, 180, 260, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+		self.font = 'Verdana'
+		self.pointsize = 12
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+end
+	
 platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do 
 	self.size = "300x200"
 	self.pointsize = 12
