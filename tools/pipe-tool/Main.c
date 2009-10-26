@@ -685,6 +685,7 @@ Options:\n\
   -elim                eliminate unreferenced code/data\n\
   -no-verify           prevent code verification\n\
   -sld                 output source/line translation in 'sld.tab'\n\
+	-collect-stabs       output debug information in 'stabs.tab'\n\
 \n\
 Resource compiler only:\n\
   -depend=file         output dependencies in makefile syntax\n\

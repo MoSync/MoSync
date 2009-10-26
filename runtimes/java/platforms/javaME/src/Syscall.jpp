@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "core_helpers.h"
 #include "generated\MAAPI_consts.h"
 #include "generated\IX_RESOURCE_TYPES_CONSTS.h"
+#include "generated\IX_SYSPROP_CONSTS.h"
 
 import javax.microedition.lcdui.*;
 import javax.microedition.media.*;
@@ -137,6 +138,9 @@ IMPLEMENTS MoSync
 		mGraphics = mCanvasGraphics = mCanvas.getGraphics();
 		//DEBUG_ALWAYS("Syscall graphics: " + mGraphics.toString() + "\n");
 		DEBUG_ASSERT(mGraphics != null);
+
+		//hack?
+		mGraphics.setFont(Font.getFont(Font.FACE_MONOSPACE, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 
 		//MA_PROF_SETCLIPFORFULLSCREENNEEDED
 		DEBUG_ALWAYS("clip: "+mCanvas.getWidth()+", "+mCanvas.getHeight()+"\n");
@@ -1777,6 +1781,8 @@ public
 		if(hash == MAIDL_HASH) {
 			DEBUG_ALWAYS("IDL version match!\n");
 		} else {
+			DEBUG_ALWAYS("Runtime: 0x"+Hex0(MAIDL_HASH)+"\n");
+			DEBUG_ALWAYS("User: 0x"+Hex0(hash)+"\n");
 			throw new Error("IDL Hash Mismatch!\n");
 		}
 		return MAIDL_HASH;
@@ -1908,9 +1914,23 @@ public
 		case maIOCtl_maBringToForeground:
 			return maBringToForeground();
 
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(readMemString(a), b, c);
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
+	}
+
+	int maGetSystemProperty(String key, MAAddress buf, int size) {
+		String value = System.getProperty(key);
+		if(value == null)
+			return -2;
+		if(value.length() >= size)
+			return value.length() + 1;
+		writeMemBytes(buf, value.getBytes(), 0, value.length());
+		WBYTE(buf + value.length(), (byte)0);
+		return value.length() + 1;
 	}
 
 #ifdef MA_IX_AUDIOBUFFER

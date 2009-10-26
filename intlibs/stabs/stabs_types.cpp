@@ -68,6 +68,7 @@ const TypeBase* findTypeByNameAndFileGlobal(const std::string& name, int scope) 
 		LOG("Searching through type set of %s for type definition of %s\n", sTypeFiles[i].c_str(), name.c_str());
 		const Type* type2 = stabsFindTypeByName(name, i);
 		if(type2)  {
+			LOG("Found one!\n");
 			if(type) {
 				LOG("Multiple instances of type %s found.", name.c_str());
 				return NULL;

@@ -2367,6 +2367,21 @@ interface MAAPI {
 		*/
 		int maAddDataSize(in MAHandle data, in int size);
 #endif	//IX_SEGMENTED_DATA
+
+#if IX_SYSPROP
+		/**
+		* Retrieves the value of a Java System Property.
+		* \param key The property's key.
+		* \param buf A buffer where the value should be written.
+		* \param size The size of the buffer, in bytes.
+		* \returns The length of the value, including the terminating zero.
+		* If this is less than \a size, the value will not have been copied to be buffer.
+		* In that case, you can make a bigger buffer and try again.
+		* If the property did not exist (System.getProperty() returned null),
+		* -2 will be returned.
+		*/
+		int maGetSystemProperty(in MAString key, out MAString buf, in int size);
+#endif	//IX_SYSPROP
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
