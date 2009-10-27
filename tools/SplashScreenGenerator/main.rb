@@ -43,10 +43,10 @@ File.open('\mb\revision', 'r') do |f|
 	end
 end
 
-buildNightly = true
+buildNightly = false
 nightly = ENV['NIGHTLY']
 if nightly.class != NilClass
-	buildNightly = false
+	buildNightly = true
 end
 
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
@@ -66,7 +66,8 @@ header.annotate(img, 271, 200, 275, 110, HEADER_TEXT) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-if(buildNightly)
+if(buildNightly == true)
+	puts "Injecting string to images : Nightly Build r#{version[1].strip}"
 	header.annotate(img, 271, 340, 275, 130, "Nightly Build r#{version[1].strip}" ) do
 		self.font = 'Verdana'
 		self.pointsize = 14
@@ -83,6 +84,7 @@ if(buildNightly)
 		self.gravity = Magick::NorthWestGravity
 	end
 else
+	puts "Injecting string to images : Version #{version[0].strip} ( Revision #{version[1].strip} )"
 	header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
 		self.font = 'Verdana'
 		self.pointsize = 14
