@@ -204,6 +204,12 @@ File.makedirs RUNTIME_DIR
 definitions = {}
 
 db.execute( "select name from vendor" ) do |vendor|
+	
+	# fix to exclude a lot of entries which is not real devices
+	if (vendor.to_s.eql?("Generic") || vendor.to_s.eql?("Native"))
+		next
+	end
+	
 	puts vendor
 	File.makedirs "#{VENDOR_DIR}/#{vendor}"
 	
@@ -353,8 +359,8 @@ runtimes.each do |platform_name, platform|
 		
 		release_defines = ['PHONE_RELEASE']
 		release_defines << "MOSYNC_COMMERCIAL"
-		#release_defines << "LOGGING_ENABLED"
-		if(platform_name == :sp2003 || platform_name == :wm5)# || platform_name == :s60v2 || platform_name == :s60v3)
+		release_defines << "LOGGING_ENABLED"
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :s60v2 || platform_name == :s60v3)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
