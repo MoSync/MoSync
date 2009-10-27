@@ -1929,6 +1929,7 @@ public
 		if(value.length() >= size)
 			return value.length() + 1;
 		writeMemBytes(buf, value.getBytes(), 0, value.length());
+		int[] mem_ds = mCore.mMem_ds;
 		WBYTE(buf + value.length(), (byte)0);
 		return value.length() + 1;
 	}
