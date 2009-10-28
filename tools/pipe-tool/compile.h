@@ -377,8 +377,8 @@ typedef struct
 //****************************************************************************************
 //								Header file for Symbols
 //****************************************************************************************
-
-#define NAME_MAX 8192
+// TODO: maxlen for string sizes seems to be short
+#define NAME_MAX 32767
 
 #define SYMMAX_MIN 1024				// Maximum symbols in table
 #define SYMMAX (64*1024)			// Maximum symbols in table

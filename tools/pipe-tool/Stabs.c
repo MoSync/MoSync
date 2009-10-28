@@ -261,7 +261,7 @@ void Stabs_Write()
 
 void StabsEmit(char *Template, ...)
 {
-	char 	Str[8192];
+	char 	Str[NAME_MAX];
 	va_list args;
 	int n,len;
 

@@ -13,9 +13,9 @@
 334-stack-info-depth
 335-stack-list-frames 0 2
 336-data-list-changed-registers
-337-var-create - * obj
+337-var-create - * gObj
 338 ptype LineObject *
-339 ptype obj
+339 ptype gObj
 340-var-evaluate-expression var0
 341-var-list-children var0
 342-var-info-expression var0

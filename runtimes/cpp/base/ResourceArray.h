@@ -133,8 +133,8 @@ namespace Base {
 		TYPES(DEFINE_GET);
 		TYPES(DEFINE_EXTRACT);
 
-#define TESTINDEX(index, mN) { if((index) >= mN || (index) == 0 ) {\
-	LOG("Bad resource index: %i. mN=%i.\n", index, mN);\
+#define TESTINDEX(index, size) { MYASSERT(size>1, ERR_RES_NO_RESOURCES); if((index) >= size || (index) == 0 ) {\
+	LOG("Bad resource index: %i. size=%i.\n", index, size);\
 	BIG_PHAT_ERROR(ERR_RES_INVALID_INDEX); } }
 
 		void destroy(unsigned index) {

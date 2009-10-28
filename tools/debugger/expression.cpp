@@ -679,6 +679,7 @@ void memoryLoaded() {
 }
 
 void ExpressionCommon::loadMemory(int addr, int len) {
+	if(addr == 0) ExpressionCommon::error("Trying to load memory from NULL");
 	DebuggerEvent *evnt = new DebuggerEvent;
 	evnt->type = DebuggerEvent::eReadMemory;
 	evnt->src = addr;
