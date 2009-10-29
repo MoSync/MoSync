@@ -1,0 +1,422 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+SYSCALL(int) maSetColor(int argb) {
+	// defaults to fully invisible without this
+	if(argb<=0xffffff) argb += 0xff000000;
+	DEBUG("MoSync Syscall - maSetColor " + argb);
+	
+	int t = mPaint.getColor();
+	mPaint.setColor(argb);
+	return t;
+}
+SYSCALL(void) maSetClipRect(int left, int top, int width, int height) {
+/* FIX-ME	
+	mGraphics.setClip(left, top, width, height);
+	mClipLeft = left;
+	mClipTop = top;
+	mClipWidth = width;
+	mClipHeight = height;
+*/		
+}
+
+SYSCALL(void) maGetClipRect(Address rect) {
+/* FIX-ME	
+#ifdef DEBUG_MEMORY
+	MYASSERT((rect & 3) == 0);
+#endif
+	rect>>=2;
+	int[] mem_ds = CORE.mMem_ds;
+	mem_ds[rect] = mClipLeft;
+	mem_ds[rect+1] = mClipTop;
+	mem_ds[rect+2] = mClipWidth;
+	mem_ds[rect+3] = mClipHeight;
+*/		
+}	
+
+SYSCALL(void) maPlot(int posX, int posY) {
+	DEBUG("MoSync Syscall - maPlot");
+	mCanvas.drawPoint(posX, posY, mPaint);
+}
+
+SYSCALL(void) maLine(int startX, int startY, int endX, int endY) {
+	DEBUG("MoSync Syscall - maLine");
+	mCanvas.drawLine(startX, startY, endX, endY, mPaint);
+}
+SYSCALL(void) maFillRect(int left, int top, int sizeX, int sizeY) {
+	DEBUG("MoSync Syscall - maFillRect");
+	mCanvas.drawRect(left, top, left+sizeX, top+sizeY, mPaint);
+}
+
+SYSCALL(void) maFillTriangleStrip(Address address, int count) {
+/* FIX-ME	
+	int i = 2;
+	MYASSERT(count >= 3);
+	address -= 4;
+	int[] mem_ds = CORE.mMem_ds;
+#define READ RINT(address += 4)
+
+	int xa = READ;
+	int ya = READ;
+
+	int xb = READ;
+	int yb = READ;
+	for(;;) {
+		int xc = READ;
+		int yc = READ;
+		mGraphics.fillTriangle(xa, ya, xb, yb, xc, yc);
+		i++;
+		if(i >= count)
+			break;
+		xa = READ;
+		ya = READ;
+		mGraphics.fillTriangle(xb, yb, xc, yc, xa, ya);
+		i++;
+		if(i >= count)
+			break;
+		xb = READ;
+		yb = READ;
+		mGraphics.fillTriangle(xc, yc, xa, ya, xb, yb);
+		i++;
+		if(i >= count)
+			break;			
+	}
+*/		
+}
+
+
+SYSCALL(void) maFillTriangleFan(Address address, int count) {
+/* FIX-ME	
+	int i = 2;
+	MYASSERT(count >= 3);
+	address -= 4;
+	int[] mem_ds = CORE.mMem_ds;
+#define READ RINT(address += 4)
+
+	int xa = READ;
+	int ya = READ;
+
+	int xb = READ;
+	int yb = READ;
+	for(;;) {
+		int xc = READ;
+		int yc = READ;
+		mGraphics.fillTriangle(xa, ya, xb, yb, xc, yc);
+		i++;
+		if(i >= count)
+			break;
+		xb = READ;
+		yb = READ;
+		mGraphics.fillTriangle(xa, ya, xc, yc, xb, yb);
+		i++;
+		if(i >= count)
+			break;			
+	}
+*/		
+//drawVertices(Canvas.VertexMode mode, int vertexCount, float[] verts, int vertOffset, float[] texs, int texOffset, int[] colors, int colorOffset, short[] indices, int indexOffset, int indexCount, Paint paint)
+}	
+
+SYSCALL(MAExtent) maGetTextSize(final String str) {
+/* FIX-ME	
+	DEBUG_ASSERT(mGraphics != null);
+	Font font = mGraphics.getFont();
+	DEBUG_ASSERT(font != null);
+	return EXTENT(font.stringWidth(str), font.getHeight());
+*/
+	return 0;
+}
+
+SYSCALL(void) maDrawText(int left, int top, final String str) {
+	DEBUG("MoSync Syscall - maDrawText :"+str+"\n");
+	mCanvas.drawText(str, left, top, mPaint);
+}
+
+SYSCALL(void) maUpdateScreen() {
+	DEBUG("MoSync Syscall - maUpdateScreen");
+	Canvas lockedCanvas = null;
+	try {
+		lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas(null);
+		synchronized (mMoSyncView.mSurfaceHolder) {
+			lockedCanvas.drawBitmap(mBitmap, 0, 0, mBlitPaint);
+		}
+	} finally {
+		if (lockedCanvas != null) {
+			mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+		}
+	}
+	mCore.yield();
+}
+
+SYSCALL(MAExtent) maGetScrSize() {
+	DEBUG("MoSync Syscall - maGetScrSize (width:" + mWidth + " height:" + mHeight + ")\n");
+	return EXTENT(mWidth, mHeight);
+}
+
+SYSCALL(void) maDrawImage(MAHandle image, int left, int top) {
+	DEBUG("MoSync Syscall - maDrawImage");
+	mCanvas.drawBitmap(((ImageCache) getResource(image)).i, left, top, mBlitPaint);
+}
+
+SYSCALL(void) maDrawRGB(MAPoint2d dstPoint, Address src, MARect srcRect, int scanlength) {
+/* FIX-ME	
+	// last param is if alpha should be taken into account
+	int[] mem_ds = CORE.mMem_ds;
+	mGraphics.drawRGB(mem_ds,
+		(src>>2) + MARect_left(srcRect) + MARect_top(srcRect) * scanlength,
+		scanlength,
+		MAPoint2d_x(dstPoint),
+		MAPoint2d_y(dstPoint),
+		MARect_width(srcRect),
+		MARect_height(srcRect),
+		true);
+*/			
+}
+
+SYSCALL(void) maDrawImageRegion(MAHandle image, MARect srcRect,
+	MAPoint2d dstTopLeft, int transformMode)
+{
+/* FIX-ME	
+	int[] mem_ds = CORE.mMem_ds;
+	int srcRect_left = MARect_left(srcRect);
+	int srcRect_top = MARect_top(srcRect);
+	int srcRect_width = MARect_width(srcRect);
+	int srcRect_height = MARect_height(srcRect);
+	int dstTopLeft_x = MAPoint2d_x(dstTopLeft);
+	int dstTopLeft_y = MAPoint2d_y(dstTopLeft);
+	Image img = ((ImageCache)getResource(image)).i;
+
+	final int imgHeight = img.getHeight();
+	if(srcRect_top > imgHeight)
+		return;
+	final int imgWidth = img.getWidth();
+	if(srcRect_left > imgWidth)
+		return;
+	if(srcRect_top < 0) {
+		srcRect_height += srcRect_top;
+		srcRect_top = 0;
+	}
+	if(srcRect_left < 0) {
+		srcRect_width += srcRect_left;
+		srcRect_left = 0;
+	}
+	if(srcRect_top + srcRect_height > imgHeight) {
+		srcRect_height = imgHeight - srcRect_top;
+	}
+	if(srcRect_left + srcRect_width > imgWidth) {
+		srcRect_width = imgWidth - srcRect_left;
+	}
+	if(srcRect_width <= 0 || srcRect_height <= 0)
+		return;
+
+	mGraphics.drawRegion(img, srcRect_left, srcRect_top, srcRect_width, srcRect_height,
+		transformMode, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
+*/			
+}
+
+
+SYSCALL(MAHandle) maInitLayer(MAHandle tileResource, MAHandle mapResource,
+	int layerSizeX, int layerSizeY)
+{
+/* FIX-ME	
+	Tileset tileset = (Tileset)getResource(tileResource);
+
+	TiledLayer layer = new TiledLayer(layerSizeX, layerSizeY, tileset.image,
+		tileset.tileSizeX, tileset.tileSizeY);
+
+	mTiledLayers.addElement(layer);
+	MAHandle ret = mTiledLayers.size()-1;
+
+	maSetMap(ret, mapResource, 0, 0);
+
+	return ret;
+*/
+	return -1;
+}
+
+SYSCALL(void) maDisposeLayer(MAHandle layer) {
+/* FIX-ME	
+	mTiledLayers.setElementAt(null, layer);
+*/		
+}
+
+SYSCALL(void) maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int destY) {	
+/* FIX-ME	
+	Tilemap map = (Tilemap)getResource(srcMapResource);
+	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
+
+	int tileSizeX = destLayer.getCellWidth();
+	int tileSizeY = destLayer.getCellHeight();
+
+	int layerWidth = destLayer.getColumns();
+	int layerHeight = destLayer.getRows();
+
+	int xStart = MAX(destX,0);
+	int xEnd = MAX(MIN(destX + map.width, layerWidth), 0);
+	int yStart = MAX(destY,0);
+	int yEnd = MAX(MIN(destY + map.height, layerHeight), 0);
+
+	int srcOffX = - destX;
+	int srcOffY = - destY;
+
+	for(int i = yStart; i < yEnd; i++) {
+		for(int j = xStart; j < xEnd; j++) {
+			destLayer.setCell(j, i, map.getValue(j + srcOffX, i + srcOffY));
+		}
+	}
+*/		
+}
+
+SYSCALL(void) maChangeTileSet(MAHandle layer, MAHandle tileResource) {
+/* FIX-ME	
+	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
+	Tileset tileset = (Tileset)getResource(tileResource);
+	destLayer.setStaticTileSet(tileset.image, tileset.tileSizeX, tileset.tileSizeY);
+*/		
+}
+
+SYSCALL(void) maDrawLayer(MAHandle layer, int offsetX, int offsetY) {
+/* FIX-ME	
+	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
+	destLayer.setPosition(offsetX, offsetY);
+	destLayer.paint(mGraphics);
+*/		
+}
+
+SYSCALL(void) maSetTile(MAHandle layer, int x, int y, int tileNumber) {
+/* FIX-ME	
+	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
+	destLayer.setCell(x,y, tileNumber);
+*/		
+}
+
+SYSCALL(MAExtent) maGetImageSize(MAHandle image) {
+	Bitmap bitmap = ((ImageCache) getResource(image)).i;
+	return EXTENT(bitmap.getWidth(), bitmap.getHeight());
+}
+
+SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int scanlength) {
+/* FIX-ME	
+	Image img = ((ImageCache)getResource(image)).i;
+	int[] mem_ds = CORE.mMem_ds;
+	img.getRGB(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
+		MARect_width(srcRect), MARect_height(srcRect));
+*/			
+}
+
+SYSCALL(MAHandle) maSetDrawTarget(MAHandle handle) {
+/* FIX-ME	
+	MAHandle temp = mDrawTargetHandle;
+	if(mDrawTarget != null) {
+		setResource(mDrawTargetHandle, mDrawTarget);
+		mDrawTarget = null;
+	}
+	if(handle == HANDLE_SCREEN) {
+		mGraphics = mCanvasGraphics;
+	} else {
+		ImageCache ic = (ImageCache)getResource(handle);
+		if(ic.g == null)
+			ic.g = ic.i.getGraphics();
+		mGraphics = ic.g;
+		setResource(handle, mFlux);
+		mDrawTarget = ic;
+	}
+	mDrawTargetHandle = handle;
+	return temp;
+*/ 
+	return -1;
+}
+
+SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size) 
+	throws Exception
+{
+/* FIX-ME	
+	BinaryInterface bi = (BinaryInterface)getResource(data);
+	MYASSERT(bi.size() >= offset + size);
+	InputStream is = bi.getInputStream();
+	is.skip(offset);
+	//LimitedLengthInputStream llis = new LimitedLengthInputStream(is, size);
+	//addResource(placeholder, new ImageCache(Image.createImage(llis)));
+	//llis.close();
+	try {
+		LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(is);
+		byte[] b = new byte[size];
+		ledis.readFully(b);
+		addResource(placeholder, new ImageCache(Image.createImage(b, 0, b.length)));
+		ledis.close();
+	} catch(java.lang.IllegalArgumentException e) {
+		return RES_BAD_INPUT;
+	} catch(java.lang.OutOfMemoryError e) {
+		return RES_OUT_OF_MEMORY;
+	}
+	return RES_OK;
+*/
+	return -1;
+}
+
+SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, int alpha) 
+	throws Exception
+{
+/* FIX-ME	
+	MYASSERT(BYTEPART(src) == 0);
+	int width = EXTENT_X(size);		
+	int height = EXTENT_Y(size);
+
+	try {
+		int[] tempArray = new int[width*height];
+		System.arraycopy(CORE.mMem_ds, INTPART(src), tempArray, 0, width*height);
+
+		addResource(placeholder, new ImageCache(Image.createRGBImage(
+			tempArray, width, height, alpha != 0)));
+
+	} catch(java.lang.OutOfMemoryError e) {
+		return RES_OUT_OF_MEMORY;
+	}
+	return RES_OK;
+*/ 
+	return -1;
+}
+
+SYSCALL(int) maCreateDrawableImage(MAHandle placeholder, int width, int height) THE {
+	try {
+		addResource(placeholder, new ImageCache(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)));
+	} catch(java.lang.OutOfMemoryError e) {
+		return RES_OUT_OF_MEMORY;
+	}
+	return RES_OK;
+}
+
+int maFrameBufferGetInfo(Address info) 
+{
+	/* FIX-ME */
+	return -1;			
+}
+
+int maFrameBufferInit(Address data) 
+{
+	/* FIX-ME */
+	return -1;
+}
+
+int maFrameBufferClose()
+{
+	/* FIX-ME */
+	return -1;
+}
+
+#ifdef MA_PROF_SUPPORT_OPENGL_ES
+#include "opengl_non_generated.jpp"
+#endif

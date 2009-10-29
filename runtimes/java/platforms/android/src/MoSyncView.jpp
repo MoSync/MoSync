@@ -1,0 +1,281 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+package com.mosync.java.android;
+
+#include "syscall_helpers.h"
+#include "generated\MAAPI_consts.h"
+#include "config_platform.h"
+
+import android.content.Context;
+import android.graphics.*;
+import android.os.Handler;
+import android.view.SurfaceView;
+import android.view.SurfaceHolder;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import java.util.Vector;
+
+public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
+{
+
+	class MoSyncThread extends Thread
+	{
+		private Context mContext;
+		private Handler mHandler;
+		private MoSyncView mMoSyncView;
+		private SurfaceHolder mSurfaceHolder;
+		private Core mCore;
+		private int mWidth;
+		private int mHeight;
+		
+		private boolean mStop;
+		
+		public MoSyncThread(SurfaceHolder surfaceHolder, Context context, Handler handler, MoSyncView view)
+		{	
+			mSurfaceHolder = surfaceHolder;
+			mContext = context;
+			mHandler = handler;
+			mMoSyncView = view;
+			
+			Log.i("MoSync Thread", "Constructor");
+		 
+			try
+			{
+				mCore = new Core(mMoSyncView, 
+						mContext.getResources().openRawResource(R.raw.program),
+						mContext.getResources().openRawResource(R.raw.resources));
+			}
+			catch(Exception e)
+			{
+				Log.e("MoSync Thread","Core creation exception: " + e.toString());
+			}
+				
+		}
+		
+		public void updateSurfaceSize(int width, int height)
+		{
+			Log.i("MoSync Thread","updateSurfaceSize");
+			mWidth = width;
+			mHeight = height;
+			mCore.resizeScreen(mWidth, mHeight);
+		}
+		
+		public void stopNow()
+		{
+			Log.i("MoSync Thread","stopNow");
+			mStop = true;
+		}
+		
+		@Override public void run()
+		{
+			Log.i("MoSync Thread", "run");
+			
+			while(true)
+			{
+				try
+				{
+					mStop = false;
+#ifndef PHONE_RELEASE
+					mCore.mInstCount = 0;
+#endif
+					long startTime = System.currentTimeMillis();
+					while(!mStop)
+					{
+						mCore.mIP = mCore.run();
+					}
+					long time = System.currentTimeMillis() - startTime;
+					if(time == 0) time++;
+#ifndef PHONE_RELEASE						
+					Log.i("MoSync Thread",""+mCore.mInstCount+" instructions in "+time+" ms: "+ (((double)mCore.mInstCount) / time)+" KIPS\n");
+#endif
+				} catch(Throwable e) {
+					Log.i("MoSync Thread","Thread crashed! " + e.toString());
+					break;
+				}
+			}
+			
+			Log.i("MoSync Thread", "loop has ended");
+			
+		}
+	}
+	
+	/** Handle to the application context, used to e.g. fetch Drawables. */
+	private Context mContext;
+	public SurfaceHolder mSurfaceHolder;
+	
+	private Vector mEventBuffer = new Vector(EVENT_BUFFER_SIZE);
+	private boolean mEventOverflow = false;
+	
+	/** The thread that actually draws the animation */
+	private MoSyncThread thread;
+
+	public MoSyncView(Context context)
+	{
+		super(context);
+		mContext = context;
+		
+		// register our interest in hearing about changes to our surface
+		mSurfaceHolder = getHolder();
+		    
+		// Use accelerated surfaces if avaiilable
+		int mode = 0;
+		try {
+			mode = 1;
+			mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_HARDWARE);
+		} catch(Exception e) {
+			try {
+				mode = 2;
+				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_GPU);
+			} catch(Exception e2) {
+				try {
+					mode = 3;
+					mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
+				} catch(Exception e3) {
+					// all has failed.
+					// Exit directly..
+				}
+			}
+		}
+
+#ifdef PUBLIC_DEBUG
+		switch(mode)
+		{
+			case 1: Log.i("MoSync", "Hardware accelerated surface"); break;
+			case 2: Log.i("MoSync", "GPU accelerated surface"); break;
+			default: Log.i("MoSync", "No hardware acceleration available");
+		}
+#endif // PUBLIC_DEBUG
+		
+		mSurfaceHolder.addCallback(this);    
+		
+		// create thread only; it's started in surfaceCreated()
+		thread = new MoSyncThread(mSurfaceHolder, mContext, new Handler() {}, this);
+		
+		setVisibility(VISIBLE);
+		setFocusable(true); // make sure we get key events
+	}
+	
+	public void stopThread()
+	{
+		Log.i("MoSync View","stopThread");
+		if(thread.isAlive())
+		{
+			thread.stopNow();
+			boolean retry = true;
+			while (retry) {
+				try {
+					thread.join();
+					retry = false;
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
+
+	@Override protected void onDraw(Canvas canvas)
+	{
+	  Log.i("MoSync View","onDraw");
+	}
+
+	/* Callback invoked when the surface dimensions change. */
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+	{
+		Log.i("MoSync View", "surfaceChanged");
+		thread.updateSurfaceSize(width, height);
+	}
+
+	/*
+	 * Callback invoked when the Surface has been created and is ready to be
+	 * used.
+	 */
+	public void surfaceCreated(SurfaceHolder holder)
+	{
+		// start the thread here so that we don't busy-wait in run()
+		// waiting for the surface to be created
+		//thread.setRunning(true);
+		Log.i("MoSync View", "surfaceCreated");
+		
+		if(!thread.isAlive())
+		{
+			thread.updateSurfaceSize(getWidth(), getHeight());
+			thread.start();
+		}
+		else
+		{
+			Log.i("MoSync View","surfaceCreated - Thread was already alive");
+		}
+	}
+
+	/*
+	 * Callback invoked when the Surface has been destroyed and must no longer
+	 * be touched. WARNING: after this method returns, the Surface/Canvas must
+	 * never be touched again!
+	 */
+	public void surfaceDestroyed(SurfaceHolder holder)
+	{
+		// we have to tell thread to shut down & wait for it to finish, or else
+		// it might touch the Surface after we return and explode
+		Log.i("MoSync View", "surfaceDestroyed");
+		stopThread();
+	}
+
+	private final int convertToMoSyncKeyCode(int keyCode) {
+#define CONVERT_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_##k) return MAK_##k;
+#define CONVERT_DPAD_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_DPAD_##k) return MAK_##k;
+#define CONVERT_SPECIAL(kIn, kOut) if(keyCode == KeyEvent.KEYCODE_##kIn) return MAK_##kOut;
+		DEVICE_KEYS(CONVERT_KEYCODE);
+		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODE);
+		DEVICE_SPECIAL(CONVERT_SPECIAL);
+		return 0;
+	}
+	
+	public boolean onKeyUp(int keyCode, KeyEvent event)
+	{
+		Log.i("MoSyncView", "key up event :" + event.toString() + "/n");
+		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
+		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
+		return true;
+	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		Log.i("MoSyncView", "key down event :" + event.toString() + "/n");
+		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
+		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
+		return true;
+	}
+	
+	public boolean onTouchEvent(MotionEvent event)
+	{
+		int action = event.getAction();
+		
+		Log.i("MoSyncView", "action:" + event.getAction() + "/n");
+		return true;
+	}
+	
+	synchronized public final int[] getEvent() {
+		if(mEventBuffer.isEmpty()) {
+			return null;
+		}
+		int[] event = (int[]) mEventBuffer.firstElement();
+		mEventBuffer.removeElementAt(0);
+		return event;
+	}
+
+}

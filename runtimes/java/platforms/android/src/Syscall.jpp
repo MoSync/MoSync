@@ -1,0 +1,1241 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+package com.mosync.java.android;
+
+#include "helpers.h"
+#include "syscall_helpers.h"
+#include "core_helpers.h"
+#include "generated\MAAPI_consts.h"
+#include "generated\IX_RESOURCE_TYPES_CONSTS.h"
+
+import android.util.Log;
+import android.view.Display;
+import android.view.SurfaceHolder;
+import android.view.Surface;
+import android.view.View;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.view.SurfaceView;
+import android.content.Context;
+
+import java.util.Vector;
+import java.util.Date;
+import java.util.TimeZone;
+import java.util.Hashtable;
+import java.util.Enumeration;
+import java.io.*;
+
+#ifdef MA_PROF_SUPPORT_OPENGL_ES
+#include "IX_OPENGL_ES_CONSTS.h"
+import java.nio.*;
+import javax.microedition.khronos.egl.*;
+import javax.microedition.khronos.opengles.*;
+#endif
+
+#ifdef MA_IX_AUDIOBUFFER
+#include "generated\IX_AUDIOBUFFER_CONSTS.h"
+#endif
+
+#define CORE mCore
+
+final class Syscall 
+#define IMPLEMENTS implements
+
+#if 0
+// Bluetooth
+IMPLEMENTS DiscoveryListener
+#undef IMPLEMENTS
+#define IMPLEMENTS ,
+
+// Location
+IMPLEMENTS LocationListener
+#undef IMPLEMENTS
+#define IMPLEMENTS ,
+#endif
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+IMPLEMENTS MoSync
+#undef IMPLEMENTS
+#define IMPLEMENTS ,
+#endif
+{
+	//***************************************************************************
+	//Constructor
+	//***************************************************************************
+	public Syscall(Core aCore, MoSyncView view) {
+		
+		Log.i("MoSync Syscall", "Syscall constructor;");
+		mCore = aCore;
+		mMoSyncView = view;
+		mCanvas = null;
+		mBlitPaint.setColor(0xffffffff);
+	}
+
+#ifdef MOSYNC_STATIC_JAVA
+#include "syscall_converters.h"
+#include "syscall_static_java.h"
+#define SPECIAL(name) name
+#else
+#ifdef MOSYNC_OLD_IDL
+#define SPECIAL(name) _##name
+#else
+#define SPECIAL(name) name
+#endif	//MOSYNC_IDL2
+#endif
+	
+	public void init() throws Exception {
+		
+		Log.i("MoSync Syscall", "Syscall.init();");
+
+		// Init all the things that should be initilalized
+	}
+
+	//***************************************************************************
+	//Declarations
+	//***************************************************************************
+
+	//Externally owned stuff
+	Core mCore;
+	
+	MoSyncView mMoSyncView;
+	Canvas mCanvas;
+	Paint mPaint = new Paint();
+	Paint mBlitPaint = new Paint();
+	int mWidth;
+	int mHeight;
+	
+	Bitmap mBitmap;
+	
+	//private stuff
+	Object[] mResourceArray, mDynamicResArray;
+	int mDynamicSize;
+	Vector mTiledLayers = new Vector();
+
+	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
+
+	ImageCache mDrawTarget = null;
+	MAHandle mDrawTargetHandle = HANDLE_SCREEN;
+
+	int mSoundVolume = 100;
+
+	boolean mDestructed = false;
+
+//	Hashtable mStores = new Hashtable();
+	int mMaxStoreId = 0;
+	
+	final long mStartTime = System.currentTimeMillis();
+
+	boolean mUseFrameBuffer = false;
+	int mFrameBufferAddr;
+
+	Object mFlux = new Object();
+
+	//***************************************************************************
+	//Destructor
+	//***************************************************************************
+	final void destruct() throws Exception {
+		if(mDestructed)
+			return;
+
+		// clean up everything
+			
+		mDestructed = true;
+	}
+
+	public void resizeScreen(int width, int height)
+	{
+		Log.i("MoSync Syscall", "window size width:" + mWidth + " height:" + mHeight);
+		
+		mWidth = width;
+		mHeight = height;
+		
+		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		mCanvas = new Canvas(mBitmap);
+	}
+	
+	//***************************************************************************
+	//Resource loader
+	//***************************************************************************
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+	public
+#endif
+	Object getResource(int index) {
+		return ((index & DYNARES_BIT) != 0) ?
+			mDynamicResArray[index & ~DYNARES_BIT] : mResourceArray[index];
+	}
+
+	// search through the resource array for the resource and returns the handle.
+	int getResourceHandle(Object resource) {
+		for(int i = 0; i < mResourceArray.length; i++) {
+			if(mResourceArray[i] == resource)
+				return i;
+		}
+		for(int i = 0; i < mDynamicResArray.length; i++) {
+			if(mDynamicResArray[i] == resource)
+				return i | DYNARES_BIT;
+		}
+		return 0;
+	}
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+	public
+#endif
+	void setResource(int index, Object o) {
+		if((index & DYNARES_BIT) != 0) {
+			mDynamicResArray[index & ~DYNARES_BIT] = o;
+		} else {
+			mResourceArray[index] = o;
+		}
+	}
+
+	public final void LoadResourcesFromStream(LittleEndianDataInputStream file,
+		final String filename) throws Exception
+	{
+		DEBUG("MoSync Syscall - load " + filename + " as resource from stream\n");
+		try {
+			if(file == null) {
+				mResourceArray = new Object[1];
+				return;
+			}
+
+			if(((char)file.read()) != 'M') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'A') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'R') { BIG_PHAT_ERROR; }
+			if(((char)file.read()) != 'S') { BIG_PHAT_ERROR; }
+
+			int nResources = file.readVarUnsignedInt();
+			DUMP(nResources);
+			int rSize = file.readVarUnsignedInt();  //ignored for now
+			DUMP(rSize);
+			int ral = nResources+1;	//ResArrLength
+			if(mResourceArray != null) {
+				ral = MAX(ral, mResourceArray.length);
+			}
+			Object[] resourceArray = new Object[ral];
+			if(mResourceArray != null) {
+				System.arraycopy(mResourceArray, 1, resourceArray, 1, mResourceArray.length - 1);
+			}
+
+			int rI = 1;
+
+#define DECLARE_AND_READ(type, name) type name = file.CAP_##type(read)()
+#define DAR_USHORT(name) int name = file.readUnsignedShort()
+#define DAR_UBYTE(name) int name = file.readUnsignedByte()
+#define DAR_UVINT(name) int name = file.readVarUnsignedInt()
+#define DAR_SVINT(name) int name = file.readVarSignedInt()
+			while(true) {
+				int type = file.readUnsignedByte();
+				if(type == 0)
+					break;
+				DEBUG_RES("Type "+type+"\n");
+				int size = file.readVarUnsignedInt();
+				DEBUG_RES("Size "+size+"\n");
+
+				if(type != RT_SKIP) {
+					MYASSERT(resourceArray[rI] != mFlux);
+				}
+
+				switch(type) {
+				case RT_PLACEHOLDER:
+					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_PLACEHOLDER");
+					MYASSERT(size == 0);
+					resourceArray[rI] = null;
+					break;
+				case RT_IMAGE:
+					{
+						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_IMAGE");
+						byte[] b = new byte[size];
+						file.readFully(b);
+						resourceArray[rI] = new ImageCache(BitmapFactory.decodeByteArray(b, 0, b.length));
+					}
+					break;
+				case RT_SPRITE:
+					{
+						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_SPRITE");
+/* FIX-ME					
+						int indexSource = file.readUnsignedShort();
+						int left = file.readUnsignedShort();
+						int top = file.readUnsignedShort();
+						int width = file.readUnsignedShort();
+						int height = file.readUnsignedShort();
+						DECLARE_AND_READ(short, cx);
+						DECLARE_AND_READ(short, cy);
+						resourceArray[rI] = new ImageCache(Image.createImage(
+							((ImageCache)resourceArray[indexSource]).i,
+							left, top, width, height, TRANS_NONE));
+*/							
+					}
+					break;
+				case RT_TILESET:
+					{
+						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILESET");
+/* FIX-ME					
+						int tileSizeX = file.readUnsignedShort();
+						int tileSizeY = file.readUnsignedShort();
+						byte[] b = new byte[size-4];
+						file.readFully(b);
+						resourceArray[rI] = new Tileset(Image.createImage(b, 0, b.length), tileSizeX, tileSizeY);
+*/						
+					}
+					break;	  
+				case RT_TILEMAP:
+					{
+						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILEMAP");
+/* FIX-ME					
+						int mapWidth  = file.readUnsignedShort();
+						int mapHeight = file.readUnsignedShort();
+
+						Tilemap tilemap = new Tilemap(mapWidth, mapHeight);
+
+						for(int i = 0; i < mapWidth*mapHeight; i++) {
+							tilemap.values[i] = file.readShort();
+						}
+
+						//tilemaps.
+						resourceArray[rI] = tilemap;
+*/						
+					}
+					break;	  
+				case RT_SKIP:
+					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_SKIP");
+					MYASSERT(size == 0);
+					break;
+#ifndef PHONE_RELEASE
+				case 99:  //testtype
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("u "+file.readVarUnsignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
+					break;
+#endif	//PHONE_RELEASE
+				case RT_LABEL: 
+					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_LABEL");
+					byte tempLabel[] = new byte[size];
+					file.readFully(tempLabel); 
+					resourceArray[rI] = new String(tempLabel);  
+					break;
+				case RT_BINARY:
+					{
+						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_BINARY");
+						byte[] b = new byte[size];
+						file.readFully(b);
+						resourceArray[rI] = new Binary(b);
+					}
+					break;
+				case RT_UBIN:
+					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_UBIN");
+					if(filename != null) {
+						resourceArray[rI] = new UBin(filename, file.tell(), size);
+					} else {
+						BIG_PHAT_ERROR;
+					}
+					//fallthrough is intentional
+				default:
+					if(file.skip(size) != size) {
+						BIG_PHAT_ERROR;
+					}
+				}
+				DEBUG_RES("Done\n");
+				rI++;
+			}
+			if(rI != nResources+1) {
+				DEBUG_ALWAYS("rI "+rI+" nR "+nResources+"\n");
+				BIG_PHAT_ERROR;
+			}
+			mResourceArray = resourceArray;
+		} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+			BIG_PHAT_ERROR;
+		}
+		DEBUG_RES("ResLoad complete, "+(mResourceArray.length-1)+" objects\n");
+	}
+
+	//***************************************************************************
+	//Helper Functions
+	//***************************************************************************
+
+	public final void readMemBytes(byte[] dst, Address src, int offset, int count) {
+		MYASSERT(count >= 0);
+		//DEBUG_TEMP("readMemBytes " + dst.length + " " + src + " " + offset + " " + count + "\n");
+		//read unaligned bytes
+		int bytePart = BYTEPART(src);
+		int intPart = INTPART(src);
+		int[] mem_ds = CORE.mMem_ds;
+		int dstPos = offset;
+		//DUMP(bytePart);
+
+		if(bytePart != 0) {
+			int uaCount = MIN(count, 4 - bytePart);
+			//DUMP(count);
+			//DUMP(uaCount);
+			int v = mem_ds[intPart++];
+			int shift = (bytePart << 3);
+			//DUMP(shift);
+			//disassemble...
+			switch(uaCount) {
+			case 3:
+				dst[dstPos++] = (byte)(0xff & (v >> shift));
+				shift += 8;
+			case 2:
+				dst[dstPos++] = (byte)(0xff & (v >> shift));
+				shift += 8;
+			case 1:
+				dst[dstPos++] = (byte)(0xff & (v >> shift));
+			}
+			count -= uaCount;
+			//DUMP(count);
+		}
+
+		//read and disassemble ints
+		int intCount = INTPART(count);
+		//DUMP(intCount);
+		while(intCount > 0) {
+			int v = mem_ds[intPart++];
+			//uncertain endianess
+			dst[dstPos++] = (byte)(0xff & v);
+			dst[dstPos++] = (byte)(0xff & (v >> 8));
+			dst[dstPos++] = (byte)(0xff & (v >> 16));
+			dst[dstPos++] = (byte)(0xff & (v >> 24));
+			intCount--;
+		}
+		count = BYTEPART(count);
+		//DUMP(count);
+
+		//read straggler bytes
+		if(count > 0) {
+			int v = mem_ds[intPart];
+			//reverse disassembly :}
+			switch(count) {
+			case 3:
+				dst[dstPos + 2] = (byte)(0xff & (v >> 16));
+			case 2:
+				dst[dstPos + 1] = (byte)(0xff & (v >> 8));
+			case 1:
+				dst[dstPos + 0] = (byte)(0xff & v);
+			}
+		}
+	}
+
+	private final byte[] getMemBytes(Address src, int count) {
+		byte[] buf = new byte[count];
+		readMemBytes(buf, src, 0, count);
+		return buf;
+	}
+
+	//I think this is more efficient than writing each byte to the stream,
+	//despite the temporary memory allocation.
+	private final void readMemStream(OutputStream dst, Address src, int count) throws IOException {
+		dst.write(getMemBytes(src, count));
+	}
+
+	private final String readMemString(Address src) throws Exception {
+		if(src == 0)
+			return null;
+		int[] mem_ds = CORE.mMem_ds;
+		int org = src;
+		byte b;
+		do {
+			RBYTE(src++, b);
+		} while(b != 0);
+		int size = src - org - 1;
+		return new String(getMemBytes(org, size));
+	}
+
+	private final void writeMemBytes(Address dst, byte[] b, int offset, int count) {
+		MYASSERT(count >= 0);
+		int[] mem_ds = CORE.mMem_ds;
+		//no need to check offset and count
+
+		//maybe align dst by writing 1 to 3 bytes
+		int bytePart = BYTEPART(dst);
+		int intPart = INTPART(dst);
+		if(bytePart != 0) {
+			int i = mem_ds[intPart];
+			int addrCount = 4 - bytePart;
+			int localCount = MIN(addrCount, count);
+			int mask = 0;
+			int other = 0;
+			while(localCount > 0) {
+				int shift = (/*32 - */bytePart * 8);
+				mask |= 0xff << shift;
+				other |= (b[offset++] & 0xff) << shift;
+				bytePart++;
+				count--;
+				localCount--;
+			}
+			i = (i & ~mask) | other;
+			mem_ds[intPart++] = i;
+		}
+
+		//write ints for as long as possible
+		while(count >= 4) {
+			int i = ((b[offset + 3] << 24) | ((b[offset + 2] & 0xff) << 16) |
+				((b[offset + 1] & 0xff) << 8) | (b[offset + 0] & 0xff));
+			offset += 4;	//can't use ++ operator since we can't be sure of read order then
+			mem_ds[intPart++] = i;
+			count -= 4;
+		}
+
+		//maybe write 1 to 3 final bytes
+		if(count > 0) {
+			int i = mem_ds[intPart];
+			int bytePart2 = 0;
+			int mask = 0;
+			int other = 0;
+			while(count > 0) {
+				int shift = (/*32 - */bytePart2 * 8);
+				mask |= 0xff << shift;
+				other |= (b[offset++] & 0xff) << shift;
+				count--;
+				bytePart2++;
+			}
+			i = (i & ~mask) | other;
+			mem_ds[intPart] = i;
+		}
+	}
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+public
+#endif
+	void writeMemStream(Address dst, InputStream in, int count) throws Exception {
+		MYASSERT(count >= 0);
+		LittleEndianDataInputStream din = new LittleEndianDataInputStream(in);
+		int[] mem_ds = CORE.mMem_ds;
+
+		//first few bytes
+		int bytePart = BYTEPART(dst);
+		if(bytePart != 0) {
+			int addrCount = 4 - bytePart;
+			int localCount = MIN(addrCount, count);
+			while(localCount > 0) {
+				WBYTE_RAW(dst, din.readUnsignedByte());
+				dst++;
+				localCount--;
+				count--;
+			}
+		}
+
+		//ints
+		int intPart = INTPART(dst);
+		int intCount = INTPART(count);
+		while(intCount > 0) {
+			//DEBUG_TEMP("wMS I\n");
+			mem_ds[intPart++] = din.readInt();
+			intCount--;
+		}
+
+		//stragglers
+		dst += count & ~3;
+		count = BYTEPART(count);
+		while(count > 0) {
+			WBYTE_RAW(dst, din.readUnsignedByte());
+			dst++;
+			count--;
+		}
+	}
+	private final void setMemBytes(Address dst, byte[] src)
+	{
+		writeMemBytes(dst, src, 0, src.length);
+	}
+
+	private final int writeStringBuf(String s, Address dst, int bufSize) {
+		MYASSERT(bufSize >= 0);
+		if(bufSize <= s.length())
+			return s.length();
+		int[] mem_ds = CORE.mMem_ds;
+		byte[] bytes = s.getBytes();
+		setMemBytes(dst, bytes);
+		WBYTE_RAW(dst + bytes.length, 0);
+		return bytes.length;
+	}
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+	public
+#endif
+	void addResource(int index, Object o) THE {
+		if(getResource(index) != null || index <= 0) {
+			BIG_PHAT_ERROR;
+		}
+		setResource(index, o);
+	}
+
+	final String readMimeString(InputStream input) throws Exception {
+		StringBuffer sb = new StringBuffer();
+		int b;
+		DEBUG_ALWAYS(input + "\n");
+		while((b=input.read())!=0) {
+			if(b==-1) BIG_PHAT_ERROR; 
+			sb.append((char)b);
+		}
+		return new String(sb);
+	}
+
+	static public final String Hex0(int h) {
+		String s = Integer.toHexString(h);
+		StringBuffer sb = new StringBuffer(8);
+		for(int i=0; i<8 - s.length(); i++) {
+			sb.append('0');
+		}
+		sb.append(s);
+		return new String(sb);
+	}
+
+	static public final String CanonicalString(Object o) {
+		return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
+	}
+
+	//***************************************************************************
+	//Proper Syscall Functions
+	//***************************************************************************
+	
+	SYSCALL(Address) SPECIAL(memset)(Address dst, int val, int count) THE {
+		DEBUG("memset("+dst+", "+val+", "+count+");\n");
+		MYASSERT(count >= 0);
+		int[] mem_ds = CORE.mMem_ds;
+
+		//construct an int
+		int maskedVal = val & 0xff;
+		int intVal = ((val << 24) | (maskedVal << 16) |
+			(maskedVal << 8) | maskedVal);
+
+		//deal with the eventual unaligned first bytes
+		int bytePart = BYTEPART(dst);
+		int intPart = INTPART(dst);
+		if(bytePart != 0) {
+			int i = mem_ds[intPart];
+			int addrCount = 4 - bytePart;
+			int localCount = MIN(addrCount, count);
+			int mask = 0;
+			while(localCount > 0) {
+				int shift = (/*32 - */bytePart * 8);
+				mask |= 0xff << shift;
+				bytePart++;
+				count--;
+				localCount--;
+			}
+			i = (i & ~mask) | (intVal & mask);
+			mem_ds[intPart++] = i;
+		}
+
+		//write at least one int
+		if(count >= 4) {
+			mem_ds[intPart++] = intVal;
+			count -= 4;
+		}
+
+		//then arraycopy as far as possible
+		int iCount = INTPART(count);
+		if(iCount > 0) {
+			int step = 1;
+			int baseIndex = intPart - 1;
+			while(iCount >= step) {
+				System.arraycopy(mem_ds, baseIndex, mem_ds, intPart, step);
+				iCount -= step;
+				intPart += step;
+				step *= 2;
+			}
+			if(iCount > 0) {
+				System.arraycopy(mem_ds, baseIndex, mem_ds, intPart, iCount);
+			}
+
+			count = BYTEPART(count);
+			intPart += iCount;
+		}
+
+		//deal with straggler bytes
+		if(count > 0) {
+			int i = mem_ds[intPart];
+			int bytePart2 = 0;
+			int mask = 0;
+			while(count > 0) {
+				int shift = (/*32 - */bytePart2 * 8);
+				mask |= 0xff << shift;
+				count--;
+				bytePart2++;
+			}
+			i = (i & ~mask) | (intVal & mask);
+			mem_ds[intPart] = i;
+		}
+		return dst;
+	}
+
+	SYSCALL(Address) SPECIAL(memcpy)(Address dst, Address src, int size) THE {
+		DEBUG("memcpy("+dst+", "+src+", "+size+");\n");
+		MYASSERT(size >= 0);
+		if(size==0) return dst;
+		int d = BYTEPART(dst);
+		int s = BYTEPART(src);
+		int[] mem_ds = CORE.mMem_ds;
+
+		if(d==0 && s==0) {
+			System.arraycopy(mem_ds, INTPART(src), mem_ds, INTPART(dst), INTPART(size));
+			src += size & ~3;
+			dst += size & ~3;
+			size &= 3;
+		}
+		while(size-- != 0) {
+			byte b;
+			RBYTE(src++, b);
+			WBYTE(dst++, b);
+		}
+
+		return dst;
+	}
+	
+	SYSCALL(Address) SPECIAL(strcpy)(Address dst, Address src) THE {
+		DEBUG("strcpy("+dst+", "+src+");\n");
+		Address origdst = dst;
+		byte c;
+		int[] mem_ds = CORE.mMem_ds;
+		do {
+			RBYTE(src, c);
+			src++;
+			WBYTE(dst++, c);
+		} while(c != 0);
+		return origdst;
+	}
+	
+	SYSCALL(int) SPECIAL(strcmp)(String a, String b) {
+		DEBUG("strcmp(\""+a+"\", \""+a+"\");\n");
+		return a.compareTo(b);
+	}
+
+	#include "FloatingPointMath.jpp"
+
+	SYSCALL(int) maGetKeys() {
+/*	FIX-ME
+		if(G_CLOSING)
+			return 0;
+		YIELD;
+		return mCanvas.getKeys();
+*/
+		return 0;
+	}
+
+	SYSCALL(void) maResetBacklight() {
+		DEBUG("MoSync Syscall - maResetBacklight");
+	}
+	
+	#include "SyscallNetwork.jpp"
+	
+	#include "SyscallGraphics.jpp"
+	
+	#include "SyscallSound.jpp"
+
+	SYSCALL(int) maGetDataSize(MAHandle data) {
+		BinaryInterface bi = (BinaryInterface)getResource(data);
+		return bi.size();
+	}
+
+	SYSCALL(void) maReadData(MAHandle data, Address dst, int offset, int size)
+		throws Exception
+	{
+		BinaryInterface bi = (BinaryInterface)getResource(data);
+		if(bi instanceof Binary) {
+			Binary b = (Binary)bi;
+			writeMemBytes(dst, b.arr, offset, size);
+		}
+		else
+		{
+			System.gc();	//HACK, useful for many repeated calls to this function
+			InputStream in = bi.getInputStream();
+			if(in.skip(offset) != offset) {
+				BIG_PHAT_ERROR;
+			}
+			writeMemStream(dst, in, size);
+			in.close();
+		}
+	}
+
+#if !defined(PHONE_RELEASE)
+	final void dumpIntMem(int index, int count) {
+		int[] mem_ds = CORE.mMem_ds;
+		for(int i=index; i<index+count; i++) {
+			String hex = Integer.toHexString(mem_ds[i]);
+			char[] lz = new char[8 - hex.length()];
+			for(int j=0; j</*lz.length*/8 - hex.length(); j++)
+				lz[j] = '0';
+			DEBUG_ALWAYS((i << 2) + ": 0x" + new String(lz) + hex + "\n");
+		}
+	}
+#endif
+
+	SYSCALL(void) maWriteData(MAHandle data, Address src, int offset, int size)
+		throws Exception
+	{
+		Binary b = (Binary)getResource(data);
+		readMemBytes(b.arr, src, offset, size);
+	}
+
+	SYSCALL(void) maCopyData(Address a) throws Exception {
+		int[] mem_ds = CORE.mMem_ds;
+		MAHandle dst = RINT(a);
+		int dstOffset = RINT(a + 4);
+		MAHandle src = RINT(a + 8);
+		int srcOffset = RINT(a + 12);
+		int size = RINT(a + 16);
+
+		Binary bDst = (Binary)getResource(dst);
+		Object oSrc = getResource(src);
+		if(oSrc instanceof Binary) {
+			Binary bSrc = (Binary)oSrc;
+			System.arraycopy(bSrc.arr, srcOffset, bDst.arr, dstOffset, size);
+		} else {
+			BinaryInterface biSrc = (BinaryInterface)oSrc;
+			DataInputStream dis = new DataInputStream(biSrc.getInputStream());
+			dis.skip(srcOffset);
+			dis.readFully(bDst.arr, dstOffset, size);
+		}
+	}
+
+	SYSCALL(MAHandle) maCreatePlaceholder() {
+		if(mDynamicResArray == null) {
+			mDynamicResArray = new Object[1];
+			mDynamicSize = 0;
+		}
+		if(mDynamicSize == mDynamicResArray.length) {
+			Object[] oldDynRes = mDynamicResArray;
+			mDynamicResArray = new Object[mDynamicResArray.length * 2];
+			System.arraycopy(oldDynRes, 0, mDynamicResArray, 0, oldDynRes.length);
+		}
+		return (mDynamicSize++) | DYNARES_BIT;
+	}
+
+	SYSCALL(void) maDestroyObject(MAHandle handle) {
+		if(getResource(handle) != null) {
+			MYASSERT(getResource(handle) != mFlux);
+			setResource(handle, null);
+		}
+	}
+
+	SYSCALL(MAHandle) maFindLabel(String name) {
+		for(int i = 0; i < mResourceArray.length; i++) {
+			if(getResource(i) instanceof String) {
+				if(((String)getResource(i)).equals(name))
+					return i;
+			}
+		}
+		return -1;
+	}
+	
+	SYSCALL(int) maCreateData(MAHandle placeholder, int size) THE {
+		try {
+			addResource(placeholder, new Binary(new byte[size]));
+		} catch(java.lang.OutOfMemoryError e) {
+			return RES_OUT_OF_MEMORY;
+		}
+		return RES_OK;
+	}
+
+#ifdef SEGMENTED_DATA
+	SYSCALL(int) maAddDataSize(MAHandle data, int size) {
+		Binary b = (Binary)getResource(data);
+		try {
+			b.add(size);
+		} catch(java.lang.OutOfMemoryError e) {
+			return RES_OUT_OF_MEMORY;
+		}
+		return RES_OK;
+	}
+#endif
+
+	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws /* FIX-ME RecordStore*/Exception {
+		/*	FIX-ME */
+		return STERR_NONEXISTENT;
+	}
+
+	SYSCALL(int) maWriteStore(MAHandle store, MAHandle data) throws Exception {
+		DEBUG_ALWAYS("maWriteStore "+store+"\n");
+		/* FIX-ME */
+		return -1;
+	}
+
+	SYSCALL(int) maReadStore(MAHandle store, MAHandle placeholder) throws Exception {
+		/*	FIX-ME */
+		return -1;
+	}
+
+	SYSCALL(void) maCloseStore(MAHandle store, int del) throws /* FIX-ME RecordStore*/Exception CEX {
+		/* FIX-ME */		
+	}
+
+	SYSCALL(int) maLoadResources(final MAHandle data) throws Exception {
+		try {
+			BinaryInterface bi = (BinaryInterface)getResource(data);
+			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(bi.getInputStream());
+			LoadResourcesFromStream(llis, null);
+			llis.close();
+			return 1;
+		} catch(Throwable e) {
+			PRINT_STACK_TRACE;
+			return 0;
+		}
+	}
+
+	SYSCALL(void) maLoadProgram(final MAHandle data, final int reload) throws Exception {
+/* FIX-ME	
+#ifdef MOSYNC_STATIC_JAVA
+		BIG_PHAT_ERROR;
+#else
+		YIELD;
+		BinaryInterface bi = (BinaryInterface)getResource(data);
+		InputStream is = bi.getInputStream();
+		DEBUG_ALWAYS("LoadProgram, "+is.available()+" bytes available.\n");
+		mCanvas.recreate(is, reload != 0);
+		//is will be closed later
+#endif
+*/
+	}
+
+	SYSCALL(int) maGetEvent(Address dst) {
+		DEBUG("GetEvent ("+dst+")\n");
+		int[] event = mMoSyncView.getEvent();
+		if(event == null)
+			return 0;
+
+		DEBUG("Event:");
+		for(int i=0; i<event.length; i++) {
+			DEBUG(" "+event[i]);
+		}
+		DEBUG("\n");
+
+		MYASSERT(BYTEPART(dst) == 0);	//alignment
+		if(EI_TYPE != EVENT_TYPE_CLOSE)
+			YIELD;
+
+		// Location
+#if 0		
+		if(EI_TYPE == EVENT_TYPE_LOCATION)
+		{
+			int address = mCore.mCustomEventPointer;
+			int[] mem_ds = mCore.mMem_ds;
+
+			//copy main data to above top-of-stack
+			System.arraycopy(event, 1, CORE.mMem_ds, INTPART(address), 9);
+
+			//write type and pointer to ordinary event location
+			WINT(dst, EVENT_TYPE_LOCATION);
+			WINT(dst + 4, address);
+		} else
+#endif
+		{
+			System.arraycopy(event, 0, CORE.mMem_ds, INTPART(dst), event.length);
+		}
+		
+		return 1;
+	}
+
+	SYSCALL(void) maWait(int timeout) THE {
+/* FIX-ME	
+		if(G_CLOSING)
+			return;
+		mCanvas.Wait(timeout);
+*/		
+	}
+
+	SYSCALL(int) maTime() {
+		Date d = new Date();
+		return (int)(d.getTime() / 1000);
+	}
+	SYSCALL(int) maLocalTime() {
+		Date d = new Date();
+		TimeZone tz = TimeZone.getDefault();
+		return (int)((d.getTime() + tz.getRawOffset()) / 1000);
+	}
+	SYSCALL(int) maGetMilliSecondCount() {
+		return (int)System.currentTimeMillis();
+	}
+
+	SYSCALL(int) maFreeObjectMemory() {
+		Runtime r = Runtime.getRuntime();
+		r.gc();
+		return (int)r.freeMemory();
+	}
+	SYSCALL(int) maTotalObjectMemory() {
+		return (int)Runtime.getRuntime().totalMemory();
+	}
+
+	SYSCALL(int) maVibrate(int duration) {
+		/* FIX-ME */		
+		return -1;
+	}
+
+	SYSCALL(int) maPlatformRequest(String url) {
+		/* FIX-ME */
+		return -1;
+	}
+
+	SYSCALL(void) maExit(int result) throws Exception {
+		DEBUG("MoSync Syscall - maExit("+result+")\n");
+#ifdef GDB_DEBUG
+		mCore.mGdbStub.exitHandler(result);
+#endif
+		YIELD;
+		
+		mMoSyncView.stopThread();
+		STATIC_EXIT;
+	}
+
+	SYSCALL(void) maPanic(int result, String message) throws Exception {
+		DEBUG("MoSync Syscall - maPanic("+result+", \""+message+"\")\n");
+#ifdef PUBLIC_DEBUG
+		int ip = -1;
+		if(mCore != null)
+		{
+			if(mCore.mMem_cs != null)
+			{
+				ip = mCore.mIP;
+			}
+		}
+		MAPanicReport pr = new MAPanicReport();
+		pr.writePanicReport(mCore.getContext(), REPORT_USER_PANIC, result, message, ip);
+#endif
+#ifdef GDB_DEBUG
+		mCore.mGdbStub.exitHandler(result);
+#endif
+		YIELD;
+/* FIX-ME		
+		mCanvas.SetAlert("User Panic", message);
+*/		
+		STATIC_EXIT;
+	}
+
+	int maCheckInterfaceVersion(int hash) {
+		if(hash == MAIDL_HASH) {
+			DEBUG_ALWAYS("IDL version match!\n");
+		} else {
+			throw new Error("IDL Hash Mismatch!\n");
+		}
+		return MAIDL_HASH;
+	}
+
+	SYSCALL(int) maIOCtl(int function, int a, int b, int c) throws Exception {
+#ifdef MA_PROF_SUPPORT_OPENGL_ES
+		int[] mem_ds = CORE.mMem_ds;
+#endif
+		switch(function) {
+
+		case maIOCtl_maCheckInterfaceVersion:
+			return maCheckInterfaceVersion(a);
+
+		case maIOCtl_maPlatformRequest:
+			return maPlatformRequest(readMemString(a));
+
+#ifdef PUBLIC_DEBUG
+		case maIOCtl_maWriteLog:
+			return maWriteLog(a, b);
+#endif
+
+		case maIOCtl_maBtStartDeviceDiscovery:
+			maBtStartDeviceDiscovery(a);
+			return 0;
+		case maIOCtl_maBtGetNewDevice:
+			return maBtGetNewDevice(a);
+		case maIOCtl_maBtStartServiceDiscovery:
+			maBtStartServiceDiscovery(a, b);
+			return 0;
+		case maIOCtl_maBtGetNewService:
+			return maBtGetNewService(a);
+		case maIOCtl_maBtGetNextServiceSize:
+			return maBtGetNextServiceSize(a);
+
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
+		//case maIOCtl_maGetLocation:
+			//return maGetLocation(a);
+		case maIOCtl_maLocationStart:
+			return maLocationStart();
+		case maIOCtl_maLocationStop:
+			return maLocationStop();
+#endif
+
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+		case maIOCtl_maFileListStart:
+			return maFileListStart(readMemString(a), readMemString(b));
+		case maIOCtl_maFileListNext:
+			return maFileListNext(a, b, c);
+		case maIOCtl_maFileListClose:
+			return maFileListClose(a);
+#endif
+
+#if 0
+		case maIOCtl_maSendTextSMS:
+			return maSendTextSMS(readMemString(a), readMemString(b));
+#endif
+
+#ifdef MA_SUPPORT_RECORD
+		case maIOCtl_maRecordSetup:
+			return maRecordSetup();
+		case maIOCtl_maRecordStart:
+			return maRecordStart(a);
+		case maIOCtl_maRecordPause:
+			return maRecordPause(a);
+#endif
+
+#ifdef MA_SUPPORT_STREAMING
+		case maIOCtl_maSoundPlayConn:
+			return maSoundPlayConn(a, readMemString(b));
+#endif
+
+#ifdef MA_PROF_SUPPORT_OPENGL_ES
+#include "opengl_invoke_generated.jpp"
+#include "opengl_invoke_non_generated.jpp"
+#endif
+
+#ifdef MA_IX_CONNSERVER
+		case maIOCtl_maAccept:
+			return maAccept(a);
+#endif
+
+#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+		case maIOCtl_maStreamVideoStart:
+			return maStreamVideoStart(readMemString(a));
+		case maIOCtl_maStreamClose:
+			return maStreamClose(a);
+		case maIOCtl_maStreamPause: 
+			return maStreamPause(a);
+		case maIOCtl_maStreamResume:
+			return maStreamResume(a);
+		case maIOCtl_maStreamVideoSize:
+			return maStreamVideoSize(a);
+		case maIOCtl_maStreamVideoSetFrame:
+			return maStreamVideoSetFrame(a, b);
+		case maIOCtl_maStreamLength:
+			return maStreamLength(a);
+		case maIOCtl_maStreamPos:
+			return maStreamPos(a);
+		case maIOCtl_maStreamSetPos:
+			return maStreamSetPos(a, b);
+#endif
+
+		case maIOCtl_maFrameBufferGetInfo:
+			return maFrameBufferGetInfo(a);
+		case maIOCtl_maFrameBufferInit:
+			return maFrameBufferInit(a);
+		case maIOCtl_maFrameBufferClose:
+			return maFrameBufferClose();
+
+#ifdef MA_IX_AUDIOBUFFER
+		case maIOCtl_maAudioBufferInit:
+			return maAudioBufferInit(a);		
+		case maIOCtl_maAudioBufferReady:
+			return maAudioBufferReady();
+		case maIOCtl_maAudioBufferClose:
+			return maAudioBufferClose();
+#endif
+
+#ifdef SEGMENTED_DATA
+		case maIOCtl_maAddDataSize:
+			return maAddDataSize(a, b);
+#endif
+
+		default:
+			return IOCTL_UNAVAILABLE;
+		}
+	}
+
+	#include "SyscallBluetooth.jpp"
+	
+#ifdef MA_SUPPORT_RECORD
+	NETSYSCALL(int) maRecordSetup() throws Exception {
+		/* FIX-ME */
+		return -1;
+	}
+
+	NETSYSCALL(int) maRecordStart(MAHandle rec) throws Exception {
+		/* FIX-ME */
+		return -1;
+	}
+
+#define CONNOP_RECORD_PAUSE 0x10	//HACK, should be defined in IDL
+	NETSYSCALL(int) maRecordPause(MAHandle rec) throws Exception {
+		/* FIX-ME */
+		return -1;
+	}
+#endif
+
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI
+	final int maSendTextSMS(String dst, String msg) {
+		/* FIX-ME */
+		return -1;
+	}
+#endif
+
+#ifdef PUBLIC_DEBUG
+	final int maWriteLog(Address src, int size) throws Exception {
+		/* FIX-ME */
+		return -1;	
+	}
+#endif
+
+	#include "SyscallStreamingVideo.jpp"
+
+	#include "SyscallLocation.jpp"
+
+	SYSCALL(int) maInvokeExtension(int function, int a, int b, int c) {
+#ifdef MOSYNC_SUPPORT_EXTENSIONS
+		return mExt.invoke(function, a, b, c);
+#else
+		return -1;
+#endif
+	}
+
+#ifdef MOSYNC_SUPPORT_EXTENSIONS	//implement MoSync
+	public Graphics getGraphics() {
+		return mGraphics;
+	}
+	public int[] getMemory() {
+		return CORE.mMem_ds;
+	}
+	public GameCanvas getCanvas() {
+		return mCanvas;
+	}
+	public MIDlet getMidlet() {
+		return mCanvas.mMidlet;
+	}
+	public ThreadPool getThreadPool() {
+		return mThreadPool;
+	}
+
+	public void postEvent(int[] event) {
+		mCanvas.postEvent(event);
+	}
+
+#ifndef MA_PROF_SUPPORT_CLDC_10
+	public double readDouble(int address) {
+		int[] mem_ds = CORE.mMem_ds;
+		return CORE.ints2double(RINT(address), RINT(address + 4));
+	}
+	public void writeDouble(int address, double d) {
+		CORE.writeMemDouble(address, d);
+	}
+#endif
+
+	public boolean isResourceInFlux(int handle) {
+		return getResource(handle) == mFlux;
+	}
+#endif
+
+}

@@ -1,0 +1,2 @@
+set TARGETDIR="C:\Code\MoSync\trunk\runtimes\java\platforms\android\AndroidProject\src\com\mosync\java\android"
+set JAVASOURCEROOT="C:\Code\MoSync\trunk\runtimes\java"

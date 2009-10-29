@@ -1,0 +1,67 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+SYSCALL(int) maSoundPlay(MAHandle sound_res, int offset, int size) throws Exception
+{
+	return 0;
+}
+
+final boolean startSound(InputStream input, String mimeString) throws Exception {
+	return false;
+}
+
+SYSCALL(void) maSoundStop() /* FIX-ME throws MediaException */ {
+}	
+
+SYSCALL(void) maSoundSetVolume(int vol) {	//vol is in range 0 - 100
+	if(vol<0) vol = 0;
+	else if(vol>100) vol = 100;
+	mSoundVolume = vol;
+}
+
+SYSCALL(int) maSoundGetVolume() {
+	return mSoundVolume;
+}
+
+// returns 1 if the sound is playing, otherwise 0
+SYSCALL(int) maSoundIsPlaying() {
+	return 0;
+}
+
+#ifdef MA_IX_AUDIOBUFFER
+private final int maAudioBufferInit(int info) throws Exception {
+	/* FIX-ME */
+	return -1;
+}
+
+private final int maAudioBufferReady() throws Exception {
+	/* FIX-ME */
+	return -1;
+}
+
+private final int maAudioBufferClose() throws Exception {
+	/* FIX-ME */
+	return -1;
+}
+#endif
+
+#ifdef MA_SUPPORT_STREAMING
+NETSYSCALL(int) maSoundPlayConn(MAHandle conn, String mimeString) throws Exception {
+	/* FIX-ME */
+	return 1;
+}
+#endif	//MA_SUPPORT_STREAMING
