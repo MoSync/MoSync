@@ -226,8 +226,8 @@ static bool sourceNexti() {
 		skipCall(r.pc + len);
 	} else {
 		op(stubStep);
-		op(sourceNexti);	//delayed recursive
 	}
+	op(sourceNexti);	//delayed recursive
 	return true;
 }
 

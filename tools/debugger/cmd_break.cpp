@@ -110,6 +110,11 @@ void break_insert(const string& args) {
 		}
 	}
 
+	if(sBreakpointAddresses.find(address) != sBreakpointAddresses.end()) {
+		error("A breakpoint already exists at that address");
+		return;
+	}
+
 	sInsertingBreakpoint.address = address;
 	sInsertingBreakpoint.enabled = true;
 	sInsertingBreakpoint.keep = true;
@@ -263,7 +268,7 @@ void StubConnection::breakpointHit() {
 	}
 
 	//todo: problematic. what if multiple breakpoints point to this address?
-	//maybe we shouldn't allow that. check gcc's behaviour.
+	//maybe we shouldn't allow that. check gdb's behaviour.
 	BreakpointAddressMap::const_iterator itr = sBreakpointAddresses.find(r.pc);
 	oprintf("*stopped,reason=\"breakpoint-hit\",bkptno=\"");
 	if(itr == sBreakpointAddresses.end()) {

@@ -378,7 +378,7 @@ int mapFileLine(const char* filename, int lineNumber) {
 	}
 	size_t fileIndex;
 	for(fileIndex=0; fileIndex<gFiles.size(); fileIndex++) {
-		if(gFiles[fileIndex].name == filename)
+		if(stricmp(gFiles[fileIndex].name.c_str(), filename) == 0)	//hack
 			break;
 	}
 	if(fileIndex == gFiles.size())
