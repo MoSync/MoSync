@@ -460,7 +460,13 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	myrfs.Connect();
 	//Initialize decoder
 	_LIT8(KPngMime, "image/png");
-	TCleaner<CImageDecoder> decoder(CImageDecoder::DataNewL(FSS, aEncodedData, KPngMime));
+	_LIT8(KJpegMime, "image/jpeg");
+	CImageDecoder* temp = NULL;
+	ITRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KPngMime));
+	if(!temp) {
+		LTRAP(temp = CImageDecoder::DataNewL(FSS, aEncodedData, KJpegMime));
+	}
+	TCleaner<CImageDecoder> decoder(temp);
 	CleanupStack::PushL(decoder());
 
 	//Create bitmap
