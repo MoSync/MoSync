@@ -2368,7 +2368,6 @@ interface MAAPI {
 		int maAddDataSize(in MAHandle data, in int size);
 #endif	//IX_SEGMENTED_DATA
 
-#if IX_SYSPROP
 		/**
 		* Retrieves the value of a Java System Property.
 		* \param key The property's key.
@@ -2381,7 +2380,6 @@ interface MAAPI {
 		* -2 will be returned.
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf, in int size);
-#endif	//IX_SYSPROP
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

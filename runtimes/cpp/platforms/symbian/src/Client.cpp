@@ -52,7 +52,10 @@ static void StartServer() {
 	
 	RProcess proc;
 	TRequestStatus rendezvousStatus;
+	
+	//TODO:if this fails, we should display a friendly "reinstall" message.
 	LHEL(proc.Create(KMoSyncServerExe, KNullDesC));
+	
 	proc.Rendezvous(rendezvousStatus);
 	proc.Resume();
 	User::WaitForRequest(rendezvousStatus);
