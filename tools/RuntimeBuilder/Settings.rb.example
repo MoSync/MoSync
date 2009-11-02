@@ -15,23 +15,9 @@
 # 02111-1307, USA.
 
 $SETTINGS = {
-		:build_javame => true,
-		:build_s60v2 => true,
-		:build_s60v3 => true,
-		:build_sp2003 => true,
-		:build_winmobile => true,
+	:java_source => "../../runtimes/java/",
+	:symbian_source => "../../runtimes/cpp/platforms/symbian/",
+	:wince_source => "../../runtimes/cpp/platforms/winmobile/",
 
-		:have_s60v2 => true,
-		:have_s60v3 => true,
-		:have_sp2003 => true,
-		:have_winmobile => true,
-
-		:java_source => "../../runtimes/java/",
-		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
-		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
-		
-		:build_commercial => true,
-		:use_arm_recompiler => true,
-		
-		:verbose => false,
-	}
+	:verbose => false,
+}

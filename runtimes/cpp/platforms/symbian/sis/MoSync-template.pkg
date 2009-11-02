@@ -4,13 +4,19 @@
 &EN
 
 ; standard SIS file header
-#{"%s"},(0x%s),1,2,0
+#{"%project-name%"},(0x%uid%),1,2,0
+
+;Localised Vendor name
+;{"%vendor-name%"}
+
+;Unique Vendor name
+;:"%vendor-name%"
 
 ;Supports Series 60 v2.0
 (0x101F7960), 0, 0, 0, {"Series60ProductID"}
 
 ;Files to install
-"%s.app"-"!:\system\apps\%s\%s.app"
-"%s.rsc"-"!:\system\apps\%s\%s.rsc"
-"%s_caption.rsc"-"!:\system\apps\%s\%s_caption.rsc"
-"program.comb"-"!:\system\apps\%s\program.comb"
+"%package-output-dir%\%uid%.app"-"!:\system\apps\%uid%\%uid%.app"
+"%package-output-dir%\%uid%.rsc"-"!:\system\apps\%uid%\%uid%.rsc"
+"%package-output-dir%\%uid%_caption.rsc"-"!:\system\apps\%uid%\%uid%_caption.rsc"
+"%programcomb-output%"-"!:\system\apps\%uid%\program.comb"

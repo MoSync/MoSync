@@ -375,12 +375,13 @@ runtimes.each do |platform_name, platform|
 		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		
 		if(platform_name == :java && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
-			puts("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
-			success = system("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")	
+			cmd = "ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		else
-			puts("ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
-			success = system("ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}")
+			cmd = "ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		end
+
+		puts(cmd)
+		success = system(cmd)
 		
 		Dir.chdir cwd
 

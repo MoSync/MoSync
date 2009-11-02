@@ -143,6 +143,7 @@ void CMoSyncSession::DispatchMessageL(const RMessage2& aMessage)
 	 //  This is considered a client programming error, so we panic the 
 	 //  client - this also completes the message.
 	default:
+		LOG("Bad request: %i\n", aMessage.Function());
 		PanicClient(aMessage, EBadRequest);
 		return;
 	}
@@ -153,6 +154,7 @@ Panics the client
 */
 void CMoSyncSession::PanicClient(const RMessage2& aMessage, TInt aPanic) const
 {
+	LOG("PanicClient %i\n", aPanic);
 	_LIT(KTxtServer,"MoSync server");
 	aMessage.Panic(KTxtServer, aPanic);
 }

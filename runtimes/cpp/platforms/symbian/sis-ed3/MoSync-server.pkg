@@ -15,6 +15,10 @@
 ;Supports S60 3rd Edition
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
+;Requires the MoSync Server, v1.2.0
+@"MoSyncServer.sis",(0x20022A9D)
+(0x20022A9D), 1, 2, 0, {"MoSync Server"}
+
 ;Files to install
 "\Symbian\9.2\S60_3rd_FP1\Epoc32\data\z\resource\apps\MoSync_3rd.RSC" -"!:\resource\apps\E7654321.rsc"
 "\Symbian\9.2\S60_3rd_FP1\Epoc32\data\z\resource\apps\MoSync_icon.mif" -"!:\resource\apps\E7654321_icon.mif"

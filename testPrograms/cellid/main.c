@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 
 int MAMain() {
-	MA_CELLINFO ci;
+	MACellInfo ci;
 	int res;
 
 	InitConsole();

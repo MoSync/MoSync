@@ -1,26 +1,30 @@
-; MoSync-template.pkg
+; LauncherApp.pkg
 ;
 ;Language - standard language definitions
 &EN
 
 ; standard SIS file header
-#{"%s"},(%s),1,2,0, TYPE=SA
+#{"%project-name%"},(0x%uid%),1,2,0, TYPE=SA
 
 ;Localised Vendor name
-%%{"%s"}
+%%{"%vendor-name%"}
 
 ;Unique Vendor name
-:"%s"
+:"%vendor-name%"
 
 ;Supports S60 3rd Edition
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
-;Files to install
-"%s.exe" -"!:\sys\bin\%s.exe"
-"%s" -"!:\resource\apps\%s.comb"
-"%s.RSC" -"!:\resource\apps\%s.rsc"
-;"%s_icon.mif" -"!:\resource\apps\%s_icon.mif"
-"%s_reg.RSC" -"!:\private\10003a3f\import\apps\%s_reg.rsc"
+;Requires the MoSync Server, v1.2.0
+;@"%runtime-dir%\MoSyncServer.sis",(0x20022A9D)
+;(0x20022A9D), 1, 2, 0, {"MoSync Server"}
 
-;required for application to be covered by backup/restore facility 
-;"backup_registration.xml" -"!:\private\%s\backup_registration.xml"
+;Files to install
+"%package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
+"%programcomb-output%" -"!:\resource\apps\%uid%.comb"
+"%package-output-dir%\%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
+;"%package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
+"%package-output-dir%\%uid%_reg.RSC" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
+
+;required for application to be covered by backup/restore facility
+;"backup_registration.xml" -"!:\private\%uid%\backup_registration.xml"

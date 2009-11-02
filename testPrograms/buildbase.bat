@@ -4,7 +4,10 @@ echo Compiling %1...
 
 REM  2>&1 | sed 's/\([-a-zA-Z0-9/]\+\)\(.[-a-zA-Z0-9]\+\):\([0-9]\+\):/%CD:\=\/%\/\1\2(\3):/'
 REM -Wshadow
-xgcc -g -I%MOSYNCDIR%/include -I%MOSYNCDIR%/libs -S -O0 -fno-omit-frame-pointer -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -o temp.s %1
+
+set IFLAGS=-I%MOSYNCDIR%/include -I%MOSYNCDIR%/libs -I%MOSYNCDIR%/profiles/vendors/MobileSorcery/Emulator
+set CFLAGS=-O0 -fno-omit-frame-pointer -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings
+xgcc -g -S %IFLAGS% %CFLAGS% -o temp.s %1
 
 if not exist temp.s goto end
 echo Done.
