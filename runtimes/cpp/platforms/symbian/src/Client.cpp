@@ -53,8 +53,17 @@ static void StartServer() {
 	RProcess proc;
 	TRequestStatus rendezvousStatus;
 	
-	//TODO:if this fails, we should display a friendly "reinstall" message.
-	LHEL(proc.Create(KMoSyncServerExe, KNullDesC));
+	//if this fails, display a friendly "reinstall" message.
+	TInt res = proc.Create(KMoSyncServerExe, KNullDesC);
+	if(IS_SYMBIAN_ERROR(res)) {
+		LOG("MoSync server proc.Create error: %i\n", res);
+		_LIT(KErrorMessage,
+			"MoSyncServer is missing. Please reinstall the application.");
+#ifdef PUBLIC_DEBUG
+		writePanicReport(REPORT_PLATFORM_CODE, res);
+#endif
+		ShowAknErrorNoteThenExitL(KErrorMessage);
+	}
 	
 	proc.Rendezvous(rendezvousStatus);
 	proc.Resume();

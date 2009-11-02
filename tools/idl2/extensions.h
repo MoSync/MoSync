@@ -29,4 +29,3 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IX_OPENGL_ES
 #define IX_AUDIOBUFFER
 #define IX_SEGMENTED_DATA
-#define IX_SYSPROP
