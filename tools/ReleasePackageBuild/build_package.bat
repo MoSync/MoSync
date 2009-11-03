@@ -460,7 +460,7 @@ call gendox.bat
 @cd %MOSYNC_TRUNK%\docs\
 
 mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
-@xcopy html %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\ /e /y
+@xcopy %MOSYNC_DOCS_PATH%\html %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\ /e /y
 @IF NOT errorlevel 0 goto TOOL_ERROR
 
 
