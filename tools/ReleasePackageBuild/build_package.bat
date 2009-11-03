@@ -117,30 +117,6 @@ cd %ORIGINAL_PATH%
 @mkdir %MOSYNC_TRUNK%\lib\pipe
 @echo.
 
-
-:BUILD_ECLIPSE
-@echo.
-@echo ------------------------------------------------
-@echo Building MoSync-Eclipse
-@echo ------------------------------------------------
-cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
-
-call build-mosync.bat release
-@IF NOT errorlevel 0 goto TOOL_ERROR
-
-@echo.
-@echo ------------------------------------------------
-@echo Moving MoSync-Eclipse
-@echo ------------------------------------------------
-echo on
-@cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
-@IF NOT errorlevel 0 goto TOOL_ERROR
-
-@del /S /Q %MOSYNC_ECLIPSE_PATH%
-
-xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
-
 :COPY
 @echo off
 @echo.
@@ -476,6 +452,42 @@ call build_docs.bat
 @echo on
 
 call gendox.bat
+
+@echo ------------------------------------------------
+@echo Copies the doxygen html files to Eclipse
+@echo ------------------------------------------------
+
+@cd %MOSYNC_TRUNK%\docs\
+
+mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
+@xcopy html %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\ /e /y
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
+
+
+:BUILD_ECLIPSE
+@echo.
+@echo ------------------------------------------------
+@echo Building MoSync-Eclipse
+@echo ------------------------------------------------
+cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
+
+call build-mosync.bat release
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
+@echo.
+@echo ------------------------------------------------
+@echo Moving MoSync-Eclipse
+@echo ------------------------------------------------
+echo on
+@cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
+@del /S /Q %MOSYNC_ECLIPSE_PATH%
+
+xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
+@IF NOT errorlevel 0 goto TOOL_ERROR
+
 
 @cd %ORIGINAL_PATH%
 @echo.
