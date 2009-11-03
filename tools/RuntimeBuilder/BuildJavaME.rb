@@ -18,11 +18,11 @@ require 'ftools'
 require 'fileutils'
 			
 class RuntimeBuilder 
-	def java(runtime_dir, mode)
+	def javame(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, false)
 	end
 	
-	def javacldc10(runtime_dir, mode)
+	def javamecldc10(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, true)
 	end
 	
@@ -56,8 +56,7 @@ class RuntimeBuilder
 	def javameBuilder(runtime_dir, mode, cldc10)
 		debug = (mode=="debug") ? "D" : ""
 		
-		# temporary fix... 
-		java_me_sdk = "D:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\"
+		java_me_sdk = "#{$SETTINGS[:javame_sdk]}"
 		
 		if ENV['JAVAMESDKDIR'] != nil
 			java_me_sdk = ENV['JAVAMESDKDIR']

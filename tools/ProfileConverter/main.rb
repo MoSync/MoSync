@@ -21,7 +21,7 @@ RELEVANT_CAPS = [
 
 RELEVANT_DEFINES = {
 
-	:java => [
+	:JavaME => [
 		'MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH',
 		'MA_PROF_BUG_BACKLIGHTFLASHES',
 		'MA_PROF_BUG_MICROEMU',
@@ -140,7 +140,7 @@ runtimes = {
 	:sp2003 => [],
 	:s60v2  => [],
 	:s60v3  => [],
-	:java => [],
+	:JavaME => [],
 }
 
 class Array
@@ -222,9 +222,7 @@ db.execute( "select name from vendor" ) do |vendor|
 		"INNER JOIN platformversion ON device.platformversion = platformversion.id " <<
 		"INNER JOIN platform ON platformversion.platform = platform.id " <<
 		"WHERE vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
-		if device[2] == "JavaME"
-			device[2] = "java"
-		end
+		
 		rt_obj = Runtime.new(device[2].to_s)
 		seen_defines = []
 		device_path = "#{VENDOR_DIR}/#{vendor}/#{device[1]}"
@@ -234,6 +232,7 @@ db.execute( "select name from vendor" ) do |vendor|
 			profile.puts
 			profile.puts "#define MA_PROF_STRING_VENDOR \"#{vendor}\""
 			profile.puts "#define MA_PROF_STRING_DEVICE \"#{device[1]}\""
+			profile.puts "#define MA_PROF_STRING_PLATFORM \"#{device[2]}\""
 			profile.puts "#define MA_PROF_VENDOR_#{vendor[0].format}"
 			profile.puts "#define MA_PROF_DEVICE_#{device[1].format}"
 			profile.puts
@@ -327,6 +326,7 @@ db.execute( "select name from vendor" ) do |vendor|
 			end
 			profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 		end
+		
 		runtime = runtimes[device[2].to_sym].add_runtime rt_obj
 		runtime.devices << Device.new(device[1], vendor)
 	end
@@ -360,7 +360,7 @@ runtimes.each do |platform_name, platform|
 		release_defines = ['PHONE_RELEASE']
 		release_defines << "MOSYNC_COMMERCIAL"
 		#release_defines << "LOGGING_ENABLED"
-		if(platform_name == :sp2003 || platform_name == :wm5)# || platform_name == :s60v2 || platform_name == :s60v3)
+		if(platform_name == :sp2003 || platform_name == :wm5) # || platform_name == :s60v2 || platform_name == :s60v3)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)
@@ -377,8 +377,8 @@ runtimes.each do |platform_name, platform|
 		
 		puts "platform dir : #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		
-		if(platform_name == :java && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
-			cmd = "ruby RuntimeBuilder.rb Settings.rb javacldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
+		if(platform_name == :JavaME && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
+			cmd = "ruby RuntimeBuilder.rb Settings.rb JavaMEcldc10 #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		else
 			cmd = "ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		end
