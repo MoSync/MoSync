@@ -50,7 +50,7 @@ typedef PrintFunctor& printfPtr;
 class TypeBase {
 public:
 	enum Type {
-		eUnknown, eBuiltin, eStruct, eArray, eEnum, ePointer, eFunction
+		eUnknown, eBuiltin, eStruct, eArray, eEnum, ePointer, eFunction, ePointerToMember
 	};
 
 	enum PrintFormat {

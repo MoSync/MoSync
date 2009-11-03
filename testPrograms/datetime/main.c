@@ -22,17 +22,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int MAMain() {
 	InitConsole();
 
-	printf("Current date/time is:");
+	printf("Current date/time is:\n");
 
 	while(1) {
-		EVENT event;
+		MAEvent event;
 		if(maGetEvent(&event))
 			if(event.type == EVENT_TYPE_CLOSE ||
 				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
 				maExit(0);
 
-		printf("%s (UTC)", sprint_time(maTime()));
-		printf("%s (local)", sprint_time(maLocalTime()));
+		printf("%s (UTC)\n", sprint_time(maTime()));
+		printf("%s (local)\n", sprint_time(maLocalTime()));
 		maWait(1000);
 	}
 }

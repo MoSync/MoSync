@@ -192,10 +192,10 @@ namespace MAUtil {
 			iterator e = end();
 
 #ifdef MOSYNCDEBUG
-			ASSERT_MSG((i<begin()) || (i>e[-1]), "Remove iterator out of bounds");
+			ASSERT_MSG((i<begin()) || (i>(e-1)), "Remove iterator out of bounds");
 #endif
 
-			while(i != &e[-1]) {
+			while(i != (e-1)) {
 				*i = *(i+1);
 				i++;
 			}
@@ -221,7 +221,7 @@ namespace MAUtil {
 			iterator i = &(begin()[index]);
 
 #ifdef MOSYNCDEBUG
-			ASSERT_MSG((i<begin()) || (i>e[-1]), "Insert iterator out of bounds");
+			ASSERT_MSG((i<begin()) || (i>(e-1)), "Insert iterator out of bounds");
 #endif
 
 			while(e != i)
@@ -246,7 +246,7 @@ namespace MAUtil {
 		 */
 		void resize(int newSize) {
 #ifdef MOSYNCDEBUG
-			ASSERT_MSG(newSize<0, "Resize negative");
+			ASSERT_MSG(newSize>=0, "Resize negative");
 #endif
 
 			MAUTIL_VECTOR_LOG("resize 0x%08X %i", (uint)this, newSize);

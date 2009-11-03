@@ -29,7 +29,7 @@ MACHDEP = " -DMAPIP"
 INCLUDE_DIRS = [".", "#{BD}/libs/MAStd", "#{BD}/libs"] + EXTRA_INCLUDES
 
 if(CONFIG == "debug") then
-	INTRA_CFLAGS = " -S" + EXTRA_CFLAGS
+	INTRA_CFLAGS = " -DMOSYNCDEBUG -S" + EXTRA_CFLAGS
 elsif(CONFIG == "")
 	INTRA_CFLAGS = " -g -S" + EXTRA_CFLAGS
 else
@@ -65,7 +65,7 @@ end
 require "#{BD}/build_rules/common.rb"
 
 def build_program(t)
-	sh "cd #{BUILDDIR} && #{PIPETOOL}#{PIPEFLAGS} -sld -B tempProgram #{expand_paths(t.prerequisites)}" do |ok, res|
+	sh "cd #{BUILDDIR} && #{PIPETOOL}#{PIPEFLAGS} -sld -collect-stabs -B tempProgram #{expand_paths(t.prerequisites)}" do |ok, res|
 		if(ok) then
 			sh "mv #{BUILDDIR}tempProgram #{t.name}"
 		else

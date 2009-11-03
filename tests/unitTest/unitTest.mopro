@@ -19,7 +19,7 @@
 		<Property name="additionalDependencies" value="MAUtilD.lib MAStdD.lib"/>
 		<Property name="extraCmd" value="-O0"/>
 		<Property name="extraResourcer" value=""/>
-		<Property name="extraLinker" value="-datasize=1024000 -stacksize=128000 -heapsize=512000"/>
+		<Property name="extraLinker" value="-datasize=1024000 -stacksize=128000 -heapsize=512000 -collect-stabs"/>
 		<Property name="debug" value="true"/>
 		<Property name="icon" value=""/>
 	</Configuration>

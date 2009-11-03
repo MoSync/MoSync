@@ -138,6 +138,17 @@ protected:
 	std::vector<StaticDataMember> mStaticDataMembers;
 };
 
+class PointerToMemberType : public TypeBase {
+public:
+	PointerToMemberType(const StructType* c, const TypeBase* m);
+
+	void printMI(printfPtr, const void*, PrintFormat) const;
+	void printTypeMI(printfPtr, bool complex) const;
+
+	const StructType* const mClass;
+	const TypeBase* const mMember;
+};
+
 class RangeType : public TypeBase {
 public:
 	RangeType(int min, int max);

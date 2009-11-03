@@ -231,6 +231,18 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			TEST(result = new ReferenceType(tb));
 		}
 		break;
+	case '@':	//C++ Pointer-to-member
+		{
+			*pText = typeText + 1;
+			const TypeBase* classType = subParseType(pText, id, name);
+			TEST(classType);
+			TEST(**pText == ',');
+			(*pText)++;
+			const TypeBase* memberType = subParseType(pText, id, name);
+			TEST(memberType);
+			TEST(classType->type == TypeBase::eStruct);
+			TEST(result = new PointerToMemberType((StructType*)classType, memberType));
+		}
 		break;
 	default:	//unknown
 		FAIL;

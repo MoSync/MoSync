@@ -140,6 +140,18 @@ const TypeBase* PointerType::deref() const {
 	return mTarget;
 }
 
+PointerToMemberType::PointerToMemberType(const StructType* c, const TypeBase* m) :
+TypeBase(4, true, ePointerToMember), mClass(c), mMember(m)
+{
+}
+void PointerToMemberType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
+	pf("0x%x", *(int*)data);
+}
+void PointerToMemberType::printTypeMI(printfPtr pf, bool complex) const {
+	mMember->printTypeMI(pf, false);
+	pf(" %s::*", mClass->mName.c_str());
+}
+
 FunctionType::FunctionType(const TypeBase* returnType) :
 TypeBase(0, false, eFunction), mReturnType(returnType) {
 }
