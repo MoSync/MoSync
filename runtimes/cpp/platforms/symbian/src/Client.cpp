@@ -58,7 +58,7 @@ static void StartServer() {
 	if(IS_SYMBIAN_ERROR(res)) {
 		LOG("MoSync server proc.Create error: %i\n", res);
 		_LIT(KErrorMessage,
-			"MoSyncServer is missing. Please reinstall the application.");
+			"A component is missing. Please reinstall the application.");
 #ifdef PUBLIC_DEBUG
 		writePanicReport(REPORT_PLATFORM_CODE, res);
 #endif

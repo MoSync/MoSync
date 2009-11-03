@@ -69,7 +69,7 @@ class RuntimeBuilder
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.app, and other runtime files was succesfully generated!\n\n"
 			return 0
-		else
+		elsif version == "s60v3"
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"		
 			exe_file = "#{epoc_dir}release/gcce/urel/MoSync2.exe"
@@ -84,9 +84,13 @@ class RuntimeBuilder
 			File.copy("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")
 			File.copy("#{epoc_dir}data/z/private/10003a3f/import/apps/MoSync_reg.RSC", "#{runtime_dir}MoSync_reg.RSC")
 			File.copy("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
+			File.copy("#{$SETTINGS[:symbian_source]}/server/MoSyncServer_Express_Signed.sis", "#{runtime_dir}MoSyncServer.sis")
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
 			return 0
+		else
+			puts "FATAL ERROR! - Unknown version (#{version})."
+			return 1
 		end
 	end
 

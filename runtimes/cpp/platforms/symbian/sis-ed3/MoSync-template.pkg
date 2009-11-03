@@ -16,8 +16,8 @@
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
 ;Requires the MoSync Server, v1.2.0
-;@"%runtime-dir%\MoSyncServer.sis",(0x20022A9D)
-;(0x20022A9D), 1, 2, 0, {"MoSync Server"}
+@"%runtime-dir%\MoSyncServer.sis",(0x20022A9D)
+(0x20022A9D), 1, 2, 0, {"MoSync Server"}
 
 ;Files to install
 "%package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
