@@ -23,8 +23,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-#define USE_AUTOMATED_TESTS
-//#define USE_INTERACTIVE_TESTS
+//#define USE_AUTOMATED_TESTS
+#define USE_INTERACTIVE_TESTS
 
 // automated tests
 void addDownloaderTests(TestSuite* suite);

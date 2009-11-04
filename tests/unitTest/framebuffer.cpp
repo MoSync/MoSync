@@ -66,7 +66,14 @@ void FramebufferTest::start() {
 		assert("malloc", false);
 		return;
 	}
-	assert("maFrameBufferInit", maFrameBufferInit(fb) >= 0);
+
+	int fbRet = maFrameBufferInit(fb);
+	if( fbRet <= 0)
+	{
+		assert("maFrameBufferInit", false);
+		free(fb);
+		return;
+	}
 
 	//draw
 #if 0
@@ -77,6 +84,7 @@ void FramebufferTest::start() {
 	//draw color rects, plot some pixels over them
 
 	Image img((byte*)fb, NULL, fi.width, fi.height, fi.pitch, Image::PIXELFORMAT_RGB888);
+
 	img.bytesPerPixel = fi.bytesPerPixel;
 	img.bitsPerPixel = fi.bitsPerPixel;
 
@@ -117,8 +125,7 @@ void FramebufferTest::start() {
 	img.drawPoint(fi.width - 1, fi.height - 1, 0xFFFFFF);	//WHITE
 
 	maUpdateScreen();
-	assert("maFrameBufferClose", maFrameBufferClose() >= 0);
-	free(fb);
+	assert("maFrameBufferClose", maFrameBufferClose() > 0);
 }
 
 void framebuffer_malloc_handler(int size) {
