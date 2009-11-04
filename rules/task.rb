@@ -1,9 +1,26 @@
 require "#{File.dirname(__FILE__)}/defaults.rb"
-require 'fileutils.rb'
+require 'fileutils'
+require 'singleton'
+require 'ftools'
 
 class TaskBase
 	#@prerequisites	#Task[]
 	#@work	#Work
+	
+	# EarlyTime is a fake timestamp that occurs _before_ any other time value.
+	class EarlyTime
+		include Comparable
+		include Singleton
+		
+		def <=>(other)
+			-1
+		end
+		
+		def to_s
+			"<EARLY TIME>"
+		end
+	end
+	EARLY = EarlyTime.instance 
 	
 	def initialize()
 		@prerequisites = []
@@ -85,6 +102,10 @@ class FileTask < Task
 		@NAME = name.to_s
 	end
 	
+	def to_str
+		@NAME
+	end
+	
 	def to_s
 		@NAME
 	end
@@ -117,9 +138,20 @@ class FileTask < Task
 	end
 end
 
-##unused
 class DirTask < FileTask
 	def execute
 		FileUtils.mkdir_p @NAME
+	end
+end
+
+class CopyFileTask < FileTask
+	def initialize(work, name, src, preq = [])
+		super(work, name)
+		@src = src
+		@prerequisites = [src] + preq
+	end
+	def execute
+		puts "cp #{@src} #{@NAME}"
+		File.copy(@NAME, @src)
 	end
 end

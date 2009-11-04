@@ -38,18 +38,7 @@ def do_subdirs(dirs, target="")
 end
 
 skins = Work.new
-class << skins
-	class CopyFileTask < FileTask
-		def initialize(work, name, src)
-			super(work, name)
-			@src = src
-			@prerequisites = [src]
-		end
-		def execute
-			call "cp #{@src} #{@NAME}"
-		end
-	end
-	
+skins.instance_eval do
 	def setup
 		builddir = "#{ENV['MOSYNCDIR']}/skins"
 		@prerequisites = [DirTask.new(self, builddir)]
