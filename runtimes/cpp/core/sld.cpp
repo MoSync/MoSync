@@ -378,7 +378,12 @@ int mapFileLine(const char* filename, int lineNumber) {
 	}
 	size_t fileIndex;
 	for(fileIndex=0; fileIndex<gFiles.size(); fileIndex++) {
+#ifdef _WIN32
+		// Since stricmp is deprecated and therfore gives warnings, which is treated as errors
+		if(_stricmp(gFiles[fileIndex].name.c_str(), filename) == 0)	//hack
+#else
 		if(stricmp(gFiles[fileIndex].name.c_str(), filename) == 0)	//hack
+#endif
 			break;
 	}
 	if(fileIndex == gFiles.size())
