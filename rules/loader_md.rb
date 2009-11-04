@@ -35,10 +35,13 @@ class MakeDependLoader
 			lines.gsub!(/\\\n/, ' ')
 			lines.split("\n").each do |line|
 				if(res) then
-					error "MD: too many logical lines"
+					error "MD: too many logical lines in file '#{fn}'"
 				end
 				res = process_line(line, target)
 			end
+		end
+		if(res == nil)
+			res = []
 		end
 		return res
 	end

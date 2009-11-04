@@ -37,11 +37,32 @@ class Targets
 	
 	# parse ARGV
 	def Targets.setup
-		@@goals = [:more]	#temp hack
+		#@@goals = [:more]	#temp hack
+		@@goals = []
+		#puts ARGV.inspect
+		ARGV.each do |a| handle_arg(a) end
+		#error "not finished"
+		if(@@goals.empty?) then
+			@@goals = [:default]
+		end
+	end
+	
+	def Targets.handle_arg(a)
+		i = a.index('=')
+		if(i) then
+			set_constant(a[0, i], a[i+1 .. a.length])
+		else
+			@@goals += [a.to_sym]
+		end
 	end
 	
 	def Targets.invoke
-		@@goals.each { |t| @@targets[t].invoke }
+		@@goals.each { |t|
+			if(@@targets[t] == nil) then
+				error "Does not have target '#{t}'"
+			end
+			@@targets[t].invoke
+		}
 	end
 end
 

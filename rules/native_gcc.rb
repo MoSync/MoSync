@@ -1,6 +1,7 @@
-require 'rules/task.rb'
-require 'rules/gcc_flags.rb'
-require 'rules/loader_md.rb'
+require "#{File.dirname(__FILE__)}/host.rb"
+require "#{File.dirname(__FILE__)}/task.rb"
+require "#{File.dirname(__FILE__)}/gcc_flags.rb"
+require "#{File.dirname(__FILE__)}/loader_md.rb"
 
 class CompileGccTask < FileTask
 		
@@ -41,23 +42,9 @@ class CompileGccTask < FileTask
 	end
 end
 
-class ExeTask < FileTask
-	def initialize(work, name, objects, linkflags)
-		super(work, name)
-		@prerequisites = @objects = objects
-		@LINKFLAGS = linkflags
-		
-		# todo: save linkflags, like CompileGccTask. share code.
-	end
-	
-	def execute
-		sh "g++ #{@objects.join(' ')}#{@LINKFLAGS} -o #{@NAME}"
-	end
-end
-
 # Compiles C/C++ code into an executable file.
 # Supports GCC on linux and mingw
-class ExeWork < BuildWork
+class NativeGccWork < BuildWork
 	def genfile(source, ending)
 		@BUILDDIR + File.basename(source.to_s).ext(ending)
 	end
@@ -71,24 +58,21 @@ class ExeWork < BuildWork
 	include GccFlags
 
 	def setup2
+		#puts "NativeGccWork.setup2: #{@NAME.inspect}"
 		define_cflags
 		@CFLAGS_MAP = { ".c" => @CFLAGS,
 			".cpp" => @CPPFLAGS,
 			".cc" => @CPPFLAGS }
 
-		#root task: exe file
-		target = @BUILDDIR + @NAME + EXE_FILE_ENDING
-		#@tasks = {target => @root}
-		
 		#find source files
 		cfiles = collect_files(".c")
 		cppfiles = collect_files(".cpp") + collect_files(".cc") 
-		all_sourcefiles = cfiles + cppfiles
+		standard_sourcefiles = cfiles + cppfiles
 
-		source_objects = objects(all_sourcefiles)
+		source_objects = objects(standard_sourcefiles)
 		all_objects = source_objects + @EXTRA_OBJECTS
-		@TARGET = ExeTask.new(self, target, all_objects, @EXTRA_LINKFLAGS)
-		@prerequisites += [@TARGET]
+		
+		setup3(all_objects)
  	end
 	
 	# returns an array of Tasks
@@ -96,7 +80,7 @@ class ExeWork < BuildWork
 		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
 		files.flatten!
 		files.reject! {|file| @IGNORED_FILES.member?(File.basename(file))}
-		files += @EXTRA_SOURCEFILES.select do |file| file.endsWith(ending) end
+		files += @EXTRA_SOURCEFILES.select do |file| file.getExt == ending end
 		return files.collect do |file| FileTask.new(self, file) end
 	end
 	

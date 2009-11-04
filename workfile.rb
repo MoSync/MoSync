@@ -1,7 +1,8 @@
-BD = '.'
-require 'rules/targets.rb'
-require 'rules/host.rb'
-require 'rules/task.rb'
+#BD = '.'
+# File.expand_path is used here to ensure the files are really only loaded once.
+require File.expand_path('rules/targets.rb')
+require File.expand_path('rules/host.rb')
+require File.expand_path('rules/task.rb')
 
 PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"]
 

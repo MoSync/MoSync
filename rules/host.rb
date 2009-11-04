@@ -14,8 +14,8 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require 'rules/error.rb'
-require 'rules/util.rb'
+require "#{File.dirname(__FILE__)}/error.rb"
+require "#{File.dirname(__FILE__)}/util.rb"
 
 UNAME = open("|uname").readline().strip()
 
@@ -83,3 +83,4 @@ else
 	DLL_FILE_ENDING = '.so'
 	EXE_FILE_ENDING = ''
 end
+NATIVE_LIB_FILE_ENDING = '.a'

@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TOKENIZER_H
 
 #include <fstream>
+#include "helpers/attribute.h"
 
 using namespace std;
 
@@ -28,8 +29,8 @@ void readLine(string& line);
 void readTextToken(string& token);
 void doExact(const string& aToken);
 string getComment();
-void tokenError(const string& token);
-void Error(const string& type, const string& str);
+void ATTRIBUTE(noreturn, tokenError(const string& token));
+void ATTRIBUTE(noreturn, Error(const string& type, const string& str));
 int getCurrentLine();
 void doEOF();
 

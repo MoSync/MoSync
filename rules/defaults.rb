@@ -1,9 +1,10 @@
-require "rules/util.rb"
+require "#{File.dirname(__FILE__)}/util.rb"
 
 module Defaults
 def set_defaults
 	default(:CONFIG, "debug")
 
+	default(:SOURCES, [])
 	default(:EXTRA_CFLAGS, "")
 	default(:EXTRA_CPPFLAGS, "")
 	default(:EXTRA_LINKFLAGS, "")
@@ -24,5 +25,7 @@ def set_defaults
 	else
 		error "wrong configuration: " + @CONFIG
 	end
+	
+	default(:COMMON_BUILDDIR, File.expand_path(File.dirname(__FILE__) + "/../" + @BUILDDIR) + "/")
 end
 end

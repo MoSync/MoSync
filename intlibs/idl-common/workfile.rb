@@ -1,11 +1,15 @@
-BD = "../.."
+#BD = "../.."
 
-require "#{BD}/rules/native_lib.rb"
+#puts Dir.getwd
+require File.expand_path('../../rules/native_lib.rb')
 
 idlc = NativeLibWork.new
-class << idlc
+idlc.instance_eval do 
 	@SOURCES = ["."]
+	@EXTRA_INCLUDES = [".."]
 	@NAME = "idl-common"
 end
 
+#puts "invoking"
 idlc.invoke
+#puts "invokation complete"

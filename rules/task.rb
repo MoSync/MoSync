@@ -1,4 +1,4 @@
-require 'rules/defaults.rb'
+require "#{File.dirname(__FILE__)}/defaults.rb"
 require 'fileutils.rb'
 
 class TaskBase
@@ -10,6 +10,7 @@ class TaskBase
 	end
 	
 	def invoke
+		#puts "pre: #{self}"
 		@prerequisites.each do |p| p.invoke end
 		if(self.needed?) then
 			self.execute
@@ -35,8 +36,12 @@ class Work < TaskBase
 	end
 	
 	def invoke
+		#puts "Work.invoke: #{@NAME.inspect}"
 		if(@prerequisites == nil) then
 			setup
+			if(@prerequisites == nil)
+				error "setup failed"
+			end
 		end
 		@prerequisites.each do |p| p.invoke end
 	end
@@ -46,17 +51,22 @@ class Work < TaskBase
 		m = Module.new
 		m.const_set("ARGV", args)
 		script = open(dir + "/workfile.rb") { |f| f.read }
+		oldDir = Dir.getwd
+		Dir.chdir(dir)
+		puts Dir.getwd
 		m.module_eval(script)
+		Dir.chdir(oldDir)
 	end
 end
 
 class BuildWork < Work
 	include Defaults
 	def setup
+		#puts "BuildWork.setup: #{@NAME.inspect}"
 		set_defaults
 		@prerequisites = [DirTask.new(self, @BUILDDIR)]
 		setup2
-		@root.dump(0)
+		#dump(0)
 	end
 end
 
@@ -110,6 +120,6 @@ end
 ##unused
 class DirTask < FileTask
 	def execute
-		FileUtils.mkdir_p @name
+		FileUtils.mkdir_p @NAME
 	end
 end

@@ -21,8 +21,7 @@ pedantic_warnings = " -Wunreachable-code -Wmissing-noreturn -Wmissing-format-att
 pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes"
 
 #only valid in C.
-lesser_conly = " -Wnested-externs" +
-	" -Wdeclaration-after-statement"
+lesser_conly = " -Wnested-externs -Wdeclaration-after-statement"
 # -Wno-format-zero-length"
 
 standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
@@ -45,7 +44,16 @@ if(!GCC_IS_V43) then
 	lesser_conly += gcc43_c_warnings
 end
 
-flags_base = include_flags + standard_warnings + lesser_warnings + pedantic_warnings + flag_warnings
+if(@CONFIG == "debug") then
+	config_flags = " -g -O0"
+elsif(@CONFIG == "")
+	config_flags =  " -O2"
+else
+	error "wrong configuration: " + @CONFIG
+end
+
+flags_base = config_flags + include_flags + standard_warnings + lesser_warnings +
+	pedantic_warnings + flag_warnings
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings
 

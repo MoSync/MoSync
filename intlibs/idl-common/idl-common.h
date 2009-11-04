@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <vector>
 #include <exception>
 #include <string>
+#include "helpers/attribute.h"
 
 using namespace std;
 
@@ -106,14 +107,6 @@ typedef unsigned int uint32;
 typedef unsigned short uint16;
 
 #define MAIN_INTERFACE (-1)
-
-#if defined(__GNUC__) || defined(__SYMBIAN32__)
-#define ATTRIBUTE(a, func)  func __attribute__ ((a))
-#elif defined(_MSC_VER)
-#define ATTRIBUTE(a, func)  __declspec (a) func
-#else
-#error Unsupported compiler!
-#endif
 
 //doesn't set Interface.path
 Interface parseInterface(const vector<string>& ixs, const string& filename);
