@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maheap.h>
 #include <matime.h>
 #include <ma.h>
-#include "../common/helpers.h"
+#include <maassert.h>
 
 int MAMain() {
 	InitConsole();

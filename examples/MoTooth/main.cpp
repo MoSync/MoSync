@@ -61,10 +61,10 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 
 	//check store, print number of devices and services stored there.
-	printfln("reading store...");
+	printf("reading store...\n");
 	gDevices.resize(3);	//this avoids a hella-weird crash later, in malloc().
 	readStore();
-	printfln("done");
+	printf("done\n");
 	for(;;) {
 		menu();
 	}
@@ -96,7 +96,7 @@ void readStore() {
 	if(!readDatabase()) {
 		gDevices.clear();
 		gnServices = 0;
-		printfln("Store corrupted.\n(5)ignore (0)delete\n");
+		printf("Store corrupted.\n(5)ignore (0)delete\n");
 		myClearEvents();
 		for(;;) {
 			maWait(0);
@@ -125,9 +125,9 @@ void deleteStore() {
 void menu() {
 	//ask user to select one (if any), scan for (more) devices or
 	//clear the store (if not already empty).
-	printfln("%i known services\n", gnServices);
+	printf("%i known services\n", gnServices);
 	if(gnServices) {
-		printfln("(F)select (5)scan (0)exit\n");
+		printf("(F)select (5)scan (0)exit\n");
 	} else {
 		printf("(5)scan (0)exit\n");
 	}
@@ -279,7 +279,7 @@ void scan() {
 	gDevices.clear();
 	gnServices = 0;
 
-	printfln("DevDisc...");
+	printf("DevDisc...\n");
 #endif
 	int startTime = maGetMilliSecondCount();
 #if SCAN_DEVICES
@@ -306,23 +306,23 @@ void scan() {
 			res = maBtGetNewDevice(&d);
 			if(res) {
 				if(res < 0) {
-					printfln("Error %i\n", res);
+					printf("Error %i\n", res);
 					break;
 				}
-				printfln("d%i: %i %s", ndev++, res, d.name);
-				printfln("%s", btaddr2string(d.address));
+				printf("d%i: %i %s\n", ndev++, res, d.name);
+				printf("%s\n", btaddr2string(d.address));
 				addDevice(d);
 			}
 		} while(res > 0);
 	} while(state == 0);
 
-	printfln("Done %i, %i ms", state, maGetMilliSecondCount() - startTime);
+	printf("Done %i, %i ms\n", state, maGetMilliSecondCount() - startTime);
 #endif	//SCAN_DEVICES
-	printfln("Scanning %i devices...\n", gDevices.size());
+	printf("Scanning %i devices...\n", gDevices.size());
 
 	for(int i=0; i<gDevices.size(); i++) {
 		const DEVICE& d = gDevices[i];
-		printfln("ServDisc %s", btaddr2string(d.address));
+		printf("ServDisc %s\n", btaddr2string(d.address));
 		int servStartTime = maGetMilliSecondCount();
 		maBtStartServiceDiscovery(&d.address, &RFCOMM_PROTOCOL_MAUUID);
 		//printfln("Started");
@@ -353,22 +353,22 @@ void scan() {
 					res = maBtGetNewService(&s);
 					if(res) {
 						if(res < 0) {
-							printfln("Error %i\n", res);
+							printf("Error %i\n", res);
 							break;
 						}
-						printfln("s%i: %i %i %s", nserv++, res, s.port, s.name);
+						printf("s%i: %i %i %s\n", nserv++, res, s.port, s.name);
 						for(int j=0; j<ss.nUuids; j++) {
 							int* u = s.uuids[j].i;
-							printfln("%08X-%08X-%08X-%08X", u[0], u[1], u[2], u[3]);
+							printf("%08X-%08X-%08X-%08X\n", u[0], u[1], u[2], u[3]);
 						}
 						addService(i, s);
 					}
 				}
 			} while(res > 0);
 		} while(state == 0);
-		printfln("Done %i, %i ms", state, maGetMilliSecondCount() - servStartTime);
+		printf("Done %i, %i ms\n", state, maGetMilliSecondCount() - servStartTime);
 	}
-	printfln("Done, total %i ms", maGetMilliSecondCount() - startTime);
+	printf("Done, total %i ms\n", maGetMilliSecondCount() - startTime);
 	writeStore();
 }
 

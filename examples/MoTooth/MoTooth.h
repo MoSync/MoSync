@@ -21,12 +21,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define MAUTIL_VECTOR_DEBUGGING
 
 #include <conprint.h>
-#define printfln printf
-
 #include <maassert.h>
-
-#include "../common/helpers.h"
+#include <MAUtil/DataHandler.h>
+#include <MAUtil/String.h>
 #include "MAHeaders.h"
+
+using namespace MAUtil;
+
+#define TEST(func) if(!(func)) return false;
+
+#define WHITE 0xffffff
+#define BLACK 0
+#define SKY_BLUE 0x60C0FF
 
 struct SERVICE {
 	int port;

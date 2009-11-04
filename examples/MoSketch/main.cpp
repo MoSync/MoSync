@@ -29,11 +29,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <conprint.h>
 #include "MAHeaders.h"
-#include "../common/helpers.h"
 #include <maassert.h>
+#include <MAUtil/DataHandler.h>
 #include "MoSketch.h"
 
 #define GRAY 0xA0A0A0//0xffffff//
+#define WHITE 0xffffff
+#define BLACK 0
+
+#define TEST(func) if(!(func)) return false;
 
 MAPoint2d gPointer, gOldD, gD, gScreenSize;
 Vector<PolyLine> gPolyLines;
