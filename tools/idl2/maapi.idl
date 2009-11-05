@@ -2380,6 +2380,35 @@ interface MAAPI {
 		* -2 will be returned.
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf, in int size);
+
+		/**
+		 * Creates and starts a thread.
+		 * \param threadFunc an adress to the entry point for the thread. The function declaration should look
+		 * like typedef int (*ThreadFunc)(void* data);
+		 * \param stack The stack used by the thread, allocated in MoSync code.
+		 * \param data A pointer to some data that will be sent as an argument to the entry point function.
+		 * \returns The id of the thread.
+		 */
+		MAHandle maStartThread(in MAAddress threadFunc, in MAAddress stack, in MAAddress data);
+
+		/**
+		 * Closes the thread it is called from. If it is called from the main thread
+		 * it will have the same effect as calling maExit(returnValue).
+		 * \param returnValue The return value from the thread.
+		 */
+		int maCloseThread(in int returnValue);
+
+		/**
+		 * Waits for a thread to be closed.
+		 * \param threadId The id of the thread.
+		 * \returns The return value from the thread.
+		 */
+		int maWaitThread(in MAHandle threadId);
+
+		MAHandle maCreateSemaphore(in int initialValue);
+		int maDestroySemaphore(in MAHandle sem);
+		int maWaitSemaphore(in MAHandle sem);
+		int maPostSemaphore(in MAHandle sem);
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

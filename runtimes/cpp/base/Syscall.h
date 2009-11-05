@@ -95,7 +95,7 @@ namespace Base {
 		int getMemoryProtection();
 #endif
 
-		void VM_Yield();
+		void VM_Yield(Core::VMCore *core);
 
 		int maBtGetNewDevice(MABtDevice* dst);
 		int maBtGetNewService(MABtService* dst);

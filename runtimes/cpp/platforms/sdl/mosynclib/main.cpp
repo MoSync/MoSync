@@ -120,7 +120,7 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)address;
 }
 
-void Base::Syscall::VM_Yield() {
+void Base::Syscall::VM_Yield(VMCore* core) {
 }
 
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {

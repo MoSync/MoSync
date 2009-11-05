@@ -32,7 +32,7 @@ private:
 
 class MoSyncSemaphore {
 public:
-	MoSyncSemaphore();
+	MoSyncSemaphore(int initialValue=0);
 	~MoSyncSemaphore();
 	void wait();
 	void post();

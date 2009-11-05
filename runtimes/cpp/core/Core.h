@@ -81,18 +81,21 @@ namespace Core {
 		//			Static variables
 		//****************************************
 
-		MA_HEAD	Head;
+
 
 		/*#define CODE_SEGMENT_SIZE (64*1024)
 		#define CODE_SEGMENT_MASK (64*1024 - 1)
 		#define DATA_SEGMENT_SIZE (64*1024)
 		#define DATA_SEGMENT_MASK (64*1024 - 1)*/
 
+		struct Shared {
+		MA_HEAD	Head;
+
 		uint CODE_SEGMENT_SIZE;
-#define CODE_SEGMENT_MASK (CODE_SEGMENT_SIZE - 1)
+#define CODE_SEGMENT_MASK (mShared.CODE_SEGMENT_SIZE - 1)
 
 		uint DATA_SEGMENT_SIZE;
-#define DATA_SEGMENT_MASK (DATA_SEGMENT_SIZE - 1)
+#define DATA_SEGMENT_MASK (mShared.DATA_SEGMENT_SIZE - 1)
 
 		byte* mem_cs;
 		int* mem_ds;
@@ -102,6 +105,15 @@ namespace Core {
 		byte* protectionSet;
 		int protectionEnabled;
 #endif
+#ifdef GDB_DEBUG
+		GdbStub *mGdbStub;
+		bool mGdbOn;
+		GdbSignal mGdbSignal;	//used for exec-interrupt and exec-step
+#endif
+		};
+		bool mIsMainThread;
+		Shared mShared;
+		
 
 #if defined(SYMBIAN) && defined(SUPPORT_RELOAD)
 		int symbianError;
@@ -112,13 +124,8 @@ namespace Core {
 #endif
 		int regs[128];
 
-#ifdef GDB_DEBUG
-		GdbStub *mGdbStub;
-		bool mGdbOn;
-		GdbSignal mGdbSignal;	//used for exec-interrupt and exec-step
-#endif
-
 		VMCore();
+		VMCore(const VMCore::Shared& shared);
 
 #ifdef LOG_STATE_CHANGE
 		void logStateChange(int ip);
@@ -132,7 +139,7 @@ namespace Core {
 	const char* CurrentSyscallString(VMCore* core, char* buffer, int bufSize);
 
 	//for main
-	VMCore* CreateCore(Syscall&);
+	VMCore* CreateCore(Syscall&, bool isMainCore=true);
 	void DeleteCore(VMCore* core);
 	int GetIp(const VMCore* core);	//only valid if VM is not Running, or UPDATE_IP is defined
 	void SetIp(VMCore* core, int ip);

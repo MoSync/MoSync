@@ -264,7 +264,7 @@ int main2(int argc, char **argv) {
 }
 
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-	Base::gSyscall->VM_Yield();
+	Base::gSyscall->VM_Yield(NULL);
 	gReloadHandle = data;
 	gReload |= (reload != 0);
 }
@@ -333,9 +333,9 @@ void reportIp(int r, const char* message) {
 	report(REPORT_IP, &ip, sizeof(int));
 
 #ifdef GDB_DEBUG
-	if(gCore->mGdbOn) {
-		gCore->mGdbStub->exitHandler(r);
-		gCore->mGdbStub->waitForRemote();
+	if(gCore->mShared.mGdbOn) {
+		gCore->mShared.mGdbStub->exitHandler(r);
+		gCore->mShared.mGdbStub->waitForRemote();
 	}
 #endif
 }

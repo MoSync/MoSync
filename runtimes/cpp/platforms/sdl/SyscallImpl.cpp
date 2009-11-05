@@ -1703,6 +1703,156 @@ namespace Base {
 		}
 	}
 
+#include "../../core/Core.h"
+
+	struct MoSyncIntThread {
+		MAAddress stack;
+		MAAddress data;
+		MAAddress threadFunc;
+		Core::VMCore *core;
+		MoSyncThread thread;
+		MoSyncSemaphore waitForThreadStart;
+		MoSyncSemaphore waitForThreadEntry;
+	};
+
+	std::vector<MoSyncIntThread*> gThreads;
+	MoSyncSemaphore gThreadsMutex;
+
+	void eraseThread(MoSyncIntThread *thread) {
+		gThreadsMutex.wait();
+		size_t threadIndex;
+		for(threadIndex = 0; threadIndex < gThreads.size(); threadIndex++) {
+			if(thread == gThreads[threadIndex]) { 
+				break;
+			}
+		}
+
+		gThreads.erase(gThreads.begin()+threadIndex);
+		gThreadsMutex.post();		
+	}
+
+	int threadRun(void *data) {
+		MoSyncIntThread *thread = (MoSyncIntThread*)data;
+		thread->waitForThreadEntry.post();
+
+		thread->waitForThreadStart.wait();
+		Core::Run2(thread->core);
+		int returnValue = thread->core->regs[Core::REG_r14];
+		eraseThread(thread);
+		delete thread;
+		return returnValue;
+	}
+
+	SYSCALL(MAHandle, maStartThread(MAAddress threadFunc, MAAddress stack, MAAddress data)) {
+		MoSyncIntThread *thread = new MoSyncIntThread;
+
+		thread->threadFunc = threadFunc;
+		thread->stack = stack;
+		thread->data = data;
+
+		// create core and setup stack pointer and argument to the thread entrypoint
+		thread->core = Core::CreateCore(*SYSCALL_THIS, false);
+		thread->core->regs[Core::REG_sp] = (int)thread->stack;
+		thread->core->regs[Core::REG_i0] = (int)thread->data;
+		
+		// set the ip of the core
+		Core::SetIp(thread->core, (int)thread->threadFunc);
+		
+		thread->thread.start(threadRun, thread);
+		
+		thread->waitForThreadEntry.wait();
+
+		/*
+		gThreadMutex.wait();
+		MAHandle id = (MAHandle)thread;
+		gThreads.push_back(thread);
+		gThreadMutex.post();
+		*/
+
+		thread->waitForThreadStart.post();
+
+		//return id;
+		return 0;
+	}
+
+	SYSCALL(int, maCloseThread(int returnValue)) {
+		MoSyncIntThread *thread = NULL;
+		gThreadsMutex.wait();
+		size_t threadIndex;
+		for(threadIndex = 0; threadIndex < gThreads.size(); threadIndex++) {
+			if(gThreads[threadIndex]->thread.isCurrent()) { 
+				thread = gThreads[threadIndex];
+				break;
+			}
+		}
+		SYSCALL_THIS->VM_Yield(thread->core);
+		gThreadsMutex.post();
+
+		return 0;
+	}
+
+	SYSCALL(int, maWaitThread(MAHandle threadId)) {
+		MoSyncIntThread *thread = NULL;
+		gThreadsMutex.wait();
+		size_t threadIndex;
+		for(threadIndex = 0; threadIndex < gThreads.size(); threadIndex++) {
+			if(threadId == (MAHandle)gThreads[threadIndex]) { 
+				thread = gThreads[threadIndex];
+				break;
+			}
+		}
+		gThreadsMutex.post();
+		
+		int retValue = thread->thread.join();
+		return retValue;
+	}
+
+	MoSyncSemaphore gSemaphoresMutex;
+	std::vector<MoSyncSemaphore*> gSemaphores;
+	SYSCALL(MAHandle, maCreateSemaphore(int initialValue)) {
+		MoSyncSemaphore *sem = new MoSyncSemaphore(initialValue);
+		gSemaphoresMutex.wait();
+		gSemaphores.push_back(sem);
+		gSemaphoresMutex.post();
+		return (MAHandle)sem;
+	}
+
+	MoSyncSemaphore* findSemaphore(MAHandle id, bool deleteIt) {
+		MoSyncSemaphore *sem = NULL;
+		gSemaphoresMutex.wait();	
+		size_t i;
+		for(i = 0; i < gSemaphores.size(); i++) {
+			if((MAHandle)gSemaphores[i] == id) {
+				sem = gSemaphores[i];
+				break;
+			}
+		}
+		if(deleteIt) {
+			gSemaphores.erase(gSemaphores.begin()+i);
+			delete sem;
+		}
+
+		gSemaphoresMutex.post();
+		return sem;
+	}
+
+	SYSCALL(int, maDestroySemaphore(MAHandle id)) {
+		findSemaphore(id, true);
+		return 0;
+	}
+
+	SYSCALL(int, maWaitSemaphore(MAHandle id)) {
+		MoSyncSemaphore *sem = findSemaphore(id, false);
+		sem->wait();
+		return 0;
+	}
+
+	SYSCALL(int, maPostSemaphore(MAHandle id)) {
+		MoSyncSemaphore *sem = findSemaphore(id, false);
+		sem->wait();
+		return 0;
+	}
+
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		int chan = 0;
 		Stream *src = gSyscall->resources.get_RT_BINARY(sound_res);
@@ -1919,10 +2069,22 @@ namespace Base {
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
-
 		case maIOCtl_maCheckInterfaceVersion:
 			return maCheckInterfaceVersion(a);
-
+		case maIOCtl_maStartThread:
+			return maStartThread((MAAddress)a, (MAAddress)b, (MAAddress)c);
+		case maIOCtl_maWaitThread:
+			return maWaitThread(a);
+		case maIOCtl_maCloseThread:
+			return maCloseThread(a);
+		case maIOCtl_maCreateSemaphore:
+			return maCreateSemaphore(a);
+		case maIOCtl_maWaitSemaphore:
+			maWaitSemaphore(a);
+			return 0;
+		case maIOCtl_maPostSemaphore:
+			maPostSemaphore(a);
+			return 0;
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
 			reportCallStack();

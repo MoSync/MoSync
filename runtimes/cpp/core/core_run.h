@@ -81,14 +81,14 @@ VMLOOP_LABEL
 #endif
 
 #ifdef UPDATE_IP
-	IP = uint(ip - mem_cs);
+	IP = uint(ip - mShared.mem_cs);
 	//LOG("IP 0x%04X\n", IP);
 #endif
 
 #ifdef MEMORY_DEBUG
 	InstCount++;
-	if(uint(ip - mem_cs) >= (CODE_SEGMENT_SIZE - 4)) {
-		uint currentIP = uint(ip - mem_cs);
+	if(uint(ip - mShared.mem_cs) >= (mShared.CODE_SEGMENT_SIZE - 4)) {
+		uint currentIP = uint(ip - mShared.mem_cs);
 		DUMPHEX(IP);
 		DUMPHEX(currentIP);
 		DUMPINT(InstCount);
@@ -287,7 +287,7 @@ VMLOOP_LABEL
 
 			OPC(JPI)		FETCH_IMM24		JMP_IMM		EOP;
 		default:
-			LOG("Illegal far instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
+			LOG("Illegal far instruction 0x%02X @ 0x%04X\n", op, (ip - mShared.mem_cs) - 1);
 			BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
 			return ip;
 		} EOP;
@@ -300,7 +300,7 @@ VMLOOP_LABEL
 		OPC(SYSCALL)
 		{
 			int syscallNumber = IB;
-			fakePush((long) (ip - mem_cs), -syscallNumber);
+			fakePush((long) (ip - mShared.mem_cs), -syscallNumber);
 			InvokeSysCall(syscallNumber);
 			fakePop();
 			if (VM_Yield)
@@ -354,7 +354,7 @@ VMLOOP_LABEL
 
 	default:
 		//VM_State = -3;				// Bad instruction
-		LOG("Illegal instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
+		LOG("Illegal instruction 0x%02X @ 0x%04X\n", op, (ip - mShared.mem_cs) - 1);
 		BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
 		return ip;
 	}

@@ -61,8 +61,8 @@ bool MoSyncThread::isCurrent() {
 //MoSyncSemaphore
 //*****************************************************************************
 
-MoSyncSemaphore::MoSyncSemaphore() {
-	mSem = SDL_CreateSemaphore(0);
+MoSyncSemaphore::MoSyncSemaphore(int initialValue) {
+	mSem = SDL_CreateSemaphore(initialValue);
 	DEBUG_ASSERT(mSem);
 	//LOG("Created semaphore 0x%08X\n", mSem);
 }

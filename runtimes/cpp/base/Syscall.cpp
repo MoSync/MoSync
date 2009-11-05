@@ -503,7 +503,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maExit(int result)) {
-		SYSCALL_THIS->VM_Yield();
+		SYSCALL_THIS->VM_Yield(NULL);
 		LOG("Exit %i\n", result);
 		MoSyncExit(result);
 	}

@@ -565,7 +565,7 @@ public:
 			return false;
 
 #ifdef FAKE_CALL_STACK
-		profTree.init(Head.EntryPoint);
+		profTree.init(mShared.Head.EntryPoint);
 #endif
 
 #ifdef GDB_DEBUG
@@ -593,7 +593,7 @@ public:
 #endif
 
 #ifdef FAKE_CALL_STACK
-		profTree.init(Head.EntryPoint);
+		profTree.init(mShared.Head.EntryPoint);
 #endif
 
 		return true;
@@ -638,19 +638,19 @@ public:
 		LOG("LoadVM\n");
 	
 		TEST(file.isOpen());
-		TEST(file.readObject(Head));	// Load header
+		TEST(file.readObject(mShared.Head));	// Load header
 
-		if(Head.Magic != 0x5844414d) {	//MADX, big-endian
-			LOG("Magic error: 0x%08x should be 0x5844414d\n", Head.Magic);
+		if(mShared.Head.Magic != 0x5844414d) {	//MADX, big-endian
+			LOG("Magic error: 0x%08x should be 0x5844414d\n", mShared.Head.Magic);
 			FAIL;
 		}
 
-		SAFE_DELETE(mem_cs);
-		SAFE_DELETE(mem_ds);
-		SAFE_DELETE(mem_cp);
+		SAFE_DELETE(mShared.mem_cs);
+		SAFE_DELETE(mShared.mem_ds);
+		SAFE_DELETE(mShared.mem_cp);
 
 #ifdef MEMORY_PROTECTION
-		SAFE_DELETE(protectionSet);
+		SAFE_DELETE(mShared.protectionSet);
 #endif
 
 		// Init regs + IP
@@ -661,65 +661,65 @@ public:
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 
-		regs[REG_sp] = Head.DataSize - 16 - maxCustomEventSize;
-		regs[REG_i0] = Head.DataSize;
-		regs[REG_i1] = Head.StackSize;
-		regs[REG_i2] = Head.HeapSize;
+		regs[REG_sp] = mShared.Head.DataSize - 16 - maxCustomEventSize;
+		regs[REG_i0] = mShared.Head.DataSize;
+		regs[REG_i1] = mShared.Head.StackSize;
+		regs[REG_i2] = mShared.Head.HeapSize;
 		
-		DUMPHEX(Head.DataSize);
-		DUMPHEX(Head.StackSize);
-		DUMPHEX(Head.HeapSize);
-		DUMPHEX(Head.EntryPoint);
-		IP = Head.EntryPoint;
+		DUMPHEX(mShared.Head.DataSize);
+		DUMPHEX(mShared.Head.StackSize);
+		DUMPHEX(mShared.Head.HeapSize);
+		DUMPHEX(mShared.Head.EntryPoint);
+		IP = mShared.Head.EntryPoint;
 
 #ifdef TRACK_SYSCALL_ID
 		currentSyscallId = -1;
 #endif
 
-		DUMPHEX(Head.CodeLen);
-		if(Head.CodeLen > 0) {
-			CODE_SEGMENT_SIZE = nextPowerOf2(2, Head.CodeLen);
-			mem_cs = new byte[CODE_SEGMENT_SIZE];
-			if(!mem_cs) BIG_PHAT_ERROR(ERR_OOM);
+		DUMPHEX(mShared.Head.CodeLen);
+		if(mShared.Head.CodeLen > 0) {
+			mShared.CODE_SEGMENT_SIZE = nextPowerOf2(2, mShared.Head.CodeLen);
+			mShared.mem_cs = new byte[mShared.CODE_SEGMENT_SIZE];
+			if(!mShared.mem_cs) BIG_PHAT_ERROR(ERR_OOM);
 #ifdef INSTRUCTION_PROFILING
 			SAFE_DELETE(instruction_count);
-			instruction_count = new int[CODE_SEGMENT_SIZE];
+			instruction_count = new int[mShared.CODE_SEGMENT_SIZE];
 			if(!instruction_count) BIG_PHAT_ERROR(ERR_OOM);
-			ZEROMEM(instruction_count, sizeof(int)*CODE_SEGMENT_SIZE);
+			ZEROMEM(instruction_count, sizeof(int)*mShared.CODE_SEGMENT_SIZE);
 #endif
-			TEST(file.read(mem_cs, Head.CodeLen));
-			ZEROMEM(mem_cs + Head.CodeLen, CODE_SEGMENT_SIZE - Head.CodeLen);
+			TEST(file.read(mShared.mem_cs, mShared.Head.CodeLen));
+			ZEROMEM(mShared.mem_cs + mShared.Head.CodeLen, mShared.CODE_SEGMENT_SIZE - mShared.Head.CodeLen);
 		} else {
 			BIG_PHAT_ERROR(ERR_PROGRAM_FILE_BROKEN);
 		}
-		DUMPHEX(CODE_SEGMENT_SIZE);
-		rIP = mem_cs + IP;
+		DUMPHEX(mShared.CODE_SEGMENT_SIZE);
+		rIP = mShared.mem_cs + IP;
 
-		DUMPHEX(Head.DataLen);
-		DUMPHEX(Head.DataSize);
-		if(Head.DataLen > 0) {
-			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
-			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
-			if(!mem_ds) BIG_PHAT_ERROR(ERR_OOM);
-			TEST(file.read(mem_ds, Head.DataLen));
-			ZEROMEM((byte*)mem_ds + Head.DataLen, DATA_SEGMENT_SIZE - Head.DataLen);
+		DUMPHEX(mShared.Head.DataLen);
+		DUMPHEX(mShared.Head.DataSize);
+		if(mShared.Head.DataLen > 0) {
+			mShared.DATA_SEGMENT_SIZE = nextPowerOf2(16, mShared.Head.DataSize);
+			mShared.mem_ds = new int[mShared.DATA_SEGMENT_SIZE / sizeof(int)];
+			if(!mShared.mem_ds) BIG_PHAT_ERROR(ERR_OOM);
+			TEST(file.read(mShared.mem_ds, mShared.Head.DataLen));
+			ZEROMEM((byte*)mShared.mem_ds + mShared.Head.DataLen, mShared.DATA_SEGMENT_SIZE - mShared.Head.DataLen);
 
 #ifdef MEMORY_PROTECTION
-			protectionSet = new byte[(DATA_SEGMENT_SIZE+7)>>3];
-			ZEROMEM(protectionSet, (DATA_SEGMENT_SIZE+7)>>3);
+			mShared.protectionSet = new byte[(mShared.DATA_SEGMENT_SIZE+7)>>3];
+			ZEROMEM(mShared.protectionSet, (mShared.DATA_SEGMENT_SIZE+7)>>3);
 			//unprotectMemory(0, DATA_SEGMENT_SIZE);
 			//protectMemory(Head.DataSize-Head.StackSize-Head.HeapSize-16, Head.HeapSize);
 #endif
 		} else {
 			BIG_PHAT_ERROR(ERR_PROGRAM_FILE_BROKEN);
 		}
-		DUMPHEX(DATA_SEGMENT_SIZE);
+		DUMPHEX(mShared.DATA_SEGMENT_SIZE);
 
-		DUMPHEX(Head.IntLen);
-		if(Head.IntLen > 0) {
-			mem_cp = new int[Head.IntLen];
-			if(!mem_cp) BIG_PHAT_ERROR(ERR_OOM);
-			TEST(file.read(mem_cp, Head.IntLen * 4));
+		DUMPHEX(mShared.Head.IntLen);
+		if(mShared.Head.IntLen > 0) {
+			mShared.mem_cp = new int[mShared.Head.IntLen];
+			if(!mShared.mem_cp) BIG_PHAT_ERROR(ERR_OOM);
+			TEST(file.read(mShared.mem_cp, mShared.Head.IntLen * 4));
 		} else {
 			BIG_PHAT_ERROR(ERR_PROGRAM_FILE_BROKEN);
 		}
@@ -731,7 +731,7 @@ public:
 		LOGC("\n");
 #endif
 
-		customEventPointer = ((char*)mem_ds) + (Head.DataSize - maxCustomEventSize);
+		customEventPointer = ((char*)mShared.mem_ds) + (mShared.Head.DataSize - maxCustomEventSize);
 		
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
@@ -779,9 +779,9 @@ public:
 #else
 #define dumpJump(a)
 #endif
-#define JMP_GENERIC(address) dumpJump(address); if(uint(address) >= CODE_SEGMENT_SIZE) {\
+#define JMP_GENERIC(address) dumpJump(address); if(uint(address) >= mShared.CODE_SEGMENT_SIZE) {\
 	LOG("\nIllegal jump to 0x%04X\n", address); BIG_PHAT_ERROR(ERR_IMEM_OOB); }\
-		ip = (byte*)(mem_cs + (address));
+		ip = (byte*)(mShared.mem_cs + (address));
 #else
 #define JMP_GENERIC(address) \
 	ip = (byte*)(mem_cs + ((address) & CODE_SEGMENT_MASK));
@@ -790,8 +790,8 @@ public:
 #define	JMP_IMM	JMP_GENERIC(IMM)
 #define	JMP_RD	JMP_GENERIC(RD)
 
-#define	CALL_IMM	REG(REG_rt) = (long) (ip - mem_cs); JMP_IMM;
-#define	CALL_RD		REG(REG_rt) = (long) (ip - mem_cs); JMP_RD;
+#define	CALL_IMM	REG(REG_rt) = (long) (ip - mShared.mem_cs); JMP_IMM;
+#define	CALL_RD		REG(REG_rt) = (long) (ip - mShared.mem_cs); JMP_RD;
 
 #define IB ((int)(*ip++))
 
@@ -799,7 +799,7 @@ public:
 #define FETCH_RS	rs = IB; LOGC(" rs%i(0x%08x)", rs, RS);
 #ifdef USE_VAR_INT
 #define FETCH_CONST	imm32 = IB; if(imm32>127) {imm32=((imm32&127)<<8)+IB;}\
-	LOGC(" c[%i]", imm32); imm32=mem_cp[imm32]; LOGC("(%i)", imm32);
+	LOGC(" c[%i]", imm32); imm32=mShared.mem_cp[imm32]; LOGC("(%i)", imm32);
 #define FETCH_INT	imm32 = IB; if(imm32>127) {imm32=((imm32&127)<<8)+IB;}\
 	LOGC(" i%i", imm32);
 #else
@@ -827,17 +827,17 @@ public:
 
 #define DIVIDE(a, b) if((b) == 0) { BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO); } else { ARITH(a, /, b); }
 
-#define RAW_MEMREF(type, addr) (*(type*)(((char*)mem_ds) + (addr)))
+#define RAW_MEMREF(type, addr) (*(type*)(((char*)mShared.mem_ds) + (addr)))
 #define MEMREF(type, addr) RAW_MEMREF(type, \
 	(addr) & DATA_SEGMENT_MASK & ~(sizeof(type) - 1))
 
 #ifdef MEMORY_PROTECTION
-#define SET_PROTECTION(x) (protectionSet[(x)>>3]|=(1<<((x)&0x7)))
-#define RESET_PROTECTION(x) (protectionSet[(x)>>3]&=~(1<<((x)&0x7)))
-#define GET_PROTECTION(x) (protectionSet[(x)>>3]&(1<<((x)&0x7)))
+#define SET_PROTECTION(x) (mShared.protectionSet[(x)>>3]|=(1<<((x)&0x7)))
+#define RESET_PROTECTION(x) (mShared.protectionSet[(x)>>3]&=~(1<<((x)&0x7)))
+#define GET_PROTECTION(x) (mShared.protectionSet[(x)>>3]&(1<<((x)&0x7)))
 
 	void checkProtection(uint address, uint size) const {
-		if(protectionEnabled) {
+		if(mShared.protectionEnabled) {
 		for(uint i = address; i < address+size; i++) 
 			if(GET_PROTECTION(i)) {
 				BIG_PHAT_ERROR(ERR_MEMORY_PROTECTED);
@@ -857,7 +857,7 @@ public:
 
 	template<class T, bool write> T& getValidatedMemRefBase(uint address) {
 		DEBUG_ASSERT(isPowerOf2(sizeof(T)));
-		if(address >= DATA_SEGMENT_SIZE || (address+sizeof(T)) > DATA_SEGMENT_SIZE ||
+		if(address >= mShared.DATA_SEGMENT_SIZE || (address+sizeof(T)) > mShared.DATA_SEGMENT_SIZE ||
 			((address & (sizeof(T) - 1)) != 0) || //alignment check
 			(address < 4))	//NULL pointer check
 		{
@@ -865,7 +865,7 @@ public:
 				sizeof(T), address);
 			if((address & (sizeof(T) - 1)) != 0) {
 				BIG_PHAT_ERROR(ERR_MEMORY_ALIGNMENT);
-			} else if(address >= DATA_SEGMENT_SIZE || (address+sizeof(T)) > DATA_SEGMENT_SIZE) {
+			} else if(address >= mShared.DATA_SEGMENT_SIZE || (address+sizeof(T)) > mShared.DATA_SEGMENT_SIZE) {
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 			} else {
 				BIG_PHAT_ERROR(ERR_MEMORY_NULL);
@@ -885,13 +885,13 @@ public:
 	//****************************************
 	//Memory validation
 	//****************************************
-#define PTR2ADDRESS(ptr) ((unsigned)((char*)ptr - (char*)mem_ds))
+#define PTR2ADDRESS(ptr) ((unsigned)((char*)ptr - (char*)mShared.mem_ds))
 	void ValidateMemStringAddress(unsigned address) const {
 #ifdef MEMORY_PROTECTION	
 		int initialAddr = address;
 #endif
 		do {
-			if(address >= DATA_SEGMENT_SIZE)
+			if(address >= mShared.DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
 #ifdef MEMORY_PROTECTION	
@@ -901,7 +901,7 @@ public:
 	int ValidatedStrLen(const char* ptr) const {
 		unsigned address = PTR2ADDRESS(ptr);
 		do {
-			if(address >= DATA_SEGMENT_SIZE)
+			if(address >= mShared.DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
 
@@ -912,37 +912,37 @@ public:
 	}
 	void ValidateMemRange(const void* ptr, unsigned int size) const {
 		unsigned address = PTR2ADDRESS(ptr);
-		if(address >= DATA_SEGMENT_SIZE || (address+size) >= DATA_SEGMENT_SIZE ||
-			size > DATA_SEGMENT_SIZE)
+		if(address >= mShared.DATA_SEGMENT_SIZE || (address+size) >= mShared.DATA_SEGMENT_SIZE ||
+			size > mShared.DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 #ifdef MEMORY_PROTECTION	
 		checkProtection(address, size);
 #endif
 	}
 	void* GetValidatedMemRange(int address, int size) {
-		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) >= DATA_SEGMENT_SIZE ||
-			uint(size) > DATA_SEGMENT_SIZE)
+		if(uint(address) >= mShared.DATA_SEGMENT_SIZE || uint(address+size) >= mShared.DATA_SEGMENT_SIZE ||
+			uint(size) > mShared.DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 #ifdef MEMORY_PROTECTION	
 		checkProtection(address, size);
 #endif
-		return ((char*)mem_ds) + address;
+		return ((char*)mShared.mem_ds) + address;
 	}
 	const char* GetValidatedStr(int a) const {
 		unsigned address = a;
 		do {
-			if(address >= DATA_SEGMENT_SIZE)
+			if(address >= mShared.DATA_SEGMENT_SIZE)
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
 #ifdef MEMORY_PROTECTION	
 		checkProtection(address, address-a);
 #endif
-		return ((char*)mem_ds) + a;
+		return ((char*)mShared.mem_ds) + a;
 	}
 
 #ifdef MEMORY_PROTECTION
 	void protectMemory(uint start, uint length) {
-		char *ptr = ((char*)mem_ds)+start;
+		char *ptr = ((char*)mShared.mem_ds)+start;
 		ValidateMemRange(ptr, length);
 		//memset(&protectionSet[start], 1, length);
 		for(uint i = start; i < start+length; i++)
@@ -950,7 +950,7 @@ public:
 	}
 
 	void unprotectMemory(uint start, uint length) {
-		char *ptr = ((char*)mem_ds)+start;
+		char *ptr = ((char*)mShared.mem_ds)+start;
 		ValidateMemRange(ptr, length);
 		//memset(&protectionSet[start], 0, length);
 		for(uint i = start; i < start+length; i++)
@@ -958,11 +958,11 @@ public:
 	}
 
 	void setMemoryProtection(int enable) {
-		this->protectionEnabled = enable;
+		this->mShared.protectionEnabled = enable;
 	}
 
 	int getMemoryProtection() {
-		return this->protectionEnabled;
+		return this->mShared.protectionEnabled;
 	}
 #endif
 
@@ -979,7 +979,7 @@ public:
 	}
 	MACopyData* _SYSCALL_CONVERT_MACopyData(int ptr) {
 		_debug_hex(ptr);
-		MACopyData* p = (MACopyData*)((char*)mem_ds + ptr);
+		MACopyData* p = (MACopyData*)((char*)mShared.mem_ds + ptr);
 		ValidateMemRange(p, sizeof(MACopyData));
 		debug_MACopyData(p);
 		return p;
@@ -990,7 +990,7 @@ public:
 	}
 	MAPoint2d* _SYSCALL_CONVERT_MAPoint2d(int ptr) {
 		_debug_hex(ptr);
-		MAPoint2d* p = (MAPoint2d*)((char*)mem_ds + ptr);
+		MAPoint2d* p = (MAPoint2d*)((char*)mShared.mem_ds + ptr);
 		ValidateMemRange(p, sizeof(MAPoint2d));
 		debug_MAPoint2d(p);
 		return p;
@@ -1001,7 +1001,7 @@ public:
 	}
 	MARect* _SYSCALL_CONVERT_MARect(int ptr) {
 		_debug_hex(ptr);
-		MARect* r = (MARect*)((char*)mem_ds + ptr);
+		MARect* r = (MARect*)((char*)mShared.mem_ds + ptr);
 		ValidateMemRange(r, sizeof(MARect));
 		debug_MARect(r);
 		return r;
@@ -1012,7 +1012,7 @@ public:
 	}
 	MAConnAddr* _SYSCALL_CONVERT_MAConnAddr(int ptr) {
 		_debug_hex(ptr);
-		MAConnAddr* r = (MAConnAddr*)((char*)mem_ds + ptr);
+		MAConnAddr* r = (MAConnAddr*)((char*)mShared.mem_ds + ptr);
 		ValidateMemRange(r, sizeof(MAConnAddr));
 		debug_MAConnAddr(r);
 		return r;
@@ -1022,7 +1022,7 @@ public:
 	char* _SYSCALL_CONVERT_MAString(int str) {
 		_debug_hex(str);
 		ValidateMemStringAddress(str);
-		char* res = (char*)mem_ds + str;
+		char* res = (char*)mShared.mem_ds + str;
 		debug_MAString(res);
 		return res;
 	}
@@ -1088,10 +1088,10 @@ public:
 	MAAddress _SYSCALL_CONVERT_MAAddress(int a) {
 		_debug_hex(a);
 		debug_MAAddress((MAAddress)a);
-		return (MAAddress)(a + (byte*)mem_ds);
+		return (MAAddress)(a + (byte*)mShared.mem_ds);
 	}
 	int _SYSCALL_CONVERTRES_MAAddress(const void* a) {
-		return (int)((byte*)a - (byte*)mem_ds);
+		return (int)((byte*)a - (byte*)mShared.mem_ds);
 	}
 #define _SYSCALL_HANDLERES_MAAddress _SYSCALL_HANDLERES_DEFAULT(MAAddress)
 
@@ -1229,6 +1229,9 @@ public:
 
 	void SetIp(int ip) {
 		IP = ip;
+
+		//gaah
+		rIP = &this->mShared.mem_cs[IP];
 	}
 
 #ifdef _MSC_VER
@@ -1252,6 +1255,26 @@ public:
 		initStateChange();
 #endif
 	}
+
+	VMCoreInt(Syscall& aSyscall, const VMCore::Shared& shared)
+	: VMCore(shared),
+	   rIP(NULL)
+#ifdef MEMORY_DEBUG
+	, InstCount(0)
+#endif
+#ifdef INSTRUCTION_PROFILING
+	,instruction_count(NULL)
+#endif
+	, mSyscall(aSyscall) {
+
+#ifdef FAKE_CALL_STACK
+		allocFakeCallStack();
+#endif
+#ifdef LOG_STATE_CHANGE
+		initStateChange();
+#endif
+	}
+	
 	
 	~VMCoreInt() {
 #ifdef GDB_DEBUG
@@ -1263,7 +1286,7 @@ public:
 		DUMPINT(InstCount);	//includes any eventual illegal instruction
 
 		//on error, this will probably have read some or all of the crashing instruction
-		LOG("IP: 0x%04X\n", rIP - mem_cs);
+		LOG("IP: 0x%04X\n", rIP - mShared.mem_cs);
 		LOGC("Regs:\n");
 		for(int i=0; i<32; i++) {
 			LOGC("%2i: 0x%08X\n", i, regs[i]);
@@ -1273,13 +1296,15 @@ public:
 #ifdef COUNT_INSTRUCTION_USE
 	logInstructionUse();
 #endif
-		delete mem_cs;
-		delete mem_ds;
-		delete mem_cp;
+	if(mIsMainThread) {
+		delete mShared.mem_cs;
+		delete mShared.mem_ds;
+		delete mShared.mem_cp;
 
 #ifdef MEMORY_PROTECTION
-		delete protectionSet;
+		delete mShared.protectionSet;
 #endif
+	}
 
 #ifdef LOG_STATE_CHANGE
 		freeStateChange();
@@ -1297,8 +1322,8 @@ public:
 		if(instruction_count != NULL) {
 			FILE* file = fopen("profile.txt", "w");
 			if(file) {
-				fprintf(file, "INSTRUCTION COUNTS: %i\n", CODE_SEGMENT_SIZE);
-				for(uint i=0; i<CODE_SEGMENT_SIZE; i++) {
+				fprintf(file, "INSTRUCTION COUNTS: %i\n", mShared.CODE_SEGMENT_SIZE);
+				for(uint i=0; i<mShared.CODE_SEGMENT_SIZE; i++) {
 					if(instruction_count[i] != 0)
 						fprintf(file, "%x: %i\n", i, instruction_count[i]);
 				}
@@ -1315,22 +1340,45 @@ private:
 	Syscall& mSyscall;
 };
 
-VMCore::VMCore() : mem_cs(NULL), mem_ds(NULL), mem_cp(NULL)
-#ifdef MEMORY_PROTECTION
-	,protectionSet(NULL)
-	,protectionEnabled(1)
-#endif
+VMCore::VMCore() : 
 #ifdef TRACK_SYSCALL_ID
-	,currentSyscallId(-1)
+	currentSyscallId(-1)
 #endif
+{
+		mShared.mem_cs = NULL;
+		mShared.mem_ds = NULL;
+		mShared.mem_cp = NULL;
 #ifdef GDB_DEBUG
-	, mGdbStub(NULL), mGdbOn(false)
+		mShared.mGdbStub = NULL;
+		mShared.mGdbOn = false;
 #endif
-{}
+#ifdef MEMORY_PROTECTION
+		mShared.protectionSet = NULL;
+		mShared.protectionEnabled = 1;
+#endif
+		mIsMainThread = true;
+
+}
+
+	VMCore::VMCore(const VMCore::Shared& shared) : 
+		mShared(shared), 
+		mIsMainThread(false)
+#ifdef TRACK_SYSCALL_ID
+		,currentSyscallId(-1)
+#endif	
+		{
+		}
 
 //Functions for outside access
-VMCore* CreateCore(Syscall& aSyscall) {
-	VMCore *core = new VMCoreInt(aSyscall);
+VMCore* CreateCore(Syscall& aSyscall, bool isMainCore) {
+	VMCore *core;
+	if(isMainCore) {
+		core = new VMCoreInt(aSyscall);
+	} else {
+		core = new VMCoreInt(aSyscall, gCore->mShared);
+		((VMCoreInt*)core)->GenConstTable();
+	}
+
 	if(!core) {
 		FAIL
 	} else {
@@ -1516,6 +1564,7 @@ int Base::Syscall::getMemoryProtection() {
 }
 #endif
 
-void Base::Syscall::VM_Yield() {
-	Core::GetVMYield(gCore) = 1;
+void Base::Syscall::VM_Yield(Core::VMCore* core) {
+	if(core==NULL) core = gCore;
+	Core::GetVMYield(core) = 1;
 }
