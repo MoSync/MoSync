@@ -50,7 +50,7 @@ int atoi(const char* string);
 /**
 * \see atoi
 */
-inline long atol(const char* string) { return atoi(string); }
+long atol(const char* string);
 
 typedef struct div_t {
 	int quot, rem;

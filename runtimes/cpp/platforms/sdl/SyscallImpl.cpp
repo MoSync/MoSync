@@ -1819,6 +1819,7 @@ namespace Base {
 		if(internalBackBuffer!=NULL) return 0;
 		internalBackBuffer = gBackBuffer;
 		gBackBuffer = SDL_CreateRGBSurfaceFrom(data, gBackBuffer->w, gBackBuffer->h, gBackBuffer->format->BitsPerPixel, gBackBuffer->pitch, gBackBuffer->format->Rmask, gBackBuffer->format->Gmask, gBackBuffer->format->Bmask, gBackBuffer->format->Amask);
+		if(gBackBuffer == NULL) return 0;
 		gDrawSurface = gBackBuffer;
 		return 1;
 	}
