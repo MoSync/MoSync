@@ -20,16 +20,21 @@ package com.mosync.java.android;
 #include "syscall_helpers.h"
 #include "generated\MAAPI_consts.h"
 #include "config_platform.h"
+#include "helpers.h"
 
 import android.content.Context;
 import android.graphics.*;
 import android.os.Handler;
+import android.os.Process;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+
 import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
@@ -46,7 +51,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		
 		private boolean mStop;
 		
-		public MoSyncThread(SurfaceHolder surfaceHolder, Context context, Handler handler, MoSyncView view)
+		public MoSyncThread(SurfaceHolder surfaceHolder, Context context, Handler handler, MoSyncView view) throws Exception
 		{	
 			mSurfaceHolder = surfaceHolder;
 			mContext = context;
@@ -64,8 +69,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			catch(Exception e)
 			{
 				Log.e("MoSync Thread","Core creation exception: " + e.toString());
+				throw(e);
 			}
-				
 		}
 		
 		public void updateSurfaceSize(int width, int height)
@@ -76,10 +81,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mCore.resizeScreen(mWidth, mHeight);
 		}
 		
-		public void stopNow()
+		public boolean stopNow()
 		{
+			if(mStop == true) return false;
 			Log.i("MoSync Thread","stopNow");
 			mStop = true;
+			return true;
 		}
 		
 		@Override public void run()
@@ -111,7 +118,41 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			}
 			
 			Log.i("MoSync Thread", "loop has ended");
-			
+		}
+		
+		class WaitTask extends TimerTask {
+			private final int mSequence;
+			WaitTask(int sequence) {
+				mSequence = sequence;
+			}
+			public final void run() {
+				if(mSequence != mWaitSequence)
+					return;
+				FinishWait();
+			}
+		}
+
+		synchronized public final void Wait(int timeout) {
+			if(mEventBuffer.size() > 0)
+				return;
+			YIELD;
+			if(timeout > 0) {
+				mTimer.schedule(new WaitTask(mWaitSequence), timeout);
+			}
+			stop();
+		}
+		
+		synchronized private final void FinishWait() {
+			if(!mStop)
+				return;
+			mStop = false;
+			try {
+				mWaitSequence++;
+				this.notify();
+			} catch(Exception e) {
+				IN_FILE_ON_LINE;
+				PRINT_STACK_TRACE;
+			}
 		}
 	}
 	
@@ -121,11 +162,15 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	
 	private Vector mEventBuffer = new Vector(EVENT_BUFFER_SIZE);
 	private boolean mEventOverflow = false;
+	private int mWaitSequence = 0;
+	Timer mTimer = new Timer();
 	
 	/** The thread that actually draws the animation */
 	private MoSyncThread thread;
 
-	public MoSyncView(Context context)
+	private int mKeyState;
+	
+	public MoSyncView(Context context) throws Exception
 	{
 		super(context);
 		mContext = context;
@@ -133,7 +178,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		// register our interest in hearing about changes to our surface
 		mSurfaceHolder = getHolder();
 		    
-		// Use accelerated surfaces if avaiilable
+		// Use accelerated surfaces if available
 		int mode = 0;
 		try {
 			mode = 1;
@@ -143,13 +188,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 				mode = 2;
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_GPU);
 			} catch(Exception e2) {
-				try {
-					mode = 3;
-					mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
-				} catch(Exception e3) {
-					// all has failed.
-					// Exit directly..
-				}
+				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
+				// if this didn't work we can do nothing...
 			}
 		}
 
@@ -166,9 +206,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		
 		// create thread only; it's started in surfaceCreated()
 		thread = new MoSyncThread(mSurfaceHolder, mContext, new Handler() {}, this);
-		
 		setVisibility(VISIBLE);
-		setFocusable(true); // make sure we get key events
+		// make sure we get key events
+		setFocusableInTouchMode(true);
 	}
 	
 	public void stopThread()
@@ -176,16 +216,26 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		Log.i("MoSync View","stopThread");
 		if(thread.isAlive())
 		{
-			thread.stopNow();
-			boolean retry = true;
-			while (retry) {
-				try {
-					thread.join();
-					retry = false;
-				} catch (InterruptedException e) {
+			boolean stopped = thread.stopNow();
+			if(!stopped)
+			{
+				boolean retry = true;
+				while (retry) {
+					try {
+						thread.join();
+						retry = false;
+					} catch (InterruptedException e) {
+						Log.i("MoSync View", "stopThread InteruptedException:" + e.toString() + "/n");
+					}
 				}
 			}
 		}
+	}
+	
+	public void killApplication()
+	{
+		stopThread();
+		Process.killProcess(Process.myPid());
 	}
 
 	@Override protected void onDraw(Canvas canvas)
@@ -193,7 +243,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	  Log.i("MoSync View","onDraw");
 	}
 
-	/* Callback invoked when the surface dimensions change. */
+	/*
+	* Called when surface has changed
+	*/
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
 	{
 		Log.i("MoSync View", "surfaceChanged");
@@ -201,14 +253,10 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/*
-	 * Callback invoked when the Surface has been created and is ready to be
-	 * used.
+	 * Called when surface has been created
 	 */
 	public void surfaceCreated(SurfaceHolder holder)
 	{
-		// start the thread here so that we don't busy-wait in run()
-		// waiting for the surface to be created
-		//thread.setRunning(true);
 		Log.i("MoSync View", "surfaceCreated");
 		
 		if(!thread.isAlive())
@@ -223,14 +271,10 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 
 	/*
-	 * Callback invoked when the Surface has been destroyed and must no longer
-	 * be touched. WARNING: after this method returns, the Surface/Canvas must
-	 * never be touched again!
+	* Called when the surface has destroyed.
 	 */
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
-		// we have to tell thread to shut down & wait for it to finish, or else
-		// it might touch the Surface after we return and explode
 		Log.i("MoSync View", "surfaceDestroyed");
 		stopThread();
 	}
@@ -245,30 +289,109 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return 0;
 	}
 	
-	public boolean onKeyUp(int keyCode, KeyEvent event)
-	{
-		Log.i("MoSyncView", "key up event :" + event.toString() + "/n");
-		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
-		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
-		return true;
+		private final int convertToMoSyncKeyByteCode(int keyCode) {
+#define CONVERT_KEYCODEB(k) if(keyCode == KeyEvent.KEYCODE_##k) return MAKB_##k;
+#define CONVERT_DPAD_KEYCODEB(k) if(keyCode == KeyEvent.KEYCODE_DPAD_##k) return MAKB_##k;
+#define CONVERT_SPECIALB(kIn, kOut) if(keyCode == KeyEvent.KEYCODE_##kIn) return MAKB_##kOut;
+		DEVICE_KEYS(CONVERT_KEYCODEB);
+		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODEB);
+		DEVICE_SPECIAL(CONVERT_SPECIALB);
+		return 0;
 	}
 	
-	public boolean onKeyDown(int keyCode, KeyEvent event)
+	public boolean onKeyUp(int keyCode, KeyEvent keyEvent)
 	{
-		Log.i("MoSyncView", "key down event :" + event.toString() + "/n");
+		Log.i("MoSyncView", "key up event :" + keyEvent.toString() + "/n");
 		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
 		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
-		return true;
-	}
-	
-	public boolean onTouchEvent(MotionEvent event)
-	{
-		int action = event.getAction();
 		
-		Log.i("MoSyncView", "action:" + event.getAction() + "/n");
+		int[] event = new int[2];
+		mKeyState &= ~convertToMoSyncKeyByteCode(keyCode);
+		
+		EI_TYPE = EVENT_TYPE_KEY_RELEASED;
+		EI_KEY = convertedKeyCode;
+		postEvent(event);
+		
 		return true;
 	}
 	
+	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
+	{
+		Log.i("MoSyncView", "key down event :" + keyEvent.toString() + "/n");
+		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
+		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
+			
+		int[] event = new int[2];
+		mKeyState |= convertToMoSyncKeyByteCode(keyCode);
+		
+		EI_TYPE = EVENT_TYPE_KEY_PRESSED;
+		EI_KEY = convertedKeyCode;
+		postEvent(event);
+		
+		return true;
+	}
+	
+	public int getKeys() {
+		return mKeyState;
+	}
+	
+	public boolean onTouchEvent(MotionEvent motionEvent)
+	{
+		int action = motionEvent.getAction();
+/*		
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		
+		switch(motionEvent.getAction())
+		{
+			case 0:
+				Log.i("MoSync View", "pointer pressed x:" + x + " y:" + y + "/n");
+				EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
+				break;
+			case 1:
+				Log.i("MoSync View", "pointer released x:" + x + " y:" + y + "/n");
+				EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
+				break;
+			case 2:
+				Log.i("MoSync View", "pointer dragged x:" + x + " y:" + y + "/n");
+				EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
+				break;
+			dafault:
+				return false;
+		}
+*/		
+		return true;
+	}
+/*	
+	protected final void pointerPressed(int x, int y) {
+		DEBUG_TEMP("pointerPressed "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+	
+	protected final void pointerReleased(int x, int y) {
+		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);	
+	}
+	
+	protected final void pointerDragged(int x, int y) {
+		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+*/	
 	synchronized public final int[] getEvent() {
 		if(mEventBuffer.isEmpty()) {
 			return null;
@@ -277,5 +400,109 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		mEventBuffer.removeElementAt(0);
 		return event;
 	}
+	
+	synchronized public final void postEvent(int[] event) {
+		if(!mEventOverflow) {
+			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				mEventOverflow = true;
+				mEventBuffer.removeAllElements();
+//				DEBUG("EventBuffer overflow!\n");
+			}
+			mEventBuffer.addElement(event);
+		}
+		thread.FinishWait();
+	}
+
+	protected void postFocusLostEvent() {
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_LOST;
+		postEvent(event);
+	}
+
+	protected void postFocusGainedEvent() {
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		postEvent(event);
+	}
+	
+/*	
+	
+	private final void handleKeyEvent(int keyCode, boolean released) {
+#ifdef PUBLIC_DEBUG
+		try {
+#endif
+			int mak = convertKeyCode(keyCode);
+			if(mak != 0) {
+				int[] event = new int[2];
+				if(released == true) {
+					mKeyState &= ~convertKeyBit(keyCode);
+				} else {
+					mKeyState |= convertKeyBit(keyCode);				
+				}
+
+				EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
+				EI_KEY = mak;
+				postEvent(event);
+			}
+#ifdef PUBLIC_DEBUG
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			MAMidlet.self.programError("Key error", e);
+		}
+#endif
+	}
+
+	synchronized public final void postEvent(int[] event) {
+		if(!mEventOverflow) {
+			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				mEventOverflow = true;
+				mEventBuffer.removeAllElements();
+				DEBUG("EventBuffer overflow!\n");
+			}
+			mEventBuffer.addElement(event);
+		}
+		FinishWait();
+	}
+
+	public int getKeys() {
+		return mKeyState;
+	}
+
+	protected final void pointerPressed(int x, int y) {
+		DEBUG_TEMP("pointerPressed "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+	
+	protected final void pointerReleased(int x, int y) {
+		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);	
+	}
+	
+	protected final void pointerDragged(int x, int y) {
+		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
+		int[] event = new int[3];
+		EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
+		EI_POINTX = x;
+		EI_POINTY = y;
+		postEvent(event);
+	}
+		
+	synchronized protected final void keyPressed(int keyCode) {
+		DEBUG_KEYS("keyPressed "+keyCode+"\n");
+		handleKeyEvent(keyCode, false);
+	}
+	synchronized protected final void keyReleased(int keyCode) {
+		DEBUG_KEYS("keyReleased "+keyCode+"\n");
+		handleKeyEvent(keyCode, true);
+	}
+*/
 
 }

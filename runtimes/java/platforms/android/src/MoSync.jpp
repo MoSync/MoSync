@@ -28,56 +28,84 @@ import android.util.Log;
 public class MoSync extends Activity
 {
 	MoSyncView mMosyncView;
+	boolean paused;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState)
 	{
+		paused = false;
 		Log.i("MoSync", "onCreate");
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        mMosyncView = new MoSyncView(this);
-        setContentView(mMosyncView);
+		
+		buildMoSyncView();
+		setContentView(mMosyncView);
     }
     
+	/*
+	* If this fails it will never return.. The application will be destroyed
+	*/
+	private void buildMoSyncView()
+	{
+		try {
+			mMosyncView = new MoSyncView(this);
+        } catch(Exception e) {
+			// No View was generated..
+			Log.i("MoSync", "No view was generated.. app could not start!");
+			super.onDestroy();
+			this.finish();
+		}
+	}
+	
     @Override
     protected void onStop()
 	{
+		// stop the thread but keep everything alive.
     	Log.i("MoSync","onStop");
     	mMosyncView.stopThread();
+		setContentView(null);
     }
 
-/* FIX-ME	
 	@Override
     protected void onRestart()
 	{
+		// reset the runtime and load the program and resource file again
     	Log.i("MoSync","onRestart");
+		buildMoSyncView();
+		setContentView(mMosyncView);
+//		super.onRestart();
     }
-*/ 
 	
-/* FIX-ME
 	@Override
     protected void onResume()
 	{
     	Log.i("MoSync","onResume");
+		if(paused)
+		{
+			mMosyncView.postFocusGainedEvent();
+			setContentView(mMosyncView);
+		}
+		super.onResume();
     }
-*/
 
-/* FIX-ME
 	@Override
     protected void onPause()
 	{
+		paused = true;
     	Log.i("MoSync","onPause");
+		mMosyncView.postFocusLostEvent();
+		setContentView(null);
+		super.onPause();
     }
-*/
 
-/* FIX-ME
 	@Override
     protected void onDestroy()
 	{
+		// Destroy everything and quit
     	Log.i("MoSync","onDestroy");
+		mMosyncView.killApplication();
     }
-*/
 
 }

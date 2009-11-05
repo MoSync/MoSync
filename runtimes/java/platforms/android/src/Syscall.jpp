@@ -32,6 +32,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.view.SurfaceView;
 import android.content.Context;
 
@@ -995,7 +996,7 @@ public
 #endif
 		YIELD;
 		
-		mMoSyncView.stopThread();
+		mMoSyncView.killApplication();
 		STATIC_EXIT;
 	}
 

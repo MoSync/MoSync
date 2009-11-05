@@ -131,13 +131,9 @@ SYSCALL(void) maFillTriangleFan(Address address, int count) {
 }	
 
 SYSCALL(MAExtent) maGetTextSize(final String str) {
-/* FIX-ME	
-	DEBUG_ASSERT(mGraphics != null);
-	Font font = mGraphics.getFont();
-	DEBUG_ASSERT(font != null);
-	return EXTENT(font.stringWidth(str), font.getHeight());
-*/
-	return 0;
+	Rect r = new Rect();
+	mPaint.getTextBounds(str, 0, str.length(), r);
+	return EXTENT(r.width(), r.height());
 }
 
 SYSCALL(void) maDrawText(int left, int top, final String str) {
