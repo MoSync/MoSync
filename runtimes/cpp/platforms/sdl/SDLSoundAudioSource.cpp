@@ -15,24 +15,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "config_platform.h"
 #include "SDLSoundAudioSource.h"
+#include "helpers/helpers.h"
 
 #define DEFAULT_DECODEBUF_BYTES 16384
 #define DEFAULT_AUDIOBUF_SAMPLES 1024*4
+
+static void skipID3(SDL_RWops *rwops);
 
 SDLSoundAudioSource::SDLSoundAudioSource(SDL_RWops *rwops) :
 mNumLoops(1), mRWops(rwops)
 {
 }
 
-
 int SDLSoundAudioSource::init() {
+	//dump info
+	const Sound_DecoderInfo** i;
+	for (i = Sound_AvailableDecoders(); *i != NULL; i++) {
+		const Sound_DecoderInfo* di = *i;
+		LOG("Supported sound format: [%s], which is [%s].\n",
+			di->extensions[0], di->description);
+	}
+
+	skipID3(mRWops);
+
 	mAudioInfo.rate=44100;
 	mAudioInfo.format=AUDIO_S16;
 	mAudioInfo.channels=2;
 	mSample = Sound_NewSample(mRWops, NULL, NULL, DEFAULT_DECODEBUF_BYTES);
 	if(!mSample) {
-		//printf("Sound_GetError() = %s\n", Sound_GetError());
+		LOG("Sound_GetError() = %s\n", Sound_GetError());
 		return -1;
 	}
 	mAudioInfo = mSample->actual;
@@ -123,4 +136,55 @@ void SDLSoundAudioSource::setNumLoops(int i) {
 
 int SDLSoundAudioSource::getNumLoops() {
 	return mNumLoops;
+}
+
+
+static bool isID3v1(const char* buf) {
+	return memcmp(buf, "TAG", 3) == 0;
+}
+
+static bool isID3v1ext(const char* buf) {
+	return memcmp(buf, "TAG+", 4) == 0;
+}
+
+static bool isID3v2(const char* buf) {
+	return memcmp(buf, "ID3", 3) == 0;
+}
+
+static int sizeID3v2(const char* buf) {
+	int size = 0;
+	for(int i=6; i<10; i++) {
+		DEBUG_ASSERT((buf[i] & 0x80) == 0);
+		size |= int(buf[i]) << ((9 - i) * 7);
+	}
+	return size;
+}
+
+static void skipID3(SDL_RWops *rwops) {
+	static const int ID3V2_HEADER_LEN = 10;
+	static const int ID3V1_LEN = 128;
+	static const int ID3V1_EXT_LEN = 227 + ID3V1_LEN;
+
+	//get length of file
+	int len = rwops->seek(rwops, 0, SEEK_END);
+	DEBUG_ASSERT(len > ID3V2_HEADER_LEN);
+
+	//read a header's worth of data
+	rwops->seek(rwops, 0, SEEK_SET);
+	char buf[ID3V2_HEADER_LEN];
+	int res = rwops->read(rwops, buf, ID3V2_HEADER_LEN, 1);
+	DEBUG_ASSERT(res == 1);
+
+	int pos;
+	if(isID3v1ext(buf)) {
+		pos = ID3V1_EXT_LEN;
+	} else if(isID3v1(buf)) {
+		pos = ID3V1_LEN;
+	} else if(isID3v2(buf)) {
+		pos = sizeID3v2(buf) + ID3V2_HEADER_LEN;
+	} else {
+		pos = 0;
+	}
+	res = rwops->seek(rwops, pos, SEEK_SET);
+	DEBUG_ASSERT(res == pos);
 }
