@@ -624,15 +624,15 @@ int CDirScrAccEng::FrameBufferGetInfo(MAFrameBufferInfo* info) {
 
 	info->supportsGfxSyscalls = 0; // TODO: right?
 
-	return 0;
+	return 1;
 }
 
 int CDirScrAccEng::FrameBufferInit(const void* data) {
 	iRawFrameBuf = data;
-	return 0;
+	return 1;
 }
 
 int CDirScrAccEng::FrameBufferClose() {
 	iRawFrameBuf = NULL;
-	return 0;
+	return 1;
 }
