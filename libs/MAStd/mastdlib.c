@@ -54,7 +54,9 @@ int atoi(const char* string)
 	return v;
 }
 
-inline long atol(const char* string) { return atoi(string); }
+long atol(const char* string) { 
+	return atoi(string); 
+}
 
 #endif	//MAPIP
 
