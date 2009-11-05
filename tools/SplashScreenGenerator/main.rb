@@ -129,7 +129,7 @@ else
 		self.gravity = Magick::NorthWestGravity
 	end
 	
-	header.annotate(img_gs, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+	header.annotate(img_gs, 271, 340, 275, 130, "Version #{version[0].strip}" ) do
 		self.font = 'Verdana'
 		self.pointsize = 14
 		self.font_weight = Magick::LighterWeight
@@ -137,7 +137,7 @@ else
 		self.gravity = Magick::NorthWestGravity
 	end
 	
-	header.annotate(img2_gs, 271, 340, 180, 260, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+	header.annotate(img2_gs, 271, 340, 180, 260, "Version #{version[0].strip}" ) do
 		self.font = 'Verdana'
 		self.pointsize = 12
 		self.font_weight = Magick::LighterWeight
