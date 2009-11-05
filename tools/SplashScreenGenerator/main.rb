@@ -55,6 +55,8 @@ COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " +
 
 img = Magick::Image.read('template.png').first
 img2 = Magick::Image.read('template_installer.png').first
+img_gs = Magick::Image.read('template2.png').first
+img2_gs = Magick::Image.read('template_installer2.png').first
 
 header = Magick::Draw.new
 
@@ -65,6 +67,15 @@ header.annotate(img, 271, 200, 275, 110, HEADER_TEXT) do
 	self.fill = 'white'
 	self.gravity = Magick::NorthWestGravity
 end
+
+header.annotate(img_gs, 271, 200, 275, 110, HEADER_TEXT) do
+	self.font = 'MyriadPro-Bold'
+	self.pointsize = 19
+	self.font_weight = Magick::BoldWeight
+	self.fill = 'white'
+	self.gravity = Magick::NorthWestGravity
+end
+
 
 if(buildNightly == true)
 	puts "Injecting string to images : Nightly Build r#{version[1].strip}"
@@ -83,6 +94,23 @@ if(buildNightly == true)
 		self.fill = 'white'
 		self.gravity = Magick::NorthWestGravity
 	end
+	
+	header.annotate(img_gs, 271, 340, 275, 130, "Nightly Build r#{version[1].strip}" ) do
+		self.font = 'Verdana'
+		self.pointsize = 14
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+		
+	header.annotate(img2_gs, 271, 340, 180, 260, "Nightly Build r#{version[1].strip}" ) do
+		self.font = 'Verdana'
+		self.pointsize = 12
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+	
 else
 	puts "Injecting string to images : Version #{version[0].strip}"
 	header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip}" ) do
@@ -94,6 +122,22 @@ else
 	end
 
 	header.annotate(img2, 271, 340, 180, 260, "Version #{version[0].strip}" ) do
+		self.font = 'Verdana'
+		self.pointsize = 12
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+	
+	header.annotate(img_gs, 271, 340, 275, 130, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
+		self.font = 'Verdana'
+		self.pointsize = 14
+		self.font_weight = Magick::LighterWeight
+		self.fill = 'white'
+		self.gravity = Magick::NorthWestGravity
+	end
+	
+	header.annotate(img2_gs, 271, 340, 180, 260, "Version #{version[0].strip} ( Revision #{version[1].strip} )" ) do
 		self.font = 'Verdana'
 		self.pointsize = 12
 		self.font_weight = Magick::LighterWeight
@@ -119,6 +163,11 @@ end
 img = img.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
 img = img.composite(copyright.first, 134, 350, Magick::ScreenCompositeOp)
 
+img_gs = img_gs.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
+img_gs = img_gs.composite(copyright.first, 134, 350, Magick::ScreenCompositeOp)
+
 img.write('bmp3:splash.bmp')
 img2.write('bmp3:installer_splash.bmp')
-
+img.write('png24:userguide_start_1.png')
+img_gs.write('png24:userguide_start_3.png')
+img2_gs.write('png24:userguide_install_2.png')
