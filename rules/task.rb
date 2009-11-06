@@ -30,6 +30,7 @@ class TaskBase
 		#puts "pre: #{self}"
 		@prerequisites.each do |p| p.invoke end
 		if(self.needed?) then
+			puts "Execute: #{self}"
 			self.execute
 		end
 	end
@@ -65,13 +66,19 @@ class Work < TaskBase
 	
 	# invoke the workfile of another directory, as if it would have been called from the command line.
 	def Work.invoke_subdir(dir, *args)
-		m = Module.new
-		m.const_set("ARGV", args)
-		script = open(dir + "/workfile.rb") { |f| f.read }
+		puts File.expand_path(dir) + " " + args.inspect
+		fn = dir + "/workfile.rb"
+		if(!File.exists?(fn))
+			error "No workfile found in #{dir}"
+		end
+		
+		if(defined?(Targets))
+			Targets.reset(args)
+		end
+		
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
-		puts Dir.getwd
-		m.module_eval(script)
+		load(File.expand_path('workfile.rb'), true)
 		Dir.chdir(oldDir)
 	end
 end
@@ -113,7 +120,10 @@ class FileTask < Task
 	# Is this file task needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
 	def needed?
-		return true unless File.exist?(@NAME)
+		if(!File.exist?(@NAME))
+			puts "Because file does not exist: #{@NAME}"
+			return true
+		end
 		return true if out_of_date?(timestamp)
 		return false
 	end
@@ -129,7 +139,13 @@ class FileTask < Task
 	
 	# Are there any prerequisites with a later time than the given time stamp?
 	def out_of_date?(stamp)
-		@prerequisites.any? { |n| n.timestamp > stamp}
+		@prerequisites.any? { |n|
+			if(n.timestamp > stamp)
+				puts "Because date of prerequisite '#{n}' is newer: #{@NAME}"
+				return true
+			end
+			return false
+		}
 	end
 	
 	def dump(level)
@@ -151,7 +167,7 @@ class CopyFileTask < FileTask
 		@prerequisites = [src] + preq
 	end
 	def execute
-		puts "cp #{@src} #{@NAME}"
-		File.copy(@NAME, @src)
+		puts "cp #{@NAME} #{@src}"
+		File.copy(@src, @NAME)
 	end
 end

@@ -19,6 +19,11 @@ class Targets
 	
 	@@targets = {}
 	
+	def Targets.reset(args)
+		@@targets = {}
+		@@args = args
+	end
+	
 	def Targets.add(args, &block)
 		case args
 		when Hash
@@ -32,16 +37,22 @@ class Targets
 			name = args
 			preqs = []
 		end
+		#puts "Target add '#{name}'"
 		@@targets.store(name, Target.new(name, preqs, &block))
 	end
 	
 	# parse ARGV
 	def Targets.setup
-		#@@goals = [:more]	#temp hack
 		@@goals = []
-		#puts ARGV.inspect
-		ARGV.each do |a| handle_arg(a) end
-		#error "not finished"
+		if(defined?(@@args) != nil)
+			#puts "Got args from reset."
+			args = @@args
+		else
+			#puts "ARGS not defined; going with ARGV."
+			args = ARGV
+		end
+		#puts args.inspect
+		args.each do |a| handle_arg(a) end
 		if(@@goals.empty?) then
 			@@goals = [:default]
 		end
@@ -57,6 +68,7 @@ class Targets
 	end
 	
 	def Targets.invoke
+		setup
 		@@goals.each { |t|
 			if(@@targets[t] == nil) then
 				error "Does not have target '#{t}'"
@@ -65,8 +77,6 @@ class Targets
 		}
 	end
 end
-
-Targets.setup
 
 def target(args, &block)
 	Targets.add(args, &block)

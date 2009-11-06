@@ -102,7 +102,7 @@ public:
 		printf("%i successes.\n", mNSuccesses);
 		printf("%i failures.\n", mFailures.size());
 		for(int i=0; i<mFailures.size(); i++) {
-			printf("%s @ %s", mFailures[i].assertName.c_str(), mFailures[i].caseName.c_str());
+			printf("%s @ %s\n", mFailures[i].assertName.c_str(), mFailures[i].caseName.c_str());
 		}
 		complete = true;
 	}

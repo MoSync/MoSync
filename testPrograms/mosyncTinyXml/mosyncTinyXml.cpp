@@ -219,25 +219,25 @@ static char sDocument[] = "<devices>"
 "</devices>"
 ;
 
-static void tagStart(MTX_CONTEXT* context, const char* name, int len) {
+static void tagStart(MTXContext* context, const char* name, int len) {
 	printf("s %i: \"%s\"\n", len, name);
 }
-static void tagAttr(MTX_CONTEXT* context, const char* attrName, const char* attrValue) {
+static void tagAttr(MTXContext* context, const char* attrName, const char* attrValue) {
 	printf("a \"%s\": \"%s\"\n", attrName, attrValue);
 }
-static void tagData(MTX_CONTEXT* context, const char* data, int len) {
+static void tagData(MTXContext* context, const char* data, int len) {
 	printf("d %i: \"%s\"\n", len, data);
 }
-static void tagEnd(MTX_CONTEXT* context, const char* name, int len) {
+static void tagEnd(MTXContext* context, const char* name, int len) {
 	printf("e %i: \"%s\"\n", len, name);
 }
-static void dataRemains(MTX_CONTEXT* context, const char* data, int len) {
+static void dataRemains(MTXContext* context, const char* data, int len) {
 	printf("r %i: \"%s\"\n", len, data);
 }
-static void parseError(MTX_CONTEXT* context) {
+static void parseError(MTXContext* context) {
 	printf("parseError\n");
 }
-static void emptyTagEnd(MTX_CONTEXT* context) {
+static void emptyTagEnd(MTXContext* context) {
 	printf("emptyTagEnd\n");
 }
 
@@ -246,7 +246,7 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 	printf("Hello World!\n");
 
-	MTX_CONTEXT c;
+	MTXContext c;
 	c.tagStart = tagStart;
 	c.tagAttr = tagAttr;
 	c.tagData = tagData;

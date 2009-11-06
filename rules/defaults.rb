@@ -12,7 +12,7 @@ def set_defaults
 	default(:IGNORED_FILES, [])
 	default(:EXTRA_SOURCEFILES, [])
 	default(:EXTRA_OBJECTS, [])
-	default(:LIBRARIES, [])
+	default(:LOCAL_LIBS, [])
 	default(:SPECIFIC_CFLAGS, {})
 	default(:BUILDDIR_BASE, "build/")
 
