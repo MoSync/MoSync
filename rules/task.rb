@@ -26,6 +26,8 @@ class TaskBase
 		@prerequisites = []
 	end
 	
+	attr_accessor(:prerequisites)
+	
 	def invoke
 		#puts "pre: #{self}"
 		@prerequisites.each do |p| p.invoke end
