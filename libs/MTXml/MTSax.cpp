@@ -128,7 +128,6 @@ void tagEnd(MTXContext* context, const char* name, int length)
 void emptyTagEnd(MTXContext* context)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
-	flushAttributes(outer);
 	outer->endElement(outer, outer->name);
 }
 

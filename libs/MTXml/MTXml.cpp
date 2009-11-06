@@ -559,6 +559,7 @@ template<bool process> static void parseTagStart() {
 template<bool process> static void parseInsideTag() {
 	if(!skipWhiteSpace())
 		return;
+	bool ete = false;
 	if(*sCurPtr == '/') {
 		sCurPtr++;
 		if(*sCurPtr == 0) {
@@ -569,12 +570,14 @@ template<bool process> static void parseInsideTag() {
 			fireParseError();
 			return;
 		}
-		fireEmptyTagEnd();
+		ete = true;
 	}
 	if(*sCurPtr == '>') {
 		sState = EOutsideTag;
 		fireTagStartEnd();
 		sCurPtr++;
+		if(ete)
+			fireEmptyTagEnd();
 		return;
 	}
 	ATTRIBUTE a;
