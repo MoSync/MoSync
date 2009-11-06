@@ -1044,6 +1044,8 @@ namespace Base {
 		MANetworkInit();
 		initNetwork();
 
+		BLUETOOTH(MABtInit)();
+
 		/*
 		if(!openAudio(44100, 16, 2)) {
 			LOG("Audio could not be initialized.\n");
