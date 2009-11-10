@@ -127,14 +127,14 @@ long long __divdi3(long long a, long long b)
 	return libgcc_divdi3(a, b);
 }
 
-unsigned long __udivdi3 (unsigned long a, unsigned long b);
-unsigned long __udivdi3 (unsigned long a, unsigned long b)
+unsigned long long __udivdi3 (unsigned long long a, unsigned long long b);
+unsigned long long __udivdi3 (unsigned long long a, unsigned long long b)
 {
 	return a / b;
 }
 
-unsigned long __umoddi3 (unsigned long a, unsigned long b);
-unsigned long __umoddi3 (unsigned long a, unsigned long b)
+unsigned long long __umoddi3 (unsigned long long a, unsigned long long b);
+unsigned long long __umoddi3 (unsigned long long a, unsigned long long b)
 {
 	return a % b;
 }
