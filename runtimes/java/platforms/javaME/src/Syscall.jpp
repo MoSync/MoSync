@@ -121,7 +121,7 @@ IMPLEMENTS MoSync
 
 #ifdef MOSYNC_STATIC_JAVA
 #include "syscall_converters.h"
-#include "syscall_static_java.h"
+#include "generated/syscall_static_java.h"
 #define SPECIAL(name) name
 #else
 #ifdef MOSYNC_OLD_IDL
@@ -129,7 +129,7 @@ IMPLEMENTS MoSync
 #else
 #define SPECIAL(name) name
 #endif	//MOSYNC_IDL2
-#endif
+#endif	//MOSYNC_STATIC_JAVA
 
 	public void init() throws Exception
 	{
@@ -1752,7 +1752,7 @@ public
 
 	SYSCALL(void) maPanic(int result, String message) throws Exception {
 		DEBUG_RELEASE("maPanic("+result+", \""+message+"\")\n");
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(MOSYNC_STATIC_JAVA)
 		int ip = -1;
 		if(mCore != null)
 		{

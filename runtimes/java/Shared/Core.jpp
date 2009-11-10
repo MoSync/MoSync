@@ -168,7 +168,9 @@ final public class Core {
 		mMoSyncView = view;
 		mSyscall = new Syscall(this, mMoSyncView);
 #endif
+		DEBUG_ASSERT(mStaticCode != null);
 		mMem_ds = mStaticCode.mem_ds;
+		DEBUG_ASSERT(mMem_ds != null);
 		mMEM_DS_SIZE = mMem_ds.length;
 		Head_AppCode = 0;
 		

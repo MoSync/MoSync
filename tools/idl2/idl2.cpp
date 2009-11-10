@@ -283,7 +283,15 @@ static void outputAsmConfigLst(const Interface& maapi) {
 			type = "void";
 		else
 			type = "int";
-		stream << ".syscall _" << f.name << " " << f.number << ", " << f.args.size() << ", " <<
+		int nargs = 0;
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(a.type == "double")
+				nargs += 2;
+			else
+				nargs += 1;
+		}
+		stream << ".syscall _" << f.name << " " << f.number << ", " << nargs << ", " <<
 			type << "\n";
 	}
 }

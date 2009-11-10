@@ -624,7 +624,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 	public void initDisplay() {
 		DEBUG_ALWAYS("initDisplay()\n");
+#ifndef MA_PROF_BUG_NO_SIZECHANGED
 		mSCState = 1;
+#endif
 		//should cause Canvas.sizeChanged asynchronously!
 		setFullScreenMode(true);
 		mDisplay.setCurrent(this);

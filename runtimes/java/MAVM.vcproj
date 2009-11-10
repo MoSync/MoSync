@@ -32,7 +32,7 @@
 				CleanCommandLine=""
 				Output=""
 				PreprocessorDefinitions="WIN32;_DEBUG"
-				IncludeSearchPath=""
+				IncludeSearchPath="shared;platforms/javaME/src"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""
@@ -84,12 +84,12 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="build.bat"
+				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;build.bat"
 				ReBuildCommandLine=""
 				CleanCommandLine=""
 				Output=""
 				PreprocessorDefinitions="WIN32;NDEBUG"
-				IncludeSearchPath=""
+				IncludeSearchPath="shared;platforms/javaME/src"
 				ForcedIncludes=""
 				AssemblySearchPath=""
 				ForcedUsingAssemblies=""

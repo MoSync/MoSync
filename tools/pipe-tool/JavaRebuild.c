@@ -376,7 +376,7 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 	JavaEmitReturnType(syscall->RetType);
 
 	if (syscall->Interface == 0)
-		RebuildEmit("syscall.%s(", syscall->Name);
+		RebuildEmit("syscall.%s(", syscall->Name + 1);
 	else
 		RebuildEmit("%s(", syscall->Name);
 
@@ -1216,10 +1216,9 @@ void RebuildJava_EmitDS()
 
 //	GetDataMemLong(data_ip++);
 
-	RebuildEmit("int mem_ds[] = new int[16384];\n\n");
+	RebuildEmit("int mem_ds[] = new int[%i];\n\n", Default_DataSize);
 
-
-	RebuildEmit("int data_section[] = {\n");
+	RebuildEmit("static final int data_section[] = {\n");
 
 	need_comma = 0;
 	count = 0;
@@ -1338,15 +1337,15 @@ void RebuildJava_StartUp()
 	RebuildEmit("	int i0,i1,i2,i3,r14,r15;\n");
 	RebuildEmit("\n");
 	//RebuildEmit("	i0 = i1 = i2 = i3 = r14 = r15 = 0;\n");
-	RebuildEmit("	i0 = 16384;	//mem size\n");
-	RebuildEmit("	i1 = 1024;	//stack size\n");
-	RebuildEmit("	i2 = 4096;	//heap size\n");
+	RebuildEmit("	i0 = %i;	//mem size\n", Default_DataSize);
+	RebuildEmit("	i1 = %i;	//stack size\n", Default_StackSize);
+	RebuildEmit("	i2 = %i;	//heap size\n", Default_HeapSize);
 	RebuildEmit("\n");
 
 	// init data array
 	
 	RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n"); 
-	RebuildEmit("	sp = 16384 - 16;\n");
+	RebuildEmit("	sp = %i - 16;\n", Default_DataSize);
 
 	RebuildEmit("\n");
 
@@ -1360,14 +1359,14 @@ void RebuildJava_StartUp()
 	RebuildEmit("\n}\n");
 	RebuildEmit("\n");
 
-	RebuildEmit("public static void main(String[] args) throws Exception\n");
+	/*RebuildEmit("public static void main(String[] args) throws Exception\n");
 	RebuildEmit("{\n");
 
 	RebuildEmit("	StaticCode sc = new StaticCode();\n");
 
 	RebuildEmit("	sc.run(new Syscall());\n");
 	RebuildEmit("}\n");
-	RebuildEmit("\n");
+	RebuildEmit("\n");*/
 
 // test function
 
@@ -1612,7 +1611,7 @@ void RebuildJava_Main()
 
 	RebuildJava_FlowClass();
 
-	RebuildJava_EmitSyscalls();
+	//RebuildJava_EmitSyscalls();
 
 	//Rebuild_Variables();
 
@@ -1627,7 +1626,9 @@ void RebuildJava_Main()
 		Error(Error_Fatal, "copy fail");
 
 	{
-		const char* cmd = "gcj -O9 -C --CLASSPATH=libgcj.jar StaticCode.java";
+		//const char* cmd = "gcj -O9 -C --CLASSPATH=libgcj.jar StaticCode.java";
+		char cmd[2048];
+		sprintf(cmd, "gcj -O9 -C %s StaticCode.java", GcjFlags);
 		printf("%s\n", cmd);
 		res = system(cmd);
 		if(res != 0)

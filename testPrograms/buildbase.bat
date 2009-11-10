@@ -19,7 +19,8 @@ pipe-tool -xerr -B program rebuild.s
 GOTO COPYFILES
 
 :JAVA
-pipe-tool -java -master-dump -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
+@REM pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
+pipe-tool -java "-gcj=\"--CLASSPATH=c:/Program/Research In Motion/BlackBerry JDE 5.0.0/lib/net_rim_api.jar;c:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2/apps/JavaVM/classes/\"" -master-dump -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
 call prever.bat
 GOTO end
 

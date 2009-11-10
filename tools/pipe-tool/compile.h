@@ -746,6 +746,7 @@ dec(char *appname)
 dec(int argno)
 decset(int xerr, 0)
 dec(char DisasFunc[128])
+dec(char GcjFlags[1024])
 
 dec(char DependName[256])
 decset(int Do_Export_Dependencies, 0)

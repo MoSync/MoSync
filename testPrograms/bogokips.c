@@ -17,6 +17,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <conprint.h>
+#include <mastdlib.h>
+
+//#define USE_PUTS
 
 int t[256];
 static const int instructionsPerLoop = 14;
@@ -24,11 +27,21 @@ static const int nLoops = 100000;
 
 int MAMain() {
 	int v, i, time, startTime;
-	EVENT event;
+	MAEvent event;
+	char buf[64];
 
-	printf("Testing %i loops", nLoops);
-	printf("of %i instructions", nLoops * instructionsPerLoop);
-	printf("Fire->Quit, other->restart");
+#ifdef USE_PUTS
+	printf("Testing %i loops\n", nLoops);
+	printf("Fire->Quit, other->restart\n");
+	printf("of %i instructions\n", nLoops * instructionsPerLoop);
+#endif
+#if 0
+	puts("Testing ");
+	itoa(nLoops, buf, 10);
+	puts(buf);
+	puts(" loops\n");
+	puts("Fire->Quit, other->restart\n");
+#endif
 beginning:
 	startTime = maGetMilliSecondCount();
 	for(i=0; i<nLoops; i++)
@@ -37,11 +50,21 @@ beginning:
 		t[(i-v) & 0xff] = v + (41*101*65537);
 	}
 	time = maGetMilliSecondCount() - startTime;
-	printf("%i ms, %i KIPS", time, (nLoops * instructionsPerLoop) / time);
+#ifndef USE_PUTS
+	sprintf(buf, "%i ms, %i KIPS\n", time, (nLoops * instructionsPerLoop) / time);
+	maSetColor(0);
+	maFillRect(0, 0, 500, 500);
+	maSetColor(-1);
+	maDrawText(10, 10, buf);
+	maUpdateScreen();
+#endif
 waitLoop:
 	while(!(maGetEvent(&event))) maWait(0);
+#ifdef USE_PUTS
+	printf("Event: %i %i\n", event.type, event.key);
+#endif
 	if((event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_FIRE) || event.type == EVENT_TYPE_CLOSE)
-		maExit(0);
+		maExit(456);
 	else if((event.type == EVENT_TYPE_KEY_RELEASED))
 		goto waitLoop;
 	else

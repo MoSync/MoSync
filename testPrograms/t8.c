@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define RGB(r, g, b) (((r) << 16) | ((g) << 8) | (b))
 
 int MAMain() {
-	const Extent scrSize = maGetScrSize();
+	const MAExtent scrSize = maGetScrSize();
 	const int scrHeight = EXTENT_Y(scrSize);
 	const int scrWidth = EXTENT_X(scrSize);
 start:	maSetColor(0x808080);
@@ -72,7 +72,7 @@ start:	maSetColor(0x808080);
 	//Freeze
 	while(1) {
 		maWait(0);
-		EVENT event;
+		MAEvent event;
 		if(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE)
 				break;

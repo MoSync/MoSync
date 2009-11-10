@@ -209,7 +209,7 @@ public final class MAMidlet extends MIDlet {
 
 	public final void programError(String message) {
 		DEBUG_ALWAYS("programError \"" + message + "\"\n");
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(MOSYNC_STATIC_JAVA)
 		int ip = -1;
 		if(mCanvas.mCore != null)
 		{
@@ -225,7 +225,7 @@ public final class MAMidlet extends MIDlet {
 	}
 
 	public final void programError(String message, Throwable e) {
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(MOSYNC_STATIC_JAVA)
 		int ip = -1;
 		if(mCanvas.mCore != null)
 		{
