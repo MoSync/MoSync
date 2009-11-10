@@ -518,8 +518,8 @@ cd %MOSYNC_TRUNK%\libs
 @call rake pipe CONFIG=""
 @IF NOT errorlevel == 0 goto TOOL_ERROR
 
-del %MOSYNC_INCLUDE_PATH%\IX_*.h
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
 
