@@ -19,6 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "syscall_helpers.h"
 #include "config_platform.h"
 #include "generated\MAAPI_consts.h"
+#ifdef MA_IX_NATIVE_KEY_PRESSED
+#include "generated\IX_NATIVE_INPUT_CONSTS.h"
+#endif
 
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.*;
@@ -339,6 +342,14 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	private final void handleKeyEvent(int keyCode, boolean released) {
 #ifdef PUBLIC_DEBUG
 		try {
+#endif
+#ifdef MA_IX_NATIVE_KEY_PRESSED
+			{
+				int event[] = new int[2];
+				EI_TYPE = released ? EVENT_TYPE_NATIVE_KEY_RELEASED : EVENT_TYPE_NATIVE_KEY_PRESSED;
+				EI_KEY = keyCode;
+				postEvent(event);
+			}
 #endif
 			int mak = convertKeyCode(keyCode);
 			if(mak != 0) {

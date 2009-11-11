@@ -309,7 +309,7 @@ IMPLEMENTS MoSync
 	public final void LoadResourcesFromStream(LittleEndianDataInputStream file,
 		final String filename) throws Exception
 	{
-		try {
+		//try {
 			if(file == null) {
 				mResourceArray = new Object[1];
 				return;
@@ -452,10 +452,10 @@ IMPLEMENTS MoSync
 				BIG_PHAT_ERROR;
 			}
 			mResourceArray = resourceArray;
-		} catch(Throwable e) {
+		/*} catch(Throwable e) {
 			PRINT_STACK_TRACE;
 			BIG_PHAT_ERROR;
-		}
+		}*/
 		DEBUG_RES("ResLoad complete, "+(mResourceArray.length-1)+" objects\n");
 	}
 

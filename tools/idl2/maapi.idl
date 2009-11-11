@@ -1131,6 +1131,10 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
+#if IX_NATIVE_INPUT
+		NATIVE_KEY_PRESSED = 19;
+		NATIVE_KEY_RELEASED = 20;
+#endif
 	}
 
 	struct MAConnEventData {

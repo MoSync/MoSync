@@ -15,18 +15,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-//Interface Extensions
+#include <MAUtil/Moblet.h>
+#include <conprint.h>
+#include <IX_NATIVE_INPUT.h>
 
-#define IX_RESOURCE_TYPES
-#define IX_GUIDO
-#define IX_WLAN
-#define IX_FILE
-#define IX_RECORD
-#define IX_CELLID
-#define IX_CALL
-#define IX_STREAMING
-#define IX_CONNSERVER
-#define IX_OPENGL_ES
-#define IX_AUDIOBUFFER
-#define IX_SEGMENTED_DATA
-#define IX_NATIVE_INPUT
+using namespace MAUtil;
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+class NKMoblet : public Moblet {
+public:
+	NKMoblet() {
+		printf("Hello World!\n");
+	}
+
+	void keyPressEvent(int keyCode) {
+		if(keyCode == MAK_0)
+			maExit(0);
+		printf("k: %i\n", keyCode);
+	}
+
+	void customEvent(const MAEvent& event) {
+		if(event.type == EVENT_TYPE_NATIVE_KEY_PRESSED) {
+			printf("nk: %i\n", event.key);
+		}
+	}
+};
+
+extern "C" int MAMain() {
+	InitConsole();
+	gConsoleLogging = 1;
+
+	Moblet::run(new NKMoblet());
+	return 0;
+}
