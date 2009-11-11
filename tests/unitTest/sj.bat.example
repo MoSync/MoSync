@@ -1,0 +1,1 @@
+rake sj "PREVERIFY=C:\Program\Research In Motion\BlackBerry JDE 5.0.0\bin\preverify.exe" "CLASSPATH=c:/Program/Research In Motion/BlackBerry JDE 5.0.0/lib/net_rim_api.jar" "STATIC_JAR=c:\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\WTK2\apps\JavaVM\bin\JavaVM.jar"

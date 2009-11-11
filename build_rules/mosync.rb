@@ -75,3 +75,18 @@ end
 task :runn => :native do
 	sh "cd #{BUILDDIR} && ./#{EXENAME}"
 end
+
+
+# static java
+task :sj do
+	require "#{BD}/build_rules/static_java.rb"
+	dir_res()
+	StaticJava.invoke
+end
+
+task :sjbb do
+	(task :sj).invoke
+	BlackBerryStaticJava.invoke
+	#rapc jar -> cod
+	#javaloader load cod
+end

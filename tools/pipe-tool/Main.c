@@ -677,7 +677,6 @@ Mode Switches:\n\
   -L                   create object/library\n\
   -R                   compile resources\n\
   -B                   build application\n\
-	-java                build a Java class file\n\
 \n\
 Options:\n\
   -entry=sym           set code entry point (default '%s')\n\
@@ -694,7 +693,8 @@ Options:\n\
   -no-verify           prevent code verification\n\
   -sld                 output source/line translation in 'sld.tab'\n\
 	-collect-stabs       output debug information in 'stabs.tab'\n\
-	-gcj=flags           for Java mode, set flags for GCJ.\n\
+	-java                together with -B mode: build a Java class file\n\
+	-gcj=flags           for Java mode: set flags for GCJ.\n\
 \n\
 Resource compiler only:\n\
   -depend=file         output dependencies in makefile syntax\n\
