@@ -91,6 +91,7 @@ public:
 
 	void beginTestSuite(const String& suiteName) {
 		//printf("Test Suite begin: %s\n", suiteName.c_str());	//mustn't trash the screen here
+		printf("Test begins..\nPlease wait,\nrunning automated tests!\n");
 		mNSuccesses = 0;
 		mFailures.clear();
 		mCurrentTestName.clear();

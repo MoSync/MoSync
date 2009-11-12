@@ -57,6 +57,7 @@ void addFramebufferTests(TestSuite* suite) {
 }
 
 void FramebufferTest::start() {
+
 	MAFrameBufferInfo fi;
 	assert("maFrameBufferGetInfo", maFrameBufferGetInfo(&fi) >= 0);
 	malloc_handler old_malloc_handler = set_malloc_handler(framebuffer_malloc_handler);
@@ -75,12 +76,6 @@ void FramebufferTest::start() {
 		return;
 	}
 
-	//draw
-#if 0
-	for(int i=0; i<fi.sizeInBytes / sizeof(int); i++) {
-		fb[i] = rand();
-	}
-#endif
 	//draw color rects, plot some pixels over them
 
 	Image img((byte*)fb, NULL, fi.width, fi.height, fi.pitch, Image::PIXELFORMAT_RGB888);
@@ -126,6 +121,7 @@ void FramebufferTest::start() {
 
 	maUpdateScreen();
 	assert("maFrameBufferClose", maFrameBufferClose() > 0);
+
 }
 
 void framebuffer_malloc_handler(int size) {

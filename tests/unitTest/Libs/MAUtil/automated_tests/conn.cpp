@@ -78,6 +78,7 @@ public:
 
 	//TestCase
 	void start() {
+		printf("Socket size test\n");
 		mCurrentSizeIndex = -1;
 		int res = mConn.connect(SOCKET_URL(SOCKET_SIZE_PORT));
 		if(res <= 0) {
@@ -161,7 +162,9 @@ public:
 
 	//TestCase
 	void start() {
-		int res = mHttp.create(HTTP_POST_URL, HTTP_POST);
+		printf("Single HTTP test (%d)\n", mMultiple);
+		int res = mHttp.create("http://www.example.com/", HTTP_POST);//HTTP_POST_URL, HTTP_POST);
+		printf("res:%d\n", res);
 		if(res <= 0) {
 			printf("create %i\n", res);
 			fail();
@@ -177,11 +180,14 @@ public:
 		for(int i=0; i<snHeaders; i++) {
 			mHttp.setRequestHeader(sHeaders[i].key, sHeaders[i].value);
 		}
+
 		char buffer[64];
 		sprintf(buffer, "%i", DATA_SIZE * mMultiple);
+		printf("cl:%d\n", DATA_SIZE*mMultiple);
 		mHttp.setRequestHeader("Content-Length", buffer);
 		//write some data
 		mHttp.write(mClientData, DATA_SIZE * mMultiple);
+
 	}
 	void close() {
 		mHttp.close();
@@ -257,7 +263,7 @@ public:
 
 	//TestCase
 	void start() {
-		printf("Socket...\n");
+		printf("Single Socket test\n");
 		memset(mReadBuffer, 0, DATA_SIZE);
 		mReadFinished = false;
 		int res = mConn.connect(SOCKET_URL(SINGLE_SOCKET_PORT));
@@ -326,7 +332,7 @@ public:
 
 	//TestCase
 	void start() {
-		printf("Http...\n");
+		printf("Single HTTP get test\n");
 		memset(mReadBuffer, 0, DATA_SIZE);
 		int res = mHttp.create(HTTP_GET_URL(HTTP_PORT), HTTP_GET);
 		if(res <= 0) {

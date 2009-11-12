@@ -157,7 +157,7 @@ public:
 	}
 
 	void start() {
-		printf("running math tests\n");
+		printf("Automated math tests\n");
 		doubleTest();
 		trigTest();
 		sqrtTest();

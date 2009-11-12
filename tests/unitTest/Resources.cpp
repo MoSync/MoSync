@@ -45,7 +45,7 @@ public:
 
 		MAHandle testImg = maCreatePlaceholder();
 
-		printf("testing resources");
+		printf("testing resources\n");
 
 		maCreateDrawableImage(testImg, NUMCOLORS, 1);
 

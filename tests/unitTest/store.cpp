@@ -28,6 +28,7 @@ public:
 
 	//TestCase
 	virtual void start() {
+		printf("Testing stores.\n");
 		//open, cin
 		MAHandle store = maOpenStore("test.store", MAS_CREATE_IF_NECESSARY);
 		TI(store);

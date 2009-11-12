@@ -62,6 +62,7 @@ public:
 	}
 
 	void start() {
+		printf("Automated string tests\n");
 		strtodTest();
 /*
  		printf("running math tests\n");

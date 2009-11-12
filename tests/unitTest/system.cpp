@@ -114,7 +114,7 @@ public:
 			return;
 		}
 		clearScreen();
-		printf("press fire to turn of vibration");
+		printf("press fire to turn of vibration\n");
 		on = true;
 	}
 
@@ -127,7 +127,7 @@ public:
 		if(keyCode == MAK_FIRE) {
 			maVibrate(0);
 			on = false;
-			printf("did you turn off the vibration?");
+			printf("did you turn off the vibration?\n");
 		}
 	}
 

@@ -35,15 +35,20 @@ public:
 	MAUtilTypesTest() : MATest::TestCase("MAUtilTypes") {}
 
 	void start() {
+		printf("MAUtil tests\n");
+		printf("-vector\n");
 		vector();
+		printf("-string\n");
 		string();
+		printf("-set\n");
 		set();
+		printf("-hashMap\n");
 		hashMap();
+		printf("-map\n");
 		map();
 		/*
 		list();
 		*/
-		printf("MAUtilTypes test complete, press OK to continue\n");
 		suite->runNextCase();
 	}
 
