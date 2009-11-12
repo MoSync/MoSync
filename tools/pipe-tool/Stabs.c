@@ -402,7 +402,7 @@ int Parse_stabn()
 int Parse_stabs()
 {
 	int Type,Desc,Value;
-	char str[10*1024];
+	char str[32*1024];
 
 	if (!Final_Pass)
 	{
@@ -418,7 +418,7 @@ int Parse_stabs()
 	
 	// Get string
 	
-	GetStringName(8000);
+	GetStringName(32*1024-2);
 	strcpy(str, Name);
 
 	// Skip comma

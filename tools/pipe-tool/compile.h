@@ -381,7 +381,7 @@ typedef struct
 #define NAME_MAX 32767
 
 #define SYMMAX_MIN 1024				// Maximum symbols in table
-#define SYMMAX (64*1024)			// Maximum symbols in table
+#define SYMMAX (16*64*1024)			// Maximum symbols in table
 
 
 //#define LABMAX 32					// Maximum symbol length

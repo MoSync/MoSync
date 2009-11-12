@@ -165,7 +165,7 @@ void Free_File(char *fptr)
 //				       Basic Memory Management
 //******************************************************************************
 
-#define MAXALLOCS 16384 * 4
+#define MAXALLOCS 16384 * 16
 
 char *allocList[MAXALLOCS];
 int allocStack[MAXALLOCS];

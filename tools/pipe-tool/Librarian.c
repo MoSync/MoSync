@@ -187,7 +187,8 @@ int ExpandSource(int length)
 
 int AddSourceText(char *Template, ...)
 {
-	char 	tbuf[256];
+	char 	tbuf[4096];
+
 	va_list args;
 	int		len;
 

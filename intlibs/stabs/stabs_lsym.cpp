@@ -349,9 +349,20 @@ static const TypeBase* subParseEnum(char** pText, const string& enumName) {
 // inheritance := numberOfBases ',' (baseClass)+
 // firstBaseClass := '~%' typeDecl ';'
 // members := (inheritance)? (member)+ ';' (firstBaseClass)?
+
 static const TypeBase* subParseMembers(int size, char** pText, const string& name) {
 	//LOG("subParseMembers %s\n", *pText);
-	StructType* st = new StructType(size, (name.length() == 0) ? "<anonymous struct>" : name);
+	StructType* st;
+	if(name.length() == 0) {
+		// for anonymous structs generate a type name that isn't valid c or c++.
+		static int anonId = 0;
+		char tmp[16];
+		itoa(anonId++, tmp, 10); 
+		st = new StructType(size, "___AnonymousStruct" + std::string(tmp));
+	} else {
+		st = new StructType(size, name);
+	}
+
 	char* next = *pText;
 	if(*next == '!') {	//this struct has base class(es)
 		TEST(next = subParseInheritance(next + 1, st));
@@ -470,6 +481,13 @@ static char* subParseMember(char* text, StructType* st) {
 			m.name = name;
 			m.visibility = v;
 			m.type = type;
+
+			// anonymous members can use the generated type name.
+			if(name.length()==0) {
+				StringPrintFunctor spf;
+				m.type->printTypeMI(spf,false);
+				m.name = spf.getString();
+			}
 			int res = sscanf(next, ",%i,%i%n", &m.offsetBits, &m.sizeBits, &len);
 			FAILIF(res != 2);
 			end = next + len;
