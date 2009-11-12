@@ -169,9 +169,9 @@ final public class Core {
 		mSyscall = new Syscall(this, mMoSyncView);
 #endif
 		DEBUG_ASSERT(mStaticCode != null);
-		mMem_ds = mStaticCode.mem_ds;
+		mMem_ds = StaticCode.mem_ds;
 		DEBUG_ASSERT(mMem_ds != null);
-		mMEM_DS_SIZE = mMem_ds.length;
+		mMEM_DS_SIZE = mMem_ds.length << 2;
 		Head_AppCode = 0;
 		
 		DEBUG_ASSERT(mSyscall != null);
@@ -606,9 +606,9 @@ final public class Core {
 #ifdef MOSYNC_STATIC_JAVA
 final class StaticCode
 {
-	int __dbl_high;
-	Syscall syscall;
-	int mem_ds[];
+	static int __dbl_high;
+	static Syscall syscall;
+	static int mem_ds[];
 	void run(Syscall s) {}
 }
 #endif

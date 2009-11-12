@@ -27,7 +27,7 @@ PREVERIFY = ENV['PREVERIFY']
 def build_static_java(t)
 	sh "cd #{BUILDDIR} && #{PIPETOOL}#{PIPEFLAGS} -java" +
 		" \"-gcj=\\\"--CLASSPATH=#{CLASSPATH};#{STATIC_JAR}\\\"\"" +
-		" -sld -collect-stabs -B tempProgram #{expand_paths(t.prerequisites)}"
+		" -sld -collect-stabs -master-dump -B tempProgram #{expand_paths(t.prerequisites)}"
 	rm "#{BUILDDIR}ms.class"
 	#sh(cmd) do |ok, res|
 		#if(!ok)

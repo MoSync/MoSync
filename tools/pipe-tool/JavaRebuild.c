@@ -1445,7 +1445,7 @@ void RebuildJava_StartUp()
 	// init data array
 	//RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n");
 	RebuildEmit("	InputStream is = getClass().getResourceAsStream(\"data_section.bin\");\n");
-	RebuildEmit("	DataInputStream dis = new DataInputStream(is);\n");
+	RebuildEmit("	LittleEndianDataInputStream dis = new LittleEndianDataInputStream(is);\n");
 	RebuildEmit("	for(int i=0; i<%i; i++) {\n", MaxDataIP >> 2);
 	RebuildEmit("		 mem_ds[i] = dis.readInt();\n");
 	RebuildEmit("	}\n");
