@@ -108,7 +108,7 @@ short HeaderCommands()
 		GetAsmName();
 		strcpy(DefineNameCopy, Name);
 
-		if (QToken("#"))
+		if (NextToken("#"))
 		{
 			// Just define a script
 			
