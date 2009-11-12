@@ -57,20 +57,19 @@ public:
 #define CONVERT_ELEM(toType, id) case Builtin::e##id: return (T)id;
 	template<typename T>
 	T convertToType() const {
+		if(isType()) throw ParseException("Cannot convert type to value.");
 		switch(mPrimitiveType) {
 			TYPES(CONVERT_ELEM)
 			default: throw ParseException("Conversion error");
 		}
 	}
 
-	template<typename T>
-	T getType() const {
-		return *((const T*)getDataAddress());
-	}
-
 	Value();
 	Value(const std::string& value);
 	Value(const SYM& sym);
+
+	// type is value
+	Value(const TypeBase* typeBase);
 
 	TYPES(V_CONSTRUCTOR_ELEM_HEADER)
 	TYPES(V_OPERATOR_CAST_ELEM_HEADER)
@@ -81,9 +80,15 @@ public:
 	const SYM& getSymbol() const;
 	void setSymbol(const SYM& sym);
 	void setTypeBase(const TypeBase* type);
+	const TypeBase* getTypeBase() const;
 	const void* getDataAddress() const;
 
 	const TypeBase *deref() const;
+
+	// if value is an actual type
+	bool isType() const;
+	int sizeOf() const;
+
 
 #include "operations_generated.h"
 

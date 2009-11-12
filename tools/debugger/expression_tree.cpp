@@ -24,22 +24,15 @@ using namespace std;
 ExpressionTreeNode::ExpressionTreeNode(ExpressionTree *tree) : mTree(tree) {
 }
 
-CastNode::CastNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars, ExpressionTreeNode *child) : 
-ExpressionTreeNode(tree), mChild(child), mNumStars(numStars) {
-	const TypeBase *target = typeBase;
-	for(int i = 0; i < mNumStars; i++) {
-		TypeBase *newTarget = new PointerType(target);
-		mPointerTypes.push_back(newTarget);
-		target = newTarget;
-	}
-	mTypeBase = target;
-
+CastNode::CastNode(ExpressionTree *tree, ExpressionTreeNode *child, ExpressionTreeNode* type) : 
+ExpressionTreeNode(tree), mChild(child), mType(type) {
 	mChild->addRef();
+	mType->addRef();
 }
 
 CastNode::~CastNode() {
-	for(int i = 0; i < mPointerTypes.size(); i++) delete mPointerTypes[i];
 	mChild->deleteRef();
+	mType->deleteRef();
 }
 
 bool isBase(const TypeBase* base, const TypeBase* what) {
@@ -56,33 +49,58 @@ bool isBase(const TypeBase* base, const TypeBase* what) {
 #define CAST_ELEM(type, id) case Builtin::##e##id: return Value((type)a);
 Value CastNode::evaluate() {
 	Value a = mChild->evaluate();
+	Value type = mType->evaluate();
 
-	if(mTypeBase->type == TypeBase::eBuiltin) {
-		switch(((Builtin*)mTypeBase)->type) {
+	// sanity check
+	if(type.isType() == false) throw ParseException("Trying to cast to non-type");
+
+	const TypeBase* typeBase = type.getTypeBase();
+
+	if(typeBase->type == TypeBase::eBuiltin) {
+		switch(((Builtin*)typeBase)->type) {
 			TYPES(CAST_ELEM)
 				default: throw ParseException("Invalid cast");
 		}
-	} else if(mTypeBase->type == TypeBase::ePointer || mTypeBase->type == TypeBase::eEnum || mTypeBase->type == TypeBase::eFunction) {
+	} else if(typeBase->type == TypeBase::ePointer || typeBase->type == TypeBase::eEnum || typeBase->type == TypeBase::eFunction) {
 		Value ret = Value((int)a);
 		SYM newSym;
 		newSym.address = NULL;
 		newSym.symType = eVariable;
-		newSym.type = mTypeBase;
+		newSym.type = typeBase;
 		ret.setSymbol(newSym);
 		return ret;
-	} else if(mTypeBase->type == TypeBase::eStruct) {
+	} else if(typeBase->type == TypeBase::eStruct) {
 		const SYM& cast = a.getSymbol();
-		if(isBase(cast.type->resolve(), mTypeBase)) {
+		if(isBase(cast.type->resolve(), typeBase)) {
 			SYM newSym;
 			newSym.address = cast.address;
 			newSym.symType = eVariable;
-			newSym.type = mTypeBase;
+			newSym.type = typeBase;
 			a.setSymbol(newSym);
 			return a;
 		} 
 	} 
 	
 	throw ParseException("Unsupported cast.");
+}
+
+TypeNode::TypeNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars) : 
+ExpressionTreeNode(tree), mNumStars(numStars) {
+	const TypeBase *target = typeBase;
+	for(int i = 0; i < mNumStars; i++) {
+		TypeBase *newTarget = new PointerType(target);
+		mPointerTypes.push_back(newTarget);
+		target = newTarget;
+	}
+	mTypeBase = target;
+}
+
+TypeNode::~TypeNode() {
+	for(int i = 0; i < mPointerTypes.size(); i++) delete mPointerTypes[i];
+}
+
+Value TypeNode::evaluate() {
+	return Value(mTypeBase);
 }
 
 TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mToken(t) {

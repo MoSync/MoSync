@@ -59,17 +59,25 @@ protected:
 	Token mToken;
 };
 
+class TypeNode : public ExpressionTreeNode {
+public:
+	TypeNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars);
+	~TypeNode();
+	Value evaluate();
+protected:
+	const TypeBase* mTypeBase;
+	std::vector<TypeBase*> mPointerTypes;
+	int mNumStars;
+};
 
 class CastNode : public ExpressionTreeNode {
 public:
-	CastNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars, ExpressionTreeNode *child);
+	CastNode(ExpressionTree *tree, ExpressionTreeNode *child, ExpressionTreeNode *type);
 	~CastNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mChild;
-	const TypeBase* mTypeBase;
-	std::vector<TypeBase*> mPointerTypes;
-	int mNumStars;
+	ExpressionTreeNode *mType;
 };
 
 class BinaryOpNode : public ExpressionTreeNode {
@@ -161,6 +169,5 @@ protected:
 	ExpressionTreeNode *mChild;
 	TypeBase *mCachedType;
 };
-
 
 #endif

@@ -116,6 +116,25 @@ Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES)
 	}
 }
 
+Value::Value(const TypeBase* typeBase) : mPrimitiveType(Builtin::NUM_SUB_TYPES) {
+	mSym.symType = eNone;
+	mSym.type = typeBase;
+	mSym.address = NULL;
+}
+
+bool Value::isType() const {
+	return getPrimitiveType()==Builtin::NUM_SUB_TYPES && mSym.address==NULL;
+}
+
+int Value::sizeOf() const {
+	if(mSym.type) {
+		return mSym.type->size;
+	} else {
+		throw ParseException("Sizeof not applicable on value.");
+	}
+}
+
+
 bool Value::isPointer() const { 
 	return getType()==TypeBase::ePointer; 
 }
@@ -139,6 +158,11 @@ void Value::setSymbol(const SYM& sym) {
 void Value::setTypeBase(const TypeBase* type) {
 	mSym.type = type;
 }
+
+const TypeBase* Value::getTypeBase() const {
+	return mSym.type;
+}
+
 
 const void* Value::getDataAddress() const {
 	if(getType() == TypeBase::eFunction) return (const void*)v;

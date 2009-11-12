@@ -136,7 +136,15 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				if(result->resolve() == result) {
 					Type s;
 					s.id = t;
-					s.name = name;
+
+					// if it is an anonymous struct we need to do a little hack.
+					if(result->type == TypeBase::eStruct && name=="") {
+						StringPrintFunctor spf;
+						result->printTypeMI(spf, false);
+						s.name = spf.getString();
+					}
+					else s.name = name;
+			
 					s.type = result;
 					addType(s);
 				}
@@ -482,7 +490,7 @@ static char* subParseMember(char* text, StructType* st) {
 			m.visibility = v;
 			m.type = type;
 
-			// anonymous members can use the generated type name.
+			// anonymous members can use the generated type name as a name.
 			if(name.length()==0) {
 				StringPrintFunctor spf;
 				m.type->printTypeMI(spf,false);
