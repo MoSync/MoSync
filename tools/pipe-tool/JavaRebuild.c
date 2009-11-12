@@ -591,7 +591,7 @@ void JavaDecodeCallReg(OpcodeInfo *theOp)
 	int i2 = ThisFunctionRegs & REGBIT(REG_i2);
 	int i3 = ThisFunctionRegs & REGBIT(REG_i3);
 
-	RebuildEmit("	CallReg(%s", java_reg[theOp->rd]);
+	RebuildEmit("	StaticCode.CallReg(%s", java_reg[theOp->rd]);
 
 	if (i0 && IsRegInit(REG_i0))
 		RebuildEmit(", i0");
@@ -1241,7 +1241,7 @@ void RebuildJava_CallReg()
 	RebuildEmit("//****************************************\n\n");
 
 
-	RebuildEmit("public " DYN_TYPE);
+	RebuildEmit("public static " DYN_TYPE);
 	RebuildEmit("int CallReg(int s, int i0, int i1, int i2, int i3) throws Exception\n");
 
 	RebuildEmit("{\n");
@@ -1407,7 +1407,7 @@ void RebuildJava_FlowClass()
 	RebuildEmit("{\n");
 
 	for (n=0;n<MaxEnumLabel+1;n++)
-	{		
+	{
 		RebuildEmit("	public static void label_%d() {}\n", n);
 		RebuildEmit("	public static void goto_%d() {}\n", n);
 	}
@@ -1446,7 +1446,7 @@ void RebuildJava_StartUp()
 	//RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n");
 	RebuildEmit("	InputStream is = getClass().getResourceAsStream(\"data_section.bin\");\n");
 	RebuildEmit("	DataInputStream dis = new DataInputStream(is);\n");
-	RebuildEmit("	for(int i=0; i<ds_len; i++) {\n");
+	RebuildEmit("	for(int i=0; i<%i; i++) {\n", MaxDataIP >> 2);
 	RebuildEmit("		 mem_ds[i] = dis.readInt();\n");
 	RebuildEmit("	}\n");
 	RebuildEmit("	dis.close();\n");
@@ -1659,7 +1659,7 @@ void RebuildJava_BeginCodeSegment(int SegNum)
 	RebuildEmit("//----------------------------------------\n");
 	RebuildEmit("\n");
 
-	RebuildEmit("public static final class Code%d\n", SegNum);
+	RebuildEmit("final class Code%d\n", SegNum);
 	RebuildEmit("{\n");
 }
 
@@ -1711,7 +1711,7 @@ void RebuildJava_WriteMemAccessFuncs()
 
 void RebuildJava_Main()
 {
-	//int res;
+	int i;
 	
 	if (ArgConstOpt != 0)
 		Error(Error_System, "(RebuildJava_Main) ArgConstOpt must be switched off");
@@ -1737,10 +1737,10 @@ void RebuildJava_Main()
 	RebuildEmit("{\n");
 
 	RebuildEmit("\n");
-	RebuildEmit("int sp;\n");
-	RebuildEmit("int __dbl_high;\n");
-	RebuildEmit("Syscall syscall;\n");
-	RebuildEmit("static int mem_ds[] = new int[%i];\n", Default_DataSize >> 2);
+	RebuildEmit("public static int sp;\n");
+	RebuildEmit("public static int __dbl_high;\n");
+	RebuildEmit("public static Syscall syscall;\n");
+	RebuildEmit("public static int mem_ds[] = new int[%i];\n", Default_DataSize >> 2);
 
 	RebuildEmit("\n");
 
@@ -1776,19 +1776,15 @@ void RebuildJava_Main()
 	Rebuild_Variables();
 #endif
 
-	ArrayWrite(&RebuildArray, "rebuild.java");
+	ArrayWrite(&RebuildArray, "StaticCode.java");
 
 	// Build class file
 
-#if 0	
-	res = system("copy rebuild.java StaticCode.java");
-
-	if(res != 0)
-		Error(Error_Fatal, "copy fail");
-
+#if 1
 	{
 		//const char* cmd = "gcj -O9 -C --CLASSPATH=libgcj.jar StaticCode.java";
 		char cmd[2048];
+		int res;
 
 		sprintf(cmd, "gcj -O9 -C %s StaticCode.java", GcjFlags);
 		printf("%s\n", cmd);
@@ -1804,7 +1800,12 @@ void RebuildJava_Main()
 //	system("del ms.class");
 //	system("del rebuild.java");
 
-	PatchClass("StaticCode.class", "StaticCode.class");
+	//PatchClass("StaticCode.class", "StaticCode.class");
+	for(i=0; i<CurrentCodeSegment; i++) {
+		char buf[32];
+		sprintf(buf, "Code%i.class", i);
+		PatchClass(buf, buf);
+	}
 //	system("jcf-dump -c StaticCode.class > javadis_after.s");
 #endif
 

@@ -37,7 +37,7 @@ def build_static_java(t)
 end
 
 def preverify()
-	sh "cd #{BUILDDIR} && \"#{PREVERIFY}\" -classpath \"#{CLASSPATH};#{STATIC_JAR}\" ."
+	sh "cd #{BUILDDIR} && \"#{PREVERIFY}\" -classpath \"#{CLASSPATH};#{STATIC_JAR}\" -d . ."
 end
 
 # inserts srcFile into srcJar, stores result in dst.
@@ -62,7 +62,7 @@ class StaticJava
 		#pack into JAR
 		jarFile = "#{BUILDDIR}#{EXENAME}.jar"
 		jarTask = file jarFile => verifiedClassfile do
-			jarInsert(jarFile, STATIC_JAR, "#{verifiedClassfile} #{BUILDDIR}data_section.bin")
+			jarInsert(jarFile, STATIC_JAR, "#{BUILDDIR}*.class #{BUILDDIR}data_section.bin")
 		end
 		jarTask.invoke
 	end
