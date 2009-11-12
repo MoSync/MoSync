@@ -567,7 +567,7 @@ int JavaDecodeCall(OpcodeInfo *theOp)
 	
 	ref = labref;
 
-	return JavaCallFunction(ref, "");
+	return JavaCallFunction(ref);
 }
 
 //****************************************
@@ -667,15 +667,12 @@ int JavaDecodeSwitch(OpcodeInfo *theOp)
 //			 
 //****************************************
 
-int JavaCallFunction(SYMBOL *ref, char *pre)
+int JavaCallFunction(SYMBOL *ref)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
 
 	JavaEmitReturnType(rettype);
-
-	if (pre)
-		RebuildEmit("%s", pre);
 
 	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
 	
@@ -1176,7 +1173,7 @@ void RebuildJava_CallReg()
 			{
 				RebuildEmit("		case 0x%x:\n", sym->VirtualIndex);
 				RebuildEmit("		");
-				JavaCallFunction(sym, "");
+				JavaCallFunction(sym);
 				RebuildEmit("\n");
 	//			RebuildEmit("		return;\n\n");	
 
@@ -1202,6 +1199,9 @@ void RebuildJava_CallReg()
 //****************************************
 //
 //****************************************
+
+#ifdef JAVA_EMIT_DS
+
 
 void RebuildJava_EmitDS()
 {
@@ -1291,6 +1291,8 @@ void RebuildJava_EmitDS()
 
 }
 
+#endif
+
 //****************************************
 // 
 //****************************************
@@ -1329,7 +1331,6 @@ void RebuildJava_StartUp()
 	RebuildEmit("//          	 Startup\n");
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("\n");
-	RebuildEmit("\n");
 	RebuildEmit("public " DYN_TYPE "void run(Syscall s) throws Exception\n");
 	RebuildEmit("{\n");
 	RebuildEmit("	syscall = s;\n");
@@ -1340,48 +1341,41 @@ void RebuildJava_StartUp()
 	RebuildEmit("	i0 = %i;	//mem size\n", Default_DataSize);
 	RebuildEmit("	i1 = %i;	//stack size\n", Default_StackSize);
 	RebuildEmit("	i2 = %i;	//heap size\n", Default_HeapSize);
+	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-	// init data array
-	
-	RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n"); 
-	RebuildEmit("	sp = %i - 16;\n", Default_DataSize);
-
-	RebuildEmit("\n");
+// init data array
+// NOT NEEDED NOW	
+//	RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n"); 
+//	RebuildEmit("\n");
 
 	ep	= GetGlobalSym(Code_EntryPoint);
 
 	if (ep)
 	{
-		JavaCallFunction(ep, "");
+		JavaCallFunction(ep);
 	}
 	
 	RebuildEmit("\n}\n");
-	RebuildEmit("\n");
+//	RebuildEmit("\n");
 
-	/*RebuildEmit("public static void main(String[] args) throws Exception\n");
+	/*
+	RebuildEmit("public static void main(String[] args) throws Exception\n");
 	RebuildEmit("{\n");
 
 	RebuildEmit("	StaticCode sc = new StaticCode();\n");
 
 	RebuildEmit("	sc.run(new Syscall());\n");
 	RebuildEmit("}\n");
-	RebuildEmit("\n");*/
-
-// test function
-
-/*	RebuildEmit("public " DYN_TYPE "void sys_print(int i0)\n");
-	RebuildEmit("{\n");
-
-	RebuildEmit("	System.out.print(\" \" + (int) i0 );\n");
-	RebuildEmit("	return;\n");	
-	RebuildEmit("\n}\n");	
-*/
+	RebuildEmit("\n");
+	*/
 }
 
 //****************************************
 // 
 //****************************************
+
+#ifdef JAVA_EMIT_INTERFACE_FUNC
 
 void RebuildJava_EmitInterfaceFunc(SYMBOL *sym)
 {
@@ -1423,9 +1417,13 @@ void RebuildJava_EmitInterfaceFunc(SYMBOL *sym)
 	RebuildEmit("\n}\n");
 }
 
+#endif
+
 //****************************************
 // 
 //****************************************
+
+#ifdef JAVA_EMIT_INTERFACE_FUNC
 
 void RebuildJava_EmitInterfaces()
 {
@@ -1445,10 +1443,13 @@ void RebuildJava_EmitInterfaces()
 	}
 }
 
+#endif
 
 //****************************************
 // 
 //****************************************
+
+#ifdef JAVA_EMIT_SYSCALLS
 
 void RebuildJava_EmitSyscallFunc(SYMBOL *sym)
 {
@@ -1494,9 +1495,13 @@ void RebuildJava_EmitSyscallFunc(SYMBOL *sym)
 	RebuildEmit("}\n");
 }
 
+#endif
+
 //****************************************
 // 
 //****************************************
+
+#ifdef JAVA_EMIT_SYSCALLS
 
 void RebuildJava_EmitSyscalls()
 {
@@ -1533,13 +1538,15 @@ void RebuildJava_EmitSyscalls()
 
 }
 
+#endif
+
 //****************************************
 //
 //****************************************
 
 void RebuildJava_Main()
 {
-	int res;
+	//int res;
 	
 	if (ArgConstOpt != 0)
 		Error(Error_System, "(RebuildJava_Main) ArgConstOpt must be switched off");
@@ -1569,8 +1576,10 @@ void RebuildJava_Main()
 
 	RebuildEmit("\n");
 
+#ifdef JAVA_EMIT_DS
 	RebuildJava_EmitDS();
 	RebuildEmit("\n");
+#endif
 
 	RebuildEmit("public " DYN_TYPE "int RBYTE(int addr)\n");
 	RebuildEmit("{\n");
@@ -1602,7 +1611,11 @@ void RebuildJava_Main()
 	MaxEnumLabel = 0;
 
 	RebuildJava_Code();
+
+#ifdef JAVA_EMIT_INTERFACE_FUNC
 	RebuildJava_EmitInterfaces();
+#endif
+
 	RebuildJava_CallReg();
 
 	RebuildEmit("} // End of StaticCode class\n");
@@ -1611,32 +1624,36 @@ void RebuildJava_Main()
 
 	RebuildJava_FlowClass();
 
-	//RebuildJava_EmitSyscalls();
-
-	//Rebuild_Variables();
-
+#ifdef JAVA_EMIT_SYSCALLS
+	RebuildJava_EmitSyscalls();
+	Rebuild_Variables();
+#endif
 
 	ArrayWrite(&RebuildArray, "rebuild.java");
 
 	// Build class file
 
-#if 1	
+#if 0	
 	res = system("copy rebuild.java StaticCode.java");
+
 	if(res != 0)
 		Error(Error_Fatal, "copy fail");
 
 	{
 		//const char* cmd = "gcj -O9 -C --CLASSPATH=libgcj.jar StaticCode.java";
 		char cmd[2048];
+
 		sprintf(cmd, "gcj -O9 -C %s StaticCode.java", GcjFlags);
 		printf("%s\n", cmd);
+
 		res = system(cmd);
+
 		if(res != 0)
 			Error(Error_Fatal, "gcj fail");
 	}
+	
 //	system("gcj -O9 -S --CLASSPATH=libgcj.jar StaticCode.java");
 //	system("jcf-dump -c StaticCode.class > javadis_before.s");
-
 //	system("del ms.class");
 //	system("del rebuild.java");
 
