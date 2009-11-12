@@ -1205,10 +1205,10 @@ void RebuildJava_CallReg()
 
 void RebuildJava_EmitDS()
 {
-	int need_comma;
-	int count;
-	int n;
-	
+	//int need_comma;
+	//int count;
+	//int n;
+
 	RebuildEmit("\n");
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("//             Data Section\n");
@@ -1216,8 +1216,9 @@ void RebuildJava_EmitDS()
 
 //	GetDataMemLong(data_ip++);
 
-	RebuildEmit("int mem_ds[] = new int[%i];\n\n", Default_DataSize);
+	RebuildEmit("int mem_ds[] = new int[%i];\n\n", Default_DataSize >> 2);
 
+#if 0
 	RebuildEmit("static final int data_section[] = {\n");
 
 	need_comma = 0;
@@ -1281,10 +1282,11 @@ void RebuildJava_EmitDS()
 
 	RebuildEmit("	0\n");
 
-#endif
+#endif	//0
 
 	RebuildEmit("};\n");
-	
+#endif	//0
+
 	RebuildEmit("int ds_len = %d;\n", DataIP >> 2);
 	RebuildEmit("int bs_len = %d;\n", BssIP >> 2);
 	RebuildEmit("int all_len = %d;\n", (BssIP + DataIP) >> 2);
@@ -1325,7 +1327,8 @@ void RebuildJava_FlowClass()
 void RebuildJava_StartUp()
 {
 	SYMBOL *ep;
-	
+	FILE* out;
+
 	RebuildEmit("\n");
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("//          	 Startup\n");
@@ -1344,10 +1347,19 @@ void RebuildJava_StartUp()
 	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-// init data array
-// NOT NEEDED NOW	
-//	RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n"); 
-//	RebuildEmit("\n");
+	// init data array
+	//RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n");
+	RebuildEmit("	InputStream is = getClass().getResourceAsStream(\"data_section.bin\");\n");
+	RebuildEmit("	DataInputStream dis = new DataInputStream(is);\n");
+	RebuildEmit("	for(int i=0; i<ds_len; i++) {\n");
+	RebuildEmit("		mem_ds[i] = dis.readInt();\n");
+	RebuildEmit("	}\n");
+	RebuildEmit("	dis.close();\n");
+
+	// emit the bin file
+	out = fopen("data_section.bin", "wb");
+	ArrayWriteFP(&DataMemArray, out, DataIP);
+	fclose(out);
 
 	ep	= GetGlobalSym(Code_EntryPoint);
 
@@ -1368,7 +1380,7 @@ void RebuildJava_StartUp()
 	RebuildEmit("	sc.run(new Syscall());\n");
 	RebuildEmit("}\n");
 	RebuildEmit("\n");
-	*/
+*/
 }
 
 //****************************************
@@ -1564,6 +1576,8 @@ void RebuildJava_Main()
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("//          Generated java code\n");
 	RebuildEmit("//****************************************\n");
+	RebuildEmit("\n");
+	RebuildEmit("import java.io.*;\n");
 	RebuildEmit("\n");
 
 	RebuildEmit("final class StaticCode\n");
