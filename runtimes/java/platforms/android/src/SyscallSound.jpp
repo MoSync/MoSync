@@ -17,11 +17,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 SYSCALL(int) maSoundPlay(MAHandle sound_res, int offset, int size) throws Exception
 {
-	return 0;
-}
-
-final boolean startSound(InputStream input, String mimeString) throws Exception {
-	return false;
+	BinaryInterface bi = (BinaryInterface)getResource(sound_res);
+	InputStream input = bi.getInputStream();
+	input.skip(offset);
+	String mimeString = readMimeString(input);
+	
+	
+	return -1;
 }
 
 SYSCALL(void) maSoundStop() /* FIX-ME throws MediaException */ {

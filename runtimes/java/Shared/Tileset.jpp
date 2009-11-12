@@ -19,17 +19,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 #endif
 
+#ifdef _JavaME
 import javax.microedition.lcdui.*;
+#elif defined(_android)
+import android.graphics.Bitmap;
+#endif
 
 final public class Tileset {
 
+#ifdef _JavaME
 	public Tileset(Image image, int tileSizeX, int tileSizeY) {
 		this.image = image;
+#elif defined(_android)
+	public Tileset(Bitmap bitmap, int tileSizeX, int tileSizeY) {
+		this.bitmap = bitmap;
+#endif
 		this.tileSizeX = tileSizeX;
 		this.tileSizeY = tileSizeY;
 	}
 
+#ifdef _JavaME
 	public Image image;
+#elif defined(_android)
+	public Bitmap bitmap;
+#endif
 	public int tileSizeX;
 	public int tileSizeY;
 }

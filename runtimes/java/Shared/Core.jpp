@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 #endif
 
 #include "generated/core_consts.h"
@@ -236,11 +237,6 @@ final public class Core {
 	public Core(MainCanvas aCanvas, String modname, String resname) throws Exception {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
-#elif defined(_android)
-	public Core(MoSyncView view, String modname, String resname) throws Exception {
-		mMoSyncView = view;
-		mSyscall = new Syscall(this, mMoSyncView);
-#endif
 
 		DEBUG_ASSERT(mSyscall != null);
 
@@ -260,16 +256,13 @@ final public class Core {
 			llis.close();
 		}
 	}
+#endif
 
 #ifdef _JavaME
 	public Core(MainCanvas aCanvas, InputStream programStream) throws Exception {
 		mCanvas = aCanvas;
 		mSyscall = new Syscall(this, aCanvas);
-#elif defined(_android)
-	public Core(MoSyncView view, InputStream programStream) throws Exception {
-		mMoSyncView = view;
-		mSyscall = new Syscall(this, mMoSyncView);
-#endif
+
 		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
 		LoadVMApp(file);
 		if(file.available()==0) {
@@ -278,25 +271,31 @@ final public class Core {
 			mSyscall.LoadResourcesFromStream(file, null);
 		}
 	}
+#endif
 
 #ifdef _android
-	public Core(MoSyncView view, InputStream programStream, InputStream resourceStream) throws Exception {
+	public Core(MoSyncView view) throws Exception {
 		mMoSyncView = view;
+		mContext = view.getContext();
 		mSyscall = new Syscall(this, mMoSyncView);
+		
+		InputStream inPrg = mContext.getResources().openRawResource(R.raw.program);
+		InputStream inRes = mContext.getResources().openRawResource(R.raw.resources);
 
-		LittleEndianDataInputStream file = new LittleEndianDataInputStream(programStream);
+		LittleEndianDataInputStream file = new LittleEndianDataInputStream(inPrg);
 		LoadVMApp(file);
+
 		if(file.available()==0) {
-			mSyscall.LoadResourcesFromStream(null, null);
+			mSyscall.LoadResourcesFromStream(null, false);
 		} else {
-			mSyscall.LoadResourcesFromStream(file, null);
+			mSyscall.LoadResourcesFromStream(file, true);
 		}
 		
-		file = new LittleEndianDataInputStream(resourceStream);
+		file = new LittleEndianDataInputStream(inRes);
 		if(file.available()==0) {
-			mSyscall.LoadResourcesFromStream(null, null);
+			mSyscall.LoadResourcesFromStream(null, false);
 		} else {
-			mSyscall.LoadResourcesFromStream(file, null);
+			mSyscall.LoadResourcesFromStream(file, true);
 		}
 		
 		

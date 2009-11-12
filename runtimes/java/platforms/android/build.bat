@@ -28,7 +28,7 @@ call process ../../shared ThreadPool 7
 call process ../../shared UBin 8
 call process ../../shared RefByteArrayOutputStream 9
 call process ../../shared Tilemap 10
-REM call process ../../shared Tileset 11
+call process ../../shared Tileset 11
 call process ../../shared ImageCache 12
 call process ../../shared MAPanicReport 13
 

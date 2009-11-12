@@ -31,7 +31,11 @@ import android.view.SurfaceHolder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.content.res.Resources;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources.NotFoundException;
 
+import java.io.FileDescriptor;
 import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,14 +64,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			
 			Log.i("MoSync Thread", "Constructor");
 		 
-			try
-			{
-				mCore = new Core(mMoSyncView, 
-						mContext.getResources().openRawResource(R.raw.program),
-						mContext.getResources().openRawResource(R.raw.resources));
-			}
-			catch(Exception e)
-			{
+			try {
+				mCore = new Core(mMoSyncView);
+			} catch(Exception e) {
 				Log.e("MoSync Thread","Core creation exception: " + e.toString());
 				throw(e);
 			}
@@ -237,7 +236,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		stopThread();
 		Process.killProcess(Process.myPid());
 	}
-
+	
 	@Override protected void onDraw(Canvas canvas)
 	{
 	  Log.i("MoSync View","onDraw");
@@ -276,7 +275,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
 		Log.i("MoSync View", "surfaceDestroyed");
-		stopThread();
 	}
 
 	private final int convertToMoSyncKeyCode(int keyCode) {

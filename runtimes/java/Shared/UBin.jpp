@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 
 import android.util.Log;
+import android.content.res.AssetFileDescriptor;
 #endif
 
 #include "helpers.h"
@@ -26,30 +27,42 @@ import android.util.Log;
 import java.io.*;
 
 final class UBin extends BinaryInterface {
-	private final String filename;
-	private final int offset, length;
 
-	public UBin(final String _filename, int _offset, int size) {
-		filename = _filename;
-		offset = _offset;
-		length = size;
-		if(size < 0 || offset < 0)
+	private final int mOffset, mSize;
+
+#ifdef _JavaME
+	private final String mFilename;
+	public UBin(final String filename, int offset, int size) {
+		mFilename = filename;
+#elif defined(_android)
+	private Core mCore;
+	public UBin(Core core, int offset, int size) {
+		mCore = core;
+#endif
+		mOffset = offset;
+		mSize = size;
+		if(mSize < 0 || mOffset < 0)
 			throw new IllegalArgumentException(IN_FILE_ON_LINE_STRING);
 	}
 	public final int size() {
-		return length;
+		return mSize;
 	}
 	public final InputStream getInputStream() throws IOException {
 		//DEBUG_ALWAYS("uGIS "+filename+"\n");
-		InputStream in = getClass().getResourceAsStream(filename);
+#ifdef _JavaME
+		InputStream in = getClass().getResourceAsStream(mFilename);
+#elif defined(_android)
+		InputStream in = new LittleEndianDataInputStream(mCore.mContext.getResources().openRawResource(R.raw.resources));
+#endif
 		MYASSERT(in != null);
-		long res = in.skip(offset);
-		if(res != offset) {
-			DEBUG_ALWAYS("skip("+offset+") = "+res+"\n");
+		long res = in.skip(mOffset);
+		if(res != mOffset) {
+			DEBUG_ALWAYS("skip("+mOffset+") = "+res+"\n");
 			BIG_PHAT_ERROR;
 		}
-		return new LimitedLengthInputStream(in, length);
+		return new LimitedLengthInputStream(in, mSize);
 	}
+
 #ifdef OLD_MEMCPY
 	public final OutputStream getOutputStream(int offset) throws IOException {
 		BIG_PHAT_ERROR;

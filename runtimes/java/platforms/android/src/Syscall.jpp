@@ -24,23 +24,21 @@ package com.mosync.java.android;
 #include "generated\IX_RESOURCE_TYPES_CONSTS.h"
 
 import android.util.Log;
-import android.view.Display;
-import android.view.SurfaceHolder;
-import android.view.Surface;
-import android.view.View;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.view.SurfaceView;
+import android.graphics.Matrix;
+import android.graphics.Region;
 import android.content.Context;
+import android.os.Vibrator;
+import android.media.MediaPlayer;
+import android.graphics.Path;
 
 import java.util.Vector;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.Hashtable;
-import java.util.Enumeration;
 import java.io.*;
 
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
@@ -76,6 +74,7 @@ IMPLEMENTS MoSync
 #undef IMPLEMENTS
 #define IMPLEMENTS ,
 #endif
+
 {
 	//***************************************************************************
 	//Constructor
@@ -106,6 +105,11 @@ IMPLEMENTS MoSync
 		Log.i("MoSync Syscall", "Syscall.init();");
 
 		// Init all the things that should be initilalized
+		mVibrator = (Vibrator) mCore.mContext.getSystemService(Context.VIBRATOR_SERVICE); 
+		
+		mPaint.setStyle(Paint.Style.FILL);
+		
+		mMediaPlayer = new MediaPlayer();
 	}
 
 	//***************************************************************************
@@ -119,6 +123,7 @@ IMPLEMENTS MoSync
 	Canvas mCanvas;
 	Paint mPaint = new Paint();
 	Paint mBlitPaint = new Paint();
+	
 	int mWidth;
 	int mHeight;
 	
@@ -138,14 +143,18 @@ IMPLEMENTS MoSync
 
 	boolean mDestructed = false;
 
+	int mFrameBufferAddress;
+	boolean mUsingFrameBuffer;
+	
 //	Hashtable mStores = new Hashtable();
 	int mMaxStoreId = 0;
 	
 	final long mStartTime = System.currentTimeMillis();
 
-	boolean mUseFrameBuffer = false;
-	int mFrameBufferAddr;
-
+	Vibrator mVibrator;
+	
+	MediaPlayer mMediaPlayer;
+	
 	Object mFlux = new Object();
 
 	//***************************************************************************
@@ -167,8 +176,15 @@ IMPLEMENTS MoSync
 		mWidth = width;
 		mHeight = height;
 		
+		mClipLeft = 0;
+		mClipTop = 0;
+		mClipWidth = mWidth;
+		mClipHeight = mHeight;
+		
 		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 		mCanvas = new Canvas(mBitmap);
+		mPaint.setAntiAlias(false);
+		mBlitPaint.setAntiAlias(false);		
 	}
 	
 	//***************************************************************************
@@ -208,7 +224,7 @@ IMPLEMENTS MoSync
 	}
 
 	public final void LoadResourcesFromStream(LittleEndianDataInputStream file,
-		final String filename) throws Exception
+											  boolean bundledResource) throws Exception
 	{
 		DEBUG("MoSync Syscall - load " + filename + " as resource from stream\n");
 		try {
@@ -246,10 +262,12 @@ IMPLEMENTS MoSync
 				int type = file.readUnsignedByte();
 				if(type == 0)
 					break;
+				DEBUG_RES("Handle "+rI+"\n");
 				DEBUG_RES("Type "+type+"\n");
 				int size = file.readVarUnsignedInt();
 				DEBUG_RES("Size "+size+"\n");
-
+				
+				
 				if(type != RT_SKIP) {
 					MYASSERT(resourceArray[rI] != mFlux);
 				}
@@ -270,8 +288,9 @@ IMPLEMENTS MoSync
 					break;
 				case RT_SPRITE:
 					{
+						Log.i("error", "unimplemented RT_SPRITE");
+					
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_SPRITE");
-/* FIX-ME					
 						int indexSource = file.readUnsignedShort();
 						int left = file.readUnsignedShort();
 						int top = file.readUnsignedShort();
@@ -279,16 +298,17 @@ IMPLEMENTS MoSync
 						int height = file.readUnsignedShort();
 						DECLARE_AND_READ(short, cx);
 						DECLARE_AND_READ(short, cy);
-						resourceArray[rI] = new ImageCache(Image.createImage(
+						  
+						resourceArray[rI] = new ImageCache(Bitmap.createBitmap(
 							((ImageCache)resourceArray[indexSource]).i,
-							left, top, width, height, TRANS_NONE));
-*/							
+							left, top, width, height));							
 					}
 					break;
 				case RT_TILESET:
 					{
+						Log.i("error", "unimplemented RT_TILESET");
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILESET");
-/* FIX-ME					
+/* FIXME					
 						int tileSizeX = file.readUnsignedShort();
 						int tileSizeY = file.readUnsignedShort();
 						byte[] b = new byte[size-4];
@@ -299,8 +319,9 @@ IMPLEMENTS MoSync
 					break;	  
 				case RT_TILEMAP:
 					{
+						Log.i("error", "unimplemented RT_TILEMAP");
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILEMAP");
-/* FIX-ME					
+/* FIXME					
 						int mapWidth  = file.readUnsignedShort();
 						int mapHeight = file.readUnsignedShort();
 
@@ -348,10 +369,8 @@ IMPLEMENTS MoSync
 					break;
 				case RT_UBIN:
 					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_UBIN");
-					if(filename != null) {
-						resourceArray[rI] = new UBin(filename, file.tell(), size);
-					} else {
-						BIG_PHAT_ERROR;
+					if(bundledResource) {
+						resourceArray[rI] = new UBin(mCore, file.tell(), size);
 					}
 					//fallthrough is intentional
 				default:
@@ -368,6 +387,7 @@ IMPLEMENTS MoSync
 			}
 			mResourceArray = resourceArray;
 		} catch(Throwable e) {
+			DEBUG("Resource throwabler catched");
 			PRINT_STACK_TRACE;
 			BIG_PHAT_ERROR;
 		}
@@ -577,10 +597,12 @@ public
 	public
 #endif
 	void addResource(int index, Object o) THE {
+		Log.i("Syscall", "addResource");
 		if(getResource(index) != null || index <= 0) {
 			BIG_PHAT_ERROR;
 		}
 		setResource(index, o);
+		Log.i("Syscall", " - resource " + index + " added!");
 	}
 
 	final String readMimeString(InputStream input) throws Exception {
@@ -727,17 +749,17 @@ public
 	#include "FloatingPointMath.jpp"
 
 	SYSCALL(int) maGetKeys() {
-/*	FIX-ME
+/* FIXME
 		if(G_CLOSING)
 			return 0;
 		YIELD;
-		return mCanvas.getKeys();
 */
-		return 0;
-	}
+		return mMoSyncView.getKeys();
+}
 
 	SYSCALL(void) maResetBacklight() {
 		DEBUG("MoSync Syscall - maResetBacklight");
+/* FIXME */		
 	}
 	
 	#include "SyscallNetwork.jpp"
@@ -748,12 +770,14 @@ public
 
 	SYSCALL(int) maGetDataSize(MAHandle data) {
 		BinaryInterface bi = (BinaryInterface)getResource(data);
+		Log.i("Syscall","maGetDataSize:" + bi.size());
 		return bi.size();
 	}
 
 	SYSCALL(void) maReadData(MAHandle data, Address dst, int offset, int size)
 		throws Exception
 	{
+		Log.i("Syscall","maReadData");
 		BinaryInterface bi = (BinaryInterface)getResource(data);
 		if(bi instanceof Binary) {
 			Binary b = (Binary)bi;
@@ -787,11 +811,13 @@ public
 	SYSCALL(void) maWriteData(MAHandle data, Address src, int offset, int size)
 		throws Exception
 	{
+		Log.i("Syscall","maWriteData");
 		Binary b = (Binary)getResource(data);
 		readMemBytes(b.arr, src, offset, size);
 	}
 
 	SYSCALL(void) maCopyData(Address a) throws Exception {
+		Log.i("Syscall","maCopyData");
 		int[] mem_ds = CORE.mMem_ds;
 		MAHandle dst = RINT(a);
 		int dstOffset = RINT(a + 4);
@@ -813,6 +839,7 @@ public
 	}
 
 	SYSCALL(MAHandle) maCreatePlaceholder() {
+		Log.i("Syscall","maCreatePlaceholder");
 		if(mDynamicResArray == null) {
 			mDynamicResArray = new Object[1];
 			mDynamicSize = 0;
@@ -822,10 +849,12 @@ public
 			mDynamicResArray = new Object[mDynamicResArray.length * 2];
 			System.arraycopy(oldDynRes, 0, mDynamicResArray, 0, oldDynRes.length);
 		}
+		Log.i("  ","Handle :" + ((mDynamicSize+1) | DYNARES_BIT));
 		return (mDynamicSize++) | DYNARES_BIT;
 	}
 
 	SYSCALL(void) maDestroyObject(MAHandle handle) {
+		Log.i("Syscall","maDestroyObject");
 		if(getResource(handle) != null) {
 			MYASSERT(getResource(handle) != mFlux);
 			setResource(handle, null);
@@ -833,6 +862,7 @@ public
 	}
 
 	SYSCALL(MAHandle) maFindLabel(String name) {
+		Log.i("Syscall","maFindLabel");
 		for(int i = 0; i < mResourceArray.length; i++) {
 			if(getResource(i) instanceof String) {
 				if(((String)getResource(i)).equals(name))
@@ -843,6 +873,7 @@ public
 	}
 	
 	SYSCALL(int) maCreateData(MAHandle placeholder, int size) THE {
+		Log.i("Syscall","maCreateData");
 		try {
 			addResource(placeholder, new Binary(new byte[size]));
 		} catch(java.lang.OutOfMemoryError e) {
@@ -853,6 +884,7 @@ public
 
 #ifdef SEGMENTED_DATA
 	SYSCALL(int) maAddDataSize(MAHandle data, int size) {
+		Log.i("Syscall","maAddDataSize");
 		Binary b = (Binary)getResource(data);
 		try {
 			b.add(size);
@@ -864,30 +896,35 @@ public
 #endif
 
 	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws /* FIX-ME RecordStore*/Exception {
+		Log.i("Syscall","maOpenStore");
 		/*	FIX-ME */
 		return STERR_NONEXISTENT;
 	}
 
 	SYSCALL(int) maWriteStore(MAHandle store, MAHandle data) throws Exception {
+		Log.i("Syscall","maWritrData");
 		DEBUG_ALWAYS("maWriteStore "+store+"\n");
 		/* FIX-ME */
 		return -1;
 	}
 
 	SYSCALL(int) maReadStore(MAHandle store, MAHandle placeholder) throws Exception {
+		Log.i("Syscall","maReadStore");
 		/*	FIX-ME */
 		return -1;
 	}
 
 	SYSCALL(void) maCloseStore(MAHandle store, int del) throws /* FIX-ME RecordStore*/Exception CEX {
+		Log.i("Syscall","maCloseStore");
 		/* FIX-ME */		
 	}
 
 	SYSCALL(int) maLoadResources(final MAHandle data) throws Exception {
+		Log.i("Syscall","maLoadResource");
 		try {
 			BinaryInterface bi = (BinaryInterface)getResource(data);
 			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(bi.getInputStream());
-			LoadResourcesFromStream(llis, null);
+			LoadResourcesFromStream(llis, false);
 			llis.close();
 			return 1;
 		} catch(Throwable e) {
@@ -897,6 +934,7 @@ public
 	}
 
 	SYSCALL(void) maLoadProgram(final MAHandle data, final int reload) throws Exception {
+		Log.i("Syscall","maLoadProgram");
 /* FIX-ME	
 #ifdef MOSYNC_STATIC_JAVA
 		BIG_PHAT_ERROR;
@@ -958,10 +996,12 @@ public
 	}
 
 	SYSCALL(int) maTime() {
+		Log.i("Syscall","maTime");
 		Date d = new Date();
 		return (int)(d.getTime() / 1000);
 	}
 	SYSCALL(int) maLocalTime() {
+		Log.i("Syscall","maLocalTime");
 		Date d = new Date();
 		TimeZone tz = TimeZone.getDefault();
 		return (int)((d.getTime() + tz.getRawOffset()) / 1000);
@@ -971,25 +1011,33 @@ public
 	}
 
 	SYSCALL(int) maFreeObjectMemory() {
+		Log.i("Syscall","maFreeObjectMemory");
 		Runtime r = Runtime.getRuntime();
 		r.gc();
 		return (int)r.freeMemory();
 	}
 	SYSCALL(int) maTotalObjectMemory() {
+		Log.i("Syscall","maTotalObjectMemory");
 		return (int)Runtime.getRuntime().totalMemory();
 	}
 
 	SYSCALL(int) maVibrate(int duration) {
-		/* FIX-ME */		
-		return -1;
+		Log.i("Syscall","maVibrate");
+		if(duration == 0)
+			mVibrator.cancel();
+		else	
+			mVibrator.vibrate(duration);
+		return 1;
 	}
 
 	SYSCALL(int) maPlatformRequest(String url) {
+		Log.i("Syscall","maPlatformRequest");
 		/* FIX-ME */
 		return -1;
 	}
 
 	SYSCALL(void) maExit(int result) throws Exception {
+		Log.i("Syscall","maExit");
 		DEBUG("MoSync Syscall - maExit("+result+")\n");
 #ifdef GDB_DEBUG
 		mCore.mGdbStub.exitHandler(result);
@@ -1001,6 +1049,7 @@ public
 	}
 
 	SYSCALL(void) maPanic(int result, String message) throws Exception {
+		Log.i("Syscall","maPanic"+result+", \""+message+"\")\n");
 		DEBUG("MoSync Syscall - maPanic("+result+", \""+message+"\")\n");
 #ifdef PUBLIC_DEBUG
 		int ip = -1;
@@ -1012,19 +1061,18 @@ public
 			}
 		}
 		MAPanicReport pr = new MAPanicReport();
-		pr.writePanicReport(mCore.getContext(), REPORT_USER_PANIC, result, message, ip);
+		pr.writePanicReport(mCore.mContext, REPORT_USER_PANIC, result, message, ip);
 #endif
 #ifdef GDB_DEBUG
 		mCore.mGdbStub.exitHandler(result);
 #endif
 		YIELD;
-/* FIX-ME		
-		mCanvas.SetAlert("User Panic", message);
-*/		
+		
 		STATIC_EXIT;
 	}
-
+	
 	int maCheckInterfaceVersion(int hash) {
+		Log.i("Syscall","maCheckInterfaceVersion");
 		if(hash == MAIDL_HASH) {
 			DEBUG_ALWAYS("IDL version match!\n");
 		} else {
@@ -1034,6 +1082,7 @@ public
 	}
 
 	SYSCALL(int) maIOCtl(int function, int a, int b, int c) throws Exception {
+		Log.i("Syscall","maIOCtl");
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
 		int[] mem_ds = CORE.mMem_ds;
 #endif
@@ -1161,31 +1210,34 @@ public
 	
 #ifdef MA_SUPPORT_RECORD
 	NETSYSCALL(int) maRecordSetup() throws Exception {
+		Log.i("Syscall","maRecordSetup");
 		/* FIX-ME */
 		return -1;
 	}
 
 	NETSYSCALL(int) maRecordStart(MAHandle rec) throws Exception {
+		Log.i("Syscall","maRecordStart");
 		/* FIX-ME */
 		return -1;
 	}
 
 #define CONNOP_RECORD_PAUSE 0x10	//HACK, should be defined in IDL
 	NETSYSCALL(int) maRecordPause(MAHandle rec) throws Exception {
+		Log.i("Syscall","maRecordPause");
 		/* FIX-ME */
 		return -1;
 	}
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI
 	final int maSendTextSMS(String dst, String msg) {
+		Log.i("Syscall","maSendTextSMS");
 		/* FIX-ME */
 		return -1;
 	}
-#endif
 
 #ifdef PUBLIC_DEBUG
 	final int maWriteLog(Address src, int size) throws Exception {
+		Log.i("Syscall","maWriteLog");
 		/* FIX-ME */
 		return -1;	
 	}
@@ -1196,6 +1248,7 @@ public
 	#include "SyscallLocation.jpp"
 
 	SYSCALL(int) maInvokeExtension(int function, int a, int b, int c) {
+		Log.i("Syscall","maInvokeExtension");
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 		return mExt.invoke(function, a, b, c);
 #else
