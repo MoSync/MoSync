@@ -23,6 +23,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "compile.h"
 
 #define DYN_TYPE "final "
+#define CLASS_SEGMENT_SIZE 16384		// Power of 2 please
+#define GET_CODE_SEGMENT(v) (v/CLASS_SEGMENT_SIZE)
 
 #ifdef INCLUDE_JAVA_REBUILD
 
@@ -37,7 +39,15 @@ static int ThisFunctionRetType;
 static int ThisFunctionExit;			// True on last instruction
 static int ReturnCount;
 
-static char *java_reg[] = {"zr","sp","rt","fr","d0","d1","d2","d3",
+#define STATIC_CODE_DOT "StaticCode."
+#define SP_STR STATIC_CODE_DOT "sp"
+#define DBL_HIGH STATIC_CODE_DOT "__dbl_high"
+#define MEM_DS STATIC_CODE_DOT "mem_ds"
+
+
+#define SYSCALLDOT "StaticCode.syscall."
+
+static char *java_reg[] = {"zr",SP_STR,"rt","fr","d0","d1","d2","d3",
 					"d4","d5","d6","d7","i0","i1","i2","i3",
 					"r0","r1","r2","r3","r4","r5","r6","r7",
 					"r8","r9","r10","r11","r12","r13","r14","r15"
@@ -70,7 +80,7 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 
 			if (function_registers_used & (1 << REG_sp))
 			{
-				RebuildEmit("	sp -= %d;\n",theOp->rs*4);
+				RebuildEmit("	" SP_STR " -= %d;\n",theOp->rs*4);
 			}
 		return 1;
 			
@@ -79,7 +89,7 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 
 			if (function_registers_used & (1 << REG_sp))
 			{
-				RebuildEmit("	sp += %d;\n",theOp->rs*4);
+				RebuildEmit("	" SP_STR " += %d;\n",theOp->rs*4);
 			}
 
 		return 1;
@@ -347,7 +357,7 @@ void JavaDecodeReturn()
 		break;
 
 		case RET_double:
-		RebuildEmit("	__dbl_high = r15;\n");
+		RebuildEmit("	" DBL_HIGH " = r15;\n");
 		RebuildEmit("	return r14;");
 		break;
 	}
@@ -361,9 +371,9 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 {
 	int param_count, need_comma, n;
 
-	SYMBOL *syscall =  FindSysCall(theOp->imm);
+	SYMBOL *theSysCall =  FindSysCall(theOp->imm);
 
-	if (!syscall)
+	if (!theSysCall)
 	{
 		Error(Error_System, "Could'nt locate syscall\n");
 		return;
@@ -371,14 +381,14 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 
 	JavaSyscallUsed[theOp->imm]++;
 
-	param_count = syscall->Params;
+	param_count = theSysCall->Params;
 
-	JavaEmitReturnType(syscall->RetType);
+	JavaEmitReturnType(theSysCall->RetType);
 
-	if (syscall->Interface == 0)
-		RebuildEmit("syscall.%s(", syscall->Name + 1);
+	if (theSysCall->Interface == 0)
+		RebuildEmit( SYSCALLDOT "%s(", theSysCall->Name + 1);
 	else
-		RebuildEmit("%s(", syscall->Name);
+		RebuildEmit("%s(", theSysCall->Name);
 
 	if (param_count > 4)
 		param_count = 4;
@@ -396,9 +406,9 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 
 	RebuildEmit(");");
 
-	if (syscall->RetType == RET_double)
+	if (theSysCall->RetType == RET_double)
 	{
-		RebuildEmit("\n	r15 = __dbl_high;");
+		RebuildEmit("\n	r15 = " DBL_HIGH ";");
 		SetRegInit(REG_r15);
 	}
 }
@@ -433,34 +443,34 @@ void Java_LoadMem(OpcodeInfo *theOp, char *str)
 
 		if (theOp->rs == 0)
 		{
-			RebuildEmit("	%s = mem_ds[0x%x];", java_reg[theOp->rd], theOp->imm >> 2);
+			RebuildEmit("	%s = " MEM_DS "[0x%x];", java_reg[theOp->rd], theOp->imm >> 2);
 			return;
 		}
 
 		if (theOp->imm == 0)
 		{
-			RebuildEmit("	%s = mem_ds[%s >> 2];", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = " MEM_DS "[%s >> 2];", java_reg[theOp->rd], java_reg[theOp->rs]);
 			return;
 		}
 			
-		RebuildEmit("	%s = mem_ds[(%s+0x%x) >> 2];", java_reg[theOp->rd], java_reg[theOp->rs], theOp->imm);
+		RebuildEmit("	%s = " MEM_DS "[(%s+0x%x) >> 2];", java_reg[theOp->rd], java_reg[theOp->rs], theOp->imm);
 		return;
 	}
 	
 	
 	if (theOp->rs == 0)
 	{
-		RebuildEmit("	%s = %s(0x%x);", java_reg[theOp->rd], str, theOp->imm);
+		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(0x%x);", java_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	%s = %s(%s);", java_reg[theOp->rd], str, java_reg[theOp->rs]);
+		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s);", java_reg[theOp->rd], str, java_reg[theOp->rs]);
 		return;
 	}
 		
-	RebuildEmit("	%s = %s(%s+0x%x);", java_reg[theOp->rd], str, java_reg[theOp->rs], theOp->imm);
+	RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s+0x%x);", java_reg[theOp->rd], str, java_reg[theOp->rs], theOp->imm);
 }
 
 
@@ -478,17 +488,17 @@ void Java_StoreMem(OpcodeInfo *theOp, char *str)
 	{
 		if (theOp->rd == 0)
 		{
-			RebuildEmit("	mem_ds[0x%x] = %s;", theOp->imm >> 2, java_reg[theOp->rs]);
+			RebuildEmit("	" MEM_DS "[0x%x] = %s;", theOp->imm >> 2, java_reg[theOp->rs]);
 			return;
 		}
 
 		if (theOp->imm == 0)
 		{
-			RebuildEmit("	mem_ds[%s >> 2] = %s;", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	" MEM_DS "[%s >> 2] = %s;", java_reg[theOp->rd], java_reg[theOp->rs]);
 			return;
 		}
 
-		RebuildEmit("	mem_ds[(%s+0x%x) >> 2] = %s;", java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
+		RebuildEmit("	" MEM_DS "[(%s+0x%x) >> 2] = %s;", java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
 		return;
 	}
 
@@ -496,17 +506,17 @@ void Java_StoreMem(OpcodeInfo *theOp, char *str)
 
 	if (theOp->rd == 0)
 	{
-		RebuildEmit("	%s(0x%x, %s);", str, theOp->imm, java_reg[theOp->rs]);
+		RebuildEmit("	" STATIC_CODE_DOT "%s(0x%x, %s);", str, theOp->imm, java_reg[theOp->rs]);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	%s(%s, %s);", str, java_reg[theOp->rd], java_reg[theOp->rs]);
+		RebuildEmit("	" STATIC_CODE_DOT "%s(%s, %s);", str, java_reg[theOp->rd], java_reg[theOp->rs]);
 		return;
 	}
 
-	RebuildEmit("	%s(%s+0x%x, %s);", str, java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
+	RebuildEmit("	" STATIC_CODE_DOT "%s(%s+0x%x, %s);", str, java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
 }
 
 
@@ -667,6 +677,25 @@ int JavaDecodeSwitch(OpcodeInfo *theOp)
 //			 
 //****************************************
 
+char FunctionClassString[2048];
+
+char * GetFunctionClass(SYMBOL *ref)
+{
+	int theClassSegment;
+
+	FunctionClassString[0] = 0;
+	
+	theClassSegment = GET_CODE_SEGMENT(ref->Value);
+
+	sprintf(FunctionClassString, "Code%d.", theClassSegment);
+
+	return FunctionClassString;
+}
+
+//****************************************
+//			 
+//****************************************
+
 int JavaCallFunction(SYMBOL *ref)
 {
 	int param_count, need_comma, n;
@@ -674,7 +703,8 @@ int JavaCallFunction(SYMBOL *ref)
 
 	JavaEmitReturnType(rettype);
 
-	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
+	
+	RebuildEmit("%s%s_%d(", GetFunctionClass(ref), ref->Name, ref->LocalScope);
 	
 	param_count = ref->Params;
 	
@@ -696,7 +726,7 @@ int JavaCallFunction(SYMBOL *ref)
 	
 	if (rettype == RET_double)
 	{
-		RebuildEmit("\n	r15 = __dbl_high;");
+		RebuildEmit("\n	r15 = " DBL_HIGH ";");
 		SetRegInit(REG_r15);
 	}
 	return 1;
@@ -873,7 +903,7 @@ void RebuildJavaProlog(SYMBOL *sym)
 
 	// Output function decl
 
-	RebuildEmit("public " DYN_TYPE);
+	RebuildEmit("public static " DYN_TYPE);
 
 	switch(ThisFunctionRetType)
 	{
@@ -1096,9 +1126,47 @@ void RebuildJavaFunc(SYMBOL *sym)
 	RebuildJavaEpilog(sym);
 }
 
+
 //****************************************
 //
 //****************************************
+
+int FindLastCodeSegment()
+{
+	SYMBOL *sym;
+	int n;
+	int last = -1;
+	
+	for (n=0;n<CodeIP;n++)
+	{
+		// Check to see if we are in a new segment, ie. new class
+
+		sym = (SYMBOL *) ArrayGet(&CodeLabelArray, n);
+
+		if (sym)
+		{
+
+#ifndef NO_ELIM
+			if (sym->Flags & SymFlag_Ref)
+#endif
+			if (sym->LabelType >= label_Function)
+			{
+				last = GET_CODE_SEGMENT(n);
+			}
+		}
+	}
+
+	if (last == -1)
+		Error(Error_Fatal,"Cant find last code segment");
+
+	return last;
+}
+
+//****************************************
+//
+//****************************************
+
+int CurrentCodeSegment;
 
 void RebuildJava_Code()
 {
@@ -1106,8 +1174,27 @@ void RebuildJava_Code()
 	int n;
 	int c = 0;
 
-	for (n=0;n<CodeIP+1;n++)
+	int LastSeg = FindLastCodeSegment();
+
+	CurrentCodeSegment = GET_CODE_SEGMENT(0);
+
+	RebuildJava_BeginCodeSegment(CurrentCodeSegment);
+
+//	for (n=0;n<CodeIP+1;n++)
+	for (n=0;n<CodeIP;n++)
 	{
+
+		if (CurrentCodeSegment != LastSeg)
+		if (GET_CODE_SEGMENT(n) != CurrentCodeSegment)
+		{
+			RebuildJava_EndCodeSegment(CurrentCodeSegment);
+
+			CurrentCodeSegment = GET_CODE_SEGMENT(n);
+			RebuildJava_BeginCodeSegment(CurrentCodeSegment);
+		}
+
+		// Check to see if we are in a new segment, ie. new class
+
 		sym = (SYMBOL *) ArrayGet(&CodeLabelArray, n);
 
 		if (sym)
@@ -1126,6 +1213,8 @@ void RebuildJava_Code()
 			}
 		}
 	}
+
+	RebuildJava_EndCodeSegment(CurrentCodeSegment);
 }
 
 //****************************************
@@ -1178,10 +1267,16 @@ void RebuildJava_CallReg()
 	//			RebuildEmit("		return;\n\n");	
 
 				ThisFunctionRetType = sym->RetType;
-				if(ThisFunctionRetType == RET_void) {
+
+				if(ThisFunctionRetType == RET_void)
+				{
 					RebuildEmit("			return 0;\n");
-				} else {
+				}
+				else
+				{
+					RebuildEmit("\t\t");
 					JavaDecodeReturn();
+					RebuildEmit("\n");
 				}
 			}
 		}
@@ -1338,27 +1433,27 @@ void RebuildJava_StartUp()
 	RebuildEmit("{\n");
 	RebuildEmit("	syscall = s;\n");
 
-	RebuildEmit("	int i0,i1,i2,i3,r14,r15;\n");
+	RebuildEmit("	int i0,i1,i2;\n");
 	RebuildEmit("\n");
 	//RebuildEmit("	i0 = i1 = i2 = i3 = r14 = r15 = 0;\n");
 	RebuildEmit("	i0 = %i;	//mem size\n", Default_DataSize);
 	RebuildEmit("	i1 = %i;	//stack size\n", Default_StackSize);
 	RebuildEmit("	i2 = %i;	//heap size\n", Default_HeapSize);
-	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
-	RebuildEmit("\n");
+	RebuildEmit("	" SP_STR " = %i-16; //Init stack\n", Default_DataSize);
+	RebuildEmit("\n\n");
 
 	// init data array
 	//RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n");
 	RebuildEmit("	InputStream is = getClass().getResourceAsStream(\"data_section.bin\");\n");
 	RebuildEmit("	DataInputStream dis = new DataInputStream(is);\n");
 	RebuildEmit("	for(int i=0; i<ds_len; i++) {\n");
-	RebuildEmit("		mem_ds[i] = dis.readInt();\n");
+	RebuildEmit("		 mem_ds[i] = dis.readInt();\n");
 	RebuildEmit("	}\n");
 	RebuildEmit("	dis.close();\n");
 
 	// emit the bin file
 	out = fopen("data_section.bin", "wb");
-	ArrayWriteFP(&DataMemArray, out, DataIP);
+	ArrayWriteFP(&DataMemArray, out, MaxDataIP);
 	fclose(out);
 
 	ep	= GetGlobalSym(Code_EntryPoint);
@@ -1556,6 +1651,64 @@ void RebuildJava_EmitSyscalls()
 //
 //****************************************
 
+void RebuildJava_BeginCodeSegment(int SegNum)
+{
+	RebuildEmit("\n");
+	RebuildEmit("//----------------------------------------\n");
+	RebuildEmit("//            Code Segment %d\n", SegNum);
+	RebuildEmit("//----------------------------------------\n");
+	RebuildEmit("\n");
+
+	RebuildEmit("public static final class Code%d\n", SegNum);
+	RebuildEmit("{\n");
+}
+
+//****************************************
+//
+//****************************************
+
+void RebuildJava_EndCodeSegment(int SegNum)
+{
+	RebuildEmit("\n} // End Segment %d\n", SegNum);
+}
+
+//****************************************
+//
+//****************************************
+
+void RebuildJava_WriteMemAccessFuncs()
+{
+	RebuildEmit("\n");
+	RebuildEmit("public static " DYN_TYPE "int RBYTE(int addr)\n");
+	RebuildEmit("{\n");
+	RebuildEmit("	int c = ((" MEM_DS "[addr>>2] >> ((addr & 3) << 3)) & 0x0ff);\n");
+	RebuildEmit("	//System.out.println(\"RBYTE(\"+addr+\")=\"+(char)c+\"(\"+c+\")\");\n");
+	RebuildEmit("	return c;\n");
+	RebuildEmit("}\n\n");
+
+	RebuildEmit("public static " DYN_TYPE "void WBYTE(int addr, int b)\n");
+	RebuildEmit("{\n");
+	RebuildEmit("	//System.out.println(\"RBYTE(\"+addr+\")=\"+(char)b+\"(\"+b+\")\");\n");
+	RebuildEmit("	int shift = (addr & 3) << 3;\n");
+	RebuildEmit("	" MEM_DS "[addr >> 2] = (" MEM_DS "[addr >> 2] & ~(0x000000ff << shift)) | ((b & 0x0ff) << shift);\n");
+	RebuildEmit("}\n\n");
+
+	RebuildEmit("public static " DYN_TYPE "int RSHORT(int addr)\n");
+	RebuildEmit("{\n");
+	RebuildEmit("	return ((" MEM_DS "[addr >> 2] >> ((addr & 3) << 3)) & (0x0ffff));\n");
+	RebuildEmit("}\n\n");
+
+	RebuildEmit("public static " DYN_TYPE "void WSHORT(int addr, int s)\n");
+	RebuildEmit("{\n");
+	RebuildEmit("	int shift = (addr & 3) << 3;\n");
+	RebuildEmit("	" MEM_DS "[addr >> 2] = (" MEM_DS "[addr >> 2] & ~(0x0ffff << shift)) | ((s & 0x0ffff) << shift);\n");
+	RebuildEmit("}\n\n");
+}
+
+//****************************************
+//
+//****************************************
+
 void RebuildJava_Main()
 {
 	//int res;
@@ -1587,6 +1740,7 @@ void RebuildJava_Main()
 	RebuildEmit("int sp;\n");
 	RebuildEmit("int __dbl_high;\n");
 	RebuildEmit("Syscall syscall;\n");
+	RebuildEmit("static int mem_ds[] = new int[%i];\n", Default_DataSize >> 2);
 
 	RebuildEmit("\n");
 
@@ -1595,36 +1749,12 @@ void RebuildJava_Main()
 	RebuildEmit("\n");
 #endif
 
-	RebuildEmit("public " DYN_TYPE "int RBYTE(int addr)\n");
-	RebuildEmit("{\n");
-	RebuildEmit("	int c = ((mem_ds[addr>>2] >> ((addr & 3) << 3)) & 0x0ff);\n");
-	RebuildEmit("	//System.out.println(\"RBYTE(\"+addr+\")=\"+(char)c+\"(\"+c+\")\");\n");
-	RebuildEmit("	return c;\n");
-	RebuildEmit("}\n\n");
-
-	RebuildEmit("public " DYN_TYPE "void WBYTE(int addr, int b)\n");
-	RebuildEmit("{\n");
-	RebuildEmit("	//System.out.println(\"RBYTE(\"+addr+\")=\"+(char)b+\"(\"+b+\")\");\n");
-	RebuildEmit("	int shift = (addr & 3) << 3;\n");
-	RebuildEmit("	mem_ds[addr >> 2] = (mem_ds[addr >> 2] & ~(0x000000ff << shift)) | ((b & 0x0ff) << shift);\n");
-	RebuildEmit("}\n\n");
-
-	RebuildEmit("public " DYN_TYPE "int RSHORT(int addr)\n");
-	RebuildEmit("{\n");
-	RebuildEmit("	return ((mem_ds[addr >> 2] >> ((addr & 3) << 3)) & (0x0ffff));\n");
-	RebuildEmit("}\n\n");
-
-	RebuildEmit("public " DYN_TYPE "void WSHORT(int addr, int s)\n");
-	RebuildEmit("{\n");
-	RebuildEmit("	int shift = (addr & 3) << 3;\n");
-	RebuildEmit("	mem_ds[addr >> 2] = (mem_ds[addr >> 2] & ~(0x0ffff << shift)) | ((s & 0x0ffff) << shift);\n");
-	RebuildEmit("}\n\n");
-
+	RebuildJava_WriteMemAccessFuncs();
 	RebuildJava_StartUp();
 
 	MaxEnumLabel = 0;
 
-	RebuildJava_Code();
+//	RebuildJava_Code();
 
 #ifdef JAVA_EMIT_INTERFACE_FUNC
 	RebuildJava_EmitInterfaces();
@@ -1634,7 +1764,10 @@ void RebuildJava_Main()
 
 	RebuildEmit("} // End of StaticCode class\n");
 
+	RebuildJava_Code();
+
 	RebuildEmit("// MaxEnumLabel=%d\n", MaxEnumLabel);
+	RebuildEmit("\n");
 
 	RebuildJava_FlowClass();
 
