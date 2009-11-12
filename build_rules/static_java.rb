@@ -62,8 +62,21 @@ class StaticJava
 		#pack into JAR
 		jarFile = "#{BUILDDIR}#{EXENAME}.jar"
 		jarTask = file jarFile => verifiedClassfile do
-			jarInsert(jarFile, STATIC_JAR, verifiedClassfile)
+			jarInsert(jarFile, STATIC_JAR, "#{verifiedClassfile} #{BUILDDIR}data_section.bin")
 		end
 		jarTask.invoke
+	end
+end
+
+class BlackBerryStaticJava
+	def BlackBerryStaticJava.invoke
+		#rapc jar -> cod
+		codFile = "#{BUILDDIR}#{EXENAME}.cod"
+		codTask = file codFile => "#{BUILDDIR}#{EXENAME}.jar" do |t|
+			sh "rapc -nowarn \"-import=#{CLASSPATH}\" -midlet #{t.prerequisites}"
+		end
+		codTask.invoke
+		#javaloader
+		sh "javaloader load #{codFile}"
 	end
 end

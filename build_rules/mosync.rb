@@ -87,6 +87,4 @@ end
 task :sjbb do
 	(task :sj).invoke
 	BlackBerryStaticJava.invoke
-	#rapc jar -> cod
-	#javaloader load cod
 end
