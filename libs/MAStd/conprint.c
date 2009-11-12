@@ -84,7 +84,7 @@ void InitConsole()
 
 	sConsole.screenSize = maGetScrSize();
 	maSetClipRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
-	sConsole.fontHeight = EXTENT_Y(maGetTextSize(" "));
+	sConsole.fontHeight = EXTENT_Y(maGetTextSize("gl"));
 	sConsole.height = EXTENT_Y(sConsole.screenSize) / sConsole.fontHeight;
 	sConsole.cursorPos.x = 0;
 	sConsole.cursorPos.y = sConsole.height - 1;
