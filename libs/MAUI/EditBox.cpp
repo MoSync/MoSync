@@ -43,26 +43,6 @@ namespace MAUI {
 	void EditBoxListener::characterAdded(EditBox *eb, char c) {
 	}
 
-	EditBox::EditBox(int x, int y, int width, int height, Widget* parent) :
-		//Widget(x, y, width, height, parent),
-		Label(x, y, width, height, parent),
-		cursorIndex(0),
-		manageNavigation(false),
-		active(false),
-		cursorColor(0xffffff),
-//		font(NULL),
-		characterInputActive(false),
-	//	multiLine(false),
-		currentLine(0),
-		maxLength(64),
-		inputMode(IM_STANDARD),
-		caseToggle(true),
-		passwordMode(false)
-	{
-		setMultiLine(false);
-		clearText();
-	}
-
 	EditBox::EditBox(int x, int y, int width, int height, Widget* parent, const String &text,
 		int backColor, Font* font, bool manageNavigation, bool multiLine, int maxLength, InputMode inputMode) :
 		//Widget(x, y, width, height, parent),
@@ -500,6 +480,13 @@ namespace MAUI {
 			requestRepaint();
 		}
 		this->passwordMode = enabled;
+	}
+
+	void EditBox::setQwerty(bool enabled) {
+		CharInput::getCharInput().setQwerty(enabled);
+	}
+	bool EditBox::getQwerty() const {
+		return CharInput::getCharInput().getQwerty();
 	}
 
 }

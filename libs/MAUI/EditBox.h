@@ -60,8 +60,6 @@ namespace MAUI {
 			IM_STANDARD
 		};
 
-		EditBox(int x, int y, int width, int height, Widget* parent);
-
 		/** Constructor.
 		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
 		  * \param y the vertical position of the Label relative to its parent's top left padded corner
@@ -146,6 +144,8 @@ namespace MAUI {
 		**/
 		void setPasswordMode(bool enabled = true);
 
+		void setQwerty(bool enabled = true);
+		bool getQwerty() const;
 		
 	private:
 		bool deleteCharacter(int c);

@@ -117,6 +117,18 @@ void CharInput_setMode(int charMode);
  */
 int CharInput_getMode();
 
+/**
+* In standard mode, only the 0-9, # and * keys are used.
+* This is suitable for devices with such keypads.
+*
+* In qwerty mode, all keys are used.
+* This is suitable for devices with qwerty keyboards.
+*/
+void CharInput_setQwerty(BOOL on);
+
+/** Get the qwerty mode. */
+BOOL CharInput_getQwerty();
+
 #ifdef __cplusplus
 }
 #endif
@@ -185,6 +197,12 @@ public:
 
 	/** Get the character input mode. */
 	CharMode getMode() const;
+
+	/** \copydoc CharInput_setQwerty */
+	void setQwerty(bool on);
+
+	/** \copydoc CharInput_getQwerty */
+	bool getQwerty() const;
 
 private:
 	CharInput();

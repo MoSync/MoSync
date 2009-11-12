@@ -83,6 +83,7 @@ public:
 		mList.add(layout, 0, -1, true);
 		Textbox* t = new Textbox(10, 200, GREEN, WHITE/*BRIGHT_RED*/);
 		mList.add(t, 0, -1, true);
+		t->setQwerty();
 		t->activate();
 		mList.add(new MultilineLabel("Line 1\nLine 10\nYet another line\n ", GREEN), 0);
 		mList.add(new Label("Next label", WHITE), 0);

@@ -233,12 +233,12 @@ namespace MinUI {
 
 	class Image : public SimpleMinSizeWidget {
 	public:
-		Image(Handle imgHandle);
+		Image(MAHandle imgHandle);
 	protected:
 		//Widget
 		void doDraw();
 		
-		Handle mHandle;
+		MAHandle mHandle;
 	};
 
 	/**
@@ -267,6 +267,7 @@ namespace MinUI {
 		const MAUtil::String& getText() const { return mText; }
 		bool moveCursorHorizontal(int steps);
 		bool deletePreviousCharacter();
+		void setQwerty(bool on = true);
 
 		//Widget
 		MAPoint2d getOptimalSize();

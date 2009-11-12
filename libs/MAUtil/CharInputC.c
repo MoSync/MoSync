@@ -40,6 +40,8 @@ static int sCurrentCharMapListIndex = 0;
 static int sCurrentMode = CI_INACTIVE;
 static int sCurrentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
 
+static BOOL sQwerty = FALSE;
+
 void CharInput_Reset() {
 	sCurrentCharMapIndex = 0;
 	sCurrentCharMapListIndex = 0;
@@ -68,12 +70,12 @@ static const char *charMapUpperCase[]= { 	".,:?!'\"/1",		"ABCÅÄ2",		"DEF3",
 							"PQRS7",			"TUV8",		"WXYZ9",
 							"*+<>()[]{}",		" 0+",		"\n#"};
 #else
-static const char *charMapLowerCase[]= {	".,:?!'\"/1",	"abcåä2",		"def3",
+static const char *charMapLowerCase[]= {	".,@:?!'\"/1",	"abcåä2",		"def3",
 							"ghi4",			"jkl5",		"mnoö6",
 							"pqrs7",		"tuv8",		"wxyz9",
 							"*+<>()[]{}",	" ",		" "};
 
-static const char *charMapUpperCase[]= {	".,:?!'\"/1",	"ABCÅÄ2",		"DEF3",
+static const char *charMapUpperCase[]= {	".,@:?!'\"/1",	"ABCÅÄ2",		"DEF3",
 							"GHI4",			"JKL5",		"MNOÖ6",
 							"PQRS7",		"TUV8",		"WXYZ9",
 							"*+<>()[]{}",	" ",		"  "};
@@ -133,7 +135,20 @@ int CharInput_getMode() {
 }
 
 void CharInput_Pressed(int keyCode) {
-	int newCharMapIndex = sCurrentCharMapIndex;
+	int newCharMapIndex;
+	if(sQwerty) {
+		//if in numeric mode
+		if(sCurrentCharMode == CI_MODE_CHAR_MODE_NUMBERS) {
+			//discard all non-number keys
+			if(keyCode < MAK_0 || keyCode > MAK_9)
+				return;
+		}
+		if(keyCode >= MAK_SPACE && keyCode < MAK_DELETE)
+			sCharacterDeployedCallback(keyCode, sCharacterDeployedUserData);
+		return;
+	}
+
+	newCharMapIndex = sCurrentCharMapIndex;
 	switch(keyCode) {
 		case MAK_0:
 			newCharMapIndex = 10;
@@ -184,6 +199,9 @@ void CharInput_Pressed(int keyCode) {
 }
 
 void CharInput_Released(int keyCode) {
+	if(sQwerty) {
+		return;
+	}
 	if(sStopTimerCallback)
 		sStopTimerCallback();
 	if(sStartTimerCallback)
@@ -217,3 +235,12 @@ void CharInput_ForceDeployment() {
 	CharInput_ShortPress();
 }
 
+void CharInput_setQwerty(BOOL on) {
+	if(!sQwerty && on && sStopTimerCallback)
+		sStopTimerCallback();
+	sQwerty = on;
+}
+
+BOOL CharInput_getQwerty() {
+	return sQwerty;
+}

@@ -143,7 +143,7 @@ namespace MinUI {
 		ASSERT_MSG(columns > 0, "too few columns");
 
 		//default size: screen
-		Extent e = maGetScrSize();
+		MAExtent e = maGetScrSize();
 		mSize.x = EXTENT_X(e);
 		mSize.y = EXTENT_Y(e);
 
@@ -367,7 +367,7 @@ namespace MinUI {
 	Label::Label(const char* text, int color) :
 		mText(text), mColor(color)
 	{
-		Extent s = maGetTextSize(text);
+		MAExtent s = maGetTextSize(text);
 		mMinimumSize.x = EXTENT_X(s);
 		mMinimumSize.y = EXTENT_Y(s);
 	}
@@ -392,7 +392,7 @@ namespace MinUI {
 			if(newLine) {
 				*newLine = 0;
 			}
-			Extent lineSize = maGetTextSize(ptr);
+			MAExtent lineSize = maGetTextSize(ptr);
 			mMinimumSize.x = MAX(mMinimumSize.x, EXTENT_X(lineSize));
 			mMinimumSize.y += mLineHeight;//EXTENT_Y(lineSize);
 			if(newLine) {
@@ -439,7 +439,7 @@ namespace MinUI {
 		*end = 0;
 		maSetColor(isLink ? mLinkColor : mColor);
 		Gfx_drawText(x, y, start);
-		Extent size = maGetTextSize(start);
+		MAExtent size = maGetTextSize(start);
 		if(isLink) {
 			int lineY = y + mLineHeight - UNDERSCORE_HEIGHT;
 			Gfx_line(x, lineY, x + EXTENT_X(size), lineY);
@@ -525,9 +525,9 @@ namespace MinUI {
 	//******************************************************************************
 	// Image
 	//******************************************************************************
-	Image::Image(Handle imgHandle) : mHandle(imgHandle)
+	Image::Image(MAHandle imgHandle) : mHandle(imgHandle)
 	{
-		Extent s = maGetImageSize(mHandle);
+		MAExtent s = maGetImageSize(mHandle);
 		mMinimumSize.x = EXTENT_X(s);
 		mMinimumSize.y = EXTENT_Y(s);
 	}
@@ -545,7 +545,7 @@ namespace MinUI {
 	{
 		//ASSERT_MSG(minHeight == 1, "single-line only for now");
 		ASSERT_MSG(minWidth <= maxLength, "minWidth > maxLength");
-		Extent s = maGetTextSize("_");	//biggest character, I think
+		MAExtent s = maGetTextSize("_");	//biggest character, I think
 		mMinimumSize.x = EXTENT_X(s) * minWidth;
 		mMinimumSize.y = EXTENT_Y(s) * 1;//minHeight;
 
@@ -590,6 +590,10 @@ namespace MinUI {
 		}
 		CharInput::getCharInput().setMode(cMode);
 		mInputMode = inputMode;
+	}
+
+	void Textbox::setQwerty(bool on) {
+		CharInput::getCharInput().setQwerty(on);
 	}
 
 	bool Textbox::moveCursorHorizontal(int steps) {
@@ -650,7 +654,7 @@ namespace MinUI {
 	void Textbox::doDraw() {
 		//TODO: scroll properly
 
-		//Extent textSize = maGetTextSize(mText.c_str());
+		//MAExtent textSize = maGetTextSize(mText.c_str());
 		const char* str = mText.c_str();
 		int cursorX;
 		if(mCursor == 0) {
@@ -666,14 +670,14 @@ namespace MinUI {
 			mDrawOffset--;
 			do {
 				mDrawOffset++;
-				Extent s = maGetTextSize(str + mDrawOffset);
+				MAExtent s = maGetTextSize(str + mDrawOffset);
 				cursorX = EXTENT_X(s);
 			} while(cursorX >= mSize.x);
 #else
 			mDrawOffset--;
 			do {
 				mDrawOffset++;
-				Extent s = maGetTextSize(str + mDrawOffset);
+				MAExtent s = maGetTextSize(str + mDrawOffset);
 				cursorX = EXTENT_X(s);
 			} while(cursorX >= mSize.x);
 #endif

@@ -25,7 +25,7 @@ call prever.bat
 GOTO end
 
 :REGULAR
-pipe-tool -xerr -master-dump -sld -collect-stabs -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
+pipe-tool -xerr -master-dump -sld -collect-stabs -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib" "%MOSYNCDIR%\lib\pipe\mauiD.lib"
 
 REM pipe-tool -elim -java -B program temp.s
 

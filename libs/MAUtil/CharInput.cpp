@@ -115,6 +115,12 @@ namespace MAUtil {
 		return (CharInput::CharMode)CharInput_getMode();
 	}
 
+	void CharInput::setQwerty(bool on) {
+		CharInput_setQwerty(on);
+	}
 
+	bool CharInput::getQwerty() const {
+		return !!CharInput_getQwerty();
+	}
 
 } // namespace MAUtil
