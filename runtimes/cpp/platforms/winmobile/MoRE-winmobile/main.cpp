@@ -57,7 +57,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
 
+#ifndef MOSYNC_COMMERCIAL
 	syscall->drawSplash();
+#endif
 
 	while(1) {
 		Core::Run2(gCore);
