@@ -462,13 +462,10 @@ std::string HttpConnection::methodString() {
 	switch(mMethod) {
 	case HTTP_GET:
 		return "GET";
-		break;
 	case HTTP_POST:
 		return "POST";
-		break;
 	case HTTP_HEAD:
 		return "HEAD";
-		break;
 	default:
 		BIG_PHAT_ERROR(ERR_HTTP_METHOD_INVALID);
 	}

@@ -160,7 +160,7 @@ void FunctionType::addParam(const TypeBase* p) {
 }
 void FunctionType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
 	//relies on data being a MoSync function pointer.
-	pf("0x%x", data);
+	pf("0x%p", data);
 }
 void FunctionType::printTypeMI(printfPtr pf, bool complex) const {
 	mReturnType->printTypeMI(pf, false);

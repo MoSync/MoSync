@@ -24,14 +24,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stabs_builtins.h"
 
-#define DECLARE_BUILTIN_BASE(name, id, size) static class id : public Builtin {\
+#define DECLARE_BUILTIN_BASE(name, id, size, attrib) static class id : public Builtin {\
 public:\
 	id() : Builtin(#name, size, e##id) {}\
-	void printMI(printfPtr, const void*, TypeBase::PrintFormat) const;\
+	void printMI(printfPtr, const void*, TypeBase::PrintFormat) const attrib;\
 } s##id;
 
-#define DECLARE_BUILTIN(name, id) DECLARE_BUILTIN_BASE(name, id, sizeof(name))
-#define DECLARE_BROKEN_BUILTIN(name, id) DECLARE_BUILTIN_BASE(name, id, 0)
+#if defined(_MSC_VER) || defined(__SYMBIAN32__)
+#define BROKEN_BASE_ATTRIB
+#elif defined(__GNUC__)
+#define BROKEN_BASE_ATTRIB __attribute((noreturn))
+#else
+#error Unsupported platform!
+#endif
+
+#define DECLARE_BUILTIN(name, id) DECLARE_BUILTIN_BASE(name, id, sizeof(name),)
+#define DECLARE_BROKEN_BUILTIN(name, id) DECLARE_BUILTIN_BASE(name, id, 0, BROKEN_BASE_ATTRIB)
 
 BUILTINS(DECLARE_BUILTIN, DECLARE_BUILTIN);
 BROKEN_BUILTINS(DECLARE_BROKEN_BUILTIN);

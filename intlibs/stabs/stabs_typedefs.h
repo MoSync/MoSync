@@ -153,8 +153,8 @@ class RangeType : public TypeBase {
 public:
 	RangeType(int min, int max);
 
-	void printMI(printfPtr, const void*, PrintFormat) const;
-	void printTypeMI(printfPtr, bool complex) const;
+	void ATTRIB(noreturn) printMI(printfPtr, const void*, PrintFormat) const;
+	void ATTRIB(noreturn) printTypeMI(printfPtr, bool complex) const;
 protected:
 	const int mMin, mMax;
 };

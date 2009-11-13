@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stabs_static.h"
 
 bool loadStabs(const char* sld, const char* stabs);
-void clearStabs();
 bool stabsIsLoaded();
 
 void stabsEnumerateSymbols(void (*callback)(const Symbol*));

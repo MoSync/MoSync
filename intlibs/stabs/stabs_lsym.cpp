@@ -66,7 +66,6 @@ bool parseLSym(Tuple t, char* text) {
 	char* declType = colon + 1;
 	switch(declType[0]) {
 	case 't':	//simple type
-		break;
 	case 'T':	//struct, union, enum
 		break;
 	case '(':	//local stack variable

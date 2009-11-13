@@ -19,13 +19,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define STABS_TYPE_H
 
 #include <string>
+#include "helpers/attribute.h"
 
 //typedef int (*printfPtr)(const char* fmt, ...);
 
 class PrintFunctor {
 public:
 	virtual ~PrintFunctor() {}
-	virtual int operator()(const char* fmt, ...) = 0;
+	virtual int operator()(const char* fmt, ...) PRINTF_ATTRIB(2,3) = 0;
 };
 
 class StringPrintFunctor : public PrintFunctor {
@@ -36,7 +37,7 @@ public:
 	const char* getString();
 	void reset();
 	void resizeString(int size);
-	int operator()(const char* fmt, ...);
+	int operator()(const char* fmt, ...) PRINTF_ATTRIB(2,3);
 
 private:
 	int mPos;

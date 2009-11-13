@@ -86,10 +86,6 @@ bool stabsIsLoaded() {
 	return sLoaded;
 }
 
-void clearStabs() {
-	DEBIG_PHAT_ERROR;
-}
-
 static bool parseStabLine(string& line) {
 	FAILIF(line.length() < 4);
 	if(line[0] == '/')	//ignore this line
