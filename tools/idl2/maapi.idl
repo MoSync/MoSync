@@ -1389,6 +1389,8 @@ interface MAAPI {
 	/**
 	* Starts playing a sound.
 	*
+	* If a sound was already playing, it is stopped.
+	*
 	* The sound data is formatted as follows: <mime type><null terminator byte><encoded data>.
 	*
 	* The .media directive in the MoSync resource compiler creates this formatting.

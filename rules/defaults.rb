@@ -26,6 +26,8 @@ def set_defaults
 		error "wrong configuration: " + @CONFIG
 	end
 	
-	default(:COMMON_BUILDDIR, File.expand_path(File.dirname(__FILE__) + "/../" + @BUILDDIR) + "/")
+	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))
+	default(:COMMON_BUILDDIR, @COMMON_BASEDIR + "/" + @BUILDDIR)
+	default(:TARGETDIR, @COMMON_BASEDIR)
 end
 end
