@@ -13,6 +13,9 @@ def set_defaults
 	default(:EXTRA_SOURCEFILES, [])
 	default(:EXTRA_OBJECTS, [])
 	default(:LOCAL_LIBS, [])
+	default(:LOCAL_DLLS, [])
+	default(:CUSTOM_LIBS, [])
+	default(:LIBRARIES, [])
 	default(:SPECIFIC_CFLAGS, {})
 	default(:BUILDDIR_BASE, "build/")
 

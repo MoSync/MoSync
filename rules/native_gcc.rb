@@ -70,6 +70,8 @@ class NativeGccWork < BuildWork
 		standard_sourcefiles = cfiles + cppfiles
 
 		@source_objects = objects(standard_sourcefiles)
+		#puts "ho"
+		#puts @EXTRA_OBJECTS
 		all_objects = @source_objects + @EXTRA_OBJECTS
 		
 		setup3(all_objects)

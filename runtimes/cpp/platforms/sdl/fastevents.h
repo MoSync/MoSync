@@ -32,15 +32,15 @@ Bob@Pendleton.com
 extern "C" {
 #endif
 
-	int FE_Init();                         // Initialize FE
-	void FE_Quit();                        // shutdown FE
+	int FE_Init(void);                         // Initialize FE
+	void FE_Quit(void);                        // shutdown FE
 
-	void FE_PumpEvents();                  // replacement for SDL_PumpEvents
+	void FE_PumpEvents(void);                  // replacement for SDL_PumpEvents
 	int FE_PollEvent(SDL_Event *event);    // replacement for SDL_PollEvent
 	int FE_WaitEvent(SDL_Event *event);    // replacement for SDL_WaitEvent
 	int FE_PushEvent(SDL_Event *event);    // replacement for SDL_PushEvent
 
-	const char *FE_GetError();                   // get the last error
+	const char *FE_GetError(void);                   // get the last error
 #ifdef __cplusplus
 }
 #endif

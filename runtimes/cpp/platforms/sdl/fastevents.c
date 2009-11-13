@@ -44,7 +44,7 @@ static __inline__ void setError(const char *err)
 	error = err;
 }
 
-const char *FE_GetError()
+const char *FE_GetError(void)
 {
 	return error;
 }
@@ -82,7 +82,7 @@ int FE_PushEvent(SDL_Event *ev)
 // 
 //
 
-void FE_PumpEvents()
+void FE_PumpEvents(void)
 {
 	SDL_LockMutex(eventLock);
 	SDL_PumpEvents();
@@ -147,7 +147,7 @@ static Uint32 timerCallback(Uint32 interval, void *param)
 //
 //
 
-int FE_Init()
+int FE_Init(void)
 {
 	if (0 == (SDL_INIT_TIMER & SDL_WasInit(SDL_INIT_TIMER)))
 	{
@@ -183,7 +183,7 @@ int FE_Init()
 //
 //
 
-void FE_Quit()
+void FE_Quit(void)
 {
 	SDL_DestroyMutex(eventLock);
 	eventLock = NULL;

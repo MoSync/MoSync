@@ -34,3 +34,18 @@ def sh(cmd)
 		error "Command failed: '#{$?}'"
 	end
 end
+
+class Object
+	def need(*args)
+		vars = instance_variables.inject({}) { |h,var| h[var] = true; h }
+		#puts instance_variables
+		#puts vars.inspect
+		args.each do |var|
+			var = var.to_s
+			#puts "#{var}: #{vars[var].inspect}"
+			if(!vars[var])
+				error "Undefined variable: #{var}"
+			end
+		end
+	end
+end

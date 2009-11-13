@@ -43,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/fifo.h>
 #include <helpers/log.h>
 #include <helpers/helpers.h>
+#include <helpers/attribute.h>
 #include <helpers/smartie.h>
 #include <MemStream.h>
 #include <FileStream.h>
@@ -1913,7 +1914,7 @@ namespace Base {
 	static int maSendTextSMS(const char* dst, const char* msg);
 	//static int maStartVideoStream(const char* url);
 
-	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+	SYSCALL(int, ATTRIB(noreturn) maInvokeExtension(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
