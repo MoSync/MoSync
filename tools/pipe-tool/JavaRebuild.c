@@ -1069,7 +1069,8 @@ void RebuildJavaFunc(SYMBOL *sym)
 #ifdef JRDEBUG
 				RebuildEmit("// %s_%d:\n", ref->Name, ref->LocalScope);
 #endif
-				RebuildEmit("ms.label_%d();\n", ref->LabelEnum);
+				if (ref->Name[1] < 59)
+					RebuildEmit("ms.label_%d();\n", ref->LabelEnum);
 			}
 		}
 

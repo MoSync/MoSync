@@ -76,9 +76,9 @@ INSTRDEF(	"ldc %c",				LDC,				0,	2,	0)
 INSTRDEF(	"ldc_w %C",				LDC_W,				0,	3,	0)
 INSTRDEF(	"ldc2_w %C",			LDC2_W,				0,	3,	BC_BAD)
 INSTRDEF(	"iload %n",				ILOAD,				0,	2,	0)
-INSTRDEF(	"lload",				LLOAD,				0,	2,	BC_BAD)
-INSTRDEF(	"fload ",				FLOAD,				0,	2,	BC_BAD)
-INSTRDEF(	"dload",				DLOAD,				0,	2,	BC_BAD)
+INSTRDEF(	"lload",				LLOAD,				0,	2,	BC_BAD) // Has imm
+INSTRDEF(	"fload ",				FLOAD,				0,	2,	BC_BAD) // Has imm
+INSTRDEF(	"dload",				DLOAD,				0,	2,	BC_BAD) // Has imm
 INSTRDEF(	"aload %n",				ALOAD,				0,	2,	0)
 INSTRDEF(	"iload_0",				ILOAD_0,			0,	1,	0)
 INSTRDEF(	"iload_1",				ILOAD_1,			0,	1,	0)
@@ -108,10 +108,10 @@ INSTRDEF(	"aaload",				AALOAD,				0,	1,	0)
 INSTRDEF(	"baload",				BALOAD,				0,	1,	0)
 INSTRDEF(	"caload",				CALOAD,				0,	1,	0)
 INSTRDEF(	"saload",				SALOAD,				0,	1,	0)
-INSTRDEF(	"istore",				ISTORE,				0,	2,	0)
-INSTRDEF(	"lstore",				LSTORE,				0,	2,	BC_BAD)
-INSTRDEF(	"fstore",				FSTORE,				0,	2,	BC_BAD)
-INSTRDEF(	"dstore",				DSTORE,				0,	2,	BC_BAD)
+INSTRDEF(	"istore %n",			ISTORE,				0,	2,	0)
+INSTRDEF(	"lstore",				LSTORE,				0,	2,	BC_BAD) // Has imm
+INSTRDEF(	"fstore",				FSTORE,				0,	2,	BC_BAD) // Has imm
+INSTRDEF(	"dstore",				DSTORE,				0,	2,	BC_BAD) // Has imm
 INSTRDEF(	"astore %n",			ASTORE,				0,	2,	0)
 INSTRDEF(	"istore_0",				ISTORE_0,			0,	1,	0)
 INSTRDEF(	"istore_1",				ISTORE_1,			0,	1,	0)

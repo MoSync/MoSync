@@ -102,17 +102,33 @@ int GetOpcodeLen(unsigned char *pc)
 {
 	uint n;
 	uchar opc = *pc;
-
+	
 	if (opc > IMPDEP2)
 		return -1;
 
 	switch (opc)
 	{
 		case TABLESWITCH:
-			n = (4 - ((uint) (pc - CodeStart) & 0x03)) + 4;
-			pc += n;
-			n += (memL(pc + 4) - memL(pc) + 1) * 4;
-			return n;
+		{
+			int off;
+			int default_off;
+			int low,high;
+			int pad;
+			uchar *ts = pc;
+						
+			// Skip padding
+			off = (ts - CodeStart);
+			pad = ((off & 3) ^ 3) + 1;	// Add 1 to skip opcode
+			ts += pad;
+			
+			default_off = memLI(ts);
+			low = memLI(ts);
+			high = memLI(ts);
+
+			ts += (high - low + 1) * 4;
+			off = (ts - pc);
+			return off;
+		}
 			
 		case LOOKUPSWITCH:
 			n = (4 - ((uint) (pc - CodeStart) & 0x03)) + 4;
@@ -200,28 +216,30 @@ void Dis_TableSwitch()
 
 	dprintf("tableswitch ");
 	
+	CodePtr--;							// Backup to opcode
+
 	// Skip padding
 	
-	off = CODE_OFFSET();
-	pad = 4 - (off % 4);
-	CodePtr += pad;
-	
-	default_off = memLI(CodePtr);
-	dprintf("default_off %d ", default_off+ off - 1);
-	
-	low = memLI(CodePtr);
-	dprintf("low %d ", low);
+	off = (CodePtr - CodeStart);
+	pad = ((off & 3) ^ 3) + 1;			// Add 1 to skip opcode
 
-	high = memLI(CodePtr);
-	dprintf("high %d\n", high);
+	CodePtr += pad;
+
+	default_off = memLI(CodePtr);
+	
+	low = memLI(CodePtr);;
+	dprintf("{ %d ", low);
+
+	high = memLI(CodePtr);;
+	dprintf("to %d\n", high);
 
 	for (n = 0; n < high - low + 1; n++)	
 	{
 		offset = memLI(CodePtr);
-
-		dprintf("\t%d: offset %d\n", low + n, offset + off - 1);
+		dprintf("\t%d: %d;\n", low + n, offset + off);
 	}
 
+	dprintf("\tdefault: %d }\n", default_off + off);
 	return;
 }
 
@@ -352,7 +370,7 @@ void PrintOpcode()
 	}
 
 	off = CODE_OFFSET();	
-	opc = memBI(CodePtr);
+	opc = *CodePtr++;
 
 	if (IsWide)
 	{
@@ -363,12 +381,15 @@ void PrintOpcode()
 	if (opc == LOOKUPSWITCH)
 	{
 		Dis_LookUpSwitch();
+		CodePtr = thisInst + opsize;
+
 		return;
 	}
 
 	if (opc == TABLESWITCH)
 	{
 		Dis_TableSwitch();
+		CodePtr = thisInst + opsize;
 		return;
 	}
 
@@ -414,9 +435,11 @@ void Disassemble()
 
 	CodeTop = CodePtr;
 
+#if 1		// Switch On Goto Label Patching with 1
+
 	// Local labels
 	
-	dprintf("Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n\n",MaxStack,MaxLocal,CodeLen);
+	dprintf("\n\nLabelSearch: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
 	
 	for (n=0;n<CodeLen;n++)
 	{
@@ -426,7 +449,7 @@ void Disassemble()
 		LastCodePtr = CodePtr;
 		LastCodeOff = CODE_OFFSET();
 		
-		dprintf("%d :", CodePtr - ClassPtr);
+		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
 
 		if (ms_trigger)
@@ -434,7 +457,7 @@ void Disassemble()
 			if (strncmp(ms_str, "label_", 6) == 0)
 			{
 				sscanf(ms_str, "label_%d", &label_num);
-				dprintf("LABEL %d at %d\n", label_num, LastCodePtr - ClassPtr);
+				dprintf(" ** LABEL %d at %d", label_num, LastCodePtr - ClassPtr);
 
 				LabelTable[label_num] = LastCodeOff; // file index
 
@@ -452,7 +475,7 @@ void Disassemble()
 
 	CodePtr = CodeTop;
 
-	dprintf("Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n\n",MaxStack,MaxLocal,CodeLen);
+	dprintf("\n\nGotoPatch: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
 	
 	for (n=0;n<CodeLen;n++)
 	{
@@ -461,8 +484,8 @@ void Disassemble()
 		
 		LastCodePtr = CodePtr;
 		LastCodeOff = CODE_OFFSET();	
-		
-		dprintf("%d :", CodePtr - ClassPtr);
+
+		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
 
 		if (ms_trigger)
@@ -472,7 +495,7 @@ void Disassemble()
 				int off;
 
 				sscanf(ms_str, "goto_%d", &goto_num);
-				dprintf("GOTO %d at %d\n", goto_num, LastCodePtr - ClassPtr);
+				dprintf(" ** GOTO %d at %d", goto_num, LastCodePtr - ClassPtr);
 
 				off = 3 + (LabelTable[goto_num] - LastCodeOff);
 
@@ -481,17 +504,20 @@ void Disassemble()
 				LastCodePtr[0] = GOTO;
 				LastCodePtr[1] = (off >> 8) & 0xff;
 				LastCodePtr[2] = off & 0xff;
+
 			}
 		}
 	}
 
-	// Result
+#endif
 
-#if 0
+#if 1		// Switch on disassembler with 1, Show results
 
 	CodePtr = CodeTop;
 
-	dprintf("Result\n\n");
+	// Local labels
+	
+	dprintf("\n\nResults: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
 	
 	for (n=0;n<CodeLen;n++)
 	{
@@ -499,15 +525,17 @@ void Disassemble()
 			break;
 		
 		LastCodePtr = CodePtr;
-		LastCodeOff = CODE_OFFSET();	
+		LastCodeOff = CODE_OFFSET();
 		
-		dprintf("%d :", CodePtr - ClassPtr);
+		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
 	}
 
-	dprintf("\n");
 
 #endif
+
+
+
 }
 
 //****************************************

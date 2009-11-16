@@ -971,6 +971,9 @@ void MainAsm(char *input, char *output)
 		LoadProfileData();
 
 
+	PatchClass("Code1.unpatched.class", "tp.class");
+	exit(0);
+
 		AsmMain();
 
 #ifdef CODE_ANALYSIS

@@ -286,7 +286,6 @@ char *NewPtr(int size)
 	// a reference to the master entry
 
 	ptr = (char *) malloc(size + 4);
-//	ptr = (char *) calloc(size + 4, 1);
 	
 	// if no mem, return
 	
