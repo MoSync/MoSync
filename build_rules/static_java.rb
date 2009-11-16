@@ -37,7 +37,10 @@ def build_static_java(t)
 end
 
 def preverify()
-	sh "cd #{BUILDDIR} && \"#{PREVERIFY}\" -classpath \"#{CLASSPATH};#{STATIC_JAR}\" -d . ."
+	ver = "#{BUILDDIR}verified"
+	Dir.mkdir ver unless File.exists? ver
+	sh "cp #{BUILDDIR}*.class #{ver}"
+	sh "cd #{ver} && \"#{PREVERIFY}\" -classpath \"#{CLASSPATH};#{STATIC_JAR}\" -d . ."
 end
 
 # inserts srcFile into srcJar, stores result in dst.
@@ -53,7 +56,7 @@ class StaticJava
 			build_static_java(t)
 		end
 		#preverify
-		verifiedClassfile = "#{BUILDDIR}output/StaticCode.class"
+		verifiedClassfile = "#{BUILDDIR}verified/StaticCode.class"
 		file verifiedClassfile => unverifiedClassfile do
 			preverify()
 		end
@@ -62,7 +65,7 @@ class StaticJava
 		#pack into JAR
 		jarFile = "#{BUILDDIR}#{EXENAME}.jar"
 		jarTask = file jarFile => verifiedClassfile do
-			jarInsert(jarFile, STATIC_JAR, "#{BUILDDIR}*.class #{BUILDDIR}data_section.bin")
+			jarInsert(jarFile, STATIC_JAR, "#{BUILDDIR}verified/*.class #{BUILDDIR}data_section.bin")
 		end
 		jarTask.invoke
 	end
@@ -73,7 +76,7 @@ class BlackBerryStaticJava
 		#rapc jar -> cod
 		codFile = "#{BUILDDIR}#{EXENAME}.cod"
 		codTask = file codFile => "#{BUILDDIR}#{EXENAME}.jar" do |t|
-			sh "rapc -nowarn \"-import=#{CLASSPATH}\" -midlet #{t.prerequisites}"
+			sh "cd #{BUILDDIR} && rapc -nowarn \"-import=#{CLASSPATH}\" -midlet #{EXENAME}.jar"
 		end
 		codTask.invoke
 		#javaloader

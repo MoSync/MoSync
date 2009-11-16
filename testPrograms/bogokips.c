@@ -24,9 +24,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int t[256];
 static const int instructionsPerLoop = 14;
 static const int nLoops = 100000;
+static const int minTime = 1000;
 
 int MAMain() {
 	int v, i, time, startTime;
+	int nitr;
 	MAEvent event;
 	char buf[64];
 
@@ -44,14 +46,18 @@ int MAMain() {
 #endif
 beginning:
 	startTime = maGetMilliSecondCount();
-	for(i=0; i<nLoops; i++)
-	{
-		v = t[i & 0xff];
-		t[(i-v) & 0xff] = v + (41*101*65537);
-	}
-	time = maGetMilliSecondCount() - startTime;
+	nitr = 0;
+	do {
+		for(i=0; i<nLoops; i++)
+		{
+			v = t[i & 0xff];
+			t[(i-v) & 0xff] = v + (41*101*65537);
+		}
+		time = maGetMilliSecondCount() - startTime;
+		nitr++;
+	} while(time < minTime);
 #ifndef USE_PUTS
-	sprintf(buf, "%i ms, %i KIPS\n", time, (nLoops * instructionsPerLoop) / time);
+	sprintf(buf, "%i ms, %i KIPS", time, (nLoops * instructionsPerLoop * nitr) / time);
 	maSetColor(0);
 	maFillRect(0, 0, 500, 500);
 	maSetColor(-1);

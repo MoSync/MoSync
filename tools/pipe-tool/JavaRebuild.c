@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // 						   		Written by A.R.Hartley
 //*********************************************************************************************
 
+#include <direct.h>
+
 #include "compile.h"
 
 #define DYN_TYPE "final "
@@ -1802,10 +1804,12 @@ void RebuildJava_Main()
 //	system("del rebuild.java");
 
 	//PatchClass("StaticCode.class", "StaticCode.class");
-	for(i=0; i<CurrentCodeSegment; i++) {
-		char buf[32];
-		sprintf(buf, "Code%i.class", i);
-		PatchClass(buf, buf);
+	_mkdir("patched");
+	for(i=0; i<=CurrentCodeSegment; i++) {
+		char in[32];//, out[32];
+		//sprintf(out, "patched/Code%i.class", i);
+		sprintf(in, "Code%i.class", i);
+		PatchClass(in, in);
 	}
 //	system("jcf-dump -c StaticCode.class > javadis_after.s");
 #endif

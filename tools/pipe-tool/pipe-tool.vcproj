@@ -430,6 +430,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\filealloc.c"
+			>
+		</File>
+		<File
 			RelativePath=".\InstTable.h"
 			>
 		</File>

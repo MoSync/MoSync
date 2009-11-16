@@ -418,7 +418,7 @@ int Parse_stabs()
 	
 	// Get string
 	
-	GetStringName(32*1024-2);
+	GetStringName(32*1024-3);
 	strcpy(str, Name);
 
 	// Skip comma

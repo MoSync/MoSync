@@ -100,6 +100,7 @@ void SaveToFile(char *filename, char *start, int len)
 
 void PatchClass(char *infile, char *outfile)
 {			
+	printf("Patching %s\n", infile);
 	ClassFilePtr = LoadToMemory(infile);
 	ClassPtr = ClassFilePtr;
 	
@@ -361,9 +362,9 @@ void ReadMedthods(ClassEntry *theClass)
 		NameIndex = ReadWord();
 		vprintf("NameIndex %d = '%s'\n", NameIndex, GPS(NameIndex));
 
-#if 0	// Dont print function names
-		printf("\nFUNC %s", GPS(theClass->ThisClass) );
-		printf(".%s\n", GPS(NameIndex) );
+#if 1	// Dont print function names
+		vprintf("\nFUNC %s", GPS(theClass->ThisClass) );
+		vprintf(".%s\n", GPS(NameIndex) );
 #endif
 
 		TypeIndex = ReadWord();
