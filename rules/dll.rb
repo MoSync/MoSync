@@ -1,39 +1,26 @@
-require "#{File.dirname(__FILE__)}/native_gcc.rb"
+require "#{File.dirname(__FILE__)}/native_link.rb"
 
-# todo: share code with exe.rb
-
-class DllTask < FileTask
+class DllTask < NativeGccLinkTask
 	def initialize(work, name, objects, linkflags)
-		super(work, name)
-		@prerequisites = @objects = objects
-		#@LINKFLAGS = " -shared -Xlinker --no-undefined" + linkflags
-		#" -Wl,-s -Wl,--enable-auto-import -Wl,-M -Wl,-x"
+		super(work, name, objects)
+		#" -Wl,-s -Wl,--enable-auto-import -Wl,-M -Wl,-x -Xlinker --no-undefined"
 		@LINKFLAGS = " -shared" + linkflags
-		
-		# todo: save linkflags, like CompileGccTask's CFLAGS.
 	end
 	
-	def execute
-		sh "g++ #{@objects.join(' ')}#{@LINKFLAGS} -o #{@NAME}"
+	#def execute
 		#libfile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, ".dll") + ".a"
 		#deffile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, ".dll") + ".def"
 		#sh "dlltool --export-all-symbols -z #{deffile} -l #{libfile} -D #{File.basename(@NAME)} #{@NAME}"
-	end
+	#end
 end
 
 # Compiles C/C++ code into an dynamic-link library.
 # Supports GCC on linux and mingw.
-class DllWork < NativeGccWork
-	private
-	
-	def setup3(all_objects)
-		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
-		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
-		need(:@NAME)
-		need(:@BUILDDIR)
-		need(:@TARGETDIR)
-		target = @TARGETDIR + "/" + @BUILDDIR + @NAME + DLL_FILE_ENDING
-		@TARGET = DllTask.new(self, target, all_objects + llo + lld, @EXTRA_LINKFLAGS)
-		@prerequisites += [@TARGET]
- 	end
+class DllWork < NativeGccLinkWork
+	def link_task_class
+		DllTask
+	end
+	def link_file_ending
+		DLL_FILE_ENDING
+	end
 end
