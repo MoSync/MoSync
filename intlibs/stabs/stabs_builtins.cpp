@@ -130,7 +130,7 @@ void Bool::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) co
 }
 
 void VTablePtr::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("0x%x", data);
+	pf("%p", data);
 }
 
 void Wchar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {

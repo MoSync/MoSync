@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdexcept>
 #include "config_platform.h"
 #include <helpers/helpers.h>
+#include <helpers/attribute.h>
 #include <base/base_errors.h>
 
 using namespace MoSyncError;
@@ -321,7 +322,7 @@ char GdbStub::getAck() {
 	return '+';
 }
 
-void GdbStub::handleNack() {
+void GCCATTRIB(noreturn) GdbStub::handleNack() {
 	LOG("GDB NACK was sent from the client.\n");
 	DEBIG_PHAT_ERROR;
 }

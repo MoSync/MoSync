@@ -125,7 +125,7 @@ private:
 	int hexToNum(char c);
 
 	template<typename type>
-	type getDataTypeFromString(const char *b) {
+	type getDataTypeFromString(char*& b) {
 		type ret = 0;
 		for(int i = (sizeof(type)*2)-1; i >= 0; i-=1) {
 			ret |= ((type)(hexToNum(*b)))<<(i*4);
@@ -162,7 +162,7 @@ private:
 	template<typename type>
 	type getDataTypeFromInput() {
 		return getDataTypeFromString<type>(mInputPtr);
-		mInputPtr += ((sizeof(type))-1)<<1;
+		//mInputPtr += ((sizeof(type))-1)<<1;
 	}
 
 	void clearOutputBuffer();

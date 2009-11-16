@@ -21,8 +21,12 @@ class ExeWork < NativeGccWork
 
 	def setup3(all_objects)
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
+		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
+		need(:@NAME)
+		need(:@BUILDDIR)
+		need(:@TARGETDIR)
 		target = @TARGETDIR + "/" + @BUILDDIR + @NAME + EXE_FILE_ENDING
-		@TARGET = ExeTask.new(self, target, all_objects + llo, @EXTRA_LINKFLAGS)
+		@TARGET = ExeTask.new(self, target, all_objects + llo + lld, @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]
  	end
 end

@@ -289,7 +289,7 @@ VMLOOP_LABEL
 		default:
 			LOG("Illegal far instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
 			BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
-			return ip;
+			//return ip;
 		} EOP;
 
 		//OPC(XB)		FETCH_RD_RS		RD = (int)((char) RS); EOP;
@@ -356,7 +356,9 @@ VMLOOP_LABEL
 		//VM_State = -3;				// Bad instruction
 		LOG("Illegal instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
 		BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
-		return ip;
+		//return ip;
 	}
+#ifdef CORE_DEBUGGING_MODE
 	RUN_LOOP;
+#endif
 }

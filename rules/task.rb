@@ -143,10 +143,9 @@ class FileTask < Task
 	def out_of_date?(stamp)
 		@prerequisites.any? { |n|
 			if(n.timestamp > stamp)
-				puts "Because date of prerequisite '#{n}' is newer: #{@NAME}"
+				puts "Because prerequisite '#{n}' is newer: #{@NAME}"
 				return true
 			end
-			return false
 		}
 	end
 	
