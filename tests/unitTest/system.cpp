@@ -59,7 +59,7 @@ public:
 
 		clearScreen();
 		Environment::getEnvironment().addTimer(this, 6000, 2);
-		printf("press keys");
+		printf("press keys\n");
 		mode = 0;
 		keyPressFlag = 0;
 	}
@@ -76,12 +76,12 @@ public:
 				suite->runNextCase();
 				return;
 			}
-			printf("key lock on");
-			printf("try to press keys");
+			printf("key lock on\n");
+			printf("try to press keys\n");
 			assert("Is locked?", maKeypadIsLocked()==1);
 		} else if( mode == 2) {
-			printf("key lock off");
-			printf("keys should be pressable again?");
+			printf("key lock off\n");
+			printf("keys should be pressable again?\n");
 			maUnlockKeypad();
 			assert("Isn't locked?", maKeypadIsLocked()==0);
 		}
@@ -89,7 +89,7 @@ public:
 
 	//KeyListener
 	virtual void keyPressEvent(int keyCode) {
-		printf("key %d pressed", keyCode);
+		printf("key %d pressed\n", keyCode);
 	}
 
 	virtual void keyReleaseEvent(int keyCode) {
