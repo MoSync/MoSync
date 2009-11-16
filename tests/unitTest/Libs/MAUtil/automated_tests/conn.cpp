@@ -163,7 +163,7 @@ public:
 	//TestCase
 	void start() {
 		printf("Single HTTP test (%d)\n", mMultiple);
-		int res = mHttp.create("http://www.example.com/", HTTP_POST);//HTTP_POST_URL, HTTP_POST);
+		int res = mHttp.create(HTTP_POST_URL, HTTP_POST);
 		printf("res:%d\n", res);
 		if(res <= 0) {
 			printf("create %i\n", res);
@@ -175,12 +175,12 @@ public:
 		for(int i=0; i<mMultiple; i++) {
 			maReadData(CLIENT_DATA, mClientData + (i * DATA_SIZE), 0, DATA_SIZE);
 		}
-/*
+
 		//set a bunch of headers
 		for(int i=0; i<snHeaders; i++) {
 			mHttp.setRequestHeader(sHeaders[i].key, sHeaders[i].value);
 		}
-*/
+
 		char buffer[64];
 		sprintf(buffer, "%i", DATA_SIZE * mMultiple);
 		printf("cl:%d\n", DATA_SIZE*mMultiple);
