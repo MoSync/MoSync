@@ -26,8 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // 		Configuration settings
 //***************************************
 
-#define OLD_MEM_MANAGEMENT
-//#define NEW_MEM_MANAGEMENT
+//#define OLD_MEM_MANAGEMENT
+#define NEW_MEM_MANAGEMENT
 
 //******************************************************************************
 //				        Old Basic Memory Management
@@ -270,7 +270,6 @@ char *ReallocPtr(char *thisPtr, int size)
 
 #ifdef NEW_MEM_MANAGEMENT
 
-
 ArrayStore allocList;
 ArrayStore allocStack;
 int allocSP = 0;
@@ -282,8 +281,6 @@ int allocCount = 0;
 
 void InitMasterAlloc()
 {
-	int n;
-	
 	allocSP = 0;
 	allocCount = 0;
 
@@ -300,12 +297,21 @@ void InitMasterAlloc()
 
 void DisposeMasterAlloc()
 {
+	char *ptr;
+	int n;
+	
+	for (n=0;n<allocCount;n++)
+	{
+		ptr = (char *) ArrayGet(&allocList, n);
+
+		if (ptr)
+		{
+			free(ptr);
+			ArraySet(&allocList, n, 0);
+		}
+	}
+
 }
-
-//***************************************
-//		Find Free Master Entry
-//***************************************
-
 
 //***************************************
 //		Find Free Master Entry
@@ -313,49 +319,37 @@ void DisposeMasterAlloc()
 
 int FindFreeMaster()
 {
-	char *ptr;
 	int n;
+
+	// Check if there is a free index on the stack
 	
-	allocCount++;
-	
-	if (allocCount >= MAXALLOCS)
-		Error(Error_Fatal, "MasterAlloc table is full");
+	if (allocSP > 0)
+	{
+		n = ArrayGet(&allocStack, --allocSP);
+		return n;
+	}
 
-	n = allocStack[allocSP++];
+	// Just mask a new alloc index then
 
-	ptr = allocList[n];
-
-	if (ptr)
-		Error(Error_Fatal, "(FindFreeMaster) alloc stack entry was not null");
-
+	n = allocCount++;
+	ArraySet(&allocList, n, 0);		// Set the new entry to 0
 	return n;	
 }
 
 
 //***************************************
-//		Find Free Master Entry
+//		Release Master Entry
 //***************************************
 
 void ReleaseFreeMaster(int i)
 {
- 	// make sure the index is within bounds
- 	
- 	if ((i < 0) || (i >= MAXALLOCS) )
- 	{ 
- 		Error(Error_Fatal, "Fatal memory error in DisposePtr : master entry is out of range (%d)\n", i);
- 		return;
- 	}
-
 	// Clear the master alloc entry
 
-	allocList[i] = 0;
-
-	allocStack[--allocSP] = i;
-	allocCount--;
-
-	if (allocCount < 0)
-		Error(Error_Fatal, "MasterAlloc table underflow");
+	ArraySet(&allocList, i, 0);
 	
+	// Save this index to the alloc stack
+	
+	ArraySet(&allocStack, allocSP++, i);
 	return;
 }
 
@@ -396,7 +390,7 @@ char *NewPtr(int size)
 	
 	// put the memory into the master alloc table
 	
-	allocList[entry] = ptr;
+	ArraySet(&allocList, entry, (int) ptr);
 
 	// finally return the allocated memory to the user,
 	// advanced by 4 bytes
@@ -465,23 +459,15 @@ char *ReallocPtr(char *thisPtr, int size)
 
  	master = (int *)(thisPtr - 4);
  	i = *master;
- 
- 	// make sure the index is within bounds
- 	
- 	if ((i < 0) || (i >= MAXALLOCS) )
- 	{ 
- 		Error(Error_Fatal, "Fatal memory error in ReallocPtr : master entry is out of range (%d)\n", i);
- 		return 0;
- 	}
-
+  	
 	newptr = (char *) realloc((void *) master, size + 4);
 
   	if (!newptr)
 		return 0;
 	
 	// Return the ptr
-
-	allocList[i] = newptr;
+	
+	ArraySet(&allocList, i, (int) newptr);
 	return newptr + 4;
 }
 
