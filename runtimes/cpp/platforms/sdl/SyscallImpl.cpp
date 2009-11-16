@@ -1716,7 +1716,7 @@ namespace Base {
 	};
 
 	std::vector<MoSyncIntThread*> gThreads;
-	MoSyncSemaphore gThreadsMutex;
+	MoSyncSemaphore gThreadsMutex(1);
 
 	void eraseThread(MoSyncIntThread *thread) {
 		gThreadsMutex.wait();
@@ -1733,8 +1733,6 @@ namespace Base {
 
 	int threadRun(void *data) {
 		MoSyncIntThread *thread = (MoSyncIntThread*)data;
-		thread->waitForThreadEntry.post();
-
 		thread->waitForThreadStart.wait();
 		Core::Run2(thread->core);
 		int returnValue = thread->core->regs[Core::REG_r14];
@@ -1760,14 +1758,10 @@ namespace Base {
 		
 		thread->thread.start(threadRun, thread);
 		
-		thread->waitForThreadEntry.wait();
-
-		/*
-		gThreadMutex.wait();
+		gThreadsMutex.wait();
 		MAHandle id = (MAHandle)thread;
 		gThreads.push_back(thread);
-		gThreadMutex.post();
-		*/
+		gThreadsMutex.post();
 
 		thread->waitForThreadStart.post();
 
@@ -1807,7 +1801,7 @@ namespace Base {
 		return retValue;
 	}
 
-	MoSyncSemaphore gSemaphoresMutex;
+	MoSyncSemaphore gSemaphoresMutex(1);
 	std::vector<MoSyncSemaphore*> gSemaphores;
 	SYSCALL(MAHandle, maCreateSemaphore(int initialValue)) {
 		MoSyncSemaphore *sem = new MoSyncSemaphore(initialValue);
@@ -1849,7 +1843,7 @@ namespace Base {
 
 	SYSCALL(int, maPostSemaphore(MAHandle id)) {
 		MoSyncSemaphore *sem = findSemaphore(id, false);
-		sem->wait();
+		sem->post();
 		return 0;
 	}
 
@@ -2063,6 +2057,68 @@ namespace Base {
 	static int maSendTextSMS(const char* dst, const char* msg);
 	//static int maStartVideoStream(const char* url);
 
+	template<typename T>
+	class HandleMap {
+	public:
+		HandleMap() : mHandleGen(0) {}
+		~HandleMap() {}
+
+		MAHandle add(T t) {
+			MAHandle id = mHandleGen++;
+			mElements[id] = t;
+			return id;
+		}
+
+		T* get(MAHandle h) {
+			std::map<MAHandle, T>::iterator i = mElements.find(h);
+			if(i!=mElements.end()) return &i->second;
+			else return NULL;
+		}
+
+
+		T get_safe(MAHandle h, int err) {
+			T* t = get(h);
+			if(!t) BIG_PHAT_ERROR(err)
+			else return *t;
+		}
+	private:
+		int mHandleGen;
+		std::map<MAHandle, T> mElements;
+	};
+
+	HandleMap<FILE*> gFileMap;
+
+	int maFileOpen(const char* filename, const char* mode) {
+		FILE *f = fopen(filename, mode);
+		if(!f) return 0;
+		return (int)gFileMap.add(f);
+	}
+
+	int maFileClose(MAHandle file) {
+		FILE *h = gFileMap.get_safe(file, ERR_FILE_HANDLE_INVALID);
+		return fclose(h);
+	}
+
+	int maFileRead(MAHandle file, void* destination, int length) {
+		FILE *h = gFileMap.get_safe(file, ERR_FILE_HANDLE_INVALID);
+		return fread(destination, 1, length, h);
+	}
+
+	int maFileWrite(MAHandle file, const void* source, int length) {
+		FILE *h = gFileMap.get_safe(file, ERR_FILE_HANDLE_INVALID);
+		return fwrite(source, 1, length, h);
+	}
+
+	int maFileTell(MAHandle file) {
+		FILE *h = gFileMap.get_safe(file, ERR_FILE_HANDLE_INVALID);
+		return ftell(h);
+	}
+
+	int maFileSeek(MAHandle file,  int offset, int origin) {
+		FILE *h = gFileMap.get_safe(file, ERR_FILE_HANDLE_INVALID);
+		return fseek(h, offset, origin);
+	}	
+	
 	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
@@ -2071,6 +2127,14 @@ namespace Base {
 		switch(function) {
 		case maIOCtl_maCheckInterfaceVersion:
 			return maCheckInterfaceVersion(a);
+
+		case maIOCtl_maFileOpen: return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileClose: return maFileClose(a);
+		case maIOCtl_maFileRead:  return maFileRead(a, gSyscall->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileWrite:  return maFileWrite(a, gSyscall->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileTell: return maFileTell(a);
+		case maIOCtl_maFileSeek: return maFileSeek(a, b, c);
+		
 		case maIOCtl_maStartThread:
 			return maStartThread((MAAddress)a, (MAAddress)b, (MAAddress)c);
 		case maIOCtl_maWaitThread:

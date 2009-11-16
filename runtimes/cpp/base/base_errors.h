@@ -73,7 +73,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(ERR_MEMORY_PROTECTED, "Attempted access protected memory")\
 	m(ERR_IMAGE_SIZE_INVALID, "Invalid image size")\
 	m(ERR_MEMORY_NULL, "Attempted to access null pointer.")\
-	m(ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")
+	m(ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")\
+	m(ERR_FILE_HANDLE_INVALID, "Invalid file handle.")
 
 DECLARE_ERROR_ENUM(BASE)
 

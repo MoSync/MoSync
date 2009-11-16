@@ -153,7 +153,7 @@ int main2(int argc, char **argv) {
 			}
 
 			FILE *f;
-			if((f=fopen(argv[i], "rb"))!=0) {
+			if((f=fopen(argv[i], "rb"))) {
 				fclose(f);
 				settings.iconPath = argv[i];
 			}

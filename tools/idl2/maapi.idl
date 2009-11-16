@@ -1982,6 +1982,19 @@ interface MAAPI {
 		//getPath()
 #endif	//IX_FILE
 
+		MAHandle maFileOpen(in MAString filename, in MAString mode);
+		int maFileClose(in MAHandle file);
+		int maFileRead(in MAHandle file, out MAAddress destination, in int length);
+		int maFileWrite(in MAHandle file, in MAAddress source, in int length);
+		int maFileTell(in MAHandle file);
+
+		constset int MA_FILE_SEEK_ {
+			SEEK_SET = 0;
+			SEEK_CUR = 1;
+			SEEK_END = 2;
+		}
+		int maFileSeek(in MAHandle file, in int offset, in int origin);
+
 		/**
 		* Sends a text SMS. Since this may cost money for the user,
 		* some platforms ask the user for permission,
@@ -2385,7 +2398,7 @@ interface MAAPI {
 		 * Creates and starts a thread.
 		 * \param threadFunc an adress to the entry point for the thread. The function declaration should look
 		 * like typedef int (*ThreadFunc)(void* data);
-		 * \param stack The stack used by the thread, allocated in MoSync code.
+		 * \param stack The stack used by the thread, allocated in MoSync code. This pointer should point to the top of the stack.
 		 * \param data A pointer to some data that will be sent as an argument to the entry point function.
 		 * \returns The id of the thread.
 		 */
@@ -2405,9 +2418,29 @@ interface MAAPI {
 		 */
 		int maWaitThread(in MAHandle threadId);
 
+		/**
+		 * Creates a semaphore.
+		 * \param initialValue The initial value of the semaphore.
+		 * \returns The handle for the semaphore.
+		 */
 		MAHandle maCreateSemaphore(in int initialValue);
+
+		/**
+		 * Destroys a semaphore.
+		 * \param sem The handle to the semaphore to be destroyed.
+		 */
 		int maDestroySemaphore(in MAHandle sem);
+
+		/**
+		 * Waits for a semaphore.
+		 * \param sem The handle to the semaphore to be waited for.
+		 */
 		int maWaitSemaphore(in MAHandle sem);
+
+		/**
+		 * Posts a semaphore.
+		 * \param sem The handle for the semaphore to be posted to.
+		 */
 		int maPostSemaphore(in MAHandle sem);
 	}
 	constset int IOCTL_ {
