@@ -34,10 +34,13 @@ include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 #flag_warnings = gcc4_warnings + gcc43_c_warnings + gcc43_warnings
 
 if(GCC_IS_V4) then
+	base_flags = " -fvisibility=hidden"
 	flag_warnings = gcc4_warnings
 	if(GCC_IS_V43) then
 		flag_warnings += gcc43_c_warnings + gcc43_warnings
 	end
+else
+	base_flags = ""
 end
 if(!GCC_IS_V43) then
 	flag_warnings = ""
@@ -52,7 +55,7 @@ else
 	error "wrong configuration: " + @CONFIG
 end
 
-flags_base = config_flags + include_flags + standard_warnings + lesser_warnings +
+flags_base = config_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
 	pedantic_warnings + flag_warnings
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings

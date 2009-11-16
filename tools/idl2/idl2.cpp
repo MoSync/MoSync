@@ -216,7 +216,7 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 
 		if(syscall)
 			stream << "SYSCALL(";
-		stream << cType(inf, f.returnType) << " ";
+		stream << cType(inf, f.returnType) << " MOSYNC_API ";
 		if(syscall)
 			stream << ", ";
 		if(f.returnType == "noreturn")
@@ -261,6 +261,8 @@ static void outputCpp(const Interface& maapi) {
 		"#else\n"
 		"#error Unsupported compiler!\n"
 		"#endif\n\n";
+
+	streamMoSyncDllDefines(stream);
 
 	streamHeaderFunctions(stream, maapi, true);
 
@@ -325,7 +327,8 @@ static void outputDllDefine(const Interface& maapi) {
 	stream << "EXPORTS\n";
 	for(size_t i=0; i<maapi.functions.size(); i++) {
 		const Function& f(maapi.functions[i]);
-		stream << "\t" << f.name << " @" << f.number << "\n";
+		if(f.name.substr(0, 2) == "ma")
+			stream << "\t" << f.name << " @" << f.number << "\n";
 	}
 	stream << "\tmosyncLibMain @" << maapi.functions.size() + 1 << "\n";
 }

@@ -124,6 +124,7 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 void streamIoctlDefines(ostream& stream, const vector<Ioctl>& ioctls, int ix);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);
+void streamMoSyncDllDefines(ostream& stream);
 
 //implemented by the user
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);

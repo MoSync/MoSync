@@ -177,6 +177,8 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 			"#include <math.h>\n"
 			"#endif	//MAPIP\n"
 			"\n";
+
+		streamMoSyncDllDefines(stream);
 	}
 
 	stream << "#ifdef __cplusplus\n"
@@ -205,6 +207,16 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	}
 
 	stream << "#endif	//" + headerName + "_H\n";
+}
+
+void streamMoSyncDllDefines(ostream& stream) {
+	stream << "#ifdef MOSYNC_DLL_EXPORT\n"
+		"#define MOSYNC_API __declspec(dllexport)\n"
+		"#elif defined(MOSYNC_DLL_IMPORT)\n"
+		"#define MOSYNC_API __declspec(dllimport)\n"
+		"#else\n"
+		"#define MOSYNC_API\n"
+		"#endif\n\n";
 }
 
 static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix) {

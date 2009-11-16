@@ -8,6 +8,7 @@ work.instance_eval do
 	COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]
 	@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal",
 		"Syscall.cpp" => " -Wno-float-equal"}
+	@EXTRA_CPPFLAGS = " -DMOSYNC_DLL_EXPORT"
 	
 	if(HOST == :win32) then
 		@EXTRA_INCLUDES = COMMON_INCLUDES

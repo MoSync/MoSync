@@ -86,8 +86,7 @@ class NativeGccWork < BuildWork
 		return files.collect do |file| FileTask.new(self, file) end
 	end
 	
-	def makeGccTask(source, ending)
-		objName = genfile(source, ending)
+	def getGccFlags(source)
 		ext = source.to_s.getExt
 		cflags = @CFLAGS_MAP[ext]
 		#puts "Ext: '#{ext}' from source '#{source}'"
@@ -96,7 +95,12 @@ class NativeGccWork < BuildWork
 		end
 		#puts "got flags: #{cflags}"
 		cflags += @SPECIFIC_CFLAGS.fetch(File.basename(source.to_s), "")
-		task = CompileGccTask.new(self, objName, source, cflags)
+		return cflags
+	end
+	
+	def makeGccTask(source, ending)
+		objName = genfile(source, ending)
+		task = CompileGccTask.new(self, objName, source, getGccFlags(source))
 		return task
 	end
 	

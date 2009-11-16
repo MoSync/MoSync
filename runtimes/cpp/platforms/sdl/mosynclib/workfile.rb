@@ -7,7 +7,11 @@ work.instance_eval do
 	@SOURCES = []
 	@EXTRA_SOURCEFILES = ["mosynclib.cpp"]
 	@EXTRA_INCLUDES = ["../../../base", ".."]
+	@SPECIFIC_CFLAGS = {"mosynclib.cpp" => " -DMOSYNC_DLL_EXPORT",
+		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	
+	#@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
+	@EXTRA_LINKFLAGS = " mosynclib.def"
 	@LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net"]
 	@LOCAL_DLLS = ["amr"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
@@ -23,7 +27,7 @@ work.instance_eval do
 			sound_lib = [ "SDL_sound" ]
 		else
 			sound_lib = []
-			@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__"
+			@EXTRA_CPPFLAGS += " -D__NO_SDL_SOUND__"
 			@IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
 		end
 		
@@ -40,7 +44,8 @@ work.instance_eval do
 	
 	setup
 	
-	MAIN = CompileGccTask.new(self, @COMMON_BUILDDIR + "mosyncmain.o", FileTask.new(self, "mosyncmain.cpp"), "")
+	source = FileTask.new(self, "mosyncmain.cpp")
+	MAIN = CompileGccTask.new(self, @COMMON_BUILDDIR + "mosyncmain.o", source, getGccFlags(source))
 end
 
 work.invoke

@@ -15,6 +15,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifdef MOSYNC_DLL_EXPORT
+#define MOSYNC_API __declspec(dllexport)
+#elif defined(MOSYNC_DLL_IMPORT)
+#define MOSYNC_API __declspec(dllimport)
+#else
+#define MOSYNC_API
+#endif
+
 typedef int (*mainfunc)();
 
-extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain);
+extern "C" int MOSYNC_API mosyncLibMain(int argc, char** argv, mainfunc maMain);

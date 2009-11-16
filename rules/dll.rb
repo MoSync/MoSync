@@ -7,13 +7,17 @@ class DllTask < FileTask
 		super(work, name)
 		@prerequisites = @objects = objects
 		#@LINKFLAGS = " -shared -Xlinker --no-undefined" + linkflags
-		@LINKFLAGS = " -shared -Wl,--enable-auto-import" + linkflags
+		#" -Wl,-s -Wl,--enable-auto-import -Wl,-M -Wl,-x"
+		@LINKFLAGS = " -shared" + linkflags
 		
 		# todo: save linkflags, like CompileGccTask's CFLAGS.
 	end
 	
 	def execute
 		sh "g++ #{@objects.join(' ')}#{@LINKFLAGS} -o #{@NAME}"
+		#libfile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, ".dll") + ".a"
+		#deffile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, ".dll") + ".def"
+		#sh "dlltool --export-all-symbols -z #{deffile} -l #{libfile} -D #{File.basename(@NAME)} #{@NAME}"
 	end
 end
 

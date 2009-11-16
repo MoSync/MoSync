@@ -37,7 +37,7 @@ class MakeDependLoader
 				if(res) then
 					error "MD: too many logical lines in file '#{fn}'"
 				end
-				res = process_line(line, target)
+				res = process_line(fn, line, target)
 			end
 		end
 		if(res == nil)
@@ -49,11 +49,11 @@ class MakeDependLoader
 	private
 
 	# Process one logical line of makefile data.
-	def MakeDependLoader.process_line(line, target)
-		index = line.index(':')
+	def MakeDependLoader.process_line(fn, line, target)
+		index = line.index(': ')
 		md = line[0, index].strip
 		if(target != md) then
-			error "MD target mismatch. target: '#{target}' md: '#{md}'"
+			error "MD target mismatch in #{fn}. target: '#{target}' md: '#{md}'"
 		end
 		args = line[index+1, line.length]
 		return [] if args.nil?

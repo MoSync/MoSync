@@ -1,0 +1,1 @@
+dlltool -z mosync.def --export-all-symbols mosync.dll
