@@ -3,6 +3,7 @@ AsmData.c
 Opcodes.c
 Directives.c
 allocator.c
+filealloc.c
 constreg.c
 Main.c
 Eval.c
