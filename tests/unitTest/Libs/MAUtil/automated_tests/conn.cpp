@@ -175,12 +175,12 @@ public:
 		for(int i=0; i<mMultiple; i++) {
 			maReadData(CLIENT_DATA, mClientData + (i * DATA_SIZE), 0, DATA_SIZE);
 		}
-
+/*
 		//set a bunch of headers
 		for(int i=0; i<snHeaders; i++) {
 			mHttp.setRequestHeader(sHeaders[i].key, sHeaders[i].value);
 		}
-
+*/
 		char buffer[64];
 		sprintf(buffer, "%i", DATA_SIZE * mMultiple);
 		printf("cl:%d\n", DATA_SIZE*mMultiple);
