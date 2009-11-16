@@ -1,5 +1,7 @@
 require File.expand_path('../../../../../rules/native_mosync.rb')
 
+# todo: make sure only syscalls are exported.
+
 work = MoSyncDll.new
 work.instance_eval do
 	@SOURCES = []

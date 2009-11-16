@@ -1914,7 +1914,7 @@ namespace Base {
 	static int maSendTextSMS(const char* dst, const char* msg);
 	//static int maStartVideoStream(const char* url);
 
-	SYSCALL(int, ATTRIB(noreturn) maInvokeExtension(int, int, int, int)) {
+	SYSCALL(int, GCCATTRIB(noreturn) maInvokeExtension(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
