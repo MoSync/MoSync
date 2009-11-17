@@ -67,9 +67,9 @@ class NativeGccWork < BuildWork
 		#find source files
 		cfiles = collect_files(".c")
 		cppfiles = collect_files(".cpp") + collect_files(".cc") 
-		standard_sourcefiles = cfiles + cppfiles
+		@all_sourcefiles = cfiles + cppfiles
 
-		@source_objects = objects(standard_sourcefiles)
+		@source_objects = objects(@all_sourcefiles)
 		#puts "ho"
 		#puts @EXTRA_OBJECTS
 		all_objects = @source_objects + @EXTRA_OBJECTS

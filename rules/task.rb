@@ -29,7 +29,7 @@ class TaskBase
 	attr_accessor(:prerequisites)
 	
 	def invoke
-		#puts "pre: #{self}"
+		#puts "invoke: #{self}"
 		@prerequisites.each do |p| p.invoke end
 		if(self.needed?) then
 			puts "Execute: #{self}"

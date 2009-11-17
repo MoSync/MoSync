@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef USE_ZLIB
 
-static unsigned long ZLibCompress(unsigned char *target, unsigned long target_size,
+unsigned long ZLibCompress(unsigned char *target, unsigned long target_size,
 	unsigned char *source, unsigned long source_size)
 {
 	uLongf dest_len = (uLongf)target_size;
@@ -45,7 +45,7 @@ static unsigned long ZLibCompress(unsigned char *target, unsigned long target_si
 	return 0;
 }
 
-static unsigned long ZLibUncompress(unsigned char *target, unsigned long target_size,
+unsigned long ZLibUncompress(unsigned char *target, unsigned long target_size,
 	unsigned char *source, unsigned long source_size)
 {
 	uLongf dest_len = (uLongf)target_size;

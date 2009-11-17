@@ -6,7 +6,7 @@ work.instance_eval do
 	@IGNORED_FILES = ["Image.cpp", "audio.cpp"]
 	COMMON_INCLUDES = [".", "../../base"]
 	COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]
-	@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal",
+	@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal -Wno-unreachable-code",
 		"Syscall.cpp" => " -Wno-float-equal"}
 	@EXTRA_CPPFLAGS = " -DMOSYNC_DLL_EXPORT"
 	

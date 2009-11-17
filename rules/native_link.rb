@@ -19,6 +19,7 @@ class NativeGccLinkWork < NativeGccWork
 	def setup3(all_objects)
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
+		@LIBRARIES.each { |l| @EXTRA_LINKFLAGS += " -l" + l }
 		need(:@NAME)
 		need(:@BUILDDIR)
 		need(:@TARGETDIR)

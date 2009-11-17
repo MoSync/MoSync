@@ -666,7 +666,7 @@ int main(int argc,char *argv[])
 //
 //****************************************
 
-static void usage ()
+void usage ()
 {
 	printf ("pipe-tool Copyright 2007-2009 Mobile Sorcery AB\n");
 	printf("Version 1.5 " __DATE__ " " __TIME__ "\n\n");

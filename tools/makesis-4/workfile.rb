@@ -1,0 +1,29 @@
+require File.expand_path('../../rules/native_mosync.rb')
+
+class SisWork < MoSyncExe
+	def init
+		@SOURCES = ["src"]
+		@EXTRA_INCLUDES = ["include", "src"]
+		@IGNORED_FILES = ["makekeys.cpp", "dumptree.cpp", "dumpcontroller.cpp", "finddatetime.cpp"]
+		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-unreachable-code"
+		@LIBRARIES = ["z"]
+		@CUSTOM_LIBS = ["libeay32.lib"]
+	end
+end
+
+makesis = SisWork.new
+makesis.instance_eval do
+	init
+	@IGNORED_FILES += ["signsis.cpp"]
+	@NAME = "makesis-4"
+end
+
+signsis = SisWork.new
+signsis.instance_eval do
+	init
+	@IGNORED_FILES += ["makesis.cpp"]
+	@NAME = "signsis-4"
+end
+
+makesis.invoke
+signsis.invoke
