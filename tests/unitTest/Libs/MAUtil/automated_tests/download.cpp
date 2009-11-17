@@ -20,36 +20,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MATest/Test.h>
 #include <common.h>
 
-class DownloaderTest : private MAUtil::DownloadListener, public KeyBaseCase {
+class DownloaderTest : private MAUtil::DownloadListener, public MATest::TestCase {
 public:
-	DownloaderTest() : KeyBaseCase("Downloader") {}
-
-	bool mIsActive;
-
-	void open() {
-		KeyBaseCase::open();
-	}
-	void close() {
-		KeyBaseCase::close();
-	}
-
-	//KeyListener
-	void keyPressEvent(int keyCode) {
-	}
-	void keyReleaseEvent(int keyCode) {
-		if(!mIsActive)
-			checkYesNo(keyCode);
-		else
-			printf("please wait.. downloading!\n");
-	}
-
-	void showEndText()
-	{
-		printf("\nAutomated tests finished!\nPress right softkey.\n");
-	}
+	DownloaderTest() : TestCase("Downloader") {}
 
 	void start() {
-		mIsActive = false;
 		printf("Automated Downloader test\n");
 		mDown.addDownloadListener(this);
 		int res = mDown.beginDownloading("http://www.example.com/");
@@ -57,29 +32,28 @@ public:
 
 		if(res <= 0) {
 			assert("begin", false);
-			showEndText();
 		}
-		else
-			mIsActive = true;
 	}
 
 	void notifyProgress(MAUtil::Downloader* downloader, int downloadedBytes, int totalBytes) {
 		printf("progress %d\%\n", downloadedBytes/totalBytes * 100);
 	}
+
 	void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data) {
-		mIsActive = false;
 		printf("Finished\nMAHandle: 0x%x\n", data);
 		assert("finished", data > 0);
-		showEndText();
+		suite->runNextCase();
 	}
+
 	void downloadCancelled(MAUtil::Downloader* downloader) {
 		printf("cancelled\n");
+		suite->runNextCase();
 	}
+
 	void error(MAUtil::Downloader* downloader, int code) {
-		mIsActive = false;
 		printf("error %i\n", code);
 		assert("error", false);
-		showEndText();
+		suite->runNextCase();
 	}
 private:
 	MAUtil::Downloader mDown;
