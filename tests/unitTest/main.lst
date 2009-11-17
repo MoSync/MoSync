@@ -11,8 +11,8 @@
 .include "png_test.png"
 
 .res RES_MP3
-.media "audio/mpeg", "mobilesorcery2.mp3"
-//.media "audio/x-wav", "mobilesorcery2.wav"
+//.media "audio/mpeg", "mobilesorcery2.mp3"
+.media "audio/x-wav", "mobilesorcery2.wav"
 
 .res RES_BINTEST
 .bin
