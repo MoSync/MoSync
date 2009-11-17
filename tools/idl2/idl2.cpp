@@ -20,12 +20,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef WIN32
 #include <direct.h>
-#endif
-#ifdef LINUX
+#elif defined(LINUX)
 #include <sys/stat.h>
 inline int _mkdir(const char* name) {
 	return mkdir(name, 0755);
 }
+#else
+#error Unsupported platform
 #endif
 
 #include <idl-common/idl-common.h>

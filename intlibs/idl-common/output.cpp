@@ -435,7 +435,7 @@ static uint32 hash32shift(uint32 key) {
 }
 
 
-#if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) || \
+#if (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))) || defined(__WATCOMC__) || \
 	defined(_MSC_VER) || defined (__BORLANDC__) || defined (__TURBOC__)
 #define get16bits(d) (*((const uint16 *) (d)))
 #endif
@@ -457,6 +457,7 @@ static uint32 SuperFastHash(const char * data, int len) {
 
 	/* Main loop */
 	for (; len > 0; len--) {
+		hash += (*((const uint16*)(data)));
 		hash  += get16bits (data);
 		tmp    = (get16bits (data+2) << 11) ^ hash;
 		hash   = (hash << 16) ^ tmp;
@@ -500,6 +501,9 @@ template<> uint32 templateHash<uint32>(const uint32& v) {
 	return hash32shift(v);
 }
 template<> uint32 templateHash<int>(const int& v) {
+	return hash32shift(v);
+}
+template<> uint32 templateHash<size_t>(const size_t& v) {
 	return hash32shift(v);
 }
 

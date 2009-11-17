@@ -1,4 +1,5 @@
-#BD = '.'
+#!/usr/bin/ruby
+
 # File.expand_path is used here to ensure the files are really only loaded once.
 require File.expand_path('rules/targets.rb')
 require File.expand_path('rules/host.rb')

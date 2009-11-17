@@ -1,4 +1,5 @@
-# File.expand_path is used here to ensure the files are really only loaded once.
+#!/usr/bin/ruby
+
 require File.expand_path('../../rules/task.rb')
 
 work = Work.new

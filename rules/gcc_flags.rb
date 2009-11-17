@@ -15,7 +15,10 @@ gcc4_warnings = " -Wvariadic-macros -Wmissing-include-dirs"
 
 lesser_warnings = " -Winline -Wpointer-arith -Wundef -Wfloat-equal -Winit-self"
 
-pedantic_warnings = " -Wunreachable-code -Wmissing-noreturn -Wmissing-format-attribute"
+pedantic_warnings = " -Wmissing-noreturn -Wmissing-format-attribute"
+
+#broken in GCC 4.3.3
+gcc_not_4_warnings = " -Wunreachable-code"
 
 #only valid in c.
 pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes"
@@ -43,7 +46,7 @@ else
 	base_flags = ""
 end
 if(!GCC_IS_V43) then
-	flag_warnings = ""
+	flag_warnings = gcc_not_4_warnings
 	lesser_conly += gcc43_c_warnings
 end
 
@@ -55,7 +58,16 @@ else
 	error "wrong configuration: " + @CONFIG
 end
 
-flags_base = config_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
+if(HOST == :win32)
+	host_flags = " -DWIN32"
+elsif(HOST == :linux)
+	host_flags = " -DLINUX"
+else
+	error "Unsupported host: #{HOST}"
+end
+
+
+flags_base = config_flags + host_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
 	pedantic_warnings + flag_warnings
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings

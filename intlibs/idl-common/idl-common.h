@@ -35,6 +35,7 @@ struct Define {
 	string value;
 	string comment;
 	int ix;
+	Define() {}
 };
 
 struct Constant {
@@ -105,6 +106,7 @@ struct Interface {
 
 typedef unsigned int uint32;
 typedef unsigned short uint16;
+typedef unsigned char uint8;
 
 #define MAIN_INTERFACE (-1)
 
