@@ -35,7 +35,6 @@ struct Define {
 	string value;
 	string comment;
 	int ix;
-	Define() {}
 };
 
 struct Constant {

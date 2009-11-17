@@ -84,3 +84,11 @@ else
 	EXE_FILE_ENDING = ''
 end
 NATIVE_LIB_FILE_ENDING = '.a'
+
+def filenamesEqual(a, b)
+	if(HOST == :win32)
+		return a.casecmp(b) == 0
+	else
+		return a == b
+	end
+end

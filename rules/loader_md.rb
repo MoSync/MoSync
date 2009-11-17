@@ -14,6 +14,8 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require "#{File.dirname(__FILE__)}/host.rb"
+
 class HeaderFileTask < FileTask
 	def execute
 	end
@@ -52,7 +54,7 @@ class MakeDependLoader
 	def MakeDependLoader.process_line(fn, line, target)
 		index = line.index(': ')
 		md = line[0, index].strip
-		if(target != md) then
+		if(!filenamesEqual(target, md)) then
 			error "MD target mismatch in #{fn}. target: '#{target}' md: '#{md}'"
 		end
 		args = line[index+1, line.length]
