@@ -40,13 +40,7 @@ work.instance_eval do
 	@NAME = "mosync_sdl"
 end
 
-gen = FileTask.new(work, "config_platform.h")
-gen.instance_eval do
-	@prerequisites = [FileTask.new(work, "config_platform.h.example")]
-	def execute
-		File.copy(@NAME, @prerequisites)
-	end
-end
+config = CopyFileTask.new(work, "config_platform.h", FileTask.new(work, "config_platform.h.example")) 
 
-gen.invoke
+config.invoke
 work.invoke

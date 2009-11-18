@@ -19,9 +19,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HASH_MAP_H
 
 #ifdef __GNUC__
+#ifdef HAVE_TR1
+#include <unordered_map>
+#define hash_map std::unordered_map
+#else
 #include <ext/hash_map>
 using namespace __gnu_cxx;
-
+#if 0	//varies by platform
 namespace __gnu_cxx {
 	template<> struct hash<std::string>
 	{
@@ -29,6 +33,8 @@ namespace __gnu_cxx {
 		{ return __stl_hash_string(__s.c_str()); }
 	};
 }
+#endif	//0
+#endif	//HAVE_TR1
 #elif defined(_MSC_VER)
 #include <hash_map>
 using namespace stdext;

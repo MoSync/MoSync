@@ -364,8 +364,8 @@ static const TypeBase* subParseMembers(int size, char** pText, const string& nam
 		// for anonymous structs generate a type name that isn't valid c or c++.
 		static int anonId = 0;
 		char tmp[16];
-		itoa(anonId++, tmp, 10); 
-		st = new StructType(size, "___AnonymousStruct" + std::string(tmp));
+		sprintf(tmp, "%i", anonId++); 
+		st = new StructType(size, "___AnonymousStruct" + string(tmp));
 	} else {
 		st = new StructType(size, name);
 	}

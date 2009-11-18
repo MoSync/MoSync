@@ -88,11 +88,11 @@ void LongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFor
 }
 
 void LongLongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%I64i", *(s64*)data);
+	pf("%"INT64PREFIX"i", *(s64*)data);
 }
 
 void LongLongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%I64u", *(u64*)data);
+	pf("%"INT64PREFIX"u", *(u64*)data);
 }
 
 void ShortInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {

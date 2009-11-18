@@ -41,9 +41,11 @@ if(GCC_IS_V4) then
 	flag_warnings = gcc4_warnings
 	if(GCC_IS_V43) then
 		flag_warnings += gcc43_c_warnings + gcc43_warnings
+		cpp_flags = " -std=c++0x -DHAVE_TR1"
 	end
 else
 	base_flags = ""
+	cpp_flags = ""
 end
 if(!GCC_IS_V43) then
 	flag_warnings = gcc_not_4_warnings
@@ -72,7 +74,7 @@ flags_base = config_flags + host_flags + base_flags + include_flags + standard_w
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings
 
-cppflags_base = " -fno-rtti" + flags_base
+cppflags_base = cpp_flags + " -fno-rtti -fPIC" + flags_base
 # -Wno-deprecated
 
 @CFLAGS = cflags_base + @EXTRA_CFLAGS

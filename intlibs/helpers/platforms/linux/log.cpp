@@ -79,7 +79,7 @@ void LogV(const char* fmt, va_list args) {
 void LogTime() {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	Log(" @ %i\n", ((tv.tv_sec - sStartTime.tv_sec) * 1000) + ((tv.tv_usec - sStartTime.tv_usec) / 1000));
+	Log(" @ %li\n", ((tv.tv_sec - sStartTime.tv_sec) * 1000) + ((tv.tv_usec - sStartTime.tv_usec) / 1000));
 }
 
 void LogTime(const char* fmt, ...) {

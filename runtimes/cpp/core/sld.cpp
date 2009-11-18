@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 #include <set>
-#include <functional>
+//#include <functional>
 
 #define CONFIG_H	//HACK
 #define LOGGING_ENABLED
@@ -33,9 +33,12 @@ using namespace std;
 #define String std::string
 #define Vector std::vector
 
+#ifndef _MSC_VER
+#define stricmp strcasecmp
+#endif 
 
 struct linemap_file_line_less
-	: public std::binary_function<LineMapping, LineMapping, bool>
+//	: public std::binary_function<LineMapping, LineMapping, bool>
 {	// functor for operator<
 	bool operator()(const LineMapping& _Left, const LineMapping& _Right) const
 	{	// apply operator< to operands
@@ -47,7 +50,7 @@ struct linemap_file_line_less
 };
 
 struct funcmap_start_less
-	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
+//	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
 {
 	bool operator()(const FuncMapping* const& l, const FuncMapping* const& r) const
 	{
@@ -56,7 +59,7 @@ struct funcmap_start_less
 };
 
 struct funcmap_name_less
-	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
+//	: public std::binary_function<FuncMapping*, FuncMapping*, bool>
 {
 	bool operator()(const FuncMapping* const& l, const FuncMapping* const& r) const
 	{

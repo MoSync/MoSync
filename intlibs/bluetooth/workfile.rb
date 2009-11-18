@@ -5,8 +5,11 @@ work.instance_eval do
 	if(HOST == :linux)
 		@SOURCES = [".", "linux", "linux/bluez"]
 		if(BLUETOOTH)
-			@EXTRA_CFLAGS = " -DBLUEZ_SUPPORTED"
+			@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
+		else
+			error "libbluetooth-dev missing!"
 		end
+		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 	elsif(HOST == :win32)
 		@SOURCES = [".", "win32"]
 		if(!GCC_IS_V4)
