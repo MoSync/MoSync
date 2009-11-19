@@ -119,7 +119,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 	//private boolean firstRun = true;
 	public final void run() {
+#ifndef JDB_DEBUG
 		try {
+#endif
 			//if(firstRun)
 			{
 				int w = getWidth();
@@ -146,7 +148,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			mCore.run();
 #else
 			while(true) {
+#ifndef JDB_DEBUG
 				try {
+#endif
 					DEBUG_ALWAYS("mainLoop start\n");
 					mStop = mDestroy = false;
 #ifndef PHONE_RELEASE
@@ -212,6 +216,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 							return;
 						}	//if
 					}	//synchronized
+#ifndef JDB_DEBUG
 				} catch(Throwable e) {
 					if(mReload) {
 						PRINT_STACK_TRACE;
@@ -220,8 +225,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 						throw e;
 					}
 				}
+#endif
 			}	//while
 #endif	//MOSYNC_STATIC_JAVA
+#ifndef JDB_DEBUG
 		} catch(Throwable e) {
 			PRINT_STACK_TRACE;
 #ifdef MOSYNC_STATIC_JAVA
@@ -239,8 +246,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		} finally {
 			DEBUG_ALWAYS("MainCanvas.run() ends\n");
 		}
+#endif
 	}
 
+#ifndef JDB_DEBUG
 	private void handleRuntimeException(Throwable e) {
 		if(mCore == null) {
 			mMidlet.programError("Loading error: " + formatThrowable(e));
@@ -248,6 +257,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			mMidlet.programError(formatThrowable(e));
 		}
 	}
+#endif	//JDB_DEBUG
 
 	private String formatThrowable(Throwable e) {
 		//cut out important parts of Exception string
@@ -327,12 +337,16 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		NUMBER_KEYS(CONVERTB_NUM);
 		OTHER_KEYS(CONVERTB_OTHER);
 
+#ifndef JDB_DEBUG
 		try {
+#endif
 			int action = getGameAction(keyCode);
 			ACTION_KEYS(CONVERTB_GAC);
+#ifndef JDB_DEBUG
 		} catch(IllegalArgumentException e) {
 			PRINT_STACK_TRACE;
 		}
+#endif
 
 		CUSTOM_KEYS(CONVERTB_CUSTOM);
 
@@ -340,7 +354,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	}
 		
 	private final void handleKeyEvent(int keyCode, boolean released) {
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		try {
 #endif
 #ifdef MA_IX_NATIVE_KEY_PRESSED
@@ -364,7 +378,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 				EI_KEY = mak;
 				postEvent(event);
 			}
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
 			MAMidlet.self.programError("Key error", e);
@@ -590,7 +604,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	synchronized public final void commandAction(Command c, Displayable d) {
 		DEBUG_ALWAYS("commandAction " + d + "\n");
 		//always the Alert's DISMISS command
+#ifndef JDB_DEBUG
 		try {
+#endif
 #ifndef MOSYNC_COMMERCIAL
 			if(d == mStartupAlert) {
 				if(mCore != null) {
@@ -604,9 +620,11 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 				this.notify();
 				mMidlet.destruct();
 			}
+#ifndef JDB_DEBUG
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
 		}
+#endif
 	}
 
 	//these two are only called from inside the thread
@@ -648,14 +666,18 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	}
 
 	private final void initAndStart() {
+#ifndef JDB_DEBUG
 		try {
+#endif
 			mSCState = 0;
 			mCore.mSyscall.init();
 			mMidlet.mThread.start();
+#ifndef JDB_DEBUG
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
 			handleRuntimeException(e);
 		}
+#endif
 	}
 
 	//ugly hacks
@@ -665,7 +687,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 //#if defined(MA_PROF_BUG_MICROEMU) || !defined(PHONE_RELEASE)
 	protected final void sizeChanged(int w, int h) {
 		DEBUG_ALWAYS("sizeChanged " + w + " " + h + "\n");
+#ifndef JDB_DEBUG
 		try {
+#endif
 #ifdef MA_PROF_BUG_MICROEMU
 			mBackbuffer = Image.createImage(getWidth(), getHeight());
 #endif	//MA_PROF_BUG_MICROEMU
@@ -678,10 +702,12 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 				initAndStart();
 				return;
 			}
+#ifndef JDB_DEBUG
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;
 			handleRuntimeException(e);
 		}
+#endif
 	}
 //#endif
 

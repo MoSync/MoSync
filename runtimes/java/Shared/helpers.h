@@ -56,6 +56,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define BIG_PHAT_ERROR throw new BigPhatError(IN_FILE_ON_LINE_STRING)
 #endif
 
+#ifdef JDB_DEBUG
+#define JDB_EXCEPTION throws Exception
+#else
+#define JDB_EXCEPTION
+#endif
+
 #define MYASSERT(a) if(!(a)) BIG_PHAT_ERROR
 
 #define INVALID_SYSCALL_NUMBER 256

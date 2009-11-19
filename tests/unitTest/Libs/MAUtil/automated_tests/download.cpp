@@ -36,7 +36,7 @@ public:
 	}
 
 	void notifyProgress(MAUtil::Downloader* downloader, int downloadedBytes, int totalBytes) {
-		printf("progress %d\%\n", downloadedBytes/totalBytes * 100);
+		printf("progress %d%%\n", downloadedBytes/totalBytes * 100);
 	}
 
 	void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data) {

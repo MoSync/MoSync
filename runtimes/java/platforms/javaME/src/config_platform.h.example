@@ -26,6 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define DEBUG_MEMORY	//defined by _DEBUG
 //#define DEBUG_SYSCALLS	//defined by _DEBUG
 
+//#define JDB_DEBUG	//disables main exception handling
+
 //#define GDB_DEBUG
 //#define BLUETOOTH_LOG	//send debug output over Bluetooth
 //#define TCP_LOG	//send debug output over TCP/IP

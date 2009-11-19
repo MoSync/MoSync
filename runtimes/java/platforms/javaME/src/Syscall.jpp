@@ -131,7 +131,7 @@ IMPLEMENTS MoSync
 #endif	//MOSYNC_IDL2
 #endif	//MOSYNC_STATIC_JAVA
 
-	public void init() throws Exception
+	public void init()
 	{
 		DEBUG_ALWAYS("Syscall.init();\n");
 		mGraphics = mCanvasGraphics = mCanvas.getGraphics();
