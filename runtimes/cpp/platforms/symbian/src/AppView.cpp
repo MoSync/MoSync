@@ -611,6 +611,7 @@ int CAppView::GetEvent(MAEvent* ep) {
 		return 0;
 	else {
 
+	//TODO: clean up using static const table instead of macro.
 #define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ep->type == eventType) { \
 	memcpy(Core::GetCustomEventPointer(iCore), ep->data, sizeof(dataType)); \
 	delete (dataType*)ep->data; \

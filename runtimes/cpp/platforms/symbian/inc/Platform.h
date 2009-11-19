@@ -157,6 +157,8 @@ private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;
 };
+
+#define MA_PROF_SUPPORT_LOCATIONAPI	//for custom events
 #endif	//SUPPORT_MOSYNC_SERVER
 
 class CDirScrAccEng;

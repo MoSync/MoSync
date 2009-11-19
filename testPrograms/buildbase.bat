@@ -8,6 +8,8 @@ REM -Wshadow
 set IFLAGS=-I%MOSYNCDIR%/include -I%MOSYNCDIR%/libs -I%MOSYNCDIR%/profiles/vendors/MobileSorcery/Emulator
 set CFLAGS=-O0 -fno-omit-frame-pointer -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings
 xgcc -g -S %IFLAGS% %CFLAGS% -o temp.s %1
+@REM gcj  -g -C -E %IFLAGS% %CFLAGS% %1
+@REM goto end
 
 if not exist temp.s goto end
 echo Done.

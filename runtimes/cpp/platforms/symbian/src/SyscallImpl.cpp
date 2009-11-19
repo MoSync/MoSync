@@ -1561,6 +1561,23 @@ int Syscall::maLocationStop() {
 	return 1;
 }
 
+
+//quick hack
+union DV {
+	int i[2];
+	double dbl;
+};
+
+static double swapd(double d) {
+	DV dv1;
+	dv1.dbl = d;
+	DV dv2;
+	dv2.i[0] = dv1.i[1];
+	dv2.i[1] = dv1.i[0];
+	return dv2.dbl;
+}
+
+
 void Syscall::LocationHandlerL(TInt status) {
 	LOG("LocationHandlerL(%i)\n", status);
 	//not so good; will fail silently.
@@ -1573,10 +1590,10 @@ void Syscall::LocationHandlerL(TInt status) {
 	LOG("lat: %g\n", p.Latitude());
 	loc->state = p.Datum() == KPositionDatumWgs84 ?
 		MA_LOC_QUALIFIED : MA_LOC_INVALID;
-	loc->lat = p.Latitude();
-	loc->lon = p.Longitude();
-	loc->horzAcc = p.HorizontalAccuracy();
-	loc->vertAcc = p.VerticalAccuracy();
+	loc->lat = swapd(p.Latitude());
+	loc->lon = swapd(p.Longitude());
+	loc->horzAcc = swapd(p.HorizontalAccuracy());
+	loc->vertAcc = swapd(p.VerticalAccuracy());
 
 	gServer.LocationGet(*gLocationSync->Status());
 	gLocationSync->SetActive();
