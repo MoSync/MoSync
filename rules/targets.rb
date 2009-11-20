@@ -31,8 +31,18 @@ class Targets
 			fail "No Task Name Given" if args.size < 1
 			name = args.keys[0]
 			preqs = args[name]
-			preqs = [preqs] if (String===preqs) || (Regexp===preqs) || (Proc===preqs) || (Symbol===preqs)
-			preqs = preqs.collect do |p| @@targets[p] end
+			preqs = [preqs] if !preqs.respond_to?(:collect)
+			preqs = preqs.collect do |p|
+				puts "testing: #{p.inspect}"
+				if(p.respond_to?(:invoke))
+					p
+				else
+					if(@@targets[p] == nil)
+						error "Target #{p.inspect} does not exist."
+					end
+					@@targets[p]
+				end
+			end
 		else
 			name = args
 			preqs = []

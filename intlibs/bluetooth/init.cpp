@@ -86,13 +86,13 @@ int Bluetooth::getLocalAddress(MABtAddr& addr) {
 	BLUETOOTH_FIND_RADIO_PARAMS bfrp;
 	bfrp.dwSize = sizeof(bfrp);
 	if(BluetoothFindFirstRadio(&bfrp, &h) == NULL) {
-		LOG("GLE %i, ", GetLastError());
+		LOG("GLE %i, ", (int)GetLastError());
 		return CONNERR_GENERIC;
 	}
 
 	bri.dwSize = sizeof(bri);
 	if(BluetoothGetRadioInfo(h, &bri) != ERROR_SUCCESS) {
-		LOG("GLE %i, ", GetLastError());
+		LOG("GLE %i, ", (int)GetLastError());
 		return CONNERR_GENERIC;
 	}
 	for(int i=0; i<BTADDR_LEN; i++) {

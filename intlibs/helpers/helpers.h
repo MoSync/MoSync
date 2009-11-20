@@ -194,7 +194,7 @@ namespace MoSyncError {
 
 #define CHECK_NZ(a) { int test_s = (a); if(test_s != 0) LOG_VAL(test_s); }
 
-#define GLECUSTOM(a) if((a)) { LOG("GLE %i, ", GetLastError()); BIG_PHAT_ERROR(ERR_INTERNAL); }
+#define GLECUSTOM(a) if((a)) { LOG("GLE %i, ", (int)GetLastError()); BIG_PHAT_ERROR(ERR_INTERNAL); }
 #define GLE(a) GLECUSTOM((a) == 0)
 
 #define HRES(a) { HRESULT hres = (a); if(FAILED(hres)) { LOG("HRES 0x%08X, ", hres);\

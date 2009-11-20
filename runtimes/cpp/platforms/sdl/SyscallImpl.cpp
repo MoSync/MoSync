@@ -729,7 +729,7 @@ namespace Base {
 		MAHandleKeyEventMAK(mak, pressed);
 	}
 
-	static Uint32 SDLCALL ATTRIB(noreturn) ExitCallback(Uint32 interval, void*) {
+	static Uint32 GCCATTRIB(noreturn) SDLCALL ExitCallback(Uint32 interval, void*) {
 		LOG("ExitCallback %i\n", interval);
 
 		{	//dump panic report
@@ -1553,7 +1553,7 @@ namespace Base {
 				}
 				else
 				{
-					LOG("maCloseStore: %s error %i\n", filename, error);
+					LOG("maCloseStore: %s error %i\n", filename, (int)error);
 					BIG_PHAT_ERROR(WINERR_STORE_DELETE_FAILED);
 				}
 			}

@@ -102,7 +102,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 		}
 	} else {
 		if(nbw != in.length()) {
-			LOG("WriteFile mismatch: %i!=%i\n", nbw, in.length());
+			LOG("WriteFile mismatch: %i!=%i\n", (int)nbw, (int)in.length());
 			return -1;
 		}
 		DEBUG_ASSERT(SetEvent(hEvent));
@@ -132,7 +132,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 			if(res == WAIT_OBJECT_0) {
 				hStdinPipeWrite.close();
 			} else if(res != WAIT_TIMEOUT) {
-				LOG("WaitForSingleObject error %i\n");
+				LOG("WaitForSingleObject error %i\n", res);
 				DO_GLE;
 			}
 		}

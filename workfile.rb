@@ -51,8 +51,7 @@ skins.instance_eval do
 	end
 end
 
-target :base do
-	skins.invoke
+target :base => skins do
 	do_subdirs(PRE_DIRS)
 	do_subdir("tools/idl2", "compile")
 end

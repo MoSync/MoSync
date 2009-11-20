@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #else
 #include <ext/hash_map>
 using namespace __gnu_cxx;
-#if 0	//varies by platform
+#if 1
 namespace __gnu_cxx {
 	template<> struct hash<std::string>
 	{
@@ -33,7 +33,7 @@ namespace __gnu_cxx {
 		{ return __stl_hash_string(__s.c_str()); }
 	};
 }
-#endif	//0
+#endif	//1
 #endif	//HAVE_TR1
 #elif defined(_MSC_VER)
 #include <hash_map>
