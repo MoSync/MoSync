@@ -210,10 +210,20 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 }
 
 void streamMoSyncDllDefines(ostream& stream) {
-	stream << "#ifdef MOSYNC_DLL_EXPORT\n"
-		"#define MOSYNC_API __declspec(dllexport)\n"
+	stream << "#ifdef WIN32\n"
+		"#define DLLEXPORT ATTRIB(dllexport)\n"
+		"#define DLLIMPORT ATTRIB(dllimport)\n"
+		"#elif defined(LINUX)\n"
+		"#define DLLEXPORT ATTRIB(visibility(\"default\"))\n"
+		"#define DLLIMPORT\n"
+		"#else\n"
+		"#error Unsupported platform!\n"
+		"#endif\n"
+		"\n"
+		"#ifdef MOSYNC_DLL_EXPORT\n"
+		"#define MOSYNC_API DLLEXPORT\n"
 		"#elif defined(MOSYNC_DLL_IMPORT)\n"
-		"#define MOSYNC_API __declspec(dllimport)\n"
+		"#define MOSYNC_API DLLIMPORT\n"
 		"#else\n"
 		"#define MOSYNC_API\n"
 		"#endif\n\n";

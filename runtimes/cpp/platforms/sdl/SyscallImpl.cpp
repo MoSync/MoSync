@@ -450,7 +450,7 @@ namespace Base {
 		SDL_RWops* rwops = SDL_RWFromConstMem(s.ptr(), size);
 		//SDL_Surface* surf = IMG_LoadPNG_RW(rwops);
 		SDL_Surface* surf = IMG_Load_RW(rwops, 0);
-		if(!surf) LOG(IMG_GetError());
+		if(!surf) LOG("%s\n", IMG_GetError());
 
 		surf = SDL_DisplayFormatAlpha(surf);
 		MYASSERT(surf, SDLERR_TILESET_LOAD_FAILED);
@@ -729,7 +729,7 @@ namespace Base {
 		MAHandleKeyEventMAK(mak, pressed);
 	}
 
-	static Uint32 SDLCALL ExitCallback(Uint32 interval, void*) {
+	static Uint32 SDLCALL ATTRIB(noreturn) ExitCallback(Uint32 interval, void*) {
 		LOG("ExitCallback %i\n", interval);
 
 		{	//dump panic report
@@ -753,7 +753,7 @@ namespace Base {
 			"The application failed to respond to the Close Event and will be terminated.",
 			"MoSync Panic");
 		TerminateProcess(GetCurrentProcess(), 0);
-		return 0;	//unreachable, but the compiler doesn't know.
+		exit(0);	//unreachable, but the compiler doesn't know.
 #else
 		MoSyncMessageBox(
 			"The application failed to respond to the Close Event and will be terminated.",
@@ -1472,7 +1472,7 @@ namespace Base {
 		SDL_RWops* rwops = SDL_RWFromStream(copy());
 		if(!rwops)
 		{
-			LOG(SDL_GetError());
+			LOG("%s\n", SDL_GetError());
 			DEBIG_PHAT_ERROR;
 		}
 		SDL_Surface* surf = IMG_LoadPNG_RW(rwops);
@@ -2223,7 +2223,8 @@ namespace Base {
 			return -2;
 		}
 #elif defined(LINUX)
-		BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+		return IOCTL_UNAVAILABLE;
 #else
 #error Unknown platform!
 #endif
@@ -2239,7 +2240,8 @@ namespace Base {
 			return -2;
 		}
 #elif defined(LINUX)
-		BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+		return IOCTL_UNAVAILABLE;
 #else
 #error Unknown platform!
 #endif

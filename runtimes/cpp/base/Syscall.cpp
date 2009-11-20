@@ -25,14 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef _WIN32_WCE
 //#include <windows.h>
 #include "wce_helpers.h"
-#else
-#ifndef SYMBIAN
-#ifdef LINUX
-#include <sys/stat.h>
-#else
-#include <direct.h>
-#endif	//LINUX
-#endif	//SYMBIAN
+#elif !defined(SYMBIAN)
+#include "helpers/mkdir.h"
 #endif	//_WIN32_WCE
 
 using namespace Base;
@@ -427,10 +421,8 @@ namespace Base {
 			strcat(temp, STORE_PATH);
 			convertAsciiToUnicode(wtemp, 256, temp);
 			CreateDirectory(wtemp, NULL);
-#elif defined(WIN32)
+#else
 			_mkdir(STORE_PATH);
-#elif defined(LINUX)
-			mkdir(STORE_PATH, 0755);
 #endif
 			storeDirectoryCreated = true;
 		}

@@ -15,7 +15,7 @@ work.instance_eval do
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	
 	#@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
-	@EXTRA_LINKFLAGS = " mosynclib.def"
+	#@EXTRA_LINKFLAGS = " mosynclib.def"
 	
 	@NAME = "mosync"
 	

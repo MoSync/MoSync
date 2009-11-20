@@ -11,14 +11,16 @@ typedef char int8;
 typedef short int16;
 typedef unsigned short uint16;
 
-#ifdef _MSC_VER
+#ifdef WIN32
 #define DLL_EXPORT __declspec(dllexport)
 #define DLL_IMPORT __declspec(dllimport)
-#elif defined(__GNUC__)
-#define DLL_EXPORT
+#else
+#ifdef __GNUC__
+#define DLL_EXPORT __attribute((visibility("default")))
 #define DLL_IMPORT
 #else
 #error Unsupported compiler!
+#endif
 #endif
 
 #ifdef GSM_AMR_EXPORTS

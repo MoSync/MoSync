@@ -15,10 +15,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "helpers/attribute.h"
+
+#ifdef WIN32
+#define DLLEXPORT ATTRIB(dllexport)
+#define DLLIMPORT ATTRIB(dllimport)
+#elif defined(LINUX)
+#define DLLEXPORT ATTRIB(visibility("default"))
+#define DLLIMPORT
+#else
+#error Unsupported platform!
+#endif
+
 #ifdef MOSYNC_DLL_EXPORT
-#define MOSYNC_API __declspec(dllexport)
+#define MOSYNC_API DLLEXPORT
 #elif defined(MOSYNC_DLL_IMPORT)
-#define MOSYNC_API __declspec(dllimport)
+#define MOSYNC_API DLLIMPORT
 #else
 #define MOSYNC_API
 #endif

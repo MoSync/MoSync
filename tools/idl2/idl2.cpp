@@ -18,21 +18,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fstream>
 #include <stdlib.h>
 
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX)
-#include <sys/stat.h>
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
-}
-#else
-#error Unsupported platform
-#endif
-
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
 #include <idl-common/stringFunctions.h>
 #include <idl-common/types.h>
+
+#include "helpers/mkdir.h"
 
 #include "core.h"
 
@@ -217,12 +208,14 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 
 		if(syscall)
 			stream << "SYSCALL(";
-		stream << cType(inf, f.returnType) << " MOSYNC_API ";
+		stream << cType(inf, f.returnType);
+		if(!syscall)
+			stream << " MOSYNC_API";
 		if(syscall)
 			stream << ", ";
 		if(f.returnType == "noreturn")
-			stream << "ATTRIBUTE(noreturn, ";
-		stream << f.name << "(";
+			stream << " ATTRIBUTE(noreturn,";
+		stream << " " << f.name << "(";
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);
 			if(j != 0)

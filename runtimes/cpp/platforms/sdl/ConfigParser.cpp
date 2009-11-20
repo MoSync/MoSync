@@ -148,7 +148,7 @@ bool parseConfig(const std::string& configPath) {
 		XML_Parse(xmlParser, file, fileLength, 1);
 		delete file;
 	} catch (exception& e) {
-		LOG(e.what());
+		LOG("%s\n", e.what());
 		return false;
 	}
 

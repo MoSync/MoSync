@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // 						   		Written by A.R.Hartley
 //*********************************************************************************************
 
-#include <direct.h>
+#include "helpers/mkdir.h"
 
 #include "compile.h"
 

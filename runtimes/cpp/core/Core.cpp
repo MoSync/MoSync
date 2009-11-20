@@ -780,7 +780,7 @@ public:
 #define dumpJump(a)
 #endif
 #define JMP_GENERIC(address) dumpJump(address); if(uint(address) >= CODE_SEGMENT_SIZE) {\
-	LOG("\nIllegal jump to 0x%04X\n", address); BIG_PHAT_ERROR(ERR_IMEM_OOB); }\
+	LOG("\nIllegal jump to 0x%04X\n", (uint)address); BIG_PHAT_ERROR(ERR_IMEM_OOB); }\
 		ip = (byte*)(mem_cs + (address));
 #else
 #define JMP_GENERIC(address) \
