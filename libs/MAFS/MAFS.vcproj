@@ -106,7 +106,6 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)/Libs;$(SolutionDir)/Libs/MAStd"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="0"
 				RuntimeLibrary="3"
@@ -174,6 +173,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="../;../MaStd"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				WarnAsError="true"
