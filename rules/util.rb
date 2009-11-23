@@ -49,3 +49,14 @@ class Object
 		end
 	end
 end
+
+def verbose_rm_rf(list)
+	case list
+	when Array
+		arr = list.collect do |p| p.to_str end
+		puts "Remove #{arr.inspect}"
+	else
+		puts "Remove '#{list}'"
+	end
+	FileUtils.rm_rf(list)
+end

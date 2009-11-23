@@ -18,12 +18,14 @@ work.instance_eval do
 	#@EXTRA_LINKFLAGS = " mosynclib.def"
 	
 	@NAME = "mosync"
-	
-	setup
-	
-	source = FileTask.new(self, "mosyncmain.cpp")
-	MAIN = CompileGccTask.new(self, @COMMON_BUILDDIR + "mosyncmain.o", source, getGccFlags(source))
+end
+
+main = NativeMoSyncLib.new
+main.instance_eval do
+	@SOURCES = []
+	@EXTRA_SOURCEFILES = ["mosyncmain.cpp"]
+	@NAME = "mosyncmain"
 end
 
 work.invoke
-MAIN.invoke
+main.invoke

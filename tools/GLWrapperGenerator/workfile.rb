@@ -20,6 +20,11 @@ work.instance_eval do
 			CopyFileTask.new(self, t, gt)
 		}
 	end
+	
+	def execute_clean
+		verbose_rm_rf(@TARGET_FILES)
+		verbose_rm_rf(@TARGET_FILES.collect do |t| File.basename(t) end)
+	end
 end
 
 work.invoke

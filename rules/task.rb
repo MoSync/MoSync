@@ -1,4 +1,5 @@
 require "#{File.dirname(__FILE__)}/defaults.rb"
+require "#{File.dirname(__FILE__)}/targets.rb"
 require 'fileutils'
 require 'singleton'
 require 'ftools'
@@ -57,12 +58,24 @@ class Work < TaskBase
 	
 	def invoke
 		#puts "Work.invoke: #{@NAME.inspect}"
+		
 		if(@prerequisites == nil) then
 			setup
 			if(@prerequisites == nil)
 				error "setup failed"
 			end
 		end
+		
+		# if you invoke a work without setting up any targets,
+		# we will check for the "clean" goal here.
+		if(Targets.size == 0)
+			Targets.setup
+			if(Targets.goals == [:clean])
+				self.execute_clean
+				return
+			end
+		end
+		
 		@prerequisites.each do |p| p.invoke end
 	end
 	
@@ -93,6 +106,12 @@ class BuildWork < Work
 		@prerequisites = [DirTask.new(self, @BUILDDIR)]
 		setup2
 		#dump(0)
+	end
+	
+	def execute_clean
+		#puts "execute_clean in #{self.inspect}"
+		verbose_rm_rf(@TARGET)
+		verbose_rm_rf(@BUILDDIR)
 	end
 end
 

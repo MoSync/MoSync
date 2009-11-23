@@ -18,11 +18,16 @@ class Targets
 	end
 	
 	@@targets = {}
+	@@goals = []
 	
 	def Targets.reset(args)
 		@@targets = {}
 		@@args = args
+		@@goals = []
 	end
+	
+	def Targets.size() @@targets.size end
+	def Targets.goals() @@goals end
 	
 	def Targets.add(args, &block)
 		case args
@@ -33,7 +38,7 @@ class Targets
 			preqs = args[name]
 			preqs = [preqs] if !preqs.respond_to?(:collect)
 			preqs = preqs.collect do |p|
-				puts "testing: #{p.inspect}"
+				#puts "testing: #{p.inspect}"
 				if(p.respond_to?(:invoke))
 					p
 				else
@@ -53,7 +58,7 @@ class Targets
 	
 	# parse ARGV
 	def Targets.setup
-		@@goals = []
+		return if(@@goals.size != 0)
 		if(defined?(@@args) != nil)
 			#puts "Got args from reset."
 			args = @@args

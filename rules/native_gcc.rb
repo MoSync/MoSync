@@ -54,9 +54,9 @@ class NativeGccWork < BuildWork
 	end
 	
 	private
-
+	
 	include GccFlags
-
+	
 	def setup2
 		#puts "NativeGccWork.setup2: #{@NAME.inspect}"
 		define_cflags

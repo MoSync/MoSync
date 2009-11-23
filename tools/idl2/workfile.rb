@@ -39,7 +39,8 @@ target :compile => :default do
 end
 
 target :clean do
-	sh "rm -rf Output"
+	verbose_rm_rf("build")
+	verbose_rm_rf("Output")
 	#TODO: remove all copied files
 end
 

@@ -30,11 +30,15 @@ EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs", "examples"]
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
 
 
-def do_subdir(dir, target="")
-	Work.invoke_subdir(dir, target)
+def do_subdir(dir, target=nil)
+	if(target)
+		Work.invoke_subdir(dir, target)
+	else
+		Work.invoke_subdir(dir)
+	end
 end
 
-def do_subdirs(dirs, target="")
+def do_subdirs(dirs, target=nil)
 	dirs.each do |dir| do_subdir(dir, target) end
 end
 
@@ -69,6 +73,7 @@ target :examples => :base do
 end
 
 target :clean do
+	verbose_rm_rf("build")
 	do_subdirs(PRE_DIRS, "clean")
 	do_subdir("tools/idl2", "clean")
 	do_subdirs(MAIN_DIRS, "clean")
