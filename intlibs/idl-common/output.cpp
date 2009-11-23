@@ -216,8 +216,6 @@ void streamMoSyncDllDefines(ostream& stream) {
 		"#elif defined(LINUX)\n"
 		"#define DLLEXPORT ATTRIB(visibility(\"default\"))\n"
 		"#define DLLIMPORT\n"
-		"#else\n"
-		"#error Unsupported platform!\n"
 		"#endif\n"
 		"\n"
 		"#ifdef MOSYNC_DLL_EXPORT\n"
