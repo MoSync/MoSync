@@ -40,9 +40,9 @@ TYPES(V_OPERATOR_CAST_ELEM_SOURCE)
 
 TypeBase* getTypeBaseFromType(Builtin::SubType type) {
 	for(int i = 0; i < snBuiltins; i++) {
-		if(sBuiltins[i].type->type == TypeBase::eBuiltin) {
+		if(sBuiltins[i].type->type() == TypeBase::eBuiltin) {
 			if(((Builtin*)sBuiltins[i].type)->mSubType == type) {
-				return sBuiltins[i].type;	
+				return sBuiltins[i].type;
 			}
 		}
 	}
@@ -96,7 +96,7 @@ Value::Value(const std::string& value) {
 }
 
 Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES) {
-	mSym.type = mSym.type->resolve();
+	mSym.type = mSym.type;
 	if(getType() == TypeBase::ePointer ) {
 		if(!mSym.address) throw ParseException("Invalid pointer.");
 		this->Int = *(const int*)mSym.address;	
@@ -128,7 +128,7 @@ bool Value::isType() const {
 
 int Value::sizeOf() const {
 	if(mSym.type) {
-		return mSym.type->size;
+		return mSym.type->size();
 	} else {
 		throw ParseException("Sizeof not applicable on value.");
 	}
@@ -144,7 +144,7 @@ Builtin::SubType Value::getPrimitiveType() const {
 }
 
 TypeBase::Type Value::getType() const {
-	return (!mSym.type)?TypeBase::eUnknown:mSym.type->type;
+	return (!mSym.type) ? TypeBase::eUnknown : mSym.type->type();
 }
 
 const SYM& Value::getSymbol() const { 
@@ -173,9 +173,9 @@ const void* Value::getDataAddress() const {
 const TypeBase* Value::deref() const {
 	if(!mSym.type) return NULL; //throw ParseException("Dereference failed.");
 	if(getType() == TypeBase::eArray) {
-		return ((ArrayType*)mSym.type)->mElemType->resolve();
+		return ((ArrayType*)mSym.type->resolve())->mElemType;
 	} else if(getType() == TypeBase::ePointer) {
-		return mSym.type->deref()->resolve();
+		return mSym.type->deref();
 	}
 
 	return NULL;

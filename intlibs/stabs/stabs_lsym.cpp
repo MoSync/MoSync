@@ -132,25 +132,23 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				result = subParseType(pText, t, name);
 				TEST(result);
 
-				if(result->resolve() == result) {
-					Type s;
-					s.id = t;
+				Type s;
+				s.id = t;
 
-					// if it is an anonymous struct we need to do a little hack.
-					if(result->type == TypeBase::eStruct && name=="") {
-						StringPrintFunctor spf;
-						result->printTypeMI(spf, false);
-						s.name = spf.getString();
-					}
-					else s.name = name;
-			
-					s.type = result;
-					addType(s);
+				// if it is an anonymous struct we need to do a little hack.
+				if(result->type() == TypeBase::eStruct && name=="") {
+					StringPrintFunctor spf;
+					result->printTypeMI(spf, false);
+					s.name = spf.getString();
 				}
+				else s.name = name;
+
+				s.type = result;
+				addType(s);
 			} else {	//ordinary typedef
 				result = findTypeByTuple(t);
 				if(!result) {
-					result = new DelayedType(t);
+					result = new DelayedType(new TupleReference(t));
 				}
 				*pText = next;
 			}
@@ -220,10 +218,8 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				colon += 2;
 			}
 			*colon = 0;
-			if(crossType == 's' || crossType == 'u') {
-				TEST(result = new CrossReferenceType(id, crossName));
-			} else if(crossType == 'e') {
-				TEST(result = new CrossReferenceType(id, crossName));
+			if(crossType == 's' || crossType == 'u' || crossType == 'e') {
+				TEST(result = new DelayedType(new CrossReferenceType(id, crossName)));
 			} else {
 				FAIL;
 			}
@@ -247,7 +243,7 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			(*pText)++;
 			const TypeBase* memberType = subParseType(pText, id, name);
 			TEST(memberType);
-			TEST(classType->type == TypeBase::eStruct);
+			TEST(classType->type() == TypeBase::eStruct);
 			TEST(result = new PointerToMemberType((StructType*)classType, memberType));
 		}
 		break;
@@ -415,6 +411,7 @@ static char* subParseInheritance(char* text, StructType* st) {
 		TEST(*text == ',');
 		text++;
 		TEST(bc.type = subParseType(&text));
+		//TEST(bc.type->type() == TypeBase::eStruct);
 		TEST(*text == ';');
 		text++;
 		st->addBaseClass(bc);

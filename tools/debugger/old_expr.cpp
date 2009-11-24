@@ -209,7 +209,7 @@ void locate_symbol(const string& name, SeeCallback cb) {
 		sym.type = sv->dataType;
 		sSeeCallback = cb;
 		sSeeSym = sym;
-		StubConnection::readMemory(gMemBuf + sv->address, sv->address, sv->dataType->size,
+		StubConnection::readMemory(gMemBuf + sv->address, sv->address, sv->dataType->size(),
 			Callback::seeReadMem);
 	} else {
 		cb(sym);
@@ -240,7 +240,7 @@ static void Callback::seeSymbol(const SYM& sym) {
 	StringPrintFunctor type, value;
 	sym.type->printTypeMI(type, sComplex);	
 	sym.type->printMI(value, sym.address, TypeBase::eNatural);
-	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue);
+	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue());
 }
 
 static void Callback::seeAddressOf(const SYM& sym) {
@@ -248,11 +248,11 @@ static void Callback::seeAddressOf(const SYM& sym) {
 	value("0x%x", (unsigned int)sym.address - (unsigned int)gMemBuf);
 	sym.type->printTypeMI(type, sComplex);
 	type("%s", "*");
-	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue);
+	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue());
 }
 
 static void Callback::seeDeref(const SYM& sym) {
-	const TypeBase* target = sym.type->resolve()->deref()->resolve();
+	const TypeBase* target = sym.type->deref();
 	if(target == NULL) {
 		error("Symbol '%s' is not a pointer", sExpr.c_str());
 		return;
@@ -262,16 +262,16 @@ static void Callback::seeDeref(const SYM& sym) {
 	//int address = (char*)sym.address - gMemBuf;
 	int address = *(int*)sym.address;
 	sSeeSym.address = gMemBuf + address;
-	if(sSeeSym.type->size <= 0) {
+	if(sSeeSym.type->size() <= 0) {
 		error("Symbol '%s' has no size", sExpr.c_str());
 		return;
 	}
-	StubConnection::readMemory(gMemBuf + address, address, sSeeSym.type->size,
+	StubConnection::readMemory(gMemBuf + address, address, sSeeSym.type->size(),
 		Callback::seeReadMem);
 }
 
 static void Callback::seeSizeof(const SYM& sym) {
 	char valBuf[BUFSIZE];
-	sprintf(valBuf, "%i", sym.type->size);
+	sprintf(valBuf, "%i", sym.type->size());
 	sEECallback("size_t", valBuf, true);
 }

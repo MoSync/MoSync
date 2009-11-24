@@ -163,10 +163,10 @@ Variable::~Variable() {
 }
 
 void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
-	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType->resolve();
+	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType;
 	std::string type = getType(arrayType, false);
 	std::string value = ""; 
-	this->exp->updateData(value, type, arrayType->isSimpleValue);
+	this->exp->updateData(value, type, arrayType->isSimpleValue());
 
 	children.resize(arrayType->mLength);
 	if(!dataAdress) { 
@@ -193,31 +193,31 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 
 		sVariableMap[var.name] = &var;
 
-		if(deref->type == TypeBase::eArray) {
+		if(deref->type() == TypeBase::eArray) {
 			var.addArray(NULL, (ArrayType*)deref);
-		} else if(deref->type == TypeBase::eStruct) {
+		} else if(deref->type() == TypeBase::eStruct) {
 			var.addStruct(NULL, (StructType*)deref);
-		} else if(deref->type == TypeBase::ePointer) {
+		} else if(deref->type() == TypeBase::ePointer) {
 			var.addPointer(NULL, (PointerType*)deref);
 		} else {
 			value = "";
-			if(dataAdress) value = getValue(deref, dataAdress+i*deref->size, var.printFormat);
+			if(dataAdress) value = getValue(deref, dataAdress+i*deref->size(), var.printFormat);
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
-				deref->isSimpleValue);
+				deref->isSimpleValue());
 		}
 	}	
 }
 
 void Variable::addPointer(const char* dataAdress, const PointerType *pointerType) {
-	const TypeBase* deref = ((const PointerType*)pointerType)->deref()->resolve();
+	const TypeBase* deref = ((const PointerType*)pointerType)->deref();
 
 	std::string type = getType(pointerType, false);
 	std::string value = "";
 	if(dataAdress)
 		value = getValue(pointerType, dataAdress, printFormat);
-	bool simpleType = pointerType->isSimpleValue;
+	bool simpleType = pointerType->isSimpleValue();
 
 	this->exp->updateData(value, type, simpleType);
 
@@ -241,11 +241,11 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	}
 
 	sVariableMap[var.name] = &var;
-	if(deref->type == TypeBase::eArray) {
+	if(deref->type() == TypeBase::eArray) {
 		var.addArray(NULL, (ArrayType*)deref);
-	} else if(deref->type == TypeBase::eStruct) {
+	} else if(deref->type() == TypeBase::eStruct) {
 		var.addStruct(NULL, (StructType*)deref);
-	} else if(deref->type == TypeBase::ePointer) {
+	} else if(deref->type() == TypeBase::ePointer) {
 		var.addPointer(NULL, (PointerType*)deref);
 	} else {
 		int addr = *((int*)dataAdress);
@@ -253,7 +253,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		var.exp->updateData(
 			value, 
 			getType(deref, false), 
-			deref->isSimpleValue);
+			deref->isSimpleValue());
 	}
 }
 
@@ -277,7 +277,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	std::string type = getType(structType, false);
 	std::string value = ""; 
-	this->exp->updateData(value, type, structType->isSimpleValue);
+	this->exp->updateData(value, type, structType->isSimpleValue());
 
 	children.resize(bases.size()+dataMembers.size());
 	if(!dataAdress) { 
@@ -288,7 +288,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 
 	for(size_t i = 0; i < bases.size(); i++) {
-		const TypeBase* deref = bases[i].type->resolve();
+		const TypeBase* deref = bases[i].type;
 
 		Variable& var = children[i];
 		{
@@ -310,7 +310,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
-		const TypeBase* deref = dataMembers[i].type->resolve();
+		const TypeBase* deref = dataMembers[i].type;
 
 		Variable& var = children[bases.size()+i];
 		{
@@ -327,11 +327,11 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 		}
 		sVariableMap[var.name] = &var;
 
-		if(deref->type == TypeBase::eArray) {
+		if(deref->type() == TypeBase::eArray) {
 			var.addArray(NULL, (ArrayType*)deref);
-		} else if(deref->type == TypeBase::eStruct) {
+		} else if(deref->type() == TypeBase::eStruct) {
 			var.addStruct(NULL, (StructType*)deref);
-		} else if(deref->type == TypeBase::ePointer) {
+		} else if(deref->type() == TypeBase::ePointer) {
 			var.addPointer(NULL, (PointerType*)deref);
 		} else {
 			value = "";
@@ -339,7 +339,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
-				deref->isSimpleValue);
+				deref->isSimpleValue());
 		}
 	}
 }
@@ -361,7 +361,7 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	} else {
 		std::string type = getType(sym.type, false);
 		std::string value = getValue(sym.type, v->getDataAddress(), sVar->printFormat);
-		bool simpleType = sym.type->isSimpleValue;
+		bool simpleType = sym.type->isSimpleValue();
 		sExp->updateData(value, type, simpleType);
 	}
 
@@ -376,7 +376,7 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 
 	const SYM& sym = v->getSymbol();
 	std::string type = getType(sym.type, false);
-	bool simpleType = sym.type->isSimpleValue;
+	bool simpleType = sym.type->isSimpleValue();
 	std::string value = "";
 
 	if(v->getType() == TypeBase::eArray) {

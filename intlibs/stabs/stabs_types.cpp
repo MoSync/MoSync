@@ -46,7 +46,12 @@ void addTypeFile(int file, const std::string& fileName) {
 void addType(const Type& s) {
 	//LOG("addType(%i,%i)\n", s.id.a, s.id.b);
 	pair<set<Type>::iterator, bool> res = sTypeSets[gCurrentFile].insert(s);
-	DEBUG_ASSERT(res.second);
+	if(!res.second) {	//tuple already defined. it must be a delayed type.
+		DEBUG_ASSERT(res.first->type->type() == TypeBase::eUnknown);
+		DEBUG_ASSERT(res.first->id == s.id);
+		res.first->name = s.name;
+		res.first->type = s.type;
+	}
 }
 
 const Type* stabsFindTypeByName(const std::string& name, int scope) {

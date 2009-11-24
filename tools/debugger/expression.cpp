@@ -217,10 +217,10 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 
 				if(typeInfo) {
 					if(type != TypeBase::eUnknown) {
-						if(type != typeInfo->type)
+						if(type != typeInfo->type())
 							ExpressionCommon::error("Invalid type specifier");
 					} else {
-						type = typeInfo->type;
+						type = typeInfo->type();
 					}
 				}
 			}
@@ -772,7 +772,7 @@ std::map<string, SYM>& ExpressionTree::getSymbols() {
 }
 
 static ExpressionTree *sExpressionTree;
-static Value sReturnValue((int)0);
+static Value sReturnValue;
 static map<string, SYM>::iterator sSymbolIter;
 static MoSyncSemaphore sSemaphore;
 static ExpressionCallback sCallback;
@@ -788,9 +788,9 @@ int evaluateThread(void* data) {
 		if(sReturnValue.isType() == false) {
 			const TypeBase* deref = NULL;	
 			if(sReturnValue.getType()==TypeBase::eArray) {
-				deref = (const ArrayType*)sReturnValue.getSymbol().type;
+				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
-				deref = sReturnValue.getSymbol().type->deref()->resolve();
+				deref = sReturnValue.getSymbol().type->deref();
 				int addr = (int)sReturnValue;
 				if(addr<=0 || addr>gMemSize) {
 					deref = NULL;
@@ -799,7 +799,7 @@ int evaluateThread(void* data) {
 			}
 
 			if(deref)
-				ExpressionCommon::loadMemory((int)sReturnValue, deref->size);
+				ExpressionCommon::loadMemory((int)sReturnValue, deref->size());
 		}
 
 	} catch(ParseException& e) {

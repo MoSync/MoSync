@@ -22,22 +22,52 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "stabs_type.h"
 
-//allocated on the heap, but managed separately from AllocatedTypeBase.
+class TypeReference : public TypeBase {
+public:
+	void printMI(printfPtr, const void*, PrintFormat) const;
+	void printTypeMI(printfPtr, bool complex) const;
+	int size() const { return 0; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return eUnknown; }
+
+	virtual const TypeBase* resolve() const = 0;
+};
+
 class DelayedType : public TypeBase {
 public:
 	/// Records the object for later deallocation.
-	DelayedType(Tuple);
+	DelayedType(TypeReference*);
 	virtual ~DelayedType();
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
-	virtual const TypeBase* resolve() const;
+	const TypeBase* deref() const;
+	const TypeBase* resolve() const;
+	int size() const { return 0; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return eUnknown; }
 
-	/// Deallocates all recorded objects.
-	static void freeAll();
+	static bool resolveAll();
 protected:
-	Tuple mId;
-	int mFile;
+	TypeBase* mType;
+};
+
+class TupleReference : public TypeReference {
+public:
+	TupleReference(Tuple);
+
+	virtual const TypeBase* resolve() const;
+protected:
+	const Tuple mId;
+	const int mFile;
+};
+
+class CrossReferenceType : public TupleReference {
+public:
+	CrossReferenceType(Tuple, const char* name);
+	const TypeBase* resolve() const;
+
+	const std::string mName;
 };
 
 class PointerType : public TypeBase {
@@ -47,6 +77,9 @@ public:
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
 	const TypeBase* deref() const;
+	int size() const { return 4; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return ePointer; }
 
 	const TypeBase* const mTarget;
 protected:
@@ -61,6 +94,9 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const { return 0; }
+	bool isSimpleValue() const { return false; }
+	Type type() const { return eFunction; }
 
 	const TypeBase* const mReturnType;
 protected:
@@ -123,8 +159,12 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const { return mSize; }
+	bool isSimpleValue() const { return false; }
+	Type type() const { return eStruct; }
 
 	const std::string mName;
+	const int mSize;
 
 	const std::vector<DataMember>& getDataMembers() const;
 	const std::vector<Method>& getMethods() const;
@@ -144,6 +184,9 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const { return 4; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return ePointerToMember; }
 
 	const StructType* const mClass;
 	const TypeBase* const mMember;
@@ -155,6 +198,9 @@ public:
 
 	void ATTRIB(noreturn) printMI(printfPtr, const void*, PrintFormat) const;
 	void ATTRIB(noreturn) printTypeMI(printfPtr, bool complex) const;
+	int size() const { return 0; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return eUnknown; }
 protected:
 	const int mMin, mMax;
 };
@@ -165,6 +211,9 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const;
+	bool isSimpleValue() const { return false; }
+	Type type() const { return eArray; }
 
 	const int mLength;
 	const TypeBase* const mElemType;
@@ -178,6 +227,9 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const;
+	bool isSimpleValue() const;
+	Type type() const;
 
 	const TypeBase* deref() const;
 
@@ -197,20 +249,15 @@ public:
 
 	void printMI(printfPtr, const void*, PrintFormat pf) const;
 	void printTypeMI(printfPtr, bool complex) const;
+	int size() const { return 4; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return eEnum; }
 
 	const std::string mName;
 protected:
 	std::vector<EnumMember> mMembers;
 };
 
-class CrossReferenceType : public DelayedType {
-public:
-	CrossReferenceType(Tuple, const char* name);
-	const TypeBase* resolve() const;
-
-	const std::string mName;
-protected:
-};
 #if 0
 class StructCrossReferenceType : public CrossReferenceType {
 public:

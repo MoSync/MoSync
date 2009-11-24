@@ -307,7 +307,7 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 		oprintf(",type=\"");
 		oprintf("%s", getType(lv->dataType, false).c_str());
 		oprintf("\"");
-		if(!lv->dataType->isSimpleValue)
+		if(!lv->dataType->isSimpleValue())
 			break;
 	case eAllValues:
 		{
@@ -487,7 +487,7 @@ static void console_print_type(const string& args, bool complex) {
 	sComplex = complex;
 	const TypeBase *typeBase = findTypeByNameAndPC(args);
 	if(typeBase) {
-		print_type_from_type(getType(typeBase->resolve(), sComplex));
+		print_type_from_type(getType(typeBase, sComplex));
 	} else {
 		stackEvaluateExpression(args, -1, Callback::print_type);
 	}
@@ -499,7 +499,7 @@ static void Callback::print_type(const Value* value, const char *err) {
 		error("%s", err);
 		return;
 	} 
-	string type = getType(value->getSymbol().type->resolve(), sComplex);
+	string type = getType(value->getSymbol().type, sComplex);
 	print_type_from_type(type);
 }
 

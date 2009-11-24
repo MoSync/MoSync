@@ -37,10 +37,10 @@ CastNode::~CastNode() {
 
 bool isBase(const TypeBase* base, const TypeBase* what) {
 	if(base == what) return true;
-	const StructType* sbase = (const StructType*)base;
+	const StructType* sbase = (const StructType*)base->resolve();
 	const std::vector<BaseClass>& bases = sbase->getBases();
 	for(int i = 0; i < bases.size(); i++) {
-		bool ret = isBase(bases[i].type->resolve(), what);
+		bool ret = isBase(bases[i].type, what);
 		if(ret) return true;
 	}
 	return false;
@@ -56,12 +56,15 @@ Value CastNode::evaluate() {
 
 	const TypeBase* typeBase = type.getTypeBase();
 
-	if(typeBase->type == TypeBase::eBuiltin) {
-		switch(((Builtin*)typeBase)->type) {
+	if(typeBase->type() == TypeBase::eBuiltin) {
+		switch(((Builtin*)typeBase->resolve())->type()) {
 			TYPES(CAST_ELEM)
 				default: throw ParseException("Invalid cast");
 		}
-	} else if(typeBase->type == TypeBase::ePointer || typeBase->type == TypeBase::eEnum || typeBase->type == TypeBase::eFunction) {
+	} else if(typeBase->type() == TypeBase::ePointer ||
+		typeBase->type() == TypeBase::eEnum ||
+		typeBase->type() == TypeBase::eFunction)
+	{
 		Value ret = Value((int)a);
 		SYM newSym;
 		newSym.address = NULL;
@@ -69,9 +72,9 @@ Value CastNode::evaluate() {
 		newSym.type = typeBase;
 		ret.setSymbol(newSym);
 		return ret;
-	} else if(typeBase->type == TypeBase::eStruct) {
+	} else if(typeBase->type() == TypeBase::eStruct) {
 		const SYM& cast = a.getSymbol();
-		if(isBase(cast.type->resolve(), typeBase)) {
+		if(isBase(cast.type, typeBase)) {
 			SYM newSym;
 			newSym.address = cast.address;
 			newSym.symType = eVariable;
@@ -109,8 +112,8 @@ TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTre
 #define CAST_BUILTIN(name, id) case Builtin::e##id##: v = Value(*((name*)symbol.address)); break;
 
 Value getValueFromSymbol(const SYM& symbol) {
-	if(symbol.type->type==TypeBase::eBuiltin) {
-		Builtin* builtin = (Builtin*)symbol.type;
+	if(symbol.type->type() == TypeBase::eBuiltin) {
+		Builtin* builtin = (Builtin*)symbol.type->resolve();
 		Value v;
 		switch(builtin->mSubType) {
 			BUILTINS(CAST_BUILTIN, CAST_BUILTIN)
@@ -166,7 +169,7 @@ Value BinaryOpNode::evaluate() {
 	bool bIsPointer = derefB!=NULL;
 
 	if(aIsPointer && !bIsPointer) {
-		b=b*Value((int)derefA->size);
+		b=b*Value((int)derefA->size());
 	}
 
 	a = a.doBinaryOperation(b, mToken);
@@ -209,15 +212,15 @@ Value DerefNode::evaluate() {
 	if(a.isPointer() == false) throw ParseException("Dereferenceing non-pointer type");
 
 	const SYM& sym = a.getSymbol();
-	const TypeBase* deref = sym.type->deref()->resolve();
+	const TypeBase* deref = sym.type->deref();
 	if(!deref) throw ParseException("Invalid pointer");
 
 	int addr = (int)a;
-	ExpressionCommon::loadMemory(addr, deref->size);
+	ExpressionCommon::loadMemory(addr, deref->size());
 
 	SYM newSym;
 	newSym.address = &gMemBuf[addr];
-	if(deref->type == TypeBase::eFunction)
+	if(deref->type() == TypeBase::eFunction)
 		newSym.symType = eFunction;
 	else newSym.symType = eVariable;
 	newSym.type = deref;
@@ -244,7 +247,7 @@ Value RefNode::evaluate() {
 	} 
 	else if(a.getType() == TypeBase::eArray) {
 		if(mPtrTypeBase != NULL) delete mPtrTypeBase;
-		mPtrTypeBase = new PointerType(((ArrayType*)sym.type)->mElemType);
+		mPtrTypeBase = new PointerType(((ArrayType*)sym.type->resolve())->mElemType);
 		SYM newSym;
 		int addr = (int)a;
 		newSym.address = NULL;
@@ -295,10 +298,10 @@ Value IndexNode::evaluate() {
 	int index = (int)idx;
 	
 	if(ptrType == TypeBase::ePointer) {
-		deref = sym.type->deref()->resolve();
+		deref = sym.type->deref();
 	} else if (ptrType == TypeBase::eArray) {
-		ArrayType *arrayType = (ArrayType*) sym.type;
-		deref = arrayType->mElemType->resolve();
+		ArrayType *arrayType = (ArrayType*) sym.type->resolve();
+		deref = arrayType->mElemType;
 		if(index<0 || index>=arrayType->mLength)
 			throw ParseException("Index out of bounds.");
 	} else {
@@ -306,12 +309,12 @@ Value IndexNode::evaluate() {
 	}
 	if(!deref) throw ParseException("Non-indexable type");
 
-	int addr = (int)ptr+index*deref->size;
-	ExpressionCommon::loadMemory(addr, deref->size);
+	int addr = (int)ptr+index*deref->size();
+	ExpressionCommon::loadMemory(addr, deref->size());
 
 	SYM newSym;
 	newSym.address = &gMemBuf[addr];
-	if(deref->type == TypeBase::eFunction)
+	if(deref->type() == TypeBase::eFunction)
 		newSym.symType = eFunction;
 	else newSym.symType = eVariable;
 	newSym.type = deref;
@@ -353,9 +356,10 @@ Value DotNode::evaluate() {
 	Value a = mChild->evaluate();
 
 	const SYM& sym = a.getSymbol();
-	if(!sym.type || sym.type->type != TypeBase::eStruct) throw ParseException("Left operand must be of type struct");
+	if(!sym.type || sym.type->type() != TypeBase::eStruct)
+		throw ParseException("Left operand must be of type struct");
 
-	StructType *s = (StructType*)sym.type;
+	StructType *s = (StructType*)sym.type->resolve();
 	std::string ident = mIdent;
 	SearchResult res;
 	recursiveSearch(ident, s, &res);
@@ -371,7 +375,7 @@ Value DotNode::evaluate() {
 		sym.address = (const void*)addr;
 		sym.storageClass = eStack;
 
-		if(res.type->type == TypeBase::eFunction)
+		if(res.type->type() == TypeBase::eFunction)
 			sym.symType = eFunction;
 		else sym.symType = eVariable;
 		sym.type = res.type;
@@ -413,7 +417,7 @@ void DotNode::recursiveSearch(const std::string& ident, StructType *s, SearchRes
 	*/
 
 	for(size_t i = 0; i < bases.size(); i++) {
-		recursiveSearch(ident, (StructType*)bases[i].type, res, bases[i].offset);
+		recursiveSearch(ident, (StructType*)bases[i].type->resolve(), res, bases[i].offset);
 		if(res->found == true) return;
 	}
 }
