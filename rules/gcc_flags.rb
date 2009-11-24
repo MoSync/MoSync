@@ -13,12 +13,9 @@ gcc43_c_warnings = " -Wmissing-declarations"
 #only valid in GCC 4.0 and later
 gcc4_warnings = " -Wvariadic-macros -Wmissing-include-dirs"
 
-lesser_warnings = " -Winline -Wpointer-arith -Wundef -Wfloat-equal -Winit-self"
+lesser_warnings = " -Wpointer-arith -Wundef -Wfloat-equal -Winit-self"
 
 pedantic_warnings = " -Wmissing-noreturn -Wmissing-format-attribute"
-
-#broken in GCC 4.3.3
-gcc_not_4_warnings = " -Wunreachable-code"
 
 #only valid in c.
 pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes"
@@ -26,6 +23,14 @@ pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-pr
 #only valid in C.
 lesser_conly = " -Wnested-externs -Wdeclaration-after-statement"
 # -Wno-format-zero-length"
+
+#broken in C++, GCC 4.3.3 -O0 and in 3.4.5 -O2.
+optimizer_dependent = " -Wunreachable-code -Winline"
+if((GCC_IS_V43 && CONFIG == "debug") || (!GCC_IS_V4 && CONFIG == ""))
+	pendantic_c_warnings += optimizer_dependent
+else
+	pedantic_warnings += optimizer_dependent
+end
 
 standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
 
@@ -38,26 +43,26 @@ include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 
 if(GCC_IS_V4) then
 	base_flags = " -fvisibility=hidden"
-	flag_warnings = gcc4_warnings
+	version_warnings = gcc4_warnings
 	if(GCC_IS_V43) then
 		flag_warnings += gcc43_c_warnings + gcc43_warnings
 		cpp_flags = " -std=c++0x -DHAVE_TR1"
 	end
 else
+	version_warnings = ""
 	base_flags = ""
 	cpp_flags = ""
 end
 if(!GCC_IS_V43) then
-	flag_warnings = gcc_not_4_warnings
 	lesser_conly += gcc43_c_warnings
 end
 
-if(@CONFIG == "debug") then
+if(CONFIG == "debug") then
 	config_flags = " -g -O0"
-elsif(@CONFIG == "")
+elsif(CONFIG == "")
 	config_flags =  " -O2"
 else
-	error "wrong configuration: " + @CONFIG
+	error "wrong configuration: " + CONFIG
 end
 
 if(HOST == :win32)
@@ -72,7 +77,7 @@ end
 
 
 flags_base = config_flags + host_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
-	pedantic_warnings + flag_warnings
+	pedantic_warnings + version_warnings
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings
 

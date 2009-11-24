@@ -1,9 +1,11 @@
 require "#{File.dirname(__FILE__)}/util.rb"
 
+if(!defined?(CONFIG))
+	set_const(:CONFIG, "debug")
+end
+
 module Defaults
 def set_defaults
-	default(:CONFIG, "debug")
-
 	default(:SOURCES, [])
 	default(:EXTRA_CFLAGS, "")
 	default(:EXTRA_CPPFLAGS, "")
@@ -19,14 +21,14 @@ def set_defaults
 	default(:SPECIFIC_CFLAGS, {})
 	default(:BUILDDIR_BASE, "build/")
 
-	if(@CONFIG == "debug") then
+	if(CONFIG == "debug") then
 		@BUILDDIR = @BUILDDIR_BASE + "debug/"
 		@CONFIG_POSTFIX = "D"
-	elsif(@CONFIG == "")
+	elsif(CONFIG == "")
 		@BUILDDIR = @BUILDDIR_BASE
 		@CONFIG_POSTFIX = ""
 	else
-		error "wrong configuration: " + @CONFIG
+		error "wrong configuration: " + CONFIG
 	end
 	
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))

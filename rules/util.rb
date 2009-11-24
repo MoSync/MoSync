@@ -4,6 +4,11 @@ def default(constant, value)
 	eval(s)
 end
 
+def set_const(name, value)
+	s = "#{name.to_s} = #{value.inspect}"
+	eval(s)
+end
+
 class String
 	def ext(newEnd)
 		doti = rindex('.')

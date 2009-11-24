@@ -71,12 +71,19 @@ class Targets
 		if(@@goals.empty?) then
 			@@goals = [:default]
 		end
+		if(!defined?(CONFIG))
+			s = "CONFIG = 'debug'"
+			eval(s)
+		end
 	end
 	
 	def Targets.handle_arg(a)
 		i = a.index('=')
 		if(i) then
-			set_constant(a[0, i], a[i+1 .. a.length])
+			name = a[0, i]
+			value = a[i+1 .. a.length]
+			puts "Set constant #{name.inspect}=#{value.inspect}"
+			set_const(name, value)
 		else
 			@@goals += [a.to_sym]
 		end
