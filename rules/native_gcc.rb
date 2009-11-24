@@ -29,7 +29,10 @@ class CompileGccTask < FileTask
 	end
 	
 	def needed?
-		return true if @OLDFLAGS != @CFLAGS
+		if(@OLDFLAGS != @CFLAGS)
+			puts "Because the flags have changed:"
+			return true
+		end
 		return true if !File.exists?(@DEPFILE)
 		super
 	end

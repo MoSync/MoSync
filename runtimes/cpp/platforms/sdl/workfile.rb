@@ -35,6 +35,9 @@ work.instance_eval do
 	
 	if(!GCC_IS_V4)
 		@SPECIFIC_CFLAGS["AudioChannel.cpp"] = " -Wno-unreachable-code"
+		if(CONFIG == "")	#buggy compiler
+			@SPECIFIC_CFLAGS["ConfigParser.cpp"] = " -Wno-uninitialized"
+		end
 	end
 	
 	@NAME = "mosync_sdl"

@@ -337,7 +337,7 @@ int ProtocolConnection::readHeaders() {
 
 		//format: key ':' (' ')* value
 		const char* colon = strchr(baseLine, ':');
-		const char* valPtr;
+		const char* valPtr = NULL;
 		if(colon != NULL) {
 			valPtr = colon + 1;
 			while(*valPtr == ' ')
