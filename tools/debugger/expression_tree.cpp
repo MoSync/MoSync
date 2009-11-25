@@ -446,7 +446,10 @@ Value ArrayNode::evaluate() {
 		throw ParseException("Right value not of integer type.");
 	}
 
-	if(mCachedType) delete mCachedType;
+	if(mCachedType) {
+		delete mCachedType->deref();
+		delete mCachedType;
+	}
 	mCachedType = 
 		new PointerType(
 		new ArrayType((int)b, deref, getTypeBaseFromType(Builtin::eInt))

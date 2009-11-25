@@ -125,7 +125,9 @@ bool DelayedType::resolveAll() {
 	for(size_t i=0; i<sDelayed.size(); i++) {
 		DelayedType* d(sDelayed[i]);
 		const TypeBase* tb = ((TypeReference*)d->mType)->resolve();
-		FAILIF(tb == NULL);
+		if(tb == NULL) {
+			FAIL;
+		}
 		d->release();
 	}
 	sDelayed.clear();
@@ -155,7 +157,8 @@ const TypeBase* CrossReferenceType::resolve() const {
 PointerType::PointerType(const TypeBase* target) : mTarget(target) {
 }
 void PointerType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("0x%x", *(int*)data);
+//	pf("0x%x", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
 void PointerType::printTypeMI(printfPtr pf, bool complex) const {
 	mTarget->printTypeMI(pf, complex);
@@ -170,7 +173,8 @@ PointerToMemberType::PointerToMemberType(const StructType* c, const TypeBase* m)
 {
 }
 void PointerToMemberType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("0x%x", *(int*)data);
+//	pf("0x%x", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
 void PointerToMemberType::printTypeMI(printfPtr pf, bool complex) const {
 	mMember->printTypeMI(pf, false);

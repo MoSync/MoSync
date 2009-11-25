@@ -104,4 +104,30 @@ struct Type {
 	}
 };
 
+
+template<typename T>
+void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt, TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural) {
+	if(natural == TypeBase::eNatural) return; // sanity check
+	T t = *((T*)data);
+
+	if(fmt == TypeBase::eNatural) {
+		printPrimitiveByFormat<T>(pf, data, decimalFmt, natural, natural);
+		return;
+	} else if(fmt == TypeBase::eDecimal) {
+		pf(decimalFmt, t);
+	} else if(fmt == TypeBase::eOctal) {
+		pf("%o", t);
+	} else if(fmt == TypeBase::eHexadecimal) {
+		pf("0x%x", t);
+	} else if(fmt == TypeBase::eBinary) {
+		u64 tt = (u64)t;
+		u64 numBits = (sizeof(T)<<3)-1;
+		while(!(tt&((u64)1<<numBits))) numBits--;
+		while(numBits) {
+			pf((tt&((u64)1<<numBits))?"1":"0");
+			numBits--;
+		}
+	}
+}
+
 #endif	//STABS_TYPE_H

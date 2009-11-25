@@ -98,6 +98,10 @@ bool parseLSym(Tuple t, char* text) {
 			return true;
 		}
 	}
+	if(*equalSign == 0) {	//typedef. tuple must already be defined.
+		FAILIF(findTypeByTuple(s.id) == NULL);
+		return true;
+	}
 	FAILIF(*equalSign != '=');
 	char* typeText = equalSign + 1;
 	TEST(s.type = subParseType(&typeText, s.id, s.name));

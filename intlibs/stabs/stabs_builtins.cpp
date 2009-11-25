@@ -68,55 +68,57 @@ BUILTINdecl sBuiltins[] = {
 const int snBuiltins = sizeof(sBuiltins) / sizeof(BUILTINdecl);
 
 void Int::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%i", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%i", fmt, TypeBase::eDecimal);
 }
 
 void Char::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%c", *(char*)data);
+	printPrimitiveByFormat<char>(pf, data, "%c", fmt, TypeBase::eDecimal);
 }
 
 void LongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%i", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%i", fmt, TypeBase::eDecimal);
 }
 
 void UnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%u", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void LongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%u", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void LongLongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%"INT64PREFIX"i", *(s64*)data);
+	printPrimitiveByFormat<s64>(pf, data, "%"INT64PREFIX"i", fmt, TypeBase::eDecimal);
 }
 
 void LongLongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%"INT64PREFIX"u", *(u64*)data);
+	printPrimitiveByFormat<u64>(pf, data, "%"INT64PREFIX"u", fmt, TypeBase::eDecimal);
 }
 
 void ShortInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%i", *(short*)data);
+	printPrimitiveByFormat<short>(pf, data, "%i", fmt, TypeBase::eDecimal);
 }
 
 void ShortUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%u", *(short*)data);
+	printPrimitiveByFormat<short>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void SignedChar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%c", *(char*)data);
+	printPrimitiveByFormat<char>(pf, data, "%c", fmt, TypeBase::eDecimal);
 }
 
 void UnsignedChar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%c", *(char*)data);
+	printPrimitiveByFormat<char>(pf, data, "%c", fmt, TypeBase::eDecimal);
 }
 
 void Float::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%f", *(float*)data);
+	if(fmt == TypeBase::eDecimal || fmt == TypeBase::eNatural) pf("%f", *(float*)data);
+	else pf("0");
 }
 
 void Double::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%f", *(double*)data);
+	if(fmt == TypeBase::eDecimal || fmt == TypeBase::eNatural) pf("%f", *(double*)data);
+	else pf("0");
 }
 
 #define BROKEN_BUILTIN_FUNCTIONS(name, id) \
@@ -126,13 +128,13 @@ void Double::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) 
 BROKEN_BUILTINS(BROKEN_BUILTIN_FUNCTIONS);
 
 void Bool::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%i", *(bool*)data);
+	printPrimitiveByFormat<bool>(pf, data, "%i", fmt, TypeBase::eDecimal);
 }
 
 void VTablePtr::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%p", data);
+	printPrimitiveByFormat<const void*>(pf, data, "%p", fmt, TypeBase::eDecimal);
 }
 
 void Wchar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("%C", *(wchar_t*)data);
+	printPrimitiveByFormat<wchar_t>(pf, data, "%C", fmt, TypeBase::eDecimal);
 }
