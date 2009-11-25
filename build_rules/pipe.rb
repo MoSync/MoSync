@@ -31,7 +31,7 @@ INCLUDE_DIRS = [".", "#{BD}/libs/MAStd", "#{BD}/libs"] + EXTRA_INCLUDES
 if(CONFIG == "debug") then
 	INTRA_CFLAGS = " -DMOSYNCDEBUG -S" + EXTRA_CFLAGS
 elsif(CONFIG == "")
-	INTRA_CFLAGS = " -g -S" + EXTRA_CFLAGS
+	INTRA_CFLAGS = " -S" + EXTRA_CFLAGS
 else
 	error "wrong configuration: " + CONFIG
 end

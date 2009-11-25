@@ -1,11 +1,11 @@
 require "#{File.dirname(__FILE__)}/util.rb"
 
-if(!defined?(CONFIG))
-	set_const(:CONFIG, "debug")
-end
-
 module Defaults
 def set_defaults
+	if(!defined?(CONFIG))
+		set_const(:CONFIG, "debug")
+	end
+	
 	default(:SOURCES, [])
 	default(:EXTRA_CFLAGS, "")
 	default(:EXTRA_CPPFLAGS, "")

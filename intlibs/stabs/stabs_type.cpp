@@ -98,8 +98,8 @@ const TypeBase* TypeBase::resolve() const {
 //keep type references here until they're resolved.
 vector<DelayedType*> sDelayed;
 
-DelayedType::DelayedType(TypeReference* type) : mType(type) {
-	type->addRef();
+DelayedType::DelayedType(TypeReference* t) : mType(t) {
+	mType->addRef();
 	addRef();
 	sDelayed.push_back(this);
 }

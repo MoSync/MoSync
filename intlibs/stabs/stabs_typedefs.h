@@ -24,8 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class TypeReference : public TypeBase {
 public:
-	void printMI(printfPtr, const void*, PrintFormat) const;
-	void printTypeMI(printfPtr, bool complex) const;
+	void ATTRIB(noreturn) printMI(printfPtr, const void*, PrintFormat) const;
+	void ATTRIB(noreturn) printTypeMI(printfPtr, bool complex) const;
 	int size() const { return 0; }
 	bool isSimpleValue() const { return true; }
 	Type type() const { return eUnknown; }
