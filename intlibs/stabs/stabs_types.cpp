@@ -47,11 +47,15 @@ void addType(const Type& s) {
 	//LOG("addType(%i,%i)\n", s.id.a, s.id.b);
 	pair<set<Type>::iterator, bool> res = sTypeSets[gCurrentFile].insert(s);
 	if(!res.second) {	//tuple already defined. it must be a delayed type.
-		Type& t(*res.first);
+		Type t = *res.first;
 		DEBUG_ASSERT(t.type->type() == TypeBase::eUnknown);
 		DEBUG_ASSERT(t.id == s.id);
 		t.name = s.name;
 		t.type = s.type;
+		set<Type>::iterator temp = res.first;
+		temp++;
+		sTypeSets[gCurrentFile].erase(res.first);
+		sTypeSets[gCurrentFile].insert(temp, t);
 	}
 }
 

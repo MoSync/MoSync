@@ -116,12 +116,12 @@ void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalF
 	} else if(fmt == TypeBase::eDecimal) {
 		pf(decimalFmt, t);
 	} else if(fmt == TypeBase::eOctal) {
-		pf("%o", t);
+		pf("%o", (unsigned)t);
 	} else if(fmt == TypeBase::eHexadecimal) {
-		pf("0x%x", t);
+		pf("0x%x", (unsigned)t);
 	} else if(fmt == TypeBase::eBinary) {
-		u64 tt = (u64)t;
-		u64 numBits = (sizeof(T)<<3)-1;
+		u64 tt = (u64)(size_t)t;
+		int numBits = (int)(sizeof(T)<<3)-1;
 		while(numBits>0 && !(tt&((u64)1<<numBits))) numBits--;
 		while(numBits>=0) {
 				pf((tt&((u64)1<<numBits))?"1":"0");

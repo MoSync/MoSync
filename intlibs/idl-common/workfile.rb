@@ -6,7 +6,6 @@ idlc = NativeLibWork.new
 idlc.instance_eval do 
 	@SOURCES = ["."]
 	@EXTRA_INCLUDES = [".."]
-	puts "Config: #{CONFIG.inspect}"
 	if(!GCC_IS_V4 && CONFIG == "")
 		# gcc's C++ optimizer has a few bugs...
 		@EXTRA_CPPFLAGS = " -Wno-uninitialized"
