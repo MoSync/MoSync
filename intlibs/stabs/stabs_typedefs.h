@@ -49,7 +49,7 @@ public:
 
 	static bool resolveAll();
 protected:
-	TypeBase* mType;
+	const TypeBase* mType;
 };
 
 class TupleReference : public TypeReference {

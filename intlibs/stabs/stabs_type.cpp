@@ -99,7 +99,6 @@ const TypeBase* TypeBase::resolve() const {
 vector<DelayedType*> sDelayed;
 
 DelayedType::DelayedType(TypeReference* t) : mType(t) {
-	mType->addRef();
 	addRef();
 	sDelayed.push_back(this);
 }
@@ -125,10 +124,11 @@ bool DelayedType::resolveAll() {
 	for(size_t i=0; i<sDelayed.size(); i++) {
 		DelayedType* d(sDelayed[i]);
 		const TypeBase* tb = ((TypeReference*)d->mType)->resolve();
-		if(tb == NULL) {
-			FAIL;
+		if(tb != NULL) {
+			FAILIF(d == tb);
+			d->mType = tb;
 		}
-		d->release();
+		d->release();	//in preparation for the clear().
 	}
 	sDelayed.clear();
 	return true;
@@ -151,7 +151,7 @@ CrossReferenceType::CrossReferenceType(Tuple id, const char* name)
 : TupleReference(id), mName(name)
 {}
 const TypeBase* CrossReferenceType::resolve() const {
-	return findTypeByNameAndTupleAndFileGlobal(mName, mId, mFile);
+	return findTypeByNameAndFileGlobal(mName, mFile);
 }
 
 PointerType::PointerType(const TypeBase* target) : mTarget(target) {
@@ -241,7 +241,9 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 		if(mBases.size()) pf(" : ");
 
 		for(size_t i=0; i<mBases.size(); i++) {
-			pf("public %s", ((StructType*)mBases[i].type)->mName.c_str());
+			const TypeBase* tb = mBases[i].type->resolve();
+			const StructType* st = (StructType*)tb;
+			pf("public %s", st->mName.c_str());
 			if(i!=mBases.size()-1) pf(", ");
 		}
 
