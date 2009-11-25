@@ -2,8 +2,10 @@ require "#{File.dirname(__FILE__)}/util.rb"
 
 module Defaults
 def set_defaults
-	default(:CONFIG, "debug")
-
+	if(!defined?(CONFIG))
+		set_const(:CONFIG, "debug")
+	end
+	
 	default(:SOURCES, [])
 	default(:EXTRA_CFLAGS, "")
 	default(:EXTRA_CPPFLAGS, "")

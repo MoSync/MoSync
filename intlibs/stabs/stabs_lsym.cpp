@@ -98,6 +98,10 @@ bool parseLSym(Tuple t, char* text) {
 			return true;
 		}
 	}
+	if(*equalSign == 0) {	//typedef. tuple must already be defined.
+		FAILIF(findTypeByTuple(s.id) == NULL);
+		return true;
+	}
 	FAILIF(*equalSign != '=');
 	char* typeText = equalSign + 1;
 	TEST(s.type = subParseType(&typeText, s.id, s.name));
@@ -105,6 +109,16 @@ bool parseLSym(Tuple t, char* text) {
 	return true;
 }
 
+//typeDecl := pointerDecl | tupleDecl | structDecl | arrayDecl | functionDecl |
+//	constDecl | enumDecl | crossRefDecl | cppRefDecl | ptmDecl
+//tupleDecl := typeId ('=' typeDecl)?
+//pointerDecl := '*' typeDecl
+//structDecl := 's' members
+//functionDecl := ('f' | '#') typeDecl (',' typeDecl)*
+//constDecl := 'k' typeDecl
+//crossRefDecl := 'x' ('s' | 'u' | 'e') name ':'
+//cppRefDecl := '&' typeDecl
+//ptmDecl := '@' typeDecl ',' typeDecl
 const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) {
 	const TypeBase* result;
 	char* typeText = *pText;
@@ -132,25 +146,23 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				result = subParseType(pText, t, name);
 				TEST(result);
 
-				if(result->resolve() == result) {
 					Type s;
 					s.id = t;
 
 					// if it is an anonymous struct we need to do a little hack.
-					if(result->type == TypeBase::eStruct && name=="") {
+				if(result->type() == TypeBase::eStruct && name=="") {
 						StringPrintFunctor spf;
 						result->printTypeMI(spf, false);
 						s.name = spf.getString();
 					}
 					else s.name = name;
-			
+
 					s.type = result;
 					addType(s);
-				}
 			} else {	//ordinary typedef
 				result = findTypeByTuple(t);
 				if(!result) {
-					result = new DelayedType(t);
+					result = new DelayedType(new TupleReference(t));
 				}
 				*pText = next;
 			}
@@ -220,10 +232,8 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				colon += 2;
 			}
 			*colon = 0;
-			if(crossType == 's' || crossType == 'u') {
-				TEST(result = new CrossReferenceType(id, crossName));
-			} else if(crossType == 'e') {
-				TEST(result = new CrossReferenceType(id, crossName));
+			if(crossType == 's' || crossType == 'u' || crossType == 'e') {
+				TEST(result = new DelayedType(new CrossReferenceType(id, crossName)));
 			} else {
 				FAIL;
 			}
@@ -247,7 +257,7 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			(*pText)++;
 			const TypeBase* memberType = subParseType(pText, id, name);
 			TEST(memberType);
-			TEST(classType->type == TypeBase::eStruct);
+			TEST(classType->type() == TypeBase::eStruct);
 			TEST(result = new PointerToMemberType((StructType*)classType, memberType));
 		}
 		break;
@@ -261,7 +271,7 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 // typeId := '(' a ',' b ')'
 // rangeTypeDefinition := typeId '=r' typeId ';' rangeMin ';' rangeMax ';'
 // rangeType := 'r' (typeId | rangeTypeDefinition) ';'
-// array := 'a' rangeType lowerBound ';' upperBound ';' elementType
+// arrayDecl := 'a' rangeType lowerBound ';' upperBound ';' elementType
 static const TypeBase* subParseArray(char** pText) {
 	char* text = *pText;
 	const TypeBase* rangeType = subParseRangeType(&text);
@@ -318,7 +328,7 @@ static const TypeBase* subParseRangeType(char** pText) {
 }
 
 //grammar:
-// enum-members := (name ':' value ',')+ ';'
+// enumDecl := (name ':' value ',')+ ';'
 static const TypeBase* subParseEnum(char** pText, const string& enumName) {
 	EnumType* et = new EnumType(enumName);
 	char* next = *pText;
@@ -380,9 +390,13 @@ static const TypeBase* subParseMembers(int size, char** pText, const string& nam
 		//LOG("subParseMember next %s\n", next);
 	}
 	next++;
-	if(*next == '~') {	//reference to first base class (useless, I think)
-		//we skip it
-		TEST(next = strchr(next, ';'));
+	if(*next == '~') {	//reference to first base class
+		next++;
+		TEST(*next == '%');
+		next++;
+		//we ignore it, but it may contain type definitions that are needed later.
+		subParseType(&next);
+		TEST(*next == ';');
 		next++;
 	}
 	*pText = next;
@@ -415,6 +429,7 @@ static char* subParseInheritance(char* text, StructType* st) {
 		TEST(*text == ',');
 		text++;
 		TEST(bc.type = subParseType(&text));
+		//TEST(bc.type->type() == TypeBase::eStruct);
 		TEST(*text == ';');
 		text++;
 		st->addBaseClass(bc);

@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string>
 #include "helpers/attribute.h"
+#include "MAUtil/RefCounted.h"
 
 //typedef int (*printfPtr)(const char* fmt, ...);
 
@@ -48,7 +49,7 @@ private:
 
 typedef PrintFunctor& printfPtr;
 
-class TypeBase {
+class TypeBase : public MAUtil::RefCounted {
 public:
 	enum Type {
 		eUnknown, eBuiltin, eStruct, eArray, eEnum, ePointer, eFunction, ePointerToMember
@@ -58,17 +59,16 @@ public:
 		eBinary, eDecimal, eHexadecimal, eOctal, eNatural
 	};
 
-	TypeBase(int s, bool simple, Type tt) : size(s), isSimpleValue(simple), type(tt) {}
 	virtual ~TypeBase() {}
 
-	const int size;
-	const bool isSimpleValue;
-	const Type type;
+	virtual int size() const = 0;
+	virtual bool isSimpleValue() const = 0;
+	virtual Type type() const = 0;
 
 	virtual void printMI(printfPtr, const void* data, PrintFormat pf) const = 0;
 
 	//if complex && !isSimpleValue, then members will be printed.
-	//multiple lines will be used to for structs.
+	//multiple lines will be used for structs.
 	//enums will be printed on single lines.
 	virtual void printTypeMI(printfPtr, bool complex) const = 0;
 
@@ -76,7 +76,7 @@ public:
 	//will return NULL if this type is not a pointer.
 	virtual const TypeBase* deref() const;
 
-	/// Returns a fixed type. Useful for types that are declared too early.
+	//returns a pointer suitable for casting.
 	virtual const TypeBase* resolve() const;
 };
 
@@ -87,6 +87,7 @@ struct Tuple {
 	bool operator!=(const Tuple& other) const { return a != other.a || b != other.b; }
 };
 
+//todo: add reference counting for the type?
 struct Type {
 	Tuple id;
 	const TypeBase* type;
@@ -102,5 +103,31 @@ struct Type {
 			return id.a < other.id.a;
 	}
 };
+
+
+template<typename T>
+void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt, TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural) {
+	if(natural == TypeBase::eNatural) return; // sanity check
+	T t = *((T*)data);
+
+	if(fmt == TypeBase::eNatural) {
+		printPrimitiveByFormat<T>(pf, data, decimalFmt, natural, natural);
+		return;
+	} else if(fmt == TypeBase::eDecimal) {
+		pf(decimalFmt, t);
+	} else if(fmt == TypeBase::eOctal) {
+		pf("%o", (unsigned)t);
+	} else if(fmt == TypeBase::eHexadecimal) {
+		pf("0x%x", (unsigned)t);
+	} else if(fmt == TypeBase::eBinary) {
+		u64 tt = (u64)(size_t)t;
+		int numBits = (int)(sizeof(T)<<3)-1;
+		while(numBits>0 && !(tt&((u64)1<<numBits))) numBits--;
+		while(numBits>=0) {
+				pf((tt&((u64)1<<numBits))?"1":"0");
+				numBits--;
+		}
+	}
+}
 
 #endif	//STABS_TYPE_H

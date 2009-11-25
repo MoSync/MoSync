@@ -91,46 +91,74 @@ int StringPrintFunctor::operator()(const char* fmt, ...) {
 const TypeBase* TypeBase::deref() const {
 	return NULL;
 }
-
 const TypeBase* TypeBase::resolve() const {
 	return this;
 }
 
+//keep type references here until they're resolved.
 vector<DelayedType*> sDelayed;
 
-DelayedType::DelayedType(Tuple id) : TypeBase(0, false, eUnknown), mId(id),
-mFile(gCurrentFile)
-{
+DelayedType::DelayedType(TypeReference* t) : mType(t) {
+	addRef();
 	sDelayed.push_back(this);
 }
 
 DelayedType::~DelayedType() {
+	release();
 }
 
 void DelayedType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	resolve()->printMI(pf, data, fmt);
+	mType->printMI(pf, data, fmt);
 }
 void DelayedType::printTypeMI(printfPtr pf, bool complex) const {
-	resolve()->printTypeMI(pf, complex);
+	mType->printTypeMI(pf, complex);
+}
+const TypeBase* DelayedType::deref() const {
+	return mType->deref();
+}
+const TypeBase* DelayedType::resolve() const {
+	return mType;
 }
 
-const TypeBase* DelayedType::resolve() const {
+bool DelayedType::resolveAll() {
+	for(size_t i=0; i<sDelayed.size(); i++) {
+		DelayedType* d(sDelayed[i]);
+		const TypeBase* tb = ((TypeReference*)d->mType)->resolve();
+		if(tb != NULL) {
+			FAILIF(d == tb);
+			d->mType = tb;
+	}
+		d->release();	//in preparation for the clear().
+	}
+	sDelayed.clear();
+	return true;
+}
+
+void TypeReference::printMI(printfPtr, const void*, PrintFormat) const {
+	DEBIG_PHAT_ERROR;
+}
+void TypeReference::printTypeMI(printfPtr, bool complex) const {
+	DEBIG_PHAT_ERROR;
+}
+
+TupleReference::TupleReference(Tuple id) : mId(id), mFile(gCurrentFile) {
+}
+const TypeBase* TupleReference::resolve() const {
 	return findTypeByTupleAndFile(mId, mFile);
 }
 
-void DelayedType::freeAll() {
-	for(size_t i=0; i<sDelayed.size(); i++) {
-		delete sDelayed[i];
-	}
-	sDelayed.clear();
+CrossReferenceType::CrossReferenceType(Tuple id, const char* name)
+: TupleReference(id), mName(name)
+{}
+const TypeBase* CrossReferenceType::resolve() const {
+	return findTypeByNameAndFileGlobal(mName, mFile);
 }
 
-PointerType::PointerType(const TypeBase* target) :
-TypeBase(4, true, ePointer), mTarget(target)
-{
+PointerType::PointerType(const TypeBase* target) : mTarget(target) {
 }
 void PointerType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("0x%x", *(int*)data);
+//	pf("0x%x", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
 void PointerType::printTypeMI(printfPtr pf, bool complex) const {
 	mTarget->printTypeMI(pf, complex);
@@ -140,20 +168,20 @@ const TypeBase* PointerType::deref() const {
 	return mTarget;
 }
 
-PointerToMemberType::PointerToMemberType(const StructType* c, const TypeBase* m) :
-TypeBase(4, true, ePointerToMember), mClass(c), mMember(m)
+PointerToMemberType::PointerToMemberType(const StructType* c, const TypeBase* m)
+: mClass(c), mMember(m)
 {
 }
 void PointerToMemberType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	pf("0x%x", *(int*)data);
+//	pf("0x%x", *(int*)data);
+	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
 void PointerToMemberType::printTypeMI(printfPtr pf, bool complex) const {
 	mMember->printTypeMI(pf, false);
 	pf(" %s::*", mClass->mName.c_str());
 }
 
-FunctionType::FunctionType(const TypeBase* returnType) :
-TypeBase(0, false, eFunction), mReturnType(returnType) {
+FunctionType::FunctionType(const TypeBase* returnType) : mReturnType(returnType) {
 }
 void FunctionType::addParam(const TypeBase* p) {
 	mParams.push_back(p);
@@ -171,9 +199,7 @@ void FunctionType::printTypeMI(printfPtr pf, bool complex) const {
 	pf(")");
 }
 
-StructType::StructType(int s, const std::string& name)
-: TypeBase(s, false, eStruct), mName(name)
-{
+StructType::StructType(int s, const std::string& name) : mName(name), mSize(s) {
 }
 
 void StructType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
@@ -215,7 +241,9 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 		if(mBases.size()) pf(" : ");
 
 		for(size_t i=0; i<mBases.size(); i++) {
-			pf("public %s", ((StructType*)mBases[i].type->resolve())->mName.c_str());
+			const TypeBase* tb = mBases[i].type->resolve();
+			const StructType* st = (StructType*)tb;
+			pf("public %s", st->mName.c_str());
 			if(i!=mBases.size()-1) pf(", ");
 		}
 
@@ -272,22 +300,18 @@ const std::vector<StaticDataMember>& StructType::getStaticDataMembers() const {
 	return mStaticDataMembers;
 }
 
-RangeType::RangeType(int min, int max) :
-TypeBase(0, true, eUnknown), mMin(min), mMax(max)
-{
+RangeType::RangeType(int min, int max) : mMin(min), mMax(max) {
 }
 
 void RangeType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
 	DEBIG_PHAT_ERROR;
 }
-
 void RangeType::printTypeMI(printfPtr pf, bool complex) const {
 	DEBIG_PHAT_ERROR;
 }
 
 ArrayType::ArrayType(int len, const TypeBase* elemType, const TypeBase* rangeType)
-: TypeBase(len * elemType->size, false, eArray), mLength(len),
-mElemType(elemType), mRangeType(rangeType)
+: mLength(len), mElemType(elemType), mRangeType(rangeType)
 {
 }
 void ArrayType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
@@ -296,7 +320,7 @@ void ArrayType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fm
 	for(int i=0; i<mLength; i++) {
 		if(i != 0)
 			pf(", ");
-		mElemType->printMI(pf, bp + i * mElemType->size, fmt);
+		mElemType->printMI(pf, bp + i * mElemType->size(), fmt);
 	}
 	pf("}");
 }
@@ -304,9 +328,11 @@ void ArrayType::printTypeMI(printfPtr pf, bool complex) const {
 	mElemType->printTypeMI(pf, complex);
 	pf(" [%i]", mLength);
 }
+int ArrayType::size() const {
+	return mLength * mElemType->size();
+}
 
-ConstType::ConstType(const TypeBase* target) :
-TypeBase(target->size, true, target->type), mTarget(target) {
+ConstType::ConstType(const TypeBase* target) : mTarget(target) {
 }
 void ConstType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
 	mTarget->printMI(pf, data, fmt);
@@ -318,8 +344,17 @@ void ConstType::printTypeMI(printfPtr pf, bool complex) const {
 const TypeBase* ConstType::deref() const {
 	return mTarget->deref();
 }
+int ConstType::size() const {
+	return mTarget->size();
+}
+bool ConstType::isSimpleValue() const {
+	return mTarget->isSimpleValue();
+}
+TypeBase::Type ConstType::type() const {
+	return mTarget->type();
+}
 
-EnumType::EnumType(const string& name) : TypeBase(4, true, eEnum), mName(name) {
+EnumType::EnumType(const string& name) : mName(name) {
 }
 void EnumType::addMember(const EnumMember& em) {
 	mMembers.push_back(em);
@@ -345,13 +380,6 @@ void EnumType::printTypeMI(printfPtr pf, bool complex) const {
 		//todo: print members, specifying values for member that had values specified in source,
 		//name only for the other members.
 	}
-}
-
-CrossReferenceType::CrossReferenceType(Tuple id, const char *name) :
-DelayedType(id), mName(name) {}
-
-const TypeBase* CrossReferenceType::resolve() const {
-	return findTypeByNameAndTupleAndFileGlobal(mName, mId, mFile);
 }
 
 

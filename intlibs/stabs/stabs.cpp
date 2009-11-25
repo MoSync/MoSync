@@ -79,7 +79,9 @@ bool loadStabs(const char* sld, const char* stabs) {
 		TEST(parseStabLine(line));
 	}
 	gCurrentFile = -1;
-	return sLoaded = in.eof();
+	TEST(in.eof());
+	TEST(DelayedType::resolveAll());
+	return sLoaded = true;
 }
 
 bool stabsIsLoaded() {

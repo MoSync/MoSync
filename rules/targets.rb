@@ -18,11 +18,16 @@ class Targets
 	end
 	
 	@@targets = {}
+	@@goals = []
 	
 	def Targets.reset(args)
 		@@targets = {}
 		@@args = args
+		@@goals = []
 	end
+	
+	def Targets.size() @@targets.size end
+	def Targets.goals() @@goals end
 	
 	def Targets.add(args, &block)
 		case args
@@ -31,8 +36,18 @@ class Targets
 			fail "No Task Name Given" if args.size < 1
 			name = args.keys[0]
 			preqs = args[name]
-			preqs = [preqs] if (String===preqs) || (Regexp===preqs) || (Proc===preqs) || (Symbol===preqs)
-			preqs = preqs.collect do |p| @@targets[p] end
+			preqs = [preqs] if !preqs.respond_to?(:collect)
+			preqs = preqs.collect do |p|
+				#puts "testing: #{p.inspect}"
+				if(p.respond_to?(:invoke))
+					p
+				else
+					if(@@targets[p] == nil)
+						error "Target #{p.inspect} does not exist."
+					end
+					@@targets[p]
+				end
+			end
 		else
 			name = args
 			preqs = []
@@ -43,7 +58,7 @@ class Targets
 	
 	# parse ARGV
 	def Targets.setup
-		@@goals = []
+		return if(@@goals.size != 0)
 		if(defined?(@@args) != nil)
 			#puts "Got args from reset."
 			args = @@args
@@ -56,12 +71,18 @@ class Targets
 		if(@@goals.empty?) then
 			@@goals = [:default]
 		end
+		if(!defined?(CONFIG))
+			set_const(:CONFIG, 'debug')
+		end
 	end
 	
 	def Targets.handle_arg(a)
 		i = a.index('=')
 		if(i) then
-			set_constant(a[0, i], a[i+1 .. a.length])
+			name = a[0, i]
+			value = a[i+1 .. a.length]
+			#puts "Set constant #{name.inspect}=#{value.inspect}"
+			set_const(name, value)
 		else
 			@@goals += [a.to_sym]
 		end

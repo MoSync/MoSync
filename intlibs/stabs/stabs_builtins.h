@@ -43,10 +43,14 @@ public:
 	};
 
 	Builtin(const char* name, int s, SubType st) :
-		TypeBase(s, true, eBuiltin), mName(name), mSubType(st) {}
+		mSize(s), mName(name), mSubType(st) {}
+	int size() const { return mSize; }
+	bool isSimpleValue() const { return true; }
+	Type type() const { return eBuiltin; }
 	const TypeBase* resolve() const { return this; }
 	void printTypeMI(printfPtr p, bool complex) const { p("%s", mName); }
 public:
+	const int mSize;
 	const char* const mName;
 	const SubType mSubType;
 };
