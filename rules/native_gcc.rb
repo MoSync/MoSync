@@ -22,7 +22,7 @@ class CompileGccTask < FileTask
 
 		# save cflags to disk, for use as dependency.
 		# but first read it back from disk, if existing.
-		@FLAGSFILE = @work.genfile(source, ".flags")
+		@FLAGSFILE = @NAME + ".flags"
 		if(File.exists?(@FLAGSFILE)) then
 			@OLDFLAGS = open(@FLAGSFILE) { |f| f.read }
 		end

@@ -55,7 +55,7 @@ class MakeDependLoader
 		index = line.index(': ')
 		md = line[0, index].strip
 		if(!filenamesEqual(target, md)) then
-			error "MD target mismatch in #{fn}. target: '#{target}' md: '#{md}'"
+			puts "Warning: MD target mismatch in #{fn}. target: '#{target}' md: '#{md}'"
 		end
 		args = line[index+1, line.length]
 		return [] if args.nil?

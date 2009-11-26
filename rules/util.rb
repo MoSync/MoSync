@@ -9,6 +9,11 @@ def set_const(name, value)
 	eval(s)
 end
 
+def default_const(constant, value)
+	s = ("if(defined?(#{constant.to_s}) == nil) then #{constant.to_s} = #{value.inspect} end")
+	eval(s)
+end
+
 class String
 	def ext(newEnd)
 		doti = rindex('.')

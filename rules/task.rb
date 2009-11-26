@@ -100,6 +100,10 @@ end
 
 class BuildWork < Work
 	include Defaults
+	def initialize
+		Targets.setup
+		super
+	end
 	def setup
 		#puts "BuildWork.setup: #{@NAME.inspect}"
 		set_defaults

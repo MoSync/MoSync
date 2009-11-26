@@ -1,4 +1,5 @@
 require "#{File.dirname(__FILE__)}/util.rb"
+require "#{File.dirname(__FILE__)}/targets.rb"
 
 module Defaults
 def set_defaults
@@ -20,6 +21,8 @@ def set_defaults
 	default(:LIBRARIES, [])
 	default(:SPECIFIC_CFLAGS, {})
 	default(:BUILDDIR_BASE, "build/")
+	
+	default_const(:CONFIG, "debug")
 
 	if(CONFIG == "debug") then
 		@BUILDDIR = @BUILDDIR_BASE + "debug/"
