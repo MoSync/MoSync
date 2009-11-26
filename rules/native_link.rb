@@ -5,10 +5,25 @@ class NativeGccLinkTask < FileTask
 		super(work, name)
 		@prerequisites = @objects = objects
 		
-		# todo: save linkflags, like CompileGccTask's CFLAGS.
+		# save linkflags, like CompileGccTask's CFLAGS.
+		@FLAGSFILE = @NAME + ".flags"
+		if(File.exists?(@FLAGSFILE)) then
+			@OLDFLAGS = open(@FLAGSFILE) { |f| f.read }
+		end
+	end
+	
+	def needed?
+		if(@OLDFLAGS != @LINKFLAGS)
+			puts "Because the flags have changed:"
+			return true
+		end
+		super
 	end
 	
 	def execute
+		if(@OLDFLAGS != @LINKFLAGS) then
+			open(@FLAGSFILE, 'w') { |f| f.write(@LINKFLAGS) }
+		end
 		sh "g++ #{@objects.join(' ')}#{@LINKFLAGS} -o #{@NAME}"
 	end
 end

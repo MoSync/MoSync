@@ -160,12 +160,13 @@ class FileTask < Task
 	
 	# Are there any prerequisites with a later time than the given time stamp?
 	def out_of_date?(stamp)
-		@prerequisites.any? { |n|
+		@prerequisites.each do |n|
 			if(n.timestamp > stamp)
 				puts "Because prerequisite '#{n}' is newer: #{@NAME}"
 				return true
 			end
-		}
+		end
+		return false
 	end
 	
 	def dump(level)

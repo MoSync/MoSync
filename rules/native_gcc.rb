@@ -33,7 +33,10 @@ class CompileGccTask < FileTask
 			puts "Because the flags have changed:"
 			return true
 		end
-		return true if !File.exists?(@DEPFILE)
+		if(!File.exists?(@DEPFILE))
+			puts "Because the dependency file is missing:"
+			return true
+		end
 		super
 	end
 	
