@@ -39,6 +39,7 @@ import android.graphics.Path;
 import java.util.Vector;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.Hashtable;
 import java.io.*;
 
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
@@ -146,7 +147,7 @@ IMPLEMENTS MoSync
 	int mFrameBufferAddress;
 	boolean mUsingFrameBuffer;
 	
-//	Hashtable mStores = new Hashtable();
+	Hashtable mStores = new Hashtable();
 	int mMaxStoreId = 0;
 	
 	final long mStartTime = System.currentTimeMillis();
@@ -171,7 +172,7 @@ IMPLEMENTS MoSync
 
 	public void resizeScreen(int width, int height)
 	{
-		Log.i("MoSync Syscall", "window size width:" + mWidth + " height:" + mHeight);
+		//Log.i("MoSync Syscall", "window size width:" + mWidth + " height:" + mHeight);
 		
 		mWidth = width;
 		mHeight = height;
@@ -597,12 +598,12 @@ public
 	public
 #endif
 	void addResource(int index, Object o) THE {
-		Log.i("Syscall", "addResource");
+		DEBUG("addResource");
 		if(getResource(index) != null || index <= 0) {
 			BIG_PHAT_ERROR;
 		}
 		setResource(index, o);
-		Log.i("Syscall", " - resource " + index + " added!");
+		DEBUG(" - resource " + index + " added!");
 	}
 
 	final String readMimeString(InputStream input) throws Exception {
@@ -770,14 +771,14 @@ public
 
 	SYSCALL(int) maGetDataSize(MAHandle data) {
 		BinaryInterface bi = (BinaryInterface)getResource(data);
-		Log.i("Syscall","maGetDataSize:" + bi.size());
+		DEBUG("maGetDataSize:" + bi.size());
 		return bi.size();
 	}
 
 	SYSCALL(void) maReadData(MAHandle data, Address dst, int offset, int size)
 		throws Exception
 	{
-		Log.i("Syscall","maReadData");
+		DEBUG("maReadData");
 		BinaryInterface bi = (BinaryInterface)getResource(data);
 		if(bi instanceof Binary) {
 			Binary b = (Binary)bi;
@@ -811,13 +812,13 @@ public
 	SYSCALL(void) maWriteData(MAHandle data, Address src, int offset, int size)
 		throws Exception
 	{
-		Log.i("Syscall","maWriteData");
+		DEBUG("maWriteData");
 		Binary b = (Binary)getResource(data);
 		readMemBytes(b.arr, src, offset, size);
 	}
 
 	SYSCALL(void) maCopyData(Address a) throws Exception {
-		Log.i("Syscall","maCopyData");
+		DEBUG("maCopyData");
 		int[] mem_ds = CORE.mMem_ds;
 		MAHandle dst = RINT(a);
 		int dstOffset = RINT(a + 4);
@@ -839,7 +840,7 @@ public
 	}
 
 	SYSCALL(MAHandle) maCreatePlaceholder() {
-		Log.i("Syscall","maCreatePlaceholder");
+		DEBUG("maCreatePlaceholder");
 		if(mDynamicResArray == null) {
 			mDynamicResArray = new Object[1];
 			mDynamicSize = 0;
@@ -849,12 +850,12 @@ public
 			mDynamicResArray = new Object[mDynamicResArray.length * 2];
 			System.arraycopy(oldDynRes, 0, mDynamicResArray, 0, oldDynRes.length);
 		}
-		Log.i("  ","Handle :" + ((mDynamicSize+1) | DYNARES_BIT));
+		DEBUG(" - Handle :" + ((mDynamicSize+1) | DYNARES_BIT));
 		return (mDynamicSize++) | DYNARES_BIT;
 	}
 
 	SYSCALL(void) maDestroyObject(MAHandle handle) {
-		Log.i("Syscall","maDestroyObject");
+		DEBUG("maDestroyObject");
 		if(getResource(handle) != null) {
 			MYASSERT(getResource(handle) != mFlux);
 			setResource(handle, null);
@@ -862,7 +863,7 @@ public
 	}
 
 	SYSCALL(MAHandle) maFindLabel(String name) {
-		Log.i("Syscall","maFindLabel");
+		DEBUG("maFindLabel");
 		for(int i = 0; i < mResourceArray.length; i++) {
 			if(getResource(i) instanceof String) {
 				if(((String)getResource(i)).equals(name))
@@ -873,7 +874,7 @@ public
 	}
 	
 	SYSCALL(int) maCreateData(MAHandle placeholder, int size) THE {
-		Log.i("Syscall","maCreateData");
+		DEBUG("maCreateData");
 		try {
 			addResource(placeholder, new Binary(new byte[size]));
 		} catch(java.lang.OutOfMemoryError e) {
@@ -884,7 +885,7 @@ public
 
 #ifdef SEGMENTED_DATA
 	SYSCALL(int) maAddDataSize(MAHandle data, int size) {
-		Log.i("Syscall","maAddDataSize");
+		DEBUG("maAddDataSize");
 		Binary b = (Binary)getResource(data);
 		try {
 			b.add(size);
@@ -895,32 +896,112 @@ public
 	}
 #endif
 
-	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws /* FIX-ME RecordStore*/Exception {
-		Log.i("Syscall","maOpenStore");
-		/*	FIX-ME */
-		return STERR_NONEXISTENT;
+	final static String storesPath = "MAStore";
+	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws IOException {
+		DEBUG("maOpenStore");
+		try
+		{
+			File f = mCore.mContext.getFileStreamPath(storesPath);
+			
+			if(f.isFile()) return STERR_GENERIC;
+			else if(!f.isDirectory())
+			{
+				boolean success = f.mkdir();
+				if(!success) return STERR_GENERIC;
+			}
+			
+			String filePath = storesPath + File.pathSeparator + name;
+			f = mCore.mContext.getFileStreamPath(filePath);
+			
+			if(f.isDirectory()) return STERR_GENERIC;
+			if(!f.isFile())
+			{
+				if ((flags & MAS_CREATE_IF_NECESSARY) == 0) return STERR_NONEXISTENT;
+				f.createNewFile();
+			}
+			
+			mMaxStoreId++;
+			mStores.put(new Integer(mMaxStoreId), filePath);
+			return mMaxStoreId;
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+			return STERR_GENERIC;
+		}
 	}
 
 	SYSCALL(int) maWriteStore(MAHandle store, MAHandle data) throws Exception {
-		Log.i("Syscall","maWritrData");
 		DEBUG_ALWAYS("maWriteStore "+store+"\n");
-		/* FIX-ME */
-		return -1;
+		
+		try {
+			File f = mCore.mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
+			if(f.isFile())
+			{
+				BinaryInterface bi = (BinaryInterface)getResource(data);
+				byte[] buffer;
+				if(bi instanceof Binary) {
+					Binary b = (Binary)bi;
+					buffer = b.arr;
+				} else {
+					DataInputStream din = new DataInputStream(bi.getInputStream());
+					buffer = new byte[bi.size()];
+					din.readFully(buffer);
+					din.close();
+				}
+			
+				FileOutputStream fos = new FileOutputStream(f, false);
+				fos.write(buffer);
+				fos.close();
+				return 1;
+			}
+		} catch(Exception e) {
+			PRINT_STACK_TRACE;
+		}
+		return STERR_GENERIC;
 	}
 
 	SYSCALL(int) maReadStore(MAHandle store, MAHandle placeholder) throws Exception {
-		Log.i("Syscall","maReadStore");
-		/*	FIX-ME */
-		return -1;
+		DEBUG("maReadStore");
+
+		try {
+			File f = mCore.mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
+			byte[] buffer;
+			if(f.isFile())
+			{
+				int length = (int)f.length();
+				buffer = new byte[length];
+				
+				FileInputStream fis = new FileInputStream(f);
+				int offset = 0;
+				while(offset >= 0 && offset < length)
+					offset = fis.read(buffer, offset, (length-offset));
+				fis.close();
+			}
+			else
+			{
+				buffer = new byte[0];
+			}
+			addResource(placeholder, new Binary(buffer));	
+		} catch(java.lang.OutOfMemoryError e) {
+			PRINT_STACK_TRACE;
+			return RES_OUT_OF_MEMORY;
+		}
+		return RES_OK;
 	}
 
-	SYSCALL(void) maCloseStore(MAHandle store, int del) throws /* FIX-ME RecordStore*/Exception CEX {
-		Log.i("Syscall","maCloseStore");
-		/* FIX-ME */		
+	SYSCALL(void) maCloseStore(MAHandle store, int del) throws IOException CEX {
+		DEBUG("maCloseStore");
+		
+		String filePath = (String)mStores.get(new Integer(store));
+		if(del != 0) {
+			File f = mCore.mContext.getFileStreamPath(filePath);
+			f.delete();
+		} 
+		
+		MYASSERT(mStores.remove(new Integer(store)) == filePath);
 	}
 
 	SYSCALL(int) maLoadResources(final MAHandle data) throws Exception {
-		Log.i("Syscall","maLoadResource");
+		DEBUG("maLoadResource");
 		try {
 			BinaryInterface bi = (BinaryInterface)getResource(data);
 			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(bi.getInputStream());
@@ -988,41 +1069,43 @@ public
 	}
 
 	SYSCALL(void) maWait(int timeout) THE {
-/* FIX-ME	
-		if(G_CLOSING)
-			return;
-		mCanvas.Wait(timeout);
-*/		
+	
+//		if(G_CLOSING)
+//			return;
+		mMoSyncView.Wait(timeout);
 	}
 
 	SYSCALL(int) maTime() {
-		Log.i("Syscall","maTime");
+		DEBUG("maTime");
 		Date d = new Date();
 		return (int)(d.getTime() / 1000);
 	}
+	
 	SYSCALL(int) maLocalTime() {
-		Log.i("Syscall","maLocalTime");
+		DEBUG("maLocalTime");
 		Date d = new Date();
 		TimeZone tz = TimeZone.getDefault();
 		return (int)((d.getTime() + tz.getRawOffset()) / 1000);
 	}
+	
 	SYSCALL(int) maGetMilliSecondCount() {
 		return (int)System.currentTimeMillis();
 	}
 
 	SYSCALL(int) maFreeObjectMemory() {
-		Log.i("Syscall","maFreeObjectMemory");
+		DEBUG("maFreeObjectMemory");
 		Runtime r = Runtime.getRuntime();
 		r.gc();
 		return (int)r.freeMemory();
 	}
+	
 	SYSCALL(int) maTotalObjectMemory() {
-		Log.i("Syscall","maTotalObjectMemory");
+		DEBUG("maTotalObjectMemory");
 		return (int)Runtime.getRuntime().totalMemory();
 	}
 
 	SYSCALL(int) maVibrate(int duration) {
-		Log.i("Syscall","maVibrate");
+		DEBUG("maVibrate");
 		if(duration == 0)
 			mVibrator.cancel();
 		else	
@@ -1037,7 +1120,6 @@ public
 	}
 
 	SYSCALL(void) maExit(int result) throws Exception {
-		Log.i("Syscall","maExit");
 		DEBUG("MoSync Syscall - maExit("+result+")\n");
 #ifdef GDB_DEBUG
 		mCore.mGdbStub.exitHandler(result);
@@ -1072,7 +1154,7 @@ public
 	}
 	
 	int maCheckInterfaceVersion(int hash) {
-		Log.i("Syscall","maCheckInterfaceVersion");
+		DEBUG("maCheckInterfaceVersion");
 		if(hash == MAIDL_HASH) {
 			DEBUG_ALWAYS("IDL version match!\n");
 		} else {
@@ -1094,6 +1176,9 @@ public
 		case maIOCtl_maPlatformRequest:
 			return maPlatformRequest(readMemString(a));
 
+		case maIOCtl_maGetBatteryCharge:
+			return maGetBatteryCharge();
+			
 #ifdef PUBLIC_DEBUG
 		case maIOCtl_maWriteLog:
 			return maWriteLog(a, b);
@@ -1206,6 +1291,13 @@ public
 		}
 	}
 
+	SYSCALL(int) maGetBatteryCharge()
+	{
+		int ch = mMoSyncView.getBatteryCharge();
+		Log.i("syscall", "Battery charge:" + ch);
+		return mMoSyncView.getBatteryCharge();
+	}
+	
 	#include "SyscallBluetooth.jpp"
 	
 #ifdef MA_SUPPORT_RECORD

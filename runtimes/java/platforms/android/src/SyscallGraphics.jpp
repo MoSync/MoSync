@@ -20,8 +20,6 @@ SYSCALL(int) maSetColor(int argb) {
 	if(argb<=0xffffff) argb += 0xff000000;
 	DEBUG("MoSync Syscall - maSetColor " + argb);
 	
-	Log.i("syscall","maSetColor:"+ argb);
-	
 	int t = mPaint.getColor();
 	mPaint.setColor(argb);
 	mPaint.setAlpha(255);
@@ -63,8 +61,11 @@ SYSCALL(void) maFillRect(int left, int top, int sizeX, int sizeY) {
 	mCanvas.drawRect(left, top, left+sizeX, top+sizeY, mPaint);
 }
 
+/*
+This implementation might seem a bit strange but it works so much better than using Canvas.drawVertices..
+*/
 SYSCALL(void) maFillTriangleStrip(Address address, int count) {
-	Log.i("Syscall","maFillTriangleStrip");
+	DEBUG("maFillTriangleStrip");
 
 	int i = 2;
 	MYASSERT(count >= 3);
@@ -113,7 +114,7 @@ SYSCALL(void) maFillTriangleStrip(Address address, int count) {
 
 
 SYSCALL(void) maFillTriangleFan(Address address, int count) {
-	Log.i("Syscall","maFillTriangleFan");
+	DEBUG("maFillTriangleFan");
 
 		int i = 2;
 		MYASSERT(count >= 3);
@@ -171,14 +172,12 @@ SYSCALL(void) maUpdateScreen() {
 		synchronized (mMoSyncView.mSurfaceHolder) {
 			if(mUsingFrameBuffer)
 			{
-				Log.i("maUpdateScreen","frame buffer"); 
 				int[] mem_ds = CORE.mMem_ds;	
 				lockedCanvas.drawBitmap(mem_ds,(mFrameBufferAddress>>2),mWidth,0,0,
 										mWidth,mHeight,false, mBlitPaint);
 			}
 			else
 			{
-				Log.i("maUpdateScreen","normal"); 
 				lockedCanvas.drawBitmap(mBitmap, 0, 0, mBlitPaint);
 			}
 		}
@@ -201,7 +200,7 @@ SYSCALL(void) maDrawImage(MAHandle image, int left, int top) {
 }
 
 SYSCALL(void) maDrawRGB(MAPoint2d dstPoint, Address src, MARect srcRect, int scanlength) {
-	Log.i("Syscall","maDrawRGB");
+	DEBUG("maDrawRGB");
 
 	int[] mem_ds = CORE.mMem_ds;
 	mCanvas.drawBitmap(mem_ds, (src>>2) + MARect_left(srcRect) + MARect_top(srcRect) * scanlength,
@@ -308,7 +307,7 @@ SYSCALL(void) maDrawImageRegion(MAHandle image, MARect srcRect,
 SYSCALL(MAHandle) maInitLayer(MAHandle tileResource, MAHandle mapResource,
 	int layerSizeX, int layerSizeY)
 {
-	Log.i("Syscall","maInitLayer");
+	DEBUG("maInitLayer");
 /* FIXME
 	Tileset tileset = (Tileset)getResource(tileResource);
 
@@ -326,14 +325,14 @@ SYSCALL(MAHandle) maInitLayer(MAHandle tileResource, MAHandle mapResource,
 }
 
 SYSCALL(void) maDisposeLayer(MAHandle layer) {
-	Log.i("Syscall","maDisposeLayer");
+	DEBUG("maDisposeLayer");
 /* FIXME	
 	mTiledLayers.setElementAt(null, layer);
 */		
 }
 
 SYSCALL(void) maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int destY) {	
-	Log.i("Syscall","maSetMap");
+	DEBUG("maSetMap");
 /* FIXME	
 	Tilemap map = (Tilemap)getResource(srcMapResource);
 	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
@@ -361,7 +360,7 @@ SYSCALL(void) maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int d
 }
 
 SYSCALL(void) maChangeTileSet(MAHandle layer, MAHandle tileResource) {
-	Log.i("Syscall","maChangeTileSet");
+	DEBUG("maChangeTileSet");
 /* FIXME	
 	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
 	Tileset tileset = (Tileset)getResource(tileResource);
@@ -370,7 +369,7 @@ SYSCALL(void) maChangeTileSet(MAHandle layer, MAHandle tileResource) {
 }
 
 SYSCALL(void) maDrawLayer(MAHandle layer, int offsetX, int offsetY) {
-	Log.i("Syscall","maDrawLayer");
+	DEBUG("maDrawLayer");
 /* FIXME	
 	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
 	destLayer.setPosition(offsetX, offsetY);
@@ -379,7 +378,7 @@ SYSCALL(void) maDrawLayer(MAHandle layer, int offsetX, int offsetY) {
 }
 
 SYSCALL(void) maSetTile(MAHandle layer, int x, int y, int tileNumber) {
-	Log.i("Syscall","maSetTile");
+	DEBUG("maSetTile");
 /* FIXME	
 	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
 	destLayer.setCell(x,y, tileNumber);
@@ -387,13 +386,13 @@ SYSCALL(void) maSetTile(MAHandle layer, int x, int y, int tileNumber) {
 }
 
 SYSCALL(MAExtent) maGetImageSize(MAHandle image) {
-	Log.i("Syscall","maImageSize");
+	DEBUG("maImageSize");
 	Bitmap bitmap = ((ImageCache) getResource(image)).i;
 	return EXTENT(bitmap.getWidth(), bitmap.getHeight());
 }
 
 SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int scanlength) {
-	Log.i("Syscall","maGetImageData");
+	DEBUG("maGetImageData");
 
 	Bitmap bitmap = ((ImageCache)getResource(image)).i;
 	int[] mem_ds = CORE.mMem_ds;
@@ -402,7 +401,7 @@ SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int sc
 }
 
 SYSCALL(MAHandle) maSetDrawTarget(MAHandle handle) {
-	Log.i("Syscall","maSetDrawTarget");
+	DEBUG("maSetDrawTarget");
 /* FIXME	
 	MAHandle temp = mDrawTargetHandle;
 	if(mDrawTarget != null) {
@@ -428,7 +427,7 @@ SYSCALL(MAHandle) maSetDrawTarget(MAHandle handle) {
 SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size) 
 	throws Exception
 {
-	Log.i("Syscall","maCreateImageFromData in:" + data + " out: " + placeholder);
+	DEBUG("maCreateImageFromData in:" + data + " out: " + placeholder);
 	
 	BinaryInterface bi = (BinaryInterface)getResource(data);
 	MYASSERT(bi.size() >= offset + size);
@@ -456,7 +455,7 @@ SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offs
 SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, int alpha) 
 	throws Exception
 {
-	Log.i("Syscall","maCreateImageRaw");
+	DEBUG("maCreateImageRaw");
 
 	MYASSERT(BYTEPART(src) == 0);
 	int width = EXTENT_X(size);		
@@ -478,7 +477,7 @@ SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, 
 }
 
 SYSCALL(int) maCreateDrawableImage(MAHandle placeholder, int width, int height) THE {
-	Log.i("Syscall","maCreateDrawableImage");
+	DEBUG("maCreateDrawableImage");
 	try {
 		addResource(placeholder, new ImageCache(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)));
 	} catch(java.lang.OutOfMemoryError e) {
@@ -489,7 +488,7 @@ SYSCALL(int) maCreateDrawableImage(MAHandle placeholder, int width, int height) 
 
 int maFrameBufferGetInfo(Address info) 
 {
-	Log.i("Syscall","maFrameBufferGetInfo");
+	DEBUG("maFrameBufferGetInfo");
 	int addr = info;
 	int[] mem_ds = CORE.mMem_ds;
 	WINT(addr+0, mWidth*mHeight*4); //int sizeInBytes;
@@ -513,7 +512,7 @@ int maFrameBufferGetInfo(Address info)
 
 int maFrameBufferInit(Address data) 
 {
-	Log.i("Syscall","maFrameBufferInit");
+	DEBUG("maFrameBufferInit");
 	mFrameBufferAddress = data;
 	mUsingFrameBuffer = true;
 	return 1;
@@ -521,7 +520,7 @@ int maFrameBufferInit(Address data)
 
 int maFrameBufferClose()
 {
-	Log.i("Syscall","maFrameBufferClose");
+	DEBUG("maFrameBufferClose");
 	mUsingFrameBuffer = false;
 	return 1;
 }
