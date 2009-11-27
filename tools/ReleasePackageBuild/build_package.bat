@@ -320,15 +320,6 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
-@echo Building MDB, the MoSync Debugger
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\debugger
-@ruby operationsGen.rb
-@vcbuild debugger.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
 @echo Building mobex
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\mobex
@@ -388,6 +379,14 @@ Release\idl2.exe
 @IF NOT errorlevel 0 goto TOOL_ERROR
 @echo.
 
+@echo ------------------------------------------------
+@echo Building MDB, the MoSync Debugger
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\debugger
+@ruby operationsGen.rb
+@vcbuild debugger.vcproj "Release|Win32"
+@IF NOT errorlevel 0 goto TOOL_ERROR
+@echo.
 
 @echo ------------------------------------------------
 @echo Building C++ runtimes:
