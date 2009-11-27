@@ -14,8 +14,8 @@ work.instance_eval do
 	@SPECIFIC_CFLAGS = {"mosynclib.cpp" => " -DMOSYNC_DLL_EXPORT",
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	
-	#@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
-	#@EXTRA_LINKFLAGS = " mosynclib.def"
+	@WHOLE_LIBS = ["mosync_sdl"]
+	@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
 	
 	@NAME = "mosync"
 end

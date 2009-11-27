@@ -74,7 +74,7 @@ int sprintf(char *buf, const char *fmt, ...);
 *
 * \return Length of output, or \<0 if the debug log is unavailable.
 */
-int lprintfln(const char* fmt, ...);
+int lprintfln(const char* fmt, ...) GCCATTRIB(format(printf, 1, 2));
 
 #ifdef __cplusplus
 }	//extern "C"

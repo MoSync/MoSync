@@ -161,8 +161,12 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 
 		stream << "#if defined(__GNUC__) || defined(__SYMBIAN32__)\n"
 			"#define ATTRIBUTE(a, func)  func __attribute__ ((a))\n"
+			"#define ATTRIB(a) __attribute__ ((a))\n"
+			"#define GCCATTRIB(a) __attribute__ ((a))\n"
 			"#elif defined(_MSC_VER)\n"
 			"#define ATTRIBUTE(a, func)  __declspec (a) func\n"
+			"#define ATTRIB(a) __declspec (a)\n"
+			"#define GCCATTRIB(a)\n"
 			"#define inline __inline\n"
 			"#else\n"
 			"#error Unsupported compiler!\n"
@@ -362,6 +366,9 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	string invokeArgs;
 	string doubleRetVar;
 	stream << "static inline " << f.returnType << " " << f.name << "(";
+	if(f.args.size() == 0) {
+		stream << "void";
+	}
 	for(size_t j=0; j<f.args.size(); j++) {
 		const Argument& a(f.args[j]);
 		if(j != 0)

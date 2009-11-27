@@ -113,13 +113,13 @@ int find(const char* a, char b);
 *
 * Returns a pseudo-random integral number in the range 0 to #RAND_MAX.
 */
-int rand();
+int rand(void);
 
 /** \brief Generate and return 32-bit random value.
 *
 * Returns a pseudo-random number in the range 0 to 0xFFFF FFFF.
 */
-int urand();
+int urand(void);
 
 /** \brief Initialize random number generator.
 *

@@ -36,13 +36,13 @@ extern "C" {
 * \see PrintConsole printf
 */
 
-void InitConsole();
+void InitConsole(void);
 
 /** \brief Display the printf console.
 *
 * \see PrintConsole printf
 */
-void DisplayConsole();
+void DisplayConsole(void);
 
 /** \brief Prints a C string to the console.
 * \param str A C string
@@ -67,7 +67,7 @@ int printf(const char *fmt, ...);
 
 int vprintf(const char *fmt, va_list args);
 
-int putchar ( int character );
+int putchar(int character);
 
 /** \brief The console text color.
 *

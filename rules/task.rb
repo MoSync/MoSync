@@ -96,6 +96,10 @@ class Work < TaskBase
 		load(File.expand_path('workfile.rb'), true)
 		Dir.chdir(oldDir)
 	end
+	
+	def Work.invoke_subdirs(dirs, *args)
+		dirs.each do |dir| Work.invoke_subdir(dir, *args) end
+	end
 end
 
 class BuildWork < Work

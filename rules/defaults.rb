@@ -18,6 +18,7 @@ def set_defaults
 	default(:LOCAL_LIBS, [])
 	default(:LOCAL_DLLS, [])
 	default(:CUSTOM_LIBS, [])
+	default(:WHOLE_LIBS, [])
 	default(:LIBRARIES, [])
 	default(:SPECIFIC_CFLAGS, {})
 	default(:BUILDDIR_BASE, "build/")

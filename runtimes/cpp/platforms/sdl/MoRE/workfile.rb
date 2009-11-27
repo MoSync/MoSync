@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path('../shared_work.rb')
 
 work = MoSyncExe.new
@@ -16,7 +18,9 @@ work.instance_eval do
 		"#{BD}/intlibs/helpers/intutil.cpp"]
 	@EXTRA_INCLUDES += ["../../.."]
 	#@EXTRA_CPPFLAGS = " -save-temps"
-	@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code" }
+	#@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code" }
+	
+	@LOCAL_LIBS = ["mosync_sdl"] + @LOCAL_LIBS
 	
 	@NAME = "moemu"
 	

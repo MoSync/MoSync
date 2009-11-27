@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path('../../rules/native_mosync.rb')
 
 class SisWork < MoSyncExe

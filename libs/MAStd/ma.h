@@ -47,7 +47,7 @@ typedef int BOOL;
 #ifdef __cplusplus
 extern "C"
 #endif
-int MAMain();
+int MAMain(void);
 
 #ifdef MAPIP
 #define _ma_inline(string) __asm__(string "\n")	
@@ -55,6 +55,6 @@ int MAMain();
 #define _ma_inline(string)	
 #endif
 
-void ErrorExit(const char * str, int v);
+void ATTRIBUTE(noreturn, ErrorExit(const char * str, int v));
 
 #endif /* MA_H */

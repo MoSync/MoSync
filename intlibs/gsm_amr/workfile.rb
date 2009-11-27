@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path('../../rules/dll.rb')
 
 work = DllWork.new

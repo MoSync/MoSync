@@ -98,7 +98,7 @@ typedef int (*block_size_hook)(void* ptr);
 /**
 * Calls maPanic().
 */
-void default_malloc_handler(int size);
+void ATTRIB(noreturn) default_malloc_handler(int size);
 
 /**
 * Sets the function to be called in case malloc() fails.

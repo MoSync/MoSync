@@ -29,19 +29,6 @@ EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs", "examples"]
 
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
 
-
-def do_subdir(dir, target=nil)
-	if(target)
-		Work.invoke_subdir(dir, target)
-	else
-		Work.invoke_subdir(dir)
-	end
-end
-
-def do_subdirs(dirs, target=nil)
-	dirs.each do |dir| do_subdir(dir, target) end
-end
-
 skins = Work.new
 skins.instance_eval do
 	def setup
@@ -56,27 +43,33 @@ skins.instance_eval do
 end
 
 target :base => skins do
-	do_subdirs(PRE_DIRS)
-	do_subdir("tools/idl2", "compile")
+	Work.invoke_subdirs(PRE_DIRS)
+	Work.invoke_subdir("tools/idl2", "compile")
 end
 
 target :default => :base do
-	do_subdirs(MAIN_DIRS)
+	Work.invoke_subdirs(MAIN_DIRS)
+end
+
+target :noidl => skins do
+	Work.invoke_subdirs(PRE_DIRS)
+	Work.invoke_subdir("tools/idl2")
+	Work.invoke_subdirs(MAIN_DIRS)
 end
 
 target :more => :base do
-	do_subdirs(MORE_DIRS)
+	Work.invoke_subdirs(MORE_DIRS)
 end
 
 target :examples => :base do
-	do_subdirs(EXAM_DIRS)
+	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :clean do
 	verbose_rm_rf("build")
-	do_subdirs(PRE_DIRS, "clean")
-	do_subdir("tools/idl2", "clean")
-	do_subdirs(MAIN_DIRS, "clean")
+	Work.invoke_subdirs(PRE_DIRS, "clean")
+	Work.invoke_subdir("tools/idl2", "clean")
+	Work.invoke_subdirs(MAIN_DIRS, "clean")
 end
 
 Targets.invoke

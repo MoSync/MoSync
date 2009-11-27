@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path('../../rules/exe.rb')
 
 work = ExeWork.new

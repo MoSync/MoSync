@@ -1,3 +1,4 @@
+require "#{File.dirname(__FILE__)}/util.rb"
 
 # add functions to this class to allow them to be used as command-line targets
 # if no command-line target is chosen, "default" is run.
@@ -13,7 +14,7 @@ class Targets
 			#puts "preqs of '#{@name}'"
 			@preqs.each do |p| p.invoke end
 			#puts "block of '#{@name}'"
-			@block.call
+			@block.call if(@block)
 		end
 	end
 	

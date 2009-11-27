@@ -1,8 +1,8 @@
 require "#{File.dirname(__FILE__)}/native_link.rb"
 
 class ExeTask < NativeGccLinkTask
-	def initialize(work, name, objects, linkflags)
-		super(work, name, objects)
+	def initialize(work, name, objects, whole_libs, libs, linkflags)
+		super(work, name, whole_libs + objects + libs)
 		@LINKFLAGS = linkflags
 	end
 end

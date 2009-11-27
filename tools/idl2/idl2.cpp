@@ -216,6 +216,9 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 		if(f.returnType == "noreturn")
 			stream << " ATTRIBUTE(noreturn,";
 		stream << " " << f.name << "(";
+		if(f.args.size() == 0) {
+			stream << "void";
+		}
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);
 			if(j != 0)

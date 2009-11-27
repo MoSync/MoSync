@@ -26,7 +26,7 @@ void ErrorExit(const char * str, int v)
 	maExit(-1);
 }
 
-typedef void (*voidfunc)();
+typedef void (*voidfunc)(void);
 void crt_tor_chain(int* ptr) {
 	if(ptr == NULL)
 		return;

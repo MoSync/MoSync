@@ -93,7 +93,7 @@ int axtoi(const char *hexStg) {
 		m--;   // adjust the position to set
 		n++;   // next digit to process
 	}
-	return (intValue);
+	return intValue;
 }
 
 char ConvertUtf8ToLatin1(const char* utf8, int* pnBytes) {
@@ -156,13 +156,13 @@ void srand(unsigned int seed) {
 	randStateW = randInitialW;
 }
 
-int urand() {
+int urand(void) {
 	unsigned int t = (randStateX ^ (randStateX << 11));
 	randStateX = randStateY; randStateY = randStateZ; randStateZ = randStateW;
 	return randStateW = (randStateW ^ (randStateW >> 19)) ^ (t ^ (t >> 8));
 }
 
-int rand() {
+int rand(void) {
 	return (int)(RAND_MAX & urand());
 }
 

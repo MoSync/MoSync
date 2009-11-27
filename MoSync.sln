@@ -177,6 +177,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "helpers", "helpers", "{B97F
 	ProjectSection(SolutionItems) = preProject
 		intlibs\helpers\array.h = intlibs\helpers\array.h
 		intlibs\helpers\asm_config.h = intlibs\helpers\asm_config.h
+		intlibs\helpers\attribute.h = intlibs\helpers\attribute.h
 		intlibs\helpers\cpp_defs.h = intlibs\helpers\cpp_defs.h
 		intlibs\helpers\cpp_maapi.h = intlibs\helpers\cpp_maapi.h
 		intlibs\helpers\errors_inline.h = intlibs\helpers\errors_inline.h

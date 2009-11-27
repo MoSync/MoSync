@@ -65,7 +65,7 @@ int gConsoleBackgroundColor = 0;	//black
 int gConsoleLogging = 1;
 int gConsoleDisplay = 1;
 
-static void FeedLine()
+static void FeedLine(void)
 {
 	sConsole.cursorPos.y++;
 	sConsole.cursorPos.x = 0;
@@ -78,7 +78,7 @@ static void FeedLine()
 	}
 }
 
-void InitConsole()
+void InitConsole(void)
 {
 	int i;
 
@@ -98,7 +98,7 @@ void InitConsole()
 	sConsole.initialized = 1;
 }
 
-void DisplayConsole()
+void DisplayConsole(void)
 {
 	int n, index;
 
@@ -220,7 +220,7 @@ int puts(const char* str)
 	return 0;
 }
 
-int putchar ( int character )
+int putchar(int character)
 {
 	char temp[2];
 	temp[0] = character;
@@ -228,4 +228,3 @@ int putchar ( int character )
 	PrintConsole(temp);
 	return character;
 }
-
