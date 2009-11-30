@@ -17,6 +17,7 @@ IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
 #EXTRA_CFLAGS = " -Wno-strict-aliasing"
 SPECIFIC_CFLAGS = {
 	"maint64.c" => " -Wno-missing-declarations",
+	"intrinsics.c" => " -Wno-missing-declarations",
 	"madmath.c" => " -Wno-missing-declarations",
 	"mavsprintf.c" => " -Wno-float-equal",
 	"strtod.c" => " -Wno-float-equal",

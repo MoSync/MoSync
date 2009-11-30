@@ -75,6 +75,7 @@
 	<File path="strtoull.c"/>
 	<File path="s_frexp.c"/>
 	<File path="maint64.c"/>
+	<File path="intrinsics.c"/>
 	<File path="tlsf.h"/>
 	<File path="tlsf.c"/>
 </Project>

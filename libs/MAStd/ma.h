@@ -25,10 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "maapi.h"
 
+#ifndef SIZE_T_DEFINED
 #ifdef _WIN32
 typedef unsigned int size_t;
 #elif defined(MAPIP)
 typedef unsigned long size_t;
+#endif
+#define SIZE_T_DEFINED
 #endif
 
 #ifdef MAPIP
