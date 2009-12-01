@@ -1,0 +1,6 @@
+-target-select sim
+-break-insert exec-next-test.c:5
+-exec-continue
+-test-wait
+ whatis this
+-exec-next

@@ -192,7 +192,7 @@ namespace MAUtil {
 			iterator e = end();
 
 #ifdef MOSYNCDEBUG
-			ASSERT_MSG((i<begin()) || (i>(e-1)), "Remove iterator out of bounds");
+			ASSERT_MSG(i>=begin() && i<=e, "Remove iterator out of bounds");
 #endif
 
 			while(i != (e-1)) {
@@ -208,7 +208,7 @@ namespace MAUtil {
 		 *  \param index The index of the element that should be removed.
 		 */
 		void remove(int index) {
-			remove((iterator)&mData[index]);
+			remove(mData + index);
 		}
 
 		/** \brief Inserts the element at \a index, moving all existing elements beginning at 'index' one step forward.
@@ -221,7 +221,7 @@ namespace MAUtil {
 			iterator i = &(begin()[index]);
 
 #ifdef MOSYNCDEBUG
-			ASSERT_MSG((i<begin()) || (i>(e-1)), "Insert iterator out of bounds");
+			ASSERT_MSG(i>=begin() && i<=e, "Insert iterator out of bounds");
 #endif
 
 			while(e != i)
@@ -307,28 +307,28 @@ namespace MAUtil {
 		 */
 		
 		iterator begin() {
-			return (iterator)mData;
+			return mData;
 		}
 
 		/** \brief Returns an iterator pointing beyond the last element of the Vector.
 		 */
 
 		iterator end() {
-			return (iterator)&mData[mSize];
+			return mData + mSize;
 		}
 
 		/** \brief Returns an iterator pointing to the first element of the Vector.
 		 */
 
 		const_iterator begin() const {
-			return (const_iterator)mData;
+			return mData;
 		}
 
 		/** \brief Returns an iterator pointing beyond the last element of the Vector.
 		 */
 
 		const_iterator end() const {
-			return (const_iterator)&mData[mSize];
+			return mData + mSize;
 		}
 
 		/** \brief Returns a reference to the element at \a index. No range-checking is done.

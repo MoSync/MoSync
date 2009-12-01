@@ -25,11 +25,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#define LOG_STATE_CHANGE	//TEMP HACK
 //#define DEBUG_DISASM
+//#define CORE_DEBUGGING_MODE
 
 
 #include <base/FileStream.h>
 #include <helpers/helpers.h>
 #include "helpers/TranslateSyscall.h"
+//#undef LOGC
+//#define LOGC(...) do { if(InstCount > 8200000) LOG(__VA_ARGS__); } while(0)
 
 #ifdef GDB_DEBUG
 #define UPDATE_IP

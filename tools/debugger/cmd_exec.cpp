@@ -266,7 +266,7 @@ static int callLen(int pc) {
 	} else if(gMemCs[pc] == _CALLI) {
 		return 3;
 	} else if(gMemCs[pc] == _FAR && gMemCs[pc + 1] == _CALLI) {
-		return 4;
+		return 5;
 	} else {
 		return 0;
 	}
