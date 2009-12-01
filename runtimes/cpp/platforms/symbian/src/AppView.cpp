@@ -206,6 +206,7 @@ void CAppView::LoadProgramL() {
 #endif	//__SERIES60_3X__
 	TBuf8<KMaxFileName> filename;
 	filename.Format(KPathFmt, iAppUi.iDocument.iApp.AppDllUid().iUid);
+	LHEL(CompleteWithAppPath(filename));
 	FileStream file(CCP filename.PtrZ());
 	MYASSERT(LoadVMApp(iCore, file, CCP filename.PtrZ()), ERR_PROGRAM_LOAD_FAILED);
 	
