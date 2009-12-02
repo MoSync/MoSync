@@ -1834,7 +1834,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	//nah, file ending is ignored.
 	{
 		WriteFileStream file("D:\\system\\temp\\temp.blaah");
-		Smartie<Stream> soundSrc(src->createLimitedCopy());
+		Smartie<Stream> soundSrc(src->createLimitedCopy(dataLength));
 		MYASSERT(file.writeFully(*soundSrc), ERR_DATA_ACCESS_FAILED);
 	}
 	gPlayer->OpenFileL(KFileName, controllerUid);
@@ -1872,13 +1872,27 @@ SYSCALL(void, maSoundSetVolume(int vol)) {
 	if(vol < 0) vol = 0;
 	if(vol > 100) vol = 100;
 	gSoundVolume = vol;
+
+	int maxVolume;
+#ifdef MMF
+	RMMFAudioPlayDeviceCustomCommands cc(gController);
+	LHEL(cc.GetMaxVolume(maxVolume));
+#else
 	if(!gPlayer)
 		return;
+	maxVolume = gPlayer->MaxVolume();
+#endif
+
 	float fvol = vol;
 	fvol /= 100;
-	fvol *= gPlayer->MaxVolume();
+	fvol *= maxVolume;
 	LOGA("Native volume: %i\n", (int)fvol);
+
+#ifdef MMF
+	LHEL(cc.SetVolume((int)fvol));
+#else	//Mda
 	gPlayer->SetVolume((int)fvol);
+#endif	//MMF
 }
 
 #ifndef MMF
