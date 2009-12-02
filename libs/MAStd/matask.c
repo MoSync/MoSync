@@ -22,14 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "matask.h"
 #include "maheap.h"
 
-// ASM function proto's
-
-int maRunTaskInit(int SP, int p0, int p1);
-int maRunTask(int SP);
-void maYield();
-void maKillTask();
-
-
 char *MainSP;
 int CurrentRunningTask = 0;
 
@@ -239,7 +231,7 @@ int maRunTask(int SP)
 //         returns stack location
 //****************************************
 
-void maYield()
+void maYield(void)
 {
 	ASM("push rt,d7			");		// Save task context
 	ASM("ld	r14,sp			");
@@ -254,7 +246,7 @@ void maYield()
 //         returns stack location
 //****************************************
 
-void maKillTask()
+void maKillTask(void)
 {
 	ASM("ld	r14,zr			");		// return sp as null
 
@@ -318,7 +310,7 @@ int InitTasks(int max_tasks)
 // 			Kill all tasks
 //***************************************
 
-void DisposeTasks()
+void DisposeTasks(void)
 {
 	short	n;
 

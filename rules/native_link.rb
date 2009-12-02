@@ -1,31 +1,24 @@
 require "#{File.dirname(__FILE__)}/native_gcc.rb"
+require "#{File.dirname(__FILE__)}/flags.rb"
 
 class NativeGccLinkTask < FileTask
 	def initialize(work, name, objects)
 		super(work, name)
+		initFlags
 		@prerequisites = @objects = objects
-		
-		# save linkflags, like CompileGccTask's CFLAGS.
-		@FLAGSFILE = @NAME + ".flags"
-		if(File.exists?(@FLAGSFILE)) then
-			@OLDFLAGS = open(@FLAGSFILE) { |f| f.read }
-		end
 	end
 	
-	def needed?
-		if(@OLDFLAGS != @LINKFLAGS)
-			puts "Because the flags have changed:"
-			return true
-		end
-		super
+	def needed?(log = true)
+		return true if(flagsNeeded?(log))
+		super(log)
 	end
 	
 	def execute
-		if(@OLDFLAGS != @LINKFLAGS) then
-			open(@FLAGSFILE, 'w') { |f| f.write(@LINKFLAGS) }
-		end
-		sh "g++ #{@objects.join(' ')}#{@LINKFLAGS} -o #{@NAME}"
+		execFlags
+		sh "g++ #{@objects.join(' ')}#{@FLAGS} -o #{@NAME}"
 	end
+	
+	include FlagsChanged
 end
 
 class NativeGccLinkWork < NativeGccWork
@@ -42,5 +35,5 @@ class NativeGccLinkWork < NativeGccWork
 		target = @TARGETDIR + "/" + @BUILDDIR + @NAME + link_file_ending
 		@TARGET = link_task_class.new(self, target, all_objects, wlo, llo + lld, @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]
- 	end
+	end
 end

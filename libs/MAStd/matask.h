@@ -31,8 +31,8 @@ extern "C" {
 
 int maRunTaskInit(int SP, int p0, int p1);
 int maRunTask(int SP);
-void maYield();
-void maKillTask();
+void maYield(void);
+void maKillTask(void);
 
 
 /** \brief Initialise the task system
@@ -45,7 +45,7 @@ int InitTasks(int max_tasks);
 /** \brief Dispose the task system
 */
 
-void DisposeTasks();
+void DisposeTasks(void);
 
 
 /** \brief Dispose a specific task
@@ -72,7 +72,7 @@ long CreateTask(char *TaskAddr, int p0, int p1);
 /** \brief Execute all cooperative tasks
 */
 
-void RunAllTasks();
+void RunAllTasks(void);
 
 #ifdef __cplusplus
 }	//extern "C"

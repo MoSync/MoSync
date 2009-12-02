@@ -42,7 +42,7 @@ class TaskBase
 		EARLY
 	end
 	
-	def needed?
+	def needed?(log = true)
 		true
 	end
 	
@@ -148,12 +148,12 @@ class FileTask < Task
 	
 	# Is this file task needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
-	def needed?
+	def needed?(log = true)
 		if(!File.exist?(@NAME))
-			puts "Because file does not exist: #{@NAME}"
+			puts "Because file does not exist: #{@NAME}" if(log)
 			return true
 		end
-		return true if out_of_date?(timestamp)
+		return true if out_of_date?(timestamp, log)
 		return false
 	end
 	
@@ -167,10 +167,10 @@ class FileTask < Task
 	end
 	
 	# Are there any prerequisites with a later time than the given time stamp?
-	def out_of_date?(stamp)
+	def out_of_date?(stamp, log=true)
 		@prerequisites.each do |n|
 			if(n.timestamp > stamp)
-				puts "Because prerequisite '#{n}' is newer: #{@NAME}"
+				puts "Because prerequisite '#{n}' is newer: #{@NAME}" if(log)
 				return true
 			end
 		end

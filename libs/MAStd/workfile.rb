@@ -17,7 +17,9 @@ mod.class_eval do
 		"mavsprintf.c" => " -Wno-float-equal"}.merge(native_specflags)
 	
 	PIPE_SPECIFIC_CFLAGS = NATIVE_SPECIFIC_CFLAGS.merge({
-		"maint64.c" => " -fno-strict-aliasing -Wno-missing-declarations",
+		"intrinsics.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
+		"madmath.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
+		"maint64.c" => " -fno-strict-aliasing -Wno-missing-prototypes -Wno-missing-declarations",
 		"strtod.c" => " -Wno-float-equal",
 		"e_log.c" => " -Wno-float-equal",
 		"s_atan.c" => " -fno-strict-aliasing",
@@ -39,7 +41,7 @@ mod.class_eval do
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = PIPE_SPECIFIC_CFLAGS
 		
-		@EXTRA_OBJECTS = ["crtlib.s"]
+		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s")]
 		setup_base
 	end
 	

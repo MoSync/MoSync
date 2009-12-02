@@ -186,6 +186,7 @@ extern void *MALLOC(size_t);
 #endif
 #ifndef __MATH_H__
 #include "madmath.h"
+#define Sudden_Underflow
 #endif
 
 typedef unsigned long u_int32_t;
@@ -1564,9 +1565,8 @@ strtod(CONST char *s00, char **se)
 				case 3: /* towards -infinity */
 					aadj1 += 0.5;
 				}
-#else
-			if (FLT_ROUNDS == 0)
-				aadj1 += 0.5;
+#elif (FLT_ROUNDS == 0)
+			aadj1 += 0.5;
 #endif
 			}
 		y = word0(rv) & Exp_mask;

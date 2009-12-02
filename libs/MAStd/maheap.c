@@ -82,7 +82,7 @@ block_size_hook set_block_size_hook(block_size_hook new) {
 #define MASTD_HEAP_LOG(...)
 #endif
 
-void ansi_heap_init_crt0();
+void ansi_heap_init_crt0(char *start, int length);
 
 //****************************************
 //				NewPtr

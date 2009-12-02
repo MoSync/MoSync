@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 typedef struct
 {
 	unsigned int lo, hi;
-	
 } int64;
 
 #define JRI_BIT(n)			((unsigned int)1 << (n))
@@ -47,7 +46,6 @@ typedef struct
      (r).hi = _y3 + _jlong_hi16(_y1);\
 }\
 
-long long __muldi3(long long a, long long b);
 long long __muldi3(long long a, long long b)
 {
 	int64 r;
@@ -58,12 +56,10 @@ long long __muldi3(long long a, long long b)
 	return (long long)*((long long*)&r);
 }
 
-long long __negdi2(long long num);
 long long __negdi2(long long num) {
 	return (~num)+1;
 }
 
-unsigned long long libgcc_udivmoddi4(unsigned long long num, unsigned long long den, unsigned long long *rem_p);
 unsigned long long libgcc_udivmoddi4(unsigned long long num, unsigned long long den, unsigned long long *rem_p)
 {
   unsigned long long quot = 0, qbit = 1;
@@ -94,7 +90,6 @@ unsigned long long libgcc_udivmoddi4(unsigned long long num, unsigned long long 
   return quot;
 }
 
-long long libgcc_divdi3(long long num, long long den);
 long long libgcc_divdi3(long long num, long long den)
 {
   int minus = 0;
@@ -121,19 +116,16 @@ long long libgcc_divdi3(long long num, long long den)
   return v;
 }
 
-long long __divdi3(long long a, long long b);
 long long __divdi3(long long a, long long b)
 {
 	return libgcc_divdi3(a, b);
 }
 
-unsigned long long __udivdi3 (unsigned long long a, unsigned long long b);
 unsigned long long __udivdi3 (unsigned long long a, unsigned long long b)
 {
 	return libgcc_udivmoddi4(a, b, NULL);
 }
 
-unsigned long long __umoddi3 (unsigned long long a, unsigned long long b);
 unsigned long long __umoddi3 (unsigned long long a, unsigned long long b)
 {
 	unsigned long long rem;
