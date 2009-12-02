@@ -205,6 +205,10 @@ void CAppView::LoadProgramL() {
 	_LIT8(KPathFmt, "\\system\\apps\\%08X\\program.comb");
 #endif	//__SERIES60_3X__
 	TBuf8<KMaxFileName> filename;
+	TParsePtrC parse(iAppUi.iDocument.iApp.AppFullName());
+	TBuf8<8> drive;
+	drive.copy(parse.Drive());
+	path.Insert(0, drive);
 	filename.Format(KPathFmt, iAppUi.iDocument.iApp.AppDllUid().iUid);
 	LHEL(CompleteWithAppPath(filename));
 	FileStream file(CCP filename.PtrZ());

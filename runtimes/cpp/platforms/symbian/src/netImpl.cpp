@@ -130,7 +130,7 @@ void Syscall::FinishNetworkingStartL() {
 	TConnectionInfo ci;
 	TPckg<TConnectionInfo> cib(ci);
 	LHEL(gConnection.GetConnectionInfo(1, cib));
-	LOG("IAP %i\n", ci.iIapId);
+	LOG("IAP %i\n", (int)ci.iIapId);
 	//TODO: dump IAP name and info
 	//name seems extremely hard to get. maybe just save IAP number in an ini file?
 	//what if user wants to change IAP? maybe she picked the wrong one.

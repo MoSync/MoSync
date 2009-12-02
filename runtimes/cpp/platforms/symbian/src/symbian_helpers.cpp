@@ -473,7 +473,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	const TFrameInfo& frameInfo = decoder->FrameInfo(0);
 	LOG("LEIWA: %i bytes, %ix%i pixels, %x flags\n", aEncodedData.Size(),
 		frameInfo.iOverallSizeInPixels.iWidth, frameInfo.iOverallSizeInPixels.iHeight,
-		frameInfo.iFlags);
+		(unsigned)frameInfo.iFlags);
 
 	TCleaner<CFbsBitmap> bmpClr(new CFbsBitmap);
 	if(!bmpClr)

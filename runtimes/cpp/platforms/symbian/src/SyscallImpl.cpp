@@ -1874,6 +1874,7 @@ SYSCALL(void, maSoundSetVolume(int vol)) {
 	float fvol = vol;
 	fvol /= 100;
 	fvol *= gPlayer->MaxVolume();
+	LOGA("Native volume: %i\n", (int)fvol);
 	gPlayer->SetVolume((int)fvol);
 }
 
