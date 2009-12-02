@@ -1790,6 +1790,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		gSoundPtr.Set(((byte*)src->ptr()) + offset + mimeLength,
 			dataLength, dataLength);
 	}
+	maSoundSetVolume(gSoundVolume);
 #ifdef MMF
 #if 0	//StreamSource
 	TMMFStreamParams params;
@@ -1871,6 +1872,8 @@ SYSCALL(void, maSoundSetVolume(int vol)) {
 	if(vol < 0) vol = 0;
 	if(vol > 100) vol = 100;
 	gSoundVolume = vol;
+	if(!gPlayer)
+		return;
 	float fvol = vol;
 	fvol /= 100;
 	fvol *= gPlayer->MaxVolume();
