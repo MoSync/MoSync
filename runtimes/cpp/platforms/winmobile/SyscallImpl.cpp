@@ -208,7 +208,8 @@ namespace Base {
 		68,-84,0,0,16,-79,2,0,4,0,16,0,100,97,116,97,4,0,0,0,76,1,-9,1};
 
 	int gVolume = -1;
-	byte *gCurrentSound = NULL;
+	//byte *gCurrentSound = NULL;
+	Stream* gCurrentSoundSource = NULL;
 
 	void MALibQuit();
 
@@ -1103,9 +1104,9 @@ namespace Base {
 		//closeAudio();
 		AudioEngine::close();
 
-		if(gCurrentSound) {
-			delete []gCurrentSound;
-		}
+		//if(gCurrentSound) {
+			//delete []gCurrentSound;
+		//}
 
 		InitWindowed();
 		CoUninitialize();
@@ -1894,9 +1895,11 @@ namespace Base {
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) 
 	{ 
 		int chan = 0;
-		Stream *src = gSyscall->resources.get_RT_BINARY(sound_res);
+		Stream *res = gSyscall->resources.get_RT_BINARY(sound_res);
 		char mimeString[256];
-		MYASSERT(src->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
+		MYASSERT(res->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
+		Stream* src = res->createLimitedCopy(size);
+		MYASSERT(src, ERR_DATA_ACCESS_FAILED);
 		readMimeString(mimeString, 256, src);
 		//MimeType mimeType = getMimeType(mimeString);
 
@@ -1907,6 +1910,12 @@ namespace Base {
 		*/
 
 		AudioChannel *chnl = AudioEngine::getChannel(chan);
+		chnl->setActive(false);
+		if(gCurrentSoundSource) {
+			delete gCurrentSoundSource;
+		}
+		gCurrentSoundSource = src;
+
 		AudioSource *audioSource = chnl->getAudioSource();
 		if(audioSource!=NULL) {
 			audioSource->close();
@@ -1965,6 +1974,10 @@ namespace Base {
 		*/
 		AudioChannel *chnl = AudioEngine::getChannel(0);
 		chnl->setActive(false);
+		if(gCurrentSoundSource) {
+			delete gCurrentSoundSource;
+			gCurrentSoundSource = NULL;
+		}
 	}
 
 	SYSCALL(int, maSoundIsPlaying()) 
