@@ -1729,7 +1729,7 @@ namespace Base {
 		int pos;
 		src->tell(pos);
 		int encodedSize = size - pos + offset;
-
+		LOGA("encodedSize: %i\n", encodedSize);
 		Stream* copy = src->createLimitedCopy(encodedSize);
 
 		/*

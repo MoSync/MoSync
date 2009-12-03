@@ -27,7 +27,11 @@ abstract class BinaryInterface {
 	abstract int size();
 
 	//Care should be taken to make sure that the new streams returned by these functions are closed.
-	abstract InputStream getInputStream() throws IOException;
+	final InputStream getInputStream() throws IOException {
+		return getInputStream(0, size());
+	}
+
+	abstract InputStream getInputStream(int offset, int size) throws IOException;
 #ifdef OLD_MEMCPY
 	abstract OutputStream getOutputStream(int offset) throws IOException;
 #endif

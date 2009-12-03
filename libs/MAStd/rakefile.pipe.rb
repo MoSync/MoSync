@@ -16,16 +16,15 @@ INSTALL_INCDIR = "."
 IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
 #EXTRA_CFLAGS = " -Wno-strict-aliasing"
 SPECIFIC_CFLAGS = {
-	"maint64.c" => " -Wno-missing-declarations",
+	"maint64.c" => " -fno-strict-aliasing -Wno-missing-prototypes -Wno-missing-declarations",
 	"intrinsics.c" => " -Wno-missing-declarations",
 	"madmath.c" => " -Wno-missing-declarations",
 	"mavsprintf.c" => " -Wno-float-equal",
 	"strtod.c" => " -Wno-float-equal",
 	"e_log.c" => " -Wno-float-equal",
-	"s_atan.c" => " -Wno-strict-aliasing",
-	"e_atan2.c" => " -Wno-strict-aliasing",
-	"e_asin.c" => " -Wno-strict-aliasing",
-	"maint64.c" => " -Wno-strict-aliasing"
+	"s_atan.c" => " -fno-strict-aliasing",
+	"e_atan2.c" => " -fno-strict-aliasing",
+	"e_asin.c" => " -fno-strict-aliasing",
 	}
 
 LIBNAME = "mastd"

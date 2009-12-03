@@ -1777,6 +1777,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		gSoundBuffer = new MemStream(dataLength);
 		MYASSERT(gSoundBuffer != NULL, ERR_OOM);
 		MYASSERT(src->readFully(*gSoundBuffer), ERR_DATA_ACCESS_FAILED);
+		LOGA("DataLength: %i\n", dataLength);
 		gSoundPtr.Set(((byte*)gSoundBuffer->ptr()) + offset,
 			dataLength, dataLength);
 #else
@@ -1787,10 +1788,10 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		gPlayer->OpenFileL(lfs->mFile);
 #endif	//1
 	} else {
+		LOGA("DataLength: %i\n", dataLength);
 		gSoundPtr.Set(((byte*)src->ptr()) + offset + mimeLength,
 			dataLength, dataLength);
 	}
-	maSoundSetVolume(gSoundVolume);
 #ifdef MMF
 #if 0	//StreamSource
 	TMMFStreamParams params;
@@ -1819,8 +1820,10 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 
 	LHEL(gController.AddDataSink(KUidMmfAudioOutput, KNullDesC8));
 	LHEL(gController.Prime());
+	maSoundSetVolume(gSoundVolume);
 	LHEL(gController.Play());
 #else	//Mda
+	maSoundSetVolume(gSoundVolume);
 #if defined(__SERIES60_3X__)
 	gPlayer->OpenDesL(gSoundPtr, controllerUid);
 #else	//2nd edition

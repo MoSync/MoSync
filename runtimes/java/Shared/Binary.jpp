@@ -210,8 +210,8 @@ final public class Binary extends BinaryInterface {
 	final int size() {
 		return arr.length;
 	}
-	final InputStream getInputStream() {
-		return new ByteArrayInputStream(arr);
+	final InputStream getInputStream(int offset, int size) {
+		return new ByteArrayInputStream(arr, offset, size);
 	}
 #ifdef OLD_MEMCPY
 	final OutputStream getOutputStream(int offset) {

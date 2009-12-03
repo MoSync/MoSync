@@ -113,7 +113,7 @@ int AmrAudioSource::fillBuffer()
 
 #endif
 
-		LOGA("decodedBytes: %i\n", chan->decodedBytes);
+		//LOGA("decodedBytes: %i\n", chan->decodedBytes);
 
 		/*
 #ifdef SOUND_DUMP

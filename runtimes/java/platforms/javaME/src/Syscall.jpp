@@ -1242,12 +1242,12 @@ public
 	SYSCALL(int) maSoundPlay(MAHandle sound_res, int offset, int size) throws Exception
 	{
 		BinaryInterface bi = (BinaryInterface)getResource(sound_res);
-		InputStream input = bi.getInputStream();	//should be closed by the Player.
-		input.skip(offset);	//size is ignored, since LimitedLengthInputStream doesn't work.
+		InputStream input = bi.getInputStream(offset, size);	//should be closed by the Player.
+		//input.skip(offset);	//size is ignored, since LimitedLengthInputStream doesn't work.
 		String mimeString = readMimeString(input);
 
 		//\bug LimitedLengthInputStream does not seem to work here, without it
-		// it will probably be problems if the same resource is played by several players
+		// there will probably be problems if the same resource is played by several players
 		// in parallel.
 		//			input = new LimitedLengthInputStream(input, input.available());
 		if(startSound(input, mimeString) == false) return -1;

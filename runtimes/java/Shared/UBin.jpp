@@ -47,7 +47,7 @@ final class UBin extends BinaryInterface {
 	public final int size() {
 		return mSize;
 	}
-	public final InputStream getInputStream() throws IOException {
+	public final InputStream getInputStream(int offset, int size) throws IOException {
 		//DEBUG_ALWAYS("uGIS "+filename+"\n");
 #ifdef _JavaME
 		InputStream in = getClass().getResourceAsStream(mFilename);
@@ -55,12 +55,14 @@ final class UBin extends BinaryInterface {
 		InputStream in = new LittleEndianDataInputStream(mCore.mContext.getResources().openRawResource(R.raw.resources));
 #endif
 		MYASSERT(in != null);
-		long res = in.skip(mOffset);
-		if(res != mOffset) {
-			DEBUG_ALWAYS("skip("+mOffset+") = "+res+"\n");
+		MYASSERT(size <= mSize);
+		offset += mOffset;
+		long res = in.skip(offset);
+		if(res != offset) {
+			DEBUG_ALWAYS("skip("+offset+") = "+res+"\n");
 			BIG_PHAT_ERROR;
 		}
-		return new LimitedLengthInputStream(in, mSize);
+		return new LimitedLengthInputStream(in, size);
 	}
 
 #ifdef OLD_MEMCPY
