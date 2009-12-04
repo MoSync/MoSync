@@ -15,7 +15,7 @@ class NativeGccLinkTask < FileTask
 	
 	def execute
 		execFlags
-		sh "g++ #{@objects.join(' ')}#{@FLAGS} -o #{@NAME}"
+		sh "g++#{@FLAGS} #{@objects.join(' ')} -o #{@NAME}"
 	end
 	
 	include FlagsChanged

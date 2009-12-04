@@ -12,6 +12,7 @@ class MoSyncDllWork < DllWork
 	def setup
 		setup_native
 		modSetup
+		@EXTRA_LINKFLAGS = @EXTRA_LINKFLAGS.to_s + " -Wl,--enable-auto-import"
 		super
 	end
 end

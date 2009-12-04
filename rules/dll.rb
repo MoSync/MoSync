@@ -15,7 +15,7 @@ class DllTask < NativeGccLinkTask
 		if(CONFIG == "")
 			libflags += " -s"
 		end
-		@FLAGS = libflags + " -shared -Wl,--out-implib=#{libfile}" + linkflags
+		@FLAGS = " -shared -Wl,--out-implib=#{libfile}" + linkflags + libflags
 	end
 end
 

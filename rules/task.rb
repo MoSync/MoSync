@@ -21,7 +21,21 @@ class TaskBase
 			"<EARLY TIME>"
 		end
 	end
-	EARLY = EarlyTime.instance 
+	EARLY = EarlyTime.instance
+	
+	class LateTime
+		include Comparable
+		include Singleton
+		
+		def <=>(other)
+			1
+		end
+		
+		def to_s
+			"<LATE TIME>"
+		end
+	end
+	LATE = LateTime.instance
 	
 	def initialize()
 		@prerequisites = []
@@ -170,7 +184,7 @@ class FileTask < Task
 	def out_of_date?(stamp, log=true)
 		@prerequisites.each do |n|
 			if(n.timestamp > stamp)
-				puts "Because prerequisite '#{n}' is newer: #{@NAME}" if(log)
+				puts "Because prerequisite '#{n}'(#{n.class}) is newer: #{@NAME}" if(log)
 				return true
 			end
 		end
@@ -186,6 +200,13 @@ end
 class DirTask < FileTask
 	def execute
 		FileUtils.mkdir_p @NAME
+	end
+	def timestamp
+		if File.exist?(@NAME)
+			EARLY
+		else
+			LATE
+		end
 	end
 end
 
