@@ -1,6 +1,5 @@
 
-#defines @CFLAGS and @CPPFLAGS
-
+# This module defines @CFLAGS and @CPPFLAGS, which are used in GccWork.
 module GccFlags
 def define_cflags
 

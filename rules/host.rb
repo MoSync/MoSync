@@ -14,6 +14,17 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+# This file defines a few constants that describe the host environment.
+# HOST, Symbol. Either :linux or :win32.
+# GCC_IS_V4, boolean. True if gcc's major version number is 4.
+# GCC_IS_V43, boolean. True if gcc's version number is 4.3 or greater.
+# DLL_FILE_ENDING, String. The file ending of DLL files.
+# EXE_FILE_ENDING, String. The file ending of executable files.
+
+# On Linux only:
+# SDL_SOUND, boolean. True if SDL_Sound is available.
+# BLUETOOTH, booelan. True if Bluez is available.
+
 require "#{File.dirname(__FILE__)}/error.rb"
 require "#{File.dirname(__FILE__)}/util.rb"
 
@@ -66,7 +77,7 @@ else
 end
 
 GCC_VERSION = (open("|gcc --version").readline().split(/ /))[2]
-GCC_IS_V4 = (GCC_VERSION[0] >= "4"[0])
+GCC_IS_V4 = (GCC_VERSION[0] == "4"[0])
 GCC_IS_V43 = (GCC_IS_V4 && (GCC_VERSION[2] >= "3"[0]))
 
 #warning("GCC version: #{GCC_VERSION}")
@@ -84,6 +95,7 @@ else
 end
 NATIVE_LIB_FILE_ENDING = '.a'
 
+# Compares two filenames, taking host-dependent case sensitivity into account.
 def filenamesEqual(a, b)
 	if(HOST == :win32)
 		return a.casecmp(b) == 0

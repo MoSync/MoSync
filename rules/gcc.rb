@@ -4,6 +4,10 @@ require "#{File.dirname(__FILE__)}/gcc_flags.rb"
 require "#{File.dirname(__FILE__)}/loader_md.rb"
 require "#{File.dirname(__FILE__)}/flags.rb"
 
+# Compiles a source file using gcc.
+# Generates extra files for tracking dependencies and flags,
+# so that if the flags or any dependency have changed, this file will be recompiled.
+# Objects of this class are created by GccWork.
 class CompileGccTask < FileTask
 	def initialize(work, name, source, cflags)
 		super(work, name)
@@ -39,13 +43,18 @@ class CompileGccTask < FileTask
 	include FlagsChanged
 end
 
+# Base class.
 # Compiles C/C++ code into an executable file.
-# Supports GCC on linux and mingw
+# Supports GCC on mingw, pipe and linux.
+# Uses the following variables: @SOURCES, @IGNORED_FILES, @EXTRA_SOURCEFILES,
+# @SPECIFIC_CFLAGS and @EXTRA_OBJECTS.
 class GccWork < BuildWork
+	# Returns a path representing a generated file, given a source filename and a new file ending.
 	def genfile(source, ending)
 		@BUILDDIR + File.basename(source.to_s).ext(ending)
 	end
 	
+	# The filename of the target.
 	def target
 		@TARGET
 	end

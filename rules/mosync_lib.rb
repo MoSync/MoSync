@@ -1,3 +1,8 @@
+# This file defines helper classes used for compiling MoSync libraries for both
+# native and pipe platforms.
+# To use, call MoSyncLib.invoke with a module
+# which has the setup_native and setup_pipe methods defined.
+
 require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 

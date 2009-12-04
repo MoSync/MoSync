@@ -1,5 +1,6 @@
 require "#{File.dirname(__FILE__)}/native_link.rb"
 
+# Links object files together to form a native executable.
 class ExeTask < NativeGccLinkTask
 	def initialize(work, name, objects, whole_libs, libs, linkflags)
 		super(work, name, whole_libs + objects + libs)
@@ -7,8 +8,8 @@ class ExeTask < NativeGccLinkTask
 	end
 end
 
-# Compiles C/C++ code into an executable file.
-# Supports GCC on linux and mingw
+# Compiles C/C++ code into an native executable file.
+# Supports GCC on linux and mingw.
 class ExeWork < NativeGccLinkWork
 	def link_task_class
 		ExeTask

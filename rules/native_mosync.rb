@@ -1,3 +1,6 @@
+# This file defines variants of the native Work classes
+# with extra includes and flags used by some of MoSync's programs.
+
 require "#{File.dirname(__FILE__)}/host.rb"
 require "#{File.dirname(__FILE__)}/native_lib.rb"
 require "#{File.dirname(__FILE__)}/exe.rb"

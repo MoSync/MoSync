@@ -1,10 +1,11 @@
 require "#{File.dirname(__FILE__)}/native_link.rb"
 
+# Links object files together to form a native dynamic-link library.
 class DllTask < NativeGccLinkTask
 	def initialize(work, name, objects, whole_libs, libs, linkflags)
 		super(work, name, objects)
 		@prerequisites += whole_libs + libs
-		libfile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, ".dll") + ".a"
+		libfile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, DLL_FILE_ENDING) + ".a"
 		libflags = ""
 		if(whole_libs.size > 0)
 			libflags += " -Wl,--whole-archive #{whole_libs.join(' ')} -Wl,--no-whole-archive"

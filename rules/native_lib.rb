@@ -1,5 +1,6 @@
 require "#{File.dirname(__FILE__)}/native_gcc.rb"
 
+# Links object files together to form a native static library.
 class NativeLibTask < FileTask
 	def initialize(work, name, objects)
 		super(work, name)
@@ -11,8 +12,10 @@ class NativeLibTask < FileTask
 	end
 end
 
-# Compiles C/C++ code into a static library.
+# Compiles C/C++ code into a native static library.
 # Supports GCC on linux and mingw.
+# In addition to the variables used by GccWork, this class uses the following:
+# @NAME and @COMMON_BUILDDIR.
 class NativeLibWork < NativeGccWork
 	private
 	
