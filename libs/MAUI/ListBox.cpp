@@ -420,20 +420,16 @@ namespace MAUI {
 
 		if(selectedIndex < 0) {
 			selectedIndex = 0;
-			switch(wrapping) {
-				case false:
-					if(shouldFireListeners) {
-						Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
-							(*i)->blocked(this, -1);
-						}
+			if(wrapping) {
+				if(shouldFireListeners) {
+					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
+						(*i)->blocked(this, -1);
 					}
-					return;
-					break;
-				case true:
-					setSelectedIndex(children.size()-1);
-					return;
-					break;
+				}
+			} else {
+				setSelectedIndex(children.size()-1);
 			}
+			return;
 		}
 		//printf("element: %d\n", selectedIndex);
 
@@ -484,21 +480,16 @@ namespace MAUI {
 		if(selectedIndex < children.size() - 1) {
 			selectedIndex++;
 		} else {
-			switch(wrapping) {
-				case false:
-					if(shouldFireListeners) {
-						Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
-							(*i)->blocked(this, 1);
-						}
+			if(wrapping) {
+				if(shouldFireListeners) {
+					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
+						(*i)->blocked(this, 1);
 					}
-					return;
-					break;
-				case true:
-					setSelectedIndex(0);
-					//for(int i = 0; i < children.size()-1; i++) selectPreviousItem();
-					return;
-					break;
+				}
+			} else {
+				setSelectedIndex(0);
 			}
+			return;
 		}
 
 		Widget *unselectedWidget = children[prevIndex];

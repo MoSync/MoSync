@@ -138,10 +138,8 @@ static VolumeEntry *findFileRecursively(const char *filename, VolumeEntry *root)
 			}
 			if(*a=='\0' && *b=='\0')
 				return root;
-			return 
-				NULL;
+			return NULL;
 		}
-		return NULL;
 	}
 
 	while(1) {
@@ -154,19 +152,19 @@ static VolumeEntry *findFileRecursively(const char *filename, VolumeEntry *root)
 	if((*c)==0) {
 		if(strncmp(root->name, filename, endOfChild)==0)
 			return root;
-		else 
-			return NULL;		
+		else
+			return NULL;
 	}
 	else if(strncmp(root->name, filename, endOfChild)==0) {
 		for(i = 0; i < root->numChildren; i++) {
 			findFile = findFileRecursively(c, &root->children[i]);
 			if(findFile) {
 				return findFile;
-			}	
+			}
 		}
 		return NULL;
 	}
-	else 
+	else
 		return NULL;
 }
 
@@ -279,7 +277,7 @@ static void buildDirectoryTree(MAHandle fileSystem) {
 //	printVolumeEntriesRecursively(sRoot, 0);
 }
 
-void freeCurrentFileSystem() {
+void freeCurrentFileSystem(void) {
 	if(sRoot) {
 		freeVolumeEntriesRecursively(sRoot);
 		sRoot = NULL;
@@ -672,7 +670,10 @@ char * MA_fgets ( char * str, int num, MA_FILE * stream ) {
 	eofReached = 0;
 	while(num--) {
 		int c = MA_fgetc(stream);
-		if((c==0) || (c=='\n') || (c == EOF)) eofReached = 1; break;
+		if((c==0) || (c=='\n') || (c == EOF)) {
+			eofReached = 1;
+			break;
+		}
 		*str_ptr++ = (char)c;
 	}
 	if(str_ptr==str && eofReached) return NULL;

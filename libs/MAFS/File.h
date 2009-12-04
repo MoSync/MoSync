@@ -301,7 +301,7 @@ void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive);
 /** 
 * Frees the resources allocated for the current file system.
 */
-void freeCurrentFileSystem();
+void freeCurrentFileSystem(void);
 
 /*
 // not implemented yet
