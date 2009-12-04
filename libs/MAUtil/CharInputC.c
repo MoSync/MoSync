@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifdef __cplusplus
+#error c++?
+#endif
+
 #include "CharInput.h"
 
 #define CI_ACTIVE 1
@@ -42,7 +46,7 @@ static int sCurrentCharMode = CI_MODE_CHAR_MODE_LOWERCASE;
 
 static BOOL sQwerty = FALSE;
 
-void CharInput_Reset() {
+void CharInput_Reset(void) {
 	sCurrentCharMapIndex = 0;
 	sCurrentCharMapListIndex = 0;
 	sCurrentMode = CI_INACTIVE;
@@ -130,7 +134,7 @@ void CharInput_setMode(int charMode) {
 	sCurrentCharMode = charMode;
 }
 
-int CharInput_getMode() {
+int CharInput_getMode(void) {
 	return sCurrentCharMode; 
 }
 
@@ -223,15 +227,15 @@ void CharInput_RegisterCharacterDeployedCallback(CharCallback callback, void *us
 	sCharacterDeployedCallback = callback;
 }
 
-const char* CharInput_getCurrentCharList() {
+const char* CharInput_getCurrentCharList(void) {
 	return (const char*) charMapUpperCase[sCurrentCharMapIndex];
 }
 
-int CharInput_getCurrentCharListIndex() {
+int CharInput_getCurrentCharListIndex(void) {
 	return sCurrentCharMapListIndex;
 }
 
-void CharInput_ForceDeployment() {
+void CharInput_ForceDeployment(void) {
 	CharInput_ShortPress();
 }
 
@@ -241,6 +245,6 @@ void CharInput_setQwerty(BOOL on) {
 	sQwerty = on;
 }
 
-BOOL CharInput_getQwerty() {
+BOOL CharInput_getQwerty(void) {
 	return sQwerty;
 }

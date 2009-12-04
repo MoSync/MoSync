@@ -70,3 +70,5 @@ def verbose_rm_rf(list)
 	end
 	FileUtils.rm_rf(list)
 end
+
+HashMergeAdd = Proc.new {|key, old, new| old + new }

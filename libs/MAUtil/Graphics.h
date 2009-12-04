@@ -40,12 +40,12 @@ extern "C" {
 /** 
   * Clears the clip rect stack.
   **/
-void Gfx_clearClipRect();
+void Gfx_clearClipRect(void);
 
 /** Sets the clip rect to the content of the top of the stack without changing the stack.  
     *  Returns true if the area of the restored clip rect is > 0, otherwise false.
     **/
-BOOL Gfx_restoreClipRect();
+BOOL Gfx_restoreClipRect(void);
 
 /** Pushes the specified clip rect on the stack and sets it as the current.
    *  Returns true if the area of the clip rect is > 0, otherwise false. 
@@ -61,19 +61,19 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height);
    * Pops a clip rect off the stack and sets is as the current. 
    * Returns true if the area of the resulting clip rect is > 0,  otherwise false. 
    **/
-BOOL Gfx_popClipRect();
+BOOL Gfx_popClipRect(void);
 
 /** 
   * Clears the transform stack.
   **/
-void Gfx_clearMatrix();
+void Gfx_clearMatrix(void);
 /** Pushes the current transform on the stack **/
-void Gfx_pushMatrix();
+void Gfx_pushMatrix(void);
 /** Pops the previous transform off the stack **/
-void Gfx_popMatrix();
+void Gfx_popMatrix(void);
 /** Translates the current transform by x,y **/
 void Gfx_translate(int x, int y);
-MAPoint2d Gfx_getTranslation();
+MAPoint2d Gfx_getTranslation(void);
 
 /**
 * Combines clipping and translation.
@@ -84,7 +84,7 @@ BOOL Gfx_pushRect(int x, int y, int width, int height);
 /**
 * \see Gfx_popClipRect()
 */
-BOOL Gfx_popRect();
+BOOL Gfx_popRect(void);
 
 /** Plots a pixel with the current color at x, y with respect to the current transform **/
 void Gfx_plot(int x, int y);

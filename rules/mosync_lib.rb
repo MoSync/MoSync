@@ -1,17 +1,27 @@
 require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
+module MoSyncMod
+	def modSetup
+		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + ["#{ENV['MOSYNCDIR']}/include"]
+	end
+end
+
 class MoSyncDllWork < DllWork
+	include MoSyncMod
 	def setup
 		setup_native
+		modSetup
 		super
 	end
 end
 
 class PipeLibWork < PipeGccWork
+	include MoSyncMod
 	def setup
 		@FLAGS = " -L"
 		setup_pipe
+		modSetup
 		super
 	end
 	def filename; @NAME + ".lib"; end

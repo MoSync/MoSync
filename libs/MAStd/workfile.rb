@@ -7,14 +7,21 @@ mod.class_eval do
 	if(CONFIG == "" && !GCC_IS_V4)
 		# broken compiler
 		native_specflags = {"mastdlib.c" => " -Wno-unreachable-code",
-		"mastring.c" => " -Wno-unreachable-code"}
+			"mastring.c" => " -Wno-unreachable-code",
+			"mavsprintf.c" => " -Wno-unreachable-code"}
 	else
 		native_specflags = {}
+	end
+	if(CONFIG="")
+		pipe_specflags = {"strtod.c" => " -Wno-unreachable-code",
+			"tlsf.c" => " -Wno-unreachable-code"}
+	else
+		pipe_specflags = {}
 	end
 	
 	NATIVE_SPECIFIC_CFLAGS = {
 		"madmath.c" => " -Wno-missing-declarations",
-		"mavsprintf.c" => " -Wno-float-equal"}.merge(native_specflags)
+		"mavsprintf.c" => " -Wno-float-equal"}.merge(native_specflags, &HashMergeAdd)
 	
 	PIPE_SPECIFIC_CFLAGS = NATIVE_SPECIFIC_CFLAGS.merge({
 		"intrinsics.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
@@ -24,7 +31,7 @@ mod.class_eval do
 		"e_log.c" => " -Wno-float-equal",
 		"s_atan.c" => " -fno-strict-aliasing",
 		"e_atan2.c" => " -fno-strict-aliasing",
-		"e_asin.c" => " -fno-strict-aliasing"})
+		"e_asin.c" => " -fno-strict-aliasing"}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
 	
 	def setup_native
 		@SOURCES = []

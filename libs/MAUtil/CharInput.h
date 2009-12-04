@@ -38,7 +38,7 @@ extern "C" {
 /** 
  * Reset system. 
  */
-void CharInput_Reset();
+void CharInput_Reset(void);
 
 /** 
  * Notify the charinput system that a key has been pressed with the keycode 'keyCode'. 
@@ -67,7 +67,7 @@ typedef void (*StartTimerCallback)(CharInputCallback, int time);
 /** 
  * The StopTimerCallback is used for stopping the timer. 
  */
-typedef void (*StopTimerCallback)();
+typedef void (*StopTimerCallback)(void);
 
 /** 
  * This function is used to register the timer callbacks, these are used to be able to start and stop a 
@@ -80,12 +80,12 @@ void CharInput_RegisterTimerCallback(StartTimerCallback startCallback, StopTimer
  * Use this to retrieve information about what chars can be 
  * currently selected. 
  */
-const char* CharInput_getCurrentCharList();
+const char* CharInput_getCurrentCharList(void);
 
 /** 
  * Use this to get where in the list the current char is. 
  */
-int CharInput_getCurrentCharListIndex();
+int CharInput_getCurrentCharListIndex(void);
 
 /** 
  * This is a callback used to notify the user about character input updates. 
@@ -105,7 +105,7 @@ void CharInput_RegisterCharacterDeployedCallback(CharCallback callback, void *us
 /**
 * force the currently selected character to be deployed.
 */
-void CharInput_ForceDeployment();
+void CharInput_ForceDeployment(void);
 
 /**
 * Set character input mode using one of the defines: CI_MODE_CHAR_MODE_LOWERCASE, CI_MODE_CHAR_MODE_UPPERCASE, CI_MODE_CHAR_MODE_NUMBERS.
@@ -115,7 +115,7 @@ void CharInput_setMode(int charMode);
 /** 
  * Get the character input mode.
  */
-int CharInput_getMode();
+int CharInput_getMode(void);
 
 /**
 * In standard mode, only the 0-9, # and * keys are used.
@@ -127,7 +127,7 @@ int CharInput_getMode();
 void CharInput_setQwerty(BOOL on);
 
 /** Get the qwerty mode. */
-BOOL CharInput_getQwerty();
+BOOL CharInput_getQwerty(void);
 
 #ifdef __cplusplus
 }

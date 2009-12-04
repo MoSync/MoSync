@@ -2,10 +2,13 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
-module mod
+mod = Module.new
+mod.class_eval do
 	if(CONFIG == "" && !GCC_IS_V4)
 		# broken compiler
-		native_specflags = {}
+		native_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
+			"Graphics.c" => " -Wno-unreachable-code",
+			"FrameBuffer.c" => " -Wno-unreachable-code"}
 	else
 		native_specflags = {}
 	end
@@ -29,6 +32,7 @@ module mod
 		@SOURCES = ["."]
 		@INSTALL_INCDIR = "MAUtil"
 		@NAME = "mautil"
+		@IGNORED_FILES = ["DomParser.cpp", "XMLDataProvider.cpp", "XPathTokenizer.cpp"]
 	end
 end
 

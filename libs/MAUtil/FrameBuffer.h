@@ -57,12 +57,12 @@ void FrameBuffer_setOrientation(int orientation);
  * Gets the orientation of the framebuffer.
  * \return The current orientation.
  */
-int FrameBuffer_getOrientation();
+int FrameBuffer_getOrientation(void);
 
 /**
  * Closes the framebuffer.
  */
-void FrameBuffer_close();
+void FrameBuffer_close(void);
 
 /**
  * Sets a part of the palette.

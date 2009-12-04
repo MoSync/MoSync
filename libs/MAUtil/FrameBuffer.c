@@ -40,7 +40,7 @@ static int sWeighted[16*16]; // only used in 4 bpp mode.
 typedef void (*ScalerFunc)(unsigned char *pixel, int pitchx, int pitchy, short x, short y, short w, short h, const byte *buf, int pitch);
 ScalerFunc sScalerFunc = NULL;
 
-void chooseScaler();
+static void chooseScaler(void);
 
 void FrameBuffer_init(int w, int h, int orientation, int flags) {
 	sScalerSizes[0].x = w>>1;
@@ -76,11 +76,11 @@ void FrameBuffer_setOrientation(int orientation) {
 
 }
 
-int FrameBuffer_getOrientation() {
+int FrameBuffer_getOrientation(void) {
 	return sOrientation;
 }
 
-void FrameBuffer_close() {
+void FrameBuffer_close(void) {
 	maFrameBufferClose();
 	if(sFrameBuffer) free(sFrameBuffer);
 	sFrameBuffer = 0;
@@ -159,7 +159,6 @@ static void pixelHalf_4bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 				*scan = sWeighted[*(buf + i)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -174,7 +173,6 @@ static void pixelHalf_4bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 				*scan = sWeighted[*(buf + i)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -197,7 +195,6 @@ static void pixelDirect_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan = sPal[p2];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -214,7 +211,6 @@ static void pixelDirect_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan = sPal[p2];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -243,7 +239,6 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
-			y++;
 			pixel += pitchx << 1;
 			buf += pitch;
 		}
@@ -266,7 +261,6 @@ static void pixelDouble_4bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan_upper = *scan_lower = sPal[p2];
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
-			y++;
 			pixel += pitchx << 1;
 			buf += pitch;
 		}
@@ -287,7 +281,6 @@ static void pixelHalf_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 				*scan = sPal[*(buf + i*2)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -302,7 +295,6 @@ static void pixelHalf_8bpp(unsigned char *pixel, int pitchx, int pitchy, short x
 				*scan = sPal[*(buf + i*2)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -320,7 +312,6 @@ static void pixelDirect_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan = sPal[*(buf + i)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -333,7 +324,6 @@ static void pixelDirect_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan = sPal[*(buf + i)];
 				scan+=mopitch;
 			}
-			y++;
 			pixel += pitchx;
 			buf += pitch;
 		}
@@ -356,7 +346,6 @@ static void pixelDouble_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan_upper = *scan_lower = col;
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
-			y++;
 			pixel += pitchx << 1;
 			buf += pitch;
 		}
@@ -373,7 +362,6 @@ static void pixelDouble_8bpp(unsigned char *pixel, int pitchx, int pitchy, short
 				*scan_upper = *scan_lower = col;
 				scan_upper+=mopitch; scan_lower+=mopitch;
 			}
-			y++;
 			pixel += pitchx << 1;
 			buf += pitch;
 		}
@@ -389,11 +377,11 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 	switch(sOrientation) {
 	case ORIENTATION_0:
 		dx = (sXOffset);
-		dy = (sYOffset);				
+		dy = (sYOffset);
 		pitchx = sFrameBufferInfo.pitch;
 		pitchy = sFrameBufferInfo.bytesPerPixel;
 		dx += dstx;
-		dy += dsty;	
+		dy += dsty;
 		break;
 	case ORIENTATION_90:
 		dx = (sXOffset+sScalerSizes[sScalerIndex].y-1);
@@ -401,23 +389,23 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 		pitchx = -sFrameBufferInfo.bytesPerPixel;
 		pitchy = sFrameBufferInfo.pitch;
 		dx += -dsty;
-		dy += dstx;						
+		dy += dstx;
 		break;
 	case ORIENTATION_180:
 		dx = (sXOffset+sScalerSizes[sScalerIndex].x-1);
 		dy = (sYOffset+sScalerSizes[sScalerIndex].y-1);
 		pitchx = -sFrameBufferInfo.pitch;
-		pitchy = -sFrameBufferInfo.bytesPerPixel;				
+		pitchy = -sFrameBufferInfo.bytesPerPixel;
 		dx += -dstx;
-		dy += -dsty;				
+		dy += -dsty;
 		break;
-	case ORIENTATION_270:	
+	case ORIENTATION_270:
 		dx = (sXOffset);
 		dy = (sYOffset+sScalerSizes[sScalerIndex].x-1);
 		pitchx = sFrameBufferInfo.bytesPerPixel;
 		pitchy = -sFrameBufferInfo.pitch;
 		dx += dsty;
-		dy += -dstx;					
+		dy += -dstx;
 		break;
 	default:
 		PANIC_MESSAGE("bad orientation");
@@ -429,7 +417,7 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 	sScalerFunc(pixel, pitchx, pitchy, x, y, w, h, buf, pitch);
 }
 
-void chooseScaler() {
+void chooseScaler(void) {
 	int scaler = 0;
 	const MAPoint2d* size = sScalerSizes;
 	int bestScaler = -1;

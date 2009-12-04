@@ -130,10 +130,9 @@ namespace MAUtil {
 		}	//while(1)
 	}
 
-	//moved to H file to avoid gcc bug
-	/*void Moblet::closeEvent() {
+	void Moblet::closeEvent() {
 		close();
-	}*/
+	}
 
 	void Moblet::close() {
 		maExit(0);

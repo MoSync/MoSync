@@ -32,7 +32,7 @@ static MAPoint2d sCurrentOffset = {0, 0};
 #define false 0
 #define true 1
 
-static void _Gfx_init() {
+static void _Gfx_init(void) {
 	if(sClipStackPtr < 0)
 		Gfx_clearClipRect();
 	if(sTransformStackPtr < 0)
@@ -42,7 +42,7 @@ static void _Gfx_init() {
 /**
  * Clears the clip rect stack.
 **/
-void Gfx_clearClipRect() {
+void Gfx_clearClipRect(void) {
 	MAExtent s = maGetScrSize();
 	sClipStackPtr = 0;
 	maSetClipRect(0,0,EXTENT_X(s),EXTENT_Y(s));
@@ -55,7 +55,7 @@ void Gfx_clearClipRect() {
 /** Sets the clip rect to the content of the top of the stack without changing the stack.  
  *  Returns true if the area of the restored clip rect is > 0, otherwise false.
 **/
-BOOL Gfx_restoreClipRect() {
+BOOL Gfx_restoreClipRect(void) {
 	_Gfx_init();
 	maSetClipRect(
 		sClipStack[sClipStackPtr].left, 
@@ -177,7 +177,7 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
    * Pops a clip rect off the stack and sets is as the current. 
    * Returns true if the area of the resulting clip rect is > 0,  otherwise false. 
    **/
-BOOL Gfx_popClipRect() {
+BOOL Gfx_popClipRect(void) {
 	_Gfx_init();
 	sClipStackPtr--;
 	if(sClipStackPtr <= -1) {
@@ -196,7 +196,7 @@ BOOL Gfx_popClipRect() {
 /** 
   * Clears the transform stack.
   **/
-void Gfx_clearMatrix() {
+void Gfx_clearMatrix(void) {
 	sTransformStackPtr = 0;
 	sCurrentOffset.x = 0;
 	sCurrentOffset.y = 0;
@@ -205,7 +205,7 @@ void Gfx_clearMatrix() {
 }
 
 /** Pushes the current transform on the stack **/
-void Gfx_pushMatrix() {
+void Gfx_pushMatrix(void) {
 	_Gfx_init();
 	if(sTransformStackPtr >= MA_TRANSFORM_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Transform stack overflow");
@@ -217,7 +217,7 @@ void Gfx_pushMatrix() {
 	sTransformStack[sTransformStackPtr] = sCurrentOffset;
 }
 /** Pops the previous transform off the stack **/
-void Gfx_popMatrix() {
+void Gfx_popMatrix(void) {
 	_Gfx_init();
 	if(sTransformStackPtr < 0) {
 		PANIC_MESSAGE("Transform stack underflow");
@@ -232,7 +232,7 @@ void Gfx_translate(int x, int y) {
 	sCurrentOffset.y += y;
 }
 
-MAPoint2d Gfx_getTranslation() {
+MAPoint2d Gfx_getTranslation(void) {
 	return sCurrentOffset;
 }
 
@@ -244,7 +244,7 @@ BOOL Gfx_pushRect(int x, int y, int width, int height) {
 	return res;
 }
 
-BOOL Gfx_popRect() {
+BOOL Gfx_popRect(void) {
 	Gfx_popMatrix();
 	return Gfx_popClipRect();
 }
