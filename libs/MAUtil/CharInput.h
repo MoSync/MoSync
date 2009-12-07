@@ -136,7 +136,7 @@ BOOL CharInput_getQwerty(void);
 #ifdef __cplusplus
 
 #include "ListenerSet.h"
-#include <MAUtil/Environment.h>
+#include "Environment.h"
 
 namespace MAUtil {
 

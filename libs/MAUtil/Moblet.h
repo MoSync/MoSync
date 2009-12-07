@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <maassert.h>
-#include <MAUtil/Environment.h>
+#include "Environment.h"
 #include "Vector.h"
 
 namespace MAUtil {

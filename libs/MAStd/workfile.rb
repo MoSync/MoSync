@@ -4,17 +4,19 @@ require File.expand_path('../../rules/mosync_lib.rb')
 
 mod = Module.new
 mod.class_eval do
-	if(CONFIG == "" && !GCC_IS_V4)
-		# broken compiler
-		native_specflags = {"mastdlib.c" => " -Wno-unreachable-code",
-			"mastring.c" => " -Wno-unreachable-code",
-			"mavsprintf.c" => " -Wno-unreachable-code"}
+	if(CONFIG == "" && NATIVE_GCC_IS_V4)
+		#broken compiler/stdlib
+		native_specflags = {"conprint.c" => " -Wno-unreachable-code"}
 	else
 		native_specflags = {}
 	end
 	if(CONFIG="")
 		pipe_specflags = {"strtod.c" => " -Wno-unreachable-code",
 			"tlsf.c" => " -Wno-unreachable-code"}
+		# broken compiler
+		native_specflags["mastdlib.c"] = " -Wno-unreachable-code"
+		native_specflags["mastring.c"] = " -Wno-unreachable-code"
+		native_specflags["mavsprintf.c"] = " -Wno-unreachable-code"
 	else
 		pipe_specflags = {}
 	end

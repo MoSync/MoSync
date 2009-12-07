@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <MAUtil/Vector.h>
+#include "Vector.h"
 #include <ma.h>
 #include "PlaceholderPool.h"
 

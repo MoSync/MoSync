@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _MAUI_SCREEN_H_
 #define _MAUI_SCREEN_H_
 
-#include <MAUI/Widget.h>
+#include "Widget.h"
 #include <MAUtil/Environment.h>
 
 namespace MAUI {

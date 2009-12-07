@@ -4,18 +4,21 @@ require File.expand_path('../../rules/mosync_lib.rb')
 
 mod = Module.new
 mod.class_eval do
-	if(CONFIG == "" && !GCC_IS_V4)
+	if(CONFIG == "")
 		# broken compiler
-		native_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
+		shared_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
 			"Graphics.c" => " -Wno-unreachable-code",
 			"FrameBuffer.c" => " -Wno-unreachable-code"}
 	else
-		native_specflags = {}
+		shared_specflags = {}
+	end
+	if(CONFIG == "" && NATIVE_GCC_IS_V4)
+		native_specflags = {"String.cpp" => " -Wno-strict-overflow"}
 	end
 	
-	NATIVE_SPECIFIC_CFLAGS = {}.merge(native_specflags)
+	NATIVE_SPECIFIC_CFLAGS = native_specflags.merge(shared_specflags)
 	
-	PIPE_SPECIFIC_CFLAGS = NATIVE_SPECIFIC_CFLAGS.merge({})
+	PIPE_SPECIFIC_CFLAGS = shared_specflags
 	
 	def setup_native
 		@SPECIFIC_CFLAGS = NATIVE_SPECIFIC_CFLAGS

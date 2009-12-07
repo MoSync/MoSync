@@ -15,7 +15,9 @@ work.instance_eval do
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	
 	@WHOLE_LIBS = ["mosync_sdl"]
-	@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
+	if(HOST == :win32)
+		@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
+	end
 	
 	@NAME = "mosync"
 end

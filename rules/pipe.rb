@@ -22,6 +22,13 @@ class PipeGccWork < GccWork
 	def gccmode; "-S"; end
 	
 	def set_defaults
+		if(!defined?(@@GCC_IS_V4))
+			gcc_version = (open("|#{gcc} --version").readline().split(/ /))[2]
+			@@GCC_IS_V4 = (gcc_version[0] == "4"[0])
+			@@GCC_IS_V43 = (@@GCC_IS_V4 && (gcc_version[2] >= "3"[0]))
+		end
+		@GCC_IS_V4 = @@GCC_IS_V4
+		@GCC_IS_V43 = @@GCC_IS_V43
 		@BUILDDIR_BASE = "build/pipe/"
 		super
 	end

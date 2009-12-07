@@ -1,5 +1,6 @@
 
-# This module defines @CFLAGS and @CPPFLAGS, which are used in GccWork.
+#defines @CFLAGS and @CPPFLAGS
+
 module GccFlags
 def define_cflags
 
@@ -25,7 +26,7 @@ lesser_conly = " -Wnested-externs -Wdeclaration-after-statement"
 
 #broken in C++, GCC 4.3.3 and in 3.4.5 -O2.
 optimizer_dependent = " -Wunreachable-code -Winline"
-if(GCC_IS_V43 || (!GCC_IS_V4 && CONFIG == ""))
+if(@GCC_IS_V43 || (!@GCC_IS_V4 && CONFIG == ""))
 	pendantic_c_warnings += optimizer_dependent
 else
 	pedantic_warnings += optimizer_dependent
@@ -34,16 +35,16 @@ end
 standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
 
 
-include_dirs = @EXTRA_INCLUDES
+include_dirs = ["."] + @EXTRA_INCLUDES
 include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 
 #temp
 #flag_warnings = gcc4_warnings + gcc43_c_warnings + gcc43_warnings
 
-if(GCC_IS_V4) then
+if(@GCC_IS_V4) then
 	base_flags = " -fvisibility=hidden"
 	version_warnings = gcc4_warnings
-	if(GCC_IS_V43) then
+	if(@GCC_IS_V43) then
 		version_warnings += gcc43_c_warnings + gcc43_warnings
 		cpp_flags = " -std=c++0x -DHAVE_TR1"
 	end
@@ -52,7 +53,7 @@ else
 	base_flags = ""
 	cpp_flags = ""
 end
-if(!GCC_IS_V43) then
+if(!@GCC_IS_V43) then
 	lesser_conly += gcc43_c_warnings
 end
 

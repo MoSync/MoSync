@@ -53,6 +53,9 @@ def set_defaults
 		error "wrong configuration: " + CONFIG
 	end
 	
+	default(:GCC_IS_V4, NATIVE_GCC_IS_V4)
+	default(:GCC_IS_V43, NATIVE_GCC_IS_V43)
+	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))
 	# String, path to a common build directory.

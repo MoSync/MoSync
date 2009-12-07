@@ -196,6 +196,10 @@ class FileTask < Task
 		@NAME
 	end
 	
+	def execute
+		error "Don't know how to build #{@NAME}"
+	end
+	
 	# Is this FileTask needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
 	# Prints the reason the task is needed, unless <tt>log</tt> is false.
@@ -262,6 +266,6 @@ class CopyFileTask < FileTask
 	end
 	def execute
 		puts "cp #{@NAME} #{@src}"
-		File.copy(@src, @NAME)
+		FileUtils.copy_file(@src, @NAME, true)
 	end
 end

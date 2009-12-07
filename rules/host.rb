@@ -76,9 +76,9 @@ else
 	error("Unknown platform: #{UNAME}")
 end
 
-GCC_VERSION = (open("|gcc --version").readline().split(/ /))[2]
-GCC_IS_V4 = (GCC_VERSION[0] == "4"[0])
-GCC_IS_V43 = (GCC_IS_V4 && (GCC_VERSION[2] >= "3"[0]))
+gcc_version = (open("|gcc --version").readline().split(/ /))[2]
+NATIVE_GCC_IS_V4 = (gcc_version[0] == "4"[0])
+NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] >= "3"[0]))
 
 #warning("GCC version: #{GCC_VERSION}")
 #warning("GCC_IS_V4: #{GCC_IS_V4}")

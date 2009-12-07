@@ -26,8 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _MAUTIL_CONNECTION_H_
 
 #include <ma.h>
-#include <MAUtil/Environment.h>
-#include <MAUtil/String.h>
+#include "Environment.h"
+#include "String.h"
 
 namespace MAUtil {
 
