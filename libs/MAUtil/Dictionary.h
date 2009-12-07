@@ -176,7 +176,7 @@ public:
 
 protected:
 	dict_t mDict;
-	Key Storage::* mKeyPtr;
+	int mKeyOffset;
 
 	//******************************************************************************
 	// DictAllocator
@@ -192,7 +192,7 @@ protected:
 	void init(CompareFunction);
 
 	/// Constructs an empty Dictionary.
-	Dictionary(CompareFunction cf, Key Storage::* mKeyPtr);
+	Dictionary(CompareFunction cf, int keyOffset);
 
 	/**
 	* Inserts a new value into the Dictionary.

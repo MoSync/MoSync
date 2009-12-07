@@ -24,6 +24,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Dictionary.h"
 
+#ifndef OFFSETOF
+#define OFFSETOF(struct, member) ((int)(((char*)&(((struct*)1)->member)) - 1))
+#endif
+
 namespace MAUtil {
 
 template<class Key, class Value>
@@ -35,7 +39,8 @@ protected:
 	typedef typename D::DictNode DN;
 public:
 
-	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, &PairKV::first) {}
+	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>)
+		: D::Dictionary(cf, OFFSETOF(PairKV, first)) {}
 	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {
 		PairKV pkv = { key, value };
 		return D::insert(pkv);
@@ -45,7 +50,7 @@ public:
 		if(node == NULL) {
 			node = new DN();
 			node->data.first = key;
-			dict_insert(&this->mDict, node, &(node->data.*(this->mKeyPtr)));
+			dict_insert(&this->mDict, node, &(node->data.first));
 		}
 		return node->data.second;
 	}

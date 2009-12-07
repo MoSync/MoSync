@@ -46,6 +46,12 @@ public:
 		hashMap();
 		printf("-map\n");
 		map();
+		printf("-setInt\n");
+		setInt();
+		printf("-hashMapInt\n");
+		hashMapInt();
+		printf("-mapInt\n");
+		mapInt();
 		/*
 		list();
 		*/
@@ -205,7 +211,92 @@ public:
 		s = copy;
 		assert("Set::operator=()", s.size() == 2);
 	}
-	
+
+	void setInt() {
+		Set<int> s;
+
+		//insert
+		assert("Set::insert()", s.insert(2).second);
+		assert("Set::insert()", s.insert(3).second);
+		assert("Set::insert()", s.insert(4).second);
+		assert("Set::size()", s.size() == 3);
+
+		//dupe insert
+		Pair<Set<int>::Iterator, bool> res = s.insert(2);
+		assert("Set::insert()", !res.second);
+		assert("Set::insert()", res.first != s.end());
+		assert("Set::insert()", *res.first == 2);
+
+		//find
+		Set<int>::Iterator itr = s.find(3);
+		assert("Set::find()", itr != s.end());
+		assert("Set::find()", *itr == 3);
+
+		//iterate
+		itr = s.begin();
+		assert("Set::begin()", itr != s.end());
+		assert("Set::Iterator", *itr == 2);
+		++itr;
+		assert("Set::Iterator", *itr == 3);
+		++itr;
+		assert("Set::Iterator", *itr == 4);
+		++itr;
+		assert("Set::Iterator", itr == s.end());
+
+		//iterator
+		--itr;
+		assert("Set::Iterator--", itr != s.end());
+		itr--;
+		itr++;
+		itr++;
+		assert("Set::Iterator++", itr == s.end());
+		itr--;
+		assert("Set::Iterator--", itr != s.end());
+
+		//const iterator
+		Set<int>::ConstIterator citr = s.find(3);
+		assert("cSet::find()", citr != s.end());
+		assert("cSet::find()", *citr == 3);
+
+		citr = s.begin();
+		assert("cSet::begin()", citr != s.end());
+		assert("cSet::Iterator", *citr == 2);
+		++citr;
+		assert("cSet::Iterator", *citr == 3);
+		++citr;
+		assert("cSet::Iterator", *citr == 4);
+		++citr;
+		assert("cSet::Iterator", citr == s.end());
+
+		--citr;
+		assert("cSet::Iterator--", citr != s.end());
+		citr--;
+		citr++;
+		citr++;
+		assert("cSet::Iterator++", citr == s.end());
+		citr--;
+		assert("cSet::Iterator--", citr != s.end());
+
+		//erase
+		assert("Set::erase()", s.erase(3));
+		assert("Set::erase()", s.size() == 2);
+
+		//copy constuctor
+		Set<int> copy(s);
+		assert("Set::Set(Set)", copy.size() == 2);
+		
+		//clear
+		s.clear();
+		assert("Set::clear()", s.size() == 0);
+		itr = s.find(4);
+		assert("Set::clear()", itr == s.end());
+		assert("Set::clear()", s.begin() == s.end());
+
+		//assignment operator
+		s = copy;
+		assert("Set::operator=()", s.size() == 2);
+	}
+
 	void hashMap() {
 		HashMap<String, String> m;
 
@@ -277,6 +368,77 @@ public:
 		assert("HashMap::operator[]", m["foo"] == "F00");
 	}
 
+	void hashMapInt() {
+		HashMap<int, int> m;
+
+		//insert
+		assert("HashMap::insert()", m.insert(2, 5).second);
+		assert("HashMap::insert()", m.insert(3, 6).second);
+		assert("HashMap::insert()", m.insert(4, 7).second);
+		assert("HashMap::size()", m.size() == 3);
+
+		//dupe insert
+		Pair<HashMap<int, int>::Iterator, bool> res = m.insert(4, 8);
+		assert("HashMap::insert()", !res.second);
+		assert("HashMap::insert()", res.first != m.end());
+		assert("HashMap::insert()", res.first->first == 4);
+		assert("HashMap::insert()", res.first->second == 7);
+
+		//find
+		HashMap<int, int>::Iterator itr = m.find(3);
+		assert("HashMap::find()", itr != m.end());
+		assert("HashMap::find()", itr->first == 3);
+		assert("HashMap::find()", itr->second == 6);
+
+		//iterate
+		itr = m.begin();
+		assert("HashMap::begin()", itr != m.end());
+		++itr;
+		itr++;
+		++itr;
+		assert("HashMap::Iterator", itr == m.end());
+
+		//const iterator
+		HashMap<int, int>::ConstIterator citr = m.find(2);
+		assert("cHashMap::find()", citr != m.end());
+		assert("cHashMap::find()", citr->first == 2);
+		assert("cHashMap::find()", citr->second == 5);
+
+		citr = m.begin();
+		assert("cHashMap::begin()", citr != m.end());
+		++citr;
+		citr++;
+		++citr;
+		assert("cHashMap::Iterator", citr == m.end());
+
+		//erase
+		assert("HashMap::erase()", m.erase(3));
+		assert("HashMap::erase()", m.size() == 2);
+
+		//copy constuctor
+		HashMap<int, int> copy(m);
+		assert("HashMap::HashMap(HashMap)", copy.size() == 2);
+		
+		//erase by iterator
+		m.erase(m.find(2));
+		assert("HashMap::erase(Iterator)", m.size() == 1);
+
+		//clear
+		m.clear();
+		assert("HashMap::clear()", m.size() == 0);
+		itr = m.find(4);
+		assert("HashMap::clear()", itr == m.end());
+		assert("HashMap::clear()", m.begin() == m.end());
+
+		//assignment operator
+		m = copy;
+		assert("HashMap::operator=", m.size() == 2);
+		
+		//square bracket operator
+		m[9] = 10;
+		assert("HashMap::operator[]", m[2] == 5);
+	}
+
 	void map() {
 		Map<String, String> m;
 
@@ -312,6 +474,44 @@ public:
 		//clear
 		m.clear();
 		itr = m.find("Abraham");
+		assert("Map::clear()", m.size()==0 && itr == m.end());
+	}
+
+	void mapInt() {
+		Map<int, int> m;
+
+		//operator[] and insert
+		m[2] = 5;
+		m[3] = 6;
+		m.insert(4, 7);
+		assert("Map::size()", m.size() == 3);
+
+		//iterate
+		{
+			Map<int, int>::ConstIterator itr = m.begin();
+			assert("Map::begin()", itr->first == 2 && itr->second == 5);
+			++itr;
+			assert("Map::ConstIterator()", itr->first == 3 && itr->second == 6);
+			itr++;
+			assert("Map::ConstIterator()", itr->first == 5 && itr->second == 7);
+			itr++;
+			assert("Map::end()", itr == m.end());
+		}
+
+		//find
+		Map<int, int>::Iterator itr = m.find(2);
+		assert("Map::find()", itr != m.end() && itr->second == 5);
+		itr = m.find(9);
+		assert("Map::find()", itr == m.end());
+
+		//erase
+		m.erase(2);
+		itr = m.find(2);
+		assert("Map::erase()", itr == m.end());
+
+		//clear
+		m.clear();
+		itr = m.find(3);
 		assert("Map::clear()", m.size()==0 && itr == m.end());
 	}
 };

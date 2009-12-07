@@ -35,14 +35,14 @@ void MAUtil::Dictionary<Key, Storage>::init(CompareFunction cf) {
 }
 
 template<class Key, class Storage>
-MAUtil::Dictionary<Key, Storage>::Dictionary(CompareFunction cf, Key Storage::* keyPtr) {
-	mKeyPtr = keyPtr;
+MAUtil::Dictionary<Key, Storage>::Dictionary(CompareFunction cf, int keyOffset) {
+	mKeyOffset = keyOffset;
 	init(cf);
 }
 
 template<class Key, class Storage>
 MAUtil::Dictionary<Key, Storage>::Dictionary(const Dictionary& o) {
-	mKeyPtr = o.mKeyPtr;
+	mKeyOffset = o.mKeyOffset;
 	init((CompareFunction)o.mDict.dict_compare);
 	operator=(o);
 }
@@ -57,7 +57,8 @@ MAUtil::Dictionary<Key, Storage>::operator=(const Dictionary& o) {
 	while(itr != o.end()) {
 		DictNode* newNode = new DictNode;
 		newNode->data = *itr;
-		dict_load_next(&load, newNode, &(newNode->data.*mKeyPtr));
+		char* ptr = (char*)&newNode->data;
+		dict_load_next(&load, newNode, ptr + mKeyOffset);
 		++itr;
 	}
 	dict_load_end(&load);
@@ -81,7 +82,8 @@ MAUtil::Dictionary<Key, Storage>::insert(const Storage& data) {
 	DictNode* newNode = new DictNode;
 	dnode_init(newNode, NULL);
 	newNode->data = data;
-	Key* kp = &(newNode->data.*mKeyPtr);
+	char* ptr = (char*)&newNode->data;
+	Key* kp = (Key*)(ptr + mKeyOffset);
 	DictNode* res = (DictNode*)dict_insert(&mDict, newNode, kp);
 	if(res != NULL) {	//insert->dupe
 		delete newNode;

@@ -31,9 +31,7 @@ class Set : public Dictionary<Key, Key> {
 public:
 	typedef Dictionary<Key, Key> D;
 
-	Set(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, NULL) {
-		//ugly hack to get around pointer-to-member NULL being stored as (-1).
-		memset(&this->mKeyPtr, 0, sizeof(this->mKeyPtr));
+	Set(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, 0) {
 	}
 	Pair<typename D::Iterator, bool> insert(const Key& key) { return D::insert(key); }
 };
