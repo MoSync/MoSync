@@ -39,12 +39,10 @@ namespace MAUI {
 		  * \param width the width of the Image.
 		  * \param height the height of the Image.
 		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Image to be added to the parent's children.
+		  * \param autoSizeX If true, the widget will be resized in the x-axis to the image size.
+		  * \param autoSizeY If true, the widget will be resized in the y-axis to the image size.
+		  * \param res A handle to the image resource containing the image data.
 		  **/
-		Image(int x, int y, int width, int height, Widget *parent=NULL);
-
-		/**
-		 * Constructor of the image widget. Pass the image resource of the image to display.
-		 */
 		Image(int x, int y, int width, int height, Widget* parent=NULL, bool autoSizeX=true, bool autoSizeY=true, MAHandle res=0);
 
 		/**

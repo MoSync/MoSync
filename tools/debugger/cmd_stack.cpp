@@ -485,12 +485,7 @@ void print_type_from_type(const std::string& type) {
 
 static void console_print_type(const string& args, bool complex) {
 	sComplex = complex;
-	const TypeBase *typeBase = findTypeByNameAndPC(args);
-	if(typeBase) {
-		print_type_from_type(getType(typeBase, sComplex));
-	} else {
-		stackEvaluateExpression(args, -1, Callback::print_type);
-	}
+	stackEvaluateExpression(args, -1, Callback::print_type);
 }
 
 static void Callback::print_type(const Value* value, const char *err) {

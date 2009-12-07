@@ -139,6 +139,8 @@ const TypeBase* findTypeByNameAndPC(const std::string& t) {
 	ASSERT_REG;
 	if(!mapIpEx(r.pc, lm))
 		return NULL;
+
+	if(isLocal(t)) return NULL;
 	return findTypeByNameAndFileGlobal(t, lm.file + 1);
 }
 
@@ -212,7 +214,6 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 				if(isSigned == 0) isSigned = 1;
 				type = TypeBase::eBuiltin;
 			} else {
-
 				typeInfo = findTypeByNameAndPC(t.toString());
 
 				if(typeInfo) {
@@ -765,6 +766,13 @@ const SYM& ExpressionTree::getSymbol(const string& name) {
 	map<string, SYM>::const_iterator i = mSymbols.find(name);
 	if(i == mSymbols.end()) ExpressionCommon::error("Undefined symbol");
 	return i->second;
+}
+
+bool ExpressionTree::hasSymbol(const string& name) const {
+	map<string, SYM>::const_iterator i = mSymbols.find(name);
+	if(i == mSymbols.end()) return false;
+	return true;
+
 }
 
 std::map<string, SYM>& ExpressionTree::getSymbols() {

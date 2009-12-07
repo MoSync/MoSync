@@ -46,4 +46,7 @@ void stackEvaluateExpression(const std::string& expr, int frameAddr,
 
 void locate_symbol(const std::string& name, SeeCallback cb);
 
+bool isLocal(const std::string& name);
+
+
 #endif

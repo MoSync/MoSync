@@ -49,6 +49,7 @@ public:
 	void addSymbol(const std::string& name);
 	void setSymbol(const std::string& name, const SYM& sym);
 	const SYM& getSymbol(const std::string& name);
+	bool hasSymbol(const std::string& name) const;
 	std::map<std::string, SYM>& getSymbols();
 	void setRoot(ExpressionTreeNode *root);
 	ExpressionTreeNode* getRoot();

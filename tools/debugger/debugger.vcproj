@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="debugger"
 	ProjectGUID="{2DA2D2D5-182A-43B6-9519-8434BF5EDCCE}"
 	RootNamespace="debugger"

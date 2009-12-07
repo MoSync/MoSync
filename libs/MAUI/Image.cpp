@@ -20,12 +20,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Image::Image(int x, int y, int width, int height, Widget *parent) :
-		Widget(x, y, width, height, parent),
-		resource(0) {
-
-	}
-
 	Image::Image(int x, int y, int width, int height, Widget* parent, bool autoSizeX, bool autoSizeY, MAHandle res) 
 		: Widget(x, y, width, height, parent),
 		resource(res),

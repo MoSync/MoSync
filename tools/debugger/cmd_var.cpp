@@ -178,9 +178,9 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 
 	for(int i = 0; i < arrayType->mLength; i++) {
 		Variable& var = children[i];
-
 		{
 			var.printFormat = TypeBase::eNatural;
+
 			StringPrintFunctor spf;
 			spf("%s.%d", name.c_str(), i);
 			var.name = spf.getString();
@@ -230,6 +230,8 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	Variable& var = children[0];
 	{
+		var.printFormat = TypeBase::eNatural;
+
 		StringPrintFunctor spf;
 		spf("%s.%d", name.c_str(), 0);
 		var.name = spf.getString();
@@ -292,6 +294,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 		Variable& var = children[i];
 		{
+			var.printFormat = TypeBase::eNatural;
+
 			string type = getType(deref, false);
 
 			StringPrintFunctor spf;
@@ -314,6 +318,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 		Variable& var = children[bases.size()+i];
 		{
+			var.printFormat = TypeBase::eNatural;
+
 			string type = getType(deref, false);
 
 			StringPrintFunctor spf;
@@ -672,6 +678,7 @@ static bool printUpdateItem(Variable* var) {
 		var->exp->outdate();
 		oprintf("{name=\"%s\"", var->name.c_str());
 		printValue(var);
+		//oprintf(",in_scope=\"true\",type_changed=\"false\"");
 		oprintf("}");
 		return true;
 	}

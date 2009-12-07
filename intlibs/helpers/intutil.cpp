@@ -65,7 +65,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 		PIPE_TYPE_BYTE | PIPE_WAIT, 1, BUFSIZE, BUFSIZE, 5000, NULL));
 	W32TEST(hStdinPipeRead = CreateFile("\\\\.\\pipe\\MoSyncStdinPipe", GENERIC_READ,
 		FILE_SHARE_READ, &sa, OPEN_EXISTING, 0, NULL));
-
+   
 	ZERO_OBJECT(si);
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESTDHANDLES;

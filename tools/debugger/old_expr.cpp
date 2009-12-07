@@ -165,6 +165,31 @@ static bool handle_params(const vector<LocalVariable*>& params,
 	return false;
 }
 
+void dummy(const SYM& sym) {
+}
+
+bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Function* f, SeeCallback cb) {
+	if(!f) {
+		error("No debugging information for current function");
+		return false;
+	}
+	int offset = frame.pc - f->address;
+
+	if(handle_locals(f->locals, offset, frame, name, cb))
+		return true;
+	if(handle_params(f->params, frame, name, cb))
+		return true;
+
+	return false;	
+}
+
+bool isLocal(const string& name) {
+	//locals
+	const FRAME& frame(gFrames[gCurrentFrameIndex]);
+	const Function* f = stabsFindFunctionByInsideAddress(frame.pc);
+	return handleLocalsAndArguments(name, frame, f, dummy);
+}
+
 void locate_symbol(const string& name, SeeCallback cb) {
 	//first search locals in the current frame, including any function parameters.
 	//then search static symbols in the current frame's file scope.
@@ -177,14 +202,7 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	//locals
 	const FRAME& frame(gFrames[gCurrentFrameIndex]);
 	const Function* f = stabsFindFunctionByInsideAddress(frame.pc);
-	if(!f) {
-		error("No debugging information for current function");
-		return;
-	}
-	int offset = frame.pc - f->address;
-	if(handle_locals(f->locals, offset, frame, name, cb))
-		return;
-	if(handle_params(f->params, frame, name, cb))
+	if(handleLocalsAndArguments(name, frame, f, cb))
 		return;
 
 	//statics and globals

@@ -1,5 +1,14 @@
 -target-select sim
--break-insert c:/mosync-trunk/examples/3dLines/main.cpp:95
+-break-insert C:/MoSync/examples/3dLines/main.cpp:217
 -exec-continue
 -test-wait
--exec-next
+-thread-info
+-stack-info-depth
+-stack-list-frames 0 2
+-data-list-changed-registers
+-stack-list-arguments 0 0 0
+-stack-list-locals 0
+ whatis time
+ whatis e
+-var-create - * time
+-var-create - * e
