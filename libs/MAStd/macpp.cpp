@@ -17,6 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "maapi.h"
 
-extern "C" void ATTRIB(noreturn) cxa_pure_virtual() {
+extern "C" void ATTRIB(noreturn) __cxa_pure_virtual() {
 	maExit(-42);
 }
