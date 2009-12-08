@@ -95,6 +95,7 @@ class GccWork < BuildWork
 		if(cflags == nil) then
 			error "Bad ext: '#{ext}' from source '#{source}'"
 		end
+		need(:@SPECIFIC_CFLAGS)
 		cflags += @SPECIFIC_CFLAGS.fetch(File.basename(source.to_s), "")
 		return cflags
 	end

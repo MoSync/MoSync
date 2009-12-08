@@ -17,7 +17,9 @@ class NativeGccLinkTask < FileTask
 	
 	def execute
 		execFlags
-		sh "g++#{@FLAGS} #{@objects.join(' ')} -o #{@NAME}"
+		#puts "objects: #{@objects.join(' ')}"
+		#puts "flags: #{@FLAGS}"
+		sh "g++ #{@objects.join(' ')}#{@FLAGS} -o #{@NAME}"
 	end
 	
 	include FlagsChanged
@@ -40,6 +42,7 @@ class NativeGccLinkWork < NativeGccWork
 		need(:@BUILDDIR)
 		need(:@TARGETDIR)
 		target = @TARGETDIR + "/" + @BUILDDIR + @NAME + link_file_ending
+		#puts "@EXTRA_LINKFLAGS: "+@EXTRA_LINKFLAGS
 		@TARGET = link_task_class.new(self, target, all_objects, wlo, llo + lld, @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]
 	end

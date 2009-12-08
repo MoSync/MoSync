@@ -7,19 +7,26 @@ class DllTask < NativeGccLinkTask
 		@prerequisites += whole_libs + libs
 		libfile = File.dirname(@NAME) + "/lib" + File.basename(@NAME, DLL_FILE_ENDING) + ".a"
 		libflags = ""
+		#puts "libflags: #{libflags}"
 		if(whole_libs.size > 0)
 			libflags += " -Wl,--whole-archive #{whole_libs.join(' ')} -Wl,--no-whole-archive"
+			#puts "libflags: #{libflags}"
 		end
 		if(libs.size > 0)
 			libflags += ' ' + libs.join(' ')
+			#puts "libflags: #{libflags}"
 		end
 		if(CONFIG == "")
 			libflags += " -s"
+			#puts "libflags: #{libflags}"
 		end
 		if(HOST == :win32)
 			implib = " -Wl,--out-implib=#{libfile}"
 		end
-		@FLAGS = " -shared#{implib}" + linkflags + libflags
+		@FLAGS = " -shared#{implib}" + libflags + linkflags
+		#puts "libflags: #{libflags}"
+		#puts "linkflags: #{linkflags}"
+		#puts "@FLAGS: #{@FLAGS}"
 	end
 end
 

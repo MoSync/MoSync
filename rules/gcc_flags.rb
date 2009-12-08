@@ -35,7 +35,7 @@ end
 standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
 
 
-include_dirs = ["."] + @EXTRA_INCLUDES
+include_dirs = @EXTRA_INCLUDES
 include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 
 #temp

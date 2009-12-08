@@ -14,7 +14,7 @@ work.instance_eval do
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 	elsif(HOST == :win32)
 		@SOURCES = [".", "win32"]
-		if(!GCC_IS_V4)
+		if(!NATIVE_GCC_IS_V4)
 			@SPECIFIC_CFLAGS = { "discImpl.cpp", " -Wno-unreachable-code" }
 		end
 	else
