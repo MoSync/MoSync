@@ -14,7 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require 'ftools'
+require 'fileutils'
 
 class RuntimeBuilder 
 
@@ -28,7 +28,7 @@ class RuntimeBuilder
 		config_file_src = "#{runtime_dir}config#{debug}.h"
 	
 		backup_file(config_file_dest)
-		File.copy(config_file_src, config_file_dest)
+		FileUtils.copy_file(config_file_src, config_file_dest)
 		
 		if (version == "sp2003")
 			configuration = "Smartphone 2003 (ARMV4)"
@@ -45,7 +45,7 @@ class RuntimeBuilder
 		revert_backupped_file(config_file_dest)
 		
 		if File.exist? exe_file_src
-			File.copy(exe_file_src, exe_file_dest)
+			FileUtils.copy_file(exe_file_src, exe_file_dest)
 			puts "\nFINISHED! - #{exe_file_dest} was succesfully generated!\n\n"
 			return 0
 		else

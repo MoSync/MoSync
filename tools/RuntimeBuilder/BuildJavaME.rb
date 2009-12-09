@@ -14,9 +14,8 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require 'ftools'
 require 'fileutils'
-			
+
 class RuntimeBuilder 
 	def javame(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, false)
@@ -67,29 +66,21 @@ class RuntimeBuilder
 		# Set up temporary dir
 		temp_dir = "#{runtime_dir}temp/"
 		if File.exist? temp_dir
-			if !File.directory? temp_dir
-				File.delete temp_dir # oops, it was a file. This is strange, just delete it
-			else
-				FileUtils.rm_rf temp_dir # delete everything in it and itself
-			end
+			FileUtils.rm_rf temp_dir # delete everything in it and itself
 		end
 		Dir.mkdir(temp_dir); # No such directory/file.. create a temp directory
 		
 		# Set up class dir
 		class_dir = "#{runtime_dir}class/"
 		if File.exist? class_dir
-			if !File.directory? class_dir
-				File.delete class_dir # oops, it was a file. This is strange, just delete it
-			else
-				FileUtils.rm_rf class_dir # delete everything in it and itself
-			end
+			FileUtils.rm_rf class_dir # delete everything in it and itself
 		end
 		Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 		
 		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
 		config_file = "#{java_me_source}/config_platform.h"		
 		backup_file config_file
-		File.copy( "#{runtime_dir}config#{debug}.h", config_file)
+		FileUtils.copy_file( "#{runtime_dir}config#{debug}.h", config_file)
 		
 		# Preprocess all the shared java files and store result in temporary location
 		preprocess_shared_java_files(temp_dir, java_me_source, "_JavaME");
@@ -142,7 +133,7 @@ class RuntimeBuilder
 		"-libraryjars #{java_me_sdk}j2melib/wma20.jar -dontusemixedcaseclassnames " +
 		"-outjars #{runtime_dir}MoSyncRuntimeObfuscated.jar -keep public class MAMidlet");
 		
-		File.copy("#{runtime_dir}MoSyncRuntimeObfuscated.jar", "#{runtime_dir}MoSyncRuntime#{debug}.jar" )
+		FileUtils.copy_file("#{runtime_dir}MoSyncRuntimeObfuscated.jar", "#{runtime_dir}MoSyncRuntime#{debug}.jar" )
 		
 		# Preverify java binaries
 		puts "Preverifying java binaries.."
@@ -154,8 +145,8 @@ class RuntimeBuilder
 		# Clean and delete all the temporary folders
 		FileUtils.rm_rf temp_dir
 		FileUtils.rm_rf class_dir
-		File.delete runtime_dir + "MoSyncRuntimeObfuscated.jar"
-		File.delete runtime_dir + "MoSyncRuntimeTemp.jar"
+		FileUtils.rm runtime_dir + "MoSyncRuntimeObfuscated.jar"
+		FileUtils.rm runtime_dir + "MoSyncRuntimeTemp.jar"
 		
 		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.jar"
 			puts "\nFATAL ERROR! - No jar file built, check previous output for errors!\n\n"

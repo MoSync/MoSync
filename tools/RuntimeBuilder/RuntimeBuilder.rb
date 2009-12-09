@@ -16,25 +16,27 @@
 
 # usage: ruby RuntimeBuilder.rb <Settings.rb file> <platform> <runtime directory (containing config.h)>
 
+require 'fileutils'
+
 def backup_file(file)
 	bak = file + ".bak"
 	if File.exist? bak
-		File.delete bak
+		FileUtils.rm bak
 	end
 	
 	if !File.exist? file
 		return
 	end
 	
-	File.copy(file, bak)
+	FileUtils.copy_file(file, bak)
 end
 
 def revert_backupped_file(file)
 	bak = file + ".bak"
 
 	if File.exist? bak	
-		File.copy(bak, file)
-		File.delete bak
+		FileUtils.copy_file(bak, file)
+		FileUtils.rm bak
 	end
 end
 
@@ -75,11 +77,9 @@ class RuntimeBuilder
 	end
 end
 
-require 'ftools'
-
 if !File.exist? "Settings.rb"
 	puts "Creates the Settings.rb file"
-	File.copy("Settings.rb.example", "Settings.rb")
+	FileUtils.copy_file("Settings.rb.example", "Settings.rb")
 end
 
 require ARGV[0]

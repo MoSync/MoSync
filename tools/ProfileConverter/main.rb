@@ -1,6 +1,10 @@
-require 'ftools'
+require 'fileutils'
 require 'sqlite3'
 require 'set'
+#require 'win32/process'
+
+# Lower priority of this process, so we don't hog the entire computer.
+#Process.setpriority(Process::PRIO_PROCESS, 0, Process.getpriority(Process::PRIO_PROCESS, 0) - 1)
 
 RELEVANT_CAPS = [
 	'ScreenSize_x',
@@ -33,6 +37,7 @@ RELEVANT_DEFINES = {
 	
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
 	:s60v3 => [],
+	:s60v5 => [],
 	:sp2003 => [],
 	:wm5 => []
 }
@@ -140,6 +145,7 @@ runtimes = {
 	:sp2003 => [],
 	:s60v2  => [],
 	:s60v3  => [],
+	:s60v5  => [],
 	:JavaME => [],
 }
 
@@ -169,6 +175,7 @@ if !File.exist? sql_filename
 	return
 end
 
+if false
 # We start from scratch
 if File.exist? filename
 	File.delete filename
@@ -189,7 +196,9 @@ File.open(sql_filename, "r") do |infile|
 		end	
 	end
 end
-
+else
+	db = SQLite3::Database.new(filename)
+end
 
 puts "Generating all capability permutations!"
 
@@ -199,11 +208,12 @@ device_query = db.prepare("SELECT capvalue.value from capvalue INNER JOIN" <<
 			   " devicecapvalue.device=?");
 VENDOR_DIR = "#{output_root}vendors"
 RUNTIME_DIR = "#{output_root}runtimes"
-File.makedirs VENDOR_DIR
-File.makedirs RUNTIME_DIR
+FileUtils.mkdir_p VENDOR_DIR
+FileUtils.mkdir_p RUNTIME_DIR
 definitions = {}
 
 db.execute( "select name from vendor" ) do |vendor|
+	vendor = vendor[0]
 	
 	# fix to exclude a lot of entries which is not real devices
 	if (vendor.to_s.eql?("Generic") || vendor.to_s.eql?("Native"))
@@ -211,11 +221,11 @@ db.execute( "select name from vendor" ) do |vendor|
 	end
 	
 	puts vendor
-	File.makedirs "#{VENDOR_DIR}/#{vendor}"
+	FileUtils.mkdir_p "#{VENDOR_DIR}/#{vendor}"
 	
 	icon_path = "icons/#{vendor.to_s.downcase}Icon.png"
 	if File.exist? icon_path
-		File.copy( icon_path, "#{VENDOR_DIR}/#{vendor}/icon.png")
+		FileUtils.copy_file( icon_path, "#{VENDOR_DIR}/#{vendor}/icon.png")
 	end
 	
 	db.execute("SELECT device.id, device.name, platform.name FROM device, vendor " <<
@@ -226,7 +236,7 @@ db.execute( "select name from vendor" ) do |vendor|
 		rt_obj = Runtime.new(device[2].to_s)
 		seen_defines = []
 		device_path = "#{VENDOR_DIR}/#{vendor}/#{device[1]}"
-		File.makedirs device_path
+		FileUtils.mkdir_p device_path
 		File.open("#{device_path}/maprofile.h", 'w') do |profile|  
 			profile.puts "#ifndef _MSAB_PROF_H_\n#define _MSAB_PROF_H_"
 			profile.puts
@@ -279,7 +289,7 @@ db.execute( "select name from vendor" ) do |vendor|
 							end
 						end
 					elsif(CAP_TYPES[:supports].include? cap)
-						value.each do |v|							
+						value.each do |v|
 							def_name = "MA_PROF_SUPPORT_#{cap.format}"
 							if(!(seen_defines.include? def_name)) then
 								if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
@@ -287,14 +297,14 @@ db.execute( "select name from vendor" ) do |vendor|
 								end
 								rt_obj.caps["#{def_name}_#{v.to_s.format}"] = "TRUE";
 								def_str = "#define #{def_name}_#{v.to_s.format}"
-								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name}_#{v.to_s.format},#{cap}/#{v.to_s}"							
+								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name}_#{v.to_s.format},#{cap}/#{v.to_s}"
 								profile.puts def_str
 							end
 						end
 					elsif(cap == "Bugs")
 						value.each do |v|
 							def_name = "MA_PROF_BUG_#{v.to_s.format}"
-							definitions[def_name] = "#{def_name},#{cap}/#{v.to_s}"							
+							definitions[def_name] = "#{def_name},#{cap}/#{v.to_s}"
 							rt_obj.caps[def_name] = "TRUE";
 							profile.puts "#define #{def_name}"
 						end
@@ -302,10 +312,10 @@ db.execute( "select name from vendor" ) do |vendor|
 						value.each do |v|
 							#puts v.to_s
 							if v.to_s == "hasPointerEvents"
-								definitions["MA_PROF_SUPPORT_STYLUS"] = "MA_PROF_SUPPORT_STYLUS,Support/Stylus"							
+								definitions["MA_PROF_SUPPORT_STYLUS"] = "MA_PROF_SUPPORT_STYLUS,Support/Stylus"
 								rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
 								def_str = "#define MA_PROF_SUPPORT_STYLUS"
-								profile.puts def_str							
+								profile.puts def_str
 							elsif v.to_s == "isVirtual"
 								## should not generate this profile......
 							end
@@ -315,7 +325,7 @@ db.execute( "select name from vendor" ) do |vendor|
 							if (v.to_s == "CLDC/1.0" ||
 								v.to_s == "CLDC/1.0.4")
 								rt_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = "TRUE";
-								definitions["MA_PROF_SUPPORT_CLDC_10"] = "MA_PROF_SUPPORT_CLDC_10,Support/Cldc1.0"							
+								definitions["MA_PROF_SUPPORT_CLDC_10"] = "MA_PROF_SUPPORT_CLDC_10,Support/Cldc1.0"
 									
 								def_str = "#define MA_PROF_SUPPORT_CLDC_10"
 								profile.puts def_str
@@ -346,7 +356,7 @@ runtimes.each do |platform_name, platform|
 	id = 1
 	platform.each do |runtime|
 		runtime_dir = "#{platform_name}/#{id}/"
-		File.makedirs "#{RUNTIME_DIR}/#{runtime_dir}"
+		FileUtils.mkdir_p "#{RUNTIME_DIR}/#{runtime_dir}"
 		File.open("#{RUNTIME_DIR}/#{runtime_dir}/devices.txt", 'w') do |devices|  
 			runtime.devices.each do |device|
 				File.open("#{VENDOR_DIR}/#{device.vendor}/#{device.name}/runtime.txt", 'w') do |runtime_txt|
