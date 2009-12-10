@@ -24,13 +24,13 @@ namespace MAUtil {
 void ConnectionListener::connectFinished(Connection* conn, int result) {
 	PANIC_MESSAGE("ConnectionListener::connectFinished unimplemented!");
 }
-void ATTRIB(noreturn) ConnectionListener::connRecvFinished(Connection* conn, int result) {
+void ConnectionListener::connRecvFinished(Connection* conn, int result) {
 	PANIC_MESSAGE("ConnectionListener::connRecvFinished unimplemented!");
 }
-void ATTRIB(noreturn) ConnectionListener::connWriteFinished(Connection* conn, int result) {
+void ConnectionListener::connWriteFinished(Connection* conn, int result) {
 	PANIC_MESSAGE("ConnectionListener::connWriteFinished unimplemented!");
 }
-void ATTRIB(noreturn) ConnectionListener::connReadFinished(Connection* conn, int result) {
+void ConnectionListener::connReadFinished(Connection* conn, int result) {
 	PANIC_MESSAGE("ConnectionListener::connReadFinished unimplemented!");
 }
 

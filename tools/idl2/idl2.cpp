@@ -209,8 +209,6 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 		if(syscall)
 			stream << "SYSCALL(";
 		stream << cType(inf, f.returnType);
-		if(!syscall)
-			stream << " MOSYNC_API";
 		if(syscall)
 			stream << ", ";
 		if(f.returnType == "noreturn")

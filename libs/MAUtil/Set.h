@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 
+/// Thin template sorted Set.
 template<class Key>
 class Set : public Dictionary<Key, Key> {
 public:

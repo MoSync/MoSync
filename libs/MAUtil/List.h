@@ -177,6 +177,7 @@ namespace MAUtil {
 		* Inserts an element at a specific position in the list.
 		* \param iterator An iterator pointing to the element after which the element is to be added.
 		* The iterator is invalidated by this operation.
+		* \param data The element to be inserted.
 		* \returns A new iterator pointing to the newly added element.
 		*/
 		ListIterator insert(ListIterator iterator, Type data) {

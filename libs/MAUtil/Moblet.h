@@ -76,7 +76,7 @@ namespace MAUtil {
 		* This function is called when the Close event is recieved.
 		* The default implementation just calls close().
 		*/
-		virtual void ATTRIB(noreturn) closeEvent();
+		virtual void ATTRIBUTE(noreturn, closeEvent());
 
 		/**
 		* This function is called when an event that Moblet doesn't recognize is recieved.

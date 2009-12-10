@@ -161,11 +161,9 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 
 		stream << "#if defined(__GNUC__) || defined(__SYMBIAN32__)\n"
 			"#define ATTRIBUTE(a, func)  func __attribute__ ((a))\n"
-			"#define ATTRIB(a) __attribute__ ((a))\n"
 			"#define GCCATTRIB(a) __attribute__ ((a))\n"
 			"#elif defined(_MSC_VER)\n"
 			"#define ATTRIBUTE(a, func)  __declspec (a) func\n"
-			"#define ATTRIB(a) __declspec (a)\n"
 			"#define GCCATTRIB(a)\n"
 			"#define inline __inline\n"
 			"#else\n"
@@ -215,10 +213,10 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 
 void streamMoSyncDllDefines(ostream& stream) {
 	stream << "#ifdef WIN32\n"
-		"#define DLLEXPORT ATTRIB(dllexport)\n"
-		"#define DLLIMPORT ATTRIB(dllimport)\n"
+		"#define DLLEXPORT dllexport\n"
+		"#define DLLIMPORT dllimport\n"
 		"#elif defined(LINUX)\n"
-		"#define DLLEXPORT ATTRIB(visibility(\"default\"))\n"
+		"#define DLLEXPORT visibility(\"default\")\n"
 		"#define DLLIMPORT\n"
 		"#endif\n"
 		"\n"

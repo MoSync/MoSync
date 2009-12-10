@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Widget.h
+/** \file InputManager.h
  *
  * This file contains the declaration of the classes for input management
  *  in MAUI. InputManager is the basic interface used to supply

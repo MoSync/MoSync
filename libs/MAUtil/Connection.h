@@ -45,7 +45,7 @@ public:
 	* \param result The result of the operation. \> 0 on success,
 	* or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
 	*/
-	virtual void ATTRIB(noreturn) connectFinished(Connection* conn, int result);
+	virtual void ATTRIBUTE(noreturn, connectFinished(Connection* conn, int result));
 
 	/**
 	* Called when a recv operation finishes.
@@ -53,17 +53,17 @@ public:
 	* \param result The number of bytes read on success,
 	* or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
 	*/
-	virtual void ATTRIB(noreturn) connRecvFinished(Connection* conn, int result);
+	virtual void ATTRIBUTE(noreturn, connRecvFinished(Connection* conn, int result));
 
 	/**
 	* Called when a write operation finishes.
 	*/
-	virtual void ATTRIB(noreturn) connWriteFinished(Connection* conn, int result);
+	virtual void ATTRIBUTE(noreturn, connWriteFinished(Connection* conn, int result));
 
 	/**
 	* Called when a read operation finishes.
 	*/
-	virtual void ATTRIB(noreturn) connReadFinished(Connection* conn, int result);
+	virtual void ATTRIBUTE(noreturn, connReadFinished(Connection* conn, int result));
 };
 
 /**
