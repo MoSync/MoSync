@@ -175,7 +175,7 @@ if !File.exist? sql_filename
 	return
 end
 
-if false
+if true
 # We start from scratch
 if File.exist? filename
 	File.delete filename
