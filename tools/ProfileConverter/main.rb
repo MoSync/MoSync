@@ -213,8 +213,6 @@ FileUtils.mkdir_p RUNTIME_DIR
 definitions = {}
 
 db.execute( "select name from vendor" ) do |vendor|
-	vendor = vendor[0]
-	
 	# fix to exclude a lot of entries which is not real devices
 	if (vendor.to_s.eql?("Generic") || vendor.to_s.eql?("Native"))
 		next
