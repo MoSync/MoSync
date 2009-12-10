@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="maui-gen"
 	ProjectGUID="{F695FBEF-5812-46B3-AACF-5A47DCE36919}"
 	RootNamespace="mauigen"

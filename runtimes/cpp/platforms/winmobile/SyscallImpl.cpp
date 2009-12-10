@@ -64,30 +64,6 @@ using namespace MoSyncError;
 
 #include <core/core.h>
 
-
-#ifdef WIN32_PLATFORM_WFSP
-#include <vibrate.h>
-#endif
-
-/****** hack for nled on pocket pc:s using smartphone runtime (htc touch for instance). ***********/
-//#include <NLed.h> 
-const int NLED_COUNT_INFO_ID = 0;
-const int NLED_SETTINGS_INFO_ID = 2;
-struct NLED_SETTINGS_INFO {
-  UINT LedNum;
-  INT OffOnBlink;
-  LONG TotalCycleTime;
-  LONG OnTime;
-  LONG OffTime;
-  INT MetaCycleOn;
-  INT MetaCycleOff; 
-};
-struct NLED_COUNT_INFO {
-  UINT cLeds; 
-};
-extern "C" { BOOL NLedGetDeviceInfo(INT nID, PVOID pOutput); BOOL NLedSetDevice(INT nID, PVOID pOutput); } 
-/*************************************************************************************************/
-
 // ifdef streaming?
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
@@ -112,6 +88,8 @@ DDSURFACEDESC ddsd;
 //#ifdef MA_PROF_SUPPORT_WLAN
 #include <helpers/CPP_IX_WLAN.h>
 #include "WifiPeek.h"
+
+#include "Vibration.h"
 
 extern "C" __declspec(dllimport) BOOL KernelIoControl(
     DWORD dwIoControlCode, 
@@ -218,8 +196,8 @@ namespace Base {
 	TCHAR g_szTitle[80]		= TEXT ("MoRE"),			// Application main window name
 	g_szClassName[80]		= TEXT ("MoRE class");	// Main window class name
 
-	CRITICAL_SECTION vibrationCS;
-	UINT_PTR vibrationId = NULL;
+	extern CRITICAL_SECTION vibrationCS;
+	extern UINT_PTR vibrationId;
 
 	//***************************************************************************
 	// Resource loading
@@ -486,6 +464,17 @@ namespace Base {
 #endif
 	}
 
+DWORD GetScreenOrientation()
+{
+    DWORD retVal ;
+    HKEY hKey;
+    DWORD dataSize = sizeof(DWORD);
+    RegOpenKeyEx(HKEY_LOCAL_MACHINE,TEXT("System\\GDI\\Rotation"),NULL,NULL,&hKey);
+    RegQueryValueEx(hKey,TEXT("Angle"),NULL,NULL,(LPBYTE)&retVal, &dataSize);
+    RegCloseKey(hKey);
+    return retVal;
+}
+
 	//***************************************************************************
 	//Initialization
 	//***************************************************************************
@@ -583,6 +572,11 @@ namespace Base {
             VideoHandleEvent((VideoStream*)lParam);
             break;
 			*/
+
+		case WM_SIZE:
+		case WM_SETTINGCHANGE:
+			DWORD orientation = GetScreenOrientation();
+			return 0;
 		}
 
 
@@ -926,9 +920,9 @@ namespace Base {
 		screenPitchY = ddsd.lPitch;
 #endif
 
-		if( screenPitchX==1 && backBuffer->width*1==backBuffer->pitch ||
-			screenPitchX==2 && backBuffer->width*2==backBuffer->pitch ||
-			screenPitchX==4 && backBuffer->width*4==backBuffer->pitch) {
+		if( (screenPitchX==1 || screenPitchY==1)&& backBuffer->width*1==backBuffer->pitch ||
+			(screenPitchX==2 || screenPitchY==2)&& backBuffer->width*2==backBuffer->pitch ||
+			(screenPitchX==4 || screenPitchY==4)&& backBuffer->width*4==backBuffer->pitch) {
 			memcpy(screen, backBuffer->data, backBuffer->bytesPerPixel*backBuffer->width*backBuffer->height);
 		} 
 		else
@@ -1723,81 +1717,13 @@ namespace Base {
 		return ms.dwTotalPhys;
 	}
 
-
-	// only used on Pocket PC devices 
-#define VIB_MODE_PPC 0
-#define VIB_MODE_SP 1
-	int vibMode;
-	int GetLedCount() {
-		NLED_COUNT_INFO nci; 
-		int wCount = 0; 
-		if(NLedGetDeviceInfo(NLED_COUNT_INFO_ID, (PVOID) &nci)) 
-			wCount = (int) nci.cLeds; 
-		return wCount; 
-	} 
-
-	HRESULT SetLedStatus(int wLed, int wStatus) { 
-		NLED_SETTINGS_INFO nsi; 
-		nsi.LedNum = (INT) GetLedCount()-1; 
-		nsi.OffOnBlink = (INT) wStatus; 
-		BOOL r = NLedSetDevice(NLED_SETTINGS_INFO_ID, &nsi); 
-		if(r == TRUE) return S_OK;
-		else return S_FALSE;
-	} 
-
-	VOID CALLBACK VibrationStopCallback(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
-		CriticalSectionHandler cs(&vibrationCS);
-		if(vibMode == VIB_MODE_PPC)	
-			SetLedStatus(0, 0);
-		else
-			VibrateStop();
-		vibrationId = NULL;
-	}
-
-	BOOL VibrationStop() {
-		if(vibrationId != NULL) {
-			GLE(KillTimer(g_hwndMain, vibrationId));
-			vibrationId = NULL;	
-			if(vibMode == VIB_MODE_PPC)
-				return SetLedStatus(0, 0);
-			else 
-				return VibrateStop() == S_OK;
-		}
-		return TRUE;
-	}
-
 	SYSCALL(int, maVibrate(int ms)) 
 	{
-#ifdef WIN32_PLATFORM_WFSP
-		CriticalSectionHandler cs(&vibrationCS);
-		vibMode = VIB_MODE_SP;
-		int ret = 0;
-		// hack to support vibration using smartphone runtime on pocket pc phones (htc touch)
-		if((ret=VibrateGetDeviceCaps(VDC_AMPLITUDE))<=0) {
-			vibMode = VIB_MODE_PPC;
-		}
-		if(ms==0) {	
+		if(ms==0) {
 			return VibrationStop();
 		} else {
-			VibrationStop();
-			
-			HRESULT res;
-
-			if(vibMode == VIB_MODE_PPC)
-				res = SetLedStatus(0, 1);
-			else
-				res = Vibrate(0, NULL, 0, INFINITE);
-
-			if(res == S_OK) {
-				GLE(vibrationId=SetTimer(g_hwndMain, 1, ms, VibrationStopCallback));
-				return 1;
-			} else {
-				return 0;
-			}
+			return VibrationStart(ms);
 		}
-#else
-		return IOCTL_UNAVAILABLE;
-#endif
 	}
 
 	SYSCALL(int, maPanic(int result, char* message)) 

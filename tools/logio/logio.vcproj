@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="logio"
 	ProjectGUID="{2D43F530-DD1E-4FE4-9810-F528EBFB2917}"
 	RootNamespace="logio"

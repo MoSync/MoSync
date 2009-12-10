@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="icon-injector"
 	ProjectGUID="{517BA040-060A-420C-8AC5-04D6365BDCBC}"
 	RootNamespace="iconinjector"

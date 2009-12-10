@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Downloader"
 	ProjectGUID="{A189CA43-B156-4421-92D9-ECC167B4AF1A}"
 	RootNamespace="Downloader"

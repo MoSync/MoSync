@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="synth"
 	ProjectGUID="{AA6779BF-24C0-4574-8324-BC61257F832D}"
 	RootNamespace="synth"
