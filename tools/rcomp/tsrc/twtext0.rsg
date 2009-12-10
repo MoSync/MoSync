@@ -1,0 +1,2 @@
+#define WIDE_STRING                               0x6455c001
+#define LONG_STRING                               0x6455c002

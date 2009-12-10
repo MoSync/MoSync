@@ -1,0 +1,60 @@
+README
+
+rcomp for Linux by Alfred E. Heggestad <alfredh@symbianos.org> (27. Dec 2003)
+See License.txt for further details.
+
+
+TESTING
+
+Porting and testing was done with:
+
+    Debian GNU/Linux unstable with kernel 2.6.0 on x86
+
+Compiler that works is gcc-2.95 (gcc-3.3 does not work yet)
+
+Regression test code can be executed by doing 'make regtest' in the root.
+This uses rcomp to generate binary .rsc files and compares them
+with reference .rsc files part of the source package from Symbian Ltd.
+
+NOTE: The generated binary .rsc files has only been verified for simple
+      .rss files part of the regression test. For more complex .rss files
+      (like e32frodo) I had to comment out two asserts to get it working.
+      The output looks sane but has not been verified yet. To find the
+      commented out asserts, grep in the source code for:
+
+          $ grep -nrI assert . | grep TODO
+
+
+SOURCE
+
+The source code is hosted in Subversion on symbianos.org which can be
+retried by doing (provided you have login):
+
+    $ svn co svn+ssh://symbianos.org/home/svn/rcomp/trunk rcomp
+
+Tarballs can be fetched from
+
+    http://symbianos.org/download/
+
+Debian packages can be installed by adding this to /etc/apt/sources.list
+
+    deb http://ftp.symbianos.org/debian sid main
+    deb-src http://ftp.symbianos.org/debian sid main
+
+and doing
+
+    $ apt-get update
+    $ apt-get install rcomp
+
+
+TODO
+
+o Get gcc-3.3 working
+o Test big-endian architectures
+o Understand why the two asserts had to be commented out
+
+
+CREDITS
+
+John Pagonis
+David Mery

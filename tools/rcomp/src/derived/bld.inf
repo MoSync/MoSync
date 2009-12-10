@@ -1,0 +1,15 @@
+// BLD.INF
+//
+// Copyright (c) 2001 Symbian Ltd.  All rights reserved.
+//
+
+PRJ_PLATFORMS
+
+TOOLS
+
+
+PRJ_MMPFILES
+
+// Additional extension makefile to process the lex and yacc source files
+gnumakefile bldex.mk
+..\rcomp.mmp

@@ -1,0 +1,5 @@
+STUPID                    Unrecognised character set name warning
+ERROR_INVALID_MEMBER      Label not found error (bof instead of buf)
+MAIN_SYNTAX_ERROR_1       STRICT instead of STRUCT - gives "syntax error"
+H_SYNTAX_ERROR_1          Syntax error in include file
+ERROR_MISSING_STRUCT      Leave out a struct definition - gives label not found

@@ -1,0 +1,15 @@
+# 1 "negativeenum.rss"
+
+enum FooEnum {
+	minus = -1,
+	zero = 0,
+	one = 1
+};
+
+STRUCT FOO {
+	BYTE value = minus;
+}
+
+RESOURCE FOO myResource {
+}
+

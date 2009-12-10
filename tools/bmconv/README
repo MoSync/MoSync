@@ -1,0 +1,188 @@
+README
+
+bmconv for Linux by Alfred E. Heggestad <alfredh@symbianos.org> (19. Dec 2003)
+See License.txt for further details.
+
+
+TESTING
+
+Porting and testing was done with:
+
+    Debian GNU/Linux unstable with kernel 2.6.0 on x86
+
+See below for other platforms status.
+
+Regression test code can be executed by doing 'make regtest' in the root.
+
+ROM files have not been tested and is expected to fail to BE/64-bit platforms.
+
+A note about Mac OS 10.2:
+
+bmconv compiled with the default compiler on Darwin (based on gcc 3.1)
+does not work. The code generated in src/pbmtobm.cpp is bogus:
+
+int EpocLoader::LoadFile(char* aFileName,int aIndex)
+{
+	...
+	file.seekg(aIndex*4,ios::cur);
+	file.read((char *)wordbuffer,4);
+	
+	/* At this point the get pointer in the file stream is -1, and there
+	 * is no way to restore it. During decompilation of 8 bitmaps, the
+	 * last one will fail.
+	 */
+	if (file.gcount()!=4)
+		return SourceFile;
+	...
+}
+
+A workaround is to use g++-2 (gcc 2.95.2) instead which generated working code.
+
+$ cd bmconv/test
+$ make test_decomp
+...
+Bad source file(s).
+make: *** [test_decomp] Error 4
+
+bash-2.05a$ g++ -v
+Reading specs from /usr/libexec/gcc/darwin/ppc/3.1/specs
+Thread model: posix
+Apple Computer, Inc. GCC version 1175, based on gcc version 3.1 20020420 (prerelease)
+bash-2.05a$ 
+bash-2.05a$ g++2 -v
+Reading specs from /usr/libexec/gcc/darwin/ppc/2.95.2/specs
+Apple Computer, Inc. version gcc-937.2, based on gcc version 2.95.2 19991024 (release)
+
+
+PLATFORM STATUS
+
+	Debian	RedHat	FreeBSD	SuSE8	Debian	MacOSX	SunOS	Debian	
+	x86	x86	x86	AMD64	Alpha	PPC-G4	Sparc	Sparc64	
+							R220
+
+long	4	4	4	8	8	4	8	8
+void*	4	4	4	8	8	4	8	8
+
+endian	little	little	little	little	little	big	big	big
+
+stat	OK	OK	OK	OK	OK	OK	OK	OK
+
+gcc	3.3.3	3.2.2	2.95.4	3.2.2	2.95.4	937.2	3.1	3.3.3	
+						2.95.2
+
+
+x86 Debian:
+~~~~~~~~~~
+$ uname -a
+Linux io 2.6.0 #18 Fri Dec 19 14:43:01 CET 2003 i686 GNU/Linux
+$ gcc -v
+Reading specs from /usr/lib/gcc-lib/i486-linux/3.3.3/specs
+Configured with: ../src/configure -v --enable-languages=c,c++,java,f77,pascal,objc,ada,treelang --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-gxx-include-dir=/usr/include/c++/3.3 --enable-shared --with-system-zlib --enable-nls --without-included-gettext --enable-__cxa_atexit --enable-clocale=gnu --enable-debug --enable-java-gc=boehm --enable-java-awt=xlib --enable-objc-gc i486-linux
+Thread model: posix
+gcc version 3.3.3 20031229 (prerelease) (Debian)
+
+
+x86 RedHat:
+~~~~~~~~~~
+$ uname -a
+Linux x86-linux2.cf.sourceforge.net 2.4.20-24.9 #1 Mon Dec 1 12:08:29 EST 2003 i686 i686 i386 GNU/Linux
+$ gcc -v
+Reading specs from /usr/lib/gcc-lib/i386-redhat-linux/3.2.2/specs
+Configured with: ../configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --enable-shared --enable-threads=posix --disable-checking --with-system-zlib --enable-__cxa_atexit --host=i386-redhat-linux
+Thread model: posix
+gcc version 3.2.2 20030222 (Red Hat Linux 3.2.2-5)
+
+
+FreeBSD
+~~~~~~~
+$ uname -a
+FreeBSD x86-freebsd1 4.9-PRERELEASE FreeBSD 4.9-PRERELEASE #23: Thu Sep 18 22:40:16 PDT 2003     root@usf-cf-x86-freebsd-1:/usr/obj/usr/src/sys/GENERIC  i386
+$ gcc -v
+Using builtin specs.
+gcc version 2.95.4 20020320 [FreeBSD]
+
+
+AMD:
+~~~
+$ uname -a
+Linux amd64-linux1 2.4.21-143-smp #1 SMP Thu Oct 30 23:48:07 UTC 2003 x86_64 unknown
+$ gcc -v
+Reading specs from /usr/lib64/gcc-lib/x86_64-suse-linux/3.2.2/specs
+Configured with: ../configure --enable-threads=posix --prefix=/usr --with-local-prefix=/usr/local --infodir=/usr/share/info --mandir=/usr/share/man --libdir=/usr/lib64 --enable-languages=c,c++,f77,objc,java,ada --enable-libgcj --with-gxx-include-dir=/usr/include/g++ --with-slibdir=/lib --with-system-zlib --enable-shared --enable-__cxa_atexit x86_64-suse-linux
+Thread model: posix
+gcc version 3.2.2 (SuSE Linux)
+
+
+Alpha:
+~~~~~
+$ uname -a
+Linux usf-cf-alpha-linux-1 2.2.20 #2 Wed Mar 20 19:57:28 EST 2002 alpha unknown
+$ gcc -v
+Reading specs from /usr/lib/gcc-lib/alpha-linux/2.95.4/specs
+gcc version 2.95.4 20011002 (Debian prerelease)
+
+
+PPC:
+~~~
+$ uname -a
+Darwin ucf-cf-ppc-macosx-2 6.8 Darwin Kernel Version 6.8: Wed Sep 10 15:20:55 PDT 2003; root:xnu/xnu-344.49.obj~2/RELEASE_PPC  Power Macintosh powerpc
+$ gcc -v
+Reading specs from /usr/libexec/gcc/darwin/ppc/3.1/specs
+Thread model: posix
+Apple Computer, Inc. GCC version 1175, based on gcc version 3.1 20020420 (prerelease)
+
+
+Sparc R220 - Solaris
+~~~~~~~~~~~~~~~~~~~~
+$ uname -a
+SunOS sparc-solaris2 5.9 Generic_112233-03 sun4u sparc SUNW,Ultra-60
+$ gcc -v
+Reading specs from /usr/local/encap/gcc-3.1/lib/gcc-lib/sparc-sun-solaris2.9/3.1/specs
+Configured with: ../../common/gcc-3.1/configure --prefix=/usr/local/encap/gcc-3.1 --disable-shared --with-gnu-as --with-as=/usr/local/bin/as --with-gnu-ld --with-ld=/usr/local/bin/ld --enable-languages=c,c++
+Thread model: posix
+gcc version 3.1
+
+
+Sparc64:
+~~~~~~~
+$ uname -a
+Linux venus 2.4.20 #2 SMP Fri Feb 28 15:48:28 CET 2003 sparc64 GNU/Linux
+$ gcc -v
+Reading specs from /usr/lib/gcc-lib/sparc-linux/3.3.3/specs
+Configured with: ../src/configure -v --enable-languages=c,c++,java,f77,pascal,objc,ada,treelang --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-gxx-include-dir=/usr/include/c++/3.3 --enable-shared --with-system-zlib --enable-nls --without-included-gettext --enable-__cxa_atexit --enable-clocale=gnu --enable-debug --enable-java-gc=boehm --enable-java-awt=xlib --with-cpu=v7 --enable-objc-gc sparc-linux
+Thread model: posix
+gcc version 3.3.3 20031229 (prerelease) (Debian)
+
+
+SOURCE
+
+The source code is hosted in Subversion on symbianos.org which can be
+retried by doing (provided you have login):
+
+    $ svn co svn+ssh://symbianos.org/home/svn/bmconv/trunk bmconv
+
+Tarballs can be fetched from
+
+    http://symbianos.org/download/
+
+Debian packages can be installed by adding this to /etc/apt/sources.list
+
+    deb http://ftp.symbianos.org/debian sid main
+    deb-src http://ftp.symbianos.org/debian sid main
+
+and doing
+
+    $ apt-get update
+    $ apt-get install bmconv
+
+
+TODO
+
+o Test ROM files
+
+
+CREDITS
+
+John Pagonis
+David Mery
+Sourceforge.net

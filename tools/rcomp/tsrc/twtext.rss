@@ -1,0 +1,51 @@
+// TWTEXT.RSS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// This is used to exercise the explicit wide character abilities of the
+// compiler
+// Pute, June 1999.
+// ---------------------------------------------------------------------------
+//
+
+
+
+
+
+NAME TWTE
+
+
+
+STRUCT TBUF
+    {
+    BUF buf; /* non-zero terminated text string */
+    }
+
+STRUCT LBUF
+    {
+    LTEXT txt; // leading-byte counted text string
+    }
+
+STRUCT LBUF16
+    {
+	LTEXT16 txt; // leading byte counted wide string
+	}
+
+STRUCT ARRAY
+    {
+    STRUCT items[];
+    }
+
+STRUCT TBUF1	
+	{ 
+	BUF<1> buf; // buffer of fixed length
+	}
+
+// The following resource contains explicit wide characters.
+
+
+
+RESOURCE TBUF wide_string { buf = "here are some wide characters:" 
+                                  <0x20AC> <0x07ED>
+                                  "...";
+                          }
+
+
+RESOURCE TBUF1 long_string { buf = <0x20AC>; }	// tests length checking

@@ -1,0 +1,186 @@
+// TUTEXT.RSS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// This is used to exercise the CHARACTER_SET and 8/16 bit text functionality
+// of the resource compiler.
+// Pute, December 1996.
+// ---------------------------------------------------------------------------
+//
+
+
+
+
+
+NAME TUTE
+
+
+CHARACTER_SET CP1252
+
+
+STRUCT LISTITEMS WORD
+{
+    STRUCT strings[];
+}
+
+
+STRUCT LIST
+{
+    WORD type;
+	STRUCT items;
+}
+
+
+
+
+STRUCT TBUF
+    {
+    BUF buf; /* non-zero terminated text string */
+    }
+
+STRUCT LBUF
+    {
+    LTEXT txt; // leading-byte counted text string
+    }
+
+STRUCT LBUF16
+    {
+	LTEXT16 txt; // leading byte counted wide string
+	}
+
+STRUCT ARRAY
+    {
+    STRUCT items[];
+    }
+
+STRUCT BUTTON
+    {
+    WORD id;
+	WORD flags;
+    LTEXT txt;
+	LTEXT txt2;
+	LTEXT bmp;
+    }
+
+STRUCT FLPTED
+	{
+	WORD maxlength;
+	DOUBLE min;
+	DOUBLE max;
+	}
+
+STRUCT MENU_BAR
+    {
+    STRUCT titles[]; // MENU_BAR_ITEMs
+    }
+
+STRUCT MENU_TITLE
+    {
+    LLINK menu_pane;
+    LTEXT txt;
+    }
+
+
+
+RESOURCE LIST list_1
+{
+    type = 5;
+	items = LISTITEMS
+	{
+	    strings = 
+		{
+		    LBUF16 {txt = "item 1"; },
+			LBUF16 {txt = "item 2"; }
+		};
+	};
+}
+
+
+// The following strings contain characters in (or at the boundary of)
+// the region of code points where Microsoft's code page 1252
+// deviates from ISO Latin 1.  The mappings to Unicode should become
+// sparse at this point, but the results should display in the same
+// way on properly configured systems.
+
+
+// The special characters highlighted below should be contiguous in
+// the CP1252 output but in Unicode output, NOT USED(1) and the
+// Y with diaeresis should have values FFFE and 0178 respectively.
+
+RESOURCE TBUF begin_except { buf = "tilde -" <126>
+                                   "- DELETE -" <127>
+                                   "- Euro sign -" <128>
+                                   "- NOT USED (1) -" <129> "-.";
+                           }
+
+
+RESOURCE TBUF end_except   { buf = "Y with diaeresis -" <159>
+                                   "- NBSP -" <160>
+                                   "- Inverted exclm -" <161> "-.";
+                           }
+
+
+
+
+RESOURCE TBUF special_string { buf = "this -" <133> "- is horizontal ellipsis"; }
+
+
+
+
+RESOURCE TBUF unbroken_string { buf = "first part, second part"; }
+
+RESOURCE TBUF broken_string { buf = "first part," <42>  <64>   <128>   
+                                      <0x1f> // escape
+                                    " second part"; }
+
+
+
+RESOURCE TBUF sys_special_characters { buf="+-*/<,>.NSWE"; }
+
+RESOURCE TBUF sys_string { buf="%s"; }
+RESOURCE TBUF sys_dimmed_msg {buf="This item is not available";}
+RESOURCE TBUF sys_locked_msg {buf="This item cannot be changed";}
+RESOURCE TBUF sys_busy { buf="Busy"; }
+RESOURCE TBUF sys_scanning { buf="Scanning"; }
+RESOURCE TBUF sys_printing_to { buf="Printing to %s";}
+RESOURCE TBUF sys_page_is { buf="(page %u)";}
+
+RESOURCE ARRAY sys_array_one
+    {
+    items=
+        {
+        LBUF { txt="Esc"; },
+        LBUF { txt="Enter"; },
+        LBUF { txt="Tab"; },
+		LBUF { txt="Del"; },
+		LBUF { txt="Space"; }
+        };
+    }
+
+RESOURCE BUTTON sys_button_one
+    {
+    id=3;
+    flags=5;
+    txt="Text";
+    txt2="";
+    bmp="Bitmap placeholder";
+    }
+
+RESOURCE FLPTED sys_flpted_one
+    {
+    maxlength=18;
+    min=0.0;
+    max=9.9e99;
+    }
+
+RESOURCE MENU_BAR sys_menubar_one
+    {
+    titles=
+        {
+        MENU_TITLE { menu_pane=1; txt="a"; },
+        MENU_TITLE { menu_pane=2; txt="ab"; },
+        MENU_TITLE { menu_pane=3; txt="abc"; },
+        MENU_TITLE { menu_pane=4; txt="abcd"; },
+        MENU_TITLE { menu_pane=5; txt="abcde"; },
+        MENU_TITLE { menu_pane=6; txt="abcdef"; },
+        MENU_TITLE { menu_pane=7; txt="abcdefg"; },
+        MENU_TITLE { menu_pane=8; txt="abcdefgh"; }
+        };
+    }

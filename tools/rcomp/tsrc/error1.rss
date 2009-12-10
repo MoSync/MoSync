@@ -1,0 +1,174 @@
+// ERROR1.RSS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// This is used to identify common errors and their diagnostics.
+// 
+// Pute, December 1996.
+// ---------------------------------------------------------------------------
+//
+
+
+
+
+
+NAME TUTE
+#if defined (STUPID)
+CHARACTER_SET stupid
+#endif
+
+CHARACTER_SET CP1252
+
+#include "error1.rh"
+
+//#include "c:\users\pute\scratch\error1.rh"
+
+
+
+
+STRUCT LISTITEMS WORD
+{
+#if defined (MAIN_SYNTAX_ERROR_1)
+    STRICT strings[];
+#else
+    STRUCT strings[];
+#endif
+}
+
+#if !defined (ERROR_MISSING_STRUCT)
+STRUCT LIST
+{
+    WORD type;
+    STRUCT items;
+}
+#endif
+
+
+
+STRUCT TBUF
+    {
+    BUF buf; /* non-zero terminated text string */
+    }
+
+STRUCT LBUF
+    {
+    LTEXT txt; // leading-byte counted text string
+    }
+
+STRUCT LBUF16
+    {
+	LTEXT16 txt; // leading byte counted wide string
+	}
+
+STRUCT ARRAY
+    {
+    STRUCT items[];
+    }
+
+STRUCT BUTTON
+    {
+    WORD id;
+	WORD flags;
+    LTEXT txt;
+	LTEXT txt2;
+	LTEXT bmp;
+    }
+
+STRUCT FLPTED
+	{
+	WORD maxlength;
+	DOUBLE min;
+	DOUBLE max;
+	}
+
+STRUCT MENU_BAR
+    {
+    STRUCT titles[]; // MENU_BAR_ITEMs
+    }
+
+STRUCT MENU_TITLE
+    {
+    LLINK menu_pane;
+    LTEXT txt;
+    }
+
+// RESOURCE TBUF arbitrary_stuff { buf="a load of x XXXXXXXXXX"; }
+
+
+RESOURCE LIST list_1
+{
+    type = 5;
+    items = LISTITEMS
+    {
+    strings = 
+        {
+        LBUF16 {txt = "item 1"; },
+        LBUF16 {txt = "item 2"; }
+        };
+    };
+}
+
+
+
+#if defined (ERROR_INVALID_MEMBER)
+RESOURCE TBUF unbroken_string { bof = "first part, second part"; }
+#else
+RESOURCE TBUF unbroken_string { buf = "first part, second part"; }
+#endif
+
+
+RESOURCE TBUF broken_string { buf = "first part," <42>  <64>   <128>   
+                                      <0x1f> // escape
+                                    " second part"; }
+
+
+
+RESOURCE TBUF sys_special_characters { buf="+-*/<,>.NSWE"; }
+
+RESOURCE TBUF sys_string { buf="%s"; }
+RESOURCE TBUF sys_dimmed_msg {buf="This item is not available";}
+RESOURCE TBUF sys_locked_msg {buf="This item cannot be changed";}
+RESOURCE TBUF sys_busy { buf="Busy"; }
+RESOURCE TBUF sys_scanning { buf="Scanning"; }
+RESOURCE TBUF sys_printing_to { buf="Printing to %s";}
+RESOURCE TBUF sys_page_is { buf="(page %u)";}
+
+RESOURCE ARRAY sys_array_one
+    {
+    items=
+        {
+        LBUF { txt="Esc"; },
+        LBUF { txt="Enter"; },
+        LBUF { txt="Tab"; },
+		LBUF { txt="Del"; },
+		LBUF { txt="Space"; }
+        };
+    }
+
+RESOURCE BUTTON sys_button_one
+    {
+    id=3;
+    flags=5;
+    txt="Text";
+    txt2="";
+    bmp="Bitmap placeholder";
+    }
+
+RESOURCE FLPTED sys_flpted_one
+    {
+    maxlength=18;
+    min=0.0;
+    max=9.9e99;
+    }
+
+RESOURCE MENU_BAR sys_menubar_one
+    {
+    titles=
+        {
+        MENU_TITLE { menu_pane=1; txt="a"; },
+        MENU_TITLE { menu_pane=2; txt="ab"; },
+        MENU_TITLE { menu_pane=3; txt="abc"; },
+        MENU_TITLE { menu_pane=4; txt="abcd"; },
+        MENU_TITLE { menu_pane=5; txt="abcde"; },
+        MENU_TITLE { menu_pane=6; txt="abcdef"; },
+        MENU_TITLE { menu_pane=7; txt="abcdefg"; },
+        MENU_TITLE { menu_pane=8; txt="abcdefgh"; }
+        };
+    }

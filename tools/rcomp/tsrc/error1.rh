@@ -1,0 +1,23 @@
+// ERROR1.RH +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// An include file with errors to exercise the filename reporting feature
+// of RCOMP's error code.
+// 
+// Pute, March 1997.
+// ---------------------------------------------------------------------------
+//
+
+STRUCT EXECRATION
+{
+#if defined (H_SYNTAX_ERROR_1)
+    STRICT stuff;
+#else
+    STRUCT stuff;
+#endif
+}
+
+
+
+
+
+
+// end of ERROR1.RH

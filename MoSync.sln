@@ -630,6 +630,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qwerty", "testPrograms\qwer
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "logio", "tools\logio\logio.vcproj", "{2D43F530-DD1E-4FE4-9810-F528EBFB2917}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bmconv", "tools\bmconv\bmconv.vcproj", "{2EAD60C4-1705-425A-AEC8-9261FCFBB637}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rcomp", "tools\rcomp\rcomp.vcproj", "{C703C8FA-5122-4969-91BB-28AA40278F99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -2892,6 +2896,42 @@ Global
 		{2D43F530-DD1E-4FE4-9810-F528EBFB2917}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
 		{2D43F530-DD1E-4FE4-9810-F528EBFB2917}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
 		{2D43F530-DD1E-4FE4-9810-F528EBFB2917}.Release|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Win32.Build.0 = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Debug|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Smartphone 2003 (ARMV4).ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Win32.ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Win32.Build.0 = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637}.Release|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Win32.Build.0 = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Debug|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Smartphone 2003 (ARMV4).ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Win32.ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Win32.Build.0 = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{C703C8FA-5122-4969-91BB-28AA40278F99}.Release|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2916,6 +2956,8 @@ Global
 		{F695FBEF-5812-46B3-AACF-5A47DCE36919} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{517BA040-060A-420C-8AC5-04D6365BDCBC} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{2D43F530-DD1E-4FE4-9810-F528EBFB2917} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
+		{2EAD60C4-1705-425A-AEC8-9261FCFBB637} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
+		{C703C8FA-5122-4969-91BB-28AA40278F99} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{5AB2E7D8-8278-4B09-9441-16136936A271} = {983447E4-503D-41A2-ABB6-51DEED74C00B}
 		{E497B42C-2029-4CA6-BBDE-E7A807279F98} = {983447E4-503D-41A2-ABB6-51DEED74C00B}
 		{CF38EA04-DCCF-4506-B5EB-6895F23F5F9A} = {983447E4-503D-41A2-ABB6-51DEED74C00B}
