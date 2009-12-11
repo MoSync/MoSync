@@ -376,7 +376,7 @@ runtimes.each do |platform_name, platform|
 		end
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
 		
-		debug_defines = ['PUBLIC_DEBUG']
+		debug_defines = ['PHONE_RELEASE', 'PUBLIC_DEBUG']
 		debug_defines << "MOSYNC_COMMERCIAL";
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
 		
