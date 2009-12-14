@@ -1135,6 +1135,7 @@ interface MAAPI {
 		NATIVE_KEY_PRESSED = 19;
 		NATIVE_KEY_RELEASED = 20;
 #endif
+		SCREEN_CHANGED = 21;
 	}
 
 	struct MAConnEventData {

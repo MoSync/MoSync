@@ -77,6 +77,12 @@ using namespace MoSyncError;
 IDirectDraw * g_pDD = NULL;
 IDirectDrawSurface * g_pDDSPrimary = NULL;		
 DDSURFACEDESC ddsd;
+/*
+namespace Base {
+BOOL InitDDraw();
+BOOL CloseDDraw();
+}
+*/
 #endif
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
@@ -132,7 +138,8 @@ namespace Base {
 
 	void InitFullScreen();
 	void InitWindowed();
-	void closeGraphics();
+	BOOL InitGraphics();
+	void CloseGraphics();
 	static void MAUpdateScreen();
 
 	BOOL VibrationStop();
@@ -151,6 +158,7 @@ namespace Base {
 	GraphicsMode graphicsMode;
 	Image::PixelFormat pixelFormat;
 	Image *backBuffer = NULL;
+	static Image *sInternalBackBuffer = NULL;
 	Image *currentDrawSurface = NULL;
 	unsigned char* screen = NULL;
 	unsigned int screenPitchX, screenPitchY;
@@ -496,7 +504,7 @@ DWORD GetScreenOrientation()
 			return 0;
 
 		case WM_DESTROY:
-			closeGraphics();
+			CloseGraphics();
 			PostQuitMessage (0);
 			return 0;
 
@@ -573,9 +581,29 @@ DWORD GetScreenOrientation()
             break;
 			*/
 
+       case WM_SETTINGCHANGE:
+            if (SETTINGCHANGE_RESET == wParam) {
+				MAEvent event;
+				event.type = EVENT_TYPE_SCREEN_CHANGED;
+				gEventFifo.put(event);
+
+				if(sInternalBackBuffer) {
+					delete sInternalBackBuffer;
+					sInternalBackBuffer = 0;
+				}
+
+				InitGraphics();
+			}
+			return 0;
 		case WM_SIZE:
-		case WM_SETTINGCHANGE:
+			/*
 			DWORD orientation = GetScreenOrientation();
+			MAEvent event;
+			event.type = EVENT_TYPE_SCREEN_CHANGED;
+			gEventFifo.put(event);
+
+			InitDDraw();
+			*/
 			return 0;
 		}
 
@@ -807,9 +835,10 @@ DWORD GetScreenOrientation()
 	void DDrawUpdateBackbufferInfo(DDSURFACEDESC &ddsd) {
 		backBuffer->alpha = NULL;
 		backBuffer->data = (unsigned char*)ddsd.lpSurface;
+
 		backBuffer->bitsPerPixel = ddsd.ddpfPixelFormat.dwRGBBitCount;
-		backBuffer->bytesPerPixel = ddsd.lXPitch;
-		backBuffer->pitch = ddsd.lPitch;
+		backBuffer->bytesPerPixel = (ddsd.ddpfPixelFormat.dwRGBBitCount+7)/8; //ddsd.lXPitch;
+		backBuffer->pitch = ddsd.dwWidth*backBuffer->bytesPerPixel;//(abs(ddsd.lPitch)<abs(ddsd.lXPitch))?abs(ddsd.lXPitch):abs(ddsd.lPitch);
 		backBuffer->redMask = ddsd.ddpfPixelFormat.dwRBitMask;
 		backBuffer->greenMask = ddsd.ddpfPixelFormat.dwGBitMask;
 		backBuffer->blueMask = ddsd.ddpfPixelFormat.dwBBitMask;
@@ -829,13 +858,14 @@ DWORD GetScreenOrientation()
 
 		if(backBuffer->bitsPerPixel == 16) {
 			if(backBuffer->greenBits == 5)
-				pixelFormat = Image::PIXELFORMAT_RGB555;
+				backBuffer->pixelFormat = Image::PIXELFORMAT_RGB555;
 			else 
-				pixelFormat = Image::PIXELFORMAT_RGB565;
+				backBuffer->pixelFormat = Image::PIXELFORMAT_RGB565;
 		}
 		else if(backBuffer->bitsPerPixel == 24 || backBuffer->bitsPerPixel == 32) {
-			pixelFormat = Image::PIXELFORMAT_RGB888;
+			backBuffer->pixelFormat = Image::PIXELFORMAT_RGB888;
 		}
+		pixelFormat = backBuffer->pixelFormat;
 	}
 
 	void DDrawCreateBackbuffer(DDSURFACEDESC &ddsd) {
@@ -844,8 +874,15 @@ DWORD GetScreenOrientation()
 		backBuffer->data = (unsigned char*)new unsigned char[backBuffer->pitch*backBuffer->height];
 	}
 
+	BOOL CloseDDraw();
+
 	BOOL InitDDraw() 
 	{
+		bool currentIsBB = false;
+		if(currentDrawSurface == backBuffer) currentIsBB = true;
+
+		CloseDDraw();
+
 		HRESULT hRet; 
 		hRet = DirectDrawCreate(NULL, &g_pDD, NULL); 
 		if(hRet != DD_OK) return FALSE;
@@ -873,17 +910,27 @@ DWORD GetScreenOrientation()
 
 		graphicsMode = GRAPHICSMODE_DDRAW;
 
+		if(currentIsBB)
+			currentDrawSurface = backBuffer;
+
 		return TRUE;  
 	}
 
 	BOOL CloseDDraw() 
 	{
-		if(g_pDDSPrimary)
+		if(g_pDDSPrimary) {
 			g_pDDSPrimary->Release();
-		if(g_pDD)
+			g_pDDSPrimary = NULL;
+		}
+		if(g_pDD) {
 			g_pDD->Release();
-
-		
+			g_pDD = NULL;
+		}
+		if(backBuffer) {
+			//delete backBuffer->data;
+			delete backBuffer;
+			backBuffer = NULL;
+		}
 		return TRUE;
 	}
 
@@ -905,6 +952,71 @@ DWORD GetScreenOrientation()
 	}
 #endif
 
+	BOOL InitGraphics() {
+#if (_WIN32_WCE >= 0x502)
+		if(!InitDDraw()) {
+			LOG("InitDDraw failed.\n");
+			return FALSE;
+		}
+#else
+		if(!InitGapi()) {
+			LOG("InitGapi failed. Trying InitGdi instead.\n");
+			if(!InitGdi()) {
+				LOG("InitGdi failed.\n");
+				return FALSE;
+			}
+		}
+#endif
+
+		return TRUE;
+	}
+
+	void CloseGraphics() 
+	{
+#if _WIN32_WCE < 0x502
+		switch(graphicsMode) {
+			case GRAPHICSMODE_GX:
+				if(!CloseGapi()) {
+					LOG("Could not close gapi\n");
+				}
+				break;
+			case GRAPHICSMODE_GDI:
+				if(!CloseGdi()) {
+					LOG("Could not close gdi\n");
+				}
+				break;
+		}
+#else
+		CloseDDraw();
+#endif
+	}
+
+
+	template<int bpp>
+	void copyPixels(byte *dst, byte *src, int w, int h, int dstPitchX, int dstPitchY, int srcPitchX, int srcPitchY) {
+		for(int i = 0; i < h; i++)
+		{
+			byte *dst_s = dst;
+			byte *src_s = src;
+			for(int j = 0; j < w; j++)
+			{
+				byte *dst_p = dst_s;
+				byte *src_p = src_s;
+				//memcpy(dst_s, src_s, bpp);
+				switch(bpp) {
+					case 4: *dst_p++ = *src_p++;
+					case 3: *dst_p++ = *src_p++;
+					case 2: *dst_p++ = *src_p++;
+					case 1: *dst_p++ = *src_p++;
+				}
+				dst_s+=dstPitchX;
+				src_s+=srcPitchX;
+			}
+			dst+=dstPitchY;
+			src+=srcPitchY;
+		}
+	}
+
 	static void MAUpdateScreen() 
 	{
 		if(GetForegroundWindow()!=g_hwndMain) return;
@@ -914,38 +1026,32 @@ DWORD GetScreenOrientation()
 			screen = (unsigned char*)GXBeginDraw();
 		}
 #else
-		g_pDDSPrimary->Lock(NULL, &ddsd, DDLOCK_WAITNOTBUSY, NULL);
+		HRESULT res = g_pDDSPrimary->Lock(NULL, &ddsd, DDLOCK_WAITNOTBUSY, NULL);
+		if(res != DD_OK) {
+			return;
+		}
+
 		screen = (unsigned char*) ddsd.lpSurface;
 		screenPitchX = ddsd.lXPitch;
 		screenPitchY = ddsd.lPitch;
 #endif
+		int w = backBuffer->width;
+		int h = backBuffer->height;
+		int spitch = backBuffer->pitch;
+		int bpp = backBuffer->bytesPerPixel;
 
-		if( (screenPitchX==1 || screenPitchY==1)&& backBuffer->width*1==backBuffer->pitch ||
-			(screenPitchX==2 || screenPitchY==2)&& backBuffer->width*2==backBuffer->pitch ||
-			(screenPitchX==4 || screenPitchY==4)&& backBuffer->width*4==backBuffer->pitch) {
-			memcpy(screen, backBuffer->data, backBuffer->bytesPerPixel*backBuffer->width*backBuffer->height);
-		} 
-		else
-		{
+		if( (screenPitchX==bpp)&& (screenPitchY==spitch)) {
+			memcpy(screen, backBuffer->data, spitch*h);
+		} else	{
 			// slow copy.... 
 			byte *dst = screen;
 			byte *src = backBuffer->data;
-			int w = backBuffer->width;
-			int h = backBuffer->height;
-			int dpitch = screenPitchX - backBuffer->width*screenPitchX;
-			int spitch = backBuffer->pitch - backBuffer->width*backBuffer->bytesPerPixel;
-			int bpp = backBuffer->bytesPerPixel;
-			for(int i = 0; i < h; i++)
-			{
-				for(int j = 0; j < w; j++)
-				{
-					memcpy(dst, src, bpp);
-					dst+=screenPitchX;
-					src+=bpp;
-				}
-				dst+=dpitch;
-				src+=spitch;
 
+			switch(bpp) {
+				case 4: copyPixels<4>(dst, src, w, h, screenPitchX, screenPitchY, bpp, spitch); break;
+				case 3: copyPixels<3>(dst, src, w, h, screenPitchX, screenPitchY, bpp, spitch); break;
+				case 2: copyPixels<2>(dst, src, w, h, screenPitchX, screenPitchY, bpp, spitch); break;
+				case 1: copyPixels<1>(dst, src, w, h, screenPitchX, screenPitchY, bpp, spitch); break;
 			}
 		}
 
@@ -993,20 +1099,7 @@ DWORD GetScreenOrientation()
 
 		InitFullScreen();
 
-#if (_WIN32_WCE >= 0x502)
-		if(!InitDDraw()) {
-			LOG("InitDDraw failed.\n");
-			return false;
-		}
-#else
-		if(!InitGapi()) {
-			LOG("InitGapi failed. Trying InitGdi instead.\n");
-			if(!InitGdi()) {
-				LOG("InitGdi failed.\n");
-				return false;
-			}
-		}
-#endif
+		if(!InitGraphics()) return false;
 
 		currentDrawSurface = backBuffer;
 
@@ -1060,27 +1153,6 @@ DWORD GetScreenOrientation()
 
 		return true;
 	}
-
-	void closeGraphics() 
-	{
-#if _WIN32_WCE < 0x502
-		switch(graphicsMode) {
-			case GRAPHICSMODE_GX:
-				if(!CloseGapi()) {
-					LOG("Could not close gapi\n");
-				}
-				break;
-			case GRAPHICSMODE_GDI:
-				if(!CloseGdi()) {
-					LOG("Could not close gdi\n");
-				}
-				break;
-		}
-#else
-		CloseDDraw();
-#endif
-	}
-
 
 	static void MALibQuit() {
 
@@ -2224,20 +2296,19 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
-	Image *internalBackBuffer = NULL;
 	SYSCALL(int, maFrameBufferInit(void *data)) {
-		if(internalBackBuffer!=NULL) return 0;
-		internalBackBuffer = backBuffer;
+		if(sInternalBackBuffer!=NULL) return 0;
+		sInternalBackBuffer = backBuffer;
 		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		currentDrawSurface = backBuffer;
 		return 1;
 	}
 
 	SYSCALL(int, maFrameBufferClose()) {
-		if(internalBackBuffer==NULL) return 0;
+		if(sInternalBackBuffer==NULL) return 0;
 		delete backBuffer;
-		backBuffer = internalBackBuffer;
-		internalBackBuffer = NULL;
+		backBuffer = sInternalBackBuffer;
+		sInternalBackBuffer = NULL;
 		currentDrawSurface = backBuffer;
 		return 1;
 	}

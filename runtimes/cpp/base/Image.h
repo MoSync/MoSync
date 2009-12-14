@@ -106,7 +106,7 @@ public:
 	int				pitch;
 	int				bytesPerPixel;
 	int				bitsPerPixel;
-
+	
 	unsigned int	alphaMask;
 	unsigned int	alphaShift;
 	unsigned int	alphaBits;

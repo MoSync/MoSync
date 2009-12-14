@@ -304,8 +304,8 @@ Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
 	alpha(NULL)
 {
 	if(height>65536 || pitch>65536) return;
-	calculateConstants();
 	init(NULL, NULL, false);
+	calculateConstants();
 }
 
 Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch, PixelFormat pixelFormat, bool makeCopy, bool shouldFreeData) :
@@ -318,8 +318,8 @@ Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, i
 	alpha(NULL)
 {
 	if(height>65536 || pitch>65536) return;
-	calculateConstants();
 	init(data, alpha, makeCopy);
+	calculateConstants();
 }
 	
 Image::~Image() {

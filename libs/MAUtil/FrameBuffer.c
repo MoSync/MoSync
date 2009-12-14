@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FrameBuffer.h"
 
 static MAPoint2d sScalerSizes[10];
-static byte *sFrameBuffer;
+static byte *sFrameBuffer = 0;
 static MAFrameBufferInfo sFrameBufferInfo;
 static int sOrientation;
 static int sFlags;
@@ -54,15 +54,18 @@ void FrameBuffer_init(int w, int h, int orientation, int flags) {
 	sOrientation = orientation;
 	sFlags = flags;
 
-	if(!sFrameBuffer) {
-		int res = maFrameBufferGetInfo(&sFrameBufferInfo);
-		if(res < 0)
-			maPanic(res, "Framebuffer info failure!");
-		sFrameBuffer = (byte*)malloc(sFrameBufferInfo.sizeInBytes);
-		res = maFrameBufferInit(sFrameBuffer);
-		if(res < 0)
-			maPanic(res, "Framebuffer init failure!");
+	if(sFrameBuffer) {
+		free(sFrameBuffer);
+		sFrameBuffer = 0;
 	}
+
+	int res = maFrameBufferGetInfo(&sFrameBufferInfo);
+	if(res < 0)
+		maPanic(res, "Framebuffer info failure!");
+	sFrameBuffer = (byte*)malloc(sFrameBufferInfo.sizeInBytes);
+	res = maFrameBufferInit(sFrameBuffer);
+	if(res < 0)
+		maPanic(res, "Framebuffer init failure!");
 
 	memset(sFrameBuffer, 0, sFrameBufferInfo.sizeInBytes);
 
@@ -413,7 +416,6 @@ void FrameBuffer_copyRect(short x, short y, short w, short h, int dstx, int dsty
 	
 	pixel = (unsigned char*)&sFrameBuffer[dx*sFrameBufferInfo.bytesPerPixel+dy*sFrameBufferInfo.pitch];
 
-	srand((int)sScalerFunc);;
 	sScalerFunc(pixel, pitchx, pitchy, x, y, w, h, buf, pitch);
 }
 

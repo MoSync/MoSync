@@ -148,6 +148,11 @@ void MoSyncStub::processEvents() {
 	MAEvent e;
 	while(maGetEvent(&e) != 0) {
 		switch(e.type) {
+			case EVENT_TYPE_SCREEN_CHANGED: {
+				FrameBuffer_close();
+				FrameBuffer_init(SCREEN_W, SCREEN_H, currentOrientation, FLAG_4BPP|FLAG_RGB666);
+			}
+			break;
 			case EVENT_TYPE_KEY_PRESSED: handleKeys(e.key, 1); break;
 			case EVENT_TYPE_KEY_RELEASED: handleKeys(e.key, 0); break;
 			case EVENT_TYPE_CLOSE: _pi.quit = true; break;
