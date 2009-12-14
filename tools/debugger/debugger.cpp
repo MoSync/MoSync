@@ -213,16 +213,18 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+#define STABS_MSG " This is probably because you linked with non-debug libraries."\
+	" Check your settings."
 	if(stabsFilename) {
 		//load stabs and SLD
 		if(!loadStabs(gSldFilename.c_str(), stabsFilename)) {
-			eprintf("Could not load Stabs file '%s'\n", stabsFilename);
+			eprintf("Could not load Stabs file '%s'"STABS_MSG"\n", stabsFilename);
 			return 1;
 		}
 	} else if(gSldFilename.size() > 0) {
 		//if no stabs, load only SLD.
 		if(!loadSLD(gSldFilename.c_str())) {
-			eprintf("Could not load SLD file '%s'\n", gSldFilename.c_str());
+			eprintf("Could not load SLD file '%s'"STABS_MSG"\n", gSldFilename.c_str());
 			return 1;
 		}
 	}
