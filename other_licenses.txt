@@ -2,6 +2,7 @@
 
 # filenames
 rakefile.*
+workfile.rb
 
 # directories
 
@@ -28,7 +29,9 @@ rakefile.*
 
 /tests/hubbub
 
-/tools/ccdebug-1.2.0
+/tools/bmconv
+/tools/rcomp
+/tools/e32hack/deflate
 /tools/makesis-4
 /tools/makesis-2.0.0
 /tools/MoCab/lcab
@@ -70,6 +73,8 @@ rakefile.*
 /runtimes/cpp/platforms/sdl/SDL_prim.c
 /runtimes/cpp/platforms/sdl/SDL_prim.h
 
+/runtimes/cpp/platforms/sdl/shared_work.rb
+
 /runtimes/cpp/platforms/symbian/inc/arm-gcc.h
 /runtimes/cpp/platforms/symbian/inc/CSmsHandler.h
 /runtimes/cpp/platforms/symbian/inc/DirScrAccEng.h
@@ -92,6 +97,11 @@ rakefile.*
 
 /tests/sdl_ffmpeg/example.c
 
+/tests/unitTestServer/httpPost.rb
+
 /tools/GLWrapperGenerator/gl_common_lite.h
+
+/tools/e32hack/crc.cpp
+/tools/e32hack/crc.h
 
 /tools/ReleasePackageBuild/build_package_tools/mosync_bin/default_maprofile.h

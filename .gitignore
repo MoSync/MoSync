@@ -72,6 +72,8 @@ stabs.tab
 /runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync.xml
 /runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync2GCCE.resources
 /runtimes/cpp/platforms/symbian/group-ed3-guido/*.cwlink
+/runtimes/cpp/platforms/symbian/sis-ed3/1/*
+/runtimes/cpp/platforms/symbian/sis-ed5/1/*
 
 /runtimes/java/settargetdir.bat
 /runtimes/java/source/config.h

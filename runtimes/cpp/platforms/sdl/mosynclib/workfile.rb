@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path('../shared_work.rb')
 
 # todo: make sure only syscalls are exported.

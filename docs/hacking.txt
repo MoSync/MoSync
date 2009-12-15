@@ -35,7 +35,7 @@ well as Mac OS X.
 Building MoSync programs
 ========================
 
-This is a quick overview of a MoSync programs' build process.
+This is a quick overview of a MoSync program's build process.
 
 The main components are GCC (compiler), pipe-tool (linker), Eclipse (IDE).
 
@@ -241,7 +241,6 @@ For GNU/Linux, you will need the following packages (tested on Ubuntu 8.04,
  * libsdl-ttf2.0-dev
  * libsdl1.2-dev
  * ruby
- * rake
  * <TODO: Complete this list.>
 
 
