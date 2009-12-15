@@ -169,6 +169,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y"
 			/>
 		</Configuration>
 	</Configurations>

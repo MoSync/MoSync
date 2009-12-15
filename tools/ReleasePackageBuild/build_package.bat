@@ -262,6 +262,14 @@ Release\idl2.exe
 @IF NOT errorlevel 0 goto TOOL_ERROR
 @echo.
 
+@echo ------------------------------------------------
+@echo Building e32hack
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\e32hack
+@vcbuild e32hack.vcproj /useenv "Release|Win32"
+@IF NOT errorlevel 0 goto TOOL_ERROR
+@echo.
+
 
 @echo ------------------------------------------------
 @echo Building internal libraries:

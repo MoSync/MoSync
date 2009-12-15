@@ -465,7 +465,7 @@ void CAppView::CCloseTimer::RunL() {
 //***************************************************************************
 
 void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
-	LOG("PE %i %ix%i\n", pe.iType, pe.iPosition.iX, pe.iPosition.iY);
+	LOGD("PE %i %ix%i\n", pe.iType, pe.iPosition.iX, pe.iPosition.iY);
 	MAEvent e;
 	switch(pe.iType) {
 	case TPointerEvent::EButton1Down:
