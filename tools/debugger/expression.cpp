@@ -800,14 +800,15 @@ int evaluateThread(void* data) {
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
 				deref = sReturnValue.getSymbol().type->deref();
 				int addr = (int)sReturnValue;
-				if(addr<=0 || addr>gMemSize) {
+				if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
 					deref = NULL;
 					sErrorStr = "Invalid pointer.";
 				}
 			}
 
-			if(deref)
+			if(deref) {
 				ExpressionCommon::loadMemory((int)sReturnValue, deref->size());
+			}
 		}
 
 	} catch(ParseException& e) {

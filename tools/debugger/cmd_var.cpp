@@ -218,6 +218,11 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 void Variable::addPointer(const char* dataAdress, const PointerType *pointerType) {
 	const TypeBase* deref = ((const PointerType*)pointerType)->deref();
 
+	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
+		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
+		return;		
+	}
+
 	std::string type = getType(pointerType, false);
 	std::string value = "";
 	if(dataAdress)
@@ -259,6 +264,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	} else if(deref->type() == TypeBase::ePointer) {
 		var.addPointer(NULL, (PointerType*)deref);
 	} else {
+
 		int addr = *((int*)dataAdress);
 		value = getValue(pointerType, &gMemBuf[addr], printFormat);
 		var.exp->updateData(
@@ -630,6 +636,9 @@ void var_update(const string& args) {
 		if(!var) {
 			error("Variable does not exist");
 			return;
+		}
+		if(strncmp(var->name.c_str(), args.c_str(), 4)!=0) {
+			int a = 2;
 		}
 		sUpdateQueue.push(var);
 	}

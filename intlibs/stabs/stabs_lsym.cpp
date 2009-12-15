@@ -508,7 +508,7 @@ static char* subParseMember(char* text, StructType* st) {
 			if(name.length()==0) {
 				StringPrintFunctor spf;
 				m.type->printTypeMI(spf,false);
-				m.name = spf.getString();
+				m.name = std::string(spf.getString()) + "Member";
 			}
 			int res = sscanf(next, ",%i,%i%n", &m.offsetBits, &m.sizeBits, &len);
 			FAILIF(res != 2);
