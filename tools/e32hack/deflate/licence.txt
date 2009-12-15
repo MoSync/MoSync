@@ -1,0 +1,47 @@
+SYMBIAN EXAMPLE SOURCE CODE LICENSE
+
+Please read this license agreement carefully: 
+
+This example source code license agreement ("Agreement") is a legal agreement between you (either as an individual or as an organization such as a company) and Symbian Software Limited ("Symbian"). The agreement covers the use of example source code, related information and documentation which can be downloaded at www.symbian.com (together the "Example Code"). By downloading or using the Example Code, you agree to be bound by the terms of this Agreement. If you do not agree to the terms of this Agreement, Symbian will not license the use of the Example Code to you. In such event, do not use or download the Example Code and you must destroy any copies of the Example Code in your possession. 
+
+This Agreement supersedes and replaces all previous licenses in respect of the Example Code. and constitutes the entire agreement between the parties with respect to its subject matter, and supersedes all prior agreements, understandings, proposals, representations and discussions between the parties, whether oral or written. There are no understandings, agreements, representations or warranties, expressed or implied not expressly specified herein. 
+
+This Agreement cannot be changed except by written agreement between the parties.
+
+Grant of license
+
+Symbian grants you the non-exclusive, limited right to (i) use and modify one copy of the Example Code for the purposes of developing, designing and testing a software product ("Application") (ii) redistribute to end users your modified version of the Example Code in source code or compiled form as part of your Application (iii) sub-license the right set out in (ii) to third parties ("Distributors") and (iv) make a single back-up copy of the Example Code and use it solely for back-up and archival purposes, provided you comply with the following terms: 
+
+1. your Application must significantly modify and materially increase the functionality provided by the Example Code; and
+
+2. your Application must either operate on devices that make use of Symbian OS as their primary operating system, or must be a software development tool for Symbian OS; or must utilize, or convert to or from, Symbian OS file formats; and 
+
+3. you must procure that all Distributors comply with all the terms of this Agreement; and 
+
+4. you must not use Symbian's trade marks, name or logos on or in relation to your Application or otherwise to market your Application, and you must not make representations that your Application is in any way endorsed by or connected with Symbian; and 
+
+5. you agree to indemnify and hold Symbian harmless from and against any and all damages, losses, costs, claims, expenditure and liability arising out of or related to the use or distribution of your Application; and 
+
+6. you must include a copyright notice in your Application of equal prominence as any other copyright notice as follows: "This product includes software licensed from Symbian Software Limited and its licensors (c) Symbian Software Limited and its licensors 1998-2007"; and 
+
+7. you may not transfer any of your rights or obligations under this Agreement to any other person; and 
+
+8. you agree to inform any recipient of your Application that no intellectual property rights in the Example Code are transferred to that recipient 
+
+Termination
+
+This Agreement lasts until you terminate it by destroying all copies of the Example Code. If you fail to comply with the terms and conditions of the Agreement, then Symbian may terminate this Agreement and you will then be required to destroy all copies of the Example Code. Symbian may also terminate this Agreement immediately on notice for any reason. 
+
+Intellectual Property Rights
+
+The Example Code is protected by international copyright laws and treaty provisions, as well as other intellectual property laws and treaties. The Example Code is licensed, not sold. 
+
+All title, copyright, and all other intellectual property rights in and to the Example Code are owned by Symbian and Symbian's licensors. Except as specifically set out in this Agreement you may not copy, sell, distribute, offer for sale or in any way disclose to third parties the Example Code. All rights not specifically granted under this Agreement are reserved by Symbian. Symbian reserves its rights separately to license these rights to any recipient of your Application. 
+
+No warranty
+
+Except where otherwise stated in writing, Symbian provides the Example Code "as is" without warranty of any kind. The terms of this license set out the full extent of Symbian's liability in respect of the Example Code. The Example Code is licensed to you without fee and accordingly you accept that there is no representation, warranty, condition or term as to the performance or quality of the Example Code and that no such representation has been made to you. Should the Example Code prove defective, you are solely responsible for the cost of all servicing, repair or correction of the Example Code and of any Application. You shall have no remedy in respect of any untrue statement made to you upon which you relied in entering into this Agreement (unless that statement was made knowing that it was untrue) other than any remedy you may have for breach of the express terms of this Agreement. Any condition, warranty, representation or other term relating to the supply or failure to supply the Example Code which would otherwise be implied into or incorporated into this license (including, without limitation, the implied terms of merchantability, satisfactory quality and fitness for purpose), whether by statute, common law, course of dealing, contract or otherwise, is hereby excluded to the extent permitted by law. In any event, Symbian's liability arising out of or in connection with this Agreement or any collateral contract, whether in contract, tort or otherwise, shall not in any circumstances exceed £1,000. Symbian shall not be liable in any way for any loss of revenues, profits, business or anticipated savings or, without limitation, for any indirect or consequential loss or damage suffered by you or any third party in connection with this Agreement notwithstanding that Symbian may have been notified of the possibility of such damage. Nothing in this Agreement shall exclude or limit Symbian's liability for the tort of deceit or for death or personal injury caused by its negligence. Nothing in this Agreement will affect the statutory rights of any consumer. 
+
+General Provisions
+
+This Agreement is governed by the laws of England, and if any disputes arise from or in relation to it, you agree to submit to the exclusive jurisdiction of the English Courts, save that Symbian may institute proceedings against you in any competent jurisdiction. 
