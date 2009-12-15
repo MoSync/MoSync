@@ -119,6 +119,7 @@ struct Variable {
 	~Variable();
 
 	string name;
+	string localName;
 	Expression* exp;
 	vector<Variable> children;
 	TypeBase::PrintFormat printFormat;
@@ -186,6 +187,10 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 			var.name = spf.getString();
 			spf.reset();
 
+			spf("[%d]", i);
+			var.localName = spf.getString();
+			spf.reset();
+
 			spf("(%s)[%d]", exp->mExprText.c_str(), i);
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
@@ -235,6 +240,10 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		StringPrintFunctor spf;
 		spf("%s.%d", name.c_str(), 0);
 		var.name = spf.getString();
+		spf.reset();
+
+		spf("ptr");
+		var.localName = spf.getString();
 		spf.reset();
 
 		spf("*(%s)", exp->mExprText.c_str());
@@ -303,6 +312,10 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			var.name = spf.getString();
 			spf.reset();
 
+			spf("%s",((StructType*)deref)->mName.c_str());
+			var.localName = spf.getString();
+			spf.reset();
+
 			spf("((%s)(%s))", type.c_str(), exp->mExprText.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
@@ -325,6 +338,10 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			StringPrintFunctor spf;
 			spf("%s.%s", name.c_str(),  dataMembers[i].name.c_str());
 			var.name = spf.getString();
+			spf.reset();
+
+			spf("%s", dataMembers[i].name.c_str());
+			var.localName = spf.getString();
 			spf.reset();
 
 			spf("(%s).%s", exp->mExprText.c_str(), dataMembers[i].name.c_str());
@@ -489,6 +506,9 @@ void var_create(const string& args) {
 	string& exp(argv[2]);
 
 	sVar->exp = new Expression(frameAddr, exp);
+
+	sVar->localName = exp;
+
 	/*
 	if(exp[0] == '$') {	//register
 		int reg;
@@ -668,6 +688,7 @@ static void printListChildrenItem(Variable* var) {
 	oprintf(",numchild=\"%d\"", var->children.size());
 	printValue(var);
 	oprintf(",type=\"%s\"", var->exp->type().c_str());
+	oprintf(",exp=\"%s\"", var->localName.c_str());
 	oprintf("}");
 }
 

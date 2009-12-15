@@ -43,6 +43,7 @@ ScalerFunc sScalerFunc = NULL;
 static void chooseScaler(void);
 
 void FrameBuffer_init(int w, int h, int orientation, int flags) {
+	int res;
 	sScalerSizes[0].x = w>>1;
 	sScalerSizes[0].y = h>>1;
 	sScalerSizes[1].x = w;
@@ -59,7 +60,7 @@ void FrameBuffer_init(int w, int h, int orientation, int flags) {
 		sFrameBuffer = 0;
 	}
 
-	int res = maFrameBufferGetInfo(&sFrameBufferInfo);
+	res = maFrameBufferGetInfo(&sFrameBufferInfo);
 	if(res < 0)
 		maPanic(res, "Framebuffer info failure!");
 	sFrameBuffer = (byte*)malloc(sFrameBufferInfo.sizeInBytes);
