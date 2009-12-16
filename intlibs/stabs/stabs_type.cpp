@@ -161,6 +161,13 @@ void PointerType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat 
 	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
 void PointerType::printTypeMI(printfPtr pf, bool complex) const {
+	if(mTarget->type() == eArray) {
+		ArrayType* arrayType = (ArrayType*)mTarget->resolve();
+		arrayType->mElemType->printTypeMI(pf, complex);
+		pf(" (*)[%i]", arrayType->mLength);	
+		return;
+	}
+	
 	mTarget->printTypeMI(pf, complex);
 	pf(" *");
 }
@@ -207,8 +214,8 @@ void StructType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat f
 	const byte* bp = (byte*)data;
 
 	for(size_t i=0; i<mBases.size(); i++) {
-		pf("<%s> = ", ((StructType*)mBases[i].type)->mName.c_str());
-		((StructType*)mBases[i].type)->printMI(pf, ((char*)data)+mBases[i].offset, fmt);
+		pf("<%s> = ", ((StructType*)mBases[i].type->resolve())->mName.c_str());
+		((StructType*)mBases[i].type->resolve())->printMI(pf, ((char*)data)+mBases[i].offset, fmt);
 		pf(", ");
 	}
 
@@ -242,7 +249,7 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 
 		for(size_t i=0; i<mBases.size(); i++) {
 			const TypeBase* tb = mBases[i].type->resolve();
-			const StructType* st = (StructType*)tb;
+			const StructType* st = (StructType*)tb->resolve();
 			pf("public %s", st->mName.c_str());
 			if(i!=mBases.size()-1) pf(", ");
 		}

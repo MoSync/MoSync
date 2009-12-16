@@ -339,6 +339,7 @@ void break_delete(const string& args) {
 
 static void Callback::bpDelete(BreakpointMap::iterator bi) {
 	bpDisable(bi);
+	sBreakpointAddresses.erase(bi->second.address);
 	sBreakpoints.erase(bi);
 }
 

@@ -247,7 +247,9 @@ Value RefNode::evaluate() {
 	} 
 	else if(a.getType() == TypeBase::eArray) {
 		if(mPtrTypeBase != NULL) delete mPtrTypeBase;
-		mPtrTypeBase = new PointerType(((ArrayType*)sym.type->resolve())->mElemType);
+		//mPtrTypeBase = new PointerType(((ArrayType*)sym.type->resolve())->mElemType);
+		mPtrTypeBase = new PointerType(sym.type->resolve());
+		
 		SYM newSym;
 		int addr = (int)a;
 		newSym.address = NULL;

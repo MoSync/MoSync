@@ -164,7 +164,7 @@ Variable::~Variable() {
 }
 
 void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
-	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType;
+	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType->resolve();
 	std::string type = getType(arrayType, false);
 	std::string value = ""; 
 	this->exp->updateData(value, type, arrayType->isSimpleValue());
@@ -216,7 +216,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 }
 
 void Variable::addPointer(const char* dataAdress, const PointerType *pointerType) {
-	const TypeBase* deref = ((const PointerType*)pointerType)->deref();
+	const TypeBase* deref = ((const PointerType*)pointerType)->deref()->resolve();
 
 	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
 		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
@@ -247,7 +247,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		var.name = spf.getString();
 		spf.reset();
 
-		spf("ptr");
+		spf("*(%s)", localName.c_str());
 		var.localName = spf.getString();
 		spf.reset();
 
@@ -305,7 +305,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 
 	for(size_t i = 0; i < bases.size(); i++) {
-		const TypeBase* deref = bases[i].type;
+		const TypeBase* deref = bases[i].type->resolve();
 
 		Variable& var = children[i];
 		{
@@ -333,7 +333,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
-		const TypeBase* deref = dataMembers[i].type;
+		const TypeBase* deref = dataMembers[i].type->resolve();
 
 		Variable& var = children[bases.size()+i];
 		{
@@ -382,11 +382,11 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	const SYM& sym = v->getSymbol();
 
 	if(v->getType() == TypeBase::eArray) {
-		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)sym.type);
+		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)sym.type->resolve());
 	} else if(v->getType() == TypeBase::eStruct) {
-		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)sym.type);
+		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)sym.type->resolve());
 	} else if(v->getType() == TypeBase::ePointer) {
-		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)sym.type);	
+		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)sym.type->resolve());	
 	} else {
 		std::string type = getType(sym.type, false);
 		std::string value = getValue(sym.type, v->getDataAddress(), sVar->printFormat);
@@ -557,10 +557,12 @@ static void Callback::varCreate() {
 
 	oprintf(",name=\"%s\",numchild=\"%d\",type=\"%s\"",
 		sVar->name.c_str(), sVar->children.size(), sVar->exp->type().c_str());
+	/*
 	if(sVar->exp->value()!="")
 		oprintf(",value=\"%s\"\n", sVar->exp->value().c_str());
 	else
-		oprintf("\n");
+	*/
+	oprintf("\n");
 
 	sVar->exp->outdate();
 	sVariableMap[sVar->name] = sVar;
@@ -648,7 +650,7 @@ void var_update(const string& args) {
 
 static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
-		Variable *v = sUpdateQueue.back();
+		Variable *v = sUpdateQueue.front();
 		sUpdateQueue.pop();
 		if(v->mHasCreatedChildren)
 			for(size_t i = 0; i < v->children.size(); i++) {
@@ -699,6 +701,7 @@ static void printListChildrenItem(Variable* var) {
 	oprintf(",type=\"%s\"", var->exp->type().c_str());
 	oprintf(",exp=\"%s\"", var->localName.c_str());
 	oprintf("}");
+	var->exp->outdate();
 }
 
 
@@ -708,10 +711,15 @@ static bool printUpdateItem(Variable* var) {
 		var->exp->outdate();
 		oprintf("{name=\"%s\"", var->name.c_str());
 		printValue(var);
-		//oprintf(",in_scope=\"true\",type_changed=\"false\"");
+		oprintf(",in_scope=\"true\",type_changed=\"false\"");
 		oprintf("}");
 		return true;
 	}
+
+	if(var->mHasCreatedChildren)
+		for(size_t i = 0; i < var->children.size(); i++)
+			printUpdateItem(&var->children[i]);
+
 	return false;
 }
 
@@ -895,7 +903,7 @@ void var_info_expression(const string& args) {
 	Variable *var = getAndValidateVariable(args);
 	if(!var) return;
 	oprintDone();
-	oprintf(",lang=\"C++\",exp=\"%s\"\n", var->name.c_str());
+	oprintf(",lang=\"C++\",exp=\"%s\"\n", var->localName.c_str());
 	commandComplete();	
 }
 

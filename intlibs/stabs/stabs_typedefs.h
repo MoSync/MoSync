@@ -43,7 +43,7 @@ public:
 	void printTypeMI(printfPtr, bool complex) const;
 	const TypeBase* deref() const;
 	const TypeBase* resolve() const;
-	int size() const { return 0; }
+	int size() const { return mType->size(); }
 	bool isSimpleValue() const { return true; }
 	Type type() const { return eUnknown; }
 
