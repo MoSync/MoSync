@@ -324,6 +324,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		}
 
 		CUSTOM_KEYS(CONVERT_CUSTOM);
+		CUSTOM_KEYS_2(CONVERT_CUSTOM);
 
 		return 0;
 	}

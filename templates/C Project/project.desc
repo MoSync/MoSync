@@ -6,4 +6,3 @@ description = A MoSync C project with a main file and stub code.
 main.c
 
 [Settings]
-build.prefs:additional.libraries=MAUtil.lib

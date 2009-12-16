@@ -66,7 +66,7 @@ class Object
 		#puts instance_variables
 		#puts vars.inspect
 		args.each do |var|
-			var = var.to_s
+			var = var.to_sym
 			#puts "#{var}: #{vars[var].inspect}"
 			if(!vars[var])
 				error "Undefined variable: #{var}"

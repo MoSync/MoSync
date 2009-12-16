@@ -7,3 +7,4 @@ main.cpp
 
 [Settings]
 build.prefs:additional.libraries=MAUtil.lib,MAUI.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib,MAUID.lib

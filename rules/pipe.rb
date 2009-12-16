@@ -57,10 +57,12 @@ class PipeGccWork < GccWork
 		#puts all_objects
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".lib") }
 		need(:@NAME)
-		need(:@BUILDDIR)
-		need(:@TARGETDIR)
-		target = @TARGETDIR + "/" + @BUILDDIR + filename
-		@TARGET = PipeTask.new(self, target, all_objects + llo, @FLAGS + @EXTRA_LINKFLAGS)
+		if(@TARGET_PATH == nil)
+			need(:@BUILDDIR)
+			need(:@TARGETDIR)
+			@TARGET_PATH = @TARGETDIR + "/" + @BUILDDIR + filename
+		end
+		@TARGET = PipeTask.new(self, @TARGET_PATH, all_objects + llo, @FLAGS + @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]
 	end
 end

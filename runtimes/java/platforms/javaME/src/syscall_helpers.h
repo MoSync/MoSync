@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(SOFTLEFT, 21) m(SOFTRIGHT, 22)	/*Motorola*/\
 	m(SOFTLEFT, -21) m(SOFTRIGHT, -22)	/*Motorola*/\
 
+#define CUSTOM_KEYS_2(m)\
+	m(BACK, -11) m(MENU, -20)	/*SE*/\
+
 #define MAX_SOUND_CHANNELS 32
 
 #define DYNARES_BIT 0x40000000

@@ -23,6 +23,7 @@ require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
 MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
+MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
 
 module MoSyncMod
 	def modSetup
@@ -60,6 +61,7 @@ class MoSyncDllWork < DllWork
 			@EXTRA_LINKFLAGS = @EXTRA_LINKFLAGS.to_s + " -Wl,--enable-auto-import"
 		end
 		@EXTRA_CFLAGS = @EXTRA_CFLAGS.to_s + " -D_POSIX_SOURCE"	#avoid silly bsd functions
+		copyHeaders
 		super
 	end
 end
@@ -70,9 +72,14 @@ class PipeLibWork < PipeGccWork
 		@FLAGS = " -L"
 		setup_pipe
 		modSetup
+		copyHeaders
 		super
 	end
-	def filename; @NAME + ".lib"; end
+	def setup3(all_objects)
+		@TARGET_PATH = MOSYNC_LIBDIR + "/pipe/" + @NAME + @CONFIG_POSTFIX + ".lib"
+		super(all_objects)
+	end
+	#def filename; @NAME + ".lib"; end
 end
 
 module MoSyncLib end
@@ -80,7 +87,6 @@ module MoSyncLib end
 def MoSyncLib.inin(work, mod)
 	work.extend(mod)
 	work.invoke
-	work.copyHeaders
 end
 
 def MoSyncLib.invoke(mod)

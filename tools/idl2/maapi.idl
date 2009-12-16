@@ -1024,6 +1024,8 @@ interface MAAPI {
 		SOFTRIGHT		= 286;
 
 		PEN				= 291;
+		BACK = 292;
+		MENU = 293;
 
 		RSHIFT			= 303;
 		LSHIFT			= 304;

@@ -30,7 +30,6 @@ require "#{File.dirname(__FILE__)}/defaults.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 require 'fileutils'
 require 'singleton'
-require 'ftools'
 
 # This is the base class for the Work system.
 class TaskBase
