@@ -333,15 +333,14 @@ static void executeCommand(const string& line) {
 
 	size_t offset = 0;
 	if(isdigit(line[0])) {	//we've got a token
-		offset = line.find('-');
-		if(offset == string::npos) {
-			//special handling for Eclipse' broken use of "whatis"
-			offset = line.find(' ');
-			if(offset == string::npos) {
-				error("Command syntax error");
-				return;
-			}
+		//special handling for Eclipse' broken use of "whatis"
+		size_t dash = line.find('-');
+		size_t space = line.find(' ');
+		if(dash == string::npos && space == string::npos) {
+			error("Command syntax error");
+			return;
 		}
+		offset = MIN(dash, space);
 		sToken = line.substr(0, offset);
 	} else {
 		sToken.clear();

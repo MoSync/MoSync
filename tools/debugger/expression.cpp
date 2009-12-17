@@ -885,6 +885,7 @@ ExpressionTree* ExpressionParser::parse(const char *expr) {
 
 void stackEvaluateExpression(const string& args, int frameAddr, ExpressionCallback callback) {
 	CHECK_STABS;
+	NEED_REG;
 
 	if(frameAddr >= 0) {
 		//todo: search the stack for a matching frame.
