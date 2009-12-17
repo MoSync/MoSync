@@ -62,7 +62,7 @@ end
 
 class Object
 	def need(*args)
-		vars = instance_variables.inject({}) { |h,var| h[var] = true; h }
+		vars = instance_variables.inject({}) { |h,var| h[var.to_sym] = true; h }
 		#puts instance_variables
 		#puts vars.inspect
 		args.each do |var|
