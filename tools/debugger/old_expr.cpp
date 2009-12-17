@@ -118,11 +118,11 @@ static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallbac
 	SYM sym;
 	if(lv->storageClass == eStack) {
 		const StackVariable* sv = (StackVariable*)lv;
-		sym.type = sv->dataType;
+		sym.type = sv->dataType->resolve();
 		sym.address = &gMemBuf[frame.pointer + sv->offset];
 	} else if(lv->storageClass == eRegister) {
 		const RegisterVariable* rv = (RegisterVariable*)lv;
-		sym.type = rv->dataType;
+		sym.type = rv->dataType->resolve();
 		ASSERT_REG;
 		sym.address = &r.gpr[rv->reg];
 	} else if(lv->storageClass == eStatic) {
@@ -219,12 +219,12 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	sym.symType = s->type;
 	if(s->type == eFunction) {
 		const Function* sf = (Function*)s;
-		sym.type = sf->type;
+		sym.type = sf->type->resolve();
 		sym.address = (void*)s->address;	//hack. see FunctionType::printMI().
 		cb(sym);
 	} else if(s->type == eVariable) {
 		const StaticVariable* sv = (StaticVariable*)s;
-		sym.type = sv->dataType;
+		sym.type = sv->dataType->resolve();
 		sSeeCallback = cb;
 		sSeeSym = sym;
 		StubConnection::readMemory(gMemBuf + sv->address, sv->address, sv->dataType->size(),

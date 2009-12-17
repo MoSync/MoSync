@@ -144,7 +144,7 @@ Builtin::SubType Value::getPrimitiveType() const {
 }
 
 TypeBase::Type Value::getType() const {
-	return (!mSym.type) ? TypeBase::eUnknown : mSym.type->type();
+	return (!mSym.type) ? TypeBase::eUnknown : mSym.type->resolve()->type();
 }
 
 const SYM& Value::getSymbol() const { 
@@ -160,7 +160,7 @@ void Value::setTypeBase(const TypeBase* type) {
 }
 
 const TypeBase* Value::getTypeBase() const {
-	return mSym.type;
+	return mSym.type->resolve();
 }
 
 

@@ -35,12 +35,13 @@ CastNode::~CastNode() {
 	mType->deleteRef();
 }
 
-bool isBase(const TypeBase* base, const TypeBase* what) {
+bool isBase(const TypeBase* base, const TypeBase* what, int& offset) {
 	if(base == what) return true;
-	const StructType* sbase = (const StructType*)base->resolve();
+	const StructType* sbase = (const StructType*)what->resolve();
 	const std::vector<BaseClass>& bases = sbase->getBases();
 	for(int i = 0; i < bases.size(); i++) {
-		bool ret = isBase(bases[i].type, what);
+		offset = bases[i].offset;
+		bool ret = isBase(base, bases[i].type, offset);
 		if(ret) return true;
 	}
 	return false;
@@ -73,10 +74,17 @@ Value CastNode::evaluate() {
 		ret.setSymbol(newSym);
 		return ret;
 	} else if(typeBase->type() == TypeBase::eStruct) {
-		const SYM& cast = a.getSymbol();
-		if(isBase(cast.type, typeBase)) {
+		const SYM& cast = type.getSymbol();
+		int toOffset = 0;
+		if(isBase(typeBase, cast.type, toOffset)) {
+			/*
+			const StructType* from = (const StructType*) typeBase;
+			const StructType* to = (const StructType*) cast.type
+			const std::vector<BaseClass>& bases = from->getBases();
+			int fromOffset = bases[bases.size()-1].offset + bases[bases.size()-1].type->size();
+			*/
 			SYM newSym;
-			newSym.address = cast.address;
+			newSym.address = a.getDataAddress();
 			newSym.symType = eVariable;
 			newSym.type = typeBase;
 			a.setSymbol(newSym);
@@ -89,7 +97,7 @@ Value CastNode::evaluate() {
 
 TypeNode::TypeNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars) : 
 ExpressionTreeNode(tree), mNumStars(numStars) {
-	const TypeBase *target = typeBase;
+	const TypeBase *target = typeBase->resolve();
 	for(int i = 0; i < mNumStars; i++) {
 		TypeBase *newTarget = new PointerType(target);
 		mPointerTypes.push_back(newTarget);

@@ -379,18 +379,19 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 		return; 
 	}
 
-	const SYM& sym = v->getSymbol();
+	//const SYM& sym = v->getSymbol();
+	const TypeBase* typeBase = v->getTypeBase();
 
-	if(v->getType() == TypeBase::eArray) {
-		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)sym.type->resolve());
-	} else if(v->getType() == TypeBase::eStruct) {
-		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)sym.type->resolve());
-	} else if(v->getType() == TypeBase::ePointer) {
-		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)sym.type->resolve());	
+	if(typeBase->type() == TypeBase::eArray) {
+		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)typeBase);
+	} else if(typeBase->type() == TypeBase::eStruct) {
+		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)typeBase);
+	} else if(typeBase->type() == TypeBase::ePointer) {
+		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)typeBase);	
 	} else {
-		std::string type = getType(sym.type, false);
-		std::string value = getValue(sym.type, v->getDataAddress(), sVar->printFormat);
-		bool simpleType = sym.type->isSimpleValue();
+		std::string type = getType(typeBase, false);
+		std::string value = getValue(typeBase, v->getDataAddress(), sVar->printFormat);
+		bool simpleType = typeBase->isSimpleValue();
 		sExp->updateData(value, type, simpleType);
 	}
 
@@ -403,15 +404,15 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 		return; 
 	}
 
-	const SYM& sym = v->getSymbol();
-	std::string type = getType(sym.type, false);
-	bool simpleType = sym.type->isSimpleValue();
+	const TypeBase* typeBase = v->getTypeBase();
+	std::string type = getType(typeBase, false);
+	bool simpleType = typeBase->isSimpleValue();
 	std::string value = "";
 
 	if(v->getType() == TypeBase::eArray) {
 	} else if(v->getType() == TypeBase::eStruct) {
 	} else {
-		value = getValue(sym.type, v->getDataAddress(), sVar->printFormat);
+		value = getValue(typeBase, v->getDataAddress(), sVar->printFormat);
 	}
 	sExp->updateData(value, type, simpleType);
 	sUpdateCallback();
