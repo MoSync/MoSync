@@ -240,9 +240,6 @@ db.execute( "select name from vendor" ) do |vendor|
 	if (vendor.eql?("Generic") || vendor.eql?("Native"))
 		next
 	end
-	if(vendor != "MicroEmulator")
-		next
-	end
 	
 	puts vendor
 	FileUtils.mkdir_p "#{VENDOR_DIR}/#{vendor}"
