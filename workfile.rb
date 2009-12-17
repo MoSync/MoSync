@@ -25,7 +25,7 @@ BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl/MoRE"
 	] + PLATFORM_TOOLS
 
-EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs", "examples"]
+EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "examples"]
 
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
 

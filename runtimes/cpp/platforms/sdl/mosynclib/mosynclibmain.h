@@ -18,13 +18,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/attribute.h"
 
 #ifdef WIN32
-#define DLLEXPORT ATTRIB(dllexport)
-#define DLLIMPORT ATTRIB(dllimport)
+#define DLLEXPORT dllexport
+#define DLLIMPORT dllimport
 #elif defined(LINUX)
-#define DLLEXPORT ATTRIB(visibility("default"))
+#define DLLEXPORT visibility("default")
 #define DLLIMPORT
-#else
-#error Unsupported platform!
 #endif
 
 #ifdef MOSYNC_DLL_EXPORT
@@ -37,4 +35,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 typedef int (*mainfunc)();
 
-extern "C" int MOSYNC_API mosyncLibMain(int argc, char** argv, mainfunc maMain);
+extern "C" int ATTRIBUTE(MOSYNC_API, mosyncLibMain(int argc, char** argv, mainfunc maMain));

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <wchar.h>
+#include <helpers/attribute.h>
 
 typedef void TAny;
 typedef uint8_t TUint8;
@@ -38,7 +39,7 @@ const TBool ETrue = true;
 
 class User {
 public:
-	static void Invariant();
+	static void ATTRIBUTE(noreturn, Invariant());
 };
 
 #define __ASSERT_ALWAYS(x, y) do { if (!(x)) { y; } } while (0)

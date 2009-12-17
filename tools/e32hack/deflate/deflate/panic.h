@@ -17,6 +17,6 @@ enum TPanic
 
 };
 
-void Panic(TPanic aPanic);
+void ATTRIBUTE(noreturn, Panic(TPanic aPanic));
 
 #endif

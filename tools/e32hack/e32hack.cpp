@@ -125,7 +125,7 @@ int copyHackExe(File& inFile, File& outFile, u32 uid) {
 		printf("Reading %i compressed bytes. Unpack to %i bytes.\n", compressedSize, inflatedSize);
 		TBitInput bitInput((byte*)buffer + HEADER_SIZE, 8*compressedSize);
 		CInflater* inflater = CInflater::NewLC(bitInput);
-		int n = inflater->ReadL(inflated.p(), inflatedSize);
+		u32 n = inflater->ReadL(inflated.p(), inflatedSize);
 		delete inflater;
 		if(n != inflatedSize) {
 			printf("Compression size mismatch. Wanted 0x%x bytes, got 0x%x.\n", inflatedSize, n);

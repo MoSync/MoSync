@@ -31,7 +31,7 @@ public:
 	void PadL(TUint aPadding);
 private:
 	void DoWriteL(TUint aBits, TInt aSize);
-	virtual void OverflowL();
+	virtual void ATTRIBUTE(noreturn, OverflowL());
 private:
 	TUint iCode;		// code in production
 	TInt iBits;
@@ -84,7 +84,7 @@ public:
 	TUint ReadL(TInt aSize);
 	TUint HuffmanL(const TUint32* aTree);
 private:
-	virtual void UnderflowL();
+	virtual ATTRIBUTE(noreturn, void UnderflowL());
 private:
 	TInt iCount;
 	TUint iBits;

@@ -86,7 +86,7 @@ class HPrint
 public:
 	~HPrint();
 	void SetLogFile(TText *aFileName);
-	TInt PrintString(TPrintType aType,const char *aFmt,...);
+	TInt PrintString(TPrintType aType,const char *aFmt,...) PRINTF_ATTRIB(3, 4);
 public:
 	TText iText[KMaxStringLength];
 	TBool iVerbose;
