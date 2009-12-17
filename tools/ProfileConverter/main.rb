@@ -117,7 +117,7 @@ class Runtime
 			if(@caps.has_key?(cap) != other.caps.has_key?(cap)) then
 				return false
 			end
-		end		
+		end
 	end
 end
 
@@ -150,6 +150,12 @@ dest_dir = ARGV[0]
 if dest_dir.class != NilClass
 	output_root = "#{dest_dir}/"
 	build_root = ""
+end
+
+if(ARGV[0])
+	REBUILD_DATABASE = (ARGV[0] != 'n')
+else
+	REBUILD_DATABASE = true
 end
 
 puts "rootdir :  #{output_root}"
@@ -191,14 +197,13 @@ if !File.exist? sql_filename
 	return
 end
 
-if true
+if REBUILD_DATABASE
 # We start from scratch
 if File.exist? filename
 	File.delete filename
 end
 
 # Create database file
-puts "Reading database: #{filename}"
 db = SQLite3::Database.new( filename )
 
 # Create database from SQL file
@@ -213,6 +218,7 @@ File.open(sql_filename, "r") do |infile|
 	end
 end
 else
+	puts "Reading database: #{filename}"
 	db = SQLite3::Database.new(filename)
 end
 
@@ -230,14 +236,18 @@ definitions = {}
 
 db.execute( "select name from vendor" ) do |vendor|
 	# fix to exclude a lot of entries which is not real devices
-	if (vendor.to_s.eql?("Generic") || vendor.to_s.eql?("Native"))
+	vendor = vendor[0]
+	if (vendor.eql?("Generic") || vendor.eql?("Native"))
+		next
+	end
+	if(vendor != "MicroEmulator")
 		next
 	end
 	
 	puts vendor
 	FileUtils.mkdir_p "#{VENDOR_DIR}/#{vendor}"
 	
-	icon_path = "icons/#{vendor.to_s.downcase}Icon.png"
+	icon_path = "icons/#{vendor.downcase}Icon.png"
 	if File.exist? icon_path
 		FileUtils.copy_file( icon_path, "#{VENDOR_DIR}/#{vendor}/icon.png")
 	end
@@ -257,7 +267,7 @@ db.execute( "select name from vendor" ) do |vendor|
 			profile.puts "#define MA_PROF_STRING_VENDOR \"#{vendor}\""
 			profile.puts "#define MA_PROF_STRING_DEVICE \"#{device[1]}\""
 			profile.puts "#define MA_PROF_STRING_PLATFORM \"#{device[2]}\""
-			profile.puts "#define MA_PROF_VENDOR_#{vendor[0].format}"
+			profile.puts "#define MA_PROF_VENDOR_#{vendor.format}"
 			profile.puts "#define MA_PROF_DEVICE_#{device[1].format}"
 			profile.puts
 			RELEVANT_CAPS.each do |cap|
@@ -266,9 +276,10 @@ db.execute( "select name from vendor" ) do |vendor|
 				) do |value|
 					if(CAP_TYPES[:constant].include? cap)
 						value.each do |v|
+							v = v[0]
 							def_name = "MA_PROF_CONST_#{cap.format}"
-							rt_obj.caps[def_name] = "#{v.to_s.upcase}"
-							def_str = "#define #{def_name} #{v.to_s.format}"
+							rt_obj.caps[def_name] = "#{v.upcase}"
+							def_str = "#define #{def_name} #{v.format}"
 						
 							if(def_name == "MA_PROF_CONST_STORAGESIZE")
 								definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
@@ -287,7 +298,7 @@ db.execute( "select name from vendor" ) do |vendor|
 							elsif(def_name == "MA_PROF_CONST_BITSPERPIXEL")
 								definitions[def_name] = "MA_PROF_CONST_BITSPERPIXEL,BitsPerPixel,bits"
 							else
-								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name},#{cap}/#{v.to_s}"
+								definitions["#{def_name}_#{v.format}"] = "#{def_name},#{cap}/#{v}"
 							end
 							
 							if(rt_obj.platform=="s60v2" && def_name == "MA_PROF_CONST_BITSPERPIXEL")
@@ -304,40 +315,44 @@ db.execute( "select name from vendor" ) do |vendor|
 						end
 					elsif(CAP_TYPES[:supports].include? cap)
 						value.each do |v|
+							v = v[0]
 							def_name = "MA_PROF_SUPPORT_#{cap.format}"
 							if(!(seen_defines.include? def_name)) then
 								if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
 									seen_defines << def_name
 								end
-								rt_obj.caps["#{def_name}_#{v.to_s.format}"] = "TRUE";
-								def_str = "#define #{def_name}_#{v.to_s.format}"
-								definitions["#{def_name}_#{v.to_s.format}"] = "#{def_name}_#{v.to_s.format},#{cap}/#{v.to_s}"
+								rt_obj.caps["#{def_name}_#{v.format}"] = "TRUE";
+								def_str = "#define #{def_name}_#{v.format}"
+								definitions["#{def_name}_#{v.format}"] = "#{def_name}_#{v.format},#{cap}/#{v}"
 								profile.puts def_str
 							end
 						end
 					elsif(cap == "Bugs")
 						value.each do |v|
-							def_name = "MA_PROF_BUG_#{v.to_s.format}"
-							definitions[def_name] = "#{def_name},#{cap}/#{v.to_s}"
+							v = v[0]
+							def_name = "MA_PROF_BUG_#{v.format}"
+							definitions[def_name] = "#{def_name},#{cap}/#{v}"
 							rt_obj.caps[def_name] = "TRUE";
 							profile.puts "#define #{def_name}"
 						end
 					elsif(cap == "Features")
 						value.each do |v|
+							v = v[0]
 							#puts v.to_s
-							if v.to_s == "hasPointerEvents"
+							if v == "hasPointerEvents"
 								definitions["MA_PROF_SUPPORT_STYLUS"] = "MA_PROF_SUPPORT_STYLUS,Support/Stylus"
 								rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
 								def_str = "#define MA_PROF_SUPPORT_STYLUS"
 								profile.puts def_str
-							elsif v.to_s == "isVirtual"
+							elsif v == "isVirtual"
 								## should not generate this profile......
 							end
 						end
 					elsif(cap == "JavaConfiguration")
 						value.each do |v|
-							if (v.to_s == "CLDC/1.0" ||
-								v.to_s == "CLDC/1.0.4")
+							v = v[0]
+							if (v == "CLDC/1.0" ||
+								v == "CLDC/1.0.4")
 								rt_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = "TRUE";
 								definitions["MA_PROF_SUPPORT_CLDC_10"] = "MA_PROF_SUPPORT_CLDC_10,Support/Cldc1.0"
 									
