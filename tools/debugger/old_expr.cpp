@@ -120,6 +120,7 @@ static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallbac
 		const StackVariable* sv = (StackVariable*)lv;
 		sym.type = sv->dataType->resolve();
 		sym.address = &gMemBuf[frame.pointer + sv->offset];
+
 	} else if(lv->storageClass == eRegister) {
 		const RegisterVariable* rv = (RegisterVariable*)lv;
 		sym.type = rv->dataType->resolve();
@@ -183,11 +184,15 @@ bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Func
 	return false;	
 }
 
-bool isLocal(const string& name) {
+bool isLocalGlobalOrStatic(const string& name) {
 	//locals
 	const FRAME& frame(gFrames[gCurrentFrameIndex]);
 	const Function* f = stabsFindFunctionByInsideAddress(frame.pc);
-	return handleLocalsAndArguments(name, frame, f, dummy);
+	if(handleLocalsAndArguments(name, frame, f, dummy)) return true;
+	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
+	if(!s)
+		s = stabsGetSymbolByScopeAndName(0, name);
+	return s != NULL;
 }
 
 void locate_symbol(const string& name, SeeCallback cb) {

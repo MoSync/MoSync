@@ -400,6 +400,9 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 
 static void Callback::varEEUpdate(const Value* v, const char *err) {
 	if(err) { 
+		
+
+
 		error("%s", err); 
 		return; 
 	}

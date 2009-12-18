@@ -30,7 +30,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class ExpressionTreeNode;
 class ExpressionTree;
 
+/*
+#define EXP_ERRORS(m)\
+	m(MISSING_SYMBOL, "Missing symbol")\
+*/
+
 namespace ExpressionCommon {
+
+
 	void loadMemory(int addr, int len);
 	void error(const char *msg);
 };

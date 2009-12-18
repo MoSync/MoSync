@@ -140,7 +140,7 @@ const TypeBase* findTypeByNameAndPC(const std::string& t) {
 	if(!mapIpEx(r.pc, lm))
 		return NULL;
 
-	if(isLocal(t)) return NULL;
+	if(isLocalGlobalOrStatic(t)) return NULL;
 	return findTypeByNameAndFileGlobal(t, lm.file + 1);
 }
 
