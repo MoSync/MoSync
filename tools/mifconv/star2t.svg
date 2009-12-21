@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1 Tiny//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11-tiny.dtd">
+<svg baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" width="64px" height="64px" viewBox="0 0 64 64">
+<defs/>
+<metadata/>
+<g id="g2886">
+<path style="fill:#fcff00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" d="M 42.000001,45.000001 L 19.757691,38.944905 L 2.1601412,53.834862 L 1.0456286,30.81004 L -18.553505,18.675026 L 2.9999989,10.5 L 8.4846185,-11.889809 L 22.919929,6.0825687 L 45.908743,4.3799204 L 33.276752,23.662487 L 42.000001,45.000001 z " transform="matrix(0.877792,0,0,0.895091,20.72932,13.3697)" id="path2888" />
+</g>
+<path style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" id="path2833" d="m 15.852754,10.498941 c 34.625,42.75 35.25,-4.5000003 35.25,-4.5000003 L 6.9777538,47.748941 l 47.8750002,-11.625 -15.125,20.25" />
+</svg>

@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../report.h"
 #include "mosynclibmain.h"
 
-extern "C" int MOSYNC_API mosyncLibMain(int argc, char** argv, mainfunc maMain) {
+extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain) {
 #ifdef _MSC_VER
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_CHECK_ALWAYS_DF);
 #endif
@@ -116,7 +116,7 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 void Base::Syscall::VM_Yield() {
 }
 
-extern "C" void MOSYNC_API GCCATTRIB(noreturn) maLoadProgram(MAHandle data, int reload) {
+extern "C" void GCCATTRIB(noreturn) maLoadProgram(MAHandle data, int reload) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 }
 

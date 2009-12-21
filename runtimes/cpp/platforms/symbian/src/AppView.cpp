@@ -226,12 +226,6 @@ void CAppView::LoadProgramL() {
 	LOG("Program loaded.\n");
 }
 
-#if 0//def PHONE_RELEASE
-void CAppView::SetProgramL(const char* filename) {
-	iFile.open(filename, false);
-}
-#endif	//PHONE_RELEASE
-
 CAppView::~CAppView() 
 {
 	LOGD("~CAppView\n");

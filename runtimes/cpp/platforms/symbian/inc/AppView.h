@@ -50,13 +50,6 @@ public:
 	static CAppView* NewL(CAppUi& aAppUi);
 	static CAppView* NewLC(CAppUi& aAppUi);
 
-#if 0//def PHONE_RELEASE
-	void SetProgramL(const char* filename);
-private:
-	FileStream iFile;
-public:
-#endif	//PHONE_RELEASE
-
 	void Stop();
 
 	int GetKeys();
