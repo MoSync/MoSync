@@ -124,18 +124,18 @@ cd %ORIGINAL_PATH%
 @echo Copying MoSync bin.
 @echo ------------------------------------------------
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_bin %MOSYNC_BIN_PATH% /y /E /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
 @echo Copying skins.
 @echo ------------------------------------------------
 @xcopy %MOSYNC_TRUNK%\skins %MOSYNC_PATH%\skins\ /y /E /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @xcopy %MOSYNC_TRUNK%\MoSyncRules.rules %MOSYNC_PATH%\ /y /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 
@@ -151,7 +151,7 @@ call build.bat
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\filelist
 @vcbuild filelist.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -159,7 +159,7 @@ call build.bat
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\idl-common
 @vcbuild idl-common.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -168,9 +168,9 @@ call build.bat
 @rem idl will copy asm_config.lst here
 @cd %MOSYNC_TRUNK%\tools\idl2
 vcbuild idl2.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 Release\idl2.exe
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -178,10 +178,10 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\FontGenerator
 @vcbuild FontGenerator.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @cd Release
 @copy FontGenerator.exe %MOSYNC_BIN_PATH%\mof.exe /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -189,9 +189,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\PanicDoc
 @vcbuild PanicDoc.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -199,9 +199,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\pipe-tool
 @protobuild  > NUL
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @vcbuild pipe-tool.vcproj /useenv "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -209,9 +209,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\MoSyncUpdater
 @vcbuild MoSyncUpdater.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy Release\updater.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -219,9 +219,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\Bundle
 @vcbuild Bundle.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy Release\Bundle.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -229,7 +229,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\icon-injector
 @vcbuild icon-injector.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -237,9 +237,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\makesis-2.0.0\win32
 @vcbuild makesis-200.vcproj /useenv "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy Release\makesis-200.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -247,9 +247,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\makesis-4\win32
 @vcbuild makesis-4.vcproj /useenv "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy Release\makesis-4.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -257,9 +257,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\makesis-4\win32
 @vcbuild signsis-4.vcproj /useenv "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy Release\signsis-4.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -267,7 +267,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\e32hack
 @vcbuild e32hack.vcproj /useenv "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 
@@ -280,7 +280,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\stdout
 @vcbuild stdout.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -288,7 +288,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\windows
 @vcbuild windows.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -297,7 +297,7 @@ Release\idl2.exe
 @cd %MOSYNC_TRUNK%\intlibs\stabs
 @ruby typeGen.rb
 @vcbuild stabs.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -306,7 +306,7 @@ Release\idl2.exe
 @cd %MOSYNC_TRUNK%\intlibs\bluetooth
 @copy config_bluetooth.h.example config_bluetooth.h
 @vcbuild bluetooth.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -314,7 +314,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\net
 @vcbuild net.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -322,9 +322,9 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\gsm_amr
 @vcbuild gsm_amr.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy release\gsm_amr.dll %MOSYNC_BIN_PATH% /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -332,7 +332,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\mobex
 @vcbuild mobex.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -351,7 +351,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\libs\MAStd
 @vcbuild MAStd.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -359,7 +359,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\libs\MAUtil
 @vcbuild MAUtil.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @cd %ORIGINAL_PATH%
 @echo.
 
@@ -368,7 +368,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\libs\MAUI
 @vcbuild MAUI.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -376,7 +376,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\libs\MTXml
 @vcbuild MTXml.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -384,7 +384,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\libs\MAFS
 @vcbuild MAFS.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -393,7 +393,7 @@ Release\idl2.exe
 @cd %MOSYNC_TRUNK%\tools\debugger
 @ruby operationsGen.rb
 @vcbuild debugger.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -406,7 +406,7 @@ Release\idl2.exe
 @cd %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl
 @copy config_platform.h.example config_platform.h
 @vcbuild sdl.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -414,7 +414,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd mosynclib
 @vcbuild MoSyncLib.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @cd ..
 @echo.
 
@@ -423,7 +423,7 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd MoRE
 @vcbuild MoRE.vcproj "Release|Win32"
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
@@ -453,7 +453,7 @@ cd %ORIGINAL_PATH%
 call build_docs.bat
 
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @cd %MOSYNC_TRUNK%\docs\
 @echo on
@@ -468,7 +468,7 @@ call gendox.bat
 
 mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
 @xcopy %MOSYNC_DOCS_PATH%\html %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\ /e /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 
 
@@ -480,7 +480,7 @@ mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
 cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
 
 call build-mosync.bat release
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo.
 @echo ------------------------------------------------
@@ -488,12 +488,12 @@ call build-mosync.bat release
 @echo ------------------------------------------------
 echo on
 @cd %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.product\build\
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @del /S /Q %MOSYNC_ECLIPSE_PATH%
 
 xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 
 @cd %ORIGINAL_PATH%
@@ -520,10 +520,10 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 cd %MOSYNC_TRUNK%\libs
 
 @call rake pipe
-@IF NOT errorlevel == 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @call rake pipe CONFIG=""
-@IF NOT errorlevel == 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
 REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
@@ -536,7 +536,7 @@ REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo ------------------------------------------------
 mkdir %MOSYNC_PATH%\templates
 @xcopy %MOSYNC_TRUNK%\templates %MOSYNC_PATH%\templates /E /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 
@@ -544,7 +544,7 @@ mkdir %MOSYNC_PATH%\templates
 @echo Copying Eclipse
 @echo ------------------------------------------------
 @xcopy \mosync_eclipse %MOSYNC_ECLIPSE_PATH% /y /E /D
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 
@@ -553,16 +553,16 @@ mkdir %MOSYNC_PATH%\templates
 @echo ------------------------------------------------
 echo on
 xcopy %ORIGINAL_PATH%\InstallerResources\*.* %MOSYNCDIR% /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 xcopy %ORIGINAL_PATH%\build_package_tools\mosync_prerequisites\*.* %MOSYNCDIR% /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 copy %ORIGINAL_PATH%\build_package_tools\mosync_docs\licenses\mosync-license.txt %MOSYNCDIR%\license.txt /y
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 ren %MOSYNCDIR%\docs\000_index.html index.html
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 %ORIGINAL_PATH%\build_package_tools\NSIS\makensis %MOSYNC_PATH%\MoSync.nsi
-@IF NOT errorlevel 0 goto TOOL_ERROR
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 ren %MOSYNCDIR%\MoSyncSetup.exe MoSyncSetup.exe
 
@@ -585,7 +585,8 @@ ren %MOSYNCDIR%\MoSyncSetup.exe MoSyncSetup.exe
 @goto END
 :TOOL_ERROR
 @echo a tool related error occured.
-
+break /b 23
 :END
 
 cd %ORIGINAL_PATH%
+break /b 0
