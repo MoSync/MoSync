@@ -585,8 +585,8 @@ ren %MOSYNCDIR%\MoSyncSetup.exe MoSyncSetup.exe
 @goto END
 :TOOL_ERROR
 @echo a tool related error occured.
-break /b 23
+exit /b 23
 :END
 
 cd %ORIGINAL_PATH%
-break /b 0
+exit /b 0
