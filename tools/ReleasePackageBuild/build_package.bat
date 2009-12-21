@@ -541,14 +541,6 @@ mkdir %MOSYNC_PATH%\templates
 
 
 @echo ------------------------------------------------
-@echo Copying Eclipse
-@echo ------------------------------------------------
-@xcopy \mosync_eclipse %MOSYNC_ECLIPSE_PATH% /y /E /D
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-
-@echo ------------------------------------------------
 @echo Making installation package.
 @echo ------------------------------------------------
 echo on
