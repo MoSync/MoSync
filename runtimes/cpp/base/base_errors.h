@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(ERR_RES_INVALID_INDEX, "Resource handle out of bounds")\
 	m(ERR_RES_OVERWRITE, "Attempted to overwrite an existing resource")\
 	m(ERR_RES_LOAD_UBIN, "Attempted to load a UBIN from memory")\
-	m(ERR_RES_NO_RESOURCES, "Attempted to load resource, but no resources exist.")\
 	m(ERR_DATA_OOB, "Data object access out of bounds")\
 	m(ERR_RES_FILE_INCONSISTENT, "Resource file inconsistent")\
 	m(ERR_DIVISION_BY_ZERO, "Division by zero")\
@@ -73,7 +72,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(ERR_MEMORY_PROTECTED, "Attempted access protected memory")\
 	m(ERR_IMAGE_SIZE_INVALID, "Invalid image size")\
 	m(ERR_MEMORY_NULL, "Attempted to access null pointer.")\
-	m(ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")
+	m(ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")\
+	m(ERR_RES_NO_RESOURCES, "Attempted to load resource, but no resources exist.")
 
 DECLARE_ERROR_ENUM(BASE)
 
