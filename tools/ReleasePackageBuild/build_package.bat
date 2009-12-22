@@ -550,8 +550,8 @@ xcopy %ORIGINAL_PATH%\build_package_tools\mosync_prerequisites\*.* %MOSYNCDIR% /
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 copy %ORIGINAL_PATH%\build_package_tools\mosync_docs\licenses\mosync-license.txt %MOSYNCDIR%\license.txt /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-ren %MOSYNCDIR%\docs\000_index.html index.html
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+REM ren %MOSYNCDIR%\docs\000_index.html index.html
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 %ORIGINAL_PATH%\build_package_tools\NSIS\makensis %MOSYNC_PATH%\MoSync.nsi
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
