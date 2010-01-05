@@ -85,7 +85,7 @@ static const char *charMapUpperCase[]= {	".,@:?!'\"/1",	"ABCÅÄ2",		"DEF3",
 							"*+<>()[]{}",	" ",		"  "};
 #endif
 
-static const char numMap[] = {'1', '2', '3',
+static char numMap[] = {'1', '2', '3',
 				 '4', '5', '6',
 				 '7', '8', '9',
 				 '+', '0', ' '};
@@ -106,6 +106,21 @@ static char getChar(int charMode) {
 			c = 0;
 	}
 	return c;
+}
+
+void CharInput_setLowerCaseMapElement(int index, const char *str) {
+	if(index<0 || index>=12) maPanic(1, "Map element index out of bounds");
+	charMapLowerCase[index] = str;
+}
+
+void CharInput_setUpperCaseMapElement(int index, const char *str) {
+	if(index<0 || index>=12) maPanic(1, "Map element index out of bounds");
+	charMapUpperCase[index] = str;
+}
+
+void CharInput_setNumMapElement(int index, char num) {
+	if(index<0 || index>=12) maPanic(1, "Map element index out of bounds");
+	numMap[index] = num;
 }
 
 static void CharInput_ShortPress(void) {

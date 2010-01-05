@@ -82,6 +82,11 @@ void CharInput_RegisterTimerCallback(StartTimerCallback startCallback, StopTimer
  */
 const char* CharInput_getCurrentCharList(void);
 
+void CharInput_setUpperCaseMapElement(int index, const char *str);
+void CharInput_setLowerCaseMapElement(int index, const char *str);
+void CharInput_setNumMapElement(int index, char num);
+
+
 /** 
  * Use this to get where in the list the current char is. 
  */
