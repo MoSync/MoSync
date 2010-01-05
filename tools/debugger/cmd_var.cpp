@@ -125,6 +125,8 @@ struct Variable {
 	TypeBase::PrintFormat printFormat;
 	bool mHasCreatedChildren;
 
+	bool outOfScope;
+
 	void addArray(const char* dataAdress, const ArrayType *arrayType);
 	void addStruct(const char* dataAdress, const StructType *arrayType);
 	void addPointer(const char* dataAdress, const PointerType *arrayType);
@@ -180,6 +182,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	for(int i = 0; i < arrayType->mLength; i++) {
 		Variable& var = children[i];
 		{
+			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
 			StringPrintFunctor spf;
@@ -240,6 +243,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	Variable& var = children[0];
 	{
+		var.outOfScope = false;
 		var.printFormat = TypeBase::eNatural;
 
 		StringPrintFunctor spf;
@@ -309,6 +313,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 		Variable& var = children[i];
 		{
+			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
 			string type = getType(deref, false);
@@ -337,6 +342,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 		Variable& var = children[bases.size()+i];
 		{
+			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
 			string type = getType(deref, false);
@@ -445,6 +451,32 @@ void Expression::update(ExpressionCallback ecb) {
 	//we want to handle the error ourselves, lest we have a memory leak (or worse).
 	if(!mExprTree) {
 		mExprTree = ExpressionParser::parse(mExprText.c_str());
+	} else {
+		// variable is already created. check if any variable is out of scope in this expression. If so, set it as out of scope and skip updation.
+		map<std::string, SYM>& symbols = mExprTree->getSymbols();
+		map<std::string, SYM>::iterator i = symbols.begin();
+		for(i; i!=symbols.end(); i++) {
+			const SYM::Scope& s = i->second.scope;
+			switch(s.type) {
+				case SYM::Scope::eGlobal:
+					// do nothing, always in scope.
+					break;
+				case SYM::Scope::eStatic: {
+					// must be in the current file scope.
+					ASSERT_REG;
+					int fileScope = getFileScope(r.pc);
+					if(fileScope==-1 || fileScope!=s.fileScope) { sVar->outOfScope = true; mUpdated = true; return; }
+					}
+					break;
+				case SYM::Scope::eLocal: {
+					// must be in the current scope.
+					ASSERT_REG;
+					if(r.pc<s.start || r.pc>s.end) { sVar->outOfScope = true; mUpdated = true; return; }
+					}
+					break;
+			}
+		}	
+		sVar->outOfScope = false;
 	}
 
 	if(mExprTree) {
@@ -497,6 +529,7 @@ void var_create(const string& args) {
 	sVar = new Variable;
 	sVar->printFormat = TypeBase::eNatural;
 	sVar->name = realName;
+	sVar->outOfScope = false;
 
 	//frame-addr
 	string& frameAddrString(argv[1]);
@@ -643,9 +676,6 @@ void var_update(const string& args) {
 			error("Variable does not exist");
 			return;
 		}
-		if(strncmp(var->name.c_str(), args.c_str(), 4)!=0) {
-			int a = 2;
-		}
 		sUpdateQueue.push(var);
 	}
 	sUpdateCallback = Callback::varUpdate;
@@ -654,15 +684,22 @@ void var_update(const string& args) {
 
 static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
-		Variable *v = sUpdateQueue.front();
-		sUpdateQueue.pop();
-		if(v->mHasCreatedChildren)
-			for(size_t i = 0; i < v->children.size(); i++) {
-				sUpdateQueue.push(&v->children[i]);
+			Variable *v;
+			
+			do {
+				v = sUpdateQueue.front();
+				sUpdateQueue.pop();
+				sVar = v;
+				v->exp->update(Callback::varEEUpdate);	
+			} while(v->outOfScope && !sUpdateQueue.empty());
+
+			if(!v->outOfScope) {
+				if(v->mHasCreatedChildren)
+				for(size_t i = 0; i < v->children.size(); i++) {
+					sUpdateQueue.push(&v->children[i]);
+				}
+				return;
 			}
-		sVar = v;
-		v->exp->update(Callback::varEEUpdate);
-		return;
 	}
 
 	oprintDone();
@@ -715,12 +752,12 @@ static bool printUpdateItem(Variable* var) {
 		var->exp->outdate();
 		oprintf("{name=\"%s\"", var->name.c_str());
 		printValue(var);
-		oprintf(",in_scope=\"true\",type_changed=\"false\"");
+		oprintf(",in_scope=\"%s\",type_changed=\"false\"", (var->outOfScope==false)?"true":"false");
 		oprintf("}");
 		return true;
 	}
 
-	if(var->mHasCreatedChildren)
+	if(!var->outOfScope && var->mHasCreatedChildren)
 		for(size_t i = 0; i < var->children.size(); i++)
 			printUpdateItem(&var->children[i]);
 

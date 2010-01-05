@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/helpers.h"
 
 #include "stabs/stabs.h"
+#include "sld.h"
 
 #include "cmd_stack.h"
 #include "helpers.h"
@@ -51,6 +52,8 @@ static char* sPtr;
 static int sPos;
 static const int BUFSIZE=1024;
 static bool sComplex;
+
+static SYM::Scope sScope;
 
 //******************************************************************************
 // stackEvaluateExpression
@@ -132,11 +135,12 @@ static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallbac
 		DEBIG_PHAT_ERROR;
 	}
 	sym.storageClass = lv->storageClass;
+	sym.scope = sScope;
 	cb(sym);
 }
 
 //returns true if a symbol was found and cb called
-static bool handle_locals(const vector<ScopedVariable>& locals, int offset,
+static bool handle_locals(const Function* f, const vector<ScopedVariable>& locals, int offset,
 	const FRAME& frame, const string& name, SeeCallback cb)
 {
 	//find the last local in scope. that should be the top scope.
@@ -146,6 +150,9 @@ static bool handle_locals(const vector<ScopedVariable>& locals, int offset,
 			continue;
 		if(sv.v->name != name)
 			continue;
+		sScope.type = SYM::Scope::eLocal;
+		sScope.start = sv.start+f->address;
+		sScope.end = sv.end+f->address;
 		handle_local(sv.v, frame, cb);
 		return true;
 	}
@@ -153,13 +160,17 @@ static bool handle_locals(const vector<ScopedVariable>& locals, int offset,
 }
 
 //returns true if a symbol was found and cb called
-static bool handle_params(const vector<LocalVariable*>& params,
+static bool handle_params(const Function* f, const vector<LocalVariable*>& params,
 	const FRAME& frame, const string& name, SeeCallback cb)
 {
 	for(size_t i=0; i<params.size(); i++) {
 		const LocalVariable* lv = params[i];
 		if(lv->name != name)
 			continue;
+		const FuncMapping *fm = mapFunctionEx(f->address);
+		sScope.type = SYM::Scope::eLocal;
+		sScope.start = fm->start;
+		sScope.end = fm->stop;
 		handle_local(lv, frame, cb);
 		return true;
 	}
@@ -176,9 +187,9 @@ bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Func
 	}
 	int offset = frame.pc - f->address;
 
-	if(handle_locals(f->locals, offset, frame, name, cb))
+	if(handle_locals(f, f->locals, offset, frame, name, cb))
 		return true;
-	if(handle_params(f->params, frame, name, cb))
+	if(handle_params(f, f->params, frame, name, cb))
 		return true;
 
 	return false;	
@@ -220,21 +231,27 @@ void locate_symbol(const string& name, SeeCallback cb) {
 		return;
 	}
 
+	sScope.fileScope = s->fileScope;
+
 	sym.address = gMemBuf + s->address;	//requires loading that part of memory...
 	sym.symType = s->type;
 	if(s->type == eFunction) {
 		const Function* sf = (Function*)s;
 		sym.type = sf->type->resolve();
 		sym.address = (void*)s->address;	//hack. see FunctionType::printMI().
+		sym.scope = sScope;
 		cb(sym);
 	} else if(s->type == eVariable) {
 		const StaticVariable* sv = (StaticVariable*)s;
 		sym.type = sv->dataType->resolve();
+		sym.scope = sScope;
 		sSeeCallback = cb;
 		sSeeSym = sym;
 		StubConnection::readMemory(gMemBuf + sv->address, sv->address, sv->dataType->size(),
 			Callback::seeReadMem);
 	} else {
+		sScope.type = SYM::Scope::eGlobal;
+		sym.scope = sScope;
 		cb(sym);
 	}
 }

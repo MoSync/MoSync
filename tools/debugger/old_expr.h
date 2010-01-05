@@ -29,6 +29,23 @@ struct SYM {
 
 	const void* address;
 	StorageClass storageClass; // only valid if adress exist.
+
+	// scope
+	struct Scope {
+		enum ScopeType {
+			eLocal,
+			eStatic,
+			eGlobal
+		};
+		ScopeType type;
+		union {
+			struct { 
+				unsigned int start, end;
+			};
+			int fileScope;
+		};
+	};
+	Scope scope;
 };
 
 typedef void (*EECallback)(const char* type, const char* value, bool simpleType);

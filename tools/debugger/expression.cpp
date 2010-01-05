@@ -134,14 +134,20 @@ std::string sTypes[] = {
 
 std::set<std::string> sTypeSet = std::set<std::string>(sTypes, sTypes + (sizeof(sTypes)/sizeof(std::string)));
 
-const TypeBase* findTypeByNameAndPC(const std::string& t) {
+int getFileScope(unsigned int pc) {
 	LineMapping lm;
+	if(!mapIpEx(pc, lm))
+		return -1;
+	return lm.file + 1;
+}
+
+const TypeBase* findTypeByNameAndPC(const std::string& t) {
 	ASSERT_REG;
-	if(!mapIpEx(r.pc, lm))
-		return NULL;
+	int fileScope = getFileScope(r.pc);
+	if(fileScope == -1) return NULL;
 
 	if(isLocalGlobalOrStatic(t)) return NULL;
-	return findTypeByNameAndFileGlobal(t, lm.file + 1);
+	return findTypeByNameAndFileGlobal(t, fileScope);
 }
 
 ExpressionTreeNode* ExpressionParser::getTypeNode() {
