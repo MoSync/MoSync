@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ConfigParser.h"
 
+#include <cstdio>
 #include <expat.h>
 #include <map>
 #include <stdexcept>
