@@ -82,9 +82,16 @@ void CharInput_RegisterTimerCallback(StartTimerCallback startCallback, StopTimer
  */
 const char* CharInput_getCurrentCharList(void);
 
+/**
+ * str is just a null-terminated string containing the characters corresponding to that index.
+ */
 void CharInput_setUpperCaseMapElement(int index, const char *str);
 void CharInput_setLowerCaseMapElement(int index, const char *str);
-void CharInput_setNumMapElement(int index, char num);
+
+/**
+ * num is the character for the number mode (i.e. the one you get if you do a long-press or 
+ */
+ void CharInput_setNumMapElement(int index, char num);
 
 
 /** 
