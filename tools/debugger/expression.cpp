@@ -147,6 +147,7 @@ const TypeBase* findTypeByNameAndPC(const std::string& t) {
 	if(fileScope == -1) return NULL;
 
 	if(isLocalGlobalOrStatic(t)) return NULL;
+	if(t=="this") return NULL; // UUUUGLYYY (seems to be a type, it exists in the type sets)
 	return findTypeByNameAndFileGlobal(t, fileScope);
 }
 
