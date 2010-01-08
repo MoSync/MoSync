@@ -163,7 +163,7 @@ unsigned int TokenNumber::match(const char* str) {
 }
 
 bool TokenIdent::isValidChar(char c) {
-	if((c>='a' && c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9') || (c=='_') ) return true;
+	if((c>='a' && c<='z') || (c>='A' && c<='Z') || (c>='0' && c<='9') || (c=='_') || (c=='$') ) return true;
 	else return false;
 }
 
