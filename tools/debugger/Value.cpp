@@ -96,7 +96,7 @@ Value::Value(const std::string& value) {
 }
 
 Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES) {
-	mSym.type = mSym.type;
+	mSym.type = mSym.type->resolve();
 	if(getType() == TypeBase::ePointer ) {
 		if(!mSym.address) throw ParseException("Invalid pointer.");
 		this->Int = *(const int*)mSym.address;	
@@ -118,7 +118,7 @@ Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES)
 
 Value::Value(const TypeBase* typeBase) : mPrimitiveType(Builtin::NUM_SUB_TYPES) {
 	mSym.symType = eNone;
-	mSym.type = typeBase;
+	mSym.type = typeBase->resolve();
 	mSym.address = NULL;
 }
 

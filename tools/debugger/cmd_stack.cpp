@@ -490,11 +490,18 @@ static void console_print_type(const string& args, bool complex) {
 
 static void Callback::print_type(const Value* value, const char *err) {
 	//handle EOL in type string. See GDB. Replace with "\"\n~\"".
+	const TypeBase *typeBase = value->getSymbol().type;
+	if(!typeBase || !typeBase->resolve()) {
+		error("Unknown type");
+		return;
+	}
+
 	if(err) {
 		error("%s", err);
 		return;
 	} 
-	string type = getType(value->getSymbol().type, sComplex);
+
+	string type = getType(typeBase->resolve(), sComplex);
 	print_type_from_type(type);
 }
 

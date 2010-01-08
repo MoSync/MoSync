@@ -431,7 +431,7 @@ short Directives()
 
 			//N_FUN 141 4935 '_Z7XPClosev:F(0,6)'
 
-			StabsEmit("N_THUNK %d %d '%s'", v, ThunkSym, Name);
+			StabsEmit("N_THUNK %d %d '%s'\n", v, ThunkSym, Name);
 
 			RegisterThunk(v, ThunkSym);
 			return 1;

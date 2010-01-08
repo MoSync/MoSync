@@ -106,7 +106,7 @@ const TypeBase* findTypeByTuple(Tuple t) {
 
 const TypeBase* findTypeByTupleAndFile(Tuple t, int file) {
 	Type s;
-	s.id = t;
+ 	s.id = t;
 	set<Type>::const_iterator itr = sTypeSets[file].find(s);
 	if(itr == sTypeSets[file].end())
 		return NULL;
