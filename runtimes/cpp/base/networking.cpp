@@ -492,6 +492,7 @@ SYSCALL(void, maConnClose(MAHandle conn)) {
 	LOGST("ConnClose %i", conn);
 	MAConn& mac = getConn(conn);
 	mac.close();	//may take too long
+	delete &mac;
 	gConnMutex.lock();
 	{
 		size_t result = gConnections.erase(conn);
