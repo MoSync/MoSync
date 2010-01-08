@@ -110,7 +110,7 @@ const uint16_t crcTab[256] =
 0x3eb2,0x0ed1,0x1ef0
 };
 
-uint16_t Crc(const void *pPtr, uint32_t dwLength, uint16_t wCheck)
+static uint16_t Crc(const void *pPtr, uint32_t dwLength, uint16_t wCheck)
 // Purpose  : Creates the CRC checksum
 // Inputs   : pPtr    - Pointer to a block of memory
 //            wLength - The length of the memory block
@@ -123,7 +123,7 @@ uint16_t Crc(const void *pPtr, uint32_t dwLength, uint16_t wCheck)
 	return crc;
 }
 
-uint16_t UIDCheck(const void *pPtr)
+static uint16_t UIDCheck(const void *pPtr)
 // Purpose  : To create a UID checksum
 // Inputs   : pPtr    - Pointer to a block of memory
 {

@@ -3,8 +3,11 @@
 // Copyright (c) 1995-2004 Symbian Software Ltd.  All rights reserved.
 //
 
-
+#ifdef WIN32
 #include <io.h>
+#else
+#define O_BINARY 0
+#endif
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -16,7 +19,7 @@
 
 TInt HFile::Open(const TText * const aFileName, TInt32 * const aFileHandle)
 {
-	TInt32 hFile = _open((const char *)aFileName, _O_RDONLY | _O_BINARY);
+	TInt32 hFile = open((const char *)aFileName, O_RDONLY | O_BINARY);
 	if (hFile == -1)
 	{
 		switch (errno)
@@ -49,7 +52,7 @@ TInt HFile::Open(const TText * const aFileName, TInt32 * const aFileHandle)
 /******************************************************************************/
 TBool HFile::Read(const TInt32 aFileHandle, TAny * const aBuffer, const TUint32 aCount)
 {
-	TInt32 bytesRead =  _read(aFileHandle, aBuffer, aCount);
+	TInt32 bytesRead =  read(aFileHandle, aBuffer, aCount);
 	if (bytesRead != (TInt32)aCount)
 		return EFalse;
 	else
@@ -59,7 +62,7 @@ TBool HFile::Read(const TInt32 aFileHandle, TAny * const aBuffer, const TUint32 
 /******************************************************************************/
 TBool HFile::Seek(const TInt32 aFileHandle, const TUint32 aOffset)
 {
-	TInt32 newPos = _lseek(aFileHandle, aOffset, SEEK_SET);
+	TInt32 newPos = lseek(aFileHandle, aOffset, SEEK_SET);
 	if (newPos == -1)
 		return(EFalse);
 	else
@@ -69,7 +72,7 @@ TBool HFile::Seek(const TInt32 aFileHandle, const TUint32 aOffset)
 /******************************************************************************/
 TUint32 HFile::GetPos(const TInt32 aFileHandle)
 {
-	TUint32 pos = _lseek(aFileHandle, 0, SEEK_CUR);
+	TUint32 pos = lseek(aFileHandle, 0, SEEK_CUR);
 	return pos;
 }
 
@@ -79,7 +82,7 @@ TUint32 HFile::GetLength(TText *aName)
 	TInt32 handle;
 	if (HFile::Open(aName, &handle)==0)
 	{
-		TUint32 size = _filelength(handle);
+		TUint32 size = GetLength(handle);
 		HFile::Close(handle);
 		return size;
 	}
@@ -90,8 +93,9 @@ TUint32 HFile::GetLength(TText *aName)
 /******************************************************************************/
 TUint32 HFile::GetLength(const TInt32 aFileHandle)
 {
-
-	TUint32 size = _filelength(aFileHandle);
+	off_t curPos = lseek(aFileHandle, 0, SEEK_CUR);
+	TUint32 size = lseek(aFileHandle, 0, SEEK_END);
+	lseek(aFileHandle, curPos, SEEK_SET);
 	return size;
 }
 
@@ -99,7 +103,7 @@ TUint32 HFile::GetLength(const TInt32 aFileHandle)
 /******************************************************************************/
 void HFile::Close(const TInt32 aFileHandle)
 {
-	_close(aFileHandle);
+	close(aFileHandle);
 }
 
 

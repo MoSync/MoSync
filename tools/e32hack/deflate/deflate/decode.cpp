@@ -12,7 +12,7 @@
 const TInt KHuffTerminate=0x0001;
 const TUint32 KBranch1=sizeof(TUint32)<<16;
 
-TUint32* HuffmanSubTree(TUint32* aPtr,const TUint32* aValue,TUint32** aLevel)
+static TUint32* HuffmanSubTree(TUint32* aPtr,const TUint32* aValue,TUint32** aLevel)
 //
 // write the subtree below aPtr and return the head
 //

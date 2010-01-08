@@ -7,6 +7,7 @@
 
 #include "huffman.h"
 #include <e32base.h>
+#include <fstream>
 
 // deflation constants
 const TInt KDeflateLengthMag=8;
@@ -60,5 +61,6 @@ private:
 };
 
 void DeflateL(const TUint8* aBuf, TInt aLength, TBitOutput& aOutput);
+TUint32 DeflateCompressCheck(char *bytes,TInt size,std::ostream &os);
 
 #endif

@@ -74,7 +74,6 @@ BOOL Gfx_pushClipRect(int left, int top, int width, int height) {
 	_Gfx_init();
 	if(sClipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Clip stack overflow");
-		return FALSE;
 	}
 	left+=sCurrentOffset.x; top+=sCurrentOffset.y;
 	maSetClipRect(left, top, width, height);
@@ -106,7 +105,6 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 
 	if(sClipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Clip stack overflow");
-		return FALSE;
 	}
 
 	if((!pWidth) || (!pHeight)) {

@@ -280,7 +280,7 @@ void TDeflater::ExtraL(TInt aLen,TUint aBits)
 	iOutput.WriteL(aBits,aLen);
 }
 
-void DoDeflateL(const TUint8* aBuf,TInt aLength,TBitOutput& aOutput,TEncoding& aEncoding)
+static void DoDeflateL(const TUint8* aBuf,TInt aLength,TBitOutput& aOutput,TEncoding& aEncoding)
 {
 	// analyse the data for symbol frequency 
 	TDeflateStats analyser(aEncoding);

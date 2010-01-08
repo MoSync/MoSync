@@ -19,6 +19,6 @@ const TInt KHuffmanErrorBase=700;
 
 void Panic(TPanic aPanic)
 {
-	Print(ESevereError,HuffmanError[TInt(aPanic)]);
+	Print(ESevereError, "%s", HuffmanError[TInt(aPanic)]);
 	exit(KHuffmanErrorBase+TInt(aPanic));
 }

@@ -34,7 +34,6 @@ static const char usage[] =
 	"usage: e32hack <input-exe> <output-exe> <new-uid>\n";
 
 int copyHackExe(File& inFile, File& outFile, u32 uid);
-extern TUint32 DeflateCompressCheck(char *bytes,TInt size,std::ostream &os);
 
 int main(int argc, const char** argv) {
 	if(argc != 4) {

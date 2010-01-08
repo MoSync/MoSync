@@ -4,12 +4,6 @@
 //
 #include "deflate.h"
 
-#ifdef __MSVCDOTNET__
-#include <fstream>
-#else //__MSVCDOTNET__
-#include <fstream>
-#endif //__MSVCDOTNET__
-
 #include <assert.h>
 #include <h_utl.h>
 
@@ -55,7 +49,8 @@ void TFileOutput::FlushL()
 	}
 }
 
-void DeflateCompress(char *bytes,TInt size,ostream &os)
+#if 0
+static void DeflateCompress(char *bytes,TInt size,ostream &os)
 {
 	TFileOutput* output=new TFileOutput(os);
 	output->iDataCount = 0;
@@ -63,6 +58,7 @@ void DeflateCompress(char *bytes,TInt size,ostream &os)
 	output->FlushL();
 	delete output;
 }
+#endif
 
 TUint32 DeflateCompressCheck(char *bytes,TInt size,ostream &os)
 {
@@ -104,9 +100,11 @@ void TFileInput::UnderflowL()
 	Print(ESevereError,"Buffer underflow on deflate\n");
 }
 
-void InflateUnCompress(unsigned char* source, int sourcesize,unsigned char* dest, int destsize)
+#if 0
+static void InflateUnCompress(unsigned char* source, int sourcesize,unsigned char* dest, int destsize)
 {
 	TFileInput* input = new TFileInput(source, sourcesize);
 	CInflater* inflater=CInflater::NewLC(*input);
 	inflater->ReadL(dest,destsize);
 }
+#endif

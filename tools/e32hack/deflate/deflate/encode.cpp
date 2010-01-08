@@ -28,7 +28,7 @@ struct TNode
 	THuff iRight;
 };
 
-void HuffmanLengthsL(TUint32* aLengths,const TNode* aNodes,TInt aNode,TInt aLen)
+static void HuffmanLengthsL(TUint32* aLengths,const TNode* aNodes,TInt aNode,TInt aLen)
 /** recursive function to calculate the code lengths from the node tree
 
 @internal
@@ -50,7 +50,7 @@ void HuffmanLengthsL(TUint32* aLengths,const TNode* aNodes,TInt aNode,TInt aLen)
 		HuffmanLengthsL(aLengths,aNodes,x,aLen);
 }
 
-void InsertInOrder(TNode* aNodes, TInt aSize, TUint aCount, TInt aVal)
+static void InsertInOrder(TNode* aNodes, TInt aSize, TUint aCount, TInt aVal)
 /**	Insert the {aCount,aValue} pair into the already sorted array of nodes
 
 @internal
@@ -276,7 +276,7 @@ const TUint32 HuffmanEncoding[]=
 	0x87fff800
 };
 
-void EncodeRunLengthL(TBitOutput& aOutput, TInt aLength)
+static void EncodeRunLengthL(TBitOutput& aOutput, TInt aLength)
 /** encode 0a as '0' and 0b as '1', return number of symbols created
 
 @internal
