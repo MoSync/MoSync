@@ -76,7 +76,19 @@ else
 	error("Unknown platform: #{UNAME}")
 end
 
-gcc_version = (open("|gcc --version").readline().split(/ /))[2]
+def get_gcc_version_string
+	file = open("|gcc -v 2>&1")
+	file.each do |line|
+		parts = line.split(/ /)
+		#puts "yo: #{parts.inspect}"
+		if(parts[0] == "gcc" && parts[1] == "version")
+			return parts[2]
+		end
+	end
+	error("Could not find gcc version.")
+end
+
+gcc_version = get_gcc_version_string
 NATIVE_GCC_IS_V4 = (gcc_version[0] == "4"[0])
 NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] >= "3"[0]))
 
