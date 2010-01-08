@@ -21,6 +21,8 @@ class RuntimeBuilder
 	
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = "#{runtime_dir}config#{debug}.h"
+		
+		puts "Using config file: #{config_file_src}"
 	
 		backup_file(config_file_dest)
 		FileUtils.copy_file(config_file_src, config_file_dest)
@@ -51,6 +53,9 @@ class RuntimeBuilder
 			system("#{cwd}/build_s60v5.bat")
 		else
 			system("devices -setdefault #{default}")
+			system("bldmake bldfiles");
+			system("call abld clean #{symbian_system} urel");
+			system("call abld build #{symbian_system} urel");
 		end
 		
 		# revert initial config file
