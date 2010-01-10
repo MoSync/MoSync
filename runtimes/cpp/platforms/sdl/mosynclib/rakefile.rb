@@ -10,8 +10,13 @@ SOURCES = []
 EXTRA_SOURCEFILES = ["mosynclib.cpp"]
 EXTRA_INCLUDES = ["#{BD}/runtimes/cpp/base", ".."]
 
-LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net"]
-LOCAL_DLLS = ["amr"]
+if ( HOST == "linux" )
+	LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net", "amr"]	
+else
+	LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net"]
+	LOCAL_DLLS = ["amr"]
+end
+
 COMMON_LIBRARIES = ["SDL", "SDL_image", "SDL_ttf"]
 
 if(HOST == "win32") then
