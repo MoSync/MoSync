@@ -196,7 +196,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 			var.printFormat = TypeBase::eNatural;
 
 			//StringPrintFunctor spf;
-			spf("%s.%s", name.c_str(), varName);
+			spf("%s.%s", name.c_str(), varName.c_str());
 			var.name = spf.getString();
 			spf.reset();
 
