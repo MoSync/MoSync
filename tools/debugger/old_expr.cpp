@@ -199,6 +199,7 @@ bool isLocalGlobalOrStatic(const string& name) {
 	//locals
 	const FRAME& frame(gFrames[gCurrentFrameIndex]);
 	const Function* f = stabsFindFunctionByInsideAddress(frame.pc);
+	if(!f) return false;
 	if(handleLocalsAndArguments(name, frame, f, dummy)) return true;
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
 	if(!s)
@@ -218,6 +219,9 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	//locals
 	const FRAME& frame(gFrames[gCurrentFrameIndex]);
 	const Function* f = stabsFindFunctionByInsideAddress(frame.pc);
+
+	if(!f) { error("Function doesn't exist"); return; }
+
 	if(handleLocalsAndArguments(name, frame, f, cb))
 		return;
 

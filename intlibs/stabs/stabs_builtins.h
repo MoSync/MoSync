@@ -38,7 +38,8 @@ public:
 	enum SubType {
 		BUILTINS(ENUM_BUILTIN_FIRST, ENUM_BUILTIN)
 		BROKEN_BUILTINS(ENUM_BUILTIN),
-		eBool, eVTablePtr,
+		eBool, 
+		eVTablePtr,
 		NUM_SUB_TYPES
 	};
 

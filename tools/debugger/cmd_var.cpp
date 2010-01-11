@@ -121,7 +121,9 @@ struct Variable {
 	string name;
 	string localName;
 	Expression* exp;
-	vector<Variable> children;
+	//vector<Variable> children;
+	map<string, Variable> children;
+	
 	TypeBase::PrintFormat printFormat;
 	bool mHasCreatedChildren;
 
@@ -159,8 +161,10 @@ static queue<Variable*> sUpdateQueue;
 // type function definitions
 //******************************************************************************
 Variable::~Variable() {
-	for(size_t i = 0; i < children.size(); i++) {
-		sVariableMap.erase(children[i].name);
+//	for(size_t i = 0; i < children.size(); i++) {
+	for(map<string, Variable>::iterator i = children.begin(); i != children.end(); i++) {
+		//sVariableMap.erase(children[i].name);
+		sVariableMap.erase(i->second.name);
 	}
 	sVariableMap.erase(name);
 }
@@ -171,7 +175,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	std::string value = ""; 
 	this->exp->updateData(value, type, arrayType->isSimpleValue());
 
-	children.resize(arrayType->mLength);
+	//children.resize(arrayType->mLength);
 	if(!dataAdress) { 
 		mHasCreatedChildren = false;
 		return; 
@@ -180,19 +184,23 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 
 
 	for(int i = 0; i < arrayType->mLength; i++) {
-		Variable& var = children[i];
+	//	Variable& var = children[i];
+		StringPrintFunctor spf;
+		spf("[%d]", i);
+		string varName = spf.getString();
+		spf.reset();
+
+		Variable& var = children[varName];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
-			StringPrintFunctor spf;
-			spf("%s.%d", name.c_str(), i);
+			//StringPrintFunctor spf;
+			spf("%s.%s", name.c_str(), varName);
 			var.name = spf.getString();
 			spf.reset();
 
-			spf("[%d]", i);
-			var.localName = spf.getString();
-			spf.reset();
+			var.localName = varName;
 
 			spf("(%s)[%d]", exp->mExprText.c_str(), i);
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
@@ -234,26 +242,29 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	this->exp->updateData(value, type, simpleType);
 
-	children.resize(1);
+	//children.resize(1);
 	if(!dataAdress) { 
 		mHasCreatedChildren = false;	
 		return; 
 	}
 	mHasCreatedChildren = true;
 
-	Variable& var = children[0];
+	StringPrintFunctor spf;
+	spf("*(%s)", localName.c_str());
+	string varName = spf.getString();
+	spf.reset();
+
+	Variable& var = children[varName];
 	{
 		var.outOfScope = false;
 		var.printFormat = TypeBase::eNatural;
 
-		StringPrintFunctor spf;
-		spf("%s.%d", name.c_str(), 0);
+		//StringPrintFunctor spf;
+		spf("%s.%s", name.c_str(), varName.c_str());
 		var.name = spf.getString();
 		spf.reset();
 
-		spf("*(%s)", localName.c_str());
-		var.localName = spf.getString();
-		spf.reset();
+		var.localName = varName;
 
 		spf("*(%s)", exp->mExprText.c_str());
 		var.exp = new Expression(exp->mFrameAddr, spf.getString());
@@ -278,18 +289,6 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	}
 }
 
-/*
-void Variable::addDataMember(const char* dataAdress, const TypeBase *typeBase, DataMember::Visbility visibility) {
-	string vis;
-	switch(visibility) {
-		case eProtected: vis="Protected"; break;
-		case ePrivate: vis="Private"; break;
-		case ePublic: vis="Public"; break;
-		default: vis=""; break;
-	}
-}
-*/
-
 void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	const vector<BaseClass>& bases = structType->getBases();
 	const vector<Method>& methods = structType->getMethods();
@@ -300,7 +299,24 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	std::string value = ""; 
 	this->exp->updateData(value, type, structType->isSimpleValue());
 
-	children.resize(bases.size()+dataMembers.size());
+//	children.resize(bases.size()+dataMembers.size());
+	
+	// add private/public/protected variables..
+	for(size_t i = 0; i < dataMembers.size(); i++) {
+		const TypeBase* deref = dataMembers[i].type->resolve();
+
+		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
+		Variable& virtualVar = children[virtualVarName];
+		virtualVar.localName = virtualVarName;
+		virtualVar.exp = NULL;
+		virtualVar.name = name + "." + virtualVarName;
+		virtualVar.mHasCreatedChildren = true;
+		virtualVar.outOfScope = false;
+
+		string varName = dataMembers[i].name;
+		sVariableMap[virtualVar.name] = &virtualVar;
+	}
+
 	if(!dataAdress) { 
 		mHasCreatedChildren = false;
 		return; 
@@ -310,8 +326,9 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	for(size_t i = 0; i < bases.size(); i++) {
 		const TypeBase* deref = bases[i].type->resolve();
+		string varName = ((StructType*)deref)->mName.c_str();
 
-		Variable& var = children[i];
+		Variable& var = children[varName];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
@@ -319,13 +336,11 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			string type = getType(deref, false);
 
 			StringPrintFunctor spf;
-			spf("%s.%s", name.c_str(),  ((StructType*)deref)->mName.c_str());
+			spf("%s.%s", name.c_str(), varName.c_str());
 			var.name = spf.getString();
 			spf.reset();
 
-			spf("%s",((StructType*)deref)->mName.c_str());
-			var.localName = spf.getString();
-			spf.reset();
+			var.localName = varName;
 
 			spf("((%s)(%s))", type.c_str(), exp->mExprText.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
@@ -336,11 +351,27 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref);
 	}
 
+	/*
+	int j = 0;
+	for(int i = 0; i < 3; i++) {
+		if(num[i]) {
+			children[bases.size()+j].addDataMembers(this, dataAdress, dataMembers, (Visibility)i, num[i]);
+			j++;
+		}
+	}
+	*/
 	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
 
-		Variable& var = children[bases.size()+i];
+
+		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
+		Variable& virtualVar = children[virtualVarName];
+
+		string varName = dataMembers[i].name;
+		sVariableMap[virtualVar.name] = &virtualVar;
+
+		Variable& var = virtualVar.children[varName];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
@@ -348,13 +379,11 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 			string type = getType(deref, false);
 
 			StringPrintFunctor spf;
-			spf("%s.%s", name.c_str(),  dataMembers[i].name.c_str());
+			spf("%s.%s", virtualVar.name.c_str(),  varName.c_str());
 			var.name = spf.getString();
 			spf.reset();
 
-			spf("%s", dataMembers[i].name.c_str());
-			var.localName = spf.getString();
-			spf.reset();
+			var.localName = varName;
 
 			spf("(%s).%s", exp->mExprText.c_str(), dataMembers[i].name.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
@@ -430,7 +459,8 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 void resetValidness() {
 	map<string, Variable*>::iterator i = sVariableMap.begin();
 	for(;i!=sVariableMap.end(); i++) {
-		i->second->exp->setValid(false);
+		if(i->second->exp)
+			i->second->exp->setValid(false);
 	}
 }
 
@@ -684,22 +714,28 @@ void var_update(const string& args) {
 
 static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
-			Variable *v;
-			
-			do {
-				v = sUpdateQueue.front();
-				sUpdateQueue.pop();
-				sVar = v;
-				v->exp->update(Callback::varEEUpdate);	
-			} while(v->outOfScope && !sUpdateQueue.empty());
+		Variable *v;
 
-			if(!v->outOfScope) {
-				if(v->mHasCreatedChildren)
-				for(size_t i = 0; i < v->children.size(); i++) {
-					sUpdateQueue.push(&v->children[i]);
+		do {
+			v = sUpdateQueue.front();
+			sUpdateQueue.pop();
+			sVar = v;
+			if(v->exp)
+				v->exp->update(Callback::varEEUpdate);	
+		} while(v->outOfScope && !sUpdateQueue.empty());
+
+		if(!v->outOfScope) {
+			if(v->mHasCreatedChildren)
+				//	for(size_t i = 0; i < v->children.size(); i++) {
+				for(map<string, Variable>::iterator i = v->children.begin(); i!=v->children.end(); i++) {
+					sUpdateQueue.push(&i->second);
+				}
+				if(!v->exp) {
+					varUpdate();
 				}
 				return;
-			}
+
+		}
 	}
 
 	oprintDone();
@@ -739,16 +775,17 @@ static void printListChildrenItem(Variable* var) {
 	oprintf("{name=\"%s\"", var->name.c_str());
 	oprintf(",numchild=\"%d\"", var->children.size());
 	printValue(var);
-	oprintf(",type=\"%s\"", var->exp->type().c_str());
+	oprintf(",type=\"%s\"", (!var->exp)?"":var->exp->type().c_str());	
 	oprintf(",exp=\"%s\"", var->localName.c_str());
 	oprintf("}");
-	var->exp->outdate();
+	if(var->exp)
+		var->exp->outdate();
 }
 
 
 //returns true if anything was printed
 static bool printUpdateItem(Variable* var) {
-	if(var->exp->updated()) {
+	if(var->exp && var->exp->updated()) {
 		var->exp->outdate();
 		oprintf("{name=\"%s\"", var->name.c_str());
 		printValue(var);
@@ -758,8 +795,9 @@ static bool printUpdateItem(Variable* var) {
 	}
 
 	if(!var->outOfScope && var->mHasCreatedChildren)
-		for(size_t i = 0; i < var->children.size(); i++)
-			printUpdateItem(&var->children[i]);
+		//for(size_t i = 0; i < var->children.size(); i++)
+		for(map<string, Variable>::iterator i = var->children.begin(); i!=var->children.end(); i++)
+			printUpdateItem(&i->second);
 
 	return false;
 }
@@ -923,16 +961,20 @@ static void Callback::varListChildren() {
 	if(!sUpdateQueue.empty()) {
 		Variable *v = sUpdateQueue.back();
 		sUpdateQueue.pop();
-		v->exp->update(Callback::varEECreate);
-		return;
+		if(v->exp) {
+			v->exp->update(Callback::varEECreate);
+			return;
+		}
 	}
 
 	oprintDone();
 	oprintf(",numchild=\"%d\",children=[", sVar->children.size());
 
-	for(size_t i = 0; i < sVar->children.size(); i++) {
-		Variable& varc = sVar->children[i];
-		if(i!=0) oprintf(",");
+	//for(size_t i = 0; i < sVar->children.size(); i++) 
+	for(map<string, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
+	{
+		Variable& varc = i->second;
+		if(i!=sVar->children.begin()) oprintf(",");
 		oprintf("child=");
 		printListChildrenItem(&varc);
 	}

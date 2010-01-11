@@ -125,6 +125,9 @@ Value getValueFromSymbol(const SYM& symbol) {
 		Value v;
 		switch(builtin->mSubType) {
 			BUILTINS(CAST_BUILTIN, CAST_BUILTIN)
+
+			case Builtin::eBool: v = Value(*((bool*)symbol.address)); break;
+
 			default:
 				throw ParseException("Unknown type.");
 		}

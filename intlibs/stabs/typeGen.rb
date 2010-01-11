@@ -18,7 +18,7 @@ require "types.rb"
 
 def generate_builtins_macro(dest)
 	out = File.new(dest, "w")
-	types = $types_int + $types_float
+	types = $types_int + $types_float # + $types_bool
 	out.write "#define BUILTINS(f, m)\\\n"
 	j = 0
 	types.each do |i|

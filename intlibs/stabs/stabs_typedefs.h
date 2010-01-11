@@ -109,6 +109,7 @@ enum Visibility {
 	eProtected = 1,
 	ePublic = 2
 };
+const char* getVisibilityString(Visibility vis);
 
 struct DataMember {
 	std::string name;

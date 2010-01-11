@@ -60,6 +60,7 @@ void addType(const Type& s) {
 }
 
 const Type* stabsFindTypeByName(const std::string& name, int scope) {
+	if((size_t)scope>=sTypeSets.size() || scope<0) return NULL;
 	set<Type>::const_iterator itr = sTypeSets[scope].begin();
 	for(;itr!=sTypeSets[scope].end(); itr++) {
 		if((*itr).name == name) return &(*itr);

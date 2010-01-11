@@ -29,8 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-#if 0	//unused
-static const char* getVisibilityString(Visibility vis) {
+//#if 0	//unused
+const char* getVisibilityString(Visibility vis) {
 	switch(vis) {
 		case ePrivate: return "private";
 		case eProtected: return "protected";
@@ -38,7 +38,7 @@ static const char* getVisibilityString(Visibility vis) {
 		default: return "";
 	}
 }
-#endif
+//#endif
 
 StringPrintFunctor::StringPrintFunctor() : mPos(0), mString(NULL), mStringSize(0) {
 	resizeString(16);

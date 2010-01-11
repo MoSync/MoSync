@@ -805,7 +805,7 @@ int evaluateThread(void* data) {
 			if(sReturnValue.getType()==TypeBase::eArray) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
-				deref = sReturnValue.getSymbol().type->deref();
+				deref = sReturnValue.getSymbol().type->deref()->resolve();
 				int addr = (int)sReturnValue;
 				if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
 					deref = NULL;
