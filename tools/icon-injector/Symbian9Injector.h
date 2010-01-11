@@ -15,22 +15,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _JAVA_INJECTOR_H_
-#define _JAVA_INJECTOR_H_
+#ifndef _SYMBIAN9_INJECTOR_H_
+#define _SYMBIAN9_INJECTOR_H_
 
 #include "Injector.h"
-#include <string>
 
 namespace MoSync {
-	
-/**
- * The java injector. Used to inject an icon into a J2ME jar-file.
- */
-class JavaInjector : public Injector {
+class Symbian9Injector : public Injector {
 public:
 	void inject(const Icon* icon, const std::map<std::string, std::string>& params);
 };
-
 }
 
-#endif // _JAVA_INJECTOR_H_
+#endif // _SYMBIAN9_INJECTOR_H_

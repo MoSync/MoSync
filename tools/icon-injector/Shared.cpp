@@ -23,22 +23,16 @@ using namespace std;
 namespace MoSync {
 
 void errorExit(const string& reason) {
-	printf("%s", reason.c_str());
+	printf("%s\n", reason.c_str());
 	exit(1);
 }
 
 string getExtension(const string& str) {
-	char ext[16];
-	char *extd = ext;
-	const char *fd = &str[str.length()-1];
-	while(*fd && *fd != '.') {
-		*extd++ = *fd--;
-	}
-	if(*fd == '.') {
-		return ext;
-	} else {
+	size_t i = str.find_last_of('.');
+	if(i == string::npos)
 		return "";
-	}
+	else
+		return str.substr(i + 1);
 }
 
 string getAbsolutePath(const string& path) {
@@ -56,7 +50,7 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *
 		mosyncdir+"\\bin\\ImageMagick\\convert " + iconInstance->filename + 
 		" -resize " + size + " " + string(dstFilename);
 
-	if(system(magick.c_str()) != 0) errorExit("Image Magick failed.");
+	if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
 
 	/*
 	string ext = getExtension(iconInstance->filename);
@@ -66,4 +60,24 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *
 	*/
 	return true;
 }
+
+void sizeString(const std::string& size, int* w, int* h) {
+	size_t ofs;
+	if((ofs=size.find("x"))!=std::string::npos) {
+		*w = atoi(size.substr(0, ofs).c_str());
+		*h = atoi(size.substr(ofs+1, size.length()-(ofs+1)).c_str());
+	} else {
+		errorExit("Invalid size string.");
+	}
+}
+
+int run(const char* cmd) {
+	printf("%s\n", cmd);
+	int res = system(cmd);
+	if(res != 0) {
+		printf("Error %i\n", res);
+	}
+	return res;
+}
+
 }

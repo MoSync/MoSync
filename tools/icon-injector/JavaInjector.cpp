@@ -25,15 +25,6 @@ using namespace std;
 
 namespace MoSync {
 
-static int run(const char* cmd) {
-	printf("%s\n", cmd);
-	int res = system(cmd);
-	if(res != 0) {
-		printf("Error %i\n", res);
-	}
-	return res;
-}
-
 int j_inject(const char *jarFile, const char *pngFile) {
 	int res;
 

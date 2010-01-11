@@ -147,16 +147,6 @@ namespace MoSync {
 		return true;
 	}
 
-	void sizeString(const std::string& size, int *w, int *h) {
-		size_t ofs;
-		if((ofs=size.find("x"))!=std::string::npos) {
-			*w = atoi(size.substr(0, ofs).c_str());
-			*h = atoi(size.substr(ofs+1, size.length()-(ofs+1)).c_str());
-		} else {
-			errorExit("Invalid size string.");
-		}
-	}
-
 	void WinmobileInjector::inject(const Icon* icon, const std::map<std::string, std::string>& params) {
 		//VP(largeSize);
 		//VP(smallSize);

@@ -47,6 +47,12 @@ std::string getExtension(const std::string& str);
  * Function to get the absolute path of a full filepath string.
  */
 std::string getAbsolutePath(const std::string& path);
+
+/// Parse a string on the format <width>x<height>.
+void sizeString(const std::string& size, int* w, int* h);
+
+/// Run a command using system().
+int run(const char* cmd);
 }
 
 #endif // _SHARED_H_

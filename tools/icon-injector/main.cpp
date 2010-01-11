@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "JavaInjector.h"
 #include "WinmobileInjector.h"
 #include "MoreInjector.h"
+#include "Symbian9Injector.h"
 #include "Shared.h"
 
 #include <conio.h>
@@ -35,6 +36,7 @@ void initInjectors() {
 	gInjectors["j2me"] = new JavaInjector();
 	gInjectors["winmobile"] = new WinmobileInjector();
 	gInjectors["more"] = new MoreInjector();
+	gInjectors["symbian9"] = new Symbian9Injector();
 }
 
 bool parseCmdLine(map<string, string>& params, int argc, char **argv) {

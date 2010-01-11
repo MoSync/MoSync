@@ -61,4 +61,4 @@ protected:
 
 }
 
-#endif
+#endif	//_ICON_H_

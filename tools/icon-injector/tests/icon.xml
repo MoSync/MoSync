@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<icon>
+	<instance size="default" src="star2t.svg" />
+	<instance size="64x64" src="star2t.svg" />
+	<instance size="32x32" src="star2q.png" />
+</icon>

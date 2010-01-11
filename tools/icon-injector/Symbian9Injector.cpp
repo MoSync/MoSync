@@ -15,23 +15,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "MoreInjector.h"
-#include "Icon.h"
+#include "Symbian9Injector.h"
 #include "Shared.h"
-#include <windows.h>
-#include <fcntl.h>
-#include <io.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 using namespace std;
 
 namespace MoSync {
-	void MoreInjector::inject(const Icon* icon, const std::map<std::string, std::string>& params) {
+	void Symbian9Injector::inject(const Icon* icon, const std::map<std::string,
+		std::string>& params)
+	{
 		string size = verifyParameter(params, "size");
 		string dst = verifyParameter(params, "dst");
 		const IconInstance* iconInst = icon->findBestInstance(size);
 		if(!iconInst) errorExit("Couldn't find any icon instance.");
-		if(!convertInstanceToImageFormat(iconInst, dst.c_str(), size, getExtension(dst))) errorExit("MoRE icon conversion failed.");
+
+		//now what?
+		string ext = getExtension(iconInst->filename);
+		string mifconvSrc;
+		if(ext == "svg") {
+			//preserve
+			mifconvSrc = iconInst->filename;
+		} else {
+			//convert to bmp
+			mifconvSrc = "temp.bmp";
+			if(!convertInstanceToImageFormat(iconInst, mifconvSrc.c_str(), size, "bmp")) 
+				errorExit("Java icon conversion failed.");
+		}
+		char buf[2048];
+		const char *mosyncdir_c = getenv("MOSYNCDIR");
+		if(!mosyncdir_c) errorExit("MOSYNCDIR missing");
+		sprintf(buf, "%s/bin/mifconv.exe %s %s", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
+		int res = run(buf);
+		if(res != 0)
+			errorExit("mifconf failed");
 	}
 }
