@@ -1,4 +1,5 @@
 BD = '..'
+require "#{BD}/build_rules/host.rb"
 require "#{BD}/build_rules/defaults.rb"
 
 SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest"] #, "MinUI"
@@ -10,6 +11,11 @@ if(Rake.application.top_level_tasks[0] == "pipe") then
 	exit(0)
 end
 
-RAKEFILES = ["rakefile.pipe.rb", "rakefile.native.rb"]
+if ( HOST == "linux" )
+	RAKEFILES = ["rakefile.pipe.rb"]
+else
+	RAKEFILES = ["rakefile.pipe.rb", "rakefile.native.rb"]
+end
+
 
 require "#{BD}/build_rules/subdirs.rb"
