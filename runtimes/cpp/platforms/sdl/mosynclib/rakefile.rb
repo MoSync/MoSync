@@ -33,9 +33,10 @@ else
 			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__"
 		end
 
-		IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
+		IGNORED_FILES = [ "SDLSoundAudioSource.cpp" ]
 	else
 		SOUND_LIB = [ "SDL_sound" ]
+		IGNORED_FILES = [ ]
 	end
 
 	LIBRARIES = COMMON_LIBRARIES + SOUND_LIB + ["gtk-x11-2.0", "bluetooth", "expat"]
