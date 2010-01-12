@@ -493,7 +493,7 @@ public:
 			++itr;
 			assert("Map::ConstIterator()", itr->first == 3 && itr->second == 6);
 			itr++;
-			assert("Map::ConstIterator()", itr->first == 5 && itr->second == 7);
+			assert("Map::ConstIterator()", itr->first == 4 && itr->second == 7);
 			itr++;
 			assert("Map::end()", itr == m.end());
 		}
