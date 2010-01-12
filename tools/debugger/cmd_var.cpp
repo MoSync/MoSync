@@ -130,7 +130,7 @@ struct Variable {
 	bool outOfScope;
 
 	void addArray(const char* dataAdress, const ArrayType *arrayType);
-	void addStruct(const char* dataAdress, const StructType *arrayType);
+	void addStruct(const char* dataAdress, const StructType *arrayType, bool isPointer=false);
 	void addPointer(const char* dataAdress, const PointerType *arrayType);
 };
 
@@ -169,11 +169,33 @@ Variable::~Variable() {
 	sVariableMap.erase(name);
 }
 
+const TypeBase* convertConstType(const TypeBase* tb) {
+	if(tb->type() == TypeBase::eConst) {
+		return ((const ConstType*)tb)->mTarget->resolve();
+	} else {
+		return tb;
+	}
+}
+
 void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType->resolve();
+	deref = convertConstType(deref);
+
 	std::string type = getType(arrayType, false);
 	std::string value = ""; 
 	this->exp->updateData(value, type, arrayType->isSimpleValue());
+
+	for(int i = 0; i < arrayType->mLength; i++) {
+	//	Variable& var = children[i];
+		StringPrintFunctor spf;
+		spf("[%d]", i);
+		string varName = spf.getString();
+		spf.reset();
+		Variable& var = children[varName];
+		var.name = name+"."+varName;
+		var.outOfScope = false;
+		var.printFormat = TypeBase::eNatural;
+	}
 
 	//children.resize(arrayType->mLength);
 	if(!dataAdress) { 
@@ -184,14 +206,14 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 
 
 	for(int i = 0; i < arrayType->mLength; i++) {
-	//	Variable& var = children[i];
 		StringPrintFunctor spf;
 		spf("[%d]", i);
 		string varName = spf.getString();
 		spf.reset();
-
+	
 		Variable& var = children[varName];
 		{
+		/*
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
@@ -199,7 +221,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 			spf("%s.%s", name.c_str(), varName.c_str());
 			var.name = spf.getString();
 			spf.reset();
-
+*/
 			var.localName = varName;
 
 			spf("(%s)[%d]", exp->mExprText.c_str(), i);
@@ -228,6 +250,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 
 void Variable::addPointer(const char* dataAdress, const PointerType *pointerType) {
 	const TypeBase* deref = ((const PointerType*)pointerType)->deref()->resolve();
+	deref = convertConstType(deref);
 
 	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
 		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
@@ -249,55 +272,60 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	}
 	mHasCreatedChildren = true;
 
-	StringPrintFunctor spf;
-	spf("*(%s)", localName.c_str());
-	string varName = spf.getString();
-	spf.reset();
-
-	Variable& var = children[varName];
-	{
-		var.outOfScope = false;
-		var.printFormat = TypeBase::eNatural;
-
-		//StringPrintFunctor spf;
-		spf("%s.%s", name.c_str(), varName.c_str());
-		var.name = spf.getString();
+	if(deref->type() != TypeBase::eStruct) {
+		StringPrintFunctor spf;
+		spf("*(%s)", localName.c_str());
+		string varName = spf.getString();
 		spf.reset();
 
-		var.localName = varName;
+		Variable& var = children[varName];
+		{
+			var.outOfScope = false;
+			var.printFormat = TypeBase::eNatural;
 
-		spf("*(%s)", exp->mExprText.c_str());
-		var.exp = new Expression(exp->mFrameAddr, spf.getString());
-		spf.reset();
-	}
+			//StringPrintFunctor spf;
+			spf("%s.%s", name.c_str(), varName.c_str());
+			var.name = spf.getString();
+			spf.reset();
 
-	sVariableMap[var.name] = &var;
-	if(deref->type() == TypeBase::eArray) {
-		var.addArray(NULL, (ArrayType*)deref);
-	} else if(deref->type() == TypeBase::eStruct) {
-		var.addStruct(NULL, (StructType*)deref);
-	} else if(deref->type() == TypeBase::ePointer) {
-		var.addPointer(NULL, (PointerType*)deref);
-	} else {
+			var.localName = varName;
 
+			spf("*(%s)", exp->mExprText.c_str());
+			var.exp = new Expression(exp->mFrameAddr, spf.getString());
+			spf.reset();
+		}
+		if(deref->type() == TypeBase::eArray) {
+			var.addArray(NULL, (ArrayType*)deref);
+		} else if(deref->type() == TypeBase::ePointer) {
+			var.addPointer(NULL, (PointerType*)deref);
+		} else {
+
+			int addr = *((int*)dataAdress);
+			value = getValue(pointerType, &gMemBuf[addr], printFormat);
+			var.exp->updateData(
+				value, 
+				getType(deref, false), 
+				deref->isSimpleValue());
+		}
+		sVariableMap[var.name] = &var;
+	}  else {
 		int addr = *((int*)dataAdress);
-		value = getValue(pointerType, &gMemBuf[addr], printFormat);
-		var.exp->updateData(
-			value, 
-			getType(deref, false), 
-			deref->isSimpleValue());
+		addStruct(&gMemBuf[addr], (StructType*)deref, true);
 	}
+
 }
 
-void Variable::addStruct(const char* dataAdress, const StructType *structType) {
+void Variable::addStruct(const char* dataAdress, const StructType *structType, bool isPointer) {
 	const vector<BaseClass>& bases = structType->getBases();
 	const vector<Method>& methods = structType->getMethods();
 	const vector<DataMember>& dataMembers = structType->getDataMembers();
 	const vector<StaticDataMember>& staticDataMembers = structType->getStaticDataMembers();
 
-	std::string type = getType(structType, false);
 	std::string value = ""; 
-	this->exp->updateData(value, type, structType->isSimpleValue());
+	if(!isPointer) {
+		std::string type = getType(structType, false);
+		this->exp->updateData(value, type, structType->isSimpleValue());
+	}
 
 //	children.resize(bases.size()+dataMembers.size());
 	
@@ -326,6 +354,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 	for(size_t i = 0; i < bases.size(); i++) {
 		const TypeBase* deref = bases[i].type->resolve();
+
 		string varName = ((StructType*)deref)->mName.c_str();
 
 		Variable& var = children[varName];
@@ -342,13 +371,14 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 			var.localName = varName;
 
-			spf("((%s)(%s))", type.c_str(), exp->mExprText.c_str());
+			if(isPointer) spf("((%s *)(%s))", type.c_str(), exp->mExprText.c_str());
+			else spf("((%s)(%s))", type.c_str(), exp->mExprText.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
 		}
 
 		sVariableMap[var.name] = &var;
-		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref);
+		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, true);
 	}
 
 	/*
@@ -363,6 +393,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
+		deref = convertConstType(deref);
 
 		if(deref->type() == TypeBase::ePointer) {
 			const PointerType* pt = (const PointerType*)deref;
@@ -394,7 +425,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 
 			var.localName = varName;
 
-			spf("(%s).%s", exp->mExprText.c_str(), dataMembers[i].name.c_str());
+			if(isPointer) spf("(%s)->%s", exp->mExprText.c_str(), dataMembers[i].name.c_str());
+			else spf("(%s).%s", exp->mExprText.c_str(), dataMembers[i].name.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
 		}
