@@ -52,6 +52,8 @@ TypeBase* getTypeBaseFromType(Builtin::SubType type);
 #define V_OPERATOR_CAST_ELEM_HEADER(toType, id)\
 	operator toType () const;
 
+const TypeBase* convertConstType(const TypeBase* tb);
+
 class Value {
 public:
 #define CONVERT_ELEM(toType, id) case Builtin::e##id: return (T)id;

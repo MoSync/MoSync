@@ -37,6 +37,13 @@ using namespace std;
 TYPES(V_CONSTRUCTOR_ELEM_SOURCE)
 TYPES(V_OPERATOR_CAST_ELEM_SOURCE)
 
+const TypeBase* convertConstType(const TypeBase* tb) {
+	if(tb->type() == TypeBase::eConst) {
+		return ((const ConstType*)tb)->mTarget->resolve();
+	} else {
+		return tb;
+	}
+}
 
 TypeBase* getTypeBaseFromType(Builtin::SubType type) {
 	for(int i = 0; i < snBuiltins; i++) {
@@ -96,7 +103,7 @@ Value::Value(const std::string& value) {
 }
 
 Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES) {
-	mSym.type = mSym.type->resolve();
+	mSym.type = convertConstType(mSym.type->resolve());
 	if(getType() == TypeBase::ePointer ) {
 		if(!mSym.address) throw ParseException("Invalid pointer.");
 		this->Int = *(const int*)mSym.address;	
@@ -118,7 +125,7 @@ Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES)
 
 Value::Value(const TypeBase* typeBase) : mPrimitiveType(Builtin::NUM_SUB_TYPES) {
 	mSym.symType = eNone;
-	mSym.type = typeBase->resolve();
+	mSym.type = convertConstType(typeBase->resolve());
 	mSym.address = NULL;
 }
 

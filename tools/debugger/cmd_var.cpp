@@ -169,14 +169,6 @@ Variable::~Variable() {
 	sVariableMap.erase(name);
 }
 
-const TypeBase* convertConstType(const TypeBase* tb) {
-	if(tb->type() == TypeBase::eConst) {
-		return ((const ConstType*)tb)->mTarget->resolve();
-	} else {
-		return tb;
-	}
-}
-
 void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType->resolve();
 	deref = convertConstType(deref);
@@ -315,6 +307,18 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 }
 
+bool isVTablePointer(const TypeBase* deref) {
+	if(deref->type() == TypeBase::ePointer) {
+		const PointerType* pt = (const PointerType*)deref;
+		const TypeBase *t = pt->mTarget->resolve();
+		if(t->type() == TypeBase::eBuiltin) {
+			const Builtin* bi = (const Builtin*)t;
+			if(bi->mSubType == Builtin::eVTablePtr) return true;
+		}
+	}
+	return false;
+}
+
 void Variable::addStruct(const char* dataAdress, const StructType *structType, bool isPointer) {
 	const vector<BaseClass>& bases = structType->getBases();
 	const vector<Method>& methods = structType->getMethods();
@@ -332,6 +336,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 	// add private/public/protected variables..
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
+		deref = convertConstType(deref);
+		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
 		Variable& virtualVar = children[virtualVarName];
@@ -354,7 +360,6 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 
 	for(size_t i = 0; i < bases.size(); i++) {
 		const TypeBase* deref = bases[i].type->resolve();
-
 		string varName = ((StructType*)deref)->mName.c_str();
 
 		Variable& var = children[varName];
@@ -371,14 +376,15 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 
 			var.localName = varName;
 
-			if(isPointer) spf("((%s *)(%s))", type.c_str(), exp->mExprText.c_str());
+			//if(isPointer) spf("((%s *)(%s))", type.c_str(), exp->mExprText.c_str());
+			if(isPointer) spf("((%s)(*(%s)))", type.c_str(), exp->mExprText.c_str());
 			else spf("((%s)(%s))", type.c_str(), exp->mExprText.c_str());
 			var.exp = new Expression(exp->mFrameAddr, spf.getString());
 			spf.reset();
 		}
 
 		sVariableMap[var.name] = &var;
-		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, true);
+		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, false);
 	}
 
 	/*
@@ -395,15 +401,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		const TypeBase* deref = dataMembers[i].type->resolve();
 		deref = convertConstType(deref);
 
-		if(deref->type() == TypeBase::ePointer) {
-			const PointerType* pt = (const PointerType*)deref;
-			const TypeBase *t = pt->mTarget->resolve();
-			if(t->type() == TypeBase::eBuiltin) {
-				const Builtin* bi = (const Builtin*)t;
-				if(bi->mSubType == Builtin::eVTablePtr) continue;
-			}
-		}
-
+		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
 		Variable& virtualVar = children[virtualVarName];
@@ -456,7 +454,7 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	}
 
 	//const SYM& sym = v->getSymbol();
-	const TypeBase* typeBase = v->getTypeBase();
+	const TypeBase* typeBase = convertConstType(v->getTypeBase());
 
 	if(typeBase->type() == TypeBase::eArray) {
 		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)typeBase);
@@ -483,7 +481,7 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 		return; 
 	}
 
-	const TypeBase* typeBase = v->getTypeBase();
+	const TypeBase* typeBase = convertConstType(v->getTypeBase());
 	std::string type = getType(typeBase, false);
 	bool simpleType = typeBase->isSimpleValue();
 	std::string value = "";
