@@ -23,7 +23,7 @@
 "%package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
 "%programcomb-output%" -"!:\resource\apps\%uid%.comb"
 "%package-output-dir%\%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
-;"%package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
+%has-icon%"%package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
 "%package-output-dir%\%uid%_reg.RSC" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
 
 ;required for application to be covered by backup/restore facility

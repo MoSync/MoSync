@@ -26,21 +26,29 @@ namespace MoSync {
 	{
 		string size = verifyParameter(params, "size");
 		string dst = verifyParameter(params, "dst");
-		const IconInstance* iconInst = icon->findBestInstance(size);
-		if(!iconInst) errorExit("Couldn't find any icon instance.");
+		const IconInstance* iconInst = icon->findBestInstance(size, "svg");
+		if(!iconInst) errorExit("Couldn't find an SVG icon instance.");
 
-		//now what?
 		string ext = getExtension(iconInst->filename);
+
+		// Bitmaps on s60v3/v5 phones turn invisible or
+		// make the entire program menu invisible, respectively.
+		// Disabled for now.
+#if 0
 		string mifconvSrc;
 		if(ext == "svg") {
 			//preserve
 			mifconvSrc = iconInst->filename;
-		} else {
+		}
+		else {
 			//convert to bmp
 			mifconvSrc = "temp.bmp";
 			if(!convertInstanceToImageFormat(iconInst, mifconvSrc.c_str(), size, "bmp")) 
 				errorExit("Java icon conversion failed.");
 		}
+#else
+		string mifconvSrc = iconInst->filename;
+#endif
 		char buf[2048];
 		const char *mosyncdir_c = getenv("MOSYNCDIR");
 		if(!mosyncdir_c) errorExit("MOSYNCDIR missing");

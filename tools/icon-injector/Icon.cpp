@@ -106,9 +106,13 @@ void end(void *data, const char *el) {
 		return instances;
 	}
 
-	const IconInstance* Icon::findBestInstance(const std::string& size) const {
+	const IconInstance* Icon::findBestInstance(const std::string& size,
+		const std::string& ext) const
+	{
 		const IconInstance* res = 0;
 		for(vector<IconInstance*>::const_iterator i = instances.begin(); i != instances.end(); ++i) {
+			if(ext.length() != 0 && getExtension((*i)->filename) != ext)
+				continue;
 			if((*i)->size == size) {
 				res = *i;
 				break;

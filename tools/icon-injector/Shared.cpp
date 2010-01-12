@@ -46,9 +46,12 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *
 	const char *mosyncdir_c = getenv("MOSYNCDIR");
 	if(!mosyncdir_c) errorExit("MOSYNCDIR missing");
 	string mosyncdir = mosyncdir_c;
+	string resizeFlag;
+	if(size != "default")
+		resizeFlag = " -resize " + size;
 	string magick = 
 		mosyncdir+"\\bin\\ImageMagick\\convert " + iconInstance->filename + 
-		" -resize " + size + " " + string(dstFilename);
+		resizeFlag + " " + string(dstFilename);
 
 	if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
 

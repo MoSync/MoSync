@@ -53,7 +53,7 @@ public:
 	 */
 	static Icon* parse(const std::string& filename);
 	void addInstance(const std::string& size, const std::string& filename);
-	const IconInstance* findBestInstance(const std::string& size) const;
+	const IconInstance* findBestInstance(const std::string& size, const std::string& ext="") const;
 	std::vector<IconInstance*>& getInstances();
 protected:
 	std::vector<IconInstance*> instances;
