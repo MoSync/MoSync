@@ -369,9 +369,6 @@ int ConstType::size() const {
 bool ConstType::isSimpleValue() const {
 	return mTarget->isSimpleValue();
 }
-TypeBase::Type ConstType::type() const {
-	return mTarget->type();
-}
 
 EnumType::EnumType(const string& name) : mName(name) {
 }

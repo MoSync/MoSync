@@ -250,10 +250,7 @@ void StubConnection::interruptHit() {
 	oprintFrame(r.pc);
 	oprintf("\n" GDB_PROMPT);
 	fflush(stdout);
-	if(sRunning) {
-		sRunning = false;
-		op.abort();
-	}
+	abortIfRunning();
 }
 
 //******************************************************************************
@@ -283,6 +280,13 @@ void StubConnection::stepHit() {
 	op.done();
 }
 
+void abortIfRunning() {
+	if(sRunning) {
+		sRunning = false;
+		op.abort();
+	}
+}
+
 //******************************************************************************
 // exitHit
 //******************************************************************************
@@ -293,10 +297,7 @@ void StubConnection::exitHit(int code) {
 	oprintFrame(r.pc);
 	oprintf("\n" GDB_PROMPT);
 	fflush(stdout);
-	if(sRunning) {
-		sRunning = false;
-		op.abort();
-	}
+	abortIfRunning();
 }
 
 //******************************************************************************

@@ -66,4 +66,10 @@ extern BreakpointMap sBreakpoints;
 extern BreakpointAddressMap sBreakpointAddresses;
 extern TempBreakpoint gTempBreakpoint;
 
+//******************************************************************************
+// functions
+//******************************************************************************
+
+void abortIfRunning();
+
 #endif	//CMD_BREAK_H

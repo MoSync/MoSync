@@ -267,6 +267,9 @@ void StubConnection::breakpointHit() {
 		return;
 	}
 
+	//useful if encountering a breakpoint while stepping.
+	abortIfRunning();
+
 	//todo: problematic. what if multiple breakpoints point to this address?
 	//maybe we shouldn't allow that. check gdb's behaviour.
 	BreakpointAddressMap::const_iterator itr = sBreakpointAddresses.find(r.pc);

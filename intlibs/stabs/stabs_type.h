@@ -52,7 +52,7 @@ typedef PrintFunctor& printfPtr;
 class TypeBase : public MAUtil::RefCounted {
 public:
 	enum Type {
-		eUnknown, eBuiltin, eStruct, eArray, eEnum, ePointer, eFunction, ePointerToMember
+		eUnknown, eBuiltin, eStruct, eArray, eEnum, ePointer, eFunction, ePointerToMember, eConst
 	};
 
 	enum PrintFormat {

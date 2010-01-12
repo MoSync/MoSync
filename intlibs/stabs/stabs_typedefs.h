@@ -230,7 +230,7 @@ public:
 	void printTypeMI(printfPtr, bool complex) const;
 	int size() const;
 	bool isSimpleValue() const;
-	Type type() const;
+	Type type() const { return eConst; }
 
 	const TypeBase* deref() const;
 
