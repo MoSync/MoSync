@@ -364,6 +364,15 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType) {
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
 
+		if(deref->type() == TypeBase::ePointer) {
+			const PointerType* pt = (const PointerType*)deref;
+			const TypeBase *t = pt->mTarget->resolve();
+			if(t->type() == TypeBase::eBuiltin) {
+				const Builtin* bi = (const Builtin*)t;
+				if(bi->mSubType == Builtin::eVTablePtr) continue;
+			}
+		}
+
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
 		Variable& virtualVar = children[virtualVarName];

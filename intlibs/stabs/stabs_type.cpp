@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stabs_typedefs.h"
 #include "stabs_types.h"
 #include "stabs_file.h"
+#include "stabs_builtins.h"
 
 using namespace std;
 
@@ -256,10 +257,21 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 
 		pf(" {\n");
 		for(size_t i=0; i<mDataMembers.size(); i++) {
+			const TypeBase* tb = mDataMembers[i].type->resolve();
+			
+			if(tb->type() == ePointer) {
+				const PointerType* pt = (const PointerType*)tb;
+				const TypeBase *t = pt->mTarget->resolve();
+				if(t->type() == eBuiltin) {
+					const Builtin* bi = (const Builtin*)t;
+					if(bi->mSubType == Builtin::eVTablePtr) continue;
+				}
+			}
+
+
 			//original GDB ptype uses "    ".
 			//any good parser should be able to handle a tab instead.
 			pf("\t");
-
 			mDataMembers[i].type->printTypeMI(pf, false);
 			if(mDataMembers[i].name.length() > 0) {
 				pf(" %s", mDataMembers[i].name.c_str());
