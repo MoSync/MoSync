@@ -115,7 +115,6 @@ const TypeBase* findTypeByNameAndFileGlobal(const std::string& name, int scope) 
 	return type->type;
 }
 
-
 const TypeBase* findTypeByNameAndTupleAndFileGlobal(const std::string& name, Tuple tuple, int scope) {
 	const TypeBase* t = findTypeByTupleAndFile(tuple, scope);
 	if(t) return t;

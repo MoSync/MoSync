@@ -36,8 +36,6 @@ class ExpressionTree;
 */
 
 namespace ExpressionCommon {
-
-
 	void loadMemory(int addr, int len);
 	void error(const char *msg);
 };

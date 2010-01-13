@@ -814,7 +814,10 @@ int evaluateThread(void* data) {
 			}
 
 			if(deref) {
-				ExpressionCommon::loadMemory((int)sReturnValue, deref->size());
+				int addr = (int)sReturnValue;
+				int len = deref->size();
+				if(addr > 0 && addr+len <= gMemSize)
+					ExpressionCommon::loadMemory(addr, len);
 			}
 		}
 
@@ -860,6 +863,7 @@ void memoryLoaded() {
 
 void ExpressionCommon::loadMemory(int addr, int len) {
 	if(addr == 0) ExpressionCommon::error("Trying to load memory from NULL");
+
 	DebuggerEvent *evnt = new DebuggerEvent;
 	evnt->type = DebuggerEvent::eReadMemory;
 	evnt->src = addr;

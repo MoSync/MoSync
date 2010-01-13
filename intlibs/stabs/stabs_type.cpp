@@ -109,22 +109,22 @@ DelayedType::~DelayedType() {
 }
 
 void DelayedType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	mType->printMI(pf, data, fmt);
+	mType->resolve()->printMI(pf, data, fmt);
 }
 void DelayedType::printTypeMI(printfPtr pf, bool complex) const {
-	mType->printTypeMI(pf, complex);
+	mType->resolve()->printTypeMI(pf, complex);
 }
 const TypeBase* DelayedType::deref() const {
-	return mType->deref();
+	return mType->resolve()->deref();
 }
 const TypeBase* DelayedType::resolve() const {
-	return mType;
+	return mType->resolve();
 }
 
 bool DelayedType::resolveAll() {
 	for(size_t i=0; i<sDelayed.size(); i++) {
 		DelayedType* d(sDelayed[i]);
-		const TypeBase* tb = ((TypeReference*)d->mType)->resolve();
+		const TypeBase* tb = d->resolve(); //((TypeReference*)d->mType)->resolve();
 		if(tb != NULL) {
 			FAILIF(d == tb);
 			d->mType = tb;
@@ -151,8 +151,39 @@ const TypeBase* TupleReference::resolve() const {
 CrossReferenceType::CrossReferenceType(Tuple id, const char* name)
 : TupleReference(id), mName(name)
 {}
+
+class UnknownType : public TypeBase {
+	int size() const {
+		return 0;
+	}
+
+	bool isSimpleValue() const {
+		return true;
+	}
+
+	Type type() const {
+		return eUnknown;
+	}
+
+	void printMI(printfPtr pfptr, const void* data, PrintFormat pf) const {
+		pfptr("%s", "?");
+	}
+
+	//if complex && !isSimpleValue, then members will be printed.
+	//multiple lines will be used for structs.
+	//enums will be printed on single lines.
+	void printTypeMI(printfPtr pf, bool complex) const {
+		pf("%s", "UnknownType");
+	}
+};
+
 const TypeBase* CrossReferenceType::resolve() const {
-	return findTypeByNameAndFileGlobal(mName, mFile);
+	const TypeBase* tb = findTypeByNameAndFileGlobal(mName, mFile);
+	//const TypeBase* tb = findTypeByNameAndTupleAndFileGlobal(mName, mId, mFile);
+	if(!tb) {
+		return new UnknownType();
+	}
+	return tb;
 }
 
 PointerType::PointerType(const TypeBase* target) : mTarget(target) {
@@ -260,9 +291,12 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 			const TypeBase* tb = mDataMembers[i].type->resolve();
 			
 			if(tb->type() == ePointer) {
+				if(mName == "Widget") {
+					int a = 2;
+				}
 				const PointerType* pt = (const PointerType*)tb;
 				const TypeBase *t = pt->mTarget->resolve();
-				if(t->type() == eBuiltin) {
+				if(t && t->type() == eBuiltin) {
 					const Builtin* bi = (const Builtin*)t;
 					if(bi->mSubType == Builtin::eVTablePtr) continue;
 				}
