@@ -30,7 +30,7 @@ struct Key {
 struct Skin {
 	std::string model;
 	std::string vendor;
-	int screenX, screenY, screenW, screenH;
+	short screenX, screenY, screenW, screenH;
 	std::vector<Key> keys;
 	std::string selectedImage;
 	std::string unselectedImage;

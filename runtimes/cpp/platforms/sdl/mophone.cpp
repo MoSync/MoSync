@@ -62,15 +62,15 @@ static Button buttons[NUM_BUTTONS] = {
 };
 */
 
-static int mophoneScreenX = 18;
-static int mophoneScreenY = 44;
-static int mophoneScreenW = 240;
-static int mophoneScreenH = 320;
+static Sint16 mophoneScreenX = 18;
+static Sint16 mophoneScreenY = 44;
+static Uint16 mophoneScreenW = 240;
+static Uint16 mophoneScreenH = 320;
 
 static Skin *sSkin = NULL;
-static int mophoneScale = -1;
-static int realScreenStartX = 0;
-static int realScreenStartY = 0;
+static Sint16 mophoneScale = -1;
+static Sint16 realScreenStartX = 0;
+static Sint16 realScreenStartY = 0;
 
 static bool hasMophone = false;
 
@@ -227,11 +227,11 @@ bool initMophoneScreen(Skin* skin, SDL_Surface **gScreen, int w, int h, bool sho
 			SDL_FreeSurface(surf);
 		}
 
-		SDL_Rect srcRect = {0, 0, mophone_unselected->w, mophone_unselected->h};
+		SDL_Rect srcRect = {0, 0, (Uint16)mophone_unselected->w, (Uint16)mophone_unselected->h};
 		pixelDoubledBlit(0, 0, *gScreen, mophone_unselected, srcRect, mophoneScale);	
 	
-		SDL_Rect dstRect = {mophoneScreenX*mophoneScale, mophoneScreenY*mophoneScale, 
-			mophoneScreenW*mophoneScale, mophoneScreenH*mophoneScale};
+		SDL_Rect dstRect = {(Sint16)(mophoneScreenX*mophoneScale), (Sint16)(mophoneScreenY*mophoneScale), 
+			(Uint16)(mophoneScreenW*mophoneScale), (Uint16)(mophoneScreenH*mophoneScale)};
 		SDL_FillRect(*gScreen, &dstRect, 0xff6f6f6f);
 		SDL_UpdateRect(*gScreen, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
 	}
@@ -243,12 +243,12 @@ void drawButtonMophone(SDL_Surface *gScreen, int mak, bool pressed) {
 	if(!hasMophone) return;
 
 	for(size_t i = 0; i < sSkin->keys.size(); i++) {
-		if(sSkin->keys[i].keyCode  == mak) {
+		if(sSkin->keys[i].keyCode == mak) {
 			SDL_Rect srcRect = {
-				sSkin->keys[i].x,
-				sSkin->keys[i].y,
-				sSkin->keys[i].w,
-				sSkin->keys[i].h
+				(Sint16)sSkin->keys[i].x,
+				(Sint16)sSkin->keys[i].y,
+				(Uint16)sSkin->keys[i].w,
+				(Uint16)sSkin->keys[i].h
 			};
 
 			if(pressed) {

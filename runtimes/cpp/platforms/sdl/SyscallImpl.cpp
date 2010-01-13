@@ -604,7 +604,7 @@ namespace Base {
 
 	static void MAUpdateScreen() {
 #ifndef MOBILEAUTHOR
-		SDL_Rect srcRect = {0, 0, gBackBuffer->w, gBackBuffer->h};
+		SDL_Rect srcRect = {0, 0, (Uint16)gBackBuffer->w, (Uint16)gBackBuffer->h};
 		pixelDoubledBlit(getMophoneRealScreenStartX(), getMophoneRealScreenStartY(), gScreen, gBackBuffer, srcRect, gScreenMultiplier);
 		/*
 		//stretch the backbuffer onto the screen
@@ -1004,7 +1004,7 @@ namespace Base {
 		SDL_drawLine(gDrawSurface, startX, startY, endX, endY, gCurrentConvertedColor);
 	}
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
-		SDL_Rect rect = { left,top,width,height };
+		SDL_Rect rect = { (Sint16)left, (Sint16)top, (Uint16)width, (Uint16)height };
 		DEBUG_ASRTZERO(SDL_FillRect(gDrawSurface, &rect, gCurrentConvertedColor));
 	}
 
@@ -1068,13 +1068,13 @@ namespace Base {
 		}
 		//LOG("DT %s\n", str);
 		int argb = gCurrentUnconvertedColor;
-		SDL_Color color = { (argb >> 16) & 0xff, (argb >> 8) & 0xff, argb & 0xff, 0 };
+		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
 		SDL_Surface* text_surface = TTF_RenderText_Solid(gFont, str, color);
 		if(!text_surface) {
 			BIG_PHAT_ERROR(SDLERR_TEXT_RENDER_FAILED);
 		}
-		SDL_Rect rect = { left,top,0,0 };
-		SDL_BlitSurface(text_surface,NULL,gDrawSurface,&rect);
+		SDL_Rect rect = { (Sint16)left, (Sint16)top, 0, 0 };
+		SDL_BlitSurface(text_surface, NULL, gDrawSurface, &rect);
 		SDL_FreeSurface(text_surface);
 	}
 	SYSCALL(void, maUpdateScreen()) {
@@ -1092,7 +1092,7 @@ namespace Base {
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
-		SDL_Rect rect = { left, top, 0, 0 };
+		SDL_Rect rect = { (Sint16)left, (Sint16)top, 0, 0 };
 		SDL_BlitSurface(surf, NULL, gDrawSurface, &rect);
 		/*
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
@@ -1112,8 +1112,10 @@ namespace Base {
 		//Fredrik: all memory access must be validated. clipping is irrelevant.
 		SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*srcRect->height*scanlength);
 
-		SDL_Rect srcSurfaceRect = { srcRect->left, srcRect->top, srcRect->width, srcRect->height};
-		SDL_Rect dstSurfaceRect = { dstPoint->x, dstPoint->y, srcRect->width, srcRect->height};
+		SDL_Rect srcSurfaceRect = { (Sint16)srcRect->left, (Sint16)srcRect->top,
+			(Uint16)srcRect->width, (Uint16)srcRect->height};
+		SDL_Rect dstSurfaceRect = { (Sint16)dstPoint->x, (Sint16)dstPoint->y,
+			(Uint16)srcRect->width, (Uint16)srcRect->height};
 		SDL_Surface* srcSurface = SDL_CreateRGBSurfaceFrom((void*)src, 
 			srcSurfaceRect.w, srcSurfaceRect.h, 32, scanlength<<2, 
 			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -1384,8 +1386,8 @@ namespace Base {
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		CHECK_INT_ALIGNMENT(src);
-		SDL_Rect srcRect = { src->left, src->top, src->width, src->height};
-		SDL_Rect dstRect = { 0, 0, src->width, src->height};
+		SDL_Rect srcRect = { (Sint16)src->left, (Sint16)src->top, (Uint16)src->width, (Uint16)src->height};
+		SDL_Rect dstRect = { 0, 0, (Uint16)src->width, (Uint16)src->height};
 
 		gSyscall->ValidateMemRange(dst, sizeof(int)*scanlength*src->height);
 		CHECK_INT_ALIGNMENT(dst);
@@ -1677,8 +1679,8 @@ namespace Base {
 		int tw = tileSet->tileWidth;
 		int th = tileSet->tileHeight;
 		int tileSetWidth = surf->w / tw;
-		SDL_Rect srcRect =	{0,0,tw,th};
-		SDL_Rect destRect =	{0,0,tw,th};
+		SDL_Rect srcRect = { 0, 0, (Uint16)tw, (Uint16)th };
+		SDL_Rect destRect = { 0, 0, (Uint16)tw, (Uint16)th };
 		for(row = 0; row < tileMap->tileMapHeight; row++)
 		{
 			dx = offsetX;
