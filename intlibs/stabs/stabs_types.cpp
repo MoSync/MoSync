@@ -30,13 +30,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-//static set<Type> sTypeSet;
+struct type_name_less : public binary_function<Type, Type, bool> {
+	bool operator()(const Type& _Left, const Type& _Right) const {
+		return (_Left.name < _Right.name);
+	}
+};
+
+typedef set<Type, type_name_less> TypeNameSet;
+
 static vector<set<Type> > sTypeSets;
+static vector<TypeNameSet> sTypeNameSets;
 static vector<std::string> sTypeFiles;
 
 void addTypeFile(int file, const std::string& fileName) {
 	if(file >= (int)sTypeSets.size()) {
 		sTypeSets.resize(file + 1);
+		sTypeNameSets.resize(file + 1);
 		sTypeFiles.resize(file + 1);
 	}
 
@@ -46,7 +55,9 @@ void addTypeFile(int file, const std::string& fileName) {
 void addType(const Type& s) {
 	//LOG("addType(%i,%i)\n", s.id.a, s.id.b);
 	pair<set<Type>::iterator, bool> res = sTypeSets[gCurrentFile].insert(s);
-	if(!res.second) {	//tuple already defined. it must be a delayed type.
+	if(res.second) {
+		sTypeNameSets[gCurrentFile].insert(s);
+	} else {	//tuple already defined. it must be a delayed type.
 		Type t = *res.first;
 		DEBUG_ASSERT(t.type->type() == TypeBase::eUnknown);
 		DEBUG_ASSERT(t.id == s.id);
@@ -56,16 +67,27 @@ void addType(const Type& s) {
 		temp++;
 		sTypeSets[gCurrentFile].erase(res.first);
 		sTypeSets[gCurrentFile].insert(temp, t);
+		sTypeNameSets[gCurrentFile].erase(s);
+		sTypeNameSets[gCurrentFile].insert(t);
 	}
 }
 
 const Type* stabsFindTypeByName(const std::string& name, int scope) {
 	if((size_t)scope>=sTypeSets.size() || scope<0) return NULL;
+#if 0
 	set<Type>::const_iterator itr = sTypeSets[scope].begin();
 	for(;itr!=sTypeSets[scope].end(); itr++) {
 		if((*itr).name == name) return &(*itr);
 	}
 	return NULL;
+#endif
+	Type t;
+	t.name = name;
+	TypeNameSet::const_iterator itr = sTypeNameSets[scope].find(t);
+	if(itr == sTypeNameSets[scope].end())
+		return NULL;
+	else
+		return &(*itr);
 }
 
 const TypeBase* findTypeByNameAndFileGlobal(const std::string& name, int scope) {

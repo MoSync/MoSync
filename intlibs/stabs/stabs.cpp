@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define CONFIG_H
 
 #include "helpers/helpers.h"
+#include "helpers/timer.h"
 
 #include "sld.h"
 
@@ -69,17 +70,24 @@ void addFile(int file,const std::string& fileName) {
 
 bool loadStabs(const char* sld, const char* stabs) {
 	gCurrentFile = -1;
-	TEST(loadSLD(sld));
-	ifstream in(stabs);
-	string line;
-	while(in.good()) {
-		getline(in, line);
-		if(!in.good())
-			break;
-		TEST(parseStabLine(line));
+	{
+		Timer t("loadSLD");
+		TEST(loadSLD(sld));
 	}
-	gCurrentFile = -1;
-	TEST(in.eof());
+	{
+		Timer t("parseStabs");
+		ifstream in(stabs);
+		string line;
+		while(in.good()) {
+			getline(in, line);
+			if(!in.good())
+				break;
+			TEST(parseStabLine(line));
+		}
+		gCurrentFile = -1;
+		TEST(in.eof());
+	}
+	Timer t("resolveAll");
 	TEST(DelayedType::resolveAll());
 	return sLoaded = true;
 }

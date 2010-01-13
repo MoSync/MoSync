@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project supports-build-configs="true">
 <target-profile device="Emulator" vendor="MobileSorcery"/>
+<build.cfg active="true" id="Debug"/>
+<build.cfg id="Release"/>
 <criteria/>
 <properties>
-<property key="build.prefs:extra.link.sw" value="-datasize=256000 -heapsize=128000"/>
-<property key="build.prefs:extra.res.sw" value=""/>
-<property key="build.prefs:additional.libraries" value="MAUI.lib, MAUtil.lib"/>
-<property key="build.prefs:additional.library.paths" value=""/>
-<property key="build.prefs:project.type" value=""/>
 <property key="build.prefs:additional.include.paths" value=""/>
+<property key="build.prefs:additional.libraries" value="MAUI.lib, MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUID.lib, MAUtilD.lib"/>
+<property key="build.prefs:additional.library.paths" value=""/>
+<property key="build.prefs:extra.link.sw" value="-datasize=256000 -heapsize=128000"/>
+<property key="build.prefs:extra.link.sw/Debug" value="-datasize=256000 -heapsize=128000 -master-dump"/>
+<property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="last.build.config" value="Debug"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0a88cac6"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xec450e0d"/>
 </properties>
 </project>
