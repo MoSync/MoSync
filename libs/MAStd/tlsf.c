@@ -52,7 +52,7 @@
 /*#define USE_SBRK        (0) */
 /*#define USE_MMAP        (0) */
 
-#include <stdio.h>
+#include <conprint.h>
 #include <mastring.h>
 
 #ifndef TLSF_USE_LOCKS
