@@ -188,7 +188,7 @@ end
 
 class String
 	def format
-		return gsub(/[\-\.\s]/, "_").upcase();
+		return gsub(/[^a-zA-Z0-9_]/, "_").upcase();
 	end
 end
 
