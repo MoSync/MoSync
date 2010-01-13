@@ -36,13 +36,6 @@ extern "C" {
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-
-// fix for a weird bug with gcc 4.4.1
-#include <stdio.h>
-#ifndef FILE
-#define FILE void
-#endif
-	
 #include <malloc.h>
 #else
 
