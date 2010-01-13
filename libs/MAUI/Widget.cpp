@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 //#include <mavsprintf.h>
 #include <MAUtil/Vector.h>
-#include <stdio.h>
 #include "Engine.h"
 #include <MAUtil/Graphics.h>
 #include <MAUtil/util.h>

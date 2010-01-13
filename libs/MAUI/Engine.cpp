@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include "Engine.h"
 #include <maheap.h>
-#include <stdio.h>
 #include <mastring.h>
 #include <mastdlib.h>
 

@@ -233,7 +233,7 @@ class FileTask < Task
 		if File.exist?(@NAME)
 			File.mtime(@NAME)
 		else
-			EARLY
+			LATE
 		end
 	end
 	
