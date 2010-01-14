@@ -80,11 +80,11 @@ buildTemplate()
 	echo "Performing rake clean"
 	echo "---------------------------------\n"
 	cd $path/../../../../../
-#	if [ "$1" = "rel" ]; then
-#		rake clean CONFIG=""
-#	else
-#		rake clean
-#	fi
+	if [ "$1" = "rel" ]; then
+		rake clean CONFIG=""
+	else
+		rake clean
+	fi
 	echo "\nOK"
 
 	echo "\n\n---------------------------------"
