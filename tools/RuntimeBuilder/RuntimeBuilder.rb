@@ -86,6 +86,7 @@ require ARGV[0]
 require "BuildJavaME.rb"
 require "BuildS60.rb"
 require "BuildWinCE.rb"
+require "BuildAndroid.rb"
 
 runtime_builder = RuntimeBuilder.new
 runtime_builder.build(ARGV[1].downcase, ARGV[2])

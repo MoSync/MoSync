@@ -20,6 +20,7 @@ $SETTINGS = {
 	:wince_source => "../../runtimes/cpp/platforms/winmobile/",
 
 	:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
+	:android_sdk => "C:\\android-sdk-windows-1.5_r3\platforms\android-1.5\\",
 	
 	:verbose => false,
 }
