@@ -10,9 +10,9 @@ then
 		then
 			list="\"$l\""
 		else
-			list="$list \"$l\""
+			list="$list, \"$l\""
 		fi
 
 	done
-	echo "\"requires\" : [$list]"	
+	echo $list	
 fi
