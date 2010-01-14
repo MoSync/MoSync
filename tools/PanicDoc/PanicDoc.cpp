@@ -29,8 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../runtimes/cpp/platforms/sdl/windows_errors.h"
 #include "../runtimes/cpp/platforms/symbian/inc/symbian_errors.h"
 #include "../../runtimes/cpp/platforms/winmobile/wce_errors.h"
+#include <net/net_errors.h>
 
-#define ERROR_SETS(m) m(HELPERS) m(BASE) m(SDL) m(BT) m(WINDOWS) m(SYMBIAN) m(WCE)
+#define ERROR_SETS(m) m(HELPERS) m(BASE) m(SDL) m(BT) m(WINDOWS) m(SYMBIAN) m(WCE) m(NET)
 
 #include <helpers/errors_inline.h>
 
