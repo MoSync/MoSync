@@ -20,8 +20,6 @@ private:
 Image* loadImage(MemStream& s);
 Image* loadSprite(void* surface, ushort left, ushort top,
 	ushort width, ushort height, ushort cx, ushort cy);
-TileSet* loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight);
-TileMap* loadTileMap(MemStream& s, ushort width, ushort height);
 
 public:
 	Syscall(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd);

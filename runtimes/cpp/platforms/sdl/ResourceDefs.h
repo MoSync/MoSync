@@ -20,13 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <SDL/SDL.h>
 #include "../../base/Stream.h"
-#include "tile.h"
 
 #define TYPES(m)\
 	m(RT_BINARY, Base::Stream, delete)\
 	m(RT_PLACEHOLDER, void, NULA)\
-	m(RT_TILESET, TileSet, delete) \
-	m(RT_TILEMAP, TileMap, delete) \
 	m(RT_LABEL, Label, delete) \
 	m(RT_IMAGE, SDL_Surface, SDL_FreeSurface)\
 	m(RT_FLUX, void, NULA)\

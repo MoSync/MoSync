@@ -40,8 +40,6 @@
 @IF NOT %MA_ERRORLEVEL%==0 goto TOOL_ERROR
 @call build_example . MoTrix
 @IF NOT %MA_ERRORLEVEL%==0 goto TOOL_ERROR
-@call build_example . Tiles
-@IF NOT %MA_ERRORLEVEL%==0 goto TOOL_ERROR
 @call build_example . MoTris
 @IF NOT %MA_ERRORLEVEL%==0 goto TOOL_ERROR
 

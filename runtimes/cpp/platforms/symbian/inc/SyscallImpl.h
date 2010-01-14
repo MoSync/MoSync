@@ -99,8 +99,6 @@ private:
 	TAlphaBitmap* loadImage(MemStream& s);
 	TAlphaBitmap* loadSprite(TAlphaBitmap* image, ushort left, ushort top,
 		ushort width, ushort height, ushort cx, ushort cy);
-	TileSet* loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight);
-	TileMap* loadTileMap(MemStream& s, ushort width, ushort height);
 
 private:
 	TInt gMicroSecondsPerTick;

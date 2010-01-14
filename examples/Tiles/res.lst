@@ -1,7 +1,0 @@
-// the tileset consisting of 16x16 tiles
-.res R_TILESET
-.tileset "tileset.png", 16, 16
-
-// just an empty 1x1 tilemap (so that we can make a tile layer, and generate the values for it)
-.res R_TILEMAP
-.tilemap "tilemap.bin", 1, 1

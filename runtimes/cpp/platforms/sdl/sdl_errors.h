@@ -21,7 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(SDLERR_MOSYNCDIR_NOT_FOUND, "Environment variable MOSYNCDIR could not be found")\
 	m(SDLERR_IMAGE_LOAD_FAILED, "Failed to load image")\
 	m(SDLERR_SPRITE_LOAD_FAILED, "Failed to load sprite")\
-	m(SDLERR_TILESET_LOAD_FAILED, "Failed to load tileset")\
 	m(SDLERR_SCREEN_NOT_32BIT, "The screen is not set to 32-bit color depth")\
 	m(SDLERR_UNDEFINED_KEYCODE, "Undefined keycode")\
 	m(SDLERR_TEXT_SIZE_FAILED, "Failed to calculate text size")\

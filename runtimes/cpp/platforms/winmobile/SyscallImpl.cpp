@@ -40,7 +40,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MemStream.h>
 #include <FileStream.h>
 #include "Syscall.h"
-#include "tile.h"
 #include "TextOutput.h"
 #include "ImageLoad.h"
 #include <helpers/CPP_IX_GUIDO.h>
@@ -225,16 +224,6 @@ namespace Base {
 		ushort width, ushort height, ushort cx, ushort cy) 
 	{
 		return NULL;
-	}
-	
-	TileSet* Syscall::loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight) 
-	{
-		int len;
-		TEST(s.length(len));
-		Image* bitmap;
-		if(loadImageFromStream(&bitmap, s.ptrc(), len)!=S_OK)
-			MYASSERT(0, WCEERR_TILESET_LOAD_FAILED);
-		return new TileSet(bitmap, tileWidth, tileHeight);
 	}
 	
 	//***************************************************************************
@@ -1822,39 +1811,6 @@ DWORD GetScreenOrientation()
 			return 0;
 		} else {
 			return IOCTL_UNAVAILABLE;
-		}
-	}
-
-	SYSCALL(void, maDrawLayer(MAHandle layer, int offsetX, int offsetY)) 
-	{
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);	
-		if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-		TileSet *tileSet = SYSCALL_THIS->gTileLayer[layer].tileSet;
-		TileMap *tileMap = SYSCALL_THIS->gTileLayer[layer].tileMap;
-		int tw = tileSet->tileWidth;
-		int th = tileSet->tileHeight;
-		int tileSetWidth = tileSet->tileSet->width/tw;
-		unsigned short *tileMapPtr = tileMap->tileMap;
-		int x = offsetX;
-		int y = offsetY;
-		for(int j = 0; j < tileMap->tileMapHeight; j++) {
-			x = offsetX;
-			for(int i = 0; i < tileMap->tileMapWidth; i++) {
-				unsigned short index = *tileMapPtr++;
-				if(index!=0) {
-					index--;
-					int u = (index%tileSetWidth)*tw;
-					int v = (index/tileSetWidth)*th;
-					Rect rect = {u, v, tw, th};
-					if(x > currentDrawSurface->clipRect.x - tw &&
-					   x < currentDrawSurface->clipRect.x + currentDrawSurface->clipRect.width + tw &&
-					   y > currentDrawSurface->clipRect.y - th &&
-					   y < currentDrawSurface->clipRect.y + currentDrawSurface->clipRect.height + th)
-						currentDrawSurface->drawImageRegion(x, y, &rect, tileSet->tileSet, TRANS_NONE);
-				}
-				x+=tw;
-			}
-			y+=th;
 		}
 	}
 

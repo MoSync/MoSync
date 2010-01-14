@@ -43,12 +43,6 @@ namespace Base {
 	uint size_RT_LABEL(Label* r) {
 		return sizeof(Label) + strlen(r->getName());
 	}
-	uint size_RT_TILEMAP(TileMap* r) {
-		return sizeof(TileMap) + r->tileMapSize * sizeof(short);
-	}
-	uint size_RT_TILESET(TileSet* r) {
-		return sizeof(TileSet) + size_RT_IMAGE(r->tileSet);
-	}
 	uint size_RT_BINARY(Stream* r) {
 		if(r->ptrc() == NULL)
 			return 0;
@@ -66,31 +60,11 @@ namespace Base {
 #endif
 
 	void Syscall::init() {
-		int i;
-		for(i = 0; i < MAX_TILE_LAYERS; i++)
-		{
-			gTileLayer[i].tileMap = NULL;
-			gTileLayer[i].tileSet = NULL;
-			gTileLayer[i].active = false;
-		}
 	}
 
 	Syscall::~Syscall() {
 		LOGD("~Syscall\n");
 		platformDestruct();
-
-		for(int i = 0; i < MAX_TILE_LAYERS; i++)
-		{
-			if(gTileLayer[i].active)
-			{
-				gTileLayer[i].active = false;
-				if(gTileLayer[i].tileMap) 
-				{
-					delete gTileLayer[i].tileMap;
-					gTileLayer[i].tileMap = NULL;
-				}
-			}
-		}
 	}
 
 	bool Syscall::loadResources(Stream& file, const char* aFilename)  {
@@ -171,24 +145,6 @@ namespace Base {
 						left, top, width, height, cx, cy)));
 				}
 				break;	
-			case RT_TILESET:
-				{
-					DAR_USHORT(tileWidth);
-					DAR_USHORT(tileHeight);
-					MemStream b(size-4);
-					TEST(file.readFully(b));
-					ROOM(resources.dadd_RT_TILESET(rI, loadTileSet(b, tileWidth, tileHeight)));								
-				}
-				break;
-			case RT_TILEMAP:
-				{
-					DAR_USHORT(tileMapWidth);
-					DAR_USHORT(tileMapHeight);
-					MemStream b(size-4);
-					TEST(file.readFully(b));
-					ROOM(resources.dadd_RT_TILEMAP(rI, loadTileMap(b, tileMapWidth, tileMapHeight)));		
-				}
-				break;
 			case RT_LABEL:
 				{
 					MemStream b(size);
@@ -223,10 +179,6 @@ namespace Base {
 		}
 		LOG_RES("ResLoad complete\n");
 		return true;
-	}
-
-	TileMap* Syscall::loadTileMap(MemStream& s, ushort width, ushort height) {
-		return new TileMap(s.ptr(), width, height);
 	}
 }	//namespace Base
 
@@ -498,110 +450,6 @@ namespace Base {
 		SYSCALL_THIS->VM_Yield();
 		LOG("Exit %i\n", result);
 		MoSyncExit(result);
-	}
-
-	SYSCALL(MAHandle, maInitLayer(MAHandle tileResource, MAHandle mapResource, int layerSizeX, int layerSizeY)) {
-		MAHandle layer;
-		for(layer = 0; layer < MAX_TILE_LAYERS; layer++)
-		{
-			if(SYSCALL_THIS->gTileLayer[layer].active == false)
-			{
-				break;
-			}
-		}
-		MYASSERT(layer < MAX_TILE_LAYERS, ERR_MAX_TILE_LAYERS);
-
-		TileMap *tileMapResource = SYSCALL_THIS->resources.get_RT_TILEMAP(mapResource);
-		TileSet *tileSet = SYSCALL_THIS->resources.get_RT_TILESET(tileResource);
-		SYSCALL_THIS->gTileLayer[layer].active = true;
-		SYSCALL_THIS->gTileLayer[layer].tileSet = tileSet;
-
-		unsigned short *tileMapData = new unsigned short[layerSizeX*layerSizeY];
-		MYASSERT(tileMapData, ERR_OOM);
-		::memset(tileMapData, 0, layerSizeX*layerSizeY*2);	
-		int right = layerSizeX<tileMapResource->tileMapWidth?layerSizeX:tileMapResource->tileMapWidth;
-		int bottom = layerSizeY<tileMapResource->tileMapHeight?layerSizeY:tileMapResource->tileMapHeight; 
-		int x,y;
-		unsigned short t;
-
-		for(y = 0; y < bottom; y++)
-		{
-			for(x = 0; x < right; x++)
-			{
-				t = tileMapResource->tileMap[x+y*tileMapResource->tileMapWidth];
-				tileMapData[x+y*layerSizeX]= t;
-			}
-		}
-
-		SYSCALL_THIS->gTileLayer[layer].tileMap = new TileMap(tileMapData, layerSizeX, layerSizeY);
-		delete []tileMapData;
-		return layer;
-	}
-
-	SYSCALL(void, maDisposeLayer(MAHandle layer)) {
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);
-		SYSCALL_THIS->gTileLayer[layer].active = false;
-		if(SYSCALL_THIS->gTileLayer[layer].tileMap) delete SYSCALL_THIS->gTileLayer[layer].tileMap;
-		SYSCALL_THIS->gTileLayer[layer].tileMap = NULL;
-		SYSCALL_THIS->gTileLayer[layer].tileSet = NULL;
-	}
-
-	SYSCALL(void, maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int destY)) {
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);
-		if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-		TileMap *src = SYSCALL_THIS->resources.get_RT_TILEMAP(srcMapResource);
-		TileMap *dst = SYSCALL_THIS->gTileLayer[layer].tileMap;
-
-		int x, y, sTop, sBottom, sLeft, sRight, dTop, dBottom, dLeft, dRight;
-
-		// the source and desination "rect"
-		sTop = 0; sBottom = src->tileMapHeight;
-		sLeft = 0; sRight = src->tileMapWidth;
-		dTop = destY; dBottom = destY+dst->tileMapHeight;
-		dLeft = destX; dRight = destX+dst->tileMapWidth;
-
-		// do the clipping stuff
-		if(dLeft>dst->tileMapWidth) return;
-		else if(dLeft<0) {sLeft = -destX; dLeft = 0;}
-		if(dTop>dst->tileMapHeight) return;
-		else if(dTop<0) {sTop = -destY; dTop = 0;}
-		if(dRight<0) return;
-		else if(dRight>dst->tileMapWidth) {sRight = src->tileMapWidth-(dRight-dst->tileMapWidth); dRight = dst->tileMapWidth;}
-		if(dBottom<0) return;
-		else if(dBottom>dst->tileMapHeight) {sBottom = src->tileMapHeight-(dBottom-dst->tileMapHeight); dBottom = dst->tileMapHeight;}
-
-		// initialize the src and dst index to the upper left corner
-		int dstIndex = dLeft + dTop*dst->tileMapWidth;
-		int srcIndex = sLeft + sTop*src->tileMapWidth;
-
-		for(y = dTop; y < dBottom; y++)
-		{
-			for(x = dLeft; x < dRight; x++)
-			{
-				dst->tileMap[dstIndex] = src->tileMap[srcIndex];
-				dstIndex++;
-				srcIndex++;
-			}
-			srcIndex-=dRight-dLeft;
-			srcIndex+=src->tileMapWidth;
-			dstIndex-=dRight-dLeft;
-			dstIndex+=dst->tileMapWidth;
-		}
-
-	}
-
-	SYSCALL(void, maChangeTileSet(MAHandle layer, MAHandle tileResource)) {
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);
-		if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-		TileSet *tileSet = SYSCALL_THIS->resources.get_RT_TILESET(tileResource);
-		SYSCALL_THIS->gTileLayer[layer].tileSet = tileSet;
-	}
-
-	SYSCALL(void, maSetTile(MAHandle layer, int x, int y, int tileNumber)) {
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);
-		if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-		TileMap *tileMap = SYSCALL_THIS->gTileLayer[layer].tileMap;
-		tileMap->tileMap[x+y*tileMap->tileMapWidth] = (unsigned short)tileNumber;
 	}
 
 	SYSCALL(int, maFindLabel(const char* name)) {

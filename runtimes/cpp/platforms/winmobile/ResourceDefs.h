@@ -20,14 +20,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <windows.h>
 #include "../../base/Stream.h"
-#include "tile.h"
 #include "Image.h"
 
 #define TYPES(m)\
 	m(RT_BINARY, Base::Stream, delete)\
 	m(RT_PLACEHOLDER, void, NUL)\
-	m(RT_TILESET, TileSet, delete) \
-	m(RT_TILEMAP, TileMap, delete) \
 	m(RT_LABEL, Label, delete) \
 	m(RT_IMAGE, Image, delete)\
 	m(RT_FLUX, void, NUL)\

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="JavaME"
 	ProjectGUID="{0430165F-29A5-4143-93B8-8BFC6A4BFE65}"
 	RootNamespace="MAVM"
@@ -146,14 +146,6 @@
 			</File>
 			<File
 				RelativePath=".\Shared\ThreadPool.jpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Shared\Tilemap.jpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Shared\Tileset.jpp"
 				>
 			</File>
 			<File

@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(WCEERR_SOUND_UNKNOWN_MIME, "Unknown mime type for sound media")\
 	m(WCEERR_IMAGE_LOAD_FAILED, "Failed to load image")\
 	m(WCEERR_SPRITE_LOAD_FAILED, "Failed to load sprite")\
-	m(WCEERR_TILESET_LOAD_FAILED, "Failed to load tileset")\
 	m(WCEERR_UNDEFINED_KEYCODE, "Undefined keycode")\
 	m(WCEERR_TEXT_SIZE_FAILED, "Failed to calculate text size")\
 	m(WCEERR_TEXT_RENDER_FAILED, "Failed to render text")\

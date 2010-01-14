@@ -23,8 +23,6 @@ public:
 SDL_Surface* loadImage(MemStream& s);
 SDL_Surface* loadSprite(SDL_Surface* surface, ushort left, ushort top,
 	ushort width, ushort height, ushort cx, ushort cy);
-TileSet* loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight);
-TileMap* loadTileMap(MemStream& s, ushort width, ushort height);
 
 public:
 	struct STARTUP_SETTINGS {

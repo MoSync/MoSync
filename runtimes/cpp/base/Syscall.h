@@ -23,7 +23,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ResourceArray.h"
 #include "Stream.h"
 #include "MemStream.h"
-#include "tile.h"
 
 #ifndef SYMBIAN
 #include <map>
@@ -77,9 +76,6 @@ namespace Base {
 #endif
 
 		ResourceArray resources;
-
-#define MAX_TILE_LAYERS 32
-		TileLayer gTileLayer[MAX_TILE_LAYERS];
 
 		void ValidateMemRange(const void* ptr, int size);
 		int ValidatedStrLen(const char* ptr);

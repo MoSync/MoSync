@@ -1349,46 +1349,6 @@ interface MAAPI {
 		char string[1];
 	}
 
-
-	// Tile API functions
-	/**
-	* Creates a tile layer with a reference to the tile set with the bitmap \a tileResource
-	* and a copy of the tile map \a mapResource. \a layerSizeX and \a layerSizeY sets the number of tiles 
-	* in each dimension of the tile layer. The tile map is copied to the tile layer and clipped to the 
-	* size of the layer. If the tile map resource is smaller than the requested tile layer the empty tile
-	* map elements of the layer will be filled with zeroes.
-	* Returns a handle to the tile layer.
-	*/
-	MAHandle maInitLayer(in MAHandle tileResource, in MAHandle mapResource, in int layerSizeX, in int layerSizeY);
-	
-	/**
-	* Disposes the specified tile layer, making its handle become a placeholder.
-	*/
-	void maDisposeLayer(in MAHandle layer);
-
-	/**
-	* Copies the tile map resource \a srcMapResource to the specified tile layer.
-	* \a destX and \a destY are the top-left destination coordinates.
-	*/
-	void maSetMap(in MAHandle layer, in MAHandle srcMapResource, in int destX, in int destY);
-	
-	/**
-	* Changes the tile set used for \a layer to \a tileResources.
-	*/
-	void maChangeTileSet(in MAHandle layer, in MAHandle tileResource);
-
-	/**
-	* Draws the \a layer using the top-left coordinates \a offsetX and \a offsetY.
-	*/
-	void maDrawLayer(in MAHandle layer, in int offsetX, in int offsetY);
-
-	/**
-	* Sets a single tile of the map used by \a layer to \a tileNumber
-	* at the coordinates \a x and \a y.
-	*/
-	void maSetTile(in MAHandle layer, in int x, in int y, in int tileNumber);
-
-
 	/**
 	* Starts playing a sound.
 	*

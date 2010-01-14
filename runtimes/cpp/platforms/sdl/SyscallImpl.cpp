@@ -59,7 +59,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <bluetooth/discovery.h>
 
 #include "Syscall.h"
-#include "tile.h"
 
 #include "fastevents.h"
 extern "C" {
@@ -442,22 +441,6 @@ namespace Base {
 		surf = SDL_DisplayFormatAlpha(surf);
 		MYASSERT(surf, SDLERR_SPRITE_LOAD_FAILED);
 		return surf;
-	}
-	
-	TileSet* Syscall::loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight) {
-		int size;
-		TEST(s.length(size));
-		SDL_RWops* rwops = SDL_RWFromConstMem(s.ptr(), size);
-		//SDL_Surface* surf = IMG_LoadPNG_RW(rwops);
-		SDL_Surface* surf = IMG_Load_RW(rwops, 0);
-		if(!surf) LOG("%s\n", IMG_GetError());
-
-		surf = SDL_DisplayFormatAlpha(surf);
-		MYASSERT(surf, SDLERR_TILESET_LOAD_FAILED);
-		TileSet *tileSet = new TileSet(surf, tileWidth, tileHeight);
-		MYASSERT(tileSet, SDLERR_TILESET_LOAD_FAILED);
-		SDL_FreeRW(rwops);
-		return tileSet;
 	}
 
 	//***************************************************************************
@@ -1667,43 +1650,6 @@ namespace Base {
 
 	SYSCALL(int, maVibrate(int)) {
 		return IOCTL_UNAVAILABLE;
-	}
-
-	SYSCALL(void, maDrawLayer(MAHandle layer, int offsetX, int offsetY)) {
-		if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);	
-		if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-		TileSet *tileSet = SYSCALL_THIS->gTileLayer[layer].tileSet;
-		TileMap *tileMap = SYSCALL_THIS->gTileLayer[layer].tileMap;
-		int row, col, tile=0, tileIndex,sx, sy, dx = offsetX, dy=offsetY;
-		SDL_Surface* surf = tileSet->tileSet;
-		int tw = tileSet->tileWidth;
-		int th = tileSet->tileHeight;
-		int tileSetWidth = surf->w / tw;
-		SDL_Rect srcRect = { 0, 0, (Uint16)tw, (Uint16)th };
-		SDL_Rect destRect = { 0, 0, (Uint16)tw, (Uint16)th };
-		for(row = 0; row < tileMap->tileMapHeight; row++)
-		{
-			dx = offsetX;
-			for(col = 0; col < tileMap->tileMapWidth; col++)
-			{	
-				tileIndex = tileMap->tileMap[tile++];
-				if(tileIndex!=0)
-				{
-					tileIndex--;
-					sx = tileIndex % tileSetWidth;
-					sy = tileIndex / tileSetWidth;
-					sx *= tw;
-					sy *= th;
-					srcRect.x = sx;
-					srcRect.y = sy;
-					destRect.x = dx;
-					destRect.y = dy;
-					SDL_BlitSurface(surf, &srcRect, gDrawSurface, &destRect);
-				}
-				dx+=tw;
-			}
-			dy+=th;
-		}
 	}
 
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {

@@ -512,12 +512,6 @@ TAlphaBitmap* Syscall::loadSprite(TAlphaBitmap* src, ushort left, ushort top,
 	return sprite;
 }
 
-TileSet* Syscall::loadTileSet(MemStream& s, ushort tileWidth, ushort tileHeight) {
-	TAlphaBitmap* image = loadImage(s);
-	TileSet *tileSet = new TileSet(image, tileWidth, tileHeight);
-	return tileSet;
-}
-
 //******************************************************************************
 //Proper syscalls
 //******************************************************************************
@@ -1668,45 +1662,6 @@ SYSCALL(void, maPanic(int MAPANIC_RESULT, const char* message)) {
 #endif
 	ShowAknErrorNoteThenExitL(*buf);
 	CleanupStack::PopAndDestroy(buf);
-}
-
-SYSCALL(void, maDrawLayer(MAHandle layer, int offsetX, int offsetY)) {
-	if((layer<0)||(layer>=MAX_TILE_LAYERS)) BIG_PHAT_ERROR(ERR_TILE_LAYER_HANDLE);	
-	if(SYSCALL_THIS->gTileLayer[layer].active==false) BIG_PHAT_ERROR(ERR_TILE_LAYER_INACTIVE);
-	TileSet *tileSet = SYSCALL_THIS->gTileLayer[layer].tileSet;
-	TileMap *tileMap = SYSCALL_THIS->gTileLayer[layer].tileMap;
-	int row, col, tile=0, tileIndex,sx, sy, dx = offsetX, dy=offsetY;
-	TAlphaBitmap* bmp = tileSet->tileSet;
-	int tw = tileSet->tileWidth;
-	int th = tileSet->tileHeight;
-	const TSize& bmpSize = bmp->Color()->SizeInPixels();
-	int tileSetWidth = bmpSize.iWidth / tw;
-	TRect srcRect;
-	TPoint destPoint(0,0);
-	for(row = 0; row < tileMap->tileMapHeight; row++)
-	{
-		dx = offsetX;
-		for(col = 0; col < tileMap->tileMapWidth; col++)
-		{	
-			tileIndex = tileMap->tileMap[tile++];
-			if(tileIndex!=0)
-			{
-				tileIndex--;
-				sx = tileIndex % tileSetWidth;
-				sy = tileIndex / tileSetWidth;
-				sx *= tw;
-				sy *= th;
-				srcRect.iTl.iX = sx;
-				srcRect.iTl.iY = sy;
-				srcRect.iBr = srcRect.iTl + TPoint(tw,th);
-				destPoint.iX = dx;
-				destPoint.iY = dy;
-				gScreenEngine.DrawImage(bmp, srcRect, destPoint, TRANS_NONE);
-			}
-			dx+=tw;
-		}
-		dy+=th;
-	}
 }
 
 SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {

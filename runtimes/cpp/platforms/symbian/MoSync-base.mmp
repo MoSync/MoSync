@@ -47,7 +47,6 @@ SOURCE            Syscall.cpp
 SOURCE            Stream.cpp
 SOURCE            MemStream.cpp
 SOURCE            FileStream.cpp
-SOURCE            tile.cpp
 
 LIBRARY           euser.lib
 LIBRARY           apparc.lib

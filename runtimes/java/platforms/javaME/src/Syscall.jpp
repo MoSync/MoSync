@@ -195,7 +195,6 @@ IMPLEMENTS MoSync
 	//private stuff
 	Object[] mResourceArray, mDynamicResArray;
 	int mDynamicSize;
-	Vector mTiledLayers = new Vector();
 
 	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
 
@@ -378,32 +377,6 @@ IMPLEMENTS MoSync
 							left, top, width, height, TRANS_NONE));
 					}
 					break;
-				case RT_TILESET:
-					{
-						int tileSizeX = file.readUnsignedShort();
-						int tileSizeY = file.readUnsignedShort();
-						byte[] b = new byte[size-4];
-						file.readFully(b);
-						resourceArray[rI] = new Tileset(Image.createImage(b, 0, b.length), tileSizeX, tileSizeY);
-					}
-					break;	  
-				case RT_TILEMAP:
-					{
-						// read stuff
-						//resourceArray[rI] = ...
-						int mapWidth  = file.readUnsignedShort();
-						int mapHeight = file.readUnsignedShort();
-
-						Tilemap tilemap = new Tilemap(mapWidth, mapHeight);
-
-						for(int i = 0; i < mapWidth*mapHeight; i++) {
-							tilemap.values[i] = file.readShort();
-						}
-
-						//tilemaps.
-						resourceArray[rI] = tilemap;
-					}
-					break;	  
 				case RT_SKIP:
 					MYASSERT(size == 0);
 					break;
@@ -1136,69 +1109,6 @@ public
 
 		mGraphics.drawRegion(img, srcRect_left, srcRect_top, srcRect_width, srcRect_height,
 			transformMode, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
-	}
-
-
-	SYSCALL(MAHandle) maInitLayer(MAHandle tileResource, MAHandle mapResource,
-		int layerSizeX, int layerSizeY)
-	{
-		Tileset tileset = (Tileset)getResource(tileResource);
-
-		TiledLayer layer = new TiledLayer(layerSizeX, layerSizeY, tileset.image,
-			tileset.tileSizeX, tileset.tileSizeY);
-
-		mTiledLayers.addElement(layer);
-		MAHandle ret = mTiledLayers.size()-1;
-
-		maSetMap(ret, mapResource, 0, 0);
-
-		return ret;
-	}
-
-	SYSCALL(void) maDisposeLayer(MAHandle layer) {
-		mTiledLayers.setElementAt(null, layer);
-	}
-
-	SYSCALL(void) maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int destY) {													
-		Tilemap map = (Tilemap)getResource(srcMapResource);
-		TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-
-		int tileSizeX = destLayer.getCellWidth();
-		int tileSizeY = destLayer.getCellHeight();
-
-		int layerWidth = destLayer.getColumns();
-		int layerHeight = destLayer.getRows();
-
-		int xStart = MAX(destX,0);
-		int xEnd = MAX(MIN(destX + map.width, layerWidth), 0);
-		int yStart = MAX(destY,0);
-		int yEnd = MAX(MIN(destY + map.height, layerHeight), 0);
-
-		int srcOffX = - destX;
-		int srcOffY = - destY;
-
-		for(int i = yStart; i < yEnd; i++) {
-			for(int j = xStart; j < xEnd; j++) {
-				destLayer.setCell(j, i, map.getValue(j + srcOffX, i + srcOffY));
-			}
-		}
-	}
-
-	SYSCALL(void) maChangeTileSet(MAHandle layer, MAHandle tileResource) {
-		TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-		Tileset tileset = (Tileset)getResource(tileResource);
-		destLayer.setStaticTileSet(tileset.image, tileset.tileSizeX, tileset.tileSizeY);
-	}
-
-	SYSCALL(void) maDrawLayer(MAHandle layer, int offsetX, int offsetY) {
-		TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-		destLayer.setPosition(offsetX, offsetY);
-		destLayer.paint(mGraphics);
-	}
-
-	SYSCALL(void) maSetTile(MAHandle layer, int x, int y, int tileNumber) {
-		TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-		destLayer.setCell(x,y, tileNumber);
 	}
 
 	class MoSyncPlayerListener implements PlayerListener {

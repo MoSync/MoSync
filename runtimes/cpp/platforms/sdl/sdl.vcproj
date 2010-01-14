@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="sdl"
 	ProjectGUID="{ADF68B96-47DA-4A30-AA51-B5450B019F7F}"
 	RootNamespace="sdl"
@@ -247,14 +247,6 @@
 			</File>
 			<File
 				RelativePath="..\..\base\ThreadPool.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\base\tile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\base\tile.h"
 				>
 			</File>
 			<Filter
@@ -616,10 +608,6 @@
 		</File>
 		<File
 			RelativePath=".\ThreadPoolImpl.h"
-			>
-		</File>
-		<File
-			RelativePath=".\TileImpl.h"
 			>
 		</File>
 		<File

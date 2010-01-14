@@ -27,9 +27,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(ERR_DATA_OOB, "Data object access out of bounds")\
 	m(ERR_RES_FILE_INCONSISTENT, "Resource file inconsistent")\
 	m(ERR_DIVISION_BY_ZERO, "Division by zero")\
-	m(ERR_MAX_TILE_LAYERS, "No more available tile layers")\
-	m(ERR_TILE_LAYER_HANDLE, "Invalid tile layer handle")\
-	m(ERR_TILE_LAYER_INACTIVE, "Tile layer inactive")\
 	m(ERR_CONN_HANDLE_INVALID, "Connection handle invalid")\
 	m(ERR_CONN_ALREADY_READING, "Connection already reading")\
 	m(ERR_CONN_ALREADY_WRITING, "Connection already writing")\
