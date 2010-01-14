@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="false">
+<target-profile/>
+<criteria/>
+<properties>
+<property key="build.prefs:additional.include.paths" value="..\maplib\include"/>
+<property key="build.prefs:additional.libraries" value="Maplib.lib,MAUI.lib,MAUtil.lib "/>
+<property key="build.prefs:additional.library.paths" value="..\maplib\Output"/>
+<property key="build.prefs:extra.link.sw" value=""/>
+<property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="template.id" value="project.empty"/>
+</properties>
+</project>
