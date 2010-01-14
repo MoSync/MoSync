@@ -13,10 +13,18 @@ if [ -e "$(which dpkg-shlibdeps)" ]; then
 	fi
 
 	cd /tmp/
-	list=$(dpkg-shlibdeps -O $bin 2>/dev/null | sed 's/shlibs:Depends=//' | sed 's/, /\", \"/g')
+	list=$(dpkg-shlibdeps -O $bin 2>/dev/null)
+	if [ ! "$?" = "0" ]; then
+		cd $cur	
+		exit 1
+	fi
+
+	list=$(echo $list | sed 's/shlibs:Depends=//' | sed 's/, /\", \"/g')
 	if [ ! "$list" = "" ]; then	
 		echo "\"$list\""
 	fi
 	cd $cur
 fi
+exit 0
+
 

@@ -4,7 +4,13 @@
 if [ -e "/usr/lib/rpm/find-requires" ]
 then
 	list=""
-	for l in $(echo $1 | /usr/lib/rpm/find-requires | sed 's/ /, /g')
+
+	req=$(echo $1 | /usr/lib/rpm/find-requires)
+	if [ ! "$?" = "0" ]; then
+		exit 1
+	fi
+
+	for l in $(echo $req | sed 's/ /, /g')
 	do
 		if [ "$list" = "" ] 
 		then
@@ -16,3 +22,4 @@ then
 	done
 	echo $list	
 fi
+exit 0
