@@ -124,17 +124,19 @@ template<class T> void swap(T& a, T& b) {
 #define ERROR_NET_PREFIX 280000
 
 #define HELPERS_ERRORS(m)\
-	m(ERR_INTERNAL, "Internal error")\
-	m(ERR_OOM, "Out of memory")\
-	m(ERR_FIFO_OVERRUN, "FIFO overrun")\
-	m(ERR_FUNCTION_UNIMPLEMENTED, "Function is not yet implemented on this platform")\
+	m(1, ERR_INTERNAL, "Internal error")\
+	m(2, ERR_OOM, "Out of memory")\
+	m(3, ERR_FIFO_OVERRUN, "FIFO overrun")\
+	m(4, ERR_FUNCTION_UNIMPLEMENTED, "Function is not yet implemented on this platform")\
 
 #define COMMA_FIRST(f, s) ,f
 #define COMMA_SECOND_DOT(f, s) ,s "."
 
+#define ERROR_ENUM_SINGLE(val, id, desc) ,id = val
+
 #define DECLARE_ERROR_ENUM(set) namespace MoSyncError {\
 	enum { ERROR_##set##_BASE = ERROR_##set##_PREFIX\
-	set##_ERRORS(COMMA_FIRST), ERROR_##set##_END };\
+	set##_ERRORS(ERROR_ENUM_SINGLE), ERROR_##set##_END };\
 	const char* set##_translate(int code); }
 
 DECLARE_ERROR_ENUM(HELPERS)

@@ -19,8 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _BASE_ERRORS_H_
 
 #define BASE_ERRORS(m)\
-	m(ERR_RES_INVALID_TYPE, "Invalid resource type")\
-	m(ERR_RES_DESTROY_FLUX, "Attempted to destroy a resource that is in flux")\
+	m(40001, ERR_RES_INVALID_TYPE, "Invalid resource type")\
+	m(40002, ERR_RES_DESTROY_FLUX, "Attempted to destroy a resource that is in flux")\
 	m(ERR_RES_INVALID_INDEX, "Resource handle out of bounds")\
 	m(ERR_RES_OVERWRITE, "Attempted to overwrite an existing resource")\
 	m(ERR_RES_LOAD_UBIN, "Attempted to load a UBIN from memory")\

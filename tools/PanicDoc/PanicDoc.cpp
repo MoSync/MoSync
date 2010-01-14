@@ -47,7 +47,7 @@ void output_error(int code, const char* name, const char* desc);
 int main() {
 	header();
 
-#define OUTPUT_ERROR(name, desc) output_error(MoSyncError::name, #name, desc);
+#define OUTPUT_ERROR(val, id, desc) output_error(val, #id, desc);
 #define OUTPUT_SET(set) { cout << " \n";\
 	set##_ERRORS(OUTPUT_ERROR); cout << "\n"; }
 

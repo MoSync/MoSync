@@ -24,13 +24,22 @@ const char* MoSyncError::subSystemString(int code) {
 }
 
 #define DECLARE_DESCRIPTIONS(set)\
-	static const char* const set##_descriptions[] = { NULL set##_ERRORS(COMMA_SECOND_DOT) };
+	static const char* set##_descriptions[MoSyncError::ERROR_##set##_END];
 
 ERROR_SETS(DECLARE_DESCRIPTIONS);
 
+static void initErrors() {
+	const char** curDescs;
+	int curBase;
+#define SET_INIT_D(val, id, desc) curDescs[val - curBase] = desc;
+#define INIT_DESCRIPTIONS(set) curDescs = set##_descriptions;\
+	curBase = MoSyncError::ERROR_##set##_BASE; set##_ERRORS(SET_INIT_D);
+	ERROR_SETS(INIT_DESCRIPTIONS);
+}
+
 const char* MoSyncError::errorDescription(int code) {
 #define RETURN_DESCRIPTION(set)\
-	if(IS_IN_SET(set)) return set##_descriptions[code - ERROR_##set##_BASE];
+	if(IS_IN_SET(set)) return set##_descriptions[code - MoSyncError::ERROR_##set##_BASE];
 
 	ERROR_SETS(RETURN_DESCRIPTION);
 	return NULL;

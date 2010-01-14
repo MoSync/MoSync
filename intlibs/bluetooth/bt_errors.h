@@ -16,10 +16,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #define BT_ERRORS(m)\
-	m(BTERR_MAX_SDP_LEVEL, "Maximum SDP level reached")\
-	m(BTERR_DISCOVERY_IN_PROGRESS, "Discovery already in progress")\
-	m(BTERR_NEGATIVE_BUFFER_SIZE, "Negative buffer size")\
-	m(BTERR_READ_BUFFER_OVERFLOW, "Read buffer overflow")\
-	m(BTERR_NONAME, "No name supplied")
+	m(120001, BTERR_MAX_SDP_LEVEL, "Maximum SDP level reached")\
+	m(120002, BTERR_DISCOVERY_IN_PROGRESS, "Discovery already in progress")\
+	m(120003, BTERR_NEGATIVE_BUFFER_SIZE, "Negative buffer size")\
+	m(120004, BTERR_READ_BUFFER_OVERFLOW, "Read buffer overflow")\
+	m(120005, BTERR_NONAME, "No name supplied")
 
 DECLARE_ERROR_ENUM(BT)
