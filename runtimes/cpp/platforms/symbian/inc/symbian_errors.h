@@ -16,11 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #define SYMBIAN_ERRORS(m)\
-	m(SYMERR_BAD_COMMAND_LINE, "Bad command line")\
-	m(SYMERR_EVENT_BUFFER_FULL, "Event buffer full")\
-	m(SYMERR_IMAGE_LOAD_FAILED, "Failed to load image")\
-	m(SYMERR_VIBRATION_DURATION_NEGATIVE, "Negative vibration duration")\
-	m(SYMERR_NO_MATCHING_DECODER, "No matching decoder found")\
-	m(SYMERR_SOUND_DECODING_ERROR, "Error while decoding sound"/* Can happen when MIME type and sound file don't match. */ )\
+	m(200001, SYMERR_BAD_COMMAND_LINE, "Bad command line")\
+	m(200002, SYMERR_EVENT_BUFFER_FULL, "Event buffer full")\
+	m(200003, SYMERR_IMAGE_LOAD_FAILED, "Failed to load image")\
+	m(200004, SYMERR_VIBRATION_DURATION_NEGATIVE, "Negative vibration duration")\
+	m(200005, SYMERR_NO_MATCHING_DECODER, "No matching decoder found")\
+	m(200006, SYMERR_SOUND_DECODING_ERROR, "Error while decoding sound"/* Can happen when MIME type and sound file don't match. */ )\
 
 DECLARE_ERROR_ENUM(SYMBIAN)

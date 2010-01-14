@@ -16,21 +16,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #define WCE_ERRORS(m)\
-	m(WCEERR_SOUND_LOOP_FAILED, "Failed to loop sound")\
-	m(WCEERR_SOUND_LOAD_FAILED, "Failed to load sound")\
-	m(WCEERR_SOUND_MIME_CORRUPTED, "Corrupted mime string for sound media")\
-	m(WCEERR_SOUND_UNKNOWN_MIME, "Unknown mime type for sound media")\
-	m(WCEERR_IMAGE_LOAD_FAILED, "Failed to load image")\
-	m(WCEERR_SPRITE_LOAD_FAILED, "Failed to load sprite")\
-	m(WCEERR_UNDEFINED_KEYCODE, "Undefined keycode")\
-	m(WCEERR_TEXT_SIZE_FAILED, "Failed to calculate text size")\
-	m(WCEERR_TEXT_RENDER_FAILED, "Failed to render text")\
-	m(WCEERR_TIMEZONE, "Could not retrieve time zone information")\
-	m(WCEERR_UNSUPPORTED_BPP, "Unsupported pixel color depth")\
-	m(WCEERR_SOURCE_RECT_OOB, "Source rect out of bounds")\
-	m(WCEERR_STORE_FILE_NOT_FOUND, "Store file not found")\
-	m(WCEERR_STORE_ACCESS_DENIED, "Store file access denied")\
-	m(WCEERR_STORE_CLOSE_FAILED, "Store close failed")\
-	m(WCEERR_UNSUPPORTED_OS_VERSION, "Unsupported OS version")\
+	m(240001, WCEERR_SOUND_LOOP_FAILED, "Failed to loop sound")\
+	m(240002, WCEERR_SOUND_LOAD_FAILED, "Failed to load sound")\
+	m(240003, WCEERR_SOUND_MIME_CORRUPTED, "Corrupted mime string for sound media")\
+	m(240004, WCEERR_SOUND_UNKNOWN_MIME, "Unknown mime type for sound media")\
+	m(240005, WCEERR_IMAGE_LOAD_FAILED, "Failed to load image")\
+	m(240006, WCEERR_SPRITE_LOAD_FAILED, "Failed to load sprite")\
+	m(240008, WCEERR_UNDEFINED_KEYCODE, "Undefined keycode")\
+	m(240009, WCEERR_TEXT_SIZE_FAILED, "Failed to calculate text size")\
+	m(240010, WCEERR_TEXT_RENDER_FAILED, "Failed to render text")\
+	m(240011, WCEERR_TIMEZONE, "Could not retrieve time zone information")\
+	m(240012, WCEERR_UNSUPPORTED_BPP, "Unsupported pixel color depth")\
+	m(240013, WCEERR_SOURCE_RECT_OOB, "Source rect out of bounds")\
+	m(240014, WCEERR_STORE_FILE_NOT_FOUND, "Store file not found")\
+	m(240015, WCEERR_STORE_ACCESS_DENIED, "Store file access denied")\
+	m(240016, WCEERR_STORE_CLOSE_FAILED, "Store close failed")\
+	m(240017, WCEERR_UNSUPPORTED_OS_VERSION, "Unsupported OS version")\
 
 DECLARE_ERROR_ENUM(WCE);

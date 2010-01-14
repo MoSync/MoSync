@@ -16,9 +16,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #define WINDOWS_ERRORS(m)\
-	m(WINERR_STORE_FILE_NOT_FOUND, "Store file not found")\
-	m(WINERR_STORE_ACCESS_DENIED, "Store file access denied")\
-	m(WINERR_STORE_DELETE_FAILED, "Store file delete failed")\
-	m(WINERR_TIMEZONE, "Could not retrieve time zone information")\
+	m(160001, WINERR_STORE_FILE_NOT_FOUND, "Store file not found")\
+	m(160002, WINERR_STORE_ACCESS_DENIED, "Store file access denied")\
+	m(160003, WINERR_STORE_DELETE_FAILED, "Store file delete failed")\
+	m(160004, WINERR_TIMEZONE, "Could not retrieve time zone information")\
 
 DECLARE_ERROR_ENUM(WINDOWS);
