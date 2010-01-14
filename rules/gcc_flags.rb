@@ -40,9 +40,9 @@ pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-pr
 lesser_conly = " -Wnested-externs -Wdeclaration-after-statement"
 # -Wno-format-zero-length"
 
-#broken in C++, GCC 4.3.3 and in 3.4.5 -O2.
+#broken in C++, GCC 4.3.3, 4.4.1 and in 3.4.5 -O2.
 optimizer_dependent = " -Wunreachable-code -Winline"
-if(@GCC_IS_V43 || (!@GCC_IS_V4 && CONFIG == ""))
+if(@GCC_IS_V43 || @GCC_IS_V44 || (!@GCC_IS_V4 && CONFIG == ""))
 	pendantic_c_warnings += optimizer_dependent
 else
 	pedantic_warnings += optimizer_dependent
@@ -57,17 +57,16 @@ include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 #temp
 #flag_warnings = gcc4_warnings + gcc43_c_warnings + gcc43_warnings
 
+version_warnings = ""
+base_flags = ""
+cpp_flags = ""
 if(@GCC_IS_V4) then
-	base_flags = " -fvisibility=hidden"
-	version_warnings = gcc4_warnings
-	if(@GCC_IS_V43) then
+	base_flags += " -fvisibility=hidden"
+	version_warnings += gcc4_warnings
+	if(@GCC_IS_V43 || @GCC_IS_V44) then
 		version_warnings += gcc43_c_warnings + gcc43_warnings
-		cpp_flags = " -std=c++0x -DHAVE_TR1"
+		cpp_flags += " -std=c++0x -DHAVE_TR1"
 	end
-else
-	version_warnings = ""
-	base_flags = ""
-	cpp_flags = ""
 end
 if(!@GCC_IS_V43) then
 	lesser_conly += gcc43_c_warnings

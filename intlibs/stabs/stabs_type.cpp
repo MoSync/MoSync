@@ -291,9 +291,11 @@ void StructType::printTypeMI(printfPtr pf, bool complex) const {
 			const TypeBase* tb = mDataMembers[i].type->resolve();
 			
 			if(tb->type() == ePointer) {
+#if 0
 				if(mName == "Widget") {
 					int a = 2;
 				}
+#endif
 				const PointerType* pt = (const PointerType*)tb;
 				const TypeBase *t = pt->mTarget->resolve();
 				if(t && t->type() == eBuiltin) {

@@ -90,7 +90,8 @@ end
 
 gcc_version = get_gcc_version_string
 NATIVE_GCC_IS_V4 = (gcc_version[0] == "4"[0])
-NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] >= "3"[0]))
+NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "3"[0]))
+NATIVE_GCC_IS_V44 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "4"[0]))
 
 #warning("GCC version: #{GCC_VERSION}")
 #warning("GCC_IS_V4: #{GCC_IS_V4}")

@@ -71,6 +71,7 @@ def set_defaults
 	
 	default(:GCC_IS_V4, NATIVE_GCC_IS_V4)
 	default(:GCC_IS_V43, NATIVE_GCC_IS_V43)
+	default(:GCC_IS_V44, NATIVE_GCC_IS_V44)
 	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))
