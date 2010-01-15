@@ -10,7 +10,7 @@ then
 		exit 1
 	fi
 
-	for l in $(echo $req | sed 's/ /, /g')
+	for l in $(echo $req)
 	do
 		if [ "$list" = "" ] 
 		then
