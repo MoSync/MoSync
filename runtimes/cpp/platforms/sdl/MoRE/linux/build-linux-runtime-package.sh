@@ -157,7 +157,7 @@ buildTemplate()
 # Initial vars
 arch=$(uname -m | sed 's/i.../i586/')
 curr=$(pwd)
-path=$(pwd)/$(echo -e $0 | sed 's/build-linux-template.sh//')
+path=$(pwd)/$(echo $0 | sed 's/\/build-linux-runtime-package.sh//')
 dist=""; distro_name
 cd $path/../../../../../
 rev=$(svn info | grep Revision | awk '{print $2}')
