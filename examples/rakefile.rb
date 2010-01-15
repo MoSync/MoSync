@@ -19,8 +19,7 @@ SUBDIRS = ["3dLines",
            "MoTooth",
            "MoTris",
            "MoTrix",
-           "OtaLoad",
-           "Tiles"]
+           "OtaLoad"]
 #TODO: MoRaw
 
 require "../build_rules/subdirs_mosync.rb"
