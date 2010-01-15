@@ -6,21 +6,21 @@
 #
 handle_error()
 {
-	echo "\n\n---------------------------------"
+	echo -e "\n\n---------------------------------"
 	if [ "$1" = "rake" ]; then
-		echo "Error: Rake failed, see log"
+		echo -e "Error: Rake failed, see log"
 	elif [ "$1" = "more" ]; then
-		echo "Error: Failed to build MoRE, see log"
+		echo -e "Error: Failed to build MoRE, see log"
 	elif [ "$1" = "tar" ]; then
-		echo "Error: Failed to extract package template"
+		echo -e "Error: Failed to extract package template"
 	elif [ "$1" = "copy_more" ]; then
-		echo "Error: While copying more"
+		echo -e "Error: While copying more"
 	elif [ "$1" = "meta" ]; then
-		echo "Error: While copying more"
+		echo -e "Error: While copying more"
 	else
-		echo "Error: Unknown cause"
+		echo -e "Error: Unknown cause"
 	fi
-	echo "---------------------------------\n"
+	echo -e "---------------------------------\n"
 
 	exit 1
 }
@@ -63,9 +63,9 @@ distro_name()
 #
 buildTemplate()
 {
-	echo "\n\n---------------------------------"
-	echo "Building $1 template"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Building $1 template"
+	echo -e "---------------------------------\n"
 
 	if [ -e  "$path/distro" ]; then
 		rm -Rf $path/distro
@@ -76,20 +76,20 @@ buildTemplate()
 
 	export MOSYNCDIR=$path/distro/tmp
 
-	echo "\n\n---------------------------------"
-	echo "Performing rake clean"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Performing rake clean"
+	echo -e "---------------------------------\n"
 	cd $path/../../../../../
 	if [ "$1" = "rel" ]; then
 		rake clean CONFIG=""
 	else
 		rake clean
 	fi
-	echo "\nOK"
+	echo -e "\nOK"
 
-	echo "\n\n---------------------------------"
-	echo "Attempting to build MoRE"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Attempting to build MoRE"
+	echo -e "---------------------------------\n"
 	if [ "$1" = "rel" ]; then
 		rake more CONFIG=""
 	else
@@ -106,12 +106,12 @@ buildTemplate()
 		handle_error "more"
 	fi
 
-	echo "\nOK"
+	echo -e "\nOK"
 
 	# Now extract the template
-	echo "\n\n---------------------------------"
-	echo "Extracting template"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Extracting template"
+	echo -e "---------------------------------\n"
 	cp ../mosync-linux-template.tar.gz .
 	tar zxvvf mosync-linux-template.tar.gz
 	if [ "$?" -ne "0" ]; then
@@ -125,27 +125,27 @@ buildTemplate()
 	fi
 
 	# Generate its meta data
-	echo "\n\n---------------------------------"
-	echo "Generating template meta data"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Generating template meta data"
+	echo -e "---------------------------------\n"
 	../generate-meta.sh usr/local/%appname%/bin/run | tee .meta/.meta
 	if [ "$?" -ne "0" ]; then
 		handle_error "meta"
 	fi
-	echo "OK"
+	echo -e "OK"
 
-	echo "\n\n---------------------------------"
-	echo "Packing template"
-	echo "---------------------------------\n"
-	tar cvvfz $curr/more-r${rev}.${dist}.${arch}.$1.tar.gz $(find .meta -type f | sort) bin usr
+	echo -e "\n\n---------------------------------"
+	echo -e "Packing template"
+	echo -e "---------------------------------\n"
+	tar cvvfz $curr/runtime.${dist}.r${rev}.${arch}.$1.tar.gz $(find .meta -type f | sort) bin usr
 
-	echo "\n\n---------------------------------"
-	echo "Clean up"
-	echo "---------------------------------\n"
+	echo -e "\n\n---------------------------------"
+	echo -e "Clean up"
+	echo -e "---------------------------------\n"
 
 	rm -Rf $path/distro
 	cd $curr
-	echo "OK"
+	echo -e "OK"
 
 	return 0
 }
@@ -157,7 +157,7 @@ buildTemplate()
 # Initial vars
 arch=$(uname -m | sed 's/i.../i586/')
 curr=$(pwd)
-path=$(pwd)/$(echo $0 | sed 's/build-linux-template.sh//')
+path=$(pwd)/$(echo -e $0 | sed 's/build-linux-template.sh//')
 dist=""; distro_name
 cd $path/../../../../../
 rev=$(svn info | grep Revision | awk '{print $2}')
@@ -172,9 +172,9 @@ buildTemplate "rel"
 #
 # Finished
 # 
-echo "\n\n---------------------------------"
-echo "Done"
-echo "---------------------------------\n"
+echo -e "\n\n---------------------------------"
+echo -e "Done"
+echo -e "---------------------------------\n"
 
 exit 0
 
