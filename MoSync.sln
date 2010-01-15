@@ -99,11 +99,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoSound", "examples\MoSound
 		{C5755F5A-7628-4F47-AF78-CAA339F28D8D} = {C5755F5A-7628-4F47-AF78-CAA339F28D8D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tiles", "examples\Tiles\Tiles.vcproj", "{F6074089-C67C-4853-A01A-10A30C322F0A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4DA91033-FE58-4729-8B55-F42614BD8F90} = {4DA91033-FE58-4729-8B55-F42614BD8F90}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "btcon", "testPrograms\btcon\btcon.vcproj", "{EB243243-A4BB-44F5-9732-F2DB48AFAAC4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4DA91033-FE58-4729-8B55-F42614BD8F90} = {4DA91033-FE58-4729-8B55-F42614BD8F90}

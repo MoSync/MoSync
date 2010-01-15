@@ -1047,10 +1047,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\TileImpl.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Vibration.cpp"
 				>
 			</File>
@@ -1163,14 +1159,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\base\ThreadPool.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\base\tile.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\base\tile.h"
 					>
 				</File>
 				<Filter
