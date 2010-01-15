@@ -77,7 +77,8 @@ NETSYSCALL(void) maConnClose(MAHandle conn) throws Exception {
 	Integer key = new Integer(conn);
 	URLConnectionInformation connectionInfo = (URLConnectionInformation)mConnections.get(new Integer(conn));
 	
-	//mac.close();
+	connectionInfo.close();
+	
 	mConnections.remove(key);
 }
 
@@ -309,7 +310,8 @@ throws Exception
 	
 	try
 	{
-		final String value = connection.getRequestProperty(key);
+		//final String value = connection.getRequestProperty(key);
+		final String value = connection.getHeaderField(key);
 		
 		if(value == null)
 			return CONNERR_NOHEADER;
@@ -402,6 +404,7 @@ public class URLConnectionInformation
 			mIs.close();
 		if(mOs != null)
 			mOs.close();
+		mConnection = null;
 	}
 	
 	
@@ -415,78 +418,48 @@ class HttpConnectionConnector implements Runnable {
 		mConn = conn;
 	}
 
-	public final void run() {
-
-/*	
-		boolean http = url.startsWith("http");
-		int result = 1;
-		try {
-			StreamConnection conn = (StreamConnection)Connector.open(url,
-				http ? Connector.READ : Connector.READ_WRITE, true);
-			if(http) {
-				HttpConnection httpConn = (HttpConnection)conn;
-				result = httpConn.getResponseCode();
-				if(result <= 0) {
+	public final void run()
+	{
+		try
+		{
+			mConn.mConnection.connect();
+			
+			int result = 1;
+			if(mConn.mIsHttpConnection)
+			{
+				HttpURLConnection http = (HttpURLConnection) mConn.mConnection;
+				
+				result = http.getResponseCode();
+				if(result <= 0)
+				{
 					DUMP(result);
 					result = CONNERR_PROTOCOL;
 				}
+				else
+				{
 #ifndef PHONE_RELEASE
-				else {
 					//dump headers
 					int i=0;
-					while(true) {
-						String key = httpConn.getHeaderFieldKey(i);
-						String value = httpConn.getHeaderField(i);
+					while(true)
+					{
+						String key = mConn.mConnection.getHeaderFieldKey(i);
+						String value = mConn.mConnection.getHeaderField(i);
 						DEBUG_ALWAYS(key + ": " + value + "\n");
 						if(key == null && value == null)
 							break;
 						i++;
 					}
-				}
 #endif
-				mac.httpState = HTTPS_FINISHED;
+					mConn.mHttpState = HTTPS_FINISHED;
+				}
 			}
-			synchronized(mac) {
-				if(mac.cancel) {
-					mac.handleResult(CONNOP_CONNECT, CONNERR_CANCELED);
+			synchronized(mConn) {
+				if(mConn.mCancelled) {
+					mConn.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 					return;
 				}
-				if(conn == null) {
-					mac.handleResult(CONNOP_CONNECT, CONNERR_GENERIC);
-					return;
-				}
-				mac.conn = conn;
-				mac.in = conn.openInputStream();
-				mac.out = http ? null : conn.openOutputStream();
 			}
-		} catch(Exception e) {
-			PRINT_STACK_TRACE;
-#ifdef CONN_PANIC
-			MAMidlet.self.programError("Conn error", e);
-#else
-			synchronized(mac) {
-				if(mac.cancel) {
-					mac.handleResult(CONNOP_CONNECT, CONNERR_CANCELED);
-					return;
-				}
-				mac.handleResult(CONNOP_CONNECT, CONNERR_GENERIC);
-			}
-#endif
-			return;
-		}
-		mac.handleResult(CONNOP_CONNECT, result);
-*/		
-
-		
-		try
-		{
-			mConn.mConnection.connect();
-			
-			if(mConn.mIsHttpConnection)
-			{
-				HttpURLConnection http = (HttpURLConnection) mConn.mConnection;
-			}
-			
+			mConn.postResultEvent(CONNOP_CONNECT, result);
 		}
 		catch(InterruptedIOException e)
 		{
@@ -500,7 +473,6 @@ class HttpConnectionConnector implements Runnable {
 			mConn.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 			return;
 		}
-		
 	}
 }
 
@@ -542,7 +514,11 @@ class HttpConnectionRunner implements Runnable
 				}
 				
 				// success
-				if(result == -1) {
+				if(result > 0)
+				{
+					opResult = result;
+				}
+				else if(result == -1) {
 					opResult = CONNERR_CLOSED;
 				} else {
 					DEBUG_ALWAYS("Weird-ass ConnRead error "+result+"!\n");
@@ -641,77 +617,6 @@ class HttpConnectionFinish implements Runnable
 		}
 	}
 }
-
-
-/*
-public class URLConnectionTask extends Threads
-{
-	public Integer doInBackground(URLConnectionInformation... conn)
-	{
-		Log.i("MoSyncSyscall","URLConnectionTask - doInBackground");
-		
-		URLConnectionInformation connectionInfo = conn[0];
-		
-		if(connectionInfo.mUseResource == false)
-		{
-			if(connectionInfo.mReadData == true)
-			{
-			
-			}
-			else // connectionInfo.mReadData == false
-			{
-			
-			}
-		}
-		else // connectionInfo.mUseResource == true
-		{
-			if(connectionInfo.mReadData == true)
-			{
-			
-			}
-			else // connectionInfo.mReadData == false
-			{
-			
-			}
-		}
-		
-		return 0;
-	}
-	
-	public void onProgressUpdate(Integer progress)
-	{
-		Log.i("MoSyncSyscall","URLConnectionTask - onProgressUpdate");
-	
-	}
-
-	public void onPostExecute(int result)
-	{
-		Log.i("MoSyncSyscall","URLConnectionTask - onPostExecute");
-	
-	}
-}
-
-
-class URLConnectionThread extends Thread
-	{
-		private URLConnectionInformation mURLConnInfo;
-		
-		public MoSyncThread(URLConnectionInformation connInfo) throws Exception
-		{	
-			Log.i("MoSync Thread", "Constructor");
-		 
-			mURLConnInfo = connInfo;
-		}
-		
-		@Override public void run()
-		{
-			Log.i("MoSync Thread", "run");
-			Log.i("MoSync Thread", "loop has ended");
-		}
-		
-	}
-*/	
-
 
 
 

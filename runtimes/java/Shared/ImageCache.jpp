@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 #elif defined(_JavaME)
 import javax.microedition.lcdui.*;
 #endif
@@ -30,8 +31,13 @@ final class ImageCache {
 
 	ImageCache(Image im) { i = im; }
 #elif defined(_android)
-	Bitmap i;
+	Bitmap mBitmap;
+	Canvas mCanvas;
 	
-	ImageCache(Bitmap im) { i = im; }
+	ImageCache(Canvas canvas, Bitmap bitmap)
+	{  
+		mCanvas = canvas;
+		mBitmap = bitmap;
+	}
 #endif
 }

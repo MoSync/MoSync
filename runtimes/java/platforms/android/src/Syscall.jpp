@@ -32,9 +32,17 @@ import android.graphics.Rect;
 import android.graphics.Matrix;
 import android.graphics.Region;
 import android.content.Context;
-import android.os.Vibrator;
 import android.media.MediaPlayer;
 import android.graphics.Path;
+
+import android.os.Vibrator;
+
+import android.content.res.Resources;
+import android.content.res.AssetManager;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources.NotFoundException;
+
+import java.net.*;
 
 import java.util.Vector;
 import java.util.Date;
@@ -85,8 +93,6 @@ IMPLEMENTS MoSync
 		Log.i("MoSync Syscall", "Syscall constructor;");
 		mCore = aCore;
 		mMoSyncView = view;
-		mCanvas = null;
-		mBlitPaint.setColor(0xffffffff);
 	}
 
 #ifdef MOSYNC_STATIC_JAVA
@@ -109,8 +115,57 @@ IMPLEMENTS MoSync
 		mVibrator = (Vibrator) mCore.mContext.getSystemService(Context.VIBRATOR_SERVICE); 
 		
 		mPaint.setStyle(Paint.Style.FILL);
+		mPaint.setAntiAlias(false);
+		mPaint.setColor(0xffffffff);
+		mBlitPaint.setAntiAlias(false);
+		mBlitPaint.setColor(0xffffffff);
 		
 		mMediaPlayer = new MediaPlayer();
+
+		try
+		{
+			byte buffer[] = new byte[100];
+			
+			FileDescriptor fd = mCore.mContext.getResources().openRawResourceFd(R.raw.program).getFileDescriptor();
+			FileInputStream fis = new FileInputStream(fd);
+			fis.read(buffer, 0, 100);
+			fis.close();
+			Log.i("MoSync Syscall","Reading raw resource");
+			String s = new String(buffer);
+			Log.i("MoSync Syscall","buffer:"+ s);
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSync Syscalls","Problem reading raw resource : " + e.toString());
+		}
+		
+		try
+		{
+			File f = mCore.mContext.getFileStreamPath("mosync_tmp");
+			f.mkdir();
+			Log.i("MoSync Syscall","Temporary storage created");
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSync Syscalls","problem creating tmp directory : " + e.toString());
+		}
+		
+		try
+		{
+			byte buffer[] = new byte[100];
+			
+			File f = mCore.mContext.getFileStreamPath("MOSYNCTEMP:1.dat");
+			FileOutputStream fos = new FileOutputStream(f, false);
+			fos.write(buffer);
+			fos.close();
+			
+			Log.i("MoSync Syscall","Temporary storage created");
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSync Syscalls","problem creating file : " + e.toString());
+		}
+		
 	}
 
 	//***************************************************************************
@@ -121,14 +176,18 @@ IMPLEMENTS MoSync
 	Core mCore;
 	
 	MoSyncView mMoSyncView;
-	Canvas mCanvas;
-	Paint mPaint = new Paint();
-	Paint mBlitPaint = new Paint();
 	
+	Canvas mCanvas;
+	Bitmap mBitmap;
 	int mWidth;
 	int mHeight;
 	
-	Bitmap mBitmap;
+	ImageCache mDrawTargetScreen = null;
+	ImageCache mDrawTarget = null;
+	MAHandle mDrawTargetHandle = HANDLE_SCREEN;
+	
+	Paint mPaint = new Paint();
+	Paint mBlitPaint = new Paint();
 	
 	//private stuff
 	Object[] mResourceArray, mDynamicResArray;
@@ -136,9 +195,6 @@ IMPLEMENTS MoSync
 	Vector mTiledLayers = new Vector();
 
 	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
-
-	ImageCache mDrawTarget = null;
-	MAHandle mDrawTargetHandle = HANDLE_SCREEN;
 
 	int mSoundVolume = 100;
 
@@ -182,10 +238,13 @@ IMPLEMENTS MoSync
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 		
-		mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
-		mCanvas = new Canvas(mBitmap);
-		mPaint.setAntiAlias(false);
-		mBlitPaint.setAntiAlias(false);		
+		Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		mDrawTargetScreen = new ImageCache(canvas, bitmap);
+		
+		mCanvas = mDrawTargetScreen.mCanvas;
+		mBitmap = mDrawTargetScreen.mBitmap;
+		
 	}
 	
 	//***************************************************************************
@@ -224,9 +283,15 @@ IMPLEMENTS MoSync
 		}
 	}
 
-	public final void LoadResourcesFromStream(LittleEndianDataInputStream file,
-											  boolean bundledResource) throws Exception
+	public final void LoadResourcesFromStream(LittleEndianDataInputStream file, int resourceId, boolean isMAResource) throws Exception
 	{
+		boolean sup = file.markSupported();
+		if(true != sup)
+		{
+			Log.i("MoSync Syscall","Unable to mark the stream. Will not be able to continue.");
+			BIG_PHAT_ERROR;
+		}
+			
 		DEBUG("MoSync Syscall - load " + filename + " as resource from stream\n");
 		try {
 			if(file == null) {
@@ -284,7 +349,7 @@ IMPLEMENTS MoSync
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_IMAGE");
 						byte[] b = new byte[size];
 						file.readFully(b);
-						resourceArray[rI] = new ImageCache(BitmapFactory.decodeByteArray(b, 0, b.length));
+						resourceArray[rI] = new ImageCache(null, BitmapFactory.decodeByteArray(b, 0, b.length));
 					}
 					break;
 				case RT_SPRITE:
@@ -300,43 +365,11 @@ IMPLEMENTS MoSync
 						DECLARE_AND_READ(short, cx);
 						DECLARE_AND_READ(short, cy);
 						  
-						resourceArray[rI] = new ImageCache(Bitmap.createBitmap(
-							((ImageCache)resourceArray[indexSource]).i,
+						resourceArray[rI] = new ImageCache(null, Bitmap.createBitmap(
+							((ImageCache)resourceArray[indexSource]).mBitmap,
 							left, top, width, height));							
 					}
-					break;
-				case RT_TILESET:
-					{
-						Log.i("error", "unimplemented RT_TILESET");
-						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILESET");
-/* FIXME					
-						int tileSizeX = file.readUnsignedShort();
-						int tileSizeY = file.readUnsignedShort();
-						byte[] b = new byte[size-4];
-						file.readFully(b);
-						resourceArray[rI] = new Tileset(Image.createImage(b, 0, b.length), tileSizeX, tileSizeY);
-*/						
-					}
-					break;	  
-				case RT_TILEMAP:
-					{
-						Log.i("error", "unimplemented RT_TILEMAP");
-						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_TILEMAP");
-/* FIXME					
-						int mapWidth  = file.readUnsignedShort();
-						int mapHeight = file.readUnsignedShort();
-
-						Tilemap tilemap = new Tilemap(mapWidth, mapHeight);
-
-						for(int i = 0; i < mapWidth*mapHeight; i++) {
-							tilemap.values[i] = file.readShort();
-						}
-
-						//tilemaps.
-						resourceArray[rI] = tilemap;
-*/						
-					}
-					break;	  
+					break;  
 				case RT_SKIP:
 					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_SKIP");
 					MYASSERT(size == 0);
@@ -363,16 +396,35 @@ IMPLEMENTS MoSync
 				case RT_BINARY:
 					{
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_BINARY");
+						
+						if(checkIfMimeAudioType(file))
+						{
+							addResourceAudio(rI, resourceId, size, file.tell(), isMAResource);
+						}
+						
 						byte[] b = new byte[size];
 						file.readFully(b);
 						resourceArray[rI] = new Binary(b);
+							
+						
 					}
 					break;
 				case RT_UBIN:
 					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_UBIN");
-					if(bundledResource) {
+					
+					if(checkIfMimeAudioType(file))
+					{
+						addResourceAudio(rI, resourceId, size, file.tell(), isMAResource);
+					}
+					
+					if(resourceId != 0) {
 						resourceArray[rI] = new UBin(mCore, file.tell(), size);
 					}
+					else
+					{
+						BIG_PHAT_ERROR;
+					}
+					
 					//fallthrough is intentional
 				default:
 					if(file.skip(size) != size) {
@@ -631,6 +683,24 @@ public
 		return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
 	}
 
+	static public final boolean checkIfMimeAudioType(InputStream in) throws Exception
+	{
+		String audio="audio";
+		in.mark(6);
+		int limit=0;
+		boolean isAudio = true;
+		while(limit<5)
+		{
+			int c = in.read();
+			if(c == 0) { isAudio = false; break;}
+			if(c != audio.charAt(limit)) {isAudio=false; break;}
+			limit++;
+		}
+		in.reset();
+		
+		return isAudio;
+	}
+	
 	//***************************************************************************
 	//Proper Syscall Functions
 	//***************************************************************************
@@ -1005,7 +1075,7 @@ public
 		try {
 			BinaryInterface bi = (BinaryInterface)getResource(data);
 			LittleEndianDataInputStream llis = new LittleEndianDataInputStream(bi.getInputStream());
-			LoadResourcesFromStream(llis, false);
+			LoadResourcesFromStream(llis, data, true);
 			llis.close();
 			return 1;
 		} catch(Throwable e) {
@@ -1369,7 +1439,6 @@ public
 		mCanvas.postEvent(event);
 	}
 
-#ifndef MA_PROF_SUPPORT_CLDC_10
 	public double readDouble(int address) {
 		int[] mem_ds = CORE.mMem_ds;
 		return CORE.ints2double(RINT(address), RINT(address + 4));
@@ -1377,7 +1446,6 @@ public
 	public void writeDouble(int address, double d) {
 		CORE.writeMemDouble(address, d);
 	}
-#endif
 
 	public boolean isResourceInFlux(int handle) {
 		return getResource(handle) == mFlux;

@@ -196,7 +196,7 @@ SYSCALL(MAExtent) maGetScrSize() {
 
 SYSCALL(void) maDrawImage(MAHandle image, int left, int top) {
 	DEBUG("MoSync Syscall - maDrawImage");
-	mCanvas.drawBitmap(((ImageCache) getResource(image)).i, left, top, mPaint);
+	mCanvas.drawBitmap(((ImageCache) getResource(image)).mBitmap, left, top, mPaint);
 }
 
 SYSCALL(void) maDrawRGB(MAPoint2d dstPoint, Address src, MARect srcRect, int scanlength) {
@@ -220,7 +220,7 @@ SYSCALL(void) maDrawImageRegion(MAHandle image, MARect srcRect,
 	int dstLeft = MAPoint2d_x(dstTopLeft);
 	int dstTop = MAPoint2d_y(dstTopLeft);
 	
-	Bitmap bitmap = ((ImageCache)getResource(image)).i;
+	Bitmap bitmap = ((ImageCache)getResource(image)).mBitmap;
 	
 	final int imgHeight = bitmap.getHeight();
 	if(srcRectTop > imgHeight)
@@ -303,98 +303,16 @@ SYSCALL(void) maDrawImageRegion(MAHandle image, MARect srcRect,
 	}
 }
 
-
-SYSCALL(MAHandle) maInitLayer(MAHandle tileResource, MAHandle mapResource,
-	int layerSizeX, int layerSizeY)
-{
-	DEBUG("maInitLayer");
-/* FIXME
-	Tileset tileset = (Tileset)getResource(tileResource);
-
-	TiledLayer layer = new TiledLayer(layerSizeX, layerSizeY, tileset.image,
-		tileset.tileSizeX, tileset.tileSizeY);
-
-	mTiledLayers.addElement(layer);
-	MAHandle ret = mTiledLayers.size()-1;
-
-	maSetMap(ret, mapResource, 0, 0);
-
-	return ret;
-*/
-	return -1;
-}
-
-SYSCALL(void) maDisposeLayer(MAHandle layer) {
-	DEBUG("maDisposeLayer");
-/* FIXME	
-	mTiledLayers.setElementAt(null, layer);
-*/		
-}
-
-SYSCALL(void) maSetMap(MAHandle layer, MAHandle srcMapResource, int destX, int destY) {	
-	DEBUG("maSetMap");
-/* FIXME	
-	Tilemap map = (Tilemap)getResource(srcMapResource);
-	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-
-	int tileSizeX = destLayer.getCellWidth();
-	int tileSizeY = destLayer.getCellHeight();
-
-	int layerWidth = destLayer.getColumns();
-	int layerHeight = destLayer.getRows();
-
-	int xStart = MAX(destX,0);
-	int xEnd = MAX(MIN(destX + map.width, layerWidth), 0);
-	int yStart = MAX(destY,0);
-	int yEnd = MAX(MIN(destY + map.height, layerHeight), 0);
-
-	int srcOffX = - destX;
-	int srcOffY = - destY;
-
-	for(int i = yStart; i < yEnd; i++) {
-		for(int j = xStart; j < xEnd; j++) {
-			destLayer.setCell(j, i, map.getValue(j + srcOffX, i + srcOffY));
-		}
-	}
-*/		
-}
-
-SYSCALL(void) maChangeTileSet(MAHandle layer, MAHandle tileResource) {
-	DEBUG("maChangeTileSet");
-/* FIXME	
-	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-	Tileset tileset = (Tileset)getResource(tileResource);
-	destLayer.setStaticTileSet(tileset.image, tileset.tileSizeX, tileset.tileSizeY);
-*/		
-}
-
-SYSCALL(void) maDrawLayer(MAHandle layer, int offsetX, int offsetY) {
-	DEBUG("maDrawLayer");
-/* FIXME	
-	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-	destLayer.setPosition(offsetX, offsetY);
-	destLayer.paint(mGraphics);
-*/		
-}
-
-SYSCALL(void) maSetTile(MAHandle layer, int x, int y, int tileNumber) {
-	DEBUG("maSetTile");
-/* FIXME	
-	TiledLayer destLayer = (TiledLayer)mTiledLayers.elementAt(layer);
-	destLayer.setCell(x,y, tileNumber);
-*/		
-}
-
 SYSCALL(MAExtent) maGetImageSize(MAHandle image) {
 	DEBUG("maImageSize");
-	Bitmap bitmap = ((ImageCache) getResource(image)).i;
+	Bitmap bitmap = ((ImageCache) getResource(image)).mBitmap;
 	return EXTENT(bitmap.getWidth(), bitmap.getHeight());
 }
 
 SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int scanlength) {
 	DEBUG("maGetImageData");
 
-	Bitmap bitmap = ((ImageCache)getResource(image)).i;
+	Bitmap bitmap = ((ImageCache)getResource(image)).mBitmap;
 	int[] mem_ds = CORE.mMem_ds;
 	bitmap.getPixels(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
 		MARect_width(srcRect), MARect_height(srcRect));
@@ -402,26 +320,26 @@ SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int sc
 
 SYSCALL(MAHandle) maSetDrawTarget(MAHandle handle) {
 	DEBUG("maSetDrawTarget");
-/* FIXME	
+
 	MAHandle temp = mDrawTargetHandle;
 	if(mDrawTarget != null) {
 		setResource(mDrawTargetHandle, mDrawTarget);
 		mDrawTarget = null;
 	}
 	if(handle == HANDLE_SCREEN) {
-		mGraphics = mCanvasGraphics;
+		mCanvas = mDrawTargetScreen.mCanvas;
+		mBitmap = mDrawTargetScreen.mBitmap;
 	} else {
-		ImageCache ic = (ImageCache)getResource(handle);
-		if(ic.g == null)
-			ic.g = ic.i.getGraphics();
-		mGraphics = ic.g;
+		ImageCache imageCache = (ImageCache)getResource(handle);
+
+		mCanvas = imageCache.mCanvas;
+		mBitmap = imageCache.mBitmap;
+
 		setResource(handle, mFlux);
-		mDrawTarget = ic;
+		mDrawTarget = imageCache;
 	}
 	mDrawTargetHandle = handle;
 	return temp;
-*/ 
-	return -1;
 }
 
 SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size) 
@@ -442,7 +360,7 @@ SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offs
 		{
 			return RES_BAD_INPUT;
 		}
-		addResource(placeholder, new ImageCache(decodedImage));
+		addResource(placeholder, new ImageCache(null, decodedImage));
 		ledis.close();
 	} catch(java.lang.IllegalArgumentException e) {
 		return RES_BAD_INPUT;
@@ -468,7 +386,7 @@ SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, 
 		// Fix this line
 		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		bitmap.setPixels(tempArray, 0, width, 0, 0, width, height);
-		addResource(placeholder, new ImageCache(bitmap));
+		addResource(placeholder, new ImageCache(null, bitmap));
 
 	} catch(java.lang.OutOfMemoryError e) {
 		return RES_OUT_OF_MEMORY;
@@ -478,8 +396,12 @@ SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, 
 
 SYSCALL(int) maCreateDrawableImage(MAHandle placeholder, int width, int height) THE {
 	DEBUG("maCreateDrawableImage");
+	
+	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	Canvas canvas = new Canvas(bitmap);
+	
 	try {
-		addResource(placeholder, new ImageCache(Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)));
+		addResource(placeholder, new ImageCache(canvas, bitmap));
 	} catch(java.lang.OutOfMemoryError e) {
 		return RES_OUT_OF_MEMORY;
 	}

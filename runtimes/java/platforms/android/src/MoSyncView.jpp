@@ -26,7 +26,10 @@ import android.content.Context;
 import android.graphics.*;
 import android.os.Handler;
 import android.os.Process;
+import android.os.AsyncTask;
+
 import android.view.SurfaceView;
+
 import android.view.SurfaceHolder;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,6 +42,8 @@ import java.io.FileDescriptor;
 import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import java.nio.ByteBuffer;
 
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
@@ -61,7 +66,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mContext = context;
 			mHandler = handler;
 			mMoSyncView = view;
-			
+		
 			Log.i("MoSync Thread", "Constructor");
 		 
 			try {
@@ -133,6 +138,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	/** The thread that actually draws the animation */
 	private MoSyncThread mCoreThread;
 
+	private Handler mMainHandler;
+	
 	private int mKeyState;
 	
 	private int mBatteryCharge;
@@ -140,14 +147,14 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public MoSyncView(Context context) throws Exception
 	{
 		super(context);
-		setId(17);
+		//setId(17);
 		
 		mContext = context;
 		mBatteryCharge = -1;
 		
 		// register our interest in hearing about changes to our surface
 		mSurfaceHolder = getHolder();
-		    
+		
 		// Use accelerated surfaces if available
 		int mode = 0;
 		try {
@@ -408,7 +415,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mEventBuffer.addElement(event);
 		}
 	}
-
+	
+	
 	@Override protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect)
 	{
 		Log.i("MoSyncView","onFocusChanged");

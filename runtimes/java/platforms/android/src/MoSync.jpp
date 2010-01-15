@@ -19,6 +19,7 @@ package com.mosync.java.android;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
 import android.util.Log;
@@ -26,6 +27,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Context;
 import android.content.BroadcastReceiver;
+
+import java.lang.Runnable;
 
 #include "config_platform.h"
 
@@ -121,7 +124,8 @@ public class MoSync extends Activity
 		mMosyncView.killApplication();
     }
 	
-	 private BroadcastReceiver mBatteryReciever = new BroadcastReceiver() {
+	private BroadcastReceiver mBatteryReciever = new BroadcastReceiver()
+	{
 		@Override
 		public void onReceive(Context context, Intent intent)
 		{
@@ -138,6 +142,6 @@ public class MoSync extends Activity
 				mMosyncView.setBatteryCharge(battery);
 			}
 		}
-     }; 
+    }; 
 
 }
