@@ -945,6 +945,8 @@ std::string getType(const TypeBase *tb, bool complex) {
 
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt) {
 	StringPrintFunctor spf;
+	const char *caddr = (const char*)addr;
+	if(caddr<gMemBuf || caddr+tb->size()>&gMemBuf[gMemSize]) return "";
 	tb->printMI(spf, addr, fmt);
 	return spf.getString();
 }

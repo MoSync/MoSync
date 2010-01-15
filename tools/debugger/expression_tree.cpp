@@ -227,7 +227,11 @@ Value DerefNode::evaluate() {
 	if(!deref) throw ParseException("Invalid pointer");
 
 	int addr = (int)a;
-	ExpressionCommon::loadMemory(addr, deref->size());
+	if(addr>0 && addr+deref->size()<=gMemSize)
+		ExpressionCommon::loadMemory(addr, deref->size());
+	else 
+		throw ParseException("Invalid pointer");
+		//addr = 4; // just so that the evaluation works..
 
 	SYM newSym;
 	newSym.address = &gMemBuf[addr];
