@@ -160,7 +160,7 @@ curr=$(pwd)
 path=$(pwd)/$(echo $0 | sed 's/build-linux-template.sh//')
 dist=""; distro_name
 cd $path/../../../../../
-rev=$(svn info -r BASE| grep Revision | awk '{print $2}')
+rev=$(svn info | grep Revision | awk '{print $2}')
 cd $curr
 
 #
