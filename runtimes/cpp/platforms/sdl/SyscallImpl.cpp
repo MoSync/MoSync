@@ -159,7 +159,9 @@ namespace Base {
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id, settings.iconPath, settings.vendor, settings.model);
+		bool res = MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id,
+			settings.iconPath, settings.vendor, settings.model);
+		DEBUG_ASSERT(res);
 #endif
 	}
 
@@ -178,7 +180,9 @@ namespace Base {
 #endif
 		screenWidth = width;
 		screenHeight = height;
-		MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id, settings.iconPath, settings.vendor, settings.model);
+		bool res = MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id,
+			settings.iconPath, settings.vendor, settings.model);
+		DEBUG_ASSERT(res);
 	}
 
 	void Syscall::platformDestruct() {
