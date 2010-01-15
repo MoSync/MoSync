@@ -45,8 +45,7 @@ class RuntimeBuilder
 		Dir.foreach(shared_src) {|x| 
 			if (x == "BigPhatError.jpp" || x == "Binary.jpp" || x == "BinaryInterface.jpp" || x == "Core.jpp" ||
 				x == "LimitedLengthInputStream.jpp" || x == "LittleEndianDataInputStream.jpp" || x == "ThreadPool.jpp" || 
-				x == "UBin.jpp" || x == "RefByteArrayOutputStream.jpp" || x == "Tilemap.jpp" || x == "Tileset.jpp" ||
-				x == "ImageCache.jpp" || x == "MAPanicReport.jpp" )
+				x == "UBin.jpp" || x == "RefByteArrayOutputStream.jpp" || x == "ImageCache.jpp" || x == "MAPanicReport.jpp" )
 				preprocess_java_file(x, shared_src, platform_dir, output_dir, platform_define)
 			end
 		}
