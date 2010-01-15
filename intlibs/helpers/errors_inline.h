@@ -29,6 +29,10 @@ const char* MoSyncError::subSystemString(int code) {
 ERROR_SETS(DECLARE_DESCRIPTIONS);
 
 static void initErrors() {
+	static bool inited = false;
+	if(inited)
+		return;
+	inited = true;
 	const char** curDescs;
 	int curBase;
 #define SET_INIT_D(val, id, desc) curDescs[val - curBase] = desc;
@@ -38,6 +42,7 @@ static void initErrors() {
 }
 
 const char* MoSyncError::errorDescription(int code) {
+	initErrors();
 #define RETURN_DESCRIPTION(set)\
 	if(IS_IN_SET(set)) return set##_descriptions[code - MoSyncError::ERROR_##set##_BASE];
 
