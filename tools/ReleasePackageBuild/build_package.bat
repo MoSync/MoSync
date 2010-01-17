@@ -192,6 +192,8 @@ Release\idl2.exe
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@Release\PanicDoc.exe -props > MOSYNC_ECLIPSE_PATH\paniccodes.properties
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
 @echo ------------------------------------------------
