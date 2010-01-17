@@ -24,7 +24,7 @@ if [ "$requires" = "" ]; then
 	fi
 fi	
 
-echo -e "{
+echo "{
 	\"prerm\"  	  : \".meta/prerm\",
 	\"postrm\"    : \".meta/postrm\",
 	\"preinst\"   : \".meta/preinst\",
