@@ -45,16 +45,8 @@ void output_error(int code, const char* name, const char* desc);
 #define COLUMN_2 35
 
 
-int main() {
-	header();
-
-#define OUTPUT_ERROR(val, id, desc) output_error(val, #id, desc);
-#define OUTPUT_SET(set) { cout << " \n";\
-	set##_ERRORS(OUTPUT_ERROR); cout << "\n"; }
-
-	ERROR_SETS(OUTPUT_SET);
-
-	footer();
+void output_error_props(int code, const char* name, const char* desc) {
+	cout << code << "=" << desc << ".\n";
 }
 
 void output_error(int code, const char* name, const char* desc) {
@@ -67,6 +59,44 @@ void output_error(int code, const char* name, const char* desc) {
 	cout.width(0);
 	cout << "// " << desc << ".\n";
 }
+
+void gen_docxml() {
+	header();
+
+#define OUTPUT_ERROR(val, id, desc) output_error(val, #id, desc);
+#define OUTPUT_SET(set) { cout << " \n";\
+	set##_ERRORS(OUTPUT_ERROR); cout << "\n"; }
+
+	ERROR_SETS(OUTPUT_SET);
+
+	footer();
+}
+
+void gen_props() {
+
+#define OUTPUT_ERROR_PROPS(val, id, desc) output_error_props(val, #id, desc);
+#define OUTPUT_PROPS_SET(set) { set##_ERRORS(OUTPUT_ERROR_PROPS);  }
+
+	ERROR_SETS(OUTPUT_PROPS_SET);
+}
+
+int main(int argc, char** argv) {
+	if(argc < 2)
+		gen_docxml();
+	else {
+		if(!strcmp(argv[1], "-props"))
+			gen_props();
+		else if(!strcmp(argv[1], "-docxml"))
+			gen_docxml();
+		else {
+			cout << "ERROR, invalid command line switch!";
+			return 1;
+		}
+	}
+	
+	return 0;
+}
+
 
 void header() {
 	cout <<
