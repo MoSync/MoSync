@@ -36,39 +36,39 @@ namespace MAP
 	{
 	public:
 		MapTile( MapSourceKind sourceKind, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
-			m_sourceKind( sourceKind ),
-			m_gridX( gridX ),
-			m_gridY( gridY ),
-			m_magnification( magnification ),
-			m_center( center ),
-			m_image( image ),
-			m_lastAccessTime( DateTime::minValue( ) )
+			mSourceKind( sourceKind ),
+			mGridX( gridX ),
+			mGridY( gridY ),
+			mMagnification( magnification ),
+			mCenter( center ),
+			mImage( image ),
+			mLastAccessTime( DateTime::minValue( ) )
 		{
 		}
 
 		virtual ~MapTile( )
 		{
-			maDestroyObject( m_image );
+			maDestroyObject( mImage );
 		}
 
-		void stamp( ) { m_lastAccessTime = DateTime::now( ); }
+		void stamp( ) { mLastAccessTime = DateTime::now( ); }
 
-		MapSourceKind getSourceKind( ) const	{ return m_sourceKind; }
-		int getGridX( ) const					{ return m_gridX; }
-		int getGridY( ) const					{ return m_gridY; }
-		int getMagnification( ) const			{ return m_magnification; }
-		LonLat getCenter( ) const				{ return m_center; }
-		MAHandle getImage( ) const				{ return m_image; }
-		DateTime getLastAccessTime( ) const		{ return m_lastAccessTime; }
+		MapSourceKind getSourceKind( ) const	{ return mSourceKind; }
+		int getGridX( ) const					{ return mGridX; }
+		int getGridY( ) const					{ return mGridY; }
+		int getMagnification( ) const			{ return mMagnification; }
+		LonLat getCenter( ) const				{ return mCenter; }
+		MAHandle getImage( ) const				{ return mImage; }
+		DateTime getLastAccessTime( ) const		{ return mLastAccessTime; }
 
 	private:
-		MapSourceKind	m_sourceKind;
-		int				m_gridX;
-		int				m_gridY;
-		int				m_magnification;
-		LonLat			m_center;
-		MAHandle		m_image;
-		DateTime		m_lastAccessTime;
+		MapSourceKind	mSourceKind;
+		int				mGridX;
+		int				mGridY;
+		int				mMagnification;
+		LonLat			mCenter;
+		MAHandle		mImage;
+		DateTime		mLastAccessTime;
 	};
 }
 #endif // MAPTILE_H_

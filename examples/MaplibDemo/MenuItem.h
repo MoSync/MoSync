@@ -40,7 +40,7 @@ namespace UI
 		Action*					getAction( ) const;
 
 	private:
-		Action*					m_action;
+		Action*					mAction;
 	};
 }
 

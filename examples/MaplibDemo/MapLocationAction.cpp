@@ -22,9 +22,9 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	MapLocationAction::	MapLocationAction( MapWidget* widget, LonLat location, const char* label ) :
 	//-------------------------------------------------------------------------
-		m_widget( widget ),
-		m_location( location ),
-		m_label( label )
+		mWidget( widget ),
+		mLocation( location ),
+		mLabel( label )
 	{
 	}
 
@@ -38,15 +38,15 @@ namespace MAP
 	const char*	MapLocationAction::getShortName( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_label;
+		return mLabel;
 	}
 
 	//-------------------------------------------------------------------------
 	void MapLocationAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		m_widget->enterMapUpdateScope( );
-		m_widget->setCenterPosition( m_location );
-		m_widget->exitMapUpdateScope( false );
+		mWidget->enterMapUpdateScope( );
+		mWidget->setCenterPosition( mLocation );
+		mWidget->exitMapUpdateScope( false );
 	}
 }

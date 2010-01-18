@@ -38,14 +38,14 @@ namespace Util
 		// Dequeueing an object means ownership is transferred to client.
 		//
 		Queue( const int capacity )
-			: m_capacity( capacity ),
-			m_items( NULL )
+			: mCapacity( capacity ),
+			mItems( NULL )
 		{
-			m_items = newobject( T*, new T*[capacity] );
-			for ( int i = 0; i < m_capacity; i++ )
-				m_items[i] = NULL;
-			m_enqueuePosition = 0;
-			m_dequeuePosition = 0;
+			mItems = newobject( T*, new T*[capacity] );
+			for ( int i = 0; i < mCapacity; i++ )
+				mItems[i] = NULL;
+			mEnqueuePosition = 0;
+			mDequeuePosition = 0;
 		}
 		//
 		// Destruct queue
@@ -55,7 +55,7 @@ namespace Util
 			// Delete each item
 			clear( );
 			// Delete array
-			deleteobject( m_items );
+			deleteobject( mItems );
 		}
 		//
 		// Returns item at location in queue.
@@ -63,20 +63,20 @@ namespace Util
 		//
 		T* peekAt( int location )
 		{
-			return m_items[location];
+			return mItems[location];
 		}
 		//
 		// Returns item capacity of queue.
 		//
-		int getCapacity( ) const { return m_capacity; }
+		int getCapacity( ) const { return mCapacity; }
 		//
 		// Returns count of queued items.
 		//
 		int getCount( ) const
 		{
-			int count = m_enqueuePosition - m_dequeuePosition;
+			int count = mEnqueuePosition - mDequeuePosition;
 			if ( count < 0 )
-				count += m_capacity;
+				count += mCapacity;
 			return count;
 		}
 		//
@@ -84,10 +84,10 @@ namespace Util
 		//
 		void clear( )
 		{
-			for ( int i = 0; i < m_capacity; i++ )
-				deleteobject( m_items[i] );
-			m_enqueuePosition = 0;
-			m_dequeuePosition = 0;
+			for ( int i = 0; i < mCapacity; i++ )
+				deleteobject( mItems[i] );
+			mEnqueuePosition = 0;
+			mDequeuePosition = 0;
 		}
 		//
 		// returns true if queue contains item.
@@ -101,8 +101,8 @@ namespace Util
 		{
 			int count = getCount( );
 			for ( int i = 0; i < count; i++ )
-				if ( m_items[i] != NULL )
-					if ( m_items[i] == item )
+				if ( mItems[i] != NULL )
+					if ( mItems[i] == item )
 						return i;
 			return -1;
 		}
@@ -115,11 +115,11 @@ namespace Util
 		{
 			if ( getCount( ) == 0 )
 				return NULL;
-			T* ret = m_items[m_dequeuePosition];
-			m_items[m_dequeuePosition] = NULL;
-			m_dequeuePosition++;
-			if ( m_dequeuePosition >= m_capacity )
-				m_dequeuePosition = 0;
+			T* ret = mItems[mDequeuePosition];
+			mItems[mDequeuePosition] = NULL;
+			mDequeuePosition++;
+			if ( mDequeuePosition >= mCapacity )
+				mDequeuePosition = 0;
 			return ret;
 		}
 		//
@@ -129,12 +129,12 @@ namespace Util
 		void enqueue( T* item )
 		{
 			// TODO: raise exception
-			if ( getCount( ) >= m_capacity)
+			if ( getCount( ) >= mCapacity)
 				return;
-			m_items[m_enqueuePosition] = item;
-			m_enqueuePosition ++;
-			if ( m_enqueuePosition >= m_capacity )
-				m_enqueuePosition = 0;
+			mItems[mEnqueuePosition] = item;
+			mEnqueuePosition ++;
+			if ( mEnqueuePosition >= mCapacity )
+				mEnqueuePosition = 0;
 		}
 		//
 		// Returns next item in queue, without removing it from queue.
@@ -143,14 +143,14 @@ namespace Util
 		{
 			if ( getCount( ) == 0 )
 				return NULL;
-			return m_items[m_dequeuePosition];
+			return mItems[mDequeuePosition];
 		}
 
 	private:
-		T**						m_items;
-		int						m_capacity;
-		int						m_enqueuePosition;
-		int						m_dequeuePosition;
+		T**						mItems;
+		int						mCapacity;
+		int						mEnqueuePosition;
+		int						mDequeuePosition;
 	};
 }
 

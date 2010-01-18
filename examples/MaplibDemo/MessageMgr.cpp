@@ -21,13 +21,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace Util
 {
-	MessageMgr* MessageMgr::s_singleton = NULL;
+	MessageMgr* MessageMgr::sSingleton = NULL;
 
 	//-------------------------------------------------------------------------
 	MessageMgr::MessageMgr( ) :
 	//-------------------------------------------------------------------------
-		m_message( ),
-		m_progress( 0 )
+		mMessage( ),
+		mProgress( 0 )
 	{
 	}
 
@@ -47,8 +47,8 @@ namespace Util
 		vsprintf( buffer, fmt, vl );
 		va_end( vl );
 
-		m_message = buffer;
-		m_progress = -1;
+		mMessage = buffer;
+		mProgress = -1;
 		onMessagePosted( );
 	}
 
@@ -56,7 +56,7 @@ namespace Util
 	void MessageMgr::postProgress( float progress )
 	//-------------------------------------------------------------------------
 	{
-		m_progress = progress;
+		mProgress = progress;
 		onMessagePosted( );
 	}
 
@@ -64,8 +64,8 @@ namespace Util
 	void MessageMgr::onMessagePosted( )
 	//-------------------------------------------------------------------------
 	{
-		int count = m_listeners.size( );
+		int count = mListeners.size( );
 		for ( int i = 0; i < count; i++ )
-			m_listeners[i]->messagePosted( this );
+			mListeners[i]->messagePosted( this );
 	}
 }

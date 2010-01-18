@@ -57,20 +57,20 @@ namespace MaplibDemo
 		//
 		// Map widget
 		//
-		m_map = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
-		m_map->enterMapUpdateScope( );
-		m_map->setCenterPosition( LonLat( 18.07, 59.33 ) );
-		m_map->setMagnification( 10 );
-		m_map->exitMapUpdateScope( true );
-		m_mapSourceKind = MapSourceKind_OpenStreetMap;
+		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
+		mMap->enterMapUpdateScope( );
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
+		mMap->setMagnification( 10 );
+		mMap->exitMapUpdateScope( true );
+		mMapSourceKind = MapSourceKind_OpenStreetMap;
 		MapSourceMgr* mgr = MapSourceMgr::get( );
-		m_map->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
+		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 
-		setClientWidget( m_map );
+		setClientWidget( mMap );
 		//
 		// Have to wait until we have proper width and height
 		//
-		m_map->setMapSourceKind( m_mapSourceKind );
+		mMap->setMapSourceKind( mMapSourceKind );
 	}
 
 	//-------------------------------------------------------------------------
@@ -79,7 +79,7 @@ namespace MaplibDemo
 	{
 		//if ( Trace ) trace( );
 		
-		deleteobject( m_map );
+		deleteobject( mMap );
 	}
 
 	//-------------------------------------------------------------------------
@@ -97,7 +97,7 @@ namespace MaplibDemo
 		if ( AppScreen::handleKeyPress( keyCode ) )
 			return true;
 
-		return m_map->handleKeyPress( keyCode );
+		return mMap->handleKeyPress( keyCode );
 	}
 
 	//-------------------------------------------------------------------------
@@ -109,7 +109,7 @@ namespace MaplibDemo
 		if ( AppScreen::handleKeyRelease( keyCode ) )
 			return true;
 
-		return m_map->handleKeyRelease( keyCode );
+		return mMap->handleKeyRelease( keyCode );
 	}
 
 	//-------------------------------------------------------------------------
@@ -119,11 +119,11 @@ namespace MaplibDemo
 		//if ( Trace ) trace( );
 
 		MapSourceMgr* mgr = MapSourceMgr::get( );
-		MapSourceKind newKind = (MapSourceKind)(m_mapSourceKind + 1);
+		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
 		if( newKind >= MapSourceKind_Last )
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
-		m_mapSourceKind = newKind;
-		m_map->setMapSourceKind( newKind );
+		mMapSourceKind = newKind;
+		mMap->setMapSourceKind( newKind );
 		MessageMgr::get( )->postMessage( MapSourceKindToString( newKind ) );
 	}
 
@@ -134,7 +134,7 @@ namespace MaplibDemo
 		//if ( Trace ) trace( );
 
 		// add my actions
-		list.add( newobject( MapLocationAction, new MapLocationAction( m_map, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
-		list.add( newobject( ExitAction, new ExitAction( m_moblet ) ) );
+		list.add( newobject( MapLocationAction, new MapLocationAction( mMap, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
+		list.add( newobject( ExitAction, new ExitAction( mMoblet ) ) );
 	}
 }

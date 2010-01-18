@@ -36,9 +36,9 @@ namespace UI
 	{
 	public:
 		KeyRepeatTimer( IKeyHandler* handler, int keyCode ) :
-			m_handler( handler ),
-			m_keyCode( keyCode ),
-			m_repeats( 0 )
+			mHandler( handler ),
+			mKeyCode( keyCode ),
+			mRepeats( 0 )
 		{
 		}
 
@@ -46,15 +46,15 @@ namespace UI
 
 		void runTimerEvent( )
 		{
-			m_repeats++;
-			if ( m_repeats > 2 )
-				m_handler->handleKeyPress( m_keyCode );
+			mRepeats++;
+			if ( mRepeats > 2 )
+				mHandler->handleKeyPress( mKeyCode );
 		}
 
 	//private:
-		IKeyHandler*		m_handler;
-		int					m_keyCode;
-		int					m_repeats;
+		IKeyHandler*		mHandler;
+		int					mKeyCode;
+		int					mRepeats;
 	};
 
 	//=========================================================================
@@ -64,12 +64,12 @@ namespace UI
 	//-------------------------------------------------------------------------
 	AppScreenBase::AppScreenBase( MobletEx* moblet ) :
 	//-------------------------------------------------------------------------
-		m_moblet( moblet ),
-		m_messagePosted( false ),
-		m_keyTimer( NULL ),
-		m_contentFrame( NULL ),
-		m_softKeyBar( NULL ),
-		m_appFrame( NULL )
+		mMoblet( moblet ),
+		mMessagePosted( false ),
+		mKeyTimer( NULL ),
+		mContentFrame( NULL ),
+		mSoftKeyBar( NULL ),
+		mAppFrame( NULL )
 	{
 		//if ( Trace ) trace( );
 
@@ -77,29 +77,29 @@ namespace UI
 		// Screen size
 		//
 		MAExtent screenSize = maGetScrSize( );
-		m_width = EXTENT_X( screenSize );
-		m_height = EXTENT_Y( screenSize );
+		mWidth = EXTENT_X( screenSize );
+		mHeight = EXTENT_Y( screenSize );
 		//
 		// Frame containing tab widgets
 		//
-		m_contentFrame = newobject( Layout, new Layout( 0, 0, m_width, m_height - BottomHeight, NULL, 1, 1 ) );
+		mContentFrame = newobject( Layout, new Layout( 0, 0, mWidth, mHeight - BottomHeight, NULL, 1, 1 ) );
 		//
 		// Bottom bar with soft key labels
 		//
-		m_softKeyBar = newobject( SoftKeyBar, new SoftKeyBar( 0, 0, m_width, BottomHeight, NULL ) );
-		m_softKeyBar->setLeftAction( newobject( ShowMenuAction, new ShowMenuAction( this ) ) );
-		m_softKeyBar->setRightAction( newobject( ExitAction, new ExitAction( m_moblet ) ) );
+		mSoftKeyBar = newobject( SoftKeyBar, new SoftKeyBar( 0, 0, mWidth, BottomHeight, NULL ) );
+		mSoftKeyBar->setLeftAction( newobject( ShowMenuAction, new ShowMenuAction( this ) ) );
+		mSoftKeyBar->setRightAction( newobject( ExitAction, new ExitAction( mMoblet ) ) );
 
 		AppStyle* style = AppStyleMgr::getStyle( );
-		m_appFrame = newobject( AppFrame, new AppFrame( 0, 0, m_width, m_height,NULL, 1, 3 ) );
+		mAppFrame = newobject( AppFrame, new AppFrame( 0, 0, mWidth, mHeight,NULL, 1, 3 ) );
 
-		m_appFrame->add( m_contentFrame );
-		m_appFrame->add( m_softKeyBar );
-		m_appFrame->setDrawBackground( false );
-		m_appFrame->setfont( style->getFont( FontSize_Smallest, Color::white, false ) );
-		m_appFrame->update( );
+		mAppFrame->add( mContentFrame );
+		mAppFrame->add( mSoftKeyBar );
+		mAppFrame->setDrawBackground( false );
+		mAppFrame->setfont( style->getFont( FontSize_Smallest, Color::white, false ) );
+		mAppFrame->update( );
 
-		setMain( m_appFrame );
+		setMain( mAppFrame );
 		//
 		// Listen to messages
 		//
@@ -114,18 +114,18 @@ namespace UI
 
 		MessageMgr::get( )->removeListener( this );
 
-		if ( m_appFrame != NULL )
+		if ( mAppFrame != NULL )
 		{
-			m_appFrame->getChildren( ).clear( );
-			deleteobject( m_appFrame );
+			mAppFrame->getChildren( ).clear( );
+			deleteobject( mAppFrame );
 		}
 
-		if ( m_contentFrame != NULL )
+		if ( mContentFrame != NULL )
 		{
-			m_contentFrame->getChildren( ).clear( );
-			deleteobject( m_contentFrame );
+			mContentFrame->getChildren( ).clear( );
+			deleteobject( mContentFrame );
 		}
-		deleteobject( m_softKeyBar );
+		deleteobject( mSoftKeyBar );
 	}
 
 	//-------------------------------------------------------------------------
@@ -134,11 +134,11 @@ namespace UI
 	{
 		//if ( Trace ) trace( );
 
-		widget->setWidth( m_contentFrame->getWidth( ) );
-		widget->setHeight( m_contentFrame->getHeight( ) );
-		if( m_contentFrame->getChildren( ).size( ) > 0 )
-			m_contentFrame->getChildren( ).clear( );
-		m_contentFrame->add( widget );
+		widget->setWidth( mContentFrame->getWidth( ) );
+		widget->setHeight( mContentFrame->getHeight( ) );
+		if( mContentFrame->getChildren( ).size( ) > 0 )
+			mContentFrame->getChildren( ).clear( );
+		mContentFrame->add( widget );
 	}
 
 	//-------------------------------------------------------------------------
@@ -148,15 +148,15 @@ namespace UI
 		//if ( Trace ) trace( );
 
 		(void)handleKeyPress( keyCode );
-		if ( m_keyTimer == NULL )
+		if ( mKeyTimer == NULL )
 		{
-			m_keyTimer = newobject( KeyRepeatTimer, new KeyRepeatTimer( this, keyCode ) );
-			Environment::getEnvironment( ).addTimer( m_keyTimer, KeyRepeatMs, 0 );
+			mKeyTimer = newobject( KeyRepeatTimer, new KeyRepeatTimer( this, keyCode ) );
+			Environment::getEnvironment( ).addTimer( mKeyTimer, KeyRepeatMs, 0 );
 		}
 		else
 		{
 			// n-key rollover
-			m_keyTimer->m_keyCode = keyCode;
+			mKeyTimer->mKeyCode = keyCode;
 		}
 	}
 
@@ -166,10 +166,10 @@ namespace UI
 	{
 		//if ( Trace ) trace( );
 
-		if ( m_keyTimer != NULL ) 
+		if ( mKeyTimer != NULL ) 
 		{
-			Environment::getEnvironment( ).removeTimer( m_keyTimer );
-			deleteobject( m_keyTimer );
+			Environment::getEnvironment( ).removeTimer( mKeyTimer );
+			deleteobject( mKeyTimer );
 		}
 		(void)handleKeyRelease( keyCode );
 	}
@@ -182,15 +182,15 @@ namespace UI
 
 		if ( this != Screen::currentScreen )
 		{
-			if ( m_keyTimer != NULL )
+			if ( mKeyTimer != NULL )
 			{
-				Environment::getEnvironment( ).removeTimer( m_keyTimer );
-				deleteobject( m_keyTimer );
+				Environment::getEnvironment( ).removeTimer( mKeyTimer );
+				deleteobject( mKeyTimer );
 			}
 			return true;
 		}
 
-		if ( m_softKeyBar->handleKeyPress( keyCode ) )
+		if ( mSoftKeyBar->handleKeyPress( keyCode ) )
 			return true;
 
 		return false;
@@ -202,7 +202,7 @@ namespace UI
 	{
 		//if ( Trace ) trace( );
 
-		if ( m_softKeyBar->handleKeyRelease( keyCode ) )
+		if ( mSoftKeyBar->handleKeyRelease( keyCode ) )
 			return true;
 
 		return false;
@@ -214,7 +214,7 @@ namespace UI
 	{
 		//if ( Trace ) trace( );
 
-		m_appFrame->setMessage( sender->getMessage( ), sender->getProgress( ) );
+		mAppFrame->setMessage( sender->getMessage( ), sender->getProgress( ) );
 
 		// start timer
 		Environment::getEnvironment( ).addTimer( this, MessagePostTimeMs, 1 );
@@ -226,6 +226,6 @@ namespace UI
 	{
 		//if ( Trace ) trace( );
 
-		m_appFrame->clearMessage( );
+		mAppFrame->clearMessage( );
 	}
 };

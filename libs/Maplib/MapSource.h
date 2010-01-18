@@ -140,8 +140,8 @@ namespace MAP
 		//
 		void						removeDownloader( MapSourceImageDownloader* downloader );
 
-		MapSourceQueue*				m_queue;
-		MapSourceImageDownloader*	m_downloaders[Downloaders];
+		MapSourceQueue*				mQueue;
+		MapSourceImageDownloader*	mDownloaders[Downloaders];
 
 	};
 }

@@ -29,13 +29,13 @@ namespace Util
 	public:
 								Color( ) { /*DebugAssert( sizeof( Color ) == sizeof( int ) );*/ }
 	private:
-								Color( int val ) : m_val( val ) { }
+								Color( int val ) : mVal( val ) { }
 	public:
 								~Color( ) { } // must not be virtual, to avoid vtable
 
 		static Color			fromInt( int val ) { return Color( val ); }
 
-		int						val( ) const { return m_val; }
+		int						val( ) const { return mVal; }
 
 		static const Color		black;
 		static const Color		white;
@@ -44,7 +44,7 @@ namespace Util
 		static const Color		blue;
 
 	private:
-		int						m_val;
+		int						mVal;
 	};
 
 	inline bool operator == ( const Color& a, const Color& b ) { return a.val( ) == b.val( ); }

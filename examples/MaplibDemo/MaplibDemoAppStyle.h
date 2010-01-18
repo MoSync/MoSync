@@ -42,24 +42,24 @@ namespace MaplibDemo
 		virtual int				getMenuItemHeight( ) const;
 		virtual int				getSoftKeyBarHeight( ) const;
 	private:
-		WidgetSkin*				m_widgetSkin;
-		WidgetSkin*				m_buttonSkin;
-		Font*					m_fontSmallestBoldBlack;
-		Font*					m_fontSmallestBoldWhite;
-		Font*					m_fontSmallestWhite;
-		Font*					m_fontSmallestBlack;
-		Font*					m_fontSmallBoldBlack;
-		Font*					m_fontSmallBoldWhite;
-		Font*					m_fontSmallWhite;
-		Font*					m_fontSmallBlue;
-		Font*					m_fontSmallBlack;
-		Font*					m_fontMediumBoldWhite;
-		Font*					m_fontMediumWhite;
-		Font*					m_fontLargeBoldWhite;
-		Font*					m_fontLargeBoldBlack;
-		Font*					m_fontLargeWhite;
-		Font*					m_fontLargestBoldWhite;
-		Font*					m_fontLargestWhite;
+		WidgetSkin*				mWidgetSkin;
+		WidgetSkin*				mButtonSkin;
+		Font*					mFontSmallestBoldBlack;
+		Font*					mFontSmallestBoldWhite;
+		Font*					mFontSmallestWhite;
+		Font*					mFontSmallestBlack;
+		Font*					mFontSmallBoldBlack;
+		Font*					mFontSmallBoldWhite;
+		Font*					mFontSmallWhite;
+		Font*					mFontSmallBlue;
+		Font*					mFontSmallBlack;
+		Font*					mFontMediumBoldWhite;
+		Font*					mFontMediumWhite;
+		Font*					mFontLargeBoldWhite;
+		Font*					mFontLargeBoldBlack;
+		Font*					mFontLargeWhite;
+		Font*					mFontLargestBoldWhite;
+		Font*					mFontLargestWhite;
 	};
 }
 

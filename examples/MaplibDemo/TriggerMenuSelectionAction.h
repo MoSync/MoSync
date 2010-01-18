@@ -38,7 +38,7 @@ namespace UI
 		// Action overrides
 		//
 		virtual const char*		getShortName( ) const {  return "OK"; }
-		virtual Action*			clone( ) const { return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( m_menu ) ); }
+		virtual Action*			clone( ) const { return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( mMenu ) ); }
 
 	protected:
 		//
@@ -47,7 +47,7 @@ namespace UI
 		virtual void			performPrim( );
 
 	private:
-		Menu*					m_menu;
+		Menu*					mMenu;
 	};
 }
 

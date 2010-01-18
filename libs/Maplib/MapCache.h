@@ -74,7 +74,7 @@ namespace MAP
 		void				setCapacity( int capacity );
 
 	private:
-		static MapCache*	s_singleton;
+		static MapCache*	sSingleton;
 		//
 		// Returns tile from cache, if available
 		//
@@ -92,10 +92,10 @@ namespace MAP
 		//
 		void				reallocateCache( );
 
-		MapTile**			m_list;
-		int					m_hits;
-		int					m_misses;
-		int					m_capacity;
+		MapTile**			mList;
+		int					mHits;
+		int					mMisses;
+		int					mCapacity;
 	};
 }
 

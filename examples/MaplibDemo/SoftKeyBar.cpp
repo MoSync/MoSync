@@ -31,32 +31,32 @@ namespace UI
 	SoftKeyBar::SoftKeyBar(  int x, int y, int width, int height, Widget* parent )
 	//-------------------------------------------------------------------------
 		: Layout( x, y, width, height, parent, 2, 1 ),
-		m_leftAction( NULL ),
-		m_rightAction( NULL ),
-		m_leftLabel( NULL ),
-		m_rightLabel( NULL )
+		mLeftAction( NULL ),
+		mRightAction( NULL ),
+		mLeftLabel( NULL ),
+		mRightLabel( NULL )
 	{
-		m_leftAction = NULL;
-		m_rightAction = NULL;
+		mLeftAction = NULL;
+		mRightAction = NULL;
 		AppStyle* appStyle = AppStyleMgr::getStyle( );
-		m_font = appStyle->getFont( FontSize_Medium, Color::white, false );
+		mFont = appStyle->getFont( FontSize_Medium, Color::white, false );
 
 		//Layout* layout = newobject( Layout, new Layout( 0, 0, width, height, NULL, 2, 1 ) );
 		WidgetSkin* skin = appStyle->getWidgetSkin( );
 
 		// Left label
-		m_leftLabel = newobject( Label, new Label( 0, 0, width / 2, height, this, "", 0x404040, m_font ) );
-		m_leftLabel->setSkin( skin );
-		m_leftLabel->setPaddingLeft( Padding );
-		m_leftLabel->setVerticalAlignment( Label::VA_CENTER );
-		m_leftLabel->setHorizontalAlignment( Label::HA_LEFT );
+		mLeftLabel = newobject( Label, new Label( 0, 0, width / 2, height, this, "", 0x404040, mFont ) );
+		mLeftLabel->setSkin( skin );
+		mLeftLabel->setPaddingLeft( Padding );
+		mLeftLabel->setVerticalAlignment( Label::VA_CENTER );
+		mLeftLabel->setHorizontalAlignment( Label::HA_LEFT );
 
 		// Right label
-		m_rightLabel = newobject( Label, new Label( 0,0, width / 2, height, this, "", 0x404040, m_font ) );
-		m_rightLabel->setPaddingRight( Padding );
-		m_rightLabel->setSkin( skin );
-		m_rightLabel->setVerticalAlignment( Label::VA_CENTER );
-		m_rightLabel->setHorizontalAlignment( Label::HA_RIGHT );
+		mRightLabel = newobject( Label, new Label( 0,0, width / 2, height, this, "", 0x404040, mFont ) );
+		mRightLabel->setPaddingRight( Padding );
+		mRightLabel->setSkin( skin );
+		mRightLabel->setVerticalAlignment( Label::VA_CENTER );
+		mRightLabel->setHorizontalAlignment( Label::HA_RIGHT );
 	}
 
 	//-------------------------------------------------------------------------
@@ -64,10 +64,10 @@ namespace UI
 	//-------------------------------------------------------------------------
 	{
 		getChildren( ).clear( );
-		deleteobject( m_leftLabel );
-		deleteobject( m_rightLabel );
-		deleteobject( m_leftAction );
-		deleteobject( m_rightAction );
+		deleteobject( mLeftLabel );
+		deleteobject( mRightLabel );
+		deleteobject( mLeftAction );
+		deleteobject( mRightAction );
 	}
 
 	//-------------------------------------------------------------------------
@@ -76,8 +76,8 @@ namespace UI
 	{
 		Layout::setWidth( width );
 
-		m_leftLabel->setWidth( width / 2 );
-		m_rightLabel->setWidth( width / 2 );
+		mLeftLabel->setWidth( width / 2 );
+		mRightLabel->setWidth( width / 2 );
 	}
 
 	//-------------------------------------------------------------------------
@@ -86,8 +86,8 @@ namespace UI
 	{
 		Layout::setHeight( height );
 
-		m_leftLabel->setHeight( height );
-		m_rightLabel->setHeight( height );
+		mLeftLabel->setHeight( height );
+		mRightLabel->setHeight( height );
 	}
 
 	//-------------------------------------------------------------------------
@@ -97,16 +97,16 @@ namespace UI
 		switch( keyCode )
 		{
 		case MAK_SOFTLEFT:
-			if ( m_leftAction != NULL )
+			if ( mLeftAction != NULL )
 			{
-				m_leftAction->perform( );
+				mLeftAction->perform( );
 				return true;
 			}
 			break;
 		case MAK_SOFTRIGHT:
-			if ( m_rightAction != NULL )
+			if ( mRightAction != NULL )
 			{
-				m_rightAction->perform( );
+				mRightAction->perform( );
 				return true;
 			}
 			break;
@@ -125,32 +125,32 @@ namespace UI
 	Action* SoftKeyBar::getLeftAction( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_leftAction;
+		return mLeftAction;
 	}
 
 	//-------------------------------------------------------------------------
 	void SoftKeyBar::setLeftAction( Action* action )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( m_leftAction );
-		m_leftAction = action;
-		m_leftLabel->setCaption( action == NULL ? "" : action->getShortName( ) );
+		deleteobject( mLeftAction );
+		mLeftAction = action;
+		mLeftLabel->setCaption( action == NULL ? "" : action->getShortName( ) );
 	}
 
 	//-------------------------------------------------------------------------
 	Action* SoftKeyBar::getRightAction( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_rightAction;
+		return mRightAction;
 	}
 
 	//-------------------------------------------------------------------------
 	void SoftKeyBar::setRightAction( Action* action )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( m_rightAction );
-		m_rightAction = action;
-		m_rightLabel->setCaption( action == NULL ? "" : action->getShortName( ) );
+		deleteobject( mRightAction );
+		mRightAction = action;
+		mRightLabel->setCaption( action == NULL ? "" : action->getShortName( ) );
 	}
 }
 

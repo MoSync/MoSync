@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <MAUtil/Graphics.h>
 #include <MAUI/Image.h>
-#include <MapWidget.h>
+#include "MapWidget.h"
 #include "MapTile.h"
 #include "MapCache.h"
 #include "MapSource.h"
@@ -65,7 +65,7 @@ namespace MAP
 		//---------------------------------------------------------------------
 		MapWidgetPanTimerListener( MapWidget* widget ) :
 		//---------------------------------------------------------------------
-			m_widget( widget )
+			mWidget( widget )
 		{
 		}
 
@@ -73,34 +73,34 @@ namespace MAP
 		void runTimerEvent( )
 		//---------------------------------------------------------------------
 		{
-			PixelCoordinate currentPix = m_widget->m_centerPositionPixels;
-			PixelCoordinate targetPix = m_widget->m_panTargetPositionPixels;
+			PixelCoordinate currentPix = mWidget->mCenterPositionPixels;
+			PixelCoordinate targetPix = mWidget->mPanTargetPositionPixels;
 			double offsetX = targetPix.getX( ) - currentPix.getX( );
 			double offsetY = targetPix.getY( ) - currentPix.getY( );
 
 			if( fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
 			{
 				Environment::getEnvironment( ).removeTimer( this );
-				m_widget->enterMapUpdateScope( );
-				// performed below m_widget->m_centerPositionLonLat = m_widget->m_panTargetPositionLonLat;
-				// performed below m_widget->m_centerPositionPixels = m_widget->m_panTargetPositionPixels;
-				m_widget->exitMapUpdateScope( true );
-				m_widget->updateMap( );
-				m_widget->requestRepaint( );
+				mWidget->enterMapUpdateScope( );
+				// performed below mWidget->mCenterPositionLonLat = mWidget->mPanTargetPositionLonLat;
+				// performed below mWidget->mCenterPositionPixels = mWidget->mPanTargetPositionPixels;
+				mWidget->exitMapUpdateScope( true );
+				mWidget->updateMap( );
+				mWidget->requestRepaint( );
 				return;
 			}
-			m_widget->enterMapUpdateScope( );
-			PixelCoordinate newPix = PixelCoordinate(	m_widget->getMagnification( ),
+			mWidget->enterMapUpdateScope( );
+			PixelCoordinate newPix = PixelCoordinate(	mWidget->getMagnification( ),
 														(int)( currentPix.getX( ) + PanTension * offsetX ),
 														(int)( currentPix.getY( ) + PanTension * offsetY ) );
-			m_widget->m_centerPositionPixels = newPix;
-			m_widget->exitMapUpdateScope( false );
-			m_widget->updateMap( );
-			m_widget->requestRepaint( );
+			mWidget->mCenterPositionPixels = newPix;
+			mWidget->exitMapUpdateScope( false );
+			mWidget->updateMap( );
+			mWidget->requestRepaint( );
 		}
 
 	private:
-		MapWidget*		m_widget;
+		MapWidget*		mWidget;
 	};
 
 	//=========================================================================
@@ -110,26 +110,26 @@ namespace MAP
 	MapWidget::MapWidget( int x, int y, int width, int height, Widget* parent)
 	//-------------------------------------------------------------------------
 	:	Widget( x, y, width, height, parent ),
-		m_centerPositionLonLat( ),
-		m_centerPositionPixels( ),
-		m_panTargetPositionLonLat( ),
-		m_panTargetPositionPixels( ),
-		m_magnification( 0 ),
-		m_sourceKind( MapSourceKind_OpenStreetMap ),
-		//m_cache( NULL ),
-		m_mapUpdateNesting( 0 ),
-		m_prevCenter( ),
-		m_screenImage( NULL ),
-		m_hasScale( true ),
-		m_hasSmoothPanning( true ),
-		m_font( NULL ),
-		m_timerRunning( false ),
-		m_panTimerListener( NULL )
+		mCenterPositionLonLat( ),
+		mCenterPositionPixels( ),
+		mPanTargetPositionLonLat( ),
+		mPanTargetPositionPixels( ),
+		mMagnification( 0 ),
+		mSourceKind( MapSourceKind_OpenStreetMap ),
+		//mCache( NULL ),
+		mMapUpdateNesting( 0 ),
+		mPrevCenter( ),
+		mScreenImage( NULL ),
+		mHasScale( true ),
+		mHasSmoothPanning( true ),
+		mFont( NULL ),
+		mTimerRunning( false ),
+		mPanTimerListener( NULL )
 	{
 		//if ( Trace ) trace( );
 
 		resetScreenImage( );
-		m_panTimerListener = newobject( MapWidgetPanTimerListener, new MapWidgetPanTimerListener( this ) );
+		mPanTimerListener = newobject( MapWidgetPanTimerListener, new MapWidgetPanTimerListener( this ) );
 	}
 
 	//-------------------------------------------------------------------------
@@ -138,9 +138,9 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		//m_cache = NULL;
-		//m_source = NULL;
-		deleteobject( m_panTimerListener );
+		//mCache = NULL;
+		//mSource = NULL;
+		deleteobject( mPanTimerListener );
 	}
 
 	//-------------------------------------------------------------------------
@@ -149,12 +149,12 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		if ( m_mapUpdateNesting == 0 )
+		if ( mMapUpdateNesting == 0 )
 		{
-			m_prevCenter = getCenterPositionPixels( );
-			m_prevMagnification = getMagnification( );
+			mPrevCenter = getCenterPositionPixels( );
+			mPrevMagnification = getMagnification( );
 		}
-		m_mapUpdateNesting ++;
+		mMapUpdateNesting ++;
 	}
 
 	//-------------------------------------------------------------------------
@@ -163,17 +163,17 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		//DebugAssert( m_mapUpdateNesting > 0 ); 
+		//DebugAssert( mMapUpdateNesting > 0 ); 
 
-		m_mapUpdateNesting--;
-		if ( m_mapUpdateNesting == 0 )
+		mMapUpdateNesting--;
+		if ( mMapUpdateNesting == 0 )
 		{
 			if ( immediate )
 			{
-				m_centerPositionLonLat = m_panTargetPositionLonLat;
-				m_centerPositionPixels = m_panTargetPositionPixels;
+				mCenterPositionLonLat = mPanTargetPositionLonLat;
+				mCenterPositionPixels = mPanTargetPositionPixels;
 			}
-			if ( getCenterPositionPixels( ) != m_prevCenter || getMagnification( ) != m_prevMagnification )
+			if ( getCenterPositionPixels( ) != mPrevCenter || getMagnification( ) != mPrevMagnification )
 			{
 				updateMap( );
 			}
@@ -186,7 +186,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		//DebugAssert( m_mapUpdateNesting > 0 );
+		//DebugAssert( mMapUpdateNesting > 0 );
 	}
 
 	//-------------------------------------------------------------------------
@@ -195,7 +195,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		return m_hasSmoothPanning ? m_panTargetPositionPixels : m_centerPositionPixels;
+		return mHasSmoothPanning ? mPanTargetPositionPixels : mCenterPositionPixels;
 	}
 
 	//-------------------------------------------------------------------------
@@ -213,7 +213,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		return m_hasSmoothPanning ? m_panTargetPositionLonLat : m_centerPositionLonLat;
+		return mHasSmoothPanning ? mPanTargetPositionLonLat : mCenterPositionLonLat;
 	}
 
 	//-------------------------------------------------------------------------
@@ -224,15 +224,15 @@ namespace MAP
 
 		checkMapUpdateScope( );
 
-		if ( m_hasSmoothPanning )
+		if ( mHasSmoothPanning )
 		{
-			m_panTargetPositionLonLat = position;
-			m_panTargetPositionPixels = position.toPixels( getMagnification( ) );
+			mPanTargetPositionLonLat = position;
+			mPanTargetPositionPixels = position.toPixels( getMagnification( ) );
 			//
 			// Make sure current position is nearby, so we only soft scroll less than one screen.
 			//
-			int deltaX = m_panTargetPositionPixels.getX( ) - m_centerPositionPixels.getX( );
-			int deltaY = m_panTargetPositionPixels.getY( ) - m_centerPositionPixels.getY( );
+			int deltaX = mPanTargetPositionPixels.getX( ) - mCenterPositionPixels.getX( );
+			int deltaY = mPanTargetPositionPixels.getY( ) - mCenterPositionPixels.getY( );
 			//
 			// go directly to location if delta is more than 1/6 of widget size.
 			//
@@ -243,17 +243,17 @@ namespace MAP
 				double factor = 6 * fabs( Max( (double)deltaX / getWidth( ), (double)deltaY / getHeight( ) ) );
 				if ( factor > 1 )
 				{
-					m_centerPositionPixels = PixelCoordinate(	getMagnification( ),
-																m_panTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
-																m_panTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
+					mCenterPositionPixels = PixelCoordinate(	getMagnification( ),
+																mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
+																mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
 				}
-				Environment::getEnvironment( ).addTimer( m_panTimerListener, PanIntervalMs, 0 );
+				Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
 			}
 		}
 		else
 		{
-			m_centerPositionLonLat = position;
-			m_centerPositionPixels = position.toPixels( getMagnification( ) );
+			mCenterPositionLonLat = position;
+			mCenterPositionPixels = position.toPixels( getMagnification( ) );
 		}
 	}
 
@@ -263,7 +263,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		return m_magnification;
+		return mMagnification;
 	}
 
 	//-------------------------------------------------------------------------
@@ -274,11 +274,11 @@ namespace MAP
 
 		checkMapUpdateScope( );
 
-		m_magnification = magnification;
-		if ( m_hasSmoothPanning )
-			setCenterPosition( m_panTargetPositionLonLat );
+		mMagnification = magnification;
+		if ( mHasSmoothPanning )
+			setCenterPosition( mPanTargetPositionLonLat );
 		else
-			setCenterPosition( m_centerPositionLonLat );
+			setCenterPosition( mCenterPositionLonLat );
 	}
 
 	//-------------------------------------------------------------------------
@@ -287,8 +287,8 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		m_sourceKind = sourceKind;
-		//m_cache = MapCacheMgr::get( )->getMapCache( m_source );
+		mSourceKind = sourceKind;
+		//mCache = MapCacheMgr::get( )->getMapCache( mSource );
 		updateMap( );
 	}
 
@@ -298,7 +298,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		return m_hasSmoothPanning;
+		return mHasSmoothPanning;
 	}
 
 	//-------------------------------------------------------------------------
@@ -307,7 +307,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		m_hasSmoothPanning = hasSmoothPanning;
+		mHasSmoothPanning = hasSmoothPanning;
 	}
 
 	//-------------------------------------------------------------------------
@@ -318,12 +318,12 @@ namespace MAP
 
 		//if ( Trace ) DebugPrintf( "MapTile received %d %d %d\n", tile->getMagnification( ), tile->getGridX( ), tile->getGridY( ) );
 
-		//DebugAssert( tile->getSourceKind( ) == m_sourceKind );
+		//DebugAssert( tile->getSourceKind( ) == mSourceKind );
 
 		PixelCoordinate tilePx = tile->getCenter( ).toPixels( tile->getMagnification( ) );
 		MAPoint2d pt = worldPixelToWidget( tilePx );
-		MAHandle old = maSetDrawTarget( m_screenImage );
-		MapSource* source = MapSourceMgr::get( )->getMapSource( m_sourceKind );
+		MAHandle old = maSetDrawTarget( mScreenImage );
+		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 		const int tileSize = source->getTileSize( );
 
 		//maDrawImage( tile->getImage( ), pt.x - tileSize / 2, pt.y - tileSize / 2 );
@@ -378,24 +378,24 @@ namespace MAP
 		//
 		// Draw map image
 		//
-		Gfx_drawImage( m_screenImage, widgetPos.x, widgetPos.y );
+		Gfx_drawImage( mScreenImage, widgetPos.x, widgetPos.y );
 		//
 		// Let subclass draw its overlay
 		//
 		drawOverlay( );
 		
-		MapSource* source = MapSourceMgr::get( )->getMapSource( m_sourceKind );
+		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 		//
 		// Draw scale indicator
 		//
-		if ( ShowPixelScale && m_hasScale )
+		if ( ShowPixelScale && mHasScale )
 		{
 			const int scaleWidth = 80;
 			const int scaleX = widgetPos.x + getWidth( ) - scaleWidth - 5;
 			const int scaleY = widgetPos.y + 5;
 			int lineThickness = 3;
 			const int crossbarHeight = 7;
-			float scaleFrac = (float)( m_magnification - source->getMagnificationMin( ) ) / ( source->getMagnificationMax( ) - source->getMagnificationMin( ) );
+			float scaleFrac = (float)( mMagnification - source->getMagnificationMin( ) ) / ( source->getMagnificationMax( ) - source->getMagnificationMin( ) );
 
 			maSetColor( 0xa0a0a0 );
 
@@ -428,8 +428,8 @@ namespace MAP
 				char buffer[100];
 				sprintf( buffer, "%5.2f m/px", offsetX );
 
-				if ( m_font != NULL )
-					m_font->drawString( buffer, scaleX, scaleY + 5 );
+				if ( mFont != NULL )
+					mFont->drawString( buffer, scaleX, scaleY + 5 );
 				else
 					Gfx_drawText( scaleX, scaleY + 5, buffer );
 			}
@@ -455,14 +455,14 @@ namespace MAP
 			static const int textWidth = 100;
 			static const int textHeight = 12;
 			char buffer[100];
-			if ( m_hasSmoothPanning )
-				sprintf( buffer, "%-3.3f %-3.3f", m_panTargetPositionLonLat.lon, m_panTargetPositionLonLat.lat );
+			if ( mHasSmoothPanning )
+				sprintf( buffer, "%-3.3f %-3.3f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
 			else
-				sprintf( buffer, "%-3.3f %-3.3f", m_centerPositionLonLat.lon, m_centerPositionLonLat.lat );
+				sprintf( buffer, "%-3.3f %-3.3f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
 			maSetColor( 0x000000 );
 
-			if ( m_font != NULL )
-				m_font->drawString( buffer, widgetPos.x, widgetPos.y );
+			if ( mFont != NULL )
+				mFont->drawString( buffer, widgetPos.x, widgetPos.y );
 			else
 				Gfx_drawText( widgetPos.x, widgetPos.y, buffer );
 		}
@@ -486,7 +486,7 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		//DebugAssert( m_mapUpdateNesting == 0 );
+		//DebugAssert( mMapUpdateNesting == 0 );
 
 		if ( getWidth( ) <= 0 || getHeight( ) <= 0 ) 
 			return;
@@ -494,7 +494,7 @@ namespace MAP
 		//
 		// Clear screen image
 		//
-		MAHandle old = maSetDrawTarget( m_screenImage );
+		MAHandle old = maSetDrawTarget( mScreenImage );
 		maSetColor( 0xc0c0c0 );
 		maFillRect( 0, 0, getWidth( ), getHeight( ) );
 		maSetDrawTarget( old );
@@ -502,8 +502,8 @@ namespace MAP
 		// Request tiles
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
-		//if ( m_cache != NULL )
-		MapCache::get( )->requestTiles( this, m_sourceKind, LonLat( m_centerPositionPixels ), m_magnification, getWidth( ), getHeight( ) );
+		//if ( mCache != NULL )
+		MapCache::get( )->requestTiles( this, mSourceKind, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
 	}
 
 	//-------------------------------------------------------------------------
@@ -513,7 +513,7 @@ namespace MAP
 		//if ( Trace ) trace( );
 
 		MAPoint2d pt;
-		PixelCoordinate screenPx = m_centerPositionPixels;
+		PixelCoordinate screenPx = mCenterPositionPixels;
 
 		//pt.x = (int)( 0.499 + wpx.getX( ) - screenPx.getX( ) + ( getWidth( ) >> 1 ) );
 		//pt.y = (int)( 0.499 -( wpx.getY( ) - screenPx.getY( ) ) + ( getHeight( ) >> 1 ) );
@@ -529,8 +529,8 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		PixelCoordinate screenPx = m_centerPositionPixels;
-		return PixelCoordinate( m_magnification,
+		PixelCoordinate screenPx = mCenterPositionPixels;
+		return PixelCoordinate( mMagnification,
 								(int)( pt.x + 0.5 - 0.5 * getWidth( ) + screenPx.getX( ) ),
 								(int)( -( pt.y + 0.5 - 0.5 * getHeight( ) - screenPx.getY( ) ) ) );
 	}
@@ -550,18 +550,18 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		MapSource* source = MapSourceMgr::get( )->getMapSource( m_sourceKind );
+		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 
-		if ( m_magnification < source->getMagnificationMax( ) )
+		if ( mMagnification < source->getMagnificationMax( ) )
 		{
-			m_magnification++;
-			if ( m_hasSmoothPanning )
+			mMagnification++;
+			if ( mHasSmoothPanning )
 			{
-				m_centerPositionPixels = m_centerPositionLonLat.toPixels( m_magnification );
-				m_panTargetPositionPixels = m_panTargetPositionLonLat.toPixels( m_magnification );
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 			}
 			else
-				m_centerPositionPixels = m_centerPositionLonLat.toPixels( m_magnification );
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 		}
 	}
 
@@ -571,21 +571,21 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		//if ( m_source == NULL )
+		//if ( mSource == NULL )
 		//	return;
 
-		MapSource* source = MapSourceMgr::get( )->getMapSource( m_sourceKind );
+		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 
-		if ( m_magnification > source->getMagnificationMin( ) )
+		if ( mMagnification > source->getMagnificationMin( ) )
 		{
-			m_magnification--;
-			if ( m_hasSmoothPanning )
+			mMagnification--;
+			if ( mHasSmoothPanning )
 			{
-				m_centerPositionPixels = m_centerPositionLonLat.toPixels( m_magnification );
-				m_panTargetPositionPixels = m_panTargetPositionLonLat.toPixels( m_magnification );
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 			}
 			else
-				m_centerPositionPixels = m_centerPositionLonLat.toPixels( m_magnification );
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 		}
 	}
 
@@ -689,13 +689,13 @@ namespace MAP
 	{
 		//if ( Trace ) trace( );
 
-		if ( m_screenImage != NULL )
-			maDestroyObject( m_screenImage );
+		if ( mScreenImage != NULL )
+			maDestroyObject( mScreenImage );
 
 		if ( getWidth( ) > 0 && getHeight( ) > 0 )
 		{
-			m_screenImage = maCreatePlaceholder( );
-			maCreateDrawableImage( m_screenImage, getWidth( ), getHeight( ) );
+			mScreenImage = maCreatePlaceholder( );
+			maCreateDrawableImage( mScreenImage, getWidth( ), getHeight( ) );
 		}
 	}
 }

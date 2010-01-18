@@ -23,7 +23,7 @@ namespace UI
 	//-------------------------------------------------------------------------
 	TriggerMenuSelectionAction::TriggerMenuSelectionAction( Menu* menu ) :
 	//-------------------------------------------------------------------------
-		m_menu( menu )
+		mMenu( menu )
 	{
 	}
 
@@ -37,6 +37,6 @@ namespace UI
 	void TriggerMenuSelectionAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		m_menu->triggerSelectedItem( );
+		mMenu->triggerSelectedItem( );
 	}
 }

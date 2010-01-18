@@ -27,13 +27,13 @@ namespace UI
 	//-------------------------------------------------------------------------
 	: Screen( )
 	{
-		//m_previous = previous;
+		//mPrevious = previous;
 		//
 		// Screen size
 		//
 		MAExtent screenSize = maGetScrSize( );
-		m_width = EXTENT_X( screenSize );
-		m_height = EXTENT_Y( screenSize );
+		mWidth = EXTENT_X( screenSize );
+		mHeight = EXTENT_Y( screenSize );
 	}
 
 	//-------------------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace UI
 	void ModalScreen::show( Screen* previous )
 	//-------------------------------------------------------------------------
 	{
-		m_previous = previous;
+		mPrevious = previous;
 		Screen::show( );
 	}
 
@@ -65,9 +65,9 @@ namespace UI
 	void ModalScreen::close( )
 	//-------------------------------------------------------------------------
 	{
-		m_previous->show( );
-		for ( int i = 0; i < m_listeners.size(); i++ )
-			m_listeners[i]->screenClosed( this );
+		mPrevious->show( );
+		for ( int i = 0; i < mListeners.size(); i++ )
+			mListeners[i]->screenClosed( this );
 		//MemoryMgr::untrack( this );
 		delete this;
 	}

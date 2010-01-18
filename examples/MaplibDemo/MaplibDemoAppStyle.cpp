@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MemoryMgr.h"
 #include "MaplibDemoAppStyle.h"
-#include "../MAHeaders.h"
+#include "MAHeaders.h"
 #include "Color.h"
 
 namespace MaplibDemo
@@ -25,72 +25,72 @@ namespace MaplibDemo
 	//-------------------------------------------------------------------------
 	MaplibDemoAppStyle::MaplibDemoAppStyle( ) :
 	//-------------------------------------------------------------------------
-		m_widgetSkin( NULL ),
-		m_buttonSkin( NULL ),
-		m_fontSmallestBoldBlack( NULL ),
-		m_fontSmallestBoldWhite( NULL ),
-		m_fontSmallestWhite( NULL ),
-		m_fontSmallestBlack( NULL ),
-		m_fontSmallBoldWhite( NULL ),
-		m_fontSmallBoldBlack( NULL ),
-		m_fontSmallWhite( NULL ),
-		m_fontSmallBlue( NULL ),
-		m_fontSmallBlack( NULL ),
-		m_fontMediumBoldWhite( NULL ),
-		m_fontMediumWhite( NULL ),
-		m_fontLargeBoldWhite( NULL ),
-		m_fontLargeBoldBlack( NULL ),
-		m_fontLargeWhite( NULL ),
-		m_fontLargestBoldWhite( NULL ),
-		m_fontLargestWhite( NULL )
+		mWidgetSkin( NULL ),
+		mButtonSkin( NULL ),
+		mFontSmallestBoldBlack( NULL ),
+		mFontSmallestBoldWhite( NULL ),
+		mFontSmallestWhite( NULL ),
+		mFontSmallestBlack( NULL ),
+		mFontSmallBoldWhite( NULL ),
+		mFontSmallBoldBlack( NULL ),
+		mFontSmallWhite( NULL ),
+		mFontSmallBlue( NULL ),
+		mFontSmallBlack( NULL ),
+		mFontMediumBoldWhite( NULL ),
+		mFontMediumWhite( NULL ),
+		mFontLargeBoldWhite( NULL ),
+		mFontLargeBoldBlack( NULL ),
+		mFontLargeWhite( NULL ),
+		mFontLargestBoldWhite( NULL ),
+		mFontLargestWhite( NULL )
 	{
-		m_widgetSkin = newobject( WidgetSkin, new WidgetSkin( RES_SELECTEDGRAYRAMP, RES_UNSELECTEDGRAYRAMP, 0, 25, 0, 25, false, false ) );
-		m_buttonSkin = newobject( WidgetSkin, new WidgetSkin( RES_SMOKESKIN, RES_SMOKESKIN, 8, 57, 8, 56, true, true ) );
+		mWidgetSkin = newobject( WidgetSkin, new WidgetSkin( RES_SELECTEDGRAYRAMP, RES_UNSELECTEDGRAYRAMP, 0, 25, 0, 25, false, false ) );
+		mButtonSkin = newobject( WidgetSkin, new WidgetSkin( RES_SMOKESKIN, RES_SMOKESKIN, 8, 57, 8, 56, true, true ) );
 
-		m_fontSmallestBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA13BLACKBOLD ) );
-		m_fontSmallestBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA13WHITEBOLD ) );
-		m_fontSmallestWhite = newobject( Font, new Font( RES_FONT_VERDANA13WHITE ) );
-		m_fontSmallestBlack = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
+		mFontSmallestBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA13BLACKBOLD ) );
+		mFontSmallestBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA13WHITEBOLD ) );
+		mFontSmallestWhite = newobject( Font, new Font( RES_FONT_VERDANA13WHITE ) );
+		mFontSmallestBlack = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 
-		m_fontSmallBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA14WHITEBOLD ) );
-		m_fontSmallBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA14BLACKBOLD ) );
-		m_fontSmallWhite = newobject( Font, new Font( RES_FONT_VERDANA14WHITE ) );
-		m_fontSmallBlue = newobject( Font, new Font( RES_FONT_VERDANA14BLUE ) );
-		m_fontSmallBlack = newobject( Font, new Font( RES_FONT_VERDANA14BLACK ) );
+		mFontSmallBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA14WHITEBOLD ) );
+		mFontSmallBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA14BLACKBOLD ) );
+		mFontSmallWhite = newobject( Font, new Font( RES_FONT_VERDANA14WHITE ) );
+		mFontSmallBlue = newobject( Font, new Font( RES_FONT_VERDANA14BLUE ) );
+		mFontSmallBlack = newobject( Font, new Font( RES_FONT_VERDANA14BLACK ) );
 
-		m_fontMediumBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA16WHITEBOLD ) );
-		m_fontMediumWhite = newobject( Font, new Font( RES_FONT_VERDANA16WHITE ) );
+		mFontMediumBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA16WHITEBOLD ) );
+		mFontMediumWhite = newobject( Font, new Font( RES_FONT_VERDANA16WHITE ) );
 
-		m_fontLargeBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA18WHITEBOLD ) );
-		m_fontLargeBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA18BLACKBOLD ) );
-		m_fontLargeWhite = newobject( Font, new Font( RES_FONT_VERDANA18WHITE ) );
+		mFontLargeBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA18WHITEBOLD ) );
+		mFontLargeBoldBlack = newobject( Font, new Font( RES_FONT_VERDANA18BLACKBOLD ) );
+		mFontLargeWhite = newobject( Font, new Font( RES_FONT_VERDANA18WHITE ) );
 
-		m_fontLargestBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA20WHITEBOLD ) );
-		m_fontLargestWhite = newobject( Font, new Font( RES_FONT_VERDANA20WHITE ) );
+		mFontLargestBoldWhite = newobject( Font, new Font( RES_FONT_VERDANA20WHITEBOLD ) );
+		mFontLargestWhite = newobject( Font, new Font( RES_FONT_VERDANA20WHITE ) );
 	}
 
 	//-------------------------------------------------------------------------
 	MaplibDemoAppStyle::~MaplibDemoAppStyle( )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( m_widgetSkin);
-		deleteobject( m_buttonSkin);
-		deleteobject( m_fontSmallestBoldBlack );
-		deleteobject( m_fontSmallestBoldWhite );
-		deleteobject( m_fontSmallestWhite );
-		deleteobject( m_fontSmallestBlack );
-		deleteobject( m_fontSmallBoldBlack );
-		deleteobject( m_fontSmallBoldWhite );
-		deleteobject( m_fontSmallWhite );
-		deleteobject( m_fontSmallBlue );
-		deleteobject( m_fontSmallBlack );
-		deleteobject( m_fontMediumBoldWhite );
-		deleteobject( m_fontMediumWhite );
-		deleteobject( m_fontLargeBoldWhite );
-		deleteobject( m_fontLargeBoldBlack );
-		deleteobject( m_fontLargeWhite );
-		deleteobject( m_fontLargestBoldWhite );
-		deleteobject( m_fontLargestWhite );
+		deleteobject( mWidgetSkin);
+		deleteobject( mButtonSkin);
+		deleteobject( mFontSmallestBoldBlack );
+		deleteobject( mFontSmallestBoldWhite );
+		deleteobject( mFontSmallestWhite );
+		deleteobject( mFontSmallestBlack );
+		deleteobject( mFontSmallBoldBlack );
+		deleteobject( mFontSmallBoldWhite );
+		deleteobject( mFontSmallWhite );
+		deleteobject( mFontSmallBlue );
+		deleteobject( mFontSmallBlack );
+		deleteobject( mFontMediumBoldWhite );
+		deleteobject( mFontMediumWhite );
+		deleteobject( mFontLargeBoldWhite );
+		deleteobject( mFontLargeBoldBlack );
+		deleteobject( mFontLargeWhite );
+		deleteobject( mFontLargestBoldWhite );
+		deleteobject( mFontLargestWhite );
 	}
 
 	//-------------------------------------------------------------------------
@@ -103,72 +103,72 @@ namespace MaplibDemo
 			if ( bold )
 		{
 				if ( color == Color::white )
-					return m_fontSmallestBoldWhite;
+					return mFontSmallestBoldWhite;
 				if ( color == Color::black )
-					return m_fontSmallestBoldBlack;
+					return mFontSmallestBoldBlack;
 			}
 			else
 			{
 				if ( color == Color::white )
-					return m_fontSmallestWhite;
+					return mFontSmallestWhite;
 				if ( color == Color::black)
-					return m_fontSmallestBlack;
+					return mFontSmallestBlack;
 			}
 			break;
 		case FontSize_Small:
 			if ( bold )
 			{
 				if ( color == Color::black )
-					return m_fontSmallBoldBlack;
+					return mFontSmallBoldBlack;
 				if ( color == Color::white )
-					return m_fontSmallBoldWhite;
+					return mFontSmallBoldWhite;
 			}
 			else
 			{
 				if ( color == Color::white )
-					return m_fontSmallWhite;
+					return mFontSmallWhite;
 				if ( color == Color::blue )
-					return m_fontSmallBlue;
+					return mFontSmallBlue;
 				if ( color == Color::black ) 
-					return m_fontSmallBlack;
+					return mFontSmallBlack;
 			}
 			break;
 		case FontSize_Medium:
 			if ( bold )
 			{
 				if ( color == Color::white ) 
-					return m_fontMediumBoldWhite;
+					return mFontMediumBoldWhite;
 			}
 			else
 			{
 				if ( color == Color::white )
-					return m_fontMediumWhite;
+					return mFontMediumWhite;
 			}
 			break;
 		case FontSize_Large:
 			if ( bold )
 			{
 				if ( color == Color::white )
-					return m_fontLargeBoldWhite;
+					return mFontLargeBoldWhite;
 				if( color == Color::black )
-					return m_fontLargeBoldBlack;
+					return mFontLargeBoldBlack;
 			}
 			else
 			{
 				if ( color == Color::white )
-					return m_fontLargeWhite;
+					return mFontLargeWhite;
 			}
 			break;
 		case FontSize_Largest:
 			if ( bold )
 			{
 				if ( color == Color::white )
-					return m_fontLargestBoldWhite;
+					return mFontLargestBoldWhite;
 			}
 			else
 			{
 				if ( color == Color::white )
-					return m_fontLargestWhite;
+					return mFontLargestWhite;
 			}
 			break;
 		}
@@ -179,14 +179,14 @@ namespace MaplibDemo
 	WidgetSkin* MaplibDemoAppStyle::getWidgetSkin( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_widgetSkin;
+		return mWidgetSkin;
 	}
 
 	//-------------------------------------------------------------------------
 	WidgetSkin* MaplibDemoAppStyle::getButtonSkin( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_buttonSkin;
+		return mButtonSkin;
 	}
 
 	//-------------------------------------------------------------------------

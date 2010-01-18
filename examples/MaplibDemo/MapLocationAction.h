@@ -40,7 +40,7 @@ namespace MAP
 		// Action overrides
 		//
 		virtual const char*		getShortName( ) const;
-		virtual Action*			clone( ) const { return newobject( MapLocationAction, new MapLocationAction( m_widget, m_location, m_label ) ); }
+		virtual Action*			clone( ) const { return newobject( MapLocationAction, new MapLocationAction( mWidget, mLocation, mLabel ) ); }
 		
 	protected:
 		//
@@ -49,9 +49,9 @@ namespace MAP
 		virtual void			performPrim( );
 
 	private:
-		MapWidget*				m_widget;
-		LonLat					m_location;
-		const char*				m_label;
+		MapWidget*				mWidget;
+		LonLat					mLocation;
+		const char*				mLabel;
 	};
 }
 

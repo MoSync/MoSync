@@ -49,12 +49,12 @@ namespace UI
 	//=========================================================================
 	{
 	public:
-								AppScreenBase( MobletEx* m_moblet );
+								AppScreenBase( MobletEx* mMoblet );
 		virtual					~AppScreenBase( );
 
 		void					setClientWidget( Widget* widget );
 		static Screen*			getCurrentScreen( ) { return currentScreen; }	
-		Moblet*					getMoblet( ) { return m_moblet; }
+		Moblet*					getMoblet( ) { return mMoblet; }
 		//
 		// Screen overrides
 		//
@@ -79,16 +79,16 @@ namespace UI
 		virtual void			enumerateActions( Vector<Action*>& list ) = 0;
 
 	protected:
-		MobletEx*				m_moblet;
-		int 					m_width;
-		int 					m_height;
-		SoftKeyBar*				m_softKeyBar;
+		MobletEx*				mMoblet;
+		int 					mWidth;
+		int 					mHeight;
+		SoftKeyBar*				mSoftKeyBar;
 
 	private:
-		Layout*					m_contentFrame;
-		AppFrame*				m_appFrame;
-		bool					m_messagePosted;
-		KeyRepeatTimer*			m_keyTimer;
+		Layout*					mContentFrame;
+		AppFrame*				mAppFrame;
+		bool					mMessagePosted;
+		KeyRepeatTimer*			mKeyTimer;
 	};
 };
 #endif // APPSCREENBASE_H_

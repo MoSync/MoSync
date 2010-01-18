@@ -56,11 +56,11 @@ namespace UI
 		virtual void		setRightAction( Action* action );
 
 	private:
-		Label*				m_leftLabel;
-		Label*				m_rightLabel;
-		Action*				m_leftAction;
-		Action*				m_rightAction;
-		Font*				m_font;
+		Label*				mLeftLabel;
+		Label*				mRightLabel;
+		Action*				mLeftAction;
+		Action*				mRightAction;
+		Font*				mFont;
 	};
 }
 

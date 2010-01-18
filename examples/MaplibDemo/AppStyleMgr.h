@@ -33,21 +33,21 @@ namespace UI
 	//=========================================================================
 	{
 	private:
-								AppStyleMgr( ) : m_style( NULL ) { }
+								AppStyleMgr( ) : mStyle( NULL ) { }
 	public:
-		virtual					~AppStyleMgr( ) { deleteobject( m_style ); }
+		virtual					~AppStyleMgr( ) { deleteobject( mStyle ); }
 
-		static AppStyleMgr*		get( ) { if ( s_singleton == NULL ) { s_singleton = newobject( AppStyleMgr, new AppStyleMgr( ) ); } return s_singleton; }
-		static void				shutdown( ) { deleteobject( s_singleton ); }
+		static AppStyleMgr*		get( ) { if ( sSingleton == NULL ) { sSingleton = newobject( AppStyleMgr, new AppStyleMgr( ) ); } return sSingleton; }
+		static void				shutdown( ) { deleteobject( sSingleton ); }
 
 		static void				setStyle( AppStyle* style ) { get( )->setStylePrim( style ); }
-		static AppStyle*		getStyle( ) { return get( )->m_style; }
+		static AppStyle*		getStyle( ) { return get( )->mStyle; }
 
 	private:
-		void					setStylePrim( AppStyle* style ) { deleteobject( m_style ); m_style = style; }
+		void					setStylePrim( AppStyle* style ) { deleteobject( mStyle ); mStyle = style; }
 
-		static AppStyleMgr*		s_singleton;
-		AppStyle*				m_style;
+		static AppStyleMgr*		sSingleton;
+		AppStyle*				mStyle;
 	};
 }
 

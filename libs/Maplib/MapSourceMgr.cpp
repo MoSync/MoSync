@@ -23,48 +23,48 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	MapSourceMgr* MapSourceMgr::s_singleton = NULL;
+	MapSourceMgr* MapSourceMgr::sSingleton = NULL;
 
 	MapSourceMgr* MapSourceMgr::get( ) 
 	{ 
-		if ( s_singleton == NULL ) 
+		if ( sSingleton == NULL ) 
 		{ 
-			s_singleton = newobject( MapSourceMgr, new MapSourceMgr( ) );
+			sSingleton = newobject( MapSourceMgr, new MapSourceMgr( ) );
 		} 
-		return s_singleton; 
+		return sSingleton; 
 	}
 
 	void MapSourceMgr::shutdown( ) 
 	{ 
-		deleteobject( s_singleton );
+		deleteobject( sSingleton );
 	}
 
 	//-------------------------------------------------------------------------
 	MapSourceMgr::MapSourceMgr( ) :
 	//-------------------------------------------------------------------------
-		m_map( )
+		mMap( )
 	{
 		for ( int i = 0; i < MapSourceKind_Last; i++ )
-			m_map[(MapSourceKind)i] = NULL;
+			mMap[(MapSourceKind)i] = NULL;
 
-		m_map[MapSourceKind_OpenStreetMap] = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
-		m_map[MapSourceKind_GoogleMap] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_StreetMap ) );
-		m_map[MapSourceKind_GoogleAerial] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Aerial ) );
-		m_map[MapSourceKind_GoogleHybrid] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Hybrid ) );
-		m_map[MapSourceKind_CloudMade1] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 1 ) );
-		m_map[MapSourceKind_CloudMade7] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 7 ) );
-		//m_map[MapSourceKind_VirtualEarth] = newobject( VirtualEarthMapSource, new VirtualEarthMapSource( ) );
+		mMap[MapSourceKind_OpenStreetMap] = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
+		mMap[MapSourceKind_GoogleMap] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_StreetMap ) );
+		mMap[MapSourceKind_GoogleAerial] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Aerial ) );
+		mMap[MapSourceKind_GoogleHybrid] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Hybrid ) );
+		mMap[MapSourceKind_CloudMade1] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 1 ) );
+		mMap[MapSourceKind_CloudMade7] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 7 ) );
+		//mMap[MapSourceKind_VirtualEarth] = newobject( VirtualEarthMapSource, new VirtualEarthMapSource( ) );
 	}
 
 	//-------------------------------------------------------------------------
 	MapSourceMgr::~MapSourceMgr( )
 	//-------------------------------------------------------------------------
 	{
-		//int count = m_map. m_map.getKeySet( ).size( );
+		//int count = mMap. mMap.getKeySet( ).size( );
 		//for ( int i = 0; i < count; i++ )
 		//{
-		//	MapSourceKind kind = m_map.getKeySet( )[i];
-		//	MapSource* source = m_map[ kind ];
+		//	MapSourceKind kind = mMap.getKeySet( )[i];
+		//	MapSource* source = mMap[ kind ];
 		//	deleteobject( source );
 		//}
 
@@ -73,7 +73,7 @@ namespace MAP
 		// we're skipping deallocation for that reason,
 		// will leak some memory blocks on exit.
 		//
-		//for ( Dictionary<MapSourceKind, Pair<MapSourceKind, MapSource*> >::Iterator i = m_map.begin();
+		//for ( Dictionary<MapSourceKind, Pair<MapSourceKind, MapSource*> >::Iterator i = mMap.begin();
 		//		i != NULL;
 		//		i++ )
 		//{
@@ -87,7 +87,7 @@ namespace MAP
 	MapSource* MapSourceMgr::getMapSource( MapSourceKind kind )
 	//-------------------------------------------------------------------------
 	{
-		return m_map[ kind ];
+		return mMap[ kind ];
 	}
 }
 

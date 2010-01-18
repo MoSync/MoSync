@@ -34,11 +34,11 @@ namespace UI
 	AppFrame::AppFrame(int x, int y, int width, int height, Widget* parent, int columns, int rows )
 	//-------------------------------------------------------------------------
 		: Layout( x, y, width, height, parent, columns, rows ),
-		m_font( NULL ),
-		m_progress( -1 )
+		mFont( NULL ),
+		mProgress( -1 )
 	{
 		AppStyle* style = AppStyleMgr::getStyle( );
-		m_msgSkin = style->getButtonSkin( );
+		mMsgSkin = style->getButtonSkin( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -53,27 +53,27 @@ namespace UI
 	{
 		if ( progress >= 0 )
 		{
-			//m_message = message;
-			m_progress = progress;
+			//mMessage = message;
+			mProgress = progress;
 			//Rect bounds( OutsideMargin + InsideMargin, 0, getWidth( ) - 2 * ( OutsideMargin + InsideMargin ), 32767 );
 			Rect bounds( OutsideMargin, OutsideMargin, getWidth() - 2 * OutsideMargin, 10 );
-			m_progressBounds = bounds;
+			mProgressBounds = bounds;
 			requestRepaint( );
 		}
 		else
 		{
-			m_message = message;
-			m_progress = -1;
+			mMessage = message;
+			mProgress = -1;
 			Rect bounds( OutsideMargin + InsideMargin, 0, getWidth( ) - 2 * ( OutsideMargin + InsideMargin ), 32767 );
-			MAExtent ext = m_font->getBoundedStringDimensions( m_message.c_str( ), bounds );
+			MAExtent ext = mFont->getBoundedStringDimensions( mMessage.c_str( ), bounds );
 			int width = EXTENT_X( ext );
 			int height = EXTENT_Y( ext );
 			int center = getWidth( ) / 2;
 			//int middle = getHeight( ) * 2 / 3;
 			int top = OutsideMargin;
-			//m_textBounds = Rect( center - width / 2, getHeight( ) - OutsideMargin - InsideMargin - height, width, height );
-			m_textBounds = Rect( center - width / 2, top + InsideMargin, width, height );
-			m_fillBounds = Rect( m_textBounds.x - InsideMargin, m_textBounds.y - InsideMargin, width + 2 * InsideMargin, height + 2 * InsideMargin );
+			//mTextBounds = Rect( center - width / 2, getHeight( ) - OutsideMargin - InsideMargin - height, width, height );
+			mTextBounds = Rect( center - width / 2, top + InsideMargin, width, height );
+			mFillBounds = Rect( mTextBounds.x - InsideMargin, mTextBounds.y - InsideMargin, width + 2 * InsideMargin, height + 2 * InsideMargin );
 			requestRepaint( );
 		}
 	}
@@ -82,7 +82,7 @@ namespace UI
 	void AppFrame::clearMessage( )
 	//-------------------------------------------------------------------------
 	{
-		m_message.clear( );
+		mMessage.clear( );
 		requestRepaint( );
 	}
 
@@ -92,23 +92,23 @@ namespace UI
 	{
 		Layout::draw( forceDraw );
 
-		if ( m_message.length( ) > 0 )
+		if ( mMessage.length( ) > 0 )
 		{
 			// draw message, if any
 			maSetColor( MessageBackColor.val( ) );
 
-			if ( m_progress < 0 )
+			if ( mProgress < 0 )
 			{
-				//Gfx_fillRect( m_fillBounds.x, m_fillBounds.y, m_fillBounds.width, m_fillBounds.height );
+				//Gfx_fillRect( mFillBounds.x, mFillBounds.y, mFillBounds.width, mFillBounds.height );
 
-				m_msgSkin->draw( m_fillBounds.x, m_fillBounds.y, m_fillBounds.width, m_fillBounds.height, WidgetSkin::/*eType::*/SELECTED );
-				m_font->drawBoundedString( m_message.c_str( ), m_textBounds.x, m_textBounds.y, m_textBounds );
+				mMsgSkin->draw( mFillBounds.x, mFillBounds.y, mFillBounds.width, mFillBounds.height, WidgetSkin::/*eType::*/SELECTED );
+				mFont->drawBoundedString( mMessage.c_str( ), mTextBounds.x, mTextBounds.y, mTextBounds );
 			}
 			else
 			{
-				Gfx_fillRect( m_progressBounds.x, m_progressBounds.y, m_progressBounds.width, m_progressBounds.height );
+				Gfx_fillRect( mProgressBounds.x, mProgressBounds.y, mProgressBounds.width, mProgressBounds.height );
 				maSetColor( MessageForeColor.val( ) );
-				Gfx_fillRect( m_progressBounds.x, m_progressBounds.y, (int)( m_progressBounds.width * m_progress ), m_progressBounds.height );
+				Gfx_fillRect( mProgressBounds.x, mProgressBounds.y, (int)( mProgressBounds.width * mProgress ), mProgressBounds.height );
 			}
 		}
 	}

@@ -52,7 +52,7 @@ namespace MAP
 		//
 		MapSourceKind getSourceKind( ) const		
 		{ 
-			switch( m_mapKind )
+			switch( mMapKind )
 			{
 			case GoogleMapsMapKind_StreetMap: return MapSourceKind_GoogleMap; 
 			case GoogleMapsMapKind_Aerial: return MapSourceKind_GoogleAerial;
@@ -69,7 +69,7 @@ namespace MAP
 		PixelCoordinate			lonLatToPixel( LonLat lonlat, int magnification );
 		LonLat					tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 	private:
-		GoogleMapsMapKind		m_mapKind;
+		GoogleMapsMapKind		mMapKind;
 	};
 }
 

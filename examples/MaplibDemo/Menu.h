@@ -58,10 +58,10 @@ namespace UI
 	private:
 		void					updateSelection( );
 
-		Layout*					m_frame;
-		ListBox*				m_listBox;
-		SoftKeyBar*				m_softKeys;
-		int						m_current;
+		Layout*					mFrame;
+		ListBox*				mListBox;
+		SoftKeyBar*				mSoftKeys;
+		int						mCurrent;
 	};
 }
 

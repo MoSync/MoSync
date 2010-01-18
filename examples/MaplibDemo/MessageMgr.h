@@ -50,19 +50,19 @@ namespace Util
 	public:
 		virtual					~MessageMgr( );
 
-		static MessageMgr*		get( ) { if ( s_singleton == NULL ) { s_singleton = newobject( MessageMgr, new MessageMgr( ) ); } return s_singleton; }
-		static void				shutdown( ) { deleteobject( s_singleton ); }
+		static MessageMgr*		get( ) { if ( sSingleton == NULL ) { sSingleton = newobject( MessageMgr, new MessageMgr( ) ); } return sSingleton; }
+		static void				shutdown( ) { deleteobject( sSingleton ); }
 		void					postMessage( const char *fmt, ... );
 		void					postProgress( float progress );
-		const char*				getMessage( ) const { return m_message.c_str( ); }
-		float					getProgress( ) const { return m_progress; }
+		const char*				getMessage( ) const { return mMessage.c_str( ); }
+		float					getProgress( ) const { return mProgress; }
 
 	private:
 		void					onMessagePosted( );
 
-		static MessageMgr*		s_singleton;
-		String					m_message;
-		float					m_progress;
+		static MessageMgr*		sSingleton;
+		String					mMessage;
+		float					mProgress;
 	};
 }
 

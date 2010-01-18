@@ -163,7 +163,7 @@ namespace MAP
 		sprintf( buffer, 
 					"http://b.tile.cloudmade.com/%s/%d/%d/%d/%d/%d.png", 
 					ApiKey, 
-					m_style, 
+					mStyle, 
 					getTileSize( ), 
 					tileXY.getMagnification( ), 
 					tileXY.getX( ), 

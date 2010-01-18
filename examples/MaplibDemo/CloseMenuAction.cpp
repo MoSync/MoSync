@@ -22,7 +22,7 @@ namespace UI
 	//-------------------------------------------------------------------------
 	CloseMenuAction::CloseMenuAction( Menu* menu ) :
 	//-------------------------------------------------------------------------
-		m_menu( menu )
+		mMenu( menu )
 	{
 	}
 
@@ -36,6 +36,6 @@ namespace UI
 	void CloseMenuAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		m_menu->close( );
+		mMenu->close( );
 	}
 }

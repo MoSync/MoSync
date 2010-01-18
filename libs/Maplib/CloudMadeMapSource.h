@@ -39,14 +39,14 @@ namespace MAP
 		static const char*	ApiKey;
 
 	public:
-							CloudMadeMapSource( int style ) : MapSource( ), m_style( style ) { }
+							CloudMadeMapSource( int style ) : MapSource( ), mStyle( style ) { }
 		virtual				~CloudMadeMapSource( ) { }
 		//
 		// MapSource overrides
 		//
 		MapSourceKind getSourceKind( ) const			
 		{
-			switch( m_style )
+			switch( mStyle )
 			{
 			case 1: return MapSourceKind_CloudMade1;
 			case 7: return MapSourceKind_CloudMade7;
@@ -57,8 +57,8 @@ namespace MAP
 		MAExtent			getTileSize( ) const			{ return 256; }
 		int					getMagnificationMin( ) const	{ return 1; }
 		int					getMagnificationMax( ) const	{ return 17; }
-		int					getStyle( ) const				{ return m_style; }
-		void				setStyle( int style )			{ m_style = style; }
+		int					getStyle( ) const				{ return mStyle; }
+		void				setStyle( int style )			{ mStyle = style; }
 
 		void				getTileUrl( char* buffer, MapTileCoordinate tileXY );
 		MapTileCoordinate	lonLatToTile( LonLat lonlat, int magnification );
@@ -67,7 +67,7 @@ namespace MAP
 
 		
 	private:
-		int					m_style;
+		int					mStyle;
 	};
 }
 

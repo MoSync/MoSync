@@ -29,7 +29,7 @@ namespace UI
 	//=========================================================================
 	{
 	public:
-								AppScreen( MobletEx* m_moblet );
+								AppScreen( MobletEx* mMoblet );
 		virtual					~AppScreen( );
 
 		virtual void			enumerateActions( Vector<Action*>& list );

@@ -29,7 +29,7 @@ namespace MAP
 	//
 	GoogleMapSource::GoogleMapSource( GoogleMapsMapKind mapKind ) :
 	//-------------------------------------------------------------------------
-		m_mapKind( mapKind )
+		mMapKind( mapKind )
 	{
 	}
 
@@ -189,7 +189,7 @@ namespace MAP
 		int tileSize = getTileSize( );
 		LonLat centerpoint = this->tileCenterToLonLat( tileSize, tileXY, 0, bottomCrop/2 );
 		char* maptype = "";
-		switch( m_mapKind )
+		switch( mMapKind )
 		{
 		case GoogleMapsMapKind_StreetMap: maptype = "roadmap"; break;
 		case GoogleMapsMapKind_Aerial: maptype = "satellite"; break;

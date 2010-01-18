@@ -46,8 +46,8 @@ namespace Util
 		static T* track( T* p, const char* label )
 		{
 			#ifdef TRACKOBJECTS
-			m_keys.add( p );
-			m_values.add( label );
+			mKeys.add( p );
+			mValues.add( label );
 			#endif
 			return p;
 		}
@@ -55,12 +55,12 @@ namespace Util
 		static void untrack( void* p )
 		{
 			#ifdef TRACKOBJECTS
-			for ( int i = 0; i < m_keys.size( ); i++ )
+			for ( int i = 0; i < mKeys.size( ); i++ )
 			{
-				if ( m_keys[i] == p )
+				if ( mKeys[i] == p )
 				{
-					m_keys.remove( i );
-					m_values.remove( i );
+					mKeys.remove( i );
+					mValues.remove( i );
 					return;
 				}
 			}
@@ -71,10 +71,10 @@ namespace Util
 		{
 			#ifdef TRACKOBJECTS
 
-			int count = m_keys.size( );
+			int count = mKeys.size( );
 			DebugPrintf( "Dump: %d objects remaining\n", count );
 			for ( int i = 0; i < count; i++ )
-				DebugPrintf( "   %s\n", m_values[ i ] );
+				DebugPrintf( "   %s\n", mValues[ i ] );
 
 			#endif
 
@@ -82,8 +82,8 @@ namespace Util
 
 	private:
 		#ifdef TRACKOBJECTS
-		static Vector<void*> m_keys;
-		static Vector<const char*> m_values;
+		static Vector<void*> mKeys;
+		static Vector<const char*> mValues;
 		#endif
 	};
 

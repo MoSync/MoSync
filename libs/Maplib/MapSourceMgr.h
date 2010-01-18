@@ -43,9 +43,9 @@ namespace MAP
 		MapSource*				getMapSource( MapSourceKind kind );
 
 	private:
-		static MapSourceMgr*	s_singleton;
+		static MapSourceMgr*	sSingleton;
 
-		Map<MapSourceKind, MapSource*> m_map;
+		Map<MapSourceKind, MapSource*> mMap;
 	};
 }
 

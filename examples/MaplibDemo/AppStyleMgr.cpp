@@ -19,5 +19,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace UI
 {
-	AppStyleMgr* AppStyleMgr::s_singleton = NULL;
+	AppStyleMgr* AppStyleMgr::sSingleton = NULL;
 }

@@ -27,26 +27,26 @@ namespace UI
 	MenuItem::MenuItem( Action* action )
 	//-------------------------------------------------------------------------
 		: Label( 0, 0, 0, 0, NULL ),
-		m_action( action )
+		mAction( action )
 	{
 		AppStyle* appStyle = AppStyleMgr::getStyle( );
 		Font* font = appStyle->getFont( FontSize_Small, Color::white, false );
 		setFont( font );
 		setVerticalAlignment(Label::VA_CENTER );
-		setCaption( m_action->getShortName( ) );
+		setCaption( mAction->getShortName( ) );
 	}
 
 	//-------------------------------------------------------------------------
 	MenuItem::~MenuItem( )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( m_action );
+		deleteobject( mAction );
 	}
 
 	//-------------------------------------------------------------------------
 	Action* MenuItem::getAction( ) const
 	//-------------------------------------------------------------------------
 	{
-		return m_action;
+		return mAction;
 	}
 }

@@ -23,7 +23,7 @@ namespace UI
 	//-------------------------------------------------------------------------
 	ShowMenuAction::ShowMenuAction( IActionSource* source ) :
 	//-------------------------------------------------------------------------
-		m_source( source )
+		mSource( source )
 	{
 	}
 
@@ -44,7 +44,7 @@ namespace UI
 	void ShowMenuAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		Menu* menu = newobject( Menu, new Menu( m_source ) );
+		Menu* menu = newobject( Menu, new Menu( mSource ) );
 		menu->show( );
 	}
 }

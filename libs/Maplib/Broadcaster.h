@@ -24,33 +24,33 @@ using namespace MAUtil;
 
 namespace Util
 {
-	//=========================================================================
-	template<class T>
-	class Broadcaster
-	//=========================================================================
-	{
-	public:
-							Broadcaster( ) { }
-		virtual				~Broadcaster( ) { }
+    //=========================================================================
+    template<class T>
+    class Broadcaster
+    //=========================================================================
+    {
+    public:
+                            Broadcaster( ) { }
+        virtual				~Broadcaster( ) { }
 
-		//
-		// listener property
-		//
-		void				addListener( T* listener ) { m_listeners.add( listener ); }
-		void				removeListener( T* listener ) 
-							{ 
-								for ( int i = 0; i < m_listeners.size( ); i++ ) 
-								{
-									if ( m_listeners[i] == listener )
+        //
+        // listener property
+        //
+        void				addListener( T* listener ) { mListeners.add( listener ); }
+        void				removeListener( T* listener ) 
+                            { 
+                                for ( int i = 0; i < mListeners.size( ); i++ ) 
+                                {
+                                    if ( mListeners[i] == listener )
 									{
-										m_listeners.remove( i );
-										return;
-									}
-								}
-							}
-	protected:
-		Vector<T*>			m_listeners;
-	};
+                                        mListeners.remove( i );
+                                        return;
+                                    }
+                                }
+                            }
+    protected:
+        Vector<T*>			mListeners;
+    };
 }
 
 #endif // BROADCASTER_H_

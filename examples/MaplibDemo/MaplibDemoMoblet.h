@@ -36,7 +36,7 @@ namespace MaplibDemo
 		virtual void			shutdown( );
 
 	private:
-		MaplibDemoScreen*			m_screen;
+		MaplibDemoScreen*			mScreen;
 	};
 }
 

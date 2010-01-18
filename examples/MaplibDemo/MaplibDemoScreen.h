@@ -37,7 +37,7 @@ namespace MaplibDemo
 	//=========================================================================
 	{
 	public:
-								MaplibDemoScreen( MobletEx* m_moblet );
+								MaplibDemoScreen( MobletEx* mMoblet );
 		virtual					~MaplibDemoScreen( );
 
 		virtual bool			handleKeyPress( int keyCode );
@@ -47,8 +47,8 @@ namespace MaplibDemo
 	private:
 		void					nextMapSource( );
 
-		MapWidget*				m_map;
-		MapSourceKind			m_mapSourceKind;
+		MapWidget*				mMap;
+		MapSourceKind			mMapSourceKind;
 	};
 }
 

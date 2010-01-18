@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Util
 {
 	#ifdef TRACKOBJECTS
-	Vector<void*> MemoryMgr::m_keys;
-	Vector<const char*> MemoryMgr::m_values;
+	Vector<void*> MemoryMgr::mKeys;
+	Vector<const char*> MemoryMgr::mValues;
 	#endif
 }

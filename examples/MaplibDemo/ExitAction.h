@@ -39,7 +39,7 @@ namespace UI
 		// Action overrides
 		//
 		virtual const char*		getShortName( ) const;
-		virtual Action*			clone( ) const { return newobject( ExitAction, new ExitAction( m_moblet ) ); }
+		virtual Action*			clone( ) const { return newobject( ExitAction, new ExitAction( mMoblet ) ); }
 
 	protected:
 		//
@@ -47,7 +47,7 @@ namespace UI
 		//
 		virtual void			performPrim( );
 	private:
-		MobletEx*				m_moblet;
+		MobletEx*				mMoblet;
 	};
 }
 

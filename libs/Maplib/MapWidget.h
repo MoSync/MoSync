@@ -67,7 +67,7 @@ namespace MAP
 		//
 		// Map source property
 		//
-		MapSourceKind		getMapSourceKind( ) const { return m_sourceKind; }
+		MapSourceKind		getMapSourceKind( ) const { return mSourceKind; }
 		void				setMapSourceKind( MapSourceKind sourceKind );
 		//
 		// Center position property
@@ -83,8 +83,8 @@ namespace MAP
 		//
 		// Magnification scale display property
 		//
-		bool				getHasScale( ) const { return m_hasScale; }
-		void				setHasScale( bool hasScale ) { m_hasScale = hasScale; }
+		bool				getHasScale( ) const { return mHasScale; }
+		void				setHasScale( bool hasScale ) { mHasScale = hasScale; }
 		//
 		// Smooth panning property
 		//
@@ -93,8 +93,8 @@ namespace MAP
 		//
 		// Font property
 		//
-		Font*				getFont( ) const { return m_font; }
-		void				setFont( Font* font ) { m_font = font; }
+		Font*				getFont( ) const { return mFont; }
+		void				setFont( Font* font ) { mFont = font; }
 
 		//
 		// Navigation
@@ -137,21 +137,21 @@ namespace MAP
 		void				resetScreenImage( );
 		void				checkMapUpdateScope( );
 
-		LonLat				m_centerPositionLonLat;
-		PixelCoordinate		m_centerPositionPixels;
-		LonLat				m_panTargetPositionLonLat;
-		PixelCoordinate		m_panTargetPositionPixels;
-		int					m_magnification;
-		MapSourceKind		m_sourceKind;
-		int					m_mapUpdateNesting;
-		PixelCoordinate		m_prevCenter;
-		int					m_prevMagnification;
-		MAHandle			m_screenImage;
-		bool				m_hasScale;
-		MapWidgetPanTimerListener*	m_panTimerListener;
-		bool				m_hasSmoothPanning;
-		Font*				m_font;
-		bool				m_timerRunning;
+		LonLat				mCenterPositionLonLat;
+		PixelCoordinate		mCenterPositionPixels;
+		LonLat				mPanTargetPositionLonLat;
+		PixelCoordinate		mPanTargetPositionPixels;
+		int					mMagnification;
+		MapSourceKind		mSourceKind;
+		int					mMapUpdateNesting;
+		PixelCoordinate		mPrevCenter;
+		int					mPrevMagnification;
+		MAHandle			mScreenImage;
+		bool				mHasScale;
+		MapWidgetPanTimerListener*	mPanTimerListener;
+		bool				mHasSmoothPanning;
+		Font*				mFont;
+		bool				mTimerRunning;
 	};
 }
 #endif // MAPWIDGET_H_

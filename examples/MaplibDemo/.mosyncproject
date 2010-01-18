@@ -3,9 +3,9 @@
 <target-profile/>
 <criteria/>
 <properties>
-<property key="build.prefs:additional.include.paths" value="..\maplib\include"/>
+<property key="build.prefs:additional.include.paths" value="..\..\libs\maplib"/>
 <property key="build.prefs:additional.libraries" value="Maplib.lib,MAUI.lib,MAUtil.lib "/>
-<property key="build.prefs:additional.library.paths" value="..\maplib\Output"/>
+<property key="build.prefs:additional.library.paths" value="..\..\libs\maplib\Output"/>
 <property key="build.prefs:extra.link.sw" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>

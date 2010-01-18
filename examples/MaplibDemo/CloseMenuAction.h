@@ -34,7 +34,7 @@ namespace UI
 		// Action overrides
 		//
 		virtual const char*		getShortName( ) const {  return "Back"; }
-		virtual Action*			clone( ) const { return newobject( CloseMenuAction, new CloseMenuAction( m_menu ) ); }
+		virtual Action*			clone( ) const { return newobject( CloseMenuAction, new CloseMenuAction( mMenu ) ); }
 
 	protected:
 		//
@@ -43,7 +43,7 @@ namespace UI
 		virtual void			performPrim( );
 
 	private:
-		Menu*					m_menu;
+		Menu*					mMenu;
 	};
 }
 

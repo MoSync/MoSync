@@ -45,19 +45,19 @@ namespace UI
 		//
 		// Font
 		//
-		void				setfont( Font* font ) { m_font = font; }
-		Font*				getFont( ) const { return m_font; }
+		void				setfont( Font* font ) { mFont = font; }
+		Font*				getFont( ) const { return mFont; }
 
 	protected:
 		virtual void		draw( bool forceDraw=false );
 	private:
-		String				m_message;
-		float				m_progress;
-		Font*				m_font;
-		Rect				m_textBounds;
-		Rect				m_fillBounds;
-		Rect				m_progressBounds;
-		WidgetSkin*			m_msgSkin;
+		String				mMessage;
+		float				mProgress;
+		Font*				mFont;
+		Rect				mTextBounds;
+		Rect				mFillBounds;
+		Rect				mProgressBounds;
+		WidgetSkin*			mMsgSkin;
 	};
 }
 #endif // APPFRAME_H_

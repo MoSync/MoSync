@@ -26,27 +26,27 @@ namespace MAP
 	{
 	public:
 		PixelCoordinate( ) :
-			m_x( 0 ),
-			m_y( 0 ),
-			m_magnification( 0 )
+			mX( 0 ),
+			mY( 0 ),
+			mMagnification( 0 )
 		{
 		}
 
 		PixelCoordinate( const int magnification, const int x, const int y)
-		:	m_x( x ),
-			m_y( y ),
-			m_magnification( magnification )
+		:	mX( x ),
+			mY( y ),
+			mMagnification( magnification )
 		{
 		}
 
-		const int getX( ) const					{ return m_x; }
-		const int getY( ) const					{ return m_y; }
-		const int getMagnification( ) const		{ return m_magnification; }
+		const int getX( ) const					{ return mX; }
+		const int getY( ) const					{ return mY; }
+		const int getMagnification( ) const		{ return mMagnification; }
 
 	private:
-		int m_x;
-		int m_y;
-		int m_magnification;
+		int mX;
+		int mY;
+		int mMagnification;
 	};
 
 	static bool operator == ( const PixelCoordinate& a, const PixelCoordinate& b ) { return a.getX( ) == b.getX( ) && a.getY( ) == b.getY( ) && a.getMagnification( ) == b.getMagnification( ); }

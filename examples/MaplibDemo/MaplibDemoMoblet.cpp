@@ -36,15 +36,15 @@ namespace MaplibDemo
 
 	//-------------------------------------------------------------------------
 	MaplibDemoMoblet::MaplibDemoMoblet( )
-		: m_screen( NULL )
+		: mScreen( NULL )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
 
 		CloudMadeMapSource::ApiKey = "2d80ddd260155a7ba03e123176011fa4"; // registered on lars@8x10.se
 		GoogleMapSource::ApiKey = "ABQIAAAASy5nCpi0Rkp7zjf61gof0RSwGmTQ8vMzg6QxXdllR2ZPmPu02RTSpCw5ldHGcP6DsMziSwGx8muqHQ"; // reg to lars@8x10.se
-		m_screen = newobject( MaplibDemoScreen, new MaplibDemoScreen( (MobletEx*)this ) );
-		m_screen->show( );
+		mScreen = newobject( MaplibDemoScreen, new MaplibDemoScreen( (MobletEx*)this ) );
+		mScreen->show( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace MaplibDemo
 	void MaplibDemoMoblet::shutdown( )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( m_screen );
+		deleteobject( mScreen );
 		//AppStyleMgr::shutdown( );
 		MapCache::shutdown( );
 		MapSourceMgr::shutdown( );

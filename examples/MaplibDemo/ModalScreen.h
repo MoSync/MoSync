@@ -75,11 +75,11 @@ namespace UI
 		virtual bool			handleKeyRelease( int keyCode ) = 0;
 
 	protected:
-		int 					m_width;
-		int 					m_height;
+		int 					mWidth;
+		int 					mHeight;
 
 	private:
-		Screen*					m_previous;
+		Screen*					mPrevious;
 	};
 }
 

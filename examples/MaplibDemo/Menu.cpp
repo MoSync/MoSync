@@ -35,15 +35,15 @@ namespace UI
 	//-------------------------------------------------------------------------
 	Menu::Menu( IActionSource* source ) :
 	//-------------------------------------------------------------------------
-		m_current( 0 ),
-		m_frame( NULL ),
-		m_listBox( NULL ),
-		m_softKeys( NULL )
+		mCurrent( 0 ),
+		mFrame( NULL ),
+		mListBox( NULL ),
+		mSoftKeys( NULL )
 	{
 		Vector<Action*> actions = Vector<Action*>( );
 		source->enumerateActions( actions );
 
-		m_frame = newobject( Layout, new Layout( 0, 0, m_width, m_height, NULL, 1, 2 ) );
+		mFrame = newobject( Layout, new Layout( 0, 0, mWidth, mHeight, NULL, 1, 2 ) );
 
 		AppStyle* appStyle = AppStyleMgr::getStyle( );
 		WidgetSkin* skin = appStyle->getWidgetSkin( );
@@ -51,8 +51,8 @@ namespace UI
 		//
 		// Listbox
 		//
-		m_listBox = newobject( ListBox, new ListBox( 0, 0, m_width, m_height - SoftKeysHeight, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_NONE, false ) );
-		m_listBox->setSkin( skin );
+		mListBox = newobject( ListBox, new ListBox( 0, 0, mWidth, mHeight - SoftKeysHeight, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_NONE, false ) );
+		mListBox->setSkin( skin );
 
 		int count = actions.size( );
 		for ( int i = 0; i < count; i++ )
@@ -60,52 +60,52 @@ namespace UI
 			MenuItem* item = newobject( MenuItem, new MenuItem( actions[i] ) );
 			item->setFont( font );
 			item->setSkin( skin );
-			item->setWidth( m_width );
+			item->setWidth( mWidth );
 			item->setHeight( ItemHeight );
-			m_listBox->add( item );
+			mListBox->add( item );
 		}
-		m_listBox->setEnabled( true );
+		mListBox->setEnabled( true );
 		//
 		// Soft keys
 		//
-		m_softKeys = newobject( SoftKeyBar, new SoftKeyBar( 0, 0, m_width, SoftKeysHeight, NULL ) );
-		m_softKeys->setLeftAction( newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( this ) ) );
-		m_softKeys->setRightAction( newobject( CloseMenuAction, new CloseMenuAction( this ) ) );
-		m_softKeys->setEnabled( true );
+		mSoftKeys = newobject( SoftKeyBar, new SoftKeyBar( 0, 0, mWidth, SoftKeysHeight, NULL ) );
+		mSoftKeys->setLeftAction( newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( this ) ) );
+		mSoftKeys->setRightAction( newobject( CloseMenuAction, new CloseMenuAction( this ) ) );
+		mSoftKeys->setEnabled( true );
 		//
 		// Frame
 		//
-		m_frame->add( m_listBox );
-		m_frame->add( m_softKeys );
-		m_frame->setEnabled( true );
-		m_frame->update( );
+		mFrame->add( mListBox );
+		mFrame->add( mSoftKeys );
+		mFrame->setEnabled( true );
+		mFrame->update( );
 
-		m_current = 0;
+		mCurrent = 0;
 		updateSelection( );
 
-		setMain( m_frame );
+		setMain( mFrame );
 	}
 
 	//-------------------------------------------------------------------------
 	Menu::~Menu( )
 	//-------------------------------------------------------------------------
 	{
-		m_frame->getChildren( ).clear( );
-		deleteobject( m_frame );
-		for ( int i = 0; i < m_listBox->getChildren().size( ); i++ )
-			deleteobject( m_listBox->getChildren( )[i] );
-		deleteobject( m_listBox );
-		deleteobject( m_softKeys );
+		mFrame->getChildren( ).clear( );
+		deleteobject( mFrame );
+		for ( int i = 0; i < mListBox->getChildren().size( ); i++ )
+			deleteobject( mListBox->getChildren( )[i] );
+		deleteobject( mListBox );
+		deleteobject( mSoftKeys );
 	}
 
 	//-------------------------------------------------------------------------
 	void Menu::triggerSelectedItem( )
 	//-------------------------------------------------------------------------
 	{
-		if ( m_listBox->getChildren( ).size( ) > 0 )
+		if ( mListBox->getChildren( ).size( ) > 0 )
 		{
-			int selected = m_listBox->getSelectedIndex( );
-			MenuItem* item = (MenuItem*)m_listBox->getChildren( )[selected];
+			int selected = mListBox->getSelectedIndex( );
+			MenuItem* item = (MenuItem*)mListBox->getChildren( )[selected];
 			Action* action = item->getAction( )->clone( );
 			close( ); // deletes this
 			//
@@ -120,22 +120,22 @@ namespace UI
 	bool Menu::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		if ( m_softKeys->handleKeyPress( keyCode ) )
+		if ( mSoftKeys->handleKeyPress( keyCode ) )
 			return true;
 
 		switch ( keyCode )
 		{
 		case MAK_UP:
-			if ( m_current > 0 )
+			if ( mCurrent > 0 )
 			{
-				m_current--;
+				mCurrent--;
 				updateSelection( );
 			}
 			return true;
 		case MAK_DOWN:
-			if ( m_current < m_listBox->getChildren( ).size( ) - 1 )
+			if ( mCurrent < mListBox->getChildren( ).size( ) - 1 )
 			{
-				m_current++;
+				mCurrent++;
 				updateSelection( );
 			}
 			return true;
@@ -158,7 +158,7 @@ namespace UI
 	bool Menu::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		if ( m_softKeys->handleKeyRelease( keyCode ) )
+		if ( mSoftKeys->handleKeyRelease( keyCode ) )
 			return true;
 
 		return false;
@@ -168,11 +168,11 @@ namespace UI
 	void Menu::updateSelection( )
 	//-------------------------------------------------------------------------
 	{
-		int count = m_listBox->getChildren( ).size( );
+		int count = mListBox->getChildren( ).size( );
 		for ( int i = 0; i < count; i++ )
-			m_listBox->getChildren( )[i]->setSelected( i == m_current );
-		if ( count > m_current )
-			m_listBox->setSelectedIndex( m_current );
+			mListBox->getChildren( )[i]->setSelected( i == mCurrent );
+		if ( count > mCurrent )
+			mListBox->setSelectedIndex( mCurrent );
 		maUpdateScreen( );
 	}
 }

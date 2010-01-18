@@ -28,23 +28,23 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-									MapTileCoordinate( ) : m_x( 0 ), m_y( 0 ), m_magnification( 0 ) { }
+									MapTileCoordinate( ) : mX( 0 ), mY( 0 ), mMagnification( 0 ) { }
 
 									MapTileCoordinate( int x, int y, int magnification ) :
-									 	m_x( x ),
-										m_y( y ),
-										m_magnification( magnification )
+									 	mX( x ),
+										mY( y ),
+										mMagnification( magnification )
 									{
 									}
 
-		int							getX( ) const { return m_x; }
-		int							getY( ) const { return m_y; }
-		int							getMagnification( ) const { return m_magnification; }
+		int							getX( ) const { return mX; }
+		int							getY( ) const { return mY; }
+		int							getMagnification( ) const { return mMagnification; }
 
 	private:
-		int							m_x;
-		int							m_y;
-		int							m_magnification;
+		int							mX;
+		int							mY;
+		int							mMagnification;
 
 	};
 }
