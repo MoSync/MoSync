@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "MaplibDemoMoblet.h"
+#include "MAPDemoMoblet.h"
 #include "MapSourceMgr.h"
 #include "CloudMadeMapSource.h"
 #include "GoogleMapSource.h"
@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 using namespace Util;
 
-namespace MaplibDemo
+namespace MAPDemo
 {
 	static const bool Trace = false;
 
@@ -35,7 +35,7 @@ namespace MaplibDemo
 
 
 	//-------------------------------------------------------------------------
-	MaplibDemoMoblet::MaplibDemoMoblet( )
+	MAPDemoMoblet::MAPDemoMoblet( )
 		: mScreen( NULL )
 	//-------------------------------------------------------------------------
 	{
@@ -43,19 +43,19 @@ namespace MaplibDemo
 
 		CloudMadeMapSource::ApiKey = "2d80ddd260155a7ba03e123176011fa4"; // registered on lars@8x10.se
 		GoogleMapSource::ApiKey = "ABQIAAAASy5nCpi0Rkp7zjf61gof0RSwGmTQ8vMzg6QxXdllR2ZPmPu02RTSpCw5ldHGcP6DsMziSwGx8muqHQ"; // reg to lars@8x10.se
-		mScreen = newobject( MaplibDemoScreen, new MaplibDemoScreen( (MobletEx*)this ) );
+		mScreen = newobject( MAPDemoScreen, new MAPDemoScreen( (MobletEx*)this ) );
 		mScreen->show( );
 	}
 
 	//-------------------------------------------------------------------------
-	MaplibDemoMoblet::~MaplibDemoMoblet( )
+	MAPDemoMoblet::~MAPDemoMoblet( )
 	//-------------------------------------------------------------------------
 	{
 		//shutdown( );
 	}
 
 	//-------------------------------------------------------------------------
-	void MaplibDemoMoblet::shutdown( )
+	void MAPDemoMoblet::shutdown( )
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mScreen );

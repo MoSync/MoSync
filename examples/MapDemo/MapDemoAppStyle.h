@@ -15,8 +15,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MAPLIBDEMOAPPSTYLE_H_
-#define MAPLIBDEMOAPPSTYLE_H_
+#ifndef MAPDEMOAPPSTYLE_H_
+#define MAPDEMOAPPSTYLE_H_
 
 //#include "MemoryMgr.h"
 #include "AppStyle.h"
@@ -25,13 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace UI;
 using namespace Util;
 
-namespace MaplibDemo
+namespace MAPDemo
 {
-	class MaplibDemoAppStyle : public AppStyle
+	class MAPDemoAppStyle : public AppStyle
 	{
 	public:
-								MaplibDemoAppStyle( );
-		virtual					~MaplibDemoAppStyle( );
+								MAPDemoAppStyle( );
+		virtual					~MAPDemoAppStyle( );
 		//
 		// For client to implement
 		//
@@ -63,5 +63,5 @@ namespace MaplibDemo
 	};
 }
 
-#endif // MAPLIBDEMOAPPSTYLE_H_
+#endif // MAPDEMOAPPSTYLE_H_
 

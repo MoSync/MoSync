@@ -15,41 +15,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MAPLIBDEMOSCREEN_H_
-#define MAPLIBDEMOSCREEN_H_
+#ifndef MAPDEMOMOBLET_H_
+#define MAPDEMOMOBLET_H_
 
-#include <MAUI/Screen.h>
-#include <MAUtil/Moblet.h>
-#include "AppScreen.h"
-#include "MapWidget.h"
-#include "MapSourceMgr.h"
+#include "MobletEx.h"
+#include "MAPDemoScreen.h"
 
-using namespace MAP;
 using namespace UI;
 
-namespace MaplibDemo 
+namespace MAPDemo
 {
 	//=========================================================================
-	//
-	// Screen for MaplibDemo app
-	//
-	class MaplibDemoScreen : public AppScreen
+	class MAPDemoMoblet : public MobletEx
 	//=========================================================================
 	{
 	public:
-								MaplibDemoScreen( MobletEx* mMoblet );
-		virtual					~MaplibDemoScreen( );
+								MAPDemoMoblet( );
+		virtual					~MAPDemoMoblet( );
 
-		virtual bool			handleKeyPress( int keyCode );
-		virtual bool			handleKeyRelease( int keyCode );
-		virtual void			enumerateActions( Vector<Action*>& list );
+		virtual void			shutdown( );
 
 	private:
-		void					nextMapSource( );
-
-		MapWidget*				mMap;
-		MapSourceKind			mMapSourceKind;
+		MAPDemoScreen*			mScreen;
 	};
 }
 
-#endif // MAPLIBDEMOSCREEN_H_
+#endif // MAPDEMOMOBLET_H_

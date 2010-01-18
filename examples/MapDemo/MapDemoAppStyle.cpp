@@ -16,14 +16,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "MemoryMgr.h"
-#include "MaplibDemoAppStyle.h"
+#include "MAPDemoAppStyle.h"
 #include "MAHeaders.h"
 #include "Color.h"
 
-namespace MaplibDemo
+namespace MAPDemo
 {
 	//-------------------------------------------------------------------------
-	MaplibDemoAppStyle::MaplibDemoAppStyle( ) :
+	MAPDemoAppStyle::MAPDemoAppStyle( ) :
 	//-------------------------------------------------------------------------
 		mWidgetSkin( NULL ),
 		mButtonSkin( NULL ),
@@ -70,7 +70,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	MaplibDemoAppStyle::~MaplibDemoAppStyle( )
+	MAPDemoAppStyle::~MAPDemoAppStyle( )
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mWidgetSkin);
@@ -94,7 +94,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	Font* MaplibDemoAppStyle::getFont( FontSize size, Color color, bool bold ) const
+	Font* MAPDemoAppStyle::getFont( FontSize size, Color color, bool bold ) const
 	//-------------------------------------------------------------------------
 	{
 		switch( size )
@@ -176,35 +176,35 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	WidgetSkin* MaplibDemoAppStyle::getWidgetSkin( ) const
+	WidgetSkin* MAPDemoAppStyle::getWidgetSkin( ) const
 	//-------------------------------------------------------------------------
 	{
 		return mWidgetSkin;
 	}
 
 	//-------------------------------------------------------------------------
-	WidgetSkin* MaplibDemoAppStyle::getButtonSkin( ) const
+	WidgetSkin* MAPDemoAppStyle::getButtonSkin( ) const
 	//-------------------------------------------------------------------------
 	{
 		return mButtonSkin;
 	}
 
 	//-------------------------------------------------------------------------
-	int MaplibDemoAppStyle::getTabHeight( ) const
+	int MAPDemoAppStyle::getTabHeight( ) const
 	//-------------------------------------------------------------------------
 	{
 		return 25;
 	}
 
 	//-------------------------------------------------------------------------
-	int MaplibDemoAppStyle::getMenuItemHeight( ) const
+	int MAPDemoAppStyle::getMenuItemHeight( ) const
 	//-------------------------------------------------------------------------
 	{
 		return 25;
 	}
 
 	//-------------------------------------------------------------------------
-	int MaplibDemoAppStyle::getSoftKeyBarHeight( ) const
+	int MAPDemoAppStyle::getSoftKeyBarHeight( ) const
 	//-------------------------------------------------------------------------
 	{
 		return 25;

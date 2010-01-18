@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "MaplibDemoScreen.h"
+#include "MAPDemoScreen.h"
 #include "ExitAction.h"
 #include "MapLocationAction.h"
 #include "AppStyleMgr.h"
@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //using namespace Mopub;
 
-namespace MaplibDemo
+namespace MAPDemo
 {
 	static const bool Trace = false;
 
@@ -48,7 +48,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	MaplibDemoScreen::MaplibDemoScreen( MobletEx* moblet ) :
+	MAPDemoScreen::MAPDemoScreen( MobletEx* moblet ) :
 		AppScreen( moblet )
 	//-------------------------------------------------------------------------
 	{
@@ -74,7 +74,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	MaplibDemoScreen::~MaplibDemoScreen( )
+	MAPDemoScreen::~MAPDemoScreen( )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
@@ -83,7 +83,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	bool MaplibDemoScreen::handleKeyPress( int keyCode )
+	bool MAPDemoScreen::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
@@ -101,7 +101,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	bool MaplibDemoScreen::handleKeyRelease( int keyCode )
+	bool MAPDemoScreen::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
@@ -113,7 +113,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	void MaplibDemoScreen::nextMapSource( )
+	void MAPDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
@@ -128,7 +128,7 @@ namespace MaplibDemo
 	}
 
 	//-------------------------------------------------------------------------
-	void MaplibDemoScreen::enumerateActions( Vector<Action*>& list )
+	void MAPDemoScreen::enumerateActions( Vector<Action*>& list )
 	//-------------------------------------------------------------------------
 	{
 		//if ( Trace ) trace( );
