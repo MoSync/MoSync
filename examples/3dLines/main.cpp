@@ -228,6 +228,11 @@ int MAMain()
 				maSetDrawTarget(0);
 				maSetColor(0x081020);
 				maFillRect(0, 0, gScreenWidth, gScreenHeight);
+
+			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
+				mode = 0;
+			} else if(event.type == EVENT_TYPE_POINTER_RELEASED) {
+				mode = 1;
 			} else if(event.type == EVENT_TYPE_CLOSE ||
 				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
 			{
