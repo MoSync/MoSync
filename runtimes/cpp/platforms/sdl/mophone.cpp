@@ -211,9 +211,7 @@ bool initMophoneScreen(Skin* skin, SDL_Surface **gScreen, int w, int h, bool sho
 #else
 			TEST_Z(*gScreen = SDL_SetVideoMode(w, h, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
 #endif
-
 		}
-
 	}
 
 	if(hasMophone) {
@@ -235,7 +233,6 @@ bool initMophoneScreen(Skin* skin, SDL_Surface **gScreen, int w, int h, bool sho
 		SDL_FillRect(*gScreen, &dstRect, 0xff6f6f6f);
 		SDL_UpdateRect(*gScreen, dstRect.x, dstRect.y, dstRect.w, dstRect.h);
 	}
-
 	return hasMophone;
 }
 
