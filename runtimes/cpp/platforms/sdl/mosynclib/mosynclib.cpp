@@ -42,10 +42,13 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain) {
 	const char *resourceFile = "resources";
 	bool resChanged = false;
 	Syscall::STARTUP_SETTINGS settings;
-	settings.model = "default";
-	settings.vendor = "default";
-	settings.iconPath = NULL;
-	int width=0, height=0;
+	settings.profile.mScreenWidth = 240;
+	settings.profile.mScreenHeight = 320;
+	settings.profile.mKeyboardType = MoRE::DeviceProfile::DKT_KEYPAD;
+	settings.profile.mVendor = "default";
+	settings.profile.mModel = "default";
+	settings.haveSkin = true;
+
 
 	for(int i = 1; i < argc; i++) {
 		if(strcmp(argv[i], "-resource")==0) {
@@ -62,18 +65,18 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain) {
 				LOG("not enough parameters for -size");			
 				return 1;
 			}
-			width = atoi(argv[i]);
+			settings.profile.mScreenWidth = atoi(argv[i]);
 			i++;
 			if(i>=argc) {
 				LOG("not enough parameters for -size");			
 				return 1;
 			}
-			height = atoi(argv[i]);
+			settings.profile.mScreenHeight = atoi(argv[i]);
 			resChanged = true;
 		} else if(strcmp(argv[i], "-noscreen")==0) {
 			settings.showScreen = false;
 		} else if(strcmp(argv[i], "-nomophone")==0) {
-			settings.shouldHaveMophone = false;
+			settings.haveSkin = false;
 		} else if(strcmp(argv[i], "-resmem")==0) {
 			i++;
 			if(i>=argc) {
@@ -91,7 +94,7 @@ extern "C" int mosyncLibMain(int argc, char** argv, mainfunc maMain) {
 	if(!resChanged)
 		syscall = new Base::Syscall(settings);
 	else
-		syscall = new Base::Syscall(width, height, settings);
+		syscall = new Base::Syscall(settings.profile.mScreenWidth, settings.profile.mScreenHeight, settings);
 
 	Base::FileStream file(resourceFile);
 	TEST(syscall->loadResources(file, resourceFile));
