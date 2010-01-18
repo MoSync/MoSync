@@ -11,19 +11,19 @@ MoSync uses a special file with the extension .lst to describe which external re
 First, select "File -> New -> Other":
 \\
 \\
-{{images\Resources_lst_1.png}}
+{{images/Resources_lst_1.png}}
 \\
 \\
 You will be presented with the "new" wizard dialog. Expand the "MoSync" folder and select "MoSync Resource File":
 \\
 \\
-{{images\Resources_lst_2.png}}
+{{images/Resources_lst_2.png}}
 \\
 \\
 Finally, enter a filename for your resource file:
 \\
 \\
-{{images\Resources_lst_3.png}}
+{{images/Resources_lst_3.png}}
 \\
 \\
 A resource is declared by using the .res statement. Optionally you can add a resource name which may be used anywhere in the code to identify the resource. These names will be used to generate a header file with preprocessor definitions, mapping the name to a numeric id, i.e. a MoSync handle. To make use of the resource it is convenient to include the MAHeaders.h file and use the symbolic names instead of the actual numbers.

@@ -137,7 +137,7 @@ We will only implement a few steps in the initial handshaking procedure. After t
 \\
 If you've done everything right, the result will look like this:
 \\
-{{images\connsocket_ftp.png}}
+{{images/connsocket_ftp.png}}
 
 ]]>
 </section>

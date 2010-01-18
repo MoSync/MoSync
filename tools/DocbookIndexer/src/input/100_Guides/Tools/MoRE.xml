@@ -10,7 +10,7 @@ implementation that all the real device platforms are required to conform to!
 MoRE can be controlled either by pressing the keys on the graphical phone, or using a
 number of keyboard shortcuts:
 \\
-{{images\MoRE_diagram.png}}
+{{images/MoRE_diagram.png}}
 
 MoRE doesn't emulate any phone in particular, but its behavior when exeuting MoSync
 application reflects that of the target device. For instance, the screen dimensions vary
@@ -31,7 +31,7 @@ of that device. Currently, the only supported property is the screen size. You c
 override the screen size setting by clicking the arrow next to the "play" button in the toolbar,
 and selecting "Run Configurations":
 
-{{images\MoRE_screensize.png}}
+{{images/MoRE_screensize.png}}
 ]]>
 </section>
 
@@ -40,7 +40,7 @@ and selecting "Run Configurations":
 When a MoSync application terminates because of a panic, a call stack is transmitted to the
 output console in the IDE:
 \\
-{{images\MoRE_callstack.png}}
+{{images/MoRE_callstack.png}}
 \\
 The call stack shows you all the stack frames that were active when the application terminated,
 and you can click on each line to go to the corresponding source file and line. This is the format of such lines:

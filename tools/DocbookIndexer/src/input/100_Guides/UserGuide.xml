@@ -41,36 +41,36 @@ Before installing MoSync you will need to download and install the <em>Java SE R
 After you have retrived the MoSync installer, double-click the installer icon to begin the installation.
 Just wait while the installer configures itself. First the the unpacker needs to unpack the files which will be installed.
 \\
-{{images\userguide_install_1.png}}
+{{images/userguide_install_1.png}}
 \\
 The MoSync package splash-screen, if you see this the package was succesfully unpacked.
 \\
-{{images\userguide_install_2.png}}
+{{images/userguide_install_2.png}}
 \\
 Read the MoSync License Agreement. Agree to it if you would like to proceed with the installation.
 \\
-{{images\userguide_install_3.png}}
+{{images/userguide_install_3.png}}
 \\
 Select the components you wish to install. Note that there isn't any options for the MoSync package, everything needs to be installed.
 \\
-{{images\userguide_install_4.png}}
+{{images/userguide_install_4.png}}
 \\
 Select where you would like MoSync to be installed. Please note that MoSync needs to be installed to a directory which is not containing any spaces in its path. 
 \\
-{{images\userguide_install_5.png}}
+{{images/userguide_install_5.png}}
 \\
 If you have a previously uninstalled copy of MoSync you will get this warning. Please follow the instruction and make a copy of your project files if they are inside the MoSync installation folder.
 Even if they shouldn't be removed it's better to be safe than sorry.
 \\
-{{images\userguide_install_6.png}}
+{{images/userguide_install_6.png}}
 \\
 If you had a previous installation it will first be removed. Now MoSync is installed on your computer. Please wait for the installation to complete.
 \\
-{{images\userguide_install_7.png}}
+{{images/userguide_install_7.png}}
 \\
 MoSync is now installed. Press Finish to end the installer. Please note that the 'Open Documentation.' checkbox is set as default.
 \\
-{{images\userguide_install_8.png}}
+{{images/userguide_install_8.png}}
 \\
 === The first time you Launch the MoSync IDE ===
 
@@ -81,21 +81,21 @@ It's in the folder 'MoSync' and is named 'MoSync IDE'.
 If you choose to install without shortcuts the file is called 'mosync.exe' and is placed in the 'eclipse' folder in the root of the installation, default is C:\MoSync.
 When you start it you should see this splash-screen.
 \\
-{{images\userguide_start_1.png}}
+{{images/userguide_start_1.png}}
 \\
 The MoSync IDE wants to know where you would like to have your Workspace.
 This is where your projects, by default, will be stored.
 If you wish to use the same Workspace for all your projects you can set the checkbox, 'Use this as the default and do not ask again', and you will not be asked the next time you start MoSync.
 \\
-{{images\userguide_start_2.png}}
+{{images/userguide_start_2.png}}
 \\
 MoSync IDE is now loading, just wait for it to finish.
 \\
-{{images\userguide_start_3.png}}
+{{images/userguide_start_3.png}}
 \\
 The MoSync IDE is now loaded.
 \\
-{{images\userguide_start_4.png}}
+{{images/userguide_start_4.png}}
 \\
 Everytime you start the MoSync IDE it will ask you to register until you have.
 It won't cost you anything and the benefit of registering is that you will get access to the latest device profile updates.
@@ -104,29 +104,29 @@ This can be disabled when you register.
 Note that if you disable automatic updates you can miss important updates and fixes.
 Insert your name and a valid e-mail address, press 'OK' to proceed.
 \\
-{{images\userguide_start_5.png}}
+{{images/userguide_start_5.png}}
 \\
 An e-mail with your registration code will be sent directly to the specified address.
 If you don't recieve the registration e-mail, your e-mail provider's spam filter might have blocked it.
 If that is the case, just check your spam mail for it.
 \\
-{{images\userguide_start_6.png}}
+{{images/userguide_start_6.png}}
 \\
 Copy the Registration Confimation Code from the e-mail and click the 'Update profile database' shown below.
 \\
-{{images\userguide_start_7.png}}
+{{images/userguide_start_7.png}}
 \\
 Paste the Registration Confirmation Code into the textbox and click 'OK'.
 \\
-{{images\userguide_start_8.png}}
+{{images/userguide_start_8.png}}
 \\
 If you recieve this message it means that you already have the latest profile database. 
 \\
-{{images\userguide_start_9.png}}
+{{images/userguide_start_9.png}}
 \\
 When you recieve an update you will see this screen. Again, we strongly encourage you to accept all updates since they will provide both updates and fixes.
 \\
-{{images\userguide_start_10.png}}
+{{images/userguide_start_10.png}}
 \\
 ]]>
 </section>
@@ -164,17 +164,17 @@ The benefit is that you only has to do this once to be able to run it on almost 
 To build a new project you have two options.
 Choose 'new' and then 'project' from the File menu or you can right-click the 'Project Explorer' and choose 'new' and then 'project'.
 \\
-{{images\userguide_using_1.png}}
+{{images/userguide_using_1.png}}
 \\
 Expand the MoSync option. Here we can either import an older MoBuild project or choose to create a new 'MoSync Project'.
 \\
 Choose the later and press 'Next'.
 \\
-{{images\userguide_using_2.png}}
+{{images/userguide_using_2.png}}
 \\
 Choose a name for your project and press 'Next'. In this demonstration we will use the name, 'HelloWorld'.
 \\
-{{images\userguide_using_3.png}}
+{{images/userguide_using_3.png}}
 \\
 In the MoSync IDE we provide you with three different project templates.
   - **MoSync C Project** These are standard C projects. A main file with stub code will be generated.
@@ -184,12 +184,12 @@ In the MoSync IDE we provide you with three different project templates.
 
 In this demonstration we will use the **Moblet**. Choose that and click 'Finish'.
 \\
-{{images\userguide_using_4.png}}
+{{images/userguide_using_4.png}}
 \\
 Your new project should now be created and loaded in the MoSync IDE.
 It's possible to run this template program by pressing the play button. The program will then be compiled and executed in the MoSync emulator.
 \\
-{{images\userguide_using_5.png}}
+{{images/userguide_using_5.png}}
 \\
 === Writing your first hello world ===
 
@@ -245,7 +245,7 @@ Read more about Moblets in the **Development models** section of this document.\
 \\
 Now press the play button (or ctrl-f11) to save, build and execute the project. If you get errors, please verify that your code looks exactly like the one above here.
 \\
-{{images\userguide_using_6.png}}
+{{images/userguide_using_6.png}}
 \\
 Congratulations, you have now compiled and executed your first MoSync program!
   ]]>
