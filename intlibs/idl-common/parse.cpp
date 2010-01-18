@@ -34,7 +34,7 @@ static void processIncludes(ostream& os, istream& is, const string& inPath, int 
 static int findIx(const string& token, const vector<string>& ixs);
 
 static ConstSet parseConstSet(const vector<string>& ixs, int currentIx);
-static Function parseFunction(const string& retType);
+static Function parseFunction(const string& retType, size_t maxArgs);
 static Struct parseStruct(const string& type, int currentIx);
 static Member parseAnonymousUnion();
 static PlainOldData parsePOD(const string& type);
@@ -80,7 +80,7 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 				inf.ioctls.push_back(parseIoctl(ixs, inf));
 			} else if(isReturnType(inf, token)) {	//function
 				TASSERT(currentIx == MAIN_INTERFACE);
-				inf.functions.push_back(parseFunction(token));
+				inf.functions.push_back(parseFunction(token, 4));
 			} else if(token == "}") {
 				TASSERT(currentIx == MAIN_INTERFACE);
 				doEOF();
@@ -205,7 +205,7 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 			inf.typedefs.push_back(parseTypedef(currentIx));
 		} else if(isReturnType(inf, token)) {	//function
 			IoctlFunction f;
-			f.f = parseFunction(token);
+			f.f = parseFunction(token, 3);
 			f.ix = currentIx;
 			ioctl.functions.push_back(f);
 		} else if(token == "}") {
@@ -306,7 +306,7 @@ static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {
 	return cs;
 }
 
-static Function parseFunction(const string& retType) {
+static Function parseFunction(const string& retType, size_t maxArgs) {
 	Function f;
 	f.returnType = retType;
 	f.number = sNextFuncNum++;
@@ -337,6 +337,9 @@ static Function parseFunction(const string& retType) {
 	}
 	doExact(";");
 	f.comment = getComment();
+	if(f.args.size() > maxArgs) {
+		Error("function", "Too many arguments");
+	}
 	return f;
 }
 

@@ -33,7 +33,7 @@ RELEVANT_CAPS = [
 	'MaxJarSize',
 	'JavaPackage',
 	'OS',
-	
+	'Packager',
 	'Features',
 	'Bugs',
 	'JavaConfiguration'
@@ -55,7 +55,8 @@ RELEVANT_DEFINES = {
 	:s60v3 => [],
 	:s60v5 => [],
 	:sp2003 => [],
-	:wm5 => []
+	:wm5 => [],
+	:moblin => [],
 }
 
 CAP_TYPES = {
@@ -67,7 +68,8 @@ CAP_TYPES = {
 		'BitsPerPixel',
 		'StorageSize',
 		'HeapSize',
-		'MaxJarSize'
+		'MaxJarSize',
+		'Packager',
 	],
 	:supports => [
 		'JavaPackage',
@@ -149,7 +151,7 @@ build_root = "../ProfileConverter/"
 dest_dir = ARGV[0]
 if dest_dir.class != NilClass
 	output_root = "#{dest_dir}/"
-	build_root = ""
+	#build_root = ""
 end
 
 if(ARGV[0])
@@ -169,6 +171,7 @@ runtimes = {
 	:s60v3  => [],
 	:s60v5  => [],
 	:JavaME => [],
+	:moblin => [],
 }
 
 class Array

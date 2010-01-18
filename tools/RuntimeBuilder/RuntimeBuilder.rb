@@ -34,7 +34,7 @@ end
 def revert_backupped_file(file)
 	bak = file + ".bak"
 
-	if File.exist? bak	
+	if File.exist? bak
 		FileUtils.copy_file(bak, file)
 		FileUtils.rm bak
 	end
@@ -44,7 +44,7 @@ class RuntimeBuilder
 	def log(str) 
 		if ($SETTINGS[:verbose])
 			puts str
-		end	
+		end
 	end
 
 	def system(str)
@@ -57,11 +57,10 @@ class RuntimeBuilder
 	end
 
 	def build(platform, runtime_dir)
-		
-		modes = [ 	
-					["release", "#{runtime_dir}config.h"],
-					["debug", "#{runtime_dir}configD.h"]	
-				]
+		modes = [
+			["release", "#{runtime_dir}config.h"],
+			["debug", "#{runtime_dir}configD.h"],
+		]
 		
 		modes.each do |mode|
 			if File.exist? mode[1]
@@ -71,7 +70,7 @@ class RuntimeBuilder
 					exit(error)
 				end
 			else
-				puts "WARNING: Skipping build. No config file for #{platform} #{mode[0]} runtime."				
+				puts "WARNING: Skipping build. No config file for #{platform} #{mode[0]} runtime."
 			end
 		end
 	end
@@ -87,6 +86,7 @@ require "BuildJavaME.rb"
 require "BuildS60.rb"
 require "BuildWinCE.rb"
 require "BuildAndroid.rb"
+require "BuildMoblin.rb"
 
 runtime_builder = RuntimeBuilder.new
 runtime_builder.build(ARGV[1].downcase, ARGV[2])

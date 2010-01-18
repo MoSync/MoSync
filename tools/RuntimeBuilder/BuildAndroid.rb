@@ -15,7 +15,6 @@
 # 02111-1307, USA.
 
 require 'fileutils'
-require 'ftools'
 
 class RuntimeBuilder 
 	def android(runtime_dir, mode)
@@ -30,7 +29,7 @@ class RuntimeBuilder
 		
 		# Preprocess the jpp file into a jtmp file, sed fixes the output if any
 		system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{$SETTINGS[:java_source]}shared -I#{platform_dir}" +
-		       " #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
+			" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 		
 		# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
 		system("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
@@ -38,7 +37,7 @@ class RuntimeBuilder
 
 	def preprocess_shared_java_files(output_dir, platform_dir, platform_define)
 		shared_src = "#{$SETTINGS[:java_source]}shared/";
-
+		
 		Dir.foreach(shared_src) {|x| 
 			if (x == "BigPhatError.jpp" || x == "Binary.jpp" || x == "BinaryInterface.jpp" || x == "Core.jpp" ||
 				x == "LimitedLengthInputStream.jpp" || x == "LittleEndianDataInputStream.jpp" || x == "ThreadPool.jpp" || 
@@ -65,7 +64,7 @@ class RuntimeBuilder
 		if File.exist? temp_dir
 			FileUtils.rm_rf temp_dir # delete everything in it and itself
 		end
-		File.makedirs(temp_dir); # No such directory/file.. create a temp directory
+		FileUtils.makedirs(temp_dir); # No such directory/file.. create a temp directory
 		
 		# Set up class dir
 		class_dir = "#{runtime_dir}class/"
