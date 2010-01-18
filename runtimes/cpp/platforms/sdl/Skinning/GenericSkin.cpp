@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "GenericSkin.h"
 #include "Screen.h"
 
-#include "maapi.h"
+#include "helpers/cpp_defs.h"
 
 #define LOG printf
 

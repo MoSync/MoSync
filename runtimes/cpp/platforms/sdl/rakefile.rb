@@ -6,7 +6,7 @@ require "#{BD}/build_rules/host.rb"
 # SOURCES is a list of directories containing source code
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
-SOURCES = [".", "./thread", "../../base", "../../base/thread"]
+SOURCES = [".", "./thread", "../../base", "../../base/thread", "./Skinning"]
 IGNORED_FILES = ["Image.cpp", "audio.cpp"]
 COMMON_INCLUDES = [".", "#{BD}/runtimes/cpp/base"]
 COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]

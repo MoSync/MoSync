@@ -93,7 +93,10 @@ namespace Base {
 	bool gReload = false;
 
 #ifndef MOBILEAUTHOR
+	/*
+	 * Deprecated? 
 	static bool gShouldHaveMophone;
+	*/
 #endif
 
 #ifndef __USE_FULLSCREEN__
@@ -105,7 +108,10 @@ namespace Base {
 	static uint screenHeight = 240*2;	//208
 #endif
 
+	/*
+	 * Deprecated ?
 	static uint gScreenMultiplier = 1;
+	*/
 	static SDL_Surface *gScreen = NULL, *gDrawSurface = NULL, *gBackBuffer = NULL;
 	static int gCurrentUnconvertedColor = 0, gCurrentConvertedColor = 0;
 	static TTF_Font *gFont = NULL;
@@ -757,8 +763,10 @@ namespace Base {
 				gEventFifo.put(event);
 			}
 			if(sSkin)
+			{
 				if(pressed) sSkin->keyPressed(mak);
 				else sSkin->keyReleased(mak);
+			}
 		}
 	}
 
@@ -811,8 +819,11 @@ namespace Base {
 		DEBUG_ASSERT(NULL != SDL_AddTimer(EVENT_CLOSE_TIMEOUT, ExitCallback, NULL));
 	}
 
+	/*
+	 * Deprecated ?
 	static int lastMophoneMouseButton = -1;
 	static bool wasInside = false;
+	*/
 
 	//returns true iff maWait should return.
 	//must be called only from the main thread!
@@ -865,10 +876,12 @@ namespace Base {
 				}
 				*/
 				if(event.motion.state&SDL_BUTTON(1))
+				{
 					if(sSkin)
 						sSkin->mouseDragged(event.button.x, event.button.y);
 					else
 						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_DRAGGED);
+				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				/*
@@ -886,10 +899,12 @@ namespace Base {
 				}
 				*/
 				if(event.button.button == 1)
+				{
 					if(sSkin)
 						sSkin->mousePressed(event.button.x, event.button.y);
 					else
 						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_PRESSED);
+				}
 				break;
 			case SDL_MOUSEBUTTONUP:
 				/*
@@ -906,10 +921,12 @@ namespace Base {
 				}
 				*/
 				if(event.button.button == 1)
+				{
 					if(sSkin)
 						sSkin->mouseReleased(event.button.x, event.button.y);
 					else
 						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_RELEASED);
+				}
 				break;
 #endif	//MOBILEAUTHOR
 

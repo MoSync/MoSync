@@ -1,26 +1,35 @@
 #!/bin/sh
 
+#
+# Outputs a message
+#
+print_msg()
+{
+	printf "\n\n%s\n" "---------------------------------"
+	printf "%s\n"     " $1"
+	printf "%s\n\n"   "---------------------------------"
+}
 
 #
 # Error handling
 #
 handle_error()
 {
-	echo -e "\n\n---------------------------------"
 	if [ "$1" = "rake" ]; then
-		echo -e "Error: Rake failed, see log"
+		reason="Rake failed, see log"
 	elif [ "$1" = "more" ]; then
-		echo -e "Error: Failed to build MoRE, see log"
+		reason="Failed to build MoRE, see log"
 	elif [ "$1" = "tar" ]; then
-		echo -e "Error: Failed to extract package template"
+		reason="Failed to extract package template"
 	elif [ "$1" = "copy_more" ]; then
-		echo -e "Error: While copying more"
+		reason="While copying more"
 	elif [ "$1" = "meta" ]; then
-		echo -e "Error: While copying more"
+		reason="While copying more"
 	else
-		echo -e "Error: Unknown cause"
+		reason="Unknown cause"
 	fi
-	echo -e "---------------------------------\n"
+
+	print_msg "Error: $reason"
 
 	exit 1
 }
@@ -63,12 +72,15 @@ distro_name()
 #
 buildTemplate()
 {
-	echo -e "\n\n---------------------------------"
-	echo -e "Building $1 template"
-	echo -e "---------------------------------\n"
+	if [ "$1" = "dbg" ]; then
+		build_type="Debug"
+	else
+		build_type="Release"
+	fi
 
+	print_msg "Building $build_type template"
 	if [ -e  "$path/distro" ]; then
-		rm -Rf $path/distro
+		chmod 755 -R $path/distro
 	fi
 	mkdir $path/distro
 	mkdir $path/distro/tmp
@@ -76,20 +88,16 @@ buildTemplate()
 
 	export MOSYNCDIR=$path/distro/tmp
 
-	echo -e "\n\n---------------------------------"
-	echo -e "Performing rake clean"
-	echo -e "---------------------------------\n"
-	cd $path/../../../../../
+	print_msg "Performing rake clean"
+	cd $path/../../../
 	if [ "$1" = "rel" ]; then
 		rake clean CONFIG=""
 	else
 		rake clean
 	fi
-	echo -e "\nOK"
+	printf "\n%s\n" "OK"
 
-	echo -e "\n\n---------------------------------"
-	echo -e "Attempting to build MoRE"
-	echo -e "---------------------------------\n"
+	print_msg "Attempting to build MoRE"
 	if [ "$1" = "rel" ]; then
 		rake more CONFIG=""
 	else
@@ -106,46 +114,35 @@ buildTemplate()
 		handle_error "more"
 	fi
 
-	echo -e "\nOK"
+	printf "\n%s\n" "OK"
 
-	# Now extract the template
-	echo -e "\n\n---------------------------------"
-	echo -e "Extracting template"
-	echo -e "---------------------------------\n"
-	cp ../mosync-linux-template.tar.gz .
-	tar zxvvf mosync-linux-template.tar.gz
-	if [ "$?" -ne "0" ]; then
-		handle_error "tar"
-	fi
+	# Copy template
+	print_msg "Copying template package"
+	cp -R ../template/* .
+	cp -R ../template/.meta .meta
 
 	# Copy MoRE
-	cp tmp/bin/moemu usr/local/%appname%/bin/run
+	cp tmp/bin/moemu opt/%appname%/bin/run
 	if [ "$?" -ne "0" ]; then
 		handle_error "copy_more"
 	fi
 
 	# Generate its meta data
-	echo -e "\n\n---------------------------------"
-	echo -e "Generating template meta data"
-	echo -e "---------------------------------\n"
-	../generate-meta.sh usr/local/%appname%/bin/run | tee .meta/.meta
+	print_msg "Generating template meta data"
+	../generate-meta.sh opt/%appname%/bin/run | tee .meta/.meta
 	if [ "$?" -ne "0" ]; then
 		handle_error "meta"
 	fi
-	echo -e "OK"
+	printf "\n%s\n" "OK"
 
-	echo -e "\n\n---------------------------------"
-	echo -e "Packing template"
-	echo -e "---------------------------------\n"
-	tar cvvfz $curr/runtime.${dist}.r${rev}.${arch}.$1.tar.gz $(find .meta -type f | sort) bin usr
+	#
+	print_msg "Packing custom template"
+	tar cvvfz $curr/runtime.${dist}.r${rev}.${arch}.$1.tar.gz $(find .meta -type f | sort) usr opt
 
-	echo -e "\n\n---------------------------------"
-	echo -e "Clean up"
-	echo -e "---------------------------------\n"
-
+	#
+	print_msg "Performing clean up"
 	rm -Rf $path/distro
 	cd $curr
-	echo -e "OK"
 
 	return 0
 }
@@ -155,11 +152,11 @@ buildTemplate()
 #######################   Main   #########################
 
 # Initial vars
-arch=$(uname -m | sed 's/i.../i586/')
+arch=$(uname -m | sed 's/i.../i386/')
 curr=$(pwd)
 path=$(pwd)/$(echo $0 | sed 's/\/build-linux-runtime-package.sh//')
 dist=""; distro_name
-cd $path/../../../../../
+cd $path/../../../
 rev=$(svn info | grep Revision | awk '{print $2}')
 cd $curr
 
@@ -172,9 +169,7 @@ buildTemplate "rel"
 #
 # Finished
 # 
-echo -e "\n\n---------------------------------"
-echo -e "Done"
-echo -e "---------------------------------\n"
+print_msg "Done"
 
 exit 0
 

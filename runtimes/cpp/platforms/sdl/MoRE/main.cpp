@@ -77,7 +77,10 @@ int main2(int argc, char **argv) {
 	const char *programFile="program";
 	const char *resourceFile="resources";
 	bool resChanged = false;
+	/*
+     * Deprecated ?
 	int width=0, height=0;
+	*/
 
 	MoRE::SkinManager::getInstance()->addSkinFactory(new MoRE::GenericSkinFactory());
 

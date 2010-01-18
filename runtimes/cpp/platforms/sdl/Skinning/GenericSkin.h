@@ -30,8 +30,8 @@ namespace MoRE {
 	 */
 
 	struct KeyRect {
-		KeyRect(int keyCode, int x, int y, int w, int h)
-			: keyCode(keyCode), x(x), y(y), w(w), h(h) {}
+		KeyRect(int lkeyCode, int lx, int ly, int lw, int lh)
+			: keyCode(lkeyCode), x(lx), y(ly), w(lw), h(lh) {}
 		bool contains(int x, int y);
 		int keyCode;
 		int x, y, w, h;
