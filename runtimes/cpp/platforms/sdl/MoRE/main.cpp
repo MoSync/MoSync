@@ -48,7 +48,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <core/GdbStub.h>
 #endif
 
-
+#include "Skinning/SkinManager.h"
+#include "Skinning/GenericSkin.h"
 
 static int gReloadHandle = 0;
 
@@ -77,9 +78,16 @@ int main2(int argc, char **argv) {
 	const char *resourceFile="resources";
 	bool resChanged = false;
 	int width=0, height=0;
+
+	MoRE::SkinManager::getInstance()->addSkinFactory(new MoRE::GenericSkinFactory());
+
 	Syscall::STARTUP_SETTINGS settings;
-	settings.model = "default";
-	settings.vendor = "default";
+	settings.profile.mScreenWidth = 240;
+	settings.profile.mScreenHeight = 320;
+	settings.profile.mKeyboardType = MoRE::DeviceProfile::DKT_KEYPAD;
+	settings.profile.mModel = "default";
+	settings.profile.mVendor = "default";
+	settings.haveSkin = true;
 	settings.iconPath = NULL;
 	const char* sldFile = NULL;
 #ifdef GDB_DEBUG
@@ -137,13 +145,13 @@ int main2(int argc, char **argv) {
 				LOG("not enough parameters for -resolution");			
 				return 1;
 			}
-			width = atoi(argv[i]);
+			settings.profile.mScreenWidth = atoi(argv[i]);
 			i++;
 			if(i>=argc) {
 				LOG("not enough parameters for -resolution");			
 				return 1;
 			}
-			height = atoi(argv[i]);
+			settings.profile.mScreenHeight = atoi(argv[i]);
 			resChanged = true;
 		} else if(strcmp(argv[i], "-icon")==0) {
 			i++;
@@ -160,21 +168,21 @@ int main2(int argc, char **argv) {
 		} else if(strcmp(argv[i], "-noscreen")==0) {
 			settings.showScreen = false;
 		} else if(strcmp(argv[i], "-nomophone")==0) {
-			settings.shouldHaveMophone = false;
+				settings.haveSkin = false;
 		} else if(strcmp(argv[i], "-model")==0) {
 			i++;
 			if(i>=argc) {
 				LOG("not enough parameters for -model");			
 				return 1;
 			}
-			settings.model = argv[i];
+			settings.profile.mModel = argv[i];
 		} else if(strcmp(argv[i], "-vendor")==0) {
 			i++;
 			if(i>=argc) {
 				LOG("not enough parameters for -vendor");			
 				return 1;
 			}
-			settings.vendor = argv[i];
+			settings.profile.mVendor = argv[i];
 		} else if(strcmp(argv[i], "-sld")==0) {
 			i++;
 			if(i>=argc) {
@@ -212,13 +220,13 @@ int main2(int argc, char **argv) {
 	Base::Syscall *syscall;
 
 #ifdef __USE_FULLSCREEN__
-        settings.shouldHaveMophone = false;
+        settings.haveSkin = false;
 #endif
 
 	if(!resChanged)
 		syscall = new Base::Syscall(settings);
 	else
-		syscall = new Base::Syscall(width, height, settings);
+		syscall = new Base::Syscall(settings.profile.mScreenWidth, settings.profile.mScreenHeight, settings);
 
 	gCore = Core::CreateCore(*syscall);
 #ifdef GDB_DEBUG

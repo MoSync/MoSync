@@ -30,6 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../fastevents.h"
 #include "../sdl_syscall.h"
 
+#include "Skinning/SkinManager.h"
+#include "Skinning/GenericSkin.h"
+
 extern "C" int MAMain();
 
 int main(int argc, char** argv) {
@@ -40,13 +43,18 @@ int main(int argc, char** argv) {
 	InitLog();
 #endif
 
+	MoRE::SkinManager::getInstance()->addSkinFactory(new MoRE::GenericSkinFactory());
+
 	const char *resourceFile = "resources";
 	bool resChanged = false;
 	Syscall::STARTUP_SETTINGS settings;
-	int width, height;
 
-	settings.model = "default";
-	settings.vendor = "default";
+	settings.profile.mScreenWidth = 240;
+	settings.profile.mScreenHeight = 320;
+	settings.profile.mKeyboardType = MoRE::DeviceProfile::DKT_KEYPAD;
+	settings.profile.mVendor = "default";
+	settings.profile.mModel = "default";
+	settings.haveSkin = true;
 
 	settings.iconPath = NULL;
 
@@ -65,18 +73,19 @@ int main(int argc, char** argv) {
 				LOG("not enough parameters for -size");			
 				return 1;
 			}
-			width = atoi(argv[i]);
+			settings.profile.mScreenWidth = atoi(argv[i]);
 			i++;
 			if(i>=argc) {
 				LOG("not enough parameters for -size");			
 				return 1;
 			}
-			height = atoi(argv[i]);
+			settings.profile.mScreenHeight = atoi(argv[i]);
 			resChanged = true;
 		} else if(strcmp(argv[i], "-noscreen")==0) {
 			settings.showScreen = false;
+			settings.haveSkin = false;
 		} else if(strcmp(argv[i], "-nomophone")==0) {
-			settings.shouldHaveMophone = false;
+			settings.haveSkin = false;
 		} else if(strcmp(argv[i], "-resmem")==0) {
 			i++;
 			if(i>=argc) {
@@ -91,14 +100,14 @@ int main(int argc, char** argv) {
 	}
         
 #ifdef __USE_FULLSCREEN__
-        settings.shouldHaveMophone = false;
+        settings.haveSkin = false;
 #endif
 
 	Base::Syscall *syscall;
 	if(!resChanged)
 		syscall = new Base::Syscall(settings);
 	else
-		syscall = new Base::Syscall(width, height, settings);
+		syscall = new Base::Syscall(settings.profile.mScreenWidth, settings.profile.mScreenHeight, settings);
 
 	Base::FileStream file(resourceFile);
 	TEST(syscall->loadResources(file, resourceFile));

@@ -1,11 +1,38 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 #include <SDL/SDL_image.h>
 
 #include "GenericSkin.h"
 #include "Screen.h"
 
+#include "maapi.h"
+
 #define LOG printf
 
+namespace Base {
+	void pixelDoubledBlit(int x, int y, SDL_Surface *dstSurface, SDL_Surface *srcSurface, SDL_Rect srcRect, int multiplier);
+}
+
 namespace MoRE {
+	bool KeyRect::contains(int x, int y) {
+		if(x>=this->x && x<this->x+this->w && y>=this->y && y<this->y+this->h) return true;
+		return false;
+	}
 
 	SDL_Surface* GenericSkin::sSkinImage = 0;
 	SDL_Surface* GenericSkin::sSelectedKeypad = 0;
@@ -29,8 +56,9 @@ namespace MoRE {
 		//return SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCALPHA, width, height, 32, rmask, gmask, bmask, amask );
 
 		SDL_Surface* first = SDL_CreateRGBSurface(SDL_SWSURFACE|SDL_SRCALPHA, width, height, 32, rmask, gmask, bmask, amask);
-		SDL_Surface* second = SDL_DisplayFormatAlpha(first);
-		return second;
+		SDL_SetAlpha(first, 0,255);
+		//SDL_Surface* second = SDL_DisplayFormatAlpha(first);
+		return first;
 	}
 
 	SDL_Surface* loadPNGImage(const char* name) {
@@ -45,16 +73,20 @@ namespace MoRE {
 		return surf;
 	}
 
-	GenericSkin::GenericSkin(DeviceProfile* profile) 
+	GenericSkin::GenericSkin(const DeviceProfile* profile) 
 		:
-		DeviceSkin(profile)
+		DeviceSkin(profile),
+		mPressedKey(0),
+		mTouchedInside(false)
 	{
+		const char *dir = getenv("MOSYNCDIR");
+
 		if(!sSkinImage) 
-			sSkinImage        = loadPNGImage("skinImage.png");
+			sSkinImage        = loadPNGImage((std::string(dir)+"/skins/skinImage.png").c_str());
 		if(!sSelectedKeypad) 
-			sSelectedKeypad   = loadPNGImage("keypadUnselected.png");
+			sSelectedKeypad   = loadPNGImage((std::string(dir)+"/skins/keypadSelected.png").c_str());
 		if(!sUnselectedKeypad) 
-			sUnselectedKeypad = loadPNGImage("keypadSelected.png");
+			sUnselectedKeypad = loadPNGImage((std::string(dir)+"/skins/keypadUnselected.png").c_str());
 
 
 		int w = getWindowWidth();
@@ -64,14 +96,62 @@ namespace MoRE {
 		selectedPhone   = createSurface(w, h);
 
 		generatePhone();
+		
+		int keysX=0, keysY=0;
+
+		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
+			keysX = w/2 - sUnselectedKeypad->w/2;
+			keysY = h - sUnselectedKeypad->h - 24;
+		} else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
+			keysX = w/2 - sUnselectedKeypad->w/2;
+			keysY = h - 74 - 24;	
+		}
+
+	
+#define OFFSET_X (27-keysX)
+#define OFFSET_Y (368-keysY)
+		if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK || mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
+
+			keyRects.push_back(KeyRect(MAK_UP, 132-OFFSET_X, 369-OFFSET_Y, 20, 20));
+			keyRects.push_back(KeyRect(MAK_RIGHT, 159-OFFSET_X, 399-OFFSET_Y, 10, 20));
+			keyRects.push_back(KeyRect(MAK_DOWN, 132-OFFSET_X, 426-OFFSET_Y, 12, 10));
+			keyRects.push_back(KeyRect(MAK_LEFT, 107-OFFSET_X, 399-OFFSET_Y, 10, 20));
+
+			keyRects.push_back(KeyRect(MAK_SOFTLEFT, 32-OFFSET_X, 378-OFFSET_Y, 80, 23));
+			keyRects.push_back(KeyRect(MAK_SOFTRIGHT, 164-OFFSET_X, 378-OFFSET_Y, 80, 23));
+
+			keyRects.push_back(KeyRect(MAK_FIRE, 120-OFFSET_X, 387-OFFSET_Y, 36, 36));
+			keyRects.push_back(KeyRect(MAK_CLEAR, 222-OFFSET_X, 500-OFFSET_Y, 26, 60));
+		}
+
+		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
+			keyRects.push_back(KeyRect(MAK_1, 54-OFFSET_X, 451-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_2, 110-OFFSET_X, 451-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_3, 166-OFFSET_X, 451-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_4, 54-OFFSET_X, 476-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_5, 110-OFFSET_X, 476-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_6, 166-OFFSET_X, 476-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_7, 54-OFFSET_X, 501-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_8, 110-OFFSET_X, 501-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_9, 166-OFFSET_X, 501-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_STAR, 54-OFFSET_X, 526-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_0, 110-OFFSET_X, 526-OFFSET_Y, 55, 23));
+			keyRects.push_back(KeyRect(MAK_HASH, 166-OFFSET_X, 526-OFFSET_Y, 55, 23));
+		}
+
+		screenRect.x = w/2 - mProfile->mScreenWidth/2;
+		screenRect.y = 24;
+		screenRect.w = mProfile->mScreenWidth;
+		screenRect.h = mProfile->mScreenHeight;
+
 	}
 
-	int GenericSkin::getWindowWidth() {
+	int GenericSkin::getWindowWidth() const {
 		int w =  mProfile->mScreenWidth + 48;
 		return w > 260 ? w : 260;
 	}
 	
-	int GenericSkin::getWindowHeight() {
+	int GenericSkin::getWindowHeight() const {
 		int extra = 0;
 
 		switch(mProfile->mKeyboardType) {
@@ -96,26 +176,61 @@ namespace MoRE {
 		SDL_FillRect(getWindowSurface(), &rect, color);
 	}
 
-	void GenericSkin::drawDevice() {
+	void GenericSkin::drawDevice() const {
 		//generatePhone();
 		int width  = getWindowWidth();
 		int height = getWindowHeight();
 
 		// draw background
+		//skinPhone(getWindowSurface());
 
-		skinPhone(getWindowSurface());
+		// draw buttons
+		/*
+		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
+			SDL_Rect srcRect, dstRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			dstRect.w = srcRect.w = sUnselectedKeypad->w;
+			dstRect.h = srcRect.h = sUnselectedKeypad->h;
+			dstRect.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect.y = height - sUnselectedKeypad->h - 24;
+			SDL_BlitSurface(sUnselectedKeypad, &srcRect, getWindowSurface(), &dstRect);
+		}
+		else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
+			SDL_Rect srcRect, dstRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			dstRect.w = srcRect.w = sUnselectedKeypad->w;
+			dstRect.h = srcRect.h = 74;
+			dstRect.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect.y = height - 74 - 24;
+			SDL_BlitSurface(sUnselectedKeypad, &srcRect, getWindowSurface(), &dstRect);
+		}
+		*/
 
-		if(SDL_BlitSurface(selectedPhone, NULL, getWindowSurface(), NULL) != 0) {
+		int err;
+		if(err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL) != 0) {
+			char* errStr = SDL_GetError();
 			printf("ERROR BLITTING!!!!\n");
 		}
+		//Base::pixelDoubledBlit(0, 0, getWindowSurface(), unselectedPhone, unselectedPhone->clip_rect, 1);
 				
 		// draw screen
 
-		fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
+		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
 
 	}
 
-	void GenericSkin::skinPhone(SDL_Surface* surface) {
+	void GenericSkin::drawScreen() const {
+		int width  = getWindowWidth();
+		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
+		
+		if(SDL_BlitSurface(getPhoneScreen(), NULL, getWindowSurface(), (SDL_Rect*) &screenRect) != 0) {
+			printf("ERROR BLITTING!!!!\n");
+		}
+	}
+
+	void GenericSkin::skinPhone(SDL_Surface* surface, SDL_Surface* keypad) const {
 		//surface = getWindowSurface();
 		
 		SDL_Rect srcRect;
@@ -270,18 +385,39 @@ namespace MoRE {
 
 		}
 
+		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
+			SDL_Rect srcRect, dstRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			dstRect.w = srcRect.w = sUnselectedKeypad->w;
+			dstRect.h = srcRect.h = sUnselectedKeypad->h;
+			dstRect.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect.y = height - sUnselectedKeypad->h - 24;
+			SDL_BlitSurface(keypad, &srcRect, surface, &dstRect);
+		}
+		else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
+			SDL_Rect srcRect, dstRect;
+			srcRect.x = 0;
+			srcRect.y = 0;
+			dstRect.w = srcRect.w = sUnselectedKeypad->w;
+			dstRect.h = srcRect.h = 74;
+			dstRect.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect.y = height - 74 - 24;
+			SDL_BlitSurface(keypad, &srcRect, surface, &dstRect);
+		}
+
 	}
 
 	void GenericSkin::generatePhone() {
 
-		skinPhone(unselectedPhone);
-		skinPhone(selectedPhone);
+		skinPhone(unselectedPhone, sUnselectedKeypad);
+		skinPhone(selectedPhone, sSelectedKeypad);
 
 		int width  = getWindowWidth();
 		int height = getWindowHeight();
 
 		// draw buttons
-
+		/*
 		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
 			SDL_Rect srcRect, dstRect;
 			srcRect.x = 0;
@@ -302,6 +438,7 @@ namespace MoRE {
 			dstRect.y = height - 74 - 24;
 			SDL_BlitSurface(sUnselectedKeypad, &srcRect, unselectedPhone, &dstRect);
 		}
+		*/
 
 	}
 	
@@ -312,23 +449,92 @@ namespace MoRE {
 	
 	}
 	
-	void GenericSkin::mouseMoved(int x, int y) {
-	
+	void GenericSkin::mouseDragged(int x, int y) {
+		if(mPressedKey) return;
+
+		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+			y>=screenRect.y && y<screenRect.y+screenRect.h) {
+				if(!mTouchedInside) {
+					mousePressed(x, y);
+					return;
+				}
+
+				mListener->onMoSyncPointerDrag(x-screenRect.x, y-screenRect.y);
+				return;
+		} else {
+			if(mTouchedInside) {
+				if(x<screenRect.x) x = screenRect.x;
+				if(y<screenRect.y) y = screenRect.y;
+				if(x>=screenRect.x+screenRect.w) x = screenRect.x+screenRect.w-1;
+				if(y>=screenRect.y+screenRect.h) x = screenRect.y+screenRect.h-1;
+				mouseReleased(x, y);
+				return;
+			}
+		}
 	}
 	
-	void GenericSkin::mousePressed(int x, int y, int button) {
-	
+	void GenericSkin::mousePressed(int x, int y) {
+		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+			y>=screenRect.y && y<screenRect.y+screenRect.h) {
+				mListener->onMoSyncPointerPress(x-screenRect.x, y-screenRect.y);
+				mTouchedInside = true;
+				return;
+		}
+
+		mTouchedInside = false;
+
+		for(size_t i = 0; i < keyRects.size(); i++) {
+			if(keyRects[i].contains(x, y)) {
+				mListener->onMoSyncKeyPress(keyRects[i].keyCode);
+				mPressedKey = keyRects[i].keyCode;
+				keyPressed(mPressedKey);
+				return;
+			}
+		}
 	}
 	
-	void GenericSkin::mouseReleased(int x, int y, int button) {
-	
+	void GenericSkin::mouseReleased(int x, int y) {
+		if(mTouchedInside) {
+			if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+				y>=screenRect.y && y<screenRect.y+screenRect.h) {
+					mListener->onMoSyncPointerRelease(x-screenRect.x, y-screenRect.y);
+					return;
+			}
+			mTouchedInside = false;
+			return;
+		}
+
+		if(!mPressedKey) return;
+		mListener->onMoSyncKeyRelease(mPressedKey);
+		keyReleased(mPressedKey);
+		mPressedKey = 0;
 	}
 
-	DeviceSkin* GenericSkinFactory::createInstanceFor(DeviceProfile* dp) const {
+	void GenericSkin::keyPressed(int mak) {
+		for(size_t i = 0; i < keyRects.size(); i++) {
+			if(keyRects[i].keyCode == mak) {
+				SDL_Rect src = {keyRects[i].x, keyRects[i].y, keyRects[i].w, keyRects[i].h};
+				SDL_BlitSurface(selectedPhone, &src, getWindowSurface(), &src);
+				return;
+			}
+		}
+	}
+
+	void GenericSkin::keyReleased(int mak) {
+		for(size_t i = 0; i < keyRects.size(); i++) {
+			if(keyRects[i].keyCode == mak) {
+				SDL_Rect src = {keyRects[i].x, keyRects[i].y, keyRects[i].w, keyRects[i].h};
+				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);			
+				return;
+			}
+		}
+	}
+
+	DeviceSkin* GenericSkinFactory::createInstanceFor(const DeviceProfile* dp) const {
 		return new GenericSkin(dp);
 	}
 	
-	SkinFactory::Fitness GenericSkinFactory::getFitnessFor(DeviceProfile* dp) const {
+	SkinFactory::Fitness GenericSkinFactory::getFitnessFor(const DeviceProfile* dp) const {
 		return SkinFactory::SKIN_FITNESS_COMPATIBLE;
 	}
 

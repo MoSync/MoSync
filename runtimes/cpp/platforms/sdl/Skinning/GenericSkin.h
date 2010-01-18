@@ -1,3 +1,20 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 #ifndef _GENERICSKIN_H_
 #define _GENERICSKIN_H_
 
@@ -14,7 +31,7 @@ namespace MoRE {
 
 	struct KeyRect {
 		KeyRect(int keyCode, int x, int y, int w, int h)
-			: keyCode(keyCode), x(x), y(y), w(w), h(w) {}
+			: keyCode(keyCode), x(x), y(y), w(w), h(h) {}
 		bool contains(int x, int y);
 		int keyCode;
 		int x, y, w, h;
@@ -22,38 +39,48 @@ namespace MoRE {
 
 	class GenericSkin : public DeviceSkin {
 	public:
-		GenericSkin(DeviceProfile* profile);
-		int getWindowWidth();
-		int getWindowHeight();
-		void drawDevice();
+		GenericSkin(const DeviceProfile* profile);
+		int getWindowWidth() const;
+		int getWindowHeight() const;
+		void drawDevice() const;
+		void drawScreen() const;
 		void rotateCW();
 		void rotateCCW();
-		void mouseMoved(int x, int y);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
+		void mouseDragged(int x, int y);
+		void mousePressed(int x, int y);
+		void mouseReleased(int x, int y);
+
+		void keyPressed(int mak);
+		void keyReleased(int mak);
+
 	private:
 
 		void addKeyRect(int keyCode, int x, int y, int w, int h);
 		void addCustonRect(int id, int x, int y, int w, int h);
 
-		void skinPhone(SDL_Surface* surface);
+		void skinPhone(SDL_Surface* surface, SDL_Surface* keypad) const;
 		void generatePhone();
 
 		static SDL_Surface* sSkinImage;
 		static SDL_Surface* sSelectedKeypad;
 		static SDL_Surface* sUnselectedKeypad;
 
+		SDL_Rect screenRect;
+		bool mTouchedInside;
+
 		SDL_Surface* unselectedPhone;
 		SDL_Surface* selectedPhone;
 
 		std::vector<KeyRect> keyRects;
 		std::vector<KeyRect> customRects;
+		
+		int mPressedKey;
 	};
 
 	class GenericSkinFactory : public SkinFactory {
 	public:
-		DeviceSkin* createInstanceFor(DeviceProfile* dp) const;
-		SkinFactory::Fitness getFitnessFor(DeviceProfile* dp) const;
+		DeviceSkin* createInstanceFor(const DeviceProfile* dp) const;
+		SkinFactory::Fitness getFitnessFor(const DeviceProfile* dp) const;
 	};
 }
 

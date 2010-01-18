@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="sdl"
 	ProjectGUID="{ADF68B96-47DA-4A30-AA51-B5450B019F7F}"
 	RootNamespace="sdl"
@@ -507,6 +507,46 @@
 			</File>
 			<File
 				RelativePath=".\thread\threadsdl.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="skinning"
+			>
+			<File
+				RelativePath=".\Skinning\DeviceProfile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\DeviceSkin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\GenericSkin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\GenericSkin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\Screen.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\Screen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\SkinFactory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\SkinManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Skinning\SkinManager.h"
 				>
 			</File>
 		</Filter>

@@ -1,3 +1,20 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 #ifndef _DEVICESKIN_H_
 #define _DEVICESKIN_H_
 
@@ -14,17 +31,34 @@ namespace MoRE {
 	 */
 	class DeviceSkin {
 	public:
-		DeviceSkin(DeviceProfile* profile) : mProfile(profile) {}
-		virtual int getWindowWidth() = 0;
-		virtual int getWindowHeight() = 0;
-		virtual void drawDevice() = 0;
+		class Listener {
+		public:
+			virtual void onMoSyncKeyPress(int mak) = 0;
+			virtual void onMoSyncKeyRelease(int mak) = 0;
+			virtual void onMoSyncPointerPress(int x, int y) = 0;
+			virtual void onMoSyncPointerDrag(int x, int y) = 0;
+			virtual void onMoSyncPointerRelease(int x, int y) = 0;
+		};
+
+		DeviceSkin(const DeviceProfile* profile) : mProfile(profile), mListener(0) {}
+		virtual int getWindowWidth() const = 0;
+		virtual int getWindowHeight() const = 0;
+		virtual void drawDevice() const = 0;
+		virtual void drawScreen() const = 0;
 		virtual void rotateCW() = 0;
 		virtual void rotateCCW() = 0;
-		virtual void mouseMoved(int x, int y) = 0;
-		virtual void mousePressed(int x, int y, int button) = 0;
-		virtual void mouseReleased(int x, int y, int button) = 0;
+		virtual void mouseDragged(int x, int y) = 0;
+		virtual void mousePressed(int x, int y) = 0;
+		virtual void mouseReleased(int x, int y) = 0;
+
+		// used to update the skin when pressing physical keys
+		virtual void keyPressed(int mak) = 0;
+		virtual void keyReleased(int mak) = 0;
+
+		void setListener(Listener* listener) { mListener = listener; }
 	protected:
-		DeviceProfile* mProfile;
+		const DeviceProfile* mProfile;
+		Listener* mListener;
 	};
 }
-#endif // _DEVICEPSKIN_H_
+#endif // _DEVICESKIN_H_

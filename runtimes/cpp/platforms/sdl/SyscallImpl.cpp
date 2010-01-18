@@ -79,6 +79,9 @@ extern "C" {
 #include "ConfigParser.h"
 #include "sdl_stream.h"
 
+#include "Skinning/Screen.h"
+#include "Skinning/SkinManager.h"
+
 
 namespace Base {
 
@@ -116,9 +119,9 @@ namespace Base {
 	static SDL_mutex* gTimerMutex = NULL;
 	static bool gShowScreen;
 
-	static Skin* sSkin = NULL;
+	static MoRE::DeviceSkin* sSkin = NULL;
 
-	static bool MALibInit(bool showScreen, bool shouldHaveMophone, const char* id, const char *iconPath, const char *vendor, const char *model);
+	static bool MALibInit(bool showScreen, bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile);
 #ifdef USE_MALIBQUIT
 	static void MALibQuit();
 #endif
@@ -126,6 +129,7 @@ namespace Base {
 
 	static void MAHandleKeyEventMAK(int mak, bool pressed);
 	static void MAHandleKeyEvent(int sdlk, bool pressed);
+	static void MASendPointerEvent(int x, int y, int type);
 
 	static int maSendToBackground();
 	static int maBringToForeground();
@@ -159,8 +163,8 @@ namespace Base {
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		bool res = MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id,
-			settings.iconPath, settings.vendor, settings.model);
+		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
+			settings.iconPath, &settings.profile);
 		DEBUG_ASSERT(res);
 #endif
 	}
@@ -180,8 +184,8 @@ namespace Base {
 #endif
 		screenWidth = width;
 		screenHeight = height;
-		bool res = MALibInit(gShowScreen, settings.shouldHaveMophone, settings.id,
-			settings.iconPath, settings.vendor, settings.model);
+		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
+			settings.iconPath, &settings.profile);
 		DEBUG_ASSERT(res);
 	}
 
@@ -252,15 +256,30 @@ namespace Base {
 
 	}
 
-	static bool MALibInit(bool showScreen,  bool shouldHaveMophone, const char* id, const char *iconPath, const char *vendor, const char *model) {
+	class MoSyncSkinListener : public MoRE::DeviceSkin::Listener {
+	public:
+		void onMoSyncKeyPress(int mak) {
+			MAHandleKeyEventMAK(mak, true);
+		}
+		void onMoSyncKeyRelease(int mak) {
+			MAHandleKeyEventMAK(mak, false);
+		}
+		void onMoSyncPointerPress(int x, int y) {
+			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+		}
+		void onMoSyncPointerDrag(int x, int y) {
+			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);	
+		}
+		void onMoSyncPointerRelease(int x, int y) {
+			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+		}
+	};
+
+	static bool MALibInit(bool showScreen,  bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile) {
 		char *mosyncDir = getenv("MOSYNCDIR");
 		if(!mosyncDir) {
 			LOG("MOSYNCDIR could not be found");
 			BIG_PHAT_ERROR(SDLERR_MOSYNCDIR_NOT_FOUND);
-		}
-		if(!parseConfig(std::string(mosyncDir) + "/skins")) {
-			LOG("Could not read skins config. Disabling skins.\n");
-			shouldHaveMophone = false;
 		}
 
 		TEST_LTZ(SDL_Init(SDL_INIT_VIDEO));
@@ -291,14 +310,29 @@ namespace Base {
 				screenHeight = pVid->current_h;
 			}
 #endif
-			sSkin = chooseSkin(model, vendor);
+			//sSkin = chooseSkin(model, vendor);
 			/*if(!sSkin) {
 				LOG("Skin '%s/%s' is not available. Aborting...\n", model, vendor);
 				BIG_PHAT_ERROR(SDLERR_NOSKIN);
 			}*/
+			/*
 			gShouldHaveMophone = 
 				initMophoneScreen(sSkin, &gScreen, screenWidth * gScreenMultiplier,
 				screenHeight * gScreenMultiplier, shouldHaveMophone);
+				*/
+
+			if(haveSkin) {
+				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
+				sSkin->setListener(new MoSyncSkinListener());
+				// fix with mobile image
+				TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
+			} else {
+#ifdef __USE_FULLSCREEN__
+				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT | SDL_FULLSCREEN));
+#else
+				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
+#endif
+			}
 #endif	//MOBILEAUTHOR
 			
 			SDL_PixelFormat* fmt = gScreen->format;
@@ -306,6 +340,14 @@ namespace Base {
 			DUMPINT(fmt->BitsPerPixel);
 			TEST_Z(gBackBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight,
 				fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask));
+
+			MoRE::setWindowSurface(gScreen);
+			MoRE::setPhoneScreen(gBackBuffer);
+			if(sSkin) {
+				sSkin->drawDevice();
+				sSkin->drawScreen();
+				SDL_UpdateRect(gScreen, 0, 0, 0, 0);
+			}
 
 			char caption[1024];
 			if(id != NULL) {
@@ -591,8 +633,15 @@ namespace Base {
 
 	static void MAUpdateScreen() {
 #ifndef MOBILEAUTHOR
-		SDL_Rect srcRect = {0, 0, (Uint16)gBackBuffer->w, (Uint16)gBackBuffer->h};
-		pixelDoubledBlit(getMophoneRealScreenStartX(), getMophoneRealScreenStartY(), gScreen, gBackBuffer, srcRect, gScreenMultiplier);
+		//SDL_Rect srcRect = {0, 0, (Uint16)gBackBuffer->w, (Uint16)gBackBuffer->h};
+		//pixelDoubledBlit(getMophoneRealScreenStartX(), getMophoneRealScreenStartY(), gScreen, gBackBuffer, srcRect, gScreenMultiplier);
+		if(sSkin) {
+			sSkin->drawScreen();
+			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
+		} else {
+			SDL_BlitSurface(gBackBuffer, NULL, gScreen, NULL);
+			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
+		}
 		/*
 		//stretch the backbuffer onto the screen
 		DEBUG_ASRTZERO(SDL_LockSurface(gScreen));
@@ -707,6 +756,9 @@ namespace Base {
 				event.key = mak;
 				gEventFifo.put(event);
 			}
+			if(sSkin)
+				if(pressed) sSkin->keyPressed(mak);
+				else sSkin->keyReleased(mak);
 		}
 	}
 
@@ -795,6 +847,7 @@ namespace Base {
 				break;
 #ifndef MOBILEAUTHOR
 			case SDL_MOUSEMOTION:
+				/*
 				if(isPointInsideScreen(event.motion.x, event.motion.y, gBackBuffer->w*gScreenMultiplier , gBackBuffer->h*gScreenMultiplier) && (event.motion.state&SDL_BUTTON(1))) {
 					if(!wasInside) {
 						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_PRESSED);
@@ -804,14 +857,21 @@ namespace Base {
 					wasInside = true;
 				} else {
 
-					/* should send a release message here the first time it goes out of the screen. */
+					// should send a release message here the first time it goes out of the screen.
 					if(wasInside && (event.motion.state&SDL_BUTTON(1))) {
 						wasInside = false;
 						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_RELEASED);
 					}
 				}
+				*/
+				if(event.motion.state&SDL_BUTTON(1))
+					if(sSkin)
+						sSkin->mouseDragged(event.button.x, event.button.y);
+					else
+						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_DRAGGED);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
+				/*
 				if(event.button.button == 1) {
 					int button = containsButtonMophone(event.button.x, event.button.y);
 					if(button!=-1) {
@@ -824,8 +884,15 @@ namespace Base {
 						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_PRESSED);
 					}
 				}
+				*/
+				if(event.button.button == 1)
+					if(sSkin)
+						sSkin->mousePressed(event.button.x, event.button.y);
+					else
+						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_PRESSED);
 				break;
 			case SDL_MOUSEBUTTONUP:
+				/*
 				if(event.button.button == 1) {
 					if(lastMophoneMouseButton!=-1) {
 						MAHandleKeyEventMAK(lastMophoneMouseButton, false);
@@ -836,7 +903,13 @@ namespace Base {
 						wasInside = false;
 						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_RELEASED);
 					}
-				}					
+				}
+				*/
+				if(event.button.button == 1)
+					if(sSkin)
+						sSkin->mouseReleased(event.button.x, event.button.y);
+					else
+						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_RELEASED);
 				break;
 #endif	//MOBILEAUTHOR
 
@@ -847,6 +920,7 @@ namespace Base {
 					break;
 				}
 #ifndef MOBILEAUTHOR
+				/*
 				else if(event.key.keysym.sym == SDLK_PAGEUP) {
 					if(gScreenMultiplier < 4 ) {
 						gScreenMultiplier++;
@@ -868,11 +942,11 @@ namespace Base {
 					}
 					break;
 				}
-
-				drawButtonMophone(gScreen, MAConvertKey(event.key.keysym.sym), true);
+				*/
+				//drawButtonMophone(gScreen, MAConvertKey(event.key.keysym.sym), true);
 #endif	//MOBILEAUTHOR
 				MAHandleKeyEvent(event.key.keysym.sym, true);
-				MAUpdateScreen();
+				//MAUpdateScreen();
 				break;
 			case SDL_KEYUP:
 				if(	event.key.keysym.sym == SDLK_PAGEUP||
@@ -882,10 +956,12 @@ namespace Base {
 				}
 
 				MAHandleKeyEvent(event.key.keysym.sym, false);
+				/*
 #ifndef MOBILEAUTHOR
 				drawButtonMophone(gScreen, MAConvertKey(event.key.keysym.sym), false);
 #endif
 				MAUpdateScreen();
+				*/
 				break;
 			case SDL_QUIT:
 				LOGT("SDL_QUIT");

@@ -21,6 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <SDL/SDL.h>
 #include <string>
 
+#include "Skinning/DeviceProfile.h"
+#include "Skinning/DeviceSkin.h"
+
 #include "config_platform.h"
 
 #include <bluetooth/discovery.h>

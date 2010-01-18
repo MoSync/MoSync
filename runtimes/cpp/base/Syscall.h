@@ -43,6 +43,7 @@ namespace Base {
 #endif
 
 #include "SyscallImpl.h"
+
 	public:
 		bool loadResources(Stream& file, const char* aFilename);
 
