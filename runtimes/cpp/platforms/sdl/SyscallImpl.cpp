@@ -329,9 +329,14 @@ namespace Base {
 
 			if(haveSkin) {
 				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
-				sSkin->setListener(new MoSyncSkinListener());
-				// fix with mobile image
-				TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
+				if(!sSkin) {
+					haveSkin = false;
+					TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
+				} else {
+					sSkin->setListener(new MoSyncSkinListener());
+					// fix with mobile image
+					TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
+				}
 			} else {
 #ifdef __USE_FULLSCREEN__
 				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT | SDL_FULLSCREEN));

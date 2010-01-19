@@ -41,8 +41,15 @@ namespace MoRE {
 				bestSkinFactory = (*i);
 			}
 		}
-		if(bestSkinFactory != NULL)
-			return bestSkinFactory->createInstanceFor(profile);
+		if(bestSkinFactory != NULL) {
+			DeviceSkin* skin = bestSkinFactory->createInstanceFor(profile);
+			if(!skin) return NULL;
+			if(!skin->init()) {
+				delete skin;
+				return NULL;
+			}
+			return skin;
+		}
 		else
 			return NULL;
 	}

@@ -79,15 +79,22 @@ namespace MoRE {
 		mPressedKey(0),
 		mTouchedInside(false)
 	{
+	}
+
+	bool GenericSkin::init() {
 		const char *dir = getenv("MOSYNCDIR");
+		
+		if(!dir) return false;
 
 		if(!sSkinImage) 
 			sSkinImage        = loadPNGImage((std::string(dir)+"/skins/skinImage.png").c_str());
+		if(!sSkinImage) return false;
 		if(!sSelectedKeypad) 
 			sSelectedKeypad   = loadPNGImage((std::string(dir)+"/skins/keypadSelected.png").c_str());
+		if(!sSelectedKeypad) return false;
 		if(!sUnselectedKeypad) 
 			sUnselectedKeypad = loadPNGImage((std::string(dir)+"/skins/keypadUnselected.png").c_str());
-
+		if(!sUnselectedKeypad) return false;
 
 		int w = getWindowWidth();
 		int h = getWindowHeight();
@@ -106,7 +113,6 @@ namespace MoRE {
 			keysX = w/2 - sUnselectedKeypad->w/2;
 			keysY = h - 74 - 24;	
 		}
-
 	
 #define OFFSET_X (27-keysX)
 #define OFFSET_Y (368-keysY)
@@ -142,8 +148,9 @@ namespace MoRE {
 		screenRect.x = w/2 - mProfile->mScreenWidth/2;
 		screenRect.y = 24;
 		screenRect.w = mProfile->mScreenWidth;
-		screenRect.h = mProfile->mScreenHeight;
+		screenRect.h = mProfile->mScreenHeight;	
 
+		return true;
 	}
 
 	int GenericSkin::getWindowWidth() const {

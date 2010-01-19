@@ -40,6 +40,7 @@ namespace MoRE {
 	class GenericSkin : public DeviceSkin {
 	public:
 		GenericSkin(const DeviceProfile* profile);
+		bool init();
 		int getWindowWidth() const;
 		int getWindowHeight() const;
 		void drawDevice() const;
