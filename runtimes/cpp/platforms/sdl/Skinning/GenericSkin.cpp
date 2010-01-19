@@ -29,8 +29,8 @@ namespace Base {
 }
 
 namespace MoRE {
-	bool KeyRect::contains(int x, int y) {
-		if(x>=this->x && x<this->x+this->w && y>=this->y && y<this->y+this->h) return true;
+	bool KeyRect::contains(int lx, int ly) {
+		if(lx>=this->x && lx<this->x+this->w && ly>=this->y && ly<this->y+this->h) return true;
 		return false;
 	}
 
@@ -38,7 +38,7 @@ namespace MoRE {
 	SDL_Surface* GenericSkin::sSelectedKeypad = 0;
 	SDL_Surface* GenericSkin::sUnselectedKeypad = 0;
 
-	SDL_Surface* createSurface(int width,int height) {
+	static SDL_Surface* createSurface(int width,int height) {
 		Uint32 rmask, gmask, bmask, amask;
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
@@ -61,7 +61,7 @@ namespace MoRE {
 		return first;
 	}
 
-	SDL_Surface* loadPNGImage(const char* name) {
+	static SDL_Surface* loadPNGImage(const char* name) {
 		SDL_RWops* rwops = SDL_RWFromFile(name, "rb");
 		if(!rwops) {
 			LOG("Failed to load %s", name);
@@ -178,15 +178,19 @@ namespace MoRE {
 		return mProfile->mScreenHeight + extra;
 	}
 
+	/*
 	static void fillRect(int left, int top, int width, int height, unsigned int color) {
 		SDL_Rect rect = { left,top,width,height };
 		SDL_FillRect(getWindowSurface(), &rect, color);
 	}
+	*/
 
 	void GenericSkin::drawDevice() const {
 		//generatePhone();
+		/*
 		int width  = getWindowWidth();
 		int height = getWindowHeight();
+		*/
 
 		// draw background
 		//skinPhone(getWindowSurface());
@@ -216,9 +220,9 @@ namespace MoRE {
 		*/
 
 		int err;
-		if(err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL) != 0) {
+		if((err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL)) != 0) {
 			char* errStr = SDL_GetError();
-			printf("ERROR BLITTING!!!!\n");
+			printf("ERROR BLITTING: %s!!!!\n", errStr);
 		}
 		//Base::pixelDoubledBlit(0, 0, getWindowSurface(), unselectedPhone, unselectedPhone->clip_rect, 1);
 				
@@ -229,7 +233,7 @@ namespace MoRE {
 	}
 
 	void GenericSkin::drawScreen() const {
-		int width  = getWindowWidth();
+		//int width  = getWindowWidth();
 		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
 		
 		if(SDL_BlitSurface(getPhoneScreen(), NULL, getWindowSurface(), (SDL_Rect*) &screenRect) != 0) {
@@ -389,27 +393,26 @@ namespace MoRE {
 			dstRect.y += 16;
 			dstRect.x = 24;
 			srcRect.w = 16;
-
 		}
 
 		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
-			SDL_Rect srcRect, dstRect;
-			srcRect.x = 0;
-			srcRect.y = 0;
-			dstRect.w = srcRect.w = sUnselectedKeypad->w;
-			dstRect.h = srcRect.h = sUnselectedKeypad->h;
-			dstRect.x = width/2 - sUnselectedKeypad->w/2;
-			dstRect.y = height - sUnselectedKeypad->h - 24;
-			SDL_BlitSurface(keypad, &srcRect, surface, &dstRect);
+			SDL_Rect srcRect2, dstRect2;
+			srcRect2.x = 0;
+			srcRect2.y = 0;
+			dstRect2.w = srcRect2.w = sUnselectedKeypad->w;
+			dstRect2.h = srcRect2.h = sUnselectedKeypad->h;
+			dstRect2.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect2.y = height - sUnselectedKeypad->h - 24;
+			SDL_BlitSurface(keypad, &srcRect2, surface, &dstRect2);
 		}
 		else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
-			SDL_Rect srcRect, dstRect;
-			srcRect.x = 0;
-			srcRect.y = 0;
-			dstRect.w = srcRect.w = sUnselectedKeypad->w;
-			dstRect.h = srcRect.h = 74;
-			dstRect.x = width/2 - sUnselectedKeypad->w/2;
-			dstRect.y = height - 74 - 24;
+			SDL_Rect srcRect2, dstRect2;
+			srcRect2.x = 0;
+			srcRect2.y = 0;
+			dstRect2.w = srcRect2.w = sUnselectedKeypad->w;
+			dstRect2.h = srcRect2.h = 74;
+			dstRect2.x = width/2 - sUnselectedKeypad->w/2;
+			dstRect2.y = height - 74 - 24;
 			SDL_BlitSurface(keypad, &srcRect, surface, &dstRect);
 		}
 
@@ -419,9 +422,10 @@ namespace MoRE {
 
 		skinPhone(unselectedPhone, sUnselectedKeypad);
 		skinPhone(selectedPhone, sSelectedKeypad);
-
+		/*
 		int width  = getWindowWidth();
 		int height = getWindowHeight();
+		*/
 
 		// draw buttons
 		/*

@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #include <MAUtil/Environment.h>
 #include <MAUtil/Moblet.h>
-#include <maprofile.h>
+//#include <maprofile.h>
 
 using namespace MAUtil;
 
@@ -68,7 +68,7 @@ using namespace MAUtil;
  * We make our Moblet inherit TimerListener
  */
 
-class TimerMoblet : public Moblet, public TimerListener, public PointerListener {
+class TimerMoblet : public Moblet, public TimerListener {
 public:
 
 	/**

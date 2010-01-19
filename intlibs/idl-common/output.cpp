@@ -261,8 +261,8 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 					throwException("Bad anonymous struct");
 				//find struct definition
 				bool found = false;
-				for(size_t m=0; m<structs.size(); m++) {
-					const Struct& as(structs[m]);
+				for(size_t m2=0; m2<structs.size(); m2++) {
+					const Struct& as(structs[m2]);
 					if(as.name == pod.type) {
 						//print it
 						stream << tab << "struct {\n";

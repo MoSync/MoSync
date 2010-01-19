@@ -45,7 +45,7 @@ void output_error(int code, const char* name, const char* desc);
 #define COLUMN_2 35
 
 
-void output_error_props(int code, const char* name, const char* desc) {
+static void output_error_props(int code, const char* name, const char* desc) {
 	cout << code << "=" << desc << ".\n";
 }
 
@@ -60,7 +60,7 @@ void output_error(int code, const char* name, const char* desc) {
 	cout << "// " << desc << ".\n";
 }
 
-void gen_docxml() {
+static void gen_docxml() {
 	header();
 
 #define OUTPUT_ERROR(val, id, desc) output_error(val, #id, desc);
@@ -72,7 +72,7 @@ void gen_docxml() {
 	footer();
 }
 
-void gen_props() {
+static void gen_props() {
 
 #define OUTPUT_ERROR_PROPS(val, id, desc) output_error_props(val, #id, desc);
 #define OUTPUT_PROPS_SET(set) { set##_ERRORS(OUTPUT_ERROR_PROPS);  }

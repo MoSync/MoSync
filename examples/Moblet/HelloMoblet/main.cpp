@@ -28,7 +28,7 @@ using namespace MAUtil;
 // this is how many pixels will be traversed each timer tick
 #define SPEED 1
 
-class MyMoblet : public Moblet, TimerListener, PointerListener {
+class MyMoblet : public Moblet, TimerListener {
 public:
 	MyMoblet() : dirx(0), diry(0), x(30), y(40) {
 		// set the text

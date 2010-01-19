@@ -67,15 +67,15 @@ namespace MoRE {
 		static SDL_Surface* sUnselectedKeypad;
 
 		SDL_Rect screenRect;
+		int mPressedKey;
 		bool mTouchedInside;
 
 		SDL_Surface* unselectedPhone;
 		SDL_Surface* selectedPhone;
 
 		std::vector<KeyRect> keyRects;
-		std::vector<KeyRect> customRects;
+		std::vector<KeyRect> customRects;		
 		
-		int mPressedKey;
 	};
 
 	class GenericSkinFactory : public SkinFactory {
