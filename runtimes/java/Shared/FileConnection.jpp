@@ -17,43 +17,159 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "FileConnection.h"
 
-#if 0
 //***************************************************************************
 //Helper Functions
 //***************************************************************************
-//Supports only *, but any number of them. Ignores case.
-final boolean wildcardMatch(String s, String filter) {
-	int wildIndex = filter.indexOf('*');
-	if(wildIndex < 0)	//no wildcard
-		return s.equalsIgnoreCase(filter);
-	
-	//first region
-	if(!s.regionMatches(true, 0, filter, 0, wildIndex))
-		return false;
-
-	int pos = wildIndex;
-
-	int nextWildIndex = wildIndex;
-	do {
-		wildIndex = nextWildIndex;
-		nextWildIndex = filter.indexOf('*', wildIndex + 1);
-	} while(nextWildIndex == wildIndex + 1);	//consecutive wildcards shall have no effect
-
-	if(nextWildIndex < 0)	//only one wildcard
-		return s.indexOf(filter.substring(wildIndex + 1), pos) >= 0;
-
-	//second region
-	String sub = filter.substring(wildIndex + 1, nextWildIndex);
-	if(s.indexOf(sub, pos) < 0)
-		return false;
-	pos += sub.length();
-
-		//if(!s.regionMatches(true, , filter, 
+FileHandle getFileHandle(MAHandle file) {
+	FileHandle fh = (FileHandle)mFileHandles.get(new Integer(file));
+	DEBUG_ASSERT(fh != null);
+	return fh;
 }
-#endif
+
+DataInputStream getFileInputStream(MAHandle file) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	if(fh.in == null) {
+		fh.in = fh.fc.openDataInputStream();
+		if(fh.position != 0)
+			fh.in.skip(fh.position);
+	}
+	return fh.in;
+}
+
+OutputStream getFileOutputStream(MAHandle file) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	if(fh.out == null) {
+		fh.out = fh.fc.openOutputStream(fh.position);
+	}
+	return fh.out;
+}
 
 //***************************************************************************
-//Proper Syscall Functions
+//File Functions
+//***************************************************************************
+final MAHandle maFileOpen(String path, int mode) throws Exception {
+	FileConnection fc = (FileConnection)Connector.open("file:///" + path, mode);
+	DEBUG_ASSERT(fc != null);
+	FileHandle fh = new FileHandle();
+	fh.fc = fc;
+	fh.position = 0;
+	mFileHandles.put(new Integer(mFileNextHandle), fh);
+	return mFileNextHandle++;
+}
+
+final int maFileExists(MAHandle file) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	return fh.fc.exists() ? 1 : 0;
+}
+
+final int maFileClose(MAHandle file) throws Exception {
+	Integer key = new Integer(file);
+	FileHandle fh = (FileHandle)mFileHandles.get(key);
+	DEBUG_ASSERT(fh != null);
+	if(fh.fc != null)
+		fh.fc.close();
+	mFileHandles.remove(key);
+	return 0;
+}
+
+final int maFileCreate(MAHandle file) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	if(fh.fc.isDirectory()) {
+		fh.fc.mkdir();
+	} else {
+		fh.fc.create();
+	}
+	return 0;
+}
+
+final int maFileTell(MAHandle file) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	MYASSERT(fh.fc.exists() && !fh.fc.isDirectory());
+	return fh.position;
+}
+
+final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
+	FileHandle fh = getFileHandle(file);
+	MYASSERT(fh.fc.exists() && !fh.fc.isDirectory());
+	int newPos;
+	switch(whence) {
+	case MA_SEEK_SET:
+		newPos = offset;
+		break;
+	case MA_SEEK_CUR:
+		newPos = fh.position + offset;
+		break;
+	case MA_SEEK_END:
+		newPos = (int)fh.fc.fileSize() + offset;
+		break;
+	default:
+		BIG_PHAT_ERROR;
+	}
+	if(newPos == fh.position)
+		return fh.position;
+	if(fh.in != null) {
+		if(newPos > fh.position) {
+			fh.in.skip(newPos - fh.position);
+		} else {
+			fh.in.close();
+			fh.in = fh.fc.openDataInputStream();
+			fh.in.skip(newPos);
+		}
+	}
+	if(fh.out != null) {
+		fh.out.close();
+		fh.out = fh.fc.openOutputStream(newPos);
+	}
+	return fh.position = newPos;
+}
+
+final int maFileWrite(MAHandle file, MAAddress src, int len) throws Exception {
+	OutputStream out = getFileOutputStream(file);
+	readMemStream(out, src, len);
+	return 0;
+}
+
+final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) throws Exception {
+	OutputStream out = getFileOutputStream(file);
+	BinaryInterface bi = (BinaryInterface)getResource(data);
+	if(bi instanceof Binary) {
+		Binary bin = (Binary)bi;
+#ifdef SEGMENTED_DATA
+		bin.write(out, offset, len);
+#else
+		out.write(bin.arr, offset, len);
+#endif
+	} else {
+		byte[] buffer = new byte[len];
+		DataInputStream dis = new DataInputStream(bi.getInputStream());
+		dis.readFully(buffer);
+		dis.close();
+		out.write(buffer);
+	}
+	return 0;
+}
+
+final int maFileRead(MAHandle file, MAAddress dst, int len) throws Exception {
+	DataInputStream dis = getFileInputStream(file);
+	byte[] bytes = new byte[len];
+	dis.readFully(bytes);
+	writeMemBytes(dst, bytes, 0, len);
+	return 0;
+}
+
+final int maFileReadToData(MAHandle file, MAHandle data, int offset, int len) throws Exception {
+	DataInputStream dis = getFileInputStream(file);
+	Binary bin = (Binary)getResource(data);
+#ifdef SEGMENTED_DATA
+	bin.read(dis, offset, len);
+#else
+	dis.readFully(bin.arr, offset, len);
+#endif
+	return 0;
+}
+
+//***************************************************************************
+//FileList Functions
 //***************************************************************************
 
 final int maFileListStart(String path, String filter) {
@@ -63,17 +179,20 @@ final int maFileListStart(String path, String filter) {
 		en = FileSystemRegistry.listRoots();
 	} else {
 		try {
-			fc = (FileConnection)Connector.open("file:///" + path +
-				(path.charAt(path.length() - 1) == '/' ? "" : "/"), Connector.READ);
+			String url = "file:///" + path +
+				(path.charAt(path.length() - 1) == '/' ? "" : "/");
+			//DEBUG_ALWAYS("maFileListStart '" + url + "'\n");
+			fc = (FileConnection)Connector.open(url, Connector.READ);
 			if(!fc.exists())
-				return FLERR_NOTFOUND;
+				return MA_FLERR_NOTFOUND;
+			//DEBUG_ALWAYS("filter: '" + filter + "'\n");
 			en = fc.list(filter, true);
 		} catch(IOException e) {
 			PRINT_STACK_TRACE;
-			return FLERR_GENERIC;
+			return MA_FLERR_GENERIC;
 		} catch(SecurityException e) {
 			PRINT_STACK_TRACE;
-			return FLERR_GENERIC;
+			return MA_FLERR_GENERIC;
 		}
 	}
 	FileListing fl = new FileListing();
@@ -108,5 +227,5 @@ final int maFileListClose(MAHandle list) throws IOException {
 	FileListing fl = (FileListing)mFileListings.get(key);
 	if(fl.fc != null)
 		fl.fc.close();
-	return mFileListings.remove(key) == null ? FLERR_GENERIC : 0;
+	return mFileListings.remove(key) == null ? MA_FLERR_GENERIC : 0;
 }

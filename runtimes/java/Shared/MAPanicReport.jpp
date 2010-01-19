@@ -97,7 +97,7 @@ public class MAPanicReport
 		}
 #endif	//0
 #elif defined(_android)
-		// Write the panic retport as a file on the device
+		// Write the panic report as a file on the device
 		try {
 			FileOutputStream fos = context.openFileOutput("panic.report", 0);
 			fos.write(bdata);

@@ -16,6 +16,11 @@
 
 require "#{File.dirname(__FILE__)}/gcc.rb"
 
+gcc_version = get_gcc_version_string("gcc")
+NATIVE_GCC_IS_V4 = (gcc_version[0] == "4"[0])
+NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "3"[0]))
+NATIVE_GCC_IS_V44 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "4"[0]))
+
 # Base class.
 class NativeGccWork < GccWork
 	def gcc; "gcc"; end

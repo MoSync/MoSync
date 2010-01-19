@@ -20,6 +20,22 @@ require "#{File.dirname(__FILE__)}/gcc_flags.rb"
 require "#{File.dirname(__FILE__)}/loader_md.rb"
 require "#{File.dirname(__FILE__)}/flags.rb"
 
+def get_gcc_version_string(gcc)
+	file = open("|#{gcc} -v 2>&1")
+	file.each do |line|
+		parts = line.split(/ /)
+		#puts "yo: #{parts.inspect}"
+		if(parts[0] == "gcc" && parts[1] == "version")
+			return parts[2]
+		end
+	end
+	error("Could not find gcc version.")
+end
+
+#warning("GCC version: #{GCC_VERSION}")
+#warning("GCC_IS_V4: #{GCC_IS_V4}")
+#warning("GCC_IS_V43: #{GCC_IS_V43}")
+
 # Compiles a source file using gcc.
 # Generates extra files for tracking dependencies and flags,
 # so that if the flags or any dependency have changed, this file will be recompiled.

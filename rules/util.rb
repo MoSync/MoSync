@@ -54,7 +54,7 @@ end
 def sh(cmd)
 	#TODO: optimize by removing the extra shell
 	#the Process class should be useful.
-	puts cmd
+	$stderr.puts cmd
 	if(!system(cmd)) then
 		error "Command failed: '#{$?}'"
 	end

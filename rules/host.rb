@@ -76,35 +76,16 @@ else
 	error("Unknown platform: #{UNAME}")
 end
 
-def get_gcc_version_string
-	file = open("|gcc -v 2>&1")
-	file.each do |line|
-		parts = line.split(/ /)
-		#puts "yo: #{parts.inspect}"
-		if(parts[0] == "gcc" && parts[1] == "version")
-			return parts[2]
-		end
-	end
-	error("Could not find gcc version.")
-end
-
-gcc_version = get_gcc_version_string
-NATIVE_GCC_IS_V4 = (gcc_version[0] == "4"[0])
-NATIVE_GCC_IS_V43 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "3"[0]))
-NATIVE_GCC_IS_V44 = (NATIVE_GCC_IS_V4 && (gcc_version[2] == "4"[0]))
-
-#warning("GCC version: #{GCC_VERSION}")
-#warning("GCC_IS_V4: #{GCC_IS_V4}")
-#warning("GCC_IS_V43: #{GCC_IS_V43}")
-
 #warning("Platform: #{HOST}")
 
 if(HOST == :win32) then
 	DLL_FILE_ENDING = '.dll'
 	EXE_FILE_ENDING = '.exe'
+	FOLDER_SEPARATOR = '\\'
 else
 	DLL_FILE_ENDING = '.so'
 	EXE_FILE_ENDING = ''
+	FOLDER_SEPARATOR = '/'
 end
 NATIVE_LIB_FILE_ENDING = '.a'
 

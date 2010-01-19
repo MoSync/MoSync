@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;build.bat"
+				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;work.bat&#x0D;&#x0A;"
 				ReBuildCommandLine=""
 				CleanCommandLine=""
 				Output=""
@@ -319,6 +319,14 @@
 		</File>
 		<File
 			RelativePath=".\platforms\javaME\process.bat"
+			>
+		</File>
+		<File
+			RelativePath=".\platforms\javaME\work.bat"
+			>
+		</File>
+		<File
+			RelativePath=".\platforms\javaME\workfile.rb"
 			>
 		</File>
 	</Files>

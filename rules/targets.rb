@@ -15,6 +15,7 @@
 # 02111-1307, USA.
 
 require "#{File.dirname(__FILE__)}/util.rb"
+require "#{File.dirname(__FILE__)}/error.rb"
 
 # add functions to this class to allow them to be used as command-line targets
 # if no command-line target is chosen, "default" is run.

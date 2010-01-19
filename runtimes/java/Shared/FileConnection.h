@@ -24,5 +24,15 @@ static class FileListing {
 	FileConnection fc;	//null if scanning roots
 }
 
+static class FileHandle {
+	FileConnection fc;
+	int position;
+	DataInputStream in;
+	OutputStream out;
+}
+
 Hashtable mFileListings = new Hashtable();
 int mFileListNextHandle = 1;
+
+Hashtable mFileHandles = new Hashtable();
+int mFileNextHandle = 1;

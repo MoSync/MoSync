@@ -19,11 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
+#include <IX_FILE.h>
 
 char buffer[256];
 
 bool dumpFileList(const char* path) {
-	Handle list = maFileListStart(path, "*");
+	MAHandle list = maFileListStart(path, "*");
 	if(list < 0) {
 		printf("Error %i\n", list);
 		return false;
@@ -32,7 +33,8 @@ bool dumpFileList(const char* path) {
 	while(maFileListNext(list, buffer, sizeof(buffer)) > 0) {
 		MAUtil::String p2(path);
 		p2 += buffer;
-		PrintConsole(p2.c_str());
+		MAUtil::String p3 = p2 + "\n";
+		PrintConsole(p3.c_str());
 		dumpFileList(p2.c_str());
 		empty = false;
 	}

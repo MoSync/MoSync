@@ -2128,7 +2128,48 @@ namespace Base {
 			return maStreamSetPos(a, b);
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef IX_FILE
+		case maIOCtl_maFileOpen:
+			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
+		case maIOCtl_maFileExists:
+			return maFileExists(a);
+		case maIOCtl_maFileClose:
+			return maFileClose(a);
+		case maIOCtl_maFileCreate:
+			return maFileCreate(a);
+		/*case maIOCtl_maFileDelete:
+			return maFileDelete(a);
+		case maIOCtl_maFileSize:
+			return maFileSize(a);
+		case maIOCtl_maFileAvailableSpace:
+			return maFileAvailableSpace(a);
+		case maIOCtl_maFileTotalSpace:
+			return maFileTotalSpace(a);
+		case maIOCtl_maFileDate:
+			return maFileDate(a);
+		case maIOCtl_maFileRename:
+			return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileTruncate:
+			return maFileTruncate(a, b);*/
+
+		case maIOCtl_maFileWrite:
+			return maFileWrite(a, b, c);
+		case maIOCtl_maFileRead:
+			return maFileRead(a, b, c);
+
+		case maIOCtl_maFileTell:
+			return maFileTell(a);
+		case maIOCtl_maFileSeek:
+			return maFileSeek(a, b, c);
+
+		case maIOCtl_maFileListStart:
+			return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileListNext:
+			return maFileListNext(a, b, c);
+		case maIOCtl_maFileListClose:
+			return maFileListClose(a);
+#endif
 		default:
 			return IOCTL_UNAVAILABLE;
 		}

@@ -1879,50 +1879,164 @@ interface MAAPI {
 		int maPlatformRequest(in MAString url);
 
 #if IX_FILE
-/*
-		
+		/*
 		* Stores the name of a root file system in \a nameBuf.
 		* Call this function repeatedly with increasing values for \a index
 		* to enumerate all file systems. Every file system name ends with a slash ('/').
 		*
 		* The buffer may be too small to contain the name; in that case, the buffer will not be filled
 		* and you should create a bigger buffer and call this function again.
-		* You may call this function with NULL and 0 to simply retrieve the length of the name.
+		* You may call this function with bufSize 0 to simply retrieve the length of the name.
 		*
 		* \returns If the file system exists, the length of the name. 0 otherwise.
 		* \< 0 on error.
 		*/
 		//int maFileSystem(in int index, out MAString nameBuf, in int bufSize);
 
+		constset int MA_ACCESS_ {
+			READ = 1;
+			WRITE = 2;
+			READ_WRITE = 3;
+		}
+
+		/**
+		* Opens a file handle.
+		* If the file exists, the file will be accessible according to the mode specified.
+		* If the file does not exist, a handle will still be returned and
+		* maFileExists() will return false.
+		* The file may then be created by calling maFileCreate().
+		*
+		* Directories may be opened with this function. They cannot be read or written,
+		* but they can be created and deleted. Directory paths must end with a slash('/').
+		*
+		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
+		* \param path The absolute path to the file.
+		* \param mode The access mode. Either MA_ACCESS_READ, MA_ACCESS_WRITE or MA_ACCESS_READ_WRITE.
+		* \returns The new file handle.
+		*/
+		MAHandle maFileOpen(in MAString path, in int mode);
+
+		/**
+		* Returns 1 if the file exists, 0 otherwise.
+		*/
+		int maFileExists(in MAHandle file);
+
+		/**
+		* Closes a file handle. Returns 0.
+		*/
+		int maFileClose(in MAHandle file);
+
 		//see JSR 75 for docs
-		int maFileCreate(in MAHandle fConn);
-		int maFileDelete(in MAHandle fConn);
-		int maFileSize(in MAHandle fConn);
-		int maFileAvailableSpace(in MAHandle fConn);
-		int maFileTotalSpace(in MAHandle fConn);
-		int maFileDate(in MAHandle fConn);
-		int maFileRename(in MAHandle fConn, in MAString newName);
-		int maFileTruncate(in MAHandle fConn, in int offset);
+		/**
+		* Creates a file or directory, given an open handle.
+		* The file must not exist prior to calling this function.
+		* After creation, the file will be accessible according to the mode specified when
+		* its handle was opened.
+		* Returns 0.
+		*/
+		int maFileCreate(in MAHandle file);
+
+		/**
+		* Deletes a file or directory.
+		* The file must exist prior to calling this function.
+		* If it's a directory, it must be empty.
+		* Returns 0.
+		*/
+		int maFileDelete(in MAHandle file);
+
+		/**
+		* Returns the size of the file.
+		* \note MoSync cannot handle files larger than 2 GiB (2^31 - 1 bytes).
+		* \param file A file handle. The file must exist and must not be a directory.
+		*/
+		int maFileSize(in MAHandle file);
+		int maFileAvailableSpace(in MAHandle file);
+		int maFileTotalSpace(in MAHandle file);
+		int maFileDate(in MAHandle file);
+		int maFileRename(in MAHandle file, in MAString newName);
+		int maFileTruncate(in MAHandle file, in int offset);
+
+		/**
+		* Write from memory to file.
+		* Returns 0.
+		*/
+		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
+
+		/**
+		* Arguments to maFileReadToData() and maFileWriteFromData().
+		*/
+		struct MA_FILE_DATA {
+			MAHandle file;
+			MAHandle data;
+			int offset;
+			int len;
+		}
+
+		/**
+		* Write from data object to file.
+		* Returns 0.
+		*/
+		int maFileWriteFromData(in MA_FILE_DATA args);
+		/**
+		* Read from file to memory.
+		* Returns 0.
+		*/
+		int maFileRead(in MAHandle file, out MAAddress dst, in int len);
+		/**
+		* Read from file to data object.
+		* Returns 0.
+		*/
+		int maFileReadToData(in MA_FILE_DATA args);
+
+		/**
+		* Returns the file's current position.
+		* \param file A file handle. The file must exist and must not be a directory.
+		*/
+		int maFileTell(in MAHandle file);
+
+		/**
+		* Sets the file's position.
+		* \param file A file handle. The file must exist and must not be a directory.
+		* \param offset The offset of the new position,
+		* relative to the position specified by \a whence.
+		* \param whence One of the \link #MA_SEEK_SET MA_SEEK \endlink constants.
+		* \returns The new position.
+		*/
+		int maFileSeek(in MAHandle file, in int offset, in int whence);
+
+		constset int MA_SEEK_ {
+			/// Beginning of file.
+			SET = 0;
+			/// Current position.
+			CUR = 1;
+			/// End of file.
+			END = 2;
+		}
 
 		/**
 		* Creates a listing of names of files and directories, or file systems.
-		* Call maFileListNext() repeatedly to retrieve the names.
+		* Call maFileListNext() repeatedly to retrieve the names. Call maFileListClose() to
+		* free the resources used.
 		*
 		* \param path The full path to a directory, or the empty string,
-		* which specifies that root file systems should be listed.
+		* which specifies that the root file systems should be listed.
 		* \param filter A string to match names with. May include an asterisk ('*') wildcard
 		* to represent 0 or more characters. Ignored if \a path is empty.
 		*
 		* \returns A File Listing handle, or \< 0 on error.
 		*/
-		int maFileListStart(in MAString path, in MAString filter);
+		MAHandle maFileListStart(in MAString path, in MAString filter);
 
 		/**
+		* Writes the name of the next file in the list to the specified buffer.
+		*
 		* The buffer may be too small to contain the name and the terminating zero;
 		* in that case, the internal list pointer remains unchanged,
-		* the buffer will not be filled
+		* the buffer will not be filled,
 		* and you should allocate a bigger buffer and call this function again.
 		* You may call this function with NULL and 0 to simply retrieve the length of the name.
+		*
+		* If the name ends with a slash('/'), it is a directory.
 		*
 		* \returns The length of the name, excluding the terminating zero,
 		* or 0 if there are no more files, or \< 0 on error.
@@ -1932,11 +2046,11 @@ interface MAAPI {
 		/**
 		* Closes a file listing, freeing its resources.
 		*
-		* \returns 0 on success.
+		* \returns 0.
 		*/
 		int maFileListClose(in MAHandle list);
 
-		constset int FLERR_ {
+		constset int MA_FLERR_ {
 			GENERIC = -2;
 			NOTFOUND = -3;
 			FORBIDDEN = -4;

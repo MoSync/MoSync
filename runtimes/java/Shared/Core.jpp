@@ -564,7 +564,7 @@ final public class Core {
 		switch(type) {
 #include "generated/invoke_syscall_java.h"
 		default:  //bad syscall
-			LOGSC("\tno syscall default("+type+")\n");
+			DEBUG_ALWAYS("bad syscall: "+type+"\n");
 			BIG_PHAT_ERROR;
 		}
 	}
