@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #include <MAUtil/Environment.h>
 #include <MAUtil/Moblet.h>
+#include <maprofile.h>
 
 using namespace MAUtil;
 
@@ -56,11 +57,18 @@ using namespace MAUtil;
 #define FLOOR_COLOR 0xCC9940
 #define OBJ_COLOR 0xF7DE5E
 
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+#define MESSAGE "Tap screen to bounce"
+#else
+#define MESSAGE "Press fire to bounce"
+#endif
+
 /**
  * We make our Moblet inherit TimerListener
  */
 
-class TimerMoblet : public Moblet, public TimerListener {
+class TimerMoblet : public Moblet, public TimerListener, public PointerListener {
 public:
 
 	/**
@@ -87,7 +95,7 @@ public:
 		maFillRect(0, screenHeight - FLOOR_HEIGHT, screenWidth, FLOOR_HEIGHT);
 		drawObject(OBJ_COLOR);
 		maSetColor(TEXT_COLOR);
-		maDrawText(3, 3, "Press fire to bounce");
+		maDrawText(3, 3, MESSAGE);
 		maUpdateScreen();
 	}
 
@@ -131,6 +139,7 @@ public:
 	**/
 
 	void keyPressEvent(int keyCode) {
+#ifndef MA_PROF_SUPPORT_STYLUS
 		switch(keyCode) {
 			case MAK_FIRE:
 				if(y == FLOOR_Y)  {
@@ -144,7 +153,17 @@ public:
 			default:
 				break;
 		}
+#endif
 	}
+
+	virtual void pointerPressEvent(MAPoint2d p) {
+		if(y == FLOOR_Y)  {
+			t = 0;
+			velocity = FIRE_VELOCITY;
+		}
+	}
+	virtual void pointerMoveEvent(MAPoint2d p) {}
+	virtual void pointerReleaseEvent(MAPoint2d p) {}
 
 private:
 	int screenWidth;

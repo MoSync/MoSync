@@ -28,7 +28,7 @@ using namespace MAUtil;
 // this is how many pixels will be traversed each timer tick
 #define SPEED 1
 
-class MyMoblet : public Moblet, TimerListener {
+class MyMoblet : public Moblet, TimerListener, PointerListener {
 public:
 	MyMoblet() : dirx(0), diry(0), x(30), y(40) {
 		// set the text
@@ -75,6 +75,21 @@ public:
 		// remove the animation timer if nothing is still moving
 		if(dirx == 0 && diry == 0)
 			removeTimer(this);
+	}
+
+	virtual void pointerPressEvent(MAPoint2d p) {
+		x = p.x;
+		y = p.y;
+		draw();
+	}
+
+	virtual void pointerMoveEvent(MAPoint2d p) {
+		x = p.x;
+		y = p.y;
+		draw();
+	}
+
+	virtual void pointerReleaseEvent(MAPoint2d p) {
 	}
 
 	// This is the function that draws a frame, it is made as a seperate function 

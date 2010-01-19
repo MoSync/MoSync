@@ -23,7 +23,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 */
 
-
 #include <ma.h>
 #include <mastdlib.h>
 #include <conprint.h>
@@ -34,7 +33,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * The size of the image.
  */
 #define DRAWIMAGESIZE 50
-
 
 /**
   * \brief A function that generates a line object cube.
