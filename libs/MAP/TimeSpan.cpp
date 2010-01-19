@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "TimeSpan.h"
 
-namespace Util
+namespace MAPUtil
 {
 	static const int TicksPerDay = 86400;
 	static const int TicksPerHour = 3600;

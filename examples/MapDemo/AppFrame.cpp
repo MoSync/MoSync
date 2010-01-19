@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUI;
 
-namespace UI
+namespace MapDemoUI
 {
 	const int OutsideMargin = 30;
 	const int InsideMargin = 10;
@@ -53,9 +53,7 @@ namespace UI
 	{
 		if ( progress >= 0 )
 		{
-			//mMessage = message;
 			mProgress = progress;
-			//Rect bounds( OutsideMargin + InsideMargin, 0, getWidth( ) - 2 * ( OutsideMargin + InsideMargin ), 32767 );
 			Rect bounds( OutsideMargin, OutsideMargin, getWidth() - 2 * OutsideMargin, 10 );
 			mProgressBounds = bounds;
 			requestRepaint( );
@@ -69,9 +67,7 @@ namespace UI
 			int width = EXTENT_X( ext );
 			int height = EXTENT_Y( ext );
 			int center = getWidth( ) / 2;
-			//int middle = getHeight( ) * 2 / 3;
 			int top = OutsideMargin;
-			//mTextBounds = Rect( center - width / 2, getHeight( ) - OutsideMargin - InsideMargin - height, width, height );
 			mTextBounds = Rect( center - width / 2, top + InsideMargin, width, height );
 			mFillBounds = Rect( mTextBounds.x - InsideMargin, mTextBounds.y - InsideMargin, width + 2 * InsideMargin, height + 2 * InsideMargin );
 			requestRepaint( );
@@ -99,8 +95,6 @@ namespace UI
 
 			if ( mProgress < 0 )
 			{
-				//Gfx_fillRect( mFillBounds.x, mFillBounds.y, mFillBounds.width, mFillBounds.height );
-
 				mMsgSkin->draw( mFillBounds.x, mFillBounds.y, mFillBounds.width, mFillBounds.height, WidgetSkin::/*eType::*/SELECTED );
 				mFont->drawBoundedString( mMessage.c_str( ), mTextBounds.x, mTextBounds.y, mTextBounds );
 			}

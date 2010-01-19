@@ -21,8 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Screen.h>
 
 #include "SoftkeyBar.h"
-//#include "IMenuSite.h"
-//#include "Menu.h"
 #include "MobletEx.h"
 #include "MessageMgr.h"
 #include "AppFrame.h"
@@ -32,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUI;
 using namespace MAUtil;
 
-namespace UI 
+namespace MapDemoUI 
 {
 	class KeyRepeatTimer;
 

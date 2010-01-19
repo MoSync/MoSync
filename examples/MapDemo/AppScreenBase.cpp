@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "IKeyHandler.h"
 //#include "TraceScope.h"
 
-namespace UI 
+namespace MapDemoUI 
 {
 	static const bool Trace = false;
 
@@ -51,7 +51,6 @@ namespace UI
 				mHandler->handleKeyPress( mKeyCode );
 		}
 
-	//private:
 		IKeyHandler*		mHandler;
 		int					mKeyCode;
 		int					mRepeats;
@@ -71,8 +70,6 @@ namespace UI
 		mSoftKeyBar( NULL ),
 		mAppFrame( NULL )
 	{
-		//if ( Trace ) trace( );
-
 		//
 		// Screen size
 		//
@@ -110,8 +107,6 @@ namespace UI
 	AppScreenBase::~AppScreenBase( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		MessageMgr::get( )->removeListener( this );
 
 		if ( mAppFrame != NULL )
@@ -132,8 +127,6 @@ namespace UI
 	void AppScreenBase::setClientWidget( Widget* widget )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		widget->setWidth( mContentFrame->getWidth( ) );
 		widget->setHeight( mContentFrame->getHeight( ) );
 		if( mContentFrame->getChildren( ).size( ) > 0 )
@@ -145,8 +138,6 @@ namespace UI
 	void AppScreenBase::keyPressEvent( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		(void)handleKeyPress( keyCode );
 		if ( mKeyTimer == NULL )
 		{
@@ -164,8 +155,6 @@ namespace UI
 	void AppScreenBase::keyReleaseEvent( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( mKeyTimer != NULL ) 
 		{
 			Environment::getEnvironment( ).removeTimer( mKeyTimer );
@@ -178,8 +167,6 @@ namespace UI
 	bool AppScreenBase::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( this != Screen::currentScreen )
 		{
 			if ( mKeyTimer != NULL )
@@ -200,8 +187,6 @@ namespace UI
 	bool AppScreenBase::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( mSoftKeyBar->handleKeyRelease( keyCode ) )
 			return true;
 
@@ -212,8 +197,6 @@ namespace UI
 	void AppScreenBase::messagePosted( MessageMgr* sender )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		mAppFrame->setMessage( sender->getMessage( ), sender->getProgress( ) );
 
 		// start timer
@@ -224,8 +207,6 @@ namespace UI
 	void AppScreenBase::runTimerEvent( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		mAppFrame->clearMessage( );
 	}
 };

@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "TriggerMenuSelectionAction.h"
 #include "Menu.h"
 
-namespace UI
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	TriggerMenuSelectionAction::TriggerMenuSelectionAction( Menu* menu ) :

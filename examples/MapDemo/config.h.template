@@ -15,24 +15,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef APPSCREEN_H_
-#define APPSCREEN_H_
+//
+// Configuration header for MapDemo
+// Please configure before building app.
+//
 
-#include "AppScreenBase.h"
+//
+// CloudMade map key
+// Used to access CloudMade map tile servers.
+// Please register with CloudMade to get a personal API key at
+// http://cloudmade.com/
+//
+//#define CLOUDMADE_API_KEY ""
 
-namespace MapDemoUI 
-{
-	//=========================================================================
-	// Simple app screen - one widget, softkey bar.
-	//
-	class AppScreen : public AppScreenBase
-	//=========================================================================
-	{
-	public:
-								AppScreen( MobletEx* mMoblet );
-		virtual					~AppScreen( );
+//
+// Google Static Maps API key
+// Used to access Google Static Maps tile servers.
+// Please register with Google to get a personal API key at
+// http://code.google.com/apis/maps/documentation/staticmaps/
+//
+//#define GOOGLE_API_KEY ""
 
-		virtual void			enumerateActions( Vector<Action*>& list );
-	};
-};
-#endif // APPSCREEN_H_

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MessageMgr.h"
 
-namespace Util
+namespace MapDemoUtil
 {
 	MessageMgr* MessageMgr::sSingleton = NULL;
 

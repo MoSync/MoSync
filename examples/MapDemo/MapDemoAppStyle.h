@@ -18,12 +18,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MAPDEMOAPPSTYLE_H_
 #define MAPDEMOAPPSTYLE_H_
 
-//#include "MemoryMgr.h"
 #include "AppStyle.h"
 #include "Color.h"
 
-using namespace UI;
-using namespace Util;
+using namespace MapDemoUI;
+using namespace MapDemoUtil;
 
 namespace MAPDemo
 {

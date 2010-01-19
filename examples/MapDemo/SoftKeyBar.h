@@ -23,12 +23,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Label.h>
 
 #include "Action.h"
-//#include "MemoryMgr.h"
 
 using namespace MAUI;
-using namespace Util;
+using namespace MapDemoUtil;
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	class SoftKeyBar : public Layout

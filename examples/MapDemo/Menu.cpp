@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUI;
 
-namespace UI
+namespace MapDemoUI
 {
 	const int ItemHeight = 25;
 	const int SoftKeysHeight = 25;

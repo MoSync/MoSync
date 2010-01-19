@@ -22,9 +22,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MobletEx.h"
 #include "MemoryMgr.h"
 
-using namespace Util;
+using namespace MAPUtil;
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	// Forces exit of the app.

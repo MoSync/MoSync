@@ -26,9 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUI;
 using namespace MAUtil;
-//using namespace Util;
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	class AppFrame: public Layout

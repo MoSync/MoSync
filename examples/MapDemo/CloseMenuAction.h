@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Action.h"
 #include "Menu.h"
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	class CloseMenuAction: public Action 

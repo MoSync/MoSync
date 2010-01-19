@@ -21,9 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "AppStyleMgr.h"
 #include "MemoryMgr.h"
 
-using namespace Util;
+using namespace MapDemoUtil;
 
-namespace UI
+namespace MapDemoUI
 {
 	const int Padding = 3;
 
@@ -41,7 +41,6 @@ namespace UI
 		AppStyle* appStyle = AppStyleMgr::getStyle( );
 		mFont = appStyle->getFont( FontSize_Medium, Color::white, false );
 
-		//Layout* layout = newobject( Layout, new Layout( 0, 0, width, height, NULL, 2, 1 ) );
 		WidgetSkin* skin = appStyle->getWidgetSkin( );
 
 		// Left label

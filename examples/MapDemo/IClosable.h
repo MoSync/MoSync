@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef ICLOSABLE_H_
 #define ICLOSABLE_H_
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	// Interface

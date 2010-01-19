@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef ICLONEABLE_H_
 #define ICLONEABLE_H_
 
-namespace Util
+namespace MapDemoUtil
 {
 	//=========================================================================
 	template<class T> 

@@ -18,16 +18,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef COLOR_H_
 #define COLOR_H_
 
-//#include "DebugPrintf.h"
-
-namespace Util
+namespace MapDemoUtil
 {
 	//=========================================================================
 	class Color
 	//=========================================================================
 	{
 	public:
-								Color( ) { /*DebugAssert( sizeof( Color ) == sizeof( int ) );*/ }
+								Color( ) { }
 	private:
 								Color( int val ) : mVal( val ) { }
 	public:

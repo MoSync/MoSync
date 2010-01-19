@@ -15,11 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-//#include <mastdlib.h>
-
 #include "ExitAction.h"
 
-namespace UI
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	ExitAction::ExitAction( MobletEx* moblet )
@@ -38,7 +36,6 @@ namespace UI
 	void ExitAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		//maExit( 0 );
 		mMoblet->shutdown( );
 	}
 

@@ -19,10 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ExitAction.h"
 #include "MapLocationAction.h"
 #include "AppStyleMgr.h"
-//#include "TraceScope.h"
-//#include "MemoryMgr.h"
-
-//using namespace Mopub;
 
 namespace MAPDemo
 {
@@ -42,7 +38,6 @@ namespace MAPDemo
 		case MapSourceKind_CloudMade7: return "CloudMade (type 7)";
 		//case MapSourceKind_VirtualEarth: return "Virtual Earth";
 		default: 
-			//DebugAssert( false );
 			return "Unknown map type";
 		}
 	}
@@ -52,8 +47,6 @@ namespace MAPDemo
 		AppScreen( moblet )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		//
 		// Map widget
 		//
@@ -77,8 +70,6 @@ namespace MAPDemo
 	MAPDemoScreen::~MAPDemoScreen( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-		
 		deleteobject( mMap );
 	}
 
@@ -86,8 +77,6 @@ namespace MAPDemo
 	bool MAPDemoScreen::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		switch( keyCode )
 		{
 			case MAK_2:
@@ -104,8 +93,6 @@ namespace MAPDemo
 	bool MAPDemoScreen::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( AppScreen::handleKeyRelease( keyCode ) )
 			return true;
 
@@ -116,8 +103,6 @@ namespace MAPDemo
 	void MAPDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		MapSourceMgr* mgr = MapSourceMgr::get( );
 		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
 		if( newKind >= MapSourceKind_Last )
@@ -131,8 +116,6 @@ namespace MAPDemo
 	void MAPDemoScreen::enumerateActions( Vector<Action*>& list )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		// add my actions
 		list.add( newobject( MapLocationAction, new MapLocationAction( mMap, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
 		list.add( newobject( ExitAction, new ExitAction( mMoblet ) ) );

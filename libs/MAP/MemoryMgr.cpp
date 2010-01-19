@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MemoryMgr.h"
 
-namespace Util
+namespace MAPUtil
 {
 	#ifdef TRACKOBJECTS
 	Vector<void*> MemoryMgr::mKeys;

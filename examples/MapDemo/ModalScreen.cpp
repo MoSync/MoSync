@@ -16,18 +16,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "ModalScreen.h"
-//#include "MemoryMgr.h"
 
-using namespace Util;
+using namespace MapDemoUtil;
 
-namespace UI 
+namespace MapDemoUI 
 {
 	//-------------------------------------------------------------------------
 	ModalScreen::ModalScreen( )
 	//-------------------------------------------------------------------------
 	: Screen( )
 	{
-		//mPrevious = previous;
 		//
 		// Screen size
 		//
@@ -68,7 +66,6 @@ namespace UI
 		mPrevious->show( );
 		for ( int i = 0; i < mListeners.size(); i++ )
 			mListeners[i]->screenClosed( this );
-		//MemoryMgr::untrack( this );
 		delete this;
 	}
 

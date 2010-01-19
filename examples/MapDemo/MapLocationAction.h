@@ -22,9 +22,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapWidget.h"
 #include "MemoryMgr.h"
 
-using namespace UI;
+using namespace MapDemoUI;
+using namespace MAP;
 
-namespace MAP
+namespace MAPDemo
 {
 	//=========================================================================
 	//

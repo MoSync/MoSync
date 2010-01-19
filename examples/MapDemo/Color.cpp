@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Color.h"
 
-namespace Util
+namespace MapDemoUtil
 {
 	const Color Color::black = Color( 0x000000 );
 	const Color Color::white = Color( 0xffffff );

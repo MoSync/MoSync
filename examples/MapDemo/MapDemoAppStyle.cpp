@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MAHeaders.h"
 #include "Color.h"
 
+using namespace MAPUtil;
+
 namespace MAPDemo
 {
 	//-------------------------------------------------------------------------

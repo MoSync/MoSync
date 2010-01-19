@@ -20,9 +20,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ICloneable.h"
 
-using namespace Util;
+using namespace MapDemoUtil;
 
-namespace UI
+namespace MapDemoUI
 {
 	//
 	// Abstract

@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MobletEx.h"
 #include "MAPDemoScreen.h"
 
-using namespace UI;
+using namespace MapDemoUI;
 
 namespace MAPDemo
 {

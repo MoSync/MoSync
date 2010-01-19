@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef IKEYHANDLER_H_
 #define IKEYHANDLER_H_
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	// Interface

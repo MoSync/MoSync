@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "AppStyleMgr.h"
 
-namespace UI
+namespace MapDemoUI
 {
 	AppStyleMgr* AppStyleMgr::sSingleton = NULL;
 }

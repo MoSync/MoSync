@@ -19,9 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "AppStyleMgr.h"
 #include "Action.h"
 
-//using namespace MAUI;
-
-namespace UI
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	MenuItem::MenuItem( Action* action )

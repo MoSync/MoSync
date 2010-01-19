@@ -19,30 +19,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSourceMgr.h"
 #include "CloudMadeMapSource.h"
 #include "GoogleMapSource.h"
+#include "config.h"
 
 using namespace MAUtil;
-using namespace Util;
+using namespace MapDemoUtil;
 
 namespace MAPDemo
 {
 	static const bool Trace = false;
 
 	const int BottomHeight = 25;
-	//
-	// Registered map API keys, please GET YOUR OWN.
-	//
-
-
 
 	//-------------------------------------------------------------------------
 	MAPDemoMoblet::MAPDemoMoblet( )
 		: mScreen( NULL )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		CloudMadeMapSource::ApiKey = "2d80ddd260155a7ba03e123176011fa4"; // registered on lars@8x10.se
-		GoogleMapSource::ApiKey = "ABQIAAAASy5nCpi0Rkp7zjf61gof0RSwGmTQ8vMzg6QxXdllR2ZPmPu02RTSpCw5ldHGcP6DsMziSwGx8muqHQ"; // reg to lars@8x10.se
+		//
+		// Map keys are defined in config.h
+		// Please copy config.h.template to config.h, register your own keys
+		// and enter in config.h
+		//
+		CloudMadeMapSource::ApiKey = CLOUDMADE_API_KEY;
+		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
+		
 		mScreen = newobject( MAPDemoScreen, new MAPDemoScreen( (MobletEx*)this ) );
 		mScreen->show( );
 	}
@@ -51,7 +51,6 @@ namespace MAPDemo
 	MAPDemoMoblet::~MAPDemoMoblet( )
 	//-------------------------------------------------------------------------
 	{
-		//shutdown( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -59,12 +58,9 @@ namespace MAPDemo
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mScreen );
-		//AppStyleMgr::shutdown( );
 		MapCache::shutdown( );
 		MapSourceMgr::shutdown( );
-		//MessageMgr::shutdown( );
 		delete this;
-		//MemoryMgr::dump( );
 		maExit( 0 );
 	}
 }

@@ -21,13 +21,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/ListBox.h>
 
 #include "ModalScreen.h"
-//#include "IActionSource.h"
-//#include "SoftKeyBar.h"
-//#include "MemoryMgr.h"
 
-using namespace Util;
+using namespace MapDemoUtil;
 
-namespace UI 
+namespace MapDemoUI 
 {
 	class IActionSource;
 	class SoftKeyBar;

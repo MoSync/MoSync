@@ -19,11 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MOBLETEX_H_
 
 #include <MAUtil/Moblet.h>
-//#include "MemoryMgr.h"
 
 using namespace MAUtil;
 
-namespace Util
+namespace MapDemoUtil
 {
 	//=========================================================================
 	//

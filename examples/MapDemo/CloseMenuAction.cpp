@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "CloseMenuAction.h"
 
-namespace UI
+namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
 	CloseMenuAction::CloseMenuAction( Menu* menu ) :

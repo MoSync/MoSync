@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef FONTSIZE_H_
 #define FONTSIZE_H_
 
-namespace UI
+namespace MapDemoUI
 {
 	//=========================================================================
 	enum FontSize

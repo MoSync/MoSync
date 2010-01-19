@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <matime.h>
 
-namespace Util
+namespace MAPUtil
 {
 	//=========================================================================
 	// Class for representing a time span.

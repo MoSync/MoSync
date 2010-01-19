@@ -23,17 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapTile.h"
 #include "MapCache.h"
 #include "MapSource.h"
-//#include "DebugPrintf.h"
 #include "OpenStreetMapSource.h"
 #include "CloudMadeMapSource.h"
-//#include "VirtualEarthMapSource.h"
 #include "GoogleMapSource.h"
-//#include "XmlHttpConnection.h"
 #include "PixelCoordinate.h"
-//#include "TraceScope.h"
-//#include "MapCacheMgr.h"
-//#include "MessageMgr.h"
-//#include "SelectMapSourceActionGroup.h"
 #include "MapSourceMgr.h"
 
 namespace MAP
@@ -82,8 +75,6 @@ namespace MAP
 			{
 				Environment::getEnvironment( ).removeTimer( this );
 				mWidget->enterMapUpdateScope( );
-				// performed below mWidget->mCenterPositionLonLat = mWidget->mPanTargetPositionLonLat;
-				// performed below mWidget->mCenterPositionPixels = mWidget->mPanTargetPositionPixels;
 				mWidget->exitMapUpdateScope( true );
 				mWidget->updateMap( );
 				mWidget->requestRepaint( );
@@ -126,8 +117,6 @@ namespace MAP
 		mTimerRunning( false ),
 		mPanTimerListener( NULL )
 	{
-		//if ( Trace ) trace( );
-
 		resetScreenImage( );
 		mPanTimerListener = newobject( MapWidgetPanTimerListener, new MapWidgetPanTimerListener( this ) );
 	}
@@ -136,10 +125,6 @@ namespace MAP
 	MapWidget::~MapWidget( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//mCache = NULL;
-		//mSource = NULL;
 		deleteobject( mPanTimerListener );
 	}
 
@@ -147,8 +132,6 @@ namespace MAP
 	void MapWidget::enterMapUpdateScope( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( mMapUpdateNesting == 0 )
 		{
 			mPrevCenter = getCenterPositionPixels( );
@@ -161,10 +144,6 @@ namespace MAP
 	void MapWidget::exitMapUpdateScope( bool immediate )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//DebugAssert( mMapUpdateNesting > 0 ); 
-
 		mMapUpdateNesting--;
 		if ( mMapUpdateNesting == 0 )
 		{
@@ -184,17 +163,12 @@ namespace MAP
 	void MapWidget::checkMapUpdateScope( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//DebugAssert( mMapUpdateNesting > 0 );
 	}
 
 	//-------------------------------------------------------------------------
 	PixelCoordinate MapWidget::getCenterPositionPixels( ) const
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return mHasSmoothPanning ? mPanTargetPositionPixels : mCenterPositionPixels;
 	}
 
@@ -202,8 +176,6 @@ namespace MAP
 	inline double Max( double x, double y )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return x > y ? x : y;
 	}
 
@@ -211,8 +183,6 @@ namespace MAP
 	LonLat MapWidget::getCenterPosition( ) const
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return mHasSmoothPanning ? mPanTargetPositionLonLat : mCenterPositionLonLat;
 	}
 
@@ -261,8 +231,6 @@ namespace MAP
 	int MapWidget::getMagnification( ) const
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return mMagnification;
 	}
 
@@ -270,8 +238,6 @@ namespace MAP
 	void MapWidget::setMagnification( int magnification )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		checkMapUpdateScope( );
 
 		mMagnification = magnification;
@@ -285,10 +251,7 @@ namespace MAP
 	void MapWidget::setMapSourceKind( MapSourceKind sourceKind )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		mSourceKind = sourceKind;
-		//mCache = MapCacheMgr::get( )->getMapCache( mSource );
 		updateMap( );
 	}
 
@@ -296,8 +259,6 @@ namespace MAP
 	bool MapWidget::getHasSmoothPanning( ) const
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return mHasSmoothPanning;
 	}
 
@@ -305,8 +266,6 @@ namespace MAP
 	void MapWidget::setHasSmoothPanning( bool hasSmoothPanning )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		mHasSmoothPanning = hasSmoothPanning;
 	}
 
@@ -314,21 +273,12 @@ namespace MAP
 	void MapWidget::tileReceived( MapCache* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//if ( Trace ) DebugPrintf( "MapTile received %d %d %d\n", tile->getMagnification( ), tile->getGridX( ), tile->getGridY( ) );
-
-		//DebugAssert( tile->getSourceKind( ) == mSourceKind );
-
 		PixelCoordinate tilePx = tile->getCenter( ).toPixels( tile->getMagnification( ) );
 		MAPoint2d pt = worldPixelToWidget( tilePx );
 		MAHandle old = maSetDrawTarget( mScreenImage );
 		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 		const int tileSize = source->getTileSize( );
 
-		//maDrawImage( tile->getImage( ), pt.x - tileSize / 2, pt.y - tileSize / 2 );
-
-		//void maDrawImageRegion(Handle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode);
 		MARect rect;
 		rect.height = tileSize;
 		rect.width = tileSize;
@@ -347,8 +297,6 @@ namespace MAP
 	Point MapWidget::getActualPosition( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		Widget* parent = this->getParent( );
 		Point pos = getPosition( );
 
@@ -365,8 +313,6 @@ namespace MAP
 	void MapWidget::drawWidget( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( !this->enabled ) 
 			return;
 
@@ -374,7 +320,7 @@ namespace MAP
 		//
 		// Save clip
 		//
-		/*BOOL ret =*/ Gfx_pushClipRect( widgetPos.x, widgetPos.y, getWidth( ), getHeight( ) );
+		(void)Gfx_pushClipRect( widgetPos.x, widgetPos.y, getWidth( ), getHeight( ) );
 		//
 		// Draw map image
 		//
@@ -469,28 +415,21 @@ namespace MAP
 		//
 		// Restore original clip
 		//
-		/*BOOL ret2 =*/ Gfx_popClipRect( );
+		(void)Gfx_popClipRect( );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapWidget::drawOverlay( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 	}
 
 	//-------------------------------------------------------------------------
 	void MapWidget::updateMap( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//DebugAssert( mMapUpdateNesting == 0 );
-
 		if ( getWidth( ) <= 0 || getHeight( ) <= 0 ) 
 			return;
-
 		//
 		// Clear screen image
 		//
@@ -502,7 +441,6 @@ namespace MAP
 		// Request tiles
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
-		//if ( mCache != NULL )
 		MapCache::get( )->requestTiles( this, mSourceKind, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
 	}
 
@@ -510,13 +448,9 @@ namespace MAP
 	MAPoint2d MapWidget::worldPixelToWidget( PixelCoordinate wpx )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		MAPoint2d pt;
 		PixelCoordinate screenPx = mCenterPositionPixels;
 
-		//pt.x = (int)( 0.499 + wpx.getX( ) - screenPx.getX( ) + ( getWidth( ) >> 1 ) );
-		//pt.y = (int)( 0.499 -( wpx.getY( ) - screenPx.getY( ) ) + ( getHeight( ) >> 1 ) );
 		pt.x =    wpx.getX( ) - screenPx.getX( )   + ( getWidth( ) >> 1 );
 		pt.y = -( wpx.getY( ) - screenPx.getY( ) ) + ( getHeight( ) >> 1 );
 
@@ -527,8 +461,6 @@ namespace MAP
 	PixelCoordinate MapWidget::widgetToWorldPixel( MAPoint2d pt )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		PixelCoordinate screenPx = mCenterPositionPixels;
 		return PixelCoordinate( mMagnification,
 								(int)( pt.x + 0.5 - 0.5 * getWidth( ) + screenPx.getX( ) ),
@@ -539,8 +471,6 @@ namespace MAP
 	static double clamp( double x, double min, double max )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return x < min ? min : x > max ? max : x;
 	}
 
@@ -548,8 +478,6 @@ namespace MAP
 	void MapWidget::zoomIn( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 
 		if ( mMagnification < source->getMagnificationMax( ) )
@@ -569,11 +497,6 @@ namespace MAP
 	void MapWidget::zoomOut( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
-		//if ( mSource == NULL )
-		//	return;
-
 		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 
 		if ( mMagnification > source->getMagnificationMin( ) )
@@ -593,8 +516,6 @@ namespace MAP
 	void MapWidget::scroll( MapWidgetScrollDirection direction, bool largeStep)
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		PixelCoordinate px = getCenterPositionPixels( );
 		const int hStep = largeStep ? getWidth( ) : SmallScrollStep;
 		const int vStep = largeStep ? getHeight( ) : SmallScrollStep;
@@ -616,8 +537,6 @@ namespace MAP
 	bool MapWidget::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		enterMapUpdateScope( );
 		bool ret = false;
 		switch( keyCode )
@@ -658,8 +577,6 @@ namespace MAP
 	bool MapWidget::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		return true;
 	}
 
@@ -667,8 +584,6 @@ namespace MAP
 	void MapWidget::setWidth( int width )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		Widget::setWidth( width );
 		resetScreenImage( );
 	}
@@ -677,8 +592,6 @@ namespace MAP
 	void MapWidget::setHeight( int height )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		Widget::setHeight( height );
 		resetScreenImage( );
 	}
@@ -687,8 +600,6 @@ namespace MAP
 	void MapWidget::resetScreenImage( )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		if ( mScreenImage != NULL )
 			maDestroyObject( mScreenImage );
 

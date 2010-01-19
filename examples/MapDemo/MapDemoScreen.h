@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSourceMgr.h"
 
 using namespace MAP;
-using namespace UI;
+using namespace MapDemoUI;
 
 namespace MAPDemo 
 {
