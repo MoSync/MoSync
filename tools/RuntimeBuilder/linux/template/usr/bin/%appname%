@@ -1,0 +1,12 @@
+#!/bin/sh
+
+curr_dir=$(pwd)
+
+# Set MOSYNCDIR
+export MOSYNCDIR=/opt/%appname%
+
+# Run
+cd /tmp
+/opt/%appname%/bin/run -program /opt/%appname%/bin/program -resource /opt/%appname%/bin/resources
+
+cd $curr_dir

@@ -23,6 +23,8 @@ handle_error()
 		reason="Failed to extract package template"
 	elif [ "$1" = "copy_more" ]; then
 		reason="While copying more"
+	elif [ "$1" = "svn_export" ]; then
+		reason="Failed to do svn export of template"
 	elif [ "$1" = "meta" ]; then
 		reason="While copying more"
 	else
@@ -88,14 +90,16 @@ buildTemplate()
 
 	export MOSYNCDIR=$path/distro/tmp
 
-	print_msg "Performing rake clean"
-	cd $path/../../../
-	if [ "$1" = "rel" ]; then
-		rake clean CONFIG=""
-	else
-		rake clean
+	if [ ! "$2" = "-noclean" ]; then
+		print_msg "Performing rake clean"
+		cd $path/../../../
+		if [ "$1" = "rel" ]; then
+			rake clean CONFIG=""
+		else
+			rake clean
+		fi
+		printf "\n%s\n" "OK"
 	fi
-	printf "\n%s\n" "OK"
 
 	print_msg "Attempting to build MoRE"
 	if [ "$1" = "rel" ]; then
@@ -118,14 +122,21 @@ buildTemplate()
 
 	# Copy template
 	print_msg "Copying template package"
-	cp -R ../template/* .
-	cp -R ../template/.meta .meta
+	if [ -e template ]; then
+		rm -Rf template
+	fi
+	svn --force export ../template ./
+	if [ "$?" -ne "0" ]; then
+		handle_error "svn_export"
+	fi
+
 
 	# Copy MoRE
 	cp tmp/bin/moemu opt/%appname%/bin/run
 	if [ "$?" -ne "0" ]; then
 		handle_error "copy_more"
 	fi
+	printf "\n%s\n" "OK"
 
 	# Generate its meta data
 	print_msg "Generating template meta data"
@@ -143,6 +154,7 @@ buildTemplate()
 	print_msg "Performing clean up"
 	rm -Rf $path/distro
 	cd $curr
+	printf "\n%s\n" "OK"
 
 	return 0
 }
@@ -163,8 +175,8 @@ cd $curr
 #
 # Build
 #
-buildTemplate "dbg"
-buildTemplate "rel"
+buildTemplate "dbg" $1
+buildTemplate "rel" $1
 
 #
 # Finished
