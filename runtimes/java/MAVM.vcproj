@@ -189,10 +189,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Shared\generated\IX_NATIVE_INPUT_CONSTS.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Shared\generated\IX_OPENGL_ES_CONSTS.h"
 				>
 			</File>

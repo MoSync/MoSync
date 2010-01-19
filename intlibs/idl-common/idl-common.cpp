@@ -41,3 +41,12 @@ void runCommand(const string& cmd) {
 		throwException("External error!");
 	}
 }
+
+bool isAnonStructName(const string& name) {
+	if(name.size() > 2) {
+		if(name[0] == '_' && name[1] >= 'A' && name[1] <= 'Z') {
+			return true;
+		}
+	}
+	return false;
+}

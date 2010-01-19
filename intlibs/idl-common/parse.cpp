@@ -29,14 +29,17 @@ using namespace std;
 #define TASSERT(cond) if(!(cond)) { throwException(#cond); }
 
 static int sNextFuncNum = 1;
+static Interface* sInf = NULL;
+static int sNextAnonStructNum = 1;
 
 static void processIncludes(ostream& os, istream& is, const string& inPath, int level=0);
 static int findIx(const string& token, const vector<string>& ixs);
 
 static ConstSet parseConstSet(const vector<string>& ixs, int currentIx);
 static Function parseFunction(const string& retType, size_t maxArgs);
-static Struct parseStruct(const string& type, int currentIx);
-static Member parseAnonymousUnion();
+static Struct parseStruct(const string& type, const string& name, int currentIx);
+static Member parseAnonymousUnion(int currentIx);
+static PlainOldData parseAnonStruct(int currentIx);
 static PlainOldData parsePOD(const string& type);
 static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf);
 static Typedef parseTypedef(int currentIx);
@@ -58,6 +61,7 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 	setTokenStream(&preprocessed);
 
 	Interface inf;
+	sInf = &inf;
 	int currentIx = MAIN_INTERFACE;
 	try {
 		doExact("interface");
@@ -70,7 +74,9 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 			if(token == "constset") {	//constset
 				inf.constSets.push_back(parseConstSet(ixs, currentIx));
 			} else if(token == "struct" || token == "union") {	//struct or union
-				inf.structs.push_back(parseStruct(token, currentIx));
+				string name;
+				readTextToken(name);
+				inf.structs.push_back(parseStruct(token, name, currentIx));
 			} else if(token == "#define") {
 				inf.defines.push_back(parseDefine(currentIx));
 			} else if(token == "typedef") {
@@ -111,6 +117,7 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 		printf("error on line %i: %s\n", getCurrentLine(), e.what());
 		throw e;
 	}
+	sInf = NULL;
 	return inf;
 }
 
@@ -198,7 +205,9 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 		if(token == "constset") {	//constset
 			inf.constSets.push_back(parseConstSet(ixs, currentIx));
 		} else if(token == "struct" || token == "union") {	//struct or union
-			inf.structs.push_back(parseStruct(token, currentIx));
+			string name;
+			readTextToken(name);
+			inf.structs.push_back(parseStruct(token, name, currentIx));
 		} else if(token == "#define") {
 			inf.defines.push_back(parseDefine(currentIx));
 		} else if(token == "typedef") {
@@ -226,11 +235,11 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 	return ioctl;
 }
 
-static Struct parseStruct(const string& type, int currentIx) {
+static Struct parseStruct(const string& type, const string& name, int currentIx) {
 	Struct s;
 	s.type = type;
 	s.ix = currentIx;
-	readTextToken(s.name);
+	s.name = name;
 	s.comment = getComment();
 	doExact("{");
 	while(true) {
@@ -242,7 +251,7 @@ static Struct parseStruct(const string& type, int currentIx) {
 		if(token == "union") {
 			if(type == "union")
 				throwException("unions may not be nested");
-			m = parseAnonymousUnion();
+			m = parseAnonymousUnion(currentIx);
 		} else {
 			m.pod.push_back(parsePOD(token));
 		}
@@ -260,7 +269,7 @@ static PlainOldData parsePOD(const string& type) {
 	return pod;
 }
 
-static Member parseAnonymousUnion() {
+static Member parseAnonymousUnion(int currentIx) {
 	Member m;
 	doExact("{");
 	while(true) {
@@ -268,9 +277,24 @@ static Member parseAnonymousUnion() {
 		readToken(token);
 		if(token == "}")
 			break;
-		m.pod.push_back(parsePOD(token));
+		if(token == "struct") {
+			m.pod.push_back(parseAnonStruct(currentIx));
+		} else {
+			m.pod.push_back(parsePOD(token));
+		}
 	}
 	return m;
+}
+
+static PlainOldData parseAnonStruct(int currentIx) {
+	char buf[32];
+	sprintf(buf, "_AS%05i", sNextAnonStructNum);
+	sNextAnonStructNum++;
+	Struct s = parseStruct("struct", buf, currentIx);
+	sInf->structs.push_back(s);
+	PlainOldData pod;
+	pod.type = s.name;
+	return pod;
 }
 
 static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {

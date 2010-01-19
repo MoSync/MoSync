@@ -19,9 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "syscall_helpers.h"
 #include "config_platform.h"
 #include "generated\MAAPI_consts.h"
-#ifdef MA_IX_NATIVE_KEY_PRESSED
-#include "generated\IX_NATIVE_INPUT_CONSTS.h"
-#endif
 
 import javax.microedition.lcdui.game.GameCanvas;
 import javax.microedition.lcdui.*;

@@ -135,6 +135,8 @@ void runCommand(const string& cmd);
 const string& getJdkDir();
 const string& getJ2meDir();
 
+bool isAnonStructName(const string& name);
+
 inline const char *validateString(const char *str) {
 	if(!str) throwException("No MOSYNCDIR exists");
 	return str;

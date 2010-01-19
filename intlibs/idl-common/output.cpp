@@ -229,48 +229,70 @@ void streamMoSyncDllDefines(ostream& stream) {
 		"#endif\n\n";
 }
 
+static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
+	const vector<Struct>& structs)
+{
+	bool lastPodHadComment = false;
+	for(size_t k=0; k<members.size(); k++) {
+		const Member& m(members[k]);
+		if(m.pod.size() != 1) {
+			stream << tab << "union {\n";
+			tab += "\t";
+		}
+		for(size_t l=0; l<m.pod.size(); l++) {
+			const PlainOldData pod(m.pod[l]);
+			if(lastPodHadComment) {
+				stream << "\n";
+			}
+			if(pod.comment.size() > 0) {
+				lastPodHadComment = true;
+				//format multi-line comments to take the tabulation into account.
+				size_t lastIdx = 0;
+				while(true) {
+					size_t idx = pod.comment.find_first_of('\n', lastIdx);
+					if(idx == string::npos)
+						break;
+					stream << tab << pod.comment.substr(lastIdx, idx - lastIdx) << "\n";
+					lastIdx = idx + 1;
+				}
+			}	//comment
+			if(isAnonStructName(pod.type)) {
+				if(pod.name.size() > 0 || pod.comment.size() > 0)
+					throwException("Bad anonymous struct");
+				//find struct definition
+				bool found = false;
+				for(size_t m=0; m<structs.size(); m++) {
+					const Struct& as(structs[m]);
+					if(as.name == pod.type) {
+						//print it
+						stream << tab << "struct {\n";
+						streamMembers(stream, tab + "\t", as.members, structs);
+						stream << tab << "};\n";
+						found = true;
+						break;
+					}
+				}
+				if(!found)
+					throwException("Anonymous struct not found");
+			} else {
+				stream << tab << pod.type << " " << pod.name << ";\n";
+			}
+		}	//pod
+		if(m.pod.size() != 1) {
+			stream << "\t};\n";
+		}
+	}	//member
+}
+
 static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix) {
 	for(size_t j=0; j<structs.size(); j++) {
 		const Struct& s(structs[j]);
-		if(s.ix != ix)
+		if(s.ix != ix || isAnonStructName(s.name))
 			continue;
-		bool lastPodHadComment = false;
 		if(s.comment.size() > 0)
 			stream << s.comment;
 		stream << "typedef " << s.type << " " << s.name << " {\n";
-		for(size_t k=0; k<s.members.size(); k++) {
-			const Member& m(s.members[k]);
-			if(m.pod.size() != 1) {
-				stream << "\tunion {\n";
-			}
-			for(size_t l=0; l<m.pod.size(); l++) {
-				const PlainOldData pod(m.pod[l]);
-				string tab = (m.pod.size() != 1) ? "\t\t" : "\t";
-				if(lastPodHadComment) {
-					stream << "\n";
-				}
-				if(pod.comment.size() > 0) {
-					lastPodHadComment = true;
-					string formattedComment;
-					formattedComment.reserve(pod.comment.size() * 2);
-					size_t lastIdx = 0;
-					while(true) {
-						size_t idx = pod.comment.find_first_of('\n', lastIdx);
-						if(idx == string::npos)
-							break;
-						formattedComment += tab;
-						formattedComment += pod.comment.substr(lastIdx, idx - lastIdx);
-						formattedComment += "\n";
-						lastIdx = idx + 1;
-					}
-					stream << formattedComment;
-				}	//comment
-				stream << tab << pod.type << " " << pod.name << ";\n";
-			}	//pod
-			if(m.pod.size() != 1) {
-				stream << "\t};\n";
-			}
-		}	//member
+		streamMembers(stream, "\t", s.members, structs);
 		stream << "} " << s.name << ";\n\n";
 	}	//struct
 }

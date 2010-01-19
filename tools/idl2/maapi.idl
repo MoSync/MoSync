@@ -1133,10 +1133,6 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-#if IX_NATIVE_INPUT
-		NATIVE_KEY_PRESSED = 19;
-		NATIVE_KEY_RELEASED = 20;
-#endif
 		SCREEN_CHANGED = 21;
 	}
 
@@ -1155,10 +1151,16 @@ interface MAAPI {
 		*/
 		int type;
 		union {
-			/**
-			* In KEY events, this will be one of the \link #MAK_UNKNOWN MAK \endlink constants.
-			*/
-			int key;
+			struct {
+				/**
+				* In KEY events, this will be one of the \link #MAK_UNKNOWN MAK \endlink constants.
+				*/
+				int key;
+				/**
+				* In KEY events, this will be the native keycode.
+				*/
+				int nativeKey;
+			}
 
 			/**
 			 * In POINTER events, this will be the location of the pointer.
