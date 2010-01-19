@@ -1542,6 +1542,8 @@ static int maBringToForeground() {
 #ifdef SUPPORT_MOSYNC_SERVER
 int Syscall::maLocationStart() {
 	LOG("maLocationStart()\n");
+	if(gLocationSync->IsActive())
+		return 0;
 	gServer.LocationGet(*gLocationSync->Status());
 	gLocationSync->SetActive();
 	return 1;

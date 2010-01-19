@@ -47,7 +47,8 @@ class CompileGccTask < FileTask
 		@prerequisites = [source]
 		
 		@DEPFILE = @work.genfile(source, ".mf")
-		depFlags = " -MMD -MF #{@DEPFILE}"
+		@TEMPDEPFILE = @work.genfile(source, ".mft")
+		depFlags = " -MMD -MF #{@TEMPDEPFILE}"
 		@FLAGS = cflags + depFlags
 		
 		initFlags
@@ -70,6 +71,11 @@ class CompileGccTask < FileTask
 	def execute
 		execFlags
 		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{@SOURCE}"
+		
+		# In certain rare cases (error during preprocess caused by a header file)
+		# gcc may output an empty dependency file, resulting in an empty dependency list for
+		# the object file, which means it will not be recompiled, even though it should be.
+		FileUtils.mv(@TEMPDEPFILE, @DEPFILE)
 	end
 	
 	include FlagsChanged

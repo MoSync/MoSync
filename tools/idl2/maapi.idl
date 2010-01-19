@@ -1823,12 +1823,12 @@ interface MAAPI {
 		* \link #EVENT_TYPE_LOCATION_PROVIDER LOCATION_PROVIDER events \endlink will be generated
 		* when the location provider state changes.
 		*
-		* \returns \> 0 on success.
+		* \returns \> 0 on success, or 0 if collection was already active.
 		*
 		* \note <b>The location API is experimental, not fully tested.
 		* It may not work as advertised.</b>
 		*
-		* In particular, it is unsupported on Symbian runtimes and on the MoSync Emulator.
+		* In particular, it is unsupported on the MoSync Emulator.
 		* Implementation details are likely to change in the future.
 		*/
 		int maLocationStart();
@@ -1837,8 +1837,8 @@ interface MAAPI {
 		* Stops collecting location information, and stops generating events.
 		* Does nothing if collection is not active.
 		*
-		* \note Events that are generated before this function returns
-		* may remain in the event queue afterwards.
+		* \note \link #EVENT_TYPE_LOCATION Location events \endlink that are generated before
+		* this function returns may remain in the event queue afterwards.
 		*/
 		int maLocationStop();
 
