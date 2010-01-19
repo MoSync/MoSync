@@ -151,7 +151,7 @@ build_root = "../ProfileConverter/"
 dest_dir = ARGV[0]
 if dest_dir.class != NilClass
 	output_root = "#{dest_dir}/"
-	#build_root = ""
+	build_root = ""
 end
 
 if(ARGV[0])
