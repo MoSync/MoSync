@@ -20,36 +20,60 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MapSource.h"
 
-using namespace MAUtil;
-
 namespace MAP
 {
 	class MapTile;
 	class MapSourceListener;
 
 	//=========================================================================
+	/**
+	 * Enumerates variations of google map rendering.
+	 */
 	enum GoogleMapsMapKind
 	//=========================================================================
 	{
 		GoogleMapsMapKind_None,
+		/**
+		 * Street map.
+		 */
 		GoogleMapsMapKind_StreetMap,
+		/**
+		 * Aerial/satellite photography
+		 */
 		GoogleMapsMapKind_Aerial,
+		/*
+		 * Aerial with map labels drawn on top.
+		 */
 		GoogleMapsMapKind_Hybrid,
 		GoogleMapsMapKind_Last
 	};
 
 	//=========================================================================
+	/**
+	 * Implements a MapSource for Google Static Maps.
+	 *
+	 * NOTE: This code is just a sample, 
+	 * Google's Static Maps service is not intended for use as a map tile server.
+	 */
 	class GoogleMapSource : public MapSource
 	//=========================================================================
 	{
 	public:
+		/**
+		 * Google Static Maps reqires a registered API key.
+		 * see http://code.google.com/apis/maps/documentation/staticmaps/
+		 * for details.
+		 *
+		 * Assign your registered key string to GoogleMapSource::ApiKey before
+		 * using this map source.
+		 */
 		static const char* ApiKey;
-
+		/**
+		 * Creates a GoogleMapSource of the specified map kind.
+		 */
 		GoogleMapSource( GoogleMapsMapKind mapKind );
 		virtual	~GoogleMapSource( );
-		//
-		// MapSource overrides
-		//
+
 		MapSourceKind getSourceKind( ) const		
 		{ 
 			switch( mMapKind )

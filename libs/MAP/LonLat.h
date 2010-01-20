@@ -36,37 +36,41 @@ namespace MAP
 	static const double OriginShift = PI * 6378137.09;
 
 	//=========================================================================
-	//
-	// Lat/lon coordinates
-	//
+	/**
+	 * This class maintains a coordinate in latitude / longitude,
+	 * and provides conversion function to and from other coordinate systems.
+	 */
 	class LonLat
 	//=========================================================================
 	{
 	public:
 	private:
-
+		/**
+		 * Returns resolution in meters per pixel at equator.
+		 */
 		static double resolution( int magnification )
 		{
 			return InitialResolution / ( 1 << magnification );
 		}
-
+		/**
+		 * Returns the inverse of resolution.
+		 */
 		static double invResolution( int magnification)
 		{
 			return ( 1 << magnification ) * InvInitialResolution;
 		}
-
-		//
-		// Converts pixel coordinates in given zoom level of pyramid to EPSG:900913
-		//
+		/**
+		 * Converts a pixel coordinate at a given zoom level of pyramid to EPSG:900913
+		 */
 		static void pixelsToMeters( const double pixelX, const double pixelY, const int magnification, double& meterX, double& meterY )
 		{
 			double res = resolution( magnification );
 			meterX = pixelX * res - OriginShift;
 			meterY = pixelY * res - OriginShift;
 		}
-		//
-		// Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
-		//
+		/**
+		 * Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
+		 */
 		static void metersToPixels( const double meterX, const double meterY, const int magnification, double& pixelX, double& pixelY )
 		{
 			double invres = invResolution( magnification );
@@ -76,26 +80,26 @@ namespace MAP
 
 		static double exp( double x ) { return pow( M_E, x ); }
 
-		//
-		// Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum
-		//
+		/**
+		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum
+		 */
 		static void metersToLonLat( const double metersX, const double metersY, double& lon, double& lat )
 		{
 			lon = metersX / OriginShift * 180.0;
 
 			lat = 360.0 / PI * atan( exp( metersY * PI / OriginShift ) ) - 90.0;
 		}
-		//
-		// Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913
-		//
+		/**
+		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913
+		 */
 		static void lonLatToMeters( const double lon, const double lat, double& meterX, double& meterY )
 		{
 			meterX = lon * OriginShift / 180.0;
 			meterY = log( tan( ( 90.0 + lat ) * PI / 360.0 ) ) * OriginShift / PI;
 		}
-		//
-		// Returns a tile covering region in given pixel coordinates
-		//
+		/**
+		 * Returns a tile covering region in given pixel coordinates
+		 */
 		static void pixelsToTile( const int tileSize, const double pixelX, const double pixelY, int& tileX, int& tileY )
 		{
 			tileX = int( ceil( pixelX / (double)tileSize ) - 1 );
@@ -149,21 +153,33 @@ namespace MAP
 		//}
 
 	public:
+		/**
+		 * Longitude
+		 */
 		double lon;
+		/**
+		 * Latitude
+		 */
 		double lat;
-
+		/**
+		 * Creates a LonLat initialized to (0, 0).
+		 */
 		LonLat( )
 		:	lon( 0 ),
 			lat( 0 )
 		{
 		}
-
+		/**
+		 * Creates at LonLat
+		 */
 		LonLat( const double _lon, const double _lat )
 		: lon( _lon ),
 			lat( _lat )
 		{
 		}
-
+		/**
+		 * Creates a LonLat from thr given global pixel coordinate.
+		 */
 		LonLat( const PixelCoordinate& px )
 		{
 			double meterX, meterY;
@@ -189,13 +205,13 @@ namespace MAP
 		//	PixelsToMeters( pixelX, pixelY, tile.getMagnification( ), meterX, meterY );
 		//	MetersToLonLat( meterX, meterY, Lon, Lat );
 		//}
-		//
-		// convert to pixel coordinates.
-		// Projection is assumed to be spherical Mercator (as opposed to ellipsoidal).
-		// This results in a slight Y-axis error.
-		// Spherical Mercator is chosen for compatibility with online tile servers
-		// such as Google Maps and Microsoft Virtual Earth.
-		//
+		/**
+		 * Converts this to global pixel coordinates.
+		 * Projection is assumed to be spherical Mercator (as opposed to ellipsoidal).
+		 * This results in a slight Y-axis error.
+		 * Spherical Mercator is chosen for compatibility with online tile servers
+		 * such as Google Maps and Microsoft Virtual Earth.
+		 */
 		const PixelCoordinate toPixels( int magnification ) const
 		{
 			double meterX, meterY;
@@ -205,9 +221,9 @@ namespace MAP
 			return PixelCoordinate( magnification, (int)pixelX, (int)pixelY );
 
 		}
-		//
-		// Convert to meters
-		//
+		/**
+		 * Convert this to meters
+		 */
 		void toMeters( int magnification, double& meterX, double& meterY ) const
 		{
 			lonLatToMeters( lon, lat, meterX, meterY );

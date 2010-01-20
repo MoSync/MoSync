@@ -15,8 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#pragma once
-
 #ifndef DEBUGPRINTF_H_
 #define DEBUGPRINTF_H_
 
@@ -34,6 +32,10 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA( /*__in_opt*/
 #endif
 #include <mavsprintf.h>
 
+//
+// Printf statement for trace prints to debugger output,
+// for example in the Visual Studio environment.
+//
 inline void DebugPrintf(const char *fmt, ...)
 {
 	#ifdef _MSC_VER
@@ -52,6 +54,11 @@ inline void DebugPrintf(const char *fmt, ...)
 	#endif
 }
 
+//
+// Assert statement for x86 debuggers.
+// Will trigger a debugger breakpoint if a debugger attached.
+// If no debugger is attached then the function does nothing.
+//
 inline void DebugAssert( bool condition )
 {
 	#ifdef _MSC_VER

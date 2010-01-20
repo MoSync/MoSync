@@ -28,22 +28,37 @@ namespace MAP
 	class MapSourceListener;
 	class MapSourceImageDownloader;
 
-	//=========================================================================
-	//
-	// CloudMade map source
-	//
+	/*
+	 * This class implements a map source for using map tile servers
+	 * at CloudMade (cloudmade.com)
+	 * 
+	 * CloudMade requires the developer to register to get an API key.
+	 * See http://www.cloudmade.com for more details.
+	 */
 	class CloudMadeMapSource : public MapSource
 	//=========================================================================
 	{
 	public:
+		/**
+		 * API key for use in calls to CloudMade tile servers.
+		 * See cloudmade.com for more details.
+		 */
 		static const char* ApiKey;
 
 	public:
-		CloudMadeMapSource( int style ) : MapSource( ), mStyle( style ) { }
-		virtual ~CloudMadeMapSource( ) { }
-		//
-		// MapSource overrides
-		//
+		CloudMadeMapSource( int style ) 
+			: MapSource( ), 
+			  mStyle( style ) 
+		{
+		}
+
+		virtual ~CloudMadeMapSource( ) 
+		{
+		}
+		/**
+		 * CloudMade supports a number of different rendering variations
+		 * for maps. MAP currently supports type 1 and 7.
+		 */
 		MapSourceKind getSourceKind( ) const			
 		{
 			switch( mStyle )
@@ -53,19 +68,30 @@ namespace MAP
 			default: return (MapSourceKind)-1;
 			}
 		}
-
+		/**
+		 * Returns tile size in pixels.
+		 */
 		MAExtent getTileSize( ) const
 		{
+			//
+			// CloudMade tile size is fixed at 256x256 pixels.
+			//
 			return 256; 
 		}
 
 		int getMagnificationMin( ) const
 		{
+			//
+			// CloudMade smallest zoom level is 1, which translates
+			// to 2 x 2 tiles for the entire world.
 			return 1;
 		}
 
 		int getMagnificationMax( ) const
 		{
+			//
+			// ClodMade largest zoom level is 17 as of June 2009.
+			//
 			return 17;
 		}
 

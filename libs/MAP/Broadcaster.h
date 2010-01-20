@@ -25,19 +25,41 @@ using namespace MAUtil;
 namespace MAPUtil
 {
 	//=========================================================================
+	/**
+	 * This template class enables typed notification broadcasting to multiple
+	 * listeners.
+	 * Listeners must implement class T.
+	 * 
+	 * A listener adds itself to the list of listeners by calling AddListener( ) on
+	 * the object it wants to listen to.
+	 * 
+	 * To broadcast, loop through all listeners in mListeners and call the appropriate
+	 * notification function.
+	 *
+	 * Example:
+	 *
+	 *    ...
+	 *    for ( int i = 0; i < mListeners.size( ); i++ )
+	 *       m_Listeners[i]->notify( );
+	 * 
+	 */
 	template<class T>
 	class Broadcaster
 	//=========================================================================
 	{
 	public:
-		//
-		// listener property
-		//
+		/**
+		* Add a listener.
+		* Clients should call this to register for notification.
+		*/
 		void addListener( T* listener ) 
 		{
 			mListeners.add( listener );
 		}
-
+		/**
+		 * Remove a listener.
+		 * Clients should call this to unregister for notification.
+		 */
 		void removeListener( T* listener ) 
 		{ 
 			for ( int i = 0; i < mListeners.size( ); i++ ) 
@@ -51,6 +73,11 @@ namespace MAPUtil
 		}
 
 	protected:
+		/**
+		 * The list of listeners.
+		 * Implementer should iterate through list and call the appropriate
+		 * notify function.
+		 */
 		Vector<T*> mListeners;
 	};
 }
