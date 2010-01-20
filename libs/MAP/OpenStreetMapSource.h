@@ -36,20 +36,37 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-								OpenStreetMapSource( );
-		virtual					~OpenStreetMapSource( );
+		OpenStreetMapSource( );
+		
+		virtual ~OpenStreetMapSource( );
 		//
 		// MapSource overrides
 		//
-		MapSourceKind			getSourceKind( ) const			{ return MapSourceKind_OpenStreetMap; }
-		MAExtent				getTileSize( ) const			{ return 256; }
-		int						getMagnificationMin( ) const	{ return 1; }
-		int						getMagnificationMax( ) const	{ return 18; }
+		MapSourceKind getSourceKind( ) const			
+		{ 
+			return MapSourceKind_OpenStreetMap; 
+		}
 
-		void					getTileUrl( char* buffer, MapTileCoordinate tileXY );
-		MapTileCoordinate		lonLatToTile( LonLat lonlat, int magnification );
-		PixelCoordinate			lonLatToPixel( LonLat lonlat, int magnification );
-		LonLat					tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
+		MAExtent getTileSize( ) const			
+		{ 
+			return 256; 
+		}
+
+		int getMagnificationMin( ) const	
+		{ 
+			return 1; 
+		}
+
+		int getMagnificationMax( ) const	
+		{ 
+			return 18; 
+		}
+
+
+		void getTileUrl( char* buffer, MapTileCoordinate tileXY );
+		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
+		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
+		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 	};
 }
 

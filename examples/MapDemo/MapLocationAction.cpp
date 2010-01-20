@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MapLocationAction.h"
 
-namespace MAPDemo
+namespace MapDemo
 {
 	//-------------------------------------------------------------------------
 	MapLocationAction::	MapLocationAction( MapWidget* widget, LonLat location, const char* label ) :

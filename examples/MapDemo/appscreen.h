@@ -29,10 +29,11 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								AppScreen( MobletEx* mMoblet );
-		virtual					~AppScreen( );
+		AppScreen( MobletEx* mMoblet );
+		
+		virtual ~AppScreen( );
 
-		virtual void			enumerateActions( Vector<Action*>& list );
+		virtual void enumerateActions( Vector<Action*>& list );
 	};
 };
 #endif // APPSCREEN_H_

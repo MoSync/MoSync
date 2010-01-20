@@ -51,24 +51,54 @@ namespace MAP
 			maDestroyObject( mImage );
 		}
 
-		void stamp( ) { mLastAccessTime = DateTime::now( ); }
+		void stamp( ) 
+		{ 
+			mLastAccessTime = DateTime::now( ); 
+		}
 
-		MapSourceKind getSourceKind( ) const	{ return mSourceKind; }
-		int getGridX( ) const					{ return mGridX; }
-		int getGridY( ) const					{ return mGridY; }
-		int getMagnification( ) const			{ return mMagnification; }
-		LonLat getCenter( ) const				{ return mCenter; }
-		MAHandle getImage( ) const				{ return mImage; }
-		DateTime getLastAccessTime( ) const		{ return mLastAccessTime; }
+		MapSourceKind getSourceKind( ) const	
+		{ 
+			return mSourceKind; 
+		}
+
+		int getGridX( ) const					
+		{ 
+			return mGridX; 
+		}
+
+		int getGridY( ) const					
+		{ 
+			return mGridY; 
+		}
+
+		int getMagnification( ) const			
+		{ 
+			return mMagnification; 
+		}
+
+		LonLat getCenter( ) const				
+		{ 
+			return mCenter; 
+		}
+
+		MAHandle getImage( ) const				
+		{ 
+			return mImage; 
+		}
+
+		DateTime getLastAccessTime( ) const		
+		{ 
+			return mLastAccessTime; 
+		}
 
 	private:
-		MapSourceKind	mSourceKind;
-		int				mGridX;
-		int				mGridY;
-		int				mMagnification;
-		LonLat			mCenter;
-		MAHandle		mImage;
-		DateTime		mLastAccessTime;
+		MapSourceKind mSourceKind;
+		int mGridX;
+		int mGridY;
+		int mMagnification;
+		LonLat mCenter;
+		MAHandle mImage;
+		DateTime mLastAccessTime;
 	};
 }
 #endif // MAPTILE_H_

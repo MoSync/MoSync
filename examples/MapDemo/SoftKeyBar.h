@@ -34,32 +34,33 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-							SoftKeyBar( int x, int y, int width, int height, Widget* parent );
-		virtual				~SoftKeyBar( );
+		SoftKeyBar( int x, int y, int width, int height, Widget* parent );
+		
+		virtual ~SoftKeyBar( );
 		//
 		// Widget overrides
 		//
-		virtual void		setWidth( int width );
-		virtual void		setHeight( int height );
+		virtual void setWidth( int width );
+		virtual void setHeight( int height );
 		//
 		// Key handling
 		//
-		virtual bool		handleKeyPress( int keyCode );
-		virtual bool		handleKeyRelease( int keyCode );
+		virtual bool handleKeyPress( int keyCode );
+		virtual bool handleKeyRelease( int keyCode );
 		//
 		// Actions
 		//
-		virtual Action*		getLeftAction( ) const;
-		virtual void		setLeftAction( Action* action );
-		virtual Action*		getRightAction( ) const;
-		virtual void		setRightAction( Action* action );
+		virtual Action* getLeftAction( ) const;
+		virtual void setLeftAction( Action* action );
+		virtual Action* getRightAction( ) const;
+		virtual void setRightAction( Action* action );
 
 	private:
-		Label*				mLeftLabel;
-		Label*				mRightLabel;
-		Action*				mLeftAction;
-		Action*				mRightAction;
-		Font*				mFont;
+		Label* mLeftLabel;
+		Label* mRightLabel;
+		Action* mLeftAction;
+		Action* mRightAction;
+		Font* mFont;
 	};
 }
 

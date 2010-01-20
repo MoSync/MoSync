@@ -21,8 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 #include "HelloMapScreen.h"
 
-//using namespace MapDemoUI;
-
 namespace HelloMap
 {
 	//=========================================================================
@@ -30,13 +28,12 @@ namespace HelloMap
 	//=========================================================================
 	{
 	public:
-								HelloMapMoblet( );
-		virtual					~HelloMapMoblet( );
-
-		//virtual void			shutdown( );
+		HelloMapMoblet( );
+		
+		virtual ~HelloMapMoblet( );
 
 	private:
-		HelloMapScreen*			mScreen;
+		HelloMapScreen* mScreen;
 	};
 }
 

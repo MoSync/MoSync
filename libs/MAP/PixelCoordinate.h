@@ -42,14 +42,19 @@ namespace MAP
 		const int getX( ) const					{ return mX; }
 		const int getY( ) const					{ return mY; }
 		const int getMagnification( ) const		{ return mMagnification; }
-
-		bool operator==(const PixelCoordinate& b) const {
-			return this->getX() == b.getX() && this->getY() == b.getY() &&
-				this->getMagnification() == b.getMagnification();
+		const int getX( ) const					
+		{ 
+			return mX; 
 		}
-		bool operator!=(const PixelCoordinate& b) const {
-			return this->getX() != b.getX() || this->getY() != b.getY() ||
-				this->getMagnification() != b.getMagnification();
+
+		const int getY( ) const					
+		{ 
+			return mY; 
+		}
+
+		const int getMagnification( ) const		
+		{ 
+			return mMagnification; 
 		}
 
 	private:
@@ -57,6 +62,16 @@ namespace MAP
 		int mY;
 		int mMagnification;
 	};
+
+	static bool operator == ( const PixelCoordinate& a, const PixelCoordinate& b ) 
+	{ 
+		return a.getX( ) == b.getX( ) && a.getY( ) == b.getY( ) && a.getMagnification( ) == b.getMagnification( ); 
+	}
+
+	static bool operator != ( const PixelCoordinate& a, const PixelCoordinate& b ) 
+	{ 
+		return a.getX( ) != b.getX( ) || a.getY( ) != b.getY( ) || a.getMagnification( ) != b.getMagnification( ); 
+	}
 }
 
 #endif // PIXELCOORDINATE_H_

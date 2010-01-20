@@ -28,8 +28,8 @@ namespace MAP
 	// Creates a new map source
 	//
 	GoogleMapSource::GoogleMapSource( GoogleMapsMapKind mapKind ) :
-	//-------------------------------------------------------------------------
 		mMapKind( mapKind )
+	//-------------------------------------------------------------------------
 	{
 	}
 
@@ -57,8 +57,8 @@ namespace MAP
 	//
 	// Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913
 	//
-	//-------------------------------------------------------------------------
 	inline static void LonLatToMeters( const double lon, const double lat, double& meterX, double& meterY )
+	//-------------------------------------------------------------------------
 	{
 		meterX = lon * OriginShift / 180.0;
 		meterY = log( tan( ( 90.0 + lat ) * PI / 360.0 ) ) * OriginShift / PI;

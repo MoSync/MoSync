@@ -33,21 +33,27 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								ExitAction( MobletEx* moblet );
-		virtual					~ExitAction( );
+		ExitAction( MobletEx* moblet );
+		
+		virtual ~ExitAction( );
 		//
 		// Action overrides
 		//
-		virtual const char*		getShortName( ) const;
-		virtual Action*			clone( ) const { return newobject( ExitAction, new ExitAction( mMoblet ) ); }
+		virtual const char* getShortName( ) const;
+
+		virtual Action* clone( ) const 
+		{
+			return newobject( ExitAction, new ExitAction( mMoblet ) ); 
+		}
 
 	protected:
 		//
 		// Action protected overrides
 		//
-		virtual void			performPrim( );
+		virtual void performPrim( );
+
 	private:
-		MobletEx*				mMoblet;
+		MobletEx* mMoblet;
 	};
 }
 

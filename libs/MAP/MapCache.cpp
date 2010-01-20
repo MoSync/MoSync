@@ -26,11 +26,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	//
-	// Debug
-	//
-	//static const bool Trace = false;
-
 	MapCache* MapCache::sSingleton = NULL;
 
 	//=========================================================================
@@ -38,8 +33,12 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-							MapCacheClientData( IMapCacheListener* listener ) : mListener( listener ) { }
-		virtual				~MapCacheClientData( ) { }
+		MapCacheClientData( IMapCacheListener* listener ) 
+			: mListener( listener ) 
+		{
+		}
+		
+		virtual ~MapCacheClientData( ) { }
 
 		IMapCacheListener*	mListener;
 	};
@@ -128,10 +127,10 @@ namespace MAP
 	//
 	// Min, Max
 	//
-	static inline double Min( double x, double y )			{ return x < y ? x : y; }
-	static inline int Min( int x, int y )					{ return x < y ? x : y; }
-	static inline double Max( double x, double y )			{ return x > y ? x : y; }
-	static inline int Max( int x, int y )					{ return x > y ? x : y; }
+	static inline double Min( double x, double y ) { return x < y ? x : y; }
+	static inline int Min( int x, int y ) { return x < y ? x : y; }
+	static inline double Max( double x, double y ) { return x > y ? x : y; }
+	static inline int Max( int x, int y ) { return x > y ? x : y; }
 
 	//-------------------------------------------------------------------------
 	//
@@ -155,7 +154,7 @@ namespace MAP
 		//
 		source->clearQueue( );
 
-#if 0
+
 		//
 		// Test code
 		//
@@ -169,7 +168,7 @@ namespace MAP
 			source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
 			return;
 		}
-#endif
+
 
 		const int offsetX = pixelWidth / 2;
 		const int offsetY = pixelHeight / 2;
@@ -207,7 +206,7 @@ namespace MAP
 				//
 				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 
-				//if ( Trace ) DebugPrintf( "MapTile requested %d %d %d\n", magnification, x, y );
+				if ( Trace ) DebugPrintf( "MapTile requested %d %d %d\n", magnification, x, y );
 
 				int loc = findInCache( sourceKind, tileXY );
 				if ( loc != -1 )

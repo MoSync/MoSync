@@ -16,33 +16,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "HelloMapScreen.h"
-//#include "ExitAction.h"
-//#include "MapLocationAction.h"
-//#include "AppStyleMgr.h"
 #include "MAHeaders.h"
 
 namespace HelloMap
 {
-	//static const bool Trace = false;
-
-	////-------------------------------------------------------------------------
-	//static const char* MapSourceKindToString( MapSourceKind kind )
-	////-------------------------------------------------------------------------
-	//{
-	//	switch( kind )
-	//	{
-	//	case MapSourceKind_OpenStreetMap: return "OpenStreetMap";
-	//	case MapSourceKind_GoogleMap: return "Google (map)";
-	//	case MapSourceKind_GoogleAerial: return "Google (aerial)";
-	//	case MapSourceKind_GoogleHybrid: return "Google (hybrid)";
-	//	case MapSourceKind_CloudMade1: return "CloudMade (type 1)";
-	//	case MapSourceKind_CloudMade7: return "CloudMade (type 7)";
-	//	//case MapSourceKind_VirtualEarth: return "Virtual Earth";
-	//	default: 
-	//		return "Unknown map type";
-	//	}
-	//}
-
 	//-------------------------------------------------------------------------
 	HelloMapScreen::HelloMapScreen( )
 	//-------------------------------------------------------------------------
@@ -62,11 +39,9 @@ namespace HelloMap
 		mMap->setMagnification( 10 );
 		mMap->exitMapUpdateScope( true );
 		mMapSourceKind = MapSourceKind_OpenStreetMap;
-		//MapSourceMgr* mgr = MapSourceMgr::get( );
 		Font* font = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( font );
 
-		//setClientWidget( mMap );
 		setMain( mMap );
 		//
 		// Have to wait until we have proper width and height
@@ -80,32 +55,6 @@ namespace HelloMap
 	{
 		deleteobject( mMap );
 	}
-
-	////-------------------------------------------------------------------------
-	//bool HelloMapScreen::handleKeyPress( int keyCode )
-	////-------------------------------------------------------------------------
-	//{
-	//	switch( keyCode )
-	//	{
-	//		case MAK_2:
-	//			nextMapSource( );
-	//			return true;
-	//	}
-	//	if ( AppScreen::handleKeyPress( keyCode ) )
-	//		return true;
-
-	//	return mMap->handleKeyPress( keyCode );
-	//}
-
-	////-------------------------------------------------------------------------
-	//bool HelloMapScreen::handleKeyRelease( int keyCode )
-	////-------------------------------------------------------------------------
-	//{
-	//	if ( AppScreen::handleKeyRelease( keyCode ) )
-	//		return true;
-
-	//	return mMap->handleKeyRelease( keyCode );
-	//}
 
 	//-------------------------------------------------------------------------
 	void HelloMapScreen::keyPressEvent( int keyCode )
@@ -141,15 +90,5 @@ namespace HelloMap
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
 		mMapSourceKind = newKind;
 		mMap->setMapSourceKind( newKind );
-		//MessageMgr::get( )->postMessage( MapSourceKindToString( newKind ) );
 	}
-
-	////-------------------------------------------------------------------------
-	//void HelloMapScreen::enumerateActions( Vector<Action*>& list )
-	////-------------------------------------------------------------------------
-	//{
-	//	// add my actions
-	//	list.add( newobject( MapLocationAction, new MapLocationAction( mMap, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
-	//	list.add( newobject( ExitAction, new ExitAction( mMoblet ) ) );
-	//}
 }

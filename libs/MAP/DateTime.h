@@ -61,7 +61,7 @@ namespace MAPUtil
 		//
 		// Destructs a DateTime.
 		//
-		/*virtual*/ ~DateTime( ); // MUST NOT be virtual, to avoid vtable
+		~DateTime( ); // MUST NOT be virtual, to avoid vtable
 		//
 		// Returns the maximum value that can be represented by a DateTime.
 		//
@@ -164,18 +164,52 @@ namespace MAPUtil
 	//
 	// Comparison operators.
 	//
-	inline bool operator > ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) > b.getTicks( ); }
-	inline bool operator < ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) < b.getTicks( ); }
-	inline bool operator >= ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) >= b.getTicks( ); }
-	inline bool operator <= ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) <= b.getTicks( ); }
-	inline bool operator == ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) == b.getTicks( ); }
-	inline bool operator != ( const DateTime& a, const DateTime& b ) { return a.getTicks( ) != b.getTicks( ); }
+	inline bool operator > ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) > b.getTicks( ); 
+	}
+
+	inline bool operator < ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) < b.getTicks( ); 
+	}
+
+	inline bool operator >= ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) >= b.getTicks( ); 
+	}
+
+	inline bool operator <= ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) <= b.getTicks( ); 
+	}
+
+	inline bool operator == ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) == b.getTicks( ); 
+	}
+
+	inline bool operator != ( const DateTime& a, const DateTime& b ) 
+	{
+		return a.getTicks( ) != b.getTicks( ); 
+	}
 	//
 	// Arithmetic binary operators.
 	//
-	inline TimeSpan operator - ( const DateTime d1, const DateTime d2 ) { return TimeSpan( (int)d1.getTicks( ) - (int)d2.getTicks( ) ); }
-	inline DateTime operator - ( const DateTime d, const TimeSpan t ) { return DateTime( (int)d.getTicks( ) - (int)t.getTicks( ) ); }
-	inline DateTime operator + ( const DateTime d, const TimeSpan t ) { return DateTime( d.getTicks( ) + t.getTicks( ) ); }
+	inline TimeSpan operator - ( const DateTime d1, const DateTime d2 ) 
+	{
+		return TimeSpan( (int)d1.getTicks( ) - (int)d2.getTicks( ) ); 
+	}
+	
+	inline DateTime operator - ( const DateTime d, const TimeSpan t ) 
+	{ 
+		return DateTime( (int)d.getTicks( ) - (int)t.getTicks( ) ); 
+	}
+
+	inline DateTime operator + ( const DateTime d, const TimeSpan t ) 
+	{ 
+		return DateTime( d.getTicks( ) + t.getTicks( ) ); 
+	}
 }
 
 #endif // DATETIME_H_

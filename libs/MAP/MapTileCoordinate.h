@@ -28,24 +28,39 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-									MapTileCoordinate( ) : mX( 0 ), mY( 0 ), mMagnification( 0 ) { }
+		MapTileCoordinate( ) 
+			: mX( 0 ), 
+			  mY( 0 ), 
+			  mMagnification( 0 ) 
+		{
+		}
 
-									MapTileCoordinate( int x, int y, int magnification ) :
-									 	mX( x ),
-										mY( y ),
-										mMagnification( magnification )
-									{
-									}
+		MapTileCoordinate( int x, int y, int magnification ) 
+			: mX( x ),
+			  mY( y ),
+			  mMagnification( magnification )
+		{
+		}
 
-		int							getX( ) const { return mX; }
-		int							getY( ) const { return mY; }
-		int							getMagnification( ) const { return mMagnification; }
+		int getX( ) const 
+		{ 
+			return mX; 
+		}
+
+		int getY( ) const 
+		{ 
+			return mY; 
+		}
+
+		int getMagnification( ) const 
+		{ 
+			return mMagnification; 
+		}
 
 	private:
-		int							mX;
-		int							mY;
-		int							mMagnification;
-
+		int mX;
+		int mY;
+		int mMagnification;
 	};
 }
 #endif // MAPTILECOORDINATE_H_

@@ -22,8 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <MAUI/Font.h>
 
-//#include "MemoryMgr.h"
-
 using namespace MAUI;
 using namespace MAUtil;
 
@@ -34,29 +32,31 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-							AppFrame(int x, int y, int width, int height, Widget* parent, int columns, int rows );
-		virtual				~AppFrame( );
+		AppFrame(int x, int y, int width, int height, Widget* parent, int columns, int rows );
+		
+		virtual ~AppFrame( );
 		//
 		// Message handling
 		//
-		void				setMessage( const char* message, float progress );
-		void				clearMessage( );
+		void setMessage( const char* message, float progress );
+		void clearMessage( );
 		//
 		// Font
 		//
-		void				setfont( Font* font ) { mFont = font; }
-		Font*				getFont( ) const { return mFont; }
+		void setfont( Font* font ) { mFont = font; }
+		Font* getFont( ) const { return mFont; }
 
 	protected:
-		virtual void		draw( bool forceDraw=false );
+		virtual void draw( bool forceDraw=false );
+
 	private:
-		String				mMessage;
-		float				mProgress;
-		Font*				mFont;
-		Rect				mTextBounds;
-		Rect				mFillBounds;
-		Rect				mProgressBounds;
-		WidgetSkin*			mMsgSkin;
+		String mMessage;
+		float mProgress;
+		Font* mFont;
+		Rect mTextBounds;
+		Rect mFillBounds;
+		Rect mProgressBounds;
+		WidgetSkin* mMsgSkin;
 	};
 }
 #endif // APPFRAME_H_

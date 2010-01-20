@@ -45,25 +45,46 @@ namespace MapDemoUtil
 	class MessageMgr : public Broadcaster<IMessageListener>
 	//============================================================================
 	{
-	public:
 	private:
-								MessageMgr( );
-	public:
-		virtual					~MessageMgr( );
+		MessageMgr( );
 
-		static MessageMgr*		get( ) { if ( sSingleton == NULL ) { sSingleton = newobject( MessageMgr, new MessageMgr( ) ); } return sSingleton; }
-		static void				shutdown( ) { deleteobject( sSingleton ); }
-		void					postMessage( const char *fmt, ... );
-		void					postProgress( float progress );
-		const char*				getMessage( ) const { return mMessage.c_str( ); }
-		float					getProgress( ) const { return mProgress; }
+	public:
+		virtual ~MessageMgr( );
+
+		static MessageMgr* get( ) 
+		{ 
+			if ( sSingleton == NULL ) 
+			{ 
+				sSingleton = newobject( MessageMgr, new MessageMgr( ) ); 
+			} 
+			return sSingleton; 
+		}
+
+		static void shutdown( ) 
+		{ 
+			deleteobject( sSingleton ); 
+		}
+
+		void postMessage( const char *fmt, ... );
+		
+		void postProgress( float progress );
+		
+		const char* getMessage( ) const 
+		{ 
+			return mMessage.c_str( ); 
+		}
+
+		float getProgress( ) const 
+		{ 
+			return mProgress; 
+		}
 
 	private:
-		void					onMessagePosted( );
+		void onMessagePosted( );
 
-		static MessageMgr*		sSingleton;
-		String					mMessage;
-		float					mProgress;
+		static MessageMgr* sSingleton;
+		String mMessage;
+		float mProgress;
 	};
 }
 

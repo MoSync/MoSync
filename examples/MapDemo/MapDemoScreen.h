@@ -27,28 +27,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAP;
 using namespace MapDemoUI;
 
-namespace MAPDemo 
+namespace MapDemo 
 {
 	//=========================================================================
 	//
-	// Screen for MAPDemo app
+	// Screen for MapDemo app
 	//
-	class MAPDemoScreen : public AppScreen
+	class MapDemoScreen : public AppScreen
 	//=========================================================================
 	{
 	public:
-								MAPDemoScreen( MobletEx* mMoblet );
-		virtual					~MAPDemoScreen( );
+		MapDemoScreen( MobletEx* mMoblet );
+		
+		virtual ~MapDemoScreen( );
 
-		virtual bool			handleKeyPress( int keyCode );
-		virtual bool			handleKeyRelease( int keyCode );
-		virtual void			enumerateActions( Vector<Action*>& list );
+		virtual bool handleKeyPress( int keyCode );
+		virtual bool handleKeyRelease( int keyCode );
+		virtual void enumerateActions( Vector<Action*>& list );
 
 	private:
-		void					nextMapSource( );
+		void nextMapSource( );
 
-		MapWidget*				mMap;
-		MapSourceKind			mMapSourceKind;
+		MapWidget* mMap;
+		MapSourceKind mMapSourceKind;
 	};
 }
 

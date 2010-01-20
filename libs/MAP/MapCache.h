@@ -46,56 +46,56 @@ namespace MAP
 	//=========================================================================
 	{
 	private:
-							MapCache( );
+		MapCache( );
 
 	public:
-		static MapCache*	get( );
-		static void			shutdown( );
+		static MapCache* get( );
+		static void shutdown( );
 
-		virtual				~MapCache( );
+		virtual ~MapCache( );
 		//
 		// Requests tiles to cover specified rectangle
 		//
-		void				requestTiles( IMapCacheListener* listener, MapSourceKind source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
+		void requestTiles( IMapCacheListener* listener, MapSourceKind source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
 		//
 		// Deletes all tiles in cache.
 		//
-		void				clear( );
+		void clear( );
 		//
 		// IMapSourceListener implementation
 		//
-		void				tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData );
-		void				downloadCancelled( MapSource* sender );
-		void				error( MapSource* source, int code );
+		void tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData );
+		void downloadCancelled( MapSource* sender );
+		void error( MapSource* source, int code );
 		//
 		// Capacity property
 		//
-		int					getCapacity( ) const;
-		void				setCapacity( int capacity );
+		int getCapacity( ) const;
+		void setCapacity( int capacity );
 
 	private:
-		static MapCache*	sSingleton;
+		static MapCache* sSingleton;
 		//
 		// Returns tile from cache, if available
 		//
-		int					findInCache( MapSourceKind source, MapTileCoordinate tileXY ) const;
+		int findInCache( MapSourceKind source, MapTileCoordinate tileXY ) const;
 		//
 		// returns first unused location in cache
 		//
-		int					findFreeLocation( ) const;
+		int findFreeLocation( ) const;
 		//
 		// returns location of least recently used tile
 		//
-		int					findLRU( ) const;
+		int findLRU( ) const;
 		//
 		// Reallocates cache, content is flushed
 		//
-		void				reallocateCache( );
+		void reallocateCache( );
 
-		MapTile**			mList;
-		int					mHits;
-		int					mMisses;
-		int					mCapacity;
+		MapTile** mList;
+		int mHits;
+		int mMisses;
+		int mCapacity;
 	};
 }
 

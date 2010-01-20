@@ -33,21 +33,49 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	private:
-								AppStyleMgr( ) : mStyle( NULL ) { }
+		AppStyleMgr( ) 
+			: mStyle( NULL ) 
+		{
+		}
 	public:
-		virtual					~AppStyleMgr( ) { deleteobject( mStyle ); }
+		virtual ~AppStyleMgr( ) 
+		{
+			deleteobject( mStyle ); 
+		}
 
-		static AppStyleMgr*		get( ) { if ( sSingleton == NULL ) { sSingleton = newobject( AppStyleMgr, new AppStyleMgr( ) ); } return sSingleton; }
-		static void				shutdown( ) { deleteobject( sSingleton ); }
+		static AppStyleMgr* get( ) 
+		{
+			if ( sSingleton == NULL ) 
+			{
+				sSingleton = newobject( AppStyleMgr, new AppStyleMgr( ) ); 
+			}
+			return sSingleton; 
+		}
 
-		static void				setStyle( AppStyle* style ) { get( )->setStylePrim( style ); }
-		static AppStyle*		getStyle( ) { return get( )->mStyle; }
+		static void shutdown( ) 
+		{
+			deleteobject( sSingleton ); 
+		}
+
+		static void setStyle( AppStyle* style ) 
+		{
+			get( )->setStylePrim( style ); 
+		}
+
+		static AppStyle* getStyle( ) 
+		{
+			return get( )->mStyle; 
+		}
 
 	private:
-		void					setStylePrim( AppStyle* style ) { deleteobject( mStyle ); mStyle = style; }
+		void setStylePrim( AppStyle* style ) 
+		{
+			deleteobject( mStyle ); 
+			mStyle = style; 
+		}
 
-		static AppStyleMgr*		sSingleton;
-		AppStyle*				mStyle;
+		static AppStyleMgr* sSingleton;
+		AppStyle* mStyle;
 	};
 }
 

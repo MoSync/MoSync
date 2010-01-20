@@ -147,10 +147,10 @@ namespace MAPUtil
 		}
 
 	private:
-		T**						mItems;
-		int						mCapacity;
-		int						mEnqueuePosition;
-		int						mDequeuePosition;
+		T** mItems;
+		int mCapacity;
+		int mEnqueuePosition;
+		int mDequeuePosition;
 	};
 }
 

@@ -28,22 +28,26 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								CloseMenuAction( Menu* menu );
-		virtual					~CloseMenuAction( );
+		CloseMenuAction( Menu* menu );
+		virtual ~CloseMenuAction( );
 		//
 		// Action overrides
 		//
-		virtual const char*		getShortName( ) const {  return "Back"; }
-		virtual Action*			clone( ) const { return newobject( CloseMenuAction, new CloseMenuAction( mMenu ) ); }
+		virtual const char* getShortName( ) const {  return "Back"; }
+		
+		virtual Action* clone( ) const 
+		{
+			return newobject( CloseMenuAction, new CloseMenuAction( mMenu ) ); 
+		}
 
 	protected:
 		//
 		// Action protected overrides
 		//
-		virtual void			performPrim( );
+		virtual void performPrim( );
 
 	private:
-		Menu*					mMenu;
+		Menu* mMenu;
 	};
 }
 

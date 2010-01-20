@@ -89,10 +89,25 @@ namespace MAPUtil
 
 #ifdef TRACKOBJECTS
 	#define newobject( type, obj ) MemoryMgr::track<type>( (obj), #type "   (" __FUNCTION__ ")" )
-	#define deleteobject( obj ) { if ( (obj) != NULL ) { MemoryMgr::untrack( obj ); delete (obj); (obj) = NULL; } }
+	#define deleteobject( obj ) \
+	{\
+		if ( (obj) != NULL )\
+		{\
+			MemoryMgr::untrack( obj );\
+			delete (obj);\
+			(obj) = NULL;\
+		}\
+	}
 #else
 	#define newobject( type, obj ) ( obj )
-	#define deleteobject( obj ) { if ( (obj) != NULL ) { delete (obj); (obj) = NULL; } }
+	#define deleteobject( obj )\
+	{\
+		if ( (obj) != NULL )\
+		{\
+			delete (obj);\
+			(obj) = NULL;\
+		}\
+	}
 #endif
 
 }

@@ -24,41 +24,45 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MapDemoUI;
 using namespace MapDemoUtil;
 
-namespace MAPDemo
+namespace MapDemo
 {
-	class MAPDemoAppStyle : public AppStyle
+	//=========================================================================
+	class MapDemoAppStyle : public AppStyle
+	//=========================================================================
 	{
 	public:
-								MAPDemoAppStyle( );
-		virtual					~MAPDemoAppStyle( );
+		MapDemoAppStyle( );
+		
+		virtual ~MapDemoAppStyle( );
 		//
 		// For client to implement
 		//
-		virtual Font*			getFont( FontSize size, Color color, bool bold ) const;
-		virtual WidgetSkin*		getWidgetSkin( ) const;
-		virtual WidgetSkin*		getButtonSkin( ) const;
-		virtual int				getTabHeight( ) const;
-		virtual int				getMenuItemHeight( ) const;
-		virtual int				getSoftKeyBarHeight( ) const;
+		virtual Font* getFont( FontSize size, Color color, bool bold ) const;
+		virtual WidgetSkin* getWidgetSkin( ) const;
+		virtual WidgetSkin* getButtonSkin( ) const;
+		virtual int getTabHeight( ) const;
+		virtual int getMenuItemHeight( ) const;
+		virtual int getSoftKeyBarHeight( ) const;
+
 	private:
-		WidgetSkin*				mWidgetSkin;
-		WidgetSkin*				mButtonSkin;
-		Font*					mFontSmallestBoldBlack;
-		Font*					mFontSmallestBoldWhite;
-		Font*					mFontSmallestWhite;
-		Font*					mFontSmallestBlack;
-		Font*					mFontSmallBoldBlack;
-		Font*					mFontSmallBoldWhite;
-		Font*					mFontSmallWhite;
-		Font*					mFontSmallBlue;
-		Font*					mFontSmallBlack;
-		Font*					mFontMediumBoldWhite;
-		Font*					mFontMediumWhite;
-		Font*					mFontLargeBoldWhite;
-		Font*					mFontLargeBoldBlack;
-		Font*					mFontLargeWhite;
-		Font*					mFontLargestBoldWhite;
-		Font*					mFontLargestWhite;
+		WidgetSkin* mWidgetSkin;
+		WidgetSkin* mButtonSkin;
+		Font* mFontSmallestBoldBlack;
+		Font* mFontSmallestBoldWhite;
+		Font* mFontSmallestWhite;
+		Font* mFontSmallestBlack;
+		Font* mFontSmallBoldBlack;
+		Font* mFontSmallBoldWhite;
+		Font* mFontSmallWhite;
+		Font* mFontSmallBlue;
+		Font* mFontSmallBlack;
+		Font* mFontMediumBoldWhite;
+		Font* mFontMediumWhite;
+		Font* mFontLargeBoldWhite;
+		Font* mFontLargeBoldBlack;
+		Font* mFontLargeWhite;
+		Font* mFontLargestBoldWhite;
+		Font* mFontLargestWhite;
 	};
 }
 

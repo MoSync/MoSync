@@ -27,7 +27,7 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-		virtual void	close( ) = 0;
+		virtual void close( ) = 0;
 	};
 }
 

@@ -37,17 +37,17 @@ namespace MapDemoUI
 		//
 		// Constructor/destructor
 		//
-								AppStyle( ) { }
-		virtual					~AppStyle( ) { }
+		AppStyle( ) { }
+		virtual ~AppStyle( ) { }
 		//
 		// For client to implement
 		//
-		virtual Font*			getFont( FontSize size, Color color, bool bold ) const = 0;
-		virtual WidgetSkin*		getWidgetSkin( ) const = 0;
-		virtual WidgetSkin*		getButtonSkin( ) const = 0;
-		virtual int				getTabHeight( ) const = 0;
-		virtual int				getMenuItemHeight( ) const = 0;
-		virtual int				getSoftKeyBarHeight( ) const = 0;
+		virtual Font* getFont( FontSize size, Color color, bool bold ) const = 0;
+		virtual WidgetSkin* getWidgetSkin( ) const = 0;
+		virtual WidgetSkin* getButtonSkin( ) const = 0;
+		virtual int getTabHeight( ) const = 0;
+		virtual int getMenuItemHeight( ) const = 0;
+		virtual int getSoftKeyBarHeight( ) const = 0;
 	};
 }
 

@@ -21,12 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ExitAction.h"
 #include "AppStyleMgr.h"
 #include "IKeyHandler.h"
-//#include "TraceScope.h"
 
 namespace MapDemoUI 
 {
-	static const bool Trace = false;
-
 	static const int KeyRepeatMs = 150;
 	static const int MessagePostTimeMs = 2000;
 
@@ -51,9 +48,9 @@ namespace MapDemoUI
 				mHandler->handleKeyPress( mKeyCode );
 		}
 
-		IKeyHandler*		mHandler;
-		int					mKeyCode;
-		int					mRepeats;
+		IKeyHandler* mHandler;
+		int mKeyCode;
+		int mRepeats;
 	};
 
 	//=========================================================================

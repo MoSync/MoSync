@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MapDemoUI;
 using namespace MAP;
 
-namespace MAPDemo
+namespace MapDemo
 {
 	//=========================================================================
 	//
@@ -35,24 +35,29 @@ namespace MAPDemo
 	//=========================================================================
 	{
 	public:
-								MapLocationAction( MapWidget* widget, LonLat location, const char* label );
-		virtual					~MapLocationAction( );
+		MapLocationAction( MapWidget* widget, LonLat location, const char* label );
+		
+		virtual	~MapLocationAction( );
 		//
 		// Action overrides
 		//
-		virtual const char*		getShortName( ) const;
-		virtual Action*			clone( ) const { return newobject( MapLocationAction, new MapLocationAction( mWidget, mLocation, mLabel ) ); }
+		virtual const char* getShortName( ) const;
+		
+		virtual Action* clone( ) const 
+		{ 
+			return newobject( MapLocationAction, new MapLocationAction( mWidget, mLocation, mLabel ) ); 
+		}
 		
 	protected:
 		//
 		// Action protected overrides
 		//
-		virtual void			performPrim( );
+		virtual void performPrim( );
 
 	private:
-		MapWidget*				mWidget;
-		LonLat					mLocation;
-		const char*				mLabel;
+		MapWidget* mWidget;
+		LonLat mLocation;
+		const char* mLabel;
 	};
 }
 

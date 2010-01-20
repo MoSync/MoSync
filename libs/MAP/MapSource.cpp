@@ -67,13 +67,40 @@ namespace MAP
 		//
 		// Field accessors
 		//
-		MapSourceKind		getSourceKind( ) const { return mSourceKind; }
-		void				setSourceKind( MapSourceKind sourceKind ) { mSourceKind = sourceKind; }
-		MapTileCoordinate	getTileXY( ) const { return mTileXY; }
-		void				setTileXY( const MapTileCoordinate tileXY ) { mTileXY = tileXY; }
-		MapSourceInnerClientData* getClientData( ) const { return mClientData; }
-		void				setClientData( MapSourceInnerClientData* clientData ) { mClientData = clientData; }
-		const char*			getUrl( ) { return mUrl.c_str( ); }
+		MapSourceKind getSourceKind( ) const 
+		{
+			return mSourceKind; 
+		}
+
+		void setSourceKind( MapSourceKind sourceKind ) 
+		{
+			mSourceKind = sourceKind; 
+		}
+		
+		MapTileCoordinate getTileXY( ) const 
+		{
+			return mTileXY; 
+		}
+
+		void setTileXY( const MapTileCoordinate tileXY ) 
+		{
+			mTileXY = tileXY; 
+		}
+
+		MapSourceInnerClientData* getClientData( ) const 
+		{
+			return mClientData; 
+		}
+		
+		void setClientData( MapSourceInnerClientData* clientData ) 
+		{
+			mClientData = clientData; 
+		}
+
+		const char* getUrl( ) 
+		{
+			return mUrl.c_str( ); 
+		}
 
 		int beginDownloading( const char* url, MAHandle placeholder = 0 )
 		{
@@ -85,9 +112,9 @@ namespace MAP
 		}
 
 	private:
-		String				mUrl;
-		MapSourceKind		mSourceKind;
-		MapTileCoordinate	mTileXY;
+		String mUrl;
+		MapSourceKind mSourceKind;
+		MapTileCoordinate mTileXY;
 		MapSourceInnerClientData* mClientData;
 	};
 
@@ -107,12 +134,23 @@ namespace MAP
 			deleteobject( mClientData );
 		}
 
-		MapTileCoordinate getTileXY( ) const { return mTileXY; }
-		MapSourceInnerClientData* getClientData( ) const { return mClientData; }
-		void setClientData( MapSourceInnerClientData* clientData ) { mClientData = clientData; }
+		MapTileCoordinate getTileXY( ) const 
+		{
+			return mTileXY; 
+		}
+		
+		MapSourceInnerClientData* getClientData( ) const 
+		{
+			return mClientData; 
+		}
+
+		void setClientData( MapSourceInnerClientData* clientData ) 
+		{
+			mClientData = clientData; 
+		}
 
 	private:
-		MapTileCoordinate		mTileXY;
+		MapTileCoordinate mTileXY;
 		MapSourceInnerClientData* mClientData; //  lifespan managed by MapSourceImageDownloader
 	};
 

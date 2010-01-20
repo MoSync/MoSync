@@ -55,31 +55,35 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								ModalScreen( );
-		virtual					~ModalScreen( );
+		ModalScreen( );
+		
+		virtual ~ModalScreen( );
 		//
 		// public methods
 		//
-		void					close( );
+		void close( );
 		//
 		// Screen overrides
 		//
-		void					keyPressEvent( int keyCode ); // client can't override
-		void					keyReleaseEvent( int keyCode ); // client can't override
-		virtual void			show( );
-		virtual void			show( Screen* previous );
+		void keyPressEvent( int keyCode ); // client can't override
+		
+		void keyReleaseEvent( int keyCode ); // client can't override
+		
+		virtual void show( );
+		
+		virtual void show( Screen* previous );
 		//
 		// IKeyHandler implementation
 		//
-		virtual bool			handleKeyPress( int keyCode ) = 0;
-		virtual bool			handleKeyRelease( int keyCode ) = 0;
+		virtual bool handleKeyPress( int keyCode ) = 0;
+		virtual bool handleKeyRelease( int keyCode ) = 0;
 
 	protected:
-		int 					mWidth;
-		int 					mHeight;
+		int mWidth;
+		int mHeight;
 
 	private:
-		Screen*					mPrevious;
+		Screen* mPrevious;
 	};
 }
 

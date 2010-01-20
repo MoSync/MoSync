@@ -47,46 +47,57 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								AppScreenBase( MobletEx* mMoblet );
-		virtual					~AppScreenBase( );
+		AppScreenBase( MobletEx* mMoblet );
+		
+		virtual ~AppScreenBase( );
 
-		void					setClientWidget( Widget* widget );
-		static Screen*			getCurrentScreen( ) { return currentScreen; }	
-		Moblet*					getMoblet( ) { return mMoblet; }
+		void setClientWidget( Widget* widget );
+		
+		static Screen* getCurrentScreen( ) 
+		{
+			return currentScreen; 
+		}	
+		
+		Moblet* getMoblet( ) 
+		{ 
+			return mMoblet; 
+		}
+
 		//
 		// Screen overrides
 		//
-		void					keyPressEvent( int keyCode );
-		void					keyReleaseEvent( int keyCode );
+		void keyPressEvent( int keyCode );
+		void keyReleaseEvent( int keyCode );
 		//
 		// IMessageListener implementation
 		//
-		virtual void			messagePosted( MessageMgr* sender );
+		virtual void messagePosted( MessageMgr* sender );
 		//
 		// TimerListener implementation
 		//
-		virtual void			runTimerEvent( );
+		virtual void runTimerEvent( );
 		//
 		// IKeyHandler implementation
 		//
-		virtual bool			handleKeyPress( int keyCode );
-		virtual bool			handleKeyRelease( int keyCode );
+		virtual bool handleKeyPress( int keyCode );
+		virtual bool handleKeyRelease( int keyCode );
 		//
 		// IActionSource implementation
 		//
-		virtual void			enumerateActions( Vector<Action*>& list ) = 0;
+		virtual void enumerateActions( Vector<Action*>& list ) = 0;
 
 	protected:
-		MobletEx*				mMoblet;
-		int 					mWidth;
-		int 					mHeight;
-		SoftKeyBar*				mSoftKeyBar;
+		MobletEx* mMoblet;
+		int mWidth;
+		int mHeight;
+		SoftKeyBar* mSoftKeyBar;
 
 	private:
-		Layout*					mContentFrame;
-		AppFrame*				mAppFrame;
-		bool					mMessagePosted;
-		KeyRepeatTimer*			mKeyTimer;
+		Layout* mContentFrame;
+		AppFrame* mAppFrame;
+		bool mMessagePosted;
+		KeyRepeatTimer* mKeyTimer;
 	};
 };
+
 #endif // APPSCREENBASE_H_

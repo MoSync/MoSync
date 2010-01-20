@@ -25,28 +25,48 @@ namespace MapDemoUtil
 	//=========================================================================
 	{
 	public:
-								Color( ) { }
+		Color( ) 
+		{ 
+		}
+
 	private:
-								Color( int val ) : mVal( val ) { }
+		Color( int val ) 
+			: mVal( val ) 
+		{ 
+		}
+
 	public:
-								~Color( ) { } // must not be virtual, to avoid vtable
+		~Color( ) { } // must not be virtual, to avoid vtable
 
-		static Color			fromInt( int val ) { return Color( val ); }
+		static Color fromInt( int val ) 
+		{
+			return Color( val ); 
+		}
 
-		int						val( ) const { return mVal; }
+		int val( ) const 
+		{
+			return mVal; 
+		}
 
-		static const Color		black;
-		static const Color		white;
-		static const Color		red;
-		static const Color		green;
-		static const Color		blue;
+		static const Color black;
+		static const Color white;
+		static const Color red;
+		static const Color green;
+		static const Color blue;
 
 	private:
-		int						mVal;
+		int mVal;
 	};
 
-	inline bool operator == ( const Color& a, const Color& b ) { return a.val( ) == b.val( ); }
-	inline bool operator != ( const Color& a, const Color& b ) { return a.val( ) != b.val( ); }
+	inline bool operator == ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) == b.val( ); 
+	}
+
+	inline bool operator != ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) != b.val( ); 
+	}
 }
 
 #endif // COLOR_H_

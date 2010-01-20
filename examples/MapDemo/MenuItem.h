@@ -31,13 +31,14 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								MenuItem( Action* action );
-		virtual					~MenuItem( );
+		MenuItem( Action* action );
+		
+		virtual ~MenuItem( );
 
-		Action*					getAction( ) const;
+		Action* getAction( ) const;
 
 	private:
-		Action*					mAction;
+		Action* mAction;
 	};
 }
 

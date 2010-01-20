@@ -33,18 +33,18 @@ namespace MAP
 	//=========================================================================
 	{
 	private:
-								MapSourceMgr( );
+		MapSourceMgr( );
+
 	public:
-		virtual					~MapSourceMgr( );
+		virtual ~MapSourceMgr( );
 
-		static MapSourceMgr*	get( );
-		static void				shutdown( );
+		static MapSourceMgr* get( );
+		static void shutdown( );
 
-		MapSource*				getMapSource( MapSourceKind kind );
+		MapSource* getMapSource( MapSourceKind kind );
 
 	private:
-		static MapSourceMgr*	sSingleton;
-
+		static MapSourceMgr* sSingleton;
 		Map<MapSourceKind, MapSource*> mMap;
 	};
 }

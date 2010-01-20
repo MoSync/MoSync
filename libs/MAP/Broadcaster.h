@@ -24,33 +24,35 @@ using namespace MAUtil;
 
 namespace MAPUtil
 {
-    //=========================================================================
-    template<class T>
-    class Broadcaster
-    //=========================================================================
-    {
-    public:
-                            Broadcaster( ) { }
-        virtual				~Broadcaster( ) { }
+	//=========================================================================
+	template<class T>
+	class Broadcaster
+	//=========================================================================
+	{
+	public:
+		//
+		// listener property
+		//
+		void addListener( T* listener ) 
+		{
+			mListeners.add( listener );
+		}
 
-        //
-        // listener property
-        //
-        void				addListener( T* listener ) { mListeners.add( listener ); }
-        void				removeListener( T* listener ) 
-                            { 
-                                for ( int i = 0; i < mListeners.size( ); i++ ) 
-                                {
-                                    if ( mListeners[i] == listener )
-									{
-                                        mListeners.remove( i );
-                                        return;
-                                    }
-                                }
-                            }
-    protected:
-        Vector<T*>			mListeners;
-    };
+		void removeListener( T* listener ) 
+		{ 
+			for ( int i = 0; i < mListeners.size( ); i++ ) 
+			{
+				if ( mListeners[i] == listener )
+				{
+					mListeners.remove( i );
+					return;
+				}
+			}
+		}
+
+	protected:
+		Vector<T*> mListeners;
+	};
 }
 
 #endif // BROADCASTER_H_

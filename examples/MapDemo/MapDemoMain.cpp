@@ -18,8 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 
 #include "AppStyleMgr.h"
-#include "MAPDemoAppStyle.h"
-#include "MAPDemoMoblet.h"
+#include "MapDemoAppStyle.h"
+#include "MapDemoMoblet.h"
 
 //-------------------------------------------------------------------------
 extern "C" int MAMain( )
@@ -28,8 +28,8 @@ extern "C" int MAMain( )
 	//
 	// Init app style
 	//
-	AppStyleMgr::setStyle( newobject( MAPDemo::MAPDemoAppStyle, new MAPDemo::MAPDemoAppStyle( ) ) );
+	AppStyleMgr::setStyle( newobject( MapDemo::MapDemoAppStyle, new MapDemo::MapDemoAppStyle( ) ) );
 
-	Moblet::run( newobject( MAPDemo::MAPDemoMoblet, new MAPDemo::MAPDemoMoblet( ) ) );
+	Moblet::run( newobject( MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet( ) ) );
 	return 0;
 }

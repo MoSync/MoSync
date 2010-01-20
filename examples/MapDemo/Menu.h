@@ -37,28 +37,28 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								Menu( IActionSource* source );
-		virtual					~Menu( );
+		Menu( IActionSource* source );
+		virtual ~Menu( );
 		//
 		// public methods
 		//
-		void					triggerSelectedItem( );
+		void triggerSelectedItem( );
 
 		//
 		// ModalScreen overrides
 		//
-		virtual bool			handleKeyPress( int keyCode );
-		virtual bool			handleKeyRelease( int keyCode );
+		virtual bool handleKeyPress( int keyCode );
+		virtual bool handleKeyRelease( int keyCode );
 
 	protected:
 
 	private:
-		void					updateSelection( );
+		void updateSelection( );
 
-		Layout*					mFrame;
-		ListBox*				mListBox;
-		SoftKeyBar*				mSoftKeys;
-		int						mCurrent;
+		Layout* mFrame;
+		ListBox* mListBox;
+		SoftKeyBar* mSoftKeys;
+		int mCurrent;
 	};
 }
 

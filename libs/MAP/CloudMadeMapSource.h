@@ -36,11 +36,11 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		static const char*	ApiKey;
+		static const char* ApiKey;
 
 	public:
-							CloudMadeMapSource( int style ) : MapSource( ), mStyle( style ) { }
-		virtual				~CloudMadeMapSource( ) { }
+		CloudMadeMapSource( int style ) : MapSource( ), mStyle( style ) { }
+		virtual ~CloudMadeMapSource( ) { }
 		//
 		// MapSource overrides
 		//
@@ -54,20 +54,41 @@ namespace MAP
 			}
 		}
 
-		MAExtent			getTileSize( ) const			{ return 256; }
-		int					getMagnificationMin( ) const	{ return 1; }
-		int					getMagnificationMax( ) const	{ return 17; }
-		int					getStyle( ) const				{ return mStyle; }
-		void				setStyle( int style )			{ mStyle = style; }
+		MAExtent getTileSize( ) const
+		{
+			return 256; 
+		}
 
-		void				getTileUrl( char* buffer, MapTileCoordinate tileXY );
-		MapTileCoordinate	lonLatToTile( LonLat lonlat, int magnification );
-		PixelCoordinate		lonLatToPixel( LonLat lonlat, int magnification );
-		LonLat				tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
+		int getMagnificationMin( ) const
+		{
+			return 1;
+		}
 
+		int getMagnificationMax( ) const
+		{
+			return 17;
+		}
+
+		int getStyle( ) const
+		{
+			return mStyle;
+		}
+
+		void setStyle( int style )
+		{
+			mStyle = style;
+		}
+
+		void getTileUrl( char* buffer, MapTileCoordinate tileXY );
+
+		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
+
+		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
+
+		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 		
 	private:
-		int					mStyle;
+		int mStyle;
 	};
 }
 

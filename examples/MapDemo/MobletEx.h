@@ -32,12 +32,16 @@ namespace MapDemoUtil
 	//=========================================================================
 	{ 
 	public:
-								MobletEx( ) : Moblet( ) { }
-		virtual					~MobletEx( ) { }
+		MobletEx( ) 
+			: Moblet( ) 
+		{ 
+		}
+
+		virtual ~MobletEx( ) { }
 		//
 		// for client to override
 		//
-		virtual void			shutdown( ) = 0;
+		virtual void shutdown( ) = 0;
 	};
 }
 

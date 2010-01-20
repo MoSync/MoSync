@@ -16,13 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "HelloMapMoblet.h"
-//#include "MapSourceMgr.h"
 #include "CloudMadeMapSource.h"
 #include "GoogleMapSource.h"
 #include "config.h"
 
 using namespace MAUtil;
-//using namespace MapDemoUtil;
 
 namespace HelloMap
 {
@@ -48,15 +46,4 @@ namespace HelloMap
 	//-------------------------------------------------------------------------
 	{
 	}
-
-	////-------------------------------------------------------------------------
-	//void HelloMapMoblet::shutdown( )
-	////-------------------------------------------------------------------------
-	//{
-	//	deleteobject( mScreen );
-	//	MapCache::shutdown( );
-	//	MapSourceMgr::shutdown( );
-	//	delete this;
-	//	maExit( 0 );
-	//}
 }

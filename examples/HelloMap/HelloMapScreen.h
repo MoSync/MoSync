@@ -20,12 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUI/Screen.h>
 #include <MAUtil/Moblet.h>
-//#include "AppScreen.h"
 #include "MapWidget.h"
 #include "MapSourceMgr.h"
 
 using namespace MAP;
-//using namespace MapDemoUI;
 
 namespace HelloMap 
 {
@@ -44,10 +42,6 @@ namespace HelloMap
 		//
 		void					keyPressEvent( int keyCode );
 		void					keyReleaseEvent( int keyCode );
-
-		//virtual bool			handleKeyPress( int keyCode );
-		//virtual bool			handleKeyRelease( int keyCode );
-		//virtual void			enumerateActions( Vector<Action*>& list );
 
 	private:
 		void					nextMapSource( );

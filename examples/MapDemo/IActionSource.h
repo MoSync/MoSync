@@ -34,7 +34,7 @@ namespace MapDemoUI
 	class IActionSource
 	{
 	public:
-		virtual void	enumerateActions( Vector<Action*>& list ) = 0;
+		virtual void enumerateActions( Vector<Action*>& list ) = 0;
 	};
 }
 

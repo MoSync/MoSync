@@ -56,102 +56,103 @@ namespace MAP
 		friend class MapWidgetPanTimerListener;
 
 	public:
-							MapWidget(int x, int y, int width, int height, Widget* parent);
-		virtual				~MapWidget( );
+		MapWidget(int x, int y, int width, int height, Widget* parent);
+		
+		virtual ~MapWidget( );
 		//
 		// Map update scope
 		//
-		void				enterMapUpdateScope( );
-		void				exitMapUpdateScope( bool immediate );
-		void				updateMap( );
+		void enterMapUpdateScope( );
+		void exitMapUpdateScope( bool immediate );
+		void updateMap( );
 		//
 		// Map source property
 		//
-		MapSourceKind		getMapSourceKind( ) const { return mSourceKind; }
-		void				setMapSourceKind( MapSourceKind sourceKind );
+		MapSourceKind getMapSourceKind( ) const { return mSourceKind; }
+		void setMapSourceKind( MapSourceKind sourceKind );
 		//
 		// Center position property
 		//
-		LonLat				getCenterPosition( ) const;
-		void				setCenterPosition( LonLat position );
-		PixelCoordinate		getCenterPositionPixels( ) const;
+		LonLat getCenterPosition( ) const;
+		void setCenterPosition( LonLat position );
+		PixelCoordinate getCenterPositionPixels( ) const;
 		//
 		// Magnification property
 		//
-		int					getMagnification( ) const;
-		void				setMagnification( int magnification );
+		int getMagnification( ) const;
+		void setMagnification( int magnification );
 		//
 		// Magnification scale display property
 		//
-		bool				getHasScale( ) const { return mHasScale; }
-		void				setHasScale( bool hasScale ) { mHasScale = hasScale; }
+		bool getHasScale( ) const { return mHasScale; }
+		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
 		//
 		// Smooth panning property
 		//
-		bool				getHasSmoothPanning( ) const;
-		void				setHasSmoothPanning( bool hasSmoothPanning );
+		bool getHasSmoothPanning( ) const;
+		void setHasSmoothPanning( bool hasSmoothPanning );
 		//
 		// Font property
 		//
-		Font*				getFont( ) const { return mFont; }
-		void				setFont( Font* font ) { mFont = font; }
+		Font* getFont( ) const { return mFont; }
+		void setFont( Font* font ) { mFont = font; }
 
 		//
 		// Navigation
 		//
-		void				scroll( MapWidgetScrollDirection direction, bool largeStep);
+		void scroll( MapWidgetScrollDirection direction, bool largeStep);
 		//
 		// Zooming
 		//
-		void				zoomIn( );
-		void				zoomOut( );
+		void zoomIn( );
+		void zoomOut( );
 		//
 		// Widget overrides
 		//
-		virtual void		setWidth( int width );
-		virtual void		setHeight( int height );
+		virtual void setWidth( int width );
+		virtual void setHeight( int height );
 		//
 		// Key handling
 		//
-		virtual bool		handleKeyPress( int keyCode );
-		virtual bool		handleKeyRelease( int keyCode );
+		virtual bool handleKeyPress( int keyCode );
+		virtual bool handleKeyRelease( int keyCode );
 		//
 		// IMapCacheListener implementation
 		//
-		virtual void		tileReceived( MapCache* sender, MapTile* tile );
+		virtual void tileReceived( MapCache* sender, MapTile* tile );
 		//
 		// Coord conversions
 		//
-		MAPoint2d			worldPixelToWidget( PixelCoordinate wpx );
-		PixelCoordinate		widgetToWorldPixel( MAPoint2d pt );
+		MAPoint2d worldPixelToWidget( PixelCoordinate wpx );
+		PixelCoordinate widgetToWorldPixel( MAPoint2d pt );
 
 	protected:
 		//
 		// Redraw
 		//
-		virtual void		drawOverlay( );
-		virtual void		drawWidget( );
-		Point				getActualPosition( );
+		virtual void drawOverlay( );
+		virtual void drawWidget( );
+		Point getActualPosition( );
 
 	private:
-		void				resetScreenImage( );
-		void				checkMapUpdateScope( );
+		void resetScreenImage( );
+		void checkMapUpdateScope( );
 
-		LonLat				mCenterPositionLonLat;
-		PixelCoordinate		mCenterPositionPixels;
-		LonLat				mPanTargetPositionLonLat;
-		PixelCoordinate		mPanTargetPositionPixels;
-		int					mMagnification;
-		MapSourceKind		mSourceKind;
-		int					mMapUpdateNesting;
-		PixelCoordinate		mPrevCenter;
-		int					mPrevMagnification;
-		MAHandle			mScreenImage;
-		bool				mHasScale;
-		MapWidgetPanTimerListener*	mPanTimerListener;
-		bool				mHasSmoothPanning;
-		Font*				mFont;
-		bool				mTimerRunning;
+		LonLat mCenterPositionLonLat;
+		PixelCoordinate mCenterPositionPixels;
+		LonLat mPanTargetPositionLonLat;
+		PixelCoordinate mPanTargetPositionPixels;
+		int mMagnification;
+		MapSourceKind mSourceKind;
+		int mMapUpdateNesting;
+		PixelCoordinate mPrevCenter;
+		int mPrevMagnification;
+		MAHandle mScreenImage;
+		bool mHasScale;
+		MapWidgetPanTimerListener* mPanTimerListener;
+		bool mHasSmoothPanning;
+		Font* mFont;
+		bool mTimerRunning;
 	};
 }
 #endif // MAPWIDGET_H_

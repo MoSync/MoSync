@@ -43,10 +43,10 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		static const char*	ApiKey;
+		static const char* ApiKey;
 
-								GoogleMapSource( GoogleMapsMapKind mapKind );
-		virtual					~GoogleMapSource( );
+		GoogleMapSource( GoogleMapsMapKind mapKind );
+		virtual	~GoogleMapSource( );
 		//
 		// MapSource overrides
 		//
@@ -61,15 +61,31 @@ namespace MAP
 			}
 		}
 
-		MAExtent				getTileSize( ) const { return 256; }
-		int						getMagnificationMin( ) const { return 1; }
-		int						getMagnificationMax( ) const { return 17; }
-		void					getTileUrl( char* buffer, MapTileCoordinate tileXY );
-		MapTileCoordinate		lonLatToTile( LonLat lonlat, int magnification );
-		PixelCoordinate			lonLatToPixel( LonLat lonlat, int magnification );
-		LonLat					tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
+		MAExtent getTileSize( ) const 
+		{
+			return 256; 
+		}
+
+		int getMagnificationMin( ) const 
+		{
+			return 1; 
+		}
+
+		int getMagnificationMax( ) const 
+		{
+			return 17; 
+		}
+
+		void getTileUrl( char* buffer, MapTileCoordinate tileXY );
+
+		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
+
+		PixelCoordinate	lonLatToPixel( LonLat lonlat, int magnification );
+		
+		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
+	
 	private:
-		GoogleMapsMapKind		mMapKind;
+		GoogleMapsMapKind mMapKind;
 	};
 }
 

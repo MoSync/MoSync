@@ -27,8 +27,8 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-		virtual bool				handleKeyPress( int keyCode ) = 0;
-		virtual bool				handleKeyRelease( int keyCode ) = 0;
+		virtual bool handleKeyPress( int keyCode ) = 0;
+		virtual bool handleKeyRelease( int keyCode ) = 0;
 	};
 }
 

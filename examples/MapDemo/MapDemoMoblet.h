@@ -19,24 +19,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAPDEMOMOBLET_H_
 
 #include "MobletEx.h"
-#include "MAPDemoScreen.h"
+#include "MapDemoScreen.h"
 
 using namespace MapDemoUI;
 
-namespace MAPDemo
+namespace MapDemo
 {
 	//=========================================================================
-	class MAPDemoMoblet : public MobletEx
+	class MapDemoMoblet : public MobletEx
 	//=========================================================================
 	{
 	public:
-								MAPDemoMoblet( );
-		virtual					~MAPDemoMoblet( );
+		MapDemoMoblet( );
+		virtual ~MapDemoMoblet( );
 
-		virtual void			shutdown( );
+		virtual void shutdown( );
 
 	private:
-		MAPDemoScreen*			mScreen;
+		MapDemoScreen* mScreen;
 	};
 }
 

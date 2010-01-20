@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "MAPDemoMoblet.h"
+#include "MapDemoMoblet.h"
 #include "MapSourceMgr.h"
 #include "CloudMadeMapSource.h"
 #include "GoogleMapSource.h"
@@ -24,16 +24,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 using namespace MapDemoUtil;
 
-namespace MAPDemo
+namespace MapDemo
 {
-	static const bool Trace = false;
-
 	const int BottomHeight = 25;
 
 	//-------------------------------------------------------------------------
-	MAPDemoMoblet::MAPDemoMoblet( )
-		: mScreen( NULL )
+	MapDemoMoblet::MapDemoMoblet( )
 	//-------------------------------------------------------------------------
+		: mScreen( NULL )
 	{
 		//
 		// Map keys are defined in config.h
@@ -43,18 +41,18 @@ namespace MAPDemo
 		CloudMadeMapSource::ApiKey = CLOUDMADE_API_KEY;
 		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
 		
-		mScreen = newobject( MAPDemoScreen, new MAPDemoScreen( (MobletEx*)this ) );
+		mScreen = newobject( MapDemoScreen, new MapDemoScreen( (MobletEx*)this ) );
 		mScreen->show( );
 	}
 
 	//-------------------------------------------------------------------------
-	MAPDemoMoblet::~MAPDemoMoblet( )
+	MapDemoMoblet::~MapDemoMoblet( )
 	//-------------------------------------------------------------------------
 	{
 	}
 
 	//-------------------------------------------------------------------------
-	void MAPDemoMoblet::shutdown( )
+	void MapDemoMoblet::shutdown( )
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mScreen );

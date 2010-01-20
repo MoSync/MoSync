@@ -15,21 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <conprint.h>
-
-//#include "AppStyleMgr.h"
-//#include "MAPDemoAppStyle.h"
 #include "HelloMapMoblet.h"
 
 //-------------------------------------------------------------------------
 extern "C" int MAMain( )
 //-------------------------------------------------------------------------
 {
-	//
-	// Init app style
-	//
-	//AppStyleMgr::setStyle( newobject( MAPDemo::MAPDemoAppStyle, new MAPDemo::MAPDemoAppStyle( ) ) );
-
 	Moblet::run( newobject( HelloMap::HelloMapMoblet, new HelloMap::HelloMapMoblet( ) ) );
 	return 0;
 }

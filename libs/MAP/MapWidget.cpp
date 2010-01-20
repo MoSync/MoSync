@@ -32,10 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//
-	// Debug
-	//
-	static const bool Trace = false;
-	//
 	// Appearance
 	//
 	static const bool ShowPixelScale = true; // shows scale slider
@@ -91,7 +87,7 @@ namespace MAP
 		}
 
 	private:
-		MapWidget*		mWidget;
+		MapWidget* mWidget;
 	};
 
 	//=========================================================================
@@ -190,8 +186,6 @@ namespace MAP
 	void MapWidget::setCenterPosition( LonLat position )
 	//-------------------------------------------------------------------------
 	{
-		//if ( Trace ) trace( );
-
 		checkMapUpdateScope( );
 
 		if ( mHasSmoothPanning )

@@ -20,9 +20,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MapDemoUI
 {
 	//-------------------------------------------------------------------------
-	CloseMenuAction::CloseMenuAction( Menu* menu ) :
+	CloseMenuAction::CloseMenuAction( Menu* menu )
+		: mMenu( menu )
 	//-------------------------------------------------------------------------
-		mMenu( menu )
 	{
 	}
 

@@ -15,15 +15,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "MAPDemoScreen.h"
+#include "MapDemoScreen.h"
 #include "ExitAction.h"
 #include "MapLocationAction.h"
 #include "AppStyleMgr.h"
 
-namespace MAPDemo
+namespace MapDemo
 {
-	static const bool Trace = false;
-
 	//-------------------------------------------------------------------------
 	static const char* MapSourceKindToString( MapSourceKind kind )
 	//-------------------------------------------------------------------------
@@ -43,7 +41,7 @@ namespace MAPDemo
 	}
 
 	//-------------------------------------------------------------------------
-	MAPDemoScreen::MAPDemoScreen( MobletEx* moblet ) :
+	MapDemoScreen::MapDemoScreen( MobletEx* moblet ) :
 		AppScreen( moblet )
 	//-------------------------------------------------------------------------
 	{
@@ -67,14 +65,14 @@ namespace MAPDemo
 	}
 
 	//-------------------------------------------------------------------------
-	MAPDemoScreen::~MAPDemoScreen( )
+	MapDemoScreen::~MapDemoScreen( )
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mMap );
 	}
 
 	//-------------------------------------------------------------------------
-	bool MAPDemoScreen::handleKeyPress( int keyCode )
+	bool MapDemoScreen::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
 		switch( keyCode )
@@ -90,7 +88,7 @@ namespace MAPDemo
 	}
 
 	//-------------------------------------------------------------------------
-	bool MAPDemoScreen::handleKeyRelease( int keyCode )
+	bool MapDemoScreen::handleKeyRelease( int keyCode )
 	//-------------------------------------------------------------------------
 	{
 		if ( AppScreen::handleKeyRelease( keyCode ) )
@@ -100,7 +98,7 @@ namespace MAPDemo
 	}
 
 	//-------------------------------------------------------------------------
-	void MAPDemoScreen::nextMapSource( )
+	void MapDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
 		MapSourceMgr* mgr = MapSourceMgr::get( );
@@ -113,7 +111,7 @@ namespace MAPDemo
 	}
 
 	//-------------------------------------------------------------------------
-	void MAPDemoScreen::enumerateActions( Vector<Action*>& list )
+	void MapDemoScreen::enumerateActions( Vector<Action*>& list )
 	//-------------------------------------------------------------------------
 	{
 		// add my actions

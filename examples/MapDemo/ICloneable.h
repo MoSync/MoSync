@@ -29,7 +29,7 @@ namespace MapDemoUtil
 		//
 		// Abstract methods for client to implement
 		//
-		virtual T*		clone( ) const = 0;
+		virtual T* clone( ) const = 0;
 	};
 }
 

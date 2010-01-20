@@ -32,22 +32,30 @@ namespace MapDemoUI
 	//=========================================================================
 	{
 	public:
-								TriggerMenuSelectionAction( Menu* menu );
-		virtual					~TriggerMenuSelectionAction( );
+		TriggerMenuSelectionAction( Menu* menu );
+		
+		virtual ~TriggerMenuSelectionAction( );
 		//
 		// Action overrides
 		//
-		virtual const char*		getShortName( ) const {  return "OK"; }
-		virtual Action*			clone( ) const { return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( mMenu ) ); }
+		virtual const char* getShortName( ) const 
+		{  
+			return "OK"; 
+		}
+
+		virtual Action* clone( ) const 
+		{ 
+			return newobject( TriggerMenuSelectionAction, new TriggerMenuSelectionAction( mMenu ) ); 
+		}
 
 	protected:
 		//
 		// Action protected overrides
 		//
-		virtual void			performPrim( );
+		virtual void performPrim( );
 
 	private:
-		Menu*					mMenu;
+		Menu* mMenu;
 	};
 }
 

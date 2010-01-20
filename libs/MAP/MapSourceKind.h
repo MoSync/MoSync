@@ -31,7 +31,7 @@ namespace MAP
 		MapSourceKind_GoogleHybrid,
 		MapSourceKind_CloudMade1,
 		MapSourceKind_CloudMade7,
-		//MapSourceKind_VirtualEarth, //not working for reasons unknown, server not responding.
+		//MapSourceKind_VirtualEarth, //not yet implemented
 		MapSourceKind_Last
 	};
 }

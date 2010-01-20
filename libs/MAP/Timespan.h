@@ -126,25 +126,56 @@ namespace MAPUtil
 	//
 	// Unary negation operator.
 	//
-	inline TimeSpan operator - ( const TimeSpan& t )						{ return t.negate( ); }
+	inline TimeSpan operator - ( const TimeSpan& t )
+	{ 
+		return t.negate( ); 
+	}
 	//
 	// Binary subtraction operator.
 	//
-	inline TimeSpan operator - ( const TimeSpan& t1, const TimeSpan& t2 )	{ return t1.subtract( t2 ); }
+	inline TimeSpan operator - ( const TimeSpan& t1, const TimeSpan& t2 )	
+	{ 
+		return t1.subtract( t2 ); 
+	}
 	//
 	// Binary addition operator.
 	//
-	inline TimeSpan operator + ( const TimeSpan& t1, const TimeSpan& t2 )	{ return TimeSpan( (int)t1.getTicks( ) + (int)t2.getTicks( ) ); }
+	inline TimeSpan operator + ( const TimeSpan& t1, const TimeSpan& t2 )	
+	{ 
+		return TimeSpan( (int)t1.getTicks( ) + (int)t2.getTicks( ) ); 
+	}
 	//
 	// Comparison operators.
 	//
-	inline bool operator == ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) == t2.getTicks( ); }
-	inline bool operator != ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) != t2.getTicks( ); }
-	inline bool operator < ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) < t2.getTicks( ); }
-	inline bool operator <= ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) <= t2.getTicks( ); }
-	inline bool operator > ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) > t2.getTicks( ); }
-	inline bool operator >= ( const TimeSpan& t1, const TimeSpan& t2 )		{ return t1.getTicks( ) >= t2.getTicks( ); }
-
+	inline bool operator == ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) == t2.getTicks( ); 
+	}
+	
+	inline bool operator != ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) != t2.getTicks( ); 
+	}
+	
+	inline bool operator < ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) < t2.getTicks( ); 
+	}
+	
+	inline bool operator <= ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) <= t2.getTicks( ); 
+	}
+	
+	inline bool operator > ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) > t2.getTicks( ); 
+	}
+	
+	inline bool operator >= ( const TimeSpan& t1, const TimeSpan& t2 )		
+	{ 
+		return t1.getTicks( ) >= t2.getTicks( ); 
+	}
 }
 
 #endif // TIMESPAN_H_
