@@ -294,6 +294,8 @@ static PlainOldData parseAnonStruct(int currentIx) {
 	sInf->structs.push_back(s);
 	PlainOldData pod;
 	pod.type = s.name;
+	readToken(pod.name);
+	doExact(";");
 	return pod;
 }
 

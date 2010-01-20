@@ -1160,7 +1160,7 @@ interface MAAPI {
 				* In KEY events, this will be the native keycode.
 				*/
 				int nativeKey;
-			}
+			} ked;
 
 			/**
 			 * In POINTER events, this will be the location of the pointer.

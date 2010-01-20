@@ -538,7 +538,7 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 #define SCANTOMAK_CASE(name, num)\
 	case num: makey = MAK_##name; makb = MAKB_##name; break;
 
-	int makey = 0;
+	int makey;
 	int makb = 0;
 	switch(scancode) {
 		STDKEYS(SCANTOMAK_CASE);
@@ -554,6 +554,7 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		break;
 	default:
 		LOG("Unknown scancode: %i\n", scancode);
+		makey = MAK_UNKNOWN;
 	}
 	switch(aKeyEvent.iCode) {
 #define DO_NUMBER(n) case ('0' + n): makey = MAK_##n; break;
@@ -569,21 +570,20 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		DO_NUMBER(9);
 	}
 
-	if(makey) {
-		if(down)
-			iKeys |= makb;
-		else
-			iKeys &= ~makb;
-				
-		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
-			MAEvent event;
-			event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
-			event.key = makey;
-			AddEvent(event);
-		}
+	if(down)
+		iKeys |= makb;
+	else
+		iKeys &= ~makb;
+			
+	if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
+		MAEvent event;
+		event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
+		event.ked.key = makey;
+		event.ked.nativeKey = scancode;
+		AddEvent(event);
 	}
 
-	return makey ? EKeyWasConsumed : EKeyWasNotConsumed;
+	return EKeyWasConsumed;
 }
 
 bool CAppView::AddEvent(const MAEvent& event) {

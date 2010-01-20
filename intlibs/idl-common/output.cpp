@@ -41,7 +41,7 @@ using namespace std;
 #define DUMPSIZE(s) { DO_LEVEL; printf("%s: %" PFZT "\n", #s, s); }
 #define DUMPSTRING(s) { DO_LEVEL; printf("%s: \"%s\"\n", #s, s.c_str()); }
 
-static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix);
+static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix, bool runtime);
 static void streamIoctls(ostream& stream, const Interface& inf, int ix);
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix);
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
@@ -190,7 +190,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	streamTypedefs(stream, inf.typedefs, ix);
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
-	streamStructs(stream, inf.structs, ix);
+	streamStructs(stream, inf.structs, ix, false);
 	if(ix == MAIN_INTERFACE) {
 		streamHeaderFunctions(stream, inf, false);
 	}
@@ -230,7 +230,7 @@ void streamMoSyncDllDefines(ostream& stream) {
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
-	const vector<Struct>& structs)
+	const vector<Struct>& structs, bool runtime)
 {
 	bool lastPodHadComment = false;
 	for(size_t k=0; k<members.size(); k++) {
@@ -257,7 +257,7 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 				}
 			}	//comment
 			if(isAnonStructName(pod.type)) {
-				if(pod.name.size() > 0 || pod.comment.size() > 0)
+				if(pod.name.empty() || pod.comment.size() > 0)
 					throwException("Bad anonymous struct");
 				//find struct definition
 				bool found = false;
@@ -265,9 +265,17 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 					const Struct& as(structs[m2]);
 					if(as.name == pod.type) {
 						//print it
+						if(runtime) {
+							stream << "#ifdef SYMBIAN\n";
+							stream << tab << pod.type << " " << pod.name << ";\n";
+							stream << "#else\n";
+						}
 						stream << tab << "struct {\n";
-						streamMembers(stream, tab + "\t", as.members, structs);
+						streamMembers(stream, tab + "\t", as.members, structs, runtime);
 						stream << tab << "};\n";
+						if(runtime) {
+							stream << "#endif\n";
+						}
 						found = true;
 						break;
 					}
@@ -284,16 +292,25 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 	}	//member
 }
 
-static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix) {
+static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix, bool runtime) {
 	for(size_t j=0; j<structs.size(); j++) {
 		const Struct& s(structs[j]);
-		if(s.ix != ix || isAnonStructName(s.name))
+		if(s.ix != ix)
 			continue;
+		if(isAnonStructName(s.name)) {
+			if(!runtime)
+				continue;
+			stream << "#ifdef SYMBIAN\n";
+		}
 		if(s.comment.size() > 0)
 			stream << s.comment;
 		stream << "typedef " << s.type << " " << s.name << " {\n";
-		streamMembers(stream, "\t", s.members, structs);
-		stream << "} " << s.name << ";\n\n";
+		streamMembers(stream, "\t", s.members, structs, runtime);
+		stream << "} " << s.name << ";\n";
+		if(isAnonStructName(s.name)) {
+			stream << "#endif\n";
+		}
+		stream << "\n";
 	}	//struct
 }
 
@@ -453,7 +470,7 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamTypedefs(stream, inf.typedefs, ix);
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
-	streamStructs(stream, inf.structs, ix);
+	streamStructs(stream, inf.structs, ix, true);
 	streamIoctlDefines(stream, inf.ioctls, ix);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
