@@ -32,8 +32,12 @@ class RuntimeBuilder
 		
 		if (version == "sp2003")
 			configuration = "Smartphone 2003 (ARMV4)"
-		else
+		elsif (version == "wm5")
 			configuration = "Windows Mobile 5.0 Smartphone SDK (ARMV4I)"
+		elsif (version == "wm6")
+			configuration = "Windows Mobile 6 Standard SDK (ARMV4I)"
+		elsif (version == "wm6pro")
+			configuration = "Windows Mobile 6 Professional SDK (ARMV4I)"
 		end
 		
 		system("build_wince.bat \"#{src_folder}\" \"Release|#{configuration}\"")
@@ -60,5 +64,13 @@ class RuntimeBuilder
 
 	def wm5(runtime_dir, mode)
 		return build_wince(runtime_dir, mode, "wm5")
+	end
+
+	def wm6(runtime_dir, mode)
+		return build_wince(runtime_dir, mode, "wm6")
+	end
+
+	def wm6pro(runtime_dir, mode)
+		return build_wince(runtime_dir, mode, "wm6pro")
 	end
 end

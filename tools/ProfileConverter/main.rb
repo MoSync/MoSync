@@ -56,6 +56,8 @@ RELEVANT_DEFINES = {
 	:s60v5 => [],
 	:sp2003 => [],
 	:wm5 => [],
+	:wm6 => [],
+	:wm6pro => [],	
 	:moblin => [],
 }
 
@@ -166,6 +168,8 @@ bitmap = {}
 
 runtimes = {
 	:wm5    => [],
+	:wm6    => [],
+	:wm6pro => [],	
 	:sp2003 => [],
 	:s60v2  => [],
 	:s60v3  => [],
