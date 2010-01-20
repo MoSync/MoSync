@@ -39,9 +39,6 @@ namespace MAP
 		{
 		}
 
-		const int getX( ) const					{ return mX; }
-		const int getY( ) const					{ return mY; }
-		const int getMagnification( ) const		{ return mMagnification; }
 		const int getX( ) const					
 		{ 
 			return mX; 

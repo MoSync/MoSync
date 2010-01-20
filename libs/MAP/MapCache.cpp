@@ -206,8 +206,6 @@ namespace MAP
 				//
 				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 
-				if ( Trace ) DebugPrintf( "MapTile requested %d %d %d\n", magnification, x, y );
-
 				int loc = findInCache( sourceKind, tileXY );
 				if ( loc != -1 )
 				{
