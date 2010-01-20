@@ -31,8 +31,8 @@ namespace MAPUtil
 	//
 	// Months
 	//
-	static const char* month[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-	static const int month_to_day[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
+	static const char* sMonth[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+	//static const int sMonth_to_day[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
 	//-------------------------------------------------------------------------
 	//
@@ -61,9 +61,8 @@ namespace MAPUtil
 		// Convert month to integer
 		int m; // zero-based
 		for ( m = 0; m < 11; m++ )
-			if ( strcmp( buf, month[m] ) == 0 )
+			if ( strcmp( buf, sMonth[m] ) == 0 )
 				break;
-		m;
 		p++;
 
 		// Get year

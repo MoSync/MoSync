@@ -2,10 +2,20 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
+class Kazlib
+	include MoSyncMod
+	def initialize
+		@SOURCES = ["../kazlib"]
+		@INSTALL_INCDIR = "kazlib"
+	end
+end
+Kazlib.new.copyHeaders
+
 mod = Module.new
 mod.class_eval do
 	def setup_base
 		@SOURCES = ["."]
+		@EXTRA_SOURCEFILES = ["../kazlib/dict.c", "../kazlib/hash.c"]
 		@INSTALL_INCDIR = "MAUtil"
 		@NAME = "mautil"
 		@IGNORED_FILES = ["DomParser.cpp", "XMLDataProvider.cpp", "XPathTokenizer.cpp"]
@@ -18,6 +28,8 @@ mod.class_eval do
 		else
 			shared_specflags = {}
 		end
+		shared_specflags["dict.c"] = " -Wno-unreachable-code"
+		shared_specflags["hash.c"] = " -Wno-unreachable-code"
 		if(CONFIG == "" && NATIVE_GCC_IS_V4)
 			native_specflags = {"String.cpp" => " -Wno-strict-overflow"}
 		else

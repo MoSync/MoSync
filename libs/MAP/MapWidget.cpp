@@ -98,9 +98,9 @@ namespace MAP
 
 
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( int x, int y, int width, int height, Widget* parent)
+	MapWidget::MapWidget( int x, int y, int width, int height, Widget* _parent)
 	//-------------------------------------------------------------------------
-	:	Widget( x, y, width, height, parent ),
+	:	Widget( x, y, width, height, _parent ),
 		mCenterPositionLonLat( ),
 		mCenterPositionPixels( ),
 		mPanTargetPositionLonLat( ),
@@ -110,12 +110,12 @@ namespace MAP
 		//mCache( NULL ),
 		mMapUpdateNesting( 0 ),
 		mPrevCenter( ),
-		mScreenImage( NULL ),
+		mScreenImage( 0 ),
 		mHasScale( true ),
+		mPanTimerListener( NULL ),
 		mHasSmoothPanning( true ),
 		mFont( NULL ),
-		mTimerRunning( false ),
-		mPanTimerListener( NULL )
+		mTimerRunning( false )
 	{
 		resetScreenImage( );
 		mPanTimerListener = newobject( MapWidgetPanTimerListener, new MapWidgetPanTimerListener( this ) );
@@ -297,14 +297,14 @@ namespace MAP
 	Point MapWidget::getActualPosition( )
 	//-------------------------------------------------------------------------
 	{
-		Widget* parent = this->getParent( );
+		Widget* p = this->getParent( );
 		Point pos = getPosition( );
 
-		while( parent != 0 )
+		while( p != 0 )
 		{
-			pos.x += parent->getPosition( ).x;
-			pos.y += parent->getPosition( ).y;
-			parent = parent->getParent( );
+			pos.x += p->getPosition( ).x;
+			pos.y += p->getPosition( ).y;
+			p = p->getParent( );
 		}
 		return pos;
 	}
@@ -398,8 +398,8 @@ namespace MAP
 		//
 		if ( ShowLatLon )
 		{
-			static const int textWidth = 100;
-			static const int textHeight = 12;
+			//static const int textWidth = 100;
+			//static const int textHeight = 12;
 			char buffer[100];
 			if ( mHasSmoothPanning )
 				sprintf( buffer, "%-3.3f %-3.3f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
@@ -600,7 +600,7 @@ namespace MAP
 	void MapWidget::resetScreenImage( )
 	//-------------------------------------------------------------------------
 	{
-		if ( mScreenImage != NULL )
+		if ( mScreenImage != 0 )
 			maDestroyObject( mScreenImage );
 
 		if ( getWidth( ) > 0 && getHeight( ) > 0 )

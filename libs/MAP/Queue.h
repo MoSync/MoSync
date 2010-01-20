@@ -38,8 +38,8 @@ namespace MAPUtil
 		// Dequeueing an object means ownership is transferred to client.
 		//
 		Queue( const int capacity )
-			: mCapacity( capacity ),
-			mItems( NULL )
+			: mItems( NULL ),
+			mCapacity( capacity )
 		{
 			mItems = newobject( T*, new T*[capacity] );
 			for ( int i = 0; i < mCapacity; i++ )

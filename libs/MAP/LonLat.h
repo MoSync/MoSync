@@ -158,9 +158,9 @@ namespace MAP
 		{
 		}
 
-		LonLat( const double lon, const double lat )
-		: 	lon( lon ),
-			lat( lat )
+		LonLat( const double _lon, const double _lat )
+		: lon( _lon ),
+			lat( _lat )
 		{
 		}
 

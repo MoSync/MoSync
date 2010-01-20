@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "GoogleMapSource.h"
 #include "MapTileCoordinate.h"
+#include <maassert.h>
 
 namespace MAP
 {
@@ -187,12 +188,13 @@ namespace MAP
 		const int bottomCrop = 30;
 		int tileSize = getTileSize( );
 		LonLat centerpoint = this->tileCenterToLonLat( tileSize, tileXY, 0, bottomCrop/2 );
-		char* maptype = "";
+		const char* maptype = "";
 		switch( mMapKind )
 		{
 		case GoogleMapsMapKind_StreetMap: maptype = "roadmap"; break;
 		case GoogleMapsMapKind_Aerial: maptype = "satellite"; break;
 		case GoogleMapsMapKind_Hybrid: maptype = "hybrid"; break;
+		default: BIG_PHAT_ERROR;
 		}
 		sprintf( buffer,
 				"http://maps.google.com/maps/api/staticmap?center=%f,%f&zoom=%d&size=%dx%d&sensor=false&maptype=%s&format=png8&key=%s",

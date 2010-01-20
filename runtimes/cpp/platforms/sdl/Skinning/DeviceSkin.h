@@ -41,6 +41,7 @@ namespace MoRE {
 		};
 
 		DeviceSkin(const DeviceProfile* profile) : mProfile(profile), mListener(0) {}
+		virtual ~DeviceSkin() {}
 		virtual bool init() = 0;
 		virtual int getWindowWidth() const = 0;
 		virtual int getWindowHeight() const = 0;

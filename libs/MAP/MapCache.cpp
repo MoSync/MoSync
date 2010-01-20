@@ -29,7 +29,7 @@ namespace MAP
 	//
 	// Debug
 	//
-	static const bool Trace = false;
+	//static const bool Trace = false;
 
 	MapCache* MapCache::sSingleton = NULL;
 
@@ -155,6 +155,7 @@ namespace MAP
 		//
 		source->clearQueue( );
 
+#if 0
 		//
 		// Test code
 		//
@@ -168,6 +169,7 @@ namespace MAP
 			source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
 			return;
 		}
+#endif
 
 		const int offsetX = pixelWidth / 2;
 		const int offsetY = pixelHeight / 2;
@@ -205,7 +207,7 @@ namespace MAP
 				//
 				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 
-				if ( Trace ) DebugPrintf( "MapTile requested %d %d %d\n", magnification, x, y );
+				//if ( Trace ) DebugPrintf( "MapTile requested %d %d %d\n", magnification, x, y );
 
 				int loc = findInCache( sourceKind, tileXY );
 				if ( loc != -1 )

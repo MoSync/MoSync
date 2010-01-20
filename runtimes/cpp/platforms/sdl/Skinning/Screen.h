@@ -27,4 +27,4 @@ namespace MoRE {
 	SDL_Surface* getPhoneScreen();
 }
 
-#endif
+#endif	//_SCREEN_H_

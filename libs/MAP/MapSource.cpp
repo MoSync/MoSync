@@ -48,8 +48,8 @@ namespace MAP
 	{
 	public:
 		MapSourceImageDownloader( ) :
-			mSourceKind( MapSourceKind_OpenStreetMap ),
 			mUrl( 0 ),
+			mSourceKind( MapSourceKind_OpenStreetMap ),
 			mTileXY( ),
 			mClientData ( NULL )
 		{

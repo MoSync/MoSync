@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //
 // Define to track memory leaks
 //
-#ifdef _WIN32
+#ifdef _MSC_VER
 #define TRACKOBJECTS
 #endif
 
@@ -88,7 +88,7 @@ namespace MAPUtil
 	};
 
 #ifdef TRACKOBJECTS
-	#define newobject( type, obj ) MemoryMgr::track<type>( (obj), #type"   ("__FUNCTION__")" )
+	#define newobject( type, obj ) MemoryMgr::track<type>( (obj), #type "   (" __FUNCTION__ ")" )
 	#define deleteobject( obj ) { if ( (obj) != NULL ) { MemoryMgr::untrack( obj ); delete (obj); (obj) = NULL; } }
 #else
 	#define newobject( type, obj ) ( obj )

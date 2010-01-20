@@ -2,7 +2,7 @@
 
 require File.expand_path('../rules/task.rb')
 
-SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest"] #, "MinUI"
+SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest", "MAP"] #, "MinUI"
 
 target :pipe do
 	Work.invoke_subdirs(SUBDIRS, 'pipe')

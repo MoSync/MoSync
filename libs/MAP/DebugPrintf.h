@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DEBUGPRINTF_H_
 #define DEBUGPRINTF_H_
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 // to speed up compiles
 ///#include "windows.h"
@@ -36,7 +36,7 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA( /*__in_opt*/
 
 inline void DebugPrintf(const char *fmt, ...)
 {
-	#ifdef WIN32
+	#ifdef _MSC_VER
 	
 	char buffer[32768];
 	va_list vl;
@@ -54,7 +54,7 @@ inline void DebugPrintf(const char *fmt, ...)
 
 inline void DebugAssert( bool condition )
 {
-	#ifdef WIN32
+	#ifdef _MSC_VER
 
 	if ( !condition )
 	{
