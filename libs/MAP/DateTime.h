@@ -18,12 +18,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DATETIME_H_
 #define DATETIME_H_
 
-#include <matime.h>
 #include <maapi.h>
 #include <maassert.h>
 #include <mastring.h>
+#include <matime.h>
 
-#include "Timespan.h"
+#include "TimeSpan.h"
 
 namespace MAPUtil
 {

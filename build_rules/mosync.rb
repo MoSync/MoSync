@@ -64,6 +64,11 @@ task :run => :pipe do
 	sh "cd #{BUILDDIR} && #{MOSYNCBIN}moemu -program program#{R}"
 end
 
+task :gdb => :pipe do
+	R = (defined?(RESTARGET) != nil) ? " -resource #{File.expand_path(RESTARGET)}" : ""
+	sh "cd #{BUILDDIR} && gdb --args #{MOSYNCBIN}moemu -program program#{R}"
+end
+
 task :native do
 	require "#{BD}/build_rules/defaults.rb"
 	EXETARGET = "#{BUILDDIR}#{EXENAME}#{EXE_FILE_ENDING}"

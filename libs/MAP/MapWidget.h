@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <MAUI/Widget.h>
-#include <MAUtil/environment.h>
+#include <MAUtil/Environment.h>
 #include <MAUI/Font.h>
 
 #include "LonLat.h"
@@ -34,6 +34,7 @@ namespace MAP
 	class MapSource;
 	class MapCache;
 	class MapWidget;
+	class MapWidgetPanTimerListener;
 
 	//=========================================================================
 	enum MapWidgetScrollDirection

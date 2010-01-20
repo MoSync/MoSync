@@ -32,13 +32,15 @@ extern "C" {
 #include <crtdefs.h>
 #endif
 
+#ifndef _TIME_H
 #ifndef MAPIP
 #define _TIME_H	//to avoid conflicting types for time_t
-#endif	
+#endif
 
 #ifndef _MSC_VER
 typedef int time_t;
 #endif
+#endif	//_TIME_H
 
 /**
 * Structure containing a calendar date and time broken down into its components.

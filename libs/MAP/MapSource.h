@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAPSOURCE_H_
 
 #include <maapi.h>
-#include <MAUtil/downloader.h>
+#include <MAUtil/Downloader.h>
 
 #include "MapTile.h"
 #include "Queue.h"

@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef LONLAT_H_
 #define LONLAT_H_
 
-#include <maUtil/geometry.h>
+#include <MAUtil/Geometry.h>
 #include <maapi.h>
 #include "madmath.h"
 #include <conprint.h>

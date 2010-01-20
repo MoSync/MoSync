@@ -38,6 +38,10 @@
 #ifndef MAVSPRINTF_H
 #define MAVSPRINTF_H
 
+#ifndef MAPIP
+#include <stdio.h>
+#endif
+
 //#include <sys/types.h>
 #include "maarg.h"
 #include "mastring.h"
@@ -46,6 +50,7 @@
 extern "C" {
 #endif
 
+#ifndef _STDIO_H
 /** \brief vsprintf - print formatted output
 * \param buf output string
 * \param fmt input format string
@@ -63,7 +68,7 @@ int vsprintf(char *buf, const char *fmt, va_list args);
 * \return Returns string length of output
 */
 int sprintf(char *buf, const char *fmt, ...);
-
+#endif	//_STDIO_H
 
 /**
 * Writes a line of formatted output to the system debug log.

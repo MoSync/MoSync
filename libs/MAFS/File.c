@@ -19,6 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maheap.h>
 #include <conprint.h>
 #include <mactype.h>
+#include <mavsprintf.h>
+
+// broken header files in linux/native
+int sprintf(char *buf, const char *fmt, ...);
 
 #define LOG(x, ...) //lprintfln
 

@@ -524,7 +524,8 @@ namespace MoRE {
 	void GenericSkin::keyPressed(int mak) {
 		for(size_t i = 0; i < keyRects.size(); i++) {
 			if(keyRects[i].keyCode == mak) {
-				SDL_Rect src = {keyRects[i].x, keyRects[i].y, keyRects[i].w, keyRects[i].h};
+				SDL_Rect src = { (Sint16)keyRects[i].x, (Sint16)keyRects[i].y,
+					(Uint16)keyRects[i].w, (Uint16)keyRects[i].h };
 				SDL_BlitSurface(selectedPhone, &src, getWindowSurface(), &src);
 				return;
 			}
@@ -534,7 +535,8 @@ namespace MoRE {
 	void GenericSkin::keyReleased(int mak) {
 		for(size_t i = 0; i < keyRects.size(); i++) {
 			if(keyRects[i].keyCode == mak) {
-				SDL_Rect src = {keyRects[i].x, keyRects[i].y, keyRects[i].w, keyRects[i].h};
+				SDL_Rect src = { (Sint16)keyRects[i].x, (Sint16)keyRects[i].y,
+					(Uint16)keyRects[i].w, (Uint16)keyRects[i].h };
 				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);			
 				return;
 			}

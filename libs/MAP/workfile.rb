@@ -15,6 +15,7 @@ mod.class_eval do
 	
 	def setup_base
 		@SOURCES = ["."]
+		@IGNORED_FILES = ["MemoryMgr.cpp"]
 		@INSTALL_INCDIR = "MAP"
 		@NAME = "map"
 	end

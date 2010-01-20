@@ -39,36 +39,35 @@ namespace MAP
 		{
 		}
 
-		const int getX( ) const					
+		int getX( ) const					
 		{ 
 			return mX; 
 		}
 
-		const int getY( ) const					
+		int getY( ) const					
 		{ 
 			return mY; 
 		}
 
-		const int getMagnification( ) const		
+		int getMagnification( ) const		
 		{ 
 			return mMagnification; 
 		}
 
+		bool operator == ( const PixelCoordinate& b ) const
+		{
+			return getX( ) == b.getX( ) && getY( ) == b.getY( ) && getMagnification( ) == b.getMagnification( );
+		}
+
+		bool operator != ( const PixelCoordinate& b ) const
+		{
+			return getX( ) != b.getX( ) || getY( ) != b.getY( ) || getMagnification( ) != b.getMagnification( );
+		}
 	private:
 		int mX;
 		int mY;
 		int mMagnification;
 	};
-
-	static bool operator == ( const PixelCoordinate& a, const PixelCoordinate& b ) 
-	{ 
-		return a.getX( ) == b.getX( ) && a.getY( ) == b.getY( ) && a.getMagnification( ) == b.getMagnification( ); 
-	}
-
-	static bool operator != ( const PixelCoordinate& a, const PixelCoordinate& b ) 
-	{ 
-		return a.getX( ) != b.getX( ) || a.getY( ) != b.getY( ) || a.getMagnification( ) != b.getMagnification( ); 
-	}
 }
 
 #endif // PIXELCOORDINATE_H_
