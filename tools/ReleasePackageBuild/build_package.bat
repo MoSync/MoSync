@@ -185,6 +185,16 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building PanicDoc.
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\PanicDoc
+@vcbuild PanicDoc.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building pipe-tool.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\pipe-tool
@@ -485,13 +495,9 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 
 
 @echo ------------------------------------------------
-@echo Building PanicDoc.
+@echo Building Eclipse PanicDoc.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\PanicDoc
-@vcbuild PanicDoc.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @Release\PanicDoc.exe -props > %MOSYNC_ECLIPSE_PATH%\paniccodes.properties
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
