@@ -355,27 +355,20 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		try {
 #endif
-#ifdef MA_IX_NATIVE_KEY_PRESSED
-			{
-				int event[] = new int[2];
-				EI_TYPE = released ? EVENT_TYPE_NATIVE_KEY_RELEASED : EVENT_TYPE_NATIVE_KEY_PRESSED;
-				EI_KEY = keyCode;
-				postEvent(event);
-			}
-#endif
 			int mak = convertKeyCode(keyCode);
-			if(mak != 0) {
-				int[] event = new int[2];
-				if(released == true) {
-					mKeyState &= ~convertKeyBit(keyCode);
-				} else {
-					mKeyState |= convertKeyBit(keyCode);				
-				}
 
-				EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
-				EI_KEY = mak;
-				postEvent(event);
+			int[] event = new int[3];
+			if(released == true) {
+				mKeyState &= ~convertKeyBit(keyCode);
+			} else {
+				mKeyState |= convertKeyBit(keyCode);				
 			}
+
+			EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
+			EI_KEY = mak;
+			EI_NATIVE_KEY = keyCode;				
+			postEvent(event);
+				
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		} catch(Exception e) {
 			PRINT_STACK_TRACE;

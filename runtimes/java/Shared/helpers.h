@@ -158,6 +158,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //Event Index, see IDL, struct MAEvent
 #define EI_TYPE event[0]
 #define EI_KEY event[1]
+#define EI_NATIVE_KEY event[2]
 #define EI_POINTX event[1]
 #define EI_POINTY event[2]
 #define EI_CONN_HANDLE event[1]

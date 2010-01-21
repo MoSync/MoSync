@@ -133,7 +133,7 @@ namespace Base {
 #endif
 	bool MAMoSyncInit();
 
-	static void MAHandleKeyEventMAK(int mak, bool pressed);
+	static void MAHandleKeyEventMAK(int mak, bool pressed, int nativeKey=0);
 	static void MAHandleKeyEvent(int sdlk, bool pressed);
 	static void MASendPointerEvent(int x, int y, int type);
 
@@ -745,40 +745,39 @@ namespace Base {
 			}
 	}
 
-	static void MAHandleKeyEventMAK(int mak, bool pressed) {
-		if(mak != 0) {
-			if(!gEventOverflow) {
-				if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
-					gEventOverflow = true;
-					gEventFifo.clear();
-					LOG("EventBuffer overflow!\n");
-				}
-				//gEventFifo.put(mak | mask);
-				MAEvent event;
-				event.type = pressed ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
-				
-				int keyBit = MAConvertKeyBitMAK(mak);
-				if(pressed) {
-					currentKeyState |= keyBit;
-				} else {
-					currentKeyState &= ~keyBit;
-				}
+	static void MAHandleKeyEventMAK(int mak, bool pressed, int nativeKey) {
+		if(!gEventOverflow) {
+			if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				gEventOverflow = true;
+				gEventFifo.clear();
+				LOG("EventBuffer overflow!\n");
+			}
+			//gEventFifo.put(mak | mask);
+			MAEvent event;
+			event.type = pressed ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
 
-				event.key = mak;
-				gEventFifo.put(event);
+			int keyBit = MAConvertKeyBitMAK(mak);
+			if(pressed) {
+				currentKeyState |= keyBit;
+			} else {
+				currentKeyState &= ~keyBit;
 			}
-			if(sSkin)
-			{
-				if(pressed) sSkin->keyPressed(mak);
-				else sSkin->keyReleased(mak);
-			}
+
+			event.key = mak;
+			event.nativeKey = nativeKey;
+			gEventFifo.put(event);
+		}
+		if(sSkin)
+		{
+			if(pressed) sSkin->keyPressed(mak);
+			else sSkin->keyReleased(mak);
 		}
 	}
 
 	static void MAHandleKeyEvent(int sdlk, bool pressed) {
 		LOGDT("MAHandleKeyEvent %i %i", sdlk, pressed);
 		int mak = MAConvertKey(sdlk);
-		MAHandleKeyEventMAK(mak, pressed);
+		MAHandleKeyEventMAK(mak, pressed, sdlk);
 	}
 
 	static Uint32 GCCATTRIB(noreturn) SDLCALL ExitCallback(Uint32 interval, void*) {
