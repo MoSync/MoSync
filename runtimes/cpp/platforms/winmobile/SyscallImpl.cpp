@@ -2615,21 +2615,23 @@ retry:
 	}
 
 	int maLocationStart() {
-		if((gpsEvent = CreateEvent(NULL, FALSE, FALSE, L"GPSEVENT")) == NULL) {
+		if(gpsDevice != NULL)
 			return 0;
+
+		if((gpsEvent = CreateEvent(NULL, FALSE, FALSE, L"GPSEVENT")) == NULL) {
+			return MA_LPS_OUT_OF_SERVICE;
 		}
 
 		if((gpsProviderEvent = CreateEvent(NULL, FALSE, FALSE, L"GPSPROVIDEREVENT")) == NULL) {
 			CloseHandle(gpsEvent);
-			return 0;
+			return MA_LPS_OUT_OF_SERVICE;
 		}
 		
 		if((gpsDevice = GPSOpenDevice(gpsEvent, gpsProviderEvent, NULL, 0)) == NULL) {
 			CloseHandle(gpsEvent);
 			CloseHandle(gpsProviderEvent);
-			return 0;
+			return MA_LPS_OUT_OF_SERVICE;
 		}
-
 
 		/*
 		if(device.dwDeviceState == SERVICE_STATE_OFF) {
@@ -2637,23 +2639,14 @@ retry:
 			CloseHandle(gpsEvent);
 			gpsDevice = NULL;
 			gpsEvent = NULL;
-			return 0;
+			return MA_LPS_OUT_OF_SERVICE;
 		}
 		*/
 
 		addWinMobileEvent(gpsEvent, locCallback);
 		addWinMobileEvent(gpsProviderEvent, lpsCallback);
 
-
-		/*
-		if(!RegisterWaitForSingleObject(NULL,gpsEvent,locCallback,NULL,INFINITE,0)) {
-			CloseHandle(gpsEvent);
-			return 0;
-		}
-		*/
-
-		return 1;
-
+		return MA_LPS_AVAILABLE;
 	}
 
 	int maLocationStop() {
@@ -2670,7 +2663,7 @@ retry:
 		gpsDevice = NULL;
 		gpsEvent = NULL;
 
-		return 1;
+		return 0;
 	}
 #endif
 

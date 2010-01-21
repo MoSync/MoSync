@@ -1825,7 +1825,8 @@ interface MAAPI {
 		* \link #EVENT_TYPE_LOCATION_PROVIDER LOCATION_PROVIDER events \endlink will be generated
 		* when the location provider state changes.
 		*
-		* \returns \> 0 on success, or 0 if collection was already active.
+		* \returns MA_LPS_AVAILABLE on success, 0 if collection was already active, or
+		* MA_LPS_OUT_OF_SERVICE if the location provider is out of service.
 		*
 		* \note <b>The location API is experimental, not fully tested.
 		* It may not work as advertised.</b>
@@ -1841,6 +1842,8 @@ interface MAAPI {
 		*
 		* \note \link #EVENT_TYPE_LOCATION Location events \endlink that are generated before
 		* this function returns may remain in the event queue afterwards.
+		*
+		* \returns 0.
 		*/
 		int maLocationStop();
 

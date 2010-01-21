@@ -1546,7 +1546,7 @@ int Syscall::maLocationStart() {
 		return 0;
 	gServer.LocationGet(*gLocationSync->Status());
 	gLocationSync->SetActive();
-	return 1;
+	return MA_LPS_AVAILABLE;
 }
 
 int Syscall::maLocationStop() {
@@ -1554,7 +1554,7 @@ int Syscall::maLocationStop() {
 	LOG("LocationStop: %i\n", res);
 	gLocationSync->Cancel();
 	LOG("maLocationStop done.\n");
-	return 1;
+	return 0;
 }
 
 

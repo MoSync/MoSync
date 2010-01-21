@@ -2313,8 +2313,14 @@ public
 	public final int maLocationStart() throws Exception {
 		if(mLocProv == null) {
 			Criteria crit = new Criteria();
-			mLocProv = LocationProvider.getInstance(crit);
+			try {
+				mLocProv = LocationProvider.getInstance(crit);
+			} catch(LocationException e) {
+				PRINT_STACK_TRACE;
+				return MA_LPS_OUT_OF_SERVICE;
+			}
 			mLocProv.setLocationListener(this, -1, -1, -1);
+			return MA_LPS_AVAILABLE;
 		}
 		return 0;
 	}
