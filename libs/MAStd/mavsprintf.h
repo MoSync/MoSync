@@ -38,7 +38,7 @@
 #ifndef MAVSPRINTF_H
 #define MAVSPRINTF_H
 
-#ifndef MAPIP
+#if !defined(MAPIP) && !defined(_MSC_VER)
 #include <stdio.h>
 #endif
 
