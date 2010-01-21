@@ -333,7 +333,7 @@ namespace Base {
 			case VK_LCONTROL: return MAK_LCTRL;
 			case VK_RCONTROL: return MAK_RCTRL;
 
-			default: return 0;
+			default: return MAK_UNKNOWN;
 		}
 	}
 
@@ -369,26 +369,26 @@ namespace Base {
 	static void MAHandleKeyEvent(int wmkey, int eventType) 
 	{
 		int mak = MAConvertKey(wmkey);
-		if(mak != 0) {
-			if(!gEventOverflow) {
-				if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
-					gEventOverflow = true;
-					gEventFifo.clear();
-					LOG("EventBuffer overflow!\n");
-				}
 
-				if(eventType==EVENT_TYPE_KEY_PRESSED) {
-					currentKeyState |= MAConvertKeyBit(wmkey);
-				} else {
-					currentKeyState &= ~MAConvertKeyBit(wmkey);
-				}
-
-				/* put event in event queue */
-				MAEvent event;
-				event.type = eventType;
-				event.key = mak;
-				gEventFifo.put(event);
+		if(!gEventOverflow) {
+			if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				gEventOverflow = true;
+				gEventFifo.clear();
+				LOG("EventBuffer overflow!\n");
 			}
+
+			if(eventType==EVENT_TYPE_KEY_PRESSED) {
+				currentKeyState |= MAConvertKeyBit(wmkey);
+			} else {
+				currentKeyState &= ~MAConvertKeyBit(wmkey);
+			}
+
+			/* put event in event queue */
+			MAEvent event;
+			event.type = eventType;
+			event.key = mak;
+			event.nativeKey = wmkey;
+			gEventFifo.put(event);
 		}
 	}
 
@@ -417,6 +417,14 @@ namespace Base {
 		HACCEL hAccel = 0;
 
 		while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
+
+			// I think I have to do this for oem keys.
+			if(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
+				if(msg.wParam == VK_PROCESSKEY) {
+					msg.wParam = ImmGetVirtualKey(msg.hwnd);
+				}
+			}
+
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 
@@ -449,15 +457,18 @@ namespace Base {
 
 	void Resume() {
 #if _WIN32_WCE < 0x502	
-				if(graphicsMode == GRAPHICSMODE_GX) GXResume();
+		if(graphicsMode == GRAPHICSMODE_GX) GXResume();
 #else
+		g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_FULLSCREEN);
+		g_pDD->RestoreAllSurfaces();
 #endif
 	}
 
 	void Suspend() {
 #if _WIN32_WCE < 0x502				
-				if(graphicsMode == GRAPHICSMODE_GX) GXSuspend();
+		if(graphicsMode == GRAPHICSMODE_GX) GXSuspend();
 #else
+		g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_NORMAL); 
 #endif
 	}
 
@@ -485,7 +496,6 @@ DWORD GetScreenOrientation()
 		case WM_CREATE:
 			ShowWindow (hwnd, SW_SHOW);
 			UpdateWindow (hwnd);
-
 			return 0;
 
 		case WM_CLOSE:
@@ -499,24 +509,29 @@ DWORD GetScreenOrientation()
 
 		case WM_LBUTTONDOWN: 	// The user pressed the screen.
 			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_PRESSED);			
-			break;
+			return 0;
 		case WM_LBUTTONUP: 	// The user released the stylus from the screen.
 			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_RELEASED);
-			break;
+			return 0;
 		case WM_MOUSEMOVE:
 			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_DRAGGED);
-			break;
+			return 0;
+		
+		//case WM_GESTURE:
+		//	return 0;
 
 		case WM_KEYDOWN:
+			if(wParam == VK_F24) return 0; // backlight hack
 			if(wParam == VK_THOME) {
 				//ShowWindow(hwnd, SW_MINIMIZE);
 				//ShowWindow(hwnd, SW_HIDE);
 				//EnableWindow(hwnd, FALSE);
 				//SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_HIDEWINDOW);
-				Close();
+				MoSyncExit(303);
+				return 0;
 			}
 
-			if(lParam&0x40000000) return 0; // check if it has been repeated more than once		
+			if(lParam&0x40000000) return 0; // check if it has been repeated more than once		q
 			//if(wParam == VK_TBACK) {
 			//	GLE(PostMessage(hwnd, WM_CLOSE, 0, 0));
 			//}
@@ -525,6 +540,7 @@ DWORD GetScreenOrientation()
 			return 0;
 
 		case WM_KEYUP:
+			if(wParam == VK_F24) return 0; // backlight hack
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_RELEASED);
 			return 0;
 		
@@ -543,26 +559,32 @@ DWORD GetScreenOrientation()
 			ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(lParam, (Stream*)wParam));
 			return 0;
 
+			/*
+			// doesnt work yet.
 		case WM_SETFOCUS:
 			{
-				InitFullScreen();
-				MAUpdateScreen();
+				//InitGraphics();
+				//InitFullScreen();
 				MAEvent event;
 				event.type = EVENT_TYPE_FOCUS_GAINED;
 				gEventFifo.put(event);
 				Resume();
+				MAUpdateScreen();
+				//SetForegroundWindow(hwnd);
 			}
 			return 0;
 
 		case WM_KILLFOCUS:
 			{
-				InitWindowed();
+				//CloseGraphics();
+				//InitWindowed();
 				MAEvent event;
 				event.type = EVENT_TYPE_FOCUS_LOST;
 				gEventFifo.put(event);
 				Suspend();
 			}
 			return 0;
+			*/
 
 			/*
 		case WM_GRAPHNOTIFY:
@@ -594,6 +616,15 @@ DWORD GetScreenOrientation()
 			InitDDraw();
 			*/
 			return 0;
+
+			/*
+		case WM_MOVE:
+		case WM_WINDOWPOSCHANGED:
+		case 0x0046: //WM_WINDOWPOSCHANGING:
+			return 0;
+			*/
+
+
 		}
 
 
@@ -627,6 +658,10 @@ DWORD GetScreenOrientation()
 	
 	  HWND hwnd = NULL;
 
+	  /*
+	  hwnd = CreateWindowEx (
+					WS_EX_NODRAG,
+					*/
 	  hwnd = CreateWindow (
 					  g_szClassName,  // Registered class name         
 					  g_szTitle,      // Application window name
@@ -640,7 +675,11 @@ DWORD GetScreenOrientation()
 					  hInstance,      // MAHandle to the application instance
 					  NULL);          // Pointer to the window-creation data
 
+
+
 	  g_hwndMain = hwnd;
+
+	  SetForegroundWindow(hwnd);
 
 	  // If it failed to create the window, return FALSE.
 	  if (!hwnd)
@@ -652,38 +691,86 @@ DWORD GetScreenOrientation()
 	}
 
 #define MENU_HEIGHT 26
+
+	HWND TaskBarFind( void )
+	{
+		// Look for Smartphone version first, in case other is around (paranoia?)
+		HWND hwnd = ::FindWindow( _T( "Tray" ), NULL );     // Smartphone
+		if (!hwnd)
+		{
+			// Eric R. Balch (microsoft.public.vc.vcce 15 Jan 99) says next line works for CE.
+			// BZ found it works for Pocket PC, old Microsoft Windows CE platforms, and generic CE
+			hwnd = ::FindWindow( _T( "HHTaskBar" ), NULL );
+			if(hwnd) return hwnd;
+		} else return hwnd;
+		// "Big" Windows
+		// (thanks to Shing Yip, comp.os.ms-windows.programmer.win32, 21 Jul 99)
+		return ::FindWindow( _T( "Shell_TrayWnd" ), NULL );
+	}   // PFWTaskBarFind
+
+
 	void InitFullScreen() {
 		RECT rc;
+
+	
+		HWND hwndTaskbar = TaskBarFind();
+		GetWindowRect(hwndTaskbar, &rc);
+		int taskBarHeight = (rc.bottom-rc.top);
 
 		//hide task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON | 
 					 SHFS_HIDESIPBUTTON);
 
+		//ShowWindow(hwndTaskbar, SW_HIDE);
+		//EnableWindow(hwndTaskbar, false);
+
+        // Next resize the main window to the size of the screen.
+        SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
+
 		//resize window to cover screen
+		/*
 		SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
 				GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top-MENU_HEIGHT, rc.right, 
-				   rc.bottom+MENU_HEIGHT, false);
+		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right, 
+				   rc.bottom+taskBarHeight, false);
+		
+		MoveWindow(hwndTaskbar, 0, 0, 0, 0, false);
 
-		HWND hwndTaskbar = FindWindow(L"HHTaskBar", NULL);
+		::ShowWindow(hwndTaskbar, SW_HIDE); 
+		*/
+
 		::ShowWindow(hwndTaskbar, SW_HIDE); 
 	}
 
 	void InitWindowed() {
 		RECT rc;
 
-		//hide task bar and other icons
-		//SHFullScreen(g_hwndMain, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON | 
-		//			 SHFS_HIDESIPBUTTON);
+		/*
+		HWND hwndTaskbar = TaskBarFind();
+		GetWindowRect(hwndTaskbar, &rc);
+		int taskBarHeight = (rc.bottom-rc.top);
+		*/
 
+		//hide task bar and other icons
+		SHFullScreen(g_hwndMain, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON | 
+					 SHFS_SHOWSIPBUTTON);
+
+        // Next resize the main window to the size of the work area.
+        SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
+		MoveWindow(g_hwndMain, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, TRUE);
+
+		/*
 		//resize window to cover screen
 		SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
 				GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top+MENU_HEIGHT, rc.right, 
-				   rc.bottom-MENU_HEIGHT, false);
+		MoveWindow(g_hwndMain, rc.left, rc.top+taskBarHeight, rc.right, 
+				   rc.bottom-taskBarHeight, false);
 
-		HWND hwndTaskbar = FindWindow(L"HHTaskBar", NULL);
-		::ShowWindow(hwndTaskbar, SW_SHOW); 
+		::ShowWindow(hwndTaskbar, SW_SHOW);
+		*/
+		HWND hwndTaskbar = TaskBarFind();
+		::ShowWindow(hwndTaskbar, SW_SHOW);
 	}
 
 #if (_WIN32_WCE < 0x502)
@@ -956,7 +1043,6 @@ DWORD GetScreenOrientation()
 			}
 		}
 #endif
-
 		return TRUE;
 	}
 
@@ -1140,6 +1226,8 @@ DWORD GetScreenOrientation()
 		maFillRect(0, 0, backBuffer->width, backBuffer->height);
 		maUpdateScreen();
 
+		AllKeys(TRUE);
+
 		return true;
 	}
 
@@ -1163,7 +1251,10 @@ DWORD GetScreenOrientation()
 			//delete []gCurrentSound;
 		//}
 
+		AllKeys(FALSE);
+
 		InitWindowed();
+		CloseGraphics();
 		CoUninitialize();
 
 		PostQuitMessage (0);
@@ -2698,7 +2789,7 @@ retry:
 
 void MoSyncExit(int r) 
 {
-	InitWindowed();
+	//InitWindowed();
 	LOG("MoSyncExit(%d)\n", r);
 
 	EnterCriticalSection(&exitMutex);
