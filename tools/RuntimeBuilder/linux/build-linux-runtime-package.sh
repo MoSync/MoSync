@@ -103,9 +103,9 @@ buildTemplate()
 
 	print_msg "Attempting to build MoRE"
 	if [ "$1" = "rel" ]; then
-		rake more CONFIG=""
+		rake more CONFIG="" FULLSCREEN="true"
 	else
-		rake more
+		rake more FULLSCREEN="true"
 	fi
 
 	if [ "$?" -ne "0" ]; then
@@ -180,7 +180,7 @@ buildTemplate "rel" $1
 
 #
 # Finished
-# 
+#
 print_msg "Done"
 
 exit 0

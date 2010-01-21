@@ -7,7 +7,7 @@ require "#{BD}/build_rules/host.rb"
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = [".", "./thread", "../../base", "../../base/thread", "./Skinning"]
-IGNORED_FILES = ["Image.cpp", "audio.cpp"]
+COMMON_IGNORED_FILES = ["Image.cpp", "audio.cpp"]
 COMMON_INCLUDES = [".", "#{BD}/runtimes/cpp/base"]
 COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]
 SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal",
@@ -16,22 +16,32 @@ SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal",
 if(HOST == "win32") then
 	EXTRA_INCLUDES = COMMON_INCLUDES
 	LIBRARIES = COMMON_LIBRARIES
+	IGNORED_FILES  = COMMON_IGNORED_FILES
 elsif(HOST == "linux")
-
 	if ( SDL_SOUND == false )
-		if ( HOST_PLATFORM != "moblin" )
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ "
-		else
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__ "
-		end
-		IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]		
+		SOUND_LIB = []
+        SDL_SOUND_FLAG   = " -D__NO_SDL_SOUND__ "
+		SDL_SOUND_IGNORE = [ "SDLSoundAudioSource.cpp" ]
+	else
+		SOUND_LIB = [ "SDL_sound" ]
+        SDL_SOUND_FLAG   = ""
+		SDL_SOUND_IGNORE = [ ]
 	end
-	
+
+    if ( FULLSCREEN == "false" )
+        FULLSCR_FLAG = ""
+    else
+        FULLSCR_FLAG = " -D__USE_FULLSCREEN__"
+    end
+
+    EXTRA_CXXFLAGS = SDL_SOUND_FLAG + FULLSCR_FLAG + " -DLINUX_RUNTIME "
+    IGNORED_FILES  = COMMON_IGNORED_FILES+SDL_SOUND_IGNORE
+
 	EXTRA_INCLUDES = COMMON_INCLUDES + ["/usr/include/gtk-2.0",
 		"/usr/include/glib-2.0", "/usr/include/pango-1.0",
 		"/usr/include/cairo", "/usr/include/atk-1.0",
 		"/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include"]
-	LIBRARIES = COMMON_LIBRARIES
+	LIBRARIES = COMMON_LIBRARIES + SOUND_LIB + ["gtk-x11-2.0", "bluetooth", "expat"]
 end
 
 LIBNAME = "mosync_sdl"

@@ -41,7 +41,7 @@ EXAM_DIRS = ["tools/protobuild",
 	] + PLATFORM_TOOLS + ["libs", "examples"]
 
 def do_subdir(dir, target="")
-	sh "cd #{dir} && rake -N #{target} CONFIG=\"#{CONFIG}\""
+	sh "cd #{dir} && rake -N #{target} CONFIG=\"#{CONFIG}\" FULLSCREEN=\"#{FULLSCREEN}\""
 end
 
 def do_subdirs(dirs, target="")

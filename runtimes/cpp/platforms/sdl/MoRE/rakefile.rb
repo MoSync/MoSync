@@ -7,7 +7,7 @@ require "#{BD}/build_rules/host.rb"
 # LIBRARIES is a list of libraries that this project needs
 #---------------------------------------------------------------------------------
 SOURCES = ["."]
-IGNORED_FILES = ["debugger.cpp"]
+COMMON_IGNORED_FILES = ["debugger.cpp"]
 EXTRA_SOURCEFILES = ["#{BD}/runtimes/cpp/core/Core.cpp",
 	"#{BD}/runtimes/cpp/core/sld.cpp",
 	"#{BD}/runtimes/cpp/core/GdbStub.cpp",
@@ -28,21 +28,26 @@ if(HOST == "win32") then
 	CUSTOM_LIBS = COMMON_LIBRARIES.collect do |lib| "#{lib}.lib" end +
 		["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a"]
 	LIBRARIES = ["wsock32", "ws2_32"]
+	IGNORED_FILES  = COMMON_IGNORED_FILES
 else
 	if ( SDL_SOUND == false )
 		SOUND_LIB = []
-
-		if ( HOST_PLATFORM != "moblin" )
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ "
-		else
-			EXTRA_CXXFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__ "
-		end
-
-		IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
+        SDL_SOUND_FLAG   = " -D__NO_SDL_SOUND__ "
+		SDL_SOUND_IGNORE = [ "SDLSoundAudioSource.cpp" ]
 	else
 		SOUND_LIB = [ "SDL_sound" ]
+        SDL_SOUND_FLAG   = ""
+		SDL_SOUND_IGNORE = [ ]
 	end
 
+    if ( FULLSCREEN == "false" )
+        FULLSCR_FLAG = ""
+    else
+        FULLSCR_FLAG = " -D__USE_FULLSCREEN__"
+    end
+
+    EXTRA_CXXFLAGS = SDL_SOUND_FLAG + FULLSCR_FLAG
+    IGNORED_FILES  = COMMON_IGNORED_FILES+SDL_SOUND_IGNORE
 	LIBRARIES = COMMON_LIBRARIES + SOUND_LIB + ["gtk-x11-2.0", "bluetooth", "expat"]
 end
 
