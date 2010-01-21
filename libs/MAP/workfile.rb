@@ -16,6 +16,7 @@ mod.class_eval do
 	def setup_base
 		@SOURCES = ["."]
 		@IGNORED_FILES = ["MemoryMgr.cpp"]
+		@SPECIFIC_CFLAGS = {"MapCache.cpp" => " -Wno-unreachable-code"}
 		@INSTALL_INCDIR = "MAP"
 		@NAME = "map"
 	end
