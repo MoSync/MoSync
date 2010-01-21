@@ -7,6 +7,7 @@
 #define CONFIG_H
 
 #define __SDL__
+#define EMULATOR
 
 //#define ENABLE_DEBUGGER
 
