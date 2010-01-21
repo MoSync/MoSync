@@ -35,11 +35,12 @@ bool dumpFileList(const char* path) {
 		p2 += buffer;
 		MAUtil::String p3 = p2 + "\n";
 		PrintConsole(p3.c_str());
-		dumpFileList(p2.c_str());
+		if(p2[p2.size()-1] == '/')
+			dumpFileList(p2.c_str());
 		empty = false;
 	}
 	maFileListClose(list);
-	printf("%s: %s\n", empty ? "Empty" : "Done", path);
+	//printf("%s: %s\n", empty ? "Empty" : "Done", path);
 	return !empty;
 }
 

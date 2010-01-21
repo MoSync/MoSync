@@ -1914,12 +1914,12 @@ interface MAAPI {
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		* \param path The absolute path to the file.
 		* \param mode The access mode. Either MA_ACCESS_READ, MA_ACCESS_WRITE or MA_ACCESS_READ_WRITE.
-		* \returns The new file handle.
+		* \returns The new file handle, or \< 0 on error.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
 
 		/**
-		* Returns 1 if the file exists, 0 otherwise.
+		* Returns 1 if the file exists, 0 if it doesn't, or \< 0 on error.
 		*/
 		int maFileExists(in MAHandle file);
 
@@ -1934,7 +1934,7 @@ interface MAAPI {
 		* The file must not exist prior to calling this function.
 		* After creation, the file will be accessible according to the mode specified when
 		* its handle was opened.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileCreate(in MAHandle file);
 
@@ -1942,12 +1942,12 @@ interface MAAPI {
 		* Deletes a file or directory.
 		* The file must exist prior to calling this function.
 		* If it's a directory, it must be empty.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileDelete(in MAHandle file);
 
 		/**
-		* Returns the size of the file.
+		* Returns the size of the file, or \< 0 on error.
 		* \note MoSync cannot handle files larger than 2 GiB (2^31 - 1 bytes).
 		* \param file A file handle. The file must exist and must not be a directory.
 		*/
@@ -1960,7 +1960,7 @@ interface MAAPI {
 
 		/**
 		* Write from memory to file.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
 
@@ -1976,17 +1976,17 @@ interface MAAPI {
 
 		/**
 		* Write from data object to file.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileWriteFromData(in MA_FILE_DATA args);
 		/**
 		* Read from file to memory.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileRead(in MAHandle file, out MAAddress dst, in int len);
 		/**
 		* Read from file to data object.
-		* Returns 0.
+		* Returns 0, or \< 0 on error.
 		*/
 		int maFileReadToData(in MA_FILE_DATA args);
 
