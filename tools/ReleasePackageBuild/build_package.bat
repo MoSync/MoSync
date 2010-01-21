@@ -185,18 +185,6 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
-@echo Building PanicDoc.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\PanicDoc
-@vcbuild PanicDoc.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@Release\PanicDoc.exe -props > %MOSYNC_ECLIPSE_PATH%\paniccodes.properties
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
 @echo Building pipe-tool.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\pipe-tool
@@ -271,7 +259,6 @@ Release\idl2.exe
 @vcbuild e32hack.vcproj /useenv "Release|Win32"
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
-
 
 @echo ------------------------------------------------
 @echo Building internal libraries:
@@ -473,7 +460,6 @@ mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 
-
 :BUILD_ECLIPSE
 @echo.
 @echo ------------------------------------------------
@@ -497,6 +483,18 @@ echo on
 xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPSE_PATH% /y /E /D
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
+
+@echo ------------------------------------------------
+@echo Building PanicDoc.
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\PanicDoc
+@vcbuild PanicDoc.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@Release\PanicDoc.exe -props > %MOSYNC_ECLIPSE_PATH%\paniccodes.properties
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
 
 @cd %ORIGINAL_PATH%
 @echo.
