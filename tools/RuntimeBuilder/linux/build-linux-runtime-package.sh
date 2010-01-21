@@ -76,13 +76,15 @@ buildTemplate()
 {
 	if [ "$1" = "dbg" ]; then
 		build_type="Debug"
+		cp $path/config_platform.h.dbg $path/../../../runtimes/cpp/platforms/sdl/config_platform.h
 	else
 		build_type="Release"
+		cp $path/config_platform.h.rel $path/../../../runtimes/cpp/platforms/sdl/config_platform.h
 	fi
 
 	print_msg "Building $build_type template"
 	if [ -e  "$path/distro" ]; then
-		chmod 755 -R $path/distro
+		rm -Rf $path/distro
 	fi
 	mkdir $path/distro
 	mkdir $path/distro/tmp
@@ -90,23 +92,15 @@ buildTemplate()
 
 	export MOSYNCDIR=$path/distro/tmp
 
+    cd $path/../../../
 	if [ ! "$2" = "-noclean" ]; then
 		print_msg "Performing rake clean"
-		cd $path/../../../
-		if [ "$1" = "rel" ]; then
-			rake clean CONFIG=""
-		else
-			rake clean
-		fi
+        rake clean CONFIG=""
 		printf "\n%s\n" "OK"
 	fi
 
 	print_msg "Attempting to build MoRE"
-	if [ "$1" = "rel" ]; then
-		rake more CONFIG="" FULLSCREEN="true"
-	else
-		rake more FULLSCREEN="true"
-	fi
+    rake more CONFIG="" FULLSCREEN="true"
 
 	if [ "$?" -ne "0" ]; then
 		handle_error "rake"
@@ -153,6 +147,7 @@ buildTemplate()
 	#
 	print_msg "Performing clean up"
 	rm -Rf $path/distro
+	rm $path/../../../runtimes/cpp/platforms/sdl/config_platform.h
 	cd $curr
 	printf "\n%s\n" "OK"
 

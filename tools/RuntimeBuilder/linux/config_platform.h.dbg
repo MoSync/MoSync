@@ -1,0 +1,26 @@
+#ifndef CONFIG_SDL_H
+#define CONFIG_SDL_H
+
+#ifdef CONFIG_H
+#error Only one config file allowed per compilation unit!
+#endif
+#define CONFIG_H
+
+#define PHONE_RELEASE
+#define MOSYNC_COMMERCIAL
+
+#define LOGGING_ENABLED
+#define UPDATE_IP
+#define FAKE_CALL_STACK
+#define RESOURCE_MEMORY_LIMIT
+#define GDB_DEBUG
+
+#define MEMORY_PROTECTION
+
+#define TRANSLATE_PANICS
+
+#define MINIMUM_SYSCALL_ID 0
+#define MAX_SYSCALL_ID 127
+
+#endif	//CONFIG_SDL_H
+
