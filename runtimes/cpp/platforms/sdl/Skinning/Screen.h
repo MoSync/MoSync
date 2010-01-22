@@ -27,4 +27,9 @@ namespace MoRE {
 	SDL_Surface* getPhoneScreen();
 }
 
+namespace Base {
+	void pixelDoubledBlit(int x, int y, SDL_Surface *dstSurface, SDL_Surface *srcSurface, SDL_Rect srcRect, int multiplier);
+}
+
+
 #endif	//_SCREEN_H_

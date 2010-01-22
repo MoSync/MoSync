@@ -24,10 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define LOG printf
 
-namespace Base {
-	void pixelDoubledBlit(int x, int y, SDL_Surface *dstSurface, SDL_Surface *srcSurface, SDL_Rect srcRect, int multiplier);
-}
-
 namespace MoRE {
 	bool KeyRect::contains(int lx, int ly) {
 		if(lx>=this->x && lx<this->x+this->w && ly>=this->y && ly<this->y+this->h) return true;
