@@ -295,7 +295,13 @@ namespace MAUI {
 		closeFontReader();
 
 		this->fontImage = PlaceholderPool::alloc();//maCreatePlaceholder();
-		maCreateImageFromData(this->fontImage, font, 8+fontInfoSize, imageSize);	
+		int err;
+		if((err=maCreateImageFromData(this->fontImage, font, 8+fontInfoSize, imageSize))!=RES_OK) {
+			if(err==RES_OUT_OF_MEMORY)
+				maPanic(0, "Font::setResource(MAHandle font), out of memory, image could not be loaded");
+			if(err==RES_BAD_INPUT)
+				maPanic(0, "Font::setResource(MAHandle font), image could not be loaded due to bad input");
+		}
 	}
 
 
