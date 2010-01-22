@@ -72,12 +72,15 @@ void Int::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) con
 }
 
 void Char::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<char>(pf, data, "%i", fmt, fmt);
+	
 	if(fmt==eNatural) {
+		printPrimitiveByFormat<char>(pf, data, "%i", eDecimal, eDecimal);
 		char c = *(char*)data;
 		if(c>=0 && c<=32) pf(" \'\\\\%o\'", c);
 		else pf(" \'%c\'", c);
-	}	
+	} else {
+		printPrimitiveByFormat<char>(pf, data, "%i", fmt, fmt);	
+	}
 }
 
 void LongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {

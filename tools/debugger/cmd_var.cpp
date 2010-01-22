@@ -122,7 +122,8 @@ struct Variable {
 	string localName;
 	Expression* exp;
 	//vector<Variable> children;
-	map<string, Variable> children;
+	//map<string, Variable> children;
+	map<int, Variable> children;
 	
 	TypeBase::PrintFormat printFormat;
 	bool mHasCreatedChildren;
@@ -141,7 +142,7 @@ struct Variable {
 //******************************************************************************
 
 static Variable* findVariable(const string& name);
-static bool printUpdateItem(Variable* var);
+static bool printUpdateItem(bool comma, Variable* var);
 
 //******************************************************************************
 // statics
@@ -162,7 +163,7 @@ static queue<Variable*> sUpdateQueue;
 //******************************************************************************
 Variable::~Variable() {
 //	for(size_t i = 0; i < children.size(); i++) {
-	for(map<string, Variable>::iterator i = children.begin(); i != children.end(); i++) {
+	for(map<int, Variable>::iterator i = children.begin(); i != children.end(); i++) {
 		//sVariableMap.erase(children[i].name);
 		sVariableMap.erase(i->second.name);
 	}
@@ -178,12 +179,12 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	this->exp->updateData(value, type, arrayType->isSimpleValue());
 
 	for(int i = 0; i < arrayType->mLength; i++) {
-	//	Variable& var = children[i];
+		Variable& var = children[i];
 		StringPrintFunctor spf;
 		spf("[%d]", i);
 		string varName = spf.getString();
 		spf.reset();
-		Variable& var = children[varName];
+		//Variable& var = children[varName];
 		var.name = name+"."+varName;
 		var.outOfScope = false;
 		var.printFormat = TypeBase::eNatural;
@@ -203,7 +204,8 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 		string varName = spf.getString();
 		spf.reset();
 	
-		Variable& var = children[varName];
+//		Variable& var = children[varName];
+		Variable& var = children[i];
 		{
 		/*
 			var.outOfScope = false;
@@ -270,7 +272,8 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		string varName = spf.getString();
 		spf.reset();
 
-		Variable& var = children[varName];
+//		Variable& var = children[varName];
+		Variable& var = children[0];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
@@ -340,7 +343,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
-		Variable& virtualVar = children[virtualVarName];
+		Variable& virtualVar = children[(int)dataMembers[i].visibility];
 		virtualVar.localName = virtualVarName;
 		virtualVar.exp = NULL;
 		virtualVar.name = name + "." + virtualVarName;
@@ -362,7 +365,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		const TypeBase* deref = bases[i].type->resolve();
 		string varName = ((StructType*)deref)->mName.c_str();
 
-		Variable& var = children[varName];
+		Variable& var = children[i];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
@@ -404,12 +407,12 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
-		Variable& virtualVar = children[virtualVarName];
+		Variable& virtualVar = children[(int)dataMembers[i].visibility];
 
 		string varName = dataMembers[i].name;
 		sVariableMap[virtualVar.name] = &virtualVar;
 
-		Variable& var = virtualVar.children[varName];
+		Variable& var = virtualVar.children[bases.size()+i];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
@@ -766,7 +769,7 @@ static void Callback::varUpdate() {
 		if(!v->outOfScope) {
 			if(v->mHasCreatedChildren)
 				//	for(size_t i = 0; i < v->children.size(); i++) {
-				for(map<string, Variable>::iterator i = v->children.begin(); i!=v->children.end(); i++) {
+				for(map<int, Variable>::iterator i = v->children.begin(); i!=v->children.end(); i++) {
 					sUpdateQueue.push(&i->second);
 				}
 				if(!v->exp) {
@@ -782,10 +785,7 @@ static void Callback::varUpdate() {
 	map<string, Variable*>::iterator itr = sVariableMap.begin();
 	bool comma = false;
 	while(itr != sVariableMap.end()) {
-		if(comma) {
-			oprintf(",");
-		}
-		comma |= printUpdateItem(itr->second);
+		comma |= printUpdateItem(comma, itr->second);
 		itr++;
 	}
 	oprintf("]\n");
@@ -823,8 +823,9 @@ static void printListChildrenItem(Variable* var) {
 
 
 //returns true if anything was printed
-static bool printUpdateItem(Variable* var) {
+static bool printUpdateItem(bool comma, Variable* var) {
 	if(var->exp && var->exp->updated()) {
+		if(comma) oprintf(",");
 		var->exp->outdate();
 		oprintf("{name=\"%s\"", var->name.c_str());
 		printValue(var);
@@ -833,10 +834,14 @@ static bool printUpdateItem(Variable* var) {
 		return true;
 	}
 
-	if(!var->outOfScope && var->mHasCreatedChildren)
+	/*
+	if(!var->outOfScope && var->mHasCreatedChildren) {
 		//for(size_t i = 0; i < var->children.size(); i++)
-		for(map<string, Variable>::iterator i = var->children.begin(); i!=var->children.end(); i++)
-			printUpdateItem(&i->second);
+		for(map<string, Variable>::iterator i = var->children.begin(); i!=var->children.end(); i++) {
+			comma |= printUpdateItem(comma, &i->second);
+		}
+	}
+	*/
 
 	return false;
 }
@@ -1010,7 +1015,7 @@ static void Callback::varListChildren() {
 	oprintf(",numchild=\"%d\",children=[", sVar->children.size());
 
 	//for(size_t i = 0; i < sVar->children.size(); i++) 
-	for(map<string, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
+	for(map<int, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
 	{
 		Variable& varc = i->second;
 		if(i!=sVar->children.begin()) oprintf(",");
