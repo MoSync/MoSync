@@ -21,6 +21,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FileStream.h"
 #include "MemStream.h"
 #include <helpers/smartie.h>
+#include <filelist/filelist.h>
+
+#ifdef IX_FILE
+#include <helpers/CPP_IX_FILE.h>
+#endif
 
 #ifdef _WIN32_WCE
 //#include <windows.h>
@@ -57,7 +62,30 @@ namespace Base {
 	typedef std::map<int, std::string> StoreMap;
 	typedef StoreMap::iterator StoreItr;
 	StoreMap gStores;
-#endif
+
+#ifdef IX_FILE
+	struct FileList {
+		std::vector<std::string> files;
+		int pos;
+	};
+	typedef std::map<int, FileList> FileListMap;
+	typedef FileListMap::iterator FileListItr;
+	static FileListMap sFileListings;
+	static int sFileListNextHandle = 1;
+
+	typedef std::map<int, FileStream*> FileMap;
+	typedef FileMap::iterator FileItr;
+	static FileMap sFileHandles;
+	static int sFileNextHandle = 1;
+
+#ifdef EMULATOR
+#define FILESYSTEM_CHROOT 1
+#define FILESYSTEM_DIR "filesystem"
+#else
+#define FILESYSTEM_CHROOT 0
+#endif	//EMULATOR
+#endif	//IX_FILE
+#endif	//SYMBIAN
 
 	void Syscall::init() {
 	}
@@ -497,6 +525,140 @@ namespace Base {
 		dst->uuids = vmUuids;
 		return res;
 	}
+
+#ifdef IX_FILE
+
+	/*constset int MA_ACCESS_ {
+		READ = 1;
+		WRITE = 2;
+		READ_WRITE = 3;
+	}*/
+
+#if 0
+	MAHandle maFileOpen(const char* path, int mode) {
+	}
+
+	int maFileExists(MAHandle file) {
+	}
+
+	int maFileClose(MAHandle file) {
+	}
+
+	int maFileCreate(MAHandle file) {
+	}
+
+	int maFileDelete(MAHandle file) {
+	}
+	int maFileSize(MAHandle file);
+	int maFileAvailableSpace(MAHandle file);
+	int maFileTotalSpace(MAHandle file);
+	int maFileDate(MAHandle file);
+	int maFileRename(MAHandle file, const char* newName);
+	int maFileTruncate(MAHandle file, int offset);
+
+	int maFileWrite(MAHandle file, const void* src, int len) {
+	}
+
+	/*struct MA_FILE_DATA {
+		MAHandle file;
+		MAHandle data;
+		int offset;
+		int len;
+	}*/
+
+	int maFileWriteFromData(const MA_FILE_DATA* args) {
+	}
+
+	int maFileRead(MAHandle file, void* dst, int len) {
+	}
+
+	int maFileReadToData(const MA_FILE_DATA* args) {
+	}
+
+	int maFileTell(MAHandle file);
+
+	int maFileSeek(MAHandle file, int offset, int whence);
+
+	/*constset int MA_SEEK_ {
+		/// Beginning of file.
+		SET = 0;
+		/// Current position.
+		CUR = 1;
+		/// End of file.
+		END = 2;
+	}*/
+#endif
+
+#ifndef SYMBIAN
+	static FileList sFileList;
+	static std::string sFileListRealDir;
+
+	static void fileListCallback(const char* filename) {
+		if(!strcmp(filename, ".") || !strcmp(filename, ".."))
+			return;
+		std::string fn = filename;
+		if(isDirectory((sFileListRealDir + fn).c_str())) {
+			fn += "/";
+		}
+		sFileList.files.push_back(fn);
+	}
+
+	// if this is MoRE, the emulator,
+	// we'll put all filesystem access into a separate directory, like chroot.
+	MAHandle maFileListStart(const char* path, const char* filter) {
+		sFileList.files.clear();
+		sFileList.pos = 0;
+		if(path[0] == 0) {	//empty string
+			//list filesystem roots
+#if FILESYSTEM_CHROOT || defined(LINUX)
+			sFileList.files.push_back("/");
+#else
+#error list them roots!
+#endif
+		} else {
+			//list files in a directory
+			std::string scanPath;
+#if FILESYSTEM_CHROOT
+			scanPath = FILESYSTEM_DIR;
+			_mkdir(FILESYSTEM_DIR);
+#endif
+			scanPath += path;
+			if(scanPath[scanPath.size()-1] != '/')
+				scanPath += "/";
+			sFileListRealDir = scanPath;
+			scanPath += filter;
+			int res = scanDirectory(scanPath.c_str(), fileListCallback);
+			if(res)
+				return MA_FLERR_GENERIC;
+		}
+		std::pair<FileListItr, bool> ires = sFileListings.insert(
+			std::pair<int, FileList>(sFileListNextHandle, sFileList));
+		DEBUG_ASSERT(ires.second);
+		return sFileListNextHandle++;
+	}
+
+	int maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
+		FileListItr itr = sFileListings.find(list);
+		MYASSERT(itr != sFileListings.end(), ERR_FILE_HANDLE_INVALID);
+		FileList& fl(itr->second);
+		if(fl.pos == fl.files.size())
+			return 0;
+		const std::string& name(fl.files[fl.pos]);
+		if((int)name.size() >= bufSize)
+			return name.size();
+		memcpy(nameBuf, name.c_str(), name.size() + 1);
+		fl.pos++;
+		return name.size();
+	}
+
+	int maFileListClose(MAHandle list) {
+		FileListItr itr = sFileListings.find(list);
+		MYASSERT(itr != sFileListings.end(), ERR_FILE_HANDLE_INVALID);
+		sFileListings.erase(itr);
+		return 0;
+	}
+#endif	//SYMBIAN
+#endif	//IX_FILE
 
 #ifdef SYMBIAN
 #if 0

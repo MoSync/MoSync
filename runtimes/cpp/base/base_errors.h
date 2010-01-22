@@ -70,7 +70,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40052, ERR_IMAGE_SIZE_INVALID, "Invalid image size")\
 	m(40053, ERR_MEMORY_NULL, "Attempted to access null pointer.")\
 	m(40054, ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")\
-	m(40055, ERR_RES_NO_RESOURCES, "Attempted to load resource, but no resources exist.")
+	m(40055, ERR_RES_NO_RESOURCES, "Attempted to load resource, but no resources exist.")\
+	m(40056, ERR_FILE_HANDLE_INVALID, "File handle invalid")\
 
 DECLARE_ERROR_ENUM(BASE)
 

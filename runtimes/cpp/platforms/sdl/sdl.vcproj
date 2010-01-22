@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="sdl"
 	ProjectGUID="{ADF68B96-47DA-4A30-AA51-B5450B019F7F}"
 	RootNamespace="sdl"
@@ -576,14 +576,6 @@
 		</File>
 		<File
 			RelativePath=".\FileImpl.h"
-			>
-		</File>
-		<File
-			RelativePath=".\mophone.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\mophone.h"
 			>
 		</File>
 		<File

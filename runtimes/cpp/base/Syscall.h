@@ -106,6 +106,12 @@ namespace Base {
 	int atoiLen(const char* str, int len);
 }
 
+#ifdef IX_FILE
+MAHandle maFileListStart(const char* path, const char* filter);
+int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
+int maFileListClose(MAHandle list);
+#endif
+
 #ifndef SYMBIAN
 #define SPECIAL(name) _##name
 #define SPECIAL_SYSCALL(type, nargs) static type SPECIAL(nargs)

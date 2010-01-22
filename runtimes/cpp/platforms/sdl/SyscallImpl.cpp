@@ -51,6 +51,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_CONNSERVER.h>
+#include <helpers/CPP_IX_FILE.h>
 
 // blah
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
@@ -73,7 +74,6 @@ extern "C" {
 #ifdef WIN32
 #include "windows_errors.h"
 #endif
-#include "mophone.h"
 #include "report.h"
 #include "TcpConnection.h"
 #include "ConfigParser.h"
@@ -92,13 +92,6 @@ namespace Base {
 	Syscall* gSyscall = NULL;
 	bool gReload = false;
 
-#ifndef MOBILEAUTHOR
-	/*
-	 * Deprecated? 
-	static bool gShouldHaveMophone;
-	*/
-#endif
-
 #ifndef __USE_FULLSCREEN__
 	static uint screenWidth  = 240;	//176
 	static uint screenHeight = 320;	//208
@@ -108,10 +101,6 @@ namespace Base {
 	static uint screenHeight = 240*2;	//208
 #endif
 
-	/*
-	 * Deprecated ?
-	static uint gScreenMultiplier = 1;
-	*/
 	static SDL_Surface *gScreen = NULL, *gDrawSurface = NULL, *gBackBuffer = NULL;
 	static int gCurrentUnconvertedColor = 0, gCurrentConvertedColor = 0;
 	static TTF_Font *gFont = NULL;
@@ -316,16 +305,6 @@ namespace Base {
 				screenHeight = pVid->current_h;
 			}
 #endif
-			//sSkin = chooseSkin(model, vendor);
-			/*if(!sSkin) {
-				LOG("Skin '%s/%s' is not available. Aborting...\n", model, vendor);
-				BIG_PHAT_ERROR(SDLERR_NOSKIN);
-			}*/
-			/*
-			gShouldHaveMophone = 
-				initMophoneScreen(sSkin, &gScreen, screenWidth * gScreenMultiplier,
-				screenHeight * gScreenMultiplier, shouldHaveMophone);
-				*/
 
 			if(haveSkin) {
 				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
@@ -395,10 +374,6 @@ namespace Base {
 		}
 
 		gDrawSurface = gBackBuffer;
-		
-
-		//TEST_Z(gFont = TTF_OpenFont("\\WINDOWS\\Fonts\\jvgasys.fon", 8));
-		//TEST_Z(gFont = TTF_OpenFont("\\WINDOWS\\Fonts\\msdlg874.fon", 8));
 
 		char destDir[256];
 		destDir[0] = 0;
@@ -644,8 +619,6 @@ namespace Base {
 
 	static void MAUpdateScreen() {
 #ifndef MOBILEAUTHOR
-		//SDL_Rect srcRect = {0, 0, (Uint16)gBackBuffer->w, (Uint16)gBackBuffer->h};
-		//pixelDoubledBlit(getMophoneRealScreenStartX(), getMophoneRealScreenStartY(), gScreen, gBackBuffer, srcRect, gScreenMultiplier);
 		if(sSkin) {
 			sSkin->drawScreen();
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
@@ -653,43 +626,14 @@ namespace Base {
 			SDL_BlitSurface(gBackBuffer, NULL, gScreen, NULL);
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		}
-		/*
-		//stretch the backbuffer onto the screen
-		DEBUG_ASRTZERO(SDL_LockSurface(gScreen));
-		DEBUG_ASRTZERO(SDL_LockSurface(gBackBuffer));
-		DEBUG_ASRTINT(gBackBuffer->format->BytesPerPixel, 4);
-		ASRTINT(gScreen->format->BytesPerPixel, 4, SDLERR_SCREEN_NOT_32BIT);
-		for(uint line=0; line < screenHeight; line++) {
-			int* dst = (int*)((char*)gScreen->pixels + gScreen->pitch * (line * gScreenMultiplier));
-			int* src = (int*)((char*)gBackBuffer->pixels + gBackBuffer->pitch * line);
-			for(uint y=0; y<gScreenMultiplier; y++) {
-				for(uint column=0; column < screenWidth ; column++) {
-					for(uint i=0; i< gScreenMultiplier; i++) {
-						dst[column * gScreenMultiplier + i] = src[column];
-					}
-				}
-				dst = (int*)(((char*)dst) + gScreen->pitch);
-			}
-		}
-		SDL_UnlockSurface(gBackBuffer);
-		SDL_UnlockSurface(gScreen);
-		SDL_UpdateRect(gScreen, 0, 0, 0, 0);
-		*/
+
 #endif
 	}
-
-//	#define GET_MULTI_KEY(mak, sdlk) if(keys[SDLK_##sdlk]) ma_keys |= MAK_##mak;
-//	#define GET_DIRECT_KEY(k) GET_MULTI_KEY(k, k)
-//	#define GET_NUMBER_KEY(k) GET_MULTI_KEY(k, KP##k)
 
 	int currentKeyState = 0;
 
 	static int MAConvertKey(int sdlkey)
 	{
-		//if((sdlkey>='A'&&sdlkey<='Z')||(sdlkey>='a'&&sdlkey<='z')||(sdlkey>='0'&&sdlkey<='9')) {
-		//	return sdlkey;
-		//}
-
 		switch(sdlkey)
 		{
 	#define CASE_MULTI_KEY(mak, sdlk) case SDLK_##sdlk: return MAK_##mak;
@@ -752,7 +696,6 @@ namespace Base {
 				gEventFifo.clear();
 				LOG("EventBuffer overflow!\n");
 			}
-			//gEventFifo.put(mak | mask);
 			MAEvent event;
 			event.type = pressed ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
 
@@ -823,12 +766,6 @@ namespace Base {
 		DEBUG_ASSERT(NULL != SDL_AddTimer(EVENT_CLOSE_TIMEOUT, ExitCallback, NULL));
 	}
 
-	/*
-	 * Deprecated ?
-	static int lastMophoneMouseButton = -1;
-	static bool wasInside = false;
-	*/
-
 	//returns true iff maWait should return.
 	//must be called only from the main thread!
 	bool MAProcessEvents() {
@@ -862,23 +799,6 @@ namespace Base {
 				break;
 #ifndef MOBILEAUTHOR
 			case SDL_MOUSEMOTION:
-				/*
-				if(isPointInsideScreen(event.motion.x, event.motion.y, gBackBuffer->w*gScreenMultiplier , gBackBuffer->h*gScreenMultiplier) && (event.motion.state&SDL_BUTTON(1))) {
-					if(!wasInside) {
-						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_PRESSED);
-					} else {
-						MASendPointerEvent((event.motion.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.motion.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_DRAGGED);
-					}
-					wasInside = true;
-				} else {
-
-					// should send a release message here the first time it goes out of the screen.
-					if(wasInside && (event.motion.state&SDL_BUTTON(1))) {
-						wasInside = false;
-						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_RELEASED);
-					}
-				}
-				*/
 				if(event.motion.state&SDL_BUTTON(1))
 				{
 					if(sSkin)
@@ -888,20 +808,6 @@ namespace Base {
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				/*
-				if(event.button.button == 1) {
-					int button = containsButtonMophone(event.button.x, event.button.y);
-					if(button!=-1) {
-						MAHandleKeyEventMAK(button, true);
-						drawButtonMophone(gScreen, button, true);
-						MAUpdateScreen();
-						lastMophoneMouseButton = button;
-					} else if(isPointInsideScreen(event.button.x, event.button.y, gBackBuffer->w*gScreenMultiplier , gBackBuffer->h*gScreenMultiplier)) {
-						wasInside = true;
-						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_PRESSED);
-					}
-				}
-				*/
 				if(event.button.button == 1)
 				{
 					if(sSkin)
@@ -911,19 +817,6 @@ namespace Base {
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
-				/*
-				if(event.button.button == 1) {
-					if(lastMophoneMouseButton!=-1) {
-						MAHandleKeyEventMAK(lastMophoneMouseButton, false);
-						drawButtonMophone(gScreen, lastMophoneMouseButton, false);
-						MAUpdateScreen();
-						lastMophoneMouseButton = -1;
-					} else if(isPointInsideScreen(event.button.x, event.button.y, gBackBuffer->w*gScreenMultiplier , gBackBuffer->h*gScreenMultiplier)) {
-						wasInside = false;
-						MASendPointerEvent((event.button.x-getMophoneRealScreenStartX())/getMophoneScale(), (event.button.y-getMophoneRealScreenStartY())/getMophoneScale(), EVENT_TYPE_POINTER_RELEASED);
-					}
-				}
-				*/
 				if(event.button.button == 1)
 				{
 					if(sSkin)
@@ -940,34 +833,7 @@ namespace Base {
 					MASetClose();
 					break;
 				}
-#ifndef MOBILEAUTHOR
-				/*
-				else if(event.key.keysym.sym == SDLK_PAGEUP) {
-					if(gScreenMultiplier < 4 ) {
-						gScreenMultiplier++;
-						initMophoneScreen(sSkin, &gScreen, screenWidth * gScreenMultiplier,
-							screenHeight * gScreenMultiplier, gShouldHaveMophone);
-						MAUpdateScreen();
-						//gScreen = SDL_SetVideoMode(screenWidth * gScreenMultiplier,
-						//	screenHeight * gScreenMultiplier, 32, SDL_SWSURFACE | SDL_ANYFORMAT);
-					}
-					break;
-				} else if(event.key.keysym.sym == SDLK_PAGEDOWN) {
-					if(gScreenMultiplier > 1) {
-						gScreenMultiplier--;
-						initMophoneScreen(sSkin, &gScreen, screenWidth * gScreenMultiplier,
-							screenHeight * gScreenMultiplier, gShouldHaveMophone);
-						MAUpdateScreen();
-						//gScreen = SDL_SetVideoMode(screenWidth * gScreenMultiplier,
-						//	screenHeight * gScreenMultiplier, 32, SDL_SWSURFACE | SDL_ANYFORMAT);
-					}
-					break;
-				}
-				*/
-				//drawButtonMophone(gScreen, MAConvertKey(event.key.keysym.sym), true);
-#endif	//MOBILEAUTHOR
 				MAHandleKeyEvent(event.key.keysym.sym, true);
-				//MAUpdateScreen();
 				break;
 			case SDL_KEYUP:
 				if(	event.key.keysym.sym == SDLK_PAGEUP||
@@ -977,12 +843,6 @@ namespace Base {
 				}
 
 				MAHandleKeyEvent(event.key.keysym.sym, false);
-				/*
-#ifndef MOBILEAUTHOR
-				drawButtonMophone(gScreen, MAConvertKey(event.key.keysym.sym), false);
-#endif
-				MAUpdateScreen();
-				*/
 				break;
 			case SDL_QUIT:
 				LOGT("SDL_QUIT");
@@ -1178,12 +1038,6 @@ namespace Base {
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
 		SDL_Rect rect = { (Sint16)left, (Sint16)top, 0, 0 };
 		SDL_BlitSurface(surf, NULL, gDrawSurface, &rect);
-		/*
-		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
-		MARect srcRect = {0, 0, surf->w, surf->h};
-		MAPoint2d dstPoint = {left, top};
-		maDrawImageRegion(image, &srcRect, &dstPoint, TRANS_NONE);
-		*/
 	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
@@ -1216,9 +1070,6 @@ namespace Base {
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
-		//SDL_Rect srcRect = {src->left, src->top, src->width, src->height};
-		//SDL_Rect destRect = {dstTopLeft->x, dstTopLeft->y, 0, 0};
-		//	SDL_BlitSurface(surf, &srcRect, gDrawSurface, &destRect);
 
 		unsigned int* srcPixels = (unsigned int*) surf->pixels;
 		unsigned int* destPixels = (unsigned int*) gDrawSurface->pixels;
@@ -1260,30 +1111,6 @@ namespace Base {
 
 		if( width <= 0 || height <= 0) return;
 
-		/*
-		if (left > gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w) 
-		return;
-		else if(left < gDrawSurface->clip_rect.x) {
-		u += gDrawSurface->clip_rect.x - left;
-		left = gDrawSurface->clip_rect.x;
-		}
-		if (top > gDrawSurface->clip_rect.y + gDrawSurface->clip_rect.h) 
-		return;
-		else if(top < gDrawSurface->clip_rect.y) {
-		v += gDrawSurface->clip_rect.y - top;		
-		top = gDrawSurface->clip_rect.y;
-		}
-		if(left + width < gDrawSurface->clip_rect.x) 
-		return;
-		else if(left + width > gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w)
-		width -= (left + width) - (gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w);
-		if(top + height < gDrawSurface->clip_rect.y) 
-		return;
-		else if(top + height > gDrawSurface->clip_rect.y + gDrawSurface->clip_rect.h)
-		height -= (top + height) - (gDrawSurface->clip_rect.y + gDrawSurface->clip_rect.h);
-
-		if( width <= 0 || height <= 0) return;
-		*/
 		switch(transformMode) {
 			case TRANS_NONE:
 				srcPitchX = bpp;
@@ -1496,34 +1323,7 @@ namespace Base {
 		if(srcAlpha) {
 			SDL_SetAlpha(surf, SDL_SRCALPHA, 0);
 		}
-/*
-		if( srcRect.x < surf->clip_rect.x ) srcRect.x = surf->clip_rect.x;
-		else if( srcRect.x > surf->clip_rect.x + surf->clip_rect.w ) return;
-		if( srcRect.y < surf->clip_rect.y ) srcRect.y = surf->clip_rect.y;
-		else if( srcRect.y > surf->clip_rect.y + surf->clip_rect.h ) return;
-		
-		if( srcRect.x + srcRect.w < surf->clip_rect.x ) return;
-		else if( srcRect.x + srcRect.w > surf->clip_rect.x + surf->clip_rect.w ) {
-			srcRect.w -= (srcRect.x + srcRect.w) - (surf->clip_rect.x + surf->clip_rect.w);
-		}
-		if( srcRect.y + srcRect.h < surf->clip_rect.y ) return;
-		else if( srcRect.y + srcRect.h > surf->clip_rect.y + surf->clip_rect.h ) {
-			srcRect.h -= (srcRect.y + srcRect.h) - (surf->clip_rect.y + surf->clip_rect.h);
-		}
 
-		if( srcRect.w <= 0 || srcRect.h <= 0 ) return;
-		
-		int width = srcRect.w;
-		int height = srcRect.h;
-		unsigned char *dptr = (unsigned char*)dstSurface->pixels;
-		unsigned char *sptr = (unsigned char*)surf->pixels[srcRect.x<<2];
-
-		while(height--) {
-			memcpy(dptr, sptr, width<<2);
-			sptr+=surf->pitch;
-			dptr+=dstSurface->pitch;
-		}
-*/
 		SDL_FreeSurface(dstSurface);
 	}
 
@@ -1574,9 +1374,6 @@ namespace Base {
 	}
 
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int alpha)) {
-	//	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(src, 
-	//		EXTENT_X(size), EXTENT_Y(size), 32, (EXTENT_X(size))<<2, 
-	//		0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 		SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 		CHECK_INT_ALIGNMENT(src);
 
@@ -1769,39 +1566,11 @@ namespace Base {
 			mime[i++] = b;
 		} while(b);
 
-		/*
-		bool isAmr = (stricmp(mime, "audio/3gpp") == 0 ||
-			stricmp(mime, "audio/amr") == 0 ||
-			stricmp(mime, "audio/amr-wb") == 0);
-		*/
-
 		int pos;
 		src->tell(pos);
 		int encodedSize = size - pos + offset;
 		LOGA("encodedSize: %i\n", encodedSize);
 		Stream* copy = src->createLimitedCopy(encodedSize);
-
-		/*
-		SDL_RWops* rwops = SDL_RWFromStream(copy);
-
-		if(!rwops)
-		{
-			delete copy;
-			LOG(SDL_GetError());
-			DEBIG_PHAT_ERROR;
-		}
-
-		SDLSoundAudioSource *audioSource = new SDLSoundAudioSource(rwops);
-		if(audioSource->init() != 0) {
-			delete copy;
-			DEBIG_PHAT_ERROR;
-		}
-		*/
-		/*
-		if(!initChannel(chan, rwops, isAmr)) {
-			return -1;
-		}
-		*/
 
 		AudioChannel *chnl = AudioEngine::getChannel(chan);
 		AudioSource *audioSource = chnl->getAudioSource();
@@ -2128,6 +1897,7 @@ namespace Base {
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 #ifdef IX_FILE
+#if 0
 		case maIOCtl_maFileOpen:
 			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
@@ -2161,14 +1931,14 @@ namespace Base {
 			return maFileTell(a);
 		case maIOCtl_maFileSeek:
 			return maFileSeek(a, b, c);
-
+#endif	//0
 		case maIOCtl_maFileListStart:
 			return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileListNext:
-			return maFileListNext(a, b, c);
+			return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileListClose:
 			return maFileListClose(a);
-#endif
+#endif	//IX_FILE
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
@@ -2406,7 +2176,7 @@ void MoSyncErrorExit(int errorCode) {
 
 	if(!gReload) {
 #ifdef __USE_FULLSCREEN__
-                SDL_Quit( );
+		SDL_Quit( );
 #endif
 		MoSyncMessageBox(buffer, "MoSync Panic");
 	}
