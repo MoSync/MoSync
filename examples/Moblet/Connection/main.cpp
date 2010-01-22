@@ -41,6 +41,8 @@ public:
 
 	virtual void httpFinished(HttpConnection* http, int result) {
 		printf("HTTP %i\n", result);
+		if(result <= 0)
+			return;
 		String cl;
 		int res = mHttp.getResponseHeader("content-length", &cl);
 		printf("cl code %i\n", res);

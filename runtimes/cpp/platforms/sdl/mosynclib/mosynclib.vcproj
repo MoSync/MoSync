@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="mosynclib"
 	ProjectGUID="{4DA91033-FE58-4729-8B55-F42614BD8F90}"
 	RootNamespace="mosynclib"
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib Irprops.lib"
+				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib"
 				OutputFile="$(MOSYNCDIR)\lib\w32\mosynclibD.lib"
 				IgnoreDefaultLibraryNames="msvcrt.lib"
 			/>
@@ -128,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a"
+				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib"
 				OutputFile="$(MOSYNCDIR)\lib\w32\$(ProjectName).lib"
 			/>
 			<Tool
