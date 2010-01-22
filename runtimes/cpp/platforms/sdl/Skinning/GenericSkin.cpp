@@ -150,6 +150,11 @@ namespace MoRE {
 		screenRect.w = mProfile->mScreenWidth;
 		screenRect.h = mProfile->mScreenHeight;	
 
+		windowRect.x = 0;
+		windowRect.y = 0;
+		windowRect.w = w;
+		windowRect.h = h;
+
 		return true;
 	}
 
@@ -219,11 +224,20 @@ namespace MoRE {
 		}
 		*/
 
+		SDL_Rect clipRect;
+		SDL_GetClipRect(getWindowSurface(), &clipRect);
+		SDL_SetClipRect(getWindowSurface(), &windowRect);
+
 		int err;
 		if((err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL)) != 0) {
 			char* errStr = SDL_GetError();
 			printf("ERROR BLITTING: %s!!!!\n", errStr);
 		}
+
+		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y, windowRect.w, windowRect.h);
+
+		SDL_SetClipRect(getWindowSurface(), &clipRect);
+
 		//Base::pixelDoubledBlit(0, 0, getWindowSurface(), unselectedPhone, unselectedPhone->clip_rect, 1);
 				
 		// draw screen
@@ -236,9 +250,16 @@ namespace MoRE {
 		//int width  = getWindowWidth();
 		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
 		
+		SDL_Rect clipRect;
+		SDL_GetClipRect(getWindowSurface(), &clipRect);
+		SDL_SetClipRect(getWindowSurface(), &windowRect);
+
 		if(SDL_BlitSurface(getPhoneScreen(), NULL, getWindowSurface(), (SDL_Rect*) &screenRect) != 0) {
 			printf("ERROR BLITTING!!!!\n");
 		}
+
+		SDL_UpdateRect(getWindowSurface(), screenRect.x, screenRect.y, screenRect.w, screenRect.h);
+		SDL_SetClipRect(getWindowSurface(), &clipRect);
 	}
 
 	void GenericSkin::skinPhone(SDL_Surface* surface, SDL_Surface* keypad) const {
@@ -524,9 +545,15 @@ namespace MoRE {
 	void GenericSkin::keyPressed(int mak) {
 		for(size_t i = 0; i < keyRects.size(); i++) {
 			if(keyRects[i].keyCode == mak) {
+				SDL_Rect clipRect;
+				SDL_GetClipRect(getWindowSurface(), &clipRect);
+				SDL_SetClipRect(getWindowSurface(), &windowRect);
+
 				SDL_Rect src = { (Sint16)keyRects[i].x, (Sint16)keyRects[i].y,
 					(Uint16)keyRects[i].w, (Uint16)keyRects[i].h };
 				SDL_BlitSurface(selectedPhone, &src, getWindowSurface(), &src);
+				SDL_UpdateRect(getWindowSurface(), src.x, src.y, src.w, src.h);
+				SDL_SetClipRect(getWindowSurface(), &clipRect);
 				return;
 			}
 		}
@@ -535,9 +562,15 @@ namespace MoRE {
 	void GenericSkin::keyReleased(int mak) {
 		for(size_t i = 0; i < keyRects.size(); i++) {
 			if(keyRects[i].keyCode == mak) {
+				SDL_Rect clipRect;
+				SDL_GetClipRect(getWindowSurface(), &clipRect);
+				SDL_SetClipRect(getWindowSurface(), &windowRect);
+
 				SDL_Rect src = { (Sint16)keyRects[i].x, (Sint16)keyRects[i].y,
 					(Uint16)keyRects[i].w, (Uint16)keyRects[i].h };
-				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);			
+				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);	
+				SDL_UpdateRect(getWindowSurface(), src.x, src.y, src.w, src.h);
+				SDL_SetClipRect(getWindowSurface(), &clipRect);
 				return;
 			}
 		}

@@ -66,7 +66,7 @@ namespace MoRE {
 		static SDL_Surface* sSelectedKeypad;
 		static SDL_Surface* sUnselectedKeypad;
 
-		SDL_Rect screenRect;
+		SDL_Rect screenRect, windowRect;
 		int mPressedKey;
 		bool mTouchedInside;
 

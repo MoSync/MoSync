@@ -521,7 +521,6 @@ DWORD GetScreenOrientation()
 		//	return 0;
 
 		case WM_KEYDOWN:
-			if(wParam == VK_F24) return 0; // backlight hack
 			if(wParam == VK_THOME) {
 				//ShowWindow(hwnd, SW_MINIMIZE);
 				//ShowWindow(hwnd, SW_HIDE);
@@ -540,7 +539,6 @@ DWORD GetScreenOrientation()
 			return 0;
 
 		case WM_KEYUP:
-			if(wParam == VK_F24) return 0; // backlight hack
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_RELEASED);
 			return 0;
 		
