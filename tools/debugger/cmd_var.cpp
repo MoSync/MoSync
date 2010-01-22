@@ -259,6 +259,16 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	this->exp->updateData(value, type, simpleType);
 
+	if(deref->type() != TypeBase::eStruct) {
+		StringPrintFunctor spf;
+		spf("*(%s)", localName.c_str());
+		string varName = spf.getString();
+		spf.reset();
+		children[0].localName = varName;
+	} else {
+		addStruct(NULL, (StructType*)deref, true);	
+	}
+
 	//children.resize(1);
 	if(!dataAdress) { 
 		mHasCreatedChildren = false;	
@@ -343,7 +353,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
-		Variable& virtualVar = children[(int)dataMembers[i].visibility];
+		Variable& virtualVar = children[bases.size()+(int)dataMembers[i].visibility];
 		virtualVar.localName = virtualVarName;
 		virtualVar.exp = NULL;
 		virtualVar.name = name + "." + virtualVarName;
@@ -407,12 +417,12 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		if(isVTablePointer(deref)) continue;
 
 		string virtualVarName = getVisibilityString(dataMembers[i].visibility);
-		Variable& virtualVar = children[(int)dataMembers[i].visibility];
+		Variable& virtualVar = children[bases.size()+(int)dataMembers[i].visibility];
 
 		string varName = dataMembers[i].name;
 		sVariableMap[virtualVar.name] = &virtualVar;
 
-		Variable& var = virtualVar.children[bases.size()+i];
+		Variable& var = virtualVar.children[i];
 		{
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
