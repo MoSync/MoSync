@@ -23,20 +23,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAPUtil
 {
 	//=========================================================================
-	// Template class for a queue with a limited fixed capacity.
-	//
+	/**
+	 * Template class for a queue with a limited fixed capacity.
+	 */
 	template<class T>
 	class Queue
 	//=========================================================================
 	{
 	public:
-		//
-		// Construct a queue with fixed capacity.
-		// Queue keeps heap-allocated objects of type T.
-		// Client must create objects.
-		// Queue assumes ownership of objects as long as objects are in queue.
-		// Dequeueing an object means ownership is transferred to client.
-		//
+		/**
+		 * Creates a queue with fixed capacity.
+		 * Queue keeps heap-allocated objects of type T.
+		 * Client must create objects.
+		 * Queue assumes ownership of objects as long as objects are in queue.
+		 * Dequeueing an object means ownership is transferred to client.
+		 */
 		Queue( const int capacity )
 			: mItems( NULL ),
 			mCapacity( capacity )
@@ -47,9 +48,9 @@ namespace MAPUtil
 			mEnqueuePosition = 0;
 			mDequeuePosition = 0;
 		}
-		//
-		// Destruct queue
-		//
+		/**
+		 * Destroys a queue
+		 */
 		virtual ~Queue( )
 		{
 			// Delete each item
@@ -57,21 +58,21 @@ namespace MAPUtil
 			// Delete array
 			deleteobject( mItems );
 		}
-		//
-		// Returns item at location in queue.
-		// Returns InvalidPtr if item is unused.
-		//
+		/**
+		 * Returns item at location in queue.
+		 * Returns null if item is unused.
+		 */
 		T* peekAt( int location )
 		{
 			return mItems[location];
 		}
-		//
-		// Returns item capacity of queue.
-		//
+		/**
+		 * Returns item capacity of queue.
+		 */
 		int getCapacity( ) const { return mCapacity; }
-		//
-		// Returns count of queued items.
-		//
+		/**
+		 * Returns count of queued items.
+		 */
 		int getCount( ) const
 		{
 			int count = mEnqueuePosition - mDequeuePosition;
@@ -79,9 +80,9 @@ namespace MAPUtil
 				count += mCapacity;
 			return count;
 		}
-		//
-		// Removes all items in queue.
-		//
+		/**
+		 * Removes all items in queue.
+		 */
 		void clear( )
 		{
 			for ( int i = 0; i < mCapacity; i++ )
@@ -89,14 +90,14 @@ namespace MAPUtil
 			mEnqueuePosition = 0;
 			mDequeuePosition = 0;
 		}
-		//
-		// returns true if queue contains item.
-		//
+		/**
+		 * returns true if queue contains item.
+		 */
 		bool contains( const T* item ) const { return Find( item ) != -1; }
-		//
-		// Returns position in array of item.
-		// If not found, returns -1.
-		//
+		/**
+		 * Returns position in array of item.
+		 * If not found, returns -1.
+		 */
 		int find ( const T* item ) const
 		{
 			int count = getCount( );
@@ -106,11 +107,11 @@ namespace MAPUtil
 						return i;
 			return -1;
 		}
-		//
-		// Returns ref to next T in queue.
-		// Caller assumes ownership of item, and is responsible for deleting item.
-		// Returns InvalidPtr if queue is empty.
-		//
+		/**
+		 * Returns ref to next T in queue.
+		 * Caller assumes ownership of item, and is responsible for deleting item.
+		 * Returns InvalidPtr if queue is empty.
+		 */
 		T* dequeue( )
 		{
 			if ( getCount( ) == 0 )
@@ -122,10 +123,10 @@ namespace MAPUtil
 				mDequeuePosition = 0;
 			return ret;
 		}
-		//
-		// Enters T into queue.
-		// Queue takes ownership of item.
-		//
+		/**
+		 * Enters T into queue.
+		 * Queue takes ownership of item.
+		 */
 		void enqueue( T* item )
 		{
 			// TODO: raise exception
@@ -136,9 +137,9 @@ namespace MAPUtil
 			if ( mEnqueuePosition >= mCapacity )
 				mEnqueuePosition = 0;
 		}
-		//
-		// Returns next item in queue, without removing it from queue.
-		//
+		/**
+		 * Returns next item in queue, without removing it from queue.
+		 */
 		const T* peek( ) const
 		{
 			if ( getCount( ) == 0 )

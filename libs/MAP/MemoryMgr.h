@@ -38,10 +38,16 @@ using namespace MAUtil;
 namespace MAPUtil
 {
 	//=========================================================================
+	/**
+	 * Simple resource tracking class.
+	 */
 	class MemoryMgr
 	//=========================================================================
 	{
 	public:
+		/**
+		 * Registers an object for resource tracking.
+		 */
 		template<class T>
 		static T* track( T* p, const char* label )
 		{
@@ -51,7 +57,9 @@ namespace MAPUtil
 			#endif
 			return p;
 		}
-
+		/**
+		 * Unregisters an object for resource tracking.
+		 */
 		static void untrack( void* p )
 		{
 			#ifdef TRACKOBJECTS
@@ -66,7 +74,9 @@ namespace MAPUtil
 			}
 			#endif
 		}
-
+		/**
+		 * Prints a list of currently tracked objects.
+		 */
 		static void dump( )
 		{
 			#ifdef TRACKOBJECTS

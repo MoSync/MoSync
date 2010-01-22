@@ -21,37 +21,48 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//=========================================================================
-	//
-	// Describes location of a tile in the tile grid.
-	//
+	/**
+	 * Describes location of a tile in the tile grid.
+	 */
 	class MapTileCoordinate
 	//=========================================================================
 	{
 	public:
+		/**
+		 * Creates a map tile coordinate.
+		 */
 		MapTileCoordinate( ) 
 			: mX( 0 ), 
 			  mY( 0 ), 
 			  mMagnification( 0 ) 
 		{
 		}
-
+		/**
+		 * Creates a map tile coordinate.
+		 */
 		MapTileCoordinate( int x, int y, int magnification ) 
 			: mX( x ),
 			  mY( y ),
 			  mMagnification( magnification )
 		{
 		}
-
+		/**
+		 * Returns X coordinate of tile in grid.
+		 */
 		int getX( ) const 
 		{ 
 			return mX; 
 		}
-
+		/*
+		 * Returns Y coordinate of tile in grid.
+		 */
 		int getY( ) const 
 		{ 
 			return mY; 
 		}
-
+		/*
+		 * Returns zoom level of tile.
+		 */ 
 		int getMagnification( ) const 
 		{ 
 			return mMagnification; 

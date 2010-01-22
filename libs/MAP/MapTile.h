@@ -27,14 +27,17 @@ using namespace MAPUtil;
 namespace MAP
 {
 	//=========================================================================
-	//
-	// Tiles use a numbering scheme like Google Maps.
-	// http://www.maptiler.org/google-maps-coordinate-system-projection-epsg-900913-3785/
-	//
+	/**
+	 * Tiles use a numbering scheme like OpenStreetMap or Google Maps.
+	 * http://www.maptiler.org/google-maps-coordinate-system-projection-epsg-900913-3785/
+	 */
 	class MapTile
 	//=========================================================================
 	{
 	public:
+		/**
+		 * Creates a map tile.
+		 */
 		MapTile( MapSourceKind sourceKind, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
 			mSourceKind( sourceKind ),
 			mGridX( gridX ),
@@ -45,47 +48,65 @@ namespace MAP
 			mLastAccessTime( DateTime::minValue( ) )
 		{
 		}
-
+		/**
+		 * Destroys a map tile.
+		 */
 		virtual ~MapTile( )
 		{
 			maDestroyObject( mImage );
 		}
-
+		/**
+		 * Sets last access timestamp to current time.
+		 */
 		void stamp( ) 
 		{ 
 			mLastAccessTime = DateTime::now( ); 
 		}
-
+		/**
+		 * Returns source kind of tile.
+		 */
 		MapSourceKind getSourceKind( ) const	
 		{ 
 			return mSourceKind; 
 		}
-
+		/**
+		 * Returns X coordinate of tile in tile grid.
+		 */
 		int getGridX( ) const					
 		{ 
 			return mGridX; 
 		}
-
+		/**
+		 * Returns Y coordinate of tile in tile grid.
+		 */
 		int getGridY( ) const					
 		{ 
 			return mGridY; 
 		}
-
+		/**
+		 * Returns zoom level of tile.
+		 */
 		int getMagnification( ) const			
 		{ 
 			return mMagnification; 
 		}
-
+		/**
+		 * Returns center of tile in longitude/latitude.
+		 */
 		LonLat getCenter( ) const				
 		{ 
 			return mCenter; 
 		}
-
+		/**
+		 * Returns the map image of the tile.
+		 */
 		MAHandle getImage( ) const				
 		{ 
 			return mImage; 
 		}
-
+		/**
+		 * Returns last access time of the tile.
+		 */
 		DateTime getLastAccessTime( ) const		
 		{ 
 			return mLastAccessTime; 

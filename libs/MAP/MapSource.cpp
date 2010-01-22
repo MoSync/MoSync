@@ -27,7 +27,7 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		MapSourceInnerClientData( IMapSourceListener* listener, MapSourceClientData* clientData ) :
+		MapSourceInnerClientData( IMapSourceListener* listener, void* clientData ) :
 			mListener( listener ), 
 			mClientData( clientData ) 
 		{
@@ -39,7 +39,7 @@ namespace MAP
 		}
 
 		IMapSourceListener* mListener;
-		MapSourceClientData* mClientData;
+		void* mClientData;
 	};
 
 	//=========================================================================
@@ -205,7 +205,7 @@ namespace MAP
 	//
 	// Returns all tiles required to cover specified rectangle around centerpoint.
 	//
-	void MapSource::requestTile( MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData )
+	void MapSource::requestTile( MapTileCoordinate tileXY, IMapSourceListener* listener, void* clientData )
 	//-------------------------------------------------------------------------
 	{
 		if ( !isInQueue( tileXY ) )

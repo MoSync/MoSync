@@ -25,10 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//=========================================================================
-	//
-	// Manages map sources for clients to access.
-	// Implemented as singleton.
-	//
+	/**
+	 * Manages map sources for clients to access.
+	 * Implemented as singleton.
+	 */
 	class MapSourceMgr
 	//=========================================================================
 	{
@@ -37,10 +37,14 @@ namespace MAP
 
 	public:
 		virtual ~MapSourceMgr( );
-
+		/**
+		 * Client accesses singleton through MapSourceMgr::get( )
+		 */
 		static MapSourceMgr* get( );
 		static void shutdown( );
-
+		/*
+		 * Returns map source
+		 */
 		MapSource* getMapSource( MapSourceKind kind );
 
 	private:

@@ -79,7 +79,7 @@ namespace MAP
 		//
 		// IMapSourceListener implementation
 		//
-		void tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData );
+		void tileReceived( MapSource* sender, MapTile* tile, void* clientData );
 		void downloadCancelled( MapSource* sender );
 		void error( MapSource* source, int code );
 		//

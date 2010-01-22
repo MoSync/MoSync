@@ -21,15 +21,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//=========================================================================
+	/**
+	 * Enumerates supported kinds of map sources
+	 */
 	enum MapSourceKind
 	//=========================================================================
 	{
 		MapSourceKind_None,
+		/**
+		 * OpenStreetMap standard rendering.
+		 */
 		MapSourceKind_OpenStreetMap,
+		/**
+		 * Google street map
+		 */
 		MapSourceKind_GoogleMap,
+		/**
+		 * Google aerial/satellite map
+		 */
 		MapSourceKind_GoogleAerial,
+		/**
+		 * Google aerial with roads and labels overlaid
+		 */
 		MapSourceKind_GoogleHybrid,
+		/**
+		 * Cloudmade road map type 1
+		 */
 		MapSourceKind_CloudMade1,
+		/**
+		 * CloudMade road map type 7
+		 */
 		MapSourceKind_CloudMade7,
 		//MapSourceKind_VirtualEarth, //not yet implemented
 		MapSourceKind_Last
@@ -37,4 +58,3 @@ namespace MAP
 }
 
 #endif // MAPSOURCEKIND_H_
-

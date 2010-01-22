@@ -37,6 +37,9 @@ namespace MAP
 	class MapWidgetPanTimerListener;
 
 	//=========================================================================
+	/**
+	 * Scroll direction for use in MapWidget::scroll( )
+	 */
 	enum MapWidgetScrollDirection
 	//=========================================================================
 	{
@@ -47,10 +50,9 @@ namespace MAP
 	};
 
 	//=========================================================================
-	//
-	// Basic map display widget.
-	// No user interaction at this level.
-	//
+	/**
+	 * Simple slippy map widget.
+	 */
 	class MapWidget : public Widget, IMapCacheListener
 	//=========================================================================
 	{
@@ -60,51 +62,54 @@ namespace MAP
 		MapWidget(int x, int y, int width, int height, Widget* parent);
 		
 		virtual ~MapWidget( );
-		//
-		// Map update scope
-		//
+		/**
+		 * Map update scope
+		 */
 		void enterMapUpdateScope( );
 		void exitMapUpdateScope( bool immediate );
 		void updateMap( );
-		//
-		// Map source property
-		//
+		/**
+		 * Map source property
+		 */
 		MapSourceKind getMapSourceKind( ) const { return mSourceKind; }
 		void setMapSourceKind( MapSourceKind sourceKind );
-		//
-		// Center position property
-		//
+		/**
+		 * Center position property
+		 */
 		LonLat getCenterPosition( ) const;
 		void setCenterPosition( LonLat position );
 		PixelCoordinate getCenterPositionPixels( ) const;
-		//
-		// Magnification property
-		//
+		/**
+		 * Magnification property
+		 */
 		int getMagnification( ) const;
 		void setMagnification( int magnification );
-		//
-		// Magnification scale display property
-		//
+		/**
+		 * Magnification scale display property
+		 */
 		bool getHasScale( ) const { return mHasScale; }
 		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
-		//
-		// Smooth panning property
-		//
+		/**
+		 * Smooth panning property
+		 */
 		bool getHasSmoothPanning( ) const;
 		void setHasSmoothPanning( bool hasSmoothPanning );
-		//
-		// Font property
-		//
+		/**
+		 * Returns currently used font.
+		 */
 		Font* getFont( ) const { return mFont; }
+		/**
+		 * Sets font property.
+		 */ 
 		void setFont( Font* font ) { mFont = font; }
-
-		//
-		// Navigation
-		//
+		/**
+		 * Scrolls the map in the specified direction.
+		 * 
+		 */
 		void scroll( MapWidgetScrollDirection direction, bool largeStep);
-		//
-		// Zooming
-		//
+		/**
+		 * Increases magnification by 1 step, i.e. a factor of two.
+		 */
 		void zoomIn( );
 		void zoomOut( );
 		//
@@ -112,19 +117,27 @@ namespace MAP
 		//
 		virtual void setWidth( int width );
 		virtual void setHeight( int height );
-		//
-		// Key handling
-		//
+		/**
+		 * Handles key press.
+		 * Returns true if handled.
+		 */
 		virtual bool handleKeyPress( int keyCode );
+		/**
+		 * Handles key release.
+		 * Returns true if handled.
+		 */
 		virtual bool handleKeyRelease( int keyCode );
 		//
 		// IMapCacheListener implementation
 		//
 		virtual void tileReceived( MapCache* sender, MapTile* tile );
-		//
-		// Coord conversions
-		//
+		/**
+		 * Converts from global map pixels to widget pixels.
+		 */
 		MAPoint2d worldPixelToWidget( PixelCoordinate wpx );
+		/**
+		 * Converts from widget pixels to global map pixels.
+		 */
 		PixelCoordinate widgetToWorldPixel( MAPoint2d pt );
 
 	protected:

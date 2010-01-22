@@ -21,44 +21,65 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//=========================================================================
+	/**
+	 * Describes a pixel coordinate on the global grid of pixels.
+	 * Range is determined by magnification, e.g. for a tile size of 256 and
+	 * a magnification of 2 the global grid is 1024x1024 pixels.
+	 * For a magnification of 10, the global grid is 262144x262144 pixels.
+	 */
 	class PixelCoordinate
 	//=========================================================================
 	{
 	public:
+		/**
+		 * Creates a new pixel coordinate.
+		 */
 		PixelCoordinate( ) :
 			mX( 0 ),
 			mY( 0 ),
 			mMagnification( 0 )
 		{
 		}
-
+		/**
+		 * Creates a new pixel coordinate.
+		 */
 		PixelCoordinate( const int magnification, const int x, const int y)
 		:	mX( x ),
 			mY( y ),
 			mMagnification( magnification )
 		{
 		}
-
+		/**
+		 * Returns the horizontal (longitude) component of the pixel coordinate.
+		 */
 		int getX( ) const					
 		{ 
 			return mX; 
 		}
-
+		/**
+		 * Returns the vertical (latitude) component of the pixel coordinate.
+		 */
 		int getY( ) const					
 		{ 
 			return mY; 
 		}
-
+		/**
+		 * Returns the magnification component of the pixel coordinate.
+		 */
 		int getMagnification( ) const		
 		{ 
 			return mMagnification; 
 		}
-
+		/**
+		 * Compares two pixel coordinates, returns true if the first coordinate is equal to the second.
+		 */
 		bool operator == ( const PixelCoordinate& b ) const
 		{
 			return getX( ) == b.getX( ) && getY( ) == b.getY( ) && getMagnification( ) == b.getMagnification( );
 		}
-
+		/**
+		 * Compare two pixel coordinates, returns true if the first coordinate is not equal to the second.
+		 */
 		bool operator != ( const PixelCoordinate& b ) const
 		{
 			return getX( ) != b.getX( ) || getY( ) != b.getY( ) || getMagnification( ) != b.getMagnification( );

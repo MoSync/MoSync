@@ -35,84 +35,84 @@ namespace MAP
 	class MapSource;
 
 	//=========================================================================
-	//
-	// Client data must subclass this
-	//
-	class MapSourceClientData
-	//=========================================================================
-	{
-	public:
-		virtual ~MapSourceClientData( ) { };
-	};
-
-	//=========================================================================
+	/**
+	 * Listener for MapSource client to implement.
+	 */
 	class IMapSourceListener
 	//=========================================================================
 	{
 	public:
-		virtual void	tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData ) = 0;
+		virtual void	tileReceived( MapSource* sender, MapTile* tile, void* clientData ) = 0;
 		virtual void	downloadCancelled( MapSource* sender ) = 0;
 		virtual void	error( MapSource* source, int code ) = 0;
 	};
 
 	//=========================================================================
+	/*
+	 * Base class for map sources.
+	 * A map source is a provider of map tiles.
+	 * Behavior is modeled after OpenStreetMap tile server.
+	 */
 	class MapSource : public DownloadListener
 	//=========================================================================
 	{
 	private:
+		//
+		// Capacity of request queue.
+		//
 		static const int			QueueSize = 100;
+		//
+		// Maximum parallel downloaders
+		//
 		static const int			Downloaders = 5; // four in parallel plus one slacking
 	public:
 									MapSource( );
 		virtual						~MapSource( );
-
-		void						setApiKey( const char* key );
-		const char*					getApiKey( ) const;
 
 		//============================================================
 		//
 		// virtual functions for client to override
 		//
 		//============================================================
-		//
-		// Returns source kind
-		//
+		/**
+		 * Returns source kind
+		 */
 		virtual MapSourceKind		getSourceKind( ) const = 0;
-		//
-		// Returns tile size
-		//
+		/**
+		 * Returns tile size
+		 */
 		virtual  MAExtent			getTileSize( ) const = 0;
-		//
-		// Returns minimum magnification
-		//
+		/**
+		 * Returns minimum magnification
+		 */
 		virtual int					getMagnificationMin( ) const = 0;
-		//
-		// Returns maximum magnification
-		//
+		/**
+		 * Returns maximum magnification
+		 */
 		virtual int					getMagnificationMax( ) const = 0;
-		//
-		// Returns URL for retrieving a tile
-		//
+		/**
+		 * Returns URL for retrieving a tile
+		 */
 		virtual void				getTileUrl( char* buffer, MapTileCoordinate tileXY ) = 0;
-		//
-		// Converts LonLat to a pixel coordinate, in a global pixel grid
-		//
+		/**
+		 * Converts LonLat to a pixel coordinate, in a global pixel grid
+		 */
 		virtual PixelCoordinate		lonLatToPixel( LonLat lonlat, int magnification ) = 0;
-		//
-		// Converts LonLat to tile coordinates for a tile that contains the lonlat point.
-		//
+		/**
+		 * Converts LonLat to tile coordinates for a tile that contains the lonlat point.
+		 */
 		virtual MapTileCoordinate	lonLatToTile( LonLat lonlat, int magnification ) = 0;
-		//
-		// Convert tile center plus pixel offset to WGS84 lat/lon.
-		//
+		/**
+		 * Convert tile center plus pixel offset to WGS84 lat/lon.
+		 */
 		virtual LonLat				tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY ) = 0;
-		//
-		// Returns all tiles required to cover specified rectangle around centerpoint.
-		//
-		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData );
-		//
-		// Clears any queued requests
-		//
+		/**
+		 * Returns all tiles required to cover specified rectangle around centerpoint.
+		 */
+		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, void* clientData );
+		/**
+		 * Clears any queued requests
+		 */
 		void						clearQueue( );
 		//
 		// DownloadListener overrides
