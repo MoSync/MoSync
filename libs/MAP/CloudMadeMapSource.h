@@ -51,10 +51,6 @@ namespace MAP
 			  mStyle( style ) 
 		{
 		}
-
-		virtual ~CloudMadeMapSource( ) 
-		{
-		}
 		/**
 		 * CloudMade supports a number of different rendering variations
 		 * for maps. MAP currently supports type 1 and 7.
@@ -94,23 +90,36 @@ namespace MAP
 			//
 			return 17;
 		}
-
+		/**
+		 * Returns style setting for the CloudMade map source.
+		 */
 		int getStyle( ) const
 		{
 			return mStyle;
 		}
-
+		/**
+		 * Sets style setting for the CloudMade map source.
+		 * Refer to CloudMade documentation for more information.
+		 */
 		void setStyle( int style )
 		{
 			mStyle = style;
 		}
-
+		/**
+		 * Creates a URL for the specified tile coordinate.
+		 */
 		void getTileUrl( char* buffer, MapTileCoordinate tileXY );
-
+		/**
+		 * Converts a LonLat coordinate to a tile coordinate.
+		 */
 		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
-
+		/**
+		 * Converts a LonLat coordinate to a global pixel coordinate.
+		 */
 		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
-
+		/**
+		 * Convert tile center plus pixel offset to LonLat. 
+		 */
 		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 		
 	private:

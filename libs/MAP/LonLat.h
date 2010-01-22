@@ -31,8 +31,17 @@ namespace MAP
 	class PixelCoordinate;
 
 	static const double PI = 3.14159265358979323846;
+	//
+	// Resolution in pixels per meter at equator, at zoom level 0
+	//
 	static const double InitialResolution = 2.0 * PI * 6378137.09 / /*TileSize*/256; // 256 is size of google full tile at zoom 0
+	//
+	// Inverse of InitialResolution
+	//
 	static const double InvInitialResolution = 256 / ( 2.0 * PI * 6378137.09 ); // 256 is size of google full tile at zoom 0
+	//
+	// Origin offset in meters
+	//
 	static const double OriginShift = PI * 6378137.09;
 
 	//=========================================================================
@@ -69,7 +78,7 @@ namespace MAP
 			meterY = pixelY * res - OriginShift;
 		}
 		/**
-		 * Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
+		 * Converts EPSG:900913 to pyramid pixel coordinates in given zoom level.
 		 */
 		static void metersToPixels( const double meterX, const double meterY, const int magnification, double& pixelX, double& pixelY )
 		{
@@ -81,7 +90,7 @@ namespace MAP
 		static double exp( double x ) { return pow( M_E, x ); }
 
 		/**
-		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum
+		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 		 */
 		static void metersToLonLat( const double metersX, const double metersY, double& lon, double& lat )
 		{
@@ -90,7 +99,7 @@ namespace MAP
 			lat = 360.0 / PI * atan( exp( metersY * PI / OriginShift ) ) - 90.0;
 		}
 		/**
-		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913
+		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 		 */
 		static void lonLatToMeters( const double lon, const double lat, double& meterX, double& meterY )
 		{
@@ -98,7 +107,7 @@ namespace MAP
 			meterY = log( tan( ( 90.0 + lat ) * PI / 360.0 ) ) * OriginShift / PI;
 		}
 		/**
-		 * Returns a tile covering region in given pixel coordinates
+		 * Returns a tile covering region in given pixel coordinates.
 		 */
 		static void pixelsToTile( const int tileSize, const double pixelX, const double pixelY, int& tileX, int& tileY )
 		{
@@ -106,7 +115,7 @@ namespace MAP
 			tileY = int( ceil( pixelY / (double)tileSize ) - 1 );
 		}
 		//
-		// Returns tile for given mercator coordinates
+		// Returns tile for given mercator coordinates.
 		//
 		//static void MetersToTile( const int tileSize, const double meterX, const double meterY, const int magnification, int& tileX, int& tileY )
 		//{
@@ -115,7 +124,7 @@ namespace MAP
 		//	PixelsToTile( tileSize, pixelX, pixelY, tileX, tileY );
 		//}
 		//
-		// Returns bounds of the given tile in EPSG:900913 coordinates
+		// Returns bounds of the given tile in EPSG:900913 coordinates.
 		//
 		//static void TileBounds( const int tileSize, const int tileX, const int tileY, const int magnification, double& meterLeft, double& meterBottom, double& meterRight, double& meterTop )
 		//{
@@ -123,7 +132,7 @@ namespace MAP
 		//	PixelsToMeters( ( tileX + 1 ) * tileSize, ( tileY + 1 ) * tileSize, magnification, meterRight, meterTop );
 		//}
 		//
-		// Returns bounds of the given tile in latutude/longitude using WGS84 datum
+		// Returns bounds of the given tile in latutude/longitude using WGS84 datum.
 		//
 		//static void TileLonLatBounds( const int tileSize, const int tileX, const int tileY, const int magnification, double& minx, double& miny, double& maxx, double& maxy )
 		//{
@@ -170,7 +179,7 @@ namespace MAP
 		{
 		}
 		/**
-		 * Creates at LonLat
+		 * Creates a LonLat.
 		 */
 		LonLat( const double _lon, const double _lat )
 		: lon( _lon ),
@@ -222,7 +231,7 @@ namespace MAP
 
 		}
 		/**
-		 * Convert this to meters
+		 * Convert this to meters.
 		 */
 		void toMeters( int magnification, double& meterX, double& meterY ) const
 		{

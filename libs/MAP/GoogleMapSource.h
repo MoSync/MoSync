@@ -29,23 +29,23 @@ namespace MAP
 	/**
 	 * Enumerates variations of google map rendering.
 	 */
-	enum GoogleMapsMapKind
+	enum GoogleMapKind
 	//=========================================================================
 	{
-		GoogleMapsMapKind_None,
+		GoogleMapKind_None,
 		/**
 		 * Street map.
 		 */
-		GoogleMapsMapKind_StreetMap,
+		GoogleMapKind_StreetMap,
 		/**
 		 * Aerial/satellite photography
 		 */
-		GoogleMapsMapKind_Aerial,
+		GoogleMapKind_Aerial,
 		/*
 		 * Aerial with map labels drawn on top.
 		 */
-		GoogleMapsMapKind_Hybrid,
-		GoogleMapsMapKind_Last
+		GoogleMapKind_Hybrid,
+		GoogleMapKind_Last
 	};
 
 	//=========================================================================
@@ -64,23 +64,23 @@ namespace MAP
 		 * see http://code.google.com/apis/maps/documentation/staticmaps/
 		 * for details.
 		 *
-		 * Assign your registered key string to GoogleMapSource::ApiKey before
+		 * NOTE: Assign your registered key string to GoogleMapSource::ApiKey before
 		 * using this map source.
 		 */
 		static const char* ApiKey;
 		/**
 		 * Creates a GoogleMapSource of the specified map kind.
 		 */
-		GoogleMapSource( GoogleMapsMapKind mapKind );
+		GoogleMapSource( GoogleMapKind mapKind );
 		virtual	~GoogleMapSource( );
 
 		MapSourceKind getSourceKind( ) const		
 		{ 
 			switch( mMapKind )
 			{
-			case GoogleMapsMapKind_StreetMap: return MapSourceKind_GoogleMap; 
-			case GoogleMapsMapKind_Aerial: return MapSourceKind_GoogleAerial;
-			case GoogleMapsMapKind_Hybrid: return MapSourceKind_GoogleHybrid;
+			case GoogleMapKind_StreetMap: return MapSourceKind_GoogleMap; 
+			case GoogleMapKind_Aerial: return MapSourceKind_GoogleAerial;
+			case GoogleMapKind_Hybrid: return MapSourceKind_GoogleHybrid;
 			default: return (MapSourceKind)-1;
 			}
 		}
@@ -109,7 +109,7 @@ namespace MAP
 		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 	
 	private:
-		GoogleMapsMapKind mMapKind;
+		GoogleMapKind mMapKind;
 	};
 }
 

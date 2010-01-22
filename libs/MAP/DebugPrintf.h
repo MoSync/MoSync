@@ -20,8 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef _MSC_VER
 
-// to speed up compiles
-///#include "windows.h"
+// To speed up compiles, the declarations we need are copied below.
+// #include "windows.h"
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA( /*__in_opt*/ const char* lpOutputString );
 #define OutputDebugString  OutputDebugStringA
 
@@ -40,6 +40,9 @@ inline void DebugPrintf(const char *fmt, ...)
 {
 	#ifdef _MSC_VER
 	
+	//
+	// Windows implementation
+	//
 	char buffer[32768];
 	va_list vl;
 	va_start( vl, fmt );
@@ -49,7 +52,9 @@ inline void DebugPrintf(const char *fmt, ...)
 
 	#else
 	
+	//
 	// do nothing
+	//
 
 	#endif
 }
@@ -63,13 +68,20 @@ inline void DebugAssert( bool condition )
 {
 	#ifdef _MSC_VER
 
+	//
+	// Windows implementation
+	//
 	if ( !condition )
 	{
 		__asm { int 3 }
 	}
 
 	#else
+
+	//
 	// do nothing
+	//
+
 	#endif
 }
 

@@ -40,6 +40,8 @@ namespace MAPUtil
 		DateTime( );
 		/*
 		 * Constructs a DateTime from the specified ticks.
+		 *
+		 * Ticks is the number of seconds since the beginning of January 1, 1970.
 		 */
 		DateTime( time_t t );
 		/**

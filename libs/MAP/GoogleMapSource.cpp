@@ -27,7 +27,7 @@ namespace MAP
 	//
 	// Creates a new map source
 	//
-	GoogleMapSource::GoogleMapSource( GoogleMapsMapKind mapKind ) :
+	GoogleMapSource::GoogleMapSource( GoogleMapKind mapKind ) :
 		mMapKind( mapKind )
 	//-------------------------------------------------------------------------
 	{
@@ -191,9 +191,9 @@ namespace MAP
 		const char* maptype = "";
 		switch( mMapKind )
 		{
-		case GoogleMapsMapKind_StreetMap: maptype = "roadmap"; break;
-		case GoogleMapsMapKind_Aerial: maptype = "satellite"; break;
-		case GoogleMapsMapKind_Hybrid: maptype = "hybrid"; break;
+		case GoogleMapKind_StreetMap: maptype = "roadmap"; break;
+		case GoogleMapKind_Aerial: maptype = "satellite"; break;
+		case GoogleMapKind_Hybrid: maptype = "hybrid"; break;
 		default: BIG_PHAT_ERROR;
 		}
 		sprintf( buffer,

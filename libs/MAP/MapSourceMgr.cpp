@@ -48,9 +48,9 @@ namespace MAP
 			mMap[(MapSourceKind)i] = NULL;
 
 		mMap[MapSourceKind_OpenStreetMap] = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
-		mMap[MapSourceKind_GoogleMap] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_StreetMap ) );
-		mMap[MapSourceKind_GoogleAerial] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Aerial ) );
-		mMap[MapSourceKind_GoogleHybrid] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapsMapKind_Hybrid ) );
+		mMap[MapSourceKind_GoogleMap] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_StreetMap ) );
+		mMap[MapSourceKind_GoogleAerial] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Aerial ) );
+		mMap[MapSourceKind_GoogleHybrid] = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Hybrid ) );
 		mMap[MapSourceKind_CloudMade1] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 1 ) );
 		mMap[MapSourceKind_CloudMade7] = newobject( CloudMadeMapSource, new CloudMadeMapSource( 7 ) );
 		//mMap[MapSourceKind_VirtualEarth] = newobject( VirtualEarthMapSource, new VirtualEarthMapSource( ) );

@@ -29,7 +29,7 @@ namespace MAP
 	MapCache* MapCache::sSingleton = NULL;
 
 	//=========================================================================
-	class MapCacheClientData
+	class MapCacheClientData : public MapSourceClientData
 	//=========================================================================
 	{
 	public:
@@ -270,7 +270,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapCache::tileReceived( MapSource* sender, MapTile* tile, void* cd )
+	void MapCache::tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* cd )
 	//-------------------------------------------------------------------------
 	{
 		MapCacheClientData* clientData = (MapCacheClientData*)cd;

@@ -36,13 +36,25 @@ namespace MAP
 
 	//=========================================================================
 	/**
+	 * Abstract base class for client data.
+	 * Client must subclass this.
+	 */
+	class MapSourceClientData
+	//=========================================================================
+	{
+	public:
+		virtual			~MapSourceClientData( ) { };
+	};
+
+	//=========================================================================
+	/**
 	 * Listener for MapSource client to implement.
 	 */
 	class IMapSourceListener
 	//=========================================================================
 	{
 	public:
-		virtual void	tileReceived( MapSource* sender, MapTile* tile, void* clientData ) = 0;
+		virtual void	tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData ) = 0;
 		virtual void	downloadCancelled( MapSource* sender ) = 0;
 		virtual void	error( MapSource* source, int code ) = 0;
 	};
@@ -109,7 +121,7 @@ namespace MAP
 		/**
 		 * Returns all tiles required to cover specified rectangle around centerpoint.
 		 */
-		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, void* clientData );
+		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData );
 		/**
 		 * Clears any queued requests
 		 */
