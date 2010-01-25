@@ -11,13 +11,13 @@ MoSync uses a special file with the extension .lst to describe which external re
 First, select "File -> New -> Other":
 \\
 \\
-{{images/Resources_lst_1.png}}
+{{images/resources_lst_1.png}}
 \\
 \\
 You will be presented with the "new" wizard dialog. Expand the "MoSync" folder and select "MoSync Resource File":
 \\
 \\
-{{images/Resources_lst_2.png}}
+{{images/resources_lst_2.png}}
 \\
 \\
 Finally, enter a filename for your resource file:
