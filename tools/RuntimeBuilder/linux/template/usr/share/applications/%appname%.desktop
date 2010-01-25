@@ -4,5 +4,5 @@ Comment=%description%
 Exec=/usr/bin/%appname%
 Icon=%appname%
 Terminal=false
-Type=Applications
+Type=Application
 Categories=%categories%
