@@ -31,7 +31,7 @@ elsif(HOST == "linux")
     if ( FULLSCREEN == "false" )
         FULLSCR_FLAG = ""
     else
-        FULLSCR_FLAG = " -D__USE_FULLSCREEN__"
+        FULLSCR_FLAG = " -D__USE_FULLSCREEN__ -D__USE_SYSTEM_RESOLUTION__"
     end
 
     EXTRA_CXXFLAGS = SDL_SOUND_FLAG + FULLSCR_FLAG
