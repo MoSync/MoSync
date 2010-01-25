@@ -806,17 +806,20 @@ int evaluateThread(void* data) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
 				deref = sReturnValue.getSymbol().type->deref()->resolve();
+				if(deref->type() == TypeBase::eConst)
+					deref = ((ConstType*)deref)->mTarget;
+
 				int addr = (int)sReturnValue;
 				if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
 					deref = NULL;
-					sErrorStr = "Invalid pointer.";
+					//sErrorStr = "Invalid pointer.";
 				}
 			}
 
 			if(deref) {
 				int addr = (int)sReturnValue;
 				int len = deref->size();
-				if(addr > 0 && addr+len <= gMemSize)
+				if(len && addr > 0 && addr+len <= gMemSize)
 					ExpressionCommon::loadMemory(addr, len);
 			}
 		}

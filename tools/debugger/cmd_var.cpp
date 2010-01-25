@@ -246,18 +246,19 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	const TypeBase* deref = ((const PointerType*)pointerType)->deref()->resolve();
 	deref = convertConstType(deref);
 
-	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
-		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
-		return;		
-	}
-
 	std::string type = getType(pointerType, false);
 	std::string value = "";
+
 	if(dataAdress)
 		value = getValue(pointerType, dataAdress, printFormat);
 	bool simpleType = pointerType->isSimpleValue();
 
 	this->exp->updateData(value, type, simpleType);
+
+	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
+		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
+		return;		
+	}
 
 	if(deref->type() != TypeBase::eStruct) {
 		StringPrintFunctor spf;
@@ -487,9 +488,6 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 
 static void Callback::varEEUpdate(const Value* v, const char *err) {
 	if(err) { 
-		
-
-
 		error("%s", err); 
 		return; 
 	}
