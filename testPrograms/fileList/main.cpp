@@ -21,9 +21,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <IX_FILE.h>
 
-char buffer[256];
+static void checkEvents() {
+	MAEvent event;
+	while(maGetEvent(&event)) {
+		if(event.type == EVENT_TYPE_CLOSE ||
+			(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+		{
+			maExit(1);
+		}
+	}
+}
 
-bool dumpFileList(const char* path) {
+static char buffer[256];
+
+static bool dumpFileList(const char* path) {
 	MAHandle list = maFileListStart(path, "*");
 	if(list < 0) {
 		printf("Error %i\n", list);
@@ -31,6 +42,7 @@ bool dumpFileList(const char* path) {
 	}
 	bool empty = true;
 	while(maFileListNext(list, buffer, sizeof(buffer)) > 0) {
+		checkEvents();
 		MAUtil::String p2(path);
 		p2 += buffer;
 		MAUtil::String p3 = p2 + "\n";
@@ -49,6 +61,7 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 
 	dumpFileList("");
+	printf("Done.\n");
 	/*MAUtil::String path;
 	do {
 		path += buffer;

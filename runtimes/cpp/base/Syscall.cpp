@@ -25,7 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef IX_FILE
 #include <helpers/CPP_IX_FILE.h>
-#endif
+#ifdef WIN32
+#include <windows.h>
+#endif	//WIN32
+#endif	//IX_FILE
 
 #ifdef _WIN32_WCE
 //#include <windows.h>
@@ -613,8 +616,20 @@ namespace Base {
 #if FILESYSTEM_CHROOT || defined(LINUX)
 			sFileList.files.push_back("/");
 #else
+#ifdef WIN32
+			DWORD res = GetLogicalDrives();
+			GLE(res);
+			char buf[] = "X:/";
+			for(int i=0; i<32; i++) {
+				if((res & (1 << i)) != 0) {
+					buf[0] = 'A' + i;
+					sFileList.files.push_back(buf);
+				}
+			}
+#else
 #error list them roots!
-#endif
+#endif	//WIN32
+#endif	//FILESYSTEM_CHROOT || defined(LINUX)
 		} else {
 			//list files in a directory
 			std::string scanPath;
