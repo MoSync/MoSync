@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUI/Screen.h>
 #include "IKeyHandler.h"
-#include "Broadcaster.h"
+#include <MAP/Broadcaster.h>
 #include "AppScreenBase.h"
 #include "IClosable.h"
 

@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false">
+<project supports-build-configs="true">
 <target-profile device="P1i" vendor="Sony-Ericsson"/>
+<build.cfg id="Debug"/>
+<build.cfg active="true" id="Release"/>
 <criteria/>
 <properties>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value="-O2"/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="false"/>
 <property key="build.prefs:ignore.default.libraries" value="false"/>
 <property key="build.prefs:ignore.default.library.paths" value="false"/>
-<property key="build.prefs:project.type" value="app"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
 <property key="screenHeight" value="320"/>
 <property key="screenWidth" value="240"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0EB569CD"/>

@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Action.h"
 #include "MobletEx.h"
-#include "MemoryMgr.h"
+#include <MAP/MemoryMgr.h>
 
 using namespace MAPUtil;
 

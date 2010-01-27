@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define APPSTYLEMGR_H_
 
 #include "AppStyle.h"
-#include "MemoryMgr.h"
+#include <MAP/MemoryMgr.h>
 
 using namespace MAPUtil;
 

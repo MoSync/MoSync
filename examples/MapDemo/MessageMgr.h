@@ -21,8 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 
-#include "MemoryMgr.h"
-#include "Broadcaster.h"
+#include <MAP/MemoryMgr.h>
+#include <MAP/Broadcaster.h>
 
 using namespace MAUtil;
 using namespace MAPUtil;

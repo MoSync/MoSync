@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "SoftKeyBar.h"
 #include "AppStyleMgr.h"
-#include "MemoryMgr.h"
+#include <MAP/MemoryMgr.h>
 
 using namespace MapDemoUtil;
 

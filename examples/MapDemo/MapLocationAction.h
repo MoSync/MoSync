@@ -19,8 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAPLOCATIONCTION_H_
 
 #include "Action.h"
-#include "MapWidget.h"
-#include "MemoryMgr.h"
+#include <MAP/MapWidget.h>
+#include <MAP/MemoryMgr.h>
 
 using namespace MapDemoUI;
 using namespace MAP;

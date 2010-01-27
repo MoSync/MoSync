@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false">
+<project supports-build-configs="true">
 <target-profile/>
+<build.cfg id="Debug"/>
+<build.cfg active="true" id="Release"/>
 <criteria/>
 <properties>
 <property key="build.prefs:additional.include.paths" value="..\..\libs\MAP"/>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib "/>
+<property key="build.prefs:additional.libraries/Debug" value="MAPD.lib,MAUID.lib,MAUtilD.lib "/>
 <property key="build.prefs:additional.library.paths" value="..\..\libs\MAP\Output"/>
-<property key="build.prefs:extra.link.sw" value="-datasize=3000000 -heapsize=2000000 -stacksize=100000"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:extra.link.sw" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:memory.heap/Debug" value="2000"/>
+<property key="build.prefs:memory.heap/Release" value="2000"/>
+<property key="build.prefs:memory.stack/Debug" value="100"/>
+<property key="build.prefs:memory.stack/Release" value="100"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="last.build.config" value="Release"/>
 <property key="template.id" value="project.empty"/>
 </properties>
 </project>

@@ -13,6 +13,7 @@
 <property key="build.prefs:extra.link.sw/Debug" value="-datasize=256000 -heapsize=128000 -master-dump"/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="last.build.config" value="Debug"/>

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define TRIGGERMENUSELECTIONACTION_H_
 
 #include "Action.h"
-#include "MemoryMgr.h"
+#include <MAP/MemoryMgr.h>
 
 using namespace MAPUtil;
 

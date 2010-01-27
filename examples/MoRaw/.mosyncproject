@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project supports-build-configs="true">
 <target-profile device="K850i" vendor="Sony-Ericsson"/>
+<build.cfg id="Debug"/>
+<build.cfg active="true" id="Release"/>
 <criteria/>
 <properties>
-<property key="Werror" value="false"/>
-<property key="screenHeight" value="320"/>
-<property key="build.prefs:extra.link.sw" value="-datasize=4096000 -heapsize=2048000 -master-dump"/>
-<property key="Wall" value="true"/>
-<property key="build.prefs:additional.libraries" value="MAUtil.lib,MAFS.lib"/>
-<property key="build.prefs:additional.library.paths" value=""/>
-<property key="debug" value="false"/>
 <property key="build.prefs:additional.include.paths" value=""/>
-<property key="build.prefs:ignore.default.library.paths" value="false"/>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib,MAFS.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib,MAFSD.lib"/>
+<property key="build.prefs:additional.library.paths" value=""/>
+<property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:extra.link.sw" value="-datasize=4096000 -heapsize=2048000 -master-dump"/>
 <property key="build.prefs:extra.res.sw" value=""/>
-<property key="symbian.uids:uid.s60v2uid" value="0x0FFF6213"/>
-<property key="symbian.uids:uid.s60v3uid" value="0xEFDB6086"/>
-<property key="screenWidth" value="240"/>
+<property key="build.prefs:gcc.switches" value="-O3 -Wno-multichar"/>
+<property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="false"/>
 <property key="build.prefs:ignore.default.libraries" value="false"/>
-<property key="build.prefs:dead.code.elim" value="false"/>
-<property key="build.prefs:gcc.switches" value="-O3 -Wno-multichar"/>
+<property key="build.prefs:ignore.default.library.paths" value="false"/>
 <property key="build.prefs:project.type" value=""/>
-<property key="build.prefs:gcc.warnings" value="0"/>
+<property key="debug" value="false"/>
+<property key="dependency.strategy" value="0"/>
+<property key="screenHeight" value="320"/>
+<property key="screenWidth" value="240"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0FFF6213"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xEFDB6086"/>
+<property key="Wall" value="true"/>
+<property key="Werror" value="false"/>
 </properties>
 </project>

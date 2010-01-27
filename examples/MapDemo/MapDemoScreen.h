@@ -21,8 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Screen.h>
 #include <MAUtil/Moblet.h>
 #include "AppScreen.h"
-#include "MapWidget.h"
-#include "MapSourceMgr.h"
+#include <MAP/MapWidget.h>
+#include <MAP/MapSourceMgr.h>
 
 using namespace MAP;
 using namespace MapDemoUI;
