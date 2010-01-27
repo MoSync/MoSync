@@ -57,21 +57,16 @@ def set_defaults
 	default_const(:CONFIG, "debug")
 	
 	# @BUILDDIR is the name of the build directory, where generated files are stored.
-	# @CONFIG_POSTFIX is a string appended to the filenames of some types of libraries,
-	# to tell which configuration they were built with.
+	# @CONFIG_NAME is the name of the configuration.
 	if(CONFIG == "debug") then
 		@BUILDDIR = @BUILDDIR_BASE + "debug/"
-		@CONFIG_POSTFIX = "D"
+		@CONFIG_NAME = "debug"
 	elsif(CONFIG == "")
 		@BUILDDIR = @BUILDDIR_BASE
-		@CONFIG_POSTFIX = ""
+		@CONFIG_NAME = "release"
 	else
 		error "wrong configuration: " + CONFIG
 	end
-	
-	default(:GCC_IS_V4, NATIVE_GCC_IS_V4)
-	default(:GCC_IS_V43, NATIVE_GCC_IS_V43)
-	default(:GCC_IS_V44, NATIVE_GCC_IS_V44)
 	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))

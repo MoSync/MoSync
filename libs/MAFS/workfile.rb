@@ -13,7 +13,7 @@ mod.class_eval do
 	
 	def setup_native
 		@LOCAL_DLLS = ["mosync", "mastd"]
-		if(NATIVE_GCC_IS_V44)
+		if(@GCC_IS_V44)
 			@EXTRA_CFLAGS = " -D_STDIO_H"
 		end
 		setup_base

@@ -4,6 +4,8 @@ require File.expand_path('../../rules/native_mosync.rb')
 
 work = NativeMoSyncLib.new
 work.instance_eval do
+	set_defaults
+	
 	if(HOST == :linux)
 		@SOURCES = [".", "linux", "linux/bluez"]
 		if(BLUETOOTH)
@@ -14,7 +16,7 @@ work.instance_eval do
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 	elsif(HOST == :win32)
 		@SOURCES = [".", "win32"]
-		if(!NATIVE_GCC_IS_V4)
+		if(!@GCC_IS_V4)
 			@SPECIFIC_CFLAGS = { "discImpl.cpp" => " -Wno-unreachable-code" }
 		end
 	else

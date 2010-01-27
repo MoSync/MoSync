@@ -13,7 +13,7 @@ target :native do
 end
 
 target :default do
-	Work.invoke_subdirs(SUBDIRS)
+	Work.invoke_subdirs(SUBDIRS, 'pipe')
 end
 
 Targets.invoke

@@ -76,7 +76,7 @@ class PipeLibWork < PipeGccWork
 		super
 	end
 	def setup3(all_objects)
-		@TARGET_PATH = MOSYNC_LIBDIR + "/pipe/" + @NAME + @CONFIG_POSTFIX + ".lib"
+		@TARGET_PATH = MOSYNC_LIBDIR + "/pipe/" + @CONFIG_NAME + "/" + @NAME + ".lib"
 		super(all_objects)
 	end
 	#def filename; @NAME + ".lib"; end

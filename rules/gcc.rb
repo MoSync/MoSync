@@ -86,6 +86,7 @@ end
 # Supports GCC on mingw, pipe and linux.
 # Uses the following variables: @SOURCES, @IGNORED_FILES, @EXTRA_SOURCEFILES,
 # @SPECIFIC_CFLAGS and @EXTRA_OBJECTS.
+# Requires subclasses to implement methods 'gcc', 'gccmode' and 'object_ending'.
 class GccWork < BuildWork
 	# Returns a path representing a generated file, given a source filename and a new file ending.
 	def genfile(source, ending)
@@ -95,6 +96,19 @@ class GccWork < BuildWork
 	# The filename of the target.
 	def target
 		@TARGET
+	end
+	
+	def set_defaults
+		if(!defined?(@@GCC_IS_V4))
+			gcc_version = get_gcc_version_string(gcc)
+			@@GCC_IS_V4 = (gcc_version[0] == "4"[0])
+			@@GCC_IS_V43 = (@@GCC_IS_V4 && (gcc_version[2] == "3"[0]))
+			@@GCC_IS_V44 = (@@GCC_IS_V4 && (gcc_version[2] == "4"[0]))
+		end
+		@GCC_IS_V4 = @@GCC_IS_V4
+		@GCC_IS_V43 = @@GCC_IS_V43
+		@GCC_IS_V44 = @@GCC_IS_V44
+		super
 	end
 	
 	private

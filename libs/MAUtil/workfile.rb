@@ -25,18 +25,16 @@ mod.class_eval do
 			shared_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
 				"Graphics.c" => " -Wno-unreachable-code",
 				"FrameBuffer.c" => " -Wno-unreachable-code"}
+			if(@GCC_IS_V4)
+				shared_specflags["String.cpp"] = " -Wno-strict-overflow"
+			end
 		else
 			shared_specflags = {}
 		end
 		shared_specflags["dict.c"] = " -Wno-unreachable-code"
 		shared_specflags["hash.c"] = " -Wno-unreachable-code"
-		if(CONFIG == "" && NATIVE_GCC_IS_V4)
-			native_specflags = {"String.cpp" => " -Wno-strict-overflow"}
-		else
-			native_specflags = {}
-		end
 		
-		@NATIVE_SPECIFIC_CFLAGS = native_specflags.merge(shared_specflags)
+		@NATIVE_SPECIFIC_CFLAGS = shared_specflags
 		
 		@PIPE_SPECIFIC_CFLAGS = shared_specflags
 	end

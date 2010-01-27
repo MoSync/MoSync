@@ -24,10 +24,10 @@ mod.class_eval do
 	end
 	
 	def setup_base
-		if(CONFIG == "" && NATIVE_GCC_IS_V4)
+		if(CONFIG == "" && @GCC_IS_V4)
 			#broken compiler/stdlib
 			native_specflags = {"conprint.c" => " -Wno-unreachable-code"}
-			if(NATIVE_GCC_IS_V44)
+			if(@GCC_IS_V44)
 				native_specflags["conprint.c"] += " -Wno-inline"
 			end
 		else
