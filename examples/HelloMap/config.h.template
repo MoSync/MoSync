@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Please register with CloudMade to get a personal API key at
 // http://cloudmade.com/
 //
-//#define CLOUDMADE_API_KEY ""
+#define CLOUDMADE_API_KEY ""
 
 //
 // Google Static Maps API key
@@ -34,5 +34,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Please register with Google to get a personal API key at
 // http://code.google.com/apis/maps/documentation/staticmaps/
 //
-//#define GOOGLE_API_KEY ""
+#define GOOGLE_API_KEY ""
 
