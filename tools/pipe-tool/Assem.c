@@ -79,6 +79,7 @@ void AsmMain()
 //	printf("final pass. %i known symbols.\n", CountUsedSymbols());
 
 	Final_Pass = 1;
+
 	AsmPass(p+1);
 
 //	printf("Symbols used %d\n",CountUsedSymbols());

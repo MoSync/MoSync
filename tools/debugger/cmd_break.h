@@ -44,7 +44,9 @@ struct Breakpoint {
 };
 
 typedef std::map<int, Instruction> InstructionMap;	//key: address
-typedef std::map<int, Breakpoint> BreakpointMap;	//key: bp-number
+
+// should probably add a vector to the breakpoint.
+typedef std::multimap<int, Breakpoint> BreakpointMap;	//key: bp-number
 
 //todo: make value into a vector. maybe combine with InstructionMap.
 typedef std::map<int, int> BreakpointAddressMap;	//key: address. value: bp-number

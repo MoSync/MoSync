@@ -17,9 +17,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Screen.h"
 
+namespace Base {
+	extern SDL_Surface* gBackBuffer;
+}
+
 namespace MoRE {
 
-static SDL_Surface* sPhoneScreen = 0;
+//static SDL_Surface* sPhoneScreen = 0;
 static SDL_Surface* sWindowSurface = 0;
 
 void setWindowSurface(SDL_Surface* s) {
@@ -31,11 +35,12 @@ SDL_Surface* getWindowSurface() {
 }
 
 void setPhoneScreen(SDL_Surface* s) {
-	sPhoneScreen = s;
+	//sPhoneScreen = s;
 }
 
 SDL_Surface* getPhoneScreen() {
-	return sPhoneScreen;
+	//return sPhoneScreen;
+	return Base::gBackBuffer;
 }
 
 }

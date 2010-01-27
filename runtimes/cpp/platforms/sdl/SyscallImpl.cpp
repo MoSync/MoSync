@@ -101,7 +101,8 @@ namespace Base {
 	static uint screenHeight = 240*2;	//208
 #endif
 
-	static SDL_Surface *gScreen = NULL, *gDrawSurface = NULL, *gBackBuffer = NULL;
+	static SDL_Surface *gScreen = NULL, *gDrawSurface = NULL;
+	SDL_Surface *gBackBuffer = NULL;
 	static int gCurrentUnconvertedColor = 0, gCurrentConvertedColor = 0;
 	static TTF_Font *gFont = NULL;
 	static MAHandle gDrawTargetHandle = HANDLE_SCREEN;

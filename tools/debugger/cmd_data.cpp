@@ -257,6 +257,7 @@ void data_disassemble(const string& args) {
 		EFAIL(argv[2] != "-e", "Bad arguments");
 		ETEST(parseArgInt(argv[3], &endAddress));
 	} else if(argv[0] == "-f") {
+		/*
 		EFAIL(argv[2] != "-l", "Bad arguments");
 		int line;
 		ETEST(parseArgInt(argv[3], &line));
@@ -268,6 +269,8 @@ void data_disassemble(const string& args) {
 		} else {
 			endAddress = gHead.CodeLen - 1;
 		}
+		*/
+		error("Not supported");
 	} else {
 		error("Bad arguments");
 		return;

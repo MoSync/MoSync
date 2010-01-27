@@ -58,7 +58,7 @@ static void (*sInsertBpInstructionCallback)();
 //returns false if an error has occured.
 //otherwise, a valid address will be stored.
 //location will be modified during parsing.
-static bool parseLocation(string& location, int& address);
+static bool parseLocation(string& location, vector<int>& addresses);
 
 static void oprintBreakpoint(int number, const Breakpoint& bp);
 
@@ -81,6 +81,8 @@ namespace Callback {
 	static void bpEnable(BreakpointMap::iterator);
 }
 
+queue<int> sBreakpointQueue;
+
 //******************************************************************************
 // insert
 //******************************************************************************
@@ -92,7 +94,8 @@ void break_insert(const string& args) {
 		return;
 	}
 
-	int address;
+	vector<int> addresses;
+
 	for(size_t i=0; i<argv.size(); i++) {
 		string& a(argv[i]);
 		_ASSERT(a.size() != 0);
@@ -105,21 +108,27 @@ void break_insert(const string& args) {
 				return;
 			}
 		} else {	//location
-			if(!parseLocation(a, address))
+			if(!parseLocation(a, addresses))
 				return;
 		}
 	}
+
+	int address = addresses[0];
 
 	if(sBreakpointAddresses.find(address) != sBreakpointAddresses.end()) {
 		error("A breakpoint already exists at that address");
 		return;
 	}
 
-	sInsertingBreakpoint.address = address;
-	sInsertingBreakpoint.enabled = true;
-	sInsertingBreakpoint.keep = true;
-	sInsertingBreakpoint.times = 0;
-	const char* functionName = mapFunction(address);
+	const FuncMapping* fm = mapFunctionEx(address);
+	const char* functionName = (fm?fm->name.c_str():NULL);
+
+	/*
+	if(isConstructor(fm->mangledName.c_str())) {
+		int a = 2;
+	}
+	*/
+
 	if(functionName)
 		sInsertingBreakpoint.func = functionName;
 	if(!mapIp(address, sInsertingBreakpoint.line, sInsertingBreakpoint.path)) {
@@ -134,6 +143,14 @@ void break_insert(const string& args) {
 		filenameIndex = lastSlash + 1;
 	sInsertingBreakpoint.file = sInsertingBreakpoint.path.substr(filenameIndex);
 
+	sInsertingBreakpoint.address = address;
+	sInsertingBreakpoint.enabled = true;
+	sInsertingBreakpoint.keep = true;
+	sInsertingBreakpoint.times = 0;
+
+	for(size_t i = 1; i < addresses.size(); i++)
+		sBreakpointQueue.push(addresses[i]);
+
 	insertBpInstruction(address, Callback::insert_done);
 }
 
@@ -146,7 +163,8 @@ static int mapFunctionBreakpoint(const char* name) {
 	return nextSldEntry(address);
 }
 
-static bool parseLocation(string& location, int& address) {
+static bool parseLocation(string& location, vector<int>& addresses) {
+	int ret;
 	_ASSERT(location.size() != 0);
 	if(location[0] == '*') {	//hex address
 		bool okFormat = false;
@@ -167,8 +185,10 @@ static bool parseLocation(string& location, int& address) {
 			error("Invalid address format");
 			return false;
 		}
+		int address;
 		int res = sscanf(location.c_str() + 3, "%x", &address);
 		_ASSERT(res == 1);
+		addresses.push_back(address);
 	}
 	else	//file or function
 	{
@@ -187,8 +207,8 @@ static bool parseLocation(string& location, int& address) {
 				_ASSERT(res == 1);
 				//Then what? Use SDL table to map to address.
 				location[colonIndex] = 0;
-				address = mapFileLine(location.c_str(), linenum);
-				switch(address) {
+				ret = mapFileLine(location.c_str(), linenum, addresses);
+				switch(ret) {
 				case ERR_NOFILE:
 					error("No such file");
 					break;
@@ -199,12 +219,10 @@ static bool parseLocation(string& location, int& address) {
 					error("Program map not loaded");
 					break;
 				}
-				if(address < 0) {
-					return false;
-				}
 			}
 			else if(iscsym(location[fli])) {	//function name (static)
-				address = mapFunctionBreakpoint(location.c_str() + fli);
+				ret = mapFunctionBreakpoint(location.c_str() + fli);
+				addresses.push_back(ret);
 			} else {
 				error("Invalid location format");
 				return false;
@@ -212,11 +230,12 @@ static bool parseLocation(string& location, int& address) {
 		}
 		else	//function without file (global?)
 		{
-			address = mapFunctionBreakpoint(location.c_str());
+			ret = mapFunctionBreakpoint(location.c_str());
+			addresses.push_back(ret);
 		}
 	}
 
-	if(address < 0) {
+	if(ret < 0) {
 		error("Address not found");
 		return false;
 	}
@@ -234,8 +253,16 @@ static void insertBpInstruction(int address, void (*cb)()) {
 }
 
 void Callback::insert_done() {
-	sBreakpoints[sNextBpNumber] = sInsertingBreakpoint;
+	sBreakpoints.insert(pair<int, Breakpoint>(sNextBpNumber, sInsertingBreakpoint));
 	sBreakpointAddresses[sInsertingBreakpoint.address] = sNextBpNumber;
+
+	if(sBreakpointQueue.size()) {
+		sInsertingBreakpoint.address = sBreakpointQueue.front();
+		insertBpInstruction(sInsertingBreakpoint.address, Callback::insert_done);
+		sBreakpointQueue.pop();
+		return;
+	}
+
 	oprintDone();
 	oprintf(",");
 	oprintBreakpoint(sNextBpNumber, sInsertingBreakpoint);
@@ -281,7 +308,17 @@ void StubConnection::breakpointHit() {
 	}
 	oprintf("\",frame={addr=\"0x%X\"", r.pc);
 	if(itr != sBreakpointAddresses.end()) {
-		Breakpoint& bp(sBreakpoints[itr->second]);
+		BreakpointMap::iterator bpiter = sBreakpoints.find(itr->second);
+		while(bpiter != sBreakpoints.end())
+			if(bpiter->first == itr->second)
+				break;
+		if(bpiter == sBreakpoints.end()) {
+			error("Couldn't find breakpoint");
+			return;
+		}
+
+
+		Breakpoint& bp(bpiter->second);
 		bp.times++;
 		oprintf(",func=\"%s\",file=\"%s\",fullname=\"%s\",line=\"%i\"",
 			bp.func.c_str(), bp.file.c_str(), bp.path.c_str(), bp.line);
@@ -322,13 +359,20 @@ static bool breakMulti(const string& args, void (*cb)(BreakpointMap::iterator bi
 			return false;
 		}
 		//todo: check for dupes
+		//niklas: or not.. there may be several physical breakpoints per actual gdb breakpoint..
 	}
 
 	_ASSERT(sBpRestoreQueue.empty());
 	for(size_t i=0; i<nums.size(); i++) {
 		BreakpointMap::iterator bi = sBreakpoints.find(nums[i]);
 		_ASSERT(bi != sBreakpoints.end());
-		cb(bi);
+
+		while(bi != sBreakpoints.end() && bi->first == nums[i]) {
+			BreakpointMap::iterator temp = bi;
+			temp++;
+			cb(bi);
+			bi = temp;
+		}
 	}
 	return true;
 }

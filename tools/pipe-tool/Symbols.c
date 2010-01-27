@@ -1407,6 +1407,29 @@ char * GetFileNumString(int file)
 	return 0;
 }
 
+char * GetFileIdString(int id)
+{
+	SYMBOL	*Sym;
+	int		n;
+
+	Sym = SymTab;
+	n = SYMMAX;
+
+	do
+	{
+		if (Sym->Section == section_SLD_File)
+		{
+			if (Sym->Type == id)
+				return Sym->Name;
+		}
+	
+		Sym++;
+	}
+	while(--n);
+
+	return 0;
+}
+
 //****************************************
 //		Dump IP Translation table
 //****************************************
@@ -1414,9 +1437,11 @@ char * GetFileNumString(int file)
 void DumpIPTrans()
 {
 	SYMBOL	*Sym;
+	SYMBOL  *LastSLDSym = NULL;
 	FILE	*SldFile = 0;
 	int		line, file;
 	uint		n;
+	int MustConvertPaths = 0;
 
 	Sym = SymTab;
 	n = SYMMAX;
@@ -1431,11 +1456,49 @@ void DumpIPTrans()
 
 	fprintf(SldFile, "Files\n");
 
+
 	do
 	{
 		if (Sym->Section == section_SLD_File)
 		{
-			fprintf(SldFile, "%d:%d:%s\n", Sym->Value, Sym->Type, Sym->Name);
+			char *SymName = Sym->Name;
+			size_t i, j = 0, len;
+			char temp[256];
+
+			if(!MustConvertPaths) {
+				if(LastSLDSym && LastSLDSym->Type > Sym->Type)
+				MustConvertPaths = 1;
+				LastSLDSym = Sym;
+			}
+		
+			if(MustConvertPaths) {
+				char* ParentPath = GetFileIdString(Sym->Type);
+				char* RelParentPath = GetRelPath(ParentPath);
+				len = strlen(Sym->Name);
+#define IS_SLASH(c) ((c)=='/' || (c)=='\\')
+				if((len>2 && Sym->Name[1]==':' && IS_SLASH(Sym->Name[2])) || (len>0 && IS_SLASH(Sym->Name[0]))) {
+					
+				} else {
+					SymName = AddRelPrefix(Sym->Name);
+				}
+			}
+
+			len = strlen(SymName);
+			// filter out bad slashes...
+			for(i = 0; i < len; i++) {
+
+				if(IS_SLASH(SymName[i])) {
+					if(i+1<len-1 && IS_SLASH(SymName[i+1])) {
+						i++;
+					}
+					temp[j++] = '/';
+				} else 
+					temp[j++] = SymName[i];
+			}
+
+			temp[j] = 0;
+
+			fprintf(SldFile, "%d:%d:%s\n", Sym->Value, Sym->Type, temp);
 		}
 	
 		Sym++;

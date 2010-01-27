@@ -408,7 +408,7 @@ int Parse_stabs()
 	{
 		SkipLine();
 		return 1;
-	}	
+	}
 
 	if (!ArgUseStabs)
 	{
@@ -458,6 +458,11 @@ int Parse_stabs()
 	// Push the file ptr
 
 	PushTokenPtr(str, 0);
+	
+	// Set sld name for header files.
+	if(Type == 132) {
+		int file = SetSLD_Name(Name);
+	}
 
 	StabsEmit("%s %d %d '%s'\n", GetStabName(Type), Desc, Value, str);
 

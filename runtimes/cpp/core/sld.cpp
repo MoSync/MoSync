@@ -74,7 +74,7 @@ static std::set<LineMapping> sLineSet;	//maps addresses to lines
 //maps lines to addresses.
 //multiple addresses may map to the same line.
 //this map will only contain the first.
-typedef std::set<LineMapping, linemap_file_line_less> AddressSet;
+typedef std::multiset<LineMapping, linemap_file_line_less> AddressSet;
 static AddressSet gAddressSet;
 
 typedef set<FuncMapping*, funcmap_start_less> FuncMapAddr;
@@ -322,6 +322,7 @@ bool loadSLD(const char* filename) {
 	std::string mosyncDir = getenv("MOSYNCDIR");
 
 	for(FuncMapAddr::iterator itr = sFuncMapAddr.begin(); itr != sFuncMapAddr.end(); itr++) {
+		(*itr)->mangledName = (*itr)->name;
 		mangledNames += (*itr)->name;
 		mangledNames += "\n";
 	}
@@ -375,7 +376,7 @@ bool mapIp(int inIp, int& outLine, String& outFile) {
 	return true;
 }
 
-int mapFileLine(const char* filename, int lineNumber) {
+int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	if(gAddressSet.size() == 0 || gFiles.size() == 0) {
 		return ERR_NOMAP;
 	}
@@ -390,10 +391,24 @@ int mapFileLine(const char* filename, int lineNumber) {
 	LineMapping lm;
 	lm.file = fileIndex;
 	lm.line = lineNumber;
+	
 	AddressSet::const_iterator itr = gAddressSet.lower_bound(lm);
-	if(itr == gAddressSet.end())
+
+	set<int> foundFunctions;
+
+	while(itr->file==fileIndex && itr->line==lineNumber && itr!=gAddressSet.end()) {
+		const FuncMapping* fm = mapFunctionEx(itr->ip);
+		if(foundFunctions.find(fm->start) == foundFunctions.end()) {
+			addresses.push_back(itr->ip);
+			foundFunctions.insert(fm->start);
+		}
+		itr++;
+	}
+
+	if(addresses.size() == 0)
 		return ERR_NOLINE;
-	return itr->ip;
+	
+	return 0;
 }
 
 const std::vector<FileMapping>& sldFiles() {

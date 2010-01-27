@@ -56,6 +56,7 @@ bool mapIpEx(int inIp, LineMapping& lm);
 struct FuncMapping {
 	int start, stop;
 	std::string name;
+	std::string mangledName;
 };
 
 //Returns a pointer to a FuncMapping or NULL, if ip is not in any function.
@@ -85,12 +86,12 @@ int nextSldEntry(int address);
 #define ERR_NOLINE -3
 #define ERR_NOMAP -4
 
-//Returns the starting address of the code represented by the specified source code position,
+//Returns the starting addressses (in 'addresses') of the code represented by the specified source code position,
 //if such an address is found. < 0 otherwise.
 //Specifically, ERR_NOFILE if the file isn't mapped,
 //ERR_NOLINE if the line number is out of bounds,
 //or ERR_NOMAP if the map is totally empty.
-int mapFileLine(const char* filename, int lineNumber);
+int mapFileLine(const char* filename, int lineNumber, std::vector<int>& addresses);
 
 struct FileMapping {
 	int scope;
