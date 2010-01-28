@@ -363,9 +363,6 @@ CDirScrAccEng::CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice
 	iWindow(aWindow), iDirectScreenAccess(0), iScreenGc(0), gCurrentConvertedColor(0),
 	iDrawing(EFalse), iOffScreenBmp(0), iOffScreenDevice(0), iFBGc(0),
 	iRawFrameBuf(NULL)
-#ifndef __WINS__
-	, iScreenAddr(0)
-#endif
 {    
 	LOGG("DSAE\n");
 	TSize size = aWindow.Size();
@@ -412,24 +409,6 @@ void CDirScrAccEng::ConstructL() {
 
 	// Create the DSA object
 	iDirectScreenAccess = CDirectScreenAccess::NewL(iClient, iScreenDevice, iWindow, *this);
-
-#ifndef __WINS__
-	// fetch screen buffer address
-	TScreenInfoV01 screenInfo;
-	TPckg<TScreenInfoV01> sInfo(screenInfo);
-	UserSvr::ScreenInfo(sInfo);
-
-	iScreenAddr = screenInfo.iScreenAddressValid ? (TUint8*)screenInfo.iScreenAddress : NULL;
-	LOGG("DSAEC1\n");
-	User::LeaveIfNull(iScreenAddr);
-	LOGG("DSAEC2\n");
-
-	// skip the control data in the beginning of frame buffer (32 bytes)
-	iScreenAddr += 32;
-
-	// initialise the raw redraw event (used when drawing directly to frame buffer)
-	iRedraw.Set(TRawEvent::ERedraw);
-#endif  //__WINS__
 	LOGG("DSAEC3\n");
 
 #ifdef MOSYNC_COMMERCIAL
@@ -463,6 +442,13 @@ void CDirScrAccEng::StartDrawingL() {
 		iRegion = iDirectScreenAccess->DrawingRegion();
 		
 		LOGG("Region: %i sections.\n", iRegion->Count());
+#ifdef GRAPHICS_DEBUGGING_MODE
+		const TRect* rl = iRegion->RectangleList();
+		for(int i=0; i<iRegion->Count(); i++) {
+			const TRect& r(rl[i]);
+			LOGG("%ix%i, %ix%i\n", r.iTl.iX, r.iTl.iY, r.iBr.iX, r.iBr.iY);
+		}
+#endif
 
 		// Set the display to clip to this region
 		iScreenGc->SetClippingRegion(iRegion);
@@ -473,6 +459,10 @@ void CDirScrAccEng::StartDrawingL() {
 		//gDrawBuffer = (TUint16*)iDrawSurface->DataAddress();
 
 		iDrawing = ETrue;
+		
+#ifdef __S60_50__	//5th edition
+		UpdateScreen();
+#endif
 	} else {
 		LHEL(dsaErr);
 	}

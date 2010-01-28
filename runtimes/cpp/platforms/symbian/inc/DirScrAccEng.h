@@ -125,11 +125,6 @@ private:
 	CFbsBitGc* iFBGc;
 
 	const void* iRawFrameBuf;
-
-#ifndef __WINS__
-	TUint8* iScreenAddr;        // frame buffer address
-	TRawEvent iRedraw;	        // raw event for forcing the update of screen 
-#endif	//__WINS__
 };
 
 #endif  //DIRSCRACCENG_H
