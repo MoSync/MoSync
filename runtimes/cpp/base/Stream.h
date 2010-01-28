@@ -25,7 +25,7 @@ namespace Base {
 
 	namespace Seek {
 		enum Enum {
-			Start, Current
+			Start, Current, End
 		};
 	}
 
@@ -64,7 +64,7 @@ namespace Base {
 
 		//writes some of src to this stream.
 		//respects both src's and this stream's position.
-		bool write(Stream& src, int size);
+		bool writeStream(Stream& src, int size);
 
 		//supported by all so far, except connection streams.
 		virtual bool length(int& aLength) const = 0;

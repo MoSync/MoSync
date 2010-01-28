@@ -16,7 +16,7 @@ echo Done.
 
 IF E%ELIM%==Ejava GOTO JAVA
 IF NOT E%ELIM%==EY GOTO REGULAR
-pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
+pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\mautil.lib"
 pipe-tool -xerr -B program rebuild.s
 GOTO COPYFILES
 
@@ -27,7 +27,7 @@ call prever.bat
 GOTO end
 
 :REGULAR
-pipe-tool -master-dump -sld -collect-stabs -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib" "%MOSYNCDIR%\lib\pipe\mauiD.lib"
+pipe-tool -master-dump -sld -collect-stabs -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\debug\mautil.lib" "%MOSYNCDIR%\lib\pipe\debug\maui.lib"
 
 REM pipe-tool -elim -java -B program temp.s
 

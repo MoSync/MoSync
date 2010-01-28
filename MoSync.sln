@@ -183,6 +183,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "helpers", "helpers", "{B97F
 		intlibs\helpers\intutil.h = intlibs\helpers\intutil.h
 		intlibs\helpers\log.h = intlibs\helpers\log.h
 		intlibs\helpers\memfuncs.h = intlibs\helpers\memfuncs.h
+		intlibs\helpers\mkdir.h = intlibs\helpers\mkdir.h
 		intlibs\helpers\smartie.h = intlibs\helpers\smartie.h
 		intlibs\helpers\timer.h = intlibs\helpers\timer.h
 		intlibs\helpers\TranslatePanic.cpp = intlibs\helpers\TranslatePanic.cpp

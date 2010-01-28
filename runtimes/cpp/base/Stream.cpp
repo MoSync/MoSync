@@ -112,13 +112,13 @@ namespace Base {
 		TEST(src.seek(Seek::Start, 0));
 #else
 		TEST(src.seek(Seek::Start, 0));
-		TEST(write(src, len));
+		TEST(writeStream(src, len));
 		TEST(src.seek(Seek::Start, 0));
 #endif
 		return true;
 	}
 
-	bool Stream::write(Stream& src, int size) {
+	bool Stream::writeStream(Stream& src, int size) {
 		const void* psrc = src.ptrc();
 		if(psrc) {	//memory source stream
 			TEST(this->write(psrc, size));

@@ -70,10 +70,14 @@ namespace Base {
 		int newPos;
 		if(mode == Seek::Start) {
 			newPos = mStartPos + offset;
-		} else {	//ESeekCurrent
+		} else if(mode == Seek::Current) {
 			int curPos;
 			TEST(FileStream::tell(curPos));
 			newPos = curPos + offset;
+		} else if(mode == Seek::End) {
+			newPos = mEndPos + offset;
+		} else {	//unsupported mode
+			FAIL;
 		}
 		if(newPos < mStartPos || newPos > mEndPos) {
 			FAIL;

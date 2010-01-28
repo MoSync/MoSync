@@ -69,6 +69,12 @@ namespace Base {
 			if(newpos != oldpos + offset) {
 				FAIL;
 			}
+		} else if(mode == Seek::End) {
+			int end;
+			TEST(length(end));
+			if(SDL_RWseek(rwops, offset, SEEK_END) != end + offset) {
+				FAIL;
+			}
 		} else {	//unsupported mode
 			FAIL;
 		}

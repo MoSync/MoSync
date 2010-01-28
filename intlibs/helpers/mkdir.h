@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MKDIR_H
 #define MKDIR_H
 
+// returns 0 on success.
+
 #ifdef WIN32
 #include <direct.h>
 #elif defined(LINUX)

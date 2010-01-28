@@ -1900,7 +1900,6 @@ interface MAAPI {
 
 		constset int MA_ACCESS_ {
 			READ = 1;
-			WRITE = 2;
 			READ_WRITE = 3;
 		}
 
@@ -1912,11 +1911,12 @@ interface MAAPI {
 		* The file may then be created by calling maFileCreate().
 		*
 		* Directories may be opened with this function. They cannot be read or written,
-		* but they can be created and deleted. Directory paths must end with a slash('/').
+		* but they can be created and deleted, and their existence can be queried.
+		* Directory paths must end with a slash('/').
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		* \param path The absolute path to the file.
-		* \param mode The access mode. Either MA_ACCESS_READ, MA_ACCESS_WRITE or MA_ACCESS_READ_WRITE.
+		* \param mode The access mode. Either MA_ACCESS_READ or MA_ACCESS_READ_WRITE.
 		* \returns The new file handle, or \< 0 on error.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
@@ -2055,7 +2055,7 @@ interface MAAPI {
 		*/
 		int maFileListClose(in MAHandle list);
 
-		constset int MA_FLERR_ {
+		constset int MA_FERR_ {
 			GENERIC = -2;
 			NOTFOUND = -3;
 			FORBIDDEN = -4;

@@ -107,6 +107,27 @@ namespace Base {
 }
 
 #ifdef IX_FILE
+#include <helpers/CPP_IX_FILE.h>
+MAHandle maFileOpen(const char* path, int mode);
+int maFileExists(MAHandle file);
+int maFileClose(MAHandle file);
+int maFileCreate(MAHandle file);
+int maFileDelete(MAHandle file);
+int maFileSize(MAHandle file);
+int maFileAvailableSpace(MAHandle file);
+int maFileTotalSpace(MAHandle file);
+int maFileDate(MAHandle file);
+int maFileRename(MAHandle file, const char* newName);
+int maFileTruncate(MAHandle file, int offset);
+
+int maFileWrite(MAHandle file, const void* src, int len);
+int maFileWriteFromData(const MA_FILE_DATA* args);
+int maFileRead(MAHandle file, void* dst, int len);
+int maFileReadToData(const MA_FILE_DATA* args);
+
+int maFileTell(MAHandle file);
+int maFileSeek(MAHandle file, int offset, int whence);
+
 MAHandle maFileListStart(const char* path, const char* filter);
 int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
 int maFileListClose(MAHandle list);

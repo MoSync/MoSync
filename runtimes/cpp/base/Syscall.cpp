@@ -76,7 +76,16 @@ namespace Base {
 	static FileListMap sFileListings;
 	static int sFileListNextHandle = 1;
 
-	typedef std::map<int, FileStream*> FileMap;
+	//todo: delete all FileStreams on exit.
+	struct FileHandle {
+		FileStream* fs;
+		int mode;
+		std::string name;
+		bool isDirectory() const {
+			return name[name.size()-1] == '/';
+		}
+	};
+	typedef std::map<int, FileHandle> FileMap;
 	typedef FileMap::iterator FileItr;
 	static FileMap sFileHandles;
 	static int sFileNextHandle = 1;
@@ -533,26 +542,101 @@ namespace Base {
 
 	/*constset int MA_ACCESS_ {
 		READ = 1;
-		WRITE = 2;
 		READ_WRITE = 3;
 	}*/
 
-#if 0
+#if 1
 	MAHandle maFileOpen(const char* path, int mode) {
+		FileHandle fh;
+		fh.mode = mode;
+		fh.name = std::string(FILESYSTEM_DIR) + path;
+		fh.fs = NULL;
+		if(mode == MA_ACCESS_READ_WRITE) {
+			if(isDirectory(fh.name.c_str()) == 0) {	//file exists and is not a directory
+				fh.fs = new WriteFileStream(fh.name.c_str());
+			}
+		} else if((mode & MA_ACCESS_READ) != 0) {
+			if(isDirectory(fh.name.c_str()) == 0) {
+				fh.fs = new FileStream(fh.name.c_str());
+			}
+		} else {
+			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
+		}
+		if(fh.fs) if(!fh.fs->isOpen()) {
+			delete fh.fs;
+			fh.fs = NULL;
+			return MA_FERR_GENERIC;
+		}
+		sFileHandles.insert(std::pair<int, FileHandle>(sFileNextHandle, fh));
+		return sFileNextHandle++;
+	}
+
+	static FileHandle& getFileHandle(MAHandle file) {
+		FileItr itr = sFileHandles.find(file);
+		MYASSERT(itr != sFileHandles.end(), ERR_FILE_HANDLE_INVALID);
+		return itr->second;
 	}
 
 	int maFileExists(MAHandle file) {
+		FileHandle& fh(getFileHandle(file));
+		if(fh.fs)
+			return true;
+		return isDirectory(fh.name.c_str()) >= 0;
 	}
 
 	int maFileClose(MAHandle file) {
+		FileItr itr = sFileHandles.find(file);
+		MYASSERT(itr != sFileHandles.end(), ERR_FILE_HANDLE_INVALID);
+		FileHandle& fh(itr->second);
+		SAFE_DELETE(fh.fs);
+		sFileHandles.erase(itr);
+		return 0;
 	}
 
 	int maFileCreate(MAHandle file) {
+		FileHandle& fh(getFileHandle(file));
+		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
+		if(fh.fs) {
+			return MA_FERR_GENERIC;
+		}
+		if(fh.isDirectory()) {
+			int res = _mkdir(fh.name.c_str());
+			if(res < 0)
+				return MA_FERR_GENERIC;
+			return 0;
+		} else {
+			fh.fs = new WriteFileStream(fh.name.c_str());
+			if(!fh.fs->isOpen()) {
+				delete fh.fs;
+				fh.fs = NULL;
+				return MA_FERR_GENERIC;
+			}
+			return 0;
+		}
 	}
 
 	int maFileDelete(MAHandle file) {
+		FileHandle& fh(getFileHandle(file));
+		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
+		SAFE_DELETE(fh.fs);
+		int res = remove(fh.name.c_str());
+		if(res < 0)
+			return MA_FERR_GENERIC;
+		return 0;
 	}
-	int maFileSize(MAHandle file);
+
+	int maFileSize(MAHandle file) {
+		FileHandle& fh(getFileHandle(file));
+		if(!fh.fs)
+			return MA_FERR_GENERIC;
+		int len;
+		bool res = fh.fs->length(len);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return len;
+	}
+
+	//TODO
 	int maFileAvailableSpace(MAHandle file);
 	int maFileTotalSpace(MAHandle file);
 	int maFileDate(MAHandle file);
@@ -560,36 +644,76 @@ namespace Base {
 	int maFileTruncate(MAHandle file, int offset);
 
 	int maFileWrite(MAHandle file, const void* src, int len) {
+		FileHandle& fh(getFileHandle(file));
+		if(!fh.fs)
+			return MA_FERR_GENERIC;
+		bool res = fh.fs->write(src, len);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return 0;
 	}
 
-	/*struct MA_FILE_DATA {
-		MAHandle file;
-		MAHandle data;
-		int offset;
-		int len;
-	}*/
-
 	int maFileWriteFromData(const MA_FILE_DATA* args) {
+		FileHandle& fh(getFileHandle(args->file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
+		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+		//todo: add ERR_DATA_OOB check for length.
+		if(!fh.fs)
+			return MA_FERR_GENERIC;
+		bool res = fh.fs->writeStream(*b, args->len);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return 0;
 	}
 
 	int maFileRead(MAHandle file, void* dst, int len) {
+		FileHandle& fh(getFileHandle(file));
+		if(!fh.fs)
+			return MA_FERR_GENERIC;
+		bool res = fh.fs->read(dst, len);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return 0;
 	}
 
 	int maFileReadToData(const MA_FILE_DATA* args) {
+		FileHandle& fh(getFileHandle(args->file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
+		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+		//todo: add ERR_DATA_OOB check for length.
+		if(!fh.fs)
+			return MA_FERR_GENERIC;
+		bool res = b->writeStream(*fh.fs, args->len);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return 0;
 	}
 
-	int maFileTell(MAHandle file);
+	int maFileTell(MAHandle file) {
+		FileHandle& fh(getFileHandle(file));
+		MYASSERT(fh.fs, ERR_FILE_CLOSED);
+		int pos;
+		bool res = fh.fs->tell(pos);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return pos;
+	}
 
-	int maFileSeek(MAHandle file, int offset, int whence);
-
-	/*constset int MA_SEEK_ {
-		/// Beginning of file.
-		SET = 0;
-		/// Current position.
-		CUR = 1;
-		/// End of file.
-		END = 2;
-	}*/
+	int maFileSeek(MAHandle file, int offset, int whence) {
+		FileHandle& fh(getFileHandle(file));
+		MYASSERT(fh.fs, ERR_FILE_CLOSED);
+		Seek::Enum mode;
+		switch(whence) {
+		case MA_SEEK_SET: mode = Seek::Start; break;
+		case MA_SEEK_CUR: mode = Seek::Current; break;
+		case MA_SEEK_END: mode = Seek::End; break;
+		default: BIG_PHAT_ERROR(ERR_INVALID_FILE_SEEK_MODE);
+		}
+		bool res = fh.fs->seek(mode, offset);
+		if(!res)
+			return MA_FERR_GENERIC;
+		return 0;
+	}
 #endif
 
 #ifndef SYMBIAN
@@ -644,7 +768,7 @@ namespace Base {
 			scanPath += filter;
 			int res = scanDirectory(scanPath.c_str(), fileListCallback);
 			if(res)
-				return MA_FLERR_GENERIC;
+				return MA_FERR_GENERIC;
 		}
 		std::pair<FileListItr, bool> ires = sFileListings.insert(
 			std::pair<int, FileList>(sFileListNextHandle, sFileList));

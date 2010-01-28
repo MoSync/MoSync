@@ -47,20 +47,18 @@ bool MemStreamC::length(int& aLength) const {
 }
 bool MemStreamC::seek(Seek::Enum mode, int offset) {
 	TEST(isOpen());
-	if(mode == Seek::Start) {
-		if(offset > mSize || offset < 0) {
-			FAIL;
-		}
-		mPos = offset;
-	} else if(mode == Seek::Current) {
-		int newpos = mPos + offset;
-		if(newpos > mSize || newpos < 0) {
-			FAIL;
-		}
-		mPos = newpos;
-	} else {	//unsupported mode
+	int newpos;
+	switch(mode) {
+	case Seek::Start: newpos = offset; break;
+	case Seek::Current: newpos = mPos + offset; break;
+	case Seek::End: newpos = mSize + offset; break;
+	default:
 		FAIL;
 	}
+	if(newpos > mSize || newpos < 0) {
+		FAIL;
+	}
+	mPos = newpos;
 	return true;
 }
 bool MemStreamC::tell(int& aPos) const {

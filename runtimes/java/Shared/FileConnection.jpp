@@ -53,7 +53,7 @@ final MAHandle maFileOpen(String path, int mode) {
 		fc = (FileConnection)Connector.open("file:///" + path, mode);
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	DEBUG_ASSERT(fc != null);
 	FileHandle fh = new FileHandle();
@@ -92,7 +92,7 @@ final int maFileCreate(MAHandle file) {
 		}
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	return 0;
 }
@@ -144,7 +144,7 @@ final int maFileWrite(MAHandle file, MAAddress src, int len) {
 		readMemStream(out, src, len);
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	return 0;
 }
@@ -169,7 +169,7 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 		}
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	return 0;
 }
@@ -182,7 +182,7 @@ final int maFileRead(MAHandle file, MAAddress dst, int len) {
 		writeMemBytes(dst, bytes, 0, len);
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	return 0;
 }
@@ -198,7 +198,7 @@ final int maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
 	#endif
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
-		return MA_FLERR_GENERIC;
+		return MA_FERR_GENERIC;
 	}
 	return 0;
 }
@@ -219,15 +219,15 @@ final int maFileListStart(String path, String filter) {
 			//DEBUG_ALWAYS("maFileListStart '" + url + "'\n");
 			fc = (FileConnection)Connector.open(url, Connector.READ);
 			if(!fc.exists())
-				return MA_FLERR_NOTFOUND;
+				return MA_FERR_NOTFOUND;
 			//DEBUG_ALWAYS("filter: '" + filter + "'\n");
 			en = fc.list(filter, true);
 		} catch(IOException e) {
 			PRINT_STACK_TRACE;
-			return MA_FLERR_GENERIC;
+			return MA_FERR_GENERIC;
 		} catch(SecurityException e) {
 			PRINT_STACK_TRACE;
-			return MA_FLERR_GENERIC;
+			return MA_FERR_GENERIC;
 		}
 	}
 	FileListing fl = new FileListing();
@@ -262,5 +262,5 @@ final int maFileListClose(MAHandle list) throws IOException {
 	FileListing fl = (FileListing)mFileListings.get(key);
 	if(fl.fc != null)
 		fl.fc.close();
-	return mFileListings.remove(key) == null ? MA_FLERR_GENERIC : 0;
+	return mFileListings.remove(key) == null ? MA_FERR_GENERIC : 0;
 }

@@ -1898,7 +1898,7 @@ namespace Base {
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 #ifdef IX_FILE
-#if 0
+#if 1
 		case maIOCtl_maFileOpen:
 			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
@@ -1908,11 +1908,11 @@ namespace Base {
 			return maFileClose(a);
 		case maIOCtl_maFileCreate:
 			return maFileCreate(a);
-		/*case maIOCtl_maFileDelete:
+		case maIOCtl_maFileDelete:
 			return maFileDelete(a);
 		case maIOCtl_maFileSize:
 			return maFileSize(a);
-		case maIOCtl_maFileAvailableSpace:
+		/*case maIOCtl_maFileAvailableSpace:
 			return maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
 			return maFileTotalSpace(a);
@@ -1924,9 +1924,13 @@ namespace Base {
 			return maFileTruncate(a, b);*/
 
 		case maIOCtl_maFileWrite:
-			return maFileWrite(a, b, c);
+			return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileWriteFromData:
+			return maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
-			return maFileRead(a, b, c);
+			return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileReadToData:
+			return maFileReadToData(GVMRA(MA_FILE_DATA));
 
 		case maIOCtl_maFileTell:
 			return maFileTell(a);
