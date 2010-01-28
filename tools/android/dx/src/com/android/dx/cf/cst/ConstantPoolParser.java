@@ -34,6 +34,7 @@ import com.android.dx.rop.cst.StdConstantPool;
 import com.android.dx.rop.type.Type;
 import com.android.dx.util.ByteArray;
 import com.android.dx.util.Hex;
+import com.mosync.android.StringPatcher;
 
 import static com.android.dx.cf.cst.ConstantTags.*;
 
@@ -322,11 +323,26 @@ public final class ConstantPoolParser {
         int length = bytes.getUnsignedShort(at + 1);
 
         at += 3; // Skip to the data.
-
         ByteArray ubytes = bytes.slice(at, at + length);
+        
+        //
+        // PATCH: Patch package names (any matching string constant) here
+        
+        // A better place for this might be in the parse0() method and
+        // the case "CONSTANT_Class", the way it is currently done
+        // will patch user generated strings as well, if they happen
+        // to use the same string as one the patch strings.
+        //        
+        String			name;
+        byte 			str[]   = new byte[ubytes.size( )];
+        StringPatcher 	patcher = StringPatcher.getInstance( );
+
+        ubytes.getBytes( str, 0 );
+        name = patcher.patch( new String( str ) );        
+        System.err.println( name );        
 
         try {
-            return new CstUtf8(ubytes);
+            return new CstUtf8( name );
         } catch (IllegalArgumentException ex) {
             // Translate the exception
             throw new ParseException(ex);

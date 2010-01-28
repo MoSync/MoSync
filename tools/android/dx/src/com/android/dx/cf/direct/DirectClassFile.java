@@ -36,6 +36,7 @@ import com.android.dx.rop.type.Type;
 import com.android.dx.rop.type.TypeList;
 import com.android.dx.util.ByteArray;
 import com.android.dx.util.Hex;
+import com.mosync.android.StringPatcher;
 
 /**
  * Class file with info taken from a {@code byte[]} or slice thereof.
@@ -495,11 +496,15 @@ public class DirectClassFile implements ClassFile {
         interfaces = makeTypeList(at, count);
         at += count * 2;
 
-        if (strictParse) {
+        //
+        // PATCH: Can not verify path names against package names
+        //		  if we're patching the package names
+        //
+        if (strictParse && StringPatcher.getInstance( ).hasPatches( ) == false) {
             /*
              * Make sure that the file/jar path matches the declared
              * package/class name.
-             */
+             */        	
             String thisClassName = thisClass.getClassType().getClassName();
             if (!(filePath.endsWith(".class") &&
                   filePath.startsWith(thisClassName) &&
@@ -507,6 +512,7 @@ public class DirectClassFile implements ClassFile {
                 throw new ParseException("class name (" + thisClassName +
                                          ") does not match path (" +
                                          filePath + ")");
+                                         
             }
         }
 

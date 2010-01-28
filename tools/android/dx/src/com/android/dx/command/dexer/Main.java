@@ -33,6 +33,7 @@ import com.android.dx.rop.annotation.Annotations;
 import com.android.dx.rop.annotation.AnnotationsList;
 import com.android.dx.rop.cst.CstNat;
 import com.android.dx.rop.cst.CstUtf8;
+import com.mosync.android.StringPatcher;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -889,6 +890,15 @@ public class Main {
                     }
                 } else if (arg.equals("--no-locals")) {
                     localInfo = false;
+                 
+                } else if (arg.equals("--patch-string")) {
+                	//
+                	// PATCH: Added the --patch-string switch
+                	//
+                    if ( at+2 > args.length )
+                    	throw new UsageException( );
+                    StringPatcher.getInstance( ).addPatch( args[at+1], args[at+2] );
+                    at += 2;
                 } else {
                     System.err.println("unknown option: " + arg);
                     throw new UsageException();
