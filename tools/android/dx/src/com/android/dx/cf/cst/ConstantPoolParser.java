@@ -327,7 +327,7 @@ public final class ConstantPoolParser {
         
         //
         // PATCH: Patch package names (any matching string constant) here
-        
+        //
         // A better place for this might be in the parse0() method and
         // the case "CONSTANT_Class", the way it is currently done
         // will patch user generated strings as well, if they happen
@@ -339,7 +339,7 @@ public final class ConstantPoolParser {
 
         ubytes.getBytes( str, 0 );
         name = patcher.patch( new String( str ) );        
-        System.err.println( name );        
+        //System.err.println( name );        
 
         try {
             return new CstUtf8( name );
