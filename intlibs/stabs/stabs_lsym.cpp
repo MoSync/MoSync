@@ -279,8 +279,16 @@ static const TypeBase* subParseArray(char** pText) {
 	//the rangeType can be ignored, because it's always going to be the same.
 	int lower, upper, len;
 	int res = sscanf(text, "%i;%i%n", &lower, &upper, &len);
-	FAILIF(lower > upper);
 	FAILIF(res != 2);
+
+	bool isUnboundedArray = false;
+
+	if(lower == 0 && upper == -1) {
+		isUnboundedArray = true;
+	} else {
+		FAILIF(lower > upper);
+	}
+
 	text += len;
 	FAILIF(text[0] != ';');
 #if 0
@@ -291,8 +299,13 @@ static const TypeBase* subParseArray(char** pText) {
 	*pText = text + 1;
 	const TypeBase* elemType = subParseType(pText, Tuple(), string());
 	TEST(elemType);
-	int size = (upper - lower) + 1;
-	return new ArrayType(size, elemType, rangeType);
+	
+	if(isUnboundedArray) {
+		int size = (upper - lower) + 1;
+		return new ArrayType(size, elemType, rangeType);
+	} else {
+		return new PointerType(elemType);
+	}
 }
 
 // alt.rangeTypeDefinition := '=r' typeId ';' rangeMin ';' rangeMax ';'

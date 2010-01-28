@@ -78,11 +78,17 @@ bool loadStabs(const char* sld, const char* stabs) {
 		Timer t("parseStabs");
 		ifstream in(stabs);
 		string line;
+		int lineNumber = 1;
 		while(in.good()) {
 			getline(in, line);
 			if(!in.good())
 				break;
-			TEST(parseStabLine(line));
+			bool ret = parseStabLine(line);
+			if(!ret) {
+				LOG("Invalid line %d in stabs.tab\n", lineNumber);
+				FAIL;
+			}
+			lineNumber++;
 		}
 		gCurrentFile = -1;
 		TEST(in.eof());
