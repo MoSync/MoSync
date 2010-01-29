@@ -5,8 +5,14 @@ curr_dir=$(pwd)
 # Set MOSYNCDIR
 export MOSYNCDIR=/opt/%appname%
 
+# Change to app directory
+if [ ! -e  "$HOME/.%appname%" ]; then
+	mkdir $HOME/.%appname%
+fi
+cd $HOME/.%appname%
+
 # Run
-cd /tmp
 /opt/%appname%/bin/run -program /opt/%appname%/bin/program -resource /opt/%appname%/bin/resources
 
+# Done
 cd $curr_dir
