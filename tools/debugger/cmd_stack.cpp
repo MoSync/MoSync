@@ -419,6 +419,11 @@ void Callback::sif() {
 static void Callback::dee(const Value* value, const char *err) {
 	const SYM& sym = value->getSymbol();
 	if(!err) {
+		if(value->isType()) {
+			error("%s", "Attempt to use a type name as an expression");
+			return;
+		}
+
 		oprintDone();
 		oprintf(",value=\"");
 		StringPrintFunctor spf;

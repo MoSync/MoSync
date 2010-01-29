@@ -227,7 +227,7 @@ Value DerefNode::evaluate() {
 	if(!deref) throw ParseException("Invalid pointer");
 
 	int addr = (int)a;
-	if(addr>0 && addr+deref->size()<=gMemSize)
+	if(deref->size() && addr>0 && addr+deref->size()<=gMemSize)
 		ExpressionCommon::loadMemory(addr, deref->size());
 	else {
 		//throw ParseException("Invalid pointer");
