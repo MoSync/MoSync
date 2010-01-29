@@ -2468,6 +2468,78 @@ interface MAAPI {
 		* -2 will be returned.
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf, in int size);
+
+#if IX_PIM
+		constset int MA_PIM_ {
+			CONTACTS = 1;
+			EVENTS = 2;
+			TODOS = 3;
+		}
+
+		constset int MA_PIM_FIELD_ {
+		}
+
+		constset int MA_PIM_ATTR_ {
+		}
+
+		constset int MA_PIM_TYPE_ {
+			/// int bytes
+			/// the int specifies the number of bytes.
+			/// the bytes are not null-terminated.
+			BINARY = 0;
+			/// int
+			BOOLEAN = 1;
+			/// int
+			/// unix time.
+			DATE = 2;
+			/// int
+			INT = 3;
+			/// string '\0'
+			STRING = 4;
+			/// int (string '\0')*
+			/// the int specifies the number of strings.
+			/// there is no extra null terminator at the end of the list.
+			STRING_ARRAY = 5;
+		}
+
+		// returns a PimList handle.
+		MAHandle maPimListOpen(in int listType);
+		// returns a PimItem handle.
+		MAHandle maPimListNext(in MAHandle list);
+		int maPimListClose(in MAHandle list);
+
+		// the number of fields in the item.
+		int maPimItemCount(in MAHandle item);
+		// the field id of the n:th field
+		int maPimItemGetField(in MAHandle item, in int index);
+		// the number of items in the field
+		int maPimItemFieldCount(in MAHandle item, in int field);
+		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
+
+		// returns one of MA_PIM_TYPE_
+		int maPimFieldType(in MAHandle list, in int field);
+
+		struct MA_PIM_ARGS {
+			MAHandle item;
+			int field;
+			MAAddress buf;
+			int bufSize;
+		}
+		/**
+		* \param index An index into the field's value array.
+		* \returns The number of bytes occupied by the value.
+		* If this number is greater than bufSize, the value is not written,
+		* and you'll have to allocate a bigger buffer and try again.
+		*/
+		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
+		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
+		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
+		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);
+		int maPimItemClose(in MAHandle item);
+
+		MAHandle maPimItemCreate(in MAHandle list);
+		int maPimItemRemove(in MAHandle list, in MAHandle item);
+#endif	//IX_PIM
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
