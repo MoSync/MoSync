@@ -1955,10 +1955,25 @@ interface MAAPI {
 		* \param file A file handle. The file must exist and must not be a directory.
 		*/
 		int maFileSize(in MAHandle file);
+
 		int maFileAvailableSpace(in MAHandle file);
 		int maFileTotalSpace(in MAHandle file);
 		int maFileDate(in MAHandle file);
 		int maFileRename(in MAHandle file, in MAString newName);
+
+		/**
+		* Truncates the file.
+		*
+		* If offset is less than the file's size,
+		* the file's new size is equal to the offset. All data after the offset is discarded.
+		* If the offset is equal to or greater than the file's size,
+		* this function does nothing.
+		* If the file's position is greater than the offset, it is reset
+		* to be equal to the offset.
+		*
+		* The file must exist prior to calling this function.
+		* Returns 0, or \< 0 on error.
+		*/
 		int maFileTruncate(in MAHandle file, in int offset);
 
 		/**
@@ -2483,8 +2498,7 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_TYPE_ {
-			/// int bytes
-			/// the int specifies the number of bytes.
+			/// bytes
 			/// the bytes are not null-terminated.
 			BINARY = 0;
 			/// int
@@ -2510,9 +2524,9 @@ interface MAAPI {
 
 		// the number of fields in the item.
 		int maPimItemCount(in MAHandle item);
-		// the field id of the n:th field
+		// the field id of the n:th field.
 		int maPimItemGetField(in MAHandle item, in int index);
-		// the number of items in the field
+		// the number of values in the field for a given item.
 		int maPimItemFieldCount(in MAHandle item, in int field);
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 

@@ -31,17 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PRINT_STACK_TRACE
 #define DEBUG_ASSERT(a)
 #else
-#if defined(BLUETOOTH_LOG) || defined(TCP_LOG)
-#define DEBUG_ALWAYS(a) MAMidlet.out.print(a); MAMidlet.out.flush()
-#else
 #ifdef _JavaME
-#define DEBUG_ALWAYS(a) System.out.print(a)
+#define DEBUG_ALWAYS(a) MAMidlet.out.print(a); MAMidlet.out.flush()
 #elif defined(_android)
 #define DEBUG_ALWAYS(a) Log.i("DEBUG MESSAGE",a)
 #else
 #error Unknown platform!
 #endif //_JavaME
-#endif	//BLUETOOTH_LOG
 #define PRINT_STACK_TRACE \
 	DEBUG_ALWAYS("Stack trace " + IN_FILE_ON_LINE_STRING + "\n"); \
 	DEBUG_ALWAYS(e.toString() + "\n"); e.printStackTrace()

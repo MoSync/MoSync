@@ -88,6 +88,11 @@ import javax.microedition.lcdui.Graphics;
 #include "generated\IX_AUDIOBUFFER_CONSTS.h"
 #endif
 
+#ifdef MA_IX_PIM
+import javax.microedition.pim.*;
+#include "generated\IX_PIM_CONSTS.h"
+#endif
+
 #define CORE mCore
 
 final class Syscall 
@@ -1760,9 +1765,9 @@ public
 		case maIOCtl_maFileDate:
 			return maFileDate(a);
 		case maIOCtl_maFileRename:
-			return maFileRename(a, readMemString(b));
+			return maFileRename(a, readMemString(b));*/
 		case maIOCtl_maFileTruncate:
-			return maFileTruncate(a, b);*/
+			return maFileTruncate(a, b);
 
 		case maIOCtl_maFileWrite:
 			return maFileWrite(a, b, c);
@@ -1861,10 +1866,47 @@ public
 		case maIOCtl_maGetSystemProperty:
 			return maGetSystemProperty(readMemString(a), b, c);
 
+#ifdef MA_IX_PIM
+		case maIOCtl_maPimListOpen:
+			return maPimListOpen(a);
+		case maIOCtl_maPimListNext:
+			return maPimListNext(a);
+		case maIOCtl_maPimListClose:
+			return maPimListClose(a);
+		case maIOCtl_maPimItemCount:
+			return maPimItemCount(a);
+		case maIOCtl_maPimItemGetField:
+			return maPimItemGetField(a, b);
+		case maIOCtl_maPimItemFieldCount:
+			return maPimItemFieldCount(a, b);
+		case maIOCtl_maPimItemGetAttributes:
+			return maPimItemGetAttributes(a, b, c);
+		case maIOCtl_maPimFieldType:
+			return maPimFieldType(a, b);
+		case maIOCtl_maPimItemGetValue:
+			return maPimItemGetValue(a, b);
+		/*case maIOCtl_maPimItemSetValue:
+			return maPimItemSetValue(a, b, c);
+		case maIOCtl_maPimItemAddValue:
+			return maPimItemAddValue(a, b);
+		case maIOCtl_maPimItemRemoveValue:
+			return maPimItemRemoveValue(a, b, c);*/
+		case maIOCtl_maPimItemClose:
+			return maPimItemClose(a);
+		/*case maIOCtl_maPimItemCreate:
+			return maPimItemCreate(a);
+		case maIOCtl_maPimItemRemove:
+			return maPimItemRemove(a, b);*/
+#endif	//MA_IX_PIM
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
 	}
+
+#ifdef MA_IX_PIM
+#include "PIM2.jpp"
+#endif	//MA_IX_PIM
 
 	int maGetSystemProperty(String key, MAAddress buf, int size) {
 		String value = System.getProperty(key);

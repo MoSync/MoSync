@@ -91,6 +91,15 @@ extern int gConsoleBackgroundColor;
 */
 extern int gConsoleLogging;
 
+/** \brief Console file logging handle
+*
+* If greater than zero, all text sent to PrintConsole will also be sent to the file
+* specified by this handle.
+* The default value is zero. You'll have to open the handle yourself.
+* \see maFileOpen()
+*/
+extern MAHandle gConsoleFile;
+
 /** \brief Console display option
 *
 * If non-zero, console will be displayed, otherwise not.

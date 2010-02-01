@@ -20,6 +20,7 @@ import javax.microedition.lcdui.*;
 import javax.microedition.rms.*;
 import javax.microedition.io.*;
 import java.io.*;
+import javax.microedition.io.file.*;
 
 #include "helpers.h"
 #include "generated\MAAPI_consts.h"
@@ -30,11 +31,16 @@ public final class MAMidlet extends MIDlet {
 	private boolean mNotifyDestroyed = true;
 	static MAMidlet self;	//used by WorkerThread
 
+#ifndef PHONE_RELEASE
+	static PrintStream out = System.out;
+#endif
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG) || defined(PUBLIC_DEBUG)
-	static PrintStream out;
-
 	private static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
 		StreamConnection sc = (StreamConnection)Connector.open(url, Connector.WRITE);
+		if(sc instanceof FileConnection) {
+			FileConnection fc = (FileConnection)sc;
+			fc.truncate(0);
+		}
 		return new PrintStream(sc.openOutputStream());
 	}
 #endif

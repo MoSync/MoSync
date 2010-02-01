@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mavsprintf.h"
 #include "maheap.h"
 #include "conprint.h"
+#include "IX_FILE.h"
 
 // Console width, in characters
 // Note that not all characters on a line may be visible on a given device, due
@@ -63,6 +64,7 @@ static ConData sConsole = { 0, 0, 0, 0, 0, EXTENT(0, 0), { 0, 0 }, NULL };
 int gConsoleTextColor = 0x00FF00;	//green
 int gConsoleBackgroundColor = 0;	//black
 int gConsoleLogging = 1;
+MAHandle gConsoleFile = 0;
 int gConsoleDisplay = 1;
 
 static void FeedLine(void)
@@ -137,6 +139,12 @@ void PrintConsole(const char *str)
 			maWriteLog(str, length);
 			if (str[length - 1] != '\n')
 				maWriteLog("\n", 1);
+		}
+	}
+	if(gConsoleFile > 0) {
+		int res = maFileWrite(gConsoleFile, str, strlen(str));
+		if(res < 0) {
+			maPanic(res, "PrintConsole maFileWrite");
 		}
 	}
 

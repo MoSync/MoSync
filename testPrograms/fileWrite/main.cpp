@@ -40,7 +40,7 @@ public:
 	/**
 	* Writes the name of the next file in the list to \a dst.
 	* \a dst's old contents are overwritten.
-	* Returns the length of the name, or \< 0 on error.
+	* Returns the length of the name, 0 if there are no more files, or \< 0 on error.
 	* On error, \a dst is not modified.
 	*/
 	int next(MAUtil::String& dst);
@@ -58,7 +58,7 @@ int FileLister::start(const char* dir, const char* filter) {
 
 int FileLister::next(MAUtil::String& dst) {
 	int len = maFileListNext(mList, NULL, 0);
-	if(len < 0)
+	if(len <= 0)
 		return len;
 	dst.resize(len);
 	len = maFileListNext(mList, dst.pointer(), len+1);
@@ -74,30 +74,45 @@ void FileLister::close() {
 	}
 }
 
-static void writeAFile() {
+static bool tryToWrite(const MAUtil::String& dir);
+
+static bool writeAFile(const MAUtil::String& dir) {
 	// find a root path
 	FileLister fl;
-	int res = fl.start("");
+	int res = fl.start(dir.c_str());
 	if(res < 0) {
 		printf("Error %i\n", res);
-		return;
+		return false;
 	}
-	MAUtil::String root;
-	res = fl.next(root);
-	if(res < 0) {
-		printf("Error %i\n", res);
-		return;
+	while(1) {
+		MAUtil::String file;
+		res = fl.next(file);
+		if(res < 0) {
+			printf("Error %i\n", res);
+			return false;
+		}
+		if(res == 0)
+			return false;
+		if(file[file.size()-1] == '/') {
+			//printf("Dir: '%s'\n", file.c_str());
+			if(tryToWrite(dir + file))
+				return true;
+			//if(writeAFile(dir + file))
+				//return true;
+			writeAFile(dir + file);
+		}
 	}
-	printf("Root: '%s'\n", root.c_str());
-	
-	MAUtil::String filename = root + "test.txt";
+}
+
+static bool tryToWrite(const MAUtil::String& dir) {
+	MAUtil::String filename = dir + "test.txt";
 	printf("Open '%s'\n", filename.c_str());
 	MAHandle file = maFileOpen(filename.c_str(), MA_ACCESS_READ_WRITE);
 	if(file < 0) {
 		printf("Error %i\n", file);
-		return;
+		return false;
 	}
-	res = maFileExists(file);
+	int res = maFileExists(file);
 	MAASSERT(res >= 0);
 	if(res) {
 		printf("File exists.\n");
@@ -106,7 +121,7 @@ static void writeAFile() {
 		res = maFileCreate(file);
 		if(res < 0) {
 			printf("Error %i\n", res);
-			return;
+			return false;
 		}
 	}
 	static const char data[] = "asfihu89ph4nma98fjioan9phadf89h239hdad9h89p\n";
@@ -117,10 +132,13 @@ static void writeAFile() {
 	res = maFileClose(file);
 	MAASSERT(res == 0);
 	printf("Done.\n");
+	return true;
 }
 
 extern "C" int MAMain() {
+	InitConsole();
+	gConsoleLogging = 1;
 	printf("Hello World!\n");
-	writeAFile();
+	writeAFile("");
 	FREEZE;
 }

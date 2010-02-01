@@ -1,0 +1,181 @@
+
+// include this file in Syscall.jpp.
+
+// subclasses
+static class MyPimList {
+	PIMList pl;
+	Enumeration e;
+}
+
+// variables
+PIM mPimInstance;
+Hashtable mPimListHandles = new Hashtable();
+int mPimListNextHandle = 1;
+Hashtable mPimItemHandles = new Hashtable();
+int mPimItemNextHandle = 1;
+
+// helpers
+MyPimList getPimList(MAHandle list) {
+	MyPimList pl = (MyPimList)mPimListHandles.get(new Integer(list));
+	DEBUG_ASSERT(pl != null);
+	return pl;
+}
+
+PIMItem getPimItem(MAHandle item) {
+	PIMItem pi = (PIMItem)mPimItemHandles.get(new Integer(item));
+	DEBUG_ASSERT(pi != null);
+	return pi;
+}
+
+
+// syscalls
+MAHandle maPimListOpen(int listType) throws PIMException {
+	if(mPimInstance == null) {
+		mPimInstance = PIM.getInstance();
+	}
+	PIMList pl = mPimInstance.openPIMList(listType, PIM.READ_WRITE);
+	MyPimList mpl = new MyPimList();
+	mpl.pl = pl;
+	mpl.e = pl.items();
+	mPimListHandles.put(new Integer(mPimListNextHandle), mpl);
+	return mPimListNextHandle++;
+}
+
+MAHandle maPimListNext(MAHandle list) {
+	MyPimList pl = getPimList(list);
+	if(!pl.e.hasMoreElements())
+		return 0;
+	PIMItem pi = (PIMItem)pl.e.nextElement();
+	mPimItemHandles.put(new Integer(mPimItemNextHandle), pi);
+	return mPimItemNextHandle++;
+}
+
+int maPimListClose(MAHandle list) throws PIMException {
+	Integer key = new Integer(list);
+	MyPimList pl = (MyPimList)mPimListHandles.get(key);
+	if(pl.pl != null)
+		pl.pl.close();
+	mPimListHandles.remove(key);
+	return 0;
+}
+
+int maPimItemClose(MAHandle item) {
+	Integer key = new Integer(item);
+	if(mPimItemHandles.remove(key) == null) {
+		BIG_PHAT_ERROR;
+	}
+	return 0;
+}
+
+int maPimItemCount(MAHandle item) {
+	PIMItem pi = getPimItem(item);
+	return pi.getFields().length;
+}
+
+int maPimItemGetField(MAHandle item, int index) {
+	PIMItem pi = getPimItem(item);
+	return pi.getFields()[index];
+}
+
+int maPimItemFieldCount(MAHandle item, int field) {
+	PIMItem pi = getPimItem(item);
+	return pi.countValues(field);
+}
+int maPimItemGetAttributes(MAHandle item, int field, int index) {
+	PIMItem pi = getPimItem(item);
+	return pi.getAttributes(field, index);
+}
+
+int maPimFieldType(MAHandle list, int field) {
+	MyPimList pl = getPimList(list);
+	return pl.pl.getFieldDataType(field);
+}
+
+#if 0
+struct MA_PIM_ARGS {
+	MAHandle item;
+	int field;
+	MAString buf;
+	int bufSize;
+}
+#endif
+
+int maPimItemGetValue(MAAddress args, int index) {
+	PIMItem pi = getPimItem(RINT(args));
+	int field = RINT(args+4);
+	int address = RINT(args+8);
+	int bufSize = RINT(args+12);
+	int dataType = pi.getPIMList().getFieldDataType(field);
+
+	int i;
+	switch(dataType) {
+	case PIMItem.BINARY:
+		{
+			byte[] bin = pi.getBinary(field, index);
+			int len = bin.length;
+			if(len > bufSize)
+				return len;
+			writeMemBytes(address, bin, 0, len);
+			return len;
+		}
+	case PIMItem.BOOLEAN:
+		i = pi.getBoolean(field, index) ? 1 : 0;
+		break;
+	case PIMItem.DATE:
+		i = (int)(pi.getDate(field, index) / 1000);
+		break;
+	case PIMItem.INT:
+		i = pi.getInt(field, index);
+		break;
+	case PIMItem.STRING:
+		{
+			String s = pi.getString(field, index);
+			int strLen = s.length();
+			int totLen = strLen + 1;
+			if(totLen > bufSize)
+				return totLen;
+			writeMemBytes(address, s.getBytes(), 0, strLen);
+			WBYTE_RAW(address + strLen, 0);
+			return totLen;
+		}
+	case PIMItem.STRING_ARRAY:
+		{
+			//collapses nulls to empty strings. hopefully it won't cause too much trouble.
+			String[] arr = pi.getStringArray(field, index);
+			int totLen = 4;
+			for(int j=0; j<arr.length; j++) {
+				if(arr[j] != null)
+					totLen += arr[j].length();
+				totLen += 1;
+			}
+			if(totLen > bufSize)
+				return totLen;
+			WINT(address, arr.length);
+			int adr = address + 4;
+			for(int j=0; j<arr.length; j++) {
+				if(arr[j] != null) {
+					writeMemBytes(adr, arr[j].getBytes(), 0, arr[j].length());
+					adr += arr[j].length();
+				}
+				WBYTE_RAW(adr, 0);
+				adr += 1;
+			}
+			return totLen;
+		}
+	default:
+		BIG_PHAT_ERROR;
+	}
+
+	if(4 > bufSize)
+		return 4;
+	WINT(address, i);
+	return 4;
+}
+
+#if 0
+int maPimItemSetValue(MAAddress args, int index, int attributes);
+int maPimItemAddValue(MAAddress args, int attributes);
+int maPimItemRemoveValue(MAHandle item, int field, int index);
+MAHandle maPimItemCreate(MAHandle list);
+int maPimItemRemove(MAHandle list, MAHandle item);
+#endif
