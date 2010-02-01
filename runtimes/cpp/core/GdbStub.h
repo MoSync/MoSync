@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Core.h"
 #include <net/net.h>
 #include "ThreadPoolImpl.h"
+#include <mostl/vector.h>
 
 /* used when compiling the GDB stub */
 #define DBG_STAB ENDOP
@@ -95,11 +96,12 @@ private:
 	int handlePacket(int pos);	//returns new pos, or <0 if packet was incomplete
 
 	// Used to store the input data and output data.
-	char mInputBuffer[1024*10];	//todo:make variable length
+	//char mInputBuffer[1024*10];	//todo:make variable length
+	mostd::vector<char> mInputBuffer;
 	int mInputPos;
 	char* mInputPtr;	//legacy
 
-	char outputBuffer[1024*10];
+	mostd::vector<char> outputBuffer;
 	char *curOutputBuffer;
 
 	// Acks
@@ -153,6 +155,7 @@ private:
 
 	void appendOut(const char *what);
 	void appendOut(char what);
+	void checkAndResize(int len);
 
 	template<typename type>
 	void appendDataTypeToOutput(type d) {

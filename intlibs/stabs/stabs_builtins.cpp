@@ -92,7 +92,7 @@ void UnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat 
 }
 
 void LongUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<unsigned int>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void LongLongInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
@@ -108,7 +108,7 @@ void ShortInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt
 }
 
 void ShortUnsignedInt::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<short>(pf, data, "%u", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<unsigned short>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void SignedChar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
@@ -116,7 +116,7 @@ void SignedChar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat f
 }
 
 void UnsignedChar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<char>(pf, data, "%c", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<unsigned char>(pf, data, "%u", fmt, TypeBase::eDecimal);
 }
 
 void Float::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {

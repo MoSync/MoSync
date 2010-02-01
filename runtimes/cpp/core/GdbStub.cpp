@@ -45,6 +45,9 @@ char GdbStub::hexChars[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c',
 
 GdbStub::GdbStub(Core::VMCore *core)
 {
+	outputBuffer.resize(1024);
+	curOutputBuffer = outputBuffer.begin();
+	mInputBuffer.resize(1024);
     mCore = core;
     mWaitingForAck = false;
     mQuit = false;
@@ -59,30 +62,39 @@ int GdbStub::hexToNum(char c) {
 	else return -1;
 }
 
+void GdbStub::checkAndResize(int len) {
+	unsigned long curIndex = (unsigned long)(curOutputBuffer-outputBuffer.begin());
+	unsigned long newSize = (len+curIndex)+1; // +1 for the null terminator...
+	if(newSize>(outputBuffer.size())) {
+		//BIG_PHAT_ERROR(ERR_INTERNAL);
+		outputBuffer.resize(newSize);
+		curOutputBuffer = outputBuffer.begin()+curIndex;
+	}	
+}
+
 void GdbStub::appendOut(const char *what) {
-	if((strlen(what)+(int)(curOutputBuffer-outputBuffer))>sizeof(outputBuffer)) {
-		BIG_PHAT_ERROR(ERR_INTERNAL);
-	}
+	checkAndResize(strlen(what));
 	curOutputBuffer += sprintf(curOutputBuffer, "%s", what);	
 }
 
 void GdbStub::appendOut(char what) {
-	if((1+(size_t)(curOutputBuffer-outputBuffer))>sizeof(outputBuffer)) {
-		BIG_PHAT_ERROR(ERR_INTERNAL);
-	}
+	checkAndResize(1);
 	*curOutputBuffer++ = what;
+	*curOutputBuffer = 0;
 }
 
 void GdbStub::clearOutputBuffer() {
-	*outputBuffer = '$';
-	curOutputBuffer = outputBuffer+1;
+	curOutputBuffer = outputBuffer.begin();
+	checkAndResize(1024);
+	appendOut('$');
+	
 }
 
 void GdbStub::setupDebugConnection() {
 	connection = NULL;
 	int res = server.open(50000);
 	MYASSERT(res > 0, ERR_GDB_SERVER_OPEN);
-	
+
 	res = server.accept(connection);
 	DEBUG_ASSERT(res > 0);
 
@@ -251,8 +263,11 @@ int GdbStub::sRunRead(void* arg) {
 void GdbStub::runRead() {
 	mInputPos = 0;
 	while(!mQuit) {
-		int res = connection->read(mInputBuffer + mInputPos,
-			sizeof(mInputBuffer) - mInputPos);
+		if(mInputPos>=(int)mInputBuffer.size()) {
+			mInputBuffer.resize((mInputBuffer.size()+1)*2);
+		}
+		int res = connection->read(mInputBuffer.begin() + mInputPos,
+			(mInputBuffer.size() - mInputPos)-1);
 		//LOG("GDB read %i\n", res);
 		if(res <= 0) {
 			LOG("connection->read error %i\n", res);
@@ -346,7 +361,7 @@ int GdbStub::handlePacket(int pos) {
 
 	//check the checksum
 	uint theirChecksum;
-	int res = sscanf(mInputBuffer + pos, "%x", &theirChecksum);
+	int res = sscanf(mInputBuffer.begin() + pos, "%x", &theirChecksum);
 	pos += 2;
 	if(res != 1 || myChecksum != theirChecksum) {
 		transmissionNAK();
@@ -354,7 +369,7 @@ int GdbStub::handlePacket(int pos) {
 	}
 
 	//parse the packet
-	mInputPtr = mInputBuffer + begin;
+	mInputPtr = mInputBuffer.begin() + begin;
 	doPacket();
 	return pos;
 }
@@ -577,7 +592,7 @@ bool GdbStub::executeCommand() {
 void GdbStub::putPacket() {
 	DEBUG_ASSERT(!mWaitingForAck);
 	int calculatedChecksum = 0;
-	const char *cur = outputBuffer + 1;
+	const char *cur = outputBuffer.begin() + 1;
 	*curOutputBuffer = 0;
 	int len = 0;
 	while(*cur) {
@@ -592,9 +607,9 @@ void GdbStub::putPacket() {
 	appendOut(hexChars[(calculatedChecksum)&0xf]);
 	*curOutputBuffer = 0;
 
-	LOG("GDB transmission: \"%s\"\n", outputBuffer);
+	LOG("GDB transmission: \"%s\"\n", outputBuffer.begin());
 	mWaitingForAck = true;
-	putDebugChars(outputBuffer, curOutputBuffer - outputBuffer);
+	putDebugChars(outputBuffer.begin(), curOutputBuffer - outputBuffer.begin());
 }
 
 // Read and execute command and send reply.

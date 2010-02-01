@@ -261,6 +261,12 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			TEST(result = new PointerToMemberType((StructType*)classType, memberType));
 		}
 		break;
+	case ':':
+		{
+			// this seems to appear when we have a pointer to member (it describes what arguments the function have.. let's just skip it for now..
+			while(**pText++ != ';');
+		}
+		break;
 	default:	//unknown
 		FAIL;
 	}
@@ -413,7 +419,9 @@ static const TypeBase* subParseMembers(int size, char** pText, const string& nam
 		next++;
 	}
 	*pText = next;
-	TEST(**pText == 0 || **pText == ',' || iscsym(**pText));	//sanity
+	TEST(
+		**pText == ':' || // test, don't know if this works.
+		**pText == 0 || **pText == ',' || iscsym(**pText));	//sanity
 	return st;
 }
 
