@@ -67,6 +67,8 @@ void GdbStub::checkAndResize(int len) {
 	unsigned long newSize = (len+curIndex)+1; // +1 for the null terminator...
 	if(newSize>(outputBuffer.size())) {
 		//BIG_PHAT_ERROR(ERR_INTERNAL);
+		unsigned long betterSize = (outputBuffer.size()+2)*2;
+		if(betterSize>newSize) newSize=betterSize;
 		outputBuffer.resize(newSize);
 		curOutputBuffer = outputBuffer.begin()+curIndex;
 	}	
