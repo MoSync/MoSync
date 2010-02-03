@@ -110,7 +110,7 @@ struct tm* split_time(time_t timer, struct tm* res)
 	ip = mon_lengths[yleap];
 	for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
 		days -= ip[res->tm_mon];
-	res->tm_mday = days + 1; 
+	res->tm_mday = days; 
 
 	return res;
 }
