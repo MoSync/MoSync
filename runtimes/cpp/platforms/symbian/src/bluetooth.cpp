@@ -115,6 +115,8 @@ void Syscall::BtRunL(TInt aResult) {
 	int result;
 	if(aResult == KErrHostResNoMoreResults) {	//time to end this
 		result = 1;
+	} else if(aResult == KErrCancel) {
+		result = CONNERR_CANCELED;
 	} else if(aResult) {
 		result = CONNERR_GENERIC;
 	} else {
@@ -151,6 +153,8 @@ void Syscall::NextRecordRequestComplete(TInt aError,
 	event.type = EVENT_TYPE_BT;
 	if(aError == KErrEof) {	//discovery complete
 		event.state = gBtServiceArray.Count() + 1;
+	} else if(aError != KErrCancel) {
+		event.state = CONNERR_CANCELED;
 	} else if(aError != 0) {
 		event.state = CONNERR_GENERIC;
 	}
@@ -328,6 +332,22 @@ void Syscall::SBTmaBtStartDeviceDiscovery(bool names) {
 	gBtResolver.GetByAddress(gBtInquirySockAddr, gBtDevice, *gBtSynchronizer->Status());
 	gBtSynchronizer->SetActive();
 	LOGBT("SBTmaBtStartDeviceDiscovery done\n");	//fixes instability in emulator?
+}
+
+int Syscall::SBTmaBtCancelDiscovery() {
+	LOGBT("SBTmaBtCancelDiscovery\n");
+	if(!gBtSynchronizer->IsActive())
+		return 0;
+	if(gBtSdpa) {	//service
+		gBtSdpa->Cancel();
+	} else {	//device
+		gBtResolver.Cancel();
+	}
+	//hopefully, this will allow the active object to be cancelled before
+	//another discovery is started.
+	VM_Yield();
+
+	return 1;
 }
 
 int Syscall::SBTmaBtGetNewDevice(MABtDevice* dst) {

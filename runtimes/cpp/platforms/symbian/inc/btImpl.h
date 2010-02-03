@@ -86,6 +86,8 @@ virtual void AttributeRequestComplete(TSdpServRecordHandle aHandle, TInt aError)
 void SBTmaBtStartDeviceDiscovery(bool names);
 int SBTmaBtGetNewDevice(MABtDevice* dst);
 
+int SBTmaBtCancelDiscovery();
+
 //Takes a device address and the UUID of the service class to search for.
 //For example, pass the RFCOMM UUID and you'll get all connectable services.
 //Pass the OBEX Object Push UUID and you'll get only that service.

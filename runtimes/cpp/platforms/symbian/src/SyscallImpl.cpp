@@ -1265,6 +1265,9 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 	case maIOCtl_maBtGetNewDevice:
 		return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
 		
+	case maIOCtl_maBtCancelDiscovery:
+		return BLUETOOTH(maBtCancelDiscovery)();
+		
 	case maIOCtl_maBtStartServiceDiscovery:
 		BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID));
 		return 0;
