@@ -33,9 +33,9 @@ int SDLSoundAudioSource::init() {
 	//dump info
 	const Sound_DecoderInfo** i;
 	for (i = Sound_AvailableDecoders(); *i != NULL; i++) {
-		const Sound_DecoderInfo* di = *i;
+		//const Sound_DecoderInfo* di = *i;
 		LOG("Supported sound format: [%s], which is [%s].\n",
-			di->extensions[0], di->description);
+			(*i)->extensions[0], (*i)->description);
 	}
 
 	skipID3(mRWops);

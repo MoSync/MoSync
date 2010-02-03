@@ -2049,6 +2049,9 @@ namespace Base {
 		}
 
 		if(!gReload) {
+#ifdef __USE_FULLSCREEN__
+			SDL_Quit( );
+#endif
 			MoSyncMessageBox(message, "User Panic");
 		}
 		DEBUG_BREAK;
