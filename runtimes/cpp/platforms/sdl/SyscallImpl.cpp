@@ -1066,7 +1066,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawImageRegion(MAHandle image, const MARect* src, const MAPoint2d* dstTopLeft, int transformMode)) {
-		//printf("Entering DrawImageRegion start\n");
+		//LOG("Entering DrawImageRegion start\n");
 		
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
@@ -1219,7 +1219,7 @@ namespace Base {
 		unsigned int srcAlphaMask = surf->format->Amask;
 		unsigned int srcAlphaShift = surf->format->Ashift;
 
-		//printf("Entering DrawImageRegion Loop\n");
+		//LOG("Entering DrawImageRegion Loop\n");
 
 		if(surf->flags&SDL_SRCALPHA) {
 			while(transHeight) {
@@ -1804,13 +1804,11 @@ namespace Base {
 			return 0;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
-			BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
-			return 0;
+			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
 		case maIOCtl_maBtGetNewDevice:
 			return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
 		case maIOCtl_maBtStartServiceDiscovery:
-			BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
-			return 0;
+			return BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
 		case maIOCtl_maBtGetNewService:
 			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
 		case maIOCtl_maBtGetNextServiceSize:

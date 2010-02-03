@@ -31,8 +31,9 @@ SYSCALL(void) maBtStartDeviceDiscovery(int names) throws Exception {
 	if(mBtDA == null)
 		mBtDA = LocalDevice.getLocalDevice().getDiscoveryAgent();
 	if(!mBtDA.startInquiry(DiscoveryAgent.GIAC, this)) {
-		BtPostState(CONNERR_GENERIC);
+		return CONNERR_GENERIC;
 	}
+	return 0;
 }
 
 SYSCALL(int) maBtGetNewDevice(Address dst) {
@@ -142,6 +143,7 @@ SYSCALL(void) maBtStartServiceDiscovery(Address dev, Address uuid) throws Except
 	MYASSERT(mrd != null);
 	int id = mBtDA.searchServices(attrSet, uuidSet, mrd, this);
 	DEBUG_BT(" ID: "+id+"\n");
+	return 0;
 }
 
 final String MAUUID2String(Address uuid) {

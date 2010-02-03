@@ -407,6 +407,19 @@ static DWORD WINAPI doDiscovery(void*) {
 	return 0;
 }
 
+static bool haveRadio() {
+	BLUETOOTH_FIND_RADIO_PARAMS btfrp;
+	btfrp.dwSize = sizeof(btfrp);
+	HANDLE hRadio;
+	HBLUETOOTH_RADIO_FIND hbtrf = BluetoothFindFirstRadio(&btfrp, &hRadio);
+	if(hbtrf == NULL) {
+		LOG("BluetoothFindFirstRadio error %i\n", GetLastError());
+		return false;
+	}
+	GLE(BluetoothFindRadioClose(hbtrf));
+	return true;
+}
+
 //***************************************************************************
 //Syscalls
 //***************************************************************************
@@ -415,9 +428,15 @@ int Bluetooth::maBtDiscoveryState() {
 	return gBt.discoveryState;
 }
 
-void Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
+int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	DEBUG_ASSERT(cb != NULL);
 	MYASSERT(gBt.discoveryState != 0, BTERR_DISCOVERY_IN_PROGRESS);
+
+	//check for active bluetooth radios in the system.
+	//if we don't have one, tell the user.
+	if(!haveRadio()) {
+		return -1;
+	}
 
 	CriticalSectionHandler csh(&gBt.critSec);
 	setDiscoveryState(0);
@@ -441,6 +460,7 @@ void Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	default:
 		DEBIG_PHAT_ERROR;
 	}
+	return 0;
 }
 
 int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
@@ -461,11 +481,14 @@ int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
 	return 1;
 }
 
-void Bluetooth::maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid,
+int Bluetooth::maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid,
 	MABtCallback cb)
 {
 	DEBUG_ASSERT(cb != NULL);
 	MYASSERT(gBt.discoveryState != 0, BTERR_DISCOVERY_IN_PROGRESS);
+	if(!haveRadio()) {
+		return -1;
+	}
 
 	CriticalSectionHandler csh(&gBt.critSec);
 	BtServiceSearch& s(gBt.serviceSearch);
@@ -476,6 +499,7 @@ void Bluetooth::maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID*
 	s.uuid = *uuid;
 	s.address = *address;
 	s.thread = CreateThread(NULL, 0, doSearch, 0, 0, NULL);
+	return 0;
 }
 
 

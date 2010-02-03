@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MoTooth"
 	ProjectGUID="{D08AC720-E4AA-470C-B999-D175BDF703A9}"
 	RootNamespace="MoTooth"
@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclib.lib MAStd.lib MAUtil.lib"
+				AdditionalDependencies="mosynclibD.lib MAStdD.lib MAUtilD.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"

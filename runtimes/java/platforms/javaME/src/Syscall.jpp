@@ -1722,13 +1722,11 @@ public
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH 
 		case maIOCtl_maBtStartDeviceDiscovery:
-			maBtStartDeviceDiscovery(a);
-			return 0;
+			return maBtStartDeviceDiscovery(a);
 		case maIOCtl_maBtGetNewDevice:
 			return maBtGetNewDevice(a);
 		case maIOCtl_maBtStartServiceDiscovery:
-			maBtStartServiceDiscovery(a, b);
-			return 0;
+			return maBtStartServiceDiscovery(a, b);
 		case maIOCtl_maBtGetNewService:
 			return maBtGetNewService(a);
 		case maIOCtl_maBtGetNextServiceSize:

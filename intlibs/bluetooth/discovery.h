@@ -42,13 +42,13 @@ typedef void (*MABtCallback)();
 int maBtDiscoveryState();
 
 //only one discovery operation may be active at a time
-void maBtStartDeviceDiscovery(MABtCallback cb, bool names);
+int maBtStartDeviceDiscovery(MABtCallback cb, bool names);
 int maBtGetNewDevice(MABtDevice* dst);
 
 //Takes a device address and the UUID of the service class to search for.
 //For example, pass the RFCOMM UUID and you'll get all connectable services.
 //Pass the OBEX Object Push UUID and you'll get only that service.
-void maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid, MABtCallback cb);
+int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid, MABtCallback cb);
 
 //returns >0 on success.
 int maBtGetNewService(MABtService* dst);

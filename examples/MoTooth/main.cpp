@@ -283,10 +283,12 @@ void scan() {
 #endif
 	int startTime = maGetMilliSecondCount();
 #if SCAN_DEVICES
-	maBtStartDeviceDiscovery(1);
-	//printfln("Started");
+	state = maBtStartDeviceDiscovery(1);
+	if(state != 0) {
+		printf("StartErr %i\n", state);
+		return;
+	}
 
-	state = 0;
 	do {
 		MABtDevice d;
 		char namebuf[256];
@@ -324,10 +326,11 @@ void scan() {
 		const DEVICE& d = gDevices[i];
 		printf("ServDisc %s\n", btaddr2string(d.address));
 		int servStartTime = maGetMilliSecondCount();
-		maBtStartServiceDiscovery(&d.address, &RFCOMM_PROTOCOL_MAUUID);
-		//printfln("Started");
-
-		state = 0;
+		state = maBtStartServiceDiscovery(&d.address, &RFCOMM_PROTOCOL_MAUUID);
+		if(state != 0) {
+			printf("StartErr %i\n", state);
+			break;
+		}
 		do {
 			MABtService s;
 			char namebuf[256];

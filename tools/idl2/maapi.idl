@@ -1572,7 +1572,6 @@ interface MAAPI {
 		* When a device or service is found, its information is stored in internal buffers
 		* for later retrieval by maBtGetNewDevice() or maBtGetNewService(), then a BT event is generated.
 		* A BT event is also generated when the operation is complete.
-		* Returns the state of the Bluetooth Discovery operation.
 
 		* A BT event contains the state of the Bluetooth Discovery operation.
 		* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
@@ -1648,15 +1647,17 @@ interface MAAPI {
 
 		/**
 		* Starts a device discovery operation.
-
+		*
 		* \param names Set this to non-zero to retrieve the names of remote devices.
 		* This takes extra time, so set it to zero for faster scanning.
-
+		*
 		* \note On Windows, due to a bug in the Microsoft Bluetooth stack,
 		* newly discovered devices may appear without names.
 		* Re-scanning should make the devices' names appear properly.
 		* A workaround is planned for a future release of MoSync.
-
+		*
+		* \returns 0 on success, \< 0 on failure.
+		*
 		* \see maBtGetNewDevice
 		* \see EVENT_TYPE_BT
 		*/
@@ -1683,10 +1684,12 @@ interface MAAPI {
 		* Starts a service discovery operation.
 		* Takes a device address and the UUID of the service class to search for.
 		* For example, pass #RFCOMM_PROTOCOL_MAUUID and you'll get all connectable services.
-		* Pass #SerialPort_Service_MAUUID and you'll get only that service.
+		* Pass #SerialPort_Service_MAUUID and you'll get only that type of service.
 		* \see maBtGetNextServiceSize
 		* \see maBtGetNewService
 		* \see EVENT_TYPE_BT
+		*
+		* \returns 0 on success, \< 0 on failure.
 		*/
 		int maBtStartServiceDiscovery(in MABtAddr address, in MAUUID uuid);
 

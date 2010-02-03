@@ -21,8 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Screen.h"
 
 #include "helpers/cpp_defs.h"
-
-#define LOG printf
+#define CONFIG_H
+#include "helpers/log.h"
 
 namespace MoRE {
 	bool KeyRect::contains(int lx, int ly) {
@@ -227,7 +227,7 @@ namespace MoRE {
 		int err;
 		if((err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL)) != 0) {
 			char* errStr = SDL_GetError();
-			printf("ERROR BLITTING: %s!!!!\n", errStr);
+			LOG("ERROR BLITTING: %s!!!!\n", errStr);
 		}
 
 		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y, windowRect.w, windowRect.h);
@@ -251,7 +251,7 @@ namespace MoRE {
 		SDL_SetClipRect(getWindowSurface(), &windowRect);
 
 		if(SDL_BlitSurface(getPhoneScreen(), NULL, getWindowSurface(), (SDL_Rect*) &screenRect) != 0) {
-			printf("ERROR BLITTING!!!!\n");
+			LOG("ERROR BLITTING!!!!\n");
 		}
 
 		SDL_UpdateRect(getWindowSurface(), screenRect.x, screenRect.y, screenRect.w, screenRect.h);
@@ -380,8 +380,8 @@ namespace MoRE {
 		int ysteps = (height - 48) / 16;
 		int yremainder = (height - 48) % 16;
 
-		printf("xsteps: %d\n", xsteps);
-		printf("ysteps: %d\n", ysteps);
+		LOG("xsteps: %d\n", xsteps);
+		LOG("ysteps: %d\n", ysteps);
 
 		for(int i = 0; i < ysteps; i++) {
 			for(int j = 0; j < xsteps; j++) {

@@ -251,4 +251,13 @@ Most of MoSync is written in C/C++. Some parts are written in Ruby and a few
 are written in Java.
 
 
+Details
+=======
+
+MoSyncLib
+---------
+
+In order to be able to link with the native MoSync library implementation, there must not be any conflicts between the native C library and MAStd. For that reason, MoSyncLib and its dependencies must not use printf(), as that function seems somewhat unique in causing linking conflicts. Instead, the LOG functions from "helpers/log.h" should be used when logging is needed.
+
+
 End of File
