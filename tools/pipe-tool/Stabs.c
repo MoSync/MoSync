@@ -461,7 +461,7 @@ int Parse_stabs()
 	
 	// Set sld name for header files.
 	if(Type == 132) {
-		int file = SetSLD_Name(Name);
+		SetSLD_Name(Name);
 	}
 
 	StabsEmit("%s %d %d '%s'\n", GetStabName(Type), Desc, Value, str);

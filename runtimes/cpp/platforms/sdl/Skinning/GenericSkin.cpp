@@ -226,8 +226,7 @@ namespace MoRE {
 
 		int err;
 		if((err=SDL_BlitSurface(unselectedPhone, NULL, getWindowSurface(), NULL)) != 0) {
-			char* errStr = SDL_GetError();
-			LOG("ERROR BLITTING: %s!!!!\n", errStr);
+			LOG("ERROR BLITTING: %s!!!!\n", SDL_GetError());
 		}
 
 		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y, windowRect.w, windowRect.h);

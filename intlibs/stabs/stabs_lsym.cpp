@@ -264,7 +264,8 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 	case ':':
 		{
 			// this seems to appear when we have a pointer to member (it describes what arguments the function have.. let's just skip it for now..
-			while(**pText++ != ';');
+			while(**pText != ';')
+				pText++;
 		}
 		break;
 	default:	//unknown

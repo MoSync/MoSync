@@ -112,11 +112,11 @@ int maBtDiscoveryState ( void )
  *                discovery operation has finished.
  * @param n 	- Attempt to discover device names
  */
-void maBtStartDeviceDiscovery ( MABtCallback cb,
-                                bool n )
+int maBtStartDeviceDiscovery ( MABtCallback cb,
+                               bool n )
 {
     MAASSERT( gInstance != NULL );
-    gInstance->startDiscovery( cb, n );
+    return gInstance->startDiscovery( cb, n );
 }
 
 /**
@@ -141,12 +141,12 @@ int maBtGetNewDevice ( MABtDevice* d )
  * @param u    The service family UUID to search for.
  * @param cb   The callback to invoke once discovery has finished.
  */
-void maBtStartServiceDiscovery ( const MABtAddr* a,
-                                 const MAUUID* u,
-                                 MABtCallback cb )
+int maBtStartServiceDiscovery ( const MABtAddr* a,
+                                const MAUUID* u,
+                                MABtCallback cb )
 {
     MAASSERT( gInstance != NULL );
-    gInstance->startServiceDiscovery(cb, a, u );
+    return gInstance->startServiceDiscovery(cb, a, u );
 }
 
 /**

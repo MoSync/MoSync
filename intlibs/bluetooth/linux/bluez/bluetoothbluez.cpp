@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/helpers.h"
 #include "helpers/cpp_defs.h"
 #include "thread/thread.hpp"
+#include "../../bt_errors.h"
 
 #define DEBUG
 #ifdef DEBUG
@@ -153,12 +154,13 @@ BluetoothBluez::~BluetoothBluez ( void )
  * @param cb    The callback to invoke onces that the discovery
  *              has finished.
  * @param n 	Attempt to discover device names
+ *
+ * @return 0 on success, \< 0 on failure.
  */
-void BluetoothBluez::startDiscovery ( MABtCallback cb,
-									  bool n )
+int BluetoothBluez::startDiscovery ( MABtCallback cb,
+		 							 bool n )
 {
-    if ( mWorking == true )
-        return;
+	MYASSERT( mWorking == false, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
 
     mState   = 0;
     mWorking = true;
@@ -166,11 +168,9 @@ void BluetoothBluez::startDiscovery ( MABtCallback cb,
     // Check if there's a bluetooth device
     if ( mDevID < 0 )
     {
-        LOGBT( "Invalid interface ID" );
+        LOGBT( "Invalid interface ID - No BT device?" );
         mWorking = false;
-        mState = CONNERR_INTERNAL;
-        cb( );
-        return;
+        return -1;
     }
 
     // Clear old devices in the list
@@ -192,6 +192,8 @@ void BluetoothBluez::startDiscovery ( MABtCallback cb,
                                     (MABtCallback)cb,
 									n ) );
     }
+
+	return 0;
 }
 
 
@@ -226,13 +228,14 @@ int BluetoothBluez::getNextDevice ( MABtDevice *d )
  *              has finished.
  * @param a     Address of the device to do discovery on.
  * @param u     The UUID to search for.
+ *
+ * @return 0 on success, \< 0 on failure.	
  */
-void BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
-                                             const MABtAddr* a,
-                                             const MAUUID* u )
+int BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
+                                            const MABtAddr* a,
+                                            const MAUUID* u )
 {
-    if ( mWorking == true )
-        return;
+	MYASSERT( mWorking == false, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
 
     mState   = 0;
     mWorking = true;
@@ -242,9 +245,7 @@ void BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
     {
         LOGBT( "Invalid interface ID" );
         mWorking = false;
-        mState = CONNERR_INTERNAL;
-        cb( );
-        return;
+        return -1;
     }
 
     // Clear old service in list
@@ -266,6 +267,8 @@ void BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
                                     *a,
                                     *u ) );
     }
+	
+	return 0;
 }
 
 /**

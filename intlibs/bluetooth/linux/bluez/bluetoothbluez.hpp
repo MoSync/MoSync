@@ -104,8 +104,10 @@ namespace Bluetooth
              * @param cb    The callback to invoke onces that the discovery
              *              has finished.
              * @param n 	Attempt to discover device names
+			 *
+			 * @return 0 on success, \< 0 on failure.
              */
-            void startDiscovery ( MABtCallback cb, bool n );
+            int startDiscovery ( MABtCallback cb, bool n );
 
             /**
              * Returns and removes the next discovered device.
@@ -123,8 +125,10 @@ namespace Bluetooth
              *              has finished.
              * @param a     Address of the device to do discovery on.
              * @param u     The UUID to search for.
+			 *
+			 * @return 0 on success, \< 0 on failure.	
              */
-            void startServiceDiscovery ( MABtCallback cb, const MABtAddr* a, const MAUUID* u );
+            int startServiceDiscovery ( MABtCallback cb, const MABtAddr* a, const MAUUID* u );
 
 
             /**

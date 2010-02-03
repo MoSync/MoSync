@@ -1472,8 +1472,8 @@ void DumpIPTrans()
 			}
 		
 			if(MustConvertPaths) {
-				char* ParentPath = GetFileIdString(Sym->Type);
-				char* RelParentPath = GetRelPath(ParentPath);
+				/* char* ParentPath = GetFileIdString(Sym->Type); */
+				/* char* RelParentPath = GetRelPath(ParentPath); */ 
 				len = strlen(Sym->Name);
 #define IS_SLASH(c) ((c)=='/' || (c)=='\\')
 				if((len>2 && Sym->Name[1]==':' && IS_SLASH(Sym->Name[2])) || (len>0 && IS_SLASH(Sym->Name[0]))) {
