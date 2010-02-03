@@ -30,6 +30,7 @@ Vector mBtQue = new Vector();
 int mBtNextIndex;
 boolean mBtDiscoveryInProgress = false;
 boolean mBtNames;
+int mBtId = -1;
 
 class MyRemoteDevice extends RemoteDevice {
 	MyRemoteDevice(final String address) {

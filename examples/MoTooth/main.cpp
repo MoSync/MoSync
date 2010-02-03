@@ -53,6 +53,11 @@ int myGetProcessedEvent(int type, MAEvent* event) {
 	{
 		maExit(0);
 	}
+	if(event->type == EVENT_TYPE_KEY_PRESSED && event->key == MAK_1) {
+		printf("Cancel...\n");
+		int res = maBtCancelDiscovery();
+		printf("%i\n", res);
+	}
 	return 0;
 }
 
@@ -279,7 +284,6 @@ void scan() {
 	gDevices.clear();
 	gnServices = 0;
 
-	printf("DevDisc...\n");
 #endif
 	int startTime = maGetMilliSecondCount();
 #if SCAN_DEVICES
@@ -288,6 +292,7 @@ void scan() {
 		printf("StartErr %i\n", state);
 		return;
 	}
+	printf("(1)cancel (0)exit\n");
 
 	do {
 		MABtDevice d;
@@ -319,6 +324,8 @@ void scan() {
 	} while(state == 0);
 
 	printf("Done %i, %i ms\n", state, maGetMilliSecondCount() - startTime);
+	if(state < 0)
+		return;
 #endif	//SCAN_DEVICES
 	printf("Scanning %i devices...\n", gDevices.size());
 

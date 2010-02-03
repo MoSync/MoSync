@@ -1731,6 +1731,8 @@ public
 			return maBtGetNewService(a);
 		case maIOCtl_maBtGetNextServiceSize:
 			return maBtGetNextServiceSize(a);
+		case maIOCtl_maBtCancelDiscovery:
+			return maBtCancelDiscovery();
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI

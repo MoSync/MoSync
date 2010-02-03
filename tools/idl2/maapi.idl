@@ -1659,6 +1659,7 @@ interface MAAPI {
 		* \returns 0 on success, \< 0 on failure.
 		*
 		* \see maBtGetNewDevice
+		* \see maBtCancelDiscovery
 		* \see EVENT_TYPE_BT
 		*/
 		int maBtStartDeviceDiscovery(in int names);
@@ -1687,6 +1688,7 @@ interface MAAPI {
 		* Pass #SerialPort_Service_MAUUID and you'll get only that type of service.
 		* \see maBtGetNextServiceSize
 		* \see maBtGetNewService
+		* \see maBtCancelDiscovery
 		* \see EVENT_TYPE_BT
 		*
 		* \returns 0 on success, \< 0 on failure.
@@ -1709,6 +1711,16 @@ interface MAAPI {
 		* \see maBtGetNextServiceSize
 		*/
 		int maBtGetNewService(out MABtService dst);
+
+		/**
+		* Cancels any active discovery operation.
+		* If an operation was canceled, its last BT event will have the status #CONNERR_CANCELED.
+		* \see maBtStartDeviceDiscovery
+		* \see maBtStartServiceDiscovery
+		* \see EVENT_TYPE_BT
+		* \returns 0 if there was no active operation, 1 if there was.
+		*/
+		int maBtCancelDiscovery();
 
 		/**@}*/
 

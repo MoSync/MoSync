@@ -21,18 +21,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //Device discovery
 //***************************************************************************
 
-SYSCALL(void) maBtStartDeviceDiscovery(int names) throws Exception {
+SYSCALL(int) maBtStartDeviceDiscovery(int names) {
 	DEBUG_BT("maBtStartDeviceDiscovery\n");
 	MYASSERT(!mBtDiscoveryInProgress);
-	mBtDiscoveryInProgress = true;
 	mBtQue.removeAllElements();
 	mBtNextIndex = 0;
 	mBtNames = names != 0;
-	if(mBtDA == null)
-		mBtDA = LocalDevice.getLocalDevice().getDiscoveryAgent();
-	if(!mBtDA.startInquiry(DiscoveryAgent.GIAC, this)) {
-		return CONNERR_GENERIC;
+	try {
+		if(mBtDA == null)
+			mBtDA = LocalDevice.getLocalDevice().getDiscoveryAgent();
+		if(!mBtDA.startInquiry(DiscoveryAgent.GIAC, this)) {
+			return CONNERR_GENERIC;
+		}
+	} catch(BluetoothStateException e) {
+		PRINT_STACK_TRACE;
+		return -1;
 	}
+	mBtDiscoveryInProgress = true;
 	return 0;
 }
 
@@ -106,11 +111,21 @@ public final void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
 public final void inquiryCompleted(int discType) {
 	DEBUG_BT("inquiryCompleted "+discType+"\n");
 	mBtDiscoveryInProgress = false;
-	if(discType == INQUIRY_ERROR) {
-		BtPostState(CONNERR_GENERIC);
-	} else {
-		BtPostState(1);
+	int state;
+	switch(discType) {
+	case INQUIRY_ERROR:
+		state = CONNERR_GENERIC;
+		break;
+	case INQUIRY_COMPLETED:
+		state = 1;
+		break;
+	case INQUIRY_TERMINATED:
+		state = CONNERR_CANCELED;
+		break;
+	default:
+		BIG_PHAT_ERROR;
 	}
+	BtPostState(state);
 }
 
 private final void BtPostState(int state) {
@@ -120,14 +135,32 @@ private final void BtPostState(int state) {
 	mCanvas.postEvent(event);
 }
 
+private final int maBtCancelDiscovery() {
+	if(!mBtDiscoveryInProgress)
+		return 0;
+	mBtDiscoveryInProgress = false;
+	boolean canceled;
+	if(mBtId != -1) {	//service discovery
+		canceled = mBtDA.cancelServiceSearch(mBtId);
+	} else {
+		canceled = mBtDA.cancelInquiry(this);
+	}
+	if(canceled) {
+		mBtId = -1;
+		BtPostState(CONNERR_CANCELED);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 //***************************************************************************
 //Service discovery
 //***************************************************************************
 
-SYSCALL(void) maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception {
+SYSCALL(int) maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception {
 	DEBUG_BT("maBtStartServiceDiscovery\n");
 	MYASSERT(!mBtDiscoveryInProgress);
-	mBtDiscoveryInProgress = true;
 	UUID[] uuidSet = { new UUID(MAUUID2String(uuid), false) };
 	mBtQue.removeAllElements();
 	mBtNextIndex = 0;
@@ -141,8 +174,9 @@ SYSCALL(void) maBtStartServiceDiscovery(Address dev, Address uuid) throws Except
 	MYASSERT(uuidSet != null);
 	MYASSERT(this != null);
 	MYASSERT(mrd != null);
-	int id = mBtDA.searchServices(attrSet, uuidSet, mrd, this);
-	DEBUG_BT(" ID: "+id+"\n");
+	mBtId = mBtDA.searchServices(attrSet, uuidSet, mrd, this);
+	DEBUG_BT(" ID: "+mBtId+"\n");
+	mBtDiscoveryInProgress = true;
 	return 0;
 }
 
@@ -354,5 +388,22 @@ private final void handlePDL(BtService s, ServiceRecord sr) {
 public final void serviceSearchCompleted(int transID, int respCode) {
 	DEBUG_BT("serviceSearchCompleted "+transID+" "+respCode+"\n");
 	mBtDiscoveryInProgress = false;
-	BtPostState(1 + mBtQue.size());
+	mBtId = -1;
+	int state;
+	switch(respCode) {
+	case SERVICE_SEARCH_TERMINATED:
+		state = CONNERR_CANCELED;
+		break;
+	case SERVICE_SEARCH_ERROR:
+	case SERVICE_SEARCH_DEVICE_NOT_REACHABLE:
+		state = CONNERR_GENERIC;
+		break;
+	case SERVICE_SEARCH_NO_RECORDS:
+	case SERVICE_SEARCH_COMPLETED:
+		state = 1 + mBtQue.size();
+		break;
+	default:
+		BIG_PHAT_ERROR;
+	}
+	BtPostState(state);
 }
