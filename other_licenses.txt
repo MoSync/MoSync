@@ -29,8 +29,10 @@ workfile.rb
 
 /tests/hubbub
 
+/tools/android/dx
 /tools/bmconv
 /tools/rcomp
+/tools/mifconv
 /tools/e32hack/deflate
 /tools/makesis-4
 /tools/makesis-2.0.0

@@ -6,6 +6,7 @@ output
 debug
 release
 stores
+FinalOutput
 
 CPP_IX_*.h
 IX_*.h
@@ -26,6 +27,7 @@ stabs.tab
 
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
+/tools/ProfileConverter/profiles/*
 
 /intlibs/bluetooth/config_bluetooth.h
 /intlibs/helpers/asm_config.h
@@ -101,6 +103,7 @@ stabs.tab
 
 /runtimes/cpp/platforms/sdl/MoRE/fp.xml
 /runtimes/cpp/platforms/sdl/MoRE/profile.txt
+/runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 /runtimes/java/platforms/javaME/setdirs.bat
 /runtimes/java/platforms/javaME/src/config_platform.h
 /runtimes/java/platforms/javaME/src/opengl_invoke_generated.jpp
