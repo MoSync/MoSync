@@ -324,7 +324,7 @@ void init_graphics() {
 }
 
 void update_events() {
-	EVENT e;
+	MAEvent e;
 	while(maGetEvent(&e)) {
 		switch(e.type) {
 		case EVENT_TYPE_CLOSE:

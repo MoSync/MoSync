@@ -167,7 +167,13 @@ void skipBreak() {
 //******************************************************************************
 
 void exec_next_instruction(const string& args) {
-	NOARGS;
+	//NOARGS; 
+	//eclipse seems to send 1 as an argument...
+	if(args.size() && args!=string("1")) {
+		error("Wrong arguments");
+		return;
+	}
+
 	NEED_REG;
 	int len = callLen(r.pc);
 	if(len > 0) {

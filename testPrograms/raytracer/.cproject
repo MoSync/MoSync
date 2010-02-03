@@ -12,6 +12,7 @@
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry kind="con" path="com.mobilesorcery.mosync.includepaths"/>
 </storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 </cconfiguration>
 </storageModule>
 </cproject>

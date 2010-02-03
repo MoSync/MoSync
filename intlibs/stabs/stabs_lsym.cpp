@@ -120,7 +120,7 @@ bool parseLSym(Tuple t, char* text) {
 //cppRefDecl := '&' typeDecl
 //ptmDecl := '@' typeDecl ',' typeDecl
 const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) {
-	const TypeBase* result;
+	const TypeBase* result = NULL;
 	char* typeText = *pText;
 	//otherwise, continue on.
 	switch(typeText[0]) {

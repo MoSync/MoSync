@@ -70,7 +70,7 @@ def generate_operations_header(dest)
 	out.write "static std::map<int, std::map<int, std::map<int, BinaryOpFunc> > > binaryOpMap;\n"
 	out.write "static std::map<int, std::map<int, UnaryOpFunc> > unaryOpMap;\n"
 	
-	out.write "static void initMaps();"
+	out.write "static void initMaps();\n"
 	
 	types = $types_int + $types_float + $types_bool
 	

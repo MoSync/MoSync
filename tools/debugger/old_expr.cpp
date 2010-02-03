@@ -130,7 +130,10 @@ static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallbac
 		ASSERT_REG;
 		sym.address = &r.gpr[rv->reg];
 	} else if(lv->storageClass == eStatic) {
-		DEBIG_PHAT_ERROR;	//todo
+		//DEBIG_PHAT_ERROR;	//todo
+		const StaticLocal* sl = (StaticLocal*)lv;
+		sym.address = &gMemBuf[sl->address];
+		sym.type = sl->dataType->resolve();
 	} else {
 		DEBIG_PHAT_ERROR;
 	}
