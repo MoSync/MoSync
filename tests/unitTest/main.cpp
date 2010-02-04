@@ -48,6 +48,8 @@ void addMathTests(TestSuite* suite);
 void addCharInputTests(TestSuite* suite);
 void addResTests(TestSuite* suite);
 
+static int lastPress = -2000;
+
 class MyMoblet : public Moblet, public TestListener {
 private:
 	struct Failure {
@@ -134,6 +136,17 @@ public:
 	void keyPressEvent(int keyCode) {
 		if(complete && keyCode == MAK_0)
 			close();
+	}
+
+	void pointerPressEvent(MAPoint2d p) {
+
+		int currentPress = maGetMilliSecondCount();
+
+		if((currentPress - lastPress) < 300) {
+			if(complete) close();
+		} else {
+			lastPress = currentPress;
+		}
 	}
 };
 
