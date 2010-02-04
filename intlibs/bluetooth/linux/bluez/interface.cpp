@@ -100,6 +100,10 @@ int maBtDiscoveryState ( void )
     return gInstance->getState( );
 }
 
+int maBtCancelDiscovery ( void )
+{
+    DEBIG_PHAT_ERROR;
+}
 
 /**
  * Start a new device discovery operation in the background
