@@ -790,9 +790,9 @@ void CHttpConnection::HeaderLineHandlerL(const TDesC8& line) {
 
 void CHttpConnection::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
 	MYASSERT(mState == FINISHED, ERR_HTTP_NOT_FINISHED);
-	if(mPos < mRecvPtr.Length()) {	//there's still some data left in the buffer
-		int len = MIN(mRecvPtr.Length() - mPos, aDes.MaxLength());
-		aDes.Copy(mRecvPtr.Ptr() + mPos, len);
+	if(mPos < mBufPtr.Length()) {	//there's still some data left in the buffer
+		int len = MIN(mBufPtr.Length() - mPos, aDes.MaxLength());
+		aDes.Copy(mBufPtr.Ptr() + mPos, len);
 		mPos += len;
 		op.SetActive();
 		TRequestStatus* temp = &op.iStatus;
