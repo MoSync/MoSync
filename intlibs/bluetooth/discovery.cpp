@@ -65,11 +65,19 @@ typedef ULONGLONG BTH_ADDR;
 
 //#define NO_DEVICE_NAME
 
+#if 0//def _WIN32_WCE
+#define CHECK_CANCELED(action)
+#else
+#define CHECK_CANCELED(action) if(sCanceled) { setDiscoveryState(CONNERR_CANCELED); action; }
+#endif
+
 //***************************************************************************
 //Variables
 //***************************************************************************
 
 Bt gBt;
+static HANDLE sLookup;
+static bool sCanceled;
 
 //***************************************************************************
 //Helpers
@@ -138,7 +146,6 @@ static void doSearch2() {
 	LOGBT("doServiceSearch\n");
 #define SEARCH gBt.serviceSearch	//Use ONLY when protected by critical section
 
-	HANDLE hLookup;
 	WSAQUERYSET qs;
 	SOCKADDR_BTH sockAddr;
 	MABtCallback callback;
@@ -212,6 +219,7 @@ static void doSearch2() {
 #endif
 	LOGBT("dSS 2\n");
 
+	CHECK_CANCELED(return);
 
 	INT res = WSALookupServiceBegin(&qs,
 #ifndef _WIN32_WCE 
@@ -219,19 +227,20 @@ static void doSearch2() {
 #else
 		0
 #endif
-		,&hLookup);
+		,&sLookup);
 	WSATS(res);
 	LOGBT("dSS 3\n");
 
 #define DUMPPTR(name) LOGBT("%s: 0x%08X\n", #name, name)
 	for(;;) {
 		LOGBT("dSS 4\n");
+		CHECK_CANCELED(break);
 		char buffer[4096];
 		DWORD qsSize = sizeof(buffer);
 		LPWSAQUERYSET pQs = (LPWSAQUERYSET) buffer;
 		ZeroMemory(pQs, sizeof(WSAQUERYSET));
 		pQs->dwSize = sizeof(WSAQUERYSET);
-		res = WSALookupServiceNext(hLookup, LUP_RETURN_COMMENT | LUP_RETURN_NAME |
+		res = WSALookupServiceNext(sLookup, LUP_RETURN_COMMENT | LUP_RETURN_NAME |
 			LUP_RETURN_ADDR | LUP_RETURN_BLOB, &qsSize, pQs);
 		DUMPPTR(res);
 		if(res == SOCKET_ERROR && (WSAGetLastError() == WSA_E_NO_MORE || WSAGetLastError() == WSAENOMORE))
@@ -279,43 +288,12 @@ static void doSearch2() {
 			}
 		}
 		LOGBT("dSS 8\n");
-
-#if 0
-		//doesn't work on WinCE
-		int port = 0;
-		if(pQs->lpcsaBuffer) {
-			DUMPPTR(pQs->lpcsaBuffer->RemoteAddr.lpSockaddr);
-			port = ((SOCKADDR_BTH *)pQs->lpcsaBuffer->RemoteAddr.lpSockaddr)->port;
-		}
-		BtService serv;
-		serv.port = port;
-		if(pQs->lpszServiceInstanceName)
-			serv.name = pQs->lpszServiceInstanceName;
-		LOGBT("dSS 6\n");
-
-		//should fill serv.uuids with what we're looking for, if everything went well.
-		GLE(MASdpEnumAttrs(pQs->lpBlob->pBlobData, pQs->lpBlob->cbSize, &serv.uuids));
-		LOGBT("dSS 7\n");
-		if(serv.uuids.size() == 0) {	//this seems to happen when the server says "no services".
-			break;
-		}
-
-		{
-			CriticalSectionHandler csh(&gBt.critSec);
-			LOGBT("sh s%i: port %i. %i UUIDs. Name:\"%s\" Comment:\"%s\"\n", SEARCH.services.size(), port,
-				serv.uuids.size(), pQs->lpszServiceInstanceName, pQs->lpszComment);
-			for(size_t i=0; i<serv.uuids.size(); i++) {
-				LOGBT("UUID: %08X-%08X-%08X-%08X\n",
-					serv.uuids[i].i[0], serv.uuids[i].i[1], serv.uuids[i].i[2], serv.uuids[i].i[3]);
-			}
-			SEARCH.services.push_back(serv);
-		}
-		LOGBT("dSS 8\n");
-#endif
 		callback();
 		LOGBT("dSS 9\n");
 	}
 	LOGBT("dSS a\n");
+	WSATD(WSALookupServiceEnd(sLookup));
+	if(!sCanceled)
 	{
 		CriticalSectionHandler csh(&gBt.critSec);
 		LOGBT("Search done\n");
@@ -334,18 +312,19 @@ static DWORD WINAPI doSearch(void*) {
 static void doDiscovery2() {
 	LOGBT("doDeviceDiscovery\n");
 	WSAQUERYSET qs;
-	HANDLE hLookup;
 	MABtCallback callback = gBt.deviceCallback;
 
 	ZERO_OBJECT(qs);
 	qs.dwSize = sizeof(WSAQUERYSET);
 	qs.dwNameSpace = NS_BTH;
+
+	CHECK_CANCELED(return);
 	
 	INT res = WSALookupServiceBegin(&qs, LUP_CONTAINERS
 #ifndef _WIN32_WCE 
 		| LUP_FLUSHCACHE
 #endif
-		,&hLookup);
+		,&sLookup);
 	WSATD(res);
 
 	for(;;) {
@@ -357,7 +336,9 @@ static void doDiscovery2() {
 		pQs->dwNameSpace = NS_BTH;
 		pQs->lpBlob = NULL;
 
-		res = WSALookupServiceNext(hLookup,
+		CHECK_CANCELED(break);
+
+		res = WSALookupServiceNext(sLookup,
 			(gBt.names ? LUP_RETURN_NAME : 0) | LUP_RETURN_ADDR, &qsSize, pQs);
 		if(res == SOCKET_ERROR && (WSAGetLastError() == WSA_E_NO_MORE || WSAGetLastError() == WSAENOMORE))
 			break;
@@ -394,7 +375,8 @@ static void doDiscovery2() {
 		}
 		callback();
 	}
-	WSATD(WSALookupServiceEnd(hLookup));
+	WSATD(WSALookupServiceEnd(sLookup));
+	if(!sCanceled)
 	{
 		CriticalSectionHandler csh(&gBt.critSec);
 		LOGBT("Discovery done\n");
@@ -437,6 +419,7 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	if(!haveRadio()) {
 		return -1;
 	}
+	sCanceled = false;
 
 	CriticalSectionHandler csh(&gBt.critSec);
 	setDiscoveryState(0);
@@ -462,6 +445,22 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	}
 	return 0;
 }
+
+int Bluetooth::maBtCancelDiscovery() {
+	if(gBt.discoveryState != 0)
+		return 0;
+#if	0//def _WIN32_WCE
+	int res = WSALookupServiceEnd(sLookup);
+	if(res == SOCKET_ERROR) {
+		WSAFAIL;
+		DEBIG_PHAT_ERROR;
+	}
+#else
+	sCanceled = true;
+#endif
+	return 1;
+}
+
 
 int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
 	CriticalSectionHandler csh(&gBt.critSec);
@@ -489,6 +488,7 @@ int Bluetooth::maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* 
 	if(!haveRadio()) {
 		return -1;
 	}
+	sCanceled = false;
 
 	CriticalSectionHandler csh(&gBt.critSec);
 	BtServiceSearch& s(gBt.serviceSearch);

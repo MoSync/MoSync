@@ -1813,6 +1813,8 @@ namespace Base {
 			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
 		case maIOCtl_maBtGetNextServiceSize:
 			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
+		case maIOCtl_maBtCancelDiscovery:
+			return BLUETOOTH(maBtCancelDiscovery)();
 
 		case maIOCtl_maPlatformRequest:
 			{

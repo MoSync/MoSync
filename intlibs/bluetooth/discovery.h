@@ -45,6 +45,8 @@ int maBtDiscoveryState();
 int maBtStartDeviceDiscovery(MABtCallback cb, bool names);
 int maBtGetNewDevice(MABtDevice* dst);
 
+int maBtCancelDiscovery();
+
 //Takes a device address and the UUID of the service class to search for.
 //For example, pass the RFCOMM UUID and you'll get all connectable services.
 //Pass the OBEX Object Push UUID and you'll get only that service.

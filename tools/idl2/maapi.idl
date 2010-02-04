@@ -1715,6 +1715,8 @@ interface MAAPI {
 		/**
 		* Cancels any active discovery operation.
 		* If an operation was canceled, its last BT event will have the status #CONNERR_CANCELED.
+		* This is an asynchronous operation. It is not safe to start another discovery before
+		* you've recieved the #CONNERR_CANCELED event.
 		* \see maBtStartDeviceDiscovery
 		* \see maBtStartServiceDiscovery
 		* \see EVENT_TYPE_BT
