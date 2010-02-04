@@ -35,17 +35,33 @@ using namespace MAUtil;
 #define WHITE 0xFFFFFF
 #define DATA_SIZE (4*1024)
 
-class KeyBaseCase : public TestCase, public KeyListener {
+class KeyBaseCase : public TestCase, public KeyListener, public PointerListener {
 public:
 	KeyBaseCase(const String& name) : TestCase(name) {}
 
 	//TestCase
 	virtual void open() {
 		Environment::getEnvironment().addKeyListener(this);
+		Environment::getEnvironment().addPointerListener(this);
+
 	}
 	virtual void close() {
 		Environment::getEnvironment().removeKeyListener(this);
+		Environment::getEnvironment().removePointerListener(this);
 	}
+
+	void pointerPressEvent(MAPoint2d p) {
+		int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
+		assert(name, res == TK_YES);
+		suite->runNextCase();
+	}
+
+	void pointerMoveEvent(MAPoint2d p) {
+	}
+
+	void pointerReleaseEvent(MAPoint2d p) {
+	}
+
 
 	void checkYesNo(int keyCode);
 };
@@ -62,6 +78,7 @@ public:
 	//KeyListener
 	virtual void keyPressEvent(int keyCode) {
 	}
+
 	virtual void keyReleaseEvent(int keyCode) {
 		checkYesNo(keyCode);
 	}

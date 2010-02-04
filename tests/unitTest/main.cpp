@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MATest/Test.h>
 #include <conprint.h>
 
+#include <maprofile.h>
+
 #include "common.h"
 
 using namespace MAUtil;
@@ -69,12 +71,16 @@ public:
 #ifdef USE_INTERACTIVE_TESTS
 		// interactive tests
 		addResTests(&mSuite);
+#ifndef MA_PROF_SUPPORT_STYLUS		
 		addCharInputTests(&mSuite);
+#endif		
 		addFramebufferTests(&mSuite);
 		addSoundTests(&mSuite);
 		addAdvGfxTests(&mSuite);
 		addBasicGfxTests(&mSuite);
+#ifndef MA_PROF_SUPPORT_STYLUS				
 		addKeypadTests(&mSuite);
+#endif		
 		addTimeTests(&mSuite);
 		addStoreTests(&mSuite);
 		addSystemTests(&mSuite);

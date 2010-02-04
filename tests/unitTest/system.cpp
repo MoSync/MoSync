@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 #include <conprint.h>
 
+#include <maprofile.h>
+
 class ResetBacklightCase : public KeyBaseCase, public TimerListener {
 public:
 	ResetBacklightCase(const String& name) : KeyBaseCase(name) {}
@@ -103,6 +105,12 @@ private:
 };
 
 
+#ifdef MA_PROF_SUPPORT_STYLUS
+#define VIB_MSG "press on screen to turn of vibration\n"
+#else
+#define VIB_MSG "press fire to turn of vibration\n"
+#endif
+
 class VibrateCase : public KeyBaseCase {
 public:
 	VibrateCase(const String& name) : KeyBaseCase(name) {}
@@ -114,7 +122,7 @@ public:
 			return;
 		}
 		clearScreen();
-		printf("press fire to turn of vibration\n");
+		printf(VIB_MSG);
 		on = true;
 	}
 
@@ -131,6 +139,18 @@ public:
 		}
 	}
 
+	void pointerPressEvent(MAPoint2d p) {
+		if(!on) {
+			maVibrate(0);
+			on = false;
+			printf("did you turn off the vibration?\n");
+		} else {
+			int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
+			assert(name, res == TK_YES);
+			suite->runNextCase();
+		}
+	}
+
 	virtual void keyReleaseEvent(int keyCode) {
 		if(!on)
 			checkYesNo(keyCode);
@@ -139,7 +159,6 @@ public:
 private:
 	bool on;
 };
-
 
 class BatteryChargeCase : public TestCase {
 public:
@@ -157,8 +176,10 @@ public:
 void addSystemTests(TestSuite* suite);
 void addSystemTests(TestSuite* suite) {
 	suite->addTestCase(new ResetBacklightCase("maResetBacklightTest"));
+#ifndef MA_PROF_SUPPORT_STYLUS
 	suite->addTestCase(new KeyLockCase("maLockKeypadTest"));
 	suite->addTestCase(new VibrateCase("maVibrateTest"));
 	suite->addTestCase(new BatteryChargeCase("maGetBatteryCharge"));
+#endif
 
 }
