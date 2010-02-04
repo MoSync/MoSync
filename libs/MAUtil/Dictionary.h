@@ -49,7 +49,7 @@ namespace MAUtil {
 * DON'T DO THAT!. It would break the sorting order of the Dictionary.
 * The consequenses are undefined, and will likely cause your program to crash.
 *
-* If you must change a Key, remove the original element from the dictionary,
+* If you must change a Key, erase the original element from the dictionary,
 * make your change and then re-insert it.
 */
 template<class Key, class Storage>

@@ -131,7 +131,7 @@ public:
 	/**
 	* Constructs an empty HashMap.
 	* \param hf The hash function.
-	* \param cf The compare function.
+	* \param cf The compare function. See Compare.
 	* \param init_bits The intial size of the hash table is 2 to the power of this number.
 	* While the table grows and shrinks dynamically, it is possible to optimize
 	* if you're doing a known number of insertions directly after constructing the

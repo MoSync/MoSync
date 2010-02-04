@@ -1,0 +1,67 @@
+<document title="Set, Map and HashMap" author="Fredrik" area="Containers" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+	The classes **MAUtil::Set**, **Map** and **HashMap** provides generic containers similar to
+	**std::set**, **map** and **unordered_map** in the STL or Java's **Set**, **Map** and **Hashtable**.
+	The provide many of the same familiar operations. Here's an example:
+	
+	[code filename="set.h"]
+	// Create a sorted set of integers.
+	Set<int> numbers;
+
+	// Fill it with multiples of two.
+	for(int i = 10; i >= 0; i--)
+		numbers.insert(i*2);
+
+	// insert another number
+	numbers.insert(66);
+
+	// find and erase
+	Iterator i = numbers.find(4);
+	if(i != numbers.end())
+		erase(i);
+
+	// erase by key
+	numbers.erase(8);
+
+	// number of numbers
+	printf("Numbers: %i\n", numbers.size());
+
+	// iterate through the vector, printing each element.
+	// note that the numbers will be printed in ascending order,
+	// even though they were inserted in descending order.
+	for(Set<int>::iterator itr = numbers.begin(); itr != numbers.end(); itr++) {
+		// The iterator needs to be dereferenced.
+		printf("numbers[i]: %d\n", *itr);
+	}
+
+	// erase all numbers
+	numbers.clear();
+	[/code]
+]]>
+</section>
+
+<section id="similatiries" title="Similarities">
+<![CDATA[
+	The containers have a number of things in common. They have default constructors, copy constructors and destructors. Elements are copied by value, so care should be taken when dealing with pointers. Large elements should be passed by pointer or reference-counted. There are **Iterator**s and **ConstIterator**s. The functions **find()**, **begin()** and **end()** can return either type. **erase()** works either with a **Key** or with an **Iterator**, but not with a **ConstIterator**. **size()** and **clear()** are available.
+
+	The constructor has an optional argument for specifying the comparison function. The default comparison function uses the Key's **operator<**, so if your Key doesn't have it and you can't readily add it, this argument is useful.
+]]>
+</section>
+
+<section id="differences" title="Differences">
+<![CDATA[
+	**Set** has only one datum per element, which **Map** and **HashMap** have two data per element: a **Key** and a **Value**. Both must be specified when inserting a new element. Both are also accessible from Iterators. Map and HashMap also have the **operator[]**.
+
+	**HashMap**'s constructor has an optional argument for specifying the hash function. The default value is **THashFunction< Key >**. This template function has no default implementation. MoSync ships with implementations for **MAUtil::String** and **int**. If you use another key type, you'll need to implement a hash function for it.
+]]>
+</section>
+
+
+<section id="furtherReading" title="Further information">
+<![CDATA[
+	All the classes has reference documentation. Also, the source code is available in **$MOSYNCDIR/include/MAUtil/** in your MoSync package.
+]]>
+</section>
+
+</document>
