@@ -40,6 +40,7 @@ using namespace MoSyncError;
 #include <bt_api.h>
 #include <bt_sdp.h>
 #include <ws2bth.h>
+#include <bthutil.h>
 typedef ULONGLONG BTH_ADDR;
 #else
 #include <BluetoothAPIs.h>
@@ -390,6 +391,13 @@ static DWORD WINAPI doDiscovery(void*) {
 }
 
 static bool haveRadio() {
+#ifdef _WIN32_WCE
+	DWORD mode;
+	int res = BthGetMode(&mode);
+	if(res != ERROR_SUCCESS)
+		return false;
+	return (mode == BTH_CONNECTABLE || mode == BTH_DISCOVERABLE);
+#else
 	BLUETOOTH_FIND_RADIO_PARAMS btfrp;
 	btfrp.dwSize = sizeof(btfrp);
 	HANDLE hRadio;
@@ -400,6 +408,7 @@ static bool haveRadio() {
 	}
 	GLE(BluetoothFindRadioClose(hbtrf));
 	return true;
+#endif
 }
 
 //***************************************************************************

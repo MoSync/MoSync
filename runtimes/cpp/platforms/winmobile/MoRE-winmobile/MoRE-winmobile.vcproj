@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MoRE-winmobile"
 	ProjectGUID="{2FCCBCA9-C8E1-4D9A-A96B-73DCAA325E71}"
 	RootNamespace="MoRE-winmobile"
@@ -77,7 +77,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmbase.lib strmiids.lib"
+				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmbase.lib strmiids.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -161,7 +161,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib"
+				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -247,7 +247,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib"
+				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -334,7 +334,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -420,7 +420,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib"
+				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -506,7 +506,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib"
+				AdditionalDependencies="Ccrtrtti.lib gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
@@ -596,7 +596,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib  gpsapi.lib"
+				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
@@ -687,7 +687,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib  gpsapi.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
@@ -777,7 +777,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -865,7 +865,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
