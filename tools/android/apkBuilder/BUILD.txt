@@ -1,0 +1,14 @@
+To build the Apk Builder you must download the Android 1.5 (Cupcake) source code and copy the following folders from it to this directory:
+
+development/tools/androidprefs
+development/tools/jarutils
+development/tools/apkbuilder
+
+Execute 'buildApkBuilder.rb [path]' to build the package.
+If no path was given the generated jar file is created in this directory.
+
+The built file is called apkbuilder.jar.
+
+Tested with:
+Java JDK 1.6.0_16
+ruby 1.8.6
