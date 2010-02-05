@@ -1,0 +1,13 @@
+To be able to build the aapt tool, download the complete android 1.5 ( cupcake ) source code from source.android.com and copy the following folders from the source root to this directory:
+
+frameworks
+system
+build
+external
+
+This folder contains an Eclipse project which can build the aapt tool for win32 with MinGW.
+
+Tested with :
+Eclipse Ganymede
+CDT-master 5.0.2 
+MinGW 5.1.6
