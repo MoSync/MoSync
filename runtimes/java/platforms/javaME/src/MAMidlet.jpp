@@ -20,7 +20,9 @@ import javax.microedition.lcdui.*;
 import javax.microedition.rms.*;
 import javax.microedition.io.*;
 import java.io.*;
+#ifndef PHONE_RELEASE
 import javax.microedition.io.file.*;
+#endif
 
 #include "helpers.h"
 #include "generated\MAAPI_consts.h"
@@ -37,10 +39,12 @@ public final class MAMidlet extends MIDlet {
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG) || defined(PUBLIC_DEBUG)
 	private static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
 		StreamConnection sc = (StreamConnection)Connector.open(url, Connector.WRITE);
+#ifndef PHONE_RELEASE
 		if(sc instanceof FileConnection) {
 			FileConnection fc = (FileConnection)sc;
 			fc.truncate(0);
 		}
+#endif
 		return new PrintStream(sc.openOutputStream());
 	}
 #endif
