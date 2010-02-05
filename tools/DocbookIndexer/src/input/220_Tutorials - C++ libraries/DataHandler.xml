@@ -1,0 +1,22 @@
+<document title="DataHandler" author="Fredrik" keyword="">
+<section id="intro" title="">
+<![CDATA[
+	The DataHandler is a small class which facilitates consecutive reads and writes to a MoSync data object.
+
+	[code filename="dataread.h"]
+	#include <MAUtil/DataHandler.h>
+	using namespace MAUtil;
+
+	DataHandler dh(dataObjectHandle);
+	char buf[1024];
+	int i=0;
+	bool success;
+	do {
+		success = dh.read(buf, 1024);
+		i++;
+	} while(success);
+	printf("Read %i KB of %i bytes.\n", i, dh.size);
+	[/code]
+]]>
+</section>
+</document>

@@ -1,0 +1,32 @@
+<document title="PlaceholderPool" author="Fredrik" keyword="">
+<section id="intro" title="">
+<![CDATA[
+	The Placeholder Pool is a small system for handling dynamic placeholders,
+	which are used in the creation of images and data objects, among other things.
+]]>
+<![CDATA[
+	Because placeholders use memory in the runtime, it's good to reuse old placeholders whose objects
+	are no longer needed, instead of just throwing them away. This Pool provides a system-wide mechanism for doing so.
+
+	[code filename="placeholderpool.h"]
+	#include <MAUtil/PlaceholderPool.h>
+	using namespace MAUtil;
+
+	// allocate a handle
+	MAHandle h = PlaceholderPool::alloc();
+
+	// create a data object
+	maCreateData(h, 9*1024);
+
+	// use the data object
+	// ...
+
+	// free the object and the handle
+	PlaceholderPool::put(h);
+
+	// now the handle gets reused
+	MAHandle h2 = PlaceholderPool::alloc();
+	[/code]
+]]>
+</section>
+</document>

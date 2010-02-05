@@ -6,6 +6,9 @@
 	The provide many of the same familiar operations. Here's an example:
 	
 	[code filename="set.h"]
+	#include <MAUtil/Set.h>
+	using namespace MAUtil;
+
 	// Create a sorted set of integers.
 	Set<int> numbers;
 
