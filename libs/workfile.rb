@@ -6,14 +6,14 @@ SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest", "MAP"] #, "MinU
 
 target :pipe do
 	Work.invoke_subdirs(SUBDIRS, 'pipe')
+	#temp until we fix the directory thing
+	sh "rake pipe CONFIG=\"#{CONFIG}\""
 end
 
 target :native do
 	Work.invoke_subdirs(SUBDIRS, 'native')
 end
 
-target :default do
-	Work.invoke_subdirs(SUBDIRS, 'pipe')
-end
+target :default => :pipe
 
 Targets.invoke

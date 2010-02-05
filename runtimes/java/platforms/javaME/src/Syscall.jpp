@@ -2132,15 +2132,15 @@ public
 
 #ifdef PUBLIC_DEBUG
 	final int maWriteLog(Address src, int size) throws Exception {
-#ifndef PHONE_RELEASE
-		String s = new String(getMemBytes(src, size));
-		DEBUG_ALWAYS("WL:"+ s + (s.charAt(s.length()-1) == '\n' ? "" : "\n"));
-#else
+#ifdef PHONE_RELEASE
 		if(MAMidlet.out == null)
 			return IOCTL_UNAVAILABLE;
 		String s = new String(getMemBytes(src, size));
 		MAMidlet.out.print(s);
 		MAMidlet.out.flush();
+#else
+		String s = new String(getMemBytes(src, size));
+		DEBUG_ALWAYS("WL:"+ s + (s.charAt(s.length()-1) == '\n' ? "" : "\n"));
 #endif
 		return 0;
 	}

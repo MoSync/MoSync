@@ -117,6 +117,7 @@ struct MA_PIM_ARGS {
 #endif
 
 int maPimItemGetValue(MAAddress args, int index) {
+	int[] mem_ds = CORE.mMem_ds;
 	PIMItem pi = getPimItem(RINT(args));
 	int field = RINT(args+4);
 	int address = RINT(args+8);
