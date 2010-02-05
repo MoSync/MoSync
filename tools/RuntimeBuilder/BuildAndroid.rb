@@ -59,14 +59,14 @@ class RuntimeBuilder
 		
 		android_source = "#{$SETTINGS[:java_source]}platforms/android/src"
 		
-		# Set up temporary dir
+		# # Set up temporary dir
 		temp_dir = "#{runtime_dir}temp/com/mosync/java/android/"
 		if File.exist? temp_dir
 			FileUtils.rm_rf temp_dir # delete everything in it and itself
 		end
 		FileUtils.makedirs(temp_dir); # No such directory/file.. create a temp directory
 		
-		# Set up class dir
+		# # Set up class dir
 		class_dir = "#{runtime_dir}class/"
 		if File.exist? class_dir
 			FileUtils.rm_rf class_dir # delete everything in it and itself
@@ -94,27 +94,27 @@ class RuntimeBuilder
 		# Build Android package file
 		android_proj_root = "#{$SETTINGS[:java_source]}platforms/android/AndroidProject/"
 		system("#{android_sdk}/tools/aapt package -f -v -M #{android_proj_root}/AndroidManifest.xml -F #{runtime_dir}resources.ap_ -I #{android_sdk}/android.jar -S #{android_proj_root}/res -m -J #{runtime_dir}temp");
-
+		
 		# Compile all the java files into class files
-		system("javac -source 1.6 -target 1.6 -d #{class_dir} -classpath #{android_sdk}android.jar #{temp_dir}*.java");
+		system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{android_sdk}android.jar #{temp_dir}*.java");
 	
-		# Convert class files into dex files
-		system("#{android_sdk}/tools/dx.bat --verbose --dex --output=#{runtime_dir}classes.dex #{class_dir} ");
-		
-		# Create unsigned APK and add the dex files
-		system("D:/android-sdk-windows-1.5_r3/tools/apkbuilder.bat #{runtime_dir}MoSyncRuntime#{debug}.apk -u -z #{runtime_dir}resources.ap_ -f #{runtime_dir}classes.dex");
-		
-		# # Clean and delete all the temporary folders
+		# This implementation assumes that MoSync was installed on the computer
+		mosync_dir = ENV['MOSYNCDIR']
+		current = Dir.pwd
+		Dir.chdir class_dir
+		system("#{mosync_dir}/bin/zip -r #{runtime_dir}MoSyncRuntime#{debug}.zip .");
+		Dir. chdir current
+	
+		# Clean and delete all the temporary folders
 		FileUtils.rm_rf "#{runtime_dir}temp"
 		FileUtils.rm_rf class_dir
-		FileUtils.rm runtime_dir + "classes.dex"
 		FileUtils.rm runtime_dir + "resources.ap_"
 		
-		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.apk"
-			puts "\nFATAL ERROR! - No apk file built, check previous output for errors!\n\n"
+		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.zip"
+			puts "\nFATAL ERROR! - No android source package built, check previous output for errors!\n\n"
 			return 1
 		else
-			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.apk was succesfully generated!\n\n"
+			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.zip, Android source package, was succesfully generated!\n\n"
 			return 0
 		end
 		return 0
