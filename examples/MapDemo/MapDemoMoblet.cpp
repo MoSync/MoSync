@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAP/MapSourceMgr.h>
 #include <MAP/CloudMadeMapSource.h>
 #include <MAP/GoogleMapSource.h>
-#include "config.h"
 
 using namespace MAUtil;
 using namespace MapDemoUtil;
