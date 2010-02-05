@@ -121,7 +121,7 @@ IMPLEMENTS MoSync
 		mBlitPaint.setColor(0xffffffff);
 		
 		mMediaPlayer = new MediaPlayer();
-
+/*
 		try
 		{
 			byte buffer[] = new byte[100];
@@ -165,7 +165,7 @@ IMPLEMENTS MoSync
 		{
 			Log.i("MoSync Syscalls","problem creating file : " + e.toString());
 		}
-		
+*/		
 	}
 
 	//***************************************************************************
@@ -284,14 +284,7 @@ IMPLEMENTS MoSync
 	}
 
 	public final void LoadResourcesFromStream(LittleEndianDataInputStream file, int resourceId, boolean isMAResource) throws Exception
-	{
-		boolean sup = file.markSupported();
-		if(true != sup)
-		{
-			Log.i("MoSync Syscall","Unable to mark the stream. Will not be able to continue.");
-			BIG_PHAT_ERROR;
-		}
-			
+	{		
 		DEBUG("MoSync Syscall - load " + filename + " as resource from stream\n");
 		try {
 			if(file == null) {
@@ -347,6 +340,7 @@ IMPLEMENTS MoSync
 				case RT_IMAGE:
 					{
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_IMAGE");
+						Log.i("MoSync Resource","Image rI:"+rI);
 						byte[] b = new byte[size];
 						file.readFully(b);
 						resourceArray[rI] = new ImageCache(null, BitmapFactory.decodeByteArray(b, 0, b.length));
@@ -369,7 +363,7 @@ IMPLEMENTS MoSync
 							((ImageCache)resourceArray[indexSource]).mBitmap,
 							left, top, width, height));							
 					}
-					break;  
+					break;
 				case RT_SKIP:
 					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_SKIP");
 					MYASSERT(size == 0);
@@ -397,28 +391,39 @@ IMPLEMENTS MoSync
 					{
 						DEBUG("MoSync Syscall LoadResourcesFromStream - RT_BINARY");
 						
-						if(checkIfMimeAudioType(file))
-						{
-							addResourceAudio(rI, resourceId, size, file.tell(), isMAResource);
-						}
-						
+						int offset = file.tell();
+						Log.i("LoadResource","tell:" + offset);
 						byte[] b = new byte[size];
 						file.readFully(b);
 						resourceArray[rI] = new Binary(b);
-							
+						if(checkIfMimeAudioType(b))
+						{
+							Log.i("MoSync Syscall","BINARY audio resource");
+							addResourceAudio(rI, resourceId, size, offset, true);
+						}
 						
 					}
 					break;
 				case RT_UBIN:
 					DEBUG("MoSync Syscall LoadResourcesFromStream - RT_UBIN");
 					
-					if(checkIfMimeAudioType(file))
-					{
-						addResourceAudio(rI, resourceId, size, file.tell(), isMAResource);
-					}
-					
 					if(resourceId != 0) {
 						resourceArray[rI] = new UBin(mCore, file.tell(), size);
+						
+						if(size > 5)
+						{
+							int offset = file.tell();
+							byte[] b = new byte[5];
+							file.read(b, 0, 5);
+							if(checkIfMimeAudioType(b))
+							{
+								Log.i("MoSync Syscall","UBIN audio resource");
+								addResourceAudio(rI, resourceId, size, offset, true);
+							}
+							size-=5;
+							file.skip(size);
+							break;
+						}
 					}
 					else
 					{
@@ -663,7 +668,7 @@ public
 		int b;
 		DEBUG_ALWAYS(input + "\n");
 		while((b=input.read())!=0) {
-			if(b==-1) BIG_PHAT_ERROR; 
+			if(b==-1) BIG_PHAT_ERROR;
 			sb.append((char)b);
 		}
 		return new String(sb);
@@ -683,22 +688,12 @@ public
 		return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
 	}
 
-	static public final boolean checkIfMimeAudioType(InputStream in) throws Exception
+	static public final boolean checkIfMimeAudioType(byte[] in) throws Exception
 	{
 		String audio="audio";
-		in.mark(6);
-		int limit=0;
-		boolean isAudio = true;
-		while(limit<5)
-		{
-			int c = in.read();
-			if(c == 0) { isAudio = false; break;}
-			if(c != audio.charAt(limit)) {isAudio=false; break;}
-			limit++;
-		}
-		in.reset();
-		
-		return isAudio;
+		String beginning = new String(in, 0, 5);
+		if(beginning.compareTo(audio) == 0) return true;
+		return false;
 	}
 	
 	//***************************************************************************
