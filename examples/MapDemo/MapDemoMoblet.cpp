@@ -34,12 +34,25 @@ namespace MapDemo
 		: mScreen( NULL )
 	{
 		//
-		// Map keys are defined in config.h
-		// Please copy config.h.template to config.h, register your own keys
-		// and enter in config.h
+		// CloudMade map key
+		// Used to access CloudMade map tile servers.
+		// Please register with CloudMade to get a personal API key at
+		// http://cloudmade.com/
 		//
+		#ifdef CLOUDMADE_API_KEY
 		CloudMadeMapSource::ApiKey = CLOUDMADE_API_KEY;
+		#endif
+
+		//
+		// Google Static Maps API key
+		// Used to access Google Static Maps tile servers.
+		// Please register with Google to get a personal API key at
+		// http://code.google.com/apis/maps/documentation/staticmaps/
+		//
+		#ifdef GOOGLE_API_KEY
 		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
+		#endif
+
 		
 		mScreen = newobject( MapDemoScreen, new MapDemoScreen( (MobletEx*)this ) );
 		mScreen->show( );

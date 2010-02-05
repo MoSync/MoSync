@@ -362,8 +362,8 @@ namespace MAP
 				LonLat p2 = LonLat( px2 );
 				double meterX1, meterY1;
 				double meterX2, meterY2;
-				p1.toMeters( mag, meterX1, meterY1 );
-				p2.toMeters( mag, meterX2, meterY2 );
+				p1.toMeters( meterX1, meterY1 );
+				p2.toMeters( meterX2, meterY2 );
 				double offsetX = meterX2 - meterX1;
 				offsetX *= cos( fabs( p2.lat * PI / 180 ) );
 				char buffer[100];
@@ -397,9 +397,9 @@ namespace MAP
 			//static const int textHeight = 12;
 			char buffer[100];
 			if ( mHasSmoothPanning )
-				sprintf( buffer, "%-3.3f %-3.3f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
+				sprintf( buffer, "%-3.4f %-3.4f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
 			else
-				sprintf( buffer, "%-3.3f %-3.3f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
+				sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
 			maSetColor( 0x000000 );
 
 			if ( mFont != NULL )

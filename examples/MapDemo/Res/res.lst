@@ -39,9 +39,6 @@
 .bin
 .include "verdana14blue.mof"
 
-
-
-
 .res RES_FONT_VERDANA14BLACK
 .bin
 .include "verdana14black.mof"

@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "HelloMapMoblet.h"
 #include <MAP/CloudMadeMapSource.h>
 #include <MAP/GoogleMapSource.h>
-#include "config.h"
 
 using namespace MAUtil;
 
@@ -30,13 +29,25 @@ namespace HelloMap
 	//-------------------------------------------------------------------------
 	{
 		//
-		// Map keys are defined in config.h
-		// Please copy config.h.template to config.h, register your own keys
-		// and enter in config.h
+		// CloudMade map key
+		// Used to access CloudMade map tile servers.
+		// Please register with CloudMade to get a personal API key at
+		// http://cloudmade.com/
 		//
+		#ifdef CLOUDMADE_API_KEY
 		CloudMadeMapSource::ApiKey = CLOUDMADE_API_KEY;
+		#endif
+
+		//
+		// Google Static Maps API key
+		// Used to access Google Static Maps tile servers.
+		// Please register with Google to get a personal API key at
+		// http://code.google.com/apis/maps/documentation/staticmaps/
+		//
+		#ifdef GOOGLE_API_KEY
 		GoogleMapSource::ApiKey = GOOGLE_API_KEY;
-		
+		#endif
+
 		mScreen = newobject( HelloMapScreen, new HelloMapScreen( ) );
 		mScreen->show( );
 	}

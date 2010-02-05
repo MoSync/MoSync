@@ -195,6 +195,15 @@ namespace MAP
 			pixelsToMeters( px.getX( ), px.getY( ), px.getMagnification( ), meterX, meterY );
 			metersToLonLat( meterX, meterY, lon, lat );
 		}
+		/**
+		 * Creates a LonLat from the given global meter coordinates.
+		 */
+		static LonLat fromMeters( const double meterX, const double meterY )
+		{
+			double lon, lat;
+			metersToLonLat( meterX, meterY, lon, lat );
+			return LonLat( lon, lat );
+		}
 		//
 		// Convert tile lower left corner plus pixel offset to WGS84 lat/lon.
 		//
@@ -233,7 +242,7 @@ namespace MAP
 		/**
 		 * Convert this to meters.
 		 */
-		void toMeters( int magnification, double& meterX, double& meterY ) const
+		void toMeters( double& meterX, double& meterY ) const
 		{
 			lonLatToMeters( lon, lat, meterX, meterY );
 		}
