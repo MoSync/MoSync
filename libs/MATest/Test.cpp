@@ -74,11 +74,11 @@ namespace MATest {
 		XML_LOG("endXML");
 		xmlOutput+="</TestReport>\n";
 #ifdef XML_LOGGING
-		maWriteLog(xmlOutput.c_str(), xmlOutput.size());
+		maWriteLog(xmlOutput.c_str(), xmlOutput.length());
 #endif
 		MAHandle store = maOpenStore(storeName.c_str(), MAS_CREATE_IF_NECESSARY);
-		maCreateData(placeHolder, xmlOutput.size());
-		maWriteData(placeHolder, xmlOutput.c_str(), 0, xmlOutput.size());
+		maCreateData(placeHolder, xmlOutput.length());
+		maWriteData(placeHolder, xmlOutput.c_str(), 0, xmlOutput.length());
 		maWriteStore(store, placeHolder);
 		maCloseStore(store, 0);
 	}

@@ -130,6 +130,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAAddress Address
 #define Address int
 #define MAString String
+#define MAWString String
 #define MAHandle int
 
 #define MAPoint2d Address

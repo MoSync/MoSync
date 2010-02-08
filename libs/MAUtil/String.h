@@ -30,11 +30,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "RefCounted.h"
 #include "Vector.h"
+#include <ma.h>
 
-#ifndef MAPIP
+#if 0//ndef MAPIP
 #define HAVE_EMPTY_STRING
 #endif
 
+template<class Tchar> int tstrlen(const Tchar*);
+template<class Tchar> int tstrcmp(const Tchar*, const Tchar*);
 
 namespace MAUtil {
 
@@ -83,13 +86,13 @@ namespace MAUtil {
 	* A class that holds the actual data used by String.
 	* It's a reference counted vector.
 	*/
-	class StringData : public Vector<char>, public RefCounted {
+	template<class Tchar> class StringData : public Vector<Tchar>, public RefCounted {
 	public:
-		StringData(const char* text);
-		StringData(const char* text, int len);
-		StringData(int size);
+		StringData(const Tchar* text);
+		StringData(const Tchar* text, int len);
+		StringData(int len);
 		StringData(const StringData& other);
-		friend class String;
+		template<class T> friend class BasicString;
 		virtual ~StringData() {}
 	};
 
@@ -100,7 +103,7 @@ namespace MAUtil {
 	* instances are shared between strings as much as possible by using
 	* the copy-on-write idiom.
 	*/
-	class String {
+	template<class Tchar> class BasicString {
 	public:
 
 		enum {
@@ -110,92 +113,79 @@ namespace MAUtil {
 		/**
 		* Initializes the new string with shared empty data.
 		*/
-		String();
+		BasicString();
 
 		/**
 		* Initializes the string with empty data and the given capacity.
 		*/
-		explicit String(int capacity);
+		explicit BasicString(int capacity);
 
 		/**
-		* Copies the specified C string into the new string.
+		* Copies the specified null-terminated string into the new string.
 		*/
-		String(const char* text);
+		BasicString(const Tchar* text);
 		
 		/**
-		* Copies \a len bytes of the C string \a text into the new string.
+		* Copies \a len bytes of the string \a text into the new string.
 		*/
-		String(const char* text, int len);
+		BasicString(const Tchar* text, int len);
 
 
 		/** Makes the new string share the data of \a s. */
-		String(const String& s);
-
-#if 0
-		/** Initializes the new string with the character \a c. */
-		String(char c);
-#endif
-
-#if 0
-		/** Initializes the new string with the integer \a i. */
-		String(int i);
-
-		/** Initializes the new string with the double \a d. */
-		String(double d);
-#endif
+		BasicString(const BasicString& s);
 
 		/** Returns a pointer to the null-terminated character data.
 		* This pointer becomes invalid as soon as non-const medthod of this class is called.
 		*/
-		const char* c_str() const;
+		const Tchar* c_str() const;
 
 		/** Makes this string share the \a other string's data. */
-		String& operator=(const String& other);
+		BasicString& operator=(const BasicString& other);
 
 		/** Returns a reference to the character at position \a index. */
-		char& operator[](int index);
+		Tchar& operator[](int index);
 
 		/** Returns a const reference to the character at position \a index. */
-		const char& operator[](int index) const;
+		const Tchar& operator[](int index) const;
 
 		/** Returns true if the strings are equal, false otherwise. */
-		bool operator==(const String& other) const;
+		bool operator==(const BasicString& other) const;
 
 		/** Returns false if the strings are equal, true otherwise. */
-		bool operator!=(const String& other) const;
+		bool operator!=(const BasicString& other) const;
 
 		/** Returns true if \a this is lexiographically less than \a other,
 		* false otherwise. */
-		bool operator<(const String& other) const;
+		bool operator<(const BasicString& other) const;
 
  		/** Returns true if \a this is lexiographically greater than other,
 		* false otherwise. */
-		bool operator>(const String& other) const;
+		bool operator>(const BasicString& other) const;
 
 		/** Returns true if \a this is lexiographically less than or equal to \a other,
 		* false otherwise. */
-		bool operator<=(const String& other) const;
+		bool operator<=(const BasicString& other) const;
 
  		/** Returns true if \a this is lexiographically greater than or equal to \a other,
 		* false otherwise. */
-		bool operator>=(const String& other) const;
+		bool operator>=(const BasicString& other) const;
 
 #ifdef NEW_OPERATORS
 		template<class T> friend
-			StringStream operator+=(String& s, T st);
+			StringStream operator+=(BasicString& s, T st);
 #else
 		/** Returns a copy of this string concatenated with the \a other. */
-		String operator+(const String& other) const;
+		BasicString operator+(const BasicString& other) const;
 
 		/** Concatenates a string in-place with \a other and returns a reference to itself. */
-		String& operator+=(const String& other);
+		BasicString& operator+=(const BasicString& other);
 
 #if 1
 		/** Returns a copy of this string concatenated with the \a c. */
-		String operator+(char c) const;
+		BasicString operator+(Tchar c) const;
 
 		/** Concatenates a string in-place with \a c and returns a reference to itself. */
-		String& operator+=(char c);
+		BasicString& operator+=(Tchar c);
 #endif
 #endif	//NEW_OPERATORS
 
@@ -203,84 +193,90 @@ namespace MAUtil {
 		* Returns the index of the first instance of the given string inside this string,
 		* starting at the given position. Returns npos if not found.
 		*/
-		int find(const String& s, unsigned int offset = 0) const;
+		int find(const BasicString& s, unsigned int offset = 0) const;
 
 		/** Returns the last index of the given character. Returns npos if not found. */
-		int findLastOf(const char findThis) const;
+		int findLastOf(const Tchar findThis) const;
 
 		/**
 		* Returns the first index of the given character starting at the given position.
 		* Returns npos if not found.
 		*/
-		int findFirstOf(const char findThis, int position = 0) const;
+		int findFirstOf(const Tchar findThis, int position = 0) const;
 
 		/**
 		* Returns the first index _not_ matching the given character, starting at the given position.
 		* Returns npos if not found.
 		*/
-		int findFirstNotOf(const char findNotThis, int position = 0) const;
+		int findFirstNotOf(const Tchar findNotThis, int position = 0) const;
 
 		/** Inserts the given string at the given position. */
-		void insert(int position, const String& other);
+		void insert(int position, const BasicString& other);
 
 		/** Inserts the given character at the given position. */
-		void insert(int position, char c);
+		void insert(int position, Tchar c);
 
 		/** Removes the given number of characters starting at the given position. */
 		void remove(int position, int number);
 
 		/** Returns a new string that is a copy of the specified portion of this string. */
-		String substr(int startIndex, int length = npos) const;
+		BasicString substr(int startIndex, int length = npos) const;
 
-		/** Returns the number of characters in the string. */
+#if 0
+		/** Returns the number of bytes occupied by the string.
+		* Note that this is NOT the same as the number of characters.
+		*/
 		int size() const;
+#endif
 
-		/** Returns the size of the reserved space in the string data object. */
+		/** Returns the size (in characters) of the reserved space in the string data object. */
 		int capacity() const;
 
 		/** Returns the number of characters in the string. */
 		int length() const;
 
 		/** Resizes the string. Any new characters are undefined. */
-		void resize(int newSize);
+		void resize(int newLen);
 
 		/** Reserves space in the string data object. */
-		void reserve(int newSize);
+		void reserve(int newLen);
 
 		/** Resizes the string to zero. */
 		void clear();
 
 		/** Appends a string at the end of the string. */
-		void append(const char* other, int len);
+		void append(const Tchar* other, int len);
 
 
 #ifdef HAVE_EMPTY_STRING
 		/** Returns a reference to an empty string. */
-		static const String& emptyString();
+		static const BasicString& emptyString();
 #endif
 
 		/** Replaces this string's data object. */
-		void setData(StringData* data);
+		void setData(StringData<Tchar>* data);
 
 		/**
 		* Returns a pointer to the string data. The pointer becomes invalidated by
 		* any non-const method of this class.
 		*/
-		char* pointer();
+		Tchar* pointer();
 
-		~String();
+		~BasicString();
 
 	protected:
-		void allocStringData(const char *text, int len);
+		void allocStringData(const Tchar *text, int len);
 	
 		/** A pointer to the string data object shared by this string. */
-		StringData* sd;
+		StringData<Tchar>* sd;
 #ifdef HAVE_EMPTY_STRING
 		/** a single empty string for convenience. */
-		static const String* EMPTY_STRING;
+		static const BasicString* EMPTY_STRING;
 #endif
 	};
 
+	typedef BasicString<char> String;
+	typedef BasicString<wchar> WString;
 
 #ifdef NEW_OPERATORS
 
@@ -393,8 +389,10 @@ namespace MAUtil {
 	/**
 	* \returns A new string that is the concatenation of \a c and \a s.
 	*/
-	inline String operator+(const char* c, const String& s) {
-		return String(c)+s;
+	template<class Tchar> inline BasicString<Tchar> operator+(const Tchar* c,
+		const BasicString<Tchar>& s)
+	{
+		return BasicString<Tchar>(c)+s;
 	}
 #endif	//NEW_OPERATORS
 }

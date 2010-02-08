@@ -127,7 +127,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WBYTE_RAW(a, b) CORE.wbyte(a,(byte)b)
 #define RINT(addr) CORE.rint(addr)
 #define WINT(addr, i) CORE.wint(addr, i)
-#define RSHORT(a, ret) { ret = (short)CORE.rshort(a); }
+#define RSHORT(a, ret) { ret = CORE.rshort(a); }
 #define WSHORT(a, s) CORE.wshort(a,s)
 
 #else	//DEBUG_MEMORY

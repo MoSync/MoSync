@@ -88,7 +88,7 @@ static void dumpSEDUUID(const SDP_ELEMENT_DATA& sed, int size, std::vector<MAUUI
 		uuid.i[0] = sed.data.uuid16;
 		break;
 	case 2:
-		LOGBT("%08X\n", sed.data.uuid32);
+		LOGBT("%08lX\n", sed.data.uuid32);
 		uuid.i[0] = sed.data.uuid32;	//slightly unsure about this.
 		break;
 	case 4:
@@ -133,7 +133,7 @@ static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>*
 	case SDP_TYPE_ALTERNATIVE:
 		//sed.data is a union. sequence and alternative are identical,
 		//so I can just pick any one of them here.
-		LOGBT("%s, %i bytes.\n", sed.type == SDP_TYPE_SEQUENCE ? "Sequence" : "Alternative",
+		LOGBT("%s, %lu bytes.\n", sed.type == SDP_TYPE_SEQUENCE ? "Sequence" : "Alternative",
 			sed.data.sequence.length);
 		TEST(dumpStream(sed.data.sequence.value, sed.data.sequence.length, uuids));	//next level
 		break;
@@ -175,7 +175,7 @@ static bool dumpSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids) {
 				sprintf(format, "%%" INT64PREFIX "%c (0x%%" INT64PREFIX "016X)\n", mainType == 1 ? 'u' : 'i');
 				LOGBT(format, sed.data.int64, sed.data.int64);
 			} else if(size == 4) {	//128-bit
-				LOGBT("%" INT64PREFIX "016X%" INT64PREFIX "016X\n", sed.data.int128.HighPart,
+				LOGBT("%016" INT64PREFIX "X%016" INT64PREFIX "X\n", sed.data.int128.HighPart,
 					sed.data.int128.LowPart);
 			} else {
 				DEBIG_PHAT_ERROR;
@@ -196,7 +196,7 @@ static BOOL CALLBACK BtEnumAttributesCallback(ULONG uAttribId, LPBYTE pValueStre
 																			 ULONG cbStreamSize, LPVOID pvParam)
 {
 	CriticalSectionHandler csh(&gBt.critSec);
-	LOGBT("Attribute ID %i, streamSize: %i bytes\n", uAttribId, cbStreamSize);
+	LOGBT("Attribute ID %lu, streamSize: %lu bytes\n", uAttribId, cbStreamSize);
 	SDP_ELEMENT_DATA sed;
 	TEST_NZ(BluetoothSdpGetElementData(pValueStream, cbStreamSize, &sed));
 	TEST(dumpSED(sed, (std::vector<MAUUID>*)pvParam));

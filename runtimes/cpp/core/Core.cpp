@@ -901,6 +901,20 @@ public:
 		checkProtection(initialAddr, address-initialAddr);
 #endif
 	}
+	void ValidateMemWStringAddress(unsigned address) const {
+#ifdef MEMORY_PROTECTION	
+		int initialAddr = address;
+#endif
+		address -= 2;
+		do {
+			address += 2;
+			if(address >= DATA_SEGMENT_SIZE)
+				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
+		} while(RAW_MEMREF(short, address) != 0);
+#ifdef MEMORY_PROTECTION	
+		checkProtection(initialAddr, address-initialAddr);
+#endif
+	}
 	int ValidatedStrLen(const char* ptr) const {
 		unsigned address = PTR2ADDRESS(ptr);
 		do {
@@ -1032,6 +1046,17 @@ public:
 #define _SYSCALL_CONVERTRES_MAString _SYSCALL_CONVERTRES_MAAddress
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
+
+	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%S\")", str); }
+	wchar* _SYSCALL_CONVERT_MAWString(int str) {
+		_debug_hex(str);
+		ValidateMemWStringAddress(str);
+		wchar* res = (wchar*)((char*)mem_ds + str);
+		debug_MAWString(res);
+		return res;
+	}
+#define _SYSCALL_CONVERTRES_MAWString _SYSCALL_CONVERTRES_MAAddress
+#define _SYSCALL_HANDLERES_MAWString _SYSCALL_HANDLERES_DEFAULT(MAWString)
 
 	void debug_int(int SCDEBUG_ARG(i)) { LOGSC("(%i)", i); }
 	int _SYSCALL_CONVERT_int(int i) {

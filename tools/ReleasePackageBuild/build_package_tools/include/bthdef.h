@@ -281,8 +281,8 @@ typedef ULONG BTH_LAP, *PBTH_LAP;
 
 #define BTH_ADDR_NULL            ((ULONGLONG) 0x0000000000000000)
 
-#define NAP_MASK                ((ULONGLONG) 0xFFFF00000000)
-#define SAP_MASK                ((ULONGLONG) 0x0000FFFFFFFF)
+#define NAP_MASK                ((ULONGLONG) 0xFFFF00000000LL)
+#define SAP_MASK                ((ULONGLONG) 0x0000FFFFFFFFLL)
 
 #define NAP_BIT_OFFSET          (8 * 4)
 #define SAP_BIT_OFFSET          (0)

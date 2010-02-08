@@ -1006,15 +1006,8 @@ namespace Base {
 		}
 		return EXTENT(x, y);
 	}
-	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		if(*str == 0) {
-			//LOG("DTempty\n");
-			return;
-		}
-		//LOG("DT %s\n", str);
-		int argb = gCurrentUnconvertedColor;
-		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
-		SDL_Surface* text_surface = TTF_RenderText_Solid(gFont, str, color);
+
+	static void drawTextSurface(int left, int top, SDL_Surface* text_surface) {
 		if(!text_surface) {
 			BIG_PHAT_ERROR(SDLERR_TEXT_RENDER_FAILED);
 		}
@@ -1022,6 +1015,25 @@ namespace Base {
 		SDL_BlitSurface(text_surface, NULL, gDrawSurface, &rect);
 		SDL_FreeSurface(text_surface);
 	}
+
+	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
+		if(*str == 0) {
+			return;
+		}
+		int argb = gCurrentUnconvertedColor;
+		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
+		drawTextSurface(left, top, TTF_RenderText_Solid(gFont, str, color));
+	}
+
+	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
+		if(*str == 0) {
+			return;
+		}
+		int argb = gCurrentUnconvertedColor;
+		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
+		drawTextSurface(left, top, TTF_RenderUNICODE_Solid(gFont, str, color));
+	}
+
 	SYSCALL(void, maUpdateScreen()) {
 		LOGG("maUpdateScreen()\n");
 		if(gClosing)

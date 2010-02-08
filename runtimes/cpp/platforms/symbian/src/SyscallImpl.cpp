@@ -662,12 +662,17 @@ SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 }
 SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 	if(*str == 0) {
-		//LOG("DTempty\n");
 		return;
 	}
-	//LOG("DT %s\n", str);
 	TCleaner<HBufC16> buf(CreateHBufC16FromCStringLC(str));
 	gScreenEngine.DrawTextL(*buf, TPoint(left, top));
+}
+SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
+	if(*str == 0) {
+		return;
+	}
+	TPtrC16 ptr(str);
+	gScreenEngine.DrawTextL(ptr, TPoint(left, top));
 }
 
 SYSCALL(void, maUpdateScreen()) {

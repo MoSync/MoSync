@@ -62,6 +62,8 @@ string jType(const Interface& inf, const string& type) {
 		return "int";
 	if(type == "MAString")
 		return "MAString";
+	if(type == "MAWString")
+		return "MAWString";
 	if(type == "float")
 		return "int";
 	if(type == "double")
@@ -76,7 +78,7 @@ string getSJType(const Interface& inf, const string& type, bool argIn) {
 	if(!argIn)
 		return "int";
 
-	if(argType == "MAString")
+	if(argType == "MAString" || argType == "MAWString")
 		return "int";
 	if(argType == "MAAddress")
 		return "int";

@@ -988,6 +988,11 @@ public
 		mGraphics.drawString(str, left, top, Graphics.TOP|Graphics.LEFT);
 	}
 
+	SYSCALL(void) maDrawTextW(int left, int top, final String str) {
+		DEBUG("DrawTextW "+str+"\n");
+		mGraphics.drawString(str, left, top, Graphics.TOP|Graphics.LEFT);
+	}
+
 	SYSCALL(void) maUpdateScreen() {
 		if(G_CLOSING)
 			return;

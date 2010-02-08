@@ -63,9 +63,18 @@ class JavaPreprocessTask < FileTask
 	def execute
 		$stderr.puts "preprocessing #{@dir}/#{@name}.jpp"
 		
+		tempDepFileName = "build/#{@name}.mft"
+		
 		#@REM sed reformats gcc's error output so that Visual Studio can understand it
-		sh("xgcc -x c -E -MMD -MF build/#{@name}.mft -D_JavaME -I#{SHARED_DIR} -Isrc" +
+		sh("xgcc -x c -E -MMD -MF #{tempDepFileName} -D_JavaME -I#{SHARED_DIR} -Isrc" +
 			" -o build/#{@name}.jtmp \"#{@prerequisites[0]}\" 2>&1 | sed s/\([a-zA-Z/]\+\)\(.[a-zA-Z]\+\):\([0-9]\+\):/\\1\\2(\\3):/")
+		
+		# problem: if xgcc fails due to a preprocessing error, it doesn't return an error value.
+		# it does, however, output an empty dependency file, which causes later rebuilds to fail.
+		# we have to check for this emtpy file and throw an error if we find it.
+		if(File.size(tempDepFileName) == 0)
+			error("xgcc failed silently")
+		end
 		
 		sh("sed s/#{@name}.o/#{escape(@NAME)}/ < build/#{@name}.mft > #{@DEPFILE}")
 		

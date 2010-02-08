@@ -136,7 +136,7 @@ namespace MAUI {
 		//if(cursorIndex>text.size()) cursorIndex = text.size();
 		//this->caption = caption;
 		Label::setCaption(text);
-		if(cursorIndex>caption.size()) cursorIndex = caption.size();
+		if(cursorIndex>caption.length()) cursorIndex = caption.length();
 		requestRepaint();
 	}
 
@@ -299,7 +299,7 @@ namespace MAUI {
 	void EditBox::characterChanged(char c) {
 //		if(text.size()==maxLength) return;
 
-		if(characterInputActive==false && caption.size()<maxLength) {
+		if(characterInputActive==false && caption.length()<maxLength) {
 			// FIXME
 			char tmp[2];
 			sprintf(tmp, "%c", c);
@@ -311,7 +311,7 @@ namespace MAUI {
 		} else {
 			if(characterInputActive==false) {
 				currentIndex = cursorIndex;
-				if(currentIndex>caption.size()-1) currentIndex = caption.size()-1;
+				if(currentIndex>caption.length()-1) currentIndex = caption.length()-1;
 			}
 
 //			text[currentIndex] = c;
@@ -327,11 +327,11 @@ namespace MAUI {
 	}
 	
 	void EditBox::characterDeployed(char c) {
-		//if(text.size()>=maxLength+1) return;
-		//if(caption.size()>=maxLength+1) return;
+		//if(text.length()>=maxLength+1) return;
+		//if(caption.length()>=maxLength+1) return;
 
 		characterInputActive = false;
-		if(caption.size()>=maxLength+1) return;
+		if(caption.length()>=maxLength+1) return;
 		
 		if(cursorIndex == currentIndex) {
 			//cursorIndex++;
@@ -350,8 +350,8 @@ namespace MAUI {
 	}
 
 	bool EditBox::moveCursorHorizontal(int steps, bool fireListeners) {
-//		if(cursorIndex + steps < 0 || cursorIndex + steps > text.size()) return false;
-		if(cursorIndex + steps < 0 || cursorIndex + steps > caption.size()) {
+//		if(cursorIndex + steps < 0 || cursorIndex + steps > text.length()) return false;
+		if(cursorIndex + steps < 0 || cursorIndex + steps > caption.length()) {
 			if(fireListeners)
 				fireCursorMoved(cursorIndex);
 			return false;
@@ -416,8 +416,8 @@ namespace MAUI {
 		bool r = deleteCharacter(expectedCursorIndex);
 		if(!r) return false;
 		cursorIndex = expectedCursorIndex;
-		//if(cursorIndex>text.size()) cursorIndex = text.size();
-		if(cursorIndex>caption.size()) cursorIndex = caption.size();
+		//if(cursorIndex>text.length()) cursorIndex = text.length();
+		if(cursorIndex>caption.length()) cursorIndex = caption.length();
 
 		return r;
 	}
@@ -470,7 +470,7 @@ namespace MAUI {
 	void EditBox::setPasswordMode(bool enabled) {
 		if(enabled && !this->passwordMode) {
 			password = caption;
-			for(int i=0; i<caption.size(); i++) {
+			for(int i=0; i<caption.length(); i++) {
 				caption[i] = '*';
 			}
 			requestRepaint();

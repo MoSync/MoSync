@@ -7,8 +7,11 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_SOURCEFILES = ["../../runtimes/cpp/core/sld.cpp"]
 	@EXTRA_INCLUDES = ["../../runtimes/cpp/core"]
-	if(!@GCC_IS_V4 && CONFIG == "")	#buggy compiler
-		@SPECIFIC_CFLAGS = {"stabs_types.cpp" => " -Wno-uninitialized"}
+	if(!@GCC_IS_V4)	#buggy compiler
+		@SPECIFIC_CFLAGS = {"sld.cpp" => " -Wno-unreachable-code"}
+		if(CONFIG == "")
+			@SPECIFIC_CFLAGS["stabs_types.cpp"] = " -Wno-uninitialized"
+		end
 	end
 	@NAME = "stabs"
 end

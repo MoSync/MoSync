@@ -471,7 +471,7 @@ static void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool ja
 				stream << "\tLOGSC(\", \");\n";
 			string argType, convType;
 			if(java) {
-				if(a.type == "MAString" && !a.in)
+				if((a.type == "MAString" || a.type == "MAWString") && !a.in)
 					argType = "MAAddress";
 				else
 					argType = jType(maapi, a.type);
@@ -495,7 +495,7 @@ static void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool ja
 		if(f.returnType != "void" && f.returnType != "noreturn") {
 			string retType;
 			if(java) {
-				if(f.returnType == "MAString")
+				if(f.returnType == "MAString" || f.returnType == "MAWString")
 					retType = "Address";
 				else
 					retType = jType(maapi, f.returnType);
@@ -543,7 +543,7 @@ static void outputSyscallStaticJava(const Interface& maapi) {
 
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);
-			if(a.type == "MAString" || a.type == "double")
+			if(a.type == "MAString" || a.type == "MAWString" || a.type == "double")
 				staticConversionNeeded = arguments = true;
 			if(a.type == "NCString")
 				staticConversionNeeded = false;
@@ -561,7 +561,7 @@ static void outputSyscallStaticJava(const Interface& maapi) {
 				staticJavaStream << "1, "<<sjType<<" "<<a.name<<"2";
 				staticJavaInvokeStream << "_SYSCALL_CONVERT_long("<<a.name<<"1, "<<a.name<<"2)";
 			} else {
-				if(jPracticalArgType == "MAString") {
+				if(jPracticalArgType == "MAString" || jPracticalArgType == "MAWString") {
 					staticJavaInvokeStream << "_SYSCALL_CONVERT_"<<jPracticalArgType<<
 						"("<<a.name<<")";
 				} else {

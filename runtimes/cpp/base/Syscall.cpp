@@ -69,7 +69,7 @@ namespace Base {
 #ifdef IX_FILE
 	struct FileList {
 		std::vector<std::string> files;
-		int pos;
+		size_t pos;
 	};
 	typedef std::map<int, FileList> FileListMap;
 	typedef FileListMap::iterator FileListItr;

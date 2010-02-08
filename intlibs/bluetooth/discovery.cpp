@@ -98,7 +98,7 @@ void TCHARtoCHAR(char *dst, const TCHAR *src, int num) {
 #define TCHARtoCHAR(x, y, z) strncpy(x, y, z)
 #endif
 
-#ifdef BLUETOOTH_DEBUGGING_MODE
+#if 0//def BLUETOOTH_DEBUGGING_MODE
 static void BTHAtoBytes(byte* bytes, BTH_ADDR btha) {
 	for(int i=0; i<BTADDR_LEN; i++) {
 		bytes[i] = (BYTE)(btha >> (40 - i*8));
@@ -232,7 +232,7 @@ static void doSearch2() {
 	WSATS(res);
 	LOGBT("dSS 3\n");
 
-#define DUMPPTR(name) LOGBT("%s: 0x%08X\n", #name, name)
+#define DUMPPTR(name) LOGBT("%s: 0x%p\n", #name, name)
 	for(;;) {
 		LOGBT("dSS 4\n");
 		CHECK_CANCELED(break);
@@ -243,7 +243,7 @@ static void doSearch2() {
 		pQs->dwSize = sizeof(WSAQUERYSET);
 		res = WSALookupServiceNext(sLookup, LUP_RETURN_COMMENT | LUP_RETURN_NAME |
 			LUP_RETURN_ADDR | LUP_RETURN_BLOB, &qsSize, pQs);
-		DUMPPTR(res);
+		DUMPPTR((void*)res);
 		if(res == SOCKET_ERROR && (WSAGetLastError() == WSA_E_NO_MORE || WSAGetLastError() == WSAENOMORE))
 			break;
 		WSATS(res);
@@ -254,7 +254,7 @@ static void doSearch2() {
 		DUMPPTR(pQs->lpBlob);
 		if(pQs->lpBlob) {
 			DUMPPTR(pQs->lpBlob->pBlobData);
-			DUMPPTR(pQs->lpBlob->cbSize);
+			DUMPPTR((void*)pQs->lpBlob->cbSize);
 			for(uint i=0; i<pQs->lpBlob->cbSize; i++) {
 				if((i & 3) == 0 && i >= 4) {
 					LOG(" ");
@@ -369,7 +369,7 @@ static void doDiscovery2() {
 
 		{
 			CriticalSectionHandler csh(&gBt.critSec);
-			LOGBT("d%i: \"%s\" (%04x%08x)\n", gBt.devices.size(),
+			LOGBT("d%i: \"%s\" (%04x%08lx)\n", gBt.devices.size(),
 				pQs->lpszServiceInstanceName, GET_NAP(b), GET_SAP(b));
 			gBt.devices.push_back(dev);
 			//LOGBT("pushed\n");
@@ -403,7 +403,7 @@ static bool haveRadio() {
 	HANDLE hRadio;
 	HBLUETOOTH_RADIO_FIND hbtrf = BluetoothFindFirstRadio(&btfrp, &hRadio);
 	if(hbtrf == NULL) {
-		LOG("BluetoothFindFirstRadio error %i\n", GetLastError());
+		LOG("BluetoothFindFirstRadio error %lu\n", GetLastError());
 		return false;
 	}
 	GLE(BluetoothFindRadioClose(hbtrf));
