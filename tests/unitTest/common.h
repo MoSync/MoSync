@@ -51,15 +51,15 @@ public:
 	}
 
 	void pointerPressEvent(MAPoint2d p) {
-		int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
-		assert(name, res == TK_YES);
-		suite->runNextCase();
 	}
 
 	void pointerMoveEvent(MAPoint2d p) {
 	}
 
 	void pointerReleaseEvent(MAPoint2d p) {
+		int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
+		assert(name, res == TK_YES);
+		suite->runNextCase();
 	}
 
 
