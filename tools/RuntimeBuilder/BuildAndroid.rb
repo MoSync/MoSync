@@ -114,7 +114,7 @@ class RuntimeBuilder
 			puts "\nFATAL ERROR! - No android source package built, check previous output for errors!\n\n"
 			return 1
 		else
-			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.zip, Android source package, was succesfully generated!\n\n"
+			puts "\nFINISHED! - #{runtime_dir}MoSyncRuntime#{debug}.zip, Android source package was succesfully generated!\n\n"
 			return 0
 		end
 		return 0
