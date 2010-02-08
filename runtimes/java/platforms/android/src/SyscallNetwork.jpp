@@ -17,11 +17,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define NETSYSCALL SYSCALL
 
-#define HTTPS_NULL 0
-#define HTTPS_SETUP 1
-#define HTTPS_WRITING 2
-#define HTTPS_FINISHING 3
-#define HTTPS_FINISHED 4
+#define HTTP_STATE_NULL 0
+#define HTTP_STATE_SETUP 1
+#define HTTP_STATE_WRITING 2
+#define HTTP_STATE_FINISHING 3
+#define HTTP_STATE_FINISHED 4
 
 Hashtable<Integer, URLConnectionInformation> mConnections = new Hashtable<Integer, URLConnectionInformation>();
 int mConnNextHandle = 1;
@@ -32,20 +32,27 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 	Log.i("MoSyncSyscall","maConnect");
 	try
 	{
-		URL connectionURL = new URL(url);
-		URLConnection con = connectionURL.openConnection();
-		con.setAllowUserInteraction(true);
-		con.setDoInput(true);
-		con.setDoOutput(true);
-		con.setUseCaches(false);
-		
-		URLConnectionInformation urlcon = new URLConnectionInformation(con, mConnNextHandle);
-		
-		mConnections.put(mConnNextHandle, urlcon);
-		
-		urlcon.mState |= CONNOP_CONNECT;
-	
-		mThreadPool.execute(new HttpConnectionConnector(urlcon));
+		if(url.startsWith("socket://"))
+		{
+			return CONNERR_GENERIC;
+		}
+		else
+		{
+			URL connectionURL = new URL(url);
+			URLConnection con = connectionURL.openConnection();
+			con.setAllowUserInteraction(true);
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setUseCaches(false);
+			
+			URLConnectionInformation urlcon = new URLConnectionInformation(con, mConnNextHandle);
+			
+			mConnections.put(mConnNextHandle, urlcon);
+			
+			urlcon.mState |= CONNOP_CONNECT;
+			
+			mThreadPool.execute(new HttpConnectionConnector(urlcon));
+		}
 	}
 	catch(MalformedURLException e)
 	{
@@ -136,8 +143,8 @@ NETSYSCALL(void) maConnWrite(MAHandle conn, Address src, int size) throws IOExce
 	if(connectionInfo.mIsHttpConnection == true) {
 		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
 		
-		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTPS_SETUP) {
-			connectionInfo.mHttpState = HTTPS_WRITING;
+		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
 		}
 	}
 	connectionInfo.mState |= CONNOP_WRITE;
@@ -211,8 +218,8 @@ NETSYSCALL(void) maConnWriteFromData(MAHandle conn, MAHandle data, int offset, i
 	if(connectionInfo.mIsHttpConnection == true) {
 		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
 		
-		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTPS_SETUP) {
-			connectionInfo.mHttpState = HTTPS_WRITING;
+		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
 		}
 	}
 	setResource(data, mFlux);
@@ -253,8 +260,8 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception
 
 		URLConnectionInformation urlcon = new URLConnectionInformation(con, mConnNextHandle);
 		
-		DEBUG_ASSERT(urlcon.mHttpState == HTTPS_NULL);
-		urlcon.mHttpState = HTTPS_SETUP;
+		DEBUG_ASSERT(urlcon.mHttpState == HTTP_STATE_NULL);
+		urlcon.mHttpState = HTTP_STATE_SETUP;
 	
 		mConnections.put(mConnNextHandle, urlcon);
 	}
@@ -283,7 +290,7 @@ throws Exception
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpSetRequestHeader");
 
 	URLConnectionInformation connectionInfo = (URLConnectionInformation)mConnections.get(new Integer(conn));
-	MYASSERT(connectionInfo.mHttpState == HTTPS_SETUP);
+	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP);
 	
 	URLConnection connection = connectionInfo.mConnection;
 	try
@@ -333,9 +340,9 @@ NETSYSCALL(void) maHttpFinish(MAHandle conn)
 	URLConnectionInformation connectionInfo = (URLConnectionInformation)mConnections.get(new Integer(conn));
 	
 	MYASSERT(connectionInfo.mState == 0);
-	MYASSERT(connectionInfo.mHttpState == HTTPS_SETUP || connectionInfo.mHttpState == HTTPS_WRITING);
+	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP || connectionInfo.mHttpState == HTTP_STATE_WRITING);
 	connectionInfo.mState = CONNOP_FINISH;
-	connectionInfo.mHttpState = HTTPS_FINISHING;
+	connectionInfo.mHttpState = HTTP_STATE_FINISHING;
 	
 	mThreadPool.execute(new HttpConnectionFinish(connectionInfo));
 }
@@ -364,24 +371,14 @@ public class URLConnectionInformation
 		mConnection = connection;
 		mHandle = handle;
 		mState = 0;
-		mHttpState = HTTPS_NULL;
+		mHttpState = HTTP_STATE_NULL;
 		mCancelled = false;
 		
 		if(mConnection.getURL().toString().startsWith("http"))
 			mIsHttpConnection = true;
 		else
 			mIsHttpConnection = false;
-/*		
-		try
-		{
-			mIs = connection.getInputStream();
-			mOs = connection.getOutputStream();
-		}
-		catch(IOException e)
-		{
-			PRINT_STACK_TRACE;
-		}
-*/		
+
 	}
 	
 	final void postResultEvent(int opType, int result) {
@@ -450,7 +447,7 @@ class HttpConnectionConnector implements Runnable {
 						i++;
 					}
 #endif
-					mConn.mHttpState = HTTPS_FINISHED;
+					mConn.mHttpState = HTTP_STATE_FINISHED;
 				}
 			}
 			synchronized(mConn) {
@@ -605,7 +602,7 @@ class HttpConnectionFinish implements Runnable
 					i++;
 				}
 #endif
-				mConn.mHttpState = HTTPS_FINISHED;
+				mConn.mHttpState = HTTP_STATE_FINISHED;
 			}
 			mConn.postResultEvent(CONNOP_FINISH, result);
 		} catch(InterruptedIOException e) {
