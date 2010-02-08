@@ -439,8 +439,6 @@ Release\idl2.exe
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\clock
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\multi
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\wolf3d
-@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\HelloMap
-@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MapDemo
 
 @REM Remove files that shouldn't be in the release
 @del /s /q %MOSYNC_EXAMPLES_PATH%\Makefile* %MOSYNC_EXAMPLES_PATH%\*.bat %MOSYNC_EXAMPLES_PATH%\*.2008.vcproj

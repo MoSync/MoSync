@@ -2,7 +2,7 @@ BD = '..'
 require "#{BD}/build_rules/host.rb"
 require "#{BD}/build_rules/defaults.rb"
 
-SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest"] #, "MinUI"
+SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest", "MAP"] #, "MinUI"
 
 if(Rake.application.top_level_tasks[0] == "pipe") then
 	RAKEFILES = ["rakefile.pipe.rb"]

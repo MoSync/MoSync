@@ -57,7 +57,6 @@ using namespace MAUtil;
 #define FLOOR_COLOR 0xCC9940
 #define OBJ_COLOR 0xF7DE5E
 
-
 #ifdef MA_PROF_SUPPORT_STYLUS
 #define MESSAGE "Tap screen to bounce"
 #else
@@ -65,7 +64,7 @@ using namespace MAUtil;
 #endif
 
 /**
- * We make our Moblet inherit TimerListener
+ * We make our Moblet inherit TimerListener and PointerListener.
  */
 
 class TimerMoblet : public Moblet, public TimerListener {
@@ -83,7 +82,7 @@ public:
 		screenHeight = EXTENT_Y(scrSize);
 		// Start with the box on the floor
 		y = FLOOR_Y;
-		// This is the interesting part! We're registering ourselves
+		// This is th	e interesting part! We're registering ourselves
 		// as a timer. That means that the function runTimerEvent()
 		// will be called every TIMER_PERIOD milliseconds starting from
 		// the time when Moblet::run() is invoked.
