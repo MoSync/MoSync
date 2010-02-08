@@ -358,6 +358,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			default:
 				return false;
 		}
+		postEvent(event);
 		return true;
 	}
 
