@@ -100,6 +100,7 @@ class RuntimeBuilder
 		system("javac -source 1.4 -target 1.4 -d #{class_dir} -classpath #{class_dir} -bootclasspath " +
 			   "#{java_me_sdk}j2melib/jsr082.jar;#{java_me_sdk}j2melib/cldcapi11.jar;" +
 			   "#{java_me_sdk}j2melib/midpapi20.jar;#{java_me_sdk}j2melib/wma20.jar;" +
+			   "#{java_me_sdk}j2melib/jsr75.jar;" +
 			   "#{java_me_sdk}j2melib/jsr179.jar #{temp_dir}*.java");
 			
 		# Generate Manifest file
@@ -129,6 +130,7 @@ class RuntimeBuilder
 		system("java -jar #{java_me_sdk}bin/proguard.jar -injars #{runtime_dir}MoSyncRuntimeTemp.jar " +
 		"-libraryjars #{java_me_sdk}j2melib/cldcapi11.jar -libraryjars #{java_me_sdk}j2melib/midpapi20.jar " +
 		"-libraryjars #{java_me_sdk}j2melib/jsr082.jar -libraryjars #{java_me_sdk}j2melib/jsr179.jar " +
+		"-libraryjars #{java_me_sdk}j2melib/jsr75.jar " +
 		"-libraryjars #{java_me_sdk}j2melib/wma20.jar -dontusemixedcaseclassnames " +
 		"-outjars #{runtime_dir}MoSyncRuntimeObfuscated.jar -keep public class MAMidlet");
 		
@@ -139,6 +141,7 @@ class RuntimeBuilder
 		system("#{java_me_sdk}bin/preverify -d #{runtime_dir[0..-2]} -classpath " +
 			   "#{java_me_sdk}j2melib/jsr082.jar;#{java_me_sdk}j2melib/cldcapi11.jar;" +
 			   "#{java_me_sdk}j2melib/midpapi20.jar;#{java_me_sdk}j2melib/jsr179.jar;" +
+			   "#{java_me_sdk}j2melib/jsr75.jar;" +
 			   "#{java_me_sdk}j2melib/wma20.jar #{runtime_dir}MoSyncRuntime#{debug}.jar")
 		
 		# Clean and delete all the temporary folders
