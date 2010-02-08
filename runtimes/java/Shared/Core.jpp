@@ -477,8 +477,6 @@ final public class Core {
 
 	void LoadVM(LittleEndianDataInputStream file) throws Exception {
 		try {
-			Log.i("MoSync Core", "LoadVM");
-
 			if(file.available() == 0) {
 				BIG_PHAT_ERROR;
 			}
