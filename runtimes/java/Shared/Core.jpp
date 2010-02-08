@@ -309,15 +309,15 @@ final public class Core {
 */		
 		InputStream inRes = mContext.getResources().openRawResource(R.raw.resources);
 		Log.i("MoSync Core","Core Constructor - getResource resource");
-
+		
 		file = new LittleEndianDataInputStream(inRes);
 		if(file.available()==0) {
 			mSyscall.LoadResourcesFromStream(null, 0, false);
 		} else {
 			mSyscall.LoadResourcesFromStream(file, R.raw.resources, false);
 		}
-		
-		
+		inRes.close();
+
 		mSyscall.init();
 	}
 #endif
