@@ -121,51 +121,7 @@ IMPLEMENTS MoSync
 		mBlitPaint.setColor(0xffffffff);
 		
 		mMediaPlayer = new MediaPlayer();
-/*
-		try
-		{
-			byte buffer[] = new byte[100];
-			
-			FileDescriptor fd = mCore.mContext.getResources().openRawResourceFd(R.raw.program).getFileDescriptor();
-			FileInputStream fis = new FileInputStream(fd);
-			fis.read(buffer, 0, 100);
-			fis.close();
-			Log.i("MoSync Syscall","Reading raw resource");
-			String s = new String(buffer);
-			Log.i("MoSync Syscall","buffer:"+ s);
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSync Syscalls","Problem reading raw resource : " + e.toString());
-		}
-		
-		try
-		{
-			File f = mCore.mContext.getFileStreamPath("mosync_tmp");
-			f.mkdir();
-			Log.i("MoSync Syscall","Temporary storage created");
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSync Syscalls","problem creating tmp directory : " + e.toString());
-		}
-		
-		try
-		{
-			byte buffer[] = new byte[100];
-			
-			File f = mCore.mContext.getFileStreamPath("MOSYNCTEMP:1.dat");
-			FileOutputStream fos = new FileOutputStream(f, false);
-			fos.write(buffer);
-			fos.close();
-			
-			Log.i("MoSync Syscall","Temporary storage created");
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSync Syscalls","problem creating file : " + e.toString());
-		}
-*/		
+		mMediaPlayer.reset();		
 	}
 
 	//***************************************************************************

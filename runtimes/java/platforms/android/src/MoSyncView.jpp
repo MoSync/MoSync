@@ -335,63 +335,32 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		Log.i("MoSyncView","onTouchEvent");
-/*
-	int action = motionEvent.getAction();
+
+		int action = motionEvent.getAction();
 
 		int[] event = new int[3];
 		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
-		EI_POINTX = x;
-		EI_POINTY = y;
+		
+		EI_POINTX = (int)motionEvent.getRawX();
+		EI_POINTY = (int)motionEvent.getRawY();
 		
 		switch(motionEvent.getAction())
 		{
 			case 0:
-				Log.i("MoSync View", "pointer pressed x:" + x + " y:" + y + "/n");
 				EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
 				break;
 			case 1:
-				Log.i("MoSync View", "pointer released x:" + x + " y:" + y + "/n");
 				EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
 				break;
 			case 2:
-				Log.i("MoSync View", "pointer dragged x:" + x + " y:" + y + "/n");
 				EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
 				break;
-			dafault:
+			default:
 				return false;
 		}
 		return true;
-	*/
-		return false;	
 	}
-/*	
-	protected final void pointerPressed(int x, int y) {
-		DEBUG_TEMP("pointerPressed "+x+" "+y+"\n");
-		int[] event = new int[3];
-		EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
-		EI_POINTX = x;
-		EI_POINTY = y;
-		postEvent(event);
-	}
-	
-	protected final void pointerReleased(int x, int y) {
-		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
-		int[] event = new int[3];
-		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
-		EI_POINTX = x;
-		EI_POINTY = y;
-		postEvent(event);	
-	}
-	
-	protected final void pointerDragged(int x, int y) {
-		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
-		int[] event = new int[3];
-		EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
-		EI_POINTX = x;
-		EI_POINTY = y;
-		postEvent(event);
-	}
-*/	
+
 	synchronized public final int[] getEvent() {
 		if(mEventBuffer.isEmpty()) {
 			return null;

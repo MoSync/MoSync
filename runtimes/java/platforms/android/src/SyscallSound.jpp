@@ -20,31 +20,16 @@ Hashtable<Integer, AudioStore> mAudioStores = new Hashtable<Integer, AudioStore>
 
 class AudioStore
 {
-	public int mOffset;
 	public int mSize;
 	public String mMimeType;
-	public boolean mIsTmpFile;
 	public String mTemporaryFileName;
-	public int mResourceId;
 	
-	AudioStore(String mimeType, int offset, int size, String temporaryFileName)
+	AudioStore(String mimeType, int size, String temporaryFileName)
 	{
 		Log.i("AudioStore","with file name");
-		mIsTmpFile = true;
 		mMimeType = mimeType;
-		mOffset = offset;
 		mSize = size;
 		mTemporaryFileName = temporaryFileName;
-	}
-	
-	AudioStore(String mimeType, int offset, int size, int resourceId)
-	{
-		Log.i("AudioStore","with resource id");
-		mIsTmpFile = false;
-		mMimeType = mimeType;
-		mOffset = offset;
-		mSize = size;
-		mResourceId = resourceId;
 	}
 };
 
@@ -62,36 +47,32 @@ void addResourceAudio(MAHandle resHandle, int resourceId, int size, int offset, 
 	}
 	
 	long s = is.skip(offset);
-	
 	String mimeType = readMimeString(is);
 	size -= mimeType.length()+1;
 	offset += mimeType.length()+1;
 	
-	if(isMAResource)
+	try 
 	{
-		mAudioStores.put(resHandle, new AudioStore(mimeType, offset, size, resourceId)); 
+		// Read the file to memory
+		byte[] buffer = new byte[size];
+		is.read(buffer);
+		is.close();
+		
+		Log.i("addResourceAudio","store to file " + size + "bytes" );
+		// Create a temporary audio file
+		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
+		FileOutputStream fos = mCore.mContext.openFileOutput(fileName,Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE); 
+		fos.write(buffer);
+		fos.close();
+		Log.i("addResourceAudio","store finished");
+		
+		mAudioStores.put(resHandle, new AudioStore(mimeType, size, fileName)); 
 	}
-	else // not the submitted resource file, now we must store this as a temporary file
+	catch(Exception e)
 	{
-		try 
-		{
-			// Read the file to memory
-			byte[] buffer = new byte[size];
-			is.read(buffer);
-			
-			// Create a temporary audio file
-			String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
-			FileOutputStream fos = mCore.mContext.openFileOutput(fileName,Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE); 
-			fos.write(buffer);
-			fos.close();
-			
-			mAudioStores.put(resHandle, new AudioStore(mimeType, offset, size, fileName)); 
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSync Exception", "Caught Exception:" + e);
-		}
+		Log.i("MoSync Exception", "Caught Exception:" + e);
 	}
+
 }
 
 SYSCALL(int) maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
@@ -101,22 +82,16 @@ SYSCALL(int) maSoundPlay(MAHandle soundResource, int offset, int length) throws 
 	
 	AudioStore audioStore = (AudioStore)mAudioStores.get(new Integer(soundResource));
 	if(audioStore == null) return -1;
+
+	FileDescriptor fileDesc = mCore.mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
+
+	Log.i("maSoundPlay","set data source");
+	mMediaPlayer.setDataSource(fileDesc, offset, length);
 	
-	FileDescriptor fileDesc;
-	if(audioStore.mIsTmpFile)
-		fileDesc = mCore.mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
-	else
-		fileDesc = mCore.mContext.getResources().openRawResourceFd(audioStore.mResourceId).getFileDescriptor();
-/*	
-	InputStream is = mCore.mContext.getResources().openRawResource(audioStore.mResourceId);
-	
-	is.skip(audioStore.mOffset);
-	for(int i = 0; i < 100; i++)
-		Log.i("reading"," - " + Integer.toHexString(is.read()));
-*/		
-//	mMediaPlayer.reset();
-	mMediaPlayer.setDataSource(fileDesc, audioStore.mOffset+offset, length);
+	Log.i("maSoundPlay","media player prepare");
 	mMediaPlayer.prepare();
+	
+	Log.i("maSoundPlay","media player start");
 	mMediaPlayer.start();
 	
 	return 1;
