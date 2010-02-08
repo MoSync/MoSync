@@ -995,19 +995,34 @@ namespace Base {
 		LOGG("\n");
 	}
 
-	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
+	template<class Tchar, int SDLCALL sizeFunc(TTF_Font*, const Tchar*, int*, int*)>
+	static MAExtent getTextSize(const Tchar* str) {
 		if(*str == 0) {
 			return 0;
 		}
 		int x,y;
 		DEBUG_ASSERT(gFont != NULL);
-		if(TTF_SizeText(gFont, str, &x, &y) != 0) {
+		if(sizeFunc(gFont, str, &x, &y) != 0) {
 			BIG_PHAT_ERROR(SDLERR_TEXT_SIZE_FAILED);
 		}
 		return EXTENT(x, y);
 	}
 
-	static void drawTextSurface(int left, int top, SDL_Surface* text_surface) {
+	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
+		return getTextSize<char, TTF_SizeText>(str);
+	}
+	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
+		return getTextSize<wchar, TTF_SizeUNICODE>(str);
+	}
+
+	template<class Tchar, SDL_Surface* SDLCALL renderFunc(TTF_Font*, const Tchar*, SDL_Color)>
+	static void drawText(int left, int top, const Tchar* str) {
+		if(*str == 0) {
+			return;
+		}
+		int argb = gCurrentUnconvertedColor;
+		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
+		SDL_Surface* text_surface = renderFunc(gFont, str, color);
 		if(!text_surface) {
 			BIG_PHAT_ERROR(SDLERR_TEXT_RENDER_FAILED);
 		}
@@ -1017,21 +1032,10 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		if(*str == 0) {
-			return;
-		}
-		int argb = gCurrentUnconvertedColor;
-		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
-		drawTextSurface(left, top, TTF_RenderText_Solid(gFont, str, color));
+		drawText<char, TTF_RenderText_Solid>(left, top, str);
 	}
-
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		if(*str == 0) {
-			return;
-		}
-		int argb = gCurrentUnconvertedColor;
-		SDL_Color color = { (Uint8)(argb >> 16), (Uint8)(argb >> 8), (Uint8)argb, 0 };
-		drawTextSurface(left, top, TTF_RenderUNICODE_Solid(gFont, str, color));
+		drawText<wchar, TTF_RenderUNICODE_Solid>(left, top, str);
 	}
 
 	SYSCALL(void, maUpdateScreen()) {

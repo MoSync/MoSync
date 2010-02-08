@@ -973,13 +973,17 @@ public
 			if(i >= count)
 				break;			
 		}
-	}	
+	}
 
 	SYSCALL(MAExtent) maGetTextSize(final String str) {
 		DEBUG_ASSERT(mGraphics != null);
 		Font font = mGraphics.getFont();
 		DEBUG_ASSERT(font != null);
 		return EXTENT(font.stringWidth(str), font.getHeight());
+	}
+
+	SYSCALL(MAExtent) maGetTextSizeW(final String str) {
+		return maGetTextSize(str);
 	}
 
 	SYSCALL(void) maDrawText(int left, int top, final String str) {

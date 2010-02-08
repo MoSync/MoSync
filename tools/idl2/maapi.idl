@@ -302,10 +302,16 @@ interface MAAPI {
 	* \param count The count of vertices in the fan. Must be at least 3.
 	*/
 	void maFillTriangleFan(in MAPoint2d points, in int count);
+
 	/**
-	* Returns the size in pixels of text as it would appear on-screen.
+	* Returns the size in pixels of Latin-1 text as it would appear on-screen.
 	*/
 	MAExtent maGetTextSize(in MAString str);
+
+	/**
+	* Returns the size in pixels of Unicode text as it would appear on-screen.
+	*/
+	MAExtent maGetTextSizeW(in MAWString str);
 
 	/**
 	* Draws Latin-1 text using the current color.

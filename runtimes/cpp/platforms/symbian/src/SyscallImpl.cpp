@@ -652,6 +652,7 @@ SYSCALL(void, maFillTriangleFan(const MAPoint2d* points, int count)) {
 	//gScreenEngine.FillTriangleStripClip(points, count);
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
+
 SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 	if(*str == 0) {
 		return 0;
@@ -660,6 +661,15 @@ SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 	MAExtent ex = gScreenEngine.GetTextSizeL(*buf);
 	return ex;
 }
+SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
+	if(*str == 0) {
+		return 0;
+	}
+	TPtrC16 ptr(str);
+	MAExtent ex = gScreenEngine.GetTextSizeL(ptr);
+	return ex;
+}
+
 SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 	if(*str == 0) {
 		return;

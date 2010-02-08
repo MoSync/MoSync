@@ -1367,6 +1367,11 @@ DWORD GetScreenOrientation()
 		SIZE s = textOutput->getTextSize(str);
 		return EXTENT(s.cx, s.cy);
 	}
+
+	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
+		DEBIG_PHAT_ERROR;
+	}
+
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 		gSyscall->ValidatedStrLen(str);
 		textOutput->drawText(currentDrawSurface, left, top, str, realColor);
@@ -1377,8 +1382,8 @@ DWORD GetScreenOrientation()
 		BITMAPINFO bmi;
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth       =  (int)FONT_BITMAP_WIDTH;
-		bmi.bmiHeader.biHeight      = -(int)FONT_BITMAP_HEIGHT;
+		bmi.bmiHeader.biWidth       =  (int)currentDrawSurface->width;
+		bmi.bmiHeader.biHeight      = -(int)currentDrawSurface->height;
 		bmi.bmiHeader.biPlanes      = 1;
 		bmi.bmiHeader.biCompression = BI_RGB;
 		bmi.bmiHeader.biBitCount    = 32;
@@ -1386,7 +1391,7 @@ DWORD GetScreenOrientation()
 		HANDLE hFont = (HFONT)GetStockObject(SYSTEM_FONT);
 		GLE(hFont);
 
-		HDC dc = GetDC(NULL):
+		HDC dc = GetDC(NULL);
 		HDC cdc = CreateCompatibleDC(dc);
 		GLE(cdc);
 		ReleaseDC(NULL, dc);
@@ -1398,11 +1403,11 @@ DWORD GetScreenOrientation()
 		SelectObject(cdc, hFont);
 		SelectObject(cdc, hbmBitmap);
 		RECT rect;
-		rect.left = x;
-		rect.top = y;
+		rect.left = 0;
+		rect.top = 0;
 		rect.right = currentDrawSurface->width;
 		rect.bottom = currentDrawSurface->height;
-		GLE(DrawTextW(cdc, str, -1, &rect, DT_TOP|DT_LEFT|DT_SINGLELINE));
+		GLE(DrawTextW(cdc, (LPCWSTR)str, -1, &rect, DT_TOP|DT_LEFT|DT_SINGLELINE));
 
 		//copy text to framebuffer
 		DEBIG_PHAT_ERROR;
