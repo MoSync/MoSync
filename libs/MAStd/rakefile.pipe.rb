@@ -20,6 +20,7 @@ SPECIFIC_CFLAGS = {
 	"intrinsics.c" => " -Wno-missing-declarations",
 	"madmath.c" => " -Wno-missing-declarations",
 	"mavsprintf.c" => " -Wno-float-equal",
+	"mawvsprintf.c" => " -Wno-float-equal",
 	"strtod.c" => " -Wno-float-equal",
 	"e_log.c" => " -Wno-float-equal",
 	"s_atan.c" => " -fno-strict-aliasing",
