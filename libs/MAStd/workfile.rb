@@ -40,6 +40,7 @@ mod.class_eval do
 			# broken compiler
 			native_specflags["mastdlib.c"] = " -Wno-unreachable-code"
 			native_specflags["mastring.c"] = " -Wno-unreachable-code"
+			native_specflags["mawstring.c"] = " -Wno-unreachable-code"
 			native_specflags["mavsprintf.c"] = " -Wno-unreachable-code"
 			native_specflags["mawvsprintf.c"] = " -Wno-unreachable-code"
 		else
