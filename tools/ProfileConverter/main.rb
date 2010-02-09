@@ -261,6 +261,11 @@ db.execute( "select name from vendor" ) do |vendor|
 		"INNER JOIN platform ON platformversion.platform = platform.id " <<
 		"WHERE vendor.id=device.vendor AND vendor.name=\"#{vendor}\"") do |device|
 		
+		# if the runtime support isn't implemented we just go to the next device.
+		if(!runtimes[device[2].to_sym]) 
+			next
+		end
+
 		rt_obj = Runtime.new(device[2].to_s)
 		seen_defines = []
 		device_path = "#{VENDOR_DIR}/#{vendor}/#{device[1]}"
