@@ -57,7 +57,7 @@ LabelScreen::~LabelScreen() {
 	delete mainLayout;
 }
 
-void LabelScreen::keyPressEvent(int keyCode) {
+void LabelScreen::keyPressEvent(int keyCode, int nativeCode) {
 	switch(keyCode) {
 			case MAK_SOFTRIGHT:
 				previous->show();

@@ -8,11 +8,11 @@ public:
 		// todo: initialize
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		// todo: handle key presses
 	}
 
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 		// todo: handle key releases
 	}
 };

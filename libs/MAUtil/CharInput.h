@@ -190,10 +190,10 @@ public:
 	void removeCharInputListener(CharInputListener *listener);
 
 	/** Inherited function from class Keylistener, updates the system. */
-	virtual void keyPressEvent(int keyCode);
+	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/** Inherited function from class Keylistener, updates the system. */
-	virtual void keyReleaseEvent(int keyCode);
+	virtual void keyReleaseEvent(int keyCode, int nativeCode);
 
 	/** Inherited function from class TimerListener, updates the system. */
 	void runTimerEvent();

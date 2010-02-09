@@ -58,7 +58,7 @@ namespace HelloMap
 	}
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::keyPressEvent( int keyCode )
+	void HelloMapScreen::keyPressEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		switch( keyCode )
@@ -76,7 +76,7 @@ namespace HelloMap
 	}
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::keyReleaseEvent( int keyCode )
+	void HelloMapScreen::keyReleaseEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		(void)mMap->handleKeyRelease( keyCode );

@@ -45,11 +45,11 @@ namespace MAUI {
 		/** keylistener implementation to overload when inheriting 
 		  * your own screens.
 		  **/
-		virtual void keyPressEvent(int keyCode) {}
+		virtual void keyPressEvent(int keyCode, int nativeCode) {}
 		/** keylistener implementation to overload when inheriting 
 		  * your own screens.
 		  **/
-		virtual void keyReleaseEvent(int keyCode) {}
+		virtual void keyReleaseEvent(int keyCode, int nativeCode) {}
 		/** pointerlistener implementation to overload when inheriting 
 		  * your own screens.
 		  **/

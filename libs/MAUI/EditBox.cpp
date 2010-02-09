@@ -262,7 +262,7 @@ namespace MAUI {
 		}
 	}
 
-	void EditBox::keyPressEvent(int keyCode) {
+	void EditBox::keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 			case MAK_LEFT:
 				if(moveCursorHorizontal(-1)==false) return;
@@ -291,7 +291,7 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	void EditBox::keyReleaseEvent(int keyCode) {
+	void EditBox::keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
 	int currentIndex;

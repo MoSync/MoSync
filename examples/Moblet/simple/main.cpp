@@ -57,7 +57,7 @@ public:
 	 * by printing out which key it was.
 	**/
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 			case MAK_LEFT:
 				printf("Pressed left");
@@ -74,7 +74,7 @@ public:
 			case MAK_0:
 				maExit(0);
 			default:
-				printf("Presscode %i\n", keyCode);
+				printf("Presscode %i/&i\n", keyCode, nativeCode);
 				break;
 		}
 	}
@@ -86,7 +86,7 @@ public:
 	 * of managing state in Moblets using member variables.
     **/
 
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 		printf("%d keys have been released\n", ++numKeyReleases);
 	}
 

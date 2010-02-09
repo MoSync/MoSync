@@ -70,14 +70,14 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
-	void ModalScreen::keyPressEvent( int keyCode )
+	void ModalScreen::keyPressEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		(void)handleKeyPress( keyCode );
 	}
 
 	//-------------------------------------------------------------------------
-	void ModalScreen::keyReleaseEvent( int keyCode )
+	void ModalScreen::keyReleaseEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		(void)handleKeyRelease( keyCode );

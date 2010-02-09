@@ -84,7 +84,7 @@ private:
 		}
 	}
 
-	virtual void keyPressEvent(int keyCode) {
+	virtual void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 		case MAK_0:
 			close();

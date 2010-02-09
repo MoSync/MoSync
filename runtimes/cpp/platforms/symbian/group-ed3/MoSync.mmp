@@ -29,4 +29,5 @@ LIBRARY ecom.lib
 LIBRARY etel3rdparty.lib
 LIBRARY mmfstandardcustomcommands.lib
 LIBRARY sendas2.lib
-
+LIBRARY RemConCoreApi.lib
+LIBRARY remconinterfacebase.lib

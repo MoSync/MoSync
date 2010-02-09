@@ -62,7 +62,7 @@ public:
 		printf("connReadFinished %i\n", result);
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
 	}

@@ -45,7 +45,7 @@ public:
 	 * Recieves key presses and performs appropriate interaction
 	 * with the UI.
 	 */
-	void keyPressEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
 	/**
 	 * Implementation of a \a WidgetListener callback, which
 	 * is notified whenever the selection state of a \a widget

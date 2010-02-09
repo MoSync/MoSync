@@ -132,7 +132,7 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
-	void AppScreenBase::keyPressEvent( int keyCode )
+	void AppScreenBase::keyPressEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		(void)handleKeyPress( keyCode );
@@ -149,7 +149,7 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
-	void AppScreenBase::keyReleaseEvent( int keyCode )
+	void AppScreenBase::keyReleaseEvent( int keyCode, int nativeCode )
 	//-------------------------------------------------------------------------
 	{
 		if ( mKeyTimer != NULL ) 

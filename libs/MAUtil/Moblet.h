@@ -51,11 +51,11 @@ namespace MAUtil {
 		/**
 		* This function is called with a \link #MAK_FIRST MAK_ code \endlink when a key is pressed.
 		*/
-		virtual void keyPressEvent(int keyCode) {}
+		virtual void keyPressEvent(int keyCode, int nativeCode) {}
 		/**
 		* This function is called with a \link #MAK_FIRST MAK_ code \endlink when a key is released.
 		*/
-		virtual void keyReleaseEvent(int keyCode) {}
+		virtual void keyReleaseEvent(int keyCode, int nativeCode) {}
 
 		/**
 		* This function is called with a coordinate when a pointer is pressed.

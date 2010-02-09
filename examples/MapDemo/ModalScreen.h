@@ -65,9 +65,9 @@ namespace MapDemoUI
 		//
 		// Screen overrides
 		//
-		void keyPressEvent( int keyCode ); // client can't override
+		void keyPressEvent( int keyCode, int nativeCode ); // client can't override
 		
-		void keyReleaseEvent( int keyCode ); // client can't override
+		void keyReleaseEvent( int keyCode, int nativeCode ); // client can't override
 		
 		virtual void show( );
 		

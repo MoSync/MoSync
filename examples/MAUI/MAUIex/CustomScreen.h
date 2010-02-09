@@ -47,7 +47,7 @@ public:
 	 * Handles key presses when this screen is active, supporting
 	 * navigating back to the previous screen.
 	 */
-	void keyPressEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
 
 private:
 	Screen *previous;

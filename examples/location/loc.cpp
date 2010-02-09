@@ -61,7 +61,7 @@ public:
 	*
 	* @param keyCode     The key code of the key that was pressed
 	*/
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
 		if(keyCode == MAK_FIRE) {

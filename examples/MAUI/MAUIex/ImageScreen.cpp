@@ -33,7 +33,7 @@ ImageScreen::ImageScreen(Screen *previous) : previous(previous) {
 ImageScreen::~ImageScreen() {
 }
 
-void ImageScreen::keyPressEvent(int keyCode) {
+void ImageScreen::keyPressEvent(int keyCode, int nativeCode) {
 	if(keyCode == MAK_SOFTRIGHT) {
 		previous->show();
 	}

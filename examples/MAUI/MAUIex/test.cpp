@@ -80,10 +80,10 @@ void MainScreen::keyPressEvent(int keyCode) {
 	}
 }
 
-void MyMoblet::keyPressEvent(int keyCode) {
+void MyMoblet::keyPressEvent(int keyCode, int nativeCode) {
 }
 
-void MyMoblet::keyReleaseEvent(int keyCode) {
+void MyMoblet::keyReleaseEvent(int keyCode, int nativeCode) {
 }
 
 void MyMoblet::closeEvent() {

@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
+// FIXME: server offline. Find another.
 
 // This particular webservice has a dictionary for the rare Manchu language.
 // We ask it for the definition of "niyalma", or 'person'.
@@ -83,14 +84,14 @@ public:
 		return c;
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 		case MAK_0:
 			maExit(0);
 		}
 	}
 
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 };
 

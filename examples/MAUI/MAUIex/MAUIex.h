@@ -41,7 +41,7 @@ class MainScreen : public Screen {
 public:
 	MainScreen();
 	~MainScreen();
-	void keyPressEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
 private:
 	Vector<Screen*> screens;
 	ListBox* listBox;
@@ -51,8 +51,8 @@ private:
 class MyMoblet : public Moblet  {
 public:
 	MyMoblet();
-	void keyPressEvent(int keyCode);
-	void keyReleaseEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
+	void keyReleaseEvent(int keyCode, int nativeCode);
 
 	void closeEvent();
 

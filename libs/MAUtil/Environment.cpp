@@ -215,20 +215,20 @@ namespace MAUtil {
 		mFocusListeners.setRunning(false);
 	}
 
-	void Environment::fireKeyPressEvent(int keyCode) {
+	void Environment::fireKeyPressEvent(int keyCode, int nativeCode) {
 		//MAASSERT(sEnvironment == this);
 
 		mKeyListeners.setRunning(true);
 		ListenerSet_each(KeyListener, i, mKeyListeners) 
-			i->keyPressEvent(keyCode);
+			i->keyPressEvent(keyCode, nativeCode);
 		mKeyListeners.setRunning(false);
 	}
 
-	void Environment::fireKeyReleaseEvent(int keyCode) {
+	void Environment::fireKeyReleaseEvent(int keyCode, int nativeCode) {
 		//MAASSERT(sEnvironment == this);
 		mKeyListeners.setRunning(true);
 		ListenerSet_each(KeyListener, i, mKeyListeners)
-			i->keyReleaseEvent(keyCode);
+			i->keyReleaseEvent(keyCode, nativeCode);
 		mKeyListeners.setRunning(false);
 	}
 

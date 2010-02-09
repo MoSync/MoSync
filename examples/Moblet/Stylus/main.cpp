@@ -69,7 +69,7 @@ public:
 		maUpdateScreen();
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_SOFTLEFT) {
 #if CONFIG_SAVE
 			segments.resize(0);
@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
 #if CONFIG_SAVE

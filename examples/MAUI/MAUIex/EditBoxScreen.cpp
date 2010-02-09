@@ -68,7 +68,7 @@ void EditBoxScreen::hide() {
 	Screen::hide();
 }
 
-void EditBoxScreen::keyPressEvent(int keyCode) {
+void EditBoxScreen::keyPressEvent(int keyCode, int nativeCode) {
 	switch(keyCode) {
 			case MAK_UP:
 				listBox->selectPreviousItem();

@@ -43,7 +43,7 @@ public:
 		draw();
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		// set the current direction
 		switch(keyCode) {
 			case MAK_LEFT:	dirx = -1;	break;
@@ -61,7 +61,7 @@ public:
 		addTimer(this, 20, -1);
 	}
 
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 		// only reset the directions if it is the current direction
 		switch(keyCode) {
 			case MAK_LEFT:	if(dirx == -1) dirx = 0; break;

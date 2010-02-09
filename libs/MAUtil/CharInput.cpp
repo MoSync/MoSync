@@ -66,11 +66,11 @@ namespace MAUtil {
 		if(charInputListeners.size()==0 && enabled) disable();
 	}
 
-	void CharInput::keyPressEvent(int keyCode) {
+	void CharInput::keyPressEvent(int keyCode, int nativeCode) {
 		CharInput_Pressed(keyCode);
 	}
 
-	void CharInput::keyReleaseEvent(int keyCode) {
+	void CharInput::keyReleaseEvent(int keyCode, int nativeCode) {
 		CharInput_Released(keyCode);
 	}
 

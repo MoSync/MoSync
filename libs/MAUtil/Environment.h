@@ -47,8 +47,8 @@ namespace MAUtil {
 	class KeyListener {
 	public:
 		virtual ~KeyListener();
-		virtual void keyPressEvent(int keyCode) = 0;
-		virtual void keyReleaseEvent(int keyCode) = 0;
+		virtual void keyPressEvent(int keyCode, int nativeCode) = 0;
+		virtual void keyReleaseEvent(int keyCode, int nativeCode) = 0;
 	};
 
 	/**
@@ -271,11 +271,11 @@ namespace MAUtil {
 		/**
 		* Calls keyPressEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
-		void fireKeyPressEvent(int keyCode);
+		void fireKeyPressEvent(int keyCode, int nativeCode);
 		/**
 		* Calls keyReleaseEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
-		void fireKeyReleaseEvent(int keyCode);
+		void fireKeyReleaseEvent(int keyCode, int nativeCode);
 		/**
 		* Calls pointerPressEvent() of all registered PointerListeners with the specified \a keyCode.
 		*/

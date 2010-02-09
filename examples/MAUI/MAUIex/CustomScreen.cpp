@@ -34,7 +34,7 @@ CustomScreen::CustomScreen(Screen *previous) : previous(previous) {
 CustomScreen::~CustomScreen() {
 }
 
-void CustomScreen::keyPressEvent(int keyCode) {
+void CustomScreen::keyPressEvent(int keyCode, int nativeCode) {
 	if(keyCode == MAK_SOFTRIGHT) {
 		previous->show();
 	}

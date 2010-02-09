@@ -50,6 +50,10 @@ void CAppUi::ConstructL( void )
 	LOGD("Created view\n");
 	iAppView->SetMopParent( this ); // allow object to be in network of object providers (see MObjectProvider)
 	AddToStackL( iAppView );        // view now gets key press events
+
+	iInterfaceSelector = CRemConInterfaceSelector::NewL();
+	iCoreTarget = CRemConCoreApiTarget::NewL(*iInterfaceSelector, *this);
+	iInterfaceSelector->OpenTargetL();
 	//DebugMarkStart();
 	LOG("Initialization complete.\n");
 }
@@ -81,6 +85,29 @@ void CAppUi::HandleCommandL( TInt aCommand )
 			Panic( EMoSyncUi );
 			break;
 	}
+}
+
+void CAppUi::MrccatoCommand(TRemConCoreApiOperationId aOperationId,
+	TRemConCoreApiButtonAction aButtonAct)
+{
+	LOGD("MrccatoCommand(%i, %i)\n", aOperationId, aButtonAct);
+	bool down = false;
+	MAEvent event;
+	event.ked.key = MAK_UNKNOWN;
+	event.ked.nativeKey = -aOperationId;
+	switch(aButtonAct) {
+	case ERemConCoreApiButtonPress: down = true; break;
+	case ERemConCoreApiButtonRelease: down = false; break;
+	case ERemConCoreApiButtonClick:	//imperfect, but with imperfect data...
+		event.type = EVENT_TYPE_KEY_PRESSED;
+		iAppView->AddEvent(event);
+		event.type = EVENT_TYPE_KEY_RELEASED;
+		iAppView->AddEvent(event);
+		return;
+	default: DEBIG_PHAT_ERROR;
+	}
+	event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
+	iAppView->AddEvent(event);
 }
 
 void CAppUi::Stop() {

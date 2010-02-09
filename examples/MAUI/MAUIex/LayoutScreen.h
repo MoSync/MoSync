@@ -27,7 +27,7 @@ class LayoutScreen : public Screen {
 public:
 	LayoutScreen(Screen *previous);
 	~LayoutScreen();
-	void keyPressEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
 
 private:
 	Screen *previous;

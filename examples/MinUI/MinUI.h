@@ -273,8 +273,8 @@ namespace MinUI {
 		MAPoint2d getOptimalSize();
 
 		//KeyListener
-		void keyPressEvent(int keyCode);
-		void keyReleaseEvent(int keyCode);
+		void keyPressEvent(int keyCode, int nativeCode);
+		void keyReleaseEvent(int keyCode, int nativeCode);
 
 	protected:
 		//Widget

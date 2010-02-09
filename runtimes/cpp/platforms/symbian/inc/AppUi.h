@@ -19,6 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define __CAPPUI_H__
 
 #include <aknappui.h>
+#ifdef __SERIES60_3X__
+#include <remconcoreapi.h>
+#include <remconcoreapitarget.h>
+#include <remconcoreapitargetobserver.h>
+#include <remconinterfaceselector.h>
+#endif
 
 #include "MoSync.pan"
 #include "config_platform.h"
@@ -30,7 +36,11 @@ namespace Core {
 	class VMCore;
 }
 
-class CAppUi : public CAknAppUi {
+class CAppUi : public CAknAppUi
+#ifdef __SERIES60_3X__
+,public MRemConCoreApiTargetObserver
+#endif
+{
 public:
 	~CAppUi();
 	void ConstructL();
@@ -53,6 +63,13 @@ private:
 	CAppView* iAppView;
 	TBool iExiting;
 	HBufC8* iBuf;
+#ifdef __SERIES60_3X__
+	CRemConInterfaceSelector* iInterfaceSelector;
+	CRemConCoreApiTarget* iCoreTarget;
+
+	void MrccatoCommand(TRemConCoreApiOperationId aOperationId,
+		TRemConCoreApiButtonAction aButtonAct);
+#endif
 };
 
 #endif // __CAPPUI_H__

@@ -137,7 +137,7 @@ public:
 	 * by printing out which key it was.
 	**/
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 #ifndef MA_PROF_SUPPORT_STYLUS
 		switch(keyCode) {
 			case MAK_FIRE:

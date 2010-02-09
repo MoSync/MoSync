@@ -40,8 +40,8 @@ namespace HelloMap
 		//
 		// Screen overrides
 		//
-		void keyPressEvent( int keyCode );
-		void keyReleaseEvent( int keyCode );
+		void keyPressEvent( int keyCode, int nativeCode );
+		void keyReleaseEvent( int keyCode, int nativeCode );
 		//
 		// PointerListener overrides
 		//

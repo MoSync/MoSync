@@ -22,7 +22,7 @@ class LabelScreen : public Screen {
 public:
 	LabelScreen(Screen *previous);
 	~LabelScreen();
-	void keyPressEvent(int keyCode) ;
+	void keyPressEvent(int keyCode, int nativeCode);
 private:
 	Screen *previous;
 	ListBox *listBox;

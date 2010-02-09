@@ -29,16 +29,16 @@ public:
 		printf("Hello World!\n");
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
-		printf("k: %i\n", keyCode);
+		printf("p: %i/%i\n", keyCode, nativeCode);
 	}
 
-	void customEvent(const MAEvent& event) {
-		if(event.type == EVENT_TYPE_NATIVE_KEY_PRESSED) {
-			printf("nk: %i\n", event.key);
-		}
+	void keyReleaseEvent(int keyCode, int nativeCode) {
+		if(keyCode == MAK_0)
+			maExit(0);
+		printf("r: %i/%i\n", keyCode, nativeCode);
 	}
 };
 

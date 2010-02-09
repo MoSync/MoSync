@@ -85,10 +85,10 @@ namespace MAUtil {
 						moblet->fireFocusLostEvent();
 						break;
 					case EVENT_TYPE_KEY_PRESSED:
-						moblet->fireKeyPressEvent(event.key);
+						moblet->fireKeyPressEvent(event.key, event.nativeKey);
 						break;
 					case EVENT_TYPE_KEY_RELEASED:
-						moblet->fireKeyReleaseEvent(event.key);
+						moblet->fireKeyReleaseEvent(event.key, event.nativeKey);
 						break;
 					case EVENT_TYPE_POINTER_PRESSED:
 						moblet->firePointerPressEvent(event.point);

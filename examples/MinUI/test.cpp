@@ -52,11 +52,11 @@ public:
 	virtual ~MyView() {}
 
 	//View
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
 	}
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 private:
 	GridLayout mLayout;
@@ -91,13 +91,13 @@ public:
 	virtual ~CompleteView() {}
 
 	//View
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
 		if(keyCode == MAK_FIRE)
 			mList.draw();
 	}
-	void keyReleaseEvent(int keyCode) {
+	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
 	//HyperlinkListener

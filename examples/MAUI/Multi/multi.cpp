@@ -107,7 +107,7 @@ public:
 		delete mFont;
 	}
 
-	void keyPressEvent(int keyCode) {
+	void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 		case MAK_0:
 			maExit(0);

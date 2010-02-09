@@ -106,9 +106,9 @@ namespace MAUI {
 		bool isActive() const;
 	
 		/** Implementation of the KeyListener interface, updating the content **/
-		void keyPressEvent(int keyCode);
+		void keyPressEvent(int keyCode, int nativeCode);
 		/** Implementation of the KeyListener interface, updating the content **/
-		void keyReleaseEvent(int keyCode);
+		void keyReleaseEvent(int keyCode, int nativeCode);
 		/** Implementation of the CharInputListener interface function **/
 		void characterChanged(char c);
 		/** Implementation of the CharInputListener interface function **/

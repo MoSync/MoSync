@@ -31,7 +31,7 @@ class ImageScreen : public Screen {
 public:
 	ImageScreen(Screen *previous);
 	~ImageScreen();
-	void keyPressEvent(int keyCode);
+	void keyPressEvent(int keyCode, int nativeCode);
 
 private:
 	Screen *previous;

@@ -38,7 +38,7 @@ LayoutScreen::LayoutScreen(Screen *previous) : previous(previous) {
 
 LayoutScreen::~LayoutScreen() {}
 
-void LayoutScreen::keyPressEvent(int keyCode) {
+void LayoutScreen::keyPressEvent(int keyCode, int nativeCode) {
 	if(keyCode == MAK_SOFTRIGHT) {
 		previous->show();
 	}

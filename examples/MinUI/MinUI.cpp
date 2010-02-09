@@ -607,7 +607,7 @@ namespace MinUI {
 		return true;
 	}
 
-	void Textbox::keyPressEvent(int keyCode) {
+	void Textbox::keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 			case MAK_LEFT:
 				if(moveCursorHorizontal(-1)==false)
