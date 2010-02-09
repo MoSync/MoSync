@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "HelloMapScreen.h"
 #include "MAHeaders.h"
+#include <mastdlib.h>
 
 namespace HelloMap
 {
@@ -71,6 +72,7 @@ namespace HelloMap
 		}
 		
 		(void)mMap->handleKeyPress( keyCode );
+
 	}
 
 	//-------------------------------------------------------------------------
@@ -79,6 +81,63 @@ namespace HelloMap
 	{
 		(void)mMap->handleKeyRelease( keyCode );
 	}
+
+
+
+	bool scrolling = false;
+	int prevX;
+	int prevY;
+
+	int lastPointerPress = -1;
+
+	//-------------------------------------------------------------------------
+	void HelloMapScreen::pointerPressEvent(MAPoint2d p)
+	//-------------------------------------------------------------------------
+	{
+		prevX = p.x;
+		prevY = p.y;
+
+		int curTime = maGetMilliSecondCount();
+		int deltaTime = curTime - lastPointerPress;
+
+		if(deltaTime < 200) {
+			maExit(0);
+		} else {
+			lastPointerPress = curTime;
+		}
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloMapScreen::pointerMoveEvent(MAPoint2d p)
+	//-------------------------------------------------------------------------
+	{
+		if(scrolling) return;
+		int dx = p.x - prevX;
+		int dy = p.y - prevY;
+
+		if(abs(dx) > abs(dy)) {
+			// mostly moving horizontally
+			if(dx < 0)
+				mMap->scroll(SCROLLDIRECTION_EAST, false);
+			else
+				mMap->scroll(SCROLLDIRECTION_WEST, false);
+		} else {
+			// mostly moving vertically
+			if(dy < 0)
+				mMap->scroll(SCROLLDIRECTION_SOUTH, false);
+			else
+				mMap->scroll(SCROLLDIRECTION_NORTH, false);
+
+		}
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloMapScreen::pointerReleaseEvent(MAPoint2d p)
+	//-------------------------------------------------------------------------
+	{
+		scrolling = false;
+	}
+
 
 	//-------------------------------------------------------------------------
 	void HelloMapScreen::nextMapSource( )
