@@ -244,7 +244,7 @@ definitions = {}
 db.execute( "select name from vendor" ) do |vendor|
 	# fix to exclude a lot of entries which is not real devices
 	vendor = vendor[0]
-	if (vendor.eql?("Generic") || vendor.eql?("Native"))
+	if (vendor.eql?("Generic") || vendor.eql?("Native") || vendor.eql?("BlackBerry"))
 		next
 	end
 	
