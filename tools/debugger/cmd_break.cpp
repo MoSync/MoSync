@@ -164,7 +164,10 @@ static int mapFunctionBreakpoint(const char* name) {
 }
 
 static bool parseLocation(string& location, vector<int>& addresses) {
-	int ret;
+	int ret = 0;
+
+	addresses.clear();
+
 	_ASSERT(location.size() != 0);
 	if(location[0] == '*') {	//hex address
 		bool okFormat = false;
@@ -236,7 +239,6 @@ static bool parseLocation(string& location, vector<int>& addresses) {
 	}
 
 	if(ret < 0) {
-		error("Address not found");
 		return false;
 	}
 	return true;

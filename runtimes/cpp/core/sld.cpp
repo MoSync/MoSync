@@ -394,7 +394,13 @@ int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	
 	AddressSet::const_iterator itr = gAddressSet.lower_bound(lm);
 
+	addresses.clear();
+
 	set<int> foundFunctions;
+
+	// find first valid line
+	while(itr->file==fileIndex && itr->line<lineNumber) itr++;
+	lineNumber = itr->line;
 
 	while(itr->file==fileIndex && itr->line==lineNumber && itr!=gAddressSet.end()) {
 		const FuncMapping* fm = mapFunctionEx(itr->ip);
