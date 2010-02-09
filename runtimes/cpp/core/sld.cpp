@@ -399,10 +399,16 @@ int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	set<int> foundFunctions;
 
 	// find first valid line
-	while(itr->file==fileIndex && itr->line<lineNumber) itr++;
+	while(itr!=gAddressSet.end() && itr->file==fileIndex && itr->line<lineNumber) { 
+		itr++;
+	}
+	if(itr==gAddressSet.end()) {
+		return ERR_NOLINE;
+	}
+
 	lineNumber = itr->line;
 
-	while(itr->file==fileIndex && itr->line==lineNumber && itr!=gAddressSet.end()) {
+	while(itr!=gAddressSet.end() && itr->file==fileIndex && itr->line==lineNumber) {
 		const FuncMapping* fm = mapFunctionEx(itr->ip);
 		if(foundFunctions.find(fm->start) == foundFunctions.end()) {
 			addresses.push_back(itr->ip);
