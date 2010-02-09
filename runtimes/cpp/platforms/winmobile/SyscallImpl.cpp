@@ -539,6 +539,7 @@ DWORD GetScreenOrientation()
 			return 0;
 
 		case WM_KEYUP:
+			if(wParam == VK_F24) break;
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_RELEASED);
 			return 0;
 		

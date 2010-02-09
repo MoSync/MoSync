@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 std::vector<std::string> inFiles;
 
-#define MAX_DATA_SIZE 16384*1024
+#define MAX_DATA_SIZE 65536*1024
 unsigned char fileData[MAX_DATA_SIZE];
 int fileDataPtr = 0;
 int startOfData = 0;

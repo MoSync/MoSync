@@ -267,9 +267,11 @@ static bool parsePSym(Tuple t, char* text) {
 
 	char* type = colon + 1;
 	switch(*type) {
+	case 'v':
 	case 'p':	//on the stack?
 		p->offset = t.b;
 		break;
+	case 'R':
 	case 'P':
 		//break;
 	default:
