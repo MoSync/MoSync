@@ -81,22 +81,22 @@ else
 end
 
 if(HOST == :win32)
-	host_flags = " -DWIN32"
-	host_cpp_flags = ""
+	@HOST_FLAGS = " -DWIN32"
+	@HOST_CPP_FLAGS = ""
 elsif(HOST == :linux)
-	host_flags = " -DLINUX"
-	host_cpp_flags = " -fPIC"
+	@HOST_FLAGS = " -DLINUX"
+	@HOST_CPP_FLAGS = " -fPIC"
 else
 	error "Unsupported host: #{HOST}"
 end
 
 
-flags_base = config_flags + host_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
+flags_base = config_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
 	pedantic_warnings + version_warnings
 
 cflags_base = flags_base + lesser_conly + pendantic_c_warnings
 
-cppflags_base = cpp_flags + " -fno-rtti" + host_cpp_flags + flags_base
+cppflags_base = cpp_flags + " -fno-rtti" + flags_base
 # -Wno-deprecated
 
 @CFLAGS = cflags_base + @EXTRA_CFLAGS

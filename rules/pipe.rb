@@ -36,6 +36,8 @@ end
 class PipeGccWork < GccWork
 	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
 	def gccmode; "-S"; end
+	def host_flags; ""; end
+	def host_cppflags; ""; end
 	
 	def set_defaults
 		@BUILDDIR_BASE = "build/pipe/"

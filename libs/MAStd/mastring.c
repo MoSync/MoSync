@@ -571,6 +571,13 @@ char *strset(char *s, int c)
 	return start;
 }
 
+size_t strnlen(const char *s, size_t count)
+{
+	const char *sc;
+	for (sc = s; *sc != '\0' && count--; ++sc);
+	return sc - s;
+}
+
 
 #endif		/* _WIN32 */
 

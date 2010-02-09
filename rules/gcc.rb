@@ -117,9 +117,9 @@ class GccWork < BuildWork
 	
 	def setup2
 		define_cflags
-		@CFLAGS_MAP = { ".c" => @CFLAGS,
-			".cpp" => @CPPFLAGS,
-			".cc" => @CPPFLAGS }
+		@CFLAGS_MAP = { ".c" => @CFLAGS + host_flags,
+			".cpp" => @CPPFLAGS + host_flags + host_cppflags,
+			".cc" => @CPPFLAGS + host_flags + host_cppflags }
 		
 		#find source files
 		cfiles = collect_files(".c")

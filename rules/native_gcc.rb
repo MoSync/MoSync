@@ -21,4 +21,6 @@ class NativeGccWork < GccWork
 	def gcc; "gcc"; end
 	def gccmode; "-c"; end
 	def object_ending; ".o"; end
+	def host_flags; @HOST_FLAGS; end
+	def host_cppflags; @HOST_CPPFLAGS; end
 end

@@ -17,6 +17,7 @@ mod.class_eval do
 	def setup_pipe
 		setup_base
 		@SOURCES = [".", "../libsupc++"]
+		@EXTRA_INCLUDES = []
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags
 		
@@ -40,13 +41,16 @@ mod.class_eval do
 			native_specflags["mastdlib.c"] = " -Wno-unreachable-code"
 			native_specflags["mastring.c"] = " -Wno-unreachable-code"
 			native_specflags["mavsprintf.c"] = " -Wno-unreachable-code"
+			native_specflags["mawvsprintf.c"] = " -Wno-unreachable-code"
 		else
 			pipe_specflags = {}
 		end
 		
 		@native_specific_cflags = {
 			"madmath.c" => " -Wno-missing-declarations",
-			"mavsprintf.c" => " -Wno-float-equal"}.merge(native_specflags, &HashMergeAdd)
+			"mavsprintf.c" => " -Wno-float-equal",
+			"mawvsprintf.c" => " -Wno-float-equal",
+			}.merge(native_specflags, &HashMergeAdd)
 		
 		@pipe_specific_cflags = @native_specific_cflags.merge({
 			"intrinsics.c" => " -Wno-missing-prototypes -Wno-missing-declarations",

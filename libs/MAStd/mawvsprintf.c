@@ -33,9 +33,10 @@
 
 //#include <sys/types.h>
 #include "maarg.h"
-#include "mastring.h"
 #include "mawstring.h"
-#include "conprint.h"
+#include "mastring.h"
+#include "mawvsprintf.h"
+//#include "conprint.h"
 #include "madmath.h"
 
 #ifdef MAPIP
@@ -51,11 +52,11 @@
 
 #define CVTBUFSIZE 80
 
-static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int eflag)
+static wchar *cvt(double arg, int ndigits, int *decpt, int *sign, wchar *buf, int eflag)
 {
   int r2;
   double fi, fj;
-  char *p, *p1;
+  wchar *p, *p1;
 
   if (ndigits < 0) ndigits = 0;
   if (ndigits >= CVTBUFSIZE - 1) ndigits = CVTBUFSIZE - 2;
@@ -135,25 +136,13 @@ static char *cvt(double arg, int ndigits, int *decpt, int *sign, char *buf, int 
   return buf;
 }
 
-/*
-char *ecvt(double arg, int ndigits, int *decpt, int *sign)
-{
-  return cvt(arg, ndigits, decpt, sign, gettib()->cvtbuf, 1);
-}
-*/
-static char *ecvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf)
+
+static wchar *ecvtbuf(double arg, int ndigits, int *decpt, int *sign, wchar *buf)
 {
   return cvt(arg, ndigits, decpt, sign, buf, 1);
 }
 
-/*
-char *fcvt(double arg, int ndigits, int *decpt, int *sign)
-{
-  return cvt(arg, ndigits, decpt, sign, gettib()->cvtbuf, 0);
-}
-*/
-
-static char *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf)
+static wchar *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, wchar *buf)
 {
   return cvt(arg, ndigits, decpt, sign, buf, 0);
 }
@@ -177,20 +166,20 @@ static char *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf)
 
 #define is_digit(c) ((c) >= '0' && (c) <= '9')
 
-static const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
-static const char *upper_digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static const wchar *digits = L"0123456789abcdefghijklmnopqrstuvwxyz";
+static const wchar *upper_digits = L"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-static int skip_atoi(const char **s)
+static int skip_atoi(const wchar **s)
 {
   int i = 0;
   while (is_digit(**s)) i = i*10 + *((*s)++) - '0';
   return i;
 }
 
-static char *number(char *str, long num, int base, int size, int precision, int type)
+static wchar *number(wchar *str, long num, int base, int size, int precision, int type)
 {
-  char c, sign, tmp[66];
-  const char *dig = digits;
+  wchar c, sign, tmp[66];
+  const wchar *dig = digits;
   int i;
 
   if (type & LARGE)  dig = upper_digits;
@@ -264,10 +253,10 @@ static char *number(char *str, long num, int base, int size, int precision, int 
   return str;
 }
 
-static char *eaddr(char *str, unsigned char *addr, int size, int type)
+static wchar *eaddr(wchar *str, wchar *addr, int size, int type)
 {
-  char tmp[24];
-  const char *dig = digits;
+  wchar tmp[24];
+  const wchar *dig = digits;
   int i, len;
 
   if (type & LARGE)  dig = upper_digits;
@@ -286,9 +275,9 @@ static char *eaddr(char *str, unsigned char *addr, int size, int type)
   return str;
 }
 
-static char *iaddr(char *str, unsigned char *addr, int size, int type)
+static wchar *iaddr(wchar *str, wchar *addr, int size, int type)
 {
-  char tmp[24];
+  wchar tmp[24];
   int i, n, len;
 
   len = 0;
@@ -327,14 +316,14 @@ static char *iaddr(char *str, unsigned char *addr, int size, int type)
 
 #ifndef NOFLOAT
 
-char *ecvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf);
-char *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, char *buf);
+wchar *ecvtbuf(double arg, int ndigits, int *decpt, int *sign, wchar *buf);
+wchar *fcvtbuf(double arg, int ndigits, int *decpt, int *sign, wchar *buf);
 
-static void cfltcvt(double value, char *buffer, char fmt, int precision)
+static void cfltcvt(double value, wchar *buffer, wchar fmt, int precision)
 {
   int decpt, sign, exp, pos;
-  char *dig = NULL;
-  char cvtbuf[80];
+  wchar *dig = NULL;
+  wchar cvtbuf[80];
   int capexp = 0;
   int magnitude;
 
@@ -437,7 +426,7 @@ static void cfltcvt(double value, char *buffer, char fmt, int precision)
   *buffer = '\0';
 }
 
-static void forcdecpt(char *buffer)
+static void forcdecpt(wchar *buffer)
 {
   while (*buffer)
   {
@@ -448,7 +437,7 @@ static void forcdecpt(char *buffer)
 
   if (*buffer)
   {
-    int n = strlen(buffer);
+    int n = wstrlen(buffer);
     while (n > 0) 
     {
       buffer[n + 1] = buffer[n];
@@ -464,9 +453,9 @@ static void forcdecpt(char *buffer)
   }
 }
 
-static void cropzeros(char *buffer)
+static void cropzeros(wchar *buffer)
 {
-  char *stop;
+  wchar *stop;
 
   while (*buffer && *buffer != '.') buffer++;
   if (*buffer++)
@@ -479,16 +468,16 @@ static void cropzeros(char *buffer)
   }
 }
 
-static char *flt(char *str, double num, int size, int precision, char fmt, int flags)
+static wchar *flt(wchar *str, double num, int size, int precision, wchar fmt, int flags)
 {
-  char tmp[80];
-  char c, sign;
+  wchar tmp[80];
+  wchar c, sign;
   int n, i;
 
   // Left align means no zero padding
   if (flags & LEFT) flags &= ~ZEROPAD;
 
-  // Determine padding and sign char
+  // Determine padding and sign wchar
   c = (flags & ZEROPAD) ? '0' : ' ';
   sign = 0;
   if (flags & SIGN)
@@ -526,7 +515,7 @@ static char *flt(char *str, double num, int size, int precision, char fmt, int f
   // 'g' format means crop zero unless '#' given
   if (fmt == 'g' && !(flags & SPECIAL)) cropzeros(tmp);
 
-  n = strlen(tmp);
+  n = wstrlen(tmp);
 
   // Output number with alignment and padding
   size -= n;
@@ -540,14 +529,14 @@ static char *flt(char *str, double num, int size, int precision, char fmt, int f
 }
 #endif
 
-int vsprintf(char *buf, const char *fmt, va_list args)
+int wvsprintf(wchar *buf, const wchar *fmt, va_list args)
 {
   int len;
   unsigned long num;
   int i, base;
-  char *str;
-  const char *s;
-	const wchar* S;
+  wchar *str;
+  const wchar *s;
+	const char* S;
 
   int flags;            // Flags to number()
 
@@ -624,25 +613,25 @@ repeat:
     {
       case 'c':
         if (!(flags & LEFT)) while (--field_width > 0) *str++ = ' ';
-        *str++ = (unsigned char) va_arg(args, int);
+        *str++ = (wchar) va_arg(args, int);
         while (--field_width > 0) *str++ = ' ';
         continue;
 
       case 's':
-        s = va_arg(args, char *);
-        if (!s) s = "<NULL>";
-        len = strnlen(s, precision);
+        s = va_arg(args, wchar *);
+        if (!s) s = L"<NULL>";
+        len = wstrnlen(s, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
         while (len < field_width--) *str++ = ' ';
         continue;
 
-      case 'S':	//Unicode string
-        S = va_arg(args, wchar *);
-        if (!S) S = L"<NULL>";
-        len = wstrnlen(S, precision);
+      case 'S':	//latin-1 string
+        S = va_arg(args, char *);
+        if (!S) S = "<NULL>";
+        len = strnlen(S, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
-        for (i = 0; i < len; ++i) *str++ = (char)*S++;
+        for (i = 0; i < len; ++i) *str++ = *S++;
         while (len < field_width--) *str++ = ' ';
         continue;
 
@@ -673,9 +662,9 @@ repeat:
 
       case 'a':
         if (qualifier == 'l')
-          str = eaddr(str, va_arg(args, unsigned char *), field_width, flags);
+          str = eaddr(str, va_arg(args, wchar *), field_width, flags);
         else
-          str = iaddr(str, va_arg(args, unsigned char *), field_width, flags);
+          str = iaddr(str, va_arg(args, wchar *), field_width, flags);
         continue;
 
       // Integer number formats - set up the flags and "break"
@@ -742,13 +731,13 @@ repeat:
   return str - buf;
 }
 
-int sprintf(char *buf, const char *fmt, ...)
+int wsprintf(wchar *buf, const wchar *fmt, ...)
 {
   va_list args;
   int n;
 
   va_start(args, fmt);
-  n = vsprintf(buf, fmt, args);
+  n = wvsprintf(buf, fmt, args);
   va_end(args);
 
   return n;
@@ -756,10 +745,10 @@ int sprintf(char *buf, const char *fmt, ...)
 #endif	//MAPIP
 
 
-int lprintfln(const char* fmt, ...)
+int wlprintfln(const wchar* fmt, ...)
 {
 	va_list args;
-	char buf[2048];
+	wchar buf[2048];
 	int len;
 	static int lastWLres = 0;
 	
@@ -769,7 +758,7 @@ int lprintfln(const char* fmt, ...)
 	buf[0] = 0;
 
 	va_start(args, fmt);
-	len = vsprintf(buf, fmt, args);
+	len = wvsprintf(buf, fmt, args);
 	if(len > (int)sizeof(buf) - 2) {
 		maPanic(0, "lprintfln buffer overrun!");
 	}
@@ -779,6 +768,6 @@ int lprintfln(const char* fmt, ...)
 		buf[len++] = '\n';
 		buf[len] = 0;
 	}
-	lastWLres = maWriteLog(buf, len);
+	lastWLres = maWriteLog(buf, len*sizeof(wchar));
 	return len;
 }
