@@ -31,10 +31,10 @@ namespace MapDemoUI
 	SoftKeyBar::SoftKeyBar(  int x, int y, int width, int height, Widget* parent )
 	//-------------------------------------------------------------------------
 		: Layout( x, y, width, height, parent, 2, 1 ),
-		mLeftAction( NULL ),
-		mRightAction( NULL ),
 		mLeftLabel( NULL ),
-		mRightLabel( NULL )
+		mRightLabel( NULL ),
+		mLeftAction( NULL ),
+		mRightAction( NULL )
 	{
 		mLeftAction = NULL;
 		mRightAction = NULL;

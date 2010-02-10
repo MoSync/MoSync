@@ -35,10 +35,10 @@ namespace MapDemoUI
 	//-------------------------------------------------------------------------
 	Menu::Menu( IActionSource* source ) :
 	//-------------------------------------------------------------------------
-		mCurrent( 0 ),
 		mFrame( NULL ),
 		mListBox( NULL ),
-		mSoftKeys( NULL )
+		mSoftKeys( NULL ),
+		mCurrent( 0 )
 	{
 		Vector<Action*> actions = Vector<Action*>( );
 		source->enumerateActions( actions );

@@ -54,7 +54,6 @@ namespace MapDemo
 		mMap->setMagnification( 10 );
 		mMap->exitMapUpdateScope( true );
 		mMapSourceKind = MapSourceKind_OpenStreetMap;
-		MapSourceMgr* mgr = MapSourceMgr::get( );
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 
 		setClientWidget( mMap );
@@ -101,7 +100,6 @@ namespace MapDemo
 	void MapDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		MapSourceMgr* mgr = MapSourceMgr::get( );
 		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
 		if( newKind >= MapSourceKind_Last )
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );

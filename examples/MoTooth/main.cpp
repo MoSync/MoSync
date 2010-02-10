@@ -61,6 +61,7 @@ int myGetProcessedEvent(int type, MAEvent* event) {
 	return 0;
 }
 
+extern "C" int MAMain() GCCATTRIB(noreturn);
 extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 1;

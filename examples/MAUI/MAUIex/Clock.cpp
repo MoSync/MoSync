@@ -173,10 +173,8 @@ namespace MAUI {
 		switch(timeType) {
 		case LOCAL:
 			return maLocalTime();
-			break;
 		case UTC:
 			return maTime();
-			break;
 		default:
 			return 0;
 		}

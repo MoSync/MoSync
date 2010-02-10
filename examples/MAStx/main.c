@@ -27,7 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <maassert.h>
 
-int MAMain() {
+int MAMain(void) GCCATTRIB(noreturn);
+int MAMain(void) {
 	InitConsole();
 
 	//These are declared extern in conprint.h.
@@ -91,5 +92,4 @@ int MAMain() {
 	}
 	printf("We're done.\n");
 	FREEZE;
-	return 0;
 }

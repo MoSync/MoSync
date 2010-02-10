@@ -61,11 +61,11 @@ namespace MapDemoUI
 	AppScreenBase::AppScreenBase( MobletEx* moblet ) :
 	//-------------------------------------------------------------------------
 		mMoblet( moblet ),
-		mMessagePosted( false ),
-		mKeyTimer( NULL ),
-		mContentFrame( NULL ),
 		mSoftKeyBar( NULL ),
-		mAppFrame( NULL )
+		mContentFrame( NULL ),
+		mAppFrame( NULL ),
+		mMessagePosted( false ),
+		mKeyTimer( NULL )
 	{
 		//
 		// Screen size

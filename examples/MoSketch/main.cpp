@@ -237,6 +237,7 @@ int getKeys() {
 	return currentKeyState;
 }
 
+extern "C" int MAMain() GCCATTRIB(noreturn);
 extern "C" int MAMain() {
 	//init
 	int screenSize = maGetScrSize();
@@ -343,7 +344,6 @@ extern "C" int MAMain() {
 			gOldD = gD;
 		}
 	}
-	return 0;
 }
 
 void doMenu() {

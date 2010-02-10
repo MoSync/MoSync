@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <mavsprintf.h>
 
-int MAMain() {
+int MAMain(void) {
 	int i;
 
 	//Logging print, Formatted, with end of LiNe.

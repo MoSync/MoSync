@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="idl-common"
 	ProjectGUID="{A61A15F9-7412-44AA-B2C8-8A3CACAAC588}"
 	RootNamespace="idlcommon"

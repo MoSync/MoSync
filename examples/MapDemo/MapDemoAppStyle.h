@@ -49,8 +49,8 @@ namespace MapDemo
 		WidgetSkin* mButtonSkin;
 		Font* mFontSmallestBoldBlack;
 		Font* mFontSmallestBoldWhite;
-		Font* mFontSmallestWhite;
 		Font* mFontSmallestBlack;
+		Font* mFontSmallestWhite;
 		Font* mFontSmallBoldBlack;
 		Font* mFontSmallBoldWhite;
 		Font* mFontSmallWhite;

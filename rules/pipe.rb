@@ -27,13 +27,15 @@ class PipeTask < FileTask
 	end
 	def execute
 		# pipe-tool may output an empty file and then fail.
-		# we use a temporary file to work around that bug.
-		tmpFile = @NAME + ".tmp"
-		sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{tmpFile} #{@objects.join(' ')}"
-		if(!File.exist?(tmpFile))
+		begin
+			sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
+		rescue => e
+			FileUtils.rm_f(@NAME)
+			raise
+		end
+		if(!File.exist?(@NAME))
 			error "Pipe-tool failed silently!"
 		end
-		FileUtils.mv(tmpFile, @NAME)
 	end
 end
 
@@ -48,6 +50,13 @@ class PipeResourceTask < PipeTask
 		if(!needed?(false)) then
 			@prerequisites = MakeDependLoader.load(@depFile, @NAME)
 		end
+	end
+	def needed?(log = true)
+		if(!File.exists?(@depFile))
+			puts "Because the dependency file is missing:" if(log)
+			return true
+		end
+		return super(log)
 	end
 	def execute
 		super

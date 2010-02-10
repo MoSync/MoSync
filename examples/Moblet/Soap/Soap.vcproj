@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="Soap"
 	ProjectGUID="{1744F547-3B2D-43E7-86AD-398CED78CA47}"
 	RootNamespace="Soap"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclib.lib mautil.lib mastd.lib mtxmlD.lib"
+				AdditionalDependencies="mosynclibD.lib mautilD.lib mastdD.lib mtxmlD.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"

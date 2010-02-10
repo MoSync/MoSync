@@ -51,8 +51,8 @@ namespace MAUtil {
 		virtual void keyReleaseEvent(int keyCode, int nativeCode);
 
 		//deprecated
-		virtual void keyPressEvent(int keyCode);
-		virtual void keyReleaseEvent(int keyCode);
+		virtual void keyPressEvent(int keyCode) {}
+		virtual void keyReleaseEvent(int keyCode) {}
 	};
 
 	/**

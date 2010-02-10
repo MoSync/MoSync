@@ -74,7 +74,7 @@ public:
 			case MAK_0:
 				maExit(0);
 			default:
-				printf("Presscode %i/&i\n", keyCode, nativeCode);
+				printf("Presscode %i/%i\n", keyCode, nativeCode);
 				break;
 		}
 	}

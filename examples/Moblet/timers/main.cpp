@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Environment.h>
 #include <MAUtil/Moblet.h>
 //#include <maprofile.h>
+#include <madmath.h>
 
 using namespace MAUtil;
 
@@ -105,12 +106,14 @@ public:
 	}
 
 	void runTimerEvent() {
-		if(velocity == 0)
+		if(velocity - DBL_EPSILON < 0) {
+			velocity = 0;
 			return;
+		}
 		// instead of clearing the entire screen, we cunningly
 		// erase only the area covered by our bouncing box by 
 		// drawing it again using the background color.
-		drawObject(BACK_COLOR);			
+		drawObject(BACK_COLOR);
 
 		// Do some physics: v = v - g*t^2
 		velocity -= (t*t*GRAVITY)/(1000000); // 

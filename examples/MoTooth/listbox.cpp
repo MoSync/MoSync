@@ -89,8 +89,6 @@ bool doSelect(int& devIndex, int& servIndex) {
 			}
 		}	//while(event = maGetEvent())
 	}	//for(;;)
-
-	return true;
 }
 
 

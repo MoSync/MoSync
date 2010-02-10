@@ -6,7 +6,8 @@ work = PipeExeWork.new
 work.instance_eval do 
 	@SOURCES = ["."]
 	@EXTRA_CPPFLAGS = " -Wno-shadow"
-	@NAME = "3dLines"
+	@LIBRARIES = ["mautil"]
+	@NAME = "MoTris"
 end
 
 work.invoke

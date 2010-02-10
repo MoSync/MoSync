@@ -152,8 +152,8 @@ private:
 		//save Last-Modified header to cache
 		mHttp.getResponseHeader("last-modified", &mLastModified);
 		MAHandle data = PlaceholderPool::alloc();
-		maCreateData(data, mLastModified.size());
-		maWriteData(data, mLastModified.c_str(), 0, mLastModified.size());
+		maCreateData(data, mLastModified.length());
+		maWriteData(data, mLastModified.c_str(), 0, mLastModified.length());
 		MAHandle store = maOpenStore(MODSAV, MAS_CREATE_IF_NECESSARY);
 		if(store < 0) {
 			printf("Meta-cache open error: %i\n", store);

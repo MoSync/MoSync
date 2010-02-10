@@ -33,7 +33,7 @@ namespace MapDemo
 		MapDemoMoblet( );
 		virtual ~MapDemoMoblet( );
 
-		virtual void shutdown( );
+		virtual void shutdown( ) GCCATTRIB(noreturn);
 
 	private:
 		MapDemoScreen* mScreen;

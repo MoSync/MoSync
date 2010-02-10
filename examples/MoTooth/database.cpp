@@ -47,7 +47,7 @@ void writeDevice(DataHandler& data, DEVICE& dev) {
 	data.write(&dev.address, BTADDR_LEN);
 
 	//name
-	int strLen = dev.name.size();
+	int strLen = dev.name.length();
 	data.write(&strLen, sizeof(int));
 	data.write(dev.name.c_str(), strLen);
 
@@ -57,7 +57,7 @@ void writeDevice(DataHandler& data, DEVICE& dev) {
 	for(int i=0; i<dev.services.size(); i++) {
 		const SERVICE& serv(dev.services[i]);
 		data.write(&serv.port, sizeof(int));
-		strLen = serv.name.size();
+		strLen = serv.name.length();
 		data.write(&strLen, sizeof(int));
 		data.write(serv.name.c_str(), strLen);
 	}
@@ -68,12 +68,12 @@ int calculateDatabaseSize() {
 	for(int i=0; i<gDevices.size(); i++) {
 		const DEVICE& dev(gDevices[i]);
 		size += BTADDR_LEN;
-		size += sizeof(int) + dev.name.size();
+		size += sizeof(int) + dev.name.length();
 
 		size += sizeof(int);
 		for(int j=0; j<dev.services.size(); j++) {
 			const SERVICE& serv(dev.services[j]);
-			size += sizeof(int) + sizeof(int) + serv.name.size();
+			size += sizeof(int) + sizeof(int) + serv.name.length();
 		}
 	}
 	return size;
@@ -99,7 +99,7 @@ bool readDevice(DataHandler& data, DEVICE& dev) {
 	//name
 	int strLen;
 	TEST(data.read(&strLen, sizeof(int)));
-	StringData* sd = new StringData(strLen);
+	StringData<char>* sd = new StringData<char>(strLen);
 	dev.name.setData(sd);
 	MAASSERT(sd->getRefCount() == 1);
 	TEST(data.read(sd->pointer(), strLen));
@@ -113,7 +113,7 @@ bool readDevice(DataHandler& data, DEVICE& dev) {
 		SERVICE& serv(dev.services[i]);
 		TEST(data.read(&serv.port, sizeof(int)));
 		TEST(data.read(&strLen, sizeof(int)));
-		sd = new StringData(strLen);
+		sd = new StringData<char>(strLen);
 		serv.name.setData(sd);
 		MAASSERT(sd->getRefCount() == 1);
 		TEST(data.read(sd->pointer(), strLen));

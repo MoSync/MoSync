@@ -36,6 +36,7 @@ extern "C" {
 /**
  * \brief The entry point.
  */
+int MAMain() GCCATTRIB(noreturn);
 int MAMain()
 {
 	MAExtent e = maGetScrSize();
@@ -50,7 +51,5 @@ int MAMain()
 
 	/// wait for key press or close event
 	FREEZE;
-
-	return 0;
 }
 }

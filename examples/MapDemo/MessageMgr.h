@@ -65,7 +65,7 @@ namespace MapDemoUtil
 			deleteobject( sSingleton ); 
 		}
 
-		void postMessage( const char *fmt, ... );
+		void postMessage( const char *fmt, ... ) GCCATTRIB(format(printf, 2, 3));
 		
 		void postProgress( float progress );
 		

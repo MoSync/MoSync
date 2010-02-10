@@ -178,7 +178,7 @@ public:
 	}
 #endif
 
-	void closeEvent() {
+	void closeEvent() GCCATTRIB(noreturn) {
 #if CONFIG_SAVE
 		if(saveImage()==false) maPanic(0, "failed to save image!");
 #endif

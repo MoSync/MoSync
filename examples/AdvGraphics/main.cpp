@@ -107,7 +107,21 @@ int MAMain()
 	static const char* text = "press fire to cast a spell.";
 	int textHeight = EXTENT_Y(maGetTextSize(text));
 	int screenWidth = EXTENT_X(maGetScrSize());
-	while(1) {
+	bool run = true;
+	while(run) {
+		drawImages();
+
+		// write some information text
+		maSetColor(0);	//black
+		maFillRect(0,0, screenWidth, textHeight);
+		maSetColor(~0);	//white
+		maDrawText(0, 0, text);
+
+		/// Updates the screen
+		maUpdateScreen();
+
+		/// Keep the backlight alive.
+		maResetBacklight();
 
 		/// Get any available events.
 		/// If MAK_FIRE is pressed, change mode.
@@ -123,28 +137,14 @@ int MAMain()
 						}
 						break;
 					case MAK_0:
-						maExit(0);
+						run = false;
 						break;
 
 				}
 			} else if(event.type == EVENT_TYPE_CLOSE) {
-				maExit(0);
+				run = false;
 			}
 		}
-
-		drawImages();
-
-		// write some information text
-		maSetColor(0);	//black
-		maFillRect(0,0, screenWidth, textHeight);
-		maSetColor(~0);	//white
-		maDrawText(0, 0, text);
-
-		/// Updates the screen
-		maUpdateScreen();
-
-		/// Keep the backlight alive.
-		maResetBacklight();
 	}
 
 	return 0;

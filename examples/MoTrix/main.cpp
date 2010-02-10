@@ -160,6 +160,7 @@ extern "C" {
 /**
  * \brief The entry point.
  */
+int MAMain() GCCATTRIB(noreturn);
 int MAMain()
 {
 	MAExtent e = maGetScrSize();
@@ -173,7 +174,7 @@ int MAMain()
 				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
 			{
 				deleteChars();
-				return 0;
+				maExit(0);
 			}
 		}
 
@@ -192,8 +193,5 @@ int MAMain()
 		maWait(40);
 #endif
 	}
-
-
-	return 0;
 }
 }

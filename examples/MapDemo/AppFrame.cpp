@@ -34,8 +34,8 @@ namespace MapDemoUI
 	AppFrame::AppFrame(int x, int y, int width, int height, Widget* parent, int columns, int rows )
 	//-------------------------------------------------------------------------
 		: Layout( x, y, width, height, parent, columns, rows ),
-		mFont( NULL ),
-		mProgress( -1 )
+		mProgress( -1 ),
+		mFont( NULL )
 	{
 		AppStyle* style = AppStyleMgr::getStyle( );
 		mMsgSkin = style->getButtonSkin( );

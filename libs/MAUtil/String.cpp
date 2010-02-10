@@ -408,6 +408,8 @@ skipp:
 	//explicit instantiation
 	template class BasicString<char>;
 	template class BasicString<wchar_t>;
+	template class StringData<char>;
+	template class StringData<wchar_t>;
 }
 
 template<> int tstrlen<char>(const char* str) { return strlen(str); }

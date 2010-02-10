@@ -143,7 +143,6 @@ namespace HelloMap
 	void HelloMapScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		MapSourceMgr* mgr = MapSourceMgr::get( );
 		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
 		if( newKind >= MapSourceKind_Last )
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );

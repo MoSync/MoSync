@@ -31,9 +31,12 @@ class PipeExeWork < PipeGccWork
 	def setup3(all_objects)
 		# resource compilation
 		if(!defined?(@LSTFILES))
-			@LSTFILES = Dir[@SOURCES[0] + "/*.lst"].collect do |name| FileTask.new(self, name) end
+			@LSTFILES = Dir[@SOURCES[0] + "/*.lst"]
 		end
-		@prerequisites << PipeResourceTask.new(self, "build/resources", @LSTFILES)
+		if(@LSTFILES.size > 0)
+			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
+			@prerequisites << PipeResourceTask.new(self, "build/resources", lstTasks)
+		end
 		
 		# libs
 		libs = (["mastd"] + @LIBRARIES).collect do |lib|

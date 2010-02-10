@@ -31,8 +31,6 @@ namespace MAUtil {
 		if(isListener)
 			Environment::getEnvironment().removeKeyListener(this);
 	}
-	void KeyListener::keyPressEvent(int keyCode) {}
-	void KeyListener::keyReleaseEvent(int keyCode) {}
 	void KeyListener::keyPressEvent(int keyCode, int nativeCode) {}
 	void KeyListener::keyReleaseEvent(int keyCode, int nativeCode) {}
 

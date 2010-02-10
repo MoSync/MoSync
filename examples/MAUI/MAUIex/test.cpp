@@ -53,7 +53,7 @@ MainScreen::~MainScreen() {
 	for(int i = 0; i < screens.size(); i++) delete screens[i];
 }
 
-void MainScreen::keyPressEvent(int keyCode) {
+void MainScreen::keyPressEvent(int keyCode, int nativeCode) {
 	switch(keyCode) {
 	case MAK_UP:
 		listBox->selectPreviousItem();

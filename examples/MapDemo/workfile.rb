@@ -6,7 +6,9 @@ work = PipeExeWork.new
 work.instance_eval do 
 	@SOURCES = ["."]
 	@EXTRA_CPPFLAGS = " -Wno-shadow"
-	@NAME = "3dLines"
+	@LSTFILES = ["Res/res.lst"]
+	@LIBRARIES = ["mautil", "map", "maui"]
+	@NAME = "MapDemo"
 end
 
 work.invoke

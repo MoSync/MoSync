@@ -593,7 +593,7 @@ namespace MinUI {
 	}
 
 	bool Textbox::moveCursorHorizontal(int steps) {
-		if(mCursor + steps < 0 || mCursor + steps > mText.size())
+		if(mCursor + steps < 0 || mCursor + steps > mText.length())
 			return false;
 		mCursor += steps;
 		return true;
@@ -627,7 +627,7 @@ namespace MinUI {
 		CharInput::getCharInput().forceDeployment();
 		setRedraw();
 	}
-	void Textbox::keyReleaseEvent(int keyCode) {
+	void Textbox::keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
 	void Textbox::characterChanged(char c) {
