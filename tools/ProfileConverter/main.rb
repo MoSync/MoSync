@@ -28,9 +28,10 @@ RELEVANT_CAPS = [
 	'IconSize_x',
 	'IconSize_y',
 	'BitsPerPixel',
-	'StorageSize',
-	'HeapSize',
-	'MaxJarSize',
+# disabled these... 
+#	'StorageSize',
+#	'HeapSize',
+#	'MaxJarSize',
 	'JavaPackage',
 	'OS',
 	'Packager',
