@@ -22,16 +22,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-// FIXME: server offline. Find another.
+// This is Flickr's echo service, as documented here:
+// http://www.flickr.com/services/api/request.soap.html
 
-// This particular webservice has a dictionary for the rare Manchu language.
-// We ask it for the definition of "niyalma", or 'person'.
+// This request will cause an error message, since it doesn't
+// have a Flickr API key. Still, it is a fair example of SOAP syntax.
 
-static const char sUrl[] = "http://www.enenggi.com/services.asmx";
+static const char sUrl[] = "http://api.flickr.com/services/soap/";
 static const char sData[] =
-"<DefineManchuWord xmlns=\"http://enenggi.com/\">"
-"<pRomanization>niyalma</pRomanization>"
-"</DefineManchuWord>";
+"<x:FlickrRequest xmlns:x=\"urn:flickr\">"
+	"<method>flickr.test.echo</method>"
+	"<name>value</name>"
+"</x:FlickrRequest>"
+;
 
 
 class MyMoblet : public Moblet, SoapListener {

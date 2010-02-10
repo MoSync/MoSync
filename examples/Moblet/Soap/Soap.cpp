@@ -34,22 +34,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //static const data
 
 // These particular headers and footers are compatible with
-// Microsoft asmx servers.
+// Flickr services.
 // They will need modification to operate properly with other SOAP servers.
 
-#define SOAPNS_BODY "soap"
+#define SOAPNS_BODY "s"
+#define SOAPNS "s"
 #define SOAP_CONTENT_TYPE "text/xml; charset=utf-8"
 
 static const char sSoapHeader[] =
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-"<soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+"<"SOAPNS":Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
 "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-"xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\">"
-"<soap12:Body>\n";
+"xmlns:"SOAPNS"=\"http://www.w3.org/2003/05/soap-envelope\">"
+"<"SOAPNS":Body>\n";
 static const int sSoapHeaderLength = sizeof(sSoapHeader) - 1;
 static const char sSoapFooter[] =
-"</soap12:Body>"
-"</soap12:Envelope>\n";
+"</"SOAPNS":Body>"
+"</"SOAPNS":Envelope>\n";
 static const int sSoapFooterLength = sizeof(sSoapFooter) - 1;
 
 
