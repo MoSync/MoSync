@@ -115,14 +115,14 @@ public:
 
 		assert("String::substr()", str.substr(8, 6) == "MAUtil");
 
-		assert("String::size(), length()", str.size() == 22 && str.length() == 22);
+		assert("String::length()", str.length() == 22);
 
 		str.reserve(32);
-		assert("String::reserve()", str == "testing MAUtil::String" && str.size() == 22);
+		assert("String::reserve()", str == "testing MAUtil::String" && str.length() == 22);
 		assert("String::capacity()", str.capacity() == 32);
 
 		str.clear();
-		assert("String::clear()", str.size() == 0 && str == "");
+		assert("String::clear()", str.length() == 0 && str == "");
 	}
 
 	void set() {
@@ -165,7 +165,7 @@ public:
 		assert("Set::Iterator++", itr == s.end());
 		itr--;
 		assert("Set::Iterator--", itr != s.end());
-		assert("Set::Iterator", itr->size() == 3);
+		assert("Set::Iterator", itr->length() == 3);
 
 		//const iterator
 		Set<String>::ConstIterator citr = s.find("bar");
@@ -190,7 +190,7 @@ public:
 		assert("cSet::Iterator++", citr == s.end());
 		citr--;
 		assert("cSet::Iterator--", citr != s.end());
-		assert("cSet::Iterator", citr->size() == 3);
+		assert("cSet::Iterator", citr->length() == 3);
 
 		//erase
 		assert("Set::erase()", s.erase("bar"));

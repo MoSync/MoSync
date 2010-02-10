@@ -24,7 +24,8 @@ MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
 class PipeExeWork < PipeGccWork
 	def setup
 		@FLAGS = " -B"
-		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [MOSYNC_INCLUDE]
+		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
+			[MOSYNC_INCLUDE, "#{ENV['MOSYNCDIR']}/profiles/vendors/MobileSorcery/Emulator"]
 		default(:TARGETDIR, '.')
 		super
 	end

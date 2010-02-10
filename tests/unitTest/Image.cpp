@@ -626,31 +626,31 @@ static bool clipLine(Point &a, Point &b, int left, int right, int top, int botto
 	switch(res) {
 		case A_IN: b = clippedPoint; break;
 		case B_IN: a = clippedPoint; break;
-		case BOTH_OUT: return false; break;
+		case BOTH_OUT: return false;
 		default: break;
 	}
 	res = clipRightLine(a, b, clippedPoint, right);
 	switch(res) {
 		case A_IN: b = clippedPoint; break;
 		case B_IN: a = clippedPoint; break;
-		case BOTH_OUT: return false; break;
-		default: break;		
+		case BOTH_OUT: return false;
+		default: break;
 	}
 
 	res = clipTopLine(a, b, clippedPoint, top);
 	switch(res) {
 		case A_IN: b = clippedPoint; break;
 		case B_IN: a = clippedPoint; break;
-		case BOTH_OUT: return false; break;
-		default: break;		
+		case BOTH_OUT: return false;
+		default: break;
 	}
 
 	res = clipBottomLine(a, b, clippedPoint, bottom);
 	switch(res) {
 		case A_IN: b = clippedPoint; break;
 		case B_IN: a = clippedPoint; break;
-		case BOTH_OUT: return false; break;
-		default: break;		
+		case BOTH_OUT: return false;
+		default: break;
 	}
 
 	return true;
