@@ -51,9 +51,11 @@ void CAppUi::ConstructL( void )
 	iAppView->SetMopParent( this ); // allow object to be in network of object providers (see MObjectProvider)
 	AddToStackL( iAppView );        // view now gets key press events
 
+#ifdef __SERIES60_3X__
 	iInterfaceSelector = CRemConInterfaceSelector::NewL();
 	iCoreTarget = CRemConCoreApiTarget::NewL(*iInterfaceSelector, *this);
 	iInterfaceSelector->OpenTargetL();
+#endif
 	//DebugMarkStart();
 	LOG("Initialization complete.\n");
 }
@@ -87,6 +89,7 @@ void CAppUi::HandleCommandL( TInt aCommand )
 	}
 }
 
+#ifdef __SERIES60_3X__
 void CAppUi::MrccatoCommand(TRemConCoreApiOperationId aOperationId,
 	TRemConCoreApiButtonAction aButtonAct)
 {
@@ -109,6 +112,7 @@ void CAppUi::MrccatoCommand(TRemConCoreApiOperationId aOperationId,
 	event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
 	iAppView->AddEvent(event);
 }
+#endif
 
 void CAppUi::Stop() {
 	LOGD("CAppUi::Stop()\n");

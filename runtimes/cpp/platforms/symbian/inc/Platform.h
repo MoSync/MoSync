@@ -34,6 +34,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #define SYMBIAN 1
 
+#ifndef __SERIES60_3X__	//2nd edition
+#undef WLAN
+#undef CALL
+#undef CELLID
+#undef SUPPORT_MOSYNC_SERVER
+#endif
+
 #include <helpers/cpp_defs.h>
 
 #ifndef DONT_SUPPORT_RELOAD
