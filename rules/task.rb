@@ -220,7 +220,7 @@ class FileTask < Task
 	# Prints the reason the task is needed, unless <tt>log</tt> is false.
 	def needed?(log = true)
 		if(!File.exist?(@NAME))
-			puts "Because file does not exist: #{@NAME}" if(log)
+			puts "Because file does not exist:" if(log)
 			return true
 		end
 		return true if out_of_date?(timestamp, log)
@@ -241,7 +241,7 @@ class FileTask < Task
 	def out_of_date?(stamp, log=true)
 		@prerequisites.each do |n|
 			if(n.timestamp > stamp)
-				puts "Because prerequisite '#{n}'(#{n.class}) is newer: #{@NAME}" if(log)
+				puts "Because prerequisite '#{n}'(#{n.class}) is newer:" if(log)
 				return true
 			end
 		end

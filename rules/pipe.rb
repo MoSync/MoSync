@@ -26,10 +26,32 @@ class PipeTask < FileTask
 		@prerequisites = @objects + [dirTask]
 	end
 	def execute
-		sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
-		if(!File.exist?(@NAME))
+		# pipe-tool may output an empty file and then fail.
+		# we use a temporary file to work around that bug.
+		tmpFile = @NAME + ".tmp"
+		sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{tmpFile} #{@objects.join(' ')}"
+		if(!File.exist?(tmpFile))
 			error "Pipe-tool failed silently!"
 		end
+		FileUtils.mv(tmpFile, @NAME)
+	end
+end
+
+# adds dependency handling
+class PipeResourceTask < PipeTask
+	def initialize(work, name, objects)
+		@depFile = "#{File.dirname(name)}/resources.mf"
+		@tempDepFile = "#{@depFile}t"
+		super(work, name, objects, " -depend=#{@tempDepFile} -R")
+		
+		# only if the file is not already needed do we care about extra dependencies
+		if(!needed?(false)) then
+			@prerequisites = MakeDependLoader.load(@depFile, @NAME)
+		end
+	end
+	def execute
+		super
+		FileUtils.mv(@tempDepFile, @depFile)
 	end
 end
 
@@ -55,7 +77,7 @@ class PipeGccWork < GccWork
 		if(@TARGET_PATH == nil)
 			need(:@BUILDDIR)
 			need(:@TARGETDIR)
-			@TARGET_PATH = @TARGETDIR + "/" + @BUILDDIR + filename
+			@TARGET_PATH = @TARGETDIR + "/" + @BUILDDIR + "program"
 		end
 		@TARGET = PipeTask.new(self, @TARGET_PATH, all_objects + llo, @FLAGS + @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]

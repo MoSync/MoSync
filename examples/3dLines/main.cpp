@@ -211,10 +211,22 @@ extern "C" {
 int MAMain()
 {
 	int mode = 1;
+	bool run = true;
 
 	init();
 
-	while(1) {
+	while(run) {
+		/// Choose drawing function depending on mode.
+		if(mode)
+			drawOne(maGetMilliSecondCount()*2);
+		else
+			drawLots(maGetMilliSecondCount()*2);
+
+		/// Updates the screen
+		maUpdateScreen();
+
+		/// Keep the backlight alive.
+		maResetBacklight();
 
 		/// Get any available events.
 		/// If MAK_FIRE is pressed, change mode.
@@ -234,21 +246,10 @@ int MAMain()
 			} else if(event.type == EVENT_TYPE_CLOSE ||
 				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
 			{
-				maExit(0);
+				run = false;
+				break;
 			}
 		}
-
-		/// Choose drawing function depending on mode.
-		if(mode)
-			drawOne(maGetMilliSecondCount()*2);
-		else
-			drawLots(maGetMilliSecondCount()*2);
-
-		/// Updates the screen
-		maUpdateScreen();
-
-		/// Keep the backlight alive.
-		maResetBacklight();
 	}
 
 	delete gObj;
