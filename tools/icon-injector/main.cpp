@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WinmobileInjector.h"
 #include "MoreInjector.h"
 #include "Symbian9Injector.h"
+#include "AndroidInjector.h"
 #include "Shared.h"
 
 #include <conio.h>
@@ -37,6 +38,7 @@ void initInjectors() {
 	gInjectors["winmobile"] = new WinmobileInjector();
 	gInjectors["more"] = new MoreInjector();
 	gInjectors["symbian9"] = new Symbian9Injector();
+	gInjectors["android"] = new AndroidInjector();
 }
 
 bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
