@@ -47,8 +47,12 @@ namespace MAUtil {
 	class KeyListener {
 	public:
 		virtual ~KeyListener();
-		virtual void keyPressEvent(int keyCode, int nativeCode) = 0;
-		virtual void keyReleaseEvent(int keyCode, int nativeCode) = 0;
+		virtual void keyPressEvent(int keyCode, int nativeCode);
+		virtual void keyReleaseEvent(int keyCode, int nativeCode);
+
+		//deprecated
+		virtual void keyPressEvent(int keyCode);
+		virtual void keyReleaseEvent(int keyCode);
 	};
 
 	/**

@@ -31,6 +31,10 @@ namespace MAUtil {
 		if(isListener)
 			Environment::getEnvironment().removeKeyListener(this);
 	}
+	void KeyListener::keyPressEvent(int keyCode) {}
+	void KeyListener::keyReleaseEvent(int keyCode) {}
+	void KeyListener::keyPressEvent(int keyCode, int nativeCode) {}
+	void KeyListener::keyReleaseEvent(int keyCode, int nativeCode) {}
 
 	Environment::TimerEventInstance::TimerEventInstance(TimerListener* tl, int aPeriod, int aNumTimes) 
 		: e(tl), period(aPeriod), numTimes(aNumTimes)
@@ -219,16 +223,20 @@ namespace MAUtil {
 		//MAASSERT(sEnvironment == this);
 
 		mKeyListeners.setRunning(true);
-		ListenerSet_each(KeyListener, i, mKeyListeners) 
+		ListenerSet_each(KeyListener, i, mKeyListeners) {
+			i->keyPressEvent(keyCode);
 			i->keyPressEvent(keyCode, nativeCode);
+		}
 		mKeyListeners.setRunning(false);
 	}
 
 	void Environment::fireKeyReleaseEvent(int keyCode, int nativeCode) {
 		//MAASSERT(sEnvironment == this);
 		mKeyListeners.setRunning(true);
-		ListenerSet_each(KeyListener, i, mKeyListeners)
+		ListenerSet_each(KeyListener, i, mKeyListeners) {
+			i->keyReleaseEvent(keyCode);
 			i->keyReleaseEvent(keyCode, nativeCode);
+		}
 		mKeyListeners.setRunning(false);
 	}
 
