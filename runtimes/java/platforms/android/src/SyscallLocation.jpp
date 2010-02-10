@@ -15,16 +15,101 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+LocationEventThread mLocationEventThread = null;
+
 public final int maLocationStart() throws Exception {
-	/* FIX-ME */
-	return -1;
+	if(mLocationEventThread != null) return 1;
+
+	if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) return -1;
+
+	mLocationEventThread  = new LocationEventThread();
+	mLocationEventThread.start();
+	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationEventThread);
+	return 1;
 }
 public final int maLocationStop() {
-	/* FIX-ME */
-	return -1;
+	if(mLocationEventThread == null) return 1;
+	
+	mLocationManager.removeUpdates(mLocationEventThread);
+	
+	mLocationEventThread.stop();
+	mLocationEventThread = null;
+	return 1;
 }
 
 synchronized final int maGetLocation(Address a) throws InterruptedException {
 	/* FIX-ME */
 	return -1;
 }
+
+
+class LocationEventThread extends Thread implements LocationListener {
+
+	Handler mHandler;
+
+	public LocationEventThread()
+	{
+		Log.i("LocationEventThread","constructor");
+		Looper.prepare();
+		Log.i("LocationEventThread","prepared!");
+	}
+
+	public void run() {
+		Log.i("LocationEventThread","run");
+		
+	}
+
+	public void onLocationChanged(Location location) {
+		Log.i("LocationEventThread","onLocationChanged");
+		int[] event = new int[10];
+		EI_TYPE = EVENT_TYPE_LOCATION;
+		EI_STATE = MA_LOC_QUALIFIED;
+		
+		writeDouble(event, 2, location.getLatitude());
+		writeDouble(event, 4, location.getLongitude());
+		writeDouble(event, 6, location.getAccuracy());
+		writeDouble(event, 8, location.getAccuracy());
+		mMoSyncView.postEvent(event);
+	}
+		
+	public void onProviderDisabled(String provider) {
+		Log.i("LocationEventThread","onProviderDisabled");
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+			int[] event = new int[2];
+			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+			EI_STATE = MA_LPS_OUT_OF_SERVICE;
+			mMoSyncView.postEvent(event);
+		}
+	}
+
+	public void onProviderEnabled(String provider) {
+		Log.i("LocationEventThread","onProviderEnabled");
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+			int[] event = new int[2];
+			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+			EI_STATE = MA_LPS_AVAILABLE;
+			mMoSyncView.postEvent(event);
+		}
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		Log.i("LocationEventThread","onStatusChanged");
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+			int[] event = new int[2];
+			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+			switch(status)
+			{
+				case LocationProvider.OUT_OF_SERVICE: EI_STATE = MA_LPS_OUT_OF_SERVICE; break;
+				case LocationProvider.TEMPORARILY_UNAVAILABLE: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE; break;
+				case LocationProvider.AVAILABLE: EI_STATE = MA_LPS_AVAILABLE; break;
+				default: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE;
+			}
+			mMoSyncView.postEvent(event);
+		}
+	}
+	
+}
+
