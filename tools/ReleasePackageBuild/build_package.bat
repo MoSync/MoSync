@@ -233,6 +233,14 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building mifconv
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\mifconv
+@vcbuild mifconv.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building makesis-200
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\makesis-2.0.0\win32
