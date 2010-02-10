@@ -54,6 +54,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @SET MOSYNC_PATH=%MOSYNC_RELEASE_BUILD_PATH%\MoSyncReleasePackage
 @SET MOSYNCDIR=%MOSYNC_PATH%
 @SET MOSYNC_BIN_PATH=%MOSYNC_PATH%\bin
+@SET MOSYNC_ETC_PATH=%MOSYNC_PATH%\etc
 @SET MOSYNC_ECLIPSE_PATH=%MOSYNC_PATH%\eclipse
 @SET MOSYNC_LIB_PATH=%MOSYNC_PATH%\lib
 @SET MOSYNC_LIB_W32_PATH=%MOSYNC_PATH%\lib\w32
@@ -73,6 +74,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @mkdir %MOSYNC_RELEASE_BUILD_PATH%
 @mkdir %MOSYNC_PATH%
 @mkdir %MOSYNC_BIN_PATH%
+@mkdir %MOSYNC_ETC_PATH%
 @mkdir %MOSYNC_ECLIPSE_PATH%
 @mkdir %MOSYNC_LIB_PATH%
 @mkdir %MOSYNC_LIB_W32_PATH%
@@ -138,6 +140,11 @@ cd %ORIGINAL_PATH%
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
+@echo ------------------------------------------------
+@echo Copying Android icon and keystore
+@echo ------------------------------------------------
+@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\drawable\icon.png %MOSYNC_ETC_PATH%\ /y /D
+@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\mosync.keystore %MOSYNC_ETC_PATH%\ /y /D
 
 @echo ------------------------------------------------
 @echo Running OpenGL Wrapper generator.
