@@ -1047,17 +1047,6 @@ public:
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
 
-	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%S\")", str); }
-	wchar* _SYSCALL_CONVERT_MAWString(int str) {
-		_debug_hex(str);
-		ValidateMemWStringAddress(str);
-		wchar* res = (wchar*)((char*)mem_ds + str);
-		debug_MAWString(res);
-		return res;
-	}
-#define _SYSCALL_CONVERTRES_MAWString _SYSCALL_CONVERTRES_MAAddress
-#define _SYSCALL_HANDLERES_MAWString _SYSCALL_HANDLERES_DEFAULT(MAWString)
-
 	void debug_int(int SCDEBUG_ARG(i)) { LOGSC("(%i)", i); }
 	int _SYSCALL_CONVERT_int(int i) {
 		_debug_hex(i);
