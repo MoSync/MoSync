@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="timers"
 	ProjectGUID="{DBA9F2B3-07D6-40AD-A8CB-967FED9EE2C1}"
 	RootNamespace="timers"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib"
+				AdditionalDependencies="mosynclibD.lib mastdD.lib mautilD.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
