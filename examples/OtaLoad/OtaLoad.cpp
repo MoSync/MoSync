@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-static const char* URL = "http://www.mosync.com/fred/otaload.v8.comb";
+static const char* URL = "http://www.mosync.com/fred/otaload.v9.comb";
 static const char* SAV = "OtaLoad.sav";
 static const char* MODSAV = "OtaLoad.mod.sav";
 
