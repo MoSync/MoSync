@@ -14,6 +14,8 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require "#{File.dirname(__FILE__)}/error.rb"
+
 def default(constant, value)
 	s = ("if(defined?(@#{constant.to_s}) == nil) then @#{constant.to_s} = #{value.inspect} end")
 	eval(s)
