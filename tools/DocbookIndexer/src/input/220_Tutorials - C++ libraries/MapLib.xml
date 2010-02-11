@@ -1,0 +1,96 @@
+<document title="Map Library" author="Ali" area="XML" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+MAP Library C++
+\\
+The Mosync Map library (MAP) provides map classes for using one or more tile-based map servers such as Open Street Map. With the MAP library there is a code example that uses the MapWidget MAUI class for displaying a so-called "slippy" (i.e., panning) map.
+\\
+\\
+You can use MapWidget as is, or extend it to overlay information on the map.
+\\
+\\
+Latitude and longitude co-ordinates can be converted to meters and pixels (both global and device).
+\\
+\\
+Connection to a location-aware sensor is performed by the client, and is outside of the scope for the library itself.
+\\
+\\
+The primary public map source is OpenStreetMap (openstreetmap.org). There is a working hook into Google Static Maps; however use of Google Static Maps requires a license agreement with Google, so this is more of a code sample.
+\\
+\\
+\\
+=== The MAP Library ===
+The Map Library provides classes for downloading, managing and displaying map tiles. The library includes:
+\\
+- MapSource base class, with implementations for OpenStreetMap, Google Static Maps, CloudMade, as well as an extensible API for other map sources
+- MapWidget class for displaying a slippy map in a Mosync Moblet-based application,
+- Tile management and caching classes
+- Utility and support classes.
+\\
+\\
+{{images/maplib_class_table.png}}
+\\
+\\
+]]>
+</section>
+
+<section id="ex" title="Example">
+<![CDATA[
+
+HelloMap Example
+\\
+HelloMap is a simple Moblet that displays an OpenStreetMap across the entire device screen. The user can use the phone keys to pan the map and to zoom in and out. The core of the HelloMap sample application is in HelloMapScreen.cpp:
+\\
+[code filename="hellomap.h"]
+//-------------------------------------------------------------------------
+HelloMapScreen::HelloMapScreen( )
+//-------------------------------------------------------------------------
+{
+	//
+	// Screen size
+	//
+	MAExtent screenSize = maGetScrSize( );
+	int width = EXTENT_X( screenSize );
+	int height = EXTENT_Y( screenSize );
+	//
+	// Map widget
+	//
+	mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
+	//
+	// Set location to Stockholm at intermediate magnification
+	//
+	mMap->enterMapUpdateScope( );
+	mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
+	mMap->setMagnification( 10 );
+	mMap->exitMapUpdateScope( true );
+	//
+	// Widget appearance
+	//
+	Font* mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
+	mMap->setFont( mFont );
+	//
+	// Commit widget to screen
+	//
+	setMain( mMap );
+	//
+	// Configure map source and widget appearance
+	//
+	// Have to wait until we have proper width and height
+	//
+	mMapSourceKind = MapSourceKind_OpenStreetMap;
+	mMap->setMapSourceKind( mMapSourceKind );
+} 
+[/code]
+HelloMapScreen provides key navigation support (see HelloMapScreen.cpp for more information).
+\\
+\\
+HelloMap listens to the following keys:
+\\
+1 = Zoom out \\
+3 = Zoom in \\
+2 = Change map source \\
+Right-softkey = Exit \\
+0 = Exit 
+]]>
+</section>
+</document>
