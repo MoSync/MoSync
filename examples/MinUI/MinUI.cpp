@@ -87,8 +87,10 @@ namespace MinUI {
 		return mMinimumSize;
 	}
 	void SimpleMinSizeWidget::setSize(const MAPoint2d& s) {
+		/*
 		ASSERT_MSG(s.x >= mMinimumSize.x && s.y >= mMinimumSize.y,
 			"set to less than minimum size");
+		*/
 	}
 
 	//******************************************************************************
