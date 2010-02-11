@@ -15,9 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-LocationEventThread mLocationEventThread = null;
+//LocationEventThread mLocationEventThread = null;
 
 public final int maLocationStart() throws Exception {
+/*
 	if(mLocationEventThread != null) return 1;
 
 	if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) return -1;
@@ -26,8 +27,11 @@ public final int maLocationStart() throws Exception {
 	mLocationEventThread.start();
 	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationEventThread);
 	return 1;
+*/
+	return -1;
 }
 public final int maLocationStop() {
+/*
 	if(mLocationEventThread == null) return 1;
 	
 	mLocationManager.removeUpdates(mLocationEventThread);
@@ -35,6 +39,8 @@ public final int maLocationStop() {
 	mLocationEventThread.stop();
 	mLocationEventThread = null;
 	return 1;
+*/
+	return -1;
 }
 
 synchronized final int maGetLocation(Address a) throws InterruptedException {
@@ -42,7 +48,7 @@ synchronized final int maGetLocation(Address a) throws InterruptedException {
 	return -1;
 }
 
-
+/*
 class LocationEventThread extends Thread implements LocationListener {
 
 	Handler mHandler;
@@ -112,4 +118,4 @@ class LocationEventThread extends Thread implements LocationListener {
 	}
 	
 }
-
+*/
