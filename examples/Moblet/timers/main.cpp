@@ -106,7 +106,7 @@ public:
 	}
 
 	void runTimerEvent() {
-		if(velocity - DBL_EPSILON < 0) {
+		if(fabs(velocity) - DBL_EPSILON < 0) {
 			velocity = 0;
 			return;
 		}
