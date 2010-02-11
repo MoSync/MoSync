@@ -49,3 +49,8 @@ cd kazlib
 mkdir "%MOSYNCDIR%\include\kazlib"
 copy *.h "%MOSYNCDIR%\include\kazlib\"
 cd ..
+
+cd MAP
+mkdir "%MOSYNCDIR%\include\MAP"
+copy *.h "%MOSYNCDIR%\include\MAP\"
+cd ..
