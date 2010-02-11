@@ -34,7 +34,6 @@
 //#include <sys/types.h>
 #include "maarg.h"
 #include "mastring.h"
-#include "mawstring.h"
 #include "conprint.h"
 #include "madmath.h"
 
@@ -547,7 +546,6 @@ int vsprintf(char *buf, const char *fmt, va_list args)
   int i, base;
   char *str;
   const char *s;
-	const wchar* S;
 
   int flags;            // Flags to number()
 
@@ -634,15 +632,6 @@ repeat:
         len = strnlen(s, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
-        while (len < field_width--) *str++ = ' ';
-        continue;
-
-      case 'S':	//Unicode string
-        S = va_arg(args, wchar *);
-        if (!S) S = L"<NULL>";
-        len = wstrnlen(S, precision);
-        if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
-        for (i = 0; i < len; ++i) *str++ = (char)*S++;
         while (len < field_width--) *str++ = ' ';
         continue;
 

@@ -661,14 +661,6 @@ SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 	MAExtent ex = gScreenEngine.GetTextSizeL(*buf);
 	return ex;
 }
-SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
-	if(*str == 0) {
-		return 0;
-	}
-	TPtrC16 ptr(str);
-	MAExtent ex = gScreenEngine.GetTextSizeL(ptr);
-	return ex;
-}
 
 SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 	if(*str == 0) {
@@ -676,13 +668,6 @@ SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 	}
 	TCleaner<HBufC16> buf(CreateHBufC16FromCStringLC(str));
 	gScreenEngine.DrawTextL(*buf, TPoint(left, top));
-}
-SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-	if(*str == 0) {
-		return;
-	}
-	TPtrC16 ptr(str);
-	gScreenEngine.DrawTextL(ptr, TPoint(left, top));
 }
 
 SYSCALL(void, maUpdateScreen()) {
@@ -1608,6 +1593,7 @@ void Syscall::LocationHandlerL(TInt status) {
 	loc->lon = swapd(p.Longitude());
 	loc->horzAcc = swapd(p.HorizontalAccuracy());
 	loc->vertAcc = swapd(p.VerticalAccuracy());
+	loc->alt = p.Altitude();
 
 	gServer.LocationGet(*gLocationSync->Status());
 	gLocationSync->SetActive();

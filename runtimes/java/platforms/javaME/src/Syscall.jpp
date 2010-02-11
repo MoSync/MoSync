@@ -982,18 +982,9 @@ public
 		return EXTENT(font.stringWidth(str), font.getHeight());
 	}
 
-	SYSCALL(MAExtent) maGetTextSizeW(final String str) {
-		return maGetTextSize(str);
-	}
-
 	SYSCALL(void) maDrawText(int left, int top, final String str) {
 		DEBUG("DrawText "+str+"\n");
 		//TODO: handle bug drawStringOver200Chars
-		mGraphics.drawString(str, left, top, Graphics.TOP|Graphics.LEFT);
-	}
-
-	SYSCALL(void) maDrawTextW(int left, int top, final String str) {
-		DEBUG("DrawTextW "+str+"\n");
 		mGraphics.drawString(str, left, top, Graphics.TOP|Graphics.LEFT);
 	}
 

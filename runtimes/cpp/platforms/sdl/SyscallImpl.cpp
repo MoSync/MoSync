@@ -1011,9 +1011,6 @@ namespace Base {
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 		return getTextSize<char, TTF_SizeText>(str);
 	}
-	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
-		return getTextSize<wchar, TTF_SizeUNICODE>(str);
-	}
 
 	template<class Tchar, SDL_Surface* SDLCALL renderFunc(TTF_Font*, const Tchar*, SDL_Color)>
 	static void drawText(int left, int top, const Tchar* str) {
@@ -1033,9 +1030,6 @@ namespace Base {
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 		drawText<char, TTF_RenderText_Solid>(left, top, str);
-	}
-	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		drawText<wchar, TTF_RenderUNICODE_Solid>(left, top, str);
 	}
 
 	SYSCALL(void, maUpdateScreen()) {

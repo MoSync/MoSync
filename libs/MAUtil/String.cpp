@@ -28,142 +28,146 @@ namespace MAUtil {
 	int nV = 0;
 #endif
 
-	template<class Tchar> StringData<Tchar>::StringData(const Tchar* text, int len)
-		: Vector<Tchar>(len + 1), RefCounted(1)
-	{
-		this->resize(len);
-		this->mData[len] = 0;
-		memcpy(this->mData, text, len * sizeof(Tchar));
+	StringData::StringData(const char* text, int len) : Vector<char>(len + 1), RefCounted(1) {
+		resize(len);
+		mData[len] = '\0';
+		memcpy(mData, text, len);
 	}
 
 
-	template<class Tchar> StringData<Tchar>::StringData(const Tchar* text)
-		: Vector<Tchar>(tstrlen(text) + 1), RefCounted(1)
-	{
-		int len = this->capacity() - 1;
-		this->resize(len);
-		memcpy(this->mData, text, this->capacity() * sizeof(Tchar));
+	StringData::StringData(const char* text) : Vector<char>(strlen(text) + 1), RefCounted(1) {
+		int len = capacity() - 1;
+		resize(len);
+		memcpy(mData, text, capacity());
 	}
 
 
-	template<class Tchar> StringData<Tchar>::StringData(int len)
-		: Vector<Tchar>(len+1), RefCounted(1)
-	{
-		this->resize(len);
-		this->mData[len] = 0;
+	StringData::StringData(int aSize) : Vector<char>(aSize+1), RefCounted(1) {
+		resize(aSize);
+		mData[aSize] = '\0';
 	}
 
 
 
-	template<class Tchar> StringData<Tchar>::StringData(const StringData& other)
-		: Vector<Tchar>(other.mSize+1), RefCounted(1)
-	{
-		this->mSize = other.mSize;
-		memcpy(this->mData, other.mData, (this->mSize+1) * sizeof(Tchar));
+	StringData::StringData(const StringData& other) : Vector<char>(other.mSize+1), RefCounted(1) {
+		mSize = other.mSize;
+		memcpy(mData, other.mData, mSize+1);
 	}
 
 #ifdef HAVE_EMPTY_STRING
-	const BasicString* BasicString<Tchar>::EMPTY_STRING = NULL;
+	const String* String::EMPTY_STRING = NULL;
 #endif
 
-	template<class Tchar> static StringData<Tchar>* getEmptyData() {
-		static StringData<Tchar>* ed = NULL;
+	static StringData* getEmptyData() {
+		static StringData* ed = NULL;
 		if(ed == NULL) {
-			ed = new StringData<Tchar>(0);
+			ed = new StringData("");
 			MAASSERT(ed);
 		}
 		ed->addRef();
 		return ed;
 	}
 
-	template<class Tchar> BasicString<Tchar>::BasicString() {
-		sd = getEmptyData<Tchar>();
+	String::String() {
+		sd = getEmptyData();
 	}
 
-	template<class Tchar> BasicString<Tchar>::BasicString(int aCapacity) {
-		sd = new StringData<Tchar>(aCapacity);
+	String::String(int aCapacity) {
+		sd = new StringData(aCapacity);
 		resize(0);
 	}
 
-	template<class Tchar> void BasicString<Tchar>::allocStringData(const Tchar* text, int len) {
+/*
+	String::String(const char* text) {
+		if(text == NULL) {
+			sd = getEmptyData();
+		} else if(*text == 0)	{	//empty string
+			sd = getEmptyData();
+		} else {
+			sd = new StringData(text);
+			MAASSERT(sd);
+		}
+	}
+*/
+	void String::allocStringData(const char *text, int len) {
 		if(len < 0) {
-			maPanic(0, "BasicString(const Tchar* text, int len), passed a negative length.");
+			maPanic(0, "String(const char* text, int len), passed a negative length.");
 		}
 
 		if(text == NULL || *text == 0 || len == 0) {
-			sd = getEmptyData<Tchar>();
+			sd = getEmptyData();
 		} else {
-			sd = new StringData<Tchar>(text, len);
+			sd = new StringData(text, len);
 			MAASSERT(sd);
 		}		
 	}
 
-	template<class Tchar> BasicString<Tchar>::BasicString(const Tchar* text, int len) {
-		if(text == NULL) maPanic(0, "BasicString(const Tchar* text, int len), passed a NULL pointer.");
+	String::String(const char* text, int len) {
+		if(text == NULL) maPanic(0, "String(const char* text, int len), passed a NULL pointer.");
 		allocStringData(text, len);
 	}
 
-	template<class Tchar> BasicString<Tchar>::BasicString(const Tchar* text) {
-		if(text == NULL) maPanic(0, "BasicString(const Tchar* text), passed a NULL pointer.");
-		allocStringData(text, tstrlen(text));
+	String::String(const char* text) {
+		if(text == NULL) maPanic(0, "String(const char* text), passed a NULL pointer.");
+		allocStringData(text, strlen(text));
 	}
 
-	template<class Tchar> BasicString<Tchar>::BasicString(const BasicString& s) {
+	String::String(const String& s) {
 		sd = s.sd;
 		sd->addRef();
 	}
 
-	template<class Tchar> const Tchar* BasicString<Tchar>::c_str() const {
-		return (const Tchar*) sd->mData;
+	const char* String::c_str() const {
+		return (const char*) sd->mData;
 	}
 
-	template<class Tchar> BasicString<Tchar>& BasicString<Tchar>::operator=(const BasicString& s) {
+	String& String::operator=(const String& s) {
 		sd->release();
 		sd = s.sd;
 		sd->addRef();
 		return *this;
 	}
 
-	template<class Tchar> bool BasicString<Tchar>::operator==(const BasicString& other) const {
-		if(this->length() != other.length())
+	bool String::operator==(const String& other) const {
+		if(this->size() != other.size())
 			return false;
 
 		if(this->sd == other.sd)
 			return true;
 
-		return tstrcmp(this->sd->mData, other.sd->mData)==0;
+		return strcmp(this->sd->mData, other.sd->mData)==0;
 	}
 
-	template<class Tchar> bool BasicString<Tchar>::operator!=(const BasicString& other) const {
+	bool String::operator!=(const String& other) const {
 		return !((*this)==other);
 	}
 
 
-	template<class Tchar> bool BasicString<Tchar>::operator<(const BasicString& other) const {
-		return tstrcmp(c_str(), other.c_str()) < 0;
+	bool String::operator<(const String& other) const {
+		return strcmp(c_str(), other.c_str()) < 0;
 	}
 
 
-	template<class Tchar> bool BasicString<Tchar>::operator>(const BasicString& other) const {
-		return tstrcmp(c_str(), other.c_str()) > 0;
+	bool String::operator>(const String& other) const {
+		return strcmp(c_str(), other.c_str()) > 0;
 	}
 
 
-	template<class Tchar> bool BasicString<Tchar>::operator<=(const BasicString& other) const {
-		return tstrcmp(c_str(), other.c_str()) <= 0;
+	bool String::operator<=(const String& other) const {
+		return strcmp(c_str(), other.c_str()) <= 0;
 	}
 
 
-	template<class Tchar> bool BasicString<Tchar>::operator>=(const BasicString& other) const {
-		return tstrcmp(c_str(), other.c_str()) >= 0;
+	bool String::operator>=(const String& other) const {
+		return strcmp(c_str(), other.c_str()) >= 0;
 	}
 
 
-	template<class Tchar> Tchar& BasicString<Tchar>::operator[](int index) {
+	char& String::operator[](int index) {
 		//if memory is shared, do copy on write
 
 		if(sd->getRefCount() > 1) {
-			StringData<Tchar>* newSd = new StringData<Tchar>(*sd);
+			StringData* newSd = new StringData(*sd);
 			MAASSERT(newSd);
 			sd->release();
 			sd = newSd;
@@ -173,10 +177,9 @@ namespace MAUtil {
 	}
 
 #ifndef NEW_OPERATORS
-	template<class Tchar>
-	BasicString<Tchar> BasicString<Tchar>::operator+(const BasicString<Tchar>& other) const {
+	String String::operator+(const String& other) const {
 #if 0
-		BasicString ret = *this;
+		String ret = *this;
 		//MAASSERT(sd->getRefCount() > 1);
 
 		StringData* newSd = new StringData(&((*sd)[0]));
@@ -190,66 +193,106 @@ namespace MAUtil {
 		ret[ret.size()] = '\0';
 		return ret;
 #else
-		BasicString<Tchar> s = *this;
+		String s = *this;
 		s += other;
 		return s;
 #endif
 	}
 
 
-	template<class Tchar> void BasicString<Tchar>::append(const Tchar* other, int len) {
+	void String::append(const char* other, int len) {
 		//order of operations is important here.
-		int oldLen = length();
-		int otherLen = len;
-		int newLen = oldLen + otherLen;
+		int oldSize = size();
+//		int otherSize = other.size();
+		int otherSize = len;
+		int newSize = oldSize + otherSize;
 		if(sd->getRefCount() > 1) {
-			StringData<Tchar>* newSd = new StringData<Tchar>(newLen);
-			memcpy(newSd->pointer(), sd->pointer(), oldLen * sizeof(Tchar));
+			StringData* newSd = new StringData(newSize);
+			memcpy(newSd->pointer(), sd->pointer(), oldSize);
 			sd->release();
 			sd = newSd;
 		} else {
-			sd->reserve(newLen + 1);
+			sd->reserve(newSize + 1);
 		}
-		memcpy(sd->pointer() + oldLen, other, otherLen * sizeof(Tchar));
-		pointer()[newLen] = 0;
-		sd->resize(newLen);		
+		memcpy(sd->pointer() + oldSize, other, otherSize);
+		pointer()[newSize] = 0;
+		sd->resize(newSize);		
 	}
 
-	template<class Tchar>
-	BasicString<Tchar>& BasicString<Tchar>::operator+=(const BasicString<Tchar>& other) {
+	String& String::operator+=(const String& other) {
 		append(other.c_str(), other.length());
 		return *this;
+		/*
+#if 1
+		//order of operations is important here.
+		int oldSize = size();
+		int otherSize = other.size();
+		int newSize = oldSize + otherSize;
+		if(sd->getRefCount() > 1) {
+			StringData* newSd = new StringData(newSize);
+			memcpy(newSd->pointer(), sd->pointer(), oldSize);
+			sd->release();
+			sd = newSd;
+		} else {
+			sd->reserve(newSize + 1);
+		}
+		memcpy(sd->pointer() + oldSize, other.sd->pointer(), otherSize + 1);
+		sd->resize(newSize);
+		return *this;
+#else
+		*this = *this + other;
+		return *this;
+#endif
+		*/
 	}
 
 #if 1
-	template<class Tchar> BasicString<Tchar> BasicString<Tchar>::operator+(Tchar c) const {
-		BasicString s = *this;
+	String String::operator+(char c) const {
+		String s = *this;
 		s += c;
 		return s;
 	}
 
-	template<class Tchar> BasicString<Tchar>& BasicString<Tchar>::operator+=(Tchar c) {
-		append(&c, 1);
+	//TODO: cleanup
+	String& String::operator+=(char c) {
+		append(&c, 1); // to avoid code duplication.... 
 		return *this;
+		/*
+		//order of operations is important here.
+		int oldSize = size();
+		int otherSize = 1;
+		int newSize = oldSize + otherSize;
+		if(sd->getRefCount() > 1) {
+			StringData* newSd = new StringData(newSize);
+			memcpy(newSd->pointer(), sd->pointer(), oldSize);
+			sd->release();
+			sd = newSd;
+		} else {
+			sd->reserve(newSize + 1);
+		}
+		sd->pointer()[oldSize] = c;
+		sd->pointer()[oldSize + 1] = 0;
+		sd->resize(newSize);
+		return *this;
+		*/
 	}
 #endif
 #endif	//NEW_OPERATORS
 
-	template<class Tchar>
-	int BasicString<Tchar>::find(const BasicString<Tchar>& s, unsigned int offset) const {
+	int String::find(const String& s, unsigned int offset) const {
 		if (s.length()+offset <= (unsigned int)sd->size()) {
 			if (!s.length())
 				return ((int) offset);	// Empty string is always found
-			const Tchar *str = (const Tchar*) sd->mData + offset;
-			const Tchar *search = s.c_str();
-			const Tchar *end = sd->mData + sd->size() - s.length() + 1;
-			const Tchar *search_end = s.c_str() + s.length();
+			const char *str = (const char*) sd->mData + offset;
+			const char *search = s.c_str();
+			const char *end = sd->mData + sd->size() - s.length() + 1;
+			const char *search_end = s.c_str() + s.length();
 skipp:
 			while (str != end) {
 				if (*str++ == *search) {
-					register Tchar *i,*j;
-					i=(Tchar*) str;
-					j=(Tchar*) search+1;
+					register char *i,*j;
+					i=(char*) str;
+					j=(char*) search+1;
 					while (j != search_end)
 						if (*i++ != *j++) goto skipp;
 					return (int) (str - sd->mData) - 1;
@@ -259,71 +302,73 @@ skipp:
 		return npos;
 	}
 
-	template<class Tchar> int BasicString<Tchar>::findLastOf(const Tchar findThis) const {
+	int String::findLastOf(const char findThis) const {
 		for(int i = this->length(); i >= 0; i--) {
 			if((*this)[i] == findThis) return i;
 		}
 		return npos;
 	}
 
-	template<class Tchar>
-	int BasicString<Tchar>::findFirstOf(const Tchar findThis, int position) const {
+	int String::findFirstOf(const char findThis, int position) const {
 		for(int i = position; i < this->length(); i++) {
 			if((*this)[i] == findThis) return i;
 		}
 		return npos;
 	}
 
-	template<class Tchar>
-	int BasicString<Tchar>::findFirstNotOf(const Tchar findNotThis, int position) const {
+	int String::findFirstNotOf(const char findNotThis, int position) const {
 		for(int i = position; i < this->length(); i++) {
 			if((*this)[i] != findNotThis) return i;
 		}
 		return npos;
 	}
 
-	template<class Tchar>
-	void BasicString<Tchar>::insert(int position, const BasicString<Tchar>& other) {
-		int otherLen = other.length();
-		int newLen = this->length() + otherLen;
-		this->resize(newLen);
-		int endpos = position + otherLen;
-		for(int i = newLen-1; i >= endpos; i--) {
-			(*sd)[i] = (*sd)[i-otherLen];
+	void String::insert(int position, const String& other) {
+		int otherSize = other.size();
+		int newSize = this->size();
+		newSize += otherSize;
+		this->resize(newSize);
+		int endpos = position+otherSize;
+		for(int i = newSize-1; i >= endpos; i--) {
+			(*sd)[i] = (*sd)[i-otherSize];
 		}
-		for(int i = 0; i < otherLen; i++) {
+		for(int i = 0; i < otherSize; i++) {
 			(*sd)[position++] = other[i];
 		}
+
+		//String begining = this->substr(0, position);
+		//String ending = this->substr(position, this->length() - position);
+		//*this = begining + other + ending;
 	}
 
 	//TODO: cleanup
-	template<class Tchar> void BasicString<Tchar>::insert(int position, Tchar c) {
-		int otherLen = 1;
-		int newLen = this->length() + otherLen;
-		this->resize(newLen);
-		int endpos = position + otherLen;
-		for(int i = newLen-1; i >= endpos; i--) {
-			(*sd)[i] = (*sd)[i-otherLen];
+	void String::insert(int position, char c) {
+		int otherSize = 1;
+		int newSize = this->size();
+		newSize += otherSize;
+		this->resize(newSize);
+		int endpos = position+otherSize;
+		for(int i = newSize-1; i >= endpos; i--) {
+			(*sd)[i] = (*sd)[i-otherSize];
 		}
-		for(int i = 0; i < otherLen; i++) {
+		for(int i = 0; i < otherSize; i++) {
 			(*sd)[position++] = c;
 		}
 	}
 
-	template<class Tchar> void BasicString<Tchar>::remove(int position, int number) {
-		BasicString beginning = this->substr(0, position);
-		BasicString ending = this->substr(position+number, this->length() - position - number);
+	void String::remove(int position, int number) {
+		String beginning = this->substr(0, position);
+		String ending = this->substr(position+number, this->length() - position - number);
 		*this = beginning + ending;
 	}
 
-	template<class Tchar>
-	BasicString<Tchar> BasicString<Tchar>::substr(int startIndex, int len) const {
+	String String::substr(int startIndex, int len) const {
 		ASSERT_MSG(startIndex >= 0 && startIndex <= this->length(), "invalid index");
 		if(len == npos)
 			len = this->length() - startIndex;
 		ASSERT_MSG(len >= 0 && (startIndex+len) <= this->length(), "invalid length");
 
-		BasicString retString;
+		String retString;
 #if 0
 		for(int i = startIndex; i < startIndex + len; i++) {
 			retString += (*this)[i];
@@ -331,8 +376,8 @@ skipp:
 #else
 		if(len > 0) {
 			retString.sd->release();
-			retString.sd = new StringData<Tchar>(len);
-			memcpy(retString.sd->pointer(), sd->pointer() + startIndex, len * sizeof(Tchar));
+			retString.sd = new StringData(len);
+			memcpy(retString.sd->pointer(), sd->pointer() + startIndex, len);
 			retString[len] = 0;
 		}
 #endif
@@ -340,92 +385,72 @@ skipp:
 	}
 
 
-	template<class Tchar> const Tchar& BasicString<Tchar>::operator[](int index) const {
+	const char& String::operator[](int index) const {
 		return sd->mData[index];
 	}
 
-#if 0
-	template<class Tchar> int BasicString<Tchar>::size() const {
-		return sd->size() * sizeof(Tchar);
-	}
-#endif
-
-	template<class Tchar> int BasicString<Tchar>::length() const {
+	int String::size() const {
 		return sd->size();
 	}
 
-	template<class Tchar> int BasicString<Tchar>::capacity() const {
+	int String::length() const {
+		return sd->size();
+	}
+
+	int String::capacity() const {
 		return sd->capacity() - 1;
 	}
 
-	template<class Tchar> BasicString<Tchar>::~BasicString() {
+	String::~String() {
 		sd->release();
 	}
 
-	template<class Tchar> void BasicString<Tchar>::resize(int newLen) {
-		reserve(newLen);
-		sd->resize(newLen);
-		(*sd)[newLen] = 0;
+	void String::resize(int newSize) {
+		reserve(newSize);
+		sd->resize(newSize);
+		(*sd)[newSize] = 0;
 	}
 
-	template<class Tchar> void BasicString<Tchar>::reserve(int newLen) {
+	void String::reserve(int newSize) {
 		if(sd->getRefCount() > 1) {
-			if(newLen < sd->capacity())
-				newLen = sd->capacity();
-			StringData<Tchar>* temp = new StringData<Tchar>(newLen);
+			if(newSize<sd->capacity()) newSize=sd->capacity();
+			StringData* temp = new StringData(newSize);
 			temp->resize(sd->size());
-			memcpy(temp->pointer(), sd->pointer(), (sd->size() + 1) * sizeof(Tchar));
+			memcpy(temp->pointer(), sd->pointer(), sd->size() + 1);
+			//memcpy(temp->pointer(), sd->pointer(), sd->size());
 			sd->release();
 			sd = temp;
 		} else {
-			sd->reserve(newLen+1);
+			sd->reserve(newSize+1);
 			(*sd)[sd->size()] = 0;
+
 		}
 	}
 
-	template<class Tchar> void BasicString<Tchar>::clear() {
+	void String::clear() {
 		if(sd) {
 			sd->release();
 		}
-		sd = getEmptyData<Tchar>();
+		sd = getEmptyData();
 	}
 
 #ifdef HAVE_EMPTY_STRING
-	template<class Tchar> const BasicString& BasicString<Tchar>::emptyString() {
+	const String& String::emptyString() {
 		return *EMPTY_STRING;
 	}
 #endif
 
-	template<class Tchar> void BasicString<Tchar>::setData(StringData<Tchar>* data) {
+	void String::setData(StringData* data) {
 		sd->release();
 		sd = data;
 	}
 
-	template<class Tchar> Tchar* BasicString<Tchar>::pointer() {
+	char* String::pointer() {
 		return sd->pointer();
 	}
 
-	//explicit instantiation
-	template class BasicString<char>;
-	template class BasicString<wchar_t>;
-	template class StringData<char>;
-	template class StringData<wchar_t>;
-}
+//	int String::hash(const String* self, int /*size*/) {
+//		return memHash(self->sd->pointer(), self->size());
+//	}
 
-template<> int tstrlen<char>(const char* str) { return strlen(str); }
-template<> int tstrcmp<char>(const char* a, const char* b) { return strcmp(a, b); }
-
-template<class Tchar> int tstrlen(const Tchar* str) {
-	int len = 0;
-	while(*str) {
-		len++;
-	}
-	return len;
-}
-template<class Tchar> int tstrcmp(const Tchar* a, const Tchar* b) {
-	while(*a == *b) {
-		a++;
-		b++;
-	}
-	return *a - *b;
 }
