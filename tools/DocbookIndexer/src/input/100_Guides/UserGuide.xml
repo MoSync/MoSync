@@ -1,14 +1,14 @@
 <document title="User Guide" author="Niklas Nummelin, Anders Malm, Aaron Chan, Patrick Broman, Ruiwen Chua" area="" keyword="">
 <section id="AboutMoSync" title="About MoSync">
   <![CDATA[
-MoSync is a tool from Mobile Sorcery that enables mobile developers to rapidly and easily create applications for a wide range of mobile devices without having to worry about porting issues.
+MoSync is a tool that enables mobile developers to rapidly and easily create applications for a wide range of mobile devices without having to worry about porting issues.
 Thanks to an advanced and constantly updated device profiling system, MoSync ensures that the same code can be built to run on a multitude of mobile platforms and devices.
 With MoSync, the developer can finally concentrate on creating quality products and services that will be able to reach virtually any mobile device.
 MoSync aims to fill the gap currently present in the mobile development world and unify the fragmented market faced by developers when dealing with porting their applications to the diverse range of mobile devices, across both platforms and models.  
   ]]>
 </section>
 
-<section id="AboutMS" title="About Mobile Sorcery">
+<section id="AboutUs" title="About us">
   <![CDATA[
 Mobile Sorcery is a software development house that generates and develops tools for the mobile industry.
 Our tools are designed to enable faster, easier and more cost efficient development of mobile applications and content.  
@@ -368,13 +368,29 @@ If you have selected a wrong target profile, your application might not be able 
 \\
 Now you can send the application to your device by pressing the 'Send To Target Device' button. How the actual installation on the device works is platform and device specific.
 If you are not sure how this is done or where your application is located after installation, consult the user manual for your device.
+\\
+\\
+**File transfer over Bluetooth (OBEX) doesn't work?**
+\\
+If your target device does not have Bluetooth file transfer (OBEX), you will need to transfer your package using one of the following methods:
 
-  ]]>
-</section>  
+   - * USB connection/Android device: connect your device using the vendor's USB cable, then select Scan for Android USB Device from the Select Target Device drop-down menu.
+   - * USB connection or other cable/any device: connect the device to your PC using the cable provided by the device vendor and use the vendor's own file transfer solution. 
+   - * No cable connection: upload the package to a web server, then download it to the device using the device's web browser. 
+\\
+**Finding the Package to Transfer**
+\\
+Open MoSync, select your device profile, and build your project. You will find the executable package that MoSync has built for your application in the folder:
+\\
+C:\<<install-path>>\<<workspace>>\<<project>>\FinalOutput\<<build-config>>\<<vendor>>\<<model>>\<<package>> where <<install-path>> is the place you installed MoSync.
+\\
+To install your application, copy the executable package to your device using the vendor's own file transfer solution and run it. 		
+    ]]>
+</section>
 
 <section id="DevelopmentModels" title="Development models">
   <![CDATA[
-=== Introduction === 
+=== Introduction ===
 The MoSync C/C++ environment supports several application development models. We call them the "classic procedural", "event driven, object oriented" and "full GUI-based". Which one to choose when developing an application depends both on the type of application and personal preference.
 
 === Classic procedural ===

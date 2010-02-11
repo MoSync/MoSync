@@ -1,0 +1,65 @@
+<document title="Using MAFS" author="Niklas" area="MAFS" keyword="">
+<section id="intro" title="Introduction">
+<![CDATA[
+MAFS (MoSync Filesystem API) is a reimplementation of the Standard C File I/O routines, that operates on either a binary image attached as a resource or using local stores for permanent storage. The binary image is actually a virtual filesystem generated using our tool Bundle.  When porting applications that use a lot of data stored as files in the file system, this comes in handy. Just use the Bundle tool on the data folder to generate an image, attach it as a resource in the MoSync application and mount it using the api functions provided.
+\\
+A policy has been implemented to handle permanent storage of files transparently. The fopen function first looks to see if the file exists in permanent storage. If that is the case everything is written or read from that permanent storage. If no file is found in permanent storage it continues to search for the file in the binary image. Reading from such a file is done by buffering data from the binary resource. Whenever such a file is written to, a copy of the data is created and saved as permanent storage.
+\\
+Any reference documentation for the f* functions of the Standard C File API will work as reference, but we've also included documentation for them in our own reference documentation. There are two special functions for mounting the filesystem image and unmounting it. There can only be one filesystem image mounted at once. Use the function setCurrentFileSystem to mount it and freeCurrentFileSystem to unmount it. setCurrentFileSystem takes two parameters, the first being a handle to the binary resource containing the Bundle-generated filesystem image. The second being an integer, where a value of 1 states that the filesystem should be treated as a case sensitive one (like on Unix systems) and a value of 0 states that it should not (like on Windows). freeCurrentFileSystem just unmounts the current file system and releases all the memory allocated for it.
+]]>
+</section>
+<section id="tutorial" title="Tutorial">
+<![CDATA[
+To show how it works, we begin by making a .bun file using the Bundle-tool.
+\\
+\\
+First create a text-file:
+\\
+{{images/text.png}}
+\\
+Then generate the .bun-file:
+\\
+{{images/bundle.png}}
+\\
+Finally we include the .bun file as an unloaded binary resource:
+[code filename="res.lst"]
+.res R_TEST_FILESYSTEM
+.ubin
+.include "test.bun"
+[/code]
+\\
+We can now write a small program that mounts the bun-file, opens and reads the text-file. Let's do it using the Moblet-architecture:
+
+[code filename="main.cpp"]
+#include <MAUtil/Moblet.h>
+#include <MAFS/File.h>
+#include "MAHeaders.h"
+
+using namespace MAUtil;
+
+class MyMoblet : public Moblet {
+public:
+    MyMoblet() {
+        char text[1024];
+
+        setCurrentFileSystem(R_TEST_FILESYSTEM, 0);
+
+        FILE *file = fopen("text.txt", "r");
+        if(!file) maPanic(1, "Could not open file!");
+        if(!fgets(text, 1024, file)) maPanic(1, "Could not read string!");
+
+        maSetColor(0x00ff00);
+        maDrawText(2, 2, text);
+        maUpdateScreen();
+
+    }
+};
+
+extern "C" int MAMain() {
+    Moblet::run(new MyMoblet());
+    return 0;
+}
+[/code]
+]]>
+</section>
+</document>
