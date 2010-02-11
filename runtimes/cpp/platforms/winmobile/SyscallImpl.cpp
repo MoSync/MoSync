@@ -720,24 +720,9 @@ DWORD GetScreenOrientation()
 		SHFullScreen(g_hwndMain, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON | 
 					 SHFS_HIDESIPBUTTON);
 
-		//ShowWindow(hwndTaskbar, SW_HIDE);
-		//EnableWindow(hwndTaskbar, false);
-
         // Next resize the main window to the size of the screen.
         SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
-
-		//resize window to cover screen
-		/*
-		SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
-				GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right, 
-				   rc.bottom+taskBarHeight, false);
-		
-		MoveWindow(hwndTaskbar, 0, 0, 0, 0, false);
-
-		::ShowWindow(hwndTaskbar, SW_HIDE); 
-		*/
 
 		::ShowWindow(hwndTaskbar, SW_HIDE); 
 	}
@@ -745,29 +730,14 @@ DWORD GetScreenOrientation()
 	void InitWindowed() {
 		RECT rc;
 
-		/*
-		HWND hwndTaskbar = TaskBarFind();
-		GetWindowRect(hwndTaskbar, &rc);
-		int taskBarHeight = (rc.bottom-rc.top);
-		*/
-
-		//hide task bar and other icons
+		//show task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON | 
 					 SHFS_SHOWSIPBUTTON);
 
         // Next resize the main window to the size of the work area.
-        SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
+		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
 		MoveWindow(g_hwndMain, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, TRUE);
 
-		/*
-		//resize window to cover screen
-		SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), 
-				GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top+taskBarHeight, rc.right, 
-				   rc.bottom-taskBarHeight, false);
-
-		::ShowWindow(hwndTaskbar, SW_SHOW);
-		*/
 		HWND hwndTaskbar = TaskBarFind();
 		::ShowWindow(hwndTaskbar, SW_SHOW);
 	}
@@ -2826,7 +2796,6 @@ retry:
 
 void MoSyncExit(int r) 
 {
-	//InitWindowed();
 	LOG("MoSyncExit(%d)\n", r);
 
 	EnterCriticalSection(&exitMutex);
@@ -2862,6 +2831,9 @@ void MoSyncErrorExit(int errorCode)
 			sprintf(ptr, "%s", appCode);
 		}
 	}
+
+	CloseGraphics();
+	InitWindowed();
 
 	//LOG("%s", buffer);
 	WCHAR wbuffer[256];
