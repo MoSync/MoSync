@@ -117,7 +117,7 @@ const String& File::getAbsolutePath() {
 String temp = "";
 
 const String& File::getName() {
-	int i = path.find_last_of("\\");
+	int i = path.find_last_of("\\/");
 	if(i==String::npos) temp = "";
 	//printf("FOUND '%s'\n", &path[i+1]);
 	temp = String(&path[i+1]);
