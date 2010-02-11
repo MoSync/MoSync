@@ -271,6 +271,7 @@ void data_disassemble(const string& args) {
 		}
 		*/
 		error("Not supported");
+		return;
 	} else {
 		error("Bad arguments");
 		return;

@@ -530,7 +530,12 @@ void Expression::update(ExpressionCallback ecb) {
 	//problematic; either calls the callback or error().
 	//we want to handle the error ourselves, lest we have a memory leak (or worse).
 	if(!mExprTree) {
-		mExprTree = ExpressionParser::parse(mExprText.c_str());
+		try {
+			mExprTree = ExpressionParser::parse(mExprText.c_str());
+		} catch(ParseException& e) {
+			error("%s", e.what());
+			return;
+		}
 	} else {
 		// variable is already created. check if any variable is out of scope in this expression. If so, set it as out of scope and skip updation.
 		map<std::string, SYM>& symbols = mExprTree->getSymbols();
