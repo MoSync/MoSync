@@ -153,17 +153,17 @@ platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do
 end
 
 copyright = Magick::Image.read("caption:#{COPYRIGHT}") do 
-	self.size = "450x100"
+	self.size = "500x100"
 	self.pointsize = 11
 	self.fill = '#b0b0b0'
 	self.background_color = '#00000000'
 end
 
 img = img.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
-img = img.composite(copyright.first, 20, 350, Magick::ScreenCompositeOp)
+img = img.composite(copyright.first, 20, 358, Magick::ScreenCompositeOp)
 
 img_gs = img_gs.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
-img_gs = img_gs.composite(copyright.first, 20, 350, Magick::ScreenCompositeOp)
+img_gs = img_gs.composite(copyright.first, 20, 358, Magick::ScreenCompositeOp)
 
 img.write('bmp3:splash.bmp')
 img2.write('bmp3:installer_splash.bmp')
