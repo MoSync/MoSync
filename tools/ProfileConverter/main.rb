@@ -60,6 +60,7 @@ RELEVANT_DEFINES = {
 	:wm6 => [],
 	:wm6pro => [],	
 	:moblin => [],
+	:android => [],
 }
 
 CAP_TYPES = {
@@ -177,6 +178,7 @@ runtimes = {
 	:s60v5  => [],
 	:JavaME => [],
 	:moblin => [],
+	:android => [],
 }
 
 class Array
@@ -428,10 +430,10 @@ runtimes.each do |platform_name, platform|
 		else
 			cmd = "ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{build_root}#{RUNTIME_DIR}/#{runtime_dir}"
 		end
-
+	
 		puts(cmd)
 		success = system(cmd)
-		
+	
 		Dir.chdir cwd
 
 		if(!success)
