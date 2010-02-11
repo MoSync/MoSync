@@ -19,9 +19,9 @@ work.instance_eval do
 		
 		if ( SDL_SOUND == false )
 			if ( HOST_PLATFORM != :moblin )
-				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__ "
+				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__"
 			else
-				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__ "
+				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__"
 			end
 			@IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
 		end
@@ -39,6 +39,7 @@ work.instance_eval do
 		@SPECIFIC_CFLAGS["AudioChannel.cpp"] = " -Wno-unreachable-code"
 		if(CONFIG == "")	#buggy compiler
 			@SPECIFIC_CFLAGS["ConfigParser.cpp"] = " -Wno-uninitialized"
+			@SPECIFIC_CFLAGS["Syscall.cpp"] = " -Wno-uninitialized -Wno-float-equal"
 		end
 	end
 	

@@ -2385,7 +2385,7 @@ public
 
 	synchronized public final void locationUpdated(LocationProvider provider, Location location) {
 		DEBUG_TEMP("locationUpdated\n");
-		int[] event = new int[10];
+		int[] event = new int[11];
 		EI_TYPE = EVENT_TYPE_LOCATION;
 		EI_STATE = handleLocation(location, event);
 		mCanvas.postEvent(event);
@@ -2404,6 +2404,7 @@ public
 		writeDouble(event, 4, qcoor.getLongitude());
 		writeDouble(event, 6, qcoor.getHorizontalAccuracy());
 		writeDouble(event, 8, qcoor.getVerticalAccuracy());
+		event[10] = Float.floatToIntBits(qcoor.getAltitude());
 
 		return MA_LOC_QUALIFIED;
 	}

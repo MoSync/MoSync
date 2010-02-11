@@ -2612,6 +2612,7 @@ retry:
 				posEventData.lon = fixDoubleEndian(pos.dblLongitude);
 				posEventData.horzAcc = fixDoubleEndian(pos.flHorizontalDilutionOfPrecision);
 				posEventData.vertAcc = fixDoubleEndian(pos.flVerticalDilutionOfPrecision);
+				posEventData.alt = pos.flAltitudeWRTEllipsoid;
 				
 				if(pos.FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
 					posEventData.state = MA_LOC_UNQUALIFIED;

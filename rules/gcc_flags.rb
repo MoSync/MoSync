@@ -82,10 +82,10 @@ end
 
 if(HOST == :win32)
 	@HOST_FLAGS = " -DWIN32"
-	@HOST_CPP_FLAGS = ""
+	@HOST_CPPFLAGS = ""
 elsif(HOST == :linux)
 	@HOST_FLAGS = " -DLINUX"
-	@HOST_CPP_FLAGS = " -fPIC"
+	@HOST_CPPFLAGS = " -fPIC"
 else
 	error "Unsupported host: #{HOST}"
 end

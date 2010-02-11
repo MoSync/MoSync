@@ -22,9 +22,6 @@
 require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
-MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
-MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
-
 module MoSyncMod
 	def modSetup
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [MOSYNC_INCLUDE]

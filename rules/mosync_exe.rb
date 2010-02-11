@@ -18,9 +18,6 @@
 
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
-MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
-MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
-
 class PipeExeWork < PipeGccWork
 	def setup
 		@FLAGS = " -B"

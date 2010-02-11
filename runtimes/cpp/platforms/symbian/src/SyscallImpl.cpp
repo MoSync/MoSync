@@ -1608,6 +1608,7 @@ void Syscall::LocationHandlerL(TInt status) {
 	loc->lon = swapd(p.Longitude());
 	loc->horzAcc = swapd(p.HorizontalAccuracy());
 	loc->vertAcc = swapd(p.VerticalAccuracy());
+	loc->alt = p.Altitude();
 
 	gServer.LocationGet(*gLocationSync->Status());
 	gLocationSync->SetActive();

@@ -1019,10 +1019,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\StreamHelpers.h"
-				>
-			</File>
-			<File
 				RelativePath="..\SyscallImpl.cpp"
 				>
 			</File>

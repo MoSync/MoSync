@@ -1807,6 +1807,7 @@ interface MAAPI {
 			double lon;
 			double horzAcc;
 			double vertAcc;
+			float alt;
 		}
 
 		constset int MA_LOC_ {

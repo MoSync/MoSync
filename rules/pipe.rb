@@ -17,6 +17,9 @@
 require "#{File.dirname(__FILE__)}/gcc.rb"
 #require 'lib/importenv.rb'
 
+MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
+MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
+
 class PipeTask < FileTask
 	def initialize(work, name, objects, linkflags)
 		super(work, name)
