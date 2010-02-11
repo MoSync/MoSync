@@ -162,8 +162,10 @@ void CharInput_Pressed(int keyCode) {
 			if(keyCode < MAK_0 || keyCode > MAK_9)
 				return;
 		}
-		if(keyCode >= MAK_SPACE && keyCode < MAK_DELETE)
+		if(keyCode >= MAK_SPACE && keyCode < MAK_DELETE) {
+			sCharacterChangedCallback(keyCode, sCharacterChangedUserData);
 			sCharacterDeployedCallback(keyCode, sCharacterDeployedUserData);
+		}
 		return;
 	}
 

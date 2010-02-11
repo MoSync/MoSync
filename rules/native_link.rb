@@ -54,7 +54,6 @@ class NativeGccLinkWork < NativeGccWork
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
 		wlo = @WHOLE_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		@LIBRARIES.each { |l| @EXTRA_LINKFLAGS += " -l" + l }
-		@EXTRA_LINKFLAGS += " -shared-libgcc"
 		need(:@NAME)
 		need(:@BUILDDIR)
 		need(:@TARGETDIR)

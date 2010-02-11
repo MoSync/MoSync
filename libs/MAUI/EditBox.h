@@ -144,9 +144,6 @@ namespace MAUI {
 		**/
 		void setPasswordMode(bool enabled = true);
 
-		void setQwerty(bool enabled = true);
-		bool getQwerty() const;
-		
 	private:
 		bool deleteCharacter(int c);
 

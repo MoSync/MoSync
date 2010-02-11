@@ -29,10 +29,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef _MSC_VER
 #define PFZT "Iu"
 #elif defined(__GNUC__)
+#if (__GNUC__ == 4) && defined(WIN32)
+#define PFZT "u"
+#else
 #define PFZT "zu"
+#endif	//WIN32
 #else
 #error Unsupported compiler!
-#endif
+#endif	//__GNUC__
 
 using namespace std;
 

@@ -171,7 +171,7 @@ void PrintConsole(const char *str)
 		else
 		{
 			line = sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
-								  sConsole.height].line;
+				sConsole.height].line;
 			line[sConsole.cursorPos.x++] = str[pos];
 
 			if (sConsole.cursorPos.x >= CONSOLE_WIDTH)

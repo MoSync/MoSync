@@ -99,7 +99,7 @@ bool readDevice(DataHandler& data, DEVICE& dev) {
 	//name
 	int strLen;
 	TEST(data.read(&strLen, sizeof(int)));
-	StringData<char>* sd = new StringData<char>(strLen);
+	StringData* sd = new StringData(strLen);
 	dev.name.setData(sd);
 	MAASSERT(sd->getRefCount() == 1);
 	TEST(data.read(sd->pointer(), strLen));
@@ -113,7 +113,7 @@ bool readDevice(DataHandler& data, DEVICE& dev) {
 		SERVICE& serv(dev.services[i]);
 		TEST(data.read(&serv.port, sizeof(int)));
 		TEST(data.read(&strLen, sizeof(int)));
-		sd = new StringData<char>(strLen);
+		sd = new StringData(strLen);
 		serv.name.setData(sd);
 		MAASSERT(sd->getRefCount() == 1);
 		TEST(data.read(sd->pointer(), strLen));
