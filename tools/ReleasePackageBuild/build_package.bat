@@ -525,8 +525,8 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 @echo Otherwise build won't succeed
 @echo ------------------------------------------------
 
-@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\program.zip /y /D
-@xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\resources.zip /y /D
+@copy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\program.zip
+@copy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\resources.zip
 
 @cd %MOSYNC_RELEASE_BUILD_PATH%
 
