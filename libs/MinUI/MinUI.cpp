@@ -597,7 +597,7 @@ namespace MinUI {
 	}
 
 	bool Textbox::moveCursorHorizontal(int steps) {
-		if(mCursor + steps < 0 || mCursor + steps > mText.size())
+		if(mCursor + steps < 0 || mCursor + steps > mText.length())
 			return false;
 		mCursor += steps;
 		return true;

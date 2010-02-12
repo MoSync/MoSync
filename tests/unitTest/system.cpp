@@ -19,7 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 #include <conprint.h>
 
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 class ResetBacklightCase : public KeyBaseCase, public TimerListener {
 public:

@@ -17,10 +17,10 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="4"
-			CharacterSet="1"
+			CharacterSet="0"
 			ManagedExtensions="0"
 			>
 			<Tool
@@ -45,6 +45,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				WarningLevel="3"
+				WarnAsError="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -77,10 +78,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="2"
-			CharacterSet="1"
+			CharacterSet="0"
 			ManagedExtensions="0"
 			WholeProgramOptimization="1"
 			>
@@ -103,8 +104,8 @@
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="2"
 				WarningLevel="3"
+				WarnAsError="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
