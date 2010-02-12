@@ -51,7 +51,7 @@ typedef unsigned int fpos_t;
 * a store. If the file is opened as read-only the system first checks if the file exist as a store.
 * If not it searches through the mounted file system for the file.
 
-* \param filename C string containing a file name.
+* \param filename C string containing a file name. (note '..' isn't supported yet)
 * \param mode C string containing a file access modes.
 
 * \return If the file has been succesfully opened the function will return a pointer to a FILE object 
