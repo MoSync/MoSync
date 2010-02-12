@@ -68,6 +68,8 @@ class PipeResourceTask < PipeTask
 end
 
 class PipeGccWork < GccWork
+	def gccVersionClass; PipeGccWork; end
+	include GccVersion
 	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
 	def gccmode; "-S"; end
 	def host_flags; ""; end

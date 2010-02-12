@@ -32,11 +32,13 @@ typedef signed short s16;
 typedef signed char s8;
 
 #ifdef _MSC_VER
-#define PFZT "I"
+#define PFZT "Iu"
 #elif defined(__GNUC__)
-#define PFZT "z"
+#if (__GNUC__ == 4) && defined(WIN32)
+#define PFZT "u"
 #else
-#ifndef __SYMBIAN32__
+#define PFZT "zu"
+#endif	//WIN32
+#else
 #error Unsupported compiler!
-#endif
-#endif
+#endif	//__GNUC__

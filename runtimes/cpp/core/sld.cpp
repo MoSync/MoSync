@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include <string.h>
 #include <stdio.h>
 #include <set>
 //#include <functional>
@@ -35,7 +36,7 @@ using namespace std;
 
 #ifndef _MSC_VER
 #define stricmp strcasecmp
-#endif 
+#endif
 
 struct linemap_file_line_less
 //	: public std::binary_function<LineMapping, LineMapping, bool>

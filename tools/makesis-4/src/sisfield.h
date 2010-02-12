@@ -42,6 +42,8 @@
 #include <string.h>
 #include <zlib.h>
 #include <time.h>
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 #include "instform.h"
 
@@ -437,7 +439,8 @@ public:
 		uint64_t n = fread(aPtr, 1, iLength, fp);
 		aPtr += n;
 		if (n != iLength) {
-			fprintf(stderr, "Not enough data returned from file %s (requested %lld bytes, got %lld bytes)\n", iName, iLength, n);
+			fprintf(stderr, "Not enough data returned from file %s "
+				"(requested %" PRId64 " bytes, got %" PRId64 " bytes)\n", iName, iLength, n);
 			throw SISFieldBadSourceFile;
 		}
 		fclose(fp);

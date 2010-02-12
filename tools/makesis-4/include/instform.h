@@ -13,17 +13,7 @@
 // EPOC build - include standard types
 #include <e32def.h>
 #else
- #ifdef _MSC_VER
-// Windows build - define a limited number of EPOC types
-//#include <stdint.h>
-
-typedef unsigned char uint8_t;
-typedef short int int16_t;
-typedef unsigned short int uint16_t;
-typedef long int int32_t;
-typedef unsigned long int uint32_t;
-typedef unsigned long long uint64_t;
- #endif
+#include <stdint.h>
 
 typedef int16_t TInt16;
 typedef uint16_t TUint16;

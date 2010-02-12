@@ -219,9 +219,15 @@ namespace MoSyncError {
 #define TRM1(func) if(!(func)) { LOG("Failure "); IN_FILE_ON_LINE; failFunction(); return -1; }
 
 #ifdef _MSC_VER	//Microsoft C
-#define INT64PREFIX "I64"
+	#define INT64PREFIX "I64"
+#elif defined(__GNUC__)
+	#if __GNUC__ == 4
+		#define INT64PREFIX "I64"
+	#else
+		#define INT64PREFIX "ll"
+	#endif
 #else	//glibc-compatible
-#define INT64PREFIX "ll"
+	#define INT64PREFIX "ll"
 #endif
 
 #define DUMPINT(i) LOG("%s: %i\n", #i, i)

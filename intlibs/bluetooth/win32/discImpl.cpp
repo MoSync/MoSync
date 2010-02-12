@@ -218,7 +218,7 @@ static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, std::vector<MAUU
 	return true;
 }
 
-int MASdpEnumAttrs(LPBYTE pSDPStream, ULONG streamSize, std::vector<MAUUID>* pUUIDs) {
+static int MASdpEnumAttrs(LPBYTE pSDPStream, ULONG streamSize, std::vector<MAUUID>* pUUIDs) {
 	//should fill serv.uuids with what we're looking for, if everything went well.
 	GLE(BluetoothSdpEnumAttributes(pSDPStream, streamSize,
 		BtEnumAttributesCallback, pUUIDs));

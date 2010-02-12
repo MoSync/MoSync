@@ -51,12 +51,12 @@ extern "C" {
 
 using std::stack;
 
-uint32_t uidCrc(uint32_t uid1, uint32_t uid2, uint32_t uid3) {
-	uint8_t buf1[] = { (uid1 >> 8), (uid1 >> 24), (uid2 >> 8), (uid2 >> 24), (uid3 >> 8), (uid3 >> 24) };
-	uint8_t buf2[] = { (uid1 >> 0), (uid1 >> 16), (uid2 >> 0), (uid2 >> 16), (uid3 >> 0), (uid3 >> 16) };
+static uint32_t uidCrc(uint32_t uid1, uint32_t uid2, uint32_t uid3) {
+	uint8_t buf1[] = { uint8_t(uid1 >> 8), uint8_t(uid1 >> 24), uint8_t(uid2 >> 8), uint8_t(uid2 >> 24), uint8_t(uid3 >> 8), uint8_t(uid3 >> 24) };
+	uint8_t buf2[] = { uint8_t(uid1 >> 0), uint8_t(uid1 >> 16), uint8_t(uid2 >> 0), uint8_t(uid2 >> 16), uint8_t(uid3 >> 0), uint8_t(uid3 >> 16) };
 	uint16_t crc1 = crcFast(buf1, 6);
 	uint16_t crc2 = crcFast(buf2, 6);
-	return (crc1<<16) | crc2;
+	return (uint32_t(crc1)<<16) | crc2;
 }
 
 
@@ -66,7 +66,7 @@ CSISFileGenerator::CSISFileGenerator(const CSISWriter *sisw) : siswriter(sisw) {
 CSISFileGenerator::~CSISFileGenerator() {
 }
 
-SISArray* GetStringArray(const LANGSTRINGNODE* base) {
+static SISArray* GetStringArray(const LANGSTRINGNODE* base) {
 	SISArray* array = new SISArray(SISFieldType::SISString);
 	stack<SISString*> tmpStack;
 	while (base) {
@@ -80,7 +80,7 @@ SISArray* GetStringArray(const LANGSTRINGNODE* base) {
 	return array;
 }
 
-SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
+static SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
 	SISArray* array = new SISArray(SISFieldType::SISDependency);
 	stack<SISDependency*> tmpStack;
 	while (dependency) {
@@ -103,7 +103,7 @@ SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
 	return array;
 }
 
-SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
+static SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
 	SISArray* array = new SISArray(SISFieldType::SISProperty);
 	stack<SISProperty*> tmpStack;
 	while (capability) {
@@ -119,7 +119,7 @@ SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
 	return array;
 }
 
-void Recompress(SISDataUnit* dataUnit, TCompressionAlgorithm algorithm) {
+static void Recompress(SISDataUnit* dataUnit, TCompressionAlgorithm algorithm) {
 	if (algorithm != ECompressNone)
 		return;
 	SISArray* fileDataArray = (SISArray*) dataUnit->FindElement(SISFieldType::SISArray);
@@ -266,7 +266,7 @@ SISCapabilities* CSISFileGenerator::GetPECapabilities(const char* filename) {
 	capabilities->AddCapabilityBytes(caps, 4);
 	return capabilities;
 }
-SISHash* GetHash(RawFile* rawFile) {
+static SISHash* GetHash(RawFile* rawFile) {
 	SHA_CTX sha;
 	SHA1_Init(&sha);
 	if (rawFile) {
@@ -379,7 +379,7 @@ bool CSISFileGenerator::GetLogo(const LOGO* logo, int index, SISFileDescription*
 	return true;
 }
 
-SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
+static SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
 	switch (condition->exprType) {
 	case EFuncExists: {
 		const struct PKGLINECONDITION* prim = condition->b.pLhs;
@@ -415,7 +415,7 @@ SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
 	return NULL;
 }
 
-SISContents* LoadSISFile(const wchar_t* name, uint32_t uid) {
+static SISContents* LoadSISFile(const wchar_t* name, uint32_t uid) {
 	char sourceFile[MAX_PATH];
 	wcstombs(sourceFile, name, sizeof(sourceFile));
 	sourceFile[MAX_PATH-1] = '\0';
@@ -786,7 +786,7 @@ void CSISFileGenerator::GenerateSISFile(const wchar_t* target, bool stub) {
 	fclose(out);
 }
 
-void writeUint32(uint32_t value, FILE* out) {
+static void writeUint32(uint32_t value, FILE* out) {
 	uint8_t buf[4];
 	buf[0] = (value >>  0) & 0xff;
 	buf[1] = (value >>  8) & 0xff;

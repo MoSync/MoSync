@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <map>
 #include <time.h>
+#include <limits.h>
 
 
 #include <helpers/fifo.h>

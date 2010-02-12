@@ -48,7 +48,7 @@ extern "C" {
 #include "selfsigned.key.h"
 
 
-SISContents* loadSISFile(const char* name, uint8_t* header) {
+static SISContents* loadSISFile(const char* name, uint8_t* header) {
 	FILE* in = fopen(name, "rb");
 	if (!in) {
 		perror(name);
@@ -80,7 +80,7 @@ SISContents* loadSISFile(const char* name, uint8_t* header) {
 	return (SISContents*) field;
 }
 
-void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
+static void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
 	uint8_t* compressedData = new uint8_t[compressed->HeaderDataLength()];
 	uint8_t* compressedPtr = compressedData;
 	compressed->CopyHeaderData(compressedPtr);
@@ -89,7 +89,7 @@ void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
 	csum->iValue = ccsum;
 }
 
-void showHelp(const char* argv0) {
+static void showHelp(const char* argv0) {
 	printf("%s [-?] [-cd | -cr] [-o[-p]] [-s] [-u] [-v] input [output [certificate key [passphrase]]]\n", argv0);
 }
 

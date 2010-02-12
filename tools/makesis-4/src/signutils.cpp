@@ -48,7 +48,7 @@
 #ifdef WIN32
 char passwordBuffer[200];
 #include <conio.h>
-char* getpass(const char* prompt) {
+static char* getpass(const char* prompt) {
 	fprintf(stderr, "%s", prompt);
 	int index = 0;
 	while (true) {
@@ -68,7 +68,7 @@ char* getpass(const char* prompt) {
 }
 #endif
 
-int password_cb(char *buf, int size, int rwflag, void *userdata) {
+static int password_cb(char *buf, int size, int rwflag, void *userdata) {
 	char* pwd = (char*) userdata;
 	if (!pwd)
 		pwd = getpass("Enter private key password: ");
@@ -95,7 +95,7 @@ char* loadTextFile(const char* name) {
 	return buffer;
 }
 
-SISSignature* makeSignature(SISField* controller, const char* keyData, const char* passphrase, SigType type) {
+static SISSignature* makeSignature(SISField* controller, const char* keyData, const char* passphrase, SigType type) {
 	if (type == SigAuto) {
 		if (strstr(keyData, " DSA "))
 			type = SigDsa;
@@ -225,7 +225,7 @@ SISCertificateChain* makeChain(const char* certData) {
 }
 */
 
-SISCertificateChain* makeChain(const char* certData) {
+static SISCertificateChain* makeChain(const char* certData) {
 	BIO* in = BIO_new_mem_buf((void*) certData, -1);
 	BIO* out = BIO_new(BIO_s_mem());
 

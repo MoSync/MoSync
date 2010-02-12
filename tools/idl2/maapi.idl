@@ -315,11 +315,13 @@ interface MAAPI {
 
 	/**
 	* Draws Latin-1 text using the current color.
+	* The coordinates are the top-left corner of the text's bounding box.
 	*/
 	void maDrawText(in int left, in int top, in MAString str);
 
 	/**
 	* Draws Unicode text using the current color.
+	* The coordinates are the top-left corner of the text's bounding box.
 	*/
 	void maDrawTextW(in int left, in int top, in MAWString str);
 

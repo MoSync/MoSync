@@ -20,10 +20,13 @@ require "#{File.dirname(__FILE__)}/pipe.rb"
 
 class PipeExeWork < PipeGccWork
 	def setup
-		@FLAGS = " -B"
+		default(:TARGETDIR, '.')
+		set_defaults
+		sld = @TARGETDIR + "/" + @BUILDDIR + "sld.tab"
+		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
+		@FLAGS = " -sld=#{sld} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[MOSYNC_INCLUDE, "#{ENV['MOSYNCDIR']}/profiles/vendors/MobileSorcery/Emulator"]
-		default(:TARGETDIR, '.')
 		super
 	end
 	def setup3(all_objects)

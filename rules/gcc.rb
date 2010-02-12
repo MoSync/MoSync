@@ -21,6 +21,7 @@ require "#{File.dirname(__FILE__)}/loader_md.rb"
 require "#{File.dirname(__FILE__)}/flags.rb"
 
 def get_gcc_version_string(gcc)
+	puts "get_gcc_version_string(#{gcc})"
 	file = open("|#{gcc} -v 2>&1")
 	file.each do |line|
 		parts = line.split(/ /)
@@ -81,6 +82,23 @@ class CompileGccTask < FileTask
 	include FlagsChanged
 end
 
+# implementations of GccWork should include this module and implement gccVersionClass.
+module GccVersion
+	def set_defaults
+		if(!gccVersionClass.class_variable_defined?(:@@GCC_IS_V4))
+			gcc_version = get_gcc_version_string(gcc)
+			is_v4 = gcc_version[0] == "4"[0]
+			gccVersionClass.class_variable_set(:@@GCC_IS_V4, is_v4)
+			gccVersionClass.class_variable_set(:@@GCC_IS_V43, is_v4 && (gcc_version[2] == "3"[0]))
+			gccVersionClass.class_variable_set(:@@GCC_IS_V44, is_v4 && (gcc_version[2] == "4"[0]))
+		end
+		@GCC_IS_V4 = gccVersionClass.class_variable_get(:@@GCC_IS_V4)
+		@GCC_IS_V43 = gccVersionClass.class_variable_get(:@@GCC_IS_V43)
+		@GCC_IS_V44 = gccVersionClass.class_variable_get(:@@GCC_IS_V44)
+		super
+	end
+end
+
 # Base class.
 # Compiles C/C++ code into an executable file.
 # Supports GCC on mingw, pipe and linux.
@@ -96,19 +114,6 @@ class GccWork < BuildWork
 	# The filename of the target.
 	def target
 		@TARGET
-	end
-	
-	def set_defaults
-		if(!defined?(@@GCC_IS_V4))
-			gcc_version = get_gcc_version_string(gcc)
-			@@GCC_IS_V4 = (gcc_version[0] == "4"[0])
-			@@GCC_IS_V43 = (@@GCC_IS_V4 && (gcc_version[2] == "3"[0]))
-			@@GCC_IS_V44 = (@@GCC_IS_V4 && (gcc_version[2] == "4"[0]))
-		end
-		@GCC_IS_V4 = @@GCC_IS_V4
-		@GCC_IS_V43 = @@GCC_IS_V43
-		@GCC_IS_V44 = @@GCC_IS_V44
-		super
 	end
 	
 	private

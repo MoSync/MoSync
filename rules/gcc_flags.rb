@@ -67,7 +67,7 @@ if(@GCC_IS_V4) then
 	version_warnings += gcc4_warnings
 	if(@GCC_IS_V43 || @GCC_IS_V44) then
 		version_warnings += gcc43_c_warnings + gcc43_warnings
-		cpp_flags += " -std=c++0x -DHAVE_TR1"
+		cpp_flags += " -std=gnu++0x -DHAVE_TR1"
 	end
 end
 if(!@GCC_IS_V43) then

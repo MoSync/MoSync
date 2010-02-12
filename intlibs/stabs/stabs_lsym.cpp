@@ -43,12 +43,6 @@ static char* subParseMethodDeclaration(char* text, const string& name, StructTyp
 static char* subParseInheritance(char* text, StructType* st);
 static bool setVisibility(Visibility&, char c);
 
-#ifndef WIN32
-bool iscsym(int c) {
-	return isalnum(c) || c == '_';
-}
-#endif
-
 bool parseLSym(Tuple t, char* text) {
 	Type s;
 	char* colon = text;
