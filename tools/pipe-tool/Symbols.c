@@ -1446,7 +1446,7 @@ void DumpIPTrans()
 	Sym = SymTab;
 	n = SYMMAX;
 
-	SldFile = fopen("Sld.tab", "w");
+	SldFile = fopen(SldName, "w");
 
 	if (!SldFile)
 	{

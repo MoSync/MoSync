@@ -252,7 +252,7 @@ void Stabs_Dispose()
 
 void Stabs_Write()
 {
-	ArrayWrite(&StabsArray, "stabs.tab");
+	ArrayWrite(&StabsArray, StabsName);
 }
 
 //***************************************

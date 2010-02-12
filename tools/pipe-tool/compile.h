@@ -708,6 +708,9 @@ decset(int ArgSkipElim, 0)
 decset(int ArgSLD, 0)
 decset(int ArgUseStabs, 0)
 
+dec(char SldName[256])
+dec(char StabsName[256])
+
 decset(int ArgUseMasterDump, 0)
 
 decset(short AsmMsg, 1)

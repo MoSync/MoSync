@@ -243,15 +243,19 @@ int main(int argc,char *argv[])
 			continue;
 		}
 
-		if (Token("sld"))
+		if (Token("sld="))
 		{
 			ArgSLD = 1;
+			GetCmdString();
+			strcpy(SldName, Name);
 			continue;
 		}
 
-		if (Token("collect-stabs"))
+		if (Token("stabs="))
 		{
 			ArgUseStabs = 1;
+			GetCmdString();
+			strcpy(StabsName, Name);
 			continue;
 		}
 
@@ -668,7 +672,7 @@ int main(int argc,char *argv[])
 
 void usage ()
 {
-	printf ("pipe-tool Copyright 2007-2009 Mobile Sorcery AB\n");
+	printf("pipe-tool Copyright 2007-2010 Mobile Sorcery AB\n");
 	printf("Version 1.5 " __DATE__ " " __TIME__ "\n\n");
 	printf("\n\
 Usage: pipe-tool <mode> [options] outfile infile1 [infile2 ...]\n\
@@ -691,8 +695,8 @@ Options:\n\
   -error-paths         show file paths in errors\n\
   -elim                eliminate unreferenced code/data\n\
   -no-verify           prevent code verification\n\
-  -sld                 output source/line translation in 'sld.tab'\n\
-  -collect-stabs       output debug information in 'stabs.tab'\n\
+  -sld=file            output source/line translation\n\
+  -stabs=file          output debug information\n\
   -java                together with -B mode: build a Java class file\n\
   -gcj=flags           for Java mode: set flags for GCJ.\n\
 \n\

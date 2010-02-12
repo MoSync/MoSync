@@ -481,12 +481,4 @@ namespace MAUI {
 		}
 		this->passwordMode = enabled;
 	}
-
-	void EditBox::setQwerty(bool enabled) {
-		CharInput::getCharInput().setQwerty(enabled);
-	}
-	bool EditBox::getQwerty() const {
-		return CharInput::getCharInput().getQwerty();
-	}
-
 }
