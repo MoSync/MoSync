@@ -104,28 +104,26 @@ void writeHeader() {
 }
 
 void saveVolumeEntries(VolumeEntry *root) {
-	for(size_t i = 0; i < root->children.size(); i++) {
-		VolumeEntry* vol = root->children[i];
-		
-		fwrite(&vol->type, 1, 1, outFile);	
-		int sizeOfName = vol->name.size()+1;
-		fwrite(vol->name.c_str(), 1, sizeOfName, outFile);
-		int numVolumeEntries;
+	fwrite(&root->type, 1, 1, outFile);	
+	int sizeOfName = root->name.size()+1;
+	fwrite(root->name.c_str(), 1, sizeOfName, outFile);
+	int numVolumeEntries;
 
-		switch(vol->type) {
-			case 0:	
-				numVolumeEntries = vol->children.size();
-				fwrite(&numVolumeEntries, 4, 1, outFile);
-				saveVolumeEntries(vol);
-				break;
-			case 1:
-				int dataOffset = vol->dataOffset;
-				fwrite(&dataOffset, 4, 1, outFile);
-				int dataLength = vol->dataLength;
-				fwrite(&dataLength, 4, 1, outFile);
-				break;
-		}
-	}
+	switch(root->type) {
+		case 0:	
+			numVolumeEntries = root->children.size();
+			fwrite(&numVolumeEntries, 4, 1, outFile);
+			for(size_t i = 0; i < root->children.size(); i++) {
+				saveVolumeEntries(root->children[i]);
+			}
+			break;
+		case 1:
+			int dataOffset = root->dataOffset;
+			fwrite(&dataOffset, 4, 1, outFile);
+			int dataLength = root->dataLength;
+			fwrite(&dataLength, 4, 1, outFile);
+			break;
+	}	
 }
 
 void parse(File file, VolumeEntry *vol);
@@ -258,13 +256,12 @@ int main(int argc, char **argv)
 	root->type = 0; // directory
 
 	for(size_t i = 0; i < inFiles.size(); i++) {
-		VolumeEntry *child = new VolumeEntry;
-		root->children.push_back(child);
 		File file(inFiles[i]);
 		if(file.isDirectory()) {
-			child->type = 0;
-			parseDirectory(file, child);
+			parseDirectory(file, root);
 		} else {
+			VolumeEntry *child = new VolumeEntry;
+			root->children.push_back(child);
 			parse(file, child);
 		}
 	}

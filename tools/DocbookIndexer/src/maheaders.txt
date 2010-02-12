@@ -2,3 +2,4 @@
 #define R_MOSO 1
 #define MY_FONT 2
 #define RES_AUDIO 3
+#define R_TEST_FILESYSTEM 4

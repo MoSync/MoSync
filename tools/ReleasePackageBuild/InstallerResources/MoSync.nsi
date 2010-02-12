@@ -122,6 +122,7 @@ Section "MoSync (required)" MoSync
   IfFileExists "$INSTDIR\include\*.*" feError
   IfFileExists "$INSTDIR\profiles\*.*" feError
   IfFileExists "$INSTDIR\lib\*.*" feError
+  IfFileExists "$INSTDIR\etc\*.*" feError
 
   goto getOnWithIt
 
@@ -134,7 +135,7 @@ feError:
   RMDir /r "$INSTDIR\include"
   RMDir /r "$INSTDIR\profiles"
   RMDir /r "$INSTDIR\lib"
-
+  RMDir /r "$INSTDIR\etc"
 
 getOnWithIt:
   ;!insertmacro UNINSTALL.LOG_OPEN_INSTALL 
@@ -148,6 +149,7 @@ getOnWithIt:
   File /nonfatal /r "lib"
   File /nonfatal /r "skins"
   File /nonfatal /r "templates"
+  File /nonfatal /r "etc"
   File /nonfatal "MoSyncRules.rules"    
 
   ;!insertmacro UNINSTALL.LOG_CLOSE_INSTALL
@@ -188,7 +190,7 @@ Goto endVcRedist
   endVcRedist:
     Delete $INSTDIR\vcredist_x86.exe  
 
-    CreateDirectory "$INSTDIR\etc"
+;   CreateDirectory "$INSTDIR\etc"
     ExecWait 'cmd /C "$INSTDIR\bin\openssl.exe genrsa -rand -des -passout pass:default 1024 > $INSTDIR\etc\default.key"'
     ExecWait 'cmd /C "$INSTDIR\bin\openssl.exe req -new -x509 -nodes -sha1 -days 3650 -key $INSTDIR\etc\default.key -batch -config $INSTDIR\bin\openssl.cnf > $INSTDIR\etc\default.cert"'
 

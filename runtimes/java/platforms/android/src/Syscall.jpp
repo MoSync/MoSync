@@ -248,7 +248,20 @@ IMPLEMENTS MoSync
 				return;
 			}
 
-			if(((char)file.read()) != 'M') { BIG_PHAT_ERROR; }
+			/*
+				The Andorid runtime needs a resource file to build. If eclipse doesn't provide one there will be a dummy resource there!
+			*/
+			char header = file.read();
+			if(header != 'M')
+			{
+				if((header == 'd') && 
+				   (((char)file.read()) == 'u') && 
+				   (((char)file.read()) == 'm') &&
+				   (((char)file.read()) == 'm') &&
+				   (((char)file.read()) == 'y'))
+					return;
+				BIG_PHAT_ERROR;
+			}
 			if(((char)file.read()) != 'A') { BIG_PHAT_ERROR; }
 			if(((char)file.read()) != 'R') { BIG_PHAT_ERROR; }
 			if(((char)file.read()) != 'S') { BIG_PHAT_ERROR; }
