@@ -88,13 +88,13 @@ module GccVersion
 		if(!gccVersionClass.class_variable_defined?(:@@GCC_IS_V4))
 			gcc_version = get_gcc_version_string(gcc)
 			is_v4 = gcc_version[0] == "4"[0]
-			gccVersionClass.class_variable_set(:@@GCC_IS_V4, is_v4)
-			gccVersionClass.class_variable_set(:@@GCC_IS_V43, is_v4 && (gcc_version[2] == "3"[0]))
-			gccVersionClass.class_variable_set(:@@GCC_IS_V44, is_v4 && (gcc_version[2] == "4"[0]))
+			set_class_var(gccVersionClass, :@@GCC_IS_V4, is_v4)
+			set_class_var(gccVersionClass, :@@GCC_IS_V43, is_v4 && (gcc_version[2] == "3"[0]))
+			set_class_var(gccVersionClass, :@@GCC_IS_V44, is_v4 && (gcc_version[2] == "4"[0]))
 		end
-		@GCC_IS_V4 = gccVersionClass.class_variable_get(:@@GCC_IS_V4)
-		@GCC_IS_V43 = gccVersionClass.class_variable_get(:@@GCC_IS_V43)
-		@GCC_IS_V44 = gccVersionClass.class_variable_get(:@@GCC_IS_V44)
+		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
+		@GCC_IS_V43 = get_class_var(gccVersionClass, :@@GCC_IS_V43)
+		@GCC_IS_V44 = get_class_var(gccVersionClass, :@@GCC_IS_V44)
 		super
 	end
 end

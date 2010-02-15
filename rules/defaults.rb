@@ -74,5 +74,8 @@ def set_defaults
 	default(:COMMON_BUILDDIR, @COMMON_BASEDIR + "/" + @BUILDDIR)
 	# String, path to a base directory which will be used as a target for executables and libraries.
 	default(:TARGETDIR, @COMMON_BASEDIR)
+	
+	# String, path to a directory. If set, the Work's target will be copied there.
+	default(:INSTALLDIR, nil)
 end
 end

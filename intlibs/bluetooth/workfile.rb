@@ -14,6 +14,7 @@ work.instance_eval do
 			error "libbluetooth-dev missing!"
 		end
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
+		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn" }
 	elsif(HOST == :win32)
 		@SOURCES = [".", "win32"]
 		if(!@GCC_IS_V4)

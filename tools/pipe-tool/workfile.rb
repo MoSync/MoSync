@@ -12,6 +12,7 @@ work.instance_eval do
 	# -Wno-unused-function
 	@LIBRARIES = ["z"]
 	@NAME = "pipe-tool"
+	@INSTALLDIR = ENV['MOSYNCDIR'] + '/bin'
 	
 	setup
 	

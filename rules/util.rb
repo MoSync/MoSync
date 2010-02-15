@@ -31,6 +31,14 @@ def default_const(constant, value)
 	eval(s)
 end
 
+def set_class_var(c, sym, val)
+	c.send(:class_variable_set, sym, val)
+end
+
+def get_class_var(c, sym)
+	c.send(:class_variable_get, sym)
+end
+
 class String
 	def ext(newEnd)
 		doti = rindex('.')
