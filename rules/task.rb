@@ -162,7 +162,7 @@ class BuildWork < Work
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)
-			@prerequisites << CopyFileTask.new(self, @INSTALLDIR + '/' + File.basename(@NAME), @TARGET)
+			@prerequisites << CopyFileTask.new(self, @INSTALLDIR + '/' + File.basename(@TARGET), @TARGET)
 		end
 	end
 	

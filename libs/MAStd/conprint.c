@@ -83,10 +83,18 @@ static void FeedLine(void)
 void InitConsole(void)
 {
 	int i;
+	char string[128];
 
 	sConsole.screenSize = maGetScrSize();
 	maSetClipRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
-	sConsole.fontHeight = EXTENT_Y(maGetTextSize("gl"));
+
+	//sConsole.fontHeight = EXTENT_Y(maGetTextSize("gl"));
+	
+	// this is more safe:
+	for(i = 1; i < 128; i++) string[i-1] = i;
+	string[127] = 0;
+	sConsole.fontHeight = EXTENT_Y(maGetTextSize(string));
+
 	sConsole.height = EXTENT_Y(sConsole.screenSize) / sConsole.fontHeight;
 	sConsole.cursorPos.x = 0;
 	sConsole.cursorPos.y = sConsole.height - 1;

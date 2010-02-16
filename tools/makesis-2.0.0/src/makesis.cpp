@@ -170,7 +170,7 @@ BOOL CMakeSIS::WriteTarget()
 			DoVerbage(_T("Generating SIS installation file..."));
 		m_SISWriter.WriteSIS(m_CmdOptions.TargetFile(),stubFile);
 		}
-	catch(TGeneratorException err)
+	catch(int err)
 		{
 		ShowGeneratorError(err);
 		fResult = FALSE;
@@ -384,7 +384,7 @@ void CMakeSIS::ShowParseError(TParseException err)
 		}
 	}
 
-void CMakeSIS::ShowGeneratorError(TGeneratorException err)
+void CMakeSIS::ShowGeneratorError(int err)
 // Purpose  : Write message for any error which occured whilst generating the output SIS file (or 
 //			  stub)(to STDOUT (cout/wcout) - naturally)
 // Inputs   : err - the error ID
