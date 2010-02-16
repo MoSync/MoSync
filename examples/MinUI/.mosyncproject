@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true">
-<target-profile device="Emulator" vendor="MobileSorcery"/>
+<project supports-build-configs="true" version="1">
 <build.cfg id="Debug"/>
-<build.cfg active="true" id="Release"/>
-<criteria/>
+<build.cfg id="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>

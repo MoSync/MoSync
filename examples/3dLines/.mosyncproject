@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true">
-<target-profile device="Emulator" vendor="MobileSorcery"/>
+<project supports-build-configs="true" version="1">
 <build.cfg id="Debug"/>
-<build.cfg active="true" id="Release"/>
-<criteria/>
+<build.cfg id="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
-<property key="build.prefs:additional.libraries/Debug" value=""/>
 <property key="build.prefs:additional.libraries/Release" value=""/>
-<property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:dead.code.elim" value="false"/>
-<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
-<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value="-O2"/>
-<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="false"/>
 <property key="build.prefs:ignore.default.libraries" value="false"/>
