@@ -92,6 +92,7 @@ class Targets
 		if(!defined?(CONFIG))
 			set_const(:CONFIG, 'debug')
 		end
+		default_const(:RELOAD, false)
 	end
 	
 	def Targets.handle_arg(a)
@@ -99,7 +100,7 @@ class Targets
 		if(i) then
 			name = a[0, i]
 			value = a[i+1 .. a.length]
-			#puts "Set constant #{name.inspect}=#{value.inspect}"
+			puts "Set constant #{name.inspect}=#{value.inspect}"
 			set_const(name, value)
 		else
 			@@goals += [a.to_sym]

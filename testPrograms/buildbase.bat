@@ -27,7 +27,7 @@ call prever.bat
 GOTO end
 
 :REGULAR
-pipe-tool -master-dump -sld -collect-stabs -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\debug\mautil.lib" "%MOSYNCDIR%\lib\pipe\debug\maui.lib"
+pipe-tool -master-dump -sld=sld.tab -stabs=stabs.tab -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\debug\mautil.lib" "%MOSYNCDIR%\lib\pipe\debug\maui.lib"
 
 REM pipe-tool -elim -java -B program temp.s
 

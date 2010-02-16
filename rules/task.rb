@@ -125,7 +125,15 @@ class Work < TaskBase
 		
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
-		load(File.expand_path('workfile.rb'), true)
+		if(RELOAD)
+			if(HOST == :win32)
+				sh 'ruby workfile.rb'
+			else
+				sh './workfile.rb'
+			end
+		else
+			load(File.expand_path('workfile.rb'), true)
+		end
 		Dir.chdir(oldDir)
 	end
 	

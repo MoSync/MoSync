@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MAStd"
 	ProjectGUID="{B95FFF1F-36B6-4B62-8B1E-137FC9F87648}"
 	RootNamespace="MAStd"
@@ -392,6 +392,14 @@
 		</File>
 		<File
 			RelativePath=".\stdio.h"
+			>
+		</File>
+		<File
+			RelativePath=".\wchar.c"
+			>
+		</File>
+		<File
+			RelativePath=".\wchar.h"
 			>
 		</File>
 	</Files>

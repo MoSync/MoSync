@@ -306,6 +306,7 @@ public:
 			friend class ProfTree;
 		public:
 			const std::vector<ProfNode*>& children() const { return mChildren; }
+			bool running() const { return mRunning; }
 
 			ProfNode(int ip, ProfNode* parent) : mCount(0), mRunning(false), mParent(parent), mIp(ip) {}
 			~ProfNode() {
@@ -421,7 +422,8 @@ public:
 			while(level > 0) {
 				ret();
 			}
-			mRoot->stop();
+			if(mRoot->running())
+				mRoot->stop();
 			{
 				FILE* file = fopen("fp.xml", "w");
 				DEBUG_ASSERT(file);
