@@ -97,7 +97,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @call "%VS80COMNTOOLS%/vsvars32.bat"
 @echo.
 
-@SET INCLUDE=%CD%\build_package_tools\include;%INCLUDE%
+@SET INCLUDE=%CD%\build_package_tools\include;%CD%\build_package_tools\include\msvc;%INCLUDE%
 @SET LIB=%CD%\build_package_tools\lib;%LIB%
 @echo.
 
