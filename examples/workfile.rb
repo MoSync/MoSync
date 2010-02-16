@@ -32,4 +32,8 @@ end
 
 target :default => :pipe
 
+target :clean do
+	Work.invoke_subdirs(SUBDIRS, 'clean')
+end
+
 Targets.invoke

@@ -28,6 +28,7 @@
 
 require "#{File.dirname(__FILE__)}/defaults.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
+require "#{File.dirname(__FILE__)}/host.rb"
 require 'fileutils'
 require 'singleton'
 
@@ -126,10 +127,11 @@ class Work < TaskBase
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
 		if(RELOAD)
+			cmd = "workfile.rb #{args.join(' ')} CONFIG=\"#{CONFIG}\" RELOAD=\"\""
 			if(HOST == :win32)
-				sh 'ruby workfile.rb'
+				sh "ruby #{cmd}"
 			else
-				sh './workfile.rb'
+				sh "./#{cmd}"
 			end
 		else
 			load(File.expand_path('workfile.rb'), true)

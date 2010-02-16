@@ -4,13 +4,6 @@ require File.expand_path('../../rules/mosync_lib.rb')
 
 mod = Module.new
 mod.class_eval do
-	if(CONFIG == "")
-		# broken compiler
-		SPECIFIC_CFLAGS = {"File.c" => " -Wno-unreachable-code"}
-	else
-		SPECIFIC_CFLAGS = {}
-	end
-	
 	def setup_native
 		@LOCAL_DLLS = ["mosync", "mastd"]
 		if(@GCC_IS_V44)
@@ -24,8 +17,13 @@ mod.class_eval do
 	end
 	
 	def setup_base
+		if(@CONFIG == "")
+			# broken compiler
+			@SPECIFIC_CFLAGS = {"File.c" => " -Wno-unreachable-code"}
+		else
+			@SPECIFIC_CFLAGS = {}
+		end
 		@SOURCES = ["."]
-		@SPECIFIC_CFLAGS = SPECIFIC_CFLAGS
 		@INSTALL_INCDIR = "MAFS"
 		@NAME = "mafs"
 	end

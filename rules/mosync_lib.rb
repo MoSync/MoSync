@@ -86,6 +86,12 @@ def MoSyncLib.inin(work, mod)
 	work.invoke
 end
 
+def MoSyncLib.clean(work, mod)
+	work.extend(mod)
+	work.setup
+	work.execute_clean
+end
+
 def MoSyncLib.invoke(mod)
 	target :pipe do
 		MoSyncLib.inin(PipeLibWork.new, mod)
@@ -94,6 +100,10 @@ def MoSyncLib.invoke(mod)
 		MoSyncLib.inin(MoSyncDllWork.new, mod)
 	end
 	target :default => [:pipe, :native]
+	target :clean do
+		MoSyncLib.clean(PipeLibWork.new, mod)
+		MoSyncLib.clean(MoSyncDllWork.new, mod)
+	end
 	
 	Targets.invoke
 end
