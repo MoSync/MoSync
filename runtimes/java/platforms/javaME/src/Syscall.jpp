@@ -93,6 +93,10 @@ import javax.microedition.pim.*;
 #include "generated\IX_PIM_CONSTS.h"
 #endif
 
+#ifdef MA_IX_CAMERA
+#include "generated\IX_CAMERA_CONSTS.h"
+#endif
+
 #define CORE mCore
 
 final class Syscall 
@@ -1908,6 +1912,15 @@ public
 			return maPimItemRemove(a, b);*/
 #endif	//MA_IX_PIM
 
+#ifdef MA_IX_CAMERA
+		case maIOCtl_maCameraStart:
+			return maCameraStart();
+		case maIOCtl_maCameraStop:
+			return maCameraStop();
+		case maIOCtl_maCameraSnapshot:
+			return maCameraSnapshot(a, b);
+#endif
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
@@ -1916,6 +1929,10 @@ public
 #ifdef MA_IX_PIM
 #include "PIM2.jpp"
 #endif	//MA_IX_PIM
+
+#ifdef MA_IX_CAMERA
+#include "Camera.jpp"
+#endif	//MA_IX_CAMERA
 
 	int maGetSystemProperty(String key, MAAddress buf, int size) {
 		String value = System.getProperty(key);

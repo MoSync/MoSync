@@ -30,3 +30,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IX_AUDIOBUFFER
 #define IX_SEGMENTED_DATA
 #define IX_PIM
+#define IX_CAMERA

@@ -1,0 +1,65 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+// include this file in Syscall.jpp.
+
+// subclasses
+//static class MyPimList {
+
+// variables
+int[] mCameraFormats;
+Player mCameraPlayer;
+VideoControl mCameraVC;
+boolean mCameraStarted = false;
+
+// helpers
+
+// syscalls
+int maCameraStart() throws Exception {
+	if(mCameraStarted) {
+		return 0;
+	}
+	if(mCameraPlayer == null) {
+		mCameraPlayer = Manager.createPlayer("capture://video");
+		mCameraPlayer.realize();
+	}
+	// Grab the video control and set it to the current display.
+	mCameraVC = (VideoControl)mCameraPlayer.getControl("VideoControl");
+	mCameraVC.initDisplayMode(VideoControl.USE_DIRECT_VIDEO, mCanvas);
+	mCameraVC.setDisplayFullScreen(true);
+	mCameraVC.setVisible(true);
+
+	mCameraPlayer.start();
+	mCameraStarted = true;
+	return 1;
+}
+
+int maCameraSnapshot(int formatIndex, MAHandle placeholder) throws Exception {
+	addResource(placeholder, new Binary(mCameraVC.getSnapshot(null)));
+	return 0;
+}
+
+int maCameraStop() throws Exception {
+	if(mCameraStarted) {
+		mCameraPlayer.close();
+		mCameraPlayer = null;
+		mCameraStarted = false;
+		return 1;
+	} else {
+		return 0;
+	}
+}

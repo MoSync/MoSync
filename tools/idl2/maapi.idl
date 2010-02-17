@@ -2587,6 +2587,49 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
+
+#if IX_CAMERA
+		struct MA_CAMERA_FORMAT {
+			//in pixels.
+			int width;
+			int height;
+		}
+
+		/**
+		* Returns the number of different output formats supported by this camera.
+		* \< 0 if there is no camera support.
+		* 0 if there IS camera support, but the format is unknown.
+		*/
+		int maCameraFormatNumber();
+
+		/**
+		* Stores an output format in \a fmt.
+		* \a index must be \>= 0 and \< the number returned by maCameraFormatNumber().
+		* \returns 0.
+		*/
+		int maCameraFormat(in int index, out MA_CAMERA_FORMAT fmt);
+
+		/**
+		* Starts a fullscreen viewfinder.
+		* Returns 1, 0 or \< 0.
+		*/
+		// can be varied, but for now, we're keeping it simple.
+		int maCameraStart();
+
+		/**
+		* Stops the viewfinder.
+		* Returns 1, 0 or \< 0.
+		*/
+		int maCameraStop();
+
+		/**
+		* Requires the viewfinder to be active.
+		* Takes a snapshot using the specified format. The snapshot is JPEG-encoded and
+		* stored as a new data object in the supplied placeholder.
+		* Returns 0 or \< 0.
+		*/
+		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+#endif	//IX_CAMERA
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

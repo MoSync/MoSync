@@ -253,6 +253,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\platforms\javaME\src\Camera.jpp"
+				>
+			</File>
+			<File
 				RelativePath=".\platforms\javaME\src\config_platform.h"
 				>
 			</File>
