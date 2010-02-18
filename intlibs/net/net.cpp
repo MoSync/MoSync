@@ -30,6 +30,11 @@ using namespace MoSyncError;
 typedef int socklen_t;
 #endif
 
+#if _WIN32_WCE >= 0x500
+#include <initguid.h>
+#include <connmgr.h>  
+#endif
+
 //******************************************************************************
 // for symbian
 //******************************************************************************
@@ -84,10 +89,47 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 //******************************************************************************
 // TcpConnection helpers
 //******************************************************************************
+#if _WIN32_WCE >= 0x500
+int ensureconnected()
+{
+	HRESULT _res;
+
+	static HANDLE _conn = 0;
+	DWORD _status = 0;
+	DWORD _timeout = 20000;
+	CONNMGR_CONNECTIONINFO _info = {0};
+
+	ConnMgrConnectionStatus(&_conn, &_status);
+    if (_status==CONNMGR_STATUS_CONNECTED)
+		return 0;
+
+	memset(&_info, 0, sizeof(CONNMGR_CONNECTIONINFO));
+	_info.cbSize = sizeof(CONNMGR_CONNECTIONINFO);
+	_info.dwParams = CONNMGR_PARAM_GUIDDESTNET;
+	_info.dwFlags = CONNMGR_FLAG_PROXY_HTTP;
+	_info.dwPriority = CONNMGR_PRIORITY_USERINTERACTIVE;
+	_info.guidDestNet = IID_DestNetInternet;
+
+	_res = ConnMgrEstablishConnectionSync(&_info, &_conn,_timeout,&_status);
+	if (_res == E_FAIL)
+	{
+			return -1;
+	}
+
+	return 0;
+}
+#endif
 
 //returns INVALID_SOCKET on failure. puts CONNERR-compliant code in result.
 MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr) {
 	int iRet;
+
+#if _WIN32_WCE >= 0x500
+	if(ensureconnected()!=0) {
+		result = CONNERR_GENERIC;
+		return INVALID_SOCKET;
+	}
+#endif
 
 	MoSyncSocket mySocket;
 	// Create socket
