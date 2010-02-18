@@ -126,7 +126,10 @@ namespace MAUI {
 	
 		/** Sets the text. **/
 		void setText(const String& text);
-		/** Returns the text. **/
+		/** Returns the text.
+		* In password mode, this returns the password, while
+		* getCaption() returns the asterisks.
+		*/
 		const String& getText() const;
 		/** Selects the input mode. **/
 		void setInputMode(InputMode inputMode);

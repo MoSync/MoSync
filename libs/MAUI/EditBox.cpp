@@ -140,8 +140,8 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	const String& EditBox:: getText() const {
-		return caption;
+	const String& EditBox::getText() const {
+		return passwordMode ? password : caption;
 	}
 
 	/*
