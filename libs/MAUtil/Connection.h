@@ -110,6 +110,8 @@ public:
 	/**
 	* Causes ConnectionListener::connWriteFinished() to be called when the operation is complete.
 	* \see maConnWrite()
+	* \warning The source data must remain available until the operation is complete, so don't
+	* use local variables as input.
 	*/
 	void write(const void* src, int len);
 	/**

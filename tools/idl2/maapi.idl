@@ -721,6 +721,8 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_WRITE.
 	* The success value is \> 0.
 	*
+	* \warning The source data must remain available until the operation is complete,
+	* so if it was dynamically allocated, don't free it too early.
 	* \see maGetEvent
 	*/
 	void maConnWrite(in MAHandle conn, in MAAddress src, in int size);
