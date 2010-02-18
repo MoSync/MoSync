@@ -191,6 +191,14 @@ IMPLEMENTS MoSync
 #include "FileConnection.jpp"
 #endif
 
+#ifdef MA_IX_PIM
+#include "PIM2.jpp"
+#endif	//MA_IX_PIM
+
+#ifdef MA_IX_CAMERA
+#include "Camera.jpp"
+#endif	//MA_IX_CAMERA
+
 	//***************************************************************************
 	//Declarations
 	//***************************************************************************
@@ -1913,26 +1921,24 @@ public
 #endif	//MA_IX_PIM
 
 #ifdef MA_IX_CAMERA
+#if USE_CR_FORMATS
+		case maIOCtl_maCameraFormatNumber:
+			return maCameraFormatNumber();
+		case maIOCtl_maCameraFormat:
+			return maCameraFormat(a, b);
+#endif	//USE_CR_FORMATS
 		case maIOCtl_maCameraStart:
 			return maCameraStart();
 		case maIOCtl_maCameraStop:
 			return maCameraStop();
 		case maIOCtl_maCameraSnapshot:
 			return maCameraSnapshot(a, b);
-#endif
+#endif	//MA_IX_CAMERA
 
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
 	}
-
-#ifdef MA_IX_PIM
-#include "PIM2.jpp"
-#endif	//MA_IX_PIM
-
-#ifdef MA_IX_CAMERA
-#include "Camera.jpp"
-#endif	//MA_IX_CAMERA
 
 	int maGetSystemProperty(String key, MAAddress buf, int size) {
 		String value = System.getProperty(key);

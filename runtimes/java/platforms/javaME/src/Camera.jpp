@@ -17,18 +17,98 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // include this file in Syscall.jpp.
 
+#define USE_CR_FORMATS 1
+
 // subclasses
 //static class MyPimList {
 
 // variables
+#if USE_CR_FORMATS
 int[] mCameraFormats;
+#endif
 Player mCameraPlayer;
 VideoControl mCameraVC;
 boolean mCameraStarted = false;
 
 // helpers
+#if USE_CR_FORMATS
+#define MA_CAMERA_FORMAT_LENGTH 2
 
 // syscalls
+int maCameraFormatNumber() {
+	if(mCameraFormats != null) {
+		return mCameraFormats.length / MA_CAMERA_FORMAT_LENGTH;
+	}
+	//parse "camera.orientations" and pick the first camera,
+	//which is defined by the JSR to be the default.
+	String co = System.getProperty("camera.orientations");
+	DUMP(co);
+	if(co == null)	//formats not supported.
+		return 0;
+	int colon = co.indexOf(':');
+	MYASSERT(colon > 0);
+	String name = co.substring(0, colon + 1);
+	DUMP(name);
+
+	//parse "camera.resolutions", picking out the resolutions for the default camera.
+	//first count the number of rezzes, then allocate the array, finally parse them all.
+	String cr = System.getProperty("camera.resolutions");
+	DUMP(cr);
+	int count = 0, pos = 0;
+	while(true) {
+		colon = cr.indexOf(name, pos);
+		if(colon < 0)
+			break;
+		//skip the minimum number of chars occupied by a well-formed resolution string.
+		pos = colon + 4;
+		count++;
+	}
+	DUMP(count);
+	MYASSERT(count > 0);
+	mCameraFormats = new int[count * MA_CAMERA_FORMAT_LENGTH];
+	int recount = 0;
+	pos = 0;
+	while(true) {
+		int npos = cr.indexOf(name, pos);
+		DUMP(npos);
+		if(npos < 0)
+			break;
+		pos = npos + name.length();
+
+		//parse one resolution string
+		int x = cr.indexOf('x', pos);
+		DUMP(x);
+		int width = Integer.parseInt(cr.substring(pos, x));
+		pos = x + 1;
+		int space = cr.indexOf(' ', pos);
+		DUMP(space);
+		//this may be the last rez. in that case, space < 0.
+		String hstr;
+		if(space < 0) {
+			hstr = cr.substring(pos);
+		} else {
+			hstr = cr.substring(pos, space);
+			pos = space + 1;
+		}
+		int height = Integer.parseInt(hstr);
+
+		mCameraFormats[recount] = width;
+		mCameraFormats[recount + 1] = height;
+		recount += MA_CAMERA_FORMAT_LENGTH;
+	}
+	return count;
+}
+
+int maCameraFormat(int index, MAAddress fmt) {
+	int[] mem_ds = CORE.mMem_ds;
+	index *= 2;
+	for(int i=0; i<MA_CAMERA_FORMAT_LENGTH; i++) {
+		WINT(fmt + i*4, mCameraFormats[index + i]);
+	}
+	return 0;
+}
+#endif	//USE_CR_FORMATS
+
 int maCameraStart() throws Exception {
 	if(mCameraStarted) {
 		return 0;
@@ -49,7 +129,21 @@ int maCameraStart() throws Exception {
 }
 
 int maCameraSnapshot(int formatIndex, MAHandle placeholder) throws Exception {
-	addResource(placeholder, new Binary(mCameraVC.getSnapshot(null)));
+#if USE_CR_FORMATS
+	String format;
+	if(mCameraFormats == null || formatIndex == 0) {
+		format = null;
+	} else {
+		int width = mCameraFormats[formatIndex*2];
+		int height = mCameraFormats[formatIndex*2+1];
+		format = "encoding=jpeg&width=" + width + "&height=" + height;
+	}
+	DUMP(format);
+	byte[] bytes = mCameraVC.getSnapshot(format);
+#else
+	byte[] bytes = mCameraVC.getSnapshot(null);
+#endif	//USE_CR_FORMATS
+	addResource(placeholder, new Binary(bytes));
 	return 0;
 }
 
