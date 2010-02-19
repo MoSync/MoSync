@@ -55,9 +55,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define MA_PROF_BUG_BACKLIGHTFLASHES
 //#define MA_PROF_BUG_MICROEMU
 //#define MA_PROF_BUG_NO_SIZECHANGED
+//#define MA_PROF_SUPPORT_CAMERA
 
 //#define MA_SUPPORT_RECORD
 //#define MA_IX_CONNSERVER
 //#define MA_IX_AUDIOBUFFER
 //#define MA_IX_PIM
-//#define MA_IX_CAMERA

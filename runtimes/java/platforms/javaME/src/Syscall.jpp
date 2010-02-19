@@ -93,7 +93,7 @@ import javax.microedition.pim.*;
 #include "generated\IX_PIM_CONSTS.h"
 #endif
 
-#ifdef MA_IX_CAMERA
+#ifdef MA_PROF_SUPPORT_CAMERA
 #include "generated\IX_CAMERA_CONSTS.h"
 #endif
 
@@ -195,9 +195,9 @@ IMPLEMENTS MoSync
 #include "PIM2.jpp"
 #endif	//MA_IX_PIM
 
-#ifdef MA_IX_CAMERA
+#ifdef MA_PROF_SUPPORT_CAMERA
 #include "Camera.jpp"
-#endif	//MA_IX_CAMERA
+#endif	//MA_PROF_SUPPORT_CAMERA
 
 	//***************************************************************************
 	//Declarations
@@ -1920,7 +1920,7 @@ public
 			return maPimItemRemove(a, b);*/
 #endif	//MA_IX_PIM
 
-#ifdef MA_IX_CAMERA
+#ifdef MA_PROF_SUPPORT_CAMERA
 #if USE_CR_FORMATS
 		case maIOCtl_maCameraFormatNumber:
 			return maCameraFormatNumber();
@@ -1933,7 +1933,7 @@ public
 			return maCameraStop();
 		case maIOCtl_maCameraSnapshot:
 			return maCameraSnapshot(a, b);
-#endif	//MA_IX_CAMERA
+#endif	//MA_PROF_SUPPORT_CAMERA
 
 		default:
 			return IOCTL_UNAVAILABLE;

@@ -22,10 +22,22 @@ require 'set'
 
 DB_FILENAME = "profiles.db"
 SQL_FILENAME = "profiles.sql"
-OUTPUT_ROOT = "n/"
+OUTPUT_ROOT = "profiles/"
 BUILD_ROOT = "../ProfileConverter/"
 VENDOR_DIR = "#{OUTPUT_ROOT}vendors"
 RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
+
+gBuildRuntimes = true
+
+ARGV.each do |arg|
+	if(arg == '-nobuild')
+		gBuildRuntimes = false
+	else
+		puts "Unknown argument: '#{arg}'"
+		exit(1)
+	end
+end
+
 
 # data types
 class PlatformReferrer
@@ -96,6 +108,9 @@ RELEVANT_CAPS = [
 	:Features,
 	:Bugs,
 	:JavaConfiguration,
+	:CameraResolution_x,
+	:CameraResolution_y,
+	:properties,
 ]
 
 RELEVANT_DEFINES = {
@@ -106,7 +121,8 @@ RELEVANT_DEFINES = {
 		'MA_PROF_SUPPORT_STYLUS',
 		'MA_PROF_SUPPORT_CLDC_10',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
-		'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI'
+		'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI',
+		'MA_PROF_SUPPORT_CAMERA',
 	],
 	
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -131,6 +147,8 @@ CAP_TYPES = {
 		:HeapSize,
 		:MaxJarSize,
 		:Packager,
+		:CameraResolution_x,
+		:CameraResolution_y,
 	],
 	:supports => [
 		:JavaPackage,
@@ -272,9 +290,7 @@ CAP = read_table(db, "cap") do |row| PlatformReferrer.new(row[1], row[2].to_i) e
 
 name = "devicecapvalue"
 puts "Reading #{name}"
-res = db.execute("select * from #{name}")
-puts res.length
-res.each do |row|
+db.execute("select * from #{name}") do |row|
 	devId = row[1].to_i
 	cap = CAP[row[2].to_i].name
 	value = CAPVALUE[row[3].to_i]
@@ -390,7 +406,7 @@ DEVICE.each_with_index do |device, index|
 					value.each do |v|
 						def_name = "MA_PROF_SUPPORT_#{cap.to_s.format}"
 						if(!(seen_defines.include? def_name)) then
-							if(def_name !=  "MA_PROF_SUPPORT_JAVAPACKAGE") then
+							if(def_name != "MA_PROF_SUPPORT_JAVAPACKAGE") then
 								seen_defines << def_name
 							end
 							rt_obj.caps["#{def_name}_#{v.format}"] = "TRUE";
@@ -414,8 +430,30 @@ DEVICE.each_with_index do |device, index|
 							rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
 							def_str = "#define MA_PROF_SUPPORT_STYLUS"
 							profile.puts def_str
+						elsif v == "hasCamera"
+							#code dupe
+							def_name = "MA_PROF_SUPPORT_CAMERA"
+							if(!(seen_defines.include? def_name))
+								definitions[def_name] = "#{def_name},Support/Camera"
+								rt_obj.caps[def_name] = "TRUE";
+								def_str = "#define #{def_name}"
+								profile.puts def_str
+							end
 						elsif v == "isVirtual"
 							## should not generate this profile......
+						end
+					end	#value.each
+				elsif(cap == :properties)
+					value.each do |v|
+						if(v == "camera.orientations")
+							#code dupe
+							def_name = "MA_PROF_SUPPORT_CAMERA"
+							if(!(seen_defines.include? def_name))
+								definitions[def_name] = "#{def_name},Support/Camera"
+								rt_obj.caps[def_name] = "TRUE";
+								def_str = "#define #{def_name}"
+								profile.puts def_str
+							end
 						end
 					end	#value.each
 				elsif(cap == :JavaConfiguration)
@@ -487,12 +525,16 @@ runtimes.each do |platform_name, platform|
 		else
 			cmd = "ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 		end
-	
+		
 		puts(cmd)
-		success = system(cmd)
-	
+		if(gBuildRuntimes)
+			success = system(cmd)
+		else
+			success = true
+		end
+		
 		Dir.chdir cwd
-
+		
 		if(!success)
 			puts "Building one of the runtimes failed."
 			exit(1)
