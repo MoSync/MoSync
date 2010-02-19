@@ -2590,7 +2590,6 @@ interface MAAPI {
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
-#if IX_CAMERA
 		struct MA_CAMERA_FORMAT {
 			//in pixels.
 			int width;
@@ -2631,7 +2630,6 @@ interface MAAPI {
 		* Returns 0 or \< 0.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
-#endif	//IX_CAMERA
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

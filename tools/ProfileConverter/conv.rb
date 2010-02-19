@@ -22,21 +22,32 @@ require 'set'
 
 DB_FILENAME = "profiles.db"
 SQL_FILENAME = "profiles.sql"
-OUTPUT_ROOT = "profiles/"
-BUILD_ROOT = "../ProfileConverter/"
-VENDOR_DIR = "#{OUTPUT_ROOT}vendors"
-RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
 
+# command-line arguments
+output_root = "profiles/"
+build_root = "../ProfileConverter/"
 gBuildRuntimes = true
 
-ARGV.each do |arg|
+i=0
+while(i<ARGV.length)
+	arg = ARGV[i]
 	if(arg == '-nobuild')
 		gBuildRuntimes = false
+	elsif(arg == '-dst')
+		i += 1
+		output_root = "#{ARGV[i]}/"
+		build_root = ''
 	else
 		puts "Unknown argument: '#{arg}'"
 		exit(1)
 	end
+	i += 1
 end
+
+OUTPUT_ROOT = output_root
+BUILD_ROOT = build_root
+VENDOR_DIR = "#{OUTPUT_ROOT}vendors"
+RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
 
 
 # data types

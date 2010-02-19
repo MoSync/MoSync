@@ -93,10 +93,6 @@ import javax.microedition.pim.*;
 #include "generated\IX_PIM_CONSTS.h"
 #endif
 
-#ifdef MA_PROF_SUPPORT_CAMERA
-#include "generated\IX_CAMERA_CONSTS.h"
-#endif
-
 #define CORE mCore
 
 final class Syscall 

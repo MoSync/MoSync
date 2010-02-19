@@ -1,6 +1,5 @@
 #include <MAUtil/Moblet.h>
 #include <MAUtil/PlaceholderPool.h>
-#include <IX_CAMERA.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
 

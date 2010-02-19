@@ -537,7 +537,7 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 
 @cd %MOSYNC_TRUNK%\tools\profileConverter
 @mkdir %MOSYNC_PROFILES_PATH%
-@call ruby conv.rb %MOSYNC_PROFILES_PATH%
+@call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo ------------------------------------------------
