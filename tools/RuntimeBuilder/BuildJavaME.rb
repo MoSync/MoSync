@@ -94,15 +94,15 @@ class RuntimeBuilder
 		
 		# Restore config_platform.h
 		revert_backupped_file config_file
-	
+		
+		libjars = ['cldcapi11', 'midpapi20', 'jsr082', 'jsr179', 'jsr179', 'wma20', 'mmapi']
+		
 		# Compile Java source
 		puts "Compiling java source.."
 		system("javac -source 1.4 -target 1.4 -d #{class_dir} -classpath #{class_dir} -bootclasspath " +
-			   "#{java_me_sdk}j2melib/jsr082.jar;#{java_me_sdk}j2melib/cldcapi11.jar;" +
-			   "#{java_me_sdk}j2melib/midpapi20.jar;#{java_me_sdk}j2melib/wma20.jar;" +
-			   "#{java_me_sdk}j2melib/jsr75.jar;" +
-			   "#{java_me_sdk}j2melib/jsr179.jar #{temp_dir}*.java");
-			
+			libjars.collect { |jar| "#{java_me_sdk}j2melib/#{jar}.jar;" }.join('') +
+			" #{temp_dir}*.java")
+		
 		# Generate Manifest file
 		puts "Generating manifest file.."
 		runtime_number = runtime_dir.split('/')[-1] # extract which runtime number it is from the path
@@ -125,24 +125,21 @@ class RuntimeBuilder
 			return
 		end
 		
+		
 		# Obfuscate java binaries
 		puts "Obfuscating java binaries.."
 		system("java -jar #{java_me_sdk}bin/proguard.jar -injars #{runtime_dir}MoSyncRuntimeTemp.jar " +
-		"-libraryjars #{java_me_sdk}j2melib/cldcapi11.jar -libraryjars #{java_me_sdk}j2melib/midpapi20.jar " +
-		"-libraryjars #{java_me_sdk}j2melib/jsr082.jar -libraryjars #{java_me_sdk}j2melib/jsr179.jar " +
-		"-libraryjars #{java_me_sdk}j2melib/jsr75.jar " +
-		"-libraryjars #{java_me_sdk}j2melib/wma20.jar -dontusemixedcaseclassnames " +
-		"-outjars #{runtime_dir}MoSyncRuntimeObfuscated.jar -keep public class MAMidlet");
+			libjars.collect { |jar| "-libraryjars #{java_me_sdk}j2melib/#{jar}.jar " }.join('') +
+			"-dontusemixedcaseclassnames " +
+			"-outjars #{runtime_dir}MoSyncRuntimeObfuscated.jar -keep public class MAMidlet");
 		
 		FileUtils.copy_file("#{runtime_dir}MoSyncRuntimeObfuscated.jar", "#{runtime_dir}MoSyncRuntime#{debug}.jar" )
 		
 		# Preverify java binaries
 		puts "Preverifying java binaries.."
 		system("#{java_me_sdk}bin/preverify -d #{runtime_dir[0..-2]} -classpath " +
-			   "#{java_me_sdk}j2melib/jsr082.jar;#{java_me_sdk}j2melib/cldcapi11.jar;" +
-			   "#{java_me_sdk}j2melib/midpapi20.jar;#{java_me_sdk}j2melib/jsr179.jar;" +
-			   "#{java_me_sdk}j2melib/jsr75.jar;" +
-			   "#{java_me_sdk}j2melib/wma20.jar #{runtime_dir}MoSyncRuntime#{debug}.jar")
+			libjars.collect { |jar| "#{java_me_sdk}j2melib/#{jar}.jar;" }.join('') +
+			" #{runtime_dir}MoSyncRuntime#{debug}.jar")
 		
 		# Clean and delete all the temporary folders
 		FileUtils.rm_rf temp_dir

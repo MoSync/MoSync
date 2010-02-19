@@ -15,6 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "helpers.h"
+#include "generated\MAAPI_consts.h"
+
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.lcdui.*;
 import javax.microedition.rms.*;
@@ -23,9 +26,6 @@ import java.io.*;
 #ifndef PHONE_RELEASE
 import javax.microedition.io.file.*;
 #endif
-
-#include "helpers.h"
-#include "generated\MAAPI_consts.h"
 
 public final class MAMidlet extends MIDlet {
 	MainCanvas mCanvas;
