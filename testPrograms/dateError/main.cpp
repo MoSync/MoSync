@@ -6,7 +6,7 @@
 extern "C" int MAMain() {
 	printf("Local time:\n");
 	time_t myTime = maLocalTime();
-	for(int i = 0; i < 61 ; i++){
+	for(int i = 0; i < 366*8 ; i++){
 		printf("%s\n", sprint_time(myTime));
 		myTime -= (60 * 60 * 24);
 	}
