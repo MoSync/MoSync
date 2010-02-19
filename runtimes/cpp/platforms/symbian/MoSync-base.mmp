@@ -75,3 +75,4 @@ LIBRARY mediaclientaudiostream.lib
 LIBRARY mediaclientvideo.lib
 LIBRARY Lbs.lib
 LIBRARY insock.lib
+LIBRARY ecam.lib

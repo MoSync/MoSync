@@ -53,7 +53,11 @@ RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
 # data types
 class PlatformReferrer
 	def initialize(name, platform_index)
-		@name = name.to_sym
+		if(name == "")
+			@name = ""
+		else
+			@name = name.to_sym
+		end
 		@platform = PLATFORM[platform_index]
 	end
 	attr_reader(:name, :platform)
@@ -61,7 +65,11 @@ end
 
 class Device
 	def initialize(name, vendor_index, platformversion_index)
-		@name = name.to_sym
+		if(name == "")
+			@name = ""
+		else
+			@name = name.to_sym
+		end
 		@vendor = vendor_index.to_i
 		@platformversion = PLATFORMVERSION[platformversion_index.to_i]
 		@caps = Hash.new
@@ -186,14 +194,14 @@ runtimes = {
 # helpers
 def assert(truth)
 	if(!truth)
-		throw a fit
+		throw(42)
 	end
 end
 
 def assert_eq(a, b)
 	if(a != b)
 		puts "Assertion failed: " + a.to_s + " = " + b.to_s
-		throw a fit
+		throw(42)
 	end
 end
 

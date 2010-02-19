@@ -75,6 +75,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40057, ERR_INVALID_FILE_ACCESS_MODE, "Invalid file access mode")\
 	m(40058, ERR_FILE_CLOSED, "The file is closed")\
 	m(40059, ERR_INVALID_FILE_SEEK_MODE, "Invalid file seek mode")\
+	m(40060, ERR_INVALID_CAMERA_FORMAT_INDEX, "Invalid camera format index")\
 
 DECLARE_ERROR_ENUM(BASE)
 

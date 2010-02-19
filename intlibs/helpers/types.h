@@ -39,6 +39,7 @@ typedef signed char s8;
 #else
 #define PFZT "zu"
 #endif	//WIN32
-#else
-#error Unsupported compiler!
+#else	//SYMBIAN
+#define PFZT "u"
+//#error Unsupported compiler!
 #endif	//__GNUC__

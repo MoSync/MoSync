@@ -173,10 +173,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Shared\generated\IX_CAMERA_CONSTS.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Shared\generated\IX_CELLID_CONSTS.h"
 				>
 			</File>

@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MdaAudioSamplePlayer.h>
 #include <MdaAudioSampleEditor.h>
 #include <mmf/common/mmfcontroller.h>
+#include <ecam.h>
 
 #include "config_platform.h"
 #define SYMBIAN 1

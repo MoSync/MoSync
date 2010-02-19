@@ -343,6 +343,10 @@ void Syscall::StopEverything() {
 	maLocationStop();
 #endif
 
+	if(gCamera) {
+		gCamera->Release();
+	}
+
 #ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	if(gVideoPlayer != NULL) {
 		gVideoPlayer->Close();
@@ -404,6 +408,8 @@ void Syscall::platformDestruct() {
 	SAFE_DELETE(gLocationSync);
 #endif
 
+	SAFE_DELETE(gCamera);
+
 	LOG("SAFE_DELETE(gVideoPlayer);\n");
 	SAFE_DELETE(gVideoPlayer);
 
@@ -431,8 +437,6 @@ void Syscall::platformDestruct() {
 	DestructGuido();
 #endif	//GUIDO
 
-
-	
 	/*for(int i=0; i<MAX_SOUND_CHANNELS; i++)
 	{
 		maSoundDispose();
@@ -1534,12 +1538,68 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 		return maSendToBackground();
 	case maIOCtl_maBringToForeground:
 		return maBringToForeground();
+	
+	case maIOCtl_maCameraFormatNumber:
+		return maCameraFormatNumber();
+	case maIOCtl_maCameraFormat:
+		return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
 
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
 }
 
+//------------------------------------------------------------------------------
+// Camera
+//------------------------------------------------------------------------------
+void Syscall::createCamera() {
+	if(!gCamera) {
+		gCamera = CCamera::NewL(*this, 0);
+		gCamera->CameraInfo(gCameraInfo);
+		DUMPINT(gCameraInfo.iNumImageSizesSupported);
+		DUMPHEX(gCameraInfo.iImageFormatsSupported);
+	}
+}
+
+int Syscall::maCameraFormatNumber() {
+	createCamera();
+	return gCameraInfo.iNumImageSizesSupported;
+}
+
+int Syscall::maCameraFormat(int index, MA_CAMERA_FORMAT* fmt) {
+	createCamera();
+	MYASSERT(index >= 0 || index < gCameraInfo.iNumImageSizesSupported,
+		ERR_INVALID_CAMERA_FORMAT_INDEX);
+	TSize s;
+	CCamera::TFormat f;
+	if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatJpeg) {
+		f = CCamera::EFormatJpeg;
+	} else if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatExif) {
+		f = CCamera::EFormatExif;
+	} else {	//camera doesn't support any jpeg version? unlikely. let's quit.
+		DEBIG_PHAT_ERROR;
+	}
+	gCamera->EnumerateCaptureSizes(s, index, f);
+	fmt->width = s.iWidth;
+	fmt->height = s.iHeight;
+	return 0;
+}
+
+void Syscall::ReserveComplete(TInt aError) {
+}
+void Syscall::PowerOnComplete(TInt aError) {
+}
+void Syscall::ViewFinderFrameReady(CFbsBitmap& aFrame) {
+}
+void Syscall::ImageReady(CFbsBitmap* aBitmap, HBufC8* aData, TInt aError) {
+}
+void Syscall::FrameBufferReady(MFrameBuffer* aFrameBuffer, TInt aError) {
+}
+
+
+//------------------------------------------------------------------------------
+// Application focus
+//------------------------------------------------------------------------------
 static int maSendToBackground() {
 	CEikonEnv* eikonEnv = CEikonEnv::Static();
 	TApaTask task(eikonEnv->WsSession());
@@ -1557,6 +1617,9 @@ static int maBringToForeground() {
 }
 
 
+//------------------------------------------------------------------------------
+// Location
+//------------------------------------------------------------------------------
 #ifdef SUPPORT_MOSYNC_SERVER
 int Syscall::maLocationStart() {
 	LOG("maLocationStart()\n");

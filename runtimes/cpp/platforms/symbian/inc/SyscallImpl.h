@@ -21,7 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 _LIT(KSoundThreadName, "MoSync Sound Thread");
 
-class Syscall : public MSdpAgentNotifier, public MVibraControlObserver
+class Syscall : public MSdpAgentNotifier, public MVibraControlObserver,
+public MCameraObserver
 #ifdef __SERIES60_3X__
 , public MRSendSMSObserver
 #else	//Series 60, 2nd Ed.
@@ -74,7 +75,8 @@ private:
 	com m(int, gStreamHandle, 0)\
 	com m(StreamState, gStreamState, SS_IDLE)\
 	com m(bool, gStreamSetPosPausable, false)\
-	com m(int, gStreamNewPos, -1)
+	com m(int, gStreamNewPos, -1)\
+	com m(CCamera*, gCamera, NULL)\
 
 	INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
 	S60V2_INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
@@ -160,6 +162,19 @@ private:
 	void MvpuoPlayComplete(TInt aError);
 	void MvpuoEvent(const TMMFEvent &aEvent);
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
+
+	void createCamera();
+	int maCameraFormatNumber();
+	int maCameraFormat(int index, MA_CAMERA_FORMAT* fmt);
+	
+	TCameraInfo gCameraInfo;
+	
+	//MCameraObserver
+	virtual void ReserveComplete(TInt aError);
+	virtual void PowerOnComplete(TInt aError);
+	virtual void ViewFinderFrameReady(CFbsBitmap& aFrame);
+	virtual void ImageReady(CFbsBitmap* aBitmap, HBufC8* aData, TInt aError);
+	virtual void FrameBufferReady(MFrameBuffer* aFrameBuffer, TInt aError);
 
 #ifdef __SERIES60_3X__
 	RAknKeylock2
