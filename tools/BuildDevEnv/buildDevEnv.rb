@@ -34,6 +34,8 @@ sh2("tools/idl2", "vcbuild idl2.vcproj \"Release|Win32\"")
 
 sh2("tools/idl2/", "Release/idl2.exe");
 
+sh("libs/copyHeaders.bat")
+
 sh2("intlibs/helpers/platforms/stdout", "vcbuild stdout.vcproj \"Release|Win32\"")
 sh2("intlibs/helpers/platforms/windows", "vcbuild windows.vcproj \"Release|Win32\"")
 sh2("intlibs/stabs", "ruby typeGen.rb")
@@ -45,7 +47,6 @@ sh2("intlibs/gsm_amr", "vcbuild gsm_amr.vcproj \"Release|Win32\"")
 copy_if_not_exist("intlibs/gsm_amr/release/gsm_amr.dll", "#{ENV['MOSYNCDIR']}/bin/gsm_amr.dll")
 sh2("tools/mobex", "vcbuild mobex.vcproj \"Release|Win32\"")
 
-#sh("libs/copyHeaders.bat")
 sh2("libs", "ruby workfile.rb")
 sh2("libs", "ruby workfile.rb CONFIG=\"\"")
 

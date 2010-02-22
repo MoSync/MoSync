@@ -178,8 +178,6 @@ namespace Base {
 
 	int gStartTime;
 
-	TextOutput *textOutput = NULL;
-
 	static ResourceArray gResourceArray;
 
 	//static int gStoreId = 1;
@@ -1157,13 +1155,6 @@ DWORD GetScreenOrientation()
 		greenBits = backBuffer->greenBits;
 		blueBits = backBuffer->blueBits;
 
-		textOutput = new TextOutput();
-
-		if(!textOutput->init()) {
-			LOG("Initialization of text outputter failed.\n");
-			return false;
-		}
-
 		// init various optimization stuff
 		initMulTable();
 		initRecipLut();
@@ -1205,11 +1196,6 @@ DWORD GetScreenOrientation()
 		// make sure it is stopped.
 		VibrationStop();
 
-		//if(textOutput) {
-		delete textOutput;
-		//	textOutput = 0;
-		//}
-		
 		MANetworkClose();
 		closeNetwork();
 		
@@ -1334,57 +1320,21 @@ DWORD GetScreenOrientation()
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		gSyscall->ValidatedStrLen(str);
-		SIZE s = textOutput->getTextSize(str);
+		SIZE s = TextOutput::getTextSize(str, false);
 		return EXTENT(s.cx, s.cy);
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
-		DEBIG_PHAT_ERROR;
+		SIZE s = TextOutput::getTextSize(str, true);
+		return EXTENT(s.cx, s.cy);
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		gSyscall->ValidatedStrLen(str);
-		textOutput->drawText(currentDrawSurface, left, top, str, realColor);
+		TextOutput::drawText(currentDrawSurface, left, top, str, realColor, false);
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		DWORD* pBitmapBits;
-		BITMAPINFO bmi;
-		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
-		bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-		bmi.bmiHeader.biWidth       =  (int)currentDrawSurface->width;
-		bmi.bmiHeader.biHeight      = -(int)currentDrawSurface->height;
-		bmi.bmiHeader.biPlanes      = 1;
-		bmi.bmiHeader.biCompression = BI_RGB;
-		bmi.bmiHeader.biBitCount    = 32;
-
-		HANDLE hFont = (HFONT)GetStockObject(SYSTEM_FONT);
-		GLE(hFont);
-
-		HDC dc = GetDC(NULL);
-		HDC cdc = CreateCompatibleDC(dc);
-		GLE(cdc);
-		ReleaseDC(NULL, dc);
-
-		HBITMAP hbmBitmap = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS,
-			(void**)&pBitmapBits, NULL, 0);
-		GLE(hbmBitmap);
-
-		SelectObject(cdc, hFont);
-		SelectObject(cdc, hbmBitmap);
-		RECT rect;
-		rect.left = 0;
-		rect.top = 0;
-		rect.right = currentDrawSurface->width;
-		rect.bottom = currentDrawSurface->height;
-		GLE(DrawTextW(cdc, (LPCWSTR)str, -1, &rect, DT_TOP|DT_LEFT|DT_SINGLELINE));
-
-		//copy text to framebuffer
-		DEBIG_PHAT_ERROR;
-
-		DeleteDC(cdc);
-		DeleteObject(hbmBitmap);
+		TextOutput::drawText(currentDrawSurface, left, top, str, realColor, true);
 	}
 
 #define WHITE 0xffffff
@@ -1419,8 +1369,8 @@ DWORD GetScreenOrientation()
 			currentDrawSurface->clipRect.y = 0;
 			currentDrawSurface->clipRect.width = backBuffer->width;
 			currentDrawSurface->clipRect.height = backBuffer->height;
-			textOutput->drawText(currentDrawSurface, 0, 0, str, BLACK);
-			textOutput->drawText(currentDrawSurface, 1, 1, str, WHITE);
+			TextOutput::drawText(currentDrawSurface, 0, 0, str, BLACK, false);
+			TextOutput::drawText(currentDrawSurface, 1, 1, str, WHITE, false);
 			currentDrawSurface->clipRect = oldRect;
 			maUpdateScreen();
 		}

@@ -21,20 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Image.h"
 #include <windows.h>
 
-class TextOutput {
-public:
-	TextOutput();
-	~TextOutput();
-
-	void drawText(Image *dst, int x, int y, const char *str, unsigned int color);
-	void drawChar(Image *dst, int x, int y, const char c, unsigned int color);
-	SIZE getTextSize(const char *str);
-	bool init();
-	
-private:
-	Rect fontCoords[128];
-	int spacing;
-	unsigned char *fontBitmap;
-};
+namespace TextOutput {
+	void drawText(Image *dst, int x, int y, const void *str, unsigned int color, bool wide);
+	SIZE getTextSize(const void *str, bool wide);
+}
 
 #endif /* _TEXTOUTPUT_H_ */

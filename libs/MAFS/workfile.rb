@@ -17,7 +17,7 @@ mod.class_eval do
 	end
 	
 	def setup_base
-		if(@CONFIG == "")
+		if(CONFIG == "")
 			# broken compiler
 			@SPECIFIC_CFLAGS = {"File.c" => " -Wno-unreachable-code"}
 		else
