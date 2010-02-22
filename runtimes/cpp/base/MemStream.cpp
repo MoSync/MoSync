@@ -86,6 +86,9 @@ Stream* MemStreamC::createCopy() const {
 //******************************************************************************
 MemStream::MemStream(int _size) : MemStreamC(open(_size), _size) {
 }
+MemStream::MemStream(char* buf, int _size) : MemStreamC(buf, _size) {
+	mBuffer = buf;
+}
 MemStream::~MemStream() {
 	delete mBuffer;
 }

@@ -54,6 +54,7 @@ namespace Base {
 		void* ptr() { return mBuffer; }
 	protected:
 		char* open(int size);
+		MemStream(char* buf, int size);
 
 		char* mBuffer;
 	};

@@ -336,6 +336,16 @@ void Syscall::ConstructL(VMCore* aCore) {
 	DebugMarkStart();
 }
 
+void Base::StopEverything() {
+	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
+	if(ui) {
+		Syscall* syscall = ui->GetSyscall();
+		if(syscall) {
+			syscall->StopEverything();
+		}
+	}	
+}
+
 void Syscall::StopEverything() {
 	LOG("StopEverything()\n");
 
@@ -343,7 +353,10 @@ void Syscall::StopEverything() {
 	maLocationStop();
 #endif
 
+	LOG("gCamera\n");
 	if(gCamera) {
+		gCamera->StopViewFinder();
+		gCamera->PowerOff();
 		gCamera->Release();
 	}
 
@@ -367,12 +380,15 @@ void Syscall::StopEverything() {
 	}
 #endif	//SYMBIAN_SOUND
 
+	LOG("RestoreDrawTarget\n");
 	RestoreDrawTarget();
 
+	LOG("StopNetworking\n");
 	StopNetworking();
 
 #ifdef __SERIES60_3X__
 	//SMS senders
+	LOG("gSmsSenders\n");
 	TDblQueIter<CRSendAsSender> itr(gSmsSenders);
 	itr.SetToFirst();
 	CRSendAsSender* op;
@@ -1543,6 +1559,12 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 		return maCameraFormatNumber();
 	case maIOCtl_maCameraFormat:
 		return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
+	case maIOCtl_maCameraStart:
+		return maCameraStart();
+	case maIOCtl_maCameraStop:
+		return maCameraStop();
+	case maIOCtl_maCameraSnapshot:
+		return maCameraSnapshot(a, b);
 
 	default:
 		return IOCTL_UNAVAILABLE;
@@ -1558,6 +1580,13 @@ void Syscall::createCamera() {
 		gCamera->CameraInfo(gCameraInfo);
 		DUMPINT(gCameraInfo.iNumImageSizesSupported);
 		DUMPHEX(gCameraInfo.iImageFormatsSupported);
+		if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatJpeg) {
+			gCameraFormat = CCamera::EFormatJpeg;
+		} else if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatExif) {
+			gCameraFormat = CCamera::EFormatExif;
+		} else {	//camera doesn't support any jpeg version? unlikely. let's quit.
+			DEBIG_PHAT_ERROR;
+		}
 	}
 }
 
@@ -1571,28 +1600,133 @@ int Syscall::maCameraFormat(int index, MA_CAMERA_FORMAT* fmt) {
 	MYASSERT(index >= 0 || index < gCameraInfo.iNumImageSizesSupported,
 		ERR_INVALID_CAMERA_FORMAT_INDEX);
 	TSize s;
-	CCamera::TFormat f;
-	if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatJpeg) {
-		f = CCamera::EFormatJpeg;
-	} else if(gCameraInfo.iImageFormatsSupported & CCamera::EFormatExif) {
-		f = CCamera::EFormatExif;
-	} else {	//camera doesn't support any jpeg version? unlikely. let's quit.
-		DEBIG_PHAT_ERROR;
-	}
-	gCamera->EnumerateCaptureSizes(s, index, f);
+	gCamera->EnumerateCaptureSizes(s, index, gCameraFormat);
 	fmt->width = s.iWidth;
 	fmt->height = s.iHeight;
 	return 0;
 }
 
+int Syscall::maCameraStart() {
+	LOG("maCameraStart()\n");
+	if(gCameraState != CS_IDLE)
+		return 0;
+	createCamera();
+	//we'll need an active object of our own to synchronize.
+	CLocalSynchronizer sync;
+	gCameraStatus = sync.Status();
+	*gCameraStatus = KRequestPending;
+	LOG("Reserve()\n");
+	gCamera->Reserve();
+	gCameraState = CS_RESERVING;
+	sync.Wait();
+	LOG("Start status: %i\n", sync.Status()->Int());
+	if(IS_SYMBIAN_ERROR(*sync.Status()))
+		return sync.Status()->Int();
+	gScreenEngine.StopDrawing();
+
+#if 1
+	TSize size(gScreenEngine.iWindow.Size());
+#else
+	TSize size;
+	//gCamera->EnumerateCaptureSizes(size, 1, CCamera::EFormatFbsBitmapColor16M);
+#endif
+	LOG("ViewFinder size: %ix%i\n", size.iWidth, size.iHeight);
+
+#if 0	//KErrNotSupported
+	TRect rect(size);
+	LTRAP(gCamera->StartViewFinderDirectL(gScreenEngine.iClient,
+		gScreenEngine.iScreenDevice, gScreenEngine.iWindow, rect));
+#else
+	LTRAP(gCamera->StartViewFinderBitmapsL(size));
+#endif
+	return 1;
+}
+
+void Syscall::ViewFinderFrameReady(CFbsBitmap& aFrame) {
+	TSize size = aFrame.SizeInPixels();
+	//LOG("ViewFinderFrameReady(%ix%i)\n", size.iWidth, size.iHeight);
+	TPoint dst(0,0);
+	gScreenEngine.DrawImageDirect(aFrame, dst);
+}
+
 void Syscall::ReserveComplete(TInt aError) {
+	LOG("ReserveComplete(%i)\n", aError);
+	DEBUG_ASSERT(gCameraState == CS_RESERVING);
+	if(IS_SYMBIAN_ERROR(aError)) {
+		gCameraState = CS_IDLE;
+		User::RequestComplete(gCameraStatus, aError);
+		return;
+	}
+	LOG("PowerOn()\n");
+	gCamera->PowerOn();
+	gCameraState = CS_POWERING;
 }
 void Syscall::PowerOnComplete(TInt aError) {
+	LOG("PowerOnComplete(%i)\n", aError);
+	DEBUG_ASSERT(gCameraState == CS_POWERING);
+	if(IS_SYMBIAN_ERROR(aError)) {
+		gCamera->Release();
+		gCameraState = CS_IDLE;
+	} else {
+		gCameraState = CS_POWERED;
+	}
+	User::RequestComplete(gCameraStatus, aError);
 }
-void Syscall::ViewFinderFrameReady(CFbsBitmap& aFrame) {
+
+int Syscall::maCameraStop() {
+	LOG("maCameraStop\n");
+	if(gCameraState != CS_POWERED)
+		return 0;
+	gCamera->StopViewFinder();
+	gCamera->PowerOff();
+	gCamera->Release();
+	if(!gScreenEngine.IsDrawing()) {
+		LTRAP(gScreenEngine.StartDrawingL());
+	}
+	gCameraState = CS_IDLE;
+	return 1;
 }
+
+int Syscall::maCameraSnapshot(int formatIndex, MAHandle placeholder) {
+	LOG("maCameraSnapshot(%i, 0x%x)\n", formatIndex, placeholder);
+	LTRAP(gCamera->PrepareImageCaptureL(gCameraFormat, formatIndex));
+	gCameraPlaceholder = placeholder;
+	CLocalSynchronizer sync;
+	gCameraStatus = sync.Status();
+	*gCameraStatus = KRequestPending;
+	gCamera->CaptureImage();
+	sync.Wait();
+	if(IS_SYMBIAN_ERROR(*sync.Status()))
+		return sync.Status()->Int();
+	return 0;
+}
+
+class HBufC8MemStream : public MemStream {
+private:
+	HBufC8* mData;
+public:
+	HBufC8MemStream(HBufC8* aData) : MemStream((char*)aData->Ptr(), aData->Size()) {
+		mData = aData;
+	}
+	virtual ~HBufC8MemStream() {
+		delete mData;
+		mBuffer = NULL;	//prevent delete of Symbian heap memory
+	}
+};
+
 void Syscall::ImageReady(CFbsBitmap* aBitmap, HBufC8* aData, TInt aError) {
+	LOG("ImageReady(0x%X, 0x%X, %i)\n", aBitmap, aData, aError);
+	DEBUG_ASSERT(aBitmap == NULL);
+	DEBUG_ASSERT(aData != NULL);
+	if(!IS_SYMBIAN_ERROR(aError)) {
+		LOG("Adding memstream: %i bytes\n", aData->Size());
+		HBufC8MemStream* ms = new HBufC8MemStream(aData);
+		DEBUG_ASSERT(ms != NULL);
+		SYSCALL_THIS->resources.add_RT_BINARY(gCameraPlaceholder, ms);
+	}
+	User::RequestComplete(gCameraStatus, aError);
 }
+
 void Syscall::FrameBufferReady(MFrameBuffer* aFrameBuffer, TInt aError) {
 }
 

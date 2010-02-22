@@ -56,6 +56,10 @@ private:
 	enum StreamState {
 		SS_IDLE, SS_OPENING, SS_PREPARING, SS_LOADING, SS_PLAYING, SS_PAUSED, SS_ERROR
 	};
+	
+	enum CameraState {
+		CS_IDLE, CS_RESERVING, CS_POWERING, CS_POWERED
+	};
 
 #define INITIALIZED_VARIABLES(m, com)\
 	m(int, gCurrentUnconvertedColor, 0)\
@@ -77,6 +81,8 @@ private:
 	com m(bool, gStreamSetPosPausable, false)\
 	com m(int, gStreamNewPos, -1)\
 	com m(CCamera*, gCamera, NULL)\
+	com m(CameraState, gCameraState, CS_IDLE)\
+	com m(TRequestStatus*, gCameraStatus, NULL)\
 
 	INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
 	S60V2_INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
@@ -166,8 +172,13 @@ private:
 	void createCamera();
 	int maCameraFormatNumber();
 	int maCameraFormat(int index, MA_CAMERA_FORMAT* fmt);
+	int maCameraStart();
+	int maCameraStop();
+	int maCameraSnapshot(int formatIndex, MAHandle placeholder);
 	
 	TCameraInfo gCameraInfo;
+	CCamera::TFormat gCameraFormat;
+	MAHandle gCameraPlaceholder;
 	
 	//MCameraObserver
 	virtual void ReserveComplete(TInt aError);

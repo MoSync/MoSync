@@ -65,6 +65,10 @@ void writePanicReport(int rt, int code, const TDesC& text);
 
 const char* FileNameFromPath(const char* path);
 
+namespace Base {
+	void StopEverything();
+}
+
 //***************************************************************************
 //CBufFlat
 //***************************************************************************

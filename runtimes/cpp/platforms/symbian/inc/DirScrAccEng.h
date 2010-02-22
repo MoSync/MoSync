@@ -68,6 +68,7 @@ public:
 	void DrawImage(TAlphaBitmap* img, int left, int top);
 	void DrawImage(TAlphaBitmap* img, const TRect& srcRect, const TPoint& dstPoint,
 		int transform);
+	void DrawImageDirect(CFbsBitmap& bitmap, const TPoint& dstPoint);
 
 	int FrameBufferGetInfo(MAFrameBufferInfo* info);
 	int FrameBufferInit(const void* data);

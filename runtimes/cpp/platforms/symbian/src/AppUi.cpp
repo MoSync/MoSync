@@ -126,6 +126,12 @@ const VMCore* CAppUi::GetCore() const {
 	return iAppView->GetCore();
 }
 
+Base::Syscall* CAppUi::GetSyscall() {
+	if(!iAppView)
+		return NULL;
+	return iAppView->GetSyscall();
+}
+
 void CAppUi::Exit() {
 	//DebugMarkEnd();
 	LOG("CAppUi::Exit()\n");

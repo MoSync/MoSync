@@ -246,6 +246,11 @@ void CDirScrAccEng::DrawImage(TAlphaBitmap* img, const TRect& srcRect,
 	}
 }
 
+void CDirScrAccEng::DrawImageDirect(CFbsBitmap& bitmap, const TPoint& dstPoint) {
+	iScreenGc->BitBlt(dstPoint, &bitmap);
+	iDirectScreenAccess->ScreenDevice()->Update();
+}
+
 //******************************************************************************
 //DrawTriangle
 //******************************************************************************

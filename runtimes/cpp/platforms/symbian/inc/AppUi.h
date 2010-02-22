@@ -35,6 +35,9 @@ class CAppView;
 namespace Core {
 	class VMCore;
 }
+namespace Base {
+	class Syscall;
+}
 
 class CAppUi : public CAknAppUi
 #ifdef __SERIES60_3X__
@@ -51,6 +54,7 @@ public:
 	void HandleCommandL(TInt aCommand);
 	TBool isExiting() const { return iExiting; }
 	const Core::VMCore* GetCore() const;
+	Base::Syscall* GetSyscall();
 
 #if 0
 	//CEikAppUi

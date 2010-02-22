@@ -331,6 +331,9 @@ static void ShowAknErrorNote(const TDesC& text) {
 
 void __declspec(noreturn) ShowAknErrorNoteThenExitL(const TDesC& text) {
 	LOG("ShowAknErrorNoteThenExit\n");
+	
+	Base::StopEverything();
+	
 #ifdef SUPPORT_RELOAD
 	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
 	if(ui->iReload)

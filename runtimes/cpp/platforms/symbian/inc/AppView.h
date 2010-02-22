@@ -60,6 +60,7 @@ public:
 	bool AddEvent(const MAEvent& event);
 	void DoCloseEventL();
 	const Core::VMCore* GetCore() const { return iCore; }
+	Base::Syscall* GetSyscall() { return iSyscall; }
 
 	//CCoeControl
 public:
