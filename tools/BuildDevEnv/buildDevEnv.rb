@@ -45,7 +45,7 @@ sh2("intlibs/gsm_amr", "vcbuild gsm_amr.vcproj \"Release|Win32\"")
 copy_if_not_exist("intlibs/gsm_amr/release/gsm_amr.dll", "#{ENV['MOSYNCDIR']}/bin/gsm_amr.dll")
 sh2("tools/mobex", "vcbuild mobex.vcproj \"Release|Win32\"")
 
-#sh("libs/copyHeaders.bat")
+sh("libs/copyHeaders.bat")
 sh2("libs", "ruby workfile.rb")
 sh2("libs", "ruby workfile.rb CONFIG=\"\"")
 

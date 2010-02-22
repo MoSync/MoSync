@@ -363,7 +363,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="\Storage Card\MoRE-winmobile"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\MoRE-winmobile\"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -806,7 +806,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="\Storage Card\MoRE-winmobile"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\MoRE-winmobile\"
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>

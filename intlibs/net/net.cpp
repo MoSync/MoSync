@@ -30,9 +30,11 @@ using namespace MoSyncError;
 typedef int socklen_t;
 #endif
 
+#ifdef _WIN32_WCE
 #if _WIN32_WCE >= 0x500
 #include <initguid.h>
 #include <connmgr.h>  
+#endif
 #endif
 
 //******************************************************************************
@@ -89,6 +91,7 @@ int readProtocolResponseCode(const char* protocolSlash, const char* line, int le
 //******************************************************************************
 // TcpConnection helpers
 //******************************************************************************
+#ifdef _WIN32_WCE
 #if _WIN32_WCE >= 0x500
 int ensureconnected()
 {
@@ -119,16 +122,19 @@ int ensureconnected()
 	return 0;
 }
 #endif
+#endif
 
 //returns INVALID_SOCKET on failure. puts CONNERR-compliant code in result.
 MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr) {
 	int iRet;
 
+#ifdef _WIN32_WCE
 #if _WIN32_WCE >= 0x500
 	if(ensureconnected()!=0) {
 		result = CONNERR_GENERIC;
 		return INVALID_SOCKET;
 	}
+#endif
 #endif
 
 	MoSyncSocket mySocket;
