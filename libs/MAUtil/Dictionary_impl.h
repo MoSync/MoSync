@@ -130,7 +130,7 @@ MAUtil::Dictionary<Key, Storage>::end() const {
 
 template<class Key, class Storage>
 size_t MAUtil::Dictionary<Key, Storage>::size() const {
-	return dict_count(&mDict);
+	return dict_count((dict_t*)&mDict);
 }
 
 template<class Key, class Storage>
@@ -154,7 +154,7 @@ template<class Key, class Storage>
 typename MAUtil::Dictionary<Key, Storage>::ConstIterator
 MAUtil::Dictionary<Key, Storage>::find(const Key& key) const {
 	ConstIterator itr(&mDict);
-	itr.mNode = (DictNode*)dict_lookup(&mDict, &key);
+	itr.mNode = (DictNode*)dict_lookup((dict_t*)&mDict, &key);
 	return itr;
 }
 
