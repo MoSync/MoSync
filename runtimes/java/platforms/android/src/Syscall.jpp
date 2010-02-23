@@ -34,8 +34,20 @@ import android.graphics.Region;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.graphics.Path;
-
+import android.os.Bundle;
+/*
+import android.os.Looper;
+import android.os.Handler;
+import android.os.Message;
+*/
 import android.os.Vibrator;
+/*
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
+import android.location.LocationProvider;
+import android.location.GpsStatus.Listener;
+*/
 
 import android.content.res.Resources;
 import android.content.res.AssetManager;
@@ -71,6 +83,7 @@ final class Syscall
 IMPLEMENTS DiscoveryListener
 #undef IMPLEMENTS
 #define IMPLEMENTS ,
+
 
 // Location
 IMPLEMENTS LocationListener
@@ -113,6 +126,7 @@ IMPLEMENTS MoSync
 
 		// Init all the things that should be initilalized
 		mVibrator = (Vibrator) mCore.mContext.getSystemService(Context.VIBRATOR_SERVICE); 
+		//mLocationManager = (LocationManager) mCore.mContext.getSystemService(Context.LOCATION_SERVICE); 
 		
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
@@ -165,6 +179,7 @@ IMPLEMENTS MoSync
 	final long mStartTime = System.currentTimeMillis();
 
 	Vibrator mVibrator;
+	//LocationManager mLocationManager;
 	
 	MediaPlayer mMediaPlayer;
 	
@@ -265,6 +280,7 @@ IMPLEMENTS MoSync
 			if(((char)file.read()) != 'A') { BIG_PHAT_ERROR; }
 			if(((char)file.read()) != 'R') { BIG_PHAT_ERROR; }
 			if(((char)file.read()) != 'S') { BIG_PHAT_ERROR; }
+
 
 			int nResources = file.readVarUnsignedInt();
 			DUMP(nResources);
@@ -497,6 +513,13 @@ IMPLEMENTS MoSync
 	//despite the temporary memory allocation.
 	private final void readMemStream(OutputStream dst, Address src, int count) throws IOException {
 		dst.write(getMemBytes(src, count));
+	}
+
+	private final void writeDouble(int[] arr, int index, double src) {
+		long lon = Double.doubleToLongBits(src);
+		int hiw = (int)lon; int low = ((int)(lon >> 32));
+		arr[index] = hiw;
+		arr[index + 1] = low;
 	}
 
 	private final String readMemString(Address src) throws Exception {
@@ -1231,14 +1254,14 @@ public
 		case maIOCtl_maBtGetNextServiceSize:
 			return maBtGetNextServiceSize(a);
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
+//#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 		//case maIOCtl_maGetLocation:
 			//return maGetLocation(a);
 		case maIOCtl_maLocationStart:
 			return maLocationStart();
 		case maIOCtl_maLocationStop:
 			return maLocationStop();
-#endif
+//#endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
 		case maIOCtl_maFileListStart:

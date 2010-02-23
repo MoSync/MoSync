@@ -157,9 +157,19 @@ SYSCALL(MAExtent) maGetTextSize(final String str) {
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
+	
+SYSCALL(MAExtent) maGetTextSizeW(final String str) {
+	return maGetTextSize(str);
+}
 
 SYSCALL(void) maDrawText(int left, int top, final String str) {
 	DEBUG("MoSync Syscall - maDrawText :"+str+"\n");
+	MAExtent e = maGetTextSize(str);
+	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
+}
+
+SYSCALL(void) maDrawTextW(int left, int top, final String str) {
+	DEBUG("MoSync Syscall - maDrawText¨W :"+str+"\n");
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }

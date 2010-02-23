@@ -94,6 +94,25 @@ final String _SYSCALL_CONVERT_MAString(int str) throws Exception {
 	return result;
 }
 
+final String _SYSCALL_CONVERT_MAWString(int str) throws Exception {
+	_debug_hex(str);
+	if(str == 0)
+		return null;
+	gStringBuffer.setLength(0);
+	int[] mem_ds = CORE.mMem_ds;
+	for(;;) {
+		short b;
+		RSHORT(str, b);
+		if(b == 0)
+			break;
+		str += 2;
+		gStringBuffer.append((char)b);
+	}
+	String result = new String(gStringBuffer);
+	debug_String(result);
+	return result;
+}
+
 //int _SYSCALL_CONVERTRES_String(char* str) { return int(str - (char*)mem_ds); }
 
 #ifdef DEBUG_SYSCALLS
