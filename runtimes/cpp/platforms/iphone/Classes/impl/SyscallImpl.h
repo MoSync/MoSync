@@ -15,21 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MKDIR_H
-#define MKDIR_H
+class Syscall {
+private:
+Image* loadImage(MemStream& s);
+Image* loadSprite(void* surface, ushort left, ushort top,
+	ushort width, ushort height, ushort cx, ushort cy);
 
-// returns 0 on success.
-
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX) || defined(__IPHONE__)
-#include <sys/stat.h>
-int _mkdir(const char* name);
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
-}
-#else
-#error Unsupported platform
-#endif
-
-#endif	//MKDIR_H
+public:
+	Syscall(int w, int h);

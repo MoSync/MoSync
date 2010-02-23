@@ -94,7 +94,7 @@ void LogTime(const char* fmt, ...) {
 void InitializeCriticalSection(CRITICAL_SECTION* cs) {
 	pthread_mutexattr_t mutexattr;
 	// Set the mutex as a recursive mutex
-	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE_NP);
+	pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
 	// create the mutex with the attributes set
 	pthread_mutex_init(cs, &mutexattr);
 	//After initializing the mutex, the thread attribute can be destroyed
@@ -105,5 +105,17 @@ void DeleteCriticalSection(CRITICAL_SECTION* cs) {
 	pthread_mutex_destroy(cs);
 }
 
+void EnterCriticalSection(CRITICAL_SECTION* cs) {
+	pthread_mutex_lock(cs);
+}
+
+void LeaveCriticalSection(CRITICAL_SECTION* cs) {
+	pthread_mutex_unlock(cs);
+}
+
+
 void failFunction() {
+#ifdef __IPHONE__
+__builtin_trap()
+#endif
 }

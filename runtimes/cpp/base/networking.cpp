@@ -33,7 +33,6 @@ int gConnNextHandle;
 ThreadPool* gpThreadPool = NULL;
 #define gThreadPool (*gpThreadPool)
 MoSyncMutex* gpConnMutex = NULL;
-#define gConnMutex (*gpConnMutex)
 
 //***************************************************************************
 //Initialization

@@ -15,21 +15,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MKDIR_H
-#define MKDIR_H
+#ifndef _PLATFORM_H_
+#define _PLATFORM_H_
 
-// returns 0 on success.
+//#include <windows.h>
+#import <CoreGraphics/CoreGraphics.h>
+#include <string>
 
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX) || defined(__IPHONE__)
-#include <sys/stat.h>
-int _mkdir(const char* name);
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
+#include "config_platform.h"
+
+#include <bluetooth/discovery.h>
+
+namespace Core {
+	class VMCore;
 }
-#else
-#error Unsupported platform
-#endif
+extern Core::VMCore* gCore;
+extern bool gRunning;
 
-#endif	//MKDIR_H
+#endif

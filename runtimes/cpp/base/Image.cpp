@@ -253,8 +253,9 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 			this->alpha = alpha;
 		}
 	} else {
+		//
 		int size = pitch * height;
-		this->data = new unsigned char[pitch * height];
+		this->data = new unsigned char[size];
 		if(this->data == 0) return;
 	}
 
@@ -336,13 +337,13 @@ Image::~Image() {
 }
 
 void Image::drawImage(int left, int top, Image *img) {
-	Rect srcRect = {0, 0, img->width, img->height};
+	ClipRect srcRect = {0, 0, img->width, img->height};
 	drawImageRegion(left, top, &srcRect, img, TRANS_NONE);
 }
 
 #define BIG_PHAT_SOURCE_RECT_ERROR { BIG_PHAT_ERROR(ERR_SOURCE_RECT_OOB);}
 
-void Image::drawImageRegion(int left, int top, Rect *srcRect, Image *img, int transformMode) {
+void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, int transformMode) {
 	int width = srcRect->width,
 		height = srcRect->height,
 		u = srcRect->x,

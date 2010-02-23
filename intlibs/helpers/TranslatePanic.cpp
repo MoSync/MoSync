@@ -38,7 +38,7 @@ const char* panicDescription(int code) {
 }
 
 const char* panicName(int code) {
-#define CASE_PANIC(name, desc) case name: return #name;
+#define CASE_PANIC(id, name, desc) case name: return #name;
 #define CASE_SET(set) set##_ERRORS(CASE_PANIC)
 
 	switch(code) {

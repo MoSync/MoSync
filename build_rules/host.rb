@@ -62,7 +62,8 @@ elsif(UNAME == "windows32")
 
 elsif(UNAME == "CYGWIN_NT-5.1")
 	HOST = "linux"
-
+elsif(UNAME == "Darwin")
+	HOST = "linux"
 else
 	error("Unknown platform: #{UNAME}")
 end

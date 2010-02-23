@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <Graphics.h>
 
-struct Rect {
+struct ClipRect {
 	int x, y, width, height;
 };
 
@@ -93,10 +93,10 @@ public:
 	void drawLine(int x1, int y1, int x2, int y2, int color);
 	void drawFilledRect(int x, int y, int w, int h, int color);
 	void drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int color);
-	void drawImageRegion(int left, int top, Rect *srcRect, Image *src, int transformMode);
+	void drawImageRegion(int left, int top, ClipRect *srcRect, Image *src, int transformMode);
 	void drawImage(int left, int top, Image *src);
 
-	Rect			clipRect;
+	ClipRect		clipRect;
 
 	PixelFormat		pixelFormat;
 	unsigned char	*data;

@@ -91,6 +91,9 @@ module GccVersion
 			set_class_var(gccVersionClass, :@@GCC_IS_V4, is_v4)
 			set_class_var(gccVersionClass, :@@GCC_IS_V43, is_v4 && (gcc_version[2] == "3"[0]))
 			set_class_var(gccVersionClass, :@@GCC_IS_V44, is_v4 && (gcc_version[2] == "4"[0]))
+			warning("GCC version: #{gcc_version.inspect}")
+			warning("GCC_IS_V4: #{is_v4}")
+			#warning("GCC_IS_V43: #{@@GCC_IS_V43}")
 		end
 		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
 		@GCC_IS_V43 = get_class_var(gccVersionClass, :@@GCC_IS_V43)

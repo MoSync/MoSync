@@ -11,7 +11,7 @@ work.instance_eval do
 		if(BLUETOOTH)
 			@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
 		else
-			error "libbluetooth-dev missing!"
+			#error "libbluetooth-dev missing!"
 		end
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn" }

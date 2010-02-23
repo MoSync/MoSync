@@ -23,6 +23,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#else	//linux
+
+#include <pthread.h>
+
+typedef pthread_mutex_t CRITICAL_SECTION;
+
+void InitializeCriticalSection(CRITICAL_SECTION* cs);
+void DeleteCriticalSection(CRITICAL_SECTION* cs);
+void EnterCriticalSection(CRITICAL_SECTION* cs);
+void LeaveCriticalSection(CRITICAL_SECTION* cs);
+
+#endif	//WIN32
+
 class CriticalSectionHandler {
 public:
 	CriticalSectionHandler(CRITICAL_SECTION* cs) : mCS(cs) {
@@ -34,28 +47,5 @@ public:
 private:
 	CRITICAL_SECTION* mCS;
 };
-
-#else	//linux
-
-#include <pthread.h>
-
-typedef pthread_mutex_t CRITICAL_SECTION;
-
-void InitializeCriticalSection(CRITICAL_SECTION* cs);
-void DeleteCriticalSection(CRITICAL_SECTION* cs);
-
-class CriticalSectionHandler {
-private:
-	CRITICAL_SECTION* mCS;
-public:
-	CriticalSectionHandler(CRITICAL_SECTION* cs) : mCS(cs) {
-		pthread_mutex_lock(mCS);
-	}
-	~CriticalSectionHandler() {
-		pthread_mutex_unlock(mCS);
-	}
-};
-
-#endif	//WIN32
 
 #endif	//CRITICAL_SECTION_H

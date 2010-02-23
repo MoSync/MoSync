@@ -32,6 +32,21 @@ UNAME = open("|uname").readline().strip()
 
 if(UNAME == "Linux")
 	HOST = :linux
+elsif(UNAME == "MINGW32_NT-5.1")
+	HOST = :win32
+elsif(UNAME == "MINGW32_NT-6.0")
+	HOST = :win32
+elsif(UNAME == "windows32")
+	HOST = :win32
+elsif(UNAME == "CYGWIN_NT-5.1")
+	HOST = :linux
+elsif(UNAME == "Darwin")
+	HOST = :linux
+else
+	error("Unknown platform: #{UNAME}")
+end
+
+if(HOST == :linux)
 
 	if ( File.exist?( "/etc/moblin-release" ) )
 		HOST_PLATFORM = :moblin
@@ -50,6 +65,7 @@ if(UNAME == "Linux")
 	elsif ( File.exist?( "/etc/slackware_version" ) )
 		HOST_PLATFORM = :slackware
 	elsif ( File.exist?( "/etc/debian-release" ) )
+
 		HOST_PLATFORM = :debian
 	elsif ( File.exist?( "/etc/debian_version" ) )
 		HOST_PLATFORM = :debian
@@ -61,19 +77,6 @@ if(UNAME == "Linux")
 
 	SDL_SOUND = File.exist?( "/usr/include/SDL/SDL_sound.h" )
 	BLUETOOTH = File.exist?( "/usr/include/bluetooth/bluetooth.h" )
-
-elsif(UNAME == "MINGW32_NT-5.1")
-	HOST = :win32
-elsif(UNAME == "MINGW32_NT-6.0")
-	HOST = :win32
-elsif(UNAME == "windows32")
-	HOST = :win32
-
-elsif(UNAME == "CYGWIN_NT-5.1")
-	HOST = :linux
-
-else
-	error("Unknown platform: #{UNAME}")
 end
 
 #warning("Platform: #{HOST}")

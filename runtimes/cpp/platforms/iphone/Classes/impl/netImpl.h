@@ -15,21 +15,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MKDIR_H
-#define MKDIR_H
+#ifndef _NET_IMPL_H_
+#define _NET_IMPL_H_
 
-// returns 0 on success.
+#include <pthread.h>
 
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX) || defined(__IPHONE__)
-#include <sys/stat.h>
-int _mkdir(const char* name);
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
-}
-#else
-#error Unsupported platform
-#endif
+class MoSyncMutex {
+public:
+	MoSyncMutex();
+	~MoSyncMutex();
+	void init();
+	void lock();
+	void unlock();
+	void close();
+private:
+	pthread_mutex_t mMutex;
+	pthread_mutexattr_t mMutexAttr;
+	
+};
 
-#endif	//MKDIR_H
+typedef int MoSyncSocket;
+typedef unsigned short Uint16;
+
+#endif /* _NET_IMPL_H_ */

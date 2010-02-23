@@ -15,21 +15,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MKDIR_H
-#define MKDIR_H
+#ifndef _RESOURCE_DEFS_H_
+#define _RESOURCE_DEFS_H_
 
-// returns 0 on success.
+//#include <windows.h>
+#include "base/Stream.h"
+#include "Image.h"
 
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX) || defined(__IPHONE__)
-#include <sys/stat.h>
-int _mkdir(const char* name);
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
-}
-#else
-#error Unsupported platform
-#endif
+#define TYPES(m)\
+	m(RT_BINARY, Base::Stream, delete)\
+	m(RT_PLACEHOLDER, void, NUL)\
+	m(RT_LABEL, Label, delete) \
+	m(RT_IMAGE, Image, delete)\
+	m(RT_FLUX, void, NUL)\
 
-#endif	//MKDIR_H
+#endif // _RESOURCE_DEFS_H_

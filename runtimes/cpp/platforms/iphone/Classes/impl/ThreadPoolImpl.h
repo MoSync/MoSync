@@ -15,21 +15,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MKDIR_H
-#define MKDIR_H
+#ifndef THREADPOOLIMPL_H
+#define THREADPOOLIMPL_H
 
-// returns 0 on success.
+#include <pthread.h>
+#include <semaphore.h>
 
-#ifdef WIN32
-#include <direct.h>
-#elif defined(LINUX) || defined(__IPHONE__)
-#include <sys/stat.h>
-int _mkdir(const char* name);
-inline int _mkdir(const char* name) {
-	return mkdir(name, 0755);
-}
-#else
-#error Unsupported platform
-#endif
+typedef int (*MoSyncThreadFunc)(void*);
 
-#endif	//MKDIR_H
+struct MoSyncInternalThread {
+	MoSyncThreadFunc func;
+	void *arg;
+	pthread_t thread;
+	
+};
+
+class MoSyncThread {
+public:
+	void start(int (*func)(void*), void* arg);
+	int join();
+        static void sleep ( unsigned int ms );
+private:
+	MoSyncInternalThread mThread;
+};
+
+class MoSyncSemaphore {
+public:
+	MoSyncSemaphore();
+	~MoSyncSemaphore();
+	void wait();
+	void post();
+private:
+	sem_t mSem;
+	
+};
+
+#endif	//THREADPOOLIMPL_H

@@ -40,9 +40,9 @@ pendantic_c_warnings = " -Wstrict-prototypes -Wold-style-definition -Wmissing-pr
 lesser_conly = " -Wnested-externs -Wdeclaration-after-statement"
 # -Wno-format-zero-length"
 
-#broken in C++, GCC 4.3.3, 4.4.1 and in 3.4.5 -O2.
+#broken in C++, GCC 4.3.3, 4.4.1, 4.2.1 and in 3.4.5 -O2.
 optimizer_dependent = " -Wunreachable-code -Winline"
-if(@GCC_IS_V43 || @GCC_IS_V44 || (!@GCC_IS_V4 && CONFIG == ""))
+if(@GCC_IS_V4 || (!@GCC_IS_V4 && CONFIG == ""))
 	pendantic_c_warnings += optimizer_dependent
 else
 	pedantic_warnings += optimizer_dependent
