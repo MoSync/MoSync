@@ -302,6 +302,10 @@ private:
 	TMdaAudioDataSettings gAudioSettings;
 #endif
 
+#ifndef __SERIES60_3X__	//Series 60, 2nd Ed.
+	int maGetCellInfo(MACellInfo*);
+#endif
+
 	StringMap gStoreMap;
 
 #ifndef __SERIES60_3X__	//2nd ed ARMI compiler hack

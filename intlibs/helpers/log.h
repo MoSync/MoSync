@@ -40,11 +40,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef LOGGING_ENABLED
 void InitLog(const char* filenameOverride = NULL);
 
-void LogV(const char* fmt, VA_LIST vaList) GCCATTRIB(format(printf, 1, 0));
+void LogV(const char* fmt, VA_LIST vaList) PRINTF_ATTRIB(1, 0);
 void LogBin(const void* data, int size);
 void LogTime();
 
-__inline void Log(const char* fmt, ...) GCCATTRIB(format(printf, 1, 2));
+__inline void Log(const char* fmt, ...) PRINTF_ATTRIB(1, 2);
 
 __inline void Log(const char* fmt, ...) {
 	VA_LIST argptr;
@@ -53,7 +53,7 @@ __inline void Log(const char* fmt, ...) {
 }
 
 //also logs some platform-specific time stamp and adds a '\n'
-void LogTime(const char* fmt, ...) GCCATTRIB(format(printf, 1, 2));
+void LogTime(const char* fmt, ...) PRINTF_ATTRIB(1, 2);
 #endif
 
 void failFunction();

@@ -27,4 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #error Unsupported compiler!
 #endif
 
+#if defined(__SYMBIAN32__)
+#define PRINTF_ATTRIB(a,b)
+#else
 #define PRINTF_ATTRIB(a,b) GCCATTRIB(format(printf, a, b))
+#endif

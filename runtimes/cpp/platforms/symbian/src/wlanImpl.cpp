@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "config_platform.h"
-#ifdef WLAN
+#if defined(__SERIES60_3X__) && defined(WLAN)
 
 #include "syscall.h"
 #include "AppView.h"

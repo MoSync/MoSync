@@ -43,12 +43,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.H>
 #endif
 
-#ifdef SUPPORT_MOSYNC_SERVER
-#include <helpers/CPP_IX_CELLID.h>
-#endif
-
 #ifdef CALL
 #include <helpers/CPP_IX_CALL.h>
+#endif
+
+#ifndef __SERIES60_3X__
+#include <etel.h>
+#include <etelbgsm.h>
 #endif
 
 using namespace MoSyncError;
@@ -1421,6 +1422,9 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 
 		return -res;	//negate the Symbian error code
 	}
+#elif !defined(__SERIES60_3X__)	//Series 60, 2nd Ed.
+	case maIOCtl_maGetCellInfo:
+		return maGetCellInfo(GVMRA(MACellInfo));
 #endif	//SUPPORT_MOSYNC_SERVER
 
 #ifdef CALL
@@ -1572,6 +1576,54 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 }
 
 //------------------------------------------------------------------------------
+// CellID
+//------------------------------------------------------------------------------
+#ifndef __SERIES60_3X__	//Series 60, 2nd Ed.
+int Syscall::maGetCellInfo(MACellInfo* ci) {
+	RBasicGsmPhone phone;
+	RTelServer server;		
+
+	LHEL(server.Connect());
+	// load a phone profile
+	_LIT(KGsmModuleName, "phonetsy.tsy");
+	LHEL(server.LoadPhoneModule(KGsmModuleName));
+
+	// initialize the phone object
+	RTelServer::TPhoneInfo info;
+	LHEL(server.GetPhoneInfo(0, info));
+	LHEL(phone.Open(server, info.iName));
+
+	MBasicGsmPhoneNetwork::TCurrentNetworkInfo ni;
+	LHEL(phone.GetCurrentNetworkInfo(ni));
+
+	ci->cellId = ni.iCellId;
+	ci->lac = ni.iLocationAreaCode;
+	MBasicGsmPhoneNetwork::TBscNetworkId& id(ni.iNetworkInfo.iId);
+
+	_LIT8(KFmt, "%i");
+	{
+		DEBUG_ASSERT(id.iMCC <= 999);	//max size: 4 bytes
+		TPtr8 ptr((byte*)ci->mcc, sizeof(ci->mcc));
+		ptr.Format(KFmt, id.iMCC);
+		ptr.ZeroTerminate();
+	}
+	{
+		DEBUG_ASSERT(id.iMNC <= 9999999);	//max size: 8 bytes
+		TPtr8 ptr((byte*)ci->mnc, sizeof(ci->mnc));
+		ptr.Format(KFmt, id.iMNC);
+		ptr.ZeroTerminate();
+	}
+
+	//unload
+	phone.Close();
+	server.UnloadPhoneModule(KGsmModuleName);
+	server.Close();
+
+	return 0;
+}
+#endif
+
+//------------------------------------------------------------------------------
 // Camera
 //------------------------------------------------------------------------------
 void Syscall::createCamera() {
@@ -1643,7 +1695,7 @@ int Syscall::maCameraStart() {
 }
 
 void Syscall::ViewFinderFrameReady(CFbsBitmap& aFrame) {
-	TSize size = aFrame.SizeInPixels();
+	//TSize size = aFrame.SizeInPixels();
 	//LOG("ViewFinderFrameReady(%ix%i)\n", size.iWidth, size.iHeight);
 	TPoint dst(0,0);
 	gScreenEngine.DrawImageDirect(aFrame, dst);

@@ -9,6 +9,9 @@ RESOURCE          MoSync_caption.rss
 
 #include "..\MoSync-base.mmp"
 
+LIBRARY           etel.lib
+LIBRARY           gsmbas.lib
+
 SOURCEPATH        ..\src
 SOURCE            RCondVar.cpp
 SOURCE            CSmsHandler.cpp
