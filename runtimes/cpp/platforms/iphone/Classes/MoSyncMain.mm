@@ -22,6 +22,7 @@
 //--------------------------------------------------------------------//
 
 #include "MoSyncMain.h"
+#include "MosyncView.h"
 
 #include "config_platform.h"
 #include <core/Core.h>
@@ -83,10 +84,16 @@ void MoSyncMain(int width, int height, UIView* mosyncView) {
 	mosyncThread.start(MoSyncThreadMain, NULL);
 }
 
+MoSyncSemaphore mViewSemaphore;
 void UpdateMoSyncView(CGContextRef ref) {
-	EnterCriticalSection(&gViewMutex);
+
+	[sMoSyncView updateMoSyncView: ref];
+	mViewSemaphore.wait();
+}
+
+void DoneUpdatingMoSyncView() {
 	
-	LeaveCriticalSection(&gViewMutex);
+	mViewSemaphore.post();
 }
 
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {

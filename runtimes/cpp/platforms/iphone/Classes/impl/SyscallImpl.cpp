@@ -44,6 +44,8 @@ using namespace MoSyncError;
 
 #include <core/core.h>
 
+#include "MoSyncMain.h"
+
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
@@ -101,13 +103,13 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 		
-		gBackBufferData = new unsigned char[gWidth*4*gHeight];
+		//gBackBufferData = new unsigned char[gWidth*4*gHeight];
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		gBackbuffer = 
-		CGBitmapContextCreate(gBackBufferData, gWidth, gHeight, 8, gWidth*4, colorSpace, kCGBitmapByteOrderDefault);
+		CGBitmapContextCreate(NULL, gWidth, gHeight, 8, gWidth*4, colorSpace, kCGImageAlphaNoneSkipFirst);
 		CGColorSpaceRelease(colorSpace);
-		CGContextTranslateCTM(gBackbuffer, 0, gHeight);
-		CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
+		//CGContextTranslateCTM(gBackbuffer, 0, gHeight);
+		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
 		return true;
 	}
 
@@ -174,9 +176,9 @@ namespace Base {
 		oldColor = currentColor;
 		currentColor = argb;
 		//realColor =	CONVERT_TO_NATIVE_COLOR_FROM_ARGB(argb);
-		int red = (argb&0x00ff0000)>>16;
-		int green = (argb&0x0000ff00)>>8;
-		int blue = (argb&0xff);
+		float red = (float)((argb&0x00ff0000)>>16);
+		float green = (float)((argb&0x0000ff00)>>8);
+		float blue = (float)((argb&0xff));
 		CGContextSetRGBStrokeColor(gBackbuffer, red, green, blue, 1);
 		CGContextSetRGBFillColor(gBackbuffer, red, green, blue, 1);
 		return oldColor;
@@ -210,8 +212,13 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		NOT_IMPLEMENTED;
-		return 0;
+		CGContextSelectFont(gBackbuffer, "Helvetica", 12.0, kCGEncodingMacRoman);
+		CGContextSetTextDrawingMode(gBackbuffer, kCGTextInvisible);
+		CGPoint before = CGContextGetTextPosition(gBackbuffer);
+		CGContextShowTextAtPoint(gBackbuffer, 0, 0, str, strlen(str));
+		CGPoint after = CGContextGetTextPosition(gBackbuffer);
+		int width = abs((int)(after.x-before.x));
+		return EXTENT(width, 12);
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
@@ -220,9 +227,9 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		CGContextSelectFont(gBackbuffer, "Helvetica", 24.0, kCGEncodingMacRoman);
+		CGContextSelectFont(gBackbuffer, "Helvetica", 12.0, kCGEncodingMacRoman);
+
 		CGContextSetTextDrawingMode(gBackbuffer, kCGTextFill);
-		CGContextSetRGBFillColor(gBackbuffer, 0, 255, 255, 1);
 		
 		CGAffineTransform xform = CGAffineTransformMake(
 														1.0,  0.0,
@@ -230,7 +237,10 @@ namespace Base {
 														0.0,  0.0);
 		CGContextSetTextMatrix(gBackbuffer, xform);
 		
-		CGContextShowTextAtPoint(gBackbuffer, left, top, str, strlen(str));
+		//CGAffineTransform xform =  CGAffineTransformMakeRotation(3.14159);
+		//CGAffineTransform xform = CGAffineTransformScale(xform, 1, -1);
+		//CGContextSetTextMatrix(gBackbuffer, xform);		
+		CGContextShowTextAtPoint(gBackbuffer, left, top+12, str, strlen(str));
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
@@ -240,9 +250,9 @@ namespace Base {
 	SYSCALL(void, maUpdateScreen()) {
 		if(gClosing)
 			return;
-		NOT_IMPLEMENTED;		
 		//MAProcessEvents();
 		//MAUpdateScreen();
+		UpdateMoSyncView(gBackbuffer);
 	}
 
 	SYSCALL(void, maResetBacklight()) {

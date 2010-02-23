@@ -10,7 +10,10 @@
 
 
 @interface MoSyncView : UIView {
+	CGContextRef mosyncView;
 
 }
+
+-(void) updateMoSyncView: (CGContextRef)ref;
 
 @end

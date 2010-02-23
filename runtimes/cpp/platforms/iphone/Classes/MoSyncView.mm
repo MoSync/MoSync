@@ -11,7 +11,11 @@
 
 @implementation MoSyncView
 
-
+- (void)updateMoSyncView:(CGContextRef)ref {
+	mosyncView = ref;
+	//[self setNeedsDisplay];
+	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+}
 
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
@@ -22,6 +26,8 @@
 
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
+		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+		mosyncView = nil;
         // Initialization code
 		MoSyncMain(self.frame.size.width, self.frame.size.height, self);
     }
@@ -30,14 +36,13 @@
 
 
 - (void)drawRect:(CGRect)rect {
-    // Drawing code
-	CGContextRef ctx = UIGraphicsGetCurrentContext();
-	// drawing with a white stroke color
-	CGContextSetRGBStrokeColor(ctx, 1.0, 1.0, 1.0, 1.0);
-	// drawing with a white fill color
-	CGContextSetRGBFillColor(ctx, 1.0, 0.0, 1.0, 1.0);
-	// Add Filled Rectangle, 
-	CGContextFillRect(ctx, rect);
+	if(mosyncView == nil) return;
+	
+	CGImageRef image = CGBitmapContextCreateImage(mosyncView);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextDrawImage(context, rect, image);	
+	
+	DoneUpdatingMoSyncView();
 }
 
 

@@ -10,7 +10,12 @@
 #ifndef _MOSYNCMAIN_H_
 #define _MOSYNCMAIN_H_
 
+class UIView;
+
 void MoSyncMain(int width, int height, UIView* mosyncView);
+
+void UpdateMoSyncView(CGContextRef ref);
+void DoneUpdatingMoSyncView();
 
 #endif
 
