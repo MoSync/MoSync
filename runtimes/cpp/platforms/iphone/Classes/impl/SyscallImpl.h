@@ -16,6 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 class Syscall {
+public:
+Surface* loadImage(MemStreamC& s);
 private:
 Surface* loadImage(MemStream& s);
 Surface* loadSprite(void* surface, ushort left, ushort top,

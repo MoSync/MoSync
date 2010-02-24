@@ -73,14 +73,12 @@ int MoSyncThreadMain(void *args) {
 }
 
 MoSyncThread mosyncThread;
-CRITICAL_SECTION gViewMutex;
+
 void MoSyncMain(int width, int height, UIView* mosyncView) {
 	sWidth = width;
 	sHeight = height;
 	sMoSyncView = mosyncView;
 
-	InitializeCriticalSection(&gViewMutex);
-	
 	mosyncThread.start(MoSyncThreadMain, NULL);
 }
 

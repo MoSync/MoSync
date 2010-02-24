@@ -23,3 +23,7 @@ const char *getWriteablePath(const char* path) {
 	NSString *myFilePath = [documentsDirectoryPath stringByAppendingPathComponent:stringFromChar];
 	return [myFilePath UTF8String];	
 }
+
+void sleepMillis(int ms) {
+	[NSThread sleepForTimeInterval:(((float)ms)/1000.0f)];
+}

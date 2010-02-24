@@ -75,7 +75,7 @@ namespace Base {
 	
 	//static ResourceArray gResourceArray;
 
-	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
+	EventQueue gEventQueue;
 	static bool gEventOverflow	= false;
 	static bool gClosing		= false;
 
@@ -94,8 +94,13 @@ namespace Base {
 		PNG = 1,
 		UNKNOWN = 2
 	};
+
+	// this must be fixed in base.. too tired
+	Surface* Syscall::loadImage(MemStream& s) {
+		return loadImage((MemStreamC&)s);
+	}
 	
-	Surface* Syscall::loadImage(MemStream& s) 
+	Surface* Syscall::loadImage(MemStreamC& s) 
 	{
 		int len;
 		TEST(s.length(len));
@@ -123,6 +128,13 @@ namespace Base {
 		   
 		CGDataProviderRelease(dpr);
 		
+		/*
+		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
+		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
+		CGContextScaleCTM(newSurface->context, 1, -1);
+		CGImageRelease(imageRef);
+		return newSurface;
+		*/	
 		return new Surface(imageRef);
 	}
 	
@@ -217,7 +229,7 @@ namespace Base {
 		rect->left = cr.origin.x;
 		rect->top = cr.origin.y;
 		rect->width = cr.size.width;
-		rect->height = cr.size.height;		
+		rect->height = cr.size.height;	
 	}
 
 #define CONVERT_TO_NATIVE_COLOR_FROM_ARGB(col) \
@@ -323,9 +335,9 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		int width = CGImageGetWidth(gBackbuffer->image);
-		int height = CGImageGetHeight(gBackbuffer->image);
-		return EXTENT(width, height);
+		//int width = CGImageGetWidth(gBackbuffer->image);
+		//int height = CGImageGetHeight(gBackbuffer->image);
+		return EXTENT(gWidth, gHeight);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
@@ -349,7 +361,14 @@ namespace Base {
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-		NOT_IMPLEMENTED;
+   
+		
+		// 0 is bottom in y-axis of pictures..
+		CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
+		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
+		CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
+		CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
+		CGImageRelease(smallImage);
 	}
 
 	SYSCALL(MAExtent, maGetImageSize(MAHandle image)) {
@@ -358,8 +377,6 @@ namespace Base {
 		int height = CGImageGetHeight(img->image);
 		return EXTENT(width, height);
 	}
-
-#define BIG_PHAT_SOURCE_RECT_ERROR {BIG_PHAT_ERROR(WCEERR_SOURCE_RECT_OOB)}
 
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
@@ -394,8 +411,32 @@ namespace Base {
 	SYSCALL(int, maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size)) {
 		MYASSERT(size>0, ERR_DATA_OOB);
 		Stream* stream = gSyscall->resources.get_RT_BINARY(data);
-		//return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
-		NOT_IMPLEMENTED;		
+		Surface *bitmap = 0;
+		
+		int len;
+		TEST(stream->length(len));	
+		
+		if(offset<0 || offset+size>len)
+			BIG_PHAT_ERROR(ERR_DATA_OOB);
+		
+		if(!stream->ptrc()) {
+			// is not a memstream, read it to a buffer and load it.
+			MYASSERT(stream->seek(Seek::Start, offset), ERR_DATA_OOB);
+			unsigned char *data = new unsigned char[size];
+			if(data==NULL) return RES_OUT_OF_MEMORY;
+			MYASSERT(stream->read(data, size), ERR_DATA_ACCESS_FAILED);
+			MemStreamC memStream(data, size);
+			bitmap = gSyscall->loadImage(memStream);
+			delete data;
+		} else {
+			const char *ptr = (const char*) stream->ptrc();
+			MemStreamC memStream((const void*)&ptr[offset], size);
+			bitmap = gSyscall->loadImage(memStream);
+		}
+
+		
+		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
+		
 	}
 
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int processAlpha)) {
@@ -437,11 +478,12 @@ namespace Base {
 
 		if(!gClosing)
 			gEventOverflow = false;
-		if(gEventFifo.count() == 0)
+		if(gEventQueue.count() == 0)
 			return 0;
-		/*
-		*dst = gEventFifo.get();
+		
+		*dst = gEventQueue.get();
 
+		/*
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
 			memcpy(Core::GetCustomEventPointer(gCore), dst->data, sizeof(dataType));\
 			delete (dataType*)dst->data;\
@@ -458,7 +500,7 @@ namespace Base {
 		if(gClosing)
 			return;
 
-		if(gEventFifo.count() != 0)
+		if(gEventQueue.count() != 0)
 			return;
 		
 		//NOT_IMPLEMENTED;
@@ -466,14 +508,14 @@ namespace Base {
 
 	SYSCALL(int, maTime()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		return (int)time(NULL);
 	}
 
 	SYSCALL(int, maLocalTime()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		time_t t = time(NULL);
+		tm* lt = localtime(&t);
+		return t + lt->tm_gmtoff;
 	}
 	
 	SYSCALL(int, maGetMilliSecondCount()) 

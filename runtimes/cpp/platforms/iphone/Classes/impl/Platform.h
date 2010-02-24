@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 
 #include <bluetooth/discovery.h>
+#include <helpers/fifo.h>
 
 namespace Core {
 	class VMCore;
@@ -49,11 +50,13 @@ public:
 		CGDataProviderRelease(dataProvider);
 		CGColorSpaceRelease(colorSpace);
 		
-		CGContextTranslateCTM(context, 0, height);
-		CGContextScaleCTM(context, 1.0, -1.0);	
+		//CGContextTranslateCTM(context, 0, height);
+		//CGContextScaleCTM(context, 1.0, -1.0);	
+		CGContextSetAllowsAntialiasing (context, false);
+		rect = CGRectMake(0, 0, width, height);
 		
 		CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-		CGContextFillRect(context, CGRectMake(0, 0, width, height));	
+		CGContextFillRect(context, rect);	
 		//CGContextClearRect(context, CGRectMake(0, 0, width, height));
 	}
 	
@@ -66,7 +69,45 @@ public:
 	
 	CGImageRef image;
 	CGContextRef context;
+	CGRect rect;
 	char *data;
 };
+
+class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
+public:
+	EventQueue() : mEventOverflow(false) {
+	}
+	
+	void addPointerEvent(int x, int y, int type) {
+		if(!mEventOverflow) {
+			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				mEventOverflow = true;
+				clear();
+				LOG("EventBuffer overflow!\n");
+			}
+			/* put event in event queue */
+			MAEvent event;
+			event.type = type;
+			event.point.x = x;
+			event.point.y = y;
+			put(event);
+		}		
+	}
+	
+	void addCloseEvent() {
+		MAEvent event;
+		event.type = EVENT_TYPE_CLOSE;
+		put(event);	
+	}
+	
+private:
+	bool mEventOverflow;
+	
+};
+
+namespace Base
+{
+	extern EventQueue gEventQueue;
+}
 
 #endif

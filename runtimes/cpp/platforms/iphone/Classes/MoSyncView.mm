@@ -18,11 +18,14 @@
 #import "MoSyncView.h"
 #include "MosyncMain.h"
 
+#include "iphone_helpers.h"
+
+#include "Platform.h"
+
 @implementation MoSyncView
 
 - (void)updateMoSyncView:(CGImageRef)ref {
 	mosyncView = ref;
-	//[self setNeedsDisplay];
 	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
 }
 
@@ -36,6 +39,7 @@
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+		self.frame.origin.y = 0;
 		mosyncView = nil;
         // Initialization code
 		MoSyncMain(self.frame.size.width, self.frame.size.height, self);
@@ -46,16 +50,11 @@
 
 - (void)drawRect:(CGRect)rect {
 	if(mosyncView == nil) return;
-	
-	//CGImageRef image = CGBitmapContextCreateImage(mosyncView);
+
     CGContextRef context = UIGraphicsGetCurrentContext();
-	//CGContextClearRect(context, rect);
-	//CGContextSetRGBFillColor(context, 0, 0, 0, 255);
-	//CGContextFillRect(context, rect);	
-	
     CGContextDrawImage(context, rect, mosyncView);	
-	
 	DoneUpdatingMoSyncView();
+	 
 }
 
 
@@ -63,5 +62,38 @@
     [super dealloc];
 }
 
+bool down = false;
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
+	CGPoint point = [touch locationInView:self];
+
+	if(!down) {
+		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
+		down = true;
+	}
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
+	CGPoint point = [touch locationInView:self];
+	
+	if(down) {
+		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_DRAGGED);
+	}	
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
+	CGPoint point = [touch locationInView:self];
+	
+	if(down) {
+		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_RELEASED);	
+		down = false;
+	}	
+}
 
 @end
