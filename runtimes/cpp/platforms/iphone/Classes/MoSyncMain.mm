@@ -17,8 +17,8 @@
 
 //--------------------------------------------------------------------//
 // MoRE                                                               //
-// MoSync Runtime Environment (Iphone Version)						  //
-// (c) Mobile Sorcery 2007                                            //
+// MoSync Runtime Environment (iPhone Version)                        //
+// (c) Mobile Sorcery 2010                                            //
 //--------------------------------------------------------------------//
 
 #include "MoSyncMain.h"
@@ -85,7 +85,7 @@ void MoSyncMain(int width, int height, UIView* mosyncView) {
 }
 
 MoSyncSemaphore mViewSemaphore;
-void UpdateMoSyncView(CGContextRef ref) {
+void UpdateMoSyncView(CGImageRef ref) {
 
 	[sMoSyncView updateMoSyncView: ref];
 	mViewSemaphore.wait();

@@ -60,14 +60,20 @@ namespace Base {
 	Syscall* gSyscall;
 
 	uint realColor;
-	uint currentColor;
+	uint currentColor, currentRed, currentGreen, currentBlue;
 	uint oldColor;
 
 	int gWidth, gHeight;
-	CGContextRef gBackbuffer;
+	//CGContextRef gBackbuffer;
+	Surface* gBackbuffer;
+	Surface* gDrawTarget;
+	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
+	
 	unsigned char *gBackBufferData;
 	
-	static ResourceArray gResourceArray;
+	double gTimeConversion;
+	
+	//static ResourceArray gResourceArray;
 
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
 	static bool gEventOverflow	= false;
@@ -83,13 +89,44 @@ namespace Base {
 	//***************************************************************************
 	// Resource loading
 	//***************************************************************************
+	enum ImageFormat {
+		JPEG = 0,
+		PNG = 1,
+		UNKNOWN = 2
+	};
 	
-	Image* Syscall::loadImage(MemStream& s) 
+	Surface* Syscall::loadImage(MemStream& s) 
 	{
-		return NULL;
+		int len;
+		TEST(s.length(len));
+		const unsigned char *data = (const unsigned char*)s.ptrc();
+		ImageFormat format;
+#define E(x, y) (data[x]==y)
+		if(len>3 && E(0, 0xff) && E(1, 0xd8)) {
+			format = JPEG;
+		}
+		else if(len>7 && E(0, 0x89) && E(1, 0x50) && E(2, 0x4e) && E(3, 0x47) && E(4, 0x0d) && E(5, 0x0a) && E(6, 0x1a) && E(7, 0x0a) ) {
+			format = PNG;
+		}
+		else {
+			return NULL;
+		}
+		//CGDataProviderRef dpr = CGDataProviderCreateWithData(NULL, data, len ,NULL);
+		CFDataRef png_data = CFDataCreate (NULL,data,len);
+		CGDataProviderRef dpr  = CGDataProviderCreateWithCFData (png_data);
+		
+		CGImageRef imageRef;
+		switch(format) {
+			case JPEG: imageRef = CGImageCreateWithJPEGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
+			case PNG: imageRef = CGImageCreateWithPNGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
+		}
+		   
+		CGDataProviderRelease(dpr);
+		
+		return new Surface(imageRef);
 	}
 	
-	Image* Syscall::loadSprite(void* surface, ushort left, ushort top,
+	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
 		ushort width, ushort height, ushort cx, ushort cy) 
 	{
 		return NULL;
@@ -99,17 +136,36 @@ namespace Base {
 	// Helpers
 	//***************************************************************************
 
+#define FONT_HEIGHT 12
 	static bool MALibInit() {
 
 		InitializeCriticalSection(&exitMutex);
 		
 		//gBackBufferData = new unsigned char[gWidth*4*gHeight];
+		/*
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		gBackbuffer = 
 		CGBitmapContextCreate(NULL, gWidth, gHeight, 8, gWidth*4, colorSpace, kCGImageAlphaNoneSkipFirst);
 		CGColorSpaceRelease(colorSpace);
 		//CGContextTranslateCTM(gBackbuffer, 0, gHeight);
 		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
+		*/
+		gBackbuffer = new Surface(gWidth, gHeight);
+		
+		// init font
+		CGContextSelectFont(gBackbuffer->context, "Helvetica", FONT_HEIGHT, kCGEncodingMacRoman);
+		CGAffineTransform xform = CGAffineTransformMake(
+														1.0,  0.0,
+														0.0, -1.0,
+														0.0,  0.0);
+		CGContextSetTextMatrix(gBackbuffer->context, xform);
+		
+		gDrawTarget = gBackbuffer;
+		
+		mach_timebase_info_data_t machInfo;
+		mach_timebase_info( &machInfo );
+		gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
+		
 		return true;
 	}
 
@@ -151,13 +207,17 @@ namespace Base {
 	//***************************************************************************
 	SYSCALL(void, maSetClipRect(int left, int top, int width, int height))
 	{
-		NOT_IMPLEMENTED;
+		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
 	{
 		gSyscall->ValidateMemRange(rect, sizeof(MARect));		
-		NOT_IMPLEMENTED;
+		CGRect cr = CGContextGetClipBoundingBox(gDrawTarget->context);
+		rect->left = cr.origin.x;
+		rect->top = cr.origin.y;
+		rect->width = cr.size.width;
+		rect->height = cr.size.height;		
 	}
 
 #define CONVERT_TO_NATIVE_COLOR_FROM_ARGB(col) \
@@ -176,11 +236,9 @@ namespace Base {
 		oldColor = currentColor;
 		currentColor = argb;
 		//realColor =	CONVERT_TO_NATIVE_COLOR_FROM_ARGB(argb);
-		float red = (float)((argb&0x00ff0000)>>16);
-		float green = (float)((argb&0x0000ff00)>>8);
-		float blue = (float)((argb&0xff));
-		CGContextSetRGBStrokeColor(gBackbuffer, red, green, blue, 1);
-		CGContextSetRGBFillColor(gBackbuffer, red, green, blue, 1);
+		currentRed = (float)((argb&0x00ff0000)>>16)/255.0f;
+		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
+		currentBlue = (float)((argb&0xff))/255.0f;
 		return oldColor;
 	}
 
@@ -189,11 +247,15 @@ namespace Base {
 	}
 
 	SYSCALL(void, maLine(int x0, int y0, int x1, int y1)) {
-		NOT_IMPLEMENTED;
-	}
+		CGContextSetRGBStrokeColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
+		CGContextBeginPath(gDrawTarget->context);
+		CGContextMoveToPoint(gDrawTarget->context, x0, y0);
+		CGContextAddLineToPoint(gDrawTarget->context, x1, y1);
+		CGContextStrokePath(gDrawTarget->context);	}
 
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
-		CGContextFillRect(gBackbuffer, CGRectMake(left, top, width, height));
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
+		CGContextFillRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 
 	}
 
@@ -208,17 +270,24 @@ namespace Base {
 		SYSCALL_THIS->ValidateMemRange(points, sizeof(MAPoint2d) * count);
 		CHECK_INT_ALIGNMENT(points);
 		MYASSERT(count >= 3, ERR_POLYGON_TOO_FEW_POINTS);
-		NOT_IMPLEMENTED;
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
+		CGContextBeginPath(gDrawTarget->context);
+		CGContextMoveToPoint(gDrawTarget->context, points[0].x, points[0].y); 
+		for(int i = 1; i < count; i++) {
+			CGContextAddLineToPoint(gDrawTarget->context, points[i].x, points[i].y);
+		}
+		CGContextClosePath(gDrawTarget->context);
+		CGContextFillPath(gDrawTarget->context);		
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		CGContextSelectFont(gBackbuffer, "Helvetica", 12.0, kCGEncodingMacRoman);
-		CGContextSetTextDrawingMode(gBackbuffer, kCGTextInvisible);
-		CGPoint before = CGContextGetTextPosition(gBackbuffer);
-		CGContextShowTextAtPoint(gBackbuffer, 0, 0, str, strlen(str));
-		CGPoint after = CGContextGetTextPosition(gBackbuffer);
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
+		
+		CGPoint before = CGContextGetTextPosition(gDrawTarget->context);
+		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
+		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = abs((int)(after.x-before.x));
-		return EXTENT(width, 12);
+		return EXTENT(width, FONT_HEIGHT);
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
@@ -227,20 +296,14 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		CGContextSelectFont(gBackbuffer, "Helvetica", 12.0, kCGEncodingMacRoman);
-
-		CGContextSetTextDrawingMode(gBackbuffer, kCGTextFill);
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
 		
-		CGAffineTransform xform = CGAffineTransformMake(
-														1.0,  0.0,
-														0.0, -1.0,
-														0.0,  0.0);
-		CGContextSetTextMatrix(gBackbuffer, xform);
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
 		
 		//CGAffineTransform xform =  CGAffineTransformMakeRotation(3.14159);
 		//CGAffineTransform xform = CGAffineTransformScale(xform, 1, -1);
 		//CGContextSetTextMatrix(gBackbuffer, xform);		
-		CGContextShowTextAtPoint(gBackbuffer, left, top+12, str, strlen(str));
+		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
@@ -252,20 +315,24 @@ namespace Base {
 			return;
 		//MAProcessEvents();
 		//MAUpdateScreen();
-		UpdateMoSyncView(gBackbuffer);
+		UpdateMoSyncView(gBackbuffer->image);
 	}
 
 	SYSCALL(void, maResetBacklight()) {
-		NOT_IMPLEMENTED;
+		// do nothing, it can't be reset as far as I can tell..
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		NOT_IMPLEMENTED;
+		int width = CGImageGetWidth(gBackbuffer->image);
+		int height = CGImageGetHeight(gBackbuffer->image);
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
-		Image* img = gSyscall->resources.get_RT_IMAGE(image);	
-		NOT_IMPLEMENTED;
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
+		int width = CGImageGetWidth(img->image);
+		int height = CGImageGetHeight(img->image);
+		CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);
 	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
@@ -281,21 +348,22 @@ namespace Base {
 	{
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
-		Image* img = gSyscall->resources.get_RT_IMAGE(image);
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
 		NOT_IMPLEMENTED;
 	}
 
 	SYSCALL(MAExtent, maGetImageSize(MAHandle image)) {
-		Image* img = gSyscall->resources.get_RT_IMAGE(image);
-		NOT_IMPLEMENTED;
-		return 0;
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
+		int width = CGImageGetWidth(img->image);
+		int height = CGImageGetHeight(img->image);
+		return EXTENT(width, height);
 	}
 
 #define BIG_PHAT_SOURCE_RECT_ERROR {BIG_PHAT_ERROR(WCEERR_SOURCE_RECT_OOB)}
 
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
-		Image* img = gSyscall->resources.get_RT_IMAGE(image);
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
 		int x = src->left;
 		int y = src->top;
 		int width = src->width;
@@ -306,8 +374,21 @@ namespace Base {
 	}
 
 	SYSCALL(MAHandle, maSetDrawTarget(MAHandle handle)) {
-		NOT_IMPLEMENTED;
-		return 0;
+		MAHandle temp = gDrawTargetHandle;
+		if(gDrawTargetHandle != HANDLE_SCREEN) {
+			SYSCALL_THIS->resources.extract_RT_FLUX(gDrawTargetHandle);
+			ROOM(SYSCALL_THIS->resources.add_RT_IMAGE(gDrawTargetHandle, gDrawTarget));
+			gDrawTargetHandle = HANDLE_SCREEN;
+		}
+		if(handle == HANDLE_SCREEN) {
+			gDrawTarget = gBackbuffer;
+		} else {
+			Surface* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
+			gDrawTarget = img; 
+			ROOM(SYSCALL_THIS->resources.add_RT_FLUX(handle, NULL));
+		}
+		gDrawTargetHandle = handle;
+		return temp;
 	}
 
 	SYSCALL(int, maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size)) {
@@ -326,7 +407,7 @@ namespace Base {
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
 		MYASSERT(width > 0 && height > 0, ERR_IMAGE_SIZE_INVALID);
-		NOT_IMPLEMENTED;
+		gSyscall->resources.add_RT_IMAGE(placeholder, new Surface(width, height));
 		return 0;
 	}
 
@@ -352,12 +433,13 @@ namespace Base {
 		MYASSERT(((uint)dst & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
 
 		//MAProcessEvents();
-		NOT_IMPLEMENTED;
-		/*
+		//NOT_IMPLEMENTED;
+
 		if(!gClosing)
 			gEventOverflow = false;
 		if(gEventFifo.count() == 0)
 			return 0;
+		/*
 		*dst = gEventFifo.get();
 
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
@@ -379,7 +461,7 @@ namespace Base {
 		if(gEventFifo.count() != 0)
 			return;
 		
-		NOT_IMPLEMENTED;
+		//NOT_IMPLEMENTED;
 	}
 
 	SYSCALL(int, maTime()) 
@@ -393,11 +475,13 @@ namespace Base {
 		NOT_IMPLEMENTED;
 		return 0;
 	}
-
+	
 	SYSCALL(int, maGetMilliSecondCount()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		//CFTimeInterval time = CFAbsoluteTimeGetCurrent();   
+		//return (int)(time*1000.0);
+
+		return (int)((double)mach_absolute_time()*gTimeConversion);
 	}
 
 	SYSCALL(int, maFreeObjectMemory()) {

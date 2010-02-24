@@ -15,6 +15,7 @@
 		2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
+		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85BF2B26113403FD00BB0201 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
 		85BF2B27113403FD00BB0201 /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
 		85BF2B28113403FD00BB0201 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
@@ -57,6 +58,8 @@
 		28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
+		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = file; path = resources; sourceTree = "<group>"; };
 		85BF2B1C113403FD00BB0201 /* bt_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_errors.h; path = ../../../../intlibs/bluetooth/bt_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1D113403FD00BB0201 /* btinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btinit.h; path = ../../../../intlibs/bluetooth/btinit.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1E113403FD00BB0201 /* connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = connection.cpp; path = ../../../../intlibs/bluetooth/connection.cpp; sourceTree = SOURCE_ROOT; };
@@ -203,6 +206,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				85A0815311353EDE00267D56 /* resources */,
 				85BF2C3A11341EF000BB0201 /* program */,
 				2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
@@ -313,6 +317,7 @@
 		85BF2B1A113403C000BB0201 /* helpers */ = {
 			isa = PBXGroup;
 			children = (
+				85A080F711352F2800267D56 /* fifo.h */,
 				85BF2B2C1134047400BB0201 /* array.h */,
 				85BF2B2D1134047400BB0201 /* attribute.h */,
 				85BF2B2E1134047400BB0201 /* constSets.h */,
@@ -407,6 +412,7 @@
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */,
 				85BF2C3B11341EF000BB0201 /* program in Resources */,
+				85A0815411353EDE00267D56 /* resources in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
