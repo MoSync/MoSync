@@ -14,7 +14,7 @@ end
 if ( HOST == "linux" )
 	RAKEFILES = ["rakefile.pipe.rb"]
 else
-	RAKEFILES = ["rakefile.pipe.rb", "rakefile.native.rb"]
+	RAKEFILES = ["rakefile.pipe.rb"]#, "rakefile.native.rb"]
 end
 
 
