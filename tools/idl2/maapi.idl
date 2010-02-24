@@ -1150,6 +1150,11 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
+
+#if IX_NATIVE_UI
+		NATIVE_UI_MSG = 19;
+#endif
+
 		SCREEN_CHANGED = 21;
 	}
 
@@ -1194,6 +1199,11 @@ interface MAAPI {
 			* Valid only in CONN events.
 			*/
 			MAConnEventData conn;
+			// Native UI
+			struct {
+				int lo_wparam;
+				int hi_wparam;
+			} full_wparam;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -2629,7 +2639,41 @@ interface MAAPI {
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 or \< 0.
 		*/
-		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
+#if IX_NATIVE_UI
+		constset int MA_NATIVE_UI_ {
+			BUFFERSIZE = 80;
+		}
+
+		struct MAWidgetParameters {
+			void *pParent;
+			int widgetID;
+			int widgetType;
+			int sizeX;
+			int sizeY;
+			int posX;
+			int posY;
+			char buf[MA_NATIVE_UI_BUFFERSIZE];
+			
+		}
+
+		struct MAWidgetHandle {
+			void *pWidget;
+		}
+		
+		int maWindow(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maMenuBar();
+		int maSetLeftButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maAddRightMenuItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maMessageBox(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maLabel(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+
+
+#endif //IX_NATIVE_UI
+
+
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

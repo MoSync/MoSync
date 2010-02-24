@@ -67,6 +67,8 @@ using namespace MoSyncError;
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
 
+#include <helpers/CPP_IX_NATIVE_UI.h>
+
 #if (_WIN32_WCE > 0x420) 
 #define MA_PROF_SUPPORT_LOCATIONAPI
 #endif
@@ -200,7 +202,11 @@ namespace Base {
 	HWND g_hwndMain			= NULL;							// MAHandle to the application main window
 	TCHAR g_szTitle[80]		= TEXT ("MoRE"),			// Application main window name
 	g_szClassName[80]		= TEXT ("MoRE class");	// Main window class name
-
+	//---------------
+	//HWND g_hwndMb;
+	HMENU g_hMenu;
+	
+	//--------------------------
 	extern CRITICAL_SECTION vibrationCS;
 	extern UINT_PTR vibrationId;
 
@@ -415,6 +421,8 @@ namespace Base {
 		HACCEL hAccel = 0;
 
 		while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
+#ifndef NATIVE_UI
+			// Interfers badly with Native UI !
 
 			// I think I have to do this for oem keys.
 			if(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
@@ -422,7 +430,7 @@ namespace Base {
 					msg.wParam = ImmGetVirtualKey(msg.hwnd);
 				}
 			}
-
+#endif
 			TranslateMessage (&msg);
 			DispatchMessage (&msg);
 
@@ -489,11 +497,36 @@ DWORD GetScreenOrientation()
 	{
 		switch (umsg)
 		{
-			// Add cases such as WM_CREATE, WM_COMMAND, WM_PAINT if you don't 
-			// want to pass these messages along for default processing.
+		// Add cases such as WM_CREATE, WM_COMMAND, WM_PAINT if you don't 
+		// want to pass these messages along for default processing.
 		case WM_CREATE:
-			ShowWindow (hwnd, SW_SHOW);
+			
+			/*
+			{
+			//add these lines in your wm_initdialog or wm_create function
+			//#define ID_CHANGE_TEXT WM_APP+1
+			//#define ID_ADD_NEW_ITEM WM_APP+2
+			//#define ID_NEW_ITEM WM_APP+3
+
+			//Create the right popupmenu
+			//HMENU hPopupRightMenu = CreatePopupMenu();
+			//InsertMenu(hPopupRightMenu, -1, MF_BYPOSITION, ID_CHANGE_TEXT, L"Change Left Text");
+			//InsertMenu(hPopupRightMenu, -1, MF_BYPOSITION, ID_ADD_NEW_ITEM, L"Add New Item here");
+			//create the toolbar menu
+			g_hMenu = CreateMenu();
+			//HMENU hMenu = CreateMenu();
+			InsertMenu(g_hMenu, 0, MF_BYPOSITION, IDOK, L"Left");
+			InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
+			//InsertMenu(hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Right");
+			//and now create the menu bar
+			SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), hwnd, SHCMBF_HMENU , (UINT)g_hMenu, g_hInst, 0, 0, 0, 0};
+			SHCreateMenuBar(&mbi);
+
+			}
+			*/
+			ShowWindow (hwnd, SW_SHOW); //MODIF COMMENTED
 			UpdateWindow (hwnd);
+			
 			return 0;
 
 		case WM_CLOSE:
@@ -506,7 +539,7 @@ DWORD GetScreenOrientation()
 			return 0;
 
 		case WM_LBUTTONDOWN: 	// The user pressed the screen.
-			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_PRESSED);			
+			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_PRESSED);
 			return 0;
 		case WM_LBUTTONUP: 	// The user released the stylus from the screen.
 			MAHandlePointerEvent(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam), EVENT_TYPE_POINTER_RELEASED);
@@ -548,6 +581,42 @@ DWORD GetScreenOrientation()
 				gEventFifo.put(*pe);
 				delete pe;
 			}
+			return 0;
+
+		// for nativue UI
+		case WM_COMMAND:
+			{
+				if(!gEventOverflow) {
+					if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+						gEventOverflow = true;
+						gEventFifo.clear();
+						LOG("EventBuffer overflow!\n");
+					}
+				// put event in event queue 
+				MAEvent event;
+				event.type = EVENT_TYPE_NATIVE_UI_MSG;
+				event.lo_wparam = LOWORD(wParam);
+				event.hi_wparam = HIWORD(wParam);
+				gEventFifo.put(event);
+				
+				}
+			}
+			
+			
+	/*		switch(LOWORD(wParam))
+					{
+						case 101:
+							// It's our button, check the notification code
+							switch(HIWORD(wParam))
+							{
+								case BN_CLICKED:
+									// Selection changed, do stuff here.
+									MessageBox(NULL, TEXT("Hello Romain !"), TEXT("Note"), MB_OK);
+								break;
+							}
+						break;
+						// ... other controls
+					}*/
 			return 0;
 
 		case WM_DEFLUX_BINARY:
@@ -641,7 +710,7 @@ DWORD GetScreenOrientation()
 	  wndclass.hIcon = NULL;
 	  wndclass.hInstance = hInstance;
 	  wndclass.hCursor = NULL;
-	  wndclass.hbrBackground = NULL; //(HBRUSH) GetStockObject (WHITE_BRUSH);
+	  wndclass.hbrBackground = (HBRUSH) GetStockObject (WHITE_BRUSH); //NULL;
 	  wndclass.lpszMenuName = NULL;
 	  wndclass.lpszClassName = g_szClassName;
 	  
@@ -662,7 +731,7 @@ DWORD GetScreenOrientation()
 	  hwnd = CreateWindow (
 					  g_szClassName,  // Registered class name         
 					  g_szTitle,      // Application window name
-					  0,			  // Window style
+					  WS_VISIBLE,//0,			  // Window style //NATIVE UI MODIFICATION
 					  CW_USEDEFAULT,  // Horizontal position of the window
 					  CW_USEDEFAULT,  // Vertical position of the window
 					  CW_USEDEFAULT,  // Window width
@@ -681,9 +750,9 @@ DWORD GetScreenOrientation()
 	  // If it failed to create the window, return FALSE.
 	  if (!hwnd)
 		return FALSE;
-
-//	  ShowWindow (hwnd, iCmdShow);
-//	  UpdateWindow (hwnd);
+//NATIVE UI MODIFICATION
+	  ShowWindow (hwnd, iCmdShow);//
+	  UpdateWindow (hwnd);//
 	  return TRUE;
 	}
 
@@ -929,9 +998,11 @@ DWORD GetScreenOrientation()
 		HRESULT hRet; 
 		hRet = DirectDrawCreate(NULL, &g_pDD, NULL); 
 		if(hRet != DD_OK) return FALSE;
-
-		// Get exclusive mode 
+#ifndef NATIVE_UI
+		// Get exclusive mode
 		hRet = g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_FULLSCREEN); 
+#endif
+		hRet = g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_NORMAL);
 		if(hRet != DD_OK) return FALSE;
 
 		memset(&ddsd, 0, sizeof(ddsd)); 
@@ -1138,11 +1209,12 @@ DWORD GetScreenOrientation()
 			LOG("InitInstance failed.\n");
 			return false;
 		}
-
+#ifndef NATIVE_UI
 		InitFullScreen();
+#endif
 
 		if(!InitGraphics()) return false;
-
+		
 		currentDrawSurface = backBuffer;
 
 		redMask = backBuffer->redMask;
@@ -1154,7 +1226,6 @@ DWORD GetScreenOrientation()
 		redBits = backBuffer->redBits;
 		greenBits = backBuffer->greenBits;
 		blueBits = backBuffer->blueBits;
-
 		// init various optimization stuff
 		initMulTable();
 		initRecipLut();
@@ -1184,8 +1255,9 @@ DWORD GetScreenOrientation()
 
 		maSetColor(0);
 		maFillRect(0, 0, backBuffer->width, backBuffer->height);
+#ifndef NATIVE_UI
 		maUpdateScreen();
-
+#endif
 		AllKeys(TRUE);
 
 		return true;
@@ -1360,6 +1432,7 @@ DWORD GetScreenOrientation()
 		}
 		str[n] = 0;
 
+#ifndef NATIVE_UI
 		// show mosync non-commercial text
 		int startTime = maGetMilliSecondCount();
 		while(maGetMilliSecondCount() < startTime + PERIOD_MS) 
@@ -1377,6 +1450,7 @@ DWORD GetScreenOrientation()
 
 		maSetColor(0);
 		maFillRect(0, 0, backBuffer->width, backBuffer->height);
+#endif
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
@@ -2357,6 +2431,202 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
+#ifdef NATIVE_UI	
+
+
+
+
+	static int maWindow(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		// Window class
+		WNDCLASS  wc;	
+		wc.style = 0;                     
+		wc.lpfnWndProc = (WNDPROC)WndProc; 
+		wc.cbClsExtra = 0;              
+		wc.cbWndExtra = 0;              
+		wc.hInstance = g_hInst;       
+		wc.hIcon = NULL;
+		wc.hCursor = 0;
+		wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); 
+		wc.lpszMenuName =  0;  
+		wc.lpszClassName = TEXT("WClass");
+		RegisterClass(&wc);
+
+		whandle->pWidget = CreateWindow(
+			TEXT("WClass"),
+			TEXT("Sample"), 
+			WS_VISIBLE,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			NULL,               
+			NULL,               
+			g_hInst,          
+			NULL);
+
+		// Create empty menu bar
+		SHMENUBARINFO mbi = {sizeof(SHMENUBARINFO), (HWND)whandle->pWidget, SHCMBF_EMPTYBAR , (UINT)0, g_hInst, 0, 0, 0, 0};
+		SHCreateMenuBar(&mbi);
+
+		return 0;
+
+	}
+
+
+	static int maButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		if((wparameters->pParent)==NULL) {
+			//create button
+			whandle->pWidget = CreateWindow( 
+				L"BUTTON",   // Predefined class; Unicode assumed. 
+				L"OK",       // Button text. 
+				WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles. 
+				wparameters->posX,         // x position. 
+				wparameters->posY,         // y position. 
+				wparameters->sizeX,        // Button width.
+				wparameters->sizeY,        // Button height.
+				g_hwndMain, // Parent window.
+				(HMENU)wparameters->widgetID,//(HMENU)MY_BUTTON,       // important ID, see #define.
+				g_hInst, 
+				NULL);      // Pointer not needed.
+		}
+		else {
+			//create button
+			whandle->pWidget = CreateWindow( 
+				L"BUTTON",   // Predefined class; Unicode assumed. 
+				L"OK",       // Button text. 
+				WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles. 
+				wparameters->posX,         // x position. 
+				wparameters->posY,         // y position. 
+				wparameters->sizeX,        // Button width.
+				wparameters->sizeY,        // Button height.
+				(HWND)wparameters->pParent,      //g_hwndMain, // Parent window.
+				(HMENU)wparameters->widgetID,//(HMENU)MY_BUTTON,       // important ID, see #define.
+				g_hInst, 
+				NULL);      // Pointer not needed.
+		}
+				
+
+			return 0;
+	}
+
+	static int maEdit(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		if((wparameters->pParent)==NULL) {	
+			whandle->pWidget = CreateWindow(TEXT("EDIT"),      // predefined class 
+                NULL,        // no window title 
+                WS_CHILD | WS_VISIBLE | WS_VSCROLL | 
+                ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL, 
+                wparameters->posX, wparameters->posY, wparameters->sizeX, wparameters->sizeY,  // set size in WM_SIZE message 
+                g_hwndMain,        // parent window 
+                (HMENU)wparameters->widgetID,//(HMENU) ID_EDITCHILD,   // edit control ID 
+                g_hInst, 
+                NULL);       // pointer not needed
+		}
+		else {
+			whandle->pWidget = CreateWindow(TEXT("EDIT"),      // predefined class 
+                NULL,        // no window title 
+                WS_CHILD | WS_VISIBLE | WS_VSCROLL | 
+                ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL, 
+                wparameters->posX, wparameters->posY, wparameters->sizeX, wparameters->sizeY,  // set size in WM_SIZE message 
+                (HWND)wparameters->pParent,        // parent window 
+                (HMENU)wparameters->widgetID,//(HMENU) ID_EDITCHILD,   // edit control ID 
+                g_hInst, 
+                NULL);       // pointer not needed
+		}
+			return 0;
+	}
+
+	static int maLabel(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		// convert ansi to unicode (char * to LPCWSTR)
+		BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+		MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+
+		if((wparameters->pParent)==NULL) {	
+			whandle->pWidget = CreateWindow(TEXT("STATIC"),      // predefined class 
+                NULL,        // no window title 
+                WS_CHILD | WS_VISIBLE | WS_VSCROLL | 
+                ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL, 
+                wparameters->posX, wparameters->posY, wparameters->sizeX, wparameters->sizeY,  // set size in WM_SIZE message 
+                g_hwndMain,        // parent window 
+                (HMENU)wparameters->widgetID,//(HMENU) ID_EDITCHILD,   // edit control ID 
+                g_hInst, 
+                NULL);       // pointer not needed
+		}
+		else {
+			whandle->pWidget = CreateWindow(TEXT("STATIC"),      // predefined class 
+                NULL,        // no window title 
+                WS_CHILD | WS_VISIBLE | 
+                ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL, 
+                wparameters->posX, wparameters->posY, wparameters->sizeX, wparameters->sizeY,  // set size in WM_SIZE message 
+                (HWND)wparameters->pParent,        // parent window 
+                (HMENU)wparameters->widgetID,//(HMENU) ID_EDITCHILD,   // edit control ID 
+                g_hInst, 
+                NULL);       // pointer not needed
+		}
+		SetDlgItemText((HWND)wparameters->pParent, wparameters->widgetID, unicodestr);
+		SysFreeString(unicodestr);
+		return 0;
+	}
+
+
+
+	static int maMenuBar() {
+			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
+			//InsertMenu(g_hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Right");
+			g_hMenu = CreateMenu();
+			//HMENU hMenu = CreateMenu();
+			InsertMenu(g_hMenu, 0, MF_BYPOSITION, IDOK, L"Left");
+			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
+			HMENU hPopupRightMenu = CreatePopupMenu();
+			//InsertMenu(hPopupRightMenu, -1, MF_BYPOSITION, ID_CHANGE_TEXT, L"Change Left Text");
+			InsertMenu(g_hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Menu");
+
+			//HMENU hPopupLeftMenu = CreatePopupMenu();
+			//InsertMenu(g_hMenu, 0, MF_BYPOSITION|MF_POPUP, (UINT)hPopupLeftMenu, L"Left");
+			
+			//and now create the menu bar
+			SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), g_hwndMain/*(HWND)winparams->hwnd_parent*/, SHCMBF_HMENU , (UINT)g_hMenu, g_hInst, 0, 0, 0, 0};
+			SHCreateMenuBar(&mbi);
+			return 0;
+	}
+
+	static int maSetLeftButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+			// convert ansi to unicode (char * to LPCWSTR)
+			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+			//try to modify text on the left button
+			TBBUTTONINFO tbbit = {0};
+			tbbit.cbSize = sizeof(tbbit);
+			tbbit.dwMask = TBIF_TEXT;
+			tbbit.pszText = unicodestr;
+			SendMessage (SHFindMenuBar(g_hwndMain), TB_SETBUTTONINFO, (UINT)IDOK, (LPARAM)&tbbit);
+
+			SysFreeString(unicodestr);
+			return 0;
+	}
+
+	static int maAddRightMenuItem(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+			// convert ansi to unicode (char * to LPCWSTR)
+			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+			// modify right popup
+			TBBUTTONINFO tbbi = {0};
+			tbbi.cbSize = sizeof(tbbi);
+			tbbi.dwMask = TBIF_LPARAM;
+			SendMessage (SHFindMenuBar(g_hwndMain), TB_GETBUTTONINFO, (WPARAM)0, (LPARAM)&tbbi);
+			HMENU hPopupMenu = (HMENU)tbbi.lParam;
+			InsertMenu(hPopupMenu, -1, MF_BYPOSITION, wparameters->widgetID, unicodestr);
+			SysFreeString(unicodestr);
+			return 0;
+	}
+	static int maMessageBox(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+			// convert ansi to unicode (char * to LPCWSTR)
+			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+			
+			MessageBox((HWND)wparameters->pParent, unicodestr, TEXT("Note"), MB_OK);
+			//DialogBox(g_hInst, TEXT("Salut"), (HWND)winparams->hwnd_parent, NULL);
+			SysFreeString(unicodestr);
+			return 0;
+	}
+#endif //IX_NATIVE_UI
+	
 
 	/*
 	MoSyncSemaphore *gAudioSem = NULL;
@@ -2634,6 +2904,8 @@ retry:
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
+		//printf( "maIOCtl function: %d\n", function );
+
 		switch(function) {
 
 		case maIOCtl_maCheckInterfaceVersion:
@@ -2710,7 +2982,25 @@ retry:
 			return maAudioBufferReady();
 		case maIOCtl_maAudioBufferClose:
 			return maAudioBufferClose();
+#ifdef NATIVE_UI
+		case maIOCtl_maWindow:
+			return maWindow(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maButton:
+			return maButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maMessageBox:
+			return maMessageBox(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maEdit:
+			return maEdit(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maMenuBar:
+			return maMenuBar();
+		case maIOCtl_maSetLeftButton:
+			return maSetLeftButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maAddRightMenuItem:
+			return maAddRightMenuItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maLabel:
+			return maLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
+#endif
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 		case maIOCtl_maLocationStart:
 			return maLocationStart();
