@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifndef NO_BUILTINS
 
-wchar *wstrncpy(wchar *dest, const wchar *source, size_t count)
+wchar *wcsncpy(wchar *dest, const wchar *source, size_t count)
 {
 	wchar *start = dest;
 
@@ -36,7 +36,7 @@ wchar *wstrncpy(wchar *dest, const wchar *source, size_t count)
 
 //#ifndef NO_BUILTINS
 
-int wstrncmp(const wchar *s1, const wchar *s2, size_t count)
+int wcsncmp(const wchar *s1, const wchar *s2, size_t count)
 {
 	if (!count) return 0;
 
@@ -53,7 +53,7 @@ int wstrncmp(const wchar *s1, const wchar *s2, size_t count)
 
 #ifndef NO_BUILTINS
 
-wchar *wstrncat(wchar *s1, const wchar *s2, size_t count)
+wchar *wcsncat(wchar *s1, const wchar *s2, size_t count)
 {
 	wchar *start = s1;
 
@@ -71,7 +71,7 @@ wchar *wstrncat(wchar *s1, const wchar *s2, size_t count)
 
 #endif	//NO_BUILTINS
 
-int wstricmp(const wchar *s1, const wchar *s2)
+int wcsicmp(const wchar *s1, const wchar *s2)
 {
 	wchar f, l;
 
@@ -86,7 +86,7 @@ int wstricmp(const wchar *s1, const wchar *s2)
 	return (int) (f - l);
 }
 
-int wstrnicmp(const wchar *s1, const wchar *s2, size_t count)
+int wcsnicmp(const wchar *s1, const wchar *s2, size_t count)
 {
 	int f, l;
 
@@ -99,14 +99,14 @@ int wstrnicmp(const wchar *s1, const wchar *s2, size_t count)
 	return f - l;
 }
 
-wchar *wstrchr(const wchar *s, int ch)
+wchar *wcschr(const wchar *s, int ch)
 {
 	while (*s && *s != (wchar) ch) s++;
 	if (*s == (wchar) ch) return (wchar *) s;
 	return NULL;
 }
 
-wchar *wstrrchr(const wchar *s, int ch)
+wchar *wcsrchr(const wchar *s, int ch)
 {
 	wchar *start = (wchar *) s;
 
@@ -117,7 +117,7 @@ wchar *wstrrchr(const wchar *s, int ch)
 	return NULL;
 }
 
-wchar *wstrstr(const wchar *str1, const wchar *str2)
+wchar *wcsstr(const wchar *str1, const wchar *str2)
 {
 	wchar *cp = (wchar *) str1;
 	wchar *s1, *s2;
@@ -137,7 +137,7 @@ wchar *wstrstr(const wchar *str1, const wchar *str2)
 	return NULL;
 }
 
-size_t wstrspn(const wchar *string, const wchar *control)
+size_t wcsspn(const wchar *string, const wchar *control)
 {
 	const wchar *str = (const wchar *)string;
 	const wchar *ctrl = (const wchar *)control;
@@ -171,7 +171,7 @@ size_t wstrspn(const wchar *string, const wchar *control)
 	return 0;
 }
 
-size_t wstrcspn(const wchar *string, const wchar *control)
+size_t wcscspn(const wchar *string, const wchar *control)
 {
 	const wchar *str = (const wchar *)string;
 	const wchar *ctrl = (const wchar *)control;
@@ -200,7 +200,7 @@ size_t wstrcspn(const wchar *string, const wchar *control)
 	return count;
 }
 
-wchar *wstrpbrk(const wchar *string, const wchar *control)
+wchar *wcspbrk(const wchar *string, const wchar *control)
 {
 	const wchar *str = (const wchar *)string;
 	const wchar *ctrl = (const wchar *)control;
@@ -249,7 +249,7 @@ void *wmemrchr(const void *buf, int ch, size_t count)
 	return (count == 0 ? ptr : NULL);
 }
 
-wchar *wstrlwr(wchar *s)
+wchar *wcslwr(wchar *s)
 {
 	wchar *p = s;
 
@@ -262,7 +262,7 @@ wchar *wstrlwr(wchar *s)
 	return s;
 }
 
-wchar *wstrupr(wchar *s)
+wchar *wcsupr(wchar *s)
 {
 	wchar *p = s;
 
@@ -276,14 +276,14 @@ wchar *wstrupr(wchar *s)
 }
 
 
-wchar *wstrnset(wchar *s, int c, size_t count)
+wchar *wcsnset(wchar *s, int c, size_t count)
 {
 	wchar *start = s;
 	while (count-- && *s) *s++ = (wchar) c;
 	return start;
 }
 
-wchar *wstrrev(wchar *s)
+wchar *wcsrev(wchar *s)
 {
 	wchar *start = s;
 	wchar *left = s;
@@ -302,14 +302,14 @@ wchar *wstrrev(wchar *s)
 	return start;
 }
 
-size_t wstrlen(const wchar *s)
+size_t wcslen(const wchar *s)
 {
 	const wchar *eos = s;
 	while (*eos++);
 	return (int) (eos - s - 1);
 }
 
-int wstrcmp(const wchar *s1, const wchar *s2)
+int wcscmp(const wchar *s1, const wchar *s2)
 {
 	int ret = 0;
 	while (!(ret = *(wchar *) s1 - *(wchar *) s2) && *s2) ++s1, ++s2;
@@ -322,7 +322,7 @@ int wstrcmp(const wchar *s1, const wchar *s2)
 	return ret;
 }
 
-wchar *wstrcat(wchar *dst, const wchar *src)
+wchar *wcscat(wchar *dst, const wchar *src)
 {
 	wchar *cp = dst;
 	while (*cp) cp++;
@@ -330,14 +330,14 @@ wchar *wstrcat(wchar *dst, const wchar *src)
 	return dst;
 }
 
-wchar *wstrset(wchar *s, int c)
+wchar *wcsset(wchar *s, int c)
 {
 	wchar *start = s;
 	while (*s) *s++ = (wchar) c;
 	return start;
 }
 
-size_t wstrnlen(const wchar *s, size_t count)
+size_t wcsnlen(const wchar *s, size_t count)
 {
 	const wchar *sc;
 	for (sc = s; *sc != '\0' && count--; ++sc);

@@ -640,7 +640,7 @@ repeat:
       case 'S':	//Unicode string
         S = va_arg(args, wchar *);
         if (!S) S = L"<NULL>";
-        len = wstrnlen(S, precision);
+        len = wcsnlen(S, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = (char)*S++;
         while (len < field_width--) *str++ = ' ';

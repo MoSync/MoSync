@@ -225,12 +225,8 @@ char *strcat(char *dst, const char *src);
 char *strset(char *s, int c);
 
 
-//char *strtok_r(char *string, const char *control, char **lasts);
-//char *strtok(char *string, const char *control);
-//void *memset(void *p, int c, size_t n);
-//void *memcpy(void *dst, const void *src, size_t n);
-//char *strcpy(char *dst, const char *src);
-//int strcmp(const char *s1, const char *s2);
+char *strtok_r(char *string, const char *control, char **lasts);
+char *strtok(char *string, const char *control);
 
 /**
 * Converts a string to a double.

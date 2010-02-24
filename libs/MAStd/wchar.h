@@ -5,6 +5,9 @@
 
 /// The maximum number of bytes in a multibyte character.
 #define MB_CUR_MAX 3
+#define MB_LEN_MAX 3
+
+typedef int wint_t;
 
 /** \brief Multibyte to wide-char.
 *
@@ -63,5 +66,7 @@ size_t mbstowcs(wchar_t* dst, const char* src, size_t count);
 * If the return value equals \a count, the output was not NUL-terminated.
 */
 size_t wcstombs(char* dst, const wchar_t* src, size_t count);
+
+int mblen(const char* string, size_t size);
 
 #endif	//WHCAR_H

@@ -866,7 +866,7 @@ public:
 			((address & (sizeof(T) - 1)) != 0) || //alignment check
 			(address < 4))	//NULL pointer check
 		{
-			LOG("Memory reference validation failed. Size %lu, address 0x%x\n",
+			LOG("Memory reference validation failed. Size %"PFZT", address 0x%x\n",
 				sizeof(T), address);
 			if((address & (sizeof(T) - 1)) != 0) {
 				BIG_PHAT_ERROR(ERR_MEMORY_ALIGNMENT);

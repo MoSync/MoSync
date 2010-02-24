@@ -437,7 +437,7 @@ static void forcdecpt(wchar *buffer)
 
   if (*buffer)
   {
-    int n = wstrlen(buffer);
+    int n = wcslen(buffer);
     while (n > 0) 
     {
       buffer[n + 1] = buffer[n];
@@ -515,7 +515,7 @@ static wchar *flt(wchar *str, double num, int size, int precision, wchar fmt, in
   // 'g' format means crop zero unless '#' given
   if (fmt == 'g' && !(flags & SPECIAL)) cropzeros(tmp);
 
-  n = wstrlen(tmp);
+  n = wcslen(tmp);
 
   // Output number with alignment and padding
   size -= n;
@@ -620,7 +620,7 @@ repeat:
       case 's':
         s = va_arg(args, wchar *);
         if (!s) s = L"<NULL>";
-        len = wstrnlen(s, precision);
+        len = wcsnlen(s, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
         while (len < field_width--) *str++ = ' ';
