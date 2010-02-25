@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #include "intutil.h"
+#include "types.h"
 
 #ifdef PTAH_EXPORTS
 #define CONFIG_H	//hack
@@ -148,7 +149,7 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 #define FAIL_ERRNO LOG("Errno %i @ %s:%i\n", errno, __FILE__, __LINE__); return -2
 #define ERRNO(a) if((a) < 0) { FAIL_ERRNO; }
 	
-	LOG("execDoublePipe(%s, %lu)\n", cmdline, in.size());
+	LOG("execDoublePipe(%s, %"PFZT")\n", cmdline, in.size());
 	
 	int pin[2], pout[2];
 	ERRNO(pipe(pin));

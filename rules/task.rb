@@ -162,6 +162,7 @@ class BuildWork < Work
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)
+			@prerequisites << DirTask.new(self, @INSTALLDIR)
 			@prerequisites << CopyFileTask.new(self, @INSTALLDIR + '/' + File.basename(@TARGET), @TARGET)
 		end
 	end
@@ -214,6 +215,10 @@ class FileTask < Task
 	def initialize(work, name)
 		super(work)
 		@NAME = name.to_s
+		# names may not contain '~', the unix home directory hack, because File.exist?() doesn't parse it.
+		if(@NAME.include?('~'))
+			error "Bad filename: #{@NAME}"
+		end
 	end
 	
 	def to_str
@@ -274,11 +279,13 @@ class DirTask < FileTask
 		FileUtils.mkdir_p @NAME
 	end
 	def timestamp
-		if File.exist?(@NAME)
-			EARLY
+		if File.directory?(@NAME)
+			t = EARLY
 		else
-			LATE
+			t = LATE
 		end
+		#puts "Timestamp(#{@NAME}): #{t}"
+		#p File.directory?(@NAME)
 	end
 end
 
@@ -293,7 +300,7 @@ class CopyFileTask < FileTask
 		@prerequisites = [src] + preq
 	end
 	def execute
-		puts "cp #{@NAME} #{@src}"
+		puts "copy #{@src} #{@NAME}"
 		FileUtils.copy_file(@src, @NAME, true)
 	end
 end
