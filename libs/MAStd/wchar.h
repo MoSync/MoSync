@@ -7,7 +7,9 @@
 #define MB_CUR_MAX 3
 #define MB_LEN_MAX 3
 
+#ifdef MAPIP
 typedef int wint_t;
+#endif
 
 /** \brief Multibyte to wide-char.
 *
