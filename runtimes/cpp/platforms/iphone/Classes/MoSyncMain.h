@@ -25,5 +25,7 @@ void MoSyncMain(int width, int height, UIView* mosyncView);
 void UpdateMoSyncView(CGImageRef ref);
 void DoneUpdatingMoSyncView();
 
+void ShowMessageBox(const char *msg, bool kill);
+
 #endif
 

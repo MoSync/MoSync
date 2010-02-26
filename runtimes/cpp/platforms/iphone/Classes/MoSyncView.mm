@@ -22,6 +22,33 @@
 
 #include "Platform.h"
 
+@interface UIApplication(MyExtras) 
+- (void)terminateWithSuccess; 
+@end
+
+@interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
+	BOOL kill;
+	NSString *msg;
+}
+@property BOOL kill;
+@property (copy, nonatomic) NSString* msg;
+- (void)alertViewCancel:(UIAlertView *)alertView;
+@end
+
+@implementation MessageBoxHandler
+@synthesize kill;
+@synthesize msg;
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+	if(kill)
+		[[UIApplication sharedApplication] terminateWithSuccess];
+}
+- (void)alertViewCancel:(UIAlertView *)alertView {
+	// don't know if this is allowed...
+	if(kill)
+		[[UIApplication sharedApplication] terminateWithSuccess];
+}
+@end
+
 @implementation MoSyncView
 
 - (void)updateMoSyncView:(CGImageRef)ref {
@@ -94,6 +121,26 @@ bool down = false;
 		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_RELEASED);	
 		down = false;
 	}	
+}
+
+-(void) messageBox:(id) obj {
+	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
+	UIAlertView *alert = [[UIAlertView alloc] 
+                          initWithTitle:nil
+                          message:mbh.msg
+                          delegate:mbh
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil];
+	
+    [alert show];
+    [alert release];
+}
+ 
+-(void) showMessageBox: (NSString*)msg shouldKill: (bool)kill {
+	MessageBoxHandler *mbh = [MessageBoxHandler alloc];
+	mbh.kill = kill;
+	mbh.msg = msg;
+	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
 }
 
 @end

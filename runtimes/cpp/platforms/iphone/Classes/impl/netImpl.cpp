@@ -65,14 +65,7 @@ void MoSyncMutex::unlock() {
 //***************************************************************************
 
 void ConnWaitEvent() {
-	/*
-	if(MsgWaitForMultipleObjects(NULL, NULL, FALSE, INFINITE, QS_ALLEVENTS) == WAIT_FAILED) {
-		//LOGT("MsgWaitForMultipleObjects failed");
-		//MoSyncErrorExit();
-		BIG_PHAT_ERROR(ERR_INTERNAL);
-	}
-	 */
-	DEBIG_PHAT_ERROR;
+	Base::gEventQueue.wait(0);
 }
 void ConnPushEvent(MAEvent* ep) {
 	//PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);

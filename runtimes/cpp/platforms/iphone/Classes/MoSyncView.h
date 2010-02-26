@@ -17,12 +17,13 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
 
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
-
+-(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
 @end
+
+

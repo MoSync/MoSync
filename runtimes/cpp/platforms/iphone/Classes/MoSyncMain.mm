@@ -53,7 +53,7 @@ int MoSyncThreadMain(void *args) {
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
 	
-	while(1) {
+	while(gRunning) {
 		Core::Run2(gCore);
 		
 		if(gReloadHandle > 0) {
@@ -99,4 +99,8 @@ SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
 	//you should get out of the VM loop before you can reload, but this will actually work anyway.
 	gReloadHandle = data;
 	//gReload = gReload || (reload != 0); ???? fredrik?
+}
+
+void ShowMessageBox(const char *msg, bool kill) {
+	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
 }

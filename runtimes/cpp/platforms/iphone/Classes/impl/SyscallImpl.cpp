@@ -128,14 +128,17 @@ namespace Base {
 		   
 		CGDataProviderRelease(dpr);
 		
-		/*
+		
 		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
-		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
+		CGContextSaveGState(newSurface->context);
+		CGContextTranslateCTM(newSurface->context, 0, CGImageGetHeight(imageRef));
 		CGContextScaleCTM(newSurface->context, 1, -1);
+		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
+		CGContextRestoreGState(newSurface->context);
 		CGImageRelease(imageRef);
 		return newSurface;
-		*/	
-		return new Surface(imageRef);
+		
+		//return new Surface(imageRef);
 	}
 	
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
@@ -219,7 +222,7 @@ namespace Base {
 	//***************************************************************************
 	SYSCALL(void, maSetClipRect(int left, int top, int width, int height))
 	{
-		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
+		//CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
@@ -255,7 +258,12 @@ namespace Base {
 	}
 
 	SYSCALL(void, maPlot(int posX, int posY)) {
-		NOT_IMPLEMENTED;
+		if(!gDrawTarget->data) DEBIG_PHAT_ERROR;
+		CGRect cr = CGContextGetClipBoundingBox(gDrawTarget->context);
+		if(posX<cr.origin.x || posY<cr.origin.y || posX>cr.size.width || posY>cr.size.height) return;
+		int *p = (int*)&gDrawTarget->data[CGBitmapContextGetBytesPerRow(gDrawTarget->context)*posY+posX];
+		*p = currentColor;
+		   
 	}
 
 	SYSCALL(void, maLine(int x0, int y0, int x1, int y1)) {
@@ -364,7 +372,8 @@ namespace Base {
    
 		
 		// 0 is bottom in y-axis of pictures..
-		CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
+		//CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
+		CGRect smallRect = CGRectMake(src->left, src->top, src->width, src->height);
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
 		CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
 		CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
@@ -452,10 +461,22 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del)) 
+	SYSCALL(void, maCloseStore(MAHandle store, int del))
 	{
-		NOT_IMPLEMENTED;
-	}
+		StoreItr itr = gStores.find(store);
+		MYASSERT(itr != gStores.end(), ERR_STORE_HANDLE_INVALID);
+		const char *filename = itr->second.c_str();
+		if(del)
+		{
+			int res = remove(filename);
+			if(res != 0) {
+				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
+				DEBIG_PHAT_ERROR;
+			}
+		}
+		gStores.erase(itr);
+	}	 
+
 
 	SYSCALL(int, maGetKeys()) 
 	{
@@ -463,7 +484,6 @@ namespace Base {
 			return 0;
 		//MAProcessEvents();
 		//return currentKeyState;
-		NOT_IMPLEMENTED;
 		return 0;
 	}
 
@@ -500,8 +520,12 @@ namespace Base {
 		if(gClosing)
 			return;
 
+		/*
 		if(gEventQueue.count() != 0)
 			return;
+		*/
+		 
+		gEventQueue.wait(timeout);
 		
 		//NOT_IMPLEMENTED;
 	}
@@ -671,6 +695,9 @@ void MoSyncErrorExit(int errorCode)
 		}
 	}
 	
-	MoSyncExit(errorCode);
+	GetVMYield(gCore) = 1;
+	gRunning = false;
+	ShowMessageBox(buffer, true);	
+	//MoSyncExit(errorCode);
 }
 	

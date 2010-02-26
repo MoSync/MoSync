@@ -22,11 +22,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <CoreGraphics/CoreGraphics.h>
 #include <string>
 #include <mach/mach_time.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "config_platform.h"
 
 #include <bluetooth/discovery.h>
 #include <helpers/fifo.h>
+
+#include "ThreadPoolImpl.h"
 
 namespace Core {
 	class VMCore;
@@ -44,6 +48,7 @@ public:
 		int rowBytes = width*4;
 		data = new char[rowBytes*height];
 		context = CGBitmapContextCreate(data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst);
+										//kCGImageAlphaNoneSkipFirst);
 		
 		CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, data, rowBytes * height, NULL);
 		image = CGImageCreate(width, height, 8, 32, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst, dataProvider, NULL, false, kCGRenderingIntentDefault);
@@ -75,9 +80,40 @@ public:
 
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
-	EventQueue() : mEventOverflow(false) {
+	EventQueue() : mEventOverflow(false), mWaiting(false) {
+		pthread_cond_init(&mCond, NULL);
+		pthread_mutex_init(&mMutex, NULL);
 	}
 	
+	~EventQueue() {
+		pthread_cond_destroy(&mCond);
+		pthread_mutex_destroy(&mMutex);
+	}
+	
+	void put(const MAEvent& e) {
+		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
+		//pthread_mutex_lock(&mMutex);	
+		pthread_cond_signal(&mCond);
+		//pthread_mutex_unlock(&mMutex);
+	}
+		
+	void wait(int ms) {
+		pthread_mutex_lock(&mMutex);
+		if(count()==0) {
+			if(ms!=0) {
+				struct timeval now;
+				struct timespec timeout;	
+				gettimeofday(&now, NULL);
+				timeout.tv_sec = now.tv_sec + (ms/1000);
+				timeout.tv_nsec = now.tv_usec * 1000 + (ms%1000)*1000000;				
+				pthread_cond_timedwait(&mCond, &mMutex, &timeout);
+			} else {
+				pthread_cond_wait(&mCond, &mMutex);
+			}
+		}
+		pthread_mutex_unlock(&mMutex);	
+	}
+		
 	void addPointerEvent(int x, int y, int type) {
 		if(!mEventOverflow) {
 			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
@@ -101,7 +137,11 @@ public:
 	}
 	
 private:
+	pthread_mutex_t mMutex;
+	pthread_cond_t mCond;
+							
 	bool mEventOverflow;
+	bool mWaiting;
 	
 };
 

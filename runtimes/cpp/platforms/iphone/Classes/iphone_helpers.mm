@@ -27,3 +27,27 @@ const char *getWriteablePath(const char* path) {
 void sleepMillis(int ms) {
 	[NSThread sleepForTimeInterval:(((float)ms)/1000.0f)];
 }
+
+
+// timer
+/*
+int timerFunc(void *arg) {
+	Timer::TimerInfo* timerInfo = (Timer::TimerInfo*) arg;
+	sleepMillis(timerInfo->ms);
+	timerInfo->cb(timerInfo->arg);
+}
+
+Timer::Timer(Timer::TimerCallback cb, int ms, void *arg) {
+	mTimerInfo.cb = cb;
+	mTimerInfo.ms = ms;
+	mTimerInfo.arg = arg;
+													 
+}
+
+Timer::~Timer() {
+}
+
+void Timer::run() {
+	mThread.start(timerFunc, &mTimerInfo);
+}
+*/
