@@ -99,6 +99,7 @@ The global pointer <<environ>> is also required.
 #include <fcntl.h>
 #include <reent.h>
 #include <errno.h>
+#include <sys/unistd.h>
 
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */

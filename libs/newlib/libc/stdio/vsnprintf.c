@@ -26,6 +26,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <limits.h>
 #include <stdarg.h>
 #include <errno.h>
+#include "local.h"
 
 #ifndef _REENT_ONLY
 

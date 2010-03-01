@@ -9,7 +9,7 @@
 #include "atexit.h"
 
 /* Make this a weak reference to avoid pulling in malloc.  */
-void * malloc(size_t) _ATTRIBUTE((__weak__));
+//void * malloc(size_t) _ATTRIBUTE((__weak__));
 
 /*
  * Register a function to be performed at exit or on shared library unload.

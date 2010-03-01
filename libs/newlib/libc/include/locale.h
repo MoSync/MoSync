@@ -25,16 +25,16 @@ _BEGIN_STD_C
 
 struct lconv
 {
-  char *decimal_point;
-  char *thousands_sep;
-  char *grouping;
-  char *int_curr_symbol;
-  char *currency_symbol;
-  char *mon_decimal_point;
-  char *mon_thousands_sep;
-  char *mon_grouping;
-  char *positive_sign;
-  char *negative_sign;
+  const char *decimal_point;
+  const char *thousands_sep;
+  const char *grouping;
+  const char *int_curr_symbol;
+  const char *currency_symbol;
+  const char *mon_decimal_point;
+  const char *mon_thousands_sep;
+  const char *mon_grouping;
+  const char *positive_sign;
+  const char *negative_sign;
   char int_frac_digits;
   char frac_digits;
   char p_cs_precedes;
@@ -52,12 +52,12 @@ struct lconv
 };
 
 #ifndef _REENT_ONLY
-char *_EXFUN(setlocale,(int category, const char *locale));
+const char *_EXFUN(setlocale,(int category, const char *locale));
 struct lconv *_EXFUN(localeconv,(void));
 #endif
 
 struct _reent;
-char *_EXFUN(_setlocale_r,(struct _reent *, int category, const char *locale));
+const char *_EXFUN(_setlocale_r,(struct _reent *, int category, const char *locale));
 struct lconv *_EXFUN(_localeconv_r,(struct _reent *));
 
 _END_STD_C

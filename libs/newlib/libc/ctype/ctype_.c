@@ -140,6 +140,8 @@ char *__ctype_ptr__ = (char *) _ctype_;
 /* Cygwin has its own implementation which additionally maintains backward
    compatibility with applications built under older Cygwin releases. */
 #ifndef __CYGWIN__
+// this function is used by locale.c
+extern void __set_ctype (const char *charset);
 void
 __set_ctype (const char *charset)
 {

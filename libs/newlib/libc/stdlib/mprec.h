@@ -98,7 +98,7 @@ typedef union { double d; __ULong i[2]; } U;
 #define SI 0
 #endif
 
-#define Storeinc(a,b,c) (*(a)++ = (b) << 16 | (c) & 0xffff)
+#define Storeinc(a,b,c) (*(a)++ = (((b) << 16) | ((c) & 0xffff)))
 
 /* #define P DBL_MANT_DIG */
 /* Ten_pmax = floor(P*log(2)/log(5)) */
@@ -395,7 +395,7 @@ _Bigint *	_EXFUN(d2b,(struct _reent *p, double d, int *e, int *bits));
 _Bigint *	_EXFUN(lshift,(struct _reent *p, _Bigint *b, int k));
 _Bigint *	_EXFUN(diff,(struct _reent *p, _Bigint *a, _Bigint *b));
 int		_EXFUN(cmp,(_Bigint *a, _Bigint *b));
-int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, struct FPI *fpi, Long *exp, _Bigint **bp, int sign));     
+int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, struct FPI *fpi, Long *_exp, _Bigint **bp, int sign));     
 double		_EXFUN(ratio,(_Bigint *a, _Bigint *b));
 __ULong		_EXFUN(any_on,(_Bigint *b, int k));
 void		_EXFUN(copybits,(__ULong *c, int n, _Bigint *b));

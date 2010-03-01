@@ -166,7 +166,7 @@ _DEFUN(_cleanup_r, (ptr),
   /* _CAST_VOID _fwalk (ptr, fflush); */	/* `cheating' */
 }
 
-#ifndef _REENT_ONLY
+#if 0//ndef _REENT_ONLY
 _VOID
 _DEFUN_VOID(_cleanup)
 {

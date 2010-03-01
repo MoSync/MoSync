@@ -26,7 +26,7 @@ class PipeExeWork < PipeGccWork
 		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
 		@FLAGS = " -sld=#{sld} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
-			[MOSYNC_INCLUDE, "#{ENV['MOSYNCDIR']}/profiles/vendors/MobileSorcery/Emulator"]
+			[mosync_include, "#{ENV['MOSYNCDIR']}/profiles/vendors/MobileSorcery/Emulator"]
 		super
 	end
 	def setup3(all_objects)
@@ -42,10 +42,15 @@ class PipeExeWork < PipeGccWork
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
 			@prerequisites << PipeResourceTask.new(self, "build/resources", lstTasks)
 		end
+		if(USE_NEWLIB)
+			default(:DEFAULT_LIBS, ["newlib"])
+		else
+			default(:DEFAULT_LIBS, ["mastd"])
+		end
 		
 		# libs
-		libs = (["mastd"] + @LIBRARIES).collect do |lib|
-			FileTask.new(self, "#{MOSYNC_LIBDIR}/pipe/#{@CONFIG_NAME}/#{lib}.lib")
+		libs = (@DEFAULT_LIBS + @LIBRARIES).collect do |lib|
+			FileTask.new(self, "#{mosync_libdir}/pipe/#{@CONFIG_NAME}/#{lib}.lib")
 		end
 		all_objects += libs
 		super(all_objects)

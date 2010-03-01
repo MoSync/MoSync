@@ -38,6 +38,7 @@
 
 #include <_ansi.h>
 #include <wctype.h>
+#include <string.h>
 #include "local.h"
 #include "jp2uc.h"
 

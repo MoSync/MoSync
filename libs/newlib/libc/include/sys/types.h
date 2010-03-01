@@ -96,8 +96,11 @@ typedef	unsigned long	u_long;
 #define _BSDTYPES_DEFINED
 #endif
 
+#ifndef _SYSV_TYPES_DEFINED
+#define _SYSV_TYPES_DEFINED
 typedef	unsigned short	ushort;		/* System V compatibility */
 typedef	unsigned int	uint;		/* System V compatibility */
+#endif	//_SYSV_TYPES_DEFINED
 # endif	/*!_POSIX_SOURCE */
 
 #ifndef __clock_t_defined

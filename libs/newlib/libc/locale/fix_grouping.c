@@ -36,6 +36,8 @@ static const char nogrouping[] = { CHAR_MAX, '\0' };
  * "3;3;-1" -> "\003\003\177"
  */
 
+const char *__fix_locale_grouping_str(const char *);
+ 
 const char *
 __fix_locale_grouping_str(const char *str) {
 

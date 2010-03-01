@@ -29,6 +29,8 @@
 
 #include <string.h>
 
+extern char *__strtok_r (char *, const char *, char **, int);
+
 char *
 _DEFUN (__strtok_r, (s, delim, lasts, skip_leading_delim),
 	register char *s _AND

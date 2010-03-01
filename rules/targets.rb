@@ -93,6 +93,7 @@ class Targets
 			set_const(:CONFIG, 'debug')
 		end
 		default_const(:RELOAD, false)
+		default_const(:USE_NEWLIB, false)
 	end
 	
 	def Targets.handle_arg(a)

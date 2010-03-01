@@ -69,7 +69,7 @@ No supporting OS subroutines are required.
 #include <errno.h>
 #include "local.h"
 
-wint_t
+static wint_t
 _DEFUN (_towctrans_r, (r, c, w), 
 	struct _reent *r _AND
 	wint_t c _AND 

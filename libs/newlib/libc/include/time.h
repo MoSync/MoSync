@@ -117,7 +117,7 @@ int		_EXFUN(getdate_r, (const char *, struct tm *));
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 extern __IMPORT long _timezone;
 extern __IMPORT int _daylight;
-extern __IMPORT char *_tzname[2];
+extern __IMPORT const char *_tzname[2];
 
 /* POSIX defines the external tzname being defined in time.h */
 #ifndef tzname

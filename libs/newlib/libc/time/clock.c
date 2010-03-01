@@ -54,7 +54,7 @@ Supporting OS subroutine required: <<times>>.
 #include <reent.h>
 
 clock_t 
-clock ()
+clock (void)
 {
   struct tms tim_s;
   clock_t res;

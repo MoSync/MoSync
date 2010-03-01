@@ -73,6 +73,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <reent.h>
 #include "mprec.h"
 #include "local.h"
+#include "../stdio/local.h"
 
 static void
 _DEFUN (print_f, (ptr, buf, invalue, ndigit, type, dot, mode),
@@ -207,9 +208,9 @@ _DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
     }
   if (decpt > 99)
     {
-      int top = decpt / 100;
-      *buf++ = top + '0';
-      decpt -= top * 100;
+      int top2 = decpt / 100;
+      *buf++ = top2 + '0';
+      decpt -= top2 * 100;
     }
   top = decpt / 10;
   *buf++ = top + '0';

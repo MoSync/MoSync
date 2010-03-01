@@ -6,7 +6,10 @@ work = PipeExeWork.new
 work.instance_eval do 
 	@SOURCES = ["."]
 	@EXTRA_CFLAGS = " -Wno-unreachable-code"
-	@NAME = "location"
+	if(USE_NEWLIB)
+		@EXTRA_LINKFLAGS = " -datasize=256000 -heapsize=128000 -stacksize=16000"
+	end
+	@NAME = "MAStx"
 end
 
 work.invoke

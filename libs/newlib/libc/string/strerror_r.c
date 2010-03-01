@@ -46,7 +46,7 @@ _DEFUN (strerror_r, (errnum, buffer, n),
 	char *buffer _AND
 	size_t n)
 {
-  char *error;
+  const char *error;
   error = strerror (errnum);
 
   return strncpy (buffer, (const char *)error, n);

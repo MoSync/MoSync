@@ -22,6 +22,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/types.h>
+#include "local.h"
 
 /*
  * Return the (stdio) flags for a given mode.  Store the flags
@@ -32,7 +33,7 @@
 int
 _DEFUN(__sflags, (ptr, mode, optr),
        struct _reent *ptr  _AND
-       register char *mode _AND
+       _CONST char *mode _AND
        int *optr)
 {
   register int ret, m, o;

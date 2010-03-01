@@ -35,6 +35,7 @@ extern "C" {
 #define __have_long64 1
 #elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
 #define __have_long32 1
+#define __have_long64 0
 #endif
 
 #if __STDINT_EXP(SCHAR_MAX) == 0x7f
@@ -208,7 +209,7 @@ typedef uint64_t  	uint_least32_t;
 #endif
 #endif
 
-#if !__int_fast64_t_defined
+#if !defined(__int_fast64_t_defined)
 #if __int_least64_t_defined
   typedef int_least64_t int_fast64_t;
   typedef uint_least64_t uint_fast64_t;

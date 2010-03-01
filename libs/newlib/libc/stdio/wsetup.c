@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
+#include "fvwrite.h"
 
 /*
  * Various output routines call wsetup to be sure it is safe to write,

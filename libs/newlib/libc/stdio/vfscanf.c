@@ -294,7 +294,7 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
 }
 #endif /* !STRING_ONLY */
 
-#if defined (STRING_ONLY) && defined (INTEGER_ONLY)
+#if defined (STRING_ONLY) //&& defined (INTEGER_ONLY)
 /* When dealing with the sscanf family, we don't want to use the
  * regular ungetc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
@@ -461,7 +461,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
 
-  char *cp;
+  //char *cp;
   short *sp;
   int *ip;
 #ifdef FLOATING_POINT

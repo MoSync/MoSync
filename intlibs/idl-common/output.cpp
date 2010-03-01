@@ -171,7 +171,8 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 			"#define memcpy _memcpy\n"
 			"#include <math.h>\n"
 			"#endif	//MAPIP\n"
-			"\n";
+			"\n"
+			;
 
 		streamMoSyncDllDefines(stream);
 	}
@@ -328,6 +329,28 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 }
 
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix) {
+	stream <<
+		"#ifndef _WCHAR_DEFINED\n"
+		"#define _WCHAR_DEFINED\n"
+		"#ifdef MAPIP\n"
+		"#ifdef __cplusplus\n"
+		"typedef wchar_t wchar;\n"
+		"#else\n"
+		"typedef unsigned short wchar;\n"
+		"typedef wchar wchar_t;\n"
+		"#endif	//__cplusplus\n"
+		"#else	//MAPIP\n"
+		"typedef unsigned short wchar;\n"
+		"#endif	//MAPIP\n"
+		"#endif	//_WCHAR_DEFINED\n"
+		"\n"
+		"#ifndef _SYSV_TYPES_DEFINED\n"
+		"#define _SYSV_TYPES_DEFINED\n"
+		"typedef unsigned short ushort;\n"
+		"typedef unsigned int uint;\n"
+		"#endif	//_SYSV_TYPES_DEFINED\n"
+		"\n"
+		;
 	bool anyStreamed = false;
 	for(size_t i=0; i<typedefs.size(); i++) {
 		const Typedef& t(typedefs[i]);

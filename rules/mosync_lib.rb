@@ -23,12 +23,13 @@ require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
 module MoSyncMod
+	include MoSyncInclude
 	def modSetup
-		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [MOSYNC_INCLUDE]
+		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [mosync_include]
 	end
 	
 	def copyHeaders
-		dir = MOSYNC_INCLUDE + "/" + @INSTALL_INCDIR
+		dir = mosync_include + "/" + @INSTALL_INCDIR
 		DirTask.new(self, dir).invoke
 		# create a bunch of CopyFileTasks, then invoke them all.
 		collect_headers(".h").each do |h|
@@ -40,7 +41,9 @@ module MoSyncMod
 	private
 	
 	def collect_headers(ending)
-		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
+		default(:HEADER_DIRS, @SOURCES)
+		files = []
+		@HEADER_DIRS.each {|dir| files += Dir[dir+"/*"+ending]}
 		files.flatten!
 		if(defined?(@IGNORED_HEADERS))
 			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file))}
@@ -73,7 +76,7 @@ class PipeLibWork < PipeGccWork
 		super
 	end
 	def setup3(all_objects)
-		@TARGET_PATH = MOSYNC_LIBDIR + "/pipe/" + @CONFIG_NAME + "/" + @NAME + ".lib"
+		@TARGET_PATH = mosync_libdir + "/pipe/" + @CONFIG_NAME + "/" + @NAME + ".lib"
 		super(all_objects)
 	end
 	#def filename; @NAME + ".lib"; end

@@ -69,15 +69,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 interface MAAPI {
 
-	typedef unsigned short wchar;
 	typedef char* MAString;
 	typedef wchar* MAWString;
 	typedef void* MAAddress;
 	typedef int MAHandle;
 	typedef int MAExtent;
 	typedef unsigned char byte;
-	typedef unsigned short ushort;
-	typedef unsigned int uint;
 	typedef unsigned long ulong;
 
 	/// Returns the height of an MAExtent.
@@ -568,9 +565,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a remove is non-zero.
+	* Closes a store. Also removes that store if \a _remove is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int remove);
+	void maCloseStore(in MAHandle store, in int _remove);
 
 	constset int CONNERR_ {
 		/// Generic error.

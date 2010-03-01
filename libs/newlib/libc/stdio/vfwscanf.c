@@ -260,6 +260,7 @@ _DEFUN(VFWSCANF, (fp, fmt, ap),
   return __SVFWSCANF_R (_REENT, fp, fmt, ap);
 }
 
+#if 0
 int
 _DEFUN(__SVFWSCANF, (fp, fmt0, ap),
        register FILE *fp _AND
@@ -268,7 +269,7 @@ _DEFUN(__SVFWSCANF, (fp, fmt0, ap),
 {
   return __SVFWSCANF_R (_REENT, fp, fmt0, ap);
 }
-
+#endif
 #endif /* !_REENT_ONLY */
 
 int
@@ -401,7 +402,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
   size_t nconv;                 /* number of bytes in mb. conversion */
   char mbbuf[MB_LEN_MAX];       /* temporary mb. character buffer */
 
-  char *cp;
+  //char *cp;
   short *sp;
   int *ip;
 #ifdef FLOATING_POINT

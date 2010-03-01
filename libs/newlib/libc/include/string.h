@@ -30,7 +30,7 @@ int	 _EXFUN(strcmp,(const char *, const char *));
 int	 _EXFUN(strcoll,(const char *, const char *));
 char 	*_EXFUN(strcpy,(char *, const char *));
 size_t	 _EXFUN(strcspn,(const char *, const char *));
-char 	*_EXFUN(strerror,(int));
+const char*_EXFUN(strerror,(int));
 size_t	 _EXFUN(strlen,(const char *));
 char 	*_EXFUN(strncat,(char *, const char *, size_t));
 int	 _EXFUN(strncmp,(const char *, const char *, size_t));
@@ -53,11 +53,11 @@ int	 _EXFUN(bcmp,(const void *, const void *, size_t));
 void	 _EXFUN(bcopy,(const void *, void *, size_t));
 void	 _EXFUN(bzero,(void *, size_t));
 int	 _EXFUN(ffs,(int));
-char 	*_EXFUN(index,(const char *, int));
+//char 	*_EXFUN(index,(const char *, int));	//disabled on MoSync
 _PTR	 _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));
 _PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
 _PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
-char 	*_EXFUN(rindex,(const char *, int));
+//char 	*_EXFUN(rindex,(const char *, int));	//disabled on MoSync
 char 	*_EXFUN(stpcpy,(char *, const char *));
 char 	*_EXFUN(stpncpy,(char *, const char *, size_t));
 int	 _EXFUN(strcasecmp,(const char *, const char *));

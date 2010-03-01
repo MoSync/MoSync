@@ -322,12 +322,11 @@ QUICKREF
 #include <errno.h>
 #include <string.h>
 
-char *
+const char *
 _DEFUN (strerror, (errnum),
 	int errnum)
 {
-  char *error;
-  extern char *_user_strerror _PARAMS ((int));
+  const char *error;
 
   switch (errnum)
     {
@@ -784,7 +783,7 @@ _DEFUN (strerror, (errnum),
         break;
 #endif
     default:
-      if ((error = _user_strerror (errnum)) == 0)
+      //if ((error = _user_strerror (errnum)) == 0)
 	error = "";
       break;
     }

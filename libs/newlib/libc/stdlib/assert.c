@@ -56,7 +56,7 @@ _DEFUN (__assert_func, (file, line, func, failedexpr),
 	const char *func _AND
 	const char *failedexpr)
 {
-  fiprintf(stderr,
+  fprintf(stderr,
 	   "assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
 	   failedexpr, file, line,
 	   func ? ", function: " : "", func ? func : "");

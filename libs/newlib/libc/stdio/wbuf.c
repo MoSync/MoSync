@@ -88,6 +88,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
   return c;
 }
 
+#if 0
 /* This function isn't any longer declared in stdio.h, but it's
    required for backward compatibility with applications built against
    earlier dynamically built newlib libraries. */
@@ -98,3 +99,4 @@ _DEFUN(__swbuf, (c, fp),
 {
   return __swbuf_r (_REENT, c, fp);
 }
+#endif

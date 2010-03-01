@@ -51,6 +51,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/unistd.h>
 
 #ifndef O_BINARY
 # define O_BINARY 0

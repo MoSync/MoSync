@@ -8,7 +8,7 @@
 #ifndef _REENT_ONLY
 
 int *
-__errno ()
+__errno (void)
 {
   return &_REENT->_errno;
 }

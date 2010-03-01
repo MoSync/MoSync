@@ -66,6 +66,7 @@ Supporting OS subroutine required: <<unlink>>.
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
+#include <sys/unistd.h>
 
 int
 _DEFUN(_remove_r, (ptr, filename),

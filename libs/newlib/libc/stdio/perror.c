@@ -72,7 +72,7 @@ _DEFUN(_perror_r, (ptr, s),
        struct _reent *ptr _AND
        _CONST char *s)
 {
-  char *error;
+  const char *error;
 
   _REENT_SMALL_CHECK_INIT (ptr);
   if (s != NULL && *s != '\0')

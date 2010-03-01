@@ -43,13 +43,13 @@
 
 #define _REL(BASE) ((int)item-BASE)
 
-extern char *__locale_charset ();
+extern const char *__locale_charset (void);
 
-char *
+const char *
 _DEFUN(nl_langinfo, (item), 
        nl_item item) {
 
-   char *ret, *s, *cs;
+   const char *ret, *s, *cs;
    static char *csym = NULL;
 #ifdef TRANSITION_PERIOD_HACK
    static char *cset = NULL;

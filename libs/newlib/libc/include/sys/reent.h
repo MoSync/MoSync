@@ -694,13 +694,14 @@ struct _reent
         {0, {0}}, \
         {0, {0}}, \
         {0, {0}}, \
-        {0, {0}} \
+        {0, {0}}, \
+	0 \
       } \
     }, \
     _NULL, \
     {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}, \
     _NULL, \
-    {_NULL, 0, _NULL} \
+    {_NULL, 0, _NULL}, \
   }
 
 #define _REENT_INIT_PTR(var) \

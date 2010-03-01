@@ -118,7 +118,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 #include <errno.h>
 #include <sys/lock.h>
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(MAPIP)
 #include <fcntl.h>
 #endif
 #include "local.h"

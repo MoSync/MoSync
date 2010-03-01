@@ -187,7 +187,7 @@ static char *rcsid = "$Id: vfprintf.c,v 1.43 2002/08/13 02:40:06 fitzsim Exp $";
    vfprintf and vfwprintf.  They must only be defined once, which we do in
    the INTEGER_ONLY versions here. */
 #ifdef STRING_ONLY
-#ifdef INTEGER_ONLY
+#if 1//def INTEGER_ONLY
 int
 _DEFUN(__ssprint_r, (ptr, fp, uio),
        struct _reent *ptr _AND
@@ -284,7 +284,7 @@ int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
 
 #else /* !STRING_ONLY */
-#ifdef INTEGER_ONLY
+#if 1//def INTEGER_ONLY
 /*
  * Flush out all the vectors defined by the given uio,
  * then reset it so that it can be reused.
@@ -553,7 +553,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
 #ifdef FLOATING_POINT
-	char *decimal_point = _localeconv_r (data)->decimal_point;
+	const char *decimal_point = _localeconv_r (data)->decimal_point;
 	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};

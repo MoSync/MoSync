@@ -8,7 +8,7 @@
 #include "atexit.h"
 
 /* Make this a weak reference to avoid pulling in free.  */
-void free(void *) _ATTRIBUTE((__weak__));
+//void free(void *) _ATTRIBUTE((__weak__));
 
 /*
  * Call registered exit handlers.  If D is null then all handlers are called,

@@ -17,8 +17,11 @@
 require "#{File.dirname(__FILE__)}/gcc.rb"
 #require 'lib/importenv.rb'
 
-MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
-MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
+module MoSyncInclude
+	def mosync_include; "#{ENV['MOSYNCDIR']}/include" + sub_include; end
+	def mosync_libdir; "#{ENV['MOSYNCDIR']}/lib"; end
+	def sub_include; USE_NEWLIB ? "/newlib" : ""; end
+end
 
 class PipeTask < FileTask
 	def initialize(work, name, objects, linkflags)
@@ -72,8 +75,10 @@ class PipeGccWork < GccWork
 	include GccVersion
 	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
 	def gccmode; "-S"; end
-	def host_flags; ""; end
+	def host_flags; USE_NEWLIB ? " -DUSE_NEWLIB" : ""; end
 	def host_cppflags; ""; end
+	
+	include MoSyncInclude
 	
 	def set_defaults
 		@BUILDDIR_BASE = "build/pipe/"

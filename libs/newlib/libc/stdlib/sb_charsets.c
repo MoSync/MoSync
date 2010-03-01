@@ -1,8 +1,8 @@
 #include <newlib.h>
 #include <wchar.h>
+#include "local.h"
 
 #ifdef _MB_CAPABLE
-extern char *__locale_charset ();
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the

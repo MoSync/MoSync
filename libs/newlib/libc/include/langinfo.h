@@ -134,7 +134,7 @@ typedef int nl_item;
 #define _NL_CTYPE_EXTRA_MAP_14 83
 
 __BEGIN_DECLS
-char	*nl_langinfo(nl_item);
+const char	*nl_langinfo(nl_item);
 __END_DECLS
 
 #endif /* !_LANGINFO_H_ */

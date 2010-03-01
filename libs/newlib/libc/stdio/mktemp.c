@@ -114,6 +114,7 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 #include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <sys/unistd.h>
 
 static int
 _DEFUN(_gettemp, (ptr, path, doopen, domkdir, suffixlen),
@@ -223,7 +224,7 @@ _DEFUN(_gettemp, (ptr, path, doopen, domkdir, suffixlen),
 	  else
 	    {
 	      /* Safe, since it only encounters 7-bit characters.  */
-	      if (isdigit (*trv))
+	      if (isdigit ((unsigned char)*trv))
 		*trv = 'a';
 	      else
 		++ * trv;

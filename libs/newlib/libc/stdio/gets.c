@@ -70,6 +70,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
+#include "local.h"
 
 char *
 _DEFUN(_gets_r, (ptr, buf),

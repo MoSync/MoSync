@@ -179,7 +179,7 @@ int __EXPORT __mb_cur_max = 1;
 
 int __nlocale_changed = 0;
 int __mlocale_changed = 0;
-char *_PathLocale = NULL;
+const char *_PathLocale = NULL;
 
 static _CONST struct lconv lconv = 
 {
@@ -194,7 +194,7 @@ static _CONST struct lconv lconv =
 /*
  * Category names for getenv()
  */
-static char *categories[_LC_LAST] = {
+static const char *categories[_LC_LAST] = {
   "LC_ALL",
   "LC_COLLATE",
   "LC_CTYPE",
@@ -236,8 +236,8 @@ static char new_categories[_LC_LAST][ENCODING_LEN + 1];
 static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
 
 static char current_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
-static char *currentlocale(void);
-static char *loadlocale(struct _reent *, int);
+static const char *currentlocale(void);
+static const char *loadlocale(struct _reent *, int);
 static const char *__get_locale_env(struct _reent *, int);
 
 #endif
@@ -251,7 +251,7 @@ static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
 #endif
 static int lc_ctype_cjk_lang = 0;
 
-char *
+const char *
 _DEFUN(_setlocale_r, (p, category, locale),
        struct _reent *p _AND
        int category _AND
@@ -396,8 +396,8 @@ _DEFUN(_setlocale_r, (p, category, locale),
 }
 
 #ifdef _MB_CAPABLE
-static char *
-currentlocale()
+static const char *
+currentlocale(void)
 {
         int i;
 
@@ -423,7 +423,7 @@ extern void *__set_charset_from_codepage (unsigned int, char *charset);
 
 extern void __set_ctype (const char *charset);
 
-static char *
+static const char *
 loadlocale(struct _reent *p, int category)
 {
   /* At this point a full-featured system would just load the locale
@@ -751,18 +751,21 @@ __get_locale_env(struct _reent *p, int category)
 }
 #endif
 
-char *
+const char *
 _DEFUN_VOID(__locale_charset)
 {
   return lc_ctype_charset;
 }
 
-char *
+#if 0
+const char *
 _DEFUN_VOID(__locale_msgcharset)
 {
   return lc_message_charset;
 }
+#endif
 
+#include "../string/local.h"
 int
 _DEFUN_VOID(__locale_cjk_lang)
 {
@@ -779,7 +782,7 @@ _DEFUN(_localeconv_r, (data),
 #ifndef _REENT_ONLY
 
 #ifndef __CYGWIN__
-char *
+const char *
 _DEFUN(setlocale, (category, locale),
        int category _AND
        _CONST char *locale)

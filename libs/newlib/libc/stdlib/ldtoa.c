@@ -367,6 +367,7 @@ typedef struct
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IBMPC 1
 #else  /* !__IEEE_LITTLE_ENDIAN */
+#define IBMPC 0
 #define MIEEE 1
 #endif /* !__IEEE_LITTLE_ENDIAN */
 #endif /* !DEC */

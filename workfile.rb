@@ -25,9 +25,11 @@ BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl/MoRE"
 	] + PLATFORM_TOOLS
 
-EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "examples"]
+EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "tests/unitTest", "examples"]
 
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
+
+NEWLIB_DIRS = ["libs/newlib", "examples/MAStx"]#, "tests/unitTest"]
 
 skins = Work.new
 skins.instance_eval do
@@ -63,6 +65,10 @@ end
 
 target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
+end
+
+target :newlib => :base do
+	Work.invoke_subdirs(NEWLIB_DIRS)
 end
 
 target :clean do

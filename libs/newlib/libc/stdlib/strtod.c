@@ -188,7 +188,7 @@ _DEFUN (ULtod, (L, bits, exp, k),
 static int
 _DEFUN (match, (sp, t),
 	_CONST char **sp _AND
-	char *t)
+	const char *t)
 {
 	int c, d;
 	_CONST char *s = *sp;

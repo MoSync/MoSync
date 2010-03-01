@@ -68,7 +68,7 @@ No supporting OS subroutines are required.
 #include <errno.h>
 #include "local.h"
 
-wctrans_t
+static wctrans_t
 _DEFUN (_wctrans_r, (r, c), 
 	struct _reent *r _AND
 	const char *c)
