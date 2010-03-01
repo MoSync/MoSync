@@ -344,11 +344,9 @@ skipp:
 		return sd->mData[index];
 	}
 
-#if 0
 	template<class Tchar> int BasicString<Tchar>::size() const {
-		return sd->size() * sizeof(Tchar);
+		return sd->size();
 	}
-#endif
 
 	template<class Tchar> int BasicString<Tchar>::length() const {
 		return sd->size();

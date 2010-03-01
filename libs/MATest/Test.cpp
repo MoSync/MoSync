@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <conprint.h>
 #include <matime.h>
+#include <mavsprintf.h>
 #include "MAUtil/String.h"
 #include "Test.h"
 

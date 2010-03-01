@@ -71,7 +71,7 @@ class CompileGccTask < FileTask
 	
 	def execute
 		execFlags
-		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{@SOURCE}"
+		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{File.expand_path(@SOURCE)}"
 		
 		# In certain rare cases (error during preprocess caused by a header file)
 		# gcc may output an empty dependency file, resulting in an empty dependency list for

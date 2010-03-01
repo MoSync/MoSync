@@ -76,7 +76,9 @@ extern _PTR memalign _PARAMS ((size_t, size_t));
 extern _PTR _memalign_r _PARAMS ((struct _reent *, size_t, size_t));
 #endif
 
+#ifndef __cplusplus
 extern struct mallinfo mallinfo _PARAMS ((void));
+#endif
 #ifdef NO_REENT_MALLOC
 #undef _mallinfo_r
 #define _mallinfo_r(r) mallinfo ()

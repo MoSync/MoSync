@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 #include <ma.h>
 #include <mastdlib.h>
+#include <mastring.h>
 #include <mavsprintf.h>
 #include "MAHeaders.h"
 
@@ -90,7 +91,7 @@ int curGameMode = MENU_INIT;
 int lastX, lastY, lastRot, brickX, brickY, curRot, curConf, curCol;
 int beneathLogoY;
 int aboveCopyrightY;
-int time = 0;
+int _time = 0;
 int timeToNextUpdate;
 int centerX, centerY, brickSize;
 int timeToNextPlayerUpdate = 0;
@@ -290,14 +291,14 @@ void initPlayerUpdateTime() {
 }
 
 void setTimeToNextPlayerUpdate() {
-//	timeToNextPlayerUpdate=time+PLAYER_UPDATE_TIME;
-	time = maGetMilliSecondCount();
-	timeToNextPlayerUpdate=time+playerUpdateTime;
+//	timeToNextPlayerUpdate=_time+PLAYER_UPDATE_TIME;
+	_time = maGetMilliSecondCount();
+	timeToNextPlayerUpdate=_time+playerUpdateTime;
 	if(playerUpdateTime>PLAYER_UPDATE_TIME_MIN) playerUpdateTime-=PLAYER_UPDATE_TIME_DECREASE;
 }
 
 void setTimeToNextUpdate() {
-	timeToNextUpdate=time+500-curLevel*30;
+	timeToNextUpdate=_time+500-curLevel*30;
 }
 
 void deployBrick(int x, int y, int size, int col, int conf, int rotation) {
@@ -460,8 +461,8 @@ int applyGravity(int line) {
 }
 void updateGravity() {
 
-	int time = maGetMilliSecondCount();
-	if((time&0x3) != 0) return;
+	int _time = maGetMilliSecondCount();
+	if((_time&0x3) != 0) return;
 
 	int render = 0;
 
@@ -492,7 +493,7 @@ void initGame(int x, int y, int b) {
 	centerX = x;
 	centerY = y;
 	brickSize = b;
-	time=maGetMilliSecondCount();
+	_time=maGetMilliSecondCount();
 	setTimeToNextUpdate();
 	setTimeToNextPlayerUpdate();
 	curScore = 0;
@@ -514,8 +515,8 @@ void resumeGame() {
 }
 
 void updatePlayer() {
-	int time=maGetMilliSecondCount();
-	if(time<timeToNextPlayerUpdate) return;
+	int _time=maGetMilliSecondCount();
+	if(_time<timeToNextPlayerUpdate) return;
 
 	setTimeToNextPlayerUpdate();
 	int code = NONE;
@@ -604,9 +605,9 @@ void updatePlayer() {
 }
 
 void updateField() {
-	time=maGetMilliSecondCount();
+	_time=maGetMilliSecondCount();
 
-	if(time>timeToNextUpdate) {
+	if(_time>timeToNextUpdate) {
 		setTimeToNextUpdate();
 		lastX = brickX;
 		lastY = brickY;

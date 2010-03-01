@@ -29,7 +29,7 @@ EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "te
 
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
 
-NEWLIB_DIRS = ["libs/newlib", "examples/MAStx"]#, "tests/unitTest"]
+NEWLIB_DIRS = ["libs", "tests/unitTest", "examples"]
 
 skins = Work.new
 skins.instance_eval do

@@ -36,6 +36,14 @@ int MAMain(void);
 #define _ma_inline(string)	
 #endif
 
+typedef int BOOL;
+#define TRUE	1
+#define FALSE	0
+
+#ifndef NULL
+#define NULL 0
+#endif
+
 void ATTRIBUTE(noreturn, ErrorExit(const char * str, int v));
 
 #endif /* MA_H */

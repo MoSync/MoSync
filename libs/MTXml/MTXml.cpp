@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mactype.h>
 #include <mavsprintf.h>
 #include <mastdlib.h>
+#include <mastring.h>
 
 #include "MTXml.h"
 
@@ -904,9 +905,9 @@ static int parseRef(char* ref, int* pnBytes) {
 	*end = 0;
 	if(ref[0] == '#') {	//character reference
 		if(ref[1] == 'x') {	//hexadecimal
-			return axtoi(ref + 2);
+			return strtol(ref + 2, NULL, 16);
 		} else {	//decimal
-			return atoi(ref + 1);
+			return strtol(ref + 1, NULL, 10);
 		}
 	} else {	//standard reference
 		for(int i=0; i<sNEntities; i++) {

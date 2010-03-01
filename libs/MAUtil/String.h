@@ -222,15 +222,11 @@ namespace MAUtil {
 		/** Returns a new string that is a copy of the specified portion of this string. */
 		BasicString substr(int startIndex, int length = npos) const;
 
-#if 0
-		/** Returns the number of bytes occupied by the string.
-		* Note that this is NOT the same as the number of characters.
-		*/
-		int size() const;
-#endif
-
 		/** Returns the size (in characters) of the reserved space in the string data object. */
 		int capacity() const;
+
+		/** Returns the number of characters in the string. */
+		int size() const;
 
 		/** Returns the number of characters in the string. */
 		int length() const;
