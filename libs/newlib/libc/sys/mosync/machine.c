@@ -11,6 +11,7 @@
 #include <maapi.h>
 #include "maassert.h"
 #include "mavsprintf.h"
+#include "conprint.h"
 
 
 typedef void (*voidfunc)(void);
@@ -59,7 +60,8 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 }
 int write(int __fd, const void *__buf, size_t __nbyte) {
 	if(__fd == 1 || __fd == 3) {	//stdout or stderr
-		return maWriteLog(__buf, __nbyte);
+		WriteConsole(__buf, __nbyte);
+		return __nbyte;
 	} else {
 		lprintfln("write(%i, %p, %zu)", __fd, __buf, __nbyte);
 		NOT;

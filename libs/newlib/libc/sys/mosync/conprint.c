@@ -69,6 +69,10 @@ int gConsoleDisplay = 1;
 
 static void FeedLine(void)
 {
+	if (gConsoleLogging)
+		lprintfln("PrintConsole: %s\n", sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
+			sConsole.height].line);
+
 	sConsole.cursorPos.y++;
 	sConsole.cursorPos.x = 0;
 
@@ -185,6 +189,60 @@ void PrintConsole(const char *str)
 			if (sConsole.cursorPos.x >= CONSOLE_WIDTH)
 			{
 				if (str[pos + 1] == '\0')
+					sConsole.postponedLineFeed = 1;
+				else
+					FeedLine();
+			}
+		}
+
+		pos++;
+	}
+
+	DisplayConsole();
+}
+
+void WriteConsole(const char* str, int len)
+{
+	int pos = 0;
+	char* line;
+
+	if(gConsoleFile > 0)
+	{
+		int res = maFileWrite(gConsoleFile, str, strlen(str));
+		if(res < 0) {
+			maPanic(res, "PrintConsole maFileWrite");
+		}
+	}
+
+	if (!sConsole.initialized)
+		InitConsole();
+
+	if (sConsole.postponedLineFeed)
+	{
+		FeedLine();
+		sConsole.postponedLineFeed = 0;
+	}
+
+	while (pos < len)
+	{
+		if (str[pos] == '\r')
+			sConsole.cursorPos.x = 0;
+		else if (str[pos] == '\n')
+		{
+			if (pos + 1 == len)
+				sConsole.postponedLineFeed = 1;
+			else
+				FeedLine();
+		}
+		else
+		{
+			line = sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
+				sConsole.height].line;
+			line[sConsole.cursorPos.x++] = str[pos];
+
+			if (sConsole.cursorPos.x >= CONSOLE_WIDTH)
+			{
+				if (pos + 1 == len)
 					sConsole.postponedLineFeed = 1;
 				else
 					FeedLine();

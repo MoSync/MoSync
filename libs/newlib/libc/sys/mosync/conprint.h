@@ -51,6 +51,15 @@ void DisplayConsole(void);
 
 void PrintConsole(const char * str);
 
+/** \brief Prints a string to the console.
+* \param str A string.
+* \param len The string's length.
+*
+* \see InitConsole printf
+*/
+void WriteConsole(const char* str, int len);
+
+
 /** \brief The console text color.
 *
 * The default color is 0x00ff00 (green).
