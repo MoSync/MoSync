@@ -76,8 +76,12 @@ class PipeLibWork < PipeGccWork
 		super
 	end
 	def setup3(all_objects)
-		@TARGET_PATH = mosync_libdir + "/pipe/" + @CONFIG_NAME + "/" + @NAME + ".lib"
+		@TARGET_PATH = "#{mosync_libdir}/#{@BUILDDIR_NAME}/#{@NAME}.lib"
 		super(all_objects)
+		if(!USE_NEWLIB)	# rake support
+			d = (CONFIG == "debug") ? 'D' : ''
+			@prerequisites << CopyFileTask.new(self, "#{mosync_libdir}/pipe/#{@NAME}#{d}.lib", @TARGET)
+		end
 	end
 	#def filename; @NAME + ".lib"; end
 end

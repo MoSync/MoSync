@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MA_H
 
 #include "maapi.h"
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C"

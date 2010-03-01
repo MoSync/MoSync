@@ -4,10 +4,6 @@ require File.expand_path('../rules/task.rb')
 
 target :pipe do
 	Work.invoke_subdirs(SUBDIRS, 'pipe')
-	if(!USE_NEWLIB)
-		#temp until we fix the directory thing
-		sh "rake pipe CONFIG=\"#{CONFIG}\""
-	end
 end
 
 target :native do

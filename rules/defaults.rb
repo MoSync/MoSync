@@ -51,6 +51,8 @@ def set_defaults
 	default(:SPECIFIC_CFLAGS, {})
 	# String, name of the base build directory.
 	default(:BUILDDIR_BASE, "build/")
+	# String, added to the beginning of build and target directories.
+	default(:BUILDDIR_PREFIX, "")
 	
 	# String, configuration identifier.
 	# Valid values are "debug" and "" (optimized).
@@ -59,14 +61,14 @@ def set_defaults
 	# @BUILDDIR is the name of the build directory, where generated files are stored.
 	# @CONFIG_NAME is the name of the configuration.
 	if(CONFIG == "debug") then
-		@BUILDDIR = @BUILDDIR_BASE + "debug/"
 		@CONFIG_NAME = "debug"
 	elsif(CONFIG == "")
-		@BUILDDIR = @BUILDDIR_BASE
 		@CONFIG_NAME = "release"
 	else
 		error "wrong configuration: " + CONFIG
 	end
+	default(:BUILDDIR_NAME, @BUILDDIR_PREFIX + @CONFIG_NAME)
+	default(:BUILDDIR, @BUILDDIR_BASE + @BUILDDIR_NAME + "/")
 	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))

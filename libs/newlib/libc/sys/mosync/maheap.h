@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include <stddef.h>
+#include <ma.h>
 
 #ifndef MAPIP
 #ifndef _CRT_SECURE_NO_WARNINGS
