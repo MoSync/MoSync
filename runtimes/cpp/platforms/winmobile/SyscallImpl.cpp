@@ -1364,7 +1364,7 @@ DWORD GetScreenOrientation()
 		int startTime = maGetMilliSecondCount();
 		while(maGetMilliSecondCount() < startTime + PERIOD_MS) 
 		{
-			Rect oldRect = currentDrawSurface->clipRect;
+			ClipRect oldRect = currentDrawSurface->clipRect;
 			currentDrawSurface->clipRect.x = 0;
 			currentDrawSurface->clipRect.y = 0;
 			currentDrawSurface->clipRect.width = backBuffer->width;
@@ -1455,7 +1455,7 @@ DWORD GetScreenOrientation()
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
 		Image* img = gSyscall->resources.get_RT_IMAGE(image);
-		Rect srcRect = {src->left, src->top, src->width, src->height};
+		ClipRect srcRect = {src->left, src->top, src->width, src->height};
 		currentDrawSurface->drawImageRegion(dstTopLeft->x, dstTopLeft->y, &srcRect, img, transformMode);
 	}
 
