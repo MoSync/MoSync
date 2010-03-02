@@ -19,82 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <string.h>
 
-void error(const char *error) {
-	printf("%s\n", error);
-	exit(1);
-}
-
-bool writeMemIntoFile(const char* filename, const char *mem, int len) {
-	FILE *file = fopen(filename, "wb");
-	if(!file) return false;
-	fwrite(mem, len, 1, file);
-	fclose(file);
-	return true;
-}
-
-char *readFileIntoMem(const char* filename, int *len) {
-	FILE *file = fopen(filename, "rb");
-	if(!file) return NULL;
-	fseek(file, 0, SEEK_END);
-	int length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	char *memory = new char[length];
-	fread(memory, length, 1, file);
-	fclose(file);
-	*len = length;
-	return memory;
-}
-
-void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
-	size_t index;
-	while((index=templateFile.find(whatToReplace))!=string::npos) {
-		int endOfReplacement = index+whatToReplace.length();
-		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
-	}
-}
-
-bool generateFont(const string& outputPath, const string& fontName, const string& fontType, const string& fontSize, const string& fontColor) {
-	int len;
-	if(fontType=="") { error("missing font type"); return false; }
-
-	const char *c= getenv("MOSYNCDIR");
-	if(!c) { error("no MOSYNCDIR"); return false; }
-	string mosyncdir = c;
-
-	char *fontTemplate = readFileIntoMem(gBmFontFile.c_str(), &len);
-	string fontTemplateStr = string(fontTemplate,len);
-	delete fontTemplate;
-
-	replaceTemplateDefine(fontTemplateStr, "%fontType%", fontType);
-
-	if(fontSize=="") { fontSize = "12"; }
-	replaceTemplateDefine(fontTemplateStr, "%fontSize%", fontSize);
-
-	if(fontColor=="") { fontColor = "ffffff"; }
-
-	writeMemIntoFile("bmfont.bmfc", fontTemplateStr.c_str(), fontTemplateStr.length());
-
-	string fntOutput = outputPath + "\\" + fontName + ".fnt";
-	string pngOutput = outputPath + "\\" + fontName + "_00.png";
-	string commandLine = (mosyncdir + "\\bin\\BMFont\\bmfont -c bmfont.bmfc -o " + font.fntOutput);
-	printf("font generator cmd: %s\n", commandLine.c_str());
-
-	if(system(commandLine.c_str()) != 0) {
-		error("font couldn't be generated.");
-		return false;
-	}
-
-	string mofOutput = outputPath + "\\" + fontName + ".mof";
-	commandLine = mosyncdir + "\\bin\\mof -fontData " + fntOutput + " -fontImage " + pngOutput + " -outFile " + mofOutput + " -fontColor " + fontColor;
-	printf("mof generator cmd: %s\n", commandLine.c_str());
-	if(system(commandLine.c_str()) != 0) {
-		error("font couldn't be generated.");
-		return false;
-	}
-
-	return true;
-}
-
 static char* readFileToMem(char *filename, int *outSize) {
 	FILE *file = fopen(filename, "rb");
 	if(!file) {
@@ -121,12 +45,9 @@ int main(int argc, char **argv) {
 		printf("| MAUI font generator.                             |\n");
 		printf("| Tool to build a MAUI font (.mof) from an         |\n");
 		printf("| Angelcode BMFont generated font (.fnt + .png).   |\n");
-		printf("| or generating using a set of parameters.		   |\n");
 		printf("| usage:                                           |\n");
-		printf("| -fontData <file> (only applies when converting)  |\n");
-		printf("| -fontImage <file> (only applies when converting) |\n");
-		printf("| -fontType \"<name>\" (eg. \"arial\")             |\n");
-		printf("| -fontSize size (defaults to 12)                  |\n");
+		printf("| -fontData <file>                                 |\n");
+		printf("| -fontImage <file>                                |\n");
 		printf("| -outFile <file>                                  |\n");
 		printf("| -fontColor <color in hex>                        |\n");
 		printf("----------------------------------------------------\n");
@@ -269,6 +190,7 @@ int main(int argc, char **argv) {
 	}
 continueApp:
 	*/
+
 	if(!FreeImage_Save(FIF_PNG, outImage, outFile)) {
 		printf("Could not save temp outfile.\n");
 		FreeImage_Unload(inImage);

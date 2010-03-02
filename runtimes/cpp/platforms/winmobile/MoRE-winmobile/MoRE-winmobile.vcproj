@@ -334,7 +334,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib BtSdkCE50.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -1371,14 +1371,6 @@
 				</File>
 				<File
 					RelativePath="..\..\..\..\..\intlibs\bluetooth\init.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\..\intlibs\bluetooth\winCE\widcomm.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\..\..\..\intlibs\bluetooth\winCE\widcomm.h"
 					>
 				</File>
 			</Filter>
