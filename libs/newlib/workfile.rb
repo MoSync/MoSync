@@ -22,6 +22,10 @@ work.instance_eval do
 		@EXTRA_INCLUDES = ["libc/include", "libc/sys/mosync", "libm/common"]
 
 		@EXTRA_CFLAGS = " -Wno-float-equal -Wno-unreachable-code -Wno-sign-compare"
+		if(CONFIG=="")
+			# buggy compiler, buggy libs... I won't fix them.
+			@EXTRA_CFLAGS += " -Wno-uninitialized"
+		end
 		@SPECIFIC_CFLAGS = {
 			"strcasestr.c" => " -Wno-old-style-definition",
 			"dtoa.c" => " -Wno-write-strings",
