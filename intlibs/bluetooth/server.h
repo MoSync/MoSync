@@ -43,7 +43,7 @@ public:
 	virtual ~BtSppServer() { close(); }
 
 private:
-#ifdef WIN32
+#if defined(WIN32) && !defined(_WIN32_WCE)
 	SOCKET mSock;
 	SOCKADDR_BTH mAddr;
 #endif

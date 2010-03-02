@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef BLUEZ_SUPPORTED
 #include "linux/bluez/connectionbluez.hpp"
 #endif
+#ifdef BROADCOM_SUPPORTED
+#include "win32/broadcom.h"
+#endif
 
 
 #undef BLUESOLEIL_SUPPORTED	//TEMP HACK
@@ -55,15 +58,14 @@ int Connection::readFully(void* dst, int len) {
 }
 
 BtSppConnection* createBtSppConnection(const MABtAddr* address, uint port) {
-	switch(Bluetooth::gBluetoothStack)
-        {
+	switch(Bluetooth::gBluetoothStack) {
 #ifdef WINSOCK_SUPPORTED
 	case Bluetooth::BTSTACK_WINSOCK:
 		return new WinsockBtSppConnection(address, port);
 #endif
 #ifdef BROADCOM_SUPPORTED
 	case Bluetooth::BTSTACK_BROADCOM:
-		return new BroadcomBtSppConnection(address, port);
+		return Broadcom::createBtSppConnection(address, port);
 #endif
 #ifdef TOSHIBA_SUPPORTED
 	case Bluetooth::BTSTACK_TOSHIBA:
@@ -205,130 +207,5 @@ void sockAddrBth2BtAddr(const SOCKADDR_BTH& sockAddr, MAConnAddrBt& btAddr) {
 		btAddr.addr.a[i] = (byte)(sockAddr.btAddr >> (8 * (5-i)));
 	}
 	btAddr.port = sockAddr.port;
-}
-#endif
-
-#ifdef BROADCOM_SUPPORTED
-//BroadcomBtSppConnection
-//***********************
-BroadcomBtSppConnection::BroadcomBtSppConnection(const MABtAddr* address, uint port) {
-	memcpy(mRemoteBdAddr, address->a, BD_ADDR_LEN);
-	mScn = (UINT8)port;
-}
-
-BroadcomBtSppConnection::~BroadcomBtSppConnection() {
-	close();
-}
-
-int BroadcomBtSppConnection::connect() {
-	int result = mPort.OpenClient(mScn, mRemoteBdAddr);
-	LOGBT("OpenClient %i\n", result);
-	if(result != CRfCommPort::SUCCESS)
-		return CONNERR_GENERIC;
-#if 0
-	//wait for it...
-	//WaitForSingleObject(mEvent, INFINITE);
-	result = mPort.IsConnected(&mRemoteBdAddr);
-	LOGBT("IsConnected: %i\n", result);
-#endif
-	while((result = mPort.IsConnected(&mRemoteBdAddr)) == 0) {
-		LOGBT("IsConnected: %i\n", result);
-		Sleep(1000);
-	}
-	return 1;//res;
-}
-
-void BroadcomBtSppConnection::close() {
-	LOGBT("Close\n");
-	mPort.Close();
-	LOGBT("Closed\n");
-}
-
-int BroadcomBtSppConnection::read(void* dst, int max) {
-	return mPort.read(dst, max);
-}
-
-BroadcomBtSppConnection::MyRfCommPort::MyRfCommPort() : mReadDst(NULL), mReadBufPos(0) {
-	InitializeCriticalSection(&mCritSec);
-	mEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-	DEBUG_ASSERT(mEvent != NULL);
-}
-BroadcomBtSppConnection::MyRfCommPort::~MyRfCommPort() {
-	DeleteCriticalSection(&mCritSec);
-	BOOL res = CloseHandle(mEvent);
-	DEBUG_ASSERT(res);
-}
-
-int BroadcomBtSppConnection::MyRfCommPort::read(void* dst, int max) {
-	LOGBT("read %i\n", max);
-	CriticalSectionHandler csh(&mCritSec);
-	DEBUG_ASSERT(mReadDst == NULL);
-	DEBUG_ASSERT(dst != NULL);
-	if(mReadBufPos > 0) {
-		//we've already got some data, read becomes instant
-		int len = MIN(max, mReadBufPos);
-		memcpy(dst, mReadBuffer, len);
-		if(mReadBufPos > len) {	//if we have leftovers, move them down
-			memcpy(mReadBuffer, mReadBuffer + len, mReadBufPos - len);
-		}
-		mReadBufPos -= len;
-		LOGBT("took %i from buffer, left %i\n", len, mReadBufPos);
-		return len;
-	} else {
-		//no data yet, we wait.
-		mReadDst = dst;
-		mReadLen = max;
-		LOGBT("waiting for read...\n");
-		LeaveCriticalSection(&mCritSec);
-		DWORD result = WaitForSingleObject(mEvent, INFINITE);
-		EnterCriticalSection(&mCritSec);
-		if(result != WAIT_OBJECT_0) {
-			LOGBT("WaitForSingleObject failed: %i\n", GetLastError());
-			return CONNERR_GENERIC;
-		}
-		LOGBT("got %i\n", mReadLen);
-		//mReadLen has been set to the number of bytes actually read by OnDataReceived
-		mReadDst = NULL;
-		return mReadLen;
-	}
-}
-
-void BroadcomBtSppConnection::MyRfCommPort::OnDataReceived(void* p_data, UINT16 len) {
-	LOGBT("OnDataReceived %i\n", len);
-	CriticalSectionHandler csh(&mCritSec);
-	if(mReadDst == NULL) {
-		//if we're not reading, store data in our buffer.
-		if(mReadBufPos + len > READBUFSIZE) {
-			BIG_PHAT_ERROR(BTERR_READ_BUFFER_OVERFLOW);
-		}
-		memcpy(mReadBuffer + mReadBufPos, p_data, len);
-		mReadBufPos += len;
-	} else {
-		//else, if we ARE reading, store as much data in the read dst as we can.
-		mReadLen = MIN(mReadLen, len);
-		memcpy(mReadDst, p_data, mReadLen);
-		if(len > mReadLen) {
-			//leftovers go in the buffer.
-			DEBUG_ASSERT(mReadBufPos == 0);
-			mReadBufPos = len - mReadLen;
-			memcpy(mReadBuffer, (byte*)p_data + mReadLen, mReadBufPos);
-		}
-		//let read() know about it
-		BOOL res = SetEvent(mEvent);
-		DEBUG_ASSERT(res);
-	}
-}
-
-void BroadcomBtSppConnection::MyRfCommPort::OnEventReceived(UINT32 event_code) {
-	LOGBT("OnEventReceived %i\n", event_code);
-	//BOOL res = SetEvent(mEvent);
-	//DEBUG_ASSERT(res);
-}
-
-int BroadcomBtSppConnection::write(const void* src, int len) {
-	//start write
-	//wait until finished
-	//restart write if not everything was written
-	return -1;
 }
 #endif

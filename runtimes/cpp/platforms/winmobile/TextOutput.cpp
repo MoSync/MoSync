@@ -138,6 +138,8 @@ namespace TextOutput {
 		BITMAPINFO bmi;
 
 		SIZE size = getTextSize(str, wide);
+		if(size.cx == 0)	//empty string
+			return;
 
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);

@@ -31,14 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ws2bth.h>
 #define WINSOCK_SUPPORTED
 
-#ifdef BROADCOM_SUPPORTED
-#pragma push_macro("FAIL")
-#undef FAIL
-#include "btw\BtIfDefinitions.h"
-#include "btw\BtIfClasses.h"
-#pragma pop_macro("FAIL")
-#endif
-
 #endif	//WIN32
 
 #include "btinit.h"
@@ -49,7 +41,7 @@ class HttpConnection;
 class Closable {
 public:
 	//Thread-safe. Will cause all active operations to return with CONNERR_CANCELED.
-	//Wait for them to do so before deleting the Connection.
+	//Wait for them to do so before deleting the Closable.
 	virtual void close() = 0;
 
 	//returns immediately.
@@ -122,51 +114,6 @@ private:
 };
 void sockAddrBth2BtAddr(const SOCKADDR_BTH& sockAddr, MAConnAddrBt& btAddr);
 #endif
-
-#ifdef BROADCOM_SUPPORTED
-class BroadcomBtSppConnection : public BtSppConnection {
-public:
-	BroadcomBtSppConnection(const MABtAddr* address, uint port);
-	~BroadcomBtSppConnection();
-
-	int connect();
-	int read(void* dst, int max);
-	int write(const void* src, int len);
-	void close();
-private:
-	class MyRfCommPort : public CRfCommPort {
-	private:
-		//CRfCommPort
-		//These functions will be called in an interrupt context.
-		//Call no Broadcom or other IO functions from them.
-		//Thread safety is a must.
-		void OnDataReceived(void* p_data, UINT16 len);
-		void OnEventReceived(UINT32 event_code);
-
-		void* mReadDst;	//valid if not NULL
-		int mReadLen;	//valid if mReadDst not NULL
-
-#define READBUFSIZE (64*1024)
-		char mReadBuffer[READBUFSIZE];
-		int mReadBufPos;	//always valid
-
-		CRITICAL_SECTION mCritSec;
-		HANDLE mEvent;
-
-	public:
-		MyRfCommPort();
-		~MyRfCommPort();
-
-		int read(void* dst, int max);
-	} mPort;
-
-	UINT8 mScn;
-	BD_ADDR mRemoteBdAddr;
-
-	BroadcomBtSppConnection(...);
-	friend class BroadcomBtSppServer;
-};
-#endif	//BROADCOM_SUPPORTED
 
 #ifdef BLUESOLEIL_SUPPORTED
 class BlueSoleilBtSppConnection : public BtSppConnection {

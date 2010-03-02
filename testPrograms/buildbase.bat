@@ -16,18 +16,18 @@ echo Done.
 
 IF E%ELIM%==Ejava GOTO JAVA
 IF NOT E%ELIM%==EY GOTO REGULAR
-pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\mautil.lib"
+pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe_release\mastd.lib" "%MOSYNCDIR%\lib\pipe_release\mautil.lib"
 pipe-tool -xerr -B program rebuild.s
 GOTO COPYFILES
 
 :JAVA
-@REM pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
+@REM pipe-tool -xerr -elim -B program_full temp.s "%MOSYNCDIR%\lib\pipe_debug\mastd.lib" "%MOSYNCDIR%\lib\pipe_debug\mautil.lib"
 pipe-tool -java "-gcj=\"--CLASSPATH=c:/Program/Research In Motion/BlackBerry JDE 5.0.0/lib/net_rim_api.jar;c:/SonyEricsson/JavaME_SDK_CLDC/PC_Emulation/WTK2/apps/JavaVM/classes/\"" -master-dump -B program temp.s "%MOSYNCDIR%\lib\pipe\mastdD.lib" "%MOSYNCDIR%\lib\pipe\mautilD.lib"
 call prever.bat
 GOTO end
 
 :REGULAR
-pipe-tool -master-dump -sld=sld.tab -stabs=stabs.tab -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe\debug\mastd.lib" "%MOSYNCDIR%\lib\pipe\debug\mautil.lib" "%MOSYNCDIR%\lib\pipe\debug\maui.lib"
+pipe-tool -master-dump -sld=sld.tab -stabs=stabs.tab -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe_debug\mastd.lib" "%MOSYNCDIR%\lib\pipe_debug\mautil.lib" "%MOSYNCDIR%\lib\pipe_debug\maui.lib"
 
 REM pipe-tool -elim -java -B program temp.s
 

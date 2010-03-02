@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void run();
 
 int MAMain() {
-	Handle conn;
+	MAHandle conn;
 	int result = 0;
 
 	InitConsole();
@@ -41,11 +41,12 @@ int MAMain() {
 
 	printf("Connecting handle %i...\n", conn);
 	while(result == 0) {
-		EVENT event;
+		MAEvent event;
 		maWait(0);
 		while(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE ||
-				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+				(event.type == EVENT_TYPE_KEY_PRESSED &&
+				(event.key == MAK_0 || event.key == MAK_KP0)))
 			{
 				maExit(0);
 			}
@@ -66,7 +67,7 @@ int MAMain() {
 	return 0;
 }
 
-void run(Handle conn) {
+void run(MAHandle conn) {
 	printf("Connected. Press 0 to disconnect.\n");
 	for(;;) {
 		char buffer[1024];
@@ -75,12 +76,14 @@ void run(Handle conn) {
 		int result = 0;
 		maConnRead(conn, buffer, sizeof(buffer) - 1);
 		while(result == 0) {
-			EVENT event;
+			MAEvent event;
 			maWait(0);
 			while(maGetEvent(&event)) {
 				if(event.type == EVENT_TYPE_CLOSE) {
 					maExit(0);
-				} else if(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0) {
+				} else if(event.type == EVENT_TYPE_KEY_PRESSED &&
+					(event.key == MAK_0 || event.key == MAK_KP0))
+				{
 					printf("Closing connection...\n");
 					maConnClose(conn);
 					close = TRUE;

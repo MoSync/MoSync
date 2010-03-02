@@ -68,6 +68,16 @@ void Bluetooth::MABtInit() {
 		Soleil::setup();
 	}
 #endif
+
+#ifdef BROADCOM_SUPPORTED
+#ifdef _WIN32_WCE
+	HINSTANCE hInst = LoadLibrary(L"btsdkce50.dll");
+	if(hInst) {
+		Bluetooth::gBluetoothStack = BTSTACK_BROADCOM;
+		//FreeLibrary(hInst);
+	}
+#endif
+#endif
 }
 
 void Bluetooth::MABtClose() {
