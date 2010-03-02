@@ -1841,7 +1841,7 @@ DWORD GetScreenOrientation()
 		}
 	}
 
-	SYSCALL(int, maPanic(int result, char* message)) 
+	SYSCALL(void, maPanic(int result, char* message)) 
 	{
 		int msgLen = strlen(message);
 		WCHAR *wbuffer = new WCHAR[msgLen];
