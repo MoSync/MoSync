@@ -1971,28 +1971,39 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	gMmfCPSP->ListImplementationsL(ciia);
 	CleanupResetAndDestroyPushL(ciia);
 
-#ifdef AUDIO_DEBUGGING_MODE
 	LOGA("%i impls\n", ciia.Count());
-	for(int i=0; i<ciia.Count(); i++) {
-		CMMFControllerImplementationInformation* cii = ciia[i];
-		LOGA("%i: 0x%08X\n", i, cii->Uid());
-	}
-#endif	//AUDIO_DEBUGGING_MODE
-
-	//MYASSERT(ciia.Count() != 0, SYMERR_NO_MATCHING_DECODER);
 	if(ciia.Count() == 0) {
 		return -1;
 	}
-	DEBUG_ASSERT(ciia[0] != NULL);
 
-	//just pick the first one
+	//CMMFControllerImplementationInformation* chosenCii = ciia[0];
+	//CMMFControllerImplementationInformation* chosenCii = ciia[ciia.Count() - 1];
+
+	//pick the most specialized implementation
+	CMMFControllerImplementationInformation* chosenCii = NULL;
+	int minIds = (1 << 30);
+	for(int i=0; i<ciia.Count(); i++) {
+		CMMFControllerImplementationInformation* cii = ciia[i];
+		int nids = cii->SupportedMediaIds().Count();
+#ifdef AUDIO_DEBUGGING_MODE
+		HBufC8* buf = CreateHBufC8FromDesC16LC(cii->DisplayName());
+		LOGA("%i: 0x%08X(%S), %i\n", i, cii->Uid(), buf, nids);
+		CleanupStack::PopAndDestroy(buf);
+#endif
+		if(nids > 0 && nids < minIds) {
+			chosenCii = cii;
+			minIds = nids;
+		}
+	}
+	DEBUG_ASSERT(chosenCii != NULL);
+
 #ifdef MMF
 	TMMFPrioritySettings dummySettings;	//ignored since we don't have MultimediaDD capbility.
-	LHEL(gController.Open(*ciia[0], dummySettings));
+	LHEL(gController.Open(*chosenCii, dummySettings));
 	RMMFAudioControllerCustomCommands accc(gController);
 #else	//Mda
 	gPlayer = CMdaAudioRecorderUtility::NewL(*this);
-	const TUid controllerUid = ciia[0]->Uid();
+	const TUid controllerUid = chosenCii->Uid();
 #endif	//MMF
 
 	CleanupStack::PopAndDestroy();	//ciia, see Push above.
