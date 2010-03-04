@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <apgcli.h>
 
 #include "config_platform.h"
+#define AUDIO_DEBUGGING_MODE
 
 #include "../../../Base/FileStream.h"
 
@@ -266,6 +267,9 @@ gBtDeviceArray(8, 0)
 	gAudioStream = NULL;
 	gAudioBuffer.ready = false;
 #endif
+#ifdef MMF
+	gControllerEventMonitor = NULL;
+#endif
 }
 
 void Syscall::ConstructL(VMCore* aCore) {
@@ -332,6 +336,10 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gLocationSync = new (ELeave) CClassSynchronizer<Syscall>(this, &Syscall::LocationHandlerL);
 #endif
 
+#ifdef MMF
+	gControllerEventMonitor = CMMFControllerEventMonitor::NewL(*this, gController);
+#endif
+
 	gStartTime = maGetMilliSecondCount();
 
 	DebugMarkStart();
@@ -365,6 +373,11 @@ void Syscall::StopEverything() {
 	if(gVideoPlayer != NULL) {
 		gVideoPlayer->Close();
 	}
+#endif
+
+#ifdef MMF
+	if(gControllerEventMonitor)
+		gControllerEventMonitor->Cancel();
 #endif
 
 #ifdef SYMBIAN_SOUND
@@ -459,6 +472,10 @@ void Syscall::platformDestruct() {
 		maSoundDispose();
 	}*/
 	maSoundStop();
+
+#ifdef MMF
+	SAFE_DELETE(gControllerEventMonitor);
+#endif
 
 	SAFE_DELETE(gMmfCPSP);
 
@@ -1269,7 +1286,7 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
+SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
 	if(!gBtAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:
@@ -2054,6 +2071,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	}
 #endif	//0
 
+	gControllerEventMonitor->Start();
 	LHEL(gController.AddDataSink(KUidMmfAudioOutput, KNullDesC8));
 	LHEL(gController.Prime());
 	maSoundSetVolume(gSoundVolume);
@@ -2086,11 +2104,21 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	return 1;
 }
 
+#ifdef MMF
+void Syscall::HandleEvent(const TMMFEvent& aEvent) {
+	LOGA("MMFEvent: 0x%08X %i\n", aEvent.iEventType.iUid, aEvent.iErrorCode);
+	if(aEvent.iEventType == KMMFEventCategoryPlaybackComplete) {
+		gPlaying = false;
+	}
+}
+#endif	//MMF
+
 SYSCALL(void, maSoundStop()) {
 	LOGA("SS\n");
 	if(gPlayer)
 		gPlayer->Close();
 #ifdef MMF
+	gControllerEventMonitor->Cancel();
 	gController.Close();
 #endif
 	SAFE_DELETE(gPlayer);

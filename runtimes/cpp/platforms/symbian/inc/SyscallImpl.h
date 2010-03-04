@@ -28,7 +28,9 @@ public MCameraObserver
 #else	//Series 60, 2nd Ed.
 , public MSmsObserver
 #endif	//__SERIES60_3X__
-#ifndef MMF
+#ifdef MMF
+, public MMMFControllerEventMonitorObserver
+#else
 , public MMdaObjectStateChangeObserver
 #endif
 #if defined(GUIDO) || defined(SUPPORT_AUDIOBUFFER)
@@ -273,6 +275,10 @@ private:
 
 #ifdef MMF
 	RMMFController gController;
+	CMMFControllerEventMonitor* gControllerEventMonitor;
+	
+	//MMMFControllerEventMonitorObserver
+	void HandleEvent(const TMMFEvent& aEvent);
 #else	//Mda
 	//MMdaObjectStateChangeObserver
 	void MoscoStateChangeEvent(CBase *aObject, TInt aPreviousState, TInt aCurrentState,
