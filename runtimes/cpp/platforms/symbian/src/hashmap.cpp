@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hashmap.h"
 #include "symbian_helpers.h"
 
-#define LOG_HASH(a...) LOG(a)
+#define LOG_HASH(a...) LOGD(a)
 
 //******************************************************************************
 //The hash function
@@ -57,10 +57,10 @@ void HashMapBase::Close() {
 	if(m.base == NULL)
 		return;
 
-	LOG("HashMap statistics:\n");
-#define DUMPSTAT(i) LOG("%s: %i\n", #i, m.stat.i)
+	LOG_HASH("HashMap statistics:\n");
+#define DUMPSTAT(i) LOG_HASH("%s: %i\n", #i, m.stat.i)
 
-	LOG("Elements left: %i\n", m.numElem);
+	LOG_HASH("Elements left: %i\n", m.numElem);
 	DUMPSTAT(rehashes);
 	DUMPSTAT(inserts);
 	DUMPSTAT(rehashInserts);
@@ -68,11 +68,11 @@ void HashMapBase::Close() {
 	DUMPSTAT(insertHashDupes);
 	DUMPSTAT(finds);
 	DUMPSTAT(linearFindSteps);
-	LOG("projected erases: %i\n", m.stat.inserts - m.numElem);
+	LOG_HASH("projected erases: %i\n", m.stat.inserts - m.numElem);
 	DUMPSTAT(erases);	//should match the projected
 	DUMPSTAT(linearEraseSteps);
 	DUMPSTAT(getsArray);
-	LOG("\n");
+	LOG_HASH("\n");
 		
 	for(uint i=0; i<m.baseLen; i++) {
 		BasePair& pair = m.base[i];

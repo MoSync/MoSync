@@ -128,7 +128,7 @@ MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inet
 		result = CONNERR_INTERNAL;
 		return INVALID_SOCKET;
 	}
-	LOG("MASocketOpen: TCP_NODELAY default value: %i\n", v);
+	//LOG("MASocketOpen: TCP_NODELAY default value: %i\n", v);
 	v = 1;
 	iRet = setsockopt(mySocket, IPPROTO_TCP, TCP_NODELAY, (char*)&v, len);
 	if(iRet == SOCKET_ERROR) {
@@ -140,7 +140,7 @@ MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inet
 		result = CONNERR_INTERNAL;
 		return INVALID_SOCKET;
 	}
-	LOG("MASocketOpen: TCP_NODELAY set value: %i\n", v);
+	//LOG("MASocketOpen: TCP_NODELAY set value: %i\n", v);
 
 	// Connect to the Server
 	iRet = connect(mySocket, (sockaddr*) &clientService, sizeof(clientService));

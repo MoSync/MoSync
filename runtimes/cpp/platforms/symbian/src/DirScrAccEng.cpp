@@ -539,15 +539,15 @@ void CDirScrAccEng::Restart(RDirectScreenAccess::TTerminationReasons /*aReason*/
 	// Restart display
 	// Note that this will result in the clipping region being updated
 	// so that menus, overlaying dialogs, etc. will not be drawn over      
-	LOGG("R\n");
+	LOG("R\n");
 	LTRAP(StartDrawingL());
 }
 
 void CDirScrAccEng::AbortNow(RDirectScreenAccess::TTerminationReasons /*aReason*/) {
 	// Cancel DSA
-	LOGG("AN\n");
+	LOG("AN\n");
 	iDirectScreenAccess->Cancel();    
-	LOGG("AN2\n");
+	LOG("AN2\n");
 	iDrawing = EFalse;
 }
 

@@ -56,7 +56,7 @@ int main() {
 		outputCoreConsts();
 		
 		//todo: combine.
-#ifdef _MSC_VER
+#ifdef WIN32
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files

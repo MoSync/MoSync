@@ -329,7 +329,8 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 }
 
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix) {
-	stream <<
+	if(ix == MAIN_INTERFACE)
+		stream <<
 		"#ifndef _WCHAR_DEFINED\n"
 		"#define _WCHAR_DEFINED\n"
 		"#ifdef MAPIP\n"
