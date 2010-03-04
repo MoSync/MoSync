@@ -28,7 +28,11 @@
 require "#{File.dirname(__FILE__)}/error.rb"
 require "#{File.dirname(__FILE__)}/util.rb"
 
-UNAME = open("|uname").readline().strip()
+begin
+	UNAME = open("|uname").readline().strip()
+rescue SystemCallError
+	UNAME = "windows32"
+end
 
 if(UNAME == "Linux")
 	HOST = :linux
