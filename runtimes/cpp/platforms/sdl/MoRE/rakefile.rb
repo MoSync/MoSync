@@ -15,10 +15,11 @@ EXTRA_SOURCEFILES = ["#{BD}/runtimes/cpp/core/Core.cpp",
 EXTRA_INCLUDES = ["#{BD}/runtimes/cpp", "#{BD}/runtimes/cpp/base", ".."]
 #SPECIFIC_CFLAGS = {"Core.cpp" => " -Wno-strict-aliasing"}
 
+local_libs = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net", "filelist"]
 if ( HOST == "linux" )
-	LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net", "amr"]
+	LOCAL_LIBS = local_libs + ["amr"]
 else
-	LOCAL_LIBS = ["mosync_sdl", "mosync_log_file", "mosync_bluetooth", "net"]
+	LOCAL_LIBS = local_libs
 	LOCAL_DLLS = ["amr"]
 end
 
