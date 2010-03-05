@@ -542,7 +542,11 @@ namespace Base {
 	MAHandle maFileOpen(const char* path, int mode) {
 		FileHandle fh;
 		fh.mode = mode;
+#if FILESYSTEM_CHROOT
 		fh.name = std::string(FILESYSTEM_DIR) + path;
+#else
+		fh.name = path;
+#endif
 		fh.fs = NULL;
 		if(mode == MA_ACCESS_READ_WRITE) {
 			if(isDirectory(fh.name.c_str()) == 0) {	//file exists and is not a directory

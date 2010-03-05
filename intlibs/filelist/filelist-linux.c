@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <glob.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #include "filelist.h"
 
@@ -32,4 +33,12 @@ int scanDirectory(const char* path, FileListCallback cb) {
 		cb(g.gl_pathv[i]);
 	}
 	return 0;
+}
+
+int isDirectory(const char* filename) {
+	struct stat s;
+	int res = stat(filename, &s);
+	if(res != 0)
+		return -1;
+	return S_ISDIR(s.st_mode);
 }
