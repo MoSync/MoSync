@@ -1914,8 +1914,6 @@ namespace Base {
 			return maStreamSetPos(a, b);
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
-#ifdef IX_FILE
-#if 1
 		case maIOCtl_maFileOpen:
 			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
@@ -1953,14 +1951,13 @@ namespace Base {
 			return maFileTell(a);
 		case maIOCtl_maFileSeek:
 			return maFileSeek(a, b, c);
-#endif	//0
 		case maIOCtl_maFileListStart:
 			return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileListNext:
 			return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileListClose:
 			return maFileListClose(a);
-#endif	//IX_FILE
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}

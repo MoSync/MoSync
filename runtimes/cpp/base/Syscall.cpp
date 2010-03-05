@@ -60,13 +60,13 @@ namespace Base {
 	}
 #endif	//RESOURCE_MEMORY_LIMIT
 
-#ifndef SYMBIAN
+#if !defined(SYMBIAN)
 	int gStoreId = 1;
 	typedef std::map<int, std::string> StoreMap;
 	typedef StoreMap::iterator StoreItr;
 	StoreMap gStores;
 
-#ifdef IX_FILE
+#if !defined(_WIN32_WCE)
 	struct FileList {
 		std::vector<std::string> files;
 		size_t pos;
@@ -96,7 +96,7 @@ namespace Base {
 #else
 #define FILESYSTEM_CHROOT 0
 #endif	//EMULATOR
-#endif	//IX_FILE
+#endif	//_WIN32_WCE
 #endif	//SYMBIAN
 
 	void Syscall::init() {
@@ -538,14 +538,7 @@ namespace Base {
 		return res;
 	}
 
-#ifdef IX_FILE
-
-	/*constset int MA_ACCESS_ {
-		READ = 1;
-		READ_WRITE = 3;
-	}*/
-
-#if 1
+#if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 	MAHandle maFileOpen(const char* path, int mode) {
 		FileHandle fh;
 		fh.mode = mode;
@@ -714,7 +707,6 @@ namespace Base {
 			return MA_FERR_GENERIC;
 		return 0;
 	}
-#endif
 
 #ifndef SYMBIAN
 	static FileList sFileList;
@@ -797,7 +789,7 @@ namespace Base {
 		return 0;
 	}
 #endif	//SYMBIAN
-#endif	//IX_FILE
+#endif	//SYMBIAN
 
 #ifdef SYMBIAN
 #if 0

@@ -106,7 +106,6 @@ namespace Base {
 	int atoiLen(const char* str, int len);
 }
 
-#ifdef IX_FILE
 #include <helpers/CPP_IX_FILE.h>
 MAHandle maFileOpen(const char* path, int mode);
 int maFileExists(MAHandle file);
@@ -131,7 +130,6 @@ int maFileSeek(MAHandle file, int offset, int whence);
 MAHandle maFileListStart(const char* path, const char* filter);
 int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
 int maFileListClose(MAHandle list);
-#endif
 
 #ifndef SYMBIAN
 #define SPECIAL(name) _##name

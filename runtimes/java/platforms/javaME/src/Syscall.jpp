@@ -43,7 +43,7 @@ import javax.microedition.location.*;
 //#include "generated\IX_LOCATION_CONSTS.h"
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 import javax.microedition.io.file.*;
 #include "generated\IX_FILE_CONSTS.h"
 #endif
@@ -183,7 +183,7 @@ IMPLEMENTS MoSync
 #include "bluetooth.jpp"
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 #include "FileConnection.jpp"
 #endif
 
@@ -1761,7 +1761,7 @@ public
 			return maLocationStop();
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 		case maIOCtl_maFileOpen:
 			return maFileOpen(readMemString(a), b);
 
