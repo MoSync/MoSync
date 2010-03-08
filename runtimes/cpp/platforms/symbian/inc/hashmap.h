@@ -107,6 +107,15 @@ public:
 		uint key;
 		T* value;
 	};
+	
+	class TIteratorC : protected HashMapBase::TIteratorC {
+	public:
+		TIteratorC(const HashMapBase::TIteratorC& o) : HashMapBase::TIteratorC(o) {}
+		bool HasMore() const { return HashMapBase::TIteratorC::HasMore(); }
+		const Pair& Next() { return (const Pair&)HashMapBase::TIteratorC::Next(); }
+	};
+	
+	TIteratorC Begin() const { return HashMapBase::Begin(); }
 
 	void InsertL(int key, T* value) { HashMapBase::InsertL(key, value); }
 	T* FindL(int key) const { return (T*)HashMapBase::FindL(key); }

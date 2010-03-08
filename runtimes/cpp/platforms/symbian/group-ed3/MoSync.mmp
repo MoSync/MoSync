@@ -23,6 +23,7 @@ END //RESOURCE
 SOURCEPATH ..\src
 SOURCE RSendAs_SMS.cpp
 SOURCE Client.cpp
+SOURCE pimV3.cpp
 
 LIBRARY gdi.lib
 LIBRARY ecom.lib
@@ -31,3 +32,4 @@ LIBRARY mmfstandardcustomcommands.lib
 LIBRARY sendas2.lib
 LIBRARY RemConCoreApi.lib
 LIBRARY remconinterfacebase.lib
+LIBRARY cntmodel.lib

@@ -351,3 +351,11 @@ private:
 #define WLANIMPL_H
 #include "wlanImpl.h"
 #endif	//WLAN
+
+private:
+#define PIMIMPL_H
+#ifdef	__SERIES60_3X__
+#include "pimV3.h"
+#else
+//#include "pimV2.h"
+#endif	//__SERIES60_3X__

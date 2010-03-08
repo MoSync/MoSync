@@ -427,6 +427,8 @@ void Syscall::platformDestruct() {
 	LOG("platformDestruct()\n");
 	
 	StopEverything();
+	
+	pimClose();
 
 #ifdef SUPPORT_MOSYNC_SERVER
 	LOG("gServer.Close();\n");
@@ -1586,6 +1588,39 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maCameraStop();
 	case maIOCtl_maCameraSnapshot:
 		return maCameraSnapshot(a, b);
+
+#ifdef __SERIES60_3X__	//todo: s60v2 implementation
+	case maIOCtl_maPimListOpen:
+		return maPimListOpen(a);
+	case maIOCtl_maPimListNext:
+		return maPimListNext(a);
+	case maIOCtl_maPimListClose:
+		return maPimListClose(a);
+	case maIOCtl_maPimItemCount:
+		return maPimItemCount(a);
+	case maIOCtl_maPimItemGetField:
+		return maPimItemGetField(a, b);
+	case maIOCtl_maPimItemFieldCount:
+		return maPimItemFieldCount(a, b);
+	case maIOCtl_maPimItemGetAttributes:
+		return maPimItemGetAttributes(a, b, c);
+	case maIOCtl_maPimFieldType:
+		return maPimFieldType(a, b);
+	case maIOCtl_maPimItemGetValue:
+		return maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
+	/*case maIOCtl_maPimItemSetValue:
+		return maPimItemSetValue(GVMRA(MA_PIM_ARGS), b, c);
+	case maIOCtl_maPimItemAddValue:
+		return maPimItemAddValue(GVMRA(MA_PIM_ARGS), b);
+	case maIOCtl_maPimItemRemoveValue:
+		return maPimItemRemoveValue(a, b, c);*/
+	case maIOCtl_maPimItemClose:
+		return maPimItemClose(a);
+	/*case maIOCtl_maPimItemCreate:
+		return maPimItemCreate(a);
+	case maIOCtl_maPimItemRemove:
+		return maPimItemRemove(a, b);*/
+#endif	//__SERIES60_3X__
 
 	default:
 		return IOCTL_UNAVAILABLE;

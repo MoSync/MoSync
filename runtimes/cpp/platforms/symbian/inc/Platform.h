@@ -102,6 +102,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
 
+#include <helpers/CPP_IX_PIM.h>
+#include <cntdb.h>
 
 //TODO: add support for s60v2fp3.
 #if defined(__SERIES60_3X__)
@@ -173,6 +175,7 @@ private:
 
 class CDirScrAccEng;
 class CAppView;
+class PimItem;
 
 namespace Core {
 	class VMCore;

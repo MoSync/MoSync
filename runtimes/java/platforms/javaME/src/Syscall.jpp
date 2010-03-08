@@ -691,6 +691,29 @@ public
 		return bytes.length;
 	}
 
+	// does not write if bufSize is too small.
+	// returns needed/used number of bytes.
+	private final int writeWideString(String s, Address dst, int bufSize) {
+		MYASSERT(bufSize >= 0);
+		int size = s.length()*2 + 2;
+		if(bufSize < size)
+			return size;
+		writeWideStringRaw(s, dst);
+		WSHORT(addr, 0);
+		return size;
+	}
+
+	// no zero-terminator.
+	private final void writeWideStringRaw(String s, Address dst) {
+		int[] mem_ds = CORE.mMem_ds;
+		int addr = dst;
+		int len = s.length();
+		for(int i=0; i<len; i++) {
+			WSHORT(addr, s.charAt(i));
+			addr += 2;
+		}
+	}
+
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 	public
 #endif
