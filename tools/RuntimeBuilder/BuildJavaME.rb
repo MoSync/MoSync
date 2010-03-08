@@ -95,7 +95,7 @@ class RuntimeBuilder
 		# Restore config_platform.h
 		revert_backupped_file config_file
 		
-		libjars = ['cldcapi11', 'midpapi20', 'jsr082', 'jsr179', 'jsr179', 'wma20', 'mmapi']
+		libjars = ['cldcapi11', 'midpapi20', 'jsr082', 'jsr179', 'wma20', 'mmapi', 'jsr75']
 		
 		# Compile Java source
 		puts "Compiling java source.."
