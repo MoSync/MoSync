@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#
+# Helper
+#
+remove_file()
+{
+	if [ -e $1 ]
+		rm $1
+	fi
+}
+
+
+#
+# Remove icons
+#
+remove_file "/usr/share/icons/hicolor/16x16/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/32x32/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/48x48/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/64x64/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/128x128/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/256x256/apps/%appname%.png"
+remove_file "/usr/share/icons/hicolor/scalable/apps/%appname%.svg"
