@@ -5,7 +5,7 @@
 #
 remove_file()
 {
-	if [ -e $1 ]
+	if [ -e $1 ]; then
 		rm $1
 	fi
 }
