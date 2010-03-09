@@ -1873,7 +1873,7 @@ int Syscall::maLocationStop() {
 	LOG("LocationStop: %i\n", res);
 	gLocationSync->Cancel();
 	LOG("maLocationStop done.\n");
-	return 0;
+	return res;
 }
 
 

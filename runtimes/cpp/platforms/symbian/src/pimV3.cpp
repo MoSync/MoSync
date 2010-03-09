@@ -33,7 +33,7 @@ using namespace Base;
 #if DO_DUMP
 #define DUMPLOG LOG
 #else
-#define DUMPLOG(...)
+#define DUMPLOG(a...)
 #endif
 
 //******************************************************************************
