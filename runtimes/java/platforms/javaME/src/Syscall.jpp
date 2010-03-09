@@ -88,7 +88,7 @@ import javax.microedition.lcdui.Graphics;
 #include "generated\IX_AUDIOBUFFER_CONSTS.h"
 #endif
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 import javax.microedition.pim.*;
 #include "generated\IX_PIM_CONSTS.h"
 #endif
@@ -187,9 +187,9 @@ IMPLEMENTS MoSync
 #include "FileConnection.jpp"
 #endif
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 #include "PIM2.jpp"
-#endif	//MA_IX_PIM
+#endif	//MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 
 #ifdef MA_PROF_SUPPORT_CAMERA
 #include "Camera.jpp"
@@ -1907,7 +1907,7 @@ public
 		case maIOCtl_maGetSystemProperty:
 			return maGetSystemProperty(readMemString(a), b, c);
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 		case maIOCtl_maPimListOpen:
 			return maPimListOpen(a);
 		case maIOCtl_maPimListNext:
@@ -1938,7 +1938,7 @@ public
 			return maPimItemCreate(a);
 		case maIOCtl_maPimItemRemove:
 			return maPimItemRemove(a, b);*/
-#endif	//MA_IX_PIM
+#endif	//MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 
 #ifdef MA_PROF_SUPPORT_CAMERA
 #if USE_CR_FORMATS

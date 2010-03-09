@@ -143,6 +143,7 @@ RELEVANT_DEFINES = {
 		'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI',
 		'MA_PROF_SUPPORT_CAMERA',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI',
 	],
 	
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -179,16 +180,16 @@ CAP_TYPES = {
 
 # static data
 runtimes = {
-	:wm5    => [],
-	:wm6    => [],
-	:wm6pro => [],
-	:sp2003 => [],
-	:s60v2  => [],
-	:s60v3  => [],
-	:s60v5  => [],
+	#:wm5    => [],
+	#:wm6    => [],
+	#:wm6pro => [],
+	#:sp2003 => [],
+	#:s60v2  => [],
+	#:s60v3  => [],
+	#:s60v5  => [],
 	:JavaME => [],
-	:moblin => [],
-	:android => [],
+	#:moblin => [],
+	#:android => [],
 }
 
 
