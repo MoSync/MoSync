@@ -427,8 +427,10 @@ void Syscall::platformDestruct() {
 	LOG("platformDestruct()\n");
 	
 	StopEverything();
-	
+
+#ifdef __SERIES60_3X__
 	pimClose();
+#endif
 
 #ifdef SUPPORT_MOSYNC_SERVER
 	LOG("gServer.Close();\n");
