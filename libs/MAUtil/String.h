@@ -135,7 +135,8 @@ namespace MAUtil {
 		BasicString(const BasicString& s);
 
 		/** Returns a pointer to the null-terminated character data.
-		* This pointer becomes invalid as soon as non-const medthod of this class is called.
+		* This pointer becomes invalid when the object is destroyed,
+		* or a non-const method of this class is called.
 		*/
 		const Tchar* c_str() const;
 

@@ -211,6 +211,25 @@ namespace MAUtil {
 			remove(mData + index);
 		}
 
+		/** \brief Removes several elements, starting at \a index.
+		* \param index The index of the element that should be removed.
+		* \param number The number of elements to remove.
+		*/
+		void remove(int index, int number) {
+#ifdef MOSYNCDEBUG
+			ASSERT_MSG(index >= 0 && index < mSize, "Remove index out of bounds");
+			ASSERT_MSG(number > 0 && (index + number) < mSize, "Remove number out of bounds");
+#endif
+			int base = index;
+			int next = index + number;
+			while(next < mSize) {
+				mData[base] = mData[next];
+				base++;
+				next++;
+			}
+			resize(mSize - number);
+		}
+
 		/** \brief Inserts the element at \a index, moving all existing elements beginning at 'index' one step forward.
 		 *  \param index The index of the newly inserted element.
 		 *  \param t The element itself.

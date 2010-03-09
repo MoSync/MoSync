@@ -311,9 +311,25 @@ skipp:
 	}
 
 	template<class Tchar> void BasicString<Tchar>::remove(int position, int number) {
-		BasicString beginning = this->substr(0, position);
-		BasicString ending = this->substr(position+number, this->length() - position - number);
-		*this = beginning + ending;
+		if(sd->getRefCount() > 1) {
+			ASSERT_MSG(position >= 0 && position < this->length(), "invalid position");
+			ASSERT_MSG(number > 0 && (position + number) <= this->length(), "invalid number");
+			int newLen = size() - number;
+			StringData<Tchar>* temp = new StringData<Tchar>(newLen);
+			if(position > 0) {
+				memcpy(temp->pointer(), sd->pointer(), position * sizeof(Tchar));
+			}
+			if(position < newLen) {
+				memcpy(temp->pointer() + position, sd->pointer() + (position + number),
+					(newLen - position) * sizeof(Tchar));
+			}
+			sd->release();
+			sd = temp;
+		} else {
+			sd->remove(position, number);
+			sd->reserve(sd->size() + 1);
+		}
+		(*sd)[sd->size()] = 0;
 	}
 
 	template<class Tchar>
