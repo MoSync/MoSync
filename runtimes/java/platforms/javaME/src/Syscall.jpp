@@ -698,19 +698,20 @@ public
 		int size = s.length()*2 + 2;
 		if(bufSize < size)
 			return size;
+		int[] mem_ds = CORE.mMem_ds;
 		writeWideStringRaw(s, dst);
-		WSHORT(addr, 0);
+		WSHORT(dst + size - 2, 0);
 		return size;
 	}
 
 	// no zero-terminator.
 	private final void writeWideStringRaw(String s, Address dst) {
 		int[] mem_ds = CORE.mMem_ds;
-		int addr = dst;
+		int address = dst;
 		int len = s.length();
 		for(int i=0; i<len; i++) {
-			WSHORT(addr, s.charAt(i));
-			addr += 2;
+			WSHORT(address, s.charAt(i));
+			address += 2;
 		}
 	}
 
