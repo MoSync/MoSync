@@ -421,23 +421,23 @@ skipp:
 
 	//explicit instantiation
 	template class BasicString<char>;
-	template class BasicString<wchar_t>;
+	template class BasicString<wchar>;
 	template class StringData<char>;
-	template class StringData<wchar_t>;
+	template class StringData<wchar>;
 }
 
 template<> int tstrlen<char>(const char* str) { return strlen(str); }
 template<> int tstrcmp<char>(const char* a, const char* b) { return strcmp(a, b); }
 
 template<class Tchar> int tstrlen(const Tchar* str) {
-	int len = 0;
+	const Tchar* start = str;
 	while(*str) {
-		len++;
+		str++;
 	}
-	return len;
+	return str - start;
 }
 template<class Tchar> int tstrcmp(const Tchar* a, const Tchar* b) {
-	while(*a == *b) {
+	while(*a && *b && (*a == *b)) {
 		a++;
 		b++;
 	}

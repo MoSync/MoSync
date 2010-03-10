@@ -158,6 +158,7 @@ namespace MAUtil {
 					b = true;
 					break;
 				}
+				d++;
 			}
 			if(b) {
 				if(start != s) {

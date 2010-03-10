@@ -34,6 +34,7 @@ using namespace MAUtil;
 void addDownloaderTests(TestSuite* suite);
 void addMAUtilTypeTests(TestSuite* suite);
 void addConnTests(TestSuite* suite);
+void addMAUtilUtilTests(TestSuite* suite);
 
 // interactive tests
 //doesn't check pixel-perfection, except in a few cases.
@@ -69,6 +70,7 @@ public:
 		// automated tests
 #ifdef USE_AUTOMATED_TESTS
 		addMAUtilTypeTests(&mSuite);
+		addMAUtilUtilTests(&mSuite);
 		addConnTests(&mSuite);
 		addDownloaderTests(&mSuite);	//right softkey press may be used during test; release is then passed to next test, failing it.
 #endif
