@@ -331,6 +331,9 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gLocationSync = new (ELeave) CClassSynchronizer<Syscall>(this, &Syscall::LocationHandlerL);
 #endif
 
+	if(!gScreenEngine.IsDrawing())
+			gScreenEngine.StartDrawingL();
+
 	gStartTime = maGetMilliSecondCount();
 
 	DebugMarkStart();
