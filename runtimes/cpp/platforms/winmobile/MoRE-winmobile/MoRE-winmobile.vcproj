@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="MoRE-winmobile"
 	ProjectGUID="{2FCCBCA9-C8E1-4D9A-A96B-73DCAA325E71}"
 	RootNamespace="MoRE-winmobile"
@@ -247,7 +247,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="gx.lib aygshell.lib wininet.lib  Cellcore.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -334,7 +334,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib  Cellcore.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
@@ -364,6 +364,94 @@
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory="%CSIDL_PROGRAM_FILES%\MoRE-winmobile\"
+				RegisterOutput="0"
+				AdditionalFiles=""
+			/>
+			<DebuggerTool
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|Windows Mobile 6 Professional SDK (ARMV4I)"
+			OutputDirectory="Windows Mobile 6 Professional SDK (ARMV4I)\$(ConfigurationName)"
+			IntermediateDirectory="Windows Mobile 6 Professional SDK (ARMV4I)\$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="1"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				ExecutionBucket="7"
+				Optimization="0"
+				AdditionalIncludeDirectories="../../../;../../../../../libs;$(ProjectDir);../../../core/;../../../base/; ../;../../../../../intlibs"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
+				MinimalRebuild="true"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				WarnAsError="true"
+				DebugInformationFormat="3"
+				CompileForArchitecture="2"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
+				Culture="1033"
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions=" /subsystem:windowsce,5.02"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Cellcore.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				OutputFile="$(OutDir)/MoRE-winmobile.exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
+				DelayLoadDLLs="$(NOINHERIT)"
+				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(OutDir)/MoRE-winmobile.pdb"
+				SubSystem="0"
+				StackReserveSize="65536"
+				StackCommitSize="4096"
+				TargetMachine="0"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCCodeSignTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+			<DeploymentTool
+				ForceDirty="-1"
+				RemoteDirectory=""
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -596,7 +684,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.01"
-				AdditionalDependencies="gx.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="gx.lib aygshell.lib wininet.lib  Cellcore.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
@@ -626,7 +714,7 @@
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
-				RemoteDirectory="\Storage Card\MoRE-winmobile"
+				RemoteDirectory="%CSIDL_PROGRAM_FILES%\MoRE-winmobile\"
 				RegisterOutput="0"
 				AdditionalFiles="program;resources"
 			/>
@@ -687,7 +775,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib Cellcore.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
@@ -719,94 +807,6 @@
 			<DeploymentTool
 				ForceDirty="-1"
 				RemoteDirectory="%CSIDL_PROGRAM_FILES%\MoRE-winmobile\"
-				RegisterOutput="0"
-				AdditionalFiles=""
-			/>
-			<DebuggerTool
-			/>
-		</Configuration>
-		<Configuration
-			Name="Debug|Windows Mobile 6 Professional SDK (ARMV4I)"
-			OutputDirectory="Windows Mobile 6 Professional SDK (ARMV4I)\$(ConfigurationName)"
-			IntermediateDirectory="Windows Mobile 6 Professional SDK (ARMV4I)\$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="1"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				ExecutionBucket="7"
-				Optimization="0"
-				AdditionalIncludeDirectories="../../../;../../../../../libs;$(ProjectDir);../../../core/;../../../base/; ../;../../../../../intlibs"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
-				MinimalRebuild="true"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				WarnAsError="true"
-				DebugInformationFormat="3"
-				CompileForArchitecture="2"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES)"
-				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
-				OutputFile="$(OutDir)/MoRE-winmobile.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
-				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/MoRE-winmobile.pdb"
-				SubSystem="0"
-				StackReserveSize="65536"
-				StackCommitSize="4096"
-				TargetMachine="0"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCCodeSignTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-			<DeploymentTool
-				ForceDirty="-1"
-				RemoteDirectory=""
 				RegisterOutput="0"
 				AdditionalFiles=""
 			/>
@@ -865,7 +865,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,5.02"
-				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
+				AdditionalDependencies="ddraw.lib aygshell.lib wininet.lib Cellcore.lib Ws2.lib bthguid.lib sms.lib strmiids.lib gpsapi.lib bthutil.lib"
 				OutputFile="$(OutDir)/MoRE-winmobile.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
