@@ -36,7 +36,7 @@ void default_malloc_handler(int size) {
 	lprintfln("um %i", gUsedMem);
 	lprintfln("nm %i, nf %i", gNumMallocs, gNumFrees);
 #endif
-	maPanic(size, "malloc failed");
+	maPanic(size, "Malloc failed. You most likely ran out of heap memory. Try to increase the heap size.");
 }
 
 malloc_handler set_malloc_handler(malloc_handler new) {

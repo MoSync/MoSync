@@ -23,12 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/smartie.h>
 #include <filelist/filelist.h>
 
-#ifdef IX_FILE
 #include <helpers/CPP_IX_FILE.h>
 #ifdef WIN32
 #include <windows.h>
 #endif	//WIN32
-#endif	//IX_FILE
 
 #ifdef _WIN32_WCE
 //#include <windows.h>

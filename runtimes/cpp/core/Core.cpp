@@ -666,12 +666,15 @@ public:
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
 
-		regs[REG_sp] = Head.DataSize - 16 - maxCustomEventSize;
+		STACK_TOP = Head.DataSize - 16 - maxCustomEventSize;
+		STACK_BOTTOM = STACK_TOP-Head.StackSize;
+
+		regs[REG_sp] = STACK_TOP;
 		regs[REG_i0] = Head.DataSize;
 		regs[REG_i1] = Head.StackSize;
 		regs[REG_i2] = Head.HeapSize;
-		
 		DUMPHEX(Head.DataSize);
 		DUMPHEX(Head.StackSize);
 		DUMPHEX(Head.HeapSize);
@@ -767,6 +770,20 @@ public:
 #define	RDU	(((unsigned long*)regs)[rd])
 #define	RSU	(((unsigned long*)regs)[rs])
 
+#ifdef STACK_POINTER_VERIFICATION
+void WRITE_REG(int reg, int value) {
+	if(reg == REG_sp) {
+		uint addr(value);
+		if(addr<STACK_TOP || addr>STACK_TOP) {
+			BIG_PHAT_ERROR(ERR_STACK_OOB);
+		}
+	}
+	regs[reg] = value;
+}
+#else
+#define WRITE_REG(reg, value) regs[reg] = value
+#endif
+
 #define IMMU	((unsigned long) imm32)
 #define IMM	((long) imm32)
 
@@ -828,10 +845,10 @@ public:
 #define FETCH_RD_RS_ADDR24	FETCH_RD FETCH_RS FETCH_IMM24
 #define FETCH_RD_IMM8		FETCH_RD FETCH_IMM8
 
-#define ARITH(a, oper, b) LOGC("\t%i %s %i = ", (a), #oper, (b)); (a) oper##= (b);\
+#define ARITH(a_reg, a, oper, b) LOGC("\t%i %s %i = ", (a), #oper, (b)); WRITE_REG(a_reg, (a) oper (b));\
 	LOGC("%i", (a));
 
-#define DIVIDE(a, b) if((b) == 0) { BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO); } else { ARITH(a, /, b); }
+#define DIVIDE(a_reg, a, b) if((b) == 0) { BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO); } else { ARITH(a_reg, a, /, b); }
 
 #define RAW_MEMREF(type, addr) (*(type*)(((char*)mem_ds) + (addr)))
 #define MEMREF(type, addr) RAW_MEMREF(type, \
