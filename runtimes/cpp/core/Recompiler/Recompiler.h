@@ -323,7 +323,7 @@ endOfFunction:
 				mNextLabel = mCurrentFunction->labels;
 				if(mNextLabel) mNextLabel = mNextLabel->next;
 				//thisImpl->beginInstruction(ip);
-				//thisImpl->beginFunction(mCurrentFunction);
+				thisImpl->beginFunction(mCurrentFunction);
 
 				thisImpl->beginPass();
 				while(ip != mEnvironment.codeSize) {
@@ -342,15 +342,15 @@ endOfFunction:
 
 					// find pattern
 					//InstructionPatternNode* node = findLongestPattern(thisImpl);
-					InstructionPatternNode* node = 0;
-
-					if(!node) {
+					//InstructionPatternNode* node = 0;
+					//if(!node) {
 						(thisImpl->*defaultVisitors[mInstructions[0].op])();
 						ip+=mInstructions[0].length;
 						for(int i = 1; i < numInstructions; i++) {   
 							mInstructions[i-1] = mInstructions[i];
 						}		
 						numInstructions -= 1;
+					/*
 					} else {
 						// visit pattern
 						(thisImpl->*node->visitor)();
@@ -359,25 +359,20 @@ endOfFunction:
 							mInstructions[i-nodeLen] = mInstructions[i];
 						}
 						numInstructions -= nodeLen;
-					}	
+					}
+					*/
 
-					/*
 					if(ip>mCurrentFunction->end) { 
 						thisImpl->endFunction(mCurrentFunction);
 						mCurrentFunction = mCurrentFunction->next; 
 						mNextLabel = mCurrentFunction->labels;
 						if(mNextLabel) mNextLabel = mNextLabel->next;
-						thisImpl->beginInstruction(ip);
 						thisImpl->beginFunction(mCurrentFunction);
-	
+						thisImpl->beginInstruction(ip);
 					}
 					else if(mNextLabel && ip>mNextLabel->ip) {
 						mNextLabel = mNextLabel->next;
-					} else 
-					{
-						thisImpl->beginInstruction(ip);
-					}
-					*/
+					} 
 	
 				}
 				thisImpl->endPass();

@@ -339,6 +339,9 @@ void Syscall::ConstructL(VMCore* aCore) {
 #ifdef MMF
 	gControllerEventMonitor = CMMFControllerEventMonitor::NewL(*this, gController);
 #endif
+	if(!gScreenEngine.IsDrawing())
+			gScreenEngine.StartDrawingL();
+
 
 	gStartTime = maGetMilliSecondCount();
 
