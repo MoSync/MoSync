@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1">
+<build.cfg id="Debug"/>
+<build.cfg id="Release"/>
+<properties>
+<property key="template.id" value="project.c"/>
+</properties>
+</project>

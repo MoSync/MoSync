@@ -1199,7 +1199,10 @@ interface MAAPI {
 			* Valid only in CONN events.
 			*/
 			MAConnEventData conn;
-			// Native UI
+			
+			/**
+			* For Native UI support
+			*/
 			struct {
 				int lo_wparam;
 				int hi_wparam;
@@ -2643,6 +2646,7 @@ interface MAAPI {
 #if IX_NATIVE_UI
 		constset int MA_NATIVE_UI_ {
 			BUFFERSIZE = 80;
+			MAX_WIDGETS = 100;
 		}
 
 		struct MAWidgetParameters {
@@ -2661,14 +2665,24 @@ interface MAAPI {
 			void *pWidget;
 		}
 		
-		int maWindow(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maMenuBar();
-		int maSetLeftButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maAddRightMenuItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maMessageBox(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maLabel(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		
+		
+		int maWinMobileWindow(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileMenuBar();
+		int maWinMobileSetLeftButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileAddRightMenuItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileMessageBox(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maWinMobileLabel(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		
+		int maAndroidStartActivity(in int id);
+		int maAndroidGetText(in int id, out MAString str);
+		int maAndroidSetText(in int id, in MAString str);
+		int maAndroidAddTextView(in int id, in MAString str);
+		int maAndroidAddEditText(in int id, in MAString str);
+		int maAndroidAddButton(in int id, in MAString str);
+		int maAndroidAddMenuItem(in int id, in MAString str);
 
 
 #endif //IX_NATIVE_UI

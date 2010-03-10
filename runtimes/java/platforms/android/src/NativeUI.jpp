@@ -1,0 +1,128 @@
+package com.mosync.java.android;
+
+#include "syscall_helpers.h"
+#include "generated\IX_NATIVE_UI_CONSTS.h"
+#include "config_platform.h"
+#include "helpers.h"
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.os.Handler;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.Window;
+
+
+
+public class NativeUI extends Activity implements OnClickListener {
+
+
+  public static Handler mHandler;
+  public static Menu mMenu;
+  public static NativeUI me;
+  public static int myId;
+  public LinearLayout ll;
+
+
+
+
+ @Override
+ public void onCreate(Bundle savedInstanceState) {
+
+  me=this;
+  mHandler= new Handler();
+  super.onCreate(savedInstanceState);
+
+
+
+
+  ll = new LinearLayout(this);
+  ll.setOrientation(LinearLayout.VERTICAL);
+
+
+  setContentView(ll);
+  
+  this.getWindow().openPanel(Window.FEATURE_OPTIONS_PANEL, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MENU));
+  
+  int[] event = new int[2];
+  event[0] = 19;
+  event[1] = myId;
+  MoSync.mMosyncView.postEvent(event);
+  Log.i("MoSync", "Native UI");
+
+
+ }
+
+
+
+	
+    protected void onStop() {
+    	Log.i("MoSync", "Native UI stopped");
+
+    	super.onStop();
+    }
+    protected void onRestart() {
+        super.onRestart();
+    }
+    protected void onResume() {
+    	Log.i("MoSync", "Native UI Resumed");
+        super.onResume();
+        //ActivityHandler.getInstance().setActivity(this);
+    }
+    protected void onPause() {
+    	
+    	Log.i("MoSync", "Native UI Paused");
+        super.onPause();
+    }
+    
+    protected void onStart() {
+    	super.onStart();
+
+    }
+
+	/* Creates the menu items */
+	public boolean onCreateOptionsMenu(Menu menu) {
+		mMenu=menu;
+	/*	  int[] event = new int[2];
+		  event[0] = 19;
+		  event[1] = 1;
+		  MoSync.mMosyncView.postEvent(event);*/
+	    return true;
+	}
+	
+
+	
+	/* Handles item selections */
+	public boolean onOptionsItemSelected(MenuItem item) {
+		  int[] event = new int[2];
+		  event[0] = 19;
+		  event[1] = item.getItemId();
+		  MoSync.mMosyncView.postEvent(event);
+		  Log.i("MoSync", "Menu item :" + item.getItemId());
+		  return true;
+	    
+
+	}
+    
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		// put the view id in the mosync event stack v.getId()
+		int[] event = new int[2];
+		EI_TYPE = EVENT_TYPE_NATIVE_UI_MSG;
+		EI_LO_WPARAM = v.getId();
+		MoSync.mMosyncView.postEvent(event);
+		
+		Log.i("MoSync", "Clicked :" + v.getId());
+		//finish();
+
+	}
+
+}

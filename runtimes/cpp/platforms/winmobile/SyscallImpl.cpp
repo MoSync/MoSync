@@ -73,6 +73,8 @@ using namespace MoSyncError;
 #define MA_PROF_SUPPORT_LOCATIONAPI
 #endif
 
+#define NATIVE_UI
+
 #if (_WIN32_WCE >= 0x502) 
 #include <ddraw.h>
 IDirectDraw * g_pDD = NULL;
@@ -1529,7 +1531,7 @@ DWORD GetScreenOrientation()
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
 		Image* img = gSyscall->resources.get_RT_IMAGE(image);
-		Rect srcRect = {src->left, src->top, src->width, src->height};
+		ClipRect srcRect = {src->left, src->top, src->width, src->height};
 		currentDrawSurface->drawImageRegion(dstTopLeft->x, dstTopLeft->y, &srcRect, img, transformMode);
 	}
 
@@ -2436,7 +2438,7 @@ DWORD GetScreenOrientation()
 
 
 
-	static int maWindow(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileWindow(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 		// Window class
 		WNDCLASS  wc;	
 		wc.style = 0;                     
@@ -2470,7 +2472,7 @@ DWORD GetScreenOrientation()
 	}
 
 
-	static int maButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 		if((wparameters->pParent)==NULL) {
 			//create button
 			whandle->pWidget = CreateWindow( 
@@ -2506,7 +2508,7 @@ DWORD GetScreenOrientation()
 			return 0;
 	}
 
-	static int maEdit(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileEdit(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 		if((wparameters->pParent)==NULL) {	
 			whandle->pWidget = CreateWindow(TEXT("EDIT"),      // predefined class 
                 NULL,        // no window title 
@@ -2532,7 +2534,7 @@ DWORD GetScreenOrientation()
 			return 0;
 	}
 
-	static int maLabel(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileLabel(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 		// convert ansi to unicode (char * to LPCWSTR)
 		BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
 		MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
@@ -2566,7 +2568,7 @@ DWORD GetScreenOrientation()
 
 
 
-	static int maMenuBar() {
+	static int maWinMobileMenuBar() {
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Right");
 			g_hMenu = CreateMenu();
@@ -2586,7 +2588,7 @@ DWORD GetScreenOrientation()
 			return 0;
 	}
 
-	static int maSetLeftButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileSetLeftButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 			// convert ansi to unicode (char * to LPCWSTR)
 			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
 			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
@@ -2601,7 +2603,7 @@ DWORD GetScreenOrientation()
 			return 0;
 	}
 
-	static int maAddRightMenuItem(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileAddRightMenuItem(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 			// convert ansi to unicode (char * to LPCWSTR)
 			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
 			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
@@ -2615,7 +2617,7 @@ DWORD GetScreenOrientation()
 			SysFreeString(unicodestr);
 			return 0;
 	}
-	static int maMessageBox(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+	static int maWinMobileMessageBox(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
 			// convert ansi to unicode (char * to LPCWSTR)
 			BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
 			MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
@@ -2983,22 +2985,22 @@ retry:
 		case maIOCtl_maAudioBufferClose:
 			return maAudioBufferClose();
 #ifdef NATIVE_UI
-		case maIOCtl_maWindow:
-			return maWindow(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maButton:
-			return maButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maMessageBox:
-			return maMessageBox(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maEdit:
-			return maEdit(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maMenuBar:
-			return maMenuBar();
-		case maIOCtl_maSetLeftButton:
-			return maSetLeftButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maAddRightMenuItem:
-			return maAddRightMenuItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
-		case maIOCtl_maLabel:
-			return maLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileWindow:
+			return maWinMobileWindow(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileButton:
+			return maWinMobileButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileMessageBox:
+			return maWinMobileMessageBox(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileEdit:
+			return maWinMobileEdit(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileMenuBar:
+			return maWinMobileMenuBar();
+		case maIOCtl_maWinMobileSetLeftButton:
+			return maWinMobileSetLeftButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileAddRightMenuItem:
+			return maWinMobileAddRightMenuItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileLabel:
+			return maWinMobileLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
 #endif
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI

@@ -163,3 +163,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_CONN_RESULT event[3]
 #define EI_STATE event[1]
 #define EI_DATA event[1]
+// NATIVE_UI
+#define EI_LO_WPARAM event[1]
+#define EI_HI_WPARAM event[2]

@@ -22,6 +22,7 @@ package com.mosync.java.android;
 #include "core_helpers.h"
 #include "generated\MAAPI_consts.h"
 #include "generated\IX_RESOURCE_TYPES_CONSTS.h"
+#include "generated\IX_NATIVE_UI_CONSTS.h"
 
 import android.util.Log;
 import android.graphics.Canvas;
@@ -61,6 +62,12 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Hashtable;
 import java.io.*;
+
+import android.widget.TextView;
+import android.app.Activity;
+import android.widget.EditText;
+import android.content.Intent;
+import android.widget.Button;
 
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
 #include "IX_OPENGL_ES_CONSTS.h"
@@ -1215,11 +1222,159 @@ public
 		if(hash == MAIDL_HASH) {
 			DEBUG_ALWAYS("IDL version match!\n");
 		} else {
+			Log.i("MOSYNC","IM DYING!");
 			throw new Error("IDL Hash Mismatch!\n");
 		}
 		return MAIDL_HASH;
 	}
+	
+ int maAndroidStartActivity(int id) {
+	NativeUI.myId=id;
+  Intent myIntent = new Intent(((MoSync) mMoSyncView.getContext()), NativeUI.class);
+  ((MoSync) mMoSyncView.getContext()).startActivityForResult(myIntent, id);
+  Log.i("MoSync", "New activity started for Native UI");
 
+ return 0;
+ }
+ 
+ int maAndroidGetText(int id,  String str) {
+ //try {
+  //Activity act = ActivityHandler.getInstance().getActivity();
+  if(NativeUI.me.findViewById(id) instanceof EditText) {
+   final EditText edt = (EditText)(NativeUI.me.findViewById(id));
+   
+   class MyRunnable implements Runnable {
+		public String str2;
+		public void run() {
+			// TODO Auto-generated method stub
+			str2=edt.getText().toString();
+		}
+   }
+   
+   MyRunnable myrunnable = new MyRunnable();
+   
+   NativeUI.mHandler.post(myrunnable); 
+   str=myrunnable.str2;
+   
+   Log.i("MoSync", "getText : " + myrunnable.str2);
+  }
+  else return -1;
+/*
+ } catch (InterruptedException e) {
+
+  e.printStackTrace();
+ }*/
+
+ return 0;
+ }
+
+ int maAndroidAddTextView(final int id, final String str) {
+ //try {
+  //Activity act = ActivityHandler.getInstance().getActivity();
+	 
+  //if(NativeUI.me.findViewById(id) instanceof EditText)
+  //{
+   //final EditText edt = (EditText)(NativeUI.me.findViewById(id));
+   //edt.setText(str);
+   NativeUI.mHandler.post(new Runnable() {
+	    public void run() {
+	    	//edt.setText(str);
+	    	TextView tv = new TextView(NativeUI.me);
+	        tv.setText(str);
+			tv.setId(id);
+	    	NativeUI.me.ll.addView(tv);
+	    	NativeUI.me.setContentView(NativeUI.me.ll);
+	    }
+	  }); 
+   Log.i("MoSync", "addTextView : " + str);
+  //}
+  //else return -1;
+/*
+ } catch (InterruptedException e) {
+
+  e.printStackTrace();
+ }*/
+
+ return 0;
+ }
+ 
+int maAndroidAddEditText(final int id, final String str) {
+
+   NativeUI.mHandler.post(new Runnable() {
+	 public void run() {
+
+	  EditText tv = new EditText(NativeUI.me);
+		 tv.setText(str);
+		 tv.setId(id);
+	  NativeUI.me.ll.addView(tv);
+	  NativeUI.me.setContentView(NativeUI.me.ll);
+	 }
+   });
+   Log.i("MoSync", "addTextView : " + str);
+//1326 "src/Syscall.jpp"
+ return 0;
+}
+	
+ int maAndroidAddButton(final int id, final String str) {
+
+   NativeUI.mHandler.post(new Runnable() {
+	 public void run() {
+
+	  Button bu = new Button(NativeUI.me);
+		 bu.setText(str);
+		 bu.setId(id);
+		 bu.setOnClickListener(NativeUI.me);
+	  NativeUI.me.ll.addView(bu);
+	  NativeUI.me.setContentView(NativeUI.me.ll);
+	 }
+   });
+   Log.i("MoSync", "addTextView : " + str);
+//1326 "src/Syscall.jpp"
+ return 0;
+ }
+ 
+  int maAndroidAddMenuItem(final int id, final String str) {
+
+   NativeUI.mHandler.post(new Runnable() {
+	 public void run() {
+
+	  NativeUI.mMenu.add(0, id, 0, str);
+	 }
+   });
+   Log.i("MoSync", "addTextView : " + str);
+//1326 "src/Syscall.jpp"
+ return 0;
+ }
+ 
+ int maAndroidSetText(int id, final String str) {
+	 //try {
+	  //Activity act = ActivityHandler.getInstance().getActivity();
+		 
+	  if(NativeUI.me.findViewById(id) instanceof EditText)
+	  {
+	   final EditText edt = (EditText)(NativeUI.me.findViewById(id));
+	   //edt.setText(str);
+	   NativeUI.mHandler.post(new Runnable() {
+		    public void run() {
+		    	edt.setText(str);
+		    	/*TextView tv = new TextView(NativeUI.me);
+		        tv.setText(str);
+		    	NativeUI.me.ll.addView(tv);
+		    	NativeUI.me.setContentView(NativeUI.me.ll);*/
+		    }
+		  }); 
+	   Log.i("MoSync", "setText : " + str);
+	  }
+	  else return -1;
+	/*
+	 } catch (InterruptedException e) {
+
+	  e.printStackTrace();
+	 }*/
+
+	 return 0;
+}
+	
 	SYSCALL(int) maIOCtl(int function, int a, int b, int c) throws Exception {
 		Log.i("Syscall","maIOCtl");
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
@@ -1342,7 +1497,20 @@ public
 		case maIOCtl_maAddDataSize:
 			return maAddDataSize(a, b);
 #endif
-
+		case maIOCtl_maAndroidStartActivity:
+			return maAndroidStartActivity(a);
+		case maIOCtl_maAndroidGetText:
+			return maAndroidGetText(a, readMemString(b));
+		case maIOCtl_maAndroidSetText:
+			return maAndroidSetText(a, readMemString(b));
+		case maIOCtl_maAndroidAddTextView:
+			return maAndroidAddTextView(a, readMemString(b));
+		case maIOCtl_maAndroidAddEditText:
+			return maAndroidAddEditText(a, readMemString(b));
+		case maIOCtl_maAndroidAddButton:
+			return maAndroidAddButton(a, readMemString(b));
+		case maIOCtl_maAndroidAddMenuItem:
+			return maAndroidAddMenuItem(a, readMemString(b));
 		default:
 			return IOCTL_UNAVAILABLE;
 		}

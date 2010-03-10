@@ -29,12 +29,13 @@ import android.content.Context;
 import android.content.BroadcastReceiver;
 
 import java.lang.Runnable;
-
+import android.widget.LinearLayout;
 #include "config_platform.h"
 
 public class MoSync extends Activity
 {
-	MoSyncView mMosyncView;
+	static public  MoSyncView mMosyncView;
+	LinearLayout ll;
 	boolean paused;
 	
     @Override
@@ -43,12 +44,13 @@ public class MoSync extends Activity
         super.onCreate(savedInstanceState);
 		paused = false;
 		Log.i("MoSync", "onCreate");
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+/*		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+*/		
 		buildMoSyncView();
 		setContentView(mMosyncView);
+
     }
     
 	/*
