@@ -45,6 +45,7 @@ public:
 	virtual void close() = 0;
 
 	//returns immediately.
+	//returns >0 on success, a CONNERR code otherwise.
 	virtual int getAddr(MAConnAddr& addr) = 0;
 
 	virtual ~Closable() {}
@@ -64,6 +65,10 @@ public:
 	//Writes <len> bytes from <src>.
 	//Returns >0 or CONNERR code.
 	virtual int write(const void* src, int len) = 0;
+
+	//Writes the remote connection's address to \a addr.
+	//Will fail if connect() has not completed.
+	virtual int getAddr(MAConnAddr& addr) = 0;
 
 	virtual HttpConnection* http() { return NULL; }
 

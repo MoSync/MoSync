@@ -18,11 +18,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef BROADCOM_H
 #define BROADCOM_H
 
+#include "../connection.h"
+
 class BtSppConnection;
 
 namespace Broadcom {
 	void setup();
-	void startDeviceDiscovery();
+	bool haveRadio();
+	int startDeviceDiscovery();
+	void cancelDiscovery();
 	BtSppConnection* createBtSppConnection(const MABtAddr* address, uint port);
 }
 

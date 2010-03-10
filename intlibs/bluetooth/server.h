@@ -30,7 +30,7 @@ public:
 	//The UUID is registered with the SDP system.
 	int open(const MAUUID& uuid, const char* name, int port = ANY_PORT);
 
-	//Stores the Bluetooth address of an open server socket.
+	//Stores the local Bluetooth address of an open server socket.
 	int getAddr(MAConnAddr& addr);
 
 	//Stores the address of a new, pre-connected BtSppConnection in connP.

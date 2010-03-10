@@ -31,6 +31,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 static bool sBlueSoleilInited = false;
 #include "win32/blueSoleil.h"
 #endif
+
+#ifdef BROADCOM_SUPPORTED
+#include "win32/broadcom.h"
+#endif
+
 #include "discInternal.h"
 
 namespace Bluetooth {
@@ -71,10 +76,12 @@ void Bluetooth::MABtInit() {
 
 #ifdef BROADCOM_SUPPORTED
 #ifdef _WIN32_WCE
+	LOGBT("Test Broadcom presence...\n");
 	HINSTANCE hInst = LoadLibrary(L"btsdkce50.dll");
 	if(hInst) {
+		LOGBT("Found Broadcom stack.\n");
 		Bluetooth::gBluetoothStack = BTSTACK_BROADCOM;
-		//FreeLibrary(hInst);
+		Broadcom::setup();
 	}
 #endif
 #endif

@@ -48,9 +48,6 @@ struct BtService {
 	int port;
 	tstring name;
 	std::vector<MAUUID> uuids;
-	~BtService() {
-		LOGBT("~BtService\n");
-	}
 };
 
 struct BtDevice {
@@ -58,9 +55,6 @@ struct BtDevice {
 	tstring name;
 #endif
 	MABtAddr address;
-	~BtDevice() {
-		LOGBT("~BtDevice\n");
-	}
 };
 
 struct BtServiceSearch {

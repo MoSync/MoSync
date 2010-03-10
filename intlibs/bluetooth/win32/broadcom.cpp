@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include <set>
+
 #pragma push_macro("FAIL")
 #undef FAIL
 #ifdef _WIN32_WCE
@@ -37,10 +39,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "broadcom.h"
 #include "../discInternal.h"
-#include "../connection.h"
 #include "../bt_errors.h"
 
 using namespace MoSyncError;
+using namespace std;
 
 
 class BroadcomBtSppConnection : public BtSppConnection {
@@ -90,120 +92,101 @@ private:
 
 class CBTWidcommStack : public CBtIf
 {
+private:
+	// Gotta keep a list of all devices discovered during the current operation,
+	// to weed out duplicates.
+	struct MABtAddr_less : public binary_function<MABtAddr, MABtAddr, bool> {
+		bool operator()(const MABtAddr& _Left, const MABtAddr& _Right) const {
+			return memcmp(_Left.a, _Right.a, BTADDR_LEN) < 0;
+		}
+	};
+	typedef set<MABtAddr, MABtAddr_less> AddrSet;
+	AddrSet mDevices;
 public:
-   CBTWidcommStack();
-   virtual ~CBTWidcommStack();
+	//CBTWidcommStack() {}
+	//virtual ~CBTWidcommStack() {}
 
-   virtual void OnDeviceResponded(BD_ADDR bda, DEV_CLASS devClass,
-	   BD_NAME bdName, BOOL bConnected) {
-   }
-   virtual void OnDiscoveryComplete() {
-   }
+	BOOL StartInquiry() {
+		mDevices.clear();
+		return CBtIf::StartInquiry();
+	}
 
-   virtual void OnInquiryComplete(BOOL bSuccess, short nResponses) {
-   }
+	virtual void OnDeviceResponded(BD_ADDR bda, DEV_CLASS devClass,
+		BD_NAME bdName, BOOL bConnected)
+	{
+		LOGBT("OnDeviceResponded()\n");
+		{
+			CriticalSectionHandler csh(&gBt.critSec);
+			BtDevice dev;
+			for(int i=0; i<BTADDR_LEN; i++) {
+				memcpy(dev.address.a, bda, BTADDR_LEN);
+			}
+			pair<AddrSet::iterator, bool> res = mDevices.insert(dev.address);
+			if(!res.second) {
+				LOGBT("Duplicate: %02x%02x%02x%02x%02x%02x\n",
+					bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]);
+				return;
+			}
+#ifndef NO_DEVICE_NAME
+			//dev.name = (char*)bdName;
+#endif
+			LOGBT("d%i: \"%s\" (%02x%02x%02x%02x%02x%02x)\n", gBt.devices.size(),
+				bdName, bda[0], bda[1], bda[2], bda[3], bda[4], bda[5]);
+			gBt.devices.push_back(dev);
+		}
+		gBt.deviceCallback();
+	}
+
+	virtual void OnInquiryComplete(BOOL success, short num_responses) {
+		LOGBT("OnInquiryComplete()\n");
+		{
+			CriticalSectionHandler csh(&gBt.critSec);
+			if(success) {
+				if(mDevices.size() != num_responses) {
+					LOGBT("num_responses: %i, mDevices.size() %i\n", num_responses, mDevices.size());
+				}
+				setDiscoveryState(mDevices.size() + 1);
+			} else {
+				setDiscoveryState(CONNERR_GENERIC);
+			}
+		}
+		gBt.deviceCallback();
+	}
 };
+
+static CBTWidcommStack* sStack = NULL;
 
 BtSppConnection* Broadcom::createBtSppConnection(const MABtAddr* address, uint port) {
 	return new BroadcomBtSppConnection(address, port);
 }
 
-
-/*
-//BlueSoleilTest
-#define BST(func) { int res = (func); if(res != BTSDK_OK) {\
-	LOG("%s:%i %i\n", __FILE__, __LINE__, res);\
-	setDiscoveryState(CONNERR_GENERIC); gBt.deviceCallback(); return; } }
-*/
-
-
-/*
-static void InquiryResult(BTDEVHDL dev_hdl);
-static void InquiryComplete();
-static void ConnEvent(BTCONNHDL conn_hdl, BTUINT16 event, BTUINT8 *arg);
-static const char* btaddr2string(const MABtAddr& a);
-*/
-
 void Broadcom::setup() {
-/*
-	BtSdkCallbackStru cb;
-
-	cb.type = BTSDK_INQUIRY_RESULT_IND;
-	cb.func = (void*)InquiryResult;
-	Btsdk_RegisterCallback4ThirdParty(&cb);
-
-	cb.type = BTSDK_INQUIRY_COMPLETE_IND;
-	cb.func = (void*)InquiryComplete;
-	Btsdk_RegisterCallback4ThirdParty(&cb);
-
-	cb.type = BTSDK_CONNECTION_EVENT_IND;
-	cb.func = (void*)ConnEvent;
-	Btsdk_RegisterCallback4ThirdParty(&cb);
-	*/
-}
-
-void Broadcom::startDeviceDiscovery() {
-	/*
-	BST(Btsdk_StartDeviceDiscovery(0, 0, 0));
-	*/
-}
-
-/*
-static void InquiryResult(BTDEVHDL dev_hdl) {
-	BtDevice dev;
-
-	BTUINT32 dev_class;
-	BST(Btsdk_GetRemoteDeviceClass(dev_hdl, &dev_class));
-
-	BtSdkRemoteDevicePropertyStru props;
-	BST(Btsdk_GetRemoteDeviceProperty(dev_hdl, &props));
-
-	byte nameBuf[256];
-	WORD len = sizeof(nameBuf);
-	BST(Btsdk_GetRemoteDeviceName(dev_hdl, nameBuf, &len));
-	dev.name = (char*)nameBuf;
-
-	BST(Btsdk_GetRemoteDeviceAddress(dev_hdl, dev.address.a));
-
-	{
-		CriticalSectionHandler csh(&gBt.critSec);
-		LOGBT("d%i: \"%s\" (%s)\n", gBt.devices.size(),
-			dev.name.c_str(), btaddr2string(dev.addr));
-		gBt.devices.push_back(dev);
+	if(sStack == NULL) {
+		sStack = new CBTWidcommStack();
 	}
-	gBt.deviceCallback();
-}
-*/
-
-/*
-static void InquiryComplete() {
-	{
-		CriticalSectionHandler csh(&gBt.critSec);
-		LOGBT("Discovery done\n");
-		setDiscoveryState(gBt.devices.size() + 1);
-	}
-	gBt.deviceCallback();
 }
 
-static const char* btaddr2string(const MABtAddr& a) {
-	static char buffer[16];
-	sprintf(buffer, "%02x%02x%02x%02x%02x%02x", a.a[0], a.a[1], a.a[2], a.a[3], a.a[4], a.a[5]);
-	return buffer;
+bool Broadcom::haveRadio() {
+	LOGBT("Broadcom::haveRadio(): %i\n", sStack->IsDeviceReady());
+	return sStack->IsDeviceReady() == TRUE;
 }
 
-static void ConnEvent(BTCONNHDL conn_hdl, BTUINT16 event, BTUINT8 *arg) {
-	LOG("ConnEvent\n");
+int Broadcom::startDeviceDiscovery() {
+	LOGBT("Broadcom::startDeviceDiscovery()\n");
+	if(sStack->StartInquiry())
+		return 0;
+	else
+		return CONNERR_GENERIC;
 }
-*/
 
+void Broadcom::cancelDiscovery() {
+	sStack->StopInquiry();
+}
 
 //BroadcomBtSppConnection
 //***********************
 BroadcomBtSppConnection::BroadcomBtSppConnection(const MABtAddr* address, uint port) {
 	memcpy(mRemoteBdAddr, address->a, BD_ADDR_LEN);
-	/*for(int i=0; i<BD_ADDR_LEN; i++) {
-		mRemoteBdAddr[i] = address->a[(BD_ADDR_LEN - 1) - i];
-	}*/
 	mScn = (UINT8)port;
 }
 
@@ -240,8 +223,14 @@ void BroadcomBtSppConnection::close() {
 }
 
 int BroadcomBtSppConnection::getAddr(MAConnAddr& addr) {
-	//TODO: implement
-	return CONNERR_GENERIC;
+	BD_ADDR remote;
+	BOOL is = mPort.IsConnected(&remote);
+	if(!is)
+		return CONNERR_GENERIC;
+	addr.family = CONN_FAMILY_BT;
+	memcpy(addr.bt.addr.a, remote, BTADDR_LEN);
+	addr.bt.port = mScn;
+	return 1;
 }
 
 int BroadcomBtSppConnection::read(void* dst, int max) {
@@ -326,10 +315,22 @@ void BroadcomBtSppConnection::MyRfCommPort::OnEventReceived(UINT32 event_code) {
 }
 
 int BroadcomBtSppConnection::write(const void* src, int len) {
+	DEBUG_ASSERT(len > 0);
 	//start write
-	//wait until finished
-	//restart write if not everything was written
-	return -1;
+	//continue write if not everything was written
+	int bytesLeft = len;
+	while(bytesLeft > 0) {
+		UINT16 written;
+		UINT16 toWrite = MIN(len, 1 << 15);
+		CRfCommPort::PORT_RETURN_CODE res = mPort.Write((void*)src, toWrite, &written);
+		if(res != CRfCommPort::SUCCESS) {
+			LOG("RfCommPort::Write() returned %i\n", res);
+			return CONNERR_GENERIC;
+		}
+		DEBUG_ASSERT(written <= toWrite);
+		bytesLeft -= written;
+	}
+	return 1;
 }
 
 #endif	//BROADCOM_SUPPORTED
