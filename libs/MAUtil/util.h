@@ -57,10 +57,16 @@ namespace MAUtil {
 	/** Splits \a str into multiple strings, one for each occurance of the entire \a delim substring.
 	* \a output is cleared, then the resulting strings are added to it. **/
 	void stringSplit(const String& str, const String& delim, MAUtil::Vector<String>& output);
+	void stringSplit(const WString& str, const WString& delim, MAUtil::Vector<WString>& output);
 	/** Converts a string to an integer, using the same semantics as strtoul(). **/
 	int stringToInteger(const String &s, int base = 10);
 	/** Converts a string to a double, using the same semantics as atof(). **/
 	double stringToDouble(const String &s);
+
+	/** Splits \a str into multiple strings, breaking at the occurrence of any character in \a delim.
+	* \a output is cleared, then the resulting strings are added to it. **/
+	void stringBreak(const char* str, const char* delim, MAUtil::Vector<String>& output);
+	void stringBreak(const wchar* str, const wchar* delim, MAUtil::Vector<WString>& output);
 
 	/// @cond DUMMY
 	int dummy(int);
