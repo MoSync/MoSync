@@ -731,7 +731,7 @@ namespace Base {
 		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
 			//list filesystem roots
-#if FILESYSTEM_CHROOT || defined(LINUX)
+#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__)
 			sFileList.files.push_back("/");
 #else
 #ifdef WIN32

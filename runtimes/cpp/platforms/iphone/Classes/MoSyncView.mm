@@ -40,12 +40,12 @@
 @synthesize msg;
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if(kill)
-		[[UIApplication sharedApplication] terminateWithSuccess];
+		Exit();
 }
 - (void)alertViewCancel:(UIAlertView *)alertView {
 	// don't know if this is allowed...
 	if(kill)
-		[[UIApplication sharedApplication] terminateWithSuccess];
+		Exit();
 }
 @end
 

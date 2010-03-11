@@ -25,6 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <time.h>
 #include <sys/time.h>
 
+#include <vector>
+#include <string>
+
 #include "config_platform.h"
 
 #include <bluetooth/discovery.h>
@@ -40,13 +43,18 @@ extern bool gRunning;
 
 class Surface {
 public:
-	Surface(CGImageRef image) : image(image), context(NULL), data(NULL) {
+	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 	}
 
-	Surface(int width, int height) {
+	Surface(int width, int height, char *data=NULL) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		int rowBytes = width*4;
-		data = new char[rowBytes*height];
+		if(data==NULL) {
+			data = new char[rowBytes*height];
+			mOwnData = true;
+		}
+		else mOwnData = false;
+		
 		context = CGBitmapContextCreate(data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst);
 										//kCGImageAlphaNoneSkipFirst);
 		
@@ -69,12 +77,13 @@ public:
 	~Surface() {
 		if(image) CGImageRelease(image);
 		if(context) CGContextRelease(context);
-		if(data) delete data;
+		if(mOwnData && data) delete data;
 	}
 	
 	CGImageRef image;
 	CGContextRef context;
 	CGRect rect;
+	bool mOwnData;
 	char *data;
 };
 

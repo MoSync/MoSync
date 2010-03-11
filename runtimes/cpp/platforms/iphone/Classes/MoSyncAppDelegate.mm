@@ -18,6 +18,8 @@
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
 
+#include "Platform.h"
+
 @implementation MoSyncAppDelegate
 
 @synthesize window;
@@ -31,6 +33,9 @@
     [window makeKeyAndVisible];
 }
 
+- (void)applicationWillTerminate:(UIApplication *)application {
+	Base::gEventQueue.addCloseEvent();
+}
 
 - (void)dealloc {
     [viewController release];

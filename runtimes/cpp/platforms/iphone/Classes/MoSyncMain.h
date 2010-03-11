@@ -27,5 +27,7 @@ void DoneUpdatingMoSyncView();
 
 void ShowMessageBox(const char *msg, bool kill);
 
+void Exit();
+
 #endif
 

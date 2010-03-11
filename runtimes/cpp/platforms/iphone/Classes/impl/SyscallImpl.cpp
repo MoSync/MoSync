@@ -519,7 +519,6 @@ namespace Base {
 	{
 		if(gClosing)
 			return;
-
 		/*
 		if(gEventQueue.count() != 0)
 			return;
@@ -565,10 +564,11 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(int, maPanic(int result, char* message)) 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
+	SYSCALL(void, maPanic(int result, char* message)) 
+	{		
+		ShowMessageBox(message, true);
+		GetVMYield(gCore) = 1;
+		gRunning = false;
 	}
 
 	SYSCALL(int, maPlatformRequest(const char* url)) 
@@ -629,8 +629,6 @@ namespace Base {
 		return 0;
 	}
 
-
-
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
 		NOT_IMPLEMENTED;
 		return 1;
@@ -639,6 +637,54 @@ namespace Base {
 	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
+	
+	SYSCALL(int, maFrameBufferGetInfo(MAFrameBufferInfo *info)) {
+		int bytesPerRow = CGBitmapContextGetBytesPerRow(gBackbuffer->context);
+		int bitsPerPixel = CGBitmapContextGetBitsPerPixel(gBackbuffer->context);
+		int bytesPerPixel = bytesPerRow/gWidth;
+		int bitsPerComponent = CGBitmapContextGetBitsPerComponent(gBackbuffer->context);
+		
+		info->bitsPerPixel = bitsPerPixel;
+		info->bytesPerPixel = bytesPerPixel;
+		info->redMask = 0x00ff0000;
+		info->greenMask = 0x0000ff00;
+		info->blueMask = 0x000000ff;
+		info->sizeInBytes = bytesPerRow*gHeight;
+		info->width = gWidth;
+		info->height = gHeight;
+		info->pitch = bytesPerRow;
+		info->redShift = 16;
+		info->greenShift = 8;
+		info->blueShift = 0;
+		info->redBits = bitsPerComponent;
+		info->greenBits = bitsPerComponent;
+		info->blueBits = bitsPerComponent;
+		info->supportsGfxSyscalls = 1;
+		
+		return 1;
+	}
+
+	static Surface *sInternalBackBuffer = NULL;	
+	SYSCALL(int, maFrameBufferInit(void *data)) {
+		if(sInternalBackBuffer!=NULL) return 0;
+		sInternalBackBuffer = gBackbuffer;
+		//backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
+		//currentDrawSurface = backBuffer;
+		gBackbuffer = new Surface(gWidth, gHeight, (char*)data);
+		gDrawTarget = gBackbuffer;
+		return 1;
+	}
+	
+	
+	SYSCALL(int, maFrameBufferClose()) {
+		if(sInternalBackBuffer==NULL) return 0;
+		delete gBackbuffer;
+		gBackbuffer = sInternalBackBuffer;
+		sInternalBackBuffer = NULL;
+		gDrawTarget = gBackbuffer;
+		return 1;
+	}
+	
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -665,7 +711,8 @@ void MoSyncExit(int r)
 	if(!exited) {
 		exited = true;
 		LeaveCriticalSection(&exitMutex);
-		exit(r);
+		//exit(r);
+		Exit();
 		EnterCriticalSection(&exitMutex);
 	}
 	LeaveCriticalSection(&exitMutex);

@@ -104,3 +104,7 @@ SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
 void ShowMessageBox(const char *msg, bool kill) {
 	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
 }
+
+void Exit() {
+	[[UIApplication sharedApplication] terminateWithSuccess];
+}
