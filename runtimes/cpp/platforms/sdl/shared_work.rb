@@ -13,6 +13,7 @@ def setup_common
 			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
 	elsif(HOST == :linux) then
+		@EXTRA_CPPFLAGS = ""
 		if(SDL_SOUND)
 			sound_lib = [ "SDL_sound" ]
 		else
