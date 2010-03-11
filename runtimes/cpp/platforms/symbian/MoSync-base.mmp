@@ -24,14 +24,17 @@ SOURCE            symbian_helpers.cpp
 SOURCE            SyscallImpl.cpp
 SOURCE            FileImpl.cpp
 SOURCE            netImpl.cpp
-SOURCE            hashmap.cpp
 SOURCE            sound.cpp
 SOURCE            bluetooth.cpp
 SOURCE            guido.cpp
 SOURCE            wlanImpl.cpp
+SOURCE            string2map.cpp
 
 SOURCEPATH ..\..\..\..\intlibs\net
 SOURCE            net.cpp
+
+SOURCEPATH ..\..\..\..\intlibs\hashmap
+SOURCE            hashmap.cpp
 
 SOURCEPATH ..\..\core
 SOURCE            core.cpp

@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef _WIN32_WCE
 //#include <windows.h>
 #include "wce_helpers.h"
+#include "wce_errors.h"
 #elif !defined(SYMBIAN)
 #include "helpers/mkdir.h"
 #endif	//_WIN32_WCE
@@ -59,10 +60,6 @@ namespace Base {
 #endif	//RESOURCE_MEMORY_LIMIT
 
 #if !defined(SYMBIAN)
-	int gStoreId = 1;
-	typedef std::map<int, std::string> StoreMap;
-	typedef StoreMap::iterator StoreItr;
-	StoreMap gStores;
 
 #if !defined(_WIN32_WCE)
 	struct FileList {
@@ -102,6 +99,7 @@ namespace Base {
 
 	Syscall::~Syscall() {
 		LOGD("~Syscall\n");
+		gStores.close();
 		platformDestruct();
 	}
 
@@ -396,35 +394,55 @@ namespace Base {
 	}
 
 
-#ifndef SYMBIAN
+#ifdef SYMBIAN
+#else
 #define STORE_PATH "stores/"
-	bool storeDirectoryCreated = false;
+#endif
+
 	SYSCALL(MAHandle, maOpenStore(const char* name, int flags)) 
 	{
-
-		if(storeDirectoryCreated == false) {
+		const char* path;
+		int len;
 #ifdef _WIN32_WCE 
-			char temp[256];
-			TCHAR wtemp[256];
-			getWorkingDirectory(temp, 256);
-			strcat(temp, "\\");
-			strcat(temp, STORE_PATH);
-			convertAsciiToUnicode(wtemp, 256, temp);
-			CreateDirectory(wtemp, NULL);
-#else
-			_mkdir(STORE_PATH);
+		char temp[256];
+		TCHAR wtemp[256];
+		getWorkingDirectory(temp, 256);
+		strcat(temp, "\\");
+		strcat(temp, STORE_PATH);
+		convertAsciiToUnicode(wtemp, 256, temp);
+		CreateDirectory(wtemp, NULL);
+#elif defined(SYMBIAN)
+		MyRFs myrfs;
+		myrfs.Connect();
+#ifdef DEBUGGING_MODE
+		int res =
 #endif
-			storeDirectoryCreated = true;
-		}
+			FSS.MkDir(KMAStorePath16);
+		LOGD("MkDir %i\n", res);
+#else
+		_mkdir(STORE_PATH);
+#endif	//_WIN32_WCE
 
+#ifdef SYMBIAN
+		TPtrC8 nameDesC(CBP name);
+		TCleaner<HBufC8> hbuf(HBufC8::NewLC(KMAStorePath8().Length() + nameDesC.Length() + 1));
+		TPtr8 des = hbuf->Des();
+		des.Append(KMAStorePath8);
+		des.Append(nameDesC);
+		path = CCP des.PtrZ();
+		len = des.Length();
+#else
 		std::string newPath = STORE_PATH + std::string(name);
+		path = newPath.c_str();
+		len = newPath.length();
+#endif
 
-		FileStream readFile(newPath.c_str());
+		FileStream readFile(path);
 		if(!readFile.isOpen())
 		{
 			if(flags & MAS_CREATE_IF_NECESSARY)
 			{
-				WriteFileStream writeFile(newPath.c_str());
+				WriteFileStream writeFile(path);
 				if(!writeFile.isOpen())
 					return STERR_GENERIC;
 			}
@@ -434,20 +452,20 @@ namespace Base {
 			}
 		}
 
-		gStores[gStoreId] = newPath;
-		return gStoreId++;
+		SYSCALL_THIS->gStores.insert(SYSCALL_THIS->gStoreNextId, path, len);
+		return SYSCALL_THIS->gStoreNextId++;
 	}
 
 	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) 
 	{
-		StoreItr iter = gStores.find(store);
+		const char* name = SYSCALL_THIS->gStores.find(store);
 
-		if(iter == gStores.end()) {
+		if(!name) {
 			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
 		}
 
-		WriteFileStream writeFile((*iter).second.c_str());
-		Stream* b = gSyscall->resources.get_RT_BINARY(data);
+		WriteFileStream writeFile(name);
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
 		if(!b->seek(Seek::Start, 0)) {
 			return STERR_GENERIC;
 		}
@@ -460,13 +478,13 @@ namespace Base {
 
 	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder)) 
 	{
-		StoreItr iter = gStores.find(store);
+		const char* name = SYSCALL_THIS->gStores.find(store);
 
-		if(iter == gStores.end()) {
+		if(!name) {
 			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
 		}
 
-		FileStream readFile((*iter).second.c_str());
+		FileStream readFile(name);
 		int len;
 		MYASSERT(readFile.length(len), ERR_STORE_READ_FAILED);
 		Smartie<MemStream> b(new MemStream(len));
@@ -474,9 +492,59 @@ namespace Base {
 		{
 			BIG_PHAT_ERROR(ERR_STORE_READ_FAILED);
 		}
-		return gSyscall->resources.add_RT_BINARY(placeholder, b.extract());
+		return SYSCALL_THIS->resources.add_RT_BINARY(placeholder, b.extract());
 	}
+
+	SYSCALL(void, maCloseStore(MAHandle store, int del))
+	{
+		const char* name = SYSCALL_THIS->gStores.find(store);
+		MYASSERT(!name, ERR_STORE_HANDLE_INVALID);
+		if(del)
+		{
+#ifdef SYMBIAN
+			MyRFs myrfs;
+			myrfs.Connect();
+			TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
+			LHEL(FSS.Delete(*desc));
+#elif defined(_WIN32_WCE)
+			char temp[MAX_PATH];
+			getWorkingDirectory(temp, MAX_PATH);
+			strcat(temp, "\\");
+			strcat(temp, name);
+			int a = strlen(temp);
+
+			BSTR unicodestr = SysAllocStringLen(NULL, a);
+			::MultiByteToWideChar(CP_ACP, 0, temp, a, unicodestr, a);
+
+			BOOL ret = DeleteFile(unicodestr);
+			::SysFreeString(unicodestr);
+			if(!ret)
+			{
+				DWORD error = GetLastError();
+
+				if(ret==ERROR_FILE_NOT_FOUND)
+				{
+					BIG_PHAT_ERROR(WCEERR_STORE_FILE_NOT_FOUND);
+				}
+				else if(ret==ERROR_ACCESS_DENIED)
+				{
+					BIG_PHAT_ERROR(WCEERR_STORE_ACCESS_DENIED);
+				}
+				else
+				{
+					BIG_PHAT_ERROR(WCEERR_STORE_CLOSE_FAILED);
+				}
+			}
+#else
+			int res = remove(name);
+			if(res != 0) {
+				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
+				DEBIG_PHAT_ERROR;
+			}
 #endif	//SYMBIAN
+		}
+		SYSCALL_THIS->gStores.erase(store);
+	}
 
 
 	SYSCALL(int, maLoadResources(MAHandle data)) {

@@ -1658,47 +1658,6 @@ DWORD GetScreenOrientation()
 		return gSyscall->resources.add_RT_IMAGE(placeholder, i);
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del)) 
-	{
-		StoreItr iter = gStores.find(store);
-		if(iter == gStores.end()) {
-			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
-		}
-		const char *filename =(*iter).second.c_str();
-		if(del)
-		{
-			char temp[256];
-			getWorkingDirectory(temp, 256);
-			strcat(temp, "\\");
-			strcat(temp, filename);
-			int a = strlen(temp);
-
-			BSTR unicodestr = SysAllocStringLen(NULL, a);
-			::MultiByteToWideChar(CP_ACP, 0, temp, a, unicodestr, a);
-
-			BOOL ret = DeleteFile(unicodestr);
-			::SysFreeString(unicodestr);
-			if(!ret)
-			{
-				DWORD error = GetLastError();
-
-				if(ret==ERROR_FILE_NOT_FOUND)
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_FILE_NOT_FOUND);
-				}
-				else if(ret==ERROR_ACCESS_DENIED)
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_ACCESS_DENIED);
-				}
-				else
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_CLOSE_FAILED);
-				}
-			}
-		}
-		gStores.erase(gStores[store].find(store));
-	}
-
 	SYSCALL(int, maGetKeys()) 
 	{
 		if(gClosing)

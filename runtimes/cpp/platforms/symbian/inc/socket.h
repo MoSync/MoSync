@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "CbSync.h"
 #include "symbian_helpers.h"
-#include "HashMap.h"
+#include "string2map.h"
 
 class CSocket : public CConnection {
 public:
@@ -73,8 +73,9 @@ public:	//CConnection
 	CHttpConnection* http() { return this; }
 
 public:	//CHttpConnection
-	CHttpConnection(RSocketServ& aServer, int method, TUint16 port)
+	CHttpConnection(RSocketServ& aServer, int method, TUint16 port, RStringPool& pool)
 	: CSocket(aServer, CSocket::ETcp), mState(SETUP), mPort(port), mMethod(method),
+	mRequestHeaders(pool), mResponseHeaders(pool),
 	mSync(TSyncCallback(SyncCallbackL, this)), mSyncOp(NULL), mLineHandler(NULL) {}
 
 	void ConstructL(const TDesC8& hostname, const TDesC8& path);

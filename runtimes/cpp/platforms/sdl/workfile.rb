@@ -6,31 +6,31 @@ work = NativeMoSyncLib.new
 work.instance_eval do 
 	@SOURCES = [".", "./thread", "./Skinning", "../../base", "../../base/thread"]
 	@IGNORED_FILES = ["Image.cpp", "audio.cpp"]
-	COMMON_INCLUDES = [".", "../../base"]
-	COMMON_LIBRARIES = ["SDL", "SDLmain", "SDL_ttf"]
+	common_includes = [".", "../../base"]
+	common_libraries = ["SDL", "SDLmain", "SDL_ttf"]
 	@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal -Wno-unreachable-code",
 		"Syscall.cpp" => " -Wno-float-equal"}
 	@EXTRA_CPPFLAGS = " -DMOSYNC_DLL_EXPORT"
 	
 	if(HOST == :win32) then
-		@EXTRA_INCLUDES = COMMON_INCLUDES
-		@LIBRARIES = COMMON_LIBRARIES
+		@EXTRA_INCLUDES = common_includes
+		@LIBRARIES = common_libraries
 	elsif(HOST == :linux)
 		
-		if ( SDL_SOUND == false )
-			if ( HOST_PLATFORM != :moblin )
-				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__"
-			else
-				@EXTRA_CPPFLAGS = " -D__NO_SDL_SOUND__ -D__USE_FULLSCREEN__"
-			end
-			@IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
+		@EXTRA_CPPFLAGS = ""
+		if (!SDL_SOUND)
+			@EXTRA_CPPFLAGS += " -D__NO_SDL_SOUND__"
+			@IGNORED_FILES += ["SDLSoundAudioSource.cpp"]
+		end
+		if(FULLSCREEN == "true")
+			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__ -D__USE_SYSTEM_RESOLUTION__"
 		end
 		
-		@EXTRA_INCLUDES = COMMON_INCLUDES + ["/usr/include/gtk-2.0",
+		@EXTRA_INCLUDES = common_includes + ["/usr/include/gtk-2.0",
 			"/usr/include/glib-2.0", "/usr/include/pango-1.0",
 			"/usr/include/cairo", "/usr/include/atk-1.0",
 			"/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include"]
-		@LIBRARIES = COMMON_LIBRARIES
+		@LIBRARIES = common_libraries
 	else
 		error "Unsupported platform"
 	end

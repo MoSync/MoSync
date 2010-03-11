@@ -15,18 +15,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <LIMITS.H>
-#include "config_platform.h"
+#include <limits.h>
+#include <string.h>
 #include "hashmap.h"
-#include "symbian_helpers.h"
 
+#define CONFIG_H	//hack
+#define LOGGING_ENABLED
+#include <helpers/helpers.h>
+
+#ifdef SYMBIAN
+#include <e32base.h>
 #define LOG_HASH(a...) LOGD(a)
+#define malloc User::AllocL
+#define free User::Free
+#define PUSH CleanupStack::PushL
+#define POPD CleanupStack::PopAndDestroy
+#define POP CleanupStack::Pop
+#else
+#define LOG_HASH LOGD
+#define PUSH(a)
+#define POPD(a)
+#define POP(a)
+#endif
+
+using namespace MoSyncError;
 
 //******************************************************************************
 //The hash function
 //******************************************************************************
 
-uint hash32shift(unsigned int key) {
+static uint hash32shift(uint key) {
 	key = key + ~(key << 15); // key = key - (key << 15) - 1;
 	key = key ^ (key >> 10);
 	key = key + (key << 3);
@@ -41,19 +59,18 @@ uint hash32shift(unsigned int key) {
 //******************************************************************************
 
 HashMapBase::HashMapBase() {
-	ZERO_OBJECT(m);
-	//DebugMarkStart();
+	memset(&m, 0, sizeof(m));
 }
 
 HashMapBase::~HashMapBase() {
-	DEBUG_ASSERT(m.base == NULL)
+	DEBUG_ASSERT(m.base == NULL);
 }
 
-uint HashMapBase::Size() const {
+uint HashMapBase::size() const {
 	return m.numElem;
 }
 
-void HashMapBase::Close() {
+void HashMapBase::close() {
 	if(m.base == NULL)
 		return;
 
@@ -73,35 +90,35 @@ void HashMapBase::Close() {
 	DUMPSTAT(linearEraseSteps);
 	DUMPSTAT(getsArray);
 	LOG_HASH("\n");
-		
+
 	for(uint i=0; i<m.baseLen; i++) {
 		BasePair& pair = m.base[i];
 		if(pair.value) {
 			LOG_HASH("Disposing of key %i\n", pair.key);
-			this->Dispose(pair);
+			this->dispose(pair);
 		}
 	}
-	User::Free(m.base);
+	free(m.base);
 	m.base = NULL;
 	//DebugMarkEnd();
 }
 
-void HashMapBase::InsertL(int key, TAny* value, bool rehash) {
+void HashMapBase::insert(int key, void* value, bool in_rehash) {
 	LOG_HASH("Insert %i\n", key);
 	DEBUG_ASSERT(value != NULL);
 	if(m.base == NULL) {
 		DEBUG_ASSERT(sizeof(BasePair) == 8);
 
 		//requested Size = (Length * sizeof)
-		m.base = (BasePair*)User::AllocL(HASHMAP_BASE_SIZE * sizeof(BasePair));
+		m.base = (BasePair*)malloc(HASHMAP_BASE_SIZE * sizeof(BasePair));
 
-		UpdateBaseLen();
+		updateBaseLen();
 	}
 	if(m.numElem >= m.loadLimit) {
-		RehashL();
+		rehash();
 	}
 
-	(rehash ? m.stat.rehashInserts : m.stat.inserts) ++;
+	(in_rehash ? m.stat.rehashInserts : m.stat.inserts) ++;
 
 	uint baseMask = m.baseLen - 1;	//broken if !isPowerOf2(m.baseLen)
 	uint hash = hash32shift(key);
@@ -132,36 +149,33 @@ void HashMapBase::InsertL(int key, TAny* value, bool rehash) {
 	m.numElem++;
 }
 
-void HashMapBase::RehashL() {
+void HashMapBase::rehash() {
 	m.stat.rehashes++;
 	LOG_HASH("Rehash\n");
 
 	DEBUG_ASSERT(sizeof(BasePair) == 8);
 	BasePair* oldBase = m.base;
-	CleanupStack::PushL(oldBase);
+	PUSH(oldBase);
 	uint oldLen = m.baseLen;
 	uint oldNumElem = m.numElem;
-	m.base = (BasePair*)User::AllocL(m.baseLen * 2 * sizeof(BasePair));
-	UpdateBaseLen();
+	m.baseLen <<= 1;
+	m.base = (BasePair*)malloc(m.baseLen * sizeof(BasePair));
+	updateBaseLen();
 	m.numElem = 0;
-	
+
 	for(uint i=0; i<oldLen; i++) {
 		BasePair& pair(oldBase[i]);
 		if(pair.value != NULL) {
-			InsertL(pair.key, pair.value, true);
+			insert(pair.key, pair.value, true);
 		}			
 	}
-	CleanupStack::PopAndDestroy(oldBase);
+	POPD(oldBase);
 	DEBUG_ASSERT(m.numElem == oldNumElem);
 }
 
-void HashMapBase::UpdateBaseLen() {
-	uint nBytes = User::AllocLen(m.base);	//allocated Size (bytes)
-	LOG_HASH("%i bytes\n", nBytes);
-	Mem::FillZ(m.base, nBytes);
-	m.baseLen = nBytes >> 3;	//allocated Length (number of Pairs)
+void HashMapBase::updateBaseLen() {
+	memset(m.base, 0, m.baseLen * sizeof(BasePair));
 	LOG_HASH("%i Pairs\n", m.baseLen);
-	m.baseLen = biggestPowerOf2(4, m.baseLen);
 	MYASSERT_EXTRA(
 		/*isPowerOf2(m.baseLen) &&*/	//not always true
 		m.baseLen > 4 && m.baseLen < (INT_MAX / 3),	//sanity check
@@ -170,26 +184,26 @@ void HashMapBase::UpdateBaseLen() {
 	m.loadLimit = (m.baseLen * 3) >> 2;	//75%
 }
 
-TAny* HashMapBase::FindL(int key) const {
+void* HashMapBase::find(int key) const {
 	m.stat.finds++;
-	const BasePair* pair(FindIndexL(key, m.stat.linearFindSteps));
+	const BasePair* pair(findIndex(key, m.stat.linearFindSteps));
 	if(pair)
 		return pair->value;
 	else
 		return NULL;
 }
 
-void HashMapBase::EraseL(int key) {
+void HashMapBase::erase(int key) {
 	m.stat.erases++;
 	LOG_HASH("Erase %i\n", key);
-	BasePair* pair(FindIndexL(key, m.stat.linearEraseSteps));
+	BasePair* pair(findIndex(key, m.stat.linearEraseSteps));
 	DEBUG_ASSERT(pair);
-	Dispose(*pair);
+	dispose(*pair);
 	pair->value = NULL;
 	m.numElem--;
 }
 
-HashMapBase::BasePair* HashMapBase::FindIndexL(int key, uint& statLinearSteps) const {
+HashMapBase::BasePair* HashMapBase::findIndex(int key, uint& statLinearSteps) const {
 	if(m.base == NULL)
 		return NULL;
 	int baseMask = m.baseLen - 1;
@@ -212,22 +226,24 @@ HashMapBase::BasePair* HashMapBase::FindIndexL(int key, uint& statLinearSteps) c
 	}
 }
 
-void HashMapBase::Dispose(BasePair&) {
+#if 0
+void HashMapBase::dispose(BasePair&) {
 	DEBIG_PHAT_ERROR;
 }
+#endif
 
 //******************************************************************************
 //HashMapBase::TIteratorC
 //******************************************************************************
 
 HashMapBase::TIteratorC::TIteratorC(const BasePair* pos, const BasePair* end)
-	: mPos(pos), mEnd(end)
+: mPos(pos), mEnd(end)
 {
 	if(mPos->value == NULL)
-		Proceed();
+		proceed();
 }
 
-void HashMapBase::TIteratorC::Proceed() {
+void HashMapBase::TIteratorC::proceed() {
 	while(mPos != mEnd) {
 		mPos++;
 		if(mPos->value != NULL)
@@ -235,15 +251,15 @@ void HashMapBase::TIteratorC::Proceed() {
 	}
 }
 
-bool HashMapBase::TIteratorC::HasMore() const {
+bool HashMapBase::TIteratorC::hasMore() const {
 	if(mPos == mEnd)
 		return false;
 	return mPos->value != NULL;
 }
 
-const HashMapBase::BasePair& HashMapBase::TIteratorC::Next() {
+const HashMapBase::BasePair& HashMapBase::TIteratorC::next() {
 	const BasePair& result = *mPos;
-	Proceed();
+	proceed();
 	return result;
 }
 
@@ -251,70 +267,16 @@ const HashMapBase::BasePair& HashMapBase::TIteratorC::Next() {
 //StringMap
 //******************************************************************************
 
-void StringMap::Dispose(BasePair& pair) {
-	User::Free(pair.value);
+void StringMap::dispose(BasePair& pair) {
+	free(pair.value);
 }
 
-const char* StringMap::InsertL(int key, const TDesC8& s1) {
-	char* value = (char*)User::AllocLC(s1.Size() + 1);
-	Mem::Copy(value, s1.Ptr(), s1.Size());
-	value[s1.Size()] = 0;
-	HashMapBase::InsertL(key, value);
-	CleanupStack::Pop(value);
+const char* StringMap::insert(int key, const char* s1, uint len) {
+	char* value = (char*)malloc(len + 1);
+	PUSH(value);
+	memcpy(value, s1, len);
+	value[len] = 0;
+	HashMapBase::insert(key, value);
+	POP(value);
 	return value;
-}
-
-//******************************************************************************
-//String2Map
-//******************************************************************************
-
-void String2Map::OpenL() {
-	mPool.OpenL();
-}
-
-void String2Map::Close() {
-	HashMap<HBufC8>::Close();
-	mPool.Close();
-}
-
-void String2Map::Dispose(BasePair& pair) {
-	RMyString string(mPool, pair.key);
-	string.Close();
-	delete (HBufC8*)pair.value;
-}
-
-const TDesC8& String2Map::InsertL(const TDesC8& key, const TDesC8& value) {
-	HBufC8* buf = HBufC8::NewLC(value.Length());
-	*buf = value;
-	RMyString string(mPool.OpenStringL(key));
-	CleanupClosePushL(string);
-	HashMap<HBufC8>::InsertL(string.Val(), buf);
-	CleanupStack::Pop();	//string
-	CleanupStack::Pop(buf);
-	return *buf;
-}
-
-const TDesC8* String2Map::FindL(const TDesC8& key) const {
-	RMyString string(mPool.OpenStringL(key));
-	int val = string.Val();
-	string.Close();
-	return HashMap<HBufC8>::FindL(val);
-}
-
-void String2Map::EraseL(const TDesC8& key) {
-	RMyString string(mPool.OpenStringL(key));
-	int val = string.Val();
-	string.Close();
-	HashMap<HBufC8>::EraseL(val);
-}
-
-//******************************************************************************
-//String2Map::TIteratorC
-//******************************************************************************
-
-String2Map::Pair String2Map::TIteratorC::Next() {
-	Pair result = { RMyString(mPool, mPos->key).DesC(),
-		*(HBufC8*)mPos->value };
-	Proceed();
-	return result;
 }

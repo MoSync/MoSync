@@ -15,7 +15,8 @@ else
 	PLATFORM_TOOLS = []
 end
 
-BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
+MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
+	"intlibs/hashmap",
 	"intlibs/bluetooth",
 	"intlibs/gsm_amr",
 	"intlibs/net",
@@ -23,7 +24,9 @@ BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl",
 	"runtimes/cpp/platforms/sdl/mosynclib",
 	"runtimes/cpp/platforms/sdl/MoRE"
-	] + PLATFORM_TOOLS
+	]
+
+BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
 EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "tests/unitTest", "examples"]
 

@@ -29,18 +29,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #endif
 
+#include <hashmap/hashmap.h>
+
 #include <helpers/CPP_IX_STREAMING.h>
-//#include <helpers/CPP_IX_LOCATION.h>
 
 struct MAConnAddr;
 
 namespace Base {
-#ifndef SYMBIAN
-	extern int gStoreId;
-	typedef std::map<int, std::string> StoreMap;
-	typedef StoreMap::iterator StoreItr;
-	extern StoreMap gStores;
-#endif
 
 #include "SyscallImpl.h"
 
@@ -75,6 +70,9 @@ namespace Base {
 #define CALL_SYSCALL(syscall) mSyscall.syscall
 #define SYSCALL_THIS this
 #endif
+
+		int gStoreNextId;
+		StringMap gStores;
 
 		ResourceArray resources;
 

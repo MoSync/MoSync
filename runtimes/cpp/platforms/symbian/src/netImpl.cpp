@@ -35,6 +35,7 @@ void Syscall::ClearNetworkingVariables() {
 }
 
 void Syscall::ConstructNetworkingL() {
+	gHttpStringPool.OpenL();
 	gConnOps.SetOffset(_FOFF(ConnOp, mLink));
 	gConnCleanupQue = new (ELeave) CActiveEnder(_FOFF(ConnOp, mLink));
 }
@@ -166,7 +167,7 @@ void Syscall::DestructNetworking() {
 	gConnOpsWaitingForNetworkingStart.Close();
 
 	//destroy all humans... I mean Connections :)
-	gConnections.Close();
+	gConnections.close();
 
 	SAFE_DELETE(gConnCleanupQue);
 
@@ -174,6 +175,7 @@ void Syscall::DestructNetworking() {
 	delete tSync;
 #endif
 	gConnection.Close();
+	gHttpStringPool.Close();
 }
 
 void Syscall::CancelConnOps(MAHandle conn) {
@@ -590,18 +592,16 @@ void Syscall::ConnOp::addHttpSendHeaders() {
 //******************************************************************************
 
 void CHttpConnection::ConstructL(const TDesC8& hostname, const TDesC8& path) {
-	mRequestHeaders.OpenL();
-	mResponseHeaders.OpenL();
 	mPath = HBufC8::NewL(path.Length());
 	*mPath = path;
 	mHostname = CreateHBufC16FromDesC8L(hostname);
-	mRequestHeaders.InsertL(_L8("host"), hostname);
+	mRequestHeaders.insert(_L8("host"), hostname);
 }
 
 CHttpConnection::~CHttpConnection() {
 	LOGST("~CHttpConnection");
-	mRequestHeaders.Close();
-	mResponseHeaders.Close();
+	mRequestHeaders.close();
+	mResponseHeaders.close();
 }
 
 void CHttpConnection::FormatRequestL() {
@@ -628,9 +628,9 @@ void CHttpConnection::FormatRequestL() {
 	APPEND(_L8(" HTTP/1.0\r\n"));
 
 	//add Headers
-	String2Map::TIteratorC itr = mRequestHeaders.Begin();
-	while(itr.HasMore()) {
-		String2Map::Pair p = itr.Next();
+	String2Map::TIteratorC itr = mRequestHeaders.begin();
+	while(itr.hasMore()) {
+		String2Map::Pair p = itr.next();
 		APPEND(p.key);
 		APPEND(_L8(": "));
 		APPEND(p.value);
@@ -766,7 +766,7 @@ void CHttpConnection::HeaderLineHandlerL(const TDesC8& line) {
 	keyBuf->Des().CopyLC(key);
 
 	//if the key is already present, comma-combine the values.
-	const TDesC8* oldValue = mResponseHeaders.FindL(*keyBuf);
+	const TDesC8* oldValue = mResponseHeaders.find(*keyBuf);
 	if(oldValue != NULL) {
 		LOGS("Combined!\n");
 		//value = itr->second + ", " + value;
@@ -777,10 +777,10 @@ void CHttpConnection::HeaderLineHandlerL(const TDesC8& line) {
 		combPtr.Append(*oldValue);
 		combPtr.Append(KCommaSpace);
 		combPtr.Append(value);
-		mResponseHeaders.EraseL(*keyBuf);
-		mResponseHeaders.InsertL(*keyBuf, combPtr);
+		mResponseHeaders.erase(*keyBuf);
+		mResponseHeaders.insert(*keyBuf, combPtr);
 	} else {
-		mResponseHeaders.InsertL(*keyBuf, value);
+		mResponseHeaders.insert(*keyBuf, value);
 	}
 }
 
@@ -815,16 +815,16 @@ void CHttpConnection::SetRequestHeaderL(const TDesC8& key, const TDesC8& value) 
 	TCleaner<HBufC8> buf(HBufC8::NewLC(key.Length()));
 	buf->Des().CopyLC(key);
 
-	if(mRequestHeaders.FindL(*buf))
-		mRequestHeaders.EraseL(*buf);
-	mRequestHeaders.InsertL(*buf, value);
+	if(mRequestHeaders.find(*buf))
+		mRequestHeaders.erase(*buf);
+	mRequestHeaders.insert(*buf, value);
 }
 const TDesC8* CHttpConnection::GetResponseHeaderL(const TDesC8& key) const {
 	//lower-case
 	TCleaner<HBufC8> buf(HBufC8::NewLC(key.Length()));
 	buf->Des().CopyLC(key);
 
-	return mResponseHeaders.FindL(*buf);
+	return mResponseHeaders.find(*buf);
 }
 
 //******************************************************************************
@@ -874,14 +874,14 @@ int Syscall::httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& con
 		}
 	}
 	TPtrC8 hostname(parturl.Left(hostname_length));
-	conn = new (ELeave) CHttpConnection(gSocketServ, method, port);
+	conn = new (ELeave) CHttpConnection(gSocketServ, method, port, gHttpStringPool);
 	CleanupStack::PushL(conn);
 	conn->ConstructL(hostname, path);
 	return 1;
 }
 
 CHttpConnection& Syscall::GetHttp(MAHandle conn) {
-	CConnection* cc = gConnections.FindL(conn);
+	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	CHttpConnection* http = cc->http();
 	MYASSERT(http, ERR_CONN_NOT_HTTP);
@@ -899,7 +899,7 @@ _LIT8(KBtspp, "btspp://");
 SYSCALL(MAHandle, maConnect(const char* url)) {
 	TPtrC8 urlP(CBP url, SYSCALL_THIS->ValidatedStrLen(url));
 	LOGST("Connect %i %s", gConnNextHandle, url);
-	if(gConnections.Size() >= CONN_MAX)
+	if(gConnections.size() >= CONN_MAX)
 		return CONNERR_MAX;
 
 	CConnection* conn;
@@ -975,7 +975,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		return CONNERR_URL;
 	}
 	CleanupStack::PushL(conn);
-	gConnections.InsertL(gConnNextHandle, conn);
+	gConnections.insert(gConnNextHandle, conn);
 	CleanupStack::Pop(conn);
 	conn->state |= CONNOP_CONNECT;
 	return gConnNextHandle++;
@@ -983,9 +983,9 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 
 SYSCALL(void, maConnClose(MAHandle conn)) {
 	LOGST("ConnClose %i", conn);
-	MYASSERT(gConnections.FindL(conn) != NULL, ERR_CONN_HANDLE_INVALID);
+	MYASSERT(gConnections.find(conn) != NULL, ERR_CONN_HANDLE_INVALID);
 	CancelConnOps(conn);
-	gConnections.EraseL(conn);
+	gConnections.erase(conn);
 }
 
 SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
@@ -1050,7 +1050,7 @@ SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
 
 SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {
 	LOGST("ConnRead %i 0x%08X %i\n", conn, dst, size);
-	CConnection* cc = gConnections.FindL(conn);
+	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	SYSCALL_THIS->ValidateMemRange(dst, size);
 	MYASSERT((cc->state & CONNOP_READ) == 0, ERR_CONN_ALREADY_READING);
@@ -1060,7 +1060,7 @@ SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {
 
 SYSCALL(void, maConnWrite(MAHandle conn, const void* src, int size)) {
 	LOGST("ConnWrite %i 0x%08X %i\n", conn, src, size);
-	CConnection* cc = gConnections.FindL(conn);
+	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	SYSCALL_THIS->ValidateMemRange(src, size);
 	MYASSERT((cc->state & CONNOP_WRITE) == 0, ERR_CONN_ALREADY_WRITING);
@@ -1075,7 +1075,7 @@ SYSCALL(void, maConnReadToData(MAHandle conn, MAHandle data, int offset, int siz
 	MYASSERT(size > 0, ERR_DATA_OOB);
 	MYASSERT(offset + size > 0, ERR_DATA_OOB);
 
-	CConnection* cc = gConnections.FindL(conn);
+	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	MYASSERT((cc->state & CONNOP_READ) == 0, ERR_CONN_ALREADY_READING);
 
@@ -1099,7 +1099,7 @@ SYSCALL(void, maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int 
 	MYASSERT(size > 0, ERR_DATA_OOB);
 	MYASSERT(offset + size > 0, ERR_DATA_OOB);
 
-	CConnection* cc = gConnections.FindL(conn);
+	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	MYASSERT((cc->state & CONNOP_WRITE) == 0, ERR_CONN_ALREADY_WRITING);
 
@@ -1119,7 +1119,7 @@ SYSCALL(void, maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int 
 SYSCALL(MAHandle, maHttpCreate(const char* url, int method)) {
 	TPtrC8 urlP(CBP url, SYSCALL_THIS->ValidatedStrLen(url));
 	LOGST("HttpCreate %i %i %s", gConnNextHandle, method, url);
-	if(gConnections.Size() >= CONN_MAX)
+	if(gConnections.size() >= CONN_MAX)
 		return CONNERR_MAX;
 	CHttpConnection* conn;
 	if(SSTREQ(urlP, KHttp)) {
@@ -1130,7 +1130,7 @@ SYSCALL(MAHandle, maHttpCreate(const char* url, int method)) {
 		return CONNERR_URL;
 	}
 	CleanupStack::PushL(conn);
-	gConnections.InsertL(gConnNextHandle, conn);
+	gConnections.insert(gConnNextHandle, conn);
 	CleanupStack::Pop(conn);
 	return gConnNextHandle++;
 }

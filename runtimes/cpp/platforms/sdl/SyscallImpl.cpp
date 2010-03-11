@@ -1429,46 +1429,6 @@ namespace Base {
 		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del))
-	{
-		StoreItr itr = gStores.find(store);
-		MYASSERT(itr != gStores.end(), ERR_STORE_HANDLE_INVALID);
-		const char *filename = itr->second.c_str();
-		if(del)
-		{
-	#ifdef _WIN32
-			BOOL ret = DeleteFile(filename);
-			if(!ret)
-			{
-				DWORD error = GetLastError();
-
-				if(error==ERROR_FILE_NOT_FOUND)
-				{
-					LOG("maCloseStore: %s not found\n", filename);
-					BIG_PHAT_ERROR(WINERR_STORE_FILE_NOT_FOUND);
-				}
-				else if(error==ERROR_ACCESS_DENIED)
-				{
-					LOG("maCloseStore: %s access denied\n", filename);
-					BIG_PHAT_ERROR(WINERR_STORE_ACCESS_DENIED);
-				}
-				else
-				{
-					LOG("maCloseStore: %s error %i\n", filename, (int)error);
-					BIG_PHAT_ERROR(WINERR_STORE_DELETE_FAILED);
-				}
-			}
-	#else
-			int res = remove(filename);
-			if(res != 0) {
-				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
-				DEBIG_PHAT_ERROR;
-			}
-	#endif
-		}
-		gStores.erase(itr);
-	}
-
 	SYSCALL(int, maGetEvent(MAEvent* dst)) {
 		CHECK_INT_ALIGNMENT(dst);
 		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));

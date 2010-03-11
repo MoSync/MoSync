@@ -293,13 +293,13 @@ public:
 	}
 
 	virtual ~ContactItem() {
-		mFieldMap.Close();
+		mFieldMap.close();
 		if(mItem)
 			delete mItem;
 	}
 
 	int count() const {
-		return 1 + mHasAddr + mHasName + mFieldMap.Size();
+		return 1 + mHasAddr + mHasName + mFieldMap.size();
 	}
 
 	int fieldId(int index) const {
@@ -317,9 +317,9 @@ public:
 				return MA_PIM_FIELD_CONTACT_NAME;
 			i++;
 		}
-		HashMap<MoSyncField>::TIteratorC itr = mFieldMap.Begin();
-		while(itr.HasMore()) {
-			const HashMap<MoSyncField>::Pair& p(itr.Next());
+		HashMap<MoSyncField>::TIteratorC itr = mFieldMap.begin();
+		while(itr.hasMore()) {
+			const HashMap<MoSyncField>::Pair& p(itr.next());
 			if(i == index) {
 				return p.key;
 			}
@@ -338,7 +338,7 @@ public:
 		if(field == MA_PIM_FIELD_CONTACT_NAME) {
 			return mHasName;
 		}
-		const MoSyncField* mf = mFieldMap.FindL(field);
+		const MoSyncField* mf = mFieldMap.find(field);
 		if(mf == NULL) {
 			return 0;
 		}
@@ -357,7 +357,7 @@ public:
 			MYASSERT(mHasName, ERR_MISSING_PIM_FIELD);
 			return 0;
 		}
-		const MoSyncField* mf = mFieldMap.FindL(field);
+		const MoSyncField* mf = mFieldMap.find(field);
 		MYASSERT(mf != NULL, ERR_MISSING_PIM_FIELD);
 		MYASSERT(index >= 0 && index < mf->values.Count(), ERR_INVALID_PIM_VALUE_INDEX);
 		return mf->values[index].attr;
@@ -379,7 +379,7 @@ public:
 			return getStringArray(buf, bufSize, index, mHasName, mName, NAME_NUM);
 		}
 
-		const MoSyncField* mf = mFieldMap.FindL(field);
+		const MoSyncField* mf = mFieldMap.find(field);
 		MYASSERT(mf != NULL, ERR_MISSING_PIM_FIELD);
 		MYASSERT(index >= 0 && index < mf->values.Count(), ERR_INVALID_PIM_VALUE_INDEX);
 		const CContactItemFieldSet& fs(mItem->CardFields());
@@ -580,10 +580,10 @@ private:
 			mName[arrayIndex] = fieldIndex;
 			mHasName = 1;
 		} else {
-			MoSyncField* f = mFieldMap.FindL(mosyncFieldType);
+			MoSyncField* f = mFieldMap.find(mosyncFieldType);
 			if(f == NULL) {
 				f = new (ELeave) MoSyncField();
-				mFieldMap.InsertL(mosyncFieldType, f);
+				mFieldMap.insert(mosyncFieldType, f);
 			}
 			MoSyncValue v = { attr, fieldIndex };
 			f->values.AppendL(v);
@@ -684,12 +684,12 @@ void Syscall::pimInit() {
 }
 
 void Syscall::pimClose() {
-	mPimItems.Close();
-	mPimLists.Close();
+	mPimItems.close();
+	mPimLists.close();
 }
 
 PimItem* Syscall::pimGetItem(MAHandle h) {
-	PimItem* pi = mPimItems.FindL(h);
+	PimItem* pi = mPimItems.find(h);
 	MYASSERT(pi != NULL, ERR_INVALID_PIM_HANDLE);
 	return pi;
 }
@@ -709,20 +709,20 @@ MAHandle Syscall::maPimListOpen(int listType) {
 	} else {
 		return -2;
 	}
-	mPimLists.InsertL(mPimListNextHandle, pl);
+	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;
 }
 MAHandle Syscall::maPimListNext(MAHandle list) {
-	PimList* pl = mPimLists.FindL(list);
+	PimList* pl = mPimLists.find(list);
 	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
 	PimItem* pi = pl->next();
 	if(pi == NULL)
 		return 0;
-	mPimItems.InsertL(mPimItemNextHandle, pi);
+	mPimItems.insert(mPimItemNextHandle, pi);
 	return mPimItemNextHandle++;
 }
 int Syscall::maPimListClose(MAHandle list) {
-	mPimLists.EraseL(list);
+	mPimLists.erase(list);
 	return 0;
 }
 
@@ -746,7 +746,7 @@ int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index) {
 }
 
 int Syscall::maPimFieldType(MAHandle list, int field) {
-	PimList* pl = mPimLists.FindL(list);
+	PimList* pl = mPimLists.find(list);
 	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
 	return pl->type(field);
 }
@@ -765,7 +765,7 @@ int Syscall::maPimItemGetValue(MA_PIM_ARGS* args, int index) {
 		GetValidatedMemRange((int)args->buf, args->bufSize), args->bufSize);
 }
 int Syscall::maPimItemClose(MAHandle item) {
-	mPimItems.EraseL(item);
+	mPimItems.erase(item);
 	return 0;
 }
 

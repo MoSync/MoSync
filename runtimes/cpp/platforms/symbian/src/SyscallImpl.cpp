@@ -496,7 +496,7 @@ void Syscall::platformDestruct() {
 
 	SAFE_DELETE(gVibraControl);
 	
-	gStoreMap.Close();
+	gStoreMap.close();
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");
@@ -1066,89 +1066,6 @@ SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height))
 		return RES_OUT_OF_MEMORY;
 	clr.pop();
 	return resources.add_RT_IMAGE(placeholder, img);;
-}
-
-SYSCALL(MAHandle, maOpenStore(const char* name, int flags)) {
-	MyRFs myrfs;
-	myrfs.Connect();
-#ifdef LOGGING_ENABLED
-	int res =
-#endif
-	FSS.MkDir(KMAStorePath16);
-	LOG("MkDir %i\n", res);
-
-	TPtrC8 nameDesC(CBP name);
-	TCleaner<HBufC8> path(HBufC8::NewLC(KMAStorePath8().Length() + nameDesC.Length() + 1));
-	path->Des().Append(KMAStorePath8);
-	path->Des().Append(nameDesC);
-	path->Des().Append(0);	//hack
-
-	FileStream readFile(CCP path->Ptr());
-	if(!readFile.isOpen()) {
-		if(flags & MAS_CREATE_IF_NECESSARY) {
-			WriteFileStream writeFile(CCP path->Ptr());
-			if(!writeFile.isOpen()) {
-				return STERR_GENERIC;
-			}
-		} else {
-			return STERR_NONEXISTENT;
-		}		
-	}
- 	gStoreMap.InsertL(gNextStoreId, *path);
-	return gNextStoreId++;
-}
-
-SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) {
-	const char* path = gStoreMap.FindL(store);
-	MyRFs myrfs;
-	myrfs.Connect();
-
-	WriteFileStream writeFile(path);
-	Stream* bp = resources.get_RT_BINARY(data);
-
-	int len;
-	MYASSERT(bp->length(len), ERR_DATA_ACCESS_FAILED);
-	TVolumeInfo vi;
-	LHEL(FSS.Volume(vi, EDriveC));
-	if(vi.iFree <= len + 10*1024) {	//magic number
-		return STERR_FULL;
-	}
-	if(!writeFile.writeFully(*bp)) {
-		return STERR_GENERIC;
-	}
-	return 1;
-}
-
-SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder))
-{
-	const char* path = gStoreMap.FindL(store);
-	MYASSERT(path != NULL, ERR_STORE_READ_FAILED);
-	MyRFs myrfs;
-	myrfs.Connect();
-
-	FileStream readFile(path);
-	int len;
-	MYASSERT(readFile.length(len), ERR_STORE_READ_FAILED);
-	Smartie<MemStream> p(new MemStream(len));
-	if(len != 0) {
-		if(!p->isOpen())
-			return RES_OUT_OF_MEMORY;
-		MYASSERT(readFile.readFully(*p), ERR_STORE_READ_FAILED);
-	}
-	return resources.add_RT_BINARY(placeholder, p.extract());
-}
-
-SYSCALL(void, maCloseStore(MAHandle store, int del))
-{
-	const char* path = gStoreMap.FindL(store);
-	MYASSERT(path != NULL, ERR_STORE_HANDLE_INVALID);
-	MyRFs myrfs;
-	myrfs.Connect();
-	if(del) {
-		TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(path));
-		LHEL(FSS.Delete(*desc));
-	}
-	gStoreMap.EraseL(store);
 }
 
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {

@@ -94,6 +94,7 @@ class Targets
 		end
 		default_const(:RELOAD, false)
 		default_const(:USE_NEWLIB, false)
+		default_const(:FULLSCREEN, HOST_PLATFORM == :moblin ? "true" : "false")
 	end
 	
 	def Targets.handle_arg(a)

@@ -247,6 +247,7 @@ int gConnNextHandle;
 HashMap<CConnection> gConnections;
 TDblQue<ConnOp> gConnOps;
 CActiveEnder* gConnCleanupQue;
+RStringPool gHttpStringPool;
 
 //TDblQue<ConnOp> gConnOpsWaitingForNetworkingStart;	//error; can't be in two Ques at once.
 //just a little inefficient, but since this is used only once,

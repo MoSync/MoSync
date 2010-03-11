@@ -4,7 +4,7 @@ module SdlCommon
 def setup_common
 	@EXTRA_INCLUDES = ["../../../base", ".."]
 	
-	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist"]
+	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist", "hashmap"]
 	@LOCAL_DLLS = ["amr"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
 	
@@ -21,7 +21,7 @@ def setup_common
 			@IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
 		end
 		
-		if(HOST_PLATFORM == :moblin)
+		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
 		
