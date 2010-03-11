@@ -774,7 +774,7 @@ public:
 void WRITE_REG(int reg, int value) {
 	if(reg == REG_sp) {
 		uint addr(value);
-		if(addr<STACK_TOP || addr>STACK_TOP) {
+		if(addr<STACK_BOTTOM || addr>STACK_TOP) {
 			BIG_PHAT_ERROR(ERR_STACK_OOB);
 		}
 	}
