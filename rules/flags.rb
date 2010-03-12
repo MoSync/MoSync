@@ -41,8 +41,8 @@ module FlagsChanged
 		#puts "Oldflags: #{@OLDFLAGS.inspect} newflags: #{@FLAGS.inspect}"
 		if(@OLDFLAGS != @FLAGS)
 			puts "Because the flags have changed:" if(log)
-			puts "Old: #{@OLDFLAGS}" if(log)
-			puts "New: #{@FLAGS}" if(log)
+			#puts "Old: #{@OLDFLAGS}" if(log)
+			#puts "New: #{@FLAGS}" if(log)
 			return true
 		end
 		return false

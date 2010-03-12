@@ -95,7 +95,7 @@ buildTemplate()
 	cd $path/../../../
 	if [ ! "$2" = "-noclean" ]; then
 		print_msg "Performing clean"
-			./workfile.rb clean CONFIG=""
+			./workfile.rb clean_more CONFIG=""
 		printf "\n%s\n" "OK"
 	fi
 

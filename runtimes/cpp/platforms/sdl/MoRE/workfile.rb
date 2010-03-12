@@ -26,6 +26,8 @@ work.instance_eval do
 	
 	@NAME = "moemu"
 	
+	@INSTALLDIR = ENV['MOSYNCDIR'] + '/bin'
+	
 	setup
 end
 

@@ -74,6 +74,13 @@ target :newlib => :base do
 	Work.invoke_subdirs(NEWLIB_DIRS)
 end
 
+target :clean_more do
+	verbose_rm_rf("build")
+	Work.invoke_subdirs(PRE_DIRS, "clean")
+	Work.invoke_subdir("tools/idl2", "clean")
+	Work.invoke_subdirs(MORE_DIRS, "clean")
+end
+
 target :clean do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
