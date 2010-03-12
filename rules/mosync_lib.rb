@@ -30,12 +30,13 @@ module MoSyncMod
 	
 	def copyHeaders
 		dir = mosync_include + "/" + @INSTALL_INCDIR
-		DirTask.new(self, dir).invoke
 		# create a bunch of CopyFileTasks, then invoke them all.
 		collect_headers(".h").each do |h|
 			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
-			task.invoke
+			#task.invoke
+			@prerequisites = [task] + @prerequisites
 		end
+		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
 	
 	private

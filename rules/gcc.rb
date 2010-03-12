@@ -45,7 +45,7 @@ class CompileGccTask < FileTask
 	def initialize(work, name, source, cflags)
 		super(work, name)
 		@SOURCE = source
-		@prerequisites = [source]
+		@prerequisites << source
 		
 		@DEPFILE = @work.genfile(source, ".mf")
 		@TEMPDEPFILE = @work.genfile(source, ".mft")
@@ -56,7 +56,7 @@ class CompileGccTask < FileTask
 		
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
-			@prerequisites = MakeDependLoader.load(@DEPFILE, @NAME)
+			@prerequisites += MakeDependLoader.load(@DEPFILE, @NAME)
 		end
 	end
 	

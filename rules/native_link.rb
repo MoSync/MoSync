@@ -23,7 +23,7 @@ class NativeGccLinkTask < FileTask
 	def initialize(work, name, objects)
 		super(work, name)
 		initFlags
-		@prerequisites = @objects = objects
+		@prerequisites += @objects = objects
 	end
 	
 	def needed?(log = true)

@@ -29,7 +29,7 @@ class PipeTask < FileTask
 		@FLAGS = linkflags
 		dirTask = DirTask.new(work, File.dirname(name))
 		@objects = objects
-		@prerequisites = @objects + [dirTask]
+		@prerequisites += @objects + [dirTask]
 	end
 	def execute
 		# pipe-tool may output an empty file and then fail.
@@ -54,7 +54,7 @@ class PipeResourceTask < PipeTask
 		
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
-			@prerequisites = MakeDependLoader.load(@depFile, @NAME)
+			@prerequisites += MakeDependLoader.load(@depFile, @NAME)
 		end
 	end
 	def needed?(log = true)

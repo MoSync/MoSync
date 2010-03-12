@@ -66,7 +66,7 @@ class TaskBase
 	end
 	LATE = LateTime.instance
 	
-	def initialize()
+	def initialize
 		@prerequisites = []
 	end
 	
@@ -85,16 +85,12 @@ end
 # Work also cooperates with the Target system.
 # Work is abstract; subclasses must define the setup and execute_clean methods.
 class Work < TaskBase
-	def initialize
-		@prerequisites = nil
-	end
-	
 	def invoke
 		#puts "Work.invoke: #{@NAME.inspect}"
 		
-		if(@prerequisites == nil) then
+		if(@prerequisites == []) then
 			setup
-			if(@prerequisites == nil)
+			if(@prerequisites == [])
 				error "setup failed"
 			end
 		end
@@ -165,7 +161,7 @@ class BuildWork < Work
 	def setup
 		#puts "BuildWork.setup: #{@NAME.inspect}"
 		set_defaults
-		@prerequisites = [DirTask.new(self, @BUILDDIR)]
+		@prerequisites << DirTask.new(self, @BUILDDIR)
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)
@@ -304,7 +300,7 @@ class CopyFileTask < FileTask
 	def initialize(work, name, src, preq = [])
 		super(work, name)
 		@src = src
-		@prerequisites = [src] + preq
+		@prerequisites += [src] + preq
 	end
 	def execute
 		puts "copy #{@src} #{@NAME}"

@@ -495,8 +495,6 @@ void Syscall::platformDestruct() {
 	gKeyLock.Close();
 
 	SAFE_DELETE(gVibraControl);
-	
-	gStoreMap.close();
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");
