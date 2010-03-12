@@ -120,7 +120,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #include "CbSync.h"
-#include "HashMap.h"
+#include "hashmap/hashmap.h"
 
 #ifdef __SERIES60_3X__
 #include "RSendAs_SMS.h"
