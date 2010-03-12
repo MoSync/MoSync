@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "hashmap.h"
 
 #define CONFIG_H	//hack
-#define LOGGING_ENABLED
+//#define LOGGING_ENABLED
 #include <helpers/helpers.h>
 
 #ifdef SYMBIAN
