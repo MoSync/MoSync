@@ -14,6 +14,7 @@ def setup_common
 		@LIBRARIES = ["wsock32", "ws2_32"]
 	elsif(HOST == :linux) then
 		@EXTRA_CPPFLAGS = ""
+		@IGNORED_FILES = []
 		if(SDL_SOUND)
 			sound_lib = [ "SDL_sound" ]
 		else
