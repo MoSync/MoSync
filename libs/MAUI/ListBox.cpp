@@ -255,7 +255,7 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
 
 			if(res) {
-				if(isDirty() && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && shouldDrawBackground) {
 					drawBackground();
 				}
 
@@ -307,7 +307,7 @@ namespace MAUI {
 
 			if(res) 
 			{
-				if(isDirty() && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && shouldDrawBackground) {
 					drawBackground();
 				}
 	
