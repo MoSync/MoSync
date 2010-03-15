@@ -550,6 +550,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="hashmap"
+			>
+			<File
+				RelativePath="..\..\..\..\intlibs\hashmap\hashmap.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\intlibs\hashmap\hashmap.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\config_platform.h"
 			>

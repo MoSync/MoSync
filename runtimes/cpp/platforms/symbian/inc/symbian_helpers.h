@@ -204,6 +204,10 @@ inline void* memset(void* dst, int c, uint len) {
 
 int unixTime(const TTime& tt);
 
+// returns 0 on success.
+int _mkdir(const char* name);
+int remove(const char* name);
+
 //***************************************************************************
 //Text conversion to/from unicode
 //***************************************************************************
@@ -262,6 +266,14 @@ inline HBufC8* CreateHBufC8FromCStringL(const char* str) {
 inline HBufC8* CreateHBufC8FromCStringLC(const char* str) {
 	TPtrC8 ptrc8(CBP str);
 	return CreateHBufC8FromDesC8LC(ptrc8);
+}
+
+inline void Append(TPtr16& ptr, const TDesC8& desc) {
+	int off = ptr.Length();
+	ptr.SetLength(ptr.Length() + desc.Length());
+	for(int i=0; i<desc.Length(); i++) {
+		ptr[off++] = desc[i];
+	}
 }
 
 
@@ -470,6 +482,7 @@ public:
 
 //***************************************************************************
 //A semi-smart pointer designed to PopAndDestroy itself when it goes out of scope.
+//Note: It does NOT PushL anything.
 //***************************************************************************
 
 template<class T> class TCleaner : public SmartieBase<T> {

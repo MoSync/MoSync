@@ -85,6 +85,7 @@ private:
 	com m(CCamera*, gCamera, NULL)\
 	com m(CameraState, gCameraState, CS_IDLE)\
 	com m(TRequestStatus*, gCameraStatus, NULL)\
+	com m(int, gFileListNextHandle, 1)\
 
 	INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
 	S60V2_INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
@@ -324,6 +325,8 @@ private:
 	void RestoreDrawTarget();
 
 	int gStartTime;
+	
+	HashMap<FileList> gFileLists;
 
 #ifdef	__SERIES60_3X__
 	TDblQue<CRSendAsSender> gSmsSenders;

@@ -177,6 +177,12 @@ class CDirScrAccEng;
 class CAppView;
 class PimItem;
 
+class FileList {
+public:
+	virtual ~FileList() {}
+	virtual int next(char* nameBuf, int bufSize) = 0;
+};
+
 namespace Core {
 	class VMCore;
 }

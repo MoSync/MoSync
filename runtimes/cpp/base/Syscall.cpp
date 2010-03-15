@@ -60,8 +60,6 @@ namespace Base {
 #endif	//RESOURCE_MEMORY_LIMIT
 
 #if !defined(SYMBIAN)
-
-#if !defined(_WIN32_WCE)
 	struct FileList {
 		std::vector<std::string> files;
 		size_t pos;
@@ -70,20 +68,7 @@ namespace Base {
 	typedef FileListMap::iterator FileListItr;
 	static FileListMap sFileListings;
 	static int sFileListNextHandle = 1;
-
-	//todo: delete all FileStreams on exit.
-	struct FileHandle {
-		FileStream* fs;
-		int mode;
-		std::string name;
-		bool isDirectory() const {
-			return name[name.size()-1] == '/';
-		}
-	};
-	typedef std::map<int, FileHandle> FileMap;
-	typedef FileMap::iterator FileItr;
-	static FileMap sFileHandles;
-	static int sFileNextHandle = 1;
+#endif	//SYMBIAN
 
 #ifdef EMULATOR
 #define FILESYSTEM_CHROOT 1
@@ -91,10 +76,10 @@ namespace Base {
 #else
 #define FILESYSTEM_CHROOT 0
 #endif	//EMULATOR
-#endif	//_WIN32_WCE
-#endif	//SYMBIAN
 
 	void Syscall::init() {
+		gStoreNextId = 1;
+		gFileNextHandle = 1;
 	}
 
 	Syscall::~Syscall() {
@@ -459,10 +444,7 @@ namespace Base {
 	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) 
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
-
-		if(!name) {
-			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
-		}
+		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
 
 		WriteFileStream writeFile(name);
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
@@ -479,10 +461,7 @@ namespace Base {
 	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder)) 
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
-
-		if(!name) {
-			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
-		}
+		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
 
 		FileStream readFile(name);
 		int len;
@@ -498,7 +477,7 @@ namespace Base {
 	SYSCALL(void, maCloseStore(MAHandle store, int del))
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
-		MYASSERT(!name, ERR_STORE_HANDLE_INVALID);
+		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
 		if(del)
 		{
 #ifdef SYMBIAN
@@ -604,23 +583,31 @@ namespace Base {
 		return res;
 	}
 
-#if !defined(SYMBIAN) && !defined(_WIN32_WCE)
-	MAHandle maFileOpen(const char* path, int mode) {
-		FileHandle fh;
+	MAHandle Syscall::maFileOpen(const char* path, int mode) {
+		Smartie<FileHandle> fhs(new FileHandle);
+		FileHandle& fh(*fhs);
 		fh.mode = mode;
+		int size;
+		const char* fn;
 #if FILESYSTEM_CHROOT
-		fh.name = std::string(FILESYSTEM_DIR) + path;
+		std::string name = std::string(FILESYSTEM_DIR) + path;
+		fn = name.c_str();
+		size = name.length() + 1;
 #else
-		fh.name = path;
+		fn = path;
+		size = strlen(path) + 1;
 #endif
+		fh.name.resize(size);
+		memcpy(fh.name, fn, size);
+		
 		fh.fs = NULL;
 		if(mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name.c_str()) == 0) {	//file exists and is not a directory
-				fh.fs = new WriteFileStream(fh.name.c_str());
+			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
+				fh.fs = new WriteFileStream(fh.name);
 			}
 		} else if((mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name.c_str()) == 0) {
-				fh.fs = new FileStream(fh.name.c_str());
+			if(isDirectory(fh.name) == 0) {
+				fh.fs = new FileStream(fh.name);
 			}
 		} else {
 			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
@@ -630,45 +617,48 @@ namespace Base {
 			fh.fs = NULL;
 			return MA_FERR_GENERIC;
 		}
-		sFileHandles.insert(std::pair<int, FileHandle>(sFileNextHandle, fh));
-		return sFileNextHandle++;
+		FileHandle* fhp = fhs.extract();
+		CLEANUPSTACK_PUSH(fhp);
+		gFileHandles.insert(gFileNextHandle, fhp);
+		CLEANUPSTACK_POP(fhp);
+		return gFileNextHandle++;
 	}
 
-	static FileHandle& getFileHandle(MAHandle file) {
-		FileItr itr = sFileHandles.find(file);
-		MYASSERT(itr != sFileHandles.end(), ERR_FILE_HANDLE_INVALID);
-		return itr->second;
+	Syscall::FileHandle& Syscall::getFileHandle(MAHandle file) {
+		FileHandle* fhp = gFileHandles.find(file);
+		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
+		return *fhp;
 	}
 
-	int maFileExists(MAHandle file) {
+	int Syscall::maFileExists(MAHandle file) {
 		FileHandle& fh(getFileHandle(file));
 		if(fh.fs)
 			return true;
-		return isDirectory(fh.name.c_str()) >= 0;
+		return isDirectory(fh.name) >= 0;
 	}
 
-	int maFileClose(MAHandle file) {
-		FileItr itr = sFileHandles.find(file);
-		MYASSERT(itr != sFileHandles.end(), ERR_FILE_HANDLE_INVALID);
-		FileHandle& fh(itr->second);
+	int Syscall::maFileClose(MAHandle file) {
+		FileHandle* fhp = gFileHandles.find(file);
+		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
+		FileHandle& fh(*fhp);
 		SAFE_DELETE(fh.fs);
-		sFileHandles.erase(itr);
+		gFileHandles.erase(file);
 		return 0;
 	}
 
-	int maFileCreate(MAHandle file) {
+	int Syscall::maFileCreate(MAHandle file) {
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
 		if(fh.fs) {
 			return MA_FERR_GENERIC;
 		}
 		if(fh.isDirectory()) {
-			int res = _mkdir(fh.name.c_str());
+			int res = _mkdir(fh.name);
 			if(res < 0)
 				return MA_FERR_GENERIC;
 			return 0;
 		} else {
-			fh.fs = new WriteFileStream(fh.name.c_str());
+			fh.fs = new WriteFileStream(fh.name);
 			if(!fh.fs->isOpen()) {
 				delete fh.fs;
 				fh.fs = NULL;
@@ -678,17 +668,17 @@ namespace Base {
 		}
 	}
 
-	int maFileDelete(MAHandle file) {
+	int Syscall::maFileDelete(MAHandle file) {
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
 		SAFE_DELETE(fh.fs);
-		int res = remove(fh.name.c_str());
+		int res = remove(fh.name);
 		if(res < 0)
 			return MA_FERR_GENERIC;
 		return 0;
 	}
 
-	int maFileSize(MAHandle file) {
+	int Syscall::maFileSize(MAHandle file) {
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			return MA_FERR_GENERIC;
@@ -706,7 +696,7 @@ namespace Base {
 	int maFileRename(MAHandle file, const char* newName);
 	int maFileTruncate(MAHandle file, int offset);
 
-	int maFileWrite(MAHandle file, const void* src, int len) {
+	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			return MA_FERR_GENERIC;
@@ -716,7 +706,7 @@ namespace Base {
 		return 0;
 	}
 
-	int maFileWriteFromData(const MA_FILE_DATA* args) {
+	int Syscall::maFileWriteFromData(const MA_FILE_DATA* args) {
 		FileHandle& fh(getFileHandle(args->file));
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
 		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
@@ -729,7 +719,7 @@ namespace Base {
 		return 0;
 	}
 
-	int maFileRead(MAHandle file, void* dst, int len) {
+	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			return MA_FERR_GENERIC;
@@ -739,7 +729,7 @@ namespace Base {
 		return 0;
 	}
 
-	int maFileReadToData(const MA_FILE_DATA* args) {
+	int Syscall::maFileReadToData(const MA_FILE_DATA* args) {
 		FileHandle& fh(getFileHandle(args->file));
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
 		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
@@ -752,7 +742,7 @@ namespace Base {
 		return 0;
 	}
 
-	int maFileTell(MAHandle file) {
+	int Syscall::maFileTell(MAHandle file) {
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.fs, ERR_FILE_CLOSED);
 		int pos;
@@ -762,7 +752,7 @@ namespace Base {
 		return pos;
 	}
 
-	int maFileSeek(MAHandle file, int offset, int whence) {
+	int Syscall::maFileSeek(MAHandle file, int offset, int whence) {
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.fs, ERR_FILE_CLOSED);
 		Seek::Enum mode;
@@ -794,7 +784,7 @@ namespace Base {
 
 	// if this is MoRE, the emulator,
 	// we'll put all filesystem access into a separate directory, like chroot.
-	MAHandle maFileListStart(const char* path, const char* filter) {
+	MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 		sFileList.files.clear();
 		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
@@ -838,7 +828,7 @@ namespace Base {
 		return sFileListNextHandle++;
 	}
 
-	int maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
+	int Syscall::maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
 		FileListItr itr = sFileListings.find(list);
 		MYASSERT(itr != sFileListings.end(), ERR_FILE_HANDLE_INVALID);
 		FileList& fl(itr->second);
@@ -852,13 +842,12 @@ namespace Base {
 		return name.size();
 	}
 
-	int maFileListClose(MAHandle list) {
+	int Syscall::maFileListClose(MAHandle list) {
 		FileListItr itr = sFileListings.find(list);
 		MYASSERT(itr != sFileListings.end(), ERR_FILE_HANDLE_INVALID);
 		sFileListings.erase(itr);
 		return 0;
 	}
-#endif	//SYMBIAN
 #endif	//SYMBIAN
 
 #ifdef SYMBIAN

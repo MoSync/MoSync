@@ -1875,48 +1875,50 @@ namespace Base {
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 		case maIOCtl_maFileOpen:
-			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
 		case maIOCtl_maFileExists:
-			return maFileExists(a);
+			return SYSCALL_THIS->maFileExists(a);
 		case maIOCtl_maFileClose:
-			return maFileClose(a);
+			return SYSCALL_THIS->maFileClose(a);
 		case maIOCtl_maFileCreate:
-			return maFileCreate(a);
+			return SYSCALL_THIS->maFileCreate(a);
 		case maIOCtl_maFileDelete:
-			return maFileDelete(a);
+			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
-			return maFileSize(a);
+			return SYSCALL_THIS->maFileSize(a);
 		/*case maIOCtl_maFileAvailableSpace:
-			return maFileAvailableSpace(a);
+			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
-			return maFileTotalSpace(a);
+			return SYSCALL_THIS->maFileTotalSpace(a);
 		case maIOCtl_maFileDate:
-			return maFileDate(a);
+			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileRename:
-			return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileTruncate:
-			return maFileTruncate(a, b);*/
+			return SYSCALL_THIS->maFileTruncate(a, b);*/
 
 		case maIOCtl_maFileWrite:
-			return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileWriteFromData:
-			return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
-			return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileReadToData:
-			return maFileReadToData(GVMRA(MA_FILE_DATA));
+			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
 		case maIOCtl_maFileTell:
-			return maFileTell(a);
+			return SYSCALL_THIS->maFileTell(a);
 		case maIOCtl_maFileSeek:
-			return maFileSeek(a, b, c);
+			return SYSCALL_THIS->maFileSeek(a, b, c);
+
 		case maIOCtl_maFileListStart:
-			return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileListNext:
-			return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileListClose:
-			return maFileListClose(a);
+			return SYSCALL_THIS->maFileListClose(a);
 
 		default:
 			return IOCTL_UNAVAILABLE;

@@ -4,7 +4,7 @@ module SdlCommon
 def setup_common
 	@EXTRA_INCLUDES = ["../../../base", ".."]
 	
-	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist", "hashmap"]
+	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist"]
 	@LOCAL_DLLS = ["amr"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
 	

@@ -214,6 +214,33 @@ void abort() {
 }
 #endif	//__WINS__
 
+int remove(const char* name) {
+	MyRFs myrfs;
+	myrfs.Connect();
+	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
+	return FSS.Delete(*desc);
+}
+int _mkdir(const char* name) {
+	MyRFs myrfs;
+	myrfs.Connect();
+	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
+	return FSS.MkDir(*desc);
+}
+
+extern "C" int isDirectory(const char* filename) {
+	MyRFs myrfs;
+	myrfs.Connect();
+	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(filename));
+	uint att;
+	int res = FSS.Att(*desc, att);
+	if(res < 0)
+		return res;
+	if((att & KEntryAttDir) != 0)
+		return 1;
+	else
+		return 0;
+}
+
 //***************************************************************************
 //Error handlers
 //***************************************************************************

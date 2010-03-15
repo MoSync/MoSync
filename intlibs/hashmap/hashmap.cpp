@@ -18,9 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <limits.h>
 #include <string.h>
 #include "hashmap.h"
-
-#define CONFIG_H	//hack
-//#define LOGGING_ENABLED
+#include "config_platform.h"
 #include <helpers/helpers.h>
 
 #ifdef SYMBIAN
@@ -28,14 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LOG_HASH(a...) LOGD(a)
 #define malloc User::AllocL
 #define free User::Free
-#define PUSH CleanupStack::PushL
-#define POPD CleanupStack::PopAndDestroy
-#define POP CleanupStack::Pop
 #else
 #define LOG_HASH LOGD
-#define PUSH(a)
-#define POPD(a)
-#define POP(a)
 #endif
 
 using namespace MoSyncError;
@@ -110,7 +102,8 @@ void HashMapBase::insert(int key, void* value, bool in_rehash) {
 		DEBUG_ASSERT(sizeof(BasePair) == 8);
 
 		//requested Size = (Length * sizeof)
-		m.base = (BasePair*)malloc(HASHMAP_BASE_SIZE * sizeof(BasePair));
+		m.baseLen = HASHMAP_BASE_SIZE;
+		m.base = (BasePair*)malloc(m.baseLen * sizeof(BasePair));
 
 		updateBaseLen();
 	}
@@ -155,7 +148,7 @@ void HashMapBase::rehash() {
 
 	DEBUG_ASSERT(sizeof(BasePair) == 8);
 	BasePair* oldBase = m.base;
-	PUSH(oldBase);
+	CLEANUPSTACK_PUSH(oldBase);
 	uint oldLen = m.baseLen;
 	uint oldNumElem = m.numElem;
 	m.baseLen <<= 1;
@@ -169,7 +162,7 @@ void HashMapBase::rehash() {
 			insert(pair.key, pair.value, true);
 		}			
 	}
-	POPD(oldBase);
+	CLEANUPSTACK_POPD(oldBase);
 	DEBUG_ASSERT(m.numElem == oldNumElem);
 }
 
@@ -273,10 +266,10 @@ void StringMap::dispose(BasePair& pair) {
 
 const char* StringMap::insert(int key, const char* s1, uint len) {
 	char* value = (char*)malloc(len + 1);
-	PUSH(value);
+	CLEANUPSTACK_PUSH(value);
 	memcpy(value, s1, len);
 	value[len] = 0;
 	HashMapBase::insert(key, value);
-	POP(value);
+	CLEANUPSTACK_POP(value);
 	return value;
 }

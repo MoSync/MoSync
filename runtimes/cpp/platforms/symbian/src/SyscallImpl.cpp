@@ -495,6 +495,8 @@ void Syscall::platformDestruct() {
 	gKeyLock.Close();
 
 	SAFE_DELETE(gVibraControl);
+	
+	gFileLists.close();
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");
@@ -1509,6 +1511,51 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maCameraSnapshot:
 		return maCameraSnapshot(a, b);
 
+	case maIOCtl_maFileOpen:
+		return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+
+	case maIOCtl_maFileExists:
+		return maFileExists(a);
+	case maIOCtl_maFileClose:
+		return maFileClose(a);
+	case maIOCtl_maFileCreate:
+		return maFileCreate(a);
+	case maIOCtl_maFileDelete:
+		return maFileDelete(a);
+	case maIOCtl_maFileSize:
+		return maFileSize(a);
+	/*case maIOCtl_maFileAvailableSpace:
+		return maFileAvailableSpace(a);
+	case maIOCtl_maFileTotalSpace:
+		return maFileTotalSpace(a);
+	case maIOCtl_maFileDate:
+		return maFileDate(a);
+	case maIOCtl_maFileRename:
+		return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+	case maIOCtl_maFileTruncate:
+		return maFileTruncate(a, b);*/
+
+	case maIOCtl_maFileWrite:
+		return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileWriteFromData:
+		return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+	case maIOCtl_maFileRead:
+		return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileReadToData:
+		return maFileReadToData(GVMRA(MA_FILE_DATA));
+
+	case maIOCtl_maFileTell:
+		return maFileTell(a);
+	case maIOCtl_maFileSeek:
+		return maFileSeek(a, b, c);
+
+	case maIOCtl_maFileListStart:
+		return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+	case maIOCtl_maFileListNext:
+		return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileListClose:
+			return maFileListClose(a);
+
 #ifdef __SERIES60_3X__	//todo: s60v2 implementation
 	case maIOCtl_maPimListOpen:
 		return maPimListOpen(a);
@@ -1545,6 +1592,143 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
+}
+
+//------------------------------------------------------------------------------
+// FileList
+//------------------------------------------------------------------------------
+
+class RootFileList : public FileList {
+private:
+	int mPos;
+public:
+	TDriveList mList;
+	
+	RootFileList() : mPos(0) {}
+	int next(char* nameBuf, int bufSize) {
+		while(mPos < KMaxDrives) {
+			if(mList[mPos] != 0) {
+				//we've got a drive.
+				if(bufSize >= 4) {
+					nameBuf[0] = 'A' + mPos;
+					nameBuf[1] = ':';
+					nameBuf[2] = '/';
+					nameBuf[3] = 0;
+					mPos++;
+				}
+				return 4;
+			}
+			mPos++;
+		}
+		return 0;
+	}
+};
+
+class DirFileList : public FileList {
+private:
+	int mPos;
+public:
+	CDir* mDir;
+	
+	DirFileList() : mPos(0), mDir(NULL) {}
+	~DirFileList() {
+		if(mDir)
+			delete mDir;
+	}
+	int next(char* nameBuf, int bufSize) {
+		if(mPos >= mDir->Count())
+			return 0;
+		const TEntry& e((*mDir)[mPos]);
+		int len = e.iName.Length();
+		if(e.IsDir()) {
+			len++;
+		}
+		if(len < bufSize) {
+			TPtr8 ptr((byte*)nameBuf, bufSize-1);
+			ptr.Copy(e.iName);
+			if(e.IsDir()) {
+				ptr.Append('/');
+			}
+			nameBuf[len] = 0;
+			mPos++;
+		}
+		return len;
+	}
+};
+
+static int translateFileListErrorCode(int sym) {
+	LOG("Error %i\n", sym);
+	switch(sym) {
+	case KErrPermissionDenied:
+		return MA_FERR_FORBIDDEN;
+	case KErrPathNotFound:
+		return MA_FERR_NOTFOUND;
+	default:
+		return MA_FERR_GENERIC;
+	}
+}
+
+MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
+	//LOG("maFileListStart(%s, %s)\n", path, filter);
+	TCleaner<FileList> fl(NULL);
+	MyRFs myrfs;
+	myrfs.Connect();
+	//LOG("connected\n");
+	if(path[0] == 0) {	//empty string
+		//list filesystem roots
+		Smartie<RootFileList> rfl(new RootFileList);
+		int res = FSS.DriveList(rfl->mList);
+		if(res < 0)
+			return translateFileListErrorCode(res);
+		fl = rfl.extract();
+	} else {
+		//list files in a directory
+		Smartie<DirFileList> dfl(new DirFileList);
+		//LOG("string hacking...\n");
+		TPtrC8 pathPtrC8(CBP path);
+		TPtrC8 filterPtrC8(CBP filter);
+		Smartie<HBufC16> desc(HBufC16::NewL(pathPtrC8.Length() + filterPtrC8.Length()));
+		TPtr16 des(desc->Des());
+		
+		//Append(des, pathPtrC8);
+		//gotta swap '/' to '\'
+		for(int i=0; i<pathPtrC8.Length(); i++) {
+			if(pathPtrC8[i] == '/')
+				des.Append('\\');
+			else
+				des.Append(pathPtrC8[i]);
+		}
+		
+		Append(des, filterPtrC8);
+		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
+		//LOG("GetDir '%S'\n", temp8());
+		int res = FSS.GetDir(des, KEntryAttMaskSupported, ESortNone, dfl->mDir);
+		//LOG("res: %i\n", res);
+		if(res < 0)
+			return translateFileListErrorCode(res);
+		//LOG("extract\n");
+		fl = dfl.extract();
+	}
+	//LOG("PushL\n");
+	CleanupStack::PushL(fl());
+	gFileLists.insert(gFileListNextHandle, fl());
+	//LOG("pop\n");
+	fl.pop();
+	//LOG("return\n");
+	return gFileListNextHandle++;
+}
+
+int Syscall::maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
+	FileList* flp = gFileLists.find(list);
+	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
+	return flp->next(nameBuf, bufSize);
+}
+
+int Syscall::maFileListClose(MAHandle list) {
+	FileList* flp = gFileLists.find(list);
+	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
+	gFileLists.erase(list);
+	return 0;
 }
 
 //------------------------------------------------------------------------------

@@ -16,7 +16,6 @@ else
 end
 
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
-	"intlibs/hashmap",
 	"intlibs/bluetooth",
 	"intlibs/gsm_amr",
 	"intlibs/net",

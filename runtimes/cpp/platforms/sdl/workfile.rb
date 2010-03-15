@@ -4,7 +4,7 @@ require File.expand_path('../../../../rules/native_mosync.rb')
 
 work = NativeMoSyncLib.new
 work.instance_eval do 
-	@SOURCES = [".", "./thread", "./Skinning", "../../base", "../../base/thread"]
+	@SOURCES = [".", "./thread", "./Skinning", "../../base", "../../base/thread", "../../../../intlibs/hashmap"]
 	@IGNORED_FILES = ["Image.cpp", "audio.cpp"]
 	common_includes = [".", "../../base"]
 	common_libraries = ["SDL", "SDLmain", "SDL_ttf"]
