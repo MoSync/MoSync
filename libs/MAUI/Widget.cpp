@@ -48,6 +48,9 @@ namespace MAUI {
 			paddingBottom(0),
 			paddingRight(0)
 		{
+		
+		skin = Engine::getSingleton().getDefaultSkin();
+		
 		if(parent) {
 			parent->add(this);
 		}
