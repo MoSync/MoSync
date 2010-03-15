@@ -42,7 +42,7 @@ static const int kNVideos = sizeof(kVideos) / sizeof(VIDEO);
 class MyMoblet : public Moblet, public TimerListener {
 private:
 	int mStartTime;
-	Handle mStream;
+	MAHandle mStream;
 	int mKeyDown;
 	int mKeyRight;
 	bool mTimerActive;
@@ -63,14 +63,14 @@ public:
 		return maGetMilliSecondCount() - mStartTime;
 	}
 	
-	void customEvent(const EVENT& event) {
+	void customEvent(const MAEvent& event) {
 		if(event.type == EVENT_TYPE_STREAM) {
-			STREAM_EVENT_DATA* sed = (STREAM_EVENT_DATA*)event.data;
+			MAStreamEventData* sed = (MAStreamEventData*)event.data;
 			printf("State %i.%i @ %i ms\n", sed->event, sed->result, getTime());
 			mPlaying = (sed->event == STREAMEVENT_LOADING_COMPLETE) && (sed->result >= 0);
 			if(sed->event == STREAMEVENT_PREPARE_COMPLETE) {
 				mFrame.top = mFrame.left = 0;
-				Extent e = maStreamVideoSize(mStream);
+				MAExtent e = maStreamVideoSize(mStream);
 				if(e < 0) {
 					printf("svs error %i\n", e);
 					int res = maStreamClose(mStream);
@@ -99,7 +99,7 @@ public:
 				mMoveSize = true;
 				if(mStream)
 				{
-					Extent e = maStreamVideoSize(mStream);
+					MAExtent e = maStreamVideoSize(mStream);
 					mFrame.width = EXTENT_X(e);
 					mFrame.height = EXTENT_Y(e);
 				}
