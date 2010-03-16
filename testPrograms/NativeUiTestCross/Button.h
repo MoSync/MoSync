@@ -10,11 +10,12 @@
 
 class Button : public Widget {
 public:
-	Button(int id, void *parent, char *str);
+	Button(int id, char *str);
 	~Button();
 	int getId();
 	void *getInstance();
 	void processEvent(const MAEvent &);
+	void build(int x, int y, int h, int l, void *f);
 
 };
 

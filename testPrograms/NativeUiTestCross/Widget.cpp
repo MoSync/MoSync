@@ -25,6 +25,10 @@ void Widget::processEvent(const MAEvent & e) {
 
 }
 
+void Widget::build(int x, int y, int h, int l, void *f) {
+
+}
+
 void Widget::addActionListener(ActionListener *a) {
 	actionListener=a;
 }

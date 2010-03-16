@@ -15,6 +15,7 @@ public:
 	int getId();
 	void *getInstance();
 	virtual void processEvent(const MAEvent &);
+	virtual void build(int x, int y, int h, int l, void *f);
 	void addActionListener(ActionListener *a);
 
 	bool operator < ( const Widget & ) const;
@@ -23,6 +24,9 @@ public:
 protected:
 	int myid;
 	void *me;
+
+	char *text;
+
 	ActionListener *actionListener;
 };
 

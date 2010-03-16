@@ -1,23 +1,13 @@
 #include "Button.h"
 
 
-Button::Button(int id, void *parent, char *str) {
+Button::Button(int id, char *str) {
 
 	myid=id;
+	text=str;
 
-	MAWidgetParameters buttonParams;
-	buttonParams.pParent=parent;
-	buttonParams.posX=30;
-	buttonParams.posY=30;
-	buttonParams.sizeX=100;//420;
-	buttonParams.sizeY=30;//60;
-	buttonParams.widgetID=id;
-	strncpy(buttonParams.buf, str, strlen(str) + 1);
-	MAWidgetHandle buttonHandle;
-	maWinMobileButton(&buttonParams, &buttonHandle);
-	me=buttonHandle.pWidget;
 
-	maAndroidAddButton(id, str);
+
 
 }
 
@@ -37,4 +27,20 @@ void Button::processEvent(const MAEvent & e) {
 	//if(e.hi_wparam==0) {
 		actionListener->onClick(e.lo_wparam);
 	//}
+}
+
+void Button::build(int x, int y, int h, int l, void *f) {
+	MAWidgetParameters buttonParams;
+	buttonParams.pParent=f;
+	buttonParams.posX=x;
+	buttonParams.posY=y;
+	buttonParams.sizeX=l;//420;
+	buttonParams.sizeY=h;//60;
+	buttonParams.widgetID=myid;
+	strncpy(buttonParams.buf, text, strlen(text) + 1);
+	MAWidgetHandle buttonHandle;
+	maWinMobileButton(&buttonParams, &buttonHandle);
+	me=buttonHandle.pWidget;
+
+	maAndroidAddButton(myid, text);
 }
