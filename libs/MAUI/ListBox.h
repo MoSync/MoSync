@@ -47,6 +47,7 @@ namespace MAUI {
 	  * followed by another, nested ListBox. Furthermore, the navigation is decoupled from input. For instance, it 
 	  * provides functions such as selectNextItem() rather than assuming that the way of doing this should always 
 	  * be done by pressing the "down" key.  
+	   * The widget draws its background by default, use setDrawBackground(false) to disable it.
 	  **/
 	class ListBox : public Widget, MAUtil::TimerListener, WidgetListener {
 	public:

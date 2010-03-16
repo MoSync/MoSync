@@ -18,6 +18,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WidgetSkin.h"
 #include <MAUtil/Graphics.h>
 
+namespace MAUtil {
+template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
+	return data.w | (data.h<<12) | (((int)data.type)<<24);
+}	
+}
+
 namespace MAUI {
 
 	WidgetSkin::WidgetSkin() :
@@ -124,7 +130,264 @@ namespace MAUI {
 		rebuildRects();
 	}
 
+	void WidgetSkin::drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint) {
+		maGetImageData(image, &data[dstPoint->x+dstPoint->y*scanLength], srcRect, scanLength);
+
+		/*
+		int *temp = new int[srcRect->width*srcRect->height];
+		maGetImageData(image, temp, srcRect, srcRect->width);
+		int *dst = &data[dstPoint->x+dstPoint->y*scanLength];
+		int *src = temp;
+		for(int i = 0; i < srcRect->height; i++) {
+			for(int j = 0; j < srcRect->width; j++) {
+				*dst++ = *src++;
+			}
+			dst+=(scanLength-srcRect->width);
+		}
+		delete temp;
+		*/
+
+
+	}
+
+	
+	int WidgetSkin::calculateNumTiles(int width, int height) {
+		int numTilesX = 0;
+		int numTilesY = 0;
+		if(top.width)
+			numTilesX = (width-(right.width+left.width))/top.width; 
+		
+		if(left.height)
+			numTilesY =  (height-(top.height+bottom.height))/left.height;
+		
+		int numTiles = numTilesX*numTilesY;
+		if(left.width)
+			numTiles += numTilesY;
+		if(right.width)
+			numTiles += numTilesY;
+		if(top.height)
+			numTiles += numTilesX;
+		if(bottom.height)
+			numTiles += numTilesX;	
+		return numTiles;
+	}
+	
+	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
+	/*
+	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
+		int totalPixelsInCache = numPixels;
+		for(int i = 0; i < cache.size(); i++) {
+			totalPixelsInCache += cache[i].w*cache[i].h;
+		}
+
+		int currentTime = maGetMilliSecondCount();
+		
+		while(totalPixelsInCache>DEFAULT_CACHE_THRESHOLD) {
+			int oldest = currentTime;
+			int index = -1;
+			for(int i = 0; i < cache.size(); i++) {
+				if(cache[i].lastUsed<oldest) {
+					oldest = cache[i].lastUsed;
+					index = i;
+				}
+			}
+			if(index == -1) break;
+			maDestroyObject(cache[index].image);
+			cache.remove(index);
+			totalPixelsInCache-=cache[index].w*cache[index].h;
+		}
+	}*/
+
+	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
+		int totalPixelsInCache = numPixels;
+		
+		HashMap<CacheKey, CacheElement>::Iterator iter = cache.begin();
+		while(iter != cache.end()) {
+			totalPixelsInCache += iter->first.w*iter->first.h;
+			iter++;
+		}
+
+		int currentTime = maGetMilliSecondCount();
+		
+		while(totalPixelsInCache>DEFAULT_CACHE_THRESHOLD) {
+			int oldest = currentTime;
+			//int index = -1;
+			iter = cache.begin();	
+			//for(int i = 0; i < cache.size(); i++) {
+			HashMap<CacheKey, CacheElement>::Iterator best = cache.end();
+			while(iter != cache.end()) {
+				if(iter->second.lastUsed<oldest) {
+					oldest = iter->second.lastUsed;
+					best = iter;
+				}
+				iter++;
+			}
+			if(best == cache.end()) break;
+			maDestroyObject(best->second.image);
+			cache.erase(best);
+			totalPixelsInCache-=iter->first.w*iter->first.h;
+		}
+	}
+	
 	void WidgetSkin::draw(int x, int y, int width, int height, eType type) {
+		MAHandle cached = 0;
+
+		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
+		int numTiles = calculateNumTiles(width, height);
+		if(numTiles<100) {
+			drawDirect(x, y, width, height, type);
+			return;
+		}
+		
+		// Do a cache lookup.
+		/*
+		for(int i = 0; i < cache.size(); i++) {
+			if(cache[i].h==height && cache[i].w==width && cache[i].type==type) {
+				cached = cache[i].image;
+				cache[i].lastUsed = maGetMilliSecondCount();
+				break;
+			}
+		}*/
+		CacheKey newKey = CacheKey(width, height, type);
+		HashMap<CacheKey, CacheElement>::Iterator cacheSearch = cache.find(newKey);
+				
+		// If we didn't find a cached widgetskin, let's generate one and save it in the cache.
+		if(cacheSearch == cache.end()) {
+			malloc_handler mh = set_malloc_handler(NULL);
+			int *data = new int[width*height];
+			if(!data) {
+				drawDirect(x, y, width, height, type);
+				return;		
+			}
+			set_malloc_handler(mh);
+			drawToData(data, 0, 0, width, height, type);
+			CacheElement cacheElem;
+
+			flushCacheUntilNewImageFits(width*height);	
+			
+			cacheElem.image = maCreatePlaceholder();
+			if(maCreateImageRaw(cacheElem.image,data,EXTENT(width,height),1)!=RES_OK) {
+				maPanic(1, "Could not create raw image");
+			}
+
+			delete data;
+			//cacheElem.w = width;
+			//cacheElem.h = height;
+			//cacheElem.type = type;
+			cacheElem.lastUsed = maGetMilliSecondCount();
+			cached = cacheElem.image;
+			
+//			cache.add(cacheElem);
+			cache.insert(newKey, cacheElem);
+		} else {
+			cached = cacheSearch->second.image;
+		}
+		
+		// Draw the cached widgetskin.
+		Gfx_drawImage(cached, x, y);
+	}
+
+	void WidgetSkin::drawToData(int *data, int x, int y, int width, int height, eType type) {
+		MAPoint2d dst;
+		MAPoint2d dst2;
+		MAHandle image;
+		switch(type) {
+			case SELECTED:
+				image = selectedImage;
+				break;
+			case UNSELECTED:
+				image = unselectedImage;
+				break;
+			default:
+				maPanic(0, "WidgetSkin::draw undefined drawing type");
+		}
+
+		if(image == 0) return;
+
+		// draw corners
+		dst.x = x; dst.y = y;
+		//maDrawImageRegion(image, &topLeft, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &topLeft, &dst);
+
+		dst.x = x; dst.y = y+height-bottomLeft.height;
+		//maDrawImageRegion(image, &bottomLeft, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &bottomLeft, &dst);
+
+		dst.x = x+width-topRight.width; dst.y = y;
+		//maDrawImageRegion(image, &topRight, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &topRight, &dst);
+
+		dst.x = x+width-bottomRight.width; dst.y = y+height-bottomRight.height;
+		//maDrawImageRegion(image, &bottomRight, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &bottomRight, &dst);
+
+		// draw middle
+		if(center.height && center.width) {
+		for(int j = y+top.height; j < y+height-bottom.height; j+=center.height) {
+			int h = center.height;
+			if(j+center.height>y+height-bottom.height) {
+				center.height -= (j+center.height)-(y+height-bottom.height);
+			} 
+			for(int i = x+left.width; i < x+width-right.width; i+=center.width) {
+				dst.x = i; dst.y = j;
+				int w = center.width;
+				if(i+center.width>x+width-right.width) {
+					center.width -= (i+center.width)-(x+width-right.width);
+				}
+				//maDrawImageRegion(image, &center, &dst, TRANS_NONE);
+				drawRegion(image, data, width, &center, &dst);
+
+				center.width = w;
+			}
+			center.height = h;
+		}
+		}
+
+		// draw borders
+		if(top.width) {
+		for(int i = x+left.width; i < x+width-right.width; i+=top.width) {
+				dst.x = i; dst.y = y;
+				dst2.x = i; dst2.y = y+height-bottom.height;
+
+				int w1 = top.width;
+				int w2 = bottom.width;
+				if(i+top.width>x+width-right.width) {
+					top.width -= (i+w1)-(x+width-right.width);
+					bottom.width -= (i+w1)-(x+width-right.width);
+				} 
+				//maDrawImageRegion(image, &top, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &bottom, &dst2, TRANS_NONE);
+				drawRegion(image, data, width, &top, &dst);
+				drawRegion(image, data, width, &bottom, &dst2);
+
+				top.width = w1;			
+				bottom.width = w2;
+		}
+		}
+
+		if(left.height) {
+		for(int i = y+top.height; i < y+height-bottom.height; i+=left.height) {
+				dst.x = x; dst.y = i;
+				dst2.x = x+width-right.width; dst2.y = i;
+
+				int w1 = left.height;
+				int w2 = right.height;
+				if(i+left.height>y+height-bottom.height) {
+					left.height -= (i+w1)-(y+height-bottom.height);
+					right.height -= (i+w1)-(y+height-bottom.height);
+				} 
+				//maDrawImageRegion(image, &left, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &right, &dst2, TRANS_NONE);
+				drawRegion(image, data, width, &left, &dst);
+				drawRegion(image, data, width, &right, &dst2);
+
+				left.height = w1;			
+				right.height = w2;
+		}
+		}
+	}
+
+	void WidgetSkin::drawDirect(int x, int y, int width, int height, eType type) {
 		MAPoint2d dst;
 		MAPoint2d dst2;
 		MAHandle image;

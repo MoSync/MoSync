@@ -1326,6 +1326,17 @@ namespace Base {
 			src->left + src->width <= surf->w &&
 			src->top + src->height <= surf->h, ERR_IMAGE_OOB);
 
+		/*
+		unsigned char *dst_ptr = (unsigned char*)dst;
+		unsigned char *src_ptr = (unsigned char*)surf->pixels;
+		src_ptr+=((src->left<<2)+src->top*surf->pitch);
+		for(int j = 0; j < src->height; j++) {
+			memcpy(dst_ptr, src_ptr, src->width<<2);
+			dst_ptr+=scanlength<<2;
+			src_ptr+=surf->pitch;
+		}
+		*/
+		
 		SDL_Surface* dstSurface = SDL_CreateRGBSurfaceFrom(dst, 
 			src->width, src->height, 32, scanlength<<2, 
 			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -1395,15 +1406,17 @@ namespace Base {
 		SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 		CHECK_INT_ALIGNMENT(src);
 
-		SDL_Surface* dst = SDL_CreateRGBSurface(SDL_SWSURFACE, EXTENT_X(size), EXTENT_Y(size), 32,
-			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+		SDL_Surface* dst = SDL_CreateRGBSurface(SDL_SWSURFACE|(alpha?SDL_SRCALPHA:0), EXTENT_X(size), EXTENT_Y(size), 32,
+			0x00ff0000, 0x0000ff00, 0x000000ff, (alpha?0xff000000:0));
 		if(dst==0) return RES_OUT_OF_MEMORY;
 
+/*
 		if(alpha) {
 			SDL_SetAlpha(dst, SDL_SRCALPHA, 0);
 		} else {
 			SDL_SetAlpha(dst, 0, 0);
 		}
+		*/
 
 		int width = EXTENT_X(size);
 		int height = dst->h;
@@ -1416,7 +1429,7 @@ namespace Base {
 			dptr+=dst->pitch;
 		}
 
-		return gSyscall->resources.add_RT_IMAGE(placeholder, dst);;
+		return gSyscall->resources.add_RT_IMAGE(placeholder, dst);
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {

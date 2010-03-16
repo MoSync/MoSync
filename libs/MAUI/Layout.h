@@ -26,6 +26,7 @@ namespace MAUI {
 
 	/** This widget is responsible for laying out its children in a grid. It also provides 
 	   *  navigation facilites within that grid,  so that the children can be selected and triggered.
+	   * The widget doesn't draw its background by default, use setDrawBackground(true) to enable it.
 	   **/
 
 	class Layout : public Widget, WidgetListener {

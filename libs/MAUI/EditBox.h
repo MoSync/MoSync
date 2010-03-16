@@ -49,6 +49,7 @@ namespace MAUI {
 	  * use it (when using the default behaviour it is then added as a keylistener to the system
 	  * and responds to all keypresses until it is deselected. Be sure to implement this behaviour
 	  * using a widgetlistener and the activate/deactivate functions if you are making a custom behaviour). 
+	  * See Label for more information.
 	  **/
 	class EditBox : 
 //		public Widget, CharInputListener, KeyListener {

@@ -21,12 +21,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MAHeaders.h"
 
 ImageScreen::ImageScreen(Screen *previous) : previous(previous) {
+
 	mainLayout = new Layout(0, 0, scrWidth, scrHeight, NULL, 1, 2);
 	Widget *softKeys = createSoftKeyBar(30, "", "back");
 	Image *image = new Image(0, 0, scrWidth, scrHeight-softKeys->getHeight(), NULL, false, false, RES_IMAGE);
 	image->setSkin(gSkin);
+	image->setDrawBackground(true);
 	mainLayout->add(image);
 	mainLayout->add(softKeys);
+
+	mainLayout->setSkin(NULL);
+	mainLayout->setDrawBackground(true);
+	mainLayout->setBackgroundColor(0);
+
 	this->setMain(mainLayout);
 }
 
