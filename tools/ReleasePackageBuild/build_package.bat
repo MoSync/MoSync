@@ -324,14 +324,6 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
-@echo hashmap
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\hashmap
-@vcbuild hashmap.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
 @echo gsm_amr
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\gsm_amr
