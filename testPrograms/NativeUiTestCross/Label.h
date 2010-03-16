@@ -10,10 +10,11 @@
 
 class Label : public Widget {
 public:
-	Label(int id, void *parent, char *str);
+	Label(char *str);
 	~Label();
 	int getId();
 	void *getInstance();
+	void build(int x, int y, int h, int l, void *f);
 };
 
 #endif

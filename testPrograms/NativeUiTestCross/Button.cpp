@@ -1,9 +1,9 @@
 #include "Button.h"
 
 
-Button::Button(int id, char *str) {
+Button::Button(char *str) {
 
-	myid=id;
+
 	text=str;
 
 

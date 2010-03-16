@@ -8,7 +8,7 @@
 
 class Frame : public Widget {
 public:
-	Frame(int id);
+	Frame();
 	~Frame();
 	int getId();
 	void *getInstance();

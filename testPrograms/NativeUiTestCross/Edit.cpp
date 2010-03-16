@@ -1,24 +1,27 @@
 #include "Edit.h"
 
-Edit::Edit(int id, void *parent, char *str) {
+Edit::Edit(char *str) {
 
-	myid=id;
 
+	text=str;
+
+
+}
+
+void Edit::build(int x, int y, int h, int l, void *f) {
 	MAWidgetParameters editParams;
-	editParams.pParent=parent;//mywin_out.hwnd;
-	editParams.posX=30;
-	editParams.posY=120;
-	editParams.sizeX=420;
-	editParams.sizeY=60;
-	editParams.widgetID=id;
-	strncpy(editParams.buf, str, strlen(str) + 1);
+	editParams.pParent=f;//mywin_out.hwnd;
+	editParams.posX=x;
+	editParams.posY=y;
+	editParams.sizeX=l;
+	editParams.sizeY=h;
+	editParams.widgetID=myid;
+	strncpy(editParams.buf, text, strlen(text) + 1);
 	MAWidgetHandle editHandle;
 	maWinMobileEdit(&editParams, &editHandle);
 	me=editHandle.pWidget;
 
-	maAndroidAddEditText(id, str);
-
-
+	maAndroidAddEditText(myid, text);
 }
 
 Edit::~Edit() {

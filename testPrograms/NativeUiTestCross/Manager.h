@@ -16,6 +16,7 @@ public:
   static Manager& Instance();
   void addWidget(Widget *w);
   void dispatch(const MAEvent &);
+  int getNextId();
 
 private:
   Manager();                                 // Private constructor
@@ -23,6 +24,7 @@ private:
   Manager(const Manager&);                 // Prevent copy-construction
   Manager& operator=(const Manager&);      // Prevent assignment
   MAUtil::Map<int, Widget*> map;
+  int generatedId;
 
 };
 

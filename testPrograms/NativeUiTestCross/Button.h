@@ -8,9 +8,10 @@
 #include "Widget.h"
 
 
+
 class Button : public Widget {
 public:
-	Button(int id, char *str);
+	Button(char *str);
 	~Button();
 	int getId();
 	void *getInstance();

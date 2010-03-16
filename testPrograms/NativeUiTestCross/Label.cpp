@@ -1,23 +1,27 @@
 #include "Label.h"
 
-Label::Label (int id, void *parent, char *str) {
+Label::Label (char *str) {
 
-	myid=id;
 
+	text=str;
+
+
+}
+
+void Label::build(int x, int y, int h, int l, void *f) {
 	MAWidgetParameters labelParams;
-	labelParams.pParent=parent;
-	labelParams.widgetID=id;
-	labelParams.posX=30;
-	labelParams.posY=210;
-	labelParams.sizeX=420;
-	labelParams.sizeY=60;
-	strncpy(labelParams.buf, str, strlen(str) + 1);
+	labelParams.pParent=f;
+	labelParams.widgetID=myid;
+	labelParams.posX=x;
+	labelParams.posY=y;
+	labelParams.sizeX=l;
+	labelParams.sizeY=h;
+	strncpy(labelParams.buf, text, strlen(text) + 1);
 	MAWidgetHandle labelHandle;
 	maWinMobileLabel(&labelParams, NULL);
 	me=labelHandle.pWidget;
 
-	maAndroidAddTextView(id, str);
-
+	maAndroidAddTextView(myid, text);
 }
 
 Label::~Label() {

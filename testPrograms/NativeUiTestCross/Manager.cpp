@@ -29,8 +29,9 @@ void Manager::dispatch(const MAEvent& e) {
 	Map<int, Widget*>::Iterator i = map.find(e.lo_wparam);
 
 	(*i).second->processEvent(e);
-
-
-
 }
 
+int Manager::getNextId() {
+	generatedId++;
+	return generatedId;
+}

@@ -2,7 +2,7 @@
 #include "Manager.h"
 
 Widget::Widget() {
-
+	myid=Manager::Instance().getNextId();
 }
 
 Widget::Widget(int id) {

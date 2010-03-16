@@ -10,10 +10,11 @@
 
 class Edit : public Widget {
 public:
-	Edit(int id, void *parent, char *str);
+	Edit(char *str);
 	~Edit();
 	int getId();
 	void *getInstance();
+	void build(int x, int y, int h, int l, void *f);
 
 };
 

@@ -1,20 +1,20 @@
 #include "Frame.h"
 
 
-Frame::Frame(int id) {
+Frame::Frame() {
 
-	myid=id;
+
 
 
 	MAWidgetParameters wp;
 	MAWidgetHandle handle;
 
 	wp.pParent=NULL;
-	wp.widgetID=id;
+	wp.widgetID=myid;
 	maWinMobileWindow(&wp, &handle);
 	me=handle.pWidget;
 
-	maAndroidStartActivity(id);
+	maAndroidStartActivity(myid);
 
 
 }
