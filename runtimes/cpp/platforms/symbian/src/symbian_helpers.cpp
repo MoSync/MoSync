@@ -226,6 +226,12 @@ int _mkdir(const char* name) {
 	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
 	return FSS.MkDir(*desc);
 }
+int _rmdir(const char* name) {
+	MyRFs myrfs;
+	myrfs.Connect();
+	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
+	return FSS.RmDir(*desc);
+}
 
 extern "C" int isDirectory(const char* filename) {
 	MyRFs myrfs;

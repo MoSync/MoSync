@@ -169,7 +169,7 @@ int maPimItemGetValue(MAAddress args, int index) {
 					writeWideStringRaw(arr[j], adr);
 					adr += arr[j].length()*2;
 				}
-				WSHORT(adr, 0);
+				WSHORT(adr, (short)0);
 				adr += 2;
 			}
 			return totSize;

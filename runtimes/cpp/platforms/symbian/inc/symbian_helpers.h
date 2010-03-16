@@ -206,6 +206,7 @@ int unixTime(const TTime& tt);
 
 // returns 0 on success.
 int _mkdir(const char* name);
+int _rmdir(const char* name);
 int remove(const char* name);
 
 //***************************************************************************

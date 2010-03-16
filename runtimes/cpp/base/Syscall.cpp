@@ -29,10 +29,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 
 #ifdef _WIN32_WCE
-//#include <windows.h>
+#include <windows.h>
 #include "wce_helpers.h"
 #include "wce_errors.h"
-#elif !defined(SYMBIAN)
+#endif	//_WIN32_WCE
+
+#if !defined(SYMBIAN)
+#include <vector>
 #include "helpers/mkdir.h"
 #endif	//_WIN32_WCE
 
@@ -599,7 +602,7 @@ namespace Base {
 #endif
 		fh.name.resize(size);
 		memcpy(fh.name, fn, size);
-		
+
 		fh.fs = NULL;
 		if(mode == MA_ACCESS_READ_WRITE) {
 			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
@@ -653,7 +656,15 @@ namespace Base {
 			return MA_FERR_GENERIC;
 		}
 		if(fh.isDirectory()) {
+#ifdef _WIN32_WCE
+			size_t len = strlen(fh.name);
+			WCHAR *unicode = new WCHAR[len];
+			convertAsciiToUnicode(unicode, len, fh.name);
+			int res = _wmkdir(unicode);
+			delete unicode;
+#else
 			int res = _mkdir(fh.name);
+#endif
 			if(res < 0)
 				return MA_FERR_GENERIC;
 			return 0;
@@ -672,7 +683,24 @@ namespace Base {
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
 		SAFE_DELETE(fh.fs);
-		int res = remove(fh.name);
+		int res;
+#ifdef _WIN32_WCE
+		size_t len = strlen(fh.name);
+		WCHAR *unicode = new WCHAR[len];
+		convertAsciiToUnicode(unicode, len, fh.name);
+		if(fh.isDirectory()) {
+			res = _wrmdir(unicode);
+		} else {
+			res = wremove(unicode);
+		}
+		delete unicode;
+#else
+		if(fh.isDirectory()) {
+			res = _rmdir(fh.name);
+		} else {
+			res = remove(fh.name);
+		}
+#endif
 		if(res < 0)
 			return MA_FERR_GENERIC;
 		return 0;
@@ -789,7 +817,7 @@ namespace Base {
 		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
 			//list filesystem roots
-#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__)
+#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__) || defined(_WIN32_WCE)
 			sFileList.files.push_back("/");
 #else
 #ifdef WIN32
@@ -803,7 +831,7 @@ namespace Base {
 				}
 			}
 #else
-#error list them roots!
+#error Unsupported platforms
 #endif	//WIN32
 #endif	//FILESYSTEM_CHROOT || defined(LINUX)
 		} else {

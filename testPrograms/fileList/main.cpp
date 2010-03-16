@@ -50,7 +50,7 @@ static char buffer[256];
 static bool dumpFileList(const char* path) {
 	MAHandle list = maFileListStart(path, "*");
 	if(list < 0) {
-		LPRINTFLN("Error %i", list);
+		LPRINTFLN("FLS error %i", list);
 		return false;
 	}
 	bool empty = true;

@@ -2676,7 +2676,53 @@ retry:
 		case maIOCtl_maLocationStop:
 			return maLocationStop();
 #endif
-	
+
+		case maIOCtl_maFileOpen:
+			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+
+		case maIOCtl_maFileExists:
+			return SYSCALL_THIS->maFileExists(a);
+		case maIOCtl_maFileClose:
+			return SYSCALL_THIS->maFileClose(a);
+		case maIOCtl_maFileCreate:
+			return SYSCALL_THIS->maFileCreate(a);
+		case maIOCtl_maFileDelete:
+			return SYSCALL_THIS->maFileDelete(a);
+		case maIOCtl_maFileSize:
+			return SYSCALL_THIS->maFileSize(a);
+		/*case maIOCtl_maFileAvailableSpace:
+			return SYSCALL_THIS->maFileAvailableSpace(a);
+		case maIOCtl_maFileTotalSpace:
+			return SYSCALL_THIS->maFileTotalSpace(a);
+		case maIOCtl_maFileDate:
+			return SYSCALL_THIS->maFileDate(a);
+		case maIOCtl_maFileRename:
+			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileTruncate:
+			return SYSCALL_THIS->maFileTruncate(a, b);*/
+
+		case maIOCtl_maFileWrite:
+			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileWriteFromData:
+			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
+		case maIOCtl_maFileRead:
+			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileReadToData:
+			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
+
+		case maIOCtl_maFileTell:
+			return SYSCALL_THIS->maFileTell(a);
+		case maIOCtl_maFileSeek:
+			return SYSCALL_THIS->maFileSeek(a, b, c);
+
+		case maIOCtl_maFileListStart:
+			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileListNext:
+			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileListClose:
+			return SYSCALL_THIS->maFileListClose(a);
+
 			/*
 		case maIOCtl_maWlanStartDiscovery:
 			return maWlanStartDiscovery();

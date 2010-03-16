@@ -700,7 +700,7 @@ public
 			return size;
 		int[] mem_ds = CORE.mMem_ds;
 		writeWideStringRaw(s, dst);
-		WSHORT(dst + size - 2, 0);
+		WSHORT(dst + size - 2, (short)0);
 		return size;
 	}
 
@@ -710,7 +710,7 @@ public
 		int address = dst;
 		int len = s.length();
 		for(int i=0; i<len; i++) {
-			WSHORT(address, s.charAt(i));
+			WSHORT(address, (short)s.charAt(i));
 			address += 2;
 		}
 	}
