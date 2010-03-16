@@ -36,9 +36,7 @@ public MCameraObserver
 #if defined(GUIDO) || defined(SUPPORT_AUDIOBUFFER)
 , public MMdaAudioOutputStreamCallback
 #endif
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING 
 , public MVideoLoadingObserver, public MVideoPlayerUtilityObserver
-#endif
 {
 private:
 #define DECLARE_INIT_VAR(type, name, val) type name;
@@ -146,7 +144,6 @@ private:
 	void LocationHandlerL(TInt status);
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	bool gStreamWantsToPause;
 
 	int maStreamVideoStart(const char* url);
@@ -170,7 +167,6 @@ private:
 	void MvpuoFrameReady(CFbsBitmap &aFrame, TInt aError);
 	void MvpuoPlayComplete(TInt aError);
 	void MvpuoEvent(const TMMFEvent &aEvent);
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 
 	void createCamera();
 	int maCameraFormatNumber();

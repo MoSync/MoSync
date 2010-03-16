@@ -185,11 +185,7 @@ namespace Base {
 #define GVMRA(type) GVMR(a, type)
 
 //Custom event handling
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)
-#else
-#define CUSTOM_EVENT_STREAM(m)
-#endif
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 #define CUSTOM_EVENT_LOCATION(m) m(EVENT_TYPE_LOCATION, MALocation)

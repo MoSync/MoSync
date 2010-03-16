@@ -372,11 +372,9 @@ void Syscall::StopEverything() {
 		gCamera->Release();
 	}
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	if(gVideoPlayer != NULL) {
 		gVideoPlayer->Close();
 	}
-#endif
 
 #ifdef MMF
 	if(gControllerEventMonitor)
@@ -1440,7 +1438,6 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	}
 #endif	//CALL
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	case maIOCtl_maStreamVideoStart: {
 		const char* url = SYSCALL_THIS->GetValidatedStr(a);
 		return maStreamVideoStart(url);
@@ -1469,7 +1466,6 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maStreamSetPos: {
 		return maStreamSetPos(a, b);
 	}
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 
 #ifdef SUPPORT_MOSYNC_SERVER
 	case maIOCtl_maLocationStart:
@@ -2441,7 +2437,6 @@ void Syscall::MaoscPlayComplete(TInt aError) {
 #endif
 
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 int Syscall::maStreamVideoStart(const char* url) {
 	MYASSERT(gStreamState == SS_IDLE, ERR_STREAM_TOO_MANY);
 	LOGT("maStartVideoStream %s", url);
@@ -2528,14 +2523,14 @@ int Syscall::maStreamLength(MAHandle stream) {
 	MYASSERT(gStreamState != SS_IDLE && stream == gStreamHandle, ERR_STREAM_HANDLE);
 	TTimeIntervalMicroSeconds d;
 	HANDLE_LEAVE(d = gVideoPlayer->, DurationL, ());
-	return (int)(d.Int64() / 1000);
+	return I64LOW(d.Int64() / 1000);
 }
 
 int Syscall::maStreamPos(MAHandle stream) {
 	MYASSERT(gStreamState != SS_IDLE && stream == gStreamHandle, ERR_STREAM_HANDLE);
 	TTimeIntervalMicroSeconds p;
 	HANDLE_LEAVE(p = gVideoPlayer->, PositionL, ());
-	return (int)(p.Int64() / 1000);
+	return I64LOW(p.Int64() / 1000);
 }
 
 int Syscall::maStreamSetPos(MAHandle stream, int pos) {
@@ -2559,14 +2554,14 @@ int Syscall::maStreamSetPos(MAHandle stream, int pos) {
 		gVideoPlayer->Play();
 		gStreamSetPosPausable = false;
 	}
-	return (int)(p.Int64() / 1000);
+	return I64LOW(p.Int64() / 1000);
 }
 
 
 void Syscall::AddStreamEvent(int event, int result) {
-	MAEVENT e;
+	MAEvent e;
 	e.type = EVENT_TYPE_STREAM;
-	STREAM_EVENT_DATA* sed = new (ELeave) STREAM_EVENT_DATA;
+	MAStreamEventData* sed = new (ELeave) MAStreamEventData;
 	sed->event = event;
 	sed->result = result;
 	//will be handled by GetEvent.
@@ -2649,4 +2644,3 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 		gStreamState = SS_ERROR;
 	}
 }
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING

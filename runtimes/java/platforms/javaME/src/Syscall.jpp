@@ -61,7 +61,7 @@ import javax.wireless.messaging.*;
 #include "generated\IX_STREAMING_CONSTS.h"
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 #include "generated\IX_STREAMING_CONSTS.h"
 #endif
 
@@ -217,7 +217,7 @@ IMPLEMENTS MoSync
 	Player mPlayer = null;
 	int mSoundVolume = 100;
 	
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING	
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI	
 	int mStreamState = SS_IDLE;
 	Player mStreamPlayer = null;
 	VideoControl mStreamVideoControl = null;
@@ -261,7 +261,7 @@ IMPLEMENTS MoSync
 		//maLocationStop();	//causes system dialog!
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 		// Streaming video
 		disposeStreamingVideo();
 #endif
@@ -1857,7 +1857,7 @@ public
 			return maAccept(a);
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 		case maIOCtl_maStreamVideoStart:
 			return maStreamVideoStart(readMemString(a));
 		case maIOCtl_maStreamClose:
@@ -2198,7 +2198,7 @@ public
 	}
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 
 	static final int SS_IDLE = 0;
 	static final int SS_OPENING = 1;
