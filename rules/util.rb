@@ -16,6 +16,9 @@
 
 require "#{File.dirname(__FILE__)}/error.rb"
 
+$stdout.sync = true
+$stderr.sync = true
+
 def default(constant, value)
 	s = ("if(defined?(@#{constant.to_s}) == nil) then @#{constant.to_s} = #{value.inspect} end")
 	eval(s)
