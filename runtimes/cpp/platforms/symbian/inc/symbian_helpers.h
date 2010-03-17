@@ -173,6 +173,7 @@ buffer.Format(_L8("In %s on line %d: Panic(%s);\n"), __FILE__, __LINE__,\
 
 #define LOG_FAILURE(a) { LOG("Failure %i ", a); IN_FILE_ON_LINE; }
 
+// Test Symbian No Return
 #define TSNR(a) { int test_s = (a); if(IS_SYMBIAN_ERROR(test_s)) LOG_FAILURE(test_s); }
 
 #define DUMP_RECT(name) LOG("%s %i,%i, %i,%i\n", #name,\

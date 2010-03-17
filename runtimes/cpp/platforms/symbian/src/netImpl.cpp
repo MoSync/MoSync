@@ -397,7 +397,7 @@ void Syscall::ConnOp::DoCancel() {
 	LOGS("SOC %i @ 0x%08X\n", sop.type, (uint)&sop);
 	switch(sop.type) {
 	case CSOC_StartNetworking:
-		LHEL(mSyscall.gConnection.Stop());
+		TSNR(mSyscall.gConnection.Stop());
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);
