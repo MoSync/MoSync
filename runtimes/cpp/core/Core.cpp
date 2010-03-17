@@ -668,10 +668,10 @@ public:
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
 
-		STACK_TOP = Head.DataSize - 16 - maxCustomEventSize;
+		STACK_TOP = Head.DataSize - maxCustomEventSize;
 		STACK_BOTTOM = STACK_TOP-Head.StackSize;
 
-		regs[REG_sp] = STACK_TOP;
+		regs[REG_sp] = STACK_TOP - 16;
 		regs[REG_i0] = Head.DataSize;
 		regs[REG_i1] = Head.StackSize;
 		regs[REG_i2] = Head.HeapSize;
