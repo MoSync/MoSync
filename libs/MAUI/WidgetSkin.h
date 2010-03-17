@@ -164,22 +164,21 @@ namespace MAUI {
 		struct CacheKey {
 			CacheKey() {
 			}
-			CacheKey(int width, int height, eType atype) : w(width), h(height), type(atype) {
+			CacheKey(WidgetSkin* s, int width, int height, eType atype) : skin(s), w(width), h(height), type(atype) {
 			}
 			
 			bool operator==(const CacheKey& c) const {
-				return (w==c.w && h==c.h && type==c.type);
+				return (skin==c.skin && w==c.w && h==c.h && type==c.type);
 			}
 			
 			bool operator<(const CacheKey& c) const {
-				return (w<c.w && h<c.h && type<c.type);
+				return (skin<c.skin && w<c.w && h<c.h && type<c.type);
 			}
-						
+					
+			WidgetSkin *skin;
 			int w, h;
 			eType type;	
 		};		
-		
-	private:
 	
 		struct CacheElement {
 			/*
@@ -193,10 +192,23 @@ namespace MAUI {
 			
 			// timestamp
 			int lastUsed;
-		};	
+		};		
+		
+
+		// in pixels.
+		static void setMaxCacheSize(int c);
+		
+		static void flushCacheUntilNewImageFits(int numPixels); 
+		static void flushCache();
+		static void addToCache(const CacheKey& key, const CacheElement& elem);
+		static MAHandle getFromCache(const CacheKey& key);
+		
+	private:
+		static int maxCacheSize;
+		
 		//Vector<CacheElement> cache;
-		HashMap<CacheKey, CacheElement> cache;
-		void flushCacheUntilNewImageFits(int numPixels); 
+		static HashMap<CacheKey, CacheElement> sCache;
+
 
 			
 		void rebuildRects();

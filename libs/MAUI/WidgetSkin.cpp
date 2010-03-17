@@ -19,9 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Graphics.h>
 
 namespace MAUtil {
-template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
-	return data.w | (data.h<<12) | (((int)data.type)<<24);
-}	
+	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
+		return THashFunction<int>(data.w | (data.h<<12) | (((int)data.type)<<24)) - THashFunction<int>((int)data.skin);
+	}	
 }
 
 namespace MAUI {
@@ -64,7 +64,7 @@ namespace MAUI {
 
 	void WidgetSkin::setSelectedImage(MAHandle image) {
 		this->selectedImage = image;
-		if(!selectedImage) return;//maPanic(0, "WidgetSkin::setSelectedImage argument image==null");
+		if(!selectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
 		
 		selectedImageWidth = EXTENT_X(imgSize);
@@ -88,7 +88,7 @@ namespace MAUI {
 
 	void WidgetSkin::setUnselectedImage(MAHandle image) {
 		this->unselectedImage = image;
-		if(!unselectedImage) return;//maPanic(0, "WidgetSkin::setUnselectedImage argument image==null");
+		if(!unselectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
 		
 		unselectedImageWidth = EXTENT_X(imgSize);
@@ -132,22 +132,6 @@ namespace MAUI {
 
 	void WidgetSkin::drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint) {
 		maGetImageData(image, &data[dstPoint->x+dstPoint->y*scanLength], srcRect, scanLength);
-
-		/*
-		int *temp = new int[srcRect->width*srcRect->height];
-		maGetImageData(image, temp, srcRect, srcRect->width);
-		int *dst = &data[dstPoint->x+dstPoint->y*scanLength];
-		int *src = temp;
-		for(int i = 0; i < srcRect->height; i++) {
-			for(int j = 0; j < srcRect->width; j++) {
-				*dst++ = *src++;
-			}
-			dst+=(scanLength-srcRect->width);
-		}
-		delete temp;
-		*/
-
-
 	}
 
 	
@@ -173,36 +157,19 @@ namespace MAUI {
 	}
 	
 	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
-	/*
-	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
-		int totalPixelsInCache = numPixels;
-		for(int i = 0; i < cache.size(); i++) {
-			totalPixelsInCache += cache[i].w*cache[i].h;
-		}
 
-		int currentTime = maGetMilliSecondCount();
+	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
+	int WidgetSkin::maxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
+	
+	void WidgetSkin::setMaxCacheSize(int c) {
+		maxCacheSize = c;
+	}
 		
-		while(totalPixelsInCache>DEFAULT_CACHE_THRESHOLD) {
-			int oldest = currentTime;
-			int index = -1;
-			for(int i = 0; i < cache.size(); i++) {
-				if(cache[i].lastUsed<oldest) {
-					oldest = cache[i].lastUsed;
-					index = i;
-				}
-			}
-			if(index == -1) break;
-			maDestroyObject(cache[index].image);
-			cache.remove(index);
-			totalPixelsInCache-=cache[index].w*cache[index].h;
-		}
-	}*/
-
 	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
 		int totalPixelsInCache = numPixels;
 		
-		HashMap<CacheKey, CacheElement>::Iterator iter = cache.begin();
-		while(iter != cache.end()) {
+		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
+		while(iter != sCache.end()) {
 			totalPixelsInCache += iter->first.w*iter->first.h;
 			iter++;
 		}
@@ -211,24 +178,37 @@ namespace MAUI {
 		
 		while(totalPixelsInCache>DEFAULT_CACHE_THRESHOLD) {
 			int oldest = currentTime;
-			//int index = -1;
-			iter = cache.begin();	
-			//for(int i = 0; i < cache.size(); i++) {
-			HashMap<CacheKey, CacheElement>::Iterator best = cache.end();
-			while(iter != cache.end()) {
+			iter = sCache.begin();	
+			HashMap<CacheKey, CacheElement>::Iterator best = sCache.end();
+			while(iter != sCache.end()) {
 				if(iter->second.lastUsed<oldest) {
 					oldest = iter->second.lastUsed;
 					best = iter;
 				}
 				iter++;
 			}
-			if(best == cache.end()) break;
+			if(best == sCache.end()) break;
 			maDestroyObject(best->second.image);
-			cache.erase(best);
+			sCache.erase(best);
 			totalPixelsInCache-=iter->first.w*iter->first.h;
 		}
 	}
 	
+	void WidgetSkin::flushCache() {
+		sCache.clear();
+	}
+			
+	void WidgetSkin::addToCache(const CacheKey& key, const CacheElement& elem) {
+		sCache.insert(key, elem);
+	}
+	
+	MAHandle WidgetSkin::getFromCache(const CacheKey& key) {
+		HashMap<CacheKey, CacheElement>::Iterator s = sCache.find(key);
+		if(s == sCache.end()) return 0;
+		else return s->second.image;
+		
+	}
+		
 	void WidgetSkin::draw(int x, int y, int width, int height, eType type) {
 		MAHandle cached = 0;
 
@@ -239,20 +219,12 @@ namespace MAUI {
 			return;
 		}
 		
-		// Do a cache lookup.
-		/*
-		for(int i = 0; i < cache.size(); i++) {
-			if(cache[i].h==height && cache[i].w==width && cache[i].type==type) {
-				cached = cache[i].image;
-				cache[i].lastUsed = maGetMilliSecondCount();
-				break;
-			}
-		}*/
-		CacheKey newKey = CacheKey(width, height, type);
-		HashMap<CacheKey, CacheElement>::Iterator cacheSearch = cache.find(newKey);
-				
+		CacheKey newKey = CacheKey(this, width, height, type);
+		cached =  getFromCache(newKey);
+		
 		// If we didn't find a cached widgetskin, let's generate one and save it in the cache.
-		if(cacheSearch == cache.end()) {
+		if(!cached) {
+			// set malloc handler to null so that we can catch if we're out of heap and write directly to the screen then.
 			malloc_handler mh = set_malloc_handler(NULL);
 			int *data = new int[width*height];
 			if(!data) {
@@ -271,16 +243,9 @@ namespace MAUI {
 			}
 
 			delete data;
-			//cacheElem.w = width;
-			//cacheElem.h = height;
-			//cacheElem.type = type;
 			cacheElem.lastUsed = maGetMilliSecondCount();
 			cached = cacheElem.image;
-			
-//			cache.add(cacheElem);
-			cache.insert(newKey, cacheElem);
-		} else {
-			cached = cacheSearch->second.image;
+			addToCache(newKey, cacheElem);
 		}
 		
 		// Draw the cached widgetskin.
