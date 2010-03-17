@@ -534,7 +534,7 @@ static uint32 SuperFastHash(const char * data, int len) {
 		hash  += hash >> 11;
 	}
 
-	/* MAHandle end cases */
+	/* Handle end cases */
 	switch (rem) {
 	case 3: hash += get16bits (data);
 		hash ^= hash << 16;

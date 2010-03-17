@@ -19,6 +19,7 @@ REM sh -c ./gendox.sh 2>&1 | tee log.txt
 cd ..\libs
 
 REM call copyHeaders.bat
+ruby workfile.rb
 
 copy Doxyfile %MOSYNCDIR%\include\
 cd %MOSYNCDIR%\include\

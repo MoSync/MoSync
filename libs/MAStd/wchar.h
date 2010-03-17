@@ -44,7 +44,7 @@ int wctomb(char* dst, wchar_t src);
 * \param dst A wide-char buffer, into which the converted string will be written.
 * Must be at least \a count characters long.
 * \param src The source UTF-8 string.
-* \param count The maximum number of characters that may be written to \dst,
+* \param count The maximum number of characters that may be written to \a dst,
 * including the terminating NUL.
 * \returns The number of characters converted, excluding the terminating NUL, or \< 0 on error.
 * If the return value equals \a count, the output was not NUL-terminated.
@@ -62,7 +62,7 @@ size_t mbstowcs(wchar_t* dst, const char* src, size_t count);
 * \param dst A buffer, into which the converted string will be written.
 * Must be at least \a count bytes long.
 * \param src The source wide-char string.
-* \param count The maximum number of bytes that may be written to \dst,
+* \param count The maximum number of bytes that may be written to \a dst,
 * including the terminating NUL.
 * \returns The number of bytes written, excluding the terminating NUL, or \< 0 on error.
 * If the return value equals \a count, the output was not NUL-terminated.

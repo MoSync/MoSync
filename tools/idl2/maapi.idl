@@ -1113,7 +1113,7 @@ interface MAAPI {
 		POINTER_DRAGGED = 10;
 
 #if IX_CALL
-		/// Has MAEvent::state be one of the \link CALLSTATE \endlink constants.
+		/// Has MAEvent::state be one of the \link #CALLSTATE_UNKNOWN CALLSTATE \endlink constants.
 		CALL = 11;
 #endif	//IX_CALL
 
@@ -1944,7 +1944,7 @@ interface MAAPI {
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		* \param path The absolute path to the file.
-		* \param mode The access mode. Either MA_ACCESS_READ or MA_ACCESS_READ_WRITE.
+		* \param mode The access mode. Either #MA_ACCESS_READ or #MA_ACCESS_READ_WRITE.
 		* \returns The new file handle, or \< 0 on error.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
@@ -2530,9 +2530,9 @@ interface MAAPI {
 			DATE = 2;
 			/// int
 			INT = 3;
-			/// wide-string '\0'
+			/// wide-string '\\0'
 			STRING = 4;
-			/// int (wide-string '\0')*
+			/// int (wide-string '\\0')*
 			/// the int specifies the number of strings.
 			/// there is no extra null terminator at the end of the list.
 			STRING_ARRAY = 5;
@@ -2543,8 +2543,8 @@ interface MAAPI {
 			ADDR = 100;
 			/// Date.
 			BIRTHDAY = 101;
-			/// Int. Access class. May be one of MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
-			/// MA_PIM_CONTACT_CLASS_PRIVATE, or MA_PIM_CONTACT_CLASS_PUBLIC.
+			/// Int. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
+			/// #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
 			CLASS = 102;
 			/// String.
 			EMAIL = 103;
@@ -2581,35 +2581,35 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_CONTACT_ {
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
 			ADDR_POBOX = 0;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Extra info.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
 			ADDR_EXTRA = 1;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
 			ADDR_STREET = 2;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
 			ADDR_LOCALITY = 3;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
 			ADDR_REGION = 4;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Postal code.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
 			ADDR_POSTALCODE = 5;
-			/// Index for MA_PIM_FIELD_CONTACT_ADDR. Country name.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
 			ADDR_COUNTRY = 6;
-			/// Index for MA_PIM_FIELD_CONTACT_NAME. Family name.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
 			NAME_FAMILY = 0;
-			/// Index for MA_PIM_FIELD_CONTACT_NAME. Given name.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
 			NAME_GIVEN = 1;
-			/// Index for MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
 			NAME_OTHER = 2;
-			/// Index for MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
 			NAME_PREFIX = 3;
-			/// Index for MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			NAME_SUFFIX = 4;
-			/// Value for MA_PIM_FIELD_CONTACT_CLASS.
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			CLASS_CONFIDENTIAL = 200;
-			/// Value for MA_PIM_FIELD_CONTACT_CLASS.
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			CLASS_PRIVATE = 201;
-			/// Value for MA_PIM_FIELD_CONTACT_CLASS.
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			CLASS_PUBLIC = 202;
 		}
 
@@ -2643,30 +2643,47 @@ interface MAAPI {
 			NATIVE_TYPE_MISMATCH = -2;
 		}
 
-		// returns a PimList handle, or \< 0 on error.
+		/** Opens a PimList. Use maPimListNext() to open the list's items.
+		* Returns a PimList handle, or \< 0 on error.
+		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
+		*/
 		MAHandle maPimListOpen(in int listType);
-		// returns a PimItem handle, or 0 if there are no more items.
+
+		/** Returns a handle to the next PimItem in the \a list, or 0 if there are no more items,
+		* or \< 0 on error.
+		*/
 		MAHandle maPimListNext(in MAHandle list);
 
-		//note: this does not close the list's items,
-		//but it does invalidate them,
-		//so that maPimItemClose() is the only function you can safely use on them.
-		//returns 0.
+		/** Closes a PimList.
+		* \note This does not close the list's items, but it does invalidate them,
+		* so that maPimItemClose() is the only function you can safely use on them.
+		* \returns 0.
+		*/
 		int maPimListClose(in MAHandle list);
 
-		// the number of fields in the item.
+		/** Returns the number of fields in the \a item.
+		*/
 		int maPimItemCount(in MAHandle item);
-		// the field id of the n:th field.
-		// panics on invalid indices.
+
+		/** Returns the field id of the item's n:th field.
+		* Panics on invalid indices.
+		* A field id is one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		*/
 		int maPimItemGetField(in MAHandle item, in int n);
-		// the number of values in the field for a given item.
-		// 0 if the field (does not exist / has no values) for this item.
+
+		/** Returns the number of values in the field for a given item.
+		* Returns 0 if the field (does not exist / has no values) for this item.
+		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
-		// returns the bitmask of attributes for the specified value in a field and item.
-		// panics on field+index combinations that don't exist in this item.
+
+		/** Returns the bitmask of attributes for the specified value in a field and item.
+		* Panics on field+index combinations that don't exist in this item.
+		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
-		// returns one of MA_PIM_TYPE_, or \< 0 if the field does not exist in the list.
+		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
+		* or \< 0 if the field does not exist in the list.
+		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
 		struct MA_PIM_ARGS {
@@ -2677,12 +2694,14 @@ interface MAAPI {
 		}
 		/**
 		* Copies the specified value from a field and item to \a args.buf.
+		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* \returns The number of bytes occupied by the value.
 		* If this number is greater than bufSize, the value is not written,
 		* and you'll have to allocate a bigger buffer and try again.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
+
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
 		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);
