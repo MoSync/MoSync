@@ -982,15 +982,14 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 
 	//copy color data
 	TBitmapUtil clrUtil(clr());
-	clrUtil.Begin(TPoint(0, 0));
 	for(int y=0; y<height; y++) {
+		clrUtil.Begin(TPoint(0, y));
 		for(int x=0; x<width; x++) {
-			clrUtil.SetPixel(srcInt[y*width + x] & 0xFFFFFF);	//uuh
-			clrUtil.IncXPos();	//wraps around for us
+			clrUtil.SetPixel(srcInt[y*width + x] & 0xFFFFFF);
+			clrUtil.IncXPos();
 		}
-		//clrUtil.IncYPos();	//not needed because of wrap
+		clrUtil.End();
 	}
-	clrUtil.End();
 
 	TCleaner<CFbsBitmap> aph(NULL);
 	if(alpha) {
@@ -1003,15 +1002,14 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 
 		//copy alpha data
 		TBitmapUtil alphaUtil(aph());
-		alphaUtil.Begin(TPoint(0, 0));
 		for(int y=0; y<height; y++) {
+			alphaUtil.Begin(TPoint(0, y));
 			for(int x=0; x<width; x++) {
-				alphaUtil.SetPixel(srcInt[y*width + x] >> 24);	//uuh
+				alphaUtil.SetPixel(srcInt[y*width + x] >> 24);
 				alphaUtil.IncXPos();
 			}
-			//alphaUtil.IncYPos();
+			alphaUtil.End();
 		}
-		alphaUtil.End();
 	}
 
 	//cleanup and store
