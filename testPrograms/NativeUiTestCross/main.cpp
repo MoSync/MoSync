@@ -31,11 +31,12 @@ public:
 		delete(button);
 		delete(button2);
 		delete(frame);
+		delete(frame2);
 	}
 
 	void onCreate (int id) {
 		if(id==frame->getId()) {
-			button = new Button("I am a button");
+			button = new Button("New frame");
 			Manager::Instance().addWidget(button);
 
 			button2 = new Button("I am a button");
@@ -60,10 +61,6 @@ public:
 	}
 	void onClick (int id) {
 		if(id==button->getId()) {
-			/*label2 = new Label("I am a Label too");
-			Manager::Instance().addWidget(label2);
-			l->addWidget(label2);
-			l->build();*/
 			frame2 = new Frame();
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
