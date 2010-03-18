@@ -5,6 +5,7 @@
 #include "Label.h"
 #include "Manager.h"
 #include "Layout.h"
+#include "MenuItem.h"
 
 
 class Main : public ActionListener {
@@ -17,6 +18,8 @@ private:
 	Label *label;
 	Label *label2;
 	Layout *l;
+	MenuItem *item;
+	MenuItem *item2;
 public:
 	Main() {
 		frame = new Frame();
@@ -57,10 +60,23 @@ public:
 
 			button->addActionListener(this);
 			button2->addActionListener(this);
+
+			item = new MenuItem("New frame", frame);
+			Manager::Instance().addWidget(item);
+			item->addActionListener(this);
+
+			item2 = new MenuItem("Useless", frame);
+			Manager::Instance().addWidget(item2);
+			item2->addActionListener(this);
 		}
 	}
 	void onClick (int id) {
 		if(id==button->getId()) {
+			frame2 = new Frame();
+			Manager::Instance().addWidget(frame2);
+			frame2->addActionListener(this);
+		}
+		if(id==item->getId()) {
 			frame2 = new Frame();
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);

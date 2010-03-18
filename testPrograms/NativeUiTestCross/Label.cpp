@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /**
  * Constructor
  *
- * @param str	Text to be shown on the button
+ * @param str	Text to be shown
  */
 Label::Label (char *str) {
 	text=str;

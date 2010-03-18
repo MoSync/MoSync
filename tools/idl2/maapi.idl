@@ -2670,7 +2670,7 @@ interface MAAPI {
 		int maWinMobileWindow(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maWinMobileButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maWinMobileEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
-		int maWinMobileMenuBar();
+		int maWinMobileMenuBar(in MAWidgetParameters wparameters);
 		int maWinMobileSetLeftButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maWinMobileAddRightMenuItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maWinMobileMessageBox(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);

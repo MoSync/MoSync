@@ -206,7 +206,7 @@ namespace Base {
 	g_szClassName[80]		= TEXT ("MoRE class");	// Main window class name
 	//---------------
 	//HWND g_hwndMb;
-	HMENU g_hMenu;
+	//HMENU g_hMenu;
 	
 	//--------------------------
 	extern CRITICAL_SECTION vibrationCS;
@@ -2459,13 +2459,19 @@ DWORD GetScreenOrientation()
 			WS_VISIBLE,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 			NULL,               
-			NULL,               
+			(HMENU)wparameters->widgetID,               
 			g_hInst,          
 			NULL);
 
 		// Create empty menu bar
 		SHMENUBARINFO mbi = {sizeof(SHMENUBARINFO), (HWND)whandle->pWidget, SHCMBF_EMPTYBAR , (UINT)0, g_hInst, 0, 0, 0, 0};
 		SHCreateMenuBar(&mbi);
+		
+		MAEvent event;
+		event.type = EVENT_TYPE_NATIVE_UI_MSG;
+		event.lo_wparam = wparameters->widgetID;
+		event.hi_wparam = 0;
+		gEventFifo.put(event);
 
 		return 0;
 
@@ -2473,11 +2479,15 @@ DWORD GetScreenOrientation()
 
 
 	static int maWinMobileButton(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		// convert ansi to unicode (char * to LPCWSTR)
+		BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+		MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+
 		if((wparameters->pParent)==NULL) {
 			//create button
 			whandle->pWidget = CreateWindow( 
 				L"BUTTON",   // Predefined class; Unicode assumed. 
-				L"OK",       // Button text. 
+				unicodestr,       // Button text. 
 				WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles. 
 				wparameters->posX,         // x position. 
 				wparameters->posY,         // y position. 
@@ -2492,7 +2502,7 @@ DWORD GetScreenOrientation()
 			//create button
 			whandle->pWidget = CreateWindow( 
 				L"BUTTON",   // Predefined class; Unicode assumed. 
-				L"OK",       // Button text. 
+				unicodestr,       // Button text. 
 				WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles. 
 				wparameters->posX,         // x position. 
 				wparameters->posY,         // y position. 
@@ -2504,11 +2514,15 @@ DWORD GetScreenOrientation()
 				NULL);      // Pointer not needed.
 		}
 				
-
-			return 0;
+		SysFreeString(unicodestr);
+		return 0;
 	}
 
 	static int maWinMobileEdit(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		// convert ansi to unicode (char * to LPCWSTR)
+		BSTR unicodestr = SysAllocStringLen(NULL, MA_NATIVE_UI_BUFFERSIZE);
+		MultiByteToWideChar(CP_ACP, 0, wparameters->buf, MA_NATIVE_UI_BUFFERSIZE, unicodestr, MA_NATIVE_UI_BUFFERSIZE);
+
 		if((wparameters->pParent)==NULL) {	
 			whandle->pWidget = CreateWindow(TEXT("EDIT"),      // predefined class 
                 NULL,        // no window title 
@@ -2531,7 +2545,9 @@ DWORD GetScreenOrientation()
                 g_hInst, 
                 NULL);       // pointer not needed
 		}
-			return 0;
+		SetDlgItemText((HWND)wparameters->pParent, wparameters->widgetID, unicodestr);
+		SysFreeString(unicodestr);
+		return 0;
 	}
 
 	static int maWinMobileLabel(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
@@ -2568,22 +2584,22 @@ DWORD GetScreenOrientation()
 
 
 
-	static int maWinMobileMenuBar() {
+	static int maWinMobileMenuBar(MAWidgetParameters *wparameters) {
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Right");
-			g_hMenu = CreateMenu();
-			//HMENU hMenu = CreateMenu();
-			InsertMenu(g_hMenu, 0, MF_BYPOSITION, IDOK, L"Left");
+			//g_hMenu = CreateMenu();
+			HMENU hMenu = CreateMenu();
+			InsertMenu(hMenu, 0, MF_BYPOSITION, IDOK, L"Exit");
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
 			HMENU hPopupRightMenu = CreatePopupMenu();
 			//InsertMenu(hPopupRightMenu, -1, MF_BYPOSITION, ID_CHANGE_TEXT, L"Change Left Text");
-			InsertMenu(g_hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Menu");
+			InsertMenu(hMenu, 1, MF_BYPOSITION|MF_POPUP, (UINT)hPopupRightMenu, L"Menu");
 
 			//HMENU hPopupLeftMenu = CreatePopupMenu();
 			//InsertMenu(g_hMenu, 0, MF_BYPOSITION|MF_POPUP, (UINT)hPopupLeftMenu, L"Left");
 			
 			//and now create the menu bar
-			SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), g_hwndMain/*(HWND)winparams->hwnd_parent*/, SHCMBF_HMENU , (UINT)g_hMenu, g_hInst, 0, 0, 0, 0};
+			SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), (HWND)wparameters->pParent, SHCMBF_HMENU , (UINT)hMenu, g_hInst, 0, 0, 0, 0};
 			SHCreateMenuBar(&mbi);
 			return 0;
 	}
@@ -2597,7 +2613,7 @@ DWORD GetScreenOrientation()
 			tbbit.cbSize = sizeof(tbbit);
 			tbbit.dwMask = TBIF_TEXT;
 			tbbit.pszText = unicodestr;
-			SendMessage (SHFindMenuBar(g_hwndMain), TB_SETBUTTONINFO, (UINT)IDOK, (LPARAM)&tbbit);
+			SendMessage (SHFindMenuBar((HWND)wparameters->pParent), TB_SETBUTTONINFO, (UINT)IDOK, (LPARAM)&tbbit);
 
 			SysFreeString(unicodestr);
 			return 0;
@@ -2611,7 +2627,7 @@ DWORD GetScreenOrientation()
 			TBBUTTONINFO tbbi = {0};
 			tbbi.cbSize = sizeof(tbbi);
 			tbbi.dwMask = TBIF_LPARAM;
-			SendMessage (SHFindMenuBar(g_hwndMain), TB_GETBUTTONINFO, (WPARAM)0, (LPARAM)&tbbi);
+			SendMessage (SHFindMenuBar((HWND)wparameters->pParent), TB_GETBUTTONINFO, (WPARAM)0, (LPARAM)&tbbi);
 			HMENU hPopupMenu = (HMENU)tbbi.lParam;
 			InsertMenu(hPopupMenu, -1, MF_BYPOSITION, wparameters->widgetID, unicodestr);
 			SysFreeString(unicodestr);
@@ -2994,7 +3010,7 @@ retry:
 		case maIOCtl_maWinMobileEdit:
 			return maWinMobileEdit(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 		case maIOCtl_maWinMobileMenuBar:
-			return maWinMobileMenuBar();
+			return maWinMobileMenuBar(GVMRA(MAWidgetParameters));
 		case maIOCtl_maWinMobileSetLeftButton:
 			return maWinMobileSetLeftButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 		case maIOCtl_maWinMobileAddRightMenuItem:

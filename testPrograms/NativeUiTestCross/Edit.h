@@ -40,7 +40,7 @@ public:
 	/**
 	 * Constructor
 	 *
-	 * @param str	Text to be shown on the button
+	 * @param str	Text to be shown
 	 */
 	Edit(char *str);
 

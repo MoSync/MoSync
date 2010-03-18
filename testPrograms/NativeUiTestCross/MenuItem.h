@@ -16,34 +16,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Frame.h
+ * MenuItem.h
  *
- *  Created on: Mar 15, 2010
- *      Author: Romain Chalant
+ *  Created on: Mar 18, 2010
+ *      Author: romain
  */
 
-#ifndef FRAME_H
-#define FRAME_H
+#ifndef MENUITEM_H_
+#define MENUITEM_H_
 
 #include <ma.h>
+#include <maassert.h>
+#include <mastring.h>
 #include <IX_NATIVE_UI.h>
 #include "Widget.h"
 
 /**
  * This class is an implementation of
- * a "frame" or "window"
+ * a menu item.
  */
-class Frame : public Widget {
+class MenuItem : public Widget {
 public:
 	/**
 	 * Constructor
+	 *
+	 * @param str		Text to be shown
+	 * @param frame		Pointer to the parent frame
 	 */
-	Frame();
+	MenuItem(char *str, Widget *frame);
 
 	/**
 	 * Destructor
 	 */
-	~Frame();
+	~MenuItem();
 
 	/**
 	 * Returns the widget's ID
@@ -51,16 +56,6 @@ public:
 	 * @return ID of the widget
 	 */
 	int getId();
-
-	/**
-	 * Returns the widget's instance INSIDE the runtime
-	 * (Used for Windows mobile).
-	 * You normally do not want to call it yourself !
-	 *
-	 * @return	Pointer to the widget instance inside the runtime:
-	 * 			This is dangerous !
-	 */
-	void *getInstance();
 
 	/**
 	 * Processes events sent by the Manager.
@@ -72,4 +67,4 @@ public:
 
 };
 
-#endif
+#endif /* MENUITEM_H_ */

@@ -16,38 +16,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Frame.cpp
+ * MenuItem.cpp
  *
- *  Created on: Mar 15, 2010
- *      Author: Romain Chalant
+ *  Created on: Mar 18, 2010
+ *      Author: romain
  */
 
-#include "Frame.h"
+#include "MenuItem.h"
 
 /**
  * Constructor
+ *
+ * @param str	Text to be shown
+ * @param frame		Pointer to the parent frame
  */
-Frame::Frame() {
-	MAWidgetParameters wp;
-	MAWidgetHandle handle;
+MenuItem::MenuItem(char *str, Widget *frame) {
+	text=str;
 
-	wp.pParent=NULL;
-	wp.widgetID=myid;
-	maWinMobileWindow(&wp, &handle);
-	me=handle.pWidget;
+	MAWidgetParameters itemParams;
 
-	maAndroidStartActivity(myid);
+	strncpy(itemParams.buf, text, strlen(text) + 1);
+	itemParams.widgetID=myid;
+	itemParams.pParent=frame->getInstance();
+	maWinMobileAddRightMenuItem(&itemParams, NULL);
 
-	MAWidgetParameters mp;
-	mp.pParent=me;
-	maWinMobileMenuBar(&mp);
-
+	maAndroidAddMenuItem(myid, text);
 }
 
 /**
  * Destructor
  */
-Frame::~Frame() {
+MenuItem::~MenuItem() {
 
 }
 
@@ -56,20 +55,8 @@ Frame::~Frame() {
  *
  * @return ID of the widget
  */
-int Frame::getId() {
+int MenuItem::getId() {
 	Widget::getId();
-}
-
-/**
- * Returns the widget's instance INSIDE the runtime
- * (Used for Windows mobile).
- * You normally do not want to call it yourself !
- *
- * @return	Pointer to the widget instance inside the runtime:
- * 			This is dangerous !
- */
-void *Frame::getInstance() {
-	Widget::getInstance();
 }
 
 /**
@@ -78,6 +65,8 @@ void *Frame::getInstance() {
  *
  * @param	MAEvent to be processed
  */
-void Frame::processEvent(const MAEvent &e) {
-	actionListener->onCreate(e.lo_wparam);
+void MenuItem::processEvent(const MAEvent & e) {
+	//if(e.hi_wparam==0) {
+		actionListener->onClick(e.lo_wparam);
+	//}
 }
