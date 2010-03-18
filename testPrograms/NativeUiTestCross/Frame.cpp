@@ -79,5 +79,7 @@ void *Frame::getInstance() {
  * @param	MAEvent to be processed
  */
 void Frame::processEvent(const MAEvent &e) {
-	actionListener->onCreate(e.lo_wparam);
+	if(e.hi_wparam==0) {
+		actionListener->onCreate(e.lo_wparam);
+	}
 }
