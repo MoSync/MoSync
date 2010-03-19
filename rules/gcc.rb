@@ -146,7 +146,9 @@ class GccWork < BuildWork
 		files.flatten!
 		files.reject! {|file| @IGNORED_FILES.member?(File.basename(file))}
 		files += @EXTRA_SOURCEFILES.select do |file| file.getExt == ending end
-		return files.collect do |file| FileTask.new(self, file) end
+		tasks = files.collect do |file| FileTask.new(self, file) end
+		extra_tasks = @EXTRA_SOURCETASKS.select do |file| file.to_s.getExt == ending end
+		return extra_tasks + tasks
 	end
 	
 	def getGccFlags(source)

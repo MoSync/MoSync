@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastring.h>
 
 #include "MTXml.h"
+#include "entities.h"
 
 //******************************************************************************
 // Declarations
@@ -45,10 +46,15 @@ struct ATTRIBUTE {
 //if any data was successfully processed, return the length of it.
 //remainsLen = 0;
 //if any data remains, set remainsLen to the length of it and set sCurPtr to the start of it.
-template<bool ent> static int proc(char* data, int* remainsLen);
+static int (*proc)(char* data, int* remainsLen, bool ent);
 
 //does processing, fires parseError on remain, returns length or PEC error.
-template<bool ent> static int procComplete(char* data);
+static int (*procComplete)(char* data, bool ent);
+
+//sets the above function pointers, enabling their use.
+//the purpose of this trick is to enable dead code elimination of
+//proc() and its dependencies.
+static void setProc();
 
 //returns a value >0 representing the reference on success.
 //returns <0 on failure.
@@ -59,12 +65,12 @@ static int parseRef(char* ref, int* pnBytes);
 //*pnBytes is valid on success and PEC_INCOMPLETE.
 static int convertUtf8ToLatin1(const char* utf8, int* pnBytes);
 
-template<bool process> static void parse();
+static void parse(bool process);
 static bool skipWhiteSpace();	//returns true if a non-whitespace character is found.
-template<bool process> static void parseOutsideTag();
-template<bool process> static void parseTagStart();
-template<bool process> static void parseInsideTag();
-template<bool process> static void parseCDATA();
+static void parseOutsideTag(bool process);
+static void parseTagStart(bool process);
+static void parseInsideTag(bool process);
+static void parseCDATA(bool process);
 static void parseSpecialTag();
 static void parseComment();
 
@@ -105,10 +111,10 @@ static int findString(const char* str);
 static int findNameEnd();	//tag or attr names
 
 static void fireEncoding(char* name);
-template<bool process> static void fireTagStart(char* name, int len);
-template<bool process> static void fireTagAttr(char* name, char* value);
-template<bool process> static void fireTagEnd(char* name, int len);
-template<bool utf8, bool ent> static void fireTagData(char* data, int len);
+static void fireTagStart(char* name, int len, bool process);
+static void fireTagAttr(char* name, char* value, bool process);
+static void fireTagEnd(char* name, int len, bool process);
+static void fireTagData(char* data, int len, bool utf8, bool ent);
 static void fireEmptyTagEnd();
 static void fireParseError();
 static void fireDataRemains(int len);	//reports len bytes starting at sCurPtr
@@ -131,125 +137,6 @@ static char* sLastBeginPtr;
 static char* sFirstPtr;
 static bool sStop;
 
-
-//******************************************************************************
-// Entities
-//******************************************************************************
-struct ENTITY {
-	const char* name;
-
-	//could be byte instead of int on IA32, but since PIP-E requires word alignment,
-	//we wouldn't save any space and would lose performance on Java machines.
-	int value;
-};
-
-//This is the Latin-1 subset of a combined HTML4.01/XML1.0 predefined entity set.
-static const ENTITY sEntities[] = {
-	{ "quot", 0x22 },
-	{ "amp", 0x26 },
-	{ "apos", 0x27 },
-	{ "lt", 0x3C },
-	{ "gt", 0x3E },
-	{ "nbsp", 0xA0 },
-	{ "iexcl", 0xA1 },
-	{ "cent", 0xA2 },
-	{ "pound", 0xA3 },
-	{ "curren", 0xA4 },
-	{ "yen", 0xA5 },
-	{ "brvbar", 0xA6 },
-	{ "sect", 0xA7 },
-	{ "uml", 0xA8 },
-	{ "copy", 0xA9 },
-	{ "ordf", 0xAA },
-	{ "laquo", 0xAB },
-	{ "not", 0xAC },
-	{ "shy", 0xAD },
-	{ "reg", 0xAE },
-	{ "macr", 0xAF },
-	{ "deg", 0xB0 },
-	{ "plusmn", 0xB1 },
-	{ "sup2", 0xB2 },
-	{ "sup3", 0xB3 },
-	{ "acute", 0xB4 },
-	{ "micro", 0xB5 },
-	{ "para", 0xB6 },
-	{ "middot", 0xB7 },
-	{ "cedil", 0xB8 },
-	{ "sup1", 0xB9 },
-	{ "ordm", 0xBA },
-	{ "raquo", 0xBB },
-	{ "frac14", 0xBC },
-	{ "frac12", 0xBD },
-	{ "frac34", 0xBE },
-	{ "iquest", 0xBF },
-	{ "Agrave", 0xC0 },
-	{ "Aacute", 0xC1 },
-	{ "Acirc", 0xC2 },
-	{ "Atilde", 0xC3 },
-	{ "Auml", 0xC4 },
-	{ "Aring", 0xC5 },
-	{ "AElig", 0xC6 },
-	{ "Ccedil", 0xC7 },
-	{ "Egrave", 0xC8 },
-	{ "Eacute", 0xC9 },
-	{ "Ecirc", 0xCA },
-	{ "Euml", 0xCB },
-	{ "Igrave", 0xCC },
-	{ "Iacute", 0xCD },
-	{ "Icirc", 0xCE },
-	{ "Iuml", 0xCF },
-	{ "ETH", 0xD0 },
-	{ "Ntilde", 0xD1 },
-	{ "Ograve", 0xD2 },
-	{ "Oacute", 0xD3 },
-	{ "Ocirc", 0xD4 },
-	{ "Otilde", 0xD5 },
-	{ "Ouml", 0xD6 },
-	{ "times", 0xD7 },
-	{ "Oslash", 0xD8 },
-	{ "Ugrave", 0xD9 },
-	{ "Uacute", 0xDA },
-	{ "Ucirc", 0xDB },
-	{ "Uuml", 0xDC },
-	{ "Yacute", 0xDD },
-	{ "THORN", 0xDE },
-	{ "szlig", 0xDF },
-	{ "agrave", 0xE0 },
-	{ "aacute", 0xE1 },
-	{ "acirc", 0xE2 },
-	{ "atilde", 0xE3 },
-	{ "auml", 0xE4 },
-	{ "aring", 0xE5 },
-	{ "aelig", 0xE6 },
-	{ "ccedil", 0xE7 },
-	{ "egrave", 0xE8 },
-	{ "eacute", 0xE9 },
-	{ "ecirc", 0xEA },
-	{ "euml", 0xEB },
-	{ "igrave", 0xEC },
-	{ "iacute", 0xED },
-	{ "icirc", 0xEE },
-	{ "iuml", 0xEF },
-	{ "eth", 0xF0 },
-	{ "ntilde", 0xF1 },
-	{ "ograve", 0xF2 },
-	{ "oacute", 0xF3 },
-	{ "ocirc", 0xF4 },
-	{ "otilde", 0xF5 },
-	{ "ouml", 0xF6 },
-	{ "divide", 0xF7 },
-	{ "oslash", 0xF8 },
-	{ "ugrave", 0xF9 },
-	{ "uacute", 0xFA },
-	{ "ucirc", 0xFB },
-	{ "uuml", 0xFC },
-	{ "yacute", 0xFD },
-	{ "thorn", 0xFE },
-	{ "yuml", 0xFF }
-};
-
-static const int sNEntities = sizeof(sEntities) / sizeof(ENTITY);
-
 //******************************************************************************
 // Functions
 //******************************************************************************
@@ -266,8 +153,9 @@ extern "C" int mtxProcess(MTXContext* context, char* data) {
 	CONTEXT_INTERNAL_VARIABLES(LOAD_CONTEXT);
 
 	//process data
+	setProc();
 	int remainLen;
-	int res = proc<true>(data, &remainLen);
+	int res = proc(data, &remainLen, true);
 	if(remainLen > 0) {
 		res = PEC_INCOMPLETE;
 	}
@@ -285,7 +173,7 @@ extern "C" void mtxStart(MTXContext* context) {
 	context->iUtf8 = TRUE;
 }
 
-template<bool process> static int feed(MTXContext* context, char* data) {
+static int feed(MTXContext* context, char* data, bool process) {
 	ASSERT_MSG(sContext == NULL, "MTXml cannot be called recursively");
 	sContext = context;
 	sCurPtr = data;
@@ -296,7 +184,7 @@ template<bool process> static int feed(MTXContext* context, char* data) {
 	do {
 		sLastBeginPtr = sCurPtr;
 		//lprintfln("parse %i \"%s\"\n", sState, sCurPtr);
-		parse<process>();
+		parse(process);
 	} while(sThereIsData && !sStop);
 	if(!sStop) {
 		CONTEXT_INTERNAL_VARIABLES(STORE_CONTEXT);
@@ -306,11 +194,12 @@ template<bool process> static int feed(MTXContext* context, char* data) {
 }
 
 extern "C" int mtxFeed(MTXContext* context, char* data) {
-	return feed<false>(context, data);
+	return feed(context, data, false);
 }
 
 extern "C" int mtxFeedProcess(MTXContext* context, char* data) {
-	return feed<true>(context, data);
+	setProc();
+	return feed(context, data, true);
 }
 
 extern "C" void mtxStop(MTXContext* context) {
@@ -349,11 +238,11 @@ static void fireEncoding(char* name) {
 	sContext->encoding(sContext, name);
 }
 
-template<bool process> static void fireTagStart(char* name, int len) {
+static void fireTagStart(char* name, int len, bool process) {
 	if(sStop)
 		return;
 	if(process) {
-		len = procComplete<false>(name);
+		len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
@@ -361,15 +250,15 @@ template<bool process> static void fireTagStart(char* name, int len) {
 	sContext->tagStart(sContext, name, len);
 }
 
-template<bool process> static void fireTagAttr(char* name, char* value) {
+static void fireTagAttr(char* name, char* value, bool process) {
 	if(sStop)
 		return;
 	if(process) {
-		int len = procComplete<false>(name);
+		int len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
-		len = procComplete<true>(value);
+		len = procComplete(value, true);
 		if(len < 0) {
 			return;
 		}
@@ -377,11 +266,11 @@ template<bool process> static void fireTagAttr(char* name, char* value) {
 	sContext->tagAttr(sContext, name, value);
 }
 
-template<bool process> static void fireTagEnd(char* name, int len) {
+static void fireTagEnd(char* name, int len, bool process) {
 	if(sStop)
 		return;
 	if(process) {
-		len = procComplete<false>(name);
+		len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
@@ -389,11 +278,11 @@ template<bool process> static void fireTagEnd(char* name, int len) {
 	sContext->tagEnd(sContext, name, len);
 }
 
-template<bool utf8, bool ent> static void fireTagData(char* data, int len) {
+static void fireTagData(char* data, int len, bool utf8, bool ent) {
 	if(sStop)
 		return;
 	if(utf8) {
-		len = procComplete<ent>(data);
+		len = procComplete(data, ent);
 		if(len <= 0) {
 			return;
 		}
@@ -407,7 +296,7 @@ static void fireEmptyTagEnd() {
 	sContext->emptyTagEnd(sContext);
 }
 
-template<bool process> static void parse() {
+static void parse(bool process) {
 	switch(sState) {
 	case EStart:
 		if(!skipWhiteSpace())
@@ -416,18 +305,18 @@ template<bool process> static void parse() {
 		break;
 	case EOutsideTag:
 		//handle data or tag-start
-		parseOutsideTag<process>();
+		parseOutsideTag(process);
 		break;
 	case ETagStart:
-		parseTagStart<process>();
+		parseTagStart(process);
 		break;
 	case EInsideTag:
 		//handle attribute or tag-end	(not end-tag)
-		parseInsideTag<process>();
+		parseInsideTag(process);
 		break;
 	case ECDATA:
 		//handle CDATA or CDATA-end
-		parseCDATA<process>();
+		parseCDATA(process);
 		break;
 	case EComment:
 		parseComment();
@@ -440,12 +329,12 @@ template<bool process> static void parse() {
 	}
 }
 
-template<bool process> static void parseOutsideTag() {
+static void parseOutsideTag(bool process) {
 	char* start = sCurPtr;
 	int index = find('<');
 	if(index > 0) {
 		sCurPtr[index] = 0;
-		fireTagData<process, process>(sCurPtr, index);
+		fireTagData(sCurPtr, index, process, process);
 		sCurPtr += index;
 	} else if(index < 0) {
 		int len = sCurPtr - start;
@@ -453,37 +342,37 @@ template<bool process> static void parseOutsideTag() {
 #if 0	//not optimal
 			if(process && (refIndex = findIncompleteReference(start)) >= 0) {
 				start[refIndex] = 0;
-				fireTagData<process, process>(start, refIndex);
+				fireTagData(start, refIndex, process, process);
 				start[refIndex] = '&';
 				fireDataRemains(start + refIndex);
 #else
 			if(process) {
 #if 0
-				int refIndex = proc<true>(start);
+				int refIndex = proc(start, true);
 				if(refIndex >= 0) {	//partial reference
 					if(refIndex > 0) {
 						start[refIndex] = 0;
-						fireTagData<false, false>(start, refIndex);
+						fireTagData(start, refIndex, false, false);
 						start[refIndex] = '&';
 					}
 					fireDataRemains(start + refIndex);
 				} else if(refIndex == PEC_SUCCESS) {
-					fireTagData<false, false>(start, refIndex);
+					fireTagData(start, refIndex, false, false);
 				} else {
 				}
 #else
 				//usage prototype
 				int remainsLen;
-				int res = proc<true>(start, &remainsLen);
+				int res = proc(start, &remainsLen, true);
 				if(res > 0)	//we got some proper data to report
-					fireTagData<false, false>(start, res);
+					fireTagData(start, res, false, false);
 				if(res < 0) {
 					fireParseError();
 				} else if(remainsLen)
 					fireDataRemains(remainsLen);
 #endif	//0
 			} else {	//(process)
-				fireTagData<process, process>(start, len);
+				fireTagData(start, len, process, process);
 			}
 #endif	//0
 		}	//(len > 0)
@@ -494,7 +383,7 @@ template<bool process> static void parseOutsideTag() {
 	sState = ETagStart;
 }
 
-template<bool process> static void parseTagStart() {
+static void parseTagStart(bool process) {
 	bool endTag;
 	int index;
 	switch(*sCurPtr) {
@@ -533,7 +422,7 @@ template<bool process> static void parseTagStart() {
 		}
 		sCurPtr++;
 		namePtr[index] = 0;
-		fireTagEnd<process>(namePtr, index);
+		fireTagEnd(namePtr, index, process);
 		sState = EOutsideTag;
 	} else {
 		if(sCurPtr[index] == '>') {
@@ -544,7 +433,7 @@ template<bool process> static void parseTagStart() {
 				endTag = true;
 		}
 		sCurPtr[index] = 0;
-		fireTagStart<process>(sCurPtr, index);
+		fireTagStart(sCurPtr, index, process);
 		if(sState == EOutsideTag) {
 			fireTagStartEnd();
 		}
@@ -557,7 +446,7 @@ template<bool process> static void parseTagStart() {
 	}
 }
 
-template<bool process> static void parseInsideTag() {
+static void parseInsideTag(bool process) {
 	if(!skipWhiteSpace())
 		return;
 	bool ete = false;
@@ -584,7 +473,7 @@ template<bool process> static void parseInsideTag() {
 	ATTRIBUTE a;
 	parseAttribute(&a);
 	if(a.namePtr && a.valuePtr)
-		fireTagAttr<process>(a.namePtr, a.valuePtr);
+		fireTagAttr(a.namePtr, a.valuePtr, process);
 }
 
 static void parseAttribute(ATTRIBUTE* a) {
@@ -654,22 +543,21 @@ static void parseSpecialTag() {
 	fireParseError();
 }
 
-template<bool process> static void parseCDATA() {
+static void parseCDATA(bool process) {
 	int res = findString("]]>");
 	if(res == 0) {
 		//strlen("]]>") == 3
 		char* endPtr = sCurPtr - 3;
 		if(endPtr - sLastBeginPtr != 0) {
 			*endPtr = 0;
-//#error
-			fireTagData<process, false>(sLastBeginPtr, endPtr - sLastBeginPtr);
+			fireTagData(sLastBeginPtr, endPtr - sLastBeginPtr, process, false);
 		}
 		sState = EOutsideTag;
 	} else if(res > 0) {	//partial match, then end-of-buffer
 		fireDataRemains(res);
 	} else {	//res < 0
 		if(sCurPtr - sLastBeginPtr != 0) {
-			fireTagData<process, false>(sLastBeginPtr, sCurPtr - sLastBeginPtr);
+			fireTagData(sLastBeginPtr, sCurPtr - sLastBeginPtr, process, false);
 		}
 		sThereIsData = false;
 	}
@@ -851,7 +739,7 @@ if(res < 0) {
 #endif
 //for some functions, remaining data will mean error.
 //remainsLen is partially used as "refLen" and "utf8Len" inside this function.
-template<bool ent> static int proc(char* data, int* remainsLen) {
+static int _proc(char* data, int* remainsLen, bool ent) {
 	char* dst = data;
 	char* src = data;
 	*remainsLen = 0;
@@ -865,6 +753,11 @@ template<bool ent> static int proc(char* data, int* remainsLen) {
 				break;
 			} else if(res < 0)
 				return res;
+			if(res > 0xFF) {
+				res = sContext->unicodeCharacter(sContext, res);
+				if(res == 0)
+					return PEC_OUTSIDE;
+			}
 		} else if(sUtf8) {	//normal character
 			res = convertUtf8ToLatin1(src, remainsLen);
 			if(res == PEC_INCOMPLETE) {
@@ -885,9 +778,9 @@ template<bool ent> static int proc(char* data, int* remainsLen) {
 	return dst - data;
 }
 
-template<bool ent> static int procComplete(char* data) {
+static int _procComplete(char* data, bool ent) {
 	int remainLen;
-	int res = proc<ent>(data, &remainLen);
+	int res = _proc(data, &remainLen, ent);
 	if(remainLen > 0) {
 		res = PEC_INCOMPLETE;
 	}
@@ -910,12 +803,12 @@ static int parseRef(char* ref, int* pnBytes) {
 			return strtol(ref + 1, NULL, 10);
 		}
 	} else {	//standard reference
-		for(int i=0; i<sNEntities; i++) {
-			if(strcmp(sEntities[i].name, ref) == 0) {
-				return sEntities[i].value;
-			}
+		const ENTITY* e = entity_lookup(ref, end - ref);
+		if(e) {
+			return e->c;
+		} else {
+			return PEC_INVALID;
 		}
-		return PEC_INVALID;
 	}
 }
 
@@ -1009,6 +902,11 @@ extern "C" unsigned char mtxBasicUnicodeConvert(MTXContext*, int unicode) {
 		result = 0;
 	}
 	return result;
+}
+
+void setProc() {
+	proc = _proc;
+	procComplete = _procComplete;
 }
 
 //******************************************************************************

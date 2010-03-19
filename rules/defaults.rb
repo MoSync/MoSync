@@ -30,10 +30,12 @@ def set_defaults
 	default(:EXTRA_LINKFLAGS, "")
 	# Array of Strings, extra include directories.
 	default(:EXTRA_INCLUDES, [])
-	# Array of Strings, names of files that should not be built.
+	# Array of Strings, names of files that should not be compiled.
 	default(:IGNORED_FILES, [])
-	# Array of Strings, paths to files that should be built, even though they are outside the SOURCES.
+	# Array of Strings, paths to files that should be compiled, even though they are outside the SOURCES.
 	default(:EXTRA_SOURCEFILES, [])
+	# Array of FileTasks, generated source files that should be compiled along with the others.
+	default(:EXTRA_SOURCETASKS, [])
 	# Array of FileTasks, precompiled object files, to link with.
 	default(:EXTRA_OBJECTS, [])
 	# Array of Strings, names of static libraries built earlier, to link with.

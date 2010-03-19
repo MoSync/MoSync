@@ -230,7 +230,7 @@ private:
 				dumpStats();
 		}	else {	//(mTortureTest)
 			mPtr[result] = 0;
-			LOG("feed %i\n", (mPtr - mBuffer) + result);
+			LOG("feed %li\n", (mPtr - mBuffer) + result);
 			mPtr = mBuffer;
 			int parseStartTime = maGetMilliSecondCount();
 			if(mProcessing)
@@ -300,7 +300,7 @@ private:
 	virtual void mtxTagData(const char* data, int len) {
 		m.tagData++;
 		LOG("d %i: \"%s\"\n", len, data);
-		if(len > BUFLEN || len <= 0 || strlen(data) != len) {
+		if(len > BUFLEN || len <= 0 || (int)strlen(data) != len) {
 			ERROR("d %i: \"%s\"\n", len, data);
 			mError = true;
 			return;
