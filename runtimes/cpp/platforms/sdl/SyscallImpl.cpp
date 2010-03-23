@@ -379,14 +379,17 @@ namespace Base {
 
 		char destDir[256];
 		destDir[0] = 0;
+
 		strcpy(destDir, mosyncDir);
-#if 1
 		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
-		TEST_Z(gFont = TTF_OpenFont(destDir, 16));
-#else
-		strcat(destDir, "/bin/maspec.fon");
-		TEST_Z(gFont = TTF_OpenFont(destDir, 8));
-#endif
+		gFont = TTF_OpenFont(destDir, 16);
+
+		if(gFont == NULL) {	//fallback to old font
+			LOG("Failed to load font %s. Attempting fallback.\n", destDir);
+			strcpy(destDir, mosyncDir);
+			strcat(destDir, "/bin/maspec.fon");
+			TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+		}
 
 		return true;
 	}
