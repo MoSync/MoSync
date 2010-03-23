@@ -23,10 +23,9 @@
 
 # On Linux only:
 # SDL_SOUND, boolean. True if SDL_Sound is available.
-# BLUETOOTH, booelan. True if Bluez is available.
+# BLUETOOTH, boolean. True if Bluez is available.
 
 require "#{File.dirname(__FILE__)}/error.rb"
-require "#{File.dirname(__FILE__)}/util.rb"
 
 begin
 	UNAME = open("|uname").readline().strip()
