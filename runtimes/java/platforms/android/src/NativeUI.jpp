@@ -39,9 +39,10 @@ public class NativeUI extends Activity implements OnClickListener {
 		ll.setOrientation(LinearLayout.VERTICAL);
 		setContentView(ll);
 		this.getWindow().openPanel(Window.FEATURE_OPTIONS_PANEL, new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MENU));
-		int[] event = new int[2];
+		int[] event = new int[3];
 		event[0] = 19;
 		event[1] = myId;
+		event[2] = 0;
 		MoSync.mMosyncView.postEvent(event);
 		Log.i("MoSync", "Native UI");
 	}
@@ -77,18 +78,20 @@ public class NativeUI extends Activity implements OnClickListener {
 
 	/* Handles item selections */
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int[] event = new int[2];
+		int[] event = new int[3];
 		event[0] = 19;
 		event[1] = item.getItemId();
+		event[2] = 0;
 		MoSync.mMosyncView.postEvent(event);
 		Log.i("MoSync", "Menu item :" + item.getItemId());
 		return true;
 	}
     
 	public void onClick(View v) {
-		int[] event = new int[2];
+		int[] event = new int[3];
 		EI_TYPE = EVENT_TYPE_NATIVE_UI_MSG;
 		EI_LO_WPARAM = v.getId();
+		EI_HI_WPARAM = 0;
 		MoSync.mMosyncView.postEvent(event);
 		Log.i("MoSync", "Clicked :" + v.getId());
 	}
