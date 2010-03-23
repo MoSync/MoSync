@@ -14,3 +14,31 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _PARSE_NODE_H_
+#define _PARSE_NODE_H_
+
+#include <string>
+#include <map>
+#include <vector>
+
+class Base;
+
+struct ParseNode {
+	ParseNode();
+	std::string getAttr(const std::string& name, bool force=true) const;
+
+	int getIntAttr(const std::string& name, bool force=true) const;
+
+	std::string name;
+	std::map<std::string, std::string> attributes;
+	std::vector<const ParseNode*> children;
+
+	ParseNode *parent;
+
+	Base* base;
+
+	int lineNumber;
+};
+
+#endif // _PARSE_NODE_H_

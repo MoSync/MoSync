@@ -14,3 +14,81 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "IDLBackend.h"
+
+using namespace std;
+
+// a bit messy this function...
+string IDLBackend::getIDLType(const Base* base, bool isArgument) {
+	string ret = "";
+	if(base->getBaseType() == Base::EFundamentalType) {
+		const FundamentalType* ft = (const FundamentalType*) base;
+		string name = ft->getName();
+		if(isArgument)
+			ret += "in ";
+		ret += name;
+	} else if(base->getBaseType() == Base::ECvQualifiedType) {
+		const CvQualifiedType* qt = (const CvQualifiedType*) base;
+		ret += getIDLType(qt->getType());
+	} else if(base->getBaseType() == Base::EPointerType) {
+		const PointerType* pt = (const PointerType*) base;
+		if(isArgument) {
+			if(pt->isConst())
+				ret += "in ";
+			else
+				ret += "out ";
+		}
+
+		const Base* pType = pt->getType();
+		if(pType->getBaseType() == Base::EFundamentalType) {
+			const FundamentalType* pfType = (const FundamentalType*)pType;
+			if(pfType->getName() == "char")
+				ret += "MAString";
+			else if(pfType->getName() == "void") 
+				ret += "MAAddress";
+			else
+				ret += getIDLType(pt->getType(), false);
+		} else if(pType->getBaseType() == Base::EFunctionType){
+			ret += "int"; // function address. We should probably be able to handle them...
+		} else {
+			ret += getIDLType(pt->getType(), false);
+		}
+
+	} else if(base->getBaseType() == Base::ETypedef) {
+		const Typedef* td = (const Typedef*) base;
+		ret += (isArgument?"in ":"") + td->getName();
+	} else {
+		System::error("don't know how to handle type\n");
+	}
+
+	return ret;
+}
+
+void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
+	pair<BasesIterator, BasesIterator> typedefs = bases.equal_range("Typedef");
+	for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
+		const Typedef* t = (const Typedef*)td->second;
+		stream << "typedef " << getIDLType(t->getType(), false) << " " << t->getName() << ";\n";
+
+	}
+
+	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
+
+	for(BasesIterator function = functions.first; function!=functions.second; function++) {
+		const Function* func = (const Function*)function->second;
+		string name = func->getName();
+		stream << func->getReturnType()->toString() << " " << name << "(";
+		const std::vector<const Argument*>& args = func->getArguments();
+		if(args.size()>4) {
+		} else {
+			for(int i = 0; i < args.size(); i++) {
+				stream << getIDLType(args[i]->getType()) << " " << args[i]->getName();
+				if(i != args.size()-1) stream << ", ";
+			}
+		}
+
+		stream << ");\n";
+	}
+
+}	

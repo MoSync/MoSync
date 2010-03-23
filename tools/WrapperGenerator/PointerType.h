@@ -14,3 +14,23 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _POINTER_TYPE_H_
+#define _POINTER_TYPE_H_
+
+#include "Base.h"
+
+class PointerType : public Base {
+public:
+	PointerType();
+	void fromParseNode(const ParseNode& node);
+	const Base* getType() const;
+	bool isConst() const;
+	virtual std::string toString() const;
+protected:
+	const Base* mType;
+	bool mIsConst;
+	int mSize, mAlign;
+};
+
+#endif // _POINTER_TYPE_H_

@@ -14,3 +14,32 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "PointerType.h"
+
+using namespace std;
+
+PointerType::PointerType() : Base(EPointerType) {
+}
+
+void PointerType::fromParseNode(const ParseNode& node) {
+	mType = parseType(node, mIsConst);
+	if(!mType) {
+		int a = 2;
+	}
+
+	mSize = node.getIntAttr("size");
+	mAlign = node.getIntAttr("align");
+}
+
+const Base* PointerType::getType() const {
+	return mType;
+}
+
+bool PointerType::isConst() const {
+	return mIsConst;
+}
+
+string PointerType::toString() const {
+	return System::genstr("%s%s*", (mIsConst?"const ":""), mType->toString().c_str());
+}

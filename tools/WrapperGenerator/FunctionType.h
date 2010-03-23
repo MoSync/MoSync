@@ -14,3 +14,21 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _FUNCTION_TYPE_H_
+#define _FUNCTION_TYPE_H_
+
+#include "Base.h"
+
+class FunctionType : public Base {
+public:
+	FunctionType();
+	void fromParseNode(const ParseNode& node);
+	const Base* getReturnType() const;
+	std::string toString() const;
+
+private:
+	const Base* mReturns;
+};
+
+#endif // _FUNCTION_TYPE_H_

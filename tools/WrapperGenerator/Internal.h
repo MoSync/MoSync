@@ -15,15 +15,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _WRAPPER_GENERATOR_H_
-#define _WRAPPER_GENERATOR_H_
+#ifndef _INTERNAL_H_
+#define _INTERNAL_H_
 
-#include <stdarg.h>
-#include <string>
+#include "Namespace.h"
+#include "Function.h"
+#include "PointerType.h"
+#include "ReferenceType.h"
+#include "Typedef.h"
+#include "CvQualifiedType.h"
+#include "ArrayType.h"
+#include "FundamentalType.h"
+#include "FunctionType.h"
+#include "File.h"
 
-namespace System  {
-	void error(const char* fmt, ...);
-	std::string genstr(const char * fmt, ...);
-} // namespace System
-
-#endif // _WRAPPER_GENERATOR_H_
+#endif // _INTERNAL_H_

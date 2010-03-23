@@ -14,3 +14,40 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "ArrayType.h"
+
+using namespace std;
+
+ArrayType::ArrayType() : Base(EArrayType) {
+}
+
+void ArrayType::fromParseNode(const ParseNode& node) {
+	bool isConst;
+	mType = parseType(node, isConst);
+	mMin = node.getIntAttr("min");
+	mMaxString = node.getAttr("max");
+	mMax = atoi(mMaxString.c_str());
+	mAlign = node.getIntAttr("align");
+}
+
+
+const Base* ArrayType::getType() const {
+	return mType;
+}
+
+int ArrayType::getMin() const {
+	return mMin;
+}
+
+int ArrayType::getMax() const {
+	return mMax;
+}
+
+int ArrayType::getAlign() const {
+	return mAlign;
+}
+
+string ArrayType::toString() const {
+	return System::genstr("%s[%s]", mType->toString().c_str(), mMaxString.c_str());
+}

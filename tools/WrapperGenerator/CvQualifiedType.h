@@ -14,3 +14,23 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _CV_QUALIFIED_TYPE_H_
+#define _CV_QUALIFIED_TYPE_H_
+
+#include "Base.h"
+
+class CvQualifiedType : public Base {
+public:
+	CvQualifiedType();
+	void fromParseNode(const ParseNode& node);
+	std::string toString() const;
+	const Base* getType() const;
+	bool isConst() const;
+
+private:
+	const Base* mType;
+	bool mIsConst;
+};
+
+#endif // _CV_QUALIFIED_TYPE_H_

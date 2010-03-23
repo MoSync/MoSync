@@ -14,3 +14,21 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _FUNDAMENTAL_TYPE_H_
+#define _FUNDAMENTAL_TYPE_H_
+
+#include "Base.h"
+
+class FundamentalType : public Base {
+	public:
+		FundamentalType();
+		void fromParseNode(const ParseNode& node);
+		const std::string& getName() const;
+		std::string toString() const;
+
+	private:
+		std::string mName;
+	};
+
+#endif // _FUNDAMENTAL_TYPE_H_

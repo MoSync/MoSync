@@ -14,3 +14,19 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _IDL_BACKEND_H_
+#define _IDL_BACKEND_H_
+
+#include "Backend.h"
+#include <string>
+
+class IDLBackend : public Backend {
+protected:
+
+	// a bit messy this function...
+	std::string getIDLType(const Base* base, bool isArgument=true);
+	void emit(const BasesMap& bases, std::fstream& stream);
+};
+
+#endif // _IDL_BACKEND_H_

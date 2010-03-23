@@ -239,6 +239,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Internal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Location.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Location.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>

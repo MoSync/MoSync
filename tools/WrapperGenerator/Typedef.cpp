@@ -14,3 +14,37 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "Typedef.h"
+
+using namespace std;
+
+Typedef::Typedef(): Base(ETypedef) {
+}
+
+void Typedef::fromParseNode(const ParseNode& node) {
+	mName = node.getAttr("name");
+	mContext = getParseNodeFromId(node.getAttr("context"))->base;
+	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
+	mType = getParseNodeFromId(node.getAttr("type"))->base;
+}
+
+const string& Typedef::getName() const {
+	return mName;
+}
+
+const Base* Typedef::getType() const {
+	return mType;
+}
+
+const Base* Typedef::getContext() const {
+	return mContext;
+}
+
+const Location* Typedef::getLocation() const {
+	return mLocation;
+}
+
+string Typedef::toString() const {
+	return System::genstr("%s", mName.c_str());
+}

@@ -14,3 +14,22 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "FunctionType.h"
+
+using namespace std;
+
+FunctionType::FunctionType() : Base(EFunctionType) {
+}
+
+void FunctionType::fromParseNode(const ParseNode& node) {
+	mReturns = getParseNodeFromId(node.getAttr("returns"))->base;
+}
+
+const Base* FunctionType::getReturnType() const {
+	return mReturns;
+}
+
+string FunctionType::toString() const {
+	return System::genstr("%s", mReturns->toString().c_str());
+}

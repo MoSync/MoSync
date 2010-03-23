@@ -14,3 +14,48 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _FUNCTION_H_
+#define _FUNCTION_H_
+
+#include "Base.h"
+#include "Location.h"
+
+class Argument {
+public:
+	void fromParseNode(const ParseNode& node);
+	const std::string& getName() const;
+	const Base* getType() const;
+	const Location* getLocation() const;
+	std::string toString() const;
+	bool isEllipsis() const;
+
+protected:
+	bool mIsEllipsis;
+	std::string mName;
+	const Base* mType;
+	Location *mLocation;
+};
+
+class Function : public Base {
+public:
+	Function();
+	void fromParseNode(const ParseNode& node);
+	const std::string& getName() const;
+	const Base* getContext() const;
+	const Base* getReturnType() const;
+	const Location* getLocation() const;
+	bool isExtern() const;
+	const std::vector<const Argument*>& getArguments() const;
+	std::string toString() const;
+
+private:
+	std::string mName;
+	const Base *mReturns;
+	const Base *mContext;
+	const Location* mLocation;
+	bool mIsExtern;
+	std::vector<const Argument*> mArguments;
+};
+
+#endif // _FUNCTION_H_

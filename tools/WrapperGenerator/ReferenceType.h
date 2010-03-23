@@ -14,3 +14,15 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _REFERENCE_TYPE_H_
+#define _REFERENCE_TYPE_H_
+
+#include "PointerType.h"
+
+class ReferenceType : public PointerType {
+public:
+	virtual std::string toString() const;
+};
+
+#endif // _REFERENCE_TYPE_H_

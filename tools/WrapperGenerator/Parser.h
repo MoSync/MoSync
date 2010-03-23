@@ -14,3 +14,19 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _PARSER_H_
+#define _PARSER_H_
+
+#include "ParseNode.h"
+#include <string>
+#include <map>
+
+const ParseNode* getParseNodeFromId(const std::string& name);
+const Base* parseType(const ParseNode& node,  bool& isconst);
+
+namespace Parser {
+	void parse(const std::string& input, std::multimap<std::string, const Base*>& output);
+};
+
+#endif // _PARSER_H_

@@ -14,3 +14,22 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "File.h"
+
+using namespace std;
+
+File::File() : Base(EFile) {
+}
+
+void File::fromParseNode(const ParseNode& node) {
+	mName = node.getAttr("name");
+}
+
+const string& File::getName() const {
+	return mName;
+}
+
+string File::toString() const {
+	return System::genstr("%s", mName.c_str());
+}

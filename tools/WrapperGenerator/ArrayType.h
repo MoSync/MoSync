@@ -14,3 +14,26 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _ARRAY_TYPE_H_
+#define _ARRAY_TYPE_H_
+
+#include "Base.h"
+
+class ArrayType : public Base {
+public:
+	ArrayType();
+	void fromParseNode(const ParseNode& node);
+	const Base* getType() const;
+	int getMin() const;
+	int getMax() const;
+	int getAlign() const;
+	std::string toString() const;
+
+private: 
+	std::string mMaxString;
+	int mMin, mMax, mAlign;
+	const Base* mType;
+};
+
+#endif // _ARRAY_TYPE_H_

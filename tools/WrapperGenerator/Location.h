@@ -15,15 +15,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _WRAPPER_GENERATOR_H_
-#define _WRAPPER_GENERATOR_H_
+#ifndef _LOCATION_H_
+#define _LOCATION_H_
 
-#include <stdarg.h>
 #include <string>
 
-namespace System  {
-	void error(const char* fmt, ...);
-	std::string genstr(const char * fmt, ...);
-} // namespace System
+class File;
 
-#endif // _WRAPPER_GENERATOR_H_
+class Location {
+public:
+	Location(int line, const File* file);
+	int getLine() const;
+	const File* getFile() const;
+	std::string toString() const;
+
+private:
+	int mLine;
+	const File* mFile;
+};
+
+#endif // _LOCATION_H_

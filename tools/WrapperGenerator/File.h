@@ -14,3 +14,21 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _FILE_H_
+#define _FILE_H_
+
+#include "Base.h"
+
+class File : public Base {
+public:
+	File();
+	void fromParseNode(const ParseNode& node);
+	const std::string& getName() const;
+	std::string toString() const;
+
+private:
+	std::string mName;
+};
+
+#endif // _FILE_H_

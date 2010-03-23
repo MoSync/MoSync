@@ -14,3 +14,26 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#ifndef _NAMESPACE_H_
+#define _NAMESPACE_H_
+
+#include "Base.h"
+
+class Namespace : public Base {
+public:
+	Namespace();
+	void addMember(const Base* id);
+	void fromParseNode(const ParseNode& node);
+	std::string toString() const;
+	const std::string& getName() const;
+	const Base* getContext() const;
+	const std::vector<const Base*>& getMembers() const;
+
+private:
+	std::string mName;
+	const Base *mContext;
+	std::vector<const Base*> mMembers;
+};
+
+#endif // _NAMESPACE_H_
