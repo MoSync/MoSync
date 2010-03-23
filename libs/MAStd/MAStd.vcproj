@@ -379,6 +379,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\mawvsprintf.c"
+			>
+		</File>
+		<File
+			RelativePath=".\mawvsprintf.h"
+			>
+		</File>
+		<File
 			RelativePath=".\maxtoa.c"
 			>
 		</File>

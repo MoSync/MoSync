@@ -421,9 +421,9 @@ skipp:
 
 	//explicit instantiation
 	template class BasicString<char>;
-	template class BasicString<wchar>;
+	template class BasicString<wchar_t>;
 	template class StringData<char>;
-	template class StringData<wchar>;
+	template class StringData<wchar_t>;
 }
 
 template<> int tstrlen<char>(const char* str) { return strlen(str); }
@@ -443,3 +443,7 @@ template<class Tchar> int tstrcmp(const Tchar* a, const Tchar* b) {
 	}
 	return *a - *b;
 }
+
+//explicit instantiation (needed to link with these functions in MAPIP.)
+template int tstrlen<wchar_t>(const wchar_t*);
+template int tstrcmp<wchar_t>(const wchar_t*, const wchar_t*);

@@ -75,7 +75,10 @@ class PipeGccWork < GccWork
 	include GccVersion
 	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
 	def gccmode; "-S"; end
-	def host_flags; USE_NEWLIB ? " -DUSE_NEWLIB" : ""; end
+	def host_flags;
+		g = CONFIG == "" ? " -g" : ""
+		return (USE_NEWLIB ? g + " -DUSE_NEWLIB" : g)
+	end
 	def host_cppflags; ""; end
 	
 	include MoSyncInclude

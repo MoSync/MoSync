@@ -174,7 +174,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating entities.c..."
-					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt | sed s/#line/\/\/line/ &gt; entities.c"
+					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt | sed s/#line/\/\/line/ &gt; entities.c&#x0D;&#x0A;"
 					Outputs="entities.c"
 				/>
 			</FileConfiguration>
@@ -184,7 +184,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description=""
-					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt &gt; entities.c"
+					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt &gt; entities.c&#x0D;&#x0A;"
 					Outputs="entities.c"
 				/>
 			</FileConfiguration>
@@ -192,6 +192,13 @@
 		<File
 			RelativePath=".\MTSax.cpp"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\MTSax.h"

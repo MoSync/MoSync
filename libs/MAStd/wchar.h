@@ -25,7 +25,7 @@ int mbtowc(wchar_t* dst, const char* src, size_t count);
 /** \brief Wide-char to multibyte.
 *
 * Converts a wide character to the equivalent UTF-8 character.
-* \param dst The destination buffer. Must be at least 4 bytes long,
+* \param dst The destination buffer. Must be at least #MB_LEN_MAX bytes long,
 * as that is the maximum length of a UTF-8 character.
 * \param src The wide character.
 * \returns The number of bytes written to \a dst, or 0 if it was a NUL character,

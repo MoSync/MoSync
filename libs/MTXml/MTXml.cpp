@@ -64,6 +64,7 @@ static int parseRef(char* ref, int* pnBytes);
 //returns the converted character, or a PEC code.
 //*pnBytes is valid on success and PEC_INCOMPLETE.
 static int convertUtf8ToLatin1(const char* utf8, int* pnBytes);
+static int convertUtf8ToUnicode(const char* utf8, int* pnBytes);
 
 static void parse(bool process);
 static bool skipWhiteSpace();	//returns true if a non-whitespace character is found.
@@ -136,6 +137,7 @@ static bool sThereIsData;
 static char* sLastBeginPtr;
 static char* sFirstPtr;
 static bool sStop;
+static wchar_t* sWideBuf;	// If NULL, then Latin-1 output. Otherwise, wchar.
 
 //******************************************************************************
 // Functions
@@ -194,10 +196,18 @@ static int feed(MTXContext* context, char* data, bool process) {
 }
 
 extern "C" int mtxFeed(MTXContext* context, char* data) {
+	sWideBuf = NULL;
 	return feed(context, data, false);
 }
 
 extern "C" int mtxFeedProcess(MTXContext* context, char* data) {
+	sWideBuf = NULL;
+	setProc();
+	return feed(context, data, true);
+}
+
+extern "C" int mtxFeedWide(MTXContext* context, char* data, wchar_t* wideBuffer) {
+	sWideBuf = wideBuffer;
 	setProc();
 	return feed(context, data, true);
 }
@@ -241,53 +251,86 @@ static void fireEncoding(char* name) {
 static void fireTagStart(char* name, int len, bool process) {
 	if(sStop)
 		return;
+	const void* wname;
+	if(sWideBuf) {
+		wname = sWideBuf;
+	} else {
+		wname = name;
+	}
 	if(process) {
 		len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
 	}
-	sContext->tagStart(sContext, name, len);
+	sContext->tagStart(sContext, wname, len);
 }
 
 static void fireTagAttr(char* name, char* value, bool process) {
 	if(sStop)
 		return;
+	const void* wname, *wvalue;
+	if(sWideBuf) {
+		wname = sWideBuf;
+		wvalue = value;
+	} else {
+		wname = name;
+		wvalue = value;
+	}
 	if(process) {
 		int len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
+		if(sWideBuf) {
+			wvalue = sWideBuf + len + 1;
+			sWideBuf = (wchar_t*)wvalue;
+		}
 		len = procComplete(value, true);
+		if(sWideBuf) {
+			sWideBuf = (wchar_t*)wname;
+		}
 		if(len < 0) {
 			return;
 		}
 	}
-	sContext->tagAttr(sContext, name, value);
+	sContext->tagAttr(sContext, wname, wvalue);
 }
 
 static void fireTagEnd(char* name, int len, bool process) {
 	if(sStop)
 		return;
+	const void* wname;
+	if(sWideBuf) {
+		wname = sWideBuf;
+	} else {
+		wname = name;
+	}
 	if(process) {
 		len = procComplete(name, false);
 		if(len <= 0) {
 			return;
 		}
 	}
-	sContext->tagEnd(sContext, name, len);
+	sContext->tagEnd(sContext, wname, len);
 }
 
 static void fireTagData(char* data, int len, bool utf8, bool ent) {
 	if(sStop)
 		return;
+	const void* wdata;
+	if(sWideBuf) {
+		wdata = sWideBuf;
+	} else {
+		wdata = data;
+	}
 	if(utf8) {
 		len = procComplete(data, ent);
 		if(len <= 0) {
 			return;
 		}
 	}
-	sContext->tagData(sContext, data, len);
+	sContext->tagData(sContext, wdata, len);
 }
 
 static void fireEmptyTagEnd() {
@@ -739,8 +782,12 @@ if(res < 0) {
 #endif
 //for some functions, remaining data will mean error.
 //remainsLen is partially used as "refLen" and "utf8Len" inside this function.
+
+//todo, maybe: improve performance at the cost of code size
+//by making this function a template on ent, sUtf8 and sWideBuf.
 static int _proc(char* data, int* remainsLen, bool ent) {
 	char* dst = data;
+	wchar_t* wdst = sWideBuf;
 	char* src = data;
 	*remainsLen = 0;
 	while(*src != 0) {
@@ -753,13 +800,17 @@ static int _proc(char* data, int* remainsLen, bool ent) {
 				break;
 			} else if(res < 0)
 				return res;
-			if(res > 0xFF) {
+			if(res > 0xFF && !sWideBuf) {
 				res = sContext->unicodeCharacter(sContext, res);
 				if(res == 0)
 					return PEC_OUTSIDE;
 			}
 		} else if(sUtf8) {	//normal character
-			res = convertUtf8ToLatin1(src, remainsLen);
+			if(sWideBuf) {
+				res = convertUtf8ToUnicode(src, remainsLen);
+			} else {
+				res = convertUtf8ToLatin1(src, remainsLen);
+			}
 			if(res == PEC_INCOMPLETE) {
 				sCurPtr = src;
 				break;
@@ -767,15 +818,28 @@ static int _proc(char* data, int* remainsLen, bool ent) {
 				return res;
 		}
 		if(res != 0) {
-			*(dst++) = (char)res;
+			if(sWideBuf) {
+				*(wdst++) = (wchar_t)res;
+			} else {
+				*(dst++) = (char)res;
+			}
 			src += *remainsLen;
 			*remainsLen = 0;
 		} else {
-			*(dst++) = *(src++);
+			if(sWideBuf) {
+				*(wdst++) = *(src++);
+			} else {
+				*(dst++) = *(src++);
+			}
 		}
 	}
-	*dst = 0;
-	return dst - data;
+	if(sWideBuf) {
+		*wdst = 0;
+		return wdst - sWideBuf;
+	} else {
+		*dst = 0;
+		return dst - data;
+	}
 }
 
 static int _procComplete(char* data, bool ent) {
@@ -812,7 +876,8 @@ static int parseRef(char* ref, int* pnBytes) {
 	}
 }
 
-static int convertUtf8ToLatin1(const char* utf8, int* pnBytes) {
+//todo: optimize. maybe use mbtowc().
+static int convertUtf8ToUnicode(const char* utf8, int* pnBytes) {
 	char b = utf8[0];
 	if(b & 0x80) {
 		int nBytes = 0, unicode, i;
@@ -832,23 +897,28 @@ static int convertUtf8ToLatin1(const char* utf8, int* pnBytes) {
 			}
 			unicode |= (utf8[i+1] & 0x3F) << ((nBytes-2-i) * 6);
 		}
-		if(unicode > 0xFF) {
-			//0xFEFF is ZERO WIDTH NO-BREAK SPACE, an encoding signature.
-			if(unicode == 0xFEFF) {
-				unicode = ' ';	//not a proper translation, but it shouldn't cause any problems.
-			} else {
-				//printf("CU8u: %i", unicode);
-				unicode = sContext->unicodeCharacter(sContext, unicode);
-				if(unicode == 0)
-					return PEC_OUTSIDE;
-			}
-		}
 		*pnBytes = nBytes;
 		return unicode;
 	} else {
 		*pnBytes = 1;
 		return b;
 	}
+}
+
+static int convertUtf8ToLatin1(const char* utf8, int* pnBytes) {
+	int unicode = convertUtf8ToUnicode(utf8, pnBytes);
+	if(unicode > 0xFF) {
+		//0xFEFF is ZERO WIDTH NO-BREAK SPACE, an encoding signature.
+		if(unicode == 0xFEFF) {
+			unicode = ' ';	//not a proper translation, but it shouldn't cause any problems.
+		} else {
+			//printf("CU8u: %i", unicode);
+			unicode = sContext->unicodeCharacter(sContext, unicode);
+			if(unicode == 0)
+				return PEC_OUTSIDE;
+		}
+	}
+	return unicode;
 }
 
 // see the official Unicode standards document
@@ -904,7 +974,7 @@ extern "C" unsigned char mtxBasicUnicodeConvert(MTXContext*, int unicode) {
 	return result;
 }
 
-void setProc() {
+static void setProc() {
 	proc = _proc;
 	procComplete = _procComplete;
 }
@@ -919,20 +989,20 @@ namespace Mtx {
 	static void encoding(MTXContext*, const char* name) {
 		sXml->mtxEncoding(name);
 	}
-	static void tagStart(MTXContext*, const char* name, int len) {
-		sXml->mtxTagStart(name, len);
+	static void tagStart(MTXContext*, const void* name, int len) {
+		sXml->mtxTagStart((char*)name, len);
 	}
-	static void tagAttr(MTXContext*, const char* attrName, const char* attrValue) {
-		sXml->mtxTagAttr(attrName, attrValue);
+	static void tagAttr(MTXContext*, const void* attrName, const void* attrValue) {
+		sXml->mtxTagAttr((char*)attrName, (char*)attrValue);
 	}
 	static void tagStartEnd(MTXContext*) {
 		sXml->mtxTagStartEnd();
 	}
-	static void tagData(MTXContext*, const char* data, int len) {
-		sXml->mtxTagData(data, len);
+	static void tagData(MTXContext*, const void* data, int len) {
+		sXml->mtxTagData((char*)data, len);
 	}
-	static void tagEnd(MTXContext*, const char* name, int len) {
-		sXml->mtxTagEnd(name, len);
+	static void tagEnd(MTXContext*, const void* name, int len) {
+		sXml->mtxTagEnd((char*)name, len);
 	}
 	static void emptyTagEnd(MTXContext*) {
 		sXml->mtxEmptyTagEnd();
@@ -952,7 +1022,7 @@ namespace Mtx {
 		return mtxBasicUnicodeConvert(NULL, unicode);
 	}
 
-	void Context::init(MtxListener* mtx, XmlListener* xml) {
+	void ContextBase::initBase() {
 		mContext.encoding = encoding;
 		mContext.tagStart = tagStart;
 		mContext.tagStartEnd = tagStartEnd;
@@ -962,14 +1032,24 @@ namespace Mtx {
 		mContext.emptyTagEnd = emptyTagEnd;
 		mContext.dataRemains = dataRemains;
 		mContext.parseError = parseError;
-		mContext.unicodeCharacter = unicodeCharacter;
 
 		//mContext.userData = this;	//not used
 
+		mtxStart(&mContext);
+	}
+
+	void Context::init(MtxListener* mtx, XmlListener* xml) {
+		initBase();
+		mContext.unicodeCharacter = unicodeCharacter;
 		mMtx = mtx;
 		mXml = xml;
+	}
 
-		mtxStart(&mContext);
+	void ContextW::init(MtxListener* mtx, XmlListenerW* xml) {
+		initBase();
+		mContext.unicodeCharacter = NULL;	//should crash if called.
+		mMtx = mtx;
+		mXml = xml;
 	}
 
 	bool Context::feed(char* data) {
@@ -984,7 +1064,14 @@ namespace Mtx {
 		return !!mtxFeedProcess(&mContext, data);
 	}
 
-	void Context::stop() {
+	bool ContextW::feed(char* data, wchar_t* wideBuffer) {
+		sMtx = mMtx;
+		// this is a very dangerous hack. I hope it works.
+		sXml = (XmlListener*)mXml;
+		return !!mtxFeedWide(&mContext, data, wideBuffer);
+	}
+
+	void ContextBase::stop() {
 		mtxStop(&mContext);
 	}
 

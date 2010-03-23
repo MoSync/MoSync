@@ -38,8 +38,9 @@
 #include "mawvsprintf.h"
 //#include "conprint.h"
 #include "madmath.h"
+#include "wchar.h"
 
-#ifdef MAPIP
+#if 1//def MAPIP
 
 //#ifdef KERNEL
 //#define NOFLOAT
@@ -747,9 +748,11 @@ int wsprintf(wchar *buf, const wchar *fmt, ...)
 
 int wlprintfln(const wchar* fmt, ...)
 {
+#define BUFLEN 2048
 	va_list args;
-	wchar buf[2048];
-	int len;
+	wchar buf[BUFLEN];
+	char buf8[BUFLEN * MB_LEN_MAX];
+	int len, len8;
 	static int lastWLres = 0;
 	
 	if(lastWLres < 0)
@@ -768,6 +771,8 @@ int wlprintfln(const wchar* fmt, ...)
 		buf[len++] = '\n';
 		buf[len] = 0;
 	}
-	lastWLres = maWriteLog(buf, len*sizeof(wchar));
+	//convert to utf-8
+	len8 = wcstombs(buf8, buf, sizeof(buf8));
+	lastWLres = maWriteLog(buf8, len8);
 	return len;
 }

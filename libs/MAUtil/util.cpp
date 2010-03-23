@@ -141,7 +141,7 @@ namespace MAUtil {
 		stringSplit<char>(str, delim, output);
 	}
 	void stringSplit(const WString& str, const WString& delim, MAUtil::Vector<WString>& output) {
-		stringSplit<wchar>(str, delim, output);
+		stringSplit<wchar_t>(str, delim, output);
 	}
 
 	template<class Tchar> void stringBreak(const Tchar* str, const Tchar* delim,
@@ -178,8 +178,8 @@ namespace MAUtil {
 	void stringBreak(const char* str, const char* delim, MAUtil::Vector<String>& output) {
 		stringBreak<char>(str, delim, output);
 	}
-	void stringBreak(const wchar* str, const wchar* delim, MAUtil::Vector<WString>& output) {
-		stringBreak<wchar>(str, delim, output);
+	void stringBreak(const wchar_t* str, const wchar_t* delim, MAUtil::Vector<WString>& output) {
+		stringBreak<wchar_t>(str, delim, output);
 	}
 
 	int dummy(int a) {

@@ -273,7 +273,7 @@ namespace MAUtil {
 	};
 
 	typedef BasicString<char> String;
-	typedef BasicString<wchar> WString;
+	typedef BasicString<wchar_t> WString;
 
 #ifdef NEW_OPERATORS
 

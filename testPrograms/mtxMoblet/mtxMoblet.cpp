@@ -20,6 +20,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <MAUtil/Connection.h>
 #include <conprint.h>
+#include <MAUtil/String.h>
+#include <wchar.h>
+#include <mawvsprintf.h>
 
 using namespace MAUtil;
 
@@ -27,8 +30,10 @@ using namespace MAUtil;
 // Config
 //******************************************************************************
 
-#define STANDARD
-//#define SVD_LOCAL
+#define MTX_UNICODE 1
+
+//#define STANDARD
+#define SVD_LOCAL
 //#define SVD_NET
 
 #define BUFLEN 1024*2
@@ -66,15 +71,31 @@ static const char* urls[] = {
 };
 static const int nUrls = (sizeof(urls) / sizeof(char*)) - 1;
 
+#if MTX_UNICODE
+typedef wchar_t tchar;
+#define TLPRINTFLN wlprintfln
+#define TPRINTF wprintf
+//#define US "%s"	//unicode string
+//#define CS "%S"	//C string
+#else
+typedef char tchar;
+#define TLPRINTFLN lprintfln
+#define TPRINTF printf
+//unicode string is not supported in this mode.
+//#define CS "%s"	//C string
+#endif
 
+typedef BasicString<tchar> TString;
+
+// if log is on, error is not needed.
 #if 0	//no log
 #define LOG(...)
-#define ERROR printf
+#define ERROR(fmt, ...) TPRINTF(L##fmt, ##__VA_ARGS__)
 #elif 0	//screen log
-#define LOG printf
+#define LOG(fmt, ...) TPRINTF(L##fmt, ##__VA_ARGS__)
 #define ERROR(...)
 #else	//file log
-#define LOG lprintfln
+#define LOG(fmt, ...) TLPRINTFLN(L##fmt, ##__VA_ARGS__)
 #define ERROR(...)
 #endif
 
@@ -82,7 +103,13 @@ static const int nUrls = (sizeof(urls) / sizeof(char*)) - 1;
 // Moblet
 //******************************************************************************
 
-class MyMoblet : public Moblet, private ConnectionListener, Mtx::MtxListener, Mtx::XmlListener {
+class MyMoblet : public Moblet, private ConnectionListener, Mtx::MtxListener,
+#if MTX_UNICODE
+	Mtx::XmlListenerW
+#else
+	Mtx::XmlListener
+#endif
+{
 public:
 	MyMoblet() : mHttp(this), currentUrl(0) {
 		totalStartTime = maGetMilliSecondCount();
@@ -94,12 +121,16 @@ public:
 private:
 	Connection mHttp;
 	int currentUrl;
+#if MTX_UNICODE
+	Mtx::ContextW mtx;
+#else
 	Mtx::Context mtx;
+#endif
 	char mBuffer[BUFLEN];
 	char* mPtr;
 	bool mError;
 #if TEST_STACK
-	Vector<String> mStack;
+	Vector<TString> mStack;
 #endif
 	int totalStartTime, connectStartTime, recvStartTime;	//TODO: rename
 	char mRecvBuffer[BUFLEN];
@@ -212,10 +243,15 @@ private:
 #endif
 				mPtr = mBuffer;
 				int parseStartTime = maGetMilliSecondCount();
+#if MTX_UNICODE
+				wchar_t wbuf[BUFLEN];
+				mtx.feed(mBuffer, wbuf);
+#else
 				if(mProcessing)
 					mtx.feedProcess(mBuffer);	//causes mtx callbacks
 				else
 					mtx.feed(mBuffer);
+#endif
 				m.parseTime += maGetMilliSecondCount() - parseStartTime;
 				if(mError) {
 					printf("error, breaking.\n");
@@ -233,10 +269,15 @@ private:
 			LOG("feed %li\n", (mPtr - mBuffer) + result);
 			mPtr = mBuffer;
 			int parseStartTime = maGetMilliSecondCount();
+#if MTX_UNICODE
+				wchar_t wbuf[BUFLEN];
+				mtx.feed(mBuffer, wbuf);
+#else
 			if(mProcessing)
 				mtx.feedProcess(mBuffer);	//causes mtx callbacks
 			else
 				mtx.feed(mBuffer);
+#endif
 			m.parseTime += maGetMilliSecondCount() - parseStartTime;
 			if(!mError) {
 				recvStartTime = maGetMilliSecondCount();
@@ -273,7 +314,7 @@ private:
 		printf("parseError\n");
 		mError = true;
 	}
-	virtual void mtxTagStart(const char* name, int len) {
+	virtual void mtxTagStart(const tchar* name, int len) {
 		m.tagStart++;
 		LOG("s %i: \"%s\"\n", len, name);
 		if(len > BUFLEN || len <= 0 || *name == '<') {
@@ -285,7 +326,7 @@ private:
 		mStack.add(name);
 #endif
 	}
-	virtual void mtxTagAttr(const char* attrName, const char* attrValue) {
+	virtual void mtxTagAttr(const tchar* attrName, const tchar* attrValue) {
 		m.tagAttr++;
 		LOG("a \"%s\"=\"%s\"\n", attrName, attrValue);
 		if(attrName[0] == 0) {
@@ -297,10 +338,10 @@ private:
 	virtual void mtxTagStartEnd() {
 		LOG("mtxTagStartEnd\n");
 	}
-	virtual void mtxTagData(const char* data, int len) {
+	virtual void mtxTagData(const tchar* data, int len) {
 		m.tagData++;
 		LOG("d %i: \"%s\"\n", len, data);
-		if(len > BUFLEN || len <= 0 || (int)strlen(data) != len) {
+		if(len > BUFLEN || len <= 0 || (int)tstrlen(data) != len) {
 			ERROR("d %i: \"%s\"\n", len, data);
 			mError = true;
 			return;
@@ -310,7 +351,7 @@ private:
 			printf("temp\n");
 #endif
 	}
-	virtual void mtxTagEnd(const char* name, int len) {
+	virtual void mtxTagEnd(const tchar* name, int len) {
 		m.tagEnd++;
 		LOG("e %i: \"%s\"\n", len, name);
 		if(len > BUFLEN || len <= 0) {
@@ -324,10 +365,14 @@ private:
 			mError = true;
 			return;
 		}
-		String& s(mStack[mStack.size() - 1]);
-		if(strcmp(s.c_str(), name) != 0 || s.length() != len) {
+		TString& s(mStack[mStack.size() - 1]);
+		if(tstrcmp(s.c_str(), name) != 0 || s.length() != len) {
 			printf("Error: stack mismatch\n"
+#if MTX_UNICODE
+				"\"%S\" != \"%S\"\n",
+#else
 				"\"%s\" != \"%s\"\n",
+#endif
 				s.c_str(), name);
 			mError = true;
 			return;
@@ -347,6 +392,7 @@ private:
 		mStack.resize(mStack.size() - 1);
 #endif
 	}
+#if !MTX_UNICODE
 	virtual unsigned char mtxUnicodeCharacter(int unicode) {
 		unsigned char result;
 		switch(unicode) {
@@ -373,6 +419,7 @@ private:
 		}
 		return result;
 	}
+#endif
 };
 
 extern "C" int MAMain() {

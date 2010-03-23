@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //*********************************************************************************************
 
 #include "compile.h"
+#include <assert.h>
 
 #define USE_HASHING
 
@@ -1541,7 +1542,7 @@ void DumpIPTrans()
 void DumpFunctions(FILE *out)
 {
 	SYMBOL	*Sym;
-
+	int lastVal = -1;
 	int		n;
 
 	fprintf(out, "FUNCTIONS\n");
@@ -1560,6 +1561,9 @@ void DumpFunctions(FILE *out)
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s",Hex32(Sym->EndIP));
 			fprintf(out, "\n");
+			assert(Sym->Value <= Sym->EndIP);
+			assert(Sym->Value > lastVal);
+			lastVal = Sym->Value;
 		}
 
 		Sym++;
