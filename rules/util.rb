@@ -65,21 +65,9 @@ class String
 	end
 end
 
-def commandLineCleanup(cmd)
-	if(HOST == :win32)
-		# bug in windows command line parser causes commands on the following format to fail:
-		# \directory\subdir/executable
-		# to work around, we substitute all / for \.
-		puts "commandLineCleanup!"
-		cmd.gsub!('/', '\\')
-		puts cmd
-	end
-end
-
 def sh(cmd)
 	#TODO: optimize by removing the extra shell
 	#the Process class should be useful.
-	commandLineCleanup(cmd)
 	$stderr.puts cmd
 	if(!system(cmd)) then
 		error "Command failed: '#{$?}'"

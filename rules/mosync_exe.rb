@@ -17,6 +17,7 @@
 # This file defines the class used for compiling MoSync programs.
 
 require "#{File.dirname(__FILE__)}/pipe.rb"
+require "#{File.dirname(__FILE__)}/mosync_util.rb"
 
 class PipeExeWork < PipeGccWork
 	def setup
@@ -26,7 +27,7 @@ class PipeExeWork < PipeGccWork
 		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
 		@FLAGS = " -sld=#{sld} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
-			[mosync_include, "#{ENV['MOSYNCDIR']}/profiles/vendors/MobileSorcery/Emulator"]
+			[mosync_include, "#{mosyncdir}/profiles/vendors/MobileSorcery/Emulator"]
 		super
 	end
 	def setup3(all_objects)

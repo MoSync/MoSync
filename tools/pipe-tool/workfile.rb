@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require File.expand_path('../../rules/native_mosync.rb')
+require File.expand_path('../../rules/mosync_util.rb')
 
 work = MoSyncExe.new
 work.instance_eval do
@@ -12,7 +13,7 @@ work.instance_eval do
 	# -Wno-unused-function
 	@LIBRARIES = ["z"]
 	@NAME = "pipe-tool"
-	@INSTALLDIR = ENV['MOSYNCDIR'] + '/bin'
+	@INSTALLDIR = mosyncdir + '/bin'
 	
 	setup
 	

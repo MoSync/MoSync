@@ -15,11 +15,11 @@
 # 02111-1307, USA.
 
 require "#{File.dirname(__FILE__)}/gcc.rb"
-#require 'lib/importenv.rb'
+require "#{File.dirname(__FILE__)}/mosync_util.rb"
 
 module MoSyncInclude
-	def mosync_include; "#{ENV['MOSYNCDIR']}/include" + sub_include; end
-	def mosync_libdir; "#{ENV['MOSYNCDIR']}/lib"; end
+	def mosync_include; "#{mosyncdir}/include" + sub_include; end
+	def mosync_libdir; "#{mosyncdir}/lib"; end
 	def sub_include; USE_NEWLIB ? "/newlib" : ""; end
 end
 

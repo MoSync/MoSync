@@ -4,6 +4,7 @@
 require File.expand_path('rules/targets.rb')
 require File.expand_path('rules/host.rb')
 require File.expand_path('rules/task.rb')
+require File.expand_path('rules/mosync_util.rb')
 
 PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"]
 
@@ -36,7 +37,7 @@ NEWLIB_DIRS = ["libs", "tests/unitTest", "examples"]
 skins = Work.new
 skins.instance_eval do
 	def setup
-		builddir = "#{ENV['MOSYNCDIR']}/skins"
+		builddir = "#{mosyncdir}/skins"
 		@prerequisites = [DirTask.new(self, builddir)]
 		skin_sources = Dir['skins/*']
 		@prerequisites |= skin_sources.collect do |src|

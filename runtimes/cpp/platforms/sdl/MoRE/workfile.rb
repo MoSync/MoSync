@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require File.expand_path('../shared_work.rb')
+require File.expand_path('../../rules/mosync_util.rb')
 
 work = MoSyncExe.new
 class << work
@@ -26,7 +27,7 @@ work.instance_eval do
 	
 	@NAME = "moemu"
 	
-	@INSTALLDIR = ENV['MOSYNCDIR'] + '/bin'
+	@INSTALLDIR = mosyncdir + '/bin'
 	
 	setup
 end

@@ -15,6 +15,7 @@
 # 02111-1307, USA.
 
 require 'fileutils'
+require '../../rules/mosync_util.rb'
 
 class RuntimeBuilder 
 	def android(runtime_dir, mode)
@@ -99,7 +100,7 @@ class RuntimeBuilder
 		system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{android_sdk}android.jar #{temp_dir}*.java");
 	
 		# This implementation assumes that MoSync was installed on the computer
-		mosync_dir = ENV['MOSYNCDIR']
+		mosync_dir = mosyncdir
 		current = Dir.pwd
 		Dir.chdir class_dir
 		system("#{mosync_dir}/bin/zip -r #{runtime_dir}MoSyncRuntime#{debug}.zip .");

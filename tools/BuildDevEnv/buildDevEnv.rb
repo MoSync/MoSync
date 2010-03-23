@@ -1,5 +1,6 @@
 require 'fileutils'
-require '../../rules/util.rb'
+require File.expand_path('../../rules/util.rb')
+require File.expand_path('../../rules/mosync_util.rb')
 
 def sh2(dir, exec)
 	prev = Dir.getwd
@@ -44,7 +45,7 @@ sh2("intlibs/bluetooth", "vcbuild bluetooth.vcproj \"Release|Win32\"")
 sh2("intlibs/net", "vcbuild net.vcproj \"Release|Win32\"")
 sh2("intlibs/gsm_amr", "vcbuild gsm_amr.vcproj \"Release|Win32\"")
 #sh("xcopy intlibs/gsm_amr/release/gsm_amr.dll \"%MOSYNCDIR%/bin/gsm_amr.dll\" /e /y")
-copy_if_not_exist("intlibs/gsm_amr/release/gsm_amr.dll", "#{ENV['MOSYNCDIR']}/bin/gsm_amr.dll")
+copy_if_not_exist("intlibs/gsm_amr/release/gsm_amr.dll", "#{mosyncdir}/bin/gsm_amr.dll")
 sh2("tools/mobex", "vcbuild mobex.vcproj \"Release|Win32\"")
 
 sh2("libs", "ruby workfile.rb")
