@@ -21,7 +21,6 @@ require "#{File.dirname(__FILE__)}/loader_md.rb"
 require "#{File.dirname(__FILE__)}/flags.rb"
 
 def get_gcc_version_string(gcc)
-	commandLineCleanup(gcc)
 	puts "get_gcc_version_string(#{gcc})"
 	file = open("|#{gcc} -v 2>&1")
 	file.each do |line|
