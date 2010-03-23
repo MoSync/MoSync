@@ -532,10 +532,10 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 
 cd %MOSYNC_TRUNK%\libs
 
-@call rake pipe
+@call ruby workfile.rb
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@call rake pipe CONFIG=""
+@call ruby workfile.rb CONFIG=""
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
