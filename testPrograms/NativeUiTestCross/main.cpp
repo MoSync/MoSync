@@ -6,6 +6,8 @@
 #include "Manager.h"
 #include "Layout.h"
 #include "MenuItem.h"
+#include "Parser.h"
+#include "MAHeaders.h"
 
 
 class Main : public ActionListener {
@@ -39,6 +41,9 @@ public:
 
 	void onCreate (int id) {
 		if(id==frame->getId()) {
+
+			Parser *parser = new Parser(MAIN_LAYOUT, frame);
+/*
 			button = new Button("New frame");
 			Manager::Instance().addWidget(button);
 
@@ -68,6 +73,7 @@ public:
 			item2 = new MenuItem("Useless", frame);
 			Manager::Instance().addWidget(item2);
 			item2->addActionListener(this);
+*/
 		}
 	}
 	void onClick (int id) {

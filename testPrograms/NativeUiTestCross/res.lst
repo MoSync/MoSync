@@ -1,0 +1,3 @@
+.res MAIN_LAYOUT
+.bin 
+.include "main_layout.xml"
