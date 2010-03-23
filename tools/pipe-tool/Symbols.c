@@ -1561,8 +1561,9 @@ void DumpFunctions(FILE *out)
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s",Hex32(Sym->EndIP));
 			fprintf(out, "\n");
-			assert(Sym->Value <= Sym->EndIP);
-			assert(Sym->Value > lastVal);
+			if(Sym->Value > Sym->EndIP || Sym->Value <= lastVal) {
+				printf("Warning: problematic symbol value: %s\n", Sym->Name);
+			}
 			lastVal = Sym->Value;
 		}
 

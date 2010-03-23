@@ -6,7 +6,8 @@ REM  2>&1 | sed 's/\([-a-zA-Z0-9/]\+\)\(.[-a-zA-Z0-9]\+\):\([0-9]\+\):/%CD:\=\/%
 REM -Wshadow
 
 set IFLAGS=-I%MOSYNCDIR%/include -I%MOSYNCDIR%/libs -I%MOSYNCDIR%/profiles/vendors/MobileSorcery/Emulator
-set CFLAGS=-O0 -fno-omit-frame-pointer -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings
+set CFLAGS=-finput-charset=UTF-8 -O0 -fno-omit-frame-pointer -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings
+echo xgcc -g -S %IFLAGS% %CFLAGS% -o temp.s %1
 xgcc -g -S %IFLAGS% %CFLAGS% -o temp.s %1
 @REM gcj  -g -C -E %IFLAGS% %CFLAGS% %1
 @REM goto end

@@ -50,8 +50,9 @@ void DisplayConsole(void);
 * \see InitConsole printf
 */
 
-void PrintConsole(const char * str);
+void PrintConsole(const wchar * str);
 int puts(const char* str);
+int wputs(const wchar* str);
 
 /** \brief Prints a formatted string to the console.
 * \param fmt A C string that may contain formatting
@@ -66,6 +67,12 @@ int puts(const char* str);
 int printf(const char *fmt, ...);
 
 int vprintf(const char *fmt, va_list args);
+
+#define _WSTDIO_DEFINED
+
+int wprintf(const wchar_t *fmt, ...);
+
+int wvprintf(const wchar_t *fmt, va_list args);
 
 int putchar(int character);
 

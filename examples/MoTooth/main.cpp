@@ -269,7 +269,10 @@ void run() {
 			return;
 		}
 		buffer[result] = 0;
-		PrintConsole(buffer);
+		int oldLog = gConsoleLogging;
+		gConsoleLogging = 0;
+		puts(buffer);
+		gConsoleLogging = oldLog;
 		maWriteLog(buffer, result);
 	}
 }

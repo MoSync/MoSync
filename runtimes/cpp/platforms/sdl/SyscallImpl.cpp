@@ -245,9 +245,9 @@ namespace Base {
 		char destDir[256];
 		destDir[0] = 0;
 		strcpy(destDir, mosyncDir);
-		strcat(destDir, "/bin/maspec.fon");
+		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
 
-		TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+		TEST_Z(gFont = TTF_OpenFont(destDir, 16));
 
 		return true;
 
@@ -380,9 +380,13 @@ namespace Base {
 		char destDir[256];
 		destDir[0] = 0;
 		strcpy(destDir, mosyncDir);
+#if 1
+		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
+		TEST_Z(gFont = TTF_OpenFont(destDir, 16));
+#else
 		strcat(destDir, "/bin/maspec.fon");
-
 		TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+#endif
 
 		return true;
 	}
@@ -541,7 +545,7 @@ namespace Base {
 		if(context) {
 			SDL_FreeRW(context);
 		}
-		return 0; 
+		return 0;
 	}
 
 	// Niklas: non static because I need it in SDL audio engine.
