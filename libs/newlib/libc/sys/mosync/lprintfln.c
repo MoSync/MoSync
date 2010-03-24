@@ -13,7 +13,7 @@ int lprintfln(const char* fmt, ...)
 	buf[0] = 0;
 
 	va_start(args, fmt);
-	len = vsprintf(buf, fmt, args);
+	len = vsnprintf(buf, sizeof(buf), fmt, args);
 	if(len > (int)sizeof(buf) - 2) {
 		maPanic(0, "lprintfln buffer overrun!");
 	}
