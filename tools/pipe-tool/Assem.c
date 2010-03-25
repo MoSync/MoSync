@@ -642,15 +642,15 @@ void DefineLabel(int isFunction)
 		return;
 	}
 
-	sym.Section		= section_Enum;
-	sym.Type		= g_Section;
+	sym.Section	= section_Enum;
+	sym.Type	= g_Section;
 	sym.LocalScope	= g_LocalScope;
 	sym.LabelType	= isFunction;
-	sym.EndIP		= 0;
-	sym.Flags		= 0;
-	sym.Value		= g_CodeIP;
-	sym.Params		= g_Function_Param_Count;
-	sym.RetType		= g_Function_Return_Type;
+	sym.EndIP	= 0;
+	sym.Flags	= 0;
+	sym.Value	= g_CodeIP;
+	sym.Params	= g_Function_Param_Count;
+	sym.RetType	= g_Function_Return_Type;
 
 	if (g_Section == SECT_data)
 		sym.Value = g_DataIP;

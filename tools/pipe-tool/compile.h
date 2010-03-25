@@ -452,10 +452,10 @@ typedef struct SYMBOL
 {
 	char	*Name;			// Symbol name in Symbol buffer
 	char	*Interface;		// Syscall interface string (used in script as a string ptr)
-	int		Type;			// Symbol type
-	int		Value;
-	int		EndIP;
-	int		Flags;
+	int	Type;			// Symbol type
+	int	Value;
+	int	EndIP;
+	int	Flags;
 
 	short	VirtualIndex;
 	short	LocalScope;		// Local Scope of variable
@@ -467,9 +467,9 @@ typedef struct SYMBOL
 	char	Params;			// Parameter count
 	char	RetType;		// Return type
 
-//	int		Size;			// size of anything
+//	int	Size;			// size of anything
 //	char	*SymLink;		// Ptr to anything
-//	int		Extern;
+//	int	Extern;
 } SYMBOL;
 
 //****************************************
@@ -480,7 +480,7 @@ typedef struct _CPE
 {
 	char	*Name;			// Symbol name in Symbol buffer
 	char	Len;			// Length of actual name
-	int		Type;			// Symbol type 
+	int	Type;			// Symbol type 
 	int	Size;			// Size of a value
 	int	Section;		// Allocated size including arrays and stuff
 	int	Value;			// IP for this label
@@ -495,7 +495,7 @@ typedef struct
 	SYMBOL *Sym;			// Pointer to original symbol
 
 	int	Value;			// Constant value or address variable string
-	int		Type;			// copy of SYMBOL.flags (used in type conversion)
+	int	Type;			// copy of SYMBOL.flags (used in type conversion)
 } EVAL;
 
 //****************************************
@@ -965,8 +965,8 @@ typedef uchar *ConstantData;
 typedef struct
 {
 	ushort	*fieldInfoP;
-	int		offset;				// in bytes
-	int		size;				// in bytes
+	int	offset;				// in bytes
+	int	size;				// in bytes
 	uchar	*type;				// ptr to sig constant
 } FieldData;
 
@@ -1088,6 +1088,7 @@ enum
 //				Prototypes
 //****************************************
 
+#include "AnalyseCode.h"
 #include "PBProto.h"
 
 //****************************************

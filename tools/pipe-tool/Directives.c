@@ -1106,7 +1106,7 @@ void DefineStructor(char *type, int count)
 	int oldSect = g_Section;
 	int oldData = g_DataIP;
 	
-	imm = GetExpression();				// Get the function value
+	g_imm = GetExpression();				// Get the function value
 
 	g_Section = SECT_data;
 	g_DataIP = g_imm;

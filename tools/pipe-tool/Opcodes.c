@@ -30,13 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #if 1
 
-#define Opcode(tok,method,opnum,opimm)		\
-		case tok:							\
-		{									\
-			SkipWhiteSpace();				\
-			method(ThisOpName,opnum,opimm);	\
-			return;							\
-		}		
+#define Opcode(tok,method,opnum,opimm)	\
+    case tok:				\
+    {					\
+        SkipWhiteSpace();		\
+        method(ThisOpName,opnum,opimm);	\
+        return;				\
+    }
 
 char ThisOpName[128];
 char *AsmCharPtr = 0;
@@ -109,12 +109,12 @@ void Instructions()
 
 #else
 
-#define Opcode(string,method,opnum,opimm)		\
-		if (QToken(string))						\
-		{										\
-			method(string,opnum,opimm);			\
-			return;								\
-		}		
+#define Opcode(string,method,opnum,opimm)   \
+    if (QToken(string))                     \
+    {                                       \
+        method(string,opnum,opimm);         \
+        return;                             \
+    }
 
 void Instructions()
 {
@@ -750,7 +750,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 			g_rs = GetReg(1);
 
 			g_op = OpcodeStore;
-			WriteOpcode(AsmName, use_rd | use_rs | use_int);		// ld [rd, imm], rs
+			WriteOpcode(AsmName, use_rd | use_rs | use_int);		// ld [rd, g_imm], rs
 			return;	
 		}
 
@@ -764,7 +764,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		{
 			Token("&");				// There may be a '&' token !!
 
-			// Get imm
+			// Get g_imm
 			HandleExprImm();
 
 			CheckDataAccess_LoadStore(OpcodeStore);
@@ -959,7 +959,7 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 
 /*	if (Opcode == _PUSH)
 	{
-		printf("--- PUSH %s,%s\n", regsyms[rd], regsyms[rs] );
+		printf("--- PUSH %s,%s\n", regsyms[g_rd], regsyms[g_rs] );
 	}
 */
 
@@ -1309,7 +1309,7 @@ void WriteOpcode(char *AsmName, int field)
 		{
 /*			if (g_ArgJavaNative)
 			{
-				*CodePtr++ = (char)(imm >> 24);			// ?? Why 32 bits, can't remember
+				*CodePtr++ = (char)(g_imm >> 24);			// ?? Why 32 bits, can't remember
 				g_CodeIP++;
 			}
 */		
