@@ -1,0 +1,42 @@
+Index: mpglib.c
+===================================================================
+--- mpglib.c	(revision 536)
++++ mpglib.c	(working copy)
+@@ -106,6 +106,28 @@
+ } /* MPGLIB_quit */
+ 
+ 
++//checks the current position for ID3 tags (both v1 and v2) and jumps past them.
++static void MPGLIB_discard_id3(SDL_RWops* rw) {
++	//read 3 bytes
++	//compare to "TAG", jump +128 bytes on match
++	//compare to "ID3", jump +0x400 bytes on match
++	//both jumps take the 3 bytes into account
++
++	char buf[3];
++	if(SDL_RWread(rw, buf, 3, 1) != 1) {
++		//couldn't read
++		return;
++	}
++	if(buf[0] == 'T' && buf[1] == 'A' && buf[2] == 'G') {
++		SDL_RWseek(rw, 128-3, SEEK_CUR);
++	} else if(buf[0] == 'I' && buf[1] == 'D' && buf[2] == '3') {
++		SDL_RWseek(rw, 0x400-3, SEEK_CUR);
++	} else {
++		SDL_RWseek(rw, -3, SEEK_CUR);
++	}
++}
++
++
+ static int MPGLIB_open(Sound_Sample *sample, const char *ext)
+ {
+     Sound_SampleInternal *internal = (Sound_SampleInternal *) sample->opaque;
+@@ -137,6 +159,8 @@
+     {
+         Uint8 mp3_magic[2];
+ 
++				MPGLIB_discard_id3(internal->rw);
++
+         if (SDL_RWread(internal->rw, mp3_magic, sizeof (mp3_magic), 1) != 1)
+             BAIL_MACRO("MPGLIB: Could not read MP3 magic.", 0);
+ 

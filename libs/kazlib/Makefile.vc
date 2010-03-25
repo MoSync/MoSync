@@ -1,0 +1,45 @@
+# $Id: Makefile.vc,v 1.4 1999/11/09 03:34:18 kaz Exp $
+# $Name: kazlib_1_20 $
+
+CC	= cl
+CFLAGS	= /nologo /Za /W3 /Ox
+
+project: tdict.exe tlist.exe thash.exe teh.exe tsfx.exe
+
+tlist.exe: list.c list.h
+	$(CC) $(CFLAGS) -DKAZLIB_TEST_MAIN /Fotlist.obj /Fetlist.exe list.c
+
+tdict.exe: dict.c dict.h
+	$(CC) $(CFLAGS) -DKAZLIB_TEST_MAIN /Fotdict.obj /Fetdict.exe dict.c
+
+thash.exe: hash.c hash.h
+	$(CC) $(CFLAGS) -DKAZLIB_TEST_MAIN /Fothash.obj /Fethash.exe hash.c
+
+teh.exe: except.c except.h
+	$(CC) $(CFLAGS) -DKAZLIB_TEST_MAIN /Foteh.obj /Feteh.exe except.c
+
+tsfx.exe: sfx.c sfx.h except.obj hash.obj
+	$(CC) $(CFLAGS) -DKAZLIB_TEST_MAIN /Fotsfx.obj /Fetsfx.exe sfx.c except.obj hash.obj
+
+docs: docs.dvi
+
+docs.dvi: docs.ltx docs.toc docs.ind
+	latex docs.ltx
+
+docs.ind: docs.idx docs.ist
+	makeindex -s docs.ist docs.idx
+
+docs.toc: docs.ltx
+	latex docs.ltx
+
+docs.idx: docs.ltx
+	latex docs.ltx
+
+clean:
+	-del tags tlist.exe tdict.exe thash.exe teh.exe tsfx.exe except.obj docs.aux docs.log docs.dvi docs.toc docs.idx docs.ind docs.ilg
+
+except.obj: except.c except.h
+	$(CC) $(CFLAGS) /c except.c
+
+hash.obj: hash.c hash.h
+	$(CC) $(CFLAGS) /c hash.c
