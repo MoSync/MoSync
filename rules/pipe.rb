@@ -30,8 +30,17 @@ class PipeTask < FileTask
 		dirTask = DirTask.new(work, File.dirname(name))
 		@objects = objects
 		@prerequisites += @objects + [dirTask]
+		
+		initFlags
 	end
+	
+	def needed?(log = true)
+		return true if(super(log))
+		return flagsNeeded?(log)
+	end
+	
 	def execute
+		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
 			sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
@@ -43,6 +52,8 @@ class PipeTask < FileTask
 			error "Pipe-tool failed silently!"
 		end
 	end
+	
+	include FlagsChanged
 end
 
 # adds dependency handling
