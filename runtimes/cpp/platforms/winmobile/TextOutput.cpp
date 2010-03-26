@@ -206,11 +206,19 @@ void TextOutput::drawChar(Image *dst, int x, int y, char c, unsigned int color) 
 }
 
 SIZE TextOutput::getTextSize(const char *str) {
+	unsigned char *ustr = (unsigned char*)str;
 	int w = 0, h = 0;
-	while(*str) {
-		if(fontCoords[(*str)-32].height > h) h = fontCoords[(*str)-32].height;	
-		w += fontCoords[(*str)-32].width;
-		str++;
+	while(*ustr) {
+		unsigned char c = *ustr;
+		if(c<32 || c>127) {
+			c = 0;
+		} else {
+			c -= 32;
+		}
+
+		if(fontCoords[c].height > h) h = fontCoords[c].height;	
+		w += fontCoords[c].width;
+		ustr++;
 	}
 
 	SIZE ret;
@@ -220,9 +228,15 @@ SIZE TextOutput::getTextSize(const char *str) {
 }
 
 void TextOutput::drawText(Image *dst, int x, int y, const char *str, unsigned int color) {
-	while(*str) {
-		drawChar(dst, x, y, *str, color);
-		x += fontCoords[(*str)-32].width;
-		str++;
+	unsigned char *ustr = (unsigned char*)str;	
+	while(*ustr) {
+		unsigned char c = *ustr;
+		if(c<32 || c>127) {
+			c = 32;
+		}
+
+		drawChar(dst, x, y, c, color);
+		x += fontCoords[c-32].width;
+		ustr++;
 	}
 }
