@@ -1,5 +1,5 @@
-#ifndef MAVSPRINTF_H
-#define MAVSPRINTF_H
+#ifndef MAWVSPRINTF_H
+#define MAWVSPRINTF_H
 
 #include <stdio.h>
 #include <ma.h>
@@ -13,4 +13,4 @@ int wlprintfln(const wchar_t* fmt, ...);
 }
 #endif
 
-#endif	//MAVSPRINTF_H
+#endif	//MAWVSPRINTF_H

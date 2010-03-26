@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1">
+<build.cfg id="Debug"/>
+<build.cfg id="Release"/>
+<properties>
+<property key="build.prefs:additional.include.paths/Debug" value="c:\mosync\include\newlib\"/>
+<property key="build.prefs:additional.include.paths/Release" value="c:\mosync\include\newlib\"/>
+<property key="build.prefs:additional.libraries/Debug" value="newlib.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="newlib.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value="c:\mosync\lib\newlib_debug\"/>
+<property key="build.prefs:additional.library.paths/Release" value="c:\mosync\lib\newlib_debug\"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.switches/Debug" value="-O0 -DUSE_NEWLIB"/>
+<property key="build.prefs:gcc.switches/Release" value="-O2 -DUSE_NEWLIB"/>
+<property key="build.prefs:gcc.warnings/Debug" value="14"/>
+<property key="build.prefs:gcc.warnings/Release" value="14"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
+<property key="build.prefs:memory.data/Release" value="128"/>
+<property key="build.prefs:memory.stack/Debug" value="32"/>
+<property key="build.prefs:memory.stack/Release" value="32"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="template.id" value="project.empty"/>
+</properties>
+</project>

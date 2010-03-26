@@ -461,7 +461,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
 
-  //char *cp;
+  char *cp;
   short *sp;
   int *ip;
 #ifdef FLOATING_POINT

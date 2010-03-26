@@ -44,7 +44,7 @@ void InitConsole(void);
 void DisplayConsole(void);
 
 /** \brief Prints a C string to the console.
-* \param str A C string
+* \param str A Latin-1 string.
 *
 * \see InitConsole printf
 */
@@ -52,7 +52,7 @@ void DisplayConsole(void);
 void PrintConsole(const char * str);
 
 /** \brief Prints a string to the console.
-* \param str A string.
+* \param str A UTF-8 string.
 * \param len The string's length.
 *
 * \see InitConsole printf

@@ -9,7 +9,7 @@
 
 int (*__mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		 const char *, mbstate_t *)
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(MAPIP)
    = __utf8_mbtowc;
 #else
    = __ascii_mbtowc;

@@ -304,7 +304,7 @@ _DEFUN(__sprint_r, (ptr, fp, uio),
 	if (fp->_flags2 & __SWID) {
 		struct __siov *iov;
 		wchar_t *p;
-		int i, len;
+		int i, len=0;
 
 		iov = uio->uio_iov;
 		for (; uio->uio_resid != 0;

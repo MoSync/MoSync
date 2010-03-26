@@ -618,7 +618,7 @@ repeat:
         while (--field_width > 0) *str++ = ' ';
         continue;
 
-      case 's':
+      case 'S':
         s = va_arg(args, wchar *);
         if (!s) s = L"<NULL>";
         len = wcsnlen(s, precision);
@@ -627,7 +627,8 @@ repeat:
         while (len < field_width--) *str++ = ' ';
         continue;
 
-      case 'S':	//latin-1 string
+      case 's':	//latin-1 string
+				//todo: src should be treated as utf-8.
         S = va_arg(args, char *);
         if (!S) S = "<NULL>";
         len = strnlen(S, precision);

@@ -22,6 +22,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "malloc.h"
 #include "conprint.h"
 #include "IX_FILE.h"
+#include <stdlib.h>
+#include <mawvsprintf.h>
+#include <limits.h>
 
 // Console width, in characters
 // Note that not all characters on a line may be visible on a given device, due
@@ -30,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 typedef struct
 {
-	char line[CONSOLE_WIDTH + 1];
+	wchar line[CONSOLE_WIDTH + 1];
 } ConLine;
 
 typedef struct ConData_t
@@ -70,7 +73,7 @@ int gConsoleDisplay = 1;
 static void FeedLine(void)
 {
 	if (gConsoleLogging)
-		lprintfln("PrintConsole: %s\n", sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
+		wlprintfln(L"PrintConsole: %S\n", sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
 			sConsole.height].line);
 
 	sConsole.cursorPos.y++;
@@ -87,7 +90,7 @@ static void FeedLine(void)
 void InitConsole(void)
 {
 	int i;
-	char string[128];
+	wchar string[128];
 
 	sConsole.screenSize = maGetScrSize();
 	maSetClipRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
@@ -97,7 +100,7 @@ void InitConsole(void)
 	// this is more safe:
 	for(i = 1; i < 128; i++) string[i-1] = i;
 	string[127] = 0;
-	sConsole.fontHeight = EXTENT_Y(maGetTextSize(string));
+	sConsole.fontHeight = EXTENT_Y(maGetTextSizeW(string));
 
 	sConsole.height = EXTENT_Y(sConsole.screenSize) / sConsole.fontHeight;
 	sConsole.cursorPos.x = 0;
@@ -128,7 +131,7 @@ void DisplayConsole(void)
 	for (n = 0;  n < sConsole.height;  n++)
 	{
 		index = (n + sConsole.firstLine) % sConsole.height;
-		maDrawText(0, n * sConsole.fontHeight, sConsole.lines[index].line);
+		maDrawTextW(0, n * sConsole.fontHeight, sConsole.lines[index].line);
 	}
 
 	maUpdateScreen();
@@ -138,7 +141,7 @@ void DisplayConsole(void)
 void PrintConsole(const char *str)
 {
 	int length, pos = 0;
-	char* line;
+	wchar* line;
 
 	if (gConsoleLogging)
 	{
@@ -184,7 +187,6 @@ void PrintConsole(const char *str)
 		{
 			line = sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
 				sConsole.height].line;
-			line[sConsole.cursorPos.x++] = str[pos];
 
 			if (sConsole.cursorPos.x >= CONSOLE_WIDTH)
 			{
@@ -204,7 +206,7 @@ void PrintConsole(const char *str)
 void WriteConsole(const char* str, int len)
 {
 	int pos = 0;
-	char* line;
+	wchar* line;
 
 	if(gConsoleFile > 0)
 	{
@@ -225,20 +227,29 @@ void WriteConsole(const char* str, int len)
 
 	while (pos < len)
 	{
-		if (str[pos] == '\r')
+		if (str[pos] == '\r') {
 			sConsole.cursorPos.x = 0;
+			pos++;
+		}
 		else if (str[pos] == '\n')
 		{
 			if (pos + 1 == len)
 				sConsole.postponedLineFeed = 1;
 			else
 				FeedLine();
+			pos++;
 		}
 		else
 		{
+			int res;
 			line = sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
 				sConsole.height].line;
-			line[sConsole.cursorPos.x++] = str[pos];
+			res = mbtowc(&line[sConsole.cursorPos.x++], str + pos, MB_LEN_MAX);//len - pos);
+			if(res <= 0) {
+				maDumpCallStackEx(str, pos);
+				maPanic(res, "WriteConsole mbtowc");
+			}
+			pos += res;
 
 			if (sConsole.cursorPos.x >= CONSOLE_WIDTH)
 			{
@@ -248,8 +259,6 @@ void WriteConsole(const char* str, int len)
 					FeedLine();
 			}
 		}
-
-		pos++;
 	}
 
 	DisplayConsole();
