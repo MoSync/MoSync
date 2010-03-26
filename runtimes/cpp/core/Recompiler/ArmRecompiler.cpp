@@ -17,6 +17,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ArmRecompiler.h"
 
+#include <base/base_errors.h>
+using namespace MoSyncError;
+
 #define CACHE_LINE_SIZE 64 // bytes
 
 #ifdef USE_ARM_RECOMPILER
@@ -582,19 +585,26 @@ namespace MoSync {
 
 	// TODO implement division with assembly?
 	void ArmRecompiler::divu(int rd, int rs) {
-		*(unsigned long*)&mEnvironment.regs[rd] /= *(unsigned long*)&mEnvironment.regs[rs];
+		unsigned long denom = *(unsigned long*)&mEnvironment.regs[rs];
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::divui(int rd, int imm32) {
-		*(unsigned long*)&mEnvironment.regs[rd] /= (unsigned long) imm32;
+		unsigned long denom = (unsigned long) imm32;
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::div(int rd, int rs) {
+		if(mEnvironment.regs[rs]==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		mEnvironment.regs[rd] /= mEnvironment.regs[rs];
 	}
 
 	void ArmRecompiler::divi(int rd, int imm32) {
-		mEnvironment.regs[rd] /= (long) imm32;
+		long denom = (long)imm32;
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::visit_DIVU() {
