@@ -313,6 +313,30 @@ void Base::reportCallStack() {
 	report(REPORT_CALL_STACK, Core::GetFakeCallStack(gCore),
 		Core::GetFakeCallStackDepth(gCore) << 2);
 }
+
+int Base::maDumpCallStackEx(const char* str, int data) {
+	if(gCore == NULL)
+		return -2;
+	LOG("DumpCallStackEx:\n%s\n%i\n", str, data);
+	LOG("IP: 0x%x\n", Core::GetIp(gCore));
+	int depth = Core::GetFakeCallStackDepth(gCore);
+	LOG("Call stack: %i frames\n", depth);
+	const int* fcs = Core::GetFakeCallStack(gCore);
+	for(int i=0; i<depth; i++) {
+		//todo: translate
+		int ip = fcs[i];
+		int line;
+		std::string file;
+		bool res = mapIp(ip, line, file);
+		LOG("%i: 0x%x", i, ip);
+		if(res) {
+			LOG("(%s:%i)", file.c_str(), line);
+		}
+		LOG("\n");
+	}
+	return 0;
+}
+
 #endif
 
 #if 0//def INSTRUCTION_PROFILING

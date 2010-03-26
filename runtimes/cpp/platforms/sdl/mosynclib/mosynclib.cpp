@@ -140,6 +140,10 @@ int Base::getRuntimeIp() {
 void Base::reportCallStack() {
 }
 
+int Base::maDumpCallStackEx(const char*, int) {
+	return -1;
+}
+
 #ifdef MEMORY_PROTECTION
 void Base::Syscall::protectMemory(int start, int length) {
 }

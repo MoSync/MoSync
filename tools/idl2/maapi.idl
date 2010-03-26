@@ -1463,6 +1463,11 @@ interface MAAPI {
 		int maReportCallStack();
 
 		/**
+		* Dumps a string, an int, and the current call stack to the log file. Returns 0 if succeeded.
+		*/
+		int maDumpCallStackEx(in MAString str, in int data);
+
+		/**
 		 * Protects a piece of the data memory.
 		 * Any attempt to write to that piece of memory will raise a panic.
 		 * \param 'start' The start address of the memory piece to protect.

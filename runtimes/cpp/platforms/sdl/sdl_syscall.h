@@ -35,6 +35,7 @@ void __attribute((noreturn)) reloadProgram();
 #endif
 
 	void reportCallStack();
+	int maDumpCallStackEx(const char*, int);
 	int getRuntimeIp();
 	bool MAProcessEvents();
 }

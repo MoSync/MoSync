@@ -1744,6 +1744,8 @@ namespace Base {
 		case maIOCtl_maReportCallStack:
 			reportCallStack();
 			return 0;
+		case maIOCtl_maDumpCallStackEx:
+			return maDumpCallStackEx(SYSCALL_THIS->GetValidatedStr(a), b);
 #endif
 
 #ifdef MEMORY_PROTECTION
