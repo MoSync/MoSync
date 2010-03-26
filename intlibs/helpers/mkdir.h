@@ -39,6 +39,7 @@ inline int wremove(const wchar_t* name) {
 #include <direct.h>
 #endif	//_WIN32_WCE
 #elif defined(LINUX) || defined(__IPHONE__)
+#include <unistd.h>
 #include <sys/stat.h>
 int _mkdir(const char* name);
 inline int _mkdir(const char* name) {
