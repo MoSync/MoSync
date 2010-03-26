@@ -23,6 +23,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Parser.h"
 
+using namespace MAUtil;
+namespace TagNameSpace{
+	char *layoutTag="Layout";
+	char *labelTag="Label";
+	char *buttonTag="Button";
+	char *editTag="Edit";
+}
 
 /**
  * Constructor
@@ -33,7 +40,9 @@ Parser::Parser(int xmlResource, Frame *frame) {
 	int len = maGetDataSize(xmlResource);
 	char buf[len];
 	maReadData(xmlResource, buf, 0, len);
+	maWriteLog(buf, len);
 	mContext.feed(buf);
+
 }
 
 /**
@@ -53,13 +62,26 @@ void Parser::mtxEncoding(const char* value) {
 * \see MTXContext::tagStart
 */
 void Parser::mtxTagStart(const char* name, int len) {
-	//printf("s %i: \"%s\"\n", len, name);
-	Label *lab = new Label("hahahah");
-	Manager::Instance().addWidget(lab);
-	Layout *l = new Layout(mFrame);
-	l->addWidget(lab);
-	l->build();
+
+	if(compareToTag(name, len, TagNameSpace::layoutTag)) {
+		l = new Layout(mFrame);
+	}
+
+	if(compareToTag(name, len, TagNameSpace::labelTag)) {
+		Label *lab = new Label("huhuhu");
+		Manager::Instance().addWidget(lab);
+		l->addWidget(lab);
+
+	}
+
+	if(compareToTag(name, len, TagNameSpace::editTag)) {
+		Edit *edit = new Edit("huhuhu");
+		Manager::Instance().addWidget(edit);
+		l->addWidget(edit);
+
+	}
 }
+
 /**
 * \see MTXContext::tagAttr
 */
@@ -82,7 +104,9 @@ void Parser::mtxTagData(const char* data, int len) {
 * \see MTXContext::tagEnd
 */
 void Parser::mtxTagEnd(const char* name, int len) {
-
+	if(compareToTag(name, len, TagNameSpace::layoutTag)) {
+		l->build();
+	}
 }
 /**
 * \see MTXContext::parseError
@@ -104,6 +128,28 @@ void Parser::mtxEmptyTagEnd() {
 unsigned char Parser::mtxUnicodeCharacter(int unicode) {
 
 }
+/**
+ * Compares a string to a known tag.
+ *
+ * @param str	Input string
+ * @param len	Length of the input string
+ * @param tag	Reference tag
+ * @return		True if the input string matches
+ * 				the reference tag, else false.
+ */
+bool Parser::compareToTag(const char *str, int len, char *tag) {
+	char s[len+1];
+	int i;
+	for(i=0 ; i<len+1 ; i++) {
+		s[i]=str[i];
+	}
 
+
+	bool same = true;
+	for(i=0; i<len+1; i++) {
+		if(s[i]!=tag[i]) same=false;
+	}
+	return same;
+}
 
 

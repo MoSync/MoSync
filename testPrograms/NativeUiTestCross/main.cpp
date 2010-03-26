@@ -22,6 +22,7 @@ private:
 	Layout *l;
 	MenuItem *item;
 	MenuItem *item2;
+	Parser *parser;
 public:
 	Main() {
 		frame = new Frame();
@@ -37,12 +38,13 @@ public:
 		delete(button2);
 		delete(frame);
 		delete(frame2);
+		delete(parser);
 	}
 
 	void onCreate (int id) {
 		if(id==frame->getId()) {
 
-			Parser *parser = new Parser(MAIN_LAYOUT, frame);
+			parser = new Parser(MAIN_LAYOUT, frame);
 /*
 			button = new Button("New frame");
 			Manager::Instance().addWidget(button);

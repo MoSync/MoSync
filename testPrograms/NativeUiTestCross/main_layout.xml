@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout>
+<Layout>
     <Label text="Hello, I am a Label" />
+    <Edit text="Hello, I am an Edit" />
     <Button text="Hello, I am a Button" />
-</LinearLayout>
+</Layout>

@@ -33,6 +33,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Manager.h"
 #include "Layout.h"
 #include "Frame.h"
+#include "Edit.h"
+#include <MAUtil/String.h>
+
 
 
 /**
@@ -45,6 +48,9 @@ class Parser : public Mtx::XmlListener {
 public:
 	/**
 	 * Constructor
+	 *
+	 * @param xmlResource	Handle to the XML resource file
+	 * @param frame			Parent frame
 	 */
 	Parser(int xmlResource, Frame *frame);
 
@@ -91,10 +97,21 @@ public:
 	*/
 	unsigned char mtxUnicodeCharacter(int unicode);
 
+	/**
+	 * Compares a string to a known tag.
+	 *
+	 * @param str	Input string
+	 * @param len	Length of the input string
+	 * @param tag	Reference tag
+	 * @return		True if the input string matches
+	 * 				the reference tag, else false.
+	 */
+	bool compareToTag(const char *str, int len, char *tag);
 
 private:
 	Mtx::Context mContext;
 	Frame *mFrame;
+	Layout *l;
 
 
 };
