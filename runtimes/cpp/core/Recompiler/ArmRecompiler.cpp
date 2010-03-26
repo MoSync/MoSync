@@ -17,13 +17,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ArmRecompiler.h"
 
-#include <helpers/helpers.h>
-#include <base/base_errors.h>
-using namespace MoSyncError;
-
 #define CACHE_LINE_SIZE 64 // bytes
 
 #ifdef USE_ARM_RECOMPILER
+
+#include <helpers/helpers.h>
+#include <base/base_errors.h>
+using namespace MoSyncError;
 
 using namespace avmplus;
 using namespace Core;
