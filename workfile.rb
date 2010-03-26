@@ -28,11 +28,13 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 
 BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
-EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "tests/unitTest", "examples"]
+EXAM_DIRS = ["tests/unitTest", "examples"]
+PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
 
-MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
+MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + PIPE_DIRS
+ALL_DIRS = MAIN_DIRS + EXAM_DIRS
 
-NEWLIB_DIRS = ["libs", "tests/unitTest"]
+NEWLIB_DIRS = ["libs"]
 
 skins = Work.new
 skins.instance_eval do
@@ -54,6 +56,10 @@ end
 
 target :default => :base do
 	Work.invoke_subdirs(MAIN_DIRS)
+end
+
+target :all => :default do
+	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :noidl => skins do
@@ -85,7 +91,7 @@ target :clean do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
-	Work.invoke_subdirs(MAIN_DIRS, "clean")
+	Work.invoke_subdirs(ALL_DIRS, "clean")
 end
 
 Targets.invoke
