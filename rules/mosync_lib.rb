@@ -81,7 +81,9 @@ class PipeLibWork < PipeGccWork
 		super(all_objects)
 		if(!USE_NEWLIB)	# rake support
 			d = (CONFIG == "debug") ? 'D' : ''
-			@prerequisites << CopyFileTask.new(self, "#{mosync_libdir}/pipe/#{@NAME}#{d}.lib", @TARGET)
+			dir = "#{mosync_libdir}/pipe/"
+			@prerequisites << DirTask.new(self, dir)
+			@prerequisites << CopyFileTask.new(self, "#{dir}#{@NAME}#{d}.lib", @TARGET)
 		end
 	end
 	#def filename; @NAME + ".lib"; end
