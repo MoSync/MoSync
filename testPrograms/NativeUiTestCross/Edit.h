@@ -42,7 +42,7 @@ public:
 	 *
 	 * @param str	Text to be shown
 	 */
-	Edit(char *str, int id);
+	Edit(const char *str, int id);
 
 	/**
 	 * Destructor

@@ -68,24 +68,19 @@ void Parser::mtxTagStart(const char* name, int len) {
 
 	if(tstrcmp(name, TagNameSpace::layoutTag)==0) {
 		mCurrentTagType = TYPE_LAYOUT;
-
 		mLayout = new Layout(mFrame);
 	}
 
 	if(tstrcmp(name, TagNameSpace::labelTag)==0) {
 		mCurrentTagType = TYPE_LABEL;
-/*
-		Label *lab = new Label("huhuhu", 10);
-		Manager::Instance().addWidget(lab);
-		l->addWidget(lab);*/
 	}
 
 	if(tstrcmp(name, TagNameSpace::editTag)==0) {
 		mCurrentTagType = TYPE_EDIT;
-/*
-		Edit *edit = new Edit("huhuhu", 11);
-		Manager::Instance().addWidget(edit);
-		l->addWidget(edit);*/
+	}
+
+	if(tstrcmp(name, TagNameSpace::buttonTag)==0) {
+		mCurrentTagType = TYPE_BUTTON;
 	}
 }
 
@@ -98,28 +93,39 @@ void Parser::mtxTagAttr(const char* attrName, const char* attrValue) {
 		{
 			mLayout = new Layout(mFrame);
 		}
+		break;
 		case TYPE_LABEL:
 		{
 			if( tstrcmp(attrName, TagNameSpace::idAttr) == 0) {
 				mCurrentTagId = atoi(attrValue);
-				/*Label *lab = new Label("haaaaaaaaa", atoi(attrValue));
-				Manager::Instance().addWidget(lab);
-				mLayout->addWidget(lab);*/
 			}
 			if( tstrcmp(attrName, TagNameSpace::textAttr) == 0) {
 				Label *lab = new Label(attrValue, mCurrentTagId);
 				Manager::Instance().addWidget(lab);
 				mLayout->addWidget(lab);
 			}
-		}
-		case TYPE_EDIT:
-		{
 
 		}
+		break;
+		case TYPE_EDIT:
+		{
+			if( tstrcmp(attrName, TagNameSpace::idAttr) == 0) {
+				mCurrentTagId = atoi(attrValue);
+			}
+			if( tstrcmp(attrName, TagNameSpace::textAttr) == 0) {
+				Edit *edit = new Edit(attrValue, mCurrentTagId);
+				Manager::Instance().addWidget(edit);
+				mLayout->addWidget(edit);
+			}
+
+		}
+		break;
 		case TYPE_BUTTON:
 		{
 
 		}
+		break;
+
 
 	}
 
