@@ -38,7 +38,7 @@ public:
 	/**
 	 * Constructor
 	 */
-	Frame();
+	Frame(int id);
 
 	/**
 	 * Destructor

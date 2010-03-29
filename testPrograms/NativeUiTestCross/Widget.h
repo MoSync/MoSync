@@ -115,7 +115,7 @@ protected:
 	 */
 	int myid;
 	void *me;
-	char *text;
+	const char *text;
 	ActionListener *actionListener;
 };
 

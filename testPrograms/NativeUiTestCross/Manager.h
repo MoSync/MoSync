@@ -67,6 +67,13 @@ public:
 	void dispatch(const MAEvent &);
 
 	/**
+	 * Finds a widget by its ID.
+	 *
+	 * @param id	ID of the widget to be found.
+	 */
+	Widget *findById(int id);
+
+	/**
 	 * Returns the next generated widget ID.
 	 * Called by Widget::Widget()
 	 * Not for the end user !

@@ -29,9 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *
  * @param str	Text to be shown on the button
  */
-Button::Button(char *str) {
+Button::Button(char *str, int id) {
 	text=str;
-
+	myid=id;
 }
 
 /**

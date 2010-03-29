@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Layout>
-    <Label text="Hello, I am a Label" />
-    <Edit text="Hello, I am an Edit" />
-    <Button text="Hello, I am a Button" />
+    <Label id="30" text="Hello, I am a Label" />
+    <Label id="33" text="Hello, I am also a Label" />
+    <Edit id="31" text="Hello, I am an Edit" />
+    <Button id="32" text="Hello, I am a Button" />
 </Layout>

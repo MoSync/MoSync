@@ -24,6 +24,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PARSER_H_
 #define PARSER_H_
 
+#define TYPE_LAYOUT 0
+#define TYPE_EDIT 1
+#define TYPE_LABEL 2
+#define TYPE_BUTTON 3
 
 #include <conprint.h>
 #include <maassert.h>
@@ -35,6 +39,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Frame.h"
 #include "Edit.h"
 #include <MAUtil/String.h>
+#include <mastdlib.h>
 
 
 
@@ -97,21 +102,13 @@ public:
 	*/
 	unsigned char mtxUnicodeCharacter(int unicode);
 
-	/**
-	 * Compares a string to a known tag.
-	 *
-	 * @param str	Input string
-	 * @param len	Length of the input string
-	 * @param tag	Reference tag
-	 * @return		True if the input string matches
-	 * 				the reference tag, else false.
-	 */
-	bool compareToTag(const char *str, int len, char *tag);
 
 private:
 	Mtx::Context mContext;
 	Frame *mFrame;
-	Layout *l;
+	Layout *mLayout;
+	int mCurrentTagType;
+	int mCurrentTagId;
 
 
 };

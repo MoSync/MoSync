@@ -42,7 +42,7 @@ public:
 	 *
 	 * @param str	Text to be shown
 	 */
-	Label(char *str);
+	Label(const char *str, int id);
 
 	/**
 	 * Destructor

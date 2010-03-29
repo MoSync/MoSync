@@ -25,7 +25,7 @@ private:
 	Parser *parser;
 public:
 	Main() {
-		frame = new Frame();
+		frame = new Frame(1);
 		Manager::Instance().addWidget(frame);
 		frame->addActionListener(this);
 	}
@@ -80,12 +80,12 @@ public:
 	}
 	void onClick (int id) {
 		if(id==button->getId()) {
-			frame2 = new Frame();
+			frame2 = new Frame(2);
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
 		}
 		if(id==item->getId()) {
-			frame2 = new Frame();
+			frame2 = new Frame(2);
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
 		}

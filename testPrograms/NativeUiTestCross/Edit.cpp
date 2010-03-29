@@ -29,8 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *
  * @param str	Text to be shown
  */
-Edit::Edit(char *str) {
+Edit::Edit(char *str, int id) {
 	text=str;
+	myid=id;
 }
 
 /**

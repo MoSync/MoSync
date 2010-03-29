@@ -70,6 +70,16 @@ void Manager::dispatch(const MAEvent& e) {
 }
 
 /**
+ * Finds a widget by its ID.
+ *
+ * @param id	ID of the widget to be found.
+ */
+Widget *Manager::findById(int id) {
+	Map<int, Widget*>::Iterator i = map.find(id);
+	return ((*i).second);
+}
+
+/**
  * Returns the next generated widget ID.
  * Called by Widget::Widget()
  * Not for the end user !

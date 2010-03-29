@@ -43,7 +43,7 @@ public:
 	 *
 	 * @param str	Text to be shown on the button
 	 */
-	Button(char *str);
+	Button(char *str, int id);
 
 	/**
 	 * Destructor

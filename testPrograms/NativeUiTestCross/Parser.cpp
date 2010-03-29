@@ -24,11 +24,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Parser.h"
 
 using namespace MAUtil;
+
 namespace TagNameSpace{
 	char *layoutTag="Layout";
 	char *labelTag="Label";
 	char *buttonTag="Button";
 	char *editTag="Edit";
+	char *textAttr="text";
+	char *idAttr="id";
 }
 
 /**
@@ -63,22 +66,26 @@ void Parser::mtxEncoding(const char* value) {
 */
 void Parser::mtxTagStart(const char* name, int len) {
 
-	if(compareToTag(name, len, TagNameSpace::layoutTag)) {
-		l = new Layout(mFrame);
+	if(tstrcmp(name, TagNameSpace::layoutTag)==0) {
+		mCurrentTagType = TYPE_LAYOUT;
+
+		mLayout = new Layout(mFrame);
 	}
 
-	if(compareToTag(name, len, TagNameSpace::labelTag)) {
-		Label *lab = new Label("huhuhu");
+	if(tstrcmp(name, TagNameSpace::labelTag)==0) {
+		mCurrentTagType = TYPE_LABEL;
+/*
+		Label *lab = new Label("huhuhu", 10);
 		Manager::Instance().addWidget(lab);
-		l->addWidget(lab);
-
+		l->addWidget(lab);*/
 	}
 
-	if(compareToTag(name, len, TagNameSpace::editTag)) {
-		Edit *edit = new Edit("huhuhu");
+	if(tstrcmp(name, TagNameSpace::editTag)==0) {
+		mCurrentTagType = TYPE_EDIT;
+/*
+		Edit *edit = new Edit("huhuhu", 11);
 		Manager::Instance().addWidget(edit);
-		l->addWidget(edit);
-
+		l->addWidget(edit);*/
 	}
 }
 
@@ -86,6 +93,35 @@ void Parser::mtxTagStart(const char* name, int len) {
 * \see MTXContext::tagAttr
 */
 void Parser::mtxTagAttr(const char* attrName, const char* attrValue) {
+	switch(mCurrentTagType) {
+		case TYPE_LAYOUT:
+		{
+			mLayout = new Layout(mFrame);
+		}
+		case TYPE_LABEL:
+		{
+			if( tstrcmp(attrName, TagNameSpace::idAttr) == 0) {
+				mCurrentTagId = atoi(attrValue);
+				/*Label *lab = new Label("haaaaaaaaa", atoi(attrValue));
+				Manager::Instance().addWidget(lab);
+				mLayout->addWidget(lab);*/
+			}
+			if( tstrcmp(attrName, TagNameSpace::textAttr) == 0) {
+				Label *lab = new Label(attrValue, mCurrentTagId);
+				Manager::Instance().addWidget(lab);
+				mLayout->addWidget(lab);
+			}
+		}
+		case TYPE_EDIT:
+		{
+
+		}
+		case TYPE_BUTTON:
+		{
+
+		}
+
+	}
 
 }
 /**
@@ -104,8 +140,8 @@ void Parser::mtxTagData(const char* data, int len) {
 * \see MTXContext::tagEnd
 */
 void Parser::mtxTagEnd(const char* name, int len) {
-	if(compareToTag(name, len, TagNameSpace::layoutTag)) {
-		l->build();
+	if(strcmp(name, TagNameSpace::layoutTag)==0) {
+		mLayout->build();
 	}
 }
 /**
@@ -127,29 +163,6 @@ void Parser::mtxEmptyTagEnd() {
 */
 unsigned char Parser::mtxUnicodeCharacter(int unicode) {
 
-}
-/**
- * Compares a string to a known tag.
- *
- * @param str	Input string
- * @param len	Length of the input string
- * @param tag	Reference tag
- * @return		True if the input string matches
- * 				the reference tag, else false.
- */
-bool Parser::compareToTag(const char *str, int len, char *tag) {
-	char s[len+1];
-	int i;
-	for(i=0 ; i<len+1 ; i++) {
-		s[i]=str[i];
-	}
-
-
-	bool same = true;
-	for(i=0; i<len+1; i++) {
-		if(s[i]!=tag[i]) same=false;
-	}
-	return same;
 }
 
 

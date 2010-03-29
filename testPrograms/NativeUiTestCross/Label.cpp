@@ -29,8 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  *
  * @param str	Text to be shown
  */
-Label::Label (char *str) {
+Label::Label (const char *str, int id) {
 	text=str;
+	myid=id;
 }
 
 /**
