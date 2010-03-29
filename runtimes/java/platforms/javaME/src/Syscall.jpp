@@ -1795,9 +1795,9 @@ public
 			return maFileClose(a);
 		case maIOCtl_maFileCreate:
 			return maFileCreate(a);
-		/*case maIOCtl_maFileDelete:
+		case maIOCtl_maFileDelete:
 			return maFileDelete(a);
-		case maIOCtl_maFileSize:
+		/*case maIOCtl_maFileSize:
 			return maFileSize(a);
 		case maIOCtl_maFileAvailableSpace:
 			return maFileAvailableSpace(a);
