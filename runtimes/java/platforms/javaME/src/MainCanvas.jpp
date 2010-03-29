@@ -49,6 +49,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	public boolean mClosing = false;
 	private int mWaitSequence = 0;
 	Timer mTimer = new Timer();
+	private int mTimeout = 0;
 
 	private int	mKeyState = 0;
 	
@@ -204,6 +205,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 						}
 
 						if(mEventBuffer.size() == 0 || mErrorAlert != null) {
+							if(mTimeout > 0) {
+								DEBUG_ALWAYS(" seq "+mWaitSequence+"\n");
+								mTimer.schedule(new WaitTask(mWaitSequence), mTimeout);
+							}
 							DEBUG_ALWAYS("wait()\n");
 							this.wait();
 							DEBUG_ALWAYS("wait() done\n");
@@ -352,6 +357,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	}
 		
 	private final void handleKeyEvent(int keyCode, boolean released) {
+		//DEBUG_TEMP("handleKeyEvent()\n");
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		try {
 #endif
@@ -366,7 +372,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 			EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
 			EI_KEY = mak;
-			EI_NATIVE_KEY = keyCode;				
+			EI_NATIVE_KEY = keyCode;
 			postEvent(event);
 				
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
@@ -378,7 +384,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	}
 
 	synchronized public final void postEvent(int[] event) {
-		//DEBUG_TEMP("postEvent\n");
+		//DEBUG_TEMP("postEvent " + event[0] + "\n");
 		if(!mEventOverflow) {
 			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 				mEventOverflow = true;
@@ -484,10 +490,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		if(mEventBuffer.size() > 0)
 			return;
 		YIELD;
-		if(timeout > 0) {
-			DEBUG_ALWAYS(" seq "+mWaitSequence+"\n");
-			mTimer.schedule(new WaitTask(mWaitSequence), timeout);
-		}
+		mTimeout = timeout;
 		stop();
 	}
 	synchronized private final void FinishWait() {
@@ -508,6 +511,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #endif	//MOSYNC_STATIC_JAVA
 
 	synchronized public final void setClose() {
+		DEBUG_ALWAYS("setClose\n");
 		mEventOverflow = mClosing = true;
 		//mCore.mEndTime = System.currentTimeMillis() + EVENT_CLOSE_TIMEOUT;
 		int[] event = new int[1];
@@ -703,12 +707,14 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 //#endif
 
 	protected void hideNotify() {
+		DEBUG_TEMP("hideNotify()\n");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_LOST;
 		postEvent(event);
 	}
 
 	protected void showNotify() {
+		DEBUG_TEMP("showNotify()\n");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
 		postEvent(event);
