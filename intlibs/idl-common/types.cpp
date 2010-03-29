@@ -34,6 +34,7 @@ string cType(const Interface& inf, const string& type) {
 		return "void";
 	if(type == "NCString")
 		return "char*";
+
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(type == s.name)

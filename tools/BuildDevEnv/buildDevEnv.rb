@@ -35,7 +35,7 @@ sh2("tools/idl2", "vcbuild idl2.vcproj \"Release|Win32\"")
 
 sh2("tools/idl2/", "Release/idl2.exe");
 
-sh("libs/copyHeaders.bat")
+sh2("libs", "copyHeaders.bat");
 
 sh2("intlibs/helpers/platforms/stdout", "vcbuild stdout.vcproj \"Release|Win32\"")
 sh2("intlibs/helpers/platforms/windows", "vcbuild windows.vcproj \"Release|Win32\"")

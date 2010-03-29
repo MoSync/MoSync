@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ParseNode.h"
 #include "WrapperGenerator.h"
+#include "Parser.h"
 
 using namespace std;
 
@@ -35,4 +36,17 @@ string ParseNode::getAttr(const string& name, bool force) const {
 int ParseNode::getIntAttr(const string& name, bool force) const {
 	string attr = getAttr(name, force);
 	return atoi(attr.c_str());
+}
+
+void ParseNode::getNodesFromIdList(const std::string& name, vector<const Base*>& output, bool force) const {
+	
+	const string& members = getAttr(name, force);
+
+	size_t startIndex = 0;
+	size_t endIndex = 0;
+	while((endIndex=members.find_first_of(" ", startIndex)) != string::npos) {
+		string member = members.substr(startIndex, endIndex-startIndex);
+		startIndex = endIndex + 1;
+		output.push_back(getParseNodeFromId(member)->base);
+	}
 }

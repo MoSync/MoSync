@@ -45,19 +45,29 @@ string IDLBackend::getIDLType(const Base* base, bool isArgument) {
 			const FundamentalType* pfType = (const FundamentalType*)pType;
 			if(pfType->getName() == "char")
 				ret += "MAString";
-			else if(pfType->getName() == "void") 
+			else //if(pfType->getName() == "void") 
 				ret += "MAAddress";
+			/*
 			else
-				ret += getIDLType(pt->getType(), false);
-		} else if(pType->getBaseType() == Base::EFunctionType){
+				ret += getIDLType(pt->getType(), false) + "*";
+			*/
+		} else {
+			ret += "MAAddress";
+		}
+		/*
+		else if(pType->getBaseType() == Base::EFunctionType){
 			ret += "int"; // function address. We should probably be able to handle them...
 		} else {
-			ret += getIDLType(pt->getType(), false);
+			ret += getIDLType(pt->getType(), false) + "*";
 		}
+		*/
 
 	} else if(base->getBaseType() == Base::ETypedef) {
 		const Typedef* td = (const Typedef*) base;
 		ret += (isArgument?"in ":"") + td->getName();
+	} else if(base->getBaseType() == Base::EStruct) {
+		const Struct* s = (const Struct*) base;
+		ret += (isArgument?"in struct":"struct ") + s->getName();
 	} else {
 		System::error("don't know how to handle type\n");
 	}
@@ -83,7 +93,13 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 		if(args.size()>4) {
 		} else {
 			for(int i = 0; i < args.size(); i++) {
-				stream << getIDLType(args[i]->getType()) << " " << args[i]->getName();
+
+
+				if(args[i]->isEllipsis()) stream << "...";
+				else {
+					stream << getIDLType(args[i]->getType());
+					stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
+				}
 				if(i != args.size()-1) stream << ", ";
 			}
 		}

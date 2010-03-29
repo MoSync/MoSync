@@ -18,6 +18,88 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FreeImage.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+#include <string>
+using namespace std;
+
+string gBmFontFile;
+
+void error(const char *error) {
+	printf("%s\n", error);
+	exit(1);
+}
+
+bool writeMemIntoFile(const char* filename, const char *mem, int len) {
+	FILE *file = fopen(filename, "wb");
+	if(!file) return false;
+	fwrite(mem, len, 1, file);
+	fclose(file);
+	return true;
+}
+
+char *readFileIntoMem(const char* filename, int *len) {
+	FILE *file = fopen(filename, "rb");
+	if(!file) return NULL;
+	fseek(file, 0, SEEK_END);
+	int length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char *memory = new char[length];
+	fread(memory, length, 1, file);
+	fclose(file);
+	*len = length;
+	return memory;
+}
+
+void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
+	size_t index;
+	while((index=templateFile.find(whatToReplace))!=string::npos) {
+		int endOfReplacement = index+whatToReplace.length();
+		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
+	}
+}
+
+bool generateFont(const string& outputPath, const string& fontName, const string& fontType, string fontSize, string fontColor) {
+	int len;
+	if(fontType=="") { error("missing font type"); return false; }
+
+	const char *c= getenv("MOSYNCDIR");
+	if(!c) { error("no MOSYNCDIR"); return false; }
+	string mosyncdir = c;
+
+	char *fontTemplate = readFileIntoMem(gBmFontFile.c_str(), &len);
+	string fontTemplateStr = string(fontTemplate,len);
+	delete fontTemplate;
+
+	replaceTemplateDefine(fontTemplateStr, "%fontType%", fontType);
+
+	if(fontSize=="") { fontSize = "12"; }
+	replaceTemplateDefine(fontTemplateStr, "%fontSize%", fontSize);
+
+	if(fontColor=="") { fontColor = "ffffff"; }
+
+	writeMemIntoFile("bmfont.bmfc", fontTemplateStr.c_str(), fontTemplateStr.length());
+
+	string fntOutput = outputPath + "\\" + fontName + ".fnt";
+	string pngOutput = outputPath + "\\" + fontName + "_00.png";
+	string commandLine = (mosyncdir + "\\bin\\BMFont\\bmfont -c bmfont.bmfc -o " + fntOutput);
+	printf("font generator cmd: %s\n", commandLine.c_str());
+
+	if(system(commandLine.c_str()) != 0) {
+		error("font couldn't be generated.");
+		return false;
+	}
+
+	string mofOutput = outputPath + "\\" + fontName + ".mof";
+	commandLine = mosyncdir + "\\bin\\mof -fontData " + fntOutput + " -fontImage " + pngOutput + " -outFile " + mofOutput + " -fontColor " + fontColor;
+	printf("mof generator cmd: %s\n", commandLine.c_str());
+	if(system(commandLine.c_str()) != 0) {
+		error("font couldn't be generated.");
+		return false;
+	}
+
+	return true;
+}
 
 static char* readFileToMem(char *filename, int *outSize) {
 	FILE *file = fopen(filename, "rb");
@@ -45,9 +127,13 @@ int main(int argc, char **argv) {
 		printf("| MAUI font generator.                             |\n");
 		printf("| Tool to build a MAUI font (.mof) from an         |\n");
 		printf("| Angelcode BMFont generated font (.fnt + .png).   |\n");
+		printf("| or generating using a set of parameters.		   |\n");
 		printf("| usage:                                           |\n");
-		printf("| -fontData <file>                                 |\n");
-		printf("| -fontImage <file>                                |\n");
+		printf("| -fontData <file> (only applies when converting)  |\n");
+		printf("| -fontImage <file> (only applies when converting) |\n");
+		printf("| -fontType \"<name>\" (eg. \"arial\")             |\n");
+		printf("| -fontSize size (defaults to 12)                  |\n");		
+		printf("| -fontTemplate <file> (needed if generating font) |\n");
 		printf("| -outFile <file>                                  |\n");
 		printf("| -fontColor <color in hex>                        |\n");
 		printf("----------------------------------------------------\n");
@@ -62,6 +148,8 @@ int main(int argc, char **argv) {
 	char *fontData = 0;
 	char *fontImage = 0;
 	char *outFile = 0;
+	const char *fontType = 0;
+	int fontSize = -1;
 	unsigned int fontColor = 0xffffffff;
 
 	for(int i = 0; i < argc; i++) {
@@ -100,6 +188,30 @@ int main(int argc, char **argv) {
 				fontColor|=0xff000000;
 			}
 		}
+		else if(strcmp(argv[i], "-fontType")==0) {
+			i++;
+			if(i>=argc) {
+				printf("not enough parameters for -fontType.");			
+				return 1;
+			}
+			fontType = argv[i];
+		}
+		else if(strcmp(argv[i], "-fontSize")==0) {
+			i++;
+			if(i>=argc) {
+				printf("not enough parameters for -fontType.");			
+				return 1;
+			}
+			fontSize = atoi(argv[i]);
+		}
+		else if(strcmp(argv[i], "-fontTemplate")==0) {
+			i++;
+			if(i>=argc) {
+				printf("not enough parameters for -fontType.");			
+				return 1;
+			}
+			gBmFontFile = argv[i];
+		}
 	}
 	if(fontData == 0) {
 		printf("you must specify -fontData <file>.\n");
@@ -113,7 +225,7 @@ int main(int argc, char **argv) {
 		printf("you must specify -outFile <file>.\n");
 		return 1;
 	}
-
+	
 	/*
 	SDL_Init( SDL_INIT_VIDEO);
 	SDL_Surface *screen = SDL_SetVideoMode( 1024, 768, 32, SDL_SWSURFACE );
@@ -190,7 +302,6 @@ int main(int argc, char **argv) {
 	}
 continueApp:
 	*/
-
 	if(!FreeImage_Save(FIF_PNG, outImage, outFile)) {
 		printf("Could not save temp outfile.\n");
 		FreeImage_Unload(inImage);

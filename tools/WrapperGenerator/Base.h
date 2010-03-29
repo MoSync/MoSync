@@ -32,24 +32,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(ArrayType, "ArrayType")\
 	m(FundamentalType, "FundamentalType")\
 	m(FunctionType, "FunctionType")\
-	m(File, "File")
+	m(File, "File")\
+	m(Struct, "Struct")\
+	m(Field, "Field")\
 
 class Base {
 public:
 
 #define DECLARE_ENUM(typeName, typeStr) E##typeName,
 
-	enum Type {
+	enum BaseType {
 		WRAPPER_TYPES(DECLARE_ENUM)
 	};
 
-	Base(Type type);
+	Base(BaseType type);
 	virtual std::string toString() const;
 	virtual void fromParseNode(const ParseNode& node) = 0;
-	Type getBaseType() const;
+	BaseType getBaseType() const;
 
-private:
-	Type mType;
+protected:
+	BaseType mBaseType;
 };
 
 #endif // _BASE_H_

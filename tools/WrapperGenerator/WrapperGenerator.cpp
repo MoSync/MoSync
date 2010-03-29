@@ -57,8 +57,7 @@ int main(int argc, char **argv) {
 	/*
 	Parser::parse("tests/sqlite.xml", bases);
 	backend->generate(bases, "tests/sqlite.idl");
-	*/
+*/
 	Parser::parse("tests/gl.xml", bases);
 	backend->generate(bases, "tests/gl.idl");
-
 }

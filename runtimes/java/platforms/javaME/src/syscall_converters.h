@@ -225,7 +225,10 @@ final void debug_double(long l, double a) {
 #define debug_double(l, d)
 #endif	//DEBUG_SYSCALLS
 
+/*
 #define _SYSCALL_CONVERT_double(reg) ints2double(REG(reg + 1), REG(reg))
+*/
+#define _SYSCALL_CONVERT_double(hi, lo) ints2long(lo, hi)
 
 #ifdef DEBUG_SYSCALLS
 final void debug_float(int i) throws Exception {
@@ -262,12 +265,13 @@ final float _SYSCALL_CONVERT_float(int i) throws Exception {
 #define debug_double(l, d)
 #endif	// MA_PROF_SUPPORT_CLDC_10
 
-#ifdef MOSYNC_STATIC_JAVA
+//#ifdef MOSYNC_STATIC_JAVA
 #define _SYSCALL_CONVERT_long(hi, lo) ints2long(lo, hi)
+/*
 #else
 #define _SYSCALL_CONVERT_long(reg) ints2long(REG(reg + 1), REG(reg))
 #endif
-
+*/
 final long ints2long(int hiw, int low) throws Exception {
 	//DEBUG_SC("("+hiw+","+low+")->");
 	//DEBUG_SC("("+UINT(low)+")");

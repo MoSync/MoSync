@@ -1734,8 +1734,15 @@ namespace Base {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
+	int maTest(int a, int b, int c, int d, int e) {
+		a = a + b + c + d;
+		return a;
+	}
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
+
+			maIOCtl_maTest_case(maTest);
 
 		case maIOCtl_maCheckInterfaceVersion:
 			return maCheckInterfaceVersion(a);

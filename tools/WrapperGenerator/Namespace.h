@@ -24,13 +24,13 @@ class Namespace : public Base {
 public:
 	Namespace();
 	void addMember(const Base* id);
-	void fromParseNode(const ParseNode& node);
+	virtual void fromParseNode(const ParseNode& node);
 	std::string toString() const;
 	const std::string& getName() const;
 	const Base* getContext() const;
 	const std::vector<const Base*>& getMembers() const;
 
-private:
+protected:
 	std::string mName;
 	const Base *mContext;
 	std::vector<const Base*> mMembers;

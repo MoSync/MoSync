@@ -165,6 +165,20 @@ void readTextToken(string& token) {
 	if(isDelimiter(token))
 		tokenError(token);
 }
+
+void readQuotedString(string& token) {
+	token.clear();
+	char c = sStream->get();
+	if(c!='\"') tokenError(token); 
+	do {
+		c = sStream->get();
+		if(c == '\n')
+			tokenError(token);
+		else if(c=='\"') break;
+		token+=c;
+	} while(1);
+}
+
 void doExact(const string& aToken) {
 	string token;
 	readToken(token);

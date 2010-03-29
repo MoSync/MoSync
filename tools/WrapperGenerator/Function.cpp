@@ -24,8 +24,11 @@ void Argument::fromParseNode(const ParseNode& node) {
 
 	if(node.name == "Ellipsis") {
 		mIsEllipsis = true;
+		// doesn't really support ellipsis.
 		return;
 	}
+
+	mIsEllipsis = false;
 
 	bool isConst;
 	mName = node.getAttr("name", false);

@@ -965,6 +965,16 @@ void WRITE_REG(int reg, int value) {
 #endif
 		return ((char*)mem_ds) + address;
 	}
+
+	int GetValidatedStackValue(int offset) {
+		int address = REG(REG_sp) + offset;
+		if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
+			BIG_PHAT_ERROR(ERR_STACK_OOB);
+		address>>=2;
+		return mem_ds[address];
+	}
+
+
 	const char* GetValidatedStr(int a) const {
 		unsigned address = a;
 		do {
@@ -1471,6 +1481,9 @@ int ValidatedStrLen(const VMCore* core, const char* ptr) {
 void* GetValidatedMemRange(VMCore* core, int address, int size) {
   return CORE->GetValidatedMemRange(address, size);
 }
+int GetValidatedStackValue(VMCore* core, int offset) {
+  return CORE->GetValidatedStackValue(offset);
+}
 const char* GetValidatedStr(const VMCore* core, int address) {
 	return CORE->GetValidatedStr(address);
 }
@@ -1535,6 +1548,9 @@ Core::VMCore* gCore = NULL;
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 	return Core::GetValidatedMemRange(gCore, address, size);
+}
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	return Core::GetValidatedStackValue(gCore, offset);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return Core::GetValidatedStr(gCore, address);

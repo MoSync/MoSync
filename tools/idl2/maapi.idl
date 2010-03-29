@@ -1420,6 +1420,7 @@ interface MAAPI {
 	* Returns -1 if the function is not available.
 	*/
 	ioctl maIOCtl {
+		int maTest(in int a, in int b, in int c, in int d, in int e);
 
 #if IX_RESOURCE_TYPES
 	constset int RT_ {  //WARNING: must match the resource compiler.

@@ -135,6 +135,14 @@ void streamHash(ostream& stream, const Interface& inf) {
 		hex << calculateChecksum(inf) << dec << ")\n\n";
 }
 
+void streamEllipsis(ostream& stream) {
+	stream << "#ifdef MAPIP\n"
+		"#define MA_IOCTL_ELLIPSIS , ...\n"
+		"#else\n"
+		"#define MA_IOCTL_ELLIPSIS\n"
+		"#endif\n\n";
+}
+
 void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix) {
 	string headerName;
 	if(ix == MAIN_INTERFACE)
@@ -175,6 +183,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 			;
 
 		streamMoSyncDllDefines(stream);
+		streamEllipsis(stream);
 	}
 
 	stream << "#ifdef __cplusplus\n"
@@ -383,7 +392,8 @@ static void streamDefines(ostream& stream, const vector<Define>& defines, int ix
 		stream << "\n";
 }
 
-void streamIoctlDefines(ostream& stream, const vector<Ioctl>& ioctls, int ix) {
+void streamIoctlDefines(ostream& stream, const Interface& inf, int ix) {
+	const vector<Ioctl>& ioctls = inf.ioctls;
 	for(size_t i=0; i<ioctls.size(); i++) {
 		const Ioctl& ioctl(ioctls[i]);
 		bool anyStreamed = false;
@@ -393,6 +403,64 @@ void streamIoctlDefines(ostream& stream, const vector<Ioctl>& ioctls, int ix) {
 				continue;
 
 			stream << "#define " << ioctl.name << "_" << f.f.name << " " << f.f.number << "\n";
+
+			stream << "#define " << ioctl.name << "_" << f.f.name << "_case(func)\\\n";
+			stream << "case " << f.f.number << ":\\\n";
+			stream << "{\\\n";
+			for(size_t k = 0; k < f.f.args.size(); k++) {
+
+				bool isPointer = isPointerType(inf, f.f.args[k].type);
+				bool isString = f.f.args[k].type == "MAString";
+				string ctype = cType(inf, f.f.args[k].type);
+
+				if(f.f.args[k].type == "MAAddress") {
+					ctype = "int";
+					isPointer = false;
+				}
+
+
+				if(isPointer || isString)
+					ctype = ((f.f.args[k].in == true)?"const ":"") + ctype;
+
+
+				stream << ctype << " ";
+				if(k < 3)
+					stream << (char)('a'+k) << "_";
+
+				stream << f.f.args[k].name << " = ";
+
+				if(isString)
+					stream << "GVS(";
+				else if(isPointer)
+					stream << "GVMR(";
+				else if(ctype != "int") stream << "(" << ctype << ")";
+				
+				if(k < 3) {
+					stream << (char)('a'+k);
+				} else {
+					stream << "SYSCALL_THIS->GetValidatedStackValue(" << ((k-3)<<2) << ")";
+				}
+
+				if(isString)
+					stream << ")";
+				else if(isPointer)
+					stream << ", " << f.f.args[k].type << ")";
+
+				stream << ";\\\n";
+			}
+			
+			stream << "return func(";
+			for(size_t k = 0; k < f.f.args.size(); k++) {
+				if(k!=0)
+					stream << ", ";
+				if(k < 3)
+					stream << (char)('a'+k) << "_";
+				stream << f.f.args[k].name;
+			}
+			stream << ");\\\n";
+			stream << "}\\\n";
+			stream << "\n";
+
 			anyStreamed = true;
 		}
 		if(anyStreamed)
@@ -445,12 +513,12 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		}
 		invokeArgs += a.name;
 	}	//args
-	stream << ") {\n	";
+	stream << ") {\n";
 
 	int usedArgs = f.args.size();
 	if(f.returnType == "double" && doubleRetVar.size() == 0) {
-		if(usedArgs >= 3)
-			throwException("Too many arguments used in function " + f.name);
+		//if(usedArgs >= 3)
+		//	throwException("Too many arguments used in function " + f.name);
 		doubleRetVar = "_temp";
 		stream << "double " << doubleRetVar << ";\n	";
 		invokeArgs += ", (int)&_temp";
@@ -464,10 +532,22 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	if(f.returnType == "double") {
 		stream << invoke + "\n	return " << doubleRetVar << ";\n";
 	} else {
+
+		if(usedArgs>=4) 
+			stream << "#ifdef MAPIP\n";
+
+		stream << "	";
+
 		if(f.returnType != "void") {
 			stream << "return ";
 		}
+		if(f.returnType != "int")
+			stream << "(" << f.returnType << ") ";
+
 		stream << invoke + "\n";
+		if(usedArgs>=4) 
+			stream << "#else\n	return IOCTL_UNAVAILABLE;\n#endif\n";
+
 	}
 	stream << "}\n\n";
 }
@@ -488,7 +568,7 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);
-	streamIoctlDefines(stream, inf.ioctls, ix);
+	streamIoctlDefines(stream, inf, ix);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }
