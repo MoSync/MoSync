@@ -30,8 +30,7 @@
 
 /** \file new
 *  This header defines several functions to manage dynamic memory and
-*  handling memory allocation errors; see
-*  http://gcc.gnu.org/onlinedocs/libstdc++/18_support/howto.html#4 for more.
+*  handling memory allocation errors.
 */
 
 #ifndef __NEW__
