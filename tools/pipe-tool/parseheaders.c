@@ -44,10 +44,9 @@ void ReadAndParseHeaders(char *filename)
 //			 Parse H Files
 //****************************************
 
-short hEndComp;
-
 void HeaderReader(char *filemem)
 {
+        short hEndComp;
 	char *FPtr = g_FilePtr;				// Preserve file pointer
 	char *FTop = g_FileTop;				// Preserve file pointer
 
@@ -88,8 +87,8 @@ void HeaderReader(char *filemem)
 //
 //****************************************
 
-extern char NameCopy[256];
-extern char DefineNameCopy[256];
+extern char g_NameCopy[256];
+extern char g_DefineNameCopy[256];
 
 short HeaderCommands()
 {	
@@ -106,14 +105,14 @@ short HeaderCommands()
 		SkipWhiteSpace();
 
 		GetAsmName();
-		strcpy(DefineNameCopy, g_Name);
+		strcpy(g_DefineNameCopy, g_Name);
 
 		if (NextToken("#"))
 		{
 			// Just define a script
 			
-			RedefENum(DefineNameCopy, 1);	
-			rhprint("HeaderRead: .set %s = 1\n", DefineNameCopy);
+			RedefENum(g_DefineNameCopy, 1);
+			rhprint("HeaderRead: .set %s = 1\n", g_DefineNameCopy);
 
 			SkipWhiteSpace();
 			return 1;
@@ -124,19 +123,19 @@ short HeaderCommands()
 		if (QToken("\""))
 		{
 			GetStringName(128);
-			RedefENumString(DefineNameCopy, g_Name);
-			printf("HeaderRead: .set %s = '%s'\n", DefineNameCopy, g_Name);
+			RedefENumString(g_DefineNameCopy, g_Name);
+			printf("HeaderRead: .set %s = '%s'\n", g_DefineNameCopy, g_Name);
 
 			SkipWhiteSpace();
 			return 1;
 		}
 		
 		v = GetExpression();
-		RedefENum(DefineNameCopy, v);	
+		RedefENum(g_DefineNameCopy, v);
 
 		SkipWhiteSpace();
 		
-		rhprint("Profile: unknown define '%s'\n", DefineNameCopy);
+		rhprint("Profile: unknown define '%s'\n", g_DefineNameCopy);
 		return 1;
 	}
 

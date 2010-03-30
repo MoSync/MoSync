@@ -94,14 +94,14 @@ void ResourceMain()
 //			 Assemble code
 //****************************************
 
-short EndComp = 0;
+short g_EndComp = 0;
 
 void ResourceComp()
 {
 	int Line = 0;
 	char *FPtr = g_FilePtr;				// Preserve file pointer
 
-	EndComp = 0;
+	g_EndComp = 0;
 
 	ResetErrorCount();
 
@@ -113,7 +113,7 @@ void ResourceComp()
 
 		Line++;
 	
-		if (EndComp)
+		if (g_EndComp)
 			break;
 
 		if (*g_FilePtr == 0)
@@ -876,7 +876,7 @@ short ResourceCommands()
 	if (QToken(".end"))
 	{
 		SkipLine();
-//		EndComp = 1;
+//		g_EndComp = 1;
 		return 1;
 	}
 
@@ -887,7 +887,7 @@ short ResourceCommands()
 	if (QToken(".eof"))
 	{
 		SkipLine();
-		EndComp = 1;
+		g_EndComp = 1;
 		return 1;
 	}
 

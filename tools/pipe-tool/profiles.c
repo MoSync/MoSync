@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //			 Assemble code
 //****************************************
 
-extern short EndComp;
+extern short g_EndComp;
 
 void ProfileReader(char *filemem, char *config_path)
 {
@@ -40,14 +40,14 @@ void ProfileReader(char *filemem, char *config_path)
 	
 	g_FileTop = g_FilePtr = filemem;
 
-	EndComp = 0;
+	g_EndComp = 0;
 
 	ResetErrorCount();
 	SetErrorReturn();
 
 	while(1)
 	{	
-		if (EndComp)
+		if (g_EndComp)
 			break;
 
 		if (*g_FilePtr == 0)
@@ -73,8 +73,8 @@ void ProfileReader(char *filemem, char *config_path)
 //
 //****************************************
 
-char NameCopy[256];
-char DefineNameCopy[256];
+char g_NameCopy[256];
+char g_DefineNameCopy[256];
 
 short ProfileCommands()
 {	
@@ -94,7 +94,7 @@ short ProfileCommands()
 
 		PushTokenPtr(g_FilePtr, 1);		// Save Token Scanner Context
 		GetAsmName();
-		strcpy(DefineNameCopy, g_Name);
+		strcpy(g_DefineNameCopy, g_Name);
 		PopTokenPtr();
 
 		if (QToken("MA_PROF_"))
@@ -103,7 +103,7 @@ short ProfileCommands()
 			if (QToken("CONST_"))
 			{
 				GetAsmName();
-				strcpy(NameCopy, g_Name);
+				strcpy(g_NameCopy, g_Name);
 				SkipWhiteSpace();
 
 				if (QToken("DYNAMIC"))
@@ -115,21 +115,21 @@ short ProfileCommands()
 					v = GetExpression();
 				}
 
-				RedefENum(DefineNameCopy, v);	
+				RedefENum(g_DefineNameCopy, v);
 	
-				profprint("Profile: const found '%s' = %d\n", DefineNameCopy, v);
+				profprint("Profile: const found '%s' = %d\n", g_DefineNameCopy, v);
 				return 1;
 			}
 			
 			GetAsmName();
 
-			RedefENum(DefineNameCopy, 1);	
+			RedefENum(g_DefineNameCopy, 1);
 	
-			profprint("Profile: found '%s'\n", DefineNameCopy);
+			profprint("Profile: found '%s'\n", g_DefineNameCopy);
 			return 1;
 		}
 		
-		profprint("Profile: unknown define '%s'\n", DefineNameCopy);
+		profprint("Profile: unknown define '%s'\n", g_DefineNameCopy);
 		return 1;
 	}
 
