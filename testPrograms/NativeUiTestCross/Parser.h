@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Layout.h"
 #include "Frame.h"
 #include "Edit.h"
+#include "Button.h"
 #include <MAUtil/String.h>
 #include <mastdlib.h>
 

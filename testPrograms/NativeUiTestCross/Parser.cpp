@@ -122,7 +122,14 @@ void Parser::mtxTagAttr(const char* attrName, const char* attrValue) {
 		break;
 		case TYPE_BUTTON:
 		{
-
+			if( tstrcmp(attrName, TagNameSpace::idAttr) == 0) {
+				mCurrentTagId = atoi(attrValue);
+			}
+			if( tstrcmp(attrName, TagNameSpace::textAttr) == 0) {
+				Button *button = new Button(attrValue, mCurrentTagId);
+				Manager::Instance().addWidget(button);
+				mLayout->addWidget(button);
+			}
 		}
 		break;
 

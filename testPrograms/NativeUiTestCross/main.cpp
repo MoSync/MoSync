@@ -14,28 +14,29 @@ class Main : public ActionListener {
 private:
 	Frame *frame;
 	Frame *frame2;
-	Button *button;
-	Button *button2;
-	Edit *edit;
-	Label *label;
-	Label *label2;
-	Layout *l;
-	MenuItem *item;
-	MenuItem *item2;
 	Parser *parser;
+	Button *button;
 public:
 	Main() {
+		frame = NULL;
+		frame2 = NULL;
+		parser = NULL;
+		button = NULL;
+
 		frame = new Frame(1);
 		Manager::Instance().addWidget(frame);
 		frame->addActionListener(this);
 	}
 
+	Main(const Main & m) {
+		frame=m.frame;
+		frame2=m.frame2;
+		parser=m.parser;
+		button=m.button;
+	}
+
 	~Main() {
-		delete(label);
-		delete(label2);
-		delete(edit);
-		delete(button);
-		delete(button2);
+		//delete(button);
 		delete(frame);
 		delete(frame2);
 		delete(parser);
@@ -45,6 +46,10 @@ public:
 		if(id==frame->getId()) {
 
 			parser = new Parser(MAIN_LAYOUT, frame);
+
+
+			button = (Button *) Manager::Instance().findById(32);
+			button->addActionListener(this);
 /*
 			button = new Button("New frame");
 			Manager::Instance().addWidget(button);
@@ -79,16 +84,16 @@ public:
 		}
 	}
 	void onClick (int id) {
-		if(id==button->getId()) {
+		if(id==32) {
 			frame2 = new Frame(2);
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
 		}
-		if(id==item->getId()) {
+	/*	if(id==item->getId()) {
 			frame2 = new Frame(2);
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
-		}
+		}*/
 	}
 
 };
