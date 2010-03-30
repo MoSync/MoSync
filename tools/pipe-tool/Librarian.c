@@ -101,9 +101,9 @@ void gDisposePtr(unsigned char *thisPtr)
 
 typedef struct
 {
-	char	magic[4];			// 0x89 'M' 'A' 'O'
-	int		id[2];				// The ID
-	int		numobj;				// Number of objects	
+	char	magic[4];// 0x89 'M' 'A' 'O'
+	int	id[2];	// The ID
+	int	numobj;	// Number of objects	
 } MA_LIB;
 
 // Each object is an int followed byte the compressed data
@@ -120,21 +120,21 @@ typedef struct
 
 #define REALLOC_CHUNK	16384			//1024
 
-unsigned char *SourceTop = 0;
-int SourceIdx = 0;
-int SourceLen = 0;
-int FileCount = 0;
+unsigned char *g_SourceTop = NULL;
+int g_SourceIdx = 0;
+int g_SourceLen = 0;
+int g_FileCount = 0;
 
 int InitSourceInput(int default_bufsize)
 {
-	SourceTop = gNewPtrClear(default_bufsize);
-	SourceLen = default_bufsize;
-	SourceIdx = 0;
+	g_SourceTop = gNewPtrClear(default_bufsize);
+	g_SourceLen = default_bufsize;
+	g_SourceIdx = 0;
 	
-	if (!SourceTop)
+	if (!g_SourceTop)
 		return 0;
 
-	FileCount = 0;
+	g_FileCount = 0;
 	return 1;
 }
 
@@ -144,11 +144,11 @@ int InitSourceInput(int default_bufsize)
 
 void DisposeSourceInput()
 {
-	if (SourceTop)
-		gDisposePtr(SourceTop);
+	if (g_SourceTop)
+		gDisposePtr(g_SourceTop);
 		
-	SourceLen = 0;
-	SourceIdx = 0;
+	g_SourceLen = 0;
+	g_SourceIdx = 0;
 	return;
 }
 
@@ -162,7 +162,7 @@ int ExpandSource(int length)
 	int diff;
 	int new_size;
 
-	bytes_left = SourceLen - SourceIdx;
+	bytes_left = g_SourceLen - g_SourceIdx;
 
 	if (length < bytes_left)
 		return 1;
@@ -170,12 +170,12 @@ int ExpandSource(int length)
 	// Expand source buffer
 	
 	diff	 = length - bytes_left;
-	new_size = diff + SourceLen + REALLOC_CHUNK;
+	new_size = diff + g_SourceLen + REALLOC_CHUNK;
 			
-	SourceTop = (unsigned char *) gReallocPtr((char *) SourceTop, new_size);		
-	SourceLen = new_size;
+	g_SourceTop = (unsigned char *) gReallocPtr((char *) g_SourceTop, new_size);
+	g_SourceLen = new_size;
 
-	if (!SourceTop)			// Has failed ?
+	if (!g_SourceTop)			// Has failed ?
 		return 0;			// Signal it
 	
 	return 1;
@@ -190,7 +190,7 @@ int AddSourceText(char *Template, ...)
 	char 	tbuf[4096];
 
 	va_list args;
-	int		len;
+	int	len;
 
 	va_start(args,Template);
 	vsprintf(tbuf,Template,args);
@@ -206,9 +206,9 @@ int AddSourceText(char *Template, ...)
 	if (!ExpandSource(len))
 		return 0;
 
-	memcpy(&SourceTop[SourceIdx], tbuf, len);
+	memcpy(&g_SourceTop[g_SourceIdx], tbuf, len);
 
-	SourceIdx += len;
+	g_SourceIdx += len;
 	return 1;
 }
 
@@ -226,8 +226,8 @@ int AddSourceBin(char *data, int len)
 	if (!ExpandSource(len))
 		return 0;
 
-	memcpy(&SourceTop[SourceIdx], data, len);
-	SourceIdx += len;
+	memcpy(&g_SourceTop[g_SourceIdx], data, len);
+	g_SourceIdx += len;
 	return 1;
 }
 
@@ -275,12 +275,12 @@ int AddSourceFile(char *FileName, int local_scope)
 
 	// Read file data
 
-	res = fread(&SourceTop[SourceIdx], 1, file_length, SrcFile);
+	res = fread(&g_SourceTop[g_SourceIdx], 1, file_length, SrcFile);
 	fclose(SrcFile);
 	if(res != file_length)
 		Error(Error_Fatal, "Could not read source file '%s'", FileName);
 
-	inptr = &SourceTop[SourceIdx];
+	inptr = &g_SourceTop[g_SourceIdx];
 
 	v = *inptr;
 	
@@ -288,7 +288,7 @@ int AddSourceFile(char *FileName, int local_scope)
 	{
 		// Wind source pointer forward
 	
-		SourceIdx += file_length;
+		g_SourceIdx += file_length;
 		return 1;
 	}
 
@@ -360,13 +360,13 @@ int AddSourceFile(char *FileName, int local_scope)
 			// Decompress data
 
 #ifdef USE_ZLIB					
-			len = ZLibUncompress( &SourceTop[SourceIdx],
+			len = ZLibUncompress( &g_SourceTop[g_SourceIdx],
 									thisObj.dsize,
 									memptr,
 									thisObj.csize);
 
 #else
-			len = FreeImage_ZLibUncompress( &SourceTop[SourceIdx],
+			len = FreeImage_ZLibUncompress( &g_SourceTop[g_SourceIdx],
 											thisObj.dsize,
 											memptr,
 											thisObj.csize);
@@ -376,7 +376,7 @@ int AddSourceFile(char *FileName, int local_scope)
 			if (len != thisObj.dsize)
 				return 0;
 			
-			SourceIdx += len;
+			g_SourceIdx += len;
 			memptr += thisObj.csize;
 		}
 
@@ -445,7 +445,7 @@ void TerminateSourceFile(int add_eof)
 //!! Add cdtors here !!
 
 //	LastEOF = (char *) &SourceTop[SourceIdx];
-	LastEOF = SourceIdx;
+	LastEOF = g_SourceIdx;
 
 	if (add_eof)
 	{
@@ -487,9 +487,9 @@ int WriteSourceFile(char *name)
 	if (!SrcFile)
 		return 0;
 
-	res = fwrite(SourceTop, 1, SourceIdx, SrcFile);		// Save the header
+	res = fwrite(g_SourceTop, 1, g_SourceIdx, SrcFile);		// Save the header
 	fclose(SrcFile);
-	if(res != SourceIdx)
+	if(res != g_SourceIdx)
 		return 0;
 	return 1;
 }
@@ -520,7 +520,7 @@ int InitLibrarian()
 
 char *GetLibaryFilePtr()
 {
-	return (char *) SourceTop;
+	return (char *) g_SourceTop;
 }
 
 //****************************************
@@ -628,7 +628,7 @@ int WriteLibrarian(char *outfile)
 	//int dlen,clen;
 	int res;
 
-	cptrtop = cptr = gNewPtrClear(SourceIdx * 2);
+	cptrtop = cptr = gNewPtrClear(g_SourceIdx * 2);
 	
 	if (!cptrtop)
 		return 0;
@@ -638,12 +638,12 @@ int WriteLibrarian(char *outfile)
 	if (!SrcFile)
 		return 0;
 
-	thisObj.dsize = SourceIdx;
+	thisObj.dsize = g_SourceIdx;
 
 #ifdef USE_ZLIB
-	thisObj.csize = ZLibCompress(cptr, SourceIdx * 2, SourceTop, SourceIdx);
+	thisObj.csize = ZLibCompress(cptr, g_SourceIdx * 2, g_SourceTop, g_SourceIdx);
 #else
-	thisObj.csize = FreeImage_ZLibCompress(cptr, SourceIdx * 2, SourceTop, SourceIdx);
+	thisObj.csize = FreeImage_ZLibCompress(cptr, g_SourceIdx * 2, g_SourceTop, g_SourceIdx);
 #endif
 
 	if (thisObj.csize)

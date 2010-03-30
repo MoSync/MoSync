@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="62">
+  <logicalFolder name="root" displayName="root" projectFiles="true">
+    <df name="pipe-tool" root="..">
+      <df name="pipe-tool">
+      </df>
+      <in>AnalyseCode.c</in>
+      <in>ArrayClass.c</in>
+      <in>AsmData.c</in>
+      <in>AsmToken.c</in>
+      <in>Assem.c</in>
+      <in>BrewRebuild.c</in>
+      <in>BucketArray.c</in>
+      <in>Bytecode.h</in>
+      <in>ClassLoader.c</in>
+      <in>CodeRebuild.c</in>
+      <in>CodeSearch.c</in>
+      <in>CodeTools.c</in>
+      <in>Directives.c</in>
+      <in>Emu.c</in>
+      <in>Eval.c</in>
+      <in>InstTable.h</in>
+      <in>JavaRebuild.c</in>
+      <in>Librarian.c</in>
+      <in>Main.c</in>
+      <in>MethodLoader.c</in>
+      <in>Opcodes.c</in>
+      <in>Output.c</in>
+      <in>PBProto.h</in>
+      <in>PBProtoPub.h</in>
+      <in>Peeper.c</in>
+      <in>Stabs.c</in>
+      <in>Symbols.c</in>
+      <in>SysCall.c</in>
+      <in>ThunkReg.c</in>
+      <in>Tokens.c</in>
+      <in>VarPool.c</in>
+      <in>allocator.c</in>
+      <in>compile.h</in>
+      <in>constreg.c</in>
+      <in>demangle.c</in>
+      <in>demangle.h</in>
+      <in>disas.c</in>
+      <in>disas.h</in>
+      <in>filealloc.c</in>
+      <in>linux.h</in>
+      <in>parseheaders.c</in>
+      <in>pipe-asm-prefix.h</in>
+      <in>profiles.c</in>
+      <in>rescomp.c</in>
+      <in>tokentable.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false">
+      <itemPath>pipe-tool-Makefile.mk</itemPath>
+      <itemPath>../workfile.rb</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>..</Elem>
+  </sourceRootList>
+  <projectmakefile>pipe-tool-Makefile.mk</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <compilerSet>GNU|GNU</compilerSet>
+        <platform>2</platform>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>..</buildCommandWorkingDir>
+          <buildCommand>ruby workfile.rb</buildCommand>
+          <cleanCommand>ruby workfile.rb clean</cleanCommand>
+          <executablePath></executablePath>
+          <cTool>
+            <preprocessorList>
+              <Elem>LINUX</Elem>
+            </preprocessorList>
+          </cTool>
+        </makeTool>
+      </makefileType>
+      <item path="../ArrayClass.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../AsmData.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../AsmToken.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Assem.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../BrewRebuild.c" ex="true" tool="0">
+      </item>
+      <item path="../BucketArray.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../ClassLoader.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../CodeRebuild.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../CodeSearch.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../CodeTools.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Directives.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Emu.c" ex="true" tool="0">
+      </item>
+      <item path="../Eval.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../JavaRebuild.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+            <pElem>../../../intlibs</pElem>
+            <pElem>../../../intlibs/helpers</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Librarian.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Main.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../MethodLoader.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Opcodes.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Output.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../PBProtoPub.h" ex="true" tool="3">
+      </item>
+      <item path="../Peeper.c" ex="true" tool="0">
+      </item>
+      <item path="../Stabs.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Symbols.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../SysCall.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../ThunkReg.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../Tokens.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../VarPool.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../allocator.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../constreg.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../demangle.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../disas.c" ex="true" tool="0">
+      </item>
+      <item path="../disas.h" ex="true" tool="3">
+      </item>
+      <item path="../filealloc.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../parseheaders.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../pipe-asm-prefix.h" ex="true" tool="3">
+      </item>
+      <item path="../profiles.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+      <item path="../rescomp.c" ex="false" tool="0">
+        <cTool>
+          <incDir>
+            <pElem>..</pElem>
+          </incDir>
+        </cTool>
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
