@@ -20,7 +20,7 @@ mod.class_eval do
 			def execute
 				tfn = 'build/_temp.c'
 				sh "gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt " +
-					"| sed s/#line/\\/\\/line/ > #{tfn}"
+					"| sed 's/#line/\\/\\/line/' > #{tfn}"
 				FileUtils.mv(tfn, @NAME)
 			end
 		end
