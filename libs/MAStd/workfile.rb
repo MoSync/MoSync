@@ -6,7 +6,7 @@ mod = Module.new
 mod.class_eval do
 	def setup_native
 		setup_base
-		@SOURCES = []
+		@SOURCES = ["libgcc"]
 		@EXTRA_SOURCEFILES = ["conprint.c", "ma.c", "maassert.c", "mactype.c", "madmath.c",
 			"mastdlib.c", "mastring.c", "matime.c", "mavsprintf.c", "maxtoa.c", "maheap.c"]
 		@SPECIFIC_CFLAGS = @native_specific_cflags
@@ -16,7 +16,7 @@ mod.class_eval do
 	
 	def setup_pipe
 		setup_base
-		@SOURCES = [".", "../libsupc++"]
+		@SOURCES = [".", "../libsupc++", "libgcc"]
 		@EXTRA_INCLUDES = []
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags
@@ -57,6 +57,7 @@ mod.class_eval do
 			"intrinsics.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
 			"madmath.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
 			"maint64.c" => " -fno-strict-aliasing -Wno-missing-prototypes -Wno-missing-declarations",
+			"libgcc2.c" => " -Wno-unreachable-code",
 			"strtod.c" => " -Wno-float-equal",
 			"e_log.c" => " -Wno-float-equal",
 			"s_atan.c" => " -fno-strict-aliasing",

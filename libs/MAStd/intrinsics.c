@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#if 0
 /*
 These functions return the result of shifting a left by b bits. 
 */
@@ -74,3 +75,4 @@ These functions convert a to a signed long, rounding toward zero.
 long __fixsfdi(float a) {
 	return (long)((int)a);
 }
+#endif
