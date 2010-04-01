@@ -14,15 +14,8 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
-#ifndef MAPIP
-#include <cstdio>
-#else
-#include <conprint.h>
-#endif
-
 #include "common.h"
 #include "bind.hpp"
-
 #include "test.hpp"
 #include "testfunction.hpp"
 #include "testmanager.hpp"

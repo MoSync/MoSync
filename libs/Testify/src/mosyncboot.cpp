@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "defaultlistener.hpp"
 
 using namespace Testify;
+extern "C" int MATestMain ( void );
 
 /**
  * This is a bootstrap function, it will overide MAMain and 
