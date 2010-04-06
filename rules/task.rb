@@ -66,7 +66,7 @@ class TaskBase
 	end
 	LATE = LateTime.instance
 	
-	def initialize()
+	def initialize
 		@prerequisites = []
 	end
 	
@@ -85,16 +85,12 @@ end
 # Work also cooperates with the Target system.
 # Work is abstract; subclasses must define the setup and execute_clean methods.
 class Work < TaskBase
-	def initialize
-		@prerequisites = nil
-	end
-	
 	def invoke
 		#puts "Work.invoke: #{@NAME.inspect}"
 		
-		if(@prerequisites == nil) then
+		if(@prerequisites == []) then
 			setup
-			if(@prerequisites == nil)
+			if(@prerequisites == [])
 				error "setup failed"
 			end
 		end
@@ -127,7 +123,14 @@ class Work < TaskBase
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
 		if(RELOAD)
-			cmd = "workfile.rb #{args.join(' ')} CONFIG=\"#{CONFIG}\" RELOAD=\"\""
+			args = ""
+			if(USE_NEWLIB)
+				args += " USE_NEWLIB=\"\""
+			end
+			if(FULLSCREEN == "true")
+				args += " FULLSCREEN=\"true\""
+			end
+			cmd = "workfile.rb #{args.join(' ')} CONFIG=\"#{CONFIG}\" RELOAD=\"\"" + args
 			if(HOST == :win32)
 				sh "ruby #{cmd}"
 			else
@@ -158,10 +161,11 @@ class BuildWork < Work
 	def setup
 		#puts "BuildWork.setup: #{@NAME.inspect}"
 		set_defaults
-		@prerequisites = [DirTask.new(self, @BUILDDIR)]
+		@prerequisites << DirTask.new(self, @BUILDDIR)
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)
+			@prerequisites << DirTask.new(self, @INSTALLDIR)
 			@prerequisites << CopyFileTask.new(self, @INSTALLDIR + '/' + File.basename(@TARGET), @TARGET)
 		end
 	end
@@ -214,6 +218,10 @@ class FileTask < Task
 	def initialize(work, name)
 		super(work)
 		@NAME = name.to_s
+		# names may not contain '~', the unix home directory hack, because File.exist?() doesn't parse it.
+		if(@NAME.include?('~'))
+			error "Bad filename: #{@NAME}"
+		end
 	end
 	
 	def to_str
@@ -274,11 +282,13 @@ class DirTask < FileTask
 		FileUtils.mkdir_p @NAME
 	end
 	def timestamp
-		if File.exist?(@NAME)
-			EARLY
+		if File.directory?(@NAME)
+			t = EARLY
 		else
-			LATE
+			t = LATE
 		end
+		#puts "Timestamp(#{@NAME}): #{t}"
+		#p File.directory?(@NAME)
 	end
 end
 
@@ -290,10 +300,10 @@ class CopyFileTask < FileTask
 	def initialize(work, name, src, preq = [])
 		super(work, name)
 		@src = src
-		@prerequisites = [src] + preq
+		@prerequisites += [src] + preq
 	end
 	def execute
-		puts "cp #{@NAME} #{@src}"
+		puts "copy #{@src} #{@NAME}"
 		FileUtils.copy_file(@src, @NAME, true)
 	end
 end

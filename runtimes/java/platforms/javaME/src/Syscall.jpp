@@ -43,7 +43,7 @@ import javax.microedition.location.*;
 //#include "generated\IX_LOCATION_CONSTS.h"
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 import javax.microedition.io.file.*;
 #include "generated\IX_FILE_CONSTS.h"
 #endif
@@ -61,7 +61,7 @@ import javax.wireless.messaging.*;
 #include "generated\IX_STREAMING_CONSTS.h"
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 #include "generated\IX_STREAMING_CONSTS.h"
 #endif
 
@@ -88,7 +88,7 @@ import javax.microedition.lcdui.Graphics;
 #include "generated\IX_AUDIOBUFFER_CONSTS.h"
 #endif
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 import javax.microedition.pim.*;
 #include "generated\IX_PIM_CONSTS.h"
 #endif
@@ -183,13 +183,13 @@ IMPLEMENTS MoSync
 #include "bluetooth.jpp"
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 #include "FileConnection.jpp"
 #endif
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 #include "PIM2.jpp"
-#endif	//MA_IX_PIM
+#endif	//MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 
 #ifdef MA_PROF_SUPPORT_CAMERA
 #include "Camera.jpp"
@@ -217,7 +217,7 @@ IMPLEMENTS MoSync
 	Player mPlayer = null;
 	int mSoundVolume = 100;
 	
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING	
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI	
 	int mStreamState = SS_IDLE;
 	Player mStreamPlayer = null;
 	VideoControl mStreamVideoControl = null;
@@ -261,7 +261,7 @@ IMPLEMENTS MoSync
 		//maLocationStop();	//causes system dialog!
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 		// Streaming video
 		disposeStreamingVideo();
 #endif
@@ -689,6 +689,30 @@ public
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
 		return bytes.length;
+	}
+
+	// does not write if bufSize is too small.
+	// returns needed/used number of bytes.
+	private final int writeWideString(String s, Address dst, int bufSize) {
+		MYASSERT(bufSize >= 0);
+		int size = s.length()*2 + 2;
+		if(bufSize < size)
+			return size;
+		int[] mem_ds = CORE.mMem_ds;
+		writeWideStringRaw(s, dst);
+		WSHORT(dst + size - 2, (short)0);
+		return size;
+	}
+
+	// no zero-terminator.
+	private final void writeWideStringRaw(String s, Address dst) {
+		int[] mem_ds = CORE.mMem_ds;
+		int address = dst;
+		int len = s.length();
+		for(int i=0; i<len; i++) {
+			WSHORT(address, (short)s.charAt(i));
+			address += 2;
+		}
 	}
 
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
@@ -1761,7 +1785,7 @@ public
 			return maLocationStop();
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILE_I_O
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 		case maIOCtl_maFileOpen:
 			return maFileOpen(readMemString(a), b);
 
@@ -1771,9 +1795,9 @@ public
 			return maFileClose(a);
 		case maIOCtl_maFileCreate:
 			return maFileCreate(a);
-		/*case maIOCtl_maFileDelete:
+		case maIOCtl_maFileDelete:
 			return maFileDelete(a);
-		case maIOCtl_maFileSize:
+		/*case maIOCtl_maFileSize:
 			return maFileSize(a);
 		case maIOCtl_maFileAvailableSpace:
 			return maFileAvailableSpace(a);
@@ -1833,7 +1857,7 @@ public
 			return maAccept(a);
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 		case maIOCtl_maStreamVideoStart:
 			return maStreamVideoStart(readMemString(a));
 		case maIOCtl_maStreamClose:
@@ -1883,7 +1907,7 @@ public
 		case maIOCtl_maGetSystemProperty:
 			return maGetSystemProperty(readMemString(a), b, c);
 
-#ifdef MA_IX_PIM
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 		case maIOCtl_maPimListOpen:
 			return maPimListOpen(a);
 		case maIOCtl_maPimListNext:
@@ -1914,7 +1938,7 @@ public
 			return maPimItemCreate(a);
 		case maIOCtl_maPimItemRemove:
 			return maPimItemRemove(a, b);*/
-#endif	//MA_IX_PIM
+#endif	//MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 
 #ifdef MA_PROF_SUPPORT_CAMERA
 #if USE_CR_FORMATS
@@ -2174,7 +2198,7 @@ public
 	}
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 
 	static final int SS_IDLE = 0;
 	static final int SS_OPENING = 1;

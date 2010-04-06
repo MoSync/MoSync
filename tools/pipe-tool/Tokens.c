@@ -696,7 +696,7 @@ char * FindDirectiveAbove(char *theFilePtr, char *directive)
 		// Have we passed out file pointer
 
 		if (FilePos > theFilePtr)
-			return PrevFilePtr;
+			return prevFilePtr;
 
 		// Have we reached eof
 		

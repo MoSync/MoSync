@@ -27,7 +27,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #endif
 
-#include "cpp_defs.h"
 #include "types.h"
 #include "log.h"
 
@@ -157,6 +156,16 @@ namespace MoSyncError {
 
 #define CBP (const byte*)
 #define CCP (const char*)
+
+#ifdef SYMBIAN
+#define CLEANUPSTACK_PUSH CleanupStack::PushL
+#define CLEANUPSTACK_POPD CleanupStack::PopAndDestroy
+#define CLEANUPSTACK_POP CleanupStack::Pop
+#else
+#define CLEANUPSTACK_PUSH(a)
+#define CLEANUPSTACK_POPD(a)
+#define CLEANUPSTACK_POP(a)
+#endif
 
 #define SAFE_DELETE(ptr) { if(ptr) { delete (ptr); (ptr) = NULL; } }
 

@@ -21,6 +21,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <IX_FILE.h>
 
+#if 0	//log to file
+#define LOG(str) lprintfln(str.c_str())
+#define LPRINTFLN lprintfln
+#else
+#if 1	//log to screen
+#define LOG(str) puts((str + "\n").c_str())
+#define LPRINTFLN(fmt, a...) printf(fmt "\n", a)
+#else	//don't log anything (useful for timing the list operation)
+#define LOG(str)
+#define LPRINTFLN(fmt, a...)
+#endif
+#endif
+
 static void checkEvents() {
 	MAEvent event;
 	while(maGetEvent(&event)) {
@@ -37,7 +50,7 @@ static char buffer[256];
 static bool dumpFileList(const char* path) {
 	MAHandle list = maFileListStart(path, "*");
 	if(list < 0) {
-		printf("Error %i\n", list);
+		LPRINTFLN("FLS error %i", list);
 		return false;
 	}
 	bool empty = true;
@@ -46,7 +59,7 @@ static bool dumpFileList(const char* path) {
 		MAUtil::String p2(path);
 		p2 += buffer;
 		MAUtil::String p3 = p2 + "\n";
-		PrintConsole(p3.c_str());
+		LOG(p3);
 		if(p2[p2.size()-1] == '/')
 			dumpFileList(p2.c_str());
 		empty = false;
@@ -59,13 +72,11 @@ static bool dumpFileList(const char* path) {
 extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 1;
-
+	printf("dumping File List...\n");
+	int startTime = maGetMilliSecondCount();
 	dumpFileList("");
-	printf("Done.\n");
-	/*MAUtil::String path;
-	do {
-		path += buffer;
-	} while(dumpFileList(path.c_str()));*/
+	int endTime = maGetMilliSecondCount();
+	printf("Done in %i ms\n", endTime - startTime);
 	
 	FREEZE;
 }

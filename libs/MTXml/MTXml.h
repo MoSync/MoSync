@@ -34,20 +34,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * MTXml is a destructive parser, which means that it modifies the input data during parsing.
 * For example, it overwrites some key bytes with null terminators for callback delivery.
-* The processing of UTF-8 and entity data replaces the original bytes with Latin-1 characters.
+* The processing of UTF-8 and entity data replaces the original bytes.
 *
 * MTXml does not keep any state beyond the bare minimum required for its parsing.
 * For example, there is no tag stack. Not even the name of the latest tag is saved.
 * Thus, you will probably need to keep your own state variables, different for each
 * document type that you parse.
 *
+* MTXml can output data in either 8-bit Latin-1 or wide-char Unicode.
+*
 * If you use mtxFeed(), the parser treats all text as Latin-1, passing UTF-8 without decoding.
+* You can then use mtxProcess() to convert the interesting parts of the document.
 *
-* If you use mtxFeedProcess(), the parser will determine if UTF-8 is used and, if so,
+* If you use mtxFeedProcess(), the parser will determine if UTF-8 is used and,
 * convert all strings reported by MTX callbacks to Latin-1.
-* It will also convert standard entity references. (XML and HTTP 4.01 Latin-1)
+* It will also convert standard entity references. (XML and HTTP 4.01)
 *
-* UTF-16 is not supported.
+* mtxFeedWide() works like mtxFeedProcess(), except the output is converted to Unicode instead
+* of Latin-1.
+*
+* UTF-16 input is not supported.
 *
 * It should not crash or freeze on any input, but it will give strange data in callbacks
 * if fed a document that is not well-formed, or a document it doesn't support.
@@ -80,7 +86,14 @@ typedef struct MTXContext MTXContext;
 * Contains function pointers for callbacks from the parser.
 * Also contains internal variables.
 *
-* You must set all the callbacks before calling mtxFeed().
+* You must set all the callbacks before calling mtxFeed(), mtxFeedProcess() or mtxFeedWide().
+* An exception is unicodeCharacter(), which will not be called if you call mtxFeedWide().
+*
+* Some functions have const void* parameters. These parameters will point to
+* null-terminated strings whose type is either char or wchar_t,
+* depending on which output type is selected.
+* You'll need to cast the pointers to the appropriate type.
+* The C++ wrapper, Context, does this automatically.
 */
 struct MTXContext {
 	/**
@@ -96,15 +109,15 @@ struct MTXContext {
 	/**
 	* Called when a start-tag is parsed.
 	* \param name The tag's name.
-	* \param len The length of the name.
+	* \param len The length of the name, in characters.
 	*/
-	void (*tagStart)(MTXContext* context, const char* name, int len);
+	void (*tagStart)(MTXContext* context, const void* name, int len);
 
 	//lengths of name and value can be added, if you like.
 	/**
 	* Called when a tag attribute is parsed.
 	*/
-	void (*tagAttr)(MTXContext* context, const char* attrName, const char* attrValue);
+	void (*tagAttr)(MTXContext* context, const void* attrName, const void* attrValue);
 
 	/**
 	* Called when the end bracket of the most recent start-tag is parsed.
@@ -118,19 +131,19 @@ struct MTXContext {
 	* so don't expect your data to be delivered in one piece.
 	*
 	* \param data The character data.
-	* \param len The length of the data.
+	* \param len The length of the data, in characters.
 	*/
-	void (*tagData)(MTXContext* context, const char* data, int len);
+	void (*tagData)(MTXContext* context, const void* data, int len);
 
 	/**
 	* Called when an end-tag is parsed.
 	* \param name The tag's name.
-	* \param len The length of the name.
+	* \param len The length of the name, in characters.
 	* \warning Unlike regular SAX parsers, this function is NOT called when the end of an empty-element tag is parsed.
 	* This is because MTXml, in the interests of performance, does not keep any copies of document data.
 	* emptyTagEnd() is called instead.
 	*/
-	void (*tagEnd)(MTXContext* context, const char* name, int len);
+	void (*tagEnd)(MTXContext* context, const void* name, int len);
 
 	/**
 	* Called at the end of an empty-element tag.
@@ -143,7 +156,7 @@ struct MTXContext {
 	* Prepend it to your next feed.
 	* \param data The XML data. May point to the beginning of the buffer that was supplied to feed().
 	* In that case, the data needn't be moved.
-	* \param len The length of the data.
+	* \param len The length of the data, in bytes.
 	* \see mtxFeed()
 	*/
 	void (*dataRemains)(MTXContext* context, const char* data, int len);
@@ -154,8 +167,8 @@ struct MTXContext {
 	void (*parseError)(MTXContext* context);
 
 	/**
-	* Called during UTF-8 processing, when a character, whose encoding is longer than 8 bits,
-	* is encountered.
+	* Called during UTF-8 processing, if Latin-1 output is selected,
+	* when a character, whose encoding is longer than 8 bits, is encountered.
 	* This function returns an 8-bit representation of that Unicode character.
 	* This function may return zero. If so, a parse error is generated.
 	*/
@@ -177,6 +190,7 @@ struct MTXContext {
 /**
 * Initializes a context's internal state.
 * Must be called before the first call to mtxFeed() with this context.
+* \param context Its variables need not be initialized.
 */
 void mtxStart(MTXContext* context);
 
@@ -190,6 +204,8 @@ void mtxStart(MTXContext* context);
 * You must not call this function from within an MTXml callback.
 * Doing so would corrupt the parser's internal state.
 *
+* This function causes Latin-1 output.
+*
 * \returns Non-zero if mtxStop() was called from a callback within the call to this function,
 * zero otherwise.
 */
@@ -200,9 +216,24 @@ int mtxFeed(MTXContext* context, char* data);
 *
 * Data sent to callbacks will have its UTF-8 characters and standard entities converted to Latin-1.
 *
+* This function causes Latin-1 output.
+*
 * \see mtxFeed()
 */
 int mtxFeedProcess(MTXContext* context, char* data);
+
+/*
+* This function causes wide-char output.
+*
+* Data sent to callbacks will have its UTF-8 characters and standard entities converted to Unicode.
+*
+* The parameter \a wideBuffer is a pointer to a scratch buffer,
+* used by the parser.
+* It must be at least as big as \a data, counted in characters.
+*
+* \see mtxFeed()
+*/
+int mtxFeedWide(MTXContext* context, char* data, wchar_t* wideBuffer);
 
 /**
 * If called from within an MTXml callback,
@@ -251,7 +282,7 @@ namespace Mtx {
 	/**
 	* \see Context
 	*/
-	class XmlListener {
+	template<class Tchar> class XmlListenerT {
 	public:
 		/**
 		* \see MTXContext::encoding
@@ -260,11 +291,11 @@ namespace Mtx {
 		/**
 		* \see MTXContext::tagStart
 		*/
-		virtual void mtxTagStart(const char* name, int len) = 0;
+		virtual void mtxTagStart(const Tchar* name, int len) = 0;
 		/**
 		* \see MTXContext::tagAttr
 		*/
-		virtual void mtxTagAttr(const char* attrName, const char* attrValue) = 0;
+		virtual void mtxTagAttr(const Tchar* attrName, const Tchar* attrValue) = 0;
 		/**
 		* \see MTXContext::tagStartEnd
 		*/
@@ -272,11 +303,11 @@ namespace Mtx {
 		/**
 		* \see MTXContext::tagData
 		*/
-		virtual void mtxTagData(const char* data, int len) = 0;
+		virtual void mtxTagData(const Tchar* data, int len) = 0;
 		/**
 		* \see MTXContext::tagEnd
 		*/
-		virtual void mtxTagEnd(const char* name, int len) = 0;
+		virtual void mtxTagEnd(const Tchar* name, int len) = 0;
 		/**
 		* \see MTXContext::parseError
 		*/
@@ -285,12 +316,19 @@ namespace Mtx {
 		* \see MTXContext::emptyTagEnd
 		*/
 		virtual void mtxEmptyTagEnd() = 0;
+	};
+
+	class XmlListener : public XmlListenerT<char> {
+	public:
 		/**
 		* \see MTXContext::unicodeCharacter
 		* \note This function is not pure virtual, like the others.
 		* Its default implementation calls mtxBasicUnicodeConvert().
 		*/
 		virtual unsigned char mtxUnicodeCharacter(int unicode);
+	};
+
+	class XmlListenerW : public XmlListenerT<wchar_t> {
 	};
 
 	/**
@@ -304,10 +342,39 @@ namespace Mtx {
 		virtual void mtxDataRemains(const char* data, int len) = 0;
 	};
 
+	class ContextBase {
+	public:
+		/**
+		* \see mtxStop()
+		*/
+		void stop();
+	protected:
+		MTXContext mContext;
+		MtxListener* mMtx;
+		void initBase();
+	};
+
 	/**
-	* This is a C++ wrapper for MTXml.
+	* A C++ wrapper for MTXml, with wide-char Unicode output.
 	*/
-	class Context {
+	class ContextW : public ContextBase {
+	public:
+		/**
+		* \see mtxStart()
+		*/
+		void init(MtxListener* mtx, XmlListenerW* xml);
+		/**
+		* \see feedWide()
+		*/
+		bool feed(char* data, wchar_t* wideBuffer);
+	private:
+		XmlListenerW* mXml;
+	};
+
+	/**
+	* A C++ wrapper for MTXml, with Latin-1 output.
+	*/
+	class Context : public ContextBase {
 	public:
 		/**
 		* \see mtxStart()
@@ -322,16 +389,10 @@ namespace Mtx {
 		*/
 		bool feedProcess(char* data);
 		/**
-		* \see mtxStop()
-		*/
-		void stop();
-		/**
 		* \see mtxProcess()
 		*/
 		int process(char* data);
 	private:
-		MTXContext mContext;
-		MtxListener* mMtx;
 		XmlListener* mXml;
 	};
 }

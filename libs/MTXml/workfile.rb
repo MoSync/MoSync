@@ -14,8 +14,24 @@ mod.class_eval do
 	end
 	
 	def setup_base
+		entities = FileTask.new(self, 'entities.c')
+		entities.instance_eval do
+			@prerequisites << FileTask.new(@work, 'entities.txt')
+			def execute
+				tfn = 'build/_temp.c'
+				sh "gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt " +
+					"| sed 's/#line/\\/\\/line/' > #{tfn}"
+				FileUtils.mv(tfn, @NAME)
+			end
+		end
+		
 		@SOURCES = ["."]
-		@SPECIFIC_CFLAGS = {"MTXml.cpp" => " -Wno-unreachable-code"}
+		@IGNORED_FILES = ['entities.c']
+		@IGNORED_HEADERS = ['entities.h']
+		@EXTRA_SOURCETASKS = [entities]
+		@SPECIFIC_CFLAGS = {"MTXml.cpp" => " -Wno-unreachable-code",
+			"entities.c" => " -Wno-extra",
+		}
 		@INSTALL_INCDIR = "MTXml"
 		@NAME = "mtxml"
 	end

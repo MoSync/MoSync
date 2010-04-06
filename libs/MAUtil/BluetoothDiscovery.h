@@ -128,6 +128,11 @@ namespace MAUtil {
 		*/
 		int startServiceDiscovery(const MABtAddr& address, const MAUUID& uuid,
 			BluetoothServiceDiscoveryListener* listener);
+
+		/**
+		* See maBtCancelDiscovery().
+		*/
+		int cancel();
 	private:
 		BluetoothDeviceDiscoveryListener* mDD;
 		BluetoothServiceDiscoveryListener* mSD;

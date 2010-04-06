@@ -46,6 +46,10 @@ typedef ULONGLONG BTH_ADDR;
 #include <BluetoothAPIs.h>
 #endif
 
+#ifdef BROADCOM_SUPPORTED
+#include "win32/broadcom.h"
+#endif
+
 #define WSASERVICE_NOT_FOUND             10108L
 #include "win32/blueSoleil.h"
 
@@ -294,11 +298,12 @@ static void doSearch2() {
 	}
 	LOGBT("dSS a\n");
 	WSATD(WSALookupServiceEnd(sLookup));
-	if(!sCanceled)
 	{
 		CriticalSectionHandler csh(&gBt.critSec);
-		LOGBT("Search done\n");
-		setDiscoveryState(SEARCH.services.size() + 1);
+		if(!sCanceled) {
+			LOGBT("Search done\n");
+			setDiscoveryState(SEARCH.services.size() + 1);
+		}
 	}
 	LOGBT("dSS b\n");
 	callback();
@@ -377,11 +382,12 @@ static void doDiscovery2() {
 		callback();
 	}
 	WSATD(WSALookupServiceEnd(sLookup));
-	if(!sCanceled)
 	{
 		CriticalSectionHandler csh(&gBt.critSec);
-		LOGBT("Discovery done\n");
-		setDiscoveryState(gBt.devices.size() + 1);
+		if(!sCanceled) {
+			LOGBT("Discovery done\n");
+			setDiscoveryState(gBt.devices.size() + 1);
+		}
 	}
 	callback();
 }
@@ -392,11 +398,21 @@ static DWORD WINAPI doDiscovery(void*) {
 
 static bool haveRadio() {
 #ifdef _WIN32_WCE
-	DWORD mode;
-	int res = BthGetMode(&mode);
-	if(res != ERROR_SUCCESS)
+	if(gBluetoothStack == BTSTACK_WINSOCK) {
+		DWORD mode;
+		int res = BthGetMode(&mode);
+		if(res != ERROR_SUCCESS)
+			return false;
+		return (mode == BTH_CONNECTABLE || mode == BTH_DISCOVERABLE);
+	}
+#ifdef BROADCOM_SUPPORTED
+	else if(gBluetoothStack == BTSTACK_BROADCOM) {
+		return Broadcom::haveRadio();
+	}
+#endif
+	else {
 		return false;
-	return (mode == BTH_CONNECTABLE || mode == BTH_DISCOVERABLE);
+	}
 #else
 	BLUETOOTH_FIND_RADIO_PARAMS btfrp;
 	btfrp.dwSize = sizeof(btfrp);
@@ -420,6 +436,7 @@ int Bluetooth::maBtDiscoveryState() {
 }
 
 int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
+	LOGBT("maBtStartDeviceDiscovery\n");
 	DEBUG_ASSERT(cb != NULL);
 	MYASSERT(gBt.discoveryState != 0, BTERR_DISCOVERY_IN_PROGRESS);
 
@@ -436,6 +453,7 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	gBt.devices.clear();
 	gBt.deviceCallback = cb;
 	gBt.names = names;
+	LOGBT("Current stack: %i\n", gBluetoothStack);
 	switch(gBluetoothStack) {
 	case BTSTACK_WINSOCK:
 		{
@@ -449,6 +467,10 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 		Soleil::startDeviceDiscovery();
 		break;
 #endif
+#ifdef BROADCOM_SUPPORTED
+	case BTSTACK_BROADCOM:
+		return Broadcom::startDeviceDiscovery();
+#endif
 	default:
 		DEBIG_PHAT_ERROR;
 	}
@@ -456,6 +478,7 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 }
 
 int Bluetooth::maBtCancelDiscovery() {
+	CriticalSectionHandler csh(&gBt.critSec);
 	if(gBt.discoveryState != 0)
 		return 0;
 #if	0//def _WIN32_WCE
@@ -465,7 +488,14 @@ int Bluetooth::maBtCancelDiscovery() {
 		DEBIG_PHAT_ERROR;
 	}
 #else
-	sCanceled = true;
+#ifdef BROADCOM_SUPPORTED
+	if(gBluetoothStack == BTSTACK_BROADCOM) {
+		Broadcom::cancelDiscovery();
+	} else
+#endif
+	{
+		sCanceled = true;
+	}
 #endif
 	return 1;
 }
@@ -473,6 +503,7 @@ int Bluetooth::maBtCancelDiscovery() {
 
 int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
 	CriticalSectionHandler csh(&gBt.critSec);
+	LOGBT("maBtGetNewDevice(). next %i, size %i\n", gBt.nextDevice, gBt.devices.size());
 	if(gBt.nextDevice == gBt.devices.size()) {
 		return 0;
 	}
@@ -483,7 +514,6 @@ int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
 		uint strLen = MIN(dev.name.size(), uint(dst->nameBufSize - 1));
 		TCHARtoCHAR(dst->name, dev.name.c_str(), strLen);
 		dst->name[strLen] = 0;
-		return strLen;
 	}
 #endif
 	return 1;

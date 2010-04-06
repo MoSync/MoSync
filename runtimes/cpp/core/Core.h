@@ -94,6 +94,9 @@ namespace Core {
 		uint DATA_SEGMENT_SIZE;
 #define DATA_SEGMENT_MASK (DATA_SEGMENT_SIZE - 1)
 
+		uint STACK_TOP;
+		uint STACK_BOTTOM;
+
 		byte* mem_cs;
 		int* mem_ds;
 		int* mem_cp;

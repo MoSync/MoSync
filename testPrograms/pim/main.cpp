@@ -21,13 +21,47 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 #include <IX_PIM.h>
 #include <IX_FILE.h>
+#include <mawstring.h>
+
+#define DUMP_ITEMS 1
+#define USE_FILE 0
+
+#if 1
+#define LOG printf
+#else
+#define LOG(...) lprintf
+
+int lprintf(const char* fmt, ...) {
+	va_list args;
+	char buf[2048];
+	int len;
+	static int lastWLres = 0;
+	
+	if(lastWLres < 0)
+		return lastWLres;
+
+	buf[0] = 0;
+
+	va_start(args, fmt);
+	len = vsprintf(buf, fmt, args);
+	if(len > (int)sizeof(buf) - 2) {
+		maPanic(0, "lprintfln buffer overrun!");
+	}
+	va_end(args);
+
+	lastWLres = maWriteLog(buf, len);
+	return len;
+}
+#endif
 
 using namespace MAUtil;
 
 #define FAIL do{ printf("%i @ %s:%i\n", res, __FILE__, __LINE__); FREEZE; }while(0)
 #define TEST(func) do{ int res = (func); if(res < 0) { FAIL; } }while(0)
 
+#if DUMP_ITEMS
 static void dumpItem(MAHandle list, MAHandle item);
+#endif
 
 static void checkEvents() {
 	MAEvent event;
@@ -48,14 +82,18 @@ static void listContacts() {
 		TEST(item);
 		if(item == 0)
 			break;
+#if DUMP_ITEMS
 		dumpItem(list, item);
+#endif
+		TEST(maPimItemClose(item));
 		checkEvents();
 	}
 	TEST(maPimListClose(list));
 	printf("Done.\n");
 }
 
-static const char* sTypes[] = {
+#if DUMP_ITEMS
+const char* sTypes[] = {
 	"binary",
 	"boolean",
 	"date",
@@ -65,11 +103,11 @@ static const char* sTypes[] = {
 };
 
 static void dumpItem(MAHandle list, MAHandle item) {
-	printf("Contact %i:\n", item);
+	LOG("Contact %i:\n", item);
 	TEST(item);
 	MA_PIM_ARGS args;
 	args.item = item;
-	char buf[64];
+	char buf[128];
 	args.buf = buf;
 	args.bufSize = sizeof(buf);
 	int nFields = maPimItemCount(item);
@@ -81,9 +119,9 @@ static void dumpItem(MAHandle list, MAHandle item) {
 		int type = maPimFieldType(list, field);
 		TEST(type);
 		//printf("Field %i:%i:%s\n", field, type, sFieldNames[field]);
-		printf("Field %i:%i", field, type);
+		LOG("Field %i:%i", field, type);
 		MAASSERT(type > 0 && type <= MA_PIM_TYPE_STRING_ARRAY);
-		printf("(%s)\n", sTypes[type]);
+		LOG("(%s)\n", sTypes[type]);
 		int nValues = maPimItemFieldCount(item, field);
 		TEST(nValues);
 		for(int k=0; k<nValues; k++) {
@@ -92,42 +130,42 @@ static void dumpItem(MAHandle list, MAHandle item) {
 			buf[0] = 0;
 			int len = maPimItemGetValue(&args, k);
 			TEST(len);
-			printf("0x%x %i(", attr, len);
+			LOG("0x%x %i(", attr, len);
 			switch(type) {
 			case MA_PIM_TYPE_BINARY:
 				break;
 			case MA_PIM_TYPE_STRING:
-				printf("%s", buf);
+				LOG("%S", (wchar*)buf);
 				break;
 			case MA_PIM_TYPE_BOOLEAN:
 			case MA_PIM_TYPE_INT:
-				printf("%i", *(int*)buf);
+				LOG("%i", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_DATE:
-				printf("%i (date unsupported)", *(int*)buf);
+				LOG("%i (date unsupported)", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_STRING_ARRAY:
 				{
 					int num = *(int*)buf;
-					const char* ptr = buf + 4;
-					printf("%i", num);
+					const wchar* ptr = (wchar*)(buf + 4);
+					LOG("%i", num);
 					for(int i=0; i<num; i++) {
-						printf(",%s", ptr);
-						ptr += strlen(ptr) + 1;
+						LOG(",%S", ptr);
+						ptr += wcslen(ptr) + 1;
 					}
 				}
 				break;
 			}
-			printf(")\n");
+			LOG(")\n");
 		}
 	}
-	TEST(maPimItemClose(item));
 }
+#endif
 
 class MyMoblet : public Moblet {
 public:
 	MyMoblet() {
-		printf("Hello World!\n");
+		printf("Hello PIM!\n");
 		listContacts();
 	}
 
@@ -140,6 +178,7 @@ public:
 extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 0;
+#if USE_FILE
 	gConsoleFile = maFileOpen("C:/Data/Images/pclog.txt", MA_ACCESS_READ_WRITE);
 	MAASSERT(gConsoleFile > 0);
 	int res = maFileExists(gConsoleFile);
@@ -150,6 +189,7 @@ extern "C" int MAMain() {
 		res = maFileCreate(gConsoleFile);
 		MAASSERT(res == 0);
 	}
+#endif
 	Moblet::run(new MyMoblet());
 	return 0;
 };

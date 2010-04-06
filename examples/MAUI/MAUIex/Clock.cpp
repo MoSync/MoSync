@@ -43,6 +43,8 @@ namespace MAUI {
 			font(0)
 			{
 		setTimeType(LOCAL);
+		setDrawBackground(false);
+	
 		//MAUtil::Environment::getEnvironment().addTimer(this, 1000, -1);
 		//requestRepaint();
 	}
@@ -54,6 +56,8 @@ namespace MAUI {
 		  font(font)
 	{
 		setTimeType(LOCAL);
+		setDrawBackground(false);
+	
 		//TODO: synchronize timer so it runs very soon after second-switch.
 		//MAUtil::Environment::getEnvironment().addTimer(this, 1000, -1);
 		//requestRepaint();

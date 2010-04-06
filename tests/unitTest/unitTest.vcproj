@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="unitTest"
 	ProjectGUID="{6455D32D-5773-4BAF-B4F4-1E70F2176C2A}"
 	RootNamespace="unitTest"
@@ -209,6 +209,10 @@
 			</File>
 			<File
 				RelativePath=".\Libs\MAUtil\automated_tests\mautil_types.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Libs\MAUtil\automated_tests\util.cpp"
 				>
 			</File>
 		</Filter>

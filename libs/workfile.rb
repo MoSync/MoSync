@@ -2,12 +2,8 @@
 
 require File.expand_path('../rules/task.rb')
 
-SUBDIRS = ["MAStd", "MAUtil", "MTXml", "MAFS", "MAUI", "MATest", "MAP"] #, "MinUI"
-
 target :pipe do
 	Work.invoke_subdirs(SUBDIRS, 'pipe')
-	#temp until we fix the directory thing
-	sh "rake pipe CONFIG=\"#{CONFIG}\""
 end
 
 target :native do
@@ -19,5 +15,14 @@ target :default => :pipe
 target :clean do
 	Work.invoke_subdirs(SUBDIRS, 'clean')
 end
+
+Targets.setup
+
+if(USE_NEWLIB)
+	stdlibs = ["newlib"]
+else
+	stdlibs = ["MAStd", "MAFS"]
+end
+SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MATest", "MAP", "Testify"] #, "MinUI"
 
 Targets.invoke

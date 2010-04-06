@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 void scan();
 
-//#define SCAN_DEVICES
+#define SCAN_DEVICES
 
 extern "C" int MAMain() {
 	InitConsole();
@@ -76,7 +76,7 @@ scan_devices:
 		if(event.type == EVENT_TYPE_BT && event.state != 0)
 			break;
 		if(event.type == EVENT_TYPE_CLOSE ||
-			(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+			(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_KP0)))
 		{
 			maExit(0);
 		}
@@ -88,14 +88,14 @@ scan_devices:
 		maWait(0);
 		maGetEvent(&event);
 		if(event.type == EVENT_TYPE_CLOSE ||
-			(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+			(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_KP0)))
 		{
 			maExit(0);
 		}
-		if(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_1) {
+		if(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_1 || event.key == MAK_KP1)) {
 			goto scan_devices;
 		}
-		if(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_3) {
+		if(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_3 || event.key == MAK_KP3)) {
 			break;
 		}
 	}
@@ -167,7 +167,7 @@ scan_devices:
 				break;
 		}
 		if(event.type == EVENT_TYPE_CLOSE ||
-			(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+			(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_KP0)))
 		{
 			maExit(0);
 		}

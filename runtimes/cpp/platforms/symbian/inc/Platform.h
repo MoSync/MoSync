@@ -102,6 +102,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
 
+#include <helpers/CPP_IX_PIM.h>
+#include <cntdb.h>
 
 //TODO: add support for s60v2fp3.
 #if defined(__SERIES60_3X__)
@@ -118,7 +120,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #include "CbSync.h"
-#include "HashMap.h"
+#include "hashmap/hashmap.h"
 
 #ifdef __SERIES60_3X__
 #include "RSendAs_SMS.h"
@@ -173,6 +175,13 @@ private:
 
 class CDirScrAccEng;
 class CAppView;
+class PimItem;
+
+class FileList {
+public:
+	virtual ~FileList() {}
+	virtual int next(char* nameBuf, int bufSize) = 0;
+};
 
 namespace Core {
 	class VMCore;

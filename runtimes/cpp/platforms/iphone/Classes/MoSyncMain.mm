@@ -17,8 +17,8 @@
 
 //--------------------------------------------------------------------//
 // MoRE                                                               //
-// MoSync Runtime Environment (Iphone Version)						  //
-// (c) Mobile Sorcery 2007                                            //
+// MoSync Runtime Environment (iPhone Version)                        //
+// (c) Mobile Sorcery 2010                                            //
 //--------------------------------------------------------------------//
 
 #include "MoSyncMain.h"
@@ -53,7 +53,7 @@ int MoSyncThreadMain(void *args) {
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
 	
-	while(1) {
+	while(gRunning) {
 		Core::Run2(gCore);
 		
 		if(gReloadHandle > 0) {
@@ -73,19 +73,17 @@ int MoSyncThreadMain(void *args) {
 }
 
 MoSyncThread mosyncThread;
-CRITICAL_SECTION gViewMutex;
+
 void MoSyncMain(int width, int height, UIView* mosyncView) {
 	sWidth = width;
 	sHeight = height;
 	sMoSyncView = mosyncView;
 
-	InitializeCriticalSection(&gViewMutex);
-	
 	mosyncThread.start(MoSyncThreadMain, NULL);
 }
 
 MoSyncSemaphore mViewSemaphore;
-void UpdateMoSyncView(CGContextRef ref) {
+void UpdateMoSyncView(CGImageRef ref) {
 
 	[sMoSyncView updateMoSyncView: ref];
 	mViewSemaphore.wait();
@@ -101,4 +99,12 @@ SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
 	//you should get out of the VM loop before you can reload, but this will actually work anyway.
 	gReloadHandle = data;
 	//gReload = gReload || (reload != 0); ???? fredrik?
+}
+
+void ShowMessageBox(const char *msg, bool kill) {
+	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
+}
+
+void Exit() {
+	[[UIApplication sharedApplication] terminateWithSuccess];
 }

@@ -23,24 +23,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ResourceArray.h"
 #include "Stream.h"
 #include "MemStream.h"
+#include "FileStream.h"
 
 #ifndef SYMBIAN
 #include <map>
 #include <string>
 #endif
 
+#include <hashmap/hashmap.h>
+
 #include <helpers/CPP_IX_STREAMING.h>
-//#include <helpers/CPP_IX_LOCATION.h>
+#include <helpers/CPP_IX_FILE.h>
 
 struct MAConnAddr;
 
 namespace Base {
-#ifndef SYMBIAN
-	extern int gStoreId;
-	typedef std::map<int, std::string> StoreMap;
-	typedef StoreMap::iterator StoreItr;
-	extern StoreMap gStores;
-#endif
 
 #include "SyscallImpl.h"
 
@@ -76,6 +73,49 @@ namespace Base {
 #define SYSCALL_THIS this
 #endif
 
+		int gStoreNextId;
+		StringMap gStores;
+
+		//todo: delete all FileStreams on exit.
+		struct FileHandle {
+			FileStream* fs;
+			int mode;
+			Array<char> name;
+			bool isDirectory() const {
+				return name[name.size()-1] == '/';
+			}
+			FileHandle() : name(0) {}
+		};
+		typedef HashMap<FileHandle> FileMap;
+		FileMap gFileHandles;
+		int gFileNextHandle;
+		
+		FileHandle& getFileHandle(MAHandle file);
+
+		MAHandle maFileOpen(const char* path, int mode);
+		int maFileExists(MAHandle file);
+		int maFileClose(MAHandle file);
+		int maFileCreate(MAHandle file);
+		int maFileDelete(MAHandle file);
+		int maFileSize(MAHandle file);
+		//int maFileAvailableSpace(MAHandle file);
+		//int maFileTotalSpace(MAHandle file);
+		//int maFileDate(MAHandle file);
+		//int maFileRename(MAHandle file, const char* newName);
+		//int maFileTruncate(MAHandle file, int offset);
+
+		int maFileWrite(MAHandle file, const void* src, int len);
+		int maFileWriteFromData(const MA_FILE_DATA* args);
+		int maFileRead(MAHandle file, void* dst, int len);
+		int maFileReadToData(const MA_FILE_DATA* args);
+
+		int maFileTell(MAHandle file);
+		int maFileSeek(MAHandle file, int offset, int whence);
+
+		MAHandle maFileListStart(const char* path, const char* filter);
+		int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
+		int maFileListClose(MAHandle list);
+
 		ResourceArray resources;
 
 		void ValidateMemRange(const void* ptr, int size);
@@ -105,33 +145,6 @@ namespace Base {
 	//platform-dependent, works like atoi.
 	int atoiLen(const char* str, int len);
 }
-
-#ifdef IX_FILE
-#include <helpers/CPP_IX_FILE.h>
-MAHandle maFileOpen(const char* path, int mode);
-int maFileExists(MAHandle file);
-int maFileClose(MAHandle file);
-int maFileCreate(MAHandle file);
-int maFileDelete(MAHandle file);
-int maFileSize(MAHandle file);
-int maFileAvailableSpace(MAHandle file);
-int maFileTotalSpace(MAHandle file);
-int maFileDate(MAHandle file);
-int maFileRename(MAHandle file, const char* newName);
-int maFileTruncate(MAHandle file, int offset);
-
-int maFileWrite(MAHandle file, const void* src, int len);
-int maFileWriteFromData(const MA_FILE_DATA* args);
-int maFileRead(MAHandle file, void* dst, int len);
-int maFileReadToData(const MA_FILE_DATA* args);
-
-int maFileTell(MAHandle file);
-int maFileSeek(MAHandle file, int offset, int whence);
-
-MAHandle maFileListStart(const char* path, const char* filter);
-int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
-int maFileListClose(MAHandle list);
-#endif
 
 #ifndef SYMBIAN
 #define SPECIAL(name) _##name
@@ -172,11 +185,7 @@ namespace Base {
 #define GVMRA(type) GVMR(a, type)
 
 //Custom event handling
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)
-#else
-#define CUSTOM_EVENT_STREAM(m)
-#endif
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 #define CUSTOM_EVENT_LOCATION(m) m(EVENT_TYPE_LOCATION, MALocation)

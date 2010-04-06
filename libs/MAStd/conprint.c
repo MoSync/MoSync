@@ -19,6 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "maarg.h"
 #include "mastring.h"
 #include "mavsprintf.h"
+#include "mawstring.h"
+#include "wchar.h"
+#include "mawvsprintf.h"
 #include "maheap.h"
 #include "conprint.h"
 #include "IX_FILE.h"
@@ -30,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 typedef struct
 {
-	char line[CONSOLE_WIDTH + 1];
+	wchar_t line[CONSOLE_WIDTH + 1];
 } ConLine;
 
 typedef struct ConData_t
@@ -124,33 +127,44 @@ void DisplayConsole(void)
 	for (n = 0;  n < sConsole.height;  n++)
 	{
 		index = (n + sConsole.firstLine) % sConsole.height;
-		maDrawText(0, n * sConsole.fontHeight, sConsole.lines[index].line);
+		maDrawTextW(0, n * sConsole.fontHeight, sConsole.lines[index].line);
 	}
 
 	maUpdateScreen();
 }
 
 #define MIN(a,b) ((a) > (b) ? (b) : (a))
-void PrintConsole(const char *str)
+void PrintConsole(const wchar_t *str)
 {
 	int length, pos = 0;
-	char* line;
+	wchar_t* line;
 
 	if (gConsoleLogging)
 	{
 		static char prefix[] = "PrintConsole: ";
 		maWriteLog(prefix, strlen(prefix));
 
-		length = strlen(str);
+		length = wcslen(str);
 		if (length > 0)
 		{
-			maWriteLog(str, length);
+#ifdef MAPIP
+			char buf8[length * MB_LEN_MAX];
+#else
+			char* buf8 = (char*)malloc(length * MB_LEN_MAX);
+#endif
+			//maWriteLog(str, length*sizeof(wchar_t));
+			//convert to utf-8
+			int len8 = wcstombs(buf8, str, sizeof(length * MB_LEN_MAX));
+			maWriteLog(buf8, len8);
 			if (str[length - 1] != '\n')
 				maWriteLog("\n", 1);
+#ifndef MAPIP
+			free(buf8);
+#endif
 		}
 	}
 	if(gConsoleFile > 0) {
-		int res = maFileWrite(gConsoleFile, str, strlen(str));
+		int res = maFileWrite(gConsoleFile, str, wcslen(str));
 		if(res < 0) {
 			maPanic(res, "PrintConsole maFileWrite");
 		}
@@ -211,9 +225,7 @@ int vprintf(const char *fmt, va_list args)
 		maPanic(1, "printf buffer overrun!");
 	}
 
-	PrintConsole(buf);
-
-	len = strlen(buf);
+	puts(buf);
 	return len;
 }
 
@@ -231,14 +243,52 @@ int printf(const char *fmt, ...)
 
 int puts(const char* str)
 {
+	wchar_t wbuf[PRINTF_BUFSIZE];
+	wsprintf(wbuf, L"%s", str);
+	PrintConsole(wbuf);
+	FeedLine();
+	return 0;
+}
+
+int wputs(const wchar_t* str) {
 	PrintConsole(str);
 	FeedLine();
 	return 0;
 }
 
+int wvprintf(const wchar_t *fmt, va_list args)
+{
+	wchar_t wbuf[PRINTF_BUFSIZE];
+	int len;
+
+	wbuf[0] = 0;
+
+	len = wvsprintf(wbuf, fmt, args);
+
+	if(len >= PRINTF_BUFSIZE) {
+		maPanic(1, "printf buffer overrun!");
+	}
+
+	PrintConsole(wbuf);
+
+	len = wcslen(wbuf);
+	return len;
+}
+
+int wprintf(const wchar_t* fmt, ...) {
+	va_list args;
+	int len;
+
+	va_start(args, fmt);
+	len = wvprintf(fmt, args);
+	va_end(args);
+
+	return len;
+}
+
 int putchar(int character)
 {
-	char temp[2];
+	wchar_t temp[2];
 	temp[0] = character;
 	temp[1] = 0;
 	PrintConsole(temp);

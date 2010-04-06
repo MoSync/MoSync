@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="pipe-tool"
 	ProjectGUID="{189444C2-356E-414B-92D1-C3F49ADFFD2D}"
 	RootNamespace="pipe-tool"
@@ -130,6 +130,7 @@
 				WarningLevel="3"
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
 				CompileAs="1"
 			/>
 			<Tool
@@ -146,7 +147,7 @@
 				AdditionalDependencies="FreeImage.lib ZLib.lib"
 				OutputFile="$(OutDir)\pipe-tool.exe"
 				LinkIncremental="1"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

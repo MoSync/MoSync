@@ -16,6 +16,7 @@
 
 require "#{File.dirname(__FILE__)}/util.rb"
 require "#{File.dirname(__FILE__)}/error.rb"
+require "#{File.dirname(__FILE__)}/host.rb"
 
 # add functions to this class to allow them to be used as command-line targets
 # if no command-line target is chosen, "default" is run.
@@ -93,6 +94,8 @@ class Targets
 			set_const(:CONFIG, 'debug')
 		end
 		default_const(:RELOAD, false)
+		default_const(:USE_NEWLIB, false)
+		default_const(:FULLSCREEN, HOST == :linux ? (HOST_PLATFORM == :moblin ? "true" : "false") : "false")
 	end
 	
 	def Targets.handle_arg(a)

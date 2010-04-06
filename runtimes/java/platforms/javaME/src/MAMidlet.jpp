@@ -111,6 +111,7 @@ public final class MAMidlet extends MIDlet {
 	private boolean mStarted = false;
 
 	public final void startApp() {
+		DEBUG_TEMP("startApp()\n");
 		try {
 			if(mCanvas != null) {
 				if(!mStarted) {
@@ -137,6 +138,7 @@ public final class MAMidlet extends MIDlet {
 	}
 
 	public final void pauseApp() {
+		DEBUG_TEMP("pauseApp()\n");
 		try {
 			//mCanvas.stop();
 			int[] event = new int[1];

@@ -76,6 +76,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40058, ERR_FILE_CLOSED, "The file is closed")\
 	m(40059, ERR_INVALID_FILE_SEEK_MODE, "Invalid file seek mode")\
 	m(40060, ERR_INVALID_CAMERA_FORMAT_INDEX, "Invalid camera format index")\
+	m(40061, ERR_INVALID_PIM_HANDLE, "Invalid PIM handle")\
+	m(40062, ERR_INVALID_PIM_FIELD_INDEX, "Invalid PIM field index")\
+	m(40063, ERR_INVALID_PIM_VALUE_INDEX, "Invalid PIM value index")\
+	m(40064, ERR_MISSING_PIM_FIELD, "Missing PIM field")\
+	m(40065, ERR_STACK_OOB, "Stack pointer out of bounds. Try to increase the stack size.")\
 
 DECLARE_ERROR_ENUM(BASE)
 

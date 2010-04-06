@@ -20,7 +20,7 @@ require "#{File.dirname(__FILE__)}/native_gcc.rb"
 class NativeLibTask < FileTask
 	def initialize(work, name, objects)
 		super(work, name)
-		@prerequisites = @objects = objects
+		@prerequisites += @objects = objects
 	end
 	
 	def execute

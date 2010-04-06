@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <maheap.h>
 #include <mastring.h>
+#include <wchar.h>
+#include <mawstring.h>
 
 namespace
 {
@@ -39,7 +41,7 @@ void flushAttributes(MTXSaxContext* context)
 	context->attrIndex[context->attrCount * 2] = NULL;
 	context->attrIndex[context->attrCount * 2 + 1] = NULL;
 
-	context->startElement(context, context->name, context->attrIndex);
+	context->startElement(context, context->name, (const void**)context->attrIndex);
 
 	context->attrCount = 0;
 	context->attrBufUsed = 0;
@@ -51,7 +53,7 @@ void encoding(MTXContext* context, const char* value)
 	outer->encoding(outer, value);
 }
 
-void tagStart(MTXContext* context, const char* name, int length)
+void tagStart(MTXContext* context, const void* name, int length)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
 
@@ -67,21 +69,24 @@ void tagStart(MTXContext* context, const char* name, int length)
 	memcpy(outer->name, name, length + 1);
 }
 
-void tagAttr(MTXContext* context, const char* attrName, const char* attrValue)
+void tagAttr(MTXContext* context, const void* attrName, const void* attrValue)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
 
-	const int attrNameLength = strlen(attrName);
-	const int attrValueLength = strlen(attrValue);
+	const int attrNameLength = outer->isWide ?
+		wcslen((wchar_t*)attrName) : strlen((char*)attrName);
+	const int attrValueLength = outer->isWide ?
+		wcslen((wchar_t*)attrValue) : strlen((char*)attrValue);
+	const int tcharSize = outer->isWide ? sizeof(char) : sizeof(wchar_t);
 
-	const int attrSize = attrNameLength + attrValueLength + 2;
+	const int attrSize = (attrNameLength + attrValueLength + 2) * tcharSize;
 
 	if (outer->attrBufSize - outer->attrBufUsed < attrSize)
 	{
-		// Make room for attribute name and value
+		// Make room for attribute name and value, with some extra space for the next one.
 		const int newSize = outer->attrBufSize + attrSize * 2;
 
-		outer->attrBuf = (char*) realloc(outer->attrBuf, newSize);
+		outer->attrBuf = (char*)realloc(outer->attrBuf, newSize);
 		outer->attrBufSize = newSize;
 	}
 
@@ -95,14 +100,24 @@ void tagAttr(MTXContext* context, const char* attrName, const char* attrValue)
 	}
 
 	// Save attribute name and offset to it
-	strcpy(outer->attrBuf + outer->attrBufUsed, attrName);
+	if(outer->isWide) {
+		wcsncpy((wchar_t*)(outer->attrBuf + outer->attrBufUsed), (wchar_t*)attrName,
+			outer->attrBufSize - outer->attrBufUsed);
+	} else {
+		strcpy(outer->attrBuf + outer->attrBufUsed, (char*)attrName);
+	}
 	outer->attrIndex[outer->attrCount * 2] = (char*) outer->attrBufUsed;
-	outer->attrBufUsed += attrNameLength + 1;
+	outer->attrBufUsed += (attrNameLength + 1) * tcharSize;
 
 	// Save attribute value and offset to it
-	strcpy(outer->attrBuf + outer->attrBufUsed, attrValue);
+	if(outer->isWide) {
+		wcsncpy((wchar_t*)(outer->attrBuf + outer->attrBufUsed), (wchar_t*)attrValue,
+			outer->attrBufSize - outer->attrBufUsed);
+	} else {
+		strcpy(outer->attrBuf + outer->attrBufUsed, (char*)attrValue);
+	}
 	outer->attrIndex[outer->attrCount * 2 + 1] = (char*) outer->attrBufUsed;
-	outer->attrBufUsed += attrValueLength + 1;
+	outer->attrBufUsed += (attrNameLength + 1) * tcharSize;
 
 	outer->attrCount++;
 }
@@ -113,13 +128,13 @@ void tagStartEnd(MTXContext* context)
 	flushAttributes(outer);
 }
 
-void tagData(MTXContext* context, const char* data, int length)
+void tagData(MTXContext* context, const void* data, int length)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
 	outer->characters(outer, data, length);
 }
 
-void tagEnd(MTXContext* context, const char* name, int length)
+void tagEnd(MTXContext* context, const void* name, int length)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
 	outer->endElement(outer, name);
@@ -220,8 +235,7 @@ void mtxSaxStop(MTXSaxContext* context)
 namespace Mtx
 {
 
-SaxContext::SaxContext(void):
-	mSaxListener(NULL),
+SaxContextBase::SaxContextBase():
 	mMtxListener(NULL)
 {
 	mContext.userData = this;
@@ -230,19 +244,23 @@ SaxContext::SaxContext(void):
 	mContext.startElement = startElement;
 	mContext.endElement = endElement;
 	mContext.characters = characters;
-	mContext.unicodeCharacter = unicodeCharacter;
 	mContext.parseError = parseError;
 }
 
-SaxContext::~SaxContext(void)
+SaxContextBase::~SaxContextBase(void)
 {
-	if (mSaxListener)
+	if (mMtxListener)
 		mtxSaxStop(&mContext);
+}
+
+SaxContext::SaxContext() {
+	mContext.unicodeCharacter = unicodeCharacter;
 }
 
 void SaxContext::start(SaxListener& newSaxListener, MtxListener& newMtxListener)
 {
-	mSaxListener = &newSaxListener;
+	//terrible hack, but it should work on most compilers.
+	mSaxListenerW = (SaxListenerW*)&newSaxListener;
 	mMtxListener = &newMtxListener;
 	mtxSaxStart(&mContext);
 }
@@ -257,58 +275,57 @@ bool SaxContext::feedProcess(char* data)
 	return mtxSaxFeedProcess(&mContext, data);
 }
 
-void SaxContext::stop(void)
+void SaxContextBase::stop(void)
 {
-	mSaxListener = NULL;
 	mMtxListener = NULL;
 	mtxSaxStop(&mContext);
 }
 
-bool SaxContext::isStarted(void) const
+bool SaxContextBase::isStarted(void) const
 {
-	return mSaxListener != NULL;
+	return mMtxListener != NULL;
 }
 
-void SaxContext::encoding(MTXSaxContext* context, const char* value)
+void SaxContextBase::encoding(MTXSaxContext* context, const char* value)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListener->mtxEncoding(value);
+	outer->mSaxListenerW->mtxEncoding(value);
 }
 
-void SaxContext::startElement(MTXSaxContext* context, const char* name, const char** attributes)
+void SaxContextBase::startElement(MTXSaxContext* context, const void* name, const void** attributes)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListener->mtxStartElement(name, attributes);
+	outer->mSaxListenerW->mtxStartElement((wchar_t*)name, (const wchar_t**)attributes);
 }
 
-void SaxContext::endElement(MTXSaxContext* context, const char* name)
+void SaxContextBase::endElement(MTXSaxContext* context, const void* name)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListener->mtxEndElement(name);
+	outer->mSaxListenerW->mtxEndElement((wchar_t*)name);
 }
 
-void SaxContext::characters(MTXSaxContext* context, const char* data, int length)
+void SaxContextBase::characters(MTXSaxContext* context, const void* data, int length)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListener->mtxCharacters(data, length);
+	outer->mSaxListenerW->mtxCharacters((wchar_t*)data, length);
 }
 
 unsigned char SaxContext::unicodeCharacter(MTXSaxContext* context, int character)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	return outer->mSaxListener->mtxUnicodeCharacter(character);
+	return ((SaxListener*)outer->mSaxListenerW)->mtxUnicodeCharacter(character);
 }
 
-void SaxContext::dataRemains(MTXSaxContext* context, const char* data, int length)
+void SaxContextBase::dataRemains(MTXSaxContext* context, const char* data, int length)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
 	outer->mMtxListener->mtxDataRemains(data, length);
 }
 
-void SaxContext::parseError(MTXSaxContext* context)
+void SaxContextBase::parseError(MTXSaxContext* context)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListener->mtxParseError();
+	outer->mSaxListenerW->mtxParseError();
 }
 
 } /* namespace Mtx */

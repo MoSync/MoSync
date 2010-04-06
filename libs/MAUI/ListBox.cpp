@@ -225,10 +225,10 @@ namespace MAUI {
 #if 0
 	static void drawRect(int x1, int y1, int x2, int y2, int col) {
 		maSetColor(col);
-		maLine(x1, y1, x2, y1);
-		maLine(x2, y1, x2, y2);
-		maLine(x1, y1, x1, y2);
-		maLine(x1, y2, x2, y2);		
+		Gfx_line(x1, y1, x2, y1);
+		Gfx_line(x2, y1, x2, y2);
+		Gfx_line(x1, y1, x1, y2);
+		Gfx_line(x1, y2, x2, y2);
 	}
 #endif
 
@@ -255,7 +255,7 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
 
 			if(res) {
-				if(isDirty() && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && shouldDrawBackground) {
 					drawBackground();
 				}
 
@@ -264,19 +264,30 @@ namespace MAUI {
 				Gfx_translate(paddingLeft, paddingTop);
 				res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
 
+				MAPoint2d tBefore = Gfx_getTranslation();
 				Gfx_translate(0, (yOffset>>16));
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
 				{	
+					srand(1);
 					for(i = 0; i < children.size(); i++)
 					{
 						Rect p = children[i]->getBounds();
 						Point rp = children[i]->getPosition();
-						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) && 
+						/*
+						// the problem is that paddedBounds isn't updated when the translation changes.
+						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) &&
 							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
 							(translation.x+rp.x+p.width)>paddedBounds.x &&
 							(translation.y+rp.y+p.height)>paddedBounds.y)
+							*/
+						if(	(translation.x+rp.x)<(tBefore.x+paddingLeft+paddedBounds.width) &&
+							(translation.y+rp.y)<(tBefore.y+paddingTop+paddedBounds.height) &&
+							(translation.x+rp.x+p.width)>tBefore.x+paddingLeft &&
+							(translation.y+rp.y+p.height)>tBefore.y+paddingTop)
+
 							children[i]->draw();
+						//drawRect(rp.x, rp.y, rp.x+p.width-1, rp.y+p.height-1, rand()&0xffffff);
 					}
 				}
 
@@ -307,7 +318,7 @@ namespace MAUI {
 
 			if(res) 
 			{
-				if(isDirty() && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && shouldDrawBackground) {
 					drawBackground();
 				}
 	
@@ -316,6 +327,7 @@ namespace MAUI {
 				Gfx_translate(paddingLeft, paddingTop);
 				res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);	
 
+				MAPoint2d tBefore = Gfx_getTranslation();
 				Gfx_translate((yOffset>>16), 0);
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
@@ -325,10 +337,16 @@ namespace MAUI {
 					{
 						Rect p = children[i]->getBounds();
 						Point rp = children[i]->getPosition();
+						/*
 						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) &&
 							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
 							(translation.x+rp.x+p.width)>paddedBounds.x &&
 							(translation.y+rp.y+p.height)>paddedBounds.y)
+							*/
+						if(	(translation.x+rp.x)<(tBefore.x+paddingLeft+paddedBounds.width) &&
+							(translation.y+rp.y)<(tBefore.y+paddingTop+paddedBounds.height) &&
+							(translation.x+rp.x+p.width)>tBefore.x+paddingLeft &&
+							(translation.y+rp.y+p.height)>tBefore.y+paddingTop)
 							children[i]->draw();	
 					}
 				}

@@ -4,6 +4,7 @@
 require File.expand_path('rules/targets.rb')
 require File.expand_path('rules/host.rb')
 require File.expand_path('rules/task.rb')
+require File.expand_path('rules/mosync_util.rb')
 
 PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"]
 
@@ -15,7 +16,7 @@ else
 	PLATFORM_TOOLS = []
 end
 
-BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
+MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"intlibs/bluetooth",
 	"intlibs/gsm_amr",
 	"intlibs/net",
@@ -23,16 +24,22 @@ BASE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl",
 	"runtimes/cpp/platforms/sdl/mosynclib",
 	"runtimes/cpp/platforms/sdl/MoRE"
-	] + PLATFORM_TOOLS
+	]
 
-EXAM_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs", "examples"]
+BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
-MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + EXAM_DIRS
+EXAM_DIRS = ["tests/unitTest", "examples"]
+PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
+
+MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + PIPE_DIRS
+ALL_DIRS = MAIN_DIRS + EXAM_DIRS
+
+NEWLIB_DIRS = ["libs"]
 
 skins = Work.new
 skins.instance_eval do
 	def setup
-		builddir = "#{ENV['MOSYNCDIR']}/skins"
+		builddir = "#{mosyncdir}/skins"
 		@prerequisites = [DirTask.new(self, builddir)]
 		skin_sources = Dir['skins/*']
 		@prerequisites |= skin_sources.collect do |src|
@@ -51,6 +58,10 @@ target :default => :base do
 	Work.invoke_subdirs(MAIN_DIRS)
 end
 
+target :all => :default do
+	Work.invoke_subdirs(EXAM_DIRS)
+end
+
 target :noidl => skins do
 	Work.invoke_subdirs(PRE_DIRS)
 	Work.invoke_subdir("tools/idl2")
@@ -65,11 +76,22 @@ target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
 end
 
+target :newlib => :base do
+	Work.invoke_subdirs(NEWLIB_DIRS)
+end
+
+target :clean_more do
+	verbose_rm_rf("build")
+	Work.invoke_subdirs(PRE_DIRS, "clean")
+	Work.invoke_subdir("tools/idl2", "clean")
+	Work.invoke_subdirs(MORE_DIRS, "clean")
+end
+
 target :clean do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
-	Work.invoke_subdirs(MAIN_DIRS, "clean")
+	Work.invoke_subdirs(ALL_DIRS, "clean")
 end
 
 Targets.invoke

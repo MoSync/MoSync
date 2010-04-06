@@ -2,14 +2,18 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
-class Kazlib
+# install the kazlib headers separately.
+class Kazlib < Work
 	include MoSyncMod
-	def initialize
+	def setup
 		@SOURCES = ["../kazlib"]
 		@INSTALL_INCDIR = "kazlib"
+		copyHeaders
+	end
+	def execute_clean
 	end
 end
-Kazlib.new.copyHeaders
+Kazlib.new.invoke
 
 mod = Module.new
 mod.class_eval do

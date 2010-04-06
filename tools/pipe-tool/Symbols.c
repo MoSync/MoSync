@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //*********************************************************************************************
 
 #include "compile.h"
+#include <assert.h>
 
 #define USE_HASHING
 
@@ -1541,7 +1542,7 @@ void DumpIPTrans()
 void DumpFunctions(FILE *out)
 {
 	SYMBOL	*Sym;
-
+	int lastVal = -1;
 	int		n;
 
 	fprintf(out, "FUNCTIONS\n");
@@ -1554,12 +1555,21 @@ void DumpFunctions(FILE *out)
 		if (((Sym->LabelType == label_Function) || (Sym->LabelType == label_Virtual))
 			//&& ((Sym->Section == section_Label) || (Sym->Section == section_Global)))
 			//&& Sym->EndIP != 0)
-			&& (Sym->Section == section_Enum))
+			&& (Sym->Section == section_Enum) && (Sym->Type != SECT_null))
 		{
 			fprintf(out, "%s ",Sym->Name);
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s",Hex32(Sym->EndIP));
+#if 0	// for debugging
+			fprintf(out, "(t%i, lt%i, s%i, vi%i, ls%i, le%i)",
+				Sym->Type, Sym->LabelType, Sym->Section, Sym->VirtualIndex,
+				Sym->LocalScope, Sym->LabelEnum);
+#endif
 			fprintf(out, "\n");
+			if(Sym->Value > Sym->EndIP || Sym->Value <= lastVal) {
+				printf("Warning: problematic symbol value: %s\n", Sym->Name);
+			}
+			lastVal = Sym->Value;
 		}
 
 		Sym++;

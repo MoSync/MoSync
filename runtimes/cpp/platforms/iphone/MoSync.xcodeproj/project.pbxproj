@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* MoSyncAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.m */; };
+		1D3623260D0F684500981E51 /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -15,13 +15,14 @@
 		2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
+		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85BF2B26113403FD00BB0201 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
 		85BF2B27113403FD00BB0201 /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
 		85BF2B28113403FD00BB0201 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
 		85BF2B29113403FD00BB0201 /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
 		85BF2B3F1134047400BB0201 /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
 		85BF2B401134047400BB0201 /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
-		85BF2B411134047400BB0201 /* TranslateSyscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3C1134047400BB0201 /* TranslateSyscall.cpp */; };
 		85BF2B43113404A800BB0201 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
 		85BF2B47113404E000BB0201 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
 		85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
@@ -47,7 +48,7 @@
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* MoSyncAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncAppDelegate.m; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncAppDelegate.mm; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -57,6 +58,10 @@
 		28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
+		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
+		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
+		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = file; path = resources; sourceTree = "<group>"; };
 		85BF2B1C113403FD00BB0201 /* bt_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_errors.h; path = ../../../../intlibs/bluetooth/bt_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1D113403FD00BB0201 /* btinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btinit.h; path = ../../../../intlibs/bluetooth/btinit.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1E113403FD00BB0201 /* connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = connection.cpp; path = ../../../../intlibs/bluetooth/connection.cpp; sourceTree = SOURCE_ROOT; };
@@ -83,7 +88,6 @@
 		85BF2B391134047400BB0201 /* smartie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smartie.h; path = ../../../../intlibs/helpers/smartie.h; sourceTree = SOURCE_ROOT; };
 		85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslatePanic.cpp; path = ../../../../intlibs/helpers/TranslatePanic.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B3B1134047400BB0201 /* TranslatePanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TranslatePanic.h; path = ../../../../intlibs/helpers/TranslatePanic.h; sourceTree = SOURCE_ROOT; };
-		85BF2B3C1134047400BB0201 /* TranslateSyscall.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslateSyscall.cpp; path = ../../../../intlibs/helpers/TranslateSyscall.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B3D1134047400BB0201 /* TranslateSyscall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TranslateSyscall.h; path = ../../../../intlibs/helpers/TranslateSyscall.h; sourceTree = SOURCE_ROOT; };
 		85BF2B3E1134047400BB0201 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../../../../intlibs/helpers/types.h; sourceTree = SOURCE_ROOT; };
 		85BF2B42113404A800BB0201 /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = ../../../../intlibs/helpers/platforms/linux/log.cpp; sourceTree = SOURCE_ROOT; };
@@ -160,7 +164,7 @@
 				85BF2B0D1134037600BB0201 /* intlibs */,
 				85BF2B0C1134036D00BB0201 /* impl */,
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
-				1D3623250D0F684500981E51 /* MoSyncAppDelegate.m */,
+				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
 				28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */,
 				85BF2BF011341A8C00BB0201 /* MoSyncMain.h */,
@@ -203,6 +207,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				85A0815311353EDE00267D56 /* resources */,
 				85BF2C3A11341EF000BB0201 /* program */,
 				2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
@@ -219,6 +224,15 @@
 				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		85923F23114539D4004875E4 /* filelist */ = {
+			isa = PBXGroup;
+			children = (
+				85923F24114539F0004875E4 /* filelist-linux.c */,
+				85923F25114539F0004875E4 /* filelist.h */,
+			);
+			name = filelist;
 			sourceTree = "<group>";
 		};
 		85BF2B0C1134036D00BB0201 /* impl */ = {
@@ -244,6 +258,7 @@
 		85BF2B0D1134037600BB0201 /* intlibs */ = {
 			isa = PBXGroup;
 			children = (
+				85923F23114539D4004875E4 /* filelist */,
 				85BF2B1B113403C600BB0201 /* net */,
 				85BF2B1A113403C000BB0201 /* helpers */,
 				85BF2B19113403B900BB0201 /* bluetooth */,
@@ -313,6 +328,7 @@
 		85BF2B1A113403C000BB0201 /* helpers */ = {
 			isa = PBXGroup;
 			children = (
+				85A080F711352F2800267D56 /* fifo.h */,
 				85BF2B2C1134047400BB0201 /* array.h */,
 				85BF2B2D1134047400BB0201 /* attribute.h */,
 				85BF2B2E1134047400BB0201 /* constSets.h */,
@@ -329,7 +345,6 @@
 				85BF2B391134047400BB0201 /* smartie.h */,
 				85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */,
 				85BF2B3B1134047400BB0201 /* TranslatePanic.h */,
-				85BF2B3C1134047400BB0201 /* TranslateSyscall.cpp */,
 				85BF2B3D1134047400BB0201 /* TranslateSyscall.h */,
 				85BF2B3E1134047400BB0201 /* types.h */,
 				85BF2B2B1134043B00BB0201 /* platform */,
@@ -407,6 +422,7 @@
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */,
 				85BF2C3B11341EF000BB0201 /* program in Resources */,
+				85A0815411353EDE00267D56 /* resources in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,7 +434,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
-				1D3623260D0F684500981E51 /* MoSyncAppDelegate.m in Sources */,
+				1D3623260D0F684500981E51 /* MoSyncAppDelegate.mm in Sources */,
 				28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */,
 				85BF2B26113403FD00BB0201 /* connection.cpp in Sources */,
 				85BF2B27113403FD00BB0201 /* discovery.cpp in Sources */,
@@ -426,7 +442,6 @@
 				85BF2B29113403FD00BB0201 /* server.cpp in Sources */,
 				85BF2B3F1134047400BB0201 /* intutil.cpp in Sources */,
 				85BF2B401134047400BB0201 /* TranslatePanic.cpp in Sources */,
-				85BF2B411134047400BB0201 /* TranslateSyscall.cpp in Sources */,
 				85BF2B43113404A800BB0201 /* log.cpp in Sources */,
 				85BF2B47113404E000BB0201 /* net.cpp in Sources */,
 				85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */,
@@ -446,6 +461,7 @@
 				85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */,
 				85BF2C0111341B3D00BB0201 /* Core.cpp in Sources */,
 				85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */,
+				85923F26114539F0004875E4 /* filelist-linux.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -55,9 +55,9 @@ extern "C" {
 
 // ** Protos
 #ifndef NO_BUILTINS
-wchar *wstrncpy(wchar *dest, const wchar *source, size_t count);		// Built-in
-int wstrncmp(const wchar *s1, const wchar *s2, size_t count);			// Built-in
-wchar *wstrncat(wchar *s1, const wchar *s2, size_t count);				// Built-in
+wchar *wcsncpy(wchar *dest, const wchar *source, size_t count);		// Built-in
+int wcsncmp(const wchar *s1, const wchar *s2, size_t count);			// Built-in
+wchar *wcsncat(wchar *s1, const wchar *s2, size_t count);				// Built-in
 #endif
 
 /**
@@ -68,7 +68,7 @@ wchar *wstrncat(wchar *s1, const wchar *s2, size_t count);				// Built-in
 *          > 0 if s1 is greater than s2\n
 */
 
-int wstricmp(const wchar *s1, const wchar *s2);
+int wcsicmp(const wchar *s1, const wchar *s2);
 
 /**
 * Compares strings \a s1 with \a s2 for a max length \a count without case sensitivity.
@@ -78,21 +78,21 @@ int wstricmp(const wchar *s1, const wchar *s2);
 *          > 0 if s1 is greater than s2\n
 */
 
-int wstrnicmp(const wchar *s1, const wchar *s2, size_t count);
+int wcsnicmp(const wchar *s1, const wchar *s2, size_t count);
 
 /**
 * Scans a string for the first occurance of a character.
 * \returns A pointer to the character, NULL if not found.
 */
 
-wchar *wstrchr(const wchar *s, int ch);
+wchar *wcschr(const wchar *s, int ch);
 
 /**
 * Scans a string for the last occurance of a character.
 * \returns A pointer to the character, NULL if not found.
 */
 
-wchar *wstrrchr(const wchar *s, int ch);
+wchar *wcsrchr(const wchar *s, int ch);
 
 /**
 * Scans the substring \a str2 in string \a str1.
@@ -100,7 +100,7 @@ wchar *wstrrchr(const wchar *s, int ch);
 */
 
 
-wchar *wstrstr(const wchar *str1, const wchar *str2);
+wchar *wcsstr(const wchar *str1, const wchar *str2);
 
 /**
 * Find length of initial segment matching mask.
@@ -108,7 +108,7 @@ wchar *wstrstr(const wchar *str1, const wchar *str2);
 * which consists only of characters that are part of \a control.
 */
 
-size_t wstrspn(const wchar *string, const wchar *control);
+size_t wcsspn(const wchar *string, const wchar *control);
 
 /**
 * Gets the length of a complementary substring.
@@ -117,7 +117,7 @@ size_t wstrspn(const wchar *string, const wchar *control);
 * This is the length of \a string if none of the characters in \a control are found in \a string.
 */
 
-size_t wstrcspn(const wchar *string, const wchar *control);
+size_t wcscspn(const wchar *string, const wchar *control);
 
 /**
 * A pointer to the first occurrence in \a string of any of the characters
@@ -125,7 +125,7 @@ size_t wstrcspn(const wchar *string, const wchar *control);
 * of \a control is found in \a string before the terminating null-character.
 */
 
-wchar *wstrpbrk(const wchar *string, const wchar *control);
+wchar *wcspbrk(const wchar *string, const wchar *control);
 
 /**
 * Searches \a buf for count bytes for the first occurance of \a ch.
@@ -146,7 +146,7 @@ void *wmemrchr(const void *buf, int ch, size_t count);
 * \returns Pointer to the new string.
 */
 
-wchar *wstrdup(const wchar *s);
+wchar *wcsdup(const wchar *s);
 
 /**
 * Makes a string lower case.
@@ -154,35 +154,35 @@ wchar *wstrdup(const wchar *s);
 */
 
 
-wchar *wstrlwr(wchar *s);
+wchar *wcslwr(wchar *s);
 
 /**
 * Makes a string upper case.
 * \returns Pointer to the end of the string.
 */
 
-wchar *wstrupr(wchar *s);
+wchar *wcsupr(wchar *s);
 
 /**
 * Sets a number of characters in the string \a s to \a c.
 * \returns Pointer to the last character changed.
 */
 
-wchar *wstrnset(wchar *s, int c, size_t count);
+wchar *wcsnset(wchar *s, int c, size_t count);
 
 /**
 * Reverses the order of the characters in a string.
 * \returns Pointer to the altered string.
 */
 
-wchar *wstrrev(wchar *s);
+wchar *wcsrev(wchar *s);
 
 /**
 * Get the length of a string.
 * \returns The length of the string.
 */
 
-size_t wstrlen(const wchar *s);
+size_t wcslen(const wchar *s);
 
 /**
 * Appends the string \a dst with the string \a src,
@@ -190,17 +190,17 @@ size_t wstrlen(const wchar *s);
 * \returns Destination string.
 */
 
-wchar *wstrcat(wchar *dst, const wchar *src);
+wchar *wcscat(wchar *dst, const wchar *src);
 
 /**
 * Sets all the characters in string \a s to the character \a c,
 * \returns Destination string \a s.
 */
 
-wchar *wstrset(wchar *s, int c);
+wchar *wcsset(wchar *s, int c);
 
 
-int wstrcmp(const wchar *s1, const wchar *s2);
+int wcscmp(const wchar *s1, const wchar *s2);
 
 /**
 * Converts a string to a double.
@@ -209,9 +209,9 @@ int wstrcmp(const wchar *s1, const wchar *s2);
 * following the converted string in the pointer pointed to by \a endptr,
 * if \a endptr is not NULL.
 */
-double wstrtod(const wchar* string, wchar** endptr);
+double wcstod(const wchar* string, wchar** endptr);
 
-size_t wstrnlen(const wchar *s, size_t count);
+size_t wcsnlen(const wchar *s, size_t count);
 
 #ifdef __cplusplus
 }	//extern "C"

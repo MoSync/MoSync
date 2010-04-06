@@ -14,7 +14,7 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
-
+#if 0
 #include "ma.h"
 
 // Functions are intrinsic, no prototypes needed.
@@ -146,3 +146,4 @@ long long __ashldi3(long long a, int b)
 	return 0;
 }
 #endif	//0
+#endif

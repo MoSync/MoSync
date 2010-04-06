@@ -46,10 +46,12 @@ Widget* createSoftKeyBar(int height, const char *left, const char *right) {
 
 	label = new Label(0,0, scrWidth/2, height, NULL, left, 0, gFont);
 	label->setHorizontalAlignment(Label::HA_LEFT);
+	label->setDrawBackground(false);
 	setLabelPadding(label);
 	layout->add(label);
 
 	label = new Label(0,0, scrWidth/2, height, NULL, right, 0, gFont);
+	label->setDrawBackground(false);
 	label->setHorizontalAlignment(Label::HA_RIGHT);
 	setLabelPadding(label);
 	layout->add(label);
@@ -70,6 +72,10 @@ Layout* createMainLayout(const char *left, const char *right) {
 	listBox->setPaddingBottom(15);
 
 	mainLayout->add(softKeys);
+
+	mainLayout->setSkin(NULL);
+	mainLayout->setDrawBackground(true);
+	mainLayout->setBackgroundColor(0);
 
 	return mainLayout;
 }

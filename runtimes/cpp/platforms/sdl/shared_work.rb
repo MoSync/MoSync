@@ -5,14 +5,17 @@ def setup_common
 	@EXTRA_INCLUDES = ["../../../base", ".."]
 	
 	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist"]
-	@LOCAL_DLLS = ["amr"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
 	
 	if(HOST == :win32) then
 		@CUSTOM_LIBS = common_libraries.collect do |lib| "#{lib}.lib" end +
 			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
+		@LOCAL_DLLS = ["amr"]
 	elsif(HOST == :linux) then
+		@EXTRA_CPPFLAGS = ""
+		@IGNORED_FILES = []
+		@LOCAL_LIBS << "amr"
 		if(SDL_SOUND)
 			sound_lib = [ "SDL_sound" ]
 		else
@@ -21,7 +24,7 @@ def setup_common
 			@IGNORED_FILES += [ "SDLSoundAudioSource.cpp" ]
 		end
 		
-		if(HOST_PLATFORM == :moblin)
+		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
 		

@@ -173,6 +173,7 @@ buffer.Format(_L8("In %s on line %d: Panic(%s);\n"), __FILE__, __LINE__,\
 
 #define LOG_FAILURE(a) { LOG("Failure %i ", a); IN_FILE_ON_LINE; }
 
+// Test Symbian No Return
 #define TSNR(a) { int test_s = (a); if(IS_SYMBIAN_ERROR(test_s)) LOG_FAILURE(test_s); }
 
 #define DUMP_RECT(name) LOG("%s %i,%i, %i,%i\n", #name,\
@@ -203,6 +204,11 @@ inline void* memset(void* dst, int c, uint len) {
 #endif
 
 int unixTime(const TTime& tt);
+
+// returns 0 on success.
+int _mkdir(const char* name);
+int _rmdir(const char* name);
+int remove(const char* name);
 
 //***************************************************************************
 //Text conversion to/from unicode
@@ -262,6 +268,14 @@ inline HBufC8* CreateHBufC8FromCStringL(const char* str) {
 inline HBufC8* CreateHBufC8FromCStringLC(const char* str) {
 	TPtrC8 ptrc8(CBP str);
 	return CreateHBufC8FromDesC8LC(ptrc8);
+}
+
+inline void Append(TPtr16& ptr, const TDesC8& desc) {
+	int off = ptr.Length();
+	ptr.SetLength(ptr.Length() + desc.Length());
+	for(int i=0; i<desc.Length(); i++) {
+		ptr[off++] = desc[i];
+	}
 }
 
 
@@ -470,6 +484,7 @@ public:
 
 //***************************************************************************
 //A semi-smart pointer designed to PopAndDestroy itself when it goes out of scope.
+//Note: It does NOT PushL anything.
 //***************************************************************************
 
 template<class T> class TCleaner : public SmartieBase<T> {

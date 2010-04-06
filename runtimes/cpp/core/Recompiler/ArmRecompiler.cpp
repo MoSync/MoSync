@@ -17,7 +17,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ArmRecompiler.h"
 
+#define CACHE_LINE_SIZE 64 // bytes
+
 #ifdef USE_ARM_RECOMPILER
+
+#include <helpers/helpers.h>
+#include <base/base_errors.h>
+using namespace MoSyncError;
 
 using namespace avmplus;
 using namespace Core;
@@ -580,19 +586,26 @@ namespace MoSync {
 
 	// TODO implement division with assembly?
 	void ArmRecompiler::divu(int rd, int rs) {
-		*(unsigned long*)&mEnvironment.regs[rd] /= *(unsigned long*)&mEnvironment.regs[rs];
+		unsigned long denom = *(unsigned long*)&mEnvironment.regs[rs];
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::divui(int rd, int imm32) {
-		*(unsigned long*)&mEnvironment.regs[rd] /= (unsigned long) imm32;
+		unsigned long denom = (unsigned long) imm32;
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::div(int rd, int rs) {
+		if(mEnvironment.regs[rs]==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		mEnvironment.regs[rd] /= mEnvironment.regs[rs];
 	}
 
 	void ArmRecompiler::divi(int rd, int imm32) {
-		mEnvironment.regs[rd] /= (long) imm32;
+		long denom = (long)imm32;
+		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::visit_DIVU() {
@@ -959,7 +972,7 @@ namespace MoSync {
 			break;
 		}
 	}
-
+	
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
 #ifdef __SYMBIAN32__
@@ -1121,6 +1134,13 @@ namespace MoSync {
 	}
 
 	void ArmRecompiler::beginFunction(Function *f) {
+		// align functions to cache line size.
+		if(((this->assm.mInstructionCount<<2)&(CACHE_LINE_SIZE-1)) != 0) {
+			while(((this->assm.mInstructionCount<<2)&(CACHE_LINE_SIZE-1)) != 0) {
+				this->assm.IMM32(0);
+				this->assm.mInstructionCount++;
+			}
+		}
 	}
 
 	void ArmRecompiler::endFunction(Function *f) {
@@ -1129,8 +1149,9 @@ namespace MoSync {
 	int ArmRecompiler::run(int ip) {
 		//LOG("ArmRecompiler::run(%i)\n", ip);
 		if(mStopped) {
-			LOG("Stopped, recompiling..\n");
+			LOG("Stopped, Recompiling..\n");
 			Recompiler<ArmRecompiler>::recompile();
+			//LOG("Finished recompiling..\n");
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
@@ -1139,8 +1160,8 @@ namespace MoSync {
 	}
 
 	int ArmRecompiler::shiftAriMatcher() {
-		Instruction i1 = mInstructions[0];
-		Instruction i2 = mInstructions[1];
+		const Instruction& i1 = mInstructions[0];
+		const Instruction& i2 = mInstructions[1];
 		if(i1.rd == i2.rs && i2.rd == i2.rs) return 1;
 		else return 0;
 	}
@@ -1151,6 +1172,29 @@ namespace MoSync {
 #endif
 	}
 
+#if 0	
+#ifdef __SYMBIAN32__	
+static void MyExceptionHandlerL(TExcType aType)
+{
+	LOG("Exception type: %d", aType);
+   User::Leave(KErrGeneral);
+   
+   /*
+   switch (aType)
+       {
+       case EExcAccessViolation:
+           {
+          // console->Printf(_L("Access Voilation Exception\n"));
+		   User::After(TTimeIntervalMicroSeconds32(1000000));
+           User::Leave(KErrGeneral);
+           break;        
+           }
+        //You can add more exceptions which are defined in e32const.h in TExcType Enumerator
+       }
+	   */
+}
+#endif	
+#endif // 0	
 	void ArmRecompiler::init(Core::VMCore *core, int *VM_Yield) {
 		Recompiler<ArmRecompiler>::init(core, VM_Yield);
 		LOG("initRecompilerVariables\n");
@@ -1158,9 +1202,16 @@ namespace MoSync {
 		mPipeToArmInstMap = NULL;
 		entryPoint.mipStart = NULL;
 
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
 		//mHeap = NULL;
-	#endif
+#if 0
+	#ifdef EKA2
+	User::SetExceptionHandler(MyExceptionHandlerL, KExceptionFault|KExceptionInteger|KExceptionAbort|KExceptionKill|KExceptionFpe|KExceptionUserInterrupt);
+	#else
+	RThread().SetExceptionHandler(MyExceptionHandlerL, KExceptionFault|KExceptionInteger|KExceptionAbort|KExceptionKill|KExceptionFpe|KExceptionUserInterrupt);
+	#endif		
+#endif // 0
+#endif // __SYMBIAN32__
 		mPipeToArmInstMap = new
 	#ifdef __SYMBIAN32__
 		(ELeave)

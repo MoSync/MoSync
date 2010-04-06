@@ -30,6 +30,7 @@ LayoutScreen::LayoutScreen(Screen *previous) : previous(previous) {
 	layout->setMarginY(5);
 	layout->setPaddingLeft(5);
 	layout->setPaddingRight(5);
+	layout->setDrawBackground(false);
 
 	for(int i = RES_ICONS_START; i != RES_ICONS_END+1; i++) {
 		new Image(0, 0, 0, 0, layout, true, true, i);

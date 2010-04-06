@@ -311,9 +311,25 @@ skipp:
 	}
 
 	template<class Tchar> void BasicString<Tchar>::remove(int position, int number) {
-		BasicString beginning = this->substr(0, position);
-		BasicString ending = this->substr(position+number, this->length() - position - number);
-		*this = beginning + ending;
+		if(sd->getRefCount() > 1) {
+			ASSERT_MSG(position >= 0 && position < this->length(), "invalid position");
+			ASSERT_MSG(number > 0 && (position + number) <= this->length(), "invalid number");
+			int newLen = size() - number;
+			StringData<Tchar>* temp = new StringData<Tchar>(newLen);
+			if(position > 0) {
+				memcpy(temp->pointer(), sd->pointer(), position * sizeof(Tchar));
+			}
+			if(position < newLen) {
+				memcpy(temp->pointer() + position, sd->pointer() + (position + number),
+					(newLen - position) * sizeof(Tchar));
+			}
+			sd->release();
+			sd = temp;
+		} else {
+			sd->remove(position, number);
+			sd->reserve(sd->size() + 1);
+		}
+		(*sd)[sd->size()] = 0;
 	}
 
 	template<class Tchar>
@@ -344,11 +360,9 @@ skipp:
 		return sd->mData[index];
 	}
 
-#if 0
 	template<class Tchar> int BasicString<Tchar>::size() const {
-		return sd->size() * sizeof(Tchar);
+		return sd->size();
 	}
-#endif
 
 	template<class Tchar> int BasicString<Tchar>::length() const {
 		return sd->size();
@@ -416,16 +430,20 @@ template<> int tstrlen<char>(const char* str) { return strlen(str); }
 template<> int tstrcmp<char>(const char* a, const char* b) { return strcmp(a, b); }
 
 template<class Tchar> int tstrlen(const Tchar* str) {
-	int len = 0;
+	const Tchar* start = str;
 	while(*str) {
-		len++;
+		str++;
 	}
-	return len;
+	return str - start;
 }
 template<class Tchar> int tstrcmp(const Tchar* a, const Tchar* b) {
-	while(*a == *b) {
+	while(*a && *b && (*a == *b)) {
 		a++;
 		b++;
 	}
 	return *a - *b;
 }
+
+//explicit instantiation (needed to link with these functions in MAPIP.)
+template int tstrlen<wchar_t>(const wchar_t*);
+template int tstrcmp<wchar_t>(const wchar_t*, const wchar_t*);

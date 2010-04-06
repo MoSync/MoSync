@@ -110,25 +110,29 @@ namespace TextOutput {
 
 		HANDLE hFont;
 		HDC dc = GetDC(NULL);
+		GLE(dc);
 		HDC cdc = CreateCompatibleDC(dc);
 		GLE(cdc);
-		ReleaseDC(NULL, dc);
+		GLE(ReleaseDC(NULL, dc));
 
 		if(hFont = (HFONT)GetStockObject(SYSTEM_FONT)) {
 			SelectObject(cdc, hFont);
+		} else {
+			ret.cx = ret.cy = 0;
+			return ret;
 		}
 
-		if(wide)
-			GetTextExtentPoint32W(cdc, (LPCWSTR)str, wcslen((const wchar_t*)str), &ret);
-		else {
+		if(wide) {
+			GLE(GetTextExtentPoint32W(cdc, (LPCWSTR)str, wcslen((const wchar_t*)str), &ret));
+		} else {
 			size_t len = strlen((const char*)str);
-			WCHAR *unicode = new WCHAR[len];
+			WCHAR *unicode = new WCHAR[len+1];
 			convertAsciiToUnicode(unicode, len, (const char*)str);
-			GetTextExtentPoint32W(cdc, unicode, len, &ret);
+			GLE(GetTextExtentPoint32W(cdc, unicode, len, &ret));
 			delete unicode;
 		}
 
-		DeleteDC(cdc);
+		GLE(DeleteDC(cdc));
 
 		return ret;
 	}
@@ -138,6 +142,8 @@ namespace TextOutput {
 		BITMAPINFO bmi;
 
 		SIZE size = getTextSize(str, wide);
+		if(size.cx == 0)	//empty string
+			return;
 
 		ZeroMemory(&bmi.bmiHeader, sizeof(BITMAPINFOHEADER));
 		bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
@@ -152,16 +158,17 @@ namespace TextOutput {
 		GLE(hFont);
 
 		HDC dc = GetDC(NULL);
+		GLE(dc);
 		HDC cdc = CreateCompatibleDC(dc);
 		GLE(cdc);
-		ReleaseDC(NULL, dc);
+		GLE(ReleaseDC(NULL, dc));
 
-		HBITMAP hbmBitmap = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS,
+		HBITMAP hbmBitmap = CreateDIBSection(cdc, &bmi, DIB_RGB_COLORS,
 			(void**)&pBitmapBits, NULL, 0);
 		GLE(hbmBitmap);
 
 		SelectObject(cdc, hFont);
-		SelectObject(cdc, hbmBitmap);
+		HANDLE old = SelectObject(cdc, hbmBitmap);
 		RECT rect;
 		rect.left = 0;
 		rect.top = 0;
@@ -176,7 +183,7 @@ namespace TextOutput {
 			GLE(DrawTextW(cdc, (LPCWSTR)str, -1, &rect, DT_TOP|DT_LEFT|DT_SINGLELINE));
 		} else {
 			size_t len = strlen((const char*)str);
-			WCHAR *unicode = new WCHAR[len];
+			WCHAR *unicode = new WCHAR[len+1];
 			convertAsciiToUnicode(unicode, len, (const char*)str);
 			GLE(DrawTextW(cdc, unicode, len, &rect, DT_TOP|DT_LEFT|DT_SINGLELINE));
 			delete unicode;
@@ -185,8 +192,9 @@ namespace TextOutput {
 		//copy text to framebuffer
 		drawImage(dst, x, y, (const unsigned int*)pBitmapBits, rect.right, rect.bottom, color);
 
-		DeleteDC(cdc);
-		DeleteObject(hbmBitmap);	
+		SelectObject(cdc, old);
+		GLE(DeleteDC(cdc));
+		GLE(DeleteObject(hbmBitmap));	
 	}
 
 } // namespace TextOutput

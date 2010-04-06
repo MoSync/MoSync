@@ -33,6 +33,7 @@ namespace MAUI {
 	gridXSize(gridXSize),
 	gridYSize(gridYSize),
 	selectedIndex(0) {
+		setDrawBackground(false);	
 		requestRepaint();
 	}
 
@@ -49,6 +50,7 @@ namespace MAUI {
 	gridYSize(gridYSize),
 	selectedIndex(0)
 	{
+		setDrawBackground(false);	
 		requestRepaint();
 	}
 

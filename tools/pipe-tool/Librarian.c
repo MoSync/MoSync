@@ -643,7 +643,7 @@ int WriteLibrarian(char *outfile)
 #ifdef USE_ZLIB
 	thisObj.csize = ZLibCompress(cptr, SourceIdx * 2, SourceTop, SourceIdx);
 #else
-	thisObj.csize = FreeImage_ZLibCompress(cptr, 0x40000, SourceTop, SourceIdx);
+	thisObj.csize = FreeImage_ZLibCompress(cptr, SourceIdx * 2, SourceTop, SourceIdx);
 #endif
 
 	if (thisObj.csize)

@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "MoTooth.h"
+#include <mastring.h>
 
 //This is the format of the Store
 /*struct STORE {

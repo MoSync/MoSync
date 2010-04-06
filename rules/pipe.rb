@@ -15,10 +15,13 @@
 # 02111-1307, USA.
 
 require "#{File.dirname(__FILE__)}/gcc.rb"
-#require 'lib/importenv.rb'
+require "#{File.dirname(__FILE__)}/mosync_util.rb"
 
-MOSYNC_INCLUDE = "#{ENV['MOSYNCDIR']}/include"
-MOSYNC_LIBDIR = "#{ENV['MOSYNCDIR']}/lib"
+module MoSyncInclude
+	def mosync_include; "#{mosyncdir}/include" + sub_include; end
+	def mosync_libdir; "#{mosyncdir}/lib"; end
+	def sub_include; USE_NEWLIB ? "/newlib" : ""; end
+end
 
 class PipeTask < FileTask
 	def initialize(work, name, objects, linkflags)
@@ -26,9 +29,18 @@ class PipeTask < FileTask
 		@FLAGS = linkflags
 		dirTask = DirTask.new(work, File.dirname(name))
 		@objects = objects
-		@prerequisites = @objects + [dirTask]
+		@prerequisites += @objects + [dirTask]
+		
+		initFlags
 	end
+	
+	def needed?(log = true)
+		return true if(super(log))
+		return flagsNeeded?(log)
+	end
+	
 	def execute
+		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
 			sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
@@ -40,6 +52,8 @@ class PipeTask < FileTask
 			error "Pipe-tool failed silently!"
 		end
 	end
+	
+	include FlagsChanged
 end
 
 # adds dependency handling
@@ -51,7 +65,7 @@ class PipeResourceTask < PipeTask
 		
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
-			@prerequisites = MakeDependLoader.load(@depFile, @NAME)
+			@prerequisites += MakeDependLoader.load(@depFile, @NAME)
 		end
 	end
 	def needed?(log = true)
@@ -72,11 +86,20 @@ class PipeGccWork < GccWork
 	include GccVersion
 	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
 	def gccmode; "-S"; end
-	def host_flags; ""; end
+	def host_flags;
+		g = CONFIG == "" ? " -g" : ""
+		return (USE_NEWLIB ? g + " -DUSE_NEWLIB" : g)
+	end
 	def host_cppflags; ""; end
 	
+	include MoSyncInclude
+	
 	def set_defaults
-		@BUILDDIR_BASE = "build/pipe/"
+		if(USE_NEWLIB)
+			@BUILDDIR_PREFIX = "newlib_"
+		else
+			@BUILDDIR_PREFIX = "pipe_"
+		end
 		super
 	end
 	

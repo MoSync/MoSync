@@ -38,7 +38,6 @@ namespace MAUtil {
 
 	/**
 	* \brief A generic, dynamic list container
-	* class behaving much like a subset of std::list.
 	*
 	* You can retrieve either a ListIterator or ConstListIterator to iterate through the list.
 	*/
@@ -49,7 +48,7 @@ namespace MAUtil {
 
 		class ListNode {
 		public:
-			ListNode(Type &data, ListNode *prev, ListNode *next) :
+			ListNode(const Type &data, ListNode *prev, ListNode *next) :
 				mData(data), mPrev(prev), mNext(next)
 				{
 				}
@@ -58,84 +57,120 @@ namespace MAUtil {
 			  ListNode *mPrev, *mNext;
 		};
 
+		class ConstListIterator;
+
 		class ListIterator {
 		public:
-			/// Returns a reference to the current element.
-			Type& get() {
+
+			/**
+			 * Function used to tell if there is a next element.
+			 * \returns 'true' if there is a next element, otherwise 'false'.
+			 */
+			bool hasNext() const {
+				return mCurrent!=NULL && mCurrent->mNext;
+			}
+
+			/**
+			 * Function used to tell if there is a previous element.
+			 * \returns 'true' if there is a previous element, otherwise 'false'.
+			 */
+			bool hasPrev() const {
+				return mCurrent!=NULL && mCurrent->mPrev;
+			}
+
+			/**
+			* Returns the data the iterator points to and attempts to move the iterator backwards.
+			* \returns a const reference to the data the iterator points to.
+			*/
+			Type& prev() {
+				if(!mFirst && mCurrent->mPrev) {
+					mCurrent = mCurrent->mPrev;
+				} else {
+					mFirst = false;
+				}
 				return mCurrent->mData;
 			}
 
 			/**
-			* Attempts to move the iterator backwards.
-			* Returns true if successful, false if there is no element before the current one.
+			* Returns the data the iterator points to and attempts to move the iterator forward.
+			* \returns a const reference to the data the iterator points to.
 			*/
-			bool prev() {
-				if(mCurrent->mPrev) {
-					mCurrent = mCurrent->mPrev;
-					return true;
+			Type& next() {
+				if(!mFirst && mCurrent->mNext) {
+					mCurrent = mCurrent->mNext;
 				} else {
-					return false;
+					mFirst = false;
 				}
-			}
-
-			/**
-			* Attempts to move the iterator forwards.
-			* Returns true if successful, false if there is no element after the current one.
-			*/
-			bool next() {
-				if(mCurrent->mNext) {
-					mCurrent = mCurrent->next;
-					return true;
-				} else {
-					return false;
-				}
+				return mCurrent->mData;
 			}
 
 		private:
-			ListIterator(ListNode *cur) {
+			friend class ConstListIterator;
+			friend class List;
+
+			ListIterator(ListNode *cur) : mFirst(true) {
 				mCurrent = cur;
 			}
 
+			bool mFirst;
 			ListNode *mCurrent;
 		};
 
 		class ConstListIterator {
 		public:
-			/// Returns a const reference to the current element.
-			const Type& get() {
+			ConstListIterator(const ListIterator& listIterator) : mCurrent(listIterator.mCurrent), mFirst(true) {
+
+			}
+
+			/**
+			 * Function used to tell if there is a next element.
+			 * \returns 'true' if there is a next element, otherwise 'false'.
+			 */
+			bool hasNext() const {
+				return mCurrent!=NULL && mCurrent->mNext;
+			}
+
+			/**
+			 * Function used to tell if there is a previous element.
+			 * \returns 'true' if there is a previous element, otherwise 'false'.
+			 */
+			bool hasPrev() const {
+				return mCurrent!=NULL && mCurrent->mPrev;
+			}
+
+			/**
+			* Returns the data the iterator points to and attempts to move the iterator backwards.
+			* \returns a const reference to the data the iterator points to.
+			*/
+			const Type& prev() {
+				if(!mFirst && mCurrent->mPrev) {
+					mCurrent = mCurrent->mPrev;
+				} else {
+					mFirst = false;
+				}
 				return mCurrent->mData;
 			}
 
 			/**
-			* Attempts to move the iterator backwards.
-			* Returns true if successful, false if there is no element before the current one.
+			* Returns the data the iterator points to and attempts to move the iterator forward.
+			* \returns a const reference to the data the iterator points to.
 			*/
-			bool prev() {
-				if(mCurrent->mPrev) {
-					mCurrent = mCurrent->mPrev;
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-			/**
-			* Attempts to move the iterator forwards.
-			* Returns true if successful, false if there is no element after the current one.
-			*/
-			bool next() {
-				if(mCurrent->mNext) {
+			const Type& next() {
+				if(!mFirst && mCurrent->mNext) {
 					mCurrent = mCurrent->mNext;
-					return true;
 				} else {
-					return false;
+					mFirst = false;
 				}
+				return mCurrent->mData;
 			}
 		private:
-			ConstListIterator(const ListNode &cur) {
+			friend class List;
+
+			ConstListIterator(const ListNode* cur) {
 				mCurrent = cur;
 			}
 
+			bool mFirst;
 			const ListNode *mCurrent;
 		};
 	
@@ -180,7 +215,7 @@ namespace MAUtil {
 		* \param data The element to be inserted.
 		* \returns A new iterator pointing to the newly added element.
 		*/
-		ListIterator insert(ListIterator iterator, Type data) {
+		ListIterator insert(ListIterator iterator, const Type& data) {
 			ListNode *next = iterator.mCurrent->mNext;
 			ListNode *newNode = new ListNode(data, iterator.mCurrent, next);
 			iterator.mCurrent->mNext = newNode;	
@@ -199,21 +234,19 @@ namespace MAUtil {
 		* \returns A new iterator pointing to the element following the removed.
 		*/
 		ListIterator remove(ListIterator iterator) {
-			ListNode* prev = iterator.mCurrent->mPrev;
-			ListNode *next = iterator.mCurrent->mNext;
-			if(mSize==0) return;
-			if(prev!=NULL) {
-				prev->mNext = next;
+			if(mSize==0) return ListIterator(NULL);
+			if(iterator.hasPrev()) {
+				iterator.mCurrent->mPrev->mNext = iterator.mCurrent->mNext;
 			} else {
-				mHead = next;
+				mHead = iterator.mCurrent->mNext;
 			}
-			if(next!=NULL) {
-				next->mPrev = prev;
+			if(iterator.hasNext()) {
+				iterator.mCurrent->mNext->mPrev = iterator.mCurrent->mPrev;
 			} else {
-				mTail = prev;
+				mTail = iterator.mCurrent->mPrev;
 			}
 			mSize--;
-			return ListIterator(next);
+			return ListIterator(iterator.mCurrent->mNext);
 		}
 
 		/**

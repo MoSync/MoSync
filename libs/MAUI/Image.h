@@ -29,6 +29,7 @@ namespace MAUI {
 	 * Image is a widget used to put plain images in a graphical user
 	 * interface. Pass the resource handle to the widget and it will display
 	 * that image.
+	* The widget doesn't draw its background by default, use setDrawBackground(true) to enable it.
 	 */
 	class Image : public Widget {
 	public:

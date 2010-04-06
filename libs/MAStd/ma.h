@@ -58,10 +58,6 @@ int MAMain(void);
 #define _ma_inline(string)	
 #endif
 
-#if defined(MAPIP) && !defined(__cplusplus)
-typedef wchar wchar_t;
-#endif
-
 void ATTRIBUTE(noreturn, ErrorExit(const char * str, int v));
 
 #endif /* MA_H */

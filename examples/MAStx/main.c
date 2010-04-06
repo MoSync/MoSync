@@ -21,16 +21,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <conprint.h>
-#include <madmath.h>
-#include <maheap.h>
 #include <matime.h>
 #include <ma.h>
 #include <maassert.h>
 
+#ifdef USE_NEWLIB
+#include <math.h>
+#include <malloc.h>
+#include <float.h>
+#else
+#include <madmath.h>
+#include <maheap.h>
+#endif	//USE_NEWLIB
+
 int MAMain(void) GCCATTRIB(noreturn);
 int MAMain(void) {
-	InitConsole();
-
 	//These are declared extern in conprint.h.
 	gConsoleBackgroundColor = 0xFF800080;
 	gConsoleTextColor = -1;

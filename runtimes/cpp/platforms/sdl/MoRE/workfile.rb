@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require File.expand_path('../shared_work.rb')
+require File.expand_path('../../../../../rules/mosync_util.rb')
 
 work = MoSyncExe.new
 class << work
@@ -9,7 +10,7 @@ end
 work.instance_eval do
 	setup_common
 	
-	BD = "../../../../.."
+	BD = '../../../../..'
 	@SOURCES = ["."]
 	@IGNORED_FILES = ["debugger.cpp"]
 	@EXTRA_SOURCEFILES = ["#{BD}/runtimes/cpp/core/Core.cpp",
@@ -25,6 +26,8 @@ work.instance_eval do
 	@LOCAL_LIBS = ["mosync_sdl"] + @LOCAL_LIBS
 	
 	@NAME = "moemu"
+	
+	@INSTALLDIR = mosyncdir + '/bin'
 	
 	setup
 end

@@ -22,6 +22,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 
+//#include <MAUtil/Vector.h>
+#include <MAUtil/HashMap.h>
+
+using namespace MAUtil;
+
 namespace MAUI {
 
 	/** A WidgetSkin is a class used to define the visual appearance
@@ -127,8 +132,15 @@ namespace MAUI {
 		 * resized to 'width' and 'height. 'type' specifies which
 		 * drawing state should be used when drawing the widget skin.
 		 **/
+		
+		// uses a cache.
 		void draw(int x, int y, int width, int height, eType type);
-	
+		
+		void drawDirect(int x, int y, int width, int height, eType type);
+		void drawToData(int *data, int x, int y, int width, int height, eType type);
+		int calculateNumTiles(int width, int height);		
+		void drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint);
+		
 		/** 
 		 * Get the image height.
 		 **/
@@ -149,7 +161,56 @@ namespace MAUI {
 		 **/
 		bool isUnselectedTransparent() const;
 
+		struct CacheKey {
+			CacheKey() {
+			}
+			CacheKey(WidgetSkin* s, int width, int height, eType atype) : skin(s), w(width), h(height), type(atype) {
+			}
+			
+			bool operator==(const CacheKey& c) const {
+				return (skin==c.skin && w==c.w && h==c.h && type==c.type);
+			}
+			
+			bool operator<(const CacheKey& c) const {
+				return (skin<c.skin && w<c.w && h<c.h && type<c.type);
+			}
+					
+			WidgetSkin *skin;
+			int w, h;
+			eType type;	
+		};		
+	
+		struct CacheElement {
+			/*
+			// key
+			int w, h;
+			eType type;
+			*/
+			
+			// value
+			MAHandle image;
+			
+			// timestamp
+			int lastUsed;
+		};		
+		
+
+		// in pixels.
+		static void setMaxCacheSize(int c);
+		
+		static void flushCacheUntilNewImageFits(int numPixels); 
+		static void flushCache();
+		static void addToCache(const CacheKey& key, const CacheElement& elem);
+		static MAHandle getFromCache(const CacheKey& key);
+		
 	private:
+		static int maxCacheSize;
+		
+		//Vector<CacheElement> cache;
+		static HashMap<CacheKey, CacheElement> sCache;
+
+
+			
 		void rebuildRects();
 
 		int selectedImageWidth;
@@ -175,8 +236,7 @@ namespace MAUI {
 		bool selectedTransparent, 
 			unselectedTransparent;
 
-	};
-
+	};	
 }
 
 #endif

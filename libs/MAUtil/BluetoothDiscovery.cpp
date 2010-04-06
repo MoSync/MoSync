@@ -50,6 +50,10 @@ int BluetoothDiscoverer::startServiceDiscovery(const MABtAddr& address, const MA
 	return result;
 }
 
+int BluetoothDiscoverer::cancel() {
+	return maBtCancelDiscovery();
+}
+
 void BluetoothDiscoverer::bluetoothEvent(int state) {
 	if(mDD) {
 		handleDD(state);

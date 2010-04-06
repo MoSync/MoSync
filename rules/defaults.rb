@@ -30,10 +30,12 @@ def set_defaults
 	default(:EXTRA_LINKFLAGS, "")
 	# Array of Strings, extra include directories.
 	default(:EXTRA_INCLUDES, [])
-	# Array of Strings, names of files that should not be built.
+	# Array of Strings, names of files that should not be compiled.
 	default(:IGNORED_FILES, [])
-	# Array of Strings, paths to files that should be built, even though they are outside the SOURCES.
+	# Array of Strings, paths to files that should be compiled, even though they are outside the SOURCES.
 	default(:EXTRA_SOURCEFILES, [])
+	# Array of FileTasks, generated source files that should be compiled along with the others.
+	default(:EXTRA_SOURCETASKS, [])
 	# Array of FileTasks, precompiled object files, to link with.
 	default(:EXTRA_OBJECTS, [])
 	# Array of Strings, names of static libraries built earlier, to link with.
@@ -51,6 +53,8 @@ def set_defaults
 	default(:SPECIFIC_CFLAGS, {})
 	# String, name of the base build directory.
 	default(:BUILDDIR_BASE, "build/")
+	# String, added to the beginning of build and target directories.
+	default(:BUILDDIR_PREFIX, "")
 	
 	# String, configuration identifier.
 	# Valid values are "debug" and "" (optimized).
@@ -59,14 +63,14 @@ def set_defaults
 	# @BUILDDIR is the name of the build directory, where generated files are stored.
 	# @CONFIG_NAME is the name of the configuration.
 	if(CONFIG == "debug") then
-		@BUILDDIR = @BUILDDIR_BASE + "debug/"
 		@CONFIG_NAME = "debug"
 	elsif(CONFIG == "")
-		@BUILDDIR = @BUILDDIR_BASE
 		@CONFIG_NAME = "release"
 	else
 		error "wrong configuration: " + CONFIG
 	end
+	default(:BUILDDIR_NAME, @BUILDDIR_PREFIX + @CONFIG_NAME)
+	default(:BUILDDIR, @BUILDDIR_BASE + @BUILDDIR_NAME + "/")
 	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))

@@ -23,18 +23,23 @@
 
 # On Linux only:
 # SDL_SOUND, boolean. True if SDL_Sound is available.
-# BLUETOOTH, booelan. True if Bluez is available.
+# BLUETOOTH, boolean. True if Bluez is available.
 
 require "#{File.dirname(__FILE__)}/error.rb"
-require "#{File.dirname(__FILE__)}/util.rb"
 
-UNAME = open("|uname").readline().strip()
+begin
+	UNAME = open("|uname").readline().strip()
+rescue SystemCallError
+	UNAME = "windows32"
+end
 
 if(UNAME == "Linux")
 	HOST = :linux
 elsif(UNAME == "MINGW32_NT-5.1")
 	HOST = :win32
 elsif(UNAME == "MINGW32_NT-6.0")
+	HOST = :win32
+elsif(UNAME == "MINGW32_NT-6.1")
 	HOST = :win32
 elsif(UNAME == "windows32")
 	HOST = :win32

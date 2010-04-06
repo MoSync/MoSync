@@ -115,7 +115,8 @@ namespace MAUtil {
 		return ret;
 	}
 
-	void stringSplit(const String& str, const String& delim, MAUtil::Vector<String>& output)
+	template<class Tchar> void stringSplit(const BasicString<Tchar>& str,
+		const BasicString<Tchar>& delim, MAUtil::Vector<BasicString<Tchar> >& output)
 	{
 		int offset = 0;
 		int delimIndex = 0;
@@ -125,15 +126,60 @@ namespace MAUtil {
 
 		delimIndex = str.find(delim, offset);
 
-		while (delimIndex != String::npos)
+		while (delimIndex != BasicString<Tchar>::npos)
 		{
-			MAUtil::String sub = str.substr(offset, delimIndex - offset);
+			MAUtil::BasicString<Tchar> sub = str.substr(offset, delimIndex - offset);
 			output.add(sub);
 			offset += delimIndex - offset + delim.length();
 			delimIndex = str.find(delim, offset);
 		}
 
 		output.add(str.substr(offset, str.length() - offset));
+	}
+
+	void stringSplit(const String& str, const String& delim, MAUtil::Vector<String>& output) {
+		stringSplit<char>(str, delim, output);
+	}
+	void stringSplit(const WString& str, const WString& delim, MAUtil::Vector<WString>& output) {
+		stringSplit<wchar_t>(str, delim, output);
+	}
+
+	template<class Tchar> void stringBreak(const Tchar* str, const Tchar* delim,
+		MAUtil::Vector<BasicString<Tchar> >& output)
+	{
+		const Tchar* s = str;
+		const Tchar* start = str;
+		output.clear();
+		while(*s) {
+			const Tchar* d = delim;
+			bool b = false;
+			while(*d) {
+				if(*d == *s) {
+					b = true;
+					break;
+				}
+				d++;
+			}
+			if(b) {
+				if(start != s) {
+					output.add(BasicString<Tchar>(start, s - start));
+				}
+				s++;
+				start = s;
+			} else {
+				s++;
+			}
+		}
+		if(*start) {
+			output.add(BasicString<Tchar>(start, s - start));
+		}
+	}
+
+	void stringBreak(const char* str, const char* delim, MAUtil::Vector<String>& output) {
+		stringBreak<char>(str, delim, output);
+	}
+	void stringBreak(const wchar_t* str, const wchar_t* delim, MAUtil::Vector<WString>& output) {
+		stringBreak<wchar_t>(str, delim, output);
 	}
 
 	int dummy(int a) {

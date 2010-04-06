@@ -34,6 +34,7 @@ using namespace MAUtil;
 void addDownloaderTests(TestSuite* suite);
 void addMAUtilTypeTests(TestSuite* suite);
 void addConnTests(TestSuite* suite);
+void addMAUtilUtilTests(TestSuite* suite);
 
 // interactive tests
 //doesn't check pixel-perfection, except in a few cases.
@@ -69,28 +70,30 @@ public:
 		// automated tests
 #ifdef USE_AUTOMATED_TESTS
 		addMAUtilTypeTests(&mSuite);
+		addMAUtilUtilTests(&mSuite);
+		addMemTests(&mSuite);
+		addMathTests(&mSuite);
+		addStoreTests(&mSuite);
 		addConnTests(&mSuite);
 		addDownloaderTests(&mSuite);	//right softkey press may be used during test; release is then passed to next test, failing it.
-#endif
+#endif	//USE_AUTOMATED_TESTS
+
 #ifdef USE_INTERACTIVE_TESTS
 		// interactive tests
 		addResTests(&mSuite);
 #ifndef MA_PROF_SUPPORT_STYLUS		
 		addCharInputTests(&mSuite);
-#endif		
+#endif	//MA_PROF_SUPPORT_STYLUS
 		addFramebufferTests(&mSuite);
 		addSoundTests(&mSuite);
 		addAdvGfxTests(&mSuite);
 		addBasicGfxTests(&mSuite);
 #ifndef MA_PROF_SUPPORT_STYLUS				
 		addKeypadTests(&mSuite);
-#endif		
+#endif	//MA_PROF_SUPPORT_STYLUS
 		addTimeTests(&mSuite);
-		addStoreTests(&mSuite);
 		addSystemTests(&mSuite);
-		addMemTests(&mSuite);
-		addMathTests(&mSuite);
-#endif
+#endif	//USE_INTERACTIVE_TESTS
 
 		mSuite.addTestListener(new XMLOutputTestListener(maCreatePlaceholder(), "unitTest.xml"));
 		mSuite.addTestListener(this);

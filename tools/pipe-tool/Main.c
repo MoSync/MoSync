@@ -678,36 +678,40 @@ void usage ()
 Usage: pipe-tool <mode> [options] outfile infile1 [infile2 ...]\n\
 \n\
 Mode Switches:\n\
-  -L                   create object/library\n\
+  -L                   create library\n\
   -R                   compile resources\n\
   -B                   build application\n\
 \n\
-Options:\n\
-  -entry=sym           set code entry point (default '%s')\n\
+General options:\n\
   -h | --help          show this usage info\n\
+  -error-paths         show file paths in errors\n\
+	-xerr                extra information in case of errors\n\
+	-master-dump         also dump the input into a single text file\n\
+	-s<dir>              search <dir> for input libraries\n\
+\n\
+Build application (-B) options:\n\
+  -entry=sym           set code entry point (default '%s')\n\
   -datasize=size       set data size (default %d)\n\
   -stacksize=size      set stack size (default %d)\n\
   -heapsize=size       set heap size (default %d)\n\
   -appcode=value       set application code (default '%s'(0x%x))\n\
-  -p=manu/model        link with device profile\n\
+  -p=vendor/model      link with device profile\n\
   -dump-syms           dump symbol tables\n\
   -dump-unref          dump unreferenced symbols\n\
-  -error-paths         show file paths in errors\n\
-  -elim                eliminate unreferenced code/data\n\
-  -no-verify           prevent code verification\n\
   -sld=file            output source/line translation\n\
   -stabs=file          output debug information\n\
-  -java                together with -B mode: build a Java class file\n\
-  -gcj=flags           for Java mode: set flags for GCJ.\n\
+  -elim                eliminate unreferenced code/data\n\
+  -no-verify           prevent code verification\n\
+	-java                build a Java class file\n\
+  -gcj=flags           for -java option: set flags for GCJ\n\
 \n\
-Resource compiler only:\n\
+Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\
 \n\
-Create object mode (-L) is used to convert .s files to .obj file, serveral .o\n\
-files can be combined to produce a .lib library file.\n\
-In resource mode (-R) resource files are compiled to the output file.\n\
-In normal mode one or more input files are built and linked to create a single\n\
-output file.\n\n",
+Library mode (-L) is used to combine .s files into a .lib library file.\n\
+In resource mode (-R), resource files are compiled to the output file.\n\
+In normal mode (-B), one or more input files are built and linked to create a\n\
+single output file.\n\n",
 Code_EntryPoint,
 Default_DataSize,
 Default_StackSize,

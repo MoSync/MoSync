@@ -193,7 +193,7 @@ void CharInput_Pressed(int keyCode) {
 			return;
 	}
 
-	if(sCurrentMode == CI_ACTIVE && newCharMapIndex == sCurrentCharMapIndex) {
+	if(sCurrentCharMode!=CI_MODE_CHAR_MODE_NUMBERS && sCurrentMode == CI_ACTIVE && newCharMapIndex == sCurrentCharMapIndex) {
 		sCurrentCharMapListIndex++;
 		if(getChar(sCurrentCharMode) == 0) {
 			sCurrentCharMapListIndex = 0;

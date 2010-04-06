@@ -290,14 +290,6 @@ Release\idl2.exe
 @echo ------------------------------------------------
 
 @echo ------------------------------------------------
-@echo helpers/stdout
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\stdout
-@vcbuild stdout.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
 @echo helpers/windows
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\windows
@@ -338,14 +330,6 @@ Release\idl2.exe
 @vcbuild gsm_amr.vcproj "Release|Win32"
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @copy release\gsm_amr.dll %MOSYNC_BIN_PATH% /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building mobex
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\mobex
-@vcbuild mobex.vcproj "Release|Win32"
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
@@ -548,10 +532,10 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 
 cd %MOSYNC_TRUNK%\libs
 
-@call rake pipe
+@call ruby workfile.rb
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@call rake pipe CONFIG=""
+@call ruby workfile.rb CONFIG=""
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h

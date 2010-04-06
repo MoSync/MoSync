@@ -142,6 +142,9 @@ RELEVANT_DEFINES = {
 		'MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI',
 		'MA_PROF_SUPPORT_CAMERA',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI',
+		'MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI',
 	],
 	
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -523,7 +526,8 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
-		if(platform_name == :sp2003 || platform_name == :wm5) # || platform_name == :s60v2 || platform_name == :s60v3)
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro)
+			# || platform_name == :s60v2 || platform_name == :s60v3)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)

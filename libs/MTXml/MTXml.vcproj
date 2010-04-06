@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MTXml"
 	ProjectGUID="{5BAF16F0-6B6A-4F3B-A88F-1EF09E8F9486}"
 	RootNamespace="MTXml"
@@ -27,6 +27,10 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description=""
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -94,6 +98,10 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description=""
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -150,8 +158,47 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\entities.c"
+			>
+		</File>
+		<File
+			RelativePath=".\entities.h"
+			>
+		</File>
+		<File
+			RelativePath=".\entities.txt"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating entities.c..."
+					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt | sed s/#line/\/\/line/ &gt; entities.c&#x0D;&#x0A;"
+					Outputs="entities.c"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description=""
+					CommandLine="gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt &gt; entities.c&#x0D;&#x0A;"
+					Outputs="entities.c"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath=".\MTSax.cpp"
 			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\MTSax.h"

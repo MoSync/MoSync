@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <conprint.h>
 #include <MAUtil/Moblet.h>
+#include <mavsprintf.h>
 
 #include "Soap.h"
 

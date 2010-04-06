@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/helpers.h>
 
 #include "ThreadPoolImpl.h"
+#include "iphone_helpers.h"
 
 #include <base_errors.h>
 using namespace MoSyncError;
@@ -49,7 +50,7 @@ int MoSyncThread::join() {
 }
 
 void MoSyncThread::sleep ( unsigned int ms ) {
-    sleep(ms);
+    sleepMillis(ms);
 }
 
 //*****************************************************************************

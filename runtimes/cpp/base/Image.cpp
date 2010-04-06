@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <config_platform.h>
 #include <helpers/helpers.h>
+#include <helpers/cpp_defs.h>
 
 //#include <windows.h>
 

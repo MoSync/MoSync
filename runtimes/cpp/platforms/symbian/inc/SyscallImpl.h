@@ -28,15 +28,15 @@ public MCameraObserver
 #else	//Series 60, 2nd Ed.
 , public MSmsObserver
 #endif	//__SERIES60_3X__
-#ifndef MMF
+#ifdef MMF
+, public MMMFControllerEventMonitorObserver
+#else
 , public MMdaObjectStateChangeObserver
 #endif
 #if defined(GUIDO) || defined(SUPPORT_AUDIOBUFFER)
 , public MMdaAudioOutputStreamCallback
 #endif
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING 
 , public MVideoLoadingObserver, public MVideoPlayerUtilityObserver
-#endif
 {
 private:
 #define DECLARE_INIT_VAR(type, name, val) type name;
@@ -83,6 +83,7 @@ private:
 	com m(CCamera*, gCamera, NULL)\
 	com m(CameraState, gCameraState, CS_IDLE)\
 	com m(TRequestStatus*, gCameraStatus, NULL)\
+	com m(int, gFileListNextHandle, 1)\
 
 	INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
 	S60V2_INITIALIZED_VARIABLES(DECLARE_INIT_VAR, NUL)
@@ -143,7 +144,6 @@ private:
 	void LocationHandlerL(TInt status);
 #endif
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	bool gStreamWantsToPause;
 
 	int maStreamVideoStart(const char* url);
@@ -167,7 +167,6 @@ private:
 	void MvpuoFrameReady(CFbsBitmap &aFrame, TInt aError);
 	void MvpuoPlayComplete(TInt aError);
 	void MvpuoEvent(const TMMFEvent &aEvent);
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 
 	void createCamera();
 	int maCameraFormatNumber();
@@ -273,6 +272,10 @@ private:
 
 #ifdef MMF
 	RMMFController gController;
+	CMMFControllerEventMonitor* gControllerEventMonitor;
+	
+	//MMMFControllerEventMonitorObserver
+	void HandleEvent(const TMMFEvent& aEvent);
 #else	//Mda
 	//MMdaObjectStateChangeObserver
 	void MoscoStateChangeEvent(CBase *aObject, TInt aPreviousState, TInt aCurrentState,
@@ -318,6 +321,8 @@ private:
 	void RestoreDrawTarget();
 
 	int gStartTime;
+	
+	HashMap<FileList> gFileLists;
 
 #ifdef	__SERIES60_3X__
 	TDblQue<CRSendAsSender> gSmsSenders;
@@ -345,3 +350,11 @@ private:
 #define WLANIMPL_H
 #include "wlanImpl.h"
 #endif	//WLAN
+
+private:
+#define PIMIMPL_H
+#ifdef	__SERIES60_3X__
+#include "pimV3.h"
+#else
+//#include "pimV2.h"
+#endif	//__SERIES60_3X__

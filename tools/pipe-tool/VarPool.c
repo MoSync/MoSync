@@ -83,7 +83,7 @@ void ClearVarPool()
 //		  Search var pool entry (Slow)
 //****************************************
 
-inline int SearchVarPool(int v)
+int SearchVarPool(int v)
 {
 	int *vptr;
 	int n;

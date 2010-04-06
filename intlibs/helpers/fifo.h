@@ -15,6 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef _FIFO_H_
+#define _FIFO_H_
+
 #include <helpers/helpers.h>
 #include <helpers/CriticalSection.h>
 
@@ -65,3 +68,5 @@ private:
 	T mBuf[size];
 	size_t mReadPos, mWritePos;
 };
+
+#endif

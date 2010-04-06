@@ -57,6 +57,8 @@ include_flags = include_dirs.collect {|dir| " -I "+dir}.join
 #temp
 #flag_warnings = gcc4_warnings + gcc43_c_warnings + gcc43_warnings
 
+c_flags = " -std=gnu99"
+
 version_warnings = ""
 base_flags = ""
 cpp_flags = ""
@@ -96,7 +98,7 @@ end
 flags_base = config_flags + base_flags + include_flags + standard_warnings + lesser_warnings +
 	pedantic_warnings + version_warnings
 
-cflags_base = flags_base + lesser_conly + pendantic_c_warnings
+cflags_base = c_flags + flags_base + lesser_conly + pendantic_c_warnings
 
 cppflags_base = cpp_flags + " -fno-rtti" + flags_base
 # -Wno-deprecated

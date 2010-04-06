@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include <mastring.h>
 #include <conprint.h>
 #include "common.h"
 #include "MAHeaders.h"

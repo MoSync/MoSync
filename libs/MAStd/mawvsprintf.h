@@ -59,7 +59,7 @@ extern "C" {
 */
 
 
-int wvsprintf(wchar *buf, const wchar *fmt, va_list args);
+int wvsprintf(wchar_t *buf, const wchar_t *fmt, va_list args);
 
 
 /** \brief wsprintf - wide print formatted output
@@ -67,7 +67,7 @@ int wvsprintf(wchar *buf, const wchar *fmt, va_list args);
 * \param fmt input format string
 * \return Returns string length of output
 */
-int wsprintf(wchar *buf, const wchar *fmt, ...);
+int wsprintf(wchar_t *buf, const wchar_t *fmt, ...);
 #endif	//_STDIO_H
 
 /**
@@ -79,7 +79,7 @@ int wsprintf(wchar *buf, const wchar *fmt, ...);
 *
 * \return Length of output, or \<0 if the debug log is unavailable.
 */
-int wlprintfln(const wchar* fmt, ...);
+int wlprintfln(const wchar_t* fmt, ...);
 
 #ifdef __cplusplus
 }	//extern "C"

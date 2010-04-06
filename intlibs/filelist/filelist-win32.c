@@ -15,20 +15,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <windows.h>
+#ifdef _WIN32_WCE
+#include <helpers/smartie.h>
+#include "wce_helpers.h"
+#endif
 
+#include <windows.h>
 #include "filelist.h"
 
 int scanDirectory(const char* path, FileListCallback cb) {
+#ifdef _WIN32_WCE
+	WCHAR tpath[MAX_PATH];
+	convertAsciiToUnicode(tpath, MAX_PATH, path);
+#else
+	const char* tpath = path;
+#endif
+
 	WIN32_FIND_DATA wfd;
 	DWORD err;
-	HANDLE h = FindFirstFile(path, &wfd);
+	HANDLE h = FindFirstFile(tpath, &wfd);
 	if(h == INVALID_HANDLE_VALUE) {
 		return -1;
 	}
 
 	do {
-		cb(wfd.cFileName);
+#ifdef _WIN32_WCE
+		char tfn[MAX_PATH];
+		convertUnicodeToAscii(tfn, MAX_PATH, wfd.cFileName);
+#else
+		const char* tfn = wfd.cFileName;
+#endif
+		cb(tfn);
 	} while(FindNextFile(h, &wfd));
 
 	err = GetLastError();
@@ -42,8 +59,15 @@ int scanDirectory(const char* path, FileListCallback cb) {
 }
 
 int isDirectory(const char* filename) {
-	DWORD res = GetFileAttributes(filename);
-	if(res == INVALID_FILE_ATTRIBUTES)
+#ifdef _WIN32_WCE
+	WCHAR tfn[MAX_PATH];
+	convertAsciiToUnicode(tfn, MAX_PATH, filename);
+#else
+	const char* tfn = filename;
+#endif
+
+	DWORD res = GetFileAttributes(tfn);
+	if(res == (DWORD)-1)
 		return -1;
 	return (res & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
 }

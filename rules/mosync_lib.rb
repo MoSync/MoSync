@@ -23,24 +23,33 @@ require "#{File.dirname(__FILE__)}/dll.rb"
 require "#{File.dirname(__FILE__)}/pipe.rb"
 
 module MoSyncMod
+	include MoSyncInclude
 	def modSetup
-		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [MOSYNC_INCLUDE]
+		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [mosync_include]
 	end
 	
 	def copyHeaders
-		dir = MOSYNC_INCLUDE + "/" + @INSTALL_INCDIR
-		DirTask.new(self, dir).invoke
+		dir = mosync_include + "/" + @INSTALL_INCDIR
 		# create a bunch of CopyFileTasks, then invoke them all.
 		collect_headers(".h").each do |h|
 			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
-			task.invoke
+			#task.invoke
+			@prerequisites = [task] + @prerequisites
 		end
+		collect_headers(".hpp").each do |h|
+			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
+			#task.invoke
+			@prerequisites = [task] + @prerequisites
+		end
+		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
 	
 	private
 	
 	def collect_headers(ending)
-		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
+		default(:HEADER_DIRS, @SOURCES)
+		files = []
+		@HEADER_DIRS.each {|dir| files += Dir[dir+"/*"+ending]}
 		files.flatten!
 		if(defined?(@IGNORED_HEADERS))
 			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file))}
@@ -73,8 +82,14 @@ class PipeLibWork < PipeGccWork
 		super
 	end
 	def setup3(all_objects)
-		@TARGET_PATH = MOSYNC_LIBDIR + "/pipe/" + @CONFIG_NAME + "/" + @NAME + ".lib"
+		@TARGET_PATH = "#{mosync_libdir}/#{@BUILDDIR_NAME}/#{@NAME}.lib"
 		super(all_objects)
+		if(!USE_NEWLIB)	# rake support
+			d = (CONFIG == "debug") ? 'D' : ''
+			dir = "#{mosync_libdir}/pipe/"
+			@prerequisites << DirTask.new(self, dir)
+			@prerequisites << CopyFileTask.new(self, "#{dir}#{@NAME}#{d}.lib", @TARGET)
+		end
 	end
 	#def filename; @NAME + ".lib"; end
 end

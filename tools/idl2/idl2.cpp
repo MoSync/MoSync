@@ -56,7 +56,7 @@ int main() {
 		outputCoreConsts();
 		
 		//todo: combine.
-#ifdef _MSC_VER
+#ifdef WIN32
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
@@ -64,6 +64,7 @@ int main() {
 
 		//runCommand("copyfiles.bat");
 		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\MAStd");
+		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\newlib\\libc\\sys\\mosync");
 		runCommand("copy /Y Output\\asm_config.lst " + MOSYNCDIR + "\\bin\\");
 
 		//runCommand("copy /Y Output\\invoke_syscall_java.h ..\\..\\runtimes\\java\\source\\");
@@ -95,6 +96,7 @@ int main() {
 			//runCommand("copy_extension.bat "+ixs[i]);
 			runCommand("copy /Y Output\\CPP_" + ixs[i] + ".h ..\\..\\intlibs\\helpers\\");
 			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\MAStd\\");
+			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\newlib\\libc\\sys\\mosync\\");
 			//runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\source\\");
 			runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
 		}
@@ -105,6 +107,7 @@ int main() {
 		_mkdir("../../runtimes/java/Shared/generated");
 
 		runCommand("cp Output/maapi.h ../../libs/MAStd");
+		runCommand("cp Output/maapi.h ../../libs/newlib/libc/sys/mosync");
 		runCommand("cp Output/asm_config.lst " + MOSYNCDIR + "/bin/");
 
 		runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/Shared/generated/");
@@ -127,6 +130,7 @@ int main() {
 		for(size_t i=0; i<ixs.size(); i++) {
 			runCommand("cp Output/CPP_" + ixs[i] + ".h ../../intlibs/helpers/");
 			runCommand("cp Output/" + ixs[i] + ".h ../../libs/MAStd/");
+			runCommand("cp Output/" + ixs[i] + ".h ../../libs/newlib/libc/sys/mosync/");
 			runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/Shared/generated/");
 		}
 #endif

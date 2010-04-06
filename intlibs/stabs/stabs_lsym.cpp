@@ -207,6 +207,14 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			TEST(result = new ConstType(tb));
 		}
 		break;
+	case 'B':	//volatile
+		{
+			*pText = typeText + 1;
+			const TypeBase* tb = subParseType(pText, id, name);
+			//should maybe have its own type, but is not needed at this time.
+			TEST(result = tb);
+		}
+		break;
 	case 'e':	//enum
 		*pText = typeText + 1;
 		TEST(result = subParseEnum(pText, name));

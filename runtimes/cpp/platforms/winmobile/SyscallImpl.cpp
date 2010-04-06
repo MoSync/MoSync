@@ -1439,7 +1439,7 @@ DWORD GetScreenOrientation()
 		int startTime = maGetMilliSecondCount();
 		while(maGetMilliSecondCount() < startTime + PERIOD_MS) 
 		{
-			Rect oldRect = currentDrawSurface->clipRect;
+			ClipRect oldRect = currentDrawSurface->clipRect;
 			currentDrawSurface->clipRect.x = 0;
 			currentDrawSurface->clipRect.y = 0;
 			currentDrawSurface->clipRect.width = backBuffer->width;
@@ -1734,47 +1734,6 @@ DWORD GetScreenOrientation()
 		return gSyscall->resources.add_RT_IMAGE(placeholder, i);
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del)) 
-	{
-		StoreItr iter = gStores.find(store);
-		if(iter == gStores.end()) {
-			BIG_PHAT_ERROR(ERR_STORE_HANDLE_INVALID);
-		}
-		const char *filename =(*iter).second.c_str();
-		if(del)
-		{
-			char temp[256];
-			getWorkingDirectory(temp, 256);
-			strcat(temp, "\\");
-			strcat(temp, filename);
-			int a = strlen(temp);
-
-			BSTR unicodestr = SysAllocStringLen(NULL, a);
-			::MultiByteToWideChar(CP_ACP, 0, temp, a, unicodestr, a);
-
-			BOOL ret = DeleteFile(unicodestr);
-			::SysFreeString(unicodestr);
-			if(!ret)
-			{
-				DWORD error = GetLastError();
-
-				if(ret==ERROR_FILE_NOT_FOUND)
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_FILE_NOT_FOUND);
-				}
-				else if(ret==ERROR_ACCESS_DENIED)
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_ACCESS_DENIED);
-				}
-				else
-				{
-					BIG_PHAT_ERROR(WCEERR_STORE_CLOSE_FAILED);
-				}
-			}
-		}
-		gStores.erase(gStores[store].find(store));
-	}
-
 	SYSCALL(int, maGetKeys()) 
 	{
 		if(gClosing)
@@ -1917,7 +1876,7 @@ DWORD GetScreenOrientation()
 		}
 	}
 
-	SYSCALL(int, maPanic(int result, char* message)) 
+	SYSCALL(void, maPanic(int result, char* message)) 
 	{
 		int msgLen = strlen(message);
 		WCHAR *wbuffer = new WCHAR[msgLen];
@@ -3025,7 +2984,53 @@ retry:
 		case maIOCtl_maLocationStop:
 			return maLocationStop();
 #endif
-	
+
+		case maIOCtl_maFileOpen:
+			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+
+		case maIOCtl_maFileExists:
+			return SYSCALL_THIS->maFileExists(a);
+		case maIOCtl_maFileClose:
+			return SYSCALL_THIS->maFileClose(a);
+		case maIOCtl_maFileCreate:
+			return SYSCALL_THIS->maFileCreate(a);
+		case maIOCtl_maFileDelete:
+			return SYSCALL_THIS->maFileDelete(a);
+		case maIOCtl_maFileSize:
+			return SYSCALL_THIS->maFileSize(a);
+		/*case maIOCtl_maFileAvailableSpace:
+			return SYSCALL_THIS->maFileAvailableSpace(a);
+		case maIOCtl_maFileTotalSpace:
+			return SYSCALL_THIS->maFileTotalSpace(a);
+		case maIOCtl_maFileDate:
+			return SYSCALL_THIS->maFileDate(a);
+		case maIOCtl_maFileRename:
+			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileTruncate:
+			return SYSCALL_THIS->maFileTruncate(a, b);*/
+
+		case maIOCtl_maFileWrite:
+			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileWriteFromData:
+			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
+		case maIOCtl_maFileRead:
+			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileReadToData:
+			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
+
+		case maIOCtl_maFileTell:
+			return SYSCALL_THIS->maFileTell(a);
+		case maIOCtl_maFileSeek:
+			return SYSCALL_THIS->maFileSeek(a, b, c);
+
+		case maIOCtl_maFileListStart:
+			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileListNext:
+			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+		case maIOCtl_maFileListClose:
+			return SYSCALL_THIS->maFileListClose(a);
+
 			/*
 		case maIOCtl_maWlanStartDiscovery:
 			return maWlanStartDiscovery();

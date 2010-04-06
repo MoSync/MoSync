@@ -147,13 +147,7 @@ int maPimItemGetValue(MAAddress args, int index) {
 	case PIMItem.STRING:
 		{
 			String s = pi.getString(field, index);
-			int strLen = s.length();
-			int totLen = strLen + 1;
-			if(totLen > bufSize)
-				return totLen;
-			writeMemBytes(address, s.getBytes(), 0, strLen);
-			WBYTE_RAW(address + strLen, 0);
-			return totLen;
+			return writeWideString(s, address, bufSize);
 		}
 	case PIMItem.STRING_ARRAY:
 		{
@@ -165,19 +159,20 @@ int maPimItemGetValue(MAAddress args, int index) {
 					totLen += arr[j].length();
 				totLen += 1;
 			}
-			if(totLen > bufSize)
-				return totLen;
+			int totSize = totLen*2;
+			if(totSize > bufSize)
+				return totSize;
 			WINT(address, arr.length);
 			int adr = address + 4;
 			for(int j=0; j<arr.length; j++) {
 				if(arr[j] != null) {
-					writeMemBytes(adr, arr[j].getBytes(), 0, arr[j].length());
-					adr += arr[j].length();
+					writeWideStringRaw(arr[j], adr);
+					adr += arr[j].length()*2;
 				}
-				WBYTE_RAW(adr, 0);
-				adr += 1;
+				WSHORT(adr, (short)0);
+				adr += 2;
 			}
-			return totLen;
+			return totSize;
 		}
 	default:
 		BIG_PHAT_ERROR;

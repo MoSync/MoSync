@@ -45,7 +45,7 @@ class CompileGccTask < FileTask
 	def initialize(work, name, source, cflags)
 		super(work, name)
 		@SOURCE = source
-		@prerequisites = [source]
+		@prerequisites << source
 		
 		@DEPFILE = @work.genfile(source, ".mf")
 		@TEMPDEPFILE = @work.genfile(source, ".mft")
@@ -56,7 +56,7 @@ class CompileGccTask < FileTask
 		
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
-			@prerequisites = MakeDependLoader.load(@DEPFILE, @NAME)
+			@prerequisites += MakeDependLoader.load(@DEPFILE, @NAME)
 		end
 	end
 	
@@ -71,7 +71,7 @@ class CompileGccTask < FileTask
 	
 	def execute
 		execFlags
-		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{@SOURCE}"
+		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{File.expand_path(@SOURCE)}"
 		
 		# In certain rare cases (error during preprocess caused by a header file)
 		# gcc may output an empty dependency file, resulting in an empty dependency list for
@@ -146,7 +146,9 @@ class GccWork < BuildWork
 		files.flatten!
 		files.reject! {|file| @IGNORED_FILES.member?(File.basename(file))}
 		files += @EXTRA_SOURCEFILES.select do |file| file.getExt == ending end
-		return files.collect do |file| FileTask.new(self, file) end
+		tasks = files.collect do |file| FileTask.new(self, file) end
+		extra_tasks = @EXTRA_SOURCETASKS.select do |file| file.to_s.getExt == ending end
+		return extra_tasks + tasks
 	end
 	
 	def getGccFlags(source)

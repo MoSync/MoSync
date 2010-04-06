@@ -245,9 +245,9 @@ namespace Base {
 		char destDir[256];
 		destDir[0] = 0;
 		strcpy(destDir, mosyncDir);
-		strcat(destDir, "/bin/maspec.fon");
+		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
 
-		TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+		TEST_Z(gFont = TTF_OpenFont(destDir, 16));
 
 		return true;
 
@@ -379,10 +379,17 @@ namespace Base {
 
 		char destDir[256];
 		destDir[0] = 0;
-		strcpy(destDir, mosyncDir);
-		strcat(destDir, "/bin/maspec.fon");
 
-		TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+		strcpy(destDir, mosyncDir);
+		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
+		gFont = TTF_OpenFont(destDir, 16);
+
+		if(gFont == NULL) {	//fallback to old font
+			LOG("Failed to load font %s. Attempting fallback.\n", destDir);
+			strcpy(destDir, mosyncDir);
+			strcat(destDir, "/bin/maspec.fon");
+			TEST_Z(gFont = TTF_OpenFont(destDir, 8));
+		}
 
 		return true;
 	}
@@ -541,7 +548,7 @@ namespace Base {
 		if(context) {
 			SDL_FreeRW(context);
 		}
-		return 0; 
+		return 0;
 	}
 
 	// Niklas: non static because I need it in SDL audio engine.
@@ -1326,6 +1333,17 @@ namespace Base {
 			src->left + src->width <= surf->w &&
 			src->top + src->height <= surf->h, ERR_IMAGE_OOB);
 
+		/*
+		unsigned char *dst_ptr = (unsigned char*)dst;
+		unsigned char *src_ptr = (unsigned char*)surf->pixels;
+		src_ptr+=((src->left<<2)+src->top*surf->pitch);
+		for(int j = 0; j < src->height; j++) {
+			memcpy(dst_ptr, src_ptr, src->width<<2);
+			dst_ptr+=scanlength<<2;
+			src_ptr+=surf->pitch;
+		}
+		*/
+		
 		SDL_Surface* dstSurface = SDL_CreateRGBSurfaceFrom(dst, 
 			src->width, src->height, 32, scanlength<<2, 
 			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
@@ -1395,15 +1413,17 @@ namespace Base {
 		SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 		CHECK_INT_ALIGNMENT(src);
 
-		SDL_Surface* dst = SDL_CreateRGBSurface(SDL_SWSURFACE, EXTENT_X(size), EXTENT_Y(size), 32,
-			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+		SDL_Surface* dst = SDL_CreateRGBSurface(SDL_SWSURFACE|(alpha?SDL_SRCALPHA:0), EXTENT_X(size), EXTENT_Y(size), 32,
+			0x00ff0000, 0x0000ff00, 0x000000ff, (alpha?0xff000000:0));
 		if(dst==0) return RES_OUT_OF_MEMORY;
 
+/*
 		if(alpha) {
 			SDL_SetAlpha(dst, SDL_SRCALPHA, 0);
 		} else {
 			SDL_SetAlpha(dst, 0, 0);
 		}
+		*/
 
 		int width = EXTENT_X(size);
 		int height = dst->h;
@@ -1416,7 +1436,7 @@ namespace Base {
 			dptr+=dst->pitch;
 		}
 
-		return gSyscall->resources.add_RT_IMAGE(placeholder, dst);;
+		return gSyscall->resources.add_RT_IMAGE(placeholder, dst);
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
@@ -1427,46 +1447,6 @@ namespace Base {
 		if(surf==0) return RES_OUT_OF_MEMORY;
 
 		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
-	}
-
-	SYSCALL(void, maCloseStore(MAHandle store, int del))
-	{
-		StoreItr itr = gStores.find(store);
-		MYASSERT(itr != gStores.end(), ERR_STORE_HANDLE_INVALID);
-		const char *filename = itr->second.c_str();
-		if(del)
-		{
-	#ifdef _WIN32
-			BOOL ret = DeleteFile(filename);
-			if(!ret)
-			{
-				DWORD error = GetLastError();
-
-				if(error==ERROR_FILE_NOT_FOUND)
-				{
-					LOG("maCloseStore: %s not found\n", filename);
-					BIG_PHAT_ERROR(WINERR_STORE_FILE_NOT_FOUND);
-				}
-				else if(error==ERROR_ACCESS_DENIED)
-				{
-					LOG("maCloseStore: %s access denied\n", filename);
-					BIG_PHAT_ERROR(WINERR_STORE_ACCESS_DENIED);
-				}
-				else
-				{
-					LOG("maCloseStore: %s error %i\n", filename, (int)error);
-					BIG_PHAT_ERROR(WINERR_STORE_DELETE_FAILED);
-				}
-			}
-	#else
-			int res = remove(filename);
-			if(res != 0) {
-				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
-				DEBIG_PHAT_ERROR;
-			}
-	#endif
-		}
-		gStores.erase(itr);
 	}
 
 	SYSCALL(int, maGetEvent(MAEvent* dst)) {
@@ -1764,6 +1744,8 @@ namespace Base {
 		case maIOCtl_maReportCallStack:
 			reportCallStack();
 			return 0;
+		case maIOCtl_maDumpCallStackEx:
+			return maDumpCallStackEx(SYSCALL_THIS->GetValidatedStr(a), b);
 #endif
 
 #ifdef MEMORY_PROTECTION
@@ -1914,53 +1896,52 @@ namespace Base {
 			return maStreamSetPos(a, b);
 		}
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
-#ifdef IX_FILE
-#if 1
 		case maIOCtl_maFileOpen:
-			return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
 		case maIOCtl_maFileExists:
-			return maFileExists(a);
+			return SYSCALL_THIS->maFileExists(a);
 		case maIOCtl_maFileClose:
-			return maFileClose(a);
+			return SYSCALL_THIS->maFileClose(a);
 		case maIOCtl_maFileCreate:
-			return maFileCreate(a);
+			return SYSCALL_THIS->maFileCreate(a);
 		case maIOCtl_maFileDelete:
-			return maFileDelete(a);
+			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
-			return maFileSize(a);
+			return SYSCALL_THIS->maFileSize(a);
 		/*case maIOCtl_maFileAvailableSpace:
-			return maFileAvailableSpace(a);
+			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
-			return maFileTotalSpace(a);
+			return SYSCALL_THIS->maFileTotalSpace(a);
 		case maIOCtl_maFileDate:
-			return maFileDate(a);
+			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileRename:
-			return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileTruncate:
-			return maFileTruncate(a, b);*/
+			return SYSCALL_THIS->maFileTruncate(a, b);*/
 
 		case maIOCtl_maFileWrite:
-			return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileWriteFromData:
-			return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
-			return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileReadToData:
-			return maFileReadToData(GVMRA(MA_FILE_DATA));
+			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
 		case maIOCtl_maFileTell:
-			return maFileTell(a);
+			return SYSCALL_THIS->maFileTell(a);
 		case maIOCtl_maFileSeek:
-			return maFileSeek(a, b, c);
-#endif	//0
+			return SYSCALL_THIS->maFileSeek(a, b, c);
+
 		case maIOCtl_maFileListStart:
-			return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b));
 		case maIOCtl_maFileListNext:
-			return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		case maIOCtl_maFileListClose:
-			return maFileListClose(a);
-#endif	//IX_FILE
+			return SYSCALL_THIS->maFileListClose(a);
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}

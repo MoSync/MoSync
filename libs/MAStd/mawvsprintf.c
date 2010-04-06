@@ -38,8 +38,9 @@
 #include "mawvsprintf.h"
 //#include "conprint.h"
 #include "madmath.h"
+#include "wchar.h"
 
-#ifdef MAPIP
+#if 1//def MAPIP
 
 //#ifdef KERNEL
 //#define NOFLOAT
@@ -437,7 +438,7 @@ static void forcdecpt(wchar *buffer)
 
   if (*buffer)
   {
-    int n = wstrlen(buffer);
+    int n = wcslen(buffer);
     while (n > 0) 
     {
       buffer[n + 1] = buffer[n];
@@ -515,7 +516,7 @@ static wchar *flt(wchar *str, double num, int size, int precision, wchar fmt, in
   // 'g' format means crop zero unless '#' given
   if (fmt == 'g' && !(flags & SPECIAL)) cropzeros(tmp);
 
-  n = wstrlen(tmp);
+  n = wcslen(tmp);
 
   // Output number with alignment and padding
   size -= n;
@@ -617,16 +618,17 @@ repeat:
         while (--field_width > 0) *str++ = ' ';
         continue;
 
-      case 's':
+      case 'S':
         s = va_arg(args, wchar *);
         if (!s) s = L"<NULL>";
-        len = wstrnlen(s, precision);
+        len = wcsnlen(s, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
         for (i = 0; i < len; ++i) *str++ = *s++;
         while (len < field_width--) *str++ = ' ';
         continue;
 
-      case 'S':	//latin-1 string
+      case 's':	//latin-1 string
+				//todo: src should be treated as utf-8.
         S = va_arg(args, char *);
         if (!S) S = "<NULL>";
         len = strnlen(S, precision);
@@ -747,9 +749,11 @@ int wsprintf(wchar *buf, const wchar *fmt, ...)
 
 int wlprintfln(const wchar* fmt, ...)
 {
+#define BUFLEN 2048
 	va_list args;
-	wchar buf[2048];
-	int len;
+	wchar buf[BUFLEN];
+	char buf8[BUFLEN * MB_LEN_MAX];
+	int len, len8;
 	static int lastWLres = 0;
 	
 	if(lastWLres < 0)
@@ -768,6 +772,8 @@ int wlprintfln(const wchar* fmt, ...)
 		buf[len++] = '\n';
 		buf[len] = 0;
 	}
-	lastWLres = maWriteLog(buf, len*sizeof(wchar));
+	//convert to utf-8
+	len8 = wcstombs(buf8, buf, sizeof(buf8));
+	lastWLres = maWriteLog(buf8, len8);
 	return len;
 }

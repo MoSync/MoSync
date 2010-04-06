@@ -67,6 +67,11 @@ div_t div(int numer, int denom);
 int axtoi(const char *hexStg);
 
 /*
+ * Convert a string to a long integer.
+ */
+long strtol(const char *nptr, char **endptr, int base);
+
+/*
  * Convert a string to an unsigned long integer.
  */
 unsigned long strtoul(const char *nptr, char **endptr, int base);

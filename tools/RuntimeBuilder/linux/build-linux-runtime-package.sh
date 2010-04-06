@@ -92,15 +92,15 @@ buildTemplate()
 
 	export MOSYNCDIR=$path/distro/tmp
 
-    cd $path/../../../
+	cd $path/../../../
 	if [ ! "$2" = "-noclean" ]; then
-		print_msg "Performing rake clean"
-        rake clean CONFIG=""
+		print_msg "Performing clean"
+			./workfile.rb clean_more CONFIG=""
 		printf "\n%s\n" "OK"
 	fi
 
 	print_msg "Attempting to build MoRE"
-    rake more CONFIG="" FULLSCREEN="true"
+	./workfile.rb more CONFIG="" FULLSCREEN="true"
 
 	if [ "$?" -ne "0" ]; then
 		handle_error "rake"

@@ -69,15 +69,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 interface MAAPI {
 
-	typedef unsigned short wchar;
 	typedef char* MAString;
 	typedef wchar* MAWString;
 	typedef void* MAAddress;
 	typedef int MAHandle;
 	typedef int MAExtent;
 	typedef unsigned char byte;
-	typedef unsigned short ushort;
-	typedef unsigned int uint;
 	typedef unsigned long ulong;
 
 	/// Returns the height of an MAExtent.
@@ -568,9 +565,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a remove is non-zero.
+	* Closes a store. Also removes that store if \a _remove is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int remove);
+	void maCloseStore(in MAHandle store, in int _remove);
 
 	constset int CONNERR_ {
 		/// Generic error.
@@ -635,16 +632,12 @@ interface MAAPI {
 	* <tt>\<protocol\>://\<address\>[:\<port\>]\<parameters\></tt>\n
 	* The following protocols are supported:
 	*
-	* <tt>socket</tt>, which is TCP and has no parameters.
-	*
-	* <tt>ssl</tt>, which is an encrypted TCP connection. It has no parameters.
+	* <tt>socket</tt>, which is TCP. It has no parameters.
 	*
 	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
 	* it defaults to port 80.
 	* Its parameters is the document path (for example, "/index.html").
 	* Writing to a http connection is not allowed.
-	*
-	* <tt>https</tt>, which is an encrypted HTTP GET. It has the same parameters as <tt>http</tt>.
 	*
 	* <tt>btspp</tt>, which is Bluetooth Serial Port and has no parameters.
 	*\n
@@ -1120,7 +1113,7 @@ interface MAAPI {
 		POINTER_DRAGGED = 10;
 
 #if IX_CALL
-		/// Has MAEvent::state be one of the \link CALLSTATE \endlink constants.
+		/// Has MAEvent::state be one of the \link #CALLSTATE_UNKNOWN CALLSTATE \endlink constants.
 		CALL = 11;
 #endif	//IX_CALL
 
@@ -1483,6 +1476,11 @@ interface MAAPI {
 		int maReportCallStack();
 
 		/**
+		* Dumps a string, an int, and the current call stack to the log file. Returns 0 if succeeded.
+		*/
+		int maDumpCallStackEx(in MAString str, in int data);
+
+		/**
 		 * Protects a piece of the data memory.
 		 * Any attempt to write to that piece of memory will raise a panic.
 		 * \param 'start' The start address of the memory piece to protect.
@@ -1745,7 +1743,8 @@ interface MAAPI {
 		/**
 		* Cancels any active discovery operation.
 		* If an operation was canceled, its last BT event will have the status #CONNERR_CANCELED.
-		* This is an asynchronous operation. It is not safe to start another discovery before
+		* This is an asynchronous operation. If this function returns 1,
+		* it is not safe to start another discovery before
 		* you've recieved the #CONNERR_CANCELED event.
 		* \see maBtStartDeviceDiscovery
 		* \see maBtStartServiceDiscovery
@@ -1964,7 +1963,7 @@ interface MAAPI {
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		* \param path The absolute path to the file.
-		* \param mode The access mode. Either MA_ACCESS_READ or MA_ACCESS_READ_WRITE.
+		* \param mode The access mode. Either #MA_ACCESS_READ or #MA_ACCESS_READ_WRITE.
 		* \returns The new file handle, or \< 0 on error.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
@@ -2539,12 +2538,6 @@ interface MAAPI {
 			TODOS = 3;
 		}
 
-		constset int MA_PIM_FIELD_ {
-		}
-
-		constset int MA_PIM_ATTR_ {
-		}
-
 		constset int MA_PIM_TYPE_ {
 			/// bytes
 			/// the bytes are not null-terminated.
@@ -2556,29 +2549,160 @@ interface MAAPI {
 			DATE = 2;
 			/// int
 			INT = 3;
-			/// string '\0'
+			/// wide-string '\\0'
 			STRING = 4;
-			/// int (string '\0')*
+			/// int (wide-string '\\0')*
 			/// the int specifies the number of strings.
 			/// there is no extra null terminator at the end of the list.
 			STRING_ARRAY = 5;
 		}
 
-		// returns a PimList handle.
+		constset int MA_PIM_FIELD_CONTACT_ {
+			/// String array.
+			ADDR = 100;
+			/// Date.
+			BIRTHDAY = 101;
+			/// Int. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
+			/// #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
+			CLASS = 102;
+			/// String.
+			EMAIL = 103;
+			/// String.
+			FORMATTED_ADDR = 104;
+			/// String.
+			FORMATTED_NAME = 105;
+			/// String array.
+			NAME = 106;
+			/// String.
+			NICKNAME = 107;
+			/// String. Supplemental information, or a comment.
+			NOTE = 108;
+			/// String. Organization/company name.
+			ORG = 109;
+			/// Binary. Connected with PHOTO_URL.
+			PHOTO = 110;
+			/// String. Connected with PHOTO.
+			PHOTO_URL = 111;
+			/// Binary. Connected with PUBLIC_KEY_STRING.
+			PUBLIC_KEY = 112;
+			/// String. Connected with PUBLIC_KEY.
+			PUBLIC_KEY_STRING = 113;
+			/// Date.
+			REVISION = 114;
+			/// String. Telephone number.
+			TEL = 115;
+			/// String. Professional title.
+			TITLE = 116;
+			/// Int. Unique identifier for the contact on this device.
+			UID = 117;
+			/// String. Uniform Resource Locator associated with the contact.
+			URL = 118;
+		}
+
+		constset int MA_PIM_CONTACT_ {
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
+			ADDR_POBOX = 0;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
+			ADDR_EXTRA = 1;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
+			ADDR_STREET = 2;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
+			ADDR_LOCALITY = 3;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
+			ADDR_REGION = 4;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
+			ADDR_POSTALCODE = 5;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
+			ADDR_COUNTRY = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
+			NAME_FAMILY = 0;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
+			NAME_GIVEN = 1;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
+			NAME_OTHER = 2;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
+			NAME_PREFIX = 3;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
+			NAME_SUFFIX = 4;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			CLASS_CONFIDENTIAL = 200;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			CLASS_PRIVATE = 201;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			CLASS_PUBLIC = 202;
+		}
+
+		constset int MA_PIM_ATTR_ {
+			/// The value describes an assistant.
+			ASST = 1;
+			/// Unknown.
+			AUTO = 2;
+			/// The value describes a fax number.
+			FAX = 4;
+			/// The value describes a home phone number.
+			HOME = 8;
+			/// The value describes a mobile phone number.
+			MOBILE = 16;
+			/// Unknown.
+			OTHER = 32;
+			/// The value describes a pager number.
+			PAGER = 64;
+			/// In a field with multiple values, this one is preferred before the others.
+			/// Only one value per field may be marked PREFERRED. Marking a value PREFERRED
+			/// causes any other PREFERRED value in the field to become unmarked.
+			PREFERRED = 128;
+			/// The value describes an SMS number?
+			SMS = 256;
+			/// The value describes a work phone number.
+			WORK = 512;
+		}
+
+		constset int MA_PIM_ERR_ {
+			/// The native database's data type did not match the MoSync API.
+			NATIVE_TYPE_MISMATCH = -2;
+		}
+
+		/** Opens a PimList. Use maPimListNext() to open the list's items.
+		* Returns a PimList handle, or \< 0 on error.
+		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
+		*/
 		MAHandle maPimListOpen(in int listType);
-		// returns a PimItem handle.
+
+		/** Returns a handle to the next PimItem in the \a list, or 0 if there are no more items,
+		* or \< 0 on error.
+		*/
 		MAHandle maPimListNext(in MAHandle list);
+
+		/** Closes a PimList.
+		* \note This does not close the list's items, but it does invalidate them,
+		* so that maPimItemClose() is the only function you can safely use on them.
+		* \returns 0.
+		*/
 		int maPimListClose(in MAHandle list);
 
-		// the number of fields in the item.
+		/** Returns the number of fields in the \a item.
+		*/
 		int maPimItemCount(in MAHandle item);
-		// the field id of the n:th field.
-		int maPimItemGetField(in MAHandle item, in int index);
-		// the number of values in the field for a given item.
+
+		/** Returns the field id of the item's n:th field.
+		* Panics on invalid indices.
+		* A field id is one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		*/
+		int maPimItemGetField(in MAHandle item, in int n);
+
+		/** Returns the number of values in the field for a given item.
+		* Returns 0 if the field (does not exist / has no values) for this item.
+		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
+
+		/** Returns the bitmask of attributes for the specified value in a field and item.
+		* Panics on field+index combinations that don't exist in this item.
+		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
-		// returns one of MA_PIM_TYPE_
+		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
+		* or \< 0 if the field does not exist in the list.
+		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
 		struct MA_PIM_ARGS {
@@ -2588,12 +2712,15 @@ interface MAAPI {
 			int bufSize;
 		}
 		/**
+		* Copies the specified value from a field and item to \a args.buf.
+		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* \returns The number of bytes occupied by the value.
 		* If this number is greater than bufSize, the value is not written,
 		* and you'll have to allocate a bigger buffer and try again.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
+
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
 		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);

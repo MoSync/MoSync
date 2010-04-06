@@ -135,7 +135,8 @@ namespace MAUtil {
 		BasicString(const BasicString& s);
 
 		/** Returns a pointer to the null-terminated character data.
-		* This pointer becomes invalid as soon as non-const medthod of this class is called.
+		* This pointer becomes invalid when the object is destroyed,
+		* or a non-const method of this class is called.
 		*/
 		const Tchar* c_str() const;
 
@@ -222,15 +223,11 @@ namespace MAUtil {
 		/** Returns a new string that is a copy of the specified portion of this string. */
 		BasicString substr(int startIndex, int length = npos) const;
 
-#if 0
-		/** Returns the number of bytes occupied by the string.
-		* Note that this is NOT the same as the number of characters.
-		*/
-		int size() const;
-#endif
-
 		/** Returns the size (in characters) of the reserved space in the string data object. */
 		int capacity() const;
+
+		/** Returns the number of characters in the string. */
+		int size() const;
 
 		/** Returns the number of characters in the string. */
 		int length() const;
@@ -276,7 +273,7 @@ namespace MAUtil {
 	};
 
 	typedef BasicString<char> String;
-	typedef BasicString<wchar> WString;
+	typedef BasicString<wchar_t> WString;
 
 #ifdef NEW_OPERATORS
 

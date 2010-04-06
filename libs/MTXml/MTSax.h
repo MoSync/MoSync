@@ -66,7 +66,7 @@ typedef struct MTXSaxContext_t
 	* \param attributes The attributes in this element, specified as a
 	* NULL-terminated name/value pointer pair array.
 	*/
-	void (*startElement)(MTXSaxContext_t* context, const char* name, const char** attributes);
+	void (*startElement)(MTXSaxContext_t* context, const void* name, const void** attributes);
 
 	/**
 	* Called when an end-element or the end of an empty element is parsed.
@@ -74,7 +74,7 @@ typedef struct MTXSaxContext_t
 	* \param context The current context.
 	* \param name The name of the element.
 	*/
-	void (*endElement)(MTXSaxContext_t* context, const char* name);
+	void (*endElement)(MTXSaxContext_t* context, const void* name);
 
 	/**
 	* Called when character data is parsed.
@@ -86,7 +86,7 @@ typedef struct MTXSaxContext_t
 	* \param data The character data.
 	* \param length The length, in characters, of the provided data.
 	*/
-	void (*characters)(MTXSaxContext_t* context, const char* data, int length);
+	void (*characters)(MTXSaxContext_t* context, const void* data, int length);
 
 	/**
 	* Called during UTF-8 processing when a character is encountered whose
@@ -132,7 +132,7 @@ typedef struct MTXSaxContext_t
 	MTXContext inner;
 	// The name of the current element.
 	// This buffer is allocated from the heap.
-	char* name;
+	void* name;
 	// The size, in bytes, of the buffer holding the current element name.
 	int nameSize;
 	// The buffer holding the (null-terminated) attribute name and value
@@ -153,6 +153,8 @@ typedef struct MTXSaxContext_t
 	int attrIndexSize;
 	// The number of attributes (name/value pairs) in the current element
 	int attrCount;
+	// True for wide-char output, false for char output.
+	bool isWide;
 #endif
 } MTXSaxContext;
 
@@ -193,6 +195,12 @@ bool mtxSaxFeed(MTXSaxContext* context, char* data);
 bool mtxSaxFeedProcess(MTXSaxContext* context, char* data);
 
 /**
+* \copydoc mtxFeedWide()
+* \see mtxSaxFeed()
+*/
+int mtxSaxFeedWide(MTXContext* context, char* data, wchar_t* wideBuffer);
+
+/**
 * Stops parsing and frees any allocated memory.  Must be called either to stop
 * parsing prematurely, or after having parsed the document, in order to avoid
 * memory leaks.
@@ -221,7 +229,7 @@ namespace Mtx
  * Inherit from this to receive callbacks from a SaxContext.  This is analogous
  * to filling in the function pointers of a MTXSaxContext object.
  */
-class SaxListener
+template<class Tchar> class SaxListenerT
 {
 public:
 	/**
@@ -231,23 +239,30 @@ public:
 	/**
 	 * \copydoc MTXSaxContext::startElement
 	 */
-	virtual void mtxStartElement(const char* name, const char** attributes) = 0;
+	virtual void mtxStartElement(const Tchar* name, const Tchar** attributes) = 0;
 	/**
 	 * \copydoc MTXSaxContext::endElement
 	 */
-	virtual void mtxEndElement(const char* name) = 0;
+	virtual void mtxEndElement(const Tchar* name) = 0;
 	/**
 	 * \copydoc MTXSaxContext::characters
 	 */
-	virtual void mtxCharacters(const char* data, int length) = 0;
-	/**
-	 * \copydoc MTXSaxContext::unicodeCharacter
-	 */
-	virtual unsigned char mtxUnicodeCharacter(int character) = 0;
+	virtual void mtxCharacters(const Tchar* data, int length) = 0;
 	/**
 	 * \copydoc MTXSaxContext::parseError
 	 */
 	virtual void mtxParseError(void) = 0;
+};
+
+class SaxListener : public SaxListenerT<char> {
+public:
+	/**
+	 * \copydoc MTXSaxContext::unicodeCharacter
+	 */
+	virtual unsigned char mtxUnicodeCharacter(int character) = 0;
+};
+
+class SaxListenerW : public SaxListenerT<wchar_t> {
 };
 
 /**
@@ -256,17 +271,48 @@ public:
  * This class wraps the mtxSax set of functions.  To use it, you need to
  * inherit and implement the MtxListener and SaxListener interfaces.
  */
-class SaxContext
+class SaxContextBase
 {
+public:
+	/**
+	 * Destructor.
+	 */
+	~SaxContextBase(void);
+
+	/**
+	 * De-initializes this parser context if it was previously initialized.
+	 *
+	 * \see mtxSaxStop
+	 */
+	void stop(void);
+	/**
+	 * \return \c true if this parser context is initialized, otherwise \c false.
+	 */
+	bool isStarted(void) const;
+protected:
+	/**
+	 * Constructor.
+	 */
+	SaxContextBase(void);
+
+	static void encoding(MTXSaxContext* context, const char* value);
+	static void startElement(MTXSaxContext* context, const void* name, const void** attributes);
+	static void endElement(MTXSaxContext* context, const void* name);
+	static void characters(MTXSaxContext* context, const void* data, int length);
+	static void dataRemains(MTXSaxContext* context, const char* data, int length);
+	static void parseError(MTXSaxContext* context);
+
+	MTXSaxContext mContext;
+	MtxListener* mMtxListener;
+	SaxListenerW* mSaxListenerW;
+};
+
+class SaxContext : public SaxContextBase {
 public:
 	/**
 	 * Constructor.
 	 */
 	SaxContext(void);
-	/**
-	 * Destructor.
-	 */
-	~SaxContext(void);
 	/**
 	 * Initializes this parser context using the specified callback interfaces.
 	 * The SAX interface receives XML data, while the MTXml interface handles
@@ -298,27 +344,15 @@ public:
 	 * \see mtxSaxFeedProcess
 	 */
 	bool feedProcess(char* data);
-	/**
-	 * De-initializes this parser context if it was previously initialized.
-	 *
-	 * \see mtxSaxStop
-	 */
-	void stop(void);
-	/**
-	 * \return \c true if this parser context is initialized, otherwise \c false.
-	 */
-	bool isStarted(void) const;
 private:
-	static void encoding(MTXSaxContext* context, const char* value);
-	static void startElement(MTXSaxContext* context, const char* name, const char** attributes);
-	static void endElement(MTXSaxContext* context, const char* name);
-	static void characters(MTXSaxContext* context, const char* data, int length);
 	static unsigned char unicodeCharacter(MTXSaxContext* context, int character);
-	static void dataRemains(MTXSaxContext* context, const char* data, int length);
-	static void parseError(MTXSaxContext* context);
-	MTXSaxContext mContext;
-	SaxListener* mSaxListener;
-	MtxListener* mMtxListener;
+};
+
+class SaxContextW : public SaxContextBase {
+public:
+	//SaxContextW(void);
+	void start(SaxListenerW& newSaxListener, MtxListener& newMtxListener);
+	bool feed(char* data, wchar_t* wideBuffer);
 };
 
 } /* namespace Mtx */

@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <apgcli.h>
 
 #include "config_platform.h"
+#define AUDIO_DEBUGGING_MODE
 
 #include "../../../Base/FileStream.h"
 
@@ -266,6 +267,9 @@ gBtDeviceArray(8, 0)
 	gAudioStream = NULL;
 	gAudioBuffer.ready = false;
 #endif
+#ifdef MMF
+	gControllerEventMonitor = NULL;
+#endif
 }
 
 void Syscall::ConstructL(VMCore* aCore) {
@@ -332,6 +336,13 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gLocationSync = new (ELeave) CClassSynchronizer<Syscall>(this, &Syscall::LocationHandlerL);
 #endif
 
+#ifdef MMF
+	gControllerEventMonitor = CMMFControllerEventMonitor::NewL(*this, gController);
+#endif
+	if(!gScreenEngine.IsDrawing())
+			gScreenEngine.StartDrawingL();
+
+
 	gStartTime = maGetMilliSecondCount();
 
 	DebugMarkStart();
@@ -361,10 +372,13 @@ void Syscall::StopEverything() {
 		gCamera->Release();
 	}
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	if(gVideoPlayer != NULL) {
 		gVideoPlayer->Close();
 	}
+
+#ifdef MMF
+	if(gControllerEventMonitor)
+		gControllerEventMonitor->Cancel();
 #endif
 
 #ifdef SYMBIAN_SOUND
@@ -415,6 +429,10 @@ void Syscall::platformDestruct() {
 	
 	StopEverything();
 
+#ifdef __SERIES60_3X__
+	pimClose();
+#endif
+
 #ifdef SUPPORT_MOSYNC_SERVER
 	LOG("gServer.Close();\n");
 	gServer.Close();
@@ -460,6 +478,10 @@ void Syscall::platformDestruct() {
 	}*/
 	maSoundStop();
 
+#ifdef MMF
+	SAFE_DELETE(gControllerEventMonitor);
+#endif
+
 	SAFE_DELETE(gMmfCPSP);
 
 	SAFE_DELETE(gMmfFSP);
@@ -472,7 +494,7 @@ void Syscall::platformDestruct() {
 
 	SAFE_DELETE(gVibraControl);
 	
-	gStoreMap.Close();
+	gFileLists.close();
 
 	DebugMarkEnd();
 	LOG("platformDestruct() done\n");
@@ -960,15 +982,14 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 
 	//copy color data
 	TBitmapUtil clrUtil(clr());
-	clrUtil.Begin(TPoint(0, 0));
 	for(int y=0; y<height; y++) {
+		clrUtil.Begin(TPoint(0, y));
 		for(int x=0; x<width; x++) {
-			clrUtil.SetPixel(srcInt[y*width + x] & 0xFFFFFF);	//uuh
-			clrUtil.IncXPos();	//wraps around for us
+			clrUtil.SetPixel(srcInt[y*width + x] & 0xFFFFFF);
+			clrUtil.IncXPos();
 		}
-		//clrUtil.IncYPos();	//not needed because of wrap
+		clrUtil.End();
 	}
-	clrUtil.End();
 
 	TCleaner<CFbsBitmap> aph(NULL);
 	if(alpha) {
@@ -981,15 +1002,14 @@ SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 
 		//copy alpha data
 		TBitmapUtil alphaUtil(aph());
-		alphaUtil.Begin(TPoint(0, 0));
 		for(int y=0; y<height; y++) {
+			alphaUtil.Begin(TPoint(0, y));
 			for(int x=0; x<width; x++) {
-				alphaUtil.SetPixel(srcInt[y*width + x] >> 24);	//uuh
+				alphaUtil.SetPixel(srcInt[y*width + x] >> 24);
 				alphaUtil.IncXPos();
 			}
-			//alphaUtil.IncYPos();
+			alphaUtil.End();
 		}
-		alphaUtil.End();
 	}
 
 	//cleanup and store
@@ -1042,89 +1062,6 @@ SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height))
 		return RES_OUT_OF_MEMORY;
 	clr.pop();
 	return resources.add_RT_IMAGE(placeholder, img);;
-}
-
-SYSCALL(MAHandle, maOpenStore(const char* name, int flags)) {
-	MyRFs myrfs;
-	myrfs.Connect();
-#ifdef LOGGING_ENABLED
-	int res =
-#endif
-	FSS.MkDir(KMAStorePath16);
-	LOG("MkDir %i\n", res);
-
-	TPtrC8 nameDesC(CBP name);
-	TCleaner<HBufC8> path(HBufC8::NewLC(KMAStorePath8().Length() + nameDesC.Length() + 1));
-	path->Des().Append(KMAStorePath8);
-	path->Des().Append(nameDesC);
-	path->Des().Append(0);	//hack
-
-	FileStream readFile(CCP path->Ptr());
-	if(!readFile.isOpen()) {
-		if(flags & MAS_CREATE_IF_NECESSARY) {
-			WriteFileStream writeFile(CCP path->Ptr());
-			if(!writeFile.isOpen()) {
-				return STERR_GENERIC;
-			}
-		} else {
-			return STERR_NONEXISTENT;
-		}		
-	}
- 	gStoreMap.InsertL(gNextStoreId, *path);
-	return gNextStoreId++;
-}
-
-SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) {
-	const char* path = gStoreMap.FindL(store);
-	MyRFs myrfs;
-	myrfs.Connect();
-
-	WriteFileStream writeFile(path);
-	Stream* bp = resources.get_RT_BINARY(data);
-
-	int len;
-	MYASSERT(bp->length(len), ERR_DATA_ACCESS_FAILED);
-	TVolumeInfo vi;
-	LHEL(FSS.Volume(vi, EDriveC));
-	if(vi.iFree <= len + 10*1024) {	//magic number
-		return STERR_FULL;
-	}
-	if(!writeFile.writeFully(*bp)) {
-		return STERR_GENERIC;
-	}
-	return 1;
-}
-
-SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder))
-{
-	const char* path = gStoreMap.FindL(store);
-	MYASSERT(path != NULL, ERR_STORE_READ_FAILED);
-	MyRFs myrfs;
-	myrfs.Connect();
-
-	FileStream readFile(path);
-	int len;
-	MYASSERT(readFile.length(len), ERR_STORE_READ_FAILED);
-	Smartie<MemStream> p(new MemStream(len));
-	if(len != 0) {
-		if(!p->isOpen())
-			return RES_OUT_OF_MEMORY;
-		MYASSERT(readFile.readFully(*p), ERR_STORE_READ_FAILED);
-	}
-	return resources.add_RT_BINARY(placeholder, p.extract());
-}
-
-SYSCALL(void, maCloseStore(MAHandle store, int del))
-{
-	const char* path = gStoreMap.FindL(store);
-	MYASSERT(path != NULL, ERR_STORE_HANDLE_INVALID);
-	MyRFs myrfs;
-	myrfs.Connect();
-	if(del) {
-		TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(path));
-		LHEL(FSS.Delete(*desc));
-	}
-	gStoreMap.EraseL(store);
 }
 
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
@@ -1269,7 +1206,7 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
+SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
 	if(!gBtAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:
@@ -1499,7 +1436,6 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 	}
 #endif	//CALL
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 	case maIOCtl_maStreamVideoStart: {
 		const char* url = SYSCALL_THIS->GetValidatedStr(a);
 		return maStreamVideoStart(url);
@@ -1528,7 +1464,6 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 	case maIOCtl_maStreamSetPos: {
 		return maStreamSetPos(a, b);
 	}
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
 
 #ifdef SUPPORT_MOSYNC_SERVER
 	case maIOCtl_maLocationStart:
@@ -1570,9 +1505,224 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int /*c*/)) {
 	case maIOCtl_maCameraSnapshot:
 		return maCameraSnapshot(a, b);
 
+	case maIOCtl_maFileOpen:
+		return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+
+	case maIOCtl_maFileExists:
+		return maFileExists(a);
+	case maIOCtl_maFileClose:
+		return maFileClose(a);
+	case maIOCtl_maFileCreate:
+		return maFileCreate(a);
+	case maIOCtl_maFileDelete:
+		return maFileDelete(a);
+	case maIOCtl_maFileSize:
+		return maFileSize(a);
+	/*case maIOCtl_maFileAvailableSpace:
+		return maFileAvailableSpace(a);
+	case maIOCtl_maFileTotalSpace:
+		return maFileTotalSpace(a);
+	case maIOCtl_maFileDate:
+		return maFileDate(a);
+	case maIOCtl_maFileRename:
+		return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+	case maIOCtl_maFileTruncate:
+		return maFileTruncate(a, b);*/
+
+	case maIOCtl_maFileWrite:
+		return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileWriteFromData:
+		return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+	case maIOCtl_maFileRead:
+		return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileReadToData:
+		return maFileReadToData(GVMRA(MA_FILE_DATA));
+
+	case maIOCtl_maFileTell:
+		return maFileTell(a);
+	case maIOCtl_maFileSeek:
+		return maFileSeek(a, b, c);
+
+	case maIOCtl_maFileListStart:
+		return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+	case maIOCtl_maFileListNext:
+		return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	case maIOCtl_maFileListClose:
+			return maFileListClose(a);
+
+#ifdef __SERIES60_3X__	//todo: s60v2 implementation
+	case maIOCtl_maPimListOpen:
+		return maPimListOpen(a);
+	case maIOCtl_maPimListNext:
+		return maPimListNext(a);
+	case maIOCtl_maPimListClose:
+		return maPimListClose(a);
+	case maIOCtl_maPimItemCount:
+		return maPimItemCount(a);
+	case maIOCtl_maPimItemGetField:
+		return maPimItemGetField(a, b);
+	case maIOCtl_maPimItemFieldCount:
+		return maPimItemFieldCount(a, b);
+	case maIOCtl_maPimItemGetAttributes:
+		return maPimItemGetAttributes(a, b, c);
+	case maIOCtl_maPimFieldType:
+		return maPimFieldType(a, b);
+	case maIOCtl_maPimItemGetValue:
+		return maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
+	/*case maIOCtl_maPimItemSetValue:
+		return maPimItemSetValue(GVMRA(MA_PIM_ARGS), b, c);
+	case maIOCtl_maPimItemAddValue:
+		return maPimItemAddValue(GVMRA(MA_PIM_ARGS), b);
+	case maIOCtl_maPimItemRemoveValue:
+		return maPimItemRemoveValue(a, b, c);*/
+	case maIOCtl_maPimItemClose:
+		return maPimItemClose(a);
+	/*case maIOCtl_maPimItemCreate:
+		return maPimItemCreate(a);
+	case maIOCtl_maPimItemRemove:
+		return maPimItemRemove(a, b);*/
+#endif	//__SERIES60_3X__
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
+}
+
+//------------------------------------------------------------------------------
+// FileList
+//------------------------------------------------------------------------------
+
+class RootFileList : public FileList {
+private:
+	int mPos;
+public:
+	TDriveList mList;
+	
+	RootFileList() : mPos(0) {}
+	int next(char* nameBuf, int bufSize) {
+		while(mPos < KMaxDrives) {
+			if(mList[mPos] != 0) {
+				//we've got a drive.
+				if(bufSize >= 4) {
+					nameBuf[0] = 'A' + mPos;
+					nameBuf[1] = ':';
+					nameBuf[2] = '/';
+					nameBuf[3] = 0;
+					mPos++;
+				}
+				return 4;
+			}
+			mPos++;
+		}
+		return 0;
+	}
+};
+
+class DirFileList : public FileList {
+private:
+	int mPos;
+public:
+	CDir* mDir;
+	
+	DirFileList() : mPos(0), mDir(NULL) {}
+	~DirFileList() {
+		if(mDir)
+			delete mDir;
+	}
+	int next(char* nameBuf, int bufSize) {
+		if(mPos >= mDir->Count())
+			return 0;
+		const TEntry& e((*mDir)[mPos]);
+		int len = e.iName.Length();
+		if(e.IsDir()) {
+			len++;
+		}
+		if(len < bufSize) {
+			TPtr8 ptr((byte*)nameBuf, bufSize-1);
+			ptr.Copy(e.iName);
+			if(e.IsDir()) {
+				ptr.Append('/');
+			}
+			nameBuf[len] = 0;
+			mPos++;
+		}
+		return len;
+	}
+};
+
+static int translateFileListErrorCode(int sym) {
+	LOG("Error %i\n", sym);
+	switch(sym) {
+	case KErrPermissionDenied:
+		return MA_FERR_FORBIDDEN;
+	case KErrPathNotFound:
+		return MA_FERR_NOTFOUND;
+	default:
+		return MA_FERR_GENERIC;
+	}
+}
+
+MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
+	//LOG("maFileListStart(%s, %s)\n", path, filter);
+	TCleaner<FileList> fl(NULL);
+	MyRFs myrfs;
+	myrfs.Connect();
+	//LOG("connected\n");
+	if(path[0] == 0) {	//empty string
+		//list filesystem roots
+		Smartie<RootFileList> rfl(new RootFileList);
+		int res = FSS.DriveList(rfl->mList);
+		if(res < 0)
+			return translateFileListErrorCode(res);
+		fl = rfl.extract();
+	} else {
+		//list files in a directory
+		Smartie<DirFileList> dfl(new DirFileList);
+		//LOG("string hacking...\n");
+		TPtrC8 pathPtrC8(CBP path);
+		TPtrC8 filterPtrC8(CBP filter);
+		Smartie<HBufC16> desc(HBufC16::NewL(pathPtrC8.Length() + filterPtrC8.Length()));
+		TPtr16 des(desc->Des());
+		
+		//Append(des, pathPtrC8);
+		//gotta swap '/' to '\'
+		for(int i=0; i<pathPtrC8.Length(); i++) {
+			if(pathPtrC8[i] == '/')
+				des.Append('\\');
+			else
+				des.Append(pathPtrC8[i]);
+		}
+		
+		Append(des, filterPtrC8);
+		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
+		//LOG("GetDir '%S'\n", temp8());
+		int res = FSS.GetDir(des, KEntryAttMaskSupported, ESortNone, dfl->mDir);
+		//LOG("res: %i\n", res);
+		if(res < 0)
+			return translateFileListErrorCode(res);
+		//LOG("extract\n");
+		fl = dfl.extract();
+	}
+	//LOG("PushL\n");
+	CleanupStack::PushL(fl());
+	gFileLists.insert(gFileListNextHandle, fl());
+	//LOG("pop\n");
+	fl.pop();
+	//LOG("return\n");
+	return gFileListNextHandle++;
+}
+
+int Syscall::maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
+	FileList* flp = gFileLists.find(list);
+	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
+	return flp->next(nameBuf, bufSize);
+}
+
+int Syscall::maFileListClose(MAHandle list) {
+	FileList* flp = gFileLists.find(list);
+	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
+	gFileLists.erase(list);
+	return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -1821,7 +1971,7 @@ int Syscall::maLocationStop() {
 	LOG("LocationStop: %i\n", res);
 	gLocationSync->Cancel();
 	LOG("maLocationStop done.\n");
-	return 0;
+	return res;
 }
 
 
@@ -1971,28 +2121,39 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	gMmfCPSP->ListImplementationsL(ciia);
 	CleanupResetAndDestroyPushL(ciia);
 
-#ifdef AUDIO_DEBUGGING_MODE
 	LOGA("%i impls\n", ciia.Count());
-	for(int i=0; i<ciia.Count(); i++) {
-		CMMFControllerImplementationInformation* cii = ciia[i];
-		LOGA("%i: 0x%08X\n", i, cii->Uid());
-	}
-#endif	//AUDIO_DEBUGGING_MODE
-
-	//MYASSERT(ciia.Count() != 0, SYMERR_NO_MATCHING_DECODER);
 	if(ciia.Count() == 0) {
 		return -1;
 	}
-	DEBUG_ASSERT(ciia[0] != NULL);
 
-	//just pick the first one
+	//CMMFControllerImplementationInformation* chosenCii = ciia[0];
+	//CMMFControllerImplementationInformation* chosenCii = ciia[ciia.Count() - 1];
+
+	//pick the most specialized implementation
+	CMMFControllerImplementationInformation* chosenCii = NULL;
+	int minIds = (1 << 30);
+	for(int i=0; i<ciia.Count(); i++) {
+		CMMFControllerImplementationInformation* cii = ciia[i];
+		int nids = cii->SupportedMediaIds().Count();
+#ifdef AUDIO_DEBUGGING_MODE
+		HBufC8* buf = CreateHBufC8FromDesC16LC(cii->DisplayName());
+		LOGA("%i: 0x%08X(%S), %i\n", i, cii->Uid(), buf, nids);
+		CleanupStack::PopAndDestroy(buf);
+#endif
+		if(nids > 0 && nids < minIds) {
+			chosenCii = cii;
+			minIds = nids;
+		}
+	}
+	DEBUG_ASSERT(chosenCii != NULL);
+
 #ifdef MMF
 	TMMFPrioritySettings dummySettings;	//ignored since we don't have MultimediaDD capbility.
-	LHEL(gController.Open(*ciia[0], dummySettings));
+	LHEL(gController.Open(*chosenCii, dummySettings));
 	RMMFAudioControllerCustomCommands accc(gController);
 #else	//Mda
 	gPlayer = CMdaAudioRecorderUtility::NewL(*this);
-	const TUid controllerUid = ciia[0]->Uid();
+	const TUid controllerUid = chosenCii->Uid();
 #endif	//MMF
 
 	CleanupStack::PopAndDestroy();	//ciia, see Push above.
@@ -2043,6 +2204,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	}
 #endif	//0
 
+	gControllerEventMonitor->Start();
 	LHEL(gController.AddDataSink(KUidMmfAudioOutput, KNullDesC8));
 	LHEL(gController.Prime());
 	maSoundSetVolume(gSoundVolume);
@@ -2075,11 +2237,21 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 	return 1;
 }
 
+#ifdef MMF
+void Syscall::HandleEvent(const TMMFEvent& aEvent) {
+	LOGA("MMFEvent: 0x%08X %i\n", aEvent.iEventType.iUid, aEvent.iErrorCode);
+	if(aEvent.iEventType == KMMFEventCategoryPlaybackComplete) {
+		gPlaying = false;
+	}
+}
+#endif	//MMF
+
 SYSCALL(void, maSoundStop()) {
 	LOGA("SS\n");
 	if(gPlayer)
 		gPlayer->Close();
 #ifdef MMF
+	gControllerEventMonitor->Cancel();
 	gController.Close();
 #endif
 	SAFE_DELETE(gPlayer);
@@ -2263,7 +2435,6 @@ void Syscall::MaoscPlayComplete(TInt aError) {
 #endif
 
 
-#ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
 int Syscall::maStreamVideoStart(const char* url) {
 	MYASSERT(gStreamState == SS_IDLE, ERR_STREAM_TOO_MANY);
 	LOGT("maStartVideoStream %s", url);
@@ -2350,14 +2521,14 @@ int Syscall::maStreamLength(MAHandle stream) {
 	MYASSERT(gStreamState != SS_IDLE && stream == gStreamHandle, ERR_STREAM_HANDLE);
 	TTimeIntervalMicroSeconds d;
 	HANDLE_LEAVE(d = gVideoPlayer->, DurationL, ());
-	return (int)(d.Int64() / 1000);
+	return I64LOW(d.Int64() / 1000);
 }
 
 int Syscall::maStreamPos(MAHandle stream) {
 	MYASSERT(gStreamState != SS_IDLE && stream == gStreamHandle, ERR_STREAM_HANDLE);
 	TTimeIntervalMicroSeconds p;
 	HANDLE_LEAVE(p = gVideoPlayer->, PositionL, ());
-	return (int)(p.Int64() / 1000);
+	return I64LOW(p.Int64() / 1000);
 }
 
 int Syscall::maStreamSetPos(MAHandle stream, int pos) {
@@ -2381,14 +2552,14 @@ int Syscall::maStreamSetPos(MAHandle stream, int pos) {
 		gVideoPlayer->Play();
 		gStreamSetPosPausable = false;
 	}
-	return (int)(p.Int64() / 1000);
+	return I64LOW(p.Int64() / 1000);
 }
 
 
 void Syscall::AddStreamEvent(int event, int result) {
-	MAEVENT e;
+	MAEvent e;
 	e.type = EVENT_TYPE_STREAM;
-	STREAM_EVENT_DATA* sed = new (ELeave) STREAM_EVENT_DATA;
+	MAStreamEventData* sed = new (ELeave) MAStreamEventData;
 	sed->event = event;
 	sed->result = result;
 	//will be handled by GetEvent.
@@ -2471,4 +2642,3 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 		gStreamState = SS_ERROR;
 	}
 }
-#endif	//MA_PROF_SUPPORT_VIDEO_STREAMING

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true">
+<target-profile device="E61i" vendor="Nokia"/>
+<build.cfg active="true" id="Debug"/>
+<build.cfg id="Release"/>
+<criteria/>
+<properties>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.libraries" value="MAFS.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, MAFSD.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:extra.link.sw" value="-datasize=8192000 -heapsize=4096000"/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:gcc.switches" value="-O2"/>
+<property key="build.prefs:gcc.switches/Debug" value="-O0"/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="false"/>
+<property key="build.prefs:ignore.default.libraries" value="false"/>
+<property key="build.prefs:ignore.default.library.paths" value="false"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="last.build.config" value="Debug"/>
+<property key="screenHeight" value="320"/>
+<property key="screenWidth" value="240"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0E0855EE"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xEC4F7D3B"/>
+<property key="Wall" value="true"/>
+<property key="Werror" value="true"/>
+</properties>
+</project>

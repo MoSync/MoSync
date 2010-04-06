@@ -110,7 +110,7 @@ int GdbStub::sRunControl(void* arg) {
 	return 0;
 }
 void GdbStub::runControl() {
-	LOG("runControl()\n");
+	LOGD("runControl()\n");
 	while(!mQuit) {
 		try {
 			handleMessage();
@@ -131,7 +131,7 @@ void GdbStub::handleMessage() {
 		mReadSem.post();
 		break;
 	case eException:
-		LOG("MESSAGE exception\n");
+		LOGD("MESSAGE exception\n");
 		sendExceptionPacket(m.code);
 		break;
 	case eExit:
@@ -322,7 +322,7 @@ void GdbStub::handleInput() {
 }
 
 void GdbStub::handleAck() {
-	LOG("GDB ACK was sent from the client.\n");
+	LOGD("GDB ACK was sent from the client.\n");
 	if(mWaitingForAck) {
 		mWaitingForAck = false;
 	} else {
@@ -400,7 +400,7 @@ void GdbStub::transmissionNAK() {
 }
 
 void GdbStub::transmissionACK() {
-	LOG("GDB transmission: ACK\n");
+	LOGD("GDB transmission: ACK\n");
 	putDebugChar('+');
 }
 
@@ -551,7 +551,7 @@ bool GdbStub::executeCommand() {
 	char instruction = *mInputPtr;
 	mInputPtr++;
 
-	LOG("GDB instruction '%c' was sent from the client.\n", instruction);
+	LOGD("GDB instruction '%c' was sent from the client.\n", instruction);
 
 	switch(instruction) {
 
@@ -609,7 +609,7 @@ void GdbStub::putPacket() {
 	appendOut(hexChars[(calculatedChecksum)&0xf]);
 	*curOutputBuffer = 0;
 
-	LOG("GDB transmission: \"%s\"\n", outputBuffer.begin());
+	LOGD("GDB transmission: \"%s\"\n", outputBuffer.begin());
 	mWaitingForAck = true;
 	putDebugChars(outputBuffer.begin(), curOutputBuffer - outputBuffer.begin());
 }

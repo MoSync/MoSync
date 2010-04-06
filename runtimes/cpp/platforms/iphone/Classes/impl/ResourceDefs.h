@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(RT_BINARY, Base::Stream, delete)\
 	m(RT_PLACEHOLDER, void, NUL)\
 	m(RT_LABEL, Label, delete) \
-	m(RT_IMAGE, Image, delete)\
+	m(RT_IMAGE, Surface, delete)\
 	m(RT_FLUX, void, NUL)\
 
 #endif // _RESOURCE_DEFS_H_
