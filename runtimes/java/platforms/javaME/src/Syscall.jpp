@@ -2187,12 +2187,13 @@ public
 #ifdef PHONE_RELEASE
 		if(MAMidlet.out == null)
 			return IOCTL_UNAVAILABLE;
-		String s = new String(getMemBytes(src, size));
-		MAMidlet.out.print(s);
+		byte[] b = getMemBytes(src, size);
+		MAMidlet.out.write(s, 0, size);
 		MAMidlet.out.flush();
 #else
+		//DEBUG_ALWAYS("WL " + HEX(src) + " " + size + "\n");
 		String s = new String(getMemBytes(src, size));
-		DEBUG_ALWAYS("WL:"+ s + (s.charAt(s.length()-1) == '\n' ? "" : "\n"));
+		DEBUG_ALWAYS("WL:"+ s + (s.charAt(size-1) == '\n' ? "" : "\n"));
 #endif
 		return 0;
 	}

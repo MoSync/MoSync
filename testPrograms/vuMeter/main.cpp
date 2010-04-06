@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <MAUtil/Moblet.h>
 #include <IX_RECORD.h>
+#include <mastdlib.h>
 
 using namespace MAUtil;
 
@@ -30,23 +31,25 @@ using namespace MAUtil;
 #define BUFSIZE 22100
 short gPcmBuf[BUFSIZE];
 
-class VuMoblet : public Moblet, public ConnectionListener, public TimerListener {
+class VuMoblet : public Moblet, public ConnListener, public TimerListener {
 public:
+	int count;
 	VuMoblet() {
 		//start recording
 		printf("maRecordSetup\n");
 		mRec = maRecordSetup();
 		CCE(mRec);
 
-		setConnectionListener(mRec, this);
+		setConnListener(mRec, this);
 
 		printf("maRecordStart\n");
 		CCE(maRecordStart(mRec));
 
 		printf("Starting loop...\n");
+		count = 0;
 		maConnRead(mRec, gPcmBuf, BUFSIZE*sizeof(short));
 
-		addTimer(this, 10000, 1);
+		//addTimer(this, 4000, 1);
 	}
 
 	void runTimerEvent() {
@@ -54,24 +57,56 @@ public:
 		maRecordPause(mRec);
 	}
 
-	void connEvent(const CONN_EVENT_DATA& data) {
-		printf("cE %i %i %i\n", data.handle, data.opType, data.result);
+	void connEvent(const MAConnEventData& data) {
+		//printf("cE %i %i %i\n", data.handle, data.opType, data.result);
 		CCE(data.result);
 		//printf("Read %i bytes\n", data.result);
 		MAASSERT(data.handle == mRec);
 		if(data.opType == CONNOP_READ) {
+			if(data.result <= 0) {
+				printf("Error!\n");
+				return;
+			}
+			count += data.result;
+			//printf("Count: %i\n", count);
+			drawVU(gPcmBuf, data.result / sizeof(short));
 			maConnRead(mRec, gPcmBuf, BUFSIZE*sizeof(short));
 		}
+	}
+
+	void drawVU(const short* buf, int len) {
+		MAExtent scrSize = maGetScrSize();
+		int scrWidth = EXTENT_X(scrSize);
+		int scrHeight = EXTENT_Y(scrSize);
+		int samplesPerLine = len / scrHeight;	//landscape mode
+		maSetColor(0);
+		maFillRect(0,0, scrWidth, scrHeight);
+		maSetColor(0x00ff00);
+		for(int i=0, y=0; i<len; y++) {
+			int sum=0;
+			int j=0;
+			for(; j<samplesPerLine && i<len; j++, i++) {
+				sum += abs(buf[i]);
+			}
+			int avg = sum / j;	//range: 0 - 2^16
+			int x = (avg * scrWidth) >> 16;
+			maLine(0,y,x,y);
+		}
+		maUpdateScreen();
 	}
 
 	void keyPressEvent(int keyCode) {
 		if(keyCode == MAK_0) {
 			maExit(0);
 		}
+		if(keyCode == MAK_1) {
+			printf("pause\n");
+			maRecordPause(mRec);
+		}
 	}
 
 private:
-	Handle mRec;
+	MAHandle mRec;
 };
 
 extern "C" int MAMain() {
@@ -79,4 +114,5 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 
 	Moblet::run(new VuMoblet());
+	return 0;
 }

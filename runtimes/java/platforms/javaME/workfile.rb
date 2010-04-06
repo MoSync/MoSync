@@ -15,6 +15,7 @@ SHARED_SOURCES = [
 	'BigPhatError',
 	'Binary',
 	'BinaryInterface',
+	#'BufferlessPipeStream',
 	'Core',
 	'LimitedLengthInputStream',
 	'LittleEndianDataInputStream',
@@ -111,7 +112,7 @@ work.instance_eval do
 		javaFiles = JAVAME_SOURCES.collect { |n| JavaPreprocessTask.new(self, 'src', n) }
 		javaFiles += SHARED_SOURCES.collect { |n| JavaPreprocessTask.new(self, SHARED_DIR, n) }
 		@prerequisites = [DirTask.new(self, 'build'), DirTask.new(self, CLASS_DIR), DirTask.new(@self, JAVA_DIR),
-			JavaCompileTask.new(self, javaFiles)]
+			DirTask.new(self, TMPCLASS_DIR), JavaCompileTask.new(self, javaFiles)]
 	end
 end
 
