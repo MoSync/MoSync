@@ -461,22 +461,6 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del))
-	{
-		StoreItr itr = gStores.find(store);
-		MYASSERT(itr != gStores.end(), ERR_STORE_HANDLE_INVALID);
-		const char *filename = itr->second.c_str();
-		if(del)
-		{
-			int res = remove(filename);
-			if(res != 0) {
-				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
-				DEBIG_PHAT_ERROR;
-			}
-		}
-		gStores.erase(itr);
-	}	 
-
 
 	SYSCALL(int, maGetKeys()) 
 	{
