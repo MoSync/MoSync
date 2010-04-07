@@ -24,12 +24,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <maassert.h>
 #include <conprint.h>
+//#include <MAUtil/mauuid.h>
 
 #include "common.h"
 
 using namespace MAUtil;
 
-static const btaddr_t sAddress = { { 0x00,0x11,0x67,0x9c,0xd9,0x3c } };	//MS-FREDRIK, sweex dongle
+//static const MABtAddr sAddress = { { 0x00,0x11,0x67,0x9c,0xd9,0x3c } }; //MS-FREDRIK, sweex dongle
+//static const MABtAddr sAddress = { { 0x00,0x25,0xE7,0x13,0x12,0xB5 } }; //W995
+static const MABtAddr sAddress = { { 0x00,0x19,0x0e,0x04,0x17,0x04 } }; //MS-FREDRIK, Belkin dongle
 static const MAUUID sUuid = SERVER_MAUUID_DECL;
 
 class MyMoblet : public Moblet, BluetoothServiceDiscoveryListener, ConnectionListener {
@@ -42,10 +45,19 @@ private:
 public:
 	MyMoblet() : mConn(this), pos(0), online(false) {
 		printf("Hello World!\n");
+#if 1
 		int res = mDisc.startServiceDiscovery(sAddress, sUuid, this);
 		printf("startDiscRes: %i\n", res);
 		if(res < 0)
 			return;
+#else
+		char buf[64];
+		const byte* a = sAddress.a;
+		sprintf(buf, "btspp://%02x%02x%02x%02x%02x%02x:%i",
+			a[0], a[1], a[2], a[3], a[4], a[5], 2);
+		int res = mConn.connect(buf);
+		printf("connect res %i\n", res);
+#endif
 	}
 
 	void keyPressEvent(int keyCode) {

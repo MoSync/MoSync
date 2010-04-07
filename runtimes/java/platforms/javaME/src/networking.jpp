@@ -21,7 +21,6 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 	DEBUG_CONN("Connect "+mConnNextHandle+" "+url+"\n");
 	if(mConnections.size() >= CONN_MAX)
 		return CONNERR_MAX;
-#ifdef MA_IX_CONNSERVER
 	if(url.startsWith("socket://:") || url.equals("socket://") ||
 		url.startsWith("btspp://localhost:"))
 	{
@@ -35,7 +34,6 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 		mConnections.put(new Integer(mConnNextHandle), mac);
 		return mConnNextHandle++;
 	}
-#endif	//MA_IX_CONNSERVER
 	MAStreamConn mac = new MAStreamConn(mConnNextHandle);
 	mConnections.put(new Integer(mConnNextHandle), mac);
 	mac.state |= CONNOP_CONNECT;
@@ -43,7 +41,6 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 	return mConnNextHandle++;
 }
 
-#ifdef MA_IX_CONNSERVER
 NETSYSCALL(int) maAccept(MAHandle serv) {
 	MAServerConn mac = (MAServerConn)mConnections.get(new Integer(serv));
 	MYASSERT((mac.state & CONNOP_ACCEPT) == 0);
@@ -52,7 +49,6 @@ NETSYSCALL(int) maAccept(MAHandle serv) {
 	mThreadPool.execute(new Accept(mac));
 	return 1;
 }
-#endif	//MA_IX_CONNSERVER
 
 NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
 	DEBUG_CONN("GCA " + conn + " " + addr + "\n");
@@ -88,7 +84,6 @@ NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
 		} catch(IllegalArgumentException e) {	//not bluetooth
 			PRINT_STACK_TRACE;
 		}
-#ifdef MA_IX_CONNSERVER
 	} else if(mac instanceof MAServerConn) {
 		MAServerConn masc = (MAServerConn)mac;
 		MYASSERT(masc.notifier != null);
@@ -108,7 +103,6 @@ NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
 			writeBtAddressToMemory(ld.getBluetoothAddress(), addr + 8);
 			return 1;
 		}
-#endif	//MA_IX_CONNSERVER
 #endif	//MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
 	}
 	return CONNERR_INTERNAL;

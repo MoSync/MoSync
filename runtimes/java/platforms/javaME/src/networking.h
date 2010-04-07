@@ -25,11 +25,7 @@ Hashtable mConnections = new Hashtable();
 int mConnNextHandle = 1;
 ThreadPool mThreadPool = new ThreadPool();
 
-#ifdef MA_IX_CONNSERVER
 #define NETSYSCALL(type) final synchronized type
-#else
-#define NETSYSCALL SYSCALL
-#endif
 
 #define HTTPS_NULL 0
 #define HTTPS_SETUP 1
@@ -41,7 +37,7 @@ ThreadPool mThreadPool = new ThreadPool();
 //Classes
 //*****************************************************************************
 
-#if defined(MA_SUPPORT_RECORD) || defined(MA_IX_CONNSERVER)
+#if 1//defined(MA_IX_CONNSERVER)
 public class MAConn {
 	int state = 0;
 	InputStream in;
@@ -89,6 +85,7 @@ public class MAStreamConn extends MAConn {
 	}
 }
 
+#if defined(MA_SUPPORT_RECORD)
 public class MARecordConn extends MAConn {
 	Player player;
 	RecordControl rc;
@@ -106,6 +103,7 @@ public class MARecordConn extends MAConn {
 		super.close();
 	}
 }
+#endif	//MA_SUPPORT_RECORD
 
 public class MAServerConn extends MAConn {
 	StreamConnectionNotifier notifier;
@@ -233,7 +231,6 @@ class Connect implements Runnable {
 }
 
 
-#ifdef MA_IX_CONNSERVER
 class Accept implements Runnable {
 	MAServerConn mac;
 
@@ -276,7 +273,6 @@ class Accept implements Runnable {
 		}
 	}
 }
-#endif
 
 class ConnRead implements Runnable {
 	MAConn mac;

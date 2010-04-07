@@ -639,7 +639,7 @@ interface MAAPI {
 	* Its parameters is the document path (for example, "/index.html").
 	* Writing to a http connection is not allowed.
 	*
-	* <tt>btspp</tt>, which is Bluetooth Serial Port and has no parameters.
+	* <tt>btspp</tt>, which is Bluetooth Serial Port. It has no parameters.
 	*\n
 	*\n
 	* For the <tt>socket</tt> and <tt>http</tt> protocols, \a \<address\> can be either a decimal,
@@ -662,7 +662,8 @@ interface MAAPI {
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
 	*
-	* To find Bluetooth addresses, use the Bluetooth discovery API. See maBtStartDeviceDiscovery().
+	* To find useful Bluetooth addresses, use the Bluetooth discovery API.
+	* See maBtStartDeviceDiscovery().
 	*
 	*
 	* The result of the operation will be delivered in a CONN event, with
@@ -680,11 +681,25 @@ interface MAAPI {
 	* opening connections without closing them, you'll eventually recieve the
 	* #CONNERR_MAX error code instead of new connection handles.
 	*
+	* Alternatively, this function can be called with one of these url types to
+	* create a Server Connection:\n
+	* <tt>socket://[:\<port\>]</tt>, for TCP.\n
+	* <tt>btspp://localhost:\<uuid\>\[;name=\<YourServiceName\>\]</tt>, for Bluetooth.\n
+	* \<uuid\> is a 32-digit hexadecimal number. It will be used to create the
+	* service record. Its MAUUID representation can be used by clients to search for
+	* this service.
+	*
+	* Example Bluetooth server url:
+	* <tt>btspp://localhost:0000110100001000800000805F9B34FB;name=Serial Port</tt>
+	*
+	* Server connections are created synchronously; no CONN event is generated,
+	* and as soon as this function returns, it's done.
+	*
+	* A server connection can not be read from or written to, but it can be closed.
+	* You can also use it in a call to maAccept() or maGetConnAddr().
 	*
 	* \returns The connecting handle \>0, or one of the \link #CONNERR_GENERIC CONNERR \endlink values.
-	* \see maGetEvent
-	*
-	* \warning At this time, encrypted connections are supported only on Java runtimes.
+	* \see maGetEvent()
 	*/
 	MAHandle maConnect(in MAString url);
 
@@ -1615,6 +1630,8 @@ interface MAAPI {
 
 		/**
 		* A Universally Unique Identifier.
+		*
+		* Common Bluetooth UUID values can be found in MAUtil/mauuid.h.
 		*/
 		struct MAUUID {
 			int i[4];
@@ -2458,7 +2475,6 @@ interface MAAPI {
 		int maAudioBufferClose();
 #endif
 
-#if IX_CONNSERVER
 		/**
 		* Asynchronously accepts and opens a remote connection to a service.
 		*
@@ -2475,8 +2491,6 @@ interface MAAPI {
 		* \see maGetEvent
 		*/
 		int maAccept(in MAHandle serv);
-
-#endif	//IX_CONNSERVER
 
 		/**
 		* Sends the application to the background, unless it's already there.

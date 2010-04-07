@@ -1852,10 +1852,8 @@ public
 #include "opengl_invoke_non_generated.jpp"
 #endif
 
-#ifdef MA_IX_CONNSERVER
 		case maIOCtl_maAccept:
 			return maAccept(a);
-#endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 		case maIOCtl_maStreamVideoStart:

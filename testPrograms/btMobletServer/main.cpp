@@ -40,14 +40,14 @@ class AcceptedConnection : public Connection {
 protected:
 	friend class Server;
 
-	AcceptedConnection(Handle conn) : Connection(NULL) {
+	AcceptedConnection(MAHandle conn) : Connection(NULL) {
 		mConn = conn;
 	}
 public:
 	void setListener(ConnectionListener* listener) {
 		mListener = listener;
 	}
-	int getAddr(ConnAddr* dst) {
+	int getAddr(MAConnAddr* dst) {
 		return maConnGetAddr(mConn, dst);
 	}
 };
@@ -55,7 +55,7 @@ public:
 class Server : public ConnListener {
 protected:
 	ServerListener* mListener;
-	Handle mServ;
+	MAHandle mServ;
 public:
 	Server(ServerListener* listener) : mListener(listener), mServ(0) {
 	}
@@ -64,7 +64,7 @@ public:
 		close();
 	}
 
-	int getAddr(ConnAddr* dst) {
+	int getAddr(MAConnAddr* dst) {
 		return maConnGetAddr(mServ, dst);
 	}
 
@@ -89,7 +89,7 @@ public:
 		}
 	}
 
-	virtual void connEvent(const CONN_EVENT_DATA& data) {
+	virtual void connEvent(const MAConnEventData& data) {
 		MAASSERT(data.opType == CONNOP_ACCEPT);
 		MAASSERT(data.handle == mServ);
 		int res = data.result;
@@ -114,7 +114,7 @@ private:
 public:
 	MyConnectionHandler(AcceptedConnection* conn, int id) : mConn(conn), mId(id) {
 		mConn->setListener(this);
-		ConnAddr addr;
+		MAConnAddr addr;
 		int res = mConn->getAddr(&addr);
 		MAASSERT(res > 0);
 		byte* a = addr.bt.addr.a;
@@ -151,7 +151,7 @@ public:
 		if(res < 0)
 			return;
 
-		ConnAddr addr;
+		MAConnAddr addr;
 		res = mServer.getAddr(&addr);
 		MAASSERT(res > 0);
 		MAASSERT(addr.family == CONN_FAMILY_BT);
