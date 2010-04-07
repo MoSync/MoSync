@@ -26,6 +26,7 @@ def switchPathSlashes(cmd)
 	return cmd
 end
 
+# This should always be used instead of the ENV.
 def mosyncdir
 	return switchPathSlashes(ENV['MOSYNCDIR'])
 end

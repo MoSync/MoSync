@@ -43,7 +43,7 @@ class PipeTask < FileTask
 		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
-			sh "#{ENV["MOSYNCDIR"]}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
+			sh "#{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
 		rescue => e
 			FileUtils.rm_f(@NAME)
 			raise
@@ -84,7 +84,7 @@ end
 class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
-	def gcc; ENV["MOSYNCDIR"] + "/bin/xgcc"; end
+	def gcc; mosyncdir + "/bin/xgcc"; end
 	def gccmode; "-S"; end
 	def host_flags;
 		g = CONFIG == "" ? " -g" : ""
