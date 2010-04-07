@@ -2188,7 +2188,7 @@ public
 		if(MAMidlet.out == null)
 			return IOCTL_UNAVAILABLE;
 		byte[] b = getMemBytes(src, size);
-		MAMidlet.out.write(s, 0, size);
+		MAMidlet.out.write(b, 0, size);
 		MAMidlet.out.flush();
 #else
 		//DEBUG_ALWAYS("WL " + HEX(src) + " " + size + "\n");
