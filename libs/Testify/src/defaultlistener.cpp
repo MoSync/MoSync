@@ -98,7 +98,7 @@ void DefaultListener::beginTest ( const char *n )
  */
 void DefaultListener::endTest ( void )
 {
-	if ( m_testFailed == false )
+	if ( m_testFailed != true )
 		printf( "OK\n" );
 }
 
