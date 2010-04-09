@@ -353,19 +353,19 @@ void *memrchr(const void *buf, int ch, size_t count)
 	return (count == 0 ? ptr : NULL);
 }
 
-/*
+
 char *strdup(const char *s)
 {
-char *t;
-int len;
+	char *t;
+	int len;
 
-if (!s) return NULL;
-len = strlen(s);
-t = (char *) malloc(len + 1);
-memcpy(t, s, len + 1);
-return t;
+	if (!s) return NULL;
+	len = strlen(s);
+	t = (char *) malloc(len + 1);
+	memcpy(t, s, len + 1);
+	return t;
 }
-*/
+
 
 char *strlwr(char *s)
 {
