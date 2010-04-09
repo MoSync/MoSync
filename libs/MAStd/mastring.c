@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ma.h"
 #include "mastring.h"
 #include "madmath.h"
+#include "maheap.h"
 
 BOOL StringMatch(const char* a, const char* b) {
 	while(*a && *b) {
