@@ -1583,6 +1583,52 @@ void DumpFunctions(FILE *out)
 }
 
 //****************************************
+//		Dump Meta data (for recompiler)
+//****************************************
+void DumpMetaData ( FILE *out )
+{
+	SYMBOL	*Sym;
+	int lastVal = -1;
+	int		n;
+	static char *returnType[RET_double+1];
+
+	returnType[RET_null]  = "[]";
+	returnType[RET_void]  = "[]";
+	returnType[RET_int]   = "[r14]";
+	returnType[RET_float] = "[r14]";
+	returnType[RET_double]= "[r14,r15]";
+
+	fprintf(out, "Meta\n");
+
+	Sym = SymTab;
+	n = SYMMAX;
+
+	do
+	{
+		if (((Sym->LabelType == label_Function) || (Sym->LabelType == label_Virtual))
+			&& (Sym->Section == section_Enum) && (Sym->Type != SECT_null))
+		{
+			fprintf(out, "<%s,",Sym->Name);
+			fprintf(out, "%s,",Hex32(Sym->Value));
+			fprintf(out, "%s,",Hex32(Sym->EndIP));
+			fprintf(out, "%s",returnType[Sym->RetType]);
+
+			fprintf(out, ">\n");
+
+			if(Sym->Value > Sym->EndIP || Sym->Value <= lastVal) {
+				printf("Warning: problematic symbol value: %s\n", Sym->Name);
+			}
+
+			lastVal = Sym->Value;
+		}
+
+		Sym++;
+	}
+	while(--n);
+
+	return;
+}
+//****************************************
 //		Dump Variable Table
 //****************************************
 
