@@ -1611,7 +1611,7 @@ void DumpMetaData ( FILE *out )
 			fprintf(out, "<%s,",Sym->Name);
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s,",Hex32(Sym->EndIP));
-			fprintf(out, "%s",returnType[Sym->RetType]);
+			fprintf(out, "%s",returnType[(int)(Sym->RetType)]);
 
 			fprintf(out, ">\n");
 
