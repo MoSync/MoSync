@@ -62,6 +62,9 @@ CBtService* gBtService;	//temporary
 RPointerArray<CBtService> gBtServiceArray;
 int gBtNextService;
 
+RSdp gBtSdp;
+RSdpDatabase gBtSdpDB;
+
 //***************************************************************************
 //Functions
 //***************************************************************************

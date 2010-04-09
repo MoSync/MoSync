@@ -131,6 +131,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class CSocket;
 class CHttpConnection;
+class CServerSocket;
 
 class CConnection : public CBase {
 protected:
@@ -144,8 +145,11 @@ public:
 	virtual bool Write(const TDesC8& aDesc, CPublicActive& op) = 0;
 
 	virtual void CancelAll() = 0;
+	
+	virtual void GetAddr(MAConnAddr* addr) = 0;
 
 	virtual CHttpConnection* http() { return NULL; }
+	virtual CServerSocket* server() { return NULL; }
 
 	int state;
 	int connErr;

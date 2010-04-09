@@ -32,7 +32,8 @@ using namespace MAUtil;
 
 //static const MABtAddr sAddress = { { 0x00,0x11,0x67,0x9c,0xd9,0x3c } }; //MS-FREDRIK, sweex dongle
 //static const MABtAddr sAddress = { { 0x00,0x25,0xE7,0x13,0x12,0xB5 } }; //W995
-static const MABtAddr sAddress = { { 0x00,0x19,0x0e,0x04,0x17,0x04 } }; //MS-FREDRIK, Belkin dongle
+//static const MABtAddr sAddress = { { 0x00,0x19,0x0e,0x04,0x17,0x04 } }; //MS-FREDRIK, Belkin dongle
+static const MABtAddr sAddress = { { 0x00,0x18,0xC5,0x3F,0x74,0x7E } }; //N73
 static const MAUUID sUuid = SERVER_MAUUID_DECL;
 
 class MyMoblet : public Moblet, BluetoothServiceDiscoveryListener, ConnectionListener {

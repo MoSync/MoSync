@@ -486,8 +486,8 @@ void Syscall::platformDestruct() {
 
 	SAFE_DELETE(gMmfFSP);
 
-	DestructBluetooth();
 	DestructNetworking();
+	DestructBluetooth();
 	gSocketServ.Close();
 
 	gKeyLock.Close();
@@ -1226,11 +1226,9 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maGetBatteryCharge();
 #endif
 
-#if 0
 	case maIOCtl_maAccept:
-		maAccept(a);
+		SYSCALL_THIS->maAccept(a);
 		return 0;
-#endif
 
 	case maIOCtl_maBtStartDeviceDiscovery:
 		BLUETOOTH(maBtStartDeviceDiscovery)(a != 0);

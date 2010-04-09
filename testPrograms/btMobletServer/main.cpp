@@ -42,6 +42,7 @@ protected:
 
 	AcceptedConnection(MAHandle conn) : Connection(NULL) {
 		mConn = conn;
+		Environment::getEnvironment().setConnListener(mConn, this);
 	}
 public:
 	void setListener(ConnectionListener* listener) {
