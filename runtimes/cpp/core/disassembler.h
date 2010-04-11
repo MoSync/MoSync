@@ -18,7 +18,46 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef DISASSEMBLER_H
 #define DISASSEMBLER_H
 
-int disassemble_one(const byte* ip, const byte* mem_cs, const int* mem_cp, char* buf);
-int disassemble_one(const byte* ip, const byte* mem_cs, const int* mem_cp, char* buf, byte& op, byte& op2, byte &rd, byte &rs, int &imm32);
+/**
+ * Disassembles one MoSync IL instruction
+ *
+ * @param ip      [in] Pointer to the instruction
+ * @param mem_cs  [in] Pointer to data section
+ * @param mem_cp  [in] Pointer to constant section
+ * @param buff    [in] Pointer to char buffer which can hold one
+ *                     dissassembled instruction.
+ *
+ * @return Size of the dissassembled instruction in bytes
+ */
+int disassemble_one ( const byte* ip, 
+                      const byte* mem_cs, 
+                      const int* mem_cp, 
+                      char* buf );
+
+/**
+ * Disassembles one MoSync IL instruction
+ *
+ * @param ip      [in] Pointer to the instruction
+ * @param mem_cs  [in] Pointer to data section
+ * @param mem_cp  [in] Pointer to constant section
+ * @param buff    [in] Pointer to char buffer which can hold one
+ *                     dissassembled instruction.
+ * @param op      [out] Opcode
+ * @param op2     [out] Second opcode, incase op was a prefix opcode
+ * @param rd      [out] Destination register
+ * @param rs      [out] Source register
+ * @param imm32   [out] Immediate
+ *
+ * @return Size of the dissassembled instruction in bytes
+ */
+int disassemble_one ( const byte* ip, 
+                      const byte* mem_cs, 
+                      const int* mem_cp, 
+                      char* buf, 
+                      byte& op, 
+                      byte& op2, 
+                      byte &rd, 
+                      byte &rs, 
+                      int &imm32 );
 
 #endif	//DISASSEMBLER_H
