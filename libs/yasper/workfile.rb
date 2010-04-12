@@ -1,18 +1,13 @@
 #!/usr/bin/ruby
 require File.expand_path('../../rules/mosync_lib.rb')
 
-mod = Module.new
-mod.class_eval do
+class YasperWork < Work
 	include MoSyncMod
-	def run
+	def setup
+		@INSTALL_INCDIR = 'yasper'
+		@SOURCES = ['.']
 		copyHeaders
 	end
-	
 end
 
-include MoSyncMod
-def run
-	copyHeaders
-end
-
-run
+YasperWork.new.invoke

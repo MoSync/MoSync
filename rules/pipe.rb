@@ -16,6 +16,7 @@
 
 require "#{File.dirname(__FILE__)}/gcc.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
+require "#{File.dirname(__FILE__)}/targets.rb"
 
 module MoSyncInclude
 	def mosync_include; "#{mosyncdir}/include" + sub_include; end

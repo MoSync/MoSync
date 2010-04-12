@@ -134,6 +134,7 @@ public:
 			printf("recv %i: %i\n", mId, result);
 			delete this;	//should be safe
 		} else {
+			mBuffer[result] = 0;
 			printf("%i: %s\n", mId, mBuffer);
 			conn->recv(mBuffer, 63);
 		}
