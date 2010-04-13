@@ -46,6 +46,9 @@ using namespace MoSyncError;
 
 #include "MoSyncMain.h"
 
+#include "iphone_helpers.h"
+#include "CMGlyphDrawing.h"
+
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
@@ -60,7 +63,8 @@ namespace Base {
 	Syscall* gSyscall;
 
 	uint realColor;
-	uint currentColor, currentRed, currentGreen, currentBlue;
+	uint currentColor;
+	float currentRed, currentGreen, currentBlue;
 	uint oldColor;
 
 	int gWidth, gHeight;
@@ -83,6 +87,8 @@ namespace Base {
 
 	bool exited = false;
 	CRITICAL_SECTION exitMutex;
+	
+	static CGFontRef sUnicodeFont;
 	
 	void MALibQuit();
 
@@ -128,17 +134,19 @@ namespace Base {
 		   
 		CGDataProviderRelease(dpr);
 		
-		
-		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
+		/*
+		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef), NULL);
 		CGContextSaveGState(newSurface->context);
 		CGContextTranslateCTM(newSurface->context, 0, CGImageGetHeight(imageRef));
 		CGContextScaleCTM(newSurface->context, 1, -1);
 		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
 		CGContextRestoreGState(newSurface->context);
-		CGImageRelease(imageRef);
-		return newSurface;
+		CGImageRelease(imageRef);		
 		
-		//return new Surface(imageRef);
+		return newSurface;
+		*/
+		
+		return new Surface(imageRef);
 	}
 	
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
@@ -151,7 +159,6 @@ namespace Base {
 	// Helpers
 	//***************************************************************************
 
-#define FONT_HEIGHT 12
 	static bool MALibInit() {
 
 		InitializeCriticalSection(&exitMutex);
@@ -168,13 +175,10 @@ namespace Base {
 		gBackbuffer = new Surface(gWidth, gHeight);
 		
 		// init font
-		CGContextSelectFont(gBackbuffer->context, "Helvetica", FONT_HEIGHT, kCGEncodingMacRoman);
-		CGAffineTransform xform = CGAffineTransformMake(
-														1.0,  0.0,
-														0.0, -1.0,
-														0.0,  0.0);
-		CGContextSetTextMatrix(gBackbuffer->context, xform);
-		
+		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
+
+		sUnicodeFont = CGFontCreateWithFontName(CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL));
+				
 		gDrawTarget = gBackbuffer;
 		
 		mach_timebase_info_data_t machInfo;
@@ -251,9 +255,10 @@ namespace Base {
 		oldColor = currentColor;
 		currentColor = argb;
 		//realColor =	CONVERT_TO_NATIVE_COLOR_FROM_ARGB(argb);
-		currentRed = (float)((argb&0x00ff0000)>>16)/255.0f;
+		currentRed =   (float)((argb&0x00ff0000)>>16)/255.0f;
 		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
-		currentBlue = (float)((argb&0xff))/255.0f;
+		currentBlue =  (float)((argb&0x000000ff))/255.0f;
+		
 		return oldColor;
 	}
 
@@ -310,9 +315,26 @@ namespace Base {
 		return EXTENT(width, FONT_HEIGHT);
 	}
 
-	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
-		NOT_IMPLEMENTED;
-		return 0;
+	SYSCALL(MAExtent, maGetTextSizeW(const wchar_t* str)) {
+		//NOT_IMPLEMENTED;
+/*
+		const char *s = unicodeToAscii(str);
+		MAExtent e = maGetTextSize(s);
+*/
+		int numGlyphs = wcslen(str)*2;
+		
+		CGGlyph* glyphs = new CGGlyph[numGlyphs];
+		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
+		
+		CGPoint before = CGContextGetTextPosition(gDrawTarget->context);
+		//CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
+		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
+		int width = abs((int)(after.x-before.x));
+		delete glyphs;	
+		return EXTENT(width, FONT_HEIGHT);
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
@@ -322,12 +344,37 @@ namespace Base {
 		
 		//CGAffineTransform xform =  CGAffineTransformMakeRotation(3.14159);
 		//CGAffineTransform xform = CGAffineTransformScale(xform, 1, -1);
-		//CGContextSetTextMatrix(gBackbuffer, xform);		
+		//CGContextSetTextMatrix(gBackbuffer, xform);	
+		
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 	}
 
-	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		NOT_IMPLEMENTED;
+	SYSCALL(void, maDrawTextW(int left, int top, const wchar_t* str)) {
+		//NOT_IMPLEMENTED;
+		/*
+		const char *s = unicodeToAscii(str);
+		maDrawText(left, top, s);
+		*/
+		int numGlyphs = wcslen(str)*2;
+		
+		CGGlyph* glyphs = new CGGlyph[numGlyphs];
+		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
+		
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+		
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);		
+		
+		delete glyphs;
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
@@ -352,7 +399,17 @@ namespace Base {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
 		int width = CGImageGetWidth(img->image);
 		int height = CGImageGetHeight(img->image);
-		CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);
+
+		if(img->context) {
+			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);		
+		} else {
+			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
+			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, 0, width, height), img->image);	
+			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);	
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
+		}
+			
 	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
@@ -375,8 +432,22 @@ namespace Base {
 		//CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
 		CGRect smallRect = CGRectMake(src->left, src->top, src->width, src->height);
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
-		CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
-		CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
+		//CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
+		CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
+		
+		
+		if(img->context) {
+			CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
+			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);	
+		} else {
+			CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
+			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);			
+			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
+			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);	
+		}
+		
 		CGImageRelease(smallImage);
 	}
 
@@ -410,6 +481,9 @@ namespace Base {
 			gDrawTarget = gBackbuffer;
 		} else {
 			Surface* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
+			if(!img->data)
+				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
+			   
 			gDrawTarget = img; 
 			ROOM(SYSCALL_THIS->resources.add_RT_FLUX(handle, NULL));
 		}
@@ -451,8 +525,14 @@ namespace Base {
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int processAlpha)) {
 		int width = EXTENT_X(size); int height = EXTENT_Y(size);
 		gSyscall->ValidateMemRange(src, width*height*4);
-		NOT_IMPLEMENTED;
-		return 0;
+		//NOT_IMPLEMENTED;
+		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
+		char *data = new char[byteSize];
+		memcpy(data, src, byteSize);
+		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaFirst:kCGImageAlphaNoneSkipFirst);
+		bitmap->mOwnData = true;
+		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
+		return 1;
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
@@ -553,6 +633,7 @@ namespace Base {
 		ShowMessageBox(message, true);
 		GetVMYield(gCore) = 1;
 		gRunning = false;
+		pthread_exit(NULL);
 	}
 
 	SYSCALL(int, maPlatformRequest(const char* url)) 

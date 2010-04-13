@@ -16,6 +16,7 @@
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
+		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85BF2B26113403FD00BB0201 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
@@ -61,6 +62,8 @@
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		853983A9116CADEF000521C0 /* hashmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashmap.cpp; path = ../../../../intlibs/hashmap/hashmap.cpp; sourceTree = SOURCE_ROOT; };
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
+		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
+		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
@@ -250,6 +253,8 @@
 		85BF2B0C1134036D00BB0201 /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				853985D9116CF423000521C0 /* CMGlyphDrawing.h */,
+				853985DA116CF423000521C0 /* CMGlyphDrawing.mm */,
 				85BF2B6A113405A800BB0201 /* config_platform.h */,
 				85BF2B6B113405A800BB0201 /* FileImpl.cpp */,
 				85BF2B6C113405A800BB0201 /* FileImpl.h */,
@@ -476,6 +481,7 @@
 				85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */,
 				85923F26114539F0004875E4 /* filelist-linux.c in Sources */,
 				853983AB116CADEF000521C0 /* hashmap.cpp in Sources */,
+				853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

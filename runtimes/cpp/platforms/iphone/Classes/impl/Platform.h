@@ -41,25 +41,44 @@ namespace Core {
 extern Core::VMCore* gCore;
 extern bool gRunning;
 
+#define FONT_HEIGHT 12
+
 class Surface {
 public:
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 	}
+	
+	void initFont() {
+		if(!context) return;
+		CGContextSelectFont(context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
 
-	Surface(int width, int height, char *data=NULL) {
+		CGContextSetFontSize(context, FONT_HEIGHT);
+		CGAffineTransform xform = CGAffineTransformMake(
+														1.0,  0.0,
+														0.0, -1.0,
+														0.0,  0.0);
+		CGContextSetTextMatrix(context, xform);	
+	}
+
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipFirst) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-		int rowBytes = width*4;
+		this->width = width,
+		this->height = height;
+		this->rowBytes = width*4;
 		if(data==NULL) {
-			data = new char[rowBytes*height];
+			this->data = new char[rowBytes*height];
 			mOwnData = true;
 		}
-		else mOwnData = false;
+		else {
+			this->data = data;
+			mOwnData = false;
+		}
 		
-		context = CGBitmapContextCreate(data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst);
-										//kCGImageAlphaNoneSkipFirst);
+		context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, bitmapInfo);
 		
-		CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, data, rowBytes * height, NULL);
-		image = CGImageCreate(width, height, 8, 32, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst, dataProvider, NULL, false, kCGRenderingIntentDefault);
+		CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, this->data, rowBytes * height, NULL);
+		image = CGImageCreate(width, height, 8, 32, rowBytes, colorSpace, bitmapInfo, 
+							  dataProvider, NULL, false, kCGRenderingIntentDefault);
 		CGDataProviderRelease(dataProvider);
 		CGColorSpaceRelease(colorSpace);
 		
@@ -68,9 +87,11 @@ public:
 		CGContextSetAllowsAntialiasing (context, false);
 		rect = CGRectMake(0, 0, width, height);
 		
-		CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-		CGContextFillRect(context, rect);	
+		//CGContextSetRGBFillColor(context, 0, 0, 0, 1);
+		//CGContextFillRect(context, rect);	
 		//CGContextClearRect(context, CGRectMake(0, 0, width, height));
+		
+		initFont();
 	}
 	
 	
@@ -80,6 +101,7 @@ public:
 		if(mOwnData && data) delete data;
 	}
 	
+	int width, height, rowBytes;
 	CGImageRef image;
 	CGContextRef context;
 	CGRect rect;
