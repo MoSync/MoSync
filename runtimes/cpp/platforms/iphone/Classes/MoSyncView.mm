@@ -59,6 +59,7 @@
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
+		self.clearsContextBeforeDrawing = NO;
     }
     return self;
 }
@@ -66,6 +67,7 @@
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+
 		self.frame.origin.y = 0;
 		mosyncView = nil;
         // Initialization code
@@ -74,6 +76,11 @@
     return self;
 }
 
+/*
+- (void)mTimerProcess{
+	DoneUpdatingMoSyncView();
+} 
+*/
 
 - (void)drawRect:(CGRect)rect {
 	if(mosyncView == nil) return;
@@ -81,6 +88,14 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextDrawImage(context, rect, mosyncView);	
 	DoneUpdatingMoSyncView();
+	/*
+	NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.000001f
+													  target:self
+													selector:@selector(mTimerProcess)
+													userInfo:nil
+													 repeats:NO];
+	[timer fire];
+	*/
 	 
 }
 

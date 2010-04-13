@@ -711,16 +711,28 @@ namespace Base {
 		
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
+/*
 		info->redMask = 0x00ff0000;
 		info->greenMask = 0x0000ff00;
 		info->blueMask = 0x000000ff;
+*/
+		info->redMask = 0x000000ff;
+		info->greenMask = 0x0000ff00;
+		info->blueMask = 0x00ff0000;
+		
 		info->sizeInBytes = bytesPerRow*gHeight;
 		info->width = gWidth;
 		info->height = gHeight;
 		info->pitch = bytesPerRow;
+/*
 		info->redShift = 16;
 		info->greenShift = 8;
 		info->blueShift = 0;
+*/
+		info->redShift = 0;
+		info->greenShift = 8;
+		info->blueShift = 16;
+		
 		info->redBits = bitsPerComponent;
 		info->greenBits = bitsPerComponent;
 		info->blueBits = bitsPerComponent;
@@ -735,7 +747,7 @@ namespace Base {
 		sInternalBackBuffer = gBackbuffer;
 		//backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		//currentDrawSurface = backBuffer;
-		gBackbuffer = new Surface(gWidth, gHeight, (char*)data);
+		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipLast);
 		gDrawTarget = gBackbuffer;
 		return 1;
 	}
@@ -761,6 +773,13 @@ namespace Base {
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
+		
+			case maIOCtl_maFrameBufferGetInfo:
+				return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+			case maIOCtl_maFrameBufferInit:
+				return maFrameBufferInit(GVMRA(void*));		
+			case maIOCtl_maFrameBufferClose:
+				return maFrameBufferClose();
 				
 		}
 		

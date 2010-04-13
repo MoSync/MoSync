@@ -19,7 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define THREADPOOLIMPL_H
 
 #include <pthread.h>
-#include <semaphore.h>
+#include <mach/semaphore.h>
+#include <mach/task.h>
+#include <mach/mach_init.h>
 
 typedef int (*MoSyncThreadFunc)(void*);
 
@@ -46,7 +48,9 @@ public:
 	void wait();
 	void post();
 private:
-	sem_t mSem;
+	
+	//sem_t mSem;
+	semaphore_t mSem;
 	
 };
 

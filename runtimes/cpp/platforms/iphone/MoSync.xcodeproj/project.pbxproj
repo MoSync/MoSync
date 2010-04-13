@@ -39,12 +39,12 @@
 		85BF2B75113405A800BB0201 /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
 		85BF2B76113405A800BB0201 /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
 		85BF2B77113405A800BB0201 /* SyscallImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B71113405A800BB0201 /* SyscallImpl.cpp */; };
-		85BF2B78113405A800BB0201 /* ThreadPoolImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B73113405A800BB0201 /* ThreadPoolImpl.cpp */; };
 		85BF2B7F1134125E00BB0201 /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */; };
 		85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */; };
 		85BF2C0111341B3D00BB0201 /* Core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BFD11341B3D00BB0201 /* Core.cpp */; };
 		85BF2C3B11341EF000BB0201 /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
 		85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2C60113429A900BB0201 /* MoSyncView.mm */; };
+		85EF80EC1174AA1900B3E43A /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -131,7 +131,6 @@
 		85BF2B70113405A800BB0201 /* ResourceDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceDefs.h; path = impl/ResourceDefs.h; sourceTree = "<group>"; };
 		85BF2B71113405A800BB0201 /* SyscallImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SyscallImpl.cpp; path = impl/SyscallImpl.cpp; sourceTree = "<group>"; };
 		85BF2B72113405A800BB0201 /* SyscallImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyscallImpl.h; path = impl/SyscallImpl.h; sourceTree = "<group>"; };
-		85BF2B73113405A800BB0201 /* ThreadPoolImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ThreadPoolImpl.cpp; path = impl/ThreadPoolImpl.cpp; sourceTree = "<group>"; };
 		85BF2B74113405A800BB0201 /* ThreadPoolImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ThreadPoolImpl.h; path = impl/ThreadPoolImpl.h; sourceTree = "<group>"; };
 		85BF2B7D1134125E00BB0201 /* iphone_helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphone_helpers.h; sourceTree = "<group>"; };
 		85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = iphone_helpers.mm; sourceTree = "<group>"; };
@@ -145,6 +144,7 @@
 		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = file; path = program; sourceTree = "<group>"; };
 		85BF2C5F113429A900BB0201 /* MoSyncView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncView.h; sourceTree = "<group>"; };
 		85BF2C60113429A900BB0201 /* MoSyncView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncView.mm; sourceTree = "<group>"; };
+		85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ThreadPoolImpl.mm; path = impl/ThreadPoolImpl.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -253,6 +253,7 @@
 		85BF2B0C1134036D00BB0201 /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */,
 				853985D9116CF423000521C0 /* CMGlyphDrawing.h */,
 				853985DA116CF423000521C0 /* CMGlyphDrawing.mm */,
 				85BF2B6A113405A800BB0201 /* config_platform.h */,
@@ -264,7 +265,6 @@
 				85BF2B70113405A800BB0201 /* ResourceDefs.h */,
 				85BF2B71113405A800BB0201 /* SyscallImpl.cpp */,
 				85BF2B72113405A800BB0201 /* SyscallImpl.h */,
-				85BF2B73113405A800BB0201 /* ThreadPoolImpl.cpp */,
 				85BF2B74113405A800BB0201 /* ThreadPoolImpl.h */,
 				85BF2B7D1134125E00BB0201 /* iphone_helpers.h */,
 				85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */,
@@ -474,7 +474,6 @@
 				85BF2B75113405A800BB0201 /* FileImpl.cpp in Sources */,
 				85BF2B76113405A800BB0201 /* netImpl.cpp in Sources */,
 				85BF2B77113405A800BB0201 /* SyscallImpl.cpp in Sources */,
-				85BF2B78113405A800BB0201 /* ThreadPoolImpl.cpp in Sources */,
 				85BF2B7F1134125E00BB0201 /* iphone_helpers.mm in Sources */,
 				85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */,
 				85BF2C0111341B3D00BB0201 /* Core.cpp in Sources */,
@@ -482,6 +481,7 @@
 				85923F26114539F0004875E4 /* filelist-linux.c in Sources */,
 				853983AB116CADEF000521C0 /* hashmap.cpp in Sources */,
 				853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */,
+				85EF80EC1174AA1900B3E43A /* ThreadPoolImpl.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
