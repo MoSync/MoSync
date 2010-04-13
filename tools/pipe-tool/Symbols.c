@@ -1585,10 +1585,53 @@ void DumpFunctions(FILE *out)
 //****************************************
 //		Dump Meta data (for recompiler)
 //****************************************
+static int IsDebugLabel ( const char *l )
+{
+	int state = 0;
+
+	// LB[B|E][0-9]+
+	while ( *l != 0 )
+	{
+		switch ( state )
+		{
+		case 0:
+			if ( *l != 'L' )
+				return 0;
+			state = 1;
+			break;
+
+		case 1:
+			if ( *l != 'B' )
+				return 0;
+			state = 2;
+			break;
+
+		case 2:
+			if ( *l != 'B' && *l != 'E' )
+				return 0;
+			state = 3;
+			break;
+
+		case 3:
+		case 4:
+			if ( *l < '0' && *l > '9' )
+				return 0;
+			state = 4;
+			break;
+		}
+
+		l++;
+	}
+
+	return 1;
+}
+
+
 void DumpMetaData ( FILE *out )
 {
 	SYMBOL	*Sym;
 	int lastVal = -1;
+	int lastEnd = -1;
 	int		n;
 	static char *returnType[RET_double+1];
 
@@ -1606,9 +1649,9 @@ void DumpMetaData ( FILE *out )
 	do
 	{
 		if (((Sym->LabelType == label_Function) || (Sym->LabelType == label_Virtual))
-			&& (Sym->Section == section_Enum) && (Sym->Type != SECT_null))
+			&& (Sym->Section == section_Enum) && (Sym->Type == SECT_code))
 		{
-			fprintf(out, "<%s,",Sym->Name);
+			fprintf(out, "F<%s,",Sym->Name);
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s,",Hex32(Sym->EndIP));
 			fprintf(out, "%s",returnType[(int)(Sym->RetType)]);
@@ -1620,7 +1663,22 @@ void DumpMetaData ( FILE *out )
 			}
 
 			lastVal = Sym->Value;
+			lastEnd = Sym->EndIP;
 		}
+		else if (((Sym->LabelType == label_Local))
+			&& (Sym->Section == section_Enum) && (Sym->Type == SECT_code))
+		{
+			if(Sym->Value <= lastEnd) {
+				// Skip debug labels				
+				if (! IsDebugLabel( Sym->Name ) )
+				{
+					fprintf(out, "L<%s,",Sym->Name);
+					fprintf(out, "%s",Hex32(Sym->Value));
+					fprintf(out, ">\n");
+				}
+			}
+		}
+
 
 		Sym++;
 	}
