@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef GUIDO
 
 #include <hal.h>
+#include <ctype.h>
 
 #include <base/FileStream.h>
 
@@ -31,17 +32,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 
-#define SWEDISH
-//#define ENGLISH
+//#define SWEDISH
+#define ENGLISH
+
+#define ERIK
 
 #if defined(SWEDISH) && defined(ENGLISH)
 #error Only one language allowed.
 #endif
 
 #ifdef BABILE2
+#if 0
 #include "babmobs.lic.h"
 #include "babmobs.lic.password.h"
-#endif
+#else
+#include "babdevlopper.lic.h"
+#include "babdevlopper.lic.password.h"
+#endif	//0
+#endif	//BABILE2
 
 //***************************************************************************
 //Con/de-structor
@@ -58,7 +66,16 @@ void Syscall::ClearGuidoVariables() {
 	gTtsNextId = 1;
 }
 
+static void BB_log_error(const char* name, const uint error) {
+	int severity = ((error) & BB_ERRORSEVERITYMASK) >> (BB_ERRORSEVERITYSHIFT+1);
+	int mod = ((error) & BB_ERRORMODIDMASK) >> (BB_ERRORMODIDSHIFT+1);
+	int submod = ((error) & BB_ERRORSUBMODIDMASK) >> (BB_ERRORSUBMODIDSHIFT+1);
+	int id = (error) & BB_ERRORIDMASK;
+	LOG("%s: 0x%08x(%i)(%x %x %x %x)\n", name, error, error, severity, mod, submod, id);
+}
+
 void Syscall::InitGuidoL() {
+	LOG("InitGuidoL\n");
 	/*for(int i=0; ; i++) {
 		GPSLOGILENAME.Format(_L("C:\\gpslog%i.txt"), i);
 		FileStream testfile(GPSLOGILENAME, false);
@@ -68,6 +85,55 @@ void Syscall::InitGuidoL() {
 	}
 	gGpsLogFile = new (ELeave) FileStream(GPSLOGILENAME, true);
 	LogDateTime();*/
+
+#ifdef BABILE2
+	MyRFs myrfs;
+	myrfs.Connect();
+
+	// read ini file... but which one?
+	// read voice selection file
+	char chosenDrive;
+	char* voiceSelection = GetFileL("C" BABEL_BASE "voice.txt");
+	if(voiceSelection) {
+		chosenDrive = 'C';
+	} else {
+		char* voiceSelection = GetFileL("E" BABEL_BASE "voice.txt");
+		if(!voiceSelection) {
+			_LIT(KErrText, "Could not read "BABEL_BASE"voice.txt");
+			ShowAknErrorNoteThenExitL(KErrText);
+		}
+		chosenDrive = 'E';
+	}
+	LOG("voiceSelection: '%s'\n", voiceSelection);
+	// now we know which directory.
+	// scan the directory for ini files, read the first one we find.
+	TBuf8<KMaxFileName> voicePath;
+	voicePath.Format(_L8("%c%s%s\\"), chosenDrive, BABEL_BASE, voiceSelection);
+	TBuf16<KMaxFileName> iniPathMask;
+	Append(iniPathMask, voicePath);
+	_LIT(KIniMask, "*.ini");
+	iniPathMask.Append(KIniMask);
+	CDir* dir;
+	LOG("GetDir(%s*.ini)\n", voicePath.PtrZ());
+	LHEL(FSS.GetDir(iniPathMask, KEntryAttMaskSupported, ESortNone, dir));
+	if(dir->Count() < 1) {
+		_LIT(KErrText, "No ini file found");
+		ShowAknErrorNoteThenExitL(KErrText);
+	}
+	TBuf8<KMaxFileName> iniPath;
+	iniPath.Copy(voicePath);
+	Append(iniPath, (*dir)[0].iName);
+	char* iniContents = GetFileL(CCP iniPath.PtrZ());
+	// what a lot of mucking about with buffers. that's Symbian for ya.
+	
+	// now we must parse the file.
+	// skip empty lines.
+	// first comes PATH, then the files for the Language Dba, terminated by an END line.
+	// then comes the files for the Voice Dba, terminated by an END line.
+	// then maybe a TXT, but we don't care about that.
+	// each file has the format: <id> <quoted string> <description>\n
+	// we'll ignore the description.
+#endif
 
 	{
 		BB_S16 i, nBlocks;
@@ -79,17 +145,23 @@ void Syscall::InitGuidoL() {
 		babParam.sSELConfig = BUFFER_UNITACOUSTIC_ALL|BUFFER_UNITSOFFSETS_ALL|BUFFER_BERSTREAM_ALL|20;
 		babParam.nlpModule = BABILE_NLPMODULE_NLPE;
 		babParam.synthModule = BABILE_SYNTHMODULE_BBSELECTOR;
-		babParam.synthLS = initVoiceDbaL();
-		if(!babParam.synthLS)
-			User::Leave(ERROR_BABILE);
+		
+		char* iniPtr = iniContents;
+		babParam.nlpeLS = initLanguageDbaL(CCP voicePath.PtrZ(), iniPtr);
+		DEBUG_ASSERT(babParam.nlpeLS);
+		babParam.synthLS = initVoiceDbaL(CCP voicePath.PtrZ(), iniPtr);
+		DEBUG_ASSERT(babParam.synthLS);
+		
 		babParam.license = (const BB_TCHAR*) babLicense;  /* load your license file */
 		babParam.uid.passwd=uid.passwd;	/* your password */
 		babParam.uid.userId=uid.userId; /* your ID */
-#else
+#else	// old version
 		babParam.sMBRConfig=0;
 		babParam.mbreLS = initVoiceDbaL();
-		if(!babParam.mbreLS)
-			User::Leave(ERROR_BABILE);
+		DEBUG_ASSERT(babParam.mbreLS);
+
+		babParam.nlpeLS = initLanguageDbaL();
+		DEBUG_ASSERT(babParam.nlpeLS);
 #ifdef SWEDISH
 		babParam.nlpModule = BABILE_NLPMODULE_TTF;
 #elif defined(ENGLISH)
@@ -98,10 +170,6 @@ void Syscall::InitGuidoL() {
 #error Unsupported language
 #endif	//SWEDISH
 #endif	//BABILE2
-
-		babParam.nlpeLS = initLanguageDbaL();
-		if(!babParam.nlpeLS)
-			User::Leave(ERROR_BABILE);
 
 		// memory descriptor creation
 		nBlocks = BABILE_numAlloc();
@@ -133,7 +201,12 @@ void Syscall::InitGuidoL() {
 
 		LOGD("B_init\n");
 		if(!(gBabileObj = BABILE_init(gMemTab, &babParam))) {
-			LOG("failed!\n");
+			LOG("B_init failed!\n");
+			BB_log_error("nlp", babParam.nlpInitError);
+			BB_log_error("mbr", babParam.mbrInitError);
+			BB_log_error("sel", babParam.selInitError);
+			BB_log_error("init", babParam.initError);
+			DEBIG_PHAT_ERROR;
 		}
 		LOGD("0x%X\n", gBabileObj);
 		
@@ -243,7 +316,7 @@ char* Syscall::GetFileL(const char* filename) {
 		LOG("GetFileL open error\n");
 		return NULL;
 	}
-	void* buf = VoidAlloc(size);
+	void* buf = VoidAlloc(size + 1);
 	if(!buf)
 		return NULL;
 	if(!file.read(buf, size)) {
@@ -251,6 +324,7 @@ char* Syscall::GetFileL(const char* filename) {
 		User::Free(buf);
 		return NULL;
 	}
+	((char*)buf)[size] = 0;
 	gAllocArray[gNumAllocs++];
 	return (char*)buf;
 }
@@ -268,27 +342,12 @@ char* Syscall::GetFileFromEitherDriveL(const char* partPath) {
 	return GetFileL(buffer);
 }
 
-#ifdef BABILE2
+#if defined(BABILE2) && defined(ENGLISH)
 static bool FileExistL(const char* path) {
 	FileStream file(path);
 	return file.isOpen();
 }
-
-static char* GetFilePathFromEitherDriveL(const char* partPath) {
-	char buffer[128];
-	strcpy(buffer + 1, partPath);
-
-	buffer[0] = 'C';
-	if(FileExistL(buffer))
-		return strdup(buffer);
-
-	buffer[0] = 'E';
-	if(FileExistL(buffer))
-		return strdup(buffer);
-	
-	return NULL;
-}
-#endif
+#endif	//BABILE2 && ENGLISH
 
 #ifdef SWEDISH
 BB_DbLs* Syscall::initVoiceDbaL() {
@@ -339,85 +398,162 @@ BB_DbLs* Syscall::initLanguageDbaL() {
 	return nlpDba;
 }
 #elif defined(ENGLISH)
-BB_DbLs* Syscall::initVoiceDbaL() {
-	//DEBUG_ALWAYS("initVoiceDbaL\n");
-	BB_DbLs* mbrDba = AllocZero<BB_DbLs>(3);
 
-	mbrDba[0].pDbId = AllocZero<BB_DbId>();
-	char* ptr;
-	if(!(ptr = GetFilePathFromEitherDriveL(BABEL_BASE "kenny_11k\\kenny_11k_85.hnmc")))
-		return NULL;
-	mbrDba[0].pDbId->type = BB_ROFILE_DBMEMTYPE;
-	mbrDba[0].pDbId->link = ptr;
-	::strcpy(mbrDba[0].descriptor, "SLV");
+// these functions panic on error.
+static int iniCountFiles(char* iniPtr);
+// these functions modify iniPtr, and may insert null terminators.
+// reads the descriptor (3 bytes) and one terminating whitespace.
+static const char* iniReadDescriptor(char*& iniPtr);
+// reads whitespace, the filename, then skips to the end of the line.
+static const char* iniReadFilename(char*& iniPtr);
+// makes sure we have an END, then skips to the end of the line.
+static void iniReadEnd(char*& iniPtr);
+// makes sure we have a PATH, then skips to the end of the line.
+static void iniReadPath(char*& iniPtr);
 
-	mbrDba[1].pDbId = AllocZero<BB_DbId>();
-	if(!(ptr = GetFilePathFromEitherDriveL(BABEL_BASE "kenny_11k\\kenny_11k_85.hnmc.nuul214vqfp")))
-		return NULL;
-	mbrDba[1].pDbId->type = BB_ROFILE_DBMEMTYPE;
-	mbrDba[1].pDbId->link = ptr;
-	::strcpy(mbrDba[1].descriptor, "SLL");
+BB_DbLs* Syscall::initVoiceDbaL(const char* voicePath, char*& iniPtr) {
+	LOGD("initVoiceDbaL\n");
+	// first we have to figure out how many files there are in this section,
+	// so we can allocate the pointer array that will hold the result.
+	const int vpLen = strlen(voicePath);
+	const int count = iniCountFiles(iniPtr);
+	BB_DbLs* mbrDba = AllocZero<BB_DbLs>(count + 1);
+
+	// then we can parse and load each file.
+	for(int i=0; i<count; i++) {
+		mbrDba[i].pDbId = AllocZero<BB_DbId>();
+		::strcpy(mbrDba[i].descriptor, iniReadDescriptor(iniPtr));
+		const char* fn = iniReadFilename(iniPtr);
+		const int fnLen = strlen(fn);
+		char* path = (char*)VoidAlloc(vpLen + fnLen + 1);
+		memcpy(path, voicePath, vpLen);
+		memcpy(path + vpLen, fn, fnLen + 1);
+		if(!FileExistL(path))
+			return NULL;
+		mbrDba[i].pDbId->type = BB_ROFILE_DBMEMTYPE;
+		mbrDba[i].pDbId->link = path;
+	}
+	iniReadEnd(iniPtr);
+
+	//mbrDba[count].pDbId=NULL;
+	//::strcpy(mbrDba[count].descriptor,"END");
 
 	return mbrDba;
 }
-BB_DbLs* Syscall::initLanguageDbaL() {
+BB_DbLs* Syscall::initLanguageDbaL(const char* voicePath, char*& iniPtr) {
+	LOGD("initLanguageDbaL\n");
+	iniReadPath(iniPtr);
 	char* ptr;
-	BB_DbLs* nlpDba = AllocZero<BB_DbLs>(8);
+	const int count = iniCountFiles(iniPtr);
+	BB_DbLs* nlpDba = AllocZero<BB_DbLs>(count + 1);
 
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu.trr")))
-		return NULL;
-	nlpDba[0].pDbId = AllocZero<BB_DbId>();
-	nlpDba[0].pDbId->type = X_RAM;
-	nlpDba[0].pDbId->link = ptr;
-	::strcpy(nlpDba[0].descriptor, "PHO");
+	// then we can parse and load each file.
+	for(int i=0; i<count; i++) {
+		nlpDba[i].pDbId = AllocZero<BB_DbId>();
+		::strcpy(nlpDba[i].descriptor, iniReadDescriptor(iniPtr));
+		const char* fn = iniReadFilename(iniPtr);
+		TBuf8<KMaxFileName> buf;
+		buf.Format(_L8("%s%s"), voicePath, fn);
+		if(!(ptr = GetFileL(CCP buf.PtrZ())))
+			return NULL;
+		nlpDba[i].pDbId->type = X_RAM;
+		nlpDba[i].pDbId->link = ptr;
+	}
+	iniReadEnd(iniPtr);
 
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu_hd.bnx")))
-		return NULL;
-	nlpDba[1].pDbId = AllocZero<BB_DbId>();
-	nlpDba[1].pDbId->type = X_RAM;
-	nlpDba[1].pDbId->link = ptr;
-	::strcpy(nlpDba[1].descriptor, "BNX");
-
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu.dca")))
-		return NULL;
-	nlpDba[2].pDbId = AllocZero<BB_DbId>();
-	nlpDba[2].pDbId->type = X_RAM;
-	nlpDba[2].pDbId->link = ptr;
-	::strcpy(nlpDba[2].descriptor, "DIC");
-
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu.ldi")))
-		return NULL;
-	nlpDba[3].pDbId = AllocZero<BB_DbId>();
-	nlpDba[3].pDbId->type = X_RAM;
-	nlpDba[3].pDbId->link = ptr;
-	::strcpy(nlpDba[3].descriptor, "LDI");
-
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu.oso")))
-		return NULL;
-	nlpDba[4].pDbId = AllocZero<BB_DbId>();
-	nlpDba[4].pDbId->type = X_RAM;
-	nlpDba[4].pDbId->link = ptr;
-	::strcpy(nlpDba[4].descriptor, "PRO");
-
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu_iv.gra")))
-		return NULL;
-	nlpDba[5].pDbId = AllocZero<BB_DbId>();
-	nlpDba[5].pDbId->type = X_RAM;
-	nlpDba[5].pDbId->link = ptr;
-	::strcpy(nlpDba[5].descriptor, "GRI");
-
-	if(!(ptr = GetFileFromEitherDriveL(BABEL_BASE "kenny_11k\\enu_oov.gra")))
-		return NULL;
-	nlpDba[6].pDbId = AllocZero<BB_DbId>();
-	nlpDba[6].pDbId->type = X_RAM;
-	nlpDba[6].pDbId->link = ptr;
-	::strcpy(nlpDba[6].descriptor, "GRO");
-
-	nlpDba[7].pDbId=NULL;
-	::strcpy(nlpDba[7].descriptor,"END");
+	nlpDba[count].pDbId=NULL;
+	::strcpy(nlpDba[count].descriptor,"END");
 
 	return nlpDba;
 }
+
+
+static void iniSkipLine(char*& iniPtr) {
+	iniPtr = strchr(iniPtr, '\n');
+	DEBUG_ASSERT(iniPtr != NULL);
+	iniPtr++;
+}
+static void iniSkipWhitespace(char*& iniPtr) {
+	while(isspace(*iniPtr)) {
+		iniPtr++;
+	}
+}
+
+static void iniReadExactLine(char*& iniPtr, const char* e) {
+	// read exact
+	const int len = strlen(e);
+	DEBUG_ASSERT(memcmp(iniPtr, e, len) == 0);
+	iniPtr += len;
+	DEBUG_ASSERT(isspace(*iniPtr));
+	// skip to next line
+	iniSkipLine(iniPtr);
+}
+
+static void iniReadPath(char*& iniPtr) {
+	iniReadExactLine(iniPtr, "PATH");
+}
+
+static void iniReadEnd(char*& iniPtr) {
+	iniReadExactLine(iniPtr, "END");
+}
+
+static int iniCountFiles(char* iniPtr) {
+	int count = 0;
+	do {
+		iniSkipWhitespace(iniPtr);
+		// 3-byte descriptor, whitespace, quoted.
+		const char* descriptor = iniPtr;
+		for(int i=0; i<3; i++) {
+			DEBUG_ASSERT(isalpha(*iniPtr));
+			iniPtr++;
+		}
+		if(memcmp(descriptor, "END", 3) == 0)
+			break;
+		DEBUG_ASSERT(isspace(*iniPtr));
+		iniSkipWhitespace(iniPtr);
+		DEBUG_ASSERT(*iniPtr == '"');
+		iniPtr++;
+		char* endQ = strchr(iniPtr, '"');
+		DEBUG_ASSERT(endQ > iniPtr);
+		iniPtr = endQ;
+		iniSkipLine(iniPtr);
+		count++;
+	} while(true);
+	return count;
+}
+
+static const char* iniReadDescriptor(char*& iniPtr) {
+	iniSkipWhitespace(iniPtr);
+	const char* descriptor = iniPtr;
+	for(int i=0; i<3; i++) {
+		DEBUG_ASSERT(isalpha(*iniPtr));
+		iniPtr++;
+	}
+	DEBUG_ASSERT(isspace(*iniPtr));
+	*iniPtr = 0;
+	iniPtr++;
+	return descriptor;
+}
+
+static const char* iniReadFilename(char*& iniPtr) {
+	iniSkipWhitespace(iniPtr);
+	DEBUG_ASSERT(*iniPtr == '"');
+	iniPtr++;
+	char* filename = iniPtr;
+	char* endQ = strchr(iniPtr, '"');
+	DEBUG_ASSERT(endQ > iniPtr);
+	*endQ = 0;
+	iniPtr = endQ + 1;
+	iniSkipLine(iniPtr);
+	
+	// change slashes
+	for(char* ptr = filename; ptr != endQ; ptr++) {
+		if(*ptr == '/')
+			*ptr = '\\';
+	}
+	return filename;
+}
+
 #else
 #error Unsupported language
 #endif	//SWEDISH
@@ -546,7 +682,7 @@ void Syscall::MaoscBufferCopied(TInt aError, const TDesC8&) {
 	if(!maIsSpeaking()) {
 		MAEvent event;
 		event.type = EVENT_TYPE_TTS;
-		event.key = gTtsNextId - 1;
+		event.ked.key = gTtsNextId - 1;
 		gAppView.AddEvent(event);
 		
 		//gAudioStream->Stop();
@@ -560,7 +696,7 @@ SYSCALL(void, maStopSpeaking()) {
 	
 	MAEvent event;
 	event.type = EVENT_TYPE_TTS;
-	event.key = gTtsNextId - 1;
+	event.ked.key = gTtsNextId - 1;
 	gAppView.AddEvent(event);
 }
 

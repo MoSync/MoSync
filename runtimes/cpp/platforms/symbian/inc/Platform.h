@@ -57,12 +57,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <babile/badesca.h>
 //#define BABILE
 #ifdef BABILE2
-#include <babile/bb_def.h>
-#include <babile/bb_types.h>
-#include <babile/bb_mem.h>
-#include <babile/i_babile.h>
-#include <babile/io_babile.h>
-#include <babile/if_babile.h>
+#include <bb_def.h>
+#include <bb_types.h>
+#include <bb_mem.h>
+#include <i_babile.h>
+#include <io_babile.h>
+#include <if_babile.h>
 #else
 #define ARM_LE_SYMBIAN
 #include <bb_def.h>

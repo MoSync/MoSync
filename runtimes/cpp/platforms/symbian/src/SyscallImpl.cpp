@@ -1967,7 +1967,8 @@ int Syscall::maLocationStart() {
 int Syscall::maLocationStop() {
 	int res = gServer.LocationStop();	//silent fail
 	LOG("LocationStop: %i\n", res);
-	gLocationSync->Cancel();
+	if(gLocationSync)
+		gLocationSync->Cancel();
 	LOG("maLocationStop done.\n");
 	return res;
 }
