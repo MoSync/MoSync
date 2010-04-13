@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Syscall.h"
 
 #include <helpers/CPP_IX_GUIDO.h>
+#include <helpers/CPP_IX_NATIVE_UI.h>
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -45,6 +46,7 @@ using namespace MoSyncError;
 #include <core/core.h>
 
 #include "MoSyncMain.h"
+#include "NativeUI.h"
 
 extern ThreadPool gThreadPool;
 
@@ -612,6 +614,9 @@ namespace Base {
 		NOT_IMPLEMENTED;
 		return 0;
 	}
+	
+
+	
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
 		NOT_IMPLEMENTED;
@@ -680,6 +685,19 @@ namespace Base {
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
+				
+		case maIOCtl_maIPhoneMessageBox:
+			return maIPhoneMessageBox();
+				
+		case maIOCtl_maIPhoneLabel:
+			return maIPhoneLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
+		case maIOCtl_maIPhoneButton:
+			return maIPhoneButton(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
+		case maIOCtl_maIPhoneView:
+			return maIPhoneView(GVMRA(MAWidgetHandle));
+
 				
 		}
 		

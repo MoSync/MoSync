@@ -19,13 +19,17 @@
 
 @class MoSyncViewController;
 
+
 @interface MoSyncAppDelegate : NSObject <UIApplicationDelegate> {
     UIWindow *window;
     MoSyncViewController *viewController;
+
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet MoSyncViewController *viewController;
+
+
 
 @end
 

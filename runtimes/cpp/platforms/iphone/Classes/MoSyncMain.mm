@@ -33,11 +33,11 @@
 #include <helpers/CriticalSection.h>
 
 using namespace Base;
-
+static UIView *sMoSyncView;
 static MAHandle gReloadHandle = 0;
 bool gRunning = false;
 
-static UIView *sMoSyncView;
+
 static int sWidth, sHeight;
 
 int MoSyncThreadMain(void *args) {
@@ -107,4 +107,8 @@ void ShowMessageBox(const char *msg, bool kill) {
 
 void Exit() {
 	[[UIApplication sharedApplication] terminateWithSuccess];
+}
+
+UIView *getMoSyncView() {
+	return sMoSyncView;
 }

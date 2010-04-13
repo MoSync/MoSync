@@ -24,6 +24,11 @@
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
+-(void) addLabel:(id) obj;
+-(void) showLabel:(NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h;
+-(void) addButton:(id) obj;
+-(void) showButton:(NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h;
+-(void) addScreen:(id) obj;
+-(MoSyncView *) showScreen;
+
 @end
-
-

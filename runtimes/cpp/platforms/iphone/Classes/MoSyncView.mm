@@ -22,6 +22,10 @@
 
 #include "Platform.h"
 
+
+
+static MoSyncView *currentScreen;
+
 @interface UIApplication(MyExtras) 
 - (void)terminateWithSuccess; 
 @end
@@ -48,6 +52,22 @@
 		Exit();
 }
 @end
+
+// Used to pass parameters to the widgets, through performSelectorOnMainThread
+@interface WidgetHandler : UIViewController <UIAlertViewDelegate> {
+	NSString *msg;
+	int x,y,l,h;
+}
+@property (copy, nonatomic) NSString* msg;
+@property int x,y,l,h;
+@end
+
+@implementation WidgetHandler
+@synthesize msg;
+@synthesize x,y,l,h;
+@end
+
+
 
 @implementation MoSyncView
 
@@ -141,6 +161,63 @@ bool down = false;
 	mbh.kill = kill;
 	mbh.msg = msg;
 	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
+}
+
+-(void) addLabel:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	UILabel *myLabel = [[UILabel alloc] initWithFrame:CGRectMake(wh.x, wh.y, wh.l, wh.h)];
+	myLabel.text = wh.msg;
+	[self addSubview:myLabel];
+	
+	
+}
+
+-(void) showLabel: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.msg = msg;
+	wh.x = x;
+	wh.y = y;
+	wh.l = l;
+	wh.h = h;
+	[self performSelectorOnMainThread: @ selector(addLabel:) withObject:(id)wh waitUntilDone:NO];
+	
+}
+
+-(void) addButton:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+	button.frame = CGRectMake(wh.x, wh.y, wh.l, wh.h);
+	[button setTitle:wh.msg forState:UIControlStateNormal];
+	//[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
+	[self addSubview:button];
+	
+}
+
+-(void) showButton: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.msg = msg;
+	wh.x = x;
+	wh.y = y;
+	wh.l = l;
+	wh.h = h;
+	[self performSelectorOnMainThread: @ selector(addButton:) withObject:(id)wh waitUntilDone:NO];
+	
+}
+
+-(void) addScreen:(id) obj {
+	CGRect frame = CGRectMake(0, 0, 320, 480);
+	MoSyncView *v = [[MoSyncView alloc] initWithFrame:frame];
+	[self addSubview:v ];
+	v.backgroundColor = [UIColor whiteColor];
+	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
+	currentScreen = v;
+	
+}
+
+-(MoSyncView *) showScreen {
+	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)nil waitUntilDone:YES];
+	return currentScreen;
+	
 }
 
 @end

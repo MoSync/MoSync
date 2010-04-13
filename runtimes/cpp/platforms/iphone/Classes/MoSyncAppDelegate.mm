@@ -18,6 +18,7 @@
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
 
+
 #include "Platform.h"
 
 @implementation MoSyncAppDelegate
@@ -28,8 +29,15 @@
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
     
-    // Override point for customization after app launch    
+    // Override point for customization after app launch   
+	//self.viewController = [MoSyncViewController alloc];
     [window addSubview:viewController.view];
+	
+
+	//[window addSubview:nativeUIViewController.view];
+	
+	
+	
     [window makeKeyAndVisible];
 }
 
@@ -39,9 +47,13 @@
 
 - (void)dealloc {
     [viewController release];
+	
     [window release];
     [super dealloc];
 }
 
 
+
 @end
+
+
