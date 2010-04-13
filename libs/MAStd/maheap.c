@@ -198,7 +198,15 @@ void free(void *mem)
 void* realloc(void* old, int size) {
 	MASTD_HEAP_LOG("realloc(0x%08X, %i)\n", (int)old, size);
 
-	return gReallocHook(old, size);
+	void* result = gReallocHook(old, size);
+	if(result == 0)
+	{
+		if (!gMallocHandler)
+			return 0;
+		gMallocHandler(size);
+		result = gReallocHook(old, size);
+	}
+	return result;
 }
 
 #endif /* MAPIP */

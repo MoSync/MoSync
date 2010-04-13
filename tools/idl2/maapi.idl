@@ -1115,7 +1115,7 @@ interface MAAPI {
 		/// Bluetooth discovery
 		BT = 5;
 #if IX_GUIDO
-		/// Has MAEvent::key be the identifier for the TTS session, as returned by maStartSpeaking().
+		/// Has MAEvent::ked::key be the identifier for the TTS session, as returned by maStartSpeaking().
 		TTS = 6;
 #endif	//IX_GUIDO
 #if IX_WLAN
