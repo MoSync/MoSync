@@ -28,7 +28,10 @@
 -(void) showLabel:(NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h;
 -(void) addButton:(id) obj;
 -(void) showButton:(NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h;
+-(void) addTextField:(id) obj;
+-(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h;
 -(void) addScreen:(id) obj;
 -(MoSyncView *) showScreen;
+-(void) passEvent:(id) obj;
 
 @end

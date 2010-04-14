@@ -188,7 +188,7 @@ bool down = false;
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	button.frame = CGRectMake(wh.x, wh.y, wh.l, wh.h);
 	[button setTitle:wh.msg forState:UIControlStateNormal];
-	//[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
+	[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
 	[self addSubview:button];
 	
 }
@@ -201,6 +201,27 @@ bool down = false;
 	wh.l = l;
 	wh.h = h;
 	[self performSelectorOnMainThread: @ selector(addButton:) withObject:(id)wh waitUntilDone:NO];
+	
+}
+
+-(void) addTextField:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(wh.x, wh.y, wh.l, wh.h)];
+	textField.placeholder = wh.msg;
+	//[button setTitle:wh.msg forState:UIControlStateNormal];
+	//[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
+	[self addSubview:textField];
+	
+}
+
+-(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.msg = msg;
+	wh.x = x;
+	wh.y = y;
+	wh.l = l;
+	wh.h = h;
+	[self performSelectorOnMainThread: @ selector(addTextField:) withObject:(id)wh waitUntilDone:NO];
 	
 }
 
@@ -217,6 +238,10 @@ bool down = false;
 -(MoSyncView *) showScreen {
 	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)nil waitUntilDone:YES];
 	return currentScreen;
+	
+}
+
+-(void) passEvent:(id) obj {
 	
 }
 
