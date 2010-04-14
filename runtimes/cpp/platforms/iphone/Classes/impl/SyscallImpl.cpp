@@ -699,7 +699,7 @@ namespace Base {
 			return maIPhoneEdit(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
 		case maIOCtl_maIPhoneView:
-			return maIPhoneView(GVMRA(MAWidgetHandle));
+			return maIPhoneView(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
 				
 		}

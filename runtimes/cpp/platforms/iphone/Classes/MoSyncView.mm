@@ -56,15 +56,15 @@ static MoSyncView *currentScreen;
 // Used to pass parameters to the widgets, through performSelectorOnMainThread
 @interface WidgetHandler : UIViewController <UIAlertViewDelegate> {
 	NSString *msg;
-	int x,y,l,h;
+	int x,y,l,h, widgetId;
 }
 @property (copy, nonatomic) NSString* msg;
-@property int x,y,l,h;
+@property int x,y,l,h, widgetId;
 @end
 
 @implementation WidgetHandler
 @synthesize msg;
-@synthesize x,y,l,h;
+@synthesize x,y,l,h, widgetId;
 @end
 
 
@@ -172,13 +172,14 @@ bool down = false;
 	
 }
 
--(void) showLabel: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+-(void) showLabel: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
 	WidgetHandler *wh = [WidgetHandler alloc];
 	wh.msg = msg;
 	wh.x = x;
 	wh.y = y;
 	wh.l = l;
 	wh.h = h;
+	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addLabel:) withObject:(id)wh waitUntilDone:NO];
 	
 }
@@ -188,18 +189,20 @@ bool down = false;
 	UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	button.frame = CGRectMake(wh.x, wh.y, wh.l, wh.h);
 	[button setTitle:wh.msg forState:UIControlStateNormal];
-	[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
+	button.tag = wh.widgetId;
+	[button addTarget:self action:@selector(passEvent:) forControlEvents:UIControlEventTouchUpInside];
 	[self addSubview:button];
 	
 }
 
--(void) showButton: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+-(void) showButton: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
 	WidgetHandler *wh = [WidgetHandler alloc];
 	wh.msg = msg;
 	wh.x = x;
 	wh.y = y;
 	wh.l = l;
 	wh.h = h;
+	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addButton:) withObject:(id)wh waitUntilDone:NO];
 	
 }
@@ -214,35 +217,44 @@ bool down = false;
 	
 }
 
--(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h {
+-(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
 	WidgetHandler *wh = [WidgetHandler alloc];
 	wh.msg = msg;
 	wh.x = x;
 	wh.y = y;
 	wh.l = l;
 	wh.h = h;
+	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addTextField:) withObject:(id)wh waitUntilDone:NO];
 	
 }
 
 -(void) addScreen:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
 	CGRect frame = CGRectMake(0, 0, 320, 480);
 	MoSyncView *v = [[MoSyncView alloc] initWithFrame:frame];
+	v.tag = wh.widgetId;
 	[self addSubview:v ];
 	v.backgroundColor = [UIColor whiteColor];
 	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
 	currentScreen = v;
+	Base::gEventQueue.addNativeUIEvent([v tag], 0);
+	NSLog(@"the tag value is: %d", [v tag]);
 	
 }
 
--(MoSyncView *) showScreen {
-	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)nil waitUntilDone:YES];
+-(MoSyncView *) showScreen:(int) widgetid {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.widgetId = widgetid;
+	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)wh waitUntilDone:YES];
 	return currentScreen;
 	
 }
 
 -(void) passEvent:(id) obj {
-	
+
+	Base::gEventQueue.addNativeUIEvent([obj tag], 0);
+	NSLog(@"the tag value is: %d", [obj tag]);
 }
 
 @end

@@ -35,6 +35,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ThreadPoolImpl.h"
 
+#include <helpers/CPP_IX_NATIVE_UI.h>
+
 namespace Core {
 	class VMCore;
 }
@@ -135,6 +137,23 @@ public:
 			event.type = type;
 			event.point.x = x;
 			event.point.y = y;
+			put(event);
+		}		
+	}
+	
+	void addNativeUIEvent(int widgetId, int actionType) {
+		if(!mEventOverflow) {
+			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
+				mEventOverflow = true;
+				clear();
+				LOG("EventBuffer overflow!\n");
+			}
+			/* put event in event queue */
+			MAEvent event;
+			event.lo_wparam = widgetId;
+			event.hi_wparam = actionType;
+			event.type = EVENT_TYPE_NATIVE_UI_MSG;
+
 			put(event);
 		}		
 	}
