@@ -8,10 +8,12 @@
 
 int MAMain() {
 	
-	//maIPhoneMessageBox();
-	//maIPhoneLabel();
+	
+	MAWidgetParameters wparams0;
+	wparams0.widgetID = 10;
+	
 	MAWidgetHandle whandle;
-	maIPhoneView(&whandle);
+	maIPhoneView(&wparams0, &whandle);
 	
 	MAWidgetParameters wparams;
 	wparams.pParent = whandle.pWidget;
@@ -21,6 +23,7 @@ int MAMain() {
 	wparams.posY = 30;
 	wparams.sizeX = 300;
 	wparams.sizeY = 30;
+	wparams.widgetID = 666;
 	
 	MAWidgetParameters wparams2;
 	wparams2.pParent = whandle.pWidget;
@@ -31,10 +34,53 @@ int MAMain() {
 	wparams2.sizeX = 300;
 	wparams2.sizeY = 30;
 	
+	MAWidgetParameters wparams3;
+	wparams3.pParent = whandle.pWidget;
+	char *str3="Even I am a native widget !";
+	strncpy(wparams3.buf, str2, strlen(str3)+1);
+	wparams3.posX = 10;
+	wparams3.posY = 150;
+	wparams3.sizeX = 300;
+	wparams3.sizeY = 30;
+	
 	maIPhoneLabel(&wparams2, NULL);
 	maIPhoneButton(&wparams, NULL);
-	//maIPhoneButton();
-	//maIPhoneView();
-	FREEZE;
+	maIPhoneEdit(&wparams3, NULL);
+
+	// Handle events
+	MAEvent event;
+	do {
+		while(maGetEvent(&event)) {
+			if(event.type == EVENT_TYPE_NATIVE_UI_MSG) {
+				
+				switch(event.lo_wparam) {
+					case 666:
+						if(event.hi_wparam==0) {
+							
+							MAWidgetParameters wparams4;
+							wparams4.widgetID = 11;
+							
+							MAWidgetHandle whandle2;
+							maIPhoneView(&wparams4, &whandle2);
+							
+							
+						}
+						break;
+						
+						
+					case 10:
+						
+						break;
+						
+
+
+				}
+
+
+			}
+		}
+		maWait(0);
+	} while(1);
+	
 	return 0;
 } 
