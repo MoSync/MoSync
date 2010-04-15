@@ -36,6 +36,7 @@ public class MoSync extends Activity
 {
 	MoSyncView mMosyncView;
 	boolean paused;
+	boolean mNoReload;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,7 +47,7 @@ public class MoSync extends Activity
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		
+				
 		buildMoSyncView();
 		setContentView(mMosyncView);
     }
@@ -70,15 +71,21 @@ public class MoSync extends Activity
     protected void onStop()
 	{
 		super.onStop();
+		mNoReload = mMosyncView.mNoReload;
+		
 		// stop the thread but keep everything alive.
     	Log.i("MoSync","onStop");
     	mMosyncView.stopThread();
+		
+		if(true == mNoReload) finish();
     }
 
 	@Override
     protected void onRestart()
 	{
 		super.onRestart();
+		
+		if(true == mNoReload) finish();
 		
 		// reset the runtime and load the program and resource file again
     	Log.i("MoSync","onRestart");
@@ -90,6 +97,8 @@ public class MoSync extends Activity
     protected void onResume()
 	{
 		super.onResume();
+		
+		if(true == mNoReload) finish();
 		
 		registerReceiver(mBatteryReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 		
@@ -105,12 +114,15 @@ public class MoSync extends Activity
     protected void onPause()
 	{
 		super.onPause();
+		mNoReload = mMosyncView.mNoReload;
 		
 		unregisterReceiver(mBatteryReciever);
 		
 		paused = true;
     	Log.i("MoSync","onPause");
 		mMosyncView.postFocusLostEvent();
+		
+		if(true == mNoReload) finish();
     }
 
 	@Override
@@ -118,10 +130,10 @@ public class MoSync extends Activity
 	{
 		super.onDestroy();
 		
-		// Destroy everything and quit
     	Log.i("MoSync","onDestroy");
-		//mMosyncView.stopThread();
-		mMosyncView.killApplication();
+		mMosyncView.stopThread();
+		finish();
+		//mMosyncView.killApplication();
     }
 	
 	private BroadcastReceiver mBatteryReciever = new BroadcastReceiver()
@@ -142,6 +154,6 @@ public class MoSync extends Activity
 				mMosyncView.setBatteryCharge(battery);
 			}
 		}
-    }; 
-
+    };
 }
+

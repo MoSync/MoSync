@@ -33,5 +33,6 @@ call process ../../shared MAPanicReport 11
 call process src MoSync 12
 call process src MoSyncView 13
 call process src Syscall 14
+call process src MoSyncPanicDialog 15
 
 :END

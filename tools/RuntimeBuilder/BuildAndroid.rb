@@ -83,7 +83,7 @@ class RuntimeBuilder
 		
 		# Preprocess all the platform dependant java files and store result in temporary location
 		Dir.foreach(android_source) {|x| 
-			if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "Syscall.jpp" || x == "Core.jpp")
+			if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "Syscall.jpp" || x == "MoSyncPanicDialog.jpp" || )
 				preprocess_java_file(x, "#{android_source}/", android_source, temp_dir, "_android")
 			end
 		}
