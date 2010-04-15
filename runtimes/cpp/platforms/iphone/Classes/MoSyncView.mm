@@ -170,6 +170,7 @@ bool down = false;
 	[self addSubview:myLabel];
 	
 	
+	
 }
 
 -(void) showLabel: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
@@ -193,6 +194,7 @@ bool down = false;
 	[button addTarget:self action:@selector(passEvent:) forControlEvents:UIControlEventTouchUpInside];
 	[self addSubview:button];
 	
+	
 }
 
 -(void) showButton: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
@@ -215,6 +217,7 @@ bool down = false;
 	//[button addTarget:self action:@selector(myAction:) forControlEvents:UIControlEventTouchUpInside];
 	[self addSubview:textField];
 	
+	
 }
 
 -(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
@@ -229,6 +232,16 @@ bool down = false;
 	
 }
 
+- (void)navigationBar:(UINavigationBar*)bar buttonClicked:(int)button
+{
+    if (button == 1)
+    {
+		[self.superview sendSubviewToBack:currentScreen];
+        NSLog(@"nav");
+    }
+
+}
+
 -(void) addScreen:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
 	CGRect frame = CGRectMake(0, 0, 320, 480);
@@ -237,9 +250,18 @@ bool down = false;
 	[self addSubview:v ];
 	v.backgroundColor = [UIColor whiteColor];
 	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
+	/*
+	UINavigationBar *nav = [[UINavigationBar alloc] 
+		   initWithFrame: CGRectMake(0.0f, 20.0f, 320.0f, 48.0f)];
+    [nav showButtonsWithLeftTitle: @"Back" 
+					   rightTitle: nil leftBack: YES];
+    [nav setDelegate: self];
+	[self addSubview:nav];
+	*/
 	currentScreen = v;
 	Base::gEventQueue.addNativeUIEvent([v tag], 0);
 	NSLog(@"the tag value is: %d", [v tag]);
+	
 	
 }
 
@@ -251,10 +273,33 @@ bool down = false;
 	
 }
 
+-(void) addNavigationBar:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	UINavigationBar *nav = [[UINavigationBar alloc] 
+							initWithFrame: CGRectMake(0.0f, 20.0f, 320.0f, 48.0f)];
+    [nav showButtonsWithLeftTitle: @"Back" 
+					   rightTitle: nil leftBack: YES];
+	nav.topItem.title = wh.msg;
+    [nav setDelegate: self];
+	[self addSubview:nav];
+	
+	
+}
+
+-(void) showNavigationBar: (NSString*) msg {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.msg = msg;
+	[self performSelectorOnMainThread: @ selector(addNavigationBar:) withObject:(id)wh waitUntilDone:NO];
+	
+}
+
 -(void) passEvent:(id) obj {
 
 	Base::gEventQueue.addNativeUIEvent([obj tag], 0);
 	NSLog(@"the tag value is: %d", [obj tag]);
+	
 }
+
+
 
 @end

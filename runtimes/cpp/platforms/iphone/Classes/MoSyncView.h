@@ -30,6 +30,9 @@
 -(void) showButton:(NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid;
 -(void) addTextField:(id) obj;
 -(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid;
+- (void)navigationBar:(UINavigationBar*)bar buttonClicked:(int)button;
+-(void) addNavigationBar:(id) obj;
+-(void) showNavigationBar: (NSString*) msg;
 -(void) addScreen:(id) obj;
 -(MoSyncView *) showScreen:(int) widgetid;
 -(void) passEvent:(id) obj;

@@ -700,6 +700,9 @@ namespace Base {
 				
 		case maIOCtl_maIPhoneView:
 			return maIPhoneView(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
+		case maIOCtl_maIPhoneNavigationBar:
+			return maIPhoneNavigationBar(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
 				
 		}
