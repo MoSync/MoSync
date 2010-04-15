@@ -14,13 +14,19 @@ int MAMain() {
 	
 	MAWidgetHandle whandle;
 	maIPhoneView(&wparams0, &whandle);
-	
+	/*
+	MAWidgetParameters wparamsBar;
+	char *str1="Hello";
+	wparamsBar.pParent = whandle.pWidget;
+	strncpy(wparamsBar.buf, str1, strlen(str1)+1);
+	maIPhoneNavigationBar(&wparamsBar, NULL);
+	*/
 	MAWidgetParameters wparams;
 	wparams.pParent = whandle.pWidget;
-	char *str1="I am a native widget !";
-	strncpy(wparams.buf, str1, strlen(str1)+1);
+	char *strBar="Open a new window";
+	strncpy(wparams.buf, strBar, strlen(strBar)+1);
 	wparams.posX = 10;
-	wparams.posY = 30;
+	wparams.posY = 200;
 	wparams.sizeX = 300;
 	wparams.sizeY = 30;
 	wparams.widgetID = 666;
@@ -63,6 +69,11 @@ int MAMain() {
 							MAWidgetHandle whandle2;
 							maIPhoneView(&wparams4, &whandle2);
 							
+							MAWidgetParameters wparamsBar;
+							char *str1="Hello";
+							wparamsBar.pParent = whandle2.pWidget;
+							strncpy(wparamsBar.buf, str1, strlen(str1)+1);
+							maIPhoneNavigationBar(&wparamsBar, NULL);
 							
 						}
 						break;
