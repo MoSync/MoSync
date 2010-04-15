@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/hash_map.h>
 
 #include <helpers/cpp_defs.h>
-#include <helpers/CPP_IX_CONNSERVER.h>
 #include <helpers/smartie.h>
 
 #include <bluetooth/connection.h>

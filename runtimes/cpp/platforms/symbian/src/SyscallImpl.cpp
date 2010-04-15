@@ -1228,7 +1228,7 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 
 	case maIOCtl_maAccept:
 		SYSCALL_THIS->maAccept(a);
-		return 0;
+		return 1;
 
 	case maIOCtl_maBtStartDeviceDiscovery:
 		BLUETOOTH(maBtStartDeviceDiscovery)(a != 0);

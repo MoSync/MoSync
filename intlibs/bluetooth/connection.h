@@ -34,7 +34,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 
 #include "btinit.h"
-#include "helpers/CPP_IX_CONNSERVER.h"
 
 class HttpConnection;
 

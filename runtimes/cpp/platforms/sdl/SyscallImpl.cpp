@@ -51,7 +51,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_CONNSERVER.h>
 #include <helpers/CPP_IX_FILE.h>
 
 // blah
@@ -1800,7 +1799,7 @@ namespace Base {
 
 		case maIOCtl_maAccept:
 			maAccept(a);
-			return 0;
+			return 1;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);

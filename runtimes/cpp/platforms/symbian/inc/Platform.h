@@ -93,8 +93,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_CELLID.h>
 
-#include <helpers/CPP_IX_CONNSERVER.H>
-
 #include <VideoPlayer.h>
 #include <helpers/CPP_IX_STREAMING.H>
 

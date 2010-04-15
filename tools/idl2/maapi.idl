@@ -617,9 +617,7 @@ interface MAAPI {
 		WRITE = 2;
 		CONNECT = 5;	//READ | WRITE | 4
 		FINISH = 11;	//READ | WRITE | 8
-#if IX_CONNSERVER
 		ACCEPT = 16;
-#endif
 	}
 	constset int CONN_ {
 		/// The maximum number of open connections allowed.
@@ -2486,7 +2484,7 @@ interface MAAPI {
 		* To accept another connection after such an event, call this function again.
 		*
 		* \param serv A server connection, opened with maConnect.
-		* \returns \< 0 on error.
+		* \returns \< 0 on error, \> 0 on success.
 		* \see maConnect
 		* \see maGetEvent
 		*/
