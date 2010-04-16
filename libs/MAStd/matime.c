@@ -89,7 +89,7 @@ struct tm* split_time(time_t timer, struct tm* res)
 		for (;;)
 		{
 			yleap = _ISLEAP(y);
-			if (days < year_lengths[yleap])
+			if (days <= year_lengths[yleap])
 				break;
 			y++;
 			days -= year_lengths[yleap];
@@ -108,7 +108,7 @@ struct tm* split_time(time_t timer, struct tm* res)
 	res->tm_year = y - YEAR_BASE;
 	res->tm_yday = days;
 	ip = mon_lengths[yleap];
-	for (res->tm_mon = 0; days >= ip[res->tm_mon]; ++res->tm_mon)
+	for (res->tm_mon = 0; days > ip[res->tm_mon]; ++res->tm_mon)
 		days -= ip[res->tm_mon];
 	res->tm_mday = days; 
 
