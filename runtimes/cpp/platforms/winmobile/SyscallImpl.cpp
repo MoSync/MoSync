@@ -163,6 +163,8 @@ namespace Base {
 	unsigned int screenPitchX, screenPitchY;
 	MAHandle drawTargetHandle = HANDLE_SCREEN;
 
+	bool gGraphicsActive = true;
+
 	uint realColor;
 	uint currentColor;
 	uint oldColor;
@@ -456,20 +458,24 @@ namespace Base {
 	}
 
 	void Resume() {
+		if(gGraphicsActive) return;
 #if _WIN32_WCE < 0x502	
 		if(graphicsMode == GRAPHICSMODE_GX) GXResume();
 #else
 		g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_FULLSCREEN);
 		g_pDD->RestoreAllSurfaces();
 #endif
+		gGraphicsActive = true;
 	}
 
 	void Suspend() {
+		if(!gGraphicsActive) return;
 #if _WIN32_WCE < 0x502				
 		if(graphicsMode == GRAPHICSMODE_GX) GXSuspend();
 #else
 		g_pDD->SetCooperativeLevel(g_hwndMain, DDSCL_NORMAL); 
 #endif
+		gGraphicsActive = false;
 	}
 
 DWORD GetScreenOrientation()
@@ -489,6 +495,8 @@ DWORD GetScreenOrientation()
 	LRESULT CALLBACK WndProc (HWND hwnd, UINT umsg, WPARAM wParam, 
 		LPARAM lParam)
 	{
+		if(wParam == VK_F24) return DefWindowProc (hwnd, umsg, wParam, lParam);
+
 		switch (umsg)
 		{
 			// Add cases such as WM_CREATE, WM_COMMAND, WM_PAINT if you don't 
@@ -530,6 +538,8 @@ DWORD GetScreenOrientation()
 				return 0;
 			}
 
+			if(wParam == VK_TTALK) break;
+
 			if(lParam&0x40000000) return 0; // check if it has been repeated more than once		q
 			//if(wParam == VK_TBACK) {
 			//	GLE(PostMessage(hwnd, WM_CLOSE, 0, 0));
@@ -558,7 +568,6 @@ DWORD GetScreenOrientation()
 			ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(lParam, (Stream*)wParam));
 			return 0;
 
-			/*
 			// doesnt work yet.
 		case WM_SETFOCUS:
 			{
@@ -583,8 +592,11 @@ DWORD GetScreenOrientation()
 				Suspend();
 			}
 			return 0;
-			*/
-
+      case WM_CANCELMODE:
+			Suspend();
+			InitWindowed();
+			ShowWindow(g_hwndMain, SW_MINIMIZE);
+            return 0;
 			/*
 		case WM_GRAPHNOTIFY:
             VideoHandleEvent((VideoStream*)lParam);
@@ -1063,7 +1075,7 @@ DWORD GetScreenOrientation()
 
 	static void MAUpdateScreen() 
 	{
-		if(GetForegroundWindow()!=g_hwndMain) return;
+		if(GetForegroundWindow()!=g_hwndMain || gGraphicsActive==false) return;
 
 #if (_WIN32_WCE < 0x502)
 		if(graphicsMode == GRAPHICSMODE_GX) {
