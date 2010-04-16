@@ -1214,7 +1214,7 @@ int Syscall::maGetBatteryCharge() {
 }
 #endif	//TELEPHONY
 
-#ifdef __SERIES60_3X__
+#if 0//def __SERIES60_3X__
 	const TInt KBrowserUid = 0x1020724D;
 #else
 	const TInt KBrowserUid = 0x10008D39;
