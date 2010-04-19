@@ -19,8 +19,13 @@
 
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
+	UIToolbar *toolbar;
+	NSMutableArray *items;
+	
 
 }
+
+
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
@@ -31,10 +36,16 @@
 -(void) addTextField:(id) obj;
 -(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid;
 - (void)navigationBar:(UINavigationBar*)bar buttonClicked:(int)button;
+- (void) pressButton1:(id)sender;
 -(void) addNavigationBar:(id) obj;
 -(void) showNavigationBar: (NSString*) msg;
 -(void) addScreen:(id) obj;
 -(MoSyncView *) showScreen:(int) widgetid;
+-(void) addToolBar:(id) obj;
+-(void) showToolBar: (NSString*) msg;
+-(void) showToolBarItem: (NSString*) msg;
+-(void) addToolBarItem:(id) obj;
 -(void) passEvent:(id) obj;
+
 
 @end

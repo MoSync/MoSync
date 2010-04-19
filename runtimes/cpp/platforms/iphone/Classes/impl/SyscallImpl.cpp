@@ -704,6 +704,11 @@ namespace Base {
 		case maIOCtl_maIPhoneNavigationBar:
 			return maIPhoneNavigationBar(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
+		case maIOCtl_maIPhoneToolBar:
+			return maIPhoneToolBar(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
+		case maIOCtl_maIPhoneToolBarItem:
+			return maIPhoneToolBarItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
 		}
 		
