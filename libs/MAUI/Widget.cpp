@@ -252,9 +252,11 @@ namespace MAUI {
 	}
 
 	Widget* Widget::widgetAt(int x, int y) {
-		Vector_each(Widget*,it,children) {
-			Widget *ret = widgetAt(x, y);
-			if(ret) return ret;
+		Vector_each(Widget *, it, children) {
+			Widget *ret = (*it)->widgetAt(x, y);
+			if(ret) {
+				return ret;
+			}
 		}
 
 		if(bounds.contains(x, y)) {
