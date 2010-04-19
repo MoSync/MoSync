@@ -206,6 +206,26 @@ namespace Base {
 	extern CRITICAL_SECTION vibrationCS;
 	extern UINT_PTR vibrationId;
 
+	// change this to use pairs??
+	typedef void (*WinMobileEventCallback)(void);
+	std::vector<WinMobileEventCallback> winMobileEventCallbacks;
+	std::vector<HANDLE> winMobileEventHandles;
+
+	void addWinMobileEvent(HANDLE event, WinMobileEventCallback callback) {
+		winMobileEventHandles.push_back(event);
+		winMobileEventCallbacks.push_back(callback);
+	}
+
+	void removeWinMobileEvent(HANDLE event) {
+		for(unsigned int i = 0; i < winMobileEventHandles.size(); i++) {
+			if(winMobileEventHandles[i] == event) {
+				winMobileEventCallbacks.erase(winMobileEventCallbacks.begin()+i);
+				winMobileEventHandles.erase(winMobileEventHandles.begin()+i);
+				return;
+			}
+		}
+	}
+
 	//***************************************************************************
 	// Resource loading
 	//***************************************************************************
@@ -532,13 +552,17 @@ DWORD GetScreenOrientation()
 				//ShowWindow(hwnd, SW_HIDE);
 				//EnableWindow(hwnd, FALSE);
 				//SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_HIDEWINDOW);
-				MoSyncExit(303);
+				
+				//MoSyncExit(303);
+				Suspend();
+				InitWindowed();
+				ShowWindow(g_hwndMain, SW_MINIMIZE);
 				return 0;
 			}
 
 			if(wParam == VK_TTALK) break;
 
-			if(lParam&0x40000000) return 0; // check if it has been repeated more than once		q
+			if(lParam&0x40000000) return 0; // check if it has been repeated more than once
 			//if(wParam == VK_TBACK) {
 			//	GLE(PostMessage(hwnd, WM_CLOSE, 0, 0));
 			//}
@@ -566,7 +590,6 @@ DWORD GetScreenOrientation()
 			ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(lParam, (Stream*)wParam));
 			return 0;
 
-			// doesnt work yet.
 		case WM_SETFOCUS:
 			{
 				//InitGraphics();
@@ -575,6 +598,7 @@ DWORD GetScreenOrientation()
 				event.type = EVENT_TYPE_FOCUS_GAINED;
 				gEventFifo.put(event);
 				Resume();
+				//InitFullScreen();
 				MAUpdateScreen();
 				//SetForegroundWindow(hwnd);
 			}
@@ -588,6 +612,8 @@ DWORD GetScreenOrientation()
 				event.type = EVENT_TYPE_FOCUS_LOST;
 				gEventFifo.put(event);
 				Suspend();
+				//InitWindowed();
+				//ShowWindow(g_hwndMain, SW_MINIMIZE);
 			}
 			return 0;
       case WM_CANCELMODE:
@@ -1702,25 +1728,6 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
-	// change this to use pairs??
-	typedef void (*WinMobileEventCallback)(void);
-	std::vector<WinMobileEventCallback> winMobileEventCallbacks;
-	std::vector<HANDLE> winMobileEventHandles;
-	void addWinMobileEvent(HANDLE event, WinMobileEventCallback callback) {
-		winMobileEventHandles.push_back(event);
-		winMobileEventCallbacks.push_back(callback);
-	}
-
-	void removeWinMobileEvent(HANDLE event) {
-		for(unsigned int i = 0; i < winMobileEventHandles.size(); i++) {
-			if(winMobileEventHandles[i] == event) {
-				winMobileEventCallbacks.erase(winMobileEventCallbacks.begin()+i);
-				winMobileEventHandles.erase(winMobileEventHandles.begin()+i);
-				return;
-			}
-		}
-	}
-
 	SYSCALL(void, maWait(int timeout)) 
 	{
 		if(gClosing)
@@ -1829,7 +1836,7 @@ DWORD GetScreenOrientation()
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
 			int strSize = strlen(url)+1;
-			sei.lpFile = new TCHAR[strSize];
+			sei.lpFile = new TCHAR[strSize]; // memory leak?
 			convertAsciiToUnicode((LPWSTR)sei.lpFile, strSize, url);
 			sei.nShow = SW_SHOW;
 			ShellExecuteEx(&sei);
@@ -2295,9 +2302,9 @@ DWORD GetScreenOrientation()
 	}
 
 	void fillBufferCallback() {
-		MAEvent audioEvent;
-		audioEvent.type = EVENT_TYPE_AUDIOBUFFER_FILL;
-		gEventFifo.put(audioEvent);
+		MAEvent* ep = new MAEvent;
+		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);
 	}
 
 	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
@@ -2309,6 +2316,7 @@ DWORD GetScreenOrientation()
 		src = new BufferAudioSource(ainfo, fillBufferCallback);
 		AudioEngine::getChannel(1)->setAudioSource(src);
 		AudioEngine::getChannel(1)->setActive(true);
+
 		return 1;
 	}
 
@@ -2319,6 +2327,7 @@ DWORD GetScreenOrientation()
 	}
 
 	static int maAudioBufferClose() {
+
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close();

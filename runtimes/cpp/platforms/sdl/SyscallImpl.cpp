@@ -1650,10 +1650,12 @@ namespace Base {
 	}
 
 	static void fillBufferCallback() {
-		MAEvent audioEvent;
-		audioEvent.type = EVENT_TYPE_AUDIOBUFFER_FILL;
-		gEventFifo.put(audioEvent);
+		MAEvent* ep = new MAEvent;
+		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
+		FE_PushEvent((SDL_Event*)&event);
 	}
+
 
 	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
