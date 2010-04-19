@@ -30,6 +30,7 @@ def get_gcc_version_string(gcc)
 			return parts[2]
 		end
 	end
+	
 	error("Could not find gcc version.")
 end
 
@@ -71,6 +72,7 @@ class CompileGccTask < FileTask
 	
 	def execute
 		execFlags
+		
 		sh "#{@work.gcc} -o #{@NAME}#{@FLAGS} #{@work.gccmode} #{File.expand_path(@SOURCE)}"
 		
 		# In certain rare cases (error during preprocess caused by a header file)

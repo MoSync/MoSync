@@ -48,7 +48,7 @@ else
 	pedantic_warnings += optimizer_dependent
 end
 
-standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
+standard_warnings = " -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
 
 
 include_dirs = @EXTRA_INCLUDES

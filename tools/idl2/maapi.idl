@@ -2810,6 +2810,15 @@ interface MAAPI {
 		int maAndroidAddEditText(in int id, in MAString str);
 		int maAndroidAddButton(in int id, in MAString str);
 		int maAndroidAddMenuItem(in int id, in MAString str);
+		
+		int maIPhoneMessageBox();
+		int maIPhoneLabel(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneView(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneNavigationBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneToolBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneToolBarItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 
 
 #endif //IX_NATIVE_UI
