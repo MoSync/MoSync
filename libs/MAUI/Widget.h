@@ -118,11 +118,17 @@ namespace MAUI {
 		// Hierarchy
 
 		/**
-		 * Function used to add childs to a widget. The parent
+		 * Function used to add children to a widget. The parent
 		 * of the children will automatically be set.
 		 * The widget cannot have a parent already.
 		 **/
 		virtual void add(Widget* w);
+
+		/**
+		 * Function used to remove all children from a widget. The parent
+		 * of the children will automatically removed.
+		 **/
+		virtual void clear();
 		
 		/**
 		 * Function used to set the parent of a widget. The widget

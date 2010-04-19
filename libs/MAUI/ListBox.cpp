@@ -169,6 +169,14 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+	void ListBox::clear() {
+		for(int i = 0; i < children.size(); i++)
+			children[i]->removeWidgetListener(this);
+		Widget::clear();
+		mustRebuild = true;
+		requestRepaint();
+	}
+
 	bool ListBox::listFrontOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:

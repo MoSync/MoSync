@@ -95,8 +95,13 @@ namespace MAUI {
 		/** Destructor **/
 		virtual ~ListBox();
 
-		/** Addes the Widget w as a child of the listbox **/
+		/** Adds the Widget w as a child of the listbox **/
 		void add(Widget *w);
+
+		/** Overloaded implementation of Widget::clear(), with the same external semantics.
+		    **/
+		void clear();
+
 		/** Renders the listbox **/
 		void draw(bool forceDraw=false);
 		void update();
