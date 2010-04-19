@@ -38,6 +38,7 @@ namespace MAUI {
 		overlay = NULL;
 		singletonPtr = this;
 		//clipStackPtr = -1;
+		Environment::getEnvironment().addFocusListener(this);
 	}
 	
 	void Engine::setMain(Widget* main) {
@@ -166,7 +167,14 @@ namespace MAUI {
 			clipStack[clipStackPtr].height);
 	}
 */	
-	
+
+	void Engine::focusLost() {
+	}
+
+	void Engine::focusGained() {
+		requestUIUpdate();
+	}
+
 	void Engine::requestUIUpdate() {
 		Environment::getEnvironment().addIdleListener(this);
 	}

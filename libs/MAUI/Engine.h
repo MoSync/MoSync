@@ -32,7 +32,7 @@ namespace MAUI {
 	  * when developing custom widgets.
 	**/
 
-	class Engine : public IdleListener {
+	class Engine : public IdleListener, public FocusListener {
 	public:
 		enum {
 			MAX_WIDGET_DEPTH = 16
@@ -66,6 +66,10 @@ namespace MAUI {
 		  **/
 		void requestUIUpdate();
 		
+		// added this because graphics can be invalidated on some devices when the focus is lost...
+		void focusLost();
+		void focusGained();
+
 		/** Actually performs repainting **/ 
 		void repaint();
 		
