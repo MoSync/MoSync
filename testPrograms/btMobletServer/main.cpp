@@ -17,8 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Connection.h>
+#include <MAUtil/Server.h>
 #include <ma.h>
-#include <IX_CONNSERVER.h>
 #include <maassert.h>
 #include <conprint.h>
 
@@ -26,95 +26,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-class Server;
-class AcceptedConnection;
-
-class ServerListener {
-public:
-	virtual void serverAcceptFailed(Server* server, int result) {}
-	virtual void serverAccepted(Server* server, AcceptedConnection* newConnection) = 0;
-};
-
-//hack until Connection itself can be changed
-class AcceptedConnection : public Connection {
-protected:
-	friend class Server;
-
-	AcceptedConnection(Handle conn) : Connection(NULL) {
-		mConn = conn;
-	}
-public:
-	void setListener(ConnectionListener* listener) {
-		mListener = listener;
-	}
-	int getAddr(ConnAddr* dst) {
-		return maConnGetAddr(mConn, dst);
-	}
-};
-
-class Server : public ConnListener {
-protected:
-	ServerListener* mListener;
-	Handle mServ;
-public:
-	Server(ServerListener* listener) : mListener(listener), mServ(0) {
-	}
-
-	virtual ~Server() {
-		close();
-	}
-
-	int getAddr(ConnAddr* dst) {
-		return maConnGetAddr(mServ, dst);
-	}
-
-	int start(const char* url) {
-		mServ = maConnect(url);
-		if(mServ < 0)
-			return mServ;
-		int res = maAccept(mServ);
-		if(res < 0) {
-			maConnClose(mServ);
-			mServ = 0;
-		} else {
-			Environment::getEnvironment().setConnListener(mServ, this);
-		}
-		return res;
-	}
-
-	void close() {
-		if(mServ > 0) {
-			maConnClose(mServ);
-			mServ = 0;
-		}
-	}
-
-	virtual void connEvent(const CONN_EVENT_DATA& data) {
-		MAASSERT(data.opType == CONNOP_ACCEPT);
-		MAASSERT(data.handle == mServ);
-		int res = data.result;
-		if(res > 0) {
-			//TODO: add setListener to Connection, make NULL default parameter value in constructor,
-			//add NULL listener support to event handler... meaning PANIC.
-			AcceptedConnection* ac = new AcceptedConnection(res);
-			mListener->serverAccepted(this, ac);
-			res = maAccept(mServ);
-		}
-		if(res < 0) {
-			mListener->serverAcceptFailed(this, res);
-		}		
-	}
-};
-
 class MyConnectionHandler : public ConnectionListener {
 private:
-	AcceptedConnection* mConn;
+	Connection* mConn;
 	char mBuffer[64];
 	const int mId;
 public:
-	MyConnectionHandler(AcceptedConnection* conn, int id) : mConn(conn), mId(id) {
+	MyConnectionHandler(Connection* conn, int id) : mConn(conn), mId(id) {
 		mConn->setListener(this);
-		ConnAddr addr;
+		MAConnAddr addr;
 		int res = mConn->getAddr(&addr);
 		MAASSERT(res > 0);
 		byte* a = addr.bt.addr.a;
@@ -133,6 +53,7 @@ public:
 			printf("recv %i: %i\n", mId, result);
 			delete this;	//should be safe
 		} else {
+			mBuffer[result] = 0;
 			printf("%i: %s\n", mId, mBuffer);
 			conn->recv(mBuffer, 63);
 		}
@@ -151,7 +72,7 @@ public:
 		if(res < 0)
 			return;
 
-		ConnAddr addr;
+		MAConnAddr addr;
 		res = mServer.getAddr(&addr);
 		MAASSERT(res > 0);
 		MAASSERT(addr.family == CONN_FAMILY_BT);
@@ -169,7 +90,7 @@ public:
 	void serverAcceptFailed(Server* server, int result) {
 		printf("accept failed: %i\n", result);
 	}
-	void serverAccepted(Server* server, AcceptedConnection* newConnection) {
+	void serverAccepted(Server* server, Connection* newConnection) {
 		new MyConnectionHandler(newConnection, mNextId++);
 	}
 };

@@ -8,6 +8,7 @@
  */
 
 #include "iphone_helpers.h"
+#include <wchar.h>
 
 const char *getReadablePath(const char* path) {
 	NSString *stringFromChar = [NSString stringWithCString:path length:strlen(path)];  	
@@ -28,6 +29,11 @@ void sleepMillis(int ms) {
 	[NSThread sleepForTimeInterval:(((float)ms)/1000.0f)];
 }
 
+const char *unicodeToAscii(const wchar_t* str) {
+	NSString *stringFromChar = [NSString stringWithCharacters:(const unichar*)str length:wcslen(str)];
+	return [stringFromChar UTF8String];
+
+}
 
 // timer
 /*

@@ -185,7 +185,33 @@ __inline void WRITE(const char* fmt, ...) {
 #define FETCH_RD_RS_ADDR24	FETCH_RD FETCH_RS FETCH_IMM24
 #define FETCH_RD_IMM8		FETCH_RD FETCH_IMM8
 
-int disassemble_one(const byte* ip, const byte* mem_cs, const int* mem_cp, char* buf, byte& op, byte& op2, byte &rd, byte &rs, int &imm32)
+
+
+/**
+ * Disassembles one MoSync IL instruction
+ *
+ * @param ip      [in] Pointer to the instruction
+ * @param mem_cs  [in] Pointer to data section
+ * @param mem_cp  [in] Pointer to constant section
+ * @param buff    [in] Pointer to char buffer which can hold one
+ *                     dissassembled instruction.
+ * @param op      [out] Opcode
+ * @param op2     [out] Second opcode, incase op was a prefix opcode
+ * @param rd      [out] Destination register
+ * @param rs      [out] Source register
+ * @param imm32   [out] Immediate
+ *
+ * @return Size of the dissassembled instruction in bytes
+ */
+int disassemble_one ( const byte* ip, 
+                      const byte* mem_cs, 
+                      const int* mem_cp, 
+                      char* buf, 
+                      byte& op, 
+                      byte& op2, 
+                      byte &rd, 
+                      byte &rs, 
+                      int &imm32 )
 {
 	const byte* startIp = ip;
 #ifndef __SYMBIAN32__
@@ -333,7 +359,23 @@ int disassemble_one(const byte* ip, const byte* mem_cs, const int* mem_cp, char*
 	return (int)(ip-startIp);
 }
 
-int disassemble_one(const byte* ip, const byte* mem_cs, const int* mem_cp, char* buf) {
+
+/**
+ * Disassembles one MoSync IL instruction
+ *
+ * @param ip      [in] Pointer to the instruction
+ * @param mem_cs  [in] Pointer to data section
+ * @param mem_cp  [in] Pointer to constant section
+ * @param buff    [in] Pointer to char buffer which can hold one
+ *                     dissassembled instruction.
+ *
+ * @return Size of the dissassembled instruction in bytes
+ */
+int disassemble_one ( const byte* ip, 
+                      const byte* mem_cs, 
+                      const int* mem_cp, 
+                      char* buf ) 
+{
 	byte rd=0, rs=0;
 	byte op, op2;
 	int imm32;

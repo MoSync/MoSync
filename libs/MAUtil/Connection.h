@@ -74,9 +74,11 @@ public:
 class Connection : protected ConnListener {
 public:
 	/**
-	* Initializes the new Connection with the specified ConnectionListener.
+	* \param listener Will recieve events from this Connection.
+	* \param conn Optional. If you have a connection handle,
+	* you can pass it here to wrap it in a Connection.
 	*/
-	Connection(ConnectionListener* listener);
+	Connection(ConnectionListener* listener, MAHandle conn=0);
 
 	/**
 	* Closes the connection, if open.
@@ -160,6 +162,12 @@ public:
 	* The connection is considered open even during the connect() operation.
 	*/
 	bool isOpen() const;
+
+	/**
+	* Retrieves the remote address of this connection.
+	* \returns \> 0 on success, \< 0 on error.
+	*/
+	int getAddr(MAConnAddr* dst);
 
 protected:
 	MAHandle mConn;

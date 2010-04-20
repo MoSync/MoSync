@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace Base;
 
+static void storeBtAddr(TBTDevAddr btaddr, MAConnAddr* addr);
+static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr);
+
 void Syscall::ClearNetworkingVariables() {
 	gConnNextHandle = 1;
 	gConnCleanupQue = NULL;
@@ -215,6 +218,12 @@ void CSocket::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
 	LOGS("A\n");
 }
 
+void CSocket::GetAddr(MAConnAddr* addr) {
+	TSockAddr sockaddr;
+	mSocket.RemoteName(sockaddr);
+	storeSockAddr(sockaddr, addr);
+}
+
 //******************************************************************************
 //ConnOp
 //******************************************************************************
@@ -283,6 +292,9 @@ void Syscall::ConnOp::SendResult(int result) {
 			event.conn.opType = hf.connect ? CONNOP_CONNECT : CONNOP_FINISH;
 		}
 		break;
+	case COC_Accept:
+		event.conn.opType = CONNOP_ACCEPT;
+		break;
 	default:
 		DEBIG_PHAT_ERROR;
 	}
@@ -309,6 +321,9 @@ void Syscall::ConnOp::RunL() {
 			return;
 		case CSOC_Resolve:
 			SendResult(CONNERR_DNS);
+			return;
+		case CSOC_Accept:
+			SendResult(CONNERR_GENERIC);
 			return;
 		case CSOC_SockConnect:
 		case CSOC_Read:
@@ -383,6 +398,12 @@ void Syscall::ConnOp::RunL() {
 			SendResult(hf.http.GetResponseCode());
 			break;
 		}
+		case COC_Accept: {
+			CO_Accept& a = (CO_Accept&)*this;
+			mSyscall.gConnections.insert(mSyscall.gConnNextHandle, a.newSock);
+			SendResult(mSyscall.gConnNextHandle++);
+			break;
+		}
 		default:
 			LOG("Unhandled ConnOp %i\n", mType);
 			DEBIG_PHAT_ERROR;
@@ -403,6 +424,11 @@ void Syscall::ConnOp::DoCancel() {
 		CSO_Resolve& r((CSO_Resolve&)sop);
 		r.resolver.Cancel();
 		break;
+	}
+	case CSOC_Accept: {
+		CSO_Accept& a = (CSO_Accept&)sop;
+		delete a.newSock;
+		// intentional fallthrough
 	}
 	case CSOC_SockConnect:
 	case CSOC_Read:
@@ -460,6 +486,11 @@ void Syscall::ConnOp::StartConnSubOpL() {
 		hrh.http.ReadHeadersL(*this);
 		break;
 	}
+	case CSOC_Accept: {
+		CSO_Accept& a = (CSO_Accept&)sop;
+		a.server.Accept(a.newSock->socket(), *this);
+		break;
+	}
 	default:
 		LOG("Unhandled SubConnOp %i\n", sop.type);
 		DEBIG_PHAT_ERROR;
@@ -474,8 +505,8 @@ void Syscall::ConnOp::StartConnSubOpL() {
 //Prototype and Initializers
 #define CO_CONSTRUCTOR_PI(name) \
 	Syscall::CO_##name* Syscall::CO_##name::NewL(bool aStartNetworking,\
-	Syscall& s, MAHandle h, CConnection& c,	FS_NULA2(CV_##name, DECLARE_ARG)) {\
-	CO_##name* self = new (ELeave) CO_##name(s, h, c, FS_NULA2(CV_##name, REFERENCE_ARG));\
+	Syscall& s, MAHandle h, CConnection& c FS_NULA2(CV_##name, CDECL_ARG)) {\
+	CO_##name* self = new (ELeave) CO_##name(s, h, c FS_NULA2(CV_##name, REFERENCE_ARG));\
 	CleanupStack::PushL(self);\
 	self->ConstructL(aStartNetworking);\
 	CleanupStack::Pop(self);\
@@ -585,6 +616,13 @@ void Syscall::ConnOp::addHttpSendHeaders() {
 	CSO_ADD(Write, http->mBufPtr);
 	
 	http->mState = CHttpConnection::WRITING;
+}
+
+CO_CONSTRUCTOR_PI(Accept) {
+	CSO_ADD(Accept, server, newSock);
+}
+CO_DESTRUCTOR_P(Accept) {
+	LOGS("~Accept\n");
 }
 
 //******************************************************************************
@@ -828,6 +866,124 @@ const TDesC8* CHttpConnection::GetResponseHeaderL(const TDesC8& key) const {
 }
 
 //******************************************************************************
+//CServerSocket
+//******************************************************************************
+
+void CServerSocket::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
+	BIG_PHAT_ERROR(ERR_CONN_NOT_STREAM);
+}
+bool CServerSocket::Write(const TDesC8& aDesc, CPublicActive& op) {
+	BIG_PHAT_ERROR(ERR_CONN_NOT_STREAM);
+}
+void CServerSocket::CancelAll() {
+	mSocket.CancelAll();
+}
+
+void CServerSocket::Accept(RSocket& aBlankSocket, CPublicActive& op) {
+	LOGS("Accept...");
+	mSocket.Accept(aBlankSocket, op.iStatus);
+	op.SetActive();
+	LOGS("A\n");
+}
+
+void CServerSocket::GetAddr(MAConnAddr* addr) {
+	TSockAddr sockaddr;
+	LOGS("LocalName\n");
+	mSocket.LocalName(sockaddr);
+	LOGS("storeSockAddr\n");
+	storeSockAddr(sockaddr, addr);
+}
+
+//******************************************************************************
+//CBtServerSocket
+//******************************************************************************
+
+void CBtServerSocket::init(RSocketServ& aServer, const TUUID& uuid, bool hasName,
+	const TDesC8& name)
+{
+	static const int KSizeOfListenQueue = 4;	//arbitrary
+
+	// open socket
+	LHEL(mSocket.Open(aServer, KBTAddrFamily, KSockStream, KRFCOMM));
+
+	// mirror JavaME
+	TCleaner<CSdpAttrValueDES> scil(CSdpAttrValueDES::NewDESL(NULL));
+	CleanupStack::PushL(scil());
+	scil
+		->StartListL()
+			->BuildUUIDL(KSerialPortUUID)
+			->BuildUUIDL(uuid)
+		->EndListL();
+
+	// create service record
+	mSdpDB.CreateServiceRecordL(*scil, mHandle);
+	LOGS("Service record handle: %i\n", mHandle);
+
+	if(hasName) {
+		// add a name to the record
+		mSdpDB.UpdateAttributeL(mHandle,
+			KSdpAttrIdBasePrimaryLanguage +
+			KSdpAttrIdOffsetServiceName,
+			name);
+	}
+
+	int channel;
+
+	// get an available listening channel
+	LHEL(mSocket.GetOpt(KRFCOMMGetAvailableServerChannel, KSolBtRFCOMM, channel));
+	// bind socket to channel
+	TBTSockAddr btsockaddr;
+	btsockaddr.SetPort(channel);
+	LHEL(mSocket.Bind(btsockaddr));
+	// listen on port. note: this is NOT accept(). that comes later.
+	mSocket.Listen(KSizeOfListenQueue);
+
+	// store attributes in record
+	// create protocol list for our service
+	TCleaner<CSdpAttrValueDES> pdl(CSdpAttrValueDES::NewDESL(NULL));
+	CleanupStack::PushL(pdl());
+	TBuf8<1> channelBuf;
+	channelBuf.Append((TChar)channel);
+	pdl
+		->StartListL()
+			->BuildDESL()
+			->StartListL()
+				->BuildUUIDL(KL2CAP)
+			->EndListL()
+
+			->BuildDESL()
+			->StartListL()
+				->BuildUUIDL(KRFCOMM)
+				->BuildUintL(channelBuf)
+			->EndListL()
+		->EndListL();
+
+	// set protocol list to the record
+	mSdpDB.UpdateAttributeL(mHandle, KSdpAttrIdProtocolDescriptorList, *pdl);
+	
+	// set browse group
+	// service will not appear in scans unless this is set properly!
+	TCleaner<CSdpAttrValueDES> bga(CSdpAttrValueDES::NewDESL(NULL));
+	CleanupStack::PushL(bga());
+	bga->StartListL()
+		->BuildUUIDL(KPublicBrowseGroupUUID)
+		->EndListL();
+	mSdpDB.UpdateAttributeL(mHandle, KSdpAttrIdBrowseGroupList, *bga);
+
+	// DO NOT set availability! It causes Windows xp to hide the service.
+	//mSdpDB.UpdateAttributeL(mHandle, KSdpAttrIdServiceAvailability, 0xFF);
+	// mark record changed
+	mSdpDB.UpdateAttributeL(mHandle, KSdpAttrIdServiceRecordState, 2);
+
+	//next step would be to call mSocket.Accept(). we have maAccept() do that.
+}
+
+CBtServerSocket::~CBtServerSocket() {
+	if(mHandle != 0)
+		mSdpDB.DeleteRecordL(mHandle);
+}
+
+//******************************************************************************
 //Helpers
 //******************************************************************************
 
@@ -888,6 +1044,35 @@ CHttpConnection& Syscall::GetHttp(MAHandle conn) {
 	return *http;
 }
 
+static void storeBtAddr(TBTDevAddr btaddr, MAConnAddr* addr) {
+	TBuf<20> aBTAddr;
+	TBuf8<20> bt8;
+	btaddr.GetReadable(aBTAddr, KNullDesC, _L(":"), KNullDesC);
+	bt8.Copy(aBTAddr);
+	LOG("Readable: %S\n", &bt8);
+
+	for(int i=0; i<BTADDR_LEN; i++) {
+		addr->bt.addr.a[i] = btaddr[i];
+	}
+}
+
+static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr) {
+	LOGS("storeSockAddr %i\n", sockaddr.Family());
+	if(sockaddr.Family() == KBTAddrFamily) {
+		addr->family = CONN_FAMILY_BT;
+		addr->bt.port = sockaddr.Port();
+		TBTSockAddr& bt((TBTSockAddr&)sockaddr);
+		storeBtAddr(bt.BTAddr(), addr);
+	} else if(sockaddr.Family() == KAfInet) {
+		addr->family = CONN_FAMILY_INET4;
+		addr->inet4.port = sockaddr.Port();
+		TInetAddr& inet((TInetAddr&)sockaddr);
+		addr->inet4.addr = inet.Address();
+	} else {
+		DEBIG_PHAT_ERROR;
+	}
+}
+
 _LIT8(KHttp, "http://");
 _LIT8(KSocket, "socket://");
 _LIT8(KBtspp, "btspp://");
@@ -902,6 +1087,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 	if(gConnections.size() >= CONN_MAX)
 		return CONNERR_MAX;
 
+	_LIT8(KLocalhost, "localhost");
 	CConnection* conn;
 
 	if(SSTREQ(urlP, KSocket)) {	//socket
@@ -913,7 +1099,6 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		}
 		Smartie<CSocket> sockp(new (ELeave) CSocket(gSocketServ, CSocket::ETcp));
 		
-		_LIT8(KLocalhost, "localhost");
 		_LIT8(K127, "127.");
 		TInetAddr addr;
 		bool localhost = false;
@@ -952,25 +1137,73 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		}
 		TPtrC8 parturl = urlP.Mid(KBtspp().Length());
 		TPtrC8 hostnamePtrC8;
-		int port;
-		if(!splitPurl(parturl, hostnamePtrC8, port, 31)) {
-			return CONNERR_URL;
+		int port_m1_index = parturl.Locate(':');
+		if(port_m1_index == KErrNotFound) {
+			return false;
 		}
-		TRfcommSockAddr rfcsa;
-
-		TBTDevAddr btaddr;
-		for(int i=0; i<BTADDR_LEN; i++) {
-			TLex8 btaLex(parturl.Mid(i*2, 2));
-			int result = btaLex.Val(btaddr[i], EHex);
-			if(result != KErrNone)
+		hostnamePtrC8.Set(parturl.Left(port_m1_index));
+		if(hostnamePtrC8 == KLocalhost) {	// server
+			// extract and parse uuid
+			static const int KUuidLength = 32;
+			int uuidStartIndex = port_m1_index + 1;
+			int paramStartIndex = uuidStartIndex + KUuidLength;
+			if(parturl.Length() < paramStartIndex) {
 				return CONNERR_URL;
-		}
-		rfcsa.SetBTAddr(btaddr);
+			}
+			TPtrC8 uuidPtrC8(parturl.Mid(uuidStartIndex, KUuidLength));
+			TUint32 us[4];
+			for(int i=0; i<4; i++) {
+				TPtrC8 p(uuidPtrC8.Mid(i*8, 8));
+				for(int j=0; j<8; j++) {
+					if(!TChar(p[j]).IsHexDigit())
+						return CONNERR_URL;
+				}
+				LHEL(TLex8(p).Val(us[i], EHex));
+			}
+			TUUID uuid(us[0], us[1], us[2], us[3]);
+			//TUUID uuid(KSerialPortUUID);	//temp hack
 
-		Smartie<CSocket> sockp(new (ELeave) CSocket(gSocketServ, CSocket::ERfcomm));
-		StartConnOpL(CO_AddrConnect::NewL(false, *this, gConnNextHandle, *sockp(),
-			rfcsa, port, *sockp()));
-		conn = sockp.extract();
+			// create listener socket
+			Smartie<CBtServerSocket> sockp(new (ELeave) CBtServerSocket(gBtSdpDB));
+
+			// extract name, if it's there. initialize the socket.
+			TPtrC8 paramPtrC8(parturl.Mid(paramStartIndex));
+			_LIT8(KNameParam, ";name=");
+			if(SSTREQ(paramPtrC8, KNameParam)) {
+				TPtrC8 namePtrC8(paramPtrC8.Mid(KNameParam().Length()));
+				sockp->init(gSocketServ, uuid, true, namePtrC8);
+			} else if(paramPtrC8.Length() == 0) {
+				sockp->init(gSocketServ, uuid, false);
+			} else {
+				return CONNERR_URL;
+			}
+			//skip the async/connect step
+			gConnections.insert(gConnNextHandle, sockp.extract());
+			return gConnNextHandle++;
+		} else {	// client
+			// extract port number
+			int port;
+			if(!splitPurl(parturl, hostnamePtrC8, port, 31)) {
+				return CONNERR_URL;
+			}
+			TRfcommSockAddr rfcsa;
+
+			// parse address
+			TBTDevAddr btaddr;
+			for(int i=0; i<BTADDR_LEN; i++) {
+				TLex8 btaLex(parturl.Mid(i*2, 2));
+				int result = btaLex.Val(btaddr[i], EHex);
+				if(result != KErrNone)
+					return CONNERR_URL;
+			}
+			rfcsa.SetBTAddr(btaddr);
+
+			// create socket
+			Smartie<CSocket> sockp(new (ELeave) CSocket(gSocketServ, CSocket::ERfcomm));
+			StartConnOpL(CO_AddrConnect::NewL(false, *this, gConnNextHandle, *sockp(),
+				rfcsa, port, *sockp()));
+			conn = sockp.extract();
+		}
 	} else {	//error
 		return CONNERR_URL;
 	}
@@ -988,7 +1221,20 @@ SYSCALL(void, maConnClose(MAHandle conn)) {
 	gConnections.erase(conn);
 }
 
+SYSCALL(void, maAccept(MAHandle conn)) {
+	LOGST("maAccept %i", conn);
+	CConnection* cc = gConnections.find(conn);
+	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
+	CServerSocket* ss = cc->server();
+	MYASSERT(ss, ERR_CONN_NOT_SERVER);
+	MYASSERT((cc->state & CONNOP_ACCEPT) == 0, ERR_CONN_ALREADY_ACCEPTING);
+	CSocket* newSock = new (ELeave) CSocket(gSocketServ, CSocket::EBlank);
+	cc->state |= CONNOP_ACCEPT;
+	StartConnOpL(CO_Accept::NewL(false, *this, conn, *cc, *ss, newSock));
+}
+
 SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
+	LOGST("maConnGetAddr(%i, 0x%08X)", conn, addr);
 	if(conn == HANDLE_LOCAL) {
 		if(addr->family == CONN_FAMILY_BT) {
 			TBTDevAddr btaddr;
@@ -1029,23 +1275,19 @@ SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
 			socket.Close();
 			btaddr = btsockaddr.BTAddr();
 #endif	//0
-#endif	//__SERIES60_3X__
-			TBuf<20> aBTAddr;
-			TBuf8<20> bt8;
-			btaddr.GetReadable(aBTAddr, KNullDesC, _L(":"), KNullDesC);
-			bt8.Copy(aBTAddr);
-			LOG("Readable: %S\n", &bt8);
-			
-			for(int i=0; i<BTADDR_LEN; i++) {
-				addr->bt.addr.a[i] = btaddr[i];
-			}
+#endif	//0//__SERIES60_3X__
+			storeBtAddr(btaddr, addr);
 			return 1;
-		} else {
+		} else {	//TCP server
 			return CONNERR_INTERNAL;
 		}
 	}
-	//todo: implement
-	return CONNERR_INTERNAL;
+	
+	CConnection* cc = gConnections.find(conn);
+	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
+	//we have 4 options: tcp client, bt client, tcp server, bt server
+	cc->GetAddr(addr);
+	return 1;
 }
 
 SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {

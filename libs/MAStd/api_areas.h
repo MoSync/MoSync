@@ -80,7 +80,7 @@ Libs: matime.h<br>
 Speak to other machines using TCP, HTTP or a Bluetooth serial port.<br>
 Syscalls: maConnect(), maConnClose(), maConnRead(), maConnWrite(), maConnReadToData(),
 maConnWriteFromData(), maHttpCreate(), maHttpSetRequestHeader(), maHttpGetResponseHeader(),
-maHttpFinish().<br>
+maHttpFinish(), maAccept().<br>
 Libs: \ref MAUtil/Connection.h, \ref MAUtil/Downloader.h, \ref MAUtil/BuffDownloader.h<br>
 Uses \ref event.<br>
 See also: \ref res.<br>

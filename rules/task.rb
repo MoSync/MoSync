@@ -85,6 +85,12 @@ end
 # Work also cooperates with the Target system.
 # Work is abstract; subclasses must define the setup and execute_clean methods.
 class Work < TaskBase
+	include Defaults
+	def initialize
+		Targets.setup
+		super
+	end
+	
 	def invoke
 		#puts "Work.invoke: #{@NAME.inspect}"
 		
@@ -152,11 +158,6 @@ end
 # Includes a set of default member variables used by the different subclasses.
 # To override the default value of such a variable, it must be set before setup is called.
 class BuildWork < Work
-	include Defaults
-	def initialize
-		Targets.setup
-		super
-	end
 	
 	def setup
 		#puts "BuildWork.setup: #{@NAME.inspect}"

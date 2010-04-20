@@ -270,11 +270,19 @@ inline HBufC8* CreateHBufC8FromCStringLC(const char* str) {
 	return CreateHBufC8FromDesC8LC(ptrc8);
 }
 
-inline void Append(TPtr16& ptr, const TDesC8& desc) {
+inline void Append(TDes16& ptr, const TDesC8& desc) {
 	int off = ptr.Length();
 	ptr.SetLength(ptr.Length() + desc.Length());
 	for(int i=0; i<desc.Length(); i++) {
 		ptr[off++] = desc[i];
+	}
+}
+
+inline void Append(TDes8& ptr, const TDesC16& desc) {
+	int off = ptr.Length();
+	ptr.SetLength(ptr.Length() + desc.Length());
+	for(int i=0; i<desc.Length(); i++) {
+		ptr[off++] = (byte)desc[i];
 	}
 }
 

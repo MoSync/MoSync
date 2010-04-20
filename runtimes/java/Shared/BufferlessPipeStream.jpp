@@ -16,6 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "helpers.h"
+//#undef DEBUG_TEMP
+//#define DEBUG_TEMP(...)
 
 import java.io.*;
 
@@ -42,9 +44,10 @@ final class BufferlessPipedInputStream extends InputStream {
 	}
 
 	public int read(byte[] dst, int off, int len) {
-		DEBUG_TEMP("BPIS.read()\n");
+		DEBUG_TEMP("BPIS.read("+off+", "+len+")\n");
 		synchronized(this) {
-			if (mLen == 0) {
+			DEBUG_TEMP("mLen: "+mLen+"\n");
+			while(mPos != len)/*bug if off != 0*/ { if(mLen == 0) {
 				mOut.mDst = dst;
 				mOut.mPos = off;
 				mOut.mLen = len;
@@ -67,9 +70,11 @@ final class BufferlessPipedInputStream extends InputStream {
 				mPos += curLen;
 				mLen -= curLen;	//this is where we update our len on read
 				this.notify();
-				return curLen;
-			}
+				if(mPos == len)	//bug if off != 0
+					return curLen;
+			}}
 		}
+		return len;
 	}
 }
 
@@ -85,6 +90,7 @@ final class BufferlessPipedOutputStream extends OutputStream {
 
 	public void flush() {
 		DEBUG_TEMP("BPOS.flush()\n");
+		//TODO
 	}
 
 	public void close() {
@@ -94,26 +100,31 @@ final class BufferlessPipedOutputStream extends OutputStream {
 
 	//bad
 	public void write(int b) {
-		DEBUG_TEMP("BPOS.write(int)\n");
-		BIG_PHAT_ERROR;
+		//DEBUG_TEMP("BPOS.write(int)\n");
+		//BIG_PHAT_ERROR;
+		//slow but simple
+		byte[] ba = new byte[1];
+		ba[0] = (byte)b;
+		write(ba);
 	}
 
 	public void write(byte[] src) {
-		DEBUG_TEMP("BPOS.write(b)\n");
+		//DEBUG_TEMP("BPOS.write(b)\n");
 		write(src, 0, src.length);
 	}
 
 	public void write(byte[] src, int off, int len) {
-		DEBUG_TEMP("BPOS.write(bii)\n");
+		//DEBUG_TEMP("BPOS.write(bii)\n");
 		try {
 		synchronized(mIn) {
 			if (mLen != 0) {
 				int curLen = MIN(mLen, len);
-				System.arraycopy(src, mPos, mDst, off, curLen);
+				System.arraycopy(src, off, mDst, mPos, curLen);
 				mPos += curLen;
 				mLen -= curLen;	//this is where we update our len on write
 				len -= curLen;
-				mIn.notify();
+				if(mLen == 0)	//temp hack
+					mIn.notify();
 			}
 			if (len != 0) {	//if not all was written
 				mIn.mSrc = src;

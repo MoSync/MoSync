@@ -169,6 +169,14 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+	void ListBox::clear() {
+		for(int i = 0; i < children.size(); i++)
+			children[i]->removeWidgetListener(this);
+		Widget::clear();
+		mustRebuild = true;
+		requestRepaint();
+	}
+
 	bool ListBox::listFrontOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:
@@ -438,7 +446,7 @@ namespace MAUI {
 
 		if(selectedIndex < 0) {
 			selectedIndex = 0;
-			if(wrapping) {
+			if(!wrapping) {
 				if(shouldFireListeners) {
 					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
 						(*i)->blocked(this, -1);
@@ -498,7 +506,7 @@ namespace MAUI {
 		if(selectedIndex < children.size() - 1) {
 			selectedIndex++;
 		} else {
-			if(wrapping) {
+			if(!wrapping) {
 				if(shouldFireListeners) {
 					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
 						(*i)->blocked(this, 1);

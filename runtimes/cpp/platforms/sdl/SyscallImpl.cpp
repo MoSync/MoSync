@@ -51,7 +51,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_CONNSERVER.h>
 #include <helpers/CPP_IX_FILE.h>
 
 // blah
@@ -1651,10 +1650,12 @@ namespace Base {
 	}
 
 	static void fillBufferCallback() {
-		MAEvent audioEvent;
-		audioEvent.type = EVENT_TYPE_AUDIOBUFFER_FILL;
-		gEventFifo.put(audioEvent);
+		MAEvent* ep = new MAEvent;
+		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
+		FE_PushEvent((SDL_Event*)&event);
 	}
+
 
 	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
@@ -1800,7 +1801,7 @@ namespace Base {
 
 		case maIOCtl_maAccept:
 			maAccept(a);
-			return 0;
+			return 1;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);

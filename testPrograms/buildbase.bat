@@ -28,7 +28,7 @@ call prever.bat
 GOTO end
 
 :REGULAR
-set CM=pipe-tool -stacksize=18000 -master-dump -sld=sld.tab -stabs=stabs.tab -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe_debug\mastd.lib" "%MOSYNCDIR%\lib\pipe_debug\mautil.lib" "%MOSYNCDIR%\lib\pipe_debug\maui.lib" "%MOSYNCDIR%\lib\pipe_debug\mtxml.lib"
+set CM=pipe-tool -stacksize=18000 -datasize=128000 -master-dump -sld=sld.tab -stabs=stabs.tab -no-verify -B program temp.s "%MOSYNCDIR%\lib\pipe_debug\mastd.lib" "%MOSYNCDIR%\lib\pipe_debug\mautil.lib" "%MOSYNCDIR%\lib\pipe_debug\maui.lib" "%MOSYNCDIR%\lib\pipe_debug\mtxml.lib"
 echo %CM%
 %CM%
 

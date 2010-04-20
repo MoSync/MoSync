@@ -30,7 +30,7 @@ namespace MAUI {
 	  * that the user can navigate between.
 	  **/
 
-	class Screen : public KeyListener, PointerListener {
+	class Screen : public KeyListener, public PointerListener {
 	public:
 		Screen();
 		/** Causes this screen to be shown and all other screens in

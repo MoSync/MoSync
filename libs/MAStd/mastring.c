@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ma.h"
 #include "mastring.h"
 #include "madmath.h"
+#include "maheap.h"
 
 BOOL StringMatch(const char* a, const char* b) {
 	while(*a && *b) {
@@ -353,19 +354,19 @@ void *memrchr(const void *buf, int ch, size_t count)
 	return (count == 0 ? ptr : NULL);
 }
 
-/*
+
 char *strdup(const char *s)
 {
-char *t;
-int len;
+	char *t;
+	int len;
 
-if (!s) return NULL;
-len = strlen(s);
-t = (char *) malloc(len + 1);
-memcpy(t, s, len + 1);
-return t;
+	if (!s) return NULL;
+	len = strlen(s);
+	t = (char *) malloc(len + 1);
+	memcpy(t, s, len + 1);
+	return t;
 }
-*/
+
 
 char *strlwr(char *s)
 {

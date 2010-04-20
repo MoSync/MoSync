@@ -32,5 +32,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(240015, WCEERR_STORE_ACCESS_DENIED, "Store file access denied")\
 	m(240016, WCEERR_STORE_CLOSE_FAILED, "Store close failed")\
 	m(240017, WCEERR_UNSUPPORTED_OS_VERSION, "Unsupported OS version")\
+	m(240018, WCEERR_COULD_NOT_CREATE_EVENT, "Could not create windows event.")
 
 DECLARE_ERROR_ENUM(WCE);

@@ -270,6 +270,8 @@ void CAppView::FocusChanged(TDrawNow LOG_ARG(aDrawNow)) {
 		if(!iEngine->IsDrawing()) {
 			LTRAP(iEngine->StartDrawingL());
 		}
+		if(aDrawNow == EDrawNow)
+			iEngine->UpdateScreen();
 
 		//send FOCUS_GAINED
 		MAEvent event;
