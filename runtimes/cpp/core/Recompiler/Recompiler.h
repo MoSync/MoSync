@@ -98,6 +98,7 @@ namespace MoSync {
 			mNumPasses(numPasses),
 			mStopped(true) {
 		}
+		virtual ~Recompiler() {}
 
 		// should be used from the constructor
 		void setPattern(Matcher m, Visitor v, byte *sequence) {
