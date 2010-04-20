@@ -787,7 +787,7 @@ namespace Base {
 				return maFrameBufferClose();
 				
 		case maIOCtl_maIPhoneMessageBox:
-			return maIPhoneMessageBox();
+			return maIPhoneMessageBox(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
 		case maIOCtl_maIPhoneLabel:
 			return maIPhoneLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));

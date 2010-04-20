@@ -16,7 +16,6 @@
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
 		7AD52246116F1A5E0038A697 /* NativeUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7AD52245116F1A5E0038A697 /* NativeUI.mm */; };
-		7AD77194117C784200974BB6 /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = 7AD77193117C784200974BB6 /* reload.png */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
@@ -64,7 +63,6 @@
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		7AD52244116F1A5E0038A697 /* NativeUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeUI.h; sourceTree = "<group>"; };
 		7AD52245116F1A5E0038A697 /* NativeUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeUI.mm; sourceTree = "<group>"; };
-		7AD77193117C784200974BB6 /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
 		853983A9116CADEF000521C0 /* hashmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashmap.cpp; path = ../../../../intlibs/hashmap/hashmap.cpp; sourceTree = SOURCE_ROOT; };
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
@@ -220,7 +218,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				7AD77193117C784200974BB6 /* reload.png */,
 				85A0815311353EDE00267D56 /* resources */,
 				85BF2C3A11341EF000BB0201 /* program */,
 				2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */,
@@ -449,7 +446,6 @@
 				2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */,
 				85BF2C3B11341EF000BB0201 /* program in Resources */,
 				85A0815411353EDE00267D56 /* resources in Resources */,
-				7AD77194117C784200974BB6 /* reload.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

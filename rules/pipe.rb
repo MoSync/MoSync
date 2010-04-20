@@ -44,7 +44,7 @@ class PipeTask < FileTask
 		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
-			if(HOST == :darwin)
+			if(HOST == :linux)
 				sh "wine #{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
 			else
 				sh "#{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
@@ -89,7 +89,7 @@ end
 class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
-	if(HOST == :darwin)
+	if(HOST == :linux)
 		def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
 	else
 		def gcc; mosyncdir + "/bin/xgcc"; end

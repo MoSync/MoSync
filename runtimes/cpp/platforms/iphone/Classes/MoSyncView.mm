@@ -195,9 +195,6 @@ bool down = false;
 	myLabel.textAlignment = UITextAlignmentCenter;
 	myLabel.textColor = [UIColor darkGrayColor];
 	[self addSubview:myLabel];
-	
-	
-	
 }
 
 -(void) showLabel: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
@@ -260,7 +257,6 @@ bool down = false;
 	wh.h = h;
 	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addTextField:) withObject:(id)wh waitUntilDone:NO];
-	
 }
 
 - (void)navigationBar:(UINavigationBar*)bar buttonClicked:(int)button
@@ -283,8 +279,6 @@ bool down = false;
 }
 
 -(void) addScreen:(id) obj {
-	
-	
 	WidgetHandler *wh = (WidgetHandler*) obj;
 	CGRect frame = CGRectMake(0, 0, 320, 480);
 	MoSyncView *v = [[MoSyncView alloc] initWithFrame:frame];
@@ -292,16 +286,9 @@ bool down = false;
 	[self addSubview:v ];
 	v.backgroundColor = [UIColor groupTableViewBackgroundColor];
 	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
-
-	
-	
-	
-	
 	currentScreen = v;
 	Base::gEventQueue.addNativeUIEvent([v tag], 0);
 	NSLog(@"the tag value is: %d", [v tag]);
-	
-	
 }
 
 -(MoSyncView *) showScreen:(int) widgetid {
@@ -309,22 +296,14 @@ bool down = false;
 	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)wh waitUntilDone:YES];
 	return currentScreen;
-	
 }
 
 -(void) addNavigationBar:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
 	UINavigationBar *nav = [[UINavigationBar alloc] 
 							initWithFrame: CGRectMake(0.0f, 20.0f, 320.0f, 48.0f)];
-							
-	//UINavigationItem* item = [[UINavigationItem alloc] initWithTitle:@"title text"];
-	
-	//[nav pushNavigationItem:item animated:YES];
-	
-	
     [nav showButtonsWithLeftTitle: @"Back" 
 				   rightTitle: nil leftBack: YES];
-	
 	CGRect frame = CGRectMake(0, 0, 320, 48);
 	UILabel *label = [[[UILabel alloc] initWithFrame:frame] autorelease];
 	label.backgroundColor = [UIColor clearColor];
@@ -334,11 +313,8 @@ bool down = false;
 	label.textColor = [UIColor whiteColor];
 	label.text = wh.msg;
 	[nav addSubview:label];
-	
     [nav setDelegate: self];
 	[self addSubview:nav];
-	
-	
 }
 
 -(void) showNavigationBar: (NSString*) msg {
@@ -350,77 +326,31 @@ bool down = false;
 
 -(void) addToolBar:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
-	//create toolbar using new
 	toolbar = [UIToolbar new];
 	toolbar.barStyle = UIBarStyleDefault;
 	[toolbar sizeToFit];
-	toolbar.frame = CGRectMake(0, 450, 320, 49);
-	
-	//Add buttons
-	//UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-		//																		 target:self
-		//																		 action:@selector(pressButton1:)];
-	/*
-	 CGRect frame2 = CGRectMake(0, 0, 30, 30);
-	 UILabel *label = [[[UILabel alloc] initWithFrame:frame2] autorelease];
-	 label.backgroundColor = [UIColor clearColor];
-	 label.font = [UIFont boldSystemFontOfSize:12.0];
-	 label.shadowColor = [UIColor colorWithWhite:0.0 alpha:0.5];
-	 label.textAlignment = UITextAlignmentCenter;
-	 label.textColor = [UIColor whiteColor];
-	 label.text = @"New";
-	 
-	 UIBarButtonItem *systemItem2 = [[UIBarButtonItem alloc] initWithCustomView:label];
-	 */
-	//Add buttons to the array
-	//NSArray *items = [NSArray arrayWithObjects: systemItem1, nil];
-	
-	//add array of buttons to toolbar
-	//[toolbar setItems:items animated:YES];
-	
-	// Initialize array of toolbar items
-	
-	
-	
+	toolbar.frame = CGRectMake(0, 436, 320, 44.0f);
 	[self addSubview:toolbar];
-	
-	
-	
 }
 
--(void) showToolBar: (NSString*) msg {
+-(void) showToolBar {
 	WidgetHandler *wh = [WidgetHandler alloc];
-	wh.msg = msg;
 	[self performSelectorOnMainThread: @ selector(addToolBar:) withObject:(id)wh waitUntilDone:NO];
-	
 }
 
 -(void) addToolBarItem:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
-
-	
-	//Add buttons
-	/*UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] 
-									initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(pressButton1:)];
-	*/
 	Surface* img = Base::gSyscall->resources.get_RT_IMAGE(1);	
-	
-	//CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);
-	
-	/*UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"reload.png"]
-																	style:UIBarButtonItemStylePlain target:self action:@selector(pressButton1:)];
-	*/
 	UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithImage:[UIImage imageWithCGImage:img->image]
-																	style:UIBarButtonItemStylePlain target:self action:@selector(pressButton1:)];
-	
+																	style:UIBarButtonItemStylePlain target:self action:@selector(passEvent:)];
+	systemItem1.tag = wh.widgetId;
 	[items addObject: systemItem1];
 	[toolbar setItems:items animated:YES];
-
 }
 
--(void) showToolBarItem: (NSString*) msg {
+-(void) showToolBarItem: (int) widgetid {
 	WidgetHandler *wh = [WidgetHandler alloc];
-	wh.msg = msg;
+	wh.widgetId = widgetid;
 	items = [NSMutableArray arrayWithCapacity:1];
 	[self performSelectorOnMainThread: @ selector(addToolBarItem:) withObject:(id)wh waitUntilDone:NO];
 	

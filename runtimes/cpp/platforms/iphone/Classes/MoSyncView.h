@@ -42,8 +42,8 @@
 -(void) addScreen:(id) obj;
 -(MoSyncView *) showScreen:(int) widgetid;
 -(void) addToolBar:(id) obj;
--(void) showToolBar: (NSString*) msg;
--(void) showToolBarItem: (NSString*) msg;
+-(void) showToolBar;
+-(void) showToolBarItem: (int) widgetid;
 -(void) addToolBarItem:(id) obj;
 -(void) passEvent:(id) obj;
 

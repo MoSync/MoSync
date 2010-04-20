@@ -15,7 +15,7 @@
 
 
 
-int maIPhoneMessageBox();
+int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneLabel(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneButton(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneEdit(MAWidgetParameters *wparams, MAWidgetHandle *whandle);

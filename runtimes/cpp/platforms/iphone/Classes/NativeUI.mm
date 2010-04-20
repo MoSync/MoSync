@@ -12,11 +12,11 @@
 #include "MoSyncView.h"
 
 
-int maIPhoneMessageBox() 
+int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	const char *str = "I am a MoSync program !";
+	//const char *str = "I am a MoSync program !";
 	UIView *my_sMoSyncView = getMoSyncView();
-	[my_sMoSyncView showMessageBox:[NSString stringWithCString:str length:strlen(str)] shouldKill:false];
+	[my_sMoSyncView showMessageBox:[NSString stringWithCString:wparams->buf length:strlen(wparams->buf)] shouldKill:false];
 	
 	return 0;
 }
@@ -69,13 +69,13 @@ int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
 	//UIView *my_sMoSyncView = getMoSyncView();
-	[wparams->pParent showToolBar:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] ];
+	[wparams->pParent showToolBar];
 	return 0;
 }
 
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
 	//UIView *my_sMoSyncView = getMoSyncView();
-	[wparams->pParent showToolBarItem:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] ];
+	[wparams->pParent showToolBarItem:wparams->widgetID ];
 	return 0;
 }
