@@ -21,6 +21,9 @@ int MAMain() {
 	strncpy(wparamsBar.buf, str1, strlen(str1)+1);
 	maIPhoneNavigationBar(&wparamsBar, NULL);
 	*/
+	
+	
+	
 	MAWidgetParameters wparams;
 	wparams.pParent = whandle.pWidget;
 	char *strBar="Open a new window";
@@ -33,7 +36,7 @@ int MAMain() {
 	
 	MAWidgetParameters wparams2;
 	wparams2.pParent = whandle.pWidget;
-	char *str2="I am a native widget too !";
+	char *str2="Enter some text:";
 	strncpy(wparams2.buf, str2, strlen(str2)+1);
 	wparams2.posX = 10;
 	wparams2.posY = 90;
@@ -48,6 +51,15 @@ int MAMain() {
 	wparams3.posY = 150;
 	wparams3.sizeX = 300;
 	wparams3.sizeY = 30;
+	
+	maIPhoneToolBar(&wparams, NULL);
+	
+	MAWidgetParameters wparamsItem;
+	wparamsItem.widgetID = 13;
+	wparamsItem.pParent = whandle.pWidget;
+	maIPhoneToolBarItem(&wparamsItem, NULL);
+	maIPhoneToolBarItem(&wparamsItem, NULL);
+	maIPhoneToolBarItem(&wparamsItem, NULL);
 	
 	maIPhoneLabel(&wparams2, NULL);
 	maIPhoneButton(&wparams, NULL);
@@ -70,7 +82,7 @@ int MAMain() {
 							maIPhoneView(&wparams4, &whandle2);
 							
 							MAWidgetParameters wparamsBar;
-							char *str1="Hello";
+							char *str1="New window";
 							wparamsBar.pParent = whandle2.pWidget;
 							strncpy(wparamsBar.buf, str1, strlen(str1)+1);
 							maIPhoneNavigationBar(&wparamsBar, NULL);
@@ -79,15 +91,17 @@ int MAMain() {
 						break;
 						
 						
-					case 10:
-						
+					case 13:
+						if(event.hi_wparam==0) {
+							
+							MAWidgetParameters wparamsAlert;
+							char *str1="You are going to die";
+							wparamsAlert.pParent = whandle.pWidget;
+							strncpy(wparamsAlert.buf, str1, strlen(str1)+1);
+							maIPhoneMessageBox(&wparamsAlert, NULL);
+						}
 						break;
-						
-
-
 				}
-
-
 			}
 		}
 		maWait(0);
