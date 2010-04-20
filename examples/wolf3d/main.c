@@ -12,13 +12,6 @@ int strcasecmp(const char *s1, const char *s2) {
 	return stricmp(s1, s2);
 }
 
-char *strdup(const char *s1) {
-	int len = strlen(s1)+1;
-	char *new_str = (char*)malloc(len);
-	memcpy(new_str, s1, len);
-	return new_str;
-}
-
 void perror(const char *str) {
 	maPanic(0, str);
 }
