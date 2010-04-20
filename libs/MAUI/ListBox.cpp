@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maxtoa.h>
 #include <mastdlib.h>
 #include <mavsprintf.h>
-//#include <conprint.h>
 
 #include <MAUtil/Graphics.h>
 
@@ -267,27 +266,20 @@ namespace MAUI {
 				MAPoint2d tBefore = Gfx_getTranslation();
 				Gfx_translate(0, (yOffset>>16));
 				MAPoint2d translation = Gfx_getTranslation();
+				
 				if(res) 
 				{	
 					srand(1);
 					for(i = 0; i < children.size(); i++)
 					{
-						Rect p = children[i]->getBounds();
-						Point rp = children[i]->getPosition();
-						/*
-						// the problem is that paddedBounds isn't updated when the translation changes.
-						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) &&
-							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
-							(translation.x+rp.x+p.width)>paddedBounds.x &&
-							(translation.y+rp.y+p.height)>paddedBounds.y)
-							*/
-						if(	(translation.x+rp.x)<(tBefore.x+paddingLeft+paddedBounds.width) &&
-							(translation.y+rp.y)<(tBefore.y+paddingTop+paddedBounds.height) &&
-							(translation.x+rp.x+p.width)>tBefore.x+paddingLeft &&
-							(translation.y+rp.y+p.height)>tBefore.y+paddingTop)
-
-							children[i]->draw();
-						//drawRect(rp.x, rp.y, rp.x+p.width-1, rp.y+p.height-1, rand()&0xffffff);
+						/**
+						 * The check wether the child should be drawn or
+						 * not is done in Widget::draw(), and we postpone
+						 * the check until then.
+						 *
+						 * // Mattias
+						 */
+						children[i]->draw();
 					}
 				}
 
@@ -332,22 +324,16 @@ namespace MAUI {
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
 				{
-
 					for(i = 0; i < children.size(); i++)
 					{
-						Rect p = children[i]->getBounds();
-						Point rp = children[i]->getPosition();
-						/*
-						if(	(translation.x+rp.x)<(paddedBounds.x+paddedBounds.width) &&
-							(translation.y+rp.y)<(paddedBounds.y+paddedBounds.height) &&
-							(translation.x+rp.x+p.width)>paddedBounds.x &&
-							(translation.y+rp.y+p.height)>paddedBounds.y)
-							*/
-						if(	(translation.x+rp.x)<(tBefore.x+paddingLeft+paddedBounds.width) &&
-							(translation.y+rp.y)<(tBefore.y+paddingTop+paddedBounds.height) &&
-							(translation.x+rp.x+p.width)>tBefore.x+paddingLeft &&
-							(translation.y+rp.y+p.height)>tBefore.y+paddingTop)
-							children[i]->draw();	
+						/**
+						 * The check wether the child should be drawn or
+						 * not is done in Widget::draw(), and we postpone
+						 * the check until then.
+						 *
+						 * // Mattias
+						 */
+						children[i]->draw();
 					}
 				}
 				setDirty(false);
@@ -603,5 +589,4 @@ namespace MAUI {
 			}
 		}
 	}
-
 }
