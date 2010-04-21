@@ -71,7 +71,9 @@
 		self.frame.origin.y = 0;
 		mosyncView = nil;
         // Initialization code
-		MoSyncMain(self.frame.size.width, self.frame.size.height, self);
+		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+		CGFloat screenHeight = appFrame.size.height;		
+		MoSyncMain(self.frame.size.width, screenHeight, self);
     }
     return self;
 }
@@ -86,6 +88,11 @@
 	if(mosyncView == nil) return;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSetAllowsAntialiasing(context, false);
+
+	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
+	CGContextScaleCTM(context, 1.0, -1.0);
+	
     CGContextDrawImage(context, rect, mosyncView);	
 	DoneUpdatingMoSyncView();
 	/*

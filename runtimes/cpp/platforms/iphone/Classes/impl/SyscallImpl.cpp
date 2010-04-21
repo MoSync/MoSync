@@ -173,6 +173,10 @@ namespace Base {
 		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
 		*/
 		gBackbuffer = new Surface(gWidth, gHeight);
+		CGContextRestoreGState(gBackbuffer->context);		
+		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
 		
 		// init font
 		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
@@ -184,7 +188,7 @@ namespace Base {
 		mach_timebase_info_data_t machInfo;
 		mach_timebase_info( &machInfo );
 		gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
-		
+				
 		return true;
 	}
 
@@ -226,7 +230,9 @@ namespace Base {
 	//***************************************************************************
 	SYSCALL(void, maSetClipRect(int left, int top, int width, int height))
 	{
-		//CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
+		CGContextRestoreGState(gDrawTarget->context);
+		CGContextSaveGState(gDrawTarget->context);
+		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
@@ -435,10 +441,12 @@ namespace Base {
 		CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
 		
 		
-		if(img->context) {
+		if(img->context) 
+		{
 			CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
 			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);	
-		} else {
+		}
+		 else {
 			CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
 			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
 			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);			

@@ -96,6 +96,8 @@ public:
 		//CGContextClearRect(context, CGRectMake(0, 0, width, height));
 		
 		initFont();
+		
+		CGContextSaveGState(context);
 	}
 	
 	
