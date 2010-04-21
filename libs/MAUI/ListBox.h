@@ -77,7 +77,7 @@ namespace MAUI {
 		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the ListBox to be added to the parent's children.
 		  * \param orientation controls the orientation of the ListBox
 		  * \param animType controls the type of animation used when scrolling the listbox content.
-		  * \param wrapping controls the behavior of the listbox when navigating. When set to true, the listbox will wrap around to selecting the first element when moving beyond the last one, and equivalently wrap around to the last one when moving back beyond the first one.
+		  * \param wrapping controls the behavior of the listbox when navigating. When set to true (default), the listbox will wrap around to selecting the first element when moving beyond the last one, and equivalently wrap around to the last one when moving back beyond the first one.
 		  **/
 
 		ListBox (
@@ -88,7 +88,7 @@ namespace MAUI {
 			Widget *parent,
 			ListBoxOrientation orientation, 
 			ListBoxAnimationType animType=LBA_NONE,
-			bool wrapping=false
+			bool wrapping=true
 		);
 
 		/** Destructor **/

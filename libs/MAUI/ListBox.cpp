@@ -424,7 +424,7 @@ namespace MAUI {
 
 		if(selectedIndex < 0) {
 			selectedIndex = 0;
-			if(wrapping) {
+			if(!wrapping) {
 				if(shouldFireListeners) {
 					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
 						(*i)->blocked(this, -1);
@@ -484,7 +484,7 @@ namespace MAUI {
 		if(selectedIndex < children.size() - 1) {
 			selectedIndex++;
 		} else {
-			if(wrapping) {
+			if(!wrapping) {
 				if(shouldFireListeners) {
 					Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
 						(*i)->blocked(this, 1);
