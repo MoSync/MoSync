@@ -466,7 +466,19 @@ namespace Base {
 		int height = src->height;
 		gSyscall->ValidateMemRange(dst, src->height*scanlength);
 
-		NOT_IMPLEMENTED;
+		CGRect smallRect = CGRectMake(x, y, width, height);
+		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
+		
+		// First get the image into your data buffer
+		int imgwidth = CGImageGetWidth(img->image);
+		int imgheight = CGImageGetHeight(img->image);
+		Surface *dstSurface = new Surface(imgwidth, imgheight, (char*) dst, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+
+		CGContextDrawImage(dstSurface->context, CGRectMake(0, 0, width, height), smallImage);
+		CGImageRelease(smallImage);
+			
+		delete dstSurface;
+		
 	}
 
 	SYSCALL(MAHandle, maSetDrawTarget(MAHandle handle)) {
@@ -528,7 +540,7 @@ namespace Base {
 		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
 		char *data = new char[byteSize];
 		memcpy(data, src, byteSize);
-		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaFirst:kCGImageAlphaNoneSkipFirst);
+		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast);
 		bitmap->mOwnData = true;
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
 		return 1;

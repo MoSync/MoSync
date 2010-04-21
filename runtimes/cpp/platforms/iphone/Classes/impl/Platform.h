@@ -60,11 +60,15 @@ public:
 		CGContextSetTextMatrix(context, xform);	
 	}
 
-	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipFirst) {
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipFirst, int rowBytes=-1) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		this->width = width,
 		this->height = height;
-		this->rowBytes = width*4;
+		if(rowBytes==-1)
+			this->rowBytes = rowBytes = width*4;
+		else
+			this->rowBytes = rowBytes;
+
 		if(data==NULL) {
 			this->data = new char[rowBytes*height];
 			mOwnData = true;
