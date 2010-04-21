@@ -262,7 +262,7 @@ CAppView::~CAppView()
 //Other stuff
 //***************************************************************************
 
-void CAppView::FocusChanged(TDrawNow LOG_ARG(aDrawNow)) {
+void CAppView::FocusChanged(TDrawNow aDrawNow) {
 	if(iStopForever)
 		return;
 	if(IsFocused()) {
