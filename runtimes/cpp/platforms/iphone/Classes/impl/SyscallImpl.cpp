@@ -306,12 +306,11 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
-		
-		CGPoint before = CGContextGetTextPosition(gDrawTarget->context);
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
-		int width = abs((int)(after.x-before.x));
+		int width = after.x;
 		return EXTENT(width, FONT_HEIGHT);
 	}
 
@@ -328,11 +327,11 @@ namespace Base {
 		
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
 		
-		CGPoint before = CGContextGetTextPosition(gDrawTarget->context);
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		//CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
-		int width = abs((int)(after.x-before.x));
+		int width = after.x;
 		delete glyphs;	
 		return EXTENT(width, FONT_HEIGHT);
 	}

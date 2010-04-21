@@ -47,7 +47,9 @@ elsif(UNAME == "CYGWIN_NT-5.1")
 	HOST = :linux
 elsif(UNAME == "Darwin")
 	HOST = :linux
-	HOST_PLATFORM = :darwin
+#	HOST_PLATFORM = :darwin
+	HOST_PLATFORM = :wine
+
 else
 	error("Unknown platform: #{UNAME}")
 end
