@@ -16,7 +16,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "config_platform.h"
-#include "generated\IX_CONNSERVER_CONSTS.h"
 
 //*****************************************************************************
 //Variables
