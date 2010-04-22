@@ -115,6 +115,10 @@ public:
 	char *data;
 };
 
+
+// never use <0 for event type :)
+#define IEVENT_TYPE_DEFLUX_BINARY -1
+
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
 	EventQueue() : mEventOverflow(false), mWaiting(false) {
@@ -126,6 +130,20 @@ public:
 		pthread_cond_destroy(&mCond);
 		pthread_mutex_destroy(&mMutex);
 	}
+	
+	void handleInternalEvent(int type, void *e);
+
+	const MAEvent* getAndProcess() {
+		if(count()==0) return NULL;
+		const MAEvent& e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
+		if(e.type<0) {
+			handleInternalEvent(e.type, e.data);
+			return getAndProcess();
+		} else {
+			return &e;
+		}
+	}
+	
 	
 	void put(const MAEvent& e) {
 		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
@@ -167,10 +185,23 @@ public:
 		}		
 	}
 	
+	void addScreenChangedEvent() {
+		MAEvent event;
+		event.type = EVENT_TYPE_SCREEN_CHANGED;
+		put(event);	
+	}
+	
 	void addCloseEvent() {
 		MAEvent event;
 		event.type = EVENT_TYPE_CLOSE;
 		put(event);	
+	}
+	
+	void addInternalEvent(int type, void* data) {
+		MAEvent event;
+		event.type = type;
+		event.data = data;
+		put(event);
 	}
 	
 private:

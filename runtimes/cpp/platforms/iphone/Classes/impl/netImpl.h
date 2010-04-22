@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _NET_IMPL_H_
 
 #include <pthread.h>
+#include "MemStream.h"
 
 class MoSyncMutex {
 public:
@@ -29,9 +30,15 @@ public:
 	void unlock();
 	void close();
 private:
+	bool mInitialized;
 	pthread_mutex_t mMutex;
 	pthread_mutexattr_t mMutexAttr;
 	
+};
+
+struct InternalEventDefluxBin {
+	MAHandle handle;
+	Base::Stream* stream;
 };
 
 typedef int MoSyncSocket;

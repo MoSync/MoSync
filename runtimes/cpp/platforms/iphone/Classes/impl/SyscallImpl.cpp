@@ -188,13 +188,16 @@ namespace Base {
 		mach_timebase_info_data_t machInfo;
 		mach_timebase_info( &machInfo );
 		gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
-				
+		
+		
+		MANetworkInit();		
+		
 		return true;
 	}
 
 	void MALibQuit() {
 		DeleteCriticalSection(&exitMutex);
-		
+		MANetworkClose();
 	}
 
 
@@ -569,7 +572,7 @@ namespace Base {
 		//return currentKeyState;
 		return 0;
 	}
-
+	
 
 	SYSCALL(int, maGetEvent(MAEvent *dst)) 
 	{
@@ -581,10 +584,12 @@ namespace Base {
 
 		if(!gClosing)
 			gEventOverflow = false;
-		if(gEventQueue.count() == 0)
-			return 0;
+//		if(gEventQueue.count() == 0)
+//			return 0;
 		
-		*dst = gEventQueue.get();
+		const MAEvent* ev = gEventQueue.getAndProcess();
+		if(!ev) return 0;
+		else *dst = *ev; //gEventQueue.get();
 
 		/*
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
@@ -805,6 +810,15 @@ namespace Base {
 		return IOCTL_UNAVAILABLE;
 	}
 } // namespace Base
+
+void EventQueue::handleInternalEvent(int type, void *e) {
+	if(type == IEVENT_TYPE_DEFLUX_BINARY) {
+		InternalEventDefluxBin *d = (InternalEventDefluxBin*)e;
+		SYSCALL_THIS->resources.extract_RT_FLUX(d->handle);
+		ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(d->handle, d->stream));	
+		delete d;
+	}
+}
 
 void MoSyncExit(int r) 
 {

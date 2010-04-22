@@ -68,6 +68,11 @@
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
 
+		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
+													 name:UIDeviceOrientationDidChangeNotification object:nil];
+		
 		self.frame.origin.y = 0;
 		mosyncView = nil;
         // Initialization code
@@ -122,6 +127,11 @@ bool down = false;
 		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
 		down = true;
 	}
+}
+
+- (void)deviceOrientationChanged:(NSNotification *)notification {
+	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+	Base::gEventQueue.addScreenChangedEvent();
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {

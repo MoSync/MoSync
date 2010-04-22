@@ -35,6 +35,7 @@ const char *unicodeToAscii(const wchar_t* str) {
 
 }
 
+
 // timer
 /*
 int timerFunc(void *arg) {

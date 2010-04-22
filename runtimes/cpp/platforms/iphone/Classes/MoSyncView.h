@@ -24,6 +24,9 @@
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
+
+- (void)deviceOrientationChanged:(NSNotification *)notification;
+
 @end
 
 

@@ -31,20 +31,21 @@ using namespace MoSyncError;
 //MoSyncMutex
 //***************************************************************************
 
-MoSyncMutex::MoSyncMutex() {}
+MoSyncMutex::MoSyncMutex() : mInitialized(false) {}
 
 void MoSyncMutex::init() {
 	if(pthread_mutex_init(&mMutex, NULL)!=0) {
 		DEBIG_PHAT_ERROR;
 	}
-
+	mInitialized = true;
 }
 
 MoSyncMutex::~MoSyncMutex() {
-//	pthread_mutex_destroy(&mMutex);
+	close();
 }
 
 void MoSyncMutex::close() {
+	if(!mInitialized) return;
 	pthread_mutex_destroy(&mMutex);
 }
 
@@ -69,10 +70,16 @@ void ConnWaitEvent() {
 }
 void ConnPushEvent(MAEvent* ep) {
 	//PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);
-	DEBIG_PHAT_ERROR;
+	//DEBIG_PHAT_ERROR;
+	Base::gEventQueue.put(*ep);
+	delete ep;
 }
 
 void DefluxBinPushEvent(MAHandle handle, Stream& s) {
 	//PostMessage(g_hwndMain, WM_DEFLUX_BINARY, (WPARAM) &s, handle);
-	DEBIG_PHAT_ERROR;
+//	DEBIG_PHAT_ERROR;
+	InternalEventDefluxBin* ie = new InternalEventDefluxBin;
+	ie->handle = handle;
+	ie->stream = (Stream*)&s;
+	Base::gEventQueue.addInternalEvent(IEVENT_TYPE_DEFLUX_BINARY, ie);
 }
