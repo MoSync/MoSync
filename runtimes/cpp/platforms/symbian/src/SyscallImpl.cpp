@@ -2387,7 +2387,7 @@ void Syscall::MaoscOpenComplete(TInt aError) {
 	}
 
 	//send event
-	MAEVENT e;
+	MAEvent e;
 	e.type = EVENT_TYPE_AUDIOBUFFER_FILL;
 	e.state = aError;
 	gAppView.AddEvent(e);
@@ -2409,7 +2409,7 @@ void Syscall::MaoscBufferCopied(TInt aError, const TDesC8 &aBuffer) {
 	if(aError >= 0) {
 		gAudioBuffer.ready = true;
 		//send event
-		MAEVENT e;
+		MAEvent e;
 		e.type = EVENT_TYPE_AUDIOBUFFER_FILL;
 		e.state = aError;
 		gAppView.AddEvent(e);

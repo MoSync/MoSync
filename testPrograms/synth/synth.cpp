@@ -52,10 +52,10 @@ public:
 			memcpy(mBuffer + (SAMPLES_PER_WAVE * i), mBuffer, SAMPLES_PER_WAVE * sizeof(s16));
 		}
 
-		Handle data = maCreatePlaceholder();
+		MAHandle data = maCreatePlaceholder();
 		maCreateData(data, sizeof(mBuffer));
 		maWriteData(data, mBuffer, 0, sizeof(mBuffer));
-		Handle store = maOpenStore("sine.pcm", MAS_CREATE_IF_NECESSARY);
+		MAHandle store = maOpenStore("sine.pcm", MAS_CREATE_IF_NECESSARY);
 		maWriteStore(store, data);
 		maCloseStore(store, 0);
 
@@ -73,7 +73,7 @@ public:
 		//printf("R %i\n", res);
 	}
 
-	void customEvent(const EVENT& event) {
+	void customEvent(const MAEvent& event) {
 		if(event.type != EVENT_TYPE_AUDIOBUFFER_FILL)
 			return;
 		printf("F %i\n", event.state);
