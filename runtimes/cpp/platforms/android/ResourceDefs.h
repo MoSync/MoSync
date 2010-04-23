@@ -15,11 +15,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _BASE_GRAPHICS_H_
-#define _BASE_GRAPHICS_H_
+#ifndef _RESOURCE_DEFS_H_
+#define _RESOURCE_DEFS_H_
 
-namespace Base {
+#include "base/Stream.h"
+#include "Image.h"
 
-}
+#define TYPES(m)\
+	m(RT_BINARY, Base::Stream, delete)\
+	m(RT_PLACEHOLDER, void, NUL)\
+	m(RT_LABEL, Label, delete) \
+	m(RT_IMAGE, Image, delete)\
+	m(RT_FLUX, void, NUL)\
 
-#endif /* _BASE_GRAPHICS_H_ */
+#endif // _RESOURCE_DEFS_H_

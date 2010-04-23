@@ -15,11 +15,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _BASE_GRAPHICS_H_
-#define _BASE_GRAPHICS_H_
+class Syscall {
+private:
+//Image* loadImage(MemStream& s);
+//Image* loadSprite(void* surface, ushort left, ushort top,
+//	ushort width, ushort height, ushort cx, ushort cy);
 
-namespace Base {
-
-}
-
-#endif /* _BASE_GRAPHICS_H_ */
+public:
+	//Syscall(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd);
+	Syscall();
+//	void drawSplash();
