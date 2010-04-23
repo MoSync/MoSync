@@ -17,25 +17,8 @@ const char *getReadablePath(const char* path);
 const char *getWriteablePath(const char* path);
 void sleepMillis(int ms);
 const char *unicodeToAscii(const wchar_t* str);
+int getFreeAmountOfMemory();
+int getTotalAmountOfMemory();
+bool platformRequest(const char *url);
 
-/*
-class Timer {
-public:
-	typedef void (*TimerCallback)(void *arg);
-
-	struct TimerInfo {
-		int ms;
-		TimerCallback cb;
-		void *arg;
-	};
-	
-	Timer(TimerCallback cb, int ms, void *arg);
-	~Timer();
-	void run();
-	
-private:
-	TimerInfo mTimerInfo;
-	MoSyncThread mThread;
-};
-*/
 #endif

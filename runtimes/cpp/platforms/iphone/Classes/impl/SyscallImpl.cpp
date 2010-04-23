@@ -48,6 +48,7 @@ using namespace MoSyncError;
 
 #include "iphone_helpers.h"
 #include "CMGlyphDrawing.h"
+#include <AudioToolbox/AudioToolbox.h>
 
 extern ThreadPool gThreadPool;
 
@@ -394,7 +395,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maResetBacklight()) {
-		// do nothing, it can't be reset as far as I can tell..
+		// do nothing, it can't be reset as far as I can tell.. still a private api.
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
@@ -570,7 +571,7 @@ namespace Base {
 			return 0;
 		//MAProcessEvents();
 		//return currentKeyState;
-		return 0;
+		return 0; // there's no keys on iphone :)
 	}
 	
 
@@ -636,20 +637,19 @@ namespace Base {
 
 		return (int)((double)mach_absolute_time()*gTimeConversion);
 	}
+	
 
 	SYSCALL(int, maFreeObjectMemory()) {
-		NOT_IMPLEMENTED;
-		return 0;
+		return getFreeAmountOfMemory();
 	}
 	SYSCALL(int, maTotalObjectMemory()) {
-		NOT_IMPLEMENTED;
-		return 0;
+		return getTotalAmountOfMemory();
 	}
 
 	SYSCALL(int, maVibrate(int ms)) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+		return 1;
 	}
 
 	SYSCALL(void, maPanic(int result, char* message)) 
@@ -662,7 +662,7 @@ namespace Base {
 
 	SYSCALL(int, maPlatformRequest(const char* url)) 
 	{
-		NOT_IMPLEMENTED;
+		if(!platformRequest(url)) return -1;
 		return 0;
 	}
 
@@ -797,13 +797,16 @@ namespace Base {
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
+				
+		case maIOCtl_maPlatformRequest:
+			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));				
 		
-			case maIOCtl_maFrameBufferGetInfo:
-				return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
-			case maIOCtl_maFrameBufferInit:
-				return maFrameBufferInit(GVMRA(void*));		
-			case maIOCtl_maFrameBufferClose:
-				return maFrameBufferClose();
+		case maIOCtl_maFrameBufferGetInfo:
+			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+		case maIOCtl_maFrameBufferInit:
+			return maFrameBufferInit(GVMRA(void*));		
+		case maIOCtl_maFrameBufferClose:
+			return maFrameBufferClose();
 				
 		}
 		
