@@ -104,11 +104,11 @@ namespace MoSync {
 		void setPattern(Matcher m, Visitor v, byte *sequence) {
 			int length = 0;
 			InstructionPatternNode *node = &mPatternNodeRoot;
-			if(*sequence == _NUL) {
+			if(*sequence == Core::_NUL) {
 				// error
 			}
 
-			while(*sequence != _NUL) {
+			while(*sequence != Core::_NUL) {
 				node = node->children[*sequence] = new InstructionPatternNode(node, length+1);
 				sequence++;
 				length++;
@@ -228,9 +228,9 @@ namespace MoSync {
 			while(ip != mEnvironment.codeSize) {
 				ip+=decodeInstruction(&mEnvironment.mem_cs[ip], inst);
 
-				if(inst.op == _FAR) inst.op = inst.op2;
+				if(inst.op == Core::_FAR) inst.op = inst.op2;
 				switch(inst.op) {
-					case _RET :
+					case Core::_RET :
 					{
 endOfFunction:
 						int ipOfInstruction = ip-inst.length;
@@ -244,7 +244,7 @@ endOfFunction:
 						}
 					}
 					break;
-					case _CASE: 
+					case Core::_CASE: 
 					{
 						inst.imm<<=2;
 						//uint CaseStart = RECOMP_MEM(int, inst.imm, READ);
@@ -266,22 +266,22 @@ endOfFunction:
 						}
 					}
 					break;
-					case _JPI:
+					case Core::_JPI:
 					if(inst.imm<ip) {
 						f->addLabel(inst.imm);
 						goto endOfFunction;
 					}
 
-					case _JC_EQ:
-					case _JC_NE:
-					case _JC_GE:
-					case _JC_GEU:
-					case _JC_GT:
-					case _JC_GTU:
-					case _JC_LE:
-					case _JC_LEU:
-					case _JC_LT:
-					case _JC_LTU:
+					case Core::_JC_EQ:
+					case Core::_JC_NE:
+					case Core::_JC_GE:
+					case Core::_JC_GEU:
+					case Core::_JC_GT:
+					case Core::_JC_GTU:
+					case Core::_JC_LE:
+					case Core::_JC_LEU:
+					case Core::_JC_LT:
+					case Core::_JC_LTU:
 						f->addLabel(inst.imm);
 					break;
 					default: break;
@@ -383,7 +383,8 @@ endOfFunction:
 		virtual int run(int ip) = 0;
 
 	protected:
-		int Recompiler::decodeInstruction(const byte *ip, Instruction& inst) {
+		int decodeInstruction(const byte *ip, Instruction& inst) {
+//		int Recompiler::decodeInstruction(const byte *ip, Instruction& inst) {
 			inst.ip = (int)(ip-mEnvironment.mem_cs);
 			inst.length = disassemble_one(ip, mEnvironment.mem_cs, mEnvironment.mem_cp, (char*)NULL, inst.op, inst.op2, inst.rd, inst.rs, inst.imm);
 			return inst.length;

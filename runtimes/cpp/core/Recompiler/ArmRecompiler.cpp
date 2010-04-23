@@ -196,6 +196,8 @@ using namespace Core;
 #else
 		return mCodeChunk.allocate(size);
 #endif	//0
+#elif defined(_android)
+		return NULL;
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -204,6 +206,8 @@ using namespace Core;
 	void* MoSync::ArmRecompiler::allocateEntryPoint(int size) {
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
+#elif defined(_android)
+		return NULL;
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -214,6 +218,8 @@ using namespace Core;
 		LOG("freeCode 0x%08x\n", addr);
 		DEBUG_ASSERT(addr == mCodeChunk.address());
 		mCodeChunk.close();
+	#elif defined(_android)
+		return;
 	#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
 	#endif
@@ -224,6 +230,8 @@ using namespace Core;
 		LOG("freeEntry 0x%08x\n", addr);
 		DEBUG_ASSERT(addr == mEntryChunk.address());
 		mEntryChunk.close();
+	#elif defined(_android)
+		return;
 	#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
 	#endif
@@ -240,6 +248,8 @@ using namespace Core;
 		LOGD("flushInstructionCache end: 0x%08x\n", end);
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
+	#elif defined(_android)
+		return;
 	#else // winmobile
 		// This seems to work, but might not be correct
 		// Might be better to call CacheSync(...)

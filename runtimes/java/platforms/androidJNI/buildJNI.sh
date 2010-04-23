@@ -21,7 +21,6 @@ echo "Copying files"
 cd $MOSYNC_SRC"/runtimes/cpp/core"
 cp -R * $ANDROID_PATH
 
-
 cd $MOSYNC_SRC"/runtimes/cpp/base"
 cp -R * $ANDROID_PATH"/base"
 cp -R * $ANDROID_PATH

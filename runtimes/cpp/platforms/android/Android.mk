@@ -19,6 +19,6 @@ LOCAL_PATH:= /cygdrive/d/android-ndk-1.5_r1/sources/mosync
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := mosync
-LOCAL_SRC_FILES := Core.cpp FileImpl.cpp FileStream.cpp AndroidHelpers.cpp SyscallsNative.cpp SyscallsDalvik.cpp
+LOCAL_SRC_FILES := Core.cpp FileImpl.cpp FileStream.cpp AndroidHelpers.cpp SyscallsNative.cpp SyscallsDalvik.cpp disassembler.cpp Recompiler/ArmAssembler.cpp Recompiler/ArmRecompiler.cpp
 
 include $(BUILD_SHARED_LIBRARY)
