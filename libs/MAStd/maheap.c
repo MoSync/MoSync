@@ -25,6 +25,8 @@ free_hook gFreeHook = NULL;
 realloc_hook gReallocHook = NULL;
 block_size_hook gBlockSizeHook = NULL;
 
+static void* sHeapBase;
+
 #ifdef MOSYNCDEBUG
 //#define MEMORY_PROTECTION
 int gUsedMem = 0;
@@ -96,6 +98,8 @@ void ansi_heap_init_crt0(char *start, int length)
 	}
 
 	MASTD_HEAP_LOG("heap: start 0x%08x len 0x%x", start, length);
+	
+	sHeapBase = start;
 
 	if(length <= 0)
 		return;
@@ -109,6 +113,13 @@ void ansi_heap_init_crt0(char *start, int length)
 	set_block_size_hook((block_size_hook)tlsf_block_size);
 		
 	MASTD_HEAP_LOG("TLSF initialized!");
+}
+
+size_t heapTotalMemory(void) {
+	return get_max_size(sHeapBase);
+}
+size_t heapFreeMemory(void) {
+	return heapTotalMemory() - get_used_size(sHeapBase);
 }
 
 //****************************************
