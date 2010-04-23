@@ -74,6 +74,23 @@ static void BB_log_error(const char* name, const uint error) {
 	LOG("%s: 0x%08x(%i)(%x %x %x %x)\n", name, error, error, severity, mod, submod, id);
 }
 
+static void dumpDba(const BB_DbLs* db) {
+	LOG("Database:\n");
+	while(true) {
+		LOG(" Descriptor: %s\n", db->descriptor);
+		BB_DbId* id = db->pDbId;
+		if(!id)
+			break;
+		LOG(" Type: %i Flags: %i Size: %i\n", id->type, id->flags, id->size);
+		db++;
+	}
+}
+
+static BB_S32 myMarkCallback(BB_S32 a, BB_S32 b, BB_S32 c, BB_U32 d) {
+	LOG("markCallback(%i, %i, %i, %i)\n", a, b, c, d);
+	return 0;
+}
+
 void Syscall::InitGuidoL() {
 	LOG("InitGuidoL\n");
 	/*for(int i=0; ; i++) {
@@ -142,19 +159,27 @@ void Syscall::InitGuidoL() {
 		babParam.sSize = sizeof(babParam);
 		babParam.sNLPConfig=0;
 #ifdef BABILE2
+		babParam.sMBRConfig = BABILE_MBRE_BUFFERING10;
 		babParam.sSELConfig = BUFFER_UNITACOUSTIC_ALL|BUFFER_UNITSOFFSETS_ALL|BUFFER_BERSTREAM_ALL|20;
 		babParam.nlpModule = BABILE_NLPMODULE_NLPE;
 		babParam.synthModule = BABILE_SYNTHMODULE_BBSELECTOR;
+		babParam.markCallback = myMarkCallback;
 		
 		char* iniPtr = iniContents;
 		babParam.nlpeLS = initLanguageDbaL(CCP voicePath.PtrZ(), iniPtr);
 		DEBUG_ASSERT(babParam.nlpeLS);
+		dumpDba(babParam.nlpeLS);
 		babParam.synthLS = initVoiceDbaL(CCP voicePath.PtrZ(), iniPtr);
 		DEBUG_ASSERT(babParam.synthLS);
+		dumpDba(babParam.synthLS);
 		
-		babParam.license = (const BB_TCHAR*) babLicense;  /* load your license file */
+		babParam.license = babLicense;  /* load your license file */
 		babParam.uid.passwd=uid.passwd;	/* your password */
 		babParam.uid.userId=uid.userId; /* your ID */
+		
+		LOG("License: '%s'\n", babParam.license);
+		LOG("userId: 0x%x\n", babParam.uid.userId);
+		LOG("passwd: 0x%x\n", babParam.uid.passwd);
 #else	// old version
 		babParam.sMBRConfig=0;
 		babParam.mbreLS = initVoiceDbaL();
@@ -308,10 +333,13 @@ void* Syscall::VoidAllocZero(int size) {
 	return gAllocArray[gNumAllocs++] = p;
 }
 
-
 char* Syscall::GetFileL(const char* filename) {
+	int dummy;
+	return GetFileWithSizeL(filename, dummy);
+}
+
+char* Syscall::GetFileWithSizeL(const char* filename, int& size) {
 	FileStream file(filename);
-	int size;
 	if(!file.length(size)) {
 		LOG("GetFileL open error\n");
 		return NULL;
@@ -341,13 +369,6 @@ char* Syscall::GetFileFromEitherDriveL(const char* partPath) {
 	buffer[0] = 'E';
 	return GetFileL(buffer);
 }
-
-#if defined(BABILE2) && defined(ENGLISH)
-static bool FileExistL(const char* path) {
-	FileStream file(path);
-	return file.isOpen();
-}
-#endif	//BABILE2 && ENGLISH
 
 #ifdef SWEDISH
 BB_DbLs* Syscall::initVoiceDbaL() {
@@ -428,15 +449,22 @@ BB_DbLs* Syscall::initVoiceDbaL(const char* voicePath, char*& iniPtr) {
 		char* path = (char*)VoidAlloc(vpLen + fnLen + 1);
 		memcpy(path, voicePath, vpLen);
 		memcpy(path + vpLen, fn, fnLen + 1);
-		if(!FileExistL(path))
+		
+		FileStream file(path);
+		int length;
+		if(!file.isOpen())
 			return NULL;
-		mbrDba[i].pDbId->type = BB_ROFILE_DBMEMTYPE;
+		if(!file.length(length))
+			return NULL;
+		
+		mbrDba[i].pDbId->size = length;
+		mbrDba[i].pDbId->type = X_FILE;
 		mbrDba[i].pDbId->link = path;
 	}
 	iniReadEnd(iniPtr);
 
-	//mbrDba[count].pDbId=NULL;
-	//::strcpy(mbrDba[count].descriptor,"END");
+	mbrDba[count].pDbId=NULL;
+	::strcpy(mbrDba[count].descriptor,"END");
 
 	return mbrDba;
 }
@@ -454,10 +482,12 @@ BB_DbLs* Syscall::initLanguageDbaL(const char* voicePath, char*& iniPtr) {
 		const char* fn = iniReadFilename(iniPtr);
 		TBuf8<KMaxFileName> buf;
 		buf.Format(_L8("%s%s"), voicePath, fn);
-		if(!(ptr = GetFileL(CCP buf.PtrZ())))
+		int size;
+		if(!(ptr = GetFileWithSizeL(CCP buf.PtrZ(), size)))
 			return NULL;
 		nlpDba[i].pDbId->type = X_RAM;
 		nlpDba[i].pDbId->link = ptr;
+		nlpDba[i].pDbId->size = size;
 	}
 	iniReadEnd(iniPtr);
 

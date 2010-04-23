@@ -78,6 +78,7 @@ template<class T> T* AllocZero(int num = 1) {
 	return (T*)VoidAllocZero(sizeof(T) * num);
 }
 char* GetFileL(const char* filename);
+char* GetFileWithSizeL(const char* filename, int& size);
 char* GetFileFromEitherDriveL(const char* partPath);
 
 //BABILE stuff
