@@ -195,6 +195,7 @@ NETSYSCALL(void) maConnReadToData(MAHandle conn, MAHandle data, int offset, int 
 
 	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
 	
+	connectionInfo.mData = data;
 	connectionInfo.mBinary = binaryResource;
 	connectionInfo.mOffset = offset;
 	connectionInfo.mSize = size;
@@ -233,6 +234,7 @@ NETSYSCALL(void) maConnWriteFromData(MAHandle conn, MAHandle data, int offset, i
 
 	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
 	
+	connectionInfo.mData = data;
 	connectionInfo.mBinary = binaryResource;
 	connectionInfo.mOffset = offset;
 	connectionInfo.mSize = size;
@@ -409,6 +411,7 @@ public class ConnectionInformation
 	private MAHandle mHandle;
 	public InputStream mIs;
 	public OutputStream mOs;
+	public MAHandle mData;
 	
 	public String mSocketAddress;
 	public int mSocketPort;
@@ -590,6 +593,8 @@ class HttpConnectionRunner implements Runnable
 					DEBUG_ALWAYS("Weird-ass ConnRead error "+result+"!\n");
 					opResult = CONNERR_INTERNAL;
 				}
+				
+				setResource(mConn.mData, mConn.mBinary);
 				mConn.postResultEvent(opType, opResult);
 				return;
 			}
@@ -617,6 +622,8 @@ class HttpConnectionRunner implements Runnable
 				}
 				
 				//success
+				
+				setResource(mConn.mData, mConn.mBinary);
 				mConn.postResultEvent(opType, 1);
 				return;
 			}	
@@ -685,6 +692,8 @@ class SocketConnectionRunner implements Runnable
 					DEBUG_ALWAYS("Weird-ass ConnRead error "+result+"!\n");
 					opResult = CONNERR_INTERNAL;
 				}
+				
+				setResource(mConn.mData, mConn.mBinary);
 				mConn.postResultEvent(opType, opResult);
 				return;
 			}
@@ -712,6 +721,7 @@ class SocketConnectionRunner implements Runnable
 				}
 				
 				//success
+				setResource(mConn.mData, mConn.mBinary);
 				mConn.postResultEvent(opType, 1);
 				return;
 			}	
