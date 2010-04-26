@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-static const char* URL = "http://www.mosync.com/fred/otaload.v9.comb";
+static const char* URL = "http://www.mosync.com/fred/otaload.v10.comb";
 static const char* SAV = "OtaLoad.sav";
 static const char* MODSAV = "OtaLoad.mod.sav";
 
@@ -106,7 +106,6 @@ private:
 	void startDownload() {
 		printf("Downloading from %s\n", URL);
 		//in case of re-download
-		maDestroyObject(mProgram);
 		mHttp.close();
 
 		mHttp.create(URL, HTTP_GET);
@@ -132,6 +131,7 @@ private:
 			}
 			int contentLength = stringToInteger(cls);
 			printf("Content-Length: %i\n", contentLength);
+			maDestroyObject(mProgram);
 			if(maCreateData(mProgram, contentLength) == RES_OUT_OF_MEMORY) {
 				printf("Out of memory!\n");
 				return;
