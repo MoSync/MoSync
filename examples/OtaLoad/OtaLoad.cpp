@@ -106,7 +106,6 @@ private:
 	void startDownload() {
 		printf("Downloading from %s\n", URL);
 		//in case of re-download
-		maDestroyObject(mProgram);
 		mHttp.close();
 
 		mHttp.create(URL, HTTP_GET);
@@ -132,6 +131,7 @@ private:
 			}
 			int contentLength = stringToInteger(cls);
 			printf("Content-Length: %i\n", contentLength);
+			maDestroyObject(mProgram);
 			if(maCreateData(mProgram, contentLength) == RES_OUT_OF_MEMORY) {
 				printf("Out of memory!\n");
 				return;
