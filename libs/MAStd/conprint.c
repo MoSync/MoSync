@@ -245,12 +245,14 @@ int puts(const char* str)
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	wsprintf(wbuf, L"%s", str);
-	PrintConsole(wbuf);
+	wputs(wbuf);
 	return 0;
 }
 
 int wputs(const wchar_t* str) {
 	PrintConsole(str);
+	if(!sConsole.postponedLineFeed)
+		FeedLine();
 	return 0;
 }
 
