@@ -17,9 +17,10 @@
 <property key="build.prefs:gcc.switches/Release" value="-O2 -Wall"/>
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
-<property key="build.prefs:project.type" value=""/>
+<property key="build.prefs:memory.stack/Release" value="20"/>
+<property key="build.prefs:project.type" value="lib"/>
 <property key="dependency.strategy" value="0"/>
-<property key="excludes/Release" value="tests/listtest.cpp stlport"/>
+<property key="excludes/Release" value=""/>
 <property key="template.id" value="project.empty"/>
 </properties>
 </project>
