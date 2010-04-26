@@ -16,6 +16,8 @@ private:
 	Frame *frame2;
 	Parser *parser;
 	Button *button;
+	MenuItem *item;
+	MenuItem *item2;
 public:
 	Main() {
 		frame = NULL;
@@ -40,6 +42,9 @@ public:
 		delete(frame);
 		delete(frame2);
 		delete(parser);
+		delete(button);
+		delete(item);
+		delete(item2);
 	}
 
 	void onCreate (int id) {
@@ -50,6 +55,14 @@ public:
 
 			button = (Button *) Manager::Instance().findById(32);
 			button->addActionListener(this);
+			
+			item = new MenuItem("New frame", frame, STAR_ICON);
+			Manager::Instance().addWidget(item);
+			item->addActionListener(this);
+			
+			item2 = new MenuItem("New frame", frame, SKULL_ICON);
+			Manager::Instance().addWidget(item2);
+			item2->addActionListener(this);
 /*
 			button = new Button("New frame");
 			Manager::Instance().addWidget(button);

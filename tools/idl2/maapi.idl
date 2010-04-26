@@ -2796,6 +2796,7 @@ interface MAAPI {
 			int sizeY;
 			int posX;
 			int posY;
+			int rsc;
 			char buf[MA_NATIVE_UI_BUFFERSIZE];
 			
 		}

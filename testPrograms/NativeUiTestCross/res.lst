@@ -1,3 +1,10 @@
 .res MAIN_LAYOUT
 .bin 
 .include "main_layout.xml"
+
+.res SKULL_ICON
+.image "skull.png"
+
+.res STAR_ICON
+.image "star.png"
+

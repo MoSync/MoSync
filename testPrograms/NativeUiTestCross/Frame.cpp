@@ -43,6 +43,9 @@ Frame::Frame(int id) {
 	MAWidgetParameters mp;
 	mp.pParent=me;
 	maWinMobileMenuBar(&mp);
+	
+	maIPhoneView(&wp, &handle);
+	me=handle.pWidget;
 
 }
 

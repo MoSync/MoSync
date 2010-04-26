@@ -43,7 +43,7 @@ public:
 	 * @param str		Text to be shown
 	 * @param frame		Pointer to the parent frame
 	 */
-	MenuItem(char *str, Widget *frame);
+	MenuItem(char *str, Widget *frame, int src);
 
 	/**
 	 * Destructor

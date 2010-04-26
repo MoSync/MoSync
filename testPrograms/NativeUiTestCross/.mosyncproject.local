@@ -2,5 +2,7 @@
 <project version="1">
 <active.build.cfg active="Release"/>
 <target-profile/>
-<properties/>
+<properties>
+<property key="last.build.config" value="Release"/>
+</properties>
 </project>

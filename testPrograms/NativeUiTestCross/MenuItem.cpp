@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * @param str	Text to be shown
  * @param frame		Pointer to the parent frame
  */
-MenuItem::MenuItem(char *str, Widget *frame) {
+MenuItem::MenuItem(char *str, Widget *frame, int rsc) {
 	text=str;
 
 	MAWidgetParameters itemParams;
@@ -38,9 +38,15 @@ MenuItem::MenuItem(char *str, Widget *frame) {
 	strncpy(itemParams.buf, text, strlen(text) + 1);
 	itemParams.widgetID=myid;
 	itemParams.pParent=frame->getInstance();
+	itemParams.rsc=rsc;
 	maWinMobileAddRightMenuItem(&itemParams, NULL);
 
 	maAndroidAddMenuItem(myid, text);
+	
+	maIPhoneToolBar(&itemParams, NULL);
+	maIPhoneToolBarItem(&itemParams, NULL);
+	
+	
 }
 
 /**

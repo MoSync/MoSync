@@ -56,16 +56,16 @@ static MoSyncView *currentScreen;
 // Used to pass parameters to the widgets, through performSelectorOnMainThread
 @interface WidgetHandler : UIViewController <UITextFieldDelegate> {
 	NSString *msg;
-	int x,y,l,h, widgetId;
+	int x,y,l,h, widgetId, rsc;
 }
 @property (copy, nonatomic) NSString* msg;
-@property int x,y,l,h, widgetId;
+@property int x,y,l,h, widgetId, rsc;
 - (BOOL)textFieldShouldReturn:(UITextField *)textField;
 @end
 
 @implementation WidgetHandler
 @synthesize msg;
-@synthesize x,y,l,h, widgetId;
+@synthesize x,y,l,h, widgetId, rsc;
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
 	[textField resignFirstResponder];
 	return NO;
@@ -264,6 +264,7 @@ bool down = false;
     if (button == 1)
     {
 		[self.superview sendSubviewToBack:currentScreen];
+		//[self.superview sendSubviewToBack:self];
         NSLog(@"Navigation bar back button clicked.");
     }
 
@@ -280,13 +281,14 @@ bool down = false;
 
 -(void) addScreen:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
-	CGRect frame = CGRectMake(0, 0, 320, 480);
-	MoSyncView *v = [[MoSyncView alloc] initWithFrame:frame];
+	MoSyncView *v = [[MoSyncView alloc] initWithFrame:self.frame];
 	v.tag = wh.widgetId;
 	[self addSubview:v ];
 	v.backgroundColor = [UIColor groupTableViewBackgroundColor];
+	//v.backgroundColor = [UIColor whiteColor];
 	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
 	currentScreen = v;
+	//currentScreen = self;
 	Base::gEventQueue.addNativeUIEvent([v tag], 0);
 	NSLog(@"the tag value is: %d", [v tag]);
 }
@@ -301,7 +303,7 @@ bool down = false;
 -(void) addNavigationBar:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
 	UINavigationBar *nav = [[UINavigationBar alloc] 
-							initWithFrame: CGRectMake(0.0f, 20.0f, 320.0f, 48.0f)];
+							initWithFrame: CGRectMake(0.0f, 20.0f, self.frame.size.width, 48.0f)];
     [nav showButtonsWithLeftTitle: @"Back" 
 				   rightTitle: nil leftBack: YES];
 	CGRect frame = CGRectMake(0, 0, 320, 48);
@@ -329,7 +331,7 @@ bool down = false;
 	toolbar = [UIToolbar new];
 	toolbar.barStyle = UIBarStyleDefault;
 	[toolbar sizeToFit];
-	toolbar.frame = CGRectMake(0, 436, 320, 44.0f);
+	toolbar.frame = CGRectMake(0, /*(self.frame.size.height - 44)*/480-44, self.frame.size.width, 44);
 	[self addSubview:toolbar];
 }
 
@@ -340,7 +342,7 @@ bool down = false;
 
 -(void) addToolBarItem:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
-	Surface* img = Base::gSyscall->resources.get_RT_IMAGE(1);	
+	Surface* img = Base::gSyscall->resources.get_RT_IMAGE(wh.rsc);	
 	UIBarButtonItem *systemItem1 = [[UIBarButtonItem alloc] initWithImage:[UIImage imageWithCGImage:img->image]
 																	style:UIBarButtonItemStylePlain target:self action:@selector(passEvent:)];
 	systemItem1.tag = wh.widgetId;
@@ -348,9 +350,10 @@ bool down = false;
 	[toolbar setItems:items animated:YES];
 }
 
--(void) showToolBarItem: (int) widgetid {
+-(void) showToolBarItem: (int) widgetid withIcon: (int) rsc {
 	WidgetHandler *wh = [WidgetHandler alloc];
 	wh.widgetId = widgetid;
+	wh.rsc = rsc;
 	items = [NSMutableArray arrayWithCapacity:1];
 	[self performSelectorOnMainThread: @ selector(addToolBarItem:) withObject:(id)wh waitUntilDone:NO];
 	

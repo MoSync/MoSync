@@ -60,6 +60,9 @@ void Edit::build(int x, int y, int h, int l, void *f) {
 	me=editHandle.pWidget;
 
 	maAndroidAddEditText(myid, text);
+	
+	maIPhoneEdit(&editParams, &editHandle);
+	me=editHandle.pWidget;
 }
 
 

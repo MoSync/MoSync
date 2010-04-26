@@ -60,6 +60,8 @@ void Label::build(int x, int y, int h, int l, void *f) {
 	me=labelHandle.pWidget;
 
 	maAndroidAddTextView(myid, text);
+	
+	maIPhoneLabel(&labelParams, NULL);
 }
 
 /**

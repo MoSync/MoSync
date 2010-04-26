@@ -43,7 +43,7 @@
 -(MoSyncView *) showScreen:(int) widgetid;
 -(void) addToolBar:(id) obj;
 -(void) showToolBar;
--(void) showToolBarItem: (int) widgetid;
+-(void) showToolBarItem: (int) widgetid withIcon: (int) rsc;
 -(void) addToolBarItem:(id) obj;
 -(void) passEvent:(id) obj;
 

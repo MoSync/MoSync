@@ -76,6 +76,6 @@ int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
 	//UIView *my_sMoSyncView = getMoSyncView();
-	[wparams->pParent showToolBarItem:wparams->widgetID ];
+	[wparams->pParent showToolBarItem:wparams->widgetID withIcon: wparams->rsc];
 	return 0;
 }

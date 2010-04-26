@@ -395,6 +395,7 @@ namespace Base {
 		//int width = CGImageGetWidth(gBackbuffer->image);
 		//int height = CGImageGetHeight(gBackbuffer->image);
 		return EXTENT(gWidth, gHeight);
+		
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {

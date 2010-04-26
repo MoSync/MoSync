@@ -100,4 +100,7 @@ void Button::build(int x, int y, int h, int l, void *f) {
 	me=buttonHandle.pWidget;
 
 	maAndroidAddButton(myid, text);
+	
+	maIPhoneButton(&buttonParams, &buttonHandle);
+	me=buttonHandle.pWidget;
 }
