@@ -63,7 +63,7 @@ void Image::build(int x, int y, int h, int l, void *f) {
 	MAWidgetHandle imageHandle;
 	//maWinMobileLabel(&labelParams, NULL);
 	
-
+	maAndroidAddImage(myid, mRsc);
 	//maAndroidAddTextView(myid, text);
 	
 	maIPhoneImage(&imageParams, NULL);

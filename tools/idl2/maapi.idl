@@ -2823,6 +2823,7 @@ interface MAAPI {
 		int maAndroidAddEditText(in int id, in MAString str);
 		int maAndroidAddButton(in int id, in MAString str);
 		int maAndroidAddMenuItem(in int id, in MAString str);
+		int maAndroidAddImage(in int id, in int rsc);
 		
 		int maIPhoneMessageBox(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneLabel(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);

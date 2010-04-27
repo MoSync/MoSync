@@ -23,6 +23,7 @@ package com.mosync.java.android;
 #include "generated\MAAPI_consts.h"
 #include "generated\IX_RESOURCE_TYPES_CONSTS.h"
 #include "generated\IX_NATIVE_UI_CONSTS.h"
+#include "generated\IX_STREAMING_CONSTS.h"
 
 import android.util.Log;
 import android.graphics.Canvas;
@@ -68,6 +69,7 @@ import android.app.Activity;
 import android.widget.EditText;
 import android.content.Intent;
 import android.widget.Button;
+import android.widget.ImageView;
 
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
 #include "IX_OPENGL_ES_CONSTS.h"
@@ -1267,6 +1269,19 @@ public
 		Log.i("MoSync", "addTextView : " + str);
 		return 0;
 	}
+	
+	int maAndroidAddImage(final int id, final int rsc) {
+		NativeUI.mHandler.post(new Runnable() {
+			public void run() {
+				ImageView img = new ImageView(NativeUI.me);
+				img.setImageBitmap( ((ImageCache) getResource(rsc)).mBitmap );
+				NativeUI.me.ll.addView(img);
+				NativeUI.me.setContentView(NativeUI.me.ll);
+			}
+		}); 
+		Log.i("MoSync", "addImage");
+		return 0;
+	}
  
 	int maAndroidAddEditText(final int id, final String str) {
 		NativeUI.mHandler.post(new Runnable() {
@@ -1454,6 +1469,8 @@ public
 			return maAndroidSetText(a, readMemString(b));
 		case maIOCtl_maAndroidAddTextView:
 			return maAndroidAddTextView(a, readMemString(b));
+		case maIOCtl_maAndroidAddImage:
+			return maAndroidAddImage(a, b);
 		case maIOCtl_maAndroidAddEditText:
 			return maAndroidAddEditText(a, readMemString(b));
 		case maIOCtl_maAndroidAddButton:
