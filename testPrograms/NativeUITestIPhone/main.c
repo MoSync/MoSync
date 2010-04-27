@@ -5,6 +5,7 @@
 #include <maheap.h>
 #include <matime.h>
 #include <maassert.h>
+#include "MAHeaders.h"
 
 int MAMain() {
 	
@@ -57,9 +58,16 @@ int MAMain() {
 	MAWidgetParameters wparamsItem;
 	wparamsItem.widgetID = 13;
 	wparamsItem.pParent = whandle.pWidget;
+	wparamsItem.rsc = SKULL_ICON;
 	maIPhoneToolBarItem(&wparamsItem, NULL);
-	maIPhoneToolBarItem(&wparamsItem, NULL);
-	maIPhoneToolBarItem(&wparamsItem, NULL);
+	
+	MAWidgetParameters wparamsImage;
+	wparamsImage.widgetID = 14;
+	wparamsImage.pParent = whandle.pWidget;
+	wparamsImage.rsc = SKY_ICON;
+	wparamsImage.posX = 30;
+	wparamsImage.posY = 250;
+	maIPhoneImage(&wparamsImage, NULL);
 	
 	maIPhoneLabel(&wparams2, NULL);
 	maIPhoneButton(&wparams, NULL);

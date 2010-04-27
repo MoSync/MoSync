@@ -1,3 +1,6 @@
+.res SKY_ICON
+.image "sky.png"
+
 .res SKULL_ICON
 .image "skull.png"
 
