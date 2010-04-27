@@ -2175,7 +2175,7 @@ DWORD GetScreenOrientation()
 
 		SmsClose(hSms);
 
-		return 1;
+		return 0;
 	}
 
 	void BtWaitTrigger() 
