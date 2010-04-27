@@ -47,6 +47,9 @@ Edit::Edit(const char *str, int id) {
  * 				the parent frame
  */
 void Edit::build(int x, int y, int h, int l, void *f) {
+	mWidth = l;
+	mHeight = h;
+	
 	MAWidgetParameters editParams;
 	editParams.pParent=f;
 	editParams.posX=x;

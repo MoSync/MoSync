@@ -8,6 +8,7 @@
 #include "MenuItem.h"
 #include "Parser.h"
 #include "MAHeaders.h"
+#include "Image.h"
 
 
 class Main : public ActionListener {
@@ -16,14 +17,17 @@ private:
 	Frame *frame2;
 	Parser *parser;
 	Button *button;
+	Button *button2;
 	MenuItem *item;
 	MenuItem *item2;
+	Image *image;
 public:
 	Main() {
 		frame = NULL;
 		frame2 = NULL;
 		parser = NULL;
 		button = NULL;
+		button2 = NULL;
 
 		frame = new Frame(1);
 		Manager::Instance().addWidget(frame);
@@ -35,6 +39,7 @@ public:
 		frame2=m.frame2;
 		parser=m.parser;
 		button=m.button;
+		button2=m.button2;
 	}
 
 	~Main() {
@@ -43,18 +48,39 @@ public:
 		delete(frame2);
 		delete(parser);
 		delete(button);
+		delete(button2);
 		delete(item);
 		delete(item2);
+		delete(image);
 	}
 
 	void onCreate (int id) {
 		if(id==frame->getId()) {
-
+/*
 			parser = new Parser(MAIN_LAYOUT, frame);
 
 
 			button = (Button *) Manager::Instance().findById(32);
 			button->addActionListener(this);
+			
+			button2 = (Button *) Manager::Instance().findById(34);
+			button2->addActionListener(this);
+			*/
+			
+			image = new Image(SKY_ICON, 21);
+			Manager::Instance().addWidget(image);
+			
+			button = new Button("New frame", 20);
+			Manager::Instance().addWidget(button);
+			button->addActionListener(this);
+			
+			
+			
+			Layout *l = new Layout(frame);
+			l->addWidget(image);
+			l->addWidget(button);
+			
+			l->build();
 			
 			item = new MenuItem("New frame", frame, STAR_ICON);
 			Manager::Instance().addWidget(item);

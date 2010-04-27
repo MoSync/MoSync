@@ -118,3 +118,14 @@ bool Widget::operator < ( const Widget & w ) const {
 	if( w.myid < myid ) return true;
 	else return false;
 }
+
+/**
+ * Getters
+ */
+int Widget::getWidth() {
+	return mWidth;
+}
+
+int Widget::getHeight() {
+	return mHeight;
+}

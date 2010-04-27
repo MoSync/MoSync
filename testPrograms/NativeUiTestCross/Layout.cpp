@@ -56,14 +56,16 @@ void Layout::addWidget(Widget *w) {
  */
 void Layout::build() {
 	int x = 10;
-	int y = 10;
-	int h = 60;
+	int y = 30;
+	int h = 30;
 
 	int l = ((short)(( maGetScrSize() ) >> 16)) - 20;
 
 	for( Set<Widget*>::Iterator i = set.begin(); i != set.end(); i++) {
+		
+		
 		(*i)->build(x, y, h, l, parentFrame->getInstance());
-		y = y + h + 10;
+		y = y + (*i)->getHeight() + 10;
 	}
 
 }

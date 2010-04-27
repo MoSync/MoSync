@@ -108,6 +108,13 @@ public:
 	 * Operator needed by the Manager
 	 */
 	bool operator == ( const Widget & ) const;
+	
+	/**
+	 * Getters
+	 */
+	int getWidth();
+	int getHeight();
+	 
 
 protected:
 	/**
@@ -117,6 +124,8 @@ protected:
 	void *me;
 	const char *text;
 	ActionListener *actionListener;
+	int mWidth;
+	int mHeight;
 };
 
 #endif

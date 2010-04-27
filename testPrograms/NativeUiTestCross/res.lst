@@ -8,3 +8,7 @@
 .res STAR_ICON
 .image "star.png"
 
+.res SKY_ICON
+.image "sky.png"
+
+

@@ -47,6 +47,9 @@ Label::Label (const char *str, int id) {
  * 				the parent frame
  */
 void Label::build(int x, int y, int h, int l, void *f) {
+	mWidth = l;
+	mHeight = h;
+	
 	MAWidgetParameters labelParams;
 	labelParams.pParent=f;
 	labelParams.widgetID=myid;

@@ -45,6 +45,8 @@
 -(void) showToolBar;
 -(void) showToolBarItem: (int) widgetid withIcon: (int) rsc;
 -(void) addToolBarItem:(id) obj;
+-(void) addImage:(id) obj;
+-(void) showImage: (int) widgetid withImage: (int) rsc posX:(int) x posY:(int) y;
 -(void) passEvent:(id) obj;
 
 

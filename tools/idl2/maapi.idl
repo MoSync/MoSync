@@ -2832,6 +2832,7 @@ interface MAAPI {
 		int maIPhoneNavigationBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneToolBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneToolBarItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneImage(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 
 
 #endif //IX_NATIVE_UI

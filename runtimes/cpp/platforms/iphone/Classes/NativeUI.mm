@@ -14,7 +14,7 @@
 
 int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//const char *str = "I am a MoSync program !";
+
 	UIView *my_sMoSyncView = getMoSyncView();
 	[my_sMoSyncView showMessageBox:[NSString stringWithCString:wparams->buf length:strlen(wparams->buf)] shouldKill:false];
 	
@@ -23,9 +23,7 @@ int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 
 int maIPhoneLabel(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//MoSyncView *my_sMoSyncView = getMoSyncView();
-	//[my_sMoSyncView showLabel];
-	//const char *str = "I am a label !";
+
 	[wparams->pParent showLabel:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] 
 						   posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
 	
@@ -34,7 +32,7 @@ int maIPhoneLabel(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 
 int maIPhoneButton(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//UIView *my_sMoSyncView = getMoSyncView();
+
 	[wparams->pParent showButton:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)]
 							posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
 	return 0;
@@ -42,7 +40,7 @@ int maIPhoneButton(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 
 int maIPhoneEdit(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//UIView *my_sMoSyncView = getMoSyncView();
+
 	[wparams->pParent showTextField:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)]
 							   posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
 	return 0;
@@ -53,14 +51,13 @@ int maIPhoneView(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 	MoSyncView *my_sMoSyncView = getMoSyncView();
 	MoSyncView *vi = [my_sMoSyncView showScreen:wparams->widgetID];
 	whandle->pWidget = vi;
-	//[vi showLabel];
-	//[vi showButton];
+
 	return 0;
 }
 
 int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//UIView *my_sMoSyncView = getMoSyncView();
+
 	[wparams->pParent showNavigationBar:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] ];
 	return 0;
 }
@@ -68,14 +65,18 @@ int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 
 int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//UIView *my_sMoSyncView = getMoSyncView();
 	[wparams->pParent showToolBar];
 	return 0;
 }
 
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	//UIView *my_sMoSyncView = getMoSyncView();
 	[wparams->pParent showToolBarItem:wparams->widgetID withIcon: wparams->rsc];
+	return 0;
+}
+
+int maIPhoneImage(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
+{
+	[wparams->pParent showImage:wparams->widgetID withImage: wparams->rsc posX: wparams->posX posY: wparams->posY];
 	return 0;
 }

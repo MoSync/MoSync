@@ -811,6 +811,9 @@ namespace Base {
 		case maIOCtl_maIPhoneToolBarItem:
 			return maIPhoneToolBarItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
+		case maIOCtl_maIPhoneImage:
+			return maIPhoneImage(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
 		}
 		
 		return IOCTL_UNAVAILABLE;

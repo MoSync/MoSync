@@ -359,6 +359,35 @@ bool down = false;
 	
 }
 
+-(void) addImage:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	Surface* img = Base::gSyscall->resources.get_RT_IMAGE(wh.rsc);
+	
+	CGRect myImageRect = CGRectMake(wh.x, wh.y, CGImageGetWidth(img->image), CGImageGetHeight(img->image));
+	UIImageView *myImage = [[UIImageView alloc] initWithFrame:myImageRect];
+	[myImage setImage:[UIImage imageWithCGImage:img->image]];
+	myImage.opaque = YES; // explicitly opaque for performance
+	
+	
+	//UIImageView *myImage = [[UIImageView alloc] initWithImage:[UIImage imageWithCGImage:img->image]];
+	//[myImage setImage:[UIImage imageWithCGImage:img->image]];
+	
+	
+	
+	//UIImage *myImage = [UIImage imageWithCGImage:img->image];
+	[self addSubview:myImage];
+}
+
+-(void) showImage: (int) widgetid withImage: (int) rsc posX:(int) x posY:(int) y {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.widgetId = widgetid;
+	wh.rsc = rsc;
+	wh.x = x;
+	wh.y = y;
+	[self performSelectorOnMainThread: @ selector(addImage:) withObject:(id)wh waitUntilDone:NO];
+	
+}
+
 -(void) passEvent:(id) obj {
 
 	Base::gEventQueue.addNativeUIEvent([obj tag], 0);

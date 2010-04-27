@@ -23,5 +23,6 @@ int maIPhoneView(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
+int maIPhoneImage(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 
 #endif
