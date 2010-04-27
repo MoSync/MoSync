@@ -493,7 +493,7 @@ namespace MoRE {
 				if(x<screenRect.x) x = screenRect.x;
 				if(y<screenRect.y) y = screenRect.y;
 				if(x>=screenRect.x+screenRect.w) x = screenRect.x+screenRect.w-1;
-				if(y>=screenRect.y+screenRect.h) x = screenRect.y+screenRect.h-1;
+				if(y>=screenRect.y+screenRect.h) y = screenRect.y+screenRect.h-1;
 				mouseReleased(x, y);
 				return;
 			}
@@ -522,12 +522,12 @@ namespace MoRE {
 	
 	void GenericSkin::mouseReleased(int x, int y) {
 		if(mTouchedInside) {
+			mTouchedInside = false;
 			if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 				y>=screenRect.y && y<screenRect.y+screenRect.h) {
 					mListener->onMoSyncPointerRelease(x-screenRect.x, y-screenRect.y);
 					return;
 			}
-			mTouchedInside = false;
 			return;
 		}
 
