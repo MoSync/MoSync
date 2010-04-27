@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define FE_DEFLUX_BINARY (SDL_USEREVENT + 3)
 #define FE_MA_NETWORK_MESSAGE (SDL_USEREVENT + 4)
 #define FE_INTERRUPT (SDL_USEREVENT + 5)
+#define FE_CAMERA_VIEWFINDER_UPDATE (SDL_USEREVENT + 6)
 
 namespace Base {
 	class Syscall;

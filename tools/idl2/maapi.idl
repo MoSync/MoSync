@@ -1254,7 +1254,7 @@ interface MAAPI {
 	*/
 	int maLocalTime();
 	/**
-	* Returns the number of milliseconds that has passed since some platform-specific point in time.
+	* Returns the number of milliseconds that has passed since some unknown point in time.
 	* Accuracy is platform-specific, but should be better than 20 ms.
 	*/
 	int maGetMilliSecondCount();
@@ -2752,14 +2752,14 @@ interface MAAPI {
 
 		/**
 		* Starts a fullscreen viewfinder.
-		* Returns 1, 0 or \< 0.
+		* Returns 1 if the viewfinder was started, 0 if it was already running or \< 0 on error.
 		*/
 		// can be varied, but for now, we're keeping it simple.
 		int maCameraStart();
 
 		/**
 		* Stops the viewfinder.
-		* Returns 1, 0 or \< 0.
+		* Returns 1 if the viewfinder was stopped, 0 if it was not running or \< 0 on error.
 		*/
 		int maCameraStop();
 

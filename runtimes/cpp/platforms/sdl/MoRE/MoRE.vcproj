@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib"
+				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="msvcrt.lib"
