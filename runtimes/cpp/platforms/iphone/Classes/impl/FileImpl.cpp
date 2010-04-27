@@ -65,7 +65,7 @@ namespace Base {
 				FAIL;
 			}
 		} else if(mode == Seek::Current) {
-			int oldpos = ftell(file);
+			//int oldpos = ftell(file);
 			if(fseek(file, offset, SEEK_CUR) != 0) {
 				FAIL;
 			}

@@ -48,6 +48,8 @@ using namespace MoSyncError;
 
 #include "iphone_helpers.h"
 #include "CMGlyphDrawing.h"
+
+#include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 
 extern ThreadPool gThreadPool;
@@ -665,57 +667,77 @@ namespace Base {
 		if(!platformRequest(url)) return -1;
 		return 0;
 	}
-
+	
+	static AVAudioPlayer* sSoundPlayer = NULL;
+	
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) 
 	{ 
-		NOT_IMPLEMENTED;
+		Stream *res = gSyscall->resources.get_RT_BINARY(sound_res);
+		MYASSERT(res->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
+		Stream* src = res->createLimitedCopy(size);
+		MYASSERT(src, ERR_DATA_ACCESS_FAILED);
+		
+		byte b;
+		do {
+			if(!src->readByte(b))
+				BIG_PHAT_ERROR(ERR_MIME_READ_FAILED);
+		} while(b);
+		
+		int pos;
+		src->tell(pos);	
+		
+		NSData *data = NULL;
+		
+		int encodedSize = size - pos + offset;
+		if(!src->ptrc()) {
+			byte* sound = new byte[encodedSize];
+			src->read(sound, encodedSize);
+			data = [NSData dataWithBytesNoCopy:sound length:encodedSize];
+
+		} else {
+			byte* sound = &(((byte*)src->ptrc())[pos]);
+			data = [NSData dataWithBytesNoCopy:sound length:encodedSize freeWhenDone:NO];
+		}		
+		
+		if(sSoundPlayer)
+			[sSoundPlayer release];	
+		NSError *err;
+		sSoundPlayer = [[AVAudioPlayer alloc] initWithData:data error:&err];
+		[data release];
+		if(!sSoundPlayer) {
+			// check err
+			return -1;
+		}
+		[sSoundPlayer play];
+		
 		return 0;
 	}
 
 	SYSCALL(void, maSoundStop()) 
 	{
-		NOT_IMPLEMENTED;
+		[sSoundPlayer stop];
+		sSoundPlayer.currentTime = 0;
 	}
 
 	SYSCALL(int, maSoundIsPlaying()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		return sSoundPlayer.playing==YES;
 	}
 
 	SYSCALL(void, maSoundSetVolume(int vol)) 
 	{
-		NOT_IMPLEMENTED;
+		sSoundPlayer.volume = (float)vol/100.0f;
 	}
 
 	SYSCALL(int, maSoundGetVolume()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		return (int)(sSoundPlayer.volume*100.0f);
 	}
 	
 	SYSCALL(int, maGetBatteryCharge()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maKeypadIsLocked() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maLockKeypad() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maUnlockKeypad() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
+		float batLeft = [[UIDevice currentDevice] batteryLevel]; 		
+		return (int)(batLeft*100.0f);
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
@@ -786,6 +808,15 @@ namespace Base {
 		return 1;
 	}
 	
+	int maLocationStart() {
+		StartUpdatingLocation();
+		return MA_LPS_AVAILABLE;
+	}
+	
+	int maLocationStop() {
+		StopUpdatingLocation();
+		return 0;
+	}
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -797,10 +828,16 @@ namespace Base {
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
-				
 		case maIOCtl_maPlatformRequest:
 			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));				
-		
+		case maIOCtl_maGetBatteryCharge:
+			return maGetBatteryCharge();		
+
+		case maIOCtl_maLocationStart:
+			return maLocationStart();
+		case maIOCtl_maLocationStop:
+			return maLocationStop();				
+			
 		case maIOCtl_maFrameBufferGetInfo:
 			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
 		case maIOCtl_maFrameBufferInit:

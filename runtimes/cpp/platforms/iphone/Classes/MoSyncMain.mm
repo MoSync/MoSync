@@ -108,3 +108,11 @@ void ShowMessageBox(const char *msg, bool kill) {
 void Exit() {
 	[[UIApplication sharedApplication] terminateWithSuccess];
 }
+
+void StartUpdatingLocation() {
+	[sMoSyncView startUpdatingLocation];
+}
+
+void StopUpdatingLocation() {
+	[sMoSyncView stopUpdatingLocation];
+}

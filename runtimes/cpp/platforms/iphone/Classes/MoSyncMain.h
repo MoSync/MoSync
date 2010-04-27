@@ -29,5 +29,8 @@ void ShowMessageBox(const char *msg, bool kill);
 
 void Exit();
 
+void StartUpdatingLocation();
+void StopUpdatingLocation();
+
 #endif
 

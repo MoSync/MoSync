@@ -56,6 +56,15 @@
 	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
 }
 
+-(void) startUpdatingLocation {
+	[locationController.locationManager startUpdatingLocation];
+}
+
+-(void) stopUpdatingLocation {
+	[locationController.locationManager stopUpdatingLocation];
+
+}
+
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
@@ -68,7 +77,9 @@
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
 
-		[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+		UIDevice* myDevice = [UIDevice currentDevice];
+		[myDevice beginGeneratingDeviceOrientationNotifications];
+		[myDevice setBatteryMonitoringEnabled:YES];
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
 													 name:UIDeviceOrientationDidChangeNotification object:nil];
@@ -77,7 +88,10 @@
 		mosyncView = nil;
         // Initialization code
 		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
-		CGFloat screenHeight = appFrame.size.height;		
+		CGFloat screenHeight = appFrame.size.height;
+		
+		locationController = [[MoSyncCLController alloc] init];
+		
 		MoSyncMain(self.frame.size.width, screenHeight, self);
     }
     return self;
@@ -114,6 +128,7 @@
 
 - (void)dealloc {
     [super dealloc];
+    [locationController release];	
 }
 
 bool down = false;
