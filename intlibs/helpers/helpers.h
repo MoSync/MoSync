@@ -24,7 +24,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifndef _android
 #include <string>
+#endif //_android
+
 #endif
 
 #include "types.h"
@@ -56,7 +60,7 @@ void __declspec(noreturn) MoSyncErrorExit(int errorCode);
 void __attribute((noreturn)) MoSyncErrorExit(int errorCode);
 #endif
 
-#ifndef __SYMBIAN32__
+#if !defined(__SYMBIAN32__) && !defined(_android)
 inline void lower(std::string& str) {
 	for(size_t i=0; i<str.length(); i++) {
 		str[i] = (char)tolower(str[i]);

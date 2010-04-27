@@ -74,16 +74,18 @@ BluetoothBluez::BluetoothBluez ( void )
 {
     mState      = 1;
     mThreadQuit = false;
-    mWorking    = false;
+    mWorkState  = IDLE;
 
     mTaskListMutex   = new Mutex( );
     mDeviceListMutex = new Mutex( );
     mServiceListMutex= new Mutex( );
     mDiscThread      = new Thread( );
+	mDeviceDiscoveryCritical = new Mutex( );
 
     mTaskListMutex->init( );
     mDeviceListMutex->init( );
     mServiceListMutex->init( );
+	mDeviceDiscoveryCritical->init( );
     
     // Start discovery thread
     mMainFunctor = Base::Thread::bind( &BluetoothBluez::threadStub, this );
@@ -142,6 +144,7 @@ BluetoothBluez::~BluetoothBluez ( void )
     delete mTaskListMutex;
     delete mDeviceListMutex;
     delete mServiceListMutex;
+	delete mDeviceDiscoveryCritical;
 
     // Delete the main functor
     delete mMainFunctor;
@@ -160,16 +163,16 @@ BluetoothBluez::~BluetoothBluez ( void )
 int BluetoothBluez::startDiscovery ( MABtCallback cb,
 		 							 bool n )
 {
-	MYASSERT( mWorking == false, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
+	MYASSERT( mWorkState == IDLE, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
 
-    mState   = 0;
-    mWorking = true;
+    mState     = 0;
+    mWorkState = DEVICE_DISC;
 
     // Check if there's a bluetooth device
     if ( mDevID < 0 )
     {
         LOGBT( "Invalid interface ID - No BT device?" );
-        mWorking = false;
+        mWorkState = IDLE;
         return -1;
     }
 
@@ -188,8 +191,8 @@ int BluetoothBluez::startDiscovery ( MABtCallback cb,
     {
         Lock lock( mTaskListMutex );
         mTaskList.push_back( bind( &BluetoothBluez::discoverDevices,
-                                    this,
-                                    (MABtCallback)cb,
+                                   this,
+                                   (MABtCallback)cb,
 									n ) );
     }
 
@@ -235,16 +238,16 @@ int BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
                                             const MABtAddr* a,
                                             const MAUUID* u )
 {
-	MYASSERT( mWorking == false, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
+	MYASSERT( mWorkState == IDLE, MoSyncError::BTERR_DISCOVERY_IN_PROGRESS );
 
-    mState   = 0;
-    mWorking = true;
+    mState     = 0;
+    mWorkState = SERVICE_DISC;
 
     // Check if there's a bluetooth device
     if ( mDevID < 0 )
     {
         LOGBT( "Invalid interface ID" );
-        mWorking = false;
+        mWorkState = IDLE;
         return -1;
     }
 
@@ -316,6 +319,29 @@ int BluetoothBluez::getNextServiceSize ( MABtServiceSize* d )
 
     return 1;
 }
+
+
+/**
+ * Cancels an on going device discovery, 
+ * Note: If an operation was canceled, its last BT event will have 
+ *       the status CONNERR_CANCELED. This is an asynchronous operation. 
+ *       It is not safe to start another discovery before you've recieved 
+ *       the CONNERR_CANCELED event.
+ *
+ * @return 0 if there was no active operation
+ *         1 if there was.
+ */
+int BluetoothBluez::cancelDeviceDiscovery ( void )
+{
+	Lock lck( mDeviceDiscoveryCritical );
+
+	if ( mWorkState != DEVICE_DISC )
+		return 0;
+
+	mWorkState = DEVICE_DISC_CANCELED;
+	return 1;
+}
+
 
 /**
  * Returns the current state
@@ -391,7 +417,7 @@ void BluetoothBluez::discoverDevices ( MABtCallback cb,
     devSock = hci_open_dev( mDevID );
     if ( devSock < 0 )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         LOGBT( "Failed to open BT device" );
         cb( );
@@ -403,18 +429,27 @@ void BluetoothBluez::discoverDevices ( MABtCallback cb,
     pQueryInfo = new inquiry_info[maxRsp];
     if ( pQueryInfo == NULL )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         cb( );
         return;
     }
+
+	// Check if discovery has been canceled
+	if ( mWorkState == DEVICE_DISC_CANCELED )
+	{
+        delete[] pQueryInfo;
+		doCleanupDiscoverDevices( );
+        cb( );
+        return;
+	}
 
     // Do a standard 10 sec discovery
     numRsp = hci_inquiry( mDevID, 8, maxRsp, NULL, &pQueryInfo, IREQ_CACHE_FLUSH );
     if ( numRsp < 0 )
     {
         delete[] pQueryInfo;
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         LOGBT( "Inquiry failed" );
         cb( );
@@ -428,9 +463,13 @@ void BluetoothBluez::discoverDevices ( MABtCallback cb,
         // Get device name and insert into list
         for ( i = 0; i < numRsp; i++ )
         {
+			// Check if discovery has been canceled
+			if ( mWorkState == DEVICE_DISC_CANCELED )
+				break;
+
             devName[0] = NULL;
 
-			// Perform a name query			
+			// Perform a name query
 			if ( n == true )
 			{            
 		        if ( hci_read_remote_name( devSock, &pQueryInfo[i].bdaddr,
@@ -444,11 +483,45 @@ void BluetoothBluez::discoverDevices ( MABtCallback cb,
             mDeviceList.push_back( new CBtDevice( &btaddr, devName ) );
         }
     }
+    delete[] pQueryInfo;
+
 
     // Invoke the callback to send the event to the user
-    mWorking = false;
-    mState   = mDeviceList.size( )+1;
-    cb( );
+	{
+		Lock lck( mDeviceDiscoveryCritical );
+
+		if ( mWorkState == DEVICE_DISC_CANCELED )
+			doCleanupDiscoverDevices( );
+		else
+			mState = mDeviceList.size( )+1;
+
+		mWorkState = IDLE;
+		cb( );
+	}
+}
+
+
+/**
+ * This method is to clean up after a canceled discovery. After
+ * it has run, it will change the work state to IDLE.
+ *
+ */
+void BluetoothBluez::doCleanupDiscoverDevices ( void )
+{
+    Lock lck( mServiceListMutex );
+
+	mWorkState = IDLE;
+	mState = CONNERR_CANCELED;
+    LOGBT( "On going discovery canceled" );
+
+    if ( mServiceList.empty( ) == true )
+        return;
+
+	while ( mServiceList.empty( ) == true )
+	{
+		delete mServiceList.front( ); 
+		mServiceList.pop_front( );
+	}
 
 }
 
@@ -487,7 +560,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     session = sdp_connect( &addrAny, &devAddr, SDP_RETRY_IF_BUSY );
     if ( session == NULL )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         LOGBT( "Could not connect to SDP server\n" );
         cb( );
@@ -497,7 +570,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     searchList = sdp_list_append( NULL, &servUuid );
     if ( searchList == NULL )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         LOGBT( "Unable to create search list, out of memory?" );
         sdp_close( session );
@@ -511,7 +584,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     attridList  = sdp_list_append( NULL, &range );
     if ( searchList == NULL )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         sdp_close( session );
         sdp_list_free( searchList, 0 );
@@ -526,7 +599,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
                                            &respList );
     if ( errCode == -1 )
     {
-        mWorking = false;
+        mWorkState = IDLE;
         mState = CONNERR_INTERNAL;
         sdp_close( session );
         sdp_list_free( searchList, 0 );
@@ -579,7 +652,7 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
                                     uuid128 = sdp_uuid_to_uuid128( &d->val.uuid );
                                     if ( uuid128 == NULL )
                                     {
-                                        mWorking = false;
+                                        mWorkState = IDLE;
                                         mState = CONNERR_INTERNAL;
                                         sdp_close( session );
                                         LOGBT( "Out of memory" );
@@ -619,10 +692,11 @@ void BluetoothBluez::discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u )
     sdp_close( session );
     
     // Invoke the callback to send the event to the user
-    mWorking = false;
-    mState   = mServiceList.size( )+1;
+    mWorkState = IDLE;
+    mState     = mServiceList.size( )+1;
     cb( );
 }
+
 
 /**
  * Thread stub, runs tasks until it has been signaled to quit.

@@ -89,6 +89,18 @@ void free(void *mem);
 */
 void* realloc(void* old, int size);
 
+
+/**
+* Returns the total size of the heap, in bytes.
+*/
+size_t heapTotalMemory(void);
+
+/**
+* Returns the amount of available memory on the heap, in bytes.
+* \note Due to overhead, you will not be able to allocate exactly this amount.
+*/
+size_t heapFreeMemory(void);
+
 #endif	//MAPIP
 
 typedef void (*malloc_handler)(int size);

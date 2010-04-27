@@ -42,9 +42,18 @@ namespace Bluetooth
         private:
             typedef Base::Thread::Functor Functor;
 
+			enum WORK_STATE
+			{
+				IDLE,
+				DEVICE_DISC,
+				SERVICE_DISC,
+				DEVICE_DISC_CANCELED
+			};
+
             int                     mDevID;
             int                     mState;
-            bool                    mWorking;
+            WORK_STATE              mWorkState;
+
             Thread*                 mDiscThread;
             bool                    mThreadQuit;
             Functor*                mMainFunctor;
@@ -54,6 +63,7 @@ namespace Bluetooth
 
             std::list<CBtDevice *>  mDeviceList;
             Mutex*                  mDeviceListMutex;
+			Mutex*                  mDeviceDiscoveryCritical;
 
             std::list<CBtService *> mServiceList;
             Mutex*                  mServiceListMutex;
@@ -85,6 +95,13 @@ namespace Bluetooth
              */
             void discoverServices ( MABtCallback cb, MABtAddr a, MAUUID u );
 
+            /**
+             * This method is to clean up after a canceled discovery. After
+			 * it has run, it will change the work state to IDLE.
+             *
+             */
+            void doCleanupDiscoverDevices ( void );
+
         public:
             /**
              * Constructor, creates thread and mutex
@@ -98,7 +115,7 @@ namespace Bluetooth
              */
             ~BluetoothBluez ( void );
 
-            /**
+            /** 
              * Starts a device discovery
              *
              * @param cb    The callback to invoke onces that the discovery
@@ -117,6 +134,18 @@ namespace Bluetooth
              * @return 1 if there was a device, 0 if not
              */
             int getNextDevice ( MABtDevice *d );
+
+			/**
+			 * Cancels an on going device discovery, 
+			 * Note: If an operation was canceled, its last BT event will have 
+			 *       the status CONNERR_CANCELED. This is an asynchronous operation. 
+			 *       It is not safe to start another discovery before you've recieved 
+			 *       the CONNERR_CANCELED event.
+			 *
+			 * @return 0 if there was no active operation
+			 *         1 if there was.
+			 */
+            int cancelDeviceDiscovery ( void );
 
             /**
              * Starts a service discovery on a device

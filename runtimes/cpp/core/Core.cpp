@@ -28,9 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define CORE_DEBUGGING_MODE
 //#define SYSCALL_DEBUGGING_MODE
 
+#include <config_platform.h>
+#include <helpers/helpers.h>
 
 #include <base/FileStream.h>
-#include <helpers/helpers.h>
+
 #include "helpers/TranslateSyscall.h"
 //#undef LOGC
 //#define LOGC(...) do { if(InstCount > 8200000) LOG(__VA_ARGS__); } while(0)
@@ -566,9 +568,11 @@ public:
 		FileStream mod(modfile);
 		if(!LoadVM(mod))
 			return false;
+#ifndef _android
 		FileStream res(resfile);
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
+#endif //_android
 
 #ifdef FAKE_CALL_STACK
 		profTree.init(Head.EntryPoint);
@@ -593,7 +597,7 @@ public:
 		InitVM();
 		if(!LoadVM(stream))
 			return false;
-#ifndef MOBILEAUTHOR
+#if !defined(MOBILEAUTHOR) && !defined(_android)
 		if(!mSyscall.loadResources(stream, combfile))
 			return false;
 #endif

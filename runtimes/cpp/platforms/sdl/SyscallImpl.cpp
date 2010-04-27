@@ -35,6 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_syswm.h>
 //#include <SDL/SDL_ffmpeg.h>
+#include <FreeImage.h>
 #include <string>
 #include <map>
 #include <time.h>
@@ -51,7 +52,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_CONNSERVER.h>
 #include <helpers/CPP_IX_FILE.h>
 
 // blah
@@ -108,6 +108,10 @@ namespace Base {
 	static TTF_Font *gFont = NULL;
 	static MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 
+	static bool gCameraViewFinderActive = false;
+	static MAPoint2d gCameraViewFinderPoint, gCameraViewFinderDirection;
+	static SDL_TimerID gCameraViewFinderTimer = NULL;
+
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
 	static bool gEventOverflow = false, gClosing = false;
 
@@ -130,6 +134,13 @@ namespace Base {
 
 	static int maSendToBackground();
 	static int maBringToForeground();
+
+	static int maCameraFormatNumber();
+	static int maCameraFormat(int index, MA_CAMERA_FORMAT* fmt);
+	static int maCameraStart();
+	static int maCameraStop();
+	static int maCameraSnapshot(int formatIndex, MAHandle placeholder);
+	static void cameraViewFinderUpdate();
 
 //********************************************************************
 
@@ -883,6 +894,10 @@ namespace Base {
 				LOGDT("FE_INTERRUPT");
 				ret = true;
 				break;
+			case FE_CAMERA_VIEWFINDER_UPDATE:
+				LOGDT("FE_CAMERA_VIEWFINDER_UPDATE");
+				cameraViewFinderUpdate();
+				break;
 			default:
 				LOG("Unhandled event, type %i\n", event.type);
 			}
@@ -1631,7 +1646,7 @@ namespace Base {
 		return 1;
 	}
 
-	SDL_Surface *internalBackBuffer = NULL;
+	static SDL_Surface *internalBackBuffer = NULL;
 	static int maFrameBufferInit(void *data) {
 		if(internalBackBuffer!=NULL) return 0;
 		internalBackBuffer = gBackBuffer;
@@ -1651,10 +1666,12 @@ namespace Base {
 	}
 
 	static void fillBufferCallback() {
-		MAEvent audioEvent;
-		audioEvent.type = EVENT_TYPE_AUDIOBUFFER_FILL;
-		gEventFifo.put(audioEvent);
+		MAEvent* ep = new MAEvent;
+		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
+		FE_PushEvent((SDL_Event*)&event);
 	}
+
 
 	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
@@ -1807,7 +1824,7 @@ namespace Base {
 
 		case maIOCtl_maAccept:
 			maAccept(a);
-			return 0;
+			return 1;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
@@ -1949,10 +1966,174 @@ namespace Base {
 		case maIOCtl_maFileListClose:
 			return SYSCALL_THIS->maFileListClose(a);
 
+		case maIOCtl_maCameraFormatNumber:
+			return maCameraFormatNumber();
+		case maIOCtl_maCameraFormat:
+			return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
+		case maIOCtl_maCameraStart:
+			return maCameraStart();
+		case maIOCtl_maCameraStop:
+			return maCameraStop();
+		case maIOCtl_maCameraSnapshot:
+			return maCameraSnapshot(a, b);
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
 	}	//maIOCtl
+
+	//****************************************************************************
+	// camera
+	//****************************************************************************
+
+	// vga
+#define CAMERA_WIDTH 640
+#define CAMERA_HEIGHT 480
+#define CAMERA_BOX_RADIUS_OUTER 50
+#define CAMERA_BOX_RADIUS_INNER 25
+#define CAMERA_FPS 20
+#define CAMERA_SPEED 4	// in pixels per frame
+
+	static int Base::maCameraFormatNumber() {
+		return 1;
+	}
+
+	static int Base::maCameraFormat(int index, MA_CAMERA_FORMAT* fmt) {
+		MYASSERT(index == 0, ERR_INVALID_CAMERA_FORMAT_INDEX);
+		fmt->width = CAMERA_WIDTH;
+		fmt->height = CAMERA_HEIGHT;
+		return 0;
+	}
+
+	static Uint32 cameraViewFinderCallback(Uint32 interval, void*) {
+		SDL_UserEvent event = { FE_CAMERA_VIEWFINDER_UPDATE, 0, NULL, NULL };
+		FE_PushEvent((SDL_Event*)&event);
+		return interval;
+	}
+
+	static void drawCameraViewFinderBox(int radius, Uint32 color) {
+		SDL_Rect rect;
+		rect.x = gCameraViewFinderPoint.x - radius;
+		rect.y = gCameraViewFinderPoint.y - radius;
+		rect.w = radius * 2;
+		rect.h = radius * 2;
+		DEBUG_ASRTZERO(SDL_FillRect(gBackBuffer, &rect, color));
+	}
+
+	static void bouncingBoxCoordUpdate(int& coord, int& direction, int radius, int limit) {
+		coord += direction;
+		if(coord + radius > limit) {
+			coord = limit - radius;
+			direction *= -1;
+		}
+		if(coord - radius < 0) {
+			coord = radius;
+			direction *= -1;
+		}
+	}
+
+	static void Base::cameraViewFinderUpdate() {
+		if(!gCameraViewFinderActive)
+			return;
+
+		// draw background
+		SDL_Rect rect = { 0, 0, (Uint16)gBackBuffer->w, (Uint16)gBackBuffer->h };
+		DEBUG_ASRTZERO(SDL_FillRect(gBackBuffer, &rect,
+			SDL_MapRGB(gBackBuffer->format, 0x80, 0x80, 0x80)));
+
+		// draw box
+		drawCameraViewFinderBox(CAMERA_BOX_RADIUS_OUTER,
+			SDL_MapRGB(gBackBuffer->format, 0, 0, 0));
+		drawCameraViewFinderBox(CAMERA_BOX_RADIUS_INNER,
+			SDL_MapRGB(gBackBuffer->format, 0x80, 0x80, 0x80));
+
+		// update coordinates
+		bouncingBoxCoordUpdate(gCameraViewFinderPoint.x, gCameraViewFinderDirection.x,
+			CAMERA_BOX_RADIUS_OUTER, gBackBuffer->w);
+		bouncingBoxCoordUpdate(gCameraViewFinderPoint.y, gCameraViewFinderDirection.y,
+			CAMERA_BOX_RADIUS_OUTER, gBackBuffer->h);
+
+		MAUpdateScreen();
+	}
+
+	static int Base::maCameraStart() {
+		if(gCameraViewFinderActive)
+			return 0;
+		gCameraViewFinderActive = true;
+		gCameraViewFinderPoint.x = CAMERA_BOX_RADIUS_OUTER;
+		gCameraViewFinderPoint.y = CAMERA_BOX_RADIUS_OUTER;
+		gCameraViewFinderDirection.x = CAMERA_SPEED;
+		gCameraViewFinderDirection.y = CAMERA_SPEED;
+		gCameraViewFinderTimer = SDL_AddTimer(1000 / CAMERA_FPS, cameraViewFinderCallback, NULL);
+		DEBUG_ASSERT(gCameraViewFinderTimer);
+		return 1;
+	}
+
+	static int Base::maCameraStop() {
+		if(!gCameraViewFinderActive)
+			return 0;
+		gCameraViewFinderActive = false;
+		DEBUG_ASSERT(SDL_RemoveTimer(gCameraViewFinderTimer));
+		return 1;
+	}
+
+	static void fiomf(FREE_IMAGE_FORMAT fif, const char *msg) {
+		LOG("fiomf: %i, '%s'\n", fif, msg);
+	}
+
+	static int Base::maCameraSnapshot(int formatIndex, MAHandle placeholder) {
+		LOGD("maCameraSnapshot(%i, %i)\n", formatIndex, placeholder);
+		if(!gCameraViewFinderActive)
+			return -2;
+
+		FreeImage_SetOutputMessage(fiomf);
+
+		// copy backbuffer to FIB
+		FIBITMAP* dib = FreeImage_Allocate(CAMERA_WIDTH, CAMERA_HEIGHT, 24,
+			0xff0000, 0x00ff00, 0x0000ff);
+		DEBUG_ASSERT(dib);
+		SDL_Surface* dib_surface = SDL_CreateRGBSurfaceFrom(FreeImage_GetBits(dib),
+			CAMERA_WIDTH, CAMERA_HEIGHT, 24, CAMERA_WIDTH*3, 0xff0000, 0x00ff00, 0x0000ff, 0);
+		DEBUG_ASSERT(dib_surface);
+
+		// can't blit all at once; result is upside-down.
+		for(int i=0, dy=CAMERA_HEIGHT-1; i<gBackBuffer->h; i++, dy--) {
+			SDL_Rect src = { 0,i, gBackBuffer->w, 1 };
+			SDL_Rect dst = { 0,dy, gBackBuffer->w, 1 };
+			DEBUG_ASRTZERO(SDL_BlitSurface(gBackBuffer, &src, dib_surface, &dst));
+		}
+
+		// open a memory stream
+		FIMEMORY *hmem = FreeImage_OpenMemory();
+		// encode and save the image to the memory
+		DEBUG_ASSERT(FreeImage_SaveToMemory(FIF_JPEG, dib, hmem, 0));
+		//DEBUG_ASSERT(FreeImage_Save(FIF_JPEG, dib, "dump.jpg"));
+
+		FreeImage_Unload(dib);
+
+		// at this point, hmem contains the entire data in memory stored in fif format.
+		// the amount of space used by the memory is equal to file_size
+		long file_size = FreeImage_TellMemory(hmem);
+		LOGD("File size : %ld\n", file_size);
+
+		DWORD data_size;
+		BYTE* data;
+		DEBUG_ASSERT(FreeImage_AcquireMemory(hmem, &data, &data_size));
+
+		MemStream* ms = new MemStream(data_size);
+		DEBUG_ASSERT(ms->write(data, data_size));
+		SYSCALL_THIS->resources.add_RT_BINARY(placeholder, ms);
+
+		// make sure to close the stream since FreeImage_SaveToMemory
+		// will cause internal memory allocations and this is the only
+		// way to free this allocated memory
+		FreeImage_CloseMemory(hmem);
+		return 0;
+	}
+
+	//****************************************************************************
+	// videoStream
+	//****************************************************************************
 
 #if 0
 	int maStartVideoStream(const char* url) {

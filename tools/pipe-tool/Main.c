@@ -169,9 +169,9 @@ int main(int argc,char *argv[])
 
 	CurrentModel = MODEL_null;
 
-	Default_DataSize  = 0x10000;
-	Default_StackSize = 0x00800;
-	Default_HeapSize  = 0x04000;
+	Default_DataSize  = 0x20000;	// 128
+	Default_StackSize = 0x08000;	// 32	
+	Default_HeapSize  = 0x10000;	// 64
 	Default_AppCode = 'TEST';
 	Do_Dump_Symbols = 0;
 	relPath[0] = 0;
@@ -256,6 +256,14 @@ int main(int argc,char *argv[])
 			ArgUseStabs = 1;
 			GetCmdString();
 			strcpy(StabsName, Name);
+			continue;
+		}
+
+		if (Token("meta="))
+		{
+			ArgWriteMeta = 1;
+			GetCmdString();
+			strcpy(MetaFileName, Name);
 			continue;
 		}
 

@@ -16,7 +16,7 @@ work.instance_eval do
 	end
 	
 	def setup_pipe
-		@SOURCES = ["libc/sys/mosync", "../libsupc++", "libc/locale", "libc/reent", "libc/stdio",
+		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++", "libc/locale", "libc/reent", "libc/stdio",
 			"libc/stdlib", "libc/string", "libc/time", "libc/ctype", "libc/errno",
 			"libm/math", "libm/common"]
 		@EXTRA_INCLUDES = ["libc/include", "libc/sys/mosync", "libm/common"]

@@ -75,6 +75,9 @@ void Syscall::ConstructBluetoothL() {
 	gBtAttrMatchList->AddL(TAttrRange(KSdpAttrIdBluetoothProfileDescriptorList));
 	gBtAttrMatchList->AddL(TAttrRange(KSdpAttrIdBasePrimaryLanguage +
 		KSdpAttrIdOffsetServiceName));
+	
+	LHEL(gBtSdp.Connect());
+	LHEL(gBtSdpDB.Open(gBtSdp));
 
 	gBtAvailable = true;
 }
@@ -91,6 +94,9 @@ void Syscall::DestructBluetooth() {
 	SAFE_DELETE(gBtAttrMatchList);
 	SAFE_DELETE(gBtService);
 	gBtServiceArray.ResetAndDestroy();
+	
+	gBtSdpDB.Close();
+	gBtSdp.Close();
 }
 
 //***************************************************************************

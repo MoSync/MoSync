@@ -56,9 +56,19 @@
 	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
 }
 
+-(void) startUpdatingLocation {
+	[locationController.locationManager startUpdatingLocation];
+}
+
+-(void) stopUpdatingLocation {
+	[locationController.locationManager stopUpdatingLocation];
+
+}
+
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
+		self.clearsContextBeforeDrawing = NO;
     }
     return self;
 }
@@ -66,27 +76,59 @@
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+
+		UIDevice* myDevice = [UIDevice currentDevice];
+		[myDevice beginGeneratingDeviceOrientationNotifications];
+		[myDevice setBatteryMonitoringEnabled:YES];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
+													 name:UIDeviceOrientationDidChangeNotification object:nil];
+		
 		self.frame.origin.y = 0;
 		mosyncView = nil;
         // Initialization code
-		MoSyncMain(self.frame.size.width, self.frame.size.height, self);
+		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+		CGFloat screenHeight = appFrame.size.height;
+		
+		locationController = [[MoSyncCLController alloc] init];
+		
+		MoSyncMain(self.frame.size.width, screenHeight, self);
     }
     return self;
 }
 
+/*
+- (void)mTimerProcess{
+	DoneUpdatingMoSyncView();
+} 
+*/
 
 - (void)drawRect:(CGRect)rect {
 	if(mosyncView == nil) return;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSetAllowsAntialiasing(context, false);
+
+	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
+	CGContextScaleCTM(context, 1.0, -1.0);
+	
     CGContextDrawImage(context, rect, mosyncView);	
 	DoneUpdatingMoSyncView();
+	/*
+	NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.000001f
+													  target:self
+													selector:@selector(mTimerProcess)
+													userInfo:nil
+													 repeats:NO];
+	[timer fire];
+	*/
 	 
 }
 
 
 - (void)dealloc {
     [super dealloc];
+    [locationController release];	
 }
 
 bool down = false;
@@ -100,6 +142,11 @@ bool down = false;
 		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
 		down = true;
 	}
+}
+
+- (void)deviceOrientationChanged:(NSNotification *)notification {
+	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+	Base::gEventQueue.addScreenChangedEvent();
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {

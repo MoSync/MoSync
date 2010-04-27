@@ -29,9 +29,9 @@ int MAMain() {
 	printf("result: %i\n", result);
 
 	for(;;) {
-		EVENT event;
+		MAEvent event;
 		while(maGetEvent(&event)) {
-			printf("e\n");
+			printf("event %i\n", event.type);
 			if(event.type == EVENT_TYPE_CLOSE ||
 				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
 			{

@@ -31,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class CSocket : public CConnection {
 public:
 	enum Type {
-		ETcp, ERfcomm
+		ETcp, ERfcomm, EBlank
 	};
 
 	CSocket(RSocketServ& aServer, Type type) {
@@ -41,6 +41,9 @@ public:
 			break;
 		case ERfcomm:
 			LHEL(mSocket.Open(aServer, KBTAddrFamily, KSockStream, KRFCOMM));
+			break;
+		case EBlank:
+			LHEL(mSocket.Open(aServer));
 			break;
 		}
 	}
@@ -53,12 +56,50 @@ public:
 	bool Write(const TDesC8& aDesc, CPublicActive& op);
 	void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
 	void CancelAll() {
-		mSocket.CancelAll();		
+		mSocket.CancelAll();
 	}
+	
+	void GetAddr(MAConnAddr* addr);
+	
+	RSocket& socket() { return mSocket; }
 
 private:
 	RSocket mSocket;
 	TSockXfrLength mDummyLength;
+};
+
+class CServerSocket : public CConnection {
+public:
+	~CServerSocket() {
+		mSocket.CancelAll();
+		mSocket.Close();
+	}
+	void Accept(RSocket& aBlankSocket, CPublicActive& op);
+
+	//CConnection
+	void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
+	bool Write(const TDesC8& aDesc, CPublicActive& op);
+	void CancelAll();
+	void GetAddr(MAConnAddr* addr);
+	CServerSocket* server() { return this; }
+protected:
+	RSocket mSocket;
+};
+
+class CBtServerSocket : public CServerSocket {
+public:
+	CBtServerSocket(RSdpDatabase& db)
+	: mSdpDB(db), mHandle(0)
+	{}
+	~CBtServerSocket();
+	void init(RSocketServ& aServer, const TUUID& uuid, bool hasName,
+		const TDesC8& name = KNullDesC8);
+
+	//CConnection
+	//CBtServerSocket* btServer() { return this; }
+private:
+	RSdpDatabase& mSdpDB;
+	TSdpServRecordHandle mHandle;
 };
 
 

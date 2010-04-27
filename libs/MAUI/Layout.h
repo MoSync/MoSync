@@ -65,6 +65,11 @@ namespace MAUI {
 		/** Overloaded implementation of Widget::add(), with the same external semantics.
 		    **/
 		void add(Widget *w);
+
+		/** Overloaded implementation of Widget::clear(), with the same external semantics.
+		    **/
+		void clear();
+
 		/** Overloaded implementation of drawWidget().
 		   **/
 		void drawWidget();

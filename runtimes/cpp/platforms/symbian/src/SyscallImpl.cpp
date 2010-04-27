@@ -486,8 +486,8 @@ void Syscall::platformDestruct() {
 
 	SAFE_DELETE(gMmfFSP);
 
-	DestructBluetooth();
 	DestructNetworking();
+	DestructBluetooth();
 	gSocketServ.Close();
 
 	gKeyLock.Close();
@@ -1184,7 +1184,7 @@ int Syscall::maGetBatteryCharge() {
 }
 #endif	//TELEPHONY
 
-#ifdef __SERIES60_3X__
+#if 0//def __SERIES60_3X__
 	const TInt KBrowserUid = 0x1020724D;
 #else
 	const TInt KBrowserUid = 0x10008D39;
@@ -1226,11 +1226,9 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maGetBatteryCharge();
 #endif
 
-#if 0
 	case maIOCtl_maAccept:
-		maAccept(a);
-		return 0;
-#endif
+		SYSCALL_THIS->maAccept(a);
+		return 1;
 
 	case maIOCtl_maBtStartDeviceDiscovery:
 		BLUETOOTH(maBtStartDeviceDiscovery)(a != 0);
@@ -1969,7 +1967,8 @@ int Syscall::maLocationStart() {
 int Syscall::maLocationStop() {
 	int res = gServer.LocationStop();	//silent fail
 	LOG("LocationStop: %i\n", res);
-	gLocationSync->Cancel();
+	if(gLocationSync)
+		gLocationSync->Cancel();
 	LOG("maLocationStop done.\n");
 	return res;
 }
@@ -2388,7 +2387,7 @@ void Syscall::MaoscOpenComplete(TInt aError) {
 	}
 
 	//send event
-	MAEVENT e;
+	MAEvent e;
 	e.type = EVENT_TYPE_AUDIOBUFFER_FILL;
 	e.state = aError;
 	gAppView.AddEvent(e);
@@ -2410,7 +2409,7 @@ void Syscall::MaoscBufferCopied(TInt aError, const TDesC8 &aBuffer) {
 	if(aError >= 0) {
 		gAudioBuffer.ready = true;
 		//send event
-		MAEVENT e;
+		MAEvent e;
 		e.type = EVENT_TYPE_AUDIOBUFFER_FILL;
 		e.state = aError;
 		gAppView.AddEvent(e);

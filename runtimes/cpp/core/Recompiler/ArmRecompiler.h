@@ -47,6 +47,20 @@ struct RegisterMapElement {
 };
 
 namespace MoSync {
+#ifdef __SYMBIAN32__
+	class SafeChunk {
+	public:
+		SafeChunk();
+		~SafeChunk();
+		void* allocate(int size);
+		void close();
+		void* address();
+	private:
+		RChunk mChunk;
+		bool mChunkIsOpen;
+	};
+#endif
+
 	class ArmRecompiler : public Recompiler <ArmRecompiler> {
 	public:
 		friend class Recompiler<ArmRecompiler>;
@@ -54,7 +68,9 @@ namespace MoSync {
 		ArmRecompiler();
 
 		void* allocateCodeMemory(int size);
+		void* allocateEntryPoint(int size);
 		void freeCodeMemory(void *addr);
+		void freeEntryPoint(void *addr);
 		void flushInstructionCache(void *addr, int len);
 		
 		int run(int ip);
@@ -64,8 +80,7 @@ namespace MoSync {
 	protected:
 
 #ifdef __SYMBIAN32__
-		RChunk mChunk;
-		RHeap* mHeap;
+		SafeChunk mCodeChunk, mEntryChunk;
 #endif
 		
 #define REGISTER_ADDR AA::FP // pointer to gCore->regs

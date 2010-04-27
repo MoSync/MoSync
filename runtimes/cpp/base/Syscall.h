@@ -25,7 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MemStream.h"
 #include "FileStream.h"
 
-#ifndef SYMBIAN
+//#ifndef SYMBIAN
+#if !defined(SYMBIAN) && !defined(_android)
 #include <map>
 #include <string>
 #endif

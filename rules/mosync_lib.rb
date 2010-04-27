@@ -36,6 +36,11 @@ module MoSyncMod
 			#task.invoke
 			@prerequisites = [task] + @prerequisites
 		end
+		collect_headers(".hpp").each do |h|
+			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
+			#task.invoke
+			@prerequisites = [task] + @prerequisites
+		end
 		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
 	

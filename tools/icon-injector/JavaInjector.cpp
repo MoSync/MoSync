@@ -30,7 +30,7 @@ int j_inject(const char *jarFile, const char *pngFile) {
 
 	//extract manifest
 	char buf[1024];
-	sprintf(buf, "unzip -o %s %s", jarFile, "META-INF/MANIFEST.MF");
+	sprintf(buf, "unzip -o \"%s\" \"%s\"", jarFile, "META-INF/MANIFEST.MF");
 	res = run(buf);
 	if(res != 0)
 		return res;
@@ -62,7 +62,7 @@ int j_inject(const char *jarFile, const char *pngFile) {
 	}
 
 	//insert modified manifest & icon
-	sprintf(buf, "zip %s %s %s", jarFile, "META-INF/MANIFEST.MF", pngFile);
+	sprintf(buf, "zip \"%s\" \"%s\" \"%s\"", jarFile, "META-INF/MANIFEST.MF", pngFile);
 	res = run(buf);
 	if(res != 0)
 		return res;

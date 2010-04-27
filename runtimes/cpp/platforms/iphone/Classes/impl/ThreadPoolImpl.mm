@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <base_errors.h>
 using namespace MoSyncError;
 
+#include <errno.h>
+
 
 //*****************************************************************************
 //MoSyncThread
@@ -58,17 +60,21 @@ void MoSyncThread::sleep ( unsigned int ms ) {
 //*****************************************************************************
 
 MoSyncSemaphore::MoSyncSemaphore() {
-	sem_init(&mSem, 0, 0);
+//	sem_init(&mSem, 0, 0);
+	semaphore_create(current_task(), &mSem, SYNC_POLICY_FIFO, 0);
 }
 
 MoSyncSemaphore::~MoSyncSemaphore() {
-	sem_destroy(&mSem);
+//	sem_destroy(&mSem);
+	semaphore_destroy(current_task(), mSem);
 }
 
 void MoSyncSemaphore::wait() {
-	sem_wait(&mSem);
+//	sem_wait(&mSem);
+   semaphore_wait(mSem);
 }
 
 void MoSyncSemaphore::post() {
-	sem_post(&mSem);
+//	sem_post(&mSem);
+    semaphore_signal(mSem);
 }

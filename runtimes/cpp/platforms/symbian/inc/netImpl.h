@@ -35,11 +35,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define DECLARE_ARG_F(type,name) type _##name
 #define DECLARE_ARG_S(type,name) ,DECLARE_ARG_F(type,name)
 
+#define CDECL_ARG_F DECLARE_ARG_S
+#define CDECL_ARG_S DECLARE_ARG_S
+
 #define INIT_ARG(type,name) ,name(_##name)
 
 #define DECLARE_VAR(type,name) type name;
 
-#define REFERENCE_ARG_F(type,name) _##name
+#define REFERENCE_ARG_F(type,name) ,_##name
 #define REFERENCE_ARG_S(type,name) ,_##name
 
 //A class describing a single asynchronous connection operation
@@ -60,13 +63,14 @@ private:
 };
 
 #define CONN_SUBOPS(f, s) f(SockConnect) s(Read) s(Write) s(HttpReadHeaders)\
-	s(StartNetworking)
+	s(StartNetworking) s(Accept)
 
 #define CSV_SockConnect(f, s) f(TSockAddr&,addr) s(int,port) s(CSocket&,sock)
 #define CSV_Read(f, s) f(TDes8&,des)
 #define CSV_Write(f, s) f(const TDesC8&,desc)
 #define CSV_HttpReadHeaders(f, s) f(CHttpConnection&,http)
 #define CSV_StartNetworking(f, s)
+#define CSV_Accept(f, s) f(CServerSocket&,server) s(CSocket*,newSock)
 
 #if 0
 #define CSV_HttpGetSetup(f, s) f(const TDesC8&,url) s(CHttpGetSocket&,hsock)\
@@ -116,7 +120,7 @@ public:
 	Syscall& mSyscall;
 	const MAHandle mHandle;
 	CConnection& mConn;
-	
+
 	virtual ~ConnOp() {
 	//	LOGD("~ConnOp 0x%08X\n", this);
 
@@ -141,12 +145,12 @@ private:
 	ConnOp();
 	ConnOp(const ConnOp&);
 	ConnOp& operator=(const ConnOp&);
-	
+
 	void SendResult(int result);
 };
 
 #define CONN_OPS(f, s) f(AddrConnect) s(NameConnect) s(Read) s(Write)\
-	s(ReadToData) s(WriteFromData) s(HttpFinish)
+	s(ReadToData) s(WriteFromData) s(HttpFinish) s(Accept)
 
 #define CV_AddrConnect(f, s, e) f(TSockAddr,addr) s(int,port) s(CSocket&,sock)
 #define CV_NameConnect(f, s, e) f(Smartie<HBufC>,hostname) s(int,port)\
@@ -158,6 +162,7 @@ private:
 #define CV_WriteFromData(f, s, e) f(Smartie<Stream>,src) s(MAHandle,handle)\
 	s(int,offset) s(int,size) e(TPtrC8,desc) e(Smartie<MemStream>,buffer)
 #define CV_HttpFinish(f, s, e) f(CHttpConnection&,http) s(bool,connect)
+#define CV_Accept(f, s, e) f(CServerSocket&,server) s(CSocket*,newSock)
 
 #define COC_F(a) COC_##a
 #define COC_S(a) ,COC_##a
@@ -166,11 +171,11 @@ enum ConnOpCode { FS(CONN_OPS, COC) };
 
 #define DEFINE_CO(name) class CO_##name : public ConnOp {\
 public: static CO_##name* NewL(bool aNetworkingIsStarted,\
-	Syscall& s, MAHandle h, CConnection& c, FS_NULA2(CV_##name, DECLARE_ARG));\
+	Syscall& s, MAHandle h, CConnection& c FS_NULA2(CV_##name, CDECL_ARG));\
 	CV_##name(DECLARE_VAR,DECLARE_VAR,DECLARE_VAR)\
 	virtual ~CO_##name();\
-private: CO_##name(Syscall& s, MAHandle h, CConnection& c,\
-	FS_NULA2(CV_##name, DECLARE_ARG))\
+private: CO_##name(Syscall& s, MAHandle h, CConnection& c\
+	FS_NULA2(CV_##name, CDECL_ARG))\
 	: ConnOp(s, h, c, COC_##name) CV_##name(INIT_ARG,INIT_ARG,NULA2) {}\
 	void ConstructL(bool aNetworkingIsStarted);\
 	};
@@ -237,6 +242,8 @@ CHttpConnection& GetHttp(MAHandle conn);
 void StartNetworkingL(ConnOp& connOp);
 
 void FinishNetworkingStartL();
+
+void maAccept(MAHandle conn);
 
 //******************************************************************************
 //Variables

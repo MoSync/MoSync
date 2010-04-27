@@ -55,6 +55,27 @@ __stacktop:
 
 // Deal with different MAMain entry symbols
 
+.ifdefglobal _MATestMain
+{		
+	call &_MATestMain
+	jp   #crt_exit
+	.set mainok=1
+}
+
+.ifdefglobal _Z10MATestMainv
+{		
+	call &_Z6MATestMainv
+	jp   #crt_exit
+	.set mainok=1
+}
+
+.ifdefglobal _Z10MATestMainiPPc
+{		
+	call &_Z6MATestMainiPPc
+	jp   #crt_exit
+	.set mainok=1
+}
+
 .ifdefglobal _MAMain
 {		
 	call &_MAMain
@@ -78,7 +99,7 @@ __stacktop:
 	.print "Unresolved symbol: MAMain"
 	.exit
 }
-
+crt_exit:
 	ld	[sp,0], r14		// save return value
 
 	ld	i0,&__global_dtor_chain			// destructor chain

@@ -23,6 +23,7 @@
 //#define CELLID
 #define CALL
 //#define SUPPORT_MOSYNC_SERVER
+//#define SUPPORT_AUDIOBUFFER
 
 //#define USE_ARM_RECOMPILER
 

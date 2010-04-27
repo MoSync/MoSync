@@ -30,12 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CriticalSection.h>
 using namespace MoSyncError;
 
-#ifndef VibrateStop
-HRESULT VibrateStop() {
-	return S_FALSE;
-}
-#endif
-
 /****** hack for nled on pocket pc:s using smartphone runtime (htc touch for instance). ***********/
 //#include <NLed.h> 
 const int NLED_COUNT_INFO_ID = 0;
@@ -75,6 +69,13 @@ extern "C" { BOOL NLedGetDeviceInfo(INT nID, PVOID pOutput); BOOL NLedSetDevice(
 		if(r == TRUE) return S_OK;
 		else return S_FALSE;
 	} 
+
+#ifndef VibrateStop
+HRESULT VibrateStop() {
+	SetLedStatus(0, 0); // let's try this.
+	return S_OK;
+}
+#endif
 
 namespace Base {
 	CRITICAL_SECTION vibrationCS;

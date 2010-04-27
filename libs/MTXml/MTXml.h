@@ -87,6 +87,8 @@ typedef struct MTXContext MTXContext;
 * Also contains internal variables.
 *
 * You must set all the callbacks before calling mtxFeed(), mtxFeedProcess() or mtxFeedWide().
+* If you do not, your program will crash when an un-set callback is called.
+* They may not be set to NULL.
 * An exception is unicodeCharacter(), which will not be called if you call mtxFeedWide().
 *
 * Some functions have const void* parameters. These parameters will point to
@@ -169,8 +171,12 @@ struct MTXContext {
 	/**
 	* Called during UTF-8 processing, if Latin-1 output is selected,
 	* when a character, whose encoding is longer than 8 bits, is encountered.
-	* This function returns an 8-bit representation of that Unicode character.
+	* In other words, its value is greater than 255(0xFF).
+	* This function should return a Latin-1 representation of that Unicode character.
+	*
 	* This function may return zero. If so, a parse error is generated.
+	*
+	* A simple implementation is available: mtxBasicUnicodeConvert().
 	*/
 	unsigned char (*unicodeCharacter)(MTXContext* context, int unicode);
 

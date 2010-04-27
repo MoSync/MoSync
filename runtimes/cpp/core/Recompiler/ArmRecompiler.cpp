@@ -152,8 +152,33 @@ using namespace Core;
 #define FUNC_CAST(func) (*(int*)&func)
 //#endif
 
+#ifdef __SYMBIAN32__
+	MoSync::SafeChunk::SafeChunk() {
+		mChunkIsOpen = false;
+	}
+	MoSync::SafeChunk::~SafeChunk() {
+		if(mChunkIsOpen)
+			close();
+	}
+	void* MoSync::SafeChunk::allocate(int size) {
+		DEBUG_ASSERT(!mChunkIsOpen);
+		LHEL(mChunk.CreateLocalCode(size, size));
+		mChunkIsOpen = true;
+		return mChunk.Base();
+	}
+	void MoSync::SafeChunk::close() {
+		DEBUG_ASSERT(mChunkIsOpen);
+		mChunk.Close();
+		mChunkIsOpen = false;
+	}
+	void* MoSync::SafeChunk::address() {
+		return mChunk.Base();
+	}
+#endif	//__SYMBIAN32__
+
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
+#if 0
 		//return new (ELeave) byte[size];
 		//return User::AllocL(size);
 		if(mHeap == NULL) {
@@ -168,17 +193,45 @@ using namespace Core;
 		void* ptr = mHeap->AllocL(size);
 		LOG("alloCode %i 0x%08x\n", size, ptr);
 		return ptr;
-	#else	// winmobile
+#else
+		return mCodeChunk.allocate(size);
+#endif	//0
+#elif defined(_android)
+		return NULL;
+#else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	#endif
+#endif
+	}
+
+	void* MoSync::ArmRecompiler::allocateEntryPoint(int size) {
+#ifdef __SYMBIAN32__
+		return mEntryChunk.allocate(size);
+#elif defined(_android)
+		return NULL;
+#else	// winmobile
+		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#endif
 	}
 
 	void MoSync::ArmRecompiler::freeCodeMemory(void *addr) {
-#ifdef __SYMBIAN32__
-		//delete (byte*)addr;
-		//User::Free(addr);
+	#ifdef __SYMBIAN32__
 		LOG("freeCode 0x%08x\n", addr);
-		mHeap->Free(addr);
+		DEBUG_ASSERT(addr == mCodeChunk.address());
+		mCodeChunk.close();
+	#elif defined(_android)
+		return;
+	#else	// winmobile
+		VirtualFree(addr, 0, MEM_RELEASE);
+	#endif
+	}
+
+	void MoSync::ArmRecompiler::freeEntryPoint(void *addr) {
+	#ifdef __SYMBIAN32__
+		LOG("freeEntry 0x%08x\n", addr);
+		DEBUG_ASSERT(addr == mEntryChunk.address());
+		mEntryChunk.close();
+	#elif defined(_android)
+		return;
 	#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
 	#endif
@@ -195,6 +248,8 @@ using namespace Core;
 		LOGD("flushInstructionCache end: 0x%08x\n", end);
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
+	#elif defined(_android)
+		return;
 	#else // winmobile
 		// This seems to work, but might not be correct
 		// Might be better to call CacheSync(...)
@@ -218,7 +273,7 @@ namespace MoSync {
 		assm.console->format("\ngenerating entry point\n\n");
 #endif
 		// allocate enough space..
-		entryPoint.mipStart = (AA::MDInstruction*)allocateCodeMemory(64*sizeof(AA::MDInstruction));
+		entryPoint.mipStart = (AA::MDInstruction*)allocateEntryPoint(64*sizeof(AA::MDInstruction));
 		entryPoint.mip = entryPoint.mipStart;
 
 		// save registers on stack
@@ -976,7 +1031,6 @@ namespace MoSync {
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
 #ifdef __SYMBIAN32__
-		mHeap = NULL;
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
 #endif
@@ -1261,23 +1315,25 @@ static void MyExceptionHandlerL(TExcType aType)
 		}
 		if(entryPoint.mipStart) {
 			LOG("freeCodeMemory(entryPoint.mipStart\n");
-			freeCodeMemory(entryPoint.mipStart);
+			freeEntryPoint(entryPoint.mipStart);
 			entryPoint.mipStart = NULL;
 		}
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
+#if 0
 		LOG("if(mHeap != NULL)\n");
 		if(mHeap != NULL) {
 			LOG("heapClose\n");
 			mHeap->Close();
 			LOG("mHeap = NULL;");
 			mHeap = NULL;
-	#if 0	//fails; maybe mHeap->Close() does what we need.
+#if 0	//fails; maybe mHeap->Close() does what we need.
 			LOG("chunkClose start\n");
 			mChunk.Close();
 			LOG("chunkClose done\n");
-	#endif
+#endif	//0
 		}
-	#endif
+#endif	//0
+#endif	//__SYMBIAN32__
 		LOG("if(mPipeToArmInstMap) (%i)\n", mPipeToArmInstMap);
 		if(mPipeToArmInstMap)
 			delete mPipeToArmInstMap;

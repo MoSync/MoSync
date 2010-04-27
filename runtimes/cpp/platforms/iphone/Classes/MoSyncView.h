@@ -16,14 +16,21 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "MoSyncCLController.h"
 
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
+    MoSyncCLController *locationController;	
 
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
+-(void) startUpdatingLocation;
+-(void) stopUpdatingLocation;
+
+- (void)deviceOrientationChanged:(NSNotification *)notification;
+
 @end
 
 

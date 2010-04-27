@@ -57,12 +57,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <babile/badesca.h>
 //#define BABILE
 #ifdef BABILE2
-#include <babile/bb_def.h>
-#include <babile/bb_types.h>
-#include <babile/bb_mem.h>
-#include <babile/i_babile.h>
-#include <babile/io_babile.h>
-#include <babile/if_babile.h>
+#include <bb_def.h>
+#include <bb_types.h>
+#include <bb_mem.h>
+#include <i_babile.h>
+#include <io_babile.h>
+#include <if_babile.h>
 #else
 #define ARM_LE_SYMBIAN
 #include <bb_def.h>
@@ -92,8 +92,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #include <helpers/CPP_IX_CELLID.h>
-
-#include <helpers/CPP_IX_CONNSERVER.H>
 
 #include <VideoPlayer.h>
 #include <helpers/CPP_IX_STREAMING.H>
@@ -131,6 +129,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class CSocket;
 class CHttpConnection;
+class CServerSocket;
 
 class CConnection : public CBase {
 protected:
@@ -144,8 +143,11 @@ public:
 	virtual bool Write(const TDesC8& aDesc, CPublicActive& op) = 0;
 
 	virtual void CancelAll() = 0;
+	
+	virtual void GetAddr(MAConnAddr* addr) = 0;
 
 	virtual CHttpConnection* http() { return NULL; }
+	virtual CServerSocket* server() { return NULL; }
 
 	int state;
 	int connErr;

@@ -25,8 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef __SYMBIAN32__
 #include <e32def.h>
 #define SYMBIAN 1
+#elif defined(_android)
+#include <android/log.h>
 #else
 #include <stdarg.h>
+#endif
+
+#ifndef __SYMBIAN32__
 #define VA_LIST va_list
 #define VA_START va_start
 #endif

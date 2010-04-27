@@ -320,6 +320,14 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+	void Layout::clear() {
+		for(int i = 0; i < children.size(); i++)
+			children[i]->removeWidgetListener(this);
+		Widget::clear();
+		mustRebuild = true;
+		requestRepaint();
+	}
+
 	void Layout::update() {
 		Widget::update();
 		if(mustRebuild) rebuild();		

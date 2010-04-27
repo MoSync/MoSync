@@ -154,6 +154,21 @@ final int maFileTruncate(MAHandle file, int offset) {
 	return 0;
 }
 
+final int maFileDelete(MAHandle file) {
+	try {
+		FileHandle fh = getFileHandle(file);
+		fh.fc.delete();
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
+		return MA_FERR_GENERIC;
+	}
+	return 0;
+}
+
+//***************************************************************************
+//Read/Write Functions
+//***************************************************************************
+
 final int maFileWrite(MAHandle file, MAAddress src, int len) {
 	try {
 		OutputStream out = getFileOutputStream(file);

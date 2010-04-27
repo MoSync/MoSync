@@ -141,7 +141,7 @@ void PrintConsole(const wchar_t *str)
 
 	if (gConsoleLogging)
 	{
-		static char prefix[] = "PrintConsole: ";
+		static const char prefix[] = "PrintConsole: ";
 		maWriteLog(prefix, strlen(prefix));
 
 		length = wcslen(str);
@@ -154,7 +154,7 @@ void PrintConsole(const wchar_t *str)
 #endif
 			//maWriteLog(str, length*sizeof(wchar_t));
 			//convert to utf-8
-			int len8 = wcstombs(buf8, str, sizeof(length * MB_LEN_MAX));
+			int len8 = wcstombs(buf8, str, length * MB_LEN_MAX);
 			maWriteLog(buf8, len8);
 			if (str[length - 1] != '\n')
 				maWriteLog("\n", 1);
@@ -245,14 +245,14 @@ int puts(const char* str)
 {
 	wchar_t wbuf[PRINTF_BUFSIZE];
 	wsprintf(wbuf, L"%s", str);
-	PrintConsole(wbuf);
-	FeedLine();
+	wputs(wbuf);
 	return 0;
 }
 
 int wputs(const wchar_t* str) {
 	PrintConsole(str);
-	FeedLine();
+	if(!sConsole.postponedLineFeed)
+		FeedLine();
 	return 0;
 }
 

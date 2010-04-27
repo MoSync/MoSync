@@ -91,8 +91,8 @@ int getLocalAddress ( MABtAddr& a )
  * Returns the device discovery state.
  *
  * @return	0 - Still working
- * 		1 - Finished successfully
- *            < 0 - (CONNERR) Failed.
+ *          1 - Finished successfully
+ *        < 0 - (CONNERR) Failed.
  */
 int maBtDiscoveryState ( void )
 {
@@ -100,10 +100,23 @@ int maBtDiscoveryState ( void )
     return gInstance->getState( );
 }
 
+
+/**
+ * Cancels an on going device discovery.
+ * Note: If an operation was canceled, its last BT event will have 
+ *       the status CONNERR_CANCELED. This is an asynchronous operation. 
+ *       It is not safe to start another discovery before you've recieved 
+ *       the CONNERR_CANCELED event.
+ *
+ * @return 0 if there was no active operation
+ *         1 if there was.
+ */
 int maBtCancelDiscovery ( void )
 {
-    DEBIG_PHAT_ERROR;
+    MAASSERT( gInstance != NULL );
+    return gInstance->cancelDeviceDiscovery( );
 }
+
 
 /**
  * Start a new device discovery operation in the background
@@ -122,6 +135,7 @@ int maBtStartDeviceDiscovery ( MABtCallback cb,
     MAASSERT( gInstance != NULL );
     return gInstance->startDiscovery( cb, n );
 }
+
 
 /**
  * Returns the next discovered device.

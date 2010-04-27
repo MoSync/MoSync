@@ -65,6 +65,14 @@ namespace MAUI {
 	void Widget::add(Widget* w) {
 		children.add(w);
 		w->setParent(this);
+		requestRepaint();
+	}
+
+	void Widget::clear() {
+		for(int i = 0; i < children.size(); i++)
+			children[i]->setParent(NULL);
+		children.clear();
+		requestRepaint();
 	}
 	
 	const Rect& Widget::getBounds() {
@@ -244,9 +252,11 @@ namespace MAUI {
 	}
 
 	Widget* Widget::widgetAt(int x, int y) {
-		Vector_each(Widget*,it,children) {
-			Widget *ret = widgetAt(x, y);
-			if(ret) return ret;
+		Vector_each(Widget *, it, children) {
+			Widget *ret = (*it)->widgetAt(x, y);
+			if(ret) {
+				return ret;
+			}
 		}
 
 		if(bounds.contains(x, y)) {

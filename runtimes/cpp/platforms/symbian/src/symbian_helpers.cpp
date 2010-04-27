@@ -333,17 +333,23 @@ unreach:
 	while(1) {}
 }
 
-static void ShowAknErrorNote(const TDesC& text) {
+static void logTDesC(const TDesC& text) {
 #ifdef LOGGING_ENABLED
-	TBuf8<128> buffer;
+	TBuf8<256> buffer;
 	buffer.Copy(text);
 	LogBin(buffer.Ptr(), buffer.Size());
 	if(buffer[buffer.Length()-1] != '\n') {
 		LOG("\n");
 	}
 #endif
+}
+
+static void ShowAknErrorNote(const TDesC& text) {
+	LOG("ShowAknErrorNote:\n");
+	logTDesC(text);
 	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
 	if(!ui->isExiting()) {
+		LOG("Showing ErrorNote...\n");
 		ui->Stop();
 		//TODO: the note disappears if the user presses any key.
 		//make the note respond only to the OK key
@@ -359,19 +365,15 @@ static void ShowAknErrorNote(const TDesC& text) {
 		if(IS_SYMBIAN_ERROR(res)) {
 			LOG("AknErrorNote error %i\n", res);
 		}
+		LOG("ErrorNote closed\n");
 	}
 }
 
 void __declspec(noreturn) ShowAknErrorNoteThenExitL(const TDesC& text) {
 	LOG("ShowAknErrorNoteThenExit\n");
-	
+	logTDesC(text);
+
 	Base::StopEverything();
-	
-#ifdef SUPPORT_RELOAD
-	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
-	if(ui->iReload)
-		User::Leave(KLeaveMoSyncReload);
-#endif
 	ShowAknErrorNote(text);
 	MoSyncExit(-1);
 }

@@ -95,7 +95,9 @@ class RuntimeBuilder
 		# Restore config_platform.h
 		revert_backupped_file config_file
 		
-		libjars = ['cldcapi11', 'midpapi20', 'jsr082', 'jsr179', 'wma20', 'mmapi', 'jsr75']
+		cldcjar = cldc10 ? 'cldcapi10' : 'cldcapi11'
+		
+		libjars = [cldcjar, 'midpapi20', 'jsr082', 'jsr179', 'wma20', 'mmapi', 'jsr75']
 		
 		# Compile Java source
 		puts "Compiling java source.."
@@ -107,11 +109,11 @@ class RuntimeBuilder
 		puts "Generating manifest file.."
 		runtime_number = runtime_dir.split('/')[-1] # extract which runtime number it is from the path
 		File.open("#{temp_dir}manifest.mf", "w")  do |infile|
-			infile.puts "MIDlet-1: MoSyncRuntime#{runtime_number} , MoSyncRuntime#{runtime_number}.png, MAMidlet\n"
+			infile.puts "MIDlet-1: MoSyncRuntime#{runtime_number}, MoSyncRuntime#{runtime_number}.png, MAMidlet\n"
 			infile.puts "MIDlet-Name: MAMidlet\n"
 			infile.puts "MIDlet-Vendor: Mobile Sorcery\n"
 			infile.puts "MIDlet-Version: 1.0\n"
-			infile.puts "MicroEdition-Configuration: CLDC-1.1\n"
+			infile.puts "MicroEdition-Configuration: CLDC-1.#{cldc10 ? '0' : '1'}\n"
 			infile.puts "MicroEdition-Profile: MIDP-2.0\n"
 		end
 		

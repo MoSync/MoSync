@@ -41,25 +41,48 @@ namespace Core {
 extern Core::VMCore* gCore;
 extern bool gRunning;
 
+#define FONT_HEIGHT 12
+
 class Surface {
 public:
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 	}
+	
+	void initFont() {
+		if(!context) return;
+		CGContextSelectFont(context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
 
-	Surface(int width, int height, char *data=NULL) {
+		CGContextSetFontSize(context, FONT_HEIGHT);
+		CGAffineTransform xform = CGAffineTransformMake(
+														1.0,  0.0,
+														0.0, -1.0,
+														0.0,  0.0);
+		CGContextSetTextMatrix(context, xform);	
+	}
+
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipFirst, int rowBytes=-1) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-		int rowBytes = width*4;
+		this->width = width,
+		this->height = height;
+		if(rowBytes==-1)
+			this->rowBytes = rowBytes = width*4;
+		else
+			this->rowBytes = rowBytes;
+
 		if(data==NULL) {
-			data = new char[rowBytes*height];
+			this->data = new char[rowBytes*height];
 			mOwnData = true;
 		}
-		else mOwnData = false;
+		else {
+			this->data = data;
+			mOwnData = false;
+		}
 		
-		context = CGBitmapContextCreate(data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst);
-										//kCGImageAlphaNoneSkipFirst);
+		context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, bitmapInfo);
 		
-		CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, data, rowBytes * height, NULL);
-		image = CGImageCreate(width, height, 8, 32, rowBytes, colorSpace, kCGImageAlphaNoneSkipFirst, dataProvider, NULL, false, kCGRenderingIntentDefault);
+		CGDataProviderRef dataProvider = CGDataProviderCreateWithData(NULL, this->data, rowBytes * height, NULL);
+		image = CGImageCreate(width, height, 8, 32, rowBytes, colorSpace, bitmapInfo, 
+							  dataProvider, NULL, false, kCGRenderingIntentDefault);
 		CGDataProviderRelease(dataProvider);
 		CGColorSpaceRelease(colorSpace);
 		
@@ -68,9 +91,13 @@ public:
 		CGContextSetAllowsAntialiasing (context, false);
 		rect = CGRectMake(0, 0, width, height);
 		
-		CGContextSetRGBFillColor(context, 0, 0, 0, 1);
-		CGContextFillRect(context, rect);	
+		//CGContextSetRGBFillColor(context, 0, 0, 0, 1);
+		//CGContextFillRect(context, rect);	
 		//CGContextClearRect(context, CGRectMake(0, 0, width, height));
+		
+		initFont();
+		
+		CGContextSaveGState(context);
 	}
 	
 	
@@ -80,12 +107,17 @@ public:
 		if(mOwnData && data) delete data;
 	}
 	
+	int width, height, rowBytes;
 	CGImageRef image;
 	CGContextRef context;
 	CGRect rect;
 	bool mOwnData;
 	char *data;
 };
+
+
+// never use <0 for event type :)
+#define IEVENT_TYPE_DEFLUX_BINARY -1
 
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
@@ -98,6 +130,20 @@ public:
 		pthread_cond_destroy(&mCond);
 		pthread_mutex_destroy(&mMutex);
 	}
+	
+	void handleInternalEvent(int type, void *e);
+
+	const MAEvent* getAndProcess() {
+		if(count()==0) return NULL;
+		const MAEvent& e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
+		if(e.type<0) {
+			handleInternalEvent(e.type, e.data);
+			return getAndProcess();
+		} else {
+			return &e;
+		}
+	}
+	
 	
 	void put(const MAEvent& e) {
 		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
@@ -139,10 +185,23 @@ public:
 		}		
 	}
 	
+	void addScreenChangedEvent() {
+		MAEvent event;
+		event.type = EVENT_TYPE_SCREEN_CHANGED;
+		put(event);	
+	}
+	
 	void addCloseEvent() {
 		MAEvent event;
 		event.type = EVENT_TYPE_CLOSE;
 		put(event);	
+	}
+	
+	void addInternalEvent(int type, void* data) {
+		MAEvent event;
+		event.type = type;
+		event.data = data;
+		put(event);
 	}
 	
 private:

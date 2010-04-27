@@ -1,33 +1,41 @@
-Copyright (C) 2009 Mobile Sorcery AB
+Copyright (C) 2010 MoSync AB. MoSync(R) is a registered trademark of MoSync AB in the European Union, the United States, and other countries.
 
-This program is free software; you can redistribute it and/or modifyit under the terms of the GNU General Public License as published bythe Free Software Foundation; version 2 of the License.
-This program is distributed in the hope that it will be useful,but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public Licensealong with this program; if not, write to the Free SoftwareFoundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License published by the Free Software Foundation, version 2.
 
-Licenses for third party libraries and applications included in the
-Software are also located in the docs/licenses subdirectory of your installation
-directory.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-lgpl.txt covers SDL, SDL_Image, SDL_Sound, SDL_Prim, SDL_ttf, SDL_Netand part of makesis-4.
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 
-gpl.txt covers Cygwin and GCC.
-
-freeimage-license.txt covers FreeImage.
-
-expat-license.txt covers Expat.
-
-info-zip-license.txt covers Info-Zip.
-
-modf-license.txt covers the modf function in MAStd, as well as acos,
-
-asin, atan2, log, pow, atan, ceil, floor and frexp.
-
-strtod-license.txt covert the strtod function in MAStd.
-
-Permission from the author has been given for Angelcode BMFont.
-
-symbian-example-license.txt covers makesis-2.0.0 and part of makesis-4.
+Licenses for third party libraries and applications included in the software are also located in the /docs/licenses subdirectory of your MoSync installation directory.
 
 apache-license-1.1.txt covers part of makesis-4.
 
-apache-license-2.0.txt covers the AMR decoder, gsm_amr.
+apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android.jar, apkbuilder.jar, dx.jar, and Apache Commons Compress.
+
+expat-license.txt covers Expat.
+
+freeimage-license.txt covers FreeImage.
+
+gpl.txt covers MoSync and GCC.
+
+info-zip-license.txt covers Info-Zip.
+
+lgpl.txt covers SDL, SDL_Image, SDL_Sound, SDL_Prim, SDL_ttf, SDL_Net, and part of makesis-4.
+
+modf-license.txt covers the modf function in MAStd, as well as acos, asin, atan2, log, pow, atan, ceil, floor and frexp.
+
+newlib-license.txt covers the newlib standard C library.
+
+openssl-licenses.txt covers OpenSSL.
+
+redline-rpm-license.txt covers Redline RPM.
+
+strtod-license.txt covers the strtod function in MAStd.
+
+symbian-example-license.txt covers makesis-2.0.0 and part of makesis-4.
+
+tlsf-license.txt covers the Two-level Segregate Fit (TLSF) allocator.
+
+yasper-license.txt covers Yasper (Yet Another Smart Process EditoR).
+
+Permission from Andreas Jönsson has kindly been given for the use of Angelcode BMFont and redistribution of its binary files.

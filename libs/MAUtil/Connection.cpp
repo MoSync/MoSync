@@ -36,7 +36,9 @@ void ConnectionListener::connReadFinished(Connection* conn, int result) {
 
 
 //if mConn == 0 then it's uninitialized
-Connection::Connection(ConnectionListener* listener) : mConn(0), mListener(listener), mRemain(0) {
+Connection::Connection(ConnectionListener* listener, MAHandle conn)
+: mConn(conn), mListener(listener), mRemain(0)
+{
 }
 
 Connection::~Connection() {
@@ -138,6 +140,10 @@ void Connection::connEvent(const MAConnEventData& data) {
 
 void Connection::setListener(ConnectionListener* listener) {
 	mListener = listener;
+}
+
+int Connection::getAddr(MAConnAddr* dst) {
+	return maConnGetAddr(mConn, dst);
 }
 
 

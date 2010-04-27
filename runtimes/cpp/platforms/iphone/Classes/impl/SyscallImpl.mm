@@ -46,6 +46,12 @@ using namespace MoSyncError;
 
 #include "MoSyncMain.h"
 
+#include "iphone_helpers.h"
+#include "CMGlyphDrawing.h"
+
+#include <AVFoundation/AVFoundation.h>
+#include <AudioToolbox/AudioToolbox.h>
+
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
@@ -60,7 +66,8 @@ namespace Base {
 	Syscall* gSyscall;
 
 	uint realColor;
-	uint currentColor, currentRed, currentGreen, currentBlue;
+	uint currentColor;
+	float currentRed, currentGreen, currentBlue;
 	uint oldColor;
 
 	int gWidth, gHeight;
@@ -83,6 +90,8 @@ namespace Base {
 
 	bool exited = false;
 	CRITICAL_SECTION exitMutex;
+	
+	static CGFontRef sUnicodeFont;
 	
 	void MALibQuit();
 
@@ -128,17 +137,19 @@ namespace Base {
 		   
 		CGDataProviderRelease(dpr);
 		
-		
-		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef));
+		/*
+		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef), NULL);
 		CGContextSaveGState(newSurface->context);
 		CGContextTranslateCTM(newSurface->context, 0, CGImageGetHeight(imageRef));
 		CGContextScaleCTM(newSurface->context, 1, -1);
 		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
 		CGContextRestoreGState(newSurface->context);
-		CGImageRelease(imageRef);
-		return newSurface;
+		CGImageRelease(imageRef);		
 		
-		//return new Surface(imageRef);
+		return newSurface;
+		*/
+		
+		return new Surface(imageRef);
 	}
 	
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
@@ -151,7 +162,6 @@ namespace Base {
 	// Helpers
 	//***************************************************************************
 
-#define FONT_HEIGHT 12
 	static bool MALibInit() {
 
 		InitializeCriticalSection(&exitMutex);
@@ -166,27 +176,31 @@ namespace Base {
 		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
 		*/
 		gBackbuffer = new Surface(gWidth, gHeight);
+		CGContextRestoreGState(gBackbuffer->context);		
+		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
 		
 		// init font
-		CGContextSelectFont(gBackbuffer->context, "Helvetica", FONT_HEIGHT, kCGEncodingMacRoman);
-		CGAffineTransform xform = CGAffineTransformMake(
-														1.0,  0.0,
-														0.0, -1.0,
-														0.0,  0.0);
-		CGContextSetTextMatrix(gBackbuffer->context, xform);
-		
+		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
+
+		sUnicodeFont = CGFontCreateWithFontName(CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL));
+				
 		gDrawTarget = gBackbuffer;
 		
 		mach_timebase_info_data_t machInfo;
 		mach_timebase_info( &machInfo );
 		gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
 		
+		
+		MANetworkInit();		
+		
 		return true;
 	}
 
 	void MALibQuit() {
 		DeleteCriticalSection(&exitMutex);
-		
+		MANetworkClose();
 	}
 
 
@@ -222,7 +236,9 @@ namespace Base {
 	//***************************************************************************
 	SYSCALL(void, maSetClipRect(int left, int top, int width, int height))
 	{
-		//CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
+		CGContextRestoreGState(gDrawTarget->context);
+		CGContextSaveGState(gDrawTarget->context);
+		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
@@ -251,9 +267,10 @@ namespace Base {
 		oldColor = currentColor;
 		currentColor = argb;
 		//realColor =	CONVERT_TO_NATIVE_COLOR_FROM_ARGB(argb);
-		currentRed = (float)((argb&0x00ff0000)>>16)/255.0f;
+		currentRed =   (float)((argb&0x00ff0000)>>16)/255.0f;
 		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
-		currentBlue = (float)((argb&0xff))/255.0f;
+		currentBlue =  (float)((argb&0x000000ff))/255.0f;
+		
 		return oldColor;
 	}
 
@@ -301,18 +318,34 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
-		
-		CGPoint before = CGContextGetTextPosition(gDrawTarget->context);
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
-		int width = abs((int)(after.x-before.x));
+		int width = after.x;
 		return EXTENT(width, FONT_HEIGHT);
 	}
 
-	SYSCALL(MAExtent, maGetTextSizeW(const char* str)) {
-		NOT_IMPLEMENTED;
-		return 0;
+	SYSCALL(MAExtent, maGetTextSizeW(const wchar_t* str)) {
+		//NOT_IMPLEMENTED;
+/*
+		const char *s = unicodeToAscii(str);
+		MAExtent e = maGetTextSize(s);
+*/
+		int numGlyphs = wcslen(str)*2;
+		
+		CGGlyph* glyphs = new CGGlyph[numGlyphs];
+		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
+		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+		//CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
+		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
+		int width = after.x;
+		delete glyphs;	
+		return EXTENT(width, FONT_HEIGHT);
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
@@ -322,12 +355,37 @@ namespace Base {
 		
 		//CGAffineTransform xform =  CGAffineTransformMakeRotation(3.14159);
 		//CGAffineTransform xform = CGAffineTransformScale(xform, 1, -1);
-		//CGContextSetTextMatrix(gBackbuffer, xform);		
+		//CGContextSetTextMatrix(gBackbuffer, xform);	
+		
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 	}
 
-	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		NOT_IMPLEMENTED;
+	SYSCALL(void, maDrawTextW(int left, int top, const wchar_t* str)) {
+		//NOT_IMPLEMENTED;
+		/*
+		const char *s = unicodeToAscii(str);
+		maDrawText(left, top, s);
+		*/
+		int numGlyphs = wcslen(str)*2;
+		
+		CGGlyph* glyphs = new CGGlyph[numGlyphs];
+		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
+		
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+		
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);
+		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
+		//CGContextScaleCTM(gDrawTarget->context, 1, -1);		
+		
+		delete glyphs;
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
@@ -339,7 +397,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maResetBacklight()) {
-		// do nothing, it can't be reset as far as I can tell..
+		// do nothing, it can't be reset as far as I can tell.. still a private api.
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
@@ -352,7 +410,17 @@ namespace Base {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
 		int width = CGImageGetWidth(img->image);
 		int height = CGImageGetHeight(img->image);
-		CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);
+
+		if(img->context) {
+			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);		
+		} else {
+			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
+			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, 0, width, height), img->image);	
+			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);	
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
+		}
+			
 	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
@@ -375,8 +443,24 @@ namespace Base {
 		//CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
 		CGRect smallRect = CGRectMake(src->left, src->top, src->width, src->height);
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
-		CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
-		CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
+		//CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
+		CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
+		
+		
+		if(img->context) 
+		{
+			CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
+			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);	
+		}
+		 else {
+			CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
+			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);			
+			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
+			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
+			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);	
+		}
+		
 		CGImageRelease(smallImage);
 	}
 
@@ -396,7 +480,19 @@ namespace Base {
 		int height = src->height;
 		gSyscall->ValidateMemRange(dst, src->height*scanlength);
 
-		NOT_IMPLEMENTED;
+		CGRect smallRect = CGRectMake(x, y, width, height);
+		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
+		
+		// First get the image into your data buffer
+		int imgwidth = CGImageGetWidth(img->image);
+		int imgheight = CGImageGetHeight(img->image);
+		Surface *dstSurface = new Surface(imgwidth, imgheight, (char*) dst, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+
+		CGContextDrawImage(dstSurface->context, CGRectMake(0, 0, width, height), smallImage);
+		CGImageRelease(smallImage);
+			
+		delete dstSurface;
+		
 	}
 
 	SYSCALL(MAHandle, maSetDrawTarget(MAHandle handle)) {
@@ -410,6 +506,9 @@ namespace Base {
 			gDrawTarget = gBackbuffer;
 		} else {
 			Surface* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
+			if(!img->data)
+				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
+			   
 			gDrawTarget = img; 
 			ROOM(SYSCALL_THIS->resources.add_RT_FLUX(handle, NULL));
 		}
@@ -451,8 +550,14 @@ namespace Base {
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int processAlpha)) {
 		int width = EXTENT_X(size); int height = EXTENT_Y(size);
 		gSyscall->ValidateMemRange(src, width*height*4);
-		NOT_IMPLEMENTED;
-		return 0;
+		//NOT_IMPLEMENTED;
+		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
+		char *data = new char[byteSize];
+		memcpy(data, src, byteSize);
+		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast);
+		bitmap->mOwnData = true;
+		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
+		return 1;
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
@@ -461,22 +566,6 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(void, maCloseStore(MAHandle store, int del))
-	{
-		StoreItr itr = gStores.find(store);
-		MYASSERT(itr != gStores.end(), ERR_STORE_HANDLE_INVALID);
-		const char *filename = itr->second.c_str();
-		if(del)
-		{
-			int res = remove(filename);
-			if(res != 0) {
-				LOG("maCloseStore: remove error %i. errno %i.\n", res, errno);
-				DEBIG_PHAT_ERROR;
-			}
-		}
-		gStores.erase(itr);
-	}	 
-
 
 	SYSCALL(int, maGetKeys()) 
 	{
@@ -484,9 +573,9 @@ namespace Base {
 			return 0;
 		//MAProcessEvents();
 		//return currentKeyState;
-		return 0;
+		return 0; // there's no keys on iphone :)
 	}
-
+	
 
 	SYSCALL(int, maGetEvent(MAEvent *dst)) 
 	{
@@ -498,10 +587,12 @@ namespace Base {
 
 		if(!gClosing)
 			gEventOverflow = false;
-		if(gEventQueue.count() == 0)
-			return 0;
+//		if(gEventQueue.count() == 0)
+//			return 0;
 		
-		*dst = gEventQueue.get();
+		const MAEvent* ev = gEventQueue.getAndProcess();
+		if(!ev) return 0;
+		else *dst = *ev; //gEventQueue.get();
 
 		/*
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
@@ -548,20 +639,19 @@ namespace Base {
 
 		return (int)((double)mach_absolute_time()*gTimeConversion);
 	}
+	
 
 	SYSCALL(int, maFreeObjectMemory()) {
-		NOT_IMPLEMENTED;
-		return 0;
+		return getFreeAmountOfMemory();
 	}
 	SYSCALL(int, maTotalObjectMemory()) {
-		NOT_IMPLEMENTED;
-		return 0;
+		return getTotalAmountOfMemory();
 	}
 
 	SYSCALL(int, maVibrate(int ms)) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+		return 1;
 	}
 
 	SYSCALL(void, maPanic(int result, char* message)) 
@@ -569,64 +659,85 @@ namespace Base {
 		ShowMessageBox(message, true);
 		GetVMYield(gCore) = 1;
 		gRunning = false;
+		pthread_exit(NULL);
 	}
 
 	SYSCALL(int, maPlatformRequest(const char* url)) 
 	{
-		NOT_IMPLEMENTED;
+		if(!platformRequest(url)) return -1;
 		return 0;
 	}
-
+	
+	static AVAudioPlayer* sSoundPlayer = NULL;
+	
 	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) 
 	{ 
-		NOT_IMPLEMENTED;
+		Stream *res = gSyscall->resources.get_RT_BINARY(sound_res);
+		MYASSERT(res->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
+		Stream* src = res->createLimitedCopy(size);
+		MYASSERT(src, ERR_DATA_ACCESS_FAILED);
+		
+		byte b;
+		do {
+			if(!src->readByte(b))
+				BIG_PHAT_ERROR(ERR_MIME_READ_FAILED);
+		} while(b);
+		
+		int pos;
+		src->tell(pos);	
+		
+		NSData *data = NULL;
+		
+		int encodedSize = size - pos + offset;
+		if(!src->ptrc()) {
+			byte* sound = new byte[encodedSize];
+			src->read(sound, encodedSize);
+			data = [NSData dataWithBytesNoCopy:sound length:encodedSize];
+
+		} else {
+			byte* sound = &(((byte*)src->ptrc())[pos]);
+			data = [NSData dataWithBytesNoCopy:sound length:encodedSize freeWhenDone:NO];
+		}		
+		
+		if(sSoundPlayer)
+			[sSoundPlayer release];	
+		NSError *err;
+		sSoundPlayer = [[AVAudioPlayer alloc] initWithData:data error:&err];
+		[data release];
+		if(!sSoundPlayer) {
+			// check err
+			return -1;
+		}
+		[sSoundPlayer play];
+		
 		return 0;
 	}
 
 	SYSCALL(void, maSoundStop()) 
 	{
-		NOT_IMPLEMENTED;
+		[sSoundPlayer stop];
+		sSoundPlayer.currentTime = 0;
 	}
 
 	SYSCALL(int, maSoundIsPlaying()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		return sSoundPlayer.playing==YES;
 	}
 
 	SYSCALL(void, maSoundSetVolume(int vol)) 
 	{
-		NOT_IMPLEMENTED;
+		sSoundPlayer.volume = (float)vol/100.0f;
 	}
 
 	SYSCALL(int, maSoundGetVolume()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
+		return (int)(sSoundPlayer.volume*100.0f);
 	}
 	
 	SYSCALL(int, maGetBatteryCharge()) 
 	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maKeypadIsLocked() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maLockKeypad() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
-	}
-
-	int maUnlockKeypad() 
-	{
-		NOT_IMPLEMENTED;
-		return 0;
+		float batLeft = [[UIDevice currentDevice] batteryLevel]; 		
+		return (int)(batLeft*100.0f);
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
@@ -646,16 +757,28 @@ namespace Base {
 		
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
+/*
 		info->redMask = 0x00ff0000;
 		info->greenMask = 0x0000ff00;
 		info->blueMask = 0x000000ff;
+*/
+		info->redMask = 0x000000ff;
+		info->greenMask = 0x0000ff00;
+		info->blueMask = 0x00ff0000;
+		
 		info->sizeInBytes = bytesPerRow*gHeight;
 		info->width = gWidth;
 		info->height = gHeight;
 		info->pitch = bytesPerRow;
+/*
 		info->redShift = 16;
 		info->greenShift = 8;
 		info->blueShift = 0;
+*/
+		info->redShift = 0;
+		info->greenShift = 8;
+		info->blueShift = 16;
+		
 		info->redBits = bitsPerComponent;
 		info->greenBits = bitsPerComponent;
 		info->blueBits = bitsPerComponent;
@@ -670,7 +793,7 @@ namespace Base {
 		sInternalBackBuffer = gBackbuffer;
 		//backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		//currentDrawSurface = backBuffer;
-		gBackbuffer = new Surface(gWidth, gHeight, (char*)data);
+		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipLast);
 		gDrawTarget = gBackbuffer;
 		return 1;
 	}
@@ -685,6 +808,15 @@ namespace Base {
 		return 1;
 	}
 	
+	int maLocationStart() {
+		StartUpdatingLocation();
+		return MA_LPS_AVAILABLE;
+	}
+	
+	int maLocationStop() {
+		StopUpdatingLocation();
+		return 0;
+	}
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -696,12 +828,37 @@ namespace Base {
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
+		case maIOCtl_maPlatformRequest:
+			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));				
+		case maIOCtl_maGetBatteryCharge:
+			return maGetBatteryCharge();		
+
+		case maIOCtl_maLocationStart:
+			return maLocationStart();
+		case maIOCtl_maLocationStop:
+			return maLocationStop();				
+			
+		case maIOCtl_maFrameBufferGetInfo:
+			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+		case maIOCtl_maFrameBufferInit:
+			return maFrameBufferInit(GVMRA(void*));		
+		case maIOCtl_maFrameBufferClose:
+			return maFrameBufferClose();
 				
 		}
 		
 		return IOCTL_UNAVAILABLE;
 	}
 } // namespace Base
+
+void EventQueue::handleInternalEvent(int type, void *e) {
+	if(type == IEVENT_TYPE_DEFLUX_BINARY) {
+		InternalEventDefluxBin *d = (InternalEventDefluxBin*)e;
+		SYSCALL_THIS->resources.extract_RT_FLUX(d->handle);
+		ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(d->handle, d->stream));	
+		delete d;
+	}
+}
 
 void MoSyncExit(int r) 
 {

@@ -255,6 +255,14 @@
 				RelativePath=".\Downloader.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Server.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Server.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Environment"
