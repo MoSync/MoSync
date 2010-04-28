@@ -61,11 +61,11 @@ void Image::build(int x, int y, int h, int l, void *f) {
 	
 	
 	MAWidgetHandle imageHandle;
-	//maWinMobileLabel(&labelParams, NULL);
+	maWinMobileImage(&imageParams, &imageHandle);
 	
 	maAndroidAddImage(myid, mRsc);
-	//maAndroidAddTextView(myid, text);
 	
+
 	maIPhoneImage(&imageParams, NULL);
 	me=imageHandle.pWidget;
 }

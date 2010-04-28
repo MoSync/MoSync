@@ -554,7 +554,7 @@ DWORD GetScreenOrientation()
 
 			}
 			*/
-			ShowWindow (hwnd, SW_SHOW); //MODIF COMMENTED
+			ShowWindow (hwnd, SW_SHOW);
 			UpdateWindow (hwnd);
 			
 			return 0;
@@ -670,6 +670,7 @@ DWORD GetScreenOrientation()
 				gEventFifo.put(event);
 				Resume();
 				//InitFullScreen();
+				
 				MAUpdateScreen();
 				//SetForegroundWindow(hwnd);
 			}
@@ -682,13 +683,18 @@ DWORD GetScreenOrientation()
 				MAEvent event;
 				event.type = EVENT_TYPE_FOCUS_LOST;
 				gEventFifo.put(event);
+#ifndef NATIVE_UI
 				Suspend();
-				//InitWindowed();
-				//ShowWindow(g_hwndMain, SW_MINIMIZE);
+#endif
+				InitWindowed();
+				ShowWindow(g_hwndMain, SW_MINIMIZE);
 			}
 			return 0;
+
       case WM_CANCELMODE:
+#ifndef NATIVE_UI
 			Suspend();
+#endif
 			InitWindowed();
 			ShowWindow(g_hwndMain, SW_MINIMIZE);
             return 0;
@@ -790,9 +796,9 @@ DWORD GetScreenOrientation()
 	  // If it failed to create the window, return FALSE.
 	  if (!hwnd)
 		return FALSE;
-//NATIVE UI MODIFICATION
-	  ShowWindow (hwnd, iCmdShow);//
-	  UpdateWindow (hwnd);//
+
+	  ShowWindow (hwnd, iCmdShow);
+	  UpdateWindow (hwnd);
 	  return TRUE;
 	}
 
@@ -2562,7 +2568,21 @@ DWORD GetScreenOrientation()
 		return 0;
 	}
 
+	static int maWinMobileImage(MAWidgetParameters *wparameters, MAWidgetHandle *whandle) {
+		whandle->pWidget = CreateWindowEx(0, TEXT("STATIC"),NULL,
+			SS_CENTERIMAGE | SS_REALSIZEIMAGE | SS_BITMAP | WS_CHILD | WS_VISIBLE,
+			10,10,380,380,
+			(HWND)wparameters->pParent,
+			(HMENU)wparameters->widgetID,
+			g_hInst,
+			NULL
+		);
+		Image *img = gSyscall->resources.get_RT_IMAGE(wparameters->rsc);
 
+		SendMessage((HWND)whandle->pWidget, STM_SETIMAGE,  (WPARAM)IMAGE_BITMAP, (LPARAM)img);
+		//currentDrawSurface->drawImage(0, 0, img);
+		return 0;
+	}
 
 	static int maWinMobileMenuBar(MAWidgetParameters *wparameters) {
 			//InsertMenu(g_hMenu, 1, MF_BYPOSITION, IDOK, L"Right");
@@ -2997,6 +3017,8 @@ retry:
 			return maWinMobileAddRightMenuItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 		case maIOCtl_maWinMobileLabel:
 			return maWinMobileLabel(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+		case maIOCtl_maWinMobileImage:
+			return maWinMobileImage(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 
 #endif
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
