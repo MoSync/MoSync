@@ -41,7 +41,7 @@ MenuItem::MenuItem(char *str, Widget *frame, int rsc) {
 	itemParams.rsc=rsc;
 	maWinMobileAddRightMenuItem(&itemParams, NULL);
 
-	maAndroidAddMenuItem(myid, text);
+	maAndroidAddMenuItem(myid, text, rsc);
 	
 	maIPhoneToolBar(&itemParams, NULL);
 	maIPhoneToolBarItem(&itemParams, NULL);
