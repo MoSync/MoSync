@@ -2091,8 +2091,8 @@ namespace Base {
 
 		// can't blit all at once; result is upside-down.
 		for(int i=0, dy=CAMERA_HEIGHT-1; i<gBackBuffer->h; i++, dy--) {
-			SDL_Rect src = { 0,i, gBackBuffer->w, 1 };
-			SDL_Rect dst = { 0,dy, gBackBuffer->w, 1 };
+			SDL_Rect src = { 0,(Sint16)i, (Uint16)gBackBuffer->w, 1 };
+			SDL_Rect dst = { 0,(Sint16)dy, (Uint16)gBackBuffer->w, 1 };
 			DEBUG_ASRTZERO(SDL_BlitSurface(gBackBuffer, &src, dib_surface, &dst));
 		}
 
@@ -2107,7 +2107,7 @@ namespace Base {
 		// at this point, hmem contains the entire data in memory stored in fif format.
 		// the amount of space used by the memory is equal to file_size
 		long file_size = FreeImage_TellMemory(hmem);
-		LOGD("File size : %ld\n", file_size);
+		LOG("File size : %ld\n", file_size);
 
 		DWORD data_size;
 		BYTE* data;
