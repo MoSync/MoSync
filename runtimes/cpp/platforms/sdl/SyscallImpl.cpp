@@ -2104,10 +2104,12 @@ namespace Base {
 
 		FreeImage_Unload(dib);
 
+#ifdef LOGGING_ENABLED
 		// at this point, hmem contains the entire data in memory stored in fif format.
 		// the amount of space used by the memory is equal to file_size
 		long file_size = FreeImage_TellMemory(hmem);
 		LOG("File size : %ld\n", file_size);
+#endif
 
 		DWORD data_size;
 		BYTE* data;
