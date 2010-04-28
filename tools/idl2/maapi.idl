@@ -2818,9 +2818,11 @@ interface MAAPI {
 		int maWinMobileImage(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		
 		int maAndroidStartActivity(in int id);
+		int maAndroidStartListActivity(in int id);
 		int maAndroidGetText(in int id, out MAString str);
 		int maAndroidSetText(in int id, in MAString str);
 		int maAndroidAddTextView(in int id, in MAString str);
+		int maAndroidAddListItem(in int id, in MAString str);
 		int maAndroidAddEditText(in int id, in MAString str);
 		int maAndroidAddButton(in int id, in MAString str);
 		int maAndroidAddMenuItem(in int id, in MAString str, in int rsc);

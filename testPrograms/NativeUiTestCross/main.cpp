@@ -32,6 +32,9 @@ public:
 		frame = new Frame(50);
 		Manager::Instance().addWidget(frame);
 		frame->addActionListener(this);
+
+		maAndroidStartListActivity(700);
+		maAndroidAddListItem(701, "salut");
 	}
 
 	Main(const Main & m) {

@@ -12,7 +12,7 @@
 
 int MAMain() {
 
-	maAndroidStartActivity(10);
+	maAndroidStartListActivity(10);
 
 
 	char *str="hello";
@@ -24,23 +24,25 @@ int MAMain() {
 		while(maGetEvent(&event)) {
 			if(event.type==EVENT_TYPE_NATIVE_UI_MSG) {
 				if(event.lo_wparam==ACTIVITY_1) {
-					maAndroidAddTextView(100, "I am a text view");
+					/*maAndroidAddTextView(100, "I am a text view");
 					maAndroidAddEditText(101, "I am an Edit Text");
-					maAndroidAddButton(102, "I am a button");
-
+					maAndroidAddButton(102, "I am a button");*/
+					maAndroidAddListItem(701, "Item 1");
+					maAndroidAddListItem(701, "Item 2");
+/*
 					maAndroidAddMenuItem(300, "New");
 					maAndroidAddMenuItem(301, "Options");
 					maAndroidAddMenuItem(302, "Favorites");
-					maAndroidAddMenuItem(303, "Search");
+					maAndroidAddMenuItem(303, "Search");*/
 
 				}
 				if(event.lo_wparam==ACTIVITY_2) {
 					maAndroidAddTextView(200, "Enter something below:");
 					maAndroidAddEditText(201, "Hello");
 					maAndroidAddButton(202, "Hello");
-
+/*
 					maAndroidAddMenuItem(400, "Item 1");
-					maAndroidAddMenuItem(401, "Item 2");
+					maAndroidAddMenuItem(401, "Item 2");*/
 				}
 
 

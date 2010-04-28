@@ -34,5 +34,6 @@ call process src MoSync 12
 call process src MoSyncView 13
 call process src Syscall 14
 call process src NativeUI 15
+call process src NativeUIListActivity 15
 
 :END

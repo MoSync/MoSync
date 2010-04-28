@@ -1238,6 +1238,14 @@ public
 		Log.i("MoSync", "New activity started for Native UI");
 		return 0;
 	}
+	
+	int maAndroidStartListActivity(int id) {
+		NativeUIListActivity.myId=id;
+		Intent myIntent = new Intent(((MoSync) mMoSyncView.getContext()), NativeUIListActivity.class);
+		((MoSync) mMoSyncView.getContext()).startActivityForResult(myIntent, id);
+		Log.i("MoSync", "New activity started for Native UI");
+		return 0;
+	}
  
 	int maAndroidGetText(int id,  String str) {
 		if(NativeUI.me.findViewById(id) instanceof EditText) {
@@ -1265,6 +1273,16 @@ public
 				tv.setId(id);
 				NativeUI.me.ll.addView(tv);
 				NativeUI.me.setContentView(NativeUI.me.ll);
+			}
+		}); 
+		Log.i("MoSync", "addTextView : " + str);
+		return 0;
+	}
+	
+	int maAndroidAddListItem(final int id, final String str) {
+		NativeUIListActivity.mHandler.post(new Runnable() {
+			public void run() {
+				NativeUIListActivity.me.arrayAdapter.add(str);
 			}
 		}); 
 		Log.i("MoSync", "addTextView : " + str);
@@ -1464,12 +1482,16 @@ public
 #endif
 		case maIOCtl_maAndroidStartActivity:
 			return maAndroidStartActivity(a);
+		case maIOCtl_maAndroidStartListActivity:
+			return maAndroidStartListActivity(a);
 		case maIOCtl_maAndroidGetText:
 			return maAndroidGetText(a, readMemString(b));
 		case maIOCtl_maAndroidSetText:
 			return maAndroidSetText(a, readMemString(b));
 		case maIOCtl_maAndroidAddTextView:
 			return maAndroidAddTextView(a, readMemString(b));
+		case maIOCtl_maAndroidAddListItem:
+			return maAndroidAddListItem(a, readMemString(b));
 		case maIOCtl_maAndroidAddImage:
 			return maAndroidAddImage(a, b);
 		case maIOCtl_maAndroidAddEditText:
