@@ -27,8 +27,10 @@ int MAMain() {
 					/*maAndroidAddTextView(100, "I am a text view");
 					maAndroidAddEditText(101, "I am an Edit Text");
 					maAndroidAddButton(102, "I am a button");*/
-					maAndroidAddListItem(701, "Item 1");
-					maAndroidAddListItem(701, "Item 2");
+					if(event.hi_wparam==0)
+						maAndroidAddListItem(701, "Add item");
+					if(event.hi_wparam==1)
+						maAndroidAddListItem(702, "Item");
 /*
 					maAndroidAddMenuItem(300, "New");
 					maAndroidAddMenuItem(301, "Options");

@@ -1,0 +1,73 @@
+package com.mosync.java.android;
+
+#include "syscall_helpers.h"
+#include "generated\IX_NATIVE_UI_CONSTS.h"
+#include "config_platform.h"
+#include "helpers.h"
+
+import java.util.LinkedList;
+import java.util.List;
+
+import android.app.ListActivity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+
+public class NativeUIListActivity extends ListActivity {
+	 public static Handler mHandler;
+	 public static NativeUIListActivity me;
+	 public static int myId;
+	 public static ArrayAdapter<String> arrayAdapter;
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		me=this;
+		mHandler= new Handler();
+		super.onCreate(savedInstanceState);
+		
+		List<String> list = new LinkedList<String>();    // Doubly-linked list
+		//list.add("Add element");
+		
+		arrayAdapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_list_item_1, list);
+		
+		
+		
+		setListAdapter(arrayAdapter);
+
+		ListView lv = getListView();
+		lv.setTextFilterEnabled(true);
+
+		lv.setOnItemClickListener(new OnItemClickListener() {
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				int[] event = new int[3];
+			   event[0] = 19;
+			   event[1] = myId;
+			   event[2] = position+1;
+			   MoSync.mMosyncView.postEvent(event);
+				Log.i("MoSync", "Clicked :" + position);
+				//arrayAdapter.add("Added dynamically");
+				// Toast.makeText(getApplicationContext(), position,
+				// Toast.LENGTH_SHORT).show();
+			}
+		});
+		int[] event = new int[3];
+		event[0] = 19;
+		event[1] = myId;
+		event[2] = 0;
+		MoSync.mMosyncView.postEvent(event);
+		Log.i("MoSync", "Native UI ListActivity");
+	}
+
+	
+	
+}
