@@ -61,6 +61,9 @@ bool Argument::isEllipsis() const {
 Function::Function() : Base(EFunction) {
 }
 
+void parseAttributes(const std::string& str, map<string, string>& attr) {
+}
+
 void Function::fromParseNode(const ParseNode& node) {
 	mName = node.getAttr("name");
 	mReturns = getParseNodeFromId(node.getAttr("returns"))->base;
@@ -74,6 +77,9 @@ void Function::fromParseNode(const ParseNode& node) {
 	}
 
 	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
+
+	//mRangeExpression = node.getAttr("attributes", false);
+
 }
 
 

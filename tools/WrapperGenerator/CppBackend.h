@@ -15,17 +15,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef _WRAPPER_GENERATOR_H_
-#define _WRAPPER_GENERATOR_H_
+#ifndef _CPP_BACKEND_H_
+#define _CPP_BACKEND_H_
 
-#include <stdarg.h>
+#include "Backend.h"
 #include <string>
-#include <vector>
 
-namespace System  {
-	void error(const char* fmt, ...);
-	std::string genstr(const char * fmt, ...);
-	void split(const std::string& str, const std::string& delim, std::vector<std::string>& output);
-} // namespace System
+class CPPBackend : public Backend {
+protected:
 
-#endif // _WRAPPER_GENERATOR_H_
+	// a bit messy this function...
+	void emit(const BasesMap& bases, std::fstream& stream);
+};
+
+#endif // _CPP_BACKEND_H_

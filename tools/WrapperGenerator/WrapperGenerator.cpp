@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Parser.h"
 #include "IDLBackend.h"
+#include "CPPBackend.h"
 
 using namespace std;
 
@@ -46,18 +47,49 @@ namespace System  {
 		va_end(argptr);
 		return str;
 	}
+
+	void split(const std::string& str, const std::string& delim, std::vector<std::string>& output)
+	{
+		int offset = 0;
+		int delimIndex = 0;
+
+		output.clear();
+		if(str.length() == 0) return;
+
+		delimIndex = str.find(delim, offset);
+
+		while (delimIndex != string::npos)
+		{
+			string sub = str.substr(offset, delimIndex - offset);
+			output.push_back(sub);
+			offset += delimIndex - offset + delim.length();
+			delimIndex = str.find(delim, offset);
+		}
+
+		output.push_back(str.substr(offset, str.length() - offset));
+	}
+
 }
 
 int main(int argc, char **argv) {
 
-	Backend *backend = new IDLBackend();
+	Backend *idlBackend = new IDLBackend();
+	Backend *cppBackend = new CPPBackend();
 
 	Backend::BasesMap bases;
 
-	/*
-	Parser::parse("tests/sqlite.xml", bases);
-	backend->generate(bases, "tests/sqlite.idl");
-*/
-	Parser::parse("tests/gl.xml", bases);
-	backend->generate(bases, "tests/gl.idl");
+	if(argc<1 || argc>2) System::error("Usage: WrapperGenerator input.h");
+	const char *header = argv[1];
+
+	string xmlName = System::genstr("%s.xml", header);
+
+	if(system(System::genstr("gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str()).c_str())<0)
+		System::error("gccxml failed\n");
+	Parser::parse(xmlName.c_str(), bases);
+
+	string idlName = System::genstr("%s.idl", header);
+	string cppName = System::genstr("%s.cpp", header);
+
+	idlBackend->generate(bases, idlName.c_str());
+	cppBackend->generate(bases, cppName.c_str());
 }

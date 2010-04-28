@@ -34,10 +34,13 @@ string IDLBackend::getIDLType(const Base* base, bool isArgument) {
 	} else if(base->getBaseType() == Base::EPointerType) {
 		const PointerType* pt = (const PointerType*) base;
 		if(isArgument) {
-			if(pt->isConst())
+			if(pt->isConst()) {
 				ret += "in ";
-			else
-				ret += "out ";
+			} else {
+				//ret += "out ";
+				ret += "in MAHandle"; 
+				return ret;
+			}
 		}
 
 		const Base* pType = pt->getType();
@@ -88,20 +91,28 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
 		string name = func->getName();
-		stream << func->getReturnType()->toString() << " " << name << "(";
+		const Base* ret = func->getReturnType();
+		string returnString = ret->toString();
+		if(ret->getBaseType() == Base::EPointerType) {
+			const PointerType* pret = (const PointerType*)ret;
+			
+			/*
+			const Base* target = pret->getType();
+			if(target->getBaseType() == Base::ETypedef)
+				target = ((const Typedef*)
+			*/
+			returnString = "MAHandle";
+		}
+
+		stream << returnString << " " << name << "(";
 		const std::vector<const Argument*>& args = func->getArguments();
-		if(args.size()>4) {
-		} else {
-			for(int i = 0; i < args.size(); i++) {
-
-
-				if(args[i]->isEllipsis()) stream << "...";
-				else {
-					stream << getIDLType(args[i]->getType());
-					stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
-				}
-				if(i != args.size()-1) stream << ", ";
+		for(int i = 0; i < args.size(); i++) {
+			if(args[i]->isEllipsis()) stream << "...";
+			else {
+				stream << getIDLType(args[i]->getType());
+				stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
 			}
+			if(i != args.size()-1) stream << ", ";
 		}
 
 		stream << ");\n";

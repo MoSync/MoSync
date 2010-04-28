@@ -52,6 +52,7 @@ public:
 private:
 	std::string mName;
 	const Base *mReturns;
+	std::string mRangeExpression;
 	const Base *mContext;
 	const Location* mLocation;
 	bool mIsExtern;

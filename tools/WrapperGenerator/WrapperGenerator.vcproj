@@ -319,6 +319,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CppBackend.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CppBackend.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IDLBackend.cpp"
 				>
 			</File>
