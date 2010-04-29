@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Broadcaster.h
+* \brief Typed notification broadcasting to multiple listeners
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef BROADCASTER_H_
 #define BROADCASTER_H_
 
