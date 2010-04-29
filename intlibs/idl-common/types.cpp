@@ -53,6 +53,16 @@ string cType(const Interface& inf, const string& type) {
 	throwException("Unhandled type: " + type);
 }
 
+const string& resolveType(const Interface& inf, const string& ctype) {
+	for(size_t i=0; i<inf.typedefs.size(); i++) {
+		const Typedef& t(inf.typedefs[i]);
+		if(ctype == t.name) {
+			return resolveType(inf, t.type);
+		}
+	}
+	return ctype;
+}
+
 bool isPointerType(const Interface& inf, const string& type) {
 	string ct = cType(inf, type);
 	return ct[ct.size() - 1] == '*';

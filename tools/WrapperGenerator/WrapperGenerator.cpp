@@ -69,6 +69,21 @@ namespace System  {
 		output.push_back(str.substr(offset, str.length() - offset));
 	}
 
+	void parseAttributes(const std::string& str, map<string, string>& attr) {
+		vector<string> output;
+		System::split(str, " ", output);
+		for(int i = 0; i < output.size(); i++) {
+			string attribute = output[i];
+			if(attribute.find("gccxml") != string::npos) {
+				attribute = attribute.substr(7, attribute.length()-7-1);
+				vector<string> values;
+				System::split(attribute, ",", values);
+				if(values.size() != 2) System::error("gccxml attribute invalid");
+				attr[values[0]] = values[1];
+			}
+		}
+	}
+
 }
 
 int main(int argc, char **argv) {

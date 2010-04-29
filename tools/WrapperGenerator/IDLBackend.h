@@ -25,7 +25,7 @@ class IDLBackend : public Backend {
 protected:
 
 	// a bit messy this function...
-	std::string getIDLType(const Base* base, bool isArgument=true);
+	std::string getIDLType(const Base* base, const Argument* argument=NULL, bool usePointer=false);
 	void emit(const BasesMap& bases, std::fstream& stream);
 };
 

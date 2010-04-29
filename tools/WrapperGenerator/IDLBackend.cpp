@@ -20,12 +20,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 // a bit messy this function...
-string IDLBackend::getIDLType(const Base* base, bool isArgument) {
+string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool usePointer) {
 	string ret = "";
 	if(base->getBaseType() == Base::EFundamentalType) {
 		const FundamentalType* ft = (const FundamentalType*) base;
 		string name = ft->getName();
-		if(isArgument)
+		if(argument)
 			ret += "in ";
 		ret += name;
 	} else if(base->getBaseType() == Base::ECvQualifiedType) {
@@ -33,13 +33,21 @@ string IDLBackend::getIDLType(const Base* base, bool isArgument) {
 		ret += getIDLType(qt->getType());
 	} else if(base->getBaseType() == Base::EPointerType) {
 		const PointerType* pt = (const PointerType*) base;
-		if(isArgument) {
+		if(argument) {
 			if(pt->isConst()) {
 				ret += "in ";
+				if(argument->usesHandle() && !usePointer) {
+					ret+= "MAHandle";
+					return ret; 
+				}
 			} else {
-				//ret += "out ";
-				ret += "in MAHandle"; 
-				return ret;
+				if(argument->usesHandle() && !usePointer) {
+					ret += "in MAHandle"; 
+					return ret;
+				} else {
+					ret += "out ";
+				}
+				
 			}
 		}
 
@@ -67,10 +75,10 @@ string IDLBackend::getIDLType(const Base* base, bool isArgument) {
 
 	} else if(base->getBaseType() == Base::ETypedef) {
 		const Typedef* td = (const Typedef*) base;
-		ret += (isArgument?"in ":"") + td->getName();
+		ret += (argument?"in ":"") + td->getName();
 	} else if(base->getBaseType() == Base::EStruct) {
 		const Struct* s = (const Struct*) base;
-		ret += (isArgument?"in struct":"struct ") + s->getName();
+		ret += (argument?"in struct":"struct ") + s->getName();
 	} else {
 		System::error("don't know how to handle type\n");
 	}
@@ -82,7 +90,7 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	pair<BasesIterator, BasesIterator> typedefs = bases.equal_range("Typedef");
 	for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
 		const Typedef* t = (const Typedef*)td->second;
-		stream << "typedef " << getIDLType(t->getType(), false) << " " << t->getName() << ";\n";
+		stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
 
 	}
 
@@ -104,18 +112,36 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 			returnString = "MAHandle";
 		}
 
-		stream << returnString << " " << name << "(";
 		const std::vector<const Argument*>& args = func->getArguments();
+
+
+		//if(func->hasPointerArguments()) {
+		stream << returnString << " " << name << "(";
 		for(int i = 0; i < args.size(); i++) {
 			if(args[i]->isEllipsis()) stream << "...";
 			else {
-				stream << getIDLType(args[i]->getType());
+				stream << getIDLType(args[i]->getType(), args[i], true);
 				stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
 			}
 			if(i != args.size()-1) stream << ", ";
 		}
-
 		stream << ");\n";
+		//}
+
+		if(func->hasHandleArguments()) {
+			stream << returnString << " " << name << "Handle(";
+			for(int i = 0; i < args.size(); i++) {
+				if(args[i]->isEllipsis()) stream << "...";
+				else {
+				    stream << getIDLType(args[i]->getType(), args[i], false);
+					stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
+				}
+				if(i != args.size()-1) stream << ", ";
+			}
+			stream << ");\n";
+		}
+
+
 	}
 
 }	

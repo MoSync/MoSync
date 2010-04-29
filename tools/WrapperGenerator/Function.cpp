@@ -16,8 +16,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "Function.h"
+#include "Typedef.h"
+#include "PointerType.h"
 
 using namespace std;
+
+bool Argument::usesPointer() const {
+	return mUsePointer;
+}
+
+bool Argument::usesHandle() const {
+	return mUseHandle;
+}
+
+bool Argument::isPointer() const {
+	const Base* type = mType;
+	if(type->getBaseType() == Base::ETypedef) type = ((const Typedef*)type)->resolveFully();
+	if(type->getBaseType() == Base::EPointerType) {
+		return true;
+	}
+	return false;
+}
 
 void Argument::fromParseNode(const ParseNode& node) {
 	mType = NULL;
@@ -33,8 +52,21 @@ void Argument::fromParseNode(const ParseNode& node) {
 	bool isConst;
 	mName = node.getAttr("name", false);
 	mType = parseType(node, isConst);
-	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
 
+
+
+	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
+	
+	mUsePointer = false;
+	mUseHandle = false;
+
+	string attributes = node.getAttr("attributes", false);
+	if(attributes != "") {
+		map<string, string> attrMap;
+		System::parseAttributes(attributes, attrMap);
+		mUsePointer = attrMap["use_pointer"]=="true";
+		mUseHandle = attrMap["use_handle"]=="true";
+	}
 }
 
 const string& Argument::getName() const {
@@ -61,14 +93,27 @@ bool Argument::isEllipsis() const {
 Function::Function() : Base(EFunction) {
 }
 
-void parseAttributes(const std::string& str, map<string, string>& attr) {
+bool Function::hasPointerArguments() const {
+	for(int i = 0; i < mArguments.size(); i++) {
+		if(mArguments[i]->usesPointer()) return true;
+	}
+	return false;
 }
+
+bool Function::hasHandleArguments() const {
+	for(int i = 0; i < mArguments.size(); i++) {
+		if(mArguments[i]->usesHandle()) return true;
+	}
+	return false;
+}
+
 
 void Function::fromParseNode(const ParseNode& node) {
 	mName = node.getAttr("name");
 	mReturns = getParseNodeFromId(node.getAttr("returns"))->base;
 	mContext = getParseNodeFromId(node.getAttr("context"))->base;
 	mIsExtern = node.getAttr("extern", false) !="";
+
 	for(size_t i = 0; i < node.children.size(); i++) {
 		const ParseNode* pn = node.children[i];
 		Argument* arg = new Argument();
@@ -78,10 +123,18 @@ void Function::fromParseNode(const ParseNode& node) {
 
 	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
 
-	//mRangeExpression = node.getAttr("attributes", false);
-
+	
+	string attributes = node.getAttr("attributes", false);
+	if(attributes != "") {
+		map<string, string> attrMap;
+		System::parseAttributes(attributes, attrMap);
+		mRangeExpression = attrMap["range"];
+	}
 }
 
+const std::string& Function::getRangeExpression() const {
+	return mRangeExpression;
+}
 
 const string& Function::getName() const {
 	return mName;

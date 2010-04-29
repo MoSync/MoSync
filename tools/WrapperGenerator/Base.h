@@ -50,6 +50,8 @@ public:
 	virtual void fromParseNode(const ParseNode& node) = 0;
 	BaseType getBaseType() const;
 
+	const Base* resolveFully() const { return this; };
+
 protected:
 	BaseType mBaseType;
 };

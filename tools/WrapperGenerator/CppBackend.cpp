@@ -39,27 +39,28 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 			returnsHandle = true;
 		}
 
-		vector<MoSyncArgument> arguments;
+		//vector<MoSyncArgument> arguments;
 
 		const std::vector<const Argument*>& args = func->getArguments();
+		
+		/*
 		for(int i = 0; i < args.size(); i++) {
 			MoSyncArgument ma;
 			ma.isHandle = false;
 
-			const Base* type = args[i]->getType();
-			if(type->getBaseType() == Base::ETypedef) type = ((const Typedef*)type)->resolveFully();
-			if(type->getBaseType() == Base::EPointerType) {
-				const PointerType* pt = (const PointerType*)type;
+			if(args[i]->isPointer()) {
+				const PointerType* pt = (const PointerType*)args[i]->getType();
 				if(!pt->isConst()) {
 					hasHandlesAsArguments = true;
 					ma.isHandle = true;
 				}
 			}
-			ma.type = type;
+			ma.type = args[i]->getType()->resolveFully();
 			arguments.push_back(ma);
 		}
+		*/
 
-		if(returnsHandle || hasHandlesAsArguments) {
+		if(returnsHandle || func->hasHandleArguments()) {
 
 			if(returnsHandle) stream << "MAHandle ";
 			else {
@@ -67,9 +68,9 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 			}
 
 			stream << func->getName() << "Handle(";
-			for(int i = 0; i < arguments.size(); i++) {
-				if(arguments[i].isHandle) stream << "MAHandle h" << args[i]->getName();
-				else stream << arguments[i].type->toString() << " " << args[i]->getName();
+			for(int i = 0; i < args.size(); i++) {
+				if(args[i]->usesHandle()) stream << "MAHandle h" << args[i]->getName();
+				else stream << args[i]->getType()->resolveFully()->toString() << " " << args[i]->getName();
 				if(i != args.size()-1) stream << ", ";
 			}
 			stream << ") {\n";
@@ -78,12 +79,12 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 				stream << "\tMAHandle placeholder = maCreatePlaceholder();\n";
 			}
 
-			for(int i = 0; i < arguments.size(); i++) {
-				if(arguments[i].isHandle) {
+			for(int i = 0; i < args.size(); i++) {
+				if(args[i]->usesHandle()) {
 					string streamName = "s" + args[i]->getName();
 
 					stream << "\tStream* " << streamName << " = " << "gSyscall->resources.get_RT_BINARY(" << "h" << args[i]->getName() << ");\n";
-					string typeName = arguments[i].type->toString();
+					string typeName = args[i]->getType()->resolveFully()->toString();
 					stream << "\t" << typeName << " " << args[i]->getName() << " = (" << typeName << ") " << streamName << ".ptr();\n";
 				}
 			}
@@ -99,7 +100,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 			}
 
 			stream << func->getName() << "(";
-			for(int i = 0; i < arguments.size(); i++) {
+			for(int i = 0; i < args.size(); i++) {
 				stream << args[i]->getName();
 				if(i != args.size()-1) stream << ", ";
 			}
@@ -107,7 +108,8 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 			if(returnsHandle) {
 				// MemStream(char* buf, size)
-				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStream(ret, " << "range" << "));\n";
+				if( func->getRangeExpression() == "") System::error("Return type is of pointer type, needs range attribute");
+				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStream(ret, " << func->getRangeExpression() << "));\n";
 			}
 
 
