@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "IDLBackend.h"
+#include "Struct.h"
 
 using namespace std;
 
@@ -33,8 +34,10 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 		ret += getIDLType(qt->getType());
 	} else if(base->getBaseType() == Base::EPointerType) {
 		const PointerType* pt = (const PointerType*) base;
+		bool isConst = false;
 		if(argument) {
 			if(pt->isConst()) {
+				isConst = true;
 				ret += "in ";
 				if(argument->usesHandle() && !usePointer) {
 					ret+= "MAHandle";
@@ -52,19 +55,42 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 		}
 
 		const Base* pType = pt->getType();
+		
+		const Base* resolvedType = pType->resolveFully();
+		if(resolvedType->getBaseType() == Base::EFundamentalType) {
+			const FundamentalType *pfType = (const FundamentalType*) resolvedType;
+			if(pfType->getName() == "void") {
+				ret += "MAAddress";
+				return ret;
+			}
+		}
+
 		if(pType->getBaseType() == Base::EFundamentalType) {
 			const FundamentalType* pfType = (const FundamentalType*)pType;
+			/*
 			if(pfType->getName() == "char")
 				ret += "MAString";
 			else //if(pfType->getName() == "void") 
 				ret += "MAAddress";
-			/*
-			else
-				ret += getIDLType(pt->getType(), false) + "*";
 			*/
-		} else {
+			ret += ((const FundamentalType*)pType)->getName();
+			if(isConst) ret+="*";
+
+		} else if(pType->getBaseType() == Base::ETypedef) {
+			ret += ((const Typedef*)pType)->getName();
+			//ret += "MAAddress";
+			if(isConst) ret+="*";
+		}  else if(pType->getBaseType() == Base::EStruct) {
+			ret += ((const Struct*)pType)->getName();
+			//ret += "MAAddress";
+			if(isConst) ret+="*";
+		} else if(pType->getBaseType() == Base::EFunctionType) {
 			ret += "MAAddress";
+		} else {
+			System::error("Unsupported type!");
 		}
+		
+
 		/*
 		else if(pType->getBaseType() == Base::EFunctionType){
 			ret += "int"; // function address. We should probably be able to handle them...
