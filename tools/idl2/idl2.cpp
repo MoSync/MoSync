@@ -47,6 +47,24 @@ static void outputCoreConsts();
 static void outputConsts(const string& filename, const Interface& inf, int ix);
 static void outputConstSets(const Interface& maapi);
 
+// change slashes
+static void u2d(string& path) {
+	for(size_t i=0; i<path.size(); i++) {
+		if(path[i] == '/')
+			path[i] = '\\';
+	}
+}
+
+static void copy(string src, string dst) {
+#ifdef WIN32
+	u2d(src);
+	u2d(dst);
+	runCommand("copy /Y " + src + " " + dst);
+#else
+	runCommand("cp " + string(src) + " " + string(dst));
+#endif
+}
+
 int main() {
 	try {
 		_mkdir("Output");
@@ -55,85 +73,40 @@ int main() {
 		outputMaapi(ixs, maapi);
 		outputCoreConsts();
 		
-		//todo: combine.
-#ifdef WIN32
-		_mkdir((MOSYNCDIR + "/include").c_str());
-
-		// create the new generated folder for java files
-		_mkdir("..\\..\\runtimes\\java\\shared\\generated");
-
-		//runCommand("copyfiles.bat");
-		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\MAStd");
-		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\newlib\\libc\\sys\\mosync");
-		runCommand("copy /Y Output\\asm_config.lst " + MOSYNCDIR + "\\bin\\");
-
-		//runCommand("copy /Y Output\\invoke_syscall_java.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\invoke_syscall_java.h ..\\..\\runtimes\\java\\shared\\generated\\");
-		
-		//runCommand("copy /Y Output\\syscall_static_java.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\syscall_static_java.h ..\\..\\runtimes\\java\\shared\\generated\\");
-
-		//runCommand("copy /Y Output\\core_consts.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\core_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
-
-		//runCommand("copy /Y Output\\maapi_consts.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\maapi_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
-
-		runCommand("copy /Y Output\\cpp_defs.h ..\\..\\intlibs\\helpers\\");
-		runCommand("copy /Y Output\\cpp_maapi.h ..\\..\\intlibs\\helpers\\");
-
-		runCommand("copy /Y Output\\invoke_syscall_cpp.h ..\\..\\runtimes\\cpp\\core\\");
-		runCommand("copy /Y Output\\invoke_syscall_arm_recompiler.h ..\\..\\runtimes\\cpp\\core\\");
-		runCommand("copy /Y Output\\asm_config.h ..\\..\\intlibs\\helpers\\");
-
-		runCommand("copy /Y Output\\mosynclib.def ..\\..\\runtimes\\cpp\\platforms\\sdl\\mosynclib\\");
-
-		//runCommand("copy /Y Output\\Syscall.java ..\\..\\testPrograms\\");
-
-		runCommand("copy /Y Output\\constSets.h ..\\..\\intlibs\\helpers\\");
-
-		for(size_t i=0; i<ixs.size(); i++) {
-			//runCommand("copy_extension.bat "+ixs[i]);
-			runCommand("copy /Y Output\\CPP_" + ixs[i] + ".h ..\\..\\intlibs\\helpers\\");
-			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\MAStd\\");
-			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\newlib\\libc\\sys\\mosync\\");
-			//runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\source\\");
-			runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
-		}
-#else
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
 		_mkdir("../../runtimes/java/Shared/generated");
 
-		runCommand("cp Output/maapi.h ../../libs/MAStd");
-		runCommand("cp Output/maapi.h ../../libs/newlib/libc/sys/mosync");
-		runCommand("cp Output/asm_config.lst " + MOSYNCDIR + "/bin/");
+		copy("Output/maapi.h", "../../libs/MAStd");
+		copy("maapi_defs.h", "../../libs/MAStd/");
+		copy("Output/maapi.h", "../../libs/newlib/libc/sys/mosync");
+		copy("Output/asm_config.lst", "" + MOSYNCDIR + "/bin/");
 
-		runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/syscall_static_java.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/core_consts.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/MAAPI_consts.h ../../runtimes/java/Shared/generated/");
+		copy("Output/invoke_syscall_java.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/syscall_static_java.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/core_consts.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/MAAPI_consts.h", "../../runtimes/java/Shared/generated/");
 
-		runCommand("cp Output/cpp_defs.h ../../intlibs/helpers/");
-		runCommand("cp Output/cpp_maapi.h ../../intlibs/helpers/");
+		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
+		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
+		copy("maapi_defs.h", "../../intlibs/helpers/");
 
-		runCommand("cp Output/invoke_syscall_cpp.h ../../runtimes/cpp/core/");
-		runCommand("cp Output/asm_config.h ../../intlibs/helpers/");
+		copy("Output/invoke_syscall_cpp.h", "../../runtimes/cpp/core/");
+		copy("Output/asm_config.h", "../../intlibs/helpers/");
 
-		runCommand("cp Output/mosynclib.def ../../runtimes/cpp/platforms/sdl/mosynclib/");
+		copy("Output/mosynclib.def", "../../runtimes/cpp/platforms/sdl/mosynclib/");
 
-		//runCommand("cp Output/Syscall.java ../../testPrograms/");
+		//copy("Output/Syscall.java ../../testPrograms/");
 
-		runCommand("cp Output/constSets.h ../../intlibs/helpers/");
+		copy("Output/constSets.h", "../../intlibs/helpers/");
 
 		for(size_t i=0; i<ixs.size(); i++) {
-			runCommand("cp Output/CPP_" + ixs[i] + ".h ../../intlibs/helpers/");
-			runCommand("cp Output/" + ixs[i] + ".h ../../libs/MAStd/");
-			runCommand("cp Output/" + ixs[i] + ".h ../../libs/newlib/libc/sys/mosync/");
-			runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/Shared/generated/");
+			copy("Output/CPP_" + ixs[i] + ".h", "../../intlibs/helpers/");
+			copy("Output/" + ixs[i] + ".h", "../../libs/MAStd/");
+			copy("Output/" + ixs[i] + ".h", "../../libs/newlib/libc/sys/mosync/");
+			copy("Output/" + ixs[i] + "_CONSTS.h", "../../runtimes/java/Shared/generated/");
 		}
-#endif
 		return 0;
 	} catch(exception& e) {
 		printf("Exception: %s\n", e.what());
@@ -257,16 +230,8 @@ static void outputCpp(const Interface& maapi) {
 		"extern \"C\" {\n"
 		"#endif\n\n";
 
-	stream << "#if defined(__GNUC__) || defined(__SYMBIAN32__)\n"
-		"#define ATTRIBUTE(a, func)  func __attribute__ ((a))\n"
-		"#elif defined(_MSC_VER)\n"
-		"#define ATTRIBUTE(a, func)  __declspec (a) func\n"
-		"#else\n"
-		"#error Unsupported compiler!\n"
-		"#endif\n\n";
+	stream << "#include \"maapi_defs.h\"\n\n";
 
-	streamMoSyncDllDefines(stream);
-	streamEllipsis(stream);
 	streamHeaderFunctions(stream, maapi, true);
 
 	stream << "#if defined(__cplusplus) && !defined(__SYMBIAN32__)\n"

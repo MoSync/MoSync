@@ -1162,35 +1162,19 @@ void WRITE_REG(int reg, int value) {
 	//void debug_double(double SCDEBUG_ARG(a)) { LOGSC("(%g)", a); }
 #define _SYSCALL_CONVERT_double(a) _convert_double(&a);
 	double _convert_double(int* ptr) {
-		DV* dv = (DV*)ptr;
+		MA_DV* dv = (MA_DV*)ptr;
 		DV_debug(*dv);
-		return dv->d();
+		return dv->d;
 	}
+	void DV_debug(const MA_DV& SCDEBUG_ARG(dv)) {
+		LOGSC("0x%08x%08x", dv.hi, dv.lo); LOGSC("(%g)", dv.d());
+	}
+#define _SYSCALL_HANDLERES_double { MA_DV dv; dv.d = res;\
+	REG(REG_r14) = dv.hi; REG(REG_r15) = dv.lo; LOGSC(");\n"); }
 
-	union DV {	//possibly problematic on 2nd edition
-		int i[2];
-	private:
-		double dbl;
-	public:
-#if defined(__MARM_ARMI__)	//2nd edition hardware
-		//void debug() const { LOGSC("0x%08X%08X", i[0], i[1]); LOGSC("(%g)", d()); }
-		double d() const { int s[2] = {i[1],i[0]}; return MAKE(double, *s); }
-		void d(double a) { DV dv; dv.dbl = a; i[0] = dv.i[1]; i[1] = dv.i[0]; }
-	};
-	void DV_debug(const DV& SCDEBUG_ARG(dv)) {
-		LOGSC("0x%08x%08x", dv.i[1], dv.i[0]); LOGSC("(%g)", dv.d());
-	}
-#else	//everything else
-		//void debug() const { LOGSC("0x%08X%08X", i[1], i[0]); LOGSC("(%g)", d()); }
-		double d() const { return dbl; }
-		void d(double a) { dbl = a; }
-	};
-	void DV_debug(const DV& SCDEBUG_ARG(dv)) {
-		LOGSC("0x%08x%08x", dv.i[1], dv.i[0]); LOGSC("(%g)", dv.d());
-	}
-#endif	//__WINS__
-#define _SYSCALL_HANDLERES_double { DV dv; dv.d(res);\
-	REG(REG_r14) = dv.i[0]; REG(REG_r15) = dv.i[1]; LOGSC(");\n"); }
+#define _SYSCALL_HANDLERES_longlong { MA_DV dv; dv.ll = res;\
+	REG(REG_r14) = dv.hi; REG(REG_r15) = dv.lo; LOGSC(");\n"); }
+
 #define _SYSCALL_HANDLERES_void LOGSC(");\n");
 
 	//****************************************

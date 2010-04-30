@@ -121,7 +121,6 @@ uint32 calculateChecksum(const vector<Interface>& infs);
 uint32 calculateChecksum(const Interface& inf);
 
 void streamHash(ostream& stream, const Interface& inf);
-void streamEllipsis(ostream& stream);
 
 void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
 void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
@@ -130,7 +129,6 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);
-void streamMoSyncDllDefines(ostream& stream);
 
 //implemented by the user
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);

@@ -179,7 +179,7 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 	{	//add ioctl function to interface
 		Function f;
 		f.name = ioctl.name;
-		f.returnType = "int";
+		f.returnType = "longlong";
 		f.comment = getComment();
 		f.number = sNextFuncNum++;
 		Argument a;

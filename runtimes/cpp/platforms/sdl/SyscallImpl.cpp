@@ -1673,7 +1673,7 @@ namespace Base {
 	}
 
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
@@ -1756,34 +1756,33 @@ namespace Base {
 		return a;
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
+	static double atanh(double x) {
+		double d = (1+x) / (1-x);
+		d = 0.5 * log(d);
+		return d;
+	}
+
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
 
 			maIOCtl_maTest_case(maTest);
-
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
+			maIOCtl_case(maCheckInterfaceVersion);
 
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
 			reportCallStack();
 			return 0;
-		case maIOCtl_maDumpCallStackEx:
-			return maDumpCallStackEx(SYSCALL_THIS->GetValidatedStr(a), b);
+
+			maIOCtl_case(maDumpCallStackEx);
 #endif
 
 #ifdef MEMORY_PROTECTION
 		case maIOCtl_maProtectMemory:
-			{
-				SYSCALL_THIS->protectMemory(a, b);
-			}
+			SYSCALL_THIS->protectMemory(a, b);
 			return 0;
 		case maIOCtl_maUnprotectMemory:
-			{
-				SYSCALL_THIS->unprotectMemory(a, b);
-			}
+			SYSCALL_THIS->unprotectMemory(a, b);
 			return 0;
-
 		case maIOCtl_maSetMemoryProtection:
 			SYSCALL_THIS->setMemoryProtection(a);
 			return 0;
@@ -1802,42 +1801,23 @@ namespace Base {
 			}
 			return 0;
 #endif	//LOGGING_ENABLED
-		case maIOCtl_sinh:
-			{
-				double& d = *GVMRA(double);
-				d = ::sinh(d);
-				return 0;
-			}
-		case maIOCtl_cosh:
-			{
-				double& d = *GVMRA(double);
-				d = ::cosh(d);
-				return 0;
-			}
-		case maIOCtl_atanh:
-			{
-				double& d = *GVMRA(double);
-				d = (1+d) / (1-d);
-				d = 0.5 * log(d);
-				return 0;
-			}
 
-		case maIOCtl_maAccept:
-			maAccept(a);
-			return 1;
+			maIOCtl_sinh_case(::sinh);
+			maIOCtl_cosh_case(::cosh);
+			maIOCtl_case(atanh);
+
+			maIOCtl_case(maAccept);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
-		case maIOCtl_maBtGetNewDevice:
-			return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
+
 		case maIOCtl_maBtStartServiceDiscovery:
 			return BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		case maIOCtl_maBtCancelDiscovery:
-			return BLUETOOTH(maBtCancelDiscovery)();
+
+			maIOCtl_syscall_case(maBtGetNewDevice);
+			maIOCtl_syscall_case(maBtGetNewService);
+			maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+			maIOCtl_maBtCancelDiscovery_case(BLUETOOTH(maBtCancelDiscovery));
 
 		case maIOCtl_maPlatformRequest:
 			{
@@ -1857,125 +1837,70 @@ namespace Base {
 				}
 			}
 
-		//case maIOCtl_maGetLocation:
-		//	{
-		//		MALocation* loc = GVMRA(MALocation);
-		//		loc->horzAcc = 0;
-		//		loc->lat = 0;
-		//		loc->lon = 0;
-		//		loc->vertAcc = 0;
-		//		return 1;
-		//	}
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		//case maIOCtl_maStartVideoStream:
-			//return maStartVideoStream(SYSCALL_THIS->GetValidatedStr(a));
+			maIOCtl_case(maSendTextSMS);
 
-		case maIOCtl_maSendToBackground:
-			return maSendToBackground();
-		case maIOCtl_maBringToForeground:
-			return maBringToForeground();
+			//maIOCtl_case(maStartVideoStream);
 
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+			maIOCtl_case(maSendToBackground);
+			maIOCtl_case(maBringToForeground);
+
+			maIOCtl_case(maFrameBufferGetInfo);
 		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
-		
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+			return maFrameBufferInit(SYSCALL_THIS->GetValidatedMemRange(a,
+				gBackBuffer->pitch*gBackBuffer->h));
+			maIOCtl_case(maFrameBufferClose);
+
+			maIOCtl_case(maAudioBufferInit);
+			maIOCtl_case(maAudioBufferReady);
+			maIOCtl_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maStreamVideoStart: {
-			const char* url = SYSCALL_THIS->GetValidatedStr(a);
-			return maStreamVideoStart(url);
-		}
-		case maIOCtl_maStreamClose: {
-			return maStreamClose(a);
-		}
-		case maIOCtl_maStreamPause: {
-			return maStreamPause(a);
-		}
-		case maIOCtl_maStreamResume: {
-			return maStreamResume(a);
-		}
-		case maIOCtl_maStreamVideoSize: {
-			return maStreamVideoSize(a);
-		}
-		case maIOCtl_maStreamVideoSetFrame: {
-			return maStreamVideoSetFrame(a, GVMR(b, MARect));
-		}
-		case maIOCtl_maStreamLength: {
-			return maStreamLength(a);
-		}
-		case maIOCtl_maStreamPos: {
-			return maStreamPos(a);
-		}
-		case maIOCtl_maStreamSetPos: {
-			return maStreamSetPos(a, b);
-		}
+			maIOCtl_case(maStreamVideoStart);
+			maIOCtl_case(maStreamClose);
+			maIOCtl_case(maStreamPause);
+			maIOCtl_case(maStreamResume);
+			maIOCtl_case(maStreamVideoSize);
+			maIOCtl_case(maStreamVideoSetFrame);
+			maIOCtl_case(maStreamLength);
+			maIOCtl_case(maStreamPos);
+			maIOCtl_case(maStreamSetPos);
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maFileOpen:
-			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
-		case maIOCtl_maFileExists:
-			return SYSCALL_THIS->maFileExists(a);
-		case maIOCtl_maFileClose:
-			return SYSCALL_THIS->maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return SYSCALL_THIS->maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return SYSCALL_THIS->maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
-			return SYSCALL_THIS->maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
-		case maIOCtl_maFileRename:
-			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+			maIOCtl_syscall_case(maFileOpen);
+			maIOCtl_syscall_case(maFileExists);
+			maIOCtl_syscall_case(maFileClose);
+			maIOCtl_syscall_case(maFileCreate);
+			maIOCtl_syscall_case(maFileDelete);
+			maIOCtl_syscall_case(maFileSize);
+#if 0
+			maIOCtl_syscall_case(maFileAvailableSpace);
+			maIOCtl_syscall_case(maFileTotalSpace);
+			maIOCtl_syscall_case(maFileDate);
+			maIOCtl_syscall_case(maFileRename);
+			maIOCtl_syscall_case(maFileTruncate);
+#endif
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileWriteFromData:
-			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
 			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileReadToData:
-			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
-		case maIOCtl_maFileTell:
-			return SYSCALL_THIS->maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return SYSCALL_THIS->maFileSeek(a, b, c);
+			maIOCtl_syscall_case(maFileWriteFromData);
+			maIOCtl_syscall_case(maFileReadToData);
 
-		case maIOCtl_maFileListStart:
-			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b));
+			maIOCtl_syscall_case(maFileTell);
+			maIOCtl_syscall_case(maFileSeek);
+
+			maIOCtl_syscall_case(maFileListStart);
 		case maIOCtl_maFileListNext:
 			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileListClose:
-			return SYSCALL_THIS->maFileListClose(a);
+			maIOCtl_syscall_case(maFileListClose);
 
-		case maIOCtl_maCameraFormatNumber:
-			return maCameraFormatNumber();
-		case maIOCtl_maCameraFormat:
-			return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
-		case maIOCtl_maCameraStart:
-			return maCameraStart();
-		case maIOCtl_maCameraStop:
-			return maCameraStop();
-		case maIOCtl_maCameraSnapshot:
-			return maCameraSnapshot(a, b);
+			maIOCtl_case(maCameraFormatNumber);
+			maIOCtl_case(maCameraFormat);
+			maIOCtl_case(maCameraStart);
+			maIOCtl_case(maCameraStop);
+			maIOCtl_case(maCameraSnapshot);
 
 		default:
 			return IOCTL_UNAVAILABLE;

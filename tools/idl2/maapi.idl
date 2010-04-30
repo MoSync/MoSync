@@ -76,6 +76,7 @@ interface MAAPI {
 	typedef int MAExtent;
 	typedef unsigned char byte;
 	typedef unsigned long ulong;
+	typedef long long longlong;
 
 	/// Returns the height of an MAExtent.
 #define EXTENT_Y(e) ((short)(e))

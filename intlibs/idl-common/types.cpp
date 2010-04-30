@@ -28,7 +28,8 @@ bool isReturnType(const Interface& inf, const string& token) {
 }
 
 string cType(const Interface& inf, const string& type) {
-	if(type == "int" || type == "double" || type == "float" || type == "void" || type == "char")
+	if(type == "int" || type == "double" || type == "float" || type == "void" ||
+		type == "char" || type == "long long")
 		return type;
 	if(type == "noreturn")
 		return "void";

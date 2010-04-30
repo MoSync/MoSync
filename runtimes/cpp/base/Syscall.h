@@ -142,7 +142,7 @@ namespace Base {
 
 	int maCheckInterfaceVersion(int hash);
 
-	void maAccept(MAHandle conn);
+	int maAccept(MAHandle conn);
 
 	//platform-dependent, works like atoi.
 	int atoiLen(const char* str, int len);
@@ -184,8 +184,11 @@ namespace Base {
 
 
 #define GVMR(p, type) (type*)SYSCALL_THIS->GetValidatedMemRange(p, sizeof(type))
-#define GVS(p) (const char*)SYSCALL_THIS->GetValidatedStr(p)
+#define GVS(p) SYSCALL_THIS->GetValidatedStr(p)
 #define GVMRA(type) GVMR(a, type)
+
+#define maIOCtl_case(func) maIOCtl_##func##_case(func)
+#define maIOCtl_syscall_case(func) maIOCtl_##func##_case(SYSCALL_THIS->func)
 
 //Custom event handling
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)
