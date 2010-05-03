@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Queue.h
+* \brief Template for a simple object queue
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef QUEUE_H_
 #define QUEUE_H_
 

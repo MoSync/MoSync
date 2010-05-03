@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file TimeSpan.h
+* \brief Utility for representing a time span
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef TIMESPAN_H_
 #define TIMESPAN_H_
 

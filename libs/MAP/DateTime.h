@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file DateTime.h
+* \brief Utility for data and time handling
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef DATETIME_H_
 #define DATETIME_H_
 

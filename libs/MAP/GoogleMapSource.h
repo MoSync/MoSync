@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file GoogleMapSource.h
+* \brief Map source for Google map tile servers
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef GOOGLEMAPSOURCE_H_
 #define GOOGLEMAPSOURCE_H_
 

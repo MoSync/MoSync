@@ -15,7 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file WidgetSkin.h Copyright (c) Mobile Sorcery AB 2005-2007 **/
+/** 
+* \file WidgetSkin.h 
+* \brief Class for defining the visual appearance of a widget
+* \author Patrick Broman and Niklas Nummelin
+*/
 
 #ifndef _SE_MSAB_MAUI_WIDGET_SKIN_H_
 #define _SE_MSAB_MAUI_WIDGET_SKIN_H_
@@ -30,7 +34,7 @@ using namespace MAUtil;
 namespace MAUI {
 
 	/** A WidgetSkin is a class used to define the visual appearance
-	 * of a widget. It is instanciated by passing an image for the
+	 * of a widget. It is instantiated by passing an image for the
 	 * selected and unselected mode, and two coordinates telling how 
 	 * to divide the image into 9 segments. These segments are then 
 	 * used as information of how to tile the skin to different widget 

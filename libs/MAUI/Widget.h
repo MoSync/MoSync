@@ -15,14 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Widget.h
- *
- * This file contains the declaration of the base Widget
- * class in MAUI.
- *
- * \author Patrick Broman and Niklas Nummelin
- *
- */
+/** 
+* \file Widget.h
+* \brief The base widget class
+* \author Patrick Broman and Niklas Nummelin
+*/
 
 #ifndef _SE_MSAB_MAUI_WIDGET_H_
 #define _SE_MSAB_MAUI_WIDGET_H_

@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapCache.h
+* \brief Cache of tiles provided by MapSource
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPCACHE_H_
 #define MAPCACHE_H_
 

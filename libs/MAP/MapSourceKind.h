@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapSourceKind.h
+* \brief Enumerations for supported types of map sources
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPSOURCEKIND_H_
 #define MAPSOURCEKIND_H_
 

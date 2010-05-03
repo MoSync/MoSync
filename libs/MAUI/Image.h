@@ -15,7 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Image.h Copyright (c) Mobile Sorcery AB 2005-2006 **/
+/** 
+* \file Image.h 
+* \brief Image widget, with position, size, and autosizing control
+* \author Patrick Broman and Niklas Nummelin
+*/
 
 #ifndef _SE_MSAB_MAUI_IMAGE_H_
 #define _SE_MSAB_MAUI_IMAGE_H_

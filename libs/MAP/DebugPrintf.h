@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file DebugPrintf.h
+* \brief Utility functions for debug output under MSVC compiler
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef DEBUGPRINTF_H_
 #define DEBUGPRINTF_H_
 

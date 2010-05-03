@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file PixelCoordinate.h
+* \brief Global pixel coordinates at a specified magnification
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef PIXELCOORDINATE_H_
 #define PIXELCOORDINATE_H_
 

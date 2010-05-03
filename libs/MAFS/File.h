@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file File.h
-* \brief MoSync File System API
+/**
+* \file File.h
+* \brief File System API
 * \author Niklas Nummelin
 *
-* MAFS is a standard c file stream implementation. You may either mount a binary image as a read-only file source or use stores for
+* MAFS is a standard C file stream implementation. You may either mount a binary image as a read-only file source or use stores for
 * the ability to write and read from a file. Use the bundle tool to build binary images.
 */
 

@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MemoryMgr.h
+* \brief Utility for heap resource tracking and debugging
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MEMORYMGR_H_
 #define MEMORYMGR_H_
 

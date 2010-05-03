@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapWidget.h
+* \brief Widget displaying a slippy map
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPWIDGET_H_
 #define MAPWIDGET_H_
 

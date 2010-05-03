@@ -16,13 +16,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file InputManager.h
+ * \brief Declaration of classes for input management
  *
  * This file contains the declaration of the classes for input management
- *  in MAUI. InputManager is the basic interface used to supply
+ * in MAUI. InputManager is the basic interface used to supply
  * support for different types of input.
  *
  * \author Patrick Broman 
- *
  */
 
 #ifndef _SE_MSAB_MAUI_INPUTMANAGER_H_

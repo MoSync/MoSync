@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file LonLat.h
+* \brief Latitude and longitude coordinates, conversion to metres and pixels
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef LONLAT_H_
 #define LONLAT_H_
 

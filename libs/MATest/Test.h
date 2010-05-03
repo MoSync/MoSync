@@ -15,14 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Test.h
-*
-* This file contains a Testing Framework, used for testing libraries and syscalls.
-*
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
+/** 
+* \file Test.h
+* \brief Testing framework for testing libraries and syscalls
 * \author Patrick Broman and Niklas Nummelin
-*
 */
 
 #ifndef _SE_MSAB_TEST_H_

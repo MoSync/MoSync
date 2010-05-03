@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file OpenStreetMapSource.h
+* \brief Map source for OpenStreet map tile servers
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef OPENSTREETMAPSOURCE_H_
 #define OPENSTREETMAPSOURCE_H_
 

@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapTileCoordinate.h
+* \brief Location of a map tile in the tile grid
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPTILECOORDINATE_H_
 #define MAPTILECOORDINATE_H_
 

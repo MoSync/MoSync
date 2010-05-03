@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapSource.h
+* \brief Abstract base class for provider of map tiles
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPSOURCE_H_
 #define MAPSOURCE_H_
 

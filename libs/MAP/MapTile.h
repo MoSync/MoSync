@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file MapTile.h
+* \brief Single tile from a map source
+* \author Lars-Åke Vinberg
+*/
+
 #ifndef MAPTILE_H_
 #define MAPTILE_H_
 
