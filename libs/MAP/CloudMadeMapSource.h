@@ -34,10 +34,9 @@ namespace MAP
 	class MapSourceListener;
 	class MapSourceImageDownloader;
 
-	/*
-	 * This class implements a map source for using map tile servers
-	 * at CloudMade (cloudmade.com)
-	 * 
+	/**
+	 * \brief A map source using map tile servers at CloudMade (cloudmade.com). 
+	 *
 	 * CloudMade requires the developer to register to get an API key.
 	 * See http://www.cloudmade.com for more details.
 	 */

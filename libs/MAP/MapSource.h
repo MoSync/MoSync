@@ -42,7 +42,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Abstract base class for client data.
+	 * \brief Abstract base class for client data.
 	 * Client must subclass this.
 	 */
 	class MapSourceClientData
@@ -54,7 +54,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Listener for MapSource client to implement.
+	 * \brief Listener for MapSource client to implement.
 	 */
 	class IMapSourceListener
 	//=========================================================================
@@ -66,8 +66,9 @@ namespace MAP
 	};
 
 	//=========================================================================
-	/*
-	 * Base class for map sources.
+	/**
+	 * \brief Base class for map sources.
+	 * 
 	 * A map source is a provider of map tiles.
 	 * Behavior is modeled after OpenStreetMap tile server.
 	 */

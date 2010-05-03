@@ -32,7 +32,7 @@ namespace MAP
 {
 	//=========================================================================
 	/**
-	 * Manages map sources for clients to access.
+	 * \brief Manages map sources for clients to access.
 	 * Implemented as singleton.
 	 */
 	class MapSourceMgr

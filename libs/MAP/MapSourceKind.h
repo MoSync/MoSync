@@ -28,7 +28,7 @@ namespace MAP
 {
 	//=========================================================================
 	/**
-	 * Enumerates supported kinds of map sources
+	 * \brief Enumerates supported kinds of map sources
 	 */
 	enum MapSourceKind
 	//=========================================================================

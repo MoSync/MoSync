@@ -30,7 +30,7 @@ namespace MAPUtil
 {
 	//=========================================================================
 	/**
-	 * Template class for a queue with a limited fixed capacity.
+	 * \brief Template class for a queue with a limited fixed capacity.
 	 */
 	template<class T>
 	class Queue

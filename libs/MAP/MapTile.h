@@ -34,6 +34,8 @@ namespace MAP
 {
 	//=========================================================================
 	/**
+	 * \brief Single tile from a map source
+	 *
 	 * Tiles use a numbering scheme like OpenStreetMap or Google Maps.
 	 * http://www.maptiler.org/google-maps-coordinate-system-projection-epsg-900913-3785/
 	 */

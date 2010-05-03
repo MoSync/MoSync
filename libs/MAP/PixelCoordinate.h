@@ -28,7 +28,8 @@ namespace MAP
 {
 	//=========================================================================
 	/**
-	 * Describes a pixel coordinate on the global grid of pixels.
+	 * \brief Describes a pixel coordinate on the global grid of pixels.
+	 * 
 	 * Range is determined by magnification, e.g. for a tile size of 256 and
 	 * a magnification of 2 the global grid is 1024x1024 pixels.
 	 * For a magnification of 10, the global grid is 262144x262144 pixels.

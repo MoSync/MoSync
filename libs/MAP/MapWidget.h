@@ -44,7 +44,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Scroll direction for use in MapWidget::scroll( )
+	 * \brief Scroll direction for use in MapWidget::scroll( )
 	 */
 	enum MapWidgetScrollDirection
 	//=========================================================================
@@ -57,7 +57,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Simple slippy map widget.
+	 * \brief Simple slippy map widget.
 	 */
 	class MapWidget : public Widget, IMapCacheListener
 	//=========================================================================

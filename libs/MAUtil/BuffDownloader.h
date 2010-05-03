@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file BuffDownloader.h
- * \brief Simple asynchronous HTTP download to main memory.
+ * \brief Simple asynchronous HTTP download to main memory
  * \author Ann-Sofie Lindblom
  */
 
@@ -32,7 +32,7 @@ namespace MAUtil {
 	class BuffDownloader;
 
 	/**
-	* \brief A listener for events from the BuffDownloader class.
+	* \brief Listener for events from the BuffDownloader class.
 	*/
 	class BuffDownloadListener
 	{
@@ -68,7 +68,7 @@ namespace MAUtil {
 
 
 	/**
-	* \brief Useful to simplify asynchronous downloading of data to a memory buffer.
+	* \brief Simplifies asynchronous downloading of data to a memory buffer.
 	*/
 	class BuffDownloader : public HttpConnectionListener
 	{

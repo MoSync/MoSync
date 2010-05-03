@@ -52,7 +52,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * This class maintains a coordinate in latitude / longitude,
+	 * \brief This class maintains a coordinate in latitude / longitude,
 	 * and provides conversion function to and from other coordinate systems.
 	 */
 	class LonLat

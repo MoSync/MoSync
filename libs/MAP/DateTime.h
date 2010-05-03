@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAPUtil
 {
 	/**
-	 * DateTime is a C++ class for time stamps.
+	 * \brief DateTime is a C++ class for time stamps.
 	 *
 	 */
 	class DateTime
@@ -44,7 +44,7 @@ namespace MAPUtil
 		 * Constructs a DateTime with default value.
 		 */
 		DateTime( );
-		/*
+		/**
 		 * Constructs a DateTime from the specified ticks.
 		 *
 		 * Ticks is the number of seconds since the beginning of January 1, 1970.
@@ -219,7 +219,7 @@ namespace MAPUtil
 	{
 		return a.getTicks( ) != b.getTicks( ); 
 	}
-	/*
+	/**
 	 * Subtracts a DateTime from another DateTime.
 	 * Returns the difference as a TimeSpan.
 	 */

@@ -33,7 +33,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Enumerates variations of google map rendering.
+	 * \brief Enumerates variations of google map rendering.
 	 */
 	enum GoogleMapKind
 	//=========================================================================
@@ -56,7 +56,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Implements a MapSource for Google Static Maps.
+	 * \brief Implements a MapSource for Google Static Maps.
 	 *
 	 * NOTE: This code is just a sample, 
 	 * Google's Static Maps service is not intended for use as a map tile server.

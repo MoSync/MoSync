@@ -28,10 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAPUtil
 {
-	//=========================================================================
-	// Class for representing a time span.
-	// Span can be positive as well as negative.
-	//
+	/** 
+	* \brief Class for representing a time span.
+	* Span can be positive as well as negative.
+	*/
 	class TimeSpan
 	//=========================================================================
 	{

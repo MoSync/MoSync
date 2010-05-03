@@ -28,7 +28,7 @@ namespace MAP
 {
 	//=========================================================================
 	/**
-	 * Describes location of a tile in the tile grid.
+	 * \brief Describes location of a tile in the tile grid.
 	 */
 	class MapTileCoordinate
 	//=========================================================================

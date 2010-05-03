@@ -45,7 +45,7 @@ namespace MAPUtil
 {
 	//=========================================================================
 	/**
-	 * Simple resource tracking class.
+	 * \brief Simple resource tracking class.
 	 */
 	class MemoryMgr
 	//=========================================================================

@@ -34,10 +34,9 @@ namespace MAP
 	class MapSourceListener;
 	class MapSourceImageDownloader;
 
-	//=========================================================================
-	//
-	// OpenStreetMap map source
-	//
+	/** 
+	* \brief OpenStreetMap map source
+	*/
 	class OpenStreetMapSource : public MapSource
 	//=========================================================================
 	{

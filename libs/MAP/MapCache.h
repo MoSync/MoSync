@@ -38,7 +38,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Listener class, for listening client to implement.
+	 * \brief Listener class, for listening client to implement.
 	 */
 	class IMapCacheListener
 	//=========================================================================
@@ -52,7 +52,7 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * Manages map caches for clients to access.
+	 * \brief Manages map caches for clients to access.
 	 * Implemented as singleton.
 	 */
 	class MapCache : IMapSourceListener

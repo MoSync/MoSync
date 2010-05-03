@@ -32,8 +32,9 @@ namespace MAPUtil
 {
 	//=========================================================================
 	/**
-	 * This template class enables typed notification broadcasting to multiple
+	 * \brief This template class enables typed notification broadcasting to multiple
 	 * listeners.
+	 * 
 	 * Listeners must implement class T.
 	 * 
 	 * A listener adds itself to the list of listeners by calling AddListener( ) on
