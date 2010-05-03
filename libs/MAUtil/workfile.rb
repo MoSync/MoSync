@@ -23,7 +23,8 @@ mod.class_eval do
 		@INSTALL_INCDIR = "MAUtil"
 		@NAME = "mautil"
 		@IGNORED_FILES = ["DomParser.cpp", "XMLDataProvider.cpp", "XPathTokenizer.cpp"]
-		
+		@IGNORED_HEADERS = ["DomParser.h", "XMLDataProvider.h", "XPathTokenizer.h", "Tokenizer.h", "ErrorListenable.h"]
+
 		if(CONFIG == "")
 			# broken compiler
 			shared_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
