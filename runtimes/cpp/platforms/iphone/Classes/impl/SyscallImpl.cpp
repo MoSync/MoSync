@@ -463,11 +463,11 @@ namespace Base {
 
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
+		/*Surface* img = gSyscall->resources.get_RT_IMAGE(image);
 		int x = src->left;
 		int y = src->top;
 		int width = src->width;
-		int height = src->height;
+		int height = src->height;*/
 		gSyscall->ValidateMemRange(dst, src->height*scanlength);
 
 		NOT_IMPLEMENTED;

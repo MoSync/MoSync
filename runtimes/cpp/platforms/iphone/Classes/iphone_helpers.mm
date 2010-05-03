@@ -11,14 +11,14 @@
 #include <wchar.h>
 
 const char *getReadablePath(const char* path) {
-	NSString *stringFromChar = [NSString stringWithCString:path length:strlen(path)];  	
+	NSString *stringFromChar = [NSString stringWithCString:path encoding:NSASCIIStringEncoding];  	
 	NSString *nspath = [[NSBundle mainBundle] pathForResource:stringFromChar ofType:@""];
 //	NSString *source = [NSString stringWithContentsOfFile:nspath encoding:NSUTF8StringEncoding error:NULL];
 	return [nspath UTF8String];
 }
 
 const char *getWriteablePath(const char* path) {
-	NSString *stringFromChar = [NSString stringWithCString:path length:strlen(path)];  	
+	NSString *stringFromChar = [NSString stringWithCString:path encoding:NSASCIIStringEncoding];  	
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
 	NSString *documentsDirectoryPath = [paths objectAtIndex:0];	
 	NSString *myFilePath = [documentsDirectoryPath stringByAppendingPathComponent:stringFromChar];

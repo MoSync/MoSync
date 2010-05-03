@@ -85,7 +85,7 @@ void MoSyncMain(int width, int height, UIView* mosyncView) {
 MoSyncSemaphore mViewSemaphore;
 void UpdateMoSyncView(CGImageRef ref) {
 
-	[sMoSyncView updateMoSyncView: ref];
+	[(MoSyncView *) sMoSyncView updateMoSyncView: ref];
 	mViewSemaphore.wait();
 }
 
@@ -102,7 +102,7 @@ SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
 }
 
 void ShowMessageBox(const char *msg, bool kill) {
-	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
+	[(MoSyncView *) sMoSyncView showMessageBox:[NSString stringWithCString:msg encoding:NSASCIIStringEncoding] shouldKill:kill];  	
 }
 
 void Exit() {
