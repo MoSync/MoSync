@@ -45,6 +45,7 @@ namespace System  {
 		char str[1024];
 		int res = vsprintf(str, fmt, argptr);
 		va_end(argptr);
+		printf("%s\n", str);
 		return str;
 	}
 
@@ -83,22 +84,20 @@ namespace System  {
 			}
 		}
 	}
-
 }
 
 int main(int argc, char **argv) {
-
 	Backend *idlBackend = new IDLBackend();
 	Backend *cppBackend = new CPPBackend();
 
 	Backend::BasesMap bases;
 
-	if(argc<1 || argc>2) System::error("Usage: WrapperGenerator input.h");
+	if(argc != 2) System::error("Usage: WrapperGenerator input.h\n");
 	const char *header = argv[1];
 
 	string xmlName = System::genstr("%s.xml", header);
 
-	if(system(System::genstr("gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str()).c_str())<0)
+	if(system(System::genstr("gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str()).c_str()) != 0)
 		System::error("gccxml failed\n");
 	Parser::parse(xmlName.c_str(), bases);
 

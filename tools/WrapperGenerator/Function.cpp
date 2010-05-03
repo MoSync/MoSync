@@ -54,8 +54,9 @@ void Argument::fromParseNode(const ParseNode& node) {
 	mType = parseType(node, isConst);
 
 
-
-	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
+	// wtf? arguments don't have locations.
+	//mLocation = new Location(node.getIntAttr("line"),
+		//(File*)getParseNodeFromId(node.getAttr("file"))->base);
 	
 	mUsePointer = false;
 	mUseHandle = false;

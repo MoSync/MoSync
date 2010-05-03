@@ -516,7 +516,7 @@ GLAPI void APIENTRY glFrustumx (GLfixed left, GLfixed right, GLfixed bottom, GLf
 GLAPI void APIENTRY glGenTextures (GLsizei n, _use_type_(true, false) GLuint *textures);
 GLAPI GLenum APIENTRY glGetError (void);
 GLAPI void APIENTRY glGetIntegerv (GLenum pname, _use_type_(true, false) GLint *params);
-GLAPI _range_(strlen(ret)) const GLubyte * APIENTRY glGetString (GLenum name);
+GLAPI _range_(strlen((char*)ret)+1) const GLubyte * APIENTRY glGetString (GLenum name);
 GLAPI void APIENTRY glHint (GLenum target, GLenum mode);
 GLAPI void APIENTRY glLightModelf (GLenum pname, GLfloat param);
 GLAPI void APIENTRY glLightModelfv (GLenum pname, _use_type_(true, false) const GLfloat *params);

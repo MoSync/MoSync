@@ -89,7 +89,6 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 		} else {
 			System::error("Unsupported type!");
 		}
-		
 
 		/*
 		else if(pType->getBaseType() == Base::EFunctionType){
@@ -127,6 +126,7 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 		string name = func->getName();
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
+		bool returnsHandle = false;
 		if(ret->getBaseType() == Base::EPointerType) {
 			const PointerType* pret = (const PointerType*)ret;
 			
@@ -136,13 +136,16 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 				target = ((const Typedef*)
 			*/
 			returnString = "MAHandle";
+			returnsHandle = true;
 		}
 
 		const std::vector<const Argument*>& args = func->getArguments();
 
-
-		//if(func->hasPointerArguments()) {
-		stream << returnString << " " << name << "(";
+		stream << returnString << " " << name;
+		if(func->hasHandleArguments() || returnsHandle) {
+			stream << "Handle";
+		}
+		stream << "(";
 		for(int i = 0; i < args.size(); i++) {
 			if(args[i]->isEllipsis()) stream << "...";
 			else {
@@ -152,22 +155,7 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 			if(i != args.size()-1) stream << ", ";
 		}
 		stream << ");\n";
-		//}
-
-		if(func->hasHandleArguments()) {
-			stream << returnString << " " << name << "Handle(";
-			for(int i = 0; i < args.size(); i++) {
-				if(args[i]->isEllipsis()) stream << "...";
-				else {
-				    stream << getIDLType(args[i]->getType(), args[i], false);
-					stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
-				}
-				if(i != args.size()-1) stream << ", ";
-			}
-			stream << ");\n";
-		}
-
 
 	}
 
-}	
+}

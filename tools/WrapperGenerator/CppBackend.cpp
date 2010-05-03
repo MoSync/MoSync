@@ -34,9 +34,11 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		string returnString = ret->toString();
 		bool returnsHandle = false;
 		bool hasHandlesAsArguments = false;
+		bool returnsConstPtr = false;
 		if(ret->getBaseType() == Base::EPointerType) {
 			const PointerType* pret = (const PointerType*)ret;
 			returnsHandle = true;
+			returnsConstPtr = pret->isConst();
 		}
 
 		//vector<MoSyncArgument> arguments;
@@ -91,7 +93,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 
 			stream << "\t";
-			
+
 			if(!returnsHandle && (ret->toString()!="void")) {
 				stream << "return ";
 			} else {
@@ -107,9 +109,10 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 			stream << ");\n";
 
 			if(returnsHandle) {
-				// MemStream(char* buf, size)
 				if( func->getRangeExpression() == "") System::error("Return type is of pointer type, needs range attribute");
-				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStream(ret, " << func->getRangeExpression() << "));\n";
+				if(!returnsConstPtr)
+					System::error("Returns non-const pointer. Can't handle yet!");
+				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStreamC(ret, " << func->getRangeExpression() << "));\n";
 			}
 
 

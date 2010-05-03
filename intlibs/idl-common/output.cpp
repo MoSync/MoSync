@@ -391,18 +391,20 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 				const Argument& arg(f.f.args[k]);
 				string ctype = cType(inf, arg.type);
 				const string& resolvedType = resolveType(inf, ctype);
-				bool isPointer = isPointerType(inf, arg.type);
+				bool isPointer = isPointerType(inf, arg.type) || !arg.in;
 				bool isString = arg.type == "MAString";
 				bool isDouble = resolvedType == "double" && arg.in;
 				bool isFloat = resolvedType == "float" && arg.in;
 
 				if(arg.type == "MAAddress") {
-					ctype = "int";
-					isPointer = false;
+					ctype = "void*";
+					isPointer = true;
 				}
 
 				if(isPointer || isString)
 					ctype = (arg.in ? "const " : "") + ctype;
+				if(!isPointerType(inf, arg.type) && !arg.in)
+					ctype += '*';
 
 				string localName = "_" + arg.name;
 				string dvName = localName+"_dv";
@@ -440,8 +442,16 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 
 					if(isString)
 						stream << ")";
-					else if(isPointer)
-						stream << ", " << arg.type << ")";
+					else if(isPointer) {
+						string gvmrType;
+						size_t m1 = arg.type.size()-1;
+						if(arg.type[m1] == '*') {
+							gvmrType = arg.type.substr(0, m1);
+						} else {
+							gvmrType = arg.type;
+						}
+						stream << ", " << gvmrType << ")";
+					}
 				}
 
 				stream << ";\\\n";
@@ -450,12 +460,15 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 			string resolvedReturnType = resolveType(inf, f.f.returnType);
 			bool returnDouble = resolvedReturnType == "double";
 			bool returnFloat = resolvedReturnType == "float";
+			bool returnVoid = resolvedReturnType == "void";
 			if(returnDouble) {
 				stream << "MA_DV result;\\\n";
 				stream << "result.d = func(";
 			} else if(returnFloat) {
 				stream << "MA_FV result;\\\n";
 				stream << "result.f = func(";
+			} else if(returnVoid) {
+				stream << "func(";
 			} else {
 				stream << "return func(";
 			}
@@ -469,6 +482,8 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 				stream << "return result.ll;\\\n";
 			} else if(returnFloat) {
 				stream << "return result.i;\\\n";
+			} else if(returnVoid) {
+				stream << "return 0;\\\n";
 			}
 			stream << "}\\\n";
 			stream << "\n";

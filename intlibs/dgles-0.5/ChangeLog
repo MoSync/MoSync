@@ -1,0 +1,12 @@
+2006-05-31
+	* Minor fixes in library loading.
+
+2006-05-29
+	* Changed license from LGPL to BSD.
+
+2006-05-15
+	* Bug fixes and Windows support.
+	* Released 0.4.
+
+2006-03-30
+	* First release.

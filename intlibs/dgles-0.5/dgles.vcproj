@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="MoRE"
-	ProjectGUID="{90CEAD6E-5FC9-4D1B-9BFC-D294319DBEBF}"
-	RootNamespace="MoRE"
+	Name="dgles"
+	ProjectGUID="{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}"
+	RootNamespace="dgles"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,8 +19,8 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="0"
+			ConfigurationType="2"
+			CharacterSet="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,16 +40,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;__GL_EXPORTS"
+				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
-				DisableSpecificWarnings="4996"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,12 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib ..\..\..\..\..\intlibs\dgles-0.5\$(ConfigurationName)\dgles.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories=""
-				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -93,15 +89,14 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="0"
+			ConfigurationType="2"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -121,14 +116,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
+				AdditionalIncludeDirectories="."
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;__GL_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
-				DisableSpecificWarnings="4996"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -141,9 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib ..\..\..\..\..\intlibs\dgles-0.5\$(ConfigurationName)\dgles.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -173,7 +165,6 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y&#x0D;&#x0A;copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -181,93 +172,83 @@
 	</References>
 	<Files>
 		<Filter
-			Name="core"
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\core\Core.cpp"
+				RelativePath="src\array.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\Core.h"
+				RelativePath="src\buffer.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\core_run.h"
+				RelativePath="src\draw.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\CoreCommon.h"
+				RelativePath="src\get.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\debugger.h"
+				RelativePath="src\glesapi.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\disassembler.cpp"
+				RelativePath="src\light.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\disassembler.h"
+				RelativePath="src\material.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\GdbCommon.h"
+				RelativePath="src\matrix.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\GdbStub.cpp"
+				RelativePath="src\texture.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\core\GdbStub.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\core\invoke_syscall_cpp.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\core\sld.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\core\sld.h"
+				RelativePath="src\win32.c"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\debugger.cpp"
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				ExcludedFromBuild="true"
+			<File
+				RelativePath="src\api.h"
 				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				ExcludedFromBuild="true"
+			</File>
+			<File
+				RelativePath="src\dgl.h"
 				>
-				<Tool
-					Name="VCCLCompilerTool"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\..\..\..\intlibs\helpers\intutil.cpp"
+			</File>
+			<File
+				RelativePath="GLES\gl.h"
+				>
+			</File>
+			<File
+				RelativePath="src\load.h"
+				>
+			</File>
+			<File
+				RelativePath="src\state.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-		</File>
-		<File
-			RelativePath="..\..\..\..\..\intlibs\helpers\intutil.h"
-			>
-		</File>
-		<File
-			RelativePath=".\main.cpp"
-			>
-		</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

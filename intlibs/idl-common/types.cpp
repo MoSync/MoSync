@@ -36,6 +36,10 @@ string cType(const Interface& inf, const string& type) {
 	if(type == "NCString")
 		return "char*";
 
+	bool isPointer = type[type.size()-1] == '*';
+	if(isPointer)
+		return type;
+
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(type == s.name)

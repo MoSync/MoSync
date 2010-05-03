@@ -53,6 +53,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_FILE.h>
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <dgles-0.5/GLES/gl.h>
 
 // blah
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
@@ -82,6 +84,8 @@ extern "C" {
 
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
+
+#include "../../generated/gl.h.cpp"
 
 
 namespace Base {
@@ -1801,6 +1805,114 @@ namespace Base {
 			}
 			return 0;
 #endif	//LOGGING_ENABLED
+
+maIOCtl_glAlphaFuncx_case(glAlphaFuncx);
+maIOCtl_glFrontFace_case(glFrontFace);
+maIOCtl_glLoadIdentity_case(glLoadIdentity);
+maIOCtl_glTexImage2D_case(glTexImage2D);
+maIOCtl_glGenTextures_case(glGenTextures);
+maIOCtl_glLogicOp_case(glLogicOp);
+maIOCtl_glTexEnvf_case(glTexEnvf);
+maIOCtl_glTexEnvx_case(glTexEnvx);
+maIOCtl_glFlush_case(glFlush);
+maIOCtl_glStencilOp_case(glStencilOp);
+maIOCtl_glTexEnvxv_case(glTexEnvxv);
+maIOCtl_glPixelStorei_case(glPixelStorei);
+maIOCtl_glFogxv_case(glFogxv);
+maIOCtl_glCullFace_case(glCullFace);
+maIOCtl_glNormal3f_case(glNormal3f);
+maIOCtl_glNormal3x_case(glNormal3x);
+maIOCtl_glMultiTexCoord4f_case(glMultiTexCoord4f);
+maIOCtl_glMultiTexCoord4x_case(glMultiTexCoord4x);
+maIOCtl_glLightModelf_case(glLightModelf);
+maIOCtl_glLightModelx_case(glLightModelx);
+maIOCtl_glDepthRangef_case(glDepthRangef);
+maIOCtl_glDepthRangex_case(glDepthRangex);
+maIOCtl_glBindTexture_case(glBindTexture);
+maIOCtl_glViewport_case(glViewport);
+maIOCtl_glLineWidthx_case(glLineWidthx);
+maIOCtl_glGetIntegerv_case(glGetIntegerv);
+maIOCtl_glAlphaFunc_case(glAlphaFunc);
+maIOCtl_glLoadMatrixf_case(glLoadMatrixf);
+maIOCtl_glLoadMatrixx_case(glLoadMatrixx);
+maIOCtl_glTexEnvfv_case(glTexEnvfv);
+maIOCtl_glScissor_case(glScissor);
+maIOCtl_glFogfv_case(glFogfv);
+maIOCtl_glDrawArrays_case(glDrawArrays);
+maIOCtl_glTexParameterf_case(glTexParameterf);
+maIOCtl_glTexParameterx_case(glTexParameterx);
+maIOCtl_glClearDepthf_case(glClearDepthf);
+maIOCtl_glClearDepthx_case(glClearDepthx);
+maIOCtl_glShadeModel_case(glShadeModel);
+maIOCtl_glTexSubImage2D_case(glTexSubImage2D);
+maIOCtl_glClientActiveTexture_case(glClientActiveTexture);
+maIOCtl_glCopyTexImage2D_case(glCopyTexImage2D);
+maIOCtl_glTexCoordPointer_case(glTexCoordPointer);
+maIOCtl_glLightf_case(glLightf);
+maIOCtl_glLightx_case(glLightx);
+maIOCtl_glMaterialfv_case(glMaterialfv);
+maIOCtl_glMultMatrixx_case(glMultMatrixx);
+maIOCtl_glScalex_case(glScalex);
+maIOCtl_glDepthFunc_case(glDepthFunc);
+maIOCtl_glStencilFunc_case(glStencilFunc);
+maIOCtl_glEnableClientState_case(glEnableClientState);
+maIOCtl_glFrustumf_case(glFrustumf);
+maIOCtl_glDepthMask_case(glDepthMask);
+maIOCtl_glColor4f_case(glColor4f);
+maIOCtl_glStencilMask_case(glStencilMask);
+maIOCtl_glMatrixMode_case(glMatrixMode);
+maIOCtl_glPolygonOffset_case(glPolygonOffset);
+maIOCtl_glSampleCoverage_case(glSampleCoverage);
+maIOCtl_glFrustumx_case(glFrustumx);
+maIOCtl_glMaterialxv_case(glMaterialxv);
+maIOCtl_glCompressedTexSubImage2D_case(glCompressedTexSubImage2D);
+maIOCtl_glFogf_case(glFogf);
+maIOCtl_glFogx_case(glFogx);
+maIOCtl_glDrawElements_case(glDrawElements);
+maIOCtl_glDisableClientState_case(glDisableClientState);
+maIOCtl_glEnable_case(glEnable);
+maIOCtl_glMultMatrixf_case(glMultMatrixf);
+maIOCtl_glFinish_case(glFinish);
+maIOCtl_glHint_case(glHint);
+maIOCtl_glNormalPointer_case(glNormalPointer);
+maIOCtl_glScalef_case(glScalef);
+maIOCtl_glMaterialf_case(glMaterialf);
+maIOCtl_glMaterialx_case(glMaterialx);
+maIOCtl_glGetError_case(glGetError);
+maIOCtl_glClearStencil_case(glClearStencil);
+maIOCtl_glClearColor_case(glClearColor);
+maIOCtl_glOrthof_case(glOrthof);
+maIOCtl_glOrthox_case(glOrthox);
+maIOCtl_glColorPointer_case(glColorPointer);
+maIOCtl_glColor4x_case(glColor4x);
+maIOCtl_glReadPixels_case(glReadPixels);
+maIOCtl_glColorMask_case(glColorMask);
+maIOCtl_glDisable_case(glDisable);
+maIOCtl_glClearColorx_case(glClearColorx);
+maIOCtl_glVertexPointer_case(glVertexPointer);
+maIOCtl_glPolygonOffsetx_case(glPolygonOffsetx);
+maIOCtl_glPopMatrix_case(glPopMatrix);
+maIOCtl_glSampleCoveragex_case(glSampleCoveragex);
+maIOCtl_glActiveTexture_case(glActiveTexture);
+maIOCtl_glLightModelfv_case(glLightModelfv);
+maIOCtl_glClear_case(glClear);
+maIOCtl_glTranslatex_case(glTranslatex);
+maIOCtl_glLightfv_case(glLightfv);
+maIOCtl_glLightModelxv_case(glLightModelxv);
+maIOCtl_glLineWidth_case(glLineWidth);
+maIOCtl_glGetStringHandle_case(glGetStringHandle);
+maIOCtl_glCompressedTexImage2D_case(glCompressedTexImage2D);
+maIOCtl_glPushMatrix_case(glPushMatrix);
+maIOCtl_glBlendFunc_case(glBlendFunc);
+maIOCtl_glRotatef_case(glRotatef);
+maIOCtl_glRotatex_case(glRotatex);
+maIOCtl_glLightxv_case(glLightxv);
+maIOCtl_glDeleteTextures_case(glDeleteTextures);
+maIOCtl_glCopyTexSubImage2D_case(glCopyTexSubImage2D);
+maIOCtl_glPointSize_case(glPointSize);
+maIOCtl_glTranslatef_case(glTranslatef);
+maIOCtl_glPointSizex_case(glPointSizex);
+
 
 			maIOCtl_sinh_case(::sinh);
 			maIOCtl_cosh_case(::cosh);
