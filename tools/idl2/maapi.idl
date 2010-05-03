@@ -2833,6 +2833,8 @@ interface MAAPI {
 		int maIPhoneButton(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneEdit(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneView(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneListView(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
+		int maIPhoneListItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneNavigationBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneToolBar(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);
 		int maIPhoneToolBarItem(in MAWidgetParameters wparameters, out MAWidgetHandle whandle);

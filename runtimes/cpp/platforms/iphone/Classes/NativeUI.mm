@@ -8,75 +8,88 @@
  */
 
 #include "NativeUI.h"
-
 #include "MoSyncView.h"
 
 
 int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-
-	UIView *my_sMoSyncView = getMoSyncView();
-	[my_sMoSyncView showMessageBox:[NSString stringWithCString:wparams->buf length:strlen(wparams->buf)] shouldKill:false];
-	
+	MoSyncView *my_sMoSyncView = (MoSyncView *)getMoSyncView();
+	[my_sMoSyncView showMessageBox:[NSString stringWithCString:wparams->buf /*length:strlen(wparams->buf)*/ encoding:NSASCIIStringEncoding] shouldKill:false];
 	return 0;
 }
 
 int maIPhoneLabel(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-
-	[wparams->pParent showLabel:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] 
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showLabel:[NSString stringWithCString:(wparams->buf) encoding:NSASCIIStringEncoding] 
 						   posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
-	
 	return 0;
 }
 
 int maIPhoneButton(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-
-	[wparams->pParent showButton:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)]
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showButton:[NSString stringWithCString:(wparams->buf) encoding:NSASCIIStringEncoding]
 							posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
 	return 0;
 }
 
 int maIPhoneEdit(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-
-	[wparams->pParent showTextField:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)]
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showTextField:[NSString stringWithCString:(wparams->buf) encoding:NSASCIIStringEncoding]
 							   posX:wparams->posX posY:wparams->posY length:wparams->sizeX height:wparams->sizeY widgetId:wparams->widgetID];
 	return 0;
 }
 
 int maIPhoneView(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	MoSyncView *my_sMoSyncView = getMoSyncView();
+	MoSyncView *my_sMoSyncView = (MoSyncView *) getMoSyncView();
 	MoSyncView *vi = [my_sMoSyncView showScreen:wparams->widgetID];
 	whandle->pWidget = vi;
+	return 0;
+}
 
+int maIPhoneListView(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
+{
+	MoSyncView *my_sMoSyncView = (MoSyncView *) getMoSyncView();
+	MoSyncView *vi = [my_sMoSyncView showScreenList:wparams->widgetID];
+	whandle->pWidget = vi;
+	return 0;
+}
+
+int maIPhoneListItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
+{
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showListItem:[NSString stringWithCString:(wparams->buf) encoding:NSASCIIStringEncoding] widgetId: wparams->widgetID ];
 	return 0;
 }
 
 int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-
-	[wparams->pParent showNavigationBar:[NSString stringWithCString:(wparams->buf) length:strlen(wparams->buf)] ];
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showNavigationBar:[NSString stringWithCString:(wparams->buf) encoding:NSASCIIStringEncoding] ];
 	return 0;
 }
 
 
 int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	[wparams->pParent showToolBar];
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showToolBar];
 	return 0;
 }
 
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	[wparams->pParent showToolBarItem:wparams->widgetID withIcon: wparams->rsc];
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showToolBarItem:wparams->widgetID withIcon: wparams->rsc];
 	return 0;
 }
 
 int maIPhoneImage(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
 {
-	[wparams->pParent showImage:wparams->widgetID withImage: wparams->rsc posX: wparams->posX posY: wparams->posY];
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	[mosyncview showImage:wparams->widgetID withImage: wparams->rsc posX: wparams->posX posY: wparams->posY];
 	return 0;
 }

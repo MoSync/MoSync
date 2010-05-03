@@ -17,16 +17,45 @@
 
 #import <UIKit/UIKit.h>
 
+@interface UIApplication(MyExtras) 
+- (void)terminateWithSuccess; 
+@end
+
+@interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
+	BOOL kill;
+	NSString *msg;
+	NSMutableArray *mutableArray;
+}
+@property BOOL kill;
+@property (copy, nonatomic) NSString* msg;
+@property (nonatomic, retain) NSMutableArray *mutableArray;
+- (void)alertViewCancel:(UIAlertView *)alertView;
+@end
+
+// Controller for a table view, used for "List Boxes"
+@interface MyTableViewController : UITableViewController {
+	NSMutableArray *displayedObjects;
+}
+@property (nonatomic, retain) NSMutableArray *displayedObjects;
+@end
+
+// Used to pass parameters to the widgets, through performSelectorOnMainThread
+@interface WidgetHandler : UIViewController <UITextFieldDelegate> {
+	NSString *msg;
+	int x,y,l,h, widgetId, rsc;
+}
+@property (copy, nonatomic) NSString* msg;
+@property int x,y,l,h, widgetId, rsc;
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
+@end
+
+// Proper MoSync View, each screen is an instance of this class
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
 	UIToolbar *toolbar;
 	NSMutableArray *items;
-	
-
+	MyTableViewController *controller;
 }
-
-
-
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
 -(void) addLabel:(id) obj;
@@ -36,11 +65,15 @@
 -(void) addTextField:(id) obj;
 -(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid;
 - (void)navigationBar:(UINavigationBar*)bar buttonClicked:(int)button;
-- (void) pressButton1:(id)sender;
+//- (void) pressButton1:(id)sender;
 -(void) addNavigationBar:(id) obj;
 -(void) showNavigationBar: (NSString*) msg;
 -(void) addScreen:(id) obj;
+-(void) addScreenList:(id) obj;
 -(MoSyncView *) showScreen:(int) widgetid;
+-(MoSyncView *) showScreenList:(int) widgetid;
+-(void) addListItem:(id) obj;
+-(void) showListItem: (NSString*) msg widgetId: (int) widgetid;
 -(void) addToolBar:(id) obj;
 -(void) showToolBar;
 -(void) showToolBarItem: (int) widgetid withIcon: (int) rsc;
@@ -48,6 +81,4 @@
 -(void) addImage:(id) obj;
 -(void) showImage: (int) widgetid withImage: (int) rsc posX:(int) x posY:(int) y;
 -(void) passEvent:(id) obj;
-
-
 @end

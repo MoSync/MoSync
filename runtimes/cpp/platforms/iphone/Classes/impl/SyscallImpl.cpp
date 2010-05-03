@@ -802,6 +802,12 @@ namespace Base {
 		case maIOCtl_maIPhoneView:
 			return maIPhoneView(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
+		case maIOCtl_maIPhoneListView:
+			return maIPhoneListView(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+			
+		case maIOCtl_maIPhoneListItem:
+			return maIPhoneListItem(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
 		case maIOCtl_maIPhoneNavigationBar:
 			return maIPhoneNavigationBar(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 

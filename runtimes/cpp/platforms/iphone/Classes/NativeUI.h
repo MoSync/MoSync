@@ -13,13 +13,13 @@
 #include "MoSyncMain.h"
 #include <helpers/CPP_IX_NATIVE_UI.h>
 
-
-
 int maIPhoneMessageBox(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneLabel(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneButton(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneEdit(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneView(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
+int maIPhoneListView(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
+int maIPhoneListItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneNavigationBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneToolBar(MAWidgetParameters *wparams, MAWidgetHandle *whandle);
 int maIPhoneToolBarItem(MAWidgetParameters *wparams, MAWidgetHandle *whandle);

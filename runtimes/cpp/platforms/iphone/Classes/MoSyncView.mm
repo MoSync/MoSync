@@ -17,31 +17,19 @@
 
 #import "MoSyncView.h"
 #include "MosyncMain.h"
-
 #include "iphone_helpers.h"
-
 #include "Platform.h"
 #include "Syscall.h"
 
-
+// Used for Native UI, not the most elegant thing
+// but the only one that I got working
 static MoSyncView *currentScreen;
-
-@interface UIApplication(MyExtras) 
-- (void)terminateWithSuccess; 
-@end
-
-@interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
-	BOOL kill;
-	NSString *msg;
-}
-@property BOOL kill;
-@property (copy, nonatomic) NSString* msg;
-- (void)alertViewCancel:(UIAlertView *)alertView;
-@end
+static NSMutableArray *listItems = nil;
 
 @implementation MessageBoxHandler
 @synthesize kill;
 @synthesize msg;
+@synthesize mutableArray;
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if(kill)
 		Exit();
@@ -53,14 +41,103 @@ static MoSyncView *currentScreen;
 }
 @end
 
-// Used to pass parameters to the widgets, through performSelectorOnMainThread
-@interface WidgetHandler : UIViewController <UITextFieldDelegate> {
-	NSString *msg;
-	int x,y,l,h, widgetId, rsc;
+// View Controller for TableView
+@implementation MyTableViewController
+@synthesize displayedObjects;
+- (void)dealloc {
+	[displayedObjects release];
+    [super dealloc];
 }
-@property (copy, nonatomic) NSString* msg;
-@property int x,y,l,h, widgetId, rsc;
-- (BOOL)textFieldShouldReturn:(UITextField *)textField;
+
+//  Lazily initializes array of displayed objects.
+- (NSMutableArray *)displayedObjects {
+    return displayedObjects;
+}
+
+//  By default, UITableViewController creates its own UITableView instance and
+//  makes itself the table view's data source (and delegate as well),
+//  so we can implement methods of the UITableViewDataSource protocol here,
+//  and they'll be called automatically by the table view at runtime.
+//  You can move these methods to another class if you prefer -- if you do, 
+//  just be sure to send a -setDataSource: message to the table view.
+//
+#pragma mark -
+#pragma mark UITableViewDataSource Protocol
+
+//  Returns the number of rows in the current section. There's only
+//  one section in a 'plain style' table view, so we can simply ignore the
+//  'section' argument.
+//
+- (NSInteger)tableView:(UITableView *)tableView
+ numberOfRowsInSection:(NSInteger)section
+{
+    return [[self displayedObjects] count];
+}
+
+// Returns a cell containing the text to display at the provided row index.
+//
+- (UITableViewCell *)tableView:(UITableView *)tableView
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath 
+{
+    //  UITableView only needs enough cells to display the rows that are
+    //  currently on screen. As the user scrolls, cells that disappear are
+    //  placed on a queue so they can be reused to display the values of the
+    //  new rows that appear.
+    //
+    //  The method we're calling here grabs the first available cell off of
+    //  that queue. Since its possible for an app to have several table views 
+    //  that use different kinds of cells, we provide a reuse identifier to
+    //  specify the kind of cell we're looking for.
+    //
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MyCell"];
+    
+    if (cell == nil)
+    {
+        //  If no cells have been dequeued yet, create a new instance. Use an
+        //  identifier so later we can dequeue this kind of cell later (in
+        //  case our app has more than one kind of cell table view cell).
+        //
+        //  The UITableViewCellStyleSubtitle is one of a small handful of 
+        //  available styles. This style provides two text areas rendered
+        //  on separate lines within the cell. The second line (referred to as
+        //  the 'detail' text label) is rendered in a smaller font in a lighter
+        //  shade of gray.
+        //
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
+                                      reuseIdentifier:@"MyCell"];
+        [cell autorelease];
+    }
+    
+    //  Find out which row we're being asked for, and get the corresponding
+    //  object from our internal array of displayed objects.
+    //
+    NSUInteger index = [indexPath row];
+    NSString *text = [[self displayedObjects] objectAtIndex:index];
+    
+    //  Populate the cell's text label with our object's value.
+    [[cell textLabel] setText:text];
+    
+    //  Populate the cell's detail text label.
+    NSString *detailText = [NSString stringWithFormat:@"Detail text for %@.", 
+                            [text lowercaseString]];
+    [[cell detailTextLabel] setText:detailText];
+    
+    return cell;
+}
+
+//
+//  The table view's delegate is notified of runtime events, such as when
+//  the user taps on a given row, or attempts to add, remove or reorder rows.
+
+//  Notifies the delegate when the user selects a row.
+//
+- (void)tableView:(UITableView *)tableView
+didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	Base::gEventQueue.addNativeUIEvent([currentScreen tag], [indexPath indexAtPosition:1+1]);
+    NSLog(@"the tag value is: %d index: %d.", [currentScreen tag], [indexPath indexAtPosition:1]+1);
+}
+
 @end
 
 @implementation WidgetHandler
@@ -72,11 +149,8 @@ static MoSyncView *currentScreen;
 }
 @end
 
-
-
+// Code for the MoSyncView
 @implementation MoSyncView
-
-
 - (void)updateMoSyncView:(CGImageRef)ref {
 	mosyncView = ref;
 	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
@@ -99,6 +173,7 @@ static MoSyncView *currentScreen;
         // Initialization code
 		MoSyncMain(self.frame.size.width, self.frame.size.height, self);
     }
+	
     return self;
 }
 
@@ -172,7 +247,6 @@ bool down = false;
                           delegate:mbh
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];
-	
     [alert show];
     [alert release];
 }
@@ -239,13 +313,7 @@ bool down = false;
 	textField.placeholder = wh.msg;
 	textField.borderStyle = UITextBorderStyleRoundedRect;
 	textField.delegate = wh;
-	//textField.rightViewMode = UITextFieldViewModeAlways;
-	//UIButton *button = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-	//textField.rightView = button;
-	//[button addTarget:self action:@selector(hideKeyboard:) forControlEvents:UIControlEventTouchUpInside];
 	[self addSubview:textField];
-	
-	
 }
 
 -(void) showTextField: (NSString*) msg posX:(int) x posY:(int) y length:(int) l height:(int) h widgetId:(int) widgetid {
@@ -264,20 +332,19 @@ bool down = false;
     if (button == 1)
     {
 		[self.superview sendSubviewToBack:currentScreen];
-		//[self.superview sendSubviewToBack:self];
         NSLog(@"Navigation bar back button clicked.");
     }
 
 }
 
 //Action methods for toolbar buttons:
-- (void) pressButton1:(id)sender {
+/*- (void) pressButton1:(id)sender {
 	//Actionsheet
 	/*UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Menu" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"test", nil];
 	[actionSheet showInView:self];
 	[actionSheet release];*/
-	NSLog(@"+ button clicked.");
-}
+/*	NSLog(@"+ button clicked.");
+}*/
 
 -(void) addScreen:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
@@ -288,7 +355,6 @@ bool down = false;
 	//v.backgroundColor = [UIColor whiteColor];
 	[[UIApplication sharedApplication] setStatusBarHidden:NO animated:NO];
 	currentScreen = v;
-	//currentScreen = self;
 	Base::gEventQueue.addNativeUIEvent([v tag], 0);
 	NSLog(@"the tag value is: %d", [v tag]);
 }
@@ -298,6 +364,35 @@ bool down = false;
 	wh.widgetId = widgetid;
 	[self performSelectorOnMainThread: @ selector(addScreen:) withObject:(id)wh waitUntilDone:YES];
 	return currentScreen;
+}
+
+-(void) addScreenList:(id) obj {
+	//WidgetHandler *wh = (WidgetHandler*) obj;
+	controller = [[MyTableViewController alloc]
+				  initWithStyle:UITableViewStyleGrouped];
+    controller.displayedObjects = listItems;
+    [self addSubview:[controller view]];
+	
+}
+
+-(MoSyncView *) showScreenList:(int) widgetid {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.widgetId = widgetid;
+	[self performSelectorOnMainThread: @ selector(addScreenList:) withObject:(id)wh waitUntilDone:YES];
+	return currentScreen;
+}
+
+-(void) addListItem:(id) obj {
+	WidgetHandler *wh = (WidgetHandler*) obj;
+	[listItems addObject: wh.msg];
+}
+
+-(void) showListItem: (NSString*) msg widgetId: (int) widgetid {
+	WidgetHandler *wh = [WidgetHandler alloc];
+	wh.widgetId = widgetid;
+	wh.msg = msg;
+	if(listItems == nil) listItems = [NSMutableArray arrayWithCapacity:1];
+	[self performSelectorOnMainThread: @ selector(addListItem:) withObject:(id)wh waitUntilDone:YES];
 }
 
 -(void) addNavigationBar:(id) obj {
@@ -327,7 +422,7 @@ bool down = false;
 }
 
 -(void) addToolBar:(id) obj {
-	WidgetHandler *wh = (WidgetHandler*) obj;
+	//WidgetHandler *wh = (WidgetHandler*) obj;
 	toolbar = [UIToolbar new];
 	toolbar.barStyle = UIBarStyleDefault;
 	[toolbar sizeToFit];
@@ -356,25 +451,15 @@ bool down = false;
 	wh.rsc = rsc;
 	items = [NSMutableArray arrayWithCapacity:1];
 	[self performSelectorOnMainThread: @ selector(addToolBarItem:) withObject:(id)wh waitUntilDone:NO];
-	
 }
 
 -(void) addImage:(id) obj {
 	WidgetHandler *wh = (WidgetHandler*) obj;
 	Surface* img = Base::gSyscall->resources.get_RT_IMAGE(wh.rsc);
-	
 	CGRect myImageRect = CGRectMake(wh.x, wh.y, CGImageGetWidth(img->image), CGImageGetHeight(img->image));
 	UIImageView *myImage = [[UIImageView alloc] initWithFrame:myImageRect];
 	[myImage setImage:[UIImage imageWithCGImage:img->image]];
 	myImage.opaque = YES; // explicitly opaque for performance
-	
-	
-	//UIImageView *myImage = [[UIImageView alloc] initWithImage:[UIImage imageWithCGImage:img->image]];
-	//[myImage setImage:[UIImage imageWithCGImage:img->image]];
-	
-	
-	
-	//UIImage *myImage = [UIImage imageWithCGImage:img->image];
 	[self addSubview:myImage];
 }
 
@@ -385,16 +470,11 @@ bool down = false;
 	wh.x = x;
 	wh.y = y;
 	[self performSelectorOnMainThread: @ selector(addImage:) withObject:(id)wh waitUntilDone:NO];
-	
 }
 
 -(void) passEvent:(id) obj {
-
 	Base::gEventQueue.addNativeUIEvent([obj tag], 0);
 	NSLog(@"the tag value is: %d", [obj tag]);
-	
 }
-
-
 
 @end

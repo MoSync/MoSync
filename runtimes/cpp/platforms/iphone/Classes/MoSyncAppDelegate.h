@@ -23,6 +23,7 @@
 @interface MoSyncAppDelegate : NSObject <UIApplicationDelegate> {
     UIWindow *window;
     MoSyncViewController *viewController;
+	
 
 }
 
