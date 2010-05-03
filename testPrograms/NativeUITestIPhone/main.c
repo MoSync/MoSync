@@ -22,9 +22,24 @@ int MAMain() {
 	strncpy(wparamsBar.buf, str1, strlen(str1)+1);
 	maIPhoneNavigationBar(&wparamsBar, NULL);
 	*/
+	MAWidgetParameters wparamsListItem;
+	char *str1="List item";
+	wparamsListItem.pParent = whandle.pWidget;
+	wparamsListItem.widgetID = 7777;
+	strncpy(wparamsListItem.buf, str1, strlen(str1)+1);
+	maIPhoneListItem(&wparamsListItem, NULL);
+	maIPhoneListItem(&wparamsListItem, NULL);
+	maIPhoneListItem(&wparamsListItem, NULL);
+	maIPhoneListItem(&wparamsListItem, NULL);
+	maIPhoneListItem(&wparamsListItem, NULL);
+	maIPhoneListItem(&wparamsListItem, NULL);
+
 	
+	//maIPhoneListItem(&wparamsListItem, NULL);
 	
-	
+	//maIPhoneListView(&wparams0, &whandle);
+	//maIPhoneListView(&wparams0, &whandle);
+	/*
 	MAWidgetParameters wparams;
 	wparams.pParent = whandle.pWidget;
 	char *strBar="Open a new window";
@@ -66,12 +81,12 @@ int MAMain() {
 	wparamsImage.pParent = whandle.pWidget;
 	wparamsImage.rsc = SKY_ICON;
 	wparamsImage.posX = 30;
-	wparamsImage.posY = 250;
-	maIPhoneImage(&wparamsImage, NULL);
+	wparamsImage.posY = 250;*/
+	//maIPhoneImage(&wparamsImage, NULL);
 	
-	maIPhoneLabel(&wparams2, NULL);
-	maIPhoneButton(&wparams, NULL);
-	maIPhoneEdit(&wparams3, NULL);
+	//maIPhoneLabel(&wparams2, NULL);
+	//maIPhoneButton(&wparams, NULL);
+	//maIPhoneEdit(&wparams3, NULL);
 
 	// Handle events
 	MAEvent event;
@@ -82,7 +97,7 @@ int MAMain() {
 				switch(event.lo_wparam) {
 					case 666:
 						if(event.hi_wparam==0) {
-							
+							/*
 							MAWidgetParameters wparams4;
 							wparams4.widgetID = 11;
 							
@@ -94,19 +109,34 @@ int MAMain() {
 							wparamsBar.pParent = whandle2.pWidget;
 							strncpy(wparamsBar.buf, str1, strlen(str1)+1);
 							maIPhoneNavigationBar(&wparamsBar, NULL);
-							
+							*/
 						}
 						break;
 						
 						
 					case 13:
 						if(event.hi_wparam==0) {
-							
+							/*
 							MAWidgetParameters wparamsAlert;
 							char *str1="You are going to die";
 							wparamsAlert.pParent = whandle.pWidget;
 							strncpy(wparamsAlert.buf, str1, strlen(str1)+1);
 							maIPhoneMessageBox(&wparamsAlert, NULL);
+							 */
+						}
+						break;
+						
+					case 10:
+						if(event.hi_wparam==0) {
+							maIPhoneListView(&wparams0, &whandle);
+							/*
+							MAWidgetParameters wparamsListItem;
+							char *str1="You are going to die";
+							wparamsListItem.pParent = whandle.pWidget;
+							wparamsListItem.widgetID = 7777;
+							strncpy(wparamsListItem.buf, str1, strlen(str1)+1);
+							maIPhoneListItem(&wparamsListItem, NULL);
+							 */
 						}
 						break;
 				}
