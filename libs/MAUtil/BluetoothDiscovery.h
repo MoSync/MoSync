@@ -16,7 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file BluetoothDiscovery.h
-* \brief \link MAUtil::Environment Environment \endlink-based classes for Bluetooth Discovery.
+* \brief Environment-based classes for Bluetooth discovery
+* \author Fredrik Eldh
 */
 
 #ifndef _SE_MSAB_MAUTIL_BLUETOOTHDISCOVERY_H_

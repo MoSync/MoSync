@@ -16,7 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file madmath.h
-* \brief Intrinsic Double Precision Math Support Lib
+* \brief Intrinsic double-precision math
+* \author Antony Hartley
 */
 
 //********************************************************************************

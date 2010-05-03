@@ -1,3 +1,8 @@
+/** \file api_areas.h
+* \brief Overview of the MoSync API
+* \author Fredrik Eldh
+*/
+
 /** \page api_areas API areas
 You can do many things with MoSync, and some things can be done in several different
 ways. This document will give you an overview of all these things.

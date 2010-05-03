@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Geometry.h
-* \brief A library for geometric helper structures/functions (Rect, Point)
+* \brief Geometric helper structures/functions (Rect, Point)
 *
 *
 * \author Niklas Nummelin

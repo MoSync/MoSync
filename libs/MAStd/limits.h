@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file limits.h
-* \brief Definitions of value limits of the integral data types.
+* \brief Value limits of the integral data types.
 */
 
 // MoSync configuration

@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Moblet.h
-* \brief A C++ event manager, a base class for applications.
+* \brief C++ event manager, a base class for applications.
 *
 * The Moblet class provides an object-oriented wrapper around the
 * C event system in MoSync.

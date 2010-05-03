@@ -31,6 +31,10 @@
 // ISO C++ 14882: 19.1  Exception classes
 //
 
+/** \file exception_defines.h
+* \brief C++ exception defines
+*/
+
 #ifndef __EXCEPTIONS
 // Iff -fno-exceptions, transform error handling code to work without it.
 # define try      if (true)

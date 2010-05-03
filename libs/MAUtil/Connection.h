@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Connection.h
-* \brief Environment-based classes that handle MoSync's Connection functions.
+* \brief Environment-based classes handling connection functions.
 *
 * Much of the documentation for these classes is shared with the functions in maapi.h.
 * Links to that documentation are available where appropriate.

@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Graphics.h
- * \brief A translation/clipping stack for MoSync graphics.
+ * \brief Translation/clipping stack for MoSync graphics.
  *
  * This file contains a set of graphics functions that closely mirror the ones available as MoSync syscalls. However, these
  * functions make use of a transformation stack similar to ones commonly found in other graphics libraries. It simplifies

@@ -15,8 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file XMLDataProvider.h Copyright (c) Mobile Sorcery AB 2005-2007 **/
-
 #ifndef _SE_MSAB_MAUTIL_XML_DATA_PROVIDER_H_
 #define _SE_MSAB_MAUTIL_XML_DATA_PROVIDER_H_
 

@@ -181,6 +181,11 @@
  *  Dave Thorup
  *
  */
+ 
+ /** \file stdint.h
+* \brief Standard integer scalar types
+* \author Paul Hsieh
+*/
 
 #ifndef STDINT_H
 #define STDINT_H

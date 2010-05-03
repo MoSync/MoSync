@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Dictionary.h
-* \brief Thin template sorted Dictionary.
+* \brief Thin template sorted dictionary.
 */
 
 #ifndef _SE_MSAB_MAUTIL_DICTIONARY_H_

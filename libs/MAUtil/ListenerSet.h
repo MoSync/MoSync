@@ -15,6 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file ListenerSet.h
+ * \brief Safe container for listeners
+ * \author Fredrik Eldh
+ */
+
 #ifndef _LISTENER_SET_H_
 #define _LISTENER_SET_H_
 

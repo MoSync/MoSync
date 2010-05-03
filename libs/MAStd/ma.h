@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file ma.h
-* \brief Defines a few standard things.
+* \brief Defines MoSync program entry point, size_t, NULL and BOOL
 */
 
 

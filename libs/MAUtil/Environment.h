@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Environment.h
-* \brief A system for cross-platform event handling.
+* \brief Cross-platform event handling
 */
 
 #ifndef _MAUTIL_ENVIRONMENT_H_

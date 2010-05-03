@@ -16,10 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file String.h
-*
-* \brief A reference-counted
-* String class that behaves much like a subset of std::string.
-*
+* \brief Reference-counted string behaving like a subset of std::string.
 * \author Patrick Broman and Niklas Nummelin
 *
 */

@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** \file Tokenizer.h
 *
-* Tokenizer (used by MAUtil for XPath expression evaluation)
+* \brief Tokenizer used by MAUtil for XPath expression evaluation
 *
 * \author Patrick Broman and Niklas Nummelin
 *

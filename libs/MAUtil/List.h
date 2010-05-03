@@ -16,11 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file List.h
-* \brief A generic, dynamic list container
-* class behaving much like a subset of std::list.
-*
+* \brief Generic, dynamic list container behaving like a subset of std::list.
 * \author Patrick Broman and Niklas Nummelin
-*
 */
 
 #ifndef _SE_MSAB_MAUTIL_LIST_H_

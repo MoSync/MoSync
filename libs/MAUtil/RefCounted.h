@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file RefCounted.h
-* \brief A mix-in class for reference counting.
+* \brief Mix-in class for reference counting.
 */
 
 #ifndef _SE_MSAB_MAUTIL_REFCOUNTED_H_

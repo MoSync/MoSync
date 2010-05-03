@@ -1,3 +1,7 @@
+/** \file Server.h
+* \brief Encapsulates MoSync's server connections
+* \author Fredrik Eldh
+*/
 
 #ifndef _MAUTIL_SERVER_H_
 #define _MAUTIL_SERVER_H_

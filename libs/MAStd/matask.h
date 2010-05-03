@@ -15,6 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file matask.h
+* \brief Task control system
+* \author Fredrik Eldh
+*/
+
 //*********************************************************************************************
 //							   MoSync Task Control System
 //*********************************************************************************************

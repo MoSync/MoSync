@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file PlaceholderPool.h
-* \brief A dynamic pool of MoSync placeholder resource handles.
+* \brief Dynamic pool of MoSync placeholder resource handles.
 */
 
 #ifndef _SE_MSAB_MAUTIL_PLACEHOLDERPOOL_H_

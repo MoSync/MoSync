@@ -17,8 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** \file Vector.h
  *
- * \brief A generic, dynamic vector container
- * class behaving much like a subset of std::vector.
+ * \brief Generic, dynamic vector container behaving like a subset of std::vector.
  *
  * \author Patrick Broman and Niklas Nummelin
  *

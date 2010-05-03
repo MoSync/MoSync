@@ -16,14 +16,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file maarg.h
-* \brief Support for variadric functions.
+* \brief Variadric functions
 
 * VAARGS
 * Functions in C take a variable amount of arguments, functions
 * such as printf and sprintf, these function use VAARGS which allow
 * a function to read the arguments passed from an ellipsis parameter
 * (...).
-* Note all va functions are implemented as macroes.
+* Note all functions are implemented as macros.
 */
 
 #ifdef MAPIP

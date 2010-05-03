@@ -15,6 +15,11 @@
  * Released under the terms of the GNU Lesser General Public License Version 2.1
  *
  */
+ 
+/** \file tlsf.h
+* \brief Two Levels Segregate Fit memory allocator
+* \author Miguel Masmano Tello
+*/
 
 #ifndef _TLSF_H_
 #define _TLSF_H_

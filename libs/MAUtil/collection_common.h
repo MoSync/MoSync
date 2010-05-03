@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file collection_common.h
+ * \brief Comparison and pair for MAUtil
+ */
+
 #ifndef _SE_MSAB_MAUTIL_COLLECTION_COMMON_H_
 #define _SE_MSAB_MAUTIL_COLLECTION_COMMON_H_
 

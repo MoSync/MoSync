@@ -1,3 +1,9 @@
+/** 
+ * \file entities.h
+ * \brief HTML entities look-up used by MTXml Parser
+ * \author Fredrik Eldh
+ */
+
 #ifndef ENTITIES_H
 #define ENTITIES_H
 

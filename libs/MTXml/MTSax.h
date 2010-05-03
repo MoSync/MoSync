@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /**
 * \file MTSax.h
-* \brief MoSync Tiny SAX parser
+* \brief Tiny SAX parser
 *
 * MTSax is a simple SAX parser built as a thin layer on top of MTXml.
 *

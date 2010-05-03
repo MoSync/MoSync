@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** \file Stack.h
  *
- * \brief A generic, dynamic stack container. A restricted subset of vector.
+ * \brief Generic, dynamic stack container. A restricted subset of vector.
  *
  * \author Niklas Nummelin
  *

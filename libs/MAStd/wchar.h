@@ -1,3 +1,8 @@
+/** \file wchar.h
+* \brief Wide character conversions
+* \author Fredrik Eldh
+*/
+
 #ifndef WCHAR_H
 #define WHCAR_H
 

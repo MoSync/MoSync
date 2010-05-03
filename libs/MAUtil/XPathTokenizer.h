@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** \file XPathTokenizer.h
 *
-* XPath expression tokenizer
+* \brief XPath expression tokenizer
 *
 * \author Patrick Broman and Niklas Nummelin
 *

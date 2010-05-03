@@ -26,6 +26,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
    This exception does not however invalidate any other reasons why
    the executable file might be covered by the GNU General Public License.  */
 
+/** \file libgcc2.h
+ *
+ * \brief Activates GCC 64-bit emulation and makes libgcc compatible with MoSync
+ */
 
 #ifndef GCC_LIBGCC2_H
 #define GCC_LIBGCC2_H

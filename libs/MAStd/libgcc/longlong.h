@@ -32,6 +32,10 @@
    on a 64 bit machine, UWtype should typically be UDItype.
 */
 
+/** \file longlong.h
+ * \brief Auxiliary ASM macros
+ */
+
 #define __BITS4 (W_TYPE_SIZE / 4)
 #define __ll_B ((UWtype) 1 << (W_TYPE_SIZE / 2))
 #define __ll_lowpart(t) ((UWtype) (t) & (__ll_B - 1))

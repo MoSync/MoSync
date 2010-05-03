@@ -1,3 +1,9 @@
+/** 
+* \file macpp.h
+* \brief Defines and typedefs needed for libsupc++
+* \author Fredrik Eldh
+*/
+
 #ifndef MACPP_H
 #define MACPP_H
 

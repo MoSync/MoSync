@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file HashMap_impl.h
+* \brief HashMap implementation
+*/
+
 #ifndef _SE_MSAB_MAUTIL_HASHMAP_H_
 #error Do not include this file directly.
 #endif

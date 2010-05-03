@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file util.h
- * \brief Utility functions
+ * \brief Utility functions (clamps, wraps, insides, string conversions and breaks)
  */
 
 #ifndef _SE_MSAB_MAUTIL_UTIL_H_

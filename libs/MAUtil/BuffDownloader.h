@@ -16,11 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file BuffDownloader.h
- *
- * \brief A class facilitating simple, asynchronous HTTP download to main memory.
- *
+ * \brief Simple asynchronous HTTP download to main memory.
  * \author Ann-Sofie Lindblom
- *
  */
 
 #ifndef _SE_MSAB_MAUTIL_BUFFDOWNLOADER_H_

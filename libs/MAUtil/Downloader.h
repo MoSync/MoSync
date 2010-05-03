@@ -15,12 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Downloader.h
- *
- * \brief Classes facilitating simple, asynchronous HTTP downloads to resources.
- *
- * \author Patrick Broman, Niklas Nummelin
- *
+/** 
+ * \file Downloader.h
+ * \brief Simple asynchronous HTTP download to resources.
+ * \author Patrick Broman and Niklas Nummelin
  */
 
 #ifndef _SE_MSAB_MAUTIL_DOWNLOADER_H_

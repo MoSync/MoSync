@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /**
 * \file MTXml.h
-* \brief MoSync Tiny XML parser
+* \brief Tiny XML parser
 *
 * MTXml is a simple XML parser which can handle most XML 1.0 and 1.1 documents.
 * It has a SAX-like interface, and is re-entrant in that it can take a partial XML document
