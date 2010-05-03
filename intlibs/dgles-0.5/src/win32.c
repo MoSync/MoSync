@@ -1,14 +1,14 @@
 #include <windows.h>
 #include "dgl.h"
 
-void *_dgles_platform_open()
+void *_dgles_platform_open(void)
 {
 	HINSTANCE lib;
 
-	lib = LoadLibrary(L"opengl32.dll");
+	lib = LoadLibraryA("opengl32.dll");
 	if (!lib)
 	{
-		lib = LoadLibrary(L"opengl.dll");
+		lib = LoadLibraryA("opengl.dll");
 		if (!lib)
 			return NULL;
 	}

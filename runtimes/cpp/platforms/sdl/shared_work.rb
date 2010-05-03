@@ -9,9 +9,9 @@ def setup_common
 	
 	if(HOST == :win32) then
 		@CUSTOM_LIBS = common_libraries.collect do |lib| "#{lib}.lib" end +
-			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a"]
+			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
-		@LOCAL_DLLS = ["amr"]
+		@LOCAL_DLLS = ["amr", "dgles"]
 	elsif(HOST == :linux) then
 		@EXTRA_CPPFLAGS = ""
 		@IGNORED_FILES = []
@@ -28,7 +28,7 @@ def setup_common
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
 		
-		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat"]
+		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage"]
 	else
 		error "Unsupported platform"
 	end

@@ -343,7 +343,7 @@ void GL_APIENTRY glCompressedTexSubImage2D (GLenum target, GLint level, GLint xo
 	/* There are no supported formats so this always causes error. */
 	ERROR(GL_INVALID_ENUM);
 
-	LEAVE();
+	//LEAVE();
 }
 
 void GL_APIENTRY glCopyTexImage2D (GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)

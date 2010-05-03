@@ -15,5 +15,5 @@ const File* Location::getFile() const {
 }
 
 string Location::toString() const {
-	return System::genstr("%d:%s", mLine, mFile->toString());
+	return System::genstr("%d:%s", mLine, mFile->toString().c_str());
 }

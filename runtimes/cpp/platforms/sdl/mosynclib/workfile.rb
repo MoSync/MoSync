@@ -12,8 +12,8 @@ work.instance_eval do
 	setup_common
 	
 	@SOURCES = []
-	@EXTRA_SOURCEFILES = ["mosynclib.cpp"]
-	@SPECIFIC_CFLAGS = {"mosynclib.cpp" => " -DMOSYNC_DLL_EXPORT",
+	@EXTRA_SOURCEFILES = ["main.cpp"]
+	@SPECIFIC_CFLAGS = {"main.cpp" => " -DMOSYNC_DLL_EXPORT -Wno-missing-noreturn",
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	
 	@WHOLE_LIBS = ["mosync_sdl"]

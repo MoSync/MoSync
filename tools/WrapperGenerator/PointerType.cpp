@@ -24,9 +24,7 @@ PointerType::PointerType() : Base(EPointerType) {
 
 void PointerType::fromParseNode(const ParseNode& node) {
 	mType = parseType(node, mIsConst);
-	if(!mType) {
-		int a = 2;
-	}
+	SASSERT(mType);
 
 	mSize = node.getIntAttr("size");
 	mAlign = node.getIntAttr("align");

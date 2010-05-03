@@ -95,14 +95,14 @@ Function::Function() : Base(EFunction) {
 }
 
 bool Function::hasPointerArguments() const {
-	for(int i = 0; i < mArguments.size(); i++) {
+	for(size_t i = 0; i < mArguments.size(); i++) {
 		if(mArguments[i]->usesPointer()) return true;
 	}
 	return false;
 }
 
 bool Function::hasHandleArguments() const {
-	for(int i = 0; i < mArguments.size(); i++) {
+	for(size_t i = 0; i < mArguments.size(); i++) {
 		if(mArguments[i]->usesHandle()) return true;
 	}
 	return false;

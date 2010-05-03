@@ -6,7 +6,7 @@
 
 /* TODO: linked list is not very efficient way to store buffers, fix that */
 
-static struct DGLES_Buffer *new_buffer()
+static struct DGLES_Buffer *new_buffer(void)
 {
 	struct DGLES_Buffer *buf;
 
@@ -50,7 +50,7 @@ static void delete_buffer(struct DGLES_Buffer *buf)
 	free(buf);
 }
 
-struct DGLES_Buffer *find_buffer(GLuint name)
+static struct DGLES_Buffer *find_buffer(GLuint name)
 {
 	struct DGLES_Buffer *buf;
 	

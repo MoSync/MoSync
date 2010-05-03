@@ -335,7 +335,7 @@ static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {
 	return cs;
 }
 
-void readRange(string &range) {
+static void readRange(string &range) {
 	doExact("(");
 	readQuotedString(range);
 	doExact(")");

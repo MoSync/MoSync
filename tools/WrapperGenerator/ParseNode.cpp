@@ -18,29 +18,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ParseNode.h"
 #include "WrapperGenerator.h"
 #include "Parser.h"
+#include <stdio.h>
 
 using namespace std;
 
 ParseNode::ParseNode() : parent(NULL) {
 }
 
-string ParseNode::getAttr(const string& name, bool force) const {
-	map<string, string>::const_iterator iter = attributes.find(name);
+string ParseNode::getAttr(const string& _name, bool force) const {
+	map<string, string>::const_iterator iter = attributes.find(_name);
 	if(iter != attributes.end()) return iter->second;
 	else if(force) {
-		System::error(System::genstr("Attribute '%s' missing on line %d\n", name.c_str(), lineNumber).c_str());
+		System::error(System::genstr("Attribute '%s' missing on line %d\n", _name.c_str(), lineNumber).c_str());
 	}
 	return "";
 }
 
-int ParseNode::getIntAttr(const string& name, bool force) const {
-	string attr = getAttr(name, force);
-	return atoi(attr.c_str());
+int ParseNode::getIntAttr(const string& _name, bool force) const {
+	string attr = getAttr(_name, force);
+	int i;
+	int res = sscanf(attr.c_str(), "%i", &i);
+	SASSERT(res == 1);
+	return i;
 }
 
-void ParseNode::getNodesFromIdList(const std::string& name, vector<const Base*>& output, bool force) const {
+void ParseNode::getNodesFromIdList(const std::string& _name, vector<const Base*>& output, bool force) const {
 	
-	const string& members = getAttr(name, force);
+	const string& members = getAttr(_name, force);
 
 	size_t startIndex = 0;
 	size_t endIndex = 0;

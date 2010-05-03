@@ -33,7 +33,6 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
 		bool returnsHandle = false;
-		bool hasHandlesAsArguments = false;
 		bool returnsConstPtr = false;
 		if(ret->getBaseType() == Base::EPointerType) {
 			const PointerType* pret = (const PointerType*)ret;
@@ -64,13 +63,15 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 		if(returnsHandle || func->hasHandleArguments()) {
 
+			stream << "static ";
+
 			if(returnsHandle) stream << "MAHandle ";
 			else {
 				stream << ret->toString() << " ";	
 			}
 
 			stream << func->getName() << "Handle(";
-			for(int i = 0; i < args.size(); i++) {
+			for(size_t i = 0; i < args.size(); i++) {
 				if(args[i]->usesHandle()) stream << "MAHandle h" << args[i]->getName();
 				else stream << args[i]->getType()->resolveFully()->toString() << " " << args[i]->getName();
 				if(i != args.size()-1) stream << ", ";
@@ -81,7 +82,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 				stream << "\tMAHandle placeholder = maCreatePlaceholder();\n";
 			}
 
-			for(int i = 0; i < args.size(); i++) {
+			for(size_t i = 0; i < args.size(); i++) {
 				if(args[i]->usesHandle()) {
 					string streamName = "s" + args[i]->getName();
 
@@ -102,7 +103,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 			}
 
 			stream << func->getName() << "(";
-			for(int i = 0; i < args.size(); i++) {
+			for(size_t i = 0; i < args.size(); i++) {
 				stream << args[i]->getName();
 				if(i != args.size()-1) stream << ", ";
 			}

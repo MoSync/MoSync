@@ -8,7 +8,7 @@
 extern struct DGLES_State _dgles_state;
 extern struct DGL _dgles_dgl;
 
-extern void _dgles_init();
+extern void _dgles_init(void);
 
 #define state _dgles_state
 #define dgl _dgles_dgl
@@ -45,22 +45,22 @@ extern void _dgles_init();
 
 #define LEAVE() \
 	do { \
-		GLenum err = dgl.glGetError(); \
-		if (err == GL_OUT_OF_MEMORY) \
+		GLenum _err = dgl.glGetError(); \
+		if (_err == GL_OUT_OF_MEMORY) \
 			state.error = GL_OUT_OF_MEMORY; \
 		else \
-			assert(err == GL_NO_ERROR); \
+			assert(_err == GL_NO_ERROR); \
 		return; \
 	} while(0)
 
 #define LEAVE2(v) \
 	do { \
 		{ \
-			GLenum err = dgl.glGetError(); \
-			if (err == GL_OUT_OF_MEMORY) \
+			GLenum _err = dgl.glGetError(); \
+			if (_err == GL_OUT_OF_MEMORY) \
 				state.error = GL_OUT_OF_MEMORY; \
 			else \
-				assert(err == GL_NO_ERROR); \
+				assert(_err == GL_NO_ERROR); \
 		} \
 		return (v); \
 	} while(0)
@@ -69,9 +69,9 @@ extern void _dgles_init();
 
 #define FORWARD_ERROR() \
 	do { \
-		GLenum err = dgl.glGetError(); \
-		if (err != GL_NO_ERROR) \
-			ERROR(err); \
+		GLenum _err = dgl.glGetError(); \
+		if (_err != GL_NO_ERROR) \
+			ERROR(_err); \
 	} while(0)
 
 #define TODO() do { assert(!"TODO!"); } while(0)

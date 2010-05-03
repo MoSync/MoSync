@@ -13,7 +13,7 @@ struct DGL _dgles_dgl;
 
 #include "api.h"
 
-GL_API int GL_APIENTRY _dgles_load_library(void *handle, void *(*load_func)(void *, const char *))
+static int _dgles_load_library(void *handle, void *(*load_func)(void *, const char *))
 {
 	void *ptr;
 
@@ -43,7 +43,7 @@ error:
 	return 1;
 }
 
-void _dgles_init()
+void _dgles_init(void)
 {
 	if (state.inited)
 		return;

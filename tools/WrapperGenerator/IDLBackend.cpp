@@ -73,7 +73,7 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 			else //if(pfType->getName() == "void") 
 				ret += "MAAddress";
 			*/
-			ret += ((const FundamentalType*)pType)->getName();
+			ret += pfType->getName();
 			if(isConst) ret+="*";
 
 		} else if(pType->getBaseType() == Base::ETypedef) {
@@ -128,13 +128,12 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 		string returnString = ret->toString();
 		bool returnsHandle = false;
 		if(ret->getBaseType() == Base::EPointerType) {
+#if 0
 			const PointerType* pret = (const PointerType*)ret;
-			
-			/*
 			const Base* target = pret->getType();
 			if(target->getBaseType() == Base::ETypedef)
 				target = ((const Typedef*)
-			*/
+#endif
 			returnString = "MAHandle";
 			returnsHandle = true;
 		}
@@ -146,7 +145,7 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 			stream << "Handle";
 		}
 		stream << "(";
-		for(int i = 0; i < args.size(); i++) {
+		for(size_t i = 0; i < args.size(); i++) {
 			if(args[i]->isEllipsis()) stream << "...";
 			else {
 				stream << getIDLType(args[i]->getType(), args[i], true);

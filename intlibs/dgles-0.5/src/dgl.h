@@ -440,7 +440,7 @@ struct DGL
 	void (CALLTYPE *glPointParameterfv)(GLenum, const GLfloat *);
 };
 
-void *_dgles_platform_open();
+void *_dgles_platform_open(void);
 void _dgles_platform_close(void *);
 void *_dgles_platform_sym(void *, const char *);
 

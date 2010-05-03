@@ -1755,16 +1755,18 @@ namespace Base {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
-	int maTest(int a, int b, int c, int d, int e) {
+	static int maTest(int a, int b, int c, int d, int e) {
 		a = a + b + c + d;
 		return a;
 	}
 
+#ifdef _MSC_VER
 	static double atanh(double x) {
 		double d = (1+x) / (1-x);
 		d = 0.5 * log(d);
 		return d;
 	}
+#endif
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
@@ -2135,8 +2137,8 @@ maIOCtl_glPointSizex_case(glPointSizex);
 
 		// can't blit all at once; result is upside-down.
 		for(int i=0, dy=CAMERA_HEIGHT-1; i<gBackBuffer->h; i++, dy--) {
-			SDL_Rect src = { 0,i, gBackBuffer->w, 1 };
-			SDL_Rect dst = { 0,dy, gBackBuffer->w, 1 };
+			SDL_Rect src = { 0,(Sint16)i, (Sint16)gBackBuffer->w, 1 };
+			SDL_Rect dst = { 0,(Sint16)dy, (Sint16)gBackBuffer->w, 1 };
 			DEBUG_ASRTZERO(SDL_BlitSurface(gBackBuffer, &src, dib_surface, &dst));
 		}
 
@@ -2150,8 +2152,10 @@ maIOCtl_glPointSizex_case(glPointSizex);
 
 		// at this point, hmem contains the entire data in memory stored in fif format.
 		// the amount of space used by the memory is equal to file_size
+#ifdef DEBUGGING_MODE
 		long file_size = FreeImage_TellMemory(hmem);
 		LOGD("File size : %ld\n", file_size);
+#endif
 
 		DWORD data_size;
 		BYTE* data;

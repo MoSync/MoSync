@@ -8,7 +8,7 @@ static int get_type_size(GLenum type)
 	{
 	default:
 		assert(!"bad");
-		return 0;
+		//return 0;
 	case GL_UNSIGNED_BYTE: return sizeof(GLubyte);
 	case GL_BYTE: return sizeof(GLbyte);
 	case GL_UNSIGNED_SHORT: return sizeof(GLushort);

@@ -294,6 +294,9 @@ class DirTask < FileTask
 end
 
 # A Task for copying a file.
+# Don't copy if destination file already exists and is indentical to source.
+# Make this check only if the existance and date check fails.
+# This will make big rebuilds faster, as fewer dependencies will be changed.
 class CopyFileTask < FileTask
 	# name is a String, the destination filename.
 	# src is a FileTask, the source file.
@@ -304,7 +307,11 @@ class CopyFileTask < FileTask
 		@prerequisites += [src] + preq
 	end
 	def execute
-		puts "copy #{@src} #{@NAME}"
-		FileUtils.copy_file(@src, @NAME, true)
+		if(FileUtils.compare_file(@src, @NAME))
+			puts "Files are identical, not copying."
+		else
+			puts "copy #{@src} #{@NAME}"
+			FileUtils.copy_file(@src, @NAME, true)
+		end
 	end
 end

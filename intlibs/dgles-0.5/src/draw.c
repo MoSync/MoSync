@@ -427,10 +427,10 @@ clean_up:
 		free(nconv);
 
 	{
-		unsigned int i;
-		for (i = 0; i < state.max_texture_units; i++)
-			if (tconv[i])
-				free(tconv[i]);
+		unsigned int u;
+		for (u = 0; u < state.max_texture_units; u++)
+			if (tconv[u])
+				free(tconv[u]);
 	}
 
 	return err;

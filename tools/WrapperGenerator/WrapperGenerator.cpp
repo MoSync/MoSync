@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdarg.h>
 #include <stdio.h>
 #include <fstream>
+#include <stdlib.h>
 
 #include "Parser.h"
 #include "IDLBackend.h"
@@ -33,7 +34,7 @@ namespace System  {
 	void error(const char* fmt, ...) {
 		va_list argptr;
 		va_start(argptr, fmt);
-		int res = vprintf(fmt, argptr);
+		vprintf(fmt, argptr);
 		va_end(argptr);
 
 		exit(1);
@@ -43,16 +44,15 @@ namespace System  {
 		va_list argptr;
 		va_start(argptr, fmt);
 		char str[1024];
-		int res = vsprintf(str, fmt, argptr);
+		vsprintf(str, fmt, argptr);
 		va_end(argptr);
-		printf("%s\n", str);
 		return str;
 	}
 
 	void split(const std::string& str, const std::string& delim, std::vector<std::string>& output)
 	{
 		int offset = 0;
-		int delimIndex = 0;
+		size_t delimIndex = 0;
 
 		output.clear();
 		if(str.length() == 0) return;
@@ -73,7 +73,7 @@ namespace System  {
 	void parseAttributes(const std::string& str, map<string, string>& attr) {
 		vector<string> output;
 		System::split(str, " ", output);
-		for(int i = 0; i < output.size(); i++) {
+		for(size_t i = 0; i < output.size(); i++) {
 			string attribute = output[i];
 			if(attribute.find("gccxml") != string::npos) {
 				attribute = attribute.substr(7, attribute.length()-7-1);
