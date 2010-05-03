@@ -27,6 +27,8 @@ import android.graphics.*;
 import android.os.Handler;
 import android.os.Process;
 import android.os.AsyncTask;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import android.view.SurfaceView;
 
@@ -34,6 +36,8 @@ import android.view.SurfaceHolder;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources.NotFoundException;
@@ -144,13 +148,15 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	
 	private int mBatteryCharge;
 	
+	public boolean mNoReload;
+	
 	public MoSyncView(Context context) throws Exception
 	{
 		super(context);
-		//setId(17);
 		
 		mContext = context;
 		mBatteryCharge = -1;
+		mNoReload = false;
 		
 		// register our interest in hearing about changes to our surface
 		mSurfaceHolder = getHolder();
@@ -420,5 +426,4 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	{
 		return mBatteryCharge;
 	}
-	
 }

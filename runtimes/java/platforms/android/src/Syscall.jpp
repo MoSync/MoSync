@@ -40,6 +40,7 @@ import android.os.Looper;
 import android.os.Handler;
 import android.os.Message;
 */
+import android.os.Bundle;
 import android.os.Vibrator;
 /*
 import android.location.Location;
@@ -49,6 +50,11 @@ import android.location.LocationProvider;
 import android.location.GpsStatus.Listener;
 */
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+
+import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.AssetManager;
 import android.content.res.AssetFileDescriptor;
@@ -79,17 +85,23 @@ final class Syscall
 #define IMPLEMENTS implements
 
 #if 0
-// Bluetooth
-IMPLEMENTS DiscoveryListener
-#undef IMPLEMENTS
-#define IMPLEMENTS ,
 
 
 // Location
 IMPLEMENTS LocationListener
 #undef IMPLEMENTS
 #define IMPLEMENTS ,
-#endif
+
+#endif // #if 0
+
+#if 0
+
+// Bluetooth
+IMPLEMENTS DiscoveryListener
+#undef IMPLEMENTS
+#define IMPLEMENTS ,
+
+#endif // #if 0
 
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 IMPLEMENTS MoSync
@@ -907,7 +919,7 @@ public
 			mDynamicResArray = new Object[mDynamicResArray.length * 2];
 			System.arraycopy(oldDynRes, 0, mDynamicResArray, 0, oldDynRes.length);
 		}
-		DEBUG(" - Handle :" + ((mDynamicSize+1) | DYNARES_BIT));
+		Log.i("maCreatePlaceholder"," - Handle :" + ((mDynamicSize+1) | DYNARES_BIT));
 		return (mDynamicSize++) | DYNARES_BIT;
 	}
 
@@ -1188,7 +1200,7 @@ public
 	}
 
 	SYSCALL(void) maPanic(int result, String message) throws Exception {
-		Log.i("Syscall","maPanic"+result+", \""+message+"\")\n");
+		Log.i("Syscall","maPanic "+result+", \""+message+"\"\n");
 		DEBUG("MoSync Syscall - maPanic("+result+", \""+message+"\")\n");
 #ifdef PUBLIC_DEBUG
 		int ip = -1;
@@ -1200,8 +1212,15 @@ public
 			}
 		}
 		MAPanicReport pr = new MAPanicReport();
-		pr.writePanicReport(mCore.mContext, REPORT_USER_PANIC, result, message, ip);
+		pr.writePanicReport(mCore.mContext, REPORT_USER_PANIC, result, message, ip);		
 #endif
+
+		mMoSyncView.mNoReload = true;
+		MoSyncPanicDialog.sMoSyncView = mMoSyncView;
+		MoSyncPanicDialog.sPanicMessage = message;
+		Intent myIntent = new Intent(mMoSyncView.getContext(), MoSyncPanicDialog.class);
+		mMoSyncView.getContext().startActivity(myIntent);
+
 #ifdef GDB_DEBUG
 		mCore.mGdbStub.exitHandler(result);
 #endif

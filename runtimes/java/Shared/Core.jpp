@@ -581,8 +581,9 @@ final public class Core {
 	{
 		mSyscall.resizeScreen(width, height);
 	}
-
 #endif
+
+
 
 	//***************************************************************************
 	//Syscalls
