@@ -32,6 +32,8 @@
 
 #include <helpers/CriticalSection.h>
 
+#include "iphone_helpers.h"
+
 using namespace Base;
 
 static MAHandle gReloadHandle = 0;
@@ -46,6 +48,8 @@ int MoSyncThreadMain(void *args) {
 	char program[] = "program";
 	char resources[] = "resources";
 
+	InitLog(getWriteablePath("log.txt"));
+	
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
 	
