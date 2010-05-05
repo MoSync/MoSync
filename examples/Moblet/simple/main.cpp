@@ -71,6 +71,7 @@ public:
 			case MAK_DOWN:
 				printf("Pressed down");
 				break;
+			case MAK_SOFTRIGHT:
 			case MAK_0:
 				maExit(0);
 			default:
