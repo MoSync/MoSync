@@ -28,8 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 */
 #include <ma.h>
-#include <mastdlib.h>
-#include <maassert.h>
+#include <conprint.h>
+
 #include "MAHeaders.h"
 
 extern "C" {
@@ -44,12 +44,17 @@ int MAMain()
 	/// play R_MOSO sound
 	maSoundPlay(R_MOSO, 0, maGetDataSize(R_MOSO));
 
-	/// clear the screen to black
-	maSetColor(0x0);
-	maFillRect(0, 0, EXTENT_X(e), EXTENT_Y(e));
-	maUpdateScreen();
+	printf("Press 0/RSK to exit.");
 
-	/// wait for key press or close event
-	FREEZE;
+	while(1) {
+		MAEvent event;
+		while(maGetEvent(&event)) {
+			if(event.type == EVENT_TYPE_CLOSE ||
+				(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_SOFTRIGHT)))
+			{
+				maExit(0);
+			}
+		}
+	}
 }
 }
