@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <mastring.h>
+#include <MAUtil/Geometry.h>
+
 #include "gui.h"
 
 static byte characterList[] = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
@@ -119,6 +121,40 @@ void Menu::show() {
 		sy+=ySize+2;
 	}
 }
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+int Menu::handlePointerPress(MAPoint2d point)
+{
+	int index = -1;
+	MAExtent me = maGetTextSize("A");
+	int sy;
+	sy = y;
+
+	int c;
+	for(int i = 0; i < menuItems.size(); i++) {
+		me = maGetTextSize(menuItems[i].c_str());
+		int xSize = EXTENT_X(me);
+		int ySize = EXTENT_Y(me);
+		int sx = x;
+
+		if(alignmentX == ALIGN_LEFT_X) {
+			sx = x+(xSize>>1);
+		}
+		else if(alignmentX == ALIGN_RIGHT_X) {
+			sx = x-(xSize>>1);
+		}
+
+		Rect bounds(sx-(xSize>>1), sy, xSize, ySize);
+		if(bounds.contains(point.x, point.y))
+		{
+			index = curSelMenuItem = i;
+			break;
+		}
+		sy+=ySize+2;
+	}
+	return index;
+}
+#endif	// MA_PROF_SUPPORT_STYLUS
 
 void Menu::update() {
 	if(EventHandler::updated) {

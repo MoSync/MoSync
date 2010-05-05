@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
+#include <maprofile.h>
+
 #include "event.h"
 
 using namespace MAUtil;
@@ -62,6 +64,10 @@ public:
 	int getCurrentlySelectedMenuIndex();
 	void show();
 	void update();
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+	int handlePointerPress(MAPoint2d point);
+#endif	// MA_PROF_SUPPORT_STYLUS
 
 private:
 	int curSelMenuItem;

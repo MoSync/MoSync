@@ -30,12 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <mastring.h>
 #include <mavsprintf.h>
-#include "MAHeaders.h"
-
+#include <maprofile.h>
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
+#include <MAUtil/Geometry.h>
 
 #include "gui.h"
+#include "MAHeaders.h"
 
 using namespace MAUtil;
 
@@ -623,9 +624,86 @@ void updateField() {
 	}
 }
 
+#ifdef MA_PROF_SUPPORT_STYLUS
+void resetEventHandler() {
+	EventHandler::left_pressed = EventHandler::up_pressed = EventHandler::right_pressed = EventHandler::down_pressed = false;
+	EventHandler::left = EventHandler::up = EventHandler::right = EventHandler::down = false;
+
+	EventHandler::pointer_pressed = false;
+
+	EventHandler::lsk_pressed = false;
+	EventHandler::rsk_pressed = false;
+
+	EventHandler::point.x = -1;
+	EventHandler::point.y = -1;
+}
+#endif	// MA_PROF_SUPPORT_STYLUS
+
 char score[255];
 char rows[255];
 char level[255];
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+void showNavKeys(MAPoint2d point) {
+	MAExtent e = maGetScrSize();
+	int w = EXTENT_X(e);
+	int h = EXTENT_Y(e);
+
+	sprintf(score, "%d", curScore);
+	sprintf(rows, "%d", curRows);
+	sprintf(level, "%d", curLevel);
+
+	MAExtent ts = maGetTextSize(score);
+	MAExtent tr = maGetTextSize(rows);
+	MAExtent tl = maGetTextSize(level);
+
+	int x1 = (w>>1)+14;
+	int y1 = centerY - ((PLAY_FIELD_Y>>1)*brickSize) + (EXTENT_Y(ts)+EXTENT_Y(tr)+EXTENT_Y(tl))*2+4;
+	int x2 = (w>>1)+85;
+	int y2 = centerY - ((PLAY_FIELD_Y>>1)*brickSize)+(PLAY_FIELD_Y*brickSize);
+
+	drawOutLinedRect(x1, y1, x2, y2, BORDER_COLOR, BACKGROUND_COLOR);
+
+	MAExtent okSize = maGetImageSize(OK);
+	Point centerOk(x1+(x2-x1)/2, y1+(y2-y1)/2);
+	Rect rect(centerOk.x - EXTENT_X(okSize)/2, centerOk.y - EXTENT_Y(okSize)/2, EXTENT_X(okSize), EXTENT_Y(okSize));
+	maDrawImage(OK, rect.x, rect.y);
+	if(rect.contains(point.x, point.y) && EventHandler::pointer_pressed) {
+		resetEventHandler();
+		EventHandler::fire_pressed = EventHandler::fire = true;
+	}
+
+	MAExtent imgSize = maGetImageSize(UP);
+	rect = Rect(x1+(x2-x1-EXTENT_X(imgSize))/2, centerOk.y - EXTENT_Y(okSize)/2 - EXTENT_Y(imgSize), EXTENT_X(imgSize), EXTENT_Y(imgSize));
+	maDrawImage(UP, rect.x, rect.y);
+	if(rect.contains(point.x, point.y) && EventHandler::pointer_pressed) {
+		resetEventHandler();
+		EventHandler::up_pressed = EventHandler::up = true;
+	}
+
+	rect = Rect(x1+(x2-x1-EXTENT_X(imgSize))/2, centerOk.y + EXTENT_Y(okSize)/2, EXTENT_X(imgSize), EXTENT_Y(imgSize));
+	maDrawImage(DOWN, rect.x, rect.y);
+	if(rect.contains(point.x, point.y) && EventHandler::pointer_pressed) {
+		resetEventHandler();
+		EventHandler::down_pressed = EventHandler::down = true;
+	}
+
+	imgSize = maGetImageSize(LEFT);
+	rect = Rect(centerOk.x - EXTENT_X(okSize)/2 - EXTENT_X(imgSize), y1+(y2-y1-EXTENT_Y(imgSize))/2, EXTENT_X(imgSize), EXTENT_Y(imgSize));
+	maDrawImage(LEFT, rect.x, rect.y);
+	if(rect.contains(point.x, point.y) && EventHandler::pointer_pressed) {
+		resetEventHandler();
+		EventHandler::left_pressed = EventHandler::left = true;
+	}
+
+	rect = Rect(centerOk.x + EXTENT_X(okSize)/2, y1+(y2-y1-EXTENT_Y(imgSize))/2, EXTENT_X(imgSize), EXTENT_Y(imgSize));
+	maDrawImage(RIGHT, rect.x, rect.y);
+	if(rect.contains(point.x, point.y) && EventHandler::pointer_pressed) {
+		resetEventHandler();
+		EventHandler::right_pressed = EventHandler::right = true;
+	}
+}
+#endif	// MA_PROF_SUPPORT_STYLUS
 
 void showScore() {
 	MAExtent e = maGetScrSize();
@@ -641,7 +719,11 @@ void showScore() {
 	MAExtent tl = maGetTextSize(level);
 
 	int x = (w>>1)+14;
+#ifdef MA_PROF_SUPPORT_STYLUS
+	int y = centerY - ((PLAY_FIELD_Y>>1)*brickSize);
+#else	// MA_PROF_SUPPORT_STYLUS
 	int y = (h>>1)-EXTENT_Y(ts)*2 - 2*(EXTENT_Y(tr)>>1);
+#endif	// MA_PROF_SUPPORT_STYLUS
 
 	drawOutLinedRect(x, y, (w>>1)+85, y+(EXTENT_Y(ts)+EXTENT_Y(tr)+EXTENT_Y(tl))*2, BORDER_COLOR, BACKGROUND_COLOR);
 
@@ -681,6 +763,25 @@ class MainMenuListener : public MenuListener {
 					break;
 			}
 		}
+#ifdef MA_PROF_SUPPORT_STYLUS
+		if(EventHandler::pointer_pressed) {
+			pushGameMode(MENU_INIT);
+			switch(menu->handlePointerPress(EventHandler::point)) {
+				case 0: // new game
+					curGameMode = GAME_INIT;
+					break;
+				case 1: // show high score
+					curGameMode = HIGH_SCORE_INIT;
+					break;
+				case 2:
+					curGameMode = GAME_SETTINGS_INIT;
+					break;
+				case 3: // quit game
+					curGameMode = GAME_QUIT;
+					break;
+			}
+		}
+#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
@@ -706,6 +807,28 @@ class PauseMenuListener : public MenuListener {
 					break;
 			}
 		}
+#ifdef MA_PROF_SUPPORT_STYLUS
+		if(EventHandler::pointer_pressed) {
+			pushGameMode(MENU_INIT);
+			switch(menu->handlePointerPress(EventHandler::point)) {
+				case 0: // resume game
+					curGameMode = GAME_RESUME;
+					break;
+				case 1: // new game
+					curGameMode = GAME_INIT;
+					break;
+				case 2: // show high score
+					curGameMode = HIGH_SCORE_INIT;
+					break;
+				case 3:
+					curGameMode = GAME_SETTINGS_INIT;
+					break;
+				case 4: // quit game
+					curGameMode = GAME_QUIT;
+					break;
+			}
+		}
+#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
@@ -716,7 +839,11 @@ int curSettingsMode = SETTINGS_CHOOSER;
 class SetNameEditBoxListener : public EditBoxListener {
 
 	void onEvent(EditBox *editBox) {
-		if(EventHandler::fire_pressed)
+		if(EventHandler::fire_pressed
+#ifdef MA_PROF_SUPPORT_STYLUS
+			|| EventHandler::pointer_pressed
+#endif	// MA_PROF_SUPPORT_STYLUS
+		)
 		{
 			curSettings.userName[0] = 0;
 			strncpy(curSettings.userName, (char*)editBox->getCurrentText(), MAX_USER_NAME);
@@ -744,21 +871,40 @@ class SettingsMenuListener : public MenuListener, public EditBoxListener {
 
 	void onEvent(int index, Menu *menu) {
 		if(EventHandler::fire_pressed) {
-			const char *menuItem = menu->getCurrentlySelectedMenuItem().c_str();
-			if(!strcmp("set name", menuItem)) { // set name
-				curSettingsMode = SETTINGS_SET_NAME;
-				curGameMode = GAME_SETTINGS_INIT;
-			}
-			else if(!strcmp("go back", menuItem)) { // go back
+			switch(menu->getCurrentlySelectedMenuIndex()) {
+				case 0: // resume game
+					curSettingsMode = SETTINGS_SET_NAME;
+					curGameMode = GAME_SETTINGS_INIT;
+					break;
+				case 1: // new game
 					popGameMode();
+					break;
 			}
 		}
+#ifdef MA_PROF_SUPPORT_STYLUS
+		if(EventHandler::pointer_pressed) {
+			pushGameMode(MENU_INIT);
+			switch(menu->handlePointerPress(EventHandler::point)) {
+			case 0: // resume game
+				curSettingsMode = SETTINGS_SET_NAME;
+				curGameMode = GAME_SETTINGS_INIT;
+				break;
+			case 1: // new game
+				popGameMode();
+				break;
+			}
+		}
+#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 };
 
 class HighScoreListListener : public MenuListener {
 	void onEvent(int index, Menu *menu) {
-		if(EventHandler::fire_pressed) {
+		if(EventHandler::fire_pressed
+#ifdef MA_PROF_SUPPORT_STYLUS
+			|| EventHandler::pointer_pressed
+#endif	// MA_PROF_SUPPORT_STYLUS
+		) {
 			popGameMode();
 		}
 	}
@@ -768,7 +914,7 @@ void showHighScore() {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
 
-	sprintf(score, "high score: %d", curSettings.curHighScore);
+	sprintf(score, "High score: %d", curSettings.curHighScore);
 
 	int x = (w>>1);
 	int y = beneathLogoY+HIGH_SCORE_OFFSET;
@@ -784,7 +930,7 @@ void updateHighScore() {
 
 void showGameOver() {
 
-	const char *gameover_str = "game over";
+	const char *gameover_str = "Game over";
 	MAExtent ge = maGetTextSize(gameover_str);
 
 	int x = centerX-(EXTENT_X(ge)>>1)-2;
@@ -923,23 +1069,23 @@ int MAMain()
 
 	beneathLogoY = (h>>1)+9-(PLAY_FIELD_Y>>1)*brickSize;
 	Menu mainMenu(TEXT_COLOR, SELECTED_TEXT_COLOR, w>>1, beneathLogoY + MENU_OFFSET, w, h, ALIGN_MID_X);
-	mainMenu.addMenuItem("new game");
-	mainMenu.addMenuItem("high score");
-	mainMenu.addMenuItem("settings");
-	mainMenu.addMenuItem("quit");
+	mainMenu.addMenuItem("New game");
+	mainMenu.addMenuItem("High score");
+	mainMenu.addMenuItem("Settings");
+	mainMenu.addMenuItem("Quit");
 	mainMenu.addMenuListener(new MainMenuListener());
 
 	Menu pauseMenu(TEXT_COLOR, SELECTED_TEXT_COLOR, w>>1, beneathLogoY + MENU_OFFSET, w, h, ALIGN_MID_X);
-	pauseMenu.addMenuItem("resume game");
-	pauseMenu.addMenuItem("new game");
-	pauseMenu.addMenuItem("high score");
-	pauseMenu.addMenuItem("settings");
-	pauseMenu.addMenuItem("quit");
+	pauseMenu.addMenuItem("Resume game");
+	pauseMenu.addMenuItem("New game");
+	pauseMenu.addMenuItem("High score");
+	pauseMenu.addMenuItem("Settings");
+	pauseMenu.addMenuItem("Quit");
 	pauseMenu.addMenuListener(new PauseMenuListener());
 
 	Menu settingsMenu(TEXT_COLOR, SELECTED_TEXT_COLOR, w>>1, beneathLogoY + MENU_OFFSET, w, h, ALIGN_MID_X);
-	settingsMenu.addMenuItem("set name");
-	settingsMenu.addMenuItem("go back");
+	settingsMenu.addMenuItem("Set name");
+	settingsMenu.addMenuItem("Go back");
 	settingsMenu.addMenuListener(new SettingsMenuListener());
 
 	EditBox setNameEditBox(w>>1, beneathLogoY+HIGH_SCORE_OFFSET, MAX_USER_NAME, TEXT_COLOR, 0x444444, ALIGN_MID_X, ALIGN_TOP_Y, "Enter a name: ");
@@ -964,6 +1110,13 @@ int MAMain()
 		else if(curGameMode == MENU_RUN) {
 			mainMenu.show();
 			mainMenu.update();
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+			if(EventHandler::pointer_pressed ||
+				EventHandler::pointer_released) {
+				mainMenu.handlePointerPress(EventHandler::point);
+			}
+#endif	// MA_PROF_SUPPORT_STYLUS
 		}
 		else if(curGameMode == PAUSE_MENU_INIT) {
 			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
@@ -989,6 +1142,10 @@ int MAMain()
 			if(curSettingsMode==SETTINGS_SET_NAME) {
 				setNameEditBox.show();
 				setNameEditBox.update();
+				if(EventHandler::rsk_pressed) {
+					curGameMode = GAME_SETTINGS_INIT;
+					curSettingsMode = SETTINGS_CHOOSER;
+				}
 			} else if(curSettingsMode==SETTINGS_CHOOSER) {
 				settingsMenu.show();
 				settingsMenu.update();
@@ -1009,6 +1166,10 @@ int MAMain()
 			clearPlayer();
 			renderPlayer();
 
+#ifdef MA_PROF_SUPPORT_STYLUS
+			showNavKeys(EventHandler::point);
+#endif	// MA_PROF_SUPPORT_STYLUS
+
 			if(EventHandler::up_pressed ||
 			   EventHandler::down_pressed ||
 			   EventHandler::left_pressed ||
@@ -1023,7 +1184,6 @@ int MAMain()
 			renderPlayer();
 
 			showScore();
-
 			/*
 			updateGravity();
 			checkBoard();
@@ -1040,7 +1200,11 @@ int MAMain()
 		maResetBacklight();
 		EventHandler::updateEvents();
 
-		if(EventHandler::star_pressed) {
+		if(curGameMode == GAME_RUN && (EventHandler::star_pressed
+#ifdef MA_PROF_SUPPORT_STYLUS
+			|| EventHandler::rsk_pressed
+#endif	// MA_PROF_SUPPORT_STYLUS
+		)) {
 			curGameMode = PAUSE_MENU_INIT;
 		}
 

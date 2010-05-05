@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <ma.h>
+
 #include "event.h"
 
 bool EventHandler::left_pressed =false;
@@ -36,8 +37,23 @@ bool EventHandler::updated =false;
 bool EventHandler::pound =false;
 bool EventHandler::star =false;
 
+#ifdef MA_PROF_SUPPORT_STYLUS
+bool EventHandler::lsk_pressed=false;
+bool EventHandler::rsk_pressed=false;
+
+bool EventHandler::lsk=false;
+bool EventHandler::rsk=false;
+
+bool EventHandler::pointer_pressed=false;
+bool EventHandler::pointer_released=false;
+MAPoint2d EventHandler::point;
+#endif	// MA_PROF_SUPPORT_STYLUS
+
 void EventHandler::updateEvents() {
 	left_pressed = right_pressed = up_pressed = down_pressed = fire_pressed = pound_pressed = star_pressed = false;
+#ifdef MA_PROF_SUPPORT_STYLUS
+	lsk_pressed = rsk_pressed = false;
+#endif	// MA_PROF_SUPPORT_STYLUS
 	updated = false;
 	MAEvent event;
 	/// update key states
@@ -80,6 +96,14 @@ void EventHandler::updateEvents() {
 			star = true;
 			star_pressed = true;
 			break;
+		case MAK_SOFTLEFT:
+			lsk = true;
+			lsk_pressed = true;
+			break;
+		case MAK_SOFTRIGHT:
+			rsk = true;
+			rsk_pressed = true;
+			break;
 		}
 		if(event.type == EVENT_TYPE_KEY_RELEASED) switch(event.key) {
 		case MAK_5:
@@ -108,6 +132,25 @@ void EventHandler::updateEvents() {
 		case MAK_STAR:
 			star = false;
 			break;
+		case MAK_SOFTLEFT:
+			lsk = false;
+			break;
+		case MAK_SOFTRIGHT:
+			rsk = false;
+			break;
 		}
+#ifdef MA_PROF_SUPPORT_STYLUS
+		if(event.type == EVENT_TYPE_POINTER_PRESSED) {
+			pointer_pressed = true;
+			point.x = event.point.x;
+			point.y = event.point.y;
+		}
+		if(event.type == EVENT_TYPE_POINTER_RELEASED) {
+			EventHandler::left = EventHandler::up = EventHandler::right = EventHandler::down = false;
+			pointer_pressed = false;
+			point.x = event.point.x;
+			point.y = event.point.y;
+		}
+#endif	// MA_PROF_SUPPORT_STYLUS
 	}
 }

@@ -18,12 +18,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
+#include <maprofile.h>
+
 class EventHandler {
 private:
 
 public:
 	static bool left_pressed, right_pressed, up_pressed, down_pressed, fire_pressed, pound_pressed, star_pressed;
 	static bool left, right, up, down, fire, pound, star;
+#ifdef MA_PROF_SUPPORT_STYLUS
+	static bool lsk_pressed, rsk_pressed;
+	static bool lsk, rsk;
+	static bool pointer_pressed, pointer_released;
+	static MAPoint2d point;
+#endif	// MA_PROF_SUPPORT_STYLUS
 	static bool quit;
 	static bool updated;
 

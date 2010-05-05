@@ -22,6 +22,21 @@
 .res MOTRIS_LOGO
 .image "motris_logo.png"
 
+.res LEFT
+.image "left.png"
+
+.res UP
+.image "up.png"
+
+.res RIGHT
+.image "right.png"
+
+.res DOWN
+.image "down.png"
+
+.res OK
+.image "ok.png"
+
 //.res MOTRIS_HIGH_SCORE
 //.placeholder
 .res MOTRIS_SETTINGS
