@@ -127,8 +127,9 @@ namespace HelloMap
 				mMap->scroll(SCROLLDIRECTION_SOUTH, false);
 			else
 				mMap->scroll(SCROLLDIRECTION_NORTH, false);
-
 		}
+		prevX = p.x;
+		prevY = p.y;
 	}
 
 	//-------------------------------------------------------------------------
