@@ -88,7 +88,7 @@ unsigned long long strtoull(const char *nptr, char **endptr, int base);
 * \return The converted character.
 */
 
-char ConvertUtf8ToLatin1(const char* utf8, int* pnBytes);
+char ConvertUtf8ToLatin1(const char* utf8, int* pnBytes) GCCATTRIB(deprecated);
 
 /**
 * Compares a UTF8 string with a Latin-1 string.
@@ -97,7 +97,7 @@ char ConvertUtf8ToLatin1(const char* utf8, int* pnBytes);
 * \return #TRUE if the strings matched, #FALSE otherwise
 */
 
-BOOL StringEqual_utf8_latin1(const char* utf8, const char* latin1);
+BOOL StringEqual_utf8_latin1(const char* utf8, const char* latin1) GCCATTRIB(deprecated);
 
 /**
 * Finds the first occurance of a character in a string

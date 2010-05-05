@@ -354,7 +354,8 @@ private:
 private:
 #define PIMIMPL_H
 #ifdef	__SERIES60_3X__
-#include "pimV3.h"
+#include "pimImpl.h"
+HashMap<PimItem> mPimItems;
 #else
 //#include "pimV2.h"
 #endif	//__SERIES60_3X__

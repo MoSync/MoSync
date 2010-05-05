@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <bluetooth/discovery.h>
 
+#include "pim.h"
+#include "helpers/CPP_IX_PIM.h"
+
 namespace Core {
 	class VMCore;
 }

@@ -198,12 +198,14 @@ namespace Base {
 	}
 
 	void Syscall::platformDestruct() {
+		gSyscall->pimClose();
 	}
 
 	//***************************************************************************
 	//Initialization
 	//***************************************************************************
 
+#ifdef MOBILEAUTHOR
 	//TODO: combine with MALibInit to avoid code duplication
 	bool MAMoSyncInit() {
 		char *mosyncDir = getenv("MOSYNCDIR");
@@ -261,8 +263,8 @@ namespace Base {
 		TEST_Z(gFont = TTF_OpenFont(destDir, 16));
 
 		return true;
-
 	}
+#endif
 
 	class MoSyncSkinListener : public MoRE::DeviceSkin::Listener {
 	public:
@@ -300,6 +302,8 @@ namespace Base {
 
 		TEST_NZ(TTF_Init());
 		atexit(TTF_Quit);
+
+		gSyscall->pimInit();
 
 		//openAudio();
 		AudioEngine::init();
@@ -1969,6 +1973,27 @@ namespace Base {
 			return maCameraStop();
 		case maIOCtl_maCameraSnapshot:
 			return maCameraSnapshot(a, b);
+
+		case maIOCtl_maPimListOpen:
+			return SYSCALL_THIS->maPimListOpen(a);
+		case maIOCtl_maPimListNext:
+			return SYSCALL_THIS->maPimListNext(a);
+		case maIOCtl_maPimListClose:
+			return SYSCALL_THIS->maPimListClose(a);
+		case maIOCtl_maPimItemCount:
+			return SYSCALL_THIS->maPimItemCount(a);
+		case maIOCtl_maPimItemGetField:
+			return SYSCALL_THIS->maPimItemGetField(a, b);
+		case maIOCtl_maPimItemFieldCount:
+			return SYSCALL_THIS->maPimItemFieldCount(a, b);
+		case maIOCtl_maPimItemGetAttributes:
+			return SYSCALL_THIS->maPimItemGetAttributes(a, b, c);
+		case maIOCtl_maPimFieldType:
+			return SYSCALL_THIS->maPimFieldType(a, b);
+		case maIOCtl_maPimItemGetValue:
+			return SYSCALL_THIS->maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
+		case maIOCtl_maPimItemClose:
+			return SYSCALL_THIS->maPimItemClose(a);
 
 		default:
 			return IOCTL_UNAVAILABLE;

@@ -14,10 +14,11 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
-#if 1
+
 #include "config_platform.h"
 
 #include "syscall.h"
+#include "pim.h"
 
 #include <cntitem.h>
 #include <cntfldst.h>
@@ -35,41 +36,6 @@ using namespace Base;
 #else
 #define DUMPLOG(a...)
 #endif
-
-//******************************************************************************
-// Base Classes
-//******************************************************************************
-
-class PimItem {
-public:
-	virtual ~PimItem() {}
-	
-	virtual int count() const = 0;
-	virtual int fieldId(int index) const = 0;
-	virtual int fieldCount(int field) const = 0;
-	virtual int attr(int field, int index) const = 0;
-	virtual int getValue(int field, int index, void* buf, int bufSize) const = 0;
-};
-
-class PimList {
-public:
-	virtual ~PimList() {}
-	
-	//returns a new PimItem, which must be deleted later.
-	//or NULL, if there are no more items.
-	virtual PimItem* next() = 0;
-	
-	virtual int type(int field) const = 0;
-};
-
-//******************************************************************************
-// Variables
-//******************************************************************************
-
-HashMap<PimList> mPimLists;
-int mPimListNextHandle = 1;
-HashMap<PimItem> mPimItems;
-int mPimItemNextHandle = 1;
 
 //******************************************************************************
 // Contacts
@@ -244,7 +210,8 @@ private:
 	int mAddr[ADDR_NUM], mName[NAME_NUM];
 	bool mHasAddr, mHasName;
 public:
-	ContactItem(TContactItemId id, const PimList* list) : mId(id), mItem(NULL), mList(list),
+	ContactItem(TContactItemId id, const PimList* list, const MAHandle plh)
+		: PimItem(plh), mId(id), mItem(NULL), mList(list),
 		mHasAddr(0), mHasName(0)
 	{
 		memset(mAddr, -1, sizeof(mAddr));
@@ -421,7 +388,7 @@ private:
 	
 	static int getText(void* buf, int bufSize, CContactTextField* tf) {
 		TPtrC ptrc = tf->Text();
-		int size = ptrc.Size() + 2;
+		int size = ptrc.Size() + sizeof(wchar);
 		if(bufSize >= size) {
 			memcpy(buf, ptrc.Ptr(), ptrc.Size());
 			*(wchar*)((byte*)buf + ptrc.Size()) = 0;
@@ -442,10 +409,10 @@ private:
 	{
 		MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
 		MYASSERT(has, ERR_MISSING_PIM_FIELD);
-		int size = 4;
+		int size = sizeof(int);
 		const CContactItemFieldSet& fs(mItem->CardFields());
 		for(int i=0; i<num; i++) {
-			size += 2;
+			size += sizeof(wchar);
 			if(arr[i] < 0)
 				continue;
 			const CContactItemField& f(fs[arr[i]]);
@@ -596,8 +563,9 @@ private:
 	CContactDatabase* mDb;
 	const CContactIdArray* mList;
 	int mPos;
+	const MAHandle mPlh;
 public:
-	ContactList() : mDb(NULL) {}
+	ContactList(MAHandle plh) : mDb(NULL), mPlh(plh) {}
 	void ConstructL() {
 		LTRAP(mDb = CContactDatabase::OpenL());
 		mList = mDb->SortedItemsL();
@@ -610,54 +578,12 @@ public:
 	virtual PimItem* next() {
 		if(mPos >= mList->Count())
 			return NULL;
-		ContactItem* ci = new (ELeave) ContactItem((*mList)[mPos++], this);
+		ContactItem* ci = new (ELeave) ContactItem((*mList)[mPos++], this, mPlh);
 		ci->ConstructL(mDb);
 		return ci;
 	}
-	//this function should be shared between platforms. move, don't copy.
 	int type(int field) const {
-		switch(field) {
-		case MA_PIM_FIELD_CONTACT_ADDR:
-			return MA_PIM_TYPE_STRING_ARRAY;
-		case MA_PIM_FIELD_CONTACT_BIRTHDAY:
-			return MA_PIM_TYPE_DATE;
-		case MA_PIM_FIELD_CONTACT_CLASS:
-			return MA_PIM_TYPE_INT;
-		case MA_PIM_FIELD_CONTACT_EMAIL:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_NAME:
-			return MA_PIM_TYPE_STRING_ARRAY;
-		case MA_PIM_FIELD_CONTACT_NICKNAME:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_NOTE:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_ORG:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_PHOTO:
-			return MA_PIM_TYPE_BINARY;
-		case MA_PIM_FIELD_CONTACT_PHOTO_URL:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
-			return MA_PIM_TYPE_BINARY;
-		case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_REVISION:
-			return MA_PIM_TYPE_DATE;
-		case MA_PIM_FIELD_CONTACT_TEL:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_TITLE:
-			return MA_PIM_TYPE_STRING;
-		case MA_PIM_FIELD_CONTACT_UID:
-			return MA_PIM_TYPE_INT;
-		case MA_PIM_FIELD_CONTACT_URL:
-			return MA_PIM_TYPE_STRING;
-		default:
-			return -1;
-		}
+		return pimContactFieldType(field);
 	}
 };
 
@@ -674,34 +600,10 @@ class EventList : public PimList {
 	}
 };
 
-//******************************************************************************
-// Helper functions
-//******************************************************************************
-
-void Syscall::pimInit() {
-	mPimListNextHandle = 1;
-	mPimItemNextHandle = 1;
-}
-
-void Syscall::pimClose() {
-	mPimItems.close();
-	mPimLists.close();
-}
-
-PimItem* Syscall::pimGetItem(MAHandle h) {
-	PimItem* pi = mPimItems.find(h);
-	MYASSERT(pi != NULL, ERR_INVALID_PIM_HANDLE);
-	return pi;
-}
-
-//******************************************************************************
-// Syscalls
-//******************************************************************************
-
 MAHandle Syscall::maPimListOpen(int listType) {
 	PimList* pl;
 	if(listType == MA_PIM_CONTACTS) {
-		ContactList* cl = new (ELeave) ContactList();
+		ContactList* cl = new (ELeave) ContactList(mPimListNextHandle);
 		cl->ConstructL();
 		pl = cl;
 	//} else if(listType == MA_PIM_EVENTS) {
@@ -712,69 +614,3 @@ MAHandle Syscall::maPimListOpen(int listType) {
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;
 }
-MAHandle Syscall::maPimListNext(MAHandle list) {
-	PimList* pl = mPimLists.find(list);
-	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
-	PimItem* pi = pl->next();
-	if(pi == NULL)
-		return 0;
-	mPimItems.insert(mPimItemNextHandle, pi);
-	return mPimItemNextHandle++;
-}
-int Syscall::maPimListClose(MAHandle list) {
-	mPimLists.erase(list);
-	return 0;
-}
-
-int Syscall::maPimItemCount(MAHandle item) {
-	PimItem* pi = pimGetItem(item);
-	return pi->count();
-}
-int Syscall::maPimItemGetField(MAHandle item, int index) {
-	PimItem* pi = pimGetItem(item);
-	MYASSERT(index < pi->count(), ERR_INVALID_PIM_FIELD_INDEX);
-	return pi->fieldId(index);
-}
-int Syscall::maPimItemFieldCount(MAHandle item, int field) {
-	PimItem* pi = pimGetItem(item);
-	return pi->fieldCount(field);
-}
-int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index) {
-	PimItem* pi = pimGetItem(item);
-	MYASSERT(index < pi->fieldCount(field), ERR_INVALID_PIM_VALUE_INDEX);
-	return pi->attr(field, index);
-}
-
-int Syscall::maPimFieldType(MAHandle list, int field) {
-	PimList* pl = mPimLists.find(list);
-	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
-	return pl->type(field);
-}
-
-#if 0
-struct MA_PIM_ARGS {
-	MAHandle item;
-	int field;
-	MAAddress buf;
-	int bufSize;
-}
-#endif
-int Syscall::maPimItemGetValue(MA_PIM_ARGS* args, int index) {
-	PimItem* pi = pimGetItem(args->item);
-	return pi->getValue(args->field, index,
-		GetValidatedMemRange((int)args->buf, args->bufSize), args->bufSize);
-}
-int Syscall::maPimItemClose(MAHandle item) {
-	mPimItems.erase(item);
-	return 0;
-}
-
-#if 0
-int Syscall::maPimItemSetValue(MA_PIM_ARGS* args, int index, int attributes);
-int Syscall::maPimItemAddValue(MA_PIM_ARGS* args, int attributes);
-int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index);
-
-MAHandle Syscall::maPimItemCreate(MAHandle list);
-int Syscall::maPimItemRemove(MAHandle list, MAHandle item);
-#endif
-#endif

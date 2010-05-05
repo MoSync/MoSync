@@ -196,6 +196,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\base\pim.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\base\pim.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\base\pimImpl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\base\ResourceArray.h"
 				>
 			</File>
@@ -599,6 +611,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\pimImpl.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\Platform.h"
 			>
 		</File>
@@ -636,6 +652,14 @@
 		</File>
 		<File
 			RelativePath=".\sdl_syscall.h"
+			>
+		</File>
+		<File
+			RelativePath=".\strptime.c"
+			>
+		</File>
+		<File
+			RelativePath=".\strptime.h"
 			>
 		</File>
 		<File

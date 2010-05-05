@@ -47,5 +47,4 @@ int maPimItemRemove(MAHandle list, MAHandle item);
 
 HashMap<PimList> mPimLists;
 int mPimListNextHandle;
-HashMap<Base::PimItem> mPimItems;
 int mPimItemNextHandle;

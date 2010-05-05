@@ -2670,6 +2670,8 @@ interface MAAPI {
 
 		/** Returns a handle to the next PimItem in the \a list, or 0 if there are no more items,
 		* or \< 0 on error.
+		*
+		* You must use maPimItemClose() on every item to prevent memory leaks.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
@@ -2721,11 +2723,19 @@ interface MAAPI {
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
+		// not implemented
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
 		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);
+
+		/**
+		* Closes the handle to a PimItem, releasing resources used by the system.
+		* Panics on invalid handles.
+		* Returns 0.
+		*/
 		int maPimItemClose(in MAHandle item);
 
+		// not implemented
 		MAHandle maPimItemCreate(in MAHandle list);
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM

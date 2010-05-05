@@ -147,6 +147,11 @@ cd %ORIGINAL_PATH%
 @xcopy %MOSYNC_TRUNK%\runtimes\java\platforms\android\mosync.keystore %MOSYNC_ETC_PATH%\ /y /D
 
 @echo ------------------------------------------------
+@echo Copying example contacts.xml
+@echo ------------------------------------------------
+@xcopy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_ETC_PATH%\ /y /D
+
+@echo ------------------------------------------------
 @echo Running OpenGL Wrapper generator.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _RESOURCE_DEFS_H_
 
 #include <SDL/SDL.h>
-#include "../../base/Stream.h"
+#include "Stream.h"
 
 #define TYPES(m)\
 	m(RT_BINARY, Base::Stream, delete)\

@@ -126,6 +126,11 @@ protected:
 	virtual void dispose(BasePair& pair) { delete (T*)pair.value; }
 };
 
+template<class T> class HashMapNoDelete : public HashMap<T> {
+protected:
+	virtual void dispose(HashMapBase::BasePair&) {}
+};
+
 // map of int to const string.
 // stores copies of the input strings. allocates and frees the storage needed.
 class StringMap : protected HashMap<const char> {

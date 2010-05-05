@@ -62,7 +62,9 @@ mod.class_eval do
 			"e_log.c" => " -Wno-float-equal",
 			"s_atan.c" => " -fno-strict-aliasing",
 			"e_atan2.c" => " -fno-strict-aliasing",
-			"e_asin.c" => " -fno-strict-aliasing"}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
+			"e_asin.c" => " -fno-strict-aliasing",
+			"mastdlib.c" => " -Wno-deprecated-declarations",
+			}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
 		
 		@INSTALL_INCDIR = "."
 		@IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]

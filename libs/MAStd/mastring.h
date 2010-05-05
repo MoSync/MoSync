@@ -268,7 +268,7 @@ BOOL memeq(const void* a, const void* b, int size);
 * Converts a single Latin-1 character to UTF-8.
 * Returns the number of bytes written to \a dst (1 or 2).
 */
-int ConvertLatin1ToUtf8(char* dst, int src);
+int ConvertLatin1ToUtf8(char* dst, int src) GCCATTRIB(deprecated);
 /**
 * Stores a string representation of \a a into the buffer pointed to by \a dst.
 * Returns strlen(dst).

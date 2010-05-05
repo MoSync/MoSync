@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #if 1
 #define LOG printf
 #else
-#define LOG(...) lprintf
+#define LOG(...) lprintf(__VA_ARGS__)
 
 int lprintf(const char* fmt, ...) {
 	va_list args;
@@ -149,6 +149,17 @@ static void dumpItem(MAHandle list, MAHandle item) {
 					int num = *(int*)buf;
 					const wchar* ptr = (wchar*)(buf + 4);
 					LOG("%i", num);
+#if 0
+					LOG("\n");
+					const wchar* t = ptr;
+					for(int i=0; i<num; ) {
+						if(*t == 0)
+							i++;
+						LOG(",%i", *t);
+						t++;
+					}
+					LOG("\n");
+#endif
 					for(int i=0; i<num; i++) {
 						LOG(",%S", ptr);
 						ptr += wcslen(ptr) + 1;

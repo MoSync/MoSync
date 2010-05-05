@@ -32,7 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-static char *readFileIntoMem(const char* filename, int *len) {
+char* readFileIntoMem(const char* filename, int* len) {
 	FILE *file = fopen(filename, "rb");
 	if(!file)
 		return NULL;

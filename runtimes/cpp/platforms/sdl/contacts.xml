@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contacts>
+	<contact>
+		<uid value="1" />
+		<name given="Some" family="Guy" />
+		<tel value="0763482039"	attr="mobile" />
+		<tel value="084728423" attr="work" />
+		<title value="Worker" />
+		<org value="MegaCorp" />
+		<email value="some.guy@megacorp.com" />
+		<addr street="Poor Street 42" postalcode="12345" locality="Mega City" country="Sweden" />
+	</contact>
+	<contact>
+		<addr pobox="Pobox" extra="Extra" street="Street" postalcode="92010" locality="Locality" region="Region" country="Country" />
+		<birthday value="1970-01-23" />
+		<email value="email@example.com" />
+		<name given="Given" family="Family" other="Other" prefix="Dr." suffix="M.D." />
+		<nickname value="Nickname" />
+		<note value="Note" attr="assistant,auto,other" />
+		<org value="Organization" />
+		<revision value="2010-04-30T16:04:39Z" />
+
+		<!--pretty sure most of these are mutually exclusive in reality-->
+		<tel value="007" attr="fax,home,mobile,work,pager,sms,preferred" />
+
+		<!--unsure of how valid this is-->
+		<tel value="000" />
+
+		<title value="Title" />
+		<uid value="2" />
+		<url value="http://www.example.com/" />
+	</contact>
+</contacts>

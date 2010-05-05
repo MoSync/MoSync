@@ -44,3 +44,8 @@ public:
 
 	Syscall(const STARTUP_SETTINGS&);
 	Syscall(int width, int height, const STARTUP_SETTINGS&);
+
+public:
+#define PIMIMPL_H
+#include "pimImpl.h"
+HashMapNoDelete<PimItem> mPimItems;

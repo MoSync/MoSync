@@ -25,6 +25,9 @@ SOURCE RSendAs_SMS.cpp
 SOURCE Client.cpp
 SOURCE pimV3.cpp
 
+SOURCEPATH ..\..\..\base
+SOURCE pim.cpp
+
 LIBRARY gdi.lib
 LIBRARY ecom.lib
 LIBRARY etel3rdparty.lib

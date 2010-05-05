@@ -122,6 +122,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef __SERIES60_3X__
 #include "RSendAs_SMS.h"
+#include "pim.h"
 #else	//Series 60, 2nd Ed.
 #include "RCondVar.h"
 #include "CSmsHandler.h"
@@ -177,7 +178,6 @@ private:
 
 class CDirScrAccEng;
 class CAppView;
-class PimItem;
 
 class FileList {
 public:

@@ -36,6 +36,9 @@ struct Skin {
 	std::string unselectedImage;
 };
 
+// returns a new char[], or NULL.
+char* readFileIntoMem(const char* filename, int* len);
+
 // returns true if succeeded, false if not
 bool parseConfig(const std::string& configPath);
 
