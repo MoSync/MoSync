@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <MAUtil/PlaceholderPool.h>
 #include <MAUtil/util.h>
+#include <maprofile.h>
 
 using namespace MAUtil;
 
@@ -51,9 +52,13 @@ public:
 				printf("Cache read failed: %i\n", res);
 			} else {
 				printf("Program cached (%i bytes).\n", maGetDataSize(mProgram));
+#ifdef MA_PROF_SUPPORT_STYLUS
+				printf("Tap screen or press fire to run.\n");
+#else	// MA_PROF_SUPPORT_STYLUS
 				printf("Press fire to run.\n");
+#endif	// MA_PROF_SUPPORT_STYLUS
 			}
-			printf("Press 6 to check for update.\n");
+			printf("Press 6/LSK to check for update.\n");
 			readLastModified();
 			mState = eReady;
 		} else {
@@ -86,6 +91,7 @@ private:
 
 	virtual void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
+		case MAK_SOFTRIGHT:
 		case MAK_0:
 			close();
 			break;
@@ -94,6 +100,7 @@ private:
 				maLoadProgram(mProgram, 1);
 			}
 			break;
+		case MAK_SOFTLEFT:
 		case MAK_6:
 			if(mState == eReady) {
 				mState = eIdle;
@@ -102,6 +109,14 @@ private:
 			break;
 		}
 	}
+
+#ifdef MA_PROF_SUPPORT_STYLUS
+	virtual void pointerPressEvent(MAPoint2d p) {
+		if(mState == eReady) {
+			maLoadProgram(mProgram, 1);
+		}
+	}
+#endif	// MA_PROF_SUPPORT_STYLUS
 
 	void startDownload() {
 		printf("Downloading from %s\n", URL);
@@ -117,7 +132,11 @@ private:
 	virtual void httpFinished(HttpConnection*, int result) {
 		if(result == 304) {	//Not Modified
 			printf("Program unchanged.\n");
+#ifdef MA_PROF_SUPPORT_STYLUS
+			printf("Tap screen or press Fire to run.\n");
+#else	// MA_PROF_SUPPORT_STYLUS
 			printf("Press Fire to run.\n");
+#endif	// MA_PROF_SUPPORT_STYLUS
 			mState = eReady;
 			return;
 		}
@@ -179,7 +198,11 @@ private:
 		}
 
 		printf("Program downloaded.\n");
+#ifdef MA_PROF_SUPPORT_STYLUS
+		printf("Tap screen or press Fire to run.\n");
+#else	// MA_PROF_SUPPORT_STYLUS
 		printf("Press Fire to run.\n");
+#endif	// MA_PROF_SUPPORT_STYLUS
 		mState = eReady;
 	}
 };
