@@ -121,6 +121,46 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
+	bool SoftKeyBar::handlePointerPress( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		Point p;
+		p.set(point.x, point.y);
+
+		if(getChildren()[0]->contains(p))	// LSK
+		{
+			if ( mLeftAction != NULL )
+			{
+				mLeftAction->perform();
+				return true;
+			}
+		}
+		else if(getChildren()[1]->contains(p))	// RSK
+		{
+			if ( mRightAction != NULL )
+			{
+				mRightAction->perform();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool SoftKeyBar::handlePointerMove( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool SoftKeyBar::handlePointerRelease( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
 	Action* SoftKeyBar::getLeftAction( ) const
 	//-------------------------------------------------------------------------
 	{

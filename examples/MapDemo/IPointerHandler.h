@@ -15,54 +15,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MENU_H_
-#define MENU_H_
+#ifndef IPOINTERHANDLER_H_
+#define IPOINTERHANDLER_H_
 
-#include <MAUI/ListBox.h>
-
-#include "ModalScreen.h"
-
-using namespace MapDemoUtil;
-
-namespace MapDemoUI 
+namespace MapDemoUI
 {
-	class IActionSource;
-	class SoftKeyBar;
-
 	//=========================================================================
+	// Interface
 	//
-	// Base class for menus
-	//
-	class Menu : public ModalScreen
+	class IPointerHandler
 	//=========================================================================
 	{
 	public:
-		Menu( IActionSource* source );
-		virtual ~Menu( );
-		//
-		// public methods
-		//
-		void triggerSelectedItem( );
-
-		//
-		// ModalScreen overrides
-		//
-		virtual bool handleKeyPress( int keyCode );
-		virtual bool handleKeyRelease( int keyCode );
-		virtual bool handlePointerPress( MAPoint2d point );
-		virtual bool handlePointerMove( MAPoint2d point );
-		virtual bool handlePointerRelease( MAPoint2d point );
-
-	protected:
-
-	private:
-		void updateSelection( );
-
-		Layout* mFrame;
-		ListBox* mListBox;
-		SoftKeyBar* mSoftKeys;
-		int mCurrent;
+		virtual bool handlePointerPress( MAPoint2d point ) = 0;
+		virtual bool handlePointerMove( MAPoint2d point ) = 0;
+		virtual bool handlePointerRelease( MAPoint2d point ) = 0;
 	};
 }
 
-#endif // MENU_H_
+#endif 	// IPOINTERHANDLER_H_

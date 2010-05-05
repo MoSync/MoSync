@@ -191,6 +191,57 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
+	void AppScreenBase::pointerPressEvent(MAPoint2d point)
+	//-------------------------------------------------------------------------
+	{
+		(void)handlePointerPress( point );
+	}
+
+	//-------------------------------------------------------------------------
+	void AppScreenBase::pointerMoveEvent(MAPoint2d point)
+	//-------------------------------------------------------------------------
+	{
+		(void)handlePointerMove( point );
+	}
+
+	//-------------------------------------------------------------------------
+	void AppScreenBase::pointerReleaseEvent(MAPoint2d point)
+	//-------------------------------------------------------------------------
+	{
+		(void)handlePointerRelease( point );
+	}
+
+	//-------------------------------------------------------------------------
+	bool AppScreenBase::handlePointerPress( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( mSoftKeyBar->handlePointerPress( point ) )
+			return true;
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool AppScreenBase::handlePointerMove( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( mSoftKeyBar->handlePointerMove( point ) )
+			return true;
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool AppScreenBase::handlePointerRelease( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( mSoftKeyBar->handlePointerRelease( point ) )
+			return true;
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
 	void AppScreenBase::messagePosted( MessageMgr* sender )
 	//-------------------------------------------------------------------------
 	{

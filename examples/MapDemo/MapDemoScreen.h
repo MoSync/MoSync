@@ -41,8 +41,18 @@ namespace MapDemo
 		
 		virtual ~MapDemoScreen( );
 
+		//
+		// Key handling
+		//
 		virtual bool handleKeyPress( int keyCode );
 		virtual bool handleKeyRelease( int keyCode );
+		//
+		// Pointer handling
+		//
+		virtual bool handlePointerPress( MAPoint2d point );
+		virtual bool handlePointerMove( MAPoint2d point );
+		virtual bool handlePointerRelease( MAPoint2d point );
+
 		virtual void enumerateActions( Vector<Action*>& list );
 
 	private:
@@ -50,6 +60,12 @@ namespace MapDemo
 
 		MapWidget* mMap;
 		MapSourceKind mMapSourceKind;
+
+		bool scrolling ;
+		int prevX;
+		int prevY;
+
+		int lastPointerPress;
 	};
 }
 

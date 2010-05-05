@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "AppFrame.h"
 #include "IActionSource.h"
 #include "IKeyHandler.h"
+#include "IPointerHandler.h"
 
 using namespace MAUI;
 using namespace MAUtil;
@@ -43,6 +44,7 @@ namespace MapDemoUI
 		IMessageListener, 
 		TimerListener, 
 		IKeyHandler, 
+		IPointerHandler,
 		public IActionSource
 	//=========================================================================
 	{
@@ -68,6 +70,9 @@ namespace MapDemoUI
 		//
 		void keyPressEvent( int keyCode, int nativeCode );
 		void keyReleaseEvent( int keyCode, int nativeCode );
+		void pointerPressEvent(MAPoint2d point);
+	    void pointerMoveEvent(MAPoint2d point);
+	    void pointerReleaseEvent(MAPoint2d point);
 		//
 		// IMessageListener implementation
 		//
@@ -81,6 +86,12 @@ namespace MapDemoUI
 		//
 		virtual bool handleKeyPress( int keyCode );
 		virtual bool handleKeyRelease( int keyCode );
+		//
+		// IPointerHandler implementation
+		//
+		virtual bool handlePointerPress( MAPoint2d point );
+		virtual bool handlePointerMove( MAPoint2d point );
+		virtual bool handlePointerRelease( MAPoint2d point );
 		//
 		// IActionSource implementation
 		//

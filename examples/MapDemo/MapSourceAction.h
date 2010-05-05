@@ -15,54 +15,51 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#ifndef MENU_H_
-#define MENU_H_
+#ifndef MAPSOURCEACTION_H_
+#define MAPSOURCEACTION_H_
 
-#include <MAUI/ListBox.h>
+#include "Action.h"
+#include <MAP/MapWidget.h>
+#include <MAP/MemoryMgr.h>
 
-#include "ModalScreen.h"
+using namespace MapDemoUI;
+using namespace MAP;
 
-using namespace MapDemoUtil;
-
-namespace MapDemoUI 
+namespace MapDemo
 {
-	class IActionSource;
-	class SoftKeyBar;
-
 	//=========================================================================
 	//
-	// Base class for menus
+	// Repositions map of a MapWidget to the specified location
 	//
-	class Menu : public ModalScreen
+	class MapSourceAction: public Action
 	//=========================================================================
 	{
 	public:
-		Menu( IActionSource* source );
-		virtual ~Menu( );
+		MapSourceAction( MapWidget* widget, MapSourceKind& kind, MapSourceKind mapSourceKind, const char* label );
+		
+		virtual	~MapSourceAction( );
 		//
-		// public methods
+		// Action overrides
 		//
-		void triggerSelectedItem( );
-
-		//
-		// ModalScreen overrides
-		//
-		virtual bool handleKeyPress( int keyCode );
-		virtual bool handleKeyRelease( int keyCode );
-		virtual bool handlePointerPress( MAPoint2d point );
-		virtual bool handlePointerMove( MAPoint2d point );
-		virtual bool handlePointerRelease( MAPoint2d point );
-
+		virtual const char* getShortName( ) const;
+		
+		virtual Action* clone( ) const 
+		{ 
+			return newobject( MapSourceAction, new MapSourceAction( mWidget, mKind, mMapSourceKind, mLabel ) );
+		}
+		
 	protected:
+		//
+		// Action protected overrides
+		//
+		virtual void performPrim( );
 
 	private:
-		void updateSelection( );
-
-		Layout* mFrame;
-		ListBox* mListBox;
-		SoftKeyBar* mSoftKeys;
-		int mCurrent;
+		MapWidget* mWidget;
+		MapSourceKind& mKind;
+		MapSourceKind mMapSourceKind;
+		const char* mLabel;
 	};
 }
 
-#endif // MENU_H_
+#endif // MAPSOURCEACTION_H_

@@ -66,9 +66,15 @@ namespace MapDemoUI
 		// Screen overrides
 		//
 		void keyPressEvent( int keyCode, int nativeCode ); // client can't override
-		
+
 		void keyReleaseEvent( int keyCode, int nativeCode ); // client can't override
-		
+
+		void pointerPressEvent(MAPoint2d point);
+
+		void pointerMoveEvent(MAPoint2d point);
+
+		void pointerReleaseEvent(MAPoint2d point);
+
 		virtual void show( );
 		
 		virtual void show( Screen* previous );
@@ -77,6 +83,12 @@ namespace MapDemoUI
 		//
 		virtual bool handleKeyPress( int keyCode ) = 0;
 		virtual bool handleKeyRelease( int keyCode ) = 0;
+		//
+		// IPointerHandler implementation
+		//
+		virtual bool handlePointerPress( MAPoint2d point ) = 0;
+		virtual bool handlePointerMove( MAPoint2d point ) = 0;
+		virtual bool handlePointerRelease( MAPoint2d point ) = 0;
 
 	protected:
 		int mWidth;

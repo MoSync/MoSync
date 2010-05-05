@@ -48,6 +48,12 @@ namespace MapDemoUI
 		virtual bool handleKeyPress( int keyCode );
 		virtual bool handleKeyRelease( int keyCode );
 		//
+		// Pointer handling
+		//
+		virtual bool handlePointerPress( MAPoint2d point );
+		virtual bool handlePointerMove( MAPoint2d point );
+		virtual bool handlePointerRelease( MAPoint2d point );
+		//
 		// Actions
 		//
 		virtual Action* getLeftAction( ) const;

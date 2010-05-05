@@ -165,6 +165,62 @@ namespace MapDemoUI
 	}
 
 	//-------------------------------------------------------------------------
+	bool Menu::handlePointerPress( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( ModalScreen::handlePointerPress( point ) )
+			return true;
+
+		if ( mSoftKeys->handlePointerPress( point ) )
+		{
+			return true;
+		}
+		else
+		{
+			Point p;
+			p.set(point.x, point.y);
+			for(int i = 0; i < mListBox->getChildren().size(); i++)
+			{
+				if(mListBox->getChildren()[i]->contains(p))
+				{
+					int index = mListBox->getSelectedIndex();
+					if( i == index )
+					{
+						handleKeyPress( MAK_FIRE );
+					}
+					else
+					{
+						mListBox->setSelectedIndex(i);
+					}
+					break;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool Menu::handlePointerMove( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( mSoftKeys->handlePointerMove( point ) )
+			return true;
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	bool Menu::handlePointerRelease( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( mSoftKeys->handlePointerRelease( point ) )
+			return true;
+
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
 	void Menu::updateSelection( )
 	//-------------------------------------------------------------------------
 	{

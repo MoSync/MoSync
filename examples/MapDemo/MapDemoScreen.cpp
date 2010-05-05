@@ -15,9 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include <mastdlib.h>
+
 #include "MapDemoScreen.h"
 #include "ExitAction.h"
 #include "MapLocationAction.h"
+#include "MapSourceAction.h"
 #include "AppStyleMgr.h"
 
 namespace MapDemo
@@ -42,7 +45,9 @@ namespace MapDemo
 
 	//-------------------------------------------------------------------------
 	MapDemoScreen::MapDemoScreen( MobletEx* moblet ) :
-		AppScreen( moblet )
+		AppScreen( moblet ),
+		scrolling( false ),
+		lastPointerPress( -1 )
 	//-------------------------------------------------------------------------
 	{
 		//
@@ -97,6 +102,68 @@ namespace MapDemo
 	}
 
 	//-------------------------------------------------------------------------
+	bool MapDemoScreen::handlePointerPress( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( AppScreen::handlePointerPress( point ) )
+			return true;
+
+		prevX = point.x;
+		prevY = point.y;
+
+		int curTime = maGetMilliSecondCount();
+		int deltaTime = curTime - lastPointerPress;
+
+		if(deltaTime < 200)
+		{
+			maExit(0);
+		}
+		else
+		{
+			lastPointerPress = curTime;
+		}
+	}
+
+	//-------------------------------------------------------------------------
+	bool MapDemoScreen::handlePointerMove( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( AppScreen::handlePointerMove( point ) )
+			return true;
+
+		if(scrolling) return false;
+		int dx = point.x - prevX;
+		int dy = point.y - prevY;
+
+		if(abs(dx) > abs(dy))
+		{
+			// mostly moving horizontally
+			if(dx < 0)
+				mMap->scroll(SCROLLDIRECTION_EAST, false);
+			else
+				mMap->scroll(SCROLLDIRECTION_WEST, false);
+		}
+		else
+		{
+			// mostly moving vertically
+			if(dy < 0)
+				mMap->scroll(SCROLLDIRECTION_SOUTH, false);
+			else
+				mMap->scroll(SCROLLDIRECTION_NORTH, false);
+		}
+	}
+
+	//-------------------------------------------------------------------------
+	bool MapDemoScreen::handlePointerRelease( MAPoint2d point )
+	//-------------------------------------------------------------------------
+	{
+		if ( AppScreen::handlePointerRelease( point ) )
+			return true;
+
+		scrolling = false;
+	}
+
+	//-------------------------------------------------------------------------
 	void MapDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
@@ -114,6 +181,12 @@ namespace MapDemo
 	{
 		// add my actions
 		list.add( newobject( MapLocationAction, new MapLocationAction( mMap, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_OpenStreetMap, "OpenStreetMap" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleMap, "Google (map)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleAerial, "Google (aerial)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleHybrid, "Google (hybrid)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade1, "CloudMade (type 1)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade7, "CloudMade (type 7)" ) ) );
 		list.add( newobject( ExitAction, new ExitAction( mMoblet ) ) );
 	}
 }
