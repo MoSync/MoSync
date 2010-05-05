@@ -150,6 +150,7 @@ public:
 					velocity = FIRE_VELOCITY;
 				}
 				break;
+			case MAK_SOFTRIGHT:
 			case MAK_0:
 				maExit(0);
 			default:
