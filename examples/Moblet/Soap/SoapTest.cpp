@@ -90,6 +90,7 @@ public:
 
 	void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
+		case MAK_SOFTRIGHT:
 		case MAK_0:
 			maExit(0);
 		}
