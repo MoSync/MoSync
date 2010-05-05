@@ -50,6 +50,7 @@ public:
 			case MAK_RIGHT: dirx = 1;	break;
 			case MAK_UP:	diry = -1;	break;
 			case MAK_DOWN:	diry = 1;	break;
+			case MAK_SOFTRIGHT:
 			case MAK_0:
 				maExit(0);
 			default:
