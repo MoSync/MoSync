@@ -63,7 +63,7 @@ public:
 	}
 
 	void keyPressEvent(int keyCode, int nativeCode) {
-		if(keyCode == MAK_0)
+		if(keyCode == MAK_0 || keyCode == MAK_SOFTRIGHT)
 			maExit(0);
 	}
 
