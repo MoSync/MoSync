@@ -49,6 +49,9 @@ public:
 	 */
 	void keyPressEvent(int keyCode, int nativeCode);
 
+	void pointerPressEvent(MAPoint2d point);
+	void pointerReleaseEvent(MAPoint2d point);
+
 private:
 	Screen *previous;
 	ListBox* listBox;
@@ -56,6 +59,7 @@ private:
 
 	Clock *anaClock;
 	Clock *digClock;
+	Widget *softKeys;
 };
 
 #endif	//_CUSTOMSCREEN_H_

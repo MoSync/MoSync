@@ -42,10 +42,13 @@ public:
 	MainScreen();
 	~MainScreen();
 	void keyPressEvent(int keyCode, int nativeCode);
+	void pointerPressEvent(MAPoint2d point);
+	void pointerReleaseEvent(MAPoint2d point);
 private:
 	Vector<Screen*> screens;
 	ListBox* listBox;
 	Layout* layout;
+	Widget *softKeys;
 };
 
 class MyMoblet : public Moblet  {

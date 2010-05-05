@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/EditBox.h>
 
 EditBoxScreen::EditBoxScreen(Screen *previous) : previous(previous) {
-	mainLayout = createMainLayout("", "back");
+	mainLayout = createMainLayout("", "Back");
 	listBox = (ListBox*) mainLayout->getChildren()[0];
 
 	Label *label;
@@ -43,6 +43,8 @@ EditBoxScreen::EditBoxScreen(Screen *previous) : previous(previous) {
 	editBox->setDrawBackground(false);
 	label->addWidgetListener(this);
 	listBox->add(label);
+
+	softKeys = mainLayout->getChildren()[1];
 
 	this->setMain(mainLayout);
 }
@@ -80,4 +82,28 @@ void EditBoxScreen::keyPressEvent(int keyCode, int nativeCode) {
 				previous->show();
 				break;
 	}
+}
+
+void EditBoxScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(listBox->contains(p)) {
+		for(int i = 0; i < listBox->getChildren().size(); i++) {
+			if(listBox->getChildren()[i]->contains(p)) {
+				listBox->setSelectedIndex(i);
+				break;
+			}
+		}
+	}
+	else if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			// Do nothing
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	}
+}
+
+void EditBoxScreen::pointerReleaseEvent(MAPoint2d point) {
 }

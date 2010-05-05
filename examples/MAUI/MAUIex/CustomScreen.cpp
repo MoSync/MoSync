@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Util.h"
 
 CustomScreen::CustomScreen(Screen *previous) : previous(previous) {
-	mainLayout = createMainLayout("", "back");
+	mainLayout = createMainLayout("", "Back");
 	listBox = (ListBox*) mainLayout->getChildren()[0];
 	
 	digClock = new Clock(0, 0, scrWidth-PADDING*2, 32, listBox, gFont);
@@ -27,6 +27,8 @@ CustomScreen::CustomScreen(Screen *previous) : previous(previous) {
 
 	anaClock = new Clock(0, 0, scrWidth-PADDING*2, 128-32, listBox, 0);
 	anaClock->setType(Clock::ANALOGUE);
+
+	softKeys = mainLayout->getChildren()[1];
 
 	setMain(mainLayout);
 }
@@ -38,4 +40,20 @@ void CustomScreen::keyPressEvent(int keyCode, int nativeCode) {
 	if(keyCode == MAK_SOFTRIGHT) {
 		previous->show();
 	}
+}
+
+void CustomScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			// Do nothing
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	}
+}
+
+void CustomScreen::pointerReleaseEvent(MAPoint2d point) {
 }

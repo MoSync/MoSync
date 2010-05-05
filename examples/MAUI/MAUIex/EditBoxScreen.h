@@ -46,6 +46,10 @@ public:
 	 * with the UI.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode);
+
+	void pointerPressEvent(MAPoint2d point);
+	void pointerReleaseEvent(MAPoint2d point);
+
 	/**
 	 * Implementation of a \a WidgetListener callback, which
 	 * is notified whenever the selection state of a \a widget
@@ -65,6 +69,7 @@ private:
 	Screen *previous;
 	ListBox* listBox;
 	Layout* mainLayout;
+	Widget *softKeys;
 };
 
 

@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 ImageScreen::ImageScreen(Screen *previous) : previous(previous) {
 
 	mainLayout = new Layout(0, 0, scrWidth, scrHeight, NULL, 1, 2);
-	Widget *softKeys = createSoftKeyBar(30, "", "back");
+	softKeys = createSoftKeyBar(30, "", "Back");
 	Image *image = new Image(0, 0, scrWidth, scrHeight-softKeys->getHeight(), NULL, false, false, RES_IMAGE);
 	image->setSkin(gSkin);
 	image->setDrawBackground(true);
@@ -44,4 +44,20 @@ void ImageScreen::keyPressEvent(int keyCode, int nativeCode) {
 	if(keyCode == MAK_SOFTRIGHT) {
 		previous->show();
 	}
+}
+
+void ImageScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			// Do nothing
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	}
+}
+
+void ImageScreen::pointerReleaseEvent(MAPoint2d point) {
 }

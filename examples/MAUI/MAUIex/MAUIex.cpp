@@ -36,7 +36,7 @@ MainScreen::MainScreen() {
 	screens.add(new LayoutScreen(this));
 	screens.add(new CustomScreen(this));
 
-	layout = createMainLayout("select", "exit");
+	layout = createMainLayout("Select", "Exit");
 	listBox = (ListBox*) layout->getChildren()[0];
 
 	listBox->add(createLabel("Label / ListBox"));
@@ -44,6 +44,8 @@ MainScreen::MainScreen() {
 	listBox->add(createLabel("EditBox"));
 	listBox->add(createLabel("Layout"));
 	listBox->add(createLabel("Custom"));
+
+	softKeys = layout->getChildren()[1];
 
 	this->setMain(layout);
 }
@@ -78,6 +80,36 @@ void MainScreen::keyPressEvent(int keyCode, int nativeCode) {
 		moblet->close();
 		break;
 	}
+}
+
+void MainScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(listBox->contains(p)) {
+		for(int i = 0; i < listBox->getChildren().size(); i++) {
+			if(listBox->getChildren()[i]->contains(p)) {
+				int index = listBox->getSelectedIndex();
+				if(index == i) {
+					keyPressEvent(MAK_FIRE, 0);
+				}
+				else {
+					listBox->setSelectedIndex(i);
+				}
+				break;
+			}
+		}
+	}
+	else if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			keyPressEvent(MAK_SOFTLEFT, 0);
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	}
+}
+
+void MainScreen::pointerReleaseEvent(MAPoint2d point) {
 }
 
 void MyMoblet::keyPressEvent(int keyCode, int nativeCode) {
