@@ -25,7 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <mastdlib.h>
+#include <maprofile.h>
 #include <conprint.h>
+
 #include "MAHeaders.h"
 #include "lineobject.h"
 
@@ -238,13 +240,13 @@ int MAMain()
 				maSetDrawTarget(0);
 				maSetColor(0x081020);
 				maFillRect(0, 0, gScreenWidth, gScreenHeight);
-
+#ifdef MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
-				mode = 0;
-			} else if(event.type == EVENT_TYPE_POINTER_RELEASED) {
-				mode = 1;
+				mode ^= 1;
+#endif	// MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_CLOSE ||
-				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+				(event.type == EVENT_TYPE_KEY_PRESSED &&
+				(event.key == MAK_0|| event.key == MAK_SOFTRIGHT)))
 			{
 				run = false;
 				break;
