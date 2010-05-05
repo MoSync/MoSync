@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include;&quot;$(ProjectDir)../../../base&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)../../../&quot;;&quot;$(ProjectDir)../../sdl/&quot;;&quot;$(ProjectDir)../../../../../intlibs/&quot;;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include;&quot;$(ProjectDir)../../../base&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
