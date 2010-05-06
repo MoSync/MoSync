@@ -203,12 +203,20 @@ void mtxSaxStart(MTXSaxContext* context)
 
 bool mtxSaxFeed(MTXSaxContext* context, char* data)
 {
+	context->isWide = false;
 	return !!mtxFeed(&(context->inner), data);
 }
 
 bool mtxSaxFeedProcess(MTXSaxContext* context, char* data)
 {
+	context->isWide = false;
 	return !!mtxFeedProcess(&(context->inner), data);
+}
+
+bool mtxSaxFeedWide(MTXSaxContext* context, char* data, wchar_t* wideBuffer)
+{
+	context->isWide = true;
+	return !!mtxFeedWide(&(context->inner), data, wideBuffer);
 }
 
 void mtxSaxStop(MTXSaxContext* context)
@@ -235,7 +243,7 @@ void mtxSaxStop(MTXSaxContext* context)
 namespace Mtx
 {
 
-SaxContextBase::SaxContextBase():
+SaxContextBase::SaxContextBase() :
 	mMtxListener(NULL)
 {
 	mContext.userData = this;
@@ -244,6 +252,7 @@ SaxContextBase::SaxContextBase():
 	mContext.startElement = startElement;
 	mContext.endElement = endElement;
 	mContext.characters = characters;
+	mContext.dataRemains = dataRemains;
 	mContext.parseError = parseError;
 }
 
@@ -253,7 +262,8 @@ SaxContextBase::~SaxContextBase(void)
 		mtxSaxStop(&mContext);
 }
 
-SaxContext::SaxContext() {
+SaxContext::SaxContext()
+{
 	mContext.unicodeCharacter = unicodeCharacter;
 }
 
@@ -274,6 +284,19 @@ bool SaxContext::feedProcess(char* data)
 {
 	return mtxSaxFeedProcess(&mContext, data);
 }
+
+
+void SaxContextW::start(SaxListenerW& newSaxListener, MtxListener& newMtxListener)
+{
+	mSaxListenerW = &newSaxListener;
+	mMtxListener = &newMtxListener;
+	mtxSaxStart(&mContext);
+}
+bool SaxContextW::feed(char* data, wchar_t* wideBuffer)
+{
+	return mtxSaxFeedWide(&mContext, data, wideBuffer);
+}
+
 
 void SaxContextBase::stop(void)
 {

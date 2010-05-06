@@ -198,7 +198,7 @@ bool mtxSaxFeedProcess(MTXSaxContext* context, char* data);
 * \copydoc mtxFeedWide()
 * \see mtxSaxFeed()
 */
-int mtxSaxFeedWide(MTXContext* context, char* data, wchar_t* wideBuffer);
+bool mtxSaxFeedWide(MTXSaxContext* context, char* data, wchar_t* wideBuffer);
 
 /**
 * Stops parsing and frees any allocated memory.  Must be called either to stop

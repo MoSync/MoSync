@@ -60,7 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * \see http://www.w3.org/TR/xml11/ - The W3C Specification of XML 1.1 (online)
 * \see http://www.w3.org/TR/html401/sgml/entities.html#h-24.2 -
-* HTTP 4.01 character entity references, Latin-1 (online)
+* HTTP 4.01 character entity references (online)
 */
 
 #ifndef _MTXML_H_
