@@ -183,8 +183,9 @@ namespace Base {
 		
 		// init font
 		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
-
-		sUnicodeFont = CGFontCreateWithFontName(CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL));
+		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
+		sUnicodeFont = CGFontCreateWithFontName(str);
+		CFRelease(str);
 				
 		gDrawTarget = gBackbuffer;
 		
@@ -239,6 +240,12 @@ namespace Base {
 		CGContextRestoreGState(gDrawTarget->context);
 		CGContextSaveGState(gDrawTarget->context);
 		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
+		
+		gDrawTarget->mImageDrawer->clipRect.x = left;
+		gDrawTarget->mImageDrawer->clipRect.y = top;
+		gDrawTarget->mImageDrawer->clipRect.width = width;
+		gDrawTarget->mImageDrawer->clipRect.height = height;
+		
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
@@ -271,50 +278,71 @@ namespace Base {
 		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
 		currentBlue =  (float)((argb&0x000000ff))/255.0f;
 		
+		// hmmmm I don't know why I have to do this :)
+		realColor = (argb&0xff00ff00)|((argb&0x00ff0000)>>16)|((argb&0x000000ff)<<16);
+		
 		return oldColor;
 	}
 
 	SYSCALL(void, maPlot(int posX, int posY)) {
 		if(!gDrawTarget->data) DEBIG_PHAT_ERROR;
+		/*
 		CGRect cr = CGContextGetClipBoundingBox(gDrawTarget->context);
 		if(posX<cr.origin.x || posY<cr.origin.y || posX>cr.size.width || posY>cr.size.height) return;
 		int *p = (int*)&gDrawTarget->data[CGBitmapContextGetBytesPerRow(gDrawTarget->context)*posY+posX];
 		*p = currentColor;
+		*/
+		gDrawTarget->mImageDrawer->drawPoint(posX, posY, realColor);
 		   
 	}
 
 	SYSCALL(void, maLine(int x0, int y0, int x1, int y1)) {
+		/*
 		CGContextSetRGBStrokeColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextBeginPath(gDrawTarget->context);
 		CGContextMoveToPoint(gDrawTarget->context, x0, y0);
 		CGContextAddLineToPoint(gDrawTarget->context, x1, y1);
-		CGContextStrokePath(gDrawTarget->context);	}
+		CGContextStrokePath(gDrawTarget->context);	
+		*/
+		gDrawTarget->mImageDrawer->drawLine(x0, y0, x1, y1, realColor);
+	}
 
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
-		CGContextFillRect(gDrawTarget->context, CGRectMake(left, top, width, height));
-
+		//CGContextFillRect(gDrawTarget->context, CGRectMake(left, top, width, height));
+		gDrawTarget->mImageDrawer->drawFilledRect(left, top, width, height, realColor);
 	}
 
 	SYSCALL(void, maFillTriangleStrip(const MAPoint2d *points, int count)) {
 		SYSCALL_THIS->ValidateMemRange(points, sizeof(MAPoint2d) * count);
 		CHECK_INT_ALIGNMENT(points);
 		MYASSERT(count >= 3, ERR_POLYGON_TOO_FEW_POINTS);
-		NOT_IMPLEMENTED;
+		for(int i = 2; i < count; i++) {
+			gDrawTarget->mImageDrawer->drawTriangle(
+											 points[i-2].x,
+											 points[i-2].y,
+											 points[i-1].x,
+											 points[i-1].y,
+											 points[i].x,
+											 points[i].y,
+											 realColor);
+		}
 	}
-
+	
 	SYSCALL(void, maFillTriangleFan(const MAPoint2d *points, int count)) {
 		SYSCALL_THIS->ValidateMemRange(points, sizeof(MAPoint2d) * count);
 		CHECK_INT_ALIGNMENT(points);
 		MYASSERT(count >= 3, ERR_POLYGON_TOO_FEW_POINTS);
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
-		CGContextBeginPath(gDrawTarget->context);
-		CGContextMoveToPoint(gDrawTarget->context, points[0].x, points[0].y); 
-		for(int i = 1; i < count; i++) {
-			CGContextAddLineToPoint(gDrawTarget->context, points[i].x, points[i].y);
+		for(int i = 2; i < count; i++) {
+			gDrawTarget->mImageDrawer->drawTriangle(
+											 points[0].x,
+											 points[0].y,
+											 points[i-1].x,
+											 points[i-1].y,
+											 points[i].x,
+											 points[i].y,
+											 realColor);
 		}
-		CGContextClosePath(gDrawTarget->context);
-		CGContextFillPath(gDrawTarget->context);		
 	}
 
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
@@ -410,7 +438,10 @@ namespace Base {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
 		int width = CGImageGetWidth(img->image);
 		int height = CGImageGetHeight(img->image);
-
+		
+		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);	
+		
+		/*
 		if(img->context) {
 			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);		
 		} else {
@@ -420,6 +451,7 @@ namespace Base {
 			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);	
 			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
 		}
+		 */
 			
 	}
 
@@ -437,38 +469,22 @@ namespace Base {
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-   
+
+		int imgWidth = CGImageGetWidth(img->image);
+		int imgHeight = CGImageGetHeight(img->image);
+		CGRect newRect = CGRectMake(dstTopLeft->x-src->left, 0, imgWidth, imgHeight);
 		
-		// 0 is bottom in y-axis of pictures..
-		//CGRect smallRect = CGRectMake(src->left, CGImageGetHeight(img->image)-(src->top+src->height), src->width, src->height);
-		CGRect smallRect = CGRectMake(src->left, src->top, src->width, src->height);
-		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
-		//CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
-		CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
-		
-		
-		if(img->context) 
-		{
-			CGRect newRect = CGRectMake(dstTopLeft->x, dstTopLeft->y, src->width, src->height);
-			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);	
-		}
-		 else {
-			CGRect newRect = CGRectMake(dstTopLeft->x, 0, src->width, src->height);
-			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
-			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);			
-			CGContextDrawImage(gDrawTarget->context, newRect, smallImage);
-			CGContextTranslateCTM(gDrawTarget->context, 0, src->height+dstTopLeft->y);
-			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);	
-		}
-		
-		CGImageRelease(smallImage);
+		ClipRect srcRect;
+		srcRect.x = src->left;
+		srcRect.y = src->top;
+		srcRect.width = src->width;
+		srcRect.height = src->height;
+		gDrawTarget->mImageDrawer->drawImageRegion(dstTopLeft->x, dstTopLeft->y, &srcRect, img->mImageDrawer, transformMode);
 	}
 
 	SYSCALL(MAExtent, maGetImageSize(MAHandle image)) {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
-		int width = CGImageGetWidth(img->image);
-		int height = CGImageGetHeight(img->image);
-		return EXTENT(width, height);
+		return EXTENT(img->width, img->height);
 	}
 
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {

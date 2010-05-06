@@ -157,6 +157,10 @@ bool Image::hasData() {if(data==NULL) return false; return true;}
 bool Image::hasAlpha() {if(alpha==NULL) return false; return true;}
 
 void Image::calculateConstants() {
+	
+	alphaMask	= 0x0;
+	alphaShift	= 0;
+	
 	switch(pixelFormat) {
 		case PIXELFORMAT_RGB444:
 			redMask		= 0x0f00;
@@ -525,9 +529,9 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 							ascan = salpha;
 							int x = transWidth;
 							while(x--) {
-								int sr = (((*src_scan)&redMask)>>redShift);
-								int sg = (((*src_scan)&greenMask)>>greenShift);
-								int sb = (((*src_scan)&blueMask)>>blueShift);
+								int sr = (((*src_scan)&img->redMask)>>img->redShift);
+								int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
+								int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
 								int dr = (((*dst_scan)&redMask)>>redShift);
 								int dg = (((*dst_scan)&greenMask)>>greenShift);
 								int db = (((*dst_scan)&blueMask)>>blueShift);
@@ -568,18 +572,67 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	}
 	else
 	{
-		int dstOffsetY = -transWidth*bytesPerPixel + pitch;
-		int srcOffsetY = -srcPitchX*transWidth + srcPitchY;
-		while(transHeight--) {
-			width = transWidth;
-			while(width--) {
-				memcpy(dst, src, bytesPerPixel);
-				src+=srcPitchX;
-				dst+=bytesPerPixel;
-			}
-			dst+=dstOffsetY;
-			src+=srcOffsetY;
-		}	
+		if(img->alphaMask) {
+			switch(bpp) {
+				case 4:
+				{
+					srcPitchX>>=2;
+					unsigned int *src_scan;
+					unsigned int *dst_scan;
+					
+					while(transHeight--) {
+						src_scan = (unsigned int*)src;
+						dst_scan = (unsigned int*)dst;
+						int x = transWidth;
+						while(x--) {
+							int sr = (((*src_scan)&img->redMask)>>img->redShift);
+							int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
+							int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
+							int sa = (((*src_scan)&img->alphaMask)>>img->alphaShift);
+							
+							int dr = (((*dst_scan)&redMask)>>redShift);
+							int dg = (((*dst_scan)&greenMask)>>greenShift);
+							int db = (((*dst_scan)&blueMask)>>blueShift);
+							
+							if(sa == 255) {
+								*dst_scan = (((sr)<< redShift)&redMask) |
+								(((sg)<< greenShift)&greenMask) |
+								(((sb)<< blueShift)&blueMask);
+							} else if(sa == 0) {
+								*dst_scan = (((dr)<< redShift)&redMask) |
+								(((dg)<< greenShift)&greenMask) |
+								(((db)<< blueShift)&blueMask);									
+							} else {
+								*dst_scan = 
+								(((dr + (((sr-dr)*(sa))>>8)) << redShift)&redMask) |
+								(((dg + (((sg-dg)*(sa))>>8)) << greenShift)&greenMask) |
+								(((db + (((sb-db)*(sa))>>8)) << blueShift)&blueMask);
+							}
+							src_scan+=srcPitchX;
+							dst_scan++;
+						}
+						src += srcPitchY;
+						dst += pitch;
+					}	
+				}
+					break;
+				default:
+					BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
+			}			
+		} else {
+			int dstOffsetY = -transWidth*bytesPerPixel + pitch;
+			int srcOffsetY = -srcPitchX*transWidth + srcPitchY;
+			while(transHeight--) {
+				width = transWidth;
+				while(width--) {
+					memcpy(dst, src, bytesPerPixel);
+					src+=srcPitchX;
+					dst+=bytesPerPixel;
+				}
+				dst+=dstOffsetY;
+				src+=srcOffsetY;
+			}	
+		}
 	}
 }
 

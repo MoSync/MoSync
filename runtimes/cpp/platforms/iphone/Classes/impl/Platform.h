@@ -35,6 +35,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "ThreadPoolImpl.h"
 
+#include <base/Image.h>
+
 namespace Core {
 	class VMCore;
 }
@@ -45,7 +47,74 @@ extern bool gRunning;
 
 class Surface {
 public:
-	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
+	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {				
+		CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(image));
+		this->data = (char *)CFDataGetBytePtr(data);		
+		width = CGImageGetWidth(image);
+		height = CGImageGetHeight(image);
+		rowBytes = CGImageGetBytesPerRow(image);
+		rect = CGRectMake(0, 0, width, height);
+		mOwnData = true;
+
+		bool noAlpha = false;
+		int bpp = CGImageGetBitsPerPixel(image);
+		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
+	
+
+		if(bpp != 32) {
+			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+			this->data = new char[width*height*4];
+			rowBytes = width*4;
+			context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipLast);
+			CGContextSetAllowsAntialiasing(context, false);
+			CGContextSetBlendMode(context, kCGBlendModeCopy);
+		
+			//CGContextSaveGState(context);
+			//CGContextTranslateCTM(context, 0, height);
+			//CGContextScaleCTM(context, 1.0, -1.0);
+			CGContextDrawImage(context, rect, image);
+			//CGContextRestoreGState(context);
+			
+			CGColorSpaceRelease(colorSpace);
+			
+			//CGContextSaveGState(context);
+			
+			noAlpha = true;
+		}
+		
+		createImageDrawer();
+		
+		if((bInfo&kCGBitmapByteOrderMask)==kCGBitmapByteOrder32Host) {
+			mImageDrawer->redMask = 0x000000ff;
+			mImageDrawer->redShift = 0;		
+			mImageDrawer->greenMask = 0x00ff00;
+			mImageDrawer->greenShift = 8;		
+			mImageDrawer->blueMask = 0xff0000;
+			mImageDrawer->blueShift = 16;		
+			mImageDrawer->alphaMask = 0xff000000;
+			mImageDrawer->alphaShift = 24;			
+		}
+
+		if(noAlpha) {
+			mImageDrawer->alphaMask = 0;
+			mImageDrawer->alphaBits = 0;	
+		}
+	}
+	
+	void createImageDrawer() {
+		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
+		mImageDrawer = new Image((unsigned char*)data, NULL, width, height, rowBytes, Image::PIXELFORMAT_ARGB8888, false, false);
+	
+		/*
+		mImageDrawer->redMask = 0xff000000;
+		mImageDrawer->redShift = 24;		
+		mImageDrawer->greenMask = 0x00ff0000;
+		mImageDrawer->greenShift = 16;		
+		mImageDrawer->blueMask = 0x0000ff00;
+		mImageDrawer->blueShift = 8;		
+		mImageDrawer->alphaMask = 0x000000ff;
+		mImageDrawer->alphaShift = 0;		
+		 */
 	}
 	
 	void initFont() {
@@ -60,7 +129,7 @@ public:
 		CGContextSetTextMatrix(context, xform);	
 	}
 
-	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipFirst, int rowBytes=-1) {
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipLast, int rowBytes=-1) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		this->width = width,
 		this->height = height;
@@ -70,7 +139,7 @@ public:
 			this->rowBytes = rowBytes;
 
 		if(data==NULL) {
-			this->data = new char[rowBytes*height];
+			this->data = data = new char[rowBytes*height];
 			mOwnData = true;
 		}
 		else {
@@ -89,6 +158,8 @@ public:
 		//CGContextTranslateCTM(context, 0, height);
 		//CGContextScaleCTM(context, 1.0, -1.0);	
 		CGContextSetAllowsAntialiasing (context, false);
+		//CGContextSetInterpolationQuality(context, kCGInterpolationNone);
+		
 		rect = CGRectMake(0, 0, width, height);
 		
 		//CGContextSetRGBFillColor(context, 0, 0, 0, 1);
@@ -98,6 +169,13 @@ public:
 		initFont();
 		
 		CGContextSaveGState(context);
+		
+		createImageDrawer();	
+		
+		if(bitmapInfo==kCGImageAlphaNoneSkipLast) {
+			mImageDrawer->alphaMask = 0;
+			mImageDrawer->alphaBits = 0;		
+		}
 	}
 	
 	
@@ -105,6 +183,7 @@ public:
 		if(image) CGImageRelease(image);
 		if(context) CGContextRelease(context);
 		if(mOwnData && data) delete data;
+		if(mImageDrawer) delete mImageDrawer;
 	}
 	
 	int width, height, rowBytes;
@@ -113,6 +192,8 @@ public:
 	CGRect rect;
 	bool mOwnData;
 	char *data;
+	
+	Image *mImageDrawer;
 };
 
 
