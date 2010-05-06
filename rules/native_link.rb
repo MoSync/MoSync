@@ -31,11 +31,15 @@ class NativeGccLinkTask < FileTask
 		super(log)
 	end
 	
+	def cFlags
+		return "#{@objects.join(' ')}#{@FLAGS}"
+	end
+	
 	def execute
 		execFlags
 		#puts "objects: #{@objects.join(' ')}"
 		#puts "flags: #{@FLAGS}"
-		sh "g++ #{@objects.join(' ')}#{@FLAGS} -o #{@NAME}"
+		sh "g++ #{cFlags} -o #{@NAME}"
 	end
 	
 	include FlagsChanged

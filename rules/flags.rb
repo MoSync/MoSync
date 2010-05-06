@@ -16,6 +16,7 @@
 
 
 # This module contains functions for saving and comparing compile or link flags.
+# execFlags and flagsNeeded require the function "cFlags".
 module FlagsChanged
 	# Call from initialize.
 	def initFlags
@@ -30,16 +31,16 @@ module FlagsChanged
 	
 	# Call from execute.
 	def execFlags
-		if(@OLDFLAGS != @FLAGS) then
-			open(@FLAGSFILE, 'w') { |f| f.write(@FLAGS) }
-			@OLDFLAGS = @FLAGS
+		if(@OLDFLAGS != cFlags) then
+			open(@FLAGSFILE, 'w') { |f| f.write(cFlags) }
+			@OLDFLAGS = cFlags
 		end
 	end
 	
 	# Call from needed?.
 	def flagsNeeded?(log=true)
 		#puts "Oldflags: #{@OLDFLAGS.inspect} newflags: #{@FLAGS.inspect}"
-		if(@OLDFLAGS != @FLAGS)
+		if(@OLDFLAGS != cFlags)
 			puts "Because the flags have changed:" if(log)
 			#puts "Old: #{@OLDFLAGS}" if(log)
 			#puts "New: #{@FLAGS}" if(log)

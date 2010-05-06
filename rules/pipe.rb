@@ -40,15 +40,19 @@ class PipeTask < FileTask
 		return flagsNeeded?(log)
 	end
 	
+	def cFlags
+		return "#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
+	end
+	
 	def execute
 		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
-                        if(HOST == :linux && HOST_PLATFORM == :wine)
-                                sh "wine #{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
-                        else
-                                sh "#{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
-                        end
+			if(HOST == :linux && HOST_PLATFORM == :wine)
+				sh "wine #{mosyncdir}/bin/pipe-tool#{cFlags}"
+			else
+				sh "#{mosyncdir}/bin/pipe-tool#{cFlags}"
+			end
 		rescue => e
 			FileUtils.rm_f(@NAME)
 			raise
@@ -89,11 +93,11 @@ end
 class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
-        if(HOST == :linux && HOST_PLATFORM == :wine)
-                def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
-        else
-                def gcc; mosyncdir + "/bin/xgcc"; end
-        end
+	if(HOST == :linux && HOST_PLATFORM == :wine)
+		def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
+	else
+		def gcc; mosyncdir + "/bin/xgcc"; end
+	end
 	def gccmode; "-S"; end
 	def host_flags;
 		g = CONFIG == "" ? " -g" : ""
