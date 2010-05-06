@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "helpers/attribute.h"
 
@@ -66,6 +67,8 @@ static void printerr(const char* fmt, ...) {
 static int checkFile(FILE* file) {
 	char buf[MAX_LINE_LENGTH + 1];
 	int fill = 0;
+	int errorState = 0;
+	int lastLongLine = 0;
 
 	// read a line and check it, until we reach eof.
 	while(1) {
@@ -92,21 +95,29 @@ static int checkFile(FILE* file) {
 		if(eol == NULL) {
 			if(feof(file)) {
 				if(fill == 0)
-					return 0;
+					return errorState;
 				printerr("no newline at end of file");
 				return 1;
 			} else {
-				printerr("line too long (max: %i bytes)", MAX_LINE_LENGTH);
 				// todo: check the beginning of this line,
 				// then read until end-of-line and check it, too.
-				return 1;
+				// then we can continue.
+
+				// for now, we'll just skip to the end of the line;
+				// not check for further errors on this line.
+				if(lastLongLine != sLineNum) {
+					printerr("line too long (max: %i bytes)", MAX_LINE_LENGTH);
+					errorState |= 1;
+					lastLongLine = sLineNum;
+					fill = 0;
+					continue;
+				}
 			}
 		}
 
-		res = checkLine(buf, eol);
-		// todo: combine error values, to allow for reporting multiple errors per file.
-		if(res)
-			return res;
+		if(lastLongLine != sLineNum) {
+			errorState |= checkLine(buf, eol);
+		}
 
 		// move the next line to the beginning of the buffer
 		remains = eol + 1;
@@ -137,7 +148,7 @@ static int checkLine(const char* start, const char* eol) {
 		}
 		if(*ptr == '\r') {
 			printerr("CR detected");
-			return 1;
+			exit(1);
 		}
 		switch(state) {
 		case eBegin:
