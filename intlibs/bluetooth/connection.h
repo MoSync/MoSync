@@ -84,20 +84,6 @@ public:
 };
 BtSppConnection* createBtSppConnection(const MABtAddr* address, uint port);
 
-#ifdef BLUEZ_SUPPORTED
-class BluezBtSppConnection : public BtSppConnection {
-public:
-	BluezBtSppConnection(const MABtAddr* address, uint port);
-	~BluezBtSppConnection();
-
-	int connect();
-	int read(void* dst, int max);
-	int write(const void* src, int len);
-	void close();
-private:
-};
-#endif
-
 #ifdef WINSOCK_SUPPORTED
 class WinsockBtSppConnection : public BtSppConnection {
 public:

@@ -105,7 +105,7 @@ void run(MAHandle conn) {
 			return;
 		}
 		buffer[result] = 0;
-		PrintConsole(buffer);
+		puts(buffer);
 		maWriteLog(buffer, result);
 	}
 }
