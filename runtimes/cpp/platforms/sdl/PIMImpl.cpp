@@ -17,9 +17,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "config_platform.h"
 
-#include "syscall.h"
+#include "Syscall.h"
 #include "pim.h"
+#ifndef LINUX
 #include "strptime.h"
+#endif
+#include "base_errors.h"
+#include "sdl_syscall.h"
+#include "helpers/CPP_IX_PIM.h"
 #include "helpers/smartie.h"
 #include "ConfigParser.h"
 #include <expat.h>
@@ -401,8 +406,8 @@ namespace ContactParser {
 				parseAttr(attrSet, v->attr, value);
 			} else {
 				// find the index into the string array
-				int i, field;
-				for(i=0; i<nNames; i++) {
+				int field = -1;
+				for(int i=0; i<nNames; i++) {
 					const FIELD_NAME& fn(fnp[i]);
 					if(streq(name, fn.name)) {
 						field = fn.id;
@@ -410,7 +415,7 @@ namespace ContactParser {
 					}
 				}
 				// sanity checks
-				if(i == nNames)
+				if(field == -1)
 					error("unknown element");
 				DEBUG_ASSERT(field < nNames);
 				if(valueSet[field]) {

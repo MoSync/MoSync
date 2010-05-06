@@ -45,7 +45,9 @@ public:
 	Syscall(const STARTUP_SETTINGS&);
 	Syscall(int width, int height, const STARTUP_SETTINGS&);
 
+#ifdef EMULATOR
 public:
 #define PIMIMPL_H
 #include "pimImpl.h"
 HashMapNoDelete<PimItem> mPimItems;
+#endif	//EMULATOR

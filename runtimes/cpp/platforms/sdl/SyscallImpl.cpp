@@ -198,7 +198,9 @@ namespace Base {
 	}
 
 	void Syscall::platformDestruct() {
+#ifdef EMULATOR
 		gSyscall->pimClose();
+#endif
 	}
 
 	//***************************************************************************
@@ -303,7 +305,9 @@ namespace Base {
 		TEST_NZ(TTF_Init());
 		atexit(TTF_Quit);
 
+#ifdef EMULATOR
 		gSyscall->pimInit();
+#endif
 
 		//openAudio();
 		AudioEngine::init();
@@ -1974,6 +1978,7 @@ namespace Base {
 		case maIOCtl_maCameraSnapshot:
 			return maCameraSnapshot(a, b);
 
+#ifdef EMULATOR
 		case maIOCtl_maPimListOpen:
 			return SYSCALL_THIS->maPimListOpen(a);
 		case maIOCtl_maPimListNext:
@@ -1994,6 +1999,7 @@ namespace Base {
 			return SYSCALL_THIS->maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
 		case maIOCtl_maPimItemClose:
 			return SYSCALL_THIS->maPimItemClose(a);
+#endif	//EMULATOR
 
 		default:
 			return IOCTL_UNAVAILABLE;

@@ -100,7 +100,7 @@ buildTemplate()
 	fi
 
 	print_msg "Attempting to build MoRE"
-	./workfile.rb more CONFIG="" FULLSCREEN="true"
+	./workfile.rb more CONFIG="" FULLSCREEN="true" NATIVE_RUNTIME="true"
 
 	if [ "$?" -ne "0" ]; then
 		handle_error "rake"

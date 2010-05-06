@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MOSYNC_BASE_PIM_H
 #define MOSYNC_BASE_PIM_H
 
+#include "helpers/cpp_defs.h"
+
 class PimItem {
 public:
 	PimItem(MAHandle list) : pimList(list) {}
