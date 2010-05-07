@@ -86,8 +86,7 @@ BB_MemRec* gMemTab;
 BABILE_Obj* gBabileObj;
 
 #ifdef BABILE2
-BB_DbLs* initVoiceDbaL(const char* voicePath, char*& iniPtr);
-BB_DbLs* initLanguageDbaL(const char* voicePath, char*& iniPtr);
+BB_DbLs* initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voiceDba);
 #else
 BB_DbLs* initVoiceDbaL();
 BB_DbLs* initLanguageDbaL();

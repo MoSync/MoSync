@@ -69,8 +69,10 @@ EXPORT_C CApaApplication* NewApplication() {
 
 #include <eikstart.h>
 GLDEF_C TInt E32Main() {
-	RHeap* oldHeap = User::SwitchHeap(UserHeap::ChunkHeap(0, 0x100000, HEAP_SIZE));
+#if 0	//must have heapsize in MMP file.
+	RHeap* oldHeap = User::SwitchHeap(UserHeap::ChunkHeap(0, 0x300000, HEAP_SIZE));
 	oldHeap->Close();
+#endif
 	TInt result = EikStart::RunApplication(NewApplication);
 	//we never get here.
 	//RHeap* myHeap = User::SwitchHeap(oldHeap);

@@ -3,7 +3,8 @@ TARGETTYPE exe
 UID 0x100039CE 0xE7654321
 VENDORID 0
 CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices	//none
-EPOCSTACKSIZE 0x5000
+EPOCSTACKSIZE 0x10000
+EPOCHEAPSIZE 0x300000 0x1400000
 
 START RESOURCE ..\data\MoSync_3rd.rss
 HEADER
@@ -26,6 +27,9 @@ SOURCEPATH ..\src
 SOURCE RSendAs_SMS.cpp
 SOURCE Client.cpp
 SOURCE PimV3.cpp
+
+SOURCEPATH ..\..\..\base
+SOURCE pim.cpp
 
 LIBRARY gdi.lib
 LIBRARY ecom.lib
