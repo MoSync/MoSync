@@ -752,6 +752,8 @@ int FunctionRegUsage(SYMBOL *sym)
 
 #define REGBIT(bit) (1 << (bit))
 
+//#define AFDEBUG
+
 int FunctionRegAnalyse(SYMBOL *sym)
 {
 	OpcodeInfo thisOp;
@@ -789,19 +791,23 @@ int FunctionRegAnalyse(SYMBOL *sym)
 	
 	// Scan the function
 
+#ifdef AFDEBUG
 	printf("\n");
+#endif
 
 	while(1)
 	{		
 		if (ip > ip_end)
 			break;
 
+#ifdef AFDEBUG
 		{
 			char buf[2560];
 			buf[0] = 0;
 			DisassembleFromSource(ip - CodeMemArray.array, buf);
 			printf("%s\n", buf);
 		}
+#endif
 	
 		ip = DecodeOpcode(&thisOp, ip);
 
@@ -914,7 +920,6 @@ int FunctionRegAnalyse(SYMBOL *sym)
 
 	}
 
-	printf("\n");
 
 /*
 	int reg_used_as_src = 0;
@@ -922,6 +927,10 @@ int FunctionRegAnalyse(SYMBOL *sym)
 	int reg_assigned = 0;
 	int reg_uninit = 0;
 */
+
+#ifdef AFDEBUG
+
+	printf("\n");
 
 	printf("                  rrrrrrrrrrrrrrrriiiiddddddddfrsz\n");
 	printf("                  fedcba9876543210321076543210rtpr\n");
@@ -934,7 +943,9 @@ int FunctionRegAnalyse(SYMBOL *sym)
 	if (reg_uninit)
 		printf("");
 
-	return 0;
+#endif
+
+	return reg_used_as_src | reg_used_as_dst;
 }
 
 

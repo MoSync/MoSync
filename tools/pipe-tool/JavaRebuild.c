@@ -20,7 +20,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // 						   		Written by A.R.Hartley
 //*********************************************************************************************
 
+#ifdef __MWERKS__
+#define _mkdir(xxx) system("mkdir " ## xxx);
+#else
 #include "helpers/mkdir.h"
+#endif
 
 #include "compile.h"
 
@@ -777,7 +781,11 @@ void JavaEmitDiv(OpcodeInfo *theOp, int hasImm)
 
 	if (hasImm)
 	{
-		RebuildEmit("	if (%s == 0) MoSync.BFE();\n", theOp->imm);		// Fails here
+//		RebuildEmit("	if (%d == 0) MoSync.BFE();\n", theOp->imm);		// Fails here
+
+		if (theOp->imm == 0)
+			Warning("Division by zero in recompiler");
+		
 		RebuildEmit("	%s /= %d;", java_reg[theOp->rd], theOp->imm);
 	}
 	else
@@ -799,6 +807,10 @@ void JavaEmitDivu(OpcodeInfo *theOp, int hasImm)
 	{
 		//Division by zero in java will cause an ArithmeticException, so we don't need this check. /Fredrik
 		//RebuildEmit("	if(%s == 0) MoSync.BFE();\n", java_reg[theOp->rs]); 		// Fails here
+
+		if (theOp->imm == 0)
+			Warning("Division by zero in recompiler");
+
 		RebuildEmit("	%s = (int) (((long)(%s) & 0x0ffffffffL) / ((long)(%d) & 0x0ffffffffL));", java_reg[theOp->rd], java_reg[theOp->rd], theOp->imm);
 	}
 	else
