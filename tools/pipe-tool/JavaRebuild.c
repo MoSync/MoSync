@@ -341,7 +341,7 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 //			 
 //****************************************
 
-void JavaDecodeReturn()
+void JavaDecodeReturn(int emit_r15)
 {
 	switch(ThisFunctionRetType)
 	{
@@ -359,7 +359,10 @@ void JavaDecodeReturn()
 		break;
 
 		case RET_double:
-		RebuildEmit("	" DBL_HIGH " = r15;\n");
+
+		if (emit_r15)
+			RebuildEmit("	" DBL_HIGH " = r15;\n");
+
 		RebuildEmit("	return r14;");
 		break;
 	}
@@ -579,7 +582,7 @@ int JavaDecodeCall(OpcodeInfo *theOp)
 	
 	ref = labref;
 
-	return JavaCallFunction(ref);
+	return JavaCallFunction(ref, 1);
 }
 
 //****************************************
@@ -698,14 +701,14 @@ char * GetFunctionClass(SYMBOL *ref)
 //			 
 //****************************************
 
-int JavaCallFunction(SYMBOL *ref)
+int JavaCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
-
+	int regs;
+	
 	JavaEmitReturnType(rettype);
 
-	
 	RebuildEmit("%s%s_%d(", GetFunctionClass(ref), ref->Name, ref->LocalScope);
 	
 	param_count = ref->Params;
@@ -715,18 +718,30 @@ int JavaCallFunction(SYMBOL *ref)
 
 	need_comma = 0;
 
+	regs = function_registers_used;
+
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
 			RebuildEmit(", ");				
-	
+
+		if (!IsRegInit(REG_i0 + n))
+		{
+			printf("Rebuilder: Function '%s' parameter %d was not initialized\n",ref->Name, n);
+			//Error(Error_Fatal,"Function parameter %d was not initialized", n);
+			RebuildEmit("<Error>");
+		}
+		
 		RebuildEmit("%s", java_reg[REG_i0 + n]);
 		need_comma = 1;
+
+		// Make sure
+
 	}
 
 	RebuildEmit(");");
 	
-	if (rettype == RET_double)
+	if (rettype == RET_double && emit_r15)
 	{
 		RebuildEmit("\n	r15 = " DBL_HIGH ";");
 		SetRegInit(REG_r15);
@@ -894,9 +909,13 @@ void RebuildJavaProlog(SYMBOL *sym)
 		
 	// Find registers used in function
 
+	FunctionRegAnalyse(sym);
+
+
 	reg_used = FunctionRegUsage(sym);
 	reg_alloc = 0;
-	
+	register_initialized = 0;
+
 	// Output helpful header
 
 	RebuildEmit("\n//****************************************\n");
@@ -942,7 +961,8 @@ void RebuildJavaProlog(SYMBOL *sym)
 		need_comma = 1;
 
 		reg_alloc |=  1 << (REG_i0 + n);
-
+		
+		SetRegInit(REG_i0 + n);
 	}
 
 	RebuildEmit(") throws Exception\n{\n");
@@ -985,6 +1005,8 @@ void RebuildJavaProlog(SYMBOL *sym)
 				RebuildEmit(" = 0");
 
 				need_comma = 1;
+				
+				SetRegInit(n);
 			}
 		}
 
@@ -992,11 +1014,9 @@ void RebuildJavaProlog(SYMBOL *sym)
 	}
 
 
-
 	// set registers that are initialized to default, SP
 
-	register_initialized = (1 << REG_sp);
-
+	SetRegInit(REG_sp);
 }
 
 //****************************************
@@ -1010,7 +1030,7 @@ void RebuildJavaEpilog(SYMBOL *sym)
 	if (ReturnCount > 0)
 		RebuildEmit("ms.label_0();\n");
 
-	JavaDecodeReturn();
+	JavaDecodeReturn(1);
 	RebuildEmit("\n");
 
 	RebuildEmit("} // %s\n", sym->Name);
@@ -1232,6 +1252,8 @@ void RebuildJava_CallReg()
 	SortVirtuals();
 	count = GetVirtualIndex();
 
+	register_initialized = 0;
+
 	if (!count)
 	{
 		RebuildEmit("\n// No virtuals\n\n");
@@ -1251,6 +1273,11 @@ void RebuildJava_CallReg()
 
 	RebuildEmit("	int r14,r15;\n\n");
 
+	SetRegInit(REG_i0);
+	SetRegInit(REG_i1);
+	SetRegInit(REG_i2);
+	SetRegInit(REG_i3);
+
 	if (count)
 	{
 
@@ -1265,7 +1292,7 @@ void RebuildJava_CallReg()
 			{
 				RebuildEmit("		case 0x%x:\n", sym->VirtualIndex);
 				RebuildEmit("		");
-				JavaCallFunction(sym);
+				JavaCallFunction(sym, 0);			// was 1
 				RebuildEmit("\n");
 	//			RebuildEmit("		return;\n\n");	
 
@@ -1278,7 +1305,7 @@ void RebuildJava_CallReg()
 				else
 				{
 					RebuildEmit("\t\t");
-					JavaDecodeReturn();
+					JavaDecodeReturn(0);			// was 1
 					RebuildEmit("\n");
 				}
 			}
@@ -1463,7 +1490,13 @@ void RebuildJava_StartUp()
 
 	if (ep)
 	{
-		JavaCallFunction(ep);
+		// Init start-up regs
+
+		SetRegInit(REG_i0);
+		SetRegInit(REG_i1);
+		SetRegInit(REG_i2);
+
+		JavaCallFunction(ep, 1);
 	}
 	
 	RebuildEmit("\n}\n");
