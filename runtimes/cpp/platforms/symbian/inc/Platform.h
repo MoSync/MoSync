@@ -106,6 +106,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //TODO: add support for s60v2fp3.
 #if defined(__SERIES60_3X__)
 #define TELEPHONY
+#define WLAN
 #endif
 
 #if (defined(CELL) || defined(CALL)) && !defined(TELEPHONY)
