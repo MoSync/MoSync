@@ -1,5 +1,8 @@
-#define BENCHMARK
-
+/**
+ * Set the correct project configuration to run benchmark
+ * or render mode.
+ *
+ */
 int BenchMain ( void );
 int RenderMain ( void );
 

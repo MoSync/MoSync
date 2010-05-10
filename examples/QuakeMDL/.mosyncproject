@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="true" version="1">
-<build.cfg id="Debug"/>
-<build.cfg id="Release"/>
+<build.cfg id="Benchmark - Debug" types="Release"/>
+<build.cfg id="Benchmark - Release" types="Release"/>
+<build.cfg id="Render - Debug" types="Release"/>
+<build.cfg id="Render - Release" types="Release"/>
 <criteria>
 <filter profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Moblin"/>
 </criteria>
 <properties>
 <property key="build.prefs:additional.include.paths" value=""/>
-<property key="build.prefs:additional.include.paths/Release" value="./inc"/>
+<property key="build.prefs:additional.include.paths/Benchmark - Debug" value="./inc"/>
+<property key="build.prefs:additional.include.paths/Benchmark - Release" value="./inc"/>
+<property key="build.prefs:additional.include.paths/Render - Debug" value="./inc"/>
+<property key="build.prefs:additional.include.paths/Render - Release" value="./inc"/>
 <property key="build.prefs:additional.libraries" value=""/>
+<property key="build.prefs:additional.libraries/Benchmark - Debug" value=""/>
+<property key="build.prefs:additional.libraries/Benchmark - Release" value=""/>
+<property key="build.prefs:additional.libraries/Render - Debug" value=""/>
+<property key="build.prefs:additional.libraries/Render - Release" value=""/>
 <property key="build.prefs:additional.library.paths" value=""/>
-<property key="build.prefs:dead.code.elim/Debug" value="false"/>
-<property key="build.prefs:dead.code.elim/Release" value="false"/>
+<property key="build.prefs:additional.library.paths/Benchmark - Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Benchmark - Release" value=""/>
+<property key="build.prefs:additional.library.paths/Render - Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Render - Release" value=""/>
+<property key="build.prefs:app.output.path/Benchmark - Debug" value="benchmark_debug"/>
+<property key="build.prefs:app.output.path/Benchmark - Release" value="benchmark_release"/>
+<property key="build.prefs:app.output.path/Render - Debug" value="render_debug"/>
+<property key="build.prefs:app.output.path/Render - Release" value="render_release/"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=512000 -heapsize=364000"/>
-<property key="build.prefs:extra.link.sw/Debug" value=""/>
-<property key="build.prefs:extra.link.sw/Release" value=" -meta=meta.dat"/>
+<property key="build.prefs:extra.link.sw/Benchmark - Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Benchmark - Release" value=""/>
+<property key="build.prefs:extra.link.sw/Render - Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Render - Release" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
-<property key="build.prefs:gcc.switches/Debug" value="-O2"/>
-<property key="build.prefs:gcc.switches/Release" value="-O2"/>
+<property key="build.prefs:extra.res.sw/Benchmark - Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Benchmark - Release" value=""/>
+<property key="build.prefs:extra.res.sw/Render - Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Render - Release" value=""/>
+<property key="build.prefs:gcc.switches/Benchmark - Debug" value="-DBENCHMARK -O0 -g"/>
+<property key="build.prefs:gcc.switches/Benchmark - Release" value="-DBENCHMARK -O2"/>
+<property key="build.prefs:gcc.switches/Render - Debug" value="-O0 -g"/>
+<property key="build.prefs:gcc.switches/Render - Release" value="-O2"/>
 <property key="build.prefs:gcc.warnings" value="0"/>
-<property key="build.prefs:memory.data/Debug" value="512"/>
-<property key="build.prefs:memory.data/Release" value="512"/>
-<property key="build.prefs:memory.heap/Debug" value="364"/>
-<property key="build.prefs:memory.heap/Release" value="364"/>
-<property key="build.prefs:memory.stack/Debug" value="20"/>
-<property key="build.prefs:memory.stack/Release" value="20"/>
+<property key="build.prefs:memory.data/Benchmark - Debug" value="512"/>
+<property key="build.prefs:memory.data/Benchmark - Release" value="512"/>
+<property key="build.prefs:memory.data/Render - Debug" value="512"/>
+<property key="build.prefs:memory.data/Render - Release" value="512"/>
+<property key="build.prefs:memory.heap/Benchmark - Debug" value="364"/>
+<property key="build.prefs:memory.heap/Benchmark - Release" value="364"/>
+<property key="build.prefs:memory.heap/Render - Debug" value="364"/>
+<property key="build.prefs:memory.heap/Render - Release" value="364"/>
 <property key="build.prefs:project.type" value=""/>
+<property key="build.prefs:runtime.debug/Benchmark - Debug" value="true"/>
+<property key="build.prefs:runtime.debug/Render - Debug" value="true"/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Release" value=""/>
 <property key="last.build.config" value="Debug"/>
