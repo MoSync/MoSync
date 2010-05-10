@@ -1360,7 +1360,7 @@ void RebuildCpp_StartUp()
 	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, all_len)\n");
+	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0)\n");
 
 	// emit the bin file
 
