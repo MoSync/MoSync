@@ -50,6 +50,8 @@ static char *Cpp_reg[] = {"zr","sp","rt","fr","d0","d1","d2","d3",
 
 static char CppSyscallUsed[1024];
 
+static FuncProp funcprop;
+
 //****************************************
 //			 
 //****************************************
@@ -384,11 +386,10 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 
 	CppEmitReturnType(syscall->RetType);
 
-	if (syscall->Interface == 0)
-//		RebuildEmit("MoSync.%s(", syscall->Name);
-		RebuildEmit("%s(", syscall->Name);
-	else
-		RebuildEmit("%s(", syscall->Name);
+
+	RebuildEmit("SYSCALL(");
+	RebuildEmit("%s", &syscall->Name[1]);
+	RebuildEmit(")(");
 
 	if (param_count > 4)
 		param_count = 4;
@@ -570,7 +571,7 @@ int CppDecodeCall(OpcodeInfo *theOp)
 	
 	ref = labref;
 
-	return CppCallFunction(ref);
+	return CppCallFunction(ref, 1);
 }
 
 //****************************************
@@ -671,8 +672,8 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 //****************************************
 //			 
 //****************************************
-
-int CppCallFunction(SYMBOL *ref)
+#if 0
+int xCppCallFunction(SYMBOL *ref)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
@@ -704,7 +705,55 @@ int CppCallFunction(SYMBOL *ref)
 	
 	return 1;
 }
+#else
+int CppCallFunction(SYMBOL *ref, int emit_r15)
+{
+	int param_count, need_comma, n;
+	int rettype = ref->RetType;
+	int regs;
+	
+	CppEmitReturnType(rettype);
 
+	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
+	
+	param_count = ref->Params;
+	
+	if (param_count > 4)
+		param_count = 4;
+
+	need_comma = 0;
+
+	regs = funcprop.reg_used;
+
+	for (n=0;n<param_count;n++)
+	{
+		if (need_comma)
+			RebuildEmit(", ");				
+
+/*		if (REGUSED(REG_i0 + n, regs))
+		{
+			printf("Rebuilder: Function '%s' parameter %d was not initialized\n",ref->Name, n);
+			//Error(Error_Fatal,"Function parameter %d was not initialized", n);
+			RebuildEmit("<Error>");
+		}
+*/		
+		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
+		need_comma = 1;
+
+		// Make sure
+
+	}
+
+	RebuildEmit(");");
+	
+	if (rettype == RET_double && emit_r15)
+	{
+		RebuildEmit("\n	r15 = __dbl_high;");
+		SetRegInit(REG_r15);
+	}
+	return 1;
+}
+#endif
 //****************************************
 //			 
 //****************************************
@@ -891,8 +940,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 
 //	reg_used = FunctionRegUsage(sym);
 	
-	reg_used = FunctionRegAnalyse(sym);
-
+	reg_used = FunctionRegAnalyse(sym, &funcprop);
 	
 	reg_alloc = 0;
 	
@@ -1207,6 +1255,9 @@ void RebuildCpp_CallReg()
 	RebuildEmit("int CallReg(int s, int i0, int i1, int i2, int i3)\n");
 	RebuildEmit("{\n");
 
+	RebuildEmit("	int r14,r15;\n");
+	RebuildEmit("	r14 = r15 = 0;\n\n");
+
 	if (count)
 	{
 		RebuildEmit("	switch(s & 0xffffff)\n");
@@ -1220,12 +1271,20 @@ void RebuildCpp_CallReg()
 			{
 				RebuildEmit("		case 0x%x:\n", sym->VirtualIndex);
 				RebuildEmit("		");
-				CppCallFunction(sym);
-				RebuildEmit("\n");
-//				RebuildEmit("		return;\n\n");	
+				CppCallFunction(sym, 0);
+				RebuildEmit("\n\t");
 
 				ThisFunctionRetType = sym->RetType;
-				CppDecodeReturn();
+
+				if(ThisFunctionRetType == RET_void)
+				{
+					RebuildEmit("	return 0;\n\n");
+				}
+				else
+				{
+					CppDecodeReturn(0);			// was 1
+					RebuildEmit("\n\n");
+				}
 
 			}
 
@@ -1245,7 +1304,7 @@ void RebuildCpp_CallReg()
 //****************************************
 //
 //****************************************
-
+/*
 void RebuildCpp_EmitDS()
 {
 	int need_comma;
@@ -1260,81 +1319,11 @@ void RebuildCpp_EmitDS()
 	RebuildEmit("#define ds_len %d\n", DataIP >> 2);
 	RebuildEmit("#define bs_len %d\n", BssIP >> 2);
 	RebuildEmit("#define all_len %d\n\n", (BssIP + DataIP) >> 2);
+	RebuildEmit("#define MaxDataIP %d\n\n", MaxDataIP >> 2);
 
-
-//	GetDataMemLong(data_ip++);
-
-//	RebuildEmit("static int mem_ds[] = new int[16384];\n\n");
-
-
-	RebuildEmit("int mem_ds[all_len] = \n{\n");
-
-	need_comma = 0;
-	count = 0;
-
-#if 0
-
-	for (n=0;n<DataIP >> 2;n++)
-	{
-		if (need_comma)
-		{
-			RebuildEmit(", ");
-			need_comma = 1;
-
-		
-			if ((count & 0x7) == 0)
-				RebuildEmit("\n");
-		}
-		
-		RebuildEmit("0x%x", GetDataMemLong(n));
-		need_comma = 1;
-
-		count++;
-
-	}
-
-	if (need_comma)
-	{
-		RebuildEmit(", ");
-	}
-
-	RebuildEmit("\n// Bss\n");
-
-	need_comma = 0;
-	count = 0;
-
-	for (n=0;n<BssIP >> 2;n++)
-	{
-		if (need_comma)
-		{
-			RebuildEmit(", ");
-			need_comma = 1;
-
-		
-			if ((count & 0x7) == 0)
-				RebuildEmit("\n");
-		}
-		
-		RebuildEmit("0");
-		need_comma = 1;
-
-		count++;
-
-	}
-#else
-
-	for (n=0;n<(DataIP) >> 2;n++)
-	{		
-		RebuildEmit("	0x%x,	//%d\n", GetDataMemLong(n), n);
-	}
-
-	RebuildEmit("	0\n");
-
-#endif
-
-	RebuildEmit("};\n");
+	RebuildEmit("int *mem_ds\n");
 }
-
+*/
 //****************************************
 // 
 //****************************************
@@ -1342,6 +1331,7 @@ void RebuildCpp_EmitDS()
 void RebuildCpp_StartUp()
 {
 	SYMBOL *ep;
+	FILE *out;
 	
 	RebuildEmit("\n");
 	RebuildEmit("//****************************************\n");
@@ -1350,48 +1340,41 @@ void RebuildCpp_StartUp()
 	RebuildEmit("\n");
 
 
-	RebuildEmit("void main()\n");
+	RebuildEmit("#define ds_len  %d\n", DataIP);
+	RebuildEmit("#define bs_len  %d\n", BssIP);
+	RebuildEmit("#define all_len %d\n", (BssIP + DataIP));
+	RebuildEmit("#define max_data %d\n\n", MaxDataIP);
+
+	RebuildEmit("int *mem_ds\n");
+
+
+	RebuildEmit("void cpp_main()\n");
 	RebuildEmit("{\n");
 
-	RebuildEmit("	int i0,i1,i2,i3,r14,r15;\n");
+	RebuildEmit("	int i0,i1,i2;\n");
 	RebuildEmit("\n");
 
-	RebuildEmit("	i0 = 0;\n");
-	RebuildEmit("	i1 = 0;\n");
-	RebuildEmit("	i2 = 0;\n");
-	RebuildEmit("	i3 = 0;\n");
-	RebuildEmit("	r14 = 0;\n");
-	RebuildEmit("	r15 = 0;\n");
+	RebuildEmit("	i0 = %i;	//mem size\n", Default_DataSize);
+	RebuildEmit("	i1 = %i;		//stack size\n", Default_StackSize);
+	RebuildEmit("	i2 = %i;		//heap size\n", Default_HeapSize);
+	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-	// init data array
+	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, all_len)\n");
 
-//	RebuildEmit("	System.arraycopy(data_section, 0, mem_ds, 0, ds_len);\n"); 
-	RebuildEmit("	sp = 16384 - 16;\n");
+	// emit the bin file
 
-	RebuildEmit("\n");
+	out = fopen("data_section.bin", "wb");
+	ArrayWriteFP(&DataMemArray, out, MaxDataIP);
+	fclose(out);
 
 	ep	= GetGlobalSym(Code_EntryPoint);
 
 	if (ep)
-	{
-		CppCallFunction(ep);
-	}
+		CppCallFunction(ep, 1);
 	
 	RebuildEmit("\n}\n");
-	
 
-	RebuildEmit("\n");
-
-// test function
-
-/*	RebuildEmit("public static void sys_print(int i0)\n");
-	RebuildEmit("{\n");
-
-	RebuildEmit("	System.out.print(\" \" + (int) i0 );\n");
-	RebuildEmit("	return;\n");	
-	RebuildEmit("\n}\n");	
-*/
 }
 
 //****************************************
@@ -1525,10 +1508,13 @@ void RebuildCpp_Main()
 	RebuildEmit("#include \"mstypeinfo.h\"\n");
 	RebuildEmit("\n");
 
+#if 0			//My Testing only
 	RebuildCpp_EmitExtensionsProto();
+#endif
+
 	RebuildCpp_EmitProtos();
 
-	RebuildCpp_EmitDS();
+//	RebuildCpp_EmitDS();
 
 //	RebuildEmit("class MoSyncCode\n");
 //	RebuildEmit("{\n");
@@ -1546,7 +1532,7 @@ void RebuildCpp_Main()
 
 	RebuildCpp_Code();
 	//RebuildCpp_EmitExtensions(1);
-	//RebuildCpp_CallReg();
+	RebuildCpp_CallReg();
 
 //	RebuildEmit("}; // End of MosyncCode class\n");
 //	RebuildEmit("// MaxEnumLabel=%d\n", MaxEnumLabel);

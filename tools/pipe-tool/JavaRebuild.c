@@ -61,8 +61,6 @@ static char *java_reg[] = {"zr",SP_STR,"rt","fr","d0","d1","d2","d3",
 
 static char JavaSyscallUsed[1024];
 
-int function_registers_used;		// reg bits used by function
-int register_initialized;			// if a register has been initialized
 
 //****************************************
 //			 
@@ -921,7 +919,7 @@ void RebuildJavaProlog(SYMBOL *sym)
 		
 	// Find registers used in function
 
-	FunctionRegAnalyse(sym);
+	//FunctionRegAnalyse(sym);
 
 
 	reg_used = FunctionRegUsage(sym);
@@ -1495,7 +1493,7 @@ void RebuildJava_StartUp()
 
 	// emit the bin file
 	out = fopen("data_section.bin", "wb");
-	ArrayWriteFP(&DataMemArray, out, MaxDataIP);
+	ArrayWriteFP(&DataMemArray, out, MaxDataIP); // !! Error here should be DataIP !!
 	fclose(out);
 
 	ep	= GetGlobalSym(Code_EntryPoint);

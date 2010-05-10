@@ -551,6 +551,18 @@ typedef struct
 	char name[7];
 } CpuRegEntry;
 
+
+// Function properties, used by analyser
+
+typedef struct
+{
+	int src_reg;
+	int dst_reg;
+	int assign_reg;
+	int uninit_reg;
+	int reg_used;
+} FuncProp;
+
 //***************************************
 //
 //***************************************
@@ -868,6 +880,10 @@ dec(int C_Source_Line)
 dec(char regstr[128])
 
 dec(int FileLine)
+
+dec(int function_registers_used)		// reg bits used by function
+dec(int register_initialized)			// if a register has been initialized
+
 
 //****************************************
 //			Dynamic Arrays

@@ -749,12 +749,22 @@ int FunctionRegUsage(SYMBOL *sym)
 //****************************************
 //		Analyse Function
 //****************************************
+/*
+typedef struct
+{
+	int src_reg;
+	int dst_reg;
+	int assign_reg;
+	int uninit_reg;
+	int reg_used;
+} FuncProp;
+*/
 
 #define REGBIT(bit) (1 << (bit))
 
 //#define AFDEBUG
 
-int FunctionRegAnalyse(SYMBOL *sym)
+int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 {
 	OpcodeInfo thisOp;
 	uchar *ip, *ip_end;
@@ -945,10 +955,14 @@ int FunctionRegAnalyse(SYMBOL *sym)
 
 #endif
 
-	return reg_used_as_src | reg_used_as_dst;
+	fp->src_reg		= reg_used_as_src;
+	fp->dst_reg		= reg_used_as_dst;
+	fp->assign_reg	= reg_assigned;
+	fp->uninit_reg	= reg_uninit;
+	fp->reg_used	= reg_used_as_src | reg_used_as_dst;
+
+	return fp->reg_used;
 }
-
-
 
 //****************************************
 // Enumerate the labels of a Function
