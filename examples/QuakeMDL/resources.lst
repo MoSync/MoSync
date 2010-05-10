@@ -1,0 +1,21 @@
+.res RES_MODEL_OGRE
+.bin
+.include "models/ogre.mdl"
+
+//.res RES_MODEL_SPIKE
+//.bin
+//.include "models/spike.mdl"
+
+//.res RES_MODEL_BOLT
+//.bin
+//.include "models/bolt2.mdl"
+
+//.res RES_MODEL_FLAME
+//.bin
+//.include "models/flame.mdl"
+
+//.res RES_MODEL_ZOMBIE
+//.bin
+//.include "models/zombie.mdl"
+
+.eof
