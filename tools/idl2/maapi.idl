@@ -2519,7 +2519,11 @@ interface MAAPI {
 #endif	//IX_SEGMENTED_DATA
 
 		/**
-		* Retrieves the value of a Java System Property.
+		* Retrieves the value of a Java System Property, or a MoSync System Property.
+		*
+		* There are two MoSync System Properties: "mosync.imei" and "mosync.imsi".
+		* They don't exist on every phone.
+		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
 		* \param size The size of the buffer, in bytes.

@@ -1958,8 +1958,43 @@ public
 		}
 	}
 
+	static final String[] sImsiProperties = {
+		"com.sonyericsson.sim.subscribernumber",	//SE JP-7.2+
+		"com.nokia.mid.imsi",	//Nokia
+		"IMSI",	//Motorola
+	};
+
+	static final String[] sImeiProperties = {
+		"com.sonyericsson.imei",	//SonyEricsson
+		"com.nokia.IMEI",	//Nokia
+		"com.nokia.mid.imei",	//Nokia
+		"phone.imei",	//Nokia?
+		"com.samsung.imei",	//Samsung
+		"IMEI",	//Motorola
+		"com.motorola.IMEI",	//Motorola
+		"com.siemens.imei",	//Siemens
+	};
+
+	String sysPropFromArray(String[] keys) {
+		for(int i=0; i<keys.length; i++) {
+			String value = System.getProperty(keys[i]);
+			if(value != null) {
+				DEBUG_ALWAYS(keys[i] + ": " + value + "\n");
+				return value;
+			}
+		}
+		return null;
+	}
+
 	int maGetSystemProperty(String key, MAAddress buf, int size) {
-		String value = System.getProperty(key);
+		String value;
+		if(key.equals("mosync.imei")) {
+			value = sysPropFromArray(sImeiProperties);
+		} else if(key.equals("mosync.imsi")) {
+			value = sysPropFromArray(sImsiProperties);
+		} else {
+			value = System.getProperty(key);
+		}
 		if(value == null)
 			return -2;
 		if(value.length() >= size)
@@ -2538,4 +2573,5 @@ public
 		//maybe we need to set full screen again? maybe not.
 		return 0;
 	}
+
 }
