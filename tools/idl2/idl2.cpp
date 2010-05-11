@@ -604,17 +604,12 @@ static void outputSyscallStaticCpp(const Interface& maapi) {
 
 	for(size_t i=0; i<maapi.functions.size(); i++) {
 		const Function& f(maapi.functions[i]);
-		//bool staticConversionNeeded = false;
-		bool arguments = false;
 		stringstream staticCppStream;
 		stringstream staticCppInvokeStream;
 		stringstream staticCppInitStream;
 
 
 		staticCppStream << "inline " << getSJType(maapi, f.returnType, true)<<" SYSCALL("<<f.name<<") (";
-
-		//if(f.returnType == "double")
-		//	staticConversionNeeded = true;
 
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);
@@ -625,16 +620,11 @@ static void outputSyscallStaticCpp(const Interface& maapi) {
 			}
 
 			string sjType = getSJType(maapi, a.type, a.in);
-			//string jPracticalArgType = (a.in ? a.type : "MAAddress");
 			string ctype = cType(maapi, a.type);
 
 			staticCppStream << "int" << " " << a.name;
 			if(a.type == "double") {
 				staticCppStream << "1, "<<sjType<<" "<<a.name<<"2";
-				
-				//staticCppInitStream << "	MA_DV " << a.name << "_dv;\n";
-				//staticCppInitStream << "	" << a.name << "_dv.lo = " << a.name << "1;\n";
-				//staticCppInitStream << "	" << a.name << "_dv.hi = " << a.name << "2;\n";
 
 				staticCppInvokeStream << "convertDoubleArg(" << a.name << "1, " << a.name << "2" << ")";//a.name << "_dv" << ".d";
 
@@ -648,7 +638,6 @@ static void outputSyscallStaticCpp(const Interface& maapi) {
 		staticCppStream << ") {";
 
 		stream << staticCppStream.str() <<"\n";
-		const char* arg = arguments ? "" : "_";
 		
 		stream << staticCppInitStream.str();
 
