@@ -953,6 +953,20 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("//****************************************\n\n");
 	}
 	
+
+	if (!isproto)
+	{
+		RebuildEmit("//             rrrrrrrrrrrrrrrriiiiddddddddfrsz\n");
+		RebuildEmit("//             fedcba9876543210321076543210rtpr\n");
+
+		RebuildEmit("//src_reg    = %s\n", Bin32(funcprop.src_reg));
+		RebuildEmit("//dst_reg    = %s\n", Bin32(funcprop.dst_reg));
+		RebuildEmit("//assign_reg = %s\n", Bin32(funcprop.assign_reg));
+		RebuildEmit("//uninit_reg = %s\n", Bin32(funcprop.uninit_reg));
+		RebuildEmit("//used_reg   = %s\n", Bin32(funcprop.reg_used));
+		RebuildEmit("\n");
+	}
+
 	// Output function decl
 
 //	RebuildEmit("static ");
@@ -1345,8 +1359,7 @@ void RebuildCpp_StartUp()
 	RebuildEmit("#define all_len %d\n", (BssIP + DataIP));
 	RebuildEmit("#define max_data %d\n\n", MaxDataIP);
 
-	RebuildEmit("int *mem_ds\n");
-
+//	RebuildEmit("int *mem_ds;\n");
 
 	RebuildEmit("void cpp_main()\n");
 	RebuildEmit("{\n");
@@ -1360,7 +1373,7 @@ void RebuildCpp_StartUp()
 	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0)\n");
+	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0);\n");
 
 	// emit the bin file
 
@@ -1519,9 +1532,9 @@ void RebuildCpp_Main()
 //	RebuildEmit("class MoSyncCode\n");
 //	RebuildEmit("{\n");
 
-	RebuildEmit("\n");
-	RebuildEmit("int sp;\n");
-	RebuildEmit("int __dbl_high;\n");
+//	RebuildEmit("\n");					// Out in .h file
+//	RebuildEmit("int sp;\n");
+//	RebuildEmit("int __dbl_high;\n");
 
 	RebuildEmit("\n");
 

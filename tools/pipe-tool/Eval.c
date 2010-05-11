@@ -1179,7 +1179,7 @@ void GetIdentifier(EVAL *Part1)
 
 				// Only convert to virtual index if in java mode
 
-				if (ArgJavaNative)
+				if (ArgJavaNative || ArgCppGen)			// !! xchange with ArgCreateVirtuals !!
 				if (sym->LabelType == label_Virtual)
 				{
 					// Change the value, to reflect functions virtual reference
