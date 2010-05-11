@@ -103,6 +103,23 @@ bool parseLSym(Tuple t, char* text) {
 	return true;
 }
 
+//xref := text ('<' xref '>')? ':'
+//text := [^<>]+
+static bool scanXrefTypename(char*& ptr, char delim) {
+	while(1) {
+		char c = *ptr;
+		TEST(c);
+		if(c == '<') {
+			ptr++;
+			TEST(scanXrefTypename(ptr, '>'));
+		} else if(c == delim) {
+			return true;
+		}
+		ptr++;
+	}
+}
+
+
 //typeDecl := pointerDecl | tupleDecl | structDecl | arrayDecl | functionDecl |
 //	constDecl | enumDecl | crossRefDecl | cppRefDecl | ptmDecl
 //tupleDecl := typeId ('=' typeDecl)?
@@ -224,15 +241,8 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 			char crossType = typeText[1];
 			char* crossName = typeText + 2;
 			char* colon = crossName;
-			//search for a single colon.
-			//a double colon is part of the typename.
-			while(1) {
-				colon = strchr(colon, ':');
-				TEST(colon);
-				if(colon[1] != ':')
-					break;
-				colon += 2;
-			}
+			//find the end of the typename
+			TEST(scanXrefTypename(colon, ':'));
 			*colon = 0;
 			if(crossType == 's' || crossType == 'u' || crossType == 'e') {
 				TEST(result = new DelayedType(new CrossReferenceType(id, crossName)));
