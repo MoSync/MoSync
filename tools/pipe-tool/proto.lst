@@ -18,7 +18,6 @@ parseheaders.c
 Librarian.c
 AnalyseCode.c
 CodeTools.c
-FuncAnalyse.c
 Stabs.c
 ArrayClass.c
 AsmToken.c
