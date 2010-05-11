@@ -35,7 +35,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #define SYMBIAN 1
 
-#ifndef __SERIES60_3X__	//2nd edition
+#ifdef __SERIES60_3X__
+#define WLAN
+#else	//2nd edition
 #undef WLAN
 #undef CALL
 #undef CELLID
@@ -106,7 +108,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //TODO: add support for s60v2fp3.
 #if defined(__SERIES60_3X__)
 #define TELEPHONY
-#define WLAN
 #endif
 
 #if (defined(CELL) || defined(CALL)) && !defined(TELEPHONY)
