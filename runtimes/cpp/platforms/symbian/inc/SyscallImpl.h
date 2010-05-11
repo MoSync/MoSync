@@ -309,6 +309,8 @@ private:
 	int maGetCellInfo(MACellInfo*);
 #endif
 
+	int maGetSystemProperty(const char* key, char* buf, int size);
+
 	StringMap gStoreMap;
 
 #ifndef __SERIES60_3X__	//2nd ed ARMI compiler hack

@@ -1581,10 +1581,64 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maPimItemRemove(a, b);*/
 #endif	//__SERIES60_3X__
 
+#ifdef TELEPHONY
+	case maIOCtl_maGetSystemProperty:
+		return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+#endif
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
 }
+
+//------------------------------------------------------------------------------
+// maGetSystemProperty
+//------------------------------------------------------------------------------
+
+#ifdef TELEPHONY
+int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
+	TPtrC8 keyC8(CBP key);
+	_LIT8(KIMEI, "mosync.imei");
+	_LIT8(KIMSI, "mosync.imsi");
+	TPtrC16 value;
+	if(keyC8.Compare(KIMEI) == 0) {
+		// fetch imei from telephony server
+		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
+		CTelephony::TPhoneIdV1 pid;
+		CTelephony::TPhoneIdV1Pckg pidP(pid);
+		gTelephony->GetPhoneId(*ls->Status(), pidP);
+		ls->Wait();
+		int result = ls->Status()->Int();
+		LOG("IMEI result: %i\n", result);
+		if(result < 0)
+			return -3;
+		value.Set(pid.iSerialNumber);
+	} else if(keyC8.Compare(KIMSI) == 0) {
+		// fetch imsi
+		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
+		CTelephony::TSubscriberIdV1 sid;
+		CTelephony::TSubscriberIdV1Pckg sidP(sid);
+		gTelephony->GetSubscriberId(*ls->Status(), sidP);
+		ls->Wait();
+		int result = ls->Status()->Int();
+		LOG("IMSI result: %i\n", result);
+		if(result < 0)
+			return -3;
+		value.Set(sid.iSubscriberId);
+	}
+	int len = value.Length();
+	if(len == 0)
+		return -2;
+	// copy value to target buffer
+	TPtr8 bufP((byte*)buf, size);
+	if(size < len + 1)
+		return len + 1;
+	bufP.Copy(value);
+	buf[len] = 0;
+	return len + 1;
+}
+#endif
 
 //------------------------------------------------------------------------------
 // FileList
