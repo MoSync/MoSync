@@ -32,3 +32,4 @@ JavaRebuild.c
 ClassLoader.c
 MethodLoader.c
 ThunkReg.c
+FuncAnalyse.c

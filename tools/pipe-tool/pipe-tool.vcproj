@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="pipe-tool"
 	ProjectGUID="{189444C2-356E-414B-92D1-C3F49ADFFD2D}"
 	RootNamespace="pipe-tool"
@@ -257,6 +257,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\CppRebuild.c"
+			>
+		</File>
+		<File
 			RelativePath=".\demangle.c"
 			>
 		</File>
@@ -270,6 +274,10 @@
 		</File>
 		<File
 			RelativePath=".\filealloc.c"
+			>
+		</File>
+		<File
+			RelativePath=".\FuncAnalyse.c"
 			>
 		</File>
 		<File
