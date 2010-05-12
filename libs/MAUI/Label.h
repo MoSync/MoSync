@@ -79,7 +79,7 @@ namespace MAUI {
 
 		/** Controls the horizontal alignment of the labels text. **/
 		void setHorizontalAlignment(HorizontalAlignment alignment);
-		/** Controls the horizontal alignment of the labels text. **/
+		/** Controls the vertical alignment of the labels text. **/
 		void setVerticalAlignment(VerticalAlignment alignment);
 
 		/** Sets the text that appears on the label **/

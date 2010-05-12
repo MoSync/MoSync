@@ -270,6 +270,10 @@ void Gfx_drawText(int left, int top, const char* text) {
 	maDrawText(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
 }
 
+void Gfx_drawTextW(int left, int top, const wchar_t* text) {
+	maDrawTextW(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
+}
+
 void Gfx_drawImage(MAHandle image, int left, int top) {
 	maDrawImage(image, sCurrentOffset.x + left, sCurrentOffset.y + top);
 }

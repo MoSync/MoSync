@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define SYSCALL_DEBUGGING_MODE
 
 #include <config_platform.h>
+#include <Platform.h>
 #include <helpers/helpers.h>
 
 #include <base/FileStream.h>
@@ -1071,7 +1072,7 @@ void WRITE_REG(int reg, int value) {
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
 
-	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%S\")", str); }
+	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%s\")", str); }
 	wchar* _SYSCALL_CONVERT_MAWString(int str) {
 		_debug_hex(str);
 		ValidateMemWStringAddress(str);
