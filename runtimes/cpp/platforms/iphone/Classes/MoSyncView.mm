@@ -118,9 +118,9 @@ static NSMutableArray *listItems = nil;
     [[cell textLabel] setText:text];
     
     //  Populate the cell's detail text label.
-    NSString *detailText = [NSString stringWithFormat:@"Detail text for %@.", 
+    /*NSString *detailText = [NSString stringWithFormat:@"Detail text for %@.", 
                             [text lowercaseString]];
-    [[cell detailTextLabel] setText:detailText];
+    [[cell detailTextLabel] setText:detailText];*/
     
     return cell;
 }

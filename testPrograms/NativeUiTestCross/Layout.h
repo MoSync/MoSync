@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LAYOUT_H_
 #include "Widget.h"
 #include "Frame.h"
-#include <MAUtil\Set.h>
+#include <MAUtil/Set.h>
 
 /**
  * This class is an implementation of

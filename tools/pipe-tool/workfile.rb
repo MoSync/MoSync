@@ -7,14 +7,15 @@ work = MoSyncExe.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@IGNORED_FILES = ["Emu.c", "BrewRebuild.c", "Peeper.c", "JavaCodeGen.c", "disas.c"]
-	@EXTRA_CFLAGS = " -Wno-strict-prototypes -Wno-missing-prototypes -Wno-old-style-definition" +
+	@EXTRA_CFLAGS = " -m32 -Wno-strict-prototypes -Wno-missing-prototypes -Wno-old-style-definition" +
 		" -Wno-missing-noreturn -Wno-shadow -Wno-unreachable-code -Wno-write-strings -Wno-multichar" +
 		" -Wno-missing-format-attribute -D_CRT_SECURE_NO_DEPRECATE -DUSE_ZLIB -fno-strict-aliasing"
 	# -Wno-unused-function
 	@LIBRARIES = ["z"]
 	@NAME = "pipe-tool"
 	@INSTALLDIR = mosyncdir + '/bin'
-	
+	@EXTRA_LINKFLAGS = " -m32"	
+
 	setup
 	
 	so = @all_sourcefiles

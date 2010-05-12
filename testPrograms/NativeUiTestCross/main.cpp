@@ -1,5 +1,6 @@
 #include <ma.h>
 #include "Frame.h"
+#include "ListFrame.h"
 #include "Button.h"
 #include "Edit.h"
 #include "Label.h"
@@ -13,52 +14,58 @@
 
 class Main : public ActionListener {
 private:
-	Frame *frame;
-	Frame *frame2;
+	ListFrame *listFrame;
+	/*Frame *frame2;
 	Parser *parser;
 	Button *button;
 	Button *button2;
 	MenuItem *item;
 	MenuItem *item2;
-	Image *image;
+	Image *image;*/
 public:
 	Main() {
-		frame = NULL;
-		frame2 = NULL;
+		listFrame = NULL;
+		/*frame2 = NULL;
 		parser = NULL;
 		button = NULL;
-		button2 = NULL;
+		button2 = NULL;*/
 
-		frame = new Frame(50);
-		Manager::Instance().addWidget(frame);
-		frame->addActionListener(this);
+		listFrame = new ListFrame(50);
+		listFrame->add("Item");
+		listFrame->add("Item");
+		listFrame->add("Item");
+		listFrame->add("Item");
+		listFrame->add("Item");
+		listFrame->show();
+		Manager::Instance().addWidget(listFrame);
+		listFrame->addActionListener(this);
 
-		maAndroidStartListActivity(700);
-		maAndroidAddListItem(701, "salut");
+		//maAndroidStartListActivity(700);
+		//maAndroidAddListItem(701, "salut");
 	}
 
 	Main(const Main & m) {
-		frame=m.frame;
-		frame2=m.frame2;
+		listFrame=m.listFrame;
+		/*frame2=m.frame2;
 		parser=m.parser;
 		button=m.button;
-		button2=m.button2;
+		button2=m.button2;*/
 	}
 
 	~Main() {
 		//delete(button);
-		delete(frame);
-		delete(frame2);
+		delete(listFrame);
+		/*delete(frame2);
 		delete(parser);
 		delete(button);
 		delete(button2);
 		delete(item);
 		delete(item2);
-		delete(image);
+		delete(image);*/
 	}
 
 	void onCreate (int id) {
-		if(id==frame->getId()) {
+		if(id==listFrame->getId()) {
 /*
 			parser = new Parser(MAIN_LAYOUT, frame);
 
@@ -70,7 +77,7 @@ public:
 			button2->addActionListener(this);
 			*/
 			
-
+/*
 
 			image = new Image(SKY_ICON, 21);
 			Manager::Instance().addWidget(image);
@@ -94,6 +101,7 @@ public:
 			item2 = new MenuItem("New frame", frame, SKULL_ICON);
 			Manager::Instance().addWidget(item2);
 			item2->addActionListener(this);
+ */
 /*
 			button = new Button("New frame");
 			Manager::Instance().addWidget(button);
@@ -129,9 +137,9 @@ public:
 	}
 	void onClick (int id) {
 		if(id==32) {
-			frame2 = new Frame(2);
+			/*frame2 = new Frame(2);
 			Manager::Instance().addWidget(frame2);
-			frame2->addActionListener(this);
+			frame2->addActionListener(this);*/
 		}
 	/*	if(id==item->getId()) {
 			frame2 = new Frame(2);
