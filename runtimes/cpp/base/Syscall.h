@@ -72,7 +72,7 @@ namespace Base {
 #define SYSCALL(type, nargs) type Syscall::nargs
 #define CALL_SYSCALL(syscall) mSyscall.syscall
 #define SYSCALL_THIS this
-#endif
+#endif	// SYMBIAN
 
 		int gStoreNextId;
 		StringMap gStores;

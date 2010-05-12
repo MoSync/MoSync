@@ -258,22 +258,9 @@ namespace Base {
 		rect->height = cr.size.height;	
 	}
 
-#define CONVERT_TO_NATIVE_COLOR_FROM_ARGB(col) \
-	((((col)&0x00ff0000)>>(16-(redShift-(8-redBits))))&redMask) | \
-	((((col)&0x0000ff00)>>(8-(greenShift-(8-greenBits))))&greenMask) | \
-	((((col)&0x000000ff)>>(0-(blueShift-(8-blueBits))))&blueMask)
-
-#define CONVERT_TO_ARGB_FROM_NATIVE_COLOR(col) \
-	rgb16_to_rgb32(col, redMask, greenMask, blueMask, redShift, greenShift, blueShift, redBits, greenBits, blueBits)
-//	((((((col)&redMask)>>redShift)<<(8-redBits))<<16)&0x00ff0000)|\
-//	((((((col)&greenMask)>>greenShift)<<(8-greenBits))<<8)&0x0000ff00)|\
-//	((((((col)&blueMask)>>blueShift)<<(8-blueBits)))&0x000000ff)\
-//	(0xff000000)
-
 	SYSCALL(int, maSetColor(int argb)) {
 		oldColor = currentColor;
 		currentColor = argb;
-		//realColor =	CONVERT_TO_NATIVE_COLOR_FROM_ARGB(argb);
 		currentRed =   (float)((argb&0x00ff0000)>>16)/255.0f;
 		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
 		currentBlue =  (float)((argb&0x000000ff))/255.0f;
@@ -286,30 +273,16 @@ namespace Base {
 
 	SYSCALL(void, maPlot(int posX, int posY)) {
 		if(!gDrawTarget->data) DEBIG_PHAT_ERROR;
-		/*
-		CGRect cr = CGContextGetClipBoundingBox(gDrawTarget->context);
-		if(posX<cr.origin.x || posY<cr.origin.y || posX>cr.size.width || posY>cr.size.height) return;
-		int *p = (int*)&gDrawTarget->data[CGBitmapContextGetBytesPerRow(gDrawTarget->context)*posY+posX];
-		*p = currentColor;
-		*/
 		gDrawTarget->mImageDrawer->drawPoint(posX, posY, realColor);
 		   
 	}
 
 	SYSCALL(void, maLine(int x0, int y0, int x1, int y1)) {
-		/*
-		CGContextSetRGBStrokeColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
-		CGContextBeginPath(gDrawTarget->context);
-		CGContextMoveToPoint(gDrawTarget->context, x0, y0);
-		CGContextAddLineToPoint(gDrawTarget->context, x1, y1);
-		CGContextStrokePath(gDrawTarget->context);	
-		*/
 		gDrawTarget->mImageDrawer->drawLine(x0, y0, x1, y1, realColor);
 	}
 
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
-		//CGContextFillRect(gDrawTarget->context, CGRectMake(left, top, width, height));
 		gDrawTarget->mImageDrawer->drawFilledRect(left, top, width, height, realColor);
 	}
 
@@ -345,6 +318,15 @@ namespace Base {
 		}
 	}
 
+	int stringLength(const wchar_t* str) {
+		int len = 0;
+		while(*str++ != 0) {
+			if(*str == '\n') return len;
+			len++;
+		}
+		return len;
+	}
+	
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);		
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
@@ -355,20 +337,12 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const wchar_t* str)) {
-		//NOT_IMPLEMENTED;
-/*
-		const char *s = unicodeToAscii(str);
-		MAExtent e = maGetTextSize(s);
-*/
 		int numGlyphs = wcslen(str)*2;
-		
+		if(numGlyphs==0) return EXTENT(0, 0);		
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
-		
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
-		
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-		//CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = after.x;
@@ -378,41 +352,18 @@ namespace Base {
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
-		
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		
-		//CGAffineTransform xform =  CGAffineTransformMakeRotation(3.14159);
-		//CGAffineTransform xform = CGAffineTransformScale(xform, 1, -1);
-		//CGContextSetTextMatrix(gBackbuffer, xform);	
-		
-		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
-		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
-		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
-		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar_t* str)) {
-		//NOT_IMPLEMENTED;
-		/*
-		const char *s = unicodeToAscii(str);
-		maDrawText(left, top, s);
-		*/
-		int numGlyphs = wcslen(str)*2;
-		
+		int numGlyphs = wcslen(str)*2;		
+		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
-		
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
-		
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		
-		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
-		//CGContextScaleCTM(gDrawTarget->context, 1, -1);
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);
-		//CGContextTranslateCTM(gDrawTarget->context, 0, gDrawTarget->height);
-		//CGContextScaleCTM(gDrawTarget->context, 1, -1);		
-		
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);		
 		delete glyphs;
 	}
 
@@ -429,30 +380,12 @@ namespace Base {
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		//int width = CGImageGetWidth(gBackbuffer->image);
-		//int height = CGImageGetHeight(gBackbuffer->image);
 		return EXTENT(gWidth, gHeight);
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
-		int width = CGImageGetWidth(img->image);
-		int height = CGImageGetHeight(img->image);
-		
-		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);	
-		
-		/*
-		if(img->context) {
-			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, top, width, height), img->image);		
-		} else {
-			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);
-			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
-			CGContextDrawImage (gDrawTarget->context, CGRectMake(left, 0, width, height), img->image);	
-			CGContextTranslateCTM(gDrawTarget->context, 0, height+top);	
-			CGContextScaleCTM(gDrawTarget->context, 1.0, -1.0);		
-		}
-		 */
-			
+		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);				
 	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
@@ -566,7 +499,6 @@ namespace Base {
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int processAlpha)) {
 		int width = EXTENT_X(size); int height = EXTENT_Y(size);
 		gSyscall->ValidateMemRange(src, width*height*4);
-		//NOT_IMPLEMENTED;
 		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
 		char *data = new char[byteSize];
 		memcpy(data, src, byteSize);
@@ -673,7 +605,7 @@ namespace Base {
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
 		ShowMessageBox(message, true);
-		GetVMYield(gCore) = 1;
+		//GetVMYield(gCore) = 1;
 		gRunning = false;
 		pthread_exit(NULL);
 	}
@@ -810,6 +742,10 @@ namespace Base {
 		//backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		//currentDrawSurface = backBuffer;
 		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipLast);
+		CGContextRestoreGState(gBackbuffer->context);		
+		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
+		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
+		CGContextSaveGState(gBackbuffer->context);
 		gDrawTarget = gBackbuffer;
 		return 1;
 	}
@@ -865,6 +801,15 @@ namespace Base {
 		
 		return IOCTL_UNAVAILABLE;
 	}
+	
+	SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
+		//Base::gSyscall->VM_Yield();
+		//you should get out of the VM loop before you can reload, but this will actually work anyway.
+		//gReloadHandle = data;
+		//gReload = gReload || (reload != 0); ???? fredrik?
+		NOT_IMPLEMENTED;
+	}
+	
 } // namespace Base
 
 void EventQueue::handleInternalEvent(int type, void *e) {
@@ -896,6 +841,7 @@ void MoSyncErrorExit(int errorCode)
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
 	char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
+#if 0
 	if(gCore) {
 #ifdef PUBLIC_DEBUG
 		if(SYSCALL_NUMBER_IS_VALID(gCore->currentSyscallId)) {
@@ -914,10 +860,12 @@ void MoSyncErrorExit(int errorCode)
 			sprintf(ptr, "%s", appCode);
 		}
 	}
+#endif
 	
-	GetVMYield(gCore) = 1;
+	//GetVMYield(gCore) = 1;
 	gRunning = false;
 	ShowMessageBox(buffer, true);	
+	pthread_exit(NULL);
 	//MoSyncExit(errorCode);
 }
 	

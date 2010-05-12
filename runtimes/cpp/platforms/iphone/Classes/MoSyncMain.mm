@@ -29,10 +29,48 @@
 #include <base/Syscall.h>
 #include <helpers/log.h>
 #include "Base/ThreadPool.h"
+#include <base/FileStream.h>
 
 #include <helpers/CriticalSection.h>
 
 #include "iphone_helpers.h"
+
+#define _USE_REBUILDER_
+
+#ifdef _USE_REBUILDER_
+#undef SYSCALL
+#define SYSCALL_IMPL(x) ::x
+#include "rebuild.build.cpp"
+
+unsigned char *mem_ds;
+
+void MoSyncDiv0() {
+	BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+}
+
+void* Base::Syscall::GetValidatedMemRange(int address, int size) {
+	return (byte*)mem_ds + address;
+}
+void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
+}
+int Base::Syscall::ValidatedStrLen(const char* ptr) {
+	return strlen(ptr);
+}
+const char* Base::Syscall::GetValidatedStr(int address) {
+	return (const char*)mem_ds+address;
+}
+
+void Base::Syscall::VM_Yield() {
+}
+
+unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
+	unsigned char* data = new unsigned char[mallocSize];
+	Base::FileStream fileStream(file);
+	fileStream.read(data, fileSize);
+	return data;
+}
+
+#endif
 
 using namespace Base;
 
@@ -53,6 +91,12 @@ int MoSyncThreadMain(void *args) {
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
 	
+#ifdef _USE_REBUILDER_
+	FileStream res(resources);
+	if(!syscall->loadResources(res, resources))
+		BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);	
+	cpp_main();
+#else
 	gCore = Core::CreateCore(*syscall);
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
@@ -70,6 +114,7 @@ int MoSyncThreadMain(void *args) {
 			}
 		}
 	}
+#endif	
 	
 	[autoreleasepool release];
 	
@@ -96,13 +141,6 @@ void UpdateMoSyncView(CGImageRef ref) {
 void DoneUpdatingMoSyncView() {
 	
 	mViewSemaphore.post();
-}
-
-SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-	Base::gSyscall->VM_Yield();
-	//you should get out of the VM loop before you can reload, but this will actually work anyway.
-	gReloadHandle = data;
-	//gReload = gReload || (reload != 0); ???? fredrik?
 }
 
 void ShowMessageBox(const char *msg, bool kill) {

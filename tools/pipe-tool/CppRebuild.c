@@ -290,7 +290,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		break;
 
 		case _XB:
-			RebuildEmit("	%s = (int)((byte) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
+			RebuildEmit("	%s = (int)((char) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
 		break;
 
 		case _XH:
@@ -846,12 +846,12 @@ void CppEmitDivu(OpcodeInfo *theOp, int imm)
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
-		RebuildEmit("	%s = (int) ((long)(%s) & 0x0ffffffffL) / ((long)(%d) & 0x0ffffffffL);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], theOp->imm);
+		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%d));", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
 		RebuildEmit("	if(%s == 0) MoSyncDiv0();\n", Cpp_reg[theOp->rs]);
-		RebuildEmit("	%s = (int) ((long)(%s) & 0x0ffffffffL) / ((long)(%s) & 0x0ffffffffL);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%s));", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
 	}
 }
 
