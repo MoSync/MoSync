@@ -70,11 +70,22 @@ int RebuildCppInst(OpcodeInfo *theOp)
 	switch (theOp->op)
 	{
 		case _PUSH:
-//			RebuildEmit("	//push");
+			RebuildEmit("	//push %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
+
+			if (funcprop.reg_used & (1 << REG_sp))
+			{
+				RebuildEmit("	sp -= %d;\n",theOp->rs*4);
+			}
 		return 1;
 			
 		case _POP:
-//			RebuildEmit("	//pop");
+			RebuildEmit("	//pop  %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
+
+			if (funcprop.reg_used & (1 << REG_sp))
+			{
+				RebuildEmit("	sp += %d;\n",theOp->rs*4);
+			}
+
 		return 1;
 
 		case _CASE:
