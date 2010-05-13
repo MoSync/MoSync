@@ -72,7 +72,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		case _PUSH:
 			RebuildEmit("	//push %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
 
-			if (funcprop.reg_used & (1 << REG_sp))
+			if (REGUSED(funcprop.reg_used, REG_sp))
 			{
 				RebuildEmit("	sp -= %d;\n",theOp->rs*4);
 			}
@@ -81,7 +81,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		case _POP:
 			RebuildEmit("	//pop  %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
 
-			if (funcprop.reg_used & (1 << REG_sp))
+			if (REGUSED(funcprop.reg_used, REG_sp))
 			{
 				RebuildEmit("	sp += %d;\n",theOp->rs*4);
 			}
@@ -444,26 +444,6 @@ void CppForceSysCallUsed(char *name)
 
 void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 {
-/*	if (strcmp(str, "RINT") == 0)
-	{
-		// Optimization for int
-
-		if (theOp->rs == 0)
-		{
-			RebuildEmit("	%s = mem_ds[0x%x];", Cpp_reg[theOp->rd], theOp->imm >> 2);
-			return;
-		}
-
-		if (theOp->imm == 0)
-		{
-			RebuildEmit("	%s = mem_ds[%s >> 2];", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
-			return;
-		}
-			
-		RebuildEmit("	%s = mem_ds[(%s+0x%x) >> 2];", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs], theOp->imm);
-		return;
-	}
-*/	
 	
 	if (theOp->rs == 0)
 	{
@@ -487,27 +467,6 @@ void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 
 void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
 {
-	// optimized ints
-	
-/*	if (strcmp(str, "WINT") == 0)
-	{
-		if (theOp->rd == 0)
-		{
-			RebuildEmit("	mem_ds[0x%x] = %s;", theOp->imm >> 2, Cpp_reg[theOp->rs]);
-			return;
-		}
-
-		if (theOp->imm == 0)
-		{
-			RebuildEmit("	mem_ds[%s >> 2] = %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
-			return;
-		}
-
-		RebuildEmit("	mem_ds[(%s+0x%x) >> 2] = %s;", Cpp_reg[theOp->rd], theOp->imm, Cpp_reg[theOp->rs]);
-		return;
-	}
-*/
-// others	
 
 	if (theOp->rd == 0)
 	{
@@ -551,7 +510,6 @@ int CppDecodeLabel(OpcodeInfo *theOp, char *str)
 	
 	ref = labref;
 
-//	RebuildEmit("	jp &%s_%d", ref->Name, ref->LocalScope);
 	RebuildEmit(str, ref->LabelEnum);
 	return 1;
 }
@@ -683,40 +641,7 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 //****************************************
 //			 
 //****************************************
-#if 0
-int xCppCallFunction(SYMBOL *ref)
-{
-	int param_count, need_comma, n;
-	int rettype = ref->RetType;
 
-	CppEmitReturnType(rettype);
-
-	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
-	
-	param_count = ref->Params;
-	
-	if (param_count > 4)
-		param_count = 4;
-
-	need_comma = 0;
-
-	for (n=0;n<param_count;n++)
-	{
-		if (need_comma)
-			RebuildEmit(", ");				
-	
-		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
-		need_comma = 1;
-	}
-
-	RebuildEmit(");");
-	
-	if (rettype == RET_double)
-		RebuildEmit("\n	r15 = __dbl_high;");
-	
-	return 1;
-}
-#else
 int CppCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
@@ -741,18 +666,8 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 		if (need_comma)
 			RebuildEmit(", ");				
 
-/*		if (REGUSED(REG_i0 + n, regs))
-		{
-			printf("Rebuilder: Function '%s' parameter %d was not initialized\n",ref->Name, n);
-			//Error(Error_Fatal,"Function parameter %d was not initialized", n);
-			RebuildEmit("<Error>");
-		}
-*/		
 		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
-
-		// Make sure
-
 	}
 
 	RebuildEmit(");");
@@ -764,7 +679,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 	}
 	return 1;
 }
-#endif
+
 //****************************************
 //			 
 //****************************************
@@ -814,21 +729,17 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 	return;
 }
 
-
 //****************************************
 //			 
 //****************************************
 
 void CppEmitDiv(OpcodeInfo *theOp, int imm)
 {
-
 	if ((theOp->rs == 0) || (theOp->imm == 0))
 		printf("");
 	
 	if (imm)
 	{
-//		RebuildEmit("	if (%d == 0) MoSyncDiv0();\n", theOp->imm);		// Fails here
-
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
@@ -847,13 +758,8 @@ void CppEmitDiv(OpcodeInfo *theOp, int imm)
 
 void CppEmitDivu(OpcodeInfo *theOp, int imm)
 {
-//	if ((theOp->rs == 0) || (theOp->imm == 0))
-//		printf("");
-
 	if (imm)
 	{
-//		RebuildEmit("	if(%d == 0) MoSyncDiv0();\n", theOp->imm); 		// Fails here
-
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
@@ -887,7 +793,7 @@ void CppEmitReturnType(int rettype)
 	switch(rettype)
 	{
 		case RET_null:
-		RebuildEmit("? // Error report to MobileSorcery");
+		RebuildEmit("? // Error report to MoSync");
 		break;
 
 		case RET_void:
@@ -911,12 +817,10 @@ void CppEmitReturnType(int rettype)
 
 void CppEmitReturnDecl(int rettype)
 {
-//	RebuildEmit("static ");
-
 	switch(rettype)
 	{
 		case RET_null:
-		RebuildEmit("? // Error report to MobileSorcery");
+		RebuildEmit("? // Error report to MoSync");
 		break;
 
 		case RET_void:
@@ -948,8 +852,6 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	int n;
 		
 	// Find registers used in function
-
-//	reg_used = FunctionRegUsage(sym);
 	
 	reg_used = FunctionRegAnalyse(sym, &funcprop);
 	
@@ -964,7 +866,6 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("//****************************************\n\n");
 	}
 	
-
 	if (!isproto)
 	{
 		RebuildEmit("//             rrrrrrrrrrrrrrrriiiiddddddddfrsz\n");
@@ -979,8 +880,6 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	}
 
 	// Output function decl
-
-//	RebuildEmit("static ");
 
 	switch(ThisFunctionRetType)
 	{
@@ -1056,6 +955,10 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 					RebuildEmit(", ");				
 
 				RebuildEmit("%s", Cpp_reg[n]);
+
+				if (funcprop.uninit_reg & (1<<n))
+					RebuildEmit("=0");
+
 				need_comma = 1;
 			}
 		}
