@@ -156,16 +156,34 @@ int CharInput_getMode(void) {
 void CharInput_Pressed(int keyCode) {
 	int newCharMapIndex;
 	if(sQwerty) {
+		char c = 0;
 		//if in numeric mode
 		if(sCurrentCharMode == CI_MODE_CHAR_MODE_NUMBERS) {
 			//discard all non-number keys
 			if(keyCode < MAK_0 || keyCode > MAK_9)
 				return;
 		}
+		
+		/* Key is a printable character */
 		if(keyCode >= MAK_SPACE && keyCode < MAK_DELETE) {
-			sCharacterChangedCallback(keyCode, sCharacterChangedUserData);
-			sCharacterDeployedCallback(keyCode, sCharacterDeployedUserData);
+			c = (char) keyCode;
+
+			/* Convert to upper case */
+			if(sCurrentCharMode == CI_MODE_CHAR_MODE_UPPERCASE &&
+				keyCode >= MAK_A && keyCode <= MAK_Z) {
+				c = keyCode - MAK_A + 'A';
+			}
 		}
+		else if(keyCode == MAK_RETURN){
+			c = '\n';
+		}
+
+		/* Deploy character */
+		if(c > 0) {
+			sCharacterChangedCallback(c, sCharacterChangedUserData);
+			sCharacterDeployedCallback(c, sCharacterDeployedUserData);
+		}
+
 		return;
 	}
 
