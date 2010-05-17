@@ -47,6 +47,14 @@ public:
 	 * @param id	ID of the widget that is clicked
 	 */
 	virtual void onClick(int id) = 0 ;
+
+	/**
+	 * The onItemSelected method shall be
+	 * overwritten to contain the user's code
+	 *
+	 * @param index	Index of the item that is selected
+	 */
+	virtual void onItemSelected(int index) = 0 ;
 };
 
 #endif /* ACTIONLISTENER_H_ */

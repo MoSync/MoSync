@@ -134,7 +134,7 @@ static NSMutableArray *listItems = nil;
 - (void)tableView:(UITableView *)tableView
 didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	Base::gEventQueue.addNativeUIEvent([currentScreen tag], [indexPath indexAtPosition:1+1]);
+	Base::gEventQueue.addNativeUIEvent([currentScreen tag], [indexPath indexAtPosition:1]+1);
     NSLog(@"the tag value is: %d index: %d.", [currentScreen tag], [indexPath indexAtPosition:1]+1);
 }
 

@@ -98,6 +98,9 @@ void ListFrame::processEvent(const MAEvent &e) {
 	if(e.hi_wparam==0) {
 		actionListener->onCreate(e.lo_wparam);
 	}
+	else {
+		actionListener->onItemSelected(e.hi_wparam);
+	}
 }
 
 /**
@@ -123,3 +126,6 @@ void ListFrame::show() {
 	wparamsListView.pParent = me;
 	maIPhoneListView(&wparamsListView, NULL);
 }
+
+
+

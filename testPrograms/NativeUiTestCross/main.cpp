@@ -15,8 +15,8 @@
 class Main : public ActionListener {
 private:
 	ListFrame *listFrame;
-	/*Frame *frame2;
-	Parser *parser;
+	Frame *frame2;
+	/*Parser *parser;
 	Button *button;
 	Button *button2;
 	MenuItem *item;
@@ -25,13 +25,13 @@ private:
 public:
 	Main() {
 		listFrame = NULL;
-		/*frame2 = NULL;
-		parser = NULL;
+		frame2 = NULL;
+		/*parser = NULL;
 		button = NULL;
 		button2 = NULL;*/
 
 		listFrame = new ListFrame(50);
-		listFrame->add("Item");
+		listFrame->add("Click me");
 		listFrame->add("Item");
 		listFrame->add("Item");
 		listFrame->add("Item");
@@ -55,8 +55,8 @@ public:
 	~Main() {
 		//delete(button);
 		delete(listFrame);
-		/*delete(frame2);
-		delete(parser);
+		delete(frame2);
+		/*delete(parser);
 		delete(button);
 		delete(button2);
 		delete(item);
@@ -146,6 +146,14 @@ public:
 			Manager::Instance().addWidget(frame2);
 			frame2->addActionListener(this);
 		}*/
+	}
+
+	void onItemSelected (int index) {
+		if(index==3) {
+			frame2 = new Frame(2);
+			Manager::Instance().addWidget(frame2);
+			frame2->addActionListener(this);
+		}
 	}
 
 };

@@ -897,7 +897,7 @@ namespace Base {
 		LOGD("MATimerCallback %i...", (int)sequence);
 		DEBUG_ASRTZERO(SDL_LockMutex(gTimerMutex));
 		{
-			SDL_UserEvent event = { FE_TIMER, (int)sequence, NULL, NULL };
+			SDL_UserEvent event = { FE_TIMER, (int)(size_t)sequence, NULL, NULL };
 			FE_PushEvent((SDL_Event*)&event);
 		}
 		DEBUG_ASRTZERO(SDL_UnlockMutex(gTimerMutex));
