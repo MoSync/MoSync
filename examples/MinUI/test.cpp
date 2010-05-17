@@ -92,7 +92,7 @@ public:
 
 	//View
 	void keyPressEvent(int keyCode, int nativeCode) {
-		if(keyCode == MAK_0)
+		if(keyCode == MAK_0 || keyCode == MAK_SOFTRIGHT)
 			maExit(0);
 		if(keyCode == MAK_FIRE)
 			mList.draw();
@@ -102,7 +102,11 @@ public:
 
 	//HyperlinkListener
 	void click(int linkIndex) {
-		printf("click %i\n", linkIndex);
+		if(linkIndex == 0) {	// User clicked on the "click here" link to exit
+			maExit(0);
+		} else {
+			printf("click %i\n", linkIndex);
+		}
 	}
 private:
 	GridLayout mList;
