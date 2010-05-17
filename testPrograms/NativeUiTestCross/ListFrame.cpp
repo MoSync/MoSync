@@ -47,6 +47,8 @@ ListFrame::ListFrame(int id) {
 	maIPhoneView(&wp, &handle);
 	me=handle.pWidget;
 	
+	maAndroidStartListActivity(id);
+
 	/*
 	MAWidgetParameters wparamsListItem;
 	char *str1="List item";
@@ -63,7 +65,7 @@ ListFrame::ListFrame(int id) {
 /**
  * Destructor
  */
-ListFrame::ListFrame() {
+ListFrame::~ListFrame() {
 
 }
 
@@ -114,6 +116,7 @@ void ListFrame::add(char *str) {
 	wparamsListItem.widgetID = myid;
 	strncpy(wparamsListItem.buf, str, strlen(str)+1);
 	maIPhoneListItem(&wparamsListItem, NULL);
+	maAndroidAddListItem(myid, str);
 }
 
 /**

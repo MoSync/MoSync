@@ -44,7 +44,7 @@ public:
 	/**
 	 * Destructor
 	 */
-	ListFrame();
+	~ListFrame();
 
 	/**
 	 * Returns the widget's ID

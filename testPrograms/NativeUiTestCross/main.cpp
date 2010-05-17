@@ -31,12 +31,7 @@ public:
 		button2 = NULL;*/
 
 		listFrame = new ListFrame(50);
-		listFrame->add("Click me");
-		listFrame->add("Item");
-		listFrame->add("Item");
-		listFrame->add("Item");
-		listFrame->add("Item");
-		listFrame->show();
+
 		Manager::Instance().addWidget(listFrame);
 		listFrame->addActionListener(this);
 
@@ -66,6 +61,12 @@ public:
 
 	void onCreate (int id) {
 		if(id==listFrame->getId()) {
+			listFrame->add("Click me");
+			listFrame->add("Item");
+			listFrame->add("Item");
+			listFrame->add("Item");
+			listFrame->add("Item");
+			listFrame->show();
 /*
 			parser = new Parser(MAIN_LAYOUT, frame);
 
