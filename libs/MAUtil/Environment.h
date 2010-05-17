@@ -36,6 +36,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Vector.h"
 #include "ListenerSet.h"
 
+/**
+ * Make a forward decleration here, so that we later can allow 
+ * the virtual keyboard to access the fireKey*-methods.
+ */
+namespace MAUI {
+	class VirtualKeyboard;
+}
 
 namespace MAUtil {
 	/**
@@ -132,6 +139,7 @@ namespace MAUtil {
 	* \brief A base class for cross-platform event managers.
 	*/
 	class Environment {
+		friend class MAUI::VirtualKeyboard;
 	public:
 		/**
 		* Adds the specified listener to the end of the list,

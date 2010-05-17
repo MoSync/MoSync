@@ -21,13 +21,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastring.h>
 #include <mastdlib.h>
 
+#include <MAUI/Keyboard/VirtualKeyboard.h>
+#include <MAUI/Keyboard/VirtualKeyboardFactory.h>
+
+#include <MAUI/Layout.h>
 #include <MAUtil/Graphics.h>
 
 //#define PUSH_EMPTY_CLIPRECT pushClipRect(0,0,0,0)
 
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
+extern char VIRTUAL_KEYBOARD_DEFAULT_XML[];
+
 namespace MAUI {
+
 	Engine* Engine::singletonPtr = 0;
 	
 	Engine::Engine()
@@ -38,7 +45,12 @@ namespace MAUI {
 		overlay = NULL;
 		singletonPtr = this;
 		//clipStackPtr = -1;
+		m_keyboardVisible = false;
 		Environment::getEnvironment().addFocusListener(this);
+
+		m_keyboard = VirtualKeyboardFactory::createFromXMLString(VIRTUAL_KEYBOARD_DEFAULT_XML);
+		MAExtent screenSize = maGetScrSize();
+		m_keyboard->setPosition(0, EXTENT_Y(screenSize) - m_keyboard->getHeight());
 	}
 	
 	void Engine::setMain(Widget* main) {
@@ -178,25 +190,36 @@ namespace MAUI {
 	void Engine::requestUIUpdate() {
 		Environment::getEnvironment().addIdleListener(this);
 	}
-	
+
 	void Engine::repaint() {
 		//lprintfln("repaint @ (%i ms)", maGetMilliSecondCount());
-		if(!main) return;
-		//printf("doing repaint!");
+		if(!main) {
+			return;
+		}
 		
 		//clearClipRect();
 		Gfx_clearClipRect();
 		Gfx_clearMatrix();
-
 		
 		int scrW = EXTENT_X(maGetScrSize());
 		int scrH = EXTENT_Y(maGetScrSize());
+
+		int availScreenWidth = scrW;
+		int availScreenHeight = scrH;
+		
+		if(keyboardVisible()) {
+			availScreenHeight -= m_keyboard->getHeight();
+		}
+
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
-		Gfx_pushClipRect(0, 0, scrW, scrH);
+		/* Draw main widget */
+		Gfx_pushClipRect(0, 0, availScreenWidth, availScreenHeight);
+		main->setHeight(availScreenHeight);
 		main->update();
 		main->draw();
 		Gfx_popClipRect();
 
+		/* Draw overlay */
 		if(overlay) {
 			Gfx_clearClipRect();
 			Gfx_clearMatrix();
@@ -206,6 +229,21 @@ namespace MAUI {
 			Gfx_translate(overlayPosition.x, overlayPosition.y);
 			overlay->update();
 			overlay->draw();
+		}
+
+		/* If the keyboard is visible it should be drawn,
+		   is is assumed that its position has been set up 
+		   correctly. */
+		if( keyboardVisible() ) {
+			Gfx_clearClipRect();
+			Gfx_clearMatrix();
+			Gfx_pushClipRect(0, availScreenHeight, availScreenWidth, scrH);
+			//Gfx_translate(0, availScreenHeight);
+
+			m_keyboard->update();
+			m_keyboard->draw();
+
+			Gfx_popClipRect();
 		}
 
 		maUpdateScreen();
@@ -218,12 +256,11 @@ namespace MAUI {
 	}
 
 	Engine&	Engine::getSingleton() {
-		if(!singletonPtr)
+		if(!singletonPtr) {
 			singletonPtr = new Engine();
+		}
 		return *singletonPtr;
 	}
-
-
 
 	/* is an overlay shown? */
 	bool Engine::isOverlayShown() {
@@ -246,4 +283,43 @@ namespace MAUI {
 		main->requestRepaint();
 	}
 
+	void Engine::showKeyboard()
+	{
+		if(!m_keyboardVisible)
+		{
+			m_keyboardVisible = true;
+
+			/* Keyboard produces qwerty output */
+			CharInput::getCharInput().setQwerty(true);
+
+			/* Let the keyboard listen to pointer events as long as it is active */
+			Environment::getEnvironment().addPointerListener(m_keyboard);
+
+			/* Reset the keyboard to the default state and display it */
+			m_keyboard->reset();
+			repaint();
+		}
+	}
+
+	void Engine::hideKeyboard()
+	{
+		if(m_keyboardVisible)
+		{
+			m_keyboardVisible = false;
+
+			/* The keyboard should not respond to pointer events when hidden */
+			Environment::getEnvironment().removePointerListener(m_keyboard);
+
+			/* Clear screen */
+			MAExtent screenSize = maGetScrSize();
+			maSetColor(0);
+			maFillRect(0, 0, EXTENT_X(screenSize), EXTENT_Y(screenSize));
+			repaint();
+		}
+	}
+
+	bool Engine::keyboardVisible()
+	{
+		return m_keyboardVisible;
+	}
 }

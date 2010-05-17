@@ -36,6 +36,8 @@ namespace MAUI {
 	  * when developing custom widgets.
 	**/
 
+	class VirtualKeyboard;
+
 	class Engine : public IdleListener, public FocusListener {
 	public:
 		enum {
@@ -92,6 +94,26 @@ namespace MAUI {
 		/* hide the currently shown overlay. */
 		void hideOverlay();
 
+		/**
+		 * Shows the on the screen virtual keyboard. The main widget
+		 * will be resized to make place for the keyboard.
+		 */
+		void showKeyboard();
+
+		/**
+		 * Hides the virtual keyboard.
+		 */
+		void hideKeyboard();
+
+		/**
+		 * Returns true if the keyboard is currently shown on the
+		 * screen.
+		 * 
+		 * @return true if the keyboard is currently shown on the
+		 * screen, false otherwise.
+		 */
+		bool keyboardVisible();
+
 	protected:
 		Widget *overlay;
 		Point overlayPosition;
@@ -99,6 +121,16 @@ namespace MAUI {
 		Widget* main;
 		Font* defaultFont;
 		WidgetSkin* defaultSkin;
+
+		/**
+		 * Current instance of the virtual keyboard.
+		 */
+		VirtualKeyboard* m_keyboard;
+
+		/**
+		 * Determiens if the virtual keyboard is shown or not.
+		 */
+		bool m_keyboardVisible;
 
 		static Engine* singletonPtr;
 

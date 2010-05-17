@@ -78,6 +78,8 @@ namespace MAUI {
 		this->caption.reserve(maxLength);
 
 		setInputMode(inputMode);
+
+		Environment::getEnvironment().addPointerListener(this);
 	}
 
 	void EditBox::setSelected(bool selected) {
@@ -271,6 +273,7 @@ namespace MAUI {
 				if(moveCursorHorizontal(1)==false) return;
 				break;
 			case MAK_CLEAR:
+			case MAK_BACKSPACE:
 				/*
 				if(characterInputActive) {
 					CharInput::getCharInput().forceDeployment();
@@ -293,6 +296,24 @@ namespace MAUI {
 
 	void EditBox::keyReleaseEvent(int keyCode, int nativeCode) {
 	}
+
+	void EditBox::pointerPressEvent(MAPoint2d p) {
+	}
+	void EditBox::pointerMoveEvent(MAPoint2d p) {
+	}
+
+	void EditBox::pointerReleaseEvent(MAPoint2d p) {
+		if(contains(p.x, p.y)) {
+			Engine::getSingleton().showKeyboard();
+			activate();
+		}
+		else {
+			if(!Engine::getSingleton().keyboardVisible()) {
+				deactivate();
+			}
+		}
+	}
+
 
 	int currentIndex;
 

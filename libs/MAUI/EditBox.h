@@ -57,7 +57,7 @@ namespace MAUI {
 	  **/
 	class EditBox : 
 //		public Widget, CharInputListener, KeyListener {
-	public Label, CharInputListener, KeyListener {
+	public Label, public CharInputListener, public KeyListener, public PointerListener {
 	public:
 		/** Enumeration for modes **/
 		enum InputMode {
@@ -114,6 +114,20 @@ namespace MAUI {
 		void keyPressEvent(int keyCode, int nativeCode);
 		/** Implementation of the KeyListener interface, updating the content **/
 		void keyReleaseEvent(int keyCode, int nativeCode);
+
+		/**
+		 * @see MAUtil::PointerListener::pointerPressEvent.
+		 */
+		void pointerPressEvent(MAPoint2d p);
+		/**
+		 * @see MAUtil::PointerListener::pointerMoveEvent.
+		 */
+		void pointerMoveEvent(MAPoint2d p);
+		/**
+		 * @see MAUtil::PointerListener::pointerReleaseEvent.
+		 */
+		void pointerReleaseEvent(MAPoint2d p); 
+
 		/** Implementation of the CharInputListener interface function **/
 		void characterChanged(char c);
 		/** Implementation of the CharInputListener interface function **/
