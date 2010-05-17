@@ -35,9 +35,11 @@ class RuntimeBuilder
 			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3"
 			default = "@S60_3rd_FP1:com.nokia.s60"
 			symbian_system = "gcce"
+			# symbian_system = "armv5"
 		elsif version == "s60v5"
 			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3"
 			symbian_system = "gcce"
+			# symbian_system = "armv5"
 		else
 			puts "FATAL ERROR! - Unknown version (#{version})."
 			return 1
@@ -67,7 +69,7 @@ class RuntimeBuilder
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis/"
-			app_file = "#{epoc_dir}release/armi/urel/MoSync.app"
+			app_file = "#{epoc_dir}release/#{symbian_system}/urel/MoSync.app"
 			
 			if(!File.exist? app_file) 
 				puts "FATAL ERROR! - S60 2nd build failed."
@@ -85,7 +87,7 @@ class RuntimeBuilder
 		elsif version == "s60v3"
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"
-			exe_file = "#{epoc_dir}release/gcce/urel/MoSync2.exe"
+			exe_file = "#{epoc_dir}release/#{symbian_system}/urel/MoSync2.exe"
 			
 			if(!File.exist? exe_file) 
 				puts "FATAL ERROR! - S60 3rd build failed."
@@ -104,7 +106,7 @@ class RuntimeBuilder
 		elsif version == "s60v5"
 			epoc_dir = "/Symbian/s60v5/S60_5th_Edition_SDK_v1.0/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed5/"
-			exe_file = "#{epoc_dir}release/gcce/urel/MoSync2.exe"
+			exe_file = "#{epoc_dir}release/#{symbian_system}/urel/MoSync2.exe"
 			
 			if(!File.exist? exe_file) 
 				puts "FATAL ERROR! - S60 5th build failed."
