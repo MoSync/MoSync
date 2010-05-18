@@ -43,7 +43,7 @@ class RuntimeBuilder
 				x == "LimitedLengthInputStream.jpp" || x == "LittleEndianDataInputStream.jpp" || x == "ThreadPool.jpp" || 
 				x == "UBin.jpp" || x == "RefByteArrayOutputStream.jpp" || x == "Tilemap.jpp" ||
 				x == "ImageCache.jpp" || x == "MAPanicReport.jpp" )
-				preprocess_java_file(x, shared_src, platform_dir, output_dir, platform_define)
+				preprocess_android_file(x, shared_src, platform_dir, output_dir, platform_define)
 			end
 		}
 	end
@@ -84,7 +84,7 @@ class RuntimeBuilder
 		# Preprocess all the platform dependant java files and store result in temporary location
 		Dir.foreach(android_source) {|x| 
 			if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "Syscall.jpp" || x == "MoSyncPanicDialog.jpp" )
-				preprocess_java_file(x, "#{android_source}/", android_source, temp_dir, "_android")
+				preprocess_android_file(x, "#{android_source}/", android_source, temp_dir, "_android")
 			end
 		}
 		
