@@ -25,7 +25,12 @@ class DllTask < NativeGccLinkTask
 		libflags = ""
 		#puts "libflags: #{libflags}"
 		if(whole_libs.size > 0)
-			libflags += " -Wl,--whole-archive #{whole_libs.join(' ')} -Wl,--no-whole-archive"
+			if(HOST_PLATFORM != :darwin)
+				libflags += " -Wl,--whole-archive #{whole_libs.join(' ')} -Wl,--no-whole-archive"
+			
+			else
+				libflags += " #{whole_libs.join(' ')}"
+			end
 			#puts "libflags: #{libflags}"
 		end
 		if(libs.size > 0)

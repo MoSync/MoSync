@@ -17,7 +17,6 @@ work.instance_eval do
 		@LIBRARIES = common_libraries
 	elsif(HOST == :linux)
 		
-		@EXTRA_CPPFLAGS = ""
 		if (!SDL_SOUND)
 			@EXTRA_CPPFLAGS += " -D__NO_SDL_SOUND__"
 			@IGNORED_FILES += ["SDLSoundAudioSource.cpp"]
@@ -25,12 +24,20 @@ work.instance_eval do
 		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__ -D__USE_SYSTEM_RESOLUTION__"
 		end
+		if(HOST_PLATFORM == :darwin)
+			@EXTRA_INCLUDES = common_includes + ["/sw/include/gtk-2.0",
+				"/sw/include/glib-2.0", "/sw/include/pango-1.0",
+				"/sw/include/cairo", "/sw/include/atk-1.0",
+				"/sw/lib/glib-2.0/include", "/sw/lib/gtk-2.0/include", "/sw/include", "/usr/include"]
+			@LIBRARIES = common_libraries +["gobject-2.0"]
+		else
+			@EXTRA_INCLUDES = common_includes + ["/usr/include/gtk-2.0",
+                        "/usr/include/glib-2.0", "/usr/include/pango-1.0",
+                        "/usr/include/cairo", "/usr/include/atk-1.0",
+                        "/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include"]
+			@LIBRARIES = common_libraries
+		end
 		
-		@EXTRA_INCLUDES = common_includes + ["/sw/include/gtk-2.0",
-			"/sw/include/glib-2.0", "/sw/include/pango-1.0",
-			"/sw/include/cairo", "/sw/include/atk-1.0",
-			"/sw/lib/glib-2.0/include", "/sw/lib/gtk-2.0/include", "/sw/include"]
-		@LIBRARIES = common_libraries
 	else
 		error "Unsupported platform"
 	end

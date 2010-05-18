@@ -603,6 +603,11 @@ int Bluetooth::maBtGetNextServiceSize(MABtServiceSize* dst) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
+int Bluetooth::maBtCancelDiscovery ( void )
+{
+    BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
+}
+
 
 #endif	//WIN32
 

@@ -40,6 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../sdl_syscall.h"
 #include "../report.h"
 
+#include <SDL.h>
 
 #ifdef ENABLE_DEBUGGER
 #include <core/debugger.h>
@@ -67,7 +68,7 @@ int main2(int argc, char **argv);
 
 
 
-int main(int argc, char **argv) {
+int SDL_main(int argc, char **argv) {
 	int result = main2(argc, argv);
 	reportClose();
 	return result;

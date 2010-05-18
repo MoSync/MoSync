@@ -44,11 +44,11 @@ class PipeTask < FileTask
 		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
-			if(HOST == :linux)
-				sh "wine #{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
-			else
+			#if(HOST == :linux)
+			#	sh "wine #{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
+			#else
 				sh "#{mosyncdir}/bin/pipe-tool#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
-			end
+			#end
 		rescue => e
 			FileUtils.rm_f(@NAME)
 			raise
@@ -89,11 +89,11 @@ end
 class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
-	if(HOST == :linux)
-		def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
-	else
+	#if(HOST == :linux)
+	#	def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
+	#else
 		def gcc; mosyncdir + "/bin/xgcc"; end
-	end
+	#end
 	def gccmode; "-S"; end
 	def host_flags;
 		g = CONFIG == "" ? " -g" : ""

@@ -1295,8 +1295,7 @@ namespace Base {
 							if( destX >= gDrawSurface->clip_rect.x && 
 								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w ) 
 							{
-								destPixels[destX + destY] = (destPixels[destX + destY]&0xff000000) | 
-									(srcPixels[srcX + srcY]&0x00ffffff);
+								destPixels[destX + destY] = srcPixels[srcX + srcY];
 							}
 							srcX+=srcPitchX;
 							destX++;
