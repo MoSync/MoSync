@@ -3,6 +3,8 @@ TARGETTYPE        app
 UID               0x100039CE 0x20015BDC
 TARGETPATH        \system\apps\mosync
 
+MACRO SYMBIAN
+
 SOURCEPATH        ..\data
 RESOURCE          MoSync.rss
 RESOURCE          MoSync_caption.rss
