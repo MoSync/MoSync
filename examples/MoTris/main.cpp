@@ -985,9 +985,14 @@ void saveSettingsToStore() {
 void populateHighScoreList() {
 	if(!highScoreListPtr) return;
 	highScoreListPtr->clear();
-	for(int i = 0; i < MIN(curSettings.numHighScoreEntries, MAX_HIGH_SCORE_ENTRIES); i++) {
-		sprintf(tempString, "%d: %s %d", i+1, curSettings.highScoreEntries[i].name, curSettings.highScoreEntries[i].score);
-		highScoreListPtr->addMenuItem(String(tempString));
+	if(curSettings.numHighScoreEntries > 0) {
+		for(int i = 0; i < MIN(curSettings.numHighScoreEntries, MAX_HIGH_SCORE_ENTRIES); i++) {
+			sprintf(tempString, "%d: %s %d", i+1, curSettings.highScoreEntries[i].name, curSettings.highScoreEntries[i].score);
+			highScoreListPtr->addMenuItem(String(tempString));
+		}
+	} else {
+		highScoreListPtr->addMenuItem(String("No highscore yet."));
+		highScoreListPtr->addMenuItem(String("Press any key to continue."));
 	}
 }
 
