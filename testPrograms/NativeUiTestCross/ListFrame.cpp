@@ -101,7 +101,7 @@ void ListFrame::processEvent(const MAEvent &e) {
 		actionListener->onCreate(e.lo_wparam);
 	}
 	else {
-		actionListener->onItemSelected(e.hi_wparam);
+		actionListener->onItemSelected(e.lo_wparam, e.hi_wparam);
 	}
 }
 

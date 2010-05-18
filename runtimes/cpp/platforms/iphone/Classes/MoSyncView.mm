@@ -378,7 +378,11 @@ bool down = false;
 -(MoSyncView *) showScreenList:(int) widgetid {
 	WidgetHandler *wh = [WidgetHandler alloc];
 	wh.widgetId = widgetid;
+	
 	[self performSelectorOnMainThread: @ selector(addScreenList:) withObject:(id)wh waitUntilDone:YES];
+	//[listItems removeAllObjects];
+	[listItems release];
+	listItems = NULL;
 	return currentScreen;
 }
 

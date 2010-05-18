@@ -54,7 +54,7 @@ public:
 	 *
 	 * @param index	Index of the item that is selected
 	 */
-	virtual void onItemSelected(int index) = 0 ;
+	virtual void onItemSelected(int id, int index) = 0 ;
 };
 
 #endif /* ACTIONLISTENER_H_ */

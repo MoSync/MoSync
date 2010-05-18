@@ -15,6 +15,7 @@
 class Main : public ActionListener {
 private:
 	ListFrame *listFrame;
+	ListFrame *listFrame2;
 	Frame *frame2;
 	/*Parser *parser;
 	Button *button;
@@ -25,6 +26,7 @@ private:
 public:
 	Main() {
 		listFrame = NULL;
+		listFrame2 = NULL;
 		frame2 = NULL;
 		/*parser = NULL;
 		button = NULL;
@@ -50,6 +52,7 @@ public:
 	~Main() {
 		//delete(button);
 		delete(listFrame);
+		delete(listFrame2);
 		delete(frame2);
 		/*delete(parser);
 		delete(button);
@@ -61,11 +64,11 @@ public:
 
 	void onCreate (int id) {
 		if(id==listFrame->getId()) {
-			listFrame->add("Click me");
-			listFrame->add("Item");
-			listFrame->add("Item");
-			listFrame->add("Item");
-			listFrame->add("Item");
+			listFrame->add("Temperature");
+			listFrame->add("Weight");
+			listFrame->add("Length");
+			listFrame->add("Currency");
+			listFrame->add("Angle");
 			listFrame->show();
 /*
 			parser = new Parser(MAIN_LAYOUT, frame);
@@ -135,6 +138,14 @@ public:
 			item2->addActionListener(this);
 */
 		}
+
+		if(id==listFrame2->getId()) {
+					listFrame2->add("Centimeters");
+					listFrame2->add("Meters");
+					listFrame2->add("Feet");
+					listFrame2->add("Inches");
+					listFrame2->show();
+		}
 	}
 	void onClick (int id) {
 		if(id==32) {
@@ -149,11 +160,11 @@ public:
 		}*/
 	}
 
-	void onItemSelected (int index) {
-		if(index==3) {
-			frame2 = new Frame(2);
-			Manager::Instance().addWidget(frame2);
-			frame2->addActionListener(this);
+	void onItemSelected (int id, int index) {
+		if(id==50 && index==3) {
+			listFrame2 = new ListFrame(51);
+			Manager::Instance().addWidget(listFrame2);
+			listFrame2->addActionListener(this);
 		}
 	}
 
