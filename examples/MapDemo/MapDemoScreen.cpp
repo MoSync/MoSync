@@ -151,8 +151,8 @@ namespace MapDemo
 			else
 				mMap->scroll(SCROLLDIRECTION_NORTH, false);
 		}
-		prevX = p.x;
-		prevY = p.y;
+		prevX = point.x;
+		prevY = point.y;
 	}
 
 	//-------------------------------------------------------------------------
