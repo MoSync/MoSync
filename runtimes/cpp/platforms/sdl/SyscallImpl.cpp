@@ -1247,6 +1247,7 @@ namespace Base {
 		unsigned int dstGreenShift = gDrawSurface->format->Gshift;
 		unsigned int dstBlueMask = gDrawSurface->format->Bmask;
 		unsigned int dstBlueShift = gDrawSurface->format->Bshift;
+		unsigned int dstAlphaMask = gDrawSurface->format->Amask;
 		unsigned int srcRedMask = surf->format->Rmask;
 		unsigned int srcRedShift = surf->format->Rshift;
 		unsigned int srcGreenMask = surf->format->Gmask;
@@ -1280,6 +1281,8 @@ namespace Base {
 								int dr = (((d)&dstRedMask)>>dstRedShift);
 								int dg = (((d)&dstGreenMask)>>dstGreenShift);
 								int db = (((d)&dstBlueMask)>>dstBlueShift);
+								
+								/* Do alpha blitting */
 								destPixels[destX + destY] = 
 									(((dr + (((sr-dr)*(a))>>8)) << dstRedShift)  &dstRedMask) |
 									(((dg + (((sg-dg)*(a))>>8)) << dstGreenShift)&dstGreenMask) |
@@ -1309,7 +1312,9 @@ namespace Base {
 							if( destX >= gDrawSurface->clip_rect.x && 
 								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w ) 
 							{
-								destPixels[destX + destY] = srcPixels[srcX + srcY];
+								/* Do blitting without alpha */
+								destPixels[destX + destY] = (destPixels[destX + destY] & dstAlphaMask) | 
+															(srcPixels[srcX + srcY] & (srcRedMask | srcGreenMask | srcBlueMask));
 							}
 							srcX+=srcPitchX;
 							destX++;
