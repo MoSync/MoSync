@@ -81,4 +81,5 @@
 -(void) addImage:(id) obj;
 -(void) showImage: (int) widgetid withImage: (int) rsc posX:(int) x posY:(int) y;
 -(void) passEvent:(id) obj;
+-(NSString *) getText:(int) widgetId;
 @end

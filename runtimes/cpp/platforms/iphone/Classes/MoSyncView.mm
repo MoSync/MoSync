@@ -313,6 +313,7 @@ bool down = false;
 	textField.placeholder = wh.msg;
 	textField.borderStyle = UITextBorderStyleRoundedRect;
 	textField.delegate = wh;
+	textField.tag = wh.widgetId;
 	[self addSubview:textField];
 }
 
@@ -479,6 +480,11 @@ bool down = false;
 -(void) passEvent:(id) obj {
 	Base::gEventQueue.addNativeUIEvent([obj tag], 0);
 	NSLog(@"the tag value is: %d", [obj tag]);
+}
+
+-(NSString *) getText:(int) widgetId {
+	UITextField *tf = (UITextField *) [self viewWithTag:widgetId];
+	return tf.text;
 }
 
 @end

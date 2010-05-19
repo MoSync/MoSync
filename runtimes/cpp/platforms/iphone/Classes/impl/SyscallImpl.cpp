@@ -820,6 +820,9 @@ namespace Base {
 		case maIOCtl_maIPhoneImage:
 			return maIPhoneImage(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
 				
+		case maIOCtl_maIPhoneGetText:
+			return maIPhoneGetText(GVMRA(MAWidgetParameters), GVMR(b, MAWidgetHandle));
+				
 		}
 		
 		return IOCTL_UNAVAILABLE;

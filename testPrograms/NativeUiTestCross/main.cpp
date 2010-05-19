@@ -14,9 +14,15 @@
 
 class Main : public ActionListener {
 private:
-	ListFrame *listFrame;
-	ListFrame *listFrame2;
-	Frame *frame2;
+	ListFrame *categoriesListFrame;
+	ListFrame *lengthListFrame;
+	Frame *inputFrame;
+	Frame *resultsFrame;
+	Button *button;
+	Edit *edit;
+	Label*label;
+	Layout *inputFrameLayout, *resultsFrameLayout;
+	MAWidgetHandle wh;
 	/*Parser *parser;
 	Button *button;
 	Button *button2;
@@ -25,24 +31,30 @@ private:
 	Image *image;*/
 public:
 	Main() {
-		listFrame = NULL;
-		listFrame2 = NULL;
-		frame2 = NULL;
+		categoriesListFrame = NULL;
+		lengthListFrame = NULL;
+		inputFrame = NULL;
+		resultsFrame = NULL;
+		button = NULL;
+		edit = NULL;
+		label = NULL;
+		inputFrameLayout = NULL;
+
 		/*parser = NULL;
 		button = NULL;
 		button2 = NULL;*/
 
-		listFrame = new ListFrame(50);
+		categoriesListFrame = new ListFrame(50);
 
-		Manager::Instance().addWidget(listFrame);
-		listFrame->addActionListener(this);
+		Manager::Instance().addWidget(categoriesListFrame);
+		categoriesListFrame->addActionListener(this);
 
 		//maAndroidStartListActivity(700);
 		//maAndroidAddListItem(701, "salut");
 	}
 
 	Main(const Main & m) {
-		listFrame=m.listFrame;
+		categoriesListFrame=m.categoriesListFrame;
 		/*frame2=m.frame2;
 		parser=m.parser;
 		button=m.button;
@@ -51,9 +63,15 @@ public:
 
 	~Main() {
 		//delete(button);
-		delete(listFrame);
-		delete(listFrame2);
-		delete(frame2);
+		delete(categoriesListFrame);
+		delete(lengthListFrame);
+		delete(inputFrame);
+		delete(resultsFrame);
+		delete(button);
+		delete(edit);
+		delete(label);
+		delete(inputFrameLayout);
+
 		/*delete(parser);
 		delete(button);
 		delete(button2);
@@ -63,13 +81,13 @@ public:
 	}
 
 	void onCreate (int id) {
-		if(id==listFrame->getId()) {
-			listFrame->add("Temperature");
-			listFrame->add("Weight");
-			listFrame->add("Length");
-			listFrame->add("Currency");
-			listFrame->add("Angle");
-			listFrame->show();
+		if(id==categoriesListFrame->getId()) {
+			categoriesListFrame->add("Temperature");
+			categoriesListFrame->add("Weight");
+			categoriesListFrame->add("Length");
+			categoriesListFrame->add("Currency");
+			categoriesListFrame->add("Angle");
+			categoriesListFrame->show();
 /*
 			parser = new Parser(MAIN_LAYOUT, frame);
 
@@ -139,19 +157,64 @@ public:
 */
 		}
 
-		if(id==listFrame2->getId()) {
-					listFrame2->add("Centimeters");
-					listFrame2->add("Meters");
-					listFrame2->add("Feet");
-					listFrame2->add("Inches");
-					listFrame2->show();
+		if(id==lengthListFrame->getId()) {
+					lengthListFrame->add("Celsius");
+					lengthListFrame->add("Fahrenheit");
+					lengthListFrame->show();
+		}
+
+		if(id==inputFrame->getId()) {
+			label = new Label("Enter a value:", 102);
+			Manager::Instance().addWidget(label);
+
+			edit = new Edit("gtgrt", 101);
+			Manager::Instance().addWidget(edit);
+
+			button = new Button("Convert", 100);
+			Manager::Instance().addWidget(button);
+			button->addActionListener(this);
+
+			inputFrameLayout = new Layout(inputFrame);
+
+			inputFrameLayout->addWidget(label);
+			inputFrameLayout->addWidget(edit);
+			inputFrameLayout->addWidget(button);
+
+			inputFrameLayout->build();
+		}
+
+		if(id==resultsFrame->getId()) {
+			Label *label1 = new Label(wh.buf, 103);
+			Manager::Instance().addWidget(label1);
+
+			Label *label2 = new Label("Fahrenheit: XX", 104);
+			Manager::Instance().addWidget(label2);
+
+			resultsFrameLayout = new Layout(resultsFrame);
+
+			resultsFrameLayout->addWidget(label1);
+			resultsFrameLayout->addWidget(label2);
+
+			resultsFrameLayout->build();
+
+			delete(label1);
+			delete(label2);
 		}
 	}
 	void onClick (int id) {
-		if(id==32) {
-			/*frame2 = new Frame(2);
-			Manager::Instance().addWidget(frame2);
-			frame2->addActionListener(this);*/
+		if(id==100) {
+			MAWidgetParameters wp;
+			wp.pParent = inputFrame->getInstance();
+			wp.widgetID = 101;
+
+
+			maIPhoneGetText(&wp, &wh);
+			//mystr=wh.buf;
+			//strcpy(mystr, wh.buf);
+
+			resultsFrame = new Frame(53);
+			Manager::Instance().addWidget(resultsFrame);
+			resultsFrame->addActionListener(this);
 		}
 	/*	if(id==item->getId()) {
 			frame2 = new Frame(2);
@@ -161,10 +224,15 @@ public:
 	}
 
 	void onItemSelected (int id, int index) {
-		if(id==50 && index==3) {
-			listFrame2 = new ListFrame(51);
-			Manager::Instance().addWidget(listFrame2);
-			listFrame2->addActionListener(this);
+		if(id==50 && index==1) {
+			lengthListFrame = new ListFrame(51);
+			Manager::Instance().addWidget(lengthListFrame);
+			lengthListFrame->addActionListener(this);
+		}
+		if(id==51 && index==1) {
+			inputFrame = new Frame(52);
+			Manager::Instance().addWidget(inputFrame);
+			inputFrame->addActionListener(this);
 		}
 	}
 

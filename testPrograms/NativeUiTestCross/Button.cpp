@@ -87,6 +87,9 @@ void Button::processEvent(const MAEvent & e) {
  * 				the parent frame
  */
 void Button::build(int x, int y, int h, int l, void *f) {
+	mWidth = l;
+	mHeight = h;
+
 	MAWidgetParameters buttonParams;
 	buttonParams.pParent=f;
 	buttonParams.posX=x;

@@ -93,3 +93,15 @@ int maIPhoneImage(MAWidgetParameters *wparams, MAWidgetHandle *whandle)
 	[mosyncview showImage:wparams->widgetID withImage: wparams->rsc posX: wparams->posX posY: wparams->posY];
 	return 0;
 }
+
+int maIPhoneGetText(MAWidgetParameters *wparams, MAWidgetHandle *whandle) 
+{
+	MoSyncView *mosyncview = (MoSyncView *)wparams->pParent;
+	NSString *str = [mosyncview getText:wparams->widgetID];
+	const char *cString = [str UTF8String];
+	//char *cString2;
+	//strcpy ( cString2, cString );
+	strcpy(whandle->buf, cString);
+	NSLog([NSString stringWithCString:(whandle->buf) encoding:NSASCIIStringEncoding]);
+	return 0;
+}

@@ -30,7 +30,10 @@
 #include <helpers/log.h>
 #include "Base/ThreadPool.h"
 
+
 #include <helpers/CriticalSection.h>
+
+#include "iphone_helpers.h"
 
 using namespace Base;
 static UIView *sMoSyncView;
@@ -48,6 +51,8 @@ int MoSyncThreadMain(void *args) {
 
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
+	
+	InitLog(getWriteablePath("log.txt"));
 	
 	gCore = Core::CreateCore(*syscall);
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
