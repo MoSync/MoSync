@@ -129,11 +129,12 @@ class GccWork < BuildWork
 		define_cflags
 		@CFLAGS_MAP = { ".c" => @CFLAGS + host_flags,
 			".cpp" => @CPPFLAGS + host_flags + host_cppflags,
+			".mm" => @CPPFLAGS + host_flags + host_cppflags,
 			".cc" => @CPPFLAGS + host_flags + host_cppflags }
 		
 		#find source files
 		cfiles = collect_files(".c")
-		cppfiles = collect_files(".cpp") + collect_files(".cc") 
+		cppfiles = collect_files(".cpp") + collect_files(".cc") + collect_files(".mm") 
 		@all_sourcefiles = cfiles + cppfiles
 		
 		@source_objects = objects(@all_sourcefiles)

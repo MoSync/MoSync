@@ -23,8 +23,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #ifdef LINUX
+
+#ifndef DARWIN
 #include <gtk/gtk.h>
 #define stricmp(x, y) strcasecmp(x, y)
+#else
+#include "MacDialogs.h"
+#endif
+
 #endif
 
 #include <math.h>
@@ -151,15 +157,17 @@ namespace Base {
 		gShowScreen = settings.showScreen;
 		init();
 #ifdef LINUX
+#ifndef DARWIN
 		int argc = 0;
 		char** argv = NULL;
 		gtk_init(&argc, &argv);
+#endif
 #endif
 
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
+		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.Id,
 			settings.iconPath, &settings.profile);
 		DEBUG_ASSERT(res);
 #endif
@@ -174,13 +182,15 @@ namespace Base {
 		gShowScreen = settings.showScreen;
 		init();
 #ifdef LINUX
+#ifndef DARWIN
 		int argc = 0;
 		char** argv = NULL;
 		gtk_init(&argc, &argv);
 #endif
+#endif
 		screenWidth = width;
 		screenHeight = height;
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
+		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.Id,
 			settings.iconPath, &settings.profile);
 		DEBUG_ASSERT(res);
 	}
@@ -585,6 +595,7 @@ namespace Base {
 			info.window = NULL;
 		MessageBox(info.window, msg, title, MB_ICONERROR);
 #elif defined(LINUX)
+#ifndef DARWIN
 		GtkWidget* dialog = gtk_message_dialog_new (NULL,
 			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_MESSAGE_ERROR,
@@ -592,6 +603,9 @@ namespace Base {
 			"%s\n\n%s", title, msg);
 		gtk_dialog_run (GTK_DIALOG (dialog));
 		gtk_widget_destroy (dialog);
+#else
+		MacMessageBox(msg, title);
+#endif //DARWIN
 #else
 #error Unsupported platform!
 #endif

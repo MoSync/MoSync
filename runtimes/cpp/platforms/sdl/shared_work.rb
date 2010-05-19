@@ -30,7 +30,8 @@ def setup_common
 		if(HOST_PLATFORM != :darwin )
 			@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat"]
 		else
-			@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "expat", "gobject-2.0", "SDLmain"]
+			#@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "expat", "gobject-2.0", "SDLmain"]
+			@LIBRARIES = common_libraries + sound_lib + ["expat", "SDLmain"]
 		end
 	else
 		error "Unsupported platform"

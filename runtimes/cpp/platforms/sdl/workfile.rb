@@ -25,11 +25,14 @@ work.instance_eval do
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__ -D__USE_SYSTEM_RESOLUTION__"
 		end
 		if(HOST_PLATFORM == :darwin)
-			@EXTRA_INCLUDES = common_includes + ["/sw/include/gtk-2.0",
-				"/sw/include/glib-2.0", "/sw/include/pango-1.0",
-				"/sw/include/cairo", "/sw/include/atk-1.0",
-				"/sw/lib/glib-2.0/include", "/sw/lib/gtk-2.0/include", "/sw/include", "/usr/include"]
-			@LIBRARIES = common_libraries +["gobject-2.0"]
+			#@EXTRA_INCLUDES = common_includes + ["/sw/include/gtk-2.0",
+			#	"/sw/include/glib-2.0", "/sw/include/pango-1.0",
+			#	"/sw/include/cairo", "/sw/include/atk-1.0",
+			#	"/sw/lib/glib-2.0/include", "/sw/lib/gtk-2.0/include", "/sw/include", "/usr/include"]
+			#@LIBRARIES = common_libraries +["gobject-2.0", "objc"]
+			@EXTRA_INCLUDES = common_includes + ["/sw/include"]
+			@LIBRARIES = common_libraries +["objc"]
+			@EXTRA_CPPFLAGS += " -x objective-c++"
 		else
 			@EXTRA_INCLUDES = common_includes + ["/usr/include/gtk-2.0",
                         "/usr/include/glib-2.0", "/usr/include/pango-1.0",

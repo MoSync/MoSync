@@ -29,13 +29,13 @@ public:
 			STARTUP_SETTINGS ( ) {
 				showScreen = true;
 				haveSkin   = true; 
-				id         = NULL;
+				Id         = NULL;
 				iconPath   = NULL;
 				resmem     = ((uint)-1);
 			}
 
 			bool showScreen;
-			const char* id;
+			const char* Id;
 			const char *iconPath;
 			uint resmem;
 			MoRE::DeviceProfile profile;

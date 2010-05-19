@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "../sdl_syscall.h"
 #include "../report.h"
 
-#include <SDL.h>
+//#include <SDL.h>
 
 #ifdef ENABLE_DEBUGGER
 #include <core/debugger.h>
@@ -117,7 +117,7 @@ int main2(int argc, char **argv) {
 		LOG("%i:%s\n", i, argv[i]);
 		if(strcmp(argv[i], "-id") == 0) {
 			i++;
-			settings.id = argv[i];
+			settings.Id = argv[i];
 		}
 		else if(strcmp(argv[i], "-fd") == 0) {
 			i++;
