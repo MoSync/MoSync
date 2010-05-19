@@ -26,9 +26,9 @@ private:
 public:
 	static bool left_pressed, right_pressed, up_pressed, down_pressed, fire_pressed, pound_pressed, star_pressed;
 	static bool left, right, up, down, fire, pound, star;
-#ifdef MA_PROF_SUPPORT_STYLUS
 	static bool lsk_pressed, rsk_pressed;
 	static bool lsk, rsk;
+#ifdef MA_PROF_SUPPORT_STYLUS
 	static bool pointer_pressed, pointer_released;
 	static MAPoint2d point;
 #endif	// MA_PROF_SUPPORT_STYLUS

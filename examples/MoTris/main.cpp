@@ -1205,11 +1205,7 @@ int MAMain()
 		maResetBacklight();
 		EventHandler::updateEvents();
 
-		if(curGameMode == GAME_RUN && (EventHandler::star_pressed
-#ifdef MA_PROF_SUPPORT_STYLUS
-			|| EventHandler::rsk_pressed
-#endif	// MA_PROF_SUPPORT_STYLUS
-		)) {
+		if(curGameMode == GAME_RUN && (EventHandler::star_pressed || EventHandler::rsk_pressed)) {
 			curGameMode = PAUSE_MENU_INIT;
 		}
 
