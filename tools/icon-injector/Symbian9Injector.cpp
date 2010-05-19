@@ -52,7 +52,7 @@ namespace MoSync {
 		char buf[2048];
 		const char *mosyncdir_c = getenv("MOSYNCDIR");
 		if(!mosyncdir_c) errorExit("MOSYNCDIR missing");
-		sprintf(buf, "\"%s/bin/mifconv.exe\" \"%s\" \"%s\"", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
+		sprintf(buf, "\"%s\\bin\\mifconv.exe\" \"%s\" \"%s\"", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
 		int res = run(buf);
 		if(res != 0)
 			errorExit("mifconf failed");
