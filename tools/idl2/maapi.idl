@@ -1443,8 +1443,6 @@ interface MAAPI {
 		BINARY = 4;
 		UBIN = 5;
 		SKIP = 6;
-		TILESET = 7;
-		TILEMAP = 8;
 		LABEL = 9;
 		FLUX = 127;
 	}

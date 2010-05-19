@@ -713,6 +713,7 @@ public:
 		DUMPHEX(Head.DataSize);
 		if(Head.DataLen > 0) {
 			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
+			DUMPHEX(DATA_SEGMENT_SIZE);
 			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
 			if(!mem_ds) BIG_PHAT_ERROR(ERR_OOM);
 			TEST(file.read(mem_ds, Head.DataLen));

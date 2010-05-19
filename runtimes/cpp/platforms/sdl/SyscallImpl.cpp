@@ -1531,8 +1531,12 @@ namespace Base {
 		TIME_ZONE_INFORMATION tzi;
 		DWORD res = GetTimeZoneInformation(&tzi);
 		MYASSERT(res != TIME_ZONE_ID_INVALID, WINERR_TIMEZONE);
-		//return (int)(time(NULL) - ((tzi.Bias + tzi.StandardBias + tzi.DaylightBias) * 60));
-		return (int)(time(NULL) - (tzi.Bias * 60));
+		int bias = tzi.Bias;
+		if(res == TIME_ZONE_ID_DAYLIGHT)
+			bias += tzi.DaylightBias;
+		if(res == TIME_ZONE_ID_STANDARD)
+			bias += tzi.StandardBias;
+		return (int)(time(NULL) - (bias * 60));
 #else
 		time_t t = time(NULL);
 		tm* lt = localtime(&t);

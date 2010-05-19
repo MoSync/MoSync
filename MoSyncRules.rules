@@ -1,15 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VisualStudioToolFile
 	Name="MoSyncRules"
-	Version="8,00"
+	Version="8.00"
 	>
 	<Rules>
 		<CustomBuildRule
 			Name="MoSync resource"
 			DisplayName="MoSync resource"
 			CommandLine="pipe-tool -R resources $(InputPath)"
-			Outputs="resources MAHeaders.h"
+			Outputs="MAHeaders.h"
 			FileExtensions="*.lst"
+			ExecutionDescription="Executing tool..."
 			>
 			<Properties>
 			</Properties>
