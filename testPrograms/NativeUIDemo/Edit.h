@@ -90,6 +90,7 @@ public:
 public:
 	MAWidgetHandle mWidgetHandler;
 	void *mParent;
+	MAString mBuf;
 };
 
 #endif

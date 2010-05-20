@@ -109,10 +109,13 @@ char *Edit::getText() {
 	wp.widgetID = myid;
 
 
-	maIPhoneGetText(&wp, &mWidgetHandler);
-	//*dst=(char *)malloc((strlen(mWidgetHandler.buf)+1)*sizeof(char));
-	//strcpy(*dst, mWidgetHandler.buf);
-	return mWidgetHandler.buf;
+	if(maIPhoneGetText(&wp, &mWidgetHandler)==-1) {
+		mBuf = new char[80];
+		maAndroidGetText(myid, mBuf, 80);
+		return mBuf;
+	}
+	else
+		return mWidgetHandler.buf;
 
 }
 

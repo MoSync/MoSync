@@ -1247,7 +1247,7 @@ public
 		return 0;
 	}
  
-	int maAndroidGetText(int id,  String str) {
+	int maAndroidGetText(int id,  Address str, int len) {
 		if(NativeUI.me.findViewById(id) instanceof EditText) {
 			final EditText edt = (EditText)(NativeUI.me.findViewById(id));
 			class MyRunnable implements Runnable {
@@ -1258,7 +1258,9 @@ public
 			}
 			MyRunnable myrunnable = new MyRunnable();
 			NativeUI.mHandler.post(myrunnable); 
-			str=myrunnable.str2;
+			
+			//str=myrunnable.str2;
+			writeStringBuf(myrunnable.str2, str, len);
 			Log.i("MoSync", "getText : " + myrunnable.str2);
 		}
 		else return -1;
@@ -1485,7 +1487,7 @@ public
 		case maIOCtl_maAndroidStartListActivity:
 			return maAndroidStartListActivity(a);
 		case maIOCtl_maAndroidGetText:
-			return maAndroidGetText(a, readMemString(b));
+			return maAndroidGetText(a, b, c);
 		case maIOCtl_maAndroidSetText:
 			return maAndroidSetText(a, readMemString(b));
 		case maIOCtl_maAndroidAddTextView:
