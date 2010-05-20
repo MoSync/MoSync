@@ -943,7 +943,11 @@ void showGameOver() {
 }
 
 void updateGameOver() {
-	if(EventHandler::fire_pressed) {
+	if(EventHandler::fire_pressed
+#ifdef MA_PROF_SUPPORT_STYLUS
+		|| EventHandler::pointer_pressed
+#endif	// MA_PROF_SUPPORT_STYLUS
+		) {
 		addPlayerToHighScore();
 		curGameMode = MENU_INIT;
 	}
