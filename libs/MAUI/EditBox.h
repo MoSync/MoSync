@@ -36,7 +36,11 @@ namespace MAUI {
 	
 	class EditBox;
 
-	/** Use this to listen for events from the EditBox. Each time the text is changed the textChanged callback will be invoked. */
+	/** 
+	* \brief Listener for EditBox events.
+	* 
+	* Each time the text is changed the textChanged callback will be invoked. 
+	*/
 	class EditBoxListener {
 	public:
 		virtual void textChanged(EditBox *eb, const String& text);

@@ -16,12 +16,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file maapi.h
-* \brief The MoSync API is a general compact API with a small footprint.
+* \brief Syscall declarations. These system calls and low-level 
+* functions provide access to the basic features of a device. They are
+* implemented by the MoSync runtimes in code native to the device.
+*
 
 
-* With this API it should be possible to do most things, although,
+* With these syscalls it should be possible to do most things, although,
 * there may still be some functionality missing. If you
-* would like a specific function added, please do send us a
+* would like a specific function added, please send us a
 * <a href="mailto:info@mobilesorcery.com">mail</a>.
 
 * In future versions of MoSync an extension API will be provided

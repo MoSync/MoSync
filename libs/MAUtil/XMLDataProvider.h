@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file XMLDataProvider.h
+* \brief XML Data Provider
+*/
+
 #ifndef _SE_MSAB_MAUTIL_XML_DATA_PROVIDER_H_
 #define _SE_MSAB_MAUTIL_XML_DATA_PROVIDER_H_
 
@@ -27,6 +31,8 @@ using namespace MAUtil::XPath;
 namespace MAUtil {
 
 	class XMLDataProvider;
+	
+	
 	class XMLDataProviderListener {
 	public:
 		virtual void onUpdate(XMLDataProvider *dataProvider) = 0;
