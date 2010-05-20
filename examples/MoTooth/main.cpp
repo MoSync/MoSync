@@ -49,11 +49,11 @@ int myGetProcessedEvent(int type, MAEvent* event) {
 	if(event->type == type)
 		return 1;
 	if(event->type == EVENT_TYPE_CLOSE ||
-		(event->type == EVENT_TYPE_KEY_PRESSED && event->key == MAK_0))
+		(event->type == EVENT_TYPE_KEY_PRESSED && (event->key == MAK_0 || event->key == MAK_SOFTRIGHT)))
 	{
 		maExit(0);
 	}
-	if(event->type == EVENT_TYPE_KEY_PRESSED && event->key == MAK_1) {
+	if(event->type == EVENT_TYPE_KEY_PRESSED && (event->key == MAK_1 || event->key == MAK_SOFTLEFT)) {
 		printf("Cancel...\n");
 		int res = maBtCancelDiscovery();
 		printf("%i\n", res);
@@ -102,7 +102,7 @@ void readStore() {
 	if(!readDatabase()) {
 		gDevices.clear();
 		gnServices = 0;
-		printf("Store corrupted.\n(5)ignore (0)delete\n");
+		printf("Store corrupted.\n(5/LSK)ignore (0/RSK)delete\n");
 		myClearEvents();
 		for(;;) {
 			maWait(0);
@@ -111,8 +111,10 @@ void readStore() {
 			if(event.type == EVENT_TYPE_CLOSE)
 				maExit(0);
 			if(event.type == EVENT_TYPE_KEY_PRESSED) switch(event.key) {
+				case MAK_SOFTRIGHT:
 				case MAK_0:
 					deleteStore();
+				case MAK_SOFTLEFT:
 				case MAK_5:
 					return;
 			}	//switch if
@@ -133,9 +135,9 @@ void menu() {
 	//clear the store (if not already empty).
 	printf("%i known services\n", gnServices);
 	if(gnServices) {
-		printf("(F)select (5)scan (0)exit\n");
+		printf("(F)select (5/LSK)scan (0/RSK)exit\n");
 	} else {
-		printf("(5)scan (0)exit\n");
+		printf("(5/LSK)scan (0/RSK)exit\n");
 	}
 	myClearEvents();
 
@@ -146,7 +148,7 @@ void menu() {
 			if(event.type == EVENT_TYPE_CLOSE)
 				maExit(0);
 			if(event.type == EVENT_TYPE_KEY_PRESSED) {
-				if(event.key == MAK_5) {
+				if(event.key == MAK_5 || event.key == MAK_SOFTLEFT) {
 					scan();
 					return;
 				}
@@ -154,7 +156,7 @@ void menu() {
 					run();
 					return;
 				}
-				if(event.key == MAK_0)
+				if(event.key == MAK_0 || event.key == MAK_SOFTRIGHT)
 					maExit(0);
 			}
 		}
@@ -215,7 +217,7 @@ void run() {
 		maWait(0);
 		while(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE ||
-				(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0))
+				(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_SOFTRIGHT)))
 			{
 				maExit(0);
 			} else if(event.type == EVENT_TYPE_CONN) {
@@ -235,7 +237,7 @@ void run() {
 	}
 
 	//on success, start dumping data flow to console
-	printf("Connected. Press 0 to disconnect.\n");
+	printf("Connected. Press 0/LSK to disconnect.\n");
 	for(;;) {
 		char buffer[1024];
 		bool close = false;
@@ -248,7 +250,7 @@ void run() {
 			while(maGetEvent(&event)) {
 				if(event.type == EVENT_TYPE_CLOSE) {
 					maExit(0);
-				} else if(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_0) {
+				} else if(event.type == EVENT_TYPE_KEY_PRESSED && (event.key == MAK_0 || event.key == MAK_SOFTLEFT)) {
 					printf("Closing connection...\n");
 					maConnClose(conn);
 					close = true;
@@ -296,7 +298,7 @@ void scan() {
 		printf("StartErr %i\n", state);
 		return;
 	}
-	printf("(1)cancel (0)exit\n");
+	printf("(1/LSK)cancel (0/RSK)exit\n");
 
 	do {
 		MABtDevice d;
