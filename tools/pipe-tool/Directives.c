@@ -120,16 +120,16 @@ short Directives()
 
 	case dir_ctor:
 	{
-		int ref;
-
+		SYMBOL* ref;
 		imm = GetExpression();				// Get the number
-		ref = (int) GetLastSymbolRef();
+		ref = GetLastSymbolRef();
 
 		if(pass_count > 1)
 		{
 			if (!ref)
 				Error(Error_Fatal, "Constructor has bad reference");
-		
+
+			ArraySet(&CtorArrayImm, CtorCount, imm);
 			ArraySet(&CtorArray, CtorCount++, (int) ref);
 		}
 		return 1;		
@@ -139,16 +139,16 @@ short Directives()
 
 	case dir_dtor:
 	{		
-		int ref;
-
+		SYMBOL* ref;
 		imm = GetExpression();				// Get the number
-		ref = (int) GetLastSymbolRef();
+		ref = GetLastSymbolRef();
 
 		if(pass_count > 1)
 		{
 			if (!ref)
 				Error(Error_Fatal, "Destructor has bad reference");
-		
+
+			ArraySet(&DtorArrayImm, DtorCount, imm);
 			ArraySet(&DtorArray, DtorCount++, (int) ref);
 		}
 		return 1;		

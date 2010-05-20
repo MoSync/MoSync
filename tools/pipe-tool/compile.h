@@ -911,6 +911,8 @@ dec(ArrayStore LabelDone)
 
 dec(ArrayStore CtorArray)
 dec(ArrayStore DtorArray)
+dec(ArrayStore CtorArrayImm)
+dec(ArrayStore DtorArrayImm)
 dec(int CtorCount)
 dec(int DtorCount)
 

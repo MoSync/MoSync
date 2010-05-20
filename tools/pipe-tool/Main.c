@@ -111,6 +111,8 @@ int main(int argc,char *argv[])
 
 	ArrayInit(&CtorArray,		4, 0);
 	ArrayInit(&DtorArray,		4, 0);
+	ArrayInit(&CtorArrayImm,	4, 0);
+	ArrayInit(&DtorArrayImm,	4, 0);
 
 	ArrayInit(&AsmCharArray,	4, 0);
 	ArrayInit(&AsmCharDataArray,4, 0);
