@@ -16,20 +16,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.cpp
+ * Label.cpp
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#include "Edit.h"
+#include "Label.h"
 
 /**
  * Constructor
  *
  * @param str	Text to be shown
  */
-Edit::Edit(const char *str, int id) {
+Label::Label (const char *str, int id) {
 	text=str;
 	myid=id;
 }
@@ -46,34 +46,31 @@ Edit::Edit(const char *str, int id) {
  * @param f		Pointer to the runtime instance of
  * 				the parent frame
  */
-void Edit::build(int x, int y, int h, int l, void *f) {
+void Label::build(int x, int y, int h, int l, void *f) {
 	mWidth = l;
 	mHeight = h;
 	
-	MAWidgetParameters editParams;
-	editParams.pParent=f;
-	mParent=f;
-	editParams.posX=x;
-	editParams.posY=y;
-	editParams.sizeX=l;
-	editParams.sizeY=h;
-	editParams.widgetID=myid;
-	strncpy(editParams.buf, text, strlen(text) + 1);
-	MAWidgetHandle editHandle;
-	maWinMobileEdit(&editParams, &editHandle);
-	me=editHandle.pWidget;
+	MAWidgetParameters labelParams;
+	labelParams.pParent=f;
+	labelParams.widgetID=myid;
+	labelParams.posX=x;
+	labelParams.posY=y;
+	labelParams.sizeX=l;
+	labelParams.sizeY=h;
+	strncpy(labelParams.buf, text, strlen(text) + 1);
+	MAWidgetHandle labelHandle;
+	maWinMobileLabel(&labelParams, NULL);
+	me=labelHandle.pWidget;
 
-	maAndroidAddEditText(myid, text);
+	maAndroidAddTextView(myid, text);
 	
-	maIPhoneEdit(&editParams, &editHandle);
-	me=editHandle.pWidget;
+	maIPhoneLabel(&labelParams, NULL);
 }
-
 
 /**
  * Destructor
  */
-Edit::~Edit() {
+Label::~Label() {
 
 }
 
@@ -82,7 +79,7 @@ Edit::~Edit() {
  *
  * @return ID of the widget
  */
-int Edit::getId() {
+int Label::getId() {
 	Widget::getId();
 }
 
@@ -94,25 +91,6 @@ int Edit::getId() {
  * @return	Pointer to the widget instance inside the runtime:
  * 			This is dangerous !
  */
-void *Edit::getInstance() {
+void *Label::getInstance() {
 	Widget::getInstance();
 }
-
-/**
- * Returns the text displayed in the Edit
- *
- * @return ID of the widget
- */
-char *Edit::getText() {
-	MAWidgetParameters wp;
-	wp.pParent = mParent;
-	wp.widgetID = myid;
-
-
-	maIPhoneGetText(&wp, &mWidgetHandler);
-	//*dst=(char *)malloc((strlen(mWidgetHandler.buf)+1)*sizeof(char));
-	//strcpy(*dst, mWidgetHandler.buf);
-	return mWidgetHandler.buf;
-
-}
-

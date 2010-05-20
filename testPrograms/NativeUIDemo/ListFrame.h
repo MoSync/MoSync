@@ -16,39 +16,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.h
+ * ListFrame.h
  *
- *  Created on: Mar 15, 2010
+ *  Created on: May 4, 2010
  *      Author: Romain Chalant
  */
 
-#ifndef EDIT_H
-#define EDIT_H
+#ifndef LISTFRAME_H
+#define LISTFRAME_H
 
 #include <ma.h>
-#include <maassert.h>
-#include <mastring.h>
+#include <conprint.h>
 #include <IX_NATIVE_UI.h>
 #include "Widget.h"
-#include <maheap.h>
 
 /**
  * This class is an implementation of
- * a multi-lines Text Edit
+ * a list box window
  */
-class Edit : public Widget {
+class ListFrame : public Widget {
 public:
 	/**
 	 * Constructor
-	 *
-	 * @param str	Text to be shown
 	 */
-	Edit(const char *str, int id);
+	ListFrame(int id);
 
 	/**
 	 * Destructor
 	 */
-	~Edit();
+	~ListFrame();
 
 	/**
 	 * Returns the widget's ID
@@ -68,28 +64,29 @@ public:
 	void *getInstance();
 
 	/**
-	 * Actually builds the widget natively.
-	 * This method is to be overwritten in derived classes.
-	 * Called by the Layout. You should not call it yourself.
+	 * Processes events sent by the Manager.
+	 * Called by the Manager. You should not call it yourself.
 	 *
-	 * @param x		Horizontal position
-	 * @param y		Vertical position
-	 * @param h		Height
-	 * @param l		Length
-	 * @param f		Pointer to the runtime instance of
-	 * 				the parent frame
+	 * @param	MAEvent to be processed
 	 */
-	void build(int x, int y, int h, int l, void *f);
-
+	void processEvent(const MAEvent &);
+	
 	/**
-	 * Returns the text displayed in the Edit
+	 * Adds an item to the list
 	 *
-	 * @return ID of the widget
+	 * @param str	Text to be displayed
 	 */
-	char *getText();
-public:
-	MAWidgetHandle mWidgetHandler;
-	void *mParent;
+	void add(char *str);
+	
+	/**
+	 * Shows the list box window.
+	 *
+	 * 
+	 */
+	void show();
+
+
+
 };
 
 #endif

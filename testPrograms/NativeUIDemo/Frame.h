@@ -16,39 +16,34 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.h
+ * Frame.h
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#ifndef EDIT_H
-#define EDIT_H
+#ifndef FRAME_H
+#define FRAME_H
 
 #include <ma.h>
-#include <maassert.h>
-#include <mastring.h>
 #include <IX_NATIVE_UI.h>
 #include "Widget.h"
-#include <maheap.h>
 
 /**
  * This class is an implementation of
- * a multi-lines Text Edit
+ * a "frame" or "window"
  */
-class Edit : public Widget {
+class Frame : public Widget {
 public:
 	/**
 	 * Constructor
-	 *
-	 * @param str	Text to be shown
 	 */
-	Edit(const char *str, int id);
+	Frame(int id);
 
 	/**
 	 * Destructor
 	 */
-	~Edit();
+	~Frame();
 
 	/**
 	 * Returns the widget's ID
@@ -68,28 +63,13 @@ public:
 	void *getInstance();
 
 	/**
-	 * Actually builds the widget natively.
-	 * This method is to be overwritten in derived classes.
-	 * Called by the Layout. You should not call it yourself.
+	 * Processes events sent by the Manager.
+	 * Called by the Manager. You should not call it yourself.
 	 *
-	 * @param x		Horizontal position
-	 * @param y		Vertical position
-	 * @param h		Height
-	 * @param l		Length
-	 * @param f		Pointer to the runtime instance of
-	 * 				the parent frame
+	 * @param	MAEvent to be processed
 	 */
-	void build(int x, int y, int h, int l, void *f);
+	void processEvent(const MAEvent &);
 
-	/**
-	 * Returns the text displayed in the Edit
-	 *
-	 * @return ID of the widget
-	 */
-	char *getText();
-public:
-	MAWidgetHandle mWidgetHandler;
-	void *mParent;
 };
 
 #endif

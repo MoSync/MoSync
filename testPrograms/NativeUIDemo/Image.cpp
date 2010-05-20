@@ -16,22 +16,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.cpp
+ * Label.cpp
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#include "Edit.h"
+#include "Image.h"
 
 /**
  * Constructor
  *
- * @param str	Text to be shown
+ * @param rsc	Resource ID
+ * @param id	Widget ID
  */
-Edit::Edit(const char *str, int id) {
-	text=str;
+Image::Image (int rsc, int id) {
 	myid=id;
+	mRsc = rsc;
+	
+	mWidth=EXTENT_X(maGetImageSize(rsc));
+	mHeight=EXTENT_X(maGetImageSize(rsc));
 }
 
 /**
@@ -46,34 +50,30 @@ Edit::Edit(const char *str, int id) {
  * @param f		Pointer to the runtime instance of
  * 				the parent frame
  */
-void Edit::build(int x, int y, int h, int l, void *f) {
-	mWidth = l;
-	mHeight = h;
+void Image::build(int x, int y, int h, int l, void *f) {
+	MAWidgetParameters imageParams;
+	imageParams.pParent=f;
+	imageParams.widgetID=myid;
+	imageParams.posX=x;
+	imageParams.posY=y;
+	imageParams.rsc=mRsc;
 	
-	MAWidgetParameters editParams;
-	editParams.pParent=f;
-	mParent=f;
-	editParams.posX=x;
-	editParams.posY=y;
-	editParams.sizeX=l;
-	editParams.sizeY=h;
-	editParams.widgetID=myid;
-	strncpy(editParams.buf, text, strlen(text) + 1);
-	MAWidgetHandle editHandle;
-	maWinMobileEdit(&editParams, &editHandle);
-	me=editHandle.pWidget;
+	
+	
+	MAWidgetHandle imageHandle;
+	maWinMobileImage(&imageParams, &imageHandle);
+	
+	maAndroidAddImage(myid, mRsc);
+	
 
-	maAndroidAddEditText(myid, text);
-	
-	maIPhoneEdit(&editParams, &editHandle);
-	me=editHandle.pWidget;
+	maIPhoneImage(&imageParams, NULL);
+	me=imageHandle.pWidget;
 }
-
 
 /**
  * Destructor
  */
-Edit::~Edit() {
+Image::~Image() {
 
 }
 
@@ -82,7 +82,7 @@ Edit::~Edit() {
  *
  * @return ID of the widget
  */
-int Edit::getId() {
+int Image::getId() {
 	Widget::getId();
 }
 
@@ -94,25 +94,6 @@ int Edit::getId() {
  * @return	Pointer to the widget instance inside the runtime:
  * 			This is dangerous !
  */
-void *Edit::getInstance() {
+void *Image::getInstance() {
 	Widget::getInstance();
 }
-
-/**
- * Returns the text displayed in the Edit
- *
- * @return ID of the widget
- */
-char *Edit::getText() {
-	MAWidgetParameters wp;
-	wp.pParent = mParent;
-	wp.widgetID = myid;
-
-
-	maIPhoneGetText(&wp, &mWidgetHandler);
-	//*dst=(char *)malloc((strlen(mWidgetHandler.buf)+1)*sizeof(char));
-	//strcpy(*dst, mWidgetHandler.buf);
-	return mWidgetHandler.buf;
-
-}
-

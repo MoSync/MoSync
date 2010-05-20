@@ -16,39 +16,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.h
+ * Widget.h
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#ifndef EDIT_H
-#define EDIT_H
+#ifndef WIDGET_H
+#define WIDGET_H
 
 #include <ma.h>
-#include <maassert.h>
-#include <mastring.h>
 #include <IX_NATIVE_UI.h>
-#include "Widget.h"
-#include <maheap.h>
+#include "ActionListener.h"
 
 /**
- * This class is an implementation of
- * a multi-lines Text Edit
+ * This class is the base class for
+ * all the widgets such as buttons, labels...
+ * You should not need to instantiate it !
  */
-class Edit : public Widget {
+
+class Widget {
 public:
 	/**
-	 * Constructor
-	 *
-	 * @param str	Text to be shown
+	 * Default constructor
 	 */
-	Edit(const char *str, int id);
+	Widget();
+
+	/**
+	 * Constructor by ID
+	 */
+	Widget(int id);
 
 	/**
 	 * Destructor
 	 */
-	~Edit();
+	~Widget();
 
 	/**
 	 * Returns the widget's ID
@@ -68,6 +70,14 @@ public:
 	void *getInstance();
 
 	/**
+	 * Processes events sent by the Manager.
+	 * Called by the Manager. You should not call it yourself.
+	 *
+	 * @param	MAEvent to be processed
+	 */
+	virtual void processEvent(const MAEvent &);
+
+	/**
 	 * Actually builds the widget natively.
 	 * This method is to be overwritten in derived classes.
 	 * Called by the Layout. You should not call it yourself.
@@ -79,17 +89,43 @@ public:
 	 * @param f		Pointer to the runtime instance of
 	 * 				the parent frame
 	 */
-	void build(int x, int y, int h, int l, void *f);
+	virtual void build(int x, int y, int h, int l, void *f);
 
 	/**
-	 * Returns the text displayed in the Edit
+	 * Adds an ActionListener class to the widget.
+	 * Needed for event handling.
 	 *
-	 * @return ID of the widget
+	 * @param a		Pointer to the ActionListener.
 	 */
-	char *getText();
-public:
-	MAWidgetHandle mWidgetHandler;
-	void *mParent;
+	void addActionListener(ActionListener *a);
+
+	/**
+	 * Operator needed by the Manager
+	 */
+	bool operator < ( const Widget & ) const;
+
+	/**
+	 * Operator needed by the Manager
+	 */
+	bool operator == ( const Widget & ) const;
+	
+	/**
+	 * Getters
+	 */
+	int getWidth();
+	int getHeight();
+	 
+
+protected:
+	/**
+	 * Protected fields common to all widgets.
+	 */
+	int myid;
+	void *me;
+	const char *text;
+	ActionListener *actionListener;
+	int mWidth;
+	int mHeight;
 };
 
 #endif

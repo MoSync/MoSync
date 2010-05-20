@@ -16,39 +16,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.h
+ * Button.h
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#ifndef EDIT_H
-#define EDIT_H
+#ifndef BUTTON_H
+#define BUTTON_H
 
 #include <ma.h>
 #include <maassert.h>
 #include <mastring.h>
 #include <IX_NATIVE_UI.h>
 #include "Widget.h"
-#include <maheap.h>
+
 
 /**
  * This class is an implementation of
- * a multi-lines Text Edit
+ * a simple push button.
  */
-class Edit : public Widget {
+class Button : public Widget {
 public:
 	/**
 	 * Constructor
 	 *
-	 * @param str	Text to be shown
+	 * @param str	Text to be shown on the button
 	 */
-	Edit(const char *str, int id);
+	Button(const char *str, int id);
 
 	/**
 	 * Destructor
 	 */
-	~Edit();
+	~Button();
 
 	/**
 	 * Returns the widget's ID
@@ -68,6 +68,14 @@ public:
 	void *getInstance();
 
 	/**
+	 * Processes events sent by the Manager.
+	 * Called by the Manager. You should not call it yourself.
+	 *
+	 * @param	MAEvent to be processed
+	 */
+	void processEvent(const MAEvent &);
+
+	/**
 	 * Actually builds the widget natively.
 	 * This method is to be overwritten in derived classes.
 	 * Called by the Layout. You should not call it yourself.
@@ -81,15 +89,6 @@ public:
 	 */
 	void build(int x, int y, int h, int l, void *f);
 
-	/**
-	 * Returns the text displayed in the Edit
-	 *
-	 * @return ID of the widget
-	 */
-	char *getText();
-public:
-	MAWidgetHandle mWidgetHandler;
-	void *mParent;
 };
 
 #endif

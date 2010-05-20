@@ -16,39 +16,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * Edit.h
+ * Image.h
  *
  *  Created on: Mar 15, 2010
  *      Author: Romain Chalant
  */
 
-#ifndef EDIT_H
-#define EDIT_H
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include <ma.h>
 #include <maassert.h>
 #include <mastring.h>
 #include <IX_NATIVE_UI.h>
 #include "Widget.h"
-#include <maheap.h>
 
 /**
  * This class is an implementation of
- * a multi-lines Text Edit
+ * a multi-lines Text Label
  */
-class Edit : public Widget {
+class Image : public Widget {
 public:
 	/**
 	 * Constructor
 	 *
-	 * @param str	Text to be shown
+	 * @param rsc	Resource ID
+	 * @param id	Widget ID
 	 */
-	Edit(const char *str, int id);
+	Image(int rsc, int id);
 
 	/**
 	 * Destructor
 	 */
-	~Edit();
+	~Image();
 
 	/**
 	 * Returns the widget's ID
@@ -80,16 +80,9 @@ public:
 	 * 				the parent frame
 	 */
 	void build(int x, int y, int h, int l, void *f);
-
-	/**
-	 * Returns the text displayed in the Edit
-	 *
-	 * @return ID of the widget
-	 */
-	char *getText();
-public:
-	MAWidgetHandle mWidgetHandler;
-	void *mParent;
+	
+private:
+	int mRsc;
 };
 
 #endif

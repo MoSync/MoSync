@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Layout>
+    
+    <Button id="32" text="New frame" />
+    <Button id="34" text="I am a button" />
+    <Edit id="31" text="I am an Edit" />
+    <Label id="30" text="I am a Label" />
+    
+    
+    
+
+</Layout>
