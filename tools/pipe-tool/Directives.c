@@ -295,7 +295,7 @@ short Directives()
 				else if (Token("void"))
 					Function_Return_Type = RET_void;
 				else if (Token("?"))
-					Function_Return_Type = RET_int;	//patch fix
+					Function_Return_Type = RET_double;	//patch fix
 			}
 		}
 
