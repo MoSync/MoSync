@@ -7,4 +7,4 @@
 
 PRJ_MMPFILES
 
-MoSyncServer.mmp
+MoSyncServer.mmp BUILD_AS_ARM

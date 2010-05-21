@@ -7,4 +7,5 @@ PRJ_MMPFILES
 
 gnumakefile icons_scalable_dc.mk
 
-MoSync.mmp
+MoSync.mmp BUILD_AS_ARM
+

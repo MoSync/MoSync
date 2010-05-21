@@ -153,6 +153,7 @@ using namespace Core;
 //#endif
 
 #ifdef __SYMBIAN32__
+	#define ROUND_DWORD(x) (((x) + 3 ) & ~(0x3))
 	MoSync::SafeChunk::SafeChunk() {
 		mChunkIsOpen = false;
 	}
@@ -161,8 +162,12 @@ using namespace Core;
 			close();
 	}
 	void* MoSync::SafeChunk::allocate(int size) {
-		DEBUG_ASSERT(!mChunkIsOpen);
-		LHEL(mChunk.CreateLocalCode(size, size));
+		TInt pageSize;
+		UserHal::PageSizeInBytes(pageSize);
+		TInt minSize = size;
+		TInt maxSize = size + pageSize;
+
+		LHEL(mChunk.CreateLocalCode(ROUND_DWORD(minSize), ROUND_DWORD(maxSize)));
 		mChunkIsOpen = true;
 		return mChunk.Base();
 	}
@@ -177,47 +182,30 @@ using namespace Core;
 #endif	//__SYMBIAN32__
 
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
-#ifdef __SYMBIAN32__
-#if 0
-		//return new (ELeave) byte[size];
-		//return User::AllocL(size);
-		if(mHeap == NULL) {
-			//HACK: extra memory for the entryPoint
-			int chunkSize = size + 1024 * 2;
-			LOG("chunkSize %i -> %i\n", size, chunkSize);
-			LHEL(mChunk.CreateLocalCode(chunkSize, chunkSize));
-			LHEL(mChunk.Adjust(chunkSize));
-			mHeap = UserHeap::ChunkHeap(mChunk, size + 1024);
-			DEBUG_ASSERT(mHeap != NULL);
-		}
-		void* ptr = mHeap->AllocL(size);
-		LOG("alloCode %i 0x%08x\n", size, ptr);
-		return ptr;
-#else
-		return mCodeChunk.allocate(size);
-#endif	//0
-#elif defined(_android)
+	#ifdef __SYMBIAN32__
+		return mCodeChunk->allocate(size);
+	#elif defined(_android)
 		return NULL;
-#else	// winmobile
+	#else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-#endif
+	#endif
 	}
 
 	void* MoSync::ArmRecompiler::allocateEntryPoint(int size) {
-#ifdef __SYMBIAN32__
-		return mEntryChunk.allocate(size);
-#elif defined(_android)
+	#ifdef __SYMBIAN32__
+		return mEntryChunk->allocate(size);
+	#elif defined(_android)
 		return NULL;
-#else	// winmobile
+	#else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-#endif
+	#endif
 	}
 
 	void MoSync::ArmRecompiler::freeCodeMemory(void *addr) {
 	#ifdef __SYMBIAN32__
 		LOG("freeCode 0x%08x\n", addr);
-		DEBUG_ASSERT(addr == mCodeChunk.address());
-		mCodeChunk.close();
+		DEBUG_ASSERT(addr == mCodeChunk->address());
+		delete mCodeChunk;
 	#elif defined(_android)
 		return;
 	#else	// winmobile
@@ -228,8 +216,8 @@ using namespace Core;
 	void MoSync::ArmRecompiler::freeEntryPoint(void *addr) {
 	#ifdef __SYMBIAN32__
 		LOG("freeEntry 0x%08x\n", addr);
-		DEBUG_ASSERT(addr == mEntryChunk.address());
-		mEntryChunk.close();
+		DEBUG_ASSERT(addr == mEntryChunk->address());
+		delete mEntryChunk;
 	#elif defined(_android)
 		return;
 	#else	// winmobile
@@ -1033,6 +1021,8 @@ namespace MoSync {
 #ifdef __SYMBIAN32__
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
+		mEntryChunk = new SafeChunk();
+		mCodeChunk = new SafeChunk();
 #endif
 		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);	
 	}

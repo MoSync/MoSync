@@ -80,7 +80,7 @@ namespace MoSync {
 	protected:
 
 #ifdef __SYMBIAN32__
-		SafeChunk mCodeChunk, mEntryChunk;
+		SafeChunk *mCodeChunk, *mEntryChunk;
 #endif
 		
 #define REGISTER_ADDR AA::FP // pointer to gCore->regs
