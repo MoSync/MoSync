@@ -124,6 +124,13 @@ namespace MapDemo
 		}
 	}
 
+    //-------------------------------------------------------------------------
+    static double clamp( double x, double min, double max )
+    //-------------------------------------------------------------------------
+    {
+            return x < min ? min : x > max ? max : x;
+    }
+
 	//-------------------------------------------------------------------------
 	bool MapDemoScreen::handlePointerMove( MAPoint2d point )
 	//-------------------------------------------------------------------------
@@ -132,25 +139,17 @@ namespace MapDemo
 			return true;
 
 		if(scrolling) return false;
-		int dx = point.x - prevX;
-		int dy = point.y - prevY;
+		int accel = 7;
+		int dx = (point.x - prevX) * accel;
+		int dy = (point.y - prevY) * accel;
 
-		if(abs(dx) > abs(dy))
-		{
-			// mostly moving horizontally
-			if(dx < 0)
-				mMap->scroll(SCROLLDIRECTION_EAST, false);
-			else
-				mMap->scroll(SCROLLDIRECTION_WEST, false);
-		}
-		else
-		{
-			// mostly moving vertically
-			if(dy < 0)
-				mMap->scroll(SCROLLDIRECTION_SOUTH, false);
-			else
-				mMap->scroll(SCROLLDIRECTION_NORTH, false);
-		}
+		PixelCoordinate px = mMap->getCenterPositionPixels( );
+
+		px = PixelCoordinate( px.getMagnification( ), px.getX( ) - dx, px.getY( ) + dy );
+
+        LonLat newPos = LonLat( px );
+        newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+        mMap->setCenterPosition( newPos );
 		prevX = point.x;
 		prevY = point.y;
 	}
