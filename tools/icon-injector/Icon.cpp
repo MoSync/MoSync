@@ -68,7 +68,7 @@ void end(void *data, const char *el) {
 		FILE* f = fopen(filename.c_str(), "r");
 
 		if(!f) {
-			errorExit((string("Could not open input file: %s.") + filename).c_str());
+			errorExit((string("Could not open input file: ") + filename).c_str());
 		}
 
 		XML_Parser parser = XML_ParserCreate(NULL);
