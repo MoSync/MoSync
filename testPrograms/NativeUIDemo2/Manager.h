@@ -56,7 +56,7 @@ public:
 	 *
 	 * @param w		Pointer to the widget to be added.
 	 */
-	void addWidget(Widget *w);
+	Widget *addWidget(Widget *w);
 
 	/**
 	 * Dispatches events coming from the runtime

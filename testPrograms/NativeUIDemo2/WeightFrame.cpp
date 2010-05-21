@@ -28,12 +28,12 @@ void WeightFrame::onItemSelected (int id, int index) {
 	if (id == this->getId()) {
 		switch(index) {
 			case 1: {
-				InputFrame *inputFrame = new InputFrame(300);
+				InputFrame *inputFrame = new InputFrame(Manager::Instance().getNextId());
 			}
 			break;
 
 			case 2: {
-				InputFrame *inputFrame = new InputFrame(301);
+				InputFrame *inputFrame = new InputFrame(Manager::Instance().getNextId());
 			}
 			break;
 		}

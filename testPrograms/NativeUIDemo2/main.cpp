@@ -1,10 +1,11 @@
 #include <ma.h>
 #include "Manager.h"
 #include "CategoriesFrame.h"
+#include "Converter.h"
 
 extern "C" int MAMain() {
-
-	CategoriesFrame *mainFrame = new CategoriesFrame(1);
+	Converter::init();
+	CategoriesFrame *mainFrame = new CategoriesFrame(Manager::Instance().getNextId());
 
 	MAEvent event;
 	while(1) {

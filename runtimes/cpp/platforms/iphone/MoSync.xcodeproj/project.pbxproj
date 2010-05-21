@@ -15,6 +15,35 @@
 		2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
+		7A5DBD4A11A691E70093D91F /* Core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BFD11341B3D00BB0201 /* Core.cpp */; };
+		7A5DBD4B11A691E70093D91F /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
+		7A5DBD4C11A691E70093D91F /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
+		7A5DBD4D11A691E70093D91F /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4C1134052300BB0201 /* Graphics.cpp */; };
+		7A5DBD4E11A691E70093D91F /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
+		7A5DBD4F11A691E70093D91F /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
+		7A5DBD5011A691E70093D91F /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
+		7A5DBD5111A691E70093D91F /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
+		7A5DBD5211A691E70093D91F /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
+		7A5DBD5311A691E70093D91F /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
+		7A5DBD5411A691E70093D91F /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
+		7A5DBD5511A691E70093D91F /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		7A5DBD5611A691E70093D91F /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
+		7A5DBD5711A691E70093D91F /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
+		7A5DBD5811A691E70093D91F /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
+		7A5DBD5911A691E70093D91F /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
+		7A5DBD5A11A691E70093D91F /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
+		7A5DBD5B11A691E70093D91F /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
+		7A5DBD5C11A691E70093D91F /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
+		7A5DBD5D11A691E70093D91F /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
+		7A5DBD5E11A691E70093D91F /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
+		7A5DBD6011A691E70093D91F /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
+		7A5DBD6111A691E70093D91F /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
+		7A5DBD6211A691E70093D91F /* SyscallImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B71113405A800BB0201 /* SyscallImpl.cpp */; };
+		7A5DBD6411A691E70093D91F /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		7A5DBD6511A691E70093D91F /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
+		7A5DBD7011A693630093D91F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		7A5DBD7111A6936C0093D91F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		7A5DBD7211A693710093D91F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		7AD52246116F1A5E0038A697 /* NativeUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7AD52245116F1A5E0038A697 /* NativeUI.mm */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
@@ -61,6 +90,7 @@
 		28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		7A5DBD4311A6911C0093D91F /* libMoSyncStaticLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncStaticLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AD52244116F1A5E0038A697 /* NativeUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeUI.h; sourceTree = "<group>"; };
 		7AD52245116F1A5E0038A697 /* NativeUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeUI.mm; sourceTree = "<group>"; };
 		853983A9116CADEF000521C0 /* hashmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hashmap.cpp; path = ../../../../intlibs/hashmap/hashmap.cpp; sourceTree = SOURCE_ROOT; };
@@ -162,6 +192,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A5DBD4111A6911C0093D91F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A5DBD7011A693630093D91F /* Foundation.framework in Frameworks */,
+				7A5DBD7111A6936C0093D91F /* UIKit.framework in Frameworks */,
+				7A5DBD7211A693710093D91F /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -190,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				1D6058910D05DD3D006BFB54 /* MoSync.app */,
+				7A5DBD4311A6911C0093D91F /* libMoSyncStaticLib.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -402,6 +443,16 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		7A5DBD3F11A6911C0093D91F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		1D6058900D05DD3D006BFB54 /* MoSync */ = {
 			isa = PBXNativeTarget;
@@ -420,6 +471,23 @@
 			productReference = 1D6058910D05DD3D006BFB54 /* MoSync.app */;
 			productType = "com.apple.product-type.application";
 		};
+		7A5DBD4211A6911C0093D91F /* MoSyncStaticLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A5DBD4811A691380093D91F /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */;
+			buildPhases = (
+				7A5DBD3F11A6911C0093D91F /* Headers */,
+				7A5DBD4011A6911C0093D91F /* Sources */,
+				7A5DBD4111A6911C0093D91F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MoSyncStaticLib;
+			productName = MoSyncStaticLib;
+			productReference = 7A5DBD4311A6911C0093D91F /* libMoSyncStaticLib.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -433,6 +501,7 @@
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* MoSync */,
+				7A5DBD4211A6911C0093D91F /* MoSyncStaticLib */,
 			);
 		};
 /* End PBXProject section */
@@ -491,6 +560,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A5DBD4011A6911C0093D91F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A5DBD4A11A691E70093D91F /* Core.cpp in Sources */,
+				7A5DBD4B11A691E70093D91F /* base_errors.cpp in Sources */,
+				7A5DBD4C11A691E70093D91F /* FileStream.cpp in Sources */,
+				7A5DBD4D11A691E70093D91F /* Graphics.cpp in Sources */,
+				7A5DBD4E11A691E70093D91F /* Image.cpp in Sources */,
+				7A5DBD4F11A691E70093D91F /* MemStream.cpp in Sources */,
+				7A5DBD5011A691E70093D91F /* networking.cpp in Sources */,
+				7A5DBD5111A691E70093D91F /* Stream.cpp in Sources */,
+				7A5DBD5211A691E70093D91F /* Syscall.cpp in Sources */,
+				7A5DBD5311A691E70093D91F /* ThreadPool.cpp in Sources */,
+				7A5DBD5411A691E70093D91F /* hashmap.cpp in Sources */,
+				7A5DBD5511A691E70093D91F /* filelist-linux.c in Sources */,
+				7A5DBD5611A691E70093D91F /* net.cpp in Sources */,
+				7A5DBD5711A691E70093D91F /* intutil.cpp in Sources */,
+				7A5DBD5811A691E70093D91F /* TranslatePanic.cpp in Sources */,
+				7A5DBD5911A691E70093D91F /* log.cpp in Sources */,
+				7A5DBD5A11A691E70093D91F /* connection.cpp in Sources */,
+				7A5DBD5B11A691E70093D91F /* discovery.cpp in Sources */,
+				7A5DBD5C11A691E70093D91F /* init.cpp in Sources */,
+				7A5DBD5D11A691E70093D91F /* server.cpp in Sources */,
+				7A5DBD5E11A691E70093D91F /* ThreadPoolImpl.mm in Sources */,
+				7A5DBD6011A691E70093D91F /* FileImpl.cpp in Sources */,
+				7A5DBD6111A691E70093D91F /* netImpl.cpp in Sources */,
+				7A5DBD6211A691E70093D91F /* SyscallImpl.cpp in Sources */,
+				7A5DBD6411A691E70093D91F /* MoSyncAppDelegate.mm in Sources */,
+				7A5DBD6511A691E70093D91F /* MoSyncViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -504,6 +606,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				INFOPLIST_FILE = "MoSync-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/build/Release-iphonesimulator\"",
+				);
 				PRODUCT_NAME = MoSync;
 			};
 			name = Debug;
@@ -516,7 +622,37 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				INFOPLIST_FILE = "MoSync-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/build/Release-iphonesimulator\"",
+				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = MoSync;
+			};
+			name = Release;
+		};
+		7A5DBD4411A6911D0093D91F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PREBINDING = NO;
+				PRODUCT_NAME = MoSyncStaticLib;
+			};
+			name = Debug;
+		};
+		7A5DBD4511A6911D0093D91F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PREBINDING = NO;
+				PRODUCT_NAME = MoSyncStaticLib;
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -571,6 +707,15 @@
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
 				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A5DBD4811A691380093D91F /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A5DBD4411A6911D0093D91F /* Debug */,
+				7A5DBD4511A6911D0093D91F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

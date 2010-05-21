@@ -8,6 +8,7 @@
 #include "Edit.h"
 #include "Button.h"
 #include "Layout.h"
+#include "ResultsFrame.h"
 
 class InputFrame : public Frame, public ActionListener {
 public:
@@ -16,6 +17,11 @@ public:
 	void onCreate (int id);
 	void onClick (int id);
 	void onItemSelected (int id, int index);
+private:
+	Button *mConvertButton;
+	Edit *mEdit;
+	Label *mLabel;
+	Layout *mLayout;
 };
 
 #endif

@@ -54,8 +54,9 @@ Manager& Manager::Instance() {
  *
  * @param w		Pointer to the widget to be added.
  */
-void Manager::addWidget(Widget* w) {
+Widget *Manager::addWidget(Widget* w) {
 	map.insert((w->getId()), w);
+	return w;
 }
 
 /**

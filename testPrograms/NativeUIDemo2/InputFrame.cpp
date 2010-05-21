@@ -8,34 +8,40 @@ InputFrame::InputFrame (int Id) : Frame(Id) {
 }
 
 InputFrame::~InputFrame() {
-
+	delete(mLayout);
+	delete(mConvertButton);
+	delete(mEdit);
+	delete(mLabel);
 }
 
 void InputFrame::onCreate (int id) {
 	if (id == this->getId()) {
-		Label *label = new Label("Enter a value:", 100);
-		Manager::Instance().addWidget(label);
+		mLabel = new Label("Enter a value:", Manager::Instance().getNextId());
+		Manager::Instance().addWidget(mLabel);
 
-		Edit *edit = new Edit("", 101);
-		Manager::Instance().addWidget(edit);
+		mEdit = new Edit("", Manager::Instance().getNextId());
+		Manager::Instance().addWidget(mEdit);
 
-		Button *button = new Button("Convert", 102);
-		Manager::Instance().addWidget(button);
-		button->addActionListener(this);
+		mConvertButton = new Button("Convert", Manager::Instance().getNextId());
+		Manager::Instance().addWidget(mConvertButton);
+		mConvertButton->addActionListener(this);
 
-		Layout *tempLayout = new Layout(this);
+		mLayout = new Layout(this);
 
-		tempLayout->addWidget(label);
-		tempLayout->addWidget(edit);
-		tempLayout->addWidget(button);
+		mLayout->addWidget(mLabel);
+		mLayout->addWidget(mEdit);
+		mLayout->addWidget(mConvertButton);
 
-		tempLayout->build();
+		mLayout->build();
+
 
 	}
 }
 
 void InputFrame::onClick (int id) {
-
+	if (id == mConvertButton->getId()) {
+		ResultsFrame *resultsFrame = new ResultsFrame(Manager::Instance().getNextId(), "Temperature");
+	}
 }
 
 void InputFrame::onItemSelected (int id, int index) {

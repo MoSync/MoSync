@@ -28,12 +28,12 @@ void TemperatureFrame::onItemSelected (int id, int index) {
 	if (id == this->getId()) {
 		switch(index) {
 			case 1: {
-				InputFrame *inputFrame = new InputFrame(200);
+				InputFrame *inputFrame = new InputFrame(Manager::Instance().getNextId());
 			}
 			break;
 
 			case 2: {
-				InputFrame *inputFrame = new InputFrame(201);
+				InputFrame *inputFrame = new InputFrame(Manager::Instance().getNextId());
 			}
 			break;
 		}

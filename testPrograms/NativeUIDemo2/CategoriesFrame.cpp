@@ -31,12 +31,12 @@ void CategoriesFrame::onItemSelected (int id, int index) {
 	if (id == this->getId()) {
 		switch(index) {
 			case 1: {
-				TemperatureFrame *temperatureFrame = new TemperatureFrame(2);
+				TemperatureFrame *temperatureFrame = new TemperatureFrame(Manager::Instance().getNextId());
 			}
 			break;
 
 			case 2: {
-				WeightFrame *weightFrame = new WeightFrame(3);
+				WeightFrame *weightFrame = new WeightFrame(Manager::Instance().getNextId());
 			}
 			break;
 		}
