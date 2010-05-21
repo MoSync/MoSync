@@ -65,6 +65,7 @@ void Base::Syscall::VM_Yield() {
 
 unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	unsigned char* data = new unsigned char[mallocSize];
+	memset(data, 0, mallocSize);
 	Base::FileStream fileStream(file);
 	fileStream.read(data, fileSize);
 	return data;
