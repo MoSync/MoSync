@@ -894,7 +894,10 @@ void CppEmitDivu(OpcodeInfo *theOp, int imm)
 
 void CppEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
 {
-	RebuildEmit("	if (%s %s %s) ",Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
+	if(unsign)
+		RebuildEmit("	if ((unsigned long)%s %s (unsigned long)%s) ",Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
+	else
+		RebuildEmit("	if (%s %s %s) ",Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
 	CppDecodeLabel(theOp, "goto label_%d;");
 
 	unsign = 0;
