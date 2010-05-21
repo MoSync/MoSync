@@ -107,27 +107,30 @@ namespace HelloMap
 		}
 	}
 
+
+    //-------------------------------------------------------------------------
+    static double clamp( double x, double min, double max )
+    //-------------------------------------------------------------------------
+    {
+            return x < min ? min : x > max ? max : x;
+    }
+
 	//-------------------------------------------------------------------------
 	void HelloMapScreen::pointerMoveEvent(MAPoint2d p)
 	//-------------------------------------------------------------------------
 	{
 		if(scrolling) return;
-		int dx = p.x - prevX;
-		int dy = p.y - prevY;
+		int accel = 7;
+		int dx = (p.x - prevX) * accel;
+		int dy = (p.y - prevY) * accel;
 
-		if(abs(dx) > abs(dy)) {
-			// mostly moving horizontally
-			if(dx < 0)
-				mMap->scroll(SCROLLDIRECTION_EAST, false);
-			else
-				mMap->scroll(SCROLLDIRECTION_WEST, false);
-		} else {
-			// mostly moving vertically
-			if(dy < 0)
-				mMap->scroll(SCROLLDIRECTION_SOUTH, false);
-			else
-				mMap->scroll(SCROLLDIRECTION_NORTH, false);
-		}
+		PixelCoordinate px = mMap->getCenterPositionPixels( );
+
+		px = PixelCoordinate( px.getMagnification( ), px.getX( ) - dx, px.getY( ) + dy );
+
+        LonLat newPos = LonLat( px );
+        newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+        mMap->setCenterPosition( newPos );
 		prevX = p.x;
 		prevY = p.y;
 	}
