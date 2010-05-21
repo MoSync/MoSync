@@ -8,6 +8,10 @@
 
 #include <ma.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /// The maximum number of bytes in a multibyte character.
 #define MB_CUR_MAX 3
 #define MB_LEN_MAX 3
@@ -75,5 +79,9 @@ size_t mbstowcs(wchar_t* dst, const char* src, size_t count);
 size_t wcstombs(char* dst, const wchar_t* src, size_t count);
 
 int mblen(const char* string, size_t size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//WHCAR_H
