@@ -59,5 +59,6 @@
 <property key="symbian.uids:uid.s60v2uid" value="0x0f7db34b"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xea30a758"/>
 <property key="template.id" value="C"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

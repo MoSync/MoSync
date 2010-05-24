@@ -17,5 +17,6 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="template.id" value="project.empty"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

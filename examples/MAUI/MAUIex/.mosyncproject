@@ -20,5 +20,6 @@
 <property key="last.build.config" value="Debug"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0a88cac6"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xec450e0d"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

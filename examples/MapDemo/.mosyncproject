@@ -22,5 +22,6 @@
 <property key="dependency.strategy" value="0"/>
 <property key="last.build.config" value="Release"/>
 <property key="template.id" value="project.empty"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>
