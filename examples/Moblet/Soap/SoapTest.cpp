@@ -23,18 +23,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-// This is Flickr's echo service, as documented here:
-// http://www.flickr.com/services/api/request.soap.html
+// This is the WebServiceX Currency Convertor, as documented here:
+// http://www.webservicex.net/CurrencyConvertor.asmx?op=ConversionRate
 
-// This request will cause an error message, since it doesn't
-// have a Flickr API key. Still, it is a fair example of SOAP syntax.
+// This request will return the current exchange rate between
+// the Pound Sterling and the Euro.
 
-static const char sUrl[] = "http://api.flickr.com/services/soap/";
+static const char sUrl[] = "http://www.webservicex.net/CurrencyConvertor.asmx";
 static const char sData[] =
-"<x:FlickrRequest xmlns:x=\"urn:flickr\">"
-	"<method>flickr.test.echo</method>"
-	"<name>value</name>"
-"</x:FlickrRequest>"
+"<ConversionRate xmlns=\"http://www.webserviceX.NET/\">"
+	"<FromCurrency>GBP</FromCurrency>"
+	"<ToCurrency>EUR</ToCurrency>"
+"</ConversionRate>"
 ;
 
 
