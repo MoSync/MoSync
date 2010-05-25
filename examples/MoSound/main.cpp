@@ -29,8 +29,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 #include <ma.h>
 #include <conprint.h>
-
+#include <maprofile.h>
 #include "MAHeaders.h"
+
+//
+// Handle different decoding capabilities of different
+// runtimes.
+//
+#if defined( MA_PROF_STRING_PLATFORM_WM5 ) || \
+	defined( MA_PROF_STRING_PLATFORM_WM6 ) || \
+	defined( MA_PROF_STRING_PLATFORM_WM6PRO ) || \
+	defined( MA_PROF_STRING_PLATFORM_SP2003 ) || \
+	defined( MA_PROF_STRING_PLATFORM_MOBLIN )
+#define SOUND_RESOURCE R_MOSO_WAV
+#else
+#define SOUND_RESOURCE R_MOSO_MP3
+#endif
+
+
+
 
 extern "C" {
 /**
@@ -42,7 +59,7 @@ int MAMain()
 	MAExtent e = maGetScrSize();
 
 	/// play R_MOSO sound
-	maSoundPlay(R_MOSO, 0, maGetDataSize(R_MOSO));
+	maSoundPlay(SOUND_RESOURCE, 0, maGetDataSize(SOUND_RESOURCE));
 
 	printf("Press 0/RSK to exit.");
 
