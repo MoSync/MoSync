@@ -26,16 +26,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define __TESTMANAGER_HPP__
 
 #include "common.h"
+#include <mastring.h>
 #include <MAUtil/Vector.h>
+#include <MAUtil/collection_common.h>
 
 NAMESPACE_BEGIN( Testify )
-
 
 class Test;
 class TestCase;
 class TestHook;
 class TestFunction;
 class TestListener;
+
+using MAUtil::Pair;
+using MAUtil::Vector;
+
 
 /**
  * This class is the most important class in Testify. All the test hooks
@@ -50,13 +55,16 @@ class TestManager
 	friend class TestCase;
 	friend class TestFunction;
 
+
 private:
 	int	m_testCount;
 	int m_testFailures;
 
-	static TestManager *			m_instance;
-	MAUtil::Vector<Test *>			m_testList;
-	MAUtil::Vector<TestListener *>	m_listenerList;
+
+	static TestManager *    m_instance;
+	Vector<Test *>          m_testList;
+	Vector<TestListener *>  m_listenerList;
+	Vector<Pair<char *, Vector<Test *> *> >   m_suiteMap;
 
 
 	/**
@@ -118,6 +126,44 @@ private:
 	 *
 	 */
 	void endTest ( void );
+
+	/**
+	 * Adds a test to a suite
+	 *
+	 * @param n Name of the suite
+	 * @param t Pointer to test to add to suite
+	 */
+	void addToSuite ( const char *n, Test *t )
+	{
+		Vector<Test *> *suiteList = NULL;
+
+		// Search for suite
+		for ( int i = 0; i < m_suiteMap.size( ); i++ )
+		{
+			if ( stricmp(m_suiteMap[i].first, n ) == 0 )
+			{
+				suiteList = m_suiteMap[i].second;
+				break;
+			}
+		}
+
+		// Suite exists ?
+		if ( suiteList == NULL )
+		{
+			suiteList = new Vector<Test *>( );
+			Pair< char *, Vector<Test *> *> pair;
+
+			int len = strlen( n );
+			pair.first = new char[len+1];
+			strcpy( pair.first, n );
+
+			pair.second= suiteList;
+			m_suiteMap.add( pair );
+		}
+
+		// Add test
+		suiteList->add( t );
+	}
 
 	/**
 	 * Deletes this instance, should only be called form

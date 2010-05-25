@@ -15,8 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 #include "testify.hpp"
-#include <list>
-
 
 using namespace Testify;
 
@@ -37,4 +35,4 @@ static Test *array[] = { Test::create( bind( Test2 ), "Test2" ),
 						 Test::create( bind( Test3 ), "Test3" ),
 						 NULL };
 
-static TestHook hook( array );
+static TestHook hook( array, "function_test" );
