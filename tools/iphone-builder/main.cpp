@@ -47,7 +47,8 @@ static const char sInfo[] =
 "   -output         specifies where to put the output.\n"
 "\n"
 " run options:\n"
-"   -input          specifies where the application is.\n";
+"   -input          specifies where the application is.\n"
+"\n";
 
 static map<string, string> sArguments;
 
@@ -60,8 +61,49 @@ void error(const char* fmt, ...) {
 	exit(1);
 }
 
+const string& validateArgument(const string& arg) {
+	map<string,string>::iterator i = sArguments.find(arg);
+	if(i==sArguments.end()) error("Missing argument %s.\n", arg.c_str());
+	return i->second;
+}
+
+// slow implementation, but fast enough.
+void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
+	size_t index;
+	while((index=templateFile.find(whatToReplace))!=string::npos) {
+		size_t endOfReplacement = index+whatToReplace.length();
+		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
+	}
+}
+
+char *readFileIntoMem(const char* filename, int *len) {
+	FILE *file = fopen(filename, "rb");
+	if(!file) return NULL;
+	fseek(file, 0, SEEK_END);
+	int length = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	char *memory = new char[length];
+	fread(memory, length, 1, file);
+	fclose(file);
+	*len = length;
+	return memory;
+}
+
+bool writeMemIntoFile(const char* filename, const char *mem, int len) {
+	FILE *file = fopen(filename, "wb");
+	if(!file) return false;
+	fwrite(mem, len, 1, file);
+	fclose(file);
+	return true;
+}
 
 void generate() {
+	int length;
+	char *templateFileStr = readFileIntoMem(validateArgument("input").c_str(), &length);
+	string templateFile = string(templateFileStr, length);
+	delete templateFileStr;
+
+
 }
 
 #ifdef PLATFORM_OSX
