@@ -377,6 +377,7 @@ DEVICE.each_with_index do |device, index|
 		profile.puts "#define MA_PROF_STRING_VENDOR \"#{vendor}\""
 		profile.puts "#define MA_PROF_STRING_DEVICE \"#{device.name}\""
 		profile.puts "#define MA_PROF_STRING_PLATFORM \"#{device.platformversion.platform}\""
+		profile.puts "#define MA_PROF_STRING_PLATFORM_#{device.platformversion.platform.upcase}"
 		profile.puts "#define MA_PROF_VENDOR_#{vendor.to_s.format}"
 		profile.puts "#define MA_PROF_DEVICE_#{device.name.to_s.format}"
 		profile.puts
