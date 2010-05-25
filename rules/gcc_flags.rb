@@ -90,6 +90,9 @@ if(HOST == :win32)
 elsif(HOST == :linux)
 	@HOST_FLAGS = " -DLINUX"
 	@HOST_CPPFLAGS = " -fPIC"
+elsif(HOST == :darwin)
+	@HOST_FLAGS = " -m32 -DDARWIN"
+	@HOST_CPPFLAGS = " -m32 -fPIC"
 else
 	error "Unsupported host: #{HOST}"
 end

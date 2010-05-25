@@ -9,6 +9,8 @@ work.instance_eval do
 		@EXTRA_SOURCEFILES = ["filelist-win32.c"]
 	elsif(HOST == :linux)
 		@EXTRA_SOURCEFILES = ["filelist-linux.c"]
+	elsif(HOST == :darwin)
+		@EXTRA_SOURCEFILES = ["filelist-linux.c"]
 	else
 		error "Unsupported platform"
 	end

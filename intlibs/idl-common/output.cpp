@@ -566,11 +566,11 @@ template<class T> uint32 templateHash(const T& v);
 template<> uint32 templateHash<string>(const string& v) {
 	return SuperFastHash(v.c_str(), v.length());
 }
-#ifdef __x86_64__	//in this case, uint32 is different from size_t
+//#ifdef __x86_64__	//in this case, uint32 is different from size_t
 template<> uint32 templateHash<uint32>(const uint32& v) {
 	return hash32shift(v);
 }
-#endif
+//#endif
 template<> uint32 templateHash<int>(const int& v) {
 	return hash32shift(v);
 }

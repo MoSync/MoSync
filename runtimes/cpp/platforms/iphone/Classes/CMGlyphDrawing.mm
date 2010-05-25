@@ -3,6 +3,7 @@
 //
 
 #import "CMGlyphDrawing.h"
+#import <CoreGraphics/CoreGraphics.h>
 #include <dlfcn.h>
 
 

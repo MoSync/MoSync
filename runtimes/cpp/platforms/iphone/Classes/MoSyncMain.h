@@ -18,7 +18,10 @@
 #ifndef _MOSYNCMAIN_H_
 #define _MOSYNCMAIN_H_
 
-class UIView;
+#import <CoreGraphics/CoreGraphics.h>
+#import <UIKit/UIKit.h>
+
+//class UIView;
 
 void MoSyncMain(int width, int height, UIView* mosyncView);
 

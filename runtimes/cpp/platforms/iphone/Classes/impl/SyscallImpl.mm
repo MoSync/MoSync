@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WIN32_LEAN_AND_MEAN
 
 #include "config_platform.h"
-
+#import <UIKit/UIKit.h>
 #include <string>
 #include <vector>
 #include <map>

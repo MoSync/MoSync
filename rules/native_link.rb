@@ -39,7 +39,11 @@ class NativeGccLinkTask < FileTask
 		execFlags
 		#puts "objects: #{@objects.join(' ')}"
 		#puts "flags: #{@FLAGS}"
-		sh "g++ #{cFlags} -o #{@NAME}"
+		if(HOST == :darwin)
+			sh "g++ -m32 #{cFlags} -o #{@NAME}"
+		else
+			sh "g++ #{cFlags} -o #{@NAME}"
+		end
 	end
 	
 	include FlagsChanged

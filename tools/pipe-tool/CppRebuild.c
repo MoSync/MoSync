@@ -852,7 +852,7 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 void CppEmitDiv(OpcodeInfo *theOp, int imm)
 {
 	if ((theOp->rs == 0) || (theOp->imm == 0))
-		printf("");
+		printf(" ");
 	
 	if (imm)
 	{

@@ -8,6 +8,8 @@
  */
 
 #include "iphone_helpers.h"
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #include <wchar.h>
 
 #include <sys/sysctl.h>  
