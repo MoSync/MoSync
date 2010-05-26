@@ -79,9 +79,10 @@
 													 name:UIDeviceOrientationDidChangeNotification object:nil];
 		
 		self.frame.origin.y = 0;
+		self.frame.origin.x = 0;
 		mosyncView = nil;
         // Initialization code
-		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+		CGRect appFrame = [[UIScreen mainScreen] bounds];
 		CGFloat screenHeight = appFrame.size.height;
 		CGFloat screenWidth = appFrame.size.width;
 		
@@ -92,7 +93,7 @@
     }
     return self;
 }
-
+/*
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
 		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
@@ -117,7 +118,7 @@
     }
     return self;
 }
-
+*/
 /*
 - (void)mTimerProcess{
 	DoneUpdatingMoSyncView();
