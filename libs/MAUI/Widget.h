@@ -155,6 +155,12 @@ namespace MAUI {
 		 * Renders the Widget and all its children recursively.
 		 */
 		virtual void draw(bool forceDraw=false);
+
+		/**
+		* Called by the Engine before drawing.
+		* The Widget should update any cached data here, if needed.
+		* The default implementation calls update() on all children.
+		*/
 		virtual void update();
 
 		/** 

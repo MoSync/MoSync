@@ -310,6 +310,7 @@ void MoSyncError::addRuntimeSpecificPanicInfo(char* ptr, bool newLines) {
 void Base::reportCallStack() {
 	if(gCore == NULL)
 		return;
+	maDumpCallStackEx("reportCallStack", 0);
 	report(REPORT_CALL_STACK, Core::GetFakeCallStack(gCore),
 		Core::GetFakeCallStackDepth(gCore) << 2);
 }

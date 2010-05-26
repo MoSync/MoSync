@@ -156,7 +156,7 @@ namespace MAUI {
 		**/
 		void setPasswordMode(bool enabled = true);
 
-	private:
+	protected:
 		bool deleteCharacter(int c);
 
 		void fireTextChanged();
