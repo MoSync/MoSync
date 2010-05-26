@@ -13,6 +13,7 @@
 #include "ThreadPoolImpl.h"
 
 // do all the const char* become memory leaks or does the garbage collector take care of that?.
+// must fix that.
 const char *getReadablePath(const char* path);
 const char *getWriteablePath(const char* path);
 void sleepMillis(int ms);

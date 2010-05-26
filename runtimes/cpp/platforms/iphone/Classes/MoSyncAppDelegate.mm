@@ -18,7 +18,9 @@
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
 //#include "Platform.h"
-#import "MoSyncMain.h"
+//#import "MoSyncMain.h"
+
+void MoSync_AddCloseEvent();
 
 @implementation MoSyncAppDelegate
 
