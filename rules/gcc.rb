@@ -135,7 +135,13 @@ class GccWork < BuildWork
 		
 		#find source files
 		cfiles = collect_files(".c")
-		cppfiles = collect_files(".cpp") + collect_files(".cc") 
+		cppfiles = collect_files(".cpp") + collect_files(".cc")
+		
+		if(HOST == :linux && HOST_PLATFORM == :darwin)
+			@CFLAGS_MAP[".mm"] = @CPPFLAGS + host_flags + host_cppflags
+			cppfiles += collect_files(".mm")
+		end
+		
 		@all_sourcefiles = cfiles + cppfiles
 		
 		@source_objects = objects(@all_sourcefiles)

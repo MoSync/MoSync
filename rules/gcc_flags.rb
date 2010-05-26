@@ -89,6 +89,9 @@ if(HOST == :win32)
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :linux)
 	@HOST_FLAGS = " -DLINUX"
+	if(HOST_PLATFORM == :darwin)
+		@HOST_FLAGS += " -m32 -DDARWIN"
+	end
 	@HOST_CPPFLAGS = " -fPIC"
 elsif(HOST == :darwin)
 	@HOST_FLAGS = " -m32 -DDARWIN"

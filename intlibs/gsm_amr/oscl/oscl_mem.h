@@ -3,7 +3,13 @@
 #define OSCL_MEM_H_INCLUDED
 
 #include <string.h>
+
+#ifdef DARWIN
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
+
 
 #define oscl_memset memset
 #define oscl_memcpy memcpy

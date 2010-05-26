@@ -161,7 +161,7 @@ static void drawLots(int time) {
 	maSetDrawTarget(1);
 
 	/// Set the following draw calls to use color 0x181020 in format rgb888.
-	maSetColor(0x081020);
+	maSetColor(0x181020);
 
 	/// Clear the drawable image.
 	maFillRect(0, 0, DRAWIMAGESIZE, DRAWIMAGESIZE);

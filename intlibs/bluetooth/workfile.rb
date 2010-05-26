@@ -7,12 +7,17 @@ work.instance_eval do
 	set_defaults
 	
 	if(HOST == :linux)
-		@SOURCES = [".", "linux", "linux/bluez"]
-		if(BLUETOOTH)
-			@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
+		if(HOST_PLATFORM == :darwin)
+			@SOURCES = ["."]
 		else
-			#error "libbluetooth-dev missing!"
+			@SOURCES = [".", "linux", "linux/bluez"]
+			if(BLUETOOTH)
+				@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
+			else
+				#error "libbluetooth-dev missing!"
+			end
 		end
+		
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn" }
 	elsif(HOST == :win32)

@@ -27,8 +27,10 @@ def setup_common
 		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
-		
 		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage"]
+	elsif(HOST == :darwin)
+		@LOCAL_DLLS << "amr"
+		@LIBRARIES += ["SDL_sound", "SDLmain"]
 	else
 		error "Unsupported platform"
 	end
