@@ -18,9 +18,8 @@
 #import "MoSyncView.h"
 #include "MosyncMain.h"
 
-#include "iphone_helpers.h"
-
-#include "Platform.h"
+//#include "iphone_helpers.h"
+//#include "Platform.h"
 
 @interface UIApplication(MyExtras) 
 - (void)terminateWithSuccess; 
@@ -30,23 +29,30 @@
 	BOOL kill;
 	NSString *msg;
 }
+
 @property BOOL kill;
 @property (copy, nonatomic) NSString* msg;
+
 - (void)alertViewCancel:(UIAlertView *)alertView;
+
 @end
 
 @implementation MessageBoxHandler
+
 @synthesize kill;
 @synthesize msg;
+
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
 	if(kill)
-		Exit();
+		MoSync_Exit();
 }
+
 - (void)alertViewCancel:(UIAlertView *)alertView {
 	// don't know if this is allowed...
 	if(kill)
-		Exit();
+		MoSync_Exit();
 }
+
 @end
 
 @implementation MoSyncView
@@ -89,7 +95,7 @@
 		locationController = [[MoSyncCLController alloc] init];
 		
 		//MoSyncMain(self.frame.size.width, screenHeight, self);
-		MoSyncMain(screenWidth, screenHeight, self);
+		MoSync_Main(screenWidth, screenHeight, self);
     }
     return self;
 }
@@ -113,8 +119,12 @@
 		
 		locationController = [[MoSyncCLController alloc] init];
 		
+<<<<<<< .mine
+		MoSync_Main(self.frame.size.width, screenHeight, self);
+=======
 		//MoSyncMain(self.frame.size.width, screenHeight, self);
 		MoSyncMain(320.0, screenHeight, self);
+>>>>>>> .r1287
     }
     return self;
 }
@@ -135,7 +145,7 @@
 	CGContextScaleCTM(context, 1.0, -1.0);
 	
     CGContextDrawImage(context, rect, mosyncView);	
-	DoneUpdatingMoSyncView();
+	MoSync_DoneUpdatingView();
 	/*
 	NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.000001f
 													  target:self
@@ -161,14 +171,16 @@ bool down = false;
 	CGPoint point = [touch locationInView:self];
 
 	if(!down) {
-		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
+//		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
+		MoSync_AddTouchPressedEvent(point.x, point.y);		
 		down = true;
 	}
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
 	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	Base::gEventQueue.addScreenChangedEvent();
+	//Base::gEventQueue.addScreenChangedEvent();
+	MoSync_AddScreenChangedEvent();
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -177,7 +189,8 @@ bool down = false;
 	CGPoint point = [touch locationInView:self];
 	
 	if(down) {
-		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_DRAGGED);
+		//Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_DRAGGED);
+		MoSync_AddTouchMovedEvent(point.x, point.y);
 	}	
 }
 
@@ -187,7 +200,8 @@ bool down = false;
 	CGPoint point = [touch locationInView:self];
 	
 	if(down) {
-		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_RELEASED);	
+		//Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_RELEASED);	
+		MoSync_AddTouchReleasedEvent(point.x, point.y);
 		down = false;
 	}	
 }

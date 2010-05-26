@@ -17,8 +17,8 @@
 
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
-
-#include "Platform.h"
+//#include "Platform.h"
+#import "MoSyncMain.h"
 
 @implementation MoSyncAppDelegate
 
@@ -27,7 +27,9 @@
 
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
-    
+	//window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];  
+    //window.backgroundColor = [UIColor whiteColor];   
+	
     // Override point for customization after app launch    
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     //window.backgroundColor = [UIColor whiteColor];
@@ -42,7 +44,8 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-	Base::gEventQueue.addCloseEvent();
+//	Base::gEventQueue.addCloseEvent();
+	MoSync_AddCloseEvent();
 }
 
 - (void)dealloc {

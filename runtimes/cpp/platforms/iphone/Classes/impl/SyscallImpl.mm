@@ -185,7 +185,7 @@ namespace Base {
 		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
 		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
 		sUnicodeFont = CGFontCreateWithFontName(str);
-		CFRelease(str);
+		//CFRelease(str);
 				
 		gDrawTarget = gBackbuffer;
 		
@@ -372,7 +372,7 @@ namespace Base {
 			return;
 		//MAProcessEvents();
 		//MAUpdateScreen();
-		UpdateMoSyncView(gBackbuffer->image);
+		MoSync_UpdateView(gBackbuffer->image);
 	}
 
 	SYSCALL(void, maResetBacklight()) {
@@ -604,7 +604,7 @@ namespace Base {
 
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
-		ShowMessageBox(message, true);
+		MoSync_ShowMessageBox(message, true);
 		//GetVMYield(gCore) = 1;
 		gRunning = false;
 		pthread_exit(NULL);
@@ -761,12 +761,12 @@ namespace Base {
 	}
 	
 	int maLocationStart() {
-		StartUpdatingLocation();
+		MoSync_StartUpdatingLocation();
 		return MA_LPS_AVAILABLE;
 	}
 	
 	int maLocationStop() {
-		StopUpdatingLocation();
+		MoSync_StopUpdatingLocation();
 		return 0;
 	}
 
@@ -830,10 +830,11 @@ void MoSyncExit(int r)
 		exited = true;
 		LeaveCriticalSection(&exitMutex);
 		//exit(r);
-		Exit();
+		MoSync_Exit();
 		EnterCriticalSection(&exitMutex);
 	}
 	LeaveCriticalSection(&exitMutex);
+	pthread_exit(NULL);
 }
 
 void MoSyncErrorExit(int errorCode) 
@@ -864,7 +865,7 @@ void MoSyncErrorExit(int errorCode)
 	
 	//GetVMYield(gCore) = 1;
 	gRunning = false;
-	ShowMessageBox(buffer, true);	
+	MoSync_ShowMessageBox(buffer, true);	
 	pthread_exit(NULL);
 	//MoSyncExit(errorCode);
 }

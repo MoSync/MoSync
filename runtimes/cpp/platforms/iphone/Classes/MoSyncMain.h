@@ -21,19 +21,21 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
 
-//class UIView;
+void MoSync_Main(int width, int height, UIView* mosyncView);
 
-void MoSyncMain(int width, int height, UIView* mosyncView);
+void MoSync_UpdateView(CGImageRef ref);
+void MoSync_DoneUpdatingView();
 
-void UpdateMoSyncView(CGImageRef ref);
-void DoneUpdatingMoSyncView();
+void MoSync_ShowMessageBox(const char *msg, bool kill);
+void MoSync_Exit();
 
-void ShowMessageBox(const char *msg, bool kill);
-
-void Exit();
-
-void StartUpdatingLocation();
-void StopUpdatingLocation();
+void MoSync_StartUpdatingLocation();
+void MoSync_StopUpdatingLocation();
+void MoSync_AddTouchPressedEvent(int x, int y);
+void MoSync_AddTouchMovedEvent(int x, int y);
+void MoSync_AddTouchReleasedEvent(int x, int y);
+void MoSync_AddScreenChangedEvent();
+void MoSync_AddCloseEvent();
 
 #endif
 

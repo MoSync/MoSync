@@ -102,7 +102,7 @@ public:
 	}
 	
 	void createImageDrawer() {
-		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
+		//CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
 		mImageDrawer = new Image((unsigned char*)data, NULL, width, height, rowBytes, Image::PIXELFORMAT_ARGB8888, false, false);
 	
 		/*

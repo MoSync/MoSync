@@ -37,12 +37,10 @@
 
 #include "iphone_helpers.h"
 
-#define _USE_REBUILDER_
+//#define _USE_REBUILDER_
 
 #ifdef _USE_REBUILDER_
-#undef SYSCALL
-#define SYSCALL_IMPL(x) ::x
-#include "rebuild.build.cpp"
+//#include "rebuild.build.cpp"
 
 unsigned char *mem_ds;
 
@@ -73,6 +71,8 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	return data;
 }
 
+void cpp_main();
+
 #endif
 
 using namespace Base;
@@ -83,7 +83,9 @@ bool gRunning = false;
 static UIView *sMoSyncView;
 static int sWidth, sHeight;
 
-int MoSyncThreadMain(void *args) {
+
+
+int MoSync_ThreadMain(void *args) {
 	NSAutoreleasePool	 *autoreleasepool = [[NSAutoreleasePool alloc] init];
 	
 	char program[] = "program";
@@ -126,38 +128,58 @@ int MoSyncThreadMain(void *args) {
 
 MoSyncThread mosyncThread;
 
-void MoSyncMain(int width, int height, UIView* mosyncView) {
+void MoSync_Main(int width, int height, UIView* mosyncView) {
 	sWidth = width;
 	sHeight = height;
 	sMoSyncView = mosyncView;
 
-	mosyncThread.start(MoSyncThreadMain, NULL);
+	mosyncThread.start(MoSync_ThreadMain, NULL);
 }
 
 MoSyncSemaphore mViewSemaphore;
-void UpdateMoSyncView(CGImageRef ref) {
+void MoSync_UpdateView(CGImageRef ref) {
 
 	[sMoSyncView updateMoSyncView: ref];
 	mViewSemaphore.wait();
 }
 
-void DoneUpdatingMoSyncView() {
+void MoSync_DoneUpdatingView() {
 	
 	mViewSemaphore.post();
 }
 
-void ShowMessageBox(const char *msg, bool kill) {
+void MoSync_ShowMessageBox(const char *msg, bool kill) {
 	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
 }
 
-void Exit() {
+void MoSync_Exit() {
 	[[UIApplication sharedApplication] terminateWithSuccess];
 }
 
-void StartUpdatingLocation() {
+void MoSync_StartUpdatingLocation() {
 	[sMoSyncView startUpdatingLocation];
 }
 
-void StopUpdatingLocation() {
+void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
+}
+
+void MoSync_AddTouchPressedEvent(int x, int y) {
+	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+}
+
+void MoSync_AddTouchMovedEvent(int x, int y) {
+	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);
+}
+
+void MoSync_AddTouchReleasedEvent(int x, int y) {
+	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+}
+
+void MoSync_AddScreenChangedEvent() {
+	Base::gEventQueue.addScreenChangedEvent();
+}
+
+void MoSync_AddCloseEvent() {
+	Base::gEventQueue.addCloseEvent();
 }
