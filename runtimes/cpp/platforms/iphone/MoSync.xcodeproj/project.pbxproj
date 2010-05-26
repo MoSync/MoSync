@@ -15,89 +15,90 @@
 		2899E5220DE3E06400AC0155 /* MoSyncViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* MoSyncViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
-		7A54D85811ABD7BD0030279F /* core_run.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2BFC11341B3D00BB0201 /* core_run.h */; };
-		7A54D85911ABD7BD0030279F /* CoreCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2BFF11341B3D00BB0201 /* CoreCommon.h */; };
-		7A54D85A11ABD7BD0030279F /* invoke_syscall_cpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2C0011341B3D00BB0201 /* invoke_syscall_cpp.h */; };
-		7A54D85B11ABD7BD0030279F /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
-		7A54D85C11ABD7BD0030279F /* base_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B491134052300BB0201 /* base_errors.h */; };
-		7A54D85D11ABD7BD0030279F /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
-		7A54D85E11ABD7BD0030279F /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4B1134052300BB0201 /* FileStream.h */; };
-		7A54D85F11ABD7BD0030279F /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4C1134052300BB0201 /* Graphics.cpp */; };
-		7A54D86011ABD7BD0030279F /* Graphics.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4D1134052300BB0201 /* Graphics.h */; };
-		7A54D86111ABD7BD0030279F /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
-		7A54D86211ABD7BD0030279F /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4F1134052300BB0201 /* Image.h */; };
-		7A54D86311ABD7BD0030279F /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
-		7A54D86411ABD7BD0030279F /* MemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B511134052300BB0201 /* MemStream.h */; };
-		7A54D86511ABD7BD0030279F /* networking.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B531134052300BB0201 /* networking.h */; };
-		7A54D86611ABD7BD0030279F /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
-		7A54D86711ABD7BD0030279F /* NotSupportedException.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B541134052300BB0201 /* NotSupportedException.h */; };
-		7A54D86811ABD7BD0030279F /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
-		7A54D86911ABD7BD0030279F /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
-		7A54D86A11ABD7BD0030279F /* Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B571134052300BB0201 /* Stream.h */; };
-		7A54D86B11ABD7BD0030279F /* StreamHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B581134052300BB0201 /* StreamHelpers.h */; };
-		7A54D86C11ABD7BD0030279F /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
-		7A54D86D11ABD7BD0030279F /* Syscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5A1134052300BB0201 /* Syscall.h */; };
-		7A54D86E11ABD7BD0030279F /* TcpConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5B1134052300BB0201 /* TcpConnection.h */; };
-		7A54D86F11ABD7BD0030279F /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
-		7A54D87011ABD7BD0030279F /* ThreadPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5D1134052300BB0201 /* ThreadPool.h */; };
-		7A54D87111ABD7BD0030279F /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
-		7A54D87211ABD7BD0030279F /* hashmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 853983AA116CADEF000521C0 /* hashmap.h */; };
-		7A54D87311ABD7BD0030279F /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
-		7A54D87411ABD7BD0030279F /* filelist.h in Headers */ = {isa = PBXBuildFile; fileRef = 85923F25114539F0004875E4 /* filelist.h */; };
-		7A54D87511ABD7BD0030279F /* net_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B44113404E000BB0201 /* net_errors.h */; };
-		7A54D87611ABD7BD0030279F /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
-		7A54D87711ABD7BD0030279F /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B46113404E000BB0201 /* net.h */; };
-		7A54D87811ABD7BD0030279F /* fifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A080F711352F2800267D56 /* fifo.h */; };
-		7A54D87911ABD7BD0030279F /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2C1134047400BB0201 /* array.h */; };
-		7A54D87A11ABD7BD0030279F /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2D1134047400BB0201 /* attribute.h */; };
-		7A54D87B11ABD7BD0030279F /* constSets.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2E1134047400BB0201 /* constSets.h */; };
-		7A54D87C11ABD7BD0030279F /* cpp_maapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2F1134047400BB0201 /* cpp_maapi.h */; };
-		7A54D87D11ABD7BD0030279F /* CriticalSection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B301134047400BB0201 /* CriticalSection.h */; };
-		7A54D87E11ABD7BD0030279F /* errors_inline.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B311134047400BB0201 /* errors_inline.h */; };
-		7A54D87F11ABD7BD0030279F /* hash_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B321134047400BB0201 /* hash_map.h */; };
-		7A54D88011ABD7BD0030279F /* helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B331134047400BB0201 /* helpers.h */; };
-		7A54D88111ABD7BD0030279F /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
-		7A54D88211ABD7BD0030279F /* intutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B351134047400BB0201 /* intutil.h */; };
-		7A54D88311ABD7BD0030279F /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B361134047400BB0201 /* log.h */; };
-		7A54D88411ABD7BD0030279F /* memfuncs.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B371134047400BB0201 /* memfuncs.h */; };
-		7A54D88511ABD7BD0030279F /* mkdir.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B381134047400BB0201 /* mkdir.h */; };
-		7A54D88611ABD7BD0030279F /* smartie.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B391134047400BB0201 /* smartie.h */; };
-		7A54D88711ABD7BD0030279F /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
-		7A54D88811ABD7BD0030279F /* TranslatePanic.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3B1134047400BB0201 /* TranslatePanic.h */; };
-		7A54D88911ABD7BD0030279F /* TranslateSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3D1134047400BB0201 /* TranslateSyscall.h */; };
-		7A54D88A11ABD7BD0030279F /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3E1134047400BB0201 /* types.h */; };
-		7A54D88B11ABD7BD0030279F /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
-		7A54D88C11ABD7BD0030279F /* bt_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1C113403FD00BB0201 /* bt_errors.h */; };
-		7A54D88D11ABD7BD0030279F /* btinit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1D113403FD00BB0201 /* btinit.h */; };
-		7A54D88E11ABD7BD0030279F /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
-		7A54D88F11ABD7BD0030279F /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1F113403FD00BB0201 /* connection.h */; };
-		7A54D89011ABD7BD0030279F /* discInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B20113403FD00BB0201 /* discInternal.h */; };
-		7A54D89111ABD7BD0030279F /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
-		7A54D89211ABD7BD0030279F /* discovery.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B22113403FD00BB0201 /* discovery.h */; };
-		7A54D89311ABD7BD0030279F /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
-		7A54D89411ABD7BD0030279F /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
-		7A54D89511ABD7BD0030279F /* server.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B25113403FD00BB0201 /* server.h */; };
-		7A54D89611ABD7BD0030279F /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
-		7A54D89711ABD7BD0030279F /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
-		7A54D89811ABD7BD0030279F /* CMGlyphDrawing.h in Headers */ = {isa = PBXBuildFile; fileRef = 853985D9116CF423000521C0 /* CMGlyphDrawing.h */; };
-		7A54D89911ABD7BD0030279F /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
-		7A54D89A11ABD7BD0030279F /* config_platform.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6A113405A800BB0201 /* config_platform.h */; };
-		7A54D89B11ABD7BD0030279F /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
-		7A54D89C11ABD7BD0030279F /* FileImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6C113405A800BB0201 /* FileImpl.h */; };
-		7A54D89D11ABD7BD0030279F /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
-		7A54D89E11ABD7BD0030279F /* netImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6E113405A800BB0201 /* netImpl.h */; };
-		7A54D89F11ABD7BD0030279F /* Platform.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6F113405A800BB0201 /* Platform.h */; };
-		7A54D8A011ABD7BD0030279F /* ResourceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B70113405A800BB0201 /* ResourceDefs.h */; };
-		7A54D8A111ABD7BD0030279F /* SyscallImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B72113405A800BB0201 /* SyscallImpl.h */; };
-		7A54D8A211ABD7BD0030279F /* ThreadPoolImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B74113405A800BB0201 /* ThreadPoolImpl.h */; };
-		7A54D8A311ABD7BD0030279F /* iphone_helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B7D1134125E00BB0201 /* iphone_helpers.h */; };
-		7A54D8A411ABD7BD0030279F /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */; };
-		7A8C147311ABC2F300777910 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
-		7A8C147411ABC2F300777910 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
-		7A8C147511ABC2F300777910 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
-		7A8C147611ABC2F300777910 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
-		7A8C147711ABC2F300777910 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
-		7A8C147811ABC2F300777910 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		7A12138311AD138F006E46E8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
+		7A12138411AD138F006E46E8 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
+		7A12138511AD138F006E46E8 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		7A12138611AD138F006E46E8 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
+		7A12138711AD138F006E46E8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		7A12138811AD138F006E46E8 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		7A12138911AD13CC006E46E8 /* core_run.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2BFC11341B3D00BB0201 /* core_run.h */; };
+		7A12138A11AD13CC006E46E8 /* CoreCommon.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2BFF11341B3D00BB0201 /* CoreCommon.h */; };
+		7A12138B11AD13CC006E46E8 /* invoke_syscall_cpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2C0011341B3D00BB0201 /* invoke_syscall_cpp.h */; };
+		7A12138C11AD13CC006E46E8 /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
+		7A12138D11AD13CC006E46E8 /* base_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B491134052300BB0201 /* base_errors.h */; };
+		7A12138E11AD13CC006E46E8 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
+		7A12138F11AD13CC006E46E8 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4B1134052300BB0201 /* FileStream.h */; };
+		7A12139011AD13CC006E46E8 /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4C1134052300BB0201 /* Graphics.cpp */; };
+		7A12139111AD13CC006E46E8 /* Graphics.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4D1134052300BB0201 /* Graphics.h */; };
+		7A12139211AD13CC006E46E8 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
+		7A12139311AD13CC006E46E8 /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B4F1134052300BB0201 /* Image.h */; };
+		7A12139411AD13CC006E46E8 /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
+		7A12139511AD13CC006E46E8 /* MemStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B511134052300BB0201 /* MemStream.h */; };
+		7A12139611AD13CC006E46E8 /* networking.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B531134052300BB0201 /* networking.h */; };
+		7A12139711AD13CC006E46E8 /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
+		7A12139811AD13CC006E46E8 /* NotSupportedException.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B541134052300BB0201 /* NotSupportedException.h */; };
+		7A12139911AD13CC006E46E8 /* ResourceArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B551134052300BB0201 /* ResourceArray.h */; };
+		7A12139A11AD13CC006E46E8 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B561134052300BB0201 /* Stream.cpp */; };
+		7A12139B11AD13CC006E46E8 /* Stream.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B571134052300BB0201 /* Stream.h */; };
+		7A12139C11AD13CC006E46E8 /* StreamHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B581134052300BB0201 /* StreamHelpers.h */; };
+		7A12139D11AD13CC006E46E8 /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
+		7A12139E11AD13CC006E46E8 /* Syscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5A1134052300BB0201 /* Syscall.h */; };
+		7A12139F11AD13CC006E46E8 /* TcpConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5B1134052300BB0201 /* TcpConnection.h */; };
+		7A1213A011AD13CC006E46E8 /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
+		7A1213A111AD13CC006E46E8 /* ThreadPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B5D1134052300BB0201 /* ThreadPool.h */; };
+		7A1213A211AD13CC006E46E8 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
+		7A1213A311AD13CC006E46E8 /* hashmap.h in Headers */ = {isa = PBXBuildFile; fileRef = 853983AA116CADEF000521C0 /* hashmap.h */; };
+		7A1213A411AD13CC006E46E8 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		7A1213A511AD13CC006E46E8 /* filelist.h in Headers */ = {isa = PBXBuildFile; fileRef = 85923F25114539F0004875E4 /* filelist.h */; };
+		7A1213A611AD13CC006E46E8 /* net_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B44113404E000BB0201 /* net_errors.h */; };
+		7A1213A711AD13CC006E46E8 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
+		7A1213A811AD13CC006E46E8 /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B46113404E000BB0201 /* net.h */; };
+		7A1213A911AD13CC006E46E8 /* fifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A080F711352F2800267D56 /* fifo.h */; };
+		7A1213AA11AD13CC006E46E8 /* array.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2C1134047400BB0201 /* array.h */; };
+		7A1213AB11AD13CC006E46E8 /* attribute.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2D1134047400BB0201 /* attribute.h */; };
+		7A1213AC11AD13CC006E46E8 /* constSets.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2E1134047400BB0201 /* constSets.h */; };
+		7A1213AD11AD13CC006E46E8 /* cpp_maapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B2F1134047400BB0201 /* cpp_maapi.h */; };
+		7A1213AE11AD13CC006E46E8 /* CriticalSection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B301134047400BB0201 /* CriticalSection.h */; };
+		7A1213AF11AD13CC006E46E8 /* errors_inline.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B311134047400BB0201 /* errors_inline.h */; };
+		7A1213B011AD13CC006E46E8 /* hash_map.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B321134047400BB0201 /* hash_map.h */; };
+		7A1213B111AD13CC006E46E8 /* helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B331134047400BB0201 /* helpers.h */; };
+		7A1213B211AD13CC006E46E8 /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
+		7A1213B311AD13CC006E46E8 /* intutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B351134047400BB0201 /* intutil.h */; };
+		7A1213B411AD13CC006E46E8 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B361134047400BB0201 /* log.h */; };
+		7A1213B511AD13CC006E46E8 /* memfuncs.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B371134047400BB0201 /* memfuncs.h */; };
+		7A1213B611AD13CC006E46E8 /* mkdir.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B381134047400BB0201 /* mkdir.h */; };
+		7A1213B711AD13CC006E46E8 /* smartie.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B391134047400BB0201 /* smartie.h */; };
+		7A1213B811AD13CC006E46E8 /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
+		7A1213B911AD13CC006E46E8 /* TranslatePanic.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3B1134047400BB0201 /* TranslatePanic.h */; };
+		7A1213BA11AD13CC006E46E8 /* TranslateSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3D1134047400BB0201 /* TranslateSyscall.h */; };
+		7A1213BB11AD13CC006E46E8 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B3E1134047400BB0201 /* types.h */; };
+		7A1213BC11AD13CC006E46E8 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
+		7A1213BD11AD13CC006E46E8 /* bt_errors.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1C113403FD00BB0201 /* bt_errors.h */; };
+		7A1213BE11AD13CC006E46E8 /* btinit.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1D113403FD00BB0201 /* btinit.h */; };
+		7A1213BF11AD13CC006E46E8 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
+		7A1213C011AD13CC006E46E8 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B1F113403FD00BB0201 /* connection.h */; };
+		7A1213C111AD13CC006E46E8 /* discInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B20113403FD00BB0201 /* discInternal.h */; };
+		7A1213C211AD13CC006E46E8 /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
+		7A1213C311AD13CC006E46E8 /* discovery.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B22113403FD00BB0201 /* discovery.h */; };
+		7A1213C411AD13CC006E46E8 /* init.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B23113403FD00BB0201 /* init.cpp */; };
+		7A1213C511AD13CC006E46E8 /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
+		7A1213C611AD13CC006E46E8 /* server.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B25113403FD00BB0201 /* server.h */; };
+		7A1213C711AD13CC006E46E8 /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
+		7A1213C811AD13CC006E46E8 /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
+		7A1213C911AD13CC006E46E8 /* CMGlyphDrawing.h in Headers */ = {isa = PBXBuildFile; fileRef = 853985D9116CF423000521C0 /* CMGlyphDrawing.h */; };
+		7A1213CA11AD13CC006E46E8 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		7A1213CB11AD13CC006E46E8 /* config_platform.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6A113405A800BB0201 /* config_platform.h */; };
+		7A1213CC11AD13CC006E46E8 /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
+		7A1213CD11AD13CC006E46E8 /* FileImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6C113405A800BB0201 /* FileImpl.h */; };
+		7A1213CE11AD13CC006E46E8 /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
+		7A1213CF11AD13CC006E46E8 /* netImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6E113405A800BB0201 /* netImpl.h */; };
+		7A1213D011AD13CC006E46E8 /* Platform.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B6F113405A800BB0201 /* Platform.h */; };
+		7A1213D111AD13CC006E46E8 /* ResourceDefs.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B70113405A800BB0201 /* ResourceDefs.h */; };
+		7A1213D211AD13CC006E46E8 /* SyscallImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B72113405A800BB0201 /* SyscallImpl.h */; };
+		7A1213D311AD13CC006E46E8 /* ThreadPoolImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B74113405A800BB0201 /* ThreadPoolImpl.h */; };
+		7A1213D411AD13CC006E46E8 /* iphone_helpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85BF2B7D1134125E00BB0201 /* iphone_helpers.h */; };
+		7A1213D511AD13CC006E46E8 /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */; };
+		7A1213EE11AD13F5006E46E8 /* libMoSyncStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7A12137E11AD136F006E46E8 /* libMoSyncStaticLib.a */; };
 		8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
 		850943FE1185C40D004A3B2D /* MoSyncCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = 850943FD1185C40D004A3B2D /* MoSyncCLController.m */; };
@@ -147,7 +148,9 @@
 		28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
-		7A8C142211ABC29400777910 /* libMoSyncStaticLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncStaticLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A12137E11AD136F006E46E8 /* libMoSyncStaticLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncStaticLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A1213E811AD13EB006E46E8 /* MoSyncWithLib.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSyncWithLib.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A1213EA11AD13EB006E46E8 /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850943FD1185C40D004A3B2D /* MoSyncCLController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncCLController.m; sourceTree = "<group>"; };
@@ -254,16 +257,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7A8C142011ABC29400777910 /* Frameworks */ = {
+		7A12137C11AD136F006E46E8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A8C147311ABC2F300777910 /* AVFoundation.framework in Frameworks */,
-				7A8C147411ABC2F300777910 /* AudioToolbox.framework in Frameworks */,
-				7A8C147511ABC2F300777910 /* CoreGraphics.framework in Frameworks */,
-				7A8C147611ABC2F300777910 /* CoreLocation.framework in Frameworks */,
-				7A8C147711ABC2F300777910 /* Foundation.framework in Frameworks */,
-				7A8C147811ABC2F300777910 /* UIKit.framework in Frameworks */,
+				7A12138311AD138F006E46E8 /* AVFoundation.framework in Frameworks */,
+				7A12138411AD138F006E46E8 /* AudioToolbox.framework in Frameworks */,
+				7A12138511AD138F006E46E8 /* CoreGraphics.framework in Frameworks */,
+				7A12138611AD138F006E46E8 /* CoreLocation.framework in Frameworks */,
+				7A12138711AD138F006E46E8 /* Foundation.framework in Frameworks */,
+				7A12138811AD138F006E46E8 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1213E611AD13EB006E46E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7A1213EE11AD13F5006E46E8 /* libMoSyncStaticLib.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +306,8 @@
 			isa = PBXGroup;
 			children = (
 				1D6058910D05DD3D006BFB54 /* MoSync.app */,
-				7A8C142211ABC29400777910 /* libMoSyncStaticLib.a */,
+				7A12137E11AD136F006E46E8 /* libMoSyncStaticLib.a */,
+				7A1213E811AD13EB006E46E8 /* MoSyncWithLib.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -309,6 +321,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				850944001185C440004A3B2D /* CoreLocation.framework */,
+				7A1213EA11AD13EB006E46E8 /* MoSyncWithLib-Info.plist */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -511,62 +524,62 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		7A8C141E11ABC29400777910 /* Headers */ = {
+		7A12137A11AD136F006E46E8 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A54D85811ABD7BD0030279F /* core_run.h in Headers */,
-				7A54D85911ABD7BD0030279F /* CoreCommon.h in Headers */,
-				7A54D85A11ABD7BD0030279F /* invoke_syscall_cpp.h in Headers */,
-				7A54D85C11ABD7BD0030279F /* base_errors.h in Headers */,
-				7A54D85E11ABD7BD0030279F /* FileStream.h in Headers */,
-				7A54D86011ABD7BD0030279F /* Graphics.h in Headers */,
-				7A54D86211ABD7BD0030279F /* Image.h in Headers */,
-				7A54D86411ABD7BD0030279F /* MemStream.h in Headers */,
-				7A54D86511ABD7BD0030279F /* networking.h in Headers */,
-				7A54D86711ABD7BD0030279F /* NotSupportedException.h in Headers */,
-				7A54D86811ABD7BD0030279F /* ResourceArray.h in Headers */,
-				7A54D86A11ABD7BD0030279F /* Stream.h in Headers */,
-				7A54D86B11ABD7BD0030279F /* StreamHelpers.h in Headers */,
-				7A54D86D11ABD7BD0030279F /* Syscall.h in Headers */,
-				7A54D86E11ABD7BD0030279F /* TcpConnection.h in Headers */,
-				7A54D87011ABD7BD0030279F /* ThreadPool.h in Headers */,
-				7A54D87211ABD7BD0030279F /* hashmap.h in Headers */,
-				7A54D87411ABD7BD0030279F /* filelist.h in Headers */,
-				7A54D87511ABD7BD0030279F /* net_errors.h in Headers */,
-				7A54D87711ABD7BD0030279F /* net.h in Headers */,
-				7A54D87811ABD7BD0030279F /* fifo.h in Headers */,
-				7A54D87911ABD7BD0030279F /* array.h in Headers */,
-				7A54D87A11ABD7BD0030279F /* attribute.h in Headers */,
-				7A54D87B11ABD7BD0030279F /* constSets.h in Headers */,
-				7A54D87C11ABD7BD0030279F /* cpp_maapi.h in Headers */,
-				7A54D87D11ABD7BD0030279F /* CriticalSection.h in Headers */,
-				7A54D87E11ABD7BD0030279F /* errors_inline.h in Headers */,
-				7A54D87F11ABD7BD0030279F /* hash_map.h in Headers */,
-				7A54D88011ABD7BD0030279F /* helpers.h in Headers */,
-				7A54D88211ABD7BD0030279F /* intutil.h in Headers */,
-				7A54D88311ABD7BD0030279F /* log.h in Headers */,
-				7A54D88411ABD7BD0030279F /* memfuncs.h in Headers */,
-				7A54D88511ABD7BD0030279F /* mkdir.h in Headers */,
-				7A54D88611ABD7BD0030279F /* smartie.h in Headers */,
-				7A54D88811ABD7BD0030279F /* TranslatePanic.h in Headers */,
-				7A54D88911ABD7BD0030279F /* TranslateSyscall.h in Headers */,
-				7A54D88A11ABD7BD0030279F /* types.h in Headers */,
-				7A54D88C11ABD7BD0030279F /* bt_errors.h in Headers */,
-				7A54D88D11ABD7BD0030279F /* btinit.h in Headers */,
-				7A54D88F11ABD7BD0030279F /* connection.h in Headers */,
-				7A54D89011ABD7BD0030279F /* discInternal.h in Headers */,
-				7A54D89211ABD7BD0030279F /* discovery.h in Headers */,
-				7A54D89511ABD7BD0030279F /* server.h in Headers */,
-				7A54D89811ABD7BD0030279F /* CMGlyphDrawing.h in Headers */,
-				7A54D89A11ABD7BD0030279F /* config_platform.h in Headers */,
-				7A54D89C11ABD7BD0030279F /* FileImpl.h in Headers */,
-				7A54D89E11ABD7BD0030279F /* netImpl.h in Headers */,
-				7A54D89F11ABD7BD0030279F /* Platform.h in Headers */,
-				7A54D8A011ABD7BD0030279F /* ResourceDefs.h in Headers */,
-				7A54D8A111ABD7BD0030279F /* SyscallImpl.h in Headers */,
-				7A54D8A211ABD7BD0030279F /* ThreadPoolImpl.h in Headers */,
-				7A54D8A311ABD7BD0030279F /* iphone_helpers.h in Headers */,
+				7A12138911AD13CC006E46E8 /* core_run.h in Headers */,
+				7A12138A11AD13CC006E46E8 /* CoreCommon.h in Headers */,
+				7A12138B11AD13CC006E46E8 /* invoke_syscall_cpp.h in Headers */,
+				7A12138D11AD13CC006E46E8 /* base_errors.h in Headers */,
+				7A12138F11AD13CC006E46E8 /* FileStream.h in Headers */,
+				7A12139111AD13CC006E46E8 /* Graphics.h in Headers */,
+				7A12139311AD13CC006E46E8 /* Image.h in Headers */,
+				7A12139511AD13CC006E46E8 /* MemStream.h in Headers */,
+				7A12139611AD13CC006E46E8 /* networking.h in Headers */,
+				7A12139811AD13CC006E46E8 /* NotSupportedException.h in Headers */,
+				7A12139911AD13CC006E46E8 /* ResourceArray.h in Headers */,
+				7A12139B11AD13CC006E46E8 /* Stream.h in Headers */,
+				7A12139C11AD13CC006E46E8 /* StreamHelpers.h in Headers */,
+				7A12139E11AD13CC006E46E8 /* Syscall.h in Headers */,
+				7A12139F11AD13CC006E46E8 /* TcpConnection.h in Headers */,
+				7A1213A111AD13CC006E46E8 /* ThreadPool.h in Headers */,
+				7A1213A311AD13CC006E46E8 /* hashmap.h in Headers */,
+				7A1213A511AD13CC006E46E8 /* filelist.h in Headers */,
+				7A1213A611AD13CC006E46E8 /* net_errors.h in Headers */,
+				7A1213A811AD13CC006E46E8 /* net.h in Headers */,
+				7A1213A911AD13CC006E46E8 /* fifo.h in Headers */,
+				7A1213AA11AD13CC006E46E8 /* array.h in Headers */,
+				7A1213AB11AD13CC006E46E8 /* attribute.h in Headers */,
+				7A1213AC11AD13CC006E46E8 /* constSets.h in Headers */,
+				7A1213AD11AD13CC006E46E8 /* cpp_maapi.h in Headers */,
+				7A1213AE11AD13CC006E46E8 /* CriticalSection.h in Headers */,
+				7A1213AF11AD13CC006E46E8 /* errors_inline.h in Headers */,
+				7A1213B011AD13CC006E46E8 /* hash_map.h in Headers */,
+				7A1213B111AD13CC006E46E8 /* helpers.h in Headers */,
+				7A1213B311AD13CC006E46E8 /* intutil.h in Headers */,
+				7A1213B411AD13CC006E46E8 /* log.h in Headers */,
+				7A1213B511AD13CC006E46E8 /* memfuncs.h in Headers */,
+				7A1213B611AD13CC006E46E8 /* mkdir.h in Headers */,
+				7A1213B711AD13CC006E46E8 /* smartie.h in Headers */,
+				7A1213B911AD13CC006E46E8 /* TranslatePanic.h in Headers */,
+				7A1213BA11AD13CC006E46E8 /* TranslateSyscall.h in Headers */,
+				7A1213BB11AD13CC006E46E8 /* types.h in Headers */,
+				7A1213BD11AD13CC006E46E8 /* bt_errors.h in Headers */,
+				7A1213BE11AD13CC006E46E8 /* btinit.h in Headers */,
+				7A1213C011AD13CC006E46E8 /* connection.h in Headers */,
+				7A1213C111AD13CC006E46E8 /* discInternal.h in Headers */,
+				7A1213C311AD13CC006E46E8 /* discovery.h in Headers */,
+				7A1213C611AD13CC006E46E8 /* server.h in Headers */,
+				7A1213C911AD13CC006E46E8 /* CMGlyphDrawing.h in Headers */,
+				7A1213CB11AD13CC006E46E8 /* config_platform.h in Headers */,
+				7A1213CD11AD13CC006E46E8 /* FileImpl.h in Headers */,
+				7A1213CF11AD13CC006E46E8 /* netImpl.h in Headers */,
+				7A1213D011AD13CC006E46E8 /* Platform.h in Headers */,
+				7A1213D111AD13CC006E46E8 /* ResourceDefs.h in Headers */,
+				7A1213D211AD13CC006E46E8 /* SyscallImpl.h in Headers */,
+				7A1213D311AD13CC006E46E8 /* ThreadPoolImpl.h in Headers */,
+				7A1213D411AD13CC006E46E8 /* iphone_helpers.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -590,13 +603,13 @@
 			productReference = 1D6058910D05DD3D006BFB54 /* MoSync.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7A8C142111ABC29400777910 /* MoSyncStaticLib */ = {
+		7A12137D11AD136F006E46E8 /* MoSyncStaticLib */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7A8C142511ABC2B300777910 /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */;
+			buildConfigurationList = 7A12138211AD138D006E46E8 /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */;
 			buildPhases = (
-				7A8C141E11ABC29400777910 /* Headers */,
-				7A8C141F11ABC29400777910 /* Sources */,
-				7A8C142011ABC29400777910 /* Frameworks */,
+				7A12137A11AD136F006E46E8 /* Headers */,
+				7A12137B11AD136F006E46E8 /* Sources */,
+				7A12137C11AD136F006E46E8 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -604,8 +617,25 @@
 			);
 			name = MoSyncStaticLib;
 			productName = MoSyncStaticLib;
-			productReference = 7A8C142211ABC29400777910 /* libMoSyncStaticLib.a */;
+			productReference = 7A12137E11AD136F006E46E8 /* libMoSyncStaticLib.a */;
 			productType = "com.apple.product-type.library.static";
+		};
+		7A1213E711AD13EB006E46E8 /* MoSyncWithLib */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A1213ED11AD13EC006E46E8 /* Build configuration list for PBXNativeTarget "MoSyncWithLib" */;
+			buildPhases = (
+				7A1213E411AD13EB006E46E8 /* Resources */,
+				7A1213E511AD13EB006E46E8 /* Sources */,
+				7A1213E611AD13EB006E46E8 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MoSyncWithLib;
+			productName = MoSyncWithLib;
+			productReference = 7A1213E811AD13EB006E46E8 /* MoSyncWithLib.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -620,7 +650,8 @@
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* MoSync */,
-				7A8C142111ABC29400777910 /* MoSyncStaticLib */,
+				7A12137D11AD136F006E46E8 /* MoSyncStaticLib */,
+				7A1213E711AD13EB006E46E8 /* MoSyncWithLib */,
 			);
 		};
 /* End PBXProject section */
@@ -635,6 +666,13 @@
 				85BF2C3B11341EF000BB0201 /* program in Resources */,
 				85A0815411353EDE00267D56 /* resources in Resources */,
 				8519011F1199B90400B71F58 /* data_section.bin in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1213E411AD13EB006E46E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,35 +717,42 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		7A8C141F11ABC29400777910 /* Sources */ = {
+		7A12137B11AD136F006E46E8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7A54D85B11ABD7BD0030279F /* base_errors.cpp in Sources */,
-				7A54D85D11ABD7BD0030279F /* FileStream.cpp in Sources */,
-				7A54D85F11ABD7BD0030279F /* Graphics.cpp in Sources */,
-				7A54D86111ABD7BD0030279F /* Image.cpp in Sources */,
-				7A54D86311ABD7BD0030279F /* MemStream.cpp in Sources */,
-				7A54D86611ABD7BD0030279F /* networking.cpp in Sources */,
-				7A54D86911ABD7BD0030279F /* Stream.cpp in Sources */,
-				7A54D86C11ABD7BD0030279F /* Syscall.cpp in Sources */,
-				7A54D86F11ABD7BD0030279F /* ThreadPool.cpp in Sources */,
-				7A54D87111ABD7BD0030279F /* hashmap.cpp in Sources */,
-				7A54D87311ABD7BD0030279F /* filelist-linux.c in Sources */,
-				7A54D87611ABD7BD0030279F /* net.cpp in Sources */,
-				7A54D88111ABD7BD0030279F /* intutil.cpp in Sources */,
-				7A54D88711ABD7BD0030279F /* TranslatePanic.cpp in Sources */,
-				7A54D88B11ABD7BD0030279F /* log.cpp in Sources */,
-				7A54D88E11ABD7BD0030279F /* connection.cpp in Sources */,
-				7A54D89111ABD7BD0030279F /* discovery.cpp in Sources */,
-				7A54D89311ABD7BD0030279F /* init.cpp in Sources */,
-				7A54D89411ABD7BD0030279F /* server.cpp in Sources */,
-				7A54D89611ABD7BD0030279F /* SyscallImpl.mm in Sources */,
-				7A54D89711ABD7BD0030279F /* ThreadPoolImpl.mm in Sources */,
-				7A54D89911ABD7BD0030279F /* CMGlyphDrawing.mm in Sources */,
-				7A54D89B11ABD7BD0030279F /* FileImpl.cpp in Sources */,
-				7A54D89D11ABD7BD0030279F /* netImpl.cpp in Sources */,
-				7A54D8A411ABD7BD0030279F /* iphone_helpers.mm in Sources */,
+				7A12138C11AD13CC006E46E8 /* base_errors.cpp in Sources */,
+				7A12138E11AD13CC006E46E8 /* FileStream.cpp in Sources */,
+				7A12139011AD13CC006E46E8 /* Graphics.cpp in Sources */,
+				7A12139211AD13CC006E46E8 /* Image.cpp in Sources */,
+				7A12139411AD13CC006E46E8 /* MemStream.cpp in Sources */,
+				7A12139711AD13CC006E46E8 /* networking.cpp in Sources */,
+				7A12139A11AD13CC006E46E8 /* Stream.cpp in Sources */,
+				7A12139D11AD13CC006E46E8 /* Syscall.cpp in Sources */,
+				7A1213A011AD13CC006E46E8 /* ThreadPool.cpp in Sources */,
+				7A1213A211AD13CC006E46E8 /* hashmap.cpp in Sources */,
+				7A1213A411AD13CC006E46E8 /* filelist-linux.c in Sources */,
+				7A1213A711AD13CC006E46E8 /* net.cpp in Sources */,
+				7A1213B211AD13CC006E46E8 /* intutil.cpp in Sources */,
+				7A1213B811AD13CC006E46E8 /* TranslatePanic.cpp in Sources */,
+				7A1213BC11AD13CC006E46E8 /* log.cpp in Sources */,
+				7A1213BF11AD13CC006E46E8 /* connection.cpp in Sources */,
+				7A1213C211AD13CC006E46E8 /* discovery.cpp in Sources */,
+				7A1213C411AD13CC006E46E8 /* init.cpp in Sources */,
+				7A1213C511AD13CC006E46E8 /* server.cpp in Sources */,
+				7A1213C711AD13CC006E46E8 /* SyscallImpl.mm in Sources */,
+				7A1213C811AD13CC006E46E8 /* ThreadPoolImpl.mm in Sources */,
+				7A1213CA11AD13CC006E46E8 /* CMGlyphDrawing.mm in Sources */,
+				7A1213CC11AD13CC006E46E8 /* FileImpl.cpp in Sources */,
+				7A1213CE11AD13CC006E46E8 /* netImpl.cpp in Sources */,
+				7A1213D511AD13CC006E46E8 /* iphone_helpers.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1213E511AD13EB006E46E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -740,19 +785,20 @@
 			};
 			name = Release;
 		};
-		7A8C142311ABC29500777910 /* Debug */ = {
+		7A12137F11AD136F006E46E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_LDFLAGS = "-ObjC";
 				PREBINDING = NO;
 				PRODUCT_NAME = MoSyncStaticLib;
 			};
 			name = Debug;
 		};
-		7A8C142411ABC29500777910 /* Release */ = {
+		7A12138011AD136F006E46E8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -761,6 +807,55 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PREBINDING = NO;
 				PRODUCT_NAME = MoSyncStaticLib;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		7A1213EB11AD13EC006E46E8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				INFOPLIST_FILE = "MoSyncWithLib-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					UIKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MoSyncWithLib;
+				SDKROOT = iphoneos3.2;
+			};
+			name = Debug;
+		};
+		7A1213EC11AD13EC006E46E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/UIKit.framework/Headers/UIKit.h";
+				INFOPLIST_FILE = "MoSyncWithLib-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					UIKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = MoSyncWithLib;
+				SDKROOT = iphoneos3.2;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -819,11 +914,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7A8C142511ABC2B300777910 /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */ = {
+		7A12138211AD138D006E46E8 /* Build configuration list for PBXNativeTarget "MoSyncStaticLib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7A8C142311ABC29500777910 /* Debug */,
-				7A8C142411ABC29500777910 /* Release */,
+				7A12137F11AD136F006E46E8 /* Debug */,
+				7A12138011AD136F006E46E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A1213ED11AD13EC006E46E8 /* Build configuration list for PBXNativeTarget "MoSyncWithLib" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A1213EB11AD13EC006E46E8 /* Debug */,
+				7A1213EC11AD13EC006E46E8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
