@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 
 @interface MoSyncViewController : UIViewController {
-	UIView* mosyncView;
+	IBOutlet UIView* mosyncView;
 }
 
 @end

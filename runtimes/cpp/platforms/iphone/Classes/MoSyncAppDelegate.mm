@@ -29,8 +29,16 @@
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
     
     // Override point for customization after app launch    
+	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    //window.backgroundColor = [UIColor whiteColor];
+	
+    viewController = [[MoSyncViewController alloc] init];
+	
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
+    //[window layoutSubviews];
+	//[window addSubview:viewController.view];
+    //[window makeKeyAndVisible];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

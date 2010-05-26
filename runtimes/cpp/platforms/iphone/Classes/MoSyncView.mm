@@ -69,6 +69,25 @@
     if (self = [super initWithFrame:frame]) {
         // Initialization code
 		self.clearsContextBeforeDrawing = NO;
+		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+		
+		UIDevice* myDevice = [UIDevice currentDevice];
+		[myDevice beginGeneratingDeviceOrientationNotifications];
+		[myDevice setBatteryMonitoringEnabled:YES];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
+													 name:UIDeviceOrientationDidChangeNotification object:nil];
+		
+		self.frame.origin.y = 0;
+		mosyncView = nil;
+        // Initialization code
+		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+		CGFloat screenHeight = appFrame.size.height;
+		
+		locationController = [[MoSyncCLController alloc] init];
+		
+		//MoSyncMain(self.frame.size.width, screenHeight, self);
+		MoSyncMain(320.0, screenHeight, self);
     }
     return self;
 }
@@ -92,7 +111,8 @@
 		
 		locationController = [[MoSyncCLController alloc] init];
 		
-		MoSyncMain(self.frame.size.width, screenHeight, self);
+		//MoSyncMain(self.frame.size.width, screenHeight, self);
+		MoSyncMain(320.0, screenHeight, self);
     }
     return self;
 }

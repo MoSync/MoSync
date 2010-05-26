@@ -16,6 +16,7 @@
  */
 
 #import "MoSyncViewController.h"
+#include "MoSyncView.h"
 
 @implementation MoSyncViewController
 
@@ -27,13 +28,19 @@
     }
     return self;
 }
+
 */
 
-/*
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
+	[super loadView];
+	//self.view = mosyncView;
+	mosyncView = [[MoSyncView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	//mosyncView = [[MoSyncView alloc] initWithCoder:nil];
+	[self.view addSubview:mosyncView];
+
 }
-*/
+
 
 /*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
