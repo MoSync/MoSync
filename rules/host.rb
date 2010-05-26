@@ -93,6 +93,10 @@ if(HOST == :win32) then
 	DLL_FILE_ENDING = '.dll'
 	EXE_FILE_ENDING = '.exe'
 	FOLDER_SEPARATOR = '\\'
+elsif(HOST == :darwin)
+	DLL_FILE_ENDING = '.dylib'
+	EXE_FILE_ENDING = ''
+	FOLDER_SEPARATOR = '/'
 else
 	DLL_FILE_ENDING = '.so'
 	EXE_FILE_ENDING = ''
