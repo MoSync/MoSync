@@ -83,11 +83,12 @@
         // Initialization code
 		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
 		CGFloat screenHeight = appFrame.size.height;
+		CGFloat screenWidth = appFrame.size.width;
 		
 		locationController = [[MoSyncCLController alloc] init];
 		
 		//MoSyncMain(self.frame.size.width, screenHeight, self);
-		MoSyncMain(320.0, screenHeight, self);
+		MoSyncMain(screenWidth, screenHeight, self);
     }
     return self;
 }
