@@ -153,7 +153,6 @@ using namespace Core;
 //#endif
 
 #ifdef __SYMBIAN32__
-	#define ROUND_DWORD(x) (((x) + 3 ) & ~(0x3))
 	MoSync::SafeChunk::SafeChunk() {
 		mChunkIsOpen = false;
 	}
@@ -163,11 +162,14 @@ using namespace Core;
 	}
 	void* MoSync::SafeChunk::allocate(int size) {
 		TInt pageSize;
-		UserHal::PageSizeInBytes(pageSize);
-		TInt minSize = size;
-		TInt maxSize = size + pageSize;
-
-		LHEL(mChunk.CreateLocalCode(ROUND_DWORD(minSize), ROUND_DWORD(maxSize)));
+		LHEL(UserHal::PageSizeInBytes(pageSize));
+		//round up to page size
+		TInt minSize = ((size-1+pageSize) / pageSize) * pageSize;
+		TInt maxSize = minSize;
+		
+		LOG("SafeChunk. request: %i page: %i grant: %i\n", size, pageSize, minSize);
+		
+		LHEL(mChunk.CreateLocalCode(minSize, maxSize));
 		mChunkIsOpen = true;
 		return mChunk.Base();
 	}
@@ -182,67 +184,67 @@ using namespace Core;
 #endif	//__SYMBIAN32__
 
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
-	#ifdef __SYMBIAN32__
-		return mCodeChunk->allocate(size);
-	#elif defined(_android)
+#ifdef __SYMBIAN32__
+		return mCodeChunk.allocate(size);
+#elif defined(_android)
 		return NULL;
-	#else	// winmobile
+#else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	#endif
+#endif
 	}
 
 	void* MoSync::ArmRecompiler::allocateEntryPoint(int size) {
-	#ifdef __SYMBIAN32__
-		return mEntryChunk->allocate(size);
-	#elif defined(_android)
+#ifdef __SYMBIAN32__
+		return mEntryChunk.allocate(size);
+#elif defined(_android)
 		return NULL;
-	#else	// winmobile
+#else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	#endif
+#endif
 	}
 
 	void MoSync::ArmRecompiler::freeCodeMemory(void *addr) {
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
 		LOG("freeCode 0x%08x\n", addr);
-		DEBUG_ASSERT(addr == mCodeChunk->address());
-		delete mCodeChunk;
-	#elif defined(_android)
+		DEBUG_ASSERT(addr == mCodeChunk.address());
+		mCodeChunk.close();
+#elif defined(_android)
 		return;
-	#else	// winmobile
+#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
-	#endif
+#endif
 	}
 
 	void MoSync::ArmRecompiler::freeEntryPoint(void *addr) {
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
 		LOG("freeEntry 0x%08x\n", addr);
-		DEBUG_ASSERT(addr == mEntryChunk->address());
-		delete mEntryChunk;
-	#elif defined(_android)
+		DEBUG_ASSERT(addr == mEntryChunk.address());
+		mEntryChunk.close();
+#elif defined(_android)
 		return;
-	#else	// winmobile
+#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
-	#endif
+#endif
 	}
 
 	void MoSync::ArmRecompiler::flushInstructionCache(void *addr, int len) {
-	#ifdef __SYMBIAN32__
-	#ifndef __SERIES60_3X__
+#ifdef __SYMBIAN32__
+#ifndef __SERIES60_3X__
 		// Adjust start and len to page boundaries
 		addr = (void*) ((int)addr & ~0xFFF);
 		len = (len+8192) & ~0xFFF;
-	#endif
+#endif
 		void *end = (void*)((int)addr+len);
 		LOGD("flushInstructionCache end: 0x%08x\n", end);
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
-	#elif defined(_android)
+#elif defined(_android)
 		return;
-	#else // winmobile
+#else // winmobile
 		// This seems to work, but might not be correct
 		// Might be better to call CacheSync(...)
 		FlushInstructionCache(GetCurrentProcess(), 0, 0);
-	#endif
+#endif
 	}
 
 namespace MoSync {
@@ -1021,8 +1023,6 @@ namespace MoSync {
 #ifdef __SYMBIAN32__
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
-		mEntryChunk = new SafeChunk();
-		mCodeChunk = new SafeChunk();
 #endif
 		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);	
 	}
