@@ -28,8 +28,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <conprint.h>
 #include <maprofile.h>
+#include <MAP/MemoryMgr.h>
 
-#include "MAHeaders.h"
+#include "main.h"
+#include "util.h"
+
+#define RGBA(r, g, b, a) ((r)<<16)|((g)<<8)|((b))|((a)<<24)
+#define FRAMES 1000
+#define FPS 50
+#define MS_PER_FRAME (1000/FPS)
 
 class DynamicResources {
 public:
@@ -46,28 +53,28 @@ public:
 	}
 };
 
-#define RGBA(r, g, b, a) ((r)<<16)|((g)<<8)|((b))|((a)<<24)
-#define MAX_IMAGES 100
 
-#ifdef MA_PROF_SUPPORT_STYLUS
-int gIndex = 0;
-int gTimeToUpdate = 0;
-#endif	// MA_PROF_SUPPORT_STYLUS
-int gNumImages = 0;
-MAHandle gImages[MAX_IMAGES];
+ObjectWidget::ObjectWidget(int x, int y, int width, int height, Widget *parent)
+	: Widget(x, y, width, height, parent) {
+	numImages = 0;
+	Environment::getEnvironment().addTimer(this, MS_PER_FRAME, FRAMES+1);
+}
 
-static MAHandle generateImage(int width, int height, int r, int g, int b) {
+ObjectWidget::~ObjectWidget() {
+}
+
+MAHandle ObjectWidget::generateImage(int width, int height, int r, int g, int b) {
 	int *temp = new int[width*height];
 	int *dst = temp;
 	double longestLength;
-	if(width<height) 
-		longestLength = width>>1; 
-	else 
+	if(width<height)
+		longestLength = width>>1;
+	else
 		longestLength = height>>1;
 
 	for(int j = 0; j < height; j++) {
 		for(int i = 0; i < width; i++) {
-			double d = sqrt((double)((width>>1)-i)*((width>>1)-i) + 
+			double d = sqrt((double)((width>>1)-i)*((width>>1)-i) +
 				((height>>1)-j)*((height>>1)-j));
 			d /= longestLength;
 			d = 1.0-d;
@@ -83,105 +90,118 @@ static MAHandle generateImage(int width, int height, int r, int g, int b) {
 	return h;
 }
 
-static void createImage() {
-	if(gNumImages+1>=MAX_IMAGES) return;
-	gImages[gNumImages] = generateImage(32, 32, rand()&0xff, rand()&0xff, rand()&0xff);
-	gNumImages++;
+void ObjectWidget::createImage() {
+	if(numImages+1>=MAX_IMAGES) return;
+	images[numImages] = generateImage(32, 32, rand()&0xff, rand()&0xff, rand()&0xff);
+	numImages++;
 }
 
-static void drawImages() {
+void ObjectWidget::drawImages() {
 	double a = 0;
 	double time = maGetMilliSecondCount()*0.001;
-	MAExtent scr = maGetScrSize();
-	int w = EXTENT_X(scr)>>1;
-	int h = EXTENT_Y(scr)>>1;
-	for(int i = 0; i < gNumImages; i++) {
+	int w = getWidth()>>1;
+	int h = getHeight()>>1;
+	for(int i = 0; i < numImages; i++) {
 		int x = (int)(cos(a*1.5+time*1.1)*50.0) + w;
-		int y = (int)(sin(a*1.09+time*1.2)*50.0) + h;		
-		MAExtent imageSize = maGetImageSize(gImages[i]);
-		maDrawImage(gImages[i], x-(EXTENT_X(imageSize)>>1), y-(EXTENT_Y(imageSize)>>1));
+		int y = (int)(sin(a*1.09+time*1.2)*50.0) + h;
+		MAExtent imageSize = maGetImageSize(images[i]);
+		maDrawImage(images[i], x-(EXTENT_X(imageSize)>>1), y-(EXTENT_Y(imageSize)>>1));
 		a+=1.0;
 	}
 }
 
-static void showInstruction() {
-#ifdef MA_PROF_SUPPORT_STYLUS
-	if (gTimeToUpdate <= maGetMilliSecondCount()) {
-		gIndex=!gIndex;
-		gTimeToUpdate = maGetMilliSecondCount() + 1000;
-	}
+void ObjectWidget::runTimerEvent() {
+	drawImages();
 
-	static const char* text[2] = {
-			"Tap the screen to cast a spell.",
-			"Press fire to cast a spell."
-	};
-#else	// MA_PROF_SUPPORT_STYLUS
-	static const char* text = "Press fire to cast a spell.";
-#endif
-#ifdef MA_PROF_SUPPORT_STYLUS
-	int textHeight = EXTENT_Y(maGetTextSize(text[gIndex]));
-#else	// MA_PROF_SUPPORT_STYLUS
-	int textHeight = EXTENT_Y(maGetTextSize(text));
-#endif	// MA_PROF_SUPPORT_STYLUS
-	int screenWidth = EXTENT_X(maGetScrSize());
-	maSetColor(0);	//black
-	maFillRect(0,0, screenWidth, textHeight);
-	maSetColor(~0);	//white
-#ifdef MA_PROF_SUPPORT_STYLUS
-	maDrawText(0, 0, text[gIndex]);
-#else	// MA_PROF_SUPPORT_STYLUS
-	maDrawText(0, 0, text);
-#endif	// MA_PROF_SUPPORT_STYLUS
+	/// Updates the screen
+	maUpdateScreen();
+
+	/// Keep the backlight alive.
+	maResetBacklight();
 }
 
-extern "C" {
-/**
- * \brief The entry point.
- */
-int MAMain()
-{
-	bool run = true;
-	while(run) {
-		drawImages();
+void ObjectWidget::drawWidget() {
+}
 
-		// write some information text
-		showInstruction();
+MainScreen::MainScreen(MyMoblet *moblet) {
+	mMoblet = moblet;
 
-		/// Updates the screen
-		maUpdateScreen();
+	layout = new Layout(0, 0, gScreenWidth, gScreenHeight, NULL, 1, 2);
 
-		/// Keep the backlight alive.
-		maResetBacklight();
+	softKeys = createSoftKeyBar(30, "Spell", "Exit");
 
-		/// Get any available events.
-		/// If MAK_FIRE is pressed, change mode.
-		/// On Close event or MAK_0 press, close program.
-		MAEvent event;
-		while(maGetEvent(&event)) {
-			if(event.type == EVENT_TYPE_KEY_PRESSED) {
-				switch(event.key) {
-					case MAK_FIRE:
-					case MAK_5:
-						{
-							createImage();
-						}
-						break;
-					case MAK_SOFTRIGHT:
-					case MAK_0:
-						run = false;
-						break;
+	objectWidget = new ObjectWidget(0, 0, gScreenWidth, gScreenHeight-softKeys->getHeight(), layout);
+	objectWidget->setDrawBackground(false);
 
-				}
-#ifdef MA_PROF_SUPPORT_STYLUS
-			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
-				createImage();
-#endif	// MA_PROF_SUPPORT_STYLUS
-			} else if(event.type == EVENT_TYPE_CLOSE) {
-				run = false;
-			}
+	layout->add(softKeys);
+
+	this->setMain(layout);
+}
+
+MainScreen::~MainScreen() {
+	delete layout;
+}
+
+void MainScreen::keyPressEvent(int keyCode, int nativeCode) {
+	switch(keyCode) {
+	case MAK_FIRE:
+	case MAK_SOFTLEFT:
+		{
+		objectWidget->createImage();
 		}
+		break;
+	case MAK_SOFTRIGHT:
+		mMoblet->closeEvent();
+		mMoblet->close();
+		break;
 	}
-
-	return 0;
 }
+
+void MainScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			keyPressEvent(MAK_SOFTLEFT, 0);
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	} else {
+		objectWidget->createImage();
+	}
+}
+
+void MainScreen::pointerReleaseEvent(MAPoint2d point) {
+}
+
+void MyMoblet::keyPressEvent(int keyCode, int nativeCode) {
+}
+
+void MyMoblet::keyReleaseEvent(int keyCode, int nativeCode) {
+}
+
+void MyMoblet::closeEvent() {
+	// do destruction here
+	delete mainScreen;
+}
+
+MyMoblet::MyMoblet() {
+	gFont = new MAUI::Font(RES_FONT);
+	gSkin = new WidgetSkin(RES_SELECTED, RES_SELECTED, 3, 18, 10, 11, true, true);
+	Engine& engine = Engine::getSingleton();
+	engine.setDefaultFont(gFont);
+	engine.setDefaultSkin(gSkin);
+
+	MAExtent screenSize = maGetScrSize();
+	gScreenWidth = EXTENT_X(screenSize);
+	gScreenHeight = EXTENT_Y(screenSize);
+
+	mainScreen = new MainScreen(this);
+	mainScreen->show();
+}
+
+extern "C" int MAMain() {
+	Moblet::run( newobject( MyMoblet, new MyMoblet( ) ) );
+	return 0;
 }
