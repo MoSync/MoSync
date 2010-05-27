@@ -16,7 +16,8 @@
  */
 
 #import "MoSyncViewController.h"
-#include "MoSyncView.h"
+
+@class MoSyncView;
 
 @implementation MoSyncViewController
 

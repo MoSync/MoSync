@@ -260,7 +260,6 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */,
 				85BF2B181134039B00BB0201 /* Core */,
 				85BF2B171134038600BB0201 /* Base */,
 				85BF2B0D1134037600BB0201 /* intlibs */,
@@ -275,6 +274,7 @@
 				85BF2C60113429A900BB0201 /* MoSyncView.mm */,
 				850943FD1185C40D004A3B2D /* MoSyncCLController.m */,
 				850943FF1185C41F004A3B2D /* MoSyncCLController.h */,
+				85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
