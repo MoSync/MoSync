@@ -192,16 +192,16 @@ void TestManager::run ( void )
 		Vector<Test *> &l = *(it.second);
 
 		// Notify listeners
-		for ( int i = 0; i < m_listenerList.size( ); i++ )
-			m_listenerList[i]->beginSuite( n );
+		for ( int j = 0; j < m_listenerList.size( ); j++ )
+			m_listenerList[j]->beginSuite( n );
 
 		// Run tests
-		for ( int i = 0; i < l.size( ); i++ )
-			l[i]->run( );
+		for ( int j = 0; j < l.size( ); j++ )
+			l[j]->run( );
 
 		// Notify listeners
-		for ( int i = 0; i < m_listenerList.size( ); i++ )
-			m_listenerList[i]->endSuite( );
+		for ( int j = 0; j < m_listenerList.size( ); j++ )
+			m_listenerList[j]->endSuite( );
 	}
 
 	// Notify listeners that testing has finished
