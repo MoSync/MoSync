@@ -36,9 +36,10 @@ work.instance_eval do
 		
 	elsif(HOST == :darwin)
 		@IGNORED_FILES << "strptime.c"
-		@EXTRA_INCLUDES = common_includes + ["/sw/include"]
+		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
 		@LIBRARIES = common_libraries +["objc"]
-		@EXTRA_CPPFLAGS += " -x objective-c++"
+		@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal -Wno-unreachable-code -D_ANSI_SOURCE",
+			"Syscall.cpp" => " -Wno-float-equal"}
 	else
 		error "Unsupported platform"
 	end

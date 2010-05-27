@@ -389,7 +389,7 @@ public:
 					}
 					fprintf(file, " c=\"%i\" t=\"%f\" lt=\"%f\" ch=\"%i\" cht=\"%f\">\n", mCount,
 						mRunTime.toMilliSeconds(), (mRunTime - childrenTime).toMilliSeconds(),
-						mChildren.size(), childrenTime.toMilliSeconds());
+						(int)mChildren.size(), childrenTime.toMilliSeconds());
 					for(size_t i=0; i<mChildren.size(); i++) {
 						ProfNode* n = mChildren[i];
 						dLev++;

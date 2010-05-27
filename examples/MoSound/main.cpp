@@ -56,7 +56,7 @@ extern "C" {
 int MAMain() GCCATTRIB(noreturn);
 int MAMain()
 {
-	MAExtent e = maGetScrSize();
+	//MAExtent e = maGetScrSize();
 
 	/// play R_MOSO sound
 	maSoundPlay(SOUND_RESOURCE, 0, maGetDataSize(SOUND_RESOURCE));

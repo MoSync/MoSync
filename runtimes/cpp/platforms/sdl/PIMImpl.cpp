@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Syscall.h"
 #include "pim.h"
-#ifndef LINUX
+#ifdef WIN32
 #include "strptime.h"
 #endif
 #include "base_errors.h"

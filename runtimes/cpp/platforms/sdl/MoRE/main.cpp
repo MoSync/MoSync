@@ -67,7 +67,7 @@ int main2(int argc, char **argv);
 
 
 
-int main(int argc, char **argv) {
+int SDL_main(int argc, char **argv) {
 	int result = main2(argc, argv);
 	reportClose();
 	return result;

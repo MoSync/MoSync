@@ -58,8 +58,8 @@ class NativeGccLinkWork < NativeGccWork
 	private
 
 	def setup3(all_objects)
-		if(HOST == :linux && HOST_PLATFORM == :darwin)
-			@EXTRA_LINKFLAGS += " -m32 -L/sw/lib -framework Cocoa"
+		if(HOST == :darwin)
+			@EXTRA_LINKFLAGS += " -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa"
 		end
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }

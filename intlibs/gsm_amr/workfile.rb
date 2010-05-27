@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 require File.expand_path('../../rules/host.rb')
-if(HOST == :linux)
+if(HOST == :linux || HOST == :darwin)
 	require File.expand_path('../../rules/native_lib.rb')
 	work = NativeLibWork.new
 else

@@ -29,8 +29,8 @@ def setup_common
 		end
 		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage"]
 	elsif(HOST == :darwin)
-		@LOCAL_DLLS << "amr"
-		@LIBRARIES += ["SDL_sound", "SDLmain"]
+		@LOCAL_LIBS << "amr"
+		@LIBRARIES = common_libraries + ["SDL_sound", "SDLmain", "expat", "freeimage"]
 	else
 		error "Unsupported platform"
 	end

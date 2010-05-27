@@ -796,6 +796,7 @@
 					../../../../libs,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 2.0;
+				OTHER_CFLAGS = "-DDARWIN";
 				PREBINDING = NO;
 				SDKROOT = iphoneos3.2;
 				TARGETED_DEVICE_FAMILY = "1,2";

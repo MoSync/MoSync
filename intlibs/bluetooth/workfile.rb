@@ -7,16 +7,14 @@ work.instance_eval do
 	set_defaults
 	
 	if(HOST == :linux)
-		if(HOST_PLATFORM == :darwin)
-			@SOURCES = ["."]
+	
+		@SOURCES = [".", "linux", "linux/bluez"]
+		if(BLUETOOTH)
+			@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
 		else
-			@SOURCES = [".", "linux", "linux/bluez"]
-			if(BLUETOOTH)
-				@EXTRA_CPPFLAGS = " -DBLUEZ_SUPPORTED"
-			else
-				#error "libbluetooth-dev missing!"
-			end
-		end
+			#error "libbluetooth-dev missing!"
+		end	
+		
 		
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn" }
@@ -25,6 +23,10 @@ work.instance_eval do
 		if(!@GCC_IS_V4)
 			@SPECIFIC_CFLAGS = { "discImpl.cpp" => " -Wno-unreachable-code" }
 		end
+	elsif(HOST == :darwin)
+		@SOURCES = ["."]
+		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
+		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn","discovery.cpp" => " -Wno-missing-noreturn" }
 	else
 		error "Unknown platform: #{HOST}"
 	end

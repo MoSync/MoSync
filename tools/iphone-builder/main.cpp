@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <stdarg.h>
 #include <helpers/attribute.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -137,6 +138,8 @@ void generate() {
 
 #ifdef PLATFORM_OSX
 void build() {
+	
+	execl("/Developer/usr/bin/xcodebuild", "/Developer/usr/bin/xcodebuild", "-project", validateArgument("input").c_str(), NULL, (char*) 0);
 }
 
 void run() {
@@ -160,7 +163,7 @@ int main(int argc, char **argv) {
 	for(int i = 2; i < argc; i++) {
 		if(argv[i][0] == '-') {
 			i++;
-			if(i>=argc) error("Missing value for option %s", argv[i-1]);
+			if(i>=argc) error("Missing value for option %s.\n", argv[i-1]);
 			sArguments[&argv[i-1][1]] = argv[i];
 		} else {
 			error("Invalid option %s", argv[i]);

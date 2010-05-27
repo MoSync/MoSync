@@ -23,15 +23,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #ifdef LINUX
+#include <gtk/gtk.h>
+#define stricmp(x, y) strcasecmp(x, y)
+#endif	//LINUX
 
 #ifdef DARWIN
 #include "MacDialogs.h"
-#else
-#include <gtk/gtk.h>
-#define stricmp(x, y) strcasecmp(x, y)
-#endif	//DARWIN
-
-#endif	//LINUX
+#endif //DARWIN
 
 #include <math.h>
 
@@ -41,7 +39,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_syswm.h>
 //#include <SDL/SDL_ffmpeg.h>
+
 #include <FreeImage.h>
+
 #include <string>
 #include <map>
 #include <time.h>
@@ -615,9 +615,6 @@ namespace Base {
 			info.window = NULL;
 		MessageBox(info.window, msg, title, MB_ICONERROR);
 #elif defined(LINUX)
-#ifdef DARWIN
-		MacMessageBox(msg, title);
-#else
 		GtkWidget* dialog = gtk_message_dialog_new (NULL,
 			GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_MESSAGE_ERROR,
@@ -625,7 +622,8 @@ namespace Base {
 			"%s\n\n%s", title, msg);
 		gtk_dialog_run (GTK_DIALOG (dialog));
 		gtk_widget_destroy (dialog);
-#endif //DARWIN
+#elif defined(DARWIN)
+		MacMessageBox(msg, title);
 #else
 #error Unsupported platform!
 #endif
@@ -2324,7 +2322,7 @@ namespace Base {
 		} else {
 			return -2;
 		}
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(DARWIN)
 		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 		return IOCTL_UNAVAILABLE;
 #else
@@ -2341,7 +2339,7 @@ namespace Base {
 		} else {
 			return -2;
 		}
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(DARWIN)
 		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 		return IOCTL_UNAVAILABLE;
 #else

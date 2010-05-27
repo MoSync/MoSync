@@ -16,6 +16,7 @@
  */
 
 #include "MacDialogs.h"
+#import <Cocoa/Cocoa.h>
 
 void MacMessageBox(const char* msg, const char* title) {
 	NSString *nstitle = [NSString stringWithCString:title encoding:NSASCIIStringEncoding];

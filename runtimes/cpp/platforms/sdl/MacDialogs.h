@@ -18,7 +18,6 @@
 #ifndef MAC_DIALOGS
 #define MAC_DIALOGS
 
-#import <Cocoa/Cocoa.h>
 
 void MacMessageBox(const char* msg, const char* title);
 

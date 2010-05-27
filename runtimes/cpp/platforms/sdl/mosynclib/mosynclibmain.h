@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef WIN32
 #define DLLEXPORT dllexport
 #define DLLIMPORT dllimport
-#elif defined(LINUX)
+#elif defined(LINUX) || defined (DARWIN)
 #define DLLEXPORT visibility("default")
 #define DLLIMPORT
 #endif

@@ -137,7 +137,7 @@ class GccWork < BuildWork
 		cfiles = collect_files(".c")
 		cppfiles = collect_files(".cpp") + collect_files(".cc")
 		
-		if(HOST == :linux && HOST_PLATFORM == :darwin)
+		if(HOST == :darwin)
 			@CFLAGS_MAP[".mm"] = @CPPFLAGS + host_flags + host_cppflags
 			cppfiles += collect_files(".mm")
 		end
