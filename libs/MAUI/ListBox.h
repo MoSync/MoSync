@@ -36,7 +36,6 @@ namespace MAUI {
 	  **/
 	class ItemSelectedListener {
 	public:
-		ItemSelectedListener(){}
 		/** This function is called whenever the selected item in a listbox changes **/
 		virtual void itemSelected(ListBox *sender, Widget *selectedWidget, Widget *unselectedWidget) = 0;
 		

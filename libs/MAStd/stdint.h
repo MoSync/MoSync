@@ -199,58 +199,6 @@
 typedef long ptrdiff_t;
 #endif
 
-/*
- *  For gcc with _STDINT_H, fill in the PRINTF_INT*_MODIFIER macros, and
- *  do nothing else.  On the Mac OS X version of gcc this is _STDINT_H_.
- */
-
-#if ((defined(__STDC__) && __STDC__ && __STDC_VERSION__ >= 199901L) || (defined (__WATCOMC__) && (defined (_STDINT_H_INCLUDED) || __WATCOMC__ >= 1250)) || (defined(__GNUC__) && (defined(_STDINT_H) || defined(_STDINT_H_)) )) && !defined (_PSTDINT_H_INCLUDED)
-#include <stdint.h>
-#define _PSTDINT_H_INCLUDED
-# ifndef PRINTF_INT64_MODIFIER
-#  define PRINTF_INT64_MODIFIER "ll"
-# endif
-# ifndef PRINTF_INT32_MODIFIER
-#  define PRINTF_INT32_MODIFIER "l"
-# endif
-# ifndef PRINTF_INT16_MODIFIER
-#  define PRINTF_INT16_MODIFIER "h"
-# endif
-# ifndef PRINTF_INTMAX_MODIFIER
-#  define PRINTF_INTMAX_MODIFIER PRINTF_INT64_MODIFIER
-# endif
-# ifndef PRINTF_INT64_HEX_WIDTH
-#  define PRINTF_INT64_HEX_WIDTH "16"
-# endif
-# ifndef PRINTF_INT32_HEX_WIDTH
-#  define PRINTF_INT32_HEX_WIDTH "8"
-# endif
-# ifndef PRINTF_INT16_HEX_WIDTH
-#  define PRINTF_INT16_HEX_WIDTH "4"
-# endif
-# ifndef PRINTF_INT8_HEX_WIDTH
-#  define PRINTF_INT8_HEX_WIDTH "2"
-# endif
-# ifndef PRINTF_INT64_DEC_WIDTH
-#  define PRINTF_INT64_DEC_WIDTH "20"
-# endif
-# ifndef PRINTF_INT32_DEC_WIDTH
-#  define PRINTF_INT32_DEC_WIDTH "10"
-# endif
-# ifndef PRINTF_INT16_DEC_WIDTH
-#  define PRINTF_INT16_DEC_WIDTH "5"
-# endif
-# ifndef PRINTF_INT8_DEC_WIDTH
-#  define PRINTF_INT8_DEC_WIDTH "3"
-# endif
-# ifndef PRINTF_INTMAX_HEX_WIDTH
-#  define PRINTF_INTMAX_HEX_WIDTH PRINTF_INT64_HEX_WIDTH
-# endif
-# ifndef PRINTF_INTMAX_DEC_WIDTH
-#  define PRINTF_INTMAX_DEC_WIDTH PRINTF_INT64_DEC_WIDTH
-# endif
-#endif
-
 #ifndef _PSTDINT_H_INCLUDED
 #define _PSTDINT_H_INCLUDED
 

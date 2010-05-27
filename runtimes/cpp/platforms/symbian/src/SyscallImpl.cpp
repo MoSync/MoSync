@@ -2176,6 +2176,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 
 	LOGA("%i impls\n", ciia.Count());
 	if(ciia.Count() == 0) {
+		CleanupStack::Pop();	//ciia
 		return -1;
 	}
 
