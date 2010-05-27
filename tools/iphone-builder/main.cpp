@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <map>
 #include <string>
 #include <stdarg.h>
+#include <helpers/attribute.h>
 
 using namespace std;
 
@@ -55,7 +56,9 @@ static const char sInfo[] =
 
 static map<string, string> sArguments;
 
-void error(const char* fmt, ...) {
+static void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2) GCCATTRIB(noreturn);
+
+static void error(const char* fmt, ...) {
 	va_list argptr;
 	va_start(argptr, fmt);
 	vprintf(fmt, argptr);
