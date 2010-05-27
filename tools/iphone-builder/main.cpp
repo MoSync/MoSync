@@ -38,9 +38,12 @@ static const char sInfo[] =
 "   run             runs an iphone application built using xcode (mac only).\n"
 "\n"
 " generate options:\n"
-"   -input          specifies the input template.\n"
+"   -pbx-template   specifies the input pbxproj template.\n"
+"   -plist-template specifies the input plist template.\n"
 "   -project-name   the name of the project.\n"
-"   -output         specifies the filename of the xcode project.\n"
+"   -company-name   the name of the company.\n"
+"   -version        the version (used for knowing when to update on the app store).\n"
+"   -output         specifies the output folder of the xcode project (the project name will be used as the name for the files).\n"
 "\n"
 " build options:\n"
 "   -input          specifies the filename of the xcode project.\n"
@@ -76,34 +79,57 @@ void replaceTemplateDefine(string &templateFile, const string &whatToReplace, co
 	}
 }
 
-char *readFileIntoMem(const char* filename, int *len) {
+void readFileIntoMem(string& output, const char* filename) {
+	output.clear();
 	FILE *file = fopen(filename, "rb");
-	if(!file) return NULL;
+	if(!file) error("Could not open file %s\n", filename);
 	fseek(file, 0, SEEK_END);
 	int length = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	char *memory = new char[length];
-	fread(memory, length, 1, file);
+	output.resize(length);
+	fread(&output[0], length, 1, file);
 	fclose(file);
-	*len = length;
-	return memory;
 }
 
-bool writeMemIntoFile(const char* filename, const char *mem, int len) {
+void writeMemIntoFile(const char* filename, const char *mem, size_t len) {
 	FILE *file = fopen(filename, "wb");
-	if(!file) return false;
+	if(!file) error("Could not open file %s\n", filename);
 	fwrite(mem, len, 1, file);
 	fclose(file);
-	return true;
+}
+
+string filterWhiteSpace(const string& str) {
+	string newString = "";
+	for(size_t i = 0; i < str.length(); i++) {
+		unsigned char s = str[i];
+		if(s > 32 && s < 127) {
+			newString += str[i];
+		} else {
+			newString += "_";
+		}
+	}
+	return newString;
 }
 
 void generate() {
-	int length;
-	char *templateFileStr = readFileIntoMem(validateArgument("input").c_str(), &length);
-	string templateFile = string(templateFileStr, length);
-	delete templateFileStr;
+	string pbxTemplateFile, plistTemplateFile;
+	readFileIntoMem(pbxTemplateFile, validateArgument("pbx-template").c_str());
+	readFileIntoMem(plistTemplateFile, validateArgument("plist-template").c_str());
 
+	string outputFolder = validateArgument("output").c_str();
+	string projectName = filterWhiteSpace(validateArgument("project-name"));
 
+	string pbxOutput = outputFolder + "/" + projectName + ".pbxproj";
+	string plistName = projectName + "-Info";
+	string plistOutput = outputFolder + "/" + plistName + ".plist";
+
+	replaceTemplateDefine(pbxTemplateFile, "__PROJECT_NAME__", projectName);
+	replaceTemplateDefine(pbxTemplateFile, "__PLIST_NAME__", plistName);
+	replaceTemplateDefine(plistTemplateFile, "__VERSION__", validateArgument("version"));
+	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company")));
+
+	writeMemIntoFile(pbxOutput.c_str(), pbxTemplateFile.c_str(), pbxTemplateFile.length());
+	writeMemIntoFile(plistOutput.c_str(), plistTemplateFile.c_str(), plistTemplateFile.length());
 }
 
 #ifdef PLATFORM_OSX
