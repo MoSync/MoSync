@@ -49,8 +49,8 @@ void LineObject::render(int width, int height, int znear, int zfar, int xOff, in
 	maSetColor(mColor);
 
 	for(int i = 0; i < mCurLines; i++) {
-		Vector& p1 = mTransformed[mLines[i].i1];
-		Vector& p2 = mTransformed[mLines[i].i2];
+		Vector3D& p1 = mTransformed[mLines[i].i1];
+		Vector3D& p2 = mTransformed[mLines[i].i2];
 		int az = (p1.mZ+p2.mZ)>>1;
 		if(az<znear) continue;
 		if(az>zfar) continue;

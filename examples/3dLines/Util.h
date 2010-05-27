@@ -15,32 +15,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file maths.cpp
-*
-* This file contains mathematical support functions and macros.
-*
-* \author Patrick Broman and Niklas Nummelin
-*
-*/
+#ifndef _UTIL_H_
+#define _UTIL_H_
 
-#include "maths.h"
-#include "madmath.h"
+#include <MAUI/Widget.h>
+#include <MAUI/Label.h>
+#include <MAUI/Layout.h>
+#include <MAUI/Font.h>
 
-Vector3D::Vector3D() : mX(0), mY(0), mZ(0) {
-}
+using namespace MAUI;
 
-Vector3D::Vector3D(int x, int y, int z) : mX(x), mY(y), mZ(z) {
-}
+#define PADDING 5
 
-int sinTable[TRIG_LOOKUP_SIZE];
-#define TRIG_LOOKUP_RANGE ((1<<TRIG_LOOKUP_BITS)-1)
+void setLabelPadding(Widget *w);
+Label* createLabel(const char *str, int height=32);
+Widget* createSoftKeyBar(int height, const char *left, const char *right);
+Layout* createMainLayout(const char *left, const char *right);
 
-void initTrigTables() {
+extern Font *gFont;
+extern WidgetSkin *gSkin;
+extern int gScreenWidth;
+extern int gScreenHeight;
 
-	double ang = 0;
-	double ang_delta = (2*PI)/TRIG_LOOKUP_SIZE;
-	for(int i = 0; i < TRIG_LOOKUP_SIZE; i++) {
-		sinTable[i] = (int)(sin(ang)*(double)TRIG_LOOKUP_RANGE);
-		ang+=ang_delta;
-	}
-}
+#endif	//_UTIL_H_

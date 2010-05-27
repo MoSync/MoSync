@@ -108,19 +108,19 @@ protected:
 	int mNumVertices;
 
 	/// The array holding the untransformed, original, vertices.
-	Vector *mOriginal;
+	Vector3D *mOriginal;
 
 	/// The array holding the transformed vertices.
-	Vector *mTransformed;
+	Vector3D *mTransformed;
 
 	/// The position.
-	Vector mPosition;
+	Vector3D mPosition;
 
 	/// The rotation.
-	Vector mRotation;
+	Vector3D mRotation;
 
 	/// The scale.
-	Vector mScale;
+	Vector3D mScale;
 };
 
 #endif

@@ -27,22 +27,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <maprofile.h>
 #include <conprint.h>
+#include <MAP/MemoryMgr.h>
 
+#include "main.h"
 #include "MAHeaders.h"
 #include "lineobject.h"
+#include "Util.h"
 
 /**
  * The size of the image.
  */
 #define DRAWIMAGESIZE 50
 
+#define FRAMES 1000
+#define FPS 50
+#define MS_PER_FRAME (1000/FPS)
+
+ObjectWidget::ObjectWidget(int x, int y, int width, int height, Widget *parent)
+	: Widget(x, y, width, height, parent) {
+	init();
+	Environment::getEnvironment().addTimer(this, MS_PER_FRAME, FRAMES+1);
+}
+
+ObjectWidget::~ObjectWidget() {
+}
+
+
 /**
   * \brief A function that generates a line object cube.
   * \param obj Reference to the LineObject object in which the cube should be built.
   * \param size The size of the generated cube.
   */
-static void generateCube(LineObject* obj, int size) {
-
+void ObjectWidget::generateCube(LineObject* obj, int size) {
 	/// Static array containing the "unit square"
 	int points[8][3] = {
 		{-1, 1,-1},
@@ -81,41 +97,30 @@ static void generateCube(LineObject* obj, int size) {
 
 }
 
-LineObject* gObj;
-int gScreenWidth;
-int gScreenHeight;
-
 /**
  * \brief Function that initializes the example.
  */
-static void init() {
+void ObjectWidget::init() {
+	mode = 0;
+
 	/// Create the image in which the cube will be drawn, to draw multiple versions of it.
 	maCreateDrawableImage(1, DRAWIMAGESIZE, DRAWIMAGESIZE);
 
 	initTrigTables();
 
 	/// Create the line object, which will represent the cube.
-	gObj = new LineObject(8, 12, 0xffffff);
+	lineObject = new LineObject(8, 12, 0xffffff);
 
 	/// Generate the cube.
-	generateCube(gObj, 7000);
-
-	/// Get screen dimensions.
-	MAExtent size = maGetScrSize();
-
-	/// Extract the screen width
-	gScreenWidth = EXTENT_X(size);
-
-	/// Extract the screen height
-	gScreenHeight = EXTENT_Y(size);
+	generateCube(lineObject, 7000);
 }
 
 /**
  * \brief Function of the example that draws the single object..
  */
-static void drawOne(int time) {
+void ObjectWidget::drawOne(int time) {
 	/// Set the position of the cube.
-	gObj->setPosition(-20000, 0, 100000);
+	lineObject->setPosition(-20000, 0, 100000);
 
 	/// Set the following draw calls to draw to the screen (draw target 0).
 	maSetDrawTarget(0);
@@ -124,38 +129,38 @@ static void drawOne(int time) {
 	maSetColor(0x181020);
 
 	/// Clear the screen.
-	maFillRect(0, 0, gScreenWidth, gScreenHeight);
+	maFillRect(0, 0, getWidth(), getHeight());
 
 	/// Set the rotation of the cube.
-	gObj->setRotation((SIN(time/60)*TRIG_LOOKUP_MAGIC)>>TRIG_LOOKUP_BITS,
+	lineObject->setRotation((SIN(time/60)*TRIG_LOOKUP_MAGIC)>>TRIG_LOOKUP_BITS,
 		              (SIN(time/50)*TRIG_LOOKUP_MAGIC)>>TRIG_LOOKUP_BITS,
 					  (COS(time/40)*TRIG_LOOKUP_MAGIC)>>TRIG_LOOKUP_BITS);
 
 	/// Transform the cube.
-	gObj->transform();
+	lineObject->transform();
 
 	/// Render the cube, the parts behind the sphere.
-	gObj->render(gScreenWidth, gScreenHeight,100000, 1000000, 0, 0);
+	lineObject->render(getWidth(), getHeight(),100000, 1000000, 0, 0);
 
 	/// Get the image dimensions of the sphere.
 	MAExtent e = maGetImageSize(R_SPRITE);
 
 	/// Draw the sphere image.
-	maDrawImage(R_SPRITE, (gScreenWidth>>1)-70, (gScreenHeight>>1)-((EXTENT_Y(e))>>1));
+	maDrawImage(R_SPRITE, (getWidth()>>1)-70, (getHeight()>>1)-((EXTENT_Y(e))>>1));
 
 	/// Render the cube, the parts in front of the sphere.
-	gObj->render(gScreenWidth, gScreenHeight,0, 100000, 0, 0);
+	lineObject->render(getWidth(), getHeight(),0, 100000, 0, 0);
 
 	/// Draw the logo image.
-	maDrawImage(R_LOGO, (gScreenWidth>>1)-20, (gScreenHeight>>1)-30);
+	maDrawImage(R_LOGO, (getWidth()>>1)-20, (getHeight()>>1)-30);
 }
 
 /**
  * \brief Function of the example that draws many objects..
  */
-static void drawLots(int time) {
+void ObjectWidget::drawLots(int time) {
 	/// Set the position of the cube.
-	gObj->setPosition(0, 0, 140000);
+	lineObject->setPosition(0, 0, 140000);
 
 	/// Set the following draw calls to draw to the drawable image created (draw target 1).
 	maSetDrawTarget(1);
@@ -167,15 +172,15 @@ static void drawLots(int time) {
 	maFillRect(0, 0, DRAWIMAGESIZE, DRAWIMAGESIZE);
 
 	/// Set the rotation of the cube.
-	gObj->setRotation((SIN(time/20)*TRIG_LOOKUP_SIZE)>>TRIG_LOOKUP_BITS,
+	lineObject->setRotation((SIN(time/20)*TRIG_LOOKUP_SIZE)>>TRIG_LOOKUP_BITS,
 		             (SIN(time/30)*TRIG_LOOKUP_SIZE)>>TRIG_LOOKUP_BITS,
 					 (COS(time/40)*TRIG_LOOKUP_SIZE)>>TRIG_LOOKUP_BITS);
 
 	/// Transform the cube.
-	gObj->transform();
+	lineObject->transform();
 
 	/// Render the cube, the parts behind the sphere.
-	gObj->render(DRAWIMAGESIZE, DRAWIMAGESIZE,140000, 1000000, 0, 0);
+	lineObject->render(DRAWIMAGESIZE, DRAWIMAGESIZE,140000, 1000000, 0, 0);
 
 	/// Get the image dimensions of the sphere.
 	MAExtent e = maGetImageSize(R_SPRITE);
@@ -184,17 +189,17 @@ static void drawLots(int time) {
 	maDrawImage(R_SPRITE, (DRAWIMAGESIZE>>1)-((EXTENT_X(e))>>1), (DRAWIMAGESIZE>>1)-((EXTENT_Y(e))>>1));
 
 	/// Render the cube, the parts in front of the sphere.
-	gObj->render(DRAWIMAGESIZE, DRAWIMAGESIZE,0, 140000, 0, 0);
+	lineObject->render(DRAWIMAGESIZE, DRAWIMAGESIZE,0, 140000, 0, 0);
 
 
 	/// Set the following draw calls to draw to the screen (draw target 0).
 	maSetDrawTarget(0);
 
-	int numX = (gScreenWidth/DRAWIMAGESIZE);
-	int numY = (gScreenHeight/DRAWIMAGESIZE);
+	int numX = (getWidth()/DRAWIMAGESIZE);
+	int numY = (getHeight()/DRAWIMAGESIZE);
 
-	int xOffs = (gScreenWidth-((numX)*DRAWIMAGESIZE))>>1;
-	int yOffs = (gScreenHeight-((numY)*DRAWIMAGESIZE))>>1;
+	int xOffs = (getWidth()-((numX)*DRAWIMAGESIZE))>>1;
+	int yOffs = (getHeight()-((numY)*DRAWIMAGESIZE))>>1;
 
 	/// Draw the drawable image to the screen, several times using nested loops.
 	for(int j = 0; j < numY; j++) {
@@ -206,56 +211,103 @@ static void drawLots(int time) {
 	}
 }
 
-extern "C" {
-/**
- * \brief The entry point.
- */
-int MAMain()
-{
-	int mode = 1;
-	bool run = true;
+void ObjectWidget::drawWidget() {
+}
 
-	init();
-
-	while(run) {
-		/// Choose drawing function depending on mode.
-		if(mode)
-			drawOne(maGetMilliSecondCount()*2);
-		else
-			drawLots(maGetMilliSecondCount()*2);
-
-		/// Updates the screen
-		maUpdateScreen();
-
-		/// Keep the backlight alive.
-		maResetBacklight();
-
-		/// Get any available events.
-		/// If MAK_FIRE is pressed, change mode.
-		/// On Close event or MAK_0 press, close program.
-		MAEvent event;
-		while(maGetEvent(&event)) {
-			if(event.type == EVENT_TYPE_KEY_PRESSED && event.key == MAK_FIRE) {
-				mode ^= 1;
-				maSetDrawTarget(0);
-				maSetColor(0x081020);
-				maFillRect(0, 0, gScreenWidth, gScreenHeight);
-#ifdef MA_PROF_SUPPORT_STYLUS
-			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
-				mode ^= 1;
-#endif	// MA_PROF_SUPPORT_STYLUS
-			} else if(event.type == EVENT_TYPE_CLOSE ||
-				(event.type == EVENT_TYPE_KEY_PRESSED &&
-				(event.key == MAK_0|| event.key == MAK_SOFTRIGHT)))
-			{
-				run = false;
-				break;
-			}
-		}
+void ObjectWidget::runTimerEvent() {
+	/// Choose drawing function depending on mode.
+	if(mode) {
+		drawOne(maGetMilliSecondCount()*2);
+	} else {
+		drawLots(maGetMilliSecondCount()*2);
 	}
 
-	delete gObj;
+	/// Updates the screen
+	maUpdateScreen();
 
-	return 0;
+	/// Keep the backlight alive.
+	maResetBacklight();
 }
+
+MainScreen::MainScreen(MyMoblet *moblet) {
+	mMoblet = moblet;
+
+	layout = new Layout(0, 0, gScreenWidth, gScreenHeight, NULL, 1, 2);
+
+	softKeys = createSoftKeyBar(30, "Toggle", "Exit");
+
+	objectWidget = new ObjectWidget(0, 0, gScreenWidth, gScreenHeight-softKeys->getHeight(), layout);
+	objectWidget->setDrawBackground(false);
+
+	layout->add(softKeys);
+
+	this->setMain(layout);
+}
+
+MainScreen::~MainScreen() {
+	delete layout;
+}
+
+void MainScreen::keyPressEvent(int keyCode, int nativeCode) {
+	switch(keyCode) {
+	case MAK_FIRE:
+	case MAK_SOFTLEFT:
+		{
+		objectWidget->toggleMode();
+		}
+		break;
+	case MAK_SOFTRIGHT:
+		mMoblet->closeEvent();
+		mMoblet->close();
+		break;
+	}
+}
+
+void MainScreen::pointerPressEvent(MAPoint2d point) {
+	Point p;
+	p.set(point.x, point.y);
+	if(softKeys->contains(p)) {
+		if(softKeys->getChildren()[0]->contains(p)) {
+			keyPressEvent(MAK_SOFTLEFT, 0);
+		}
+		else if(softKeys->getChildren()[1]->contains(p)) {
+			keyPressEvent(MAK_SOFTRIGHT, 0);
+		}
+	} else {
+		objectWidget->toggleMode();
+	}
+}
+
+void MainScreen::pointerReleaseEvent(MAPoint2d point) {
+}
+
+void MyMoblet::keyPressEvent(int keyCode, int nativeCode) {
+}
+
+void MyMoblet::keyReleaseEvent(int keyCode, int nativeCode) {
+}
+
+void MyMoblet::closeEvent() {
+	// do destruction here
+	delete mainScreen;
+}
+
+MyMoblet::MyMoblet() {
+	gFont = new MAUI::Font(RES_FONT);
+	gSkin = new WidgetSkin(RES_SELECTED, RES_SELECTED, 3, 18, 10, 11, true, true);
+	Engine& engine = Engine::getSingleton();
+	engine.setDefaultFont(gFont);
+	engine.setDefaultSkin(gSkin);
+
+	MAExtent screenSize = maGetScrSize();
+	gScreenWidth = EXTENT_X(screenSize);
+	gScreenHeight = EXTENT_Y(screenSize);
+
+	mainScreen = new MainScreen(this);
+	mainScreen->show();
+}
+
+extern "C" int MAMain() {
+	Moblet::run( newobject( MyMoblet, new MyMoblet( ) ) );
+	return 0;
 }

@@ -32,8 +32,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 Drawable::Drawable(int aNumVertices) :
 	mCurVertex(0),
 	mNumVertices(aNumVertices),
-	mOriginal(new Vector[aNumVertices]),
-	mTransformed(new Vector[aNumVertices])
+	mOriginal(new Vector3D[aNumVertices]),
+	mTransformed(new Vector3D[aNumVertices])
 {
 }
 
@@ -50,7 +50,7 @@ Drawable::~Drawable() {
  */
 void Drawable::addVertex(int x, int y, int z) {
 	if(mCurVertex<mNumVertices)
-		mOriginal[mCurVertex++] = Vector(x, y, z);
+		mOriginal[mCurVertex++] = Vector3D(x, y, z);
 }
 
 /**
@@ -64,21 +64,21 @@ int Drawable::getNumVertices() {
  * Set position with coordinates 'x', 'y', 'z'.
  */
 void Drawable::setPosition(int x, int y, int z) {
-	mPosition = Vector(x, y, z);
+	mPosition = Vector3D(x, y, z);
 }
 
 /**
  * Set rotation with rotation angles 'x', 'y', 'z' around each respective axis.
  */
 void Drawable::setRotation(int x, int y, int z) {
-	mRotation = Vector(x, y, z);
+	mRotation = Vector3D(x, y, z);
 }
 
 /**
  * Set scale with scale factors 'x', 'y', 'z'.
  */
 void Drawable::setScale(int x, int y, int z) {
-	mScale = Vector(x, y, z);
+	mScale = Vector3D(x, y, z);
 }
 
 /**
