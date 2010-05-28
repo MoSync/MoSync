@@ -61,13 +61,13 @@ static void DeleteCore() {
 
 int main2(int argc, char **argv);
 
-#ifndef _MSC_VER
+#ifdef WIN32
 #undef main
 #endif
 
 
 
-int SDL_main(int argc, char **argv) {
+int main(int argc, char **argv) {
 	int result = main2(argc, argv);
 	reportClose();
 	return result;
