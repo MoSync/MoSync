@@ -61,10 +61,9 @@ static void DeleteCore() {
 
 int main2(int argc, char **argv);
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(_MSC_VER)
 #undef main
 #endif
-
 
 
 int main(int argc, char **argv) {
