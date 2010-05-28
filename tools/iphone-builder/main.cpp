@@ -17,9 +17,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <map>
 #include <string>
+#include <stack>
 #include <stdarg.h>
 #include <helpers/attribute.h>
+#include <helpers/mkdir.h>
+#include <filelist/filelist.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -58,6 +64,88 @@ static const char sInfo[] =
 static map<string, string> sArguments;
 
 static void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2) GCCATTRIB(noreturn);
+
+#define ERR_COPY_SRC_COULD_NOT_BE_OPENED -1
+#define ERR_COPY_DST_COULD_NOT_BE_OPENED -2
+#define ERR_COPY_READ_FAILED -3
+#define ERR_COPY_WRITE_FAILED -4
+
+// returns total amount of bytes written.
+// on failure, returns an error code, and errno will be set.
+int copyFile(const char *src, const char* dst) {
+	char buffer[1024];
+	ssize_t bytesRead, bytesWritten;
+	ssize_t bufferIndex = 0;	
+	ssize_t res = 0;
+	int fd_src, fd_dst;
+
+	fd_src = open(src, O_RDONLY);
+	if(fd_src==-1) return ERR_COPY_SRC_COULD_NOT_BE_OPENED;
+	fd_dst = open(dst, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU& (~S_IXUSR));
+	if(fd_dst==-1) return ERR_COPY_DST_COULD_NOT_BE_OPENED;
+
+
+	while(1) {
+		if((bytesRead = read(fd_src, buffer, 1024)) == -1) 
+			 { res = ERR_COPY_READ_FAILED; goto close_fds; }
+		if(bytesRead == 0) 
+			break;
+		bufferIndex = 0;
+		while(bufferIndex != bytesRead) {
+			bytesWritten = write(fd_dst, &buffer[bufferIndex], bytesRead - bufferIndex);
+			if(bytesWritten == -1) { res = ERR_COPY_WRITE_FAILED; goto close_fds; }
+			bufferIndex += bytesWritten;
+			res += bytesWritten;
+		}
+	}
+
+close_fds:
+	close(fd_src);
+	close(fd_dst);
+	return res;
+}
+
+static stack<string> sDestinationDirectory;
+static stack<string> sSourceDirectory;
+
+void copyFilesRecurse();
+
+void copyFilesCallback(const char *path) {
+	if(path[0] == '.') return;
+	const char* fn = strrchr(path, '/') + 1;
+	if(isDirectory(path)) {
+		sDestinationDirectory.push(sDestinationDirectory.top() + string("/") + fn);
+		sSourceDirectory.push(path);
+			
+		copyFilesRecurse();
+	} else {
+		string srcFile = path;		
+		string dstFile = sDestinationDirectory.top() + string("/") + fn;
+		int errCode;
+		if((errCode = copyFile(srcFile.c_str(), dstFile.c_str()))<0) {
+			
+			error("Could not copy file %s. Error code: %d, errno: %i (%s)\n", path, errCode, errno, strerror(errno));
+		}
+	}
+}
+
+void copyFilesRecurse() {
+	_mkdir(sDestinationDirectory.top().c_str());
+	printf("src: %s\n", sSourceDirectory.top().c_str());
+	printf("dst: %s\n", sDestinationDirectory.top().c_str());
+
+	if(scanDirectory((sSourceDirectory.top()+"/*").c_str(), copyFilesCallback) != 0) 
+		error("Could not scan source directory.\n");
+	sSourceDirectory.pop();
+	sDestinationDirectory.pop();
+}
+
+
+void copyFilesRecursively(const char *src_dir, const char *dst_dir) {
+	sSourceDirectory.push(src_dir);
+	sDestinationDirectory.push(dst_dir);
+	copyFilesRecurse();
+}
 
 static void error(const char* fmt, ...) {
 	va_list argptr;
@@ -117,20 +205,30 @@ string filterWhiteSpace(const string& str) {
 
 void generate() {
 	string pbxTemplateFile, plistTemplateFile;
-	readFileIntoMem(pbxTemplateFile, validateArgument("pbx-template").c_str());
-	readFileIntoMem(plistTemplateFile, validateArgument("plist-template").c_str());
 
-	string outputFolder = validateArgument("output").c_str();
+	string inputFolder = validateArgument("input");
+	string outputFolder = validateArgument("output");
+	
+	copyFilesRecursively(inputFolder.c_str(), outputFolder.c_str());
+
+	string pbxInput = outputFolder + string("/") + "project.pbxprojtemplate";
+	string plistInput = outputFolder + string("/") + "project.plisttemplate";
+
+	readFileIntoMem(pbxTemplateFile, pbxInput.c_str());
+	readFileIntoMem(plistTemplateFile, plistInput.c_str());
+
 	string projectName = filterWhiteSpace(validateArgument("project-name"));
 
-	string pbxOutput = outputFolder + "/" + projectName + ".pbxproj";
-	string plistName = projectName + "-Info";
-	string plistOutput = outputFolder + "/" + plistName + ".plist";
+	string xcodeProjectPath = outputFolder + "/" + projectName + ".xcodeproj";
+	string pbxOutput = xcodeProjectPath + "/" + "project.pbxproj";
+	
+	_mkdir(xcodeProjectPath.c_str());	
+
+	string plistOutput = outputFolder + "/" + projectName + ".plist";
 
 	replaceTemplateDefine(pbxTemplateFile, "__PROJECT_NAME__", projectName);
-	replaceTemplateDefine(pbxTemplateFile, "__PLIST_NAME__", plistName);
 	replaceTemplateDefine(plistTemplateFile, "__VERSION__", validateArgument("version"));
-	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company")));
+	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company-name")));
 
 	writeMemIntoFile(pbxOutput.c_str(), pbxTemplateFile.c_str(), pbxTemplateFile.length());
 	writeMemIntoFile(plistOutput.c_str(), plistTemplateFile.c_str(), plistTemplateFile.length());
