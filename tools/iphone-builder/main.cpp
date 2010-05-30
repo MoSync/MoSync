@@ -18,14 +18,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <map>
 #include <string>
 #include <stack>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
+#include <cstdlib>
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/stat.h>
+
+
 #include <helpers/attribute.h>
 #include <helpers/mkdir.h>
 #include <filelist/filelist.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
+
 
 using namespace std;
 
@@ -69,6 +75,21 @@ static void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2) GCCATTRIB(noreturn);
 #define ERR_COPY_DST_COULD_NOT_BE_OPENED -2
 #define ERR_COPY_READ_FAILED -3
 #define ERR_COPY_WRITE_FAILED -4
+
+int copyFile ( const char *src, const char* dst );
+void copyFilesRecurse ( void );
+void copyFilesCallback ( const char *path );
+void copyFilesRecursively( const char *src_dir, const char *dst_dir );
+void error(const char* fmt, ...);
+const string& validateArgument(const string& arg);
+void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement);
+void readFileIntoMem(string& output, const char* filename);
+string filterWhiteSpace(const string& str);
+void generate();
+void writeMemIntoFile(const char* filename, const char *mem, size_t len);
+void build ( void );
+void run ( void );
+
 
 // returns total amount of bytes written.
 // on failure, returns an error code, and errno will be set.
