@@ -41,8 +41,8 @@
 		855FE8A611AFF9A900769F0D /* icon_72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_72x72.png; sourceTree = "<group>"; };
 		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = file; path = resources; sourceTree = "<group>"; };
 		85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
+		85F2558711AC155D00EB47EE /* __PROJECT_NAME__.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = __PROJECT_NAME__.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		85F2558911AC155D00EB47EE /* __PROJECT_NAME__.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "__PROJECT_NAME__.plist"; sourceTree = "<group>"; };
 		85F25A8211AD6ADD00EB47EE /* libMoSyncLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMoSyncLib.a; path = libs/simulator/Debug/libMoSyncLib.a; sourceTree = "<group>"; };
 		85F25B0011AD723900EB47EE /* cpp_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpp_defs.h; path = helpers/cpp_defs.h; sourceTree = "<group>"; };
 		85F25B0111AD723900EB47EE /* cpp_maapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpp_maapi.h; path = helpers/cpp_maapi.h; sourceTree = "<group>"; };
@@ -83,7 +83,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				85F2558711AC155D00EB47EE /* MoSync.app */,
+				85F2558711AC155D00EB47EE /* __PROJECT_NAME__.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,7 +117,7 @@
 				855FE7F411AFF8B100769F0D /* icon_57x57.png */,
 				8519011E1199B90400B71F58 /* data_section.bin */,
 				85A0815311353EDE00267D56 /* resources */,
-				85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */,
+				85F2558911AC155D00EB47EE /* __PROJECT_NAME__.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -159,9 +159,9 @@
 			);
 			dependencies = (
 			);
-			name = "MoSync with library";
-			productName = MoSync;
-			productReference = 85F2558711AC155D00EB47EE /* MoSync.app */;
+			name = "__PROJECT_NAME__";
+			productName = __PROJECT_NAME__;
+			productReference = 85F2558711AC155D00EB47EE /* __PROJECT_NAME__.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -219,12 +219,12 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
-				INFOPLIST_FILE = "MoSyncWithLib-Info.plist";
+				INFOPLIST_FILE = "__PROJECT_NAME__.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)\"/libs/debug",
 					"\"$(SRCROOT)/libs/release\"",
 				);
-				PRODUCT_NAME = MoSync;
+				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Debug;
 		};
@@ -235,12 +235,12 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
-				INFOPLIST_FILE = "MoSyncWithLib-Info.plist";
+				INFOPLIST_FILE = "__PROJECT_NAME__.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(SRCROOT)\"/libs/release",
 					"\"$(SRCROOT)/libs/debug\"",
 				);
-				PRODUCT_NAME = MoSync;
+				PRODUCT_NAME = __PROJECT_NAME__;
 			};
 			name = Release;
 		};
