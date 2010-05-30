@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "File.h"
 #include <vector>
+#include <cstring>
 
 std::vector<std::string> inFiles;
 
@@ -128,30 +129,38 @@ void saveVolumeEntries(VolumeEntry *root) {
 
 void parse(File file, VolumeEntry *vol);
 
-void parseDirectory(File file, VolumeEntry *vol)  {
-	File iterFile = File(file.getAbsolutePath());
-	if(!file.first(&iterFile, FSF_FILE|FSF_DIR)) return;
-	do {
-		if(	(iterFile.getAbsolutePath().find("\\.")!=String::npos) ||
-			(iterFile.getAbsolutePath().find("\\..")!=String::npos))
-				continue;
+void parseDirectory(File file, VolumeEntry *vol)  
+{
+	std::list<File> l = file.listFiles( );
+	
+	// Go through file and directories	
+	for ( std::list<File>::iterator it = l.begin( ); it != l.end( ); ++it )
+	{
+		// Skip self & backward references
+		if ( it->isSelfOrBackRef( ) == true )
+			continue;
+		
 		VolumeEntry *childVol = new VolumeEntry;
 		vol->children.push_back(childVol);
-		parse(iterFile, childVol);
-	} while(file.next(&iterFile, FSF_FILE|FSF_DIR));	
-
+		parse( *it, childVol );		
+	}
+	
 	if(file.isDirectory()) {
-		printf("-\n", file.getName());		
+		printf("-\n %s\n", file.getAbsolutePath( ).c_str( ));		
 	}
 }
 
 void parse(File file, VolumeEntry *vol) {
-	if(file.isDirectory()) {
+	if ( file.isDirectory( ) == true ) 
+	{
 		vol->name = file.getName();
 
-		for(size_t i = 0; i < vol->name.size(); i++) {
-			if(changeCase == 1) vol->name[i] = to_upper(vol->name[i]);
-			else if(changeCase == 2) vol->name[i] = to_lower(vol->name[i]);
+		for(size_t i = 0; i < vol->name.size(); i++) 
+		{
+			if ( changeCase == 1 ) 
+				vol->name[i] = to_upper( vol->name[i] );
+			else if(changeCase == 2) 
+				vol->name[i] = to_lower( vol->name[i] );
 		}
 
 		printf("+\"%s\"\n", vol->name.c_str());
@@ -159,13 +168,16 @@ void parse(File file, VolumeEntry *vol) {
 		vol->type = 0;
 		parseDirectory(file, vol);
 	}
-	else {
+	else 
+	{
 		//printf("\"%s\"\n", file.getName().c_str());		
 		vol->name = file.getName();
 
 		for(size_t i = 0; i < vol->name.size(); i++) {
-			if(changeCase == 1) vol->name[i] = to_upper(vol->name[i]);
-			else if(changeCase == 2) vol->name[i] = to_lower(vol->name[i]);
+			if ( changeCase == 1 ) 
+				vol->name[i] = to_upper( vol->name[i] );
+			else if ( changeCase == 2 ) 
+				vol->name[i] = to_lower( vol->name[i] );
 		}
 
 		printf("\"%s\"\n", vol->name.c_str());		
@@ -175,25 +187,6 @@ void parse(File file, VolumeEntry *vol) {
 		vol->dataLength = readFile(file.getAbsolutePath().c_str());
 		return;
 	}
-
-	/*
-	File iterFile = File(file.getAbsolutePath());
-	if(!file.first(&iterFile, FSF_FILE|FSF_DIR)) return;
-
-	do {
-		if(	(iterFile.getAbsolutePath().find("\\.")!=String::npos) ||
-			(iterFile.getAbsolutePath().find("\\..")!=String::npos))
-				continue;
-		VolumeEntry *childVol = new VolumeEntry;
-		vol->children.push_back(childVol);
-		parse(iterFile, childVol);
-	} while(file.next(&iterFile, FSF_FILE|FSF_DIR));	
-	
-	if(file.isDirectory()) {
-		printf("-\n", file.getName());		
-	}
-	*/
-	
 }
 
 

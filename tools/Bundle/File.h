@@ -20,40 +20,87 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_FILE_H_
 #define _SE_MSAB_FILE_H_
 
+#include <list>
 #include <string>
+#include <cstdio>
+
+#ifdef WIN32
+#define F_SEPERATOR	'\\'
+#else
+#define F_SEPERATOR	'/'
+#endif
 
 typedef std::string String;
-typedef bool Bool;
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+/**
+ * This class is used to traverse through
+ * a directory tree in a platform independent
+ * way.
+ *
+ */
+class File 
+{
+public:
+	/**
+	 * Constructor
+	 *
+	 * @param p Path to file/directory
+	 */
+	File( const String &p );
+	
+	/**
+	 * Copy constructor
+	 *
+	 * @param f const reference to File to copy
+	 */	
+	File( const File & f );
+	
+	/**
+	 * Returns if this is a directory or not
+	 *
+	 * @return true/false
+	 */
+	bool isDirectory ( void );
+	
+	/**
+	 * Returns the file name
+	 
+	 * @return File name without full path or empty
+	 *         string if not a file.
+	 */
+	String getName ( void );
+	
+	/**
+	 * Returns the full path of the file.
+	 *
+	 * @return Full path as string
+	 */
+	String getAbsolutePath ( void );
+	
+	/**
+	 * Checks if it is a 'self' or 'back' reference,
+	 * i.e '/.'
+	 *
+	 * @return true/false
+	 */
+	 bool isSelfOrBackRef ( void )
+	 {
+		static const char backRef[3] = { '.', '.', F_SEPERATOR };
+		return m_path[m_path.length( )-1] == '.' ||
+			   m_path.find( backRef ) != String::npos;
+	 }
+	
+	/**
+	 * Returns a linked list of the files in 
+	 * this directory. If this file is not a
+	 * directory, the list will be empty
+	 *
+	 * @return Linked list with files.
+	 */
+	std::list<File> listFiles ( void );
 
+private:
+	String	m_path;
+};
 
-	enum eFileSearchFlag {
-		FSF_FILE=1,
-		FSF_DIR=2
-	};
-
-	class File {
-	public:
-
-
-		File(String path="");
-		~File();
-		Bool isDirectory();
-		void open(String path);
-		void close();
-
-		// only when File object is a directory
-		Bool first(File*, int flags);
-		Bool next(File*, int flags);
-
-		const String& getAbsolutePath();
-		const String& getName();
-
-	protected:
-		HANDLE file;
-		WIN32_FIND_DATAA fd;
-		String path;
-	};
 #endif //_SE_MSAB_FILE_H_

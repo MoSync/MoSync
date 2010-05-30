@@ -18,109 +18,100 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** Copyright (c) Mobile Sorcery AB 2005-2006 **/
 
 #include "File.h"
-#include <windows.h>
+#include <list>
+#include <filelist/filelist.h>
 
-#ifdef _MSC_VER
-#pragma warning(disable:4800)
-#endif
 
-File::File(String path) : file(NULL), path(path) {
+/**
+ * Callback used for filelist library.
+ *
+ */
+static String g_currentPath;
+static std::list<File> *g_fileList;
+static void callback ( const char *f )
+{
+	g_fileList->push_back( File( g_currentPath+f ) );
 }
 
-File::~File() {
-	close();
+/**
+ * Constructor
+ *
+ * @param p Path to file/directory
+ */
+File::File ( const String &p )
+: m_path( p )
+{ }
+
+
+/**
+ * Copy constructor
+ *
+ * @param f const reference to File to copy
+ */
+File::File ( const File & f )
+: m_path( f.m_path )
+{ }
+
+
+/**
+ * Returns if this is a directory or not
+ *
+ * @return true/false
+ */
+bool File::isDirectory ( void ) 
+{
+	return ::isDirectory( m_path.c_str( ) ) == 1;
 }
 
-Bool File::isDirectory() {
-	DWORD attributes = GetFileAttributesA((path).c_str());
-	return attributes & FILE_ATTRIBUTE_DIRECTORY;
-}
-void File::open(String path) {
-	this->path = path;
-	file = NULL;
-}
-
-void File::close() {
-	if(!file) return;
-	FindClose(file);
-}
-
-Bool File::first(File *firstFile, int flags) {
-	if(file) FindClose(file);
-	file = FindFirstFileA((path + "\\" + "*").c_str(), &fd);
-	if(file==INVALID_HANDLE_VALUE) return false;
-
-	if((flags&FSF_FILE)&&(flags&FSF_DIR)) {
-		firstFile->close();
-		firstFile->open(path + "\\" + fd.cFileName);
-		return true;
-	}
-
-	if((flags&FSF_FILE)&&(!(flags&FSF_DIR))) {
-		while((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			Bool ret = FindNextFileA(file, &fd);
-			if(ret == false) return false;
-		}
-	}
-
-	if(!(flags&FSF_FILE)&&(flags&FSF_DIR)) {
-		while(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			Bool ret = FindNextFileA(file, &fd);
-			if(ret == false) return false;
-		}
-	}
-
-	firstFile->close();
-	firstFile->open(path + "\\" + fd.cFileName);
-
-	return true;
-}
-
-Bool File::next(File *nextFile, int flags) {
-	Bool ret = FindNextFileA(file, &fd);
-	if(ret == false) return false;
-
-	if((flags&FSF_FILE)&&(flags&FSF_DIR)) {
-		nextFile->close();
-		nextFile->open(path + "\\" + fd.cFileName);
-		return true;
-	}
-
-	if((flags&FSF_FILE)&&(!(flags&FSF_DIR))) {
-		while((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			Bool ret = FindNextFileA(file, &fd);
-			if(ret == false) return false;
-		}
-	}
-
-	if(!(flags&FSF_FILE)&&(flags&FSF_DIR)) {
-		while(!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			Bool ret = FindNextFileA(file, &fd);
-			if(ret == false) return false;
-		}
-	}
-
-	nextFile->close();
-	nextFile->open(path + "\\" + fd.cFileName);
-
-	return true;
-}
-
-const String& File::getAbsolutePath() {
-	return (path);
-}
-
-String temp = "";
-
-const String& File::getName() {
-	int i = path.find_last_of("\\/");
-	if(i==String::npos) temp = "";
-	//printf("FOUND '%s'\n", &path[i+1]);
-	temp = String(&path[i+1]);
+/**
+ * Returns the file name
+ 
+ * @return File name without full path or empty
+ *         string if not a file.
+ */
+String File::getName ( void ) 
+{
+	String temp = "";
+	
+	unsigned int i = m_path.find_last_of( F_SEPERATOR );
+	if ( i != String::npos ) 
+		temp = String( &m_path[i+1] );
 
 	return temp;
+}
+
+/**
+ * Returns the full path of the file.
+ *
+ * @return Full path as string
+ */
+String File::getAbsolutePath ( void ) 
+{
+	return m_path;
+}
+
+/**
+ * Returns a linked list of the files in 
+ * this directory. If this file is not a
+ * directory, the list will be empty
+ *
+ * @return Linked list with files.
+ */
+std::list<File> File::listFiles ( void )
+{
+	std::list<File> l;
+
+	// Can only list files for directories	
+	if ( isDirectory( ) == false )
+		return l;
+	
+	// Hack - uses global
+	g_fileList = &l;
+	//g_currentPath = "";
+	//if ( m_path.length( ) > 0 && m_path != "."  )
+		g_currentPath = m_path + F_SEPERATOR;
+	scanDirectory( (m_path + "/*").c_str( ), callback );
+	g_fileList = NULL;
+
+	return l;
 }
