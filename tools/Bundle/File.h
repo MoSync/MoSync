@@ -85,7 +85,7 @@ public:
 	 */
 	 bool isSelfOrBackRef ( void )
 	 {
-		static const char backRef[3] = { '.', '.', F_SEPERATOR };
+		static const char backRef[3] = { '.', '.', F_SEPERATOR, '\0' };
 		return m_path[m_path.length( )-1] == '.' ||
 			   m_path.find( backRef ) != String::npos;
 	 }
