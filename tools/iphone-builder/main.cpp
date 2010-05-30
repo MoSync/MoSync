@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <cstdarg>
 #include <cstring>
 #include <cstdlib>
-#include <unistd.h>
+#include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -95,34 +95,38 @@ void run ( void );
 // on failure, returns an error code, and errno will be set.
 int copyFile(const char *src, const char* dst) {
 	char buffer[1024];
-	ssize_t bytesRead, bytesWritten;
-	ssize_t bufferIndex = 0;	
-	ssize_t res = 0;
-	int fd_src, fd_dst;
+	size_t bytesRead, bytesWritten;
+	size_t bufferIndex = 0;	
+	int res = 0;
+	FILE *fd_src, *fd_dst;
 
-	fd_src = open(src, O_RDONLY);
-	if(fd_src==-1) return ERR_COPY_SRC_COULD_NOT_BE_OPENED;
-	fd_dst = open(dst, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU& (~S_IXUSR));
-	if(fd_dst==-1) return ERR_COPY_DST_COULD_NOT_BE_OPENED;
-
-
-	while(1) {
-		if((bytesRead = read(fd_src, buffer, 1024)) == -1) 
-			 { res = ERR_COPY_READ_FAILED; goto close_fds; }
-		if(bytesRead == 0) 
-			break;
-		bufferIndex = 0;
-		while(bufferIndex != bytesRead) {
-			bytesWritten = write(fd_dst, &buffer[bufferIndex], bytesRead - bufferIndex);
-			if(bytesWritten == -1) { res = ERR_COPY_WRITE_FAILED; goto close_fds; }
-			bufferIndex += bytesWritten;
-			res += bytesWritten;
-		}
+	fd_src = fopen(src, "rb");
+	if(fd_src==NULL) return ERR_COPY_SRC_COULD_NOT_BE_OPENED;
+	fd_dst = fopen(dst,"wb");
+	if(fd_dst==NULL) {
+		fclose(fd_src);
+		return ERR_COPY_DST_COULD_NOT_BE_OPENED;
 	}
 
-close_fds:
-	close(fd_src);
-	close(fd_dst);
+	int eof = 0;
+	while(!eof) {
+		if((bytesRead = fread(buffer, 1, 1024, fd_src)) != 1024) {
+			if(!feof(fd_src)) {
+				res = ERR_COPY_READ_FAILED; 
+				break;
+			} else {
+				eof = 1;
+			}
+		}
+		if((bytesWritten=fwrite(&buffer[bufferIndex], 1, bytesRead, fd_dst)) != bytesRead) {
+			res = ERR_COPY_WRITE_FAILED;
+			break;
+		}
+		res += (int)bytesWritten;
+	}
+
+	fclose(fd_src);
+	fclose(fd_dst);
 	return res;
 }
 
@@ -133,11 +137,25 @@ void copyFilesRecurse();
 
 void copyFilesCallback(const char *path) {
 	if(path[0] == '.') return;
-	const char* fn = strrchr(path, '/') + 1;
+	const char* slash = strrchr(path, '/');
+	const char *fn;
+	if(slash)
+		fn = slash + 1;
+	else fn = path;
+
+#ifdef WIN32
+	string p = sSourceDirectory.top() + string("/") + fn;
+	path = p.c_str();
+#endif
+
 	if(isDirectory(path)) {
 		sDestinationDirectory.push(sDestinationDirectory.top() + string("/") + fn);
+#ifdef WIN32
+		sSourceDirectory.push(sSourceDirectory.top() + string("/") + fn);
+#else
 		sSourceDirectory.push(path);
-			
+#endif
+
 		copyFilesRecurse();
 	} else {
 		string srcFile = path;		
