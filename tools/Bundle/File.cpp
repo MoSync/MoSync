@@ -105,11 +105,13 @@ std::list<File> File::listFiles ( void )
 	if ( isDirectory( ) == false )
 		return l;
 	
-	// Hack - uses global
+	// file-list lib is crap
 	g_fileList = &l;
-	//g_currentPath = "";
-	//if ( m_path.length( ) > 0 && m_path != "."  )
-		g_currentPath = m_path + F_SEPERATOR;
+#ifndef WIN32
+	g_currentPath = "";
+#else
+	g_currentPath = m_path + F_SEPERATOR;
+#endif	
 	scanDirectory( (m_path + "/*").c_str( ), callback );
 	g_fileList = NULL;
 
