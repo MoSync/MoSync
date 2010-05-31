@@ -165,7 +165,7 @@ static void Callback::lsReadMem() {
 		level++;
 	} while(true);
 	if(level != sFrames.size()) {
-		LOG("Warning: stack broken at level %i (%i)\n", level, sFrames.size());
+		LOG("Warning: stack broken at level %i (%"PFZT")\n", level, sFrames.size());
 	}
 	sLsCallback();
 }
@@ -370,7 +370,7 @@ void Callback::sll() {
 // select-frame
 //******************************************************************************
 void stack_select_frame(const string& args) {
-	if(sscanf(args.c_str(), "%i", &sFrameRequest) != 1) {
+	if(sscanf(args.c_str(), "%"PFZT"", &sFrameRequest) != 1) {
 		error("Not enough arg");
 		return;
 	}

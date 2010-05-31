@@ -50,7 +50,7 @@ namespace Callback {
 	static void varCreate();
 	static void varUpdate();
 	static void varEvaluateExpression();
-	static void regUpdate(const Registers& r);
+	//static void regUpdate(const Registers& r);
 
 	static void varListChildren();
 };
@@ -92,17 +92,17 @@ public:
 	}
 
 protected:
+	const int mFrameAddr;
 	std::string mExprText;
 	ExpressionTree *mExprTree;
 
-	const int mFrameAddr;
 	string mType, mValue;
 	bool mSimpleType;
 	bool mUpdated;
 	bool mIsValid;
 
-	friend static void Callback::varEECreate(const Value* value, const char *err);
-	friend static void Callback::varEEUpdate(const Value* value, const char *err);
+	friend /* static */ void Callback::varEECreate(const Value* value, const char *err);
+	friend /* static */ void Callback::varEEUpdate(const Value* value, const char *err);
 	friend struct Variable;
 };
 
@@ -540,7 +540,7 @@ void Expression::update(ExpressionCallback ecb) {
 		// variable is already created. check if any variable is out of scope in this expression. If so, set it as out of scope and skip updation.
 		map<std::string, SYM>& symbols = mExprTree->getSymbols();
 		map<std::string, SYM>::iterator i = symbols.begin();
-		for(i; i!=symbols.end(); i++) {
+		for(; i!=symbols.end(); i++) {
 			const SYM::Scope& s = i->second.scope;
 			switch(s.type) {
 				case SYM::Scope::eGlobal:

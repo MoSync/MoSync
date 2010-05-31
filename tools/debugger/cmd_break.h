@@ -55,7 +55,7 @@ static const byte BREAKPOINT_OPCODE = 55;	//warning for hardcode
 
 struct TempBreakpoint {
 	void (*callback)();	//NULL if invalid.
-	int address;
+	uint address;
 	byte orig;
 };
 

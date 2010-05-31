@@ -73,7 +73,6 @@ static void insertBpInstruction(int address, void (*cb)());
 //******************************************************************************
 namespace Callback {
 	static void insert_done();
-	static void breakpointRegs(const Registers&);
 	static void bpRestore();
 	static void bpStore();
 	static void bpDelete(BreakpointMap::iterator);

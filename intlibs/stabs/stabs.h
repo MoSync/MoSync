@@ -34,7 +34,7 @@ const StaticVariable* stabsGetVariableByAddress(int address);
 const Symbol* stabsGetSymbolByScopeAndName(int scope, const std::string& name);
 
 #ifndef WIN32
-bool iscsym(int c);
+inline int iscsym(int c) { return (isalnum(c) || ((c) == '_')); }
 #endif
 
 #endif	//STABS_H

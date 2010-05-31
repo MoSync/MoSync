@@ -61,9 +61,9 @@ public:
 	const char *getExpression();
 
 private:
-	std::map<std::string, SYM> mSymbols;
-	std::string mExpression;
 	ExpressionTreeNode* mRoot;
+	std::string mExpression;
+	std::map<std::string, SYM> mSymbols;
 };
 
 // err!=NULL on error, describing the error.

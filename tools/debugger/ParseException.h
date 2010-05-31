@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _PARSE_EXCEPTION_H_
 
 #include <exception>
+#include <string>
+#include <stdexcept> // is this available in windows?
 
 class ParseException : public std::runtime_error {
  public:

@@ -49,7 +49,7 @@ static bool sRunning = false;
 static Registers sCachedReg;
 static bool sCachedRegValid = false;
 static bool sIdle = true;
-static Functor sFunctor = { NULL, 0, false };
+static Functor sFunctor = { NULL, 0, false, "unknown", 0 };
 
 //globals
 const Registers& getReg() {
@@ -59,7 +59,7 @@ const bool isRegValid() {
 	return sCachedRegValid;
 }
 
-static void stepAck();
+//static void stepAck();
 static void getRegistersAck();
 static bool getRegistersPacket(const char* data, int len);
 static void readMemoryAck();
@@ -105,7 +105,7 @@ void StubConnection::connect(const std::string& hostname, u16 port, AckCallback 
 	if(!res)
 		return;
 
-	sFunctor.f = cb;
+	sFunctor.f = (void*)cb;
 	sFunctor.hasParam = false;
 	getRegisters();
 }
@@ -186,21 +186,21 @@ static bool asyncPacket(const char* data, int len) {
 	//todo: fix code dupes
 	if(strcmp(data, "S01") == 0) {	//breakpoint
 		sRunning = false;
-		sFunctor.f = StubConnection::breakpointHit;
+		sFunctor.f = (void*)StubConnection::breakpointHit;
 		sFunctor.hasParam = false;
 		getRegisters();
 		return true;
 	}
 	if(strcmp(data, "S02") == 0) {	//interrupt
 		sRunning = false;
-		sFunctor.f = StubConnection::interruptHit;
+		sFunctor.f = (void*)StubConnection::interruptHit;
 		sFunctor.hasParam = false;
 		getRegisters();
 		return true;
 	}
 	if(strcmp(data, "S03") == 0) {	//step
 		sRunning = false;
-		sFunctor.f = StubConnection::stepHit;
+		sFunctor.f = (void*)StubConnection::stepHit;
 		sFunctor.hasParam = false;
 		getRegisters();
 		return true;
@@ -208,7 +208,7 @@ static bool asyncPacket(const char* data, int len) {
 	if(data[0] == 'W') {	//exit
 		sRunning = false;
 		int code = strtoul(data + 1, NULL, 16);
-		sFunctor.f = StubConnection::exitHit;
+		sFunctor.f = (void*)StubConnection::exitHit;
 		sFunctor.p = code;
 		sFunctor.hasParam = true;
 		getRegisters();

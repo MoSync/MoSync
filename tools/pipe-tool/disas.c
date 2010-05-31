@@ -168,7 +168,7 @@ const char *DisasStrings[256] =
 //
 //***************************************
 
-void DisasGenReg()
+void DisasGenReg(void)
 {
 	int n, p;
 	int mask;

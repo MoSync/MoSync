@@ -20,8 +20,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <set>
 //#include <functional>
 
+#ifndef CONFIG_H
 #define CONFIG_H	//HACK
+#endif
+
+#ifndef LOGGING_ENABLED
 #define LOGGING_ENABLED
+#endif
+
 #include <helpers/helpers.h>
 #include <helpers/intutil.h>
 

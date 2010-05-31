@@ -35,11 +35,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 namespace Callback {
+/*
 	static void see();
 	static void seeSymbol(const SYM& sym);
 	static void seeAddressOf(const SYM& sym);
 	static void seeDeref(const SYM& sym);
 	static void seeSizeof(const SYM& sym);
+*/
 	static void seeReadMem();
 }
 
@@ -77,6 +79,7 @@ void stackEvaluateExpression(const std::string& expr, int frameAddr,
 }
 */
 
+/*
 void Callback::see() {
 	SeeCallback cb;
 
@@ -116,6 +119,7 @@ void Callback::see() {
 	}
 	locate_symbol(sExpr, cb);
 }
+*/
 
 static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallback cb) {
 	SYM sym;
@@ -267,6 +271,7 @@ static void Callback::seeReadMem() {
 	sSeeCallback(sSeeSym);
 }
 
+/*
 static int seePrintf(const char* fmt, ...) {
 	if(sPos >= BUFSIZE)
 		return -1;
@@ -322,3 +327,4 @@ static void Callback::seeSizeof(const SYM& sym) {
 	sprintf(valBuf, "%i", sym.type->size());
 	sEECallback("size_t", valBuf, true);
 }
+*/

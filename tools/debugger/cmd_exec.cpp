@@ -347,7 +347,7 @@ static bool setTempBreak(int address) {
 }
 
 static bool removeTempBreak(int address) {
-	_ASSERT(gTempBreakpoint.callback != NULL && gTempBreakpoint.address == address);
+	_ASSERT(gTempBreakpoint.callback != NULL && gTempBreakpoint.address == (uint)address);
 	StubConnection::writeCodeMemory(address, &gMemCs[address], 1, &Callback::opDone);
 	gTempBreakpoint.callback = NULL;
 	return false;

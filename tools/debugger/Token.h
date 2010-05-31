@@ -116,7 +116,7 @@ private:
 	bool isHex(char c);
 
 public:
-	TokenNumber::TokenNumber();
+	TokenNumber();
 	unsigned int match(const char* str);
 };
 

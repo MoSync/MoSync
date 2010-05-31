@@ -39,7 +39,7 @@ bool isBase(const TypeBase* base, const TypeBase* what, int& offset) {
 	if(base == what) return true;
 	const StructType* sbase = (const StructType*)what->resolve();
 	const std::vector<BaseClass>& bases = sbase->getBases();
-	for(int i = 0; i < bases.size(); i++) {
+	for(size_t i = 0; i < bases.size(); i++) {
 		offset = bases[i].offset;
 		bool ret = isBase(base, bases[i].type, offset);
 		if(ret) return true;
@@ -47,7 +47,7 @@ bool isBase(const TypeBase* base, const TypeBase* what, int& offset) {
 	return false;
 }
 
-#define CAST_ELEM(type, id) case Builtin::##e##id: return Value((type)a);
+#define CAST_ELEM(type, id) case Builtin::e##id: return Value((type)a);
 Value CastNode::evaluate() {
 	Value a = mChild->evaluate();
 	Value type = mType->evaluate();
@@ -107,7 +107,7 @@ ExpressionTreeNode(tree), mNumStars(numStars) {
 }
 
 TypeNode::~TypeNode() {
-	for(int i = 0; i < mPointerTypes.size(); i++) delete mPointerTypes[i];
+	for(size_t i = 0; i < mPointerTypes.size(); i++) delete mPointerTypes[i];
 }
 
 Value TypeNode::evaluate() {
@@ -117,7 +117,7 @@ Value TypeNode::evaluate() {
 TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mToken(t) {
 }
 
-#define CAST_BUILTIN(name, id) case Builtin::e##id##: v = Value(*((name*)symbol.address)); break;
+#define CAST_BUILTIN(name, id) case Builtin::e##id: v = Value(*((name*)symbol.address)); break;
 
 Value getValueFromSymbol(const SYM& symbol) {
 	if(symbol.type->type() == TypeBase::eBuiltin) {

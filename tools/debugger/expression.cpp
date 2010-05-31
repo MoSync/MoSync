@@ -723,7 +723,7 @@ bool ExpressionParser::accept(int tokenId, Token &token) {
 	if(!peekToken(token)) {
 		return false;
 	}
-	if(tokenId == token.getTokenType()) {
+	if((uint)tokenId == token.getTokenType()) {
 		nextToken(token);
 		return true;
 	} else {
