@@ -21,4 +21,19 @@ work.instance_eval do
 	@TARGETDIR = "."
 end
 
+class OpGenTask < FileTask
+	def setup
+		super
+		@prerequisites = [FileTask.new(@work, "operationsGen.rb"), FileTask.new(@work, "../../intlibs/stabs/types.rb")]
+	end
+	def execute
+		sh "ruby operationsGen.rb"
+	end
+end
+
+gen = OpGenTask.new(work, "operations_generated.h")
+gen.invoke
+gen = OpGenTask.new(work, "operations_generated.cpp")
+gen.invoke
+
 work.invoke
