@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef WIN32
 #include <conio.h>
 #include <winsock2.h>
+typedef int socklen_t;
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
