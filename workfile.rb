@@ -34,7 +34,7 @@ BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 EXAM_DIRS = ["tests/unitTest", "examples"]
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
 
-MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc"] + PIPE_DIRS
+MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc", "tools/Bundle", "tests/unitTestServer"] + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS
 
 NEWLIB_DIRS = ["libs"]

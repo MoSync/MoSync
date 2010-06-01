@@ -301,7 +301,7 @@ public:
 			conn->write(mClientData, DATA_SIZE);
 		} else {	//reply to write
 			//success?
-			assert(name, mReadBuffer[0] != 0x01);
+			assert(name, mReadBuffer[0] == 1);
 			suite->runNextCase();
 		}
 	}
@@ -369,8 +369,7 @@ public:
 
 void addConnTests(TestSuite* suite);
 void addConnTests(TestSuite* suite) {
-	//suite->addTestCase(new SingleSocketCase);
-	//suite->addTestCase(new SingleHttpGetCase);
+	suite->addTestCase(new SingleSocketCase);
 	for(int i=0; i<5; i++) {
 		suite->addTestCase(new SingleHttpPostCase(1 << i));
 	}

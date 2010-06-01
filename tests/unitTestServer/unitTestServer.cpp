@@ -35,10 +35,11 @@ void socketSizeSpinOff(SOCKET sock);
 
 #define TB(func) if(!(func)) { printf("%s failed\n", #func); return false; }
 
-void MoSyncErrorExit(int) {
+void MoSyncErrorExit(int code) {
+	exit(code);
 }
 
-bool loadData() {
+static bool loadData() {
 	int len;
 
 	Base::FileStream c("../unitTest/client_data.bin");
@@ -108,7 +109,7 @@ public:
 			}
 			printf("Connection accepted from %s:%i\n",
 				inet_ntoa(remoteAddr.sin_addr), remoteAddr.sin_port);
-			mSpinOff(servSock);
+			mSpinOff(aSock);
 		}
 	}
 };
@@ -126,9 +127,11 @@ public:
 		if(res != 1) {
 			printf("send error %i (WSA %i)\n", res, WSAGetLastError());
 		}
+		printf("reply sent.\n");
 		if(closesocket(mSock) == SOCKET_ERROR) {
 			printf("closesocket error %i\n", WSAGetLastError());
 		}
+		printf("socket closed.\n");
 	}
 };
 
@@ -144,6 +147,7 @@ public:
 		if(res != mSize) {
 			printf("send error %i (WSA %i)\n", res, WSAGetLastError());
 		}
+		printf("data sent.\n");
 	}
 };
 
@@ -168,8 +172,10 @@ public:
 				return;
 			}
 		}
+		printf("data received.\n");
 
 		bool success = memcmp(mReadBuffer, gClientData, DATA_SIZE) == 0;
+		printf("compare: %s\n", success ? "success" : "failure");
 		gThreadPool.execute(new WriteReply(mSock, success ? 1 : 0));
 	}
 };
@@ -183,8 +189,9 @@ void socketSizeSpinOff(SOCKET sock) {
 	//gThreadPool.execute(new SockSizeWrite(sock, gServerData, DATA_SIZE));
 }
 
+static void ATTRIBUTE(noreturn, closeProgram(int sn));
 
-void closeProgram(int sn) {
+static void closeProgram(int sn) {
 	printf("Signal %i\n", sn);
 	Acceptor::closeAll();
 	gThreadPool.close();
