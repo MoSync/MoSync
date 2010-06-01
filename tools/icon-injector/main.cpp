@@ -37,7 +37,7 @@ map<string, Injector*> gInjectors;
 
 void initInjectors() {
 	gInjectors["j2me"] = new JavaInjector();
-#ifdef _WIN32 // for now..
+#ifdef WIN32 // for now..
 	gInjectors["winmobile"] = new WinmobileInjector();
 #endif
 	gInjectors["more"] = new MoreInjector();

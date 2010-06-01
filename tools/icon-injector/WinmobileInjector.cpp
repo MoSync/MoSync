@@ -76,16 +76,55 @@ typedef struct
 #pragma pack( pop )
 
 
-namespace MoSync {
+namespace MoSync 
+{
+	void ErrorExit(LPTSTR lpszFunction) 
+	{ 
+		// Retrieve the system error message for the last-error code
+
+		LPVOID lpMsgBuf;
+		LPVOID lpDisplayBuf;
+		DWORD dw = GetLastError(); 
+
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dw,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR) &lpMsgBuf,
+			0, NULL );
+
+		// Display the error message and exit the process
+
+		lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+			(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
+		sprintf( (LPTSTR)lpDisplayBuf,  
+		         "%\ns failed with error %d: %s", 
+		         lpszFunction, 
+		         dw, 
+		         lpMsgBuf ); 
+		printf( "Error: %s", lpDisplayBuf ); 
+
+		LocalFree(lpMsgBuf);
+		LocalFree(lpDisplayBuf);
+		ExitProcess(dw); 
+	}
+	
+	
 	bool InjectMainIcon(const vector<ICON>& icons, const char *exeFileName)
 	{
 
 
 		HANDLE hWhere = BeginUpdateResource(exeFileName, FALSE);
+		if ( hWhere == NULL )
+			ErrorExit( "MoSync::InjectMainIcon" );
 
 
-		for(size_t i = 0; i < icons.size(); i++) {
-			UpdateResource(
+		for(size_t i = 0; i < icons.size(); i++) 
+		{
+			BOOL res = UpdateResource(
 				hWhere,                         // Handle to executable
 				RT_ICON,                        // Resource type - icon
 				MAKEINTRESOURCE(1+i),             // Make the id 1
@@ -96,6 +135,9 @@ namespace MoSync {
 				// images, the directory entries will be larger than 22 bytes)
 				icons[i].iconDir.idEntries[0].dwBytesInRes // length of buffer
 				);
+				
+			if ( res == FALSE )
+				ErrorExit( "MoSync::InjectMainIcon" );
 		}
 
 		// Again, we use this structure for educational purposes.
@@ -124,7 +166,7 @@ namespace MoSync {
 			grDirEntry++;
 		}
 
-		UpdateResource(
+		BOOL res = UpdateResource(
 			hWhere,
 			RT_GROUP_ICON,
 			// RT_GROUP_ICON resources contain information about
@@ -139,11 +181,14 @@ namespace MoSync {
 			(DWORD) dataSize
 			);
 
+		if ( res == FALSE )
+			ErrorExit( "MoSync::InjectMainIcon" );
+
 		// Perform the update, don't discard changes
-		EndUpdateResource(hWhere, FALSE);
+		if ( EndUpdateResource(hWhere, FALSE) == FALSE )
+			ErrorExit( "MoSync::InjectMainIcon" );		
 
 		delete data;
-
 		return true;
 	}
 
