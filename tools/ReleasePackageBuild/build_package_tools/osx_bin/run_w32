@@ -1,0 +1,17 @@
+#!/bin/sh
+WINE=$(which wine)
+
+#
+# Check for the wine standard OS X binary distribution
+#
+if [ -e '/Applications/Wine.app/Contents/Resources/bin/wine' ]; then
+	WINE='/Applications/Wine.app/Contents/Resources/bin/wine'
+fi
+
+# Error
+if [ "$WINE" = "" ]; then
+	echo "Could not locate wine!"
+	exit 1
+fi
+
+$WINE $*
