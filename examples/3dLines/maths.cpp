@@ -26,10 +26,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "maths.h"
 #include "madmath.h"
 
-Vector3D::Vector3D() : mX(0), mY(0), mZ(0) {
+Vector::Vector() : mX(0), mY(0), mZ(0) {
 }
 
-Vector3D::Vector3D(int x, int y, int z) : mX(x), mY(y), mZ(z) {
+Vector::Vector(int x, int y, int z) : mX(x), mY(y), mZ(z) {
 }
 
 int sinTable[TRIG_LOOKUP_SIZE];

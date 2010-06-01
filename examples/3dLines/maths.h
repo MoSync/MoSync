@@ -34,20 +34,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /**
  * Class representing a vector in 3-space.
  */
-class Vector3D {
+class Vector {
 public:
 	/**
 	 * \brief Create a vector.
 	 */
-	Vector3D();
+	Vector();
 
 	/**
-	 * \brief Create a Vector3D.
+	 * \brief Create a vector.
 	 * \param x x-coordinate.
 	 * \param y y-coordinate.
 	 * \param z z-coordinate.
 	 */
-	Vector3D(int x, int y, int z);
+	Vector(int x, int y, int z);
 
 
 	/// x-coordinate
@@ -96,12 +96,12 @@ extern int sinTable[TRIG_LOOKUP_SIZE];
 void initTrigTables();
 
 /**
- * \brief Rotate a Vector3D around the x axis.
+ * \brief Rotate a vector around the x axis.
  * \param ang The angle to rotate with.
- * \param src The source Vector3D.
- * \param dest The destination Vector3D.
+ * \param src The source vector.
+ * \param dest The destination vector.
  */
-inline void rotateX(int ang, Vector3D* src, Vector3D* dest) {
+inline void rotateX(int ang, Vector* src, Vector* dest) {
 	// x rotation
 	dest->mY = (src->mY*COS(ang) - src->mZ*SIN(ang))>>TRIG_LOOKUP_BITS;
 	dest->mZ = (src->mY*SIN(ang) + src->mZ*COS(ang))>>TRIG_LOOKUP_BITS;
@@ -109,12 +109,12 @@ inline void rotateX(int ang, Vector3D* src, Vector3D* dest) {
 }
 
 /**
- * \brief Rotate a Vector3D around the y axis.
+ * \brief Rotate a vector around the y axis.
  * \param ang The angle to rotate with.
- * \param src The source Vector3D.
- * \param dest The destination Vector3D.
+ * \param src The source vector.
+ * \param dest The destination vector.
  */
-inline void rotateY(int ang, Vector3D* src, Vector3D* dest) {
+inline void rotateY(int ang, Vector* src, Vector* dest) {
 	// y rotation
 	dest->mZ = (src->mZ*COS(ang) - src->mX*SIN(ang))>>TRIG_LOOKUP_BITS;
 	dest->mX = (src->mZ*SIN(ang) + src->mX*COS(ang))>>TRIG_LOOKUP_BITS;
@@ -122,12 +122,12 @@ inline void rotateY(int ang, Vector3D* src, Vector3D* dest) {
 }
 
 /**
- * \brief Rotate a Vector3D around the z axis.
+ * \brief Rotate a vector around the z axis.
  * \param ang The angle to rotate with.
- * \param src The source Vector3D.
- * \param dest The destination Vector3D.
+ * \param src The source vector.
+ * \param dest The destination vector.
  */
-inline void rotateZ(int ang, Vector3D* src, Vector3D* dest) {
+inline void rotateZ(int ang, Vector* src, Vector* dest) {
 	// z rotation
 	dest->mX = (src->mX*COS(ang) - src->mY*SIN(ang))>>TRIG_LOOKUP_BITS;
 	dest->mY = (src->mX*SIN(ang) + src->mY*COS(ang))>>TRIG_LOOKUP_BITS;

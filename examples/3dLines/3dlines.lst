@@ -7,11 +7,4 @@
 .res R_SPRITE
 .image "ball.png"
 
-.res RES_FONT
-.bin
-.include "font.mof"
-
-.res RES_SELECTED
-.image "backgroundtile.png"
-
 .eof
