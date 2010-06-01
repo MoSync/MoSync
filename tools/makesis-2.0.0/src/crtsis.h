@@ -25,7 +25,8 @@
 // What could possibly go wrong ?
 enum TGeneratorException
 	{
-	ErrFailedToWriteHeader,			
+	DummyMin = -100,
+	ErrFailedToWriteHeader = 0,			
 	ErrFailedToWriteLanguages,		
 	ErrFailedToWriteFilesBlock,		
 	ErrFailedToWriteDependencyBlock,

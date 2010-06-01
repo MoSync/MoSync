@@ -48,7 +48,7 @@ class CMakeSIS : public MParserObserver
 		void ShowUtilsError(TUtilsException err);
 		void ShowParseError(TParseException err);
 		void ShowCommandLineError(TCommandLineException err);
-		void ShowGeneratorError(int err);
+		void ShowGeneratorError(TGeneratorException err);
 		
 		WORD m_wLineNo;
 		BOOL m_fVerbose;

@@ -13,7 +13,7 @@
 #include <tchar.h>
 #include "parsecmd.h"
 #include "crtsis.h"
-//#include "wcstub.h"
+#include "wcstub.h"
 
 
 // ===========================================================================
@@ -153,7 +153,7 @@ void CParseCmd::SetTarget(LPCWSTR pszTarget)
 		throw ErrBadTargetFile;
 	else
 		{
-		if (_wcsicmp(&pszTarget[wcslen(pszTarget) - (wcslen(DESTFILE))], DESTFILE) != 0)
+		if (wcsicmp(&pszTarget[wcslen(pszTarget) - (wcslen(DESTFILE))], DESTFILE) != 0)
 			throw ErrBadTargetFile;
 		else
 			wcscpy(m_pszTarget, pszTarget);
@@ -169,7 +169,7 @@ void CParseCmd::SetSource(LPCWSTR pszSource)
 		throw ErrBadSourceFile;
 	else
 		{
-		if (_wcsicmp(&pszSource[wcslen(pszSource) - (wcslen(SOURCEFILE))], SOURCEFILE) != 0)
+		if (wcsicmp(&pszSource[wcslen(pszSource) - (wcslen(SOURCEFILE))], SOURCEFILE) != 0)
 			throw ErrBadSourceFile;
 		else
 			wcscpy(m_pszSource, pszSource);

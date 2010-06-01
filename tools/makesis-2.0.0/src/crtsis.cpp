@@ -755,7 +755,7 @@ void CSISFileGeneratorBase::WriteHeaderL()
 			if (pNode->file->pszDest[0]) {
 				if (iiHead.iInstallDrive==0)
 					iiHead.iInstallDrive=pNode->file->pszDest[0];
-				else if ((WCHAR)iiHead.iInstallDrive!=pNode->file->pszDest[0])
+				else if (iiHead.iInstallDrive!=pNode->file->pszDest[0])
 					iiHead.iInstallDrive = '!';
 			}
 			if (pNode->iPackageLineType==EInstPkgLineLanguageFile) {
