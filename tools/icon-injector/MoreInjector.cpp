@@ -18,11 +18,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoreInjector.h"
 #include "Icon.h"
 #include "Shared.h"
-#include <windows.h>
-#include <fcntl.h>
-#include <io.h>
-#include <stdio.h>
-#include <stdlib.h>
+//#include <fcntl.h>
+//#include <io.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
 using namespace std;
 
