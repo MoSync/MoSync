@@ -105,7 +105,6 @@ std::list<File> File::listFiles ( void )
 	if ( isDirectory( ) == false )
 		return l;
 	
-	// file-list lib is crap
 	g_fileList = &l;
 #ifndef WIN32
 	g_currentPath = "";

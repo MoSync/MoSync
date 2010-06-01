@@ -83,13 +83,13 @@ public:
 	 *
 	 * @return true/false
 	 */
-	 bool isSelfOrBackRef ( void )
-	 {
-		static const char backRef[3] = { '.', '.', F_SEPERATOR, '\0' };
+	bool isSelfOrBackRef ( void )
+	{
+		static const char backRef[4] = { '.', '.', F_SEPERATOR, '\0' };
 		return m_path[m_path.length( )-1] == '.' ||
-			   m_path.find( backRef ) != String::npos;
-	 }
-	
+			m_path.find( backRef ) != String::npos;
+	}
+
 	/**
 	 * Returns a linked list of the files in 
 	 * this directory. If this file is not a
