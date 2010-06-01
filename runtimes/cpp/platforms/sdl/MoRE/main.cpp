@@ -115,7 +115,7 @@ int main2(int argc, char **argv) {
 		LOG("%i:%s\n", i, argv[i]);
 		if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
 			static const char sInfo[] = 
-				"MoSync Runtime Environment (MoRE) © MoSync AB 2010\n"
+				"MoSync Runtime Environment (MoRE) (c) MoSync AB 2010\n"
 				"\n"
 				"  Options (Optional):\n"
 				"\n"
@@ -132,8 +132,9 @@ int main2(int argc, char **argv) {
 				"  -sld <filename:string>                 load sld-file.\n"
 				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -resmem <bytes:integer>                set resource memory limit.\n"
-				"  -gdb                                   start gdb stub.\n";
-			LOG("%s", sInfo);
+				"  -gdb                                   start gdb stub.\n"
+				"\n";
+			printf("%s", sInfo);
 			return 1;
 
 		}
