@@ -11,7 +11,7 @@
 // INCLUDES
 // ===========================================================================
 
-#include <instform.h>
+#include "../include/instform.h"
 
 #ifdef _MSC_VER
 #pragma warning( disable : 4201) 

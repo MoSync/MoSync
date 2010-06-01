@@ -11,7 +11,7 @@
 // INCLUDES
 // ===========================================================================
 
-#include <instform.h>
+#include "../include/instform.h"
 
 #include "parsepkg.h"
 #include "zlib.h"

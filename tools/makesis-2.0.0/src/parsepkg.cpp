@@ -15,7 +15,7 @@
 #include <wchar.h>
 #include <tchar.h>
 #include <errno.h>
-#include <instform.h>
+#include "../include/instform.h"
 #ifdef __SYMBIAN32__
 #include <hal_data.h>
 #endif
@@ -26,6 +26,9 @@
 #include "crtsis.h"
 #include "wcstub.h"
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4996 )
+#endif
 
 // ===========================================================================
 // CONSTANTS
@@ -1760,7 +1763,7 @@ void CParsePkg::GetNumericToken()
 	temp[i] = '\0';
 
 	/* Rewind */
-	(void)::SetFilePointer(m_file, -sizeof(tmp_char), NULL, FILE_CURRENT);
+	(void)::SetFilePointer(m_file, -(int)sizeof(tmp_char), NULL, FILE_CURRENT);
 
 	hexString = (!wcsnicmp(temp, L"0x", 2) || !wcsnicmp(&temp[1], L"0x", 2));
 	m_tokenValue.dwNumber = wcstol(temp, &end, (hexString) ? 16 : 10);

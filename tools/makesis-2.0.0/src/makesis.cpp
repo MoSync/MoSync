@@ -593,7 +593,7 @@ void CMakeSIS::DoMsg(const _TCHAR* pszText1, const _TCHAR* pszText2) const
 extern "C" {
 	int main(int argc, _TCHAR *argv[], _TCHAR *envp[])
 	{
-		if(sizeof(WCHAR) != 4) {
+		if(sizeof(WCHAR) < 2) {
 			OUT << "WCHAR error. Check your compiler\n";
 			exit(1);
 		}
