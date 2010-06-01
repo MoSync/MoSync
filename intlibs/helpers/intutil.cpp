@@ -146,7 +146,9 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 
 	return exitCode;
 #else
-#define FAIL_ERRNO LOG("Errno %i @ %s:%i\n", errno, __FILE__, __LINE__); return -2
+
+#define LOG_ERRNO LOG("Errno %i @ %s:%i\n", errno, __FILE__, __LINE__)
+#define FAIL_ERRNO LOG_ERRNO; return -2
 #define ERRNO(a) if((a) < 0) { FAIL_ERRNO; }
 	
 	LOG("execDoublePipe(%s, %"PFZT")\n", cmdline, in.size());
@@ -163,7 +165,14 @@ int execDoublePipe(const char* cmdline, const std::string& in, std::string& out)
 		if(dup2(pout[1], STDOUT_FILENO) < 0)
 			_exit(errno);
 		close(pout[0]);
-		execvp(cmdline, NULL);	//if this function returns, it has failed.
+
+		// the first argument in the argument vector should by convention be the filename.
+		char arg[1024];
+		strcpy(arg ,cmdline);
+		char *const argv[2] = {arg, NULL};
+
+		execvp(cmdline, argv);	//if this function returns, it has failed.	
+		LOG_ERRNO;
 		_exit(errno);
 	} else {	//parent
 		if(pid < 0) {	//fork failed

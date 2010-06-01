@@ -333,6 +333,8 @@ bool loadSLD(const char* filename) {
 		mangledNames += (*itr)->name;
 		mangledNames += "\n";
 	}
+
+	LOG("c++filt dir: %s\n", (mosyncDir + "/bin/c++filt").c_str());
 	int res = execDoublePipe((mosyncDir + "/bin/c++filt").c_str(), mangledNames, demangledNames);
 	if(res != 0) {
 		LOG("Error calling c++filt: %i\n", res);
