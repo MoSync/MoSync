@@ -10,7 +10,6 @@
 
 #include <wchar.h>
 #include <cstdio>
-#include <cstdlib>
 #include <iostream>
 #include "utils.h"
 #include <tchar.h>
@@ -171,7 +170,7 @@ BOOL CMakeSIS::WriteTarget()
 			DoVerbage(_T("Generating SIS installation file..."));
 		m_SISWriter.WriteSIS(m_CmdOptions.TargetFile(),stubFile);
 		}
-	catch(TGeneratorException err)
+	catch(int err)
 		{
 		ShowGeneratorError(err);
 		fResult = FALSE;
@@ -385,7 +384,7 @@ void CMakeSIS::ShowParseError(TParseException err)
 		}
 	}
 
-void CMakeSIS::ShowGeneratorError(TGeneratorException err)
+void CMakeSIS::ShowGeneratorError(int err)
 // Purpose  : Write message for any error which occured whilst generating the output SIS file (or 
 //			  stub)(to STDOUT (cout/wcout) - naturally)
 // Inputs   : err - the error ID
@@ -593,10 +592,10 @@ void CMakeSIS::DoMsg(const _TCHAR* pszText1, const _TCHAR* pszText2) const
 extern "C" {
 	int main(int argc, _TCHAR *argv[], _TCHAR *envp[])
 	{
-		if(sizeof(WCHAR) < 2) {
+		/*if(sizeof(WCHAR) != 4) {
 			OUT << "WCHAR error. Check your compiler\n";
 			exit(1);
-		}
+		}*/
 
 		CMakeSIS app;
 		return app.Run(argc, argv, envp);

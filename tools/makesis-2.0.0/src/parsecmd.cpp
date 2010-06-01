@@ -13,11 +13,7 @@
 #include <tchar.h>
 #include "parsecmd.h"
 #include "crtsis.h"
-#include "wcstub.h"
-
-#ifdef _MSC_VER
-#pragma warning( disable : 4996 )
-#endif
+//#include "wcstub.h"
 
 
 // ===========================================================================
@@ -47,7 +43,7 @@ BOOL CParseCmd::ParseCommandLine(int argc, _TCHAR *argv[])
 	// Check for options
 	while(wCount < argc)
 		{
-		if(argv[wCount][0] != '-' )
+		if(argv[wCount][0] != '-' && argv[wCount][0] != '/')
 			break;
 		else
 			{
@@ -157,7 +153,7 @@ void CParseCmd::SetTarget(LPCWSTR pszTarget)
 		throw ErrBadTargetFile;
 	else
 		{
-		if (wcsicmp(&pszTarget[wcslen(pszTarget) - (wcslen(DESTFILE))], DESTFILE) != 0)
+		if (_wcsicmp(&pszTarget[wcslen(pszTarget) - (wcslen(DESTFILE))], DESTFILE) != 0)
 			throw ErrBadTargetFile;
 		else
 			wcscpy(m_pszTarget, pszTarget);
@@ -173,7 +169,7 @@ void CParseCmd::SetSource(LPCWSTR pszSource)
 		throw ErrBadSourceFile;
 	else
 		{
-		if (wcsicmp(&pszSource[wcslen(pszSource) - (wcslen(SOURCEFILE))], SOURCEFILE) != 0)
+		if (_wcsicmp(&pszSource[wcslen(pszSource) - (wcslen(SOURCEFILE))], SOURCEFILE) != 0)
 			throw ErrBadSourceFile;
 		else
 			wcscpy(m_pszSource, pszSource);

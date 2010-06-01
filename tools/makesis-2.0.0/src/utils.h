@@ -11,7 +11,9 @@
 // INCLUDES
 // ===========================================================================
 
+#ifdef WIN32
 #include <windows.h>
+#endif
 
 enum TUtilsException
 	{ErrNotEnoughMemory	=-1,

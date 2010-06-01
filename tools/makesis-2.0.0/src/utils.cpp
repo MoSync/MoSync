@@ -226,13 +226,21 @@ LPWSTR TempFileName(LPCWSTR fileName)
 		if(index > 0)
 			fileName = &fileName[index+1];
 
-		(void)swprintf(tmpFileName, sizeof(tmpFileName), L"%s\\%s",tmpPath,fileName);
+		swprintf(tmpFileName,
+#ifndef __GNUC__
+			sizeof(tmpFileName),
+#endif
+			L"%s\\%s",tmpPath,fileName);
 		for (WORD i=0; i<10000;i++)
 			{
 			hFile = ::MakeSISOpenFile(tmpFileName, GENERIC_READ, OPEN_EXISTING);
 			if (hFile==INVALID_HANDLE_VALUE) break;
 			CloseHandle(hFile);
-			(void)swprintf(tmpFileName, sizeof(tmpFileName), L"%s\\%s%d",tmpPath,fileName,i);
+			swprintf(tmpFileName,
+#ifndef __GNUC__
+			sizeof(tmpFileName),
+#endif
+				L"%s\\%s%d",tmpPath,fileName,i);
 			}
 		/** Convert backslash to underscore for the generated filename */
 		WCHAR *tmp = &tmpFileName[0];
@@ -281,6 +289,12 @@ HANDLE MakeSISOpenFile(LPCWSTR pszFilename, DWORD dwAccessMode, DWORD dwCreateFl
 		
 	hFile = ::CreateFileA(pszMultiByte, dwAccessMode, 0, NULL,
 			      dwCreateFlags, FILE_ATTRIBUTE_NORMAL, NULL);
+
+#if 0	//Fredrik
+	if(hFile == INVALID_HANDLE_VALUE) {
+		printf("Cannot open file \"%S\"\n", pszFilename);
+	}
+#endif
 
 	return hFile;
 	}

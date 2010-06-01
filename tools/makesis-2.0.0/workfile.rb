@@ -4,7 +4,7 @@ require File.expand_path('../../rules/exe.rb')
 
 work = ExeWork.new
 work.instance_eval do
-	@SOURCES = ["src" ]
+	@SOURCES = ["src"]
 	@EXTRA_INCLUDES = ["include"]
 	@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-unreachable-code"
 	@LIBRARIES = ["z"]

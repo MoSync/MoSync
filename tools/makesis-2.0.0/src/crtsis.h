@@ -11,7 +11,7 @@
 // INCLUDES
 // ===========================================================================
 
-#include "../include/instform.h"
+#include <instform.h>
 
 #include "parsepkg.h"
 #include "zlib.h"
@@ -25,8 +25,7 @@
 // What could possibly go wrong ?
 enum TGeneratorException
 	{
-	DummyMin = -100,
-	ErrFailedToWriteHeader = 0,			
+	ErrFailedToWriteHeader,			
 	ErrFailedToWriteLanguages,		
 	ErrFailedToWriteFilesBlock,		
 	ErrFailedToWriteDependencyBlock,

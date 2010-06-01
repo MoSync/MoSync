@@ -15,7 +15,7 @@
 #include <wchar.h>
 #include <tchar.h>
 #include <errno.h>
-#include "../include/instform.h"
+#include <instform.h>
 #ifdef __SYMBIAN32__
 #include <hal_data.h>
 #endif
@@ -24,11 +24,8 @@
 #include "parsepkg.h"
 #include "parsecmd.h"
 #include "crtsis.h"
-#include "wcstub.h"
+//#include "wcstub.h"
 
-#ifdef _MSC_VER
-#pragma warning( disable : 4996 )
-#endif
 
 // ===========================================================================
 // CONSTANTS
@@ -508,7 +505,7 @@ void CParsePkg::ParseLanguagesL()
 			WORD wLoop;
 			for(wLoop = 0; wLoop < NUMLANGOPTIONS; wLoop++)
 				{
-				if(!wcsicmp(m_tokenValue.pszString, KLangOptions[wLoop].pszOpt))
+				if(!_wcsicmp(m_tokenValue.pszString, KLangOptions[wLoop].pszOpt))
 					{ // found match
 					LANGNODE *pNode = new LANGNODE;
 					if (!pNode) throw ErrNotEnoughMemory;
@@ -806,7 +803,7 @@ void CParsePkg::ParsePackageL()
 		}
 	
 	// Test that the filename is *.SIS
-	if(wcsicmp(&pNode->file->pszSource[wcslen(pNode->file->pszSource) - wcslen(DESTFILE)], DESTFILE))
+	if(_wcsicmp(&pNode->file->pszSource[wcslen(pNode->file->pszSource) - wcslen(DESTFILE)], DESTFILE))
 		throw ErrPackageNotASISFile;
 	
 	pNode->file->pszDest[0] = '\0';
@@ -1395,7 +1392,7 @@ PKGLINECONDITION* CParsePkg::ParseFactor()
 					{
 						expr->exprType=EInstCondPrimTypeVariable;
 						// check if it is "option1", "option2",...
-						if(!wcsnicmp(m_tokenValue.pszString, L"option",6))
+						if(!_wcsnicmp(m_tokenValue.pszString, L"option",6))
 							{
 							LPWSTR temp,end;
 							temp=&m_tokenValue.pszString[6];
@@ -1411,7 +1408,7 @@ PKGLINECONDITION* CParsePkg::ParseFactor()
 							WORD wLoop;
 							for(wLoop = 0; wLoop < NUMVAROPTIONS; wLoop++)
 								{
-								if(!wcsicmp(m_tokenValue.pszString, KVariableLookupTable[wLoop].pszOpt))
+								if(!_wcsicmp(m_tokenValue.pszString, KVariableLookupTable[wLoop].pszOpt))
 									{ // found match
 									expr->pPrim->dwNumber = (WORD)KVariableLookupTable[wLoop].dwOpt;
 									break;
@@ -1445,7 +1442,7 @@ DWORD CParsePkg::ParseOption(const SParseOpt* options, DWORD dwNumOptions, DWORD
 	WORD wLoop;
 	for(wLoop = 0; wLoop < dwNumOptions; wLoop++)
 		{
-		if(wcsicmp(m_tokenValue.pszString, options[wLoop].pszOpt) == 0)
+		if(_wcsicmp(m_tokenValue.pszString, options[wLoop].pszOpt) == 0)
 			{
 			option=options[wLoop].dwOpt;
 			break;
@@ -1548,7 +1545,7 @@ void CParsePkg::GetNextToken()
 		// check if it is a keyword
 		for(WORD wLoop = 0; wLoop < NUMPARSETOKENS; wLoop++)
 			{
-			if(wcsicmp(m_tokenValue.pszString, KTokens[wLoop].pszOpt) == 0)
+			if(_wcsicmp(m_tokenValue.pszString, KTokens[wLoop].pszOpt) == 0)
 				{
 				m_token=KTokens[wLoop].dwOpt;
 				break;
@@ -1765,7 +1762,7 @@ void CParsePkg::GetNumericToken()
 	/* Rewind */
 	(void)::SetFilePointer(m_file, -(int)sizeof(tmp_char), NULL, FILE_CURRENT);
 
-	hexString = (!wcsnicmp(temp, L"0x", 2) || !wcsnicmp(&temp[1], L"0x", 2));
+	hexString = (!_wcsnicmp(temp, L"0x", 2) || !_wcsnicmp(&temp[1], L"0x", 2));
 	m_tokenValue.dwNumber = wcstol(temp, &end, (hexString) ? 16 : 10);
 
 	if (end==temp) throw ErrReadFailed;
