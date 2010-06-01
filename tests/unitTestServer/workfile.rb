@@ -28,8 +28,9 @@ work.instance_eval do
 		#@EXTRA_SOURCEFILES << '../../runtimes/cpp/base/thread/mutexfactory.cpp'
 	elsif(HOST == :darwin)
 		@LIBRARIES = common_libraries
-		@EXTRA_SOURCEFILES << '../../runtimes/cpp/platforms/sdl/thread/mutexsdl.cpp'
-		@EXTRA_SOURCEFILES << '../../runtimes/cpp/base/thread/mutex.cpp'
+		#@EXTRA_SOURCEFILES << '../../runtimes/cpp/platforms/sdl/thread/mutexsdl.cpp'
+		@EXTRA_SOURCEFILES << '../../runtimes/cpp/platforms/sdl/mutexImpl.cpp'
+		#@EXTRA_SOURCEFILES << '../../runtimes/cpp/base/thread/mutex.cpp'
 	else
 		error 'Unsupported platform'
 	end

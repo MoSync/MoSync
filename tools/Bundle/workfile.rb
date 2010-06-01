@@ -6,7 +6,7 @@ work = MoSyncExe.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@LOCAL_LIBS = ["filelist"]
-	@EXTRA_CPPFLAGS = " -Wno-missing-declarations "
+	@EXTRA_CFLAGS = " -Wno-missing-declarations "
 	@NAME = "Bundle"
 	@TARGETDIR = "."
 end

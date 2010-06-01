@@ -30,6 +30,8 @@ module NativeMoSyncWork
 			custom_lib_dir = bd+"/tools/ReleasePackageBuild/build_package_tools/lib/"
 			need(:@CUSTOM_LIBS)
 			@CUSTOM_LIBS.each { |cl| @EXTRA_LINKFLAGS += " " + custom_lib_dir + cl }
+		elsif(HOST == :darwin) 
+			@EXTRA_INCLUDES += ["/sw/include", "/opt/local/include"]	
 		end
 		@EXTRA_INCLUDES += [bd+"/intlibs", bd+"/libs"]
 		@EXTRA_CFLAGS += " -D_POSIX_SOURCE"	#avoid silly bsd functions
