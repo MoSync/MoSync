@@ -163,6 +163,9 @@ class BuildWork < Work
 		#puts "BuildWork.setup: #{@NAME.inspect}"
 		set_defaults
 		@prerequisites << DirTask.new(self, @BUILDDIR)
+		if(@TARGETDIR)
+			@prerequisites << DirTask.new(self, @TARGETDIR)
+		end
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)

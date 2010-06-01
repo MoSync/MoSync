@@ -603,6 +603,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\mutexImpl.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\netImpl.cpp"
 			>
 		</File>
