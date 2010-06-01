@@ -22,26 +22,32 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NETWORKING_H
 #include "networking.h"
 
-#include "Syscall.h"
-
-#include "fastevents.h"
-#include "sdl_syscall.h"
-
 //***************************************************************************
-//Helpers
+//MoSyncMutex
 //***************************************************************************
 
-void ConnWaitEvent() {
-	if(FE_WaitEvent(NULL) != 1) {
-		LOGT("FE_WaitEvent failed");
-		DEBIG_PHAT_ERROR;
+MoSyncMutex::MoSyncMutex() : mMutex(NULL) {}
+
+void MoSyncMutex::init() {
+	mMutex = SDL_CreateMutex();
+	MYASSERT(mMutex, ERR_OOM);
+}
+
+MoSyncMutex::~MoSyncMutex() {
+	DEBUG_ASSERT(mMutex == NULL);	//make sure it's closed
+}
+
+void MoSyncMutex::close() {
+	if(mMutex) {
+		SDL_DestroyMutex(mMutex);
+		mMutex = NULL;
 	}
 }
-void ConnPushEvent(MAEvent* ep) {
-	SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
-	FE_PushEvent((SDL_Event*)&event);
+
+void MoSyncMutex::lock() {
+	DEBUG_ASRTZERO(SDL_mutexP(mMutex));
 }
-void DefluxBinPushEvent(MAHandle handle, Stream& s) {
-	SDL_UserEvent event = { FE_DEFLUX_BINARY, handle, &s, NULL };
-	FE_PushEvent((SDL_Event*)&event);
+
+void MoSyncMutex::unlock() {
+	DEBUG_ASRTZERO(SDL_mutexV(mMutex));
 }

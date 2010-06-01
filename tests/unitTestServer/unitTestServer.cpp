@@ -18,13 +18,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //listen. use a thread pool.
 
 #include <stdio.h>
-#include <conio.h>
-#include <winsock2.h>
 #include <vector>
 #include <ThreadPool.h>
 #include <FileStream.h>
 #include <bluetooth/server.h>
-#include "..\unitTest\conn_common.h"
+#include "../unitTest/conn_common.h"
+
+#ifdef WIN32
+#include <conio.h>
+#include <winsock2.h>
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+typedef int SOCKET;
+typedef sockaddr SOCKADDR;
+#define closesocket close
+//#define IPPROTO_TCP 0
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+static int WSAGetLastError(void) {
+	return errno;
+}
+#endif
 
 ThreadPool gThreadPool;
 char gServerData[DATA_SIZE];
@@ -64,6 +80,7 @@ public:
 
 	static void closeAll() {
 		for(size_t i=0; i<mSockets.size(); i++) {
+			printf("closing socket %i\n", mSockets[i]);
 			closesocket(mSockets[i]);
 		}
 	}
@@ -100,7 +117,7 @@ public:
 		printf("Waiting...\n");
 		while(true) {
 			sockaddr_in remoteAddr;
-			int addrLen = sizeof(remoteAddr);
+			socklen_t addrLen = sizeof(remoteAddr);
 			SOCKET aSock = accept(servSock, (SOCKADDR*)&remoteAddr, &addrLen);
 			if(aSock == INVALID_SOCKET) {
 				printf("accept error %i.\n", WSAGetLastError());
@@ -212,11 +229,13 @@ int main() {
 	//gThreadPool.execute(new Acceptor(SOCKET_SIZE_PORT, socketSizeSpinOff));
 
 	while(true) {
-		int ch = _getch();
+		int ch = getchar();
 		printf("ch %i\n", ch);
 		if(ch == '0' || ch == 3) {
 			closeProgram(0);
 		}
+		if(ch < 0)
+			closeProgram(ch);
 	}
 	return 0;
 }
