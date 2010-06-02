@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -36,11 +36,25 @@ namespace Base {
 		strcat(temp, filename);
 		file = fopen(temp, "rb");
 */
+		__android_log_write(ANDROID_LOG_INFO, "FileStream cosntructor", "1");
+
+		if(filename == 0)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "FileStream cosntructor", "no filename given!");
+			return;
+		}	
+
+		__android_log_write(ANDROID_LOG_INFO, "FileStream cosntructor", "2");
+		
 		file = fopen(filename, "rb");
+		
+		if(file == NULL)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "3");
+		}
+		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "4");
 	}
-
-
-
+	
 	bool FileStream::isOpen() const {
 		return file != NULL;
 	}
@@ -93,10 +107,14 @@ namespace Base {
 	LimitedFileStream::LimitedFileStream(const char* filename, int offset, int len)
 		: FileStream(filename), mStartPos(offset), mEndPos(offset + len)
 	{
+		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "1");
 		if(!_open()) {
+			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "2");
 			fclose(file);
+			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "3");
 			file = NULL;
 		}
+		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream cosntructor", "3");
 	}
 
 	//******************************************************************************

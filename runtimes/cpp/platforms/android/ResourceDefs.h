@@ -19,13 +19,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _RESOURCE_DEFS_H_
 
 #include "base/Stream.h"
-#include "Image.h"
+#include "image.h"
+
+// On android all images are stored and used on the Dalvik side
 
 #define TYPES(m)\
 	m(RT_BINARY, Base::Stream, delete)\
 	m(RT_PLACEHOLDER, void, NUL)\
 	m(RT_LABEL, Label, delete) \
-	m(RT_IMAGE, Image, delete)\
+	m(RT_IMAGE, int, delete)\
 	m(RT_FLUX, void, NUL)\
 
 #endif // _RESOURCE_DEFS_H_

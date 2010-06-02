@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 Mobile Sorcery AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Core {
 	class VMCore;
 }
-//extern Core::VMCore* gCore;
-//extern bool gRunning;
+extern Core::VMCore* gCore;
+extern bool gRunning;
 
 #endif
