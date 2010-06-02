@@ -31,6 +31,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #endif
 
+#ifdef _android
+#include <jni.h>
+#endif
+
 #include <hashmap/hashmap.h>
 
 #include <helpers/CPP_IX_STREAMING.h>
@@ -48,7 +52,12 @@ namespace Base {
 		void init();
 		virtual ~Syscall();
 		void platformDestruct();
-
+/*
+#ifdef _android
+		extern JNIEnv* mJNIEnv;
+		extern jobject mJThis;
+#endif
+*/
 #ifdef SYMBIAN
 #define SPECIAL(name) name
 #define SYSCALL(type, nargs) type nargs

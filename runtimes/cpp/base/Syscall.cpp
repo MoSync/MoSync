@@ -32,13 +32,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <windows.h>
 #endif	//WIN32
 
+#ifdef _android
+#include <android/log.h>
+#endif
+
 #ifdef _WIN32_WCE
 #include <windows.h>
 #include "wce_helpers.h"
 #include "wce_errors.h"
 #endif	//_WIN32_WCE
 
-#if !defined(SYMBIAN)
+#if !defined(SYMBIAN) && !defined(_android)
 #include <vector>
 #include "helpers/mkdir.h"
 #endif	//_WIN32_WCE
@@ -66,7 +70,7 @@ namespace Base {
 	}
 #endif	//RESOURCE_MEMORY_LIMIT
 
-#if !defined(SYMBIAN)
+#if !defined(SYMBIAN) && !defined(_android)
 	struct FileList {
 		std::vector<std::string> files;
 		size_t pos;
@@ -135,7 +139,12 @@ namespace Base {
 			switch(type) {
 			case RT_BINARY:
 				{
+#ifndef _android
 					MemStream* ms = new MemStream(size);
+#else
+					char* b = loadBinary(rI, size);
+					MemStream* ms = new MemStream(b, size);
+#endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
 				}
@@ -145,8 +154,15 @@ namespace Base {
 					int pos;			
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
+					
+#ifndef _android
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
+#else
+					// This will need to be changed because of how resources are loaded in the Android JNI runtime
+					ROOM(resources.dadd_RT_BINARY(rI,
+						new LimitedFileStream(aFilename, pos, size)));
+#endif
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;
@@ -157,7 +173,14 @@ namespace Base {
 				{
 					MemStream b(size);
 					TEST(file.readFully(b));
+#ifndef _android
 					ROOM(resources.dadd_RT_IMAGE(rI, loadImage(b)));
+#else
+					ROOM(resources.dadd_RT_IMAGE(rI, NULL));
+					int pos;
+					file.tell(pos);
+					loadImage(rI, pos-size, size);
+#endif
 				}
 				break;
 			case RT_SPRITE:
@@ -169,8 +192,10 @@ namespace Base {
 					DAR_USHORT(height);
 					DAR_SHORT(cx);
 					DAR_SHORT(cy);
+#ifndef _android
 					ROOM(resources.dadd_RT_IMAGE(rI, loadSprite(resources.get_RT_IMAGE(indexSource),
 						left, top, width, height, cx, cy)));
+#endif
 				}
 				break;	
 			case RT_LABEL:
@@ -385,7 +410,7 @@ namespace Base {
 		MYASSERT(dst->write(src, a->size), ERR_DATA_OOB);
 	}
 
-
+#if !defined(_android)
 #ifdef SYMBIAN
 #else
 #define STORE_PATH "stores/"
@@ -531,7 +556,7 @@ namespace Base {
 		}
 		SYSCALL_THIS->gStores.erase(store);
 	}
-
+#endif // _android
 
 	SYSCALL(int, maLoadResources(MAHandle data)) {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
@@ -562,11 +587,13 @@ namespace Base {
 			LOG("IDL version match!\n");
 		} else {
 			LOG("IDL version mismatch: runtime 0x%08x != user 0x%08x\n", MAIDL_HASH, hash);
+
 			BIG_PHAT_ERROR(ERR_IDL_VERSION);
 		}
 		return MAIDL_HASH;
 	}
 
+#if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
 		char* vmName = dst->name;
 		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
@@ -881,6 +908,7 @@ namespace Base {
 		return 0;
 	}
 #endif	//SYMBIAN
+#endif //_android
 
 #ifdef SYMBIAN
 #if 0

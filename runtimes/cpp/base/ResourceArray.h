@@ -224,7 +224,12 @@ namespace Base {
 			}
 
 			if(o == NULL && (type != RT_PLACEHOLDER && type != RT_FLUX)) {
+#ifdef _android
+				// On Android JNI RT_IMAGE is stored on the Java side
+				if(type != RT_IMAGE) DEBIG_PHAT_ERROR;
+#else
 				DEBIG_PHAT_ERROR;
+#endif
 			}
 
 			if(res[index] != NULL || types[index] != RT_PLACEHOLDER) {
@@ -244,7 +249,6 @@ namespace Base {
 				return RES_OUT_OF_MEMORY;
 			}
 #endif	//RESOURCE_MEMORY_LIMIT
-
 			res[index] = o;
 			types[index] = type;
 			return RES_OK;
