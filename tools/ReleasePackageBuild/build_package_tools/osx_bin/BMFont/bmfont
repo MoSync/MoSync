@@ -9,8 +9,9 @@ else
 	script=$0
 fi
 
-cd $script_dir/../
-./run_w32 Z:$(echo $script|sed s/\\//\\\\/g).exe $*
+cd $script_dir
+../run_w32 cmd /c "set PATH=%PATH%;.."
+../run_w32 Z:$(echo $script|sed s/\\//\\\\/g).exe $*
 cd $curr_dir
 
 
