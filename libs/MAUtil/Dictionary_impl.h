@@ -147,6 +147,11 @@ bool MAUtil::Dictionary<Key, Storage>::erase(const Key& key) {
 }
 
 template<class Key, class Storage>
+void MAUtil::Dictionary<Key, Storage>::erase(Iterator itr) {
+	dict_delete_free(&mDict, itr.mNode);
+}
+
+template<class Key, class Storage>
 typename MAUtil::Dictionary<Key, Storage>::Iterator
 MAUtil::Dictionary<Key, Storage>::find(const Key& key) {
 	Iterator itr(&mDict);
