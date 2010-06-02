@@ -14,5 +14,4 @@ if [ "$WINE" = "" ]; then
 	exit 1
 fi
 
-export DISPLAY=""
 $WINE $* 2>/dev/null

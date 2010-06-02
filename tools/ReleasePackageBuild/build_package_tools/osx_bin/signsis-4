@@ -1,2 +1,3 @@
 #!/bin/sh
+export DISPLAY=""
 ./run_w32 Z:$(echo $0|sed s/\\//\\\\/g).exe $* 
