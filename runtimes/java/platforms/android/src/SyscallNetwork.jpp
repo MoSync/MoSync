@@ -590,7 +590,7 @@ class HttpConnectionRunner implements Runnable
 				else if(result == -1) {
 					opResult = CONNERR_CLOSED;
 				} else {
-					DEBUG_ALWAYS("Weird-ass ConnRead error "+result+"!\n");
+					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
 					opResult = CONNERR_INTERNAL;
 				}
 				
@@ -689,7 +689,7 @@ class SocketConnectionRunner implements Runnable
 				else if(result == -1) {
 					opResult = CONNERR_CLOSED;
 				} else {
-					DEBUG_ALWAYS("Weird-ass ConnRead error "+result+"!\n");
+					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
 					opResult = CONNERR_INTERNAL;
 				}
 				
