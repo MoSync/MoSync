@@ -49,8 +49,11 @@ int RenderMain ( void )
 		MAEvent e;
 		while ( maGetEvent( &e ) )
 		{
-			if ( e.type == EVENT_TYPE_CLOSE )
+			if ( e.type == EVENT_TYPE_CLOSE ||
+				 e.type == EVENT_TYPE_KEY_PRESSED ||
+				 e.type == EVENT_TYPE_POINTER_PRESSED )
 				maExit(0);
+
 			else if ( e.type == EVENT_TYPE_KEY_PRESSED )
 			{
 				if ( e.key == MAK_LEFT )
