@@ -156,6 +156,7 @@ RELEVANT_DEFINES = {
 	:wm6pro => [],
 	:moblin => [],
 	:android => [],
+	:iPhone => [],
 }
 
 CAP_TYPES = {
@@ -191,6 +192,7 @@ runtimes = {
 	:JavaME => [],
 	:moblin => [],
 	:android => [],
+	:iPhone => [],
 }
 
 
@@ -270,6 +272,11 @@ if(File.exist?(DB_FILENAME))
 	#puts DB_FILENAME + ": " + File.mtime(DB_FILENAME).to_s
 	#puts SQL_FILENAME + ": " + File.mtime(SQL_FILENAME).to_s
 	REBUILD_DATABASE = File.mtime(DB_FILENAME) < File.mtime(SQL_FILENAME)
+	if(REBUILD_DATABASE)
+		puts "Database is out of date."
+	else
+		puts "Database is up to date."
+	end
 else
 	REBUILD_DATABASE = true
 end
@@ -380,6 +387,9 @@ DEVICE.each_with_index do |device, index|
 		profile.puts "#define MA_PROF_STRING_PLATFORM_#{device.platformversion.platform.to_s.upcase}"
 		profile.puts "#define MA_PROF_VENDOR_#{vendor.to_s.format}"
 		profile.puts "#define MA_PROF_DEVICE_#{device.name.to_s.format}"
+		if(device.platformversion.platform == :iPhone)
+			profile.puts "#define MA_PROF_OUTPUT_CPP"
+		end
 		profile.puts
 		RELEVANT_CAPS.each do |cap|
 			if(device.caps.has_key?(cap))
