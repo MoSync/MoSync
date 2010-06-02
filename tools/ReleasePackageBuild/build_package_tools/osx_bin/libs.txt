@@ -1,0 +1,27 @@
+Libs to include in $MOSYNCDIR/bin
+
+!! These are symbolic links which are followed by cp but not by the Finder !!
+
+/sw/lib/libFLAC.8.dylib
+/sw/lib/libSDL-1.2.0.dylib
+/sw/lib/libSDL_image-1.2.0.dylib
+/sw/lib/libSDL_sound-1.0.1.dylib
+/sw/lib/libSDL_ttf-2.0.0.dylib
+/sw/lib/libexpat.1.dylib
+/opt/lib/libfreeimage.3.dylib
+/sw/lib/libfreetype.6.dylib
+/sw/lib/libjpeg.62.dylib
+/sw/lib/libmikmod.3.dylib
+/sw/lib/libmodplug.0.dylib
+/sw/lib/libogg.0.dylib
+/sw/lib/libpng12.0.dylib
+/sw/lib/libsmpeg-0.4.0.dylib
+/sw/lib/libspeex.1.dylib
+/sw/lib/libtiff.3.dylib
+/sw/lib/libvorbis.0.dylib
+/sw/lib/libvorbisfile.3.dylib
+
+Copy cc1 and cc1plus to $MOSYNCDIR/libexec/gcc/mapip/3.4.6
+
+Copy msvcp71.dll to $MOSYNCDIR/bin/BMFont
+
