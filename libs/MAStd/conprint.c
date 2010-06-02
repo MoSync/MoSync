@@ -93,8 +93,8 @@ void InitConsole(void)
 
 	//sConsole.fontHeight = EXTENT_Y(maGetTextSize("gl"));
 	
-	// this is even more safe:
-	for(i = 0; i < 127; i++) string[i] = i + 32;
+	// this is actually even more safe:
+	for(i = 0; i < 95; i++) string[i] = i + 32;
 	string[127] = 0;
 	sConsole.fontHeight = EXTENT_Y(maGetTextSize(string));
 
