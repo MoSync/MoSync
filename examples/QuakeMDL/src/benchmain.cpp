@@ -15,7 +15,7 @@
 #include "MAHeaders.h"
 
 #define BENCH_PASSES	3
-#define FRAMES_PASS		1000
+#define FRAMES_PASS		100
 
 
 int BenchMain ( void )
@@ -91,6 +91,20 @@ int BenchMain ( void )
 				break;
 		}
 
+		//
+		// Handle input
+		//
+		while ( true )
+		{
+			MAEvent e;
+			while ( maGetEvent( &e ) )
+			{
+				if ( e.type == EVENT_TYPE_CLOSE ||
+					 e.type == EVENT_TYPE_KEY_PRESSED ||
+					 e.type == EVENT_TYPE_POINTER_PRESSED )
+					maExit( 0 );
+			}
+		}
 		// Calculate average fps for pass
 		tmrEnd  = maGetMilliSecondCount( );
 		int denom = (tmrEnd-tmrIni);
@@ -106,18 +120,7 @@ int BenchMain ( void )
 	printf( "-------------\n\n" );
 	printf( ".\n" );
 
-	//
-	// Handle input
-	//
-	while ( true )
-	{
-		MAEvent e;
-		while ( maGetEvent( &e ) )
-		{
-			if ( e.type == EVENT_TYPE_CLOSE )
-				maExit(0);
-		}
-	}
+	maWait( 0 );
 
 	return 0;
 }
