@@ -156,7 +156,7 @@ RELEVANT_DEFINES = {
 	:wm6pro => [],
 	:moblin => [],
 	:android => [],
-	:iPhone => [],
+	:iphoneos => [],
 }
 
 CAP_TYPES = {
@@ -192,7 +192,7 @@ runtimes = {
 	:JavaME => [],
 	:moblin => [],
 	:android => [],
-	:iPhone => [],
+	:iphoneos => [],
 }
 
 
@@ -387,7 +387,7 @@ DEVICE.each_with_index do |device, index|
 		profile.puts "#define MA_PROF_STRING_PLATFORM_#{device.platformversion.platform.to_s.upcase}"
 		profile.puts "#define MA_PROF_VENDOR_#{vendor.to_s.format}"
 		profile.puts "#define MA_PROF_DEVICE_#{device.name.to_s.format}"
-		if(device.platformversion.platform == :iPhone)
+		if(device.platformversion.platform == :iphoneos)
 			profile.puts "#define MA_PROF_OUTPUT_CPP"
 		end
 		profile.puts

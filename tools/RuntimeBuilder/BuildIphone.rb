@@ -17,7 +17,7 @@
 require 'fileutils'
 
 class RuntimeBuilder 
-	def iphone(runtime_dir, mode)
+	def iphoneos(runtime_dir, mode)
 		puts "todo: copy files from some predefined place"
 		return 0
 	end

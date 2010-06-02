@@ -75,7 +75,7 @@ INSERT INTO 'platformversion' VALUES (3, '', 3);
 INSERT INTO 'device' VALUES (3, 'OT-800A', 2, 3);
 INSERT INTO 'device' VALUES (4, 'One Touch 735i', 2, 3);
 INSERT INTO 'device' VALUES (5, 'One Touch 756', 2, 3);
-INSERT INTO 'platform' VALUES (4, 'iPhone');
+INSERT INTO 'platform' VALUES (4, 'iphoneos');
 INSERT INTO 'platformversion' VALUES (4, '', 4);
 INSERT INTO 'device' VALUES (6, 'iPad', 3, 4);
 INSERT INTO 'device' VALUES (7, 'iPhone', 3, 4);
