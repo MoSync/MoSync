@@ -45,7 +45,7 @@ out_dir = "AndroidProject/src/com/mosync/java/android/"
 
 # Preprocess all the jpp files and create java files from them
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "MoSyncService.jpp" || x == "MoSyncThread.jpp" )
+	if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" )
 		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
 	end
 }

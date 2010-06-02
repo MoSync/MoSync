@@ -1,0 +1,721 @@
+/* Copyright (C) 2010 MoSync AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#include "helpers.h"
+#include "config_platform.h"
+#include "generated\MAAPI_consts.h"
+
+//#define SYSLOG(a) Log.i("Dalvik Syscalls", a);
+#define SYSLOG(...)
+
+final class ImageCache {
+	Bitmap mBitmap;
+	Canvas mCanvas;
+
+	ImageCache(Canvas canvas, Bitmap bitmap)
+	{
+		mCanvas = canvas;
+		mBitmap = bitmap;
+	}
+}
+
+
+ByteBuffer mMemDataSection;
+ByteBuffer mResourceFile;
+
+Canvas mCanvas;
+Bitmap mBitmap;
+
+int mWidth;
+int mHeight;
+
+int mClipLeft, mClipTop, mClipWidth, mClipHeight;
+
+boolean mUsingFrameBuffer;
+
+ImageCache mDrawTargetScreen = null;
+ImageCache mDrawTarget = null;
+int mDrawTargetHandle = 0;
+
+Paint mPaint = new Paint();
+Paint mBlitPaint = new Paint();
+
+boolean initSyscalls()
+{
+	SYSLOG("initSyscalls");
+	 mUsingFrameBuffer = false;
+
+	 mClipLeft = 0;
+	 mClipTop = 0;
+	 mClipWidth = mWidth;
+	 mClipHeight = mHeight;
+
+	 mPaint.setStyle(Paint.Style.FILL);
+	 mPaint.setAntiAlias(false);
+	 mPaint.setColor(0xffffffff);
+	 mBlitPaint.setAntiAlias(false);
+	 mBlitPaint.setColor(0xffffffff);
+
+	 return true;
+}
+
+int maSetColor(int rgb)
+{
+	SYSLOG("maSetColor");
+
+	int t = mPaint.getColor();
+	mPaint.setColor(rgb);
+	mPaint.setAlpha(255);
+	return t;
+}
+
+void maSetClipRect(int left, int top, int width, int height)
+{
+	SYSLOG("maSetClipRect");
+
+	mClipLeft = left;
+	mClipTop = top;
+	mClipWidth = width;
+	mClipHeight = height;
+
+	mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE );
+}
+
+void maPlot(int posX, int posY)
+{
+	SYSLOG("maPlot");
+
+	mCanvas.drawPoint(posX, posY, mPaint);
+}
+
+void maLine(int startX, int startY, int endX, int endY)
+{
+	SYSLOG("maLine");
+
+	mCanvas.drawLine(startX, startY, endX, endY, mPaint);
+}
+
+void maFillRect(int left, int top, int width, int height)
+{
+	SYSLOG("maFillRect");
+
+	mCanvas.drawRect(left, top, left+width, top+height, mPaint);
+}
+
+void maFillTriangleStrip(int address, int count)
+{
+	SYSLOG("maFillTriangleStrip - NOT IMPLEMENTED");
+}
+
+void maFillTriangleFan(int address, int count)
+{
+	SYSLOG("maFillTriangleFan");
+}
+
+Rect mTextSizeRect = new Rect();
+int maGetTextSize(final String str)
+{
+	SYSLOG("maTextSizeRect");
+	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
+	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+}
+
+int maGetTextSizeW(final String str)
+{
+	SYSLOG("maGetTextSizeW");
+	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
+	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+}
+
+void maDrawText(int left, int top, final String str)
+{
+	SYSLOG("maDrawText");
+	MAExtent e = maGetTextSize(str);
+	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
+}
+
+void maDrawTextW(int left, int top, final String str)
+{
+ 	SYSLOG("maDrawTextW");
+	MAExtent e = maGetTextSize(str);
+	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
+}
+
+void maUpdateScreen()
+{
+	SYSLOG("maUpdateScreen");
+	Canvas lockedCanvas = null;
+
+	if(mMoSyncView == null) return;
+
+	//Rect r = mMoSyncView.mSurfaceHolder.getSurfaceFrame();
+
+	try {
+		lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
+		synchronized (mMoSyncView.mSurfaceHolder)
+		{
+			if(mUsingFrameBuffer)
+			{
+				Log.i("update","framebuffer");
+
+			}
+			else
+			{
+				if(null != lockedCanvas)
+				{
+					lockedCanvas.drawBitmap(mBitmap, 0, 0, mBlitPaint);
+				}
+			}
+		}
+	} finally {
+		if (lockedCanvas != null)
+		mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	}
+}
+
+void maResetBacklight()
+{
+	SYSLOG("maResetBacklight");
+}
+
+int maGetScrSize()
+{
+	SYSLOG("maGetScrSize");
+	return EXTENT(mWidth, mHeight);
+}
+
+void maDrawImage(int image, int left, int top)
+{
+	SYSLOG("maDrawImage");
+	
+	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
+	if(imageResource == null)
+	{
+		return;
+	}
+
+	mCanvas.drawBitmap(imageResource.mBitmap, left, top, mPaint);
+}
+
+void maDrawRGB(int dstPoint, int src, int srcRect, int scanlength)
+{
+	SYSLOG("maDrawRGB");
+}
+
+private Bitmap mTempBitmap;
+private Matrix mTempMatrix = new Matrix();
+
+void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int dstLeft, int dstTop, int transformMode)
+{
+	SYSLOG("maDrawImageRegion");
+
+	ImageCache imageResource = (ImageCache)mImageResources.get(image);
+	if(imageResource == null)
+	{
+		;
+		return;
+	}
+
+	final int imgHeight = imageResource.mBitmap.getHeight();
+	if(srcRectTop > imgHeight) return;
+	
+	final int imgWidth = imageResource.mBitmap.getWidth();
+	if(srcRectLeft > imgWidth) return;
+	
+	if(srcRectTop < 0)
+	{
+		srcRectHeight += srcRectTop;
+		srcRectTop = 0;
+	}
+	
+	if(srcRectLeft < 0)
+	{
+		srcRectWidth += srcRectLeft;
+		srcRectLeft = 0;
+	}
+	
+	if(srcRectTop + srcRectHeight > imgHeight)
+	{
+		srcRectHeight = imgHeight - srcRectTop;
+	}
+	
+	if(srcRectLeft + srcRectWidth > imgWidth)
+	{
+		srcRectWidth = imgWidth - srcRectLeft;
+	}
+	
+	if(srcRectWidth <= 0 || srcRectHeight <= 0)
+		return;
+
+	if(transformMode == TRANS_NONE)
+	{
+		mCanvas.clipRect(dstLeft, dstTop, dstLeft+srcRectWidth, dstTop+srcRectHeight, Region.Op.REPLACE);
+		mCanvas.drawBitmap(imageResource.mBitmap, dstLeft-srcRectLeft, dstTop-srcRectTop, mPaint);
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipLeft+mClipWidth, mClipTop+mClipHeight, Region.Op.REPLACE );
+		return;
+	}
+	else
+	{
+		boolean mirror = false;
+		int rotation = 0;
+
+		switch(transformMode)
+		{
+		case TRANS_ROT90:
+			rotation = 90;
+			break;
+		case TRANS_ROT180:
+			rotation = 180;
+			break;
+		case TRANS_ROT270:
+			rotation = 270;
+			break;
+		case TRANS_MIRROR:
+			mirror = true;
+			break;
+		case TRANS_MIRROR_ROT90:
+			mirror = true;
+			rotation = 90;
+			break;
+		case TRANS_MIRROR_ROT180:
+			mirror = true;
+			rotation = 180;
+		break;
+		case TRANS_MIRROR_ROT270:
+			mirror = true;
+			rotation = 270;
+			break;
+		default:
+		maPanic(0,"error");
+		}
+
+		mTempMatrix.reset();
+		if(mirror)
+		{
+			mTempMatrix.setScale(-1, 1);
+			mTempMatrix.postTranslate(imgWidth, 0);
+		}
+		if(rotation != 0) {
+			mTempMatrix.postRotate(rotation);
+		}
+
+		mTempBitmap = Bitmap.createBitmap(imageResource.mBitmap, srcRectLeft, srcRectTop, srcRectWidth, srcRectHeight, mTempMatrix, false);
+
+		mCanvas.drawBitmap(mTempBitmap, dstLeft, dstTop, mPaint);
+	}
+}
+
+int maGetImageSize(int image)
+{
+	SYSLOG("maGetImageSize");
+	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
+	if(imageResource == null)
+	{
+		return -1;
+	}
+
+	return EXTENT(imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
+}
+
+void maGetImageData(int image, int dst, int srcRect, int scanlength)
+{
+	SYSLOG("maGetImageData");
+}
+
+int maSetDrawTarget(int image)
+{
+	SYSLOG("maSetDrawTarget");
+	if(0 == image)
+	{
+		mCanvas = mDrawTargetScreen.mCanvas;
+		mBitmap = mDrawTargetScreen.mBitmap;
+	}
+	else
+	{
+		ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
+		if(null == imageResource)
+		{
+			return -1;
+		}
+
+		mCanvas = imageResource.mCanvas;
+		mBitmap = imageResource.mBitmap;
+	}
+	return 1;
+}
+
+int maCreateImageFromData(int placeholder, int data, int offset, int size)
+{
+	SYSLOG("maCreateImageFromData");
+
+	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
+	if(null == bb)
+	{
+		return RES_BAD_INPUT;
+	}
+	
+	byte[] ra = new byte[size];
+	try
+	{
+		bb.position(offset);
+		bb.get(ra);
+	}catch(Exception e){
+		return RES_BAD_INPUT;
+	}
+
+	try {
+		Bitmap decodedImage = BitmapFactory.decodeByteArray(ra, 0, ra.length);
+		if(decodedImage == null)
+		{
+			return RES_BAD_INPUT;
+		}
+		mImageResources.put(placeholder, new ImageCache(null, decodedImage));
+		
+	} catch(java.lang.IllegalArgumentException e) {
+		return RES_BAD_INPUT;
+	} catch(java.lang.OutOfMemoryError e) {
+		return RES_OUT_OF_MEMORY;
+	}
+	return RES_OK;
+}
+
+int maCreateImageRaw(int placeholder, int src, int size, int alpha)
+{
+	SYSLOG("maCreateImageRaw");
+	return -1;
+}
+
+int maCreateDrawableImage(int placeholder, int width, int height)
+{
+	SYSLOG("maCreateDrawableImage");
+	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	Canvas canvas = new Canvas(bitmap);
+
+	try
+	{
+		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));
+	}
+	catch(java.lang.OutOfMemoryError e)
+	{
+		return -1;
+	}
+	return 1;
+}
+
+Hashtable<Integer, String> mStores = new Hashtable<Integer, String>();
+int mMaxStoreId = 0;
+
+final static String storesPath = "MAStore";
+int maOpenStore(String name, int flags)
+{
+	SYSLOG("maOpenStore");
+	
+	try
+	{
+		File f = mContext.getFileStreamPath(storesPath);
+
+		if(f.isFile()) return STERR_GENERIC;
+		else if(!f.isDirectory())
+		{
+			boolean success = f.mkdir();
+			if(!success) return STERR_GENERIC;
+		}
+		
+		String filePath = storesPath + File.pathSeparator + name;
+		f = mContext.getFileStreamPath(filePath);
+		
+		if(f.isDirectory()) return STERR_GENERIC;
+		if(!f.isFile())
+		{
+			if ((flags & MAS_CREATE_IF_NECESSARY) == 0) return STERR_NONEXISTENT;
+			f.createNewFile();
+		}
+		
+		mMaxStoreId++;
+		mStores.put(new Integer(mMaxStoreId), filePath);
+		return mMaxStoreId;
+
+	} catch(Exception e) {
+		PRINT_STACK_TRACE;
+		return STERR_GENERIC;
+	}
+}
+
+int maWriteStore(int store, int data)
+{
+	SYSLOG("maWriteStore");
+	try {
+		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
+		if(f.isFile())
+		{
+/*		
+			BinaryInterface bi = (BinaryInterface)getResource(data);
+			byte[] buffer;
+			if(bi instanceof Binary) {
+				Binary b = (Binary)bi;
+				buffer = b.arr;
+			} else {
+				DataInputStream din = new DataInputStream(bi.getInputStream());
+				buffer = new byte[bi.size()];
+				din.readFully(buffer);
+				din.close();
+			}
+*/		
+			ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
+			if(null == bb)
+			{
+				return STERR_GENERIC;
+			}
+				
+			FileOutputStream fos = new FileOutputStream(f, false);
+			FileChannel fc = fos.getChannel();
+			
+			fc.write(bb);
+			
+			fos.close();
+			return 1;
+		}
+	} catch(Exception e) {
+		PRINT_STACK_TRACE;
+	}
+	return STERR_GENERIC;
+}
+
+int maReadStore(int store, int placeholder)
+{
+	SYSLOG("maReadStore");
+	return -1;
+}
+
+void maCloseStore(int store, int remove)
+{
+	SYSLOG("maCloseStore");
+}
+
+int maConnect(final String url)
+{
+	SYSLOG("maConnect");
+	return -1;
+}
+
+void maConnClose(int conn)
+{
+	SYSLOG("maConnClose");
+}
+
+void maConnRead(int conn, int dst, int size)
+{
+	SYSLOG("maConnRead");
+}
+
+void maConnWrite(int conn, int src, int size)
+{
+	SYSLOG("maConnWrite");
+}
+
+void maConnReadToData(int conn, int data, int offset, int size)
+{
+	SYSLOG("maConnReadToData");
+}
+
+void maConnWriteFromData(int conn, int data, int offset, int size)
+{
+	SYSLOG("maConnWrietFromData");
+}
+
+int maConnGetAddr(int conn, int addr)
+{
+	SYSLOG("maConnGetAddr");
+	return -1;
+}
+
+int maHttpCreate(String url, int method)
+{
+	SYSLOG("maHttpCreate");
+	return -1;
+}
+
+void maHttpSetRequestHeader(int conn, String key, String value)
+{
+	SYSLOG("maHttpSetRequestHeader");
+}
+
+int maHttpGetResponseHeader(int conn, String key, int buffer, int bufSize)
+{
+	SYSLOG("maHttpGetResponseHeader");
+	return -1;
+}
+
+void maHttpFinish(int conn)
+{
+	SYSLOG("maHttpFinish");
+}
+
+void maLoadProgram(int data, int reload)
+{
+	SYSLOG("maLoadProgram");
+}
+
+int maGetKeys()
+{
+	SYSLOG("maGetKeys");
+	return -1;
+}
+
+int maGetEvent(int event)
+{
+	SYSLOG("maGetEvent");
+	return -1;
+}
+
+void maWait(int timeout)
+{
+	SYSLOG("maWait");
+}
+
+int maTime()
+{
+	SYSLOG("maTime");
+	Date d = new Date();
+	return (int)(d.getTime() / 1000);
+}
+
+int maLocalTime()
+{
+	SYSLOG("maLocalTime");
+	Date d = new Date();
+	TimeZone tz = TimeZone.getDefault();
+	return (int)((d.getTime() + tz.getRawOffset()) / 1000);
+}
+
+int maGetMilliSecondCount()
+{
+	SYSLOG("maGetMilliSecondCount");
+	return (int)System.currentTimeMillis();
+}
+
+int maFreeObjectMemory()
+{
+	SYSLOG("maFreeObjectMemory");
+	return -1;
+}
+
+int maTotalObjectMemory()
+{
+	SYSLOG("maTotalObjectMemory");
+	return -1;
+}
+
+int maVibrate(int ms)
+{
+	SYSLOG("maVibrate");
+	return -1;
+}
+
+void maPanic(int result, String message)
+{
+	SYSLOG("maPanic");
+}
+
+int maSoundPlay(int sound_res, int offset, int size)
+{
+	SYSLOG("maSoundPlay");
+	return -1;
+}
+
+void maSoundStop()
+{
+	SYSLOG("maSoundStop");
+}
+
+int maSoundIsPlaying()
+{
+	SYSLOG("maSoundIsPlaying");
+	return -1;
+}
+
+int maSoundGetVolume()
+{
+	SYSLOG("maSoundGetVolume");
+	return -1;
+}
+
+void maSoundSetVolume(int vol)
+{
+	SYSLOG("maSondSetVolume");
+}
+
+int maInvokeExtension(int function, int a, int b, int c)
+{
+	SYSLOG("maInvokeExtension");
+	return -1;
+}
+
+int maIOCtl(int function, int a, int b, int c)
+{
+	SYSLOG("maIOCtl");
+	return -1;
+}
+
+
+Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
+
+boolean loadImage(int resourceIndex, int pos, int length)
+{
+	SYSLOG("LoadImage");
+	try
+	{
+		byte[] ra = new byte[length];
+		mResourceFile.position(pos);
+		mResourceFile.get(ra);
+		mResourceFile.position(0);
+
+		Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
+		if(bitmap != null)
+		{
+			mImageResources.put(resourceIndex, new ImageCache(null, bitmap));
+			return true;
+		}
+		return false;
+	}
+	catch (Exception e)
+	{
+		return false;
+	}
+}
+
+
+Hashtable<Integer, ByteBuffer> mBinaryResources = new Hashtable<Integer, ByteBuffer>();
+
+ByteBuffer loadBinary(int resourceIndex, int size)
+{
+	SYSLOG("loadBinary");
+	
+	try
+	{
+		ByteBuffer data = ByteBuffer.allocateDirect(size);
+		mBinaryResources.put(resourceIndex, data);
+		return data;
+	}
+	catch(Exception e)
+	{
+		Log.i("MoSyncThread", "Out of Memory!");
+	}
+	return null;
+}
+
+
