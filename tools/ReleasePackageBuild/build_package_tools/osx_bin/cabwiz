@@ -1,6 +1,6 @@
 #!/bin/sh
 curr_dir=$(pwd)
-script_dir=$(echo $0 | sed 's/makesis-200//')
+script_dir=$(echo $0 | sed 's/cabwiz//')
 
 # Try to resolve full path to script
 if [ -e $curr_dir/$0 ]; then

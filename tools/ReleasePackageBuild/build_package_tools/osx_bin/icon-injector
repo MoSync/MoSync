@@ -1,3 +1,16 @@
 #!/bin/sh
+curr_dir=$(pwd)
+script_dir=$(echo $0 | sed 's/icon-injector//')
+
+# Try to resolve full path to script
+if [ -e $curr_dir/$0 ]; then
+	script=$curr_dir/$0
+else
+	script=$0
+fi
+
+cd $script_dir
 export DISPLAY=""
-./run_w32 Z:$(echo $0|sed s/\\//\\\\/g).exe $*
+./run_w32 Z:$(echo $script|sed s/\\//\\\\/g).exe $*
+cd $curr_dir
+
