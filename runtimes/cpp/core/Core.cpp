@@ -564,16 +564,31 @@ public:
 	//				 Init MA
 	//****************************************
 #ifndef MOBILEAUTHOR
+
+#ifndef _android
 	bool LoadVMApp(const char* modfile, const char* resfile) {
 		InitVM();
+
 		FileStream mod(modfile);
 		if(!LoadVM(mod))
 			return false;
-#ifndef _android
+			
 		FileStream res(resfile);
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
-#endif //_android
+#else
+	bool LoadVMApp(const char* modfile, int modsize, const char* resfile, int ressize) {
+		InitVM();
+
+		MemStreamC mod(modfile, modsize);
+		if(!LoadVM(mod))
+			return false;
+			
+		MemStreamC res(resfile, ressize);
+		if(!mSyscall.loadResources(res, resfile))
+			return false;
+#endif
+
 
 #ifdef FAKE_CALL_STACK
 		profTree.init(Head.EntryPoint);
@@ -598,7 +613,7 @@ public:
 		InitVM();
 		if(!LoadVM(stream))
 			return false;
-#if !defined(MOBILEAUTHOR) && !defined(_android)
+#if !defined(MOBILEAUTHOR)
 		if(!mSyscall.loadResources(stream, combfile))
 			return false;
 #endif
@@ -647,10 +662,9 @@ public:
 	int LoadVM(Stream& file) {
 	
 		LOG("LoadVM\n");
-	
+
 		TEST(file.isOpen());
 		TEST(file.readObject(Head));	// Load header
-
 		if(Head.Magic != 0x5844414d) {	//MADX, big-endian
 			LOG("Magic error: 0x%08x should be 0x5844414d\n", Head.Magic);
 			FAIL;
@@ -713,12 +727,21 @@ public:
 		DUMPHEX(Head.DataSize);
 		if(Head.DataLen > 0) {
 			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
-			DUMPHEX(DATA_SEGMENT_SIZE);
+			
+#ifdef _android
+			jclass cls = mJniEnv->GetObjectClass(mJThis);
+			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(I)Ljava/nio/ByteBuffer;");
+			if (methodID == 0) return -1;
+			jobject jo = mJniEnv->CallObjectMethod(mJThis, methodID, (DATA_SEGMENT_SIZE));
+			mem_ds = (int*)mJniEnv->GetDirectBufferAddress(jo);
+			mJniEnv->DeleteLocalRef(cls);
+#else
 			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
+#endif		
+
 			if(!mem_ds) BIG_PHAT_ERROR(ERR_OOM);
 			TEST(file.read(mem_ds, Head.DataLen));
 			ZEROMEM((byte*)mem_ds + Head.DataLen, DATA_SEGMENT_SIZE - Head.DataLen);
-
 #ifdef MEMORY_PROTECTION
 			protectionSet = new byte[(DATA_SEGMENT_SIZE+7)>>3];
 			ZEROMEM(protectionSet, (DATA_SEGMENT_SIZE+7)>>3);
@@ -1190,6 +1213,7 @@ void WRITE_REG(int reg, int value) {
 	//****************************************
 
 	void ISC2(int syscall_id) {
+
 		switch(syscall_id) {
 #ifdef MOBILEAUTHOR
 #include <Deimos/DeimosInvokeSyscall.h>
@@ -1364,7 +1388,9 @@ void WRITE_REG(int reg, int value) {
 		}
 		delete instruction_count;
 #endif
+
 	}
+	
 private:
 	Syscall& mSyscall;
 };
@@ -1396,7 +1422,6 @@ void DeleteCore(VMCore* core) {
 	delete CORE;
 }
 
-
 void VMCore::invokeSysCall(int id) {
 	((VMCoreInt*)this)->InvokeSysCall(id);
 }
@@ -1408,9 +1433,15 @@ void VMCore::logStateChange(int ip) {
 #endif
 
 #ifndef MOBILEAUTHOR
+#ifndef _android
 bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
+#else
+bool LoadVMApp(VMCore* core, const char* modfile,int modSize,const char* resfile,int resSize) {
+	return CORE->LoadVMApp(modfile,modSize,resfile,resSize);
+}
+#endif
 #endif
 
 bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile) {

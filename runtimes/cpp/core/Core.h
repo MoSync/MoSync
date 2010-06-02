@@ -39,6 +39,10 @@ typedef union _LARGE_INTEGER {
 #include <helpers/types.h>
 #include <helpers/helpers.h>
 
+#ifdef _android
+#include <jni.h>
+#endif
+
 #define USE_VAR_INT
 
 #ifdef GDB_DEBUG
@@ -100,6 +104,12 @@ namespace Core {
 		byte* mem_cs;
 		int* mem_ds;
 		int* mem_cp;
+		
+#if defined(_android)
+		JNIEnv* mJniEnv;
+		jobject mJThis;
+		jobject mem_ds_jobject;
+#endif
 
 #ifdef MEMORY_PROTECTION
 		byte* protectionSet;
@@ -127,7 +137,7 @@ namespace Core {
 		void logStateChange(int ip);
 #endif
 		void invokeSysCall(int id);
-
+		
 	};
 
 	class Application;
@@ -146,7 +156,11 @@ namespace Core {
 #ifdef MOBILEAUTHOR
 	void RunFrom(VMCore* core, int ip);
 #else
+#ifndef _android
 	bool LoadVMApp(VMCore* core, const char* modfile, const char* resfile);
+#else
+	bool LoadVMApp(VMCore* core, const char* modfile, int modsize, const char* resfile, int ressize);
+#endif
 #endif
 	bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile=0);
 	void Run2(VMCore* core);
@@ -171,6 +185,7 @@ namespace Core {
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
 	const char* GetValidatedStr(const VMCore* core, int address);
 	void* GetCustomEventPointer(VMCore* core);
+	
 }
 
 #ifndef SYMBIAN
