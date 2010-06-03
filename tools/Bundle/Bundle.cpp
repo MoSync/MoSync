@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "File.h"
 #include <vector>
 #include <cstring>
+#include <stdlib.h>
 
 std::vector<std::string> inFiles;
 
@@ -55,7 +56,7 @@ struct VolumeEntryDirectory {
 	int numVolumeEntries;
 };
 */
-char to_upper(char c) {
+static char to_upper(char c) {
 
 	if(c>='a' && c<='z') 
 		return c-'a'+'A';
@@ -63,7 +64,7 @@ char to_upper(char c) {
 		return c;
 }
 
-char to_lower(char c) {
+static char to_lower(char c) {
 	if(c>='A' && c <='Z') 
 		return c-'A'+'a';
 	else 
@@ -80,22 +81,26 @@ struct VolumeEntry {
 
 VolumeEntry *g_root;
 
-int readFile(std::string name) {
+static int readFile(std::string name) {
 	FILE *file = fopen(name.c_str(), "rb");
 	fseek(file, 0, SEEK_END);
 	int len = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	fread(&fileData[fileDataPtr], 1, len, file);
+	int res = fread(&fileData[fileDataPtr], 1, len, file);
+	if(res != len) {
+		printf("failure reading %s\n", name.c_str());
+		exit(1);
+	}
 	fileDataPtr+=len;
 	return len;
 }
 
-void saveFileData() {
+static void saveFileData() {
 	startOfData = ftell(outFile);
 	fwrite(fileData, 1, fileDataPtr, outFile);
 }
 
-void writeHeader() {
+static void writeHeader() {
 	fseek(outFile, 0, SEEK_SET);
 	int magic = 0x12345678;
 	fwrite(&magic, 4, 1, outFile);
@@ -104,7 +109,7 @@ void writeHeader() {
 	fwrite(&startOfData, 4, 1, outFile); 
 }
 
-void saveVolumeEntries(VolumeEntry *root) {
+static void saveVolumeEntries(VolumeEntry *root) {
 	fwrite(&root->type, 1, 1, outFile);	
 	int sizeOfName = root->name.size()+1;
 	fwrite(root->name.c_str(), 1, sizeOfName, outFile);
@@ -129,7 +134,7 @@ void saveVolumeEntries(VolumeEntry *root) {
 
 void parse(File file, VolumeEntry *vol);
 
-void parseDirectory(File file, VolumeEntry *vol)  
+static void parseDirectory(File file, VolumeEntry *vol)  
 {
 	std::list<File> l = file.listFiles( );
 	
