@@ -37,6 +37,9 @@ using namespace std;
 
 #if defined (__MACH__) || defined(__APPLE__) 
 #define PLATFORM_OSX
+#define ONLY_ON_OSX
+#else
+#define ONLY_ON_OSX GCCATTRIB(noreturn)
 #endif
 
 static const char sInfo[] =
@@ -87,8 +90,8 @@ void readFileIntoMem(string& output, const char* filename);
 string filterWhiteSpace(const string& str);
 void generate();
 void writeMemIntoFile(const char* filename, const char *mem, size_t len);
-void build ( void );
-void run ( void );
+void build(void) ONLY_ON_OSX;
+void run(void) ONLY_ON_OSX;
 
 
 // returns total amount of bytes written.
@@ -218,7 +221,8 @@ void readFileIntoMem(string& output, const char* filename) {
 	int length = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	output.resize(length);
-	fread(&output[0], length, 1, file);
+	int res = fread(&output[0], length, 1, file);
+	if(res != 1) error("Could not read file %s\n", filename);
 	fclose(file);
 }
 
@@ -275,8 +279,8 @@ void generate() {
 
 #ifdef PLATFORM_OSX
 void build() {
-	
-	execl("/Developer/usr/bin/xcodebuild", "/Developer/usr/bin/xcodebuild", "-project", validateArgument("input").c_str(), NULL, (char*) 0);
+	execl("/Developer/usr/bin/xcodebuild", "/Developer/usr/bin/xcodebuild", "-project",
+		validateArgument("input").c_str(), NULL, (char*) 0);
 }
 
 void run() {

@@ -473,7 +473,7 @@ void thread_info(const string& args) {
 
 static bool sComplex;
 
-void print_type_from_type(const std::string& type) {
+static void print_type_from_type(const std::string& type) {
 	oprintf("~\"type = ");//%s\"\n", type);
 	const char* t = type.c_str();
 	while(*t) {

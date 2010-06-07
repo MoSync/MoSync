@@ -10,7 +10,7 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
 	PLATFORM_TOOLS = []
@@ -33,6 +33,8 @@ BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
 EXAM_DIRS = ["tests/unitTest", "examples"]
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
+TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector"]
 
 MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc", "tools/Bundle", "tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/Bundle"] + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS

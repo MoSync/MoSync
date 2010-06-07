@@ -39,6 +39,15 @@ void var_update(const string& args);
 void var_evaluate_expression(const string& args);
 void var_show_attributes(const string& args);
 
+void var_info_expression(const string& args);
+void var_info_num_children(const string& args);
+void var_info_num_children(const string& args);
+void var_info_path_expression(const string& args);
+void var_info_type(const string& args);
+void var_list_children(const string& args);
+void var_set_format(const string& args);
+void var_show_format(const string& args);
+
 //******************************************************************************
 // Callbacks
 //******************************************************************************
@@ -321,7 +330,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 }
 
-bool isVTablePointer(const TypeBase* deref) {
+static bool isVTablePointer(const TypeBase* deref) {
 	if(deref->type() == TypeBase::ePointer) {
 		const PointerType* pt = (const PointerType*)deref;
 		const TypeBase *t = pt->mTarget->resolve();
@@ -506,7 +515,7 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 	sUpdateCallback();
 }
 
-void resetValidness() {
+static void resetValidness() {
 	map<string, Variable*>::iterator i = sVariableMap.begin();
 	for(;i!=sVariableMap.end(); i++) {
 		if(i->second->exp)
@@ -914,7 +923,7 @@ void var_show_attributes(const string& args) {
 //******************************************************************************
 // show and set format
 //******************************************************************************
-Variable* getAndValidateVariable(const string& args) {
+static Variable* getAndValidateVariable(const string& args) {
 	vector<string> argv;
 	splitArgs(args, argv);
 	string name;

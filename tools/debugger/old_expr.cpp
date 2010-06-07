@@ -184,10 +184,10 @@ static bool handle_params(const Function* f, const vector<LocalVariable*>& param
 	return false;
 }
 
-void dummy(const SYM& sym) {
+static void dummy(const SYM& sym) {
 }
 
-bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Function* f, SeeCallback cb) {
+static bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Function* f, SeeCallback cb) {
 	if(!f) {
 		error("No debugging information for current function");
 		return false;

@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Value.h"
 #include "operations_generated.cpp"
 #include "stabs/stabs_typedefs.h"
+#include <stdlib.h>
 
 using namespace std;
 
@@ -78,19 +79,17 @@ Value::Value(const std::string& value) {
 		this->Int = 0;
 		sscanf(value.c_str(), "0x%x", &this->Int);
 		mPrimitiveType = Builtin::eInt;			
-	} 
-	else if(value.find_first_of(".")!=std::string::npos ||
-		value[value.size()-1]=='f') {
-			if(value[value.size()-1]=='f') {
-				this->Float = (float)atof(value.c_str());
-				mPrimitiveType = Builtin::eFloat;		
-			} else{
-				this->Double = strtod(value.c_str(), NULL);
-				mPrimitiveType = Builtin::eDouble;
-			}
-
-	}
-	else {
+	} else if(value.find_first_of(".")!=std::string::npos ||
+		value[value.size()-1]=='f')
+	{
+		if(value[value.size()-1]=='f') {
+			this->Float = (float)atof(value.c_str());
+			mPrimitiveType = Builtin::eFloat;		
+		} else {
+			this->Double = strtod(value.c_str(), NULL);
+			mPrimitiveType = Builtin::eDouble;
+		}
+	} else {
 		if(value == "true" || value == "false") {
 			this->Bool = (value=="true")?true:false;
 			mPrimitiveType = Builtin::eBool;

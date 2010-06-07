@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Symbian9Injector.h"
 #include "Shared.h"
+#include <stdlib.h>
 
 using namespace std;
 

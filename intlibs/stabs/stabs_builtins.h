@@ -50,6 +50,7 @@ public:
 	Type type() const { return eBuiltin; }
 	const TypeBase* resolve() const { return this; }
 	void printTypeMI(printfPtr p, bool complex) const { p("%s", mName); }
+	SubType subType() const { return mSubType; }
 public:
 	const int mSize;
 	const char* const mName;

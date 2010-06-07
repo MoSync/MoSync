@@ -81,7 +81,9 @@ enum eTokenType {
 	TOKEN_COLON,
 
 	// GDB specific
-	TOKEN_AT
+	TOKEN_AT,
+	
+	_TOKEN_END
 };
 
 class TokenMatcher {

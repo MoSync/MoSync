@@ -39,6 +39,7 @@ void data_list_register_values(const string& args);
 void data_read_memory(const string& args);
 void data_list_register_names(const string& args);
 void data_list_changed_registers(const string& args);
+void data_disassemble(const string& args);
 
 //called during disassembly of CALL instructions.
 //should return the demangled name of the function that starts at the specified address.

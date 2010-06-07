@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "StubConnection.h"
 #include "StubConnLow.h"
 #include "helpers.h"
-#include "OpHandler.h"
+#include "opHandler.h"
 
 #include "memory.h"
 
@@ -55,7 +55,7 @@ static Functor sFunctor = { NULL, 0, false, "unknown", 0 };
 const Registers& getReg() {
 	return sCachedReg;
 }
-const bool isRegValid() {
+bool isRegValid() {
 	return sCachedRegValid;
 }
 

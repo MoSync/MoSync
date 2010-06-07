@@ -28,7 +28,7 @@ namespace MoSync {
 static int Depth = 0;
 static Icon* retIcon = 0;
 	
-void start(void *data, const char *el, const char **attr) {
+static void start(void *data, const char *el, const char **attr) {
   int i;
 
   if(!strcmp(el, "icon")) {
@@ -55,7 +55,7 @@ void start(void *data, const char *el, const char **attr) {
   Depth++;
 }  /* End of start handler */
 
-void end(void *data, const char *el) {
+static void end(void *data, const char *el) {
   Depth--;
 }  /* End of end handler */
 

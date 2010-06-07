@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#include <stdlib.h>
 
 using namespace std;
 

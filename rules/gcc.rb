@@ -143,6 +143,7 @@ class GccWork < BuildWork
 		end
 		
 		@all_sourcefiles = cfiles + cppfiles
+		@all_sourcefiles.sort! do |a,b| File.mtime(b) <=> File.mtime(a) end
 		
 		@source_objects = objects(@all_sourcefiles)
 		all_objects = @source_objects + @EXTRA_OBJECTS
@@ -150,12 +151,18 @@ class GccWork < BuildWork
 		setup3(all_objects)
  	end
 	
+	def check_extra_sourcefile(file, ending)
+		return false if(file.getExt != ending)
+		raise "Extra sourcefile '#{file}' does not exist!" if(!File.exist?(file))
+		return true
+	end
+	
 	# returns an array of FileTasks
 	def collect_files(ending)
 		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
 		files.flatten!
 		files.reject! {|file| @IGNORED_FILES.member?(File.basename(file))}
-		files += @EXTRA_SOURCEFILES.select do |file| file.getExt == ending end
+		files += @EXTRA_SOURCEFILES.select do |file| check_extra_sourcefile(file, ending) end
 		tasks = files.collect do |file| FileTask.new(self, file) end
 		extra_tasks = @EXTRA_SOURCETASKS.select do |file| file.to_s.getExt == ending end
 		return extra_tasks + tasks

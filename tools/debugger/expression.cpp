@@ -794,7 +794,7 @@ static ExpressionCallback sCallback;
 static bool sComplex;
 static std::string sErrorStr;
 
-int evaluateThread(void* data) {
+static int evaluateThread(void* data) {
 	DebuggerEvent *evnt = new DebuggerEvent;
 	evnt->err = NULL;
 	try {
@@ -838,13 +838,13 @@ int evaluateThread(void* data) {
 
 void loadSymbol();
 
-void symbolLoaded(const SYM& sym) {
+static void symbolLoaded(const SYM& sym) {
 	sExpressionTree->setSymbol(sSymbolIter->first, sym);
 	sSymbolIter++;
 	loadSymbol();
 }
 
-void errorCallback() {
+static void errorCallback() {
 	//TODO: set error state, so thread knows not to continue?
 	sSemaphore.post();
 	setErrorCallback(NULL);
@@ -860,7 +860,7 @@ void loadSymbol() {
 	}
 }
 
-void memoryLoaded() {
+static void memoryLoaded() {
 	sSemaphore.post();
 }
 
@@ -876,7 +876,7 @@ void ExpressionCommon::loadMemory(int addr, int len) {
 	sSemaphore.wait();
 }
 
-void stackLoaded() {
+static void stackLoaded() {
 	sSymbolIter = sExpressionTree->getSymbols().begin();
 	loadSymbol();
 }

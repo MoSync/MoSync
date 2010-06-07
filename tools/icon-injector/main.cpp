@@ -36,7 +36,7 @@ using namespace MoSync;
 
 map<string, Injector*> gInjectors;
 
-void initInjectors() {
+static void initInjectors() {
 	gInjectors["j2me"] = new JavaInjector();
 #ifdef WIN32 // for now..
 	gInjectors["winmobile"] = new WinmobileInjector();
@@ -46,7 +46,7 @@ void initInjectors() {
 	gInjectors["android"] = new AndroidInjector();
 }
 
-bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
+static bool parseCmdLine(map<string, string>& params, int argc, char **argv) {
 	for(int i = 1; i < argc; i++) {
 		const char *name = argv[i];
 		if(strncmp(name, "-", 1)==0) {

@@ -30,7 +30,7 @@ struct Registers {
 };
 
 const Registers& getReg();
-const bool isRegValid();
+bool isRegValid();
 
 #define NEED_REG \
 	if(!isRegValid()) { error("Inferior is not ready"); return; }\

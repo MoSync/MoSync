@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class MoSyncThread {
 public:
 	void start(int (SDLCALL * func)(void*), void* arg);
+	static void sleep(unsigned int ms);
 	int join();
 private:
 	SDL_Thread* mThread;
