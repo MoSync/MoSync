@@ -54,6 +54,7 @@
 <property key="build.prefs:runtime.debug/Render - Debug" value="true"/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Release" value=""/>
+<property key="finalizer:auto.change.config" value="false"/>
 <property key="last.build.config" value="Debug"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0f7db34b"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xea30a758"/>

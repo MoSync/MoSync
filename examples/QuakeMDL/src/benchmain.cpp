@@ -89,13 +89,10 @@ int BenchMain ( void )
 			renderedFrames++;
 			if ( renderedFrames == FRAMES_PASS )
 				break;
-		}
 
-		//
-		// Handle input
-		//
-		while ( true )
-		{
+			//
+			// Handle input
+			//
 			MAEvent e;
 			while ( maGetEvent( &e ) )
 			{
@@ -105,6 +102,7 @@ int BenchMain ( void )
 					maExit( 0 );
 			}
 		}
+
 		// Calculate average fps for pass
 		tmrEnd  = maGetMilliSecondCount( );
 		int denom = (tmrEnd-tmrIni);
