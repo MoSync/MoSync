@@ -23,6 +23,7 @@ public:
 private:
 	Layout *mLayout;
 	MAUtil::Vector<MAUtil::String> mVec;
+
 };
 
 #endif

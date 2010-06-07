@@ -333,7 +333,9 @@ bool down = false;
     if (button == 1)
     {
 		[self.superview sendSubviewToBack:currentScreen];
+		currentScreen=(MoSyncView *)self.superview;
         NSLog(@"Navigation bar back button clicked.");
+		//NSLog(@"the tag value is: %d", [self.superview tag]);
     }
 
 }

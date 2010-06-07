@@ -3,9 +3,10 @@
 
 using namespace MAUtil;
 
-ResultsFrame::ResultsFrame (int Id, const String& category) : Frame(Id) {
+ResultsFrame::ResultsFrame (int Id, const String& category) : Frame(Id) { //params category, unit
 	Manager::Instance().addWidget(this);
 	this->addActionListener(this);
+
 	mVec = Converter::getUnitsInCategory(category);
 
 }
