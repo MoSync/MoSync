@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../intlibs"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_VISUALC_;STATIC_MAGICK;_MAGICKMOD_;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -117,6 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="../../intlibs"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_VISUALC_;STATIC_MAGICK;_MAGICKMOD_"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
