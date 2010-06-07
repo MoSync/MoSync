@@ -203,7 +203,7 @@ void mtxStart(MTXContext* context);
 /**
 * Parses \a data in a \a context.
 *
-* The data is null-terminated. It needn't be the entire XML document;
+* The data must be null-terminated. It needn't be the entire XML document;
 * MTXContext::dataRemains() will be called with any data that couldn't be completely parsed.
 * You can then call this function again when you have more data.
 *
@@ -214,6 +214,8 @@ void mtxStart(MTXContext* context);
 *
 * \returns Non-zero if mtxStop() was called from a callback within the call to this function,
 * zero otherwise.
+* \note The data is altered in unspecified ways during parsing, as to avoid time-consuming copies.
+* Don't try to reuse it during or after the call to this function.
 */
 int mtxFeed(MTXContext* context, char* data);
 
