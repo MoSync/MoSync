@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <map>
 #include <string>
+#include <cstring>
 
 #include "Icon.h"
 #include "JavaInjector.h"

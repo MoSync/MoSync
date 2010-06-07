@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Icon.h"
 #include <expat.h>
 #include <stdio.h>
+#include <cstring>
 #include "Shared.h"
 
 using namespace std;

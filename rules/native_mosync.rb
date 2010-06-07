@@ -21,6 +21,7 @@ require "#{File.dirname(__FILE__)}/host.rb"
 require "#{File.dirname(__FILE__)}/native_lib.rb"
 require "#{File.dirname(__FILE__)}/exe.rb"
 require "#{File.dirname(__FILE__)}/dll.rb"
+require "#{File.dirname(__FILE__)}/mosync_util.rb"
 
 module NativeMoSyncWork
 	def define_cflags

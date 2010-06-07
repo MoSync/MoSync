@@ -185,7 +185,7 @@ void parse(File file, VolumeEntry *vol) {
 				vol->name[i] = to_lower( vol->name[i] );
 		}
 
-		printf("\"%s\"\n", vol->name.c_str());		
+		printf("\"%s\"\n", file.getAbsolutePath().c_str() );//vol->name.c_str());		
 
 		vol->type = 1;
 		vol->dataOffset = fileDataPtr;
