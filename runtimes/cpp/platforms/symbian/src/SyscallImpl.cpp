@@ -1943,6 +1943,7 @@ int Syscall::maCameraStop() {
 
 int Syscall::maCameraSnapshot(int formatIndex, MAHandle placeholder) {
 	LOG("maCameraSnapshot(%i, 0x%x)\n", formatIndex, placeholder);
+	MYASSERT(gCameraState == CS_POWERED, ERR_CAMERA_UNPOWERED);
 	LTRAP(gCamera->PrepareImageCaptureL(gCameraFormat, formatIndex));
 	gCameraPlaceholder = placeholder;
 	CLocalSynchronizer sync;
