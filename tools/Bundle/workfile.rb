@@ -9,6 +9,7 @@ work.instance_eval do
 	@EXTRA_CFLAGS = " -Wno-missing-declarations "
 	@NAME = "Bundle"
 	@TARGETDIR = "."
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 work.invoke

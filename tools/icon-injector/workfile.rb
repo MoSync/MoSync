@@ -11,6 +11,7 @@ work.instance_eval do
 		@IGNORED_FILES = ["WinmobileInjector.cpp", "ErrorCheck.cpp", "IconFileLoader.cpp"]
 	end
 	@LIBRARIES = ["expat"]
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 work.invoke

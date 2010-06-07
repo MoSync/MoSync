@@ -19,6 +19,7 @@ work.instance_eval do
 	@IGNORED_FILES = ["operations_generated.cpp"]
 	@NAME = "mdb"
 	@TARGETDIR = "."
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 class OpGenTask < FileTask
