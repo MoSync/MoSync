@@ -82,6 +82,7 @@ static bool filesAreEqual(const char* a, const char* b) {
 	return true;
 }
 
+#ifdef WIN32
 // change slashes
 static void u2d(string& path) {
 	for(size_t i=0; i<path.size(); i++) {
@@ -89,6 +90,7 @@ static void u2d(string& path) {
 			path[i] = '\\';
 	}
 }
+#endif
 
 static void copy(string src, string dst) {
 	// check if the file is different. if not, don't copy.
@@ -123,7 +125,7 @@ int main() {
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
-		_mkdir("..\\..\\runtimes\\java\\shared\\generated");
+		_mkdir("../../runtimes/java/shared/generated");
 
 		copy("Output/maapi.h", "../../libs/MAStd/");
 		copy("Output/maapi.h", "../../libs/newlib/libc/sys/mosync/");
