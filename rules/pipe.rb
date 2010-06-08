@@ -49,7 +49,6 @@ class PipeTask < FileTask
 		# pipe-tool may output an empty file and then fail.
 		begin
 			sh "#{mosyncdir}/bin/pipe-tool#{cFlags}"
-			
 		rescue => e
 			FileUtils.rm_f(@NAME)
 			raise

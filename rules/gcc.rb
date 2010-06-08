@@ -75,7 +75,13 @@ class CompileGccTask < FileTask
 	
 	def execute
 		execFlags
-		sh "#{@work.gcc} -o #{@NAME}#{cFlags}"
+		begin
+			sh "#{@work.gcc} -o #{@NAME}#{cFlags}"
+		rescue => e
+			# in case gcc output a broken object file
+			FileUtils.rm_f(@NAME)
+			raise
+		end
 		
 		# In certain rare cases (error during preprocess caused by a header file)
 		# gcc may output an empty dependency file, resulting in an empty dependency list for
