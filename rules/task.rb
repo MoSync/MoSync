@@ -29,43 +29,11 @@
 require "#{File.dirname(__FILE__)}/defaults.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 require "#{File.dirname(__FILE__)}/host.rb"
+require "#{File.dirname(__FILE__)}/util.rb"
 require 'fileutils'
-require 'singleton'
 
 # This is the base class for the Work system.
 class TaskBase
-	# EarlyTime is a fake timestamp that occurs _before_ any other time value.
-	# Its instance is called EARLY.
-	class EarlyTime
-		include Comparable
-		include Singleton
-		
-		def <=>(other)
-			-1
-		end
-		
-		def to_s
-			"<EARLY TIME>"
-		end
-	end
-	EARLY = EarlyTime.instance
-	
-	# LateTime is a fake timestamp that occurs _after_ any other time value.
-	# Its instance is called LATE.
-	class LateTime
-		include Comparable
-		include Singleton
-		
-		def <=>(other)
-			1
-		end
-		
-		def to_s
-			"<LATE TIME>"
-		end
-	end
-	LATE = LateTime.instance
-	
 	def initialize
 		@prerequisites = []
 	end
@@ -258,7 +226,7 @@ class FileTask < Task
 		if File.exist?(@NAME)
 			File.mtime(@NAME)
 		else
-			LATE
+			EARLY
 		end
 	end
 	

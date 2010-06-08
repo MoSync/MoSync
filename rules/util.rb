@@ -16,6 +16,7 @@
 
 require "#{File.dirname(__FILE__)}/error.rb"
 require "#{File.dirname(__FILE__)}/host.rb"
+require 'singleton'
 
 $stdout.sync = true
 $stderr.sync = true
@@ -63,6 +64,12 @@ class String
 		end
 		return self[doti..self.length]
 	end
+
+	# Returns true if self begins with with.
+	def beginsWith(with)
+		return false if(self.length < with.length)
+		return self[0, with.length] == with
+	end
 end
 
 def sh(cmd)
@@ -102,12 +109,59 @@ end
 
 HashMergeAdd = Proc.new {|key, old, new| old + new }
 
+
 # returns a command-line string with the correct invocation of sed for all platforms
 def sed(script)
 	file = open("|sed --version 2>&1")
-	if(file.gets == 'GNU sed' && HOST != :win32)
+	if(file.gets.beginsWith('GNU sed') && HOST != :win32)
 		return "sed '#{script}'"
 	else
 		return "sed #{script}"
+	end
+end
+
+# EarlyTime is a fake timestamp that occurs _before_ any other time value.
+# Its instance is called EARLY.
+class EarlyTime
+	include Comparable
+	include Singleton
+	
+	def <=>(other)
+		return 0 if(other.instance_of?(EarlyTime))
+		return -1
+	end
+	
+	def to_s
+		"<EARLY TIME>"
+	end
+end
+EARLY = EarlyTime.instance
+
+# LateTime is a fake timestamp that occurs _after_ any other time value.
+# Its instance is called LATE.
+class LateTime
+	include Comparable
+	include Singleton
+	
+	def <=>(other)
+		return 0 if(other.instance_of?(LateTime))
+		return 1
+	end
+	
+	def to_s
+		"<LATE TIME>"
+	end
+end
+LATE = LateTime.instance
+
+# Extension to the standard Time class to allow comparison with EarlyTime and LateTime.
+class Time
+	alias work_original_compare :<=>
+	def <=>(other)
+		if(other.instance_of?(EarlyTime) || other.instance_of?(LateTime))
+			return - other.<=>(self)
+		else
+			return work_original_compare(other)
+		end
 	end
 end
