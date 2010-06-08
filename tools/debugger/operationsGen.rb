@@ -135,10 +135,11 @@ def generate_operations_cpp(dest)
 	
 	invalidOperations.each do |i|
 		invalidSet.each do |j| 
-		out.write "template<>\n"
-		out.write "Value do_"+i[0]+"<"+ j[0] + ", " + j[1] + ">(const Value& a, const Value& b) {\n"
-		out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for types " + j[0] + " and " + j[1] +".\");\n";
-		out.write "}\n"
+			decl = "template<> Value do_"+i[0]+"<"+ j[0] + ", " + j[1] + ">(const Value& a, const Value& b)"
+			out.write "#{decl} GCCATTRIB(noreturn);\n"
+			out.write "#{decl} {\n"
+			out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for types " + j[0] + " and " + j[1] +".\");\n";
+			out.write "}\n"
 		end
 	end	
 	
@@ -158,8 +159,9 @@ def generate_operations_cpp(dest)
 	
 	invalidOperations.each do |i|
 		invalidTypes.each do |j| 
-			out.write "template<>\n"
-			out.write "Value do_"+i[0]+"<"+j+">(const Value& a) {\n"
+			decl = "template<> Value do_"+i[0]+"<"+j+">(const Value& a)"
+			out.write "#{decl} GCCATTRIB(noreturn);\n"
+			out.write "#{decl} {\n"
 			out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for type " + j + ".\");\n";
 			out.write "}\n"	
 		end

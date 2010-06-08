@@ -93,7 +93,7 @@ namespace Callback {
 
 void exec_continue(const string& args) {
 	NOARGS;
-	NEED_REG;
+	CHECK_REG;
 	if(nextInstrIsBreak()) {
 		skipBreak();
 	}
@@ -107,7 +107,7 @@ void exec_continue(const string& args) {
 
 void exec_step_instruction(const string& args) {
 	NOARGS;
-	NEED_REG;
+	CHECK_REG;
 	if(nextInstrIsBreak()) {
 		skipBreak();
 	} else {

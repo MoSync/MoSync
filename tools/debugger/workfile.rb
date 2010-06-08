@@ -17,15 +17,13 @@ work.instance_eval do
 	if(HOST == :linux)
 		@LIBRARIES << "bluetooth"
 		@EXTRA_SOURCEFILES << "../../runtimes/cpp/platforms/sdl/mutexImpl.cpp"
-		#@EXTRA_SOURCEFILES << "../../runtimes/cpp/platforms/sdl/ThreadPoolImpl.cpp"
 	end
 	@SPECIFIC_CFLAGS = {
-		"expression.cpp" => " -Wno-shadow",
-		"async.cpp" => " -Wno-shadow",
-		"Value.cpp" => " -Wno-float-equal -Wno-sign-compare"
+		"Value.cpp" => " -Wno-float-equal -Wno-sign-compare",
+		"disas.c" => " -Wno-missing-format-attribute -Wno-unreachable-code",
 	}
-	@EXTRA_CFLAGS = " -DPTAH_EXPORTS -DLOGGING_ENABLED -Wno-strict-prototypes -Wno-missing-prototypes -Wno-missing-format-attribute -Wno-missing-noreturn -Wno-shadow -Wno-unreachable-code -Wno-write-strings -Wno-multichar -fno-strict-aliasing"
-	@EXTRA_CPPFLAGS = " -DPTAH_EXPORTS -DLOGGING_ENABLED -Wno-missing-format-attribute -Wno-missing-noreturn -Wno-shadow -Wno-unreachable-code -Wno-unused-variable"
+	@EXTRA_CFLAGS = " -DPTAH_EXPORTS -DLOGGING_ENABLED"
+	@EXTRA_CPPFLAGS = " -DPTAH_EXPORTS -DLOGGING_ENABLED"
 	@IGNORED_FILES = ["operations_generated.cpp"]
 	@NAME = "mdb"
 	@TARGETDIR = "."

@@ -311,7 +311,7 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 			break;
 	case eAllValues:
 		{
-		oprintf(",value=\"", lv->name.c_str());
+		oprintf(",value=\"");
 		StringPrintFunctor spf;
 		if(lv->storageClass == eStack) {
 			const StackVariable* sv = (StackVariable*)lv;

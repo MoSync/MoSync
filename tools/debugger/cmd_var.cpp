@@ -84,15 +84,15 @@ public:
 	bool simpleType() const { return mSimpleType; }
 
 	void setValid(bool v=true) { mIsValid = v; }
-	bool isValid() const { return mIsValid; };
+	bool isValid() const { return mIsValid; }
 
-	const string& getExprText() {return mExprText;};
+	const string& getExprText() { return mExprText; }
 
-	void updateData(std::string value, std::string type, bool simpleType) {
-		if(mValue != value || mType != type || mSimpleType != simpleType) {
-			mValue = value;
-			mType = type;
-			mSimpleType = simpleType;
+	void updateData(std::string _value, std::string _type, bool _simpleType) {
+		if(mValue != _value || mType != _type || mSimpleType != _simpleType) {
+			mValue = _value;
+			mType = _type;
+			mSimpleType = _simpleType;
 			mUpdated = true;
 		} else {
 			mUpdated = false;
@@ -344,9 +344,7 @@ static bool isVTablePointer(const TypeBase* deref) {
 
 void Variable::addStruct(const char* dataAdress, const StructType *structType, bool isPointer) {
 	const vector<BaseClass>& bases = structType->getBases();
-	const vector<Method>& methods = structType->getMethods();
 	const vector<DataMember>& dataMembers = structType->getDataMembers();
-	const vector<StaticDataMember>& staticDataMembers = structType->getStaticDataMembers();
 
 	std::string value = ""; 
 	if(!isPointer) {

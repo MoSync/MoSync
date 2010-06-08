@@ -343,22 +343,22 @@ Value IndexNode::evaluate() {
 }
 
 ConditionalNode::ConditionalNode(ExpressionTree *tree, ExpressionTreeNode* a, ExpressionTreeNode* b, ExpressionTreeNode *c) : 
-ExpressionTreeNode(tree), a(a), b(b), c(c) {
-	a->addRef();
-	b->addRef();
-	c->addRef();
+ExpressionTreeNode(tree), mA(a), mB(b), mC(c) {
+	mA->addRef();
+	mB->addRef();
+	mC->addRef();
 }
 
 ConditionalNode::~ConditionalNode() {
-	a->deleteRef();
-	b->deleteRef();
-	c->deleteRef();
+	mA->deleteRef();
+	mB->deleteRef();
+	mC->deleteRef();
 }
 
 Value ConditionalNode::evaluate() {
-	Value x = a->evaluate();
-	Value y = b->evaluate();
-	Value z = c->evaluate();
+	Value x = mA->evaluate();
+	Value y = mB->evaluate();
+	Value z = mC->evaluate();
 
 	return ((bool)x)?y:z;
 }
@@ -391,16 +391,17 @@ Value DotNode::evaluate() {
 		addr+=res.offsetBits>>3;
 		//mParser->loadMemory(addr, res.sizeBits>>3);
 
-		SYM sym;
-		sym.address = (const void*)addr;
-		sym.storageClass = eStack;
+		SYM stackSym;
+		stackSym.address = (const void*)addr;
+		stackSym.storageClass = eStack;
 
 		if(res.type->type() == TypeBase::eFunction)
-			sym.symType = eFunction;
-		else sym.symType = eVariable;
-		sym.type = res.type;
+			stackSym.symType = eFunction;
+		else
+			stackSym.symType = eVariable;
+		stackSym.type = res.type;
 
-		return getValueFromSymbol(sym);
+		return getValueFromSymbol(stackSym);
 	}
 
 	throw ParseException("Data member not found");
@@ -409,10 +410,7 @@ Value DotNode::evaluate() {
 
 void DotNode::recursiveSearch(const std::string& ident, StructType *s, SearchResult *res, int offset) {
 	const std::vector<DataMember>& dataMembers = s->getDataMembers();
-	const std::vector<Method>& methods = s->getMethods();
 	const std::vector<BaseClass>& bases = s->getBases();
-	const std::vector<StaticDataMember>& staticDataMembers = 
-		s->getStaticDataMembers();
 
 	res->found = false;
 

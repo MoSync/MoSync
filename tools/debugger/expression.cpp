@@ -677,7 +677,7 @@ bool ExpressionParser::peekToken(Token &output) {
 	while(*str && *str > 0 && *str <= 32) str++;
 	if(!*str) return false;
 	int matchLen = 0;
-	unsigned int tokenType;
+	unsigned int tokenType = 0;
 	//const char *str = &strPtr[position];
 	for(unsigned int i = 0; i < mTokenMatchers.size(); i++) {
 		int newMatchLen;
@@ -791,7 +791,6 @@ static Value sReturnValue;
 static map<string, SYM>::iterator sSymbolIter;
 static MoSyncSemaphore sSemaphore;
 static ExpressionCallback sCallback;
-static bool sComplex;
 static std::string sErrorStr;
 
 static int evaluateThread(void* data) {
@@ -899,7 +898,7 @@ ExpressionTree* ExpressionParser::parse(const char *expr) {
 
 void stackEvaluateExpression(const string& args, int frameAddr, ExpressionCallback callback) {
 	CHECK_STABS;
-	NEED_REG;
+	CHECK_REG;
 
 	if(frameAddr >= 0) {
 		//todo: search the stack for a matching frame.

@@ -151,9 +151,7 @@ static bool checkErrorPacket(const char* data, int len) {
 		return false;
 	if(data[1] != ' ')
 		return false;
-	char buffer[128];
-	sprintf(buffer, "Stub reported error '%s'\n", data + 2);
-	error(buffer);
+	error("Stub reported error '%s'\n", data + 2);
 	return true;
 }
 

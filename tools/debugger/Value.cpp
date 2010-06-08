@@ -171,9 +171,9 @@ const TypeBase* Value::getTypeBase() const {
 
 
 const void* Value::getDataAddress() const {
-	if(getType() == TypeBase::eFunction) return (const void*)v;
+	if(getType() == TypeBase::eFunction) return (const void*)mV;
 	else if(mSym.address != NULL) return mSym.address;
-	else return &v;
+	else return &mV;
 }
 
 const TypeBase* Value::deref() const {

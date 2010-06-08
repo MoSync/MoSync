@@ -36,7 +36,7 @@ PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
 	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector"]
 
-MAIN_DIRS = BASE_DIRS + ["tools/FontGenerator", "tools/PanicDoc", "tools/Bundle", "tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/Bundle"] + PIPE_DIRS
+MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS
 
 NEWLIB_DIRS = ["libs"]
