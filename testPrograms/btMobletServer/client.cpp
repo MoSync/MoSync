@@ -15,8 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-//This program will find and connect to a bluetooth service on a hardcoded
-//address. It will then send character input to that service.
+// This program will find and connect to a Bluetooth service
+// with a specific UUID on a hardcoded address.
+// It will then send character input to that service.
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Connection.h>
@@ -24,7 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 #include <maassert.h>
 #include <conprint.h>
-//#include <MAUtil/mauuid.h>
 
 #include "common.h"
 
@@ -40,18 +40,21 @@ class MyMoblet : public Moblet, BluetoothServiceDiscoveryListener, ConnectionLis
 private:
 	Connection mConn;
 	BluetoothDiscoverer mDisc;
-	char buffer[1024];
+	char buffer1[512], buffer2[512];
+	char* currentBuffer;
 	int pos;
 	bool writing, online;
 public:
 	MyMoblet() : mConn(this), pos(0), online(false) {
 		printf("Hello World!\n");
 #if 1
+		// Find the service's port.
 		int res = mDisc.startServiceDiscovery(sAddress, sUuid, this);
 		printf("startDiscRes: %i\n", res);
 		if(res < 0)
 			return;
 #else
+		// Connect directly to a known port.
 		char buf[64];
 		const byte* a = sAddress.a;
 		sprintf(buf, "btspp://%02x%02x%02x%02x%02x%02x:%i",
@@ -59,21 +62,29 @@ public:
 		int res = mConn.connect(buf);
 		printf("connect res %i\n", res);
 #endif
+		currentBuffer = buffer1;
 	}
 
 	void keyPressEvent(int keyCode) {
+		// If it's a number key and we're connected...
 		if(keyCode >= MAK_0 && keyCode <= MAK_9 && online) {
-			buffer[pos++] = '0' + (keyCode - MAK_0);
+			// Store the digit.
+			currentBuffer[pos++] = '0' + (keyCode - MAK_0);
+			// If we're not still writing...
 			if(!writing) {
-				mConn.write(buffer, pos);
+				// Send data to server.
+				mConn.write(currentBuffer, pos);
 				writing = true;
 				pos = 0;
+				// Swap buffers, to avoid overwriting data that's still being sent.
+				currentBuffer = (currentBuffer == buffer1) ? buffer2 : buffer1;
 			}
 		}
 	}
 
 	//BluetoothServiceDiscoveryListener
 	void btNewService(const BtService& serv) {
+		// Having found our service, we can now connect to it.
 		printf("found service, port %i\n", serv.port);
 		printf("name: %s\n", serv.name.c_str());
 		for(int j=0; j<serv.uuids.size(); j++) {

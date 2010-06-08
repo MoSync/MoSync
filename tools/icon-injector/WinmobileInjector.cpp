@@ -78,7 +78,8 @@ typedef struct
 
 namespace MoSync 
 {
-	void ErrorExit(LPTSTR lpszFunction) 
+	static void ErrorExit(const char* lpszFunction) GCCATTRIB(noreturn);
+	static void ErrorExit(const char* lpszFunction)
 	{ 
 		// Retrieve the system error message for the last-error code
 
@@ -93,33 +94,36 @@ namespace MoSync
 			NULL,
 			dw,
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR) &lpMsgBuf,
+			(LPSTR) &lpMsgBuf,
 			0, NULL );
 
 		// Display the error message and exit the process
 
 		lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-			(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
-		sprintf( (LPTSTR)lpDisplayBuf,  
-		         "%\ns failed with error %d: %s", 
-		         lpszFunction, 
-		         dw, 
-		         lpMsgBuf ); 
-		printf( "Error: %s", lpDisplayBuf ); 
+			(strlen((LPCSTR)lpMsgBuf) + strlen((LPCSTR)lpszFunction) + 40) * sizeof(char)); 
+		sprintf( (LPSTR)lpDisplayBuf,
+		         "%s failed with error %lu: %s",
+		         lpszFunction,
+		         dw,
+		         (char*)lpMsgBuf );
+		printf( "Error: %s", (char*)lpDisplayBuf );
 
 		LocalFree(lpMsgBuf);
 		LocalFree(lpDisplayBuf);
 		ExitProcess(dw); 
 	}
-	
-	
+
+#ifdef UNICODE
+#define T L
+#else
+#define T
+#endif
+
 	bool InjectMainIcon(const vector<ICON>& icons, const char *exeFileName)
 	{
-
-
 		HANDLE hWhere = BeginUpdateResource(exeFileName, FALSE);
 		if ( hWhere == NULL )
-			ErrorExit( "MoSync::InjectMainIcon" );
+			ErrorExit( T"MoSync::InjectMainIcon" );
 
 
 		for(size_t i = 0; i < icons.size(); i++) 
@@ -137,7 +141,7 @@ namespace MoSync
 				);
 				
 			if ( res == FALSE )
-				ErrorExit( "MoSync::InjectMainIcon" );
+				ErrorExit( T"MoSync::InjectMainIcon" );
 		}
 
 		// Again, we use this structure for educational purposes.

@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <queue>
+#include <stdio.h>
 
 #include "config.h"
 #include "helpers/log.h"

@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+// This program acts as a Bluetooth server.
+// It sets up an RFCOMM service with a particular UUID and listens for connections.
+// For each connection accepted, it prints any data recieved.
+
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Connection.h>
 #include <MAUtil/Server.h>
@@ -33,13 +37,16 @@ private:
 	const int mId;
 public:
 	MyConnectionHandler(Connection* conn, int id) : mConn(conn), mId(id) {
-		mConn->setListener(this);
+		// Print the remote address.
 		MAConnAddr addr;
 		int res = mConn->getAddr(&addr);
 		MAASSERT(res > 0);
 		byte* a = addr.bt.addr.a;
 		printf("%i @ %02X%02X%02X%02X%02X%02X\n", mId,
 			a[0], a[1], a[2], a[3], a[4], a[5]);
+
+		// Start recieving data.
+		mConn->setListener(this);
 		mConn->recv(mBuffer, 4);
 	}
 
@@ -49,12 +56,14 @@ public:
 
 	//ConnectionListener
 	void connRecvFinished(Connection* conn, int result) {
-		if(result < 0) {
+		if(result < 0) {	// error
 			printf("recv %i: %i\n", mId, result);
-			delete this;	//should be safe
+			delete this;	// should be safe
 		} else {
+			// We recieved data. Print it.
 			mBuffer[result] = 0;
 			printf("%i: %s\n", mId, mBuffer);
+			// Continue recieving data.
 			conn->recv(mBuffer, 63);
 		}
 	}
@@ -66,12 +75,14 @@ private:
 	int mNextId;
 public:
 	MyMoblet() : mServer(this), mNextId(1) {
+		// Start the server.
 		printf("Hello World!\n");
 		int res = mServer.start("btspp://localhost:"SERVER_UUID_STRING";name=btServer");
 		printf("startRes: %i\n", res);
 		if(res < 0)
 			return;
 
+		// Print the server's address.
 		MAConnAddr addr;
 		res = mServer.getAddr(&addr);
 		MAASSERT(res > 0);

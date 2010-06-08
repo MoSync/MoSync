@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <set>
 #include <vector>
-
+#include <stdio.h>
 #include <queue>
 
 #include "config.h"

@@ -13,7 +13,12 @@ work.instance_eval do
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES + ["/sw/include"]
 	end
 	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "stabs"]
-	@LIBRARIES = ["SDL", "SDLmain"]
+	if(HOST == :win32)
+		@CUSTOM_LIBS = ["SDL.lib", "libirprops.a", "libuuid.a"]
+		@LIBRARIES = ["wsock32", "ws2_32"]
+	else
+		@LIBRARIES = ["SDL", "SDLmain"]
+	end
 	if(HOST == :linux)
 		@LIBRARIES << "bluetooth"
 		@EXTRA_SOURCEFILES << "../../runtimes/cpp/platforms/sdl/mutexImpl.cpp"

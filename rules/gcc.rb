@@ -143,7 +143,7 @@ class GccWork < BuildWork
 		end
 		
 		@all_sourcefiles = cfiles + cppfiles
-		@all_sourcefiles.sort! do |a,b| File.mtime(b) <=> File.mtime(a) end
+		@all_sourcefiles.sort! do |a,b| b.timestamp <=> a.timestamp end
 		
 		@source_objects = objects(@all_sourcefiles)
 		all_objects = @source_objects + @EXTRA_OBJECTS

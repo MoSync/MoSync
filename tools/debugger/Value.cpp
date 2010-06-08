@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "operations_generated.cpp"
 #include "stabs/stabs_typedefs.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 

@@ -18,8 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** \file main.cpp
 * MoTooth is a simple Bluetooth exploration program.
 * It can search for devices and RFCOMM services,
-* store them in a database,
-* connect to a service and display its output.
+* list them and store them in a database.
+* It can also connect to a service and display its output.
 
 * On Windows, due to a bug in the Windows Bluetooth stack,
 * newly discovered devices may appear without names.
@@ -162,32 +162,6 @@ void menu() {
 		}
 	}
 }
-
-/*int select() {
-	//user must press a number of number keys to match the ten-logarithm of the number of available services
-	//alt: avsluta med fyrkant :)
-	//alt: choose 1-9, press 0 for more choices
-	int max = MIN(gnServices, 9);
-	int selected;
-	printf("Press 1-%i\n", max);
-	for(;;) {
-		int event;
-		while(event = maGetEvent()) {
-			switch(event) {
-			case EVENT_CLOSE:
-				maExit(0);
-				break;
-
-			//case MAK_1:
-				//selected = 1;
-				//break;
-#define SELECT(num) case MAK_##num: return num;
-#define NUMBERS(m) m(1) m(2) m(3) m(4) m(5) m(6) m(7) m(8) m(9)
-			NUMBERS(SELECT);
-			}
-		}
-	}
-}*/
 
 void run() {
 	//select

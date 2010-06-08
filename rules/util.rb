@@ -101,3 +101,13 @@ def verbose_rm_rf(list)
 end
 
 HashMergeAdd = Proc.new {|key, old, new| old + new }
+
+# returns a command-line string with the correct invocation of sed for all platforms
+def sed(script)
+	file = open("|sed --version 2>&1")
+	if(file.gets == 'GNU sed' && HOST != :win32)
+		return "sed '#{script}'"
+	else
+		return "sed #{script}"
+	end
+end

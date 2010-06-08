@@ -91,7 +91,7 @@ static bool start_sim() {
 	int res = CreateProcess(NULL, ptr, NULL, NULL, false, 0, NULL, "debug", &si, &pi);
 	delete ptr;
 	if(res == 0) {
-		LOG("GLE %i\n", GetLastError());
+		LOG("GLE %lu\n", GetLastError());
 		error("CreateProcess failed");
 		return false;
 	}

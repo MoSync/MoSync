@@ -8,16 +8,19 @@ work.instance_eval do
 
 	if ( HOST == :darwin )
 		# Objective-C++ compiler
-		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"	
+		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
 	else
-		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-declarations"	
+		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-declarations"
 	end
 
 	@NAME = "icon-injector"
 	if(HOST==:linux || HOST==:darwin)
 		@IGNORED_FILES = ["WinmobileInjector.cpp", "ErrorCheck.cpp", "IconFileLoader.cpp"]
+		@LIBRARIES = ["expat"]
+	else	# win32
+		@CUSTOM_LIBS = ["libexpat.lib"]
 	end
-	@LIBRARIES = ["expat"]
+	
 	@INSTALLDIR = mosyncdir + '/bin'
 end
 

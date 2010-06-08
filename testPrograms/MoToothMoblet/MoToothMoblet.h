@@ -45,8 +45,8 @@ public:
 
 	void addDevice(const BtDevice& d);
 	void addService(int deviceIndex, const BtService& s);
-	bool read(Handle data);
-	void write(Handle data) const;
+	bool read(MAHandle data);
+	void write(MAHandle data) const;
 
 	Vector<DEVICE> devices;
 };
@@ -55,5 +55,5 @@ extern Database gDatabase;
 
 void writeStore();
 void deleteStore();
-const char* btaddr2string(const btaddr_t& a);
-int btaddr2string(char* buf, const btaddr_t& a);
+const char* btaddr2string(const MABtAddr& a);
+int btaddr2string(char* buf, const MABtAddr& a);

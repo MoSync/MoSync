@@ -24,7 +24,7 @@ class MoSyncThread {
 public:
 	void start(int (SDLCALL * func)(void*), void* arg);
 	int join();
-        static void sleep ( unsigned int ms );
+	static void sleep(unsigned int ms);
 	bool isCurrent();	//returns true if this thread is the current thread.
 private:
 	SDL_Thread* mThread;

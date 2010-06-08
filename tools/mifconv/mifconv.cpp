@@ -79,13 +79,13 @@ int stricmp(const char* str1, const char* str2) {
 }
 #endif
 
-void writeUint32(uint32_t value, FILE* out) {
+static void writeUint32(uint32_t value, FILE* out) {
 	uint8_t buf[] = { uint8_t(value >> 0), uint8_t(value >> 8),
 		uint8_t(value >> 16), uint8_t(value >> 24) };
 	fwrite(buf, 1, 4, out);
 }
 
-uint32_t readUint32(FILE* in) {
+static uint32_t readUint32(FILE* in) {
 	uint8_t buf[4];
 	if (fread(buf, 1, 4, in) != 4) {
 		fprintf(stderr, "Unexpected end of file\n");
@@ -94,16 +94,16 @@ uint32_t readUint32(FILE* in) {
 	return buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 }
 
-char* outname = NULL;
-char* headername = NULL;
+static char* outname = NULL;
+static char* headername = NULL;
 
-uint32_t colorType = 0;
-uint32_t maskType = 0;
-uint32_t animType = 0;
+static uint32_t colorType = 0;
+static uint32_t maskType = 0;
+static uint32_t animType = 0;
 
-bool extract = false;
+static bool extract = false;
 
-void fixDirSep(char* str) {
+static void fixDirSep(char* str) {
 	char* ptr = str;
 	while (*ptr) {
 		if (*ptr == '\\')
@@ -142,9 +142,9 @@ public:
 	uint32_t maskType;
 	uint32_t animType;
 };
-vector<ImageFile> images;
+static vector<ImageFile> images;
 
-void readParamFile(const char* filename);
+static void readParamFile(const char* filename);
 
 struct ColorType {
 	const char* name;
@@ -163,7 +163,7 @@ struct ColorType {
 	{ NULL, 0 },
 };
 
-void processArgument(const char* arg) {
+static void processArgument(const char* arg) {
 	if (arg[0] == '/') {
 		const char* param = arg + 1;
 		if (param[0] == 'h' || param[0] == 'H') {
@@ -219,7 +219,7 @@ void processArgument(const char* arg) {
 	}
 }
 
-void readParamFile(const char* filename) {
+static void readParamFile(const char* filename) {
 	char* localName = strdup(filename);
 	fixDirSep(localName);
 	FILE* in = fopen(localName, "r");
@@ -244,7 +244,7 @@ void readParamFile(const char* filename) {
 	fclose(in);
 }
 
-char* toName(const char* str) {
+static char* toName(const char* str) {
 	const char* slash = strrchr(str, '/');
 	if (slash)
 		slash++;
@@ -263,16 +263,16 @@ char* toName(const char* str) {
 	return base;
 }
 
-void expectUint32(uint32_t value, FILE* in) {
+static void expectUint32(uint32_t value, FILE* in) {
 	if (readUint32(in) != value) {
 		fprintf(stderr, "Expected value not found\n");
 		exit(2);
 	}
 }
 
-int outIndex = 1;
+static int outIndex = 1;
 
-FILE* openOutFile() {
+static FILE* openOutFile() {
 	char buf[200];
 	while (true) {
 		sprintf(buf, "mif%03d.svg", outIndex++);
@@ -288,7 +288,7 @@ FILE* openOutFile() {
 	return NULL;
 }
 
-void doExtract(const char* name) {
+static void doExtract(const char* name) {
 	FILE* in = fopen(name, "rb");
 	if (!in) {
 		perror(name);
@@ -450,4 +450,3 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
-

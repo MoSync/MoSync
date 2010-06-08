@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef COMMON_H
 #define COMMON_H
 
+// This is the service UUID, shared between client and server.
+
 //#define SERVER_UUID "102030405060708090A0B0C0D0E0F010"
 #define SERVER_UUID_1(m) m(10203040)
 #define SERVER_UUID_2(m) m(50607080)
