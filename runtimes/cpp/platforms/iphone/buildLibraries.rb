@@ -18,7 +18,7 @@ sh "lipo build/Debug-iphoneos/libMoSyncLib.a build/Debug-iphonesimulator/libMoSy
 sh "lipo build/Release-iphoneos/libMoSyncLib.a build/Release-iphonesimulator/libMoSyncLib.a -create -output template/libs/release/libMoSyncLib.a"
 
 # these files should probably be combined into one
-FileUtils.cp "Classes/maapi_defs.h", "template/Classes/maapi_defs.h"
+FileUtils.cp "Classes/helpers/maapi_defs.h", "template/Classes/helpers/maapi_defs.h"
 FileUtils.cp "Classes/converters.h", "template/Classes/converters.h"
 FileUtils.cp "Classes/mstypeinfo.h", "template/Classes/mstypeinfo.h"
 
