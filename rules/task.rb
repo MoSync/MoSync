@@ -97,14 +97,14 @@ class Work < TaskBase
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
 		if(RELOAD)
-			args = ""
+			args = args.join(' ')
 			if(USE_NEWLIB)
 				args += " USE_NEWLIB=\"\""
 			end
 			if(FULLSCREEN == "true")
 				args += " FULLSCREEN=\"true\""
 			end
-			cmd = "workfile.rb #{args.join(' ')} CONFIG=\"#{CONFIG}\" RELOAD=\"\"" + args
+			cmd = "workfile.rb #{args} CONFIG=\"#{CONFIG}\" RELOAD=\"\""
 			if(HOST == :win32)
 				sh "ruby #{cmd}"
 			else
