@@ -169,8 +169,8 @@ end
 # Extension to class File, to make sure that the drive letter is always lowercase.
 # This resolves an issue where programs were rebuilt due to file paths being changed,
 # itself due to strange behaviour in the Windows command-line console.
-if(HOST == :win32)
-	class File
+class File
+	if(HOST == :win32)
 		def self.expand_path_fix(p)
 			ep = self.expand_path(p)
 			return ep if(ep.length <= 3)
@@ -178,6 +178,10 @@ if(HOST == :win32)
 				ep[0,1] = ep[0,1].downcase
 			end
 			return ep
+		end
+	else
+		class << self	# alias class methods, rather than instance methods
+			alias_method(:expand_path_fix, :expand_path)
 		end
 	end
 end
