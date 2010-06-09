@@ -79,25 +79,25 @@ int RenderMain ( void )
 		}
 
 		if ( keyTable[MAK_LEFT-MAK_UP] )
-			rotRadY -= M_PI / 60;
+			rotRadY -= (float)M_PI / 60;
 		else if ( keyTable[MAK_RIGHT-MAK_UP] )
-			rotRadY += M_PI / 60;
+			rotRadY += (float)M_PI / 60;
 		else if ( keyTable[MAK_UP-MAK_UP] )
-			rotRadX -= M_PI / 60;
+			rotRadX -= (float)M_PI / 60;
 		else if ( keyTable[MAK_DOWN-MAK_UP] )
-			rotRadX += M_PI / 60;
+			rotRadX += (float)M_PI / 60;
 
-		rotRadX = (rotRadX >= 2*M_PI) ? rotRadX-2*M_PI : rotRadX;
-		rotRadY = (rotRadY >= 2*M_PI) ? rotRadY-2*M_PI : rotRadY;
+		rotRadX = (rotRadX >= 2*(float)M_PI) ? rotRadX-2*(float)M_PI : rotRadX;
+		rotRadY = (rotRadY >= 2*(float)M_PI) ? rotRadY-2*(float)M_PI : rotRadY;
 
 		//
 		// Construct transformation pipe
 		//
 		pipe.resetPipe( );
 
-		transMatrix.rotateX( -M_PI/2 );
+		transMatrix.rotateX( (float)-M_PI/2 );
 		pipe.addTransform( transMatrix );
-		transMatrix.rotateY( M_PI/4 );
+		transMatrix.rotateY( (float)M_PI/4 );
 		pipe.addTransform( transMatrix );
 
 		transMatrix.rotateX( rotRadX );
