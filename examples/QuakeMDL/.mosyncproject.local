@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1">
 <active.build.cfg active="Benchmark - Release"/>
-<target-profile device="iPad" vendor="Apple"/>
-<properties>
-<property key="last.build.config" value="Benchmark - Release"/>
-</properties>
+<target-profile/>
+<properties/>
 </project>
