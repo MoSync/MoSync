@@ -24,7 +24,7 @@ work.instance_eval do
 	
 	@LOCAL_LIBS = ["mosync_sdl"] + @LOCAL_LIBS
 	
-	@NAME = "MoRE" # was 'moemu', should probably rename it to that later on.
+	@NAME = "moemu" # was 'moemu', should probably rename it to that later on.
 	
 	@INSTALLDIR = mosyncdir + '/bin'
 	

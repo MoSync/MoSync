@@ -108,7 +108,7 @@ buildTemplate()
 
 	#Check if it built ok
 	cd $path/distro
-	if [ ! -e  "tmp/bin/MoRE" ]; then
+	if [ ! -e  "tmp/bin/moemu" ]; then
 		handle_error "more"
 	fi
 
@@ -126,7 +126,7 @@ buildTemplate()
 
 
 	# Copy MoRE
-	cp tmp/bin/MoRE opt/%appname%/bin/run
+	cp tmp/bin/moemu opt/%appname%/bin/run
 	if [ "$?" -ne "0" ]; then
 		handle_error "copy_more"
 	fi
