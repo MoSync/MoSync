@@ -9,8 +9,6 @@ work.instance_eval do
 	if ( HOST == :darwin )
 		# Objective-C++ compiler
 		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"	
-	else
-		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-declarations"	
 	end
 	@NAME = "Bundle"
 	@TARGETDIR = "."

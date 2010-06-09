@@ -5,14 +5,12 @@ require File.expand_path('../../rules/native_mosync.rb')
 work = MoSyncExe.new
 work.instance_eval do
 	@SOURCES = ["."]
-
+	
 	if ( HOST == :darwin )
 		# Objective-C++ compiler
 		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
-	else
-		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-declarations"
 	end
-
+	
 	@NAME = "icon-injector"
 	if(HOST==:linux || HOST==:darwin)
 		@IGNORED_FILES = ["WinmobileInjector.cpp", "ErrorCheck.cpp", "IconFileLoader.cpp"]

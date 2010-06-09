@@ -165,3 +165,19 @@ class Time
 		end
 	end
 end
+
+# Extension to class File, to make sure that the drive letter is always lowercase.
+# This resolves an issue where programs were rebuilt due to file paths being changed,
+# itself due to strange behaviour in the Windows command-line console.
+if(HOST == :win32)
+	class File
+		def self.expand_path_fix(p)
+			ep = self.expand_path(p)
+			return ep if(ep.length <= 3)
+			if(ep[1,1] == ':')
+				ep[0,1] = ep[0,1].downcase
+			end
+			return ep
+		end
+	end
+end

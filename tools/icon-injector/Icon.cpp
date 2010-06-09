@@ -91,27 +91,27 @@ static void end(void *data, const char *el) {
 		XML_ParserFree(parser);
 
 		string absolutePath = getAbsolutePath(filename);
-		vector<IconInstance*>& instances = retIcon->getInstances();
-		for(size_t i = 0; i < instances.size(); i++) {
-			instances[i]->filename = absolutePath + "\\" + instances[i]->filename;
+		vector<IconInstance*>& mInstances = retIcon->getInstances();
+		for(size_t i = 0; i < mInstances.size(); i++) {
+			mInstances[i]->filename = absolutePath + "\\" + mInstances[i]->filename;
 		}
 
 		return retIcon;
 	}
 
 	void Icon::addInstance(const std::string& size, const std::string& filename) {
-		instances.push_back(new IconInstance(size, filename));
+		mInstances.push_back(new IconInstance(size, filename));
 	}
 
 	std::vector<IconInstance*>& Icon::getInstances() {
-		return instances;
+		return mInstances;
 	}
 
 	const IconInstance* Icon::findBestInstance(const std::string& size,
 		const std::string& ext) const
 	{
 		const IconInstance* res = 0;
-		for(vector<IconInstance*>::const_iterator i = instances.begin(); i != instances.end(); ++i) {
+		for(vector<IconInstance*>::const_iterator i = mInstances.begin(); i != mInstances.end(); ++i) {
 			if(ext.length() != 0 && getExtension((*i)->filename) != ext)
 				continue;
 			if((*i)->size == size) {

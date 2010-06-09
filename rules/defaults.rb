@@ -73,7 +73,7 @@ def set_defaults
 	default(:BUILDDIR, @BUILDDIR_BASE + @BUILDDIR_NAME + "/")
 	
 	# String, path to a common base directory for all workfiles in the project.
-	default(:COMMON_BASEDIR, File.expand_path(File.dirname(__FILE__) + "/.."))
+	default(:COMMON_BASEDIR, File.expand_path_fix(File.dirname(__FILE__) + "/.."))
 	# String, path to a common build directory.
 	default(:COMMON_BUILDDIR, @COMMON_BASEDIR + "/" + @BUILDDIR)
 	# String, path to a base directory which will be used as a target for executables and libraries.

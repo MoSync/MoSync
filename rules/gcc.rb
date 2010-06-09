@@ -70,7 +70,7 @@ class CompileGccTask < FileTask
 	end
 	
 	def cFlags
-		return "#{@FLAGS} #{@work.gccmode} #{File.expand_path(@SOURCE)}"
+		return "#{@FLAGS} #{@work.gccmode} #{File.expand_path_fix(@SOURCE)}"
 	end
 	
 	def execute

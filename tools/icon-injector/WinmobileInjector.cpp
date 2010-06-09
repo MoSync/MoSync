@@ -119,7 +119,7 @@ namespace MoSync
 #define T
 #endif
 
-	bool InjectMainIcon(const vector<ICON>& icons, const char *exeFileName)
+	static bool InjectMainIcon(const vector<ICON>& icons, const char *exeFileName)
 	{
 		HANDLE hWhere = BeginUpdateResource(exeFileName, FALSE);
 		if ( hWhere == NULL )
