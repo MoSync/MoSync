@@ -684,7 +684,7 @@ static void Callback::varCreate() {
 
 	oprintDone();
 
-	oprintf(",name=\"%s\",numchild=\"%d\",type=\"%s\"",
+	oprintf(",name=\"%s\",numchild=\"%"PFZT"\",type=\"%s\"",
 		sVar->name.c_str(), sVar->children.size(), sVar->exp->type().c_str());
 	/*
 	if(sVar->exp->value()!="")
@@ -832,7 +832,7 @@ static void printValue(Variable *var) {
 
 static void printListChildrenItem(Variable* var) {
 	oprintf("{name=\"%s\"", var->name.c_str());
-	oprintf(",numchild=\"%d\"", var->children.size());
+	oprintf(",numchild=\"%"PFZT"\"", var->children.size());
 	printValue(var);
 	oprintf(",type=\"%s\"", (!var->exp)?"":var->exp->type().c_str());	
 	oprintf(",exp=\"%s\"", var->localName.c_str());
@@ -1032,7 +1032,7 @@ static void Callback::varListChildren() {
 	}
 
 	oprintDone();
-	oprintf(",numchild=\"%d\",children=[", sVar->children.size());
+	oprintf(",numchild=\"%"PFZT"\",children=[", sVar->children.size());
 
 	//for(size_t i = 0; i < sVar->children.size(); i++) 
 	for(map<int, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
@@ -1066,7 +1066,7 @@ void var_info_num_children(const string& args) {
 	Variable *var = getAndValidateVariable(args);
 	if(!var) return;
 	oprintDone();
-	oprintf(",numchild=\"%d\"\n", var->children.size());
+	oprintf(",numchild=\"%"PFZT"\"\n", var->children.size());
 	commandComplete();
 }
 

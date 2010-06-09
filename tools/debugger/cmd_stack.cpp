@@ -406,7 +406,7 @@ void Callback::sif() {
 		pc = sFrames[sCurrentFrameIndex].pc;
 	}
 	oprintDone();
-	oprintf(",frame={level=\"%i\",", sCurrentFrameIndex);
+	oprintf(",frame={level=\"%"PFZT"\",", sCurrentFrameIndex);
 	oprintFrame(pc);
 	oprintf("\n");
 	commandComplete();
