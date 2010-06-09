@@ -95,11 +95,13 @@ int MoSync_ThreadMain(void *args) {
 	
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
-	
+
 #ifdef _USE_REBUILDER_
-	FileStream res(resources);
-	if(!syscall->loadResources(res, resources))
-		BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);	
+	{
+		FileStream res(resources);
+		if(!syscall->loadResources(res, resources))
+			BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);	
+	}
 	cpp_main();
 #else
 	gCore = Core::CreateCore(*syscall);

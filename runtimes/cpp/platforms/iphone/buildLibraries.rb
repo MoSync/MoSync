@@ -1,3 +1,4 @@
+#!/usr/bin/ruby
 require "../../../../rules/util.rb"
 require "FileUtils"
 
