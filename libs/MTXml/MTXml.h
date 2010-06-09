@@ -48,7 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * If you use mtxFeedProcess(), the parser will determine if UTF-8 is used and,
 * convert all strings reported by MTX callbacks to Latin-1.
-* It will also convert standard entity references. (XML and HTTP 4.01)
+* It will also convert standard entity references. (XML and HTML 4.01)
 *
 * mtxFeedWide() works like mtxFeedProcess(), except the output is converted to Unicode instead
 * of Latin-1.
@@ -60,7 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * \see http://www.w3.org/TR/xml11/ - The W3C Specification of XML 1.1 (online)
 * \see http://www.w3.org/TR/html401/sgml/entities.html#h-24.2 -
-* HTTP 4.01 character entity references (online)
+* HTML 4.01 character entity references (online)
 */
 
 #ifndef _MTXML_H_

@@ -184,7 +184,7 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 </tr>
 
 <tr style="background-color: rgb(207, 226, 243);">
-<td><a name="comms" />
+<td><a name="comms"></a>
 <strong>Communications</strong>
 </td>
 <td>Communicate via TCP, HTTP and Bluetooth serial port.<br>
