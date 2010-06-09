@@ -28,6 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 
+/**
+* \brief MoSync test case classes
+*/
+
 namespace MATest {
 
 	using namespace MAUtil;

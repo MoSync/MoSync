@@ -286,6 +286,11 @@ unsigned char mtxBasicUnicodeConvert(MTXContext* context, int unicode);
 #endif
 
 #ifdef __cplusplus
+
+/**
+* \brief MoSync wrappers for XML/SAX parser
+*/
+
 namespace Mtx {
 	/**
 	* \see Context

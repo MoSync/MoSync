@@ -33,12 +33,15 @@ public:
 
 /**
 * \brief Encapsulates MoSync's server connections.
-* Use this class to listen for incoming Connections.
+* Use this class to listen for incoming connections.
 */
 class Server : protected ConnListener {
 public:
 	Server(ServerListener* listener) : mListener(listener), mServ(0) {}
 
+	/**
+	* Closes the server.
+	*/
 	virtual ~Server();
 
 	/**
@@ -52,6 +55,7 @@ public:
 
 	/**
 	* Retrieves the local address of this server.
+	* \param dst A pointer to the struct that will receive the address.
 	* \returns \> 0 on success, \< 0 on error.
 	*/
 	int getAddr(MAConnAddr* dst);

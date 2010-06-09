@@ -27,6 +27,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Widget.h"
 #include <MAUtil/Environment.h>
 
+/**
+* \brief MoSync graphical user interface classes
+*/
+
 namespace MAUI {
 
 	using namespace MAUtil;

@@ -42,7 +42,10 @@
 
 //extern "C++" {
 
-	namespace std 
+/**
+* \brief Standard C++ namespace
+*/
+	namespace std
 	{
 		struct nothrow_t { };
 		extern const nothrow_t nothrow;
