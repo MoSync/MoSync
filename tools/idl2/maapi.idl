@@ -2392,11 +2392,6 @@ interface MAAPI {
 		int maStreamClose(in MAHandle stream);
 #endif	//IX_STREAMING
 
-#if IX_OPENGL_ES
-#include "opengl_generated.idl"
-#include "opengl_non_generated.idl"
-#endif
-
 		/**
 		* A structure containing information about the native framebuffer, 
 		* with things like color format and resolution. The 'sizeInBytes' field is 
