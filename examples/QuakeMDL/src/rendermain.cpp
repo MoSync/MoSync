@@ -13,6 +13,7 @@
 #include "matrix4fi.hpp"
 #include "transformpipe.hpp"
 #include "MAHeaders.h"
+#include "main.h"
 
 
 int RenderMain ( void )
@@ -142,7 +143,4 @@ int RenderMain ( void )
 			lprintfln( "fps: %d", lastFps );
 		}
 	}
-
-
-	return 0;
 }

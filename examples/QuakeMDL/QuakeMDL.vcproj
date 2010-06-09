@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclibD.lib mastdD.lib mautilD.lib"
+				AdditionalDependencies="mosynclibD.lib mastdD.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -147,7 +147,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib"
+				AdditionalDependencies="mosynclib.lib mastd.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -193,6 +193,10 @@
 			</File>
 			<File
 				RelativePath=".\inc\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\main.h"
 				>
 			</File>
 			<File
