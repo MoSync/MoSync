@@ -102,6 +102,10 @@ public:
 		printf("accept failed: %i\n", result);
 	}
 	void serverAccepted(Server* server, Connection* newConnection) {
+		// Create a handler for the new connection.
+		// Give it an id, so we can tell different connections apart.
+		// No need to save the pointer; the handler will delete itself
+		// when the connection closes.
 		new MyConnectionHandler(newConnection, mNextId++);
 	}
 };

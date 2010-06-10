@@ -102,10 +102,14 @@ class PipeGccWork < GccWork
 	include MoSyncInclude
 	
 	def set_defaults
+		default(:BUILDDIR_PREFIX, "")
+		default(:COMMOM_BUILDDDIR_PREFIX, "")
 		if(USE_NEWLIB)
-			@BUILDDIR_PREFIX = "newlib_"
+			@BUILDDIR_PREFIX += "newlib_"
+			@COMMOM_BUILDDDIR_PREFIX += "newlib_"
 		else
-			@BUILDDIR_PREFIX = "pipe_"
+			@BUILDDIR_PREFIX += "pipe_"
+			@COMMOM_BUILDDDIR_PREFIX += "pipe_"
 		end
 		super
 	end

@@ -53,8 +53,10 @@ def set_defaults
 	default(:SPECIFIC_CFLAGS, {})
 	# String, name of the base build directory.
 	default(:BUILDDIR_BASE, "build/")
-	# String, added to the beginning of build and target directories.
+	# String, added to the beginning of build directories.
 	default(:BUILDDIR_PREFIX, "")
+	# String, added to the beginning of the common build directories.
+	default(:COMMOM_BUILDDDIR_PREFIX, "")
 	
 	# String, configuration identifier.
 	# Valid values are "debug" and "" (optimized).
@@ -72,10 +74,12 @@ def set_defaults
 	default(:BUILDDIR_NAME, @BUILDDIR_PREFIX + @CONFIG_NAME)
 	default(:BUILDDIR, @BUILDDIR_BASE + @BUILDDIR_NAME + "/")
 	
+	default(:COMMON_BUILDDIR_NAME, @COMMOM_BUILDDDIR_PREFIX + @CONFIG_NAME)
+	
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path_fix(File.dirname(__FILE__) + "/.."))
 	# String, path to a common build directory.
-	default(:COMMON_BUILDDIR, @COMMON_BASEDIR + "/" + @BUILDDIR)
+	default(:COMMON_BUILDDIR, @COMMON_BASEDIR + "/" + @BUILDDIR_BASE + @COMMON_BUILDDIR_NAME + "/")
 	# String, path to a base directory which will be used as a target for executables and libraries.
 	default(:TARGETDIR, @COMMON_BASEDIR)
 	

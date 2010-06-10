@@ -82,6 +82,17 @@ class Work < TaskBase
 		@prerequisites.each do |p| p.invoke end
 	end
 	
+	def invoke_clean
+		if(@prerequisites == []) then
+			setup
+			if(@prerequisites == [])
+				error "setup failed"
+			end
+		end
+		
+		self.execute_clean
+	end
+	
 	# Invoke the workfile of another directory, as if it would have been called from the command line.
 	def Work.invoke_subdir(dir, *args)
 		puts File.expand_path(dir) + " " + args.inspect

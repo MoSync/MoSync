@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
-	Name="btMobletServer"
-	ProjectGUID="{8D0700E9-E5AC-49BD-8A36-647B850BA524}"
-	RootNamespace="btMobletServer"
+	Version="8.00"
+	Name="btClient"
+	ProjectGUID="{5A1FA99E-7CAF-475C-B664-F42763073197}"
+	RootNamespace="btClient"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -47,7 +47,6 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4355"
 			/>
@@ -62,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclibD.lib mastdD.lib mautilD.lib"
+				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -123,7 +122,6 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4355"
 			/>
@@ -138,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -175,7 +174,11 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\main.cpp"
+			RelativePath=".\client.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\common.h"
 			>
 		</File>
 	</Files>
