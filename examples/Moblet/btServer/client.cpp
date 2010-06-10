@@ -73,7 +73,7 @@ public:
 		// If it's a printable key and we're connected...
 		if(keyCode >= MAK_SPACE && keyCode <= MAK_Z && online) {
 			// Store the digit.
-			currentBuffer[pos++] = '0' + (keyCode - MAK_0);
+			currentBuffer[pos++] = keyCode;
 			// If we're not still writing...
 			if(!writing) {
 				// Send data to server.

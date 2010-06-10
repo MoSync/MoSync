@@ -68,12 +68,29 @@ public:
 		if(res < 0) {
 			printf("Error: %i\n", res);
 		}
+		mOnline = false;
+		mWriting = false;
 	}
 
 	//View
 	void keyPressEvent(int keyCode) {
 		if(keyCode == MAK_0)
 			mMenuView->show();
+
+		// If it's a printable key and we're connected...
+		if(keyCode >= MAK_SPACE && keyCode <= MAK_Z && mOnline) {
+			// Store the digit.
+			mCurrentWriteBuf[mWritePos++] = keyCode;
+			// If we're not still writing...
+			if(!mWriting) {
+				// Send data to server.
+				mConn.write(mCurrentWriteBuf, mWritePos);
+				mWriting = true;
+				mWritePos = 0;
+				// Swap buffers, to avoid overwriting data that's still being sent.
+				mCurrentWriteBuf = (mCurrentWriteBuf == mWriteBuf1) ? mWriteBuf2 : mWriteBuf1;
+			}
+		}
 	}
 	void keyReleaseEvent(int keyCode) {
 	}
@@ -86,21 +103,33 @@ public:
 		printf("connect %i\n", result);
 		if(result < 0)
 			return;
-		mConn.recv(mBuf, sizeof(mBuf) - 1);
+		mConn.recv(mRecvBuf, sizeof(mRecvBuf) - 1);
+		mOnline = true;
 	}
 	void connRecvFinished(Connection* conn, int result) {
+		mOnline = result > 0;
 		if(result < 0) {
 			printf("recv %i\n", result);
 			return;
 		}
-		mBuf[result] = 0;
-		printfln("%s", mBuf);
-		mConn.recv(mBuf, sizeof(mBuf) - 1);
+		mRecvBuf[result] = 0;
+		printfln("%s", mRecvBuf);
+		mConn.recv(mRecvBuf, sizeof(mRecvBuf) - 1);
+	}
+	void connWriteFinished(Connection* conn, int result) {
+		printf("write %i\n", result);
+		mOnline = result > 0;
+		mWriting = false;
 	}
 private:
 	View* mMenuView;
 	Connection mConn;
-	char mBuf[128];
+	char mRecvBuf[128];
+
+	char mWriteBuf1[512], mWriteBuf2[512];
+	char* mCurrentWriteBuf;
+	int mWritePos;
+	bool mWriting, mOnline;
 };
 
 //******************************************************************************
