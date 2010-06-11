@@ -365,7 +365,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 CDirScrAccEng::CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice,
 	RWindow& aWindow)
 	: iClient(aClient),	iScreenDevice(aScreenDevice),
-	iWindow(aWindow), iDirectScreenAccess(0), iScreenGc(0), gCurrentConvertedColor(0),
+	iWindow(aWindow), iDirectScreenAccess(0), iScreenGc(0),
 	iDrawing(EFalse), iOffScreenBmp(0), iOffScreenDevice(0), iFBGc(0),
 	iRawFrameBuf(NULL)
 {    
@@ -373,6 +373,7 @@ CDirScrAccEng::CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice
 	TSize size = aWindow.Size();
 	// calculate the (used) frame buffer size in bytes
 	iFrameBufLen = size.iWidth * size.iHeight * sizeof(Pixel);
+	SetColor(0);
 }
 
 CDirScrAccEng* CDirScrAccEng::NewL(RWsSession& aClient, CWsScreenDevice& aScreenDevice,
@@ -406,6 +407,8 @@ void CDirScrAccEng::ConstructL() {
 	// create the offscreen bitmap
 	iOffScreenBmp = new (ELeave) CFbsBitmap;
 	TSize offScreenSize = iScreenDevice.SizeInPixels();
+	LOG("Screen size: %ix%i\n", offScreenSize.iWidth, offScreenSize.iHeight);
+	LOG("Display mode: %i\n", iScreenDevice.DisplayMode());
 	iOffScreenBmp->Create(offScreenSize, iScreenDevice.DisplayMode());
 	iOffScreenClipRect = offScreenSize;
 	iFBGc = CFbsBitGc::NewL();
