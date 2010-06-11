@@ -1992,6 +1992,11 @@ public
 			value = sysPropFromArray(sImeiProperties);
 		} else if(key.equals("mosync.imsi")) {
 			value = sysPropFromArray(sImsiProperties);
+		} else if(key.equals("mosync.iso-639-1")) {
+			value = System.getProperty("microedition.locale");
+			if(value != null) {
+				value = value.substring(0, 2);
+			}
 		} else {
 			value = System.getProperty(key);
 		}

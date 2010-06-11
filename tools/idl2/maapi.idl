@@ -2517,8 +2517,13 @@ interface MAAPI {
 		/**
 		* Retrieves the value of a Java System Property, or a MoSync System Property.
 		*
-		* There are two MoSync System Properties: "mosync.imei" and "mosync.imsi".
-		* They don't exist on every phone.
+		* There are a few MoSync System Properties. They are unavailable on some devices.
+		* "mosync.imei" and "mosync.imsi" is the device's IMEI and IMSI number, respectively.
+		*
+		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
+		* Multi-language applications should use this to determine which language to use.
+		*
+		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
@@ -2780,6 +2785,7 @@ interface MAAPI {
 		* Returns 0 or \< 0.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
