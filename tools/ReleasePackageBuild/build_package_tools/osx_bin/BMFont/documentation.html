@@ -1,0 +1,383 @@
+<html>
+<head>
+<title>Bitmap Font Generator - Documentation</title>
+</head>
+<body>
+
+<a name="#top"></a>
+<h1>Bitmap Font Generator - Documentation</h1>
+
+<p>The Bitmap Font Generator is a free program to generate bitmap fonts from true type fonts. 
+The bitmaps are generated in such a way as to leave as little unused space as possible. The
+position of the characters in the bitmap is not regular so you'll need the generated font
+descriptor file to determine how to draw each character.</p>
+
+<ul>
+<li><a href="#settings">Font settings</a>
+<li><a href="#cmdline">Command line parameters</a>
+<li><a href="#tags">File tags</a>
+<li><a href="#bin">Binary file layout</a>
+<li><a href="#shader">Pixel shader sample</a>
+<li><a href="#issues">Known issues</a>
+</ul>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#settings"></a>
+<h2>Font settings</h2>
+
+<p><img src="doc/font_settings.png"></p>
+
+<p>You can open the font settings dialog by going to the Options menu and choosing Font 
+settings, or you can just press F on the keyboard.</p>
+
+<p>The left half of this dialog controls the properties of the font, i.e. the character
+set, and looks. The right half controls how the font will be stored, i.e. texture layout, 
+file format, etc. The left half is pretty self explanatory, so I'll explain only the 
+right half.</p>
+
+<h3>Padding</h3>
+
+<p>Padding is useful when you want to add some post processing effects in another 
+paint program. For example, if you want to add a blurring effect that uses a 5x5 kernel,
+you would add a padding of 2 on all sides. Similarly if you want to add a drop shadow, you
+would add a bit of padding below and to the right of the characters (assuming that's the 
+direction of the drop shadow that you want).
+
+<h3>Spacing</h3>
+
+<p>The spacing controls how much minimum space is left between characters in the font 
+texture. If you're using mipmapping to scale the font texture when drawing the font, you'll 
+need to add spacing to avoid bleeding when the texture is downscaled. The more mipmap levels
+you use the more spacing you need.</p>
+
+<p>Bilinear filtering may also cause bleeding, so unless you use pixel perfect drawing, where
+each texel is perfectly mapped to a pixel on the screen with a 1-to-1 releation ship you'll
+want to use at least 1 for vertical and horizontal spacing.</p>
+
+<h3>Texture</h3>
+
+<p>BMFont supports several different texture layouts. The width and height, of course control
+the size of the texture. You'll want to keep the texture as small as possible, while 
+still allowing all characters to fit in one texture.</p>
+
+<p>If you're importing colored icons, or planning on using post processing to add colors to the
+characters, then you'll want to choose the 32bit format, otherwise the 8bit format may be sufficient.</p>
+
+<p>If you choose the 32bit format, you may still optimize the usage of the texture memory if you
+choose to pack characters in each channel, though that will require a special <a href="#shader">pixel shader</a> to 
+decode during drawing. In this mode you can still import colored icons, the characters will be
+properly packed around them.</p>
+
+<p>The font outline can also be encoded together with the character in 8 bits, allowing you to
+store many more characters in the same space than if you had stored the outlined characters as
+colored images. This too require a special <a href="#shader">pixel shader</a> to 
+decode during drawing.</p>
+
+<h3>File format</h3>
+
+<p>Finally you can choose the file format for both the font descriptor and textures. This is mostly
+a matter of choice, rather than one having more benefits than the other. Though if you want to save
+disc space, you may want to choose binary file descriptor with png textures.</p>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#cmdline"></a>
+<h2>Command line parameters</h2>
+
+<p>The application can be used from the command line, to performed automated generation of font files. The 
+prerequisite is a font configuration file, that you can save from the application, or even generate yourself. 
+The command line parameters are:</p>
+
+<ul>
+<li>-c fontconfig.bmfc : Names the configuration file with the options for generating the font.
+<li>-o outputfile.fnt : Names of the output font file.
+<li>-t textfile.txt : Optional argument that names a text file. All characters present in the text file will be 
+added to the font.
+</ul>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#tags"></a>
+<h2>File tags</h2>
+
+<h3>info</h3>
+
+<p>This tag holds information on how the font was generated.</p>
+
+<table>
+<tr><td width=100>face</td><td>This is the name of the true type font.</td></tr>
+<tr><td>size</td><td>The size of the true type font.</td></tr>
+<tr><td>bold</td><td>The font is bold.</td></tr>
+<tr><td>italic</td><td>The font is italic.</td></tr>
+<tr><td>charset</td><td>The name of the OEM charset used (when not unicode).</td></tr>
+<tr><td>unicode</td><td>Set to 1 if it is the unicode charset.</td></tr>
+<tr><td>stretchH</td><td>The font height stretch in percentage. 100% means no stretch.</td></tr>
+<tr><td>smooth</td><td>Set to 1 if smoothing was turned on.</td></tr>
+<tr><td>aa</td><td>The supersampling level used. 1 means no supersampling was used.</td></tr>
+<tr><td>padding</td><td>The padding for each character (up, right, down, left).</td></tr>
+<tr><td>spacing</td><td>The spacing for each character (horizontal, vertical).</td></tr>
+<tr><td>outline</td><td>The outline thickness for the characters.</td></tr>
+</table>
+
+<h3>common</h3>
+
+<p>This tag holds information common to all characters.</p>
+
+<table>
+<tr><td width=100>lineHeight</td><td>This is the distance in pixels between each line of text.</td></tr>
+<tr><td>base</td><td>The number of pixels from the absolute top of the line to the base of the characters.</td></tr>
+<tr><td>scaleW</td><td>The width of the texture, normally used to scale the x pos of the character image.</td></tr>
+<tr><td>scaleH</td><td>The height of the texture, normally used to scale the y pos of the character image.</td></tr>
+<tr><td>pages</td><td>The number of texture pages included in the font.</td></tr>
+<tr><td>packed</td><td>Set to 1 if the monochrome characters have been packed into each of the texture channels.</td></tr>
+<tr><td>encoded</td><td>Set to 1 if the black outline is encoded together with the white char in the alpha channel.</td></tr>
+</table>
+
+<h3>page</h3>
+
+<p>This tag gives the name of a texture file. There is one for each page in the font.</p>
+
+<table>
+<tr><td width=100>id</td><td>The page id.</td></tr>
+<tr><td>file</td><td>The texture file name.</td></tr>
+</table>
+
+<h3>char</h3>
+
+<p>This tag describes on character in the font. There is one for each included character in the font.</p>
+
+<table>
+<tr><td width=100>id</td><td>The character id.</td></tr>
+<tr><td>x</td><td>The left position of the character image in the texture.</td></tr>
+<tr><td>y</td><td>The top position of the character image in the texture.</td></tr>
+<tr><td>width</td><td>The width of the character image in the texture.</td></tr>
+<tr><td>height</td><td>The height of the character image in the texture.</td></tr>
+<tr><td>xoffset</td><td>How much the current position should be offset when copying the image from the texture to 
+the screen.</td></tr>
+<tr><td>yoffset</td><td>How much the current position should be offset when copying the image from the texture to 
+the screen.</td></tr>
+<tr><td>xadvance</td><td>How much the current position should be advanced after drawing the character.</td></tr>
+<tr><td>page</td><td>The texture page where the character image is found.</td></tr>
+<tr><td>chnl</td><td>The texture channel where the character image is found 
+(1 = blue, 2 = green, 4 = red, 8 = alpha, 15 = all channels).</td></tr>
+</table>
+
+<h3>kerning</h3>
+
+<p>The kerning information is used to adjust the distance between certain characters, e.g. some characters should 
+be placed closer to each other than others.</p>
+
+<table>
+<tr><td width=100>first</td><td>The first character id.</td></tr>
+<tr><td>second</td><td>The second character id.</td></tr>
+<tr><td>amount</td><td>How much the x position should be adjusted when drawing the second character immediately 
+following the first.</td></tr>
+</table>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#bin"></A>
+<h2>Binary file layout</h2>
+
+<p>This section describes the layout of the tags in the binary file format. To understand what each tag means refer 
+to the <a href="#tags">file tags</A> section.</p>
+
+<p>The first three bytes are the file identifier and must always be 66, 77, 70, or "BMF". The fourth byte gives 
+the format version, currently it must be the binary 1 or 2. Version 2 sees the addition of outline in the 
+infoBlock and encoded in the commonBlock.</p>
+
+<p>Following the first four bytes is a series of blocks with information. Each block starts with a one byte block 
+type identifier, followed by a 4 byte integer that gives the size of the block, including the 4 byte size value, 
+but not the block type identifier.</p>
+
+<h3>Block type 1: info</h3>
+
+<pre>
+#pragma pack(1)
+struct infoBlock
+{
+    int  blockSize;
+    WORD fontSize;
+    BYTE reserved:4;
+    BYTE bold    :1;
+    BYTE italic  :1;
+    BYTE unicode :1;
+    BYTE smooth  :1;
+    BYTE charSet;
+    WORD stretchH;
+    BYTE aa;
+    BYTE paddingUp;
+    BYTE paddingRight;
+    BYTE paddingDown;
+    BYTE paddingLeft;
+    BYTE spacingHoriz;
+    BYTE spacingVert;
+    BYTE outline;         // Added with version 2
+    char fontName[1];
+};
+</pre>
+
+<p>This structure gives the layout of the fields. Remember that there should be no 
+padding between members. Allocate the size of the block using the blockSize, as 
+following the block comes the font name, including the terminating null char. 
+Most of the time this block can simply be ignored.</p>
+
+<h3>Block type 2: common</h3>
+
+<pre>
+#pragma pack(1)
+struct commonBlock
+{
+    int  blockSize;
+    WORD lineHeight;
+    WORD base;
+    WORD scaleW;
+    WORD scaleH;
+    WORD pages;
+    BYTE packed  :1;
+    BYTE encoded :1;      // Added with version 2
+    BYTE reserved:6;
+}; 
+</pre>
+
+<h3>Block type 3: pages</h3>
+
+<pre>
+#pragma pack(1)
+struct pagesBlock
+{
+    int  blockSize;
+    char pageNames[1];
+};
+</pre>
+
+<p>This block gives the name of each texture file with the image data for the characters. 
+The string pageNames holds the names separated and terminated by null chars. Each filename 
+has the same length, so once you know the size of the first name, you can easily determine 
+the position of each of the names. The id of each page is the zero-based index of the string name.</p>
+
+<h3>Block type 4: chars</h3>
+
+<pre>
+#pragma pack(1)
+struct charsBlock
+{
+    int blockSize;
+    struct charInfo
+    {
+        WORD  id;
+        WORD  x;
+        WORD  y;
+        WORD  width;
+        WORD  height;
+        short xoffset;
+        short yoffset;
+        short xadvance;
+        BYTE  page;
+        BYTE  chnl;
+    } chars[1];
+};
+</pre>
+
+<p>The number of characters in the file can be computed by taking the size of the block 
+and dividing with the size of the charInfo structure, i.e.:  numChars = (charsBlock.blockSize - 4)/18.</p>
+
+<h3>Block type 5: kerning pairs</h3>
+
+<pre>
+#pragma pack(1)
+struct kerningPairsBlock
+{
+    int blockSize;
+    struct kerningPair
+    {
+        WORD  first;
+        WORD  second;
+        short amount;
+    } kerningPairs[1];
+};
+</pre>
+
+<p>This block is only in the file if there are any kerning pairs with amount differing from 0.</p>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#shader"></a>
+<h2>Pixel shader sample</h2>
+
+<p>This pixel shader shows how to decode the color from a font texture with characters packed 
+into all 4 channels, and each channel using special encoding to store the character with the 
+outline. The texture is also allowed to store full 32bit images for some characters.</p>
+
+<pre>
+// DirectX 9 pixel shader
+float4 PixScene( float4 color : COLOR0,
+                 int4   chnl  : TEXCOORD1,
+                 float2 tex0  : TEXCOORD0 ) : COLOR0
+{
+  float4 pixel = tex2D(g_samScene, tex0);
+    
+  if( dot(vector(1,1,1,1), chnl) )
+  {
+    float val = dot(pixel, chnl);
+		
+    pixel.rgb = val > 0.5 ? 2*val-1 : 0;
+    pixel.a   = val > 0.5 ? 1 : 2*val;
+  }
+    
+  return pixel * color;
+}
+</pre>
+
+<p>The chnl texture coordinate is a 4D vector that shows which channel the character should be read 
+from. If this is (0,0,0,0) the character is interpreted as a 32 bit image. The texture coordinate 
+can be stored in a UBYTE4 type, so it doesn't require much bandwidth when being sent to the video card.</p>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+<a name="#issues"></a>
+<h2>Known issues</h2>
+
+<h3>Cropped characters</h3>
+
+<p>With some fonts, some characters are cropped. An example is Bitstream's Cyberbit font, where the bottom of the 
+square bracket characters are cropped off in some font sizes.</p>
+
+<p>This is a compatibility problem between the font and GDI, not a problem in this application by itself. You get 
+the same problem in WordPad for example. I will however try out other font rasterizers, to see if I can fix this 
+problem in a future version.</p>
+
+<h3>Characters are disabled, yet they have images</h3>
+
+<p>Depending on your Windows configuration you may see that with some fonts characters are disabled, yet have a 
+character image. Especially with the asian character sets. This is because Windows automatically fills in the 
+missing characters by taking them from another font when the international language pack is installed.</p>
+
+<p>I do not consider this an error in BMFont, but it may be fixed in a future version, especially if I end up using 
+another font rasterizer.</p>
+
+<h3>Rotated characters</h3>
+
+<p>Some font files have some but not all subsets with characters rotated by 90 degrees. For example @Arial Unicode MS, 
+with subset Enclosed Alphanumerics. This is not an error, but a feature of that font file. With the font rotated 
+like this it permits writing texts in normal text editors as if they were in vertical lines.</p>
+
+<hr>
+<a href="#top">top</a>
+<hr>
+
+</body>
+</html>
