@@ -1,0 +1,10 @@
+CXXFLAGS = -Wall -pedantic
+LDFLAGS = -lcrypto -lzlib -lgdi32
+
+signsis.exe: signsis.o signutils.o sisfield.o crc.o
+	$(CXX) -o $@ $+ $(LDFLAGS)
+	$(STRIP) $@
+
+clean:
+	rm -f signsis.exe *.o
+
