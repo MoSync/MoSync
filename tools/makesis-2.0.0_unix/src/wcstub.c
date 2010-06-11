@@ -34,7 +34,7 @@ int wcsnicmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
 //#ifdef __APPLE__
 #if 1
-     int i;
+     size_t i;
 
      for (i = 0; 
 	  i < n && s1[i] != L'\0' && s2[i] != L'\0'; 

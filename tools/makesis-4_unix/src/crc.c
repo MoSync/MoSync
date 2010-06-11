@@ -53,20 +53,20 @@
  * Returns:		The reflection of the original data.
  *
  *********************************************************************/
-static unsigned long
+/*static unsigned long
 reflect(unsigned long data, unsigned char nBits)
 {
 	unsigned long  reflection = 0x00000000;
 	unsigned char  bit;
 
-	/*
-	 * Reflect the data about the center bit.
-	 */
+	
+	 // Reflect the data about the center bit.
+	 
 	for (bit = 0; bit < nBits; ++bit)
 	{
-		/*
-		 * If the LSB bit is set, set the reflection of it.
-		 */
+		
+		 // If the LSB bit is set, set the reflection of it.
+		 
 		if (data & 0x01)
 		{
 			reflection |= (1 << ((nBits - 1) - bit));
@@ -77,7 +77,7 @@ reflect(unsigned long data, unsigned char nBits)
 
 	return (reflection);
 
-}	/* reflect() */
+}*/
 
 
 /*********************************************************************

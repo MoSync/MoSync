@@ -53,7 +53,7 @@ HANDLE CreateFileA(LPCSTR filename, DWORD access, DWORD sharing,
 		fd = creat(filename, 0664);
 	}
 	else {
-		printf("CreateFileA: unknown creation flag %lu\n", creation);
+		printf("CreateFileA: unknown creation flag %lu\n", (long unsigned int)creation);
 	}
 
 	if(fd < 0) {

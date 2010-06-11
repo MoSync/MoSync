@@ -302,7 +302,7 @@ public:
 		return iNumElements;
 	}
 	SISField* ElementAt(uint32_t aIndex) {
-		if (aIndex >= 0 && aIndex < iNumElements)
+		if (/*aIndex >= 0 &&*/ aIndex < iNumElements)
 			return iElements[aIndex];
 		return NULL;
 	}

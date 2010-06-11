@@ -519,7 +519,7 @@ void CParsePkg::ParseLanguagesL()
 			if(wLoop == NUMLANGOPTIONS)
 				throw ErrUnknownLanguagesId;
 		}
-		else if (m_token==NUMERIC_TOKEN && m_tokenValue.dwNumber>=0 && m_tokenValue.dwNumber<=1000)
+		else if (m_token==NUMERIC_TOKEN && /*m_tokenValue.dwNumber>=0 &&*/ m_tokenValue.dwNumber<=1000)
 			// language codes may be given as a numeric value
 		{
 			if (!pNode) throw ErrNotEnoughMemory;
