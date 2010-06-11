@@ -14,3 +14,4 @@ export DISPLAY=""
 ./run_w32 Z:$(echo $script|sed s/\\//\\\\/g).exe $*
 cd $curr_dir
 
+
