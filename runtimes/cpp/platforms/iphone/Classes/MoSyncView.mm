@@ -72,10 +72,19 @@
 }
 
 - (id)initWithFrame:(CGRect)frame {
+
+	int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
+	frame.origin.y -= statusBarHeight;
+
+	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
+	[[UIApplication sharedApplication] setStatusBarHidden:YES animated:YES];
+	
+	
     if (self = [super initWithFrame:frame]) {
         // Initialization code
 		self.clearsContextBeforeDrawing = NO;
-		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
+		//[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
+		//[[UIApplication sharedApplication] setStatusBarHidden:YES animated:YES];
 		
 		UIDevice* myDevice = [UIDevice currentDevice];
 		[myDevice beginGeneratingDeviceOrientationNotifications];
@@ -99,6 +108,7 @@
     }
     return self;
 }
+
 /*
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {

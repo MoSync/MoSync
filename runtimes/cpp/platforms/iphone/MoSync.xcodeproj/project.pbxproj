@@ -81,7 +81,6 @@
 		85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
 		85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		85F2553611AC12DE00EB47EE /* MoSyncCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = 850943FD1185C40D004A3B2D /* MoSyncCLController.m */; };
-		85F2555911AC155D00EB47EE /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
 		85F2555A11AC155D00EB47EE /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85F2555B11AC155D00EB47EE /* data_section.bin in Resources */ = {isa = PBXBuildFile; fileRef = 8519011E1199B90400B71F58 /* data_section.bin */; };
 		85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -131,7 +130,7 @@
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
-		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = file; path = resources; sourceTree = "<group>"; };
+		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; path = resources; sourceTree = "<group>"; };
 		85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rebuild.cpp; sourceTree = "<group>"; };
 		85BF2B1C113403FD00BB0201 /* bt_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_errors.h; path = ../../../../intlibs/bluetooth/bt_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1D113403FD00BB0201 /* btinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btinit.h; path = ../../../../intlibs/bluetooth/btinit.h; sourceTree = SOURCE_ROOT; };
@@ -203,7 +202,7 @@
 		85BF2BFC11341B3D00BB0201 /* core_run.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core_run.h; path = ../../core/core_run.h; sourceTree = SOURCE_ROOT; };
 		85BF2BFF11341B3D00BB0201 /* CoreCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreCommon.h; path = ../../core/CoreCommon.h; sourceTree = SOURCE_ROOT; };
 		85BF2C0011341B3D00BB0201 /* invoke_syscall_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = invoke_syscall_cpp.h; path = ../../core/invoke_syscall_cpp.h; sourceTree = SOURCE_ROOT; };
-		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = file; path = program; sourceTree = "<group>"; };
+		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = text; path = program; sourceTree = "<group>"; };
 		85BF2C5F113429A900BB0201 /* MoSyncView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncView.h; sourceTree = "<group>"; };
 		85BF2C60113429A900BB0201 /* MoSyncView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncView.mm; sourceTree = "<group>"; };
 		85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -595,7 +594,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85F2555911AC155D00EB47EE /* program in Resources */,
 				85F2555A11AC155D00EB47EE /* resources in Resources */,
 				85F2555B11AC155D00EB47EE /* data_section.bin in Resources */,
 			);
@@ -709,6 +707,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
 			};
@@ -721,6 +720,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
 			};
