@@ -277,15 +277,18 @@ interface MAAPI {
 
 	/**
 	* Draws a single pixel using the current color.
+	* \see maSetColor()
 	*/
 	void maPlot(in int posX, in int posY);
 	/**
 	* Draws a line using the current color.
+	* \see maSetColor()
 	*/
 	void maLine(in int startX, in int startY, in int endX, in int endY);
 	/**
 	* Draws a filled rectangle using the current color.
 	* Width and height must be greater than zero.
+	* \see maSetColor()
 	*/
 	void maFillRect(in int left, in int top, in int width, in int height);
 	/**
@@ -293,6 +296,7 @@ interface MAAPI {
 	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
 	* vertices of the strip.
 	* \param count The count of vertices in the strip. Must be at least 3.
+	* \see maSetColor()
 	*/
 	void maFillTriangleStrip(in MAPoint2d points, in int count);
 	/**
@@ -300,6 +304,7 @@ interface MAAPI {
 	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
 	* vertices of the fan.
 	* \param count The count of vertices in the fan. Must be at least 3.
+	* \see maSetColor()
 	*/
 	void maFillTriangleFan(in MAPoint2d points, in int count);
 
@@ -316,12 +321,14 @@ interface MAAPI {
 	/**
 	* Draws Latin-1 text using the current color.
 	* The coordinates are the top-left corner of the text's bounding box.
+	* \see maSetColor()
 	*/
 	void maDrawText(in int left, in int top, in MAString str);
 
 	/**
 	* Draws Unicode text using the current color.
 	* The coordinates are the top-left corner of the text's bounding box.
+	* \see maSetColor()
 	*/
 	void maDrawTextW(in int left, in int top, in MAWString str);
 

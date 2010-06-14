@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // This program acts as a Bluetooth server.
 // It sets up an RFCOMM service with a particular UUID and listens for connections.
-// For each connection accepted, it prints any data recieved.
+// For each connection accepted, it prints any data received.
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Connection.h>
@@ -45,7 +45,7 @@ public:
 		printf("%i @ %02X%02X%02X%02X%02X%02X\n", mId,
 			a[0], a[1], a[2], a[3], a[4], a[5]);
 
-		// Start recieving data.
+		// Start receiving data.
 		mConn->setListener(this);
 		mConn->recv(mBuffer, 4);
 	}
@@ -60,10 +60,10 @@ public:
 			printf("recv %i: %i\n", mId, result);
 			delete this;	// should be safe
 		} else {
-			// We recieved data. Print it.
+			// We received data. Print it.
 			mBuffer[result] = 0;
 			printf("%i: %s\n", mId, mBuffer);
-			// Continue recieving data.
+			// Continue receiving data.
 			conn->recv(mBuffer, 63);
 		}
 	}
