@@ -36,7 +36,11 @@ private:
 	char mBuffer[64];
 	const int mId;
 public:
-	MyConnectionHandler(Connection* conn, int id) : mConn(conn), mId(id) {
+	MyConnectionHandler(int id) : mConn(NULL), mId(id) {}
+
+	void start(Connection* conn) {
+		mConn = conn;
+
 		// Print the remote address.
 		MAConnAddr addr;
 		int res = mConn->getAddr(&addr);
@@ -73,6 +77,7 @@ class MyMoblet : public Moblet, public ServerListener {
 private:
 	Server mServer;
 	int mNextId;
+	MyConnectionHandler* mCH;
 public:
 	MyMoblet() : mServer(this), mNextId(1) {
 		// Start the server.
@@ -90,6 +95,17 @@ public:
 		byte* a = addr.bt.addr.a;
 		printf("@ %i %02X%02X%02X%02X%02X%02X\n", addr.bt.port,
 			a[0], a[1], a[2], a[3], a[4], a[5]);
+
+		accept();
+	}
+
+	void accept() {
+		// Create a handler for the new connection.
+		// Give it an id, so we can tell different connections apart.
+		// No need to save the pointer; the handler will delete itself
+		// when the connection closes.
+		mCH = new MyConnectionHandler(mNextId++);
+		mServer.accept(mCH);
 	}
 
 	void keyPressEvent(int keyCode) {
@@ -101,12 +117,9 @@ public:
 	void serverAcceptFailed(Server* server, int result) {
 		printf("accept failed: %i\n", result);
 	}
-	void serverAccepted(Server* server, Connection* newConnection) {
-		// Create a handler for the new connection.
-		// Give it an id, so we can tell different connections apart.
-		// No need to save the pointer; the handler will delete itself
-		// when the connection closes.
-		new MyConnectionHandler(newConnection, mNextId++);
+	void serverAccepted(Server*, Connection* newConnection) {
+		mCH->start(newConnection);
+		accept();
 	}
 };
 
