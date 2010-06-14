@@ -32,7 +32,7 @@ namespace MAUI {
 	
 	class ListBox;
 
-	/** A listener interface that receives notifications whenever an item in a ListBox is selected.
+	/** \brief Listener interface that receives notifications when an item in a ListBox is selected.
 	  **/
 	class ItemSelectedListener {
 	public:
@@ -44,7 +44,9 @@ namespace MAUI {
 	};
 
 	
-	/** The MAUI ListBox is a very generic and flexible container that enables laying out widgets in vertical
+	/** \brief List box widget for horizontal or vertical lists.
+	  *
+	  * The MAUI ListBox is a very generic and flexible container that enables laying out widgets in vertical
 	  * or horizontal lists. Unlike list boxes you might find in other UI toolkits, this one doesn't only support
 	  * text-based items - it supports putting in any type of widget. You could add an image followed by a label,
 	  * followed by another, nested ListBox. Furthermore, the navigation is decoupled from input. For instance, it 

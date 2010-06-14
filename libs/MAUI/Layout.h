@@ -28,8 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	/** This widget is responsible for laying out its children in a grid. It also provides 
-	   *  navigation facilites within that grid,  so that the children can be selected and triggered.
+	/** \brief Layout and navigation of child widgets in a grid.
+	   *
+	   * This widget is responsible for laying out its children in a grid. It also provides 
+	   * navigation facilites within that grid, so that the children can be selected and triggered.
 	   * The widget doesn't draw its background by default, use setDrawBackground(true) to enable it.
 	   **/
 

@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 	/**
-	* A C++ representation of a Bluetooth device.
+	* \brief A C++ representation of a Bluetooth device.
 	* \see BluetoothDiscoverer
 	*/
 	struct BtDevice {
@@ -38,7 +38,7 @@ namespace MAUtil {
 	};
 
 	/**
-	* A C++ representation of a Bluetooth service.
+	* \brief A C++ representation of a Bluetooth service.
 	* \see BluetoothDiscoverer
 	*/
 	struct BtService {
@@ -48,7 +48,7 @@ namespace MAUtil {
 	};
 
 	/**
-	* An interface for listening to Bluetooth device discovery events.
+	* \brief An interface for listening to Bluetooth device discovery events.
 	* \see BluetoothDiscoverer
 	*/
 	class BluetoothDeviceDiscoveryListener {
@@ -69,7 +69,7 @@ namespace MAUtil {
 	};
 
 	/**
-	* An interface for listening to Bluetooth service discovery events.
+	* \brief An interface for listening to Bluetooth service discovery events.
 	* \see BluetoothDiscoverer
 	*/
 	class BluetoothServiceDiscoveryListener {

@@ -40,6 +40,10 @@ namespace MAUI {
 	
 	class Widget;
 
+/** 
+ * \brief Input management for keys and pointers
+ */
+	
 	class InputManager {
 	public:
 		virtual void keyPressed(int key) = 0;
@@ -50,6 +54,10 @@ namespace MAUI {
 	protected:
 		Widget* mWidget;
 	};
+	
+/** 
+ * \brief Default input management for keys and pointers
+ */
 	
 	class DefaultInputManager : public InputManager {
 	public:

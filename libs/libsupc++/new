@@ -43,7 +43,7 @@
 //extern "C++" {
 
 /**
-* \brief Standard C++ namespace
+* \brief A few essential C++ declarations
 */
 	namespace std
 	{

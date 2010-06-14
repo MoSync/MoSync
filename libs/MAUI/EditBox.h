@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Label.h"
 
 namespace MAUI {
-	
+
 	class EditBox;
 
 	/** 
@@ -50,15 +50,18 @@ namespace MAUI {
 		virtual void characterAdded(EditBox *eb, char c);
 	};
 
-	/** This is an EditBox widget. It has two modes: multi line and single line.
-	  * You can either make a custom behaviour of navigating in the editbox by calling
-	  * the navigation functions such as: moveCursorVertical, moveCursorHorizontal etc.
-	  * or use the default behaviour. Be sure to set the editbox as selected when you want to 
-	  * use it (when using the default behaviour it is then added as a keylistener to the system
-	  * and responds to all keypresses until it is deselected. Be sure to implement this behaviour
-	  * using a widgetlistener and the activate/deactivate functions if you are making a custom behaviour). 
-	  * See Label for more information.
-	  **/
+	/** 
+	* \brief Edit box widget, multi and single line
+	* 
+	* This widget has two modes: multi line and single line.
+	* You can either make a custom behaviour of navigating in the editbox by calling
+	* the navigation functions such as: moveCursorVertical, moveCursorHorizontal etc.
+	* or use the default behaviour. Be sure to set the editbox as selected when you want to 
+	* use it (when using the default behaviour it is then added as a keylistener to the system
+	* and responds to all keypresses until it is deselected. Be sure to implement this behaviour
+	* using a widgetlistener and the activate/deactivate functions if you are making a custom behaviour). 
+	* See Label for more information.
+	**/
 	class EditBox : 
 //		public Widget, CharInputListener, KeyListener {
 	public Label, CharInputListener, KeyListener {

@@ -70,6 +70,8 @@ public:
 	class ConstIterator;
 
 	/**
+	* \brief An iterator for a HashMap.
+	* 
 	* An Iterator is bound to a specific HashMap object.
 	* The Iterator can point to a specific element in that HashMap, or at HashMap::end(),
 	* which is "beyond" the last element of the HashMap.
@@ -102,6 +104,8 @@ public:
 	};
 
 	/**
+	* \brief A constant iterator for a HashMap.
+	* 
 	* A ConstIterator is just like an ordinary Iterator, except
 	* all its methods and return values are const.
 	*/

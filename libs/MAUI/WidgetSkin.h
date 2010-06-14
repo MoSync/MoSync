@@ -33,7 +33,9 @@ using namespace MAUtil;
 
 namespace MAUI {
 
-	/** A WidgetSkin is a class used to define the visual appearance
+	/** \brief A customizable skin for widgets.
+	 * 
+	 * A WidgetSkin is a class used to define the visual appearance
 	 * of a widget. It is instantiated by passing an image for the
 	 * selected and unselected mode, and two coordinates telling how 
 	 * to divide the image into 9 segments. These segments are then 
@@ -164,7 +166,9 @@ namespace MAUI {
 		 * Returns whether the unselected image is transparent or not.
 		 **/
 		bool isUnselectedTransparent() const;
-
+/** 
+* \brief Key to cache element for skins
+*/
 		struct CacheKey {
 			CacheKey() {
 			}
@@ -184,6 +188,10 @@ namespace MAUI {
 			eType type;	
 		};		
 	
+/** 
+* \brief Cache element for skins
+*/
+
 		struct CacheElement {
 			/*
 			// key

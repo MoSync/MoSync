@@ -35,7 +35,9 @@ namespace MAUI {
 
 	using namespace MAUtil;
 
-	/** A Screen is a logically distinct part of a MAUI interface.
+	/** \brief A displayable screen; a container for MAUI widgets.
+	  *
+	  * A Screen is a logically distinct part of a MAUI interface.
 	  * MAUI applications typically consist of a number of screens
 	  * that the user can navigate between.
 	  **/

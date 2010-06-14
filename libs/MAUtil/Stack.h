@@ -16,11 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file Stack.h
- *
  * \brief Generic, dynamic stack container. A restricted subset of vector.
- *
  * \author Niklas Nummelin
- *
  */
  
 #ifndef _SE_MSAB_MAUTIL_STACK_H_
@@ -31,6 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUtil {
 
 template <typename T>
+
+/** 
+ * \brief Generic, dynamic stack container. A restricted subset of vector.
+ */
+
 class Stack {
 	public:
 		void clear() {

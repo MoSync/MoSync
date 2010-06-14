@@ -32,6 +32,10 @@ namespace MAUI {
 
 	using namespace MAUtil;
 
+	/** 
+	* \brief A character descriptor for a bitmap font.
+	**/
+	
 	struct CharDescriptor
 	{
 		unsigned short x, y;
@@ -42,6 +46,10 @@ namespace MAUI {
 	};
 
 	#define CHARSET_MAX_NAME_LEN 16
+
+	/** 
+	* \brief A character set for a bitmap font.
+	**/
 
 	struct Charset
 	{
@@ -54,8 +62,10 @@ namespace MAUI {
 		char name[CHARSET_MAX_NAME_LEN];
 	};
 
-	/** This class represents and embodies bitmap fonts used by MAUI applications.
-	  **/
+	/** \brief Bitmap font.
+	*
+	* This class represents and embodies bitmap fonts used by MAUI applications.
+	**/
 	
 	class Font {
 	public:

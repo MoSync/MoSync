@@ -16,7 +16,7 @@
 </td>
 
 <td>
-<span style="color: rgb(255, 255, 255);"><strong>Syscalls</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
 </td>
 <td>
 <span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
@@ -102,7 +102,7 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 </td>
 
 <td>
-<span style="color: rgb(255, 255, 255);"><strong>Syscalls</strong></span>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
 </td>
 <td>
 <span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
@@ -279,7 +279,7 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Standard C Functions</span></strong><strong><br>
 </strong></td>
 
-<td><strong><span style="color: rgb(255, 255, 255);">Syscalls</span><br>
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
 </strong></td>
 <td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
 </strong></td>
@@ -383,7 +383,7 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Miscellaneous libraries</span></strong><strong><br>
 </strong></td>
 
-<td><strong><span style="color: rgb(255, 255, 255);">Syscalls</span><br>
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
 </strong></td>
 <td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
 </strong></td>

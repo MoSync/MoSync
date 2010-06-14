@@ -37,7 +37,8 @@ extern "C" {
 #endif
 
 /**
-* The context of an MTSax parser.
+* \brief The context of an MTSax parser.
+*
 * Contains function pointers for callbacks from the parser.
 * Also contains internal variables.
 *
@@ -268,7 +269,7 @@ class SaxListenerW : public SaxListenerT<wchar_t> {
 };
 
 /**
- * SAX parser context wrapper class.
+ * \brief SAX parser context wrapper class.
  *
  * This class wraps the mtxSax set of functions.  To use it, you need to
  * inherit and implement the MtxListener and SaxListener interfaces.

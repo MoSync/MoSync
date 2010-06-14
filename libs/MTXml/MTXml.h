@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /**
 * \file MTXml.h
-* \brief Tiny XML parser
+* \brief Tiny XML parser with a SAX-like interface.
 *
 * MTXml is a simple XML parser which can handle most XML 1.0 and 1.1 documents.
 * It has a SAX-like interface, and is re-entrant in that it can take a partial XML document
@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * In the interests of performance, MTXml is not a conforming XML processor,
 * as defined by the W3C Recommendation. It does not validate documents,
-* and it only checks a few of the well-formed-ness criteria.
+* and it only checks a few of the well-formedness criteria.
 * It even ignores some "fatal errors". Still, it should be able to properly parse
 * a well-formed document.
 *
@@ -82,7 +82,8 @@ extern "C" {
 typedef struct MTXContext MTXContext;
 
 /**
-* The context of an MTXml parser.
+* \brief The context of an MTXml parser.
+*
 * Contains function pointers for callbacks from the parser.
 * Also contains internal variables.
 *
@@ -368,7 +369,7 @@ namespace Mtx {
 	};
 
 	/**
-	* A C++ wrapper for MTXml, with wide-char Unicode output.
+	* \brief A C++ wrapper for MTXml, with wide-char Unicode output.
 	*/
 	class ContextW : public ContextBase {
 	public:
@@ -385,7 +386,7 @@ namespace Mtx {
 	};
 
 	/**
-	* A C++ wrapper for MTXml, with Latin-1 output.
+	* \brief A C++ wrapper for MTXml, with Latin-1 output.
 	*/
 	class Context : public ContextBase {
 	public:
