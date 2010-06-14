@@ -148,6 +148,8 @@ namespace Base {
 	static int maCameraSnapshot(int formatIndex, MAHandle placeholder);
 	static void cameraViewFinderUpdate();
 
+	static int maGetSystemProperty(const char* key, char* buf, int size);
+
 //********************************************************************
 
 #ifdef MOBILEAUTHOR
@@ -2021,6 +2023,10 @@ namespace Base {
 			return SYSCALL_THIS->maPimItemClose(a);
 #endif	//EMULATOR
 
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
@@ -2345,6 +2351,18 @@ namespace Base {
 #else
 #error Unknown platform!
 #endif
+	}
+
+	static int Base::maGetSystemProperty(const char* key, char* buf, int size) {
+#ifdef WIN32
+		if(strcmp(key, "mosync.iso-639-1") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, buf, size);
+			GLE(res);
+			return res;
+		}
+#endif
+		return -2;
 	}
 
 void MoSyncExit(int r) {

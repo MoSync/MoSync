@@ -2611,6 +2611,21 @@ retry:
 	}
 #endif
 
+	static int maGetSystemProperty(const char* key, char* buf, int size) {
+		if(strcmp(key, "mosync.iso-639-1") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			WCHAR wbuf[4];
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, 4);
+			GLE(res);
+			if(res > size)
+				return res;
+			size_t sres = wcstombs(buf, wbuf, size);
+			DEBUG_ASSERT(sres == res-1);
+			return res;
+		}
+		return -2;
+	}
+
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -2764,6 +2779,10 @@ retry:
 			maCloseStream((MAHandle)a);
 			return 0;
 			*/
+
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		}
 		
 		return IOCTL_UNAVAILABLE;
