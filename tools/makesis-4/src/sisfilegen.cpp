@@ -39,8 +39,6 @@
 #include <stdlib.h>
 
 #include "signutils.h"
-#include "selfsigned.cer.h"
-#include "selfsigned.key.h"
 
 #include "sisfield.h"
 #include <openssl/sha.h>
@@ -725,18 +723,6 @@ void CSISFileGenerator::GenerateSISFile(const wchar_t* target, bool stub) {
 
 	SISInstallBlock* installBlock = new SISInstallBlock(fileDescArray, embeddedArray, ifArray);
 	controller->AddElement(installBlock);
-
-
-	if (siswriter->GetSelfsign()) {
-		initSigning();
-		try {
-			SISSignatureCertificateChain* chain = makeChain(controller, selfsignedCer, selfsignedKey, NULL);
-			controller->AddElement(chain);
-		} catch (SignUtilError) {
-			throw ErrCantSign;
-		}
-		cleanupSigning();
-	}
 
 	SISDataIndex* dataIndex = new SISDataIndex(0);
 	controller->AddElement(dataIndex);
