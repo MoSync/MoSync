@@ -1193,13 +1193,15 @@ namespace MoSync {
 	int ArmRecompiler::run(int ip) {
 		//LOG("ArmRecompiler::run(%i)\n", ip);
 		if(mStopped) {
-			LOG("Stopped, Recompiling..\n");
+			LOG("Stopped, Recompiling...\n");
 			Recompiler<ArmRecompiler>::recompile();
-			//LOG("Finished recompiling..\n");
+			LOG("Finished recompiling.\n");
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
+		LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
+		LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 
