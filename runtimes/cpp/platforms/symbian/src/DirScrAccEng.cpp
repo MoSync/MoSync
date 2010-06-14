@@ -223,7 +223,7 @@ MAExtent CDirScrAccEng::GetTextSizeL(const TDesC& aText) {
 }
 void CDirScrAccEng::DrawTextL(const TDesC& aText, TPoint aPoint) {
 	aPoint.iY += gFontBaseline;
-	LOGG("DrawTextL(0x%06x)\n", gCurrentUnconvertedColor.Internal());
+	LOGG("DrawTextL(0x%06x)\n", gCurrentUnconvertedColor.Value());
 	iFBGc->SetPenColor(gCurrentUnconvertedColor | 0xff000000);
 	iFBGc->DrawText(aText, aPoint);
 }

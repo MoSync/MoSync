@@ -1595,13 +1595,125 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 //------------------------------------------------------------------------------
 // maGetSystemProperty
 //------------------------------------------------------------------------------
+static const TDesC& getIso639() {
+	// find current UI language
+	TLanguage tl = User::Language();
 
-#ifdef TELEPHONY
+#define LANGUAGES(m)\
+	m(ELangEnglish, en)\
+	m(ELangFrench, fr)\
+	m(ELangGerman, de)\
+	m(ELangSpanish, es)\
+	m(ELangItalian, it)\
+	m(ELangSwedish, sv)\
+	m(ELangDanish, da)\
+	m(ELangNorwegian, no)\
+	m(ELangFinnish, fi)\
+	m(ELangAmerican, en)\
+	m(ELangSwissFrench, fr)\
+	m(ELangSwissGerman, de)\
+	m(ELangPortuguese, pt)\
+	m(ELangTurkish, tr)\
+	m(ELangIcelandic, is)\
+	m(ELangRussian, ru)\
+	m(ELangHungarian, hu)\
+	m(ELangDutch, nl)\
+	m(ELangBelgianFlemish, nl)\
+	m(ELangAustralian, en)\
+	m(ELangBelgianFrench, fr)\
+	m(ELangAustrian, de)\
+	m(ELangNewZealand, en)\
+	m(ELangInternationalFrench, fr)\
+	m(ELangCzech, cs)\
+	m(ELangSlovak, sk)\
+	m(ELangPolish, pl)\
+	m(ELangSlovenian, sl)\
+	m(ELangTaiwanChinese, zh)\
+	m(ELangHongKongChinese, zh)\
+	m(ELangPrcChinese, zh)\
+	m(ELangJapanese, ja)\
+	m(ELangThai, th)\
+	m(ELangAfrikaans, af)\
+	m(ELangAlbanian, sq)\
+	m(ELangAmharic, am)\
+	m(ELangArabic, ar)\
+	m(ELangArmenian, hy)\
+	m(ELangTagalog, tl)\
+	m(ELangBelarussian, be)\
+	m(ELangBengali, bn)\
+	m(ELangBulgarian, bg)\
+	m(ELangBurmese, my)\
+	m(ELangCatalan, ca)\
+	m(ELangCroatian, hr)\
+	m(ELangCanadianEnglish, en)\
+	m(ELangInternationalEnglish, en)\
+	m(ELangSouthAfricanEnglish, en)\
+	m(ELangEstonian, et)\
+	m(ELangFarsi, fa)\
+	m(ELangCanadianFrench, fr)\
+	m(ELangScotsGaelic, gd)\
+	m(ELangGeorgian, ka)\
+	m(ELangGreek, el)\
+	m(ELangCyprusGreek, el)\
+	m(ELangGujarati, gu)\
+	m(ELangHebrew, he)\
+	m(ELangHindi, hi)\
+	m(ELangIndonesian, id)\
+	m(ELangIrish, ga)\
+	m(ELangSwissItalian, )\
+	m(ELangKannada, kn)\
+	m(ELangKazakh, kk)\
+	m(ELangKhmer, km)\
+	m(ELangKorean, ko)\
+	m(ELangLao, lo)\
+	m(ELangLatvian, lv)\
+	m(ELangLithuanian, lt)\
+	m(ELangMacedonian, mk)\
+	m(ELangMalay, ms)\
+	m(ELangMalayalam, ml)\
+	m(ELangMarathi, mr)\
+	m(ELangMoldavian, ro)\
+	m(ELangMongolian, mn)\
+	m(ELangNorwegianNynorsk, no)\
+	m(ELangBrazilianPortuguese, pt)\
+	m(ELangPunjabi, pa)\
+	m(ELangRomanian, ro)\
+	m(ELangSerbian, sr)\
+	m(ELangSinhalese, si)\
+	m(ELangSomali, so)\
+	m(ELangInternationalSpanish, es)\
+	m(ELangLatinAmericanSpanish, es)\
+	m(ELangSwahili, sw)\
+	m(ELangFinlandSwedish, sv)\
+	m(ELangTamil, ta)\
+	m(ELangTelugu, te)\
+	m(ELangTibetan, bo)\
+	m(ELangTigrinya, ti)\
+	m(ELangCyprusTurkish, tr)\
+	m(ELangTurkmen, tk)\
+	m(ELangUkrainian, uk)\
+	m(ELangUrdu, ur)\
+	m(ELangVietnamese, vi)\
+	m(ELangWelsh, cy)\
+	m(ELangZulu, zu)\
+
+	
+#define CASE_LANGUAGE(id, iso) case id: { _LIT(KTemp, #iso); return KTemp(); }
+	switch(tl) {
+		//case ELangEnglish: { _LIT(KTemp, "en"); return KTemp(); }
+		LANGUAGES(CASE_LANGUAGE)
+		default:
+			return KNullDesC;
+	}
+}
+
 int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	TPtrC8 keyC8(CBP key);
+	TPtrC16 value;
+	_LIT8(KISO639, "mosync.iso-639-1");
+#ifdef TELEPHONY
 	_LIT8(KIMEI, "mosync.imei");
 	_LIT8(KIMSI, "mosync.imsi");
-	TPtrC16 value;
 	if(keyC8.Compare(KIMEI) == 0) {
 		// fetch imei from telephony server
 		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
@@ -1626,6 +1738,10 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 		if(result < 0)
 			return -3;
 		value.Set(sid.iSubscriberId);
+	} else
+#endif	//TELEPHONY
+	if(keyC8.Compare(KISO639) == 0) {
+		value.Set(getIso639());
 	}
 	int len = value.Length();
 	if(len == 0)
@@ -1638,7 +1754,7 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	buf[len] = 0;
 	return len + 1;
 }
-#endif
+
 
 //------------------------------------------------------------------------------
 // FileList
