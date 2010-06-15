@@ -1688,6 +1688,9 @@ public
 		} catch(ConnectionNotFoundException e) {
 			PRINT_STACK_TRACE;
 			return IOCTL_UNAVAILABLE;
+		} catch(SecurityException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_FORBIDDEN;
 		}
 #if 1	//MA_BUG_PLATFORMREQUEST_CHANGES_CLIPRECT
 		finally {
