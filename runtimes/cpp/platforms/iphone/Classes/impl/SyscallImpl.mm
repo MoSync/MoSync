@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 
 #include "config_platform.h"
 #import <UIKit/UIKit.h>
@@ -541,15 +541,13 @@ namespace Base {
 		const MAEvent* ev = gEventQueue.getAndProcess();
 		if(!ev) return 0;
 		else *dst = *ev; //gEventQueue.get();
-
-		/*
-		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
-			memcpy(Core::GetCustomEventPointer(gCore), dst->data, sizeof(dataType));\
-			delete (dataType*)dst->data;\
-			dst->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
-
+		
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev->type == eventType) {\
+		memcpy(MoSync_GetCustomEventData(), ev->data, sizeof(dataType));\
+		delete (dataType*)ev->data;\
+		dst->data = MoSync_GetCustomEventDataMoSyncPointer(); }
+		
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
-		*/
 		
 		return 1;
 	}

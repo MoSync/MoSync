@@ -68,7 +68,6 @@
 
 -(void) stopUpdatingLocation {
 	[locationController.locationManager stopUpdatingLocation];
-
 }
 
 - (id)initWithFrame:(CGRect)frame {

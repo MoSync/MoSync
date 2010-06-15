@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
+#define MA_PROF_SUPPORT_LOCATIONAPI
+
 //#include <windows.h>
 #import <CoreGraphics/CoreGraphics.h>
 #include <string>
@@ -284,7 +286,7 @@ public:
 		event.data = data;
 		put(event);
 	}
-	
+		
 private:
 	pthread_mutex_t mMutex;
 	pthread_cond_t mCond;

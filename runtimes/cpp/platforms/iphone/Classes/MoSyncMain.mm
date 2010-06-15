@@ -42,7 +42,11 @@
 #ifdef _USE_REBUILDER_
 //#include "rebuild.build.cpp"
 
+int sp;
 unsigned char *mem_ds;
+void *sCustomEventData;
+static int sDataSize;
+static int sCustomEventDataPointer;
 
 void MoSyncDiv0() {
 	BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
@@ -68,8 +72,17 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	memset(data, 0, mallocSize);
 	Base::FileStream fileStream(file);
 	fileStream.read(data, fileSize);
+	
+	// setup some stuff here.
+	int mces =  Base::getMaxCustomEventSize();
+	sp -= mces;
+	sDataSize = mallocSize;
+	sCustomEventDataPointer = mallocSize-mces;
+	sCustomEventData = &data[sCustomEventDataPointer];
+	
 	return data;
 }
+
 
 void cpp_main();
 
@@ -185,3 +198,23 @@ void MoSync_AddScreenChangedEvent() {
 void MoSync_AddCloseEvent() {
 	Base::gEventQueue.addCloseEvent();
 }
+
+void MoSync_AddEvent(const MAEvent &e) {
+	Base::gEventQueue.put(e);
+}
+
+void* MoSync_GetCustomEventData() {
+	return sCustomEventData;
+}
+
+void* MoSync_GetCustomEventDataMoSyncPointer() {
+	return (void*) sCustomEventDataPointer;
+}
+
+/*
+void MoSync_AddLocationProviderEvent(int state) {
+}
+
+void MoSync_AddLocationEvent(int state, const MALocation& location) {
+}
+ */

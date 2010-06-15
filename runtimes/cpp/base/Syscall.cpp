@@ -50,6 +50,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace Base;
 
 namespace Base {
+	
+	uint getMaxCustomEventSize() {
+		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
+		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+		
+		uint maxCustomEventSize = 0;
+		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
+		DUMPHEX(maxCustomEventSize);
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+		return maxCustomEventSize;
+	}
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {

@@ -33,7 +33,7 @@
 
 void MoSyncDiv0();
 
-int sp;
+extern int sp;
 int __dbl_high;
 
 extern unsigned char* mem_ds;

@@ -207,4 +207,8 @@ namespace Base {
 	CUSTOM_EVENT_LOCATION(m)\
 	CUSTOM_EVENT_STREAM(m)\
 
+namespace Base {
+	uint getMaxCustomEventSize();
+}
+
 #endif // _SYSCALL_H_
