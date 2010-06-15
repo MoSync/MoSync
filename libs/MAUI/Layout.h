@@ -35,7 +35,7 @@ namespace MAUI {
 	   * The widget doesn't draw its background by default, use setDrawBackground(true) to enable it.
 	   **/
 
-	class Layout : public Widget, WidgetListener {
+	class Layout : public Widget, protected WidgetListener {
 	public:
 		enum HorizontalAlignment {
 			HA_LEFT,

@@ -54,7 +54,7 @@ namespace MAUI {
 	  * be done by pressing the "down" key.  
 	   * The widget draws its background by default, use setDrawBackground(false) to disable it.
 	  **/
-	class ListBox : public Widget, MAUtil::TimerListener, WidgetListener {
+	class ListBox : public Widget, protected MAUtil::TimerListener, protected WidgetListener {
 	public:
 		enum ListBoxOrientation {
 			LBO_HORIZONTAL,

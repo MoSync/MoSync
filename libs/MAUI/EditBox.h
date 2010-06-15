@@ -63,8 +63,7 @@ namespace MAUI {
 	* See Label for more information.
 	**/
 	class EditBox : 
-//		public Widget, CharInputListener, KeyListener {
-	public Label, CharInputListener, KeyListener {
+	public Label, protected CharInputListener, protected KeyListener {
 	public:
 		/** Enumeration for modes **/
 		enum InputMode {
