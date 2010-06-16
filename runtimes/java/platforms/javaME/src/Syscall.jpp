@@ -901,6 +901,12 @@ public
 
 	#include "FloatingPointMath.jpp"
 
+	SYSCALL(long) __muldi3(int a1, int a2, int b1, int b2) {
+		long a = (((long)a2)<<32) | a1;
+		long b = (((long)b2)<<32) | b1;		
+		return a*b;
+	}
+
 	SYSCALL(int) maGetKeys() {	
 		if(G_CLOSING)
 			return 0;
