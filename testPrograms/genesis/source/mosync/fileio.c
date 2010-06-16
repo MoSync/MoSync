@@ -1,5 +1,5 @@
 #include "shared.h"
-#include "../../MAHeaders.h"
+#include "MAHeaders.h"
 /*
     Load a normal file, or ZIP/GZ archive.
     Returns NULL if an error occured.
