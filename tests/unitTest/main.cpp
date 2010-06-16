@@ -69,6 +69,7 @@ public:
 
 		// automated tests
 #ifdef USE_AUTOMATED_TESTS
+		addResTests(&mSuite);
 		addMAUtilTypeTests(&mSuite);
 		addMAUtilUtilTests(&mSuite);
 		addMemTests(&mSuite);
@@ -80,7 +81,6 @@ public:
 
 #ifdef USE_INTERACTIVE_TESTS
 		// interactive tests
-		addResTests(&mSuite);
 #ifndef MA_PROF_SUPPORT_STYLUS		
 		addCharInputTests(&mSuite);
 #endif	//MA_PROF_SUPPORT_STYLUS

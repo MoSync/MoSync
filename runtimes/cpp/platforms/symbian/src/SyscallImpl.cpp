@@ -873,8 +873,18 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		if(hasAlpha)
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
-			//will work properly only on 32-bit 3rd edition devices.
 			TUint32 pixel = clr.GetPixel();
+#if !(defined(__SERIES60_3X__) || defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT))
+			// 2nd edition, format 565
+			// convert to 888.
+			TUint32 blue = pixel & 0x001F;
+			blue |= (blue & 0x1C) << 3;
+			TUint32 green = (pixel & 0x07E0) >> 5;
+			green |= (green & 0x30) << 2;
+			TUint32 red = (pixel & 0xF800) >> 11;
+			red |= (red & 0x1C) << 3;
+			pixel = blue | (green << 8) | (red << 16);
+#endif
 			clr.IncXPos();
 			if(hasAlpha) {
 				pixel |= alpha.GetPixel() << 24;
