@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="MoRE"
 	ProjectGUID="{90CEAD6E-5FC9-4D1B-9BFC-D294319DBEBF}"
 	RootNamespace="MoRE"

@@ -46,6 +46,7 @@ typedef struct
      (r).hi = _y3 + _jlong_hi16(_y1);\
 }\
 
+#if 0
 long long __muldi3(long long a, long long b)
 {
 	int64 r;
@@ -55,6 +56,7 @@ long long __muldi3(long long a, long long b)
     (r).hi += _a.hi * _b.lo + _a.lo * _b.hi;   
 	return (long long)*((long long*)&r);
 }
+#endif
 
 long long __negdi2(long long num) {
 	return (~num)+1;

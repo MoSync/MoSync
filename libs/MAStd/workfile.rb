@@ -16,7 +16,10 @@ mod.class_eval do
 	
 	def setup_pipe
 		setup_base
-		@SOURCES = [".", "../libsupc++", "libgcc"]
+		@SOURCES = [".", "../libsupc++", 
+		"libgcc"
+		]
+		
 		@EXTRA_INCLUDES = []
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags

@@ -237,6 +237,11 @@ interface MAAPI {
 	double sqrt(in double x);
 
 	/**
+	 * hack
+	 */
+	double __muldi3(in int a1, in int a2, in int b1, in int b2);
+
+	/**
 	 * A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
 	 */
 	struct MAPoint2d {
