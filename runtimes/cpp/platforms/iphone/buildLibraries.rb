@@ -27,7 +27,7 @@ FileUtils.cp "Classes/mstypeinfo.h", "template/Classes/mstypeinfo.h"
 FileUtils.cp "Classes/MoSyncAppDelegate.h", "template/Classes/MoSyncAppDelegate.h"
 FileUtils.cp "Classes/MoSyncAppDelegate.mm", "template/Classes/MoSyncAppDelegate.mm"
 FileUtils.cp "Classes/MoSyncViewController.h", "template/Classes/MoSyncViewController.h"
-FileUtils.cp "Classes/MoSyncViewController.m", "template/Classes/MoSyncViewController.m"
+FileUtils.cp "Classes/MoSyncViewController.mm", "template/Classes/MoSyncViewController.mm"
 
 # copy template files and default icons
 FileUtils.cp "library_project/project.plisttemplate", "template/project.plisttemplate"
