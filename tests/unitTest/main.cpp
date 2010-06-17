@@ -67,6 +67,7 @@ private:
 public:
 	MyMoblet() : mSuite("MoSync") {
 
+#if 1
 		// automated tests
 #ifdef USE_AUTOMATED_TESTS
 		addResTests(&mSuite);
@@ -94,6 +95,7 @@ public:
 		addTimeTests(&mSuite);
 		addSystemTests(&mSuite);
 #endif	//USE_INTERACTIVE_TESTS
+#endif	//1
 
 		mSuite.addTestListener(new XMLOutputTestListener(maCreatePlaceholder(), "unitTest.xml"));
 		mSuite.addTestListener(this);
