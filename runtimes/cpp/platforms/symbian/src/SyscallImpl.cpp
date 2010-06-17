@@ -833,6 +833,12 @@ SYSCALL(void, maGetClipRect(MARect* rect)) {
 	rect->height = clipRect.Height();
 }
 
+#if 0
+static int scanlineLength(CFbsBitmap* fb) {
+	return fb->ScanLineLength(fb->SizeInPixels().iWidth, fb->DisplayMode());
+}
+#endif
+
 SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	const MARect* srcRect, int scanlength))
 {
@@ -857,6 +863,14 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		TSize(aSrcRect->width, aSrcRect->height));
 
 	bool hasAlpha = img->Alpha() != NULL;
+#if 0
+	LOG("maGetImageData(image): %ix%i, alpha %i\n", size.iWidth, size.iHeight, hasAlpha);
+	if(hasAlpha) {
+		TSize as(img->Alpha()->SizeInPixels());
+		LOG("alpha size: %ix%i\n", as.iWidth, as.iHeight);
+		LOG("pitch. color: %i, alpha: %i\n", scanlineLength(img->Color()), scanlineLength(img->Alpha()));
+	}
+#endif
 	TBitmapUtil clr(img->Color());
 	clr.Begin(TPoint(0,0));	//begin point is irrelevant, since we do SetPos.
 
@@ -870,8 +884,12 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	for(int sY=lSrcRect.iTl.iY; sY<lSrcRect.iBr.iY; sY++) {
 		int dX = 0;
 		clr.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+
+		// bugged on 5th edition when image width isn't pitch-aligned.
+#ifndef __S60_50__
 		if(hasAlpha)
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+#endif
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
 			TUint32 pixel = clr.GetPixel();
 #if !(defined(__SERIES60_3X__) || defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT))
@@ -887,20 +905,24 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 #endif
 			clr.IncXPos();
 			if(hasAlpha) {
+				// clr.GetPixel() may have the alpha-bits set. Indeed, they are undefined.
+				pixel &= ~0xFF000000;
+
 				pixel |= alpha.GetPixel() << 24;
+				//LOG("Alpha: 0x%x\n", alpha.GetPixel());
 				alpha.IncXPos();
 			} else {
 				pixel |= 0xFF000000;
 			}
 			dstInt[dY*scanlength + dX] = pixel;
 			dX++;
-		}
+		}	//for x
 		dY++;
-	}
+	}	//for y
 
 	clr.End();
 	if(hasAlpha)
-		alpha.End();	
+		alpha.End();
 }
 
 SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
