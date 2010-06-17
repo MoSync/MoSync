@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="sdl"
 	ProjectGUID="{ADF68B96-47DA-4A30-AA51-B5450B019F7F}"
 	RootNamespace="sdl"
@@ -107,7 +107,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				WholeProgramOptimization="false"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="../../base;../../../../intlibs;&quot;$(ProjectDir)&quot;;../../../../libs;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"

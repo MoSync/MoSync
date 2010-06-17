@@ -13,15 +13,15 @@
 
 #define LOGGING_ENABLED
 
-#define UPDATE_IP
+//#define UPDATE_IP
 
-#define FAKE_CALL_STACK
+//#define FAKE_CALL_STACK
 
-#define INSTRUCTION_PROFILING
+//#define INSTRUCTION_PROFILING
 
-#define RESOURCE_MEMORY_LIMIT
+//#define RESOURCE_MEMORY_LIMIT
 
-#define GDB_DEBUG
+//#define GDB_DEBUG
 
 //#define DEBUGGING_MODE
 

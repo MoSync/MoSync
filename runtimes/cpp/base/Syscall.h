@@ -157,6 +157,7 @@ namespace Base {
 }
 
 #ifndef SYMBIAN
+
 #define SPECIAL(name) _##name
 #define SPECIAL_SYSCALL(type, nargs) static type SPECIAL(nargs)
 

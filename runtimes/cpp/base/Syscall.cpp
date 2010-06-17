@@ -380,10 +380,10 @@ namespace Base {
 
 	union LLU 
 	{
-#ifdef _WIN32_WCE
-		struct { int i1, i2; } ii;
+#if 1
+		struct { int i1, i2; } ints;
 #else
-		struct { int i2, i1; } ii;
+		struct { int i2, i1; } ints;
 #endif
 
 		long long ll;
@@ -393,10 +393,10 @@ namespace Base {
 	SYSCALL(double, __muldi3(int a1, int a2, int b1, int b2)) {
 		LLU a;
 		LLU b;
-		a.ii.i1 = a1;
-		a.ii.i2 = a2;
-		b.ii.i1 = b1; 
-		b.ii.i2 = b2; 
+		a.ints.i1 = a1;
+		a.ints.i2 = a2;
+		b.ints.i1 = b1; 
+		b.ints.i2 = b2; 
 		a.ll = a.ll*b.ll;
 		return a.d;
 	}
