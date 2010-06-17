@@ -381,7 +381,7 @@ namespace Base {
 	union LLU 
 	{
 #ifdef _WIN32_WCE
-		struct { int i1, i2; };
+		struct { int i1, i2; } ii;
 #else
 		struct { int i2, i1; } ii;
 #endif
