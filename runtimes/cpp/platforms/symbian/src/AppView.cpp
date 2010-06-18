@@ -202,7 +202,7 @@ void CAppView::LoadProgramL() {
 #if defined(__SERIES60_3X__)
 	_LIT8(KPathFmt, "%S\\resource\\apps\\%08X.comb");
 #else
-	_LIT8(KPathFmt, "%S\\system\\apps\\%08X\\program.comb");
+	_LIT8(KPathFmt, "%S\\system\\apps\\%08X.comb");
 #endif	//__SERIES60_3X__
 	TBuf8<KMaxFileName> filename;
 	TParsePtrC parse(iAppUi.iDocument.iApp.AppFullName());
