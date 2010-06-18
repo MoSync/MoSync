@@ -876,8 +876,9 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 
 	//set to color if no alpha, to avoid potential crash on NULL.
 	TBitmapUtil alpha(hasAlpha ? img->Alpha() : img->Color());
-	if(hasAlpha)
-		alpha.Begin(TPoint(0,0));
+	if(hasAlpha) {
+		alpha.Begin(TPoint(0,0), clr);
+	}
 
 	//iterate through the source, combining and copying pixels
 	int dY = 0;
@@ -903,6 +904,7 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 			red |= (red & 0x1C) << 3;
 			pixel = blue | (green << 8) | (red << 16);
 #endif
+			//LOG("Color(%ix%i): 0x%x\n", sX, sY, pixel);
 			clr.IncXPos();
 			if(hasAlpha) {
 				// clr.GetPixel() may have the alpha-bits set. Indeed, they are undefined.
@@ -920,9 +922,9 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		dY++;
 	}	//for y
 
-	clr.End();
 	if(hasAlpha)
 		alpha.End();
+	clr.End();
 }
 
 SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
