@@ -56,6 +56,8 @@ extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
 
+int Surface::fontSize;
+
 namespace Base {
 
 	//***************************************************************************
@@ -175,6 +177,7 @@ namespace Base {
 		//CGContextTranslateCTM(gBackbuffer, 0, gHeight);
 		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
 		*/
+		Surface::fontSize = gHeight/40;
 		gBackbuffer = new Surface(gWidth, gHeight);
 		CGContextRestoreGState(gBackbuffer->context);		
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
@@ -393,7 +396,18 @@ namespace Base {
 		gSyscall->ValidateMemRange(dstPoint, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(srcRect, sizeof(MARect));
 		gSyscall->ValidateMemRange(src, scanlength*srcRect->height*4);
-		NOT_IMPLEMENTED;
+	//	NOT_IMPLEMENTED;
+		
+		Surface *srcSurface = new 
+		Surface(srcRect->width, srcRect->height, (char*) src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+		
+		ClipRect srcRectCR;
+		srcRectCR.x = srcRect->left;
+		srcRectCR.y = srcRect->top;
+		srcRectCR.width = srcRect->width;
+		srcRectCR.height = srcRect->height;
+		gDrawTarget->mImageDrawer->drawImageRegion(dstPoint->x, dstPoint->y, &srcRectCR, srcSurface->mImageDrawer, 0);
+		delete srcSurface;
 	}
 
 	SYSCALL(void, maDrawImageRegion(MAHandle image, const MARect* src, const MAPoint2d* dstTopLeft,

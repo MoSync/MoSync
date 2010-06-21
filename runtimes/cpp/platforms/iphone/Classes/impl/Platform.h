@@ -45,10 +45,13 @@ namespace Core {
 extern Core::VMCore* gCore;
 extern bool gRunning;
 
-#define FONT_HEIGHT 12
+
+#define FONT_HEIGHT Surface::fontSize //14
 
 class Surface {
 public:
+	static int fontSize;
+	
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {				
 		CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(image));
 		this->data = (char *)CFDataGetBytePtr(data);		
@@ -121,9 +124,9 @@ public:
 	
 	void initFont() {
 		if(!context) return;
-		CGContextSelectFont(context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
+		CGContextSelectFont(context, "Arial", fontSize, kCGEncodingMacRoman);
 
-		CGContextSetFontSize(context, FONT_HEIGHT);
+		CGContextSetFontSize(context, fontSize);
 		CGAffineTransform xform = CGAffineTransformMake(
 														1.0,  0.0,
 														0.0, -1.0,

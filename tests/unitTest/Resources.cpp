@@ -109,7 +109,7 @@ public:
 		);
 		maDrawImage(ARGB_PNG, 0, 0);
 		maUpdateScreen();
-		FREEZE;
+		//FREEZE;
 	}
 
 	void testImageRawData() {
