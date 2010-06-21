@@ -59,7 +59,7 @@ if nightly.class != NilClass
 end
 
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
-            "MoSync and the MoSync logo are trademarks of MoSync AB."
+            "MoSync and the MoSync logo are registered trademarks of MoSync AB."
 
 img = Magick::Image.read('template.png').first
 img2 = Magick::Image.read('template_installer.png').first
