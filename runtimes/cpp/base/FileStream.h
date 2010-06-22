@@ -24,11 +24,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // platform specific
 
+#ifdef _android
+#include <jni.h>
+#endif
+
 namespace Base {
 
 	class FileStream : public Stream {	//read-only
 	public:
 		FileStream(const char* filename);
+#ifdef _android
+		FileStream(FILE* file);
+#endif
 		virtual ~FileStream();
 		virtual bool isOpen() const;
 		virtual bool read(void* dst, int size);
@@ -38,7 +45,11 @@ namespace Base {
 		virtual bool seek(Seek::Enum mode, int offset);
 		virtual bool tell(int& aPos) const;
 
+#ifndef _android
 		virtual Stream* createLimitedCopy(int size) const;
+#else
+		virtual Stream* createLimitedCopy(int size, JNIEnv* jniEnv, jobject jthis) const;
+#endif
 		virtual Stream* createCopy() const;
 
 		const char* getFilename() const;
@@ -56,7 +67,11 @@ namespace Base {
 
 	class LimitedFileStream : public FileStream {	//read-only
 	public:
+#ifndef _android
 		LimitedFileStream(const char* filename, int offset, int len);
+#else
+		LimitedFileStream(const char* filename, int offset, int len, JNIEnv* jNIEnv, jobject jThis);
+#endif
 		bool read(void* dst, int size);
 
 		bool length(int& aLength) const;

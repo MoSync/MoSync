@@ -37,8 +37,11 @@ namespace Base {
 
 		const void* ptrc() { return mSrc; }
 		virtual void* ptr() { FAIL; }
-
+#ifndef _android
 		Stream* createLimitedCopy(int size) const;
+#else
+		Stream* createLimitedCopy(int size, JNIEnv* jNIEnv, jobject jThis) const;
+#endif
 		Stream* createCopy() const;
 	protected:
 		const void* mSrc;
