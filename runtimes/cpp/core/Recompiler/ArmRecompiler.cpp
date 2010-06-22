@@ -32,6 +32,13 @@ using namespace Core;
 #include <windows.h>
 #endif
 
+#ifdef _android
+#include <unistd.h>
+#include <sys/mman.h>
+int _androidMemSize;
+int _androidEntryMemSize;
+#endif
+
 //#define LOGC(x, ...)
 //#define LOG(x, ...)
 
@@ -183,11 +190,61 @@ using namespace Core;
 	}
 #endif	//__SYMBIAN32__
 
+#ifdef _android
+// Returns true iff x is a power of 2.  Does not work for zero.
+template <typename T>
+static inline bool IsPowerOf2(T x) {
+  return (x & (x - 1)) == 0;
+}
+
+// Compute the 0-relative offset of some absolute value x of type T.
+// This allows conversion of Addresses and integral types into
+// 0-relative int offsets.
+template <typename T>
+static inline intptr_t OffsetFrom(T x) {
+  return x - static_cast<T>(0);
+}
+
+// Compute the absolute value of type T for some 0-relative offset x.
+// This allows conversion of 0-relative int offsets into Addresses and
+// integral types.
+template <typename T>
+static inline T AddressFrom(intptr_t x) {
+  return static_cast<T>(0) + x;
+}
+
+// Return the largest multiple of m which is <= x.
+template <typename T>
+static inline T RoundDown(T x, int m) {
+  DEBUG_ASSERT(IsPowerOf2(m));
+  return AddressFrom<T>(OffsetFrom(x) & -m);
+}
+
+
+// Return the smallest multiple of m which is >= x.
+template <typename T>
+static inline T RoundUp(T x, int m) {
+  return RoundDown(x + m - 1, m);
+}
+#endif
+
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
 #ifdef __SYMBIAN32__
 		return mCodeChunk.allocate(size);
 #elif defined(_android)
-		return NULL;
+		int nsize = RoundUp<int>(size, getpagesize());
+
+		void* mem = memalign(getpagesize(), nsize);
+		if(NULL == mem) 
+			return NULL;
+
+		int mret = mprotect(mem, nsize, PROT_READ|PROT_WRITE|PROT_EXEC);
+
+		if(0 != mret)
+			return NULL;
+
+		return mem;
+
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -197,7 +254,8 @@ using namespace Core;
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
 #elif defined(_android)
-		return NULL;
+		return allocateCodeMemory(size);
+
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -209,7 +267,7 @@ using namespace Core;
 		DEBUG_ASSERT(addr == mCodeChunk.address());
 		mCodeChunk.close();
 #elif defined(_android)
-		return;
+		free(addr);
 #else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
 #endif
@@ -221,7 +279,7 @@ using namespace Core;
 		DEBUG_ASSERT(addr == mEntryChunk.address());
 		mEntryChunk.close();
 #elif defined(_android)
-		return;
+		free(addr);
 #else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
 #endif
@@ -239,6 +297,7 @@ using namespace Core;
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
 #elif defined(_android)
+		cacheflush((long int)addr, (long int)addr+len, 0);
 		return;
 #else // winmobile
 		// This seems to work, but might not be correct
@@ -278,6 +337,10 @@ namespace MoSync {
 		loadEnvironmentRegisters(entryPoint);
 
 		loadStaticRegisters(entryPoint);
+
+#ifdef _android
+		flushInstructionCache(entryPoint.mipStart, 64*sizeof(AA::MDInstruction));
+#endif
 
 		// goto recompiled code
 		entryPoint.MOV(AA::PC, AA::R0);
@@ -1021,6 +1084,10 @@ namespace MoSync {
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
 #ifdef __SYMBIAN32__
+		mPipeToArmInstMap = NULL;
+		mInstructions = NULL;
+#endif
+#ifdef _android
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
 #endif
