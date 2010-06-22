@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -15,11 +15,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-FILE* mFile;
-const char* mFilename;
+#include <syscall.h>
 
-protected:
-FileStream();
+namespace Base
+{
 
-JNIEnv* mJNIEnv;
-jobject mJThis;
+	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
+	
+	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
+	
+}

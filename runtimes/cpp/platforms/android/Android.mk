@@ -20,7 +20,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := mosync
 LOCAL_ARM_MODE	:= arm
-LOCAL_SRC_FILES := Core.cpp FileImpl.cpp FileStream.cpp MemStream.cpp Stream.cpp Image.cpp hashmap/hashmap.cpp AndroidHelpers.cpp Syscall.cpp SyscallImpl.cpp disassembler.cpp Recompiler/ArmAssembler.cpp Recompiler/ArmRecompiler.cpp MoSyncBridge.cpp helpers/platforms/linux/log.cpp
+LOCAL_SRC_FILES := Core.cpp FileImpl.cpp FileStream.cpp MemStream.cpp Stream.cpp Image.cpp hashmap/hashmap.cpp AndroidHelpers.cpp Syscall.cpp SyscallImpl.cpp IOCtl.cpp disassembler.cpp Recompiler/ArmAssembler.cpp Recompiler/ArmRecompiler.cpp MoSyncBridge.cpp helpers/platforms/linux/log.cpp
 LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
 
 LOCAL_CFLAGS := -DFPM_ARM 
