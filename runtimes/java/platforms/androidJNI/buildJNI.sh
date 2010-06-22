@@ -40,6 +40,7 @@ cp config_platform.h $ANDROID_PATH
 cp config_platform.h $ANDROID_PATH"/base"
 
 
+
 cd $ANDROID_PATH
 cd ../..
 
