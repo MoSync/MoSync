@@ -95,12 +95,12 @@ buildTemplate()
 	cd $path/../../../
 	if [ ! "$2" = "-noclean" ]; then
 		print_msg "Performing clean"
-			./workfile.rb clean_more CONFIG=""
+			ruby workfile.rb clean_more CONFIG=""
 		printf "\n%s\n" "OK"
 	fi
 
 	print_msg "Attempting to build MoRE"
-	./workfile.rb more CONFIG="" FULLSCREEN="true" NATIVE_RUNTIME="true"
+	ruby workfile.rb more CONFIG="" FULLSCREEN="true" NATIVE_RUNTIME="true"
 
 	if [ "$?" -ne "0" ]; then
 		handle_error "rake"
