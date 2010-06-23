@@ -37,7 +37,8 @@ extern "C" {
 #endif
 
 /**
-* The context of an MTSax parser.
+* \brief The context of an MTSax parser.
+*
 * Contains function pointers for callbacks from the parser.
 * Also contains internal variables.
 *
@@ -181,6 +182,7 @@ void mtxSaxStart(MTXSaxContext* context);
 *
 * \returns True if mtxSaxStop() was called from a callback within the call to
 * this function, false otherwise.
+* \note This function alters the content of the input buffer.
 */
 bool mtxSaxFeed(MTXSaxContext* context, char* data);
 
@@ -190,6 +192,7 @@ bool mtxSaxFeed(MTXSaxContext* context, char* data);
 * Data sent to callbacks will have its UTF-8 characters and standard entities
 * converted to Latin-1.
 *
+* \note This function alters the content of the input buffer.
 * \see mtxSaxFeed()
 */
 bool mtxSaxFeedProcess(MTXSaxContext* context, char* data);
@@ -266,7 +269,7 @@ class SaxListenerW : public SaxListenerT<wchar_t> {
 };
 
 /**
- * SAX parser context wrapper class.
+ * \brief SAX parser context wrapper class.
  *
  * This class wraps the mtxSax set of functions.  To use it, you need to
  * inherit and implement the MtxListener and SaxListener interfaces.
@@ -329,6 +332,7 @@ public:
 	 * \param data The (null-terminated) data to feed into the parser.
 	 *
 	 * \note You must not call this method from within a callback.
+	 * \note This function alters the content of the input buffer.
 	 *
 	 * \see mtxSaxFeed
 	 */
@@ -340,6 +344,7 @@ public:
 	 * \param data The (null-terminated) data to feed into the parser.
 	 *
 	 * \note You must not call this method from within a callback.
+	 * \note This function alters the content of the input buffer.
 	 *
 	 * \see mtxSaxFeedProcess
 	 */

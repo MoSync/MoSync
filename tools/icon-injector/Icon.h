@@ -28,8 +28,8 @@ namespace MoSync {
 *	basically a size string (WxH format) mapped to a relative file path.
 */
 struct IconInstance {
-	IconInstance(const std::string size, const std::string& filename)
-		: size(size), filename(filename) {}
+	IconInstance(const std::string _size, const std::string& _filename)
+		: size(_size), filename(_filename) {}
 	std::string size;
 	std::string filename;
 };
@@ -56,7 +56,7 @@ public:
 	const IconInstance* findBestInstance(const std::string& size, const std::string& ext="") const;
 	std::vector<IconInstance*>& getInstances();
 protected:
-	std::vector<IconInstance*> instances;
+	std::vector<IconInstance*> mInstances;
 };
 
 }

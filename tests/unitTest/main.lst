@@ -10,6 +10,9 @@
 .ubin
 .include "png_test.png"
 
+.res ARGB_PNG
+.image "argb.png"
+
 .res RES_MP3
 //.media "audio/mpeg", "mobilesorcery2.mp3"
 .media "audio/x-wav", "mobilesorcery2.wav"

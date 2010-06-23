@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** 
 * \file Scaler.h 
-* \brief Utility class for scaling images by nearest neighbour or bilinearly
+* \brief Utility for scaling images by nearest neighbour or bilinearly
 * \author Patrick Broman and Niklas Nummelin
 */
 
@@ -28,6 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
+/** 
+* \brief Utility for scaling images by nearest neighbour or bilinearly
+*/
 	class Scaler {
 	public:
 
@@ -37,7 +40,7 @@ namespace MAUI {
 		};
 
 		// be aware that you need placeholderStart to placeholderStart+levels amount of placeholders ordered
-		// after eachother.
+		// after each other.
 		Scaler(MAHandle image, const MARect *srcRect, double minScale, double maxScale,
 			int levels, eScaleType scaleType);
 		MAExtent getSize(int scale);

@@ -25,7 +25,7 @@ using namespace std;
 
 namespace MoSync {
 
-int j_inject(const char *jarFile, const char *pngFile) {
+static int j_inject(const char *jarFile, const char *pngFile) {
 	int res;
 
 	//extract manifest

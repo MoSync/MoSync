@@ -15,8 +15,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-FILE* file;
+FILE* mFile;
 const char* mFilename;
 
 protected:
 FileStream();
+
+JNIEnv* mJNIEnv;
+jobject mJThis;

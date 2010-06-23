@@ -275,7 +275,7 @@ sound_init(SOUND_FREQUENCY);
   /* start emulation loop */
 //  SDL_SetTimer(1000/vdp_rate, fps_callback);
 //  if (use_sound) SDL_PauseAudio(0);
-EVENT e;
+MAEvent e;
 
 	int update = 0;
 

@@ -31,7 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 static MoSyncSemaphore sRead;
 static Connection* sConn;
-static bool sStopThread = false;
 static void* sDst;
 static int sMaxLen;
 
@@ -41,14 +40,14 @@ static int sMaxLen;
 
 int SDLCALL remoteReadThreadFunc(void* arg) {
 	//TODO: more error management, restart support.
-	while(!sStopThread) {
+	while(1) {
 		sRead.wait();
-		if(sStopThread)
-			break;
 		DebuggerEvent* de = new DebuggerEvent;
 		de->type = DebuggerEvent::eRecv;
 		de->result = sConn->read(sDst, sMaxLen);
 		putEvent(de);
+		if(de->result < 0)
+			break;
 	}
 	return 0;
 }

@@ -7,6 +7,7 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_CPPFLAGS = ""	
 	@NAME = "mifconv"
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 work.invoke

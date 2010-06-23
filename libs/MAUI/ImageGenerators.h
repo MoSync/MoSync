@@ -30,6 +30,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUI {
 	using namespace MAUtil;
 
+/** 
+* \brief Utility generating linear and circular gradients
+*/
+
 class ImageGenerators {
 public:
 	enum AlphaMode {

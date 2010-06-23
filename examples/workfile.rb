@@ -14,23 +14,22 @@ SUBDIRS = [
 	"MinUI",
 	"Moblet/Connection",
 	"Moblet/HelloMoblet",
+	"Moblet/MoTooth",
+	"Moblet/btServer",
 	"Moblet/simple",
 	"Moblet/Soap",
 	"Moblet/Stylus",
 	"Moblet/timers",
 	"MoSketch",
 	"MoSound",
-	"MoTooth",
 	"MoTris",
 	"MoTrix",
 	"OtaLoad",
 ]
 
-target :pipe do
-	Work.invoke_subdirs(SUBDIRS, 'pipe')
+target :default do
+	Work.invoke_subdirs(SUBDIRS)
 end
-
-target :default => :pipe
 
 target :clean do
 	Work.invoke_subdirs(SUBDIRS, 'clean')

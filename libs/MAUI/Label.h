@@ -30,10 +30,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUI {
 
 
-	/** A label widget is a simple widget capable of displaying
-	    *text. The text can be aligned left, right or centered
-	    * both vertically and horizontally.
-	   * The widget draws its background by default, use setDrawBackground(false) to disable it.	
+	/** \brief Text label widget with alignment control
+	* 
+	* A label widget is a simple widget capable of displaying
+	* text. The text can be aligned left, right or centered
+	* both vertically and horizontally.
+	* The widget draws its background by default, use setDrawBackground(false) to disable it.	
 	**/
 
 	class Label : public Widget {

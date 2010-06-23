@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -22,54 +22,105 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <jni.h>
 
+#include <unistd.h>
+
 #include <android/log.h>
+
+//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+#define SYSLOG(...)
 
 /*
 Function that initializes the native core	
 */
 static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 {
-	__android_log_write(ANDROID_LOG_INFO,"JNI","InitRuntime start");
+	SYSLOG("InitRuntime start");
 
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall();
 
 	gCore = Core::CreateCore(*syscall);
+	if(NULL == gCore)
+	{
+		SYSLOG("Couldn't create core");
+		return false;
+	}
+	SYSLOG("Core created");
+	return true;
 }
 
 /*
 	/return The newly created Data Section as a Direct ByteBuffer object
 */
-static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, int programSize, jobject resource, int resourceSize)
+static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong programOffset, jobject resource, jlong resourceOffset)
 {
-	__android_log_write(ANDROID_LOG_INFO,"JNI","load program and resource");
-	
-	char* programBuffer = (char*)env->GetDirectBufferAddress(program);
-	if(programBuffer == NULL)
-	{
-		__android_log_write(ANDROID_LOG_INFO,"JNI","whops.. no program buffer");
-		return false;
-	}
-	
-	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
-	if(resourceBuffer == NULL)
-	{
-		__android_log_write(ANDROID_LOG_INFO,"JNI","whops.. no resource buffer");
-		return false;
-	}
+	SYSLOG("load program and resource");
 
-	__android_log_write(ANDROID_LOG_INFO,"JNI","call load vm app");
+	FILE* prg = NULL;
+	FILE* res = NULL;
+	
+	SYSLOG("get program file");
+	jclass fdClass = env->FindClass("java/io/FileDescriptor");
+	if (fdClass != NULL) 
+	{
+		jclass fdPrgClassRef = (jclass) env->NewGlobalRef(fdClass); 
+		jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdPrgClassRef, "descriptor", "I");
+		
+		if (fdClassDescriptorFieldID != NULL && program != NULL) 
+		{			
+			jint fd = env->GetIntField(program, fdClassDescriptorFieldID);	
+			int myfd = dup(fd);
+			prg = fdopen(myfd, "rb");
+			fseek(prg, programOffset, SEEK_SET); 
+		}
+	}
+	
+	SYSLOG("get resource file");
+	jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
+	if (fdClass2 != NULL) 
+	{
+		jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2); 
+		jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdResClassRef, "descriptor", "I");
+		
+		if (fdClassDescriptorFieldID != NULL && resource != NULL) 
+		{			
+			jint fd = env->GetIntField(resource, fdClassDescriptorFieldID);	
+			int myfd = dup(fd);
+			res = fdopen(myfd, "rb"); 
+			fseek(res, resourceOffset, SEEK_SET);
+		}
+	}
+	
+	SYSLOG("both files was obtained!");
+	
+	if(NULL == prg || NULL == res)
+	{
+		SYSLOG("seams to be something wrong here..");
+		return false;
+	}
+	
+	SYSLOG("set jni environment");
 	
 	gCore->mJniEnv = env; gCore->mJThis = jthis;
 	Base::gSyscall->setJNIEnvironment(env, jthis);
-	return Core::LoadVMApp(gCore, programBuffer, programSize, resourceBuffer, resourceSize);
+	
+	SYSLOG("call load vm app");
+
+	if(NULL == gCore) __android_log_write(ANDROID_LOG_INFO,"JNI","gCore == NULL");
+	SYSLOG("gCore!");
+	if(NULL == prg) __android_log_write(ANDROID_LOG_INFO,"JNI","prg == NULL");
+	SYSLOG("prg!");
+	if(NULL == res) __android_log_write(ANDROID_LOG_INFO,"JNI","res == NULL");
+	SYSLOG("res!");
+	
+	return Core::LoadVMApp(gCore, prg, res);
 }
 
 /*
 */
 static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 {
-	__android_log_write(ANDROID_LOG_INFO,"JNI","load resource");
+	SYSLOG("load resource");
 
 	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
 	
@@ -80,7 +131,7 @@ static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 */
 static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 {
-	__android_log_write(ANDROID_LOG_INFO,"JNI","load combined file");
+	SYSLOG("load combined file");
 
 	char* combinedBuffer = (char*)env->GetDirectBufferAddress(combined);
 	
@@ -120,17 +171,33 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
-	__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "JNI PostEvent");
+	SYSLOG("JNI PostEvent");
 	
 	jsize len = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
 	
 	// rebuild the event
 	MAEvent event;
+	
 	event.type = intArray[0];
-	event.point.x = intArray[1];
-	event.point.y = intArray[2];
-		
+	
+	if(event.type == EVENT_TYPE_POINTER_PRESSED || event.type == EVENT_TYPE_POINTER_RELEASED || event.type == EVENT_TYPE_POINTER_DRAGGED )
+	{
+		event.point.x = intArray[1];
+		event.point.y = intArray[2];
+	}
+	else if(event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED )
+	{
+		event.key = intArray[1];
+		event.nativeKey = intArray[2];
+	}
+	else if(event.type == EVENT_TYPE_CONN)
+	{
+		event.conn.handle = intArray[1];
+		event.conn.opType = intArray[2];
+		event.conn.result = intArray[3];
+	}
+	
 	// release the memory used
 	env->ReleaseIntArrayElements( eventBuffer, intArray, 0);
 	
@@ -141,13 +208,15 @@ int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativ
 {
 	jclass clazz;
 
+	SYSLOG("Register native functions");
+	
 	clazz = env->FindClass(className);
 	if (clazz == NULL)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI_OnLoad", "Class not found");
+		SYSLOG("Class not found");
 		return -1;
 	}
-	__android_log_write(ANDROID_LOG_INFO, "JNI_OnLoad", "Class found!");
+	SYSLOG("Class found!");
 	if (env->RegisterNatives(clazz, gMethods, numMethods) < 0)
 	{
 		return -1;
@@ -159,8 +228,8 @@ jint numJavaMethods = 6;
 static JNINativeMethod sMethods[] =
 {
     // name, signature, funcPtr 
-   { "nativeInitRuntime", "()Z", (void*)nativeInitRuntime},
-   { "nativeLoad", "(Ljava/nio/ByteBuffer;ILjava/nio/ByteBuffer;I)Z", (void*)nativeLoad},
+   { "nativeInitRuntime", "()Z", (void*)nativeInitRuntime}, 
+   { "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad},
    { "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource},
    { "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined},
    { "nativeRun", "()V", (void*)nativeRun},
@@ -172,13 +241,15 @@ jint JNI_OnLoad ( JavaVM* vm, void* reserved )
 	JNIEnv* env = NULL;
 	jint result = -1;
 
-	__android_log_write(ANDROID_LOG_INFO, "JNI_OnLoad", "Check JNI version");
+	SYSLOG("JNI_OnLoad");
+	
+	SYSLOG("Check JNI version");
 
 	if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
 	{
 		return result;
 	}
-	__android_log_write(ANDROID_LOG_INFO, "JNI_OnLoad", "Register native methods");
+	
 	jniRegisterNativeMethods( env, "com/mosync/java/android/MoSyncThread", sMethods, numJavaMethods );
 	return JNI_VERSION_1_4;
 }

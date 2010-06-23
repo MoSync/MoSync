@@ -1,0 +1,64 @@
+
+Makesis 4
+
+This is a tool for generating sis files, conforming to the new sis file format
+used in Symbian 9. (The specification of this format is available in
+http://developer.symbian.com/main/downloads/papers/SymbianOSv91/softwareinstallsis.pdf).
+
+It is based on the original modified makesis 2.0.0 release; the parser and the
+rest of the front end of the tool is modified to handle the new pkg file format,
+the SIS file generation back end is completely replaced with new code.
+
+The parts descending from the original makesis release from Symbian is licensed
+according to the Symbian Example Source License (see License.txt), the new
+parts written from scratch are licensed according to the LGPL (see COPYING).
+
+This version of makesis can sign the sis directly using a built-in selfsigned
+certificate, using the switch -c. This should only be used under development,
+you should preferrably sign the sis for distribution with a certificate of
+your own.
+
+This also includes a signsis replacement, and a small makekeys tool which
+acts as a wrapper for the openssl commandline tool for generating keys
+and certificates.
+
+
+
+Martin Storsjö
+martin@martin.st
+
+
+
+===============
+
+Original README
+
+makesis was ported to Linux week 29 in 2003 during the DebCamp in Oslo.
+
+PLATFORMS
+
+architectures:
+
+  x86
+
+operating systems:
+
+  Debian GNU/Linux (kernel 2.6.0-test1)
+
+compilers that work:
+
+  gcc-2.95.4
+  gcc-3.2
+  gcc-3.3
+
+
+CREDITS
+
+The WINE project :)
+Unicode org
+Symbian Ltd.
+Alfred E. Heggestad
+Paul Sladen
+John Pagonis
+David Mery
+Marius Kotsbak

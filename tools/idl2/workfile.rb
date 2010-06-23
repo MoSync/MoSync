@@ -16,8 +16,8 @@ target :default do
 	work.invoke
 end
 
-# let's pick a late target, to minimize the chances of something going wrong.
-ct = FileTask.new(work, "../../runtimes/cpp/core/invoke_syscall_cpp.h")
+# let's pick an early target, for great speed.
+ct = FileTask.new(work, "Output/invoke_syscall_cpp.h")
 ct.instance_eval do
 	def setup
 		@prerequisites = [@work.target] + (["extensions.h"] + Dir["*.idl"]).collect { |f|
@@ -31,11 +31,14 @@ ct.instance_eval do
 end
 
 target :compile => :default do
-	#puts "IDL2 compile"
-	#puts ct
-	ct.setup
-	#puts ct.inspect
-	ct.invoke
+	begin
+		ct.setup
+		ct.invoke
+	rescue => e
+		# if the compiler should fail, we must make sure it runs next time.
+		FileUtils.rm_f(ct.to_str)
+		raise
+	end
 end
 
 target :clean do

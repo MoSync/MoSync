@@ -21,6 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -81,7 +83,7 @@ void sizeString(const std::string& size, int* w, int* h) {
 int run(const char* cmd) {
 	printf("%s\n", cmd);
 #ifdef WIN32
-#define GLE(e, func, args) { BOOL res = (func args); if(res == e) { int err = GetLastError();\
+#define GLE(e, func, args) { DWORD res = (func args); if(res == e) { int err = GetLastError();\
 	printf(#func " error %i\n", err); return err; } }
 
 	// hopefully this method should be more stable than the system() function.
@@ -95,7 +97,7 @@ int run(const char* cmd) {
 	DWORD exitCode;
 	GLE(0, GetExitCodeProcess, (pi.hProcess, &exitCode));
 	if(exitCode != 0) {
-		printf("exitCode: %i\n", exitCode);
+		printf("exitCode: %lu\n", exitCode);
 	}
 	return exitCode;
 #else

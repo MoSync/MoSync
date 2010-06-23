@@ -12,14 +12,16 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
-		28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
 		8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
-		850943FE1185C40D004A3B2D /* MoSyncCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = 850943FD1185C40D004A3B2D /* MoSyncCLController.m */; };
 		850944011185C440004A3B2D /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
 		8519011F1199B90400B71F58 /* data_section.bin in Resources */ = {isa = PBXBuildFile; fileRef = 8519011E1199B90400B71F58 /* data_section.bin */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
+		8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
+		8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
+		8558308211C79B210008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -80,8 +82,6 @@
 		85F2553311AC12DE00EB47EE /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
 		85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
 		85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
-		85F2553611AC12DE00EB47EE /* MoSyncCLController.m in Sources */ = {isa = PBXBuildFile; fileRef = 850943FD1185C40D004A3B2D /* MoSyncCLController.m */; };
-		85F2555911AC155D00EB47EE /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
 		85F2555A11AC155D00EB47EE /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85F2555B11AC155D00EB47EE /* data_section.bin in Resources */ = {isa = PBXBuildFile; fileRef = 8519011E1199B90400B71F58 /* data_section.bin */; };
 		85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -94,7 +94,6 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
-		85F25A3811AD614700EB47EE /* MoSyncViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,12 +114,10 @@
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
-		28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		850943FD1185C40D004A3B2D /* MoSyncCLController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncCLController.m; sourceTree = "<group>"; };
 		850943FF1185C41F004A3B2D /* MoSyncCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncCLController.h; sourceTree = "<group>"; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8519011E1199B90400B71F58 /* data_section.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = data_section.bin; sourceTree = "<group>"; };
@@ -128,10 +125,12 @@
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
 		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
+		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
+		8558307E11C79B030008FDC1 /* MoSyncViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncViewController.mm; sourceTree = "<group>"; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
-		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = file; path = resources; sourceTree = "<group>"; };
+		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; path = resources; sourceTree = "<group>"; };
 		85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rebuild.cpp; sourceTree = "<group>"; };
 		85BF2B1C113403FD00BB0201 /* bt_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_errors.h; path = ../../../../intlibs/bluetooth/bt_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1D113403FD00BB0201 /* btinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btinit.h; path = ../../../../intlibs/bluetooth/btinit.h; sourceTree = SOURCE_ROOT; };
@@ -203,7 +202,7 @@
 		85BF2BFC11341B3D00BB0201 /* core_run.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core_run.h; path = ../../core/core_run.h; sourceTree = SOURCE_ROOT; };
 		85BF2BFF11341B3D00BB0201 /* CoreCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CoreCommon.h; path = ../../core/CoreCommon.h; sourceTree = SOURCE_ROOT; };
 		85BF2C0011341B3D00BB0201 /* invoke_syscall_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = invoke_syscall_cpp.h; path = ../../core/invoke_syscall_cpp.h; sourceTree = SOURCE_ROOT; };
-		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = file; path = program; sourceTree = "<group>"; };
+		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = text; path = program; sourceTree = "<group>"; };
 		85BF2C5F113429A900BB0201 /* MoSyncView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncView.h; sourceTree = "<group>"; };
 		85BF2C60113429A900BB0201 /* MoSyncView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncView.mm; sourceTree = "<group>"; };
 		85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -267,14 +266,14 @@
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
 				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
-				28D7ACF70DDB3853001CB0EB /* MoSyncViewController.m */,
 				85BF2BF011341A8C00BB0201 /* MoSyncMain.h */,
 				85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */,
 				85BF2C5F113429A900BB0201 /* MoSyncView.h */,
 				85BF2C60113429A900BB0201 /* MoSyncView.mm */,
-				850943FD1185C40D004A3B2D /* MoSyncCLController.m */,
 				850943FF1185C41F004A3B2D /* MoSyncCLController.h */,
 				85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */,
+				8558307D11C79B030008FDC1 /* MoSyncCLController.mm */,
+				8558307E11C79B030008FDC1 /* MoSyncViewController.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -595,7 +594,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				85F2555911AC155D00EB47EE /* program in Resources */,
 				85F2555A11AC155D00EB47EE /* resources in Resources */,
 				85F2555B11AC155D00EB47EE /* data_section.bin in Resources */,
 			);
@@ -610,7 +608,6 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* MoSyncAppDelegate.mm in Sources */,
-				28D7ACF80DDB3853001CB0EB /* MoSyncViewController.m in Sources */,
 				85BF2B26113403FD00BB0201 /* connection.cpp in Sources */,
 				85BF2B27113403FD00BB0201 /* discovery.cpp in Sources */,
 				85BF2B28113403FD00BB0201 /* init.cpp in Sources */,
@@ -638,8 +635,9 @@
 				853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */,
 				85EF80EC1174AA1900B3E43A /* ThreadPoolImpl.mm in Sources */,
 				8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */,
-				850943FE1185C40D004A3B2D /* MoSyncCLController.m in Sources */,
 				85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */,
+				8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */,
+				8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -647,6 +645,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */,
+				8558308211C79B210008FDC1 /* MoSyncViewController.mm in Sources */,
 				85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */,
 				85F2551B11AC12DE00EB47EE /* connection.cpp in Sources */,
 				85F2551C11AC12DE00EB47EE /* discovery.cpp in Sources */,
@@ -674,7 +674,6 @@
 				85F2553311AC12DE00EB47EE /* CMGlyphDrawing.mm in Sources */,
 				85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */,
 				85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */,
-				85F2553611AC12DE00EB47EE /* MoSyncCLController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -684,7 +683,6 @@
 			files = (
 				85F25A3611AD614700EB47EE /* main.m in Sources */,
 				85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */,
-				85F25A3811AD614700EB47EE /* MoSyncViewController.m in Sources */,
 				85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -709,6 +707,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
 			};
@@ -721,6 +720,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
 			};

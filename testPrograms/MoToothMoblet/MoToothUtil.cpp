@@ -61,7 +61,7 @@ bool Database::readDevice(DataHandler& data, DEVICE& dev) {
 	//name
 	int strLen;
 	TEST(data.read(&strLen, sizeof(int)));
-	StringData* sd = new StringData(strLen);
+	StringData<char>* sd = new StringData<char>(strLen);
 	dev.name.setData(sd);
 	MAASSERT(sd->getRefCount() == 1);
 	TEST(data.read(sd->pointer(), strLen));
@@ -75,7 +75,7 @@ bool Database::readDevice(DataHandler& data, DEVICE& dev) {
 		BtService& serv(dev.services[i]);
 		TEST(data.read(&serv.port, sizeof(int)));
 		TEST(data.read(&strLen, sizeof(int)));
-		sd = new StringData(strLen);
+		sd = new StringData<char>(strLen);
 		serv.name.setData(sd);
 		MAASSERT(sd->getRefCount() == 1);
 		TEST(data.read(sd->pointer(), strLen));
@@ -85,7 +85,7 @@ bool Database::readDevice(DataHandler& data, DEVICE& dev) {
 	return true;
 }
 
-bool Database::read(Handle h) {
+bool Database::read(MAHandle h) {
 	DataHandler data(h);
 	int nDevices;
 	TEST(data.read(&nDevices, sizeof(int)));
@@ -96,7 +96,7 @@ bool Database::read(Handle h) {
 	return true;
 }
 
-void Database::write(Handle h) const {
+void Database::write(MAHandle h) const {
 	maDestroyObject(h);
 	maCreateData(h, calculateDatabaseSize());
 	DataHandler data(h);
@@ -145,12 +145,12 @@ int Database::calculateDatabaseSize() const {
 	return size;
 }
 
-const char* btaddr2string(const btaddr_t& a) {
+const char* btaddr2string(const MABtAddr& a) {
 	static char buffer[16];
 	sprintf(buffer, "%02x%02x%02x%02x%02x%02x", a.a[0], a.a[1], a.a[2], a.a[3], a.a[4], a.a[5]);
 	return buffer;
 }
 
-int btaddr2string(char* buf, const btaddr_t& a) {
+int btaddr2string(char* buf, const MABtAddr& a) {
 	return sprintf(buf, "%02x%02x%02x%02x%02x%02x", a.a[0], a.a[1], a.a[2], a.a[3], a.a[4], a.a[5]);
 }

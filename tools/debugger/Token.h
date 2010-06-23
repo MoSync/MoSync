@@ -81,7 +81,9 @@ enum eTokenType {
 	TOKEN_COLON,
 
 	// GDB specific
-	TOKEN_AT
+	TOKEN_AT,
+	
+	_TOKEN_END
 };
 
 class TokenMatcher {
@@ -91,7 +93,7 @@ public:
 	virtual unsigned int match(const char* str) = 0;
 	unsigned int getType();
 private:
-	unsigned int type;
+	unsigned int mType;
 };
 
 class TokenFixed : public TokenMatcher {
@@ -150,9 +152,9 @@ public:
 	int toInt() const;
 	std::string toString() const;
 private:
-	unsigned int tokenType;
-	const char *start;
-	unsigned int length;
+	unsigned int mTokenType;
+	const char *mStart;
+	unsigned int mLength;
 };
 
 #endif // _TOKEN_H_

@@ -84,6 +84,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40064, ERR_MISSING_PIM_FIELD, "Missing PIM field")\
 	m(40065, ERR_STACK_OOB, "Stack pointer out of bounds. Try to increase the stack size.")\
 	m(40066, ERR_PIM_LIST_CLOSED, "The PIM item's parent list is closed")\
+	m(40067, ERR_CAMERA_UNPOWERED, "Camera viewfinder is not active")\
 
 DECLARE_ERROR_ENUM(BASE)
 

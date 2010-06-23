@@ -257,6 +257,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\MAHeaders.h"
+			>
+		</File>
+		<File
 			RelativePath=".\main.cpp"
 			>
 		</File>

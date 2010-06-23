@@ -71,7 +71,11 @@ bool MemStreamC::tell(int& aPos) const {
 	return true;
 }
 
+#ifndef _android
 Stream* MemStreamC::createLimitedCopy(int size) const {
+#else
+Stream* MemStreamC::createLimitedCopy(int size, JNIEnv* jNIEnv, jobject jThis) const {
+#endif
 	if(size < 0)
 		size = mSize - mPos;
 	else if(mPos + size > mSize) {

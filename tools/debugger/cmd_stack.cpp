@@ -311,7 +311,7 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 			break;
 	case eAllValues:
 		{
-		oprintf(",value=\"", lv->name.c_str());
+		oprintf(",value=\"");
 		StringPrintFunctor spf;
 		if(lv->storageClass == eStack) {
 			const StackVariable* sv = (StackVariable*)lv;
@@ -406,7 +406,7 @@ void Callback::sif() {
 		pc = sFrames[sCurrentFrameIndex].pc;
 	}
 	oprintDone();
-	oprintf(",frame={level=\"%i\",", sCurrentFrameIndex);
+	oprintf(",frame={level=\"%"PFZT"\",", sCurrentFrameIndex);
 	oprintFrame(pc);
 	oprintf("\n");
 	commandComplete();
@@ -473,7 +473,7 @@ void thread_info(const string& args) {
 
 static bool sComplex;
 
-void print_type_from_type(const std::string& type) {
+static void print_type_from_type(const std::string& type) {
 	oprintf("~\"type = ");//%s\"\n", type);
 	const char* t = type.c_str();
 	while(*t) {

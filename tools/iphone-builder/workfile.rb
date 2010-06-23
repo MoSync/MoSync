@@ -6,9 +6,9 @@ work = MoSyncExe.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@LOCAL_LIBS = ["filelist"]
-	@EXTRA_CPPFLAGS = " -Wno-missing-declarations -Wno-missing-noreturn "
 	@NAME = "iphone-builder"
 	@TARGETDIR = "."
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 work.invoke

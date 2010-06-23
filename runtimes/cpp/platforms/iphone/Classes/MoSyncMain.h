@@ -20,6 +20,7 @@
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
+#include "Platform.h"
 
 void MoSync_Main(int width, int height, UIView* mosyncView);
 
@@ -36,6 +37,13 @@ void MoSync_AddTouchMovedEvent(int x, int y);
 void MoSync_AddTouchReleasedEvent(int x, int y);
 void MoSync_AddScreenChangedEvent();
 void MoSync_AddCloseEvent();
+void* MoSync_GetCustomEventData();
+void* MoSync_GetCustomEventDataMoSyncPointer();
+
+/*
+void MoSync_AddLocationProviderEvent(int state);
+void MoSync_AddLocationEvent(int state, const MALocation& location);
+*/
 
 #endif
 

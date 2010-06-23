@@ -1044,7 +1044,7 @@ void MainAsm(char *input, char *output)
 
 void MainRes(char *input, char *output)
 {		
-  	if (AsmMsg) printf("Resource Compiler Copyright 2007-2009 Mobile Sorcery AB\n\n");
+  	if (AsmMsg) printf("Resource Compiler Copyright 2007-2010 MoSync AB\n\n");
 
 	FileTop = FilePtr = input;
 

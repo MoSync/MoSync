@@ -97,7 +97,7 @@ public:
 private:
 #define UNION_ELEM(type, id) type id;
 	union {
-		int v;
+		int mV;
 		TYPES(UNION_ELEM)
 	};
 

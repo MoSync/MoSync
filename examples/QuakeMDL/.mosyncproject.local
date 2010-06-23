@@ -2,7 +2,5 @@
 <project version="1">
 <active.build.cfg active="Benchmark - Release"/>
 <target-profile/>
-<properties>
-<property key="last.build.config" value="Benchmark - Debug"/>
-</properties>
+<properties/>
 </project>

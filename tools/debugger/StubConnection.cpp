@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <vector>
 
 #include "config.h"
@@ -29,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "StubConnection.h"
 #include "StubConnLow.h"
 #include "helpers.h"
-#include "OpHandler.h"
+#include "opHandler.h"
 
 #include "memory.h"
 
@@ -55,7 +56,7 @@ static Functor sFunctor = { NULL, 0, false, "unknown", 0 };
 const Registers& getReg() {
 	return sCachedReg;
 }
-const bool isRegValid() {
+bool isRegValid() {
 	return sCachedRegValid;
 }
 
@@ -151,9 +152,7 @@ static bool checkErrorPacket(const char* data, int len) {
 		return false;
 	if(data[1] != ' ')
 		return false;
-	char buffer[128];
-	sprintf(buffer, "Stub reported error '%s'\n", data + 2);
-	error(buffer);
+	error("Stub reported error '%s'\n", data + 2);
 	return true;
 }
 

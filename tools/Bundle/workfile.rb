@@ -6,9 +6,13 @@ work = MoSyncExe.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@LOCAL_LIBS = ["filelist"]
-	@EXTRA_CFLAGS = " -Wno-missing-declarations "
+	if ( HOST == :darwin )
+		# Objective-C++ compiler
+		@EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"	
+	end
 	@NAME = "Bundle"
 	@TARGETDIR = "."
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 work.invoke

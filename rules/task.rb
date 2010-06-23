@@ -29,43 +29,11 @@
 require "#{File.dirname(__FILE__)}/defaults.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 require "#{File.dirname(__FILE__)}/host.rb"
+require "#{File.dirname(__FILE__)}/util.rb"
 require 'fileutils'
-require 'singleton'
 
 # This is the base class for the Work system.
 class TaskBase
-	# EarlyTime is a fake timestamp that occurs _before_ any other time value.
-	# Its instance is called EARLY.
-	class EarlyTime
-		include Comparable
-		include Singleton
-		
-		def <=>(other)
-			-1
-		end
-		
-		def to_s
-			"<EARLY TIME>"
-		end
-	end
-	EARLY = EarlyTime.instance
-	
-	# LateTime is a fake timestamp that occurs _after_ any other time value.
-	# Its instance is called LATE.
-	class LateTime
-		include Comparable
-		include Singleton
-		
-		def <=>(other)
-			1
-		end
-		
-		def to_s
-			"<LATE TIME>"
-		end
-	end
-	LATE = LateTime.instance
-	
 	def initialize
 		@prerequisites = []
 	end
@@ -114,6 +82,17 @@ class Work < TaskBase
 		@prerequisites.each do |p| p.invoke end
 	end
 	
+	def invoke_clean
+		if(@prerequisites == []) then
+			setup
+			if(@prerequisites == [])
+				error "setup failed"
+			end
+		end
+		
+		self.execute_clean
+	end
+	
 	# Invoke the workfile of another directory, as if it would have been called from the command line.
 	def Work.invoke_subdir(dir, *args)
 		puts File.expand_path(dir) + " " + args.inspect
@@ -129,14 +108,14 @@ class Work < TaskBase
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
 		if(RELOAD)
-			args = ""
+			args = args.join(' ')
 			if(USE_NEWLIB)
 				args += " USE_NEWLIB=\"\""
 			end
 			if(FULLSCREEN == "true")
 				args += " FULLSCREEN=\"true\""
 			end
-			cmd = "workfile.rb #{args.join(' ')} CONFIG=\"#{CONFIG}\" RELOAD=\"\"" + args
+			cmd = "workfile.rb #{args} CONFIG=\"#{CONFIG}\" RELOAD=\"\""
 			if(HOST == :win32)
 				sh "ruby #{cmd}"
 			else

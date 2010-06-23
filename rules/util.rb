@@ -16,6 +16,7 @@
 
 require "#{File.dirname(__FILE__)}/error.rb"
 require "#{File.dirname(__FILE__)}/host.rb"
+require 'singleton'
 
 $stdout.sync = true
 $stderr.sync = true
@@ -63,6 +64,12 @@ class String
 		end
 		return self[doti..self.length]
 	end
+
+	# Returns true if self begins with with.
+	def beginsWith(with)
+		return false if(self.length < with.length)
+		return self[0, with.length] == with
+	end
 end
 
 def sh(cmd)
@@ -101,3 +108,81 @@ def verbose_rm_rf(list)
 end
 
 HashMergeAdd = Proc.new {|key, old, new| old + new }
+
+
+# returns a command-line string with the correct invocation of sed for all platforms
+def sed(script)
+	file = open("|sed --version 2>&1")
+	if((file.gets.beginsWith('GNU sed') && HOST != :win32) ||
+		HOST == :darwin)
+		return "sed '#{script}'"
+	else
+		return "sed #{script}"
+	end
+end
+
+# EarlyTime is a fake timestamp that occurs _before_ any other time value.
+# Its instance is called EARLY.
+class EarlyTime
+	include Comparable
+	include Singleton
+	
+	def <=>(other)
+		return 0 if(other.instance_of?(EarlyTime))
+		return -1
+	end
+	
+	def to_s
+		"<EARLY TIME>"
+	end
+end
+EARLY = EarlyTime.instance
+
+# LateTime is a fake timestamp that occurs _after_ any other time value.
+# Its instance is called LATE.
+class LateTime
+	include Comparable
+	include Singleton
+	
+	def <=>(other)
+		return 0 if(other.instance_of?(LateTime))
+		return 1
+	end
+	
+	def to_s
+		"<LATE TIME>"
+	end
+end
+LATE = LateTime.instance
+
+# Extension to the standard Time class to allow comparison with EarlyTime and LateTime.
+class Time
+	alias work_original_compare :<=>
+	def <=>(other)
+		if(other.instance_of?(EarlyTime) || other.instance_of?(LateTime))
+			return - other.<=>(self)
+		else
+			return work_original_compare(other)
+		end
+	end
+end
+
+# Extension to class File, to make sure that the drive letter is always lowercase.
+# This resolves an issue where programs were rebuilt due to file paths being changed,
+# itself due to strange behaviour in the Windows command-line console.
+class File
+	if(HOST == :win32)
+		def self.expand_path_fix(p)
+			ep = self.expand_path(p)
+			return ep if(ep.length <= 3)
+			if(ep[1,1] == ':')
+				ep[0,1] = ep[0,1].downcase
+			end
+			return ep
+		end
+	else
+		class << self	# alias class methods, rather than instance methods
+			alias_method(:expand_path_fix, :expand_path)
+		end
+	end
+end

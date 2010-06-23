@@ -54,8 +54,8 @@ namespace Base {
 		void platformDestruct();
 /*
 #ifdef _android
-		extern JNIEnv* mJNIEnv;
-		extern jobject mJThis;
+		JNIEnv* mJNIEnv;
+		jobject mJThis;
 #endif
 */
 #ifdef SYMBIAN
@@ -206,5 +206,9 @@ namespace Base {
 #define CUSTOM_EVENTS(m)\
 	CUSTOM_EVENT_LOCATION(m)\
 	CUSTOM_EVENT_STREAM(m)\
+
+namespace Base {
+	uint getMaxCustomEventSize();
+}
 
 #endif // _SYSCALL_H_

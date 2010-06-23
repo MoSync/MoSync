@@ -20,6 +20,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/helpers.h>
 
+#ifdef _android
+#include <jni.h>
+#endif
 
 namespace Base {
 
@@ -79,8 +82,11 @@ namespace Base {
 		//Creates a copy of this stream, with the current position as the copy's starting point
 		//and the specified size. The default size, < 0, means that (src_size - pos) will be used.
 		//Returns NULL on failure.
+#ifndef _android
 		virtual Stream* createLimitedCopy(int size = -1) const = 0;
-
+#else
+		virtual Stream* createLimitedCopy(int size, JNIEnv* jniEnv, jobject jthis) const = 0;
+#endif
 		//Creates a [new] read-only copy of this stream, with the position reset.
 		//May fail if a stream is singular by nature (like a Connection stream),
 		//or if the system is out of memory.

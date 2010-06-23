@@ -12,13 +12,13 @@ Normally, a Workfile will define an object of one of the Work classes, appropria
 Useful Work classes include ExeWork(exe.rb), DllWork(dll.rb) and NativeLibWork(native_lib.rb)
 For building MoSync internals, variants of these three defined are in native_mosync.rb.
 For building MoSync libraries, use the MoSyncLib module, which works a bit differently, because it can build both pipe and native versions. See mosync_lib.rb for details.
-For building MoSync applications, see mosync.rb. (Which hasn't been written yet. :)
+For building MoSync applications, use PipeExeWork(mosync_exe.rb).
 
 Common variables that one will want to set include:
 @NAME, the name of the work.
 @SOURCES, a list of directories containing source files.
 
-Other variables may be used, depending on the type of Work.
+Other variables may be used, depending on the type of Work. See defaults.rb for a list of variables and their default values.
 
 When the variables are set, call invoke on your object. This builds all needed files.
 
@@ -34,8 +34,8 @@ target :name => preqs do
 	...
 end
 
-Where preqs is either a single identifier or an array.
-Each identifier is a symbol, which specifies another target, or the name of a Work defined previously in the Workfile.
+Where preqs is either a single symbol or an array of symbols.
+Each symbol specifies another target, or the name of a Work defined previously in the Workfile.
 
 If no targets are specified on the command line, the :default target will be invoked. It's usually a good idea to specify a :default target in every workfile that uses targets, unless you want to force the user to select one.
 

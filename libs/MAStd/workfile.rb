@@ -22,6 +22,8 @@ mod.class_eval do
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags
 		
 		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s")]
+		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/new",
+			FileTask.new(self, "../libsupc++/new"))
 	end
 	
 	def setup_base

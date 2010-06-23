@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //debug
 #include <string>
-#ifdef _WIN32
+#ifdef _MSC_VER
 #include <windows.h>
 #include <Dbghelp.h>
 #endif
@@ -41,7 +41,7 @@ typedef bool (*ifptr)(int);
 class OpHandler {
 public:
 	OpHandler() {
-#ifdef _WIN32
+#ifdef _MSC_VER
 		BOOL res = SymInitialize(GetCurrentProcess(), NULL, true);
 		_ASSERT(res);
 #endif
@@ -81,7 +81,7 @@ private:
 	typedef std::queue<Functor> FunctorQueue;
 
 	void input(Functor f) {
-#ifdef _WIN32
+#ifdef _MSC_VER
 		char buf[1024];
 		SYMBOL_INFO& si(*(SYMBOL_INFO*)buf);
 		DWORD64 dis;

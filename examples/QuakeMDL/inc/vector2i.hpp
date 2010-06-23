@@ -118,7 +118,7 @@ public:
 
 	sint32 length ( void ) const
 	{
-		return (sint32)sqrt( this->dot( *this ) );
+		return (sint32)sqrt((double) this->dot( *this ) );
 	}
 
 	sint32 cross ( const Vector2i &v ) const

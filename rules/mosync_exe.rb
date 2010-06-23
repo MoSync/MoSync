@@ -51,7 +51,7 @@ class PipeExeWork < PipeGccWork
 		
 		# libs
 		libs = (@DEFAULT_LIBS + @LIBRARIES).collect do |lib|
-			FileTask.new(self, "#{mosync_libdir}/#{@BUILDDIR_NAME}/#{lib}.lib")
+			FileTask.new(self, "#{mosync_libdir}/#{@COMMON_BUILDDIR_NAME}/#{lib}.lib")
 		end
 		all_objects += libs
 		super(all_objects)

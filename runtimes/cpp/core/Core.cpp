@@ -577,16 +577,19 @@ public:
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
 #else
-	bool LoadVMApp(const char* modfile, int modsize, const char* resfile, int ressize) {
+	bool LoadVMApp(FILE* modfile, FILE* resfile) {
 		InitVM();
 
-		MemStreamC mod(modfile, modsize);
+		FileStream mod(modfile);
+
 		if(!LoadVM(mod))
 			return false;
-			
-		MemStreamC res(resfile, ressize);
-		if(!mSyscall.loadResources(res, resfile))
+
+		FileStream res(resfile);
+
+		if(!mSyscall.loadResources(res, "resources"))
 			return false;
+
 #endif
 
 
@@ -1438,8 +1441,8 @@ bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
 #else
-bool LoadVMApp(VMCore* core, const char* modfile,int modSize,const char* resfile,int resSize) {
-	return CORE->LoadVMApp(modfile,modSize,resfile,resSize);
+bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile) {
+	return CORE->LoadVMApp(modfile, resfile);
 }
 #endif
 #endif

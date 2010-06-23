@@ -318,6 +318,10 @@ void Syscall::ConnOp::RunL() {
 		switch(sop.type) {
 		case CSOC_StartNetworking:
 			SendResult(CONNERR_NETWORK);
+			LOGS("gConnection.Close()\n");
+			mSyscall.gConnection.Close();
+			LOGS("gConnection.Close() successful\n");
+			mSyscall.gNetworkingState = EIdle;
 			return;
 		case CSOC_Resolve:
 			SendResult(CONNERR_DNS);
@@ -418,7 +422,11 @@ void Syscall::ConnOp::DoCancel() {
 	LOGS("SOC %i @ 0x%08X\n", sop.type, (uint)&sop);
 	switch(sop.type) {
 	case CSOC_StartNetworking:
-		TSNR(mSyscall.gConnection.Stop());
+		LOGS("gConnection.Close()\n");
+		//TSNR(mSyscall.gConnection.Stop());	// can cause KERN-EXEC 0
+		mSyscall.gConnection.Close();
+		LOGS("gConnection.Close() successful\n");
+		mSyscall.gNetworkingState = EIdle;
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);

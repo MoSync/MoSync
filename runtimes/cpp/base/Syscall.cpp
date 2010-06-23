@@ -50,6 +50,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace Base;
 
 namespace Base {
+	
+	uint getMaxCustomEventSize() {
+		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
+		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+		
+		uint maxCustomEventSize = 0;
+		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
+		DUMPHEX(maxCustomEventSize);
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+		return maxCustomEventSize;
+	}
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {
@@ -154,15 +165,15 @@ namespace Base {
 					int pos;			
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
-					
-#ifndef _android
+#ifndef _android					
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
 #else
-					// This will need to be changed because of how resources are loaded in the Android JNI runtime
+					loadUBinary(rI, pos, size);
 					ROOM(resources.dadd_RT_BINARY(rI,
-						new LimitedFileStream(aFilename, pos, size)));
+						new LimitedFileStream(aFilename, pos, size, getJNIEnvironment(), getJNIThis())));
 #endif
+
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;
@@ -366,6 +377,7 @@ namespace Base {
 		else	//a < b		//or NaN!
 			return -1;
 	}
+
 #endif	//S60v2
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
@@ -377,7 +389,12 @@ namespace Base {
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {
+#ifndef _android
 		MemStream* ms = new MemStream(size);
+#else
+		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
+		MemStream* ms = new MemStream(b, size);
+#endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;
 		if(ms->ptr()==0) { delete ms; return RES_OUT_OF_MEMORY; }
 

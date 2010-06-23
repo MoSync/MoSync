@@ -44,9 +44,6 @@ extern "C" {
 }
 #include <getopt.h>
 
-#include "selfsigned.cer.h"
-#include "selfsigned.key.h"
-
 
 static SISContents* loadSISFile(const char* name, uint8_t* header) {
 	FILE* in = fopen(name, "rb");
@@ -182,8 +179,8 @@ int main(int argc, char *argv[]) {
 		delete field;
 	} else {
 		SISDataIndex* dataIndex = (SISDataIndex*) controller->FindRemoveElement(SISFieldType::SISDataIndex);
-		const char* certData = selfsignedCer;
-		const char* keyData = selfsignedKey;
+		const char* certData = NULL;
+		const char* keyData = NULL;
 		bool freeCerts = false;
 		if (cert && key) {
 			try {
@@ -194,7 +191,8 @@ int main(int argc, char *argv[]) {
 			}
 			freeCerts = true;
 		} else {
-			printf("Warning, using built in self-signed certificate\n");
+			fprintf(stderr, "You must specify certificate and key.\n");
+			exit(1);
 		}
 
 		try {

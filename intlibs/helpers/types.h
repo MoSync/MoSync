@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef _INTLIBS_TYPES_H_
+#define _INTLIBS_TYPES_H_
+
 typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
-
-typedef long long s64;
 
 typedef unsigned long long u64;
 typedef unsigned int u32;
@@ -44,3 +45,5 @@ typedef signed char s8;
 #else
 # error Unsupported compiler!
 #endif
+
+#endif // _INTLIBS_TYPES_H_

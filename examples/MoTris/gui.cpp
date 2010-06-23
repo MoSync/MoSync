@@ -130,7 +130,6 @@ int Menu::handlePointerPress(MAPoint2d point)
 	int sy;
 	sy = y;
 
-	int c;
 	for(int i = 0; i < menuItems.size(); i++) {
 		me = maGetTextSize(menuItems[i].c_str());
 		int xSize = EXTENT_X(me);

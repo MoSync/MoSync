@@ -8,6 +8,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include <ma.h>
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -51,7 +53,7 @@ typedef sint32			fix32;
  * Quits the application with a message
  *
  */
-void FatalError ( char msg[] );
+void FatalError ( char msg[] ) GCCATTRIB(noreturn);
 
 
 #endif /* __COMMON_H__ */

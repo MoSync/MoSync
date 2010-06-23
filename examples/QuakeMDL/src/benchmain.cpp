@@ -15,7 +15,7 @@
 #include "MAHeaders.h"
 
 #define BENCH_PASSES	3
-#define FRAMES_PASS		100
+#define FRAMES_PASS		1000
 
 
 int BenchMain ( void )
@@ -60,9 +60,9 @@ int BenchMain ( void )
 			//
 			pipe.resetPipe( );
 
-			transMatrix.rotateX( -M_PI/2 );
+			transMatrix.rotateX( (float)-M_PI/2 );
 			pipe.addTransform( transMatrix );
-			transMatrix.rotateY( M_PI/4 );
+			transMatrix.rotateY( (float)M_PI/4 );
 			pipe.addTransform( transMatrix );
 
 			transMatrix.rotateX( rotRadX );
@@ -89,13 +89,10 @@ int BenchMain ( void )
 			renderedFrames++;
 			if ( renderedFrames == FRAMES_PASS )
 				break;
-		}
 
-		//
-		// Handle input
-		//
-		while ( true )
-		{
+			//
+			// Handle input
+			//
 			MAEvent e;
 			while ( maGetEvent( &e ) )
 			{
@@ -105,6 +102,7 @@ int BenchMain ( void )
 					maExit( 0 );
 			}
 		}
+
 		// Calculate average fps for pass
 		tmrEnd  = maGetMilliSecondCount( );
 		int denom = (tmrEnd-tmrIni);

@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /**
 * \file MTXml.h
-* \brief Tiny XML parser
+* \brief Tiny XML parser with a SAX-like interface.
 *
 * MTXml is a simple XML parser which can handle most XML 1.0 and 1.1 documents.
 * It has a SAX-like interface, and is re-entrant in that it can take a partial XML document
@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * In the interests of performance, MTXml is not a conforming XML processor,
 * as defined by the W3C Recommendation. It does not validate documents,
-* and it only checks a few of the well-formed-ness criteria.
+* and it only checks a few of the well-formedness criteria.
 * It even ignores some "fatal errors". Still, it should be able to properly parse
 * a well-formed document.
 *
@@ -48,7 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * If you use mtxFeedProcess(), the parser will determine if UTF-8 is used and,
 * convert all strings reported by MTX callbacks to Latin-1.
-* It will also convert standard entity references. (XML and HTTP 4.01)
+* It will also convert standard entity references. (XML and HTML 4.01)
 *
 * mtxFeedWide() works like mtxFeedProcess(), except the output is converted to Unicode instead
 * of Latin-1.
@@ -60,7 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * \see http://www.w3.org/TR/xml11/ - The W3C Specification of XML 1.1 (online)
 * \see http://www.w3.org/TR/html401/sgml/entities.html#h-24.2 -
-* HTTP 4.01 character entity references (online)
+* HTML 4.01 character entity references (online)
 */
 
 #ifndef _MTXML_H_
@@ -82,7 +82,8 @@ extern "C" {
 typedef struct MTXContext MTXContext;
 
 /**
-* The context of an MTXml parser.
+* \brief The context of an MTXml parser.
+*
 * Contains function pointers for callbacks from the parser.
 * Also contains internal variables.
 *
@@ -203,7 +204,7 @@ void mtxStart(MTXContext* context);
 /**
 * Parses \a data in a \a context.
 *
-* The data is null-terminated. It needn't be the entire XML document;
+* The data must be null-terminated. It needn't be the entire XML document;
 * MTXContext::dataRemains() will be called with any data that couldn't be completely parsed.
 * You can then call this function again when you have more data.
 *
@@ -214,6 +215,8 @@ void mtxStart(MTXContext* context);
 *
 * \returns Non-zero if mtxStop() was called from a callback within the call to this function,
 * zero otherwise.
+* \note The data is altered in unspecified ways during parsing, as to avoid time-consuming copies.
+* Don't try to reuse it during or after the call to this function.
 */
 int mtxFeed(MTXContext* context, char* data);
 
@@ -284,6 +287,11 @@ unsigned char mtxBasicUnicodeConvert(MTXContext* context, int unicode);
 #endif
 
 #ifdef __cplusplus
+
+/**
+* \brief MoSync wrappers for XML/SAX parser
+*/
+
 namespace Mtx {
 	/**
 	* \see Context
@@ -361,7 +369,7 @@ namespace Mtx {
 	};
 
 	/**
-	* A C++ wrapper for MTXml, with wide-char Unicode output.
+	* \brief A C++ wrapper for MTXml, with wide-char Unicode output.
 	*/
 	class ContextW : public ContextBase {
 	public:
@@ -378,7 +386,7 @@ namespace Mtx {
 	};
 
 	/**
-	* A C++ wrapper for MTXml, with Latin-1 output.
+	* \brief A C++ wrapper for MTXml, with Latin-1 output.
 	*/
 	class Context : public ContextBase {
 	public:

@@ -1,0 +1,14 @@
+#!/bin/sh
+curr_dir=$(pwd)
+script_dir=$(echo $0 | sed 's/MoRE//')
+
+# Try to resolve full path to script
+if [ -e $curr_dir/$0 ]; then
+	script=$curr_dir/$0
+else
+	script=$0
+fi
+
+cd $script_dir
+DYLD_LIBRARY_PATH=$(pwd) ./moemu $*
+cd $curr_dir

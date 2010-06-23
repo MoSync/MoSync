@@ -22,4 +22,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-void checkResult(BOOL result, char *errorMessage);
+void checkResult(BOOL result, const char *errorMessage);

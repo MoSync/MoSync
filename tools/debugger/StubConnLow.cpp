@@ -101,9 +101,7 @@ static void connError(int code) {
 #else
 	sAckCallback = NULL;
 #endif
-	char buf[128];
-	sprintf(buf, "Connection failure, code %i", code);
-	error(buf);
+	error("Connection failure, code %i", code);
 }
 
 //******************************************************************************
