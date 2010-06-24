@@ -13,7 +13,7 @@ if(HOST == :win32) then
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv"]
 else
 	INTLIB_PLATFORM = HOST
 	PLATFORM_TOOLS = []

@@ -164,7 +164,11 @@ struct ColorType {
 };
 
 static void processArgument(const char* arg) {
+#ifdef WIN32
 	if (arg[0] == '/') {
+#else
+	if (arg[0] == '-') {
+#endif
 		const char* param = arg + 1;
 		if (param[0] == 'h' || param[0] == 'H') {
 			free(headername);

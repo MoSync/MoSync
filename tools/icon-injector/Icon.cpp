@@ -93,7 +93,11 @@ static void end(void *data, const char *el) {
 		string absolutePath = getAbsolutePath(filename);
 		vector<IconInstance*>& mInstances = retIcon->getInstances();
 		for(size_t i = 0; i < mInstances.size(); i++) {
+#ifdef WIN32
 			mInstances[i]->filename = absolutePath + "\\" + mInstances[i]->filename;
+#else
+			mInstances[i]->filename = absolutePath + "/" + mInstances[i]->filename;
+#endif
 		}
 
 		return retIcon;
