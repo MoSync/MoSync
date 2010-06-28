@@ -199,6 +199,10 @@ namespace Base {
 		
 		MANetworkInit();		
 		
+		// init some image.h optimizations.
+		initMulTable();
+		initRecipLut();
+		
 		return true;
 	}
 
@@ -504,7 +508,13 @@ namespace Base {
 			MemStreamC memStream((const void*)&ptr[offset], size);
 			bitmap = gSyscall->loadImage(memStream);
 		}
-
+		
+		if(!bitmap) return RES_BAD_INPUT;
+		if(!bitmap->image) {
+			delete bitmap;
+			// most likely bad input.
+			return RES_BAD_INPUT;
+		}
 		
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
 		
@@ -515,17 +525,35 @@ namespace Base {
 		gSyscall->ValidateMemRange(src, width*height*4);
 		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
 		char *data = new char[byteSize];
+		if(!data) return RES_OUT_OF_MEMORY;
 		memcpy(data, src, byteSize);
-		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast);
+		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaPremultipliedLast:kCGImageAlphaNoneSkipLast);
+		if(!bitmap) {
+			delete data;
+			return RES_OUT_OF_MEMORY;
+		}
+		
+		if(!bitmap->context || !bitmap->image || !bitmap->data) {
+			delete bitmap;
+			delete data;
+			return RES_OUT_OF_MEMORY;
+		}
+		
+		
 		bitmap->mOwnData = true;
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
-		return 1;
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
 		MYASSERT(width > 0 && height > 0, ERR_IMAGE_SIZE_INVALID);
-		gSyscall->resources.add_RT_IMAGE(placeholder, new Surface(width, height));
-		return 0;
+		Surface *surf = new Surface(width, height);
+		if(!surf) return RES_OUT_OF_MEMORY;
+		if(!surf->context || !surf->image || !surf->data) {
+			delete surf;
+			return RES_OUT_OF_MEMORY;			
+		}
+			
+		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
 	}
 
 

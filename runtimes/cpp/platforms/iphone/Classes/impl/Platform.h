@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <bluetooth/discovery.h>
 #include <helpers/fifo.h>
+#include "iphone_helpers.h"
 
 #include "ThreadPoolImpl.h"
 
@@ -53,13 +54,13 @@ public:
 	static int fontSize;
 	
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {				
-		CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(image));
-		this->data = (char *)CFDataGetBytePtr(data);		
+		mDataRef = CGDataProviderCopyData(CGImageGetDataProvider(image));
+		this->data = (char *)CFDataGetBytePtr(mDataRef);		
 		width = CGImageGetWidth(image);
 		height = CGImageGetHeight(image);
 		rowBytes = CGImageGetBytesPerRow(image);
 		rect = CGRectMake(0, 0, width, height);
-		mOwnData = true;
+		mOwnData = false;
 
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
@@ -134,7 +135,7 @@ public:
 		CGContextSetTextMatrix(context, xform);	
 	}
 
-	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipLast, int rowBytes=-1) {
+	Surface(int width, int height, char *data=NULL, CGBitmapInfo bitmapInfo=kCGImageAlphaNoneSkipLast, int rowBytes=-1) : mDataRef(NULL) {
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		this->width = width,
 		this->height = height;
@@ -189,6 +190,7 @@ public:
 		if(context) CGContextRelease(context);
 		if(mOwnData && data) delete data;
 		if(mImageDrawer) delete mImageDrawer;
+		if(mDataRef) CFRelease(mDataRef);
 	}
 	
 	int width, height, rowBytes;
@@ -197,12 +199,13 @@ public:
 	CGRect rect;
 	bool mOwnData;
 	char *data;
+	CFDataRef mDataRef;
 	
 	Image *mImageDrawer;
 };
 
 
-// never use <0 for event type :)
+// never use <0 for event type, just internal events :)
 #define IEVENT_TYPE_DEFLUX_BINARY -1
 
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {

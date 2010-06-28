@@ -453,6 +453,7 @@ namespace Base {
 #endif
 			FSS.MkDir(KMAStorePath16);
 		LOGD("MkDir %i\n", res);
+#elif defined(__IPHONE__)
 #else
 		_mkdir(STORE_PATH);
 #endif	//_WIN32_WCE
@@ -465,6 +466,12 @@ namespace Base {
 		des.Append(nameDesC);
 		path = CCP des.PtrZ();
 		len = des.Length();
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(STORE_PATH);
+		std::string newFile =  newPath + "/" + std::string(name);
+		path = newFile.c_str();
+		len = newFile.length();
+		int ret = _mkdir(newPath.c_str());
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();

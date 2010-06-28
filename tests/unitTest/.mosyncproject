@@ -12,8 +12,8 @@
 <property key="build.prefs:gcc.switches" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:ignore.default.libraries" value="true"/>
-<property key="build.prefs:memory.data" value="1024"/>
-<property key="build.prefs:memory.heap" value="768"/>
+<property key="build.prefs:memory.data" value="4096"/>
+<property key="build.prefs:memory.heap" value="2048"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x09f34d84"/>
