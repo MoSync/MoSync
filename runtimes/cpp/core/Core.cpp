@@ -776,7 +776,11 @@ public:
 		
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
+#ifndef _android
 		recompiler.init(this, &VM_Yield);
+#else
+		recompiler.init(this, &VM_Yield, mJniEnv, mJThis);
+#endif
 #endif
 
 		return 1; //good load
