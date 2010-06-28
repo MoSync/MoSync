@@ -21,6 +21,8 @@ $SETTINGS = {
 
 	:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
 	:android_sdk => "C:\\android-sdk-windows-1.5_r3\\platforms\\android-1.5\\",
+	:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
+
 	
 	:verbose => false,
 }

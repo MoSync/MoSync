@@ -51,8 +51,9 @@ class RuntimeBuilder
 		
 		# call the build functions
 		if version == "s60v5"
-			puts "#{cwd}/build_s60v5.bat"
-			system("#{cwd}/build_s60v5.bat")
+			cmd = "#{cwd}/build_s60v5.bat #{$SETTINGS[:s60v5_compiler]}"
+			puts cmd
+			system(cmd)
 		else
 			system("devices -setdefault #{default}")
 			system("bldmake bldfiles");
