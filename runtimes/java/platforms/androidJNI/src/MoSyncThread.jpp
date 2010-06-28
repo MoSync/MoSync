@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-package com.mosync.java.android;
+public package com.mosync.internal.android;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -58,13 +58,16 @@ import android.util.Log;
 
 #include "helpers.h"
 
-class MoSyncThread extends Thread
+public class MoSyncThread extends Thread
 {
 	private Context mContext;
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
 	
 	private long mResourceOffset = 0;
+	
+	ByteBuffer mRecompilerCodeBlock;
+	ByteBuffer mRecompilerEntryBlock;
 	
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{	
@@ -115,6 +118,35 @@ class MoSyncThread extends Thread
 		}
 		return mMemDataSection;
 	}
+	
+	public ByteBuffer generateRecompilerCodeBlock(int size)
+	{
+		Log.i("MoSyncThread","generate recompiler code block");
+		try
+		{
+			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerCodeBlock;
+	}
+	
+	public ByteBuffer generateRecompilerEntryBlock(int size)
+	{
+		Log.i("MoSyncThread","generate recompiler entry block");
+		try
+		{
+			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerEntryBlock;
+	}
+	
 /*
 	public void waitThread()
 	{
@@ -148,12 +180,6 @@ class MoSyncThread extends Thread
 			long rFdLength = rAfd.getLength();
 			mResourceOffset = rAfd.getStartOffset();
 			
-			Log.i("MoSync Thread","program offset: " + pFdOffset);
-			Log.i("MoSync Thread","resource offset: " + mResourceOffset);
-			
-		
-			Log.i("MoSync Thread","prg: "+ pFd + " res: " + rFd);
-		
 			if((null != pFd) && (null != rFd))
 			{
 				Log.i("MoSync Thread", "calling native function");
