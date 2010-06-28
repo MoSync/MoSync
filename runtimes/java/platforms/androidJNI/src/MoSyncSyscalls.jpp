@@ -47,7 +47,6 @@ int mClipLeft, mClipTop, mClipWidth, mClipHeight;
 
 boolean mUsingFrameBuffer;
 int mFrameBufferAddress;
-//int[] mFrameBuffer;
 int mFrameBufferSize;
 Bitmap mFrameBufferBitmap;
 
@@ -175,23 +174,17 @@ void maUpdateScreen()
 		{
 			if(mUsingFrameBuffer)
 			{
-
-				Log.i("update","framebuffer");
-
-				SYSLOG("address: " + mFrameBufferAddress + " size: " + mFrameBufferSize);
-
-				long st = System.currentTimeMillis();
+			//	long st = System.currentTimeMillis();
 				
 				mMemDataSection.mark();
 				mMemDataSection.position(mFrameBufferAddress);
 				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 				mMemDataSection.reset();
 				
-				//lockedCanvas.drawBitmap(mFrameBuffer,0,mWidth,0,0, mWidth,mHeight,false, mBlitPaint);
 				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
 				
-				long t = System.currentTimeMillis() - st;
-				Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
+			//	long t = System.currentTimeMillis() - st;
+			//	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
 			}
 			else
 			{
@@ -252,7 +245,6 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 	ImageCache imageResource = (ImageCache)mImageResources.get(image);
 	if(imageResource == null)
 	{
-		;
 		return;
 	}
 
@@ -594,8 +586,6 @@ ByteBuffer _maReadStore(int store, int resourceIndex)
 		{
 			buffer = new byte[0];
 		}
-		
-		//addResource(placeholder, new Binary(buffer));
 		
 		ByteBuffer bb = loadBinary(resourceIndex, length);
 		bb.put(buffer);

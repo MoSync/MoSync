@@ -29,6 +29,9 @@ import java.util.Locale;
 
 import android.os.Handler;
 
+import com.mosync.internal.android.MoSyncThread;
+import com.mosync.internal.android.MoSyncView;
+
 public class MoSync extends Activity {
 
 	MoSyncView mMoSyncView;

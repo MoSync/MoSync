@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+//(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 #define SYSLOG(...)
 
 /*
@@ -250,6 +250,6 @@ jint JNI_OnLoad ( JavaVM* vm, void* reserved )
 		return result;
 	}
 	
-	jniRegisterNativeMethods( env, "com/mosync/java/android/MoSyncThread", sMethods, numJavaMethods );
+	jniRegisterNativeMethods( env, "com/mosync/internal/android/MoSyncThread", sMethods, numJavaMethods );
 	return JNI_VERSION_1_4;
 }
