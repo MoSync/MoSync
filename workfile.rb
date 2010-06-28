@@ -10,10 +10,10 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv"]
-elsif(HOST == :darwin)
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4"]
+elsif(HOST == :darwin || HOST == :linux)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix"]
 else
 	INTLIB_PLATFORM = HOST
 	PLATFORM_TOOLS = []
@@ -29,12 +29,13 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl/MoRE"
 	]
 
-BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
+BASE_DIRS = MORE_DIRS
 
 EXAM_DIRS = ["tests/unitTest", "examples"]
-PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
-TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector"]
+PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs"]
+TOOL_DIRS = PLATFORM_TOOLS + ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc",
+	"tools/Bundle", "tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector",
+	"tools/mifconv", "tools/e32hack"]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS

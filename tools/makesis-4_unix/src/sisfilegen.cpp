@@ -51,9 +51,11 @@ extern "C" {
 
 using std::stack;
 
-uint32_t uidCrc(uint32_t uid1, uint32_t uid2, uint32_t uid3) {
-	uint8_t buf1[] = { (uid1 >> 8), (uid1 >> 24), (uid2 >> 8), (uid2 >> 24), (uid3 >> 8), (uid3 >> 24) };
-	uint8_t buf2[] = { (uid1 >> 0), (uid1 >> 16), (uid2 >> 0), (uid2 >> 16), (uid3 >> 0), (uid3 >> 16) };
+static uint32_t uidCrc(uint32_t uid1, uint32_t uid2, uint32_t uid3) {
+	uint8_t buf1[] = { uint8_t(uid1 >> 8), uint8_t(uid1 >> 24), uint8_t(uid2 >> 8),
+		uint8_t(uid2 >> 24), uint8_t(uid3 >> 8), uint8_t(uid3 >> 24) };
+	uint8_t buf2[] = { uint8_t(uid1 >> 0), uint8_t(uid1 >> 16), uint8_t(uid2 >> 0),
+		uint8_t(uid2 >> 16), uint8_t(uid3 >> 0), uint8_t(uid3 >> 16) };
 	uint16_t crc1 = crcFast(buf1, 6);
 	uint16_t crc2 = crcFast(buf2, 6);
 	return (crc1<<16) | crc2;
@@ -66,7 +68,7 @@ CSISFileGenerator::CSISFileGenerator(const CSISWriter *sisw) : siswriter(sisw) {
 CSISFileGenerator::~CSISFileGenerator() {
 }
 
-SISArray* GetStringArray(const LANGSTRINGNODE* base) {
+static SISArray* GetStringArray(const LANGSTRINGNODE* base) {
 	SISArray* array = new SISArray(SISFieldType::SISString);
 	stack<SISString*> tmpStack;
 	while (base) {
@@ -80,7 +82,7 @@ SISArray* GetStringArray(const LANGSTRINGNODE* base) {
 	return array;
 }
 
-SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
+static SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
 	SISArray* array = new SISArray(SISFieldType::SISDependency);
 	stack<SISDependency*> tmpStack;
 	while (dependency) {
@@ -103,7 +105,7 @@ SISArray* GetDependencyArray(const DEPENDNODE* dependency) {
 	return array;
 }
 
-SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
+static SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
 	SISArray* array = new SISArray(SISFieldType::SISProperty);
 	stack<SISProperty*> tmpStack;
 	while (capability) {
@@ -119,7 +121,7 @@ SISArray* GetPropertyArray(const CAPABILITYNODE* capability) {
 	return array;
 }
 
-void Recompress(SISDataUnit* dataUnit, TCompressionAlgorithm algorithm) {
+static void Recompress(SISDataUnit* dataUnit, TCompressionAlgorithm algorithm) {
 	if (algorithm != ECompressNone)
 		return;
 	SISArray* fileDataArray = (SISArray*) dataUnit->FindElement(SISFieldType::SISArray);
@@ -185,7 +187,10 @@ SISCapabilities* CSISFileGenerator::GetE32Capabilities(const char* filename) {
 	fseek(in, 16, SEEK_SET);
 	char buf[4];
 	memset(buf, 0, sizeof(buf));
-	fread(buf, 1, 4, in);
+	if(fread(buf, 1, 4, in) != 4) {
+		fclose(in);
+		return NULL;
+	}
 	if (memcmp(buf, "EPOC", 4)) {
 		fclose(in);
 		return NULL;
@@ -215,32 +220,50 @@ SISCapabilities* CSISFileGenerator::GetPECapabilities(const char* filename) {
 	}
 	uint8_t buf[4];
 	memset(buf, 0, sizeof(buf));
-	fread(buf, 1, 2, in);
+	if(fread(buf, 1, 2, in) != 2) {
+		fclose(in);
+		return NULL;
+	}
 	if (memcmp(buf, "MZ", 2)) {
 		fclose(in);
 		return NULL;
 	}
 	fseek(in, 0x3c, SEEK_SET);
 	uint8_t coffOffset;
-	fread(&coffOffset, 1, 1, in);
+	if(fread(&coffOffset, 1, 1, in) != 1) {
+		fclose(in);
+		return NULL;
+	}
 	fseek(in, coffOffset, SEEK_SET);
-	fread(buf, 1, 4, in);
+	if(fread(buf, 1, 4, in) != 4) {
+		fclose(in);
+		return NULL;
+	}
 	if (memcmp(buf, "PE\0\0", 4)) {
 		fclose(in);
 		return NULL;
 	}
 	fseek(in, 2, SEEK_CUR);
-	fread(buf, 1, 2, in);
+	if(fread(buf, 1, 2, in) != 2) {
+		fclose(in);
+		return NULL;
+	}
 	uint16_t numberOfSections = buf[0] | (buf[1] << 8);
 	bool found = false;
 	uint32_t sectionOffset = 0;
 	for (uint16_t i = 0; i < numberOfSections; i++) {
 		fseek(in, coffOffset + 248 + 40*i, SEEK_SET);
 		uint8_t nameBuf[8];
-		fread(nameBuf, 1, 8, in);
+		if(fread(nameBuf, 1, 8, in) != 4) {
+			fclose(in);
+			return NULL;
+		}
 		if (!memcmp(nameBuf, ".SYMBIAN", 8)) {
 			fseek(in, 12, SEEK_CUR);
-			fread(buf, 1, 4, in);
+			if(fread(buf, 1, 4, in) != 4) {
+				fclose(in);
+				return NULL;
+			}
 			found = true;
 			sectionOffset = buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24);
 			break;
@@ -266,7 +289,7 @@ SISCapabilities* CSISFileGenerator::GetPECapabilities(const char* filename) {
 	capabilities->AddCapabilityBytes(caps, 4);
 	return capabilities;
 }
-SISHash* GetHash(RawFile* rawFile) {
+static SISHash* GetHash(RawFile* rawFile) {
 	SHA_CTX sha;
 	SHA1_Init(&sha);
 	if (rawFile) {
@@ -379,7 +402,7 @@ bool CSISFileGenerator::GetLogo(const LOGO* logo, int index, SISFileDescription*
 	return true;
 }
 
-SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
+static SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
 	switch (condition->exprType) {
 	case EFuncExists: {
 		const struct PKGLINECONDITION* prim = condition->b.pLhs;
@@ -415,7 +438,7 @@ SISExpression* GetExpression(const struct PKGLINECONDITION* condition) {
 	return NULL;
 }
 
-SISContents* LoadSISFile(const wchar_t* name, uint32_t uid) {
+static SISContents* LoadSISFile(const wchar_t* name, uint32_t uid) {
 	char sourceFile[MAX_PATH];
 	wcstombs(sourceFile, name, sizeof(sourceFile));
 	sourceFile[MAX_PATH-1] = '\0';
@@ -429,7 +452,10 @@ SISContents* LoadSISFile(const wchar_t* name, uint32_t uid) {
         uint32_t len = ftell(in);
         fseek(in, 0, SEEK_SET);
         uint8_t* buffer = new uint8_t[len];
-        fread(buffer, 1, len, in);
+        if(fread(buffer, 1, len, in) != 1) {
+		fclose(in);
+		return NULL;
+	}
         fclose(in);
 	const uint8_t* uidPtr = buffer + 8;
 	uint32_t fileUid = uidPtr[0] | (uidPtr[1] << 8) | (uidPtr[2] << 16) | (uidPtr[3] << 24);
@@ -786,7 +812,7 @@ void CSISFileGenerator::GenerateSISFile(const wchar_t* target, bool stub) {
 	fclose(out);
 }
 
-void writeUint32(uint32_t value, FILE* out) {
+static void writeUint32(uint32_t value, FILE* out) {
 	uint8_t buf[4];
 	buf[0] = (value >>  0) & 0xff;
 	buf[1] = (value >>  8) & 0xff;

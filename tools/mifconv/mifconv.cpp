@@ -362,8 +362,12 @@ int main(int argc, char *argv[]) {
 		sprintf(buf, "mkdir -p %s", outname);
 		char* ptr = strrchr(buf, '/');
 		*ptr = '\0';
-		system(buf);
+		int res = system(buf);
 		free(buf);
+		if(res != 0) {
+			perror("mkdir");
+			return 1;
+		}
 		// Retry opening
 		out = fopen(outname, "wb");
 	}
