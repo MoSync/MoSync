@@ -75,7 +75,7 @@
 	int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
 	frame.origin.y -= statusBarHeight;
 
-	[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
+	//[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
 	[[UIApplication sharedApplication] setStatusBarHidden:YES animated:YES];
 	
 	

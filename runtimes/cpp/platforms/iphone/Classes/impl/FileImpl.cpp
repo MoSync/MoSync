@@ -30,7 +30,7 @@ namespace Base {
 	}
 	FileStream::FileStream() {}
 	FileStream::FileStream(const char* filename) : mFilename(filename) {
-		file = fopen(getReadablePath(filename), "rb");
+		file = fopen(filename, "rb");
 	}
 
 	bool FileStream::isOpen() const {
@@ -98,9 +98,9 @@ namespace Base {
 
 	WriteFileStream::WriteFileStream(const char* filename, bool append) {
 		if(append) {
-			file = fopen(getWriteablePath(filename), "ab");
+			file = fopen(filename, "ab");
 		} else {
-			file = fopen(getWriteablePath(filename), "wb");
+			file = fopen(filename, "wb");
 		}
 
 		if(!file)
