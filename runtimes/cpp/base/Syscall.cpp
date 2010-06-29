@@ -424,7 +424,7 @@ namespace Base {
 		Stream* src = SYSCALL_THIS->resources.get_RT_BINARY(a->src);
 		MYASSERT(dst->seek(Seek::Start, a->dstOffset), ERR_DATA_OOB);
 		MYASSERT(src->seek(Seek::Start, a->srcOffset), ERR_DATA_OOB);
-		MYASSERT(dst->write(src, a->size), ERR_DATA_OOB);
+		MYASSERT(dst->writeStream(*src, a->size), ERR_DATA_OOB);
 	}
 
 #if !defined(_android)
