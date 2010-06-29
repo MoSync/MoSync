@@ -400,7 +400,7 @@ public class HTMLGenerator extends Generator {
 		String fileName = getFileName(root, outputFolder);
 		buf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
 				"<?NLS TYPE=\"org.eclipse.help.toc\"?>\n\n" +
-				"<toc label=\"MoSync\" topic=\"docs/"+ fileName + "\">\n");
+				"<toc label=\"MoSync SDK\" topic=\"docs/"+ fileName + "\">\n");
 		generateEclipseHelpSubMenuReplacement(root, outputFolder, templateFile);
 		ArrayList<DocFolder> children = root.getChildren();
 		for (int i = 0; i < children.size(); i++) {
