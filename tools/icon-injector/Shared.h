@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Icon.h"
 #include <string>
+#include <helpers/attribute.h>
 
 namespace MoSync {
 
@@ -27,7 +28,7 @@ namespace MoSync {
  * Function used to exit on error. 
  * \param reason The reason for exiting (i.e. the error).
  */
-void errorExit(const std::string& reason);
+void errorExit(const std::string& reason) GCCATTRIB(noreturn);
 
 /**
  * Function used to convert an icon instance to an image.

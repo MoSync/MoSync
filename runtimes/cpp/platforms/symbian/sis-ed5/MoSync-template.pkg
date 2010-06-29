@@ -16,11 +16,11 @@
 [0x1028315F], 0, 0, 0, {"Series60ProductID"}
 
 ;Files to install
-"%package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
-"%programcomb-output%" -"!:\resource\apps\%uid%.comb"
-"%package-output-dir%\%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
-%has-icon%"%package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
-"%package-output-dir%\%uid%_reg.RSC" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
+"%pkg-package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
+"%pkg-programcomb-output%" -"!:\resource\apps\%uid%.comb"
+"%pkg-package-output-dir%\%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
+%has-icon%"%pkg-package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
+"%pkg-package-output-dir%\%uid%_reg.RSC" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
 
 ;required for application to be covered by backup/restore facility
 ;"backup_registration.xml" -"!:\private\%uid%\backup_registration.xml"

@@ -26,6 +26,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NULL 0
 #endif
 
+/**
+* \brief MoSync utility libraries
+*/
 namespace MAUtil {
 
 //******************************************************************************

@@ -48,11 +48,7 @@ class PipeTask < FileTask
 		execFlags
 		# pipe-tool may output an empty file and then fail.
 		begin
-			if(HOST == :linux && HOST_PLATFORM == :wine)
-				sh "wine #{mosyncdir}/bin/pipe-tool#{cFlags}"
-			else
-				sh "#{mosyncdir}/bin/pipe-tool#{cFlags}"
-			end
+			sh "#{mosyncdir}/bin/pipe-tool#{cFlags}"
 		rescue => e
 			FileUtils.rm_f(@NAME)
 			raise
@@ -93,11 +89,9 @@ end
 class PipeGccWork < GccWork
 	def gccVersionClass; PipeGccWork; end
 	include GccVersion
-	if(HOST == :linux && HOST_PLATFORM == :wine)
-		def gcc; "wine '" + mosyncdir + "/bin/xgcc'"; end
-	else
-		def gcc; mosyncdir + "/bin/xgcc"; end
-	end
+
+	def gcc; mosyncdir + "/bin/xgcc"; end
+	
 	def gccmode; "-S"; end
 	def host_flags;
 		g = CONFIG == "" ? " -g" : ""
@@ -108,10 +102,14 @@ class PipeGccWork < GccWork
 	include MoSyncInclude
 	
 	def set_defaults
+		default(:BUILDDIR_PREFIX, "")
+		default(:COMMOM_BUILDDDIR_PREFIX, "")
 		if(USE_NEWLIB)
-			@BUILDDIR_PREFIX = "newlib_"
+			@BUILDDIR_PREFIX += "newlib_"
+			@COMMOM_BUILDDDIR_PREFIX += "newlib_"
 		else
-			@BUILDDIR_PREFIX = "pipe_"
+			@BUILDDIR_PREFIX += "pipe_"
+			@COMMOM_BUILDDDIR_PREFIX += "pipe_"
 		end
 		super
 	end

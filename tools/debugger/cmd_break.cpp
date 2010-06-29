@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <queue>
+#include <stdio.h>
 
 #include "config.h"
 #include "helpers/log.h"
@@ -73,7 +74,6 @@ static void insertBpInstruction(int address, void (*cb)());
 //******************************************************************************
 namespace Callback {
 	static void insert_done();
-	static void breakpointRegs(const Registers&);
 	static void bpRestore();
 	static void bpStore();
 	static void bpDelete(BreakpointMap::iterator);

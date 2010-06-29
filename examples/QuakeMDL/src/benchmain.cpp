@@ -60,9 +60,9 @@ int BenchMain ( void )
 			//
 			pipe.resetPipe( );
 
-			transMatrix.rotateX( -M_PI/2 );
+			transMatrix.rotateX( (float)-M_PI/2 );
 			pipe.addTransform( transMatrix );
-			transMatrix.rotateY( M_PI/4 );
+			transMatrix.rotateY( (float)M_PI/4 );
 			pipe.addTransform( transMatrix );
 
 			transMatrix.rotateX( rotRadX );
@@ -89,6 +89,18 @@ int BenchMain ( void )
 			renderedFrames++;
 			if ( renderedFrames == FRAMES_PASS )
 				break;
+
+			//
+			// Handle input
+			//
+			MAEvent e;
+			while ( maGetEvent( &e ) )
+			{
+				if ( e.type == EVENT_TYPE_CLOSE ||
+					 e.type == EVENT_TYPE_KEY_PRESSED ||
+					 e.type == EVENT_TYPE_POINTER_PRESSED )
+					maExit( 0 );
+			}
 		}
 
 		// Calculate average fps for pass
@@ -106,18 +118,7 @@ int BenchMain ( void )
 	printf( "-------------\n\n" );
 	printf( ".\n" );
 
-	//
-	// Handle input
-	//
-	while ( true )
-	{
-		MAEvent e;
-		while ( maGetEvent( &e ) )
-		{
-			if ( e.type == EVENT_TYPE_CLOSE )
-				maExit(0);
-		}
-	}
+	maWait( 0 );
 
 	return 0;
 }

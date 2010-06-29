@@ -32,6 +32,15 @@ using namespace Core;
 #include <windows.h>
 #endif
 
+#ifdef _android
+#include <unistd.h>
+#include <sys/mman.h>
+int _androidMemSize;
+int _androidEntryMemSize;
+JNIEnv* mJNIEnv;
+jobject mJThis;
+#endif
+
 //#define LOGC(x, ...)
 //#define LOG(x, ...)
 
@@ -161,8 +170,15 @@ using namespace Core;
 			close();
 	}
 	void* MoSync::SafeChunk::allocate(int size) {
-		DEBUG_ASSERT(!mChunkIsOpen);
-		LHEL(mChunk.CreateLocalCode(size, size));
+		TInt pageSize;
+		LHEL(UserHal::PageSizeInBytes(pageSize));
+		//round up to page size
+		TInt minSize = ((size-1+pageSize) / pageSize) * pageSize;
+		TInt maxSize = minSize;
+		
+		LOG("SafeChunk. request: %i page: %i grant: %i\n", size, pageSize, minSize);
+		
+		LHEL(mChunk.CreateLocalCode(minSize, maxSize));
 		mChunkIsOpen = true;
 		return mChunk.Base();
 	}
@@ -176,28 +192,85 @@ using namespace Core;
 	}
 #endif	//__SYMBIAN32__
 
+#ifdef _android
+// Returns true iff x is a power of 2.  Does not work for zero.
+template <typename T>
+static inline bool IsPowerOf2(T x) {
+  return (x & (x - 1)) == 0;
+}
+
+// Compute the 0-relative offset of some absolute value x of type T.
+// This allows conversion of Addresses and integral types into
+// 0-relative int offsets.
+template <typename T>
+static inline intptr_t OffsetFrom(T x) {
+  return x - static_cast<T>(0);
+}
+
+// Compute the absolute value of type T for some 0-relative offset x.
+// This allows conversion of 0-relative int offsets into Addresses and
+// integral types.
+template <typename T>
+static inline T AddressFrom(intptr_t x) {
+  return static_cast<T>(0) + x;
+}
+
+// Return the largest multiple of m which is <= x.
+template <typename T>
+static inline T RoundDown(T x, int m) {
+  DEBUG_ASSERT(IsPowerOf2(m));
+  return AddressFrom<T>(OffsetFrom(x) & -m);
+}
+
+
+// Return the smallest multiple of m which is >= x.
+template <typename T>
+static inline T RoundUp(T x, int m) {
+  return RoundDown(x + m - 1, m);
+}
+#endif
+
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
 #ifdef __SYMBIAN32__
-#if 0
-		//return new (ELeave) byte[size];
-		//return User::AllocL(size);
-		if(mHeap == NULL) {
-			//HACK: extra memory for the entryPoint
-			int chunkSize = size + 1024 * 2;
-			LOG("chunkSize %i -> %i\n", size, chunkSize);
-			LHEL(mChunk.CreateLocalCode(chunkSize, chunkSize));
-			LHEL(mChunk.Adjust(chunkSize));
-			mHeap = UserHeap::ChunkHeap(mChunk, size + 1024);
-			DEBUG_ASSERT(mHeap != NULL);
-		}
-		void* ptr = mHeap->AllocL(size);
-		LOG("alloCode %i 0x%08x\n", size, ptr);
-		return ptr;
-#else
 		return mCodeChunk.allocate(size);
-#endif	//0
 #elif defined(_android)
-		return NULL;
+		int nsize = RoundUp<int>(size, getpagesize());
+/*
+		void* mem = memalign(getpagesize(), nsize);
+		if(NULL == mem) 
+			return NULL;
+*/
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "generateRecompilerCodeBlock", "(I)Ljava/nio/ByteBuffer;");
+		if (methodID == 0) return NULL;
+		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, nsize);
+		void* mem = (void*)mJNIEnv->GetDirectBufferAddress(jo);
+		mJNIEnv->DeleteLocalRef(cls);
+
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block returned!");
+
+		int prot = PROT_READ | PROT_WRITE | PROT_EXEC;
+		void* mbase = mmap(mem, nsize, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
+/*
+		int mret = mprotect(mem, nsize, PROT_READ|PROT_WRITE|PROT_EXEC);
+		if(0 != mret)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block couldn't set mprotect!");
+			return NULL;
+		}
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block succesfully created!");
+
+		return mem;
+*/
+		if(NULL != mbase)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block couldn't get mmap!");
+			return NULL;
+		}
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block succesfully created!");
+
+		return mbase;
+
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -207,54 +280,77 @@ using namespace Core;
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
 #elif defined(_android)
-		return NULL;
+		int nsize = RoundUp<int>(size, getpagesize());
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "generateRecompilerEntryBlock", "(I)Ljava/nio/ByteBuffer;");
+		if (methodID == 0) return NULL;
+		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, nsize);
+		void* mem = (void*)mJNIEnv->GetDirectBufferAddress(jo);
+		mJNIEnv->DeleteLocalRef(cls);
+
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry block returned!");
+
+		int mret = mprotect(mem, nsize, PROT_READ|PROT_WRITE|PROT_EXEC);
+
+		if(0 != mret)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry block couldn't set mprotect!");
+			return NULL;
+		}
+
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry block succesfully created!");
+
+		return mem;
+
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
 	}
 
 	void MoSync::ArmRecompiler::freeCodeMemory(void *addr) {
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
 		LOG("freeCode 0x%08x\n", addr);
 		DEBUG_ASSERT(addr == mCodeChunk.address());
 		mCodeChunk.close();
-	#elif defined(_android)
-		return;
-	#else	// winmobile
+#elif defined(_android)
+		free(addr);
+#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
-	#endif
+#endif
 	}
 
 	void MoSync::ArmRecompiler::freeEntryPoint(void *addr) {
-	#ifdef __SYMBIAN32__
+#ifdef __SYMBIAN32__
 		LOG("freeEntry 0x%08x\n", addr);
 		DEBUG_ASSERT(addr == mEntryChunk.address());
 		mEntryChunk.close();
-	#elif defined(_android)
-		return;
-	#else	// winmobile
+#elif defined(_android)
+		free(addr);
+#else	// winmobile
 		VirtualFree(addr, 0, MEM_RELEASE);
-	#endif
+#endif
 	}
 
 	void MoSync::ArmRecompiler::flushInstructionCache(void *addr, int len) {
-	#ifdef __SYMBIAN32__
-	#ifndef __SERIES60_3X__
+#ifdef __SYMBIAN32__
+#ifndef __SERIES60_3X__
 		// Adjust start and len to page boundaries
 		addr = (void*) ((int)addr & ~0xFFF);
 		len = (len+8192) & ~0xFFF;
-	#endif
+#endif
 		void *end = (void*)((int)addr+len);
 		LOGD("flushInstructionCache end: 0x%08x\n", end);
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
-	#elif defined(_android)
+#elif defined(_android)
+		cacheflush((long int)addr, (long int)addr+len, 0);
 		return;
-	#else // winmobile
+#else // winmobile
 		// This seems to work, but might not be correct
 		// Might be better to call CacheSync(...)
 		FlushInstructionCache(GetCurrentProcess(), 0, 0);
-	#endif
+#endif
 	}
 
 namespace MoSync {
@@ -288,6 +384,10 @@ namespace MoSync {
 		loadEnvironmentRegisters(entryPoint);
 
 		loadStaticRegisters(entryPoint);
+
+#ifdef _android
+		flushInstructionCache(entryPoint.mipStart, 64*sizeof(AA::MDInstruction));
+#endif
 
 		// goto recompiled code
 		entryPoint.MOV(AA::PC, AA::R0);
@@ -1034,6 +1134,10 @@ namespace MoSync {
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
 #endif
+#ifdef _android
+		mPipeToArmInstMap = NULL;
+		mInstructions = NULL;
+#endif
 		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);	
 	}
 
@@ -1203,13 +1307,15 @@ namespace MoSync {
 	int ArmRecompiler::run(int ip) {
 		//LOG("ArmRecompiler::run(%i)\n", ip);
 		if(mStopped) {
-			LOG("Stopped, Recompiling..\n");
+			LOG("Stopped, Recompiling...\n");
 			Recompiler<ArmRecompiler>::recompile();
-			//LOG("Finished recompiling..\n");
+			LOG("Finished recompiling.\n");
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
+		LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
+		LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 
@@ -1249,12 +1355,20 @@ static void MyExceptionHandlerL(TExcType aType)
 }
 #endif	
 #endif // 0	
+#ifndef _android
 	void ArmRecompiler::init(Core::VMCore *core, int *VM_Yield) {
+#else
+	void ArmRecompiler::init(Core::VMCore *core, int *VM_Yield, JNIEnv* jniEnv, jobject jthis) {
+#endif
 		Recompiler<ArmRecompiler>::init(core, VM_Yield);
 		LOG("initRecompilerVariables\n");
 		assm.mipStart = NULL;
 		mPipeToArmInstMap = NULL;
 		entryPoint.mipStart = NULL;
+#ifdef _android
+		mJNIEnv = jniEnv;
+		mJThis = jthis;
+#endif
 
 #ifdef __SYMBIAN32__
 		//mHeap = NULL;

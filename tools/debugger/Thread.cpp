@@ -27,6 +27,10 @@ void MoSyncThread::start(int (SDLCALL * func)(void*), void* arg) {
 	_ASSERT(mThread);
 }
 
+void MoSyncThread::sleep(unsigned int ms) {
+	SDL_Delay(ms);
+}
+
 int MoSyncThread::join() {
 	_ASSERT(mThread);
 	int result;

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //Make sure the result != 0, if not, throw an exception so there's no messy ifs
 
-void checkResult(BOOL result, char *errorMessage)
+void checkResult(BOOL result, const char *errorMessage)
 {
 	if (!result)
 	{

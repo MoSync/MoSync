@@ -1184,7 +1184,7 @@ void GetIdentifier(EVAL *Part1)
 				{
 					// Change the value, to reflect functions virtual reference
 
-					Part1->Value = sym->VirtualIndex;
+					Part1->Value = sym->VirtualIndex | 0xe0000000;
 				}
 
 				CodeValue = Part1->Value;

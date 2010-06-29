@@ -23,8 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //debug
 #include <string>
+#ifdef _MSC_VER
 #include <windows.h>
 #include <Dbghelp.h>
+#endif
 
 struct Functor {
 	void* f;
@@ -39,17 +41,19 @@ typedef bool (*ifptr)(int);
 class OpHandler {
 public:
 	OpHandler() {
+#ifdef _MSC_VER
 		BOOL res = SymInitialize(GetCurrentProcess(), NULL, true);
 		_ASSERT(res);
+#endif
 	}
 
 	void operator()(vfptr f) {
-		Functor fct = { f, 0, false };
+		Functor fct = { (void*)f, 0, false, "unknown", 0};
 		input(fct);
 	}
 
 	void operator()(ifptr f, int p) {
-		Functor fct = { f, p, true };
+		Functor fct = { (void*)f, p, true, "unknown", 0};
 		input(fct);
 	}
 
@@ -77,6 +81,7 @@ private:
 	typedef std::queue<Functor> FunctorQueue;
 
 	void input(Functor f) {
+#ifdef _MSC_VER
 		char buf[1024];
 		SYMBOL_INFO& si(*(SYMBOL_INFO*)buf);
 		DWORD64 dis;
@@ -87,7 +92,7 @@ private:
 		int err = GetLastError();
 		_ASSERT(res);
 		f.name = si.Name;
-
+#endif
 		static int sId = 1;
 		f.id = sId++;
 
@@ -106,11 +111,12 @@ private:
 	}
 
 	void execute(Functor f) {
+#ifdef LOGGING_ENABLED
 		LOG("OpQueue: executing %i: %s", f.id, f.name.c_str());
 		if(f.hasParam)
 			LOG(" 0x%x", f.p);
 		LOG("\n");
-
+#endif
 		FunctorQueue* orig(&cur());
 		int origLevel = level();
 		int size = cur().size();
@@ -158,16 +164,18 @@ private:
 	void dump() const {
 		//copy the queue, since it can't be read in a non-destructive way.
 		std::stack<FunctorQueue> ops = mOps;
-		LOG("OpQueue: %i levels\n", ops.size());
+		LOG("OpQueue: %"PFZT" levels\n", ops.size());
 		while(!ops.empty()) {
 			FunctorQueue& fq(ops.top());
-			LOG(" %i elements:\n", fq.size());
+			LOG(" %"PFZT" elements:\n", fq.size());
 			while(!fq.empty()) {
+#ifdef LOGGING_ENABLED
 				Functor& f(fq.front());
 				LOG("  %i: %s", f.id, f.name.c_str());
 				if(f.hasParam)
 					LOG(" 0x%x", f.p);
 				LOG("\n");
+#endif
 				fq.pop();
 			}
 			ops.pop();

@@ -15,7 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 #include "common.h"
-
 #include "test.hpp"
 #include "testmanager.hpp"
 #include "testlistener.hpp"
@@ -27,6 +26,7 @@ extern "C" int atexit ( void ( * function ) (void) );
 
 
 NAMESPACE_BEGIN( Testify )
+
 
 /**
  * Constructor, private since this is a singleton class
@@ -44,13 +44,23 @@ TestManager::TestManager ( void )
 TestManager::~TestManager ( void )
 {
 	// Remove tests
-	for ( int i = 0; i < m_testList.size( ); i++ )
-		delete m_testList[i];
+	for ( int i = 0; i < m_suiteMap.size( ); i++ )
+	{
+		Vector<Test *> &l = *(m_suiteMap[i].second);
 
+		// Delete tests in suite
+		for ( int j = 0; j < l.size( ); j++ )
+			delete l[j];
+
+		// Delete data
+		delete m_suiteMap[i].first;
+		delete m_suiteMap[i].second;
+	}
+	m_suiteMap.clear( );
 
 	// Remove listeners
 	for ( int i = 0; i < m_listenerList.size( ); i++ )
-			delete m_listenerList[i];
+		delete m_listenerList[i];
 
 }
 
@@ -63,7 +73,8 @@ TestManager::~TestManager ( void )
 void TestManager::addTest ( Test *t,
                             const char *s )
 {
-	m_testList.add( t );
+	// Add to suite
+	addToSuite( s, t );
 }
 
 /**
@@ -173,9 +184,25 @@ void TestManager::run ( void )
 	for ( int i = 0; i < m_listenerList.size( ); i++ )
 		m_listenerList[i]->beginUnit( );
 
-	// Run tests
-	for ( int i = 0; i < m_testList.size( ); i++ )
-		m_testList[i]->run( );
+	// Run suites
+	for ( int i = 0; i < m_suiteMap.size( ); i++ )
+	{
+		Pair<char *, Vector<Test *> *> &it = m_suiteMap[i];
+		const char * n = it.first;
+		Vector<Test *> &l = *(it.second);
+
+		// Notify listeners
+		for ( int j = 0; j < m_listenerList.size( ); j++ )
+			m_listenerList[j]->beginSuite( n );
+
+		// Run tests
+		for ( int j = 0; j < l.size( ); j++ )
+			l[j]->run( );
+
+		// Notify listeners
+		for ( int j = 0; j < m_listenerList.size( ); j++ )
+			m_listenerList[j]->endSuite( );
+	}
 
 	// Notify listeners that testing has finished
 	for ( int i = 0; i < m_listenerList.size( ); i++ )

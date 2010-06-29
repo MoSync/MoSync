@@ -16,12 +16,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file maapi.h
-* \brief The MoSync API is a general compact API with a small footprint.
+* \brief Syscall declarations. These system calls and low-level 
+* functions provide access to the basic features of a device. They are
+* implemented by the MoSync runtimes in code native to the device.
+*
 
 
-* With this API it should be possible to do most things, although,
+* With these syscalls it should be possible to do most things, although,
 * there may still be some functionality missing. If you
-* would like a specific function added, please do send us a
+* would like a specific function added, please send us a
 * <a href="mailto:info@mobilesorcery.com">mail</a>.
 
 * In future versions of MoSync an extension API will be provided
@@ -274,15 +277,18 @@ interface MAAPI {
 
 	/**
 	* Draws a single pixel using the current color.
+	* \see maSetColor()
 	*/
 	void maPlot(in int posX, in int posY);
 	/**
 	* Draws a line using the current color.
+	* \see maSetColor()
 	*/
 	void maLine(in int startX, in int startY, in int endX, in int endY);
 	/**
 	* Draws a filled rectangle using the current color.
 	* Width and height must be greater than zero.
+	* \see maSetColor()
 	*/
 	void maFillRect(in int left, in int top, in int width, in int height);
 	/**
@@ -290,6 +296,7 @@ interface MAAPI {
 	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
 	* vertices of the strip.
 	* \param count The count of vertices in the strip. Must be at least 3.
+	* \see maSetColor()
 	*/
 	void maFillTriangleStrip(in MAPoint2d points, in int count);
 	/**
@@ -297,6 +304,7 @@ interface MAAPI {
 	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
 	* vertices of the fan.
 	* \param count The count of vertices in the fan. Must be at least 3.
+	* \see maSetColor()
 	*/
 	void maFillTriangleFan(in MAPoint2d points, in int count);
 
@@ -313,12 +321,14 @@ interface MAAPI {
 	/**
 	* Draws Latin-1 text using the current color.
 	* The coordinates are the top-left corner of the text's bounding box.
+	* \see maSetColor()
 	*/
 	void maDrawText(in int left, in int top, in MAString str);
 
 	/**
 	* Draws Unicode text using the current color.
 	* The coordinates are the top-left corner of the text's bounding box.
+	* \see maSetColor()
 	*/
 	void maDrawTextW(in int left, in int top, in MAWString str);
 
@@ -1443,8 +1453,6 @@ interface MAAPI {
 		BINARY = 4;
 		UBIN = 5;
 		SKIP = 6;
-		TILESET = 7;
-		TILEMAP = 8;
 		LABEL = 9;
 		FLUX = 127;
 	}
@@ -2391,11 +2399,6 @@ interface MAAPI {
 		int maStreamClose(in MAHandle stream);
 #endif	//IX_STREAMING
 
-#if IX_OPENGL_ES
-#include "opengl_generated.idl"
-#include "opengl_non_generated.idl"
-#endif
-
 		/**
 		* A structure containing information about the native framebuffer, 
 		* with things like color format and resolution. The 'sizeInBytes' field is 
@@ -2521,8 +2524,13 @@ interface MAAPI {
 		/**
 		* Retrieves the value of a Java System Property, or a MoSync System Property.
 		*
-		* There are two MoSync System Properties: "mosync.imei" and "mosync.imsi".
-		* They don't exist on every phone.
+		* There are a few MoSync System Properties. They are unavailable on some devices.
+		* "mosync.imei" and "mosync.imsi" is the device's IMEI and IMSI number, respectively.
+		*
+		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
+		* Multi-language applications should use this to determine which language to use.
+		*
+		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
@@ -2784,6 +2792,7 @@ interface MAAPI {
 		* Returns 0 or \< 0.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

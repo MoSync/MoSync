@@ -252,7 +252,7 @@ MDLFixed::MDLFixed ( MAHandle h,
 	for ( i = 0; i < m_triCount; i++ )
 	{
 
-		m_triList[i].m_front = stream->readUInt32( );
+		m_triList[i].m_front = stream->readUInt32( ) != 0;
 		m_triList[i].m_v1 = stream->readUInt32( );
 		m_triList[i].m_v2 = stream->readUInt32( );
 		m_triList[i].m_v3 = stream->readUInt32( );

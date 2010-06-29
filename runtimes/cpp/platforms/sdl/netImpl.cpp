@@ -28,36 +28,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "sdl_syscall.h"
 
 //***************************************************************************
-//MoSyncMutex
-//***************************************************************************
-
-MoSyncMutex::MoSyncMutex() : mMutex(NULL) {}
-
-void MoSyncMutex::init() {
-	mMutex = SDL_CreateMutex();
-	MYASSERT(mMutex, ERR_OOM);
-}
-
-MoSyncMutex::~MoSyncMutex() {
-	DEBUG_ASSERT(mMutex == NULL);	//make sure it's closed
-}
-
-void MoSyncMutex::close() {
-	if(mMutex) {
-		SDL_DestroyMutex(mMutex);
-		mMutex = NULL;
-	}
-}
-
-void MoSyncMutex::lock() {
-	DEBUG_ASRTZERO(SDL_mutexP(mMutex));
-}
-
-void MoSyncMutex::unlock() {
-	DEBUG_ASRTZERO(SDL_mutexV(mMutex));
-}
-
-//***************************************************************************
 //Helpers
 //***************************************************************************
 

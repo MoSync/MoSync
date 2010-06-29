@@ -34,6 +34,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUI {
 
 	using namespace MAUtil;
+	
+/** 
+* \brief The base widget class
+*/
 
 	class Widget;
 
@@ -42,7 +46,9 @@ namespace MAUI {
 			(*wl)->boundsChanged(this, this->bounds); \
 		} \
 
-	/** A WidgetListener can be registered with any Widget to be notified of changes
+	/** \brief A Widget listener which detects trigger, selection, state and positional changes.
+	  *
+	  * A WidgetListener can be registered with any Widget to be notified of changes
 	  * to the Widget's state or actions it is subjected to.
 	  **/
 	
@@ -61,8 +67,10 @@ namespace MAUI {
 			virtual void boundsChanged(Widget *widget, const Rect& bounds) {};
 	};
 
-	/** A Widget is an object that has a graphical representation and can
-	  * perform (or be subjected to) (inter)actions by the user. It is abstract,
+	/** \brief A MAUI widget; a graphical object the user can interact with.
+	  * 
+	  * A Widget is an object that has a graphical representation and can
+	  * perform (or be subjected to) interactions by the user. It is abstract,
 	  * since there is no default implementation of the drawWidget() function.
 	  *
 	  * Examples of components are the images, labels and listboxes you would
@@ -155,6 +163,12 @@ namespace MAUI {
 		 * Renders the Widget and all its children recursively.
 		 */
 		virtual void draw(bool forceDraw=false);
+
+		/**
+		* Called by the Engine before drawing.
+		* The Widget should update any cached data here, if needed.
+		* The default implementation calls update() on all children.
+		*/
 		virtual void update();
 
 		/** 

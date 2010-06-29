@@ -28,7 +28,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 #include "bind.hpp"
 
-NAMESPACE_BEGIN( Testify )
+/**
+* \brief MoSync test framework
+*/
+
+namespace Testify
+{
 
 /**
  * This is the base class for all tests. It is wrapped by
@@ -60,6 +65,6 @@ public:
 
 };
 
-NAMESPACE_END
+}
 
 #endif 	// __TESTIFY_TEST_HPP__

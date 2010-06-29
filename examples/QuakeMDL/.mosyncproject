@@ -4,9 +4,6 @@
 <build.cfg id="Benchmark - Release" types="Release"/>
 <build.cfg id="Render - Debug" types="Release"/>
 <build.cfg id="Render - Release" types="Release"/>
-<criteria>
-<filter profiles="" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors="Moblin"/>
-</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths" value=""/>
 <property key="build.prefs:additional.include.paths/Benchmark - Debug" value="./inc"/>
@@ -27,6 +24,8 @@
 <property key="build.prefs:app.output.path/Benchmark - Release" value="benchmark_release"/>
 <property key="build.prefs:app.output.path/Render - Debug" value="render_debug"/>
 <property key="build.prefs:app.output.path/Render - Release" value="render_release/"/>
+<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=512000 -heapsize=364000"/>
 <property key="build.prefs:extra.link.sw/Benchmark - Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Benchmark - Release" value=""/>
@@ -55,6 +54,7 @@
 <property key="build.prefs:runtime.debug/Render - Debug" value="true"/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Release" value=""/>
+<property key="finalizer:auto.change.config" value="false"/>
 <property key="last.build.config" value="Debug"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0f7db34b"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xea30a758"/>

@@ -22,8 +22,11 @@ namespace Base {
 	Stream* FileStream::createCopy() const {
 		return new FileStream(getFilename());
 	}
-
+#ifndef _android
 	Stream* FileStream::createLimitedCopy(int size) const {
+#else
+	Stream* FileStream::createLimitedCopy(int size, JNIEnv* jniEnv, jobject jthis) const {
+#endif
 		int curPos;
 		TEST(tell(curPos));
 		int src_size;
@@ -33,7 +36,11 @@ namespace Base {
 		else if(curPos + size > src_size) {
 			FAIL;
 		}
+#ifndef _android
 		return new LimitedFileStream(getFilename(), curPos, size);
+#else
+		return new LimitedFileStream(getFilename(), curPos, size, mJNIEnv, mJThis);
+#endif
 	}
 
 	bool LimitedFileStream::_open() {
@@ -94,13 +101,23 @@ namespace Base {
 		else if(curPos + size > mEndPos) {
 			FAIL;
 		}
+
+#ifndef _android
 		return new LimitedFileStream(getFilename(), curPos, mEndPos - curPos);
+#else
+		return new LimitedFileStream(getFilename(), curPos, mEndPos - curPos, mJNIEnv, mJThis);
+#endif
 	}
 
 	Stream* LimitedFileStream::createCopy() const {
 		int curPos;
 		TEST(FileStream::tell(curPos));
+
+#ifndef _android
 		return new LimitedFileStream(getFilename(), mStartPos, mEndPos - mStartPos);
+#else
+		return new LimitedFileStream(getFilename(), mStartPos, mEndPos - mStartPos, mJNIEnv, mJThis);
+#endif
 	}
 
 }

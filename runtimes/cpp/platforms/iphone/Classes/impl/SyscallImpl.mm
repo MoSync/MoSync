@@ -15,10 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 
 #include "config_platform.h"
-
+#import <UIKit/UIKit.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -55,6 +55,8 @@ using namespace MoSyncError;
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
+
+int Surface::fontSize;
 
 namespace Base {
 
@@ -175,6 +177,7 @@ namespace Base {
 		//CGContextTranslateCTM(gBackbuffer, 0, gHeight);
 		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
 		*/
+		Surface::fontSize = gHeight/40;
 		gBackbuffer = new Surface(gWidth, gHeight);
 		CGContextRestoreGState(gBackbuffer->context);		
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
@@ -185,7 +188,7 @@ namespace Base {
 		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
 		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
 		sUnicodeFont = CGFontCreateWithFontName(str);
-		CFRelease(str);
+		//CFRelease(str);
 				
 		gDrawTarget = gBackbuffer;
 		
@@ -195,6 +198,10 @@ namespace Base {
 		
 		
 		MANetworkInit();		
+		
+		// init some image.h optimizations.
+		initMulTable();
+		initRecipLut();
 		
 		return true;
 	}
@@ -372,7 +379,7 @@ namespace Base {
 			return;
 		//MAProcessEvents();
 		//MAUpdateScreen();
-		UpdateMoSyncView(gBackbuffer->image);
+		MoSync_UpdateView(gBackbuffer->image);
 	}
 
 	SYSCALL(void, maResetBacklight()) {
@@ -393,7 +400,18 @@ namespace Base {
 		gSyscall->ValidateMemRange(dstPoint, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(srcRect, sizeof(MARect));
 		gSyscall->ValidateMemRange(src, scanlength*srcRect->height*4);
-		NOT_IMPLEMENTED;
+	//	NOT_IMPLEMENTED;
+		
+		Surface *srcSurface = new 
+		Surface(srcRect->width, srcRect->height, (char*) src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+		
+		ClipRect srcRectCR;
+		srcRectCR.x = srcRect->left;
+		srcRectCR.y = srcRect->top;
+		srcRectCR.width = srcRect->width;
+		srcRectCR.height = srcRect->height;
+		gDrawTarget->mImageDrawer->drawImageRegion(dstPoint->x, dstPoint->y, &srcRectCR, srcSurface->mImageDrawer, 0);
+		delete srcSurface;
 	}
 
 	SYSCALL(void, maDrawImageRegion(MAHandle image, const MARect* src, const MAPoint2d* dstTopLeft,
@@ -490,7 +508,13 @@ namespace Base {
 			MemStreamC memStream((const void*)&ptr[offset], size);
 			bitmap = gSyscall->loadImage(memStream);
 		}
-
+		
+		if(!bitmap) return RES_BAD_INPUT;
+		if(!bitmap->image) {
+			delete bitmap;
+			// most likely bad input.
+			return RES_BAD_INPUT;
+		}
 		
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
 		
@@ -501,17 +525,35 @@ namespace Base {
 		gSyscall->ValidateMemRange(src, width*height*4);
 		int byteSize = EXTENT_X(size)*EXTENT_Y(size)*4;
 		char *data = new char[byteSize];
+		if(!data) return RES_OUT_OF_MEMORY;
 		memcpy(data, src, byteSize);
-		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaLast:kCGImageAlphaNoneSkipLast);
+		Surface *bitmap = new Surface(EXTENT_X(size), EXTENT_Y(size), data, processAlpha?kCGImageAlphaPremultipliedLast:kCGImageAlphaNoneSkipLast);
+		if(!bitmap) {
+			delete data;
+			return RES_OUT_OF_MEMORY;
+		}
+		
+		if(!bitmap->context || !bitmap->image || !bitmap->data) {
+			delete bitmap;
+			delete data;
+			return RES_OUT_OF_MEMORY;
+		}
+		
+		
 		bitmap->mOwnData = true;
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
-		return 1;
 	}
 
 	SYSCALL(int, maCreateDrawableImage(MAHandle placeholder, int width, int height)) {
 		MYASSERT(width > 0 && height > 0, ERR_IMAGE_SIZE_INVALID);
-		gSyscall->resources.add_RT_IMAGE(placeholder, new Surface(width, height));
-		return 0;
+		Surface *surf = new Surface(width, height);
+		if(!surf) return RES_OUT_OF_MEMORY;
+		if(!surf->context || !surf->image || !surf->data) {
+			delete surf;
+			return RES_OUT_OF_MEMORY;			
+		}
+			
+		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
 	}
 
 
@@ -541,15 +583,13 @@ namespace Base {
 		const MAEvent* ev = gEventQueue.getAndProcess();
 		if(!ev) return 0;
 		else *dst = *ev; //gEventQueue.get();
-
-		/*
-		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
-			memcpy(Core::GetCustomEventPointer(gCore), dst->data, sizeof(dataType));\
-			delete (dataType*)dst->data;\
-			dst->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
-
+		
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev->type == eventType) {\
+		memcpy(MoSync_GetCustomEventData(), ev->data, sizeof(dataType));\
+		delete (dataType*)ev->data;\
+		dst->data = MoSync_GetCustomEventDataMoSyncPointer(); }
+		
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
-		*/
 		
 		return 1;
 	}
@@ -604,7 +644,7 @@ namespace Base {
 
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
-		ShowMessageBox(message, true);
+		MoSync_ShowMessageBox(message, true);
 		//GetVMYield(gCore) = 1;
 		gRunning = false;
 		pthread_exit(NULL);
@@ -761,12 +801,12 @@ namespace Base {
 	}
 	
 	int maLocationStart() {
-		StartUpdatingLocation();
+		MoSync_StartUpdatingLocation();
 		return MA_LPS_AVAILABLE;
 	}
 	
 	int maLocationStop() {
-		StopUpdatingLocation();
+		MoSync_StopUpdatingLocation();
 		return 0;
 	}
 
@@ -830,10 +870,11 @@ void MoSyncExit(int r)
 		exited = true;
 		LeaveCriticalSection(&exitMutex);
 		//exit(r);
-		Exit();
+		MoSync_Exit();
 		EnterCriticalSection(&exitMutex);
 	}
 	LeaveCriticalSection(&exitMutex);
+	pthread_exit(NULL);
 }
 
 void MoSyncErrorExit(int errorCode) 
@@ -864,7 +905,7 @@ void MoSyncErrorExit(int errorCode)
 	
 	//GetVMYield(gCore) = 1;
 	gRunning = false;
-	ShowMessageBox(buffer, true);	
+	MoSync_ShowMessageBox(buffer, true);	
 	pthread_exit(NULL);
 	//MoSyncExit(errorCode);
 }

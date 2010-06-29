@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 Mobile Sorcery AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -16,12 +16,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 class Syscall {
-private:
-//Image* loadImage(MemStream& s);
-//Image* loadSprite(void* surface, ushort left, ushort top,
-//	ushort width, ushort height, ushort cx, ushort cy);
 
+private:
+	bool loadImage(int resourceIndex, int pos, int length);
+	Image* loadSprite(void* surface, ushort left, ushort top, ushort width, ushort height, ushort cx, ushort cy);
+	void loadUBinary(int resourceIndex, int offset, int size);
+	
+	JNIEnv* getJNIEnvironment();
+	jobject getJNIThis();
+	
 public:
-	//Syscall(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nShowCmd);
-	Syscall();
-//	void drawSplash();
+
+	Syscall();	
+	
+	char* loadBinary(int resourceIndex, int size);
+	void postEvent(MAEvent event);
+	void setJNIEnvironment(JNIEnv* je, jobject jthis);

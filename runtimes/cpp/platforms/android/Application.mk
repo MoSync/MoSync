@@ -1,4 +1,4 @@
-# Copyright (C) 2009 Mobile Sorcery AB
+# Copyright (C) 20010 MoSync AB
 # 
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
@@ -14,8 +14,6 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-APP_PROJECT_PATH := /cygdrive/d/Code/work/MoSync/trunk/runtimes/java/platforms/android/AndroidProject
+APP_PROJECT_PATH := $(MOSYNC_SRC)/runtimes/java/platforms/androidJNI/AndroidProject
 APP_MODULES      := mosync
-APP_CPPFLAGS := -D_android
-#-I../Code/work/MoSync/trunk/runtimes/java/platforms/android/src -I../Code/work/MoSync/trunk/runtimes/cpp/core
-#-I../Code/work/MoSync/trunk/runtimes/cpp
+APP_CPPFLAGS := -D_android -I$(MOSYNC_CPP)/core -I$(MOSYNC_CPP)/base -I$(MOSYNC_CPP) -I$(MOSYNC_CPP_SRC) -I$(MOSYNC_SRC)/intlibs

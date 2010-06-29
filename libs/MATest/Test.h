@@ -28,12 +28,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 
+/**
+* \brief MoSync test case classes
+*/
+
 namespace MATest {
 
 	using namespace MAUtil;
 
 	/**
-	* Class that listens to events triggered by the tests
+	* \brief Listener for events triggered by the tests
 	*/
 	class TestListener {
 	public:
@@ -46,7 +50,7 @@ namespace MATest {
 	};
 
 	/**
-	* Class that listens to events triggered by the tests and ouputs them to a store, as an xml file.
+	* \brief Listener for events triggered by the tests and ouputs them to a store, as xml.
 	*/
 	class XMLOutputTestListener : public TestListener {
 	private:
@@ -69,6 +73,8 @@ namespace MATest {
 	class TestSuite;
 
 	/**
+	* \brief A test case.
+	* 
 	* Implement this class for each of your test cases. Use assert when testing
 	* assertions. Override open and close to initialize and deinitialize test case 
 	* specific things. Override start for the tests.
@@ -96,7 +102,9 @@ namespace MATest {
 	};
 
 	/**
-	* class TestSuite. Keeps a list of TestCases. Add test cases with addTestCase.
+	* \brief A list of TestCases. 
+	* 
+	* Add test cases with addTestCase.
 	* Use runTestCases to run all test cases.
 	*/
 	class TestSuite {

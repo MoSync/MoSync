@@ -1,5 +1,5 @@
 PRJ_PLATFORMS
-WINSCW GCCE
+WINSCW GCCE ARMV5
 
 PRJ_EXPORTS
 
@@ -7,4 +7,5 @@ PRJ_MMPFILES
 
 gnumakefile icons_scalable_dc.mk
 
-MoSync.mmp
+MoSync.mmp BUILD_AS_ARM
+

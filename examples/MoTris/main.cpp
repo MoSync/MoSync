@@ -647,7 +647,6 @@ char level[255];
 void showNavKeys(MAPoint2d point) {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
-	int h = EXTENT_Y(e);
 
 	sprintf(score, "%d", curScore);
 	sprintf(rows, "%d", curRows);
@@ -708,7 +707,6 @@ void showNavKeys(MAPoint2d point) {
 void showScore() {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
-	int h = EXTENT_Y(e);
 
 	sprintf(score, "%d", curScore);
 	sprintf(rows, "%d", curRows);
@@ -943,7 +941,11 @@ void showGameOver() {
 }
 
 void updateGameOver() {
-	if(EventHandler::fire_pressed) {
+	if(EventHandler::fire_pressed
+#ifdef MA_PROF_SUPPORT_STYLUS
+		|| EventHandler::pointer_pressed
+#endif	// MA_PROF_SUPPORT_STYLUS
+		) {
 		addPlayerToHighScore();
 		curGameMode = MENU_INIT;
 	}
@@ -985,9 +987,14 @@ void saveSettingsToStore() {
 void populateHighScoreList() {
 	if(!highScoreListPtr) return;
 	highScoreListPtr->clear();
-	for(int i = 0; i < MIN(curSettings.numHighScoreEntries, MAX_HIGH_SCORE_ENTRIES); i++) {
-		sprintf(tempString, "%d: %s %d", i+1, curSettings.highScoreEntries[i].name, curSettings.highScoreEntries[i].score);
-		highScoreListPtr->addMenuItem(String(tempString));
+	if(curSettings.numHighScoreEntries > 0) {
+		for(int i = 0; i < MIN(curSettings.numHighScoreEntries, MAX_HIGH_SCORE_ENTRIES); i++) {
+			sprintf(tempString, "%d: %s %d", i+1, curSettings.highScoreEntries[i].name, curSettings.highScoreEntries[i].score);
+			highScoreListPtr->addMenuItem(String(tempString));
+		}
+	} else {
+		highScoreListPtr->addMenuItem(String("No highscore yet."));
+		highScoreListPtr->addMenuItem(String("Press any key to continue."));
 	}
 }
 
@@ -1200,11 +1207,7 @@ int MAMain()
 		maResetBacklight();
 		EventHandler::updateEvents();
 
-		if(curGameMode == GAME_RUN && (EventHandler::star_pressed
-#ifdef MA_PROF_SUPPORT_STYLUS
-			|| EventHandler::rsk_pressed
-#endif	// MA_PROF_SUPPORT_STYLUS
-		)) {
+		if(curGameMode == GAME_RUN && (EventHandler::star_pressed || EventHandler::rsk_pressed)) {
 			curGameMode = PAUSE_MENU_INIT;
 		}
 

@@ -20,6 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MemStream.h"
 
+#ifdef _android
+#include <jni.h>
+#endif
+
 //******************************************************************************
 //MemStreamC
 //******************************************************************************
@@ -67,7 +71,11 @@ bool MemStreamC::tell(int& aPos) const {
 	return true;
 }
 
+#ifndef _android
 Stream* MemStreamC::createLimitedCopy(int size) const {
+#else
+Stream* MemStreamC::createLimitedCopy(int size, JNIEnv* jNIEnv, jobject jThis) const {
+#endif
 	if(size < 0)
 		size = mSize - mPos;
 	else if(mPos + size > mSize) {
@@ -89,6 +97,7 @@ MemStream::MemStream(int _size) : MemStreamC(open(_size), _size) {
 MemStream::MemStream(char* buf, int _size) : MemStreamC(buf, _size) {
 	mBuffer = buf;
 }
+
 MemStream::~MemStream() {
 	delete mBuffer;
 }

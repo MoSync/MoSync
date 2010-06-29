@@ -39,7 +39,11 @@ class NativeGccLinkTask < FileTask
 		execFlags
 		#puts "objects: #{@objects.join(' ')}"
 		#puts "flags: #{@FLAGS}"
-		sh "g++ #{cFlags} -o #{@NAME}"
+		if(HOST == :darwin)
+			sh "g++ -m32 #{cFlags} -o #{@NAME}"
+		else
+			sh "g++ #{cFlags} -o #{@NAME}"
+		end
 	end
 	
 	include FlagsChanged
@@ -54,6 +58,9 @@ class NativeGccLinkWork < NativeGccWork
 	private
 
 	def setup3(all_objects)
+		if(HOST == :darwin)
+			@EXTRA_LINKFLAGS += " -mmacosx-version-min=10.5 -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa"
+		end
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
 		wlo = @WHOLE_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }

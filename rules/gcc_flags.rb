@@ -89,7 +89,13 @@ if(HOST == :win32)
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :linux)
 	@HOST_FLAGS = " -DLINUX"
+	if(HOST_PLATFORM == :darwin)
+		@HOST_FLAGS += " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -DDARWIN"
+	end
 	@HOST_CPPFLAGS = " -fPIC"
+elsif(HOST == :darwin)
+	@HOST_FLAGS = " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -DDARWIN"
+	@HOST_CPPFLAGS = " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -fPIC"
 else
 	error "Unsupported host: #{HOST}"
 end

@@ -30,6 +30,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CriticalSection.h>
 using namespace MoSyncError;
 
+#if !defined(_android)
+
 static const char* sFilename = "log.txt";
 timeval sStartTime;
 
@@ -91,6 +93,8 @@ void LogTime(const char* fmt, ...) {
 	LogTime();
 }
 
+#endif // _android
+
 void InitializeCriticalSection(CRITICAL_SECTION* cs) {
 	pthread_mutexattr_t mutexattr;
 	// Set the mutex as a recursive mutex
@@ -113,9 +117,12 @@ void LeaveCriticalSection(CRITICAL_SECTION* cs) {
 	pthread_mutex_unlock(cs);
 }
 
+#if !defined(_android)
 
 void failFunction() {
 #ifdef __IPHONE__
 __builtin_trap()
 #endif
 }
+
+#endif // _android

@@ -21,16 +21,16 @@ Here's a minimal C program that uses MTXml.
 #include <conprint.h>
 #include <maassert.h>
  
-static void tagStart(MTXContext* context, const char* name, int len) {
+static void tagStart(MTXContext* context, const void* name, int len) {
 	printf("s %i: \"%s\"\n", len, name);
 }
-static void tagAttr(MTXContext* context, const char* attrName, const char* attrValue) {
+static void tagAttr(MTXContext* context, const void* attrName, const void* attrValue) {
 	printf("a \"%s\": \"%s\"\n", attrName, attrValue);
 }
-static void tagData(MTXContext* context, const char* data, int len) {
+static void tagData(MTXContext* context, const void* data, int len) {
 	printf("d %i: \"%s\"\n", len, data);
 }
-static void tagEnd(MTXContext* context, const char* name, int len) {
+static void tagEnd(MTXContext* context, const void* name, int len) {
 	printf("e %i: \"%s\"\n", len, name);
 }
 static void dataRemains(MTXContext* context, const char* data, int len) {
@@ -50,10 +50,10 @@ int MAMain() {
 
 	printf("Hello World!\n");
  
-	c.tagStart = tagStart;
-	c.tagAttr = tagAttr;
-	c.tagData = tagData;
-	c.tagEnd = tagEnd;
+	c.tagStart = &tagStart;
+	c.tagAttr = &tagAttr;
+	c.tagData = &tagData;
+	c.tagEnd = &tagEnd;
 	c.dataRemains = dataRemains;
 	c.parseError = parseError;
 	c.emptyTagEnd = emptyTagEnd;

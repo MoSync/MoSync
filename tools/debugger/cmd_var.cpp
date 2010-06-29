@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <set>
 #include <vector>
-
+#include <stdio.h>
 #include <queue>
 
 #include "config.h"
@@ -39,6 +39,15 @@ void var_update(const string& args);
 void var_evaluate_expression(const string& args);
 void var_show_attributes(const string& args);
 
+void var_info_expression(const string& args);
+void var_info_num_children(const string& args);
+void var_info_num_children(const string& args);
+void var_info_path_expression(const string& args);
+void var_info_type(const string& args);
+void var_list_children(const string& args);
+void var_set_format(const string& args);
+void var_show_format(const string& args);
+
 //******************************************************************************
 // Callbacks
 //******************************************************************************
@@ -50,7 +59,7 @@ namespace Callback {
 	static void varCreate();
 	static void varUpdate();
 	static void varEvaluateExpression();
-	static void regUpdate(const Registers& r);
+	//static void regUpdate(const Registers& r);
 
 	static void varListChildren();
 };
@@ -75,15 +84,15 @@ public:
 	bool simpleType() const { return mSimpleType; }
 
 	void setValid(bool v=true) { mIsValid = v; }
-	bool isValid() const { return mIsValid; };
+	bool isValid() const { return mIsValid; }
 
-	const string& getExprText() {return mExprText;};
+	const string& getExprText() { return mExprText; }
 
-	void updateData(std::string value, std::string type, bool simpleType) {
-		if(mValue != value || mType != type || mSimpleType != simpleType) {
-			mValue = value;
-			mType = type;
-			mSimpleType = simpleType;
+	void updateData(std::string _value, std::string _type, bool _simpleType) {
+		if(mValue != _value || mType != _type || mSimpleType != _simpleType) {
+			mValue = _value;
+			mType = _type;
+			mSimpleType = _simpleType;
 			mUpdated = true;
 		} else {
 			mUpdated = false;
@@ -92,17 +101,17 @@ public:
 	}
 
 protected:
+	const int mFrameAddr;
 	std::string mExprText;
 	ExpressionTree *mExprTree;
 
-	const int mFrameAddr;
 	string mType, mValue;
 	bool mSimpleType;
 	bool mUpdated;
 	bool mIsValid;
 
-	friend static void Callback::varEECreate(const Value* value, const char *err);
-	friend static void Callback::varEEUpdate(const Value* value, const char *err);
+	friend /* static */ void Callback::varEECreate(const Value* value, const char *err);
+	friend /* static */ void Callback::varEEUpdate(const Value* value, const char *err);
 	friend struct Variable;
 };
 
@@ -321,7 +330,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 }
 
-bool isVTablePointer(const TypeBase* deref) {
+static bool isVTablePointer(const TypeBase* deref) {
 	if(deref->type() == TypeBase::ePointer) {
 		const PointerType* pt = (const PointerType*)deref;
 		const TypeBase *t = pt->mTarget->resolve();
@@ -335,9 +344,7 @@ bool isVTablePointer(const TypeBase* deref) {
 
 void Variable::addStruct(const char* dataAdress, const StructType *structType, bool isPointer) {
 	const vector<BaseClass>& bases = structType->getBases();
-	const vector<Method>& methods = structType->getMethods();
 	const vector<DataMember>& dataMembers = structType->getDataMembers();
-	const vector<StaticDataMember>& staticDataMembers = structType->getStaticDataMembers();
 
 	std::string value = ""; 
 	if(!isPointer) {
@@ -506,7 +513,7 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 	sUpdateCallback();
 }
 
-void resetValidness() {
+static void resetValidness() {
 	map<string, Variable*>::iterator i = sVariableMap.begin();
 	for(;i!=sVariableMap.end(); i++) {
 		if(i->second->exp)
@@ -540,7 +547,7 @@ void Expression::update(ExpressionCallback ecb) {
 		// variable is already created. check if any variable is out of scope in this expression. If so, set it as out of scope and skip updation.
 		map<std::string, SYM>& symbols = mExprTree->getSymbols();
 		map<std::string, SYM>::iterator i = symbols.begin();
-		for(i; i!=symbols.end(); i++) {
+		for(; i!=symbols.end(); i++) {
 			const SYM::Scope& s = i->second.scope;
 			switch(s.type) {
 				case SYM::Scope::eGlobal:
@@ -677,7 +684,7 @@ static void Callback::varCreate() {
 
 	oprintDone();
 
-	oprintf(",name=\"%s\",numchild=\"%d\",type=\"%s\"",
+	oprintf(",name=\"%s\",numchild=\"%"PFZT"\",type=\"%s\"",
 		sVar->name.c_str(), sVar->children.size(), sVar->exp->type().c_str());
 	/*
 	if(sVar->exp->value()!="")
@@ -825,7 +832,7 @@ static void printValue(Variable *var) {
 
 static void printListChildrenItem(Variable* var) {
 	oprintf("{name=\"%s\"", var->name.c_str());
-	oprintf(",numchild=\"%d\"", var->children.size());
+	oprintf(",numchild=\"%"PFZT"\"", var->children.size());
 	printValue(var);
 	oprintf(",type=\"%s\"", (!var->exp)?"":var->exp->type().c_str());	
 	oprintf(",exp=\"%s\"", var->localName.c_str());
@@ -914,7 +921,7 @@ void var_show_attributes(const string& args) {
 //******************************************************************************
 // show and set format
 //******************************************************************************
-Variable* getAndValidateVariable(const string& args) {
+static Variable* getAndValidateVariable(const string& args) {
 	vector<string> argv;
 	splitArgs(args, argv);
 	string name;
@@ -1025,7 +1032,7 @@ static void Callback::varListChildren() {
 	}
 
 	oprintDone();
-	oprintf(",numchild=\"%d\",children=[", sVar->children.size());
+	oprintf(",numchild=\"%"PFZT"\",children=[", sVar->children.size());
 
 	//for(size_t i = 0; i < sVar->children.size(); i++) 
 	for(map<int, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
@@ -1059,7 +1066,7 @@ void var_info_num_children(const string& args) {
 	Variable *var = getAndValidateVariable(args);
 	if(!var) return;
 	oprintDone();
-	oprintf(",numchild=\"%d\"\n", var->children.size());
+	oprintf(",numchild=\"%"PFZT"\"\n", var->children.size());
 	commandComplete();
 }
 

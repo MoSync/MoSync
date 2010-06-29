@@ -80,7 +80,8 @@ namespace MAUtil {
 #endif	//NEW_OPERATORS
 
 	/**
-	* A class that holds the actual data used by String.
+	* \brief A class that holds the actual data used by String.
+	*
 	* It's a reference counted vector.
 	*/
 	template<class Tchar> class StringData : public Vector<Tchar>, public RefCounted {

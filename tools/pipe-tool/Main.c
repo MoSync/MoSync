@@ -111,6 +111,8 @@ int main(int argc,char *argv[])
 
 	ArrayInit(&CtorArray,		4, 0);
 	ArrayInit(&DtorArray,		4, 0);
+	ArrayInit(&CtorArrayImm,	4, 0);
+	ArrayInit(&DtorArrayImm,	4, 0);
 
 	ArrayInit(&AsmCharArray,	4, 0);
 	ArrayInit(&AsmCharDataArray,4, 0);
@@ -1042,7 +1044,7 @@ void MainAsm(char *input, char *output)
 
 void MainRes(char *input, char *output)
 {		
-  	if (AsmMsg) printf("Resource Compiler Copyright 2007-2009 Mobile Sorcery AB\n\n");
+  	if (AsmMsg) printf("Resource Compiler Copyright 2007-2010 MoSync AB\n\n");
 
 	FileTop = FilePtr = input;
 

@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Symbian9Injector.h"
 #include "Shared.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -52,7 +54,11 @@ namespace MoSync {
 		char buf[2048];
 		const char *mosyncdir_c = getenv("MOSYNCDIR");
 		if(!mosyncdir_c) errorExit("MOSYNCDIR missing");
-		sprintf(buf, "\"%s/bin/mifconv.exe\" \"%s\" \"%s\"", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
+#ifdef WIN32
+		sprintf(buf, "\"%s\\bin\\mifconv.exe\" \"%s\" \"%s\"", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
+#else
+		sprintf(buf, "\"%s/bin/mifconv\" \"%s\" \"%s\"", mosyncdir_c, dst.c_str(), mifconvSrc.c_str());
+#endif
 		int res = run(buf);
 		if(res != 0)
 			errorExit("mifconf failed");

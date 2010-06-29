@@ -32,13 +32,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <windows.h>
 #endif	//WIN32
 
+#ifdef _android
+#include <android/log.h>
+#endif
+
 #ifdef _WIN32_WCE
 #include <windows.h>
 #include "wce_helpers.h"
 #include "wce_errors.h"
 #endif	//_WIN32_WCE
 
-#if !defined(SYMBIAN)
+#if !defined(SYMBIAN) && !defined(_android)
 #include <vector>
 #include "helpers/mkdir.h"
 #endif	//_WIN32_WCE
@@ -46,6 +50,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace Base;
 
 namespace Base {
+	
+	uint getMaxCustomEventSize() {
+		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
+		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+		
+		uint maxCustomEventSize = 0;
+		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
+		DUMPHEX(maxCustomEventSize);
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+		return maxCustomEventSize;
+	}
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {
@@ -66,7 +81,7 @@ namespace Base {
 	}
 #endif	//RESOURCE_MEMORY_LIMIT
 
-#if !defined(SYMBIAN)
+#if !defined(SYMBIAN) && !defined(_android)
 	struct FileList {
 		std::vector<std::string> files;
 		size_t pos;
@@ -135,7 +150,12 @@ namespace Base {
 			switch(type) {
 			case RT_BINARY:
 				{
+#ifndef _android
 					MemStream* ms = new MemStream(size);
+#else
+					char* b = loadBinary(rI, size);
+					MemStream* ms = new MemStream(b, size);
+#endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
 				}
@@ -145,8 +165,15 @@ namespace Base {
 					int pos;			
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
+#ifndef _android					
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
+#else
+					loadUBinary(rI, pos, size);
+					ROOM(resources.dadd_RT_BINARY(rI,
+						new LimitedFileStream(aFilename, pos, size, getJNIEnvironment(), getJNIThis())));
+#endif
+
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;
@@ -157,7 +184,14 @@ namespace Base {
 				{
 					MemStream b(size);
 					TEST(file.readFully(b));
+#ifndef _android
 					ROOM(resources.dadd_RT_IMAGE(rI, loadImage(b)));
+#else
+					ROOM(resources.dadd_RT_IMAGE(rI, NULL));
+					int pos;
+					file.tell(pos);
+					loadImage(rI, pos-size, size);
+#endif
 				}
 				break;
 			case RT_SPRITE:
@@ -169,8 +203,10 @@ namespace Base {
 					DAR_USHORT(height);
 					DAR_SHORT(cx);
 					DAR_SHORT(cy);
+#ifndef _android
 					ROOM(resources.dadd_RT_IMAGE(rI, loadSprite(resources.get_RT_IMAGE(indexSource),
 						left, top, width, height, cx, cy)));
+#endif
 				}
 				break;	
 			case RT_LABEL:
@@ -341,6 +377,7 @@ namespace Base {
 		else	//a < b		//or NaN!
 			return -1;
 	}
+
 #endif	//S60v2
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
@@ -352,7 +389,12 @@ namespace Base {
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {
+#ifndef _android
 		MemStream* ms = new MemStream(size);
+#else
+		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
+		MemStream* ms = new MemStream(b, size);
+#endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;
 		if(ms->ptr()==0) { delete ms; return RES_OUT_OF_MEMORY; }
 
@@ -382,10 +424,10 @@ namespace Base {
 		Stream* src = SYSCALL_THIS->resources.get_RT_BINARY(a->src);
 		MYASSERT(dst->seek(Seek::Start, a->dstOffset), ERR_DATA_OOB);
 		MYASSERT(src->seek(Seek::Start, a->srcOffset), ERR_DATA_OOB);
-		MYASSERT(dst->write(src, a->size), ERR_DATA_OOB);
+		MYASSERT(dst->writeStream(*src, a->size), ERR_DATA_OOB);
 	}
 
-
+#if !defined(_android)
 #ifdef SYMBIAN
 #else
 #define STORE_PATH "stores/"
@@ -411,6 +453,7 @@ namespace Base {
 #endif
 			FSS.MkDir(KMAStorePath16);
 		LOGD("MkDir %i\n", res);
+#elif defined(__IPHONE__)
 #else
 		_mkdir(STORE_PATH);
 #endif	//_WIN32_WCE
@@ -423,6 +466,12 @@ namespace Base {
 		des.Append(nameDesC);
 		path = CCP des.PtrZ();
 		len = des.Length();
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(STORE_PATH);
+		std::string newFile =  newPath + "/" + std::string(name);
+		path = newFile.c_str();
+		len = newFile.length();
+		int ret = _mkdir(newPath.c_str());
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();
@@ -531,7 +580,7 @@ namespace Base {
 		}
 		SYSCALL_THIS->gStores.erase(store);
 	}
-
+#endif // _android
 
 	SYSCALL(int, maLoadResources(MAHandle data)) {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
@@ -562,11 +611,13 @@ namespace Base {
 			LOG("IDL version match!\n");
 		} else {
 			LOG("IDL version mismatch: runtime 0x%08x != user 0x%08x\n", MAIDL_HASH, hash);
+
 			BIG_PHAT_ERROR(ERR_IDL_VERSION);
 		}
 		return MAIDL_HASH;
 	}
 
+#if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
 		char* vmName = dst->name;
 		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
@@ -881,6 +932,7 @@ namespace Base {
 		return 0;
 	}
 #endif	//SYMBIAN
+#endif //_android
 
 #ifdef SYMBIAN
 #if 0

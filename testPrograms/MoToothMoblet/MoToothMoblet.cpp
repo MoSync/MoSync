@@ -125,7 +125,7 @@ public:
 
 		mLayout.setBackground(true, BLACK);
 
-		Extent s = maGetScrSize();
+		MAExtent s = maGetScrSize();
 		MAPoint2d scrSize = { EXTENT_X(s), EXTENT_Y(s) };
 		mLayout.setSize(scrSize);
 	}
@@ -215,7 +215,7 @@ class MenuView : public View, private BluetoothDeviceDiscoveryListener,
 	private BluetoothServiceDiscoveryListener
 {
 private:
-	Handle RES_STORE;
+	MAHandle RES_STORE;
 	ListboxView* mListboxView;
 public:
 	MenuView() : RES_STORE(maCreatePlaceholder()), mState(EBootup) {}
@@ -273,7 +273,7 @@ private:
 	void startScan() {
 		mStartTime = maGetMilliSecondCount();
 		printfln("DevDisc...");
-		int res = mDiscoverer.startDeviceDiscovery(this);
+		int res = mDiscoverer.startDeviceDiscovery(this, true);
 		if(res < 0) {
 			printfln("failed: %i", res);
 			return;
@@ -350,7 +350,7 @@ private:
 
 	void readStore() {
 		//open store
-		Handle store = maOpenStore(STORENAME, 0);
+		MAHandle store = maOpenStore(STORENAME, 0);
 		if(store <= 0) {
 			printfln("No store.");
 			startMainMenu();
@@ -376,7 +376,7 @@ private:
 
 	void writeStore() {
 		//open store
-		Handle store = maOpenStore(STORENAME, MAS_CREATE_IF_NECESSARY);
+		MAHandle store = maOpenStore(STORENAME, MAS_CREATE_IF_NECESSARY);
 		if(store <= 0) {
 			printf("writeStore error %i\n", store);
 			return;
@@ -388,7 +388,7 @@ private:
 
 	void deleteStore() {
 		//open store
-		Handle store = maOpenStore(STORENAME, 0);
+		MAHandle store = maOpenStore(STORENAME, 0);
 		if(store <= 0)
 			return;
 		maCloseStore(store, true);

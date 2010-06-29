@@ -153,7 +153,7 @@ BOOL CharInput_getQwerty(void);
 namespace MAUtil {
 
 /**
- * A listener for character input events.	
+ * \brief A listener for character input events.	
  */
 class CharInputListener {
 public:

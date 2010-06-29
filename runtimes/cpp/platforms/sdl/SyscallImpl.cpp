@@ -25,7 +25,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef LINUX
 #include <gtk/gtk.h>
 #define stricmp(x, y) strcasecmp(x, y)
-#endif
+#endif	//LINUX
+
+#ifdef DARWIN
+#include "MacDialogs.h"
+#endif //DARWIN
 
 #include <math.h>
 
@@ -35,7 +39,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_syswm.h>
 //#include <SDL/SDL_ffmpeg.h>
+
 #include <FreeImage.h>
+
 #include <string>
 #include <map>
 #include <time.h>
@@ -142,6 +148,8 @@ namespace Base {
 	static int maCameraSnapshot(int formatIndex, MAHandle placeholder);
 	static void cameraViewFinderUpdate();
 
+	static int maGetSystemProperty(const char* key, char* buf, int size);
+
 //********************************************************************
 
 #ifdef MOBILEAUTHOR
@@ -163,9 +171,11 @@ namespace Base {
 		gShowScreen = settings.showScreen;
 		init();
 #ifdef LINUX
+#ifndef DARWIN
 		int argc = 0;
 		char** argv = NULL;
 		gtk_init(&argc, &argv);
+#endif
 #endif
 
 #ifdef MOBILEAUTHOR
@@ -186,9 +196,11 @@ namespace Base {
 		gShowScreen = settings.showScreen;
 		init();
 #ifdef LINUX
+#ifndef DARWIN
 		int argc = 0;
 		char** argv = NULL;
 		gtk_init(&argc, &argv);
+#endif
 #endif
 		screenWidth = width;
 		screenHeight = height;
@@ -612,6 +624,8 @@ namespace Base {
 			"%s\n\n%s", title, msg);
 		gtk_dialog_run (GTK_DIALOG (dialog));
 		gtk_widget_destroy (dialog);
+#elif defined(DARWIN)
+		MacMessageBox(msg, title);
 #else
 #error Unsupported platform!
 #endif
@@ -1257,6 +1271,7 @@ namespace Base {
 		unsigned int dstGreenShift = gDrawSurface->format->Gshift;
 		unsigned int dstBlueMask = gDrawSurface->format->Bmask;
 		unsigned int dstBlueShift = gDrawSurface->format->Bshift;
+		unsigned int dstAlphaMask = gDrawSurface->format->Amask;
 		unsigned int srcRedMask = surf->format->Rmask;
 		unsigned int srcRedShift = surf->format->Rshift;
 		unsigned int srcGreenMask = surf->format->Gmask;
@@ -1290,6 +1305,8 @@ namespace Base {
 								int dr = (((d)&dstRedMask)>>dstRedShift);
 								int dg = (((d)&dstGreenMask)>>dstGreenShift);
 								int db = (((d)&dstBlueMask)>>dstBlueShift);
+								
+								/* Do alpha blitting */
 								destPixels[destX + destY] = 
 									(((dr + (((sr-dr)*(a))>>8)) << dstRedShift)  &dstRedMask) |
 									(((dg + (((sg-dg)*(a))>>8)) << dstGreenShift)&dstGreenMask) |
@@ -1319,8 +1336,9 @@ namespace Base {
 							if( destX >= gDrawSurface->clip_rect.x && 
 								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w ) 
 							{
-								destPixels[destX + destY] = (destPixels[destX + destY]&0xff000000) | 
-									(srcPixels[srcX + srcY]&0x00ffffff);
+								/* Do blitting without alpha */
+								destPixels[destX + destY] = (destPixels[destX + destY] & dstAlphaMask) | 
+									(srcPixels[srcX + srcY] & (srcRedMask | srcGreenMask | srcBlueMask));
 							}
 							srcX+=srcPitchX;
 							destX++;
@@ -1531,8 +1549,12 @@ namespace Base {
 		TIME_ZONE_INFORMATION tzi;
 		DWORD res = GetTimeZoneInformation(&tzi);
 		MYASSERT(res != TIME_ZONE_ID_INVALID, WINERR_TIMEZONE);
-		//return (int)(time(NULL) - ((tzi.Bias + tzi.StandardBias + tzi.DaylightBias) * 60));
-		return (int)(time(NULL) - (tzi.Bias * 60));
+		int bias = tzi.Bias;
+		if(res == TIME_ZONE_ID_DAYLIGHT)
+			bias += tzi.DaylightBias;
+		if(res == TIME_ZONE_ID_STANDARD)
+			bias += tzi.StandardBias;
+		return (int)(time(NULL) - (bias * 60));
 #else
 		time_t t = time(NULL);
 		tm* lt = localtime(&t);
@@ -2001,6 +2023,10 @@ namespace Base {
 			return SYSCALL_THIS->maPimItemClose(a);
 #endif	//EMULATOR
 
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
@@ -2302,7 +2328,7 @@ namespace Base {
 		} else {
 			return -2;
 		}
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(DARWIN)
 		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 		return IOCTL_UNAVAILABLE;
 #else
@@ -2319,12 +2345,24 @@ namespace Base {
 		} else {
 			return -2;
 		}
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(DARWIN)
 		//BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 		return IOCTL_UNAVAILABLE;
 #else
 #error Unknown platform!
 #endif
+	}
+
+	static int Base::maGetSystemProperty(const char* key, char* buf, int size) {
+#ifdef WIN32
+		if(strcmp(key, "mosync.iso-639-1") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, buf, size);
+			GLE(res);
+			return res;
+		}
+#endif
+		return -2;
 	}
 
 void MoSyncExit(int r) {

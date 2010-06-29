@@ -60,10 +60,6 @@ int CMakeSIS::Run(int argc, _TCHAR* argv[], _TCHAR** /*envp*/)
 			{
 			m_SISWriter.SetCmdPassword(m_CmdOptions.GetPassword());
 			}
-		if (m_CmdOptions.Flags() & CParseCmd::EOptSelfsign)
-			{
-			m_SISWriter.SetSelfsign(TRUE);
-			}
 		if (m_CmdOptions.SetTimestamp())
 			{
 			DWORD year, month, day, hours, minutes, seconds;
@@ -468,7 +464,6 @@ void CMakeSIS::ShowUsage()
 	OUT << __T("  Options : -s Create stub SIS file") << endl;
 	OUT << __T("  Options : -d Specify a directory path to search") << endl;
 	OUT << __T("  Options : -p Specify a password to decrypt private key") << endl << endl;
-	OUT << __T("  Options : -c Sign the SIS with a selfsigned certificate") << endl;
 #ifdef TEST
 	OUT << __T("  Options : -t Specify a timestamp") << endl << endl;
 #endif

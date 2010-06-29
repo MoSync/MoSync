@@ -2,7 +2,7 @@ require File.expand_path('../../../../../rules/native_mosync.rb')
 
 module SdlCommon
 def setup_common
-	@EXTRA_INCLUDES = ["../../../base", ".."]
+	common_includes = ["../../../base", ".."]
 	
 	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
@@ -12,6 +12,7 @@ def setup_common
 			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
 		@LOCAL_DLLS = ["amr"]
+		@EXTRA_INCLUDES = ["../../../base", ".."]
 	elsif(HOST == :linux) then
 		@EXTRA_CPPFLAGS = ""
 		@IGNORED_FILES = []
@@ -27,8 +28,13 @@ def setup_common
 		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
-		
 		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage"]
+		@EXTRA_INCLUDES = ["../../../base", ".."]
+	
+	elsif(HOST == :darwin)
+		@LOCAL_LIBS << "amr"
+		@LIBRARIES = common_libraries + ["SDL_sound", "SDLmain", "expat", "freeimage"]
+		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
 	else
 		error "Unsupported platform"
 	end

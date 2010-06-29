@@ -64,26 +64,51 @@ static void dumpPacket(byte* p, int len) {
 static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOffset,
 													const Array<char>& file, const Array<u16>& name,
 													std::string mimeType);
+static int OBEXDisconnect(BtSppConnection& conn);
 
 //TODO: implement OBEXDisconnect().
 int sendObject(const MABtAddr& address, const Array<char>& file, const Array<u16>& name,
 							 int port, int maxPacketSize)
 {
+	LOG("Connecting...\n");
 	Smartie<BtSppConnection> conn(createBtSppConnection(&address, port));
 	TEST_LEZ(conn->connect());
+	LOG("Connected!\n");
 	u16 shortMPS = (u16)maxPacketSize;
 	TEST_LEZ(OBEXConnect(*conn, &shortMPS, file.size()));
-	int res = OBEXPut(*conn, shortMPS, file, name);
-	/*if(res <= 0) {
-		OBEXDisconnect(*conn, shortMPS);
-	}*/
-	return res;
+	TEST_LEZ(OBEXPut(*conn, shortMPS, file, name));
+	TEST_LEZ(OBEXDisconnect(*conn));
+	return 1;
+}
+
+static int OBEXDisconnect(BtSppConnection& conn) {
+	LOG("OBEXDisconnect...\n");
+
+	//send packet
+	byte packet[3];
+	packet[0] = 0x81;			// Disconnect
+	packet[1] = 0x00;			// Packetlength Hi Byte
+	packet[2] = 0x03;			// Packetlength Lo Byte
+	TEST_LEZ(conn.write(packet, sizeof(packet)));
+
+	//listen for server response
+	byte ReceiveBufferA[3];
+	TEST_LEZ(conn.readFully(ReceiveBufferA, 3));
+	dumpPacket(ReceiveBufferA, 3);
+
+	if(ReceiveBufferA[0] == 0xa0) {
+		LOG("Disconnect successful.\n");
+		return 1;
+	} else {
+		LOG("Unknown reply: 0x%02X\n", ReceiveBufferA[0]);
+		return CONNERR_OBEX;
+	}
 }
 
 //may decrease *maxPacketSize to match the remote device
 //added the optional LENGTH header here. didn't do anything for the k800i prototype.
 static int OBEXConnect(BtSppConnection& conn, u16* maxPacketSize, int fileSize) {
-	printf("OBEXConnect...\n");
+	LOG("OBEXConnect...\n");
 	//send client request
 	byte ConnectPacket[0x11];
 
@@ -220,7 +245,7 @@ static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOf
 	//Name Header
 	if(tNameLength && firstPacket) {
 		nameheadsize = (3 + (tNameLength*2) + 2); 
-		namesizeHi = (nameheadsize & 0xff00)/0xff;
+		namesizeHi = (nameheadsize & 0xff00) >> 8;
 		namesizeLo = nameheadsize & 0x00ff;
 		packetsize += nameheadsize;
 	}
@@ -228,7 +253,7 @@ static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOf
 	//Type Header
 	if(tTypeLen && firstPacket) {
 		typeheadsize = 3 + tTypeLen+1;
-		typesizeHi = (typeheadsize & 0xff00)/0xff;
+		typesizeHi = (typeheadsize & 0xff00) >> 8;
 		typesizeLo = typeheadsize & 0x00ff;
 		packetsize += typeheadsize;
 	}
@@ -241,7 +266,7 @@ static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOf
 	//Body
 	int fileLen = MIN(maxPacketSize - packetsize - 3, file.size() - *fileOffset);
 	int fileheadsize = 3 + fileLen;
-	int filesizeHi = (fileheadsize & 0xff00)/0xff;
+	int filesizeHi = (fileheadsize & 0xff00) >> 8;
 	int filesizeLo = fileheadsize & 0x00ff;
 
 	packetsize += fileheadsize;
@@ -249,7 +274,7 @@ static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOf
 
 	DEBUG_ASSERT(packetsize <= maxPacketSize);
 
-	int packetsizeHi = (packetsize & 0xff00)/0xff;
+	int packetsizeHi = (packetsize & 0xff00) >> 8;
 	int packetsizeLo = packetsize & 0x00ff;
 
 	Array<byte> tSendByte(packetsize);
@@ -267,7 +292,7 @@ static int OBEXSendPacket(BtSppConnection& conn, u16 maxPacketSize, uint* fileOf
 		tSendByte[offset+2] = byte(namesizeHi);		// Length of Name header (2 bytes per char)
 		tSendByte[offset+3] = byte(namesizeLo);		// Length of Name header (2 bytes per char)
 
-		// Name+\n\n in unicode
+		// Name + \0 in unicode
 		memcpy(tSendByte + offset + 4, name, tNameLength*2);
 
 		offset = offset + 3 + (tNameLength*2);

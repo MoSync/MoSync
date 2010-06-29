@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string>
 #include "helpers/attribute.h"
+#include "helpers/types.h"
 #include "MAUtil/RefCounted.h"
 
 //typedef int (*printfPtr)(const char* fmt, ...);

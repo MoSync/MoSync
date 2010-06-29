@@ -51,7 +51,6 @@ m_pSignatureBase(NULL),
 m_pCapabilityBase(NULL),
 m_bCmdPassword(FALSE),
 m_bSetTimestamp(FALSE),
-m_bSelfsign(FALSE),
 m_pObserver(NULL)
 
 	{ ; }
@@ -436,8 +435,3 @@ BOOL CSISWriter::GetTimestamp(DWORD* dwYear, DWORD* dwMonth, DWORD* dwDay, DWORD
 	*dwSeconds = m_dwSeconds;
 	return TRUE;
 }
-
-void CSISWriter::SetSelfsign(BOOL selfsign) {
-	m_bSelfsign = selfsign;
-}
-

@@ -67,15 +67,17 @@ def generate_operations_header(dest)
 	out.write "typedef Value (*BinaryOpFunc)(const Value& a, const Value& b);\n"
 	out.write "typedef Value (*UnaryOpFunc)(const Value& a);\n"
 	
-	out.write "static std::map<int, std::map<int, std::map<int, BinaryOpFunc> > > binaryOpMap;\n"
-	out.write "static std::map<int, std::map<int, UnaryOpFunc> > unaryOpMap;\n"
+	#out.write "std::map<int, std::map<int, std::map<int, BinaryOpFunc> > > binaryOpMap;\n"
+	#out.write "std::map<int, std::map<int, UnaryOpFunc> > unaryOpMap;\n"
+	out.write "static UnaryOpFunc unaryOpMap[_TOKEN_END][Builtin::NUM_SUB_TYPES];\n"
+	out.write "static BinaryOpFunc binaryOpMap[_TOKEN_END][Builtin::NUM_SUB_TYPES][Builtin::NUM_SUB_TYPES];\n"
 	
 	out.write "static void initMaps();\n"
 	
 	types = $types_int + $types_float + $types_bool
 	
 	# generate unary operations	
-	operations = $binary_operations + $binary_operations_int +	$binary_operations_boolean
+	operations = $binary_operations + $binary_operations_int + $binary_operations_boolean
 	
 
 	operations.each do |i|
@@ -106,18 +108,19 @@ end
 
 def generate_operations_cpp(dest)
 	out = File.new(dest, "w")
+
 	types = $types_int + $types_float + $types_bool
 	
 	# generate unary operations	
 	binaryOperations = $binary_operations + $binary_operations_int +	$binary_operations_boolean
-		
+	
 	binaryOperations.each do |i|
 		out.write "template<typename T1, typename T2>\n"
-		out.write "static Value do_" + i[0] + "(const Value& a, const Value& b) {\n"
+		out.write "Value do_" + i[0] + "(const Value& a, const Value& b) {\n"
 		out.write "\treturn Value((T1)a" + i[1] + "(T2)b);\n";
 		out.write "}\n"	
 	end	
-		
+	
 	# generate template specializations for invalid operations
 	invalidTypes = ["double", "float"];
 	invalidSet = Set.new [["double", "double"]]
@@ -132,10 +135,11 @@ def generate_operations_cpp(dest)
 	
 	invalidOperations.each do |i|
 		invalidSet.each do |j| 
-		out.write "template<>\n"
-		out.write "static Value do_"+i[0]+"<"+ j[0] + ", " + j[1] + ">(const Value& a, const Value& b) {\n"
-		out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for types " + j[0] + " and " + j[1] +".\");\n";
-		out.write "}\n"
+			decl = "template<> Value do_"+i[0]+"<"+ j[0] + ", " + j[1] + ">(const Value& a, const Value& b)"
+			out.write "#{decl} GCCATTRIB(noreturn);\n"
+			out.write "#{decl} {\n"
+			out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for types " + j[0] + " and " + j[1] +".\");\n";
+			out.write "}\n"
 		end
 	end	
 	
@@ -145,7 +149,7 @@ def generate_operations_cpp(dest)
 		
 	unaryOperations.each do |i|
 		out.write "template<typename T>\n"
-		out.write "static Value do_"+i[0]+"(const Value& a) {\n"	
+		out.write "Value do_"+i[0]+"(const Value& a) {\n"	
 		out.write "\treturn Value(" + i[1] + "(T)a);\n";
 		out.write "}\n"
 	end	
@@ -155,17 +159,18 @@ def generate_operations_cpp(dest)
 	
 	invalidOperations.each do |i|
 		invalidTypes.each do |j| 
-			out.write "template<>\n"
-			out.write "static Value do_"+i[0]+"<"+j+">(const Value& a) {\n"
+			decl = "template<> Value do_"+i[0]+"<"+j+">(const Value& a)"
+			out.write "#{decl} GCCATTRIB(noreturn);\n"
+			out.write "#{decl} {\n"
 			out.write "\tthrow ParseException(\"Invalid operation " + i[1] + " for type " + j + ".\");\n";
 			out.write "}\n"	
 		end
 	end	
 	
 	# generate map for stuff
-	out.write "std::map<int, std::map<int, std::map<int, Value::BinaryOpFunc> > > Value::binaryOpMap;\n"
-	out.write "std::map<int, std::map<int, Value::UnaryOpFunc> > 	Value::unaryOpMap;\n"	
-	
+	out.write "Value::UnaryOpFunc Value::unaryOpMap[_TOKEN_END][Builtin::NUM_SUB_TYPES];\n"
+	out.write "Value::BinaryOpFunc Value::binaryOpMap[_TOKEN_END][Builtin::NUM_SUB_TYPES][Builtin::NUM_SUB_TYPES];\n"
+
 	out.write "void Value::initMaps() {\n"
 	out.write "\tstatic bool mapsInitialized = false;\n"
 	out.write "\tif(mapsInitialized) return;\n"

@@ -50,8 +50,14 @@ extern GUID MAUUID2GUID(MAUUID uuid);
 //Function declarations
 //***************************************************************************
 
-static bool dumpSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids);
-static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, std::vector<MAUUID>* uuids);
+static bool dumpSED(const SDP_ELEMENT_DATA& sed, ULONG uAttribId);
+static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, ULONG uAttribId);
+
+//***************************************************************************
+//Static variables
+//***************************************************************************
+
+static BtService* sServ;
 
 //***************************************************************************
 //Helpers
@@ -79,7 +85,7 @@ static int getSEDInt(const SDP_ELEMENT_DATA& sed, int size) {
 }
 #endif
 
-static void dumpSEDUUID(const SDP_ELEMENT_DATA& sed, int size, std::vector<MAUUID>* uuids) {
+static void dumpSEDUUID(const SDP_ELEMENT_DATA& sed, int size) {
 	LOGBT("UUID ");
 	MAUUID uuid = Bluetooth_Base_MAUUID;
 	switch(size) {
@@ -99,10 +105,10 @@ static void dumpSEDUUID(const SDP_ELEMENT_DATA& sed, int size, std::vector<MAUUI
 		DEBIG_PHAT_ERROR;
 	}
 	//save!
-	uuids->push_back(uuid);
+	sServ->uuids.push_back(uuid);
 }
 
-static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids) {
+static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, ULONG uAttribId) {
 	switch(sed.type) {
 	case SDP_TYPE_NIL:
 		LOGBT("NIL\n");
@@ -120,6 +126,9 @@ static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>*
 		LOGBT("String: \"");
 		LOGBTBIN(sed.data.string.value, sed.data.string.length);
 		LOGBT("\"\n");
+		if(uAttribId == 256) {	// service name
+			sServ->name = std::string((char*)sed.data.string.value, sed.data.string.length);
+		}
 		break;
 	case SDP_TYPE_BOOLEAN:
 		LOGBT("%s\n", sed.data.booleanVal ? "true" : "false");
@@ -135,7 +144,7 @@ static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>*
 		//so I can just pick any one of them here.
 		LOGBT("%s, %lu bytes.\n", sed.type == SDP_TYPE_SEQUENCE ? "Sequence" : "Alternative",
 			sed.data.sequence.length);
-		TEST(dumpStream(sed.data.sequence.value, sed.data.sequence.length, uuids));	//next level
+		TEST(dumpStream(sed.data.sequence.value, sed.data.sequence.length, uAttribId));	//next level
 		break;
 	case SDP_TYPE_CONTAINER:
 		LOGBT("Container!\n");
@@ -146,7 +155,7 @@ static bool dumpNonSpecificSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>*
 	return true;
 }
 
-static bool dumpSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids) {
+static bool dumpSED(const SDP_ELEMENT_DATA& sed, ULONG uAttribId) {
 	static int level = -1;
 	MYASSERT(level < 16, BTERR_MAX_SDP_LEVEL);
 	level++;
@@ -155,7 +164,7 @@ static bool dumpSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids) {
 	logLevel(level);
 	//LOGBT("Data: ");
 	if(sed.specificType == SDP_ST_NONE) {
-		TEST(dumpNonSpecificSED(sed, uuids));
+		TEST(dumpNonSpecificSED(sed, uAttribId));
 	} else {
 		int mainType = (sed.specificType & 0xF0) >> 4;
 		int size = (sed.specificType & 0xF00) >> 8;
@@ -182,7 +191,7 @@ static bool dumpSED(const SDP_ELEMENT_DATA& sed, std::vector<MAUUID>* uuids) {
 			}
 			break;
 		case 3:	//UUID
-			dumpSEDUUID(sed, size, uuids);
+			dumpSEDUUID(sed, size);
 			break;
 		default:
 			DEBIG_PHAT_ERROR;
@@ -199,11 +208,11 @@ static BOOL CALLBACK BtEnumAttributesCallback(ULONG uAttribId, LPBYTE pValueStre
 	LOGBT("Attribute ID %lu, streamSize: %lu bytes\n", uAttribId, cbStreamSize);
 	SDP_ELEMENT_DATA sed;
 	TEST_NZ(BluetoothSdpGetElementData(pValueStream, cbStreamSize, &sed));
-	TEST(dumpSED(sed, (std::vector<MAUUID>*)pvParam));
+	TEST(dumpSED(sed, uAttribId));
 	return true;
 }
 
-static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, std::vector<MAUUID>* uuids) {
+static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, ULONG uAttribId) {
 	HBLUETOOTH_CONTAINER_ELEMENT handle = NULL;
 	for(;;) {
 		SDP_ELEMENT_DATA sed;
@@ -212,16 +221,16 @@ static bool dumpStream(LPBYTE pValueStream, ULONG cbStreamSize, std::vector<MAUU
 			break;
 		} else {
 			TEST_NZ(res);
-			TEST(dumpSED(sed, uuids));
+			TEST(dumpSED(sed, uAttribId));
 		}
 	}
 	return true;
 }
 
-static int MASdpEnumAttrs(LPBYTE pSDPStream, ULONG streamSize, std::vector<MAUUID>* pUUIDs) {
-	//should fill serv.uuids with what we're looking for, if everything went well.
+static int MASdpEnumAttrs(LPBYTE pSDPStream, ULONG streamSize)
+{
 	GLE(BluetoothSdpEnumAttributes(pSDPStream, streamSize,
-		BtEnumAttributesCallback, pUUIDs));
+		BtEnumAttributesCallback, NULL));
 	return 1;
 }
 
@@ -232,12 +241,14 @@ int handleSdpResponse(std::vector<BtService>* services, LPWSAQUERYSET pQs) {
 	}
 	BtService serv;
 	serv.port = port;
+	// May not be null-terminated. Check the SDP array to get a better value.
 	if(pQs->lpszServiceInstanceName)
 		serv.name = pQs->lpszServiceInstanceName;
 	LOGBT("dSS 6\n");
 
-	//should fill serv.uuids with what we're looking for, if everything went well.
-	GLE(MASdpEnumAttrs(pQs->lpBlob->pBlobData, pQs->lpBlob->cbSize, &serv.uuids));
+	//should fill serv.uuids and serv.name with what we're looking for, if everything goes well.
+	sServ = &serv;
+	GLE(MASdpEnumAttrs(pQs->lpBlob->pBlobData, pQs->lpBlob->cbSize));
 	LOGBT("dSS 7\n");
 	if(serv.uuids.size() == 0) {	//this seems to happen when the server says "no services".
 		return 0;

@@ -10,10 +10,15 @@ workfile.rb
 /examples/flashback
 /examples/MoRaw
 /examples/MoVec
+/examples/QuakeMDL
 
 /libs/MAStd/GLES
+/libs/MAStd/libgcc
 /libs/libsupc++
 /libs/kazlib
+/libs/newlib
+/libs/Testify
+/libs/yasper
 
 /intlibs/gsm_amr
 /intlibs/sqlite
@@ -30,12 +35,13 @@ workfile.rb
 /tests/hubbub
 
 /tools/android/dx
+/tools/android/aapt
 /tools/bmconv
 /tools/rcomp
 /tools/mifconv
 /tools/e32hack/deflate
-/tools/makesis-4
-/tools/makesis-2.0.0
+/tools/makesis-4*
+/tools/makesis-2.0.0*
 /tools/MoCab/lcab
 /tools/ReleasePackageBuild/build_package_tools/include
 
@@ -52,11 +58,15 @@ workfile.rb
 /libs/MAStd/math_private.h
 /libs/MAStd/mavsprintf.c
 /libs/MAStd/mavsprintf.h
+/libs/MAStd/mawvsprintf.c
+/libs/MAStd/mawvsprintf.h
+/libs/MAStd/mawstring.h
 /libs/MAStd/maxtoa.c
 /libs/MAStd/maxtoa.h
 /libs/MAStd/modf.c
 /libs/MAStd/stdint.h
 /libs/MAStd/strtod.c
+/libs/MAStd/strtol.c
 /libs/MAStd/strtoul.c
 /libs/MAStd/strtoull.c
 /libs/MAStd/s_atan.c
@@ -65,15 +75,25 @@ workfile.rb
 /libs/MAStd/s_frexp.c
 /libs/MAStd/tlsf.c
 /libs/MAStd/tlsf.h
+/libs/MAStd/wchar.h
+
+/libs/MTXml/entities.c
+/libs/MTXml/entities.h
 
 /runtimes/cpp/core/Recompiler/ArmAssembler.cpp
 /runtimes/cpp/core/Recompiler/ArmAssembler.h
+
+/runtimes/cpp/platforms/iphone/buildLibraries.rb
+/runtimes/cpp/platforms/iphone/Classes/CMGlyphDrawing.h
 
 /runtimes/cpp/platforms/sdl/fastevents.c
 /runtimes/cpp/platforms/sdl/fastevents.h
 
 /runtimes/cpp/platforms/sdl/SDL_prim.c
 /runtimes/cpp/platforms/sdl/SDL_prim.h
+
+/runtimes/cpp/platforms/sdl/strptime.h
+/runtimes/cpp/platforms/sdl/strptime.c
 
 /runtimes/cpp/platforms/sdl/shared_work.rb
 
@@ -107,3 +127,5 @@ workfile.rb
 /tools/e32hack/crc.h
 
 /tools/ReleasePackageBuild/build_package_tools/mosync_bin/default_maprofile.h
+
+/tools/SplashScreenGenerator/main.rb

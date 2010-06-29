@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** \file ErrorListenable.h
+* \brief Handling of error events
+*/
+
 #ifndef _MAUTIL_ERROR_LISTENABLE_H_
 #define _MAUTIL_ERROR_LISTENABLE_H_
 

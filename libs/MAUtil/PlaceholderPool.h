@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUtil {
 
 /**
-* A dynamic pool of MoSync placeholder resource handles.
+* \brief A dynamic pool of MoSync placeholder resource handles.
 *
 * Such handles are used to construct new MoSync resources,
 * such as images, sound clips or data objects.

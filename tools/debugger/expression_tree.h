@@ -136,7 +136,7 @@ public:
 	~ConditionalNode();
 	Value evaluate();
 protected:
-	ExpressionTreeNode *a, *b, *c;
+	ExpressionTreeNode *mA, *mB, *mC;
 };
 
 class DotNode : public ExpressionTreeNode {

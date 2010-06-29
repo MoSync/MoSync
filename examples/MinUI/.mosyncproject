@@ -13,5 +13,6 @@
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

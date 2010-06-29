@@ -69,10 +69,6 @@ BOOL CParseCmd::ParseCommandLine(int argc, _TCHAR *argv[])
 				case 'v' : // Verbose
 				case 'V' : m_dwOptions |= EOptVerbose;
 					break;
-				case 'c' : // Selfsigned
-				case 'C' : m_dwOptions |= EOptSelfsign;
-					printf("Warning, using built in self-signed certificate\n");
-					break;
 				case 's' : // Generate stub
 				case 'S' : m_dwOptions |= EOptMakeStub;
 					break;

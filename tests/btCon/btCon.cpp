@@ -54,6 +54,10 @@ int main2() {
 	while(true) {
 		TEST_LEZ(server.accept(conn));
 		LOG("Connection accepted.\n");
+		MAConnAddr remAddr;
+		TEST_LEZ(conn->getAddr(remAddr));
+		byte* b = remAddr.bt.addr.a;
+		LOG("Remote address: %02x%02x%02x%02x%02x%02x\n", b[0], b[1], b[2], b[3], b[4], b[5]);
 		while(true) {
 			char buffer[1024];
 			int res = conn->read(buffer, sizeof(buffer));

@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -18,7 +18,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <config_platform.h>
 #include "FileStream.h"
 #include <stdio.h>
+
+#include <android/log.h>
 //#include "wce_helpers.h"
+
+//#include <SyscallImpl.h>
+
+#include <unistd.h>
 
 namespace Base {
 	//******************************************************************************
@@ -36,44 +42,68 @@ namespace Base {
 		strcat(temp, filename);
 		file = fopen(temp, "rb");
 */
-		file = fopen(filename, "rb");
+		if(filename == 0)
+			return;
+		
+		mFile = NULL;//fopen(filename, "rb");
 	}
-
-
-
+	
+	FileStream::FileStream(FILE* file) : mFile(file) {
+	
+		mFilename = "";
+		__android_log_write(ANDROID_LOG_INFO, "FileStream constructor", "1");
+		
+		if(!isOpen())
+		{
+			__android_log_write(ANDROID_LOG_INFO, "FileStream constructor", "2");
+		}
+		__android_log_write(ANDROID_LOG_INFO, "FileStream constructor", "3");
+	
+	}
+	
 	bool FileStream::isOpen() const {
-		return file != NULL;
+		return mFile != NULL;
 	}
+	
 	FileStream::~FileStream() {
 		if(isOpen())
-			fclose(file);
+			fclose(mFile);
 	}
+	
 	bool FileStream::read(void* dst, int size) {
 		TEST(isOpen());
-		int res = fread(dst, 1, size, file);
+		int res = fread(dst, 1, size, mFile);
+		
+		char* b = (char*)malloc(200);
+		sprintf(b, "size: %i res: %i (read: %x)", size, res, dst);
+		__android_log_write(ANDROID_LOG_INFO, "FileStream::read", b);
+		free(b);
+		
 		return res == size;
 	}
+	
 	bool FileStream::length(int& aLength) const {
 		TEST(isOpen());
-		int oldpos = ftell(file);
+		int oldpos = ftell(mFile);
 
-		if(fseek(file, 0, SEEK_END) != 0) {
+		if(fseek(mFile, 0, SEEK_END) != 0) {
 			FAIL;
 		}
-		aLength = ftell(file);
+		aLength = ftell(mFile);
 
-		fseek(file, oldpos, SEEK_SET);
+		fseek(mFile, oldpos, SEEK_SET);
 		return true;
 	}
+	
 	bool FileStream::seek(Seek::Enum mode, int offset) {
 		TEST(isOpen());
 		if(mode == Seek::Start) {
-			if(fseek(file, offset, SEEK_SET) != 0) {
+			if(fseek(mFile, offset, SEEK_SET) != 0) {
 				FAIL;
 			}
 		} else if(mode == Seek::Current) {
-			int oldpos = ftell(file);
-			if(fseek(file, offset, SEEK_CUR) != 0) {
+			int oldpos = ftell(mFile);
+			if(fseek(mFile, offset, SEEK_CUR) != 0) {
 				FAIL;
 			}
 		} else {	//unsupported mode
@@ -81,24 +111,67 @@ namespace Base {
 		}
 		return true;
 	}
+	
 	bool FileStream::tell(int& aPos) const {
 		TEST(isOpen());
-		aPos = ftell(file);
+		aPos = ftell(mFile);
 		return true;
 	}
 
 	//******************************************************************************
 	//LimitedFileStream
 	//******************************************************************************
-	LimitedFileStream::LimitedFileStream(const char* filename, int offset, int len)
-		: FileStream(filename), mStartPos(offset), mEndPos(offset + len)
+	LimitedFileStream::LimitedFileStream(const char* filename, int offset, int len, JNIEnv* jNIEnv, jobject jThis)
+		: FileStream(filename) , mStartPos(offset), mEndPos(offset + len)
 	{
-		if(!_open()) {
-			fclose(file);
-			file = NULL;
-		}
-	}
+		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "1");
+		
+		mJNIEnv = jNIEnv;
+		mJThis = jThis;
+		
+		
+		// get a file handle for the namned filename file from Dalvik
 
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "getResourceFileDesriptor", "()Ljava/io/FileDescriptor;");
+		if (methodID == 0) return;
+		jobject jo = jNIEnv->CallObjectMethod(mJThis, methodID);
+		
+		methodID = jNIEnv->GetMethodID(cls, "getResourceStartOffset", "()I");
+		if (methodID == 0) return;
+		jint startOffset = mJNIEnv->CallIntMethod(mJThis, methodID);
+		
+		offset += startOffset;
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		
+		jclass fdClass = mJNIEnv->FindClass("java/io/FileDescriptor");
+		if (fdClass != NULL) 
+		{
+			jclass fdPrgClassRef = (jclass) mJNIEnv->NewGlobalRef(fdClass); 
+			jfieldID fdClassDescriptorFieldID = mJNIEnv->GetFieldID(fdPrgClassRef, "descriptor", "I");
+			
+			if (fdClassDescriptorFieldID != NULL && jo != NULL) 
+			{			
+				jint fd = mJNIEnv->GetIntField(jo, fdClassDescriptorFieldID);	
+				int myfd = dup(fd);
+				mFile = fdopen(myfd, "rb");
+			}
+		}
+				
+		if(!_open()) {
+			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "2");
+			fclose(mFile);
+			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "3");
+			mFile = NULL;
+		}	
+		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "4");
+		
+
+
+	}
+	
 	//******************************************************************************
 	//WriteFileStream
 	//******************************************************************************
@@ -111,12 +184,12 @@ namespace Base {
 		strcat(temp, filename);
 */		
 		if(append) {
-			file = fopen(filename, "ab");
+			mFile = fopen(filename, "ab");
 		} else {
-			file = fopen(filename, "wb");
+			mFile = fopen(filename, "wb");
 		}
 
-		if(!file)
+		if(!mFile)
 		{
 			LOG("Could not open file for writing\n");
 			//LOG(SDL_GetError());
@@ -124,7 +197,7 @@ namespace Base {
 	}
 	bool WriteFileStream::write(const void* src, int size) {
 		TEST(isOpen());
-		int res = fwrite(src, 1, size, file);
+		int res = fwrite(src, 1, size, mFile);
 		return res == size;
 	}
 

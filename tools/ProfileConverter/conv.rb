@@ -14,6 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require 'rubygems'	# needed for sqlite3 on some(unknown) versions of Ruby
 require 'fileutils'
 require 'sqlite3'
 require 'set'
@@ -156,6 +157,7 @@ RELEVANT_DEFINES = {
 	:wm6pro => [],
 	:moblin => [],
 	:android => [],
+	:iphoneos => [],
 }
 
 CAP_TYPES = {
@@ -191,6 +193,7 @@ runtimes = {
 	:JavaME => [],
 	:moblin => [],
 	:android => [],
+	:iphoneos => [],
 }
 
 
@@ -270,6 +273,11 @@ if(File.exist?(DB_FILENAME))
 	#puts DB_FILENAME + ": " + File.mtime(DB_FILENAME).to_s
 	#puts SQL_FILENAME + ": " + File.mtime(SQL_FILENAME).to_s
 	REBUILD_DATABASE = File.mtime(DB_FILENAME) < File.mtime(SQL_FILENAME)
+	if(REBUILD_DATABASE)
+		puts "Database is out of date."
+	else
+		puts "Database is up to date."
+	end
 else
 	REBUILD_DATABASE = true
 end
@@ -377,8 +385,12 @@ DEVICE.each_with_index do |device, index|
 		profile.puts "#define MA_PROF_STRING_VENDOR \"#{vendor}\""
 		profile.puts "#define MA_PROF_STRING_DEVICE \"#{device.name}\""
 		profile.puts "#define MA_PROF_STRING_PLATFORM \"#{device.platformversion.platform}\""
+		profile.puts "#define MA_PROF_STRING_PLATFORM_#{device.platformversion.platform.to_s.upcase}"
 		profile.puts "#define MA_PROF_VENDOR_#{vendor.to_s.format}"
 		profile.puts "#define MA_PROF_DEVICE_#{device.name.to_s.format}"
+		if(device.platformversion.platform == :iphoneos)
+			profile.puts "#define MA_PROF_OUTPUT_CPP"
+		end
 		profile.puts
 		RELEVANT_CAPS.each do |cap|
 			if(device.caps.has_key?(cap))
@@ -526,7 +538,7 @@ runtimes.each do |platform_name, platform|
 		end
 		
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
-		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v2 || platform_name == :s60v3 || platform_name == :s60v5)
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5)
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)

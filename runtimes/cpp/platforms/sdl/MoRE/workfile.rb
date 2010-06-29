@@ -18,14 +18,13 @@ work.instance_eval do
 		"#{BD}/runtimes/cpp/core/GdbStub.cpp",
 		"#{BD}/intlibs/helpers/intutil.cpp"]
 	@EXTRA_INCLUDES += ["../../.."]
-	#@EXTRA_CPPFLAGS = " -save-temps"
 	if(!@GCC_IS_V4 && CONFIG=="debug")
 		@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code", "sld.cpp" => " -Wno-unreachable-code" }
 	end
 	
 	@LOCAL_LIBS = ["mosync_sdl"] + @LOCAL_LIBS
 	
-	@NAME = "moemu"
+	@NAME = "moemu" # was 'moemu', should probably rename it to that later on.
 	
 	@INSTALLDIR = mosyncdir + '/bin'
 	

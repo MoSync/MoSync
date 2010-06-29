@@ -17,6 +17,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Shared.h"
 #include "Icon.h"
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+#include <stdlib.h>
+#include <stdio.h>
 
 using namespace std;
 
@@ -49,10 +55,16 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *
 	string resizeFlag;
 	if(size != "default")
 		resizeFlag = " -resize " + size;
+#if defined(WIN32)
 	string magick = 
-		"\"\""+mosyncdir+"\\bin\\ImageMagick\\convert\" \"" + iconInstance->filename + "\"" +
+		"\""+mosyncdir+"\\bin\\ImageMagick\\convert.exe\" \"" + iconInstance->filename + "\"" +
 		resizeFlag + " \"" + string(dstFilename) + "\"";
-
+#else
+	string magick = 
+	"\""+mosyncdir+"/bin/ImageMagick/convert\" \"" + iconInstance->filename + "\"" +
+	resizeFlag + " \"" + string(dstFilename) + "\"";
+#endif
+	
 	if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
 
 	/*
@@ -76,11 +88,31 @@ void sizeString(const std::string& size, int* w, int* h) {
 
 int run(const char* cmd) {
 	printf("%s\n", cmd);
+#ifdef WIN32
+#define GLE(e, func, args) { DWORD res = (func args); if(res == e) { int err = GetLastError();\
+	printf(#func " error %i\n", err); return err; } }
+
+	// hopefully this method should be more stable than the system() function.
+	PROCESS_INFORMATION pi;
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	GLE(0, CreateProcess, (NULL, (char*)cmd, NULL, NULL, false, 0, NULL, NULL, &si, &pi));
+	GLE(0, CloseHandle, (pi.hThread));
+	GLE(WAIT_FAILED, WaitForSingleObject, (pi.hProcess, INFINITE));
+	DWORD exitCode;
+	GLE(0, GetExitCodeProcess, (pi.hProcess, &exitCode));
+	if(exitCode != 0) {
+		printf("exitCode: %lu\n", exitCode);
+	}
+	return exitCode;
+#else
 	int res = system(cmd);
 	if(res != 0) {
 		printf("Error %i\n", res);
 	}
 	return res;
+#endif
 }
 
 }

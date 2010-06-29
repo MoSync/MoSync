@@ -35,6 +35,23 @@ using namespace MAUtil;
 #define WHITE 0xFFFFFF
 #define DATA_SIZE (4*1024)
 
+/*
+int waitTest() {
+	MAEvent event;
+	while(maGetEvent(&event)) {
+		switch(event.type) {
+			case EVENT_TYPE_KEY_RELEASED:
+				if(event.key == TK_YES) return TK_YES;
+				else return TK_NO;
+
+			case EVENT_TYPE_POINTER_RELEASED:
+				return (((EXTENT_X(maGetScrSize())/ 2) - event.point.x) < 0) ? TK_YES : TK_NO;
+			case EVENT_TYPE_CLOSE: maExit(1);
+		}
+	}
+}
+*/
+
 class KeyBaseCase : public TestCase, public KeyListener, public PointerListener {
 public:
 	KeyBaseCase(const String& name) : TestCase(name) {}
@@ -57,7 +74,7 @@ public:
 	}
 
 	void pointerReleaseEvent(MAPoint2d p) {
-		int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
+		int res = ((p.x - (EXTENT_X(maGetScrSize())/ 2)) > 0) ? TK_YES : TK_NO;
 		assert(name, res == TK_YES);
 		suite->runNextCase();
 	}

@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //--------------------------------------------------------------------//
 // MoRE                                                               //
 // MoSync Runtime Environment (SDL Version)                           //
-// (c) Mobile Sorcery 2007                                            //
+// (c) MoSync AB 2010                                                 //
 //--------------------------------------------------------------------//
 
 #include "../config_platform.h"
@@ -61,10 +61,9 @@ static void DeleteCore() {
 
 int main2(int argc, char **argv);
 
-#ifndef _MSC_VER
+#if defined(WIN32) && !defined(_MSC_VER)
 #undef main
 #endif
-
 
 
 int main(int argc, char **argv) {
@@ -114,7 +113,32 @@ int main2(int argc, char **argv) {
 
 	for(int i = 1; i < argc; i++) {
 		LOG("%i:%s\n", i, argv[i]);
-		if(strcmp(argv[i], "-id") == 0) {
+		if((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0)) {
+			static const char sInfo[] = 
+				"MoSync Runtime Environment (MoRE) (c) MoSync AB 2010\n"
+				"\n"
+				"  Options (Optional):\n"
+				"\n"
+				"  -id <integer>                          instance id.\n"
+				"  -fd <integer>                          file descriptor to which stdout is redirected.\n"
+				"  -program <filename:string>             program file to be executed (if option isn't specified it defaults to 'program' in cwd).\n"
+				"  -resource <filename:string>            resource file to be loaded (if option isn't specified it defaults to 'resources' in cwd).\n"
+				"  -resolution <x:integer> <y:integer>    resolution to use (defaults to 240 x 320).\n"
+				"  -icon <filename:string>                icon to use, to identify the instance.\n"
+				"  -noscreen                              run emulator in hidden mode.\n"
+				"  -nomophone                             run emulator without skin, just show the screen.\n"
+				"  -model <string>                        set model. Used to choose skin.\n"
+				"  -vendor <string>                       set vendor. Used to choose skin.\n"
+				"  -sld <filename:string>                 load sld-file.\n"
+				"  -vendor <string>                       set vendor. Used to choose skin.\n"
+				"  -resmem <bytes:integer>                set resource memory limit.\n"
+				"  -gdb                                   start gdb stub.\n"
+				"\n";
+			printf("%s", sInfo);
+			return 1;
+
+		}
+		else if(strcmp(argv[i], "-id") == 0) {
 			i++;
 			settings.id = argv[i];
 		}
@@ -310,6 +334,7 @@ void MoSyncError::addRuntimeSpecificPanicInfo(char* ptr, bool newLines) {
 void Base::reportCallStack() {
 	if(gCore == NULL)
 		return;
+	maDumpCallStackEx("reportCallStack", 0);
 	report(REPORT_CALL_STACK, Core::GetFakeCallStack(gCore),
 		Core::GetFakeCallStackDepth(gCore) << 2);
 }

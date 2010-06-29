@@ -3,201 +3,445 @@
 * \author Fredrik Eldh
 */
 
-/** \page api_areas API areas
-You can do many things with MoSync, and some things can be done in several different
-ways. This document will give you an overview of all these things.
-<br>
-<br>
-<br>
-\section mosync MoSync-specific functions
-
-
-\subsection sys System functions
-
-Syscalls: maExit(), maPanic().<br>
-
-\subsection event Event handling
-
-Recieve information about user input, communications and other asynchronous events.<br>
-Syscalls: maWait(), maGetEvent().<br>
-Libs: MAUtil::Environment, MAUtil::Moblet, \ref MAUtil/CharInput.h<br>
-
-\subsection res Resource management
-
-Create, read and write large binary objects, destroy any object, create new resource handles.<br>
-Syscalls: maCreateData(), maCreatePlaceholder(), maDestroyObject(), maGetDataSize(), maReadData(),
-maWriteData().<br>
-Libs: MAUtil::DataHandler, MAUtil::PlaceholderPool<br>
-
-\subsection dyna Dynamic loading
-
-Load code and data from a binary object, which can be filled with anything from
-anywhere.<br>
-Syscalls: maLoadResources(), maLoadProgram().<br>
-Uses \ref res.
-<br>
-<br>
-<br>
-\section common Common functions with a MoSync-specific interface
-
-\subsection rms Permanent storage
-
-Useful for storing settings, high-scores, downloaded data and programs.<br>
-Syscalls: maOpenStore(), maWriteStore(), maReadStore(), maCloseStore().<br>
-Uses \ref res.
-
-\subsection Graphics
-
-Draw pixels, lines, rectangles, triangles and images to either the screen or to
-a drawable image. Create new images, either empty or from compressed or uncompressed data.
-Use a clipping rectange to control drawing.<br>
-Syscalls: maSetColor(), maPlot(), maLine(), maFillRect(), maFillTriangleStrip(),
-maFillTriangleFan(), maDrawImage(),
-maDrawText(), maDrawTextW(), maGetTextSize(), maGetTextSizeW(), maUpdateScreen(),
-maResetBacklight(), maGetScrSize(), maDrawRGB(),
-maDrawImageRegion(), maGetImageSize(), maGetImageData(), maSetDrawTarget(), maSetClipRect(),
-maGetClipRect(), maCreateImageFromData(), maCreateImageRaw(), maCreateDrawableImage().<br>
-Libs: \ref MAUtil/Graphics.h<br>
-See also: \ref res.<br>
-
-\subsubsection Framebuffer
-
-Access the device's graphical framebuffer (more or less) directly.
-This allows for more advanced graphics operations that the regular API.<br>
-Syscalls: maFrameBufferGetInfo(), maFrameBufferInit(), maFrameBufferClose().<br>
-Libs: \ref MAUtil/FrameBuffer.h
-
-\subsection Sound
-
-Play a sound, with volume control.<br>
-Syscalls: maSoundPlay(), maSoundStop(), maSoundIsPlaying(), maSoundGetVolume(),
-maSoundSetVolume().<br>
-See also: \ref res.<br>
-
-\subsection time Time and date
-
-Check the current time and date, convert to C string.<br>
-Syscalls: maGetMilliSecondCount(), maTime(), maLocalTime().<br>
-Libs: matime.h<br>
-
-\subsection Communications
-
-Speak to other machines using TCP, HTTP or a Bluetooth serial port.<br>
-Syscalls: maConnect(), maConnClose(), maConnRead(), maConnWrite(), maConnReadToData(),
-maConnWriteFromData(), maHttpCreate(), maHttpSetRequestHeader(), maHttpGetResponseHeader(),
-maHttpFinish(), maAccept().<br>
-Libs: \ref MAUtil/Connection.h, \ref MAUtil/Downloader.h, \ref MAUtil/BuffDownloader.h<br>
-Uses \ref event.<br>
-See also: \ref res.<br>
-
-\subsection bt Bluetooth discovery
-
-Search for Bluetooth devices in the vicinity and ask them what services they provide.<br>
-Syscalls: maBtStartDeviceDiscovery(), maBtGetNewDevice(), maBtStartServiceDiscovery(),
-maBtGetNextServiceSize(), maBtGetNewService(), maBtCancelDiscovery().<br>
-Uses \ref event.<br>
-Libs: \ref MAUtil/BluetoothDiscovery.h, \ref MAUtil/mauuid.h<br>
-
-\subsection Location
-
-Read your current geographical location.<br>
-Syscalls: maLocationStart(), maLocationStop().<br>
-Uses \ref event.<br>
-
-\subsection Filesystem
-
-Access the device's filesystem. List, create and delete files and directories.
-Open, close, read and write files.<br>
-Syscalls: maFileListStart(), maFileListNext(), maFileListClose(),
-maFileOpen(), maFileExists(), maFileClose(), maFileCreate(), maFileDelete(),
-maFileSize(), maFileAvailableSpace(), maFileTotalSpace(), maFileDate(), maFileRename(),
-maFileTruncate(), maFileWrite(), maFileWriteFromData(), maFileRead(), maFileReadToData(),
-maFileTell(), maFileSeek().<br>
-
-\subsection Camera
-
-Use the device's camera to display a viewfinder and capture snapshots.<br>
-Syscalls: maCameraFormatNumber(), maCameraFormat(), maCameraStart(), maCameraStop(),
-maCameraSnapshot().<br>
-
-\subsection sysmisc Miscellaneous functions
-
-Syscalls: maGetKeys(), maVibrate(), maGetBatteryCharge(), maPlatformRequest(), maSendTextSMS(),
-maSendToBackground(), maBringToForeground(), maGetSystemProperty(),
-maLockKeypad(), maUnlockKeypad(), maKeypadIsLocked().<br>
-Libs: \ref maassert.h<br>
-<br>
-<br>
+/** \mainpage MoSync API Reference
+<center>The essential guide to MoSync syscalls and libraries</center>
 <br>
 
-
-\section std Standard C functions
-
-\subsection Math
-
-Trigonometric functions, common constants, and others.<br>
-Syscalls: sin(), cos(), tan(), sqrt().<br>
-Libs: limits.h, madmath.h.<br>
-
-\subsection mem Memory management
-
-Allocate and free memory. Copy and set data.<br>
-Syscalls: memset(), memcpy().<br>
-Libs: maheap.h<br>
-
-\subsection c_str C string handling
-
-Compare, copy, format and convert null-terminated 8-bit strings.<br>
-Syscalls: strcmp(), strcpy().<br>
-Libs: mactype.h, mastring.h, maxtoa.h, mavsprintf.h<br>
-
-\subsection wcs Wide-char string handling
-
-Compare, copy, format and convert null-terminated 16-bit strings.<br>
-Libs: wchar.h, mawstring.h, mawvsprintf.h<br>
-
-\subsection stdlib Miscellaneous
-
-Among them are variadric function helpers and random number generation.<br>
-Libs: maarg.h, mastdlib.h<br>
-
-\subsection conprint Simple output console
-
-A way to print text to the screen. Options include color and logging.<br>
-Libs: conprint.h<br>
-
-\subsection mafs Virtual file system
-
-A subset of the buffered file I/O library.<br>
-Libs: \ref MAFS/File.h<br><br>
-<br>
-<br>
+<table style="border-color: lightgrey;">
+<tr style="background-color: rgb(53, 28, 117);">
+<td colspan="2">
+<span style="color: rgb(255, 255, 255);"><strong>MoSync-Specific Functions</strong></span>
 
 
-\section misclib Miscellaneous libraries
+</td>
 
-\subsection cpp C++ utilities
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
+</td>
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
+</td>
+<td>
+<strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong>
+</td>
+</tr>
 
-Libs: MAUtil::Vector, MAUtil::String, MAUtil::HashMap, MAUtil::Map, MAUtil::Set, MAUtil::List,
+<tr style="background-color: rgb(217, 210, 233);">
+<td>
+<strong>System functions</strong>
+</td>
+<td>Exit application, report non-recoverable error.
+</td>
+<td>
+maExit(), maPanic()
+</td>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr style="background-color: rgb(217, 210, 233);">
+<td>
+<strong><a name="event"></a>Event handling</strong>
+</td>
+<td>
+User input, communications, asynchronous events.
+</td>
+<td>
+maWait(), maGetEvent()
+</td>
+<td>
+MAUtil::Environment, MAUtil::Moblet, \ref MAUtil/CharInput.h
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr style="background-color: rgb(217, 210, 233);">
+<td>
+<strong><a name="res"></a>Resource&nbsp;management</strong>
+</td>
+<td>
+Create, read, write binary objects, destroy objects, create resource handles.
+</td>
+<td>
+maCreateData(), maCreatePlaceholder(), maDestroyObject(), maGetDataSize(), maReadData(),<br>
+maWriteData()
+</td>
+<td>
+MAUtil::DataHandler, MAUtil::PlaceholderPool
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr style="background-color: rgb(217, 210, 233);">
+<td>
+<strong>Dynamic loading</strong>
+</td>
+<td>Load code and data from binary object.<br>
+</td>
+<td>maLoadResources(), maLoadProgram()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+<tr style="background-color: rgb(11, 147, 148);">
+<td colspan="2">
+<span style="color: rgb(255, 255, 255);"><strong>Functions with MoSync interfaces</strong></span>
+
+
+</td>
+
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Syscalls (maapi.h)</strong></span>
+</td>
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
+</td>
+<td>
+<strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Permanent storage</strong>
+</td>
+<td>Store settings, values, downloaded data and programs.<br>
+</td>
+<td>maOpenStore(), maWriteStore(), maReadStore(), maCloseStore()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Graphics</strong>
+</td>
+<td>Draw pixels, lines, rectangles, triangles and images to either the screen or to a drawable image. Create new images, either empty or from compressed or uncompressed data. Use a clipping rectange to control drawing.<br>
+</td>
+<td>maSetColor(), maPlot(), maLine(), maFillRect(), maFillTriangleStrip(), maFillTriangleFan(), maDrawImage(), maDrawText(), maDrawTextW(), maGetTextSize(), maGetTextSizeW(), maUpdateScreen(), maResetBacklight(), maGetScrSize(), maDrawRGB(), maDrawImageRegion(), maGetImageSize(), maGetImageData(), maSetDrawTarget(), maSetClipRect(), maGetClipRect(), maCreateImageFromData(), maCreateImageRaw(), maCreateDrawableImage()<br>
+</td>
+<td>\ref MAUtil/Graphics.h<br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Framebuffer</strong>
+</td>
+<td>Access the device's graphical framebuffer (more or less) directly, allowing more advanced graphics operations.<br>
+</td>
+<td>maFrameBufferGetInfo(), maFrameBufferInit(), maFrameBufferClose()<br>
+</td>
+<td>\ref MAUtil/FrameBuffer.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Sound</strong>
+</td>
+<td>Play a sound, control volume.<br>
+</td>
+<td>maSoundPlay(), maSoundStop(), maSoundIsPlaying(), maSoundGetVolume(), maSoundSetVolume()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#res" class="el">Resource management</a><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Time and date</strong>
+</td>
+<td>Check current time and date, convert to C string.<br>
+</td>
+<td>maGetMilliSecondCount(), maTime(), maLocalTime()<br>
+</td>
+<td>matime.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td><a name="comms"></a>
+<strong>Communications</strong>
+</td>
+<td>Communicate via TCP, HTTP and Bluetooth serial port.<br>
+</td>
+<td>maConnect(), maConnClose(), maConnRead(), maConnWrite(), maConnReadToData(), maConnWriteFromData(), maHttpCreate(), maHttpSetRequestHeader(), maHttpGetResponseHeader(), maHttpFinish()<br>
+</td>
+<td>\ref MAUtil/Connection.h, \ref MAUtil/Downloader.h, \ref MAUtil/BuffDownloader.h<br>
+</td>
+<td><a href="#event" class="el">Event handling</a>,
+<a href="#res" class="el">Resource management</a>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Servers</strong>
+</td>
+<td>Advertise services, listen for incoming connections.<br>
+</td>
+<td>maConnect(), maConnClose(), maAccept()<br>
+</td>
+<td>\ref MAUtil/Server.h<br>
+</td>
+<td><a href="#comms" class="el">Communications</a>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Bluetooth discovery</strong>
+</td>
+<td>Search for nearby Bluetooth devices and query their capabilities.<br>
+</td>
+<td>maBtStartDeviceDiscovery(), maBtGetNewDevice(), maBtStartServiceDiscovery(), maBtGetNextServiceSize(), maBtGetNewService(), maBtCancelDiscovery()<br>
+</td>
+<td>\ref MAUtil/BluetoothDiscovery.h, \ref MAUtil/mauuid.h<br>
+</td>
+<td><a href="#event" class="el">Event handling</a><br>
+</td>
+</tr>
+
+<tr style="background-color: rgb(207, 226, 243);">
+<td><strong>Location</strong><br>
+</td>
+<td>Read your current geographical location.<br>
+</td>
+<td>maLocationStart(), maLocationStop()<br>
+</td>
+<td><br>
+</td>
+<td><a href="#event" class="el">Event handling</a><br>
+</td>
+</tr>
+<tr style="background-color: rgb(207, 226, 243);">
+<td><strong>Filesystem</strong><br>
+</td>
+<td>Access the device's filesystem; list, create and delete files and directories; open, close, read and write files.<br>
+</td>
+<td>maFileListStart(), maFileListNext(), maFileListClose(), maFileOpen(), maFileExists(), maFileClose(), maFileCreate(), maFileDelete(), maFileSize(), maFileAvailableSpace(), maFileTotalSpace(), maFileDate(), maFileRename(), maFileTruncate(), maFileWrite(), maFileWriteFromData(), maFileRead(), maFileReadToData(), maFileTell(), maFileSeek()<br>
+</td>
+<td><br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(207, 226, 243);">
+<td><strong>Camera</strong><br>
+</td>
+<td>Use the device's camera to display a viewfinder and capture snapshots.<br>
+</td>
+<td>maCameraFormatNumber(), maCameraFormat(), maCameraStart(), maCameraStop(), maCameraSnapshot()<br>
+</td>
+<td><br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(207, 226, 243);">
+<td>
+<strong>Miscellaneous functions</strong>
+</td>
+<td>Detect key state, control vibration, measure battery, platform request, send SMS, switch focus, get system property, lock/unlock keypad.<br>
+</td>
+<td>maGetKeys(), maVibrate(), maGetBatteryCharge(), maPlatformRequest(), maSendTextSMS(), maSendToBackground(), maBringToForeground(), maGetSystemProperty(), maLockKeypad(), maUnlockKeypad(), maKeypadIsLocked()<br>
+</td>
+<td>\ref maassert.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(56, 118, 29);">
+<td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Standard C Functions</span></strong><strong><br>
+</strong></td>
+
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong></td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>Math</strong>
+</td>
+<td>Trigonometric functions, common constants, etc.<br>
+</td>
+<td>sin(), cos(), tan(), sqrt()<br>
+</td>
+<td>limits.h, madmath.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>Memory<br>
+</strong>
+</td>
+<td>Allocate and free memory. Copy and set data.<br>
+</td>
+<td>memset(), memcpy()<br>
+</td>
+<td>maheap.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>C string handling<br>
+</strong>
+</td>
+<td>Compare, copy, format and convert null-terminated 8-bit strings.<br>
+</td>
+<td>strcmp(), strcpy()<br>
+</td>
+<td>mactype.h, mastring.h, maxtoa.h, mavsprintf.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td><strong>Wide-char string handling</strong><br>
+</td>
+<td>Compare, copy, format and convert null-terminated 16-bit strings.<br>
+</td>
+<td><br>
+</td>
+<td>wchar.h, mawstring.h, mawvsprintf.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>Miscellaneous</strong>
+</td>
+<td>Variadric function helpers and random number generation.<br>
+</td>
+<td><br>
+</td>
+<td>maarg.h, mastdlib.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>Console output<br>
+</strong>
+</td>
+<td>Print text to the screen, with colour and logging options.<br>
+</td>
+<td><br>
+</td>
+<td>conprint.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(217, 234, 211);">
+<td>
+<strong>Virtual file system</strong>
+</td>
+<td>A subset of the buffered file I/O library.<br>
+</td>
+<td><br>
+</td>
+<td>\ref MAFS/File.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(180, 95, 6);">
+<td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Miscellaneous libraries</span></strong><strong><br>
+</strong></td>
+
+<td><strong><span style="color: rgb(255, 255, 255);">Syscalls (maapi.h)</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong></td>
+</tr>
+<tr style="background-color: rgb(249, 203, 156);">
+<td>
+<strong>C++ utilities</strong>
+</td>
+<td>Containers, geomeric helper structures, utilities.<br>
+</td>
+<td><br>
+</td>
+<td>MAUtil::Vector, MAUtil::String, MAUtil::HashMap, MAUtil::Map, MAUtil::Set, MAUtil::List,<br>
 \ref MAUtil/Geometry.h, \ref MAUtil/util.h<br>
-
-\subsection xml XML processing
-
-Libs: \ref MTXml/MTXml.h<br>
-<br>
-<br>
-<br>
-
-
-\section gui Graphical user interface
-
-See MAUI.<br>
-
-
-\subsection map Roadmaps
-
-Download, cache and display maps of Earth. They are divided into tiles.
-They are available from multiple sources and in multiple resolutions.<br>
-Libs: MAP.<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(249, 203, 156);">
+<td>
+<strong>XML processing</strong>
+</td>
+<td>Tiny XML parser.<br>
+</td>
+<td><br>
+</td>
+<td>\ref MTXml/MTXml.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(249, 203, 156);">
+<td>
+<strong>Graphical user interface</strong>
+</td>
+<td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
+</td>
+<td><br>
+</td>
+<td>MAUI<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(249, 203, 156);">
+<td><strong>Slippy maps</strong><br>
+</td>
+<td>Download, cache and display maps from multiple sources in different resolutions.<br>
+</td>
+<td><br>
+</td>
+<td>MAP<br>
+</td>
+<td><br>
+</td>
+</tr>
+</table>
 
 */

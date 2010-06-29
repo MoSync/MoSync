@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1">
-<active.build.cfg active="Render - Release"/>
+<active.build.cfg active="Benchmark - Release"/>
 <target-profile/>
-<properties>
-<property key="last.build.config" value="Release"/>
-</properties>
+<properties/>
 </project>

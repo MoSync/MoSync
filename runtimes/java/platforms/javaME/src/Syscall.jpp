@@ -1688,6 +1688,9 @@ public
 		} catch(ConnectionNotFoundException e) {
 			PRINT_STACK_TRACE;
 			return IOCTL_UNAVAILABLE;
+		} catch(SecurityException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_FORBIDDEN;
 		}
 #if 1	//MA_BUG_PLATFORMREQUEST_CHANGES_CLIPRECT
 		finally {
@@ -1992,6 +1995,11 @@ public
 			value = sysPropFromArray(sImeiProperties);
 		} else if(key.equals("mosync.imsi")) {
 			value = sysPropFromArray(sImsiProperties);
+		} else if(key.equals("mosync.iso-639-1")) {
+			value = System.getProperty("microedition.locale");
+			if(value != null) {
+				value = value.substring(0, 2);
+			}
 		} else {
 			value = System.getProperty(key);
 		}

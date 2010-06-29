@@ -16,16 +16,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "Token.h"
+#include <stdlib.h>
+#include <string.h>
 
 using namespace std;
 
-TokenMatcher::TokenMatcher(unsigned int type) : type(type) {
+TokenMatcher::TokenMatcher(unsigned int type) : mType(type) {
 }
 
 TokenMatcher::~TokenMatcher() {}
 
 unsigned int TokenMatcher::getType() {
-	return type;
+	return mType;
 }
 
 
@@ -51,42 +53,42 @@ void TokenFixed::addPattern(const char* str) {
 	patterns.push_back(str);
 }
 
-Token::Token() : tokenType(0), start(0), length(0) {
+Token::Token() : mTokenType(0), mStart(0), mLength(0) {
 }
 
 Token::Token(unsigned int tokenType, const char* start, unsigned int length)
-: tokenType(tokenType),	start(start), length(length)
+: mTokenType(tokenType), mStart(start), mLength(length)
 {
 }
 
 unsigned int Token::getTokenType() const {
-	return tokenType;
+	return mTokenType;
 }
 
 const char *Token::getStart() const {
-	return start;
+	return mStart;
 }
 
 unsigned int Token::getLength() const {
-	return length;
+	return mLength;
 }
 
 double Token::toDouble() const {
 	char temp[16];
-	memcpy(temp, start, length);
-	temp[length] = 0;
+	memcpy(temp, mStart, mLength);
+	temp[mLength] = 0;
 	return atof(temp);
 }
 
 int Token::toInt() const {
 	char temp[16];
-	memcpy(temp, start, length);
-	temp[length] = 0;
+	memcpy(temp, mStart, mLength);
+	temp[mLength] = 0;
 	return atoi(temp);
 }
 
 string Token::toString() const {
-	return string(start, length);
+	return string(mStart, mLength);
 }
 
 TokenLiteral::TokenLiteral() : TokenMatcher(TOKEN_LITERAL) {

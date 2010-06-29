@@ -32,7 +32,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	/** This class manages the MAUI widget system. It is mainly of interest when
+	/** \brief Widget manager.
+	  *
+	  * This class manages the MAUI widget system. It is mainly of interest when
 	  * when developing custom widgets.
 	**/
 

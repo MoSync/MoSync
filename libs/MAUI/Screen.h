@@ -27,11 +27,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Widget.h"
 #include <MAUtil/Environment.h>
 
+/**
+* \brief MoSync graphical user interface classes
+*/
+
 namespace MAUI {
 
 	using namespace MAUtil;
 
-	/** A Screen is a logically distinct part of a MAUI interface.
+	/** \brief A displayable screen; a container for MAUI widgets.
+	  *
+	  * A Screen is a logically distinct part of a MAUI interface.
 	  * MAUI applications typically consist of a number of screens
 	  * that the user can navigate between.
 	  **/

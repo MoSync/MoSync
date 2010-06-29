@@ -403,10 +403,6 @@
 			>
 		</File>
 		<File
-			RelativePath=".\wchar.c"
-			>
-		</File>
-		<File
 			RelativePath=".\wchar.h"
 			>
 		</File>

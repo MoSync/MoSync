@@ -32,11 +32,10 @@ namespace MAUI {
 	
 	class ListBox;
 
-	/** A listener interface that receives notifications whenever an item in a ListBox is selected.
+	/** \brief Listener interface that receives notifications when an item in a ListBox is selected.
 	  **/
 	class ItemSelectedListener {
 	public:
-		ItemSelectedListener(){}
 		/** This function is called whenever the selected item in a listbox changes **/
 		virtual void itemSelected(ListBox *sender, Widget *selectedWidget, Widget *unselectedWidget) = 0;
 		
@@ -45,7 +44,9 @@ namespace MAUI {
 	};
 
 	
-	/** The MAUI ListBox is a very generic and flexible container that enables laying out widgets in vertical
+	/** \brief List box widget for horizontal or vertical lists.
+	  *
+	  * The MAUI ListBox is a very generic and flexible container that enables laying out widgets in vertical
 	  * or horizontal lists. Unlike list boxes you might find in other UI toolkits, this one doesn't only support
 	  * text-based items - it supports putting in any type of widget. You could add an image followed by a label,
 	  * followed by another, nested ListBox. Furthermore, the navigation is decoupled from input. For instance, it 
@@ -53,7 +54,7 @@ namespace MAUI {
 	  * be done by pressing the "down" key.  
 	   * The widget draws its background by default, use setDrawBackground(false) to disable it.
 	  **/
-	class ListBox : public Widget, MAUtil::TimerListener, WidgetListener {
+	class ListBox : public Widget, protected MAUtil::TimerListener, protected WidgetListener {
 	public:
 		enum ListBoxOrientation {
 			LBO_HORIZONTAL,

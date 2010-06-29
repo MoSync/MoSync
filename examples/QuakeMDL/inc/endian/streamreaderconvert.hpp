@@ -18,7 +18,7 @@
  *
  */
 class StreamReaderConvert
-: protected StreamReader
+: public StreamReader
 {
 public:
 	/**

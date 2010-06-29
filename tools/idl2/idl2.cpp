@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <fstream>
 #include <stdlib.h>
+#include <string.h>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
@@ -48,6 +49,71 @@ static void outputCoreConsts();
 static void outputConsts(const string& filename, const Interface& inf, int ix);
 static void outputConstSets(const Interface& maapi);
 
+static bool filesAreEqual(const char* a, const char* b) {
+	ifstream as(a, ios_base::in | ios_base::binary);
+	ifstream bs(b, ios_base::in | ios_base::binary);
+
+	// compare size
+	as.seekg(0, ios_base::end);
+	size_t aSize = as.tellg();
+	bs.seekg(0, ios_base::end);
+	size_t bSize = bs.tellg();
+	if(!(as.good() && bs.good() && (aSize == bSize)))
+		return false;
+
+	// compare content
+	as.seekg(0);
+	bs.seekg(0);
+	static const size_t BUFSIZE = 64*1024;	//arbitrary
+	char aBuf[BUFSIZE], bBuf[BUFSIZE];
+	size_t pos = 0;
+	while(pos < aSize) {
+		size_t len = MIN(BUFSIZE, aSize - pos);
+		as.read(aBuf, len);
+		bs.read(bBuf, len);
+		if(!(as.good() && bs.good())) {
+			printf("Warning: file read error.\n");
+			return false;
+		}
+		if(memcmp(aBuf, bBuf, len) != 0)
+			return false;
+		pos += len;
+	}
+	return true;
+}
+
+#ifdef WIN32
+// change slashes
+static void u2d(string& path) {
+	for(size_t i=0; i<path.size(); i++) {
+		if(path[i] == '/')
+			path[i] = '\\';
+	}
+}
+#endif
+
+static void copy(string src, string dst) {
+	// check if the file is different. if not, don't copy.
+	size_t off = src.find_last_of('/');
+	if(off == string::npos)
+		off = 0;
+	else
+		off++;
+	string dstFile = dst + src.substr(off);
+	if(filesAreEqual(src.c_str(), dstFile.c_str())) {
+		printf("Files are equal: %s => %s\n", src.c_str(), dstFile.c_str());
+		return;
+	}
+
+#ifdef WIN32
+	u2d(src);
+	u2d(dst);
+	runCommand("copy /Y " + src + " " + dst);
+#else
+	runCommand("cp " + string(src) + " " + string(dst));
+#endif
+}
+
 int main() {
 	try {
 		_mkdir("Output");
@@ -55,86 +121,41 @@ int main() {
 		Interface maapi = parseInterface(ixs, "maapi.idl");
 		outputMaapi(ixs, maapi);
 		outputCoreConsts();
-		
-		//todo: combine.
-#ifdef WIN32
+
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
-		_mkdir("..\\..\\runtimes\\java\\shared\\generated");
+		_mkdir("../../runtimes/java/shared/generated");
 
-		//runCommand("copyfiles.bat");
-		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\MAStd");
-		runCommand("copy /Y Output\\maapi.h ..\\..\\libs\\newlib\\libc\\sys\\mosync");
-		runCommand("copy /Y Output\\asm_config.lst " + MOSYNCDIR + "\\bin\\");
+		copy("Output/maapi.h", "../../libs/MAStd/");
+		copy("Output/maapi.h", "../../libs/newlib/libc/sys/mosync/");
+		copy("Output/asm_config.lst", "" + MOSYNCDIR + "/bin/");
 
-		//runCommand("copy /Y Output\\invoke_syscall_java.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\invoke_syscall_java.h ..\\..\\runtimes\\java\\shared\\generated\\");
-		
-		//runCommand("copy /Y Output\\syscall_static_java.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\syscall_static_java.h ..\\..\\runtimes\\java\\shared\\generated\\");
+		copy("Output/invoke_syscall_java.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/syscall_static_java.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/core_consts.h", "../../runtimes/java/Shared/generated/");
+		copy("Output/MAAPI_consts.h", "../../runtimes/java/Shared/generated/");
 
-		//runCommand("copy /Y Output\\core_consts.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\core_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
+		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
+		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
 
-		//runCommand("copy /Y Output\\maapi_consts.h ..\\..\\runtimes\\java\\source\\");
-		runCommand("copy /Y Output\\maapi_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
+		copy("Output/invoke_syscall_cpp.h", "../../runtimes/cpp/core/");
+		copy("Output/invoke_syscall_arm_recompiler.h", "../../runtimes/cpp/core/");
+		copy("Output/asm_config.h", "../../intlibs/helpers/");
 
-		runCommand("copy /Y Output\\cpp_defs.h ..\\..\\intlibs\\helpers\\");
-		runCommand("copy /Y Output\\cpp_maapi.h ..\\..\\intlibs\\helpers\\");
+		copy("Output/mosynclib.def", "../../runtimes/cpp/platforms/sdl/mosynclib/");
 
-		runCommand("copy /Y Output\\invoke_syscall_cpp.h ..\\..\\runtimes\\cpp\\core\\");
-		runCommand("copy /Y Output\\invoke_syscall_arm_recompiler.h ..\\..\\runtimes\\cpp\\core\\");
-		runCommand("copy /Y Output\\asm_config.h ..\\..\\intlibs\\helpers\\");
+		//copy("Output/Syscall.java ../../testPrograms/");
 
-		runCommand("copy /Y Output\\mosynclib.def ..\\..\\runtimes\\cpp\\platforms\\sdl\\mosynclib\\");
-
-		//runCommand("copy /Y Output\\Syscall.java ..\\..\\testPrograms\\");
-
-		runCommand("copy /Y Output\\constSets.h ..\\..\\intlibs\\helpers\\");
+		copy("Output/constSets.h", "../../intlibs/helpers/");
 
 		for(size_t i=0; i<ixs.size(); i++) {
-			//runCommand("copy_extension.bat "+ixs[i]);
-			runCommand("copy /Y Output\\CPP_" + ixs[i] + ".h ..\\..\\intlibs\\helpers\\");
-			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\MAStd\\");
-			runCommand("copy /Y Output\\" + ixs[i] + ".h ..\\..\\libs\\newlib\\libc\\sys\\mosync\\");
-			//runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\source\\");
-			runCommand("copy /Y Output\\" + ixs[i] + "_consts.h ..\\..\\runtimes\\java\\shared\\generated\\");
+			copy("Output/CPP_" + ixs[i] + ".h", "../../intlibs/helpers/");
+			copy("Output/" + ixs[i] + ".h", "../../libs/MAStd/");
+			copy("Output/" + ixs[i] + ".h", "../../libs/newlib/libc/sys/mosync/");
+			copy("Output/" + ixs[i] + "_CONSTS.h", "../../runtimes/java/Shared/generated/");
 		}
-#else
-		_mkdir((MOSYNCDIR + "/include").c_str());
 
-		// create the new generated folder for java files
-		_mkdir("../../runtimes/java/Shared/generated");
-
-		runCommand("cp Output/maapi.h ../../libs/MAStd");
-		runCommand("cp Output/maapi.h ../../libs/newlib/libc/sys/mosync");
-		runCommand("cp Output/asm_config.lst " + MOSYNCDIR + "/bin/");
-
-		runCommand("cp Output/invoke_syscall_java.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/syscall_static_java.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/core_consts.h ../../runtimes/java/Shared/generated/");
-		runCommand("cp Output/MAAPI_consts.h ../../runtimes/java/Shared/generated/");
-
-		runCommand("cp Output/cpp_defs.h ../../intlibs/helpers/");
-		runCommand("cp Output/cpp_maapi.h ../../intlibs/helpers/");
-
-		runCommand("cp Output/invoke_syscall_cpp.h ../../runtimes/cpp/core/");
-		runCommand("cp Output/asm_config.h ../../intlibs/helpers/");
-
-		runCommand("cp Output/mosynclib.def ../../runtimes/cpp/platforms/sdl/mosynclib/");
-
-		//runCommand("cp Output/Syscall.java ../../testPrograms/");
-
-		runCommand("cp Output/constSets.h ../../intlibs/helpers/");
-
-		for(size_t i=0; i<ixs.size(); i++) {
-			runCommand("cp Output/CPP_" + ixs[i] + ".h ../../intlibs/helpers/");
-			runCommand("cp Output/" + ixs[i] + ".h ../../libs/MAStd/");
-			runCommand("cp Output/" + ixs[i] + ".h ../../libs/newlib/libc/sys/mosync/");
-			runCommand("cp Output/" + ixs[i] + "_CONSTS.h ../../runtimes/java/Shared/generated/");
-		}
-#endif
 		return 0;
 	} catch(exception& e) {
 		printf("Exception: %s\n", e.what());

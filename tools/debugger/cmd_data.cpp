@@ -39,6 +39,7 @@ void data_list_register_values(const string& args);
 void data_read_memory(const string& args);
 void data_list_register_names(const string& args);
 void data_list_changed_registers(const string& args);
+void data_disassemble(const string& args);
 
 //called during disassembly of CALL instructions.
 //should return the demangled name of the function that starts at the specified address.
@@ -164,11 +165,11 @@ static void Callback::read_memory() {
 	int next = sRMP.address + sReadMemBuf.size();
 	int rowSize = sRMP.wordSize * sRMP.nCols;
 	oprintDone();
-	oprintf(",addr=\"0x%X\",nr-bytes=\"%i\",total-bytes=\"%i\","
+	oprintf(",addr=\"0x%X\",nr-bytes=\"%"PFZT"\",total-bytes=\"%"PFZT"\","
 		"next-row=\"0x%X\",prev-row=\"0x%X\",next-page=\"0x%X\",prev-page=\"0x%X\","
 		"memory=[",
 		sRMP.address, sReadMemBuf.size(), sReadMemBuf.size(),
-		next, sRMP.address - rowSize, next, sRMP.address - sReadMemBuf.size());
+		next, sRMP.address - rowSize, next, sRMP.address - (int)sReadMemBuf.size());
 	int offset = 0;
 	const byte* ptr = sReadMemBuf.p();
 	for(int row=0; row<sRMP.nRows; row++) {

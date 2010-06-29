@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //Device discovery
 //***************************************************************************
 
-SYSCALL(int) maBtStartDeviceDiscovery(int names) {
+synchronized SYSCALL(int) maBtStartDeviceDiscovery(int names) {
 	DEBUG_BT("maBtStartDeviceDiscovery\n");
 	MYASSERT(!mBtDiscoveryInProgress);
 	mBtQue.removeAllElements();
@@ -41,23 +41,26 @@ SYSCALL(int) maBtStartDeviceDiscovery(int names) {
 	return 0;
 }
 
-SYSCALL(int) maBtGetNewDevice(Address dst) {
+synchronized SYSCALL(int) maBtGetNewDevice(Address dst) {
+	MYASSERT(mBtQue != null);
 	if(mBtQue.size() == mBtNextIndex)
 		return 0;
 
 	BtDevice d = (BtDevice)mBtQue.elementAt(mBtNextIndex++);
+	MYASSERT(d != null);
 	int[] mem_ds = CORE.mMem_ds;
+	MYASSERT(mem_ds != null);
 
 	try {
 		if(mBtNames) {
+			if(d.name == null) {
+				d.name = "";
+			}
 			writeNameToMemory(RINT(dst), RINT(dst + 4), d.name);
 			WINT(dst + 8, d.name.length());
 		}
 		writeBtAddressToMemory(d.address, dst + 12);
-		if(d.name == null)
-			return 1;
-		else
-			return d.name.length();
+		return 1;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		BIG_PHAT_ERROR;
@@ -88,7 +91,7 @@ private final void writeBtAddressToMemory(String bta, Address a) {
 	setMemBytes(a, address);
 }
 
-public final void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
+synchronized public final void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
 	BtDevice d = new BtDevice();
 	d.address = btDevice.getBluetoothAddress();
 	if(mBtNames) {
@@ -108,7 +111,7 @@ public final void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
 	BtPostState(0);
 }
 
-public final void inquiryCompleted(int discType) {
+synchronized public final void inquiryCompleted(int discType) {
 	DEBUG_BT("inquiryCompleted "+discType+"\n");
 	mBtDiscoveryInProgress = false;
 	int state;
@@ -158,7 +161,7 @@ private final int maBtCancelDiscovery() {
 //Service discovery
 //***************************************************************************
 
-SYSCALL(int) maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception {
+synchronized SYSCALL(int) maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception {
 	DEBUG_BT("maBtStartServiceDiscovery\n");
 	MYASSERT(!mBtDiscoveryInProgress);
 	UUID[] uuidSet = { new UUID(MAUUID2String(uuid), false) };
@@ -210,7 +213,7 @@ final String btaddr2String(Address a) {
 	return s;
 }
 
-SYSCALL(int) maBtGetNewService(Address dst) throws Exception {
+synchronized SYSCALL(int) maBtGetNewService(Address dst) throws Exception {
 	if(mBtQue.size() == mBtNextIndex)
 		return 0;
 
@@ -224,7 +227,7 @@ SYSCALL(int) maBtGetNewService(Address dst) throws Exception {
 	}
 	return 1;
 }
-SYSCALL(int) maBtGetNextServiceSize(Address dst) throws Exception {
+synchronized SYSCALL(int) maBtGetNextServiceSize(Address dst) throws Exception {
 	if(mBtQue.size() == mBtNextIndex)
 		return 0;
 
@@ -281,7 +284,7 @@ private final void writeUUIDsToMemory(Address dst, Vector uuids) throws Exceptio
 	}
 }
 
-public final void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
+synchronized public final void servicesDiscovered(int transID, ServiceRecord[] servRecord) {
 	//transID should be the same as the ID returned by searchServices,
 	//but I'm not gonna ASSERT it for now.
 	DEBUG_BT("servicesDiscovered "+transID+"\n");
@@ -385,7 +388,7 @@ private final void handlePDL(BtService s, ServiceRecord sr) {
 	}
 }
 
-public final void serviceSearchCompleted(int transID, int respCode) {
+synchronized public final void serviceSearchCompleted(int transID, int respCode) {
 	DEBUG_BT("serviceSearchCompleted "+transID+" "+respCode+"\n");
 	mBtDiscoveryInProgress = false;
 	mBtId = -1;

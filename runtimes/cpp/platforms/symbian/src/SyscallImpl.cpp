@@ -833,6 +833,12 @@ SYSCALL(void, maGetClipRect(MARect* rect)) {
 	rect->height = clipRect.Height();
 }
 
+#if 0
+static int scanlineLength(CFbsBitmap* fb) {
+	return fb->ScanLineLength(fb->SizeInPixels().iWidth, fb->DisplayMode());
+}
+#endif
+
 SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	const MARect* srcRect, int scanlength))
 {
@@ -857,40 +863,68 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		TSize(aSrcRect->width, aSrcRect->height));
 
 	bool hasAlpha = img->Alpha() != NULL;
+#if 0
+	LOG("maGetImageData(image): %ix%i, alpha %i\n", size.iWidth, size.iHeight, hasAlpha);
+	if(hasAlpha) {
+		TSize as(img->Alpha()->SizeInPixels());
+		LOG("alpha size: %ix%i\n", as.iWidth, as.iHeight);
+		LOG("pitch. color: %i, alpha: %i\n", scanlineLength(img->Color()), scanlineLength(img->Alpha()));
+	}
+#endif
 	TBitmapUtil clr(img->Color());
 	clr.Begin(TPoint(0,0));	//begin point is irrelevant, since we do SetPos.
 
 	//set to color if no alpha, to avoid potential crash on NULL.
 	TBitmapUtil alpha(hasAlpha ? img->Alpha() : img->Color());
-	if(hasAlpha)
-		alpha.Begin(TPoint(0,0));
+	if(hasAlpha) {
+		alpha.Begin(TPoint(0,0), clr);
+	}
 
 	//iterate through the source, combining and copying pixels
 	int dY = 0;
 	for(int sY=lSrcRect.iTl.iY; sY<lSrcRect.iBr.iY; sY++) {
 		int dX = 0;
 		clr.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+
+		// bugged on 5th edition when image width isn't pitch-aligned.
+#ifndef __S60_50__
 		if(hasAlpha)
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+#endif
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
-			//will work properly only on 32-bit 3rd edition devices.
 			TUint32 pixel = clr.GetPixel();
+#if !(defined(__SERIES60_3X__) || defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT))
+			// 2nd edition, format 565
+			// convert to 888.
+			TUint32 blue = pixel & 0x001F;
+			blue |= (blue & 0x1C) << 3;
+			TUint32 green = (pixel & 0x07E0) >> 5;
+			green |= (green & 0x30) << 2;
+			TUint32 red = (pixel & 0xF800) >> 11;
+			red |= (red & 0x1C) << 3;
+			pixel = blue | (green << 8) | (red << 16);
+#endif
+			//LOG("Color(%ix%i): 0x%x\n", sX, sY, pixel);
 			clr.IncXPos();
 			if(hasAlpha) {
+				// clr.GetPixel() may have the alpha-bits set. Indeed, they are undefined.
+				pixel &= ~0xFF000000;
+
 				pixel |= alpha.GetPixel() << 24;
+				//LOG("Alpha: 0x%x\n", alpha.GetPixel());
 				alpha.IncXPos();
 			} else {
 				pixel |= 0xFF000000;
 			}
 			dstInt[dY*scanlength + dX] = pixel;
 			dX++;
-		}
+		}	//for x
 		dY++;
-	}
+	}	//for y
 
-	clr.End();
 	if(hasAlpha)
-		alpha.End();	
+		alpha.End();
+	clr.End();
 }
 
 SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
@@ -1595,13 +1629,125 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 //------------------------------------------------------------------------------
 // maGetSystemProperty
 //------------------------------------------------------------------------------
+static const TDesC& getIso639() {
+	// find current UI language
+	TLanguage tl = User::Language();
 
-#ifdef TELEPHONY
+#define LANGUAGES(m)\
+	m(ELangEnglish, en)\
+	m(ELangFrench, fr)\
+	m(ELangGerman, de)\
+	m(ELangSpanish, es)\
+	m(ELangItalian, it)\
+	m(ELangSwedish, sv)\
+	m(ELangDanish, da)\
+	m(ELangNorwegian, no)\
+	m(ELangFinnish, fi)\
+	m(ELangAmerican, en)\
+	m(ELangSwissFrench, fr)\
+	m(ELangSwissGerman, de)\
+	m(ELangPortuguese, pt)\
+	m(ELangTurkish, tr)\
+	m(ELangIcelandic, is)\
+	m(ELangRussian, ru)\
+	m(ELangHungarian, hu)\
+	m(ELangDutch, nl)\
+	m(ELangBelgianFlemish, nl)\
+	m(ELangAustralian, en)\
+	m(ELangBelgianFrench, fr)\
+	m(ELangAustrian, de)\
+	m(ELangNewZealand, en)\
+	m(ELangInternationalFrench, fr)\
+	m(ELangCzech, cs)\
+	m(ELangSlovak, sk)\
+	m(ELangPolish, pl)\
+	m(ELangSlovenian, sl)\
+	m(ELangTaiwanChinese, zh)\
+	m(ELangHongKongChinese, zh)\
+	m(ELangPrcChinese, zh)\
+	m(ELangJapanese, ja)\
+	m(ELangThai, th)\
+	m(ELangAfrikaans, af)\
+	m(ELangAlbanian, sq)\
+	m(ELangAmharic, am)\
+	m(ELangArabic, ar)\
+	m(ELangArmenian, hy)\
+	m(ELangTagalog, tl)\
+	m(ELangBelarussian, be)\
+	m(ELangBengali, bn)\
+	m(ELangBulgarian, bg)\
+	m(ELangBurmese, my)\
+	m(ELangCatalan, ca)\
+	m(ELangCroatian, hr)\
+	m(ELangCanadianEnglish, en)\
+	m(ELangInternationalEnglish, en)\
+	m(ELangSouthAfricanEnglish, en)\
+	m(ELangEstonian, et)\
+	m(ELangFarsi, fa)\
+	m(ELangCanadianFrench, fr)\
+	m(ELangScotsGaelic, gd)\
+	m(ELangGeorgian, ka)\
+	m(ELangGreek, el)\
+	m(ELangCyprusGreek, el)\
+	m(ELangGujarati, gu)\
+	m(ELangHebrew, he)\
+	m(ELangHindi, hi)\
+	m(ELangIndonesian, id)\
+	m(ELangIrish, ga)\
+	m(ELangSwissItalian, )\
+	m(ELangKannada, kn)\
+	m(ELangKazakh, kk)\
+	m(ELangKhmer, km)\
+	m(ELangKorean, ko)\
+	m(ELangLao, lo)\
+	m(ELangLatvian, lv)\
+	m(ELangLithuanian, lt)\
+	m(ELangMacedonian, mk)\
+	m(ELangMalay, ms)\
+	m(ELangMalayalam, ml)\
+	m(ELangMarathi, mr)\
+	m(ELangMoldavian, ro)\
+	m(ELangMongolian, mn)\
+	m(ELangNorwegianNynorsk, no)\
+	m(ELangBrazilianPortuguese, pt)\
+	m(ELangPunjabi, pa)\
+	m(ELangRomanian, ro)\
+	m(ELangSerbian, sr)\
+	m(ELangSinhalese, si)\
+	m(ELangSomali, so)\
+	m(ELangInternationalSpanish, es)\
+	m(ELangLatinAmericanSpanish, es)\
+	m(ELangSwahili, sw)\
+	m(ELangFinlandSwedish, sv)\
+	m(ELangTamil, ta)\
+	m(ELangTelugu, te)\
+	m(ELangTibetan, bo)\
+	m(ELangTigrinya, ti)\
+	m(ELangCyprusTurkish, tr)\
+	m(ELangTurkmen, tk)\
+	m(ELangUkrainian, uk)\
+	m(ELangUrdu, ur)\
+	m(ELangVietnamese, vi)\
+	m(ELangWelsh, cy)\
+	m(ELangZulu, zu)\
+
+	
+#define CASE_LANGUAGE(id, iso) case id: { _LIT(KTemp, #iso); return KTemp(); }
+	switch(tl) {
+		//case ELangEnglish: { _LIT(KTemp, "en"); return KTemp(); }
+		LANGUAGES(CASE_LANGUAGE)
+		default:
+			return KNullDesC;
+	}
+}
+
 int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	TPtrC8 keyC8(CBP key);
+	TPtrC16 value;
+	_LIT8(KISO639, "mosync.iso-639-1");
+#ifdef TELEPHONY
 	_LIT8(KIMEI, "mosync.imei");
 	_LIT8(KIMSI, "mosync.imsi");
-	TPtrC16 value;
 	if(keyC8.Compare(KIMEI) == 0) {
 		// fetch imei from telephony server
 		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
@@ -1626,6 +1772,10 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 		if(result < 0)
 			return -3;
 		value.Set(sid.iSubscriberId);
+	} else
+#endif	//TELEPHONY
+	if(keyC8.Compare(KISO639) == 0) {
+		value.Set(getIso639());
 	}
 	int len = value.Length();
 	if(len == 0)
@@ -1638,7 +1788,7 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	buf[len] = 0;
 	return len + 1;
 }
-#endif
+
 
 //------------------------------------------------------------------------------
 // FileList
@@ -1943,6 +2093,7 @@ int Syscall::maCameraStop() {
 
 int Syscall::maCameraSnapshot(int formatIndex, MAHandle placeholder) {
 	LOG("maCameraSnapshot(%i, 0x%x)\n", formatIndex, placeholder);
+	MYASSERT(gCameraState == CS_POWERED, ERR_CAMERA_UNPOWERED);
 	LTRAP(gCamera->PrepareImageCaptureL(gCameraFormat, formatIndex));
 	gCameraPlaceholder = placeholder;
 	CLocalSynchronizer sync;
@@ -2176,6 +2327,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 
 	LOGA("%i impls\n", ciia.Count());
 	if(ciia.Count() == 0) {
+		CleanupStack::Pop();	//ciia
 		return -1;
 	}
 

@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define SYSCALL_DEBUGGING_MODE
 
 #include <config_platform.h>
+#include <Platform.h>
 #include <helpers/helpers.h>
 
 #include <base/FileStream.h>
@@ -388,7 +389,7 @@ public:
 					}
 					fprintf(file, " c=\"%i\" t=\"%f\" lt=\"%f\" ch=\"%i\" cht=\"%f\">\n", mCount,
 						mRunTime.toMilliSeconds(), (mRunTime - childrenTime).toMilliSeconds(),
-						mChildren.size(), childrenTime.toMilliSeconds());
+						(int)mChildren.size(), childrenTime.toMilliSeconds());
 					for(size_t i=0; i<mChildren.size(); i++) {
 						ProfNode* n = mChildren[i];
 						dLev++;
@@ -563,16 +564,34 @@ public:
 	//				 Init MA
 	//****************************************
 #ifndef MOBILEAUTHOR
+
+#ifndef _android
 	bool LoadVMApp(const char* modfile, const char* resfile) {
 		InitVM();
+
 		FileStream mod(modfile);
 		if(!LoadVM(mod))
 			return false;
-#ifndef _android
+			
 		FileStream res(resfile);
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
-#endif //_android
+#else
+	bool LoadVMApp(FILE* modfile, FILE* resfile) {
+		InitVM();
+
+		FileStream mod(modfile);
+
+		if(!LoadVM(mod))
+			return false;
+
+		FileStream res(resfile);
+
+		if(!mSyscall.loadResources(res, "resources"))
+			return false;
+
+#endif
+
 
 #ifdef FAKE_CALL_STACK
 		profTree.init(Head.EntryPoint);
@@ -597,7 +616,7 @@ public:
 		InitVM();
 		if(!LoadVM(stream))
 			return false;
-#if !defined(MOBILEAUTHOR) && !defined(_android)
+#if !defined(MOBILEAUTHOR)
 		if(!mSyscall.loadResources(stream, combfile))
 			return false;
 #endif
@@ -646,10 +665,9 @@ public:
 	int LoadVM(Stream& file) {
 	
 		LOG("LoadVM\n");
-	
+
 		TEST(file.isOpen());
 		TEST(file.readObject(Head));	// Load header
-
 		if(Head.Magic != 0x5844414d) {	//MADX, big-endian
 			LOG("Magic error: 0x%08x should be 0x5844414d\n", Head.Magic);
 			FAIL;
@@ -712,11 +730,21 @@ public:
 		DUMPHEX(Head.DataSize);
 		if(Head.DataLen > 0) {
 			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
+			
+#ifdef _android
+			jclass cls = mJniEnv->GetObjectClass(mJThis);
+			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(I)Ljava/nio/ByteBuffer;");
+			if (methodID == 0) return -1;
+			jobject jo = mJniEnv->CallObjectMethod(mJThis, methodID, (DATA_SEGMENT_SIZE));
+			mem_ds = (int*)mJniEnv->GetDirectBufferAddress(jo);
+			mJniEnv->DeleteLocalRef(cls);
+#else
 			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
+#endif		
+
 			if(!mem_ds) BIG_PHAT_ERROR(ERR_OOM);
 			TEST(file.read(mem_ds, Head.DataLen));
 			ZEROMEM((byte*)mem_ds + Head.DataLen, DATA_SEGMENT_SIZE - Head.DataLen);
-
 #ifdef MEMORY_PROTECTION
 			protectionSet = new byte[(DATA_SEGMENT_SIZE+7)>>3];
 			ZEROMEM(protectionSet, (DATA_SEGMENT_SIZE+7)>>3);
@@ -748,7 +776,11 @@ public:
 		
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
+#ifndef _android
 		recompiler.init(this, &VM_Yield);
+#else
+		recompiler.init(this, &VM_Yield, mJniEnv, mJThis);
+#endif
 #endif
 
 		return 1; //good load
@@ -1071,7 +1103,7 @@ void WRITE_REG(int reg, int value) {
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
 
-	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%S\")", str); }
+	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%s\")", str); }
 	wchar* _SYSCALL_CONVERT_MAWString(int str) {
 		_debug_hex(str);
 		ValidateMemWStringAddress(str);
@@ -1188,6 +1220,7 @@ void WRITE_REG(int reg, int value) {
 	//****************************************
 
 	void ISC2(int syscall_id) {
+
 		switch(syscall_id) {
 #ifdef MOBILEAUTHOR
 #include <Deimos/DeimosInvokeSyscall.h>
@@ -1362,7 +1395,9 @@ void WRITE_REG(int reg, int value) {
 		}
 		delete instruction_count;
 #endif
+
 	}
+	
 private:
 	Syscall& mSyscall;
 };
@@ -1394,7 +1429,6 @@ void DeleteCore(VMCore* core) {
 	delete CORE;
 }
 
-
 void VMCore::invokeSysCall(int id) {
 	((VMCoreInt*)this)->InvokeSysCall(id);
 }
@@ -1406,9 +1440,15 @@ void VMCore::logStateChange(int ip) {
 #endif
 
 #ifndef MOBILEAUTHOR
+#ifndef _android
 bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
+#else
+bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile) {
+	return CORE->LoadVMApp(modfile, resfile);
+}
+#endif
 #endif
 
 bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile) {

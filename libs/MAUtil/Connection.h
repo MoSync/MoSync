@@ -42,7 +42,7 @@ public:
 	/**
 	* Called when a connect operation finishes.
 	* \param conn The Connection that ran the operation.
-	* \param result The result of the operation. \> 0 on success,
+	* \param result \> 0 on success,
 	* or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
 	*/
 	virtual void ATTRIBUTE(noreturn, connectFinished(Connection* conn, int result));
@@ -57,11 +57,17 @@ public:
 
 	/**
 	* Called when a write operation finishes.
+	* \param conn The Connection that ran the operation.
+	* \param result \> 0 on success,
+	* or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
 	*/
 	virtual void ATTRIBUTE(noreturn, connWriteFinished(Connection* conn, int result));
 
 	/**
 	* Called when a read operation finishes.
+	* \param conn The Connection that ran the operation.
+	* \param result \> 0 on success,
+	* or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
 	*/
 	virtual void ATTRIBUTE(noreturn, connReadFinished(Connection* conn, int result));
 };

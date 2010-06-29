@@ -235,7 +235,7 @@ void TcpConnection::close() {
 		}
 		res = closesocket(mSock);
 		if(SOCKET_ERROR == res) {
-			LOG("TcpConnection::shutdown failed: %i\n", SOCKET_ERRNO);
+			LOG("TcpConnection::closesocket failed: %i\n", SOCKET_ERRNO);
 		}
 		mSock = INVALID_SOCKET;
 	}

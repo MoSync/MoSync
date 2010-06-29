@@ -37,7 +37,7 @@ class ExpressionTree;
 
 namespace ExpressionCommon {
 	void loadMemory(int addr, int len);
-	void error(const char *msg);
+	void error(const char *msg) GCCATTRIB(noreturn);
 };
 
 namespace ExpressionParser {
@@ -61,9 +61,9 @@ public:
 	const char *getExpression();
 
 private:
-	std::map<std::string, SYM> mSymbols;
-	std::string mExpression;
 	ExpressionTreeNode* mRoot;
+	std::string mExpression;
+	std::map<std::string, SYM> mSymbols;
 };
 
 // err!=NULL on error, describing the error.

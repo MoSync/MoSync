@@ -1,0 +1,17 @@
+#!/bin/sh
+WINE=$(which wine)
+
+#
+# Check for the standard wine OS X binary distribution
+#
+if [ -e '/Applications/Wine.app/Contents/MacOS/startwine' ]; then
+	WINE='/Applications/Wine.app/Contents/MacOS/startwine'
+fi
+
+# Error
+if [ "$WINE" = "" ]; then
+	echo "Could not locate wine!"
+	exit 1
+fi
+
+$WINE $* 2>/dev/null

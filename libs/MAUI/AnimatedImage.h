@@ -38,6 +38,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
+/** 
+* \brief Animated image widget with stepping, speed and direction control
+*/
+
 	class AnimatedImage : public Widget, public MAUtil::TimerListener {
 	public:
 		AnimatedImage(int x, int y, int width, int height, Widget *parent=NULL);

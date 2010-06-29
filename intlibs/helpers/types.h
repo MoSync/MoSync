@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef _INTLIBS_TYPES_H_
+#define _INTLIBS_TYPES_H_
+
 typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
-
-typedef long long s64;
 
 typedef unsigned long long u64;
 typedef unsigned int u32;
@@ -32,14 +33,17 @@ typedef signed short s16;
 typedef signed char s8;
 
 #ifdef _MSC_VER
-#define PFZT "Iu"
+# define PFZT "Iu"
+#elif defined(SYMBIAN)
+# define PFZT "u"
 #elif defined(__GNUC__)
-#if (__GNUC__ == 4) && defined(WIN32)
-#define PFZT "u"
+# if (__GNUC__ == 4) && defined(WIN32)
+#  define PFZT "u"
+# else
+#  define PFZT "zu"
+# endif	//WIN32
 #else
-#define PFZT "zu"
-#endif	//WIN32
-#else	//SYMBIAN
-#define PFZT "u"
-//#error Unsupported compiler!
-#endif	//__GNUC__
+# error Unsupported compiler!
+#endif
+
+#endif // _INTLIBS_TYPES_H_

@@ -93,6 +93,7 @@ void Gfx_line(int x1, int y1, int x2, int y2);
 /** Draws a line with the current color from x1,  y1 to x2, y2 with respect to the current transform **/
 void Gfx_fillRect(int left, int top, int width, int height);
 void Gfx_drawText(int left, int top, const char* text);
+void Gfx_drawTextW(int left, int top, const wchar_t* text);
 void Gfx_drawImage(MAHandle image, int left, int top);
 void Gfx_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);

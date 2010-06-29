@@ -5,5 +5,4 @@ PRJ_EXPORTS
 
 PRJ_MMPFILES
 
-
-MoSync.mmp
+MoSync.mmp BUILD_AS_ARM

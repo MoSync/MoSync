@@ -35,87 +35,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 namespace Callback {
-	static void see();
-	static void seeSymbol(const SYM& sym);
-	static void seeAddressOf(const SYM& sym);
-	static void seeDeref(const SYM& sym);
-	static void seeSizeof(const SYM& sym);
 	static void seeReadMem();
 }
 
-//static int sFrameAddr;
 static string sExpr;
-static EECallback sEECallback;
 static SeeCallback sSeeCallback;
 static SYM sSeeSym;
-static char* sPtr;
-static int sPos;
 static const int BUFSIZE=1024;
-static bool sComplex;
-
 static SYM::Scope sScope;
 
-//******************************************************************************
-// stackEvaluateExpression
-//******************************************************************************
-
-/*
-void stackEvaluateExpression(const std::string& expr, int frameAddr,
-	EECallback cb, bool complex)
-{
-	if(frameAddr >= 0) {
-		//todo: search the stack for a matching frame.
-		// if no matching frame is found, the address can be considered faulty.
-		error("Don't know how to handle specific frame address");
-		return;
-	}
-	CHECK_STABS;
-	sExpr = expr;
-	sEECallback = cb;
-	sComplex = complex;
-	loadStack(Callback::see);
-}
-*/
-
-void Callback::see() {
-	SeeCallback cb;
-
-	//custom hack-filtering
-	if(sExpr == "*((this)+0)@1") {
-		sExpr = "*this";
-	}
-
-	if(sExpr[0] == '&') {	//address of
-		cb = Callback::seeAddressOf;
-		sExpr.erase(0, 1);
-	} else if(sExpr[0] == '*') {	//dereference
-		cb = Callback::seeDeref;
-		sExpr.erase(0, 1);
-	} else if(sExpr[0] == '$') {	//named register
-		int ri;
-		if(!parseArgRegName(sExpr.substr(1), &ri))
-			return;
-		char buf[32];
-		ASSERT_REG;
-		sprintf(buf, "%i", r.gpr[ri]);
-		sEECallback("int", buf, true);
-		return;
-	} else if(beginsWith(sExpr, "sizeof(")) {	//sizeof
-		size_t end = sExpr.find(')', 7);
-		if(end == string::npos) {
-			error("Syntax error");
-			return;
-		}
-		sExpr = sExpr.substr(7, end - 7);
-		cb = Callback::seeSizeof;
-	} else if(iscsym(sExpr[0])) {	//symbol
-		cb = Callback::seeSymbol;
-	} else {
-		error("Cannot evaluate symbol '%s'", sExpr.c_str());
-		return;
-	}
-	locate_symbol(sExpr, cb);
-}
 
 static void handle_local(const LocalVariable* lv, const FRAME& frame, SeeCallback cb) {
 	SYM sym;
@@ -180,10 +108,10 @@ static bool handle_params(const Function* f, const vector<LocalVariable*>& param
 	return false;
 }
 
-void dummy(const SYM& sym) {
+static void dummy(const SYM& sym) {
 }
 
-bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Function* f, SeeCallback cb) {
+static bool handleLocalsAndArguments(const string& name, const FRAME& frame, const Function* f, SeeCallback cb) {
 	if(!f) {
 		error("No debugging information for current function");
 		return false;
@@ -265,60 +193,4 @@ void locate_symbol(const string& name, SeeCallback cb) {
 
 static void Callback::seeReadMem() {
 	sSeeCallback(sSeeSym);
-}
-
-static int seePrintf(const char* fmt, ...) {
-	if(sPos >= BUFSIZE)
-		return -1;
-	va_list argptr;
-	va_start(argptr, fmt);
-	int left = BUFSIZE - sPos;
-	int len = vsnprintf(sPtr + sPos, left, fmt, argptr);
-	if(len >= left) {
-		sPos = BUFSIZE;
-		error("Buffer overrun");
-		return -1;
-	}
-	sPos += len;
-	return len;
-}
-
-static void Callback::seeSymbol(const SYM& sym) {
-	StringPrintFunctor type, value;
-	sym.type->printTypeMI(type, sComplex);	
-	sym.type->printMI(value, sym.address, TypeBase::eNatural);
-	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue());
-}
-
-static void Callback::seeAddressOf(const SYM& sym) {
-	StringPrintFunctor type, value;
-	value("0x%x", (unsigned int)sym.address - (unsigned int)gMemBuf);
-	sym.type->printTypeMI(type, sComplex);
-	type("%s", "*");
-	sEECallback(type.getString(), value.getString(), sym.type->isSimpleValue());
-}
-
-static void Callback::seeDeref(const SYM& sym) {
-	const TypeBase* target = sym.type->deref();
-	if(target == NULL) {
-		error("Symbol '%s' is not a pointer", sExpr.c_str());
-		return;
-	}
-	sSeeCallback = seeSymbol;
-	sSeeSym.type = target;
-	//int address = (char*)sym.address - gMemBuf;
-	int address = *(int*)sym.address;
-	sSeeSym.address = gMemBuf + address;
-	if(sSeeSym.type->size() <= 0) {
-		error("Symbol '%s' has no size", sExpr.c_str());
-		return;
-	}
-	StubConnection::readMemory(gMemBuf + address, address, sSeeSym.type->size(),
-		Callback::seeReadMem);
-}
-
-static void Callback::seeSizeof(const SYM& sym) {
-	char valBuf[BUFSIZE];
-	sprintf(valBuf, "%i", sym.type->size());
-	sEECallback("size_t", valBuf, true);
 }

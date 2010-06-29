@@ -32,5 +32,6 @@ int MATestMain ( void )
 	TestManager::getInstance( )->addTestListener( new DefaultListener( ) );
 	TestManager::getInstance( )->run( );
 
+	maWait( 0 );
 	return 0;
 }

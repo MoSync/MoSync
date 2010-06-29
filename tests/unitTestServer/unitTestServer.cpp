@@ -18,13 +18,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //listen. use a thread pool.
 
 #include <stdio.h>
-#include <conio.h>
-#include <winsock2.h>
 #include <vector>
 #include <ThreadPool.h>
 #include <FileStream.h>
 #include <bluetooth/server.h>
-#include "..\unitTest\conn_common.h"
+#include "../unitTest/conn_common.h"
+
+#ifdef WIN32
+#include <conio.h>
+#include <winsock2.h>
+typedef int socklen_t;
+#else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <errno.h>
+typedef int SOCKET;
+typedef sockaddr SOCKADDR;
+#define closesocket close
+//#define IPPROTO_TCP 0
+#define INVALID_SOCKET (-1)
+#define SOCKET_ERROR (-1)
+static int WSAGetLastError(void) {
+	return errno;
+}
+#endif
 
 ThreadPool gThreadPool;
 char gServerData[DATA_SIZE];
@@ -35,10 +53,11 @@ void socketSizeSpinOff(SOCKET sock);
 
 #define TB(func) if(!(func)) { printf("%s failed\n", #func); return false; }
 
-void MoSyncErrorExit(int) {
+void MoSyncErrorExit(int code) {
+	exit(code);
 }
 
-bool loadData() {
+static bool loadData() {
 	int len;
 
 	Base::FileStream c("../unitTest/client_data.bin");
@@ -63,6 +82,7 @@ public:
 
 	static void closeAll() {
 		for(size_t i=0; i<mSockets.size(); i++) {
+			printf("closing socket %i\n", mSockets[i]);
 			closesocket(mSockets[i]);
 		}
 	}
@@ -99,7 +119,7 @@ public:
 		printf("Waiting...\n");
 		while(true) {
 			sockaddr_in remoteAddr;
-			int addrLen = sizeof(remoteAddr);
+			socklen_t addrLen = sizeof(remoteAddr);
 			SOCKET aSock = accept(servSock, (SOCKADDR*)&remoteAddr, &addrLen);
 			if(aSock == INVALID_SOCKET) {
 				printf("accept error %i.\n", WSAGetLastError());
@@ -108,7 +128,7 @@ public:
 			}
 			printf("Connection accepted from %s:%i\n",
 				inet_ntoa(remoteAddr.sin_addr), remoteAddr.sin_port);
-			mSpinOff(servSock);
+			mSpinOff(aSock);
 		}
 	}
 };
@@ -126,9 +146,11 @@ public:
 		if(res != 1) {
 			printf("send error %i (WSA %i)\n", res, WSAGetLastError());
 		}
+		printf("reply sent.\n");
 		if(closesocket(mSock) == SOCKET_ERROR) {
 			printf("closesocket error %i\n", WSAGetLastError());
 		}
+		printf("socket closed.\n");
 	}
 };
 
@@ -144,6 +166,7 @@ public:
 		if(res != mSize) {
 			printf("send error %i (WSA %i)\n", res, WSAGetLastError());
 		}
+		printf("data sent.\n");
 	}
 };
 
@@ -168,8 +191,10 @@ public:
 				return;
 			}
 		}
+		printf("data received.\n");
 
 		bool success = memcmp(mReadBuffer, gClientData, DATA_SIZE) == 0;
+		printf("compare: %s\n", success ? "success" : "failure");
 		gThreadPool.execute(new WriteReply(mSock, success ? 1 : 0));
 	}
 };
@@ -183,8 +208,9 @@ void socketSizeSpinOff(SOCKET sock) {
 	//gThreadPool.execute(new SockSizeWrite(sock, gServerData, DATA_SIZE));
 }
 
+static void ATTRIBUTE(noreturn, closeProgram(int sn));
 
-void closeProgram(int sn) {
+static void closeProgram(int sn) {
 	printf("Signal %i\n", sn);
 	Acceptor::closeAll();
 	gThreadPool.close();
@@ -205,11 +231,13 @@ int main() {
 	//gThreadPool.execute(new Acceptor(SOCKET_SIZE_PORT, socketSizeSpinOff));
 
 	while(true) {
-		int ch = _getch();
+		int ch = getchar();
 		printf("ch %i\n", ch);
 		if(ch == '0' || ch == 3) {
 			closeProgram(0);
 		}
+		if(ch < 0)
+			closeProgram(ch);
 	}
 	return 0;
 }

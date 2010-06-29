@@ -229,7 +229,7 @@ int openAudio()
 	res = SDL_OpenAudio(desired, obtained);
 	if (res < 0)
 	{
-		LOG(SDL_GetError());
+		LOG("%s\n", SDL_GetError());
 		//BIG_PHAT_ERROR(SDLERR_SOUND_LOAD_FAILED);
 		return res;
 	}

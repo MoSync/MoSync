@@ -37,8 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Flickr services.
 // They will need modification to operate properly with other SOAP servers.
 
-#define SOAPNS_BODY "s"
-#define SOAPNS "s"
+#define SOAPNS_BODY "soap"
+#define SOAPNS "soap"
 #define SOAP_CONTENT_TYPE "text/xml; charset=utf-8"
 
 static const char sSoapHeader[] =

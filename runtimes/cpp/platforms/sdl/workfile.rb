@@ -16,9 +16,8 @@ work.instance_eval do
 		@EXTRA_INCLUDES = common_includes
 		@LIBRARIES = common_libraries
 	elsif(HOST == :linux)
-
+		
 		@IGNORED_FILES << "strptime.c"
-		@EXTRA_CPPFLAGS = ""
 		if (!SDL_SOUND)
 			@EXTRA_CPPFLAGS += " -D__NO_SDL_SOUND__"
 			@IGNORED_FILES += ["SDLSoundAudioSource.cpp"]
@@ -29,12 +28,18 @@ work.instance_eval do
 		if(NATIVE_RUNTIME == "true")
 			@IGNORED_FILES += ["PIMImpl.cpp", "pim.cpp"]
 		end
-		
 		@EXTRA_INCLUDES = common_includes + ["/usr/include/gtk-2.0",
 			"/usr/include/glib-2.0", "/usr/include/pango-1.0",
 			"/usr/include/cairo", "/usr/include/atk-1.0",
 			"/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include"]
 		@LIBRARIES = common_libraries
+		
+	elsif(HOST == :darwin)
+		@IGNORED_FILES << "strptime.c"
+		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
+		@LIBRARIES = common_libraries +["objc"]
+		@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal -Wno-unreachable-code -D_ANSI_SOURCE",
+			"Syscall.cpp" => " -Wno-float-equal"}
 	else
 		error "Unsupported platform"
 	end

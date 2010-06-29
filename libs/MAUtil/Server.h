@@ -1,3 +1,20 @@
+/* Copyright (C) 2010 MoSync AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 /** \file Server.h
 * \brief Encapsulates MoSync's server connections
 * \author Fredrik Eldh
@@ -33,12 +50,15 @@ public:
 
 /**
 * \brief Encapsulates MoSync's server connections.
-* Use this class to listen for incoming Connections.
+* Use this class to listen for incoming connections.
 */
 class Server : protected ConnListener {
 public:
 	Server(ServerListener* listener) : mListener(listener), mServ(0) {}
 
+	/**
+	* Closes the server.
+	*/
 	virtual ~Server();
 
 	/**
@@ -52,6 +72,7 @@ public:
 
 	/**
 	* Retrieves the local address of this server.
+	* \param dst A pointer to the struct that will receive the address.
 	* \returns \> 0 on success, \< 0 on error.
 	*/
 	int getAddr(MAConnAddr* dst);

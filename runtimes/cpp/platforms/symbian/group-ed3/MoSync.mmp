@@ -5,6 +5,8 @@ VENDORID 0
 CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices	//none
 EPOCSTACKSIZE 0x10000
 
+MACRO SYMBIAN=1
+
 START RESOURCE ..\data\MoSync_3rd.rss
 HEADER
 TARGETPATH resource\apps

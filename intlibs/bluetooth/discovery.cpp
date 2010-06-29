@@ -270,7 +270,7 @@ static void doSearch2() {
 
 		std::vector<BtService> services;
 		res = handleSdpResponse(&services, pQs);
-		if(res < 0)	{
+		if(res < 0) {
 			{
 				CriticalSectionHandler csh(&gBt.critSec);
 				setDiscoveryState(res);
@@ -352,7 +352,7 @@ static void doDiscovery2() {
 		DEBUG_ASSERT(pQs->dwNumberOfCsAddrs == 1);
 		//some results have empty names
 		//bHaveName = pwsaResults->lpszServiceInstanceName && *(pwsaResults->lpszServiceInstanceName);
-		if((pQs->lpszServiceInstanceName) == 0) {
+		if(pQs->lpszServiceInstanceName == NULL) {
 #ifdef _WIN32_WCE 
 			pQs->lpszServiceInstanceName = (LPWSTR)TEXT("");
 #else
@@ -600,6 +600,10 @@ int Bluetooth::maBtGetNewService(MABtService* dst) {
 }
 
 int Bluetooth::maBtGetNextServiceSize(MABtServiceSize* dst) {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
+}
+
+int Bluetooth::maBtCancelDiscovery(void) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 

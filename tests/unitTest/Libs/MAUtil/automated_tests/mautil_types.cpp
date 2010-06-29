@@ -467,8 +467,13 @@ public:
 		assert("Map::find()", itr == m.end());
 
 		//erase
-		m.erase("Benjamin");
+		bool e = m.erase("Benjamin");
+		assert("Map::erase()", e);
 		itr = m.find("Benjamin");
+		assert("Map::erase()", itr == m.end());
+		itr = m.find("Abraham");
+		m.erase(itr);
+		itr = m.find("Abraham");
 		assert("Map::erase()", itr == m.end());
 
 		//clear

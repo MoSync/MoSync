@@ -47,7 +47,6 @@ class CSISWriter
 		void AddLocalizedVendorNode(LANGSTRINGNODE *pLSNode);
 		void AddVendorNode(LANGSTRINGNODE *pLSNode);
 		void AddLogo(LOGO *pLSNode);
-		void SetSelfsign(BOOL selfsign);
 
 		void SetCmdPassword(LPCWSTR pszCmdPassword);
 		void SetObserver(const MParserObserver *pObserver) { m_pObserver = pObserver; }
@@ -79,7 +78,6 @@ class CSISWriter
 
 		void SetTimestamp(DWORD dwYear, DWORD dwMonth, DWORD dwDay, DWORD dwHours, DWORD dwMinutes, DWORD dwSeconds);
 		BOOL GetTimestamp(DWORD* dwYear, DWORD* dwMonth, DWORD* dwDay, DWORD* dwHours, DWORD* dwMinutes, DWORD* dwSeconds) const;
-		BOOL GetSelfsign() const { return m_bSelfsign; }
 
 	private:
 		void ReleaseCondExpr(PKGLINECONDITION* expr);				// Destroy condition expr
@@ -109,7 +107,6 @@ class CSISWriter
 
 		BOOL m_bSetTimestamp;
 		DWORD m_dwYear, m_dwMonth, m_dwDay, m_dwHours, m_dwMinutes, m_dwSeconds;
-		BOOL m_bSelfsign;
 		
 		const MParserObserver *m_pObserver;	 // Observer object
 	};

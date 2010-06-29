@@ -66,7 +66,7 @@ namespace MAUtil {
 	/** Splits \a str into multiple strings, breaking at the occurrence of any character in \a delim.
 	* \a output is cleared, then the resulting strings are added to it. **/
 	void stringBreak(const char* str, const char* delim, MAUtil::Vector<String>& output);
-	void stringBreak(const wchar* str, const wchar* delim, MAUtil::Vector<WString>& output);
+	void stringBreak(const wchar_t* str, const wchar_t* delim, MAUtil::Vector<WString>& output);
 
 	/// @cond DUMMY
 	int dummy(int);

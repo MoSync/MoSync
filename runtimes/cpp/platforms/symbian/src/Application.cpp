@@ -69,7 +69,7 @@ EXPORT_C CApaApplication* NewApplication() {
 
 #include <eikstart.h>
 GLDEF_C TInt E32Main() {
-#if 0	//must have heapsize in MMP file.
+#if 1
 	RHeap* oldHeap = User::SwitchHeap(UserHeap::ChunkHeap(0, 0x300000, HEAP_SIZE));
 	oldHeap->Close();
 #endif

@@ -27,5 +27,6 @@
 <property key="symbian.uids:uid.s60v3uid" value="0xEC4F7D3B"/>
 <property key="Wall" value="true"/>
 <property key="Werror" value="true"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

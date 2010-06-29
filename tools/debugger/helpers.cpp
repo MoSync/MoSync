@@ -16,6 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "config.h"
 #undef LOGGING_ENABLED
@@ -128,7 +130,7 @@ bool parseArgRegName(const std::string& src, int* dst) {
 		int i;
 		int len;
 		int res = sscanf(src.c_str() + 1, "%i%n", &i, &len);
-		if(res == 1 && len+1 == src.length()) {
+		if(res == 1 && len+1 == (int)src.length()) {
 			*dst = 32 + i;
 			return true;
 		}

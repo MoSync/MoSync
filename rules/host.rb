@@ -46,10 +46,7 @@ elsif(UNAME == "windows32")
 elsif(UNAME == "CYGWIN_NT-5.1")
 	HOST = :linux
 elsif(UNAME == "Darwin")
-	HOST = :linux
-#	HOST_PLATFORM = :darwin
-	HOST_PLATFORM = :wine
-
+	HOST = :darwin
 else
 	error("Unknown platform: #{UNAME}")
 end
@@ -93,6 +90,10 @@ if(HOST == :win32) then
 	DLL_FILE_ENDING = '.dll'
 	EXE_FILE_ENDING = '.exe'
 	FOLDER_SEPARATOR = '\\'
+elsif(HOST == :darwin)
+	DLL_FILE_ENDING = '.dylib'
+	EXE_FILE_ENDING = ''
+	FOLDER_SEPARATOR = '/'
 else
 	DLL_FILE_ENDING = '.so'
 	EXE_FILE_ENDING = ''

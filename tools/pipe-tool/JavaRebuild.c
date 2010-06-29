@@ -824,7 +824,10 @@ void JavaEmitDivu(OpcodeInfo *theOp, int hasImm)
 
 void JavaEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
 {
-	RebuildEmit("	if (%s %s %s) ",java_reg[theOp->rd], str, java_reg[theOp->rs]);
+	if(unsign)
+		RebuildEmit("	if (((long)(%s) & 0x0ffffffffL) %s ((long)(%s) & 0x0ffffffffL)) ",java_reg[theOp->rd], str, java_reg[theOp->rs]);
+	else
+		RebuildEmit("	if (%s %s %s) ",java_reg[theOp->rd], str, java_reg[theOp->rs]);
 	JavaDecodeLabel(theOp, "ms.goto_%d();");
 
 	unsign = 0;

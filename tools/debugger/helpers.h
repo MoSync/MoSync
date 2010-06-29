@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string>
 #include <vector>
+#include <helpers/attribute.h>
 
 #ifdef __GNUC__
 #include <assert.h>
@@ -47,15 +48,15 @@ bool parseArgPVS(const std::string& src, PrintValueSimplicity* dst);
 //puts the register index into *dst.
 bool parseArgRegName(const std::string& src, int* dst);
 
-int eprintf(const char* fmt, ...);	//prints to stderr, logs
-int oprintf(const char* fmt, ...);	//prints to stdout, logs
+int eprintf(const char* fmt, ...) PRINTF_ATTRIB(1, 2);	//prints to stderr, logs
+int oprintf(const char* fmt, ...) PRINTF_ATTRIB(1, 2);	//prints to stdout, logs
 void oputc(int c);
 
 void oprintFrame(int pc);
 
 typedef void (*ErrorCallback)();
 void setErrorCallback(ErrorCallback ecb);
-void error(const char* fmt, ...);
+void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2);
 
 #define EFAIL(cond, msg) if(cond) { error(msg); return; }
 

@@ -26,6 +26,8 @@ bool EventHandler::down_pressed =false;
 bool EventHandler::fire_pressed =false;
 bool EventHandler::pound_pressed =false;
 bool EventHandler::star_pressed =false;
+bool EventHandler::lsk_pressed=false;
+bool EventHandler::rsk_pressed=false;
 
 bool EventHandler::left =false;
 bool EventHandler::right =false;
@@ -36,24 +38,17 @@ bool EventHandler::quit =false;
 bool EventHandler::updated =false;
 bool EventHandler::pound =false;
 bool EventHandler::star =false;
-
-#ifdef MA_PROF_SUPPORT_STYLUS
-bool EventHandler::lsk_pressed=false;
-bool EventHandler::rsk_pressed=false;
-
 bool EventHandler::lsk=false;
 bool EventHandler::rsk=false;
 
+#ifdef MA_PROF_SUPPORT_STYLUS
 bool EventHandler::pointer_pressed=false;
 bool EventHandler::pointer_released=false;
 MAPoint2d EventHandler::point;
 #endif	// MA_PROF_SUPPORT_STYLUS
 
 void EventHandler::updateEvents() {
-	left_pressed = right_pressed = up_pressed = down_pressed = fire_pressed = pound_pressed = star_pressed = false;
-#ifdef MA_PROF_SUPPORT_STYLUS
-	lsk_pressed = rsk_pressed = false;
-#endif	// MA_PROF_SUPPORT_STYLUS
+	left_pressed = right_pressed = up_pressed = down_pressed = fire_pressed = pound_pressed = star_pressed = lsk_pressed = rsk_pressed = false;
 	updated = false;
 	MAEvent event;
 	/// update key states

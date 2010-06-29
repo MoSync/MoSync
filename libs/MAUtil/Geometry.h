@@ -29,12 +29,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ma.h>
 
 namespace MAUtil {
+
+/**
+* \brief Point geometric helper structure/function
+*/
+
 	class Point : public MAPoint2d {
 	public:
 		Point() { x = y = 0; }
 		Point(int ax, int ay) { x = ax; y = ay; }
 		void set(int ax, int ay) { this->x = ax; this->y = ay; }
 	};
+
+/**
+* \brief Rect geometric helper structure/function
+*/
 
 	class Rect {
 	public:
@@ -45,12 +54,12 @@ namespace MAUtil {
 		bool contains(int x, int y) const;
 		
 		/**
-		* Returns true iff \a this and \a r share any surface point.
+		* Returns true if \a this and \a r share any surface point.
 		*/
 		bool overlaps(const Rect &r) const;
 
 		/*
-		* Returns true iff any edge of \a this crosses any edge of \a r.
+		* Returns true if any edge of \a this crosses any edge of \a r.
 		*/
 		//virtual bool intersects(const Rect &r) const;
 

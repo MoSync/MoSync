@@ -37,8 +37,11 @@ namespace Base {
 
 		const void* ptrc() { return mSrc; }
 		virtual void* ptr() { FAIL; }
-
+#ifndef _android
 		Stream* createLimitedCopy(int size) const;
+#else
+		Stream* createLimitedCopy(int size, JNIEnv* jNIEnv, jobject jThis) const;
+#endif
 		Stream* createCopy() const;
 	protected:
 		const void* mSrc;
@@ -49,13 +52,18 @@ namespace Base {
 	class MemStream : public MemStreamC {
 	public:
 		MemStream(int _size);	//allocates memory
+#ifdef _android
+		MemStream(char* _src, int _size);
+#endif
 		virtual ~MemStream();	//frees memory
+
 		bool write(const void* src, int size);
 		void* ptr() { return mBuffer; }
 	protected:
 		char* open(int size);
+#ifndef _android
 		MemStream(char* buf, int size);
-
+#endif
 		char* mBuffer;
 	};
 

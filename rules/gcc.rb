@@ -70,12 +70,18 @@ class CompileGccTask < FileTask
 	end
 	
 	def cFlags
-		return "#{@FLAGS} #{@work.gccmode} #{File.expand_path(@SOURCE)}"
+		return "#{@FLAGS} #{@work.gccmode} #{File.expand_path_fix(@SOURCE)}"
 	end
 	
 	def execute
 		execFlags
-		sh "#{@work.gcc} -o #{@NAME}#{cFlags}"
+		begin
+			sh "#{@work.gcc} -o #{@NAME}#{cFlags}"
+		rescue => e
+			# in case gcc output a broken object file
+			FileUtils.rm_f(@NAME)
+			raise
+		end
 		
 		# In certain rare cases (error during preprocess caused by a header file)
 		# gcc may output an empty dependency file, resulting in an empty dependency list for
@@ -135,8 +141,15 @@ class GccWork < BuildWork
 		
 		#find source files
 		cfiles = collect_files(".c")
-		cppfiles = collect_files(".cpp") + collect_files(".cc") 
+		cppfiles = collect_files(".cpp") + collect_files(".cc")
+		
+		if(HOST == :darwin)
+			@CFLAGS_MAP[".mm"] = @CPPFLAGS + host_flags + host_cppflags
+			cppfiles += collect_files(".mm")
+		end
+		
 		@all_sourcefiles = cfiles + cppfiles
+		@all_sourcefiles.sort! do |a,b| b.timestamp <=> a.timestamp end
 		
 		@source_objects = objects(@all_sourcefiles)
 		all_objects = @source_objects + @EXTRA_OBJECTS
@@ -144,12 +157,18 @@ class GccWork < BuildWork
 		setup3(all_objects)
  	end
 	
+	def check_extra_sourcefile(file, ending)
+		return false if(file.getExt != ending)
+		raise "Extra sourcefile '#{file}' does not exist!" if(!File.exist?(file))
+		return true
+	end
+	
 	# returns an array of FileTasks
 	def collect_files(ending)
 		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
 		files.flatten!
 		files.reject! {|file| @IGNORED_FILES.member?(File.basename(file))}
-		files += @EXTRA_SOURCEFILES.select do |file| file.getExt == ending end
+		files += @EXTRA_SOURCEFILES.select do |file| check_extra_sourcefile(file, ending) end
 		tasks = files.collect do |file| FileTask.new(self, file) end
 		extra_tasks = @EXTRA_SOURCETASKS.select do |file| file.to_s.getExt == ending end
 		return extra_tasks + tasks

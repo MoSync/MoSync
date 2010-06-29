@@ -273,6 +273,29 @@ class Accept implements Runnable {
 	}
 }
 
+// workaround for the case where the buffer isn't filled
+public static final int recv(InputStream in, byte[] bytes, int offset, int size)
+throws IOException
+{
+	//DEBUG_TEMP("special recv\n");
+	int res = in.read(bytes, offset, 1);
+	if(res == 1) {
+		int len = size - 1;
+		if(len > 0) {
+			int ava = in.available();
+			//DEBUG_TEMP("available: "+ava+"\n");
+			if(len > ava)
+				len = ava;
+			//DEBUG_TEMP("len: "+len+"\n");
+			res = in.read(bytes, offset + 1, len);
+			//DEBUG_TEMP("res: "+res+"\n");
+			if(res > 0)
+				res++;
+		}
+	}
+	return res;
+}
+
 class ConnRead implements Runnable {
 	MAConn mac;
 	Address dst;
@@ -290,7 +313,14 @@ class ConnRead implements Runnable {
 		int res;
 		try {
 			//DEBUG_ALWAYS("ConnRead " + size + "\n");
-			res = mac.in.read(bytes);	//if connect failed, mac still exists, but in is null.
+#if 0
+			// if connect failed, mac still exists, but in is null.
+			// this means that if you try to read from a broken connection,
+			// you get a NullPointerException.
+			res = mac.in.read(bytes);
+#else
+			res = recv(mac.in, bytes, 0, size);
+#endif
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			mac.handleResult(CONNOP_READ, CONNERR_CANCELED);
@@ -354,8 +384,12 @@ class ConnReadToData implements Runnable {
 #ifdef SEGMENTED_DATA
 			res = bin.read(mac.in, offset, size);
 #else
+#if 0
 			res = mac.in.read(bin.arr, offset, size);
-#endif
+#else
+			res = recv(mac.in, bin.arr, offset, size);
+#endif	//0
+#endif	//SEGMENTED_DATA
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			finish(CONNERR_CANCELED);
@@ -401,6 +435,7 @@ class ConnWrite implements Runnable {
 #else
 			readMemStream(mac.out, src, size);
 #endif
+			mac.out.flush();
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			mac.handleResult(CONNOP_WRITE, CONNERR_CANCELED);
@@ -454,6 +489,7 @@ class ConnWriteFromData implements Runnable {
 				dis.close();
 				mac.out.write(buffer);
 			}
+			mac.out.flush();
 		} catch(InterruptedIOException e) {
 			PRINT_STACK_TRACE;
 			finish(CONNERR_CANCELED);
