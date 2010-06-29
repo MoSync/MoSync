@@ -51,7 +51,7 @@ class RuntimeBuilder
 		
 		# call the build functions
 		if version == "s60v5"
-			cmd = "#{cwd}/build_s60v5.bat #{$SETTINGS[:s60v5_compiler]}"
+			cmd = "#{cwd}/build_s60v5.bat \"#{$SETTINGS[:s60v5_compiler]}\""
 			puts cmd
 			system(cmd)
 		else
