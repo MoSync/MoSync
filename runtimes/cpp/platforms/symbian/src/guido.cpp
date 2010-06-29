@@ -111,8 +111,8 @@ static void dumpBab(const BABILE_MemParam* mp) {
 	DUMPI(selInitError);
 	DUMPI(initError);
 	DUMPS(license);
-	DUMPI(uid.userId);
-	DUMPI(uid.passwd);
+	DUMPX(uid.userId);
+	DUMPX(uid.passwd);
 
 	dumpDba(mp->nlpeLS);
 	dumpDba(mp->synthLS);
@@ -199,6 +199,7 @@ void Syscall::InitGuidoL() {
 		babParam.markCallback = myMarkCallback;
 		
 		char* iniPtr = iniContents;
+		voicePath[voicePath.Length() - 1] = '/';	// fugly hack
 		babParam.nlpeLS = initDbaL(CCP voicePath.PtrZ(), iniPtr, babParam.synthLS);
 		DEBUG_ASSERT(babParam.nlpeLS);
 		DEBUG_ASSERT(babParam.synthLS);
@@ -376,8 +377,19 @@ char* Syscall::GetFileL(const char* filename) {
 	return GetFileWithSizeL(filename, dummy);
 }
 
-char* Syscall::GetFileWithSizeL(const char* filename, int& size) {
-	FileStream file(filename);
+char* Syscall::GetFileWithSizeL(const char* fn1, int& size) {
+#if 1	//temp hack
+	Smartie<char> filename(new char[strlen(fn1) + 1]);
+	
+	// change slashes
+	strcpy(filename(), fn1);
+	for(char* ptr = filename(); *ptr != 0; ptr++) {
+		if(*ptr == '/')
+			*ptr = '\\';
+	}
+#endif
+
+	FileStream file(filename());
 	if(!file.length(size)) {
 		LOG("GetFileL open error\n");
 		return NULL;
@@ -506,7 +518,18 @@ BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voice
 			memcpy(path, voicePath, vpLen);
 			memcpy(path + vpLen, fn, fnLen + 1);
 			
-			FileStream file(path);
+#if 1	//temp hack
+	Smartie<char> filename(new char[strlen(path) + 1]);
+	
+	// change slashes
+	strcpy(filename(), path);
+	for(char* ptr = filename(); *ptr != 0; ptr++) {
+		if(*ptr == '/')
+			*ptr = '\\';
+	}
+#endif
+
+			FileStream file(filename());
 			if(!file.isOpen())
 				return NULL;
 			if(!file.length(size))
@@ -524,7 +547,7 @@ BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voice
 		}
 		//nlpDba[i].pDbId->size = size;
 	}
-	iniReadEnd(iniPtr);
+	//iniReadEnd(iniPtr);
 
 	nlpDba[count].pDbId=NULL;
 	nlpDba[count].descriptor[0] = 0;
@@ -575,7 +598,7 @@ static int iniCountFiles(char* iniPtr) {
 		}
 		if(memcmp(descriptor, "END", 3) == 0) {
 			ends++;
-			if(ends == 2)	//magic number. see ini file.
+			if(ends == 3)	//magic number. see ini file.
 				break;
 			iniSkipLine(iniPtr);
 			continue;
@@ -616,11 +639,13 @@ static const char* iniReadFilename(char*& iniPtr) {
 	*endQ = 0;
 	iniPtr = endQ + 1;
 	
+#if 0
 	// change slashes
 	for(char* ptr = filename; ptr != endQ; ptr++) {
 		if(*ptr == '/')
 			*ptr = '\\';
 	}
+#endif
 	return filename;
 }
 
