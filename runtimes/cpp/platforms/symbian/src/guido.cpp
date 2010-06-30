@@ -30,16 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.H>
 
-//ugly hacks
-#include <dblsman.hpp>
-#include <bbansi.cpp>
-#include <filesys.cpp>
-
 
 //#define SWEDISH
 #define ENGLISH
-
-#define ERIK
 
 #if defined(SWEDISH) && defined(ENGLISH)
 #error Only one language allowed.
@@ -179,9 +172,7 @@ void Syscall::InitGuidoL() {
 	TBuf8<KMaxFileName> iniPath;
 	iniPath.Copy(voicePath);
 	Append(iniPath, (*dir)[0].iName);
-#if 0
 	char* iniContents = GetFileL(CCP iniPath.PtrZ());
-#endif
 	// what a lot of mucking about with buffers. that's Symbian for ya.
 	
 	// now we must parse the file.
@@ -208,33 +199,9 @@ void Syscall::InitGuidoL() {
 		babParam.markCallback = myMarkCallback;
 		
 		voicePath[voicePath.Length() - 1] = '/';	// fugly hack
-#if 0
+
 		char* iniPtr = iniContents;
 		babParam.nlpeLS = initDbaL(CCP voicePath.PtrZ(), iniPtr, babParam.synthLS);
-#else
-		int err;
-		TBuf16<KMaxFileName> iniName16;
-		iniName16.Copy(iniPath);
-		babParam.nlpeLS = initLanguageDba(NULL, &iniName16, voicePath.PtrZ(),
-			0, &err, X_RAM);
-		LOG("initLanguageDba err: %i\n", err);
-
-		// find SLV/SLL section of Dba.
-		DEBUG_ASSERT(babParam.nlpeLS);
-		BB_DbLs* iData = babParam.nlpeLS;
-		int vi;
-		for (vi=0; iData[vi].descriptor[0] && (
-			strcmp((char*)iData[vi].descriptor,"SLV") &&
-			strcmp((char*)iData[vi].descriptor,"SLL")
-			) ;vi++)
-			;
-		if (iData[vi].descriptor[0])
-		{
-			babParam.synthLS = &iData[vi];
-			LOG("SELECTOR SELECTED\n");
-		}
-		gNumAllocs = 0;	// workaround for what appears to be a buffer overrun.
-#endif	// 0
 		DEBUG_ASSERT(babParam.nlpeLS);
 		DEBUG_ASSERT(babParam.synthLS);
 		
@@ -520,16 +487,14 @@ static const char* iniReadDescriptor(char*& iniPtr);
 static const char* iniReadFilename(char*& iniPtr);
 // reads whitespace, then returns any text found until end-of-line.
 static const char* iniReadExtra(char*& iniPtr);
-// makes sure we have an END, then skips to the end of the line.
-//static void iniReadEnd(char*& iniPtr);
-// makes sure we have a PATH, then skips to the end of the line.
-static void iniReadPath(char*& iniPtr);
 // skips the rest of the current line.
 static void iniSkipLine(char*& iniPtr);
+// reads the exact text, panics if that text is not found, then skips to end-of-line.
+static void iniReadExactLine(char*& iniPtr, const char* e);
 
 BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voiceDba) {
 	LOGD("initLanguageDbaL\n");
-	iniReadPath(iniPtr);
+	iniReadExactLine(iniPtr, "PATH");
 	char* ptr;
 	const int count = iniCountFiles(iniPtr);
 	BB_DbLs* nlpDba = AllocZero<BB_DbLs>(count + 1);
@@ -617,16 +582,6 @@ static void iniReadExactLine(char*& iniPtr, const char* e) {
 	// skip to next line
 	iniSkipLine(iniPtr);
 }
-
-static void iniReadPath(char*& iniPtr) {
-	iniReadExactLine(iniPtr, "PATH");
-}
-
-#if 0
-static void iniReadEnd(char*& iniPtr) {
-	iniReadExactLine(iniPtr, "END");
-}
-#endif
 
 static int iniCountFiles(char* iniPtr) {
 	int count = 0;
