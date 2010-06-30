@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "resourcearray.h"
 #include "DirScrAccEng.h"
 #include "AppView.h"
+#include "AppUi.h"
 #include "symbian_errors.h"
 #include "Stream.h"
 #include "heapsize.h"

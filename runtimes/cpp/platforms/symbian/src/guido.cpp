@@ -30,6 +30,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.H>
 
+//ugly hacks
+#include <dblsman.hpp>
+#include <bbansi.cpp>
+#include <filesys.cpp>
 
 
 //#define SWEDISH
@@ -56,6 +60,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //***************************************************************************
 
 void Syscall::ClearGuidoVariables() {
+	LOG("ClearGuidoVariables\n");
 	gAudioStream = NULL;
 	gBuffersQueued = gNumAllocs = gCurrentAudioBuffer = 0;
 	ZERO_ARRAY(gAllocArray);
@@ -98,10 +103,11 @@ static void dumpDba(const BB_DbLs* db) {
 #define DUMPS(name) LOG("%s: '%s'\n", #name, mp->name ? mp->name : "null")
 
 static void dumpBab(const BABILE_MemParam* mp) {
+	LOG("\ndumpBab\n");
 	DUMPI(sSize);
-	DUMPI(sMBRConfig); 
-	DUMPI(sSELConfig); 
-	DUMPI(sNLPConfig); 
+	DUMPX(sMBRConfig); 
+	DUMPX(sSELConfig); 
+	DUMPX(sNLPConfig); 
 	DUMPI(nlpModule);
 	DUMPI(synthModule);
 	DUMPI(u32MarkCallbackInstance);
@@ -116,6 +122,7 @@ static void dumpBab(const BABILE_MemParam* mp) {
 
 	dumpDba(mp->nlpeLS);
 	dumpDba(mp->synthLS);
+	LOG("\n");
 }
 
 static BB_S32 myMarkCallback(BB_S32 a, BB_S32 b, BB_S32 c, BB_U32 d) {
@@ -172,7 +179,9 @@ void Syscall::InitGuidoL() {
 	TBuf8<KMaxFileName> iniPath;
 	iniPath.Copy(voicePath);
 	Append(iniPath, (*dir)[0].iName);
+#if 0
 	char* iniContents = GetFileL(CCP iniPath.PtrZ());
+#endif
 	// what a lot of mucking about with buffers. that's Symbian for ya.
 	
 	// now we must parse the file.
@@ -198,9 +207,34 @@ void Syscall::InitGuidoL() {
 		babParam.synthModule = BABILE_SYNTHMODULE_BBSELECTOR;
 		babParam.markCallback = myMarkCallback;
 		
-		char* iniPtr = iniContents;
 		voicePath[voicePath.Length() - 1] = '/';	// fugly hack
+#if 0
+		char* iniPtr = iniContents;
 		babParam.nlpeLS = initDbaL(CCP voicePath.PtrZ(), iniPtr, babParam.synthLS);
+#else
+		int err;
+		TBuf16<KMaxFileName> iniName16;
+		iniName16.Copy(iniPath);
+		babParam.nlpeLS = initLanguageDba(NULL, &iniName16, voicePath.PtrZ(),
+			0, &err, X_RAM);
+		LOG("initLanguageDba err: %i\n", err);
+
+		// find SLV/SLL section of Dba.
+		DEBUG_ASSERT(babParam.nlpeLS);
+		BB_DbLs* iData = babParam.nlpeLS;
+		int vi;
+		for (vi=0; iData[vi].descriptor[0] && (
+			strcmp((char*)iData[vi].descriptor,"SLV") &&
+			strcmp((char*)iData[vi].descriptor,"SLL")
+			) ;vi++)
+			;
+		if (iData[vi].descriptor[0])
+		{
+			babParam.synthLS = &iData[vi];
+			LOG("SELECTOR SELECTED\n");
+		}
+		gNumAllocs = 0;	// workaround for what appears to be a buffer overrun.
+#endif	// 0
 		DEBUG_ASSERT(babParam.nlpeLS);
 		DEBUG_ASSERT(babParam.synthLS);
 		
@@ -227,7 +261,9 @@ void Syscall::InitGuidoL() {
 		// memory descriptor creation
 		nBlocks = BABILE_numAlloc();
 		LOG("B_numAlloc %i\n", nBlocks);
-		gMemTab = AllocZero<BB_MemRec>(nBlocks);
+		//gMemTab = AllocZero<BB_MemRec>(nBlocks);
+		gMemTab = (BB_MemRec*) User::Alloc(nBlocks*sizeof(BB_MemRec));
+		LOG("gMemTab: 0x%08x\n", gMemTab);
 		if(!gMemTab) {
 			LOG("BB_MemRec error!\n");
 			User::Leave(ERROR_BABILE);
@@ -366,10 +402,15 @@ void* Syscall::VoidAllocZero(int size) {
 		return NULL;
 	}
 	void* p = VoidAlloc(size);
+	LOG("VAZ's VA: 0x%08x\n", p);
 	if(!p)
 		return NULL;
+	LOG("VAZ ZEROMEM\n");
 	ZEROMEM(p, size);
-	return gAllocArray[gNumAllocs++] = p;
+	LOG("VAZ gAllocArray 0x%08x[%i]\n", gAllocArray, gNumAllocs);
+	gAllocArray[gNumAllocs++] = p;
+	LOG("VAZ return\n");
+	return p;
 }
 
 char* Syscall::GetFileL(const char* filename) {
@@ -480,7 +521,7 @@ static const char* iniReadFilename(char*& iniPtr);
 // reads whitespace, then returns any text found until end-of-line.
 static const char* iniReadExtra(char*& iniPtr);
 // makes sure we have an END, then skips to the end of the line.
-static void iniReadEnd(char*& iniPtr);
+//static void iniReadEnd(char*& iniPtr);
 // makes sure we have a PATH, then skips to the end of the line.
 static void iniReadPath(char*& iniPtr);
 // skips the rest of the current line.
@@ -581,9 +622,11 @@ static void iniReadPath(char*& iniPtr) {
 	iniReadExactLine(iniPtr, "PATH");
 }
 
+#if 0
 static void iniReadEnd(char*& iniPtr) {
 	iniReadExactLine(iniPtr, "END");
 }
+#endif
 
 static int iniCountFiles(char* iniPtr) {
 	int count = 0;

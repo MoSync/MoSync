@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int MAMain() {
 	while(1) {
 		maWait(0);
-		EVENT event;
+		MAEvent event;
 		if(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE)
 				break;

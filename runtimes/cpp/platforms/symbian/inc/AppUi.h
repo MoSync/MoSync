@@ -55,6 +55,7 @@ public:
 	TBool isExiting() const { return iExiting; }
 	const Core::VMCore* GetCore() const;
 	Base::Syscall* GetSyscall();
+	CAppView* GetAppView() { return iAppView; }
 
 #if 0
 	//CEikAppUi

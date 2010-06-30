@@ -69,6 +69,12 @@ namespace Base {
 	void StopEverything();
 }
 
+class CAppUi;
+class CAppView;
+
+CAppUi* GetAppUi();
+CAppView* GetAppView();
+
 //***************************************************************************
 //CBufFlat
 //***************************************************************************

@@ -187,11 +187,29 @@ size_t strlen(const char* str) {
 }
 
 int strcmp(const char* a, const char* b) {
-	return memcmp(a, b, 1024*1024);	//hack
+	while(*a || *b) {
+		if(*a > *b)
+			return 1;
+		if(*a < *b)
+			return -1;
+		a++;
+		b++;
+	}
+	return 0;
 }
-int strncmp(const char *a, const char *b, size_t len) {
-	return memcmp(a, b, len);	//hack
+
+int strncmp(const char *s1, const char *s2, size_t count) {
+	if (!count) return 0;
+
+	while (--count && *s1 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+
+	return *(unsigned char *) s1 - *(unsigned char *) s2;
 }
+
 int isdigit(int c) {
 	return TChar(c).IsDigit();
 }
@@ -312,7 +330,7 @@ void PanicIfError(TInt code) {
 
 void MoSyncExit(int LOG_ARG(result)) {
 	LOG("MoSyncExit %i\n", result);
-	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
+	CAppUi* ui = GetAppUi();
 #ifdef SUPPORT_RELOAD
 	const Core::VMCore* core = ui->GetCore();
 	if(core) if(core->currentSyscallId < 0) {
@@ -331,6 +349,14 @@ unreach:
 	LOG("This code should not be reached.\n");
 	Panic(EMoSyncLoggedPanic);
 	while(1) {}
+}
+
+CAppUi* GetAppUi() {
+	return (CAppUi*)(CEikonEnv::Static()->AppUi());
+}
+
+CAppView* GetAppView() {
+	return GetAppUi()->GetAppView();
 }
 
 static void logTDesC(const TDesC& text) {
