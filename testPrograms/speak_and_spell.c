@@ -19,6 +19,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <IX_GUIDO.H>
 
 int MAMain() {
+	maSetColor(0x00ff00);
+	maDrawText(10, 10, "Hello World!");
+	maDrawText(10, 40, "Use the joystick.");
+	maDrawText(10, 60, "Press 0 to exit.");
+	maUpdateScreen();
 	while(1) {
 		maWait(0);
 		MAEvent event;
