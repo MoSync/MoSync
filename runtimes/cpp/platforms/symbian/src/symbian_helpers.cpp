@@ -56,6 +56,14 @@ void InitLog(const char* filenameOverride) {
 	{
 		MyRFs myrfs;
 		myrfs.Connect();
+		FSS.Delete(KOldLogFilePath);
+		FSS.Rename(KLogFilePath, KOldLogFilePath);
+		{
+			RFile file;
+			LHEL(file.Create(FSS, KLogFilePath,
+				EFileWrite | EFileShareExclusive | EFileStreamText));
+			file.Close();
+		}
 #ifdef GUIDO
 		RFile oldFile;
 		//if the old file exists
@@ -63,26 +71,52 @@ void InitLog(const char* filenameOverride) {
 			oldFile.Close();
 			//rename old log file to msrlog%i.txt
 			int i=0;
-			TBuf<32> tempFileName;
-			do {
+
+			// keep a counter file.
 #ifdef __SERIES60_3X__
-				_LIT(KLogFileFormat, "C:\\data\\msrlog%i.txt");
+			static const char* KCounterFile = "C:\\data\\msrlog_counter.bin";
 #else	//Series 60, 2nd Ed.
-				_LIT(KLogFileFormat, "C:\\msrlog%i.txt");
+			static const char* KCounterFile = "C:\\msrlog_counter.bin";
 #endif	//__SERIES60_3X__
-				tempFileName.Format(KLogFileFormat, ++i);
-			} while(FSS.Rename(KLogFilePath, tempFileName) != KErrNone);
+			do {
+				FileStream file(KCounterFile);
+				int size;
+				if(!file.length(size)) {
+					LOG("Could not open counter file.\n");
+					break;
+				}
+				if(size != sizeof(i)) {
+					LOG("Counter file is broken.\n");
+					break;
+				}
+				if(!file.read(&i, sizeof(i))) {
+					LOG("Could not read counter file.\n");
+				}
+			} while(0);
+			
+			TBuf<32> tempFileName;
+#ifdef __SERIES60_3X__
+			_LIT(KLogFileFormat, "C:\\data\\msrlog%03i.txt");
+#else	//Series 60, 2nd Ed.
+			_LIT(KLogFileFormat, "C:\\msrlog%03i.txt");
+#endif	//__SERIES60_3X__
+			tempFileName.Format(KLogFileFormat, ++i);
+			FSS.Rename(KOldLogFilePath, tempFileName);
+			static const int KLogFileAmount = 10;	//arbitrary
+			int iDelete = i - KLogFileAmount;
+			if(iDelete > 0) {
+				tempFileName.Format(KLogFileFormat, iDelete);
+				LOG("Removing file no. %i\n", iDelete);
+				FSS.Delete(tempFileName);
+			}
+			
+			// save counter to file
+			WriteFileStream file(KCounterFile);
+			if(!file.write(&i, sizeof(i))) {
+				LOG("Could not write counter file!\n");
+			}
 		}
-#else
-		FSS.Delete(KOldLogFilePath);
-		FSS.Rename(KLogFilePath, KOldLogFilePath);
 #endif	//GUIDO
-		{
-			RFile file;
-			LHEL(file.Create(FSS, KLogFilePath,
-				EFileWrite | EFileShareExclusive | EFileStreamText));
-			file.Close();
-		}
 	}
 	Log("Logging started\n");
 	LogAvailableMemory();
