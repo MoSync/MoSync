@@ -394,6 +394,18 @@ namespace Base {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
 		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);				
 	}
+	
+	void flipColorsFromAxGyToAyGx(int *buf, int width, int height, int scanlength) {
+		int *ptr = (int*)buf;
+		for(int j = 0; j < height; j++) {
+			for(int i = 0; i < width; i++) {
+				int abgr = *ptr;
+				*ptr = (abgr&0xff00ff00)|((abgr&0x00ff0000)>>16)|((abgr&0x000000ff)<<16);
+				ptr++;
+			}
+			ptr+=-width+scanlength;
+		}		
+	}	
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
 		int scanlength)) {
@@ -403,7 +415,7 @@ namespace Base {
 	//	NOT_IMPLEMENTED;
 		
 		Surface *srcSurface = new 
-		Surface(srcRect->width, srcRect->height, (char*) src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+		Surface(srcRect->width, srcRect->height, (char*)src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
 		
 		ClipRect srcRectCR;
 		srcRectCR.x = srcRect->left;
@@ -412,6 +424,8 @@ namespace Base {
 		srcRectCR.height = srcRect->height;
 		gDrawTarget->mImageDrawer->drawImageRegion(dstPoint->x, dstPoint->y, &srcRectCR, srcSurface->mImageDrawer, 0);
 		delete srcSurface;
+		
+		flipColorsFromAxGyToAyGx(&((int*)gDrawTarget->data)[srcRect->left+srcRect->top*(gDrawTarget->rowBytes>>2)], srcRect->width, srcRect->height, gDrawTarget->rowBytes>>2);
 	}
 
 	SYSCALL(void, maDrawImageRegion(MAHandle image, const MARect* src, const MAPoint2d* dstTopLeft,
@@ -438,6 +452,7 @@ namespace Base {
 		return EXTENT(img->width, img->height);
 	}
 
+	
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
@@ -449,16 +464,31 @@ namespace Base {
 
 		CGRect smallRect = CGRectMake(x, y, width, height);
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
-		
+
 		// First get the image into your data buffer
 		int imgwidth = CGImageGetWidth(img->image);
 		int imgheight = CGImageGetHeight(img->image);
-		Surface *dstSurface = new Surface(imgwidth, imgheight, (char*) dst, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
+		memset(dst, 0, scanlength*height*4);
+		
+		Surface *srcSurface = new Surface(smallImage);
+		
+		//Surface *dstSurface = new Surface(imgwidth, imgheight, (char*) dst, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
 
-		CGContextDrawImage(dstSurface->context, CGRectMake(0, 0, width, height), smallImage);
-		CGImageRelease(smallImage);
-			
-		delete dstSurface;
+		int* dstptr = (int*)dst;
+		int* srcptr = (int*)srcSurface->data;
+		for(int i = 0; i < height; i++) {
+			memcpy(dstptr, srcptr, width*4); 
+			srcptr+=width;
+			dstptr+=scanlength;
+	   }
+		
+		//CGContextDrawImage(dstSurface->context, CGRectMake(0, 0, width, height), smallImage);
+		//CGImageRelease(smallImage);
+		
+		flipColorsFromAxGyToAyGx((int*)dst, width, height, scanlength);
+		delete srcSurface;
+		//delete dstSurface;
+		
 		
 	}
 
@@ -541,6 +571,7 @@ namespace Base {
 		
 		
 		bitmap->mOwnData = true;
+		flipColorsFromAxGyToAyGx((int*)data, EXTENT_X(size), EXTENT_Y(size), EXTENT_X(size));
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
 	}
 
