@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # These should be defined outside of this file!
-export MOSYNC_SRC="/Users/anders/Code/trunk"
-export ANDROID_PATH="/Users/anders/Android/android-ndk-r4"
+export MOSYNC_SRC="D:\Code\work\MoSync\trunk"
+export ANDROID_PATH="D:\android-ndk-r4"
 
 export MOSYNC_CPP=$MOSYNC_SRC"/runtimes/cpp"
 export MOSYNC_CPP_SRC=$MOSYNC_SRC"/runtimes/cpp/platforms/android"

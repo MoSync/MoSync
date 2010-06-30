@@ -1,4 +1,4 @@
-# Copyright (C) 2010 Mobile Sorcery AB
+# Copyright (C) 2010 MoSync AB
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
@@ -14,15 +14,31 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-LOCAL_PATH:= /cygdrive/d/android-ndk-1.5_r1/sources/mosync
+LOCAL_PATH		:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := mosync
 LOCAL_ARM_MODE  := arm
-LOCAL_SRC_FILES := Core.cpp FileImpl.cpp FileStream.cpp MemStream.cpp Stream.cpp Image.cpp hashmap/hashmap.cpp AndroidHelpers.cpp Syscall.cpp SyscallImpl.cpp IOCtl.cpp disassembler.cpp Recompiler/ArmAssembler.cpp Recompiler/ArmRecompiler.cpp MoSyncBridge.cpp helpers/platforms/linux/log.cpp
-LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
+LOCAL_SRC_FILES := FileImpl.cpp \
+				   MoSyncBridge.cpp \
+				   AndroidHelpers.cpp \
+				   SyscallImpl.cpp \
+				   IOCtl.cpp \
+				   ../../base/FileStream.cpp \
+				   ../../base/MemStream.cpp \
+				   ../../base/Stream.cpp \
+				   ../../base/Image.cpp \
+				   ../../base/Syscall.cpp \
+				   ../../core/Core.cpp \
+				   ../../core/disassembler.cpp \
+				   ../../core/Recompiler/ArmAssembler.cpp \
+				   ../../core/Recompiler/ArmRecompiler.cpp \
+				   ../../../../intlibs/hashmap/hashmap.cpp \
+				   ../../../../intlibs/helpers/platforms/linux/log.cpp
+				   
+LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog
 
-LOCAL_CFLAGS := -DFPM_ARM
+LOCAL_CFLAGS	:= -DFPM_ARM
 
 include $(BUILD_SHARED_LIBRARY)
