@@ -65,7 +65,6 @@ public:
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
 		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
-	
 
 		if(bpp != 32) {
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
