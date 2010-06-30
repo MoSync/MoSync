@@ -24,7 +24,7 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	puts "Processing " + java_file
 	
 	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-	system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D_android -I#{shared_dir} -Isrc" +
+	system("gcc -x c -E -o #{output_dir}#{jtmp_file} -D_android -I#{shared_dir} -Isrc" +
 		" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 	
 	# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
@@ -39,7 +39,12 @@ if !File.exist? "src/config_platform.h"
 end
 
 android_source = "src"
+
 shared_java_source = "../../Shared"
+if(ENV['MOSYNC_SRC'] != nil)
+	shared_java_source = ENV['MOSYNC_SRC'] + "/runtimes/java/Shared"
+end
+puts "shared lib: " + shared_java_source
 
 out_dir = "AndroidProject/src/com/mosync/java/android/"
 
