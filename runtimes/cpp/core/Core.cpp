@@ -682,13 +682,7 @@ public:
 #endif
 
 		// Init regs + IP
-#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-	if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-
-		uint maxCustomEventSize = 0;
-		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
-		DUMPHEX(maxCustomEventSize);
-		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
+		int maxCustomEventSize = getMaxCustomEventSize();
 
 		STACK_TOP = Head.DataSize - maxCustomEventSize;
 		STACK_BOTTOM = STACK_TOP-Head.StackSize;
@@ -827,12 +821,12 @@ void WRITE_REG(int reg, int value) {
 #ifdef CORE_DEBUGGING_MODE
 	void dumpJump(uint address) {
 #ifdef SYMBIAN
-		LOGC("\nJump to 0x%04X\n", address);
+		LOGC("\nJump to 0x%x\n", address);
 #else
 		std::string file;
 		int line;
 		bool res = mapIp(address, line, file);
-		LOGC("\nJump to 0x%04X %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
+		LOGC("\nJump to 0x%x %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
 #endif
 	}
 #else

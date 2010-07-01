@@ -174,9 +174,11 @@ private:
 	TPosition mPosition;
 	TPckg<TPosition> mPositionPckg;
 };
-
-#define MA_PROF_SUPPORT_LOCATIONAPI	//for custom events
 #endif	//SUPPORT_MOSYNC_SERVER
+
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
+#define MA_PROF_SUPPORT_LOCATIONAPI	//for custom events
+#endif
 
 class CDirScrAccEng;
 class CAppView;

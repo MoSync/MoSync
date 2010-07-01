@@ -45,6 +45,7 @@ bool Server::isOpen() const {
 void Server::close() {
 	if(mServ > 0) {
 		maConnClose(mServ);
+		Environment::getEnvironment().removeConnListener(mServ);
 		mServ = 0;
 	}
 }

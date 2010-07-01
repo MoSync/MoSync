@@ -1884,7 +1884,8 @@ interface MAAPI {
 		* when the location provider state changes.
 		*
 		* \returns MA_LPS_AVAILABLE on success, 0 if collection was already active, or
-		* MA_LPS_OUT_OF_SERVICE if the location provider is out of service.
+		* MA_LPS_OUT_OF_SERVICE if the location provider is out of service, or
+		* \< 0 on error.
 		*
 		* \note <b>The location API is experimental, not fully tested.
 		* It may not work as advertised.</b>
