@@ -422,7 +422,6 @@ void CMakeSIS::ShowGeneratorError(TGeneratorException err)
 		case ErrFailedCompression:
 			DoErrMsg(__T("Failed to compress Files"));
 			break;
-#if 0	// fixme: illegal case values.
 		case ErrCannotOpenFile:
 			DoErrMsg(__T("unable to open file"));
 			break;
@@ -432,7 +431,6 @@ void CMakeSIS::ShowGeneratorError(TGeneratorException err)
 		case ErrCannotWriteFile:
 			DoErrMsg(__T("failed whilst writing file"));
 			break;
-#endif	//0
 		default:
 			DoErrMsg(__T("internal error"));
 			break;

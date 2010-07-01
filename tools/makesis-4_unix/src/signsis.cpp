@@ -46,7 +46,7 @@ extern "C" {
 #include "selfsigned.key.h"
 
 
-static SISContents* loadSISFile(const char* name, uint8_t* header) {
+SISContents* loadSISFile(const char* name, uint8_t* header) {
 	FILE* in = fopen(name, "rb");
 	if (!in) {
 		perror(name);
@@ -56,10 +56,7 @@ static SISContents* loadSISFile(const char* name, uint8_t* header) {
 	uint32_t len = ftell(in);
 	fseek(in, 0, SEEK_SET);
 	uint8_t* buffer = new uint8_t[len];
-	if(fread(buffer, 1, len, in) != 1) {
-		fclose(in);
-		return NULL;
-	}
+	fread(buffer, 1, len, in);
 	fclose(in);
 	memcpy(header, buffer, 16);
 	const uint8_t* ptr = buffer + 16;
@@ -84,7 +81,7 @@ static SISContents* loadSISFile(const char* name, uint8_t* header) {
 	return (SISContents*) field;
 }
 
-static void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
+void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
 	uint8_t* compressedData = new uint8_t[compressed->HeaderDataLength()];
 	uint8_t* compressedPtr = compressedData;
 	compressed->CopyHeaderData(compressedPtr);
@@ -93,18 +90,18 @@ static void updateChecksum(SISControllerChecksum* csum, SISField* compressed) {
 	csum->iValue = ccsum;
 }
 
-static void showHelp(const char* argv0) {
+void showHelp(const char* argv0) {
 	printf("%s [-?] [-cd | -cr] [-o[-p]] [-s] [-u] [-v] input [output [certificate key [passphrase]]]\n", argv0);
 }
 
-static void printTime(ASN1_TIME* time) {
+void printTime(ASN1_TIME* time) {
 	BIO* bio = BIO_new(BIO_s_file());
 	BIO_set_fp(bio, stdout, BIO_NOCLOSE);
 	ASN1_TIME_print(bio, time);
 	BIO_free_all(bio);
 }
 
-static void displayCert(X509* cert) {
+void displayCert(X509* cert) {
 	printf("Issued by: ");
 	X509_NAME_print_ex_fp(stdout, X509_get_issuer_name(cert), 0, XN_FLAG_ONELINE);
 	printf("\n");

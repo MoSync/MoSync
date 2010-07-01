@@ -68,7 +68,7 @@ char* getpass(const char* prompt) {
 }
 #endif
 
-static int password_cb(char *buf, int size, int rwflag, void *userdata) {
+int password_cb(char *buf, int size, int rwflag, void *userdata) {
 	char* pwd = (char*) userdata;
 	if (!pwd)
 		pwd = getpass("Enter private key password: ");
@@ -89,16 +89,13 @@ char* loadTextFile(const char* name) {
 	uint32_t len = ftell(in);
 	fseek(in, 0, SEEK_SET);
 	char* buffer = new char[len + 1];
-	if(fread(buffer, 1, len, in) != len) {
-		fclose(in);
-		return NULL;
-	}
+	fread(buffer, 1, len, in);
 	fclose(in);
 	buffer[len] = '\0';
 	return buffer;
 }
 
-static SISSignature* makeSignature(SISField* controller, const char* keyData, const char* passphrase, SigType type, EVP_PKEY* publicKey) {
+SISSignature* makeSignature(SISField* controller, const char* keyData, const char* passphrase, SigType type, EVP_PKEY* publicKey) {
 	if (type == SigAuto) {
 		if (strstr(keyData, " DSA "))
 			type = SigDsa;
@@ -248,7 +245,7 @@ SISCertificateChain* makeChain(const char* certData) {
 }
 */
 
-static SISCertificateChain* makeChain(const char* certData, EVP_PKEY** publicKey) {
+SISCertificateChain* makeChain(const char* certData, EVP_PKEY** publicKey) {
 	BIO* in = BIO_new_mem_buf((void*) certData, -1);
 	BIO* out = BIO_new(BIO_s_mem());
 
