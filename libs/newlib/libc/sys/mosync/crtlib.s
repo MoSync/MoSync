@@ -28,16 +28,20 @@ __stacktop:
 	.align 4
 	.global crt0_startup
 
+	// sp: top of stack
+	// i0: memory size
+	// i1: stack size
+	// i2: heap size
 .func crt0_startup, 3, void
 	.line 1
 
 	ld	[&__memtop],i0		// Save top of memory
 	
-	sub i0, #16			// move stack down memory 16 bytes
-	ld	[&__stacktop],i0	// Save top of memory
+	sub sp, #16			// move stack down memory 16 bytes
+	ld	[&__stacktop],sp	// Save top of memory
+	ld	i0,sp
 
-	ld  sp,i0			// set stack top
-	sub i0,i1			// make i0 into heap_bottom
+	sub i0,i1			// make i0 into heap_top
 	sub i0,i2			// i0 is now start of heap
 	ld  i1,i2			// make i1 into heap_size
 
