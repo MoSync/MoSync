@@ -86,6 +86,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		setFocusableInTouchMode(true);
 	}
 
+	public void  onSizeChanged  (int w, int h, int oldw, int oldh)
+	{
+		Log.i("MoSync", "onSizeChanged w:" + w + " h:" + h + " oldw:" + oldw + " oldh:" + oldh);
+	}
+	
+	
 	/*
 	* This function is called directly after that a change which affects the structure of the surface has changed
 	*/

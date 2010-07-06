@@ -14,4 +14,18 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-android_sdk = "C:\\android-sdk-windows\\platforms\\android-1.5"
+#!/bin/bash
+
+export ANDROID_PATH=`cygpath -u $1`
+export MOSYNC_SRC=`cygpath -u $3` 
+export MOSYNC_CPP=`cygpath -u $3"/runtimes/cpp"`
+export MOSYNC_CPP_SRC=`cygpath -u $3"/runtimes/cpp/platforms/android"`
+export MOSYNC_JAVA_SRC=`cygpath -u $3"/runtimes/java/platforms/androidJNI"`
+
+echo "Build library!"
+
+cd $MOSYNC_JAVA_SRC/AndroidProject
+
+$ANDROID_PATH/ndk-build -B
+
+echo "Finished!"

@@ -612,8 +612,11 @@ void maCloseStore(int store, int remove)
 		maPanic(1, "maCloseStore failed!");
 }
 
-#include "MoSyncNetwork.jpp"
+#ifdef _ANDROID_BLUETOOTH
+#include "MoSyncBluetooth.jpp"
+#endif
 
+#include "MoSyncNetwork.jpp"
 
 void maLoadProgram(int data, int reload)
 {
@@ -695,6 +698,8 @@ int maVibrate(int ms)
 void maPanic(int result, String message)
 {
 	SYSLOG("maPanic");
+	
+	threadPanic(result, message);
 }
 
 int maSoundPlay(int sound_res, int offset, int size)
@@ -736,6 +741,30 @@ int maIOCtl(int function, int a, int b, int c)
 	SYSLOG("maIOCtl");
 	return -1;
 }
+
+int _maPlatformRequest()
+{
+
+	return -1;
+}
+/*
+			{
+#ifdef WIN32
+				const char* url = SYSCALL_THIS->GetValidatedStr(a);
+				if(sstrcmp(url, "http://") == 0) {
+					int result = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOW);
+					if(result <= 32) {
+						LOG("ShellExecute(%s) error %i\n", url, result);
+						return CONNERR_GENERIC;
+					}
+					return 0;
+				} else
+#endif
+				{
+					return IOCTL_UNAVAILABLE;
+				}
+			}
+*/
 
 void _enableFramebuffer(int address)
 {
