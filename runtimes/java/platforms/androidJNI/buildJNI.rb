@@ -87,8 +87,7 @@ puts "Building native Library\n\n"
 FileUtils.cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
-	system "d2u cygwin.sh"
-	system "D:/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
 	system "#{firstarg}/ndk-build"
 end
