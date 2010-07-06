@@ -303,7 +303,7 @@ namespace Base {
 	// Proper Syscalls
 	//***************************************************************************
 
-#if 1//!(defined(SYMBIAN) && !defined(__SERIES60_3X__))	//S60v2
+#ifndef _android
 
 	// doubles -------------------------------------------
 	SYSCALL(double, __adddf3(double a, double b)) {
@@ -329,7 +329,7 @@ namespace Base {
 	SYSCALL(double, __floatsidf(int a)) {
 		return (double)a;
 	}
-
+#endif
 	SYSCALL(double, f2d(float f)) {
 		return (double)f;
 	}
@@ -342,6 +342,7 @@ namespace Base {
 			return -1;
 	}
 
+#ifndef _android
 	// floats -------------------------------------------
 	SYSCALL(float, __addsf3(float a, float b)) {
 		return a+b;
@@ -366,6 +367,8 @@ namespace Base {
 	SYSCALL(float, __floatsisf(int a)) {
 		return (float)a;
 	}
+#endif
+
 	SYSCALL(float, d2f(double a)) {
 		return (float)a;
 	}
@@ -377,8 +380,6 @@ namespace Base {
 		else	//a < b		//or NaN!
 			return -1;
 	}
-
-#endif	//S60v2
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
 		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();

@@ -14,7 +14,6 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require "androidPaths.rb"
 require 'fileutils'
 
 def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
@@ -23,8 +22,10 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	
 	puts "Processing " + java_file
 	
+	#-D_ANDROID_BLUETOOTH
+	
 	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-	system("gcc -x c -E -o #{output_dir}#{jtmp_file} -D_android -I#{shared_dir} -Isrc" +
+	system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D_android -I#{shared_dir} -Isrc" +
 		" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 	
 	# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
@@ -50,7 +51,7 @@ out_dir = "AndroidProject/src/com/mosync/java/android/"
 
 # Preprocess all the jpp files and create java files from them
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSync.jpp" ) # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
+	if (x == "MoSync.jpp" || x == "MoSyncPanicDialog.jpp" ) # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
 		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
 	end
 }

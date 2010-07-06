@@ -166,6 +166,74 @@ final int maFileDelete(MAHandle file) {
 }
 
 //***************************************************************************
+//Miscellaneous Functions
+//***************************************************************************
+
+#define INT_MAX 0x7FFFFFFF
+
+final int maFileSize(MAHandle file) {
+	try {
+		FileHandle fh = getFileHandle(file);
+		long s = fh.fc.fileSize();
+		if(s > INT_MAX || s < 0) {
+			return MA_FERR_GENERIC;
+		}
+		return (int)s;
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
+		return MA_FERR_GENERIC;
+	}
+}
+
+final int maFileDate(MAHandle file) {
+	FileHandle fh = getFileHandle(file);
+	long d = fh.fc.lastModified() / 1000;
+	if(d > INT_MAX) {
+		return MA_FERR_GENERIC;
+	}
+	return (int)d;
+}
+
+final int maFileAvailableSpace(MAHandle file) {
+	FileHandle fh = getFileHandle(file);
+	long s = fh.fc.availableSize();
+	if(s > INT_MAX) {
+		return INT_MAX;
+	}
+	if(s < 0) {
+		return MA_FERR_GENERIC;
+	}
+	return (int)s;
+}
+
+final int maFileTotalSpace(MAHandle file) {
+	FileHandle fh = getFileHandle(file);
+	long s = fh.fc.totalSize();
+	if(s > INT_MAX) {
+		return INT_MAX;
+	}
+	if(s < 0) {
+		return MA_FERR_GENERIC;
+	}
+	return (int)s;
+}
+
+final int maFileRename(MAHandle file, String newName) {
+	if(newName.indexOf('/') < 0) {
+		return MA_FERR_RENAME_DIRECTORY;
+	}
+	try {
+		FileHandle fh = getFileHandle(file);
+		fh.fc.rename(newName);
+		return 0;
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
+		return MA_FERR_GENERIC;
+	}
+}
+
+
+//***************************************************************************
 //Read/Write Functions
 //***************************************************************************
 

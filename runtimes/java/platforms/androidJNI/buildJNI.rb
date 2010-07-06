@@ -19,26 +19,22 @@ require 'fileutils'
 
 # buildJNI.rb <ANDROID_NDK_PATH> <ANDROID_SDK_PATH> <CONFIG_PATH> <DEBUG>
 
-
 cpath = FileUtils.pwd
 
 if ENV['MOSYNC_SRC'] == nil
 	FileUtils.cd "../../../../"
 	ENV['MOSYNC_SRC'] = FileUtils.pwd
-	puts "MOSYNC_SRC " + FileUtils.pwd
 	FileUtils.cd cpath
 end
 
 mosyncpp = "../../../cpp"
 FileUtils.cd mosyncpp
 ENV['MOSYNC_CPP'] = FileUtils.pwd
-puts "MOSYNC_CPP " + FileUtils.pwd
 FileUtils.cd cpath
 
 mosyncppsource = "../../../cpp/platforms/android"
 FileUtils.cd mosyncppsource
 ENV['MOSYNC_CPP_SRC'] = FileUtils.pwd
-puts "MOSYNC_CPP_SRC " + FileUtils.pwd
 FileUtils.cd cpath
 
 ENV['MOSYNC_JAVA_SRC'] = cpath
@@ -70,16 +66,19 @@ if ARGV[2] != nil
 		FileUtils.copy_file( "#{ARGV[2]}/#{configfile}", "/src/config_platform.h")
 end
 
+debug = (ARGV[3] == nil) ? "" : "D"
+
 puts "Building native Library\n\n"
 
 FileUtils.cd "AndroidProject"
-puts FileUtils.pwd
 
-system "#{ARGV[0]}/ndk-build"
+if ENV['OS'] == "Windows_NT"
+	system "D:/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{ARGV[0]} #{ARGV[1]} #{ENV['MOSYNC_SRC']}"
+else
+	system "#{ARGV[0]}/ndk-build"
+end
 
-
-
-puts "Building Java Source\n\n"
+puts "Preprocess Java Source Files\n\n"
 
 FileUtils.cd ".."
 puts FileUtils.pwd
@@ -93,21 +92,33 @@ if File.exist? class_dir
 end
 Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
+puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
 system("#{ARGV[1]}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{ARGV[1]}/android.jar -S #{package_root}/res -m -J #{package_root}src");
 		
+puts "Compile Java Source Files\n\n"
+		
 # Compile all the java files into class files
-system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{ARGV[1]}android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{ARGV[1]}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+
+puts "Copy Generated Library File\n\n"
 
 # copy the library file
 FileUtils.copy_file( "#{cpath}/AndroidProject/libs/armeabi/libmosync.so", "temp/libmosync.so")
 
+puts "Build Zip Package\n\n"
+
 # package the files
 FileUtils.cd "temp"
-system "tar -zcf runtime.tar.gz libmosync.so com/"
-FileUtils.copy_file( "runtime.tar.gz", "../runtime.tar.gz")
+
+system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "../MoSyncRuntime#{debug}.zip")
+
+#system "tar -zcf runtime.tar.gz libmosync.so com/"
+#FileUtils.copy_file( "runtime.tar.gz", "../runtime.tar.gz")
+
 FileUtils.cd ".."
 
 # clean up

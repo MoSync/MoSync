@@ -1797,7 +1797,7 @@ public
 			return maFileCreate(a);
 		case maIOCtl_maFileDelete:
 			return maFileDelete(a);
-		/*case maIOCtl_maFileSize:
+		case maIOCtl_maFileSize:
 			return maFileSize(a);
 		case maIOCtl_maFileAvailableSpace:
 			return maFileAvailableSpace(a);
@@ -1806,7 +1806,7 @@ public
 		case maIOCtl_maFileDate:
 			return maFileDate(a);
 		case maIOCtl_maFileRename:
-			return maFileRename(a, readMemString(b));*/
+			return maFileRename(a, readMemString(b));
 		case maIOCtl_maFileTruncate:
 			return maFileTruncate(a, b);
 

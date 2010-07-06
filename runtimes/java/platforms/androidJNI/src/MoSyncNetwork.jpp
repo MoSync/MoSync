@@ -53,6 +53,12 @@ MAHandle maConnect(final String url) {
 
 			conInfo = new ConnectionInformation(newUrl, port, mConnNextHandle);
 		}
+/*		
+		else if(url.startsWith("btspp://"))
+		{
+		
+		}
+*/		
 		else
 		{
 			URL connectionURL = new URL(url);
@@ -447,6 +453,7 @@ public class ConnectionInformation
 	public boolean mCancelled;
 	public boolean mIsHttpConnection;
 	public boolean mIsSocketConnection;
+	public boolean mIsBluetoothConnection;
 	private MAHandle mHandle;
 	public InputStream mIs;
 	public OutputStream mOs;

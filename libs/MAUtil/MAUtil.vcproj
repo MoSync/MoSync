@@ -219,6 +219,26 @@
 				RelativePath=".\Vector.h"
 				>
 			</File>
+			<Filter
+				Name="kazlib"
+				>
+				<File
+					RelativePath="..\kazlib\dict.c"
+					>
+				</File>
+				<File
+					RelativePath="..\kazlib\dict.h"
+					>
+				</File>
+				<File
+					RelativePath="..\kazlib\hash.c"
+					>
+				</File>
+				<File
+					RelativePath="..\kazlib\hash.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Communication"

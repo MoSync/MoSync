@@ -260,7 +260,7 @@ gBtDeviceArray(8, 0)
 	gHangupSync = NULL;
 	gNotify = NULL;
 #endif
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	gLocationSync = NULL;
 #endif
 #ifdef SUPPORT_AUDIOBUFFER
@@ -332,7 +332,7 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gSmsHandler = CSmsHandler::NewL(this);
 #endif	//__SERIES60_3X__
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	gLocationSync = new (ELeave) CClassSynchronizer<Syscall>(this, &Syscall::LocationHandlerL);
 #endif
 
@@ -361,7 +361,7 @@ void Base::StopEverything() {
 void Syscall::StopEverything() {
 	LOG("StopEverything()\n");
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	maLocationStop();
 #endif
 
@@ -436,7 +436,9 @@ void Syscall::platformDestruct() {
 #ifdef SUPPORT_MOSYNC_SERVER
 	LOG("gServer.Close();\n");
 	gServer.Close();
+#endif
 	
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	//calls Cancel, which should really call the server's cancel mechanism...
 	//except it doesn't have one. tricky...
 	LOG("SAFE_DELETE(gLocationSync);\n");
@@ -1497,7 +1499,7 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maStreamSetPos(a, b);
 	}
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	case maIOCtl_maLocationStart:
 		return maLocationStart();
 	case maIOCtl_maLocationStop:
@@ -2043,7 +2045,7 @@ static int maBringToForeground() {
 //------------------------------------------------------------------------------
 // Location
 //------------------------------------------------------------------------------
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) && !defined(__S60_50__)
 int Syscall::maLocationStart() {
 	LOG("maLocationStart()\n");
 	if(gLocationSync->IsActive())
@@ -2062,6 +2064,22 @@ int Syscall::maLocationStop() {
 	return res;
 }
 
+void Syscall::LocationHandlerL(TInt status) {
+	LOG("LocationHandlerL(%i)\n", status);
+	//not so good; will fail silently.
+	if(IS_SYMBIAN_ERROR(status))
+		return;
+
+	//send event
+	AddLocationEvent(gServer.Position());
+
+	//wait for the next location
+	gServer.LocationGet(*gLocationSync->Status());
+	gLocationSync->SetActive();
+}
+#endif	//SUPPORT_MOSYNC_SERVER && !__S60_50__
+
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 
 //quick hack
 union DV {
@@ -2078,16 +2096,8 @@ static double swapd(double d) {
 	return dv2.dbl;
 }
 
-
-void Syscall::LocationHandlerL(TInt status) {
-	LOG("LocationHandlerL(%i)\n", status);
-	//not so good; will fail silently.
-	if(IS_SYMBIAN_ERROR(status))
-		return;
-
-	//send event
+void Syscall::AddLocationEvent(const TPosition& p) {
 	MALocation* loc = new MALocation;
-	const TPosition& p(gServer.Position());
 	LOG("lat: %g\n", p.Latitude());
 	loc->state = p.Datum() == KPositionDatumWgs84 ?
 		MA_LOC_QUALIFIED : MA_LOC_INVALID;
@@ -2097,9 +2107,6 @@ void Syscall::LocationHandlerL(TInt status) {
 	loc->vertAcc = swapd(p.VerticalAccuracy());
 	loc->alt = p.Altitude();
 
-	gServer.LocationGet(*gLocationSync->Status());
-	gLocationSync->SetActive();
-
 	MAEvent e;
 	e.type = EVENT_TYPE_LOCATION;
 	//will be handled by GetEvent.
@@ -2108,7 +2115,56 @@ void Syscall::LocationHandlerL(TInt status) {
 	e.data = loc;
 	gAppView.AddEvent(e);
 }
-#endif	//SUPPORT_MOSYNC_SERVER
+#endif	//SUPPORT_MOSYNC_SERVER || __S60_50__
+
+#ifdef __S60_50__
+int Syscall::maLocationStart() {
+	LOG("maLocationStart()\n");
+	if(gLocationSync->IsActive())
+		return 0;
+
+	SYMTESTFAIL(gPositionServer.Connect());
+	SYMTESTFAIL(gPositioner.Open(gPositionServer));
+
+	// Needed to placate Symbian's sense of "user privacy".
+	SYMTESTFAIL(gPositioner.SetRequestor(CRequestor::ERequestorService,
+		CRequestor::EFormatApplication, KMoSync));
+
+	gPositioner.NotifyPositionUpdate(gPositionInfo, *gLocationSync->Status());
+	gLocationSync->SetActive();
+
+	return MA_LPS_AVAILABLE;
+}
+
+int Syscall::maLocationStop() {
+	LOG("maLocationStop()\n");
+	if(gLocationSync) {
+		if(gLocationSync->IsActive())
+			TSNR(gPositioner.CancelRequest(EPositionerNotifyPositionUpdate));
+		gPositioner.Close();
+		gPositionServer.Close();
+	}
+	LOG("maLocationStop done.\n");
+	return 0;
+}
+
+void Syscall::LocationHandlerL(TInt status) {
+	//not so good; will fail silently.
+	if(IS_SYMBIAN_ERROR(status)) {
+		LOG("LocationHandlerL(%i)\n", status);
+		return;
+	}
+
+	//send event
+	TPosition p;
+	gPositionInfo.GetPosition(p);
+	AddLocationEvent(p);
+
+	//wait for the next location
+	gPositioner.NotifyPositionUpdate(gPositionInfo, *gLocationSync->Status());
+	gLocationSync->SetActive();
+}
+#endif	//__S60_50__
 
 
 #ifdef CALL
