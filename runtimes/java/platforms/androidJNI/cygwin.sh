@@ -16,7 +16,7 @@
 
 #!/bin/bash
 
-export ANDROID_PATH=`cygpath -u $1`
+export ANDROID_NDK_PATH=`cygpath -u $1`
 export MOSYNC_SRC=`cygpath -u $3` 
 export MOSYNC_CPP=`cygpath -u $3"/runtimes/cpp"`
 export MOSYNC_CPP_SRC=`cygpath -u $3"/runtimes/cpp/platforms/android"`
@@ -26,6 +26,6 @@ echo "Build library!"
 
 cd $MOSYNC_JAVA_SRC/AndroidProject
 
-$ANDROID_PATH/ndk-build -B
+$ANDROID_NDK_PATH/ndk-build -B
 
 echo "Finished!"
