@@ -36,7 +36,7 @@ namespace MAUI {
 		selectedTransparent(true), 
 		unselectedTransparent(true)
 		{
-			rebuildRects();
+			//rebuildRects();
 	}
 
 	WidgetSkin::WidgetSkin(MAHandle selectedImage, MAHandle unselectedImage, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) :

@@ -2,8 +2,13 @@
 #include <MAUI/Keyboard/Parser/LayoutParser.h>
 #include <MAUI/Keyboard/Parser/ResourceIO.h>
 
+#include <MAUI/Keyboard/Util/ResourceManager.h>
+#include <MAUI/Keyboard/Util/SkinSet.h>
+
 #include <MAUI/Keyboard/VirtualKeyboard.h>
 #include <MAUI/Keyboard/VirtualKey.h>
+
+#include <MAUI/WidgetSkin.h>
 
 #include "VirtualKeyboardFactory.h"
 
@@ -79,15 +84,23 @@ VirtualKey *
 VirtualKeyboardFactory::createFromAttributes(AttributeHandler *attrHandler)
 {
 	/* Check for that key has a label */
-	const char *label = attrHandler->getValueString("label");
+	const char *label = attrHandler->getValueString( "label" );
 
 	if( label == NULL )
 	{
 		return NULL;
 	}
 
-	const char *output = attrHandler->getValueString("output");
-	const char *action = attrHandler->getValueString("onclick");
+	const char *output = attrHandler->getValueString( "output" );
+	const char *action = attrHandler->getValueString( "onclick" );
+	
+	/* Check for that key has an icon */
+	MAUI::WidgetSkin *icon = NULL;
+	const char *iconName =  attrHandler->getValueString( "icon" );
+	if( iconName != NULL )
+	{
+		icon = ResourceManager::getSkins( "keyboard" )->getSkin( iconName );
+	}
 
 	/* Default values */
 	VirtualKey::Type keyType = stringToType( action );
@@ -95,7 +108,7 @@ VirtualKeyboardFactory::createFromAttributes(AttributeHandler *attrHandler)
 	const char *layout = NULL;
 
 	/* Get layout change */
-	const char *newLayout = attrHandler->getValueString("change");
+	const char *newLayout = attrHandler->getValueString( "change" );
 	if( newLayout )
 	{
 		keyType = VirtualKey::CHANGE_LAYOUT;
@@ -108,7 +121,7 @@ VirtualKeyboardFactory::createFromAttributes(AttributeHandler *attrHandler)
 	}
 
 	/* Get width */
-	int newWidth = attrHandler->getValueInt("width");
+	int newWidth = attrHandler->getValueInt( "width" );
 	if( attrHandler->conversionOk( ) )
 	{
 		width = newWidth;
@@ -120,7 +133,8 @@ VirtualKeyboardFactory::createFromAttributes(AttributeHandler *attrHandler)
 									  output,
 									  keyType,
 									  layout,
-									  width
+									  width,
+									  icon
 									 );
 	return key;
 }

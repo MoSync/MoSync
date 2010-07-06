@@ -79,7 +79,7 @@ namespace MAUI {
 
 		setInputMode(inputMode);
 
-		Environment::getEnvironment().addPointerListener(this);
+		Environment::getEnvironment().addVKListener(this);
 	}
 
 	void EditBox::setSelected(bool selected) {
@@ -101,6 +101,7 @@ namespace MAUI {
 		CharInput::getCharInput().addCharInputListener(this);
 		active = true;
 		setInputMode(inputMode);
+		Engine::getSingleton().showKeyboard();
 		setSelected(true);
 	}
 
@@ -117,6 +118,7 @@ namespace MAUI {
 		if(CharInput::getCharInput().isCharInputListener(this))
 			CharInput::getCharInput().removeCharInputListener(this);
 		active = false;
+		Engine::getSingleton().hideKeyboard();
 		setSelected(false);
 	}
 
@@ -297,23 +299,15 @@ namespace MAUI {
 	void EditBox::keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
-	void EditBox::pointerPressEvent(MAPoint2d p) {
-	}
-	void EditBox::pointerMoveEvent(MAPoint2d p) {
+	void EditBox::keyboardShown() {
+
 	}
 
-	void EditBox::pointerReleaseEvent(MAPoint2d p) {
-		if(contains(p.x, p.y)) {
-			Engine::getSingleton().showKeyboard();
-			activate();
-		}
-		else {
-			if(!Engine::getSingleton().keyboardVisible()) {
-				deactivate();
-			}
+	void EditBox::keyboardHidden() {
+		if(isActive()) {
+			deactivate();
 		}
 	}
-
 
 	int currentIndex;
 

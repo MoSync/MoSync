@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  */
 namespace MAUI {
 	class VirtualKeyboard;
+	class Engine;
 }
 
 namespace MAUtil {
@@ -136,10 +137,30 @@ namespace MAUtil {
 	};
 
 	/**
+	* \brief A listener that captures when the virtual keyboard 
+	*        is shown or hidden.
+	* 
+	* It does not handle the key events from the keyboard.
+	*/
+	class VKListener {
+	public:
+		/**
+		* Is called when the virtual keyboard is activated or shown.
+		*/
+		virtual void keyboardShown() = 0;
+
+		/**
+		* Is called when the virtual keyboard is deactivated or hidden.
+		*/
+		virtual void keyboardHidden() = 0;
+	};
+
+	/**
 	* \brief A base class for cross-platform event managers.
 	*/
 	class Environment {
 		friend class MAUI::VirtualKeyboard;
+		friend class MAUI::Engine;
 	public:
 		/**
 		* Adds the specified listener to the end of the list,
@@ -155,6 +176,16 @@ namespace MAUtil {
 		  * list of key listeners.
 		  **/
 		bool isFocusListener(FocusListener* kl);
+
+		/**
+		* Adds a listener for the virtual keyboard.
+		*/
+		void addVKListener(VKListener *vkl);
+
+		/**
+		* Removes the specified VKListener.
+		*/
+		void removeVKListener(VKListener *vkl);
 
 		/**
 		* Adds the specified listener to the end of the list,
@@ -280,6 +311,17 @@ namespace MAUtil {
 		* Calls focusLost() of all registered FocusListeners.
 		*/
 		void fireFocusLostEvent();
+
+		/**
+		* Broadcasts a virtual keyboard shown event to all VKListeners.
+		*/
+		void fireVKShownEvent();
+
+		/**
+		* Broadcasts a virtual keyboard hidden event to all VKListeners.
+		*/
+		void fireVKHiddenEvent();
+
 		/**
 		* Calls keyPressEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
@@ -336,6 +378,7 @@ namespace MAUtil {
 		ListenerSet<IdleListener> mIdleListeners;
 		ListenerSet<TimerEventInstance> mTimerEvents;
 		ListenerSet<FocusListener> mFocusListeners;
+		ListenerSet<VKListener> mVKListeners;
 private:
 		static Environment* sEnvironment;
 	};

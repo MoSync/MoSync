@@ -8,6 +8,7 @@
 #define VIRTUALKEY_H_
 
 #include <MAUtil/String.h>
+#include <MAUI/WidgetSkin.h>
 
 namespace MAUI {
 
@@ -15,6 +16,7 @@ namespace MAUI {
  * Max length of the string outputted when a key is pressed.
  */
 #define VIRTUAL_KEY_STR_LEN 6
+#define BUFFER_LENGTH 30
 
 /**
  * This class represents a key on a virtual keyboard. It holds
@@ -60,7 +62,9 @@ public:
 			   const char *outputString,
 			   VirtualKey::Type keyType = KEY,
 			   const char *newLayout = NULL,
-			   int width = DEFAULT_KEY_WIDTH);
+			   int width = DEFAULT_KEY_WIDTH,
+			   WidgetSkin *icon = NULL
+			   );
 
 	/**
 	 * Returns the width of the key in pixels.
@@ -89,6 +93,13 @@ public:
 	 * @return The label.
 	 */
 	const char *getLabel(bool shift = false) const;
+
+	/**
+	 * Returns the label that is displayed for this key.
+	 *
+	 * @return The label.
+	 */
+	WidgetSkin *getIcon() const;
 
 	/**
 	 * Returns the string that should be outputted when this
@@ -152,6 +163,11 @@ private:
 	 * The label that is shown on the key button.
 	 */
 	char m_label[VIRTUAL_KEY_STR_LEN];
+
+	/**
+	 * An icon that can be drawn instead of a label.
+	 */
+	WidgetSkin *m_icon;
 
 	/**
 	 * The label that is shown on the key button when shift

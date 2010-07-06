@@ -221,6 +221,11 @@ private:
 	 * Skins used for this keyboard.
 	 */
 	SkinSet *m_skins;
+
+	/**
+	 * Font used for the keys.
+	 */
+	Font *m_keyFont;
 };
 
 

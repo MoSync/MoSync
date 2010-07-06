@@ -48,12 +48,16 @@ namespace MAUI {
 		m_keyboardVisible = false;
 		Environment::getEnvironment().addFocusListener(this);
 
+		// Setup virtual keyboard
 		m_keyboard = VirtualKeyboardFactory::createFromXMLString(VIRTUAL_KEYBOARD_DEFAULT_XML);
 		MAExtent screenSize = maGetScrSize();
 		m_keyboard->setPosition(0, EXTENT_Y(screenSize) - m_keyboard->getHeight());
 	}
 	
 	void Engine::setMain(Widget* main) {
+		/* The keyboard must be hidden before the main widget is updated. */
+		hideKeyboard();
+
 		main->setPosition(main->getPosition().x, main->getPosition().y);
 		this->main = main;
 	}
@@ -204,17 +208,12 @@ namespace MAUI {
 		int scrW = EXTENT_X(maGetScrSize());
 		int scrH = EXTENT_Y(maGetScrSize());
 
-		int availScreenWidth = scrW;
-		int availScreenHeight = scrH;
-		
-		if(keyboardVisible()) {
-			availScreenHeight -= m_keyboard->getHeight();
-		}
+		int mainWidgetHeight = main->getHeight();
+		int mainWidgetWidth = main->getWidth();
 
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
 		/* Draw main widget */
-		Gfx_pushClipRect(0, 0, availScreenWidth, availScreenHeight);
-		main->setHeight(availScreenHeight);
+		Gfx_pushClipRect(0, 0, mainWidgetWidth, mainWidgetHeight);
 		main->update();
 		main->draw();
 		Gfx_popClipRect();
@@ -234,11 +233,10 @@ namespace MAUI {
 		/* If the keyboard is visible it should be drawn,
 		   is is assumed that its position has been set up 
 		   correctly. */
-		if( keyboardVisible() ) {
+		if(keyboardVisible()) {
 			Gfx_clearClipRect();
 			Gfx_clearMatrix();
-			Gfx_pushClipRect(0, availScreenHeight, availScreenWidth, scrH);
-			//Gfx_translate(0, availScreenHeight);
+			Gfx_pushClipRect(0, scrH - m_keyboard->getHeight(), m_keyboard->getWidth(), scrH);
 
 			m_keyboard->update();
 			m_keyboard->draw();
@@ -288,6 +286,13 @@ namespace MAUI {
 		if(!m_keyboardVisible)
 		{
 			m_keyboardVisible = true;
+			m_mainHeight = main->getHeight();
+
+			/* Change height of main widget if it is too big */
+			int screenHeight = EXTENT_Y(maGetScrSize());
+			if(screenHeight - main->getHeight() <  m_keyboard->getHeight()) {
+				main->setHeight(screenHeight - m_keyboard->getHeight());
+			}
 
 			/* Keyboard produces qwerty output */
 			CharInput::getCharInput().setQwerty(true);
@@ -297,7 +302,11 @@ namespace MAUI {
 
 			/* Reset the keyboard to the default state and display it */
 			m_keyboard->reset();
-			repaint();
+
+			Environment::getEnvironment().fireVKShownEvent();
+
+			main->requestRepaint();
+			requestUIUpdate();
 		}
 	}
 
@@ -306,6 +315,7 @@ namespace MAUI {
 		if(m_keyboardVisible)
 		{
 			m_keyboardVisible = false;
+			main->setHeight(m_mainHeight);
 
 			/* The keyboard should not respond to pointer events when hidden */
 			Environment::getEnvironment().removePointerListener(m_keyboard);
@@ -313,13 +323,34 @@ namespace MAUI {
 			/* Clear screen */
 			MAExtent screenSize = maGetScrSize();
 			maSetColor(0);
-			maFillRect(0, 0, EXTENT_X(screenSize), EXTENT_Y(screenSize));
-			repaint();
+			Gfx_fillRect(0, EXTENT_Y(screenSize) - m_keyboard->getHeight( ), 
+						 EXTENT_X(screenSize), EXTENT_Y(screenSize));
+
+			Environment::getEnvironment().fireVKHiddenEvent();
+
+			main->requestRepaint();
+			requestUIUpdate();
 		}
 	}
 
 	bool Engine::keyboardVisible()
 	{
 		return m_keyboardVisible;
+	}
+
+	bool Engine::onKeyboard(int x, int y)
+	{
+		if(!keyboardVisible())
+		{
+			return false;
+		}
+		
+		MAExtent screenSize = maGetScrSize();
+		if(y > EXTENT_Y(screenSize) - m_keyboard->getHeight()) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }

@@ -56,6 +56,11 @@ ResourceManager::getFont( const char *name )
 SkinSet *
 ResourceManager::__getSkins(const char *name)
 {
+	if( name == NULL )
+	{
+		return NULL;
+	}
+
 	return m_skinSets[ MAUtil::String( name ) ];
 }
 
@@ -76,6 +81,11 @@ ResourceManager::__addFont(const char *name, MAUI::Font *font)
 MAUI::Font *
 ResourceManager::__getFont(const char *name)
 {
+	if( name == NULL )
+	{
+		return NULL;
+	}
+
 	return m_fonts[ MAUtil::String( name ) ];
 }
 

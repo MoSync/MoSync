@@ -12,6 +12,9 @@
 
 #define DEFAULT_PADDING 5
 
+#define USE_SIZE18_FONTS 300
+#define USE_SIZE24_FONTS 460
+
 namespace MAUI {
 
 VirtualLayout::VirtualLayout(const char *name,
@@ -31,6 +34,21 @@ VirtualLayout::VirtualLayout(const char *name,
 	m_hspace = hspace;
 	m_vspace = vspace;
 	m_shift = false;
+
+	int screenWidth = EXTENT_X( maGetScrSize( ) );
+
+	if( screenWidth <= USE_SIZE18_FONTS )
+	{
+		m_keyFont = ResourceManager::getFont( "verdana18" );
+	}
+	else if( screenWidth <= USE_SIZE24_FONTS )
+	{
+		m_keyFont = ResourceManager::getFont( "verdana24" );
+	}
+	else
+	{
+		m_keyFont = ResourceManager::getFont( "verdana32" );
+	}
 }
 
 VirtualLayout::~VirtualLayout()
@@ -181,29 +199,39 @@ void VirtualLayout::draw(bool forceDraw)
 	Gfx_popMatrix();
 }
 
+#include <conprint.h>
+
 void VirtualLayout::drawKeys(VirtualLayoutRow *row) const
 {
 	unsigned int x = 0;
-	MAUI::Font *font = ResourceManager::getFont( "key" );
-
 	for(unsigned int keyIndex = 0; keyIndex < row->numKeys( ); keyIndex++)
 	{
 		VirtualKey *key = row->getKey( keyIndex );
 		MAUI::WidgetSkin *skin = m_skins->getSkin( "key" );
+
 		MAUI::WidgetSkin::eType skinType = !key->pressed() ? MAUI::WidgetSkin::UNSELECTED
 														   : MAUI::WidgetSkin::SELECTED;
 
 		/* Draw the skin of the key */
 		skin->draw( x, 0, keyWidth( key ), rowHeight( row ), skinType );
 
-		/* Calculate center placement of the string */
-		MAExtent labelBounds = font->getStringDimensions( key->getLabel( shift( ) ) );
-		int startX = (keyWidth( key ) - EXTENT_X( labelBounds )) / 2;
-		int startY = (rowHeight( row ) - EXTENT_Y(labelBounds)) / 2;
+		if(key->getIcon( ) == NULL) {
+			/* Calculate center placement of the string */
+			MAExtent labelBounds = m_keyFont->getStringDimensions( key->getLabel( shift( ) ) );
+			int startX = (keyWidth( key ) - EXTENT_X( labelBounds )) / 2;
+			int startY = (rowHeight( row ) - EXTENT_Y(labelBounds)) / 2;
 
-		/* Draw the string in the center of the button */
-		font->drawString(key->getLabel( shift( ) ), x + startX, startY);
+			/* Draw the string in the center of the button */
+			m_keyFont->drawString(key->getLabel( shift( ) ), x + startX, startY);
+		}
+		else {
+			MAUI::WidgetSkin *keyIcon = key->getIcon( );
+			//MAExtent imageBounds = maGetImageSize( keyIcon->getUnselectedImage ); 
+			
+			//NOT DONE: Gfx_drawImag
 
+			keyIcon->draw( x, 0, keyWidth( key ), rowHeight( row ), skinType);
+		}
 		/* Move to the next key */
 		x += m_hspace + keyWidth( key );
 	}

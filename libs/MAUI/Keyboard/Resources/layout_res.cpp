@@ -78,7 +78,7 @@ char VIRTUAL_KEYBOARD_DEFAULT_XML[] =
 "	  </key>"
 "	  <key change=\"NUMBERS\" label=\"12\">"
 "	  </key>"
-"	  <key label=\"\\n\" output=\"\" onclick=\"line\">"
+"	  <key label=\"\\n\" onclick=\"line\" icon=\"enter\">"
 "	  </key>"
 "	  <key onclick=\"right\" label=\"->\">"
 "	  </key>"
@@ -158,8 +158,8 @@ char VIRTUAL_KEYBOARD_DEFAULT_XML[] =
 "	  </key>"
 "	  <key change=\"DEFAULT\" label=\"ab\">"
 "	  </key>"
-"	  <key label=\"\\n\" output=\"\" onclick=\"line\">"
+"	  <key label=\"\\n\" icon=\"enter\" onclick=\"line\">"
 "	  </key>"
 "    </row>"
 "  </layout>"
-"<layouts>\0";
+"<layouts>";

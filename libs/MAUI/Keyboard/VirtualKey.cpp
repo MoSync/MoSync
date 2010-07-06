@@ -3,13 +3,17 @@
 
 #include "VirtualKey.h"
 
+#include <conprint.h>
+
 namespace MAUI {
 
 VirtualKey::VirtualKey(const char *label,
 					   const char *outputString,
 					   VirtualKey::Type keyType,
 					   const char *newLayout,
-					   int width)
+					   int width,
+					   WidgetSkin *icon
+					)
 	:	m_keyType( keyType ),
 		m_width( width )
 		
@@ -22,12 +26,13 @@ VirtualKey::VirtualKey(const char *label,
 	strcpy(m_label, label);
 	strcpy(m_output, outputString);
 
+	m_icon = icon;
+
 	if(m_keyType == KEY)
 	{
 		/* Get shifted output */
 		shiftChars(m_label, m_shiftedLabel);
 		shiftChars(m_output, m_shiftedOutput);
-
 	}
 
 	if(m_keyType == LINE_FEED)
@@ -56,6 +61,12 @@ VirtualKey::getLabel(bool shifted) const
 	{
 		return m_shiftedLabel;
 	}
+}
+
+WidgetSkin *
+VirtualKey::getIcon() const
+{
+	return m_icon;
 }
 
 const char *

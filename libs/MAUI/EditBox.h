@@ -63,7 +63,7 @@ namespace MAUI {
 	* See Label for more information.
 	**/
 	class EditBox : 
-	public Label, protected CharInputListener, protected KeyListener {
+	public Label, protected CharInputListener, protected KeyListener, protected VKListener {
 	public:
 		/** Enumeration for modes **/
 		enum InputMode {
@@ -132,7 +132,17 @@ namespace MAUI {
 		/**
 		 * @see MAUtil::PointerListener::pointerReleaseEvent.
 		 */
-		void pointerReleaseEvent(MAPoint2d p); 
+		void pointerReleaseEvent(MAPoint2d p);
+
+		/**
+		 * @see MAUtil::VKListener::keyboardShown.
+		 */
+		void keyboardShown(); 
+
+		/**
+		 * @see MAUtil::VKListener::keyboardHidden.
+		 */
+		void keyboardHidden(); 
 
 		/** Implementation of the CharInputListener interface function **/
 		void characterChanged(char c);

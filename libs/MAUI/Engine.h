@@ -108,6 +108,17 @@ namespace MAUI {
 		void hideKeyboard();
 
 		/**
+		 * Returns true if the point (x, y) is on the keyboard.
+		 *
+		 * @param x x-coordinate
+		 * @param y y-coordinate
+		 * @returns true if the points (x, y) is on the virtual keyboard,
+		 *          or false if the keyboard is not shown or the point (x, y)
+		 *          lies outside the keyboard.
+		 */
+		bool onKeyboard(int x, int y);
+
+		/**
 		 * Returns true if the keyboard is currently shown on the
 		 * screen.
 		 * 
@@ -133,6 +144,13 @@ namespace MAUI {
 		 * Determiens if the virtual keyboard is shown or not.
 		 */
 		bool m_keyboardVisible;
+
+		/**
+		 * The height of the main widget. It is used to remember the height
+		 * of the main widget when the keyboard pops up, so that it may be
+		 * restored when the keyboard is hidden again.
+		 */
+		int m_mainHeight;	
 
 		static Engine* singletonPtr;
 

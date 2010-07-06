@@ -51,7 +51,8 @@ namespace MAUtil {
 		mConnListeners(false),
 		mIdleListeners(false),
 		mTimerEvents(true),
-		mFocusListeners(false)
+		mFocusListeners(false),
+		mVKListeners(false)
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -77,6 +78,14 @@ namespace MAUtil {
 	void Environment::removeFocusListener(FocusListener* fl) {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.remove(fl);
+	}
+
+	void Environment::addVKListener(VKListener *vkl) {
+		mVKListeners.add(vkl);
+	}
+
+	void Environment::removeVKListener(VKListener *vkl) {
+		mVKListeners.remove(vkl);
 	}
 
 	bool Environment::isFocusListener(FocusListener* fl) {
@@ -215,6 +224,20 @@ namespace MAUtil {
 		ListenerSet_each(FocusListener, i, mFocusListeners)
 			i->focusLost();
 		mFocusListeners.setRunning(false);
+	}
+
+	void Environment::fireVKShownEvent() {
+		mVKListeners.setRunning(true);
+		ListenerSet_each(VKListener, i, mVKListeners)
+			i->keyboardShown();
+		mVKListeners.setRunning(false);
+	}
+
+	void Environment::fireVKHiddenEvent() {
+		mVKListeners.setRunning(true);
+		ListenerSet_each(VKListener, i, mVKListeners)
+			i->keyboardHidden();
+		mVKListeners.setRunning(false);
 	}
 
 	void Environment::fireKeyPressEvent(int keyCode, int nativeCode) {

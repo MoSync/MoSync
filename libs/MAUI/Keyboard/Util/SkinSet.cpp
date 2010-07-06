@@ -18,7 +18,21 @@ SkinSet::addSkin(const char *name, MAUI::WidgetSkin *skin)
 WidgetSkin *
 SkinSet::getSkin(const char *name)
 {
-	return m_skinMap[ MAUtil::String( name ) ];
+	if( name == NULL )
+	{
+		return NULL;
+	}
+
+	MAUtil::String keyName( name );
+	MAUtil::HashMap< MAUtil::String, MAUI::WidgetSkin * >::Iterator it = m_skinMap.find( keyName );
+	if( it != m_skinMap.end( ) )
+	{
+		return (*it).second;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 } /* Namespace end */

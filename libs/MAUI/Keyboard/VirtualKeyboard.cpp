@@ -67,7 +67,7 @@ void
 VirtualKeyboard::pointerReleaseEvent(MAPoint2d p)
 {
 	VirtualKey *pressedKey = m_curLayout->getKey( p.x - bounds.x, p.y - bounds.y );
-	if( pressedKey )
+	if( pressedKey && pressedKey->pressed( ) )
 	{
 		switch( pressedKey->getType( ) )
 		{
