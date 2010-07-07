@@ -59,6 +59,8 @@ if secondarg == nil
 	exit 0
 end
 
+debug = (fortharg == nil) ? "" : "D"
+
 outdir = ".."
 if thirdarg != nil
 	outdir = thirdarg
@@ -71,16 +73,10 @@ if thirdarg != nil
 		FileUtils.copy_file "src/config_platform.h", "src/config_platform.h.saved"
 	end
 
-	configfile = "config.h"
-	if fortharg == nil
-		configfile = "configD.h"
-	end
-	
-		# copy the config.h file to it's correct position and change it's name to config_platform.h
-		FileUtils.copy_file( "#{thirdarg}/#{configfile}", "src/config_platform.h")
+	# copy the config.h file to it's correct position and change it's name to config_platform.h
+	FileUtils.copy_file( "#{thirdarg}/config#{debug}.h", "src/config_platform.h")
 end
 
-debug = (fortharg == nil) ? "" : "D"
 
 puts "Building native Library\n\n"
 
