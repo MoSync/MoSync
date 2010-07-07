@@ -549,7 +549,7 @@ int MAMain() {
             printf("Read %i bytes:\n", e.conn.result);
             // Zero-terminate buffer.
             buffer[e.conn.result] = 0;
-            PrintConsole(buffer);
+            printf("%s", buffer);
             // Read more data.
             maConnRead(conn, buffer, sizeof(buffer) - 1);
           }
@@ -658,7 +658,7 @@ public:
         printf("Read %i bytes:\n", data.result);
         // Zero-terminate buffer, so it can be printed.
         mBuffer[data.result] = 0;
-        PrintConsole(mBuffer);
+        printf("%s", mBuffer);
         // Read more data.
         maConnRead(mConn, mBuffer, sizeof(mBuffer) - 1);
       }

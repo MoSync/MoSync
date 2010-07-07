@@ -288,7 +288,7 @@ typedef int word_type __attribute__ ((mode (__word__)));
 #define __popcountDI2	__NDW(popcount,2)
 #define __parityDI2	__NDW(parity,2)
 
-extern DWtype __muldi3 (DWtype, DWtype);
+//extern DWtype __muldi3 (DWtype, DWtype);
 extern DWtype __divdi3 (DWtype, DWtype);
 extern UDWtype __udivdi3 (UDWtype, UDWtype);
 extern UDWtype __umoddi3 (UDWtype, UDWtype);

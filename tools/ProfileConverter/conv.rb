@@ -14,6 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require 'rubygems'	# needed for sqlite3 on some(unknown) versions of Ruby
 require 'fileutils'
 require 'sqlite3'
 require 'set'

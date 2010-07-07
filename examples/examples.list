@@ -1,0 +1,26 @@
+[examples]
+# This file contains a list of examples that should be included in the released packages,
+# it is used by eclipse to switch to an example workspace.
+# File format: project name = project location (relative to the examples directory)
+3dlines = 3dLines
+AdvGraphics
+debugging
+HelloMap
+Location = location
+MapDemo
+MAStx
+MAUIEx = MAUI/MAUIex
+MinUI
+Connection = Moblet/Connection
+HelloMoblet = Moblet/HelloMoblet
+simple = Moblet/simple
+Soap = Moblet/Soap
+Stylus = Moblet/Stylus
+timers = Moblet/timers
+MoSketch
+MoSound
+MoTooth
+MoTris
+MoTrix
+OtaLoad
+MDLBenchmark = QuakeMDL

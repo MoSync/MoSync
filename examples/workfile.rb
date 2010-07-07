@@ -27,11 +27,9 @@ SUBDIRS = [
 	"OtaLoad",
 ]
 
-target :pipe do
-	Work.invoke_subdirs(SUBDIRS, 'pipe')
+target :default do
+	Work.invoke_subdirs(SUBDIRS)
 end
-
-target :default => :pipe
 
 target :clean do
 	Work.invoke_subdirs(SUBDIRS, 'clean')

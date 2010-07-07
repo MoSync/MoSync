@@ -1889,7 +1889,8 @@ interface MAAPI {
 		* when the location provider state changes.
 		*
 		* \returns MA_LPS_AVAILABLE on success, 0 if collection was already active, or
-		* MA_LPS_OUT_OF_SERVICE if the location provider is out of service.
+		* MA_LPS_OUT_OF_SERVICE if the location provider is out of service, or
+		* \< 0 on error.
 		*
 		* \note <b>The location API is experimental, not fully tested.
 		* It may not work as advertised.</b>
@@ -1990,7 +1991,7 @@ interface MAAPI {
 		int maFileExists(in MAHandle file);
 
 		/**
-		* Closes a file handle. Returns 0.
+		* Closes a file handle. Returns 0. Panics on error.
 		*/
 		int maFileClose(in MAHandle file);
 
@@ -2000,7 +2001,7 @@ interface MAAPI {
 		* The file must not exist prior to calling this function.
 		* After creation, the file will be accessible according to the mode specified when
 		* its handle was opened.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileCreate(in MAHandle file);
 
@@ -2008,7 +2009,7 @@ interface MAAPI {
 		* Deletes a file or directory.
 		* The file must exist prior to calling this function.
 		* If it's a directory, it must be empty.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileDelete(in MAHandle file);
 
@@ -2019,9 +2020,41 @@ interface MAAPI {
 		*/
 		int maFileSize(in MAHandle file);
 
+		/**
+		* Returns the number of free bytes on the file system on which \a file resides.
+		* Note that due to file system overhead, it is not possible to use all of
+		* this space for file data.
+		* Returns \< 0 on error.
+		*/
 		int maFileAvailableSpace(in MAHandle file);
+
+		/**
+		* Returns the total size, in bytes, of the file system on which \a file resides.
+		* Returns \< 0 on error.
+		*/
 		int maFileTotalSpace(in MAHandle file);
+
+		/**
+		* Returns the date/time when the file was last modified, or \< 0 on error.
+		* The time format is Unix UTC.
+		* \see maTime()
+		*/
 		int maFileDate(in MAHandle file);
+
+		/**
+		* Renames a file.
+		*
+		* If \a newName does not contain a slash,
+		* the file stays in its original directory.
+		*
+		* If \a newName does contain a slash, it must be a complete pathname,
+		* and the file is moved to that path. The new path must be on the same file system
+		* as the original path. If it is not, this function fails with #MA_FERR_RENAME_FILESYSTEM.
+		* Moving a file to another directory is not supported on Java ME. If it is attempted,
+		* this function fails with #MA_FERR_RENAME_DIRECTORY.
+		*
+		* \returns 0 on success, or \< 0 on error.
+		*/
 		int maFileRename(in MAHandle file, in MAString newName);
 
 		/**
@@ -2035,13 +2068,13 @@ interface MAAPI {
 		* to be equal to the offset.
 		*
 		* The file must exist prior to calling this function.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileTruncate(in MAHandle file, in int offset);
 
 		/**
 		* Write from memory to file.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
 
@@ -2057,17 +2090,17 @@ interface MAAPI {
 
 		/**
 		* Write from data object to file.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWriteFromData(in MA_FILE_DATA args);
 		/**
 		* Read from file to memory.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileRead(in MAHandle file, out MAAddress dst, in int len);
 		/**
 		* Read from file to data object.
-		* Returns 0, or \< 0 on error.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileReadToData(in MA_FILE_DATA args);
 
@@ -2137,6 +2170,8 @@ interface MAAPI {
 			GENERIC = -2;
 			NOTFOUND = -3;
 			FORBIDDEN = -4;
+			RENAME_FILESYSTEM = -5;
+			RENAME_DIRECTORY = -6;
 		}
 
 		//maybe add support for "hidden" files

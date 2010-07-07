@@ -15,19 +15,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-package com.mosync.java.android;
+package com.mosync.internal.android;
 
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileDescriptor;
+import java.io.InterruptedIOException;
 
+import java.io.IOException;
+
+import java.net.*;
+
+import android.content.Intent;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.AssetFileDescriptor;
+
 import android.os.Handler;
+
 
 import android.graphics.Canvas;
 import android.graphics.Bitmap;
@@ -43,16 +57,36 @@ import java.util.Hashtable;
 
 import android.util.Log;
 
-class MoSyncThread extends Thread
+import com.mosync.java.android.MoSyncPanicDialog;
+
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+
+#ifdef _ANDROID_BLUETOOTH
+import android.app.Activity;
+import android.bluetooth.*;
+
+#endif
+
+#include "helpers.h"
+
+public class MoSyncThread extends Thread
 {
 	private Context mContext;
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
+	private boolean hasDied;
+	
+	private long mResourceOffset = 0;
+	
+	ByteBuffer mRecompilerCodeBlock;
+	ByteBuffer mRecompilerEntryBlock;
 	
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{	
 		mContext = context;
 		mHandler = handler;
+		hasDied = false;
 	
 		Log.i("MoSync Thread", "Constructor");
 
@@ -63,6 +97,11 @@ class MoSyncThread extends Thread
 	public void setMoSyncView(MoSyncView moSyncView)
 	{
 		mMoSyncView = moSyncView;
+	}
+	
+	public boolean isDead()
+	{
+		return hasDied;
 	}
 	
 	public void updateSurfaceSize(int width, int height)
@@ -98,17 +137,50 @@ class MoSyncThread extends Thread
 		}
 		return mMemDataSection;
 	}
-
-	public void waitThread()
+	
+	public ByteBuffer generateRecompilerCodeBlock(int size)
 	{
-		Log.i("MoSyncThread","waitThread");
+		Log.i("MoSyncThread","generate recompiler code block");
 		try
 		{
-			sleep(1000);
+			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
 		}
 		catch(Exception e)
 		{
-			Log.i("MoSyncThread","sleep exception:" + e.toString());
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerCodeBlock;
+	}
+	
+	public ByteBuffer generateRecompilerEntryBlock(int size)
+	{
+		Log.i("MoSyncThread","generate recompiler entry block");
+		try
+		{
+			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerEntryBlock;
+	}
+	
+
+	public void threadPanic(int errorCode, String message)
+	{
+		Log.i("MoSyncThread","threadPanic");
+		hasDied = true;
+		try
+		{
+			MoSyncPanicDialog.sPanicMessage = message;
+			Intent myIntent = new Intent(mMoSyncView.getContext(), MoSyncPanicDialog.class);
+			mMoSyncView.getContext().startActivity(myIntent);
+			this.sleep(Long.MAX_VALUE);
+		}
+		catch(Exception e)
+		{
+			Log.i("MoSyncThread","threadPanic exception:" + e.toString());
 		}
 	}
 	
@@ -117,33 +189,61 @@ class MoSyncThread extends Thread
 		Log.i("MoSync Thread", "load program");
 		try
 		{
-			ByteBuffer programBuffer = readInputStream(mContext.getResources().openRawResource(R.raw.program));
-			int programBufferSize = programBuffer.position();
-			programBuffer.position(0);
-			
-			mResourceFile = readInputStream(mContext.getResources().openRawResource(R.raw.resources));
-			int resourceFileSize = mResourceFile.position();
-			mResourceFile.position(0);
 		
-			if(programBuffer != null && mResourceFile != null)
-			{
+			Log.i("MoSync Thread", "load program 2");
+		
+			AssetManager assetManager = mContext.getAssets();
+			AssetFileDescriptor pAfd = assetManager.openFd("program.mp3");
+			FileDescriptor pFd = pAfd.getFileDescriptor();
+			long pFdLength = pAfd.getLength();
+			long pFdOffset = pAfd.getStartOffset();
 			
-				if(false == nativeLoad(programBuffer, programBufferSize, mResourceFile, resourceFileSize))
+			AssetFileDescriptor rAfd = assetManager.openFd("resources.mp3");
+			FileDescriptor rFd = rAfd.getFileDescriptor();
+			long rFdLength = rAfd.getLength();
+			mResourceOffset = rAfd.getStartOffset();
+			
+			if((null != pFd) && (null != rFd))
+			{
+				Log.i("MoSync Thread", "calling native function");
+				if(false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
 				{
 					Log.e("MoSync Thread", "ERROR Load program was unsuccesfull");
+					threadPanic(0, "Unable to load program or resources");
 					return false;
 				}
 
 				Log.i("MoSync Thread", "Load program was succesfull");
 				return true;
 			}
-			Log.e("MoSyncService", "No program buffer created!");
+
 		}
 		catch(Exception e)
 		{
 			Log.e("MoSyncService", "Exception while loading program:" + e.toString());
 		}
 		return false;
+	}
+	
+	public FileDescriptor getResourceFileDesriptor()
+	{		
+		try
+		{
+			AssetManager assetManager = mContext.getAssets();
+			AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+			FileDescriptor pFd = pAfd.getFileDescriptor();
+			return pFd;
+		}
+		catch(Exception e)
+		{
+			Log.e("MoSyncService","getResourceFileDesriptor exception:" + e.toString());
+		}
+		return null;
+	}
+	
+	public int getResourceStartOffset()
+	{
+		return (int)mResourceOffset;
 	}
 
 
@@ -173,7 +273,12 @@ private static final int CHUNK_READ_SIZE = 1024;
 		
 		return byteBuffer;  
 	}  
-
+/*
+	public FileDescriptor getResourceFileDescriptor()
+	{
+	
+	}
+*/	
 	public void stopNow()
 	{
 		Log.i("MoSync Thread","stopNow");
@@ -195,11 +300,11 @@ private static final int CHUNK_READ_SIZE = 1024;
 		
 		Log.i("MoSync Thread", "loop has ended");
 	}
-
+	
 	#include "MoSyncSyscalls.jpp"
 
 	public native boolean nativeInitRuntime();
-	public native boolean nativeLoad(ByteBuffer program, int programSize, ByteBuffer resource, int resourceSize);
+	public native boolean nativeLoad(FileDescriptor program, long programOffset, FileDescriptor resource, long resourceOffset);
 	public native boolean nativeLoadResource(ByteBuffer resource);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();	

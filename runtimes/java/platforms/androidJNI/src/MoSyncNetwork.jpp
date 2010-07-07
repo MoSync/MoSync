@@ -1,0 +1,899 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+#define HTTP_STATE_NULL 0
+#define HTTP_STATE_SETUP 1
+#define HTTP_STATE_WRITING 2
+#define HTTP_STATE_FINISHING 3
+#define HTTP_STATE_FINISHED 4
+
+Hashtable<Integer, ConnectionInformation> mConnections = new Hashtable<Integer, ConnectionInformation>();
+int mConnNextHandle = 1;
+ThreadPool mThreadPool = new ThreadPool();
+
+
+MAHandle maConnect(final String url) {
+	Log.i("MoSyncSyscall","maConnect");
+	Log.i("maConnect", "url:" + url);
+	
+	try
+	{
+		ConnectionInformation conInfo;
+		if(url.startsWith("socket://"))
+		{
+			// restructure the url since port can't be part of it
+			String realUrl = url.substring(9);
+			String[] splitUrl = realUrl.split("\\b:\\d{1,5}\\b");
+	
+			if (splitUrl.length > 2) return CONNERR_URL;
+			
+			String newUrl = splitUrl[0];
+			int port = 80;
+			if(splitUrl.length == 2)
+			{
+				int end = splitUrl[0].length() + realUrl.length()-(splitUrl[0].length()+splitUrl[1].length());
+				port = Integer.valueOf(realUrl.substring(splitUrl[0].length()+1, end)).intValue();
+				newUrl += splitUrl[1];
+			}
+			else port = Integer.valueOf(realUrl.substring(splitUrl[0].length()+1)).intValue();
+
+			conInfo = new ConnectionInformation(newUrl, port, mConnNextHandle);
+		}
+/*		
+		else if(url.startsWith("btspp://"))
+		{
+		
+		}
+*/		
+		else
+		{
+			URL connectionURL = new URL(url);
+			URLConnection con = connectionURL.openConnection();
+			con.setAllowUserInteraction(true);
+			con.setDoInput(true);
+			con.setDoOutput(true);
+			con.setUseCaches(false);
+			
+			conInfo = new ConnectionInformation(con, mConnNextHandle);	
+		}
+		
+		mConnections.put(mConnNextHandle, conInfo);
+			
+		conInfo.mState |= CONNOP_CONNECT;
+		conInfo.mMoSyncThread = this;
+			
+		mThreadPool.execute(new HttpConnectionConnector(conInfo));
+	}
+	catch(MalformedURLException e)
+	{
+		SYSLOG("MalformedURLException: " + e.toString());
+		return CONNERR_URL;
+	}
+	catch(IOException e)
+	{
+		SYSLOG("IOException: " + e.toString());
+		PRINT_STACK_TRACE;
+		return CONNERR_GENERIC;
+	}
+	catch(Exception e)
+	{
+		SYSLOG("Exception: " + e.toString());
+		PRINT_STACK_TRACE;
+		return CONNERR_GENERIC;
+	}	
+	
+	return mConnNextHandle++;
+}
+
+int maConnGetAddr(MAHandle conn, long addr) throws Exception {
+	Log.i("MoSyncSyscall","maConnect");
+	/* FIX-ME */
+	return -1;
+}
+
+void maConnClose(MAHandle conn) throws Exception {
+	Log.i("MoSyncSyscall","maConnClose");
+	
+	Integer key = new Integer(conn);
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	connectionInfo.close();
+	
+	mConnections.remove(key);
+}
+
+void maConnRead(MAHandle conn, int dst, int size) {
+	Log.i("MoSyncSyscall","maConnRead");
+	SYSLOG("conn:" + conn + " dst:" + dst + " size:" + size);
+	
+	MYASSERT(size > 0);
+	
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	connectionInfo.mMemory = dst;
+	connectionInfo.mSize = size;
+	connectionInfo.mReadData = true;
+	connectionInfo.mUseResource = false;
+	
+	try
+	{
+		if(connectionInfo.mIsHttpConnection)
+			connectionInfo.mIs = connectionInfo.mConnection.getInputStream();
+		else if (connectionInfo.mIsSocketConnection)
+			connectionInfo.mIs = connectionInfo.mSocket.getInputStream();
+			
+		MYASSERT(connectionInfo.mIs != null);
+	}
+	catch(IOException e)
+	{
+		PRINT_STACK_TRACE;
+	}
+	
+	MYASSERT((connectionInfo.mState & CONNOP_READ) == 0);
+	connectionInfo.mState |= CONNOP_READ;
+	connectionInfo.mMoSyncThread = this;
+	
+	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+}
+
+void maConnWrite(MAHandle conn, int src, int size) throws IOException {
+	Log.i("MoSyncSyscall","maConnWrite");
+	SYSLOG("conn:" + conn + " src:" + src + " size:" + size);
+	
+	MYASSERT(size > 0);
+	
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	connectionInfo.mMemory = src;
+	connectionInfo.mSize = size;
+	connectionInfo.mReadData = false;
+	connectionInfo.mUseResource = false;
+	
+	try
+	{
+		if(connectionInfo.mIsHttpConnection)
+			connectionInfo.mOs = connectionInfo.mConnection.getOutputStream();
+		else if (connectionInfo.mIsSocketConnection)
+			connectionInfo.mOs = connectionInfo.mSocket.getOutputStream();
+			
+		MYASSERT(connectionInfo.mOs != null);
+	}
+	catch(IOException e)
+	{
+		PRINT_STACK_TRACE;
+	}
+	
+	MYASSERT((connectionInfo.mState & CONNOP_WRITE) == 0);
+	if(connectionInfo.mIsHttpConnection == true) {
+		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
+		
+		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
+		}
+	}
+	else if(connectionInfo.mIsSocketConnection == true) {
+		if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
+	}
+	connectionInfo.mState |= CONNOP_WRITE;
+	connectionInfo.mMoSyncThread = this;
+	
+	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+}
+
+void maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) {
+	Log.i("MoSyncSyscall","maConnReadToData");
+
+	MYASSERT(offset >= 0);
+	MYASSERT(size > 0);
+	MYASSERT(offset + size > 0);
+/*
+	Binary binaryResource = (Binary)getResource(data);
+	MYASSERT(binaryResource.size() >= offset + size);
+*/
+
+	ByteBuffer byteBuffer = (ByteBuffer)mBinaryResources.get(data);
+	if(null == byteBuffer) BIG_PHAT_ERROR;
+
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	connectionInfo.mData = data;
+	//connectionInfo.mBinary = binaryResource;
+	connectionInfo.mByteBuffer = byteBuffer;
+	connectionInfo.mOffset = offset;
+	connectionInfo.mSize = size;
+	connectionInfo.mReadData = true;
+	connectionInfo.mUseResource = true;
+	
+	try
+	{
+		if(connectionInfo.mIsHttpConnection)
+			connectionInfo.mIs = connectionInfo.mConnection.getInputStream();
+		else if (connectionInfo.mIsSocketConnection)
+			connectionInfo.mIs = connectionInfo.mSocket.getInputStream();
+			
+		MYASSERT(connectionInfo.mIs != null);
+	}
+	catch(IOException e)
+	{
+		PRINT_STACK_TRACE;
+	}
+	
+	/*
+		The JNI side is responsible for setting the resource in flux
+	*/
+	//setResource(data, mFlux);
+	
+	connectionInfo.mState |= CONNOP_READ;
+	connectionInfo.mMoSyncThread = this;
+	
+	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+}
+
+void maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size) throws IOException {
+	Log.i("MoSyncSyscall","maConnReadFromData");
+
+	MYASSERT(offset >= 0);
+	MYASSERT(size > 0);
+	MYASSERT(offset + size > 0);
+
+/*
+	Binary binaryResource = (Binary)getResource(data);
+	MYASSERT(binaryResource.size() >= offset + size);
+*/
+	ByteBuffer byteBuffer = (ByteBuffer)mBinaryResources.get(data);
+	if(null == byteBuffer) BIG_PHAT_ERROR;
+	
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	connectionInfo.mData = data;
+	//connectionInfo.mBinary = binaryResource;
+	connectionInfo.mByteBuffer = byteBuffer;
+	connectionInfo.mOffset = offset;
+	connectionInfo.mSize = size;
+	connectionInfo.mReadData = false;
+	connectionInfo.mUseResource = true;
+	
+	try
+	{
+		if(connectionInfo.mIsHttpConnection)
+			connectionInfo.mOs = connectionInfo.mConnection.getOutputStream();
+		else if (connectionInfo.mIsSocketConnection)
+			connectionInfo.mOs = connectionInfo.mSocket.getOutputStream();
+			
+		MYASSERT(connectionInfo.mOs != null);
+	}
+	catch(IOException e)
+	{
+		PRINT_STACK_TRACE;
+	}
+	
+	MYASSERT((connectionInfo.mState & CONNOP_WRITE) == 0);
+	if(connectionInfo.mIsHttpConnection == true) {
+		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
+		
+		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
+		}
+	}
+	else if(connectionInfo.mIsSocketConnection == true) {
+		if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
+			connectionInfo.mHttpState = HTTP_STATE_WRITING;
+	}
+	
+	/*
+		The JNI side is responsible for setting the resource in flux
+	*/
+	//setResource(data, mFlux);
+	
+	connectionInfo.mState |= CONNOP_WRITE;
+	connectionInfo.mMoSyncThread = this;
+	
+	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+}
+
+
+
+MAHandle maHttpCreate(String url, int method) throws Exception
+{
+	Log.i("MoSyncSyscall","URLConnectionTask - maHttpCreate");
+	try
+	{
+		URL connectionURL = new URL(url);
+		URLConnection con = connectionURL.openConnection();
+		con.setAllowUserInteraction(true);
+		con.setDoInput(true);
+		con.setDoOutput(true);
+		con.setUseCaches(false);
+		
+		HttpURLConnection httpConn = (HttpURLConnection) con;
+		
+		switch(method) {
+		case HTTP_GET:
+			httpConn.setRequestMethod("GET");
+			break;
+		case HTTP_POST:
+			httpConn.setRequestMethod("POST");
+			break;
+		case HTTP_HEAD:
+			httpConn.setRequestMethod("HEAD");
+			break;
+		default:
+			BIG_PHAT_ERROR;
+		}
+
+		ConnectionInformation urlcon = new ConnectionInformation(con, mConnNextHandle);
+		
+		DEBUG_ASSERT(urlcon.mHttpState == HTTP_STATE_NULL);
+		urlcon.mHttpState = HTTP_STATE_SETUP;
+	
+		mConnections.put(mConnNextHandle, urlcon);
+	}
+	catch(MalformedURLException e)
+	{
+		PRINT_STACK_TRACE;
+		return CONNERR_URL;
+	}
+	catch(IOException e)
+	{
+		PRINT_STACK_TRACE;
+		return CONNERR_GENERIC;
+	}
+	catch(Exception e)
+	{
+		PRINT_STACK_TRACE;
+		return CONNERR_GENERIC;
+	}
+	
+	return mConnNextHandle++;
+}
+
+void maHttpSetRequestHeader(MAHandle conn, String key, String value)
+throws Exception
+{
+	Log.i("MoSyncSyscall","URLConnectionTask - maHttpSetRequestHeader");
+
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP);
+	
+	URLConnection connection = connectionInfo.mConnection;
+	try
+	{
+		connection.setRequestProperty(key, value);
+	} 
+	catch (IllegalStateException e)
+	{
+		PRINT_STACK_TRACE;
+	} 
+	catch (NullPointerException e)
+	{
+		PRINT_STACK_TRACE;
+	}
+}
+
+int maHttpGetResponseHeader(MAHandle conn, String key, long address, int bufSize)
+throws Exception
+{
+	Log.i("MoSyncSyscall","URLConnectionTask - maHttpGetResponseHeader");
+	
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	URLConnection connection = connectionInfo.mConnection;
+	
+	try
+	{
+		//final String value = connection.getRequestProperty(key);
+		final String value = connection.getHeaderField(key);
+		
+		if(value == null)
+			return CONNERR_NOHEADER;
+		
+		// Write the bufSize first characters in the String value to ds_mem starting at address
+				
+		byte[] vstr = value.getBytes();
+		
+		SYSLOG("value: " + value + " vstr: " + new String(vstr) + " vstr.length: " + vstr.length + "position: " + address);
+		
+		mMemDataSection.mark();
+		mMemDataSection.position((int)address);
+		mMemDataSection.put(vstr, 0, vstr.length);
+		mMemDataSection.reset();
+		
+		return vstr.length;
+	} 
+	catch (IllegalStateException e)
+	{
+		PRINT_STACK_TRACE;
+	} 
+	
+	return -1;
+}
+
+void maHttpFinish(MAHandle conn)
+{
+	Log.i("MoSyncSyscall","URLConnectionTask - maHttpFinish");
+	
+	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	
+	MYASSERT(connectionInfo.mState == 0);
+	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP || connectionInfo.mHttpState == HTTP_STATE_WRITING);
+	connectionInfo.mState = CONNOP_FINISH;
+	connectionInfo.mHttpState = HTTP_STATE_FINISHING;
+	connectionInfo.mMoSyncThread = this;
+	
+	mThreadPool.execute(new HttpConnectionFinish(connectionInfo));
+}
+
+
+public class ConnectionInformation
+{
+	public ByteBuffer mByteBuffer;
+	public long mMemory;
+	public int mOffset;
+	public int mSize;
+	public URLConnection mConnection;
+	public Socket mSocket;
+	public boolean mReadData;
+	public boolean mUseResource;
+	public int mState;
+	public int mHttpState;
+	public boolean mCancelled;
+	public boolean mIsHttpConnection;
+	public boolean mIsSocketConnection;
+	public boolean mIsBluetoothConnection;
+	private MAHandle mHandle;
+	public InputStream mIs;
+	public OutputStream mOs;
+	public MAHandle mData;
+	public Thread mMoSyncThread;
+	
+	public String mSocketAddress;
+	public int mSocketPort;
+	
+	
+	public ConnectionInformation(URLConnection connection, MAHandle handle )
+	{
+		mConnection = connection;
+		mHandle = handle;
+		mState = 0;
+		mHttpState = HTTP_STATE_NULL;
+		mCancelled = false;
+		
+		mIsHttpConnection = true;
+		mIsSocketConnection = false;
+	}
+	
+	public ConnectionInformation(String socketAddress, int socketPort, MAHandle handle )
+	{
+		mSocketAddress = socketAddress;
+		mSocketPort = socketPort;
+		mHandle = handle;
+		mState = 0;
+		mHttpState = HTTP_STATE_NULL;
+		mCancelled = false;
+		
+		mIsHttpConnection = false;
+		mIsSocketConnection = true;
+	}
+	
+	final void postResultEvent(int opType, int result) {
+		Log.i("MoSync syscall", "handle:" + mHandle + " opType:" + opType + " result:" + result);
+		MYASSERT((mState & opType) != 0);
+		mState &= ~opType;
+
+		int[] event = new int[4];
+		event[0] = EVENT_TYPE_CONN;
+		event[1] = mHandle;
+		event[2] = opType;
+		event[3] = result;
+		
+		Log.i("ConnectionInformation","Native Post Event");
+		nativePostEvent(event);
+		
+		Log.i("ConnectionInformation","Interrupt");
+		mMoSyncThread.interrupt();
+	}
+	
+	synchronized final void close() throws IOException
+	{
+		mCancelled = true;
+		if(mIs != null)
+			mIs.close();
+		if(mOs != null)
+			mOs.close();
+		mConnection = null;
+	}
+	
+	
+}
+
+class HttpConnectionConnector implements Runnable {
+
+	ConnectionInformation mConn;
+
+	HttpConnectionConnector(ConnectionInformation conn) {
+		mConn = conn;
+	}
+
+	public final void run()
+	{
+		try
+		{
+			int result = 1;
+			if(mConn.mIsHttpConnection)
+			{
+				mConn.mConnection.connect();
+			
+				HttpURLConnection http = (HttpURLConnection) mConn.mConnection;
+				
+				result = http.getResponseCode();
+				if(result <= 0)
+				{
+					DUMP(result);
+					result = CONNERR_PROTOCOL;
+				}
+				else
+				{
+#ifndef PHONE_RELEASE
+					//dump headers
+					int i=0;
+					while(true)
+					{
+						String key = mConn.mConnection.getHeaderFieldKey(i);
+						String value = mConn.mConnection.getHeaderField(i);
+						DEBUG_ALWAYS(key + ": " + value + "\n");
+						if(key == null && value == null)
+							break;
+						i++;
+					}
+#endif
+					mConn.mHttpState = HTTP_STATE_FINISHED;
+				}
+			}
+			if(mConn.mIsSocketConnection)
+			{
+				Log.i("Connector","connection to socket");
+				mConn.mSocket = new Socket(mConn.mSocketAddress, mConn.mSocketPort);
+				Log.i("Connector","connection returned");
+				
+				if(mConn.mSocket.isConnected())
+					mConn.mHttpState = HTTP_STATE_FINISHED;
+				else
+					result = CONNERR_GENERIC;
+			}
+			synchronized(mConn) {
+				if(mConn.mCancelled) {
+					mConn.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
+					return;
+				}
+			}
+			mConn.postResultEvent(CONNOP_CONNECT, result);
+		}
+		catch(InterruptedIOException e)
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
+			return;
+		}
+		catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			return;
+		}
+	}
+}
+
+class HttpConnectionRunner implements Runnable 
+{
+	ConnectionInformation mConn;
+
+	HttpConnectionRunner(ConnectionInformation conn)
+	{
+		mConn = conn;
+	}
+
+	public final void run() {
+
+		int opType = -1;
+		try
+		{
+			if(mConn.mReadData == true) // Read data
+			{
+				int result = -1;
+				int opResult;
+				opType = CONNOP_READ;
+				
+				byte[] bytes = new byte[mConn.mSize];
+				result = mConn.mIs.read(bytes);
+				
+				if(mConn.mUseResource == true) // store in resource 
+				{
+					Log.i("HttpConnectionRunner","Read to resource");
+					
+					// READ DATA DIRECTLY INTO A RESOURCE
+
+					mConn.mByteBuffer.position(0);
+					mConn.mByteBuffer.put(bytes, 0, result);
+				
+					//result = mConn.mIs.read(mConn.mBinary.arr, mConn.mOffset, mConn.mSize);
+				}
+				else // store in memory
+				{
+					Log.i("HttpConnectionRunner","Read to memory");
+					
+					if(result > 0)
+					{
+						
+						// WRITE THE DATA IN BUFFER bytes TO MEMORY AT ADDRESS mConn.mMemory
+						
+						mMemDataSection.mark();
+						mMemDataSection.position((int)mConn.mMemory);
+						mMemDataSection.put(bytes, 0, result);
+						mMemDataSection.reset();
+						
+						opResult = result;
+					}
+				}
+				
+				// success
+				if(result > 0)
+				{
+					opResult = result;
+				}
+				else if(result == -1) {
+					opResult = CONNERR_CLOSED;
+				} else {
+					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
+					opResult = CONNERR_INTERNAL;
+				}
+				
+				
+				/*
+					Restore resource from flux
+				*/
+				//setResource(mConn.mData, mConn.mBinary);
+				
+				mConn.postResultEvent(opType, opResult);
+				return;
+			}
+			else // Write data
+			{
+				opType = CONNOP_WRITE;
+				if(mConn.mUseResource == true) // resource
+				{
+					Log.i("HttpConnectionRunner","Send from resource");
+					/*
+					if(mConn.mBinary instanceof Binary) {
+						Binary bin = (Binary)mConn.mBinary;
+						
+						mConn.mOs.write(bin.arr, mConn.mOffset, mConn.mSize);
+					} else {
+						byte[] buffer = new byte[mConn.mSize];
+						DataInputStream dis = new DataInputStream(mConn.mBinary.getInputStream());
+						dis.readFully(buffer);
+						dis.close();
+						
+						mConn.mOs.write(buffer);
+					}
+					*/
+					
+					// WRITE DATA DIRECTLY TO THE STREAM FROM mConn.ByteBuffer
+					
+				}
+				else // memory
+				{
+					Log.i("HttpConnectionRunner","Send from memory");
+					SYSLOG("memstart:" + (int)mConn.mMemory + " size:" + mConn.mSize + " datasize:" + mMemDataSection.capacity());
+					
+					// WRITE DATA DIRECTLY TO THE STREAM FROM memory at position mConn.mMemory
+					
+					byte[] data = new byte[mConn.mSize];
+					mMemDataSection.mark();
+					mMemDataSection.position((int)mConn.mMemory);
+					mMemDataSection.get(data);
+					mMemDataSection.reset();
+					
+					mConn.mOs.write(data);
+					
+					//readMemStream(mConn.mOs, mConn.mMemory, mConn.mSize);
+				}
+				
+				//success
+				
+				/*
+					Restore resource from flux
+				*/
+				//setResource(mConn.mData, mConn.mBinary);
+				
+				mConn.postResultEvent(opType, 1);
+				return;
+			}	
+		}
+		catch(InterruptedIOException e)
+		{
+			SYSLOG("InterruptedIOException e:" + e.toString());
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(opType, CONNERR_CANCELED);
+			return;
+		}
+		catch(IOException e)
+		{
+			SYSLOG("IOException e:" + e.toString());
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(opType, CONNERR_GENERIC);
+			return;
+		}
+		catch(Exception e)
+		{
+			SYSLOG("Exception e:" + e.toString());
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(opType, CONNERR_GENERIC);
+			return;
+		}
+		
+	}
+}
+/*
+class SocketConnectionRunner implements Runnable 
+{
+	ConnectionInformation mConn;
+
+	SocketConnectionRunner(ConnectionInformation conn)
+	{
+		mConn = conn;
+	}
+
+	public final void run() {
+
+		int opType = -1;
+		try
+		{
+			if(mConn.mReadData == true) // Read data
+			{
+				int result = -1;
+				int opResult;
+				opType = CONNOP_READ;
+				
+				if(mConn.mUseResource == true) // store in resource 
+				{
+					Log.i("HttpConnectionRunner","Read to resource");
+					result = mConn.mIs.read(mConn.mBinary.arr, mConn.mOffset, mConn.mSize);
+				}
+				else // store in memory
+				{
+					Log.i("HttpConnectionRunner","Read to memory");
+					byte[] bytes = new byte[mConn.mSize];
+					result = mConn.mIs.read(bytes);
+					if(result > 0)
+					{
+						writeMemBytes(mConn.mMemory, bytes, 0, result);
+						opResult = result;
+					}
+				}
+				
+				// success
+				if(result > 0)
+				{
+					opResult = result;
+				}
+				else if(result == -1) {
+					opResult = CONNERR_CLOSED;
+				} else {
+					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
+					opResult = CONNERR_INTERNAL;
+				}
+				
+				setResource(mConn.mData, mConn.mBinary);
+				mConn.postResultEvent(opType, opResult);
+				return;
+			}
+			else // Write data
+			{
+				opType = CONNOP_WRITE;
+				if(mConn.mUseResource == true) // resource
+				{
+					Log.i("HttpConnectionRunner","Send from resource");
+					if(mConn.mBinary instanceof Binary) {
+						Binary bin = (Binary)mConn.mBinary;
+						mConn.mOs.write(bin.arr, mConn.mOffset, mConn.mSize);
+					} else {
+						byte[] buffer = new byte[mConn.mSize];
+						DataInputStream dis = new DataInputStream(mConn.mBinary.getInputStream());
+						dis.readFully(buffer);
+						dis.close();
+						mConn.mOs.write(buffer);
+					}
+				}
+				else // memory
+				{
+					Log.i("HttpConnectionRunner","Send from memory");
+					readMemStream(mConn.mOs, mConn.mMemory, mConn.mSize);
+				}
+				
+				//success
+				setResource(mConn.mData, mConn.mBinary);
+				mConn.postResultEvent(opType, 1);
+				return;
+			}	
+		}
+		catch(InterruptedIOException e)
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(opType, CONNERR_CANCELED);
+			return;
+		}
+		catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(opType, CONNERR_GENERIC);
+			return;
+		}
+		
+	}
+}
+*/
+class HttpConnectionFinish implements Runnable
+{
+	ConnectionInformation mConn;
+
+	HttpConnectionFinish(ConnectionInformation conn)
+	{
+		mConn = conn;
+	}
+
+	public final void run() {
+		HttpURLConnection httpConn = (HttpURLConnection)mConn.mConnection;
+		try {
+			if(mConn.mOs != null) {
+				mConn.mOs.close();
+				mConn.mOs = null;
+			}
+			
+			int result = httpConn.getResponseCode();
+			if(result <= 0) {
+				DUMP(result);
+				result = CONNERR_PROTOCOL;
+			} else {
+//#ifndef PHONE_RELEASE
+				//dump headers
+				int i=0;
+				while(true) {
+					String key = mConn.mConnection.getHeaderFieldKey(i);
+					String value = mConn.mConnection.getHeaderField(i);
+					DEBUG_ALWAYS(key + ": " + value + "\n");
+					if(key == null && value == null)
+						break;
+					i++;
+				}
+//#endif
+				mConn.mHttpState = HTTP_STATE_FINISHED;
+			}
+			mConn.postResultEvent(CONNOP_FINISH, result);
+		} catch(InterruptedIOException e) {
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_FINISH, CONNERR_CANCELED);
+		} catch(IOException e) {
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
+		}
+	}
+}
+
+
+
+
+

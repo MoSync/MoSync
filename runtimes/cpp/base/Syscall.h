@@ -54,8 +54,8 @@ namespace Base {
 		void platformDestruct();
 /*
 #ifdef _android
-		extern JNIEnv* mJNIEnv;
-		extern jobject mJThis;
+		JNIEnv* mJNIEnv;
+		jobject mJThis;
 #endif
 */
 #ifdef SYMBIAN

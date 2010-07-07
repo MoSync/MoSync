@@ -14,7 +14,6 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require "androidPaths.rb"
 require 'fileutils'
 
 def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
@@ -22,6 +21,8 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	java_file = src_file.gsub(/.jpp$/, ".java")
 	
 	puts "Processing " + java_file
+	
+	#-D_ANDROID_BLUETOOTH
 	
 	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
 	system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D_android -I#{shared_dir} -Isrc" +
@@ -39,13 +40,27 @@ if !File.exist? "src/config_platform.h"
 end
 
 android_source = "src"
+
 shared_java_source = "../../Shared"
+if(ENV['MOSYNC_SRC'] != nil)
+	shared_java_source = ENV['MOSYNC_SRC'] + "/runtimes/java/Shared"
+end
+puts "shared lib: " + shared_java_source
 
 out_dir = "AndroidProject/src/com/mosync/java/android/"
 
 # Preprocess all the jpp files and create java files from them
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" )
+	if (x == "MoSync.jpp" || x == "MoSyncPanicDialog.jpp" ) # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
+		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
+	end
+}
+
+out_dir = "AndroidProject/src/com/mosync/internal/android/"
+
+# Preprocess all the jpp files and create java files from them
+Dir.foreach(android_source) {|x| 
+	if (x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
 		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
 	end
 }

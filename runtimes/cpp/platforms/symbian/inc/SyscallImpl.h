@@ -132,16 +132,24 @@ private:
 	void HangupHandlerL(TInt status);
 #endif	//CALL
 
-#ifdef SUPPORT_MOSYNC_SERVER
-	RMoSyncServerSession gServer;
-
 	//Location API
+#if defined(SUPPORT_MOSYNC_SERVER) && !defined(__S60_50__)
+	RMoSyncServerSession gServer;
+#endif
+
+#ifdef __S60_50__
+	RPositioner gPositioner;
+	RPositionServer gPositionServer;
+	TPositionInfo gPositionInfo;
+#endif
+
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	CClassSynchronizer<Syscall>* gLocationSync;
-	TPosition gPosition;
 
 	int maLocationStart();
 	int maLocationStop();
 	void LocationHandlerL(TInt status);
+	void AddLocationEvent(const TPosition&);
 #endif
 
 	bool gStreamWantsToPause;

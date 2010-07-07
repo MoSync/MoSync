@@ -577,16 +577,19 @@ public:
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
 #else
-	bool LoadVMApp(const char* modfile, int modsize, const char* resfile, int ressize) {
+	bool LoadVMApp(FILE* modfile, FILE* resfile) {
 		InitVM();
 
-		MemStreamC mod(modfile, modsize);
+		FileStream mod(modfile);
+
 		if(!LoadVM(mod))
 			return false;
-			
-		MemStreamC res(resfile, ressize);
-		if(!mSyscall.loadResources(res, resfile))
+
+		FileStream res(resfile);
+
+		if(!mSyscall.loadResources(res, "resources"))
 			return false;
+
 #endif
 
 
@@ -679,13 +682,7 @@ public:
 #endif
 
 		// Init regs + IP
-#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-	if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-
-		uint maxCustomEventSize = 0;
-		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
-		DUMPHEX(maxCustomEventSize);
-		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
+		int maxCustomEventSize = getMaxCustomEventSize();
 
 		STACK_TOP = Head.DataSize - maxCustomEventSize;
 		STACK_BOTTOM = STACK_TOP-Head.StackSize;
@@ -773,7 +770,11 @@ public:
 		
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
+#ifndef _android
 		recompiler.init(this, &VM_Yield);
+#else
+		recompiler.init(this, &VM_Yield, mJniEnv, mJThis);
+#endif
 #endif
 
 		return 1; //good load
@@ -820,12 +821,12 @@ void WRITE_REG(int reg, int value) {
 #ifdef CORE_DEBUGGING_MODE
 	void dumpJump(uint address) {
 #ifdef SYMBIAN
-		LOGC("\nJump to 0x%04X\n", address);
+		LOGC("\nJump to 0x%x\n", address);
 #else
 		std::string file;
 		int line;
 		bool res = mapIp(address, line, file);
-		LOGC("\nJump to 0x%04X %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
+		LOGC("\nJump to 0x%x %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
 #endif
 	}
 #else
@@ -1438,8 +1439,8 @@ bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
 #else
-bool LoadVMApp(VMCore* core, const char* modfile,int modSize,const char* resfile,int resSize) {
-	return CORE->LoadVMApp(modfile,modSize,resfile,resSize);
+bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile) {
+	return CORE->LoadVMApp(modfile, resfile);
 }
 #endif
 #endif

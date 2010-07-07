@@ -543,6 +543,12 @@ cd %MOSYNC_TRUNK%\libs
 @call ruby workfile.rb CONFIG=""
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
+@call ruby workfile.rb USE_NEWLIB=""
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@call ruby workfile.rb USE_NEWLIB="" CONFIG=""
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
 REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 

@@ -159,7 +159,7 @@ namespace Core {
 #ifndef _android
 	bool LoadVMApp(VMCore* core, const char* modfile, const char* resfile);
 #else
-	bool LoadVMApp(VMCore* core, const char* modfile, int modsize, const char* resfile, int ressize);
+	bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile);
 #endif
 #endif
 	bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile=0);

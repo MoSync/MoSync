@@ -122,6 +122,7 @@ namespace MapDemo
 		{
 			lastPointerPress = curTime;
 		}
+		return true;
 	}
 
     //-------------------------------------------------------------------------
@@ -152,6 +153,7 @@ namespace MapDemo
         mMap->setCenterPosition( newPos );
 		prevX = point.x;
 		prevY = point.y;
+		return true;
 	}
 
 	//-------------------------------------------------------------------------
@@ -162,6 +164,7 @@ namespace MapDemo
 			return true;
 
 		scrolling = false;
+		return true;
 	}
 
 	//-------------------------------------------------------------------------

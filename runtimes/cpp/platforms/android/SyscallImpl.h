@@ -20,10 +20,15 @@ class Syscall {
 private:
 	bool loadImage(int resourceIndex, int pos, int length);
 	Image* loadSprite(void* surface, ushort left, ushort top, ushort width, ushort height, ushort cx, ushort cy);
-	char* loadBinary(int resourceIndex, int size);
+	void loadUBinary(int resourceIndex, int offset, int size);
+	
+	JNIEnv* getJNIEnvironment();
+	jobject getJNIThis();
 	
 public:
 
 	Syscall();	
+	
+	char* loadBinary(int resourceIndex, int size);
 	void postEvent(MAEvent event);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);

@@ -164,7 +164,11 @@ struct ColorType {
 };
 
 static void processArgument(const char* arg) {
+#ifdef WIN32
 	if (arg[0] == '/') {
+#else
+	if (arg[0] == '-') {
+#endif
 		const char* param = arg + 1;
 		if (param[0] == 'h' || param[0] == 'H') {
 			free(headername);
@@ -358,8 +362,12 @@ int main(int argc, char *argv[]) {
 		sprintf(buf, "mkdir -p %s", outname);
 		char* ptr = strrchr(buf, '/');
 		*ptr = '\0';
-		system(buf);
+		int res = system(buf);
 		free(buf);
+		if(res != 0) {
+			perror("mkdir");
+			return 1;
+		}
 		// Retry opening
 		out = fopen(outname, "wb");
 	}

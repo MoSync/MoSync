@@ -21,6 +21,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MAHeaders.h"
 #include <conprint.h>
 
+static const unsigned int sColors[] = {
+	0xff000000,
+	0xff0000ff,
+	0xff00ff00,
+	0xff00ffff,
+	0xffff0000,
+	0xffff00ff,
+	0xffffff00,
+	0xffffffff,
+	0x00000000,
+	0x000000ff,
+	0x0000ff00,
+	0x0000ffff,
+	0x00ff0000,
+	0x00ff00ff,
+	0x00ffff00,
+	0x00ffffff,
+};
+
 class ResTestCase : public TestCase {
 
 public:
@@ -28,18 +47,18 @@ public:
 	}
 
 	void testDrawableImages() {
-		unsigned int colors[] = {
-				0xff000000,
-				0xff0000ff,
-				0xff00ff00,
-				0xff00ffff,
-				0xffff0000,
-				0xffff00ff,
-				0xffffff00,
-				0xffffffff,
+		const unsigned int colors[] = {
+			0xff000000,
+			0xff0000ff,
+			0xff00ff00,
+			0xff00ffff,
+			0xffff0000,
+			0xffff00ff,
+			0xffffff00,
+			0xffffffff,
 		};
 
-#define NUMCOLORS (sizeof(colors)/sizeof(int))
+		const unsigned int NUMCOLORS = sizeof(colors)/sizeof(int);
 
 		unsigned int colors2[NUMCOLORS];
 
@@ -47,7 +66,8 @@ public:
 
 		printf("testing resources\n");
 
-		maCreateDrawableImage(testImg, NUMCOLORS, 1);
+		int res = maCreateDrawableImage(testImg, NUMCOLORS, 1);
+		assert("maCreateImageRaw", res == RES_OK);
 
 		MAExtent e1 = maGetImageSize(testImg);
 
@@ -70,7 +90,51 @@ public:
 				"testing drawable image res",
 				(memcmp(colors, colors2, sizeof(colors)) == 0)
 		);
+	}
 
+	void testGetImageData() {
+		printf("testing maGetImageData\n");
+
+		const unsigned int NUMCOLORS = sizeof(sColors)/sizeof(int);
+		unsigned int colors2[NUMCOLORS];
+		MAExtent e1 = maGetImageSize(ARGB_PNG);
+
+		assert("maGetImageSize", e1 == EXTENT(NUMCOLORS,1));
+
+		MARect rect = {0, 0, NUMCOLORS, 1};
+		maGetImageData(ARGB_PNG, colors2, &rect, NUMCOLORS);
+
+		assert("image: getData from PNG",
+			(memcmp(sColors, colors2, sizeof(sColors)) == 0)
+		);
+		maDrawImage(ARGB_PNG, 0, 0);
+		maUpdateScreen();
+		//FREEZE;
+	}
+
+	void testImageRawData() {
+		const unsigned int NUMCOLORS = sizeof(sColors)/sizeof(int);
+
+		unsigned int colors2[NUMCOLORS];
+
+		MAHandle testImg = maCreatePlaceholder();
+
+		printf("imageRawData\n");
+
+		int res = maCreateImageRaw(testImg, sColors, EXTENT(NUMCOLORS,1), 1);
+		assert("maCreateImageRaw", res == RES_OK);
+
+		MAExtent e1 = maGetImageSize(testImg);
+
+		assert("maGetImageSize", e1 == EXTENT(NUMCOLORS,1));
+
+		MARect rect = {0, 0, NUMCOLORS, 1};
+
+		maGetImageData(testImg, colors2, &rect, NUMCOLORS);
+
+		assert("image: createRaw then getData",
+			(memcmp(sColors, colors2, sizeof(sColors)) == 0)
+		);
 	}
 
 	void testStaticResources() {
@@ -112,10 +176,9 @@ public:
 	}
 
 	void start() {
-
-
-
 		testDrawableImages();
+		testGetImageData();
+		testImageRawData();
 		testStaticResources();
 
 		suite->runNextCase();

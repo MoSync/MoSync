@@ -46,6 +46,9 @@ int mHeight;
 int mClipLeft, mClipTop, mClipWidth, mClipHeight;
 
 boolean mUsingFrameBuffer;
+int mFrameBufferAddress;
+int mFrameBufferSize;
+Bitmap mFrameBufferBitmap;
 
 ImageCache mDrawTargetScreen = null;
 ImageCache mDrawTarget = null;
@@ -67,6 +70,7 @@ boolean initSyscalls()
 	 mPaint.setStyle(Paint.Style.FILL);
 	 mPaint.setAntiAlias(false);
 	 mPaint.setColor(0xffffffff);
+	 
 	 mBlitPaint.setAntiAlias(false);
 	 mBlitPaint.setColor(0xffffffff);
 
@@ -75,7 +79,7 @@ boolean initSyscalls()
 
 int maSetColor(int rgb)
 {
-	SYSLOG("maSetColor");
+	//SYSLOG("maSetColor");
 
 	int t = mPaint.getColor();
 	mPaint.setColor(rgb);
@@ -129,28 +133,28 @@ void maFillTriangleFan(int address, int count)
 Rect mTextSizeRect = new Rect();
 int maGetTextSize(final String str)
 {
-	SYSLOG("maTextSizeRect");
+	//SYSLOG("maGetTextSize");
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
 int maGetTextSizeW(final String str)
 {
-	SYSLOG("maGetTextSizeW");
+	//SYSLOG("maGetTextSizeW");
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
 void maDrawText(int left, int top, final String str)
 {
-	SYSLOG("maDrawText");
+	//SYSLOG("maDrawText");
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
 
 void maDrawTextW(int left, int top, final String str)
 {
- 	SYSLOG("maDrawTextW");
+ 	//SYSLOG("maDrawTextW");
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
@@ -170,8 +174,17 @@ void maUpdateScreen()
 		{
 			if(mUsingFrameBuffer)
 			{
-				Log.i("update","framebuffer");
-
+			//	long st = System.currentTimeMillis();
+				
+				mMemDataSection.mark();
+				mMemDataSection.position(mFrameBufferAddress);
+				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+				mMemDataSection.reset();
+				
+				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
+				
+			//	long t = System.currentTimeMillis() - st;
+			//	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
 			}
 			else
 			{
@@ -181,10 +194,16 @@ void maUpdateScreen()
 				}
 			}
 		}
-	} finally {
-		if (lockedCanvas != null)
-		mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	} 
+	catch(Exception e)
+	{
+		SYSLOG("updateScreen Exception : " + e.toString());
+		return;
 	}
+		
+	if (lockedCanvas != null)
+	mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	
 }
 
 void maResetBacklight()
@@ -226,7 +245,6 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 	ImageCache imageResource = (ImageCache)mImageResources.get(image);
 	if(imageResource == null)
 	{
-		;
 		return;
 	}
 
@@ -334,7 +352,25 @@ int maGetImageSize(int image)
 void maGetImageData(int image, int dst, int srcRect, int scanlength)
 {
 	SYSLOG("maGetImageData");
+/*	
+	mMemDataSection.mark();
+	mMemDataSection.position(mFrameBufferAddress);
+	mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+	mMemDataSection.reset();
+*/	
+	
+/*	
+	Bitmap bitmap = ((ImageCache)getResource(image)).mBitmap;
+	int[] mem_ds = CORE.mMem_ds;
+	bitmap.getPixels(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
+		MARect_width(srcRect), MARect_height(srcRect));
+*/
+
+
+	
 }
+
+
 
 int maSetDrawTarget(int image)
 {
@@ -357,6 +393,8 @@ int maSetDrawTarget(int image)
 	}
 	return 1;
 }
+
+
 
 int maCreateImageFromData(int placeholder, int data, int offset, int size)
 {
@@ -393,21 +431,38 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 	return RES_OK;
 }
 
+
+
+
 int maCreateImageRaw(int placeholder, int src, int size, int alpha)
 {
 	SYSLOG("maCreateImageRaw");
 	return -1;
 }
 
+
+
+
 int maCreateDrawableImage(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateDrawableImage");
-	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-	Canvas canvas = new Canvas(bitmap);
-
+	SYSLOG("ph: " + placeholder + " width; " + width + " height: " + height);
 	try
 	{
+		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+	
 		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));
+	}
+	catch(UnsupportedOperationException e)
+	{
+		Log.i("maCreateDrawableImage","e: " + e.toString());
+		return -1;
+	}
+	catch(Exception e)
+	{
+		Log.i("maCreateDrawableImage","e: " + e.toString());
+		return -1;
 	}
 	catch(java.lang.OutOfMemoryError e)
 	{
@@ -415,6 +470,8 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 	}
 	return 1;
 }
+
+
 
 Hashtable<Integer, String> mStores = new Hashtable<Integer, String>();
 int mMaxStoreId = 0;
@@ -451,6 +508,7 @@ int maOpenStore(String name, int flags)
 
 	} catch(Exception e) {
 		PRINT_STACK_TRACE;
+		SYSLOG("open store exception : " + e.toString());
 		return STERR_GENERIC;
 	}
 }
@@ -462,108 +520,103 @@ int maWriteStore(int store, int data)
 		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
 		if(f.isFile())
 		{
-/*		
-			BinaryInterface bi = (BinaryInterface)getResource(data);
-			byte[] buffer;
-			if(bi instanceof Binary) {
-				Binary b = (Binary)bi;
-				buffer = b.arr;
-			} else {
-				DataInputStream din = new DataInputStream(bi.getInputStream());
-				buffer = new byte[bi.size()];
-				din.readFully(buffer);
-				din.close();
-			}
-*/		
+			SYSLOG("Looking for binary resource..");
 			ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
-			if(null == bb)
+			if(null != bb)
 			{
-				return STERR_GENERIC;
-			}
+				SYSLOG("Found it!");
+				FileOutputStream fos = new FileOutputStream(f, false);
+				FileChannel fc = fos.getChannel();
 				
-			FileOutputStream fos = new FileOutputStream(f, false);
-			FileChannel fc = fos.getChannel();
+				fc.write(bb);
+				
+				fos.close();
+				return 1;
+			}
 			
-			fc.write(bb);
+			SYSLOG("Looking for ubinary resource..");
+			UBinData ubd = (UBinData)mUBinaryResources.get(data);
+			if(null != ubd)
+			{
+				SYSLOG("Found it!");
+				byte[] ra = new byte[ubd.mSize];
 			
-			fos.close();
-			return 1;
+				AssetManager assetManager = mContext.getAssets();
+				InputStream is = assetManager.open("resources.mp3");
+				
+				is.skip(ubd.mOffset - (int)mResourceOffset);
+				is.read(ra);
+			
+				FileOutputStream fos = new FileOutputStream(f, false);
+				fos.write(ra);
+				fos.close();
+				return 1;
+			}
+			
+			SYSLOG("didn't find buffer, data:" + data);
+			return STERR_GENERIC;			
 		}
 	} catch(Exception e) {
+		SYSLOG("write store exception : " + e.toString());
 		PRINT_STACK_TRACE;
 	}
 	return STERR_GENERIC;
 }
 
-int maReadStore(int store, int placeholder)
+ByteBuffer _maReadStore(int store, int resourceIndex)
 {
-	SYSLOG("maReadStore");
-	return -1;
+	SYSLOG("_maReadStore");
+	
+	try {
+		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
+		byte[] buffer;
+		int length = 0;
+		if(f.isFile())
+		{
+			length = (int)f.length();
+			buffer = new byte[length];
+			
+			FileInputStream fis = new FileInputStream(f);
+			int offset = 0;
+			while(offset >= 0 && offset < length)
+				offset = fis.read(buffer, offset, (length-offset));
+			fis.close();	
+		}
+		else
+		{
+			buffer = new byte[0];
+		}
+		
+		ByteBuffer bb = loadBinary(resourceIndex, length);
+		bb.put(buffer);
+		return bb;
+		
+	} catch(Exception e) {
+		SYSLOG("read store exception : " + e.toString());
+		PRINT_STACK_TRACE;
+		return null;
+	}
 }
 
 void maCloseStore(int store, int remove)
 {
 	SYSLOG("maCloseStore");
+	
+	String filePath = (String)mStores.get(new Integer(store));
+	if(remove != 0) {
+		File f = mContext.getFileStreamPath(filePath);
+		f.delete();
+	} 
+	
+	if(!(mStores.remove(new Integer(store)) == filePath))
+		maPanic(1, "maCloseStore failed!");
 }
 
-int maConnect(final String url)
-{
-	SYSLOG("maConnect");
-	return -1;
-}
+#ifdef _ANDROID_BLUETOOTH
+#include "MoSyncBluetooth.jpp"
+#endif
 
-void maConnClose(int conn)
-{
-	SYSLOG("maConnClose");
-}
-
-void maConnRead(int conn, int dst, int size)
-{
-	SYSLOG("maConnRead");
-}
-
-void maConnWrite(int conn, int src, int size)
-{
-	SYSLOG("maConnWrite");
-}
-
-void maConnReadToData(int conn, int data, int offset, int size)
-{
-	SYSLOG("maConnReadToData");
-}
-
-void maConnWriteFromData(int conn, int data, int offset, int size)
-{
-	SYSLOG("maConnWrietFromData");
-}
-
-int maConnGetAddr(int conn, int addr)
-{
-	SYSLOG("maConnGetAddr");
-	return -1;
-}
-
-int maHttpCreate(String url, int method)
-{
-	SYSLOG("maHttpCreate");
-	return -1;
-}
-
-void maHttpSetRequestHeader(int conn, String key, String value)
-{
-	SYSLOG("maHttpSetRequestHeader");
-}
-
-int maHttpGetResponseHeader(int conn, String key, int buffer, int bufSize)
-{
-	SYSLOG("maHttpGetResponseHeader");
-	return -1;
-}
-
-void maHttpFinish(int conn)
-{
-	SYSLOG("maHttpFinish");
-}
+#include "MoSyncNetwork.jpp"
 
 void maLoadProgram(int data, int reload)
 {
@@ -584,7 +637,23 @@ int maGetEvent(int event)
 
 void maWait(int timeout)
 {
-	SYSLOG("maWait");
+	SYSLOG("maWait");	
+
+	try
+	{
+		Log.i("MoSyncThread","sleep for :" + timeout);
+		if(timeout<=0)
+			this.sleep(Long.MAX_VALUE);
+		else
+			this.sleep(timeout);
+
+	} catch(InterruptedException ie) {
+		Log.i("MoSync View","Sleeping thread interrupted!");
+	} catch(Exception e) {
+		Log.i("MoSync View","Thread sleep failed : " + e.toString());
+	}
+	
+	SYSLOG("maWait returned");
 }
 
 int maTime()
@@ -604,7 +673,7 @@ int maLocalTime()
 
 int maGetMilliSecondCount()
 {
-	SYSLOG("maGetMilliSecondCount");
+//	SYSLOG("maGetMilliSecondCount");
 	return (int)System.currentTimeMillis();
 }
 
@@ -629,6 +698,8 @@ int maVibrate(int ms)
 void maPanic(int result, String message)
 {
 	SYSLOG("maPanic");
+	
+	threadPanic(result, message);
 }
 
 int maSoundPlay(int sound_res, int offset, int size)
@@ -671,39 +742,103 @@ int maIOCtl(int function, int a, int b, int c)
 	return -1;
 }
 
+int _maPlatformRequest()
+{
+
+	return -1;
+}
+/*
+			{
+#ifdef WIN32
+				const char* url = SYSCALL_THIS->GetValidatedStr(a);
+				if(sstrcmp(url, "http://") == 0) {
+					int result = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOW);
+					if(result <= 32) {
+						LOG("ShellExecute(%s) error %i\n", url, result);
+						return CONNERR_GENERIC;
+					}
+					return 0;
+				} else
+#endif
+				{
+					return IOCTL_UNAVAILABLE;
+				}
+			}
+*/
+
+void _enableFramebuffer(int address)
+{
+	mUsingFrameBuffer = true;
+	mFrameBufferAddress = address; // address is pointing at a byte but that array is an int array..
+	mFrameBufferSize = mWidth*mHeight;
+	mFrameBufferBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888 );
+}
+
+void _disableFramebuffer()
+{
+	mUsingFrameBuffer = false;
+}
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
-boolean loadImage(int resourceIndex, int pos, int length)
+boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 {
 	SYSLOG("LoadImage");
+	SYSLOG("ri:" + resourceIndex + " pos:" + pos + " length:" + length + " br:" + binaryResource );
 	try
 	{
 		byte[] ra = new byte[length];
-		mResourceFile.position(pos);
-		mResourceFile.get(ra);
-		mResourceFile.position(0);
-
+		
+		if(binaryResource != 0)
+		{
+			SYSLOG("Reading image resource from binary resource");
+			ByteBuffer bb = (ByteBuffer)mBinaryResources.get(binaryResource);
+			if(null == bb)
+				return false;
+			
+			int p = bb.position();
+			bb.position(pos);
+			bb.get(ra);
+			bb.position(p);
+		}
+		else
+		{
+			SYSLOG("Reading image resource from asset");
+			int offset =  pos-(int)mResourceOffset;
+			SYSLOG("resoff:" + mResourceOffset + " pos: " + pos + " finaloffset: " + offset);
+			
+			AssetManager assetManager = mContext.getAssets();
+			InputStream is = assetManager.open("resources.mp3");
+			
+			SYSLOG("read stream");
+			is.skip(offset);
+			is.read(ra);
+			SYSLOG("stream finished");
+		}
+		
+		SYSLOG("Decode a bitmap!");
 		Bitmap bitmap = BitmapFactory.decodeByteArray(ra, 0, length);
 		if(bitmap != null)
 		{
+			SYSLOG("Bitmap was created!");
 			mImageResources.put(resourceIndex, new ImageCache(null, bitmap));
 			return true;
 		}
+		SYSLOG("Bitmap wasn't created!");
 		return false;
 	}
 	catch (Exception e)
 	{
+		SYSLOG("Bitmap exceptions : " + e.toString());
 		return false;
 	}
 }
 
 
 Hashtable<Integer, ByteBuffer> mBinaryResources = new Hashtable<Integer, ByteBuffer>();
-
 ByteBuffer loadBinary(int resourceIndex, int size)
 {
-	SYSLOG("loadBinary");
+	SYSLOG("loadBinary index:" + resourceIndex);
 	
 	try
 	{
@@ -718,4 +853,21 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 	return null;
 }
 
+class UBinData
+{
+	public UBinData(int offset, int size)
+	{
+		mOffset = offset;
+		mSize = size;
+	}
+	public int mOffset;
+	public int mSize;
+};
+
+Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
+void loadUBinary(int resourceIndex, int offset, int size)
+{
+	SYSLOG("loadUBinary index:" + resourceIndex);
+	mUBinaryResources.put(resourceIndex, new UBinData(offset, size));
+}
 

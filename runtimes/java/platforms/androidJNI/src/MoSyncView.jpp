@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-package com.mosync.java.android;
+package com.mosync.internal.android;
 
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
@@ -86,6 +86,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		setFocusableInTouchMode(true);
 	}
 
+	public void  onSizeChanged  (int w, int h, int oldw, int oldh)
+	{
+		Log.i("MoSync", "onSizeChanged w:" + w + " h:" + h + " oldw:" + oldw + " oldh:" + oldh);
+	}
+	
+	
 	/*
 	* This function is called directly after that a change which affects the structure of the surface has changed
 	*/
@@ -109,15 +115,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mMoSyncThread.start();
 		}
 		//mMoSyncThread.setMoSyncView(this);
-		
-		//drawSomething();
-	}
-
-	public void drawSomething()
-	{
-		mMoSyncThread.maSetColor(0xff00ff);
-		mMoSyncThread.maLine(0, 0, 43, 432);
-		mMoSyncThread.maUpdateScreen();
 	}
 	
 	/*
@@ -171,7 +168,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			default:
 				return false;
 		}
+		
 		mMoSyncThread.nativePostEvent(event);
+		mMoSyncThread.interrupt();
 		
 		return true;
 	}
@@ -188,9 +187,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		
 	}
 */	
-	synchronized public final void postEvent(int[] event)
-	{	
-		Log.i("MoSyncView","postEvent\n");
+
+
+//	synchronized public final void postEvent(int[] event)
+//	{	
+//		Log.i("MoSyncView","postEvent  -- -  should never come here...\n");
 /*		
 		mCoreThread.interrupt();
 		Log.i("MoSyncView","interrupt returned\n");
@@ -204,7 +205,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mEventBuffer.addElement(event);
 		}
 */		
-	}
+//	}
 
 #include "generated\MAAPI_consts.h"
 	
@@ -251,10 +252,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_RELEASED;
-		event[1] = convertToMoSyncKeyByteCode(keyCode);
+		event[1] = convertToMoSyncKeyCode(keyCode);
 		event[2] = keyCode;
 	
 		mMoSyncThread.nativePostEvent(event);
+		mMoSyncThread.interrupt();
 		return true;
 	}
 	
@@ -275,10 +277,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_PRESSED;
-		event[1] = convertToMoSyncKeyByteCode(keyCode);
+		event[1] = convertToMoSyncKeyCode(keyCode);
 		event[2] = keyCode;
 	
 		mMoSyncThread.nativePostEvent(event);
+		mMoSyncThread.interrupt();
 		return true;
 	}
 	

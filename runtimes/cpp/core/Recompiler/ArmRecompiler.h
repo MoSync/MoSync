@@ -74,7 +74,11 @@ namespace MoSync {
 		void flushInstructionCache(void *addr, int len);
 		
 		int run(int ip);
+#ifndef _android
 		void init(Core::VMCore *core, int *VM_Yield);
+#else
+		void init(Core::VMCore *core, int *VM_Yield, JNIEnv* jniEnv, jobject jthis);
+#endif
 		void close();
 
 	protected:

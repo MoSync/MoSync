@@ -1,3 +1,9 @@
+#!/usr/bin/ruby
+# encoding: UTF-8
+
+# the above line, although it looks like a comment, is actually parsed by the Ruby engine to set
+# the default String encoding for this program.
+
 # Copyright (C) 2009 Mobile Sorcery AB
 # 
 # This program is free software; you can redistribute it and/or modify it under
@@ -19,7 +25,10 @@
 require 'rubygems'
 require 'RMagick'
 
-$KCODE = "UTF8"
+SV = RUBY_VERSION.split('.')
+if(SV[0] == '1' && SV[1] == '8')
+	$KCODE = "UTF8"
+end
 
 HEADER_TEXT = 'MoSync mobile development SDK'
 
@@ -50,7 +59,7 @@ if nightly.class != NilClass
 end
 
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
-            "MoSync and the MoSync logo are trademarks of MoSync AB."
+            "MoSync and the MoSync logo are registered trademarks of MoSync AB."
 
 img = Magick::Image.read('template.png').first
 img2 = Magick::Image.read('template_installer.png').first
@@ -153,7 +162,7 @@ platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do
 end
 
 copyright = Magick::Image.read("caption:#{COPYRIGHT}") do 
-	self.size = "500x100"
+	self.size = "600x100"
 	self.pointsize = 11
 	self.fill = '#b0b0b0'
 	self.background_color = '#00000000'

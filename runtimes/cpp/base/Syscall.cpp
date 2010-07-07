@@ -165,15 +165,15 @@ namespace Base {
 					int pos;			
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
-					
-#ifndef _android
+#ifndef _android					
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
 #else
-					// This will need to be changed because of how resources are loaded in the Android JNI runtime
+					loadUBinary(rI, pos, size);
 					ROOM(resources.dadd_RT_BINARY(rI,
-						new LimitedFileStream(aFilename, pos, size)));
+						new LimitedFileStream(aFilename, pos, size, getJNIEnvironment(), getJNIThis())));
 #endif
+
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;
@@ -303,7 +303,7 @@ namespace Base {
 	// Proper Syscalls
 	//***************************************************************************
 
-#if 1//!(defined(SYMBIAN) && !defined(__SERIES60_3X__))	//S60v2
+#ifndef _android
 
 	// doubles -------------------------------------------
 	SYSCALL(double, __adddf3(double a, double b)) {
@@ -329,7 +329,7 @@ namespace Base {
 	SYSCALL(double, __floatsidf(int a)) {
 		return (double)a;
 	}
-
+#endif
 	SYSCALL(double, f2d(float f)) {
 		return (double)f;
 	}
@@ -342,6 +342,7 @@ namespace Base {
 			return -1;
 	}
 
+#ifndef _android
 	// floats -------------------------------------------
 	SYSCALL(float, __addsf3(float a, float b)) {
 		return a+b;
@@ -366,6 +367,8 @@ namespace Base {
 	SYSCALL(float, __floatsisf(int a)) {
 		return (float)a;
 	}
+#endif
+
 	SYSCALL(float, d2f(double a)) {
 		return (float)a;
 	}
@@ -411,7 +414,12 @@ namespace Base {
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {
+#ifndef _android
 		MemStream* ms = new MemStream(size);
+#else
+		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
+		MemStream* ms = new MemStream(b, size);
+#endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;
 		if(ms->ptr()==0) { delete ms; return RES_OUT_OF_MEMORY; }
 
@@ -441,7 +449,7 @@ namespace Base {
 		Stream* src = SYSCALL_THIS->resources.get_RT_BINARY(a->src);
 		MYASSERT(dst->seek(Seek::Start, a->dstOffset), ERR_DATA_OOB);
 		MYASSERT(src->seek(Seek::Start, a->srcOffset), ERR_DATA_OOB);
-		MYASSERT(dst->write(src, a->size), ERR_DATA_OOB);
+		MYASSERT(dst->writeStream(*src, a->size), ERR_DATA_OOB);
 	}
 
 #if !defined(_android)
@@ -470,6 +478,7 @@ namespace Base {
 #endif
 			FSS.MkDir(KMAStorePath16);
 		LOGD("MkDir %i\n", res);
+#elif defined(__IPHONE__)
 #else
 		_mkdir(STORE_PATH);
 #endif	//_WIN32_WCE
@@ -482,6 +491,12 @@ namespace Base {
 		des.Append(nameDesC);
 		path = CCP des.PtrZ();
 		len = des.Length();
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(STORE_PATH);
+		std::string newFile =  newPath + "/" + std::string(name);
+		path = newFile.c_str();
+		len = newFile.length();
+		int ret = _mkdir(newPath.c_str());
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();

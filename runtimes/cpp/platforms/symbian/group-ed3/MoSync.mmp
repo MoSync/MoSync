@@ -2,7 +2,13 @@ TARGET MoSync2.exe
 TARGETTYPE exe
 UID 0x100039CE 0xE7654321
 VENDORID 0
-CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices	//none
+
+#ifdef __S60_50__
+CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices Location
+#else
+CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServices
+#endif
+
 EPOCSTACKSIZE 0x10000
 
 MACRO SYMBIAN=1

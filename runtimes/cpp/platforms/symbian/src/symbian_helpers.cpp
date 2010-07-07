@@ -56,6 +56,14 @@ void InitLog(const char* filenameOverride) {
 	{
 		MyRFs myrfs;
 		myrfs.Connect();
+		FSS.Delete(KOldLogFilePath);
+		FSS.Rename(KLogFilePath, KOldLogFilePath);
+		{
+			RFile file;
+			LHEL(file.Create(FSS, KLogFilePath,
+				EFileWrite | EFileShareExclusive | EFileStreamText));
+			file.Close();
+		}
 #ifdef GUIDO
 		RFile oldFile;
 		//if the old file exists
@@ -63,26 +71,52 @@ void InitLog(const char* filenameOverride) {
 			oldFile.Close();
 			//rename old log file to msrlog%i.txt
 			int i=0;
-			TBuf<32> tempFileName;
-			do {
+
+			// keep a counter file.
 #ifdef __SERIES60_3X__
-				_LIT(KLogFileFormat, "C:\\data\\msrlog%i.txt");
+			static const char* KCounterFile = "C:\\data\\msrlog_counter.bin";
 #else	//Series 60, 2nd Ed.
-				_LIT(KLogFileFormat, "C:\\msrlog%i.txt");
+			static const char* KCounterFile = "C:\\msrlog_counter.bin";
 #endif	//__SERIES60_3X__
-				tempFileName.Format(KLogFileFormat, ++i);
-			} while(FSS.Rename(KLogFilePath, tempFileName) != KErrNone);
+			do {
+				FileStream file(KCounterFile);
+				int size;
+				if(!file.length(size)) {
+					LOG("Could not open counter file.\n");
+					break;
+				}
+				if(size != sizeof(i)) {
+					LOG("Counter file is broken.\n");
+					break;
+				}
+				if(!file.read(&i, sizeof(i))) {
+					LOG("Could not read counter file.\n");
+				}
+			} while(0);
+			
+			TBuf<32> tempFileName;
+#ifdef __SERIES60_3X__
+			_LIT(KLogFileFormat, "C:\\data\\msrlog%03i.txt");
+#else	//Series 60, 2nd Ed.
+			_LIT(KLogFileFormat, "C:\\msrlog%03i.txt");
+#endif	//__SERIES60_3X__
+			tempFileName.Format(KLogFileFormat, ++i);
+			FSS.Rename(KOldLogFilePath, tempFileName);
+			static const int KLogFileAmount = 10;	//arbitrary
+			int iDelete = i - KLogFileAmount;
+			if(iDelete > 0) {
+				tempFileName.Format(KLogFileFormat, iDelete);
+				LOG("Removing file no. %i\n", iDelete);
+				FSS.Delete(tempFileName);
+			}
+			
+			// save counter to file
+			WriteFileStream file(KCounterFile);
+			if(!file.write(&i, sizeof(i))) {
+				LOG("Could not write counter file!\n");
+			}
 		}
-#else
-		FSS.Delete(KOldLogFilePath);
-		FSS.Rename(KLogFilePath, KOldLogFilePath);
 #endif	//GUIDO
-		{
-			RFile file;
-			LHEL(file.Create(FSS, KLogFilePath,
-				EFileWrite | EFileShareExclusive | EFileStreamText));
-			file.Close();
-		}
 	}
 	Log("Logging started\n");
 	LogAvailableMemory();
@@ -187,11 +221,29 @@ size_t strlen(const char* str) {
 }
 
 int strcmp(const char* a, const char* b) {
-	return memcmp(a, b, 1024*1024);	//hack
+	while(*a || *b) {
+		if(*a > *b)
+			return 1;
+		if(*a < *b)
+			return -1;
+		a++;
+		b++;
+	}
+	return 0;
 }
-int strncmp(const char *a, const char *b, size_t len) {
-	return memcmp(a, b, len);	//hack
+
+int strncmp(const char *s1, const char *s2, size_t count) {
+	if (!count) return 0;
+
+	while (--count && *s1 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+
+	return *(unsigned char *) s1 - *(unsigned char *) s2;
 }
+
 int isdigit(int c) {
 	return TChar(c).IsDigit();
 }
@@ -312,7 +364,7 @@ void PanicIfError(TInt code) {
 
 void MoSyncExit(int LOG_ARG(result)) {
 	LOG("MoSyncExit %i\n", result);
-	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
+	CAppUi* ui = GetAppUi();
 #ifdef SUPPORT_RELOAD
 	const Core::VMCore* core = ui->GetCore();
 	if(core) if(core->currentSyscallId < 0) {
@@ -331,6 +383,14 @@ unreach:
 	LOG("This code should not be reached.\n");
 	Panic(EMoSyncLoggedPanic);
 	while(1) {}
+}
+
+CAppUi* GetAppUi() {
+	return (CAppUi*)(CEikonEnv::Static()->AppUi());
+}
+
+CAppView* GetAppView() {
+	return GetAppUi()->GetAppView();
 }
 
 static void logTDesC(const TDesC& text) {

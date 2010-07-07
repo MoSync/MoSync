@@ -1,1 +1,0 @@
-\cygwin\bin\bash.exe --login -i /cygdrive/d/code/work/mosync/trunk/runtimes/java/platforms/androidjni/buildJNI.sh

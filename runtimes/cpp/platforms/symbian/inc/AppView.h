@@ -25,10 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <base/FileStream.h>
 
-#include "AppUi.h"
-
-struct MAEVENT;
-
 class CAppUi;
 class CDocument;
 class CDirScrAccEng;

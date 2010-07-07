@@ -43,7 +43,11 @@ BOOL CParseCmd::ParseCommandLine(int argc, _TCHAR *argv[])
 	// Check for options
 	while(wCount < argc)
 		{
-		if(argv[wCount][0] != '-' && argv[wCount][0] != '/')
+#ifdef WIN32
+			if(argv[wCount][0] != '-' && argv[wCount][0] != '/')
+#else
+				if(argv[wCount][0] != '-')
+#endif
 			break;
 		else
 			{

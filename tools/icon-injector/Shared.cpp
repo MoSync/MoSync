@@ -55,10 +55,16 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *
 	string resizeFlag;
 	if(size != "default")
 		resizeFlag = " -resize " + size;
+#if defined(WIN32)
 	string magick = 
 		"\""+mosyncdir+"\\bin\\ImageMagick\\convert.exe\" \"" + iconInstance->filename + "\"" +
 		resizeFlag + " \"" + string(dstFilename) + "\"";
-
+#else
+	string magick = 
+	"\""+mosyncdir+"/bin/ImageMagick/convert\" \"" + iconInstance->filename + "\"" +
+	resizeFlag + " \"" + string(dstFilename) + "\"";
+#endif
+	
 	if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
 
 	/*

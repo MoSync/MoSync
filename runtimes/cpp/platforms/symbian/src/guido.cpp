@@ -31,11 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.H>
 
 
-
 //#define SWEDISH
 #define ENGLISH
-
-#define ERIK
 
 #if defined(SWEDISH) && defined(ENGLISH)
 #error Only one language allowed.
@@ -56,6 +53,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //***************************************************************************
 
 void Syscall::ClearGuidoVariables() {
+	LOG("ClearGuidoVariables\n");
 	gAudioStream = NULL;
 	gBuffersQueued = gNumAllocs = gCurrentAudioBuffer = 0;
 	ZERO_ARRAY(gAllocArray);
@@ -98,10 +96,11 @@ static void dumpDba(const BB_DbLs* db) {
 #define DUMPS(name) LOG("%s: '%s'\n", #name, mp->name ? mp->name : "null")
 
 static void dumpBab(const BABILE_MemParam* mp) {
+	LOG("\ndumpBab\n");
 	DUMPI(sSize);
-	DUMPI(sMBRConfig); 
-	DUMPI(sSELConfig); 
-	DUMPI(sNLPConfig); 
+	DUMPX(sMBRConfig); 
+	DUMPX(sSELConfig); 
+	DUMPX(sNLPConfig); 
 	DUMPI(nlpModule);
 	DUMPI(synthModule);
 	DUMPI(u32MarkCallbackInstance);
@@ -111,11 +110,12 @@ static void dumpBab(const BABILE_MemParam* mp) {
 	DUMPI(selInitError);
 	DUMPI(initError);
 	DUMPS(license);
-	DUMPI(uid.userId);
-	DUMPI(uid.passwd);
+	DUMPX(uid.userId);
+	DUMPX(uid.passwd);
 
 	dumpDba(mp->nlpeLS);
 	dumpDba(mp->synthLS);
+	LOG("\n");
 }
 
 static BB_S32 myMarkCallback(BB_S32 a, BB_S32 b, BB_S32 c, BB_U32 d) {
@@ -198,6 +198,8 @@ void Syscall::InitGuidoL() {
 		babParam.synthModule = BABILE_SYNTHMODULE_BBSELECTOR;
 		babParam.markCallback = myMarkCallback;
 		
+		voicePath[voicePath.Length() - 1] = '/';	// fugly hack
+
 		char* iniPtr = iniContents;
 		babParam.nlpeLS = initDbaL(CCP voicePath.PtrZ(), iniPtr, babParam.synthLS);
 		DEBUG_ASSERT(babParam.nlpeLS);
@@ -226,7 +228,9 @@ void Syscall::InitGuidoL() {
 		// memory descriptor creation
 		nBlocks = BABILE_numAlloc();
 		LOG("B_numAlloc %i\n", nBlocks);
-		gMemTab = AllocZero<BB_MemRec>(nBlocks);
+		//gMemTab = AllocZero<BB_MemRec>(nBlocks);
+		gMemTab = (BB_MemRec*) User::Alloc(nBlocks*sizeof(BB_MemRec));
+		LOG("gMemTab: 0x%08x\n", gMemTab);
 		if(!gMemTab) {
 			LOG("BB_MemRec error!\n");
 			User::Leave(ERROR_BABILE);
@@ -365,10 +369,15 @@ void* Syscall::VoidAllocZero(int size) {
 		return NULL;
 	}
 	void* p = VoidAlloc(size);
+	LOG("VAZ's VA: 0x%08x\n", p);
 	if(!p)
 		return NULL;
+	LOG("VAZ ZEROMEM\n");
 	ZEROMEM(p, size);
-	return gAllocArray[gNumAllocs++] = p;
+	LOG("VAZ gAllocArray 0x%08x[%i]\n", gAllocArray, gNumAllocs);
+	gAllocArray[gNumAllocs++] = p;
+	LOG("VAZ return\n");
+	return p;
 }
 
 char* Syscall::GetFileL(const char* filename) {
@@ -376,8 +385,19 @@ char* Syscall::GetFileL(const char* filename) {
 	return GetFileWithSizeL(filename, dummy);
 }
 
-char* Syscall::GetFileWithSizeL(const char* filename, int& size) {
-	FileStream file(filename);
+char* Syscall::GetFileWithSizeL(const char* fn1, int& size) {
+#if 1	//temp hack
+	Smartie<char> filename(new char[strlen(fn1) + 1]);
+	
+	// change slashes
+	strcpy(filename(), fn1);
+	for(char* ptr = filename(); *ptr != 0; ptr++) {
+		if(*ptr == '/')
+			*ptr = '\\';
+	}
+#endif
+
+	FileStream file(filename());
 	if(!file.length(size)) {
 		LOG("GetFileL open error\n");
 		return NULL;
@@ -467,16 +487,14 @@ static const char* iniReadDescriptor(char*& iniPtr);
 static const char* iniReadFilename(char*& iniPtr);
 // reads whitespace, then returns any text found until end-of-line.
 static const char* iniReadExtra(char*& iniPtr);
-// makes sure we have an END, then skips to the end of the line.
-static void iniReadEnd(char*& iniPtr);
-// makes sure we have a PATH, then skips to the end of the line.
-static void iniReadPath(char*& iniPtr);
 // skips the rest of the current line.
 static void iniSkipLine(char*& iniPtr);
+// reads the exact text, panics if that text is not found, then skips to end-of-line.
+static void iniReadExactLine(char*& iniPtr, const char* e);
 
 BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voiceDba) {
 	LOGD("initLanguageDbaL\n");
-	iniReadPath(iniPtr);
+	iniReadExactLine(iniPtr, "PATH");
 	char* ptr;
 	const int count = iniCountFiles(iniPtr);
 	BB_DbLs* nlpDba = AllocZero<BB_DbLs>(count + 1);
@@ -506,7 +524,18 @@ BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voice
 			memcpy(path, voicePath, vpLen);
 			memcpy(path + vpLen, fn, fnLen + 1);
 			
-			FileStream file(path);
+#if 1	//temp hack
+	Smartie<char> filename(new char[strlen(path) + 1]);
+	
+	// change slashes
+	strcpy(filename(), path);
+	for(char* ptr = filename(); *ptr != 0; ptr++) {
+		if(*ptr == '/')
+			*ptr = '\\';
+	}
+#endif
+
+			FileStream file(filename());
 			if(!file.isOpen())
 				return NULL;
 			if(!file.length(size))
@@ -524,7 +553,7 @@ BB_DbLs* Syscall::initDbaL(const char* voicePath, char*& iniPtr, BB_DbLs*& voice
 		}
 		//nlpDba[i].pDbId->size = size;
 	}
-	iniReadEnd(iniPtr);
+	//iniReadEnd(iniPtr);
 
 	nlpDba[count].pDbId=NULL;
 	nlpDba[count].descriptor[0] = 0;
@@ -554,14 +583,6 @@ static void iniReadExactLine(char*& iniPtr, const char* e) {
 	iniSkipLine(iniPtr);
 }
 
-static void iniReadPath(char*& iniPtr) {
-	iniReadExactLine(iniPtr, "PATH");
-}
-
-static void iniReadEnd(char*& iniPtr) {
-	iniReadExactLine(iniPtr, "END");
-}
-
 static int iniCountFiles(char* iniPtr) {
 	int count = 0;
 	int ends = 0;
@@ -575,7 +596,7 @@ static int iniCountFiles(char* iniPtr) {
 		}
 		if(memcmp(descriptor, "END", 3) == 0) {
 			ends++;
-			if(ends == 2)	//magic number. see ini file.
+			if(ends == 3)	//magic number. see ini file.
 				break;
 			iniSkipLine(iniPtr);
 			continue;
@@ -616,11 +637,13 @@ static const char* iniReadFilename(char*& iniPtr) {
 	*endQ = 0;
 	iniPtr = endQ + 1;
 	
+#if 0
 	// change slashes
 	for(char* ptr = filename; ptr != endQ; ptr++) {
 		if(*ptr == '/')
 			*ptr = '\\';
 	}
+#endif
 	return filename;
 }
 

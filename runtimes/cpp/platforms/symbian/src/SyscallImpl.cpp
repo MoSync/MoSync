@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "resourcearray.h"
 #include "DirScrAccEng.h"
 #include "AppView.h"
+#include "AppUi.h"
 #include "symbian_errors.h"
 #include "Stream.h"
 #include "heapsize.h"
@@ -260,7 +261,7 @@ gBtDeviceArray(8, 0)
 	gHangupSync = NULL;
 	gNotify = NULL;
 #endif
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	gLocationSync = NULL;
 #endif
 #ifdef SUPPORT_AUDIOBUFFER
@@ -332,7 +333,7 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gSmsHandler = CSmsHandler::NewL(this);
 #endif	//__SERIES60_3X__
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	gLocationSync = new (ELeave) CClassSynchronizer<Syscall>(this, &Syscall::LocationHandlerL);
 #endif
 
@@ -361,7 +362,7 @@ void Base::StopEverything() {
 void Syscall::StopEverything() {
 	LOG("StopEverything()\n");
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	maLocationStop();
 #endif
 
@@ -436,7 +437,9 @@ void Syscall::platformDestruct() {
 #ifdef SUPPORT_MOSYNC_SERVER
 	LOG("gServer.Close();\n");
 	gServer.Close();
+#endif
 	
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	//calls Cancel, which should really call the server's cancel mechanism...
 	//except it doesn't have one. tricky...
 	LOG("SAFE_DELETE(gLocationSync);\n");
@@ -833,6 +836,12 @@ SYSCALL(void, maGetClipRect(MARect* rect)) {
 	rect->height = clipRect.Height();
 }
 
+#if 0
+static int scanlineLength(CFbsBitmap* fb) {
+	return fb->ScanLineLength(fb->SizeInPixels().iWidth, fb->DisplayMode());
+}
+#endif
+
 SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	const MARect* srcRect, int scanlength))
 {
@@ -857,40 +866,68 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		TSize(aSrcRect->width, aSrcRect->height));
 
 	bool hasAlpha = img->Alpha() != NULL;
+#if 0
+	LOG("maGetImageData(image): %ix%i, alpha %i\n", size.iWidth, size.iHeight, hasAlpha);
+	if(hasAlpha) {
+		TSize as(img->Alpha()->SizeInPixels());
+		LOG("alpha size: %ix%i\n", as.iWidth, as.iHeight);
+		LOG("pitch. color: %i, alpha: %i\n", scanlineLength(img->Color()), scanlineLength(img->Alpha()));
+	}
+#endif
 	TBitmapUtil clr(img->Color());
 	clr.Begin(TPoint(0,0));	//begin point is irrelevant, since we do SetPos.
 
 	//set to color if no alpha, to avoid potential crash on NULL.
 	TBitmapUtil alpha(hasAlpha ? img->Alpha() : img->Color());
-	if(hasAlpha)
-		alpha.Begin(TPoint(0,0));
+	if(hasAlpha) {
+		alpha.Begin(TPoint(0,0), clr);
+	}
 
 	//iterate through the source, combining and copying pixels
 	int dY = 0;
 	for(int sY=lSrcRect.iTl.iY; sY<lSrcRect.iBr.iY; sY++) {
 		int dX = 0;
 		clr.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+
+		// bugged on 5th edition when image width isn't pitch-aligned.
+#ifndef __S60_50__
 		if(hasAlpha)
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
+#endif
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
-			//will work properly only on 32-bit 3rd edition devices.
 			TUint32 pixel = clr.GetPixel();
+#if !(defined(__SERIES60_3X__) || defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT))
+			// 2nd edition, format 565
+			// convert to 888.
+			TUint32 blue = pixel & 0x001F;
+			blue |= (blue & 0x1C) << 3;
+			TUint32 green = (pixel & 0x07E0) >> 5;
+			green |= (green & 0x30) << 2;
+			TUint32 red = (pixel & 0xF800) >> 11;
+			red |= (red & 0x1C) << 3;
+			pixel = blue | (green << 8) | (red << 16);
+#endif
+			//LOG("Color(%ix%i): 0x%x\n", sX, sY, pixel);
 			clr.IncXPos();
 			if(hasAlpha) {
+				// clr.GetPixel() may have the alpha-bits set. Indeed, they are undefined.
+				pixel &= ~0xFF000000;
+
 				pixel |= alpha.GetPixel() << 24;
+				//LOG("Alpha: 0x%x\n", alpha.GetPixel());
 				alpha.IncXPos();
 			} else {
 				pixel |= 0xFF000000;
 			}
 			dstInt[dY*scanlength + dX] = pixel;
 			dX++;
-		}
+		}	//for x
 		dY++;
-	}
+	}	//for y
 
-	clr.End();
 	if(hasAlpha)
-		alpha.End();	
+		alpha.End();
+	clr.End();
 }
 
 SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
@@ -1463,7 +1500,7 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maStreamSetPos(a, b);
 	}
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 	case maIOCtl_maLocationStart:
 		return maLocationStart();
 	case maIOCtl_maLocationStop:
@@ -2125,7 +2162,7 @@ static int maBringToForeground() {
 //------------------------------------------------------------------------------
 // Location
 //------------------------------------------------------------------------------
-#ifdef SUPPORT_MOSYNC_SERVER
+#if defined(SUPPORT_MOSYNC_SERVER) && !defined(__S60_50__)
 int Syscall::maLocationStart() {
 	LOG("maLocationStart()\n");
 	if(gLocationSync->IsActive())
@@ -2144,6 +2181,22 @@ int Syscall::maLocationStop() {
 	return res;
 }
 
+void Syscall::LocationHandlerL(TInt status) {
+	LOG("LocationHandlerL(%i)\n", status);
+	//not so good; will fail silently.
+	if(IS_SYMBIAN_ERROR(status))
+		return;
+
+	//send event
+	AddLocationEvent(gServer.Position());
+
+	//wait for the next location
+	gServer.LocationGet(*gLocationSync->Status());
+	gLocationSync->SetActive();
+}
+#endif	//SUPPORT_MOSYNC_SERVER && !__S60_50__
+
+#if defined(SUPPORT_MOSYNC_SERVER) || defined(__S60_50__)
 
 //quick hack
 union DV {
@@ -2160,16 +2213,8 @@ static double swapd(double d) {
 	return dv2.dbl;
 }
 
-
-void Syscall::LocationHandlerL(TInt status) {
-	LOG("LocationHandlerL(%i)\n", status);
-	//not so good; will fail silently.
-	if(IS_SYMBIAN_ERROR(status))
-		return;
-
-	//send event
+void Syscall::AddLocationEvent(const TPosition& p) {
 	MALocation* loc = new MALocation;
-	const TPosition& p(gServer.Position());
 	LOG("lat: %g\n", p.Latitude());
 	loc->state = p.Datum() == KPositionDatumWgs84 ?
 		MA_LOC_QUALIFIED : MA_LOC_INVALID;
@@ -2179,9 +2224,6 @@ void Syscall::LocationHandlerL(TInt status) {
 	loc->vertAcc = swapd(p.VerticalAccuracy());
 	loc->alt = p.Altitude();
 
-	gServer.LocationGet(*gLocationSync->Status());
-	gLocationSync->SetActive();
-
 	MAEvent e;
 	e.type = EVENT_TYPE_LOCATION;
 	//will be handled by GetEvent.
@@ -2190,7 +2232,56 @@ void Syscall::LocationHandlerL(TInt status) {
 	e.data = loc;
 	gAppView.AddEvent(e);
 }
-#endif	//SUPPORT_MOSYNC_SERVER
+#endif	//SUPPORT_MOSYNC_SERVER || __S60_50__
+
+#ifdef __S60_50__
+int Syscall::maLocationStart() {
+	LOG("maLocationStart()\n");
+	if(gLocationSync->IsActive())
+		return 0;
+
+	SYMTESTFAIL(gPositionServer.Connect());
+	SYMTESTFAIL(gPositioner.Open(gPositionServer));
+
+	// Needed to placate Symbian's sense of "user privacy".
+	SYMTESTFAIL(gPositioner.SetRequestor(CRequestor::ERequestorService,
+		CRequestor::EFormatApplication, KMoSync));
+
+	gPositioner.NotifyPositionUpdate(gPositionInfo, *gLocationSync->Status());
+	gLocationSync->SetActive();
+
+	return MA_LPS_AVAILABLE;
+}
+
+int Syscall::maLocationStop() {
+	LOG("maLocationStop()\n");
+	if(gLocationSync) {
+		if(gLocationSync->IsActive())
+			TSNR(gPositioner.CancelRequest(EPositionerNotifyPositionUpdate));
+		gPositioner.Close();
+		gPositionServer.Close();
+	}
+	LOG("maLocationStop done.\n");
+	return 0;
+}
+
+void Syscall::LocationHandlerL(TInt status) {
+	//not so good; will fail silently.
+	if(IS_SYMBIAN_ERROR(status)) {
+		LOG("LocationHandlerL(%i)\n", status);
+		return;
+	}
+
+	//send event
+	TPosition p;
+	gPositionInfo.GetPosition(p);
+	AddLocationEvent(p);
+
+	//wait for the next location
+	gPositioner.NotifyPositionUpdate(gPositionInfo, *gLocationSync->Status());
+	gLocationSync->SetActive();
+}
+#endif	//__S60_50__
 
 
 #ifdef CALL

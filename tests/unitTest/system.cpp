@@ -142,16 +142,18 @@ public:
 	}
 
 	void pointerPressEvent(MAPoint2d p) {
-		if(!on) {
+		if(on) {
 			maVibrate(0);
 			on = false;
 			printf("did you turn off the vibration?\n");
 		} else {
-			int res = EXTENT_X(maGetScrSize()) / 2 ? TK_YES : TK_NO;
-			assert(name, res == TK_YES);
-			suite->runNextCase();
+			KeyBaseCase::pointerReleaseEvent(p);
 		}
 	}
+
+	void pointerReleaseEvent(MAPoint2d p) {
+	}
+
 
 	virtual void keyReleaseEvent(int keyCode) {
 		if(!on)

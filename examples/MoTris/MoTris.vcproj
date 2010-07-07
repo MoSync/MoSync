@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MoTris"
 	ProjectGUID="{6A8055BC-65E1-4237-8D23-56E16E7EB4C2}"
 	RootNamespace="MoTris"
@@ -46,6 +46,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="$(MOSYNCDIR)/profiles/vendors/MobileSorcery/Emulator"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -127,6 +128,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="$(MOSYNCDIR)/profiles/vendors/MobileSorcery/Emulator"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
@@ -204,22 +206,8 @@
 			>
 		</File>
 		<File
-			RelativePath=".\res.lst"
+			RelativePath=".\Res\res.lst"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="MoSync resource"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="MoSync resource"
-				/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>
