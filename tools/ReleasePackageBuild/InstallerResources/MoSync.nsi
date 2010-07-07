@@ -118,25 +118,33 @@ Section "MoSync (required)" MoSync
   IfFileExists "$INSTDIR\bin\*.*" feError
   IfFileExists "$INSTDIR\docs\*.*" feError
   IfFileExists "$INSTDIR\eclipse\*.*" feError
+  IfFileExists "$INSTDIR\etc\*.*" feError
   IfFileExists "$INSTDIR\examples\*.*s" feError
   IfFileExists "$INSTDIR\include\*.*" feError
-  IfFileExists "$INSTDIR\profiles\*.*" feError
   IfFileExists "$INSTDIR\lib\*.*" feError
-  IfFileExists "$INSTDIR\etc\*.*" feError
+  IfFileExists "$INSTDIR\null\*.*" feError
+  IfFileExists "$INSTDIR\profiles\*.*" feError
+  IfFileExists "$INSTDIR\skins\*.*" feError
+  IfFileExists "$INSTDIR\templates\*.*" feError
 
   goto getOnWithIt
 
 feError:
-  MessageBox MB_OKCANCEL "Old MoSync files will now be deleted. Your projects should be safe, but please make sure you have a backup, just in case. Click OK to continue or CANCEL to abort the installation process." IDOK removeoldfiles IDCANCEL abortinstallation
+  MessageBox MB_OKCANCEL|MB_ICONINFORMATION "Old MoSync files will now be deleted. Your projects should be safe, but please make sure you have a backup, just in case. Click OK to continue or CANCEL to abort the installation process." IDOK removeoldfiles IDCANCEL abortinstallation
 removeoldfiles:
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\docs"
   RMDir /r "$INSTDIR\eclipse"
+  RMDir /r "$INSTDIR\etc"
   RMDir /r "$INSTDIR\examples"
   RMDir /r "$INSTDIR\include"
-  RMDir /r "$INSTDIR\profiles"
   RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\etc"
+  RMDir /r "$INSTDIR\null"
+  RMDir /r "$INSTDIR\profiles"
+  RMDir /r "$INSTDIR\skins"
+  RMDir /r "$INSTDIR\templates"
+  Delete $INSTDIR\MoSyncRules.rules
+  Delete $INSTDIR\uninstall.exe
   
   goto getOnWithIt
   
@@ -251,7 +259,7 @@ SectionEnd
 
 Section "Uninstall"
 
-  MessageBox MB_OK|MB_ICONEXCLAMATION "The uninstaller will remove all shortcuts and registry entries. The directory you installed MoSync to will be left intact."
+  MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller will remove all MoSync shortcuts, registry entries and product files. Workspaces and projects will be left intact. Just delete them manually if you no longer need them."
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MoSync"
@@ -261,6 +269,18 @@ Section "Uninstall"
   ${unregisterExtension} ".mopro" "MoSync Project File"
 
   ; Remove files and uninstaller
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\docs"
+  RMDir /r "$INSTDIR\eclipse"
+  RMDir /r "$INSTDIR\etc"
+  RMDir /r "$INSTDIR\examples"
+  RMDir /r "$INSTDIR\include"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\null"
+  RMDir /r "$INSTDIR\profiles"
+  RMDir /r "$INSTDIR\skins"
+  RMDir /r "$INSTDIR\templates"
+  Delete $INSTDIR\MoSyncRules.rules
   Delete $INSTDIR\uninstall.exe
 
   ; Remove Desktop shortcut
