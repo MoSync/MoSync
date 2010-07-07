@@ -127,7 +127,8 @@ Section "MoSync (required)" MoSync
   goto getOnWithIt
 
 feError:
-  MessageBox MB_OK "Old MoSync files will now be deleted. Your projects should be safe, but please make sure you have a backup, just in case."
+  MessageBox MB_OKCANCEL "Old MoSync files will now be deleted. Your projects should be safe, but please make sure you have a backup, just in case. Click OK to continue or CANCEL to abort the installation process." IDOK removeoldfiles IDCANCEL abortinstallation
+removeoldfiles:
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\docs"
   RMDir /r "$INSTDIR\eclipse"
@@ -136,7 +137,13 @@ feError:
   RMDir /r "$INSTDIR\profiles"
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\etc"
+  
+  goto getOnWithIt
+  
+abortinstallation:
 
+  Quit
+  
 getOnWithIt:
   ;!insertmacro UNINSTALL.LOG_OPEN_INSTALL 
 
