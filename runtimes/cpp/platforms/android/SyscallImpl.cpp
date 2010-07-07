@@ -819,6 +819,19 @@ namespace Base
 	SYSCALL(void, maPanic(int result, const char* message))
 	{
 		SYSLOG("maPanic NOT IMPLEMENTED");
+		
+		int yield = Core::GetVMYield(gCore);
+		yield = 1;
+		
+		jstring jstr = mJNIEnv->NewStringUTF(message);
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPanic", "(ILjava/lang/String;)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, (jint)result, jstr);
+		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jstr);
+		
 	}
 
 	SYSCALL(int,  maSoundPlay(MAHandle sound_res, int offset, int size))
@@ -896,8 +909,8 @@ namespace Base
 			return -1;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
-			SYSLOG("maIOCtl_maBtStartDeviceDiscovery NOT IMPLEMENTED");
-			return -1;
+			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
+			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 		
 		case maIOCtl_maBtGetNewDevice:
 			SYSLOG("maIOCtl_maBtGetNewDevice NOT IMPLEMENTED");
@@ -1062,12 +1075,26 @@ void MoSyncErrorExit(int errorCode)
 	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", "MOSYNC ERROR");
 	int yield = Core::GetVMYield(gCore);
 	yield = 1;
-	
+/*	
 	jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
 	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "waitThread", "()V");
 	if (methodID == 0) ERROR_EXIT;
 	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID);
 	
 	Base::mJNIEnv->DeleteLocalRef(cls);
+*/	
+	char* b = (char*)malloc(200);
+	sprintf(b, "MoSync error: %i", errorCode);
+	
+	jstring jstr = Base::mJNIEnv->NewStringUTF(b);
+	
+	free(b);
+	
+	jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
+	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic", "(ILjava/lang/String;)V");
+	if (methodID == 0) ERROR_EXIT;
+	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID, (jint)errorCode, jstr);
+	Base::mJNIEnv->DeleteLocalRef(cls);
+	Base::mJNIEnv->DeleteLocalRef(jstr);
 	
 }

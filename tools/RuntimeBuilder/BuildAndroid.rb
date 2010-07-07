@@ -17,99 +17,30 @@
 require 'fileutils'
 require '../../rules/mosync_util.rb'
 
+
+# The Android builder is designed so that it's using the build files which
+# is located in the source tree where the runtime is located.
+
 class RuntimeBuilder 
 	def android(runtime_dir, mode)
 		return androidBuilder(runtime_dir, mode)
 	end
 	
-	def preprocess_android_file(src_file, src_dir, platform_dir, output_dir, platform_define)
-		jtmp_file = src_file.gsub(/.jpp$/, ".jtmp")		
-		java_file = src_file.gsub(/.jpp$/, ".java")
-		
-		puts "Processing " + java_file
-		
-		# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-		system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{$SETTINGS[:java_source]}shared -I#{platform_dir}" +
-			" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
-		
-		# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
-		system("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
-	end
 
-	def preprocess_shared_java_files(output_dir, platform_dir, platform_define)
-		shared_src = "#{$SETTINGS[:java_source]}shared/";
-		
-		Dir.foreach(shared_src) {|x| 
-			if (x == "BigPhatError.jpp" || x == "Binary.jpp" || x == "BinaryInterface.jpp" || x == "Core.jpp" ||
-				x == "LimitedLengthInputStream.jpp" || x == "LittleEndianDataInputStream.jpp" || x == "ThreadPool.jpp" || 
-				x == "UBin.jpp" || x == "RefByteArrayOutputStream.jpp" || x == "Tilemap.jpp" ||
-				x == "ImageCache.jpp" || x == "MAPanicReport.jpp" )
-				preprocess_android_file(x, shared_src, platform_dir, output_dir, platform_define)
-			end
-		}
-	end
-	
 	def androidBuilder(runtime_dir, mode)
 		debug = (mode=="debug") ? "D" : ""
 		
-		android_sdk = "#{$SETTINGS[:android_sdk]}"
+		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-3"
+		android_ndk = "#{$SETTINGS[:android_ndk]}"
 		
-		if ENV['ANDROIDSDKDIR'] != nil
-			android_sdk = ENV['ANDROIDSDKDIR']
-		end
+		cpath = FileUtils.pwd
 		
-		android_source = "#{$SETTINGS[:java_source]}platforms/android/src"
+		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 		
-		# # Set up temporary dir
-		temp_dir = "#{runtime_dir}temp/com/mosync/java/android/"
-		if File.exist? temp_dir
-			FileUtils.rm_rf temp_dir # delete everything in it and itself
-		end
-		FileUtils.makedirs(temp_dir); # No such directory/file.. create a temp directory
-		
-		# # Set up class dir
-		class_dir = "#{runtime_dir}class/"
-		if File.exist? class_dir
-			FileUtils.rm_rf class_dir # delete everything in it and itself
-		end
-		Dir.mkdir class_dir; # No such directory/file.. create a temp directory
-		
-		# Copy the old config_platform.h file and copy the one from the runtime_dir to the source location
-		config_file = "#{android_source}/config_platform.h"		
-		backup_file config_file
-		FileUtils.copy_file( "#{runtime_dir}config#{debug}.h", config_file)
-		
-		# Preprocess all the shared java files and store result in temporary location
-		preprocess_shared_java_files(temp_dir, android_source, "_android");
-		
-		# Preprocess all the platform dependant java files and store result in temporary location
-		Dir.foreach(android_source) {|x| 
-			if (x == "MoSync.jpp" || x == "MoSyncView.jpp" || x == "Syscall.jpp" || x == "MoSyncPanicDialog.jpp")
-				preprocess_android_file(x, "#{android_source}/", android_source, temp_dir, "_android")
-			end
-		}
-		
-		# Restore config_platform.h
-		revert_backupped_file config_file
-	
-		# Build Android package file
-		android_proj_root = "#{$SETTINGS[:java_source]}platforms/android/AndroidProject/"
-		system("#{android_sdk}/tools/aapt package -f -v -M #{android_proj_root}/AndroidManifest.xml -F #{runtime_dir}resources.ap_ -I #{android_sdk}/android.jar -S #{android_proj_root}/res -m -J #{runtime_dir}temp");
-		
-		# Compile all the java files into class files
-		system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{android_sdk}android.jar #{temp_dir}*.java");
-	
-		# This implementation assumes that MoSync was installed on the computer
-		mosync_dir = mosyncdir
-		current = Dir.pwd
-		Dir.chdir class_dir
-		system("#{mosync_dir}/bin/zip -r #{runtime_dir}MoSyncRuntime#{debug}.zip .");
-		Dir. chdir current
-	
-		# Clean and delete all the temporary folders
-		FileUtils.rm_rf "#{runtime_dir}temp"
-		FileUtils.rm_rf class_dir
-		FileUtils.rm runtime_dir + "resources.ap_"
+		puts "ruby buildJNI.rb #{android_ndk} #{android_ndk} #{runtime_dir} #{debug}"
+		system "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
+				
+		Dir.chdir cpath
 		
 		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.zip"
 			puts "\nFATAL ERROR! - No android source package built, check previous output for errors!\n\n"

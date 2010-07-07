@@ -26,4 +26,13 @@ namespace Base
 	
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
 	
+	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
 }

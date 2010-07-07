@@ -100,5 +100,36 @@ namespace Base
 		return 1;
 	}
 	
+	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)ret;
+	}
+	
+	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis)
+	{
+		return -1;
+	}
+	
+	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis)
+	{
+		return -1;
+	}
+	
+	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis)
+	{
+		return -1;
+	}
+	
+	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis)
+	{
+		return -1;
+	}
 	
 }
