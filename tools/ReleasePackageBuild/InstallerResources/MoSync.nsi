@@ -51,8 +51,8 @@ SetCompressor /SOLID lzma
   !define MUI_HEADERIMAGE_BITMAP "installer.bmp" ; optional
   !define MUI_ABORTWARNING
 
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\docs\index.html"
-  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open Documentation."
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\eclipse\mosync.exe"
+  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the MoSync IDE."
   !define MUI_FINISHPAGE_NOAUTOCLOSE
 
   !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
