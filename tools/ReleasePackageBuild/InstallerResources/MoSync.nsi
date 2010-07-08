@@ -145,6 +145,7 @@ removeoldfiles:
   RMDir /r "$INSTDIR\templates"
   Delete $INSTDIR\MoSyncRules.rules
   Delete $INSTDIR\uninstall.exe
+  Delete "$SMPROGRAMS\MoSync\*.*"
   
   goto getOnWithIt
   
