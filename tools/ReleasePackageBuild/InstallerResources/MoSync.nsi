@@ -221,8 +221,7 @@ Section "Start Menu Shortcuts" StartMenu
   CreateDirectory "$SMPROGRAMS\MoSync"
     CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 0
     CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 1
-	WriteINIStr "$SMPROGRAMS\MoSync\Online User Guides.url" "InternetShortcut" "URL" "http://www.mosync.com/content/documentation" 2
-    ;CreateShortCut "$SMPROGRAMS\MoSync\Documentation.lnk" "$INSTDIR\docs\index.html" "" "$INSTDIR\docs\index.html" 2
+	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "$INSTDIR\bin\MoSyncOnlineDocs.URL" 2
     CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 3
 SectionEnd
 
