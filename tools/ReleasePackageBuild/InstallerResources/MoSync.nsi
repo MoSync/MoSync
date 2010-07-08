@@ -130,7 +130,7 @@ Section "MoSync (required)" MoSync
   goto getOnWithIt
 
 feError:
-  MessageBox MB_OKCANCEL|MB_ICONINFORMATION "Old MoSync files will now be deleted. Your projects should be safe, but please make sure you have a backup, just in case. Click OK to continue or CANCEL to abort the installation process." IDOK removeoldfiles IDCANCEL abortinstallation
+  MessageBox MB_OKCANCEL|MB_ICONINFORMATION "The old MoSync product files in the installation directory will now be removed. Your projects and workspaces will be kep, but please make sure you have a backup, just in case. Click OK to continue the installation process, or CANCEL to abort." IDOK removeoldfiles IDCANCEL abortinstallation
 removeoldfiles:
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\docs"
