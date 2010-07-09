@@ -2792,6 +2792,25 @@ interface MAAPI {
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
+#if IX_SECURE_RANDOM
+		/**
+		* Seeds the secure random generator
+		* \param seed Memory address in where the seed is store.
+		* \param length Length of the seed in bytes
+		* \returns <0 if not implemented and 0 on success
+		*/
+		int maSecureRandSeed(in MAAddress seed, in int length);
+
+		/**
+		* Get the next secure random number from the underlying random system.
+		* \param data The buffer in which the result will be stored
+		* \param length The number of requested bytes in the result
+		* \returns <0 if not implemented and 0 on success
+		*/
+		int maSecureRandBytes(out MAAddress data, in int length);
+
+#endif //IX_SECURE_RANDOM
+
 		struct MA_CAMERA_FORMAT {
 			//in pixels.
 			int width;

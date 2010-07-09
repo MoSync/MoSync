@@ -35,4 +35,8 @@ namespace Base
 	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maSecureRandSeed(int seedData, int seedLength, int memstart, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maSecureRandBytes(int randData, int randLength, int memstart, JNIEnv* jNIEnv, jobject jThis);
 }

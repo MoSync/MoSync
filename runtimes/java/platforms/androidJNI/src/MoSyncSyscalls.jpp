@@ -57,6 +57,8 @@ int mDrawTargetHandle = 0;
 Paint mPaint = new Paint();
 Paint mBlitPaint = new Paint();
 
+SecureRandom mSecureRandom;
+
 boolean initSyscalls()
 {
 	SYSLOG("initSyscalls");
@@ -74,6 +76,9 @@ boolean initSyscalls()
 	 mBlitPaint.setAntiAlias(false);
 	 mBlitPaint.setColor(0xffffffff);
 
+	 mSecureRandom = new SecureRandom();
+	 mSecureRandom.generateSeed(64);
+	 
 	 return true;
 }
 
@@ -778,6 +783,37 @@ void _disableFramebuffer()
 {
 	mUsingFrameBuffer = false;
 }
+
+
+int maSecureRandSeed(int seedData, int seedLength)
+{
+	byte[] ra = new byte[seedLength];
+	int p = mMemDataSection.position();
+	
+	mMemDataSection.position(seedData);
+	mMemDataSection.get(ra);
+	mMemDataSection.position(p);
+		
+	mSecureRandom.setSeed(ra);
+	
+	return 0;
+}	
+	
+int maSecureRandBytes(int randData, int randLength)
+{
+	byte[] ra = new byte[randLength];
+	int p = mMemDataSection.position();
+	
+	mSecureRandom.nextBytes(ra);
+	
+	mMemDataSection.position(randData);
+	mMemDataSection.put(ra);
+	mMemDataSection.position(p);
+	
+	return 0;
+}
+
+
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 

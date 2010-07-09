@@ -56,6 +56,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MemStream.h>
 #include <FileStream.h>
 
+#include <helpers/CPP_IX_SECURE_RANDOM.h>
+
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_FILE.h>

@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/cpp_defs.h>
 #include <helpers/fifo.h>
 
+#include <helpers/CPP_IX_SECURE_RANDOM.h>
+
 #include <jni.h>
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
@@ -748,6 +750,8 @@ namespace Base
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, timeout);
 
+		mJNIEnv->DeleteLocalRef(cls);
+		
 		// now we must wait so we don't end up in a deadlock
 /*		
 		while(true == mGotLookedEvent) {}
@@ -1057,8 +1061,17 @@ namespace Base
 			SYSLOG("maIOCtl_maCloseStream NOT IMPLEMENTED");
 			return -1;
 */			
-		}
 		
+		case maIOCtl_maSecureRandSeed:
+			SYSLOG("maIOCtl_maSecureRandSeed");
+			return _maSecureRandSeed((int)GVMRA(void*), b, (int)gCore->mem_ds, mJNIEnv, mJThis);
+			
+		case maIOCtl_maSecureRandBytes:
+			SYSLOG("maIOCtl_maSecureRandBytes");
+			return _maSecureRandBytes((int)GVMRA(void*), b, (int)gCore->mem_ds, mJNIEnv, mJThis);
+		
+		}
+				
 		return IOCTL_UNAVAILABLE;
 	}
 }

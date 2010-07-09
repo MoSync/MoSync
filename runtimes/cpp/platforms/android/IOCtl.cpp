@@ -132,4 +132,33 @@ namespace Base
 		return -1;
 	}
 	
+	int _maSecureRandSeed(int seedData, int seedLength, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	{
+		int rData = seedData - memStart;
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSecureRandSeed", "(II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, rData, seedLength);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)ret;
+	}
+	
+
+	
+	int _maSecureRandBytes(int randData, int randLength, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	{	
+		int rData = randData - memStart;
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSecureRandBytes", "(II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, rData, randLength);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)ret;
+	}
 }

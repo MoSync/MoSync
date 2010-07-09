@@ -403,7 +403,6 @@ namespace Base {
 		a.ll = a.ll*b.ll;
 		return a.d;
 	}
-#endif	//S60v2
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
 		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();

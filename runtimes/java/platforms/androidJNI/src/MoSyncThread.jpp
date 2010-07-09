@@ -62,6 +62,8 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 
+import java.security.SecureRandom;
+
 #ifdef _ANDROID_BLUETOOTH
 import android.app.Activity;
 import android.bluetooth.*;
