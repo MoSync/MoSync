@@ -75,25 +75,28 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 		}
 	}
 	
-	SYSLOG("get resource file");
-	jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
-	if (fdClass2 != NULL) 
+	if(resourceOffset != 0)
 	{
-		jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2); 
-		jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdResClassRef, "descriptor", "I");
-		
-		if (fdClassDescriptorFieldID != NULL && resource != NULL) 
-		{			
-			jint fd = env->GetIntField(resource, fdClassDescriptorFieldID);	
-			int myfd = dup(fd);
-			res = fdopen(myfd, "rb"); 
-			fseek(res, resourceOffset, SEEK_SET);
+		SYSLOG("get resource file");
+		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
+		if (fdClass2 != NULL) 
+		{
+			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2); 
+			jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdResClassRef, "descriptor", "I");
+			
+			if (fdClassDescriptorFieldID != NULL && resource != NULL) 
+			{			
+				jint fd = env->GetIntField(resource, fdClassDescriptorFieldID);	
+				int myfd = dup(fd);
+				res = fdopen(myfd, "rb"); 
+				fseek(res, resourceOffset, SEEK_SET);
+			}
 		}
 	}
 	
 	SYSLOG("both files was obtained!");
 	
-	if(NULL == prg || NULL == res)
+	if(NULL == prg)
 	{
 		SYSLOG("seams to be something wrong here..");
 		return false;
@@ -115,6 +118,7 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	
 	return Core::LoadVMApp(gCore, prg, res);
 }
+
 
 /*
 */
