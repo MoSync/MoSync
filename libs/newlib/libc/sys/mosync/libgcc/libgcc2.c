@@ -534,7 +534,7 @@ __ffsDI2 (DWtype u)
   return count + add + 1;
 }
 #endif
-
+/*
 #ifdef L_muldi3
 DWtype
 __muldi3 (DWtype u, DWtype v)
@@ -549,7 +549,7 @@ __muldi3 (DWtype u, DWtype v)
   return w.ll;
 }
 #endif
-
+*/
 #if (defined (L_udivdi3) || defined (L_divdi3) || \
      defined (L_umoddi3) || defined (L_moddi3))
 #if defined (sdiv_qrnnd)
