@@ -431,13 +431,26 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 	return RES_OK;
 }
 
+ByteBuffer tempImageRawBuffer;
+ByteBuffer _maCreateImageRawGetData(int size)
+{
+	tempImageRawBuffer = ByteBuffer.allocateDirect(size);
+	return tempImageRawBuffer;
+}
 
-
-
-int maCreateImageRaw(int placeholder, int src, int size, int alpha)
+// This function takes the content of the tempImageRawBuffer and creates an Image from it.
+// 
+//
+int _maCreateImageRaw(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateImageRaw");
-	return -1;
+	
+	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	bitmap.copyPixelsFromBuffer(tempImageRawBuffer);
+	
+	mImageResources.put(placeholder, new ImageCache(null, bitmap));
+	
+	return RES_OK;
 }
 
 
@@ -777,6 +790,34 @@ void _enableFramebuffer(int address)
 void _disableFramebuffer()
 {
 	mUsingFrameBuffer = false;
+}
+
+int maGetSystemProperty(String key, int buf, int size)
+{
+/*
+	String value;
+	if(key.equals("mosync.imei")) {
+		value = sysPropFromArray(sImeiProperties);
+	} else if(key.equals("mosync.imsi")) {
+		value = sysPropFromArray(sImsiProperties);
+	} else if(key.equals("mosync.iso-639-1")) {
+		value = System.getProperty("microedition.locale");
+		if(value != null) {
+			value = value.substring(0, 2);
+		}
+	} else {
+		value = System.getProperty(key);
+	}
+	if(value == null)
+		return -2;
+	if(value.length() >= size)
+		return value.length() + 1;
+	writeMemBytes(buf, value.getBytes(), 0, value.length());
+	int[] mem_ds = mCore.mMem_ds;
+	WBYTE(buf + value.length(), (byte)0);
+	return value.length() + 1;
+*/	
+	return 0;
 }
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();

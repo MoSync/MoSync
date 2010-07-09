@@ -132,4 +132,20 @@ namespace Base
 		return -1;
 	}
 	
+	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrKey = jNIEnv->NewStringUTF(key);
+
+		int rBuf = buf - memStart;
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetSystemProperty", "(Ljava/lang/String;Ljava/lang/String;II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrKey, rBuf, size);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrKey);
+		
+		return (int)ret;
+	}
+	
 }

@@ -73,8 +73,10 @@ if thirdarg != nil
 		FileUtils.copy_file "src/config_platform.h", "src/config_platform.h.saved"
 	end
 
+	puts "using runtime #{thirdarg}config#{debug}.h"
+	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
-	FileUtils.copy_file( "#{thirdarg}/config#{debug}.h", "src/config_platform.h")
+	FileUtils.copy_file( "#{thirdarg}config#{debug}.h", "src/config_platform.h")
 end
 
 

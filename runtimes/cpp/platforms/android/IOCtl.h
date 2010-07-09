@@ -35,4 +35,7 @@ namespace Base
 	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
+	
 }

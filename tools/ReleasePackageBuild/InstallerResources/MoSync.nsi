@@ -145,6 +145,7 @@ removeoldfiles:
   RMDir /r "$INSTDIR\templates"
   Delete $INSTDIR\MoSyncRules.rules
   Delete $INSTDIR\uninstall.exe
+   ;Remove the shortcuts on the Start menu too
   Delete "$SMPROGRAMS\MoSync\*.*"
   
   goto getOnWithIt
@@ -220,10 +221,10 @@ SectionEnd
 Section "Start Menu Shortcuts" StartMenu
 
   CreateDirectory "$SMPROGRAMS\MoSync"
-    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 0
-    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 1
-	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "$INSTDIR\bin\MoSyncOnlineDocs.URL" 2
-    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 3
+    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 1
+    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 2
+	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "C:\WINDOWS\SYSTEM\url.dll" 3
+    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 4
 SectionEnd
 
 
@@ -259,7 +260,13 @@ SectionEnd
 
 Section "Uninstall"
 
-  MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller will remove all MoSync shortcuts, registry entries and product files. Workspaces and projects will be left intact. Just delete them manually if you no longer need them."
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "This uninstaller will remove all MoSync shortcuts, registry entries and product files. Your workspaces and projects will be left intact; delete them manually if you no longer need them." IDOK removeexistingfiles IDCANCEL abortuninstall
+  
+abortuninstall:
+
+  Quit
+
+removeexistingfiles:
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MoSync"
@@ -269,19 +276,19 @@ Section "Uninstall"
   ${unregisterExtension} ".mopro" "MoSync Project File"
 
   ; Remove files and uninstaller
-  RMDir /r "$INSTDIR\bin"
-  RMDir /r "$INSTDIR\docs"
-  RMDir /r "$INSTDIR\eclipse"
-  RMDir /r "$INSTDIR\etc"
-  RMDir /r "$INSTDIR\examples"
-  RMDir /r "$INSTDIR\include"
-  RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\null"
-  RMDir /r "$INSTDIR\profiles"
-  RMDir /r "$INSTDIR\skins"
-  RMDir /r "$INSTDIR\templates"
-  Delete $INSTDIR\MoSyncRules.rules
-  Delete $INSTDIR\uninstall.exe
+  ; RMDir /r "$INSTDIR\bin"
+  ; RMDir /r "$INSTDIR\docs"
+  ; RMDir /r "$INSTDIR\eclipse"
+  ; RMDir /r "$INSTDIR\etc"
+  ; RMDir /r "$INSTDIR\examples"
+  ; RMDir /r "$INSTDIR\include"
+  ; RMDir /r "$INSTDIR\lib"
+  ; RMDir /r "$INSTDIR\null"
+  ; RMDir /r "$INSTDIR\profiles"
+  ; RMDir /r "$INSTDIR\skins"
+  ; RMDir /r "$INSTDIR\templates"
+  ; Delete $INSTDIR\MoSyncRules.rules
+  ; Delete $INSTDIR\uninstall.exe
 
   ; Remove Desktop shortcut
   Delete "$DESKTOP\MoSync.lnk"

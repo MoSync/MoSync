@@ -59,6 +59,8 @@ import android.util.Log;
 
 import com.mosync.java.android.MoSyncPanicDialog;
 
+import java.io.FileNotFoundException;
+
 import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 
@@ -198,12 +200,23 @@ public class MoSyncThread extends Thread
 			long pFdLength = pAfd.getLength();
 			long pFdOffset = pAfd.getStartOffset();
 			
-			AssetFileDescriptor rAfd = assetManager.openFd("resources.mp3");
-			FileDescriptor rFd = rAfd.getFileDescriptor();
-			long rFdLength = rAfd.getLength();
-			mResourceOffset = rAfd.getStartOffset();
+
+			FileDescriptor rFd = null;
+			mResourceOffset = 0;
 			
-			if((null != pFd) && (null != rFd))
+			try
+			{
+				AssetFileDescriptor rAfd = assetManager.openFd("resourcesass.mp3");
+				rFd = rAfd.getFileDescriptor();
+				long rFdLength = rAfd.getLength();
+				mResourceOffset = rAfd.getStartOffset();
+			}
+			catch(FileNotFoundException fnfc)
+			{
+				Log.i("loadProgram","Has no resources!");
+			}
+			
+			if(null != pFd)
 			{
 				Log.i("MoSync Thread", "calling native function");
 				if(false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
@@ -216,6 +229,8 @@ public class MoSyncThread extends Thread
 				Log.i("MoSync Thread", "Load program was succesfull");
 				return true;
 			}
+		
+		
 
 		}
 		catch(Exception e)
@@ -268,8 +283,6 @@ private static final int CHUNK_READ_SIZE = 1024;
 		}
 		
 		Log.i("MoSync Thread", "position : " + byteBuffer.position());
-		
-		//byteBuffer.position(0);  
 		
 		return byteBuffer;  
 	}  
