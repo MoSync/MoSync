@@ -276,19 +276,19 @@ removeexistingfiles:
   ${unregisterExtension} ".mopro" "MoSync Project File"
 
   ; Remove files and uninstaller
-  RMDir /r "$INSTDIR\bin"
-  RMDir /r "$INSTDIR\docs"
-  RMDir /r "$INSTDIR\eclipse"
-  RMDir /r "$INSTDIR\etc"
-  RMDir /r "$INSTDIR\examples"
-  RMDir /r "$INSTDIR\include"
-  RMDir /r "$INSTDIR\lib"
-  RMDir /r "$INSTDIR\null"
-  RMDir /r "$INSTDIR\profiles"
-  RMDir /r "$INSTDIR\skins"
-  RMDir /r "$INSTDIR\templates"
-  Delete $INSTDIR\MoSyncRules.rules
-  Delete $INSTDIR\uninstall.exe
+  ; RMDir /r "$INSTDIR\bin"
+  ; RMDir /r "$INSTDIR\docs"
+  ; RMDir /r "$INSTDIR\eclipse"
+  ; RMDir /r "$INSTDIR\etc"
+  ; RMDir /r "$INSTDIR\examples"
+  ; RMDir /r "$INSTDIR\include"
+  ; RMDir /r "$INSTDIR\lib"
+  ; RMDir /r "$INSTDIR\null"
+  ; RMDir /r "$INSTDIR\profiles"
+  ; RMDir /r "$INSTDIR\skins"
+  ; RMDir /r "$INSTDIR\templates"
+  ; Delete $INSTDIR\MoSyncRules.rules
+  ; Delete $INSTDIR\uninstall.exe
 
   ; Remove Desktop shortcut
   Delete "$DESKTOP\MoSync.lnk"
