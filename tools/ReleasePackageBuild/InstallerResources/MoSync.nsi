@@ -145,6 +145,7 @@ removeoldfiles:
   RMDir /r "$INSTDIR\templates"
   Delete $INSTDIR\MoSyncRules.rules
   Delete $INSTDIR\uninstall.exe
+   ;Remove the shortcuts on the Start menu too
   Delete "$SMPROGRAMS\MoSync\*.*"
   
   goto getOnWithIt
@@ -220,10 +221,10 @@ SectionEnd
 Section "Start Menu Shortcuts" StartMenu
 
   CreateDirectory "$SMPROGRAMS\MoSync"
-    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 0
-    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 1
-	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "$INSTDIR\bin\MoSyncOnlineDocs.URL" 2
-    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 3
+    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 1
+    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 2
+	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "C:\WINDOWS\SYSTEM\url.dll" 3
+    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 4
 SectionEnd
 
 
