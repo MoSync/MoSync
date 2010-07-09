@@ -148,4 +148,17 @@ namespace Base
 		return (int)ret;
 	}
 	
+	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrURL = jNIEnv->NewStringUTF(url);
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPlatformRequest", "(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrURL);
+		
+		return (int)ret;
+	}
 }

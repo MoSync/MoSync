@@ -917,10 +917,6 @@ namespace Base
 			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
 			return -1;
 		
-		case maIOCtl_maPlatformRequest:
-			SYSLOG("maIOCtl_maPlatformRequest NOT IMPLEMENTED");
-			return -1;
-		
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS NOT IMPLEMENTED");
 			return -1;
@@ -1094,28 +1090,10 @@ namespace Base
 			SYSLOG("maIOCtl_maGetSystemProperty");
 			return _maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a), (int)SYSCALL_THIS->GetValidatedMemRange(b, c),  (int)gCore->mem_ds, c, mJNIEnv, mJThis);
 			
-		
-		/**
-		* Retrieves the value of a Java System Property, or a MoSync System Property.
-		*
-		* There are a few MoSync System Properties. They are unavailable on some devices.
-		* "mosync.imei" and "mosync.imsi" is the device's IMEI and IMSI number, respectively.
-		*
-		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
-		* Multi-language applications should use this to determine which language to use.
-		*
-		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
-		*
-		* \param key The property's key.
-		* \param buf A buffer where the value should be written.
-		* \param size The size of the buffer, in bytes.
-		* \returns The length of the value, including the terminating zero.
-		* If this is less than \a size, the value will not have been copied to be buffer.
-		* In that case, you can make a bigger buffer and try again.
-		* If the property did not exist (System.getProperty() returned null),
-		* -2 will be returned.
-		*/
-		//int maGetSystemProperty(in MAString key, out MAString buf, in int size);
+		case maIOCtl_maPlatformRequest:
+			SYSLOG("maIOCtl_maPlatformRequest");
+			return _maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+
 
 		}
 		
