@@ -755,30 +755,6 @@ int maIOCtl(int function, int a, int b, int c)
 	return -1;
 }
 
-int _maPlatformRequest()
-{
-
-	return -1;
-}
-/*
-			{
-#ifdef WIN32
-				const char* url = SYSCALL_THIS->GetValidatedStr(a);
-				if(sstrcmp(url, "http://") == 0) {
-					int result = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOW);
-					if(result <= 32) {
-						LOG("ShellExecute(%s) error %i\n", url, result);
-						return CONNERR_GENERIC;
-					}
-					return 0;
-				} else
-#endif
-				{
-					return IOCTL_UNAVAILABLE;
-				}
-			}
-*/
-
 void _enableFramebuffer(int address)
 {
 	mUsingFrameBuffer = true;
@@ -818,6 +794,20 @@ int maGetSystemProperty(String key, int buf, int size)
 	return value.length() + 1;
 */	
 	return 0;
+}
+
+int maPlatformRequest(String url)
+{
+	if(url.startsWith("http://"))
+	{
+		Log.i("maPlatformRequest","Starting browser:" + url);
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		((Activity)mContext).startActivity(i);
+		
+		return 0;
+	}
+	return -1;
 }
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
