@@ -259,7 +259,13 @@ SectionEnd
 
 Section "Uninstall"
 
-  MessageBox MB_OK|MB_ICONEXCLAMATION "This uninstaller will remove all MoSync shortcuts, registry entries and product files. Workspaces and projects will be left intact. Just delete them manually if you no longer need them."
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "This uninstaller will remove all MoSync shortcuts, registry entries and product files. Your workspaces and projects will be left intact; delete them manually if you no longer need them." IDOK removeoldfiles IDCANCEL abortuninstall
+  
+abortuninstall:
+
+  Quit
+
+removeoldfiles:
 
   ; Remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MoSync"
