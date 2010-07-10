@@ -132,6 +132,35 @@ namespace Base
 		return -1;
 	}
 	
+	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrKey = jNIEnv->NewStringUTF(key);
+
+		int rBuf = buf - memStart;
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetSystemProperty", "(Ljava/lang/String;Ljava/lang/String;II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrKey, rBuf, size);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrKey);
+		
+		return (int)ret;
+	}
+	
+	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrURL = jNIEnv->NewStringUTF(url);
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPlatformRequest", "(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrURL);
+		
+		return (int)ret;
+	}
 	int _maSecureRandSeed(int seedData, int seedLength, int memStart, JNIEnv* jNIEnv, jobject jThis)
 	{
 		int rData = seedData - memStart;

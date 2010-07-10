@@ -36,6 +36,10 @@ namespace Base
 	
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
 	
+	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis);
+	
 	int _maSecureRandSeed(int seedData, int seedLength, int memstart, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maSecureRandBytes(int randData, int randLength, int memstart, JNIEnv* jNIEnv, jobject jThis);

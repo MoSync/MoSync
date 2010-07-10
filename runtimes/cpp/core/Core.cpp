@@ -585,11 +585,13 @@ public:
 		if(!LoadVM(mod))
 			return false;
 
-		FileStream res(resfile);
+		if(NULL != resfile)
+		{
+			FileStream res(resfile);
 
-		if(!mSyscall.loadResources(res, "resources"))
-			return false;
-
+			if(!mSyscall.loadResources(res, "resources"))
+				return false;
+		}
 #endif
 
 

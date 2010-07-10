@@ -428,11 +428,6 @@ namespace Base
 	{
 		SYSLOG("maCreateImageFromData");
 		
-		char* b = (char*)malloc(200);
-		sprintf(b, "placeholder: %i data: %i\n", placeholder, data);
-		SYSLOG(b);
-		free(b);
-		
 		if(SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
@@ -447,8 +442,46 @@ namespace Base
 
 	SYSCALL(int,  maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int alpha))
 	{
-		SYSLOG("maCreateImageRaw NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maCreateImageRaw");
+		
+		int imgWidth = size&0xffff;
+		int imgHeight = (size>>16)&0xffff;
+		
+		int imgSize = imgWidth * imgHeight * 4;
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maCreateImageRawGetData", "(I)Ljava/nio/ByteBuffer;");
+		if (methodID == 0) return -1;
+		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, imgSize);
+		char* img = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		if(1==alpha)
+		{
+			char* srcImg = (char*)src;
+			int j = 0;
+			for(int i = 0 ; i < imgSize/4; i++)
+			{
+				(*(img+j)) = (*(srcImg+j));j++;
+				(*(img+j)) = (*(srcImg+j));j++;
+				(*(img+j)) = (*(srcImg+j));j++;
+				(*(img+j)) = 255;j++;
+			}
+		}
+		else
+		{
+			memcpy(img, src, imgSize);
+		}
+		
+		cls = mJNIEnv->GetObjectClass(mJThis);
+		methodID = mJNIEnv->GetMethodID(cls, "_maCreateImageRaw", "(III)I");
+		if (methodID == 0) ERROR_EXIT;
+		int retVal = mJNIEnv->CallIntMethod(mJThis, methodID, placeholder, imgWidth, imgHeight);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL);
+		return retVal;
 	}
 
 	SYSCALL(int,  maCreateDrawableImage(MAHandle placeholder, int width, int height))
@@ -888,10 +921,6 @@ namespace Base
 			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
 			return -1;
 		
-		case maIOCtl_maPlatformRequest:
-			SYSLOG("maIOCtl_maPlatformRequest NOT IMPLEMENTED");
-			return -1;
-		
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS NOT IMPLEMENTED");
 			return -1;
@@ -1061,6 +1090,15 @@ namespace Base
 			SYSLOG("maIOCtl_maCloseStream NOT IMPLEMENTED");
 			return -1;
 */			
+		case maIOCtl_maGetSystemProperty:		
+			SYSLOG("maIOCtl_maGetSystemProperty");
+			return _maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a), (int)SYSCALL_THIS->GetValidatedMemRange(b, c),  (int)gCore->mem_ds, c, mJNIEnv, mJThis);
+			
+		case maIOCtl_maPlatformRequest:
+			SYSLOG("maIOCtl_maPlatformRequest");
+			return _maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+
+
 		
 		case maIOCtl_maSecureRandSeed:
 			SYSLOG("maIOCtl_maSecureRandSeed");
