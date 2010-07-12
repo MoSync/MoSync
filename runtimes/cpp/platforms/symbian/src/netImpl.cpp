@@ -1299,7 +1299,7 @@ SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {
 }
 
 SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {
-	LOGST("ConnRead %i 0x%08X %i\n", conn, dst, size);
+	LOGST("ConnRead %i 0x%08X %i", conn, dst, size);
 	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	SYSCALL_THIS->ValidateMemRange(dst, size);
@@ -1309,7 +1309,7 @@ SYSCALL(void, maConnRead(MAHandle conn, void* dst, int size)) {
 }
 
 SYSCALL(void, maConnWrite(MAHandle conn, const void* src, int size)) {
-	LOGST("ConnWrite %i 0x%08X %i\n", conn, src, size);
+	LOGST("ConnWrite %i 0x%08X %i", conn, src, size);
 	CConnection* cc = gConnections.find(conn);
 	MYASSERT(cc, ERR_CONN_HANDLE_INVALID);
 	SYSCALL_THIS->ValidateMemRange(src, size);

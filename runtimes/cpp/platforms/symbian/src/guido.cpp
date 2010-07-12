@@ -305,6 +305,17 @@ void Syscall::InitGuidoL() {
 		//retrieve the default pitch
 		CHECK_NZ(BABILE_getSetting(gBabileObj, BABIL_PARM_PITCH, &gPitch));
 		LOG("pitch: %i\n", gPitch);
+		
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_SEL_SYNC, BABIL_PARM_SEL_VAL_MBR_SYNCONWORDS));
+		
+		// Some nice settings to speed up the TTS
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_LEADINGSILENCE, 5));
+		//CHECK_N(BABILE_setSetting(gBabileObj, BABIL_PARM_SEL_NBPRESEL, 40));
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_SEL_NBPRESEL, 30));
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_SENTENCELENGTH, BABIL_PARM_VAL_SENTENCE_MED));
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_SEL_SELBREAK, 2));
+		CHECK_NZ(BABILE_setSetting(gBabileObj, BABIL_PARM_SEL_SPANAROUNDVOICEPITCHDELTA, 5));
+		BABILE_resetError(gBabileObj);
 	}
 	LOGD("CMAOS:NewL\n");
 	gAudioStream = CMdaAudioOutputStream::NewL(*this, EMdaPriorityNormal,
@@ -683,7 +694,7 @@ void Syscall::MaoscOpenComplete(TInt aError) {
 
 #if 1//ndef BABILE2	//???
 #ifdef BABILE2
-#define SAMPLE_RATE TMdaAudioDataSettings::ESampleRate11025Hz
+#define SAMPLE_RATE TMdaAudioDataSettings::ESampleRate8000Hz
 #else
 #define SAMPLE_RATE TMdaAudioDataSettings::ESampleRate16000Hz
 #endif
