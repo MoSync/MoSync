@@ -27,35 +27,45 @@ pattern.gsub!("\\", '/')
 puts pattern
 files = Dir.glob(pattern)
 puts "#{files.count} files to test:"
-files.each do |filename|
-	bn = File.basename(filename)
-	if(SKIPPED.include?(bn))
-		puts "Skipped #{bn}"
-		next
+
+def delete_if_empty(filename)
+	if(!File.size?(filename))
+		if(File.exists?(filename))
+			FileUtils.rm(filename)
+		end
 	end
-	puts bn
-	ofn = BUILD_DIR + '/' + bn.ext('.s')
-	pfn = ofn.ext('.moo')
-	winFile = ofn.ext('.win')
-	failFile = ofn.ext('.fail')
-	logFile = ofn.ext('.log')
+end
+
+def link_and_test(ofn, dead_code, force_rebuild)
+	suffix = dead_code ? 'e' : ''
+	pfn = ofn.ext('.moo' + suffix)
+	winFile = ofn.ext('.win' + suffix)
+	failFile = ofn.ext('.fail' + suffix)
+	logFile = ofn.ext('.log' + suffix)
+	mdsFile = ofn.ext('.md.s')
+	esFile = ofn.ext('.e.s')
 	
-	force_rebuild = SETTINGS[:rebuild_failed] && File.exists?(failFile)
+	delete_if_empty(pfn)
 	
-	# build the program.
-	if(!File.exists?(ofn) || force_rebuild)
-		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}"
-		force_rebuild = true
-	end
+	# link
 	if(!File.exists?(pfn) || force_rebuild)
-		sh "pipe-tool#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+		if(dead_code)
+			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+			sh "pipe-tool -B #{pfn} rebuild.s"
+		else
+			sh "pipe-tool#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+		end
 		force_rebuild = true
+	end
+	delete_if_empty(pfn)
+	if(!File.exists?(pfn))
+		error"Unknown link failure."
 	end
 	
 	# execute it, if not win already, or we rebuilt something.
 	
-	if(File.exists?(winFile) && !force_rebuild)
-		next
+	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
+		return force_rebuild
 	end
 	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn}"
 	$stderr.puts cmd
@@ -65,12 +75,38 @@ files.each do |filename|
 		FileUtils.touch(winFile)
 		FileUtils.rm_f(failFile)
 		FileUtils.rm_f(logFile)
+		FileUtils.rm_f(mdsFile)
+		FileUtils.rm_f(esFile)
 	else	# failure
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
-		FileUtils.mv('log.txt', logFile)
+		FileUtils.mv('log.txt', logFile) if(File.exists?('log.txt'))
+		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s'))
+		FileUtils.mv('rebuild.s', esFile) if(File.exists?('rebuild.s'))
 		if(SETTINGS[:stop_on_fail])
-			break
+			error "Stop on fail"
 		end
 	end
+	return force_rebuild
+end
+
+files.each do |filename|
+	bn = File.basename(filename)
+	if(SKIPPED.include?(bn))
+		puts "Skipped #{bn}"
+		next
+	end
+	puts bn
+	
+	ofn = BUILD_DIR + '/' + bn.ext('.s')
+	force_rebuild |= SETTINGS[:rebuild_failed] && (File.exists?(ofn.ext('.fail')) || File.exists?(ofn.ext('.faile')))
+	
+	# compile
+	if(!File.exists?(ofn) || force_rebuild)
+		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}"
+		force_rebuild = true
+	end
+	
+	force_rebuild = link_and_test(ofn, false, force_rebuild)
+	link_and_test(ofn, true, force_rebuild)
 end
