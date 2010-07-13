@@ -8,7 +8,8 @@ require '../../rules/util.rb'
 BUILD_DIR = 'build'
 MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I. -I#{MOSYNCDIR}/include -DNO_TRAMPOLINES"
-PIPE_FLAGS = " #{MOSYNCDIR}/lib/pipe_debug/mastd.lib"
+PIPE_FLAGS = " -datasize=#{2*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024}"
+PIPE_LIBS = " #{MOSYNCDIR}/lib/pipe_debug/mastd.lib"
 
 # SETTINGS[:source_path] - directory in which source files are stored.
 
@@ -25,7 +26,7 @@ pattern = SETTINGS[:source_path] + '/*.c'
 pattern.gsub!("\\", '/')
 puts pattern
 files = Dir.glob(pattern)
-puts files.count
+puts "#{files.count} files to test:"
 files.each do |filename|
 	bn = File.basename(filename)
 	if(SKIPPED.include?(bn))
@@ -35,6 +36,41 @@ files.each do |filename|
 	puts bn
 	ofn = BUILD_DIR + '/' + bn.ext('.s')
 	pfn = ofn.ext('.moo')
-	sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}" unless(File.exists?(ofn))
-	sh "pipe-tool -B #{pfn} #{ofn} build/helpers.s#{PIPE_FLAGS}" unless(File.exists?(pfn))
+	winFile = ofn.ext('.win')
+	failFile = ofn.ext('.fail')
+	logFile = ofn.ext('.log')
+	
+	force_rebuild = SETTINGS[:rebuild_failed] && File.exists?(failFile)
+	
+	# build the program.
+	if(!File.exists?(ofn) || force_rebuild)
+		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}"
+		force_rebuild = true
+	end
+	if(!File.exists?(pfn) || force_rebuild)
+		sh "pipe-tool#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+		force_rebuild = true
+	end
+	
+	# execute it, if not win already, or we rebuilt something.
+	
+	if(File.exists?(winFile) && !force_rebuild)
+		next
+	end
+	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn}"
+	$stderr.puts cmd
+	res = system(cmd)
+	puts res
+	if(res == true)	# success
+		FileUtils.touch(winFile)
+		FileUtils.rm_f(failFile)
+		FileUtils.rm_f(logFile)
+	else	# failure
+		FileUtils.touch(failFile)
+		FileUtils.rm_f(winFile)
+		FileUtils.mv('log.txt', logFile)
+		if(SETTINGS[:stop_on_fail])
+			break
+		end
+	end
 end
