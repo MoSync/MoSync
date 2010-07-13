@@ -6,6 +6,7 @@
 #endif
 #define CONFIG_H
 
+#define __SYMBIAN__
 
 //#define PHONE_RELEASE	//undef to read program and resources from C:/data/
 #define MOSYNC_COMMERCIAL	//controls nag text
@@ -15,16 +16,16 @@
 
 
 #define GUIDO
-//#define BABILE2
+#define BABILE2
 
 #define WLAN
 #define SAVE_IAP
 //#define CELLID
 #define CALL
-//#define IX_LOCATION
 //#define SUPPORT_MOSYNC_SERVER
+//#define SUPPORT_AUDIOBUFFER
 
-//#define USE_ARM_RECOMPILER
+#define USE_ARM_RECOMPILER
 
 #define SUPPORT_RELOAD
 
