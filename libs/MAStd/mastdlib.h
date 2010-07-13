@@ -142,6 +142,11 @@ void srand(unsigned int seed);
 */
 int abs(int x);
 
+/**
+* Places \a n zero-valued bytes in the area pointed to by \a s.
+*/
+void bzero(void* s, size_t n);
+
 #ifdef __cplusplus
 }	//extern "C"
 #endif
