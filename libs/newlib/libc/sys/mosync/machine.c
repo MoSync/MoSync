@@ -7,6 +7,12 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <inttypes.h>
+#include <pwd.h>
+#include <grp.h>
+#include <utime.h>
+#include <sys/signal.h>
+#include <string.h>
+#include <getopt.h>
 
 #include <maapi.h>
 #include <IX_FILE.h>
@@ -44,77 +50,220 @@ int getpid(void) {
   return 1;
 }
 
+uid_t getuid(void) {
+	return 0;
+}
+
+struct passwd* getpwuid(uid_t uid) {
+	return NULL;
+}
+
+struct group* getgrgid(gid_t gid) {
+	return NULL;
+}
+
 int fstat(int __fd, struct stat *st) {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
+
 int stat(const char *file, struct stat *st) {
 	st->st_mode = S_IFCHR;
 	return 0;
 }
 
-#define FHANDLE_OFFSET 4
+// Define file descriptors.
+// In this scheme, a file descriptor is an index into this array.
+// Each value in this array is a pointer to a struct, which is stored in yet another array.
+// This struct has a low-level descriptor, which means this:
+// 0 is invalid. 1 is the console. 2 is maWriteLog().
+// 3 and above are file handles, as returned by maFileOpen(), plus LOWFD_OFFSET.
+// With this scheme, dup() and dup2() should be possible to implement.
+// The struct also has a reference counter.
 
-off_t lseek(int __fd, off_t __offset, int __whence) {
-	int res;
-	if(__fd <= FHANDLE_OFFSET) {
+#define LOWFD_CONSOLE 0
+#define LOWFD_WRITELOG 1
+#define LOWFD_OFFSET 2
+
+struct LOW_FD {
+	int lowFd;
+	int refCount;
+};
+
+#define NFD 32
+static struct LOW_FD* sFda[NFD];
+static struct LOW_FD sLfda[NFD];
+
+static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1 };
+//static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1 };
+
+static int closeLfd(struct LOW_FD* plfd);
+
+static void initFda(void) {
+	static int initialized = 0;
+	if(initialized)
+		return;
+	initialized = 1;
+
+	memset(sFda, 0, sizeof(sFda));
+	memset(sLfda, 0, sizeof(sLfda));
+	sFda[1] = &sLfConsole;
+	sFda[2] = &sLfConsole;
+	sFda[3] = &sLfConsole;
+}
+
+static struct LOW_FD* getLowFd(int __fd) {
+	initFda();
+	if(__fd <= 0 || __fd >= NFD) {
+		errno = EBADF;
+		return NULL;
+	}
+	if(sFda[__fd] == NULL) {
+		errno = EBADF;
+		return NULL;
+	}
+	MAASSERT(sFda[__fd]->refCount > 0);
+	return sFda[__fd];
+}
+#define LOWFD int lfd; struct LOW_FD* plfd = getLowFd(__fd); if(plfd == NULL) return -1; lfd = plfd->lowFd;
+
+static struct LOW_FD* findFreeLfd(void) {
+	initFda();
+	for(int i=0; i<NFD; i++) {
+		if(sLfda[i].refCount == 0)
+			return sLfda + i;
+	}
+	BIG_PHAT_ERROR;
+}
+
+static int findFreeFd(void) {
+	initFda();
+	for(int i=4; i<NFD; i++) {
+		if(sFda[i] == NULL)
+			return i;
+	}
+	return -1;
+}
+
+
+int dup(int __fd) {
+	int newFd;
+	LOWFD;
+	newFd = findFreeFd();
+	if(newFd < 0) {
+		errno = EMFILE;
+		return -1;
+	}
+	sFda[newFd] = plfd;
+	plfd->refCount++;
+	return newFd;
+}
+
+int dup2(int __fd, int newFd) {
+	struct LOW_FD* newLfd;
+	LOWFD;
+	if(__fd == newFd)
+		return newFd;
+	if(newFd < 0 || newFd >= NFD) {
 		errno = EBADF;
 		return -1;
 	}
-	res = maFileSeek(__fd - FHANDLE_OFFSET, __offset, __whence);
+	newLfd = getLowFd(newFd);
+	if(newLfd != NULL) {
+		int res = closeLfd(newLfd);
+		if(res < 0)
+			return res;
+	}
+	sFda[newFd] = plfd;
+	plfd->refCount++;
+	return newFd;
+}
+
+
+off_t lseek(int __fd, off_t __offset, int __whence) {
+	int res;
+	LOWFD;
+	res = maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence);
 	if(res < 0) {
 		errno = EINVAL;
 		return -1;
 	}
 	return res;
 }
-int read(int __fd, void *__buf, size_t __nbyte) {
+
+int ftruncate(int __fd, off_t __length) {
 	int res;
-	if(__fd <= FHANDLE_OFFSET) {
-		errno = EBADF;
+	LOWFD;
+	res = maFileTruncate(lfd - LOWFD_OFFSET, __length);
+	if(res < 0) {
+		errno = EINVAL;
 		return -1;
 	}
-	res = maFileRead(__fd - FHANDLE_OFFSET, __buf, __nbyte);
+	return res;
+}
+
+int read(int __fd, void *__buf, size_t __nbyte) {
+	int res;
+	LOWFD;
+	res = maFileRead(lfd - LOWFD_OFFSET, __buf, __nbyte);
 	if(res != 0) {
 		errno = EIO;
 		return -1;
 	}
 	return __nbyte;
 }
+
 int write(int __fd, const void *__buf, size_t __nbyte) {
-	if(__fd == 1 || __fd == 3) {	//stdout or stderr
+	int res;
+	LOWFD;
+	if(lfd == LOWFD_CONSOLE) {
 		WriteConsole(__buf, __nbyte);
 		return __nbyte;
-	} else if(__fd > FHANDLE_OFFSET) {
-		int res = maFileWrite(__fd - FHANDLE_OFFSET, __buf, __nbyte);
-		if(res < 0) {
-			errno = EIO;
-			return -1;
-		}
-		return __nbyte;
+	} else if(lfd == LOWFD_WRITELOG) {
+		res = maWriteLog(__buf, __nbyte);
 	} else {
-		lprintfln("write(%i, %p, %zu)", __fd, __buf, __nbyte);
-		NOT;
+		res = maFileWrite(lfd - LOWFD_OFFSET, __buf, __nbyte);
 	}
-}
-int close(int __fd) {
-	int res;
-	if(__fd <= FHANDLE_OFFSET) {
-		errno = EBADF;
-		return -1;
-	}
-	res = maFileClose(__fd - FHANDLE_OFFSET);
-	if(res != 0) {
+	if(res < 0) {
 		errno = EIO;
 		return -1;
 	}
+	return __nbyte;
+}
+
+static int closeLfd(struct LOW_FD* plfd) {
+	int res;
+	plfd->refCount--;
+	if(plfd->refCount == 0) {
+		res = maFileClose(plfd->lowFd - LOWFD_OFFSET);
+		if(res != 0) {
+			errno = EIO;
+			return -1;
+		}
+	}
 	return 0;
 }
+
+int close(int __fd) {
+	int res;
+	LOWFD;
+	res = closeLfd(plfd);
+	sFda[__fd] = NULL;
+	return res;
+}
+
+int isatty(int __fd) {
+	LOWFD;
+	return lfd == LOWFD_CONSOLE;
+}
+
 int open(const char * __filename, int __mode, ...) {
 	int ma_mode;
 	int res;
 	int handle;
 	int exists;
+	int newFd;
+	struct LOW_FD* newLfd;
 	if(__mode & O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
 	} else if(__mode & O_RDONLY) {
@@ -129,6 +278,14 @@ int open(const char * __filename, int __mode, ...) {
 		PANIC_MESSAGE("unsupported mode: O_APPEND");
 	}
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
+
+	// Find a spot in the descriptor array.
+	newFd = findFreeFd();
+	if(newFd < 0) {
+		errno = EMFILE;
+		return -1;
+	}
+	newLfd = findFreeLfd();
 
 	res = maFileOpen(__filename, ma_mode);
 	if(res < 0) {
@@ -168,23 +325,33 @@ int open(const char * __filename, int __mode, ...) {
 			return -1;
 		}
 	}
-	return handle + FHANDLE_OFFSET;
+	sFda[newFd]->lowFd = handle + LOWFD_OFFSET;
+	sFda[newFd]->refCount = 1;
+	return newFd;
 }
+
+int creat(const char *filename, mode_t mode) {
+	return open(filename, O_WRONLY | O_CREAT | O_TRUNC, mode);
+}
+
 int unlink(const char *name) {
 	int res;
-	int handle;
-	handle = open(name, O_WRONLY);
-	if(handle < 0)
-		return handle;
-	res = maFileDelete(handle - FHANDLE_OFFSET);
+	int __fd;
+	__fd = open(name, O_WRONLY);
+	if(__fd < 0)
+		return __fd;
+	res = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
 	if(res < 0) {
 		errno = EPERM;
 		return -1;
 	}
 	return 0;
 }
-int isatty(int __fd) {
-	return __fd >= 1 && __fd <= 3;
+
+
+int chdir(const char *filename) {
+	errno = ENOSYS;
+	return -1;
 }
 
 char* getenv(const char *__string) {
@@ -195,9 +362,43 @@ char* _getenv_r(struct _reent *p, const char *__string) {
 	return NULL;
 }
 
+int setenv(const char *name, const char *value, int replace) {
+	errno = ENOSYS;
+	return -1;
+}
+
+int setpgid(pid_t pid, pid_t pgid) {
+	errno = ENOSYS;
+	return -1;
+}
+
+int fork(void) {
+	errno = ENOSYS;
+	return -1;
+}
+
+_sig_func_ptr signal(int sig, _sig_func_ptr f) {
+	errno = ENOSYS;
+	return SIG_ERR;
+}
+
+unsigned int alarm(unsigned int seconds) {
+	BIG_PHAT_ERROR;
+}
+
+
+int mallopt(int parameter, int value) {
+	errno = ENOSYS;
+	return 0;
+}
+
+int getpagesize(void) {
+	return 1024;	//arbitrary
+}
 
 
 clock_t times (struct tms *buffer) {
+	errno = ENOSYS;
 	return -1;
 }
 
