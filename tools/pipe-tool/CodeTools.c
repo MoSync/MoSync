@@ -68,7 +68,8 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 	thisOp = *code_ip++;
 
 	if (thisOp > _FAR)
-		return 0;
+		ErrorOnIP(Error_Fatal, rip, "DecodeOpcode: Illegal instruction > _FAR (1)");
+//		return 0;
 
 	// Decode the op
 	
@@ -79,7 +80,8 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 	}
 
 	if (thisOp >= _FAR)
-		return 0;
+		ErrorOnIP(Error_Fatal, rip, "DecodeOpcode: Illegal instruction > _FAR (2)");
+//		return 0;
 	
 	flags = OpcodeFetch[thisOp];
 		
@@ -167,6 +169,10 @@ int DecodeOpcodeIP(OpcodeInfo *thisOpcode, int code_ip)
 	ip = DecodeOpcode(thisOpcode, ip);
 	
 	code_ip += (int) (ip - sip);
+
+	if (code_ip > 0x80000000)
+		Error(Error_Fatal, "DecodeOpcodeIP: code_ip > 0x80000000 (Contact MoSync)");
+
 	return code_ip;
 }
 
