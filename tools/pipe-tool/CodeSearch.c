@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //				Defines
 //****************************************
 
-#define CD_DEBUG
+//#define CD_DEBUG
 
 #ifdef CD_DEBUG
 #define CDPRINTF	if (1) printf

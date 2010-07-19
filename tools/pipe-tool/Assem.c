@@ -251,7 +251,7 @@ int AsmPass(int thisPass)
 	AlignDataSection();
 	MaxDataIP = DataIP;
 
-//	if (INFO)
+	if (INFO)
 	{
 		printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
 
@@ -377,7 +377,7 @@ void SetAsmPtrs()
 {
 	LocalScope = 1;
 
-	CodeIP = 0;			// !! New Code starts at 1
+	CodeIP = 1;			// !! New Code starts at 1
 	DataIP = 4;			// Avoid using location 0
 	BssIP = 0;
 
