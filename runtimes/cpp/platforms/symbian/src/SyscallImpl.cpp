@@ -1202,16 +1202,21 @@ int Syscall::maGetBatteryCharge() {
 		LOG("GetBatteryCharge error %i\n", status.Int());
 		return IOCTL_UNAVAILABLE;  //magic number, identify it!
 	}
+#ifdef DEBUGGING_MODE
 	DUMPINT(info.iStatus); //CTelephony::TBatteryStatus
+#endif
 	return info.iChargeLevel;
-	/*int value, res;
+
+#if 0
+	int value, res;
 	res = HAL::Get(HALData::EPowerBatteryStatus, value);
 	DUMPINT(value);
 	if(res != KErrNone) {
 		LOG("GetBatteryCharge error %i\n", res);
 		return res;
 	}	//TPowerBatteryStatus
-	return value;*/
+	return value;
+#endif
 
 	//other alternatives:
 	//HALData								//not found in 3rd ed docs.
