@@ -3,6 +3,8 @@
 #include "mavsprintf.h"
 #include "maassert.h"
 #include <errno.h>
+#include <stdlib.h>
+#include <string.h>
 
 int main();
 
@@ -43,10 +45,24 @@ const char* strsignal(int __signo) {
 	return NULL;
 }
 
-int mcheck (void (*__abortfunc) (enum mcheck_status)) {
+void sleep(int s) {
+	BIG_PHAT_ERROR;
+}
+
+FILE *popen(const char *s, const char * mode) {
+	errno = ENOSYS;
+	return NULL;
+}
+
+int pclose(FILE* file) {
+	errno = ENOSYS;
+	return -1;
+}
+
+int mcheck (void (*__abortfunc) (int)) {
 	return 0;
 }
-int mcheck_pedantic (void (*__abortfunc) (enum mcheck_status)) {
+int mcheck_pedantic (void (*__abortfunc) (int)) {
 	return 0;
 }
 void mcheck_check_all (void) {
@@ -59,6 +75,14 @@ void muntrace (void) {
 long int random (void) {
 	return rand();
 }
+char *initstate(unsigned seed, char *state, size_t size) {
+	return NULL;
+}
+void srandom(unsigned seed) {
+}
+void * setstate (void *state) {
+	return NULL;
+}
 
 double nexttoward(double x, double y) {
 	return nextafter(x, y);
@@ -66,4 +90,143 @@ double nexttoward(double x, double y) {
 
 float nexttowardf(float x, double y) {
 	return nextafterf(x, y);
+}
+
+char* strdupa(char* str) {
+	// not a valid implementation, but it'll work for these small test programs.
+	return strdup(str);
+}
+
+void re_set_syntax(int a) {
+}
+
+const char *re_compile_pattern (const char *__pattern, size_t __length,
+	struct re_pattern_buffer *__buffer)
+{
+	int res = regcomp(__buffer, __pattern, __length);
+	if(res == 0)
+		return NULL;
+	else
+		return "regcomp error";
+}
+
+
+#define MAXPATHLEN 1024
+char *
+basename(const char *path)
+{
+	static char bname[MAXPATHLEN];
+	size_t len;
+	const char *endp, *startp;
+
+	/* Empty or NULL string gets treated as "." */
+	if (path == NULL || *path == '\0') {
+		bname[0] = '.';
+		bname[1] = '\0';
+		return (bname);
+	}
+
+	/* Strip any trailing slashes */
+	endp = path + strlen(path) - 1;
+	while (endp > path && *endp == '/')
+		endp--;
+
+	/* All slashes becomes "/" */
+	if (endp == path && *endp == '/') {
+		bname[0] = '/';
+		bname[1] = '\0';
+		return (bname);
+	}
+
+	/* Find the start of the base */
+	startp = endp;
+	while (startp > path && *(startp - 1) != '/')
+		startp--;
+
+	len = endp - startp + 1;
+	if (len >= sizeof(bname)) {
+		errno = ENAMETOOLONG;
+		return (NULL);
+	}
+	memcpy(bname, startp, len);
+	bname[len] = '\0';
+	return (bname);
+}
+char *
+dirname(const char *path)
+{
+	static char dname[MAXPATHLEN];
+	size_t len;
+	const char *endp;
+
+	/* Empty or NULL string gets treated as "." */
+	if (path == NULL || *path == '\0') {
+		dname[0] = '.';
+		dname[1] = '\0';
+		return (dname);
+	}
+
+	/* Strip any trailing slashes */
+	endp = path + strlen(path) - 1;
+	while (endp > path && *endp == '/')
+		endp--;
+
+	/* Find the start of the dir */
+	while (endp > path && *endp != '/')
+		endp--;
+
+	/* Either the dir is "/" or there are no slashes */
+	if (endp == path) {
+		dname[0] = *endp == '/' ? '/' : '.';
+		dname[1] = '\0';
+		return (dname);
+	} else {
+		/* Move forward past the separating slashes */
+		do {
+			endp--;
+		} while (endp > path && *endp == '/');
+	}
+
+	len = endp - path + 1;
+	if (len >= sizeof(dname)) {
+		errno = ENAMETOOLONG;
+		return (NULL);
+	}
+	memcpy(dname, path, len);
+	dname[len] = '\0';
+	return (dname);
+}
+
+char* strchrnul(const char* str, int c) {
+	char* res = strchr(str, c);
+	if(res == NULL)
+		return (char*)str + strlen(str);
+	else
+		return res;
+}
+
+char* index(const char* str, int c) {
+	return strchr(str, c);
+}
+
+char* rindex(const char* str, int c) {
+	return strrchr(str, c);
+}
+
+void * memrchr (const void *block, int c, size_t size) {
+	char* p = (char*)block + size;
+	while(p > (char*)block) {
+		p--;
+		if(*p == c)
+			return p;
+	}
+	return NULL;
+}
+
+void* rawmemchr(const void *block, int c) {
+	char* p = (char*)block;
+	while(*p != c) {
+		p++;
+	}
+	return p;
 }

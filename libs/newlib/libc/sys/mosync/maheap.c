@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ma.h"
 #include "maheap.h"
 #include "stdio.h"
+#include "mavsprintf.h"
 
 malloc_handler gMallocHandler = default_malloc_handler;
 malloc_hook gMallocHook = NULL;

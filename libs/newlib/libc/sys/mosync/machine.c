@@ -330,39 +330,35 @@ int open(const char * __filename, int __mode, ...) {
 	return newFd;
 }
 
-int creat(const char *filename, mode_t mode) {
-	return open(filename, O_WRONLY | O_CREAT | O_TRUNC, mode);
-}
-
 int unlink(const char *name) {
-	int res;
+	int dres, cres;
 	int __fd;
 	__fd = open(name, O_WRONLY);
 	if(__fd < 0)
 		return __fd;
-	res = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
-	if(res < 0) {
+	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
+	cres = close(__fd);
+	if(dres < 0) {
 		errno = EPERM;
 		return -1;
 	}
-	return 0;
+	return cres;
 }
 
+int truncate(const char *path, off_t length) {
+	int tres, cres;
+	int __fd;
+	__fd = open(path, O_WRONLY);
+	if(__fd < 0)
+		return __fd;
+	tres = ftruncate(__fd, length);
+	cres = close(__fd);
+	if(tres < 0)
+		return tres;
+	return cres;
+}
 
 int chdir(const char *filename) {
-	errno = ENOSYS;
-	return -1;
-}
-
-char* getenv(const char *__string) {
-	return NULL;
-}
-
-char* _getenv_r(struct _reent *p, const char *__string) {
-	return NULL;
-}
-
-int setenv(const char *name, const char *value, int replace) {
 	errno = ENOSYS;
 	return -1;
 }
@@ -380,6 +376,11 @@ int fork(void) {
 _sig_func_ptr signal(int sig, _sig_func_ptr f) {
 	errno = ENOSYS;
 	return SIG_ERR;
+}
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oset) {
+	errno = ENOSYS;
+	return -1;
 }
 
 unsigned int alarm(unsigned int seconds) {
@@ -410,4 +411,9 @@ int gettimeofday (struct timeval *tp, void *tzp) {
 		return -1;
 	}
 	return 0;
+}
+
+int nice(int incr) {
+	errno = ENOSYS;
+	return -1;
 }

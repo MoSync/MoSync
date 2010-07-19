@@ -19,7 +19,7 @@ PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 
 FileUtils.mkdir_p(BUILD_DIR)
 
-sh "#{MOSYNCDIR}/bin/xgcc -g -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
+sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
 
 # Find tests.
 # We have many directories. Some of these have Makefiles with a definition of a "tests" variable.
@@ -28,14 +28,30 @@ sh "#{MOSYNCDIR}/bin/xgcc -g -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
 
 # Go through each directory, search for a Makefile and parse it to find "tests". Print the results.
 
+MAKEFILE_TEST_ARRAYS = ['tests', 'tests-static']
+
 def process_line(line)
-	if(line.beginsWith('tests'))
+	lineIsInteresting = false
+	MAKEFILE_TEST_ARRAYS.each do |ta|
+		if(line.beginsWith(ta))
+			lineIsInteresting = true
+		end
+	end
+	if(lineIsInteresting)
 		#p line
 		words = line.scan(/[^ \t]+/)
-		return nil unless(words[0] == 'tests' || words[0] == 'tests-static')
+		
+		puts "test: #{words[0]}"
+		return nil unless(MAKEFILE_TEST_ARRAYS.include?(words[0]))
 		#p words
 		if(words[1] == '=' || words[1] == ':=' || words[1] == '+=')
-			return words.slice(2..-1)
+			result = words.slice(2..-1)
+			if(words[0] == 'strop-tests')
+				p result
+				result.collect! do |t| "test#{t}" end
+				p result
+			end
+			return result
 		end
 	end
 	return nil
@@ -168,7 +184,14 @@ files.each do |filename|
 		puts "Nonexistant: #{bn}"
 		next
 	end
-	if(SKIPPED_FILES.include?(bn))
+	skip = SKIPPED_FILES.include?(bn)
+	SKIPPED_PATTERNS.each do |r|
+		if(r.match(bn))
+			skip = true
+			break
+		end
+	end
+	if(skip)
 		puts "Skipped #{bn}"
 		next
 	end

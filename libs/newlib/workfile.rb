@@ -16,18 +16,21 @@ work.instance_eval do
 	end
 	
 	def setup_pipe
-		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++", "libc/locale", "libc/reent", "libc/stdio",
+		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++",
+			"libc/misc", "libc/unix", "libc/posix", "libc/locale", "libc/reent", "libc/stdio",
 			"libc/search", "libc/stdlib", "libc/string", "libc/time", "libc/ctype", "libc/errno",
 			"libm/math", "libm/common"]
 		@EXTRA_INCLUDES = ["libc/include", "libc/sys/mosync", "libm/common"]
 
-		@EXTRA_CFLAGS = " -Wno-float-equal -Wno-unreachable-code -Wno-sign-compare"
+		@EXTRA_CFLAGS = " -Wno-float-equal -Wno-unreachable-code -Wno-sign-compare -Wno-old-style-definition"
 		if(CONFIG=="")
 			# buggy compiler, buggy libs... I won't fix them.
 			@EXTRA_CFLAGS += " -Wno-uninitialized"
 		end
+		if(CONFIG=="debug")
+			@EXTRA_CFLAGS += " -DMOSYNCDEBUG"
+		end
 		@SPECIFIC_CFLAGS = {
-			"strcasestr.c" => " -Wno-old-style-definition",
 			"dtoa.c" => " -Wno-write-strings",
 			"ldtoa.c" => " -Wno-shadow",
 			"vfprintf.c" => " -Wno-shadow -Wno-missing-format-attribute -Wno-write-strings -Wno-missing-declarations -Wno-missing-prototypes",
@@ -38,8 +41,6 @@ work.instance_eval do
 			"svfscanf.c" => " -Wno-shadow -Wno-missing-declarations -Wno-missing-prototypes",
 			"impure.c" => " -Wno-extra",
 			"madmath.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
-			"sf_infinity.c" => " -Wno-old-style-definition",
-			"s_infinity.c" => " -Wno-old-style-definition",
 			"maint.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
 			"machine.c" => " -Wno-missing-noreturn -D_COMPILING_NEWLIB",
 			"gdtoa-gethex.c" => " -Wno-shadow",
@@ -48,7 +49,11 @@ work.instance_eval do
 			"wctomb_r.c" => " -Wno-shadow",
 			"sf_ldexp.c" => " -Wno-shadow",
 			"s_ldexp.c" => " -Wno-shadow",
+			"regexec.c" => " -Wno-char-subscripts",
+			"regcomp.c" => " -Wno-char-subscripts",
 		}
+		
+		@IGNORED_FILES = ["engine.c"]
 		
 		@EXTRA_OBJECTS = [FileTask.new(self, "libc/sys/mosync/crtlib.s")]
 		

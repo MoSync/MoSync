@@ -15,6 +15,12 @@ SKIPPED_DIRECTORIES = [
 	'intl',
 	'localedata',
 	'login',
+	'nptl',
+	'nss',
+	'resolv',
+	'resource',
+	'rt',
+	'shadow',
 ]
 
 SKIPPED_FILES = [
@@ -95,4 +101,89 @@ SKIPPED_FILES = [
 	'test-tgmath-int.c',
 	'test-tgmath-ret.c',
 	'bug-tgmath1.c',
+	
+	'tst-dirname.c',	# dirname
+	'tst-efgcvt.c',	# ecvt_r
+	'tst-mntent.c',	# mntent.h
+	'tst-mntent2.c',	# mntent.h
+	'tst-pselect.c',	# select
+	'tst-preadwrite64.c',	# 64
+	'test-vfork.c',	# fork
+	'tst-getlogin.c',	# getlogin_r
+	'tst-mmap.c',	# mmap
+	
+	# todo, netinet
+	'tst-getaddrinfo.c',
+	
+	'tst-truncate64.c',	# truncate64
+	'tst-fork.c',	# fork
+	'tst-dir.c',	# todo, dirent.h
+	'tst-chmod.c',	# chmod
+	'bug-regex1.c',	# re_registers
+	'bug-regex4.c',	# re_search_2
+	'bug-regex5.c', # locale/localeinfo.h
+	'bug-regex7.c', # regex_t::regs
+	'bug-regex8.c',	# re_search_2
+	'bug-regex10.c', # regex_t::regs
+	'bug-regex13.c',	# re_search
+	'bug-regex14.c',	# re_comp
+	'bug-regex19.c',	# re_search
+	'bug-regex20.c',	# regex_internal.h
+	'bug-regex22.c',	# re_search
+	'bug-regex25.c', # regex_t::regs
+	'bug-regex26.c',	# re_search
+	'bug-regex28.c',	# re_search
+	'tst-gnuglob.c',	# gnuglob
+	'tst-regex.c',	# iconv, regex_t::fastmap
+	'tst-regex2.c',	# regex_t::regs
+	'transbug.c',	# re_registers
+	'bug-ga1.c',	# sys/socket.h
+	'tst-vfork1.c',
+	'tst-vfork2.c',
+	'tst-vfork3.c',
+	'tst-waitid.c',
+	'bug-glob1.c',	# symlink, glob
+	'bug-glob2.c',
+	'tst-sysconf.c',
+	'tst-cpucount.c',
+	'tst-cpuset.c',
+	'wordexp-test.c',	# todo, wordexp -> dirent.h
+	'tst-spawn.c',
+	'tst-getpw.c',	# getpw
+	'tst-shm.c',	# sys/mman.h
+	'test-popen.c',	# popen
+	'errnobug.c',	# pipe
+	'tst-printfsz.c',	# register_printf_function
+	'tst-obprintf.c',	# obstack.h
+	'tst-fmemopen.c',	# mmap
+	'tst-unlockedio.c',
+	'tst-environ.c',	#todo, setenv & getenv
+	'tst-xpg-basename.c',
+	'tst-setcontext.c',
+	'tst-makecontext.c',
+	'tst-makecontext2.c',
+	'tst-unsetenv1.c',	# clearenv
+	'stratcliff.c',	# mmap
+	'tst-strxfrm.c',	# newlocale
+	'tst-strfry.c',	# strfry
+	'bug-envz1.c',	# envz_entry
+	'tst-endian.c',	# htobe16
+	'clocktest.c',	# signal
+	'tst-getdate.c',	# getdate
+	'tst-ftime_l.c',	# locale_t
+	'tst-strptime2.c',	# tm_gmtoff
+	'bug-getdate1.c',	# getdate
+	'wcsatcliff.c',	# mmap
+]
+
+SKIPPED_PATTERNS = [
+	/tst-exec.*.c/,
+	/tst-rfc3484.*.c/,	# ifaddrs.h
+	/tst-getaddrinfo.*.c/,	# sys/socket.h
+	/tst-clock.*.c/,	# todo, clock_getres
+	/tst-aio.*.c/,	# aio.h
+	/test-canon.*.c/,
+	/tst-rand48.*.c/,	# srand48_r
+	/tst-svc.*.c/,	# strverscmp
+	/tst-xdrmem.*.c/,
 ]
