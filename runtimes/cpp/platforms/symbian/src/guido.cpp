@@ -119,7 +119,7 @@ static void dumpBab(const BABILE_MemParam* mp) {
 }
 
 static BB_S32 myMarkCallback(BB_S32 a, BB_S32 b, BB_S32 c, BB_U32 d) {
-	LOG("markCallback(%i, %i, %i, %i)\n", a, b, c, d);
+	LOGD("markCallback(%i, %i, %i, %i)\n", a, b, c, d);
 	return 0;
 }
 
@@ -227,10 +227,10 @@ void Syscall::InitGuidoL() {
 
 		// memory descriptor creation
 		nBlocks = BABILE_numAlloc();
-		LOG("B_numAlloc %i\n", nBlocks);
+		LOGD("B_numAlloc %i\n", nBlocks);
 		//gMemTab = AllocZero<BB_MemRec>(nBlocks);
 		gMemTab = (BB_MemRec*) User::Alloc(nBlocks*sizeof(BB_MemRec));
-		LOG("gMemTab: 0x%08x\n", gMemTab);
+		LOGD("gMemTab: 0x%08x\n", gMemTab);
 		if(!gMemTab) {
 			LOG("BB_MemRec error!\n");
 			User::Leave(ERROR_BABILE);
@@ -238,9 +238,9 @@ void Syscall::InitGuidoL() {
 		//PMemZero(gMemTab, nBlocks*sizeof(BB_MemRec));
 
 		dumpBab(&babParam);
-		LOG("B_alloc\n");
+		LOGD("B_alloc\n");
 		int blocksToAlloc = BABILE_alloc(&babParam, gMemTab);
-		LOG("blocksToAlloc: %i\n", blocksToAlloc);
+		LOGD("blocksToAlloc: %i\n", blocksToAlloc);
 		if(nBlocks != blocksToAlloc) {
 			LOG("BB_Alloc discrepancy: %i != %i\n", nBlocks, blocksToAlloc);
 			User::Leave(ERROR_BABILE);
@@ -711,7 +711,7 @@ void Syscall::MaoscOpenComplete(TInt aError) {
 SYSCALL(int, maStartSpeaking(const char* text)) {
 	//LOGD("maStartSpeaking\n");
 	int size = ValidatedStrLen(text) + 1;
-	LOGR("S %i %s\n", gTtsNextId, text);
+	LOGD("S %i %s\n", gTtsNextId, text);
 	if(maIsSpeaking())
 		maStopSpeaking();
 
@@ -805,7 +805,7 @@ void Syscall::MaoscBufferCopied(TInt aError, const TDesC8&) {
 }
 
 SYSCALL(void, maStopSpeaking()) {
-	LOG("SS @ %d\n", TICK);
+	LOGD("SS @ %d\n", TICK);
 	gAudioStream->Stop();
 	gTextBuffer = NULL;
 	
@@ -816,7 +816,7 @@ SYSCALL(void, maStopSpeaking()) {
 }
 
 void Syscall::MaoscPlayComplete(TInt aError) {
-	LOG("AuPlC %i @ %d\n", gBuffersQueued, TICK);
+	LOGD("AuPlC %i @ %d\n", gBuffersQueued, TICK);
 	if(aError != KErrNone && aError != KErrCancel) {
 		LOG("AuPlC error %i\n", aError);
 		return;
