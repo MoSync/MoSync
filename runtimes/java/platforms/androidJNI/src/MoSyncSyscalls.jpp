@@ -770,30 +770,46 @@ void _disableFramebuffer()
 
 int maGetSystemProperty(String key, int buf, int size)
 {
-/*
-	String value;
-	if(key.equals("mosync.imei")) {
-		value = sysPropFromArray(sImeiProperties);
-	} else if(key.equals("mosync.imsi")) {
-		value = sysPropFromArray(sImsiProperties);
-	} else if(key.equals("mosync.iso-639-1")) {
-		value = System.getProperty("microedition.locale");
-		if(value != null) {
-			value = value.substring(0, 2);
-		}
-	} else {
-		value = System.getProperty(key);
+	String property = "";
+	
+	if(key.equals("mosync.imei"))
+	{
+		TelephonyManager manager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+		property = manager.getDeviceId();
 	}
-	if(value == null)
+	else if(key.equals("mosync.imsi"))
+	{
+		TelephonyManager manager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
+		property = manager.getSubscriberId();
+	}
+	else if(key.equals("mosync.iso-639-1"))
+	{
+		Locale locale = Locale.getDefault();
+		property = locale.getLanguage();
+	}
+	else if(key.equals("mosync.iso-639-2"))
+	{
+		Locale locale = Locale.getDefault();
+		property = locale.getISO3Language();
+	}
+	
+	if(null == property)
 		return -2;
-	if(value.length() >= size)
-		return value.length() + 1;
-	writeMemBytes(buf, value.getBytes(), 0, value.length());
-	int[] mem_ds = mCore.mMem_ds;
-	WBYTE(buf + value.length(), (byte)0);
-	return value.length() + 1;
-*/	
-	return 0;
+	
+	if(property.length() >= size)
+		return property.length() + 1;
+		
+	// Write this property to memory
+	
+	byte[] ba = property.getBytes();
+	
+	mMemDataSection.mark();
+	mMemDataSection.position(buf);
+	mMemDataSection.put(ba);
+	mMemDataSection.put((byte)0);
+	mMemDataSection.reset();
+	
+	return property.length() + 1;
 }
 
 int maPlatformRequest(String url)
