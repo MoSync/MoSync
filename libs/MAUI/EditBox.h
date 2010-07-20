@@ -68,7 +68,8 @@ namespace MAUI {
 		/** Enumeration for modes **/
 		enum InputMode {
 			IM_NUMBERS,
-			IM_STANDARD
+			IM_STANDARD,
+			IM_QWERTY
 		};
 
 		/** Constructor.

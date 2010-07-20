@@ -168,6 +168,9 @@ namespace MAUI {
 		} else if(inputMode == IM_NUMBERS) {
 			CharInput::getCharInput().setMode(CharInput::NUMBERS);
 		}
+		else if(inputMode == IM_QWERTY) {
+			CharInput::getCharInput().setQwerty(true);
+		}
 		this->inputMode = inputMode;
 	}
 

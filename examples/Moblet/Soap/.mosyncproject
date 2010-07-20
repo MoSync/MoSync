@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="true" version="1">
-<build.cfg id="Debug"/>
-<build.cfg id="Release"/>
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
@@ -9,6 +9,8 @@
 <property key="build.prefs:additional.libraries/Release" value="mautil.lib,mtxml.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
@@ -18,6 +20,5 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="template.id" value="project.empty"/>
-<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

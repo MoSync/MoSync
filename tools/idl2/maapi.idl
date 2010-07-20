@@ -2827,6 +2827,11 @@ interface MAAPI {
 		* Returns 0 or \< 0.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+		
+		/**
+		* Shows the virtual keyboard.
+		*/
+		int maShowVirtualKeyboard();
 
 	}
 	constset int IOCTL_ {

@@ -18,7 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSCALL(a) final a
 
 #define DEVICE_KEYS(m) m(0) m(1) m(2) m(3) m(4)	m(5) m(6) m(7) m(8) m(9) \
-				       m(STAR) m(POUND) m(CLEAR)
+				       m(STAR) m(POUND) m(CLEAR) //m(A) m(B) m(C) m(D) m(E) m(F) m(G) m(H) m(I) m(J) m(K) m(L) \
+					   //m(M) m(N) m(O) m(P) m(Q) m(R) m(S) m(T) m(U) m(V) m(W) m(X) m(Y) m(Z)
 #define DEVICE_DPAD_KEYS(m) m(LEFT) m(RIGHT) m(UP) m(DOWN)
 #define DEVICE_SPECIAL(m) m(DPAD_CENTER, FIRE) m(SOFT_LEFT, SOFTLEFT) m(SOFT_RIGHT, SOFTRIGHT) m(MENU, SOFTLEFT) m(BACK, SOFTRIGHT)
 
