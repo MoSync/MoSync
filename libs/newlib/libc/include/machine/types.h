@@ -6,7 +6,7 @@
  *  closely match the types defined in the BSD machine/types.h.
  *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
  */
-#if defined(__rtems__)
+#if defined(__rtems__) || defined(MAPIP)
 #include <machine/_types.h>
 #endif
 

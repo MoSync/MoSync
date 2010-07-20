@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <malloc.h>
 
 int main();
 
@@ -230,3 +231,26 @@ void* rawmemchr(const void *block, int c) {
 	}
 	return p;
 }
+
+void* mmap(void* address, size_t length, int protect, int flags, int filedes, off_t offset) {
+	if((flags & MAP_FIXED) != 0 || (flags & MAP_ANON) == 0) {
+		errno = ENOSYS;
+		return NULL;
+	}
+	return malloc(length);
+}
+
+int mprotect(void* a, size_t b, int c) {
+	return 1;
+}
+
+
+#define MAX_IMPLS 64
+typedef struct
+{
+  const char *name;
+  void (*fn) (void);
+  long test;
+} impl_t;
+impl_t __start_impls[MAX_IMPLS];
+impl_t* __stop_impls = __start_impls;

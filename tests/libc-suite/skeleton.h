@@ -95,3 +95,14 @@ char* rindex(const char *, int);
 void * rawmemchr (const void *block, int c);
 void * memrchr (const void *block, int c, size_t size);
 char* strdupa(char* str);
+
+#define MAP_FIXED 1
+#define MAP_ANON 2
+#define PROT_READ 4
+#define PROT_WRITE 8
+#define MAP_PRIVATE 16
+#define MAP_FAILED NULL
+#define PROT_NONE 0
+
+void* mmap(void* address, size_t length, int protect, int flags, int filedes, off_t offset);
+int mprotect(void*, size_t, int);

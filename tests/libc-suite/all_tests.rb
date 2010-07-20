@@ -7,7 +7,7 @@ require '../../rules/util.rb'
 
 BUILD_DIR = 'build'
 MOSYNCDIR = ENV['MOSYNCDIR']
-GCC_FLAGS = " -I- -std=gnu99 -I. -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -include skeleton.h"
+GCC_FLAGS = " -I- -std=gnu99 -I. -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
 PIPE_FLAGS = " -datasize=#{2*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024}"
 PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 
@@ -28,7 +28,7 @@ sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S helpers.c -o build/helpers.s#{GCC_FLAGS}
 
 # Go through each directory, search for a Makefile and parse it to find "tests". Print the results.
 
-MAKEFILE_TEST_ARRAYS = ['tests', 'tests-static']
+MAKEFILE_TEST_ARRAYS = ['tests', 'tests-static', 'libm-tests', 'strop-tests']
 
 def process_line(line)
 	lineIsInteresting = false
@@ -48,7 +48,7 @@ def process_line(line)
 			result = words.slice(2..-1)
 			if(words[0] == 'strop-tests')
 				p result
-				result.collect! do |t| "test#{t}" end
+				result.collect! do |t| "test-#{t}" end
 				p result
 			end
 			return result
