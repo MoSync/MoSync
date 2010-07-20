@@ -325,8 +325,10 @@ int open(const char * __filename, int __mode, ...) {
 			return -1;
 		}
 	}
-	sFda[newFd]->lowFd = handle + LOWFD_OFFSET;
-	sFda[newFd]->refCount = 1;
+	
+	newLfd->lowFd = handle + LOWFD_OFFSET;
+	newLfd->refCount = 1;
+	sFda[newFd] = newLfd;
 	return newFd;
 }
 
