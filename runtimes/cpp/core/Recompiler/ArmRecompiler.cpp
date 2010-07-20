@@ -235,11 +235,12 @@ static inline T RoundUp(T x, int m) {
 		return mCodeChunk.allocate(size);
 #elif defined(_android)
 		int nsize = RoundUp<int>(size, getpagesize());
-/*
+
 		void* mem = memalign(getpagesize(), nsize);
 		if(NULL == mem) 
 			return NULL;
-*/
+
+/*
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "generateRecompilerCodeBlock", "(I)Ljava/nio/ByteBuffer;");
 		if (methodID == 0) return NULL;
@@ -251,7 +252,7 @@ static inline T RoundUp(T x, int m) {
 
 		int prot = PROT_READ | PROT_WRITE | PROT_EXEC;
 		void* mbase = mmap(mem, nsize, prot, MAP_PRIVATE | MAP_ANON, -1, 0);
-/*
+*/
 		int mret = mprotect(mem, nsize, PROT_READ|PROT_WRITE|PROT_EXEC);
 		if(0 != mret)
 		{
@@ -261,7 +262,7 @@ static inline T RoundUp(T x, int m) {
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block succesfully created!");
 
 		return mem;
-*/
+/*
 		if(NULL != mbase)
 		{
 			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block couldn't get mmap!");
@@ -270,7 +271,7 @@ static inline T RoundUp(T x, int m) {
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block succesfully created!");
 
 		return mbase;
-
+*/
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -280,6 +281,8 @@ static inline T RoundUp(T x, int m) {
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
 #elif defined(_android)
+		return allocateCodeMemory(size);
+/*
 		int nsize = RoundUp<int>(size, getpagesize());
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
@@ -302,7 +305,7 @@ static inline T RoundUp(T x, int m) {
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry block succesfully created!");
 
 		return mem;
-
+*/
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif

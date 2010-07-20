@@ -55,7 +55,8 @@ import android.graphics.Matrix;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.Hashtable;
-
+import java.util.Locale;
+	
 import android.util.Log;
 
 import com.mosync.java.android.MoSyncPanicDialog;
@@ -66,6 +67,8 @@ import android.content.BroadcastReceiver;
 import android.content.IntentFilter;
 
 import android.app.Activity;
+
+import android.telephony.TelephonyManager;
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
@@ -194,12 +197,9 @@ public class MoSyncThread extends Thread
 		try
 		{
 		
-			Log.i("MoSync Thread", "load program 2");
-		
 			AssetManager assetManager = mContext.getAssets();
 			AssetFileDescriptor pAfd = assetManager.openFd("program.mp3");
 			FileDescriptor pFd = pAfd.getFileDescriptor();
-			long pFdLength = pAfd.getLength();
 			long pFdOffset = pAfd.getStartOffset();
 			
 
@@ -208,14 +208,14 @@ public class MoSyncThread extends Thread
 			
 			try
 			{
-				AssetFileDescriptor rAfd = assetManager.openFd("resourcesass.mp3");
+				AssetFileDescriptor rAfd = assetManager.openFd("resources.mp3");
 				rFd = rAfd.getFileDescriptor();
-				long rFdLength = rAfd.getLength();
 				mResourceOffset = rAfd.getStartOffset();
 			}
-			catch(FileNotFoundException fnfc)
+			catch(FileNotFoundException fnfe)
 			{
 				Log.i("loadProgram","Has no resources!");
+				Log.i("loadProgram","exception" + fnfe.toString());
 			}
 			
 			if(null != pFd)
