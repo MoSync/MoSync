@@ -139,7 +139,7 @@ namespace Base
 		int rBuf = buf - memStart;
 	
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetSystemProperty", "(Ljava/lang/String;Ljava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetSystemProperty", "(Ljava/lang/String;II)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrKey, rBuf, size);
 		jNIEnv->DeleteLocalRef(cls);
