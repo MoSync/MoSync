@@ -72,7 +72,7 @@ if(@GCC_IS_V4) then
 		base_flags += " -fvisibility=hidden"
 	end
 	version_warnings += gcc4_warnings
-	if(@GCC_IS_V43 || @GCC_IS_V44) then
+	if(@GCC_V4_SUB >= 3) then
 		version_warnings += gcc43_c_warnings + gcc43_warnings
 		cpp_flags += " -std=gnu++0x -DHAVE_TR1"
 	end
