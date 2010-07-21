@@ -32,6 +32,14 @@ import android.graphics.Canvas;
 
 import android.app.Service;
 
+import android.view.inputmethod.InputConnection;
+ 
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.BaseInputConnection;
+import android.text.InputType;
+import android.view.View;
+import android.view.KeyCharacterMap;
+
 #include "generated\MAAPI_consts.h"
 
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
@@ -41,6 +49,21 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
 
+	class CustomInputConnection extends BaseInputConnection
+	{
+		public CustomInputConnection(View targetView, boolean fullEditor)
+		{
+			super(targetView, fullEditor);
+			// TODO Auto-generated constructor stub
+		}
+		
+		public boolean performEditorAction (int actionCode)
+		{
+			Log.i("performEditorAction", "Pressed enter key");
+			return true;
+		}
+	}
+	
 	public MoSyncView(Context context, MoSyncThread moSyncThread) throws Exception
 	{
 		super(context);
@@ -214,15 +237,21 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 #define DEVICE_DPAD_KEYS(m) m(LEFT) m(RIGHT) m(UP) m(DOWN)
 #define DEVICE_SPECIAL(m) m(DPAD_CENTER, FIRE) m(SOFT_LEFT, SOFTLEFT) m(SOFT_RIGHT, SOFTRIGHT)
 
-	private final int convertToMoSyncKeyCode(int keyCode)
+	private final int convertToMoSyncKeyCode(int keyCode, KeyEvent keyEvent)
 	{
 #define CONVERT_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_##k) return MAK_##k;
 #define CONVERT_DPAD_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_DPAD_##k) return MAK_##k;
 #define CONVERT_SPECIAL(kIn, kOut) if(keyCode == KeyEvent.KEYCODE_##kIn) return MAK_##kOut;
-		DEVICE_KEYS(CONVERT_KEYCODE);
+//		DEVICE_KEYS(CONVERT_KEYCODE);
 		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODE);
 		DEVICE_SPECIAL(CONVERT_SPECIAL);
-		return 0;
+		
+		/*-------------------------------------*/
+		/* Support for native virtual keyboard */
+		/*-------------------------------------*/
+		if(keyCode == KeyEvent.KEYCODE_DEL) { return MAK_CLEAR;}
+		KeyCharacterMap keyCharacterMap = KeyCharacterMap.load(keyEvent.getDeviceId());
+		return keyCharacterMap.get(keyCode, keyEvent.getMetaState());
 	}
 	
 	private final int convertToMoSyncKeyByteCode(int keyCode) {
@@ -238,21 +267,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onKeyUp(int keyCode, KeyEvent keyEvent)
 	{
 		Log.i("MoSyncView", "key up event :" + keyEvent.toString() + "/n");
-/*		
-		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
-		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
-		
-		int[] event = new int[2];
-		mKeyState &= ~convertToMoSyncKeyByteCode(keyCode);
-		
-		EI_TYPE = EVENT_TYPE_KEY_RELEASED;
-		EI_KEY = convertedKeyCode;
-		postEvent(event);
-*/	
+
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_RELEASED;
-		event[1] = convertToMoSyncKeyCode(keyCode);
+		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
 		mMoSyncThread.nativePostEvent(event);
@@ -263,21 +282,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
 	{
 		Log.i("MoSyncView", "key down event :" + keyEvent.toString() + "/n");
-/*		
-		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
-		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
-			
-		int[] event = new int[2];
-		mKeyState |= convertToMoSyncKeyByteCode(keyCode);
-		
-		EI_TYPE = EVENT_TYPE_KEY_PRESSED;
-		EI_KEY = convertedKeyCode;
-		postEvent(event);
-*/		
+
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_PRESSED;
-		event[1] = convertToMoSyncKeyCode(keyCode);
+		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
 		mMoSyncThread.nativePostEvent(event);
@@ -285,4 +294,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return true;
 	}
 	
+	public InputConnection onCreateInputConnection (EditorInfo outAttrs)
+	{
+		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
+		CustomInputConnection ic = new CustomInputConnection(this, false); // mEventOverflow);
+		return ic;
+	}
+ 
 }

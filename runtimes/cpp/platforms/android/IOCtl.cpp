@@ -161,4 +161,16 @@ namespace Base
 		
 		return (int)ret;
 	}
+	
+	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
 }

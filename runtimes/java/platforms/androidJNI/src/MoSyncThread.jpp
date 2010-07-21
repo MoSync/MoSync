@@ -70,6 +70,8 @@ import android.app.Activity;
 
 import android.telephony.TelephonyManager;
 
+import android.view.inputmethod.InputMethodManager;
+
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
 

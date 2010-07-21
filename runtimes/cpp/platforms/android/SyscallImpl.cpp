@@ -1094,7 +1094,10 @@ namespace Base
 			SYSLOG("maIOCtl_maPlatformRequest");
 			return _maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
 
-
+		case maIOCtl_maShowVirtualKeyboard:
+			SYSLOG("maIOCtl_maShowVirtualKeyboard");
+			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
+			
 		}
 		
 		return IOCTL_UNAVAILABLE;

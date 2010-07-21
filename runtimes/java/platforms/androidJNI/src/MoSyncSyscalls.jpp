@@ -826,6 +826,13 @@ int maPlatformRequest(String url)
 	return -1;
 }
 
+int maShowVirtualKeyboard()
+{
+	InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+	mgr.showSoftInput(mMoSyncView, InputMethodManager.SHOW_FORCED);
+	return 0;
+}
+
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
 boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)

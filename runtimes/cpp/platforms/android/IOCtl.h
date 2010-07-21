@@ -39,4 +39,6 @@ namespace Base
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis);
 }
