@@ -88,6 +88,7 @@ namespace MAUI {
 			deactivate();
 		}
 		Widget::setSelected(selected);
+		
 	}
 
 
@@ -100,6 +101,7 @@ namespace MAUI {
 		active = true;
 		setInputMode(inputMode);
 		setSelected(true);
+		
 	}
 
 	void EditBox::deactivate() {
