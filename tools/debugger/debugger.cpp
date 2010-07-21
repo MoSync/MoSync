@@ -213,7 +213,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-#define STABS_MSG " This is probably because you linked with non-debug libraries."\
+#define STABS_MSG ". This is probably because you linked with non-debug libraries."\
 	" Check your settings."
 	if(stabsFilename) {
 		//load stabs and SLD
@@ -364,10 +364,24 @@ void MoSyncErrorExit(int code) {
 	exit(code);
 }
 
+static bool readAll(int fd, void* dst, int len) {
+	char* p = (char*)dst;
+	int pos = 0;
+	while(pos < len) {
+		int remain = len - pos;
+		int res = read(fd, p, remain);
+		if(res <= 0) {
+			LOG("read error: %i, %i\n", res, errno);
+			FAIL;
+		}
+		pos += res;
+	}
+	return true;
+}
+
 static bool readOpenProgramFile(int fd) {
 	MA_HEAD& h(gHead);
-	int res = read(fd, &h, sizeof(h));
-	TEST(res == sizeof(h));
+	TEST(readAll(fd, &h, sizeof(h)));
 
 	if(h.Magic != 0x5844414d) {	//MADX, big-endian
 		LOG("Magic error: 0x%08x should be 0x5844414d\n", h.Magic);
@@ -378,22 +392,20 @@ static bool readOpenProgramFile(int fd) {
 	setMemSize(h.DataSize);
 
 	gMemCs = new byte[h.CodeLen];
-	res = read(fd, gMemCs, h.CodeLen);
-	TEST(res == h.CodeLen);
+	TEST(readAll(fd, gMemCs, h.CodeLen));
 
 	if(lseek(fd, h.DataLen, SEEK_CUR) < 0) {
 		FAIL;
 	}
 
 	gMemCp = new int[h.IntLen];
-	res = read(fd, gMemCp, h.IntLen * 4);
-	TEST(res == h.IntLen * 4);
+	TEST(readAll(fd, gMemCp, h.IntLen * 4));
 	return true;
 }
 
 static bool readProgramFile(const char* filename) {
 	int fd = open(filename, O_RDONLY
-#ifdef _MSC_VER
+#ifdef WIN32
 		| O_BINARY
 #endif
 		);

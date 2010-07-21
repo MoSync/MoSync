@@ -337,7 +337,9 @@ static const TypeBase* subParseRangeType(char** pText) {
 	TEST(next);
 	if(*next == ';') {	//no definition
 		*pText = next + 1;
-		return findTypeByTuple(t);
+		const TypeBase* tb = findTypeByTuple(t);
+		TEST(tb);
+		return tb;
 	}
 	//alt.rangeTypeDefinition
 	FAILIF(next[0] != '=');
@@ -352,6 +354,7 @@ static const TypeBase* subParseRangeType(char** pText) {
 	FAILIF(next[len+1] != ';');
 	*pText = next + len + 2;
 	RangeType* rt = new RangeType(min, max);
+	TEST(rt);
 	Type s;
 	s.id = t;
 	s.type = rt;

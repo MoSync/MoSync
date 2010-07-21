@@ -61,6 +61,9 @@ class NativeGccLinkWork < NativeGccWork
 		if(HOST == :darwin)
 			@EXTRA_LINKFLAGS += " -mmacosx-version-min=10.5 -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa"
 		end
+		if(PROFILING)
+			@EXTRA_LINKFLAGS += " -pg"
+		end
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }
 		lld = @LOCAL_DLLS.collect { |ld| FileTask.new(self, @COMMON_BUILDDIR + ld + DLL_FILE_ENDING) }
 		wlo = @WHOLE_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".a") }

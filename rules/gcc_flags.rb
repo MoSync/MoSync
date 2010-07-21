@@ -62,6 +62,11 @@ c_flags = " -std=gnu99"
 version_warnings = ""
 base_flags = ""
 cpp_flags = ""
+
+if(PROFILING)
+	base_flags += " -pg"
+end
+
 if(@GCC_IS_V4) then
 	if(HOST != :win32)
 		base_flags += " -fvisibility=hidden"

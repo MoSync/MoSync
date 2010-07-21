@@ -7,6 +7,7 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_SOURCEFILES = ["../../runtimes/cpp/core/sld.cpp"]
 	@EXTRA_INCLUDES = ["../../runtimes/cpp/core"]
+	@EXTRA_CPPFLAGS = " -fno-exceptions"
 	if(!@GCC_IS_V4)	#buggy compiler
 		@SPECIFIC_CFLAGS = {"sld.cpp" => " -Wno-unreachable-code"}
 		if(CONFIG == "")
