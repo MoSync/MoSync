@@ -99,6 +99,23 @@ static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1 };
 
 static int closeLfd(struct LOW_FD* plfd);
 
+static char sCwd[2048] = "/";
+
+// returns 1 if it's a directory, 0 if it's not.
+static int getRealPath(char *buf, const char* path, int size) {
+	if(path[0]!='/') {
+		strncpy(buf, sCwd, size);
+		strncat(buf, path, size);
+		path = buf;
+	} else {
+		strncpy(buf, path, size);
+	}
+	
+	size=strlen(buf);
+	if(!size || buf[size-1]=='/') return 1;
+	else return 0;
+}
+
 static void initFda(void) {
 	static int initialized = 0;
 	if(initialized)
@@ -203,9 +220,28 @@ int ftruncate(int __fd, off_t __length) {
 }
 
 int read(int __fd, void *__buf, size_t __nbyte) {
-	int res;
+	int res, remaining, fileSize, fileTell;
+	MAHandle file;
 	LOWFD;
-	res = maFileRead(lfd - LOWFD_OFFSET, __buf, __nbyte);
+	file = lfd - LOWFD_OFFSET;
+
+	fileSize = maFileSize(file);
+	fileTell = maFileTell(file);
+	if(fileSize<0 || fileTell<0) {
+		errno = EIO;
+		return -1;
+	}
+ 
+	remaining = fileSize - fileTell;
+	if(remaining<0) {
+		errno = EIO;
+		return -1;
+	} else {
+		if(remaining<__nbyte)
+			__nbyte = remaining;
+	}
+	
+	res = maFileRead(file, __buf, __nbyte);
 	if(res != 0) {
 		errno = EIO;
 		return -1;
@@ -264,9 +300,16 @@ int open(const char * __filename, int __mode, ...) {
 	int exists;
 	int newFd;
 	struct LOW_FD* newLfd;
-	if(__mode & O_WRONLY) {
+
+	char temp[2048];
+	if(getRealPath(temp, __filename, 2048) == 1) {
+		errno = ENOENT;
+		return -1;
+	}
+	
+	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
-	} else if(__mode & O_RDONLY) {
+	} else if((__mode & 3) == O_RDONLY) {
 		ma_mode = MA_ACCESS_READ;
 	} else {
 		PANIC_MESSAGE("bad mode");
@@ -287,7 +330,7 @@ int open(const char * __filename, int __mode, ...) {
 	}
 	newLfd = findFreeLfd();
 
-	res = maFileOpen(__filename, ma_mode);
+	res = maFileOpen(temp, ma_mode);
 	if(res < 0) {
 		switch(res) {
 		case MA_FERR_FORBIDDEN: errno = EACCES; break;
@@ -335,7 +378,11 @@ int open(const char * __filename, int __mode, ...) {
 int unlink(const char *name) {
 	int dres, cres;
 	int __fd;
-	__fd = open(name, O_WRONLY);
+	char temp[2048];
+
+	getRealPath(temp, name, 2048);		
+
+	__fd = open(temp, O_WRONLY);
 	if(__fd < 0)
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
@@ -350,7 +397,10 @@ int unlink(const char *name) {
 int truncate(const char *path, off_t length) {
 	int tres, cres;
 	int __fd;
-	__fd = open(path, O_WRONLY);
+	char temp[2048];
+	getRealPath(temp, path, 2048);	
+
+	__fd = open(temp, O_WRONLY);
 	if(__fd < 0)
 		return __fd;
 	tres = ftruncate(__fd, length);
@@ -361,8 +411,31 @@ int truncate(const char *path, off_t length) {
 }
 
 int chdir(const char *filename) {
-	errno = ENOSYS;
-	return -1;
+	MAHandle file;
+	int length;
+	int ret = 1;
+	char temp[2048];
+	getRealPath(temp, filename, 2048);	
+	
+	length = strlen(temp);
+	if(temp[length-1]!='/')
+		strncat(temp, "/", sizeof(sCwd));
+	
+	file = maFileOpen(sCwd, MA_ACCESS_READ);
+	if(maFileExists(file)) {
+		strcpy(sCwd, temp);
+		ret = 0;
+		errno = ENOENT;
+	}
+	
+	maFileClose(file);
+	
+	return ret;
+}
+
+char* getcwd(char *__buf, size_t __size ) {
+	strncpy(__buf, sCwd, __size);
+	return __buf;
 }
 
 int setpgid(pid_t pid, pid_t pgid) {
