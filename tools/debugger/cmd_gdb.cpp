@@ -76,3 +76,8 @@ void gdb_set(const string& args) {
 	oprintDoneLn();
 	commandComplete();
 }
+
+void gdb_show(const string& args) {
+	oprintDoneLn();
+	commandComplete();
+}
