@@ -146,7 +146,7 @@ namespace MAUI {
 		void drawToData(int *data, int x, int y, int width, int height, eType type);
 		int calculateNumTiles(int width, int height);		
 		void drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint);
-		
+			
 		/** 
 		 * Get the image height.
 		 **/
@@ -206,13 +206,12 @@ namespace MAUI {
 			int lastUsed;
 		};		
 		
-
 		// in pixels.
 		static void setMaxCacheSize(int c);
 		static void setCacheEnabled(bool e=true);
-		
+
+		static void flushCache();		
 		static void flushCacheUntilNewImageFits(int numPixels); 
-		static void flushCache();
 		static void addToCache(const CacheKey& key, const CacheElement& elem);
 		static MAHandle getFromCache(const CacheKey& key);
 		

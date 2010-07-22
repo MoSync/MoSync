@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "WidgetSkin.h"
 #include <MAUtil/Graphics.h>
+#include <MAUtil/PlaceholderPool.h>
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
@@ -195,12 +196,19 @@ namespace MAUI {
 			}
 			if(best == sCache.end()) break;
 			maDestroyObject(best->second.image);
+			PlaceholderPool::put(best->second.image);
 			sCache.erase(best);
 			totalPixelsInCache-=iter->first.w*iter->first.h;
 		}
 	}
 	
 	void WidgetSkin::flushCache() {
+		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
+		while(iter != sCache.end()) {
+			maDestroyObject(iter->second.image);
+			PlaceholderPool::put(iter->second.image);
+			iter++;
+		}
 		sCache.clear();
 	}
 			
@@ -243,7 +251,7 @@ namespace MAUI {
 
 			flushCacheUntilNewImageFits(width*height);	
 			
-			cacheElem.image = maCreatePlaceholder();
+			cacheElem.image = PlaceholderPool::alloc();
 			if(maCreateImageRaw(cacheElem.image,data,EXTENT(width,height),1)!=RES_OK) {
 				maPanic(1, "Could not create raw image");
 			}
