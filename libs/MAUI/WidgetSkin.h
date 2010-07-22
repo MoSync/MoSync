@@ -209,6 +209,7 @@ namespace MAUI {
 
 		// in pixels.
 		static void setMaxCacheSize(int c);
+		static void setCacheEnabled(bool e=true);
 		
 		static void flushCacheUntilNewImageFits(int numPixels); 
 		static void flushCache();
@@ -217,6 +218,7 @@ namespace MAUI {
 		
 	private:
 		static int maxCacheSize;
+		static bool useCache;
 		
 		//Vector<CacheElement> cache;
 		static HashMap<CacheKey, CacheElement> sCache;
