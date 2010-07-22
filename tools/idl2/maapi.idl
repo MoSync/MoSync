@@ -1167,6 +1167,10 @@ interface MAAPI {
 		AUDIOBUFFER_FILL = 18;
 #endif
 		SCREEN_CHANGED = 21;
+
+#if IX_WEBKIT
+        WEBKIT = 10001; // Change to WEBVIEW_SERVICE_REQUEST
+#endif	
 	}
 
 	struct MAConnEventData {
@@ -1176,6 +1180,10 @@ interface MAAPI {
 		int opType;
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
+	}
+
+	struct MAWebKitEventData {
+		char m_data[16];
 	}
 
 	struct MAEvent {
@@ -1215,6 +1223,11 @@ interface MAAPI {
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
+
+			/**
+			* WebKit event data (only here for miki's learning purposes).
+			*/
+			MAWebKitEventData webKitEventData;
 		}
 	}
 
@@ -2788,6 +2801,10 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
+
+#if IX_WEBKIT
+ 	int maSyscallWebKit(in MAString data);
+#endif //IX_WEBKIT
 
 		struct MA_CAMERA_FORMAT {
 			//in pixels.
