@@ -76,6 +76,9 @@ static bool start_sim() {
 	if(gResourceFilename.size() > 0)
 		cmdLine += " -resource \""+gResourceFilename+"\"";
 	cmdLine += " -sld \""+gSldFilename+"\"";
+
+	LOG("%s\n", cmdLine);
+
 	PROCESS_INFORMATION pi;
 	char* ptr = new char[cmdLine.size() + 1];
 	strcpy(ptr, cmdLine.c_str());
@@ -88,7 +91,7 @@ static bool start_sim() {
 	//this is just to avoid fouling up our own stdout.
 	si.hStdOutput = INVALID_HANDLE_VALUE;
 	si.hStdError = INVALID_HANDLE_VALUE;
-	int res = CreateProcess(NULL, ptr, NULL, NULL, false, 0, NULL, "debug", &si, &pi);
+	int res = CreateProcess(NULL, ptr, NULL, NULL, false, 0, NULL, NULL, &si, &pi);
 	delete ptr;
 	if(res == 0) {
 		LOG("GLE %lu\n", GetLastError());
