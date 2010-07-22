@@ -1976,6 +1976,8 @@ interface MAAPI {
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		* \param path The absolute path to the file.
 		* \param mode The access mode. Either #MA_ACCESS_READ or #MA_ACCESS_READ_WRITE.
+		* Directories also use these access modes. #MA_ACCESS_READ lets you see if the directory exists.
+		* #MA_ACCESS_READ_WRITE also lets you create or delete it.
 		* \returns The new file handle, or \< 0 on error.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
