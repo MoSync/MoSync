@@ -88,14 +88,15 @@ int stat(const char *file, struct stat *st) {
 struct LOW_FD {
 	int lowFd;
 	int refCount;
+	int flags;
 };
 
 #define NFD 32
 static struct LOW_FD* sFda[NFD];
 static struct LOW_FD sLfda[NFD];
 
-static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1 };
-//static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1 };
+static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND };
+//static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND };
 
 static int closeLfd(struct LOW_FD* plfd);
 
@@ -258,7 +259,30 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 	} else if(lfd == LOWFD_WRITELOG) {
 		res = maWriteLog(__buf, __nbyte);
 	} else {
-		res = maFileWrite(lfd - LOWFD_OFFSET, __buf, __nbyte);
+		MAHandle h = lfd - LOWFD_OFFSET;
+		if(plfd->flags & O_APPEND) {
+			int oldPos = maFileTell(h);
+			int fileSize = maFileSize(h);
+			if(oldPos < 0 || fileSize < 0) {
+				errno = EIO;
+				return -1;
+			}
+			res = maFileSeek(h, 0, MA_SEEK_END);
+			if(res < 0) {
+				errno = EIO;
+				return -1;
+			}
+			res = maFileWrite(h, __buf, __nbyte);
+			if(res < 0) {
+				errno = EIO;
+				return -1;
+			}
+			if(oldPos != fileSize) {
+				res = maFileSeek(h, oldPos, MA_SEEK_SET);
+			}
+		} else {
+			res = maFileWrite(h, __buf, __nbyte);
+		}
 	}
 	if(res < 0) {
 		errno = EIO;
@@ -317,9 +341,6 @@ int open(const char * __filename, int __mode, ...) {
 	if(__mode & O_NONBLOCK) {
 		PANIC_MESSAGE("unsupported mode: O_NONBLOCK");
 	}
-	if(__mode & O_APPEND) {
-		PANIC_MESSAGE("unsupported mode: O_APPEND");
-	}
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
 
 	// Find a spot in the descriptor array.
@@ -371,6 +392,7 @@ int open(const char * __filename, int __mode, ...) {
 	
 	newLfd->lowFd = handle + LOWFD_OFFSET;
 	newLfd->refCount = 1;
+	newLfd->flags = __mode;
 	sFda[newFd] = newLfd;
 	return newFd;
 }
