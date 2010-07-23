@@ -7,10 +7,11 @@
 #include <string.h>
 #include <malloc.h>
 
-int main();
+int main(int argc, const char** argv);
 
 int MAMain() {
-	return main();
+	const char* argv[] = { "MoSync", "--direct", "--test-dir", "/" };
+	return main(4, argv);
 }
 
 void error(int __status, int __errnum, __const char* __format, ...)
@@ -20,7 +21,7 @@ void error(int __status, int __errnum, __const char* __format, ...)
 	char buffer[2048];
 	vsprintf(buffer, __format, args);
 	va_end(args);
-	lprintfln("error(%i, %i, %s)\n", buffer);
+	lprintfln("error(%i, %i, %s)\n", __status, __errnum, buffer);
 	maExit(1);
 }
 
@@ -241,7 +242,12 @@ void* mmap(void* address, size_t length, int protect, int flags, int filedes, of
 }
 
 int mprotect(void* a, size_t b, int c) {
-	return 1;
+	return 0;
+}
+
+int munmap(void* address, size_t size) {
+	free(address);
+	return 0;
 }
 
 
@@ -254,3 +260,25 @@ typedef struct
 } impl_t;
 impl_t __start_impls[MAX_IMPLS];
 impl_t* __stop_impls = __start_impls;
+
+int ffsl(long int i) {
+	return ffs(i);
+}
+
+int ffsll(long long int i) {
+	unsigned long long int x = i & -i;
+
+	if (x <= 0xffffffff)
+		return ffs (i);
+	else
+		return 32 + ffs (i >> 32);
+}
+
+long int sysconf (int parameter) {
+	errno = ENOSYS;
+	return -1;
+}
+
+wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size) {
+	return (wchar_t *)mempcpy(wto, wfrom, size * sizeof(wchar_t));
+}

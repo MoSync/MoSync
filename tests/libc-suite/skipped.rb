@@ -155,7 +155,6 @@ SKIPPED_FILES = [
 	'errnobug.c',	# pipe
 	'tst-printfsz.c',	# register_printf_function
 	'tst-obprintf.c',	# obstack.h
-	'tst-fmemopen.c',	# mmap
 	'tst-unlockedio.c',
 	'tst-environ.c',	#todo, setenv & getenv
 	'tst-xpg-basename.c',
@@ -163,7 +162,6 @@ SKIPPED_FILES = [
 	'tst-makecontext.c',
 	'tst-makecontext2.c',
 	'tst-unsetenv1.c',	# clearenv
-	'stratcliff.c',	# mmap
 	'tst-strxfrm.c',	# newlocale
 	'tst-strfry.c',	# strfry
 	'bug-envz1.c',	# envz_entry
@@ -173,7 +171,7 @@ SKIPPED_FILES = [
 	'tst-ftime_l.c',	# locale_t
 	'tst-strptime2.c',	# tm_gmtoff
 	'bug-getdate1.c',	# getdate
-	'wcsatcliff.c',	# mmap
+	'tst-nanosleep.c',	# nanosleep
 ]
 
 SKIPPED_PATTERNS = [
