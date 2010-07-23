@@ -168,6 +168,10 @@ int webViewOpen()
 		return 1;
 	}
 
+	// Does not seem to fix the overdraw problem.
+	LONG windowStyle = GetWindowLong(hMainWnd, GWL_STYLE);
+	SetWindowLong(hMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN); // WS_CLIPSIBLINGS
+
     //HWND hMainWnd = FindWindow(NULL, "MoSync");
 
     HRESULT hr = WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, (void**)&gWebView);
