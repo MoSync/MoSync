@@ -59,7 +59,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
 #include <helpers/CPP_IX_FILE.h>
-#include <helpers/CPP_IX_WEBKIT.h>
+#include <helpers/CPP_IX_WEBVIEW.h>
 
 // blah
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
@@ -90,6 +90,7 @@ extern "C" {
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
 
+#include "WebView.h"
 
 namespace Base {
 
@@ -2028,24 +2029,15 @@ namespace Base {
 			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
-		case maIOCtl_maSyscallWebKit:
-		{
-            char *  data;
-            MAEvent myevent;
-            
-            // Get pointer to memory
-            data = (char*)SYSCALL_THIS->GetValidatedMemRange( a, 16 );
-
-            // Copy to event
-            myevent.type = EVENT_TYPE_WEBKIT;
-            memcpy( myevent.webKitEventData.m_data, data, 16 );
-
-            // Put in event queue
-            gEventFifo.put( myevent );
-
-            // Return success code
-            return 1;   
-        }
+		// WebView IOCtls
+		case maIOCtl_maWebViewOpen:
+            return webViewOpen();
+		case maIOCtl_maWebViewClose:
+            return webViewClose();
+		case maIOCtl_maWebViewSetHTML:
+            return webViewSetHTML(a);
+		case maIOCtl_maWebViewEvaluateScript:
+            return webViewEvaluateScript(a);
 		
 		default:
 			return IOCTL_UNAVAILABLE;
