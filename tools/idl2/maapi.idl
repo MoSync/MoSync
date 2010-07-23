@@ -1979,6 +1979,10 @@ interface MAAPI {
 		* Directories also use these access modes. #MA_ACCESS_READ lets you see if the directory exists.
 		* #MA_ACCESS_READ_WRITE also lets you create or delete it.
 		* \returns The new file handle, or \< 0 on error.
+		*
+		* \note If any maFile function other than maFileOpen() fails,
+		* the state of the file handle becomes boundedly undefined.
+		* This means that any operation on it, other than maFileClose(), may fail.
 		*/
 		MAHandle maFileOpen(in MAString path, in int mode);
 

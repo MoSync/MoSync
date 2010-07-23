@@ -1956,16 +1956,18 @@ namespace Base {
 			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
 			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
+#if 0	//TODO
+		case maIOCtl_maFileAvailableSpace:
 			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
 			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileRename:
 			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+#endif
+		case maIOCtl_maFileDate:
+			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+			return SYSCALL_THIS->maFileTruncate(a, b);
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
@@ -2028,6 +2030,7 @@ namespace Base {
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
 		default:
+			LOGD("maIOCtl(%i) unimplemented.\n", function);
 			return IOCTL_UNAVAILABLE;
 		}
 	}	//maIOCtl

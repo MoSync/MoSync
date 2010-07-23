@@ -21,6 +21,20 @@
 #include "conprint.h"
 
 
+#ifdef MOSYNCDEBUG
+#define LOGD(...) lprintfln(__VA_ARGS__)
+#else
+#define LOGD(...)
+#endif
+
+#define LOGFAIL LOGD("Failure @ %s:%i", __FILE__, __LINE__)
+#define STDFAIL { LOGFAIL; return -1; }
+
+#define CHECK(val, _errno) FAILIF((val) < 0, _errno)
+#define FAILIF(bool, _errno) if((bool)) { errno = (_errno); STDFAIL; }
+#define TEST(val) { int _temp = (val); if(_temp < 0) { LOGFAIL; return _temp; } }
+
+
 typedef void (*voidfunc)(void);
 void crt_tor_chain(int* ptr);
 void crt_tor_chain(int* ptr) {
@@ -41,7 +55,7 @@ void _exit(int status) {
 int raise(int code) {
 	//exit? panic?
 	//maPanic(code, "raise()");
-	return -1;
+	STDFAIL;
 }
 
 #define NOT PANIC_MESSAGE("not supported")
@@ -60,16 +74,6 @@ struct passwd* getpwuid(uid_t uid) {
 
 struct group* getgrgid(gid_t gid) {
 	return NULL;
-}
-
-int fstat(int __fd, struct stat *st) {
-	st->st_mode = S_IFCHR;
-	return 0;
-}
-
-int stat(const char *file, struct stat *st) {
-	st->st_mode = S_IFCHR;
-	return 0;
 }
 
 // Define file descriptors.
@@ -143,7 +147,7 @@ static struct LOW_FD* getLowFd(int __fd) {
 	MAASSERT(sFda[__fd]->refCount > 0);
 	return sFda[__fd];
 }
-#define LOWFD int lfd; struct LOW_FD* plfd = getLowFd(__fd); if(plfd == NULL) return -1; lfd = plfd->lowFd;
+#define LOWFD int lfd; struct LOW_FD* plfd = getLowFd(__fd); if(plfd == NULL) STDFAIL; lfd = plfd->lowFd;
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -160,18 +164,27 @@ static int findFreeFd(void) {
 		if(sFda[i] == NULL)
 			return i;
 	}
-	return -1;
+	STDFAIL;
 }
 
+static MAHandle errnoFileOpen(const char* path, int ma_mode) {
+	MAHandle h = maFileOpen(path, ma_mode);
+	if(h < 0) {
+		switch(h) {
+		case MA_FERR_FORBIDDEN: errno = EACCES; break;
+		case MA_FERR_NOTFOUND: errno = ENOENT; break;
+		default: errno = EIO;
+		}
+		STDFAIL;
+	}
+	return h;
+}
 
 int dup(int __fd) {
 	int newFd;
 	LOWFD;
 	newFd = findFreeFd();
-	if(newFd < 0) {
-		errno = EMFILE;
-		return -1;
-	}
+	CHECK(newFd, EMFILE);
 	sFda[newFd] = plfd;
 	plfd->refCount++;
 	return newFd;
@@ -182,10 +195,7 @@ int dup2(int __fd, int newFd) {
 	LOWFD;
 	if(__fd == newFd)
 		return newFd;
-	if(newFd < 0 || newFd >= NFD) {
-		errno = EBADF;
-		return -1;
-	}
+	FAILIF(newFd < 0 || newFd >= NFD, EBADF);
 	newLfd = getLowFd(newFd);
 	if(newLfd != NULL) {
 		int res = closeLfd(newLfd);
@@ -197,56 +207,88 @@ int dup2(int __fd, int newFd) {
 	return newFd;
 }
 
+static int baseStat(MAHandle h, struct stat* st) {
+	CHECK(st->st_size = maFileSize(h), EIO);
+	CHECK(st->st_mtime = maFileDate(h), EIO);
+	return 0;
+}
+
+int fstat(int __fd, struct stat *st) {
+	LOWFD;
+	if(lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG) {
+		st->st_mode = S_IFCHR;
+		return 0;
+	} else {
+		MAHandle h = lfd - LOWFD_OFFSET;
+		st->st_mode = S_IFREG;
+		return baseStat(h, st);
+	}
+}
+
+int stat(const char *file, struct stat *st) {
+	MAHandle h;
+	int res;
+	char temp[2048];
+	int length;
+	getRealPath(temp, file, 2046);	
+	
+	// check if it's a directory.
+	length = strlen(temp);
+	if(temp[length-1] != '/') {
+		strncat(temp, "/", sizeof(temp));
+		length++;
+	}
+	h = errnoFileOpen(file, MA_ACCESS_READ);
+	if(h > 0) {	// it worked, and it's a directory.
+		st->st_mode = S_IFDIR;
+		st->st_mtime = maFileDate(h);
+		CHECK(maFileClose(h), EIO);
+		CHECK(st->st_mtime, EIO);
+		return 0;
+	} else {
+		if(errno != ENOENT)
+			STDFAIL;
+	}
+	
+	// see if we can find a regular file.
+	temp[length-1] = 0;	// remove the ending slash
+	TEST(h = errnoFileOpen(file, MA_ACCESS_READ));
+	st->st_mode = S_IFREG;
+	res = baseStat(h, st);
+	CHECK(maFileClose(h), EIO);
+	TEST(res);
+	return 0;
+}
 
 off_t lseek(int __fd, off_t __offset, int __whence) {
 	int res;
 	LOWFD;
-	res = maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence);
-	if(res < 0) {
-		errno = EINVAL;
-		return -1;
-	}
+	CHECK(maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence), EINVAL);
 	return res;
 }
 
 int ftruncate(int __fd, off_t __length) {
 	int res;
 	LOWFD;
-	res = maFileTruncate(lfd - LOWFD_OFFSET, __length);
-	if(res < 0) {
-		errno = EINVAL;
-		return -1;
-	}
+	CHECK(maFileTruncate(lfd - LOWFD_OFFSET, __length), EINVAL);
 	return res;
 }
 
 int read(int __fd, void *__buf, size_t __nbyte) {
-	int res, remaining, fileSize, fileTell;
+	int remaining, fileSize, fileTell;
 	MAHandle file;
 	LOWFD;
 	file = lfd - LOWFD_OFFSET;
 
-	fileSize = maFileSize(file);
-	fileTell = maFileTell(file);
-	if(fileSize<0 || fileTell<0) {
-		errno = EIO;
-		return -1;
-	}
+	CHECK(fileSize = maFileSize(file), EIO);
+	CHECK(fileTell = maFileTell(file), EIO);
  
 	remaining = fileSize - fileTell;
-	if(remaining<0) {
-		errno = EIO;
-		return -1;
-	} else {
-		if(remaining<__nbyte)
-			__nbyte = remaining;
-	}
+	FAILIF(remaining < 0, EIO);
+	if(remaining<__nbyte)
+		__nbyte = remaining;
 	
-	res = maFileRead(file, __buf, __nbyte);
-	if(res != 0) {
-		errno = EIO;
-		return -1;
-	}
+	CHECK(maFileRead(file, __buf, __nbyte), EIO);
 	return __nbyte;
 }
 
@@ -263,20 +305,9 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 		if(plfd->flags & O_APPEND) {
 			int oldPos = maFileTell(h);
 			int fileSize = maFileSize(h);
-			if(oldPos < 0 || fileSize < 0) {
-				errno = EIO;
-				return -1;
-			}
-			res = maFileSeek(h, 0, MA_SEEK_END);
-			if(res < 0) {
-				errno = EIO;
-				return -1;
-			}
-			res = maFileWrite(h, __buf, __nbyte);
-			if(res < 0) {
-				errno = EIO;
-				return -1;
-			}
+			FAILIF(oldPos < 0 || fileSize < 0, EIO);
+			CHECK(maFileSeek(h, 0, MA_SEEK_END), EIO);
+			CHECK(maFileWrite(h, __buf, __nbyte), EIO);
 			if(oldPos != fileSize) {
 				res = maFileSeek(h, oldPos, MA_SEEK_SET);
 			}
@@ -284,22 +315,14 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 			res = maFileWrite(h, __buf, __nbyte);
 		}
 	}
-	if(res < 0) {
-		errno = EIO;
-		return -1;
-	}
+	CHECK(res, EIO);
 	return __nbyte;
 }
 
 static int closeLfd(struct LOW_FD* plfd) {
-	int res;
 	plfd->refCount--;
 	if(plfd->refCount == 0) {
-		res = maFileClose(plfd->lowFd - LOWFD_OFFSET);
-		if(res != 0) {
-			errno = EIO;
-			return -1;
-		}
+		CHECK(maFileClose(plfd->lowFd - LOWFD_OFFSET), EIO);
 	}
 	return 0;
 }
@@ -319,7 +342,6 @@ int isatty(int __fd) {
 
 int open(const char * __filename, int __mode, ...) {
 	int ma_mode;
-	int res;
 	int handle;
 	int exists;
 	int newFd;
@@ -328,7 +350,7 @@ int open(const char * __filename, int __mode, ...) {
 	char temp[2048];
 	if(getRealPath(temp, __filename, 2048) == 1) {
 		errno = ENOENT;
-		return -1;
+		STDFAIL;
 	}
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
@@ -344,50 +366,22 @@ int open(const char * __filename, int __mode, ...) {
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
 
 	// Find a spot in the descriptor array.
-	newFd = findFreeFd();
-	if(newFd < 0) {
-		errno = EMFILE;
-		return -1;
-	}
+	CHECK(newFd = findFreeFd(), EMFILE);
 	newLfd = findFreeLfd();
 
-	res = maFileOpen(temp, ma_mode);
-	if(res < 0) {
-		switch(res) {
-		case MA_FERR_FORBIDDEN: errno = EACCES; break;
-		case MA_FERR_NOTFOUND: errno = ENOENT; break;
-		default: errno = EIO;
-		}
-		return -1;
-	}
-	handle = res;
-	exists = maFileExists(handle);
-	if(exists < 0) {
-		errno = ENOTRECOVERABLE;
-		return -1;
-	}
+	TEST(handle = errnoFileOpen(temp, ma_mode));
+	CHECK(exists = maFileExists(handle), ENOTRECOVERABLE);
+	LOGD("exists: %i", exists);
 	if(__mode & O_CREAT) {
-		if((__mode & O_EXCL) && exists) {
-			errno = EEXIST;
-			return -1;
-		}
+		FAILIF((__mode & O_EXCL) && exists, EEXIST);
 		if(!exists) {
-			res = maFileCreate(handle);
-			if(res < 0) {
-				errno = EACCES;
-				return -1;
-			}
+			CHECK(maFileCreate(handle), EACCES);
 		}
-	} else if(!exists) {
-		errno = ENOENT;
-		return -1;
+	} else {
+		FAILIF(!exists, ENOENT);
 	}
 	if(__mode & O_TRUNC) {
-		res = maFileTruncate(handle, 0);
-		if(res < 0) {
-			errno = EIO;
-			return -1;
-		}
+		CHECK(maFileTruncate(handle, 0), EIO);
 	}
 	
 	newLfd->lowFd = handle + LOWFD_OFFSET;
@@ -409,20 +403,15 @@ int unlink(const char *name) {
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
 	cres = close(__fd);
-	if(dres < 0) {
-		errno = EPERM;
-		return -1;
-	}
+	CHECK(dres, EPERM);
 	return cres;
 }
 
 int truncate(const char *path, off_t length) {
 	int tres, cres;
 	int __fd;
-	char temp[2048];
-	getRealPath(temp, path, 2048);	
 
-	__fd = open(temp, O_WRONLY);
+	__fd = open(path, O_WRONLY);
 	if(__fd < 0)
 		return __fd;
 	tres = ftruncate(__fd, length);
@@ -447,7 +436,6 @@ int chdir(const char *filename) {
 	if(maFileExists(file)) {
 		strcpy(sCwd, temp);
 		ret = 0;
-		errno = ENOENT;
 	}
 	
 	maFileClose(file);
@@ -462,12 +450,12 @@ char* getcwd(char *__buf, size_t __size ) {
 
 int setpgid(pid_t pid, pid_t pgid) {
 	errno = ENOSYS;
-	return -1;
+	STDFAIL;
 }
 
 int fork(void) {
 	errno = ENOSYS;
-	return -1;
+	STDFAIL;
 }
 
 _sig_func_ptr signal(int sig, _sig_func_ptr f) {
@@ -477,7 +465,7 @@ _sig_func_ptr signal(int sig, _sig_func_ptr f) {
 
 int sigprocmask(int how, const sigset_t *set, sigset_t *oset) {
 	errno = ENOSYS;
-	return -1;
+	STDFAIL;
 }
 
 unsigned int alarm(unsigned int seconds) {
@@ -497,20 +485,17 @@ int getpagesize(void) {
 
 clock_t times (struct tms *buffer) {
 	errno = ENOSYS;
-	return -1;
+	STDFAIL;
 }
 
 int gettimeofday (struct timeval *tp, void *tzp) {
 	tp->tv_sec = maLocalTime();
 	tp->tv_usec = 0;
-	if(tzp != NULL) {
-		errno = ENOSYS;
-		return -1;
-	}
+	FAILIF(tzp != NULL, ENOSYS);
 	return 0;
 }
 
 int nice(int incr) {
 	errno = ENOSYS;
-	return -1;
+	STDFAIL;
 }

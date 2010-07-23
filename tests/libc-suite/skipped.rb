@@ -40,8 +40,6 @@ SKIPPED_FILES = [
 	'tst-longjmp_chk2.c',
 	'tst-gshadow.c',
 	'test-utime.c',
-	'test-stat.c',	# todo
-	'test-stat2.c',	# todo
 	'test-lfs.c',
 	'tst-getcwd.c',
 	'tst-fcntl.c',
@@ -53,7 +51,6 @@ SKIPPED_FILES = [
 	'tst-statvfs.c',
 	'tst-openat.c',	# todo
 	'tst-unlinkat.c',	# todo
-	'tst-fstatat.c',	# todo
 	'tst-futimesat.c',	# todo
 	'tst-renameat.c',	# todo
 	'tst-fchownat.c',	# todo

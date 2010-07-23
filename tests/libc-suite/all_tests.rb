@@ -19,6 +19,7 @@ PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 # but it would be faster.
 
 FileUtils.mkdir_p(BUILD_DIR)
+FileUtils.mkdir_p('filesystem/tmp')
 
 sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
 
@@ -186,7 +187,7 @@ end
 #exit 0
 
 if(ARGV.size > 0)
-	files = ARGV
+	files.reject! do |f| !ARGV.include?(File.basename(f)) end
 end
 
 unskippedCount = 0

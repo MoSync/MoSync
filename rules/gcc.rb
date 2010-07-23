@@ -100,10 +100,13 @@ module GccVersion
 			is_v4 = gcc_version[0] == "4"[0]
 			set_class_var(gccVersionClass, :@@GCC_IS_V4, is_v4)
 			if(is_v4)
-				set_class_var(gccVersionClass, :@@GCC_V4_SUB, gcc_version[2] - '0'[0])
+				set_class_var(gccVersionClass, :@@GCC_V4_SUB, gcc_version[2].to_i)
 			end
 			warning("GCC version: #{gcc_version.inspect}")
 			warning("GCC_IS_V4: #{is_v4}")
+			if(is_v4)
+				warning("GCC sub-version: #{gcc_version[2].to_i}")
+			end
 		end
 		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
 		if(@GCC_IS_V4)
