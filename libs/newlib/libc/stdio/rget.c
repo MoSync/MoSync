@@ -45,6 +45,7 @@ _DEFUN(__srget_r, (ptr, fp),
       fp->_r--;
       return *fp->_p++;
     }
+	fp->_flags |= __SEOF;
   return EOF;
 }
 

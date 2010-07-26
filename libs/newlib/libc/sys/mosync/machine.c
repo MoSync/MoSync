@@ -263,15 +263,14 @@ int stat(const char *file, struct stat *st) {
 off_t lseek(int __fd, off_t __offset, int __whence) {
 	int res;
 	LOWFD;
-	CHECK(maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence), EINVAL);
+	CHECK(res = maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence), EINVAL);
 	return res;
 }
 
 int ftruncate(int __fd, off_t __length) {
-	int res;
 	LOWFD;
 	CHECK(maFileTruncate(lfd - LOWFD_OFFSET, __length), EINVAL);
-	return res;
+	return 0;
 }
 
 int read(int __fd, void *__buf, size_t __nbyte) {

@@ -881,7 +881,7 @@ namespace Base {
 			FILE_FAIL(MA_FERR_GENERIC);
 		bool res = fh.fs->read(dst, len);
 		if(!res)
-			return MA_FERR_GENERIC;
+			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 
@@ -892,10 +892,10 @@ namespace Base {
 		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
 		//todo: add ERR_DATA_OOB check for length.
 		if(!fh.fs)
-			return MA_FERR_GENERIC;
+			FILE_FAIL(MA_FERR_GENERIC);
 		bool res = b->writeStream(*fh.fs, args->len);
 		if(!res)
-			return MA_FERR_GENERIC;
+			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 
@@ -906,12 +906,12 @@ namespace Base {
 		int pos;
 		bool res = fh.fs->tell(pos);
 		if(!res)
-			return MA_FERR_GENERIC;
+			FILE_FAIL(MA_FERR_GENERIC);
 		return pos;
 	}
 
 	int Syscall::maFileSeek(MAHandle file, int offset, int whence) {
-		LOGD("maFileTell(%i, %i, %i)\n", file, offset, whence);
+		LOGD("maFileSeek(%i, %i, %i)\n", file, offset, whence);
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.fs, ERR_FILE_CLOSED);
 		Seek::Enum mode;
@@ -923,7 +923,7 @@ namespace Base {
 		}
 		bool res = fh.fs->seek(mode, offset);
 		if(!res)
-			return MA_FERR_GENERIC;
+			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 
@@ -979,7 +979,7 @@ namespace Base {
 			scanPath += filter;
 			int res = scanDirectory(scanPath.c_str(), fileListCallback);
 			if(res)
-				return MA_FERR_GENERIC;
+				FILE_FAIL(MA_FERR_GENERIC);
 		}
 		std::pair<FileListItr, bool> ires = sFileListings.insert(
 			std::pair<int, FileList>(sFileListNextHandle, sFileList));
