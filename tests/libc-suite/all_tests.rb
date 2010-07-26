@@ -1,7 +1,6 @@
 #!/usr/bin/ruby
 
 require 'FileUtils'
-require 'timeout'
 require 'settings.rb'
 require 'skipped.rb'
 require '../../rules/util.rb'
@@ -156,12 +155,9 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn} -sld #{sldFile}"
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 20 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
-	res = false
-	timeout(30) do
-		res = system(cmd)
-	end
+	res = system(cmd)
 	puts res
 	if(res == true)	# success
 		FileUtils.touch(winFile)

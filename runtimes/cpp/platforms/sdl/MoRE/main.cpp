@@ -91,9 +91,15 @@ int main2(int argc, char **argv) {
 	settings.profile.mVendor = "default";
 	settings.haveSkin = true;
 	settings.iconPath = NULL;
+#ifdef EMULATOR
+	settings.timeout = 0;
+#endif
 	const char* sldFile = NULL;
 #ifdef GDB_DEBUG
 	bool gdb = false;
+#endif
+#ifdef EMULATOR
+	bool allowDivZero = false;
 #endif
 
 	//NOTE: could have a -no-console option used by MoBuild, otherwise use a console for error output.
@@ -133,6 +139,10 @@ int main2(int argc, char **argv) {
 				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -resmem <bytes:integer>                set resource memory limit.\n"
 				"  -gdb                                   start gdb stub.\n"
+#ifdef EMULATOR
+				"  -allowdivzero                          allow floating-point division by zero. this produces ieee standard results.\n"
+				"  -timeout <seconds:integer>             close the program if it runs longer than the timeout.\n"
+#endif
 				"\n";
 			printf("%s", sInfo);
 			return 1;
@@ -228,6 +238,17 @@ int main2(int argc, char **argv) {
 		} else if(strcmp(argv[i], "-gdb")==0) {
 			gdb = true;
 #endif
+#ifdef EMULATOR
+		} else if(strcmp(argv[i], "-allowdivzero")==0) {
+			allowDivZero = true;
+		} else if(strcmp(argv[i], "-timeout")==0) {
+			i++;
+			if(i>=argc) {
+				LOG("not enough parameters for -timeout");			
+				return 1;
+			}
+			settings.timeout = atoi(argv[i]);
+#endif
 		} else {
 			LOG("unknown parameter: \"%s\"\n", argv[i]);
 			return 1;
@@ -258,6 +279,9 @@ int main2(int argc, char **argv) {
 	gCore = Core::CreateCore(*syscall);
 #ifdef GDB_DEBUG
 	gCore->mGdbOn = gdb;
+#endif
+#ifdef EMULATOR
+	syscall->mAllowDivZero = allowDivZero;
 #endif
 	if(!Core::LoadVMApp(gCore, programFile, resourceFile)) {
 		BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);

@@ -336,7 +336,7 @@ int close(int __fd) {
 
 int isatty(int __fd) {
 	LOWFD;
-	return lfd == LOWFD_CONSOLE;
+	return lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG;
 }
 
 int open(const char * __filename, int __mode, ...) {

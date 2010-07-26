@@ -11,6 +11,7 @@ int main(int argc, const char** argv);
 
 int MAMain() {
 	const char* argv[] = { "MoSync", "--direct", "--test-dir", "/" };
+	printf("MAMain()\n");
 	return main(4, argv);
 }
 

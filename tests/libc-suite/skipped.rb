@@ -51,6 +51,7 @@ SKIPPED_FILES = [
 	'tst-statvfs.c',
 	'tst-openat.c',	# todo
 	'tst-unlinkat.c',	# todo
+	'tst-fstatat.c',	# todo, dirent
 	'tst-futimesat.c',	# todo
 	'tst-renameat.c',	# todo
 	'tst-fchownat.c',	# todo
@@ -169,6 +170,7 @@ SKIPPED_FILES = [
 	'tst-strptime2.c',	# tm_gmtoff
 	'bug-getdate1.c',	# getdate
 	'tst-nanosleep.c',	# nanosleep
+	'tst-nice.c'	# we are not nice
 ]
 
 SKIPPED_PATTERNS = [

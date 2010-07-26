@@ -142,6 +142,10 @@ namespace Base {
 		int getMemoryProtection();
 #endif
 
+#ifdef EMULATOR
+		bool mAllowDivZero;
+#endif
+
 		void VM_Yield();
 
 		int maBtGetNewDevice(MABtDevice* dst);

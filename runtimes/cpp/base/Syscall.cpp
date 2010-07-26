@@ -323,8 +323,13 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(double, __divdf3(double a, double b)) {
-		if(b == 0)
+		if(b == 0
+#ifdef EMULATOR
+			&& !gSyscall->mAllowDivZero
+#endif
+			) {
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		}
 		return a/b;
 	}
 	SYSCALL(double, __negdf2(double a)) {
@@ -361,8 +366,13 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(float, __divsf3(float a, float b)) {
-		if(b == 0)
+		if(b == 0
+#ifdef EMULATOR
+			&& !gSyscall->mAllowDivZero
+#endif
+			) {
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+		}
 		return a/b;
 	}
 	SYSCALL(float, __negsf2(float a)) {
@@ -798,6 +808,7 @@ namespace Base {
 	int maFileTotalSpace(MAHandle file);
 	int maFileRename(MAHandle file, const char* newName);
 
+#ifndef SYMBIAN
 	int Syscall::maFileDate(MAHandle file) {
 		LOGD("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
@@ -848,6 +859,7 @@ namespace Base {
 		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
+#endif
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
 		LOGD("maFileWrite(%i, 0x%p, %i)\n", file, src, len);

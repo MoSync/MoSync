@@ -128,7 +128,7 @@ namespace Base {
 
 	static MoRE::DeviceSkin* sSkin = NULL;
 
-	static bool MALibInit(bool showScreen, bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile);
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS&);
 #ifdef USE_MALIBQUIT
 	static void MALibQuit();
 #endif
@@ -181,8 +181,7 @@ namespace Base {
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 #endif
 	}
@@ -204,8 +203,7 @@ namespace Base {
 #endif
 		screenWidth = width;
 		screenHeight = height;
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 	}
 
@@ -299,7 +297,15 @@ namespace Base {
 		}
 	};
 
-	static bool MALibInit(bool showScreen,  bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile) {
+
+#ifdef EMULATOR
+	static Uint32 GCCATTRIB(noreturn) SDLCALL TimeoutCallback(Uint32 interval, void*) {
+		LOG("TimeoutCallback %i\n", interval);
+		exit(2);
+	}
+#endif
+
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS& settings) {
 		char *mosyncDir = getenv("MOSYNCDIR");
 		if(!mosyncDir) {
 			LOG("MOSYNCDIR could not be found");
@@ -328,7 +334,7 @@ namespace Base {
 
 		MANetworkInit(/*broadcom*/);
 
-		if(showScreen) {
+		if(settings.showScreen) {
 #ifndef MOBILEAUTHOR
 #ifdef __USE_SYSTEM_RESOLUTION__
 			const SDL_VideoInfo* pVid = SDL_GetVideoInfo();
@@ -339,10 +345,9 @@ namespace Base {
 			}
 #endif
 
-			if(haveSkin) {
-				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
+			if(settings.haveSkin) {
+				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(&settings.profile);
 				if(!sSkin) {
-					haveSkin = false;
 					TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
 				} else {
 					sSkin->setListener(new MoSyncSkinListener());
@@ -373,16 +378,16 @@ namespace Base {
 			}
 
 			char caption[1024];
-			if(id != NULL) {
-				int res = _snprintf(caption, 1024, "%s - MoSync", id);
+			if(settings.id != NULL) {
+				int res = _snprintf(caption, 1024, "%s - MoSync", settings.id);
 				DEBUG_ASSERT(res > 0 && res < 1024);
 			} else {
 				strcpy(caption, "MoSync");
 			}
 			SDL_WM_SetCaption(caption, NULL);
 
-			if(iconPath) {
-				SDL_Surface *surf = IMG_Load(iconPath);
+			if(settings.iconPath) {
+				SDL_Surface *surf = IMG_Load(settings.iconPath);
 				if(surf)
 					SDL_WM_SetIcon(surf, NULL);				
 			}
@@ -421,6 +426,12 @@ namespace Base {
 			strcat(destDir, "/bin/maspec.fon");
 			TEST_Z(gFont = TTF_OpenFont(destDir, 8));
 		}
+
+#ifdef EMULATOR
+		if(settings.timeout != 0) {
+			DEBUG_ASSERT(NULL != SDL_AddTimer(settings.timeout * 1000, TimeoutCallback, NULL));
+		}
+#endif
 
 		return true;
 	}
