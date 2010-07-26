@@ -77,7 +77,7 @@ static bool start_sim() {
 		cmdLine += " -resource \""+gResourceFilename+"\"";
 	cmdLine += " -sld \""+gSldFilename+"\"";
 
-	LOG("%s\n", cmdLine);
+	LOG("%s\n", cmdLine.c_str());
 
 	PROCESS_INFORMATION pi;
 	char* ptr = new char[cmdLine.size() + 1];

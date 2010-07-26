@@ -170,8 +170,8 @@ int DecodeOpcodeIP(OpcodeInfo *thisOpcode, int code_ip)
 	
 	code_ip += (int) (ip - sip);
 
-	if (code_ip > 0x80000000)
-		Error(Error_Fatal, "DecodeOpcodeIP: code_ip > 0x80000000 (Contact MoSync)");
+	if (code_ip < 0)
+		Error(Error_Fatal, "DecodeOpcodeIP: code_ip < 0 (Contact MoSync)");
 
 	return code_ip;
 }
