@@ -29,6 +29,7 @@
 
 #define LOGFAIL LOGD("Failure @ %s:%i", __FILE__, __LINE__)
 #define STDFAIL { LOGFAIL; return -1; }
+#define ERRNOFAIL(_errno) { LOGFAIL; errno = _errno; return -1; }
 
 #define CHECK(val, _errno) FAILIF((val) < 0, _errno)
 #define FAILIF(bool, _errno) if((bool)) { errno = (_errno); STDFAIL; }
@@ -261,9 +262,19 @@ int stat(const char *file, struct stat *st) {
 }
 
 off_t lseek(int __fd, off_t __offset, int __whence) {
+	MAHandle file;
 	int res;
 	LOWFD;
-	CHECK(res = maFileSeek(lfd - LOWFD_OFFSET, __offset, __whence), EINVAL);
+	file = lfd - LOWFD_OFFSET;
+	switch(__whence) {
+		case SEEK_SET: __whence = MA_SEEK_SET; break;
+		case SEEK_CUR: __whence = MA_SEEK_CUR; break;
+		case SEEK_END: __whence = MA_SEEK_END; break;
+		default: ERRNOFAIL(EINVAL);
+	}
+	
+	CHECK(maFileSeek(file, __offset, __whence), EINVAL);
+	CHECK(res = maFileTell(file), EINVAL);
 	return res;
 }
 
@@ -283,6 +294,7 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 	CHECK(fileTell = maFileTell(file), EIO);
  
 	remaining = fileSize - fileTell;
+	if(remaining==0) return 0;
 	FAILIF(remaining < 0, EIO);
 	if(remaining<__nbyte)
 		__nbyte = remaining;
