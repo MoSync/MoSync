@@ -19,12 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	TInt mOpenResult;
 	Smartie<HBufC8> mFilename;
 
-	FileStream(const char* filename, bool write, bool append) {
-		open(filename, write, append);
+	FileStream(const char* filename, bool write, bool append, bool exist = false) {
+		open(filename, write, append, exist);
 	}
 
 public:
 	RFile mFile;
 
 	FileStream();
-	void open(const char* filename, bool write, bool append);
+	void open(const char* filename, bool write, bool append, bool exist);
