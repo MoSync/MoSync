@@ -2106,7 +2106,7 @@ interface MAAPI {
 		int maFileReadToData(in MA_FILE_DATA args);
 
 		/**
-		* Returns the file's current position.
+		* Returns the file's current position, or \< 0 on error.
 		* \param file A file handle. The file must exist and must not be a directory.
 		*/
 		int maFileTell(in MAHandle file);
@@ -2117,7 +2117,7 @@ interface MAAPI {
 		* \param offset The offset of the new position,
 		* relative to the position specified by \a whence.
 		* \param whence One of the \link #MA_SEEK_SET MA_SEEK \endlink constants.
-		* \returns The new position.
+		* \returns The new position, or \< 0 on error.
 		*/
 		int maFileSeek(in MAHandle file, in int offset, in int whence);
 

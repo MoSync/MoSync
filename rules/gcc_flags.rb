@@ -73,7 +73,6 @@ if(@GCC_IS_V4) then
 	end
 	version_warnings += gcc4_warnings
 	if(@GCC_V4_SUB >= 3) then
-		puts "gcc is >= v4.3"
 		version_warnings += gcc43_c_warnings + gcc43_warnings
 		cpp_flags += " -std=gnu++0x -DHAVE_TR1"
 	end

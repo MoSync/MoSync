@@ -30,7 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_FILE.h>
 #ifdef WIN32
 #include <windows.h>
+#ifndef _WIN32_WCE
 #include <io.h>
+#endif	//_WIN32_WCE
 #endif	//WIN32
 
 #ifdef _android
@@ -48,15 +50,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/mkdir.h"
 #endif
 
-#ifndef SYMBIAN
+#if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#ifdef DARWIN
+#ifndef WIN32
 #define _stat stat
 #define _open open
-#endif	//DARWIN
-#endif	//SYMBIAN
+#endif	//WIN32
+#endif	//SYMBIAN && _WIN32_WCE
 
 using namespace Base;
 
@@ -812,7 +814,7 @@ namespace Base {
 	int maFileTotalSpace(MAHandle file);
 	int maFileRename(MAHandle file, const char* newName);
 
-#ifndef SYMBIAN
+#if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 	int Syscall::maFileDate(MAHandle file) {
 		LOGD("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
@@ -863,7 +865,7 @@ namespace Base {
 		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
-#endif
+#endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
 		LOGD("maFileWrite(%i, 0x%p, %i)\n", file, src, len);
@@ -940,7 +942,11 @@ namespace Base {
 		bool res = fh.fs->seek(mode, offset);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
-		return 0;
+		int pos;
+		res = fh.fs->tell(pos);
+		if(!res)
+			FILE_FAIL(MA_FERR_GENERIC);
+		return pos;
 	}
 
 #ifndef SYMBIAN

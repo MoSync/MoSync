@@ -50,6 +50,7 @@ void crt_tor_chain(int* ptr) {
 
 
 void _exit(int status) {
+	fcloseall();
 	maExit(status);
 }
 
@@ -231,7 +232,8 @@ int stat(const char *file, struct stat *st) {
 	int res;
 	char temp[2048];
 	int length;
-	getRealPath(temp, file, 2046);	
+	getRealPath(temp, file, 2046);
+	LOGD("stat(%s)", temp);
 	
 	// check if it's a directory.
 	length = strlen(temp);
@@ -272,9 +274,7 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 		case SEEK_END: __whence = MA_SEEK_END; break;
 		default: ERRNOFAIL(EINVAL);
 	}
-	
-	CHECK(maFileSeek(file, __offset, __whence), EINVAL);
-	CHECK(res = maFileTell(file), EINVAL);
+	CHECK(res = maFileSeek(file, __offset, __whence), EINVAL);
 	return res;
 }
 
@@ -363,6 +363,7 @@ int open(const char * __filename, int __mode, ...) {
 		errno = ENOENT;
 		STDFAIL;
 	}
+	LOGD("open(%s)", temp);
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
@@ -407,7 +408,8 @@ int unlink(const char *name) {
 	int __fd;
 	char temp[2048];
 
-	getRealPath(temp, name, 2048);		
+	getRealPath(temp, name, 2048);
+	LOGD("unlink(%s)", temp);
 
 	__fd = open(temp, O_WRONLY);
 	if(__fd < 0)
@@ -437,7 +439,8 @@ int chdir(const char *filename) {
 	int length;
 	int ret = 1;
 	char temp[2048];
-	getRealPath(temp, filename, 2048);	
+	getRealPath(temp, filename, 2048);
+	LOGD("chdir(%s)", temp);
 	
 	length = strlen(temp);
 	if(temp[length-1]!='/')

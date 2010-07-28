@@ -5,6 +5,12 @@ require 'settings.rb'
 require 'skipped.rb'
 require '../../rules/util.rb'
 
+if(ARGV.length > 0)
+	SETTINGS[:stop_on_fail] = true
+	SETTINGS[:rebuild_failed] = true
+	SETTINGS[:retry_failed] = true
+end
+
 BUILD_DIR = 'build'
 MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
