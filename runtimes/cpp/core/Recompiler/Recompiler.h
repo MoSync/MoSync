@@ -221,7 +221,7 @@ namespace MoSync {
 		};
 
 		Function* findFunctions() {
-			int ip = 0;
+			int ip = 1;
 			Function *start;
 			Function *f = start = new Function(0, 0);
 			Instruction inst;
@@ -316,7 +316,7 @@ endOfFunction:
 			//printFunctionsSize(mFunctions);
 			//printFunctions(fb);
 			for(mPass = 1; mPass <= mNumPasses; mPass++) { 
-				int ip = 0, windowIp = 0;
+				int ip = 1, windowIp = 1;
 				int numInstructions = 0;
 				T* thisImpl = ((T*)this);
 
