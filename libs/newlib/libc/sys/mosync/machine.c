@@ -134,10 +134,12 @@ static void initFda(void) {
 	sFda[1] = &sLfConsole;
 	sFda[2] = &sLfConsole;
 	sFda[3] = &sLfConsole;
+	sLfConsole.refCount = 3;
 }
 
 static struct LOW_FD* getLowFd(int __fd) {
 	initFda();
+	LOGD("getLowFd(%i)", __fd);
 	if(__fd <= 0 || __fd >= NFD) {
 		errno = EBADF;
 		return NULL;
@@ -149,7 +151,9 @@ static struct LOW_FD* getLowFd(int __fd) {
 	MAASSERT(sFda[__fd]->refCount > 0);
 	return sFda[__fd];
 }
-#define LOWFD int lfd; struct LOW_FD* plfd = getLowFd(__fd); if(plfd == NULL) STDFAIL; lfd = plfd->lowFd;
+#define LOWFD int lfd; struct LOW_FD* plfd; \
+	/*LOGD("LOWFD(%i) in %s", __fd, __FUNCTION__);*/ \
+	plfd = getLowFd(__fd); if(plfd == NULL) STDFAIL; lfd = plfd->lowFd;
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -195,6 +199,7 @@ int dup(int __fd) {
 int dup2(int __fd, int newFd) {
 	struct LOW_FD* newLfd;
 	LOWFD;
+	LOGD("dup2(%i, %i)", __fd, newFd);
 	if(__fd == newFd)
 		return newFd;
 	FAILIF(newFd < 0 || newFd >= NFD, EBADF);
@@ -331,8 +336,9 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 }
 
 static int closeLfd(struct LOW_FD* plfd) {
+	LOGD("closeLfd(%i, %i)", plfd->lowFd, plfd->refCount);
 	plfd->refCount--;
-	if(plfd->refCount == 0) {
+	if(plfd->refCount == 0 && plfd->lowFd > LOWFD_OFFSET) {
 		CHECK(maFileClose(plfd->lowFd - LOWFD_OFFSET), EIO);
 	}
 	return 0;
@@ -341,6 +347,7 @@ static int closeLfd(struct LOW_FD* plfd) {
 int close(int __fd) {
 	int res;
 	LOWFD;
+	LOGD("close(%i)", __fd);
 	res = closeLfd(plfd);
 	sFda[__fd] = NULL;
 	return res;
@@ -446,14 +453,14 @@ int chdir(const char *filename) {
 	if(temp[length-1]!='/')
 		strncat(temp, "/", sizeof(sCwd));
 	
-	file = maFileOpen(sCwd, MA_ACCESS_READ);
-	if(maFileExists(file)) {
+	CHECK(file = maFileOpen(sCwd, MA_ACCESS_READ), EIO);
+	ret = maFileExists(file);
+	if(ret > 0) {
 		strcpy(sCwd, temp);
 		ret = 0;
 	}
-	
-	maFileClose(file);
-	
+	CHECK(maFileClose(file), EIO);
+	CHECK(ret, EIO);
 	return ret;
 }
 

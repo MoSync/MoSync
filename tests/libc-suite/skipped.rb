@@ -170,7 +170,8 @@ SKIPPED_FILES = [
 	'tst-strptime2.c',	# tm_gmtoff
 	'bug-getdate1.c',	# getdate
 	'tst-nanosleep.c',	# nanosleep
-	'tst-nice.c'	# we are not nice
+	'tst-nice.c',	# we are not nice
+	'tst-perror.c',	# To be used only for testing glibc.
 ]
 
 SKIPPED_PATTERNS = [

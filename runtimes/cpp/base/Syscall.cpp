@@ -688,7 +688,7 @@ namespace Base {
 		fh.fs = NULL;
 		if(mode == MA_ACCESS_READ_WRITE) {
 			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
-				fh.fs = new WriteFileStream(fh.name);
+				fh.fs = new WriteFileStream(fh.name, false, true);
 			}
 		} else if((mode & MA_ACCESS_READ) != 0) {
 			if(isDirectory(fh.name) == 0) {

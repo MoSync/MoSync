@@ -49,7 +49,23 @@ const char* strsignal(int __signo) {
 }
 
 void sleep(int s) {
-	BIG_PHAT_ERROR;
+	lprintfln("sleep(%i)", s);
+	const int start = maGetMilliSecondCount();
+	const int end = start + s * 1000;
+	do {
+		int left = end - maGetMilliSecondCount();
+		int res;
+		MAEvent e;
+		if(left <= 0)
+			break;
+		while(maGetEvent(&e)) {
+			if(e.type = EVENT_TYPE_CLOSE) {
+				lprintfln("EVENT_TYPE_CLOSE");
+				exit(42);
+			}
+		}
+		maWait(left);
+	} while(1);
 }
 
 FILE *popen(const char *s, const char * mode) {

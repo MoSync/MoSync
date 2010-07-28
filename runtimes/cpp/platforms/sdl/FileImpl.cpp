@@ -108,8 +108,8 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append) {
-		const char* mode = append ? "ab" : "wb";
+	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist) {
+		const char* mode = append ? "ab+" : (exist ? "rb+" : "wb+");
 		rwops = SDL_RWFromFile(filename, mode);
 		if(!rwops)
 		{
