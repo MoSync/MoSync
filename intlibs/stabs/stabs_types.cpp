@@ -127,7 +127,11 @@ void addType(const Type& cs) {
 		TypeTupleSet::iterator temp = res.first;
 		temp++;
 		sTypeTupleSets[gCurrentFile]->erase(res.first);
+#if defined(__GNUC__) && !defined(HAVE_TR1)
+		sTypeTupleSets[gCurrentFile]->insert(t);
+#else
 		sTypeTupleSets[gCurrentFile]->insert(temp, t);
+#endif
 		sTypeNameSets[gCurrentFile]->erase(s);
 		sTypeNameSets[gCurrentFile]->insert(t);
 	}

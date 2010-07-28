@@ -52,7 +52,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
+#ifdef DARWIN
+#define _stat stat
+#define _open open
+#endif	//DARWIN
+#endif	//SYMBIAN
 
 using namespace Base;
 

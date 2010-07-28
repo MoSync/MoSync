@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <io.h>
 #endif
 #include <fcntl.h>
+#include <errno.h>
 
 #include "config.h"
 #include "helpers/helpers.h"
@@ -42,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "commandInterface.h"
 #include "StubConnection.h"
 #include "cmd_stack.h"
+
 
 using namespace std;
 
