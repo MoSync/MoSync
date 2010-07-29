@@ -1709,6 +1709,7 @@ namespace Base {
 	static void fillBufferCallback() {
 		MAEvent* ep = new MAEvent;
 		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		ep->state = 1;
 		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
 		FE_PushEvent((SDL_Event*)&event);
 	}
