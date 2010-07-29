@@ -838,8 +838,8 @@ namespace Base {
 
 #else	//!WIN32
 
-	static fileSpace(MAHandle file, fsblkcnt_t statvfs::* clusters) {
-		FileHandle& fh(getFileHandle(file));
+	static int fileSpace(MAHandle file, fsblkcnt_t statvfs::* clusters) {
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		struct statvfs s;
 		if(statvfs(fh.name, &s) != 0) {
 			LOG("statvfs errno %i\n", errno);
