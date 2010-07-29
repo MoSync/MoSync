@@ -1967,14 +1967,12 @@ namespace Base {
 			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
 			return SYSCALL_THIS->maFileSize(a);
-#if 0	//TODO
 		case maIOCtl_maFileAvailableSpace:
 			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
 			return SYSCALL_THIS->maFileTotalSpace(a);
 		case maIOCtl_maFileRename:
 			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-#endif
 		case maIOCtl_maFileDate:
 			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileTruncate:

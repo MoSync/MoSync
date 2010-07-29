@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <math.h>
+#include <limits.h>
 
 #ifndef _WIN32_WCE
 #include <errno.h>
@@ -59,6 +60,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _open open
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
+
+#ifndef WIN32
+#include <sys/statvfs.h>
+#endif
 
 using namespace Base;
 
@@ -809,12 +814,55 @@ namespace Base {
 		return len;
 	}
 
-	//TODO
-	int maFileAvailableSpace(MAHandle file);
-	int maFileTotalSpace(MAHandle file);
-	int maFileRename(MAHandle file, const char* newName);
-
 #if !defined(SYMBIAN) && !defined(_WIN32_WCE)
+
+#ifdef WIN32
+	static int fileSpace(MAHandle file, unsigned _diskfree_t::* clusters) {
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+		_diskfree_t df;
+		unsigned drive;
+#if FILESYSTEM_CHROOT
+		DEBUG_ASSERT(fh.name[0] == '/');
+		drive = 0;
+#else
+		drive = (fh.name[0] - 'A') + 1;
+#endif	//FILESYSTEM_CHROOT
+		if(_getdiskfree(drive, &df) != 0) {
+			LOG("_getdiskfree errno %i\n", errno);
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
+		return (int)MIN(df.bytes_per_sector * df.sectors_per_cluster * (u64)(df.*clusters), INT_MAX);
+	}
+#define SPACE_AVAIL &_diskfree_t::avail_clusters
+#define SPACE_TOTAL &_diskfree_t::total_clusters
+
+#else	//!WIN32
+
+	static fileSpace(MAHandle file, fsblkcnt_t statvfs::* clusters) {
+		FileHandle& fh(getFileHandle(file));
+		struct statvfs s;
+		if(statvfs(fh.name, &s) != 0) {
+			LOG("statvfs errno %i\n", errno);
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
+		return (int)MIN(s.f_frsize * s.*clusters, INT_MAX);
+	}
+#define SPACE_AVAIL &statvfs::f_bavail
+#define SPACE_TOTAL &statvfs::f_blocks
+#endif	//WIN32
+
+	int Syscall::maFileAvailableSpace(MAHandle file) {
+		return fileSpace(file, SPACE_AVAIL);
+	}
+
+	int Syscall::maFileTotalSpace(MAHandle file) {
+		return fileSpace(file, SPACE_TOTAL);
+	}
+
+	int Syscall::maFileRename(MAHandle file, const char* newName) {
+		return -1;
+	}
+
 	int Syscall::maFileDate(MAHandle file) {
 		LOGD("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));

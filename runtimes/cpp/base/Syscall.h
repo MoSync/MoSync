@@ -108,10 +108,10 @@ namespace Base {
 		int maFileCreate(MAHandle file);
 		int maFileDelete(MAHandle file);
 		int maFileSize(MAHandle file);
-		//int maFileAvailableSpace(MAHandle file);
-		//int maFileTotalSpace(MAHandle file);
+		int maFileAvailableSpace(MAHandle file);
+		int maFileTotalSpace(MAHandle file);
 		int maFileDate(MAHandle file);
-		//int maFileRename(MAHandle file, const char* newName);
+		int maFileRename(MAHandle file, const char* newName);
 		int maFileTruncate(MAHandle file, int offset);
 
 		int maFileWrite(MAHandle file, const void* src, int len);
