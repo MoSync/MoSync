@@ -135,19 +135,18 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld')
-	stabsFile = ofn.ext('.stabs')
+	sldFile = ofn.ext('.sld' + suffix)
+	stabsFile = ofn.ext('.stabs' + suffix)
 	
 	delete_if_empty(pfn)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
-		pipe_flags = " -sld=#{sldFile} -stabs=#{stabsFile}"
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{PIPE_LIBS}"
-			sh "pipe-tool#{pipe_flags} -B #{pfn} rebuild.s"
+			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool#{pipe_flags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{PIPE_LIBS}"
+			sh "pipe-tool -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -227,7 +226,9 @@ files.each do |filename|
 	end
 	
 	force_rebuild = link_and_test(ofn, false, force_rebuild)
-	#link_and_test(ofn, true, force_rebuild)
+	if(:test_dead_code_elimination && File.exists?(ofn.ext('.win')))
+		link_and_test(ofn, true, force_rebuild)
+	end
 end
 
 puts "#{unskippedCount} actual tests."
