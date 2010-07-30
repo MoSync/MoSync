@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
 
-#ifndef WIN32
+#if defined(LINUX) || defined(DARWIN)
 #include <sys/statvfs.h>
 #endif
 
@@ -672,6 +672,27 @@ namespace Base {
 
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
+	static int openFile(Syscall::FileHandle& fh) {
+		if(fh.mode == MA_ACCESS_READ_WRITE) {
+			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
+				fh.fs = new WriteFileStream(fh.name, false, true);
+			}
+		} else if((fh.mode & MA_ACCESS_READ) != 0) {
+			if(isDirectory(fh.name) == 0) {
+				fh.fs = new FileStream(fh.name);
+			}
+		} else {
+			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
+		}
+		if(fh.fs) if(!fh.fs->isOpen()) {
+			delete fh.fs;
+			fh.fs = NULL;
+			LOGD("maFileOpen failed.\n");
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
+		return 0;
+	}
+
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
 		LOGD("maFileOpen(%s, %x)\n", path, mode);
 		Smartie<FileHandle> fhs(new FileHandle);
@@ -691,23 +712,7 @@ namespace Base {
 		memcpy(fh.name, fn, size);
 
 		fh.fs = NULL;
-		if(mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
-				fh.fs = new WriteFileStream(fh.name, false, true);
-			}
-		} else if((mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name) == 0) {
-				fh.fs = new FileStream(fh.name);
-			}
-		} else {
-			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
-		}
-		if(fh.fs) if(!fh.fs->isOpen()) {
-			delete fh.fs;
-			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
+		TEST_LTZ(openFile(fh));
 		FileHandle* fhp = fhs.extract();
 		CLEANUPSTACK_PUSH(fhp);
 		gFileHandles.insert(gFileNextHandle, fhp);
@@ -860,7 +865,64 @@ namespace Base {
 	}
 
 	int Syscall::maFileRename(MAHandle file, const char* newName) {
-		return -1;
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+
+		// close the file while we're renaming.
+		bool wasOpen;
+		int oldPos;
+		if(fh.fs)
+			wasOpen = fh.fs->isOpen();
+		else
+			wasOpen = false;
+		if(wasOpen) {
+			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+			delete fh.fs;
+			fh.fs = NULL;
+		}
+
+		bool hasPath = false;
+#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(FILESYSTEM_CHROOT)
+		// If fh.name and newName are on different file systems,
+		// forbid the operation.
+		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
+			return MA_FERR_RENAME_FILESYSTEM;
+		}
+		if(newName[1] == ':' || newName[0] == '/')
+			hasPath = true;
+#else
+		if(newName[0] == '/')
+			hasPath = true;
+#endif
+		std::string nn;
+		if(!hasPath) {
+			int oldPathLen = 0;
+			const char* lastSlash = strrchr(fh.name, '/');
+			if(lastSlash != NULL) {
+				oldPathLen = (lastSlash - fh.name) + 1;
+			}
+			if(oldPathLen > 0) {
+				nn.append(fh.name, oldPathLen);
+				nn.append(newName);
+				newName = nn.c_str();
+			}
+		}
+		int res = rename(fh.name, newName);
+		if(res != 0) {
+			if(errno == EXDEV)
+				return MA_FERR_RENAME_FILESYSTEM;
+			else if(errno == EACCES)
+				return MA_FERR_FORBIDDEN;
+			else
+				return MA_FERR_GENERIC;
+		}
+		fh.name.resize(strlen(newName) + 1);
+		strcpy(fh.name, newName);
+
+		if(!wasOpen)
+			return 0;
+		TEST_LTZ(openFile(fh));
+		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+		return 0;
 	}
 
 	int Syscall::maFileDate(MAHandle file) {
@@ -896,20 +958,7 @@ namespace Base {
 		if(res < 0) FILE_FAIL(MA_FERR_GENERIC);
 		if(close(fd) < 0) FILE_FAIL(MA_FERR_GENERIC);
 
-		// todo: share code with maFileOpen().
-		if(fh.mode == MA_ACCESS_READ_WRITE) {
-			fh.fs = new WriteFileStream(fh.name);
-		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			fh.fs = new FileStream(fh.name);
-		} else {
-			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
-		}
-		if(fh.fs) if(!fh.fs->isOpen()) {
-			delete fh.fs;
-			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
+		TEST_LTZ(openFile(fh));
 		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
