@@ -1,0 +1,1 @@
+r1717: Tested & confirmed - C++ output as well as the IL output produce the same output as the trunk version (r1716) of pipe-tool
