@@ -662,10 +662,8 @@ namespace Base {
 
 
 	static void MAUpdateScreen() {
-			printf("Kalle Anka 1");
 #ifndef MOBILEAUTHOR
 		if(sSkin) {
-			printf("Kalle Anka 2");
 			sSkin->drawScreen();
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		} else {
@@ -854,7 +852,6 @@ namespace Base {
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				printf("Mousedown");
 				if(event.button.button == 1)
 				{
 					if(sSkin)
@@ -2034,7 +2031,7 @@ namespace Base {
 
 		// WebView IOCtls
 		case maIOCtl_maWebViewOpen:
-            return webViewOpen();
+            return webViewOpen(sSkin->mProfile->mScreenWidth, sSkin->mProfile->mScreenHeight);
 		case maIOCtl_maWebViewClose:
             return webViewClose();
 		case maIOCtl_maWebViewSetHTML:

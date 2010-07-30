@@ -150,7 +150,8 @@ ULONG STDMETHODCALLTYPE WinLauncherWebHost::Release(void)
 	return newRef;
 }
 
-int webViewOpen()
+
+int webViewOpen(int width, int height)
 {
     // Init COM.
     OleInitialize(NULL);
@@ -216,7 +217,8 @@ int webViewOpen()
 	
     RECT rcClient;
     GetClientRect(hMainWnd, &rcClient);
-    MoveWindow(gViewWindow, 0, 0, rcClient.right - 50, rcClient.bottom - 100, TRUE);
+    //MoveWindow(gViewWindow, 0, 0, rcClient.right - 50, rcClient.bottom - 100, TRUE);
+	MoveWindow(gViewWindow, 24, 24, width, height, TRUE);
 
     ShowWindow(gViewWindow, SW_SHOW);
     UpdateWindow(gViewWindow);
@@ -242,6 +244,13 @@ int webViewClose()
 
 int webViewSetHTML(int a)
 {
+	/*
+	char *  data;
+    
+    // Get pointer to memory
+    data = (char*)SYSCALL_THIS->GetValidatedMemRange( a, 16 );
+	*/
+
 	return 1;
 }
 

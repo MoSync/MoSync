@@ -58,7 +58,7 @@ namespace MoRE {
 		virtual void keyReleased(int mak) = 0;
 
 		void setListener(Listener* listener) { mListener = listener; }
-	protected:
+	public:
 		const DeviceProfile* mProfile;
 		Listener* mListener;
 	};

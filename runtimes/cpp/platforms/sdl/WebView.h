@@ -9,7 +9,7 @@ enum WebViewStatusCode
    WebViewScriptError = 3
 };
 
-int webViewOpen();
+int webViewOpen(int width, int height);
 int webViewClose();
 int webViewSetHTML(int a);
 int webViewEvaluateScript(int a);
