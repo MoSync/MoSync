@@ -19,17 +19,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
+#include <MAUtil/FileLister.h>
 #include <IX_FILE.h>
 
 #define TEST(func) do { int _res = (func); if(_res < 0) { printf("Fail %i @ %i\n", _res, __LINE__); return; } } while(0)
 
-static void checkSpace() {
-	MAHandle file = maFileOpen("/", MA_ACCESS_READ);
+static void checkSpace(const char* path) {
+	printf("%s\n", path);
+	MAHandle file = maFileOpen(path, MA_ACCESS_READ);
 	TEST(file);
 	int total = maFileTotalSpace(file);
 	int avail = maFileAvailableSpace(file);
-	printf("total: %i\n", total);
-	printf("avail: %i\n", avail);
+	printf("%i / %i\n", avail, total);
+}
+
+static void checkSpaces() {
+	FileLister fl;
+	fl.start("");
+	MAUtil::String name;
+	int res;
+	while((res = fl.next(name)) > 0) {
+		checkSpace(name.c_str());
+	}
+	if(res < 0) {
+		printf("FileList error %i\n", res);
+	}
 }
 
 extern "C" int MAMain() {
@@ -37,7 +51,7 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 	printf("Hello World!\n");
 
-	checkSpace();
+	checkSpaces();
 
 	FREEZE;
 }

@@ -827,7 +827,6 @@ namespace Base {
 		_diskfree_t df;
 		unsigned drive;
 #if FILESYSTEM_CHROOT
-		DEBUG_ASSERT(fh.name[0] == '/');
 		drive = 0;
 #else
 		drive = (fh.name[0] - 'A') + 1;

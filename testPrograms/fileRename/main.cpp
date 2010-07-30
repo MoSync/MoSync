@@ -99,7 +99,8 @@ static bool writeAFile(const MAUtil::String& dir) {
 				return true;
 			//if(writeAFile(dir + file))
 				//return true;
-			writeAFile(dir + file);
+			if(writeAFile(dir + file))
+				return true;
 		}
 	}
 }
