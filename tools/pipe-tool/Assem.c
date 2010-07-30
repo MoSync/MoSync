@@ -414,6 +414,8 @@ void SetAsmCDtors()
 	
 	ArrayClear(&g_CtorArray);
 	ArrayClear(&g_DtorArray);
+	ArrayClear(&g_CtorArrayImm);
+	ArrayClear(&g_DtorArrayImm);
 }
 
 //****************************************
@@ -744,8 +746,9 @@ void EmitCDtors()
 		
 	for (n=0;n<g_CtorCount;n++)
 	{
+		int imm = ArrayGet(&g_CtorArrayImm, n);
 		ref = (SYMBOL *) ArrayGet(&g_CtorArray, n);
-		WriteLongRef(ref->Value, ref);
+		WriteLongRef(imm, ref);
 	}
 
 	WriteLong(0);							// Terminate table
@@ -760,8 +763,9 @@ void EmitCDtors()
 		
 	for (n=0;n<g_DtorCount;n++)
 	{
+		int imm = ArrayGet(&g_DtorArrayImm, n);
 		ref = (SYMBOL *) ArrayGet(&g_DtorArray, n);
-		WriteLongRef(ref->Value, ref);
+		WriteLongRef(imm, ref);
 	}
 
 	WriteLong(0);							// Terminate table
