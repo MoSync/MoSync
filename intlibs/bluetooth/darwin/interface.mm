@@ -16,40 +16,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * File:   interface.cpp
- * Author: Ali Mosavian
+ * File:   interface.mm
+ * Author: Romain Chalant
  *
  * Created on July 29, 2009
  */
 #include <cstdlib>
-//#include <bluetooth/bluetooth.h>
-
 #include "../config_bluetooth.h"
 #include "../btinit.h"
 #include "../discovery.h"
-//#include "bluetoothbluez.hpp"
 #include "helpers/helpers.h"
-
-
-//#import <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #include "DiscoveryCocoa.h"
 
-//#include <Foundation/Foundation.h>
-//#include <String>
 
 using namespace Bluetooth;
 
 /**
  * Globals
  */
-//static BlueZ::BluetoothBluez* gInstance = NULL;
-static DiscoveryCocoa *dis = NULL;
+static DiscoveryCocoa *gDiscovery = NULL;
 
 
 
 namespace Bluetooth
 {
-    BluetoothStack gBluetoothStack = BTSTACK_BLUEZ;
 
 
 /**
@@ -58,8 +48,7 @@ namespace Bluetooth
  */
 void MABtInit ( void )
 {
-    //MAASSERT( gInstance == NULL );
-    //gInstance = new BlueZ::BluetoothBluez( );
+	gDiscovery = [[DiscoveryCocoa alloc] init];
 }
 
 /**
@@ -67,14 +56,14 @@ void MABtInit ( void )
  *
  */
 void MABtClose ( void )
-{
-    /*if ( gInstance == NULL )
-    {
-        LOGBT( "gInstance is NULL" );
-        return;
-    }
-
-    delete gInstance;*/
+{	
+	if ( gDiscovery == NULL )
+	 {
+	 LOGBT( "gDiscovery is NULL" );
+	 return;
+	 }
+	 
+	 [gDiscovery release];
 }
 
 
@@ -102,12 +91,8 @@ int getLocalAddress ( MABtAddr& a )
  */
 int maBtDiscoveryState ( void )
 {
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getState( );*/
-	
-	return 0;
-
-	
+	MAASSERT( gDiscovery != NULL );
+	return gDiscovery._status;	
 }
 
 
@@ -123,9 +108,18 @@ int maBtDiscoveryState ( void )
  */
 int maBtCancelDiscovery ( void )
 {
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->cancelDeviceDiscovery( );*/
-	return 0;
+	MAASSERT( gDiscovery != NULL );
+	if (gDiscovery == NULL) {
+		return 0;
+	}
+	else if (gDiscovery._status == 0) {
+		[gDiscovery stopInquiry];
+		return 1;
+	}
+	else {
+		[gDiscovery stopInquiry];
+		return 0;
+	}
 }
 
 
@@ -142,48 +136,16 @@ int maBtCancelDiscovery ( void )
  */
 int maBtStartDeviceDiscovery ( MABtCallback cb,
                                bool n )
-{
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->startDiscovery( cb, n );*/
-	/*IOReturn	status;
-	
-	//[self	stopInquiry];
-	
-	IOBluetoothDeviceInquiry *		_inquiry;
-	BOOL							_busy;
-	
-	_inquiry = [IOBluetoothDeviceInquiry	inquiryWithDelegate:Discovery];
-	
-	status = [_inquiry	start];
-	if( status == kIOReturnSuccess )
-	{
-		[_inquiry	retain];
-		//[_progressBar startAnimation:self];
-		//[_searchButton 	setTitle:@"Stop"];
-		
-		_busy = TRUE;
-	}
-	else
-	{
-		//[_messageText setObjectValue:@"Idle (Search Failed)."];
-		return 1;
-	}*/
-	
-	dis = [[DiscoveryCocoa alloc] init];
-	
-	IOReturn status = [dis startInquiry];
-	
+{	
+	MAASSERT( gDiscovery != NULL );
+	IOReturn status = [gDiscovery startInquiry:n];
 	if (status == kIOReturnSuccess) {
+		gDiscovery._callback = cb;
 		return 0;
 	}
 	else {
 		return -1;
 	}
-
-	
-	//NSString *str = [dev getAddressString];
-	
-	
 }
 
 
@@ -195,30 +157,33 @@ int maBtStartDeviceDiscovery ( MABtCallback cb,
  * @return 1 if there was a device, 0 if not
  */
 int maBtGetNewDevice ( MABtDevice* d )
-{
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getNextDevice( d );*/
-	//IOBluetoothDevice *dev = [dis._foundDevices objectAtIndex:0];
-	//NSString *str = [dev getAddressString];
-	//const char *cstr = new char[str.length+1];
-	//const char* cstr;
-	//cstr = [str cStringUsingEncoding:NSASCIIStringEncoding];
-	
-	
-	//strcpy(d->name, cstr);
-/*	IOBluetoothDevice *dev = [dis._foundDevices objectAtIndex:0];
-	const BluetoothDeviceAddress * addressPtr = [dev getAddress];
-	if (addressPtr) {
-		return addressPtr->data[0];
+{	
+	if ( [gDiscovery._foundDevices count] != 0 ) {
+		
+		IOBluetoothDevice *dev = [gDiscovery._foundDevices objectAtIndex:0];
+		const BluetoothDeviceAddress * addressPtr = [dev getAddress];
+		if (addressPtr) {
+			d->address.a[0] = addressPtr->data[0];
+			d->address.a[1] = addressPtr->data[1];
+			d->address.a[2] = addressPtr->data[2];
+			d->address.a[3] = addressPtr->data[3];
+			d->address.a[4] = addressPtr->data[4];
+			d->address.a[5] = addressPtr->data[5];
+			
+			NSString* deviceNameString	= [dev getNameOrAddress];
+			const char *cstr = new char[deviceNameString.length+1];
+			cstr = [deviceNameString cStringUsingEncoding:NSASCIIStringEncoding];
+			if (cstr == NULL) cstr = "NO NAME";
+			d->actualNameLength=deviceNameString.length;
+			strcpy(d->name, cstr);
+			delete(cstr);
+		}
+		[gDiscovery._foundDevices removeObjectAtIndex:0];
+		return 1;
 	}
 	else {
-		return -1;
-	}*/
-	d->actualNameLength = 6;
-	return 0;
-
-
-	
+		return 0;
+	}
 }
 
 

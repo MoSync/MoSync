@@ -1722,6 +1722,9 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
+		* Note that you need to fill the MABtDevice structure before passing it
+		* as a parameter, otherwise you will get memory access problems.
+		*
 		* \returns 1 if successful, zero if the queue is empty.
 		*/
 		int maBtGetNewDevice(out MABtDevice d);
