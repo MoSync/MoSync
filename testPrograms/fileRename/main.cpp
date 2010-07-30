@@ -149,7 +149,10 @@ static bool tryToWrite(const MAUtil::String& dir) {
 	static const char data[] = "asfihu89ph4nma98fjioan9phadf89h239hdad9h89p\n";
 	printf("Writing %lu bytes...\n", sizeof(data));
 	res = maFileWrite(file, data, sizeof(data));
-	MAASSERT(res == 0);
+	if(res != 0) {
+		printf("Write error %i\n", res);
+		return false;
+	}
 
 	printf("Checking for old file...\n");
 	if(!deleteIfExist(dir + "test2.txt"))
@@ -159,7 +162,7 @@ static bool tryToWrite(const MAUtil::String& dir) {
 	res = maFileRename(file, "test2.txt");
 	if(res != 0) {
 		printf("Rename error %i\n", res);
-		BIG_PHAT_ERROR;
+		return false;
 	}
 	
 	printf("Closing...\n");
@@ -173,5 +176,6 @@ extern "C" int MAMain() {
 	gConsoleLogging = 1;
 	printf("Hello World!\n");
 	writeAFile("");
+	printf("Done. Press 0 to exit.\n");
 	FREEZE;
 }
