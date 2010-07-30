@@ -259,6 +259,14 @@ int main(int argc,char *argv[])
 			continue;
 		}
 
+		if (Token("meta="))
+		{
+			g_ArgWriteMeta = 1;
+			GetCmdString();
+			strcpy(g_MetaFileName, g_Name);
+			continue;
+		}
+
 		if (Token("no-verify"))
 		{
 			g_ArgVerifierOff = 1;

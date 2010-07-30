@@ -137,6 +137,20 @@ void AsmMain()
 	if (g_ArgSLD)
 		DumpIPTrans();
 
+	// Dump meta data for recompiler
+	if ( g_ArgWriteMeta )
+	{
+		FILE *fout = fopen( g_MetaFileName, "w" );
+		if ( fout == NULL )
+			printf( "Failed to meta data file\n" );		
+		else
+		{
+			DumpMetaData( fout );
+			fclose( fout );
+		}
+	}
+
+
 //	PerfEnd();
 
 	t = GetTickCount() - t;

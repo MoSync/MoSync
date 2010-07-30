@@ -707,9 +707,11 @@ decset(int g_ArgDebugRebuild, 0)
 decset(int g_ArgSkipElim, 0)
 decset(int g_ArgSLD, 0)
 decset(int g_ArgUseStabs, 0)
+decset(int g_ArgWriteMeta, 0)
 
 dec(char g_SldName[256])
 dec(char g_StabsName[256])
+dec(char g_MetaFileName[256])
 
 decset(int g_ArgUseMasterDump, 0)
 
