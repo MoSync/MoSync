@@ -69,20 +69,21 @@ void AsmMain()
 	
 	g_Final_Pass = 0;
 
-	for (p=1;p<16;p++)
+	for (p=1;p<32;p++)
 	{
 		printf("pass %i. %i known symbols.\n", p, CountUsedSymbols());
 		if (AsmPass(p))
 			break;
 	}
 
+	if (p == 32)
+		Error(Error_Fatal, "Code did'nt settle correctly (Please report this)");
+
 //	printf("final pass. %i known symbols.\n", CountUsedSymbols());
 
 	g_Final_Pass = 1;
 
 	AsmPass(p+1);
-
-//	printf("Symbols used %d\n",CountUsedSymbols());
 
 //-------------------------
 //  Do dependency search
@@ -167,6 +168,8 @@ void AsmMain()
 //		Do one pass of assembly
 //****************************************
 
+extern int g_Last_Instruction;
+
 int AsmPass(int thisPass)
 {
 	// Set the pass number
@@ -192,14 +195,23 @@ int AsmPass(int thisPass)
 		// Clear access arrays
 
 		ArrayClear(&g_CallArray);
-		ArrayClear(&g_DataArray);
-		ArrayClear(&g_DataAlignArray);
-		ArrayClear(&g_DataTypeArray);
 		ArrayClear(&g_LabelArray);
 		ArrayClear(&g_CodeLabelArray);
+
+		ArrayClear(&g_DataArray);
 		ArrayClear(&g_DataAccessArray);
+		ArrayClear(&g_DataTypeArray);
 		ArrayClear(&g_DataMixArray);
+
 		ArrayClear(&g_PaddingArray);
+		ArrayClear(&g_DataAlignArray);
+
+#if 0	// Not Needed
+		ArrayClear(&g_CtorArray);
+		ArrayClear(&g_DtorArray);
+		ArrayClear(&g_CtorArrayImm);
+		ArrayClear(&g_DtorArrayImm);
+#endif
 
 		ArrayClear(&g_SLD_Line_Array);
 		ArrayClear(&g_SLD_File_Array);
@@ -207,6 +219,7 @@ int AsmPass(int thisPass)
 		// Sort constant pool
 
 		SortVarPool();
+
 		//printf("Pass %d VarPool Hash %x\n",thisPass,HashVarPool());
 	}
 
@@ -240,16 +253,16 @@ int AsmPass(int thisPass)
 
 	if (g_INFO)
 	{
-		printf("Sections: Code=%x : Data=%d : BSS=%x (Final %d)\n",g_CodeIP, g_DataIP, g_BssIP, g_Final_Pass);
+		printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",g_CodeIP, g_DataIP, g_BssIP, g_CtorCount, g_DtorCount, g_Final_Pass);
+
+		{
+			char buf[2560];
+			buf[0] = 0;
+			DisassembleFromSource(g_Last_Instruction, buf);
+			printf("%d: %s\n", g_Last_Instruction, buf);
+		}
+
 	}
-
-	// Sort constant pool
-
-//	if (!Final_Pass)
-//		SortElimVarPool();
-
-//	printf("Pass %d VarPool Hash %x\n",thisPass,HashVarPool());
-
 
 	// Check if the code is ready
 
@@ -308,12 +321,6 @@ void Assemble()
 		if (Directives())
 			continue;
 	
-/*		if (*g_FilePtr == 0)
-		{
-			Error(Error_Fatal, "File terminates with null character\n");
-			break;
-		}
-*/	
 		if (TestAsmLabel())
 		{
 			GetAsmName();
@@ -349,18 +356,7 @@ void Assemble()
 //****************************************
 
 void AsmAllocMem()
-{
-
-//!	ConstMem = NewPtrClear( (int) MAX_CONST_MEM);
-//!	DataMem  = NewPtrClear( (int) MAX_DATA_MEM);
-//!	CodeMem  = NewPtrClear( (int) MAX_CODE_MEM);
-//!	ResMem   = NewPtrClear( (int) MAX_RES_MEM);
-	
-//!	if (ConstMem == 0)	Error(Error_Fatal, "can't allocate ConstMem");
-//!	if (DataMem == 0)	Error(Error_Fatal, "can't allocate DataMem");
-//!	if (CodeMem == 0)	Error(Error_Fatal, "can't allocate CodeMem");
-//!	if (ResMem == 0)	Error(Error_Fatal, "can't allocate ResMem");
-	
+{	
 }
 
 //****************************************
@@ -369,15 +365,6 @@ void AsmAllocMem()
 
 void AsmCheckBounds()
 {
-//!	if (DataPtr > (DataMem + (MAX_DATA_MEM - MEM_BOUNDS_WARN)))
-//!		Error(Error_Fatal, "DataMem is low %d",DataPtr - DataMem);
-	
-//!	if (CodePtr > (CodeMem + (MAX_CODE_MEM - MEM_BOUNDS_WARN)))
-//!		Error(Error_Fatal, "CodeMem is low %d",CodePtr - CodeMem);
-
-//!	if (ResPtr > (ResMem + (MAX_RES_MEM - MEM_BOUNDS_WARN)))
-//!		Error(Error_Fatal, "ResMem is  low %d",ResPtr - ResMem);
-
 	return;
 
 }
@@ -390,10 +377,7 @@ void SetAsmPtrs()
 {
 	g_LocalScope = 1;
 
-//!	DataPtr = DataMem;
-//!	CodePtr = CodeMem;
-
-	g_CodeIP = 0;
+	g_CodeIP = 1;			// !! New Code starts at 1
 	g_DataIP = 4;			// Avoid using location 0
 	g_BssIP = 0;
 
@@ -424,17 +408,6 @@ void SetAsmCDtors()
 
 void AsmDisposeMem()
 {
-//!	if (ConstMem)
-//!		DisposePtr(ConstMem);
-
-//!	if (DataMem)
-//!		DisposePtr(DataMem);
-
-//!	if (CodeMem)
-//!		DisposePtr(CodeMem);
-
-//!	if (ResMem)
-//!		DisposePtr(ResMem);
 }
 
 //****************************************
@@ -550,22 +523,12 @@ void SetCurrentFunction(SYMBOL * Sym)
 			
 			g_CurrentFunction->EndIP = g_CodeIP - 1;
 
-//#ifdef INCLUDE_JAVAGEN
-//			if (g_JavaPass)
-//				JavaGen_FunctionEnd(g_CurrentFunction->Name, g_CurrentFunction->Value);
-//#endif
-
 			// Reset function
 			g_CurrentFunction = 0;
 		}
 
 		return;		
 	}
-
-//#ifdef INCLUDE_JAVAGEN
-//	if (g_JavaPass)
-//		JavaGen_FunctionBegin(Sym->Name, Sym->Value);
-//#endif
 
 	g_CurrentFunction = Sym;
 	return;
@@ -641,13 +604,6 @@ void DefineLabel(int isFunction)
 			SetCurrentFunction(Sym);
 			
 		// Dont redefine scope
-
-//#ifdef INCLUDE_JAVAGEN
-//		if (!isFunction)
-//			if (g_JavaPass)
-//				JavaGen_Label(g_Name, Sym->Value, Section);
-//#endif
-
 		// Write ref to data label array
 
 		if (g_Section == SECT_code)

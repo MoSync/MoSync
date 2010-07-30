@@ -85,7 +85,7 @@ void InitFiles() {
 		f = fopen(fileName, "rb");
 		if(f)
 		{
-			size_t i, dataSize, line;
+			size_t i, dataSize, line, res;
 			fseek(f, 0, SEEK_END);
 			dataSize = ftell(f);
 
@@ -93,7 +93,11 @@ void InitFiles() {
 
 			fileInfo[file].fileData[dataSize] = 0;
 			fseek(f, 0, SEEK_SET);
-			fread(fileInfo[file].fileData, 1, dataSize, f);
+			res = fread(fileInfo[file].fileData, 1, dataSize, f);
+			if(res != dataSize) {
+				printf("Error reading file '%s'\n", fileName);
+				exit(1);
+			}
 			line = 0;
 			for(i = 0; i < dataSize; i++) {
 				if(fileInfo[file].fileData[i] == '\n') line++;
@@ -852,7 +856,7 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 void CppEmitDiv(OpcodeInfo *theOp, int imm)
 {
 	if ((theOp->rs == 0) || (theOp->imm == 0))
-		printf("");
+		printf(" ");
 	
 	if (imm)
 	{

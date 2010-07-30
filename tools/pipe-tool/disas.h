@@ -69,7 +69,7 @@ typedef struct
 	int len;
 } DisasInfo;
 
-void DisasGenReg();
+void DisasGenReg(void);
 void DisasInit(char *codemem, int *constpool);
 const uchar * DisasDecode(DisasInfo *thisOpcode, const uchar *code_ip);
 int DisasDecodeIP(DisasInfo *thisOpcode, int code_ip);
