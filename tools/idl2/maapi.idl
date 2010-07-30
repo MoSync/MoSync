@@ -1799,7 +1799,15 @@ interface MAAPI {
 		*/
 		int maWlanStartDiscovery();
 
-		/// Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
+		/**
+		* Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
+		*
+		* If \a dst.nameBufSize is less than the return value, the name is not copied.
+		*
+		* The IEEE 802.11 WLAN standard specifies that a name may be up to 32 characters long.
+		* Your buffer should therefore be at least 33 bytes long,
+		* in order to contain a maximum-length name and terminating zero.
+		*/
 		int maWlanGetNewAp(out MAWlanAp dst);
 #endif	//IX_WLAN
 
