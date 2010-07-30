@@ -284,6 +284,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\FuncAnalyse.c"
+			>
+		</File>
+		<File
 			RelativePath=".\InstTable.h"
 			>
 		</File>

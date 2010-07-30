@@ -921,7 +921,7 @@ void RebuildJavaProlog(SYMBOL *sym)
 
 	// Find registers used in function
 
-	FunctionRegAnalyse(sym);
+	//FunctionRegAnalyse(sym);
 
 
 	reg_used = FunctionRegUsage(sym);
@@ -1495,7 +1495,7 @@ void RebuildJava_StartUp()
 
 	// emit the bin file
 	out = fopen("data_section.bin", "wb");
-	ArrayWriteFP(&g_DataMemArray, out, g_MaxDataIP);
+	ArrayWriteFP(&g_DataMemArray, out, g_MaxDataIP); // !! Error here should be DataIP !!
 	fclose(out);
 
 	ep	= GetGlobalSym(g_Code_EntryPoint);
