@@ -311,6 +311,7 @@ void DisposeMasterAlloc()
 		}
 	}
 
+//	printf("allocCount = %d : allocSP = %d\n", allocCount ,allocSP);
 }
 
 //***************************************

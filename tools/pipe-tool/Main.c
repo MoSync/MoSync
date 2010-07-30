@@ -159,6 +159,7 @@ int main(int argc,char *argv[])
 	g_ArgBuild = 0;
 	g_ArgJavaNative = 0;
 	g_ArgBrewGen = 0;
+	g_ArgCppGen = 0;
 	g_ArgSLD = 0;
 	g_ArgDebugRebuild = 0;
 	g_ArgUseStabs = 0;
@@ -445,6 +446,17 @@ int main(int argc,char *argv[])
 			continue;
 		}
 */
+
+		if (Token("cpp"))
+		{
+			g_ArgCppGen = 1;
+			g_ArgConstOpt = 0;
+			g_Do_Elimination = 1;
+
+			dbprintf("Native cpp build on\n");
+			continue;
+		}
+
 		if (Token("s"))
 		{
 			GetCmdString();

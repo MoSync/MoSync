@@ -20,7 +20,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // 						   		Written by A.R.Hartley
 //*********************************************************************************************
 
+#ifdef __MWERKS__
+#define _mkdir(xxx) system("mkdir " ## xxx);
+#else
 #include "helpers/mkdir.h"
+#endif
 
 #include "compile.h"
 
@@ -36,10 +40,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define REGBIT(v)		(1 << v)
 #define REGUSED(v, reg) (reg & REGBIT(v))
 
-static int ThisFunctionRegs;			// Register usage for current function
-static int ThisFunctionRetType;
-static int ThisFunctionExit;			// True on last instruction
-static int ReturnCount;
+static int g_ThisFunctionRegs;			// Register usage for current function
+static int g_ThisFunctionRetType;
+static int g_ThisFunctionExit;			// True on last instruction
+static int g_ReturnCount;
 
 #define STATIC_CODE_DOT "StaticCode."
 #define SP_STR STATIC_CODE_DOT "sp"
@@ -49,16 +53,16 @@ static int ReturnCount;
 
 #define SYSCALLDOT "StaticCode.syscall."
 
-static char *java_reg[] = {"zr",SP_STR,"rt","fr","d0","d1","d2","d3",
+static char *g_java_reg[] = {"zr",SP_STR,"rt","fr","d0","d1","d2","d3",
 					"d4","d5","d6","d7","i0","i1","i2","i3",
 					"r0","r1","r2","r3","r4","r5","r6","r7",
 					"r8","r9","r10","r11","r12","r13","r14","r15"
 				   };
 
-static char JavaSyscallUsed[1024];
+static char g_JavaSyscallUsed[1024];
 
-int function_registers_used;		// reg bits used by function
-int register_initialized;			// if a register has been initialized
+int g_function_registers_used;		// reg bits used by function
+int g_register_initialized;			// if a register has been initialized
 
 //****************************************
 //			 
@@ -78,18 +82,18 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 	switch (theOp->op)
 	{
 		case _PUSH:
-			RebuildEmit("	//push %s,%d\n",java_reg[theOp->rd], theOp->rs);
+			RebuildEmit("	//push %s,%d\n",g_java_reg[theOp->rd], theOp->rs);
 
-			if (function_registers_used & (1 << REG_sp))
+			if (g_function_registers_used & (1 << REG_sp))
 			{
 				RebuildEmit("	" SP_STR " -= %d;\n",theOp->rs*4);
 			}
 		return 1;
 			
 		case _POP:
-			RebuildEmit("	//pop  %s,%d\n",java_reg[theOp->rd], theOp->rs);
+			RebuildEmit("	//pop  %s,%d\n",g_java_reg[theOp->rd], theOp->rs);
 
-			if (function_registers_used & (1 << REG_sp))
+			if (g_function_registers_used & (1 << REG_sp))
 			{
 				RebuildEmit("	" SP_STR " += %d;\n",theOp->rs*4);
 			}
@@ -114,7 +118,7 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 		break;
 
 		case _LDI:
-			RebuildEmit("	%s = 0x%x;", java_reg[theOp->rd], theOp->imm);			
+			RebuildEmit("	%s = 0x%x;", g_java_reg[theOp->rd], theOp->imm);			
 			SetRegInit(theOp->rd);
 		break;
 
@@ -123,9 +127,9 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 			SetRegInit(theOp->rd);
 
 			if (IsRegConst(theOp->rs))
-				RebuildEmit("	%s = 0x%x;", java_reg[theOp->rd], ConstRegValue(theOp->rs));
+				RebuildEmit("	%s = 0x%x;", g_java_reg[theOp->rd], ConstRegValue(theOp->rs));
 			else
-				RebuildEmit("	%s = %s;", java_reg[theOp->rd], java_reg[theOp->rs]);		
+				RebuildEmit("	%s = %s;", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);		
 		}
 		break;
 
@@ -222,21 +226,21 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 		break;
 
 		case _NOT:
-			RebuildEmit("	%s = ~%s;", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = ~%s;", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 			SetRegInit(theOp->rd);
 		break;
 
 		case _NEG:
-			RebuildEmit("	%s = -%s;", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = -%s;", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 			SetRegInit(theOp->rd);
 		break;
 
 		case _RET:
 		{
-			if (ThisFunctionExit == 0)	// Don't output a return jump on last instruction
+			if (g_ThisFunctionExit == 0)	// Don't output a return jump on last instruction
 			{
 				RebuildEmit("	ms.goto_0();	// return");
-				ReturnCount++;
+				g_ReturnCount++;
 			}
 		}
 		break;
@@ -319,11 +323,11 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 		break;
 
 		case _XB:
-			RebuildEmit("	%s = (int)((byte) %s);", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = (int)((byte) %s);", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 		break;
 
 		case _XH:
-			RebuildEmit("	%s = (int)((short) %s);", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = (int)((short) %s);", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 		break;
 
 		default:
@@ -341,9 +345,9 @@ int RebuildJavaInst(OpcodeInfo *theOp)
 //
 //****************************************
 
-void JavaDecodeReturn()
+void JavaDecodeReturn(int emit_r15)
 {
-	switch(ThisFunctionRetType)
+	switch(g_ThisFunctionRetType)
 	{
 		case RET_null:
 		RebuildEmit("	return ?; // Error report to MobileSorcery");
@@ -359,7 +363,10 @@ void JavaDecodeReturn()
 		break;
 
 		case RET_double:
-		RebuildEmit("	" DBL_HIGH " = r15;\n");
+
+		if (emit_r15)
+			RebuildEmit("	" DBL_HIGH " = r15;\n");
+
 		RebuildEmit("	return r14;");
 		break;
 	}
@@ -381,7 +388,7 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 		return;
 	}
 
-	JavaSyscallUsed[theOp->imm]++;
+	g_JavaSyscallUsed[theOp->imm]++;
 
 	param_count = theSysCall->Params;
 
@@ -402,7 +409,7 @@ void JavaDecodeSysCall(OpcodeInfo *theOp)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("%s", java_reg[REG_i0 + n]);
+		RebuildEmit("%s", g_java_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -428,7 +435,7 @@ void JavaForceSysCallUsed(char *name)
 	if (!sym)
 		return;
 
-	JavaSyscallUsed[sym->Value]++;
+	g_JavaSyscallUsed[sym->Value]++;
 }
 
 //****************************************
@@ -445,34 +452,34 @@ void Java_LoadMem(OpcodeInfo *theOp, char *str)
 
 		if (theOp->rs == 0)
 		{
-			RebuildEmit("	%s = " MEM_DS "[0x%x];", java_reg[theOp->rd], theOp->imm >> 2);
+			RebuildEmit("	%s = " MEM_DS "[0x%x];", g_java_reg[theOp->rd], theOp->imm >> 2);
 			return;
 		}
 
 		if (theOp->imm == 0)
 		{
-			RebuildEmit("	%s = " MEM_DS "[%s >> 2];", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	%s = " MEM_DS "[%s >> 2];", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 			return;
 		}
 
-		RebuildEmit("	%s = " MEM_DS "[(%s+0x%x) >> 2];", java_reg[theOp->rd], java_reg[theOp->rs], theOp->imm);
+		RebuildEmit("	%s = " MEM_DS "[(%s+0x%x) >> 2];", g_java_reg[theOp->rd], g_java_reg[theOp->rs], theOp->imm);
 		return;
 	}
 
 
 	if (theOp->rs == 0)
 	{
-		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(0x%x);", java_reg[theOp->rd], str, theOp->imm);
+		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(0x%x);", g_java_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s);", java_reg[theOp->rd], str, java_reg[theOp->rs]);
+		RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s);", g_java_reg[theOp->rd], str, g_java_reg[theOp->rs]);
 		return;
 	}
 
-	RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s+0x%x);", java_reg[theOp->rd], str, java_reg[theOp->rs], theOp->imm);
+	RebuildEmit("	%s = " STATIC_CODE_DOT "%s(%s+0x%x);", g_java_reg[theOp->rd], str, g_java_reg[theOp->rs], theOp->imm);
 }
 
 
@@ -490,17 +497,17 @@ void Java_StoreMem(OpcodeInfo *theOp, char *str)
 	{
 		if (theOp->rd == 0)
 		{
-			RebuildEmit("	" MEM_DS "[0x%x] = %s;", theOp->imm >> 2, java_reg[theOp->rs]);
+			RebuildEmit("	" MEM_DS "[0x%x] = %s;", theOp->imm >> 2, g_java_reg[theOp->rs]);
 			return;
 		}
 
 		if (theOp->imm == 0)
 		{
-			RebuildEmit("	" MEM_DS "[%s >> 2] = %s;", java_reg[theOp->rd], java_reg[theOp->rs]);
+			RebuildEmit("	" MEM_DS "[%s >> 2] = %s;", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 			return;
 		}
 
-		RebuildEmit("	" MEM_DS "[(%s+0x%x) >> 2] = %s;", java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
+		RebuildEmit("	" MEM_DS "[(%s+0x%x) >> 2] = %s;", g_java_reg[theOp->rd], theOp->imm, g_java_reg[theOp->rs]);
 		return;
 	}
 
@@ -508,17 +515,17 @@ void Java_StoreMem(OpcodeInfo *theOp, char *str)
 
 	if (theOp->rd == 0)
 	{
-		RebuildEmit("	" STATIC_CODE_DOT "%s(0x%x, %s);", str, theOp->imm, java_reg[theOp->rs]);
+		RebuildEmit("	" STATIC_CODE_DOT "%s(0x%x, %s);", str, theOp->imm, g_java_reg[theOp->rs]);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	" STATIC_CODE_DOT "%s(%s, %s);", str, java_reg[theOp->rd], java_reg[theOp->rs]);
+		RebuildEmit("	" STATIC_CODE_DOT "%s(%s, %s);", str, g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 		return;
 	}
 
-	RebuildEmit("	" STATIC_CODE_DOT "%s(%s+0x%x, %s);", str, java_reg[theOp->rd], theOp->imm, java_reg[theOp->rs]);
+	RebuildEmit("	" STATIC_CODE_DOT "%s(%s+0x%x, %s);", str, g_java_reg[theOp->rd], theOp->imm, g_java_reg[theOp->rs]);
 }
 
 
@@ -579,7 +586,7 @@ int JavaDecodeCall(OpcodeInfo *theOp)
 
 	ref = labref;
 
-	return JavaCallFunction(ref);
+	return JavaCallFunction(ref, 1);
 }
 
 //****************************************
@@ -588,12 +595,12 @@ int JavaDecodeCall(OpcodeInfo *theOp)
 
 void JavaDecodeCallReg(OpcodeInfo *theOp)
 {
-	int i0 = ThisFunctionRegs & REGBIT(REG_i0);
-	int i1 = ThisFunctionRegs & REGBIT(REG_i1);
-	int i2 = ThisFunctionRegs & REGBIT(REG_i2);
-	int i3 = ThisFunctionRegs & REGBIT(REG_i3);
+	int i0 = g_ThisFunctionRegs & REGBIT(REG_i0);
+	int i1 = g_ThisFunctionRegs & REGBIT(REG_i1);
+	int i2 = g_ThisFunctionRegs & REGBIT(REG_i2);
+	int i3 = g_ThisFunctionRegs & REGBIT(REG_i3);
 
-	RebuildEmit("	StaticCode.CallReg(%s", java_reg[theOp->rd]);
+	RebuildEmit("	StaticCode.CallReg(%s", g_java_reg[theOp->rd]);
 
 	if (i0 && IsRegInit(REG_i0))
 		RebuildEmit(", i0");
@@ -651,7 +658,7 @@ int JavaDecodeSwitch(OpcodeInfo *theOp)
 	def_ip	= GetDataMemLong(data_ip++);	// default case
 
 
-	RebuildEmit("	switch(%s)\n",  java_reg[theOp->rd]);
+	RebuildEmit("	switch(%s)\n",  g_java_reg[theOp->rd]);
 	RebuildEmit("	{\n");
 
 	for (i=0;i<len+1;i++)
@@ -679,32 +686,32 @@ int JavaDecodeSwitch(OpcodeInfo *theOp)
 //
 //****************************************
 
-char FunctionClassString[2048];
+char g_FunctionClassString[2048];
 
 char * GetFunctionClass(SYMBOL *ref)
 {
 	int theClassSegment;
 
-	FunctionClassString[0] = 0;
+	g_FunctionClassString[0] = 0;
 
 	theClassSegment = GET_CODE_SEGMENT(ref->Value);
 
-	sprintf(FunctionClassString, "Code%d.", theClassSegment);
+	sprintf(g_FunctionClassString, "Code%d.", theClassSegment);
 
-	return FunctionClassString;
+	return g_FunctionClassString;
 }
 
 //****************************************
 //
 //****************************************
 
-int JavaCallFunction(SYMBOL *ref)
+int JavaCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
-
+	int regs;
+	
 	JavaEmitReturnType(rettype);
-
 
 	RebuildEmit("%s%s_%d(", GetFunctionClass(ref), ref->Name, ref->LocalScope);
 
@@ -715,18 +722,30 @@ int JavaCallFunction(SYMBOL *ref)
 
 	need_comma = 0;
 
+	regs = g_function_registers_used;
+
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
-			RebuildEmit(", ");
+			RebuildEmit(", ");				
 
-		RebuildEmit("%s", java_reg[REG_i0 + n]);
+		if (!IsRegInit(REG_i0 + n))
+		{
+			printf("Rebuilder: Function '%s' parameter %d was not initialized\n",ref->Name, n);
+			//Error(Error_Fatal,"Function parameter %d was not initialized", n);
+			RebuildEmit("<Error>");
+		}
+		
+		RebuildEmit("%s", g_java_reg[REG_i0 + n]);
 		need_comma = 1;
+
+		// Make sure
+
 	}
 
 	RebuildEmit(");");
 
-	if (rettype == RET_double)
+	if (rettype == RET_double && emit_r15)
 	{
 		RebuildEmit("\n	r15 = " DBL_HIGH ";");
 		SetRegInit(REG_r15);
@@ -744,11 +763,11 @@ void JavaEmitArith(OpcodeInfo *theOp, char *str, int hasImm)
 
 	if (hasImm)
 	{
-		RebuildEmit("	%s %s= 0x%x;", java_reg[theOp->rd], str, theOp->imm);
+		RebuildEmit("	%s %s= 0x%x;", g_java_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
 
-	RebuildEmit("	%s %s= %s;", java_reg[theOp->rd], str, java_reg[theOp->rs]);
+	RebuildEmit("	%s %s= %s;", g_java_reg[theOp->rd], str, g_java_reg[theOp->rs]);
 	return;
 }
 
@@ -762,13 +781,17 @@ void JavaEmitDiv(OpcodeInfo *theOp, int hasImm)
 
 	if (hasImm)
 	{
-		RebuildEmit("	if (%s == 0) MoSync.BFE();\n", theOp->imm);		// Fails here
-		RebuildEmit("	%s /= %d;", java_reg[theOp->rd], theOp->imm);
+//		RebuildEmit("	if (%d == 0) MoSync.BFE();\n", theOp->imm);		// Fails here
+
+		if (theOp->imm == 0)
+			Warning("Division by zero in recompiler");
+		
+		RebuildEmit("	%s /= %d;", g_java_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
-		RebuildEmit("	if (%s == 0) MoSync.BFE();\n", java_reg[theOp->rs]);
-		RebuildEmit("	%s /= %s;", java_reg[theOp->rd], java_reg[theOp->rs]);
+		RebuildEmit("	if (%s == 0) MoSync.BFE();\n", g_java_reg[theOp->rs]);
+		RebuildEmit("	%s /= %s;", g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 	}
 }
 
@@ -784,12 +807,16 @@ void JavaEmitDivu(OpcodeInfo *theOp, int hasImm)
 	{
 		//Division by zero in java will cause an ArithmeticException, so we don't need this check. /Fredrik
 		//RebuildEmit("	if(%s == 0) MoSync.BFE();\n", java_reg[theOp->rs]); 		// Fails here
-		RebuildEmit("	%s = (int) (((long)(%s) & 0x0ffffffffL) / ((long)(%d) & 0x0ffffffffL));", java_reg[theOp->rd], java_reg[theOp->rd], theOp->imm);
+
+		if (theOp->imm == 0)
+			Warning("Division by zero in recompiler");
+
+		RebuildEmit("	%s = (int) (((long)(%s) & 0x0ffffffffL) / ((long)(%d) & 0x0ffffffffL));", g_java_reg[theOp->rd], g_java_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
 		//RebuildEmit("	if(%s == 0) MoSync.BFE();\n", java_reg[theOp->rs]);
-		RebuildEmit("	%s = (int) (((long)(%s) & 0x0ffffffffL) / ((long)(%s) & 0x0ffffffffL));", java_reg[theOp->rd], java_reg[theOp->rd], java_reg[theOp->rs]);
+		RebuildEmit("	%s = (int) (((long)(%s) & 0x0ffffffffL) / ((long)(%s) & 0x0ffffffffL));", g_java_reg[theOp->rd], g_java_reg[theOp->rd], g_java_reg[theOp->rs]);
 	}
 }
 
@@ -799,7 +826,7 @@ void JavaEmitDivu(OpcodeInfo *theOp, int hasImm)
 
 void JavaEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
 {
-	RebuildEmit("	if (%s %s %s) ",java_reg[theOp->rd], str, java_reg[theOp->rs]);
+	RebuildEmit("	if (%s %s %s) ",g_java_reg[theOp->rd], str, g_java_reg[theOp->rs]);
 	JavaDecodeLabel(theOp, "ms.goto_%d();");
 
 	unsign = 0;
@@ -869,12 +896,12 @@ void JavaEmitReturnDecl(int rettype)
 
 void SetRegInit(int reg)
 {
-	register_initialized |= (1 << reg);
+	g_register_initialized |= (1 << reg);
 }
 
 int IsRegInit(int reg)
 {
-	if (register_initialized & (1 << reg))
+	if (g_register_initialized & (1 << reg))
 		return 1;
 
 	return 0;
@@ -894,8 +921,12 @@ void RebuildJavaProlog(SYMBOL *sym)
 
 	// Find registers used in function
 
+	FunctionRegAnalyse(sym);
+
+
 	reg_used = FunctionRegUsage(sym);
 	reg_alloc = 0;
+	g_register_initialized = 0;
 
 	// Output helpful header
 
@@ -907,7 +938,7 @@ void RebuildJavaProlog(SYMBOL *sym)
 
 	RebuildEmit("public static " DYN_TYPE);
 
-	switch(ThisFunctionRetType)
+	switch(g_ThisFunctionRetType)
 	{
 		case RET_null:
 		RebuildEmit(" ?; // Error report to MobileSorcery\n");
@@ -938,18 +969,19 @@ void RebuildJavaProlog(SYMBOL *sym)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("int %s", java_reg[REG_i0 + n]);
+		RebuildEmit("int %s", g_java_reg[REG_i0 + n]);
 		need_comma = 1;
 
 		reg_alloc |=  1 << (REG_i0 + n);
-
+		
+		SetRegInit(REG_i0 + n);
 	}
 
 	RebuildEmit(") throws Exception\n{\n");
 
 	// Write local decl
 
-	function_registers_used = reg_used;
+	g_function_registers_used = reg_used;
 
 	// Remove regs that are already declared in func decl
 
@@ -979,12 +1011,14 @@ void RebuildJavaProlog(SYMBOL *sym)
 				if (need_comma)
 					RebuildEmit(", ");
 
-				RebuildEmit("%s", java_reg[n]);
+				RebuildEmit("%s", g_java_reg[n]);
 
 				// **FIXME** Cheat by preinitializing registers
 				RebuildEmit(" = 0");
 
 				need_comma = 1;
+				
+				SetRegInit(n);
 			}
 		}
 
@@ -992,11 +1026,9 @@ void RebuildJavaProlog(SYMBOL *sym)
 	}
 
 
-
 	// set registers that are initialized to default, SP
 
-	register_initialized = (1 << REG_sp);
-
+	SetRegInit(REG_sp);
 }
 
 //****************************************
@@ -1007,10 +1039,10 @@ void RebuildJavaEpilog(SYMBOL *sym)
 {
 //	ThisFunctionExit
 
-	if (ReturnCount > 0)
+	if (g_ReturnCount > 0)
 		RebuildEmit("ms.label_0();\n");
 
-	JavaDecodeReturn();
+	JavaDecodeReturn(1);
 	RebuildEmit("\n");
 
 	RebuildEmit("} // %s\n", sym->Name);
@@ -1035,16 +1067,16 @@ void RebuildJavaFunc(SYMBOL *sym)
 
 	// Say no returns yet
 
-	ReturnCount = 0;
+	g_ReturnCount = 0;
 
 	// Enumerate this functions labels
 
 	EnumerateFunctionLabels(sym);
 
-	ThisFunctionRegs = FunctionRegUsage(sym);
-	ThisFunctionRetType = sym->RetType;
+	g_ThisFunctionRegs = FunctionRegUsage(sym);
+	g_ThisFunctionRetType = sym->RetType;
 
-	if (ThisFunctionRegs == -1)
+	if (g_ThisFunctionRegs == -1)
 		return;
 
 	RebuildJavaProlog(sym);
@@ -1086,10 +1118,10 @@ void RebuildJavaFunc(SYMBOL *sym)
 
 		ip = DecodeOpcode(&thisOp, ip);
 
-		ThisFunctionExit = 0;
+		g_ThisFunctionExit = 0;
 
 		if (ip > ip_end)
-			ThisFunctionExit = 1;
+			g_ThisFunctionExit = 1;
 
 		RebuildJavaInst(&thisOp);
 
@@ -1169,7 +1201,7 @@ int FindLastCodeSegment()
 //
 //****************************************
 
-int CurrentCodeSegment;
+int g_CurrentCodeSegment;
 
 void RebuildJava_Code()
 {
@@ -1179,21 +1211,21 @@ void RebuildJava_Code()
 
 	int LastSeg = FindLastCodeSegment();
 
-	CurrentCodeSegment = GET_CODE_SEGMENT(0);
+	g_CurrentCodeSegment = GET_CODE_SEGMENT(0);
 
-	RebuildJava_BeginCodeSegment(CurrentCodeSegment);
+	RebuildJava_BeginCodeSegment(g_CurrentCodeSegment);
 
 //	for (n=0;n<g_CodeIP+1;n++)
 	for (n=0;n<g_CodeIP;n++)
 	{
 
-		if (CurrentCodeSegment != LastSeg)
-		if (GET_CODE_SEGMENT(n) != CurrentCodeSegment)
+		if (g_CurrentCodeSegment != LastSeg)
+		if (GET_CODE_SEGMENT(n) != g_CurrentCodeSegment)
 		{
-			RebuildJava_EndCodeSegment(CurrentCodeSegment);
+			RebuildJava_EndCodeSegment(g_CurrentCodeSegment);
 
-			CurrentCodeSegment = GET_CODE_SEGMENT(n);
-			RebuildJava_BeginCodeSegment(CurrentCodeSegment);
+			g_CurrentCodeSegment = GET_CODE_SEGMENT(n);
+			RebuildJava_BeginCodeSegment(g_CurrentCodeSegment);
 		}
 
 		// Check to see if we are in a new segment, ie. new class
@@ -1217,7 +1249,7 @@ void RebuildJava_Code()
 		}
 	}
 
-	RebuildJava_EndCodeSegment(CurrentCodeSegment);
+	RebuildJava_EndCodeSegment(g_CurrentCodeSegment);
 }
 
 //****************************************
@@ -1231,6 +1263,8 @@ void RebuildJava_CallReg()
 
 	SortVirtuals();
 	count = GetVirtualIndex();
+
+	g_register_initialized = 0;
 
 	if (!count)
 	{
@@ -1251,6 +1285,11 @@ void RebuildJava_CallReg()
 
 	RebuildEmit("	int r14,r15;\n\n");
 
+	SetRegInit(REG_i0);
+	SetRegInit(REG_i1);
+	SetRegInit(REG_i2);
+	SetRegInit(REG_i3);
+
 	if (count)
 	{
 
@@ -1265,20 +1304,20 @@ void RebuildJava_CallReg()
 			{
 				RebuildEmit("		case 0x%x:\n", sym->VirtualIndex);
 				RebuildEmit("		");
-				JavaCallFunction(sym);
+				JavaCallFunction(sym, 0);			// was 1
 				RebuildEmit("\n");
 	//			RebuildEmit("		return;\n\n");
 
-				ThisFunctionRetType = sym->RetType;
+				g_ThisFunctionRetType = sym->RetType;
 
-				if(ThisFunctionRetType == RET_void)
+				if(g_ThisFunctionRetType == RET_void)
 				{
 					RebuildEmit("			return 0;\n");
 				}
 				else
 				{
 					RebuildEmit("\t\t");
-					JavaDecodeReturn();
+					JavaDecodeReturn(0);			// was 1
 					RebuildEmit("\n");
 				}
 			}
@@ -1463,7 +1502,13 @@ void RebuildJava_StartUp()
 
 	if (ep)
 	{
-		JavaCallFunction(ep);
+		// Init start-up regs
+
+		SetRegInit(REG_i0);
+		SetRegInit(REG_i1);
+		SetRegInit(REG_i2);
+
+		JavaCallFunction(ep, 1);
 	}
 
 	RebuildEmit("\n}\n");
@@ -1516,7 +1561,7 @@ void RebuildJava_EmitInterfaceFunc(SYMBOL *sym)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("int %s", java_reg[REG_i0 + n]);
+		RebuildEmit("int %s", g_java_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -1538,12 +1583,12 @@ void RebuildJava_EmitInterfaceFunc(SYMBOL *sym)
 void RebuildJava_EmitInterfaces()
 {
 	SYMBOL *sym;
-	int len = sizeof(JavaSyscallUsed);
+	int len = sizeof(g_JavaSyscallUsed);
 	int n;
 
 	for (n=0;n<len;n++)
 	{
-		if (JavaSyscallUsed[n])
+		if (g_JavaSyscallUsed[n])
 		{
 			sym = FindSysCall(n);
 
@@ -1587,7 +1632,7 @@ void RebuildJava_EmitSyscallFunc(SYMBOL *sym)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("int %s", java_reg[REG_i0 + n]);
+		RebuildEmit("int %s", g_java_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -1616,7 +1661,7 @@ void RebuildJava_EmitSyscallFunc(SYMBOL *sym)
 void RebuildJava_EmitSyscalls()
 {
 	SYMBOL *sym;
-	int len = sizeof(JavaSyscallUsed);
+	int len = sizeof(g_JavaSyscallUsed);
 	int n;
 
 	RebuildEmit("\n");
@@ -1632,7 +1677,7 @@ void RebuildJava_EmitSyscalls()
 
 	for (n=0;n<len;n++)
 	{
-		if (JavaSyscallUsed[n])
+		if (g_JavaSyscallUsed[n])
 		{
 			sym = FindSysCall(n);
 
@@ -1722,7 +1767,7 @@ void RebuildJava_Main()
 	ArrayInit(&g_RebuildArray, sizeof(char), 0);
 	ArrayInit(&g_LabelDone, sizeof(char), 0);
 
-	memset(JavaSyscallUsed, 0, sizeof(JavaSyscallUsed));
+	memset(g_JavaSyscallUsed, 0, sizeof(g_JavaSyscallUsed));
 
 	JavaForceSysCallUsed("RBYTE");
 	JavaForceSysCallUsed("WBYTE");
@@ -1805,7 +1850,7 @@ void RebuildJava_Main()
 
 	//PatchClass("StaticCode.class", "StaticCode.class");
 	_mkdir("patched");
-	for(i=0; i<=CurrentCodeSegment; i++) {
+	for(i=0; i<=g_CurrentCodeSegment; i++) {
 		char in[32];//, out[32];
 		//sprintf(out, "patched/Code%i.class", i);
 		sprintf(in, "Code%i.class", i);

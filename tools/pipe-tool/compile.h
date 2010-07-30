@@ -700,6 +700,8 @@ decset(int g_FarAddressing, 1)
 decset(int g_ArgRes, 0)
 decset(int g_ArgJavaNative, 0)
 decset(int g_ArgBrewGen, 0)
+decset(int g_ArgCppGen, 0)
+
 decset(int g_ArgFilePaths, 0)
 decset(int g_ArgOptimize, 1)
 decset(int g_Do_Elimination, 0)

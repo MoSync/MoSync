@@ -264,6 +264,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\CppRebuild.c"
+			>
+		</File>
+		<File
 			RelativePath=".\demangle.c"
 			>
 		</File>

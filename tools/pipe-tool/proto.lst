@@ -25,6 +25,7 @@ BucketArray.c
 CodeSearch.c
 CodeRebuild.c
 JavaRebuild.c
+CppRebuild.c
 BrewRebuild.c
 Peeper.c
 JavaRebuild.c

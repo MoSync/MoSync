@@ -105,6 +105,10 @@ void AsmMain()
 			RebuildBrew_Main();
 		}
 #endif
+		else if (g_ArgCppGen)
+		{
+			RebuildCpp_Main();
+		}
 		else
 		{
 			Rebuild_Main();

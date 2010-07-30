@@ -723,7 +723,7 @@ char * FindDirectiveAbove(char *theFilePtr, char *directive)
 //****************************************
 
 char hextab2[] = "0123456789abcdef";
-char hexstr[16];
+char hexstr[64];
 
 char * Hex32(int v)
 {
@@ -749,4 +749,27 @@ char * Hex8(int v)
 	hexstr[2] = 0;
 	return hexstr;
 }
+
+//****************************************
+//		     Print Binary
+//****************************************
+
+char * Bin32(int v)
+{
+	int n;
+	
+	for (n=0;n<32;n++)
+	{
+		hexstr[n] = '0';
+		
+		if (v & 0x80000000)
+			hexstr[n] = '1';
+
+		v <<= 1;
+	}
+
+	hexstr[n] = 0;
+	return hexstr;
+}
+
 
