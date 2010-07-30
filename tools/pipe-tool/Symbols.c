@@ -1580,7 +1580,7 @@ void DumpFunctions(FILE *out)
 //****************************************
 //		Dump Meta data (for recompiler)
 //****************************************
-static int IsDebugLabel ( const char *l )
+int IsDebugLabel ( const char *l )
 {
 	int state = 0;
 

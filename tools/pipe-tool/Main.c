@@ -169,9 +169,9 @@ int main(int argc,char *argv[])
 
 	g_CurrentModel = MODEL_null;
 
-	g_Default_DataSize  = 0x10000;
-	g_Default_StackSize = 0x00800;
-	g_Default_HeapSize  = 0x04000;
+	g_Default_DataSize  = 0x20000;	// 128
+	g_Default_StackSize = 0x08000;	// 32	
+	g_Default_HeapSize  = 0x10000;	// 64
 	g_Default_AppCode = 'TEST';
 	g_Do_Dump_Symbols = 0;
 	g_relPath[0] = 0;
