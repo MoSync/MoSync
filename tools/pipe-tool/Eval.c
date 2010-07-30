@@ -338,7 +338,7 @@ int GetNum()
 {
 	register unsigned int v = 0;
 
-	if (Token("'"))			// found �
+	if (Token("'"))			// found ?
 	{		
 		if (Token("\\"))		// Test "\"
 		{
@@ -1179,8 +1179,8 @@ void GetIdentifier(EVAL *Part1)
 
 				// Only convert to virtual index if in java mode
 
-				if (g_ArgJavaNative)
-				if (sym->LabelType == label_Virtual)
+				if ((g_ArgJavaNative || g_ArgCppGen) &&			// !! xchange with ArgCreateVirtuals !!				
+				    (sym->LabelType == label_Virtual) )
 				{
 					// Change the value, to reflect functions virtual reference
 

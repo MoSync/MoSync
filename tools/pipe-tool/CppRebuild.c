@@ -70,11 +70,22 @@ int RebuildCppInst(OpcodeInfo *theOp)
 	switch (theOp->op)
 	{
 		case _PUSH:
-//			RebuildEmit("	//push");
+			RebuildEmit("	//push %s,%d\n",g_Cpp_reg[theOp->rd], theOp->rs);
+
+			if (REGUSED(funcprop.reg_used, REG_sp))
+			{
+				RebuildEmit("	sp -= %d;\n",theOp->rs*4);
+			}
 		return 1;
 			
 		case _POP:
-//			RebuildEmit("	//pop");
+			RebuildEmit("	//pop  %s,%d\n",g_Cpp_reg[theOp->rd], theOp->rs);
+
+			if (REGUSED(funcprop.reg_used, REG_sp))
+			{
+				RebuildEmit("	sp += %d;\n",theOp->rs*4);
+			}
+
 		return 1;
 
 		case _CASE:
@@ -290,7 +301,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		break;
 
 		case _XB:
-			RebuildEmit("	%s = (int)((byte) %s);", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rs]);		
+			RebuildEmit("	%s = (int)((char) %s);", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rs]);		
 		break;
 
 		case _XH:
@@ -433,26 +444,6 @@ void CppForceSysCallUsed(char *name)
 
 void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 {
-/*	if (strcmp(str, "RINT") == 0)
-	{
-		// Optimization for int
-
-		if (theOp->rs == 0)
-		{
-			RebuildEmit("	%s = mem_ds[0x%x];", Cpp_reg[theOp->rd], theOp->imm >> 2);
-			return;
-		}
-
-		if (theOp->imm == 0)
-		{
-			RebuildEmit("	%s = mem_ds[%s >> 2];", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
-			return;
-		}
-			
-		RebuildEmit("	%s = mem_ds[(%s+0x%x) >> 2];", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs], theOp->imm);
-		return;
-	}
-*/	
 	
 	if (theOp->rs == 0)
 	{
@@ -476,27 +467,6 @@ void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 
 void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
 {
-	// optimized ints
-	
-/*	if (strcmp(str, "WINT") == 0)
-	{
-		if (theOp->rd == 0)
-		{
-			RebuildEmit("	mem_ds[0x%x] = %s;", theOp->imm >> 2, Cpp_reg[theOp->rs]);
-			return;
-		}
-
-		if (theOp->imm == 0)
-		{
-			RebuildEmit("	mem_ds[%s >> 2] = %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
-			return;
-		}
-
-		RebuildEmit("	mem_ds[(%s+0x%x) >> 2] = %s;", Cpp_reg[theOp->rd], theOp->imm, Cpp_reg[theOp->rs]);
-		return;
-	}
-*/
-// others	
 
 	if (theOp->rd == 0)
 	{
@@ -540,7 +510,6 @@ int CppDecodeLabel(OpcodeInfo *theOp, char *str)
 	
 	ref = labref;
 
-//	RebuildEmit("	jp &%s_%d", ref->Name, ref->LocalScope);
 	RebuildEmit(str, ref->LabelEnum);
 	return 1;
 }
@@ -672,40 +641,7 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 //****************************************
 //			 
 //****************************************
-#if 0
-int xCppCallFunction(SYMBOL *ref)
-{
-	int param_count, need_comma, n;
-	int rettype = ref->RetType;
 
-	CppEmitReturnType(rettype);
-
-	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
-	
-	param_count = ref->Params;
-	
-	if (param_count > 4)
-		param_count = 4;
-
-	need_comma = 0;
-
-	for (n=0;n<param_count;n++)
-	{
-		if (need_comma)
-			RebuildEmit(", ");				
-	
-		RebuildEmit("%s", g_Cpp_reg[REG_i0 + n]);
-		need_comma = 1;
-	}
-
-	RebuildEmit(");");
-	
-	if (rettype == RET_double)
-		RebuildEmit("\n	r15 = __dbl_high;");
-	
-	return 1;
-}
-#else
 int CppCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
@@ -730,18 +666,8 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 		if (need_comma)
 			RebuildEmit(", ");				
 
-/*		if (REGUSED(REG_i0 + n, regs))
-		{
-			printf("Rebuilder: Function '%s' parameter %d was not initialized\n",ref->Name, n);
-			//Error(Error_Fatal,"Function parameter %d was not initialized", n);
-			RebuildEmit("<Error>");
-		}
-*/		
 		RebuildEmit("%s", g_Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
-
-		// Make sure
-
 	}
 
 	RebuildEmit(");");
@@ -753,7 +679,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 	}
 	return 1;
 }
-#endif
+
 //****************************************
 //			 
 //****************************************
@@ -803,21 +729,17 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 	return;
 }
 
-
 //****************************************
 //			 
 //****************************************
 
 void CppEmitDiv(OpcodeInfo *theOp, int imm)
 {
-
 	if ((theOp->rs == 0) || (theOp->imm == 0))
 		printf("");
 	
 	if (imm)
 	{
-//		RebuildEmit("	if (%d == 0) MoSyncDiv0();\n", theOp->imm);		// Fails here
-
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
@@ -836,22 +758,17 @@ void CppEmitDiv(OpcodeInfo *theOp, int imm)
 
 void CppEmitDivu(OpcodeInfo *theOp, int imm)
 {
-//	if ((theOp->rs == 0) || (theOp->imm == 0))
-//		printf("");
-
 	if (imm)
 	{
-//		RebuildEmit("	if(%d == 0) MoSyncDiv0();\n", theOp->imm); 		// Fails here
-
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
-		RebuildEmit("	%s = (int) ((long)(%s) & 0x0ffffffffL) / ((long)(%d) & 0x0ffffffffL);", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rd], theOp->imm);
+		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%d));", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
 		RebuildEmit("	if(%s == 0) MoSyncDiv0();\n", g_Cpp_reg[theOp->rs]);
-		RebuildEmit("	%s = (int) ((long)(%s) & 0x0ffffffffL) / ((long)(%s) & 0x0ffffffffL);", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rs]);
+		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%s));", g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rd], g_Cpp_reg[theOp->rs]);
 	}
 }
 
@@ -876,7 +793,7 @@ void CppEmitReturnType(int rettype)
 	switch(rettype)
 	{
 		case RET_null:
-		RebuildEmit("? // Error report to MobileSorcery");
+		RebuildEmit("? // Error report to MoSync");
 		break;
 
 		case RET_void:
@@ -900,12 +817,10 @@ void CppEmitReturnType(int rettype)
 
 void CppEmitReturnDecl(int rettype)
 {
-//	RebuildEmit("static ");
-
 	switch(rettype)
 	{
 		case RET_null:
-		RebuildEmit("? // Error report to MobileSorcery");
+		RebuildEmit("? // Error report to MoSync");
 		break;
 
 		case RET_void:
@@ -937,8 +852,6 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	int n;
 		
 	// Find registers used in function
-
-//	reg_used = FunctionRegUsage(sym);
 	
 	reg_used = FunctionRegAnalyse(sym, &funcprop);
 	
@@ -953,9 +866,20 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("//****************************************\n\n");
 	}
 	
-	// Output function decl
+	if (!isproto)
+	{
+		RebuildEmit("//             rrrrrrrrrrrrrrrriiiiddddddddfrsz\n");
+		RebuildEmit("//             fedcba9876543210321076543210rtpr\n");
 
-//	RebuildEmit("static ");
+		RebuildEmit("//src_reg    = %s\n", Bin32(funcprop.src_reg));
+		RebuildEmit("//dst_reg    = %s\n", Bin32(funcprop.dst_reg));
+		RebuildEmit("//assign_reg = %s\n", Bin32(funcprop.assign_reg));
+		RebuildEmit("//uninit_reg = %s\n", Bin32(funcprop.uninit_reg));
+		RebuildEmit("//used_reg   = %s\n", Bin32(funcprop.reg_used));
+		RebuildEmit("\n");
+	}
+
+	// Output function decl
 
 	switch(g_ThisFunctionRetType)
 	{
@@ -1031,6 +955,10 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 					RebuildEmit(", ");				
 
 				RebuildEmit("%s", g_Cpp_reg[n]);
+
+				if (funcprop.uninit_reg & (1<<n))
+					RebuildEmit("=0");
+
 				need_comma = 1;
 			}
 		}
@@ -1304,7 +1232,7 @@ void RebuildCpp_CallReg()
 //****************************************
 //
 //****************************************
-/*
+#if 0
 void RebuildCpp_EmitDS()
 {
 	int need_comma;
@@ -1323,7 +1251,7 @@ void RebuildCpp_EmitDS()
 
 	RebuildEmit("int *mem_ds\n");
 }
-*/
+#endif
 //****************************************
 // 
 //****************************************
@@ -1345,8 +1273,7 @@ void RebuildCpp_StartUp()
 	RebuildEmit("#define all_len %d\n", (g_BssIP + g_DataIP));
 	RebuildEmit("#define max_data %d\n\n", g_MaxDataIP);
 
-	RebuildEmit("int *mem_ds\n");
-
+//	RebuildEmit("int *mem_ds;\n");
 
 	RebuildEmit("void cpp_main()\n");
 	RebuildEmit("{\n");
@@ -1360,7 +1287,7 @@ void RebuildCpp_StartUp()
 	RebuildEmit("	sp = %i-16; //Init stack\n", g_Default_DataSize);
 	RebuildEmit("\n");
 
-	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0)\n");
+	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0);\n");
 
 	// emit the bin file
 
@@ -1519,9 +1446,9 @@ void RebuildCpp_Main()
 //	RebuildEmit("class MoSyncCode\n");
 //	RebuildEmit("{\n");
 
-	RebuildEmit("\n");
-	RebuildEmit("int sp;\n");
-	RebuildEmit("int __dbl_high;\n");
+//	RebuildEmit("\n");					// Out in .h file
+//	RebuildEmit("int sp;\n");
+//	RebuildEmit("int __dbl_high;\n");
 
 	RebuildEmit("\n");
 
