@@ -125,6 +125,7 @@ namespace Base {
 	Syscall::~Syscall() {
 		LOGD("~Syscall\n");
 		gStores.close();
+		gFileHandles.close();
 		platformDestruct();
 	}
 
@@ -709,7 +710,18 @@ namespace Base {
 		size = strlen(path) + 1;
 #endif
 		fh.name.resize(size);
+#ifdef SYMBIAN
+		// Switch directory separators.
+		for(int i=0; i<size; i++) {
+			if(fn[i] == '/') {
+				fh.name[i] = '\\';
+			} else {
+				fh.name[i] = fn[i];
+			}
+		}
+#else
 		memcpy(fh.name, fn, size);
+#endif
 
 		fh.fs = NULL;
 		TEST_LTZ(openFile(fh));
@@ -964,7 +976,7 @@ namespace Base {
 #endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
-		LOGD("maFileWrite(%i, 0x%p, %i)\n", file, src, len);
+		LOGD("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -989,7 +1001,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
-		LOGD("maFileRead(%i, 0x%p, %i)\n", file, dst, len);
+		LOGD("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);

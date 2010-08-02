@@ -343,6 +343,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\FileLister.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\FileLister.h"
+			>
+		</File>
+		<File
 			RelativePath=".\FrameBuffer.c"
 			>
 		</File>

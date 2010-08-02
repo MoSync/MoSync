@@ -19,86 +19,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
+#include <MAUtil/FileLister.h>
 #include <IX_FILE.h>
-
-/**
-* This object encapsulates a file list handle.
-* It can be reused for multiple listings.
-* \see maFileListStart()
-*/
-class FileLister {
-public:
-	FileLister() : mList(-1) {}
-	~FileLister() { close(); }
-
-	/**
-	* \see maFileListStart()
-	* Closes the active list, if any.
-	*/
-	int start(const char* dir, const char* filter = "*");
-
-	/**
-	* Writes the name of the next file in the list to \a dst.
-	* \a dst's old contents are overwritten.
-	* Returns the length of the name, 0 if there are no more files, or \< 0 on error.
-	* On error, \a dst is not modified.
-	*/
-	int next(MAUtil::String& dst);
-
-	/** \see maFileListClose() */
-	void close();
-private:
-	MAHandle mList;
-};
-
-int FileLister::start(const char* dir, const char* filter) {
-	close();
-	return mList = maFileListStart(dir, filter);
-}
-
-int FileLister::next(MAUtil::String& dst) {
-	int len = maFileListNext(mList, NULL, 0);
-	if(len <= 0)
-		return len;
-	dst.resize(len);
-	len = maFileListNext(mList, dst.pointer(), len+1);
-	MAASSERT(len > 0);
-	return len;
-}
-
-void FileLister::close() {
-	if(mList > 0) {
-		int res = maFileListClose(mList);
-		MAASSERT(res == 0);
-		mList = -1;
-	}
-}
 
 static bool tryToWrite(const MAUtil::String& dir);
 
 static bool writeAFile(const MAUtil::String& dir) {
 	// find a root path
+	printf("Dir: '%s'\n", dir.c_str());
 	FileLister fl;
 	int res = fl.start(dir.c_str());
 	if(res < 0) {
 		printf("Error %i\n", res);
 		return false;
 	}
+	MAUtil::String file;
 	while(1) {
-		MAUtil::String file;
 		res = fl.next(file);
+		printf("%i: '%s'\n", res, file.c_str());
 		if(res < 0) {
 			printf("Error %i\n", res);
 			return false;
 		}
-		if(res == 0)
+		if(res == 0) {
+			printf("Dir '%s' ends.\n", dir.c_str());
 			return false;
+		}
 		if(file[file.size()-1] == '/') {
-			//printf("Dir: '%s'\n", file.c_str());
 			if(tryToWrite(dir + file))
 				return true;
-			//if(writeAFile(dir + file))
-				//return true;
 			if(writeAFile(dir + file))
 				return true;
 		}
@@ -176,7 +125,7 @@ extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 1;
 	printf("Hello World!\n");
-	writeAFile("");
-	printf("Done. Press 0 to exit.\n");
+	bool res = writeAFile("");
+	printf("Done, %i. Press 0 to exit.\n", res);
 	FREEZE;
 }

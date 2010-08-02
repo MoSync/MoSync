@@ -343,12 +343,12 @@ TInt CAppView::RunL() {
 		LOGD("RunIdle stopped forever.\n");
 		return iKeepRunning = 0;
 	}
-	LOGD("RIS\n");
+	//LOGD("RIS\n");
 #ifdef SUPPORT_RELOAD
 	iCore->symbianError = KErrNone;
 #endif
 	Run2(iCore);
-	LOGD("RIE\n");
+	//LOGD("RIE\n");
 #ifdef SUPPORT_RELOAD
 	if(iCore->symbianError != KErrNone) {
 		LOG("Found core leave, code %i\n", iCore->symbianError);
