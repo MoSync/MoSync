@@ -586,7 +586,7 @@ interface MAAPI {
 		MAX = -3;
 		/// DNS resolution error.
 		DNS = -4;
-		/// Internal error. Please report any occurrences to Mobile Sorcery.
+		/// Internal error. Please report any occurrences.
 		INTERNAL = -5;
 
 		/** \brief The connection was closed by the remote peer.
@@ -606,6 +606,7 @@ interface MAAPI {
 		/// You supplied a malformed URL.
 		URL = -11;
 		/// The protocol is not available.
+		/// If a Bluetooth function returns this, the Bluetooth chip is turned off.
 		UNAVAILABLE = -12;
 		/// You canceled the operation.
 		CANCELED = -13;
@@ -620,7 +621,7 @@ interface MAAPI {
 		* If you wish to share the CONNERR codespace,
 		* use values below this for your own error codes.
 		*/
-		USER = -1000000;	
+		USER = -1000000;
 	}
 	constset int CONNOP_ {
 		READ = 1;

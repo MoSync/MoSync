@@ -1250,13 +1250,18 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 
 SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
-	if(!gBtAvailable) switch(function) {
+	if(gBtState != eAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:
 	case maIOCtl_maBtGetNewDevice:
 	case maIOCtl_maBtStartServiceDiscovery:
 	case maIOCtl_maBtGetNewService:
 	case maIOCtl_maBtGetNextServiceSize:
-		return IOCTL_UNAVAILABLE;
+		switch(gBtState) {
+		case eTurnedOff: return CONNERR_UNAVAILABLE;
+		case eForbidden: return CONNERR_FORBIDDEN;
+		case eError: return IOCTL_UNAVAILABLE;
+		default: DEBIG_PHAT_ERROR;
+		}
 	}
 	switch(function) {
 
@@ -1995,14 +2000,14 @@ int Syscall::maFileAvailableSpace(MAHandle file) {
 	LOGD("maFileAvailableSpace(%i)\n", file);
 	TVolumeInfo vi;
 	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
-	return MIN(vi.iFree, 0x7fffffff);
+	return I64LOW(MIN(vi.iFree, TInt64(0x7fffffff)));
 }
 
 int Syscall::maFileTotalSpace(MAHandle file) {
 	LOGD("maFileTotalSpace(%i)\n", file);
 	TVolumeInfo vi;
 	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
-	return MIN(vi.iSize, 0x7fffffff);
+	return I64LOW(MIN(vi.iSize, TInt64(0x7fffffff)));
 }
 
 	

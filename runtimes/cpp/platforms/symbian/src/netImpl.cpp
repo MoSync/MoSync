@@ -1140,7 +1140,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		conn = http;
 		CleanupStack::Pop(conn);
 	} else if(SSTREQ(urlP, KBtspp)) {	//btspp
-		if(!gBtAvailable) {
+		if(gBtState != eAvailable) {
 			return CONNERR_UNAVAILABLE;
 		}
 		TPtrC8 parturl = urlP.Mid(KBtspp().Length());
