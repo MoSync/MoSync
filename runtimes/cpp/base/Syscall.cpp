@@ -861,7 +861,7 @@ namespace Base {
 			LOG("statvfs errno %i\n", errno);
 			FILE_FAIL(MA_FERR_GENERIC);
 		}
-		return I64LOW(MIN(s.f_frsize * s.*clusters, INT_MAX));
+		return (int)MIN(s.f_frsize * s.*clusters, INT_MAX);
 	}
 #define SPACE_AVAIL &statvfs::f_bavail
 #define SPACE_TOTAL &statvfs::f_blocks
