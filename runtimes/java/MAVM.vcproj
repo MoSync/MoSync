@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;work.bat&#x0D;&#x0A;"
+				BuildCommandLine="cd platforms\javaME\&#x0D;&#x0A;work.bat"
 				ReBuildCommandLine=""
 				CleanCommandLine=""
 				Output=""

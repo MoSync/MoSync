@@ -1125,6 +1125,9 @@ void WRITE_REG(int reg, int value) {
 	int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
 
+	int _SYSCALL_CONVERTRES_uint(uint i) { return i; }
+#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
+
 	void debug_ulong(int SCDEBUG_ARG(i)) { LOGSC("(%u)", i); }
 	int _SYSCALL_CONVERT_ulong(int i) {
 		_debug_hex(i);

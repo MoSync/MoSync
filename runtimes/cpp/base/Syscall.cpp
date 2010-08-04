@@ -353,9 +353,12 @@ namespace Base {
 	SYSCALL(double, __floatsidf(int a)) {
 		return (double)a;
 	}
-#endif
-	SYSCALL(double, f2d(float f)) {
+#endif	//_android
+	SYSCALL(double, __extendsfdf2(float f)) {
 		return (double)f;
+	}
+	SYSCALL(uint, __fixunsdfsi(double f)) {
+		return (uint)f;
 	}
 	SYSCALL(int, dcmp(double a, double b)) {
 		if(a > b)
@@ -396,10 +399,12 @@ namespace Base {
 	SYSCALL(float, __floatsisf(int a)) {
 		return (float)a;
 	}
-#endif
-
-	SYSCALL(float, d2f(double a)) {
+#endif	//_android
+	SYSCALL(float, __truncdfsf2(double a)) {
 		return (float)a;
+	}
+	SYSCALL(uint, __fixunssfsi(float f)) {
+		return (uint)f;
 	}
 	SYSCALL(int, fcmp(float a, float b)) {
 		if(a > b)

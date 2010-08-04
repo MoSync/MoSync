@@ -204,13 +204,17 @@ interface MAAPI {
 	*/
 	int __fixdfsi(in double a);
 	/**
+	* Returns the unsigned integer part of \a a. Negative values become zero.
+	*/
+	uint __fixunsdfsi(in double a);
+	/**
 	* Returns the double representation of \a a.
 	*/
 	double __floatsidf(in int a);
 	/**
 	* Returns the double representation of \a a.
 	*/
-	double f2d(in float a);
+	double __extendsfdf2(in float a);
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
@@ -244,13 +248,17 @@ interface MAAPI {
 	*/
 	int __fixsfsi(in float a);
 	/**
+	* Returns the unsigned integer part of \a a. Negative values become zero.
+	*/
+	uint __fixunssfsi(in float a);
+	/**
 	* Returns the float representation of \a a.
 	*/
 	float __floatsisf(in int a);
 	/**
-	* Returns the double representation of \a a.
+	* Returns the float representation of \a a.
 	*/
-	float d2f(in double a);
+	float __truncdfsf2(in double a);
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.

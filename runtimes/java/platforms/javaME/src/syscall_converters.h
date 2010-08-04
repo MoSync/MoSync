@@ -130,6 +130,20 @@ final int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #endif	//DEBUG_SYSCALLS
 
 #ifdef DEBUG_SYSCALLS
+final void debug_uint(int i) { DEBUG_SC("("+(((long)i) & 0xFFFFFFFF)+")"); }
+final long _SYSCALL_CONVERT_uint(int i) {
+	_debug_hex(i);
+	debug_uint(i);
+	return i;
+}
+final int _SYSCALL_CONVERTRES_uint(long i) { return (int)i; }
+#else
+#define debug_uint(i)
+#define _SYSCALL_CONVERT_uint(i) i
+#define _SYSCALL_CONVERTRES_uint(i) (int)i
+#endif	//DEBUG_SYSCALLS
+
+#ifdef DEBUG_SYSCALLS
 final void debug_short(short i) { DEBUG_SC("("+i+")"); }
 final short _SYSCALL_CONVERT_short(int i) {
 	_debug_hex(i);
@@ -283,6 +297,7 @@ final long ints2long(int hiw, int low) throws Exception {
 #define _SYSCALL_HANDLERES_MAAddress _SYSCALL_HANDLERES_DEFAULT(MAAddress)
 #define _SYSCALL_HANDLERES_Address _SYSCALL_HANDLERES_DEFAULT(MAAddress)
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
+#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_HANDLERES_float _SYSCALL_HANDLERES_DEFAULT(float)
 #define _SYSCALL_HANDLERES_MAExtent _SYSCALL_HANDLERES_DEFAULT(MAExtent)
