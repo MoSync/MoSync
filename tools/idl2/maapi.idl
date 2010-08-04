@@ -89,6 +89,47 @@ interface MAAPI {
 	/// Creates an MAExtent.
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
+	// These three functions are at the top,
+	// to ensure their numeric identifiers do not change in the future.
+
+	/**
+	* Compares the runtime's interface version with yours,
+	* using a hash of the interface's contents.
+	*
+	* If the versions do not match, a MoSync Panic is generated.
+	*
+	* This function returns the runtime's hash. However, if there is
+	* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
+	* your version of the header files, causing a different function than this to be called.
+	*
+	* The hash appears as a 32-bit random number, so it is very unlikely that the return
+	* value from any other function is the same as the runtime's hash.
+	*
+	* Therefore, you should always compare the return value from this function to your hash
+	* and exit your program, preferably using maPanic(), if they don't match.
+	*
+	* \param hash Your hash. Pass #MAIDL_HASH.
+	* \returns The runtime's hash.
+	*/
+	int maCheckInterfaceVersion(in int hash);
+
+	/**
+	* Shuts down the system. This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	*/
+	noreturn maExit(in int result);
+
+	/**
+	* Displays a message to the user, then shuts down the system.
+	* This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	* \param message The message should be short, not more than 40 characters,
+	* to ensure its visibility on all screen sizes.
+	* \see MAPanicReport
+	*/
+	noreturn maPanic(in int result, in MAString message);
+
+
 	/**
 	* Sets \a size bytes, starting at \a dst, to the specified value, interpreted as an unsigned char.
 	* \returns \a dst.
@@ -1313,22 +1354,6 @@ interface MAAPI {
 	*/
 	int maVibrate(in int ms);
 
-	/**
-	* Shuts down the system. This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	*/
-	noreturn maExit(in int result);
-
-	/**
-	* Displays a message to the user, then shuts down the system.
-	* This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	* \param message The message should be short, not more than 40 characters,
-	* to ensure its visibility on all screen sizes.
-	* \see MAPanicReport
-	*/
-	noreturn maPanic(in int result, in MAString message);
-
 	constset int RUNTIME_ {
 		/// The MoSync Reference Environment, also known as the Emulator.
 		MORE = 1;
@@ -1464,27 +1489,6 @@ interface MAAPI {
 		FLUX = 127;
 	}
 #endif	//IX_RESOURCE_TYPES
-
-		/**
-		* Compares the runtime's interface version with yours,
-		* using a hash of the interface's contents.
-		*
-		* If the versions do not match, a MoSync Panic is generated.
-		*
-		* This function returns the runtime's hash. However, if there is
-		* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
-		* your version of the header files, causing a different function than this to be called.
-		*
-		* The hash appears as a 32-bit random number, so it is very unlikely that the return
-		* value from any other function is the same as the runtime's hash.
-		*
-		* Therefore, you should always compare the return value from this function to your hash
-		* and exit your program, preferably using maPanic(), if they don't match.
-		*
-		* \param hash Your hash. Pass #MAIDL_HASH.
-		* \returns The runtime's hash.
-		*/
-		int maCheckInterfaceVersion(in int hash);
 
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.

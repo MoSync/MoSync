@@ -1753,9 +1753,6 @@ public
 #endif
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
-
 		case maIOCtl_maPlatformRequest:
 			return maPlatformRequest(readMemString(a));
 

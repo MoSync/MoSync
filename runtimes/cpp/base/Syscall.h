@@ -152,8 +152,6 @@ namespace Base {
 		int maBtGetNewService(MABtService* dst);
 	};
 
-	int maCheckInterfaceVersion(int hash);
-
 	void maAccept(MAHandle conn);
 
 	//platform-dependent, works like atoi.

@@ -1796,9 +1796,6 @@ namespace Base {
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
-
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
 			reportCallStack();

@@ -636,7 +636,7 @@ namespace Base {
 		return -1;
 	}
 
-	int Base::maCheckInterfaceVersion(int hash) {
+	SYSCALL(int, maCheckInterfaceVersion(int hash)) {
 		if(hash == (int)MAIDL_HASH) {
 			LOG("IDL version match!\n");
 		} else {
@@ -835,12 +835,13 @@ namespace Base {
 
 #ifdef WIN32
 	static int fileSpace(MAHandle file, unsigned _diskfree_t::* clusters) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		_diskfree_t df;
 		unsigned drive;
 #if FILESYSTEM_CHROOT
+		SYSCALL_THIS->getFileHandle(file);	// just to make sure the file handle is ok.
 		drive = 0;
 #else
+		Syscall::FileHandle& fh();
 		drive = (fh.name[0] - 'A') + 1;
 #endif	//FILESYSTEM_CHROOT
 		if(_getdiskfree(drive, &df) != 0) {

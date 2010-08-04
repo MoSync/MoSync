@@ -1265,9 +1265,6 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	}
 	switch(function) {
 
-	case maIOCtl_maCheckInterfaceVersion:
-		return Base::maCheckInterfaceVersion(a);
-
 #ifdef TELEPHONY
 	case maIOCtl_maGetBatteryCharge:
 		return maGetBatteryCharge();
