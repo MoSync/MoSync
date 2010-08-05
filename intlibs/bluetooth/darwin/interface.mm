@@ -45,7 +45,7 @@ static DiscoveryCocoa *gDiscovery = NULL;
 
 namespace Bluetooth
 {
-
+	BluetoothStack gBluetoothStack = BTSTACK_COCOA;
 
 /**
  * Will initialize the bluetooth system
