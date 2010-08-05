@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 #include <MAUtil/BluetoothDiscovery.h>
 #include <MAUtil/Connection.h>
-#include <MAUtil/MAUUID.h>
+#include <MAUtil/mauuid.h>
 #include <MAUtil/util.h>
 
 #include "../../MinUI/MinUI.h"
@@ -446,6 +446,7 @@ public:
 		mConnectionView.setMenuView(&mMenuView);
 		mMenuView.show();
 	}
+	void closeEvent() {}
 private:
 	MenuView mMenuView;
 	ListboxView mListboxView;

@@ -1,11 +1,17 @@
 #import <unistd.h>
 #include <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #import "DiscoveryCocoa.h"
+#include "../discovery.h"
+#include "../config_bluetooth.h"
+#include "../btinit.h"
+#include "../discovery.h"
+#include "helpers/helpers.h"
 
 
 
 @implementation DiscoveryCocoa
 @synthesize _foundDevices;
+@synthesize _foundServices;
 @synthesize _status;
 @synthesize _callback;
 
@@ -50,7 +56,7 @@
 	
 	if( error )
 	{
-		_status = -1;
+		_status = CONNERR_INTERNAL;
 		
 	}
 	else
@@ -187,6 +193,52 @@
 	}
 	
 	return ret;
+}
+
+//===========================================================================================================================
+// startServiceDiscovery
+//===========================================================================================================================
+-(int)startServiceDiscovery:(BluetoothDeviceAddress*)addressPtr serviceWithUUID:(IOBluetoothSDPUUID*)uuid
+{
+	if( !_foundServices )
+	{
+		_foundServices = [[NSMutableArray alloc] initWithCapacity:1];
+		if( !_foundServices ) return( -1 );
+		[_foundServices retain];
+	}
+	else {
+		[_foundServices removeAllObjects];
+	}
+
+	IOBluetoothDevice  *dev = [IOBluetoothDevice withAddress:addressPtr];
+	if(!dev) return CONNERR_INTERNAL;
+	_currentUUID = uuid;
+	[dev performSDPQuery:self];
+	return 0;
+	
+}
+
+//===========================================================================================================================
+// sdpQueryComplete
+//===========================================================================================================================
+-(void)sdpQueryComplete:(IOBluetoothDevice *)device status:(IOReturn)status
+{
+	if (status != kIOReturnSuccess) {
+		_status = CONNERR_INTERNAL;
+		_callback ( );
+		return;
+	}
+	NSArray *servicesArray = [device getServices];
+	NSArray *uuidArray = [NSArray arrayWithObject:_currentUUID];
+	
+	// Using fast enumeration
+	for (IOBluetoothSDPServiceRecord *s in servicesArray) {
+		if ( [s hasServiceFromArray:uuidArray] ) {
+			[_foundServices addObject:s];
+		}
+	}
+	_status = [_foundServices count];
+	_callback ( );
 }
 
 
