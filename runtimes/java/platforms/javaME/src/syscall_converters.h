@@ -81,7 +81,7 @@ final String _SYSCALL_CONVERT_MAString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;;
 	for(;;) {
 		char b;
 		RCHAR(str++, b);	//TODO: optimize by reading ints at a time.
@@ -99,7 +99,7 @@ final String _SYSCALL_CONVERT_MAWString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;;
 	for(;;) {
 		short b;
 		RSHORT(str, b);
@@ -239,8 +239,6 @@ final void debug_double(long l, double a) {
 #define debug_double(l, d)
 #endif	//DEBUG_SYSCALLS
 
-#define _SYSCALL_CONVERT_double(reg) ints2double(REG(reg + 1), REG(reg))
-
 #ifdef DEBUG_SYSCALLS
 final void debug_float(int i) throws Exception {
 	float f = _SYSCALL_CONVERT_float(i);
@@ -262,12 +260,14 @@ final void debug_float(int i) throws Exception {
 #else
 #define debug_float(i)
 #endif
+#if 0	//unused
 final float _SYSCALL_CONVERT_float(int i) throws Exception {
 	_debug_hex(i);
 	float f = Float.intBitsToFloat(i);
 	debug_float(i);
 	return f;
 }
+#endif
 #define _SYSCALL_CONVERTRES_float(f) Float.floatToIntBits(f)
 
 #else	// MA_PROF_SUPPORT_CLDC_10

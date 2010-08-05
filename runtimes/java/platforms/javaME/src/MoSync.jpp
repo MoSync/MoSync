@@ -41,7 +41,9 @@ interface MoSync {
 	void postEvent(int[] event);
 
 #ifndef MA_PROF_SUPPORT_CLDC_10
+#if 0	//unused
 	double readDouble(int address);
+#endif
 	void writeDouble(int address, double d);
 #endif
 	void writeMemStream(Address dst, InputStream in, int count) throws Exception;

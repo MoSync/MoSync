@@ -31,7 +31,7 @@ JAVAME_SOURCES = [
 	'MainCanvas',
 	#'PngStream',
 	'MoSync',
-	'ExtensionHandler',
+	#'ExtensionHandler',
 	#'AudioBufferDataSource',
 ]
 CLDC10_SOURCES = [
