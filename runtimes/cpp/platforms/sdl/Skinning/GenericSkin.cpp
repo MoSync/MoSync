@@ -179,6 +179,22 @@ namespace MoRE {
 		return mProfile->mScreenHeight + extra;
 	}
 
+	int GenericSkin::getScreenWidth() const {
+		return mProfile->mScreenWidth;
+	}
+
+	int GenericSkin::getScreenHeight() const {
+		return mProfile->mScreenHeight;
+	}
+	
+	int GenericSkin::getScreenLeft() const {
+		return 24;
+	}
+
+	int GenericSkin::getScreenTop() const {
+		return 24;
+	}
+
 	/*
 	static void fillRect(int left, int top, int width, int height, unsigned int color) {
 		SDL_Rect rect = { left,top,width,height };

@@ -45,6 +45,10 @@ namespace MoRE {
 		virtual bool init() = 0;
 		virtual int getWindowWidth() const = 0;
 		virtual int getWindowHeight() const = 0;
+		virtual int getScreenWidth() const = 0;
+		virtual int getScreenHeight() const = 0;
+		virtual int getScreenLeft() const = 0;
+		virtual int getScreenTop() const = 0;
 		virtual void drawDevice() const = 0;
 		virtual void drawScreen() const = 0;
 		virtual void rotateCW() = 0;
@@ -58,7 +62,7 @@ namespace MoRE {
 		virtual void keyReleased(int mak) = 0;
 
 		void setListener(Listener* listener) { mListener = listener; }
-	public:
+	protected:
 		const DeviceProfile* mProfile;
 		Listener* mListener;
 	};

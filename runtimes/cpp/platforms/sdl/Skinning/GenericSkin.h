@@ -43,6 +43,10 @@ namespace MoRE {
 		bool init();
 		int getWindowWidth() const;
 		int getWindowHeight() const;
+		int getScreenWidth() const;
+		int getScreenHeight() const;
+		int getScreenLeft() const;
+		int getScreenTop() const;
 		void drawDevice() const;
 		void drawScreen() const;
 		void rotateCW();

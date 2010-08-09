@@ -2031,13 +2031,17 @@ namespace Base {
 
 		// WebView IOCtls
 		case maIOCtl_maWebViewOpen:
-            return webViewOpen(sSkin->mProfile->mScreenWidth, sSkin->mProfile->mScreenHeight);
+            return webViewOpen(
+				sSkin->getScreenLeft(), 
+				sSkin->getScreenTop(), 
+				sSkin->getScreenWidth(), 
+				sSkin->getScreenHeight());
 		case maIOCtl_maWebViewClose:
             return webViewClose();
 		case maIOCtl_maWebViewSetHTML:
-            return webViewSetHTML(a);
+            return webViewSetHTML(SYSCALL_THIS->GetValidatedStr(a));
 		case maIOCtl_maWebViewEvaluateScript:
-            return webViewEvaluateScript(a);
+            return webViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a));
 		
 		default:
 			return IOCTL_UNAVAILABLE;
