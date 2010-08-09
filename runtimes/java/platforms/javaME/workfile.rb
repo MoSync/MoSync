@@ -5,10 +5,12 @@ require File.expand_path('../../../../rules/targets.rb')
 require File.expand_path('../../../../rules/task.rb')
 require File.expand_path('../../../../rules/loader_md.rb')
 
+PROJECT_NAME = ENV['PROJECT_NAME']
 JAVA_ME_LIB = ENV['JAVA_ME_LIB']
 TMPCLASS_DIR = ENV['PROJECT_DIR'] + '/tmpclasses'
 CLASS_DIR = ENV['PROJECT_DIR'] + '/classes'
 JAVA_DIR = ENV['PROJECT_DIR'] + '/src'
+BIN_DIR = ENV['PROJECT_DIR'] + '/bin'
 SHARED_DIR = '../../shared'
 
 SHARED_SOURCES = [
@@ -136,6 +138,10 @@ end
 
 target :default do
 	work.invoke
+end
+
+target :pack => :default do
+	sh "cd #{CLASS_DIR} && zip -u0 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
 end
 
 # parses ARGV

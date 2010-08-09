@@ -1,3 +1,4 @@
 set JAVA_ME_LIB=\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\j2melib
 set PROJECT_DIR=\SonyEricsson\JavaME_SDK_CLDC\PC_Emulation\WTK2\apps\JavaVM
+set PROJECT_NAME=JavaVM
 ruby workfile.rb %*
