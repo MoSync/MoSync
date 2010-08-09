@@ -32,6 +32,8 @@
 #include "Syscall.h"
 #include <helpers/CPP_IX_WEBVIEW.h>
 
+// Defined in SyscallImpl.cpp
+// TODO: In which file should we put declaration?
 void MoSyncPostEvent(MAEvent& e);
 
 // Forward declaration.
@@ -353,6 +355,7 @@ int webViewOpen(int left, int top, int width, int height)
     if (FAILED(hr))
         goto exit;
 
+	// Set default document content.
 	privateWebViewSetHTML(gWebView, "<p style=\"background-color: #00FF00\">Hello World</p><div style=\"border: solid blue\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul>");
 
     IWebViewPrivate* viewExt;
@@ -442,29 +445,3 @@ int webViewEvaluateScript(const char* script)
 
 	return WebViewOk;
 }
-
-#ifdef DONT_USE
-		case maIOCtl_maWebViewOpen:
-		{
-            char *  data;
-            MAEvent myevent;
-            
-            // Get pointer to memory
-            data = (char*)SYSCALL_THIS->GetValidatedMemRange( a, 16 );
-
-            // Copy to event
-            myevent.type = EVENT_TYPE_WEBKIT;
-            memcpy( myevent.webKitEventData.m_data, data, 16 );
-
-            // Put in event queue
-            gEventFifo.put( myevent );
-
-            // Return success code
-            return 1;   
-        }
-		
-		default:
-			return IOCTL_UNAVAILABLE;
-		}
-	}	//maIOCtl
-#endif
