@@ -2458,3 +2458,8 @@ void MoSyncErrorExit(int errorCode) {
 	DEBUG_BREAK;
 	MoSyncExit(errorCode);
 }
+
+void MoSyncPostEvent(MAEvent& e)
+{
+	gEventFifo.put(e);
+}
