@@ -16,7 +16,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <math.h>
-#include <limits.h>
 
 #ifndef _WIN32_WCE
 #include <errno.h>
@@ -60,10 +59,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _open open
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
-
-#if defined(LINUX) || defined(DARWIN)
-#include <sys/statvfs.h>
-#endif
 
 using namespace Base;
 
@@ -125,7 +120,6 @@ namespace Base {
 	Syscall::~Syscall() {
 		LOGD("~Syscall\n");
 		gStores.close();
-		gFileHandles.close();
 		platformDestruct();
 	}
 
@@ -321,7 +315,6 @@ namespace Base {
 	//***************************************************************************
 	// Proper Syscalls
 	//***************************************************************************
-
 #ifndef _android
 
 	// doubles -------------------------------------------
@@ -353,13 +346,10 @@ namespace Base {
 	SYSCALL(double, __floatsidf(int a)) {
 		return (double)a;
 	}
-	SYSCALL(double, __extendsfdf2(float f)) {
+#endif
+	SYSCALL(double, f2d(float f)) {
 		return (double)f;
 	}
-	SYSCALL(uint, __fixunsdfsi(double f)) {
-		return (uint)f;
-	}
-#endif	//_android
 	SYSCALL(int, dcmp(double a, double b)) {
 		if(a > b)
 			return 1;
@@ -368,6 +358,27 @@ namespace Base {
 		else	//a < b		//or NaN!
 			return -1;
 	}
+	SYSCALL(float, __truncdfsf2(double a)) {
+		return d2f( a );
+	}
+	SYSCALL(int, __eqdf2(double a, double b )) {
+		return dcmp( a, b );
+	}		
+	SYSCALL(int, __nedf2(double a, double b )) {
+		return dcmp( a, b );
+	}			
+	SYSCALL(int, __gedf2(double a, double b )) {
+		return dcmp( a, b );
+	}		
+	SYSCALL(int, __gtdf2(double a, double b )) {
+		return dcmp( a, b );
+	}			
+	SYSCALL(int, __ledf2(double a, double b )) {
+		return dcmp( a, b );
+	}		
+	SYSCALL(int, __ltdf2(double a, double b )) {
+		return dcmp( a, b );
+	}					
 
 #ifndef _android
 	// floats -------------------------------------------
@@ -399,13 +410,11 @@ namespace Base {
 	SYSCALL(float, __floatsisf(int a)) {
 		return (float)a;
 	}
-	SYSCALL(float, __truncdfsf2(double a)) {
+#endif
+
+	SYSCALL(float, d2f(double a)) {
 		return (float)a;
 	}
-	SYSCALL(uint, __fixunssfsi(float f)) {
-		return (uint)f;
-	}
-#endif	//_android
 	SYSCALL(int, fcmp(float a, float b)) {
 		if(a > b)
 			return 1;
@@ -413,7 +422,51 @@ namespace Base {
 			return 0;
 		else	//a < b		//or NaN!
 			return -1;
+	}	
+	SYSCALL(double, __extendsfdf2(float a)) {
+		return f2d( a );
+	}	
+	SYSCALL(int, __eqsf2(float a, float b )) {
+		return fcmp( a, b );
 	}
+	SYSCALL(int, __nesf2(float a, float b )) {
+		return fcmp( a, b );
+	}	
+	SYSCALL(int, __gesf2(float a, float b )) {
+		return fcmp( a, b );
+	}			
+	SYSCALL(int, __gtsf2(float a, float b )) {
+		return fcmp( a, b );
+	}
+	SYSCALL(int, __lesf2(float a, float b )) {
+		return fcmp( a, b );
+	}	
+	SYSCALL(int, __ltsf2(float a, float b )) {
+		return fcmp( a, b );
+	}		
+	
+	union LLU 
+	{
+#if 1
+		struct { int i1, i2; } ints;
+#else
+		struct { int i2, i1; } ints;
+#endif
+
+		long long ll;
+		double d;
+	};
+	SYSCALL(double, __muldi3(int a1, int a2, int b1, int b2)) {
+		LLU a;
+		LLU b;
+		a.ints.i1 = a1;
+		a.ints.i2 = a2;
+		b.ints.i1 = b1; 
+		b.ints.i2 = b2; 
+		a.ll = a.ll*b.ll;
+		return a.d;
+	}
+	
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
 		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();
@@ -641,7 +694,7 @@ namespace Base {
 		return -1;
 	}
 
-	SYSCALL(int, maCheckInterfaceVersion(int hash)) {
+	int Base::maCheckInterfaceVersion(int hash) {
 		if(hash == (int)MAIDL_HASH) {
 			LOG("IDL version match!\n");
 		} else {
@@ -678,27 +731,6 @@ namespace Base {
 
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
-	static int openFile(Syscall::FileHandle& fh) {
-		if(fh.mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
-				fh.fs = new WriteFileStream(fh.name, false, true);
-			}
-		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name) == 0) {
-				fh.fs = new FileStream(fh.name);
-			}
-		} else {
-			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
-		}
-		if(fh.fs) if(!fh.fs->isOpen()) {
-			delete fh.fs;
-			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
-		return 0;
-	}
-
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
 		LOGD("maFileOpen(%s, %x)\n", path, mode);
 		Smartie<FileHandle> fhs(new FileHandle);
@@ -715,21 +747,26 @@ namespace Base {
 		size = strlen(path) + 1;
 #endif
 		fh.name.resize(size);
-#ifdef SYMBIAN
-		// Switch directory separators.
-		for(int i=0; i<size; i++) {
-			if(fn[i] == '/') {
-				fh.name[i] = '\\';
-			} else {
-				fh.name[i] = fn[i];
-			}
-		}
-#else
 		memcpy(fh.name, fn, size);
-#endif
 
 		fh.fs = NULL;
-		TEST_LTZ(openFile(fh));
+		if(mode == MA_ACCESS_READ_WRITE) {
+			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
+				fh.fs = new WriteFileStream(fh.name, false, true);
+			}
+		} else if((mode & MA_ACCESS_READ) != 0) {
+			if(isDirectory(fh.name) == 0) {
+				fh.fs = new FileStream(fh.name);
+			}
+		} else {
+			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
+		}
+		if(fh.fs) if(!fh.fs->isOpen()) {
+			delete fh.fs;
+			fh.fs = NULL;
+			LOGD("maFileOpen failed.\n");
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
 		FileHandle* fhp = fhs.extract();
 		CLEANUPSTACK_PUSH(fhp);
 		gFileHandles.insert(gFileNextHandle, fhp);
@@ -836,112 +873,12 @@ namespace Base {
 		return len;
 	}
 
+	//TODO
+	int maFileAvailableSpace(MAHandle file);
+	int maFileTotalSpace(MAHandle file);
+	int maFileRename(MAHandle file, const char* newName);
+
 #if !defined(SYMBIAN) && !defined(_WIN32_WCE)
-
-#ifdef WIN32
-	static int fileSpace(MAHandle file, unsigned _diskfree_t::* clusters) {
-		_diskfree_t df;
-		unsigned drive;
-#if FILESYSTEM_CHROOT
-		SYSCALL_THIS->getFileHandle(file);	// just to make sure the file handle is ok.
-		drive = 0;
-#else
-		Syscall::FileHandle& fh();
-		drive = (fh.name[0] - 'A') + 1;
-#endif	//FILESYSTEM_CHROOT
-		if(_getdiskfree(drive, &df) != 0) {
-			LOG("_getdiskfree errno %i\n", errno);
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
-		return (int)MIN(df.bytes_per_sector * df.sectors_per_cluster * (u64)(df.*clusters), INT_MAX);
-	}
-#define SPACE_AVAIL &_diskfree_t::avail_clusters
-#define SPACE_TOTAL &_diskfree_t::total_clusters
-
-#else	//!WIN32
-
-	static int fileSpace(MAHandle file, fsblkcnt_t statvfs::* clusters) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
-		struct statvfs s;
-		if(statvfs(fh.name, &s) != 0) {
-			LOG("statvfs errno %i\n", errno);
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
-		return (int)MIN(s.f_frsize * s.*clusters, INT_MAX);
-	}
-#define SPACE_AVAIL &statvfs::f_bavail
-#define SPACE_TOTAL &statvfs::f_blocks
-#endif	//WIN32
-
-	int Syscall::maFileAvailableSpace(MAHandle file) {
-		return fileSpace(file, SPACE_AVAIL);
-	}
-
-	int Syscall::maFileTotalSpace(MAHandle file) {
-		return fileSpace(file, SPACE_TOTAL);
-	}
-
-	int Syscall::maFileRename(MAHandle file, const char* newName) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
-
-		// close the file while we're renaming.
-		bool wasOpen;
-		int oldPos;
-		if(fh.fs)
-			wasOpen = fh.fs->isOpen();
-		else
-			wasOpen = false;
-		if(wasOpen) {
-			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-			delete fh.fs;
-			fh.fs = NULL;
-		}
-
-		bool hasPath = false;
-#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(FILESYSTEM_CHROOT)
-		// If fh.name and newName are on different file systems,
-		// forbid the operation.
-		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
-			return MA_FERR_RENAME_FILESYSTEM;
-		}
-		if(newName[1] == ':' || newName[0] == '/')
-			hasPath = true;
-#else
-		if(newName[0] == '/')
-			hasPath = true;
-#endif
-		std::string nn;
-		if(!hasPath) {
-			int oldPathLen = 0;
-			const char* lastSlash = strrchr(fh.name, '/');
-			if(lastSlash != NULL) {
-				oldPathLen = (lastSlash - fh.name) + 1;
-			}
-			if(oldPathLen > 0) {
-				nn.append(fh.name, oldPathLen);
-				nn.append(newName);
-				newName = nn.c_str();
-			}
-		}
-		int res = rename(fh.name, newName);
-		if(res != 0) {
-			if(errno == EXDEV)
-				return MA_FERR_RENAME_FILESYSTEM;
-			else if(errno == EACCES)
-				return MA_FERR_FORBIDDEN;
-			else
-				return MA_FERR_GENERIC;
-		}
-		fh.name.resize(strlen(newName) + 1);
-		strcpy(fh.name, newName);
-
-		if(!wasOpen)
-			return 0;
-		TEST_LTZ(openFile(fh));
-		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-		return 0;
-	}
-
 	int Syscall::maFileDate(MAHandle file) {
 		LOGD("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
@@ -975,14 +912,27 @@ namespace Base {
 		if(res < 0) FILE_FAIL(MA_FERR_GENERIC);
 		if(close(fd) < 0) FILE_FAIL(MA_FERR_GENERIC);
 
-		TEST_LTZ(openFile(fh));
+		// todo: share code with maFileOpen().
+		if(fh.mode == MA_ACCESS_READ_WRITE) {
+			fh.fs = new WriteFileStream(fh.name);
+		} else if((fh.mode & MA_ACCESS_READ) != 0) {
+			fh.fs = new FileStream(fh.name);
+		} else {
+			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
+		}
+		if(fh.fs) if(!fh.fs->isOpen()) {
+			delete fh.fs;
+			fh.fs = NULL;
+			LOGD("maFileOpen failed.\n");
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
 		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 #endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
-		LOGD("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
+		LOGD("maFileWrite(%i, 0x%p, %i)\n", file, src, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -1007,7 +957,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
-		LOGD("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
+		LOGD("maFileRead(%i, 0x%p, %i)\n", file, dst, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);

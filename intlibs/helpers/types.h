@@ -46,10 +46,4 @@ typedef signed char s8;
 # error Unsupported compiler!
 #endif
 
-#ifdef SYMBIAN
-# define PFP "08x"
-#else
-# define PFP "p"
-#endif
-
 #endif // _INTLIBS_TYPES_H_

@@ -1709,7 +1709,6 @@ namespace Base {
 	static void fillBufferCallback() {
 		MAEvent* ep = new MAEvent;
 		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
-		ep->state = 1;
 		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
 		FE_PushEvent((SDL_Event*)&event);
 	}
@@ -1795,6 +1794,9 @@ namespace Base {
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
+
+		case maIOCtl_maCheckInterfaceVersion:
+			return maCheckInterfaceVersion(a);
 
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
@@ -1965,12 +1967,14 @@ namespace Base {
 			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
 			return SYSCALL_THIS->maFileSize(a);
+#if 0	//TODO
 		case maIOCtl_maFileAvailableSpace:
 			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
 			return SYSCALL_THIS->maFileTotalSpace(a);
 		case maIOCtl_maFileRename:
 			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+#endif
 		case maIOCtl_maFileDate:
 			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileTruncate:

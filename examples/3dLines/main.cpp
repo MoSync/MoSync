@@ -85,17 +85,6 @@ LineObject* gObj;
 int gScreenWidth;
 int gScreenHeight;
 
-static void updateScreenDimensions() {
-	/// Get screen dimensions.
-	MAExtent size = maGetScrSize();
-
-	/// Extract the screen width
-	gScreenWidth = EXTENT_X(size);
-
-	/// Extract the screen height
-	gScreenHeight = EXTENT_Y(size);
-}
-
 /**
  * \brief Function that initializes the example.
  */
@@ -111,7 +100,14 @@ static void init() {
 	/// Generate the cube.
 	generateCube(gObj, 7000);
 
-	updateScreenDimensions();
+	/// Get screen dimensions.
+	MAExtent size = maGetScrSize();
+
+	/// Extract the screen width
+	gScreenWidth = EXTENT_X(size);
+
+	/// Extract the screen height
+	gScreenHeight = EXTENT_Y(size);
 }
 
 /**
@@ -248,8 +244,6 @@ int MAMain()
 			} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
 				mode ^= 1;
 #endif	// MA_PROF_SUPPORT_STYLUS
-			} else if(event.type == EVENT_TYPE_SCREEN_CHANGED) {
-				updateScreenDimensions();
 			} else if(event.type == EVENT_TYPE_CLOSE ||
 				(event.type == EVENT_TYPE_KEY_PRESSED &&
 				(event.key == MAK_0|| event.key == MAK_SOFTRIGHT)))

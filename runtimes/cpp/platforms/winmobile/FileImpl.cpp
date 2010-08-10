@@ -100,23 +100,22 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist) {
+	WriteFileStream::WriteFileStream(const char* filename, bool append) {
 		char temp[256];
 		getWorkingDirectory(temp, 256);
 		strcat(temp, "\\");
 		strcat(temp, filename);
-
+		
 		if(append) {
-			file = fopen(temp, "ab+");
-		} else if(exist) {
-			file = fopen(temp, "rb+");
+			file = fopen(temp, "ab");
 		} else {
-			file = fopen(temp, "wb+");
+			file = fopen(temp, "wb");
 		}
 
 		if(!file)
 		{
 			LOG("Could not open file for writing\n");
+			//LOG(SDL_GetError());
 		}
 	}
 	bool WriteFileStream::write(const void* src, int size) {

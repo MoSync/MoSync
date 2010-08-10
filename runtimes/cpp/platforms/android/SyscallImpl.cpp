@@ -908,6 +908,11 @@ namespace Base
 		SYSLOG("maIOCtl");
 		
 		switch(function) {
+
+		case maIOCtl_maCheckInterfaceVersion:
+			SYSLOG("maIOCtl_maCheckInterfaceVersion");
+			return Base::maCheckInterfaceVersion(a);
+
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
 			return -1;

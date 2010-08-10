@@ -24,6 +24,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // See http://gcc.gnu.org/onlinedocs/gccint/Soft-float-library-routines.html
 // for documentation
 
+// ** Convert float to unsigned int
+unsigned int __fixunssfsi(float a)			/// ??? Might need fixing
+{
+	if (a < 0)
+		return 0;
+
+	if (a > 0xffffffff)
+		return 0xffffffff;
+
+	if (a < 0x80000000)
+		return (unsigned) __fixsfsi(a);
+	
+	return ((unsigned int) __fixsfsi(a - 0x7fffffff)) + 0x7fffffff;
+}
+
 // ** if a greater than b
 
 int __gtsf2(float a, float b)
@@ -66,6 +81,21 @@ int __nesf2(float a, float b)
 	return fcmp(a,b);
 }
 
+// ** Convert double to unsigned int
+
+unsigned int __fixunsdfsi(double a)			/// ??? Might need fixing
+{
+	if (a < 0)
+		return 0;
+
+	if (a > 0xffffffff)
+		return 0xffffffff;
+
+	if (a < 0x80000000)
+		return (unsigned) __fixdfsi(a);
+	
+	return ((unsigned int) __fixdfsi(a - 0x7fffffff)) + 0x7fffffff;
+}
 
 // ** if a greater than b
 
@@ -109,6 +139,10 @@ int __nedf2(double a, double b)
 	return dcmp(a,b);
 }
 
+float __truncdfsf2 (double a)
+{
+	return d2f(a);
+}
 
 /* the following deal with IEEE single-precision numbers */
 
@@ -156,6 +190,34 @@ union float_long
 	float f;
 	long l;
 };
+
+// ** convert float to double
+
+double __extendsfdf2 (float a1)
+{
+  return f2d(a1);
+  /*
+  register union float_long fl1;
+  register union double_long dl;
+  register int exp;
+
+  fl1.f = a1;
+
+  if (!fl1.l)
+    {
+      dl.l.upper = dl.l.lower = 0;
+      return (dl.d);
+    }
+
+  dl.l.upper = FSIGN (fl1.l);
+  exp = EXP (fl1.l) - EXCESS + EXCESSD;
+  dl.l.upper |= exp << 20;
+  dl.l.upper |= (MANT (fl1.l) & ~HIDDEN) >> 3;
+  dl.l.lower = MANT (fl1.l) << 29;
+
+  return (dl.d);
+  */
+}
 
 double fabs(double d) {
 	return d > 0 ? d : -d;

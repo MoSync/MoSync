@@ -159,7 +159,7 @@ public class MAConn {
 #endif
 
 
-static class Connect implements Runnable {
+class Connect implements Runnable {
 	MAStreamConn mac;
 	final String url;
 
@@ -508,7 +508,7 @@ class ConnWriteFromData implements Runnable {
 }
 
 
-static class HttpFinish implements Runnable {
+class HttpFinish implements Runnable {
 	MAStreamConn mac;
 
 	HttpFinish(MAStreamConn m) {

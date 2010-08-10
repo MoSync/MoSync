@@ -1316,9 +1316,9 @@ namespace MoSync {
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
-		//LOGD("Entering generated code...\n");
+		LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
-		//LOGD("Exited generated code.\n");
+		LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 

@@ -21,8 +21,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Graphics.h>
 #include <MAUI/Image.h>
 #include "MapWidget.h"
+#include "MapTile.h"
 #include "MapCache.h"
 #include "MapSource.h"
+#include "OpenStreetMapSource.h"
+#include "CloudMadeMapSource.h"
+#include "GoogleMapSource.h"
+#include "PixelCoordinate.h"
 #include "MapSourceMgr.h"
 
 namespace MAP

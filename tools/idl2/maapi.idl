@@ -89,47 +89,6 @@ interface MAAPI {
 	/// Creates an MAExtent.
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
-	// These three functions are at the top,
-	// to ensure their numeric identifiers do not change in the future.
-
-	/**
-	* Compares the runtime's interface version with yours,
-	* using a hash of the interface's contents.
-	*
-	* If the versions do not match, a MoSync Panic is generated.
-	*
-	* This function returns the runtime's hash. However, if there is
-	* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
-	* your version of the header files, causing a different function than this to be called.
-	*
-	* The hash appears as a 32-bit random number, so it is very unlikely that the return
-	* value from any other function is the same as the runtime's hash.
-	*
-	* Therefore, you should always compare the return value from this function to your hash
-	* and exit your program, preferably using maPanic(), if they don't match.
-	*
-	* \param hash Your hash. Pass #MAIDL_HASH.
-	* \returns The runtime's hash.
-	*/
-	int maCheckInterfaceVersion(in int hash);
-
-	/**
-	* Shuts down the system. This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	*/
-	noreturn maExit(in int result);
-
-	/**
-	* Displays a message to the user, then shuts down the system.
-	* This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	* \param message The message should be short, not more than 40 characters,
-	* to ensure its visibility on all screen sizes.
-	* \see MAPanicReport
-	*/
-	noreturn maPanic(in int result, in MAString message);
-
-
 	/**
 	* Sets \a size bytes, starting at \a dst, to the specified value, interpreted as an unsigned char.
 	* \returns \a dst.
@@ -199,28 +158,36 @@ interface MAAPI {
 	* Returns -\a a.
 	*/
 	double __negdf2(in double a);
+	
+	/**
+	* Returns the double representation of \a a.
+	*/
+	float d2f(in double a);
+	
 	/**
 	* Returns the integer part of \a a.
 	*/
 	int __fixdfsi(in double a);
 	/**
-	* Returns the unsigned integer part of \a a. Negative values become zero.
-	*/
-	uint __fixunsdfsi(in double a);
-	/**
 	* Returns the double representation of \a a.
 	*/
 	double __floatsidf(in int a);
-	/**
-	* Returns the double representation of \a a.
-	*/
-	double __extendsfdf2(in float a);
+	
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
 	*/
 	int dcmp(in double a, in double b); 
-
+	
+	/**
+	 * Double float comparision, same as fcmp
+	 */
+	int __eqdf2(in double a, in double b);	
+	int __nedf2(in double a, in double b);	
+	int __gedf2(in double a, in double b);
+	int __gtdf2(in double a, in double b);
+	int __ledf2(in double a, in double b);
+	int __ltdf2(in double a, in double b);	
 
 	/**
 	* Returns \a a + \a b.
@@ -239,31 +206,50 @@ interface MAAPI {
 	* If \a b == 0, a <a href="../panics.html">MoSync Panic</a> is thrown.
 	*/
 	float __divsf3(in float a, in float b);
-	/**
-	* Returns -\a a.
-	*/
+	
 	float __negsf2(in float a);
+
 	/**
 	* Returns the integer part of \a a.
 	*/
 	int __fixsfsi(in float a);
 	/**
-	* Returns the unsigned integer part of \a a. Negative values become zero.
-	*/
-	uint __fixunssfsi(in float a);
-	/**
 	* Returns the float representation of \a a.
 	*/
 	float __floatsisf(in int a);
+
 	/**
-	* Returns the float representation of \a a.
+	* Returns the double representation of \a a.
 	*/
+	double f2d(in float a);
+	
+	/**
+	 * Converts float to double
+	 *
+	 */
+	double __extendsfdf2(in float a);
+	
+	/**
+	 * Convert (truncates) double to float
+	 */
 	float __truncdfsf2(in double a);
+	
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
 	*/
 	int fcmp(in float a, in float b); 
+	
+	/**
+	 * Single float comparision, same as fcmp
+	 */
+	int __eqsf2(in float a, in float b);	
+	int __nesf2(in float a, in float b);	
+	int __gesf2(in float a, in float b);
+	int __gtsf2(in float a, in float b);
+	int __lesf2(in float a, in float b);
+	int __ltsf2(in float a, in float b);
+	
 
 	/**
 	* Returns the sine of \a x.
@@ -284,7 +270,13 @@ interface MAAPI {
 	* Returns the square root of \a x.
 	*/
 	double sqrt(in double x);
+	
 
+	/**
+	 * Long long multiply
+	 */
+	double __muldi3(in int a1, in int a2, in int b1, in int b2);
+	
 	/**
 	 * A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
 	 */
@@ -635,7 +627,7 @@ interface MAAPI {
 		MAX = -3;
 		/// DNS resolution error.
 		DNS = -4;
-		/// Internal error. Please report any occurrences.
+		/// Internal error. Please report any occurrences to Mobile Sorcery.
 		INTERNAL = -5;
 
 		/** \brief The connection was closed by the remote peer.
@@ -655,7 +647,6 @@ interface MAAPI {
 		/// You supplied a malformed URL.
 		URL = -11;
 		/// The protocol is not available.
-		/// If a Bluetooth function returns this, the Bluetooth chip is turned off.
 		UNAVAILABLE = -12;
 		/// You canceled the operation.
 		CANCELED = -13;
@@ -670,7 +661,7 @@ interface MAAPI {
 		* If you wish to share the CONNERR codespace,
 		* use values below this for your own error codes.
 		*/
-		USER = -1000000;
+		USER = -1000000;	
 	}
 	constset int CONNOP_ {
 		READ = 1;
@@ -1216,12 +1207,6 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-		/** \brief The size of the screen changed.
-		* Use maGetScrSize() to get the new size.
-		*
-		* If the screen is the current draw target, the clipping rectangle is removed.
-		* Use maSetClipRect() to reset it.
-		*/
 		SCREEN_CHANGED = 21;
 	}
 
@@ -1362,6 +1347,22 @@ interface MAAPI {
 	*/
 	int maVibrate(in int ms);
 
+	/**
+	* Shuts down the system. This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	*/
+	noreturn maExit(in int result);
+
+	/**
+	* Displays a message to the user, then shuts down the system.
+	* This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	* \param message The message should be short, not more than 40 characters,
+	* to ensure its visibility on all screen sizes.
+	* \see MAPanicReport
+	*/
+	noreturn maPanic(in int result, in MAString message);
+
 	constset int RUNTIME_ {
 		/// The MoSync Reference Environment, also known as the Emulator.
 		MORE = 1;
@@ -1497,6 +1498,27 @@ interface MAAPI {
 		FLUX = 127;
 	}
 #endif	//IX_RESOURCE_TYPES
+
+		/**
+		* Compares the runtime's interface version with yours,
+		* using a hash of the interface's contents.
+		*
+		* If the versions do not match, a MoSync Panic is generated.
+		*
+		* This function returns the runtime's hash. However, if there is
+		* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
+		* your version of the header files, causing a different function than this to be called.
+		*
+		* The hash appears as a 32-bit random number, so it is very unlikely that the return
+		* value from any other function is the same as the runtime's hash.
+		*
+		* Therefore, you should always compare the return value from this function to your hash
+		* and exit your program, preferably using maPanic(), if they don't match.
+		*
+		* \param hash Your hash. Pass #MAIDL_HASH.
+		* \returns The runtime's hash.
+		*/
+		int maCheckInterfaceVersion(in int hash);
 
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
@@ -1735,9 +1757,6 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
-		* Note that you need to fill the MABtDevice structure before passing it
-		* as a parameter, otherwise you will get memory access problems.
-		*
 		* \returns 1 if successful, zero if the queue is empty.
 		*/
 		int maBtGetNewDevice(out MABtDevice d);
@@ -1815,15 +1834,7 @@ interface MAAPI {
 		*/
 		int maWlanStartDiscovery();
 
-		/**
-		* Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
-		*
-		* If \a dst.nameBufSize is less than the return value, the name is not copied.
-		*
-		* The IEEE 802.11 WLAN standard specifies that a name may be up to 32 characters long.
-		* Your buffer should therefore be at least 33 bytes long,
-		* in order to contain a maximum-length name and terminating zero.
-		*/
+		/// Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
 		int maWlanGetNewAp(out MAWlanAp dst);
 #endif	//IX_WLAN
 
@@ -2093,13 +2104,8 @@ interface MAAPI {
 		*
 		* If offset is less than the file's size,
 		* the file's new size is equal to the offset. All data after the offset is discarded.
-		*
-		* If the offset is equal to the file's size, this function does nothing.
-		*
-		* If the offset is greater than the file's current size,
-		* this function MAY increase the size of the file.
-		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
-		*
+		* If the offset is equal to or greater than the file's size,
+		* this function does nothing.
 		* If the file's position is greater than the offset, it is reset
 		* to be equal to the offset.
 		*
@@ -2621,10 +2627,6 @@ interface MAAPI {
 
 #if IX_PIM
 		constset int MA_PIM_ {
-			/**
-			* Each contact commonly includes a name and one or more phone numbers.
-			* May also include a street address and an email address.
-			*/
 			CONTACTS = 1;
 			EVENTS = 2;
 			TODOS = 3;
@@ -2650,46 +2652,44 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_FIELD_CONTACT_ {
-			/// #MA_PIM_TYPE_STRING_ARRAY.
-			/// Has \link #MA_PIM_CONTACT_ADDR_POBOX MA_PIM_CONTACT_ADDR \endlink indices.
+			/// String array.
 			ADDR = 100;
-			/// #MA_PIM_TYPE_DATE.
+			/// Date.
 			BIRTHDAY = 101;
-			/// #MA_PIM_TYPE_INT. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
+			/// Int. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
 			/// #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
 			CLASS = 102;
-			/// #MA_PIM_TYPE_STRING.
+			/// String.
 			EMAIL = 103;
-			/// #MA_PIM_TYPE_STRING.
+			/// String.
 			FORMATTED_ADDR = 104;
-			/// #MA_PIM_TYPE_STRING.
+			/// String.
 			FORMATTED_NAME = 105;
-			/// #MA_PIM_TYPE_STRING_ARRAY.
-			/// Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
+			/// String array.
 			NAME = 106;
-			/// #MA_PIM_TYPE_STRING.
+			/// String.
 			NICKNAME = 107;
-			/// #MA_PIM_TYPE_STRING. Supplemental information, or a comment.
+			/// String. Supplemental information, or a comment.
 			NOTE = 108;
-			/// #MA_PIM_TYPE_STRING. Organization/company name.
+			/// String. Organization/company name.
 			ORG = 109;
-			/// #MA_PIM_TYPE_BINARY. Connected with PHOTO_URL.
+			/// Binary. Connected with PHOTO_URL.
 			PHOTO = 110;
-			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
+			/// String. Connected with PHOTO.
 			PHOTO_URL = 111;
-			/// #MA_PIM_TYPE_BINARY. Connected with PUBLIC_KEY_STRING.
+			/// Binary. Connected with PUBLIC_KEY_STRING.
 			PUBLIC_KEY = 112;
-			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
+			/// String. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
-			/// #MA_PIM_TYPE_DATE.
+			/// Date.
 			REVISION = 114;
-			/// #MA_PIM_TYPE_STRING. Telephone number.
+			/// String. Telephone number.
 			TEL = 115;
-			/// #MA_PIM_TYPE_STRING. Professional title.
+			/// String. Professional title.
 			TITLE = 116;
-			/// #MA_PIM_TYPE_INT. Unique identifier for the contact on this device.
+			/// Int. Unique identifier for the contact on this device.
 			UID = 117;
-			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
+			/// String. Uniform Resource Locator associated with the contact.
 			URL = 118;
 		}
 
@@ -2783,48 +2783,34 @@ interface MAAPI {
 		/** Returns the field id of the item's n:th field.
 		* Panics on invalid indices.
 		* A field id is one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \param item Opened by maPimListNext().
-		* \param n \>= 0 and \< maPimItemCount().
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
 		/** Returns the number of values in the field for a given item.
 		* Returns 0 if the field (does not exist / has no values) for this item.
-		* \param item Opened by maPimListNext().
-		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
-		* \param item Opened by maPimListNext().
-		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \param index \>= 0 and \< maPimItemFieldCount().
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
-		* \param list Opened by maPimListOpen().
-		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
 		struct MA_PIM_ARGS {
-			/// Opened by maPimListNext().
 			MAHandle item;
-			/// One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 			int field;
-			/// The address to a buffer, where a value is or will be stored.
 			MAAddress buf;
-			/// The size of the buffer, in bytes.
 			int bufSize;
 		}
 		/**
 		* Copies the specified value from a field and item to \a args.buf.
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
-		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \returns The number of bytes occupied by the value.
 		* If this number is greater than bufSize, the value is not written,
 		* and you'll have to allocate a bigger buffer and try again.

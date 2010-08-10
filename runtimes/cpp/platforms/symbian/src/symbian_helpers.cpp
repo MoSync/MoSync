@@ -582,20 +582,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	CGraphicsDevice* gd = coeenv->SystemGc().Device();
 	TDisplayMode mode = gd->DisplayMode();
 	//frameInfo.iFrameDisplayMode);
-// bugged on 5th edition when image width isn't pitch-aligned.
-	const bool hasAlpha = (frameInfo.iFlags & TFrameInfo::ETransparencyPossible) != 0;
-#ifdef __S60_50__
-	TSize imgSize = frameInfo.iOverallSizeInPixels;
-	int unalignment = (imgSize.iWidth & 3);
-	if(unalignment != 0 && hasAlpha) {
-		imgSize.iWidth += 4 - unalignment;
-		LOGD("Changing image width from %i to %i.\n",
-			frameInfo.iOverallSizeInPixels.iWidth, imgSize.iWidth);
-	}
-#else
-	const TSize& imgSize(frameInfo.iOverallSizeInPixels);
-#endif
-	LHEL_BASE(bmpClr->Create(imgSize, mode), return NULL);
+	LHEL_BASE(bmpClr->Create(frameInfo.iOverallSizeInPixels, mode), return NULL);
 
 	//Create Synchronizer  
 	TCleaner<CLocalSynchronizer> sync(new CLocalSynchronizer);
@@ -605,12 +592,12 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 
 	//Create mask, if needed.
 	TCleaner<CFbsBitmap> bmpMask(NULL);
-	if(hasAlpha) {
+	if(frameInfo.iFlags & TFrameInfo::ETransparencyPossible) {
 		bmpMask = new CFbsBitmap;
 		if(!bmpMask)
 			return NULL;
 		CleanupStack::PushL(bmpMask());
-		LHEL_BASE(bmpMask->Create(imgSize,
+		LHEL_BASE(bmpMask->Create(frameInfo.iOverallSizeInPixels,
 			(frameInfo.iFlags & TFrameInfo::EAlphaChannel) ? EGray256 : EGray2),
 			return NULL);
 		decoder->Convert(sync->Status(), *bmpClr, *bmpMask);  //Perform decoding

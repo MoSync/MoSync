@@ -15,16 +15,42 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include <string.h>
 #include "TranslateSyscall.h"
-
-extern "C" const char* translateSyscall(int num) {
 #include "asm_config.h"
+
 #define SYSCALL_NAME(number,reType,name,arg1,argD) ,#name
-	static const char* const syscallStrings[] = { 0 SYSCALLS(SYSCALL_NAME, , , ) };
-	static const int nSyscalls = sizeof(syscallStrings) / sizeof(char*) - 1;
+static const char* const syscallStrings[] = { 0 SYSCALLS(SYSCALL_NAME, , , ) };
+static const int nSyscalls = sizeof(syscallStrings) / sizeof(char*) - 1;
+
+
+extern "C" const char* translateSyscall(int num) 
+{
 	if(num >= 0 && num < nSyscalls) {
 		return syscallStrings[num];
 	} else {
 		return 0;
 	}
 }
+
+/**
+ * Returns a syscall ID from it's name.
+ *
+ * @param name Name of syscall to look up
+ *
+ * @return < 0 - Not found
+ *         > 0 - The requested syscall ID
+ */
+extern "C" int translateSyscallID ( const char *name )
+{
+	for ( int i = 1; i <= nSyscalls; i++ )
+	{
+		if ( strcmp( name, syscallStrings[i] ) == 0 )
+			return i;
+	}		
+	
+	return -1;
+}
+
+
+

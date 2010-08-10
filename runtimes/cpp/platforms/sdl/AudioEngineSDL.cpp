@@ -106,9 +106,6 @@ namespace AudioEngine {
 			}
 		}
 
-
-		SDL_LockAudio();
-	   	 SDL_UnlockAudio();
 		SDL_CloseAudio();
 		for(int i = 0; i < MAX_CHANNELS; i++) {
 			if(gChannels[i]) {
@@ -158,10 +155,8 @@ namespace AudioEngine {
 		}
 #endif		
 
-		if(audioSource->init() !=0) {
-			delete audioSource;
+		if(audioSource->init() !=0)
 			return NULL;
-		}
 		else
 			return audioSource;
 	}

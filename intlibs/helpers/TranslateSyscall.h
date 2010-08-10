@@ -18,6 +18,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //Returns NULL if not found.
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
 const char* translateSyscall(int num);
+
+/**
+ * Returns a syscall ID from it's name.
+ *
+ * @param name Name of syscall to look up
+ *
+ * @return < 0 - Not found
+ *         > 0 - The requested syscall ID
+ */
+int translateSyscallID ( const char *name );
+
+#ifdef __cplusplus
+}
+#endif

@@ -45,10 +45,7 @@ public:
 //Variables
 //***************************************************************************
 
-enum BtState {
-	eAvailable, eTurnedOff, eForbidden, eError
-} gBtState;
-
+bool gBtAvailable;
 CCBSynchronizer* gBtSynchronizer;
 
 RHostResolver gBtResolver;
@@ -75,8 +72,6 @@ RSdpDatabase gBtSdpDB;
 void ClearBluetoothVariables();
 void ConstructBluetoothL();
 void DestructBluetooth();
-
-BtState BtCheckPowerState();
 
 static void BtSyncCallbackL(TAny* aPtr, TInt aResult);
 void BtRunL(TInt aResult);

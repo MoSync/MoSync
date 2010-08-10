@@ -30,5 +30,4 @@ SKIPPED = [
 'eeprof-1.c', #profiler
 '941014-1.c', #pipe-tool reports: illegal function pointer manipulation.
 'builtin-bitops-1.c', #builtin.functions
-'930622-2.c', #gcc bug: calls __fixdfdi instead of __fixdfti or __fixtfti
 ]

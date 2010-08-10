@@ -28,9 +28,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef BLUEZ_SUPPORTED
 #include "linux/bluez/connectionbluez.hpp"
 #endif
-#ifdef COCOA_SUPPORTED
-#include "darwin/ConnectionCocoa.h"
-#endif
 #ifdef BROADCOM_SUPPORTED
 #include "win32/broadcom.h"
 #endif
@@ -81,10 +78,6 @@ BtSppConnection* createBtSppConnection(const MABtAddr* address, uint port) {
 #ifdef BLUEZ_SUPPORTED
 	case Bluetooth::BTSTACK_BLUEZ:
 		return new Bluetooth::BlueZ::BtSppConnectionBluez( address, port );
-#endif
-#ifdef COCOA_SUPPORTED
-		case Bluetooth::BTSTACK_COCOA:
-			return new Bluetooth::Darwin::BtSppConnectionCocoa( address, port );
 #endif
 	default:
 		return NULL;

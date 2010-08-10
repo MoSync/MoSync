@@ -63,6 +63,12 @@ byte* RUN_NAME(byte* ip) {
 	byte op,rd,rs;
 	unsigned long imm32;
 
+	union DR 
+	{
+		int		i[2];
+		double	d;
+	};
+	
 	VM_Yield = 0;
 
 #ifdef _WIN32
@@ -302,6 +308,7 @@ VMLOOP_LABEL
 		OPC(SYSCALL)
 		{
 			int syscallNumber = IB;
+			
 			fakePush((long) (ip - mem_cs), -syscallNumber);
 			InvokeSysCall(syscallNumber);
 			fakePop();
@@ -323,6 +330,247 @@ VMLOOP_LABEL
 				JMP_GENERIC(DefaultCaseAddress);
 			}
 		} EOP;
+		
+		/* Float ops */
+		OPC(FADD)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			float &fb = (float &)REG( REG_i1 );
+			
+			fd = fa+fb;
+		} EOP;
+		
+		OPC(FSUB)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			float &fb = (float &)REG( REG_i1 );
+			
+			fd = fa-fb;
+		} EOP;
+		
+		OPC(FMUL)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			float &fb = (float &)REG( REG_i1 );
+			
+			fd = fa*fb;
+		} EOP;
+		
+		OPC(FDIV)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			float &fb = (float &)REG( REG_i1 );
+			
+			fd = fa/fb;
+		} EOP;
+		
+		OPC(FNEG)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			
+			fd = -fa;
+		} EOP;		
+		
+		OPC(FCMP)
+		{
+			IB;
+			int   &rd = REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			float &fb = (float &)REG( REG_i1 );
+			
+			if ( fa > fb )
+				rd = 1;
+			else if ( fa == fb )
+				rd = 0;
+			else	//a < b		//or NaN!
+				rd = -1;
+			/*
+			rd = (int)(fa-fb);
+			rd = (rd>>31)-(-rd>>31);
+			*/
+		} EOP;	
+		
+		OPC(F2I)
+		{
+			IB;
+			int   &rd = REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			
+			rd = (int)fa;
+		} EOP;
+		
+		OPC(F2D)
+		{
+			IB;
+			DR    &fd = (DR &)REG( REG_r14 );
+			float &fa = (float &)REG( REG_i0 );
+			
+			fd.d = (double)fa;
+		} EOP;
+			
+		
+		OPC(DADD)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			DR &fb = (DR &)REG( REG_i2 );
+			
+			fd.d = fa.d+fb.d;
+		} EOP;
+		
+		
+		OPC(DSUB)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			DR &fb = (DR &)REG( REG_i2 );
+			
+			fd.d = fa.d-fb.d;
+		} EOP;		
+		
+		
+		OPC(DMUL)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			DR &fb = (DR &)REG( REG_i2 );
+			
+			fd.d = fa.d*fb.d;
+		} EOP;		
+		
+		OPC(DDIV)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			DR &fb = (DR &)REG( REG_i2 );
+			
+			fd.d = fa.d/fb.d;
+		} EOP;		
+		
+		OPC(DNEG)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			
+			fd.d = -fa.d;
+		} EOP;				
+
+		
+		OPC(DCMP)
+		{
+			IB;
+			int &rd = REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			DR &fb = (DR &)REG( REG_i2 );
+			
+			if ( fa.d > fb.d )
+				rd = 1;
+			else if ( fa.d == fb.d )
+				rd = 0;
+			else	//a < b		//or NaN!
+				rd = -1;
+			/*
+			rd = (int)(fa.d-fb.d);
+			rd = (rd>>31)-(-rd>>31);
+			*/
+		} EOP;	
+		
+		OPC(D2I)
+		{
+			IB;
+			int &rd = REG( REG_r14 );
+			DR  &fa = (DR &)REG( REG_i0 );
+			
+			rd = (int)fa.d;
+		} EOP;
+		
+		OPC(D2F)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			DR    &fa = (DR &)REG( REG_i0 );
+			
+			fd = (float)fa.d;
+		} EOP;
+		
+		OPC(I2F)
+		{
+			IB;
+			float &fd = (float &)REG( REG_r14 );
+			int   &ra = REG( REG_i0 );
+			
+			fd = (float)ra;
+		} EOP;		
+
+		
+		OPC(I2D)
+		{
+			IB;
+			DR    &fd = (DR &)REG( REG_r14 );
+			int   &ra = REG( REG_i0 );
+			
+			fd.d = (double)ra;
+		} EOP;	
+		
+		OPC(DSIN)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			
+			fd.d = sin( fa.d );
+		} EOP;
+		
+		OPC(DCOS)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			
+			fd.d = cos( fa.d );
+		} EOP;
+		
+		OPC(DTAN)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			
+			fd.d = tan( fa.d );
+		} EOP;
+		
+		OPC(DSQRT)
+		{
+			IB;
+			DR &fd = (DR &)REG( REG_r14 );
+			DR &fa = (DR &)REG( REG_i0 );
+			
+			fd.d = sqrt( fa.d );
+		} EOP;
+		
+		OPC(LMUL)
+		{
+			IB;
+			long long &r = (long long &)REG( REG_r14 );
+			long long &a = (long long &)REG( REG_i0 );
+			long long &b = (long long &)REG( REG_i2 );
+			r = a*b;
+		} EOP;		
 
 #if 0
 #ifdef ENABLE_DEBUGGER

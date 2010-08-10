@@ -22,13 +22,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MAUUID_H
 #define MAUUID_H
 
-/**
-* Defines a MAUUID that follows the Bluetooth standard of UUIDs.
-* The lower 96 bits are constant.
-*/
-#define DEFINE_BTMAUUID(name, uuid16) static const MAUUID name = {{ uuid16, 0x00001000, 0x80000080, 0x5F9B34FB }}
+#define DEFINE_MAUUID(name, i1, i2, i3, i4) static const MAUUID name = {{ i1, i2, i3, i4 }}
+DEFINE_MAUUID(Bluetooth_Base_MAUUID, 0x00000000, 0x00001000, 0x80000080, 0x5F9B34FB);
 
-DEFINE_BTMAUUID(Bluetooth_Base_MAUUID, 0);
+#define DEFINE_BTMAUUID(name, uuid16) DEFINE_MAUUID(name, uuid16, 0x00001000, 0x80000080, 0x5F9B34FB)
 
 DEFINE_BTMAUUID(L2CAP_PROTOCOL_MAUUID, 0x0100);
 

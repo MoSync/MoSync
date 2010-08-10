@@ -176,15 +176,18 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist) {
+	WriteFileStream::WriteFileStream(const char* filename, bool append) {
 /*		
 		char temp[256];	
 		getWorkingDirectory(temp, 256);
 		strcat(temp, "\\");
 		strcat(temp, filename);
 */		
-		const char* mode = append ? "ab+" : (exist ? "rb+" : "wb+");
-		mFile = fopen(filename, mode);
+		if(append) {
+			mFile = fopen(filename, "ab");
+		} else {
+			mFile = fopen(filename, "wb");
+		}
 
 		if(!mFile)
 		{

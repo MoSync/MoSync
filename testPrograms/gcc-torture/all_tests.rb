@@ -44,8 +44,6 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld' + suffix)
-	stabsFile = ofn.ext('.stabs' + suffix)
 	
 	delete_if_empty(pfn)
 	
@@ -53,9 +51,9 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	if(!File.exists?(pfn) || force_rebuild)
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
-			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
+			sh "pipe-tool -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+			sh "pipe-tool#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -69,7 +67,7 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn} -sld #{sldFile}"
+	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn}"
 	$stderr.puts cmd
 	res = system(cmd)
 	puts res
@@ -79,8 +77,6 @@ def link_and_test(ofn, dead_code, force_rebuild)
 		FileUtils.rm_f(logFile)
 		FileUtils.rm_f(mdsFile)
 		FileUtils.rm_f(esFile)
-		FileUtils.rm_f(sldFile)
-		FileUtils.rm_f(stabsFile)
 	else	# failure
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
@@ -107,14 +103,10 @@ files.each do |filename|
 	
 	# compile
 	if(!File.exists?(ofn) || force_rebuild)
-		if(bn == 'conversion.c')
-			# avoid testing long longs, as they are not yet properly supported by MoSync.
-			extra_flags = ' -U __GNUC__'
-		end
-		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}#{extra_flags}"
+		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS}"
 		force_rebuild = true
 	end
 	
 	force_rebuild = link_and_test(ofn, false, force_rebuild)
-	link_and_test(ofn, true, force_rebuild) if(SETTINGS[:test_dce])
+	link_and_test(ofn, true, force_rebuild)
 end

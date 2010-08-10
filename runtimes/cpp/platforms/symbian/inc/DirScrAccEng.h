@@ -51,7 +51,6 @@ public:
 	uint Height() { return iWindow.Size().iHeight; }
 	void SetDrawSurfaceL(TAlphaBitmap* img);
 	void ClearScreen();
-	void UpdateScreenSize();
 	
 	void Reset();
 

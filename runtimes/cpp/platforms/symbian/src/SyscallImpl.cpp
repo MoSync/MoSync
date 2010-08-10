@@ -1250,20 +1250,18 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 
 SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
-	if(gBtState != eAvailable) switch(function) {
+	if(!gBtAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:
 	case maIOCtl_maBtGetNewDevice:
 	case maIOCtl_maBtStartServiceDiscovery:
 	case maIOCtl_maBtGetNewService:
 	case maIOCtl_maBtGetNextServiceSize:
-		switch(gBtState) {
-		case eTurnedOff: return CONNERR_UNAVAILABLE;
-		case eForbidden: return CONNERR_FORBIDDEN;
-		case eError: return IOCTL_UNAVAILABLE;
-		default: DEBIG_PHAT_ERROR;
-		}
+		return IOCTL_UNAVAILABLE;
 	}
 	switch(function) {
+
+	case maIOCtl_maCheckInterfaceVersion:
+		return Base::maCheckInterfaceVersion(a);
 
 #ifdef TELEPHONY
 	case maIOCtl_maGetBatteryCharge:
@@ -1560,7 +1558,7 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		return maFileDelete(a);
 	case maIOCtl_maFileSize:
 		return maFileSize(a);
-	case maIOCtl_maFileAvailableSpace:
+	/*case maIOCtl_maFileAvailableSpace:
 		return maFileAvailableSpace(a);
 	case maIOCtl_maFileTotalSpace:
 		return maFileTotalSpace(a);
@@ -1569,7 +1567,7 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maFileRename:
 		return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
 	case maIOCtl_maFileTruncate:
-		return maFileTruncate(a, b);
+		return maFileTruncate(a, b);*/
 
 	case maIOCtl_maFileWrite:
 		return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
@@ -1812,23 +1810,20 @@ public:
 	
 	RootFileList() : mPos(0) {}
 	int next(char* nameBuf, int bufSize) {
-		LOGD("RootFileList::next(%i)\n", mPos);
 		while(mPos < KMaxDrives) {
 			if(mList[mPos] != 0) {
 				//we've got a drive.
-				if(bufSize > 3) {
+				if(bufSize >= 4) {
 					nameBuf[0] = 'A' + mPos;
 					nameBuf[1] = ':';
 					nameBuf[2] = '/';
 					nameBuf[3] = 0;
 					mPos++;
 				}
-				LOGD("RootFileList::next() returning 3 (%i) at %i\n", bufSize, mPos);
-				return 3;
+				return 4;
 			}
 			mPos++;
 		}
-		LOGD("RootFileList::next() returning 0 at %i\n", mPos);
 		return 0;
 	}
 };
@@ -1878,13 +1873,12 @@ static int translateFileListErrorCode(int sym) {
 }
 
 MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
-	LOGD("maFileListStart(%s, %s)\n", path, filter);
+	//LOG("maFileListStart(%s, %s)\n", path, filter);
 	TCleaner<FileList> fl(NULL);
 	MyRFs myrfs;
 	myrfs.Connect();
 	//LOG("connected\n");
 	if(path[0] == 0) {	//empty string
-		LOGD("list filesystem roots\n");
 		//list filesystem roots
 		Smartie<RootFileList> rfl(new RootFileList);
 		int res = FSS.DriveList(rfl->mList);
@@ -1911,9 +1905,9 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 		
 		Append(des, filterPtrC8);
 		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
-		LOGD("GetDir '%S'\n", temp8());
+		//LOG("GetDir '%S'\n", temp8());
 		int res = FSS.GetDir(des, KEntryAttMaskSupported, ESortNone, dfl->mDir);
-		LOGD("res: %i\n", res);
+		//LOG("res: %i\n", res);
 		if(res < 0)
 			return translateFileListErrorCode(res);
 		//LOG("extract\n");
@@ -1929,85 +1923,18 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 }
 
 int Syscall::maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
-	LOGD("maFileListNext(%i)\n", list);
 	FileList* flp = gFileLists.find(list);
 	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
 	return flp->next(nameBuf, bufSize);
 }
 
 int Syscall::maFileListClose(MAHandle list) {
-	LOGD("maFileListClose(%i)\n", list);
 	FileList* flp = gFileLists.find(list);
 	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
 	gFileLists.erase(list);
 	return 0;
 }
 
-//------------------------------------------------------------------------------
-// maFile*
-//------------------------------------------------------------------------------
-
-#define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
-
-int Syscall::maFileDate(MAHandle file) {
-	LOGD("maFileDate(%i)\n", file);
-	FileHandle& fh(getFileHandle(file));
-	TTime modTime;
-	// TODO: improve error code translation
-	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
-	return unixTime(modTime);
-}
-
-int Syscall::maFileTruncate(MAHandle file, int offset) {
-	LOGD("maFileTruncate(%i, %i)\n", file, offset);
-	FileHandle& fh(getFileHandle(file));
-	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
-	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
-	SYMERR_CONVERT(fh.fs->mFile.SetSize(offset), MA_FERR_GENERIC);
-	return 0;
-}
-
-int Syscall::maFileRename(MAHandle file, const char* newName) {
-	LOGD("maFileRename(%i, %s)\n", file, newName);
-	FileHandle& fh(getFileHandle(file));
-	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
-	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
-	Smartie<HBufC16> nn(CreateHBufC16FromCStringL(newName));
-	// TODO: The RFile::Rename function is simple, but doesn't follow the MoSync spec in a few cases.
-	// Use RFs::Rename() instead.
-	// May have to switch directory separators, too.
-	SYMERR_CONVERT(fh.fs->mFile.Rename(*nn), MA_FERR_GENERIC);
-	return 0;
-}
-
-int Syscall::getVolumeInfo(MAHandle file, TVolumeInfo& vi) {
-	FileHandle& fh(getFileHandle(file));
-	int drive;
-	if(fh.name[1] == ':') {
-		drive = EDriveA + (fh.name[0] - 'A');
-	} else {
-		drive = KDefaultDrive;
-	}
-	MyRFs myrfs;
-	myrfs.Connect();
-	return FSS.Volume(vi, drive);
-}
-
-int Syscall::maFileAvailableSpace(MAHandle file) {
-	LOGD("maFileAvailableSpace(%i)\n", file);
-	TVolumeInfo vi;
-	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
-	return I64LOW(MIN(vi.iFree, TInt64(0x7fffffff)));
-}
-
-int Syscall::maFileTotalSpace(MAHandle file) {
-	LOGD("maFileTotalSpace(%i)\n", file);
-	TVolumeInfo vi;
-	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
-	return I64LOW(MIN(vi.iSize, TInt64(0x7fffffff)));
-}
-
-	
 //------------------------------------------------------------------------------
 // CellID
 //------------------------------------------------------------------------------

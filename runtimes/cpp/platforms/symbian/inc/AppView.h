@@ -64,7 +64,6 @@ public:
 	void HandlePointerEventL(const TPointerEvent&);
 protected:
 	void FocusChanged(TDrawNow aDrawNow);
-	void HandleResourceChange(TInt aType);
 
 private:
 	CAppView(CAppUi& aAppUi);

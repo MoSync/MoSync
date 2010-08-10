@@ -101,10 +101,6 @@ extern "C" int MAMain() {
 #define HANDLE_KEY_RELEASED(key) case MAK_##key: keys[E_##key] = FALSE; break;
 						ALL_KEYS(HANDLE_KEY_RELEASED);
 					}
-				} else if(event.type == EVENT_TYPE_POINTER_PRESSED) {
-					keys[E_FIRE] = TRUE;
-				} else if(event.type == EVENT_TYPE_POINTER_RELEASED) {
-					keys[E_FIRE] = FALSE;
 				}
 			}
 		}

@@ -92,6 +92,7 @@ __inline void chrashTestDummy(const char* fmt, ...) {
 #endif	// USE_ARM_RECOMPILER
 
 #include "Core.h"
+#include "Patcher/patcher.h"
 
 #if defined (FAKE_CALL_STACK)
 #include "sld.h"
@@ -427,6 +428,7 @@ public:
 			while(level > 0) {
 				ret();
 			}
+			
 			if(mRoot->running())
 				mRoot->stop();
 			{
@@ -633,6 +635,8 @@ public:
 		profTree.init(Head.EntryPoint);
 #endif
 
+		// Perform patching step
+		
 		return true;
 	}
 
@@ -776,6 +780,19 @@ public:
 
 		customEventPointer = ((char*)mem_ds) + (Head.DataSize - maxCustomEventSize);
 		
+		//
+		// Run code patcher
+		// TODO: Add the instructions to the recompiler.
+		// Warning: From rev 1647 and forward, code starts 
+		//          at offset 1 and not 0.
+		//
+/*
+#ifndef USE_ARM_RECOMPILER		
+		CodePatcher( mem_cs, mem_cp, 0, Head.CodeLen );
+#endif		
+*/
+		
+
 #ifdef USE_ARM_RECOMPILER
 		//initRecompilerVariables();
 #ifndef _android
@@ -1124,9 +1141,6 @@ void WRITE_REG(int reg, int value) {
 	}
 	int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
-
-	int _SYSCALL_CONVERTRES_uint(uint i) { return i; }
-#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
 
 	void debug_ulong(int SCDEBUG_ARG(i)) { LOGSC("(%u)", i); }
 	int _SYSCALL_CONVERT_ulong(int i) {

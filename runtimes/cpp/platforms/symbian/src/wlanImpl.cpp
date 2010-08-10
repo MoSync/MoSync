@@ -108,24 +108,8 @@ int Syscall::WlanGetNewAp(MAWlanAp* dst) {
 
 	dst->signalStrength = - gWlanInfo->RXLevel();	//dBm
 
+	dst->name[0] = 0;	//TODO: name (aka SSID)
 	
-	TUint8 ieLen = 0;
-	const TUint8* ieData = NULL;
-	// Information Element ID for SSID as specified in 802.11.
-	const TUint8 KWlan80211SsidIE = 0;
-	TInt ret = gWlanInfo->InformationElement(KWlan80211SsidIE, ieLen, &ieData);
-	if(ret == KErrNone) {
-		// ieData now points to the beginning of the 802.11 SSID payload data
-		// (i.e. the header is bypassed). ieLen contains the length of payload
-		// data.
-		if(ieLen < dst->nameBufSize) {
-			memcpy(dst->name, ieData, ieLen);
-			dst->name[ieLen] = 0;
-		}
-	} else {
-		dst->name[0] = 0;
-	}
-
 	gWlanInfo->Next();
 
 	return 1;

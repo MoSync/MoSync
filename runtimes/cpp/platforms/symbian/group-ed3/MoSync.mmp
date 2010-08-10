@@ -44,4 +44,3 @@ LIBRARY sendas2.lib
 LIBRARY RemConCoreApi.lib
 LIBRARY remconinterfacebase.lib
 LIBRARY cntmodel.lib
-LIBRARY centralrepository.lib

@@ -31,23 +31,15 @@
 #include "SDL_nullvideo.h"
 #include "SDL_nullevents_c.h"
 
-#include <IX_AUDIOBUFFER.h>
 #include <ma.h>
 
 enum MOUSE_ACTION { MOUSE_DOWN = 0, MOUSE_UP=1, MOUSE_MOVE=2 };
-
-void SDL_MoSync_AudioBufferFill();
-
 void DUMMY_PumpEvents(_THIS)
 {
 	MAEvent event;
 	SDL_keysym ks;
-
 	while(maGetEvent(&event)) {
 		switch(event.type) {
-			case EVENT_TYPE_AUDIOBUFFER_FILL:
-				SDL_MoSync_AudioBufferFill();
-				break;
 			case EVENT_TYPE_CLOSE:
 				//if(SDL_PrivateQuit()) {
 					// must do some kind of delayed quit..¨

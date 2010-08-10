@@ -576,10 +576,6 @@ int Bluetooth::maBtGetNextServiceSize(MABtServiceSize* dst) {
 
     // Code is in linux/bluez/interface.cpp
 
-#elif defined( COCOA_SUPPORTED )
-
-// Code is in darwin/interface.mm
-
 #else
 int Bluetooth::maBtDiscoveryState() {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);

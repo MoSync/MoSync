@@ -21,13 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "core.h"
 #include <bluetooth/bt_errors.h>
 
-#ifdef __SERIES60_3X__
-#include <centralrepository.h>
-#include <BTServerSDKCRKeys.h>
-#else	// 2nd edition
-#include <SettingInfo.h>
-#endif	//__SERIES60_3X__
-
 using namespace MoSyncError;
 
 //***************************************************************************
@@ -41,38 +34,13 @@ using namespace MoSyncError;
 //***************************************************************************
 
 void Syscall::ClearBluetoothVariables() {
-	gBtState = eError;
+	gBtAvailable = false;
 	gBtSynchronizer = NULL;
 	gBtSdpa = NULL;
 	gBtServiceSearchPattern = NULL;
 	gBtAttrMatchList = NULL;
 	gBtService = NULL;
 	gBtInquirySockAddr.SetIAC(KGIAC);
-}
-
-Syscall::BtState Syscall::BtCheckPowerState() {
-	// check power state
-	// if error while checking
-	// gBtState = eError;
-	// else
-	// gBtState = eTurnedOff;
-	TInt btMode = -1;
-#ifdef __SERIES60_3X__
-	Smartie<CRepository> crep(CRepository::NewL(KCRUidBluetoothPowerState));
-	TInt err = crep->Get(KBTPowerState, btMode);
-#else	// 2nd edition
-	Smartie<CSettingInfo> si(CSettingInfo::NewL(NULL));
-	TInt err = si->Get(SettingInfo::EBluetoothPowerMode, btMode);
-#endif	//__SERIES60_3X__
-	LOG("BtCheckPowerState: err %i, mode %i\n", err, btMode);
-	if(IS_SYMBIAN_ERROR(err) || btMode < 0) {
-		LOG_FAILURE(err);
-		return eError;
-	}
-	if(btMode == 0)
-		return eTurnedOff;
-	LOG("Mysterious BluetoothPowerMode: %i\n", btMode);
-	return eError;
 }
 
 void Syscall::ConstructBluetoothL() {
@@ -87,14 +55,8 @@ void Syscall::ConstructBluetoothL() {
 	LHEL(res);
 	
 	res = gBtResolver.Open(gSocketServ, pInfo.iAddrFamily, pInfo.iProtocol);
-	if(res == KErrPermissionDenied) {
-		LOG("BtResolver Open error %i\n", res);
-		gBtState = eForbidden;
-		return;
-	}
 	if(res == KErrHardwareNotAvailable || res == KErrNotSupported) {
 		LOG("BtResolver Open error %i\n", res);
-		gBtState = BtCheckPowerState();
 		return;
 	} else {
 		LHEL(res);
@@ -117,11 +79,11 @@ void Syscall::ConstructBluetoothL() {
 	LHEL(gBtSdp.Connect());
 	LHEL(gBtSdpDB.Open(gBtSdp));
 
-	gBtState = eAvailable;
+	gBtAvailable = true;
 }
 
 void Syscall::DestructBluetooth() {
-	if(gBtState == eAvailable)
+	if(gBtAvailable)
 		gBtResolver.Cancel();
 	gBtResolver.Close();
 	SAFE_DELETE(gBtSynchronizer);

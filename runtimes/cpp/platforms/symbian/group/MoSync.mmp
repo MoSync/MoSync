@@ -13,7 +13,6 @@ RESOURCE          MoSync_caption.rss
 
 LIBRARY           etel.lib
 LIBRARY           gsmbas.lib
-LIBRARY           PlatformEnv.lib
 
 SOURCEPATH        ..\src
 SOURCE            RCondVar.cpp

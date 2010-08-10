@@ -30,9 +30,9 @@ namespace Base {
 	FileStream::FileStream() : mOpenResult(KErrGeneral) {}
 
 	FileStream::FileStream(const char* filename) {
-		open(filename, false, false, false);
+		open(filename, false, false);
 	}
-	void FileStream::open(const char* filename, bool write, bool append, bool exist) {
+	void FileStream::open(const char* filename, bool write, bool append) {
 		mOpenResult = mFs.Connect();
 		if(mOpenResult != KErrNone)
 			return;
@@ -48,17 +48,13 @@ namespace Base {
 
 		TCleaner<HBufC16> unicodeName(CreateHBufC16FromDesC8LC(namePtr));
 		if(write) {
-			if(append || exist) {
+			if(append) {
 				LOG("AFO %s\n", filename);
 				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
 				if(IS_SYMBIAN_ERROR(mOpenResult))
 					return;
 				TInt offset = 0;
-				if(append) {
-					// TODO: set a flag so that every write goes to the end of the file,
-					// even if you seek to another position.
-					TSNR(mOpenResult = mFile.Seek(ESeekEnd, offset));
-				}
+				TSNR(mOpenResult = mFile.Seek(ESeekEnd, offset));
 			} else {
 				LOG("WFO %s\n", filename);
 				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
@@ -120,8 +116,8 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist)
-		: FileStream(filename, true, append, exist) {}
+	WriteFileStream::WriteFileStream(const char* filename, bool append)
+		: FileStream(filename, true, append) {}
 
 	bool WriteFileStream::write(const void* src, int size) {
 		TEST(isOpen());

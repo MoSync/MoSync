@@ -56,7 +56,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define L_divdi3
 #define L_lshrdi3
 #define L_moddi3
-#define L_muldi3
+/*#define L_muldi3*/
 #define L_negdi2
 #define L_udivdi3
 #define L_udivmoddi3
@@ -288,7 +288,7 @@ typedef int word_type __attribute__ ((mode (__word__)));
 #define __popcountDI2	__NDW(popcount,2)
 #define __parityDI2	__NDW(parity,2)
 
-extern DWtype __muldi3 (DWtype, DWtype);
+/*extern DWtype __muldi3 (DWtype, DWtype);*/
 extern DWtype __divdi3 (DWtype, DWtype);
 extern UDWtype __udivdi3 (UDWtype, UDWtype);
 extern UDWtype __umoddi3 (UDWtype, UDWtype);

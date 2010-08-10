@@ -163,10 +163,6 @@ int Bluetooth::getLocalAddress(MABtAddr& addr) {
 
     // Code is in linux/bluez/interface.cpp
 
-#elif defined( COCOA_SUPPORTED )
-
-	// Code is in darwin/interface.mm
-
 #else
 
 namespace Bluetooth {

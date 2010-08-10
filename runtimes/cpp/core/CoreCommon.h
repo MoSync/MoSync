@@ -81,7 +81,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(XH)\
 	m(SYSCALL)\
 	m(CASE)\
-	m(FAR)
+	m(FAR)\
+	m(FADD)\
+	m(FSUB)\
+	m(FMUL)\
+	m(FDIV)\
+	m(FNEG)\
+	m(FCMP)\
+	m(F2I)\
+	m(F2D)\
+	m(DADD)\
+	m(DSUB)\
+	m(DMUL)\
+	m(DDIV)\
+	m(DNEG)\
+	m(DCMP)\
+	m(D2I)\
+	m(D2F)\
+	m(I2F)\
+	m(I2D)\
+	m(DSIN)\
+	m(DCOS)\
+	m(DTAN)\
+	m(DSQRT)\
+	m(LMUL)
 
 #define ENUM_INSTRUCTION_ELEM(inst) _ ## inst,
 enum
