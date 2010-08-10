@@ -833,6 +833,7 @@ namespace Base {
 		bool res = fh.fs->length(len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
+		LOGD("file size: %i\n", len);
 		return len;
 	}
 

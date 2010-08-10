@@ -21,8 +21,8 @@ extern "C" const char* translateSyscall(int num) {
 #include "asm_config.h"
 #define SYSCALL_NAME(number,reType,name,arg1,argD) ,#name
 	static const char* const syscallStrings[] = { 0 SYSCALLS(SYSCALL_NAME, , , ) };
-	static const int nSyscalls = sizeof(syscallStrings) / sizeof(char*) - 1;
-	if(num >= 0 && num < nSyscalls) {
+	static const int nSyscalls = (sizeof(syscallStrings) / sizeof(char*)) - 1;
+	if(num > 0 && num <= nSyscalls) {
 		return syscallStrings[num];
 	} else {
 		return 0;
