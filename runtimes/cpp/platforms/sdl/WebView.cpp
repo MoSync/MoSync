@@ -1,25 +1,25 @@
 
-// This code is Windows specific.
+// The code in this file is Windows specific.
 
 // Modify the following defines if you have to target a platform prior to the ones specified below.
 // Refer to MSDN for the latest info on corresponding values for different platforms.
 #ifndef WINVER                // Allow use of features specific to Windows XP or later.
-#define WINVER 0x0501        // Change this to the appropriate value to target other versions of Windows.
+#define WINVER 0x0501         // Change this to the appropriate value to target other versions of Windows.
 #endif
 
-#ifndef _WIN32_WINNT        // Allow use of features specific to Windows XP or later.                   
-#define _WIN32_WINNT 0x0501    // Change this to the appropriate value to target other versions of Windows.
+#ifndef _WIN32_WINNT          // Allow use of features specific to Windows XP or later.                   
+#define _WIN32_WINNT 0x0501   // Change this to the appropriate value to target other versions of Windows.
 #endif                        
 
 #ifndef _WIN32_WINDOWS        // Allow use of features specific to Windows 98 or later.
 #define _WIN32_WINDOWS 0x0410 // Change this to the appropriate value to target Windows Me or later.
 #endif
 
-#ifndef _WIN32_IE            // Allow use of features specific to IE 6.0 or later.
-#define _WIN32_IE 0x0600    // Change this to the appropriate value to target other versions of IE.
+#ifndef _WIN32_IE             // Allow use of features specific to IE 6.0 or later.
+#define _WIN32_IE 0x0600      // Change this to the appropriate value to target other versions of IE.
 #endif
 
-#define WIN32_LEAN_AND_MEAN        // Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN   // Exclude rarely-used stuff from Windows headers
 
 #include <windows.h>
 
@@ -30,10 +30,9 @@
 
 #include "WebView.h"
 #include "Syscall.h"
-#include <helpers/CPP_IX_WEBVIEW.h>
 
 // Defined in SyscallImpl.cpp
-// TODO: In which file should we put declaration?
+// TODO: In which file should we put this declaration?
 void MoSyncPostEvent(MAEvent& e);
 
 // Forward declaration.
@@ -48,8 +47,10 @@ static IWebView* gWebView = 0; // We use this variable to check if a WebView is 
 static HWND gViewWindow = 0;
 static PolicyDelegate* gPolicyDelegate = 0;
 
-// Helper to convert a char* to a wide string. 
-// TODO: Specify how returned string should be deallocated.
+/**
+ * Helper to convert a char* to a wide string. 
+ * TODO: Specify how returned string should be deallocated.
+ */
 BSTR privateCharToWideChar(const char* s)
 {
 	// First find out how many wide characters are required. 
@@ -105,8 +106,10 @@ BSTR privateCharToWideChar(const char* s)
 	return wideString;
 }
 
-// Helper to convert a wide string to a char*.
-// TODO: Specify how returned string should be deallocated.
+/** 
+ * Helper to convert a wide string to a char*.
+ * TODO: Specify how returned string should be deallocated.
+ */
 LPSTR privateWideCharToChar(LPCWSTR s)
 {
 	// First find out how many wide characters are required. 
@@ -160,7 +163,9 @@ LPSTR privateWideCharToChar(LPCWSTR s)
 	return (LPSTR) tempString;
 }
 
-// Helper function that sets the HTML of a WebView.
+/**
+ * Helper function that sets the HTML of a WebView.
+ */
 static int privateWebViewSetHTML(IWebView* webView, const char* html)
 {
 	// Get the WebFrame of the WebView.
@@ -168,21 +173,23 @@ static int privateWebViewSetHTML(IWebView* webView, const char* html)
     HRESULT result = webView->mainFrame(&frame);
     if (FAILED(result))
 	{
-        return WebViewError;
+        return WEBVIEW_ERROR;
 	}
 
 	// We need to convert the char* string to a wide character string.
 	BSTR wideHTML = privateCharToWideChar(html);
 	if (!wideHTML)
 	{
-        return WebViewError;
+        return WEBVIEW_ERROR;
 	}
 
 	// Should we make use of the base url? (second param)
+	// It is assumed that the frame takes ownership of the string wideHTML,
+	// therefore we don't free it after the call. TODO: Should check this.
     frame->loadHTMLString(wideHTML, 0);
     frame->Release();
 
-	return WebViewOk;
+	return WEBVIEW_OK;
 }
 
 class PolicyDelegate : public IWebPolicyDelegate
@@ -292,6 +299,9 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
 	}
     strcpy(theEvent.serviceRequest, url);
 
+	// We are done with the string.
+	free(url);
+
     // Post in event queue
     MoSyncPostEvent(theEvent);
 
@@ -306,7 +316,7 @@ int webViewOpen(int left, int top, int width, int height)
 	// Return if there is already an open WebView.
 	if (gWebView) 
 	{
-		return WebViewOk;
+		return WEBVIEW_OK;
 	}
 
     // Init COM.
@@ -322,38 +332,40 @@ int webViewOpen(int left, int top, int width, int height)
 	else
 	{
 		//printf("NOT Found gMainWnd");
-		return WebViewError;
+		return WEBVIEW_ERROR;
 	}
 
 	// Setting window style WS_CLIPCHILDREN prevents drawing on top of the WebView.
 	LONG windowStyle = GetWindowLong(gMainWnd, GWL_STYLE);
-	SetWindowLong(gMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN); // WS_CLIPSIBLINGS
+	SetWindowLong(gMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN); // Not needed: WS_CLIPSIBLINGS
 
     HRESULT hr = WebKitCreateInstance(CLSID_WebView, 0, IID_IWebView, (void**)&gWebView);
     if (FAILED(hr))
+	{
         goto exit;
-#ifdef UNUSED
-    gFrameLoadDelegate = new FrameLoadDelegate();
-    gFrameLoadDelegate->AddRef();
-    hr = gWebView->setFrameLoadDelegate(gFrameLoadDelegate);
-    if (FAILED(hr))
-        goto exit;
-#endif
+	}
+
     gPolicyDelegate = new PolicyDelegate();
     gPolicyDelegate->AddRef();
     hr = gWebView->setPolicyDelegate(gPolicyDelegate);
     if (FAILED(hr))
+	{
         goto exit;
+	}
 
     hr = gWebView->setHostWindow((OLE_HANDLE) gMainWnd);
     if (FAILED(hr))
+	{
         goto exit;
+	}
 
     RECT clientRect;
     GetClientRect(gMainWnd, &clientRect);
     hr = gWebView->initWithFrame(clientRect, 0, 0);
     if (FAILED(hr))
+	{
         goto exit;
+	}
 
 	// Set default document content.
 	privateWebViewSetHTML(gWebView, "<p style=\"background-color: #00FF00\">Hello World</p><div style=\"border: solid blue\">div with blue border</div><ul><li>foo<li>bar<li>baz</ul>");
@@ -361,12 +373,16 @@ int webViewOpen(int left, int top, int width, int height)
     IWebViewPrivate* viewExt;
     hr = gWebView->QueryInterface(IID_IWebViewPrivate, (void**)&viewExt);
     if (FAILED(hr))
+	{
         goto exit;
+	}
 
     hr = viewExt->viewWindow((OLE_HANDLE*) &gViewWindow);
     viewExt->Release();
     if (FAILED(hr) || !gViewWindow)
+	{
         goto exit;
+	}
 	
     //RECT rcClient;
     //GetClientRect(gMainWnd, &rcClient);
@@ -378,22 +394,22 @@ int webViewOpen(int left, int top, int width, int height)
     ShowWindow(gViewWindow, SW_SHOW);
     UpdateWindow(gViewWindow);
 
-	return WebViewOk;
+	return WEBVIEW_OK;
 
 exit:
     gWebView->Release();
     shutDownWebKit();
     OleUninitialize();
 
-	return WebViewError;
+	return WEBVIEW_ERROR;
 }
 
 int webViewClose()
 {
-	// Return if there is NOT an open WebView.
+	// Return if there is not an open WebView.
 	if (!gWebView)
 	{
-		return WebViewNotOpen;
+		return WEBVIEW_NOT_OPEN;
 	}
 
     gWebView->Release();
@@ -407,20 +423,32 @@ int webViewClose()
 	gPolicyDelegate = 0;
 	//gFrameLoadDelegate = 0;
 
-	return WebViewOk;
+	return WEBVIEW_OK;
 }
 
 int webViewSetHTML(const char* html)
 {
+	// Return if there is not an open WebView.
+	if (!gWebView)
+	{
+		return WEBVIEW_NOT_OPEN;
+	}
+
 	return privateWebViewSetHTML(gWebView, html);
 }
 
 int webViewEvaluateScript(const char* script)
 {
+	// Return if there is not an open WebView.
+	if (!gWebView)
+	{
+		return WEBVIEW_NOT_OPEN;
+	}
+
 	BSTR wideScript = privateCharToWideChar(script);
 	if (!wideScript)
 	{
-        return WebViewError;
+        return WEBVIEW_ERROR;
 	}
 
 	BSTR returnValue;
@@ -428,12 +456,15 @@ int webViewEvaluateScript(const char* script)
 	HRESULT result = gWebView->stringByEvaluatingJavaScriptFromString(wideScript, &returnValue);
     if (FAILED(result))
 	{
-        return WebViewError;
+        return WEBVIEW_ERROR;
 	}
 
 	printf("Return value: %S\n", returnValue);
 
-	/*
+	// Should we free string wideScript after the call?
+    SysFreeString(wideScript);
+
+	/* Does not work, windowScriptObject returns NULL.
 	IWebScriptObject* scriptObject;
 	HRESULT result = gWebView->windowScriptObject(&scriptObject);
     if (FAILED(result))
@@ -443,5 +474,5 @@ int webViewEvaluateScript(const char* script)
 	scriptObject->evaluateWebScript(wideScript, NULL);
 	*/
 
-	return WebViewOk;
+	return WEBVIEW_OK;
 }

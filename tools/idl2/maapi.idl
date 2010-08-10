@@ -2801,6 +2801,16 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WEBVIEW
+
+		constset int WEBVIEW_ {
+			/// Success code.
+			OK = 0;
+			/// Generic error code.
+			ERROR = 1;
+			/// WebView is not open.
+			NOT_OPEN = 2;
+		}
+	
 		/** 
 		* Open a fullscreen WebView.
 		* There is only one WebView instance in the system.
