@@ -416,12 +416,15 @@ int webViewClose()
     shutDownWebKit();
     OleUninitialize();
 
+	//ShowWindow(gViewWindow, SW_HIDE);
+	CloseWindow(gViewWindow);
+	DestroyWindow(gViewWindow);
+
 	// Clear global variables.
 	gMainWnd = 0;
 	gWebView = 0;
 	gViewWindow = 0;
 	gPolicyDelegate = 0;
-	//gFrameLoadDelegate = 0;
 
 	return WEBVIEW_OK;
 }
@@ -434,6 +437,11 @@ int webViewSetHTML(const char* html)
 		return WEBVIEW_NOT_OPEN;
 	}
 
+	if (0 == strlen(html))
+	{
+		return WEBVIEW_ERROR;
+	}
+
 	return privateWebViewSetHTML(gWebView, html);
 }
 
@@ -442,12 +450,19 @@ int webViewEvaluateScript(const char* script)
 	// Return if there is not an open WebView.
 	if (!gWebView)
 	{
+		printf("WebView is not open\n");
 		return WEBVIEW_NOT_OPEN;
+	}
+
+	if (0 == strlen(script))
+	{
+		return WEBVIEW_ERROR;
 	}
 
 	BSTR wideScript = privateCharToWideChar(script);
 	if (!wideScript)
 	{
+		printf("Failed to convert script to wide string: %s\n", script);
         return WEBVIEW_ERROR;
 	}
 
@@ -456,6 +471,7 @@ int webViewEvaluateScript(const char* script)
 	HRESULT result = gWebView->stringByEvaluatingJavaScriptFromString(wideScript, &returnValue);
     if (FAILED(result))
 	{
+		printf("Failed to evaluate: %S\n", wideScript);
         return WEBVIEW_ERROR;
 	}
 

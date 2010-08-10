@@ -58,10 +58,10 @@ int MAMain()
 					return 0;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (e.key == MAK_0) { SetBgColor("Black"); }
-					if (e.key == MAK_1) { SetBgColor("White"); }
+					if (e.key == MAK_0) { maWebViewClose(); }
+					if (e.key == MAK_1) { maWebViewOpen(); maWebViewSetHTML(HTML); }
 					if (e.key == MAK_2) { SetBgColor("Gray"); }
-					if (e.key == MAK_3) { SetBgColor("Red"); }
+					if (e.key == MAK_3) { SetBgColor("White"); }
 					if (e.key == MAK_4) { SetBgColor("Pink"); }
 					if (e.key == MAK_5) { SetBgColor("Orange"); }
 					if (e.key == MAK_6) { SetBgColor("Chocolate"); }
