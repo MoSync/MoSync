@@ -236,7 +236,7 @@ int maBtStartServiceDiscovery ( const MABtAddr* a,
 	addressPtr->data[3] = a->a[3];
 	addressPtr->data[4] = a->a[4];
 	addressPtr->data[5] = a->a[5];
-	// Convert MoSync UUID to Cocoa address
+	// Convert MoSync UUID to Cocoa UUID
 	IOBluetoothSDPUUID * refUUID = [IOBluetoothSDPUUID uuid16:u->i[0]];
 	// Set the callback
 	gDiscovery._callback = cb;

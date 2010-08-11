@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "linux/bluez/connectionbluez.hpp"
 #endif
 #ifdef COCOA_SUPPORTED
-#include "darwin/ConnectionCocoa.h"
+#include "darwin/ConnectionCocoaInterface.h"
 #endif
 #ifdef BROADCOM_SUPPORTED
 #include "win32/broadcom.h"

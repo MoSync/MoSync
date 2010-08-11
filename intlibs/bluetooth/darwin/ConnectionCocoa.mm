@@ -1,183 +1,158 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+//
+//  ChatBluetoothInterface_ObjC.m
+//  IOBluetoothFamily
+//
+//  Created by Eric Brown on Fri Apr 18 2003.
+//  Copyright (c) 2003 __MyCompanyName__. All rights reserved.
+//
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
-*/
-/*
-* File:   ConnectionCocoa.mm
-* Author: Romain Chalant
-*
-* Created on August 5, 2010
-*/
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <sys/select.h>
+// Only compile this file if we are building the ObjC version of the app.
 
 
 
-#include "bluetooth/config_bluetooth.h"
-#include "ConnectionCocoa.h"
-#include "helpers/helpers.h"
+#import "ConnectionCocoa.h"
 
 
 
-#ifndef INVALID_SOCKET
-#define INVALID_SOCKET -1
-#endif
-
-using namespace Bluetooth::Darwin;
 
 
-/**
- * Constructor, creates the socket
- *
- * @param a Pointer to bluetooth adress
- * @param p Port to connect to
- */
-BtSppConnectionCocoa::BtSppConnectionCocoa ( const MABtAddr* a, uint p )
+@implementation ConnectionCocoa
+
+@synthesize mAddress;
+@synthesize mPort;
+@synthesize mState;
+@synthesize mReadQueue;
+
+@synthesize mMutexConnect;
+@synthesize mConditionConnect;
+@synthesize mMutexRead;
+@synthesize mConditionRead;
+
+
+
+- (void)openSerialPortProfile:(id)param
 {
-   /* mAddr.rc_family = AF_BLUETOOTH;
-    mAddr.rc_channel = (uint8_t)p;
-    // Convert MoSync address to bluez adress
-    ma2ba( mAddr.rc_bdaddr.b, a->a );*/
+	// The following will be started in a new cocoa thread, from a pthread
+	
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+	IOBluetoothSDPUUID *sppServiceUUID;
+
+	// Create an IOBluetoothSDPUUID object for the chat service UUID
+	sppServiceUUID = [IOBluetoothSDPUUID uuid16:kBluetoothSDPUUID16ServiceClassSerialPort];
+
+	// The device we want is the first in the array (even if the user somehow selected more than
+	// one device in this example we care only about the first one):
+	IOBluetoothDevice *device = [IOBluetoothDevice withAddress:mAddress];
+	
+	// Finds the service record that describes the service (UUID) we are looking for:
+	IOBluetoothSDPServiceRecord	*sppServiceRecord = [device getServiceRecordForUUID:sppServiceUUID];
+	
+	if ( sppServiceRecord == nil )
+	{
+		NSLog( @"Error - no spp service in selected device.  ***This should never happen since the selector forces the user to select only devices with spp.***\n" );
+		mState = -5;
+	}
+	
+	// Open asyncronously the rfcomm channel when all the open sequence is completed my implementation of "rfcommChannelOpenComplete:" will be called.
+	if ( ( [device openRFCOMMChannelAsync:&mRFCOMMChannel withChannelID:mPort delegate:self] != kIOReturnSuccess ) && ( mRFCOMMChannel != nil ) )
+	{
+		// Something went bad (looking at the error codes I can also say what, but for the moment let's not dwell on
+		// those details). If the device connection is left open close it and return an error:
+		NSLog( @"Error - open sequence failed.***\n" );
+		
+		[self closeDeviceConnection:nil];
+		mState = -5;
+		
+	}
+	
+	// So far a lot of stuff went well, so we can assume that the device is a good one and that rfcomm channel open process is going
+	// well. So we keep track of the device and we (MUST) retain the RFCOMM channel:
+	mBluetoothDevice = device;
+	[mBluetoothDevice  retain];
+	[mRFCOMMChannel retain];
+	
+	// Set the connection state and signal mCondition that it is ready
+	mState = 1;
+	pthread_mutex_lock(mMutexConnect);
+	pthread_cond_signal(mConditionConnect);
+	pthread_mutex_unlock(mMutexConnect);
+	
+	// Keep running the loop, otherwise the callbacks (e.g. rfcommChannelData) won't be called back...
+	CFRunLoopRun();
+	
+	[pool release];
 }
 
-/**
- * Destructor, will close any connection and free
- * resources
- *
- */
-BtSppConnectionCocoa::~BtSppConnectionCocoa ( void )
+- (void)closeRFCOMMConnection
 {
-    //close( );
+	
+	[mRFCOMMChannel closeChannel];
+	
 }
 
-
-/**
- * Attempts to connect to the remote host
- *
- * @return > 0          On success
- *         < 0 CONNERR  On failure
- */
-int BtSppConnectionCocoa::connect ( void )
+- (void)closeDeviceConnection:(id)param
 {
-    /*if ( mSocket != INVALID_SOCKET )
-    {
-        LOGBT( "Socket already connected" );
-        return CONNERR_INTERNAL;
-    }
 
-    // Create socket
-    mSocket = socket( AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM );
-    if ( mSocket == INVALID_SOCKET )
-    {
-        LOGBT( "Failed to create socket" );
-        return CONNERR_INTERNAL;
-    }
+	IOReturn error = [mBluetoothDevice closeConnection];
+	if ( error != kIOReturnSuccess )
+	{
+		// I failed to close the connection, maybe the device is busy, no problem, as soon as the device is no more busy it will close the connetion itself.
+		NSLog(@"Error - failed to close the device connection with error %08lx.\n", (UInt32)error);
+	}
+	
+	[mBluetoothDevice release];
+	mBluetoothDevice = nil;
 
-    // Attempt to connect
-    if ( ::connect( mSocket, (sockaddr *)&mAddr, sizeof( sockaddr_rc ) ) == -1 )
-    {
-        LOGBT( "Failed to connect" );
-        ::close( mSocket );
-        mSocket = INVALID_SOCKET;
-        return CONNERR_GENERIC;
-    }
+	
 
-    // TODO: Explcicitly put in blocking mode ?
-*/
-    return 1;
 }
 
-/**
- * Reads one to max bytes from the the socket without blocking.
- *
- * @param dst   Pointer to the buffer to write to.
- * @param max   Maximum number of bytes to read.
- *
- * @return Number of read bytes or (0 < ) CONNERR if failed.
- */
-int BtSppConnectionCocoa::read ( void* dst, int max )
+// Called by the RFCOMM channel on us once the baseband and rfcomm connection is completed:
+- (void)rfcommChannelOpenComplete:(IOBluetoothRFCOMMChannel*)rfcommChannel status:(IOReturn)error
 {
-   /* if ( mSocket == INVALID_SOCKET )
-        return CONNERR_GENERIC;
+	// If it failed to open the channel call our close routine and from there the code will
+	// perform all the necessary cleanup:
+	if ( error != kIOReturnSuccess )
+	{
+		NSLog(@"Error - failed to open the RFCOMM channel with error %08lx.\n", (UInt32)error);
+		[self rfcommChannelClosed:rfcommChannel];
+		return;
+	}
+	
 
-    int res = recv( mSocket, dst, max, 0 );
-    if ( res == 0 )
-        return CONNERR_CLOSED;
-    else if ( res < 0 )
-        return CONNERR_GENERIC;
-    else
-        return res;*/
-	return 0;
+	
+	// The RFCOMM channel is now completly open so it is possible to send and receive data
+	// ... add the code that begin the send data ... for example to reset a modem:
+	//[rfcommChannel writeSync:"ATZ\n" length:4];
 }
 
-/**
- * Sends the supplied number of bytes to the destination.
- *
- * @param src   Pointer to the buffer that holds the data.
- * @param len   Number of bytes to send.
- *
- * @return > 0           The data has been sent.
- *         0 < (CONNERR) If there was an error.
- */
-int BtSppConnectionCocoa::write ( const void* src, int len )
+// Called by the RFCOMM channel on us when new data is received from the channel:
+- (void)rfcommChannelData:(IOBluetoothRFCOMMChannel *)rfcommChannel data:(void *)dataPointer length:(size_t)dataLength
 {
-    /*if ( mSocket == INVALID_SOCKET )
-        return CONNERR_GENERIC;
 
-    int res = send( mSocket, src, len, 0 );
-    if ( res < 0 )
-        return CONNERR_GENERIC;
-    else
-        return res;*/
-	return 0;
+	if(mReadQueue == nil) {
+		mReadQueue = [[NSMutableArray alloc] initWithCapacity:1];
+		
+	}
+	NSData *dataAsBytes = [NSData dataWithBytes:dataPointer length:dataLength];
+
+	[mReadQueue addObject:dataAsBytes];
+	
+	pthread_mutex_lock(mMutexRead);
+	pthread_cond_signal(mConditionRead);
+	pthread_mutex_unlock(mMutexRead);
+
 }
 
-/**
- * Closes any open connections
- *
- */
-void BtSppConnectionCocoa::close ( void )
+// Called by the RFCOMM channel on us when something happens and the connection is lost:
+- (void)rfcommChannelClosed:(IOBluetoothRFCOMMChannel *)rfcommChannel
 {
-   /* if ( mSocket == INVALID_SOCKET )
-        return;
 
-    // Send any waiting data
-    shutdown( mSocket, SHUT_RDWR );
+	// wait a second and close the device connection as well:
+	[self performSelector:@selector(closeDeviceConnection:) withObject:nil afterDelay:1.0];
 
-    // Close descriptor
-    ::close( mSocket );
-    mSocket = INVALID_SOCKET;*/
 }
 
-/**
- * Returns the adress of the remote host.
- *
- * @param a     Structure to fill
- */
-int BtSppConnectionCocoa::getAddr ( MAConnAddr& a )
-{
-   /* if ( mSocket == INVALID_SOCKET )
-        return CONNERR_GENERIC;
+@end
 
-    a.family  = CONN_FAMILY_BT;
-    a.bt.port = mAddr.rc_channel;
-
-    // Convert bluez address to MoSync address
-    ba2ma( a.bt.addr.a, mAddr.rc_bdaddr.b );*/
-    return 1;
-}
