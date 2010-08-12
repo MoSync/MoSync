@@ -161,7 +161,7 @@ static int sAutoNameCounter = 0;
 static map<string, Variable*> sVariableMap;
 static map<string, Variable*> sRootVariableMap;
 
-static Variable* sVar;
+static Variable* sVar = NULL;
 static Expression* sExp;
 static void (*sUpdateCallback)();
 static PrintValueSimplicity sPrintValueSimplicity;
@@ -607,7 +607,7 @@ void var_create(const string& args) {
 	string realName;
 	if(name == "-") {
 		char buffer[32];
-		sprintf(buffer, "var%i", sAutoNameCounter++);
+		sprintf(buffer, "var%i", ++sAutoNameCounter);
 		realName = buffer;
 	} else {
 		realName = name;
@@ -618,6 +618,7 @@ void var_create(const string& args) {
 		return;
 	}
 
+	_ASSERT(sVar == NULL);
 	sVar = new Variable;
 	sVar->printFormat = TypeBase::eNatural;
 	sVar->name = realName;
@@ -684,18 +685,18 @@ static void Callback::varCreate() {
 
 	oprintDone();
 
-	oprintf(",name=\"%s\",numchild=\"%"PFZT"\",type=\"%s\"",
+	oprintf(",name=\"%s\",numchild=\"%"PFZT"\",type=\"%s\",value=\"",
 		sVar->name.c_str(), sVar->children.size(), sVar->exp->type().c_str());
-	/*
 	if(sVar->exp->value()!="")
-		oprintf(",value=\"%s\"\n", sVar->exp->value().c_str());
+		oprintf("%s", sVar->exp->value().c_str());
 	else
-	*/
-	oprintf("\n");
+		oprintf("{...}");
+	oprintf("\"\n");
 
 	sVar->exp->outdate();
 	sVariableMap[sVar->name] = sVar;
 	sRootVariableMap[sVar->name] = sVar;
+	sVar = NULL;
 	commandComplete();
 }
 
@@ -781,9 +782,11 @@ static void Callback::varUpdate() {
 		do {
 			v = sUpdateQueue.front();
 			sUpdateQueue.pop();
+			_ASSERT(sVar == NULL);
 			sVar = v;
 			if(v->exp)
 				v->exp->update(Callback::varEEUpdate);	
+			sVar = NULL;
 		} while(v->outOfScope && !sUpdateQueue.empty());
 
 		if(!v->outOfScope) {
@@ -889,6 +892,7 @@ void var_evaluate_expression(const string& args) {
 		return;
 	}
 
+	_ASSERT(sVar == NULL);
 	sVar = var;
 	if(!var->exp->isValid()) {
 		sUpdateCallback = Callback::varEvaluateExpression;
@@ -1013,6 +1017,7 @@ void var_list_children(const string& args) {
 		error("Missing variable.");
 		return;
 	}
+	_ASSERT(sVar == NULL);
 
 	sUpdateQueue.push(var);
 
@@ -1043,6 +1048,7 @@ static void Callback::varListChildren() {
 		printListChildrenItem(&varc);
 	}
 	oprintf("]\n");
+	sVar = NULL;
 	commandComplete();
 }
 

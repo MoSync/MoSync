@@ -302,7 +302,7 @@ void StubConnection::breakpointHit() {
 	//todo: problematic. what if multiple breakpoints point to this address?
 	//maybe we shouldn't allow that. check gdb's behaviour.
 	BreakpointAddressMap::const_iterator itr = sBreakpointAddresses.find(r.pc);
-	oprintf("*stopped,reason=\"breakpoint-hit\",bkptno=\"");
+	oprintf("*stopped,reason=\"breakpoint-hit\",thread-id=\"1\",bkptno=\"");
 	if(itr == sBreakpointAddresses.end()) {
 		oprintf("unknown");
 	} else {

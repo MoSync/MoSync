@@ -258,8 +258,10 @@ int main(int argc, char** argv) {
 		case DebuggerEvent::eUserInput:
 			if(StubConnection::isIdle())
 				executeCommand(de->str);
-			else
+			else {
+				_ASSERT(savedLine.empty());
 				savedLine = de->str;
+			}
 			break;
 		case DebuggerEvent::eReadMemory:
 			StubConnection::readMemory(gMemBuf + de->src, de->src, de->len, de->rmcb);
@@ -316,7 +318,12 @@ void error(const char* fmt, ...) {
 	commandComplete();
 }
 
+static bool sExecutingCommand = false;
+
 void commandComplete() {
+	_ASSERT(sExecutingCommand);
+	sExecutingCommand = false;
+
 	oprintf(GDB_PROMPT);
 	fflush(stdout);
 
@@ -327,6 +334,8 @@ void commandComplete() {
 
 static void executeCommand(const string& line) {
 	LOG("Command: %s\n", line.c_str());
+	_ASSERT(!sExecutingCommand);
+	sExecutingCommand = true;
 
 #ifdef COMMAND_LOGGING_ENABLED
 	fprintf(gCommandLog, "%s\n", line.c_str());
