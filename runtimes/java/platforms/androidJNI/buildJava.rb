@@ -20,7 +20,7 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	jtmp_file = src_file.gsub(/.jpp$/, ".jtmp")		
 	java_file = src_file.gsub(/.jpp$/, ".java")
 	
-	puts "Processing " + java_file
+	puts "Processing " + output_dir + java_file
 	
 	#-D_ANDROID_BLUETOOTH
 	

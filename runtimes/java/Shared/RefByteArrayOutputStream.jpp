@@ -49,6 +49,7 @@ final class RefByteArrayOutputStream extends OutputStream {
 		pos += len;
 	}
 
+#if 0	//unused
 	//for Pcm2WavInputStream
 	public final void writeLeShort(short v) throws IOException
 	{
@@ -81,4 +82,5 @@ final class RefByteArrayOutputStream extends OutputStream {
 		buf[offset + pos++] = (byte) (v >> 48);
 		buf[offset + pos++] = (byte) (v >> 56);
 	}
+#endif
 }

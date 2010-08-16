@@ -200,9 +200,6 @@ void file_list_symbol_files(const string& args) {
 void file_symbol_file(const string& args) {
 	UNIMPL;
 }
-void gdb_show(const string& args) {
-	UNIMPL;
-}
 void inferior_tty_set(const string& args) {
 	UNIMPL;
 }

@@ -845,26 +845,23 @@ namespace Base {
 	{
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return Base::maCheckInterfaceVersion(a);
-
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
 		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));				
+			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
 		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();		
+			return maGetBatteryCharge();
 
 		case maIOCtl_maLocationStart:
 			return maLocationStart();
 		case maIOCtl_maLocationStop:
-			return maLocationStop();				
+			return maLocationStop();
 			
 		case maIOCtl_maFrameBufferGetInfo:
 			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
 		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
+			return maFrameBufferInit(GVMRA(void*));
 		case maIOCtl_maFrameBufferClose:
 			return maFrameBufferClose();
 				

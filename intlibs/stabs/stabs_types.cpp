@@ -89,8 +89,8 @@ struct type_tuple_equal {
 typedef hash_set<Type*, type_name_hash TNE> TypeNameSet;
 typedef hash_set<Type*, type_tuple_hash TTE> TypeTupleSet;
 
-static vector<TypeTupleSet> sTypeTupleSets;
-static vector<TypeNameSet> sTypeNameSets;
+static vector<TypeTupleSet*> sTypeTupleSets;
+static vector<TypeNameSet*> sTypeNameSets;
 static vector<std::string> sTypeFiles;
 
 void addTypeFile(int file, const std::string& fileName) {
@@ -98,6 +98,9 @@ void addTypeFile(int file, const std::string& fileName) {
 		sTypeTupleSets.resize(file + 1);
 		sTypeNameSets.resize(file + 1);
 		sTypeFiles.resize(file + 1);
+
+		sTypeTupleSets[file] = new TypeTupleSet;
+		sTypeNameSets[file] = new TypeNameSet;
 	}
 
 	sTypeFiles[file] = fileName;
@@ -106,9 +109,9 @@ void addTypeFile(int file, const std::string& fileName) {
 void addType(const Type& cs) {
 	Type* s = new Type(cs);
 	//LOG("addType %i (%i,%i)\n", gCurrentFile, s->id.a, s->id.b);
-	pair<TypeTupleSet::iterator, bool> res = sTypeTupleSets[gCurrentFile].insert(s);
+	pair<TypeTupleSet::iterator, bool> res = sTypeTupleSets[gCurrentFile]->insert(s);
 	if(res.second) {
-		sTypeNameSets[gCurrentFile].insert(s);
+		sTypeNameSets[gCurrentFile]->insert(s);
 	} else {	//tuple already defined. it must be a delayed type.
 		//LOG("dupe\n");
 		Type* t = *res.first;
@@ -123,10 +126,14 @@ void addType(const Type& cs) {
 		t->type = s->type;
 		TypeTupleSet::iterator temp = res.first;
 		temp++;
-		sTypeTupleSets[gCurrentFile].erase(res.first);
-		sTypeTupleSets[gCurrentFile].insert(temp, t);
-		sTypeNameSets[gCurrentFile].erase(s);
-		sTypeNameSets[gCurrentFile].insert(t);
+		sTypeTupleSets[gCurrentFile]->erase(res.first);
+#if defined(__GNUC__) && !defined(HAVE_TR1)
+		sTypeTupleSets[gCurrentFile]->insert(t);
+#else
+		sTypeTupleSets[gCurrentFile]->insert(temp, t);
+#endif
+		sTypeNameSets[gCurrentFile]->erase(s);
+		sTypeNameSets[gCurrentFile]->insert(t);
 	}
 }
 
@@ -139,10 +146,12 @@ const Type* stabsFindTypeByName(const std::string& name, int scope) {
 	}
 	return NULL;
 #endif
+	if(!sTypeNameSets[scope])
+		return NULL;
 	Type t;
 	t.name = name;
-	TypeNameSet::const_iterator itr = sTypeNameSets[scope].find(&t);
-	if(itr == sTypeNameSets[scope].end())
+	TypeNameSet::const_iterator itr = sTypeNameSets[scope]->find(&t);
+	if(itr == sTypeNameSets[scope]->end())
 		return NULL;
 	else
 		return *itr;
@@ -187,8 +196,8 @@ const TypeBase* findTypeByTuple(Tuple t) {
 const TypeBase* findTypeByTupleAndFile(Tuple t, int file) {
 	Type s;
  	s.id = t;
-	TypeTupleSet::const_iterator itr = sTypeTupleSets[file].find(&s);
-	if(itr == sTypeTupleSets[file].end())
+	TypeTupleSet::const_iterator itr = sTypeTupleSets[file]->find(&s);
+	if(itr == sTypeTupleSets[file]->end())
 		return NULL;
 	return (*itr)->type;
 }

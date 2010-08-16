@@ -290,6 +290,22 @@ void CAppView::FocusChanged(TDrawNow aDrawNow) {
 	}
 }
 
+void CAppView::HandleResourceChange(TInt aType) {
+	LOG("HandleResourceChange(0x%x)\n", aType);
+	CCoeControl::HandleResourceChange(aType);
+	if(aType != KEikDynamicLayoutVariantSwitch)
+		return;
+
+	// resize the window
+	SetRect(CCoeEnv::Static()->ScreenDevice()->SizeInPixels());
+	iEngine->UpdateScreenSize();
+	
+	MAEvent event;
+	event.type = EVENT_TYPE_SCREEN_CHANGED;
+	AddEvent(event);
+	LOG("EVENT_TYPE_SCREEN_CHANGED sent\n");
+}
+
 void CAppView::Draw(const TRect& /* aRect */) const {
 	LOGG("AVD\n");
 	if(iStopForever)
@@ -327,12 +343,12 @@ TInt CAppView::RunL() {
 		LOGD("RunIdle stopped forever.\n");
 		return iKeepRunning = 0;
 	}
-	LOGD("RIS\n");
+	//LOGD("RIS\n");
 #ifdef SUPPORT_RELOAD
 	iCore->symbianError = KErrNone;
 #endif
 	Run2(iCore);
-	LOGD("RIE\n");
+	//LOGD("RIE\n");
 #ifdef SUPPORT_RELOAD
 	if(iCore->symbianError != KErrNone) {
 		LOG("Found core leave, code %i\n", iCore->symbianError);
@@ -523,15 +539,15 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 	int scancode = aKeyEvent.iScanCode;
 	switch(aType) {
 	case EEventKeyUp:
-		LOGD("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOG("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = false;
 		break;
 	case EEventKeyDown:
-		LOGD("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOG("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = true;
 		break;
 	case EEventKey:
-		LOGD("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		return EKeyWasNotConsumed;
 	default:
 		LOG("KeyEvent %i\n", aType);

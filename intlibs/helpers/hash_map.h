@@ -34,6 +34,7 @@ namespace __gnu_cxx {
 	};
 }
 #endif	//1
+template<class T> class hash_compare : public hash<T> {};
 #endif	//HAVE_TR1
 #elif defined(_MSC_VER)
 #include <hash_map>

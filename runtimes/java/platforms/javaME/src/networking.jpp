@@ -52,7 +52,7 @@ NETSYSCALL(int) maAccept(MAHandle serv) {
 
 NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
 	DEBUG_CONN("GCA " + conn + " " + addr + "\n");
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	if(conn == HANDLE_LOCAL) {
 		int family = RINT(addr);
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH

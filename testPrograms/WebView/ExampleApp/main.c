@@ -21,6 +21,7 @@
 // This exact thing can be done in pure HTML/JS, but in this demo the JS call is made via MoSync.
 #define HTML " \
 	<html><body> \
+	<a href=\"http://www.jqtouch.com/preview/demos/main/#home\">jQTouch Demo</a> \
 	<script>function ServiceRequest(request) { document.location = 'mosync://' + request; }</script> \
 	<div style=\"margin-bottom:10pt; font-size:150%%;\">Touch a color or press a keypad number key!</div> \
 	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"ServiceRequest('BgColor/Yellow')\">Yellow</div> \
@@ -42,6 +43,32 @@ void SetBgColor(char* color)
 	maWebViewEvaluateScript(script);
 }
 
+#ifdef COMMENT_OUT
+int MAMain()
+{
+	maWebViewOpen();
+
+	while (1)
+	{
+		MAEvent e;
+		while (0 != maGetEvent(&e))
+		{
+			switch (e.type)
+			{
+				case EVENT_TYPE_CLOSE:
+					return 0;
+
+				case EVENT_TYPE_WEBVIEW_SERVICE_REQUEST:
+					break;
+			}
+		}
+	}
+
+	return 0;
+}
+#endif
+
+#ifndef COMMENT_OUT
 int MAMain()
 {
 	maWebViewOpen();
@@ -108,3 +135,4 @@ int MAMain()
 
 	return 0;
 }
+#endif

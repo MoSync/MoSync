@@ -5,9 +5,15 @@ require 'settings.rb'
 require 'skipped.rb'
 require '../../rules/util.rb'
 
+if(ARGV.length > 0)
+	SETTINGS[:stop_on_fail] = true
+	SETTINGS[:rebuild_failed] = true
+	SETTINGS[:retry_failed] = true
+end
+
 BUILD_DIR = 'build'
 MOSYNCDIR = ENV['MOSYNCDIR']
-GCC_FLAGS = " -I- -std=gnu99 -I. -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
+GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
 PIPE_FLAGS = " -datasize=#{2*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024}"
 PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 
@@ -18,6 +24,8 @@ PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 # but it would be faster.
 
 FileUtils.mkdir_p(BUILD_DIR)
+FileUtils.rm_rf('filesystem')
+FileUtils.mkdir_p('filesystem/tmp')
 
 sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
 
@@ -41,15 +49,15 @@ def process_line(line)
 		#p line
 		words = line.scan(/[^ \t]+/)
 		
-		puts "test: #{words[0]}"
+		#puts "test: #{words[0]}"
 		return nil unless(MAKEFILE_TEST_ARRAYS.include?(words[0]))
 		#p words
 		if(words[1] == '=' || words[1] == ':=' || words[1] == '+=')
 			result = words.slice(2..-1)
 			if(words[0] == 'strop-tests')
-				p result
+				#p result
 				result.collect! do |t| "test-#{t}" end
-				p result
+				#p result
 			end
 			return result
 		end
@@ -127,18 +135,18 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld')
+	sldFile = ofn.ext('.sld' + suffix)
+	stabsFile = ofn.ext('.stabs' + suffix)
 	
 	delete_if_empty(pfn)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
-		sld_flags = " -sld=#{sldFile}"
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{PIPE_LIBS}"
-			sh "pipe-tool#{sld_flags} -B #{pfn} rebuild.s"
+			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool#{sld_flags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{PIPE_LIBS}"
+			sh "pipe-tool -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -152,7 +160,7 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -noscreen -program #{pfn} -sld #{sldFile}"
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 20 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
 	res = system(cmd)
 	puts res
@@ -162,6 +170,8 @@ def link_and_test(ofn, dead_code, force_rebuild)
 		FileUtils.rm_f(logFile)
 		FileUtils.rm_f(mdsFile)
 		FileUtils.rm_f(esFile)
+		FileUtils.rm_f(sldFile)
+		FileUtils.rm_f(stabsFile)
 	else	# failure
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
@@ -177,6 +187,12 @@ end
 
 #puts "premature exit"
 #exit 0
+
+if(ARGV.size > 0)
+	files.reject! do |f| !ARGV.include?(File.basename(f)) end
+end
+
+unskippedCount = 0
 
 files.each do |filename|
 	bn = File.basename(filename)
@@ -196,9 +212,12 @@ files.each do |filename|
 		next
 	end
 	puts bn
+	unskippedCount += 1
 	
 	ofn = BUILD_DIR + '/' + bn.ext('.s')
 	force_rebuild |= SETTINGS[:rebuild_failed] && (File.exists?(ofn.ext('.fail')) || File.exists?(ofn.ext('.faile')))
+	force_rebuild |= SETTINGS[:rebuild_missing_log] && !File.exists?(ofn.ext('.win')) && !File.exists?(ofn.ext('.log'))
+	force_rebuild |= !File.exists?(ofn.ext('.win')) && !File.exists?(ofn.ext('.fail'))
 	
 	# compile
 	if(!File.exists?(ofn) || force_rebuild)
@@ -207,5 +226,9 @@ files.each do |filename|
 	end
 	
 	force_rebuild = link_and_test(ofn, false, force_rebuild)
-	#link_and_test(ofn, true, force_rebuild)
+	if(:test_dead_code_elimination && File.exists?(ofn.ext('.win')))
+		link_and_test(ofn, true, force_rebuild)
+	end
 end
+
+puts "#{unskippedCount} actual tests."

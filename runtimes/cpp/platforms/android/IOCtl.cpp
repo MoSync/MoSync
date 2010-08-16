@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "IOCtl.h"
 
 #include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WEBVIEW.h>
 
 namespace Base
 {
@@ -166,6 +167,18 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
+	
+	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maOpenWebView", "()I");
 		if (methodID == 0) return 0;
 		int retval = jNIEnv->CallIntMethod(jThis, methodID);
 		

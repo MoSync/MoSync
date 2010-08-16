@@ -103,6 +103,14 @@ char* strdupa(char* str);
 #define MAP_PRIVATE 16
 #define MAP_FAILED NULL
 #define PROT_NONE 0
+#define MAP_SHARED 0
 
 void* mmap(void* address, size_t length, int protect, int flags, int filedes, off_t offset);
 int mprotect(void*, size_t, int);
+int munmap(void*, size_t);
+
+#define ITERATIONS 1000	//arbitrary. used by test-string.h. increase once this one passes.
+
+int ffsl(long int i);
+int ffsll(long long int i);
+wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);

@@ -27,6 +27,7 @@ void gdb_exit(const string& args) GCCATTRIB(noreturn);
 void gdb_version(const string& args);
 void interpreter_exec(const string& args);
 void gdb_set(const string& args);
+void gdb_show(const string& args);
 
 void gdb_exit(const string& args) {
 	oprintToken();
@@ -73,6 +74,11 @@ void interpreter_exec(const string& args) {
 }
 
 void gdb_set(const string& args) {
+	oprintDoneLn();
+	commandComplete();
+}
+
+void gdb_show(const string& args) {
 	oprintDoneLn();
 	commandComplete();
 }

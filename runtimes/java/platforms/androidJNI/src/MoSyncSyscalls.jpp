@@ -833,6 +833,11 @@ int maShowVirtualKeyboard()
 	return 0;
 }
 
+int maWebViewOpen()
+{
+	return 0;
+}
+
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
 boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)

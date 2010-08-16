@@ -77,7 +77,7 @@ if(@GCC_IS_V4) then
 		cpp_flags += " -std=gnu++0x -DHAVE_TR1"
 	end
 end
-if(!@GCC_IS_V43) then
+if(!(@GCC_IS_V4 && @GCC_V4_SUB >= 3)) then
 	lesser_conly += gcc43_c_warnings
 end
 

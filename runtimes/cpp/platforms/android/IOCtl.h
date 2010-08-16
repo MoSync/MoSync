@@ -41,4 +41,6 @@ namespace Base
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);
 }

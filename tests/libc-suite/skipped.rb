@@ -40,8 +40,6 @@ SKIPPED_FILES = [
 	'tst-longjmp_chk2.c',
 	'tst-gshadow.c',
 	'test-utime.c',
-	'test-stat.c',	# todo
-	'test-stat2.c',	# todo
 	'test-lfs.c',
 	'tst-getcwd.c',
 	'tst-fcntl.c',
@@ -53,7 +51,7 @@ SKIPPED_FILES = [
 	'tst-statvfs.c',
 	'tst-openat.c',	# todo
 	'tst-unlinkat.c',	# todo
-	'tst-fstatat.c',	# todo
+	'tst-fstatat.c',	# todo, dirent
 	'tst-futimesat.c',	# todo
 	'tst-renameat.c',	# todo
 	'tst-fchownat.c',	# todo
@@ -155,7 +153,6 @@ SKIPPED_FILES = [
 	'errnobug.c',	# pipe
 	'tst-printfsz.c',	# register_printf_function
 	'tst-obprintf.c',	# obstack.h
-	'tst-fmemopen.c',	# mmap
 	'tst-unlockedio.c',
 	'tst-environ.c',	#todo, setenv & getenv
 	'tst-xpg-basename.c',
@@ -163,7 +160,6 @@ SKIPPED_FILES = [
 	'tst-makecontext.c',
 	'tst-makecontext2.c',
 	'tst-unsetenv1.c',	# clearenv
-	'stratcliff.c',	# mmap
 	'tst-strxfrm.c',	# newlocale
 	'tst-strfry.c',	# strfry
 	'bug-envz1.c',	# envz_entry
@@ -173,7 +169,9 @@ SKIPPED_FILES = [
 	'tst-ftime_l.c',	# locale_t
 	'tst-strptime2.c',	# tm_gmtoff
 	'bug-getdate1.c',	# getdate
-	'wcsatcliff.c',	# mmap
+	'tst-nanosleep.c',	# nanosleep
+	'tst-nice.c',	# we are not nice
+	'tst-perror.c',	# To be used only for testing glibc.
 ]
 
 SKIPPED_PATTERNS = [

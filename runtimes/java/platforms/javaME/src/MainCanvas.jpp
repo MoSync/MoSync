@@ -664,7 +664,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 		try {
 #endif
-			mSCState = 0;
+			mSCState = 2;
 			mCore.mSyscall.init();
 			mMidlet.mThread.start();
 #ifndef JDB_DEBUG
@@ -685,6 +685,15 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 		try {
 #endif
+			if(mSCState == 2) {	//we're already started, which means the screen actually changed.
+				// reset cliprect
+				mCore.mSyscall.mCanvasGraphics.setClip(0, 0, w, h);
+
+				// post event
+				int[] event = new int[1];
+				EI_TYPE = EVENT_TYPE_SCREEN_CHANGED;
+				postEvent(event);
+			}
 #ifdef MA_PROF_BUG_MICROEMU
 			mBackbuffer = Image.createImage(getWidth(), getHeight());
 #endif	//MA_PROF_BUG_MICROEMU

@@ -108,11 +108,11 @@ namespace Base {
 		int maFileCreate(MAHandle file);
 		int maFileDelete(MAHandle file);
 		int maFileSize(MAHandle file);
-		//int maFileAvailableSpace(MAHandle file);
-		//int maFileTotalSpace(MAHandle file);
-		//int maFileDate(MAHandle file);
-		//int maFileRename(MAHandle file, const char* newName);
-		//int maFileTruncate(MAHandle file, int offset);
+		int maFileAvailableSpace(MAHandle file);
+		int maFileTotalSpace(MAHandle file);
+		int maFileDate(MAHandle file);
+		int maFileRename(MAHandle file, const char* newName);
+		int maFileTruncate(MAHandle file, int offset);
 
 		int maFileWrite(MAHandle file, const void* src, int len);
 		int maFileWriteFromData(const MA_FILE_DATA* args);
@@ -142,13 +142,15 @@ namespace Base {
 		int getMemoryProtection();
 #endif
 
+#ifdef EMULATOR
+		bool mAllowDivZero;
+#endif
+
 		void VM_Yield();
 
 		int maBtGetNewDevice(MABtDevice* dst);
 		int maBtGetNewService(MABtService* dst);
 	};
-
-	int maCheckInterfaceVersion(int hash);
 
 	void maAccept(MAHandle conn);
 

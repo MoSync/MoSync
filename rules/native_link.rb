@@ -59,7 +59,7 @@ class NativeGccLinkWork < NativeGccWork
 
 	def setup3(all_objects)
 		if(HOST == :darwin)
-			@EXTRA_LINKFLAGS += " -mmacosx-version-min=10.5 -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa"
+			@EXTRA_LINKFLAGS += " -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa -framework IOBluetooth -framework Foundation"
 		end
 		if(PROFILING)
 			@EXTRA_LINKFLAGS += " -pg"

@@ -24,9 +24,10 @@ work.instance_eval do
 			@SPECIFIC_CFLAGS = { "discImpl.cpp" => " -Wno-unreachable-code" }
 		end
 	elsif(HOST == :darwin)
-		@SOURCES = ["."]
+		@SOURCES = [".", "darwin"]
+		@EXTRA_CPPFLAGS = " -DCOCOA_SUPPORTED"
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
-		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn","discovery.cpp" => " -Wno-missing-noreturn" }
+		@SPECIFIC_CFLAGS = { "interface.mm" => " -Wno-missing-noreturn","discovery.cpp" => " -Wno-missing-noreturn" }
 	else
 		error "Unknown platform: #{HOST}"
 	end

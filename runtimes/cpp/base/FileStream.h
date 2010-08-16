@@ -59,7 +59,10 @@ namespace Base {
 
 	class WriteFileStream : public FileStream {
 	public:
-		WriteFileStream(const char* filename, bool append=false);	//creates a file. overwrites any existing file.
+		// if append: open an existing file, or create a new one if needed.
+		// else if exist: open an existing file with write access.
+		// else: create a file. overwrite any existing file.
+		WriteFileStream(const char* filename, bool append=false, bool exist=false);
 		bool write(const void* src, int size);
 		Stream* createLimitedCopy(int /*size*/) const { FAIL; }
 		Stream* createCopy() const { FAIL; }

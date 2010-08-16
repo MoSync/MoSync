@@ -55,8 +55,10 @@ int main(int argc, char** argv) {
 	settings.profile.mVendor = "default";
 	settings.profile.mModel = "default";
 	settings.haveSkin = true;
-
 	settings.iconPath = NULL;
+#ifdef EMULATOR
+	settings.timeout = 0;
+#endif
 
 	for(int i = 1; i < argc; i++) {
 		if(strcmp(argv[i], "-resource")==0) {

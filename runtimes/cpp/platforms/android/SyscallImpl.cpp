@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/cpp_defs.h>
 #include <helpers/fifo.h>
+#include <helpers/CPP_IX_WEBVIEW.h>
 
 #include <jni.h>
 
@@ -908,11 +909,6 @@ namespace Base
 		SYSLOG("maIOCtl");
 		
 		switch(function) {
-
-		case maIOCtl_maCheckInterfaceVersion:
-			SYSLOG("maIOCtl_maCheckInterfaceVersion");
-			return Base::maCheckInterfaceVersion(a);
-
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
 			return -1;
@@ -1098,6 +1094,9 @@ namespace Base
 			SYSLOG("maIOCtl_maShowVirtualKeyboard");
 			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
 			
+		case maIOCtl_maWebViewOpen:
+			SYSLOG("maIOCtl_maWebViewOpen");
+			return _maWebViewOpen(mJNIEnv, mJThis);
 		}
 		
 		return IOCTL_UNAVAILABLE;

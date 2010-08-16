@@ -23,21 +23,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // See http://gcc.gnu.org/onlinedocs/gccint/Soft-float-library-routines.html
 // for documentation
 
-// ** Convert float to unsigned int
-unsigned int __fixunssfsi(float a)			/// ??? Might need fixing
-{
-	if (a < 0)
-		return 0;
-
-	if (a > 0xffffffff)
-		return 0xffffffff;
-
-	if (a < 0x80000000)
-		return (unsigned) __fixsfsi(a);
-	
-	return ((unsigned int) __fixsfsi(a - 0x7fffffff)) + 0x7fffffff;
-}
-
 // ** if a greater than b
 
 int __gtsf2(float a, float b)
@@ -81,22 +66,6 @@ int __nesf2(float a, float b)
 }
 
 
-// ** Convert double to unsigned int
-
-unsigned int __fixunsdfsi(double a)			/// ??? Might need fixing
-{
-	if (a < 0)
-		return 0;
-
-	if (a > 0xffffffff)
-		return 0xffffffff;
-
-	if (a < 0x80000000)
-		return (unsigned) __fixdfsi(a);
-	
-	return ((unsigned int) __fixdfsi(a - 0x7fffffff)) + 0x7fffffff;
-}
-
 // ** if a greater than b
 
 int __gtdf2(double a, double b)
@@ -137,16 +106,6 @@ int __eqdf2(double a, double b)
 int __nedf2(double a, double b)
 {
 	return dcmp(a,b);
-}
-
-float __truncdfsf2 (double a)
-{
-	return d2f(a);
-}
-
-double __extendsfdf2(float a)
-{
-	return f2d(a);
 }
 
 // these should not be needed, as long == int.

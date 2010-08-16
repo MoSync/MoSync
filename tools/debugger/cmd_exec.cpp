@@ -384,6 +384,8 @@ static bool runPrologue() {
 }
 
 static bool reportRunning() {
+	if(sRunning)
+		return true;
 	oprintToken();
 	oprintf("^running\n");
 	commandComplete();
@@ -409,8 +411,7 @@ static void Callback::opDone() {
 }
 
 static void Callback::opRunning() {
-	if(!sRunning)
-		reportRunning();
+	reportRunning();
 	sRunning = true;
 }
 

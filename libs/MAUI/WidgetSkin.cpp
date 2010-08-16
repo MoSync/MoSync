@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "WidgetSkin.h"
 #include <MAUtil/Graphics.h>
+#include <MAUtil/PlaceholderPool.h>
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
@@ -160,10 +161,16 @@ namespace MAUI {
 
 	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
 	int WidgetSkin::maxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
+	bool WidgetSkin::useCache = false;
 	
 	void WidgetSkin::setMaxCacheSize(int c) {
 		maxCacheSize = c;
 	}
+	
+	void WidgetSkin::setCacheEnabled(bool e) {
+		useCache = e;
+	}
+	
 		
 	void WidgetSkin::flushCacheUntilNewImageFits(int numPixels) {
 		int totalPixelsInCache = numPixels;
@@ -176,7 +183,7 @@ namespace MAUI {
 
 		int currentTime = maGetMilliSecondCount();
 		
-		while(totalPixelsInCache>DEFAULT_CACHE_THRESHOLD) {
+		while(totalPixelsInCache>maxCacheSize) {
 			int oldest = currentTime;
 			iter = sCache.begin();	
 			HashMap<CacheKey, CacheElement>::Iterator best = sCache.end();
@@ -189,12 +196,19 @@ namespace MAUI {
 			}
 			if(best == sCache.end()) break;
 			maDestroyObject(best->second.image);
+			PlaceholderPool::put(best->second.image);
 			sCache.erase(best);
 			totalPixelsInCache-=iter->first.w*iter->first.h;
 		}
 	}
 	
 	void WidgetSkin::flushCache() {
+		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
+		while(iter != sCache.end()) {
+			maDestroyObject(iter->second.image);
+			PlaceholderPool::put(iter->second.image);
+			iter++;
+		}
 		sCache.clear();
 	}
 			
@@ -214,7 +228,7 @@ namespace MAUI {
 
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
 		int numTiles = calculateNumTiles(width, height);
-		if(numTiles<100) {
+		if(!useCache || numTiles<100) {
 			drawDirect(x, y, width, height, type);
 			return;
 		}
@@ -237,7 +251,7 @@ namespace MAUI {
 
 			flushCacheUntilNewImageFits(width*height);	
 			
-			cacheElem.image = maCreatePlaceholder();
+			cacheElem.image = PlaceholderPool::alloc();
 			if(maCreateImageRaw(cacheElem.image,data,EXTENT(width,height),1)!=RES_OK) {
 				maPanic(1, "Could not create raw image");
 			}
