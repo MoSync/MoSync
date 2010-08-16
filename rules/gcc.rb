@@ -99,15 +99,19 @@ module GccVersion
 			gcc_version = get_gcc_version_string(gcc)
 			is_v4 = gcc_version[0] == "4"[0]
 			set_class_var(gccVersionClass, :@@GCC_IS_V4, is_v4)
-			set_class_var(gccVersionClass, :@@GCC_IS_V43, is_v4 && (gcc_version[2] == "3"[0]))
-			set_class_var(gccVersionClass, :@@GCC_IS_V44, is_v4 && (gcc_version[2] == "4"[0]))
+			if(is_v4)
+				set_class_var(gccVersionClass, :@@GCC_V4_SUB, gcc_version[2, 1].to_i)
+			end
 			warning("GCC version: #{gcc_version.inspect}")
 			warning("GCC_IS_V4: #{is_v4}")
-			#warning("GCC_IS_V43: #{@@GCC_IS_V43}")
+			if(is_v4)
+				warning("GCC sub-version: #{gcc_version[2, 1].to_i}")
+			end
 		end
 		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
-		@GCC_IS_V43 = get_class_var(gccVersionClass, :@@GCC_IS_V43)
-		@GCC_IS_V44 = get_class_var(gccVersionClass, :@@GCC_IS_V44)
+		if(@GCC_IS_V4)
+			@GCC_V4_SUB = get_class_var(gccVersionClass, :@@GCC_V4_SUB)
+		end
 		super
 	end
 end

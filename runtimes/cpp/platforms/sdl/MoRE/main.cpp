@@ -91,9 +91,15 @@ int main2(int argc, char **argv) {
 	settings.profile.mVendor = "default";
 	settings.haveSkin = true;
 	settings.iconPath = NULL;
+#ifdef EMULATOR
+	settings.timeout = 0;
+#endif
 	const char* sldFile = NULL;
 #ifdef GDB_DEBUG
 	bool gdb = false;
+#endif
+#ifdef EMULATOR
+	bool allowDivZero = false;
 #endif
 
 	//NOTE: could have a -no-console option used by MoBuild, otherwise use a console for error output.
@@ -120,12 +126,12 @@ int main2(int argc, char **argv) {
 				"  Options (Optional):\n"
 				"\n"
 				"  -id <integer>                          instance id.\n"
-				"  -fd <integer>                          file descriptor to which stdout is redirected.\n"
+				"  -fd <integer>                          file descriptor to which certain binary data is written. used with IDEs.\n"
 				"  -program <filename:string>             program file to be executed (if option isn't specified it defaults to 'program' in cwd).\n"
 				"  -resource <filename:string>            resource file to be loaded (if option isn't specified it defaults to 'resources' in cwd).\n"
 				"  -resolution <x:integer> <y:integer>    resolution to use (defaults to 240 x 320).\n"
 				"  -icon <filename:string>                icon to use, to identify the instance.\n"
-				"  -noscreen                              run emulator in hidden mode.\n"
+				"  -noscreen                              don't open a display window. useful for repeated tests from a console script.\n"
 				"  -nomophone                             run emulator without skin, just show the screen.\n"
 				"  -model <string>                        set model. Used to choose skin.\n"
 				"  -vendor <string>                       set vendor. Used to choose skin.\n"
@@ -133,6 +139,10 @@ int main2(int argc, char **argv) {
 				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -resmem <bytes:integer>                set resource memory limit.\n"
 				"  -gdb                                   start gdb stub.\n"
+#ifdef EMULATOR
+				"  -allowdivzero                          allow floating-point division by zero. this produces ieee standard results.\n"
+				"  -timeout <seconds:integer>             close the program if it runs longer than the timeout.\n"
+#endif
 				"\n";
 			printf("%s", sInfo);
 			return 1;
@@ -228,6 +238,17 @@ int main2(int argc, char **argv) {
 		} else if(strcmp(argv[i], "-gdb")==0) {
 			gdb = true;
 #endif
+#ifdef EMULATOR
+		} else if(strcmp(argv[i], "-allowdivzero")==0) {
+			allowDivZero = true;
+		} else if(strcmp(argv[i], "-timeout")==0) {
+			i++;
+			if(i>=argc) {
+				LOG("not enough parameters for -timeout");			
+				return 1;
+			}
+			settings.timeout = atoi(argv[i]);
+#endif
 		} else {
 			LOG("unknown parameter: \"%s\"\n", argv[i]);
 			return 1;
@@ -258,6 +279,9 @@ int main2(int argc, char **argv) {
 	gCore = Core::CreateCore(*syscall);
 #ifdef GDB_DEBUG
 	gCore->mGdbOn = gdb;
+#endif
+#ifdef EMULATOR
+	syscall->mAllowDivZero = allowDivZero;
 #endif
 	if(!Core::LoadVMApp(gCore, programFile, resourceFile)) {
 		BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);

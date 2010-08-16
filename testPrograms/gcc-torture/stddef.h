@@ -1,1 +1,1 @@
-typedef unsigned short wchar_t;
+#include <ma.h>

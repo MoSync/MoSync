@@ -40,6 +40,9 @@ public:
 			uint resmem;
 			MoRE::DeviceProfile profile;
 			bool haveSkin;
+#ifdef EMULATOR
+			uint timeout;
+#endif
 		};
 
 	Syscall(const STARTUP_SETTINGS&);

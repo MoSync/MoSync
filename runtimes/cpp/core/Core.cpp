@@ -258,6 +258,7 @@ public:
 	int fakeCallStackDepth;	//measured in ints
 	int fakeCallStackCapacity;	//measured in ints
 
+#ifdef FUNCTION_PROFILING
 	class ProfTree {
 	private:
 		class ProfTime {
@@ -468,6 +469,7 @@ public:
 
 		const ProfNode* getRoot() const { return mRoot; }
 	} profTree;
+#endif	//FUNCTION_PROFILING
 
 	//init functions
 	void allocFakeCallStack() {
@@ -493,7 +495,9 @@ public:
 			fakeCallStack = temp;
 		}
 		fakeCallStack[fakeCallStackDepth++] = returnAddress;
+#ifdef FUNCTION_PROFILING
 		profTree.call(callAddress);
+#endif
 	}
 	void fakePop() {
 		if(fakeCallStackDepth > 0)
@@ -501,7 +505,9 @@ public:
 		else {
 			LOG("Warning: Call stack broken @ IP 0x%X\n", IP);
 		}
+#ifdef FUNCTION_PROFILING
 		profTree.ret();
+#endif
 	}
 #else
 #define fakePush(i,j)
@@ -595,7 +601,7 @@ public:
 #endif
 
 
-#ifdef FAKE_CALL_STACK
+#ifdef FUNCTION_PROFILING
 		profTree.init(Head.EntryPoint);
 #endif
 
@@ -623,7 +629,7 @@ public:
 			return false;
 #endif
 
-#ifdef FAKE_CALL_STACK
+#ifdef FUNCTION_PROFILING
 		profTree.init(Head.EntryPoint);
 #endif
 
@@ -1118,6 +1124,9 @@ void WRITE_REG(int reg, int value) {
 	}
 	int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
+
+	int _SYSCALL_CONVERTRES_uint(uint i) { return i; }
+#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
 
 	void debug_ulong(int SCDEBUG_ARG(i)) { LOGSC("(%u)", i); }
 	int _SYSCALL_CONVERT_ulong(int i) {

@@ -130,7 +130,7 @@ namespace Base {
 
 	static MoRE::DeviceSkin* sSkin = NULL;
 
-	static bool MALibInit(bool showScreen, bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile);
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS&);
 #ifdef USE_MALIBQUIT
 	static void MALibQuit();
 #endif
@@ -183,8 +183,7 @@ namespace Base {
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 #endif
 	}
@@ -206,8 +205,7 @@ namespace Base {
 #endif
 		screenWidth = width;
 		screenHeight = height;
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 	}
 
@@ -301,7 +299,15 @@ namespace Base {
 		}
 	};
 
-	static bool MALibInit(bool showScreen,  bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile) {
+
+#ifdef EMULATOR
+	static Uint32 GCCATTRIB(noreturn) SDLCALL TimeoutCallback(Uint32 interval, void*) {
+		LOG("TimeoutCallback %i\n", interval);
+		exit(2);
+	}
+#endif
+
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS& settings) {
 		char *mosyncDir = getenv("MOSYNCDIR");
 		if(!mosyncDir) {
 			LOG("MOSYNCDIR could not be found");
@@ -330,7 +336,7 @@ namespace Base {
 
 		MANetworkInit(/*broadcom*/);
 
-		if(showScreen) {
+		if(settings.showScreen) {
 #ifndef MOBILEAUTHOR
 #ifdef __USE_SYSTEM_RESOLUTION__
 			const SDL_VideoInfo* pVid = SDL_GetVideoInfo();
@@ -341,10 +347,9 @@ namespace Base {
 			}
 #endif
 
-			if(haveSkin) {
-				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
+			if(settings.haveSkin) {
+				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(&settings.profile);
 				if(!sSkin) {
-					haveSkin = false;
 					TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
 				} else {
 					sSkin->setListener(new MoSyncSkinListener());
@@ -375,16 +380,16 @@ namespace Base {
 			}
 
 			char caption[1024];
-			if(id != NULL) {
-				int res = _snprintf(caption, 1024, "%s - MoSync", id);
+			if(settings.id != NULL) {
+				int res = _snprintf(caption, 1024, "%s - MoSync", settings.id);
 				DEBUG_ASSERT(res > 0 && res < 1024);
 			} else {
 				strcpy(caption, "MoSync");
 			}
 			SDL_WM_SetCaption(caption, NULL);
 
-			if(iconPath) {
-				SDL_Surface *surf = IMG_Load(iconPath);
+			if(settings.iconPath) {
+				SDL_Surface *surf = IMG_Load(settings.iconPath);
 				if(surf)
 					SDL_WM_SetIcon(surf, NULL);				
 			}
@@ -423,6 +428,12 @@ namespace Base {
 			strcat(destDir, "/bin/maspec.fon");
 			TEST_Z(gFont = TTF_OpenFont(destDir, 8));
 		}
+
+#ifdef EMULATOR
+		if(settings.timeout != 0) {
+			DEBUG_ASSERT(NULL != SDL_AddTimer(settings.timeout * 1000, TimeoutCallback, NULL));
+		}
+#endif
 
 		return true;
 	}
@@ -1700,6 +1711,7 @@ namespace Base {
 	static void fillBufferCallback() {
 		MAEvent* ep = new MAEvent;
 		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		ep->state = 1;
 		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
 		FE_PushEvent((SDL_Event*)&event);
 	}
@@ -1785,9 +1797,6 @@ namespace Base {
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
-
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
 
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
@@ -1958,16 +1967,16 @@ namespace Base {
 			return SYSCALL_THIS->maFileDelete(a);
 		case maIOCtl_maFileSize:
 			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
+		case maIOCtl_maFileAvailableSpace:
 			return SYSCALL_THIS->maFileAvailableSpace(a);
 		case maIOCtl_maFileTotalSpace:
 			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileRename:
 			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
+		case maIOCtl_maFileDate:
+			return SYSCALL_THIS->maFileDate(a);
 		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+			return SYSCALL_THIS->maFileTruncate(a, b);
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
@@ -2030,6 +2039,7 @@ namespace Base {
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
 		default:
+			LOGD("maIOCtl(%i) unimplemented.\n", function);
 			return IOCTL_UNAVAILABLE;
 		}
 	}	//maIOCtl

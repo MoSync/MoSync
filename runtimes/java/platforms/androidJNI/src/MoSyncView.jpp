@@ -32,6 +32,15 @@ import android.graphics.Canvas;
 
 import android.app.Service;
 
+import android.view.inputmethod.InputConnection;
+ 
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.BaseInputConnection;
+import android.text.InputType;
+import android.view.View;
+import android.view.KeyCharacterMap;
+import android.view.inputmethod.InputMethodManager;
+
 #include "generated\MAAPI_consts.h"
 
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
@@ -41,6 +50,24 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
 
+	class CustomInputConnection extends BaseInputConnection
+	{
+		private MoSyncView mMoSyncView;
+		public CustomInputConnection(View targetView, boolean fullEditor, MoSyncView mosyncView)
+		{
+			super(targetView, fullEditor);
+			mMoSyncView = mosyncView;
+		}
+		
+		public boolean performEditorAction (int actionCode)
+		{
+			Log.i("performEditorAction", "Pressed enter key");
+			InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+			mgr.hideSoftInputFromWindow(mMoSyncView.getWindowToken(), 0);
+			return true;
+		}
+	}
+	
 	public MoSyncView(Context context, MoSyncThread moSyncThread) throws Exception
 	{
 		super(context);
@@ -285,4 +312,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return true;
 	}
 	
+	public InputConnection onCreateInputConnection (EditorInfo outAttrs)
+	{
+		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
+		CustomInputConnection ic = new CustomInputConnection(this, false, this);
+		return ic;
+	}
+ 
 }

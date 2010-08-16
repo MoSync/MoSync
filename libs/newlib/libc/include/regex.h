@@ -42,14 +42,14 @@
 /* types */
 typedef off_t regoff_t;
 
-typedef struct {
+typedef struct regex_t {
 	int re_magic;
 	size_t re_nsub;		/* number of parenthesized subexpressions */
 	__const char *re_endp;	/* end pointer for REG_PEND */
 	struct re_guts *re_g;	/* none of your business :-) */
 } regex_t;
 
-typedef struct {
+typedef struct regmatch_t {
 	regoff_t rm_so;		/* start of match */
 	regoff_t rm_eo;		/* end of match */
 } regmatch_t;
@@ -65,6 +65,7 @@ typedef struct {
 #define	REG_DUMP	0200
 
 /* regerror() flags */
+#define REG_NOERROR	 0
 #define	REG_NOMATCH	 1
 #define	REG_BADPAT	 2
 #define	REG_ECOLLATE	 3

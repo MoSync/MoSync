@@ -15,8 +15,10 @@
 # 02111-1307, USA.
 
 require "#{File.dirname(__FILE__)}/host.rb"
+require "#{File.dirname(__FILE__)}/error.rb"
 
 def switchPathSlashes(cmd)
+	error("null path") if(!cmd)
 	if(HOST == :win32)
 		# bug in windows command line parser causes commands on the following format to fail:
 		# \directory\subdir/executable

@@ -179,6 +179,9 @@ buffer.Format(_L8("In %s on line %d: Panic(%s);\n"), __FILE__, __LINE__,\
 
 #define LOG_FAILURE(a) { LOG("Failure %i ", a); IN_FILE_ON_LINE; }
 
+#define SYMERR_CONVERT(func, moerr) { int test_s = (func); if(IS_SYMBIAN_ERROR(test_s)) {\
+	LOG_VAL(test_s) return moerr; } }
+
 // Test Symbian No Return
 #define TSNR(a) { int test_s = (a); if(IS_SYMBIAN_ERROR(test_s)) LOG_FAILURE(test_s); }
 

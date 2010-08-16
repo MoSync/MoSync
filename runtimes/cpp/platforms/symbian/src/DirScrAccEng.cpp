@@ -432,9 +432,30 @@ void CDirScrAccEng::ClearScreen() {
 	iFBGc->CancelClippingRect();
 }
 
+void CDirScrAccEng::UpdateScreenSize() {
+	// If screen size has changed, resize the backbuffer.
+	TSize oldSize = iOffScreenBmp->SizeInPixels();
+	TSize newSize = iScreenDevice.SizeInPixels();
+	if(oldSize != newSize) {
+		LOG("Screen resize from %ix%i to %ix%i\n", oldSize.iWidth, oldSize.iHeight,
+			newSize.iWidth, newSize.iHeight);
+		iOffScreenBmp->Resize(newSize);
+		iOffScreenDevice->Resize(newSize);
+		iFBGc->Resized();
+		// probably a good idea to reset the clip rect, too.
+		iOffScreenClipRect = newSize;
+		if(iDrawSurface == iOffScreenBmp) {
+			iDrawWidth = newSize.iWidth;
+			SetClip(iOffScreenClipRect);
+		}
+	}
+}
+
 void CDirScrAccEng::StartDrawingL() {
 	LOGG("SD\n");
 	DEBUG_ASSERT(!iDrawing);
+	
+	UpdateScreenSize();
 
 	// Initialise DSA
 

@@ -88,6 +88,7 @@ namespace MAUI {
 			deactivate();
 		}
 		Widget::setSelected(selected);
+		
 	}
 
 
@@ -100,6 +101,7 @@ namespace MAUI {
 		active = true;
 		setInputMode(inputMode);
 		setSelected(true);
+		
 	}
 
 	void EditBox::deactivate() {
@@ -167,6 +169,9 @@ namespace MAUI {
 			CharInput::getCharInput().setMode(CharInput::LOWERCASE);
 		} else if(inputMode == IM_NUMBERS) {
 			CharInput::getCharInput().setMode(CharInput::NUMBERS);
+		}
+		else if(inputMode == IM_QWERTY) {
+			CharInput::getCharInput().setQwerty(true);
 		}
 		this->inputMode = inputMode;
 	}

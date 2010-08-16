@@ -52,9 +52,9 @@ void file_list_exec_source_files(const string& args) {
 		const char* f = files[i].name.c_str();
 		const char* name = strrchr(f, '/');
 		if(name)
-			oprintf("{file=%s,fullname=%s}", name + 1, f);
+			oprintf("{file=\"%s\",fullname=\"%s\"}", name + 1, f);
 		else
-			oprintf("{file=%s}", f);
+			oprintf("{file=\"%s\"}", f);
 	}
 	oprintf("]\n");
 	commandComplete();

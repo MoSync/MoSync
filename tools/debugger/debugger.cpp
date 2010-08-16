@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <io.h>
 #endif
 #include <fcntl.h>
+#include <errno.h>
 
 #include "config.h"
 #include "helpers/helpers.h"
@@ -42,6 +43,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "commandInterface.h"
 #include "StubConnection.h"
 #include "cmd_stack.h"
+
 
 using namespace std;
 
@@ -213,7 +215,7 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
-#define STABS_MSG " This is probably because you linked with non-debug libraries."\
+#define STABS_MSG ". This is probably because you linked with non-debug libraries."\
 	" Check your settings."
 	if(stabsFilename) {
 		//load stabs and SLD
@@ -256,8 +258,10 @@ int main(int argc, char** argv) {
 		case DebuggerEvent::eUserInput:
 			if(StubConnection::isIdle())
 				executeCommand(de->str);
-			else
+			else {
+				_ASSERT(savedLine.empty());
 				savedLine = de->str;
+			}
 			break;
 		case DebuggerEvent::eReadMemory:
 			StubConnection::readMemory(gMemBuf + de->src, de->src, de->len, de->rmcb);
@@ -314,7 +318,12 @@ void error(const char* fmt, ...) {
 	commandComplete();
 }
 
+static bool sExecutingCommand = false;
+
 void commandComplete() {
+	_ASSERT(sExecutingCommand);
+	sExecutingCommand = false;
+
 	oprintf(GDB_PROMPT);
 	fflush(stdout);
 
@@ -325,6 +334,8 @@ void commandComplete() {
 
 static void executeCommand(const string& line) {
 	LOG("Command: %s\n", line.c_str());
+	_ASSERT(!sExecutingCommand);
+	sExecutingCommand = true;
 
 #ifdef COMMAND_LOGGING_ENABLED
 	fprintf(gCommandLog, "%s\n", line.c_str());
@@ -364,10 +375,24 @@ void MoSyncErrorExit(int code) {
 	exit(code);
 }
 
+static bool readAll(int fd, void* dst, int len) {
+	char* p = (char*)dst;
+	int pos = 0;
+	while(pos < len) {
+		int remain = len - pos;
+		int res = read(fd, p, remain);
+		if(res <= 0) {
+			LOG("read error: %i, %i\n", res, errno);
+			FAIL;
+		}
+		pos += res;
+	}
+	return true;
+}
+
 static bool readOpenProgramFile(int fd) {
 	MA_HEAD& h(gHead);
-	int res = read(fd, &h, sizeof(h));
-	TEST(res == sizeof(h));
+	TEST(readAll(fd, &h, sizeof(h)));
 
 	if(h.Magic != 0x5844414d) {	//MADX, big-endian
 		LOG("Magic error: 0x%08x should be 0x5844414d\n", h.Magic);
@@ -378,22 +403,20 @@ static bool readOpenProgramFile(int fd) {
 	setMemSize(h.DataSize);
 
 	gMemCs = new byte[h.CodeLen];
-	res = read(fd, gMemCs, h.CodeLen);
-	TEST(res == h.CodeLen);
+	TEST(readAll(fd, gMemCs, h.CodeLen));
 
 	if(lseek(fd, h.DataLen, SEEK_CUR) < 0) {
 		FAIL;
 	}
 
 	gMemCp = new int[h.IntLen];
-	res = read(fd, gMemCp, h.IntLen * 4);
-	TEST(res == h.IntLen * 4);
+	TEST(readAll(fd, gMemCp, h.IntLen * 4));
 	return true;
 }
 
 static bool readProgramFile(const char* filename) {
 	int fd = open(filename, O_RDONLY
-#ifdef _MSC_VER
+#ifdef WIN32
 		| O_BINARY
 #endif
 		);

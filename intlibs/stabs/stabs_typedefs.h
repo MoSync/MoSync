@@ -57,6 +57,7 @@ public:
 	TupleReference(Tuple);
 
 	virtual const TypeBase* resolve() const;
+	void printTypeMI(printfPtr, bool complex) const;
 protected:
 	const Tuple mId;
 	const int mFile;
@@ -66,6 +67,7 @@ class CrossReferenceType : public TupleReference {
 public:
 	CrossReferenceType(Tuple, const char* name);
 	const TypeBase* resolve() const;
+	void printTypeMI(printfPtr, bool complex) const;
 
 	const std::string mName;
 };

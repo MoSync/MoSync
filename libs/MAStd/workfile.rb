@@ -33,7 +33,7 @@ mod.class_eval do
 		if(CONFIG == "" && @GCC_IS_V4)
 			#broken compiler/stdlib
 			native_specflags = {"conprint.c" => " -Wno-unreachable-code"}
-			if(@GCC_IS_V44)
+			if(@GCC_V4_SUB == 4)
 				native_specflags["conprint.c"] += " -Wno-inline"
 			end
 		else

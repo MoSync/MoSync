@@ -23,12 +23,13 @@ bool isReturnType(const Interface& inf, const string& token) {
 		if(token == t.name)
 			return true;
 	}
-	return token == "int" || token == "void" || token == "double" ||
+	return token == "int" || token == "uint" || token == "void" || token == "double" ||
 		token == "float" || token == "noreturn";
 }
 
 string cType(const Interface& inf, const string& type) {
-	if(type == "int" || type == "double" || type == "float" || type == "void" || type == "char")
+	if(type == "int" || type == "double" || type == "float" || type == "void" ||
+		type == "char" || type == "uint")
 		return type;
 	if(type == "noreturn")
 		return "void";
@@ -59,6 +60,8 @@ bool isPointerType(const Interface& inf, const string& type) {
 
 string jType(const Interface& inf, const string& type) {
 	if(type == "ulong")
+		return "int";
+	if(type == "uint")
 		return "int";
 	if(type == "MAString")
 		return "MAString";
@@ -97,6 +100,9 @@ string getSJType(const Interface& inf, const string& type, bool argIn) {
 	if(argType == "float")
 		return "int";
 	if(argType == "double")
+		return "int";
+
+	if(argType == "uint")
 		return "int";
 
 	for(size_t i=0; i<inf.structs.size(); i++) {

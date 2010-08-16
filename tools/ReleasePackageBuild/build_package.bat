@@ -63,6 +63,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @SET MOSYNC_DOCS_PATH=%MOSYNC_PATH%\docs
 @SET MOSYNC_EXAMPLES_PATH=%MOSYNC_PATH%\examples
 @SET MOSYNC_PROFILES_PATH=%MOSYNC_PATH%\profiles
+@SET MOSYNC_MAPIP_BIN_PATH=%MOSYNC_PATH%\mapip\bin
 @SET MOSYNC_TRUNK=%MOSYNC_RELEASE_BUILD_PATH%\mosync-trunk
 
 @IF "%2" == "/SKIP" goto MKDIRS
@@ -82,6 +83,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @mkdir %MOSYNC_INCLUDE_PATH%
 @mkdir %MOSYNC_EXAMPLES_PATH%
 @mkdir %MOSYNC_DOCS_PATH%
+@mkdir %MOSYNC_MAPIP_BIN_PATH%
 
 @echo ------------------------------------------------
 @echo Setting build package vars
@@ -127,8 +129,15 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_bin %MOSYNC_BIN_PATH% /y /E /D
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
 
+@echo.
+@echo ------------------------------------------------
+@echo Copying MAPIP bin.
+@echo ------------------------------------------------
+@xcopy %ORIGINAL_PATH%\build_package_tools\mapip_bin %MOSYNC_MAPIP_BIN_PATH% /y /E /D
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@echo.
 @echo ------------------------------------------------
 @echo Copying skins.
 @echo ------------------------------------------------

@@ -219,7 +219,7 @@ final int maFileTotalSpace(MAHandle file) {
 }
 
 final int maFileRename(MAHandle file, String newName) {
-	if(newName.indexOf('/') < 0) {
+	if(newName.indexOf('/') >= 0) {
 		return MA_FERR_RENAME_DIRECTORY;
 	}
 	try {

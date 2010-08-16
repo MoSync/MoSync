@@ -178,3 +178,7 @@ div_t div(int numer, int denom) {
 	return r;
 }
 #endif
+
+void bzero(void* s, size_t n) {
+	memset(s, 0, n);
+}

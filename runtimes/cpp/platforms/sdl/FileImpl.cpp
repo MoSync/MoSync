@@ -45,7 +45,12 @@ namespace Base {
 	bool FileStream::read(void* dst, int size) {
 		TEST(isOpen());
 		int res = SDL_RWread(rwops, dst, 1, size);
-		return res == size;
+		if(res != size) {
+			LOGD("SDL_RWread(%i): %i\n", size, res);
+			LOGD("%s\n", SDL_GetError());
+			return false;
+		}
+		return true;
 	}
 	bool FileStream::length(int& aLength) const {
 		TEST(isOpen());
@@ -83,6 +88,7 @@ namespace Base {
 	bool FileStream::tell(int& aPos) const {
 		TEST(isOpen());
 		aPos = SDL_RWtell(rwops);
+		LOGD("SDL_RWtell: %i\n", aPos);
 		return true;
 	}
 
@@ -102,8 +108,8 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append) {
-		const char* mode = append ? "ab" : "wb";
+	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist) {
+		const char* mode = append ? "ab+" : (exist ? "rb+" : "wb+");
 		rwops = SDL_RWFromFile(filename, mode);
 		if(!rwops)
 		{

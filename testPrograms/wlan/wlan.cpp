@@ -17,10 +17,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <conprint.h>
 #include <maassert.h>
-#include "IX_WLAN.H"
+#include <IX_WLAN.H>
 
 void dumpAllAvailableAps() {
-	MA_WLAN_AP ap;
+	MAWlanAp ap;
 	char name[128];
 	ap.name = name;
 	ap.nameBufSize = 128;
@@ -29,6 +29,7 @@ void dumpAllAvailableAps() {
 		byte* mac = ap.address.a;
 		printf("%02X%02X%02X%02X%02X%02X %i dBm\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
 			ap.signalStrength);
+		printf("SSID: '%s'\n", ap.name);
 	}
 }
 
@@ -43,7 +44,7 @@ extern "C" int MAMain() {
 	
 	while(1) {
 		maWait(0);
-		EVENT event;
+		MAEvent event;
 		if(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE)
 				break;

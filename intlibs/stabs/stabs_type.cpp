@@ -126,7 +126,13 @@ bool DelayedType::resolveAll() {
 		DelayedType* d(sDelayed[i]);
 		const TypeBase* tb = d->resolve(); //((TypeReference*)d->mType)->resolve();
 		if(tb != NULL) {
-			FAILIF(d == tb);
+			if(d == tb) {
+				TypeReference* tr = (TypeReference*)d->mType;
+				StringPrintFunctor pp;
+				tr->printTypeMI(pp, true);
+				LOG("Could not resolve type: %s\n", pp.getString());
+			}
+			//FAILIF(d == tb);
 			d->mType = tb;
 		}
 		d->release();	//in preparation for the clear().
@@ -147,10 +153,17 @@ TupleReference::TupleReference(Tuple id) : mId(id), mFile(gCurrentFile) {
 const TypeBase* TupleReference::resolve() const {
 	return findTypeByTupleAndFile(mId, mFile);
 }
+void TupleReference::printTypeMI(printfPtr pf, bool complex) const {
+	pf("file %i, (%i,%i)", mFile, mId.a, mId.b);
+}
+
 
 CrossReferenceType::CrossReferenceType(Tuple id, const char* name)
 : TupleReference(id), mName(name)
 {}
+void CrossReferenceType::printTypeMI(printfPtr pf, bool complex) const {
+	pf("xs%s", mName.c_str());
+}
 
 class UnknownType : public TypeBase {
 	int size() const {

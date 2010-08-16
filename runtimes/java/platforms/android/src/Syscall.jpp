@@ -35,6 +35,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 /*
 import android.os.Looper;
 import android.os.Handler;
@@ -1238,6 +1239,12 @@ public
 		}
 		return MAIDL_HASH;
 	}
+	
+	int maShowVirtualKeyboard() {
+		InputMethodManager mgr = (InputMethodManager) mCore.mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+		mgr.showSoftInput(mMoSyncView, InputMethodManager.SHOW_FORCED);
+		return 0;
+	}
 
 	SYSCALL(int) maIOCtl(int function, int a, int b, int c) throws Exception {
 		Log.i("Syscall","maIOCtl");
@@ -1321,7 +1328,7 @@ public
 #endif
 
 #ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maStreamVideoStart:
+/*		case maIOCtl_maStreamVideoStart:
 			return maStreamVideoStart(readMemString(a));
 		case maIOCtl_maStreamClose:
 			return maStreamClose(a);
@@ -1338,7 +1345,7 @@ public
 		case maIOCtl_maStreamPos:
 			return maStreamPos(a);
 		case maIOCtl_maStreamSetPos:
-			return maStreamSetPos(a, b);
+			return maStreamSetPos(a, b);*/
 #endif
 
 		case maIOCtl_maFrameBufferGetInfo:
@@ -1361,7 +1368,9 @@ public
 		case maIOCtl_maAddDataSize:
 			return maAddDataSize(a, b);
 #endif
-
+		case maIOCtl_maShowVirtualKeyboard:
+			return maShowVirtualKeyboard();
+			
 		default:
 			return IOCTL_UNAVAILABLE;
 		}

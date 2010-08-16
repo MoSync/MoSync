@@ -33,6 +33,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers.h"
 #include "commandInterface.h"
 
+#include "memory.h"
+
 using namespace std;
 
 void data_list_register_values(const string& args);
@@ -156,6 +158,10 @@ void data_read_memory(const string& args) {
 	EFAIL(sscanf(argv[4].c_str(), "%i", &sRMP.nCols) != 1, "Bad format");
 
 	int totalBytes = sRMP.wordSize * sRMP.nRows * sRMP.nCols;
+
+	if(totalBytes>gMemSize || sRMP.address+totalBytes>gMemSize || sRMP.address>gMemSize)
+		error("Bad arguments");
+
 	sReadMemBuf.resize(totalBytes);
 
 	StubConnection::readMemory(sReadMemBuf.p(), sRMP.address, totalBytes, Callback::read_memory);

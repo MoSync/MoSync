@@ -51,7 +51,7 @@ sh2("tools/idl2", "vcbuild idl2.vcproj \"Release|Win32\"")
 
 sh2("tools/idl2/", "Release/idl2.exe");
 
-sh("libs/copyHeaders.bat")
+sh2("libs/", "copyHeaders.bat")
 
 sh2("intlibs/helpers/platforms/stdout", "vcbuild stdout.vcproj \"Release|Win32\"")
 sh2("intlibs/helpers/platforms/windows", "vcbuild windows.vcproj \"Release|Win32\"")
@@ -66,6 +66,8 @@ sh2("tools/mobex", "vcbuild mobex.vcproj \"Release|Win32\"")
 
 sh2("libs", "ruby workfile.rb")
 sh2("libs", "ruby workfile.rb CONFIG=\"\"")
+sh2("libs", "ruby workfile.rb USE_NEWLIB=\"\"")
+sh2("libs", "ruby workfile.rb USE_NEWLIB=\"\" CONFIG=\"\"")
 
 sh2("runtimes/cpp/platforms/sdl", "vcbuild sdl.vcproj \"Release|Win32\"")
 sh2("runtimes/cpp/platforms/sdl/mosynclib", "vcbuild mosynclib.vcproj \"Release|Win32\"")

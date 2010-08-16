@@ -2631,9 +2631,6 @@ retry:
 	{
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return Base::maCheckInterfaceVersion(a);
-
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;

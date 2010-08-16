@@ -17,4 +17,8 @@
 #endif
 #endif
 
+#define __BIG_ENDIAN BIG_ENDIAN
+#define __LITTLE_ENDIAN LITTLE_ENDIAN
+#define __BYTE_ORDER BYTE_ORDER
+
 #endif /* __MACHINE_ENDIAN_H__ */

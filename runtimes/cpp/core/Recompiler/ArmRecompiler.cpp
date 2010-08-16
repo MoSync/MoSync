@@ -1151,7 +1151,7 @@ namespace MoSync {
 
 		byte *loopWeights = new byte[mEnvironment.codeSize];
 		memset(loopWeights, 0, mEnvironment.codeSize);
-		const byte *ip = mEnvironment.mem_cs;
+		const byte *ip = mEnvironment.mem_cs+1;
 		const byte *endip = &ip[mEnvironment.codeSize];
 
 		Instruction inst;
@@ -1316,9 +1316,9 @@ namespace MoSync {
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
-		LOGD("Entering generated code...\n");
+		//LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
-		LOGD("Exited generated code.\n");
+		//LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 

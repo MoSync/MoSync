@@ -1215,12 +1215,16 @@ int GetReg(int err)
 //	input  op, imm, rd , rs
 //****************************************
 
+int Last_Instruction = 0;
+
 void WriteOpcode(char *AsmName, int field)
 {
 	int StartCodeIP = CodeIP;
 		
 	char *CodePtr = (char *) ArrayPtrBound(&CodeMemArray, CodeIP, CodeIP + 32);
 	//char *StartCodePtr = CodePtr;
+
+	Last_Instruction = CodeIP;
 
 	if (AsmCharPtr)
 		ArraySet(&AsmCharArray, CodeIP, (int) AsmCharPtr);
@@ -1307,12 +1311,6 @@ void WriteOpcode(char *AsmName, int field)
 	{
 		if (farop)
 		{
-/*			if (ArgJavaNative)
-			{
-				*CodePtr++ = (char)(imm >> 24);			// ?? Why 32 bits, can't remember
-				CodeIP++;
-			}
-*/		
 			*CodePtr++ = (char)(imm >> 16);
 			CodeIP++;
 		}
@@ -1375,18 +1373,7 @@ void WriteOpcode(char *AsmName, int field)
 		*CodePtr++ = (char)(imm & 0xff);
 		CodeIP++;
 	}
-	
-	
-	// Call the java translator
-
-//#ifdef INCLUDE_JAVAGEN
-//	if (JavaPass)
-//	{
-//		int err;
-//		err = JavaGen_Convert(StartCodePtr, StartCodeIP);
-//	}
-//#endif
-	
+		
 	// Debug list
 		
 	if (LIST)

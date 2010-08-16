@@ -45,7 +45,7 @@ BufferAudioSource::BufferAudioSource(MAAudioBufferInfo *i, BufferRequestCallback
 					break;
 				case AUDIO_FMT_U8: 
 					info.fmt = AudioSource::FMT_U8;
-					info.bytesPerSample = 2;
+					info.bytesPerSample = 1;
 					info.bitDepth = 8;
 					break;
 	}

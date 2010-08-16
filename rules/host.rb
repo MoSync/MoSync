@@ -16,8 +16,6 @@
 
 # This file defines a few constants that describe the host environment.
 # HOST, Symbol. Either :linux or :win32.
-# GCC_IS_V4, boolean. True if gcc's major version number is 4.
-# GCC_IS_V43, boolean. True if gcc's version number is 4.3 or greater.
 # DLL_FILE_ENDING, String. The file ending of DLL files.
 # EXE_FILE_ENDING, String. The file ending of executable files.
 
