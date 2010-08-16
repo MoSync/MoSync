@@ -86,7 +86,7 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 				inf.ioctls.push_back(parseIoctl(ixs, inf));
 			} else if(isReturnType(inf, token)) {	//function
 				TASSERT(currentIx == MAIN_INTERFACE);
-				inf.functions.push_back(parseFunction(token, 4));
+				inf.functions.push_back(parseFunction(token, 256)); // 256 arguments should be enough :)
 			} else if(token == "}") {
 				TASSERT(currentIx == MAIN_INTERFACE);
 				doEOF();
@@ -179,7 +179,7 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 	{	//add ioctl function to interface
 		Function f;
 		f.name = ioctl.name;
-		f.returnType = "int";
+		f.returnType = "longlong";
 		f.comment = getComment();
 		f.number = sNextFuncNum++;
 		Argument a;
@@ -193,6 +193,9 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 		f.args.push_back(a);
 		a.name = "c";
 		f.args.push_back(a);
+
+		f.isIOCtl = true;
+
 		inf.functions.push_back(f);
 	}
 
@@ -214,7 +217,7 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 			inf.typedefs.push_back(parseTypedef(currentIx));
 		} else if(isReturnType(inf, token)) {	//function
 			IoctlFunction f;
-			f.f = parseFunction(token, 3);
+			f.f = parseFunction(token, 256); // 256 should be enough :)
 			f.ix = currentIx;
 			ioctl.functions.push_back(f);
 		} else if(token == "}") {
@@ -332,16 +335,24 @@ static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {
 	return cs;
 }
 
+static void readRange(string &range) {
+	doExact("(");
+	readQuotedString(range);
+	doExact(")");
+}
+
 static Function parseFunction(const string& retType, size_t maxArgs) {
 	Function f;
 	f.returnType = retType;
 	f.number = sNextFuncNum++;
+	f.isIOCtl = false;
+
 	readTextToken(f.name);
 	doExact("(");
+	string token;
+	readToken(token);
 	while(true) {
 		Argument a;
-		string token;
-		readToken(token);
 		if(token == ")") {
 			break;
 		}
@@ -359,9 +370,24 @@ static Function parseFunction(const string& retType, size_t maxArgs) {
 		}
 		readTextToken(a.type);
 		readTextToken(a.name);
+		readToken(token);
+		if(token == "range") {
+			readRange(a.range);
+			readToken(token);
+		}
 		f.args.push_back(a);
 	}
-	doExact(";");
+
+	readToken(token);
+	if(token == "range") {
+		readRange(f.returnTypeRange);
+		readToken(token);
+	}
+	
+	if(token != ";") {
+		tokenError(token);
+	}
+
 	f.comment = getComment();
 	if(f.args.size() > maxArgs) {
 		Error("function", "Too many arguments");

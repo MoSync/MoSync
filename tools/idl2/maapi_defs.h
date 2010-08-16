@@ -25,13 +25,13 @@
 
 // Convert between double, 2 ints and long long.
 union MA_DV {
-	struct {
 #if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
-		int lo, hi;
+	int i[2];
 #else	//everything else
+	struct {
 		int hi, lo;
-#endif	//__MARM_ARMI__
 	};
+#endif	//__MARM_ARMI__
 	long long ll;
 	double d;
 };

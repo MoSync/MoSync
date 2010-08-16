@@ -89,6 +89,11 @@ extern "C" {
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
 
+#ifdef SUPPORT_OPENGL_ES
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <dgles-0.5/GLES/gl.h>
+#include "../../generated/gl.h.cpp"
+#endif
 
 namespace Base {
 
@@ -1715,7 +1720,7 @@ namespace Base {
 	}
 
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
@@ -1793,29 +1798,32 @@ namespace Base {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
+#ifdef _MSC_VER
+	static double atanh(double x) {
+		double d = (1+x) / (1-x);
+		d = 0.5 * log(d);
+		return d;
+	}
+#endif
+
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
 			reportCallStack();
 			return 0;
-		case maIOCtl_maDumpCallStackEx:
-			return maDumpCallStackEx(SYSCALL_THIS->GetValidatedStr(a), b);
+
+			maIOCtl_case(maDumpCallStackEx);
 #endif
 
 #ifdef MEMORY_PROTECTION
 		case maIOCtl_maProtectMemory:
-			{
-				SYSCALL_THIS->protectMemory(a, b);
-			}
+			SYSCALL_THIS->protectMemory(a, b);
 			return 0;
 		case maIOCtl_maUnprotectMemory:
-			{
-				SYSCALL_THIS->unprotectMemory(a, b);
-			}
+			SYSCALL_THIS->unprotectMemory(a, b);
 			return 0;
-
 		case maIOCtl_maSetMemoryProtection:
 			SYSCALL_THIS->setMemoryProtection(a);
 			return 0;
@@ -1834,42 +1842,132 @@ namespace Base {
 			}
 			return 0;
 #endif	//LOGGING_ENABLED
-		case maIOCtl_sinh:
-			{
-				double& d = *GVMRA(double);
-				d = ::sinh(d);
-				return 0;
-			}
-		case maIOCtl_cosh:
-			{
-				double& d = *GVMRA(double);
-				d = ::cosh(d);
-				return 0;
-			}
-		case maIOCtl_atanh:
-			{
-				double& d = *GVMRA(double);
-				d = (1+d) / (1-d);
-				d = 0.5 * log(d);
-				return 0;
-			}
 
-		case maIOCtl_maAccept:
-			maAccept(a);
-			return 1;
+#ifdef SUPPORT_OPENGL_ES
+maIOCtl_glAlphaFuncx_case(glAlphaFuncx);
+maIOCtl_glFrontFace_case(glFrontFace);
+maIOCtl_glLoadIdentity_case(glLoadIdentity);
+maIOCtl_glTexImage2D_case(glTexImage2D);
+maIOCtl_glGenTextures_case(glGenTextures);
+maIOCtl_glLogicOp_case(glLogicOp);
+maIOCtl_glTexEnvf_case(glTexEnvf);
+maIOCtl_glTexEnvx_case(glTexEnvx);
+maIOCtl_glFlush_case(glFlush);
+maIOCtl_glStencilOp_case(glStencilOp);
+maIOCtl_glTexEnvxv_case(glTexEnvxv);
+maIOCtl_glPixelStorei_case(glPixelStorei);
+maIOCtl_glFogxv_case(glFogxv);
+maIOCtl_glCullFace_case(glCullFace);
+maIOCtl_glNormal3f_case(glNormal3f);
+maIOCtl_glNormal3x_case(glNormal3x);
+maIOCtl_glMultiTexCoord4f_case(glMultiTexCoord4f);
+maIOCtl_glMultiTexCoord4x_case(glMultiTexCoord4x);
+maIOCtl_glLightModelf_case(glLightModelf);
+maIOCtl_glLightModelx_case(glLightModelx);
+maIOCtl_glDepthRangef_case(glDepthRangef);
+maIOCtl_glDepthRangex_case(glDepthRangex);
+maIOCtl_glBindTexture_case(glBindTexture);
+maIOCtl_glViewport_case(glViewport);
+maIOCtl_glLineWidthx_case(glLineWidthx);
+maIOCtl_glGetIntegerv_case(glGetIntegerv);
+maIOCtl_glAlphaFunc_case(glAlphaFunc);
+maIOCtl_glLoadMatrixf_case(glLoadMatrixf);
+maIOCtl_glLoadMatrixx_case(glLoadMatrixx);
+maIOCtl_glTexEnvfv_case(glTexEnvfv);
+maIOCtl_glScissor_case(glScissor);
+maIOCtl_glFogfv_case(glFogfv);
+maIOCtl_glDrawArrays_case(glDrawArrays);
+maIOCtl_glTexParameterf_case(glTexParameterf);
+maIOCtl_glTexParameterx_case(glTexParameterx);
+maIOCtl_glClearDepthf_case(glClearDepthf);
+maIOCtl_glClearDepthx_case(glClearDepthx);
+maIOCtl_glShadeModel_case(glShadeModel);
+maIOCtl_glTexSubImage2D_case(glTexSubImage2D);
+maIOCtl_glClientActiveTexture_case(glClientActiveTexture);
+maIOCtl_glCopyTexImage2D_case(glCopyTexImage2D);
+maIOCtl_glTexCoordPointer_case(glTexCoordPointer);
+maIOCtl_glLightf_case(glLightf);
+maIOCtl_glLightx_case(glLightx);
+maIOCtl_glMaterialfv_case(glMaterialfv);
+maIOCtl_glMultMatrixx_case(glMultMatrixx);
+maIOCtl_glScalex_case(glScalex);
+maIOCtl_glDepthFunc_case(glDepthFunc);
+maIOCtl_glStencilFunc_case(glStencilFunc);
+maIOCtl_glEnableClientState_case(glEnableClientState);
+maIOCtl_glFrustumf_case(glFrustumf);
+maIOCtl_glDepthMask_case(glDepthMask);
+maIOCtl_glColor4f_case(glColor4f);
+maIOCtl_glStencilMask_case(glStencilMask);
+maIOCtl_glMatrixMode_case(glMatrixMode);
+maIOCtl_glPolygonOffset_case(glPolygonOffset);
+maIOCtl_glSampleCoverage_case(glSampleCoverage);
+maIOCtl_glFrustumx_case(glFrustumx);
+maIOCtl_glMaterialxv_case(glMaterialxv);
+maIOCtl_glCompressedTexSubImage2D_case(glCompressedTexSubImage2D);
+maIOCtl_glFogf_case(glFogf);
+maIOCtl_glFogx_case(glFogx);
+maIOCtl_glDrawElements_case(glDrawElements);
+maIOCtl_glDisableClientState_case(glDisableClientState);
+maIOCtl_glEnable_case(glEnable);
+maIOCtl_glMultMatrixf_case(glMultMatrixf);
+maIOCtl_glFinish_case(glFinish);
+maIOCtl_glHint_case(glHint);
+maIOCtl_glNormalPointer_case(glNormalPointer);
+maIOCtl_glScalef_case(glScalef);
+maIOCtl_glMaterialf_case(glMaterialf);
+maIOCtl_glMaterialx_case(glMaterialx);
+maIOCtl_glGetError_case(glGetError);
+maIOCtl_glClearStencil_case(glClearStencil);
+maIOCtl_glClearColor_case(glClearColor);
+maIOCtl_glOrthof_case(glOrthof);
+maIOCtl_glOrthox_case(glOrthox);
+maIOCtl_glColorPointer_case(glColorPointer);
+maIOCtl_glColor4x_case(glColor4x);
+maIOCtl_glReadPixels_case(glReadPixels);
+maIOCtl_glColorMask_case(glColorMask);
+maIOCtl_glDisable_case(glDisable);
+maIOCtl_glClearColorx_case(glClearColorx);
+maIOCtl_glVertexPointer_case(glVertexPointer);
+maIOCtl_glPolygonOffsetx_case(glPolygonOffsetx);
+maIOCtl_glPopMatrix_case(glPopMatrix);
+maIOCtl_glSampleCoveragex_case(glSampleCoveragex);
+maIOCtl_glActiveTexture_case(glActiveTexture);
+maIOCtl_glLightModelfv_case(glLightModelfv);
+maIOCtl_glClear_case(glClear);
+maIOCtl_glTranslatex_case(glTranslatex);
+maIOCtl_glLightfv_case(glLightfv);
+maIOCtl_glLightModelxv_case(glLightModelxv);
+maIOCtl_glLineWidth_case(glLineWidth);
+maIOCtl_glGetStringHandle_case(glGetStringHandle);
+maIOCtl_glCompressedTexImage2D_case(glCompressedTexImage2D);
+maIOCtl_glPushMatrix_case(glPushMatrix);
+maIOCtl_glBlendFunc_case(glBlendFunc);
+maIOCtl_glRotatef_case(glRotatef);
+maIOCtl_glRotatex_case(glRotatex);
+maIOCtl_glLightxv_case(glLightxv);
+maIOCtl_glDeleteTextures_case(glDeleteTextures);
+maIOCtl_glCopyTexSubImage2D_case(glCopyTexSubImage2D);
+maIOCtl_glPointSize_case(glPointSize);
+maIOCtl_glTranslatef_case(glTranslatef);
+maIOCtl_glPointSizex_case(glPointSizex);
+#endif	//SUPPORT_OPENGL_ES
+
+			maIOCtl_sinh_case(::sinh);
+			maIOCtl_cosh_case(::cosh);
+			maIOCtl_case(atanh);
+
+			maIOCtl_case(maAccept);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
-		case maIOCtl_maBtGetNewDevice:
-			return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
+
 		case maIOCtl_maBtStartServiceDiscovery:
 			return BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		case maIOCtl_maBtCancelDiscovery:
-			return BLUETOOTH(maBtCancelDiscovery)();
+
+			maIOCtl_syscall_case(maBtGetNewDevice);
+			maIOCtl_syscall_case(maBtGetNewService);
+			maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+			maIOCtl_maBtCancelDiscovery_case(BLUETOOTH(maBtCancelDiscovery));
 
 		case maIOCtl_maPlatformRequest:
 			{
@@ -1889,125 +1987,68 @@ namespace Base {
 				}
 			}
 
-		//case maIOCtl_maGetLocation:
-		//	{
-		//		MALocation* loc = GVMRA(MALocation);
-		//		loc->horzAcc = 0;
-		//		loc->lat = 0;
-		//		loc->lon = 0;
-		//		loc->vertAcc = 0;
-		//		return 1;
-		//	}
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		//case maIOCtl_maStartVideoStream:
-			//return maStartVideoStream(SYSCALL_THIS->GetValidatedStr(a));
+			maIOCtl_case(maSendTextSMS);
 
-		case maIOCtl_maSendToBackground:
-			return maSendToBackground();
-		case maIOCtl_maBringToForeground:
-			return maBringToForeground();
+			//maIOCtl_case(maStartVideoStream);
 
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+			maIOCtl_case(maSendToBackground);
+			maIOCtl_case(maBringToForeground);
+
+			maIOCtl_case(maFrameBufferGetInfo);
 		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
-		
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+			return maFrameBufferInit(SYSCALL_THIS->GetValidatedMemRange(a,
+				gBackBuffer->pitch*gBackBuffer->h));
+			maIOCtl_case(maFrameBufferClose);
+
+			maIOCtl_case(maAudioBufferInit);
+			maIOCtl_case(maAudioBufferReady);
+			maIOCtl_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maStreamVideoStart: {
-			const char* url = SYSCALL_THIS->GetValidatedStr(a);
-			return maStreamVideoStart(url);
-		}
-		case maIOCtl_maStreamClose: {
-			return maStreamClose(a);
-		}
-		case maIOCtl_maStreamPause: {
-			return maStreamPause(a);
-		}
-		case maIOCtl_maStreamResume: {
-			return maStreamResume(a);
-		}
-		case maIOCtl_maStreamVideoSize: {
-			return maStreamVideoSize(a);
-		}
-		case maIOCtl_maStreamVideoSetFrame: {
-			return maStreamVideoSetFrame(a, GVMR(b, MARect));
-		}
-		case maIOCtl_maStreamLength: {
-			return maStreamLength(a);
-		}
-		case maIOCtl_maStreamPos: {
-			return maStreamPos(a);
-		}
-		case maIOCtl_maStreamSetPos: {
-			return maStreamSetPos(a, b);
-		}
+			maIOCtl_case(maStreamVideoStart);
+			maIOCtl_case(maStreamClose);
+			maIOCtl_case(maStreamPause);
+			maIOCtl_case(maStreamResume);
+			maIOCtl_case(maStreamVideoSize);
+			maIOCtl_case(maStreamVideoSetFrame);
+			maIOCtl_case(maStreamLength);
+			maIOCtl_case(maStreamPos);
+			maIOCtl_case(maStreamSetPos);
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maFileOpen:
-			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
-		case maIOCtl_maFileExists:
-			return SYSCALL_THIS->maFileExists(a);
-		case maIOCtl_maFileClose:
-			return SYSCALL_THIS->maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return SYSCALL_THIS->maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return SYSCALL_THIS->maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return SYSCALL_THIS->maFileSize(a);
-		case maIOCtl_maFileAvailableSpace:
-			return SYSCALL_THIS->maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileRename:
-			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
-		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);
+			maIOCtl_syscall_case(maFileOpen);
+			maIOCtl_syscall_case(maFileExists);
+			maIOCtl_syscall_case(maFileClose);
+			maIOCtl_syscall_case(maFileCreate);
+			maIOCtl_syscall_case(maFileDelete);
+			maIOCtl_syscall_case(maFileSize);
+			maIOCtl_syscall_case(maFileAvailableSpace);
+			maIOCtl_syscall_case(maFileTotalSpace);
+			maIOCtl_syscall_case(maFileDate);
+			maIOCtl_syscall_case(maFileRename);
+			maIOCtl_syscall_case(maFileTruncate);
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileWriteFromData:
-			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
 			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileReadToData:
-			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
-		case maIOCtl_maFileTell:
-			return SYSCALL_THIS->maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return SYSCALL_THIS->maFileSeek(a, b, c);
+			maIOCtl_syscall_case(maFileWriteFromData);
+			maIOCtl_syscall_case(maFileReadToData);
 
-		case maIOCtl_maFileListStart:
-			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b));
+			maIOCtl_syscall_case(maFileTell);
+			maIOCtl_syscall_case(maFileSeek);
+
+			maIOCtl_syscall_case(maFileListStart);
 		case maIOCtl_maFileListNext:
 			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileListClose:
-			return SYSCALL_THIS->maFileListClose(a);
+			maIOCtl_syscall_case(maFileListClose);
 
-		case maIOCtl_maCameraFormatNumber:
-			return maCameraFormatNumber();
-		case maIOCtl_maCameraFormat:
-			return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
-		case maIOCtl_maCameraStart:
-			return maCameraStart();
-		case maIOCtl_maCameraStop:
-			return maCameraStop();
-		case maIOCtl_maCameraSnapshot:
-			return maCameraSnapshot(a, b);
+			maIOCtl_case(maCameraFormatNumber);
+			maIOCtl_case(maCameraFormat);
+			maIOCtl_case(maCameraStart);
+			maIOCtl_case(maCameraStop);
+			maIOCtl_case(maCameraSnapshot);
 
 #ifdef EMULATOR
 		case maIOCtl_maPimListOpen:
@@ -2174,8 +2215,10 @@ namespace Base {
 #ifdef LOGGING_ENABLED
 		// at this point, hmem contains the entire data in memory stored in fif format.
 		// the amount of space used by the memory is equal to file_size
+#ifdef DEBUGGING_MODE
 		long file_size = FreeImage_TellMemory(hmem);
 		LOG("File size : %ld\n", file_size);
+#endif
 #endif
 
 		DWORD data_size;

@@ -22,6 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class ReferenceType : public PointerType {
 public:
+	ReferenceType();
+
 	virtual std::string toString() const;
 };
 

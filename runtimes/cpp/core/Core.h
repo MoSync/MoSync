@@ -183,6 +183,7 @@ namespace Core {
 
 	//for ioctl
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
+	int GetValidatedStackValue(VMCore* core, int offset);
 	const char* GetValidatedStr(const VMCore* core, int address);
 	void* GetCustomEventPointer(VMCore* core);
 	

@@ -128,7 +128,10 @@ int main() {
 		_mkdir("../../runtimes/java/shared/generated");
 
 		copy("Output/maapi.h", "../../libs/MAStd/");
+		copy("maapi_defs.h", "../../libs/MAStd/");
 		copy("Output/maapi.h", "../../libs/newlib/libc/sys/mosync/");
+		copy("maapi_defs.h", "../../libs/newlib/libc/sys/mosync/");
+
 		copy("Output/asm_config.lst", "" + MOSYNCDIR + "/bin/");
 
 		copy("Output/invoke_syscall_java.h", "../../runtimes/java/Shared/generated/");
@@ -138,6 +141,7 @@ int main() {
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
+		copy("maapi_defs.h", "../../intlibs/helpers/");
 
 		copy("Output/invoke_syscall_cpp.h", "../../runtimes/cpp/core/");
 		copy("Output/invoke_syscall_arm_recompiler.h", "../../runtimes/cpp/core/");
@@ -222,7 +226,7 @@ static void outputConsts(const string& filename, const Interface& inf, int ix) {
 	}
 
 	streamConstants(stream, inf.constSets, ix);
-	streamIoctlDefines(stream, inf.ioctls, ix);
+	streamIoctlDefines(stream, inf, def, ix);
 
 	stream << "#endif\t//" << def << "\n";
 }
@@ -256,6 +260,10 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 				stream << "*";
 			stream << " " << a.name;
 		}
+
+		if(f.isIOCtl) 
+			stream << " MA_IOCTL_ELLIPSIS";
+
 		if(f.returnType == "noreturn")
 			stream << ")";
 		if(syscall)
@@ -276,15 +284,7 @@ static void outputCpp(const Interface& maapi) {
 		"extern \"C\" {\n"
 		"#endif\n\n";
 
-	stream << "#if defined(__GNUC__) || defined(__SYMBIAN32__)\n"
-		"#define ATTRIBUTE(a, func)  func __attribute__ ((a))\n"
-		"#elif defined(_MSC_VER)\n"
-		"#define ATTRIBUTE(a, func)  __declspec (a) func\n"
-		"#else\n"
-		"#error Unsupported compiler!\n"
-		"#endif\n\n";
-
-	streamMoSyncDllDefines(stream);
+	stream << "#include \"maapi_defs.h\"\n\n";
 
 	streamHeaderFunctions(stream, maapi, true);
 
@@ -492,6 +492,7 @@ static void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool ja
 		"{\n"
 		"\tLOGSC(\"\\t" << f.name << "(\");\n";
 		int ireg = 0;
+		int stack_ireg = 0;
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);
 			if(j != 0)
@@ -507,16 +508,34 @@ static void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool ja
 				argType = cType(maapi, a.type);
 				convType = a.type;
 			}
+
+			int sizeOfArgType = 1;
+			if(argType == "double" || argType == "long")
+				sizeOfArgType = 2;
+
 			stream << "\t" << argType << " " << a.name << " = _SYSCALL_CONVERT_" << convType;
-			if((argType == "double" || argType == "long") && java) {
-				stream << "(REG_i" << ireg << ");\n";
+			if(ireg+sizeOfArgType>4) {
+				if(java) {
+					stream << "(RINT(REG(REG_sp)+" << (stack_ireg<<2) << ")";
+					if(argType == "double" || argType == "long") {
+						stream << ", RINT(REG(REG_sp)+" << ((stack_ireg+1)<<2) << ")";
+					}
+					stream << ")";
+				}
+				else
+					stream << "(MEM(" << argType << ", REG(REG_sp)+" << (stack_ireg<<2) << ")";
+
+				stream << ");\n";
+				stack_ireg += sizeOfArgType;
+				continue;
+			}
+			else if((argType == "double" || argType == "long") && java) {
+				//stream << "(REG_i" << ireg << ");\n";
+				stream << "(REG(REG_i" << ireg << "), REG(REG_i" << ireg << "+1));\n";
 			} else {
 				stream << "(REG(REG_i" << ireg << "));\n";
 			}
-			if(argType == "double" || argType == "long")
-				ireg += 2;
-			else
-				ireg += 1;
+			ireg += sizeOfArgType;
 		}
 		stream << "\t";
 		if(f.returnType != "void" && f.returnType != "noreturn") {

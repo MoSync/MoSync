@@ -1248,7 +1248,7 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
+SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
 	if(gBtState != eAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:

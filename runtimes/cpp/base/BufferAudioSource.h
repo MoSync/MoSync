@@ -27,7 +27,7 @@ typedef void (*BufferRequestCallback)(void);
 
 class BufferAudioSource : public AudioSource {
 public:
-	BufferAudioSource(MAAudioBufferInfo *i, BufferRequestCallback callback);
+	BufferAudioSource(const MAAudioBufferInfo *i, BufferRequestCallback callback);
 	virtual ~BufferAudioSource();
 	int init();
 	void close();

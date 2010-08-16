@@ -2284,10 +2284,12 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
-	SYSCALL(int, maFrameBufferInit(void *data)) {
+	SYSCALL(int, maFrameBufferInit(const void* addr)) {
+		gSyscall->ValidateMemRange(addr, backBuffer->pitch*backBuffer->height);
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = backBuffer;
-		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
+		backBuffer = new Image((unsigned char*)addr, NULL, backBuffer->width,
+			backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		currentDrawSurface = backBuffer;
 		return 1;
 	}
@@ -2307,7 +2309,7 @@ DWORD GetScreenOrientation()
 		PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);
 	}
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close();
@@ -2611,6 +2613,12 @@ retry:
 	}
 #endif
 
+	int maWriteLog(const void* a, int b) {
+		gSyscall->ValidateMemRange(a, b);
+		LOGBIN(a, b);
+		return 0;
+	}
+
 	static int maGetSystemProperty(const char* key, char* buf, int size) {
 		if(strcmp(key, "mosync.iso-639-1") == 0) {
 			LCID lcid = GetUserDefaultLCID();
@@ -2630,10 +2638,6 @@ retry:
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
-
-		case maIOCtl_maWriteLog:
-			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
-			return 0;
 			/*
 			//these are the same across all C++ platforms. consider sharing them somehow.
 		case maIOCtl_sinh:
@@ -2663,18 +2667,14 @@ retry:
 				return 0;
 			}
 			*/
-		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();
-		case maIOCtl_maKeypadIsLocked:
-			return maKeypadIsLocked();
-		case maIOCtl_maLockKeypad:
-			return maLockKeypad();
-		case maIOCtl_maUnlockKeypad:
-			return maUnlockKeypad();
+
+		maIOCtl_maWriteLog_case(maWriteLog);
+		maIOCtl_maPlatformRequest_case(maPlatformRequest);
+		maIOCtl_maSendTextSMS_case(maSendTextSMS);
+		maIOCtl_maGetBatteryCharge_case(maGetBatteryCharge);
+		maIOCtl_maKeypadIsLocked_case(maKeypadIsLocked);
+		maIOCtl_maLockKeypad_case(maLockKeypad);
+		maIOCtl_maUnlockKeypad_case(maUnlockKeypad);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
@@ -2684,24 +2684,16 @@ retry:
 		case maIOCtl_maBtStartServiceDiscovery:
 			BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
 			return 0;
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
-		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
 
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+		maIOCtl_maBtGetNewService_case(SYSCALL_THIS->maBtGetNewService);
+		maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+		maIOCtl_maFrameBufferGetInfo_case(maFrameBufferGetInfo);
+		maIOCtl_maFrameBufferInit_case(maFrameBufferInit);		
+		maIOCtl_maFrameBufferClose_case(maFrameBufferClose);
+
+		maIOCtl_maAudioBufferInit_case(maAudioBufferInit);		
+		maIOCtl_maAudioBufferReady_case(maAudioBufferReady);
+		maIOCtl_maAudioBufferClose_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 		case maIOCtl_maLocationStart:

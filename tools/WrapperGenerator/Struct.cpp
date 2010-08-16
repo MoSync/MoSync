@@ -17,3 +17,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Struct.h"
 
+using namespace std;
+
+Struct::Struct() {
+	mBaseType = EStruct;
+}
+
+void Struct::fromParseNode(const ParseNode& node) {
+	mIncomplete = node.getIntAttr("incomplete", false)==1;
+	Namespace::fromParseNode(node);
+	node.getNodesFromIdList("bases", mBases, false);
+	mLocation = new Location(node.getIntAttr("line"), (File*)getParseNodeFromId(node.getAttr("file"))->base);
+	mSize = node.getIntAttr("size", false);
+	mAlign = node.getIntAttr("align", false);
+	mIsArtificial = node.getIntAttr("artificial", false)==1;
+}
+
+const Location* Struct::getLocation() const {
+	return mLocation;
+}

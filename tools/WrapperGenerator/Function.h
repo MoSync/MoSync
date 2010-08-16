@@ -30,11 +30,18 @@ public:
 	std::string toString() const;
 	bool isEllipsis() const;
 
+	bool usesPointer() const;
+	bool usesHandle() const;
+	bool isPointer() const;
+
 protected:
 	bool mIsEllipsis;
 	std::string mName;
 	const Base* mType;
 	Location *mLocation;
+
+	bool mUsePointer;
+	bool mUseHandle;
 };
 
 class Function : public Base {
@@ -49,6 +56,11 @@ public:
 	const std::vector<const Argument*>& getArguments() const;
 	std::string toString() const;
 
+	const std::string& getRangeExpression() const;
+
+	bool hasPointerArguments() const;
+	bool hasHandleArguments() const;
+
 private:
 	std::string mName;
 	const Base *mReturns;
@@ -56,6 +68,9 @@ private:
 	const Location* mLocation;
 	bool mIsExtern;
 	std::vector<const Argument*> mArguments;
+
+	// gcc-xml attribute.. used to describe how to calculate the amount of memory that is used from a pointer, in this case the return value.
+	std::string mRangeExpression;
 };
 
 #endif // _FUNCTION_H_

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../base;../../../../intlibs;&quot;$(ProjectDir)&quot;;../../../../libs;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include"
+				AdditionalIncludeDirectories="../../base;../../../../intlibs;&quot;$(ProjectDir)&quot;;../../../../libs"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

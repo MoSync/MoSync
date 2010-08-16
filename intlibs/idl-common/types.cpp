@@ -29,12 +29,17 @@ bool isReturnType(const Interface& inf, const string& token) {
 
 string cType(const Interface& inf, const string& type) {
 	if(type == "int" || type == "double" || type == "float" || type == "void" ||
-		type == "char" || type == "uint")
+		type == "char" || type == "uint" || type == "long long")
 		return type;
 	if(type == "noreturn")
 		return "void";
 	if(type == "NCString")
 		return "char*";
+
+	bool isPointer = type[type.size()-1] == '*';
+	if(isPointer)
+		return type;
+
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(type == s.name)
@@ -51,6 +56,16 @@ string cType(const Interface& inf, const string& type) {
 		}
 	}
 	throwException("Unhandled type: " + type);
+}
+
+const string& resolveType(const Interface& inf, const string& ctype) {
+	for(size_t i=0; i<inf.typedefs.size(); i++) {
+		const Typedef& t(inf.typedefs[i]);
+		if(ctype == t.name) {
+			return resolveType(inf, t.type);
+		}
+	}
+	return ctype;
 }
 
 bool isPointerType(const Interface& inf, const string& type) {
@@ -70,6 +85,8 @@ string jType(const Interface& inf, const string& type) {
 	if(type == "float")
 		return "int";
 	if(type == "double")
+		return "long";
+	if(type == "longlong")
 		return "long";
 	if(isPointerType(inf, type))
 		return "MAAddress";
