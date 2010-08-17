@@ -226,7 +226,7 @@ static void outputConsts(const string& filename, const Interface& inf, int ix) {
 	}
 
 	streamConstants(stream, inf.constSets, ix);
-	streamIoctlDefines(stream, inf, def, ix);
+	streamIoctlDefines(stream, inf, def, ix, true);
 
 	stream << "#endif\t//" << def << "\n";
 }

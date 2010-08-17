@@ -354,26 +354,32 @@ static void streamDefines(ostream& stream, const vector<Define>& defines, int ix
 		stream << "\n";
 }
 
-static void streamIoctlInputParam(ostream& stream, int k) {
+static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 	if(k < 3) {
 		stream << (char)('a'+k);
 	} else {
-		stream << "SYSCALL_THIS->GetValidatedStackValue(" << ((k-3)<<2) << ")";
+		if(java)
+			stream << "mCore.";
+		else
+			stream << "SYSCALL_THIS->";
+		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
 	}
 }
 
-void streamIoctlDefines(ostream& stream, const Interface& inf, const string& headerName, int ix) {
+void streamIoctlDefines(ostream& stream, const Interface& inf, const string& headerName,
+	int ix, bool java)
+{
 	const vector<Ioctl>& ioctls = inf.ioctls;
 	for(size_t i=0; i<ioctls.size(); i++) {
 		const Ioctl& ioctl(ioctls[i]);
 		bool anyStreamed = false;
 
-		stream << "#define " << ioctl.name << "_" << headerName << "_caselist\\\n";
+		stream << "#define " << ioctl.name << "_" << headerName << "_caselist \\\n";
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
 			const IoctlFunction& f(ioctl.functions[j]);
 			if(f.ix != ix)
 				continue;
-			stream << ioctl.name << "_" << f.f.name << "_case(" << f.f.name << ")\\\n";
+			stream << ioctl.name << "_" << f.f.name << "_case(" << f.f.name << ") \\\n";
 		}
 		stream << "\n";
 
@@ -384,46 +390,51 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 
 			stream << "#define " << ioctl.name << "_" << f.f.name << " " << f.f.number << "\n";
 
-			stream << "#define " << ioctl.name << "_" << f.f.name << "_case(func)\\\n";
-			stream << "case " << f.f.number << ":\\\n";
-			stream << "{\\\n";
+			stream << "#define " << ioctl.name << "_" << f.f.name << "_case(func) \\\n";
+			stream << "case " << f.f.number << ": \\\n";
+			stream << "{ \\\n";
 			for(size_t k = 0, inK = 0; k < f.f.args.size(); k++, inK++) {
 				const Argument& arg(f.f.args[k]);
-				string ctype = cType(inf, arg.type);
+				string ctype = (java ? jType : cType)(inf, arg.type);
 				const string& resolvedType = resolveType(inf, ctype);
 				bool isPointer = isPointerType(inf, arg.type) || !arg.in;
-				bool isString = arg.type == "MAString";
+				bool isString = arg.type == "MAString" || arg.type == "MAWString";
+				bool isWideString = arg.type == "MAWString";
 				bool isDouble = resolvedType == "double" && arg.in;
 				bool isFloat = resolvedType == "float" && arg.in;
 
-				if(arg.type == "MAAddress") {
-					ctype = "void*";
-					isPointer = true;
-				}
+				if(!java) {
+					if(arg.type == "MAAddress") {
+						ctype = "void*";
+						isPointer = true;
+					}
 
-				if(isPointer || isString)
-					ctype = (arg.in ? "const " : "") + ctype;
-				if(!isPointerType(inf, arg.type) && !arg.in)
-					ctype += '*';
+					if(isPointer || isString)
+						ctype = (arg.in ? "const " : "") + ctype;
+					if(!isPointerType(inf, arg.type) && !arg.in)
+						ctype += '*';
+				} else if(!arg.in) {
+					ctype = "MAAddress";
+				}
 
 				string localName = "_" + arg.name;
 				string dvName = localName+"_dv";
 
 				if(isDouble) {
-					stream << "MA_DV "<<dvName<<";\\\n";
+					stream << "MA_DV "<<dvName<<"; \\\n";
 					stream << dvName<<".hi = ";
-					streamIoctlInputParam(stream, inK);
-					stream << ";\\\n";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
 					inK++;
 					stream << dvName<<".lo = ";
-					streamIoctlInputParam(stream, inK);
-					stream << ";\\\n";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
 				}
 				if(isFloat) {
-					stream << "MA_FV "<<dvName<<";\\\n";
+					stream << "MA_FV "<<dvName<<"; \\\n";
 					stream << dvName<<".i = ";
-					streamIoctlInputParam(stream, inK);
-					stream << ";\\\n";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
 				}
 				stream << ctype << " " << localName << " = ";
 
@@ -432,17 +443,17 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 				} else if(isFloat) {
 					stream << dvName << ".f";
 				} else {
-					if(isString)
-						stream << "GVS(";
-					else if(isPointer)
+					if(isString && arg.in)
+						stream << (isWideString ? "GVWS(" : "GVS(");
+					else if(isPointer && !java)
 						stream << "GVMR(";
 					else if(ctype != "int") stream << "(" << ctype << ")";
 
-					streamIoctlInputParam(stream, inK);
+					streamIoctlInputParam(stream, inK, java);
 
-					if(isString)
+					if(isString && arg.in)
 						stream << ")";
-					else if(isPointer) {
+					else if(isPointer && !java) {
 						string gvmrType;
 						size_t m1 = arg.type.size()-1;
 						if(arg.type[m1] == '*') {
@@ -454,7 +465,7 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 					}
 				}
 
-				stream << ";\\\n";
+				stream << "; \\\n";
 			}
 
 			string resolvedReturnType = resolveType(inf, f.f.returnType);
@@ -462,10 +473,10 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 			bool returnFloat = resolvedReturnType == "float";
 			bool returnVoid = resolvedReturnType == "void";
 			if(returnDouble) {
-				stream << "MA_DV result;\\\n";
+				stream << "MA_DV result; \\\n";
 				stream << "result.d = func(";
 			} else if(returnFloat) {
-				stream << "MA_FV result;\\\n";
+				stream << "MA_FV result; \\\n";
 				stream << "result.f = func(";
 			} else if(returnVoid) {
 				stream << "func(";
@@ -477,15 +488,15 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 					stream << ", ";
 				stream << "_" << f.f.args[k].name;
 			}
-			stream << ");\\\n";
+			stream << "); \\\n";
 			if(returnDouble) {
-				stream << "return result.ll;\\\n";
+				stream << "return result.ll; \\\n";
 			} else if(returnFloat) {
-				stream << "return result.i;\\\n";
+				stream << "return result.i; \\\n";
 			} else if(returnVoid) {
-				stream << "return 0;\\\n";
+				stream << "return 0; \\\n";
 			}
-			stream << "}\\\n";
+			stream << "} \\\n";
 			stream << "\n";
 
 			anyStreamed = true;
@@ -515,7 +526,7 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	string invokeArgs;
 	string tempVars;
 	int usedArgs = f.args.size();
-	stream << "static inline " << f.returnType << " " << f.name << "(";
+	stream << "IOCTLDEF " << f.returnType << " " << f.name << "(";
 	if(f.args.size() == 0) {
 		stream << "void";
 	}
@@ -599,7 +610,7 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);
-	streamIoctlDefines(stream, inf, headerName, ix);
+	streamIoctlDefines(stream, inf, headerName, ix, false);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }

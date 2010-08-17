@@ -15,6 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef SYSCALL_CONVERTERS_H
+#define SYSCALL_CONVERTERS_H
+
 #ifdef DEBUG_SYSCALLS
 final void _debug_hex(int hex) {
 	String s = Integer.toHexString(hex);
@@ -310,3 +313,5 @@ final long ints2long(int hiw, int low) throws Exception {
 	REG(REG_r14) = hiw; REG(REG_r15) = low; debug_long(res);
 
 #define _SYSCALL_HANDLERES_double _SYSCALL_HANDLERES_longlong
+
+#endif	//SYSCALL_CONVERTERS_H

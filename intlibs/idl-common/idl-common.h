@@ -126,7 +126,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
 
 void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix);
-void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix);
+void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);
 

@@ -115,9 +115,9 @@ namespace Base {
 		int maFileTruncate(MAHandle file, int offset);
 
 		int maFileWrite(MAHandle file, const void* src, int len);
-		int maFileWriteFromData(const MA_FILE_DATA* args);
+		int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len);
 		int maFileRead(MAHandle file, void* dst, int len);
-		int maFileReadToData(const MA_FILE_DATA* args);
+		int maFileReadToData(MAHandle file, MAHandle data, int offset, int len);
 
 		int maFileTell(MAHandle file);
 		int maFileSeek(MAHandle file, int offset, int whence);

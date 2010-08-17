@@ -2114,22 +2114,11 @@ interface MAAPI {
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
-
-		/**
-		* Arguments to maFileReadToData() and maFileWriteFromData().
-		*/
-		struct MA_FILE_DATA {
-			MAHandle file;
-			MAHandle data;
-			int offset;
-			int len;
-		}
-
 		/**
 		* Write from data object to file.
 		* Returns 0 on success, or \< 0 on error.
 		*/
-		int maFileWriteFromData(in MA_FILE_DATA args);
+		int maFileWriteFromData(in MAHandle file, in MAHandle data, in int offset, in int len);
 		/**
 		* Read from file to memory.
 		* Returns 0 on success, or \< 0 on error.
@@ -2139,7 +2128,7 @@ interface MAAPI {
 		* Read from file to data object.
 		* Returns 0 on success, or \< 0 on error.
 		*/
-		int maFileReadToData(in MA_FILE_DATA args);
+		int maFileReadToData(in MAHandle file, in MAHandle data, in int offset, in int len);
 
 		/**
 		* Returns the file's current position, or \< 0 on error.
@@ -2895,6 +2884,63 @@ interface MAAPI {
 		*/
 		int maShowVirtualKeyboard();
 
+		/**
+		* Displays a fullscreen text box.
+		* The user can enter text using the native input system.
+		*
+		* An "OK" button or similar command item is displayed.
+		* The function returns when this command item is used.
+		*
+		* \returns \>= 0.
+		*
+		* \param title The box's title.
+		* \param text Pointer to a buffer. When the text box is created, it is populated with
+		* the contents of this buffer. When the function returns, the contents of the text box
+		* is copied back to the buffer.
+		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
+		* \param constraints Rules for how text is entered into the box.
+		* Must be exactly one of the MA_TB_TYPE constants, or'd with zero or more of the
+		* MA_TB_FLAG constants.
+		* \note Some of the MA_TB_FLAG constants do not work well together.
+		*/
+		int maTextBox(in MAWString title, out MAWString text, in int maxSize, in int constraints);
+
+		constset int MA_TB_TYPE_ {
+			/// The user is allowed to enter any text, including line breaks.
+			ANY = 0;
+			/// The user is allowed to enter an e-mail address.
+			EMAILADDR = 1;
+			/// The user is allowed to enter an integer value.
+			NUMERIC = 2;
+			/// The user is allowed to enter a phone number.
+			PHONENUMBER = 3;
+			/// The user is allowed to enter a URL.
+			URL = 4;
+			/// The user is allowed to enter a real number value.
+			/// This extends #MA_TB_TYPE_NUMERIC by allowing a decimal point.
+			DECIMAL = 5;
+		}
+		constset int MA_TB_FLAG_ {
+			/// Indicates that the text entered is confidential data that should be
+			/// obscured whenever possible.
+			/// This implies #MA_TB_FLAG_SENSITIVE.
+			PASSWORD = 0x1000;
+			/// Indicates that editing is disallowed.
+			UNEDITABLE = 0x2000;
+			/// Indicates that the text entered is sensitive data that the implementation
+			/// must never store into a dictionary or table for use in predictive, auto-completing,
+			/// or other accelerated input schemes. A credit card number is an example of sensitive data.
+			SENSITIVE = 0x4000;
+			/// Indicates that the text entered does not consist of words that are likely
+			/// to be found in dictionaries typically used by predictive input schemes.
+			NON_PREDICTIVE = 0x8000;
+			/// This flag is a hint to the implementation that during text editing,
+			/// the initial letter of each word should be capitalized.
+			INITIAL_CAPS_WORD = 0x10000;
+			/// This flag is a hint to the implementation that during text editing,
+			/// the initial letter of each sentence should be capitalized.
+			INITIAL_CAPS_SENTENCE = 0x20000;
+		}
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

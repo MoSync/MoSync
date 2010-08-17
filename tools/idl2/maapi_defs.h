@@ -11,10 +11,12 @@
 #define ATTRIBUTE(a, func)  func __attribute__ ((a))
 #define ATTRIB(a) __attribute__ ((a))
 #define GCCATTRIB(a) __attribute__ ((a))
+#define IOCTLDEF static inline
 #elif defined(_MSC_VER)
 #define ATTRIBUTE(a, func)  __declspec (a) func
 #define ATTRIB(a) __declspec (a)
 #define GCCATTRIB(a)
+#define IOCTLDEF static
 #else
 #error Unsupported compiler!
 #endif
