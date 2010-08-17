@@ -1547,50 +1547,34 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maCameraSnapshot:
 		return maCameraSnapshot(a, b);
 
-	case maIOCtl_maFileOpen:
-		return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+	maIOCtl_syscall_case(maFileOpen);
 
-	case maIOCtl_maFileExists:
-		return maFileExists(a);
-	case maIOCtl_maFileClose:
-		return maFileClose(a);
-	case maIOCtl_maFileCreate:
-		return maFileCreate(a);
-	case maIOCtl_maFileDelete:
-		return maFileDelete(a);
-	case maIOCtl_maFileSize:
-		return maFileSize(a);
-	case maIOCtl_maFileAvailableSpace:
-		return maFileAvailableSpace(a);
-	case maIOCtl_maFileTotalSpace:
-		return maFileTotalSpace(a);
-	case maIOCtl_maFileDate:
-		return maFileDate(a);
-	case maIOCtl_maFileRename:
-		return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-	case maIOCtl_maFileTruncate:
-		return maFileTruncate(a, b);
+	maIOCtl_syscall_case(maFileExists);
+	maIOCtl_syscall_case(maFileClose);
+	maIOCtl_syscall_case(maFileCreate);
+	maIOCtl_syscall_case(maFileDelete);
+	maIOCtl_syscall_case(maFileSize);
+	maIOCtl_syscall_case(maFileAvailableSpace);
+	maIOCtl_syscall_case(maFileTotalSpace);
+	maIOCtl_syscall_case(maFileDate);
+	maIOCtl_syscall_case(maFileRename);
+	maIOCtl_syscall_case(maFileTruncate);
 
 	case maIOCtl_maFileWrite:
-		return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileWriteFromData:
-		return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+		return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 	case maIOCtl_maFileRead:
-		return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileReadToData:
-		return maFileReadToData(GVMRA(MA_FILE_DATA));
+		return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
-	case maIOCtl_maFileTell:
-		return maFileTell(a);
-	case maIOCtl_maFileSeek:
-		return maFileSeek(a, b, c);
+	maIOCtl_syscall_case(maFileWriteFromData);
+	maIOCtl_syscall_case(maFileReadToData);
 
-	case maIOCtl_maFileListStart:
-		return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+	maIOCtl_syscall_case(maFileTell);
+	maIOCtl_syscall_case(maFileSeek);
+
+	maIOCtl_syscall_case(maFileListStart);
 	case maIOCtl_maFileListNext:
-		return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileListClose:
-			return maFileListClose(a);
+		return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	maIOCtl_syscall_case(maFileListClose);
 
 #ifdef __SERIES60_3X__	//todo: s60v2 implementation
 	case maIOCtl_maPimListOpen:
