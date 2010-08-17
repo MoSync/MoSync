@@ -25,17 +25,22 @@
 
 #include <SDL/SDL_syswm.h>
 
-#include <WebKit/WebKit.h>
-#include <WebKit/WebKitCOMAPI.h>
+#include <webkit/windows/WebKit.h>
+#include <webkit/windows/WebKitCOMAPI.h>
 
 #include "WebView.h"
 #include "Syscall.h"
 
 // Defined in SyscallImpl.cpp
 // TODO: In which file should we put this declaration?
-void MoSyncPostEvent(MAEvent& e);
+extern void MoSyncPostEvent(MAEvent& e);
 
-// Forward declaration.
+// Local functions.
+static BSTR privateCharToWideChar(const char* s);
+static LPSTR privateWideCharToChar(LPCWSTR s);
+static int privateWebViewSetHTML(IWebView* webView, const char* html);
+
+// Forward class declaration.
 class PolicyDelegate;
 
 // Are static variables application instance specific?
@@ -51,7 +56,7 @@ static PolicyDelegate* gPolicyDelegate = 0;
  * Helper to convert a char* to a wide string. 
  * TODO: Specify how returned string should be deallocated.
  */
-BSTR privateCharToWideChar(const char* s)
+static BSTR privateCharToWideChar(const char* s)
 {
 	// First find out how many wide characters are required. 
 	int numWideCharsRequired = MultiByteToWideChar(
@@ -110,7 +115,7 @@ BSTR privateCharToWideChar(const char* s)
  * Helper to convert a wide string to a char*.
  * TODO: Specify how returned string should be deallocated.
  */
-LPSTR privateWideCharToChar(LPCWSTR s)
+static LPSTR privateWideCharToChar(LPCWSTR s)
 {
 	// First find out how many wide characters are required. 
 	int numCharsRequired = WideCharToMultiByte(
@@ -280,7 +285,7 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
 	}
 
 	// Is this a mosync url?
-	char* mosync = "mosync://";
+	const char* mosync = "mosync://";
 	int result = strncmp(url, mosync, sizeof(mosync));
 	if (0 != result)
 	{

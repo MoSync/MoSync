@@ -16,8 +16,11 @@
 */
 //@@MIDL_FILE_HEADING(  )
 
+/* MOSYNC: Visual Studio specific #pragma should only be present when
+ compiling with Visual Studio. */
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
-
+#endif	
 
 /* verify that the <rpcndr.h> version is high enough to compile this file*/
 #ifndef __REQUIRED_RPCNDR_H_VERSION__
@@ -1320,8 +1323,11 @@ void __RPC_USER MIDL_user_free( void * );
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/* MOSYNC: Visual Studio specific declaration should only be present when
+ compiling with Visual Studio. Is the declaration needed when compiling with gcc? */ 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 extern const GUID  __declspec(selectany) SID_AccessibleComparable = { 0x62b8cb5f, 0xfb7a, 0x4faf, 0x81, 0xe8, 0x52, 0xb6, 0x5f, 0x12, 0x8b, 0x31 };
-
+#endif
 
 extern RPC_IF_HANDLE __MIDL_itf_WebKit_0000_v0_0_c_ifspec;
 extern RPC_IF_HANDLE __MIDL_itf_WebKit_0000_v0_0_s_ifspec;
@@ -44257,7 +44263,8 @@ enum WebMenuItemTag
 	WebMenuItemBaseApplicationTag	= 10000
     } 	WebMenuItemTag;
 
-typedef 
+/* MOSYNC: Removed typedef causing errors in gcc */
+//typedef
 enum WebDragDestinationAction
     {	WebDragDestinationActionNone	= 0,
 	WebDragDestinationActionDHTML	= 1,
@@ -44266,7 +44273,8 @@ enum WebDragDestinationAction
 	WebDragDestinationActionAny	= ( unsigned long  )-1
     } 	;
 
-typedef 
+/* MOSYNC: Removed typedef causing errors in gcc */
+//typedef
 enum WebDragSourceAction
     {	WebDragSourceActionNone	= 0,
 	WebDragSourceActionDHTML	= 1,

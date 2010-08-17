@@ -47,7 +47,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <time.h>
 #include <limits.h>
 
-
 #include <helpers/fifo.h>
 #include <helpers/log.h>
 #include <helpers/helpers.h>
@@ -91,6 +90,8 @@ extern "C" {
 #include "Skinning/SkinManager.h"
 
 #include "WebView.h"
+
+void MoSyncPostEvent(MAEvent& e);
 
 namespace Base {
 

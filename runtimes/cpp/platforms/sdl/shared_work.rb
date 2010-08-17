@@ -9,7 +9,8 @@ def setup_common
 	
 	if(HOST == :win32) then
 		@CUSTOM_LIBS = common_libraries.collect do |lib| "#{lib}.lib" end +
-			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib"]
+			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib",
+			"WebKit.lib", "WebKitGUID.lib"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
 		@LOCAL_DLLS = ["amr"]
 		@EXTRA_INCLUDES = ["../../../base", ".."]
