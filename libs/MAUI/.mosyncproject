@@ -4,14 +4,25 @@
 <build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value=".;../"/>
+<property key="build.prefs:additional.include.paths/Release" value=".,../MAStd,../"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib"/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value=""/>
 <property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value="-O2 -fno-omit-frame-pointer"/>
-<property key="build.prefs:project.type" value="lib"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
 <property key="outputPath" value="%MOSYNCDIR%\lib\pipe\MAUI.lib"/>
 <property key="screenHeight" value="320"/>
 <property key="screenWidth" value="240"/>
 <property key="symbian.uids:s60v2uid" value="0x02905627"/>
 <property key="symbian.uids:s60v3uid" value="0xEB6F5427"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0c7958e0"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xe673e428"/>
 <property key="Wall" value="false"/>
 <property key="Werror" value="true"/>
 <property key="Wextra" value="false"/>
