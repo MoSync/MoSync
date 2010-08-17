@@ -20,7 +20,6 @@ else
 end
 
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
-	"intlibs/dgles-0.5",
 	"intlibs/bluetooth",
 	"intlibs/gsm_amr",
 	"intlibs/net",
