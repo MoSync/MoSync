@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<properties>
+<property key="build.prefs:additional.include.paths" value=".;../"/>
+<property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:gcc.switches" value="-O2 -fno-omit-frame-pointer"/>
+<property key="build.prefs:project.type" value="lib"/>
+<property key="outputPath" value="%MOSYNCDIR%\lib\pipe\MAUI.lib"/>
+<property key="screenHeight" value="320"/>
+<property key="screenWidth" value="240"/>
+<property key="symbian.uids:s60v2uid" value="0x02905627"/>
+<property key="symbian.uids:s60v3uid" value="0xEB6F5427"/>
+<property key="Wall" value="false"/>
+<property key="Werror" value="true"/>
+<property key="Wextra" value="false"/>
+</properties>
+</project>
