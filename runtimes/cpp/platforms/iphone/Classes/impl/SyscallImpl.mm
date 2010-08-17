@@ -466,8 +466,8 @@ namespace Base {
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
 
 		// First get the image into your data buffer
-		int imgwidth = CGImageGetWidth(img->image);
-		int imgheight = CGImageGetHeight(img->image);
+		//int imgwidth = CGImageGetWidth(img->image);
+		//int imgheight = CGImageGetHeight(img->image);
 		memset(dst, 0, scanlength*height*4);
 		
 		Surface *srcSurface = new Surface(smallImage);
@@ -909,7 +909,7 @@ void MoSyncErrorExit(int errorCode)
 {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
-	char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
+	//char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
 #if 0
 	if(gCore) {
 #ifdef PUBLIC_DEBUG

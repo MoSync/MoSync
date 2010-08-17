@@ -80,12 +80,7 @@
 - (void) deviceInquiryDeviceFound:(IOBluetoothDeviceInquiry*)sender	
 						   device:(IOBluetoothDevice*)device
 {
-	if( ![self saveNewDeviceIfAcceptable:device] )
-	{
-		// Already have seen it
-		return;
-	}
-	
+	[self saveNewDeviceIfAcceptable:device];
 }
 
 /**
