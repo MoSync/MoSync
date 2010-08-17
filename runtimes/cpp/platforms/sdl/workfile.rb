@@ -13,7 +13,7 @@ work.instance_eval do
 	@EXTRA_CPPFLAGS = " -DMOSYNC_DLL_EXPORT"
 	
 	if(HOST == :win32) then
-		@EXTRA_INCLUDES = common_includes + ["./webkit/windows/include"]
+		@EXTRA_INCLUDES = common_includes
 		@LIBRARIES = common_libraries
 	elsif(HOST == :linux)
 		

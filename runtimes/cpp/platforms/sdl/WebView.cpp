@@ -1,5 +1,9 @@
+#include "WebView.h"
+#include "Syscall.h"
 
-// The code in this file is Windows specific.
+// Start of Windows/Visual Studio specific code
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 
 // Modify the following defines if you have to target a platform prior to the ones specified below.
 // Refer to MSDN for the latest info on corresponding values for different platforms.
@@ -28,8 +32,6 @@
 #include <webkit/windows/WebKit.h>
 #include <webkit/windows/WebKitCOMAPI.h>
 
-#include "WebView.h"
-#include "Syscall.h"
 
 // Defined in SyscallImpl.cpp
 // TODO: In which file should we put this declaration?
@@ -497,3 +499,33 @@ int webViewEvaluateScript(const char* script)
 
 	return WEBVIEW_OK;
 }
+
+// End of Windows/VisualStudio specific code
+
+#else
+
+// Start of dummy implementation
+
+int webViewOpen(int left, int top, int width, int height)
+{
+	return WEBVIEW_ERROR;
+}
+
+int webViewClose()
+{
+	return WEBVIEW_ERROR;
+}
+
+int webViewSetHTML(const char* html)
+{
+	return WEBVIEW_ERROR;
+}
+
+int webViewEvaluateScript(const char* script)
+{
+	return WEBVIEW_ERROR;
+}
+
+// End of dummy implementation
+
+#endif

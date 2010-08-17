@@ -93,7 +93,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="echo copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y&#x0D;&#x0A;copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y"
+				CommandLine="echo copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y&#x0D;&#x0A;copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration

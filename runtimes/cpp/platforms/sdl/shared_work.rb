@@ -9,8 +9,9 @@ def setup_common
 	
 	if(HOST == :win32) then
 		@CUSTOM_LIBS = common_libraries.collect do |lib| "#{lib}.lib" end +
-			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib",
-			"WebKit.lib", "WebKitGUID.lib"]
+			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib"]
+			# We should also add: "WebKit.lib", "WebKitGUID.lib"
+			# But we need to build versions that are not Visual Studio specific.
 		@LIBRARIES = ["wsock32", "ws2_32"]
 		@LOCAL_DLLS = ["amr"]
 		@EXTRA_INCLUDES = ["../../../base", ".."]
