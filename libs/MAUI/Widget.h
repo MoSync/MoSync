@@ -29,7 +29,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>
 #include "WidgetSkin.h"
-#include "InputManager.h"
 
 namespace MAUI {
 
@@ -295,11 +294,6 @@ namespace MAUI {
 		Vector<WidgetListener*>& getWidgetListeners();
 		
 		/**
-		 *  Sets the input manager to use for this widget
-		 */
-		void setInputManager(InputManager* inputManager);
-
-		/**
 		 *	Set left padding width.
 		 */ 
 		virtual void setPaddingLeft(int l);
@@ -415,9 +409,6 @@ namespace MAUI {
 		// a list of widget listeners
 		Vector<WidgetListener*> widgetListeners;
 		
-		// The InputManager for this Widget
-		InputManager* mInputManager;
-
 		// padding information
 		Rect paddedBounds;
 		int paddingLeft;
