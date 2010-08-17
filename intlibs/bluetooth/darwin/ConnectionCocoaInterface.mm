@@ -22,19 +22,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 #include <IOBluetooth/objc/IOBluetoothDevice.h>
 #include <IOBluetoothUI/IOBluetoothUIUserLib.h>
-#include <pthread.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 #include "ConnectionCocoa.h"
 #include "ConnectionCocoaInterface.h"
 
+#ifndef INVALID_SOCKET
+#define INVALID_SOCKET -1
+#endif
 
 using namespace Bluetooth::Darwin;
-/**
- * Globals
- */
-//static ConnectionCocoa *gConnection = NULL;
 
 /**
  * Constructor, creates the socket
@@ -42,19 +43,33 @@ using namespace Bluetooth::Darwin;
  * @param a Pointer to bluetooth adress
  * @param p Port to connect to
  */
+
 BtSppConnectionCocoa::BtSppConnectionCocoa ( const MABtAddr* a, uint p )
 {
-	mPort=p;
 	// Convert MoSync address to cocoa address
-	mAddressPtr = new BluetoothDeviceAddress();
-	mAddressPtr->data[0] = a->a[0];
-	mAddressPtr->data[1] = a->a[1];
-	mAddressPtr->data[2] = a->a[2];
-	mAddressPtr->data[3] = a->a[3];
-	mAddressPtr->data[4] = a->a[4];
-	mAddressPtr->data[5] = a->a[5];
+	BluetoothDeviceAddress *addressPtr = new BluetoothDeviceAddress();
+	addressPtr->data[0] = a->a[0];
+	addressPtr->data[1] = a->a[1];
+	addressPtr->data[2] = a->a[2];
+	addressPtr->data[3] = a->a[3];
+	addressPtr->data[4] = a->a[4];
+	addressPtr->data[5] = a->a[5];
+	
+	// Initialize cocoa connection class
 	mConnection = [[ConnectionCocoa alloc] init];
-	[mConnection retain];
+	
+	// Initialize darwin kernel semaphores
+	// (no counting POSIX semaphores on darwin)
+	mConnection.mSemConnect = new semaphore_t;
+	semaphore_create(mach_task_self(), mConnection.mSemConnect, SYNC_POLICY_FIFO, 0);
+	
+	// Initialize mutex for the read queue
+	mConnection.mMutexRead = new pthread_mutex_t;
+	pthread_mutex_init(mConnection.mMutexRead, NULL);
+	
+	// Pass address and port to mConnection
+	mConnection.mAddress = addressPtr;
+	mConnection.mPort = p;
 }
 
 /**
@@ -64,7 +79,8 @@ BtSppConnectionCocoa::BtSppConnectionCocoa ( const MABtAddr* a, uint p )
  */
 BtSppConnectionCocoa::~BtSppConnectionCocoa ( void )
 {
-	delete(mAddressPtr);
+	pthread_mutex_destroy(mConnection.mMutexRead);
+	delete(mConnection.mMutexRead);
 	delete(mConnection);
 }
 
@@ -77,34 +93,14 @@ BtSppConnectionCocoa::~BtSppConnectionCocoa ( void )
  */
 int BtSppConnectionCocoa::connect ( void )
 {
-	mConnection.mAddress = mAddressPtr;
-	mConnection.mPort = mPort;
-	
-	// Using pthread instead of cocoa threads here,
-	// because this class is created from a pthread.
-	
-	//Initialize condition and mutex
-	pthread_cond_t conditionConnect;
-	pthread_cond_init(&conditionConnect, NULL);
-	pthread_mutex_t mutexConnect;
-	pthread_mutex_init(&mutexConnect, NULL);
-	
-	// Pass condition and mutex to the obj-c class
-	mConnection.mMutexConnect=&mutexConnect;
-	mConnection.mConditionConnect=&conditionConnect;
-	
 	// Create the connection in a new cocoa thread
-	// Here, we can use cocoa threads :)
 	NSThread* connectionThread = [[NSThread alloc] initWithTarget:mConnection
 								selector:@selector(openSerialPortProfile:)
 								object:nil];
 	[connectionThread start];
 	
 	// Wait until the connection state is set
-	pthread_mutex_lock(&mutexConnect);
-	pthread_cond_wait(&conditionConnect, &mutexConnect);
-	pthread_mutex_unlock(&mutexConnect);
-	pthread_mutex_destroy(&mutexConnect);
+	semaphore_wait( *mConnection.mSemConnect );
 	
 	// Now the connection state is set, just return it
 	return mConnection.mState;
@@ -119,31 +115,72 @@ int BtSppConnectionCocoa::connect ( void )
  * @return Number of read bytes or (0 < ) CONNERR if failed.
  */
 int BtSppConnectionCocoa::read ( void* dst, int max )
-{
-	//Initialize condition and mutex
-	pthread_cond_t conditionRead;
-	pthread_cond_init(&conditionRead, NULL);
-	pthread_mutex_t mutexRead;
-	pthread_mutex_init(&mutexRead, NULL);
-	
-	// Pass condition and mutex to the obj-c class
-	mConnection.mMutexRead=&mutexRead;
-	mConnection.mConditionRead=&conditionRead;
-	
-	// Wait until there is some data to be read
-	pthread_mutex_lock(&mutexRead);
-	pthread_cond_wait(&conditionRead, &mutexRead);
-	pthread_mutex_unlock(&mutexRead);
-	
-	// Actually read the data
-	NSData *nsdata = [mConnection.mReadQueue objectAtIndex:0];
-	if(!nsdata) return 1;
-	max = [nsdata length];
-	const void *data = [nsdata bytes];
-	memcpy(dst, data, max);
-	[mConnection.mReadQueue removeObjectAtIndex:0];
-
-	return max;
+{	
+	// Check if the connection was established
+	// then check if data is available
+	// if there is no data, sleep for 50 ms and try again
+	// otherwise, fetch the data
+	while ( mConnection.mConnectionOpen ) {
+		if( mConnection.mDataReady ) {
+			
+			while ( [mConnection.mReadQueue count] > 0 ) {
+				
+				pthread_mutex_lock (mConnection.mMutexRead);
+				// Collect the garbage !
+				NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+				// Get data from the queue
+				NSData *nsdata = [mConnection.mReadQueue objectAtIndex:0];
+				// If the data object is empty, remove it from the queue and break
+				if( [nsdata length] == 0 ) {
+				 	[mConnection.mReadQueue removeObjectAtIndex:0];
+					[pool release];
+					pthread_mutex_unlock (mConnection.mMutexRead);
+					break;
+				}
+				// If max is too big, just read what we can
+				if( (unsigned int)max > [nsdata length] ) {
+					max = [nsdata length];
+					NSRange readRange;
+					readRange.location = 0;
+					readRange.length = max;
+					[nsdata getBytes: dst range:readRange];
+					[mConnection.mReadQueue removeObjectAtIndex:0];
+				}
+				// Otherwise, get "max" bytes
+				else {
+					
+					// Write max bytes to dst
+					NSRange readRange;
+					readRange.location = 0;
+					readRange.length = max;
+					[nsdata getBytes: dst range:readRange];
+					
+					// Get the remaining bytes
+					NSRange remainingRange;
+					remainingRange.location = max;
+					remainingRange.length = [nsdata length] - max;
+					char *remainingBytes = new char[remainingRange.length];
+					[nsdata getBytes: remainingBytes range:remainingRange];
+					NSData *remainingData = [NSData dataWithBytes:remainingBytes 
+														   length:remainingRange.length];
+					delete(remainingBytes);
+					// Replace the data object from which we read max bytes
+					// by one that contains only unread bytes
+					[mConnection.mReadQueue replaceObjectAtIndex:0 
+													  withObject:remainingData];
+				}
+				[pool release];
+				pthread_mutex_unlock (mConnection.mMutexRead);
+				return max;
+			}
+			
+			mConnection.mDataReady = FALSE;
+		}
+		else {
+			usleep(50000);
+		}
+	}
+	return CONNERR_CLOSED;
 }
 
 /**
@@ -157,15 +194,17 @@ int BtSppConnectionCocoa::read ( void* dst, int max )
  */
 int BtSppConnectionCocoa::write ( const void* src, int len )
 {
-    /*if ( mSocket == INVALID_SOCKET )
-        return CONNERR_GENERIC;
-
-    int res = send( mSocket, src, len, 0 );
-    if ( res < 0 )
-        return CONNERR_GENERIC;
-    else
-        return res;*/
-	return 0;
+	// Check if the connection was established
+	if ( mConnection.mState > 0 ) {
+		char *buf = new char[len];
+		memcpy(buf, src, len);
+		int result = [mConnection sendData:buf length:len];
+		delete(buf);
+		return result;
+	}
+	else {
+		return INVALID_SOCKET;
+	}
 }
 
 /**
@@ -174,15 +213,17 @@ int BtSppConnectionCocoa::write ( const void* src, int len )
  */
 void BtSppConnectionCocoa::close ( void )
 {	
-	// Signal that the last data must be read now
-	pthread_mutex_lock(mConnection.mMutexRead);
-	pthread_cond_signal(mConnection.mConditionRead);
-	pthread_mutex_unlock(mConnection.mMutexRead);
-	pthread_mutex_destroy(mConnection.mMutexRead);
-	
-	// Close the RFCOMM Channel
-	[mConnection closeRFCOMMConnection];
-
+	// Check if the connection was established
+	if ( mConnection.mState > 0 ) {
+		
+		// Wait for the last data
+		//semaphore_wait( *mConnection.mSemRead );
+		
+		// Close the RFCOMM Channel after 1sec
+		[mConnection closeRFCOMMConnection];
+		
+		
+	}
 }
 
 /**
@@ -192,13 +233,20 @@ void BtSppConnectionCocoa::close ( void )
  */
 int BtSppConnectionCocoa::getAddr ( MAConnAddr& a )
 {
-   /* if ( mSocket == INVALID_SOCKET )
-        return CONNERR_GENERIC;
-
-    a.family  = CONN_FAMILY_BT;
-    a.bt.port = mAddr.rc_channel;
-
-    // Convert bluez address to MoSync address
-    ba2ma( a.bt.addr.a, mAddr.rc_bdaddr.b );*/
-    return 1;
+	// Check if the connection was established
+	if ( mConnection.mState > 0 ) {
+		a.family  = CONN_FAMILY_BT;
+		a.bt.port = mConnection.mPort;
+		// Convert the address to the MoSync format
+		a.bt.addr.a[0] = mConnection.mAddress->data[0];
+		a.bt.addr.a[1] = mConnection.mAddress->data[1];
+		a.bt.addr.a[2] = mConnection.mAddress->data[2];
+		a.bt.addr.a[3] = mConnection.mAddress->data[3];
+		a.bt.addr.a[4] = mConnection.mAddress->data[4];
+		a.bt.addr.a[5] = mConnection.mAddress->data[5];
+		return 1;
+	}	
+    else {
+		return INVALID_SOCKET;
+	}
 }

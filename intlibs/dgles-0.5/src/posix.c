@@ -9,7 +9,7 @@
 #define OPENGL_LIBRARY "libGL.so"
 #endif
 
-void *_dgles_platform_open()
+void *_dgles_platform_open(void)
 {
 	return dlopen(OPENGL_LIBRARY, RTLD_NOW);
 }
