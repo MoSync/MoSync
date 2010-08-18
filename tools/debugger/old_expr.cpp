@@ -141,7 +141,8 @@ bool isLocalGlobalOrStatic(const string& name) {
 static SeeCallback sSeeCallbackThis = NULL;
 static bool sWasThis = false;
 static string sThisName ="";
-void thisHandler(const SYM& sym) {
+
+static void thisHandler(const SYM& sym) {
 	const TypeBase* resolved = sym.type->resolve();
 	if(resolved->type() != TypeBase::eConst) return;
 	const ConstType* thisType = (const ConstType*) resolved;

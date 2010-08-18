@@ -90,8 +90,8 @@ struct type_tuple_equal {
 //typedef hash_set<Type*, type_name_hash TNE> TypeNameSet;
 //typedef hash_set<Type*, type_tuple_hash TTE> TypeTupleSet;
 
-typedef set<Type*, type_name_hash TNE> TypeNameSet;
-typedef set<Type*, type_tuple_hash TTE> TypeTupleSet;
+typedef set<Type*, type_name_hash> TypeNameSet;
+typedef set<Type*, type_tuple_hash> TypeTupleSet;
 
 static vector<TypeTupleSet*> sTypeTupleSets;
 static vector<TypeNameSet*> sTypeNameSets;
