@@ -1,0 +1,82 @@
+package com.mosync.java.android;
+
+//#include "generated\IX_WEBVIEW_CONSTS.h"
+//#include "config_platform.h"
+//#include "helpers.h"
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.os.Handler;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.Window;
+
+public class WebViewActivity extends Activity 
+{
+	//public static Handler mHandler;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) 
+	{
+		Log.i("MoSync", "WebViewActivity.onCreate");
+		
+		super.onCreate(savedInstanceState);
+		Button button = new Button(this);
+		button.setText("Hello World!");
+		setContentView(button);
+
+		/*
+		int[] event = new int[3];
+		event[0] = 19;
+		event[1] = myId;
+		event[2] = 0;
+		MoSync.mMosyncView.postEvent(event);
+		*/
+	}
+
+	@Override
+    protected void onStart() 
+	{
+    	Log.i("MoSync", "WebViewActivity.onStart");
+    	super.onStart();
+    }
+	
+	@Override
+    protected void onStop() 
+	{
+    	Log.i("MoSync", "WebViewActivity.onStop");
+    	super.onStop();
+    }
+	
+	@Override
+    protected void onRestart() 
+	{
+    	Log.i("MoSync", "WebViewActivity.onRestart");
+        super.onRestart();
+    }
+	
+	@Override
+    protected void onResume() 
+	{
+    	Log.i("MoSync", "WebViewActivity.onResume");
+        super.onResume();
+    }
+	
+	@Override
+    protected void onPause() 
+	{
+    	Log.i("MoSync", "WebViewActivity.onPause");
+        super.onPause();
+    }
+	
+	@Override
+    protected void onDestroy()
+	{
+		super.onDestroy();
+    	Log.i("MoSync", "WebViewActivity.onDestroy");
+    }
+}

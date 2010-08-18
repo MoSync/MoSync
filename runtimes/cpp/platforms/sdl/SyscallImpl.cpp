@@ -2470,6 +2470,7 @@ void MoSyncErrorExit(int errorCode) {
 	MoSyncExit(errorCode);
 }
 
+// TODO: Make this thread safe.
 void MoSyncPostEvent(MAEvent& e)
 {
 	gEventFifo.put(e);

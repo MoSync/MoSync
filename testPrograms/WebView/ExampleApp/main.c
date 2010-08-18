@@ -43,7 +43,7 @@ void SetBgColor(char* color)
 	maWebViewEvaluateScript(script);
 }
 
-#ifndef COMMENT_OUT
+#ifdef COMMENT_OUT
 int MAMain()
 {
 	MAEvent e;
@@ -98,7 +98,7 @@ int MAMain()
 }
 #endif
 
-#ifdef COMMENT_OUT
+#ifndef COMMENT_OUT
 int MAMain()
 {
 	MAEvent e;
