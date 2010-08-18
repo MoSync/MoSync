@@ -25,7 +25,7 @@ work.instance_eval do
 		end
 	elsif(HOST == :darwin)
 		@SOURCES = [".", "darwin"]
-		@EXTRA_CPPFLAGS = " -DCOCOA_SUPPORTED"
+		@EXTRA_CPPFLAGS = " -DCOCOA_SUPPORTED -S"
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
 		@SPECIFIC_CFLAGS = { "interface.mm" => " -Wno-missing-noreturn","discovery.cpp" => " -Wno-missing-noreturn" }
 	else

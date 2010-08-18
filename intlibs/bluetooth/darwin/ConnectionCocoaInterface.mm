@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 /*
-* File:   ConnectionCocoa.mm
+* File:   ConnectionCocoaInterface.mm
 * Author: Romain Chalant
 *
 * Created on August 5, 2010
