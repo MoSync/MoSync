@@ -174,6 +174,7 @@ void thisHandler(const SYM& sym) {
 
 void locate_symbol(const string& name, SeeCallback cb) {
 	//first search locals in the current frame, including any function parameters.
+	//then check if there is a this symbol local in the current frame, and search through that (only if it's a class with methods).
 	//then search static symbols in the current frame's file scope.
 	//finally search global symbols (scope 0).
 

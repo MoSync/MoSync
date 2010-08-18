@@ -5,3 +5,5 @@
 -data-evaluate-expression MyLayout
 -data-evaluate-expression MainScreen
 -data-evaluate-expression MyListBox
+ kill
+-gdb-exit

@@ -366,7 +366,6 @@ static void executeCommand(const string& line) {
 		cmd(args);
 	} else {
 		error("Undefined MI command: '%s'", line.c_str());
-		commandComplete();
 	}
 }
 
