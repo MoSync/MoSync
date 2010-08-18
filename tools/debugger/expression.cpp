@@ -875,7 +875,22 @@ void ExpressionCommon::loadMemory(int addr, int len) {
 	sSemaphore.wait();
 }
 
+static string sExpression;
 static void stackLoaded() {
+
+	if(!sExpressionTree) {
+		ExpressionTree *tree;
+		try {
+			tree = ExpressionParser::parse(sExpression.c_str());
+		} 
+		catch(ParseException& e) {
+			error("%s", e.what());
+			return;
+		}
+
+		sExpressionTree = tree;
+	}
+
 	sSymbolIter = sExpressionTree->getSymbols().begin();
 	loadSymbol();
 }
@@ -907,18 +922,9 @@ void stackEvaluateExpression(const string& args, int frameAddr, ExpressionCallba
 		return;
 	}
 
+	sExpression = args;
+	sExpressionTree = NULL;
 	sCallback = callback;
-
-	ExpressionTree *tree;
-	try {
-		tree = ExpressionParser::parse(args.c_str());
-	} 
-	catch(ParseException& e) {
-		error("%s", e.what());
-		return;
-	}
-
-	sExpressionTree = tree;
 
 	loadStack(stackLoaded);
 }

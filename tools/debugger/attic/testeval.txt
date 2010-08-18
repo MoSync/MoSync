@@ -1,10 +1,5 @@
 -target-select sim
--break-insert _Z3adddi
+-break-insert c:/MoSync/workspace/mauitest/TestMaui.cpp:11
 -exec-continue
 -test-wait
--var-create - * array
--var-create - * i
--var-create - * ii
--var-list-children var2
--var-list-children var2.0
--var-list-children var2.0.Base
+-data-evaluate-expression MyLayout

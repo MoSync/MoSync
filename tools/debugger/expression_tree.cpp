@@ -408,7 +408,7 @@ Value DotNode::evaluate() {
 	return Value(0);
 }
 
-void DotNode::recursiveSearch(const std::string& ident, StructType *s, SearchResult *res, int offset) {
+void DotNode::recursiveSearch(const std::string& ident, const StructType *s, SearchResult *res, int offset) {
 	const std::vector<DataMember>& dataMembers = s->getDataMembers();
 	const std::vector<BaseClass>& bases = s->getBases();
 

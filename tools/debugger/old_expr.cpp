@@ -138,6 +138,25 @@ bool isLocalGlobalOrStatic(const string& name) {
 	return s != NULL;
 }
 
+static SeeCallback sSeeCallbackThis = NULL;
+static bool sWasThis = false;
+static string sThisName ="";
+void thisHandler(const SYM& sym) {
+	const TypeBase* resolved = sym.type->resolve();
+	if(sym.type && resolved->type() == TypeBase::eStruct) {
+		const StructType *type = ((const StructType*)resolved);
+		DotNode::SearchResult res;
+		DotNode::recursiveSearch(sThisName, type, &res);
+		if(res.found) {
+			SYM newSym = sym;
+			newSym.address = (char*)newSym.address + (res.offsetBits>>3);
+			newSym.type = res.type;
+			sSeeCallbackThis(newSym);
+			sWasThis = true;
+		}
+	}
+}
+
 void locate_symbol(const string& name, SeeCallback cb) {
 	//first search locals in the current frame, including any function parameters.
 	//then search static symbols in the current frame's file scope.
@@ -155,6 +174,14 @@ void locate_symbol(const string& name, SeeCallback cb) {
 
 	if(handleLocalsAndArguments(name, frame, f, cb))
 		return;
+
+	// this
+	sWasThis = false;
+	sThisName = name;
+	sSeeCallbackThis = cb;
+	if(handleLocalsAndArguments("this", frame, f, thisHandler)) {
+		if(sWasThis) return;
+	}
 
 	//statics and globals
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);

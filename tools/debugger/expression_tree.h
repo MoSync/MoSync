@@ -22,26 +22,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include "old_expr.h"
 #include "stabs/stabs_typedefs.h"
+#include "helpers/RefCounted.h"
 
 class ExpressionTree;
-
-class RefCounted {
-public:
-	RefCounted() : mCount(1) { }
-	
-	void addRef() { 
-		mCount++; 
-	}
-
-	void deleteRef() { 
-		mCount--; 
-		if(mCount==0) 
-			delete this; 
-	}
-private:
-	int mCount;
-};
-
 
 class ExpressionTreeNode : public RefCounted {
 public:
@@ -144,7 +127,9 @@ public:
 	DotNode(ExpressionTree *tree, std::string ident, ExpressionTreeNode* child);
 	~DotNode();
 	Value evaluate();
-protected:
+
+
+	// I need to use these on another place.. maybe should be put in stabs instead..
 	struct SearchResult {
 		bool found;
 		int offsetBits, sizeBits;
@@ -153,8 +138,8 @@ protected:
 	};
 
 	// returns offset
-	void recursiveSearch(const std::string& ident, StructType *s, SearchResult *res, int offset=0);
-
+	static void recursiveSearch(const std::string& ident, const StructType *s, SearchResult *res, int offset=0);
+protected:
 	std::string mIdent;
 	ExpressionTreeNode *mChild;
 };
