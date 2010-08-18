@@ -502,6 +502,31 @@ void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
 //Key handling
 //***************************************************************************
 
+#define QWERTY_KEYS(m)\
+	m(MAK_RETURN, EStdKeyEnter)\
+	m(MAK_SPACE, EStdKeySpace)\
+	m(MAK_LSHIFT, EStdKeyLeftShift)\
+	m(MAK_RSHIFT, EStdKeyRightShift)\
+	m(MAK_LALT, EStdKeyLeftFunc)\
+	m(MAK_RALT, EStdKeyRightFunc)\
+	m(MAK_LCTRL, EStdKeyLeftCtrl)\
+	m(MAK_RCTRL, EStdKeyRightCtrl)\
+
+// Keycode values >= ASCII_MIN && <= ASCII_MAX
+// can be passed directly as ASCII codes.
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+
+// These keycode identifiers do not respond to the proper keys
+// on a Swedish E71.
+#define BROKEN_KEYS(m)\
+	m(MAK_COMMA, EStdKeyComma)\
+	m(MAK_PERIOD, EStdKeyFullStop)\
+	m(MAK_SLASH, EStdKeyForwardSlash)\
+	m(MAK_BACKSLASH, EStdKeyBackSlash)\
+	m(MAK_SEMICOLON, EStdKeySemiColon)\
+	m(MAK_QUOTE, EStdKeySingleQuote)\
+
 #define STDKEYS(m)\
 	m(UP, EStdKeyUpArrow)\
 	m(DOWN, EStdKeyDownArrow)\
@@ -554,23 +579,41 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		return EKeyWasNotConsumed;
 	}
 
-#define SCANTOMAK_CASE(name, num)\
+#define SCANTOMAKB_CASE(name, num)\
 	case num: makey = MAK_##name; makb = MAKB_##name; break;
+
+#define SCANTOMAK_CASE(name, num)\
+	case num: makey = name; break;
 
 	int makey;
 	int makb = 0;
-	switch(scancode) {
-		STDKEYS(SCANTOMAK_CASE);
+
+	// TODO: handle Unicode input, which is received in aKeyEvent.iCode
+	// when aType == EEventKey.
+	// Will probably need a new MoSync EVENT_TYPE_CHAR for this.
+
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+	if(scancode >= ASCII_MIN && scancode <= ASCII_MAX) {
+		makey = scancode;
+	} else switch(scancode) {
+		STDKEYS(SCANTOMAKB_CASE);
+		QWERTY_KEYS(SCANTOMAK_CASE);
+		BROKEN_KEYS(SCANTOMAK_CASE);
 
 	case EStdKeyDevice3:	//Middle joystick button?
+#ifndef QWERTY_KEYS
 	case EStdKeyLeftCtrl: //emu only
 	case EStdKeyRightCtrl:  //emu only
+#endif
 		makey = MAK_FIRE;
 		makb = MAKB_FIRE;
 		break;
+#ifndef QWERTY_KEYS
 	case EStdKeyRightShift:
 		makey = MAK_PEN;
 		break;
+#endif
 	default:
 		LOG("Unknown scancode: %i\n", scancode);
 		makey = MAK_UNKNOWN;
