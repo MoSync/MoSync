@@ -3,3 +3,5 @@
 -exec-continue
 -test-wait
 -data-evaluate-expression MyLayout
+-data-evaluate-expression MainScreen
+-data-evaluate-expression MyListBox

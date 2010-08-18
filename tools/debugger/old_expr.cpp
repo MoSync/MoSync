@@ -143,17 +143,32 @@ static bool sWasThis = false;
 static string sThisName ="";
 void thisHandler(const SYM& sym) {
 	const TypeBase* resolved = sym.type->resolve();
-	if(sym.type && resolved->type() == TypeBase::eStruct) {
+	if(resolved->type() != TypeBase::eConst) return;
+	const ConstType* thisType = (const ConstType*) resolved;
+	resolved = thisType->deref();
+	if(!resolved) return;
+	resolved = resolved->resolve();
+
+	if(resolved && resolved->type() == TypeBase::eStruct) {
 		const StructType *type = ((const StructType*)resolved);
+		
+		// cannot be c++ (if we are in a method, the this pointer must have methods naturally.)
+		if(type->getMethods().size()==0) return;
+
 		DotNode::SearchResult res;
 		DotNode::recursiveSearch(sThisName, type, &res);
 		if(res.found) {
-			SYM newSym = sym;
-			newSym.address = (char*)newSym.address + (res.offsetBits>>3);
-			newSym.type = res.type;
-			sSeeCallbackThis(newSym);
+			sSeeSym = sym;
+			int thisPointer = *(int*)sSeeSym.address;
+			int ptr = thisPointer + (res.offsetBits>>3);
+			sSeeSym.address = gMemBuf + ptr;
+			sSeeSym.type = res.type;
 			sWasThis = true;
-		}
+			sSeeSym.scope = sScope;
+			sSeeCallback = sSeeCallbackThis;
+			StubConnection::readMemory(gMemBuf + ptr, ptr, res.type->size(),
+				Callback::seeReadMem);
+			}
 	}
 }
 

@@ -39,4 +39,28 @@ private:
 	SDL_sem* mSem;
 };
 
+class MoSyncMutex {
+public:
+	MoSyncMutex();
+	~MoSyncMutex();
+	void init();
+	void lock();
+	void unlock();
+	void close();
+private:
+	SDL_mutex* mMutex;
+};
+
+class MoSyncMutexHandler {
+public:
+	MoSyncMutexHandler(MoSyncMutex* mutex) : mMutex(mutex) {
+		mMutex->lock();
+	}
+	~MoSyncMutexHandler() {
+		mMutex->unlock();
+	}
+private:
+	MoSyncMutex* mMutex;
+};
+
 #endif	//THREAD_H
