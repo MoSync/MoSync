@@ -43,20 +43,50 @@ void SetBgColor(char* color)
 	maWebViewEvaluateScript(script);
 }
 
-#ifdef COMMENT_OUT
+#ifndef COMMENT_OUT
 int MAMain()
 {
-	maWebViewOpen();
+	MAEvent e;
+
+	//maWebViewOpen();
+
+	maSetColor(0xFF0000);
+	maFillRect(0, 0, 300, 200);
+	maUpdateScreen();
+
+	//maPanic(1, "Hi!!");
 
 	while (1)
 	{
-		MAEvent e;
+		maWait(0);
 		while (0 != maGetEvent(&e))
 		{
 			switch (e.type)
 			{
 				case EVENT_TYPE_CLOSE:
 					return 0;
+
+				case EVENT_TYPE_POINTER_PRESSED:
+
+					if (e.point.y < 200)
+					{
+						maExit(0);
+					}
+					else
+					{
+						maSetColor(0x888888);
+						maFillRect(0, 200, 300, 100);
+						maUpdateScreen();
+
+						maWebViewOpen();
+						//maPanic(1, "Hellooo!!");
+
+						maSetColor(0xFFFF00);
+						maFillRect(0, 300, 300, 100);
+						maUpdateScreen();
+					}
+
+					break;
 
 				case EVENT_TYPE_WEBVIEW_SERVICE_REQUEST:
 					break;
@@ -68,15 +98,17 @@ int MAMain()
 }
 #endif
 
-#ifndef COMMENT_OUT
+#ifdef COMMENT_OUT
 int MAMain()
 {
+	MAEvent e;
+
 	maWebViewOpen();
 	maWebViewSetHTML(HTML);
 
 	while (1)
 	{
-		MAEvent e;
+		maWait(0);
 		while (0 != maGetEvent(&e))
 		{
 			switch (e.type)

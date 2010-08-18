@@ -178,7 +178,7 @@ namespace Base
 	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maOpenWebView", "()I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewOpen", "()I");
 		if (methodID == 0) return 0;
 		int retval = jNIEnv->CallIntMethod(jThis, methodID);
 		

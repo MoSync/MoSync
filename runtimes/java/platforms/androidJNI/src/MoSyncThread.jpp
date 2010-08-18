@@ -60,6 +60,7 @@ import java.util.Locale;
 import android.util.Log;
 
 import com.mosync.java.android.MoSyncPanicDialog;
+import com.mosync.java.android.WebViewActivity;
 
 import java.io.FileNotFoundException;
 

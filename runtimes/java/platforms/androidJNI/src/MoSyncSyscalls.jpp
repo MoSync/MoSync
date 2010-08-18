@@ -835,8 +835,73 @@ int maShowVirtualKeyboard()
 
 int maWebViewOpen()
 {
-	return 0;
+	Log.i("MoSync", "maWebViewOpen1 - launching intent");
+	
+	final Activity activity = (Activity) mContext;
+		
+	activity.runOnUiThread(new Runnable() 
+	{
+		public void run() 
+		{
+			try 
+			{	
+				Log.i("MoSync", "maWebViewOpen3.1 hej6");
+				
+				Intent myIntent = new Intent(mMoSyncView.getContext(), WebViewActivity.class);
+				mMoSyncView.getContext().startActivity(myIntent);
+				
+				Log.i("MoSync", "maWebViewOpen3.2");
+				
+				//Intent intent = new Intent();
+				//intent.setClassName(activity, "com.mosync.java.android.WebViewActivity");
+				//activity.startActivity(intent);
+			}
+			catch (Throwable e)
+			{
+				Log.i("MoSync", "maWebViewOpen3 - error");
+				e.printStackTrace();
+			}
+		}
+	});
+
+	Log.i("MoSync", "maWebViewOpen2");
+	
+	return 1;
 }
+
+/*
+// This is a test that pops up a Toast.
+int maWebViewOpen()
+{
+	Log.i("MoSync", "maWebViewOpen1");
+
+	final Activity activity = (Activity) mContext;
+	
+	activity.runOnUiThread(new Runnable() 
+	{
+		public void run() 
+		{
+			try 
+			{	
+				Log.i("MoSync", "maWebViewOpen3.1");
+				android.widget.Toast.makeText(
+					activity,
+					"Hello World!", 
+					android.widget.Toast.LENGTH_SHORT).show();
+				Log.i("MoSync", "maWebViewOpen3.2");
+			}
+			catch (Throwable e)
+			{
+				Log.i("MoSync", "maWebViewOpen3 - error");
+			}
+		}
+	});
+
+	Log.i("MoSync", "maWebViewOpen2");
+	
+	return 1;
+}
+*/
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 

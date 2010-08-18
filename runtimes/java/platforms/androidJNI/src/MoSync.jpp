@@ -49,16 +49,15 @@ public class MoSync extends Activity {
 		
 		if(mThreadHasDied) this.finish();
 		
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		//this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		mMoSyncView = null;
 		
-		try{
+		try {
 			mMoSyncThread = new MoSyncThread(this, new Handler());
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			Log.e("MoSync", "Unable to create thread! Application is closed!");
 			super.onDestroy();
 			this.finish();
