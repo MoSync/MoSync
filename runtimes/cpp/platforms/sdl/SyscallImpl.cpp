@@ -339,6 +339,8 @@ namespace Base {
 
 		MANetworkInit(/*broadcom*/);
 
+		SDL_EnableUNICODE(true);
+
 		if(settings.showScreen) {
 #ifndef MOBILEAUTHOR
 #ifdef __USE_SYSTEM_RESOLUTION__
@@ -781,6 +783,16 @@ namespace Base {
 		MAHandleKeyEventMAK(mak, pressed, sdlk);
 	}
 
+	static void MAHandleCharEvent(uint unicode) {
+		LOGDT("MAHandleCharEvent 0x%x", unicode);
+		if(unicode == 0)
+			return;
+		MAEvent event;
+		event.type = EVENT_TYPE_CHAR;
+		event.character = unicode;
+		gEventFifo.put(event);
+	}
+
 	static Uint32 GCCATTRIB(noreturn) SDLCALL ExitCallback(Uint32 interval, void*) {
 		LOG("ExitCallback %i\n", interval);
 
@@ -892,6 +904,7 @@ namespace Base {
 					break;
 				}
 				MAHandleKeyEvent(event.key.keysym.sym, true);
+				MAHandleCharEvent(event.key.keysym.unicode);
 				break;
 			case SDL_KEYUP:
 				if(	event.key.keysym.sym == SDLK_PAGEUP||
