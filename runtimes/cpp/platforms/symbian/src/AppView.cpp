@@ -573,7 +573,13 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		break;
 	case EEventKey:
 		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
-		return EKeyWasNotConsumed;
+		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
+			MAEvent event;
+			event.type = EVENT_TYPE_CHAR;
+			event.character = aKeyEvent.iCode;
+			AddEvent(event);
+		}
+		return EKeyWasConsumed;
 	default:
 		LOG("KeyEvent %i\n", aType);
 		return EKeyWasNotConsumed;
@@ -636,7 +642,7 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		iKeys |= makb;
 	else
 		iKeys &= ~makb;
-			
+
 	if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
 		MAEvent event;
 		event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;

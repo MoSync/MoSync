@@ -1224,6 +1224,9 @@ interface MAAPI {
 		* Use maSetClipRect() to reset it.
 		*/
 		SCREEN_CHANGED = 21;
+
+		/// Character input. Uses MAEvent::character.
+		CHAR = 22;
 	}
 
 	struct MAConnEventData {
@@ -1251,6 +1254,11 @@ interface MAAPI {
 				*/
 				int nativeKey;
 			} ked;
+
+			/**
+			* In CHAR events, this is the Unicode character that was received.
+			*/
+			uint character;
 
 			/**
 			 * In POINTER events, this will be the location of the pointer.
