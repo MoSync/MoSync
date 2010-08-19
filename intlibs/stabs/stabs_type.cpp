@@ -205,6 +205,7 @@ void PointerType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat 
 //	pf("0x%x", *(int*)data);
 	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
+
 void PointerType::printTypeMI(printfPtr pf, bool complex) const {
 	if(mTarget->type() == eArray) {
 		ArrayType* arrayType = (ArrayType*)mTarget->resolve();

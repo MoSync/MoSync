@@ -426,9 +426,7 @@ static void Callback::dee(const Value* value, const char *err) {
 
 		oprintDone();
 		oprintf(",value=\"");
-		StringPrintFunctor spf;
-		sym.type->printMI(spf, value->getDataAddress(), TypeBase::eNatural);	
-		oprintf("%s", spf.getString());
+		oprintf("%s", getValue(value->getTypeBase(), value->getDataAddress(), TypeBase::eNatural).c_str());
 		oprintf("\"\n");
 		commandComplete();
 	} else {

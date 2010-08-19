@@ -1,9 +1,5 @@
 -target-select sim
--break-insert c:/MoSync/workspace/mauitest/TestMaui.cpp:11
+-break-insert c:/MoSync/workspace/gdbtest1/main.cpp:10
 -exec-continue
 -test-wait
--data-evaluate-expression MyLayout
--data-evaluate-expression MainScreen
--data-evaluate-expression MyListBox
- kill
--gdb-exit
+-data-evaluate-expression b
