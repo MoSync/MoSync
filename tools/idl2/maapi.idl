@@ -1225,8 +1225,15 @@ interface MAAPI {
 		SCREEN_CHANGED = 21;
 
 #if IX_WEBVIEW
-        // Event for making a servie request from JavaScript to MoSync.
-        WEBVIEW_SERVICE_REQUEST = 22;
+        /**
+		 * Event for making a request from JavaScript to MoSync.
+		 */
+        WEBVIEW_REQUEST = 22;
+		
+        /**
+		 * Event sent when the WebView is created.
+		 */
+        WEBVIEW_CREATED = 23;
 #endif
 	}
 
@@ -1278,10 +1285,10 @@ interface MAAPI {
 			void* data;
 
 			/**
-			* WebView service request expressed as a string.
+			* WebView request expressed as a string.
 			* TODO: Change to use the data pointer in the event struct.
 			*/
-			char serviceRequest[256];
+			char request[256];
 		}
 	}
 

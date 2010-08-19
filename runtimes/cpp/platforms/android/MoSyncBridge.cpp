@@ -26,6 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
+#include <helpers/CPP_IX_WEBVIEW.h>
+
 //(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 #define SYSLOG(...)
 
@@ -200,6 +202,22 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.conn.handle = intArray[1];
 		event.conn.opType = intArray[2];
 		event.conn.result = intArray[3];
+	}
+	else if(event.type == EVENT_TYPE_WEBVIEW_REQUEST)
+	{
+		// Request string data starts at third element of the
+		// int array. Each int element is a character code.
+		
+		// Second element is length of string data.
+		int n = intArray[1];
+		
+		// Max size of request string is number of chars in array, 
+		// minus one char required for null termination.
+		int maxChars = (sizeof(event.request) / sizeof(char)) - 1;
+		for (int i = 0; i < n && i < maxChars; ++i)
+		{
+			event.request[i] = (char) intArray[i + 2];
+		}
 	}
 	
 	// release the memory used

@@ -21,26 +21,26 @@ char* CharStringAllocate(int size);
 
 
 /**
- * Return true (non-zero) if the service name of the request
+ * Return true (non-zero) if the name of the request
  * matches the given name.
  */
-int ServiceRequestNameIs(char* request, char* name);
+int WebViewRequestedServiceIs(char* request, char* name);
 
 /**
- * Return the service name part of a request that has the form:
- * mosync://ServiceName/Data
+ * Return the service part of a request that has the form:
+ * mosync://Service/Data
  * Returned string must be deallocated with CharStringFree().
  * On error, NULL is returned.
  */
-char* ServiceRequestName(char* request);
+char* WebViewRequestedService(char* request);
 
 /**
  * Return the data part of a request that has the form:
- * mosync://ServiceName/Data
+ * mosync://Service/Data
  * Returned string must be deallocated with CharStringFree().
  * On error, NULL is returned.
  */
-char* ServiceRequestData(const char* request);
+char* WebViewRequestData(const char* request);
 
 #ifdef __cplusplus
 }

@@ -34,6 +34,14 @@ import com.mosync.internal.android.MoSyncView;
 
 public class MoSync extends Activity {
 
+	/**
+	 * TODO: Replace this with a way of passing object references
+	 * between activities. Perhaps we can use an Application object:
+	 * http://developer.android.com/reference/android/app/Application.html
+	 * http://developer.android.com/guide/appendix/faq/framework.html#3
+	 */
+	static MoSync Instance;
+	
 	MoSyncView mMoSyncView;
 	MoSyncThread mMoSyncThread;
 	Intent mMoSyncServiceIntent;
@@ -44,6 +52,9 @@ public class MoSync extends Activity {
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+	
+		Instance = this;
+		
 		super.onCreate(savedInstanceState);
 		Log.i("MoSync", "onCreate");
 		
@@ -79,6 +90,16 @@ public class MoSync extends Activity {
 			super.onDestroy();
 			this.finish();
 		}
+	}
+	
+	public static MoSync getInstance()
+	{
+		return Instance;
+	}
+	
+	public MoSyncView getMoSyncView()
+	{
+		return mMoSyncView;
 	}
 	
     @Override

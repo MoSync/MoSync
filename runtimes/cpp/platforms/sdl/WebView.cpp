@@ -298,13 +298,13 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
 
     // Create event.
     MAEvent theEvent;
-    theEvent.type = EVENT_TYPE_WEBVIEW_SERVICE_REQUEST;
-	if (strlen(url) >= sizeof(theEvent.serviceRequest))
+    theEvent.type = EVENT_TYPE_WEBVIEW_REQUEST;
+	if (strlen(url) >= sizeof(theEvent.request))
 	{
 		// Url is to long to fit in event data field.
 		return S_FALSE;
 	}
-    strcpy(theEvent.serviceRequest, url);
+    strcpy(theEvent.request, url);
 
 	// We are done with the string.
 	free(url);
@@ -400,6 +400,11 @@ int webViewOpen(int left, int top, int width, int height)
 
     ShowWindow(gViewWindow, SW_SHOW);
     UpdateWindow(gViewWindow);
+
+	// Post created event to MoSync.
+    MAEvent theEvent;
+    theEvent.type = EVENT_TYPE_WEBVIEW_CREATED;
+    MoSyncPostEvent(theEvent);
 
 	return WEBVIEW_OK;
 

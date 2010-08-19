@@ -43,6 +43,9 @@ import android.view.inputmethod.InputMethodManager;
 
 #include "generated\MAAPI_consts.h"
 
+/**
+ * This is a SurfaceView where MoSync graphics/MAUI is rendered.
+ */
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
 	public SurfaceHolder mSurfaceHolder;
@@ -113,24 +116,23 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		setFocusableInTouchMode(true);
 	}
 
-	public void  onSizeChanged  (int w, int h, int oldw, int oldh)
+	public void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
 		Log.i("MoSync", "onSizeChanged w:" + w + " h:" + h + " oldw:" + oldw + " oldh:" + oldh);
 	}
 	
-	
-	/*
-	* This function is called directly after that a change which affects the structure of the surface has changed
-	*/
+	/**
+	 * This function is called directly after that a change which affects the structure of the surface has changed
+	 */
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
 	{
 		Log.i("MoSyncView", "surfaceChanged");
 		mMoSyncThread.updateSurfaceSize(width, height);
 	}
 
-	/*
-	* Function which is called directly after the surface has been created
-	*/
+	/**
+	 * Function which is called directly after the surface has been created
+	 */
 	public void surfaceCreated(SurfaceHolder holder)
 	{
 		Log.i("MoSyncView", "surfaceCreated");
@@ -144,9 +146,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		//mMoSyncThread.setMoSyncView(this);
 	}
 	
-	/*
-	* Function that is called directly before the surface is destroyed  
-	*/
+	/**
+	 * Function that is called directly before the surface is destroyed  
+	 */
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
 		Log.i("MoSyncView", "surfaceDestroyed");
@@ -215,7 +217,19 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 */	
 
-
+	/**
+	 * Post an event to the MoSync event queue.
+	 * The event data is organised as an array of ints.
+	 * The first element is the id of the event.
+	 */
+	public void postEvent(int[] event)
+	{
+		Log.i("MoSyncView", "postEvent");
+		
+		mMoSyncThread.nativePostEvent(event);
+		mMoSyncThread.interrupt();
+	}
+	
 //	synchronized public final void postEvent(int[] event)
 //	{	
 //		Log.i("MoSyncView","postEvent  -- -  should never come here...\n");

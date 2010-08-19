@@ -181,7 +181,41 @@ namespace Base
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewOpen", "()I");
 		if (methodID == 0) return 0;
 		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
 		
+		return retval;
+	}
+	
+	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewClose", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
+	
+	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrHTML = jNIEnv->NewStringUTF(html);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewSetHTML", "(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID, jstrHTML);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
+	
+	int _maWebViewEvaluateScript(const char* script, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrScript = jNIEnv->NewStringUTF(script);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewEvaluateScript", "(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID, jstrScript);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return retval;

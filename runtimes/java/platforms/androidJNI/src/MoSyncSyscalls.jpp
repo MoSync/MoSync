@@ -835,48 +835,61 @@ int maShowVirtualKeyboard()
 
 int maWebViewOpen()
 {
-	Log.i("MoSync", "maWebViewOpen1 - launching intent");
+	Log.i("MoSync", "maWebViewOpen - launching intent");
 	
-	final Activity activity = (Activity) mContext;
-		
-	activity.runOnUiThread(new Runnable() 
+	//final Activity activity = (Activity) mContext;
+	((Activity) mMoSyncView.getContext()).runOnUiThread(new Runnable() 
 	{
 		public void run() 
 		{
 			try 
-			{	
-				Log.i("MoSync", "maWebViewOpen3.1 hej6");
-				
+			{		
 				Intent myIntent = new Intent(mMoSyncView.getContext(), WebViewActivity.class);
 				mMoSyncView.getContext().startActivity(myIntent);
-				
-				Log.i("MoSync", "maWebViewOpen3.2");
-				
-				//Intent intent = new Intent();
-				//intent.setClassName(activity, "com.mosync.java.android.WebViewActivity");
-				//activity.startActivity(intent);
 			}
 			catch (Throwable e)
 			{
-				Log.i("MoSync", "maWebViewOpen3 - error");
+				Log.e("MoSync", "maWebViewOpen - error");
 				e.printStackTrace();
 			}
 		}
 	});
-
-	Log.i("MoSync", "maWebViewOpen2");
+	
+	// TODO: Wait here for the WebView to be created? Better to post events.
+	// But the post event mechanism should queue events until the WebView is created.
 	
 	return 1;
 }
 
-/*
-// This is a test that pops up a Toast.
+int maWebViewClose()
+{
+	Log.i("MoSync", "maWebViewClose");
+	// TODO: How to refer to the activity? How to close an activity?
+	WebViewActivity.getInstance().finish();
+	return 1;
+}
+
+int maWebViewSetHTML(String html)
+{
+	Log.i("MoSync", "maWebViewSetHTML");
+	WebViewActivity.getInstance().setHTML(html);
+	return 1;
+}
+
+int maWebViewEvaluateScript(String script)
+{
+	Log.i("MoSync", "maWebViewEvaluateScript");
+	WebViewActivity.getInstance().evaluateScript(script);
+	return 1;
+}
+
+#ifdef COMMENT_OUT
+// This is a test method that pops up a Toast.
 int maWebViewOpen()
 {
 	Log.i("MoSync", "maWebViewOpen1");
 
 	final Activity activity = (Activity) mContext;
-	
 	activity.runOnUiThread(new Runnable() 
 	{
 		public void run() 
@@ -901,7 +914,7 @@ int maWebViewOpen()
 	
 	return 1;
 }
-*/
+#endif
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 

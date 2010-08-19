@@ -1,41 +1,164 @@
+/* Copyright (C) 2010 MoSync AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 package com.mosync.java.android;
 
-//#include "generated\IX_WEBVIEW_CONSTS.h"
+#include "generated\IX_WEBVIEW_CONSTS.h"
 //#include "config_platform.h"
 //#include "helpers.h"
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.os.Handler;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.Window;
+import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+/**
+ * Activity that contains a WebView instance.
+ */
 public class WebViewActivity extends Activity 
 {
 	//public static Handler mHandler;
 
+	/**
+	 * The one and only instance of this activity.
+	 * This is truly crappy, but will do for now.
+	 */
+	static WebViewActivity Instance;
+	
+	/** 
+	 * The WebView instance of this Activity. 
+	 */
+	WebView webview;
+	
+	/**
+	 * Handler used to run code on the UI thread.
+	 */
+	Handler handler;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
 		Log.i("MoSync", "WebViewActivity.onCreate");
 		
+		handler = new Handler();
+		Instance = this;
+		
 		super.onCreate(savedInstanceState);
-		Button button = new Button(this);
-		button.setText("Hello World!");
-		setContentView(button);
+		
+		webview = new WebView(this);
+		webview.getSettings().setJavaScriptEnabled(true);
+		//webview.addJavascriptInterface(this, "activity");
+		
+		// Create WebViewClient object to handle WebView events.
+		final WebViewActivity activity = this;
+		webview.setWebViewClient(new WebViewClient() 
+		{
+			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) 
+			{
+				Toast.makeText(activity, "WebView Error: " + description, Toast.LENGTH_SHORT).show();
+			}
+			
+			public boolean shouldOverrideUrlLoading(WebView view, String url)
+			{
+				String mosyncProtocol = "mosync://";
+				
+				Log.i("MoSync", "WebViewActivity..WebViewClient.shouldOverrideUrlLoading");
+				if (url.startsWith(mosyncProtocol))
+				{
+					Log.i("MoSync", "Handling mosync:// url");
+					
+					// Post message to MoSync.
+					// TODO: Ask Anders about best method for this.
+					
+					// Find length of request. The max number of characters is 255.
+					int mosyncProtocolLength = mosyncProtocol.length();
+					int requestLength = Math.min(255, url.length() - mosyncProtocolLength);
+					
+					// Allocate event array.
+					int[] event = new int[2 + requestLength];
+					
+					// Set event type.
+					event[0] = EVENT_TYPE_WEBVIEW_REQUEST;
+					
+					// Set length of data (number of characters).
+					event[1] = requestLength;
+					
+					// Copy characters to event array.
+					for (int i = 0; i < requestLength; ++i)
+					{
+						event[2 + i] = (int) url.charAt(mosyncProtocolLength + i);
+					}
+					
+					// Post event to MoSync event system.
+					MoSync.getInstance().getMoSyncView().postEvent(event);
+					
+					// Abort further processing of this url by the WebView by returning true.
+					return true;
+				}
+				else
+				{
+					Log.i("MoSync", "Standard url handling");
+					
+					// Do normal url processing.
+					return false;
+				}
+			}
+		});
+		
+		String html = "<html><body>New WebView</body></html>";
+		//setHTML(html);
+		webview.loadData(html, "text/html", "utf-8");
+		
+		setContentView(webview);
 
-		/*
+		// Post created message to MoSync.
 		int[] event = new int[3];
-		event[0] = 19;
-		event[1] = myId;
-		event[2] = 0;
-		MoSync.mMosyncView.postEvent(event);
-		*/
+		event[0] = EVENT_TYPE_WEBVIEW_CREATED;
+		MoSync.getInstance().getMoSyncView().postEvent(event);
+	}
+	
+	public static WebViewActivity getInstance()
+	{
+		return Instance;
+	}
+	
+	public int setHTML(final String html)
+	{
+		Log.i("MoSync", "WebViewActivity.setHTML");
+		handler.post(new Runnable() { 
+			public void run() { 
+				webview.loadData(html, "text/html", "utf-8"); } });
+		return 1;
+	}
+	
+	/**
+	 * Use the bookmarklet technique to run a script in the WebView.
+	 * http://en.wikipedia.org/wiki/Bookmarklet
+	 */
+	public int evaluateScript(final String script)
+	{
+		Log.i("MoSync", "WebViewActivity.evaluateScript");
+		handler.post(new Runnable() { 
+			public void run() { 
+				webview.loadUrl("javascript: " + script); } });
+		return 1;
 	}
 
 	@Override

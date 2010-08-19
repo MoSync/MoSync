@@ -18,7 +18,7 @@ char* CharStringAllocate(int size)
 	return (char*) malloc(size + 1);
 }
 
-int ServiceRequestNameIs(char* request, char* name)
+int WebViewRequestedServiceIs(char* request, char* name)
 {
 	char pattern[256];
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return 0; }
@@ -26,7 +26,7 @@ int ServiceRequestNameIs(char* request, char* name)
 	return (int) (strstr(request, pattern) == request);
 }
 
-char* ServiceRequestName(char* request)
+char* WebViewRequestedService(char* request)
 {
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return NULL; }
 
@@ -58,7 +58,7 @@ exit:
 	return name;
 }
 
-char* ServiceRequestData(const char* request)
+char* WebViewRequestData(const char* request)
 {
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 3) { return NULL; }
 

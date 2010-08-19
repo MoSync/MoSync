@@ -1097,6 +1097,18 @@ namespace Base
 		case maIOCtl_maWebViewOpen:
 			SYSLOG("maIOCtl_maWebViewOpen");
 			return _maWebViewOpen(mJNIEnv, mJThis);
+			
+		case maIOCtl_maWebViewClose:
+			SYSLOG("maIOCtl_maWebViewClose");
+			return _maWebViewClose(mJNIEnv, mJThis);
+			
+		case maIOCtl_maWebViewSetHTML:
+			SYSLOG("maIOCtl_maWebViewSetHTML");
+			return _maWebViewSetHTML(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWebViewEvaluateScript:
+			SYSLOG("maIOCtl_maWebViewEvaluateScript");
+			return _maWebViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
 		}
 		
 		return IOCTL_UNAVAILABLE;

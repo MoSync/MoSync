@@ -19,21 +19,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace Base
 {
-
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
-	
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis);
-	
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis);
-	
 	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis);
-	
 	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis);
-	
 	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
-	
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
@@ -43,4 +36,7 @@ namespace Base
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewEvaluateScript(const char* html, JNIEnv* jNIEnv, jobject jThis);
 }

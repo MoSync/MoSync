@@ -22,13 +22,20 @@
 #define HTML " \
 	<html><body> \
 	<a href=\"http://www.jqtouch.com/preview/demos/main/#home\">jQTouch Demo</a> \
-	<script>function ServiceRequest(request) { document.location = 'mosync://' + request; }</script> \
+	<script>function MoSyncRequest(request) { document.location = 'mosync://' + request; }</script> \
 	<div style=\"margin-bottom:10pt; font-size:150%%;\">Touch a color or press a keypad number key!</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"ServiceRequest('BgColor/Yellow')\">Yellow</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"ServiceRequest('BgColor/Blue')\">Blue</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"ServiceRequest('BgColor/Green')\">Green</div> \
+	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</div> \
+	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Blue')\">Blue</div> \
+	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</div> \
 	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"Message\"></div> \
-	<div style=\"margin-top:20pt; cursor: hand; font-size:150%%;\" onclick=\"ServiceRequest('ExitApp')\">Exit Application</div> \
+	<div style=\"margin-top:20pt; cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</div> \
+    </body></html>"
+
+// TODO: Fix utf8 issues!!
+
+#define HTML4 " \
+	<html><body> \
+	<div style=\"margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
     </body></html>"
 
 #define SCRIPT " \
@@ -43,22 +50,30 @@ void SetBgColor(char* color)
 	maWebViewEvaluateScript(script);
 }
 
-#ifdef COMMENT_OUT
+#ifndef COMMENT_OUT
 int MAMain()
 {
 	MAEvent e;
 
 	//maWebViewOpen();
+	//maWebViewSetHTML("<html><body>MAMain 1</body></html>");
+
+	//maPanic(1, "Hi!!");
 
 	maSetColor(0xFF0000);
 	maFillRect(0, 0, 300, 200);
 	maUpdateScreen();
 
-	//maPanic(1, "Hi!!");
+	maWebViewOpen();
+	//maWebViewSetHTML("<html><body>MAMain1</body></html>");
 
 	while (1)
 	{
-		maWait(0);
+		maSetColor(0xFF0000);
+		maFillRect(0, 0, 300, 200);
+		maUpdateScreen();
+
+		//maWait(0);
 		while (0 != maGetEvent(&e))
 		{
 			switch (e.type)
@@ -78,7 +93,9 @@ int MAMain()
 						maFillRect(0, 200, 300, 100);
 						maUpdateScreen();
 
-						maWebViewOpen();
+						//maWebViewOpen();
+						//maWebViewSetHTML("<html><body>MAMain2</body></html>");
+
 						//maPanic(1, "Hellooo!!");
 
 						maSetColor(0xFFFF00);
@@ -88,7 +105,13 @@ int MAMain()
 
 					break;
 
-				case EVENT_TYPE_WEBVIEW_SERVICE_REQUEST:
+				case EVENT_TYPE_WEBVIEW_CREATED:
+					maWebViewSetHTML(HTML4);
+					break;
+
+				case EVENT_TYPE_WEBVIEW_REQUEST:
+					//maWebViewSetHTML("<html><body>&lt;3 &lt;3 &lt;3</body></html>");
+					maWebViewEvaluateScript("document.body.innerHTML = '&lt;3 &lt;3 &lt;3 ;-)'");
 					break;
 			}
 		}
@@ -98,17 +121,15 @@ int MAMain()
 }
 #endif
 
-#ifndef COMMENT_OUT
+#ifdef COMMENT_OUT
 int MAMain()
 {
 	MAEvent e;
 
 	maWebViewOpen();
-	maWebViewSetHTML(HTML);
 
 	while (1)
 	{
-		maWait(0);
 		while (0 != maGetEvent(&e))
 		{
 			switch (e.type)
@@ -130,21 +151,25 @@ int MAMain()
 
 					break;
 
-				case EVENT_TYPE_WEBVIEW_SERVICE_REQUEST:
+				case EVENT_TYPE_WEBVIEW_CREATED:
+					maWebViewSetHTML(HTML);
+					break;
+
+				case EVENT_TYPE_WEBVIEW_REQUEST:
 					{
 						// Print service request.
-						printf("ServiceRequest: %s\n", e.serviceRequest);
-						char* name = ServiceRequestName(e.serviceRequest);
-						if (name)
+						printf("Request: %s\n", e.request);
+						char* service = WebViewRequestedService(e.request);
+						if (service)
 						{
-							printf("ServiceRequestName: %s\n", name);
-							CharStringFree(name);
+							printf("Requested Service: %s\n", service);
+							CharStringFree(service);
 						}
 
 						// Process request.
-						if (ServiceRequestNameIs(e.serviceRequest, "BgColor"))
+						if (WebViewRequestedServiceIs(e.request, "BgColor"))
 						{
-							char* color = ServiceRequestData(e.serviceRequest);
+							char* color = WebViewRequestData(e.request);
 							if (color)
 							{
 								printf("ServiceRequestData: %s\n", color);
@@ -153,7 +178,7 @@ int MAMain()
 							}
 
 						}
-						else if (ServiceRequestNameIs(e.serviceRequest, "ExitApp"))
+						else if (WebViewRequestedServiceIs(e.request, "ExitApp"))
 						{
 							maExit(0);
 						}
@@ -161,6 +186,8 @@ int MAMain()
 					break;
 			}
 		}
+
+		//maWait(0);
 	}
 
 	maWebViewClose();
