@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
 
-#if defined(LINUX) || defined(DARWIN)
+#if defined(LINUX) || defined(__IPHONE__)
 #include <sys/statvfs.h>
 #endif
 
@@ -507,6 +507,7 @@ namespace Base {
 		path = newFile.c_str();
 		len = newFile.length();
 		int ret = _mkdir(newPath.c_str());
+		// TODO: handle return value
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();
