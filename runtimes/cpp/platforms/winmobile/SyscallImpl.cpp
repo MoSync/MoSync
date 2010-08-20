@@ -412,6 +412,13 @@ namespace Base {
 		}
 	}
 
+	static void MAHandleCharEvent(uint character) 
+	{
+		MAEvent event;
+		event.type = EVENT_TYPE_CHAR;
+		event.character = character;
+		gEventFifo.put(event);
+	}
 
 	static void MAHandlePointerEvent(int x, int y, int eventType) 
 	{
@@ -568,6 +575,10 @@ DWORD GetScreenOrientation()
 			//}
 
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_PRESSED);
+			return 0;
+
+		case WM_CHAR:
+			MAHandleCharEvent(wParam);
 			return 0;
 
 		case WM_KEYUP:
