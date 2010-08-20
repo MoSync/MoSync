@@ -21,14 +21,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern int gMemSize;
 extern char* gMemBuf;
 
+/**
+ * Sets the size of the memory being cached and initializes the memory module.
+ *
+ * @param size Size of the memory.
+ */
 void setMemSize(int size);
 
-// all bits are belong to us
+/**
+ * Clears the all cached memory locations.
+ */
 void clearMemoryCacheBits();
 
-// will fill all bits between src and src+len with ones
-// i.e. you have to download memory between src+len if memory
-// isn't cached.
+/**
+ * Checks if the given memory locations are cached. After this call the 
+ * specified memory locations will be marked as cached, i.e. assuming a call
+ * to chache them will be made after this call.
+ *
+ * @param src Address of the beginning of the cached locations.
+ * @param len The range of the bytes being cached.
+ * @return True if the specified memory locations was cached, false otherwise.
+ */
 bool isMemoryCached(int src, int len);
 
 #endif /* _MEMORY_H_ */

@@ -24,6 +24,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 typedef void (*AckCallback)();
 
+/**
+ * The debugger is event-driven and responds to the following events:
+ *   eRecv - indicates that there are packets available from MoRE.
+ *   eUserInput - a GDB MI command from the GDB session.
+ *   eReadMemory - a request for MDB to read memory from MoRE.
+ *   eLocateSymbol - a request for MDB to find a symbol with the given name.
+ *   eExpressionEvaluated - indicates that the result of an expression
+ *                         evaluation is ready.
+ */
 struct DebuggerEvent {
 	enum Type { eRecv, eUserInput, eReadMemory, eLocateSymbol, eExpressionEvaluated };
 
@@ -45,13 +54,27 @@ struct DebuggerEvent {
 	};
 };
 
+/**
+ * Initializes the event system, must be called before any other function
+ * in this module is called.
+ */
 void initEventSystem();
 
-//waits until there is an event.
-//*pde must be deleted.
+/**
+ * Waits until there is an event and points *pde to it. 
+ *
+ * @param pde A pointer to a pointer that will point to the event upon return.
+ *            The user is responsible for deallocating the memory for the 
+ *            event.
+ */
 void getEvent(DebuggerEvent** pde);
 
-//takes a new DebuggerEvent. It will be deleted when Gotten.
+/**
+ * Adds the given event to the event queue.
+ *
+ * @param de The event to put in the queue. The allocated memory for de will be
+ *        deallocated.
+ */
 void putEvent(DebuggerEvent* de);
 
 #endif	//ASYNC_H
