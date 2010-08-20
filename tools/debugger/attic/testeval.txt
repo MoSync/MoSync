@@ -2,4 +2,4 @@
 -break-insert c:/MoSync/workspace/gdbtest1/main.cpp:10
 -exec-continue
 -test-wait
--data-evaluate-expression b
+-data-evaluate-expression $sp
