@@ -53,6 +53,7 @@ static HWND gMainWnd;
 static IWebView* gWebView = 0; // We use this variable to check if a WebView is open.
 static HWND gViewWindow = 0;
 static PolicyDelegate* gPolicyDelegate = 0;
+static char* gWebViewRequest = 0; // Hard coded to support one request.
 
 /**
  * Helper to convert a char* to a wide string. 
@@ -192,7 +193,7 @@ static int privateWebViewSetHTML(IWebView* webView, const char* html)
 
 	// Should we make use of the base url? (second param)
 	// It is assumed that the frame takes ownership of the string wideHTML,
-	// therefore we don't free it after the call. TODO: Should check this.
+	// therefore we don't free it after the call. TODO: We should check this.
     frame->loadHTMLString(wideHTML, 0);
     frame->Release();
 
@@ -299,12 +300,19 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
     // Create event.
     MAEvent theEvent;
     theEvent.type = EVENT_TYPE_WEBVIEW_REQUEST;
-	if (strlen(url) >= sizeof(theEvent.request))
+	// Hard coded request id. 
+	// TODO: Change to a circular buffer or something, to support multiple requests.
+	theEvent.key = 1; 
+
+	// Store request in a buffer.
+	if (gWebViewRequest) { free(gWebViewRequest); gWebViewRequest = 0; }
+	gWebViewRequest = (char*) malloc(sizeof(char) * (strlen(url) + 1));
+	if (!gWebViewRequest)
 	{
-		// Url is to long to fit in event data field.
+		// Could not allocate memory.
 		return S_FALSE;
 	}
-    strcpy(theEvent.request, url);
+    strcpy(gWebViewRequest, url);
 
 	// We are done with the string.
 	free(url);
@@ -318,7 +326,7 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
 	return S_OK;
 }
 
-int webViewOpen(int left, int top, int width, int height)
+int maWebViewOpen(int left, int top, int width, int height)
 {
 	// Return if there is already an open WebView.
 	if (gWebView) 
@@ -401,9 +409,9 @@ int webViewOpen(int left, int top, int width, int height)
     ShowWindow(gViewWindow, SW_SHOW);
     UpdateWindow(gViewWindow);
 
-	// Post created event to MoSync.
+	// Post opened event to MoSync.
     MAEvent theEvent;
-    theEvent.type = EVENT_TYPE_WEBVIEW_CREATED;
+    theEvent.type = EVENT_TYPE_WEBVIEW_OPENED;
     MoSyncPostEvent(theEvent);
 
 	return WEBVIEW_OK;
@@ -416,7 +424,7 @@ exit:
 	return WEBVIEW_ERROR;
 }
 
-int webViewClose()
+int maWebViewClose()
 {
 	// Return if there is not an open WebView.
 	if (!gWebView)
@@ -438,10 +446,19 @@ int webViewClose()
 	gViewWindow = 0;
 	gPolicyDelegate = 0;
 
+	// Free memory for request. 
+	// TODO: Move this to its own handler. We have duplicated code now.
+	if (gWebViewRequest) { free(gWebViewRequest); gWebViewRequest = 0; }
+
+	// Post closed event to MoSync.
+    MAEvent theEvent;
+    theEvent.type = EVENT_TYPE_WEBVIEW_CLOSED;
+    MoSyncPostEvent(theEvent);
+
 	return WEBVIEW_OK;
 }
 
-int webViewSetHTML(const char* html)
+int maWebViewSetHTML(const char* html)
 {
 	// Return if there is not an open WebView.
 	if (!gWebView)
@@ -454,10 +471,44 @@ int webViewSetHTML(const char* html)
 		return WEBVIEW_ERROR;
 	}
 
-	return privateWebViewSetHTML(gWebView, html);
+	int result = privateWebViewSetHTML(gWebView, html);
+
+	// Post loaded event to MoSync.
+	// TODO: Move this to IWebFrameLoadDelegate.didFinishLoadForFrame()
+    MAEvent theEvent;
+    theEvent.type = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
+    MoSyncPostEvent(theEvent);
+
+	return result;
 }
 
-int webViewEvaluateScript(const char* script)
+
+int maWebViewLoadURL(const char* url)
+{
+	// Return if there is not an open WebView.
+	if (!gWebView)
+	{
+		return WEBVIEW_NOT_OPEN;
+	}
+
+	if (0 == strlen(url))
+	{
+		return WEBVIEW_ERROR;
+	}
+
+	// Will this work?!
+	int result = privateWebViewSetHTML(gWebView, url);
+
+	// Post loaded event to MoSync.
+	// TODO: Move this to IWebFrameLoadDelegate.didFinishLoadForFrame()
+    MAEvent theEvent;
+    theEvent.type = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
+    MoSyncPostEvent(theEvent);
+
+	return result;
+}
+
+int maWebViewEvaluateScript(const char* script)
 {
 	// Return if there is not an open WebView.
 	if (!gWebView)
@@ -505,28 +556,62 @@ int webViewEvaluateScript(const char* script)
 	return WEBVIEW_OK;
 }
 
+// TODO: Use requestID to support multiple requests.
+int maWebViewGetRequestSize(int requestID)
+{
+	return strlen(gWebViewRequest) + 1;
+}
+
+// TODO: Use requestID to support multiple requests.
+int maWebViewGetRequest(int requestID, char* buf, int bufSize)
+{
+	if ((size_t)bufSize < strlen(gWebViewRequest) + 1)
+	{
+		return WEBVIEW_ERROR;
+	}
+
+	strcpy(buf, gWebViewRequest);
+
+	return strlen(gWebViewRequest) + 1;
+}
+
 // End of Windows/VisualStudio specific code
 
 #else
 
 // Start of dummy implementation
 
-int webViewOpen(int left, int top, int width, int height)
+int maWebViewOpen(int left, int top, int width, int height)
 {
 	return WEBVIEW_ERROR;
 }
 
-int webViewClose()
+int maWebViewClose()
 {
 	return WEBVIEW_ERROR;
 }
 
-int webViewSetHTML(const char* html)
+int maWebViewSetHTML(const char* html)
 {
 	return WEBVIEW_ERROR;
 }
 
-int webViewEvaluateScript(const char* script)
+int maWebViewLoadURL(const char* url)
+{
+	return WEBVIEW_ERROR;
+}
+
+int maWebViewEvaluateScript(const char* script)
+{
+	return WEBVIEW_ERROR;
+}
+
+int maWebViewGetRequestSize(int requestID)
+{
+	return WEBVIEW_ERROR;
+}
+
+int maWebViewGetRequest(int requestID, char* buf, int bufSize)
 {
 	return WEBVIEW_ERROR;
 }

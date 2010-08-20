@@ -10,37 +10,41 @@ extern "C" {
 #define MOSYNC_PROTOCOL "mosync://"
 
 /**
- * Free a char string.
- */
-void CharStringFree(char* p);
-
-/**
  * Allocate a char string.
  */
-char* CharStringAllocate(int size);
-
+void* maWebViewAllocateData(int size);
 
 /**
- * Return true (non-zero) if the name of the request
- * matches the given name.
+ * Free allocated data.
  */
-int WebViewRequestedServiceIs(char* request, char* name);
+void maWebViewFreeData(void* data);
+
+/**
+ * Return true (non-zero) if the name of the requested service
+ * matches the given name. The request has the format:
+ * mosync://Service/Data
+ */
+int maWebViewRequestIs(char* request, char* service);
 
 /**
  * Return the service part of a request that has the form:
  * mosync://Service/Data
- * Returned string must be deallocated with CharStringFree().
+ * Returned string must be deallocated with maWebViewFreeData.
  * On error, NULL is returned.
  */
-char* WebViewRequestedService(char* request);
+char* maWebViewGetRequestService(char* request);
 
 /**
  * Return the data part of a request that has the form:
  * mosync://Service/Data
- * Returned string must be deallocated with CharStringFree().
+ * Returned string must be deallocated with maWebViewFreeData.
  * On error, NULL is returned.
  */
-char* WebViewRequestData(const char* request);
+char* maWebViewGetRequestData(const char* request);
+
+// Call JS to go back and forward.
+//int maWebViewBack();
+//int maWebViewForward();
 
 #ifdef __cplusplus
 }

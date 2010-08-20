@@ -38,5 +38,8 @@ namespace Base
 	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);
 	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis);
 	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewEvaluateScript(const char* html, JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewLoadURL(const char* url, JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewEvaluateScript(const char* script, JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewGetRequestSize(int requestID, JNIEnv* jNIEnv, jobject jThis);
+	int _maWebViewGetRequest(int requestID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 }

@@ -1231,9 +1231,21 @@ interface MAAPI {
         WEBVIEW_REQUEST = 22;
 		
         /**
-		 * Event sent when the WebView is created.
+		 * Event sent when a WebView is created.
 		 */
-        WEBVIEW_CREATED = 23;
+        WEBVIEW_OPENED = 23;
+		
+        /**
+		 * Event sent when a WebView is closed.
+		 */
+        WEBVIEW_CLOSED = 24;
+		
+        /**
+		 * Event sent when a page load is complete.
+		 * Send url in the request param?
+		 */
+        WEBVIEW_PAGE_LOADED = 25;
+		
 #endif
 	}
 
@@ -1286,9 +1298,9 @@ interface MAAPI {
 
 			/**
 			* WebView request expressed as a string.
-			* TODO: Change to use the data pointer in the event struct.
+			* TODO: Change to use syscall!
 			*/
-			char request[256];
+			//char request[256];
 		}
 	}
 
@@ -2872,39 +2884,115 @@ interface MAAPI {
 			/// Success code.
 			OK = 0;
 			/// Generic error code.
-			ERROR = 1;
+			ERROR = -1;
 			/// WebView is not open.
-			NOT_OPEN = 2;
+			NOT_OPEN = -2;
 		}
 	
 		/** 
-		* Open a fullscreen WebView.
-		* There is only one WebView instance in the system.
-		* Calling it a second time does nothing.
-		* \returns A status code.
-		*/
+		 * Create and open a fullscreen WebView.
+		 * There is only one WebView instance in the system.
+		 * \returns A status code.
+		 */
 		int maWebViewOpen();
 
 		/** 
-		* Close a fullscreen WebView.
-		* Calling it a second time does nothing and returns an error code.
-		* \returns A status code.
-		*/
+		 * Close and destroy a fullscreen WebView.
+		 * \returns A status code.
+		 */
 		int maWebViewClose();
+		
+		/*
+		 * Show a fullscreen WebView.
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewShow();
+		
+		/*
+		 * Hide a fullscreen WebView.
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewHide();
+		
+		/*
+		 * Return non zero if a fullscreen WebView is open and visible.
+		 * \returns Non-zero if a WebView is visible, zero if not.
+		 */
+		// TODO: int maWebViewIsVisible();
 
 		/**
-		* Display the html content in an open WebView.
-		* The WebView must be open.
-		* \returns A status code.
-		*/
+		 * Display html content in an WebView.
+		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
+		 * when content is fully displayed.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
 		int maWebViewSetHTML(in MAString html);
+		
+		/*
+		 * Display Unicode html content in an WebView.
+		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
+		 * when content is fully displayed.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewSetHTMLW(in MAWString html);
+		
+		/**
+		 * Load a url in an WebView.
+		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
+		 * when page is fully displayed.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
+		int maWebViewLoadURL(in MAString url);
+		
+		/*
+		 * Load a Unicode url in an WebView.
+		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
+		 * when page is fully displayed.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewLoadURLW(in MAWString url);
 
 		/**
-		* Evaluate JavaScript code in the WebView.
-		* The WebView must be open.
-		* \returns A status code.
-		*/
+		 * Evaluate JavaScript code in the WebView.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
 		int maWebViewEvaluateScript(in MAString script);
+		
+		/*
+		 * Evaluate Unicode JavaScript code in the WebView.
+		 * The WebView must be open.
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewEvaluateScriptW(in MAWString script);
+		
+		/**
+		 * Get the size of the given request.
+		 * \returns The number of characters in the string.
+		 */
+		int maWebViewGetRequestSize(in int requestID);
+		
+		/**
+		 * Get the string of the given request.
+		 * The caller should use maWebViewGetRequestSize to ensure 
+		 * that the buffer is sufficienly large to hold the data.
+		 * \returns A status code.
+		 */
+		int maWebViewGetRequest(in int requestID, out MAString buf, in int bufSize);
+		
+		/*
+		 * Get the Unicode string of the given request.
+		 * The caller should use maWebViewGetRequestSize to ensure 
+		 * that the buffer is sufficienly large to hold the data.
+		 * TODO: Is bufSize the number of bytes or characters the buffer can hold?
+		 * \returns A status code.
+		 */
+		// TODO: int maWebViewGetRequestW(in int requestID, out MAWString buf, int bufSize);
+		
 #endif //IX_WEBVIEW
 
 		struct MA_CAMERA_FORMAT {

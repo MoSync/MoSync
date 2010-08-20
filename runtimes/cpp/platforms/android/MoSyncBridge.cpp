@@ -205,19 +205,8 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	}
 	else if(event.type == EVENT_TYPE_WEBVIEW_REQUEST)
 	{
-		// Request string data starts at third element of the
-		// int array. Each int element is a character code.
-		
-		// Second element is length of string data.
-		int n = intArray[1];
-		
-		// Max size of request string is number of chars in array, 
-		// minus one char required for null termination.
-		int maxChars = (sizeof(event.request) / sizeof(char)) - 1;
-		for (int i = 0; i < n && i < maxChars; ++i)
-		{
-			event.request[i] = (char) intArray[i + 2];
-		}
+		// Use the key field for the request id.
+		event.key = intArray[1];
 	}
 	
 	// release the memory used

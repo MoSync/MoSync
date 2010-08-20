@@ -2041,17 +2041,23 @@ namespace Base {
 
 		// WebView IOCtls
 		case maIOCtl_maWebViewOpen:
-            return webViewOpen(
+            return maWebViewOpen(
 				sSkin->getScreenLeft(), 
 				sSkin->getScreenTop(), 
 				sSkin->getScreenWidth(), 
 				sSkin->getScreenHeight());
 		case maIOCtl_maWebViewClose:
-            return webViewClose();
+            return maWebViewClose();
 		case maIOCtl_maWebViewSetHTML:
-            return webViewSetHTML(SYSCALL_THIS->GetValidatedStr(a));
+            return maWebViewSetHTML(SYSCALL_THIS->GetValidatedStr(a));
+		case maIOCtl_maWebViewLoadURL:
+            return maWebViewLoadURL(SYSCALL_THIS->GetValidatedStr(a));
 		case maIOCtl_maWebViewEvaluateScript:
-            return webViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a));
+            return maWebViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a));
+		case maIOCtl_maWebViewGetRequestSize:
+            return maWebViewGetRequestSize(a);
+		case maIOCtl_maWebViewGetRequest:
+			return maWebViewGetRequest(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 		
 		default:
 			LOGD("maIOCtl(%i) unimplemented.\n", function);

@@ -1106,9 +1106,27 @@ namespace Base
 			SYSLOG("maIOCtl_maWebViewSetHTML");
 			return _maWebViewSetHTML(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
 			
+		case maIOCtl_maWebViewLoadURL:
+			SYSLOG("maIOCtl_maWebViewLoadURL");
+			return _maWebViewLoadURL(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			
 		case maIOCtl_maWebViewEvaluateScript:
 			SYSLOG("maIOCtl_maWebViewEvaluateScript");
 			return _maWebViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWebViewGetRequestSize:
+			SYSLOG("maIOCtl_maWebViewGetRequestSize");
+			return _maWebViewGetRequestSize(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWebViewGetRequest:
+			SYSLOG("maIOCtl_maWebViewGetRequest");
+			return _maWebViewGetRequest(
+				a, 
+				(int)SYSCALL_THIS->GetValidatedMemRange(b, c), 
+				(int)gCore->mem_ds, 
+				c, 
+				mJNIEnv, 
+				mJThis);
 		}
 		
 		return IOCTL_UNAVAILABLE;

@@ -8,25 +8,25 @@
 extern "C" {
 #endif
 
-void CharStringFree(char* p)
+void* maWebViewAllocateData(int size)
 {
-	free(p);
+	return malloc(sizeof(char) * (size + 1));
 }
 
-char* CharStringAllocate(int size)
+void maWebViewFreeData(void* data)
 {
-	return (char*) malloc(size + 1);
+	free(data);
 }
 
-int WebViewRequestedServiceIs(char* request, char* name)
+int maWebViewRequestIs(char* request, char* service)
 {
 	char pattern[256];
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return 0; }
-	sprintf(pattern, "%s%s", MOSYNC_PROTOCOL, name);
+	sprintf(pattern, "%s%s", MOSYNC_PROTOCOL, service);
 	return (int) (strstr(request, pattern) == request);
 }
 
-char* WebViewRequestedService(char* request)
+char* maWebViewGetRequestService(char* request)
 {
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return NULL; }
 
@@ -44,7 +44,7 @@ char* WebViewRequestedService(char* request)
 		*p2 = '\0';
 	}
 
-	char* name = CharStringAllocate(strlen(p1));
+	char* name = (char*) maWebViewAllocateData(strlen(p1));
 	if (!name) { goto exit; }
 	strcpy(name, p1);
 
@@ -58,7 +58,7 @@ exit:
 	return name;
 }
 
-char* WebViewRequestData(const char* request)
+char* maWebViewGetRequestData(const char* request)
 {
 	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 3) { return NULL; }
 
@@ -70,7 +70,7 @@ char* WebViewRequestData(const char* request)
 	if (!p) { return NULL; }
 
 	++p; // Move to first char after the slash
-	char* data = CharStringAllocate(strlen(p));
+	char* data = (char*) maWebViewAllocateData(strlen(p));
 	if (!data) { return NULL; }
 
 	strcpy(data, p);

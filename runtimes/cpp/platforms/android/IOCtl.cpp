@@ -180,10 +180,10 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewOpen", "()I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return result;
 	}
 	
 	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis)
@@ -191,10 +191,10 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewClose", "()I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return result;
 	}
 	
 	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis)
@@ -203,10 +203,24 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewSetHTML", "(Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID, jstrHTML);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrHTML);
 		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrHTML);
 		
-		return retval;
+		return result;
+	}
+	
+	int _maWebViewLoadURL(const char* url, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrURL = jNIEnv->NewStringUTF(url);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewLoadURL", "(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrURL);
+		
+		return result;
 	}
 	
 	int _maWebViewEvaluateScript(const char* script, JNIEnv* jNIEnv, jobject jThis)
@@ -215,9 +229,33 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewEvaluateScript", "(Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID, jstrScript);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrScript);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrScript);
+		
+		return result;
+	}
+	
+	int _maWebViewGetRequestSize(int requestID, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewGetRequestSize", "(I)I");
+		if (methodID == 0) return 0;
+		int result = jNIEnv->CallIntMethod(jThis, methodID, requestID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return result;
+	}
+	
+	int _maWebViewGetRequest(int requestID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewGetRequest", "(III)I");
+		if (methodID == 0) return 0;
+		int rBuf = buf - memStart;
+		int result = jNIEnv->CallIntMethod(jThis, methodID, requestID, rBuf, size);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
 	}
 }

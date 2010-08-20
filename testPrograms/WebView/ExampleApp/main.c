@@ -45,7 +45,7 @@
 
 void SetBgColor(char* color)
 {
-	char* script = CharStringAllocate(strlen(SCRIPT) + strlen(color) + strlen(color) + 1);
+	char* script = (char*) maWebViewAllocateData(strlen(SCRIPT) + strlen(color) + strlen(color) + 1);
 	sprintf(script, SCRIPT, color, color);
 	maWebViewEvaluateScript(script);
 }
@@ -53,7 +53,39 @@ void SetBgColor(char* color)
 #ifndef COMMENT_OUT
 int MAMain()
 {
-	MAEvent e;
+	MAEvent event;
+
+	while (1)
+	{
+		//maWait(0);
+		while (0 != maGetEvent(&event))
+		{
+			switch (event.type)
+			{
+				case EVENT_TYPE_CLOSE:
+					return 0;
+
+				case EVENT_TYPE_POINTER_PRESSED:
+
+					if (event.point.y < 200)
+					{
+						maExit(0);
+					}
+
+					break;
+			}
+		}
+	}
+
+	return 0;
+}
+#endif
+
+
+#ifdef COMMENT_OUT
+int MAMain()
+{
+	MAEvent event;
 
 	//maWebViewOpen();
 	//maWebViewSetHTML("<html><body>MAMain 1</body></html>");
@@ -64,7 +96,7 @@ int MAMain()
 	maFillRect(0, 0, 300, 200);
 	maUpdateScreen();
 
-	maWebViewOpen();
+	//maWebViewOpen();
 	//maWebViewSetHTML("<html><body>MAMain1</body></html>");
 
 	while (1)
@@ -74,16 +106,16 @@ int MAMain()
 		maUpdateScreen();
 
 		//maWait(0);
-		while (0 != maGetEvent(&e))
+		while (0 != maGetEvent(&event))
 		{
-			switch (e.type)
+			switch (event.type)
 			{
 				case EVENT_TYPE_CLOSE:
 					return 0;
 
 				case EVENT_TYPE_POINTER_PRESSED:
 
-					if (e.point.y < 200)
+					if (event.point.y < 200)
 					{
 						maExit(0);
 					}
@@ -105,14 +137,21 @@ int MAMain()
 
 					break;
 
-				case EVENT_TYPE_WEBVIEW_CREATED:
-					maWebViewSetHTML(HTML4);
+				case EVENT_TYPE_WEBVIEW_OPENED:
+					//maWebViewSetHTML(HTML3);
 					break;
 
 				case EVENT_TYPE_WEBVIEW_REQUEST:
+				{
 					//maWebViewSetHTML("<html><body>&lt;3 &lt;3 &lt;3</body></html>");
-					maWebViewEvaluateScript("document.body.innerHTML = '&lt;3 &lt;3 &lt;3 ;-)'");
+					int size = maWebViewGetRequestSize(event.key);
+					char* request = (char*) maWebViewAllocateData(size);
+					int result = maWebViewGetRequest(event.key, request, size);
+					if (result < 1) { break; }
+					maWebViewSetHTML(request);
+					//maWebViewEvaluateScript("document.body.innerHTML = '&lt;3 &lt;3 &lt;3 ;-)'");
 					break;
+				}
 			}
 		}
 	}
@@ -124,61 +163,69 @@ int MAMain()
 #ifdef COMMENT_OUT
 int MAMain()
 {
-	MAEvent e;
+	MAEvent event;
 
 	maWebViewOpen();
 
 	while (1)
 	{
-		while (0 != maGetEvent(&e))
+		while (0 != maGetEvent(&event))
 		{
-			switch (e.type)
+			switch (event.type)
 			{
 				case EVENT_TYPE_CLOSE:
 					return 0;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (e.key == MAK_0) { maWebViewClose(); }
-					if (e.key == MAK_1) { maWebViewOpen(); maWebViewSetHTML(HTML); }
-					if (e.key == MAK_2) { SetBgColor("Gray"); }
-					if (e.key == MAK_3) { SetBgColor("White"); }
-					if (e.key == MAK_4) { SetBgColor("Pink"); }
-					if (e.key == MAK_5) { SetBgColor("Orange"); }
-					if (e.key == MAK_6) { SetBgColor("Chocolate"); }
-					if (e.key == MAK_7) { SetBgColor("ABCDEF"); }
-					if (e.key == MAK_8) { SetBgColor("DeepPink"); }
-					if (e.key == MAK_9) { SetBgColor("Gold"); }
+					if (event.key == MAK_0) { maWebViewClose(); }
+					if (event.key == MAK_1) { maWebViewOpen(); }
+					if (event.key == MAK_2) { SetBgColor("Gray"); }
+					if (event.key == MAK_3) { SetBgColor("White"); }
+					if (event.key == MAK_4) { SetBgColor("Pink"); }
+					if (event.key == MAK_5) { SetBgColor("Orange"); }
+					if (event.key == MAK_6) { SetBgColor("Chocolate"); }
+					if (event.key == MAK_7) { SetBgColor("ABCDEF"); }
+					if (event.key == MAK_8) { SetBgColor("DeepPink"); }
+					if (event.key == MAK_9) { SetBgColor("Gold"); }
+					if (event.key == MAK_BACK) { maExit(0); }
 
 					break;
 
-				case EVENT_TYPE_WEBVIEW_CREATED:
+				case EVENT_TYPE_WEBVIEW_OPENED:
 					maWebViewSetHTML(HTML);
 					break;
 
 				case EVENT_TYPE_WEBVIEW_REQUEST:
 					{
-						// Print service request.
-						printf("Request: %s\n", e.request);
-						char* service = WebViewRequestedService(e.request);
+						// Get request.
+						int size = maWebViewGetRequestSize(event.key);
+						char* request = (char*) maWebViewAllocateData(size);
+						int result = maWebViewGetRequest(event.key, request, size);
+						if (result < 1) { break; }
+
+						// Print request.
+						printf("Request: %s\n", request);
+
+						// Process request.
+						char* service = maWebViewGetRequestService(request);
 						if (service)
 						{
 							printf("Requested Service: %s\n", service);
-							CharStringFree(service);
+							maWebViewFreeData(service);
 						}
 
 						// Process request.
-						if (WebViewRequestedServiceIs(e.request, "BgColor"))
+						if (maWebViewRequestIs(request, "BgColor"))
 						{
-							char* color = WebViewRequestData(e.request);
+							char* color = maWebViewGetRequestData(request);
 							if (color)
 							{
 								printf("ServiceRequestData: %s\n", color);
 								SetBgColor(color); // This is where JS is called.
-								CharStringFree(color);
+								maWebViewFreeData(color);
 							}
-
 						}
-						else if (WebViewRequestedServiceIs(e.request, "ExitApp"))
+						else if (maWebViewRequestIs(request, "ExitApp"))
 						{
 							maExit(0);
 						}

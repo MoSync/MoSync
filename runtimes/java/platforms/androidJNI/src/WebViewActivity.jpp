@@ -52,6 +52,11 @@ public class WebViewActivity extends Activity
 	 */
 	Handler handler;
 	
+	/**
+	 * Holds the latest request.
+	 */
+	String request;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
@@ -84,30 +89,24 @@ public class WebViewActivity extends Activity
 				{
 					Log.i("MoSync", "Handling mosync:// url");
 					
-					// Post message to MoSync.
-					// TODO: Ask Anders about best method for this.
-					
-					// Find length of request. The max number of characters is 255.
-					int mosyncProtocolLength = mosyncProtocol.length();
-					int requestLength = Math.min(255, url.length() - mosyncProtocolLength);
+					// Post regest message to MoSync.
 					
 					// Allocate event array.
-					int[] event = new int[2 + requestLength];
+					int[] event = new int[3];
 					
 					// Set event type.
 					event[0] = EVENT_TYPE_WEBVIEW_REQUEST;
 					
-					// Set length of data (number of characters).
-					event[1] = requestLength;
+					// Set request id.
+					// TODO: Hardcoded for now, fix this.
+					event[1] = 1;
 					
-					// Copy characters to event array.
-					for (int i = 0; i < requestLength; ++i)
-					{
-						event[2 + i] = (int) url.charAt(mosyncProtocolLength + i);
-					}
+					// Save request.
+					// TODO: Save requests in something like a circular buffer.
+					request = url.substring(mosyncProtocol.length());
 					
 					// Post event to MoSync event system.
-					MoSync.getInstance().getMoSyncView().postEvent(event);
+					postMoSyncEvent(event);
 					
 					// Abort further processing of this url by the WebView by returning true.
 					return true;
@@ -116,7 +115,7 @@ public class WebViewActivity extends Activity
 				{
 					Log.i("MoSync", "Standard url handling");
 					
-					// Do normal url processing.
+					// Do normal url processing by returning false.
 					return false;
 				}
 			}
@@ -128,9 +127,14 @@ public class WebViewActivity extends Activity
 		
 		setContentView(webview);
 
-		// Post created message to MoSync.
+		// Post notification message to MoSync.
 		int[] event = new int[3];
-		event[0] = EVENT_TYPE_WEBVIEW_CREATED;
+		event[0] = EVENT_TYPE_WEBVIEW_OPENED;
+		postMoSyncEvent(event);
+	}
+	
+	private void postMoSyncEvent(int[] event)
+	{
 		MoSync.getInstance().getMoSyncView().postEvent(event);
 	}
 	
@@ -139,12 +143,46 @@ public class WebViewActivity extends Activity
 		return Instance;
 	}
 	
+	public int close()
+	{
+		// Close activity.
+		finish();
+		
+		// Notification event to MoSync is posted in onDestroy().
+		
+		return 1;
+	}
+	
 	public int setHTML(final String html)
 	{
 		Log.i("MoSync", "WebViewActivity.setHTML");
 		handler.post(new Runnable() { 
 			public void run() { 
-				webview.loadData(html, "text/html", "utf-8"); } });
+				webview.loadData(html, "text/html", "ISO-8859-1" //"utf-8" // TODO: Fix encoding
+				); } });
+				
+		// Post notification message to MoSync.
+		// TODO: Move to a listener where this is notified.
+		int[] event = new int[3];
+		event[0] = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
+		postMoSyncEvent(event);
+		
+		return 1;
+	}
+	
+	public int loadURL(final String url)
+	{
+		Log.i("MoSync", "WebViewActivity.loadURL");
+		handler.post(new Runnable() { 
+			public void run() { 
+				webview.loadUrl(url); } });
+				
+		// Post notification message to MoSync.
+		// TODO: Move to a listener where this is notified.
+		int[] event = new int[3];
+		event[0] = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
+		postMoSyncEvent(event);
+		
 		return 1;
 	}
 	
@@ -160,7 +198,17 @@ public class WebViewActivity extends Activity
 				webview.loadUrl("javascript: " + script); } });
 		return 1;
 	}
-
+	
+	public int getRequestSize(int requestID)
+	{
+		return request.length() + 1;
+	}
+	
+	public byte[] getRequestBytes(int requestID)
+	{
+		return request.getBytes();
+	}
+	
 	@Override
     protected void onStart() 
 	{
@@ -199,7 +247,12 @@ public class WebViewActivity extends Activity
 	@Override
     protected void onDestroy()
 	{
-		super.onDestroy();
     	Log.i("MoSync", "WebViewActivity.onDestroy");
+		super.onDestroy();
+		
+		// Post notification message to MoSync.
+		int[] event = new int[3];
+		event[0] = EVENT_TYPE_WEBVIEW_CLOSED;
+		postMoSyncEvent(event);
     }
 }
