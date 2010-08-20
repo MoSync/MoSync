@@ -40,15 +40,19 @@ static int sMaxLen;
 
 int SDLCALL remoteReadThreadFunc(void* arg) {
 	//TODO: more error management, restart support.
+	LOG("remoteReadThreadFunc start\n");
 	while(1) {
 		sRead.wait();
 		DebuggerEvent* de = new DebuggerEvent;
 		de->type = DebuggerEvent::eRecv;
-		de->result = sConn->read(sDst, sMaxLen);
+		int result = sConn->read(sDst, sMaxLen);
+		de->result = result;
+		//LOG("Remote read result: %i\n", result);
 		putEvent(de);
-		if(de->result < 0)
+		if(result < 0)
 			break;
 	}
+	LOG("remoteReadThreadFunc end\n");
 	return 0;
 }
 
