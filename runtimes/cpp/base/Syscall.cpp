@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
 
-#if defined(LINUX) || defined(__IPHONE__)
+#if defined(LINUX) || defined(__IPHONE__) || defined(DARWIN)
 #include <sys/statvfs.h>
 #endif
 
