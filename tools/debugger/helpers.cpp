@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config.h"
 #undef LOGGING_ENABLED
 #include "helpers/log.h"
+#include "stabs/stabs.h"
 
 #include "helpers.h"
 #include "commandInterface.h"

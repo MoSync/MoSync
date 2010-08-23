@@ -971,7 +971,7 @@ std::string getType(const TypeBase *tb, bool complex) {
 
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt) {
 	StringPrintFunctor spf;
-	const char *caddr = (const char*)addr;
+	//const char *caddr = (const char*)addr;
 	
 	// this isn't always true because some values has been evaluated in memory, should be a flag stating if this is the case.
 	//if(caddr<gMemBuf || caddr+tb->size()>&gMemBuf[gMemSize]) return "";

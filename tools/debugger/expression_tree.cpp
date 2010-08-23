@@ -114,10 +114,10 @@ Value TypeNode::evaluate() {
 	return Value(mTypeBase);
 }
 
-TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mToken(t), mType(IS_TOKEN) {
+TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mType(IS_TOKEN), mToken(t) {
 }
 
-TerminalNode::TerminalNode(ExpressionTree *tree, const SYM& s) : ExpressionTreeNode(tree), mSym(s), mType(IS_SYM) {
+TerminalNode::TerminalNode(ExpressionTree *tree, const SYM& s) : ExpressionTreeNode(tree), mType(IS_SYM), mSym(s) {
 }
 
 #define CAST_BUILTIN(name, id) case Builtin::e##id: v = Value(*((name*)symbol.address)); break;
