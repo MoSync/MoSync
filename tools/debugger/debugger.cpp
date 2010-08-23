@@ -281,7 +281,10 @@ int main(int argc, char** argv) {
 			executeCommand(savedLine);
 			savedLine.clear();
 		}
-		if(gTestWaiting && !StubConnection::isRunning()) {
+		if(gTestWaiting && 
+			!execIsRunning() &&
+			!StubConnection::isRunning())
+		{
 			gTestWaiting = false;
 			oprintDone();
 			oprintf(",test-wait\n");

@@ -435,7 +435,14 @@ static void Callback::dee(const Value* value, const char *err) {
 }
 
 void data_evaluate_expression(const string& args) {
-	stackEvaluateExpression(args, -1, Callback::dee);
+	vector<string> argv;
+	splitArgs(args, argv);
+	if(argv.size()!=1) {
+		error("Invalid arguments.");
+		return;
+	}
+
+	stackEvaluateExpression(argv[0], -1, Callback::dee);
 }
 
 //******************************************************************************

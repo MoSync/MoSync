@@ -46,6 +46,7 @@ namespace ExpressionParser {
 
 class ExpressionTree {
 public:
+	ExpressionTree();
 	ExpressionTree(const char *expression);
 	~ExpressionTree();
 
@@ -69,7 +70,7 @@ private:
 // err!=NULL on error, describing the error.
 typedef void (*ExpressionCallback)(const Value* value, const char *err);
 void stackEvaluateExpression(const std::string& expr, int frameAddr, ExpressionCallback cb);
-void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback cb);
+void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback cb, bool parse=true);
 std::string getType(const TypeBase* tb, bool complex);
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt);
 

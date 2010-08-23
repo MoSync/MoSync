@@ -111,4 +111,13 @@ void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2);
 
 #define GDB_PROMPT "(gdb) \n"
 
+//returns the first safe breakpoint address in the named function,
+//or <0 on failure.
+int mapFunctionBreakpoint(const char* name);
+
+//returns false if an error has occured.
+//otherwise, a valid address will be stored.
+//location will be modified during parsing.
+bool parseLocation(std::string& location, std::vector<int>& addresses);
+
 #endif // _HELPERS_H_

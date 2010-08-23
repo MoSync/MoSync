@@ -36,10 +36,22 @@ protected:
 
 class TerminalNode : public ExpressionTreeNode {
 public:
+	enum Type {
+		IS_SYM,
+		IS_TOKEN
+	};
+
 	TerminalNode(ExpressionTree *tree, const Token& token);
+	TerminalNode(ExpressionTree *tree, const SYM& sym);
 	Value evaluate();
 protected:
+	Type mType;
+
+	// what's the problem with the constructor (can't create union?)
+	//union {
 	Token mToken;
+	SYM mSym;
+	//};
 };
 
 class TypeNode : public ExpressionTreeNode {

@@ -169,17 +169,10 @@ void exec_abort(const string& args) {
 void exec_arguments(const string& args) {
 	UNIMPL;
 }
-
-void exec_finish(const string& args) {
-	UNIMPL;
-}
 void exec_return(const string& args) {
 	UNIMPL;
 }
 void exec_show_arguments(const string& args) {
-	UNIMPL;
-}
-void exec_until(const string& args) {
 	UNIMPL;
 }
 void file_exec_file(const string& args) {

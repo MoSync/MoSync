@@ -1,5 +1,8 @@
 -target-select sim
--break-insert c:/MoSync/workspace/gdbtest1/main.cpp:10
+-break-insert C:/MoSync/workspace/gdbtest1/main.cpp:8
 -exec-continue
 -test-wait
--data-evaluate-expression $sp
+-exec-until C:/MoSync/workspace/gdbtest1/main.cpp:11
+-test-wait
+-exec-finish
+-test-wait

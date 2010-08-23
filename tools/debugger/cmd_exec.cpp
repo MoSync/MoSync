@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "cmd_break.h"
 #include "globals.h"
 #include "opHandler.h"
+#include "expression.h"
 
 using namespace std;
 
@@ -81,6 +82,10 @@ static bool removeTempBreak(int address);
 static bool sourceNexti();
 static bool reportRunning();
 static bool stepStop();
+
+bool execIsRunning() {
+	return sRunning;
+}
 
 namespace Callback {
 	static void opDone();
@@ -316,11 +321,13 @@ void test_wait(const string& args) {
 		error("Too many arguments");
 		return;
 	}
+	/*
 	if(!StubConnection::isRunning()) {
 		oprintDoneLn();
 		commandComplete();
 		return;
-	}
+	}*/
+
 	gTestWaiting = true;
 }
 
@@ -392,14 +399,18 @@ static bool reportRunning() {
 	return true;
 }
 
-static bool stepStop() {
+static bool genericStop(const char *reason) {
 	ASSERT_REG;
-	oprintf("*stopped,reason=\"end-stepping-range\",frame={");
+	oprintf("*stopped,reason=\"%s\",frame={", reason);
 	oprintFrame(r.pc);
 	oprintf("\n" GDB_PROMPT);
 	fflush(stdout);
 	sRunning = false;
 	return true;
+}
+
+static bool stepStop() {
+	return genericStop("end-stepping-range");
 }
 
 //******************************************************************************
@@ -418,4 +429,125 @@ static void Callback::opRunning() {
 static void Callback::tempBreakpointHit() {
 	_ASSERT(sRunning);
 	op.done();
+}
+
+//******************************************************************************
+// until and finish
+//******************************************************************************
+
+static bool untilStop() {
+	return genericStop("location-reached");
+}
+
+void exec_until(const string& args) {
+//	UNIMPL;
+
+	vector<int> addresses;
+	if(args.size()) {
+		string loc = args;
+		if(!parseLocation(loc, addresses))
+			return;
+	} else {
+		ASSERT_REG;
+		if(!mapIp(r.pc, sStepLine, sStepFile)) {
+			exec_step_instruction(args);
+			return;
+		}
+		int ret = mapFileLine(sStepFile.c_str(), sStepLine+1, addresses);
+		if(ret<0) {
+			error("%s", getMapFileLineError(ret));
+			return;
+		}
+	}
+	
+	if(addresses.size()==0) {
+		error("No valid address found.");
+		return;
+	}
+
+	if(nextInstrIsBreak()) {
+		skipBreak();
+	}
+
+	skipCall(addresses[0]);
+	op(untilStop);
+}
+
+
+static ExpressionTree* sReturnTree;
+static void finishStopRetValueEvaluated(const Value* value, const char *err) {
+	if(err) { 
+		error("%s", err); 
+		return; 
+	}
+	oprintf(",gdb-result-var=\"$1\",return-value=\"%s\"", getValue(value->getTypeBase(), value->getDataAddress(), TypeBase::eNatural).c_str());
+	delete sReturnTree;
+	sReturnTree = NULL;
+
+	oprintf("\n" GDB_PROMPT);
+	fflush(stdout);
+	sRunning = false;
+}
+
+static bool finishStop() {
+	ASSERT_REG;
+	oprintf("*stopped,reason=\"function-finished\",frame={");
+	oprintFrame(r.pc);
+	
+	if(sReturnTree) {
+		stackEvaluateExpressionTree(sReturnTree, -1, finishStopRetValueEvaluated, false);
+	} else {
+		oprintf("\n" GDB_PROMPT);
+		fflush(stdout);
+		sRunning = false;
+	}
+
+	return true;
+}
+
+static void setExecFinish() {
+	ASSERT_REG;
+	int level = 1;
+	if(level  >= (int)gFrames.size()) {
+		error("Cannot return from function. It's the top level.");
+		return;
+	}
+	int returnAddr = gFrames[level].pc;
+
+	sReturnTree = NULL;
+	const FuncMapping* fmapping = mapFunctionEx(r.pc);
+	if(fmapping) {
+		const Function* currentFunction = stabsGetFunctionByAddress(fmapping->start);
+		if(currentFunction) {
+			if(currentFunction->type && currentFunction->type->type() == TypeBase::eFunction) {
+				const FunctionType* funcType = (const FunctionType*) currentFunction->type;
+				const TypeBase* returnType = (const TypeBase*) funcType->mReturnType;
+				if(returnType) {
+					SYM returnSym;
+					returnSym.address = &r.gpr[REG_r14];
+					returnSym.type = returnType;
+					returnSym.storageClass = eRegister;
+
+					_ASSERT(sReturnTree==NULL);
+					sReturnTree = new ExpressionTree();
+					TerminalNode *terminalNode = new TerminalNode(sReturnTree, returnSym);
+					sReturnTree->setRoot(terminalNode);
+				}
+			}
+		}
+	}
+
+	if(nextInstrIsBreak()) {
+		skipBreak();
+	}
+	skipCall(returnAddr);
+	op(finishStop);
+}
+
+void exec_finish(const string& args) {
+	if(args.size()>0) {
+		error("Invalid arguments.");
+		return;
+	}
+	loadStack(setExecFinish);
 }

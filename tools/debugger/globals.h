@@ -51,4 +51,6 @@ extern int* gMemCp;
 extern HANDLE gSimProcess;
 #endif
 
+bool execIsRunning();
+
 #endif	//GLOBALS_H

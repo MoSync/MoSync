@@ -161,3 +161,85 @@ void oprintFrame(int pc) {
 	}
 	oprintf("}");
 }
+
+
+//returns the first safe breakpoint address in the named function,
+//or <0 on failure.
+int mapFunctionBreakpoint(const char* name) {
+	int address = mapFunction(name);
+	if(address < 0)
+		return address;
+	return nextSldEntry(address);
+}
+
+bool parseLocation(string& location, vector<int>& addresses) {
+	int ret = 0;
+
+	addresses.clear();
+
+	_ASSERT(location.size() != 0);
+	if(location[0] == '*') {	//hex address
+		bool okFormat = false;
+		do {
+			if(location.size() != 11)
+				break;
+			if(location.substr(1, 2) != "0x")
+				break;
+			okFormat = true;
+			for(size_t i=3; i<location.size(); i++) {
+				if(!isxdigit(location[i])) {
+					okFormat = false;
+					break;
+				}
+			}
+		} while(0);
+		if(!okFormat) {
+			error("Invalid address format");
+			return false;
+		}
+		int address;
+		int res = sscanf(location.c_str() + 3, "%x", &address);
+		_ASSERT(res == 1);
+		addresses.push_back(address);
+	}
+	else	//file or function
+	{
+		size_t colonIndex = location.find_last_of(':');
+		if(colonIndex != string::npos) {	//filename:<linenum | function>
+			int fli = colonIndex + 1;
+			if(isdigit(location[fli])) {	//linenum, since function names may not begin with a digit.
+				for(size_t i=fli; i<location.size(); i++) {
+					if(!isdigit(location[i])) {
+						error("Invalid linenum format");
+						return false;
+					}
+				}
+				int linenum;
+				int res = sscanf(location.c_str() + fli, "%i", &linenum);
+				_ASSERT(res == 1);
+				//Then what? Use SDL table to map to address.
+				location[colonIndex] = 0;
+				ret = mapFileLine(location.c_str(), linenum, addresses);
+				if(ret<0)
+					error("%s", getMapFileLineError(ret));
+			}
+			else if(iscsym(location[fli])) {	//function name (static)
+				ret = mapFunctionBreakpoint(location.c_str() + fli);
+				addresses.push_back(ret);
+			} else {
+				error("Invalid location format");
+				return false;
+			}
+		}
+		else	//function without file (global?)
+		{
+			ret = mapFunctionBreakpoint(location.c_str());
+			addresses.push_back(ret);
+		}
+	}
+
+	if(ret < 0) {
+		return false;
+	}
+	return true;
+}

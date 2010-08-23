@@ -745,6 +745,10 @@ void ExpressionCommon::error(const char *msg) {
 ExpressionTree::ExpressionTree(const char *expression) : mRoot(NULL), mExpression(expression) {
 }
 
+ExpressionTree::ExpressionTree() : mRoot(NULL), mExpression("") {
+}
+
+
 ExpressionTree::~ExpressionTree() {
 	if(mRoot) delete mRoot;
 }
@@ -938,7 +942,7 @@ void stackEvaluateExpression(const string& args, int frameAddr, ExpressionCallba
 	loadStack(stackLoaded);
 }
 
-void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback callback) {
+void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback callback, bool parse) {
 	CHECK_STABS;
 
 	if(frameAddr >= 0) {
@@ -951,7 +955,12 @@ void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, Expression
 	sCallback = callback;
 	sExpressionTree = tree;
 
+	if(parse) {
 	loadStack(stackLoaded);
+	} else {
+		MoSyncThread thread;
+		thread.start(evaluateThread, NULL);
+	}
 }
 
 std::string getType(const TypeBase *tb, bool complex) {
