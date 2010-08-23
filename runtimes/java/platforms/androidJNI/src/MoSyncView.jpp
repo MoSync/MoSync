@@ -79,10 +79,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 
 		// register our interest in hearing about changes to our surface
 		mSurfaceHolder = getHolder();
-/*		
-		// Use a normal buffer.. if there is GPU or Hardware types available they will be used
-		mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
-*/
+
 		// Use accelerated surfaces if available
 		int mode = 0;
 		try {
@@ -141,7 +138,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mMoSyncThread.initSyscalls();
 			mMoSyncThread.start();
 		}
-		//mMoSyncThread.setMoSyncView(this);
+		else
+			mMoSyncThread.updateScreen();
 	}
 	
 	/*
@@ -201,45 +199,14 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		
 		return true;
 	}
-/*
-	synchronized public final int[] getEvent()
-	{	
-		if(mEventBuffer.isEmpty())
-		{
-			return null;
-		}
-		int[] event = (int[]) mEventBuffer.firstElement();
-		mEventBuffer.removeElementAt(0);
-		return event;
-		
-	}
-*/	
-
-
-//	synchronized public final void postEvent(int[] event)
-//	{	
-//		Log.i("MoSyncView","postEvent  -- -  should never come here...\n");
-/*		
-		mCoreThread.interrupt();
-		Log.i("MoSyncView","interrupt returned\n");
-		if(!mEventOverflow)
-		{
-			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE)
-			{
-				mEventOverflow = true;
-				mEventBuffer.removeAllElements();
-			}
-			mEventBuffer.addElement(event);
-		}
-*/		
-//	}
 
 #include "generated\MAAPI_consts.h"
 	
 	// Defines used to map Android keycodes to MoSync 	
 #define DEVICE_KEYS(m) m(0) m(1) m(2) m(3) m(4)	m(5) m(6) m(7) m(8) m(9) m(STAR) m(POUND) m(CLEAR)
 #define DEVICE_DPAD_KEYS(m) m(LEFT) m(RIGHT) m(UP) m(DOWN)
-#define DEVICE_SPECIAL(m) m(DPAD_CENTER, FIRE) m(SOFT_LEFT, SOFTLEFT) m(SOFT_RIGHT, SOFTRIGHT)
+#define DEVICE_SPECIAL(m) m(DPAD_CENTER, FIRE) m(SOFT_LEFT, SOFTLEFT) m(SOFT_RIGHT, SOFTRIGHT) m(BACK, BACK) m(MENU, MENU)
+#define DEVICE_SPECIALB(m) m(DPAD_CENTER, FIRE) m(SOFT_LEFT, SOFTLEFT) m(SOFT_RIGHT, SOFTRIGHT)
 
 	private final int convertToMoSyncKeyCode(int keyCode, KeyEvent keyEvent)
 	{
@@ -264,7 +231,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 #define CONVERT_SPECIALB(kIn, kOut) if(keyCode == KeyEvent.KEYCODE_##kIn) return MAKB_##kOut;
 		DEVICE_KEYS(CONVERT_KEYCODEB);
 		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODEB);
-		DEVICE_SPECIAL(CONVERT_SPECIALB);
+		DEVICE_SPECIALB(CONVERT_SPECIALB);
 		return 0;
 	}
 	

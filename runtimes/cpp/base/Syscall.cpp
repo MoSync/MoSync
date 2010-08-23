@@ -420,6 +420,9 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
+#ifdef _android
+		SYSCALL_THIS->destroyResource(handle);
+#endif
 		SYSCALL_THIS->resources.destroy(handle);
 	}
 

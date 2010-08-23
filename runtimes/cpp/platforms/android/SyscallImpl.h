@@ -30,5 +30,6 @@ public:
 	Syscall();	
 	
 	char* loadBinary(int resourceIndex, int size);
+	void destroyResource(int resourceIndex);
 	void postEvent(MAEvent event);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);

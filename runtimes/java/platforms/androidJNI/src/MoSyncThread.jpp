@@ -22,6 +22,7 @@ import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.BufferUnderflowException;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +43,9 @@ import android.content.res.AssetManager;
 import android.content.res.AssetFileDescriptor;
 
 import android.os.Handler;
-
+import android.os.Looper;
+import android.os.Message;
+import android.os.Bundle;
 
 import android.graphics.Canvas;
 import android.graphics.Bitmap;
@@ -56,9 +59,11 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Hashtable;
 import java.util.Locale;
-	
+import java.util.List;
+
 import android.util.Log;
 
+import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 
 import java.io.FileNotFoundException;
@@ -72,16 +77,24 @@ import android.telephony.TelephonyManager;
 
 import android.view.inputmethod.InputMethodManager;
 
+import android.media.MediaPlayer;
+
+//#define _ANDROID_BLUETOOTH
+
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
-
 #endif
+
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
+import android.location.LocationProvider;
 
 #include "helpers.h"
 
 public class MoSyncThread extends Thread
 {
-	private Context mContext;
+	private MoSync mContext;
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
 	private boolean hasDied;
@@ -93,7 +106,7 @@ public class MoSyncThread extends Thread
 	
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{	
-		mContext = context;
+		mContext = (MoSync)context;
 		mHandler = handler;
 		hasDied = false;
 	
@@ -290,17 +303,17 @@ private static final int CHUNK_READ_SIZE = 1024;
 		
 		return byteBuffer;  
 	}  
-/*
-	public FileDescriptor getResourceFileDescriptor()
-	{
-	
-	}
-*/	
+
 	public void stopNow()
 	{
 		Log.i("MoSync Thread","stopNow");
 	}
-	
+
+	public void updateScreen()
+	{
+		maUpdateScreen();
+	}
+
 	@Override public void run()
 	{
 		Log.i("MoSync Thread", "run");

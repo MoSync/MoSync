@@ -102,12 +102,15 @@ namespace Base
 	
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery");
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		
 		jNIEnv->DeleteLocalRef(cls);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery leaving!");
 		
 		return (int)ret;
 	}
@@ -130,6 +133,30 @@ namespace Base
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis)
 	{
 		return -1;
+	}
+	
+	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStart", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
+	
+	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStop", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 	
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
@@ -158,6 +185,20 @@ namespace Base
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrURL);
+		
+		return (int)ret;
+	}
+	
+	int _maWriteLog(const char* str, int b, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrLOG = jNIEnv->NewStringUTF(str);
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWriteLog", "(Ljava/lang/String;I)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrLOG);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrLOG);
 		
 		return (int)ret;
 	}

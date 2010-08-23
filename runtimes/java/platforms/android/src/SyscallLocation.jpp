@@ -20,27 +20,42 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 public final int maLocationStart() throws Exception {
 /*
 	if(mLocationEventThread != null) return 1;
-
-	if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) return -1;
-
 	mLocationEventThread  = new LocationEventThread();
 	mLocationEventThread.start();
-	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationEventThread);
-	return 1;
 */
-	return -1;
+
+/*
+	mLocationManager = (LocationManager) mCore.mContext.getSystemService(Context.LOCATION_SERVICE); 
+	if(mLocationManager == null) return -1;
+	
+	List<String> provider = mLocationManager.getProviders(true);
+	Log.i("maLocationStart", "providers:" + provider.toString());
+
+	Log.i("maLocationStart","run 2");
+	if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) { Log.i("LocationEventThread", "No GPS provider enabled"); return -1;}
+
+	Log.i("maLocationStart","run 3");
+	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, (MoSync)(mMoSyncView.getContext()));
+
+	Log.i("maLocationStart","run 4");	
+*/	
+	Log.i("maLocationStart","run 1");
+	if(((MoSync)(mMoSyncView.getContext())).startLocation() == false) return -1;
+	Log.i("maLocationStart","run 2");
+	return 1;
 }
+
 public final int maLocationStop() {
 /*
 	if(mLocationEventThread == null) return 1;
-	
-	mLocationManager.removeUpdates(mLocationEventThread);
-	
+*/	
+//	mLocationManager.removeUpdates((MoSync)(mMoSyncView.getContext()));
+	((MoSync)(mMoSyncView.getContext())).stopLocation();
+/*	
 	mLocationEventThread.stop();
 	mLocationEventThread = null;
+*/	
 	return 1;
-*/
-	return -1;
 }
 
 synchronized final int maGetLocation(Address a) throws InterruptedException {
@@ -52,17 +67,57 @@ synchronized final int maGetLocation(Address a) throws InterruptedException {
 class LocationEventThread extends Thread implements LocationListener {
 
 	Handler mHandler;
+//	LocationManager mLocationManager;
 
 	public LocationEventThread()
 	{
 		Log.i("LocationEventThread","constructor");
-		Looper.prepare();
-		Log.i("LocationEventThread","prepared!");
+		
 	}
 
+	public void kill()
+	{
+//		mLocationManager.removeUpdates(this);
+//		Looper.quit();
+	}
+	
 	public void run() {
 		Log.i("LocationEventThread","run");
 		
+		mLocationManager = (LocationManager) mCore.mContext.getSystemService(Context.LOCATION_SERVICE); 
+		if(mLocationManager == null) return;
+		
+		List<String> provider = mLocationManager.getProviders(true);
+		Log.i("loc thread", "providers:" + provider.toString());
+	
+		Log.i("LocationEventThread","run 2");
+		if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) { Log.i("LocationEventThread", "No GPS provider enabled");return;}
+
+		Log.i("LocationEventThread","run 3");
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+		
+		Log.i("LocationEventThread", "prepare looper");
+		try
+		{
+			Looper.prepare();
+		} catch(Exception e)
+		{
+			Log.e("loc thread", "e:" + e.toString());
+		}
+
+		Log.i("LocationEventThread","Create new handler");
+		mHandler = new Handler()
+		{
+			public void handleMessage(Message msg)
+			{
+				Log.i("loc thread handler", "msg:" + msg.toString());
+			}
+		};
+
+//		Log.i("LocationEventThread", "loop looper");
+		Looper.loop();
+		
+		Log.i("LocationEventThread", "end thread");
 	}
 
 	public void onLocationChanged(Location location) {
@@ -71,11 +126,11 @@ class LocationEventThread extends Thread implements LocationListener {
 		EI_TYPE = EVENT_TYPE_LOCATION;
 		EI_STATE = MA_LOC_QUALIFIED;
 		
-		writeDouble(event, 2, location.getLatitude());
-		writeDouble(event, 4, location.getLongitude());
-		writeDouble(event, 6, location.getAccuracy());
-		writeDouble(event, 8, location.getAccuracy());
-		mMoSyncView.postEvent(event);
+//		writeDouble(event, 2, location.getLatitude());
+//		writeDouble(event, 4, location.getLongitude());
+//		writeDouble(event, 6, location.getAccuracy());
+//		writeDouble(event, 8, location.getAccuracy());
+//		mMoSyncView.postEvent(event);
 	}
 		
 	public void onProviderDisabled(String provider) {
@@ -85,10 +140,10 @@ class LocationEventThread extends Thread implements LocationListener {
 			int[] event = new int[2];
 			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
 			EI_STATE = MA_LPS_OUT_OF_SERVICE;
-			mMoSyncView.postEvent(event);
+//			mMoSyncView.postEvent(event);
 		}
-	}
 
+	}
 	public void onProviderEnabled(String provider) {
 		Log.i("LocationEventThread","onProviderEnabled");
 		if(provider == LocationManager.GPS_PROVIDER)
@@ -96,7 +151,7 @@ class LocationEventThread extends Thread implements LocationListener {
 			int[] event = new int[2];
 			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
 			EI_STATE = MA_LPS_AVAILABLE;
-			mMoSyncView.postEvent(event);
+//			mMoSyncView.postEvent(event);
 		}
 	}
 
@@ -113,7 +168,7 @@ class LocationEventThread extends Thread implements LocationListener {
 				case LocationProvider.AVAILABLE: EI_STATE = MA_LPS_AVAILABLE; break;
 				default: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE;
 			}
-			mMoSyncView.postEvent(event);
+//			mMoSyncView.postEvent(event);
 		}
 	}
 	

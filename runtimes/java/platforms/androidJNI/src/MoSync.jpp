@@ -32,7 +32,12 @@ import android.os.Handler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
-public class MoSync extends Activity {
+import android.content.res.Configuration;
+
+import android.content.Context;
+
+public class MoSync extends Activity
+{
 
 	MoSyncView mMoSyncView;
 	MoSyncThread mMoSyncThread;
@@ -68,6 +73,7 @@ public class MoSync extends Activity {
 		
 		setContentView(mMoSyncView);
 		mMoSyncThread.setMoSyncView(mMoSyncView);
+		
     }
 	
 	private void createMoSyncView()
@@ -81,6 +87,14 @@ public class MoSync extends Activity {
 			this.finish();
 		}
 	}
+
+	@Override
+	public void onConfigurationChanged(Configuration config)
+	{
+		super.onConfigurationChanged(config);
+
+		setContentView(mMoSyncView);
+	}
 	
     @Override
     protected void onStop()
@@ -90,7 +104,7 @@ public class MoSync extends Activity {
 		
 		mThreadHasDied = mMoSyncThread.isDead();
 		
-		// The view is destroyed, inform the service about this
+		// The view is destroyed, inform the thread about this
 		mMoSyncThread.setMoSyncView(null);
 	}
 
@@ -102,7 +116,7 @@ public class MoSync extends Activity {
 		
 		if(mThreadHasDied) this.finish();
 		
-		// create a new view and inform the service about this
+		// create a new view and inform the thread about this
 		createMoSyncView();
 	}
 	

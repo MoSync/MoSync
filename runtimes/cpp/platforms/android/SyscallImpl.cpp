@@ -44,6 +44,9 @@ namespace Base
 	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
 	MAHandle drawTargetHandle = HANDLE_SCREEN;
 	
+	/**
+	* Syscall constructor	
+	*/
 	Syscall::Syscall()
 	{
 		gSyscall = this;
@@ -51,16 +54,30 @@ namespace Base
 //		mGotLockedEvent = false;
 	}
 
+	/**
+	* Returns the JNI Environment variable.
+	* 
+	* @ return The JNI Environment
+	*/
 	JNIEnv* Syscall::getJNIEnvironment()
 	{
 		return mJNIEnv;
 	}
 	
+	/**
+	* Returns a reference to the JNI Object which initiated the execution of this native code
+	*
+	* @return A reference the JNI  Object
+	*/
 	jobject Syscall::getJNIThis()
 	{
 		return mJThis;
 	}
 	
+	/**
+	* 
+	* 
+	*/
 	bool Syscall::loadImage(int resourceIndex, int pos, int length)
 	{
 		SYSLOG("loadImage");
@@ -90,8 +107,8 @@ namespace Base
 		if (methodID == 0) return NULL;
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
 		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
-		mJNIEnv->DeleteLocalRef(cls);
-		
+
+		mJNIEnv->DeleteLocalRef(cls);		
 		return buffer;
 	}
 
@@ -103,9 +120,22 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadUBinary", "(III)V");
 		if (methodID == 0) return;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex, offset, size);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 	
+	void Syscall::destroyResource(int resourceIndex)
+	{
+		SYSLOG("destroyResource");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "destroyResource", "(I)V");
+		if (methodID == 0) return;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
 	void Syscall::platformDestruct()
 	{
 	
@@ -128,7 +158,7 @@ namespace Base
 	
 	SYSCALL(int,  maSetColor(int rgb))
 	{
-		//SYSLOG("maSetColor");
+		SYSLOG("maSetColor");
 	
 		if(rgb<=0xffffff) rgb += 0xff000000;
 	
@@ -138,7 +168,6 @@ namespace Base
 		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, rgb);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-	
 		return retval;
 	}
 
@@ -270,6 +299,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maDrawText", "(IILjava/lang/String;)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, left, top, jstr);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 	}
@@ -285,6 +315,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maDrawTextW", "(IILjava/lang/String;)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, left, top, jstr);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		
@@ -452,6 +483,7 @@ namespace Base
 		if (methodID == 0) return -1;
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, imgSize);
 		char* img = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		
 		if(1==alpha)
@@ -553,6 +585,7 @@ namespace Base
 		if(SYSCALL_THIS->resources.add_RT_BINARY(placeholder, ms) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
 
 		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(ob);
 		
 		return RES_OK;
 	}
@@ -579,6 +612,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnect", "(Ljava/lang/String;)I");
 		if (methodID == 0) ERROR_EXIT;
 		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, jstr);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		
@@ -686,6 +720,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpCreate", "(Ljava/lang/String;I)I");
 		if (methodID == 0) ERROR_EXIT;
 		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, jstr, method);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		
@@ -703,6 +738,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpSetRequestHeader", "(ILjava/lang/String;Ljava/lang/String;)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, jstrKey, jstrValue);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstrKey);
 		mJNIEnv->DeleteLocalRef(jstrValue);
@@ -720,6 +756,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpGetResponseHeader", "(ILjava/lang/String;JI)I");
 		if (methodID == 0) ERROR_EXIT;
 		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, jstr, (jlong)rbuffer, bufSize);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		
@@ -734,6 +771,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpFinish", "(I)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 	
@@ -752,6 +790,7 @@ namespace Base
 		return -1;
 	}
 
+	void* mGetEventData;
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));	
@@ -764,6 +803,13 @@ namespace Base
 
 		*event = gEventFifo.get();
 		
+		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) {\
+			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType));\
+			delete (dataType*)event->data;\
+			event->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
+
+		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
+		
 		return 1;
 	}
 
@@ -773,20 +819,14 @@ namespace Base
 
 		if(gEventFifo.count() != 0)
 			return;
-
-//		mIsLooked = true;
-			
+		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maWait", "(I)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, timeout);
 
-		// now we must wait so we don't end up in a deadlock
-/*		
-		while(true == mGotLookedEvent) {}
-		mGotLookedEvent = false;
-		mIsLooked = false;
-*/		
+		mJNIEnv->DeleteLocalRef(cls);
+		
 	}
 
 	SYSCALL(int,  maTime(void))
@@ -862,6 +902,7 @@ namespace Base
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPanic", "(ILjava/lang/String;)V");
 		if (methodID == 0) ERROR_EXIT;
 		mJNIEnv->CallVoidMethod(mJThis, methodID, (jint)result, jstr);
+		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		
@@ -910,7 +951,7 @@ namespace Base
 		switch(function) {
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
-			return -1;
+			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
 		
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS NOT IMPLEMENTED");
@@ -933,6 +974,7 @@ namespace Base
 			return -1;
 
 		case maIOCtl_maBtStartDeviceDiscovery:
+			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtStartDeviceDiscovery");
 			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
 			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 		
@@ -978,12 +1020,12 @@ namespace Base
 			return -1;
 */
 		case maIOCtl_maLocationStart:
-			SYSLOG("maIOCtl_maLocationStart NOT IMPLEMENTED");
-			return -1;
+			SYSLOG("maIOCtl_maLocationStart");
+			return _maLocationStart(mJNIEnv, mJThis);
 			
 		case maIOCtl_maLocationStop:
-			SYSLOG("maIOCtl_maLocationStop NOT IMPLEMENTED");
-			return -1;
+			SYSLOG("maIOCtl_maLocationStop");
+			return _maLocationStop(mJNIEnv, mJThis);
 
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen NOT IMPLEMENTED");
@@ -1101,27 +1143,19 @@ namespace Base
 
 void MoSyncExit(int errorCode)
 {
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "MOSYNC ERROR");
-	int yield = Core::GetVMYield(gCore);
-	yield = 1;
+	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
+
+	exit(errorCode);
 }
 
 void MoSyncErrorExit(int errorCode)
 {
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", "MOSYNC ERROR");
-	int yield = Core::GetVMYield(gCore);
-	yield = 1;
-/*	
-	jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
-	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "waitThread", "()V");
-	if (methodID == 0) ERROR_EXIT;
-	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID);
-	
-	Base::mJNIEnv->DeleteLocalRef(cls);
-*/	
 	char* b = (char*)malloc(200);
 	sprintf(b, "MoSync error: %i", errorCode);
-	
+
+	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
+
+
 	jstring jstr = Base::mJNIEnv->NewStringUTF(b);
 	
 	free(b);
@@ -1130,7 +1164,9 @@ void MoSyncErrorExit(int errorCode)
 	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic", "(ILjava/lang/String;)V");
 	if (methodID == 0) ERROR_EXIT;
 	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID, (jint)errorCode, jstr);
+	
 	Base::mJNIEnv->DeleteLocalRef(cls);
 	Base::mJNIEnv->DeleteLocalRef(jstr);
-	
+
+	exit(errorCode);
 }
