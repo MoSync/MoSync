@@ -46,6 +46,12 @@ char* maWebViewGetRequestData(const char* request);
 //int maWebViewBack();
 //int maWebViewForward();
 
+/**
+ * Convert url encoded string to ascii string (or wide char string).
+ */
+//TODO: char* maWebViewDecodeRequest(char* request);
+// --> Or even better, let the syscall maWebViewGetRequest do this!
+
 #ifdef __cplusplus
 }
 #endif
