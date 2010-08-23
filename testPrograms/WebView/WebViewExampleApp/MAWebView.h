@@ -7,8 +7,6 @@
 extern "C" {
 #endif
 
-#define MOSYNC_PROTOCOL "mosync://"
-
 /**
  * Allocate a char string.
  */
@@ -22,13 +20,13 @@ void maWebViewFreeData(void* data);
 /**
  * Return true (non-zero) if the name of the requested service
  * matches the given name. The request has the format:
- * mosync://Service/Data
+ * Service/Data
  */
 int maWebViewRequestIs(char* request, char* service);
 
 /**
  * Return the service part of a request that has the form:
- * mosync://Service/Data
+ * Service/Data
  * Returned string must be deallocated with maWebViewFreeData.
  * On error, NULL is returned.
  */
@@ -36,7 +34,7 @@ char* maWebViewGetRequestService(char* request);
 
 /**
  * Return the data part of a request that has the form:
- * mosync://Service/Data
+ * Service/Data
  * Returned string must be deallocated with maWebViewFreeData.
  * On error, NULL is returned.
  */

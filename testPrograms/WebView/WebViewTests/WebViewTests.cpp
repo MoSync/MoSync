@@ -114,7 +114,14 @@ void CallMoSyncService()
 
 	while (!maGetEvent(&e));
 	assert(EVENT_TYPE_WEBVIEW_REQUEST == e.type);
-	// TODO: assert(0 == strcmp(request, "mosync://Hello"));
+	int size = maWebViewGetRequestSize(e.key);
+	assert(size > 0);
+	char* request = (char*) malloc(size);
+	assert(NULL != request);
+	result = maWebViewGetRequest(e.key, request, size);
+	assert(result > 0);
+	assert(0 == strcmp(request, "Hello"));
+	free(request);
 
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
@@ -227,7 +234,7 @@ void SayThanks()
 	assert(NULL != request);
 	result = maWebViewGetRequest(e.key, request, size);
 	assert(result > 0);
-	assert(0 == strcmp(request, "mosync://Done"));
+	assert(0 == strcmp(request, "Done"));
 	free(request);
 
 	result = maWebViewClose();

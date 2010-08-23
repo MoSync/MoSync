@@ -35,7 +35,7 @@ import com.mosync.internal.android.MoSyncView;
 public class MoSync extends Activity {
 
 	/**
-	 * TODO: Replace this with a way of passing object references
+	 * TODO: Replace this static variable with a way of passing object references
 	 * between activities. Perhaps we can use an Application object:
 	 * http://developer.android.com/reference/android/app/Application.html
 	 * http://developer.android.com/guide/appendix/faq/framework.html#3

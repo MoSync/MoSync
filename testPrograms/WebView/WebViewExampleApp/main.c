@@ -18,7 +18,8 @@
 	<a href=\"#\" onclick=\"document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
     </body></html>"
 
-#define HTML4 " \
+
+#define HTML4x " \
 	<html><body> \
 	<script> \
 		function MoSyncRequest(request) { document.location = 'mosync://' + request; } \
@@ -33,12 +34,47 @@
 	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"ColorMessage\"></div> \
 	<div style=\"margin-top:20pt;\"> \
 		<input style=\"font-size:150%%;\" type='text' id='DataField' /> \
-		<input style=\"font-size:150%%;\" type=\"button\" value=\"ClickeMe!\" onclick=\"ProcessData()\"/> \
+		<input style=\"font-size:150%%;\" type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
 	<div> \
 	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"DataMessage\"></div> \
 	<div style=\"margin-top:20pt; font-size:150%%;\"><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
 	<div style=\"margin-top:20pt; font-size:150%%;\"<a cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
     </body></html>"
+
+
+#define HTML4 " \
+	<html> \
+	<head> \
+    <style type=\"text/css\"> \
+		div { font-size:1.8em; margin-top:20pt; } \
+		a { cursor: hand; } \
+		input { font-size:1.2em; } \
+	</style> \
+	</head> \
+	<body> \
+	<script> \
+		function MoSyncRequest(request) { \
+			document.location = 'mosync://' + request; } \
+		function ProcessData() { \
+			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncRequest(request); } \
+	</script> \
+	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
+	<div> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
+	</div> \
+	<div id=\"ColorMessage\"></div> \
+	<div> \
+		<input type='text' id='DataField' /> \
+		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
+	</div> \
+	<div id=\"DataMessage\"></div> \
+	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+    </body> \
+    </html>"
 
 // TODO: Fix utf8 issues!!
 
@@ -189,15 +225,18 @@ int MAMain()
 						if (result < 1) { break; }
 
 						// Print request.
-						printf("Request: %s\n", request);
+						//printf("Request: %s\n", request);
 
-						// Process request.
+						/*
 						char* service = maWebViewGetRequestService(request);
 						if (service)
 						{
-							printf("Requested Service: %s\n", service);
+							//maWebViewSetHTML("Service is something");
+							//printf("Requested Service: %s\n", service);
 							maWebViewFreeData(service);
 						}
+						//else maWebViewSetHTML("Service is null");
+						*/
 
 						// Process request.
 						if (maWebViewRequestIs(request, "BgColor"))

@@ -21,29 +21,29 @@ void maWebViewFreeData(void* data)
 int maWebViewRequestIs(char* request, char* service)
 {
 	char pattern[256];
-	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return 0; }
-	sprintf(pattern, "%s%s", MOSYNC_PROTOCOL, service);
-	return (int) (strstr(request, pattern) == request);
+	if (strlen(request) < 1) { return 0; }
+	// Service should start at beginning of request.
+	return (int) (strstr(request, service) == request);
 }
 
 char* maWebViewGetRequestService(char* request)
 {
-	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 1) { return NULL; }
-
-	char* p1 = strstr(request, MOSYNC_PROTOCOL);
-	if (!p1) { return NULL; }
-
-	// Move to start of request name.
-	p1 += strlen(MOSYNC_PROTOCOL);
+	// Must be at least one character in the request.
+	if (strlen(request) < 1) { return NULL; }
 
 	// Find start of data part.
+	char* p1 = request;
 	char* p2 = strstr(p1, "/");
 	if (p2)
 	{
 		// We have a data part, insert temporary zero termination.
+		// It goes without saying that this it is bad practice to
+		// modify the input string. At least, we reset it below,
+		// but this is not at all thread safe.
 		*p2 = '\0';
 	}
 
+	// Copy data part to buffer.
 	char* name = (char*) maWebViewAllocateData(strlen(p1));
 	if (!name) { goto exit; }
 	strcpy(name, p1);
@@ -51,7 +51,7 @@ char* maWebViewGetRequestService(char* request)
 exit:
 	if (p2)
 	{
-		// Restore slash
+		// Restore slash.
 		*p2 = '/';
 	}
 
@@ -60,19 +60,20 @@ exit:
 
 char* maWebViewGetRequestData(const char* request)
 {
-	if (strlen(request) < strlen(MOSYNC_PROTOCOL) + 3) { return NULL; }
+	// Must be at least three characters in a request
+	// that has a data part.
+	if (strlen(request) < 3) { return NULL; }
 
-	char* p = strstr(request, MOSYNC_PROTOCOL);
+	// Find first slash.
+	char* p = strstr(request, "/");
 	if (!p) { return NULL; }
 
-	p += strlen(MOSYNC_PROTOCOL);
-	p = strstr(p, "/");
-	if (!p) { return NULL; }
+	// Move to first char after the slash.
+	++p;
 
-	++p; // Move to first char after the slash
+	// Copy data to buffer.
 	char* data = (char*) maWebViewAllocateData(strlen(p));
 	if (!data) { return NULL; }
-
 	strcpy(data, p);
 
 	return data;

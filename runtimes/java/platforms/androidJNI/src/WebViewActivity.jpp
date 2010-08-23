@@ -84,10 +84,10 @@ public class WebViewActivity extends Activity
 			{
 				String mosyncProtocol = "mosync://";
 				
-				Log.i("MoSync", "WebViewActivity..WebViewClient.shouldOverrideUrlLoading");
+				Log.i("MoSync", "WebViewActivity.WebViewClient.shouldOverrideUrlLoading");
 				if (url.startsWith(mosyncProtocol))
 				{
-					Log.i("MoSync", "Handling mosync:// url");
+					Log.i("MoSync", "Processing MoSync url: " + url);
 					
 					// Post regest message to MoSync.
 					
@@ -113,7 +113,7 @@ public class WebViewActivity extends Activity
 				}
 				else
 				{
-					Log.i("MoSync", "Standard url handling");
+					Log.i("MoSync", "Processing standard url: " + url);
 					
 					// Do normal url processing by returning false.
 					return false;
@@ -122,7 +122,6 @@ public class WebViewActivity extends Activity
 		});
 		
 		String html = "<html><body>New WebView</body></html>";
-		//setHTML(html);
 		webview.loadData(html, "text/html", "utf-8");
 		
 		setContentView(webview);
@@ -158,8 +157,8 @@ public class WebViewActivity extends Activity
 		Log.i("MoSync", "WebViewActivity.setHTML");
 		handler.post(new Runnable() { 
 			public void run() { 
-				webview.loadData(html, "text/html", "ISO-8859-1" //"utf-8" // TODO: Fix encoding
-				); } });
+				webview.loadData(html, "text/html", "utf-8"); //"ISO-8859-1" "utf-8" // TODO: Fix encoding
+				} });
 				
 		// Post notification message to MoSync.
 		// TODO: Move to a listener where this is notified.

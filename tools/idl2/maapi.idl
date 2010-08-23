@@ -2980,6 +2980,7 @@ interface MAAPI {
 		 * Get the string of the given request.
 		 * The caller should use maWebViewGetRequestSize to ensure 
 		 * that the buffer is sufficienly large to hold the data.
+		 * The request does not include the "mosync://" protocol specifier.
 		 * \returns A status code.
 		 */
 		int maWebViewGetRequest(in int requestID, out MAString buf, in int bufSize);

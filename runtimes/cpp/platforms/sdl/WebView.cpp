@@ -304,15 +304,18 @@ HRESULT STDMETHODCALLTYPE PolicyDelegate::decidePolicyForNavigationAction(
 	// TODO: Change to a circular buffer or something, to support multiple requests.
 	theEvent.key = 1; 
 
-	// Store request in a buffer.
+	// Store request in a buffer, stripped of the protocol identifier.
 	if (gWebViewRequest) { free(gWebViewRequest); gWebViewRequest = 0; }
-	gWebViewRequest = (char*) malloc(sizeof(char) * (strlen(url) + 1));
+	gWebViewRequest = (char*) malloc(sizeof(char) * (strlen(url) - strlen(mosync) + 1));
 	if (!gWebViewRequest)
 	{
 		// Could not allocate memory.
 		return S_FALSE;
 	}
-    strcpy(gWebViewRequest, url);
+
+	// Copy request part of url to buffer.
+	char* startOfRequest = url + strlen(mosync);
+    strcpy(gWebViewRequest, startOfRequest);
 
 	// We are done with the string.
 	free(url);

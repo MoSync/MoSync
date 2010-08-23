@@ -864,7 +864,6 @@ int maWebViewOpen()
 int maWebViewClose()
 {
 	Log.i("MoSync", "maWebViewClose");
-	// TODO: How to refer to the activity? How to close an activity?
 	WebViewActivity.getInstance().close();
 	return 1;
 }
@@ -901,9 +900,9 @@ int maWebViewGetRequest(int requestID, int buf, int bufSize)
 	Log.i("MoSync", "maWebViewGetRequest");
 	
 	int size = WebViewActivity.getInstance().getRequestSize(requestID);
-	
 	if (bufSize < size)
 	{
+		Log.i("MoSync", "maWebViewGetRequest - error");
 		return WEBVIEW_ERROR;
 	}
 		
@@ -919,7 +918,6 @@ int maWebViewGetRequest(int requestID, int buf, int bufSize)
 	
 	return size;
 }
-
 
 #ifdef COMMENT_OUT
 // This is a test method that pops up a Toast.
