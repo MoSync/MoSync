@@ -18,25 +18,21 @@
 	<a href=\"#\" onclick=\"document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
     </body></html>"
 
-// This exact thing can be done in pure HTML/JS, but in this demo the JS call is made via MoSync.
-#define HTML " \
+#define HTML4 " \
 	<html><body> \
-	<a href=\"http://www.jqtouch.com/preview/demos/main/#home\">jQTouch Demo</a> \
 	<script>function MoSyncRequest(request) { document.location = 'mosync://' + request; }</script> \
 	<div style=\"margin-bottom:10pt; font-size:150%%;\">Touch a color or press a keypad number key!</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Blue')\">Blue</div> \
-	<div style=\"cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</div> \
+	<div> \
+	<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
+	<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
+	<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
+	</div> \
 	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"Message\"></div> \
-	<div style=\"margin-top:20pt; cursor: hand; font-size:150%%;\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</div> \
+	<div style=\"margin-top:20pt; font-size:150%%;\"><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
+	<div style=\"margin-top:20pt; ><a cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
     </body></html>"
 
 // TODO: Fix utf8 issues!!
-
-#define HTML4 " \
-	<html><body> \
-	<div style=\"margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
-    </body></html>"
 
 #define SCRIPT " \
 	document.getElementById(\"Message\").innerHTML = '%s is a beautiful color!'; \
@@ -49,38 +45,6 @@ void SetBgColor(char* color)
 	sprintf(script, SCRIPT, color, color);
 	maWebViewEvaluateScript(script);
 }
-
-#ifndef COMMENT_OUT
-int MAMain()
-{
-	MAEvent event;
-
-	while (1)
-	{
-		//maWait(0);
-		while (0 != maGetEvent(&event))
-		{
-			switch (event.type)
-			{
-				case EVENT_TYPE_CLOSE:
-					return 0;
-
-				case EVENT_TYPE_POINTER_PRESSED:
-
-					if (event.point.y < 200)
-					{
-						maExit(0);
-					}
-
-					break;
-			}
-		}
-	}
-
-	return 0;
-}
-#endif
-
 
 #ifdef COMMENT_OUT
 int MAMain()
@@ -160,7 +124,7 @@ int MAMain()
 }
 #endif
 
-#ifdef COMMENT_OUT
+#ifndef COMMENT_OUT
 int MAMain()
 {
 	MAEvent event;
@@ -192,7 +156,7 @@ int MAMain()
 					break;
 
 				case EVENT_TYPE_WEBVIEW_OPENED:
-					maWebViewSetHTML(HTML);
+					maWebViewSetHTML(HTML4);
 					break;
 
 				case EVENT_TYPE_WEBVIEW_REQUEST:

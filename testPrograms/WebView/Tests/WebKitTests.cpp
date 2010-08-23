@@ -1,4 +1,5 @@
 #include <ma.h>
+#include <maheap.h>
 #include <testify/testify.hpp>
 #include <IX_WEBVIEW.h>
 
@@ -6,7 +7,7 @@ using namespace Testify;
 
 #define assert TESTIFY_ASSERT
 
-// Seems to be needed, when though not called?
+// Seems to be needed, even though not called?
 int MAMain()
 {
 	return 0;
@@ -16,61 +17,109 @@ int MAMain()
 
 void OpenAndCloseWebView()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void OpenAndCloseWebViewTwice()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void SetHTML()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewSetHTML("<html><body>Hello World!</body></html>");
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_PAGE_LOADED == e.type);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void EvaluateScript()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewEvaluateScript("foo = 42;");
 	assert(WEBVIEW_OK == result);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void CallMoSyncService()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewSetHTML("<html><body>Please Wait...<script>setTimeout(\"document.location = 'mosync://Hello'\", 1000);</script></body></html>");
 	assert(WEBVIEW_OK == result);
-	MAEvent e;
 	while (!maGetEvent(&e));
-	TESTIFY_ASSERT(EVENT_TYPE_WEBVIEW_SERVICE_REQUEST == e.type);
-	assert(0 == strcmp(e.serviceRequest, "mosync://Hello"));
+	assert(EVENT_TYPE_WEBVIEW_PAGE_LOADED == e.type);
+
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_REQUEST == e.type);
+	// TODO: assert(0 == strcmp(request, "mosync://Hello"));
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 // ****** Cloudy Tests ****** //
@@ -91,13 +140,21 @@ void SetHTMLWithNoOpenWebViewShouldFail()
 
 void SetHTMLWithNULLValueShouldFail()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewSetHTML(NULL);
 	assert(WEBVIEW_ERROR == result);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void EvaluateScriptWithNoOpenWebViewShouldFail()
@@ -109,41 +166,74 @@ void EvaluateScriptWithNoOpenWebViewShouldFail()
 
 void EvaluateScriptWithErrorsShouldFail()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewEvaluateScript("foo = fortytwo;");
 	assert(WEBVIEW_ERROR == result);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 void EvaluateScriptWithNULLValueShouldFail()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
 	result = maWebViewEvaluateScript(NULL);
 	assert(WEBVIEW_ERROR == result);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 // ****** Funny Tests ****** //
 
 void SayThanks()
 {
+	MAEvent e;
 	int result;
+
 	result = maWebViewOpen();
 	assert(WEBVIEW_OK == result);
-	result = maWebViewSetHTML("<html><body>All tests passed! Have a wonderful day (or night)!<script>setTimeout(\"document.location = 'mosync://Done'\", 2000);</script></body></html>");
-	assert(WEBVIEW_OK == result);
-	MAEvent e;
 	while (!maGetEvent(&e));
-	TESTIFY_ASSERT(EVENT_TYPE_WEBVIEW_SERVICE_REQUEST == e.type);
-	assert(0 == strcmp(e.serviceRequest, "mosync://Done"));
+	assert(EVENT_TYPE_WEBVIEW_OPENED == e.type);
+
+	result = maWebViewSetHTML("<html><body>Have a wonderful day!<script>setTimeout(\"document.location = 'mosync://Done'\", 2000);</script></body></html>");
+	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_PAGE_LOADED == e.type);
+
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_REQUEST == e.type);
+	int size = maWebViewGetRequestSize(e.key);
+	assert(size > 0);
+	char* request = (char*) malloc(size);
+	assert(NULL != request);
+	result = maWebViewGetRequest(e.key, request, size);
+	assert(result > 0);
+	assert(0 == strcmp(request, "mosync://Done"));
+	free(request);
+
 	result = maWebViewClose();
 	assert(WEBVIEW_OK == result);
+	while (!maGetEvent(&e));
+	assert(EVENT_TYPE_WEBVIEW_CLOSED == e.type);
 }
 
 Test *TestSuiteArray[] =
