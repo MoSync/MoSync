@@ -185,6 +185,7 @@ namespace Core {
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
 	int GetValidatedStackValue(VMCore* core, int offset);
 	const char* GetValidatedStr(const VMCore* core, int address);
+	const wchar* GetValidatedWStr(const VMCore* core, int address);
 	void* GetCustomEventPointer(VMCore* core);
 	
 }

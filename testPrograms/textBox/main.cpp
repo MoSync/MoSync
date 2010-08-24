@@ -9,9 +9,10 @@ public:
 	MyMoblet() {
 		printf("Hello World!\n");
 #if 1
-		wchar_t buf[1024];
-		int res = maTextBox(L"Title", buf, 1024, MA_TB_TYPE_ANY);
+		wchar_t buf[32] = L"buf";
+		int res = maTextBox(L"Title", buf, 32, MA_TB_TYPE_ANY);
 		printf("maTextBox: %i\n", res);
+		wprintf(L"text: '%S'\n", buf);
 #endif
 	}
 

@@ -1013,7 +1013,6 @@ void WRITE_REG(int reg, int value) {
 		return mem_ds[address];
 	}
 
-
 	const char* GetValidatedStr(int a) const {
 		unsigned address = a;
 		do {
@@ -1024,6 +1023,20 @@ void WRITE_REG(int reg, int value) {
 		checkProtection(address, address-a);
 #endif
 		return ((char*)mem_ds) + a;
+	}
+
+	const wchar* GetValidatedWStr(int a) const {
+		unsigned address = a - sizeof(wchar);
+		MYASSERT((address & (sizeof(wchar)-1)) == 0, ERR_MEMORY_ALIGNMENT);
+		do {
+			address += sizeof(wchar);
+			if(address >= DATA_SEGMENT_SIZE)
+				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
+		} while(RAW_MEMREF(wchar, address) != 0);
+#ifdef MEMORY_PROTECTION	
+		checkProtection(address, address-a);
+#endif
+		return (wchar*)(((char*)mem_ds) + a);
 	}
 
 #ifdef MEMORY_PROTECTION
@@ -1525,6 +1538,9 @@ int GetValidatedStackValue(VMCore* core, int offset) {
 const char* GetValidatedStr(const VMCore* core, int address) {
 	return CORE->GetValidatedStr(address);
 }
+const wchar* GetValidatedWStr(const VMCore* core, int address) {
+	return CORE->GetValidatedWStr(address);
+}
 void* GetCustomEventPointer(VMCore* core) {
 	return CORE->customEventPointer;
 }
@@ -1592,6 +1608,9 @@ int Base::Syscall::GetValidatedStackValue(int offset) {
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return Core::GetValidatedStr(gCore, address);
+}
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return Core::GetValidatedWStr(gCore, address);
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 	Core::ValidateMemRange(gCore, ptr, size);

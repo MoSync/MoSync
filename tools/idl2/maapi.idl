@@ -2907,11 +2907,12 @@ interface MAAPI {
 		* is copied back to the buffer.
 		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
 		* \param constraints Rules for how text is entered into the box.
-		* Must be exactly one of the MA_TB_TYPE constants, or'd with zero or more of the
-		* MA_TB_FLAG constants.
-		* \note Some of the MA_TB_FLAG constants do not work well together.
+		* Must be exactly one of the \link #MA_TB_TYPE_ANY MA_TB_TYPE \endlink constants, or'd with zero or more of the
+		* \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants.
+		* \note Some of the \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants do not work well together.
 		*/
-		int maTextBox(in MAWString title, out MAWString text, in int maxSize, in int constraints);
+		int maTextBox(in MAWString title, out MAWString text range("maxSize * sizeof(wchar)"),
+			in int maxSize, in int constraints);
 
 		constset int MA_TB_TYPE_ {
 			/// The user is allowed to enter any text, including line breaks.

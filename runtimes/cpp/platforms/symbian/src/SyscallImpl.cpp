@@ -1615,6 +1615,10 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 #endif
 
+#define maxSize c	//ugly hack
+	maIOCtl_syscall_case(maTextBox);
+#undef maxSize
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
@@ -2965,4 +2969,14 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 	if(aEvent.iErrorCode != KErrNone) {
 		gStreamState = SS_ERROR;
 	}
+}
+
+int Syscall::maTextBox(const wchar* title, wchar* text, int maxSize, int constraints) {
+	TPtrC tTitle(title);
+	TPtrC tInText(text);
+	TPtr tText(text, tInText.Length(), maxSize - 1);
+	int res = gAppView.TextBox(tTitle, tText, constraints);
+	DEBUG_ASSERT(tText.Length() < maxSize);
+	text[tText.Length()] = 0;
+	return res;
 }

@@ -134,6 +134,7 @@ namespace Base {
 		//for ioctl
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
+		const wchar* GetValidatedWStr(int address);
 		int GetValidatedStackValue(int offset);
 
 #ifdef MEMORY_PROTECTION
@@ -196,6 +197,7 @@ namespace Base {
 
 #define GVMR(p, type) (type*)SYSCALL_THIS->GetValidatedMemRange(p, sizeof(type))
 #define GVS(p) SYSCALL_THIS->GetValidatedStr(p)
+#define GVWS(p) SYSCALL_THIS->GetValidatedWStr(p)
 #define GVMRA(type) GVMR(a, type)
 
 #define maIOCtl_case(func) maIOCtl_##func##_case(func)

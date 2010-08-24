@@ -17,6 +17,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <coemain.h>
 #include <BACLINE.H>
+#include <eikgted.h>
+#include <gulftflg.hrh>
+#include <AknQueryDialog.h>
+#ifdef __SERIES60_3X__
+#include <MoSync_3rd.RSG>
+#else
+#include <MoSync.RSG>
+#endif
 
 #include "config_platform.h"
 
@@ -693,4 +701,53 @@ bool CAppView::HasEvent() {
 
 int CAppView::GetKeys() {
 	return iKeys;
+}
+
+int CAppView::TextBox(const TDesC& title, TDes& text, int constraints) {
+	if(iEngine->IsDrawing())
+		iEngine->StopDrawing();
+#if 0
+	CEikGlobalTextEditor* iEditor = new (ELeave) CEikGlobalTextEditor;
+	iEditor->SetContainerWindowL(*this);
+	iEditor->ConstructL(this, 42, text.Length(), CEikEdwin::ELineCursor |
+		CEikEdwin::ENoHorizScrolling | CEikEdwin::EAllowUndo | CEikEdwin::EAvkonEditor |
+		CEikEdwin::EEdwinAlternativeWrapping, EGulFontControlAll, EGulAllFonts);
+
+	//iGTextEd->SetAvkonWrap(ETrue);	// set by flag
+
+	// Enable cut'n'paste support.
+	iEditor->EnableCcpuSupportL(ETrue);
+	iEditor->SetFocus(ETrue);
+	iEditor->SetExtent(TPoint(0,0), Size());
+	iAppUi.AddToStackL(iEditor, 1);
+	
+	SetBlank();
+	ActivateL();
+	return 0;
+#else
+	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(text);
+	CleanupStack::PushL(dlg);
+	dlg->SetPromptL(title);
+	dlg->SetPredictiveTextInputPermitted(true);
+	dlg->SetMaxLength(text.MaxLength());
+	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
+	CleanupStack::Pop(dlg);
+	return answer ? 1 : 0;
+#endif
+}
+
+TInt CAppView::CountComponentControls() const {
+	LOG("CountComponentControls\n");
+	//if(iEditor)
+	//	return 1;
+	//else
+		return 0;
+}
+
+CCoeControl* CAppView::ComponentControl(TInt aIndex) const {
+	LOG("ComponentControl %i\n", aIndex);
+	if(iEditor && aIndex == 0)
+		return iEditor;
+	else
+		return NULL;
 }

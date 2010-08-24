@@ -445,23 +445,32 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 				} else {
 					if(isString && arg.in)
 						stream << (isWideString ? "GVWS(" : "GVS(");
-					else if(isPointer && !java)
-						stream << "GVMR(";
-					else if(ctype != "int") stream << "(" << ctype << ")";
+					else if(isPointer && !java) {
+						if(arg.range.empty()) {
+							stream << "GVMR(";
+						} else {
+							stream << "(" << arg.type << ") SYSCALL_THIS->GetValidatedMemRange(";
+						}
+					} else if(ctype != "int")
+						stream << "(" << ctype << ")";
 
 					streamIoctlInputParam(stream, inK, java);
 
 					if(isString && arg.in)
 						stream << ")";
 					else if(isPointer && !java) {
-						string gvmrType;
-						size_t m1 = arg.type.size()-1;
-						if(arg.type[m1] == '*') {
-							gvmrType = arg.type.substr(0, m1);
+						if(arg.range.empty()) {
+							string gvmrType;
+							size_t m1 = arg.type.size()-1;
+							if(arg.type[m1] == '*') {
+								gvmrType = arg.type.substr(0, m1);
+							} else {
+								gvmrType = arg.type;
+							}
+							stream << ", " << gvmrType << ")";
 						} else {
-							gvmrType = arg.type;
+							stream << ", " << arg.range << ")";
 						}
-						stream << ", " << gvmrType << ")";
 					}
 				}
 
