@@ -638,7 +638,7 @@ void maCloseStore(int store, int remove)
 		maPanic(1, "maCloseStore failed!");
 }
 
-//#include "MoSyncSound.jpp"
+#include "MoSyncSound.jpp"
 
 #ifdef _ANDROID_BLUETOOTH
 #include "MoSyncBluetooth.jpp"
@@ -922,7 +922,29 @@ Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
-	mUBinaryResources.put(resourceIndex, new UBinData(offset, size));
+	UBinData ubd = new UBinData(offset, size);
+	mUBinaryResources.put(resourceIndex, ubd);
+	
+	// UBIN must always point to the resource file.
+	try
+	{
+		AssetManager assetManager = mContext.getAssets();
+		AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+	
+		FileInputStream fis = pAfd.createInputStream();
+		fis.skip(offset);
+	
+		if(true == checkIfMimeAudioType(fis))
+			storeAudioUBin(ubd, resourceIndex);
+	}
+	catch(IOException ioe)
+	{
+	
+	}
+	catch(Exception e)
+	{
+	
+	}
 }
 
 void destroyResource(int resourceIndex)
