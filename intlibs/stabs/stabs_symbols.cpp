@@ -50,18 +50,29 @@ struct symbol_p_scope_name_less
 	}
 };
 
+struct symbol_p_name_less
+	: public binary_function<Symbol*, Symbol*, bool>
+{	// functor for operator<
+	bool operator()(const Symbol*const& _Left, const Symbol*const& _Right) const
+	{	// apply operator< to operands
+		return _Left->name < _Right->name;
+	}
+};
+
 typedef set<Symbol*, symbol_p_address_less> SymbolSet;
 typedef set<Symbol*, symbol_p_scope_name_less> SymbolScopeSet;
+typedef set<Symbol*, symbol_p_name_less> SymbolNameSet;
 
 static SymbolSet sVariableSet, sFunctionSet;
 static SymbolScopeSet sSymbolScopeSet;
+static SymbolNameSet sSymbolGlobalSet;
 
 void addSymbolFile(int file, const std::string& fileName) {
 }
 
 static void addSymbol(SymbolSet& ss, Symbol* s) {
 	//LOG("addSymbol(%i,%s) 0x%x\n", s->fileScope, s->name.c_str(), s->address);
-	DEBUG_ASSERT(s->fileScope >= 0);
+	DEBUG_ASSERT(s->fileScope > 0);
 	pair<SymbolSet::iterator, bool> res = ss.insert(s);
 	if(!res.second) {
 		//if the existing symbol isn't identical to the new, then error.
@@ -78,6 +89,10 @@ static void addSymbol(SymbolSet& ss, Symbol* s) {
 	}
 	pair<SymbolScopeSet::iterator, bool> sres = sSymbolScopeSet.insert(s);
 	DEBUG_ASSERT(sres.second);
+	if(s->global) {
+		pair<SymbolNameSet::iterator, bool> nres = sSymbolGlobalSet.insert(s);
+		DEBUG_ASSERT(nres.second);
+	}
 }
 
 void addFunction(Symbol* s) {
@@ -127,4 +142,13 @@ const StaticVariable* stabsGetVariableByAddress(int address) {
 		return NULL;
 	DEBUG_ASSERT(s->type == eVariable);
 	return (StaticVariable*)s;
+}
+
+const Symbol* stabsGetSymbolGlobal(const std::string& name) {
+	Symbol s(eNone);
+	s.name = name;
+	SymbolNameSet::const_iterator itr = sSymbolGlobalSet.find(&s);
+	if(itr == sSymbolGlobalSet.end())
+		return NULL;
+	return *itr;
 }

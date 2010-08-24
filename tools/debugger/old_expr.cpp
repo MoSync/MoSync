@@ -134,7 +134,7 @@ bool isLocalGlobalOrStatic(const string& name) {
 	if(handleLocalsAndArguments(name, frame, f, dummy)) return true;
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
 	if(!s)
-		s = stabsGetSymbolByScopeAndName(0, name);
+		s = stabsGetSymbolGlobal(name);
 	return s != NULL;
 }
 
@@ -203,7 +203,7 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	//statics and globals
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
 	if(!s)
-		s = stabsGetSymbolByScopeAndName(0, name);
+		s = stabsGetSymbolGlobal(name);
 	if(!s) {
 		//cb(sym);
 		error("cannot find symbol '%s'", name.c_str());

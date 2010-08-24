@@ -32,6 +32,7 @@ const Function* stabsGetFunctionByAddress(int address);
 const StaticVariable* stabsGetVariableByAddress(int address);
 
 const Symbol* stabsGetSymbolByScopeAndName(int scope, const std::string& name);
+const Symbol* stabsGetSymbolGlobal(const std::string& name);
 
 #ifndef WIN32
 inline int iscsym(int c) { return (isalnum(c) || ((c) == '_')); }

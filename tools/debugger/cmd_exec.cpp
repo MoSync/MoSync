@@ -40,6 +40,8 @@ void exec_step(const string& args);
 void exec_next_instruction(const string& args);
 void exec_next(const string& args);
 void exec_interrupt(const string& args);
+void exec_until(const string& args);
+void exec_finish(const string& args);
 void test_wait(const string& args);
 
 //******************************************************************************
