@@ -33,3 +33,4 @@ public:
 	void destroyResource(int resourceIndex);
 	void postEvent(MAEvent event);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);
+	void checkAndStoreAudioResource(int resourceIndex);

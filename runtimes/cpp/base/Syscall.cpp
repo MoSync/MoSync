@@ -177,6 +177,12 @@ namespace Base {
 #endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
+
+#ifdef _android
+					checkAndStoreAudioResource(rI);
+					
+#endif
+
 				}
 				break;
 			case RT_UBIN:

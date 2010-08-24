@@ -136,6 +136,17 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
+	
+	void Syscall::checkAndStoreAudioResource(int resourceIndex)
+	{
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "checkIfBinaryAudioResource", "(I)V");
+		if (methodID != 0)
+			mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex);
+				
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+	
 	void Syscall::platformDestruct()
 	{
 	

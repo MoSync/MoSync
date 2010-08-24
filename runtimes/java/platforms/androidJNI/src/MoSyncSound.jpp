@@ -35,11 +35,11 @@ static public final boolean checkIfMimeAudioType(FileInputStream fis) throws Exc
 
 /*
 */
-void checkIfBinaryAudioResource(int resourceIndex)
+void checkIfBinaryAudioResource(int resourceIndex) throws Exception
 {
 	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(resourceIndex);
 	if(null == bb)
-		return false;
+		return;
 	
 	byte header[] = new byte[5];	
 	int p = bb.position();
@@ -48,7 +48,7 @@ void checkIfBinaryAudioResource(int resourceIndex)
 	bb.position(p);
 
 	if(checkIfMimeAudioType(header))
-		StoreAudioBin(bb, resourceIndex);
+		storeAudioBin(bb, resourceIndex);
 }
 
 /*
