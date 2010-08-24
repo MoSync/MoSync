@@ -41,6 +41,8 @@ typedef union _LARGE_INTEGER {
 
 #ifdef _android
 #include <jni.h>
+
+typedef unsigned short wchar;
 #endif
 
 #define USE_VAR_INT
