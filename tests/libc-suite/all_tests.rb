@@ -27,7 +27,7 @@ FileUtils.mkdir_p(BUILD_DIR)
 FileUtils.rm_rf('filesystem')
 FileUtils.mkdir_p('filesystem/tmp')
 
-sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S helpers.c -o build/helpers.s#{GCC_FLAGS}"
+sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path('helpers.c')} -o build/helpers.s#{GCC_FLAGS}"
 
 # Find tests.
 # We have many directories. Some of these have Makefiles with a definition of a "tests" variable.

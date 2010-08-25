@@ -16,3 +16,27 @@ RESOURCE EIK_APP_INFO {
 	//status_pane = r_status_pane_null;
 	//cba = R_AVKON_SOFTKEYS_EMPTY;
 }
+
+RESOURCE DIALOG r_textbox_query {
+	flags = EGeneralQueryFlags;
+	buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+	items = {
+		DLG_LINE {
+			type = EAknCtQuery;
+			id = EGeneralQuery;
+			control = AVKON_DATA_QUERY {
+				layout = EDataLayout;
+				label = "";
+				control = EDWIN {
+					flags = EEikEdwinNoHorizScrolling;
+					width = 320;
+					maxlength = 4096;
+					max_view_height_in_lines = 64;
+					base_line_delta = 21;
+					allowed_input_modes = EAknEditorAllInputModes;
+					default_input_mode = EAknEditorTextInputMode;
+				};
+			};
+		}
+	};
+}

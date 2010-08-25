@@ -22,7 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define SYSLOG(a) Log.i("Dalvik Syscalls", a);
 #define SYSLOG(...)
 
-final class ImageCache {
+final class ImageCache
+{
 	Bitmap mBitmap;
 	Canvas mCanvas;
 
@@ -54,6 +55,9 @@ ImageCache mDrawTargetScreen = null;
 ImageCache mDrawTarget = null;
 int mDrawTargetHandle = 0;
 
+int mSoundVolume;
+MediaPlayer mMediaPlayer;
+
 Paint mPaint = new Paint();
 Paint mBlitPaint = new Paint();
 
@@ -75,6 +79,10 @@ boolean initSyscalls()
 	 
 	 mBlitPaint.setAntiAlias(false);
 	 mBlitPaint.setColor(0xffffffff);
+	 
+	 mSoundVolume = 50;
+	 mMediaPlayer = new MediaPlayer();
+	 mMediaPlayer.reset();
 
 	 mSecureRandom = new SecureRandom();
 	 mSecureRandom.generateSeed(64);
@@ -123,6 +131,7 @@ void maFillRect(int left, int top, int width, int height)
 	SYSLOG("maFillRect");
 
 	mCanvas.drawRect(left, top, left+width, top+height, mPaint);
+	
 }
 
 void maFillTriangleStrip(int address, int count)
@@ -169,27 +178,22 @@ void maUpdateScreen()
 	SYSLOG("maUpdateScreen");
 	Canvas lockedCanvas = null;
 
+	long st = System.currentTimeMillis();
+	
 	if(mMoSyncView == null) return;
-
-	//Rect r = mMoSyncView.mSurfaceHolder.getSurfaceFrame();
 
 	try {
 		lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
 		synchronized (mMoSyncView.mSurfaceHolder)
 		{
 			if(mUsingFrameBuffer)
-			{
-			//	long st = System.currentTimeMillis();
-				
+			{				
 				mMemDataSection.mark();
 				mMemDataSection.position(mFrameBufferAddress);
 				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 				mMemDataSection.reset();
 				
 				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
-				
-			//	long t = System.currentTimeMillis() - st;
-			//	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
 			}
 			else
 			{
@@ -208,6 +212,9 @@ void maUpdateScreen()
 		
 	if (lockedCanvas != null)
 	mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	
+	long t = System.currentTimeMillis() - st;
+	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
 	
 }
 
@@ -336,9 +343,11 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 			mTempMatrix.postRotate(rotation);
 		}
 
+		/* TO-DO: This implementation is really slow, needs to be fixed */
 		mTempBitmap = Bitmap.createBitmap(imageResource.mBitmap, srcRectLeft, srcRectTop, srcRectWidth, srcRectHeight, mTempMatrix, false);
 
 		mCanvas.drawBitmap(mTempBitmap, dstLeft, dstTop, mPaint);
+
 	}
 }
 
@@ -421,6 +430,7 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 	}
 
 	try {
+		Log.i("Decode image","size:" + size + " offset:" + offset + " ra.length:" + ra.length);
 		Bitmap decodedImage = BitmapFactory.decodeByteArray(ra, 0, ra.length);
 		if(decodedImage == null)
 		{
@@ -428,6 +438,9 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 		}
 		mImageResources.put(placeholder, new ImageCache(null, decodedImage));
 		
+	} catch(UnsupportedOperationException e) {
+		Log.e("maCreateImageFromData exception",e.toString());
+		return RES_BAD_INPUT;
 	} catch(java.lang.IllegalArgumentException e) {
 		return RES_BAD_INPUT;
 	} catch(java.lang.OutOfMemoryError e) {
@@ -630,11 +643,15 @@ void maCloseStore(int store, int remove)
 		maPanic(1, "maCloseStore failed!");
 }
 
+#include "MoSyncSound.jpp"
+
 #ifdef _ANDROID_BLUETOOTH
 #include "MoSyncBluetooth.jpp"
 #endif
 
 #include "MoSyncNetwork.jpp"
+
+#include "MoSyncLocation.jpp"
 
 void maLoadProgram(int data, int reload)
 {
@@ -691,7 +708,6 @@ int maLocalTime()
 
 int maGetMilliSecondCount()
 {
-//	SYSLOG("maGetMilliSecondCount");
 	return (int)System.currentTimeMillis();
 }
 
@@ -720,34 +736,6 @@ void maPanic(int result, String message)
 	threadPanic(result, message);
 }
 
-int maSoundPlay(int sound_res, int offset, int size)
-{
-	SYSLOG("maSoundPlay");
-	return -1;
-}
-
-void maSoundStop()
-{
-	SYSLOG("maSoundStop");
-}
-
-int maSoundIsPlaying()
-{
-	SYSLOG("maSoundIsPlaying");
-	return -1;
-}
-
-int maSoundGetVolume()
-{
-	SYSLOG("maSoundGetVolume");
-	return -1;
-}
-
-void maSoundSetVolume(int vol)
-{
-	SYSLOG("maSondSetVolume");
-}
-
 int maInvokeExtension(int function, int a, int b, int c)
 {
 	SYSLOG("maInvokeExtension");
@@ -771,6 +759,18 @@ void _enableFramebuffer(int address)
 void _disableFramebuffer()
 {
 	mUsingFrameBuffer = false;
+}
+
+/**
+* Implemation of the maWriteLog syscall which only sends the log message to the Android Logcat
+*
+* @param str	The string to send to Logcat
+*		 size	The number of characters in the string
+*/
+int maWriteLog(String str, int size)
+{
+	Log.i("maWriteLog", str);
+	return 1;
 }
 
 int maGetSystemProperty(String key, int buf, int size)
@@ -829,6 +829,13 @@ int maPlatformRequest(String url)
 		return 0;
 	}
 	return -1;
+}
+
+int maShowVirtualKeyboard()
+{
+	InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+	mgr.showSoftInput(mMoSyncView, InputMethodManager.SHOW_FORCED);
+	return 0;
 }
 
 
@@ -951,6 +958,52 @@ Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
-	mUBinaryResources.put(resourceIndex, new UBinData(offset, size));
+	UBinData ubd = new UBinData(offset, size);
+	mUBinaryResources.put(resourceIndex, ubd);
+	
+	// UBIN must always point to the resource file.
+	try
+	{
+		AssetManager assetManager = mContext.getAssets();
+		AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+	
+		FileInputStream fis = pAfd.createInputStream();
+		fis.skip(offset);
+	
+		if(true == checkIfMimeAudioType(fis))
+			storeAudioUBin(ubd, resourceIndex);
+	}
+	catch(IOException ioe)
+	{
+	
+	}
+	catch(Exception e)
+	{
+	
+	}
 }
 
+void destroyResource(int resourceIndex)
+{
+	SYSLOG("destroyBinary :" + resourceIndex);
+	
+	if(mBinaryResources.contains(resourceIndex))
+	{
+		mBinaryResources.remove(resourceIndex);
+		return;
+	}
+
+	if(mUBinaryResources.contains(resourceIndex))
+	{
+		mUBinaryResources.remove(resourceIndex);
+		return;
+	}
+
+	if(mImageResources.contains(resourceIndex))
+	{
+		mImageResources.remove(resourceIndex);
+		return;
+	}
+
+
+}

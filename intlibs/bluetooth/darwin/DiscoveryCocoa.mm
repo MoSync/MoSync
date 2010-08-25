@@ -1,3 +1,27 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+ 
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
+
+/*
+ * File:   DiscoveryCocoa.mm
+ * Author: Romain Chalant
+ *
+ * Created on July 29, 2009
+ */
+
 #import <unistd.h>
 #include <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #import "DiscoveryCocoa.h"
@@ -7,27 +31,30 @@
 #include "../discovery.h"
 #include "helpers/helpers.h"
 
-
-
+/**
+ * Discovery class for both devices and services
+ */
 @implementation DiscoveryCocoa
+
 @synthesize _foundDevices;
 @synthesize _foundServices;
 @synthesize _status;
 @synthesize _callback;
 
-//===========================================================================================================================
-// startInquiry
-//===========================================================================================================================
-
+/**
+ * Starts a device discovery.
+ *
+ * @param withNames Perform name requests as well or not
+ *
+ * @return Success or failure
+ */
 -(IOReturn)startInquiry:(BOOL)withNames
 {
-	
-	
 	IOReturn	status;
 	
-	//[self	stopInquiry];
+	[self stopInquiry];
 	
-	_inquiry = [IOBluetoothDeviceInquiry	inquiryWithDelegate:self];
+	_inquiry = [IOBluetoothDeviceInquiry inquiryWithDelegate:self];
 	[_inquiry setUpdateNewDeviceNames:withNames];
 	
 	status = [_inquiry	start];
@@ -35,25 +62,27 @@
 	{
 		
 		[_inquiry	retain];
-		//_busy = TRUE;
 		_status = 0;
 	}
 	else
 	{
-		//[_messageText setObjectValue:@"Idle (Search Failed)."];
+		_status = CONNERR_INTERNAL;
 	}
 	
 	return( status );
 }
 
-//===========================================================================================================================
-// deviceInquiryComplete
-//===========================================================================================================================
-
-- (void)	deviceInquiryComplete:(IOBluetoothDeviceInquiry*)sender	error:(IOReturn)error	aborted:(BOOL)aborted
+/**
+ * Called when the device discovery completes
+ *
+ * @param sender	The instance that requested an inquiry
+ * @param error		Eventual error to be processed
+ * @param aborted	True if the discovery was aborted
+ */
+- (void) deviceInquiryComplete:(IOBluetoothDeviceInquiry*)sender
+					error:(IOReturn)error	
+					aborted:(BOOL)aborted
 {
-
-	
 	if( error )
 	{
 		_status = CONNERR_INTERNAL;
@@ -64,70 +93,34 @@
 		_status = 1;
 		_callback ( );
 	}
-	
-	//[_progressBar 	stopAnimation:self];
-	//[_searchButton 	setTitle:@"Search"];
-	//[_searchButton 	setEnabled:TRUE];
-	
-	//_busy = FALSE;
 }
 
-//===========================================================================================================================
-// deviceInquiryDeviceFound
-//===========================================================================================================================
-
-- (void)	deviceInquiryDeviceFound:(IOBluetoothDeviceInquiry*)sender	device:(IOBluetoothDevice*)device
+/**
+ * Called when a device is found
+ *
+ * @param sender The instance that found a device
+ * @param device The device that was found
+ */
+- (void) deviceInquiryDeviceFound:(IOBluetoothDeviceInquiry*)sender	
+						   device:(IOBluetoothDevice*)device
 {
-
-	
-	[self addDeviceToList:device];
-	//[_messageText setObjectValue:[NSString stringWithFormat:@"Found %d devices...", [[sender foundDevices] count]]];
+	[self saveNewDeviceIfAcceptable:device];
 }
 
-//===========================================================================================================================
-// deviceInquiryDeviceNameUpdated
-//===========================================================================================================================
-
-- (void)	deviceInquiryDeviceNameUpdated:(IOBluetoothDeviceInquiry*)sender	device:(IOBluetoothDevice*)device devicesRemaining:(uint32_t)devicesRemaining
-{
-
-	//[_messageText setObjectValue:[NSString stringWithFormat:@"Refreshing %d device names...", devicesRemaining]];
-	
-	//[self	updateDeviceInfoInList:device];
-}
-
-//===========================================================================================================================
-// deviceInquiryUpdatingDeviceNamesStarted
-//===========================================================================================================================
-
-- (void)	deviceInquiryUpdatingDeviceNamesStarted:(IOBluetoothDeviceInquiry*)sender	devicesRemaining:(uint32_t)devicesRemaining
-{
-	
-	//[_messageText setObjectValue:[NSString stringWithFormat:@"Refreshing %d device names...", devicesRemaining]];
-}
-
-//===========================================================================================================================
-// deviceInquiryStarted
-//===========================================================================================================================
-
-- (void)	deviceInquiryStarted:(IOBluetoothDeviceInquiry*)sender
-{
-	//[_messageText 	setObjectValue:@"Searching for Devices..."];
-	//[_progressBar 	startAnimation:self];
-}
-
-
-//===========================================================================================================================
-//	saveNewDeviceIfAcceptable
-//===========================================================================================================================
-
+/**
+ * Saves the new device in an array if it
+ * has not been saved already
+ *
+ * @param inNewDevice The device to be saved
+ *
+ * @return	True if the device was added to the array
+ *			False otherwise
+ */
 -(BOOL)saveNewDeviceIfAcceptable:(IOBluetoothDevice*)inNewDevice
 {
-	
-	
-	NSEnumerator*					enumerator;
-	IOBluetoothDevice*				tmpDevice;
-	const BluetoothDeviceAddress* 	newDeviceAddress = [inNewDevice getAddress];
+	NSEnumerator* enumerator;
+	IOBluetoothDevice* tmpDevice;
+	const BluetoothDeviceAddress*  newDeviceAddress = [inNewDevice getAddress];
 	
 	if( !_foundDevices )
 	{
@@ -137,7 +130,6 @@
 	}
 	
 	// walk the devices in the array.
-	
 	enumerator = [_foundDevices objectEnumerator];
 	if( enumerator )
 	{
@@ -147,7 +139,8 @@
 		{
 			tempAddress = [tmpDevice getAddress];
 			
-			if( memcmp( newDeviceAddress, tempAddress, sizeof( BluetoothDeviceAddress ) ) == 0 )
+			if( memcmp( newDeviceAddress, tempAddress, 
+					   sizeof( BluetoothDeviceAddress ) ) == 0 )
 			{
 				// Already have it.
 				return( FALSE );
@@ -162,25 +155,11 @@
 	return( TRUE );
 }
 
-//===========================================================================================================================
-//	addDeviceToList
-//===========================================================================================================================
-
--(void)addDeviceToList:(IOBluetoothDevice*)inDevice
-{
-
-	
-	if( ![self saveNewDeviceIfAcceptable:inDevice] )
-	{
-		// Already have seen it. Bail.
-		
-		return;
-	}
-}
-
-//===========================================================================================================================
-// stopInquiry
-//===========================================================================================================================
+/**
+ * Stops a running inquiry
+ *
+ * @return Success or failure
+ */
 - (IOReturn) stopInquiry
 {
 	IOReturn ret = kIOReturnNotOpen;
@@ -195,39 +174,52 @@
 	return ret;
 }
 
-//===========================================================================================================================
-// startServiceDiscovery
-//===========================================================================================================================
+/**
+ * Starts a service discovery on a specified device
+ *
+ * @param addressPtr	Address of the device
+ * @param uuid			UUID of the protocol to look for
+ *
+ * @return <0			If it failed
+ *			0			If it suceeded
+ */
 -(int)startServiceDiscovery:(BluetoothDeviceAddress*)addressPtr serviceWithUUID:(IOBluetoothSDPUUID*)uuid
 {
-	if( !_foundServices )
-	{
-		_foundServices = [[NSMutableArray alloc] initWithCapacity:1];
-		if( !_foundServices ) return( -1 );
-		[_foundServices retain];
+	if ( _status > 0 ) {
+		_status = 0;
+		if( !_foundServices )
+		{
+			_foundServices = [[NSMutableArray alloc] initWithCapacity:1];
+			if( !_foundServices ) return( -1 );
+			[_foundServices retain];
+		}
+		else {
+			[_foundServices removeAllObjects];
+		}
+
+		IOBluetoothDevice  *dev = [IOBluetoothDevice withAddress:addressPtr];
+		if(!dev) return CONNERR_INTERNAL;
+		_currentUUID = uuid;
+		[dev performSDPQuery:self];
+		return 0;
 	}
 	else {
-		[_foundServices removeAllObjects];
+		_status = CONNERR_INTERNAL;
+		return CONNERR_INTERNAL;
 	}
 
-	IOBluetoothDevice  *dev = [IOBluetoothDevice withAddress:addressPtr];
-	if(!dev) return CONNERR_INTERNAL;
-	_currentUUID = uuid;
-	[dev performSDPQuery:self];
-	return 0;
-	
 }
 
-//===========================================================================================================================
-// sdpQueryComplete
-//===========================================================================================================================
+/**
+ * Called when the service discovery is completed
+ * 
+ * @param device	The device on which the discovery
+ *					was performed
+ * @param status	The status of the service discovery
+ *					that just completed
+ */
 -(void)sdpQueryComplete:(IOBluetoothDevice *)device status:(IOReturn)status
 {
-	if (status != kIOReturnSuccess) {
-		_status = CONNERR_INTERNAL;
-		_callback ( );
-		return;
-	}
 	NSArray *servicesArray = [device getServices];
 	NSArray *uuidArray = [NSArray arrayWithObject:_currentUUID];
 	
@@ -237,7 +229,11 @@
 			[_foundServices addObject:s];
 		}
 	}
-	_status = [_foundServices count];
+	
+	//_status = [_foundServices count];
+	_status = 1;
+	
+	// Post a MoSync event when the discovery is finished
 	_callback ( );
 }
 

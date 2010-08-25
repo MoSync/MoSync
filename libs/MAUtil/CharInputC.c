@@ -155,19 +155,8 @@ int CharInput_getMode(void) {
 
 void CharInput_Pressed(int keyCode) {
 	int newCharMapIndex;
-	if(sQwerty) {
-		//if in numeric mode
-		if(sCurrentCharMode == CI_MODE_CHAR_MODE_NUMBERS) {
-			//discard all non-number keys
-			if(keyCode < MAK_0 || keyCode > MAK_9)
-				return;
-		}
-		if(keyCode >= MAK_SPACE && keyCode < MAK_DELETE) {
-			sCharacterChangedCallback(keyCode, sCharacterChangedUserData);
-			sCharacterDeployedCallback(keyCode, sCharacterDeployedUserData);
-		}
+	if(sQwerty)	// use the Char event instead
 		return;
-	}
 
 	newCharMapIndex = sCurrentCharMapIndex;
 	switch(keyCode) {
@@ -217,6 +206,33 @@ void CharInput_Pressed(int keyCode) {
 		sStopTimerCallback();
 	if(sStartTimerCallback)
 		sStartTimerCallback(CharInput_LongPress, CI_LONG_PRESS_TIME);
+}
+
+void CharInput_Char(uint character) {
+	if(!sQwerty)
+		return;
+	//if in numeric mode
+	if(sCurrentCharMode == CI_MODE_CHAR_MODE_NUMBERS) {
+		//discard all non-number keys
+		if(character < '0' || character > '9')
+			return;
+	}
+	if(character < 32) {	//control character
+		//allow only a few.
+		switch(character) {
+		case 0x9:	//tab
+		case 0xA:	//end-of-line
+			break;
+		default:
+			return;
+		}
+	}
+	//TODO: update with wide-char support.
+	if(character >= 256) {	//can't handle unicode yet
+		return;
+	}
+	sCharacterChangedCallback(character, sCharacterChangedUserData);
+	sCharacterDeployedCallback(character, sCharacterDeployedUserData);
 }
 
 void CharInput_Released(int keyCode) {

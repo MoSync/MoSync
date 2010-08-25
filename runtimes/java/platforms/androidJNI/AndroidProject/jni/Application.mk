@@ -19,3 +19,4 @@ APP_PROJECT_PATH	:= $(MOSYNC_JAVA_SRC)/AndroidProject
 APP_MODULES			:= mosync
 
 APP_CPPFLAGS		:= -D_android -I$(MOSYNC_CPP)/core -I$(MOSYNC_CPP)/base -I$(MOSYNC_CPP) -I$(MOSYNC_CPP_SRC) -I$(MOSYNC_SRC)/intlibs -I$(MOSYNC_JAVA_SRC)/src
+APP_CFLAGS			:= -DMOSYNC -DLTM_DESC -DLTC_SOURCE -I$(MOSYNC_CPP_SRC)/libtommath -I$(MOSYNC_CPP_SRC)/libtomcrypt/src/headers

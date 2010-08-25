@@ -28,5 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FundamentalType.h"
 #include "FunctionType.h"
 #include "File.h"
+#include "Struct.h"
+#include "Field.h"
 
 #endif // _INTERNAL_H_

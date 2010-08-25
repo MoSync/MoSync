@@ -29,6 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std; 
 
+#define MAX_STRING_SIZE 128
+
 namespace ExpressionParser {
 	void init();
 	bool peekToken(Token &t);
@@ -743,6 +745,10 @@ void ExpressionCommon::error(const char *msg) {
 ExpressionTree::ExpressionTree(const char *expression) : mRoot(NULL), mExpression(expression) {
 }
 
+ExpressionTree::ExpressionTree() : mRoot(NULL), mExpression("") {
+}
+
+
 ExpressionTree::~ExpressionTree() {
 	if(mRoot) delete mRoot;
 }
@@ -818,7 +824,14 @@ static int evaluateThread(void* data) {
 			if(deref) {
 				int addr = (int)sReturnValue;
 				int len = deref->size();
-				if(len && addr > 0 && addr+len <= gMemSize)
+				if(deref->type() == TypeBase::eBuiltin) {
+					const Builtin* builtin = (const Builtin*)deref;
+					if(builtin->subType() == Builtin::eChar) {
+						len = MAX_STRING_SIZE;
+					}
+				}
+
+				if(len>0 && addr > 0 && addr+len <= gMemSize)
 					ExpressionCommon::loadMemory(addr, len);
 			}
 		}
@@ -875,7 +888,22 @@ void ExpressionCommon::loadMemory(int addr, int len) {
 	sSemaphore.wait();
 }
 
+static string sExpression;
 static void stackLoaded() {
+
+	if(!sExpressionTree) {
+		ExpressionTree *tree;
+		try {
+			tree = ExpressionParser::parse(sExpression.c_str());
+		} 
+		catch(ParseException& e) {
+			error("%s", e.what());
+			return;
+		}
+
+		sExpressionTree = tree;
+	}
+
 	sSymbolIter = sExpressionTree->getSymbols().begin();
 	loadSymbol();
 }
@@ -907,23 +935,14 @@ void stackEvaluateExpression(const string& args, int frameAddr, ExpressionCallba
 		return;
 	}
 
+	sExpression = args;
+	sExpressionTree = NULL;
 	sCallback = callback;
-
-	ExpressionTree *tree;
-	try {
-		tree = ExpressionParser::parse(args.c_str());
-	} 
-	catch(ParseException& e) {
-		error("%s", e.what());
-		return;
-	}
-
-	sExpressionTree = tree;
 
 	loadStack(stackLoaded);
 }
 
-void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback callback) {
+void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, ExpressionCallback callback, bool parse) {
 	CHECK_STABS;
 
 	if(frameAddr >= 0) {
@@ -936,7 +955,12 @@ void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, Expression
 	sCallback = callback;
 	sExpressionTree = tree;
 
+	if(parse) {
 	loadStack(stackLoaded);
+	} else {
+		MoSyncThread thread;
+		thread.start(evaluateThread, NULL);
+	}
 }
 
 std::string getType(const TypeBase *tb, bool complex) {
@@ -947,8 +971,33 @@ std::string getType(const TypeBase *tb, bool complex) {
 
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt) {
 	StringPrintFunctor spf;
-	const char *caddr = (const char*)addr;
-	if(caddr<gMemBuf || caddr+tb->size()>&gMemBuf[gMemSize]) return "";
+	//const char *caddr = (const char*)addr;
+	
+	// this isn't always true because some values has been evaluated in memory, should be a flag stating if this is the case.
+	//if(caddr<gMemBuf || caddr+tb->size()>&gMemBuf[gMemSize]) return "";
+	
 	tb->printMI(spf, addr, fmt);
+
+	// special treatment for (const) char*
+	if(tb->type() == TypeBase::ePointer) {
+		const TypeBase* target = ((const PointerType*)tb)->mTarget;
+		if(target->type() == TypeBase::eConst) {
+			target = ((const ConstType*)target)->mTarget;
+		}
+		if(target->type() == TypeBase::eBuiltin) {
+			const Builtin* builtin = (const Builtin*)target;
+			if(builtin->subType() == Builtin::eChar) {
+				int msAddr = *(const int*)addr;
+				int msLen = MAX_STRING_SIZE;
+				if(msAddr+msLen>gMemSize) {
+					msLen-= (msAddr+msLen)-gMemSize;
+				}
+				if(msLen>0)
+					spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
+			}
+		}	
+
+	}
+
 	return spf.getString();
 }

@@ -93,12 +93,21 @@ Stream* MemStreamC::createCopy() const {
 //MemStream
 //******************************************************************************
 MemStream::MemStream(int _size) : MemStreamC(open(_size), _size) {
+#ifdef _android
+	externalAllocated = false;
+#endif
 }
 MemStream::MemStream(char* buf, int _size) : MemStreamC(buf, _size) {
 	mBuffer = buf;
+#ifdef _android
+	externalAllocated = true;
+#endif
 }
 
 MemStream::~MemStream() {
+#ifdef _android
+	if(false == externalAllocated)
+#endif
 	delete mBuffer;
 }
 char* MemStream::open(int size) {

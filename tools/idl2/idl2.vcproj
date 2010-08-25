@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="idl2"
 	ProjectGUID="{F0CF395D-E1D8-4B94-BBE2-679B8AE71E3D}"
 	RootNamespace="idl2"
@@ -208,6 +208,10 @@
 					Name="VCMIDLTool"
 				/>
 			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\maapi_defs.h"
+			>
 		</File>
 		<File
 			RelativePath=".\opengl_generated.idl"

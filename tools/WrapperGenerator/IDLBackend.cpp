@@ -16,16 +16,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "IDLBackend.h"
+#include "Struct.h"
 
 using namespace std;
 
 // a bit messy this function...
-string IDLBackend::getIDLType(const Base* base, bool isArgument) {
+string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool usePointer) {
 	string ret = "";
 	if(base->getBaseType() == Base::EFundamentalType) {
 		const FundamentalType* ft = (const FundamentalType*) base;
 		string name = ft->getName();
-		if(isArgument)
+		if(argument)
 			ret += "in ";
 		ret += name;
 	} else if(base->getBaseType() == Base::ECvQualifiedType) {
@@ -33,31 +34,76 @@ string IDLBackend::getIDLType(const Base* base, bool isArgument) {
 		ret += getIDLType(qt->getType());
 	} else if(base->getBaseType() == Base::EPointerType) {
 		const PointerType* pt = (const PointerType*) base;
-		if(isArgument) {
-			if(pt->isConst())
+		bool isConst = false;
+		if(argument) {
+			if(pt->isConst()) {
+				isConst = true;
 				ret += "in ";
-			else
-				ret += "out ";
+				if(argument->usesHandle() && !usePointer) {
+					ret+= "MAHandle";
+					return ret; 
+				}
+			} else {
+				if(argument->usesHandle() && !usePointer) {
+					ret += "in MAHandle"; 
+					return ret;
+				} else {
+					ret += "out ";
+				}
+				
+			}
 		}
 
 		const Base* pType = pt->getType();
+		
+		const Base* resolvedType = pType->resolveFully();
+		if(resolvedType->getBaseType() == Base::EFundamentalType) {
+			const FundamentalType *pfType = (const FundamentalType*) resolvedType;
+			if(pfType->getName() == "void") {
+				ret += "MAAddress";
+				return ret;
+			}
+		}
+
 		if(pType->getBaseType() == Base::EFundamentalType) {
 			const FundamentalType* pfType = (const FundamentalType*)pType;
+			/*
 			if(pfType->getName() == "char")
 				ret += "MAString";
-			else if(pfType->getName() == "void") 
+			else //if(pfType->getName() == "void") 
 				ret += "MAAddress";
-			else
-				ret += getIDLType(pt->getType(), false);
-		} else if(pType->getBaseType() == Base::EFunctionType){
+			*/
+			ret += pfType->getName();
+			if(isConst) ret+="*";
+
+		} else if(pType->getBaseType() == Base::ETypedef) {
+			ret += ((const Typedef*)pType)->getName();
+			//ret += "MAAddress";
+			if(isConst) ret+="*";
+		}  else if(pType->getBaseType() == Base::EStruct) {
+			ret += ((const Struct*)pType)->getName();
+			//ret += "MAAddress";
+			if(isConst) ret+="*";
+		} else if(pType->getBaseType() == Base::EFunctionType) {
+			ret += "MAAddress";
+		} else {
+			System::error("Unsupported type!");
+		}
+
+		/*
+		else if(pType->getBaseType() == Base::EFunctionType){
 			ret += "int"; // function address. We should probably be able to handle them...
 		} else {
-			ret += getIDLType(pt->getType(), false);
+			ret += getIDLType(pt->getType(), false) + "*";
 		}
+		*/
 
 	} else if(base->getBaseType() == Base::ETypedef) {
 		const Typedef* td = (const Typedef*) base;
-		ret += (isArgument?"in ":"") + td->getName();
+		ret += (argument?"in ":"") + td->getName();
+	} else if(base->getBaseType() == Base::EStruct) {
+		const Struct* s = (const Struct*) base;
+		ret += (argument?"in struct":"struct ") + s->getName();
 	} else {
 		System::error("don't know how to handle type\n");
 	}
@@ -69,7 +115,7 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	pair<BasesIterator, BasesIterator> typedefs = bases.equal_range("Typedef");
 	for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
 		const Typedef* t = (const Typedef*)td->second;
-		stream << "typedef " << getIDLType(t->getType(), false) << " " << t->getName() << ";\n";
+		stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
 
 	}
 
@@ -78,17 +124,37 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
 		string name = func->getName();
-		stream << func->getReturnType()->toString() << " " << name << "(";
-		const std::vector<const Argument*>& args = func->getArguments();
-		if(args.size()>4) {
-		} else {
-			for(int i = 0; i < args.size(); i++) {
-				stream << getIDLType(args[i]->getType()) << " " << args[i]->getName();
-				if(i != args.size()-1) stream << ", ";
-			}
+		const Base* ret = func->getReturnType();
+		string returnString = ret->toString();
+		bool returnsHandle = false;
+		if(ret->getBaseType() == Base::EPointerType) {
+#if 0
+			const PointerType* pret = (const PointerType*)ret;
+			const Base* target = pret->getType();
+			if(target->getBaseType() == Base::ETypedef)
+				target = ((const Typedef*)
+#endif
+			returnString = "MAHandle";
+			returnsHandle = true;
 		}
 
+		const std::vector<const Argument*>& args = func->getArguments();
+
+		stream << returnString << " " << name;
+		if(func->hasHandleArguments() || returnsHandle) {
+			stream << "Handle";
+		}
+		stream << "(";
+		for(size_t i = 0; i < args.size(); i++) {
+			if(args[i]->isEllipsis()) stream << "...";
+			else {
+				stream << getIDLType(args[i]->getType(), args[i], true);
+				stream << (args[i]->getName()!=""?" ":"") << args[i]->getName();
+			}
+			if(i != args.size()-1) stream << ", ";
+		}
 		stream << ");\n";
+
 	}
 
-}	
+}

@@ -9,7 +9,6 @@
 #define __SDL__
 #define EMULATOR
 
-//#define ENABLE_DEBUGGER
 
 #define LOGGING_ENABLED
 
@@ -22,7 +21,9 @@
 
 //#define RESOURCE_MEMORY_LIMIT
 
-//#define GDB_DEBUG
+//#define SUPPORT_OPENGL_ES
+
+#define GDB_DEBUG
 
 //#define DEBUGGING_MODE
 

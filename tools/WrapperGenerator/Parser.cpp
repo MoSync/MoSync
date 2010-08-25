@@ -21,13 +21,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <expat.h>
 #include <stdio.h>
 #include "Internal.h"
+#include "Parser.h"
 
 using namespace std;
 
 #define DEFINE_FACTORY(typeName, typeStr) \
 	if(name==typeStr) return new typeName();
 
-Base* createNode(const string& name) {
+static Base* createNode(const string& name) {
 	WRAPPER_TYPES(DEFINE_FACTORY)
 	else return NULL;
 }
@@ -52,8 +53,7 @@ const Base* parseType(const ParseNode& node,  bool& isconst) {
 
 namespace Parser {
 
-
-	char *readFileIntoMem(const char* filename, int *len) {
+	static char *readFileIntoMem(const char* filename, int *len) {
 		FILE *file = fopen(filename, "rb");
 		if(!file) return NULL;
 		fseek(file, 0, SEEK_END);
@@ -69,7 +69,7 @@ namespace Parser {
 	static stack<ParseNode*> sParseStack;
 	static XML_Parser sXmlParser;
 
-	void start(void *data, const char *el, const char **attr) {
+	static void start(void *data, const char *el, const char **attr) {
 			ParseNode* parseNode = new ParseNode();
 			parseNode->name = el;
 			sParseStack.push(parseNode);
@@ -81,7 +81,7 @@ namespace Parser {
 
 	}  /* End of start handler */
 
-	void end(void *data, const char *el) {
+	static void end(void *data, const char *el) {
 			ParseNode* child = sParseStack.top();
 			if(sParseStack.size()!=1) {
 				sParseStack.pop();
@@ -99,6 +99,7 @@ namespace Parser {
 
 		int fileLength;
 		char *file = readFileIntoMem(input.c_str(), &fileLength);
+		SASSERT(file);
 		XML_Parse(sXmlParser, file, fileLength, 1);
 		delete file;
 		XML_ParserFree(sXmlParser);
@@ -121,12 +122,13 @@ namespace Parser {
 			}
 		}
 
+#if 0
 		// write info.
 		for(size_t i = 0; i < parseNodes.size(); i++) {
 			if(parseNodes[i]->base)
 				printf("%s\n", parseNodes[i]->base->toString().c_str());
 		}
-
+#endif
 	}
 
 }

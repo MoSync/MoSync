@@ -27,6 +27,7 @@ void setTokenStream(istream* is);
 void readToken(string& token);
 void readLine(string& line);
 void readTextToken(string& token);
+void readQuotedString(string& token);
 void doExact(const string& aToken);
 string getComment();
 void ATTRIBUTE(noreturn, tokenError(const string& token));

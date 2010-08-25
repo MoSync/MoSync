@@ -41,6 +41,8 @@ typedef union _LARGE_INTEGER {
 
 #ifdef _android
 #include <jni.h>
+
+typedef unsigned short wchar;
 #endif
 
 #define USE_VAR_INT
@@ -183,7 +185,9 @@ namespace Core {
 
 	//for ioctl
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
+	int GetValidatedStackValue(VMCore* core, int offset);
 	const char* GetValidatedStr(const VMCore* core, int address);
+	const wchar* GetValidatedWStr(const VMCore* core, int address);
 	void* GetCustomEventPointer(VMCore* core);
 	
 }

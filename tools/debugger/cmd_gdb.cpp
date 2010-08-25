@@ -73,6 +73,8 @@ void interpreter_exec(const string& args) {
 	commandComplete();
 }
 
+
+// we don't take any gdb internal variables into account yet..
 void gdb_set(const string& args) {
 	oprintDoneLn();
 	commandComplete();

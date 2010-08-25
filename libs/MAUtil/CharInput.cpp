@@ -74,6 +74,10 @@ namespace MAUtil {
 		CharInput_Released(keyCode);
 	}
 
+	void CharInput::charEvent(uint character) {
+		CharInput_Char(character);
+	}
+
 	void CharInput::runTimerEvent() {
 		charInputCallback();
 	}

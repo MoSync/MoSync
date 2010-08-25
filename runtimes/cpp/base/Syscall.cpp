@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
 
-#if defined(LINUX) || defined(DARWIN)
+#if defined(LINUX) || defined(__IPHONE__) || defined(DARWIN)
 #include <sys/statvfs.h>
 #endif
 
@@ -177,6 +177,12 @@ namespace Base {
 #endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
+
+#ifdef _android
+					checkAndStoreAudioResource(rI);
+					
+#endif
+
 				}
 				break;
 			case RT_UBIN:
@@ -443,6 +449,9 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
+#ifdef _android
+		SYSCALL_THIS->destroyResource(handle);
+#endif
 		SYSCALL_THIS->resources.destroy(handle);
 	}
 
@@ -530,6 +539,7 @@ namespace Base {
 		path = newFile.c_str();
 		len = newFile.length();
 		int ret = _mkdir(newPath.c_str());
+		// TODO: handle return value
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();
@@ -1016,15 +1026,15 @@ namespace Base {
 		return 0;
 	}
 
-	int Syscall::maFileWriteFromData(const MA_FILE_DATA* args) {
-		LOGD("maFileWriteFromData(%i, %i)\n", args->file, args->len);
-		FileHandle& fh(getFileHandle(args->file));
-		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
-		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+	int Syscall::maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) {
+		LOGD("maFileWriteFromData(%i, %i)\n", file, len);
+		FileHandle& fh(getFileHandle(file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
+		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
 		//todo: add ERR_DATA_OOB check for length.
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
-		bool res = fh.fs->writeStream(*b, args->len);
+		bool res = fh.fs->writeStream(*b, len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
@@ -1041,15 +1051,15 @@ namespace Base {
 		return 0;
 	}
 
-	int Syscall::maFileReadToData(const MA_FILE_DATA* args) {
-		LOGD("maFileReadToData(%i, %i)\n", args->file, args->len);
-		FileHandle& fh(getFileHandle(args->file));
-		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
-		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+	int Syscall::maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
+		LOGD("maFileReadToData(%i, %i)\n", file, len);
+		FileHandle& fh(getFileHandle(file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
+		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
 		//todo: add ERR_DATA_OOB check for length.
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
-		bool res = b->writeStream(*fh.fs, args->len);
+		bool res = b->writeStream(*fh.fs, len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;

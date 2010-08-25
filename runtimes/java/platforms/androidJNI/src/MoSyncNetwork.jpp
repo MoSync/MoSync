@@ -21,14 +21,29 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HTTP_STATE_FINISHING 3
 #define HTTP_STATE_FINISHED 4
 
+
+/*
+* The hashtable mConnections is used to keep all the open connections
+*/
 Hashtable<Integer, ConnectionInformation> mConnections = new Hashtable<Integer, ConnectionInformation>();
 int mConnNextHandle = 1;
 ThreadPool mThreadPool = new ThreadPool();
 
 
+/**
+* Initiates a connection and if successfull, adds the new connection to the table of open connections
+*
+* @param url	The URL to which the connection should be established.
+				URLs that starts with "socket://" needs to have a port specified.
+				URLs that starts with "btspp://" tries to connect to a bluetooth port.
+*
+* @return CONNERR_URL	if the URL wasn't correct.
+* 		  > 0			on success. This number is the handle to the opened connection.
+*/
 MAHandle maConnect(final String url) {
 	Log.i("MoSyncSyscall","maConnect");
 	Log.i("maConnect", "url:" + url);
+
 	
 	try
 	{
@@ -99,12 +114,18 @@ MAHandle maConnect(final String url) {
 	return mConnNextHandle++;
 }
 
+/**
+*
+*/
 int maConnGetAddr(MAHandle conn, long addr) throws Exception {
 	Log.i("MoSyncSyscall","maConnect");
 	/* FIX-ME */
 	return -1;
 }
 
+/**
+*
+*/
 void maConnClose(MAHandle conn) throws Exception {
 	Log.i("MoSyncSyscall","maConnClose");
 	

@@ -417,7 +417,7 @@ void Callback::sif() {
 //******************************************************************************
 
 static void Callback::dee(const Value* value, const char *err) {
-	const SYM& sym = value->getSymbol();
+	//const SYM& sym = value->getSymbol();
 	if(!err) {
 		if(value->isType()) {
 			error("%s", "Attempt to use a type name as an expression");
@@ -426,9 +426,7 @@ static void Callback::dee(const Value* value, const char *err) {
 
 		oprintDone();
 		oprintf(",value=\"");
-		StringPrintFunctor spf;
-		sym.type->printMI(spf, value->getDataAddress(), TypeBase::eNatural);	
-		oprintf("%s", spf.getString());
+		oprintf("%s", getValue(value->getTypeBase(), value->getDataAddress(), TypeBase::eNatural).c_str());
 		oprintf("\"\n");
 		commandComplete();
 	} else {
@@ -437,7 +435,14 @@ static void Callback::dee(const Value* value, const char *err) {
 }
 
 void data_evaluate_expression(const string& args) {
-	stackEvaluateExpression(args, -1, Callback::dee);
+	vector<string> argv;
+	splitArgs(args, argv);
+	if(argv.size()!=1) {
+		error("Invalid arguments.");
+		return;
+	}
+
+	stackEvaluateExpression(argv[0], -1, Callback::dee);
 }
 
 //******************************************************************************

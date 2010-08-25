@@ -30,16 +30,15 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 		Log.i("maBtStartDeviceDiscovery", "1");
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		Log.i("maBtStartDeviceDiscovery", "2");
-		if(null == mBluetoothAdapter) return -1;
+		if(null == mBluetoothAdapter)
+		{
+			Log.i("maBtStartDeviceDiscovery", "NO DEFAULT ADAPTER AVAILABLE!");
+			return -1;
+		}
+		Log.i("maBtStartDeviceDiscovery", "3");
 	}
 
-	Log.i("maBtStartDeviceDiscovery", "3");
-	mContext.registerReceiver(mBluetoothReciever, null);
-	if ( mBluetoothAdapter.isEnabled() )
-	{
-		mBluetoothAdapter.startDiscovery();
-	}
-	else
+	if ( !mBluetoothAdapter.isEnabled() )
 	{
 		Intent btPermissionIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
 		((Activity)mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
@@ -61,6 +60,12 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 		mBluetoothAdapter.enable();
 	}
 
+	mBluetoothAdapter.startDiscovery();
+	
+	Log.i("maBtStartDeviceDiscovery", "4");
+	mContext.registerReceiver(mBluetoothReciever, null);
+	
+	
 	return 0;
 }
 

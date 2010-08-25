@@ -1,10 +1,8 @@
 -target-select sim
--break-insert _Z3adddi
+-break-insert C:/MoSync/workspace/gdbtest1/main.cpp:8
 -exec-continue
 -test-wait
--var-create - * array
--var-create - * i
--var-create - * ii
--var-list-children var2
--var-list-children var2.0
--var-list-children var2.0.Base
+-exec-until C:/MoSync/workspace/gdbtest1/main.cpp:11
+-test-wait
+-exec-finish
+-test-wait

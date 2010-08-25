@@ -20,7 +20,7 @@ end
 ct = FileTask.new(work, "Output/invoke_syscall_cpp.h")
 ct.instance_eval do
 	def setup
-		@prerequisites = [@work.target] + (["extensions.h"] + Dir["*.idl"]).collect { |f|
+		@prerequisites = [@work.target] + (["extensions.h", "maapi_defs.h"] + Dir["*.idl"]).collect { |f|
 			FileTask.new(@work, f)
 		}
 	end

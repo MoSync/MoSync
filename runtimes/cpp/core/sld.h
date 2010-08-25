@@ -92,6 +92,7 @@ int nextSldEntry(int address);
 //ERR_NOLINE if the line number is out of bounds,
 //or ERR_NOMAP if the map is totally empty.
 int mapFileLine(const char* filename, int lineNumber, std::vector<int>& addresses);
+const char* getMapFileLineError(int ret);
 
 struct FileMapping {
 	int scope;

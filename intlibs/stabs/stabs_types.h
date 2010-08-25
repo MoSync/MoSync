@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //must call before adding any types for that file
 void addTypeFile(int file, const std::string& fileName);
 
-void addType(const Type&);
+bool addType(const Type&);
 
 //returns NULL if the type cannot be found.
 const TypeBase* findTypeByTuple(Tuple);

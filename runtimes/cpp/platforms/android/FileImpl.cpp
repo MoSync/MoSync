@@ -30,10 +30,14 @@ namespace Base {
 	//******************************************************************************
 	//FileStream
 	//******************************************************************************
+	
 	const char* FileStream::getFilename() const {
 		return mFilename;
 	}
+	
 	FileStream::FileStream() {}
+	
+	
 	FileStream::FileStream(const char* filename) : mFilename(filename) {
 /*		
 		char temp[256];

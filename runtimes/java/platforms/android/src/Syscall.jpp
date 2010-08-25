@@ -40,22 +40,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.os.Looper;
 import android.os.Handler;
 import android.os.Message;
-*/
+import android.content.Intent;
+
 import android.os.Bundle;
 import android.os.Vibrator;
-/*
-import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationListener;
-import android.location.LocationProvider;
-import android.location.GpsStatus.Listener;
-*/
 
-import android.location.Location;
-import android.location.LocationListener;
+//import android.location.Location;
 import android.location.LocationManager;
+//import android.location.LocationListener;
+//import android.location.LocationProvider;
+//import android.location.GpsStatus.Listener;
 
-import android.content.Intent;
+
 import android.content.res.Resources;
 import android.content.res.AssetManager;
 import android.content.res.AssetFileDescriptor;
@@ -63,6 +59,7 @@ import android.content.res.Resources.NotFoundException;
 
 import java.net.*;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.Date;
 import java.util.TimeZone;
@@ -87,12 +84,10 @@ final class Syscall
 
 #if 0
 
-
 // Location
 IMPLEMENTS LocationListener
 #undef IMPLEMENTS
 #define IMPLEMENTS ,
-
 #endif // #if 0
 
 #if 0
@@ -138,8 +133,7 @@ IMPLEMENTS MoSync
 		Log.i("MoSync Syscall", "Syscall.init();");
 
 		// Init all the things that should be initilalized
-		mVibrator = (Vibrator) mCore.mContext.getSystemService(Context.VIBRATOR_SERVICE); 
-		//mLocationManager = (LocationManager) mCore.mContext.getSystemService(Context.LOCATION_SERVICE); 
+		mVibrator = (Vibrator) mCore.mContext.getSystemService(Context.VIBRATOR_SERVICE);
 		
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
@@ -192,7 +186,7 @@ IMPLEMENTS MoSync
 	final long mStartTime = System.currentTimeMillis();
 
 	Vibrator mVibrator;
-	//LocationManager mLocationManager;
+//	LocationManager mLocationManager;
 	
 	MediaPlayer mMediaPlayer;
 	
@@ -212,7 +206,7 @@ IMPLEMENTS MoSync
 
 	public void resizeScreen(int width, int height)
 	{
-		//Log.i("MoSync Syscall", "window size width:" + mWidth + " height:" + mHeight);
+		Log.i("MoSync Syscall", "resizeScreen. Window size width:" + mWidth + " height:" + mHeight);
 		
 		mWidth = width;
 		mHeight = height;
@@ -1232,10 +1226,15 @@ public
 	
 	int maCheckInterfaceVersion(int hash) {
 		DEBUG("maCheckInterfaceVersion");
+		Log.i("maCheckInterfaceVersion", "is :" + hash + " == " + MAIDL_HASH + " ?");
 		if(hash == MAIDL_HASH) {
 			DEBUG_ALWAYS("IDL version match!\n");
 		} else {
-			throw new Error("IDL Hash Mismatch!\n");
+			try{
+				maPanic(0, "IDL Hash Mismatch!");
+			} catch (Exception e) { Log.e("interface exception", "FFFFFUUUUUU :" + e.toString()); }
+				
+//			throw new Error("IDL Hash Mismatch!\n");
 		}
 		return MAIDL_HASH;
 	}
@@ -1247,23 +1246,27 @@ public
 	}
 
 	SYSCALL(int) maIOCtl(int function, int a, int b, int c) throws Exception {
-		Log.i("Syscall","maIOCtl");
+		Log.i("Syscall","maIOCtl function:" + function + " a:" + a + " b:" + b + " c:" + c);
 #ifdef MA_PROF_SUPPORT_OPENGL_ES
 		int[] mem_ds = CORE.mMem_ds;
 #endif
 		switch(function) {
 
 		case maIOCtl_maCheckInterfaceVersion:
+			Log.i("Syscall maIOCtl","maIOCtl_maCheckInterfaceVersion");
 			return maCheckInterfaceVersion(a);
 
 		case maIOCtl_maPlatformRequest:
+			Log.i("Syscall maIOCtl","maIOCtl_maPlatformRequest");
 			return maPlatformRequest(readMemString(a));
 
 		case maIOCtl_maGetBatteryCharge:
+			Log.i("Syscall maIOCtl","maIOCtl_maGetBatteryCharge");
 			return maGetBatteryCharge();
 			
 #ifdef PUBLIC_DEBUG
 		case maIOCtl_maWriteLog:
+			Log.i("Syscall maIOCtl","maIOCtl_maWriteLog");
 			return maWriteLog(a, b);
 #endif
 
@@ -1305,10 +1308,13 @@ public
 
 #ifdef MA_SUPPORT_RECORD
 		case maIOCtl_maRecordSetup:
+			Log.i("Syscall maIOCtl","maIOCtl_maRecordSetup");
 			return maRecordSetup();
 		case maIOCtl_maRecordStart:
+			Log.i("Syscall maIOCtl","maIOCtl_maRecordStart");
 			return maRecordStart(a);
 		case maIOCtl_maRecordPause:
+			Log.i("Syscall maIOCtl","maIOCtl_maRecordPause");
 			return maRecordPause(a);
 #endif
 
@@ -1372,6 +1378,7 @@ public
 			return maShowVirtualKeyboard();
 			
 		default:
+			Log.i("Syscall maIOCtl","IOCTL_UNAVAILABLE");
 			return IOCTL_UNAVAILABLE;
 		}
 	}

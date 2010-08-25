@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/cpp_defs.h>
 
+#include "libtomcrypt-1.17/src/headers/tomcrypt.h"
+
 namespace Base
 {
 
@@ -102,12 +104,15 @@ namespace Base
 	
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery");
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		
 		jNIEnv->DeleteLocalRef(cls);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery leaving!");
 		
 		return (int)ret;
 	}
@@ -130,6 +135,30 @@ namespace Base
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis)
 	{
 		return -1;
+	}
+	
+	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStart", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
+	
+	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStop", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 	
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
@@ -161,6 +190,32 @@ namespace Base
 		
 		return (int)ret;
 	}
+	
+	int _maWriteLog(const char* str, int b, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrLOG = jNIEnv->NewStringUTF(str);
+	
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWriteLog", "(Ljava/lang/String;I)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrLOG);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrLOG);
+		
+		return (int)ret;
+	}
+	
+	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
+		if (methodID == 0) return 0;
+		int retval = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
+	}
 	int _maSecureRandSeed(int seedData, int seedLength, int memStart, JNIEnv* jNIEnv, jobject jThis)
 	{
 		int rData = seedData - memStart;
@@ -189,5 +244,52 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return (int)ret;
+	}
+	
+	unsigned char* rsaData = NULL;
+	int rsaDataSize;
+	unsigned char* rsaExponent = NULL;
+	int rsaExponentSize;
+	unsigned char* rsaModulus = NULL;
+	int rsaModulusSize;
+	
+	int _maLoadRSAData(int data, int length, JNIEnv* jNIEnv, jobject jThis)
+	{		
+		rsaData = (unsigned char*)data;
+		rsaDataSize = length;
+	}
+	
+	int _maLoadRSAExponent(int exponent, int length, JNIEnv* jNIEnv, jobject jThis)
+	{	
+		rsaExponent = (unsigned char*)exponent;
+		rsaExponentSize = length;
+	}
+	
+	int _maLoadRSAModulus(int modulus, int length, JNIEnv* jNIEnv, jobject jThis)
+	{
+		rsaModulus = (unsigned char*)modulus;
+		rsaModulusSize = length;
+	}
+
+	int _maGetRSA(int data, int length, JNIEnv* jNIEnv, jobject jThis)
+	{
+			
+		unsigned char* result = (unsigned char*)data;
+		unsigned long resultSize;
+		rsa_key rsaKey;
+		
+		ltc_mp = ltm_desc;
+		rsaKey.type = PK_PUBLIC;
+		ltc_mp.init(&rsaKey.e);
+		ltc_mp.init(&rsaKey.N);
+		ltc_mp.unsigned_read(rsaKey.e, rsaExponent, rsaExponentSize);
+		ltc_mp.unsigned_read(rsaKey.N, rsaModulus, rsaModulusSize);
+		resultSize = length;
+
+		ltc_mp.rsa_me(rsaData, rsaDataSize, result, &resultSize, rsaKey.type, &rsaKey);
+
+		ltc_mp.deinit(rsaKey.e);
+		ltc_mp.deinit(rsaKey.N);
+
 	}
 }

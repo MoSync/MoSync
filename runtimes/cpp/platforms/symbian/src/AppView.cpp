@@ -17,6 +17,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <coemain.h>
 #include <BACLINE.H>
+#include <eikgted.h>
+#include <gulftflg.hrh>
+#include <AknQueryDialog.h>
+#ifdef __SERIES60_3X__
+#include <MoSync_3rd.RSG>
+#else
+#include <MoSync.RSG>
+#endif
 
 #include "config_platform.h"
 
@@ -502,6 +510,31 @@ void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
 //Key handling
 //***************************************************************************
 
+#define QWERTY_KEYS(m)\
+	m(MAK_RETURN, EStdKeyEnter)\
+	m(MAK_SPACE, EStdKeySpace)\
+	m(MAK_LSHIFT, EStdKeyLeftShift)\
+	m(MAK_RSHIFT, EStdKeyRightShift)\
+	m(MAK_LALT, EStdKeyLeftFunc)\
+	m(MAK_RALT, EStdKeyRightFunc)\
+	m(MAK_LCTRL, EStdKeyLeftCtrl)\
+	m(MAK_RCTRL, EStdKeyRightCtrl)\
+
+// Keycode values >= ASCII_MIN && <= ASCII_MAX
+// can be passed directly as ASCII codes.
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+
+// These keycode identifiers do not respond to the proper keys
+// on a Swedish E71.
+#define BROKEN_KEYS(m)\
+	m(MAK_COMMA, EStdKeyComma)\
+	m(MAK_PERIOD, EStdKeyFullStop)\
+	m(MAK_SLASH, EStdKeyForwardSlash)\
+	m(MAK_BACKSLASH, EStdKeyBackSlash)\
+	m(MAK_SEMICOLON, EStdKeySemiColon)\
+	m(MAK_QUOTE, EStdKeySingleQuote)\
+
 #define STDKEYS(m)\
 	m(UP, EStdKeyUpArrow)\
 	m(DOWN, EStdKeyDownArrow)\
@@ -548,29 +581,53 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		break;
 	case EEventKey:
 		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
-		return EKeyWasNotConsumed;
+		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
+			MAEvent event;
+			event.type = EVENT_TYPE_CHAR;
+			event.character = aKeyEvent.iCode;
+			AddEvent(event);
+		}
+		return EKeyWasConsumed;
 	default:
 		LOG("KeyEvent %i\n", aType);
 		return EKeyWasNotConsumed;
 	}
 
-#define SCANTOMAK_CASE(name, num)\
+#define SCANTOMAKB_CASE(name, num)\
 	case num: makey = MAK_##name; makb = MAKB_##name; break;
+
+#define SCANTOMAK_CASE(name, num)\
+	case num: makey = name; break;
 
 	int makey;
 	int makb = 0;
-	switch(scancode) {
-		STDKEYS(SCANTOMAK_CASE);
+
+	// TODO: handle Unicode input, which is received in aKeyEvent.iCode
+	// when aType == EEventKey.
+	// Will probably need a new MoSync EVENT_TYPE_CHAR for this.
+
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+	if(scancode >= ASCII_MIN && scancode <= ASCII_MAX) {
+		makey = scancode;
+	} else switch(scancode) {
+		STDKEYS(SCANTOMAKB_CASE);
+		QWERTY_KEYS(SCANTOMAK_CASE);
+		BROKEN_KEYS(SCANTOMAK_CASE);
 
 	case EStdKeyDevice3:	//Middle joystick button?
+#ifndef QWERTY_KEYS
 	case EStdKeyLeftCtrl: //emu only
 	case EStdKeyRightCtrl:  //emu only
+#endif
 		makey = MAK_FIRE;
 		makb = MAKB_FIRE;
 		break;
+#ifndef QWERTY_KEYS
 	case EStdKeyRightShift:
 		makey = MAK_PEN;
 		break;
+#endif
 	default:
 		LOG("Unknown scancode: %i\n", scancode);
 		makey = MAK_UNKNOWN;
@@ -593,7 +650,7 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		iKeys |= makb;
 	else
 		iKeys &= ~makb;
-			
+
 	if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
 		MAEvent event;
 		event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
@@ -644,4 +701,53 @@ bool CAppView::HasEvent() {
 
 int CAppView::GetKeys() {
 	return iKeys;
+}
+
+int CAppView::TextBox(const TDesC& title, TDes& text, int constraints) {
+	if(iEngine->IsDrawing())
+		iEngine->StopDrawing();
+#if 0
+	CEikGlobalTextEditor* iEditor = new (ELeave) CEikGlobalTextEditor;
+	iEditor->SetContainerWindowL(*this);
+	iEditor->ConstructL(this, 42, text.Length(), CEikEdwin::ELineCursor |
+		CEikEdwin::ENoHorizScrolling | CEikEdwin::EAllowUndo | CEikEdwin::EAvkonEditor |
+		CEikEdwin::EEdwinAlternativeWrapping, EGulFontControlAll, EGulAllFonts);
+
+	//iGTextEd->SetAvkonWrap(ETrue);	// set by flag
+
+	// Enable cut'n'paste support.
+	iEditor->EnableCcpuSupportL(ETrue);
+	iEditor->SetFocus(ETrue);
+	iEditor->SetExtent(TPoint(0,0), Size());
+	iAppUi.AddToStackL(iEditor, 1);
+	
+	SetBlank();
+	ActivateL();
+	return 0;
+#else
+	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(text);
+	CleanupStack::PushL(dlg);
+	dlg->SetPromptL(title);
+	dlg->SetPredictiveTextInputPermitted(true);
+	dlg->SetMaxLength(text.MaxLength());
+	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
+	CleanupStack::Pop(dlg);
+	return answer ? 1 : 0;
+#endif
+}
+
+TInt CAppView::CountComponentControls() const {
+	LOG("CountComponentControls\n");
+	//if(iEditor)
+	//	return 1;
+	//else
+		return 0;
+}
+
+CCoeControl* CAppView::ComponentControl(TInt aIndex) const {
+	LOG("ComponentControl %i\n", aIndex);
+	if(iEditor && aIndex == 0)
+		return iEditor;
+	else
+		return NULL;
 }

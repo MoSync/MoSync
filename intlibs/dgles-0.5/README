@@ -1,0 +1,50 @@
+DESKTOP OPENGL ES
+-----------------
+
+DGLES is an OpenGL ES 1.1 wrapper that uses existing OpenGL 1.5
+implementation. It can be used to ease development of OpenGL ES
+content.
+
+Homepage: http://developer.hybrid.fi/dgles/index.html
+Old homepage: http://dgles.sourceforge.net/
+
+Bug reports and preferably also patches or at least small test cases to email
+address hipo at users dot sourceforge dot net.
+
+I've tested this on Linux (Mesa), FreeBSD (NVIDIA GeForce 6600) and Mac OS X
+(iBook G4, ATI Radeon 9600). See dgles homepages for conformance test
+results.
+
+INSTALLATION
+------------
+
+On standard UNIX-like environment it should be just:
+  ./configure
+  make
+  sudo make install
+
+Or something similiar. You might also find file INSTALL helpful.
+
+On Dev-C++ you can use dgles.dev and simple.dev as a basis.
+
+In Visual Studio 2005, use dgles.sln.
+
+In Visual C++ 6.0, use dgles.dsw.
+
+Make sure you don't link you software with the real OpenGL.
+
+THINGS TO NOTE
+--------------
+
+OES_point_sprite is only supported if underlaying OpenGL supports
+ARB_point_sprite.
+
+Implementation dependant buffer reading format/type combination is GL_RGBA
+and GL_UNSIGNED_CHAR.
+
+OpenGL doesn't support GL_BYTE nor GL_FIXED like OpenGL ES 1.1 does. These
+are converted every time in glDrawElements and glDrawArrays and are probably
+much slower than in real OpenGL ES implementation.
+
+Buffer objects are always emulated so those aren't any faster than array
+pointers.

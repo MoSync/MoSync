@@ -22,8 +22,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers/types.h"
 
+/**
+ * Number of general purpose registers.
+ */
 static const int N_GPR = 128;
 
+/**
+ * Struct meant to hold the value of different registers.
+ */
 struct Registers {
 	u32 gpr[N_GPR];
 	u32 pc;
@@ -46,29 +52,121 @@ bool isRegValid();
 namespace StubConnection {
 	typedef void (*AckCallback)();
 
-	void addContinueListener(AckCallback);
+	/**
+	 * Adds a continue listener that will be called when the program is
+	 * stepped or continued.
+	 *
+	 * @param cb Function that will be called when the program is stepped or
+	 *           continued.
+	 */
+	void addContinueListener(AckCallback cb);
 
-	void connect(const std::string& hostname, u16 port, AckCallback);
+	/**
+	 * Makes a TCP connection to the given host on the specified port.
+	 *
+	 * @param hostname Hostname as a symbolic name or ip address.
+	 * @param port The port to connect on.
+	 * @param cb Function that will be called when the connection is 
+	 *           established.
+	 */
+	void connect(const std::string& hostname, u16 port, AckCallback cb);
 
+	/**
+	 * Handles unexpected packets
+	 *
+	 * @param data Contains the data of the packet.
+	 * @param len Length of the packet.
+	 */
 	void handleUnexpectedPacket(const char* data, int len);
 
-	void execContinue(AckCallback);
-	void step(AckCallback);
+	/**
+	 * Sends a message to MoRE telling it to continue the execution.
+	 *
+	 * @param cb Function that will be called once the execution is continued.
+	 */
+	void execContinue(AckCallback cb);
+
+	/**
+	 * Sends a message to MoRE telling it to step one line.
+	 *
+	 * @param cb Will be called once MoRE has executed the step.
+	 */
+	void step(AckCallback cb);
+
+	/**
+	 * Sends a message to MoRE telling it to stop the execution.
+	 */
 	void interrupt();
 
-	void readMemory(void* dst, int src, int len, AckCallback);
+	/**
+	 * Sends a request to MoRE telling it to read memory at a specific 
+	 * address. The callback function is then called when MoRE has provided
+	 * the memory values.
+	 *
+	 * @param dst Buffer to store the memory values.
+	 * @param src Start address of the memory to read.
+	 * @param len Length of the memory to read in bytes.
+	 * @param cb Called when the memory values has been received from MoRE.
+	 */
+	void readMemory(void* dst, int src, int len, AckCallback cb);
 
 	//src may be freed after this function returns
-	void writeCodeMemory(int dst, const void* src, int len, AckCallback);
-	void writeDataMemory(int dst, const void* src, int len, AckCallback);
+	/**
+	 * Sends a request to MoRE telling it write the code memory at a specific
+	 * address.
+	 *
+	 * @param dst The address in the code memory to write to.
+	 * @param src An array of values to write to the memory. 
+	 * @param len Length of the array to write in bytes.
+	 * @param cb Function called when the values has been written to memory.
+	 */
+	void writeCodeMemory(int dst, const void* src, int len, AckCallback cb);
 
+	/**
+	 * Sends a request to MoRE telling it to write the data memory at a
+	 * specific address.
+	 *
+	 * @param dst The address in the data memory to write to.
+	 * @param src An array of values to write to the memory. 
+	 * @param len Length of the array to write in bytes.
+	 * @param cb Function called when the values has been written to memory.
+	 */
+	void writeDataMemory(int dst, const void* src, int len, AckCallback cb);
+
+	/**
+	 * Returns true if we are currently sending a packet.
+	 *
+	 * @return 
+	 */
 	bool isRunning();
+
+	/**
+	 * Determines if we are currently sending a packet or waiting for a 
+	 * response.
+	 *
+	 * @return true if we are currently not sending a packet and not waiting
+	 *              for a response, false otherwise.
+	 */
 	bool isIdle();
 
-	//external callbacks
+	/**
+	 * Responds to the GDB session that a breakpoint has been reached.
+	 */
 	void breakpointHit();
+
+	/**
+	 * Responds to the GDB session that an interrupt has been performed.
+	 */
 	void interruptHit();
+
+	/**
+	 * Responds to the GDB session that a step has been performed.
+	 */
 	void stepHit();
+
+	/**
+	 * Responds to the GDB session that the program being debugged has exited.
+	 */
 	void exitHit(int code);
 }
 

@@ -489,7 +489,6 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 		bool simpleType = typeBase->isSimpleValue();
 		sExp->updateData(value, type, simpleType);
 	}
-
 	sUpdateCallback();
 }
 
@@ -777,21 +776,20 @@ void var_update(const string& args) {
 
 static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
-		Variable *v;
+		Variable *v = NULL;
 
 		do {
 			v = sUpdateQueue.front();
 			sUpdateQueue.pop();
-			_ASSERT(sVar == NULL);
+			//_ASSERT(sVar == NULL);
 			sVar = v;
 			if(v->exp)
-				v->exp->update(Callback::varEEUpdate);	
-			sVar = NULL;
+				v->exp->update(Callback::varEEUpdate);
+			//sVar = NULL;
 		} while(v->outOfScope && !sUpdateQueue.empty());
 
-		if(!v->outOfScope) {
+		if(v && !v->outOfScope) {
 			if(v->mHasCreatedChildren)
-				//	for(size_t i = 0; i < v->children.size(); i++) {
 				for(map<int, Variable>::iterator i = v->children.begin(); i!=v->children.end(); i++) {
 					sUpdateQueue.push(&i->second);
 				}
@@ -812,6 +810,7 @@ static void Callback::varUpdate() {
 		itr++;
 	}
 	oprintf("]\n");
+	sVar = NULL;
 	commandComplete();
 }
 
@@ -894,7 +893,7 @@ void var_evaluate_expression(const string& args) {
 
 	_ASSERT(sVar == NULL);
 	sVar = var;
-	if(!var->exp->isValid()) {
+	if(/*!var->exp->isValid()*/!var->exp->updated()) {
 		sUpdateCallback = Callback::varEvaluateExpression;
 		var->exp->update(Callback::varEEUpdate);
 	}
@@ -910,6 +909,7 @@ static void Callback::varEvaluateExpression() {
 	else
 		oprintf("{...}");
 	oprintf("\"\n");
+	sVar = NULL;
 	commandComplete();
 }
 
@@ -1039,7 +1039,6 @@ static void Callback::varListChildren() {
 	oprintDone();
 	oprintf(",numchild=\"%"PFZT"\",children=[", sVar->children.size());
 
-	//for(size_t i = 0; i < sVar->children.size(); i++) 
 	for(map<int, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
 	{
 		Variable& varc = i->second;

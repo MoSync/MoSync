@@ -385,6 +385,21 @@ bool mapIp(int inIp, int& outLine, String& outFile) {
 	return true;
 }
 
+const char* getMapFileLineError(int ret) {
+	switch(ret) {
+			case ERR_NOFILE:
+				return "No such file";
+			break;
+			case ERR_NOLINE:
+				return "Bad line number";
+			break;
+			case ERR_NOMAP:
+				return "Program map not loaded";
+			break;
+	}
+	return NULL;
+}
+
 int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	if(gAddressSet.size() == 0 || gFiles.size() == 0) {
 		return ERR_NOMAP;

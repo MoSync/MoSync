@@ -50,6 +50,11 @@ namespace MAUtil {
 		virtual void keyPressEvent(int keyCode, int nativeCode);
 		virtual void keyReleaseEvent(int keyCode, int nativeCode);
 
+		/**
+		* \param character A Unicode character.
+		*/
+		virtual void charEvent(uint character);
+
 		//deprecated
 		virtual void keyPressEvent(int keyCode) {}
 		virtual void keyReleaseEvent(int keyCode) {}
@@ -280,6 +285,10 @@ namespace MAUtil {
 		* Calls keyReleaseEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
 		void fireKeyReleaseEvent(int keyCode, int nativeCode);
+		/**
+		* Calls charEvent() of all registered KeyListeners with the specified \a character.
+		*/
+		void fireCharEvent(uint character);
 		/**
 		* Calls pointerPressEvent() of all registered PointerListeners with the specified \a keyCode.
 		*/
