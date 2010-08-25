@@ -30,7 +30,7 @@ class RuntimeBuilder
 	def androidBuilder(runtime_dir, mode)
 		debug = (mode=="debug") ? "D" : ""
 		
-		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-3"
+		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-4"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
 		
 		cpath = FileUtils.pwd
