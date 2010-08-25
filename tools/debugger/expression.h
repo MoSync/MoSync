@@ -37,7 +37,7 @@ class ExpressionTree;
 
 namespace ExpressionCommon {
 	void loadMemory(int addr, int len);
-	void error(const char *msg) GCCATTRIB(noreturn);
+	void ATTRIBUTE(noreturn, error(const char *msg));
 };
 
 namespace ExpressionParser {

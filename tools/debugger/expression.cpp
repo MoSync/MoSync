@@ -35,9 +35,9 @@ namespace ExpressionParser {
 	void init();
 	bool peekToken(Token &t);
 	void nextToken(Token &t);
-	bool expect(int token);
+	void expect(int token);
 	bool accept(int token);
-	bool expect(int token, Token &t);
+	void expect(int token, Token &t);
 	bool accept(int token, Token &t);
 
 	ExpressionTreeNode* getTypeNode();
@@ -144,8 +144,9 @@ int getFileScope(unsigned int pc) {
 }
 
 const TypeBase* findTypeByNameAndPC(const std::string& t) {
-	ASSERT_REG;
-	int fileScope = getFileScope(r.pc);
+	//ASSERT_REG;
+	const FRAME& frame(gFrames[gCurrentFrameIndex]);
+	int fileScope = getFileScope(frame.pc);
 	if(fileScope == -1) return NULL;
 
 	if(isLocalGlobalOrStatic(t)) return NULL;
@@ -599,8 +600,7 @@ ExpressionTreeNode* ExpressionParser::unaryExpression() {
 	} else {
 		return postfixExpression();	
 	}
-
-	return NULL;
+//	return NULL;
 }
 
 ExpressionTreeNode* ExpressionParser::postfixExpression() {
@@ -666,7 +666,6 @@ ExpressionTreeNode* ExpressionParser::primaryExpression() {
 		return ret;
 	}
 	ExpressionCommon::error("Parse error");
-	return NULL;
 }
 
 /*
@@ -704,21 +703,19 @@ void ExpressionParser::nextToken(Token &token) {
 	mExpr = token.getStart()+token.getLength();
 }
 
-bool ExpressionParser::expect(int token, Token &t) {
+void ExpressionParser::expect(int token, Token &t) {
 	if(accept(token, t)) {
-		return true;
+		return;
 	}
 
 	ExpressionCommon::error("Unexpected token");
-	return false;
 }
 
-bool ExpressionParser::expect(int token) {
+void ExpressionParser::expect(int token) {
 	if(accept(token)) {
-		return true;
+		return;
 	}
 	ExpressionCommon::error("Unexpected token");
-	return false;
 }
 
 bool ExpressionParser::accept(int tokenId, Token &token) {
@@ -811,13 +808,18 @@ static int evaluateThread(void* data) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
 				deref = sReturnValue.getSymbol().type->deref()->resolve();
-				if(deref->type() == TypeBase::eConst)
-					deref = ((ConstType*)deref)->mTarget;
-
-				int addr = (int)sReturnValue;
-				if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
+				if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->subType() == Builtin::eVoid) {
 					deref = NULL;
-					//sErrorStr = "Invalid pointer.";
+				} else {
+					if(deref->type() == TypeBase::eConst)
+						deref = ((ConstType*)deref)->mTarget;
+
+					int addr = (int)sReturnValue;
+					if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
+						deref = NULL;
+						sErrorStr = "Invalid pointer.";
+						evnt->err = sErrorStr.c_str();
+					}
 				}
 			}
 
@@ -956,7 +958,7 @@ void stackEvaluateExpressionTree(ExpressionTree *tree, int frameAddr, Expression
 	sExpressionTree = tree;
 
 	if(parse) {
-	loadStack(stackLoaded);
+		loadStack(stackLoaded);
 	} else {
 		MoSyncThread thread;
 		thread.start(evaluateThread, NULL);

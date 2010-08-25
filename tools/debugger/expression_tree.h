@@ -29,6 +29,7 @@ class ExpressionTree;
 class ExpressionTreeNode : public RefCounted {
 public:
 	ExpressionTreeNode(ExpressionTree *tree);
+
 	virtual Value evaluate() = 0;
 protected:
 	ExpressionTree *mTree;
@@ -43,6 +44,7 @@ public:
 
 	TerminalNode(ExpressionTree *tree, const Token& token);
 	TerminalNode(ExpressionTree *tree, const SYM& sym);
+
 	Value evaluate();
 protected:
 	Type mType;
@@ -57,7 +59,7 @@ protected:
 class TypeNode : public ExpressionTreeNode {
 public:
 	TypeNode(ExpressionTree *tree, const TypeBase *typeBase, int numStars);
-	~TypeNode();
+	virtual ~TypeNode();
 	Value evaluate();
 protected:
 	const TypeBase* mTypeBase;
@@ -68,7 +70,7 @@ protected:
 class CastNode : public ExpressionTreeNode {
 public:
 	CastNode(ExpressionTree *tree, ExpressionTreeNode *child, ExpressionTreeNode *type);
-	~CastNode();
+	virtual ~CastNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mChild;
@@ -78,7 +80,7 @@ protected:
 class BinaryOpNode : public ExpressionTreeNode {
 public:
 	BinaryOpNode(ExpressionTree *tree, const Token& t, ExpressionTreeNode* child1, ExpressionTreeNode *child2);
-	~BinaryOpNode();
+	virtual ~BinaryOpNode();
 	Value evaluate();
 protected:
 	Token mToken;
@@ -89,7 +91,7 @@ protected:
 class UnaryOpNode : public ExpressionTreeNode {
 public:
 	UnaryOpNode(ExpressionTree *tree, const Token& t, ExpressionTreeNode* child);
-	~UnaryOpNode();
+	virtual ~UnaryOpNode();
 	Value evaluate();
 protected:
 	Token mToken;
@@ -99,7 +101,7 @@ protected:
 class DerefNode : public ExpressionTreeNode {
 public:
 	DerefNode(ExpressionTree *tree, ExpressionTreeNode* child);
-	~DerefNode();
+	virtual ~DerefNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mChild;
@@ -108,7 +110,7 @@ protected:
 class RefNode : public ExpressionTreeNode {
 public:
 	RefNode(ExpressionTree *tree, ExpressionTreeNode* child);
-	~RefNode();
+	virtual ~RefNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mChild;
@@ -118,7 +120,7 @@ protected:
 class IndexNode : public ExpressionTreeNode {
 public:
 	IndexNode(ExpressionTree *tree, ExpressionTreeNode* child, ExpressionTreeNode* index);
-	~IndexNode();
+	virtual ~IndexNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mChild;
@@ -128,7 +130,7 @@ protected:
 class ConditionalNode : public ExpressionTreeNode {
 public:
 	ConditionalNode(ExpressionTree *tree, ExpressionTreeNode* a, ExpressionTreeNode* b, ExpressionTreeNode *c);
-	~ConditionalNode();
+	virtual ~ConditionalNode();
 	Value evaluate();
 protected:
 	ExpressionTreeNode *mA, *mB, *mC;
@@ -137,7 +139,7 @@ protected:
 class DotNode : public ExpressionTreeNode {
 public:
 	DotNode(ExpressionTree *tree, std::string ident, ExpressionTreeNode* child);
-	~DotNode();
+	virtual ~DotNode();
 	Value evaluate();
 
 
@@ -159,7 +161,7 @@ protected:
 class ArrayNode : public ExpressionTreeNode {
 public:
 	ArrayNode(ExpressionTree *tree, std::string length, ExpressionTreeNode *child);
-	~ArrayNode();
+	virtual ~ArrayNode();
 	Value evaluate();
 protected:
 	std::string mLength;

@@ -1,8 +1,9 @@
 -target-select sim
--break-insert C:/MoSync/workspace/gdbtest1/main.cpp:8
--exec-continue
+71-thread-info
+72-data-list-register-names
+73-break-insert C:/MoSync/workspace/xrick/src/sysvid.c:271
+75-exec-continue
 -test-wait
--exec-until C:/MoSync/workspace/gdbtest1/main.cpp:11
+108-exec-finish
 -test-wait
--exec-finish
--test-wait
+112-var-create - * rects

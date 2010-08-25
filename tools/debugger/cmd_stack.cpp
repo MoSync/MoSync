@@ -90,6 +90,9 @@ void stackContinued() {
 //******************************************************************************
 // loadStack
 //******************************************************************************
+void assertStack() {
+	_ASSERT(sFrames.size() > 0 && gCurrentFrameIndex<sFrames.size());
+}
 
 void loadStack(void (*cb)()) {
 	if(sFrames.size() > 0) {

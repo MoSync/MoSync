@@ -22,7 +22,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 
 /* Defines a function that handles a GDB MI command. */
+/*
 typedef void (*Command)(const std::string& args);
+*/
+
+// Niklas: changed it to this, because a lot of commands has a loaded stack as a prerequisite.
+// This makes it possible to add a mask of prerequisites to the commands in the initCommands.cpp list.
+// and assures you for instance that the stack is loaded.
+// TODO: refactor so that all commands that need the stack, not loads the stack manually, 
+// just add the LOAD_STACK bit to the mask for it.
+
+class Command {
+public:
+	enum {
+		LOAD_STACK = 1
+	};
+
+	typedef void (*Proc)(const std::string& args);
+
+	Command();
+	Command(Proc p);
+	Command(Proc p, int options);
+	void operator()(const std::string& args);
+
+private:
+	static Command sCommand;
+	static void cmdStackLoaded();
+
+	Proc mProc;
+	std::string mArgs;
+	int mOptions;
+};
 
 typedef std::map<std::string, Command>::iterator CommandIterator;
 typedef std::pair<std::string, Command> CommandPair;

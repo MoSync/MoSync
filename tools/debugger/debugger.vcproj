@@ -368,6 +368,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\command.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\command.h"
 			>
 		</File>

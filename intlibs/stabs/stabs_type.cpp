@@ -444,7 +444,14 @@ void EnumType::printTypeMI(printfPtr pf, bool complex) const {
 	pf("%s", mName.c_str());
 	if(complex) {
 		//todo: print members, specifying values for member that had values specified in source,
-		//name only for the other members.
+		//name only for the other members. 
+		// added by niklas, don't know if this is right though.
+		pf("{\n");
+		for(size_t i=0; i<mMembers.size(); i++) {
+			pf("%s = %d", mMembers[i].name.c_str(), mMembers[i].value);
+			pf((i!=mMembers.size()-1)?(",\n"):("\n"));
+		}
+		pf("}");
 	}
 }
 

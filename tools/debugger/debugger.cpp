@@ -391,6 +391,8 @@ void setErrorCallback(ErrorCallback ecb) {
 	sErrorCallback = ecb;
 }
 
+void varErrorFunction();
+
 /**
  * Sends a GDB/MI error message with the given
  * message string.
@@ -399,6 +401,8 @@ void setErrorCallback(ErrorCallback ecb) {
  */
 void error(const char* fmt, ...) {
 	if(sErrorCallback) sErrorCallback();
+	varErrorFunction(); // this is a bit ugly, but necessary. (sets sVar to NULL etc.)
+
 	va_list argptr;
 	va_start(argptr, fmt);
 	oprintf("%s^error,msg=\"", sToken.c_str());

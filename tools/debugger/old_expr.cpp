@@ -220,9 +220,10 @@ void locate_symbol(const string& name, SeeCallback cb) {
 		sym.address = (void*)s->address;	//hack. see FunctionType::printMI().
 		sym.scope = sScope;
 		cb(sym);
-	} else if(s->type == eVariable) {
+	} else if(s->type == eVariable && s->global==false) {
 		const StaticVariable* sv = (StaticVariable*)s;
 		sym.type = sv->dataType->resolve();
+		sScope.type = SYM::Scope::eStatic;
 		sym.scope = sScope;
 		sSeeCallback = cb;
 		sSeeSym = sym;
