@@ -1,0 +1,6 @@
+libtomcrypt
+-----------
+
+This component is based on libtomcrypt 1.16 taken from http://libtomcrypt.org/
+which is in the public domain. Minor changes have been made to make it work with MoSync
+
