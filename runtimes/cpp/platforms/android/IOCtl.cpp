@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/cpp_defs.h>
 
-#include "libtomcrypt-1.17/src/headers/tomcrypt.h"
+#include "libtomcrypt/src/headers/tomcrypt.h"
 
 namespace Base
 {
