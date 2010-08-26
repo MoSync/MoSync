@@ -148,9 +148,9 @@ struct Variable {
 
 	bool outOfScope;
 
-	void addArray(const char* dataAdress, const ArrayType *arrayType);
-	void addStruct(const char* dataAdress, const StructType *arrayType, bool isPointer=false);
-	void addPointer(const char* dataAdress, const PointerType *arrayType);
+	void addArray(const char* dataAdress, const ArrayType *arrayType,  bool shouldCreateChildren, bool invalidMemory=false);
+	void addStruct(const char* dataAdress, const StructType *arrayType, bool shouldCreateChildren, bool isPointer=false, bool invalidMemory=false);
+	void addPointer(const char* dataAdress, const PointerType *arrayType, bool shouldCreateChildren, bool invalidMemory=false);
 };
 
 
@@ -188,7 +188,7 @@ Variable::~Variable() {
 	sVariableMap.erase(name);
 }
 
-void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
+void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool shouldCreateChildren, bool invalidMemory) {
 	const TypeBase* deref = ((const ArrayType*)arrayType)->mElemType->resolve();
 	deref = convertConstType(deref);
 
@@ -209,7 +209,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	}
 
 	//children.resize(arrayType->mLength);
-	if(!dataAdress) { 
+	if(!shouldCreateChildren) { 
 		mHasCreatedChildren = false;
 		return; 
 	}
@@ -244,14 +244,14 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 		sVariableMap[var.name] = &var;
 
 		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref);
+			var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::eStruct) {
-			var.addStruct(NULL, (StructType*)deref);
+			var.addStruct(NULL, (StructType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref);
+			var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
 		} else {
 			value = "";
-			if(dataAdress) value = getValue(deref, dataAdress+i*deref->size(), var.printFormat);
+			if(!invalidMemory && dataAdress) value = getValue(deref, dataAdress+i*deref->size(), var.printFormat);
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
@@ -260,7 +260,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType) {
 	}	
 }
 
-void Variable::addPointer(const char* dataAdress, const PointerType *pointerType) {
+void Variable::addPointer(const char* dataAdress, const PointerType *pointerType, bool shouldCreateChildren, bool invalidMemory) {
 	const TypeBase* deref = ((const PointerType*)pointerType)->deref()->resolve();
 	deref = convertConstType(deref);
 
@@ -278,18 +278,18 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		return;		
 	}
 
-	if(deref->type() != TypeBase::eStruct) {
-		StringPrintFunctor spf;
-		spf("*(%s)", localName.c_str());
-		string varName = spf.getString();
-		spf.reset();
-		children[0].localName = varName;
-	} else {
-		addStruct(NULL, (StructType*)deref, true);	
-	}
-
 	//children.resize(1);
-	if(!dataAdress) { 
+	if(!shouldCreateChildren) { 
+		if(deref->type() != TypeBase::eStruct) {
+			StringPrintFunctor spf;
+			spf("*(%s)", localName.c_str());
+			string varName = spf.getString();
+			spf.reset();
+			children[0].localName = varName;
+		} else {
+			addStruct(NULL, (StructType*)deref, false, true);	
+		}
+
 		mHasCreatedChildren = false;	
 		return; 
 	}
@@ -319,13 +319,15 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 			spf.reset();
 		}
 		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref);
+			var.addArray(NULL, (ArrayType*)deref, false);
 		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref);
+			var.addPointer(NULL, (PointerType*)deref, false);
 		} else {
-
-			int addr = *((int*)dataAdress);
-			value = getValue(pointerType, &gMemBuf[addr], printFormat);
+			value = "";
+			if(!invalidMemory) {
+				int addr = *((int*)dataAdress);
+				value = getValue(pointerType, &gMemBuf[addr], printFormat);
+			}
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
@@ -333,8 +335,13 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		}
 		sVariableMap[var.name] = &var;
 	}  else {
-		int addr = *((int*)dataAdress);
-		addStruct(&gMemBuf[addr], (StructType*)deref, true);
+		
+		if(invalidMemory) {
+			addStruct(NULL, (StructType*)deref, true, true, invalidMemory);
+		} else {
+			int addr = *((int*)dataAdress);
+			addStruct(&gMemBuf[addr], (StructType*)deref, true, true, invalidMemory);
+		}
 	}
 
 }
@@ -351,7 +358,7 @@ static bool isVTablePointer(const TypeBase* deref) {
 	return false;
 }
 
-void Variable::addStruct(const char* dataAdress, const StructType *structType, bool isPointer) {
+void Variable::addStruct(const char* dataAdress, const StructType *structType, bool shouldCreateChildren, bool isPointer, bool invalidMemory) {
 	const vector<BaseClass>& bases = structType->getBases();
 	const vector<DataMember>& dataMembers = structType->getDataMembers();
 
@@ -381,7 +388,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		sVariableMap[virtualVar.name] = &virtualVar;
 	}
 
-	if(!dataAdress) { 
+	if(!shouldCreateChildren) { 
 		mHasCreatedChildren = false;
 		return; 
 	}
@@ -414,7 +421,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		}
 
 		sVariableMap[var.name] = &var;
-		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, false);
+		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, false, false, invalidMemory);
 	}
 
 	/*
@@ -461,14 +468,14 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		sVariableMap[var.name] = &var;
 
 		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref);
+			var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::eStruct) {
-			var.addStruct(NULL, (StructType*)deref);
+			var.addStruct(NULL, (StructType*)deref, false, false, invalidMemory);
 		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref);
+			var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
 		} else {
 			value = "";
-			if(dataAdress) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
+			if(dataAdress && !invalidMemory) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
@@ -492,11 +499,12 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	}
 
 	if(typeBase->type() == TypeBase::eArray) {
-		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)typeBase);
+		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)typeBase, true, !v->isDereferencable());
 	} else if(typeBase->type() == TypeBase::eStruct) {
-		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)typeBase);
+		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)typeBase, true, false, false);
 	} else if(typeBase->type() == TypeBase::ePointer) {
-		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)typeBase);	
+		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)typeBase, true, !v->isDereferencable());	
+
 	} else {
 		std::string type = getType(typeBase, false);
 		std::string value = getValue(typeBase, v->getDataAddress(), sVar->printFormat);

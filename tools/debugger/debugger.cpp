@@ -229,6 +229,13 @@ int main(int argc, char** argv) {
 		eprintf("Could not open command logging output file.\n");
 		return 1;
 	}
+
+	for(int i = 0; i < argc; i++) {
+		fprintf(gCommandLog, "%s", argv[i]);
+		if(i!=argc-1) fprintf(gCommandLog, " ");
+	}
+	fprintf(gCommandLog, "\n");
+
 #endif
 	for(int i=0; i<argc; i++) {
 		LOG("%s ", argv[i]);

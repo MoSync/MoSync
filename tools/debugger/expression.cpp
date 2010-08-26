@@ -808,18 +808,13 @@ static int evaluateThread(void* data) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
 				deref = sReturnValue.getSymbol().type->deref()->resolve();
-				if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->subType() == Builtin::eVoid) {
-					deref = NULL;
-				} else {
-					if(deref->type() == TypeBase::eConst)
-						deref = ((ConstType*)deref)->mTarget;
+				if(deref->type() == TypeBase::eConst)
+					deref = ((ConstType*)deref)->mTarget;
 
-					int addr = (int)sReturnValue;
-					if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
-						deref = NULL;
-						sErrorStr = "Invalid pointer.";
-						evnt->err = sErrorStr.c_str();
-					}
+				if(!sReturnValue.isDereferencable()) {
+					deref = NULL;
+					//sErrorStr = "Invalid pointer.";
+					//evnt->err = sErrorStr.c_str();
 				}
 			}
 
@@ -989,13 +984,15 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 		if(target->type() == TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
-				int msAddr = *(const int*)addr;
-				int msLen = MAX_STRING_SIZE;
-				if(msAddr+msLen>gMemSize) {
-					msLen-= (msAddr+msLen)-gMemSize;
+				unsigned int msAddr = *(const unsigned int*)addr;
+				if(msAddr<gMemSize) {
+					int msLen = MAX_STRING_SIZE;
+					if(msAddr+msLen>gMemSize) {
+						msLen-= (msAddr+msLen)-gMemSize;
+					}
+					if(msLen>0)
+						spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
 				}
-				if(msLen>0)
-					spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
 			}
 		}	
 

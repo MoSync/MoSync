@@ -381,7 +381,7 @@ void stack_select_frame(const string& args) {
 }
 
 void Callback::ssf() {
-	if(sFrameRequest > sFrames.size()) {
+	if(sFrameRequest >= sFrames.size()) {
 		error("no such frame");
 		return;
 	}
