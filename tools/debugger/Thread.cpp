@@ -61,3 +61,35 @@ void MoSyncSemaphore::post() {
 	int res = SDL_SemPost(mSem);
 	_ASSERT(res == 0);
 }
+
+//*****************************************************************************
+//MoSyncMutex
+//*****************************************************************************
+
+MoSyncMutex::MoSyncMutex() : mMutex(NULL) {}
+
+void MoSyncMutex::init() {
+	mMutex = SDL_CreateMutex();
+	_ASSERT(mMutex);
+}
+
+MoSyncMutex::~MoSyncMutex() {
+	_ASSERT(mMutex == NULL);	//make sure it's closed
+}
+
+void MoSyncMutex::close() {
+	if(mMutex) {
+		SDL_DestroyMutex(mMutex);
+		mMutex = NULL;
+	}
+}
+
+void MoSyncMutex::lock() {
+	if(!mMutex) init();
+	_ASSERT(SDL_mutexP(mMutex) == 0);
+}
+
+void MoSyncMutex::unlock() {
+	_ASSERT(mMutex != NULL);
+	_ASSERT(SDL_mutexV(mMutex) == 0);
+}

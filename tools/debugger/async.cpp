@@ -23,33 +23,40 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-static MoSyncSemaphore sWait, sAccess;
+static MoSyncSemaphore sWait;
+static MoSyncMutex sAccess;
 static queue<DebuggerEvent*> sQueue;
 static bool sIsWaiting = false;
 
+static void closeEventSystem() {
+	sAccess.close();
+}
+
 void initEventSystem() {
-	sAccess.post();
+	sAccess.init();
+	atexit(closeEventSystem);
 }
 
 void getEvent(DebuggerEvent** pde) {
-	sAccess.wait();
+	sAccess.lock();
 	_ASSERT(!sIsWaiting);
 	while(sQueue.empty()) {
 		sIsWaiting = true;
-		sAccess.post();
+		sAccess.unlock();
 		sWait.wait();
-		sAccess.wait();
+		sAccess.lock();
+
 	}
 	sIsWaiting = false;
 	*pde = sQueue.front();
 	sQueue.pop();
-	sAccess.post();
+	sAccess.unlock();
 }
 
 void putEvent(DebuggerEvent* de) {
-	sAccess.wait();
+	sAccess.lock();
 	sQueue.push(de);
 	if(sIsWaiting)
 		sWait.post();
-	sAccess.post();
+	sAccess.unlock();
 }

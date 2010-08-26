@@ -1,10 +1,9 @@
 -target-select sim
--break-insert _Z3adddi
--exec-continue
+71-thread-info
+72-data-list-register-names
+73-break-insert C:/MoSync/workspace/xrick/src/sysvid.c:271
+75-exec-continue
 -test-wait
--var-create - * array
--var-create - * i
--var-create - * ii
--var-list-children var2
--var-list-children var2.0
--var-list-children var2.0.Base
+108-exec-finish
+-test-wait
+112-var-create - * rects

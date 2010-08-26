@@ -412,6 +412,13 @@ namespace Base {
 		}
 	}
 
+	static void MAHandleCharEvent(uint character) 
+	{
+		MAEvent event;
+		event.type = EVENT_TYPE_CHAR;
+		event.character = character;
+		gEventFifo.put(event);
+	}
 
 	static void MAHandlePointerEvent(int x, int y, int eventType) 
 	{
@@ -568,6 +575,10 @@ DWORD GetScreenOrientation()
 			//}
 
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_PRESSED);
+			return 0;
+
+		case WM_CHAR:
+			MAHandleCharEvent(wParam);
 			return 0;
 
 		case WM_KEYUP:
@@ -2284,10 +2295,12 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
-	SYSCALL(int, maFrameBufferInit(void *data)) {
+	SYSCALL(int, maFrameBufferInit(const void* addr)) {
+		gSyscall->ValidateMemRange(addr, backBuffer->pitch*backBuffer->height);
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = backBuffer;
-		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
+		backBuffer = new Image((unsigned char*)addr, NULL, backBuffer->width,
+			backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		currentDrawSurface = backBuffer;
 		return 1;
 	}
@@ -2307,7 +2320,7 @@ DWORD GetScreenOrientation()
 		PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);
 	}
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close();
@@ -2611,6 +2624,12 @@ retry:
 	}
 #endif
 
+	int maWriteLog(const void* a, int b) {
+		gSyscall->ValidateMemRange(a, b);
+		LOGBIN(a, b);
+		return 0;
+	}
+
 	static int maGetSystemProperty(const char* key, char* buf, int size) {
 		if(strcmp(key, "mosync.iso-639-1") == 0) {
 			LCID lcid = GetUserDefaultLCID();
@@ -2630,10 +2649,6 @@ retry:
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
-
-		case maIOCtl_maWriteLog:
-			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
-			return 0;
 			/*
 			//these are the same across all C++ platforms. consider sharing them somehow.
 		case maIOCtl_sinh:
@@ -2663,18 +2678,14 @@ retry:
 				return 0;
 			}
 			*/
-		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();
-		case maIOCtl_maKeypadIsLocked:
-			return maKeypadIsLocked();
-		case maIOCtl_maLockKeypad:
-			return maLockKeypad();
-		case maIOCtl_maUnlockKeypad:
-			return maUnlockKeypad();
+
+		maIOCtl_maWriteLog_case(maWriteLog);
+		maIOCtl_maPlatformRequest_case(maPlatformRequest);
+		maIOCtl_maSendTextSMS_case(maSendTextSMS);
+		maIOCtl_maGetBatteryCharge_case(maGetBatteryCharge);
+		maIOCtl_maKeypadIsLocked_case(maKeypadIsLocked);
+		maIOCtl_maLockKeypad_case(maLockKeypad);
+		maIOCtl_maUnlockKeypad_case(maUnlockKeypad);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
@@ -2684,24 +2695,16 @@ retry:
 		case maIOCtl_maBtStartServiceDiscovery:
 			BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
 			return 0;
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
-		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
 
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+		maIOCtl_maBtGetNewService_case(SYSCALL_THIS->maBtGetNewService);
+		maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+		maIOCtl_maFrameBufferGetInfo_case(maFrameBufferGetInfo);
+		maIOCtl_maFrameBufferInit_case(maFrameBufferInit);		
+		maIOCtl_maFrameBufferClose_case(maFrameBufferClose);
+
+		maIOCtl_maAudioBufferInit_case(maAudioBufferInit);		
+		maIOCtl_maAudioBufferReady_case(maAudioBufferReady);
+		maIOCtl_maAudioBufferClose_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 		case maIOCtl_maLocationStart:
@@ -2710,51 +2713,36 @@ retry:
 			return maLocationStop();
 #endif
 
-		case maIOCtl_maFileOpen:
-			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+		maIOCtl_syscall_case(maFileOpen);
 
-		case maIOCtl_maFileExists:
-			return SYSCALL_THIS->maFileExists(a);
-		case maIOCtl_maFileClose:
-			return SYSCALL_THIS->maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return SYSCALL_THIS->maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return SYSCALL_THIS->maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
-			return SYSCALL_THIS->maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
-		case maIOCtl_maFileRename:
-			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+		maIOCtl_syscall_case(maFileExists);
+		maIOCtl_syscall_case(maFileClose);
+		maIOCtl_syscall_case(maFileCreate);
+		maIOCtl_syscall_case(maFileDelete);
+		maIOCtl_syscall_case(maFileSize);
+#if 0	//todo
+		maIOCtl_syscall_case(maFileAvailableSpace);
+		maIOCtl_syscall_case(maFileTotalSpace);
+		maIOCtl_syscall_case(maFileDate);
+		maIOCtl_syscall_case(maFileRename);
+		maIOCtl_syscall_case(maFileTruncate);
+#endif
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileWriteFromData:
-			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
 			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileReadToData:
-			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
-		case maIOCtl_maFileTell:
-			return SYSCALL_THIS->maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return SYSCALL_THIS->maFileSeek(a, b, c);
+		maIOCtl_syscall_case(maFileWriteFromData);
+		maIOCtl_syscall_case(maFileReadToData);
 
-		case maIOCtl_maFileListStart:
-			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b));
+		maIOCtl_syscall_case(maFileTell);
+		maIOCtl_syscall_case(maFileSeek);
+
+		maIOCtl_syscall_case(maFileListStart);
 		case maIOCtl_maFileListNext:
 			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileListClose:
-			return SYSCALL_THIS->maFileListClose(a);
+		maIOCtl_syscall_case(maFileListClose);
 
 			/*
 		case maIOCtl_maWlanStartDiscovery:

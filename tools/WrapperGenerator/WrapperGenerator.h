@@ -20,10 +20,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdarg.h>
 #include <string>
+#include <vector>
+#include <map>
+#include "helpers/attribute.h"
 
-namespace System  {
-	void error(const char* fmt, ...);
-	std::string genstr(const char * fmt, ...);
+namespace System {
+	void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2) GCCATTRIB(noreturn);
+	std::string genstr(const char * fmt, ...) PRINTF_ATTRIB(1, 2);
+	void split(const std::string& str, const std::string& delim, std::vector<std::string>& output);
+	void parseAttributes(const std::string& str, std::map<std::string, std::string>& attr);
 } // namespace System
+
+#define SASSERT(truthiness) if(!(truthiness)) {\
+	System::error("Assertion failure (" #truthiness ") on line %i in %s", __LINE__, __FILE__); }
 
 #endif // _WRAPPER_GENERATOR_H_

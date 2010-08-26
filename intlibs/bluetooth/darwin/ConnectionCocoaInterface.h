@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /* 
- * File:   ConnectionCocoa.h
+ * File:   ConnectionCocoaInterface.h
  * Author: Romain Chalant
  *
  * Created on August 5, 2010
@@ -24,12 +24,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef __CONNECTIONCOCOA_H__
 #define	__CONNECTIONCOCOA_H__
 
+#include <pthread.h>
+#include <mach/semaphore.h>
+#include <mach/task.h>
 #include <IOBluetooth/Bluetooth.h>
 #include "../connection.h"
 
 class ConnectionCocoa;
-
-
 
 namespace Bluetooth
 {
@@ -43,8 +44,6 @@ namespace Bluetooth
         class BtSppConnectionCocoa : public BtSppConnection
         {
         private:
-			BluetoothDeviceAddress * mAddressPtr;
-			int mPort;
 			ConnectionCocoa *mConnection;
 
         public:

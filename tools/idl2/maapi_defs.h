@@ -11,10 +11,12 @@
 #define ATTRIBUTE(a, func)  func __attribute__ ((a))
 #define ATTRIB(a) __attribute__ ((a))
 #define GCCATTRIB(a) __attribute__ ((a))
+#define IOCTLDEF static inline
 #elif defined(_MSC_VER)
 #define ATTRIBUTE(a, func)  __declspec (a) func
 #define ATTRIB(a) __declspec (a)
 #define GCCATTRIB(a)
+#define IOCTLDEF static
 #else
 #error Unsupported compiler!
 #endif
@@ -25,13 +27,13 @@
 
 // Convert between double, 2 ints and long long.
 union MA_DV {
-	struct {
 #if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
-		int lo, hi;
+	int i[2];
 #else	//everything else
+	struct {
 		int hi, lo;
-#endif	//__MARM_ARMI__
 	};
+#endif	//__MARM_ARMI__
 	long long ll;
 	double d;
 };

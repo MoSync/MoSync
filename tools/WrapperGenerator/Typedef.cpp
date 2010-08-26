@@ -48,3 +48,9 @@ const Location* Typedef::getLocation() const {
 string Typedef::toString() const {
 	return System::genstr("%s", mName.c_str());
 }
+
+const Base* Typedef::resolveFully() const {
+	if(mType->getBaseType() == Base::ETypedef) {
+		return ((const Typedef*)mType)->resolveFully();
+	} else return mType;
+}

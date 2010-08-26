@@ -184,6 +184,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	
 	// rebuild the event
 	MAEvent event;
+	event.data = NULL;
 	
 	event.type = intArray[0];
 	
@@ -202,6 +203,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.conn.handle = intArray[1];
 		event.conn.opType = intArray[2];
 		event.conn.result = intArray[3];
+	}
+	else if(event.type == EVENT_TYPE_LOCATION)
+	{
+		int size = sizeof(MALocation);
+		event.data = new byte[size];
+		memcpy(event.data, intArray, size);
 	}
 	else if(event.type == EVENT_TYPE_WEBVIEW_REQUEST)
 	{

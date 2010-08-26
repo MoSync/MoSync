@@ -202,18 +202,16 @@ static bool parseFun(Tuple t, char* text) {
 	char* type = colon + 1;
 	switch(*type) {
 	case 'F':
-		f.fileScope = 0;
+		f.global = true;
 		break;
 	case 'f':
-		f.fileScope = gCurrentFile;
+		f.global = false;
 		break;
 	default:
 		FAIL;
 	}
-	/*char* end = scanTuple(type + 1, &t);
-	TEST(end);
-	FAILIF(*end != 0);
-	TEST(f.returnType = findTypeByTuple(t));*/
+	f.fileScope = gCurrentFile;
+
 	char* retType = type + 1;
 	const TypeBase* tb;
 	TEST(tb = subParseType(&retType, Tuple(), string()));
@@ -230,6 +228,7 @@ static bool parseThunk(Tuple t, char* text) {
 	f.lineNumber = -t.a;
 	f.address = -(gCurrentFile*10000 + t.a);
 	f.fileScope = gCurrentFile;
+	f.global = false;
 	f.name = "thunk";	//incorrect; we don't get the proper name from pipe-tool.
 	f.name += t.a;
 	f.name += text;
@@ -334,6 +333,7 @@ static bool parseSTSym(Tuple t, char* text) {
 	case 'S':
 		{
 			StaticVariable* var = new StaticVariable;
+			var->global = false;
 			var->fileScope = gCurrentFile;
 			var->name = text;
 			var->address = t.b;
@@ -375,7 +375,8 @@ static bool parseGSym(Tuple t, char* text) {
 	var->address = mapVariable(text, gCurrentFile - 1);
 	FAILIF(var->address < 0);
 	var->dataType = dataType;
-	var->fileScope = 0;
+	var->global = true;
+	var->fileScope = gCurrentFile;
 	var->lineNumber = t.a;
 	addVariable(var);
 	return true;

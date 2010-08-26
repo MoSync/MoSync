@@ -86,8 +86,12 @@ struct type_tuple_equal {
 #define TTE
 #endif
 
-typedef hash_set<Type*, type_name_hash TNE> TypeNameSet;
-typedef hash_set<Type*, type_tuple_hash TTE> TypeTupleSet;
+// this doesn't work yet for some strange reason.
+//typedef hash_set<Type*, type_name_hash TNE> TypeNameSet;
+//typedef hash_set<Type*, type_tuple_hash TTE> TypeTupleSet;
+
+typedef set<Type*, type_name_hash> TypeNameSet;
+typedef set<Type*, type_tuple_hash> TypeTupleSet;
 
 static vector<TypeTupleSet*> sTypeTupleSets;
 static vector<TypeNameSet*> sTypeNameSets;
@@ -106,9 +110,10 @@ void addTypeFile(int file, const std::string& fileName) {
 	sTypeFiles[file] = fileName;
 }
 
-void addType(const Type& cs) {
+bool addType(const Type& cs) {
 	Type* s = new Type(cs);
 	//LOG("addType %i (%i,%i)\n", gCurrentFile, s->id.a, s->id.b);
+
 	pair<TypeTupleSet::iterator, bool> res = sTypeTupleSets[gCurrentFile]->insert(s);
 	if(res.second) {
 		sTypeNameSets[gCurrentFile]->insert(s);
@@ -119,7 +124,7 @@ void addType(const Type& cs) {
 		if(t->type->type() != TypeBase::eUnknown) {
 			LOG("weird dupe: (%i,%i) %s\n", t->id.a, t->id.b, t->name.c_str());
 			delete s;
-			return;
+			return false;
 		}
 		DEBUG_ASSERT(t->id == s->id);
 		t->name = s->name;
@@ -135,6 +140,8 @@ void addType(const Type& cs) {
 		sTypeNameSets[gCurrentFile]->erase(s);
 		sTypeNameSets[gCurrentFile]->insert(t);
 	}
+
+	return true;
 }
 
 const Type* stabsFindTypeByName(const std::string& name, int scope) {

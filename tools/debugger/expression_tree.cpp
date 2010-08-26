@@ -114,7 +114,10 @@ Value TypeNode::evaluate() {
 	return Value(mTypeBase);
 }
 
-TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mToken(t) {
+TerminalNode::TerminalNode(ExpressionTree *tree, const Token& t) : ExpressionTreeNode(tree), mType(IS_TOKEN), mToken(t) {
+}
+
+TerminalNode::TerminalNode(ExpressionTree *tree, const SYM& s) : ExpressionTreeNode(tree), mType(IS_SYM), mSym(s) {
 }
 
 #define CAST_BUILTIN(name, id) case Builtin::e##id: v = Value(*((name*)symbol.address)); break;
@@ -143,13 +146,18 @@ static Value getValueFromSymbol(const SYM& symbol) {
 }
 
 Value TerminalNode::evaluate() {
-	if(mToken.getTokenType() == TOKEN_IDENT) {
-		const SYM& symbol = mTree->getSymbol(mToken.toString());	
-		return getValueFromSymbol(symbol);
+	if(mType == IS_TOKEN) {
+		if(mToken.getTokenType() == TOKEN_IDENT) {
+			const SYM& symbol = mTree->getSymbol(mToken.toString());	
+			return getValueFromSymbol(symbol);
+		}
+		else if(mToken.getTokenType() == TOKEN_NUMBER || mToken.getTokenType() == TOKEN_REG)
+			return Value(mToken.toString());
+	} else if(mType == IS_SYM) {
+		return getValueFromSymbol(mSym);
 	}
-	else if(mToken.getTokenType() == TOKEN_NUMBER || mToken.getTokenType() == TOKEN_REG)
-		return Value(mToken.toString());
-	else throw ParseException("Invalid value or identifier");
+
+	throw ParseException("Invalid value or identifier");
 }
 
 BinaryOpNode::BinaryOpNode(ExpressionTree *tree, const Token& t, ExpressionTreeNode* child1, ExpressionTreeNode *child2) :
@@ -408,7 +416,7 @@ Value DotNode::evaluate() {
 	return Value(0);
 }
 
-void DotNode::recursiveSearch(const std::string& ident, StructType *s, SearchResult *res, int offset) {
+void DotNode::recursiveSearch(const std::string& ident, const StructType *s, SearchResult *res, int offset) {
 	const std::vector<DataMember>& dataMembers = s->getDataMembers();
 	const std::vector<BaseClass>& bases = s->getBases();
 

@@ -19,20 +19,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace Base
 {
+	// Framebuffer API
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis);
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
 	
+	// Bluetooth
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis);
 	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis);
 	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis);
 	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
 	
+	// Location API
+	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis);
+	
+	// Other IOCTLs
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis);
 	
+	int _maWriteLog(const char* str, int b, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);

@@ -31,13 +31,13 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
-		printf("p: %i/%i\n", keyCode, nativeCode);
+		printf("p: 0x%x/0x%x\n", keyCode, nativeCode);
 	}
 
 	void keyReleaseEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			maExit(0);
-		printf("r: %i/%i\n", keyCode, nativeCode);
+		printf("r: 0x%x/0x%x\n", keyCode, nativeCode);
 	}
 };
 

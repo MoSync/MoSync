@@ -46,7 +46,7 @@ void break_enable(const string& args);
 InstructionMap sInstructions;
 BreakpointMap sBreakpoints;
 BreakpointAddressMap sBreakpointAddresses;
-TempBreakpoint gTempBreakpoint = { NULL, -1, 0 };
+TempBreakpoint gTempBreakpoint = { NULL, (uint)-1, 0 };
 
 //******************************************************************************
 // statics
@@ -59,7 +59,7 @@ static void (*sInsertBpInstructionCallback)();
 //returns false if an error has occured.
 //otherwise, a valid address will be stored.
 //location will be modified during parsing.
-static bool parseLocation(string& location, vector<int>& addresses);
+//static bool parseLocation(string& location, vector<int>& addresses);
 
 static void oprintBreakpoint(int number, const Breakpoint& bp);
 
@@ -154,6 +154,7 @@ void break_insert(const string& args) {
 	insertBpInstruction(address, Callback::insert_done);
 }
 
+/*
 //returns the first safe breakpoint address in the named function,
 //or <0 on failure.
 static int mapFunctionBreakpoint(const char* name) {
@@ -211,17 +212,8 @@ static bool parseLocation(string& location, vector<int>& addresses) {
 				//Then what? Use SDL table to map to address.
 				location[colonIndex] = 0;
 				ret = mapFileLine(location.c_str(), linenum, addresses);
-				switch(ret) {
-				case ERR_NOFILE:
-					error("No such file");
-					break;
-				case ERR_NOLINE:
-					error("Bad line number");
-					break;
-				case ERR_NOMAP:
-					error("Program map not loaded");
-					break;
-				}
+				if(ret<0)
+					error("%s", getMapFileLineError(ret));
 			}
 			else if(iscsym(location[fli])) {	//function name (static)
 				ret = mapFunctionBreakpoint(location.c_str() + fli);
@@ -243,6 +235,7 @@ static bool parseLocation(string& location, vector<int>& addresses) {
 	}
 	return true;
 }
+*/
 
 static void insertBpInstruction(int address, void (*cb)()) {
 	sInsertBpInstructionCallback = cb;

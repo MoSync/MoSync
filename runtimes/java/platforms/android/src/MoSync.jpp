@@ -20,6 +20,7 @@ package com.mosync.java.android;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Debug;
 import android.view.Window;
 import android.view.WindowManager;
 import android.util.Log;
@@ -28,13 +29,19 @@ import android.content.IntentFilter;
 import android.content.Context;
 import android.content.BroadcastReceiver;
 
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationListener;
+import android.location.LocationProvider;
+
 import java.lang.Runnable;
+import java.util.List;
 
 #include "config_platform.h"
 
-public class MoSync extends Activity
+public class MoSync extends Activity implements LocationListener
 {
-	MoSyncView mMosyncView;
+	MoSyncView mMoSyncView;
 	boolean paused;
 	boolean mNoReload;
 	
@@ -42,6 +49,7 @@ public class MoSync extends Activity
     protected void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
+		//Debug.startMethodTracing("mosync");
 		paused = false;
 		Log.i("MoSync", "onCreate");
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -49,7 +57,7 @@ public class MoSync extends Activity
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);
 				
 		buildMoSyncView();
-		setContentView(mMosyncView);
+		setContentView(mMoSyncView);
     }
     
 	/*
@@ -58,7 +66,7 @@ public class MoSync extends Activity
 	private void buildMoSyncView()
 	{
 		try {
-			mMosyncView = new MoSyncView(this);
+			mMoSyncView = new MoSyncView(this);
         } catch(Exception e) {
 			// No View was generated..
 			Log.i("MoSync", "No view was generated.. app could not start!");
@@ -71,11 +79,11 @@ public class MoSync extends Activity
     protected void onStop()
 	{
 		super.onStop();
-		mNoReload = mMosyncView.mNoReload;
+		mNoReload = mMoSyncView.mNoReload;
 		
 		// stop the thread but keep everything alive.
     	Log.i("MoSync","onStop");
-    	mMosyncView.stopThread();
+    	mMoSyncView.stopThread();
 		
 		if(true == mNoReload) finish();
     }
@@ -90,7 +98,7 @@ public class MoSync extends Activity
 		// reset the runtime and load the program and resource file again
     	Log.i("MoSync","onRestart");
 		buildMoSyncView();
-		setContentView(mMosyncView);
+		setContentView(mMoSyncView);
     }
 	
 	@Override
@@ -105,8 +113,8 @@ public class MoSync extends Activity
     	Log.i("MoSync","onResume");
 		if(paused)
 		{
-			mMosyncView.postFocusGainedEvent();
-			setContentView(mMosyncView);
+			mMoSyncView.postFocusGainedEvent();
+			setContentView(mMoSyncView);
 		}
     }
 
@@ -114,13 +122,16 @@ public class MoSync extends Activity
     protected void onPause()
 	{
 		super.onPause();
-		mNoReload = mMosyncView.mNoReload;
+		
+		//Debug.stopMethodTracing();
+		
+		mNoReload = mMoSyncView.mNoReload;
 		
 		unregisterReceiver(mBatteryReciever);
 		
 		paused = true;
     	Log.i("MoSync","onPause");
-		mMosyncView.postFocusLostEvent();
+		mMoSyncView.postFocusLostEvent();
 		
 		if(true == mNoReload) finish();
     }
@@ -131,7 +142,7 @@ public class MoSync extends Activity
 		super.onDestroy();
 		
     	Log.i("MoSync","onDestroy");
-		mMosyncView.stopThread();
+		mMoSyncView.stopThread();
 		finish();
 		//mMosyncView.killApplication();
     }
@@ -151,9 +162,103 @@ public class MoSync extends Activity
 
 				Log.i("MoSync", "Battery level:" + level + " scale:" + scale + " = " + battery);
 
-				mMosyncView.setBatteryCharge(battery);
+				mMoSyncView.setBatteryCharge(battery);
 			}
 		}
     };
+//}
+
+	boolean mLocationActive = false;
+	LocationManager mLocationManager;
+	
+	public boolean startLocation()
+	{
+		Log.i("startLocation","run 0");
+		if(true == mLocationActive) return true;
+		
+		mLocationActive = true;
+		
+		Log.i("startLocation","run 1");
+		
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
+		if(mLocationManager == null) return false;
+		
+		List<String> provider = mLocationManager.getProviders(true);
+		Log.i("startLocation", "providers:" + provider.toString());
+
+		Log.i("startLocation","run 2");
+		if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) { Log.i("LocationEventThread", "No GPS provider enabled"); return false;}
+
+		Log.i("startLocation","run 3");
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+
+		Log.i("startLocation","run 4");	
+		return true;
+	}
+	
+	public void stopLocation()
+	{
+		mLocationManager.removeUpdates(this);
+	}
+	
+	public void onLocationChanged(Location location) {
+		Log.i("LocationEventThread","onLocationChanged");
+		
+		int[] event = new int[10];
+//		EI_TYPE = EVENT_TYPE_LOCATION;
+//		EI_STATE = MA_LOC_QUALIFIED;
+		
+//		writeDouble(event, 2, location.getLatitude());
+//		writeDouble(event, 4, location.getLongitude());
+//		writeDouble(event, 6, location.getAccuracy());
+//		writeDouble(event, 8, location.getAccuracy());
+//		mMoSyncView.postEvent(event);
+	}
+		
+	public void onProviderDisabled(String provider) {
+		Log.i("LocationEventThread","onProviderDisabled");
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+		
+			int[] event = new int[2];
+//			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+//			EI_STATE = MA_LPS_OUT_OF_SERVICE;
+			mMoSyncView.postEvent(event);
+
+		}
+
+	}
+	public void onProviderEnabled(String provider) {
+		Log.i("LocationEventThread","onProviderEnabled");
+		
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+			int[] event = new int[2];
+//			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+//			EI_STATE = MA_LPS_AVAILABLE;
+			mMoSyncView.postEvent(event);
+		}
+		
+	}
+
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		Log.i("LocationEventThread","onStatusChanged");
+		
+		if(provider == LocationManager.GPS_PROVIDER)
+		{
+			int[] event = new int[2];
+//			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
+//			switch(status)
+//			{
+//				case LocationProvider.OUT_OF_SERVICE: EI_STATE = MA_LPS_OUT_OF_SERVICE; break;
+//				case LocationProvider.TEMPORARILY_UNAVAILABLE: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE; break;
+//				case LocationProvider.AVAILABLE: EI_STATE = MA_LPS_AVAILABLE; break;
+//				default: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE;
+//			}
+			mMoSyncView.postEvent(event);		
+		}
+		
+	}
+	
 }
 

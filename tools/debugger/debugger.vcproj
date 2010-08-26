@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib $(MOSYNCDIR)\lib\w32\MAUtilD.lib"
+				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -143,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib $(MOSYNCDIR)\lib\w32\MAUtil.lib"
+				AdditionalDependencies="Dbghelp.lib ..\..\intlibs\net\$(ConfigurationName)\net.lib ..\..\intlibs\bluetooth\$(ConfigurationName)\bluetooth.lib ..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib ..\..\intlibs\stabs\$(ConfigurationName)\stabs.lib Ws2_32.lib libirprops.a SDL.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -365,6 +365,10 @@
 		</File>
 		<File
 			RelativePath=".\cmd_var.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\command.cpp"
 			>
 		</File>
 		<File

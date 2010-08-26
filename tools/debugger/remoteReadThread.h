@@ -21,9 +21,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "bluetooth/connection.h"
 #include "Thread.h"
 
+/**
+ * Continuously looks for available packets from MoRE, and notifies the
+ * main program via the global event queue.
+ *
+ * @param arg is not used.
+ * @return Should not return, but returns 0 when a connection error 
+ *         has occurred.
+ */
 int SDLCALL remoteReadThreadFunc(void* arg);
 
-//causes a DebuggerLowLevelEvent of type eRecv.
+/**
+ * Notifies the remoteReadThread that there is a packet available from
+ * MoRE. Which results in a eRecv event in the global event queue.
+ *
+ * @param conn Connection where the packet is available.
+ * @param dst Buffer to store the packet.
+ * @param maxLen Length of the buffer.
+ */
 void remoteRecv(Connection* conn, void* dst, int maxLen);
 
 #endif	//REMOTEREADTHREAD_H

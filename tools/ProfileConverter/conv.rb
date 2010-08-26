@@ -286,13 +286,15 @@ if REBUILD_DATABASE
 	# We start from scratch
 	if File.exist? DB_FILENAME
 		File.delete DB_FILENAME
+	else
+		puts "Database didn't exist."
 	end
 
 	# Create database file
 	db = SQLite3::Database.new( DB_FILENAME )
 
 	# Create database from SQL file
-	puts "Create database from SQL file"
+	puts "Create database from SQL file..."
 	File.open(SQL_FILENAME, "r") do |infile|
 		while (line = infile.gets)
 			if(line.length != 1)

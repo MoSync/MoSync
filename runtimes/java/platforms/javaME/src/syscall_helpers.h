@@ -15,7 +15,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef SYSCALL_HELPERS_H
+#define SYSCALL_HELPERS_H
+
 #define SYSCALL(a) final a
+
+#define maIOCtl_case(func) maIOCtl_##func##_case(func)
+#define GVMR(name, type) name
+#define GVS(name) mCore._SYSCALL_CONVERT_MAString(name)
+#define GVWS(name) mCore._SYSCALL_CONVERT_MAWString(name)
 
 #define NUMBER_KEYS(m) m(0) m(1) m(2) m(3) m(4)	m(5) m(6) m(7) m(8) m(9)
 #define OTHER_KEYS(m) m(STAR) m(POUND)
@@ -35,3 +43,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define DYNARES_BIT 0x40000000
 
+#endif	//SYSCALL_HELPERS_H

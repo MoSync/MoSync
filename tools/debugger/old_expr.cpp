@@ -134,12 +134,48 @@ bool isLocalGlobalOrStatic(const string& name) {
 	if(handleLocalsAndArguments(name, frame, f, dummy)) return true;
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
 	if(!s)
-		s = stabsGetSymbolByScopeAndName(0, name);
+		s = stabsGetSymbolGlobal(name);
 	return s != NULL;
+}
+
+static SeeCallback sSeeCallbackThis = NULL;
+static bool sWasThis = false;
+static string sThisName ="";
+
+static void thisHandler(const SYM& sym) {
+	const TypeBase* resolved = sym.type->resolve();
+	if(resolved->type() != TypeBase::eConst) return;
+	const ConstType* thisType = (const ConstType*) resolved;
+	resolved = thisType->deref();
+	if(!resolved) return;
+	resolved = resolved->resolve();
+
+	if(resolved && resolved->type() == TypeBase::eStruct) {
+		const StructType *type = ((const StructType*)resolved);
+		
+		// cannot be c++ (if we are in a method, the this pointer must have methods naturally.)
+		if(type->getMethods().size()==0) return;
+
+		DotNode::SearchResult res;
+		DotNode::recursiveSearch(sThisName, type, &res);
+		if(res.found) {
+			sSeeSym = sym;
+			int thisPointer = *(int*)sSeeSym.address;
+			int ptr = thisPointer + (res.offsetBits>>3);
+			sSeeSym.address = gMemBuf + ptr;
+			sSeeSym.type = res.type;
+			sWasThis = true;
+			sSeeSym.scope = sScope;
+			sSeeCallback = sSeeCallbackThis;
+			StubConnection::readMemory(gMemBuf + ptr, ptr, res.type->size(),
+				Callback::seeReadMem);
+			}
+	}
 }
 
 void locate_symbol(const string& name, SeeCallback cb) {
 	//first search locals in the current frame, including any function parameters.
+	//then check if there is a this symbol local in the current frame, and search through that (only if it's a class with methods).
 	//then search static symbols in the current frame's file scope.
 	//finally search global symbols (scope 0).
 
@@ -156,10 +192,18 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	if(handleLocalsAndArguments(name, frame, f, cb))
 		return;
 
+	// this
+	sWasThis = false;
+	sThisName = name;
+	sSeeCallbackThis = cb;
+	if(handleLocalsAndArguments("this", frame, f, thisHandler)) {
+		if(sWasThis) return;
+	}
+
 	//statics and globals
 	const Symbol* s = stabsGetSymbolByScopeAndName(f->fileScope, name);
 	if(!s)
-		s = stabsGetSymbolByScopeAndName(0, name);
+		s = stabsGetSymbolGlobal(name);
 	if(!s) {
 		//cb(sym);
 		error("cannot find symbol '%s'", name.c_str());
@@ -176,9 +220,10 @@ void locate_symbol(const string& name, SeeCallback cb) {
 		sym.address = (void*)s->address;	//hack. see FunctionType::printMI().
 		sym.scope = sScope;
 		cb(sym);
-	} else if(s->type == eVariable) {
+	} else if(s->type == eVariable && s->global==false) {
 		const StaticVariable* sv = (StaticVariable*)s;
 		sym.type = sv->dataType->resolve();
+		sScope.type = SYM::Scope::eStatic;
 		sym.scope = sScope;
 		sSeeCallback = cb;
 		sSeeSym = sym;

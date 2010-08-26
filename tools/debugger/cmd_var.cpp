@@ -68,11 +68,19 @@ namespace Callback {
 // types
 //******************************************************************************
 
+enum ExpUpdateResult {
+	EXP_PARSE_ERROR,
+	EXP_OUT_OF_SCOPE,
+	EXP_EVAL_FAILED,
+	EXP_OK
+};
+
 class Expression {
 public:
 	Expression(int frameAddr, const string& exprText) : mFrameAddr(frameAddr), mExprText(exprText), mExprTree(NULL), mIsValid(false) {}
+	virtual ~Expression() {}
 
-	virtual void update(ExpressionCallback ecb);
+	virtual ExpUpdateResult update(ExpressionCallback ecb);
 	bool updated() const { return mUpdated; }
 	void outdate() { mUpdated = false; }
 
@@ -87,6 +95,7 @@ public:
 	bool isValid() const { return mIsValid; }
 
 	const string& getExprText() { return mExprText; }
+	void setExprTree(ExpressionTree* expr) { mExprTree = expr; }
 
 	void updateData(std::string _value, std::string _type, bool _simpleType) {
 		if(mValue != _value || mType != _type || mSimpleType != _simpleType) {
@@ -477,6 +486,11 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	//const SYM& sym = v->getSymbol();
 	const TypeBase* typeBase = convertConstType(v->getTypeBase());
 
+	if(v->isType()) {
+		error("Variable is a type.");
+		return;
+	}
+
 	if(typeBase->type() == TypeBase::eArray) {
 		sVar->addArray((const char*)v->getDataAddress(), (const ArrayType*)typeBase);
 	} else if(typeBase->type() == TypeBase::eStruct) {
@@ -489,7 +503,6 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 		bool simpleType = typeBase->isSimpleValue();
 		sExp->updateData(value, type, simpleType);
 	}
-
 	sUpdateCallback();
 }
 
@@ -500,6 +513,12 @@ static void Callback::varEEUpdate(const Value* v, const char *err) {
 	}
 
 	const TypeBase* typeBase = convertConstType(v->getTypeBase());
+
+	if(v->isType()) {
+		error("Variable is a type.");
+		return;
+	}
+
 	std::string type = getType(typeBase, false);
 	bool simpleType = typeBase->isSimpleValue();
 	std::string value = "";
@@ -521,7 +540,7 @@ static void resetValidness() {
 	}
 }
 
-void Expression::update(ExpressionCallback ecb) {
+ExpUpdateResult Expression::update(ExpressionCallback ecb) {
 	static bool first = true;
 	if(first) {
 		first = false;
@@ -541,7 +560,7 @@ void Expression::update(ExpressionCallback ecb) {
 			mExprTree = ExpressionParser::parse(mExprText.c_str());
 		} catch(ParseException& e) {
 			error("%s", e.what());
-			return;
+			return EXP_PARSE_ERROR;
 		}
 	} else {
 		// variable is already created. check if any variable is out of scope in this expression. If so, set it as out of scope and skip updation.
@@ -557,13 +576,13 @@ void Expression::update(ExpressionCallback ecb) {
 					// must be in the current file scope.
 					ASSERT_REG;
 					int fileScope = getFileScope(r.pc);
-					if(fileScope==-1 || fileScope!=s.fileScope) { sVar->outOfScope = true; mUpdated = true; return; }
+					if(fileScope==-1 || fileScope!=s.fileScope) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
 					}
 					break;
 				case SYM::Scope::eLocal: {
 					// must be in the current scope.
 					ASSERT_REG;
-					if(r.pc<s.start || r.pc>s.end) { sVar->outOfScope = true; mUpdated = true; return; }
+					if(r.pc<s.start || r.pc>s.end) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
 					}
 					break;
 			}
@@ -575,7 +594,10 @@ void Expression::update(ExpressionCallback ecb) {
 		stackEvaluateExpressionTree(mExprTree, mFrameAddr, ecb);
 	} else {
 		error("Parsing of expression failed.");
+		return EXP_EVAL_FAILED;
 	}
+
+	return EXP_OK;
 }
 
 //******************************************************************************
@@ -777,21 +799,20 @@ void var_update(const string& args) {
 
 static void Callback::varUpdate() {
 	if(!sUpdateQueue.empty()) {
-		Variable *v;
+		Variable *v = NULL;
 
 		do {
 			v = sUpdateQueue.front();
 			sUpdateQueue.pop();
-			_ASSERT(sVar == NULL);
+			//_ASSERT(sVar == NULL);
 			sVar = v;
 			if(v->exp)
-				v->exp->update(Callback::varEEUpdate);	
-			sVar = NULL;
+				v->exp->update(Callback::varEEUpdate);
+			//sVar = NULL;
 		} while(v->outOfScope && !sUpdateQueue.empty());
 
-		if(!v->outOfScope) {
+		if(v && !v->outOfScope) {
 			if(v->mHasCreatedChildren)
-				//	for(size_t i = 0; i < v->children.size(); i++) {
 				for(map<int, Variable>::iterator i = v->children.begin(); i!=v->children.end(); i++) {
 					sUpdateQueue.push(&i->second);
 				}
@@ -812,6 +833,7 @@ static void Callback::varUpdate() {
 		itr++;
 	}
 	oprintf("]\n");
+	sVar = NULL;
 	commandComplete();
 }
 
@@ -894,9 +916,12 @@ void var_evaluate_expression(const string& args) {
 
 	_ASSERT(sVar == NULL);
 	sVar = var;
-	if(!var->exp->isValid()) {
+	if(/*!var->exp->isValid()*/!var->exp->updated()) {
 		sUpdateCallback = Callback::varEvaluateExpression;
-		var->exp->update(Callback::varEEUpdate);
+		ExpUpdateResult res = var->exp->update(Callback::varEEUpdate);
+		if(res == EXP_OUT_OF_SCOPE) {
+			error("Variable out of scope.");
+		}
 	}
 	else
 		Callback::varEvaluateExpression();
@@ -910,6 +935,7 @@ static void Callback::varEvaluateExpression() {
 	else
 		oprintf("{...}");
 	oprintf("\"\n");
+	sVar = NULL;
 	commandComplete();
 }
 
@@ -1039,7 +1065,6 @@ static void Callback::varListChildren() {
 	oprintDone();
 	oprintf(",numchild=\"%"PFZT"\",children=[", sVar->children.size());
 
-	//for(size_t i = 0; i < sVar->children.size(); i++) 
 	for(map<int, Variable>::iterator i = sVar->children.begin(); i!=sVar->children.end(); i++)
 	{
 		Variable& varc = i->second;
@@ -1082,4 +1107,15 @@ void var_info_type(const string& args) {
 	oprintDone();
 	oprintf(",type=\"%s\"\n", var->exp->type().c_str());
 	commandComplete();
+}
+
+void varErrorFunction() {
+	if(sVar) {
+
+		if(sRootVariableMap.find(sVar->name) == sRootVariableMap.end() &&
+			sVariableMap.find(sVar->name) == sVariableMap.end()) {
+			delete sVar;
+		}
+		sVar = NULL;
+	}
 }

@@ -500,7 +500,7 @@ SYSCALL(void, maConnClose(MAHandle conn)) {
 	gConnMutex.unlock();
 }
 
-void Base::maAccept(MAHandle conn) {
+int Base::maAccept(MAHandle conn) {
 	LOGST("Accept %i", conn);
 	MAConn& mac = getConn(conn);
 	MYASSERT(mac.type == eServerConn, ERR_CONN_NOT_SERVER);
@@ -512,6 +512,7 @@ void Base::maAccept(MAHandle conn) {
 	mac.state |= CONNOP_ACCEPT;
 	gThreadPool.execute(new Accept(masc));
 #endif	//_WIN32_WCE
+	return 0;
 }
 
 SYSCALL(int, maConnGetAddr(MAHandle conn, MAConnAddr* addr)) {

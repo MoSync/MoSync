@@ -115,9 +115,9 @@ namespace Base {
 		int maFileTruncate(MAHandle file, int offset);
 
 		int maFileWrite(MAHandle file, const void* src, int len);
-		int maFileWriteFromData(const MA_FILE_DATA* args);
+		int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len);
 		int maFileRead(MAHandle file, void* dst, int len);
-		int maFileReadToData(const MA_FILE_DATA* args);
+		int maFileReadToData(MAHandle file, MAHandle data, int offset, int len);
 
 		int maFileTell(MAHandle file);
 		int maFileSeek(MAHandle file, int offset, int whence);
@@ -134,6 +134,8 @@ namespace Base {
 		//for ioctl
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
+		const wchar* GetValidatedWStr(int address);
+		int GetValidatedStackValue(int offset);
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);
@@ -152,7 +154,7 @@ namespace Base {
 		int maBtGetNewService(MABtService* dst);
 	};
 
-	void maAccept(MAHandle conn);
+	int maAccept(MAHandle conn);
 
 	//platform-dependent, works like atoi.
 	int atoiLen(const char* str, int len);
@@ -194,7 +196,12 @@ namespace Base {
 
 
 #define GVMR(p, type) (type*)SYSCALL_THIS->GetValidatedMemRange(p, sizeof(type))
+#define GVS(p) SYSCALL_THIS->GetValidatedStr(p)
+#define GVWS(p) SYSCALL_THIS->GetValidatedWStr(p)
 #define GVMRA(type) GVMR(a, type)
+
+#define maIOCtl_case(func) maIOCtl_##func##_case(func)
+#define maIOCtl_syscall_case(func) maIOCtl_##func##_case(SYSCALL_THIS->func)
 
 //Custom event handling
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)

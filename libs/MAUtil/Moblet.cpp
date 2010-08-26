@@ -90,6 +90,9 @@ namespace MAUtil {
 					case EVENT_TYPE_KEY_RELEASED:
 						moblet->fireKeyReleaseEvent(event.key, event.nativeKey);
 						break;
+					case EVENT_TYPE_CHAR:
+						moblet->fireCharEvent(event.character);
+						break;
 					case EVENT_TYPE_POINTER_PRESSED:
 						moblet->firePointerPressEvent(event.point);
 						break;

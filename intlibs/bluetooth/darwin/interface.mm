@@ -39,9 +39,6 @@ using namespace Bluetooth;
  * Globals
  */
 static DiscoveryCocoa *gDiscovery = NULL;
-//static NSMutableArray *gFoundServices = NULL;
-
-
 
 namespace Bluetooth
 {

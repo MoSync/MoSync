@@ -52,14 +52,18 @@ struct Argument {
 	bool in;
 	string type;
 	string name;
+	string range; // if available
 };
 
 struct Function {
 	string returnType;
+	string returnTypeRange; // if available
+
 	string name;
 	vector<Argument> args;
 	string comment;
 	int number;
+	bool isIOCtl;
 };
 
 struct IoctlFunction {
@@ -122,10 +126,9 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
 
 void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix);
-void streamIoctlDefines(ostream& stream, const vector<Ioctl>& ioctls, int ix);
+void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);
-void streamMoSyncDllDefines(ostream& stream);
 
 //implemented by the user
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);

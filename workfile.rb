@@ -6,7 +6,7 @@ require File.expand_path('rules/host.rb')
 require File.expand_path('rules/task.rb')
 require File.expand_path('rules/mosync_util.rb')
 
-PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"]
+PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
@@ -56,6 +56,7 @@ end
 
 target :base => skins do
 	Work.invoke_subdirs(PRE_DIRS)
+	#Work.invoke_subdir("tools/WrapperGenerator", "compile")
 	Work.invoke_subdir("tools/idl2", "compile")
 end
 

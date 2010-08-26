@@ -152,16 +152,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 
 		streamHash(stream, inf);
 
-		stream << "#if defined(__GNUC__) || defined(__SYMBIAN32__)\n"
-			"#define ATTRIBUTE(a, func)  func __attribute__ ((a))\n"
-			"#define GCCATTRIB(a) __attribute__ ((a))\n"
-			"#elif defined(_MSC_VER)\n"
-			"#define ATTRIBUTE(a, func)  __declspec (a) func\n"
-			"#define GCCATTRIB(a)\n"
-			"#define inline __inline\n"
-			"#else\n"
-			"#error Unsupported compiler!\n"
-			"#endif\n"
+		stream << "#include \"maapi_defs.h\"\n"
 			"\n"
 			"#ifndef MAPIP\n"
 			"#define _HAVE_STRING_ARCH_strcmp\n"
@@ -173,8 +164,6 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 			"#endif	//MAPIP\n"
 			"\n"
 			;
-
-		streamMoSyncDllDefines(stream);
 	}
 
 	stream << "#ifdef __cplusplus\n"
@@ -203,24 +192,6 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	}
 
 	stream << "#endif	//" + headerName + "_H\n";
-}
-
-void streamMoSyncDllDefines(ostream& stream) {
-	stream << "#ifdef WIN32\n"
-		"#define DLLEXPORT dllexport\n"
-		"#define DLLIMPORT dllimport\n"
-		"#elif defined(LINUX)\n"
-		"#define DLLEXPORT visibility(\"default\")\n"
-		"#define DLLIMPORT\n"
-		"#endif\n"
-		"\n"
-		"#ifdef MOSYNC_DLL_EXPORT\n"
-		"#define MOSYNC_API DLLEXPORT\n"
-		"#elif defined(MOSYNC_DLL_IMPORT)\n"
-		"#define MOSYNC_API DLLIMPORT\n"
-		"#else\n"
-		"#define MOSYNC_API\n"
-		"#endif\n\n";
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
@@ -383,16 +354,160 @@ static void streamDefines(ostream& stream, const vector<Define>& defines, int ix
 		stream << "\n";
 }
 
-void streamIoctlDefines(ostream& stream, const vector<Ioctl>& ioctls, int ix) {
+static void streamIoctlInputParam(ostream& stream, int k, bool java) {
+	if(k < 3) {
+		stream << (char)('a'+k);
+	} else {
+		if(java)
+			stream << "mCore.";
+		else
+			stream << "SYSCALL_THIS->";
+		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
+	}
+}
+
+void streamIoctlDefines(ostream& stream, const Interface& inf, const string& headerName,
+	int ix, bool java)
+{
+	const vector<Ioctl>& ioctls = inf.ioctls;
 	for(size_t i=0; i<ioctls.size(); i++) {
 		const Ioctl& ioctl(ioctls[i]);
 		bool anyStreamed = false;
+
+		stream << "#define " << ioctl.name << "_" << headerName << "_caselist \\\n";
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+			const IoctlFunction& f(ioctl.functions[j]);
+			if(f.ix != ix)
+				continue;
+			stream << ioctl.name << "_" << f.f.name << "_case(" << f.f.name << ") \\\n";
+		}
+		stream << "\n";
+
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
 			const IoctlFunction& f(ioctl.functions[j]);
 			if(f.ix != ix)
 				continue;
 
 			stream << "#define " << ioctl.name << "_" << f.f.name << " " << f.f.number << "\n";
+
+			stream << "#define " << ioctl.name << "_" << f.f.name << "_case(func) \\\n";
+			stream << "case " << f.f.number << ": \\\n";
+			stream << "{ \\\n";
+			for(size_t k = 0, inK = 0; k < f.f.args.size(); k++, inK++) {
+				const Argument& arg(f.f.args[k]);
+				string ctype = (java ? jType : cType)(inf, arg.type);
+				const string& resolvedType = resolveType(inf, ctype);
+				bool isPointer = isPointerType(inf, arg.type) || !arg.in;
+				bool isString = arg.type == "MAString" || arg.type == "MAWString";
+				bool isWideString = arg.type == "MAWString";
+				bool isDouble = resolvedType == "double" && arg.in;
+				bool isFloat = resolvedType == "float" && arg.in;
+
+				if(!java) {
+					if(arg.type == "MAAddress") {
+						ctype = "void*";
+						isPointer = true;
+					}
+
+					if(isPointer || isString)
+						ctype = (arg.in ? "const " : "") + ctype;
+					if(!isPointerType(inf, arg.type) && !arg.in)
+						ctype += '*';
+				} else if(!arg.in) {
+					ctype = "MAAddress";
+				}
+
+				string localName = "_" + arg.name;
+				string dvName = localName+"_dv";
+
+				if(isDouble) {
+					stream << "MA_DV "<<dvName<<"; \\\n";
+					stream << dvName<<".hi = ";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
+					inK++;
+					stream << dvName<<".lo = ";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
+				}
+				if(isFloat) {
+					stream << "MA_FV "<<dvName<<"; \\\n";
+					stream << dvName<<".i = ";
+					streamIoctlInputParam(stream, inK, java);
+					stream << "; \\\n";
+				}
+				stream << ctype << " " << localName << " = ";
+
+				if(isDouble) {
+					stream << dvName << ".d";
+				} else if(isFloat) {
+					stream << dvName << ".f";
+				} else {
+					if(isString && arg.in)
+						stream << (isWideString ? "GVWS(" : "GVS(");
+					else if(isPointer && !java) {
+						if(arg.range.empty()) {
+							stream << "GVMR(";
+						} else {
+							stream << "(" << arg.type << ") SYSCALL_THIS->GetValidatedMemRange(";
+						}
+					} else if(ctype != "int")
+						stream << "(" << ctype << ")";
+
+					streamIoctlInputParam(stream, inK, java);
+
+					if(isString && arg.in)
+						stream << ")";
+					else if(isPointer && !java) {
+						if(arg.range.empty()) {
+							string gvmrType;
+							size_t m1 = arg.type.size()-1;
+							if(arg.type[m1] == '*') {
+								gvmrType = arg.type.substr(0, m1);
+							} else {
+								gvmrType = arg.type;
+							}
+							stream << ", " << gvmrType << ")";
+						} else {
+							stream << ", " << arg.range << ")";
+						}
+					}
+				}
+
+				stream << "; \\\n";
+			}
+
+			string resolvedReturnType = resolveType(inf, f.f.returnType);
+			bool returnDouble = resolvedReturnType == "double";
+			bool returnFloat = resolvedReturnType == "float";
+			bool returnVoid = resolvedReturnType == "void";
+			if(returnDouble) {
+				stream << "MA_DV result; \\\n";
+				stream << "result.d = func(";
+			} else if(returnFloat) {
+				stream << "MA_FV result; \\\n";
+				stream << "result.f = func(";
+			} else if(returnVoid) {
+				stream << "func(";
+			} else {
+				stream << "return func(";
+			}
+			for(size_t k = 0; k < f.f.args.size(); k++) {
+				if(k!=0)
+					stream << ", ";
+				stream << "_" << f.f.args[k].name;
+			}
+			stream << "); \\\n";
+			if(returnDouble) {
+				stream << "return result.ll; \\\n";
+			} else if(returnFloat) {
+				stream << "return result.i; \\\n";
+			} else if(returnVoid) {
+				stream << "return 0; \\\n";
+			}
+			stream << "} \\\n";
+			stream << "\n";
+
 			anyStreamed = true;
 		}
 		if(anyStreamed)
@@ -418,8 +533,9 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	stream << f.comment;
 
 	string invokeArgs;
-	string doubleRetVar;
-	stream << "static inline " << f.returnType << " " << f.name << "(";
+	string tempVars;
+	int usedArgs = f.args.size();
+	stream << "IOCTLDEF " << f.returnType << " " << f.name << "(";
 	if(f.args.size() == 0) {
 		stream << "void";
 	}
@@ -439,36 +555,51 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 			invokeArgs += "(int)";
 		}
 		if(a.type == "double" && a.in) {
-			invokeArgs += "(int)&";
-			if(doubleRetVar.size() == 0)
-				doubleRetVar = a.name;
+			string tvn = "_" + a.name;
+			tempVars += "\tMA_DV " + tvn + ";\n";
+			tempVars += "\t" + tvn + ".d = " + a.name + ";\n";
+			invokeArgs += tvn + ".hi, " + tvn + ".lo";
+			usedArgs++;
+		} else if(a.type == "float" && a.in) {
+			string tvn = "_" + a.name;
+			tempVars += "\tMA_FV " + tvn + ";\n";
+			tempVars += "\t" + tvn + ".f = " + a.name + ";\n";
+			invokeArgs += tvn + ".i";
+		} else {
+			invokeArgs += a.name;
 		}
-		invokeArgs += a.name;
 	}	//args
-	stream << ") {\n	";
+	stream << ") {\n";
+	if(usedArgs > 3)
+		stream << "#ifdef MAPIP\n";
+	stream << tempVars;
 
-	int usedArgs = f.args.size();
-	if(f.returnType == "double" && doubleRetVar.size() == 0) {
-		if(usedArgs >= 3)
-			throwException("Too many arguments used in function " + f.name);
-		doubleRetVar = "_temp";
-		stream << "double " << doubleRetVar << ";\n	";
-		invokeArgs += ", (int)&_temp";
-		usedArgs++;
-	}
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
 
 	string invoke = ioctlName + "(" + toString(f.number) + invokeArgs + ");";
 	if(f.returnType == "double") {
-		stream << invoke + "\n	return " << doubleRetVar << ";\n";
+		stream << "\tMA_DV _result;\n";
+		stream << "\t_result.ll = " + invoke + "\n";
+		stream << "\treturn _result.d;\n";
+	} else if(f.returnType == "float") {
+		stream << "\tMA_FV _result;\n";
+		stream << "\t_result.i = (int)" + invoke + "\n";
+		stream << "\treturn _result.f;\n";
 	} else {
+		stream << "\t";
+
 		if(f.returnType != "void") {
 			stream << "return ";
 		}
+		if(f.returnType != "longlong")
+			stream << "(" << f.returnType << ") ";
+
 		stream << invoke + "\n";
 	}
+	if(usedArgs > 3)
+		stream << "#else\n\treturn IOCTL_UNAVAILABLE;\n#endif\n";
 	stream << "}\n\n";
 }
 
@@ -488,7 +619,7 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);
-	streamIoctlDefines(stream, inf.ioctls, ix);
+	streamIoctlDefines(stream, inf, headerName, ix, false);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }
