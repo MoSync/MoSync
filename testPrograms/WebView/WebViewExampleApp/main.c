@@ -3,45 +3,25 @@
 #include <mavsprintf.h>
 #include <MAWebView.h>
 
+// Test that JavaScript runs in the browser.
 #define HTML1 " \
 	<html><body> \
     <script>for(var i = 0; i < 100; ++i) { document.write('Hello World ' + i + '</br>'); }</script> \
     </body></html>"
 
+// Call MoSync via JavsScript from a clickable link.
 #define HTML2 " \
 	<html><body> \
 	<a href=\"javascript:document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
     </body></html>"
 
+// Another way to specify the click action.
 #define HTML3 " \
 	<html><body> \
 	<a href=\"#\" onclick=\"document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
     </body></html>"
 
-
-#define HTML4x " \
-	<html><body> \
-	<script> \
-		function MoSyncRequest(request) { document.location = 'mosync://' + request; } \
-		function ProcessData() { var request = 'ProcessData/' + document.getElementById(\"DataField\").value; MoSyncRequest(request); } \
-	</script> \
-	<div style=\"margin-bottom:10pt; font-size:150%%;\">Touch a color or press a keypad number key!</div> \
-	<div> \
-		<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
-		<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
-		<a style=\"cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
-	</div> \
-	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"ColorMessage\"></div> \
-	<div style=\"margin-top:20pt;\"> \
-		<input style=\"font-size:150%%;\" type='text' id='DataField' /> \
-		<input style=\"font-size:150%%;\" type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
-	<div> \
-	<div style=\"margin-top:20pt; font-size:150%%;\" id=\"DataMessage\"></div> \
-	<div style=\"margin-top:20pt; font-size:150%%;\"><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div style=\"margin-top:20pt; font-size:150%%;\"<a cursor: hand; font-size:150%%;\" href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
-    </body></html>"
-
-
+// Test many features in one example.
 #define HTML4 " \
 	<html> \
 	<head> \
@@ -72,11 +52,46 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
-// TODO: Fix utf8 issues!!
+// Test that percent signs work (was an issue on Android).
+#define HTML5 " \
+	<html> \
+	<head> \
+    <style type=\"text/css\"> \
+		div { font-size:150%; margin-top:20pt; } \
+		a { cursor: hand; } \
+		input { font-size:120%; } \
+	</style> \
+	</head> \
+	<body> \
+	<script> \
+		function MoSyncRequest(request) { \
+			document.location = 'mosync://' + request; } \
+		function ProcessData() { \
+			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncRequest(request); } \
+	</script> \
+	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
+	<div> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
+	</div> \
+	<div id=\"ColorMessage\"></div> \
+	<div> \
+		<input type='text' id='DataField' /> \
+		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
+	</div> \
+	<div id=\"DataMessage\"></div> \
+	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+    </body> \
+    </html>"
 
 #define BGCOLOR_SCRIPT " \
 	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color!'; \
@@ -103,89 +118,18 @@ void DisplayData(char* data)
 	maWebViewFreeData(script);
 }
 
-#ifdef COMMENT_OUT
-int MAMain()
-{
-	MAEvent event;
-
-	//maWebViewOpen();
-	//maWebViewSetHTML("<html><body>MAMain 1</body></html>");
-
-	//maPanic(1, "Hi!!");
-
-	maSetColor(0xFF0000);
-	maFillRect(0, 0, 300, 200);
-	maUpdateScreen();
-
-	//maWebViewOpen();
-	//maWebViewSetHTML("<html><body>MAMain1</body></html>");
-
-	while (1)
-	{
-		maSetColor(0xFF0000);
-		maFillRect(0, 0, 300, 200);
-		maUpdateScreen();
-
-		//maWait(0);
-		while (0 != maGetEvent(&event))
-		{
-			switch (event.type)
-			{
-				case EVENT_TYPE_CLOSE:
-					return 0;
-
-				case EVENT_TYPE_POINTER_PRESSED:
-
-					if (event.point.y < 200)
-					{
-						maExit(0);
-					}
-					else
-					{
-						maSetColor(0x888888);
-						maFillRect(0, 200, 300, 100);
-						maUpdateScreen();
-
-						//maWebViewOpen();
-						//maWebViewSetHTML("<html><body>MAMain2</body></html>");
-
-						//maPanic(1, "Hellooo!!");
-
-						maSetColor(0xFFFF00);
-						maFillRect(0, 300, 300, 100);
-						maUpdateScreen();
-					}
-
-					break;
-
-				case EVENT_TYPE_WEBVIEW_OPENED:
-					//maWebViewSetHTML(HTML3);
-					break;
-
-				case EVENT_TYPE_WEBVIEW_REQUEST:
-				{
-					//maWebViewSetHTML("<html><body>&lt;3 &lt;3 &lt;3</body></html>");
-					int size = maWebViewGetRequestSize(event.key);
-					char* request = (char*) maWebViewAllocateData(size);
-					int result = maWebViewGetRequest(event.key, request, size);
-					if (result < 1) { break; }
-					maWebViewSetHTML(request);
-					//maWebViewEvaluateScript("document.body.innerHTML = '&lt;3 &lt;3 &lt;3 ;-)'");
-					break;
-				}
-			}
-		}
-	}
-
-	return 0;
-}
-#endif
-
 #ifndef COMMENT_OUT
 int MAMain()
 {
 	MAEvent event;
 
+	// Paint something into the drawable MoSync view to make it
+	// visually identifiable.
+	maSetColor(0xFF77FF);
+	maFillRect(20, 20, 300, 300);
+	maUpdateScreen();
+
+	// Immediately open the WebView.
 	maWebViewOpen();
 
 	while (1)
@@ -196,6 +140,12 @@ int MAMain()
 			{
 				case EVENT_TYPE_CLOSE:
 					return 0;
+
+				case EVENT_TYPE_POINTER_PRESSED:
+					// If the WebView has been closed, touching
+					// the screen will open it.
+					maWebViewOpen();
+					break;
 
 				case EVENT_TYPE_KEY_PRESSED:
 					if (event.key == MAK_0) { maWebViewClose(); }
@@ -209,34 +159,25 @@ int MAMain()
 					if (event.key == MAK_8) { SetBgColor("DeepPink"); }
 					if (event.key == MAK_9) { SetBgColor("Gold"); }
 					if (event.key == MAK_BACK) { maExit(0); }
-
 					break;
 
 				case EVENT_TYPE_WEBVIEW_OPENED:
+					// Must wait to set the HTML until this event to make
+					// sure the WebView is fully created before use.
 					maWebViewSetHTML(HTML4);
 					break;
 
 				case EVENT_TYPE_WEBVIEW_REQUEST:
+					// This is where requests from the WebView are handled.
+					// I have used a block hete to be able to declare local
+					// variables inside a case-statement (would be better to
+					// move this to a separate function).
 					{
 						// Get request.
 						int size = maWebViewGetRequestSize(event.key);
 						char* request = (char*) maWebViewAllocateData(size);
 						int result = maWebViewGetRequest(event.key, request, size);
 						if (result < 1) { break; }
-
-						// Print request.
-						//printf("Request: %s\n", request);
-
-						/*
-						char* service = maWebViewGetRequestService(request);
-						if (service)
-						{
-							//maWebViewSetHTML("Service is something");
-							//printf("Requested Service: %s\n", service);
-							maWebViewFreeData(service);
-						}
-						//else maWebViewSetHTML("Service is null");
-						*/
 
 						// Process request.
 						if (maWebViewRequestIs(request, "BgColor"))
@@ -260,6 +201,10 @@ int MAMain()
 								maWebViewFreeData(data);
 							}
 						}
+						else if (maWebViewRequestIs(request, "CloseWebView"))
+						{
+							maWebViewClose();
+						}
 						else if (maWebViewRequestIs(request, "ExitApp"))
 						{
 							maExit(0);
@@ -269,10 +214,11 @@ int MAMain()
 			}
 		}
 
+		// TODO: Cannot call maWait, locks the WebView. Look into this.
 		//maWait(0);
 	}
 
-	maWebViewClose();
+	//maWebViewClose();
 
 	return 0;
 }

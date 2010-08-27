@@ -85,14 +85,20 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 
 		// Use accelerated surfaces if available
 		int mode = 0;
-		try {
+		try 
+		{
 			mode = 1;
 			mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_HARDWARE);
-		} catch(Exception e) {
-			try {
+		} 
+		catch(Exception e) 
+		{
+			try 
+			{
 				mode = 2;
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_GPU);
-			} catch(Exception e2) {
+			} 
+			catch(Exception e2) 
+			{
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
 				// if this didn't work we can do nothing...
 			}
@@ -141,7 +147,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			mMoSyncThread.start();
 		}
 		else
+		{
 			mMoSyncThread.updateScreen();
+		}
 	}
 	
 	/**
@@ -196,8 +204,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 				return false;
 		}
 		
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		postEvent(event);
 		
 		return true;
 	}
@@ -206,10 +213,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	 * Post an event to the MoSync event queue.
 	 * The event data is organised as an array of ints.
 	 * The first element is the id of the event.
+	 * TODO: Should this method be synchronized?
 	 */
-	public void postEvent(int[] event)
+	private void postEvent(int[] event)
 	{
-		Log.i("MoSyncView", "postEvent");
+		//Log.i("MoSyncView", "postEvent: " + event[0]);
 		
 		mMoSyncThread.nativePostEvent(event);
 		mMoSyncThread.interrupt();
@@ -278,8 +286,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		postEvent(event);
+		
 		return true;
 	}
 	
@@ -293,8 +301,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		postEvent(event);
+		
 		return true;
 	}
 	

@@ -45,6 +45,7 @@ namespace Base
 
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis);
 	
+	// WebView API
 	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);
 	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis);
 	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis);

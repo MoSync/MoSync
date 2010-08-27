@@ -176,11 +176,14 @@ void maUpdateScreen()
 
 	long st = System.currentTimeMillis();
 	
-	if(mMoSyncView == null) return;
+	MoSyncView moSyncView = ((MoSync) mContext).getMoSyncView();
+	
+	if(moSyncView == null) return;
 
-	try {
-		lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
-		synchronized (mMoSyncView.mSurfaceHolder)
+	try 
+	{
+		lockedCanvas = moSyncView.mSurfaceHolder.lockCanvas();
+		synchronized (moSyncView.mSurfaceHolder)
 		{
 			if(mUsingFrameBuffer)
 			{				
@@ -207,7 +210,9 @@ void maUpdateScreen()
 	}
 		
 	if (lockedCanvas != null)
-	mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	{
+		moSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
+	}
 	
 	long t = System.currentTimeMillis() - st;
 	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
@@ -375,12 +380,7 @@ void maGetImageData(int image, int dst, int srcRect, int scanlength)
 	bitmap.getPixels(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
 		MARect_width(srcRect), MARect_height(srcRect));
 */
-
-
-	
 }
-
-
 
 int maSetDrawTarget(int image)
 {
@@ -403,8 +403,6 @@ int maSetDrawTarget(int image)
 	}
 	return 1;
 }
-
-
 
 int maCreateImageFromData(int placeholder, int data, int offset, int size)
 {
@@ -467,9 +465,6 @@ int _maCreateImageRaw(int placeholder, int width, int height)
 	return RES_OK;
 }
 
-
-
-
 int maCreateDrawableImage(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateDrawableImage");
@@ -497,8 +492,6 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 	}
 	return 1;
 }
-
-
 
 Hashtable<Integer, String> mStores = new Hashtable<Integer, String>();
 int mMaxStoreId = 0;
@@ -829,77 +822,60 @@ int maPlatformRequest(String url)
 
 int maShowVirtualKeyboard()
 {
+	MoSyncView moSyncView = ((MoSync) mContext).getMoSyncView();
+	if(moSyncView == null) return -1;
 	InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-	mgr.showSoftInput(mMoSyncView, InputMethodManager.SHOW_FORCED);
+	mgr.showSoftInput(moSyncView, InputMethodManager.SHOW_FORCED);
 	return 0;
 }
 
 int maWebViewOpen()
 {
-	Log.i("MoSync", "maWebViewOpen - launching intent");
-	
-	((Activity) mMoSyncView.getContext()).runOnUiThread(new Runnable() 
-	{
-		public void run() 
-		{
-			try 
-			{		
-				Intent myIntent = new Intent(mMoSyncView.getContext(), WebViewActivity.class);
-				mMoSyncView.getContext().startActivity(myIntent);
-			}
-			catch (Throwable e)
-			{
-				Log.e("MoSync", "maWebViewOpen - error");
-				e.printStackTrace();
-			}
-		}
-	});
-	
-	// TODO: Wait here for the WebView to be created? Better to post events.
-	// But the post event mechanism should queue events until the WebView is created.
-	
-	return 1;
+	Log.i("MoSync", "maWebViewOpen");
+	return ((MoSync) mContext).maWebViewOpen();
 }
 
 int maWebViewClose()
 {
 	Log.i("MoSync", "maWebViewClose");
-	WebViewActivity.getInstance().close();
-	return 1;
+	// Old code: WebViewActivity.getInstance().close();
+	return ((MoSync) mContext).maWebViewClose();
 }
 
 int maWebViewSetHTML(String html)
 {
 	Log.i("MoSync", "maWebViewSetHTML");
-	WebViewActivity.getInstance().setHTML(html);
-	return 1;
+	// Old code: WebViewActivity.getInstance().setHTML(html);
+	return ((MoSync) mContext).maWebViewSetHTML(html);
 }
 
 int maWebViewLoadURL(String url)
 {
 	Log.i("MoSync", "maWebViewLoadURL");
-	WebViewActivity.getInstance().loadURL(url);
-	return 1;
+	// Old code: WebViewActivity.getInstance().loadURL(url);
+	return ((MoSync) mContext).maWebViewLoadURL(url);
 }
 
 int maWebViewEvaluateScript(String script)
 {
 	Log.i("MoSync", "maWebViewEvaluateScript");
-	WebViewActivity.getInstance().evaluateScript(script);
-	return 1;
+	// Old code: WebViewActivity.getInstance().evaluateScript(script);
+	return ((MoSync) mContext).maWebViewEvaluateScript(script);
 }
 
 int maWebViewGetRequestSize(int requestID)
 {
 	Log.i("MoSync", "maWebViewGetRequestSize");
-	return WebViewActivity.getInstance().getRequestSize(requestID);
+	// Old code: return WebViewActivity.getInstance().getRequestSize(requestID);
+	return ((MoSync) mContext).maWebViewGetRequestSize(requestID);
 }
 
 int maWebViewGetRequest(int requestID, int buf, int bufSize)
 {
 	Log.i("MoSync", "maWebViewGetRequest");
 	
-	int size = WebViewActivity.getInstance().getRequestSize(requestID);
+	// Old code: int size = WebViewActivity.getInstance().getRequestSize(requestID);
+	int size = ((MoSync) mContext).maWebViewGetRequestSize(requestID);
 	if (bufSize < size)
 	{
 		Log.i("MoSync", "maWebViewGetRequest - error");
@@ -908,7 +884,8 @@ int maWebViewGetRequest(int requestID, int buf, int bufSize)
 		
 	// Write request to memory.
 	
-	byte[] bytes = WebViewActivity.getInstance().getRequestBytes(requestID);
+	// Old code: byte[] bytes = WebViewActivity.getInstance().getRequestBytes(requestID);
+	byte[] bytes = ((MoSync) mContext).maWebViewGetRequestBytes(requestID);
 	
 	mMemDataSection.mark();
 	mMemDataSection.position(buf);
@@ -919,9 +896,9 @@ int maWebViewGetRequest(int requestID, int buf, int bufSize)
 	return size;
 }
 
-#ifdef COMMENT_OUT
+/*
 // This is a test method that pops up a Toast.
-int maWebViewOpen()
+int maWebViewOpenToast()
 {
 	Log.i("MoSync", "maWebViewOpen1");
 
@@ -932,25 +909,21 @@ int maWebViewOpen()
 		{
 			try 
 			{	
-				Log.i("MoSync", "maWebViewOpen3.1");
 				android.widget.Toast.makeText(
 					activity,
 					"Hello World!", 
 					android.widget.Toast.LENGTH_SHORT).show();
-				Log.i("MoSync", "maWebViewOpen3.2");
 			}
 			catch (Throwable e)
 			{
-				Log.i("MoSync", "maWebViewOpen3 - error");
+				Log.i("MoSync", "maWebViewOpenToast - error: " + e);
 			}
 		}
 	});
-
-	Log.i("MoSync", "maWebViewOpen2");
 	
 	return 1;
 }
-#endif
+*/
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
@@ -1007,8 +980,8 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 	}
 }
 
-
 Hashtable<Integer, ByteBuffer> mBinaryResources = new Hashtable<Integer, ByteBuffer>();
+
 ByteBuffer loadBinary(int resourceIndex, int size)
 {
 	SYSLOG("loadBinary index:" + resourceIndex);
@@ -1035,9 +1008,10 @@ class UBinData
 	}
 	public int mOffset;
 	public int mSize;
-};
+}
 
 Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
+
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
@@ -1087,6 +1061,4 @@ void destroyResource(int resourceIndex)
 		mImageResources.remove(resourceIndex);
 		return;
 	}
-
-
 }

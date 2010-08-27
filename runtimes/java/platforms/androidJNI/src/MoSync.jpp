@@ -31,35 +31,34 @@ import android.os.Handler;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.MoSyncWebView;
+
+#include "generated\IX_WEBVIEW_CONSTS.h"
 
 import android.content.res.Configuration;
 import android.content.Context;
 
 public class MoSync extends Activity
 {
-	/**
-	 * TODO: Replace this static variable with a way of passing object references
-	 * between activities. Perhaps we can use an Application object:
-	 * http://developer.android.com/reference/android/app/Application.html
-	 * http://developer.android.com/guide/appendix/faq/framework.html#3
-	 */
-	static MoSync Instance;
-	
 	MoSyncView mMoSyncView;
+	MoSyncWebView mMoSyncWebView;
 	MoSyncThread mMoSyncThread;
 	Intent mMoSyncServiceIntent;
 	
-	boolean mThreadHasDied = false;
+	/**
+	 * Handler used to run code on the UI thread.
+	 */
+	Handler mHandler;
 	
+	boolean mThreadHasDied = false;
 	boolean mIsPaused = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	
-		Instance = this;
+		Log.i("MoSync", "onCreate");
 		
 		super.onCreate(savedInstanceState);
-		Log.i("MoSync", "onCreate");
 		
 		if(mThreadHasDied) this.finish();
 		
@@ -67,11 +66,16 @@ public class MoSync extends Activity
         //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		mMoSyncView = null;
+		mMoSyncWebView = null;
 		
-		try {
-			mMoSyncThread = new MoSyncThread(this, new Handler());
+		mHandler = new Handler();
+		
+		try 
+		{
+			mMoSyncThread = new MoSyncThread(this); // TODO: Delete if not needed: , new Handler());
 		}
-		catch(Exception e) {
+		catch(Exception e) 
+		{
 			Log.e("MoSync", "Unable to create thread! Application is closed!");
 			super.onDestroy();
 			this.finish();
@@ -80,20 +84,28 @@ public class MoSync extends Activity
 		createMoSyncView();
 		
 		setContentView(mMoSyncView);
-		mMoSyncThread.setMoSyncView(mMoSyncView);
+		// TODO: Restore if needed: mMoSyncThread.setMoSyncView(mMoSyncView);
 		
     }
 	
 	private void createMoSyncView()
 	{
 		Log.i("MoSync", "createMoSyncView");
-		try {
+		try 
+		{
 			mMoSyncView = new MoSyncView(this, mMoSyncThread);
-        } catch(Exception e) {
+        } 
+		catch(Exception e) 
+		{
 			Log.e("MoSync", "No view was generated.. app could not start!");
 			super.onDestroy();
 			this.finish();
 		}
+	}
+	
+	public MoSyncView getMoSyncView()
+	{
+		return mMoSyncView;
 	}
 
 	@Override
@@ -102,16 +114,6 @@ public class MoSync extends Activity
 		super.onConfigurationChanged(config);
 
 		setContentView(mMoSyncView);
-	}
-	
-	public static MoSync getInstance()
-	{
-		return Instance;
-	}
-	
-	public MoSyncView getMoSyncView()
-	{
-		return mMoSyncView;
 	}
 	
     @Override
@@ -123,7 +125,7 @@ public class MoSync extends Activity
 		mThreadHasDied = mMoSyncThread.isDead();
 		
 		// The view is destroyed, inform the thread about this
-		mMoSyncThread.setMoSyncView(null);
+		// TODO: Restore if needed: mMoSyncThread.setMoSyncView(null);
 	}
 
 	@Override
@@ -155,7 +157,7 @@ public class MoSync extends Activity
 			
 			//mMoSyncView.postFocusGainedEvent();
 			setContentView(mMoSyncView);
-			mMoSyncThread.setMoSyncView(mMoSyncView);
+			// TODO: Delete this line: mMoSyncThread.setMoSyncView(mMoSyncView);
 		}
     }
 
@@ -189,4 +191,105 @@ public class MoSync extends Activity
 		//mMosyncView.killApplication();
     }
 	
+	public int maWebViewOpen()
+	{
+		// Open only if there is no WebView open.
+		if (null == mMoSyncWebView)
+		{
+			final Context context = this;
+			mHandler.post(new Runnable() { 
+				public void run() { 
+					mMoSyncWebView = new MoSyncWebView(context, mMoSyncThread);
+					setContentView(mMoSyncWebView);
+					mMoSyncWebView.requestFocus(); } });
+			return WEBVIEW_OK;
+		}
+		else
+		{
+			return WEBVIEW_ERROR;
+		}
+	}
+	
+	public int maWebViewClose()
+	{
+		if (null != mMoSyncWebView)
+		{
+			mHandler.post(new Runnable() { 
+				public void run() { 
+					mMoSyncWebView.close();
+					mMoSyncWebView = null;
+					setContentView(mMoSyncView); } });
+			return WEBVIEW_OK;
+		}
+		else
+		{
+			return WEBVIEW_NOT_OPEN;
+		}
+	}
+	
+	public int maWebViewSetHTML(final String html)
+	{
+		if (null != mMoSyncWebView)
+		{
+			mHandler.post(new Runnable() { 
+				public void run() { mMoSyncWebView.setHTML(html); } });
+			return WEBVIEW_OK;
+		}
+		else
+		{
+			return WEBVIEW_NOT_OPEN;
+		}
+	}
+
+	public int maWebViewLoadURL(final String url)
+	{
+		if (null != mMoSyncWebView)
+		{
+			mHandler.post(new Runnable() { 
+				public void run() { mMoSyncWebView.loadURL(url); } });
+			return WEBVIEW_OK;
+		}
+		else
+		{
+			return WEBVIEW_NOT_OPEN;
+		}
+	}
+
+	public int maWebViewEvaluateScript(final String script)
+	{
+		if (null != mMoSyncWebView)
+		{
+			mHandler.post(new Runnable() { 
+				public void run() { mMoSyncWebView.evaluateScript(script); } });
+			return WEBVIEW_OK;
+		}
+		else
+		{
+			return WEBVIEW_NOT_OPEN;
+		}
+	}
+	
+	public int maWebViewGetRequestSize(int requestID)
+	{
+		if (null != mMoSyncWebView)
+		{
+			return mMoSyncWebView.getRequestSize(requestID);
+		}
+		else
+		{
+			return WEBVIEW_NOT_OPEN;
+		}
+	}
+	
+	public byte[] maWebViewGetRequestBytes(int requestID)
+	{
+		if (null != mMoSyncWebView)
+		{
+			return mMoSyncWebView.getRequestBytes(requestID);
+		}
+		else
+		{
+			return null;
+		}
+	}
 }

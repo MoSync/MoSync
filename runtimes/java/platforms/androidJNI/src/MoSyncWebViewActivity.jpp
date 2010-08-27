@@ -1,3 +1,5 @@
+// THIS CLASS IS NOT USED - KEPT HERE FOR REFERENCE
+
 /* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
@@ -32,7 +34,7 @@ import android.widget.Toast;
 /**
  * Activity that contains a WebView instance.
  */
-public class WebViewActivity extends Activity 
+public class MoSyncWebViewActivity extends Activity 
 {
 	//public static Handler mHandler;
 
@@ -40,7 +42,7 @@ public class WebViewActivity extends Activity
 	 * The one and only instance of this activity.
 	 * This is truly crappy, but will do for now.
 	 */
-	static WebViewActivity Instance;
+	static MoSyncWebViewActivity Instance;
 	
 	/** 
 	 * The WebView instance of this Activity. 
@@ -60,7 +62,7 @@ public class WebViewActivity extends Activity
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
 	{
-		Log.i("MoSync", "WebViewActivity.onCreate");
+		Log.i("MoSync", "MoSyncWebViewActivity.onCreate");
 		
 		handler = new Handler();
 		Instance = this;
@@ -72,7 +74,7 @@ public class WebViewActivity extends Activity
 		//webview.addJavascriptInterface(this, "activity");
 		
 		// Create WebViewClient object to handle WebView events.
-		final WebViewActivity activity = this;
+		final MoSyncWebViewActivity activity = this;
 		webview.setWebViewClient(new WebViewClient() 
 		{
 			public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) 
@@ -84,7 +86,7 @@ public class WebViewActivity extends Activity
 			{
 				String mosyncProtocol = "mosync://";
 				
-				Log.i("MoSync", "WebViewActivity.WebViewClient.shouldOverrideUrlLoading");
+				Log.i("MoSync", "MoSyncWebViewActivity.WebViewClient.shouldOverrideUrlLoading");
 				if (url.startsWith(mosyncProtocol))
 				{
 					Log.i("MoSync", "Processing MoSync url: " + url);
@@ -132,16 +134,49 @@ public class WebViewActivity extends Activity
 		postMoSyncEvent(event);
 	}
 	
+	// TODO: Impelement this method if this code should be used again.
 	private void postMoSyncEvent(int[] event)
 	{
-		MoSync.getInstance().getMoSyncView().postEvent(event);
+		// Commented out because MoSync protocol has changed.
+		// MoSync.getInstance().getMoSyncView().postEvent(event);
 	}
 	
-	public static WebViewActivity getInstance()
+	public static MoSyncWebViewActivity getInstance()
 	{
 		return Instance;
 	}
 	
+/* 
+// Old code from MoSyncSyscalls.jpp
+// Old version that opens a new activity with a WebView.
+int maWebViewOpen()
+{
+	Log.i("MoSync", "maWebViewOpen - launching intent");
+	
+	((Activity) mMoSyncView.getContext()).runOnUiThread(new Runnable() 
+	{
+		public void run() 
+		{
+			try 
+			{		
+				Intent myIntent = new Intent(mMoSyncView.getContext(), WebViewActivity.class);
+				mMoSyncView.getContext().startActivity(myIntent);
+			}
+			catch (Throwable e)
+			{
+				Log.e("MoSync", "maWebViewOpen - error");
+				e.printStackTrace();
+			}
+		}
+	});
+	
+	// TODO: Wait here for the WebView to be created? Better to post events.
+	// But the post event mechanism should queue events until the WebView is created.
+	
+	return 1;
+}
+*/
+
 	public int close()
 	{
 		// Close activity.
@@ -154,7 +189,7 @@ public class WebViewActivity extends Activity
 	
 	public int setHTML(final String html)
 	{
-		Log.i("MoSync", "WebViewActivity.setHTML");
+		Log.i("MoSync", "MoSyncWebViewActivity.setHTML");
 		handler.post(new Runnable() { 
 			public void run() { 
 				webview.loadData(html, "text/html", "utf-8"); //"ISO-8859-1" "utf-8" // TODO: Fix encoding
@@ -171,7 +206,7 @@ public class WebViewActivity extends Activity
 	
 	public int loadURL(final String url)
 	{
-		Log.i("MoSync", "WebViewActivity.loadURL");
+		Log.i("MoSync", "MoSyncWebViewActivity.loadURL");
 		handler.post(new Runnable() { 
 			public void run() { 
 				webview.loadUrl(url); } });
@@ -191,7 +226,7 @@ public class WebViewActivity extends Activity
 	 */
 	public int evaluateScript(final String script)
 	{
-		Log.i("MoSync", "WebViewActivity.evaluateScript");
+		Log.i("MoSync", "MoSyncWebViewActivity.evaluateScript");
 		handler.post(new Runnable() { 
 			public void run() { 
 				webview.loadUrl("javascript: " + script); } });
@@ -211,42 +246,42 @@ public class WebViewActivity extends Activity
 	@Override
     protected void onStart() 
 	{
-    	Log.i("MoSync", "WebViewActivity.onStart");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onStart");
     	super.onStart();
     }
 	
 	@Override
     protected void onStop() 
 	{
-    	Log.i("MoSync", "WebViewActivity.onStop");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onStop");
     	super.onStop();
     }
 	
 	@Override
     protected void onRestart() 
 	{
-    	Log.i("MoSync", "WebViewActivity.onRestart");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onRestart");
         super.onRestart();
     }
 	
 	@Override
     protected void onResume() 
 	{
-    	Log.i("MoSync", "WebViewActivity.onResume");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onResume");
         super.onResume();
     }
 	
 	@Override
     protected void onPause() 
 	{
-    	Log.i("MoSync", "WebViewActivity.onPause");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onPause");
         super.onPause();
     }
 	
 	@Override
     protected void onDestroy()
 	{
-    	Log.i("MoSync", "WebViewActivity.onDestroy");
+    	Log.i("MoSync", "MoSyncWebViewActivity.onDestroy");
 		super.onDestroy();
 		
 		// Post notification message to MoSync.

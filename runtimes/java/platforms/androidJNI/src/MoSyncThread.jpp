@@ -65,7 +65,6 @@ import android.util.Log;
 
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
-import com.mosync.java.android.WebViewActivity;
 
 import java.io.FileNotFoundException;
 
@@ -96,8 +95,7 @@ import android.location.LocationProvider;
 public class MoSyncThread extends Thread
 {
 	private MoSync mContext;
-	private Handler mHandler;
-	private MoSyncView mMoSyncView;
+	// TODO: Delete if not needed: private Handler mHandler;
 	private boolean hasDied;
 	
 	private long mResourceOffset = 0;
@@ -105,21 +103,17 @@ public class MoSyncThread extends Thread
 	ByteBuffer mRecompilerCodeBlock;
 	ByteBuffer mRecompilerEntryBlock;
 	
-	public MoSyncThread(Context context, Handler handler) throws Exception
+	public MoSyncThread(Context context // TODO: Delete if not needed: , Handler handler
+		) throws Exception
 	{	
+		Log.i("MoSyncThread", "Constructor");
+		
 		mContext = (MoSync)context;
-		mHandler = handler;
+		// TODO: Delete if not needed: mHandler = handler;
 		hasDied = false;
-	
-		Log.i("MoSync Thread", "Constructor");
 
 		nativeInitRuntime();	
 		//initSyscalls();
-	}
-	
-	public void setMoSyncView(MoSyncView moSyncView)
-	{
-		mMoSyncView = moSyncView;
 	}
 	
 	public boolean isDead()
@@ -127,9 +121,12 @@ public class MoSyncThread extends Thread
 		return hasDied;
 	}
 	
+	// TODO: Move this method to class MoSyncView? 
+	// Does not seem to use anything in this class.
 	public void updateSurfaceSize(int width, int height)
 	{
-		Log.i("MoSync Thread","updateSurfaceSize");		
+		Log.i("MoSyncThread", "updateSurfaceSize");		
+		
 		//mCore.resizeScreen(mWidth, mHeight);
 
 		mWidth = width;
@@ -142,49 +139,49 @@ public class MoSyncThread extends Thread
 		mCanvas = mDrawTargetScreen.mCanvas;
 		mBitmap = mDrawTargetScreen.mBitmap;
 		
-		Log.i("MoSync Thread","input width:" + width + " height:" + height);
-		Log.i("MoSync Thread","mBitmap width:" + mBitmap.getWidth() + " height:" + mBitmap.getHeight());
+		Log.i("MoSyncThread", "input width:" + width + " height:" + height);
+		Log.i("MoSyncThread", "mBitmap width:" + mBitmap.getWidth() + " height:" + mBitmap.getHeight());
 	}
 
 	public ByteBuffer generateDataSection(int size)
 	{
 		try
 		{
-			Log.i("MoSyncThread","generate data section");
+			Log.i("MoSyncThread", "generate data section");
 			mMemDataSection = ByteBuffer.allocateDirect(size);
-			Log.i("MoSyncThread","generate data section - SUCCESS");
+			Log.i("MoSyncThread", "generate data section - SUCCESS");
 		}
 		catch(Exception e)
 		{
-			Log.i("MoSyncThread", "Out of Memory!");
+			Log.i("MoSyncThread", "generate data section - Out of Memory!");
 		}
 		return mMemDataSection;
 	}
 	
 	public ByteBuffer generateRecompilerCodeBlock(int size)
 	{
-		Log.i("MoSyncThread","generate recompiler code block");
+		Log.i("MoSyncThread", "generate recompiler code block");
 		try
 		{
 			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
 		}
 		catch(Exception e)
 		{
-			Log.i("MoSyncThread", "Out of Memory!");
+			Log.i("MoSyncThread", "generate recompiler code block - Out of Memory!");
 		}
 		return mRecompilerCodeBlock;
 	}
 	
 	public ByteBuffer generateRecompilerEntryBlock(int size)
 	{
-		Log.i("MoSyncThread","generate recompiler entry block");
+		Log.i("MoSyncThread", "generate recompiler entry block");
 		try
 		{
 			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
 		}
 		catch(Exception e)
 		{
-			Log.i("MoSyncThread", "Out of Memory!");
+			Log.i("MoSyncThread", "generate recompiler entry block - Out of Memory!");
 		}
 		return mRecompilerEntryBlock;
 	}
@@ -192,13 +189,13 @@ public class MoSyncThread extends Thread
 
 	public void threadPanic(int errorCode, String message)
 	{
-		Log.i("MoSyncThread","threadPanic");
+		Log.i("MoSyncThread", "threadPanic");
 		hasDied = true;
 		try
 		{
 			MoSyncPanicDialog.sPanicMessage = message;
-			Intent myIntent = new Intent(mMoSyncView.getContext(), MoSyncPanicDialog.class);
-			mMoSyncView.getContext().startActivity(myIntent);
+			Intent myIntent = new Intent(mContext, MoSyncPanicDialog.class);
+			mContext.startActivity(myIntent);
 			this.sleep(Long.MAX_VALUE);
 		}
 		catch(Exception e)
@@ -236,7 +233,7 @@ public class MoSyncThread extends Thread
 			
 			if(null != pFd)
 			{
-				Log.i("MoSync Thread", "calling native function");
+				Log.i("MoSyncThread", "calling native function");
 				if(false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
 				{
 					Log.e("MoSync Thread", "ERROR Load program was unsuccesfull");
@@ -244,7 +241,7 @@ public class MoSyncThread extends Thread
 					return false;
 				}
 
-				Log.i("MoSync Thread", "Load program was succesfull");
+				Log.i("MoSyncThread", "Load program was succesfull");
 				return true;
 			}
 		
@@ -269,7 +266,7 @@ public class MoSyncThread extends Thread
 		}
 		catch(Exception e)
 		{
-			Log.e("MoSyncService","getResourceFileDesriptor exception:" + e.toString());
+			Log.e("MoSyncService", "getResourceFileDesriptor exception:" + e.toString());
 		}
 		return null;
 	}
