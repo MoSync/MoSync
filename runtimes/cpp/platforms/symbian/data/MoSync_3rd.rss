@@ -1,5 +1,8 @@
 NAME MOSR // 4-letter ID, unique resource identifier for the application
 
+// WARNING: any changes to this file risks breaking the packager.
+// Make sure to test before commit.
+
 #include <eikon.rh>
 #include <eikon.rsg>
 #include <avkon.rh>
