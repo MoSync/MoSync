@@ -41,16 +41,15 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="inc;src/derived"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;YY_NO_UNISTD_H"
+				PreprocessorDefinitions="__MSVCDOTNET__;WIN32;_DEBUG;_CONSOLE;YY_NO_UNISTD_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4996"
+				DisableSpecificWarnings="4996;4065;4102"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -119,14 +118,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="inc;src/derived"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;YY_NO_UNISTD_H"
+				PreprocessorDefinitions="__MSVCDOTNET__;WIN32;NDEBUG;_CONSOLE;YY_NO_UNISTD_H"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
-				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4996"
+				DisableSpecificWarnings="4996;4065;4102"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -219,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inc\localise.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inc\main.h"
 				>
 			</File>
@@ -227,11 +229,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inc\messages.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inc\nameidma.h"
 				>
 			</File>
 			<File
 				RelativePath=".\inc\numval.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\parser.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\qualifar.h"
 				>
 			</File>
 			<File
@@ -271,7 +285,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inc\unistd.h"
+				>
+			</File>
+			<File
 				RelativePath=".\inc\version.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\wide.h"
 				>
 			</File>
 		</Filter>
@@ -315,11 +337,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\linkarra.cpp"
+				RelativePath=".\src\linklist.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\linklist.cpp"
+				RelativePath=".\src\localise.cpp"
 				>
 			</File>
 			<File
@@ -331,6 +353,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\messages.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\nameidma.cpp"
 				>
 			</File>
@@ -339,15 +365,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\qualifar.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\rcbinstr.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\src\rcompl_wrap.cpp"
+				RelativePath=".\src\rcomp.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\rcompl.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\src\rcostrm.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\rcscan.cpp"
 				>
 			</File>
 			<File
@@ -374,26 +412,6 @@
 				RelativePath=".\src\unicode_compressor.cpp"
 				>
 			</File>
-			<Filter
-				Name="derived"
-				>
-				<File
-					RelativePath=".\src\derived\rcomp.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\derived\rcomp.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\src\derived\rcompl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\derived\rcompl.hpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

@@ -1,0 +1,31 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+#ifndef __TRCOMP18030_IBY__
+#define __TRCOMP18030_IBY__
+
+REM Form
+
+file=ABI_DIR\BUILD_DIR\TRcomp18030.exe 		 Test\TRcomp18030.exe
+data=DATAZ_\resource\apps\TRcomp18030.rsc 	 resource\apps\TRcomp18030.rsc
+data=ZPRIVATE\10003a3f\apps\Tgb18030_reg.rsc		private\10003a3f\apps\Tgb18030_reg.rsc
+data=DATAZ_\resource\apps\Tgb18030.mbm 	 resource\apps\Tgb18030.mbm
+data=DATAZ_\resource\data\Trcomp_neg.rsc 	 resource\data\Trcomp_neg.rsc
+data=DATAZ_\resource\data\Trcomp_pos.rsc 	 resource\data\Trcomp_pos.rsc
+
+#endif
