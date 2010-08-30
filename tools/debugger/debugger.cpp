@@ -398,8 +398,6 @@ void setErrorCallback(ErrorCallback ecb) {
 	sErrorCallback = ecb;
 }
 
-void varErrorFunction();
-
 /**
  * Sends a GDB/MI error message with the given
  * message string.

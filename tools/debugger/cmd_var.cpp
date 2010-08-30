@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/log.h"
 
 #include "helpers.h"
+#include "globals.h"
 #include "commandInterface.h"
 #include "old_expr.h"
 #include "StubConnection.h"

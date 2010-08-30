@@ -984,7 +984,7 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 		if(target->type() == TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
-				unsigned int msAddr = *(const unsigned int*)addr;
+				int msAddr = *(int*)addr;
 				if(msAddr<gMemSize) {
 					int msLen = MAX_STRING_SIZE;
 					if(msAddr+msLen>gMemSize) {

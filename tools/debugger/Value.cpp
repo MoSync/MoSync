@@ -155,8 +155,8 @@ bool Value::isDereferencable() const {
 
 	if(type->type() == TypeBase::ePointer) {
 		int addr = mV;
-		const TypeBase* deref = type->deref()->resolve();
-		if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
+		const TypeBase* dr = type->deref()->resolve();
+		if(addr<=0 || addr>gMemSize || (dr->type()==TypeBase::eBuiltin && ((Builtin*)dr)->mSubType==Builtin::eVoid)) {
 			return false;
 		}
 		return true;

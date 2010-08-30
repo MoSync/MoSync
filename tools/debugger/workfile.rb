@@ -21,7 +21,6 @@ work.instance_eval do
 	end
 	if(HOST == :linux)
 		@LIBRARIES << "bluetooth"
-		@EXTRA_SOURCEFILES << "../../runtimes/cpp/platforms/sdl/mutexImpl.cpp"
 	end
 	@SPECIFIC_CFLAGS = {
 		"Value.cpp" => " -Wno-float-equal -Wno-sign-compare",

@@ -662,8 +662,8 @@ char *yytext;
 #include <limits.h>
 #include <string.h>
 #include "main.h"
-#include "STRUCTST.H"
-#include "Parser.h"
+#include "structst.h"
+#include "parser.h"
 #include "localise.h"
 
 #define YY_SKIP_YYWRAP 1
@@ -703,7 +703,7 @@ static int new_yy_input(char *buf, int max_size)
 }
 
 #include "rcomp.hpp"
-#include "FILELINE.H"
+#include "fileline.h"
 
 #define VALUE_LEN   (1024*8)	// must match sizeof(YYSTYPE.Value)
 char buf[VALUE_LEN];
@@ -719,7 +719,7 @@ extern int*		pCurrentLineNumber;
 char RealLineNumber[200];
  
 
-#include "ERRORHAN.H"
+#include "errorhan.h"
 
 #define REGISTER_LINE	ErrorHandler::Register(pFileLineHandler->GetCurrentFile(), pFileLineHandler->GetErrorLine(* pCurrentLineNumber))
 

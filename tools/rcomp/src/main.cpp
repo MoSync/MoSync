@@ -29,7 +29,9 @@
 using std::cout;
 using std::endl;
 using std::cerr;
+#ifdef WIN32
 #define snprintf _snprintf
+#endif
 #else //!__MSVCDOTNET__
 #ifndef __LINUX__
 #include <io.h>
@@ -373,7 +375,11 @@ int main(int argc, char * argv[])
 		}
 		//Searchig for BOM signature which if found will be ignored
 		unsigned char buffer[3];
-		fread( buffer, sizeof( char ), 3, pSourceFile);	
+		int res = fread( buffer, sizeof( char ), 3, pSourceFile);
+		if(res < 0) {
+			perror("fread error");
+			exit(-2);
+		}
 		if((buffer[0]!=239) && (buffer[1]!=187) && (buffer[2]!=191))
 		{
 			// BOM not found. Set the file-position indicator to 0

@@ -20,11 +20,11 @@
 #define __RESOURCE_H__
 
 #include "astring.h" 
-#include "STRINGAR.H"
-#include "STRUCTST.H"
-#include "STACK.H"   
-#include "RCBINSTR.H"
-#include "NAMEIDMA.H"
+#include "stringar.h"
+#include "structst.h"
+#include "stack.h"   
+#include "rcbinstr.h"
+#include "nameidma.h"
 
 
 enum { EResourceItem, ESimpleResourceItem, EArrayResourceItem, EStructTypeResourceItem, EStructArrayResourceItem };

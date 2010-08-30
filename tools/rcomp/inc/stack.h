@@ -19,7 +19,7 @@
 #ifndef __STACK_H__
 #define __STACK_H__
 
-#include "LINKLIST.H"
+#include "linklist.h"
 
 class StackItem : public ListItem
 	{
