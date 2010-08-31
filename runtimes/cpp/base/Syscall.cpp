@@ -71,12 +71,13 @@ namespace Base {
 	
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-		
+			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+
 		return maxCustomEventSize;
 	}
 

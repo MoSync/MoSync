@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "config_platform.h"
 
+#define MA_PROF_SUPPORT_LOCATIONAPI
+
 namespace Core {
 	class VMCore;
 }

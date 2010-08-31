@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 //#define SYSLOG(...)
 
+#define MA_PROF_SUPPORT_LOCATIONAPI
+
 namespace Base
 {
 	Syscall* gSyscall;
@@ -135,7 +137,6 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 	}
-
 	
 	void Syscall::checkAndStoreAudioResource(int resourceIndex)
 	{
@@ -164,7 +165,6 @@ namespace Base
 	{
 		SYSLOG("PostEvent");
 		gEventFifo.put(event);
-		
 	}
 	
 	SYSCALL(int,  maSetColor(int rgb))
@@ -329,7 +329,6 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
-		
 	}
 
 	SYSCALL(void,  maUpdateScreen(void))
@@ -419,7 +418,6 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 */		
-		
 	}
 
 	SYSCALL(MAHandle,  maSetDrawTarget(MAHandle image))
@@ -786,13 +784,9 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 	
-	
-	
-	
 	SYSCALL(void,  maLoadProgram(MAHandle data, int reload))
 	{
 		SYSLOG("maLoadProgram NOT IMPLEMENTED");
-
 	}
 
 	SYSCALL(int,  maGetKeys(void))
@@ -801,24 +795,30 @@ namespace Base
 		return -1;
 	}
 
-	void* mGetEventData;
+	// NOT USED? 
+	//void* mGetEventData;
+	
+	// Parameter event points to event object on the MoSync side.
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));	
 		MYASSERT(((uint)event & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
 		
-		if(gEventFifo.count() == 0)
-			return 0;
+		// Exit if event queue is empty.
+		if (gEventFifo.count() == 0) return 0;
 		
 //		SYSLOG("maGetEvent");
 
+		// Copy runtime side event to MoSync side event.
 		*event = gEventFifo.get();
 		
-		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) {\
-			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType));\
-			delete (dataType*)event->data;\
-			event->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
+		// Copy event data to memory on the MoSync side.
+		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
+			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType)); \
+			delete (dataType*) event->data; \
+			event->data = (void*) (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
 
+		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 		
 		return 1;
@@ -837,7 +837,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, timeout);
 
 		mJNIEnv->DeleteLocalRef(cls);
-		
 	}
 
 	SYSCALL(int,  maTime(void))
@@ -916,7 +915,6 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
-		
 	}
 
 	SYSCALL(int,  maSoundPlay(MAHandle sound_res, int offset, int size))
@@ -928,7 +926,6 @@ namespace Base
 	SYSCALL(void,  maSoundStop(void))
 	{
 		SYSLOG("maStopSound NOT IMPLEMENTED");
-
 	}
 
 	SYSCALL(int,  maSoundIsPlaying(void))
@@ -946,7 +943,6 @@ namespace Base
 	SYSCALL(void,  maSoundSetVolume(int vol))
 	{
 		SYSLOG("maSoundSetVolume NOT IMPLEMENTED");
-
 	}
 
 	SYSCALL(int,  maInvokeExtension(int function, int a, int b, int c))

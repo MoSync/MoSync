@@ -194,8 +194,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 				return false;
 		}
 		
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		mMoSyncThread.postEvent(event);
 		
 		return true;
 	}
@@ -245,8 +244,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		mMoSyncThread.postEvent(event);
+		
 		return true;
 	}
 	
@@ -260,8 +259,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
 	
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		mMoSyncThread.postEvent(event);
+		
 		return true;
 	}
 	

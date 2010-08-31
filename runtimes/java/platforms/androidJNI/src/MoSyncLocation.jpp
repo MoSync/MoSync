@@ -15,147 +15,163 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-boolean mLocationActive = false;
 LocationEventThread mLocationEventThread = null;
 
 public final int maLocationStart() throws Exception
 {
-	if(false == mLocationActive)
+	if (null == mLocationEventThread)
 	{
 		mLocationEventThread = new LocationEventThread();
 		mLocationEventThread.start();
 	}
-	mLocationActive = true;
 	
 	return 1;
 }
 
 public final int maLocationStop()
 {
-	mLocationEventThread.kill();
-	mLocationActive = false;
+	if (null != mLocationEventThread)
+	{
+		mLocationEventThread.kill();
+		mLocationEventThread = null;
+	}
 	
 	return 1;
 }
 
-
 class LocationEventThread extends Thread implements LocationListener
 {
-	Handler mHandler;
 	LocationManager mLocationManager;
+	Looper mLooper;
 
 	public LocationEventThread()
 	{
-		Log.i("LocationEventThread","constructor");
-
 	}
 
 	public void kill()
 	{
 		mLocationManager.removeUpdates(this);
-		Looper loop = Looper.myLooper();
-		if(null != loop)
-			loop.quit();
+		if (null != mLooper)
+		{
+			mLooper.quit();
+		}
+	}
+	
+	void postOutOfServiceMessage()
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_LOCATION_PROVIDER;
+		event[1] = MA_LPS_OUT_OF_SERVICE;
+		postEvent(event);
 	}
 	
 	public void run()
 	{
-		Log.i("LocationEventThread","run");
-		
 		try
 		{
 			Looper.prepare();
-		} catch(Exception e)
-		{
-			Log.e("loc thread", "e:" + e.toString());
-		}
 
-		mHandler = new Handler()
-		{
-			public void handleMessage(Message msg)
+			mLooper = Looper.myLooper();
+		
+			mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE); 
+			if (mLocationManager == null) 
 			{
-				SYSLOG("location handler msg:" + msg.toString());
+				postOutOfServiceMessage();
+				return;
 			}
-		};
-	
-		mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE); 
-		if(mLocationManager == null) return;
-	
-		if(mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == false) return;
+		
+			if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) 
+			{
+				postOutOfServiceMessage();
+				return;
+			}
 
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+			mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+			mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 			
-		Looper.loop();
+			Looper.loop();
+		}
+		catch (Throwable e)
+		{
+			Log.i("MoSyncLocation.LocationEventThread", "Error: " + e);
+			postOutOfServiceMessage();
+		}
 	}
 
 	public void onLocationChanged(Location location)
 	{
-		Log.i("LocationEventThread","onLocationChanged");
 		int[] event = new int[11];
-		EI_TYPE = EVENT_TYPE_LOCATION;
-		EI_STATE = MA_LOC_QUALIFIED;
+		event[0] = EVENT_TYPE_LOCATION;
+		event[1] = MA_LOC_QUALIFIED;
 
 		// LATITUDE
 		long lat = Double.doubleToLongBits(location.getLatitude());
-		event[2] = (int)lat; event[3] = ((int)(lat >> 32));
+		event[2] = (int)lat; 
+		event[3] = ((int)(lat >> 32));
 		
 		// LONGITUDE
 		long lon = Double.doubleToLongBits(location.getLongitude());
-		event[4] = (int)lon; event[5] = ((int)(lon >> 32));
+		event[4] = (int)lon; 
+		event[5] = ((int)(lon >> 32));
 		
 		// ACCURACCY
 		long acc = Double.doubleToLongBits(location.getAccuracy());
-		event[6] = (int)acc; event[7] = ((int)(acc >> 32));
-		event[8] = (int)acc; event[9] = ((int)(acc >> 32));
+		// Latitude accuraccy
+		event[6] = (int)acc; 
+		event[7] = ((int)(acc >> 32));
+		// Longitude accuraccy (same value)
+		event[8] = (int)acc; 
+		event[9] = ((int)(acc >> 32));
 		
 		// ALTITUDE
 		event[10] = (int) Float.floatToIntBits((float)location.getAltitude());
 
-		nativePostEvent(event);
+		postEvent(event);
 	}
 		
 	public void onProviderDisabled(String provider)
 	{
-		Log.i("LocationEventThread","onProviderDisabled provider:" + provider);
-		if(provider.equals("gps"))
+		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
-			int[] event = new int[2];
-			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
-			EI_STATE = MA_LPS_OUT_OF_SERVICE;
-			nativePostEvent(event);
+			postOutOfServiceMessage();
 		}
 	}
 	
 	public void onProviderEnabled(String provider)
 	{
-		Log.i("LocationEventThread","onProviderEnabled provider:" + provider);
-		if(provider.equals("gps"))
+		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
 			int[] event = new int[2];
-			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
-			EI_STATE = MA_LPS_AVAILABLE;
-			nativePostEvent(event);
+			event[0] = EVENT_TYPE_LOCATION_PROVIDER;
+			event[1] = MA_LPS_AVAILABLE;
+			postEvent(event);
 		}
 	}
 
 	public void onStatusChanged(String provider, int status, Bundle extras)
 	{
-		Log.i("LocationEventThread","onStatusChanged provider:" + provider);
-		if(provider.equals("gps"))
+		if (provider.equals(LocationManager.GPS_PROVIDER))
 		{
 			int[] event = new int[2];
-			EI_TYPE = EVENT_TYPE_LOCATION_PROVIDER;
 			
-			switch(status)
+			event[0] = EVENT_TYPE_LOCATION_PROVIDER;
+			
+			switch (status)
 			{
-				case LocationProvider.OUT_OF_SERVICE: EI_STATE = MA_LPS_OUT_OF_SERVICE; break;
-				case LocationProvider.TEMPORARILY_UNAVAILABLE: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE; break;
-				case LocationProvider.AVAILABLE: EI_STATE = MA_LPS_AVAILABLE; break;
-				default: EI_STATE = MA_LPS_TEMPORARILY_UNAVAILABLE; 
+				case LocationProvider.OUT_OF_SERVICE: 
+					event[1] = MA_LPS_OUT_OF_SERVICE; 
+					break;
+				case LocationProvider.TEMPORARILY_UNAVAILABLE: 
+					event[1] = MA_LPS_TEMPORARILY_UNAVAILABLE; 
+					break;
+				case LocationProvider.AVAILABLE: 
+					event[1] = MA_LPS_AVAILABLE; 
+					break;
+				default: 
+					event[1] = MA_LPS_TEMPORARILY_UNAVAILABLE; 
 			}
 			
-			nativePostEvent(event);
+			postEvent(event);
 		}
 	}
-
 }
