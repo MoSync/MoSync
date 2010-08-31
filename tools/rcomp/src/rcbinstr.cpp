@@ -87,12 +87,14 @@ void RCBinaryStream::WriteCompressedInteger(unsigned int aInteger)
 	}
 
 void RCBinaryStream::Write( const unsigned char * p, unsigned long count)
-	{
+{
+	if(count == 0)
+		return;
 	iOs.write( (const char*)p, count);
 #if defined(_DEBUG)
 	iOs.flush();
 #endif
-	}
+}
 
 unsigned long RCBinaryStream::GetPosition()
 	{

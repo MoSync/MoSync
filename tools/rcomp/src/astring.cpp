@@ -138,11 +138,13 @@ const char * String::GetBuffer() const
 	}
 
 const char * String::GetAssertedNonEmptyBuffer() const
-	{
+{
+	if(iRep == NULL && iLength == 0)
+		return "";
 	assert( iRep != NULL);
 	assert( iLength > 0);
 	return iRep;
-	}
+}
 
 int String::IsDecNatural() const
 	{

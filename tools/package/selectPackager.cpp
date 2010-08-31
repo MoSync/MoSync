@@ -4,12 +4,12 @@
 #include <fstream>
 #include "package.h"
 #include "packagers.h"
+#include "util.h"
 
 using namespace std;
 
 static bool parseRuntimeTxt(const char* filename, string& path, string& name);
 static bool parseProfileHeader(const char* filename, bool& isBlackberry);
-static void toSlashes(string& str);
 
 void package(const SETTINGS& s) {
 	// Read runtime.txt and maprofile.h to find which runtime to use.
@@ -30,6 +30,8 @@ void package(const SETTINGS& s) {
 		printf("runtime.txt parse error\n");
 		exit(1);
 	}
+
+	toDir(runtimePath);
 
 	if(runtimeName == "JavaME") {
 		bool isBlackberry;
@@ -63,7 +65,7 @@ void package(const SETTINGS& s) {
 	}
 }
 
-static void toSlashes(string& str) {
+void toSlashes(string& str) {
 	for(size_t i=0; i<str.size(); i++) {
 		str[i] = (str[i] == '\\' ? '/' : str[i]);
 	}
@@ -83,7 +85,7 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	toSlashes(line);
 
 	// set path
-	path = mosyncdir() + line;
+	path = mosyncdir() + ("/" + line);
 
 	// check runtime number
 	size_t lastSlash = line.find_last_of('/');
@@ -123,10 +125,6 @@ static bool parseProfileHeader(const char* filename, bool& isBlackberry) {
 }
 
 void packageS60v2(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageS60v3(const SETTINGS&, const std::string& runtimePath) {
 	printf("not implemented\n");
 	exit(1);
 }

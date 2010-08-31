@@ -192,7 +192,19 @@
 			>
 		</File>
 		<File
+			RelativePath=".\s60v3.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\selectPackager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\util.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\util.h"
 			>
 		</File>
 	</Files>
