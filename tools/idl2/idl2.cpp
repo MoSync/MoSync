@@ -280,6 +280,11 @@ static void outputCpp(const Interface& maapi) {
 	stream << "#ifndef CPP_MAAPI_H\n";
 	stream << "#define CPP_MAAPI_H\n\n";
 
+	stream << "#ifdef _android\n";
+	stream << "#pragma pack( push )\n";
+	stream << "#pragma pack( 1 )\n";
+	stream << "#endif // _android\n\n";
+
 	stream << "#if defined(__cplusplus) && !defined(__SYMBIAN32__)\n"
 		"extern \"C\" {\n"
 		"#endif\n\n";
@@ -291,6 +296,10 @@ static void outputCpp(const Interface& maapi) {
 	stream << "#if defined(__cplusplus) && !defined(__SYMBIAN32__)\n"
 		"}\n"
 		"#endif\n\n";
+
+	stream << "#ifdef _android\n";
+	stream << "#pragma pack( pop )\n";
+	stream << "#endif // _android\n\n";
 
 	stream << "#endif\t//CPP_MAAPI_H\n";
 }
