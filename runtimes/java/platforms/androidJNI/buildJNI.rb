@@ -108,12 +108,12 @@ puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
-system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/platforms/android-3/android.jar -S #{package_root}/res -m -J #{package_root}src");
+system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
 		
 puts "Compile Java Source Files\n\n"
 
 # Compile all the java files into class files
-system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/platforms/android-3/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
 
 puts "Copy Generated Library File\n\n"
 
