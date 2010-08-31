@@ -976,12 +976,12 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 	tb->printMI(spf, addr, fmt);
 
 	// special treatment for (const) char*
-	if(tb->type() == TypeBase::ePointer) {
+	if((int)tb->type() == (int)TypeBase::ePointer) {
 		const TypeBase* target = ((const PointerType*)tb)->mTarget;
 		if(target->type() == TypeBase::eConst) {
 			target = ((const ConstType*)target)->mTarget;
 		}
-		if(target->type() == TypeBase::eBuiltin) {
+		if((int)target->type() == (int)TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
 				int msAddr = *(int*)addr;
