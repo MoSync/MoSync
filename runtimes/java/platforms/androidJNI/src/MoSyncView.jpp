@@ -41,7 +41,7 @@ import android.view.View;
 import android.view.KeyCharacterMap;
 import android.view.inputmethod.InputMethodManager;
 
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
@@ -200,7 +200,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return true;
 	}
 
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 	
 	// Defines used to map Android keycodes to MoSync 	
 #define DEVICE_KEYS(m) m(0) m(1) m(2) m(3) m(4)	m(5) m(6) m(7) m(8) m(9) m(STAR) m(POUND) m(CLEAR)

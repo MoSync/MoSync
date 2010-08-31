@@ -26,8 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
-//(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
-#define SYSLOG(...)
+#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+//#define SYSLOG(...)
 
 /*
 Function that initializes the native core	
