@@ -300,6 +300,22 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building rcomp
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\rcomp
+@vcbuild rcomp.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo Building package
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\package
+@vcbuild package.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building internal libraries:
 @echo ------------------------------------------------
 

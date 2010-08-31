@@ -48,7 +48,7 @@ void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
 	string regRscName = rscBaseName + "_reg.rsc";
 
 	std::ostringstream cmd;
-	cmd << mosyncdir()<<"/bin/rcomp -o"<<mainRscName<<" -h"<<rsgName<<
+	cmd << mosyncdir()<<"/bin/rcomp -u -o"<<mainRscName<<" -h"<<rsgName<<
 		" -s"<<genRssName;
 	sh(cmd.str().c_str());
 
@@ -65,7 +65,7 @@ void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
 
 	// call rcomp again
 	cmd.str("");
-	cmd << mosyncdir()<<"/bin/rcomp -o"<<regRscName<<
+	cmd << mosyncdir()<<"/bin/rcomp -u -o"<<regRscName<<
 		" -s"<<genRegName;
 	sh(cmd.str().c_str());
 

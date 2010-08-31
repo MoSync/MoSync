@@ -22,6 +22,7 @@ class RuntimeBuilder
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = "#{runtime_dir}config#{debug}.h"
 		
+		
 		puts "Using config file: #{config_file_src}"
 	
 		backup_file(config_file_dest)
@@ -57,8 +58,8 @@ class RuntimeBuilder
 		else
 			system("devices -setdefault #{default}")
 			system("bldmake bldfiles");
-			system("call abld clean #{symbian_system} urel");
-			system("call abld build #{symbian_system} urel");
+			s#ystem("call abld clean #{symbian_system} urel");
+			#system("call abld build #{symbian_system} urel");
 		end
 		
 		# revert initial config file
@@ -66,6 +67,9 @@ class RuntimeBuilder
 		
 		# go back to the initial directory
 		Dir.chdir cwd
+		
+		data_dir = $SETTINGS[:symbian_source] + "data-ed3/"
+		inc_dir = $SETTINGS[:symbian_source] + "inc/"
 		
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/"
@@ -95,13 +99,17 @@ class RuntimeBuilder
 				return 1
 			end
 			
+			# Preprocess resource files
+			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			
 			# Copy all the generated files to it's runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
 			FileUtils.copy_file("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")
 			FileUtils.copy_file("#{epoc_dir}data/z/private/10003a3f/import/apps/MoSync_reg.RSC", "#{runtime_dir}MoSync_reg.RSC")
 			FileUtils.copy_file("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			FileUtils.copy_file("#{$SETTINGS[:symbian_source]}/server/MoSyncServer_Express_Signed.sis", "#{runtime_dir}MoSyncServer.sis")
-			
+
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
 			return 0
 		elsif version == "s60v5"
@@ -114,6 +122,10 @@ class RuntimeBuilder
 				return 1
 			end
 			
+			# Preprocess resource files
+			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			 
 			# Copy all the generated files to it's runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
 			FileUtils.copy_file("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")

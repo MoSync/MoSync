@@ -46,7 +46,7 @@ void package(const SETTINGS& s) {
 	} else if(runtimeName == "s60v3") {
 		packageS60v3(s, runtimePath);
 	} else if(runtimeName == "s60v5") {
-		packageS60v5(s, runtimePath);
+		packageS60v3(s, runtimePath);
 	} else if(runtimeName == "sp2003") {
 		packageWM(s, runtimePath);
 	} else if(runtimeName == "wm5") {
@@ -125,10 +125,6 @@ static bool parseProfileHeader(const char* filename, bool& isBlackberry) {
 }
 
 void packageS60v2(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageS60v5(const SETTINGS&, const std::string& runtimePath) {
 	printf("not implemented\n");
 	exit(1);
 }
