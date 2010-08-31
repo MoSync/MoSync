@@ -143,7 +143,7 @@ struct Variable {
 	//vector<Variable> children;
 	//map<string, Variable> children;
 	map<int, Variable> children;
-	
+
 	TypeBase::PrintFormat printFormat;
 	bool mHasCreatedChildren;
 
@@ -181,7 +181,7 @@ static queue<Variable*> sUpdateQueue;
 // type function definitions
 //******************************************************************************
 Variable::~Variable() {
-//	for(size_t i = 0; i < children.size(); i++) {
+	//	for(size_t i = 0; i < children.size(); i++) {
 	for(map<int, Variable>::iterator i = children.begin(); i != children.end(); i++) {
 		//sVariableMap.erase(children[i].name);
 		sVariableMap.erase(i->second.name);
@@ -222,11 +222,11 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 		spf("[%d]", i);
 		string varName = spf.getString();
 		spf.reset();
-	
-//		Variable& var = children[varName];
+
+		//		Variable& var = children[varName];
 		Variable& var = children[i];
 		{
-		/*
+			/*
 			var.outOfScope = false;
 			var.printFormat = TypeBase::eNatural;
 
@@ -234,7 +234,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 			spf("%s.%s", name.c_str(), varName.c_str());
 			var.name = spf.getString();
 			spf.reset();
-*/
+			*/
 			var.localName = varName;
 
 			spf("(%s)[%d]", exp->mExprText.c_str(), i);
@@ -288,7 +288,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 			spf.reset();
 			children[0].localName = varName;
 		} else {
-			addStruct(NULL, (StructType*)deref, false, true);	
+			addStruct(NULL, (StructType*)deref, false, true, true);	
 		}
 
 		mHasCreatedChildren = false;	
@@ -302,7 +302,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		string varName = spf.getString();
 		spf.reset();
 
-//		Variable& var = children[varName];
+		//		Variable& var = children[varName];
 		Variable& var = children[0];
 		{
 			var.outOfScope = false;
@@ -336,7 +336,7 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		}
 		sVariableMap[var.name] = &var;
 	}  else {
-		
+
 		if(invalidMemory) {
 			addStruct(NULL, (StructType*)deref, true, true, invalidMemory);
 		} else {
@@ -369,9 +369,10 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		this->exp->updateData(value, type, structType->isSimpleValue());
 	}
 
-//	children.resize(bases.size()+dataMembers.size());
-	
+	//	children.resize(bases.size()+dataMembers.size());
+
 	// add private/public/protected variables..
+
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
 		deref = convertConstType(deref);
@@ -384,15 +385,14 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		virtualVar.name = name + "." + virtualVarName;
 		virtualVar.mHasCreatedChildren = true;
 		virtualVar.outOfScope = false;
-
-		string varName = dataMembers[i].name;
 		sVariableMap[virtualVar.name] = &virtualVar;
 	}
 
 	if(!shouldCreateChildren) { 
 		mHasCreatedChildren = false;
-		return; 
+		//return; 
 	}
+
 	mHasCreatedChildren = true;
 
 
@@ -422,19 +422,11 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		}
 
 		sVariableMap[var.name] = &var;
-		var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, false, false, invalidMemory);
+
+		if(shouldCreateChildren)
+			var.addStruct(dataAdress+bases[i].offset, (const StructType*)deref, false, false, invalidMemory);
 	}
 
-	/*
-	int j = 0;
-	for(int i = 0; i < 3; i++) {
-		if(num[i]) {
-			children[bases.size()+j].addDataMembers(this, dataAdress, dataMembers, (Visibility)i, num[i]);
-			j++;
-		}
-	}
-	*/
-	
 	for(size_t i = 0; i < dataMembers.size(); i++) {
 		const TypeBase* deref = dataMembers[i].type->resolve();
 		deref = convertConstType(deref);
@@ -468,19 +460,21 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		}
 		sVariableMap[var.name] = &var;
 
-		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
-		} else if(deref->type() == TypeBase::eStruct) {
-			var.addStruct(NULL, (StructType*)deref, false, false, invalidMemory);
-		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
-		} else {
-			value = "";
-			if(dataAdress && !invalidMemory) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
-			var.exp->updateData(
-				value, 
-				getType(deref, false), 
-				deref->isSimpleValue());
+		if(shouldCreateChildren) {
+			if(deref->type() == TypeBase::eArray) {
+				var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
+			} else if(deref->type() == TypeBase::eStruct) {
+				var.addStruct(NULL, (StructType*)deref, false, false, invalidMemory);
+			} else if(deref->type() == TypeBase::ePointer) {
+				var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
+			} else {
+				value = "";
+				if(dataAdress && !invalidMemory) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
+				var.exp->updateData(
+					value, 
+					getType(deref, false), 
+					deref->isSimpleValue());
+			}
 		}
 	}
 }
@@ -586,14 +580,14 @@ ExpUpdateResult Expression::update(ExpressionCallback ecb) {
 					ASSERT_REG;
 					int fileScope = getFileScope(r.pc);
 					if(fileScope==-1 || fileScope!=s.fileScope) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
-					}
-					break;
+										  }
+										  break;
 				case SYM::Scope::eLocal: {
 					// must be in the current scope.
 					ASSERT_REG;
 					if(r.pc<s.start || r.pc>s.end) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
-					}
-					break;
+										 }
+										 break;
 			}
 		}	
 		sVar->outOfScope = false;
@@ -678,28 +672,28 @@ void var_create(const string& args) {
 
 	/*
 	if(exp[0] == '$') {	//register
-		int reg;
-		if(!parseArgRegName(exp.substr(1), &reg))
-			return;
-		sVar->exp = new RegExp(frameAddr, reg);
-#if 0
+	int reg;
+	if(!parseArgRegName(exp.substr(1), &reg))
+	return;
+	sVar->exp = new RegExp(frameAddr, reg);
+	#if 0
 	} else if(exp[0] == '*') {	//address (-range)
-		int start, end, len;
-		int res = sscanf(exp.c_str() + 1, "%i-%i%n", &start, &end, &len);
-		if(res == 2 || len == exp.size()) {
-			sVar->exp = new AddrExp(frameAddr, start, end);
-		} else {
-			//try address only
-			res = sscanf(exp.c_str() + 1, "%i%n", &start, &len);
-			if(res != 1 || len != exp.size()) {
-				error("Bad expression address format");
-				return;
-			}
-			sVar->exp = new AddrExp(frameAddr, start, start);
-		}
-#endif
+	int start, end, len;
+	int res = sscanf(exp.c_str() + 1, "%i-%i%n", &start, &end, &len);
+	if(res == 2 || len == exp.size()) {
+	sVar->exp = new AddrExp(frameAddr, start, end);
+	} else {
+	//try address only
+	res = sscanf(exp.c_str() + 1, "%i%n", &start, &len);
+	if(res != 1 || len != exp.size()) {
+	error("Bad expression address format");
+	return;
+	}
+	sVar->exp = new AddrExp(frameAddr, start, start);
+	}
+	#endif
 	} else {	//variable-expression
-		sVar->exp = new VarExp(frameAddr, exp);
+	sVar->exp = new VarExp(frameAddr, exp);
 	}
 	*/
 
@@ -792,7 +786,7 @@ void var_update(const string& args) {
 	if(name == "*") {	//all variables...
 		for(map<string, Variable*>::iterator i =
 			sRootVariableMap.begin(); i!=sRootVariableMap.end(); i++) {
-			sUpdateQueue.push(i->second);
+				sUpdateQueue.push(i->second);
 		}
 	} else {
 		Variable* var = findVariable(name);
@@ -890,10 +884,10 @@ static bool printUpdateItem(bool comma, Variable* var) {
 
 	/*
 	if(!var->outOfScope && var->mHasCreatedChildren) {
-		//for(size_t i = 0; i < var->children.size(); i++)
-		for(map<string, Variable>::iterator i = var->children.begin(); i!=var->children.end(); i++) {
-			comma |= printUpdateItem(comma, &i->second);
-		}
+	//for(size_t i = 0; i < var->children.size(); i++)
+	for(map<string, Variable>::iterator i = var->children.begin(); i!=var->children.end(); i++) {
+	comma |= printUpdateItem(comma, &i->second);
+	}
 	}
 	*/
 
@@ -983,7 +977,7 @@ static Variable* getAndValidateVariable(const string& args) {
 void var_show_format(const string& args) {
 	Variable *var = getAndValidateVariable(args);
 	if(!var) return;
-	
+
 	string format;
 	switch(var->printFormat) {
 		case TypeBase::eNatural: format = "natural"; break;
@@ -1058,6 +1052,7 @@ void var_list_children(const string& args) {
 
 	sUpdateCallback = Callback::varListChildren;
 	sVar = var;
+
 	Callback::varListChildren();
 }
 
@@ -1123,7 +1118,7 @@ void varErrorFunction() {
 
 		if(sRootVariableMap.find(sVar->name) == sRootVariableMap.end() &&
 			sVariableMap.find(sVar->name) == sVariableMap.end()) {
-			delete sVar;
+				delete sVar;
 		}
 		sVar = NULL;
 	}
