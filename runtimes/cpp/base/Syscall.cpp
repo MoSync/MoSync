@@ -735,6 +735,11 @@ namespace Base {
 				fh.name[i] = fn[i];
 			}
 		}
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(fn);
+		fn = newPath.c_str();
+		size = newPath.size();
+		memcpy(fh.name, fn, size);		
 #else
 		memcpy(fh.name, fn, size);
 #endif

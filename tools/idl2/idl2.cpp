@@ -144,6 +144,7 @@ int main() {
 		copy("maapi_defs.h", "../../intlibs/helpers/");
 
 		copy("Output/invoke_syscall_cpp.h", "../../runtimes/cpp/core/");
+		copy("Output/syscall_static_cpp.h", "../../runtimes/cpp/platforms/iphone/Classes/");
 		copy("Output/invoke_syscall_arm_recompiler.h", "../../runtimes/cpp/core/");
 		copy("Output/asm_config.h", "../../intlibs/helpers/");
 

@@ -21,9 +21,6 @@
 #error Unsupported compiler!
 #endif
 
-#ifdef __IPHONE__
-#define __MARM_ARMI__
-#endif
 
 // Convert between double, 2 ints and long long.
 union MA_DV {
@@ -31,7 +28,11 @@ union MA_DV {
 	int i[2];
 #else	//everything else
 	struct {
+#ifdef __IPHONE__
+		int lo, hi;
+#else
 		int hi, lo;
+#endif
 	};
 #endif	//__MARM_ARMI__
 	long long ll;
