@@ -44,7 +44,7 @@ void copyFile(const char* dst, const char* src) {
 
 void appendFile(const char* dst, const char* src) {
 	ifstream in(src, ios_base::binary);
-	ofstream out(dst, ios_base::binary || ios_base::app);
+	ofstream out(dst, ios_base::binary | ios_base::app);
 	writeCopy(in, out);
 }
 
