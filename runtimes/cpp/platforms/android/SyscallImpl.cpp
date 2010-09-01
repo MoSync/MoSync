@@ -31,8 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 //#define SYSLOG(...)
 
-#define MA_PROF_SUPPORT_LOCATIONAPI
-
 namespace Base
 {
 	Syscall* gSyscall;
