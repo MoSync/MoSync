@@ -57,6 +57,17 @@ void MoSyncSemaphore::wait() {
 	_ASSERT(res == 0);
 }
 
+bool MoSyncSemaphore::tryWait(int timeout) {
+	_ASSERT(timeout > 0);
+	if(SDL_SemWaitTimeout(mSem, timeout) == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+
+}
+
 void MoSyncSemaphore::post() {
 	int res = SDL_SemPost(mSem);
 	_ASSERT(res == 0);

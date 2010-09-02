@@ -28,13 +28,12 @@ static MoSyncMutex sAccess;
 static queue<DebuggerEvent*> sQueue;
 static bool sIsWaiting = false;
 
-static void closeEventSystem() {
+void closeEventSystem() {
 	sAccess.close();
 }
 
 void initEventSystem() {
 	sAccess.init();
-	atexit(closeEventSystem);
 }
 
 void getEvent(DebuggerEvent** pde) {
