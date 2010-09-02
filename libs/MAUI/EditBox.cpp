@@ -379,7 +379,13 @@ namespace MAUI {
 		*/
 		if(c<0 || c>=caption.length()) return false;
 		char deletedCharacter = caption[c];
-		caption.remove(c, 1);
+
+		if(passwordMode) {
+			password.remove(c, 1);
+			caption.remove(c, 1);
+		} else {
+			caption.remove(c, 1);
+		}
 
 /*
 		for(int i = cursorIndex; i < text.size(); i++) {
