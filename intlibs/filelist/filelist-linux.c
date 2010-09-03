@@ -38,7 +38,7 @@ int scanDirectory(const char* path, FileListCallback cb) {
 int isDirectory(const char* filename) {
 	struct stat s;
 	int res = stat(filename, &s);
-	if(res != 0)
+	if(res == -1)
 		return -1;
 	return S_ISDIR(s.st_mode);
 }

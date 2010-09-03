@@ -739,6 +739,7 @@ namespace Base {
 		std::string newPath = getWriteablePath(fn);
 		fn = newPath.c_str();
 		size = newPath.size();
+		fh.name.resize(size);
 		memcpy(fh.name, fn, size);		
 #else
 		memcpy(fh.name, fn, size);
