@@ -28,8 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
-//#define SYSLOG(...)
+//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+#define SYSLOG(...)
 
 namespace Base
 {
@@ -952,10 +952,11 @@ namespace Base
 	SYSCALL(int,  maIOCtl(int function, int a, int b, int c))
 	{
 		SYSLOG("maIOCtl");
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "****** maIOCtl miki");
 		
 		switch(function) {
 		case maIOCtl_maWriteLog:
-			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
+			SYSLOG("maIOCtl_maWriteLog");
 			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
 		
 		case maIOCtl_maSendTextSMS:

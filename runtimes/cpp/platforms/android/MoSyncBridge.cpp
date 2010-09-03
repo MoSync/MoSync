@@ -185,7 +185,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	event.type = intArray[0];
 	event.data = NULL;
 	
-	if (event.type == EVENT_TYPE_POINTER_PRESSED || event.type == EVENT_TYPE_POINTER_RELEASED || event.type == EVENT_TYPE_POINTER_DRAGGED)
+	if (event.type == EVENT_TYPE_POINTER_PRESSED || 
+		event.type == EVENT_TYPE_POINTER_RELEASED || 
+		event.type == EVENT_TYPE_POINTER_DRAGGED)
 	{
 		event.point.x = intArray[1];
 		event.point.y = intArray[2];
@@ -212,8 +214,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.state = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_BT)
+	{
+		event.state = intArray[1];
+	}
 	
-	// release the memory used
+	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);

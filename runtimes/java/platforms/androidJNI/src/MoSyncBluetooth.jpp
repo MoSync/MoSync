@@ -17,56 +17,183 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 final static int REQUEST_ENABLE_BT = 2;
 static BluetoothAdapter mBluetoothAdapter = null;
-static boolean mBluetoothGetNames = false;
+//static boolean mBluetoothGetNames = false;
+BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
+ConcurrentLinkedQueue mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
 
 int maBtStartDeviceDiscovery(int names) throws Exception
 {
-	if(0 != names) mBluetoothGetNames = true;
-
-	Log.i("maBtStartDeviceDiscovery", "0");
-	
-	if(null == mBluetoothAdapter)
+	if (null == mBluetoothDeviceDiscoveryThread)
 	{
-		Log.i("maBtStartDeviceDiscovery", "1");
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		Log.i("maBtStartDeviceDiscovery", "2");
-		if(null == mBluetoothAdapter)
-		{
-			Log.i("maBtStartDeviceDiscovery", "NO DEFAULT ADAPTER AVAILABLE!");
-			return -1;
-		}
-		Log.i("maBtStartDeviceDiscovery", "3");
+		mBluetoothDeviceDiscoveryThread = new BluetoothDeviceDiscoveryThread();
+		mBluetoothDeviceDiscoveryThread.start();
+	}
+	
+	return 1;
+}
+
+class BluetoothDeviceDiscoveryThread extends Thread
+{
+	Looper mLooper;
+	BroadcastReceiver mBluetoothReciever;
+
+	public BluetoothDeviceDiscoveryThread()
+	{
 	}
 
-	if ( !mBluetoothAdapter.isEnabled() )
+	// TODO: When to call this?
+	public void kill()
 	{
-		Intent btPermissionIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		((Activity)mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+		// TODO: Do cleanup here
+		if (null != mLooper)
+		{
+			mLooper.quit();
+		}
+	}
+	
+	public void run()
+	{
+		try
+		{
+			Looper.prepare();
+			mLooper = Looper.myLooper();
+			initiateDeviceDiscovery();
+			Looper.loop();
+		}
+		catch (Throwable e)
+		{
+			Log.i("BluetoothDeviceDiscoveryThread", "Error: " + e);
+			e.printStackTrace();
+			//postOutOfServiceMessage();
+		}
+		finally
+		{
+			mContext.unregisterReceiver(mBluetoothReciever);
+		}
+	}
+	
+	int initiateDeviceDiscovery()
+	{
+		// if (0 != names) mBluetoothGetNames = true;
 		
-		mContext.registerReceiver(new BroadcastReceiver()
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "begin");
+		
+		if (null == mBluetoothAdapter)
+		{
+			mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+			if (null == mBluetoothAdapter)
+			{
+				Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "NO DEFAULT ADAPTER AVAILABLE!");
+				return -1;
+			}
+		}
+
+		// If not enabled, open an activity for the user to enable Bluetooth.
+		// TODO: Fix this code.
+		if (!mBluetoothAdapter.isEnabled())
+		{
+			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "!mBluetoothAdapter.isEnabled()");
+		
+			// Open the activity.
+			Intent btPermissionIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			((Activity) mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+			
+			// Register receiver for Bluetooth state changes.
+			mContext.registerReceiver(new BroadcastReceiver()
+			{
+				@Override
+				public void onReceive(Context context, Intent i)
+				{		
+					int newState = i.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
+					if (newState == BluetoothAdapter.STATE_ON)
+					{
+						// Bluetooth is now enabled, start discovery.
+						context.unregisterReceiver(this); // Finished using this listener.
+						startDeviceDiscovery();
+					}
+				}
+			}, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+			
+			// Do not call explictly: mBluetoothAdapter.enable();
+		}
+		else
+		{
+			// Start discovery.
+			startDeviceDiscovery();
+		}
+		
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "end");
+		
+		return 0;
+	}
+	
+	void startDeviceDiscovery()
+	{
+		// Create device listener.
+		mBluetoothReciever = new BroadcastReceiver()
 		{
 			@Override
-			public void onReceive(Context context, Intent i)
+			public void onReceive(Context context, Intent intent)
 			{		
-				int newState = i.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
-				if (newState == BluetoothAdapter.STATE_ON)
+				final String action = intent.getAction();
+				if (action.equals(BluetoothDevice.ACTION_FOUND))
 				{
-					context.unregisterReceiver(this);
-					mBluetoothAdapter.startDiscovery();
+					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "****** x Found device!");
+					
+					// Add found device to list of devices.
+					BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+					deviceFound(device);
+					
+					//BluetoothDevice rbd = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+					//int rssi = intent.getIntExtra(BluetoothDevice.EXTRA_RSSI, Integer.MIN_VALUE);
+					//RemoteDevice2Impl tobounce = new RemoteDevice2Impl(rbd, rssi);
+					//scanListener.deviceFound(tobounce);
+				}
+				else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+				{
+					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "***************** Scan complete!");
+					mContext.unregisterReceiver(this);
+					//scanListener.scanCompleted();
 				}
 			}
-		}, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+		};
 		
-		mBluetoothAdapter.enable();
+		// Register receiver.
+		// TODO: When should we unregister?
+		//   on BluetoothAdapter.ACTION_DISCOVERY_FINISHED
+		//   on abort (maBtCancelDiscovery)
+		//   on error
+		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+		mContext.registerReceiver(mBluetoothReciever, filter);
+		
+		// This is where devices will be saved for retrieval.
+		mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
+		
+		// Cancel any ongoing discovery.
+		if (mBluetoothAdapter.isDiscovering()) 
+		{
+			mBluetoothAdapter.cancelDiscovery();
+		}
+		
+		// Start discovery.
+		mBluetoothAdapter.startDiscovery();
 	}
-
-	mBluetoothAdapter.startDiscovery();
 	
-	Log.i("maBtStartDeviceDiscovery", "4");
-	mContext.registerReceiver(mBluetoothReciever, null);
+	void deviceFound(BluetoothDevice device)
+	{
+		mBluetoothDevices.add(device);
+		postBluetoothMessage();
+	}
 	
-	
-	return 0;
+	void postBluetoothMessage()
+	{
+		Log.i("BluetoothDeviceDiscoveryThread.postBluetoothMessage", "begin");
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_BT;
+		event[1] = RES_OK;
+		postEvent(event);
+		Log.i("BluetoothDeviceDiscoveryThread.postBluetoothMessage", "end");
+	}
 }
 
 int maBtGetNewDevice(Address dst)
@@ -94,29 +221,8 @@ int maBtGetNextServiceSize(Address dst) throws Exception
 
 void killBluetooth()
 {
-	mContext.unregisterReceiver(mBluetoothReciever);
+	// TODO: Kill thread here also
+	// stop d
+	//mContext.unregisterReceiver(mBluetoothReciever);
 }
 
-private BroadcastReceiver mBluetoothReciever = new BroadcastReceiver()
-{
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{		
-		final String action = intent.getAction();
-		if (action.equals(BluetoothDevice.ACTION_FOUND))
-		{
-			BluetoothDevice rbd = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			int rssi = intent.getIntExtra(BluetoothDevice.EXTRA_RSSI, Integer.MIN_VALUE);
-			
-			Log.i("mBluetoothReciever", "found device!");
-			//RemoteDevice2Impl tobounce = new RemoteDevice2Impl(rbd, rssi);
-			//scanListener.deviceFound(tobounce);
-		}
-		else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
-		{
-			Log.i("mBluetoothReciever", "scan complete!");
-			//scanListener.scanCompleted();
-		}
-
-	}
-};

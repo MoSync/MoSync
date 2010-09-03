@@ -61,6 +61,8 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.List;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;
@@ -79,7 +81,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import android.media.MediaPlayer;
 
-//#define _ANDROID_BLUETOOTH
+#define _ANDROID_BLUETOOTH
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
