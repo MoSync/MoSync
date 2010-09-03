@@ -21,6 +21,13 @@
 #error Unsupported compiler!
 #endif
 
+#if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
+#define MA_DV_HI i[1]
+#define MA_DV_LO i[0]
+#else
+#define MA_DV_HI hi
+#define MA_DV_LO lo
+#endif
 
 // Convert between double, 2 ints and long long.
 union MA_DV {

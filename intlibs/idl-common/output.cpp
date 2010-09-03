@@ -422,11 +422,11 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 
 				if(isDouble) {
 					stream << "MA_DV "<<dvName<<"; \\\n";
-					stream << dvName<<".hi = ";
+					stream << dvName<<".MA_DV_HI = ";
 					streamIoctlInputParam(stream, inK, java);
 					stream << "; \\\n";
 					inK++;
-					stream << dvName<<".lo = ";
+					stream << dvName<<".MA_DV_LO = ";
 					streamIoctlInputParam(stream, inK, java);
 					stream << "; \\\n";
 				}
@@ -613,11 +613,6 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	stream << "#ifndef " << headerName << "_DEFS_H\n";
 	stream << "#define " << headerName << "_DEFS_H\n\n";
 
-	stream << "#ifdef _android\n";
-	stream << "#pragma pack( push )\n";
-	stream << "#pragma pack( 1 )\n";
-	stream << "#endif // _android\n\n";
-
 	streamHash(stream, inf);
 
 	streamTypedefs(stream, inf.typedefs, ix);
@@ -625,10 +620,6 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);
 	streamIoctlDefines(stream, inf, headerName, ix, false);
-
-	stream << "#ifdef _android\n";
-	stream << "#pragma pack( pop )\n";
-	stream << "#endif // _android\n\n";
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }

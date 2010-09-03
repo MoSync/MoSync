@@ -1210,25 +1210,26 @@ void WRITE_REG(int reg, int value) {
 
 #define _SYSCALL_CONVERT_MAEvent(i) (MAEvent*)_SYSCALL_CONVERT_MAAddress(i)
 
-#if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
-#define hi i[1]
-#define lo i[0]
-#endif
-
 #define _SYSCALL_CONVERT_double(a) _convert_double(&a);
 	double _convert_double(int* ptr) {
-		MA_DV* dv = (MA_DV*)ptr;
-		DV_debug(*dv);
-		return dv->d;
+#ifdef DEBUGGING_MODE
+		DEBUG_ASSERT(sizeof(MA_DV) == 8);
+		DEBUG_ASSERT(sizeof(double) == 8);
+#endif
+		MA_DV dv;
+		dv.MA_DV_HI = ptr[0];
+		dv.MA_DV_LO = ptr[1];
+		DV_debug(dv);
+		return dv.d;
 	}
 	void DV_debug(const MA_DV& SCDEBUG_ARG(dv)) {
-		LOGSC("0x%08x%08x", dv.hi, dv.lo); LOGSC("(%g)", dv.d());
+		LOGSC("0x%08x%08x", dv.MA_DV_HI, dv.MA_DV_LO); LOGSC("(%g)", dv.d);
 	}
 #define _SYSCALL_HANDLERES_double { MA_DV dv; dv.d = res;\
-	REG(REG_r14) = dv.hi; REG(REG_r15) = dv.lo; LOGSC(");\n"); }
+	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(" = "); DV_debug(dv); LOGSC(");\n"); }
 
 #define _SYSCALL_HANDLERES_longlong { MA_DV dv; dv.ll = res;\
-	REG(REG_r14) = dv.hi; REG(REG_r15) = dv.lo; LOGSC(");\n"); }
+	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(");\n"); }
 
 #define _SYSCALL_HANDLERES_void LOGSC(");\n");
 
