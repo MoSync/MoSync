@@ -19,7 +19,7 @@ public:
 		{}
 	};
 
-int usage()
+static int usage()
 	{
 	fprintf(stderr, "uidcrc <uid1> <uid2> <uid3> [ <outputfile> ]\n");
 	return -1;

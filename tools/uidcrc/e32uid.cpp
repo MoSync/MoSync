@@ -40,7 +40,7 @@ const UINT crcTab[256] =
 	0x3eb2,0x0ed1,0x1ef0
     };
 
-void Crc(WORD& aCrc,const void* aPtr,int aLength)
+static void Crc(WORD& aCrc,const void* aPtr,int aLength)
 //
 // Perform a CCITT CRC checksum.
 //

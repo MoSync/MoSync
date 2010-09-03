@@ -300,6 +300,14 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building uidcrc
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\uidcrc
+@vcbuild uidcrc.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building rcomp
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\rcomp
