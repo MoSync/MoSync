@@ -64,6 +64,29 @@ string readFileToString(const char* src) {
 	return oss.str();
 }
 
+#if 0
+void* readBinaryFile(const char* src, size_t& size) {
+	ifstream in(src, ios_base::binary);
+	beGood(in);
+
+	in.seekg(0, ios_base::end);
+	size = in.tellg();
+	in.seekg(0, ios_base::beg);
+	beGood(in);
+
+	void* buf = malloc(size);
+	in.read((char*)buf, size);
+	beGood(in);
+	return buf;
+}
+
+void writeFile(const char* dst, const void* src, size_t size) {
+	ofstream out(dst, ios_base::binary);
+	beGood(out);
+	out.write(src, size);
+	beGood(out);
+}
+#endif
 
 void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 	ifstream in(src);

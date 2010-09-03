@@ -9,6 +9,11 @@ void appendFile(const char* dst, const char* src);
 
 std::string readFileToString(const char* src);
 
+// mallocs the buffer
+void* readBinaryFile(const char* src, size_t& size);
+
+void writeFile(const char* dst, const void* src, int size);
+
 typedef std::map<std::string, std::string> TemplateMap;
 
 void applyTemplate(const char* dst, const char* src, const TemplateMap&);

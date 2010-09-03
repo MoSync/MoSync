@@ -124,10 +124,6 @@ static bool parseProfileHeader(const char* filename, bool& isBlackberry) {
 	return true;
 }
 
-void packageS60v2(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
 void packageWM(const SETTINGS&, const std::string& runtimePath) {
 	printf("not implemented\n");
 	exit(1);
