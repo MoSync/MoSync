@@ -21,8 +21,12 @@
 #include <string.h>
 #include "fileacc.h"
 
+#if defined(__LINUX__) || defined(DARWIN)
 #ifdef __LINUX__
 #include <linux/limits.h>
+#else
+#include <limits.h>
+#endif
 #include <stdlib.h>
 #include <libgen.h>
 #endif //__LINUX__
@@ -31,7 +35,7 @@
 
 String FileAccess::FullPath(const String& aPartialPath)
 	{
-#ifndef __LINUX__
+#if !defined(__LINUX__) && !defined(DARWIN)
 	char path[_MAX_PATH];
 	if(aPartialPath.Length()==0)
 		assert(_fullpath(path,"",_MAX_PATH)!=NULL);
@@ -50,7 +54,7 @@ String FileAccess::FullPath(const String& aPartialPath)
 
 String FileAccess::GetDriveAndDirectory(const String& aFullFileName)
 	{
-#ifndef __LINUX__
+#if !defined(__LINUX__) && !defined(DARWIN)
 	char drive[_MAX_DRIVE];
 	char directory[_MAX_DIR];
 	char filename[_MAX_FNAME];

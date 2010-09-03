@@ -33,7 +33,7 @@ using std::cerr;
 #define snprintf _snprintf
 #endif
 #else //!__MSVCDOTNET__
-#ifndef __LINUX__
+#if !defined(__LINUX__) && !defined(DARWIN)
 #include <io.h>
 #endif //!__LINUX__
 #endif //__MSVCDOTNET__
@@ -485,7 +485,7 @@ int main(int argc, char * argv[])
 		{
 
 
-#ifdef __LINUX__
+#if defined(__LINUX__) || defined(DARWIN)
 
 		std::string totalpath(s.substr( 0, s.rfind("/")+1 ));
 		const char* uidTool = "uidcrc";

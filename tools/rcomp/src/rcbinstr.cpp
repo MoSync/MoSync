@@ -20,7 +20,10 @@
 #include <string.h>
 #include "astring.h"
 #include <stdlib.h>
+
+#ifndef DARWIN
 #include <malloc.h>
+#endif
 
 #include "rcbinstr.h"
 #include "tokens.h"  

@@ -33,7 +33,7 @@
 #endif
 
 // VT fix for Linux
-#ifdef __LINUX__
+#if defined(__LINUX__) || defined(DARWIN)
    #include <stdio.h>
 #endif // LINUX
 // end VT

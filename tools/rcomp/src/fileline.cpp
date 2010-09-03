@@ -24,8 +24,12 @@
 #include "numval.h"
 #include "tokens.h"
 
-#ifdef __LINUX__
+#if defined(__LINUX__) || defined(DARWIN)
+#ifndef DARWIN
 #include <linux/limits.h>
+#else
+#include <limits.h>
+#endif
 #define _MAX_PATH PATH_MAX
 #endif //__LINUX__
 
@@ -102,7 +106,7 @@ String FileLineManager::ExtractFileName( const String & Text)
         buffer[n] = '\0';
         }
 
-#ifndef __LINUX__
+#if !defined(__LINUX__) && !defined(DARWIN)
     // Replace all the unix-like forward slashes with DOS-like backslashes
 
     while ( n > 0 )

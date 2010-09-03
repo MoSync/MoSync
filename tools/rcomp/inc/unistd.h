@@ -16,7 +16,7 @@
 */
 
 
-#ifdef __LINUX__
+#if defined(__LINUX__) || defined(DARWIN)
 
 #include_next <unistd.h>
 
