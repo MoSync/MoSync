@@ -82,7 +82,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import android.media.MediaPlayer;
 
-#define _ANDROID_BLUETOOTH
+//#define _ANDROID_BLUETOOTH
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
@@ -163,7 +163,7 @@ public class MoSyncThread extends Thread
 		}
 		return mMemDataSection;
 	}
-/*	
+
 	public void threadPanic(int errorCode, String message)
 	{
 		Log.i("MoSyncThread","threadPanic");
