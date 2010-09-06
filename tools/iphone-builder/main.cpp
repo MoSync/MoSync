@@ -240,7 +240,7 @@ string filterWhiteSpace(const string& str) {
 		if(s > 32 && s < 127) {
 			newString += str[i];
 		} else {
-			newString += "_";
+			newString += "";
 		}
 	}
 	return newString;
