@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -160,6 +161,34 @@ public class MoSyncThread extends Thread
 			Log.i("MoSyncThread", "Out of Memory!");
 		}
 		return mMemDataSection;
+	}
+	
+	public ByteBuffer generateRecompilerCodeBlock(int size)
+	{
+		Log.i("MoSyncThread","generate recompiler code block");
+		try
+		{
+			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
+		}
+		catch (Exception e)
+		{
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerCodeBlock;
+	}
+	
+	public ByteBuffer generateRecompilerEntryBlock(int size)
+	{
+		Log.i("MoSyncThread","generate recompiler entry block");
+		try
+		{
+			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
+		}
+		catch (Exception e)
+		{
+			Log.i("MoSyncThread", "Out of Memory!");
+		}
+		return mRecompilerEntryBlock;
 	}
 	
 	public void threadPanic(int errorCode, String message)

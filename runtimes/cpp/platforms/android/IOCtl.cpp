@@ -33,18 +33,18 @@ namespace Base
 		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
 		free(b);
 	
-		info->bitsPerPixel = 32;//backBuffer->bitsPerPixel;
+		info->bitsPerPixel = 24;//backBuffer->bitsPerPixel;
 		info->bytesPerPixel = 4;//backBuffer->bytesPerPixel;
-		info->redMask = 0xff0000ff; //backBuffer->redMask;
+		info->redMask = 0x00ff0000; //backBuffer->redMask;
 		info->greenMask = 0x0000ff00;// backBuffer->greenMask;
-		info->blueMask = 0x00ff0000; //backBuffer->blueMask;
+		info->blueMask = 0x0000000ff; //backBuffer->blueMask;
 		info->sizeInBytes = width * height * 4; //backBuffer->pitch*backBuffer->height;
 		info->width = width; //backBuffer->width;
 		info->height = height; // backBuffer->height;
 		info->pitch = width*4; //backBuffer->pitch;
-		info->redShift = 0; //backBuffer->redShift;
-		info->greenShift = 8; //backBuffer->greenShift;
-		info->blueShift = 16; //backBuffer->blueShift;
+		info->redShift = 16; //backBuffer->redShift;
+		info->greenShift = 9; //backBuffer->greenShift;
+		info->blueShift = 0; //backBuffer->blueShift;
 		info->redBits = 8;// backBuffer->redBits;
 		info->greenBits = 8;// backBuffer->greenBits;
 		info->blueBits = 8; //backBuffer->blueBits;
@@ -102,22 +102,50 @@ namespace Base
 	
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery enter");
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery begin");
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
 		if (methodID == 0) return 0;
-		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, names);
 		
 		jNIEnv->DeleteLocalRef(cls);
 		
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery leaving");
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery end");
 		
 		return (int)ret;
 	}
 	
-	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis)
+	/**
+	 * Returns actual length of device name.
+	 */
+	int _maBtGetNewDevice(
+		int memStart, 
+		int nameBufPointer, 
+		int nameBufSize, 
+		int actualNameLengthPointer,
+		int addressPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis)
 	{
-		return -1;
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice begin");
+		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewDevice", "(IIII)I");
+		if (methodID == 0) return 0;
+		
+		jint ret = jNIEnv->CallIntMethod(
+			jThis, 
+			methodID, 
+			nameBufPointer - memStart,
+			nameBufSize,
+			actualNameLengthPointer - memStart,
+			addressPointer - memStart);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice end");
+		
+		return (int)ret;
 	}
 	
 	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis)
@@ -135,16 +163,28 @@ namespace Base
 		return -1;
 	}
 	
+	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis)
+	{
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery begin");
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtCancelDiscovery", "()I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery end");
+		
+		return (int)ret;
+	}
+	
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStart", "()I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID);
-		
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return (int)ret;
 	}
 	
 	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis)
@@ -152,11 +192,10 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maLocationStop", "()I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID);
-		
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return (int)ret;
 	}
 	
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
@@ -178,7 +217,6 @@ namespace Base
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrURL = jNIEnv->NewStringUTF(url);
-
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPlatformRequest", "(Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
@@ -192,7 +230,6 @@ namespace Base
 	int _maWriteLog(const char* str, int b, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrLOG = jNIEnv->NewStringUTF(str);
-	
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWriteLog", "(Ljava/lang/String;I)I");
 		if (methodID == 0) return 0;
@@ -208,10 +245,9 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
 		if (methodID == 0) return 0;
-		int retval = jNIEnv->CallIntMethod(jThis, methodID);
-		
+		int ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
-		return retval;
+		return ret;
 	}
 }

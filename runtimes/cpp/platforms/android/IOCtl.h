@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace Base
 {
-
 	// Framebuffer API
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
 	
@@ -27,16 +26,25 @@ namespace Base
 	
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
 	
-	// Bluetooth
+	// Bluetooth API
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis);
 	
-	int _maBtGetNewDevice(MABtDevice* dst, JNIEnv* jNIEnv, jobject jThis);
+	int _maBtGetNewDevice(
+		int memStart, 
+		int nameBufPointer, 
+		int nameBufSize, 
+		int actualNameLengthPointer,
+		int addressPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis);
 	
 	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis);
 	
 	// Location API
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis);
