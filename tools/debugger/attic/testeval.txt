@@ -1,8 +1,6 @@
 -target-select sim
--break-insert C:/MoSync/workspace/gdbtest1/main.cpp:8
--exec-continue
+1999-break-insert C:/MoSync/examples/MAUI/MAUIex/LabelScreen.cpp:27
+2001-exec-continue
 -test-wait
--exec-until C:/MoSync/workspace/gdbtest1/main.cpp:11
--test-wait
--exec-finish
--test-wait
+-var-create - * this
+-var-list-children var1

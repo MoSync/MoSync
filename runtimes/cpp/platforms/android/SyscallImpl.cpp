@@ -138,12 +138,20 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 	}
-
-	
+	/**
+	* Calls the Java fucntion 'stroeIfBinaryAudioresource'.
+	* If this resource is an audio resource, with a correct mime header,
+	* this file will be saved to the memoory.
+	* This is because Android can only play commpressed audio formats 
+	* with a file descriptor and not from a buffer or array in memory.
+	*
+	* @param resourceIndex		The resource index of the resource which shall be checked.
+	*
+	*/
 	void Syscall::checkAndStoreAudioResource(int resourceIndex)
 	{
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "checkIfBinaryAudioResource", "(I)V");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "storeIfBinaryAudioResource", "(I)V");
 		if (methodID != 0)
 			mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex);
 				
@@ -167,7 +175,6 @@ namespace Base
 	{
 		SYSLOG("PostEvent");
 		gEventFifo.put(event);
-		
 	}
 	
 	SYSCALL(int,  maSetColor(int rgb))
@@ -332,7 +339,6 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
-		
 	}
 
 	SYSCALL(void,  maUpdateScreen(void))
@@ -378,10 +384,16 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
-	SYSCALL(void,  maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect, int scanlength))
+	SYSCALL(void,  maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect, int scanLength))
 	{
-		SYSLOG("maDrawRGB NOT IMPLEMENTED");
-
+		SYSLOG("maDrawRGB");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maDrawRGB", "(IIIIIIII)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, dstPoint->x, dstPoint->y, src, srcRect->left, srcRect->top, srcRect->width, srcRect->height, scanLength);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(void,  maDrawImageRegion(MAHandle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode))
@@ -413,16 +425,18 @@ namespace Base
 
 	SYSCALL(void,  maGetImageData(MAHandle image, void* dst, const MARect* srcRect, int scanlength))
 	{
-		SYSLOG("maGetImageData NOT IMPLEMENTED");
-/*		
+		SYSLOG("maGetImageData");
+
+		if (srcRect->width > scanlength) maPanic(ERR_IMAGE_OOB, "maGetImageData, scanlenght < width");
+		
+		int rdst = (int)dst - (int)gCore->mem_ds;
+		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maDrawImageRegion", "(IIIIIIII)V");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maGetImageData", "(IIIIIII)V");
 		if (methodID == 0) ERROR_EXIT;
-		mJNIEnv->CallVoidMethod(mJThis, methodID, image, srcRect->left, srcRect->top, srcRect->width, srcRect->height, dstPoint->x, dstPoint->y, transformMode);
+		mJNIEnv->CallVoidMethod(mJThis, methodID, image, rdst, srcRect->left, srcRect->top, srcRect->width, srcRect->height, scanlength);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-*/		
-		
 	}
 
 	SYSCALL(MAHandle,  maSetDrawTarget(MAHandle image))
@@ -487,8 +501,8 @@ namespace Base
 	{
 		SYSLOG("maCreateImageRaw");
 		
-		int imgWidth = size&0xffff;
-		int imgHeight = (size>>16)&0xffff;
+		int imgHeight = size&0xffff;
+		int imgWidth = (size>>16)&0xffff;
 		
 		int imgSize = imgWidth * imgHeight * 4;
 		
@@ -509,7 +523,8 @@ namespace Base
 				(*(img+j)) = (*(srcImg+j));j++;
 				(*(img+j)) = (*(srcImg+j));j++;
 				(*(img+j)) = (*(srcImg+j));j++;
-				(*(img+j)) = 255;j++;
+				(*(img+j)) = (*(srcImg+j));j++;
+				//(*(img+j)) = 255;j++;
 			}
 		}
 		else
@@ -789,13 +804,9 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 	
-	
-	
-	
 	SYSCALL(void,  maLoadProgram(MAHandle data, int reload))
 	{
 		SYSLOG("maLoadProgram NOT IMPLEMENTED");
-
 	}
 
 	SYSCALL(int,  maGetKeys(void))
@@ -804,24 +815,30 @@ namespace Base
 		return -1;
 	}
 
-	void* mGetEventData;
+	// NOT USED? 
+	//void* mGetEventData;
+	
+	// Parameter event points to event object on the MoSync side.
 	SYSCALL(int,  maGetEvent(MAEvent* event))
 	{
 		gSyscall->ValidateMemRange(event, sizeof(MAEvent));	
 		MYASSERT(((uint)event & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
 		
-		if(gEventFifo.count() == 0)
-			return 0;
+		// Exit if event queue is empty.
+		if (gEventFifo.count() == 0) return 0;
 		
 //		SYSLOG("maGetEvent");
 
+		// Copy runtime side event to MoSync side event.
 		*event = gEventFifo.get();
 		
-		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) {\
-			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType));\
-			delete (dataType*)event->data;\
-			event->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
+		// Copy event data to memory on the MoSync side.
+		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
+			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType)); \
+			delete (dataType*) event->data; \
+			event->data = (void*) (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
 
+		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 		
 		return 1;
@@ -840,7 +857,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, timeout);
 
 		mJNIEnv->DeleteLocalRef(cls);
-		
 	}
 
 	SYSCALL(int,  maTime(void))
@@ -905,7 +921,7 @@ namespace Base
 
 	SYSCALL(void, maPanic(int result, const char* message))
 	{
-		SYSLOG("maPanic NOT IMPLEMENTED");
+		SYSLOG("maPanic");
 		
 		int yield = Core::GetVMYield(gCore);
 		yield = 1;
@@ -919,37 +935,72 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
-		
 	}
 
-	SYSCALL(int,  maSoundPlay(MAHandle sound_res, int offset, int size))
+	SYSCALL(int,  maSoundPlay(MAHandle soundResource, int offset, int size))
 	{
-		SYSLOG("maSoundPlay NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maSoundPlay");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSoundPlay", "(III)I");
+		if (methodID == 0) ERROR_EXIT;
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, soundResource, offset, size);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 
 	SYSCALL(void,  maSoundStop(void))
 	{
-		SYSLOG("maStopSound NOT IMPLEMENTED");
-
+		SYSLOG("maStopSound");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSoundStop", "()V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(int,  maSoundIsPlaying(void))
 	{
-		SYSLOG("maSoundIsPlaying NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maSoundIsPlaying");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSoundIsPlaying", "()I");
+		if (methodID == 0) ERROR_EXIT;
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 
 	SYSCALL(int,  maSoundGetVolume(void))
 	{
-		SYSLOG("maSoundGetVolume NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maSoundGetVolume");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSoundGetVolume", "()I");
+		if (methodID == 0) ERROR_EXIT;
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 
-	SYSCALL(void,  maSoundSetVolume(int vol))
+	SYSCALL(void,  maSoundSetVolume(int volume))
 	{
-		SYSLOG("maSoundSetVolume NOT IMPLEMENTED");
-
+		SYSLOG("maSoundSetVolume");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSoundSetVolume", "(I)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, volume);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(int,  maInvokeExtension(int function, int a, int b, int c))
@@ -958,13 +1009,30 @@ namespace Base
 		return -1;
 	}
 
+	/**
+	* Call one of the platform dependant syscalls. For more information about each of these syscalls,
+	* their paramaters and return values, please check the MoSync documentation.
+	* 
+	* @param function	The number of the syscall, this number is generated by the IDL compiler
+	* @param a		The first paramater
+	* @param b		The second paramater
+	* @param c		The third paramater
+	* @return		< 0
+	*				if error
+	*				> 0
+	*				on success
+	* 				-1
+	*				if this syscall is not implemented on this platfom.
+	*
+	*/
 	SYSCALL(int,  maIOCtl(int function, int a, int b, int c))
 	{
 		SYSLOG("maIOCtl");
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "****** maIOCtl miki");
 		
 		switch(function) {
 		case maIOCtl_maWriteLog:
-			SYSLOG("maIOCtl_maWriteLog NOT IMPLEMENTED");
+			SYSLOG("maIOCtl_maWriteLog");
 			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
 		
 		case maIOCtl_maSendTextSMS:

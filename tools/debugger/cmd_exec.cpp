@@ -479,6 +479,7 @@ void exec_until(const string& args) {
 static ExpressionTree* sReturnTree;
 static void finishStopRetValueEvaluated(const Value* value, const char *err) {
 	if(err) { 
+		oprintf("\n");
 		error("%s", err); 
 		return; 
 	}
@@ -524,7 +525,7 @@ static void setExecFinish() {
 			if(currentFunction->type && currentFunction->type->type() == TypeBase::eFunction) {
 				const FunctionType* funcType = (const FunctionType*) currentFunction->type;
 				const TypeBase* returnType = (const TypeBase*) funcType->mReturnType;
-				if(returnType) {
+				if(returnType && !(returnType->type()==TypeBase::eBuiltin && ((Builtin*)returnType)->subType()==Builtin::eVoid)) {
 					SYM returnSym;
 					returnSym.address = &r.gpr[REG_r14];
 					returnSym.type = returnType;

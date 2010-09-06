@@ -21,6 +21,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void oprintToken();
 void oprintDone();
 void oprintDoneLn();
+
+/**
+ * Completes the current command so that the more commands
+ * can be processed.
+ */
 void commandComplete();
 
 #endif	//COMMANDINTERFACE_H

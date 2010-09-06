@@ -1,0 +1,59 @@
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+TARGET        TRcomp18030.exe
+TARGETTYPE    exe
+UID           0x100039CE 0x10287187
+VENDORID 	  0x70000001
+SOURCEPATH    .
+SOURCE        Tgb18030_Main.cpp
+SOURCE        Tgb18030_Application.cpp
+SOURCE        Tgb18030_Document.cpp
+SOURCE        Tgb18030_AppUi.cpp
+SOURCE        Tgb18030_AppView.cpp
+USERINCLUDE   .
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\techview
+
+
+START RESOURCE Tgb18030.rss
+	HEADER
+	TARGETPATH \Resource\Apps
+	TARGET  	TRcomp18030.rsc
+END
+
+START RESOURCE	Tgb18030_reg.rss
+TARGETPATH		\private\10003a3f\apps
+END
+
+START RESOURCE	Trcomp_neg.rss
+TARGETPATH		\Resource\Data
+END
+
+START RESOURCE	Trcomp_pos.rss
+TARGETPATH		\Resource\Data
+END
+
+START BITMAP	Tgb18030.mbm
+TARGETPATH		\Resource\Apps
+SOURCE			c8,1 icon24.bmp icon2m.bmp icon32.bmp icon3m.bmp icon48.bmp icon4m.bmp
+END
+
+LIBRARY       euser.lib apparc.lib cone.lib eikcore.lib gdi.lib eikctl.lib eikcoctl.lib 
+
+capability		SwEvent WriteDeviceData

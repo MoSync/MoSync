@@ -55,12 +55,13 @@ using namespace std;
 namespace ContactParser {
 	static void start(void *data, const char *el, const char **attr);
 	static void end(void *data, const char *el);
-	static void error(const char* msg) GCCATTRIB(noreturn);
+	static void ATTRIBUTE(noreturn, error(const char* msg));
 }
 
 struct ContactValue {
 	int attr;
 
+	virtual ~ContactValue() {}
 	ContactValue() : attr(0) {}
 	virtual int getValue(void* buf, int bufSize) const = 0;
 };
@@ -362,7 +363,7 @@ namespace ContactParser {
 		if(*res != 0)
 			error("date conversion incomplete");
 		time_t ttime = mktime(&ctime);
-		if(ttime > INT_MAX)
+		if(ttime > INT_MAX || ttime < 0)
 			error("date out of bounds");
 		d = (int)ttime;
 	}

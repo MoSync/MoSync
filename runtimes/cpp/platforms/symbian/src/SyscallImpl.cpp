@@ -43,6 +43,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef GUIDO
 #include <helpers/CPP_IX_GUIDO.H>
+static double _atanh(double d) {
+	d = (1+d) / (1-d);
+	return 0.5 * log(d);
+}
 #endif
 
 #ifdef CALL
@@ -1317,22 +1321,9 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maSetSpeechPitch:
 		return maSetSpeechPitch(a);
 
-	case maIOCtl_sinh: {
-		double& d = *GVMRA(double);
-		d = ::sinh(d);
-		return 0;
-	}
-	case maIOCtl_cosh: {
-		double& d = *GVMRA(double);
-		d = ::cosh(d);
-		return 0;
-	}
-	case maIOCtl_atanh: {
-		double& d = *GVMRA(double);
-		d = (1+d) / (1-d);
-		d = 0.5 * log(d);
-		return 0;
-	}
+	maIOCtl_sinh_case(::sinh);
+	maIOCtl_cosh_case(::cosh);
+	maIOCtl_atanh_case(_atanh);
 #endif	//GUIDO
 
 	case maIOCtl_maLockKeypad:

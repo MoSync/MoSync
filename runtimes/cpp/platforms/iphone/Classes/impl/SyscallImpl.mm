@@ -865,6 +865,22 @@ namespace Base {
 		case maIOCtl_maFrameBufferClose:
 			return maFrameBufferClose();
 				
+		maIOCtl_syscall_case(maFileOpen);
+			
+		maIOCtl_syscall_case(maFileWriteFromData);
+		maIOCtl_syscall_case(maFileReadToData);
+				
+		maIOCtl_syscall_case(maFileTell);
+		maIOCtl_syscall_case(maFileSeek);
+		maIOCtl_syscall_case(maFileRead);
+		maIOCtl_syscall_case(maFileWrite);				
+			
+		maIOCtl_syscall_case(maFileExists);
+		maIOCtl_syscall_case(maFileClose);
+		maIOCtl_syscall_case(maFileCreate);
+		maIOCtl_syscall_case(maFileDelete);
+		maIOCtl_syscall_case(maFileSize);				
+				
 		}
 		
 		return IOCTL_UNAVAILABLE;

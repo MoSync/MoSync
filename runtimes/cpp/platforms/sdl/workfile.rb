@@ -45,6 +45,7 @@ work.instance_eval do
 	end
 	
 	if(!@GCC_IS_V4)
+		@SPECIFIC_CFLAGS["hashmap.cpp"] = " -Wno-unreachable-code"
 		@SPECIFIC_CFLAGS["AudioChannel.cpp"] = " -Wno-unreachable-code"
 		if(CONFIG == "")	#buggy compiler
 			@SPECIFIC_CFLAGS["ConfigParser.cpp"] = " -Wno-uninitialized"

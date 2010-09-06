@@ -46,7 +46,7 @@ void break_enable(const string& args);
 InstructionMap sInstructions;
 BreakpointMap sBreakpoints;
 BreakpointAddressMap sBreakpointAddresses;
-TempBreakpoint gTempBreakpoint = { NULL, -1, 0 };
+TempBreakpoint gTempBreakpoint = { NULL, (uint)-1, 0 };
 
 //******************************************************************************
 // statics

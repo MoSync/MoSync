@@ -76,6 +76,7 @@ public:
 	TYPES(V_CONSTRUCTOR_ELEM_HEADER)
 	TYPES(V_OPERATOR_CAST_ELEM_HEADER)
 
+	bool isDereferencable() const;
 	bool isPointer() const; 
 	Builtin::SubType getPrimitiveType() const;
 	TypeBase::Type getType() const;

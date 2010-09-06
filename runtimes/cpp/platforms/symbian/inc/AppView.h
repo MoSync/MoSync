@@ -29,7 +29,6 @@ class CAppUi;
 class CDocument;
 class CDirScrAccEng;
 class CIdle;
-class CEikGlobalTextEditor;
 
 namespace Core {
 	class VMCore;
@@ -64,8 +63,6 @@ public:
 public:
 	TKeyResponse OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aType);
 	void HandlePointerEventL(const TPointerEvent&);
-	TInt CountComponentControls() const;
-	CCoeControl* ComponentControl(TInt aIndex) const;
 protected:
 	void FocusChanged(TDrawNow aDrawNow);
 	void HandleResourceChange(TInt aType);
@@ -92,7 +89,6 @@ private:
 	Syscall* iSyscall;
 	VMCore* iCore;
 	CIdle* iIdle;
-	CEikGlobalTextEditor* iEditor;
 	bool iKeepRunning, iStopForever;
 	int iReloadHandle, iKeys;
 

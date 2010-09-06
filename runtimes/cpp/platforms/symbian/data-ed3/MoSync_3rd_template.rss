@@ -1,0 +1,55 @@
+NAME MOSR // 4-letter ID, unique resource identifier for the application
+
+// WARNING: any changes to this file risks breaking the packager.
+// Make sure to test before commit.
+
+#include <eikon.rh>
+#include <eikon.rsg>
+#include <avkon.rh>
+#include <avkon.rsg>
+#include "MoSync.hrh"
+
+RESOURCE RSS_SIGNATURE { } // Needs to be left empty
+
+RESOURCE TBUF r_default_document_name { buf=""; }
+
+RESOURCE EIK_APP_INFO {
+	cba = R_AVKON_SOFTKEYS_EXIT;
+}
+
+#include <appinfo.rh>
+
+RESOURCE LOCALISABLE_APP_INFO r_mosync_app_info {
+	short_caption = "%app-name%";
+	//view_list = { };
+	caption_and_icon =
+	CAPTION_AND_ICON_INFO {
+		caption = "%app-name%";
+		number_of_icons = 1;
+		icon_file = "\\resource\\apps\\%uid%_icon.mif";
+	};
+}
+
+RESOURCE DIALOG r_textbox_query {
+	flags = EGeneralQueryFlags;
+	buttons = R_AVKON_SOFTKEYS_OK_CANCEL;
+	items = {
+		DLG_LINE {
+			type = EAknCtQuery;
+			id = EGeneralQuery;
+			control = AVKON_DATA_QUERY {
+				layout = EDataLayout;
+				label = "";
+				control = EDWIN {
+					flags = EEikEdwinNoHorizScrolling;
+					width = 320;
+					maxlength = 4096;
+					max_view_height_in_lines = 64;
+					base_line_delta = 21;
+					allowed_input_modes = EAknEditorAllInputModes;
+					default_input_mode = EAknEditorTextInputMode;
+				};
+			};
+		}
+	};
+}

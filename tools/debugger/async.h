@@ -61,6 +61,12 @@ struct DebuggerEvent {
 void initEventSystem();
 
 /**
+ * Closes the event system, any subsequent calls to getEvent or putEvent will
+ * fail.
+ */
+void closeEventSystem();
+
+/**
  * Waits until there is an event and points *pde to it. 
  *
  * @param pde A pointer to a pointer that will point to the event upon return.

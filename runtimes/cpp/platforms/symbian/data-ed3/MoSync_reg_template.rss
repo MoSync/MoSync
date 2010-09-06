@@ -1,0 +1,19 @@
+#include <appinfo.rh>
+%resource-header%
+
+UID2 KUidAppRegistrationResourceFile
+
+// Application UID
+UID3 0x%uid%
+
+RESOURCE APP_REGISTRATION_INFO
+{
+	app_file = "%uid%";
+	localisable_resource_file = "\\resource\\apps\\%uid%";
+	localisable_resource_id = R_MOSYNC_APP_INFO;
+	embeddability = KAppNotEmbeddable;
+	newfile = KAppDoesNotSupportNewFile;
+	hidden = KAppNotHidden;	//try to set KAppIsHidden for package release
+}
+
+// End of File

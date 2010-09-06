@@ -61,6 +61,8 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.List;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;
@@ -80,7 +82,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import android.media.MediaPlayer;
 
-//#define _ANDROID_BLUETOOTH
+#define _ANDROID_BLUETOOTH
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
@@ -154,42 +156,14 @@ public class MoSyncThread extends Thread
 			mMemDataSection = ByteBuffer.allocateDirect(size);
 			Log.i("MoSyncThread","generate data section - SUCCESS");
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.i("MoSyncThread", "Out of Memory!");
+			return null;
 		}
 		return mMemDataSection;
 	}
-	
-	public ByteBuffer generateRecompilerCodeBlock(int size)
-	{
-		Log.i("MoSyncThread","generate recompiler code block");
-		try
-		{
-			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSyncThread", "Out of Memory!");
-		}
-		return mRecompilerCodeBlock;
-	}
-	
-	public ByteBuffer generateRecompilerEntryBlock(int size)
-	{
-		Log.i("MoSyncThread","generate recompiler entry block");
-		try
-		{
-			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
-		}
-		catch(Exception e)
-		{
-			Log.i("MoSyncThread", "Out of Memory!");
-		}
-		return mRecompilerEntryBlock;
-	}
-	
-
+/*	
 	public void threadPanic(int errorCode, String message)
 	{
 		Log.i("MoSyncThread","threadPanic");
@@ -201,7 +175,7 @@ public class MoSyncThread extends Thread
 			mMoSyncView.getContext().startActivity(myIntent);
 			this.sleep(Long.MAX_VALUE);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.i("MoSyncThread","threadPanic exception:" + e.toString());
 		}
@@ -228,16 +202,16 @@ public class MoSyncThread extends Thread
 				rFd = rAfd.getFileDescriptor();
 				mResourceOffset = rAfd.getStartOffset();
 			}
-			catch(FileNotFoundException fnfe)
+			catch (FileNotFoundException fnfe)
 			{
 				Log.i("loadProgram","Has no resources!");
 				Log.i("loadProgram","exception" + fnfe.toString());
 			}
 			
-			if(null != pFd)
+			if (null != pFd)
 			{
 				Log.i("MoSync Thread", "calling native function");
-				if(false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
+				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
 				{
 					Log.e("MoSync Thread", "ERROR Load program was unsuccesfull");
 					threadPanic(0, "Unable to load program or resources");
@@ -247,11 +221,8 @@ public class MoSyncThread extends Thread
 				Log.i("MoSync Thread", "Load program was succesfull");
 				return true;
 			}
-		
-		
-
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.e("MoSyncService", "Exception while loading program:" + e.toString());
 		}
@@ -267,7 +238,7 @@ public class MoSyncThread extends Thread
 			FileDescriptor pFd = pAfd.getFileDescriptor();
 			return pFd;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.e("MoSyncService","getResourceFileDesriptor exception:" + e.toString());
 		}
@@ -314,12 +285,19 @@ private static final int CHUNK_READ_SIZE = 1024;
 	{
 		maUpdateScreen();
 	}
+	
+	public void postEvent(int[] event)
+	{
+		nativePostEvent(event);
+		interrupt(); // Wake up thread.
+	}
 
-	@Override public void run()
+	@Override 
+	public void run()
 	{
 		Log.i("MoSync Thread", "run");
 
-		if(false == loadProgram())
+		if (false == loadProgram())
 		{
 			Log.i("MoSync Thread", "load program failed!! :(");
 			return;

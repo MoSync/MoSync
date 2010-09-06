@@ -26,8 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
-//(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
-#define SYSLOG(...)
+#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+//#define SYSLOG(...)
 
 /*
 Function that initializes the native core	
@@ -180,37 +180,47 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	jsize len = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
 	
-	// rebuild the event
+	// Build the event.
 	MAEvent event;
+	event.type = intArray[0];
 	event.data = NULL;
 	
-	event.type = intArray[0];
-	
-	if(event.type == EVENT_TYPE_POINTER_PRESSED || event.type == EVENT_TYPE_POINTER_RELEASED || event.type == EVENT_TYPE_POINTER_DRAGGED )
+	if (event.type == EVENT_TYPE_POINTER_PRESSED || 
+		event.type == EVENT_TYPE_POINTER_RELEASED || 
+		event.type == EVENT_TYPE_POINTER_DRAGGED)
 	{
 		event.point.x = intArray[1];
 		event.point.y = intArray[2];
 	}
-	else if(event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED )
+	else if (event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED)
 	{
 		event.key = intArray[1];
 		event.nativeKey = intArray[2];
 	}
-	else if(event.type == EVENT_TYPE_CONN)
+	else if (event.type == EVENT_TYPE_CONN)
 	{
 		event.conn.handle = intArray[1];
 		event.conn.opType = intArray[2];
 		event.conn.result = intArray[3];
 	}
-	else if(event.type == EVENT_TYPE_LOCATION)
+	else if (event.type == EVENT_TYPE_LOCATION)
 	{
+		// Copy location data. This data starts at array index 1.
 		int size = sizeof(MALocation);
 		event.data = new byte[size];
-		memcpy(event.data, intArray, size);
+		memcpy(event.data, intArray + 1, size);
+	}
+	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
+	{
+		event.state = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_BT)
+	{
+		event.state = intArray[1];
 	}
 	
-	// release the memory used
-	env->ReleaseIntArrayElements( eventBuffer, intArray, 0);
+	// Release the memory used for the int array.
+	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
 }

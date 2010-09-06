@@ -1,7 +1,20 @@
-// NUMVAL.H
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #ifndef __NUMVAL_H__
 #define __NUMVAL_H__
@@ -12,9 +25,9 @@ class String;
 class ResourceDataStream;
 
 class NumericValue
-{
-	friend class String;
-	friend RCBinaryStream& operator<<(RCBinaryStream& os,NumericValue aValue);
+	{
+    friend class String;
+    friend RCBinaryStream& operator<<(RCBinaryStream& os,NumericValue aValue);
 public:
 	NumericValue(const String & Source, DataType NumericValueType);
 	NumericValue(DataType NumericValueType);
@@ -28,6 +41,7 @@ public:
 	long GetLong() const;
 	NumericValue& operator=(unsigned long aValueToSet);
 	static String ltoa(long aValue);
+	static bool CheckSigned(unsigned long aValue,DataType NumericValueType);
 	void StreamOut(ResourceDataStream& aStream) const;
 private:
 	void AllocateSpace();
@@ -42,6 +56,6 @@ private:
 	unsigned long iULongValue;
 	long iSignedValue;
 	double iDoubleValue;
-};
+	};
 
 #endif

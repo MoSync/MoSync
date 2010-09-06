@@ -83,6 +83,9 @@ static bool start_sim() {
 	if(gResourceFilename.size() > 0)
 		cmdLine += " -resource \""+gResourceFilename+"\"";
 	cmdLine += " -sld \""+gSldFilename+"\"";
+#ifdef _DEBUG
+	cmdLine += " -resolution 320 240"; 
+#endif
 
 	LOG("%s\n", cmdLine.c_str());
 

@@ -71,6 +71,15 @@ public:
 	 * reduces it by 1.
 	 */
 	void wait();
+	
+	/**
+	 * Same as wait but with a timeout. 
+	 *
+	 * @param timeout The number of miliseconds to wait for the semaphore.
+	 * @return True if the semaphore was acquired in timeout miliseconds,
+	 *         false otherwise.
+	 */
+	bool tryWait(int timeout);
 
 	/**
 	 * Increases the value of the semaphore by 1.

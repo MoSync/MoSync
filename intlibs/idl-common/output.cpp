@@ -422,11 +422,11 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 
 				if(isDouble) {
 					stream << "MA_DV "<<dvName<<"; \\\n";
-					stream << dvName<<".hi = ";
+					stream << dvName<<".MA_DV_HI = ";
 					streamIoctlInputParam(stream, inK, java);
 					stream << "; \\\n";
 					inK++;
-					stream << dvName<<".lo = ";
+					stream << dvName<<".MA_DV_LO = ";
 					streamIoctlInputParam(stream, inK, java);
 					stream << "; \\\n";
 				}

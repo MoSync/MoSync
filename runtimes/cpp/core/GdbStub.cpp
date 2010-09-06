@@ -273,6 +273,11 @@ void GdbStub::runRead() {
 		//LOG("GDB read %i\n", res);
 		if(res <= 0) {
 			LOG("connection->read error %i\n", res);
+			
+			/* If there is a connection error, then either mdb has crashed, been
+			 * killed by a signal or gotten -gdb-exit. In either case we should
+			 * quit since we cannot restore the debug session. */
+			mQuit = true;
 			break;
 		}
 		mInputPos += res;
@@ -497,6 +502,11 @@ bool GdbStub::stepExec() {
 	return true;
 }
 
+bool GdbStub::quit() {
+	mQuit = true;
+	return true;
+}
+
 // Optional commands follows:
 bool GdbStub::lastSignal() {
 	return false;
@@ -562,6 +572,7 @@ bool GdbStub::executeCommand() {
 		case 'M': return writeMemory();
 		case 'c': return continueExec();
 		case 's': return stepExec();
+		case 'e': return quit();
 
 			// optional;
 

@@ -90,6 +90,9 @@ void stackContinued() {
 //******************************************************************************
 // loadStack
 //******************************************************************************
+void assertStack() {
+	_ASSERT(sFrames.size() > 0 && gCurrentFrameIndex<sFrames.size());
+}
 
 void loadStack(void (*cb)()) {
 	if(sFrames.size() > 0) {
@@ -378,7 +381,7 @@ void stack_select_frame(const string& args) {
 }
 
 void Callback::ssf() {
-	if(sFrameRequest > sFrames.size()) {
+	if(sFrameRequest >= sFrames.size()) {
 		error("no such frame");
 		return;
 	}

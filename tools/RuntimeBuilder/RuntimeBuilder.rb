@@ -81,6 +81,8 @@ if !File.exist? "Settings.rb"
 	FileUtils.copy_file("Settings.rb.example", "Settings.rb")
 end
 
+# usage example: runtimebuilder.rb Settings.rb s60v3 /mosync/profiles/runtimes/s60v3/1/
+
 require ARGV[0]
 require "BuildJavaME.rb"
 require "BuildS60.rb"

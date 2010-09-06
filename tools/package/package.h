@@ -8,6 +8,7 @@ struct SETTINGS {
 	const char* model;
 	const char* dst;
 	const char* name;
+	const char* vendor;
 	const char* uid;
 	bool debug;
 };
@@ -18,6 +19,8 @@ void testProgram(const SETTINGS&);
 void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
 void testName(const SETTINGS&);
+void testVendor(const SETTINGS& s);
+void testUid(const SETTINGS&);
 
 const char* mosyncdir();
 void sh(const char* cmd);

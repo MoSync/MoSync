@@ -223,15 +223,12 @@ void locate_symbol(const string& name, SeeCallback cb) {
 	} else if(s->type == eVariable) {
 		const StaticVariable* sv = (StaticVariable*)s;
 		sym.type = sv->dataType->resolve();
+		sScope.type = (s->global==false)?SYM::Scope::eStatic:SYM::Scope::eGlobal;
 		sym.scope = sScope;
 		sSeeCallback = cb;
 		sSeeSym = sym;
 		StubConnection::readMemory(gMemBuf + sv->address, sv->address, sv->dataType->size(),
 			Callback::seeReadMem);
-	} else {
-		sScope.type = SYM::Scope::eGlobal;
-		sym.scope = sScope;
-		cb(sym);
 	}
 }
 

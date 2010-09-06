@@ -651,6 +651,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoTooth", "examples\Moblet\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "package", "tools\package\package.vcproj", "{93CBBDC2-46DF-4484-9BEA-E937DBB625E9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "uidcrc", "tools\uidcrc\uidcrc.vcproj", "{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -3066,6 +3068,24 @@ Global
 		{93CBBDC2-46DF-4484-9BEA-E937DBB625E9}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
 		{93CBBDC2-46DF-4484-9BEA-E937DBB625E9}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
 		{93CBBDC2-46DF-4484-9BEA-E937DBB625E9}.Release|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Smartphone 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Win32.Build.0 = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Debug|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Debug|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Smartphone 2003 (ARMV4).ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Win32.ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Win32.Build.0 = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Windows Mobile 5.0 Smartphone SDK (ARMV4I).ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Windows Mobile 6 Professional SDK (ARMV4I).ActiveCfg = Release|Win32
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3}.Release|Windows Mobile 6 Standard SDK (ARMV4I).ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3097,6 +3117,7 @@ Global
 		{BF366092-3745-4CDF-8E05-C5D4F4C84660} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{3A2ACC94-D4D1-4BA8-A8DB-5EDD6268AB52} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{93CBBDC2-46DF-4484-9BEA-E937DBB625E9} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
+		{4B18256E-9C27-4CC5-9D66-A87DE4DED0F3} = {599E2A2E-27B3-47C0-A02C-79BFC4220463}
 		{5AB2E7D8-8278-4B09-9441-16136936A271} = {983447E4-503D-41A2-ABB6-51DEED74C00B}
 		{E497B42C-2029-4CA6-BBDE-E7A807279F98} = {983447E4-503D-41A2-ABB6-51DEED74C00B}
 		{CF38EA04-DCCF-4506-B5EB-6895F23F5F9A} = {983447E4-503D-41A2-ABB6-51DEED74C00B}

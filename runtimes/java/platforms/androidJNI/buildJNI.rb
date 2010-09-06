@@ -87,7 +87,7 @@ FileUtils.cd "AndroidProject"
 if ENV['OS'] == "Windows_NT"
 	system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
-	system "#{firstarg}/ndk-build"
+	system("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
 
 puts "Preprocess Java Source Files\n\n"
@@ -111,7 +111,7 @@ package_root = "#{cpath}/AndroidProject/"
 system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
 		
 puts "Compile Java Source Files\n\n"
-		
+
 # Compile all the java files into class files
 system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
 
@@ -125,7 +125,11 @@ puts "Build Zip Package\n\n"
 # package the files
 FileUtils.cd "temp"
 
-system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+if ENV['OS'] == "Windows_NT"
+	system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+else
+	system("zip -r MoSyncRuntime#{debug}.zip .");
+end
 FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
 
 FileUtils.cd ".."

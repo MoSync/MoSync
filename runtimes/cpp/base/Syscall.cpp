@@ -71,12 +71,13 @@ namespace Base {
 	
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-		
+			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+
 		return maxCustomEventSize;
 	}
 
@@ -179,7 +180,7 @@ namespace Base {
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
 
 #ifdef _android
-					checkAndStoreAudioResource(rI);
+					//checkAndStoreAudioResource(rI);
 					
 #endif
 
@@ -757,6 +758,12 @@ namespace Base {
 				fh.name[i] = fn[i];
 			}
 		}
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(fn);
+		fn = newPath.c_str();
+		size = newPath.size();
+		fh.name.resize(size);
+		memcpy(fh.name, fn, size);		
 #else
 		memcpy(fh.name, fn, size);
 #endif

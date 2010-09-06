@@ -36,6 +36,15 @@ import android.content.res.Configuration;
 
 import android.content.Context;
 
+
+import android.content.pm.ActivityInfo;
+
+/**
+*
+* Main MoSync activity
+*
+* As long as this activity is running the application is running.
+*/
 public class MoSync extends Activity
 {
 
@@ -47,6 +56,17 @@ public class MoSync extends Activity
 	
 	boolean mIsPaused = false;
 	
+	/**
+	*
+	* onCreate
+	*
+	* Informs the underlying system that a fullscreen windows with no title bar shall be used.
+	*
+	* Creates and initializes the MoSync thread
+	*
+	* Calls the createMoSyncView method and then shows the created view
+	*
+	*/
     @Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,6 +96,12 @@ public class MoSync extends Activity
 		
     }
 	
+	/**
+	*
+	* createMoSyncView 
+	* Creates a MoSyncView. If it fails the Activity is destroyed.
+	*
+	*/
 	private void createMoSyncView()
 	{
 		Log.i("MoSync", "createMoSyncView");
@@ -88,14 +114,26 @@ public class MoSync extends Activity
 		}
 	}
 
+	/**
+	*
+	* onConfigurationChanged
+	* Handles the new configurations when the screen rotates and/or the keyboard was opened.
+	*
+	*/
 	@Override
 	public void onConfigurationChanged(Configuration config)
 	{
 		super.onConfigurationChanged(config);
 
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(mMoSyncView);
 	}
 	
+	/**
+	*
+	* onStop
+	* 
+	*/
     @Override
     protected void onStop()
 	{
@@ -105,7 +143,8 @@ public class MoSync extends Activity
 		mThreadHasDied = mMoSyncThread.isDead();
 		
 		// The view is destroyed, inform the thread about this
-		mMoSyncThread.setMoSyncView(null);
+		if(!mThreadHasDied)
+			mMoSyncThread.setMoSyncView(null);
 	}
 
 	@Override

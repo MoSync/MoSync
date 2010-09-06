@@ -4,11 +4,11 @@
 <build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths/Debug" value="C:\MoSync\include\newlib,./include"/>
-<property key="build.prefs:additional.include.paths/Release" value="C:\MoSync\include\newlib,./include"/>
+<property key="build.prefs:additional.include.paths/Release" value="/Applications/MoSync/include/newlib,./include"/>
 <property key="build.prefs:additional.libraries/Debug" value=""/>
 <property key="build.prefs:additional.libraries/Release" value=""/>
 <property key="build.prefs:additional.library.paths/Debug" value="C:\MoSync\lib\newlib_debug"/>
-<property key="build.prefs:additional.library.paths/Release" value="C:\MoSync\lib\newlib_release"/>
+<property key="build.prefs:additional.library.paths/Release" value="/Applications/MoSync/lib/newlib_release"/>
 <property key="build.prefs:app.permissions" value=""/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>

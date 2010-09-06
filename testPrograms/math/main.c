@@ -16,12 +16,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <madmath.h>
+#include <maassert.h>
 #include <conprint.h>
 #include <mastdlib.h>
+#include <limits.h>
+#include <maapi_defs.h>
+typedef union MA_DV MA_DV;
 
-
-#define GUIDO
-#include <IX_GUIDO.H>
+//#define GUIDO
+//#include <IX_GUIDO.H>
+#define FULLMATH
 
 
 double drand() {
@@ -60,10 +64,9 @@ int MAMain() {
 	TEST(sqrt);
 
 #ifdef FULLMATH
-#define GUIDO
+//#define GUIDO
 	TEST2(pow);
 	TEST(log);
-	TEST(tanh);
 
 	TEST(asin);
 	TEST(acos);
@@ -73,22 +76,22 @@ int MAMain() {
 #ifdef GUIDO
 	TEST(sinh);
 	TEST(cosh);
+	TEST(tanh);
 
 	TEST(atanh);
-
-	TEST2(atan2);
 #endif	//GUIDO
 
-	while(maGetEvent() != EVENT_CLOSE) {
-		maWait(WAIT_EVENT, 0);
-	}
+	TEST2(atan2);
+
+	FREEZE;
 	return 0;
 }
 
-
+#if 0
 void printf_crash_test() {
 	__int64 ll_qnan = 0x7FFFFFFFFFFFFFFF;
 	__int64 llind = 0xfff8000000000000;
 	double dind = sqrt(-10);//*(double*)&llind;
 	printf("%f", dind);
 }
+#endif

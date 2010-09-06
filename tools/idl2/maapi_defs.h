@@ -21,8 +21,12 @@
 #error Unsupported compiler!
 #endif
 
-#ifdef __IPHONE__
-#define __MARM_ARMI__
+#if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
+#define MA_DV_HI i[1]
+#define MA_DV_LO i[0]
+#else
+#define MA_DV_HI hi
+#define MA_DV_LO lo
 #endif
 
 // Convert between double, 2 ints and long long.
@@ -31,7 +35,11 @@ union MA_DV {
 	int i[2];
 #else	//everything else
 	struct {
+#ifdef __IPHONE__
+		int lo, hi;
+#else
 		int hi, lo;
+#endif
 	};
 #endif	//__MARM_ARMI__
 	long long ll;

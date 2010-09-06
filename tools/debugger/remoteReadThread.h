@@ -41,4 +41,9 @@ int SDLCALL remoteReadThreadFunc(void* arg);
  */
 void remoteRecv(Connection* conn, void* dst, int maxLen);
 
+/**
+ * Stops the read thread.
+ */
+void stopReadThread();
+
 #endif	//REMOTEREADTHREAD_H
