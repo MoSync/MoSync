@@ -43,6 +43,12 @@ import android.view.inputmethod.InputMethodManager;
 
 #include "generated/MAAPI_consts.h"
 
+
+/**
+*
+* MoSyncView class
+*
+*/
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
 	public SurfaceHolder mSurfaceHolder;
@@ -67,7 +73,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			return true;
 		}
 	}
-	
+
+	/**
+	*
+	* MoSyncView Constructor
+	*
+	* 
+	*/
 	public MoSyncView(Context context, MoSyncThread moSyncThread) throws Exception
 	{
 		super(context);
@@ -91,7 +103,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_GPU);
 			} catch(Exception e2) {
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
-				// if this didn't work we can do nothing...
 			}
 		}
 

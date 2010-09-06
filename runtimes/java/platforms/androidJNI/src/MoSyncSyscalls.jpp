@@ -76,8 +76,10 @@ boolean initSyscalls()
 	 
 	 mBlitPaint.setAntiAlias(false);
 	 mBlitPaint.setColor(0xffffffff);
+	 mBlitPaint.setAlpha(255);
 	 
 	 mSoundVolume = 50;
+
 	 mMediaPlayer = new MediaPlayer();
 	 mMediaPlayer.reset();
 
@@ -134,7 +136,7 @@ void maFillTriangleStrip(int address, int count)
 
 void maFillTriangleFan(int address, int count)
 {
-	SYSLOG("maFillTriangleFan");
+	SYSLOG("maFillTriangleFan - NOT IMPLEMENTED");
 }
 
 Rect mTextSizeRect = new Rect();
@@ -170,8 +172,6 @@ void maUpdateScreen()
 {
 	SYSLOG("maUpdateScreen");
 	Canvas lockedCanvas = null;
-
-	long st = System.currentTimeMillis();
 	
 	if (mMoSyncView == null) return;
 
@@ -187,6 +187,7 @@ void maUpdateScreen()
 				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 				mMemDataSection.reset();
 				
+				lockedCanvas.drawRGB(0,0,0);
 				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
 			}
 			else
@@ -209,8 +210,6 @@ void maUpdateScreen()
 		mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
 	}
 	
-	long t = System.currentTimeMillis() - st;
-	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
 }
 
 void maResetBacklight()
@@ -237,9 +236,53 @@ void maDrawImage(int image, int left, int top)
 	mCanvas.drawBitmap(imageResource.mBitmap, left, top, mPaint);
 }
 
-void maDrawRGB(int dstPoint, int src, int srcRect, int scanlength)
+void _maDrawRGB(int dstX, int dstY, int mem, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int scanLength)
 {
 	SYSLOG("maDrawRGB");
+/*	
+	int[] mem_ds = CORE.mMem_ds;
+	mCanvas.drawBitmap(mem_ds, (src>>2) + MARect_left(srcRect) + MARect_top(srcRect) * scanlength,
+	scanlength, MAPoint2d_x(dstPoint), MAPoint2d_y(dstPoint),
+	MARect_width(srcRect), MARect_height(srcRect), true, mPaint);
+*/
+
+/*
+	mCanvas.drawBitmap(
+		mem, 
+		srcRectLeft + srcRectTop * scanlength,
+		scanlength,
+		dstX,
+		dstY,
+		srcRectWidth,
+		srcRectHeight,
+		true,
+		mPaint);
+*/
+
+	// start in memory where to draw from
+	int dataStart = srcRectLeft + srcRectTop * scanLength;
+	
+	// size of the memory which are being drawn
+	int memSize = srcRectHeight * scanLength;
+	
+	int pixels[] = new int[memSize];
+	
+	int initialPosition = mMemDataSection.position();
+	
+	mMemDataSection.position(dataStart);
+	
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	ib.get(pixels);
+	
+	mMemDataSection.position(initialPosition);
+	
+	mCanvas.drawBitmap(
+		pixels, 0, scanLength,
+		dstX, dstY,
+		srcRectWidth, srcRectHeight,
+		true, mPaint);
+
 }
 
 private Bitmap mTempBitmap;
@@ -366,22 +409,32 @@ int maGetImageSize(int image)
 	return EXTENT(imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
 }
 
-void maGetImageData(int image, int dst, int srcRect, int scanlength)
+void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth, int srcHeight, int scanLength)
 {
 	SYSLOG("maGetImageData");
-/*	
-	mMemDataSection.mark();
-	mMemDataSection.position(mFrameBufferAddress);
-	mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
-	mMemDataSection.reset();
-*/	
+
+	Log.i("maGetImageData","srcLeft:" + srcLeft + " srcTop:" + srcTop + " srcWidth:" + srcWidth + " srcHeight:" + srcHeight + " scanLength:" + scanLength);
 	
-/*	
-	Bitmap bitmap = ((ImageCache)getResource(image)).mBitmap;
-	int[] mem_ds = CORE.mMem_ds;
-	bitmap.getPixels(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
-		MARect_width(srcRect), MARect_height(srcRect));
-*/
+
+	ImageCache imageResource = (ImageCache)mImageResources.get(image);
+	
+	int bitmapSize = scanLength * imageResource.mBitmap.getHeight();
+	
+	if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight()) maPanic(-1, "maGetImageData, (srcTop + srcHeight) > imageResource.mBitmap.getHeight() : " + (srcTop + srcHeight) + " > " + imageResource.mBitmap.getHeight());
+	if ((srcLeft + srcWidth) > imageResource.mBitmap.getWidth()) maPanic(-1, "maGetImageData, (srcLeft + srcWidth) > imageResource.mBitmap.getWidth() : " + (srcLeft + srcWidth) + " > " + imageResource.mBitmap.getWidth());	
+
+	
+	int pixels[] = new int[bitmapSize];
+	
+	imageResource.mBitmap.getPixels(pixels, 0, scanLength, 0, 0, imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
+	
+	int initialPosition = mMemDataSection.position();
+	
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	ib.put(pixels);
+	
+	mMemDataSection.position(initialPosition);
 }
 
 int maSetDrawTarget(int image)
@@ -471,6 +524,8 @@ int _maCreateImageRaw(int placeholder, int width, int height)
 	
 	mImageResources.put(placeholder, new ImageCache(null, bitmap));
 	
+	Log.i("maCreateImageRaw", "bitmap created width:" + bitmap.getWidth() + " height:" + bitmap.getHeight());
+	
 	return RES_OK;
 }
 
@@ -484,6 +539,9 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 		Canvas canvas = new Canvas(bitmap);
 	
 		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));
+	
+		Log.i("maCreateDrawableImage", "bitmap created width:" + bitmap.getWidth() + " height:" + bitmap.getHeight());
+	
 	}
 	catch (UnsupportedOperationException e)
 	{
@@ -777,6 +835,12 @@ void _enableFramebuffer(int address)
 	mFrameBufferAddress = address; // address is pointing at a byte but that array is an int array..
 	mFrameBufferSize = mWidth*mHeight;
 	mFrameBufferBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888 );
+	
+	int p = mMemDataSection.position();
+	mMemDataSection.position(mFrameBufferAddress);
+	
+	mMemDataSection.position(p);
+	
 }
 
 void _disableFramebuffer()
