@@ -28,106 +28,106 @@ namespace MAUtil {
 namespace MAUI {
 
 	WidgetSkin::WidgetSkin() :
-		selectedImage(0),
-		unselectedImage(0),
-		startX(16),
-		endX(32),
-		startY(16),
-		endY(32),
-		selectedTransparent(true), 
-		unselectedTransparent(true)
+		mSelectedImage(0),
+		mUnselectedImage(0),
+		mStartX(16),
+		mEndX(32),
+		mStartY(16),
+		mEndY(32),
+		mSelectedTransparent(true),
+		mUnselectedTransparent(true)
 		{
 			rebuildRects();
 	}
 
-	WidgetSkin::WidgetSkin(MAHandle selectedImage, MAHandle unselectedImage, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) :
-		selectedImage(0),
-		unselectedImage(0),
-		startX(startX),
-		endX(endX),
-		startY(startY),
-		endY(endY),
-		selectedTransparent(selectedTransparent), 
-		unselectedTransparent(unselectedTransparent)
+	WidgetSkin::WidgetSkin(MAHandle mSelectedImage, MAHandle mUnselectedImage, int mStartX, int mEndX, int mStartY, int mEndY, bool mSelectedTransparent, bool mUnselectedTransparent) :
+		mSelectedImage(0),
+		mUnselectedImage(0),
+		mStartX(mStartX),
+		mEndX(mEndX),
+		mStartY(mStartY),
+		mEndY(mEndY),
+		mSelectedTransparent(mSelectedTransparent),
+		mUnselectedTransparent(mUnselectedTransparent)
 		{
-			setSelectedImage(selectedImage);
-			setUnselectedImage(unselectedImage);
+			setSelectedImage(mSelectedImage);
+			setUnselectedImage(mUnselectedImage);
 			rebuildRects();
 	}
 
 	MAHandle WidgetSkin::getUnselectedImage() const {
-		return unselectedImage;
+		return mUnselectedImage;
 	}
 
 	MAHandle WidgetSkin::getSelectedImage() const {
-		return selectedImage;
+		return mSelectedImage;
 	}
 
 	void WidgetSkin::setSelectedImage(MAHandle image) {
-		this->selectedImage = image;
-		if(!selectedImage) return;
+		this->mSelectedImage = image;
+		if(!mSelectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
 		
-		selectedImageWidth = EXTENT_X(imgSize);
-		selectedImageHeight = EXTENT_Y(imgSize);
+		mSelectedImageWidth = EXTENT_X(imgSize);
+		mSelectedImageHeight = EXTENT_Y(imgSize);
 
-		if(unselectedImage) {
-			if(unselectedImageHeight!=selectedImageHeight ||
-				unselectedImageWidth!=selectedImageWidth) {
-				selectedImageWidth = 0;
-				selectedImageHeight = 0;
-				selectedImage = 0;
-				maPanic(0, "Not the same dimension on WidgetSkin selectedImage as unselectedImage");
+		if(mUnselectedImage) {
+			if(mUnselectedImageHeight!=mSelectedImageHeight ||
+				mUnselectedImageWidth!=mSelectedImageWidth) {
+				mSelectedImageWidth = 0;
+				mSelectedImageHeight = 0;
+				mSelectedImage = 0;
+				maPanic(0, "Not the same dimension on WidgetSkin mSelectedImage as mUnselectedImage");
 			}
 		} else {
-			imageWidth = selectedImageWidth;
-			imageHeight = selectedImageHeight;
+			mImageWidth = mSelectedImageWidth;
+			mImageHeight = mSelectedImageHeight;
 		}
 
 		rebuildRects();
 	}
 
 	void WidgetSkin::setUnselectedImage(MAHandle image) {
-		this->unselectedImage = image;
-		if(!unselectedImage) return;
+		this->mUnselectedImage = image;
+		if(!mUnselectedImage) return;
 		MAExtent imgSize = maGetImageSize(image);
 		
-		unselectedImageWidth = EXTENT_X(imgSize);
-		unselectedImageHeight = EXTENT_Y(imgSize);
+		mUnselectedImageWidth = EXTENT_X(imgSize);
+		mUnselectedImageHeight = EXTENT_Y(imgSize);
 
-		if(selectedImage) {
-			if(unselectedImageHeight!=selectedImageHeight ||
-				unselectedImageWidth!=selectedImageWidth) {
-				unselectedImageWidth = 0;
-				unselectedImageHeight = 0;
-				unselectedImage = 0;
-				maPanic(0, "Not the same dimension on WidgetSkin unselectedImage as selectedImage");
+		if(mSelectedImage) {
+			if(mUnselectedImageHeight!=mSelectedImageHeight ||
+				mUnselectedImageWidth!=mSelectedImageWidth) {
+				mUnselectedImageWidth = 0;
+				mUnselectedImageHeight = 0;
+				mUnselectedImage = 0;
+				maPanic(0, "Not the same dimension on WidgetSkin mUnselectedImage as mSelectedImage");
 			}
 		} else {
-			imageWidth = unselectedImageWidth;
-			imageHeight = unselectedImageHeight;
+			mImageWidth = mUnselectedImageWidth;
+			mImageHeight = mUnselectedImageHeight;
 		}
 
 		rebuildRects();	
 	}
 
 	void WidgetSkin::setStartX(int x) {
-		startX = x;
+		mStartX = x;
 		rebuildRects();
 	}
 
 	void WidgetSkin::setEndX(int x) {
-		endX = x;
+		mEndX = x;
 		rebuildRects();
 	}
 
 	void WidgetSkin::setStartY(int y) {
-		startY = y;
+		mStartY = y;
 		rebuildRects();
 	}
 
 	void WidgetSkin::setEndY(int y) {
-		endY = y;
+		mEndY = y;
 		rebuildRects();
 	}
 
@@ -139,20 +139,20 @@ namespace MAUI {
 	int WidgetSkin::calculateNumTiles(int width, int height) {
 		int numTilesX = 0;
 		int numTilesY = 0;
-		if(top.width)
-			numTilesX = (width-(right.width+left.width))/top.width; 
+		if(mTop.width)
+			numTilesX = (width-(mRight.width+mLeft.width))/mTop.width;
 		
-		if(left.height)
-			numTilesY =  (height-(top.height+bottom.height))/left.height;
+		if(mLeft.height)
+			numTilesY =  (height-(mTop.height+mBottom.height))/mLeft.height;
 		
 		int numTiles = numTilesX*numTilesY;
-		if(left.width)
+		if(mLeft.width)
 			numTiles += numTilesY;
-		if(right.width)
+		if(mRight.width)
 			numTiles += numTilesY;
-		if(top.height)
+		if(mTop.height)
 			numTiles += numTilesX;
-		if(bottom.height)
+		if(mBottom.height)
 			numTiles += numTilesX;	
 		return numTiles;
 	}
@@ -160,15 +160,15 @@ namespace MAUI {
 	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
 
 	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
-	int WidgetSkin::maxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
-	bool WidgetSkin::useCache = false;
+	int WidgetSkin::mMaxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
+	bool WidgetSkin::mUseCache = false;
 	
 	void WidgetSkin::setMaxCacheSize(int c) {
-		maxCacheSize = c;
+		mMaxCacheSize = c;
 	}
 	
 	void WidgetSkin::setCacheEnabled(bool e) {
-		useCache = e;
+		mUseCache = e;
 	}
 	
 		
@@ -183,7 +183,7 @@ namespace MAUI {
 
 		int currentTime = maGetMilliSecondCount();
 		
-		while(totalPixelsInCache>maxCacheSize) {
+		while(totalPixelsInCache>mMaxCacheSize) {
 			int oldest = currentTime;
 			iter = sCache.begin();	
 			HashMap<CacheKey, CacheElement>::Iterator best = sCache.end();
@@ -228,7 +228,7 @@ namespace MAUI {
 
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
 		int numTiles = calculateNumTiles(width, height);
-		if(!useCache || numTiles<100) {
+		if(!mUseCache || numTiles<100) {
 			drawDirect(x, y, width, height, type);
 			return;
 		}
@@ -272,10 +272,10 @@ namespace MAUI {
 		MAHandle image;
 		switch(type) {
 			case SELECTED:
-				image = selectedImage;
+				image = mSelectedImage;
 				break;
 			case UNSELECTED:
-				image = unselectedImage;
+				image = mUnselectedImage;
 				break;
 			default:
 				maPanic(0, "WidgetSkin::draw undefined drawing type");
@@ -285,83 +285,83 @@ namespace MAUI {
 
 		// draw corners
 		dst.x = x; dst.y = y;
-		//maDrawImageRegion(image, &topLeft, &dst, TRANS_NONE);
-		drawRegion(image, data, width, &topLeft, &dst);
+		//maDrawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &mTopLeft, &dst);
 
-		dst.x = x; dst.y = y+height-bottomLeft.height;
-		//maDrawImageRegion(image, &bottomLeft, &dst, TRANS_NONE);
-		drawRegion(image, data, width, &bottomLeft, &dst);
+		dst.x = x; dst.y = y+height-mBottomLeft.height;
+		//maDrawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &mBottomLeft, &dst);
 
-		dst.x = x+width-topRight.width; dst.y = y;
-		//maDrawImageRegion(image, &topRight, &dst, TRANS_NONE);
-		drawRegion(image, data, width, &topRight, &dst);
+		dst.x = x+width-mTopRight.width; dst.y = y;
+		//maDrawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &mTopRight, &dst);
 
-		dst.x = x+width-bottomRight.width; dst.y = y+height-bottomRight.height;
-		//maDrawImageRegion(image, &bottomRight, &dst, TRANS_NONE);
-		drawRegion(image, data, width, &bottomRight, &dst);
+		dst.x = x+width-mBottomRight.width; dst.y = y+height-mBottomRight.height;
+		//maDrawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
+		drawRegion(image, data, width, &mBottomRight, &dst);
 
 		// draw middle
-		if(center.height && center.width) {
-		for(int j = y+top.height; j < y+height-bottom.height; j+=center.height) {
-			int h = center.height;
-			if(j+center.height>y+height-bottom.height) {
-				center.height -= (j+center.height)-(y+height-bottom.height);
+		if(mCenter.height && mCenter.width) {
+		for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
+			int h = mCenter.height;
+			if(j+mCenter.height>y+height-mBottom.height) {
+				mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
 			} 
-			for(int i = x+left.width; i < x+width-right.width; i+=center.width) {
+			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
 				dst.x = i; dst.y = j;
-				int w = center.width;
-				if(i+center.width>x+width-right.width) {
-					center.width -= (i+center.width)-(x+width-right.width);
+				int w = mCenter.width;
+				if(i+mCenter.width>x+width-mRight.width) {
+					mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
 				}
-				//maDrawImageRegion(image, &center, &dst, TRANS_NONE);
-				drawRegion(image, data, width, &center, &dst);
+				//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
+				drawRegion(image, data, width, &mCenter, &dst);
 
-				center.width = w;
+				mCenter.width = w;
 			}
-			center.height = h;
+			mCenter.height = h;
 		}
 		}
 
 		// draw borders
-		if(top.width) {
-		for(int i = x+left.width; i < x+width-right.width; i+=top.width) {
+		if(mTop.width) {
+		for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
 				dst.x = i; dst.y = y;
-				dst2.x = i; dst2.y = y+height-bottom.height;
+				dst2.x = i; dst2.y = y+height-mBottom.height;
 
-				int w1 = top.width;
-				int w2 = bottom.width;
-				if(i+top.width>x+width-right.width) {
-					top.width -= (i+w1)-(x+width-right.width);
-					bottom.width -= (i+w1)-(x+width-right.width);
+				int w1 = mTop.width;
+				int w2 = mBottom.width;
+				if(i+mTop.width>x+width-mRight.width) {
+					mTop.width -= (i+w1)-(x+width-mRight.width);
+					mBottom.width -= (i+w1)-(x+width-mRight.width);
 				} 
-				//maDrawImageRegion(image, &top, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &bottom, &dst2, TRANS_NONE);
-				drawRegion(image, data, width, &top, &dst);
-				drawRegion(image, data, width, &bottom, &dst2);
+				//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
+				drawRegion(image, data, width, &mTop, &dst);
+				drawRegion(image, data, width, &mBottom, &dst2);
 
-				top.width = w1;			
-				bottom.width = w2;
+				mTop.width = w1;
+				mBottom.width = w2;
 		}
 		}
 
-		if(left.height) {
-		for(int i = y+top.height; i < y+height-bottom.height; i+=left.height) {
+		if(mLeft.height) {
+		for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
 				dst.x = x; dst.y = i;
-				dst2.x = x+width-right.width; dst2.y = i;
+				dst2.x = x+width-mRight.width; dst2.y = i;
 
-				int w1 = left.height;
-				int w2 = right.height;
-				if(i+left.height>y+height-bottom.height) {
-					left.height -= (i+w1)-(y+height-bottom.height);
-					right.height -= (i+w1)-(y+height-bottom.height);
+				int w1 = mLeft.height;
+				int w2 = mRight.height;
+				if(i+mLeft.height>y+height-mBottom.height) {
+					mLeft.height -= (i+w1)-(y+height-mBottom.height);
+					mRight.height -= (i+w1)-(y+height-mBottom.height);
 				} 
-				//maDrawImageRegion(image, &left, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &right, &dst2, TRANS_NONE);
-				drawRegion(image, data, width, &left, &dst);
-				drawRegion(image, data, width, &right, &dst2);
+				//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
+				drawRegion(image, data, width, &mLeft, &dst);
+				drawRegion(image, data, width, &mRight, &dst2);
 
-				left.height = w1;			
-				right.height = w2;
+				mLeft.height = w1;
+				mRight.height = w2;
 		}
 		}
 	}
@@ -372,10 +372,10 @@ namespace MAUI {
 		MAHandle image;
 		switch(type) {
 			case SELECTED:
-				image = selectedImage;
+				image = mSelectedImage;
 				break;
 			case UNSELECTED:
-				image = unselectedImage;
+				image = mUnselectedImage;
 				break;
 			default:
 				maPanic(0, "WidgetSkin::draw undefined drawing type");
@@ -385,117 +385,117 @@ namespace MAUI {
 
 		// draw corners
 		dst.x = x; dst.y = y;
-		//maDrawImageRegion(image, &topLeft, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &topLeft, &dst, TRANS_NONE);
+		//maDrawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
+		Gfx_drawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
 
-		dst.x = x; dst.y = y+height-bottomLeft.height;
-		//maDrawImageRegion(image, &bottomLeft, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &bottomLeft, &dst, TRANS_NONE);
+		dst.x = x; dst.y = y+height-mBottomLeft.height;
+		//maDrawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
+		Gfx_drawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
 
-		dst.x = x+width-topRight.width; dst.y = y;
-		//maDrawImageRegion(image, &topRight, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &topRight, &dst, TRANS_NONE);
+		dst.x = x+width-mTopRight.width; dst.y = y;
+		//maDrawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
+		Gfx_drawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
 
-		dst.x = x+width-bottomRight.width; dst.y = y+height-bottomRight.height;
-		//maDrawImageRegion(image, &bottomRight, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &bottomRight, &dst, TRANS_NONE);
+		dst.x = x+width-mBottomRight.width; dst.y = y+height-mBottomRight.height;
+		//maDrawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
+		Gfx_drawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
 
 		// draw middle
-		if(center.height && center.width) {
-		for(int j = y+top.height; j < y+height-bottom.height; j+=center.height) {
-			int h = center.height;
-			if(j+center.height>y+height-bottom.height) {
-				center.height -= (j+center.height)-(y+height-bottom.height);
+		if(mCenter.height && mCenter.width) {
+		for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
+			int h = mCenter.height;
+			if(j+mCenter.height>y+height-mBottom.height) {
+				mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
 			} 
-			for(int i = x+left.width; i < x+width-right.width; i+=center.width) {
+			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
 				dst.x = i; dst.y = j;
-				int w = center.width;
-				if(i+center.width>x+width-right.width) {
-					center.width -= (i+center.width)-(x+width-right.width);
+				int w = mCenter.width;
+				if(i+mCenter.width>x+width-mRight.width) {
+					mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
 				}
-				//maDrawImageRegion(image, &center, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &center, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
+				Gfx_drawImageRegion(image, &mCenter, &dst, TRANS_NONE);
 
-				center.width = w;
+				mCenter.width = w;
 			}
-			center.height = h;
+			mCenter.height = h;
 		}
 		}
 
 		// draw borders
-		if(top.width) {
-		for(int i = x+left.width; i < x+width-right.width; i+=top.width) {
+		if(mTop.width) {
+		for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
 				dst.x = i; dst.y = y;
-				dst2.x = i; dst2.y = y+height-bottom.height;
+				dst2.x = i; dst2.y = y+height-mBottom.height;
 
-				int w1 = top.width;
-				int w2 = bottom.width;
-				if(i+top.width>x+width-right.width) {
-					top.width -= (i+w1)-(x+width-right.width);
-					bottom.width -= (i+w1)-(x+width-right.width);
+				int w1 = mTop.width;
+				int w2 = mBottom.width;
+				if(i+mTop.width>x+width-mRight.width) {
+					mTop.width -= (i+w1)-(x+width-mRight.width);
+					mBottom.width -= (i+w1)-(x+width-mRight.width);
 				} 
-				//maDrawImageRegion(image, &top, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &bottom, &dst2, TRANS_NONE);
-				Gfx_drawImageRegion(image, &top, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &bottom, &dst2, TRANS_NONE);
+				//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
+				Gfx_drawImageRegion(image, &mTop, &dst, TRANS_NONE);
+				Gfx_drawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
 
-				top.width = w1;			
-				bottom.width = w2;
+				mTop.width = w1;
+				mBottom.width = w2;
 		}
 		}
 
-		if(left.height) {
-		for(int i = y+top.height; i < y+height-bottom.height; i+=left.height) {
+		if(mLeft.height) {
+		for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
 				dst.x = x; dst.y = i;
-				dst2.x = x+width-right.width; dst2.y = i;
+				dst2.x = x+width-mRight.width; dst2.y = i;
 
-				int w1 = left.height;
-				int w2 = right.height;
-				if(i+left.height>y+height-bottom.height) {
-					left.height -= (i+w1)-(y+height-bottom.height);
-					right.height -= (i+w1)-(y+height-bottom.height);
+				int w1 = mLeft.height;
+				int w2 = mRight.height;
+				if(i+mLeft.height>y+height-mBottom.height) {
+					mLeft.height -= (i+w1)-(y+height-mBottom.height);
+					mRight.height -= (i+w1)-(y+height-mBottom.height);
 				} 
-				//maDrawImageRegion(image, &left, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &right, &dst2, TRANS_NONE);
-				Gfx_drawImageRegion(image, &left, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &right, &dst2, TRANS_NONE);
+				//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+				//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
+				Gfx_drawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+				Gfx_drawImageRegion(image, &mRight, &dst2, TRANS_NONE);
 
-				left.height = w1;			
-				right.height = w2;
+				mLeft.height = w1;
+				mRight.height = w2;
 		}
 		}
 	}
 
 	int	WidgetSkin::getStartX() const {
-		return startX;
+		return mStartX;
 	}
 
 	int WidgetSkin::getStartY() const {
-		return startY;
+		return mStartY;
 	}
 
 	int WidgetSkin::getEndX() const {
-		return endX;
+		return mEndX;
 	}
 
 	int WidgetSkin::getEndY() const {
-		return endY;
+		return mEndY;
 	}
 
 	bool WidgetSkin::isSelectedTransparent() const {
-		return selectedTransparent;
+		return mSelectedTransparent;
 	}
 
 	bool WidgetSkin::isUnselectedTransparent() const {
-		return unselectedTransparent;
+		return mUnselectedTransparent;
 	}
 
 	int WidgetSkin::getImageHeight() const {
-		return imageHeight;
+		return mImageHeight;
 	}
 
 	int WidgetSkin::getImageWidth() const {
-		return imageWidth;
+		return mImageWidth;
 	}
 
 
@@ -504,45 +504,45 @@ namespace MAUI {
 	void WidgetSkin::rebuildRects() {
 #ifdef MOBILEAUTHOR
 		int temp;
-		if(startX>endX) {
-			temp = startX;
-			startX = endX;
-			endX = temp;
+		if(mStartX>mEndX) {
+			temp = mStartX;
+			mStartX = mEndX;
+			mEndX = temp;
 		}
-		if(startY>endY) {
-			temp = startY;
-			startY = endY;
-			endY = temp;
+		if(mStartY>mEndY) {
+			temp = mStartY;
+			mStartY = mEndY;
+			mEndY = temp;
 		}
-		if(startX<0) startX = 0;
-		if(startY<0) startY = 0;
-		if(endX<0) endX = 0;
-		if(endY<0) endY = 0;
-		if(startX>imageWidth) startX = imageWidth;
-		if(endX>imageWidth) endX = imageWidth;
-		if(startY>imageHeight) startY = imageHeight;
-		if(endY>imageHeight) endY = imageHeight;
+		if(mStartX<0) mStartX = 0;
+		if(mStartY<0) mStartY = 0;
+		if(mEndX<0) mEndX = 0;
+		if(mEndY<0) mEndY = 0;
+		if(mStartX>mImageWidth) mStartX = mImageWidth;
+		if(mEndX>mImageWidth) mEndX = mImageWidth;
+		if(mStartY>mImageHeight) mStartY = mImageHeight;
+		if(mEndY>mImageHeight) mEndY = mImageHeight;
 #else
-		if(startX>endX)			maPanic(0, "WidgetSkin::rebuildRects startX>endX");
-		if(startY>endY)			maPanic(0, "WidgetSkin::rebuildRects startY>endY");
-		if(startX<0)			maPanic(0, "WidgetSkin::rebuildRects startX<0");
-		if(startY<0)			maPanic(0, "WidgetSkin::rebuildRects startY<0");
-		if(endX<0)				maPanic(0, "WidgetSkin::rebuildRects endX<0");
-		if(endY<0)				maPanic(0, "WidgetSkin::rebuildRects endY<0");
-		if(startX>imageWidth)	maPanic(0, "WidgetSkin::rebuildRects startX>imageWidth");
-		if(endX>imageWidth)		maPanic(0, "WidgetSkin::rebuildRects endX>imageWidth");
-		if(startY>imageHeight)	maPanic(0, "WidgetSkin::rebuildRects startY>imageHeight");
-		if(endY>imageHeight)	maPanic(0, "WidgetSkin::rebuildRects endY>imageHeight");		
+		if(mStartX>mEndX)			maPanic(0, "WidgetSkin::rebuildRects mStartX>mEndX");
+		if(mStartY>mEndY)			maPanic(0, "WidgetSkin::rebuildRects mStartY>mEndY");
+		if(mStartX<0)			maPanic(0, "WidgetSkin::rebuildRects mStartX<0");
+		if(mStartY<0)			maPanic(0, "WidgetSkin::rebuildRects mStartY<0");
+		if(mEndX<0)				maPanic(0, "WidgetSkin::rebuildRects mEndX<0");
+		if(mEndY<0)				maPanic(0, "WidgetSkin::rebuildRects mEndY<0");
+		if(mStartX>mImageWidth)	maPanic(0, "WidgetSkin::rebuildRects mStartX>mImageWidth");
+		if(mEndX>mImageWidth)		maPanic(0, "WidgetSkin::rebuildRects mEndX>mImageWidth");
+		if(mStartY>mImageHeight)	maPanic(0, "WidgetSkin::rebuildRects mStartY>mImageHeight");
+		if(mEndY>mImageHeight)	maPanic(0, "WidgetSkin::rebuildRects mEndY>mImageHeight");
 #endif		
 
-		SET_RECT(topLeft,     0,      0,      startX,     startY);
-		SET_RECT(top,         startX, 0,      endX,       startY);
-		SET_RECT(topRight,    endX,   0,      imageWidth, startY);
-		SET_RECT(left,	      0,      startY, startX,     endY);
-		SET_RECT(center,      startX, startY, endX,       endY);
-		SET_RECT(right,       endX,   startY, imageWidth, endY);
-		SET_RECT(bottomLeft,  0,      endY,   startX,     imageHeight);
-		SET_RECT(bottom,      startX, endY,   endX,       imageHeight);
-		SET_RECT(bottomRight, endX,   endY,  imageWidth,  imageHeight);
+		SET_RECT(mTopLeft,     0,      0,      mStartX,     mStartY);
+		SET_RECT(mTop,         mStartX, 0,      mEndX,       mStartY);
+		SET_RECT(mTopRight,    mEndX,   0,      mImageWidth, mStartY);
+		SET_RECT(mLeft,	      0,      mStartY, mStartX,     mEndY);
+		SET_RECT(mCenter,      mStartX, mStartY, mEndX,       mEndY);
+		SET_RECT(mRight,       mEndX,   mStartY, mImageWidth, mEndY);
+		SET_RECT(mBottomLeft,  0,      mEndY,   mStartX,     mImageHeight);
+		SET_RECT(mBottom,      mStartX, mEndY,   mEndX,       mImageHeight);
+		SET_RECT(mBottomRight, mEndX,   mEndY,  mImageWidth,  mImageHeight);
 	}
 }

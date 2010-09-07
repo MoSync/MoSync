@@ -60,9 +60,9 @@ namespace MAUI {
 			MARect srcRect;
 			srcRect.left  = 0;
 			srcRect.width = EXTENT_X(mResSize);
-			srcRect.top   = mCurrentFrame * paddedBounds.height; 
-			srcRect.height = paddedBounds.height;
-			//MAPoint2d destPoint = {paddedBounds.x, paddedBounds.y};
+			srcRect.top   = mCurrentFrame * mPaddedBounds.height;
+			srcRect.height = mPaddedBounds.height;
+			//MAPoint2d destPoint = {mPaddedBounds.x, mPaddedBounds.y};
 			MAPoint2d destPoint = {0, 0};
 
 			//maDrawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
@@ -121,9 +121,9 @@ namespace MAUI {
 	}
 
 	void AnimatedImage::setFrameHeight(int height) {
-		bounds.width = EXTENT_X(mResSize);
-		setWidth(bounds.width);
-		bounds.height = height;
+		mBounds.width = EXTENT_X(mResSize);
+		setWidth(mBounds.width);
+		mBounds.height = height;
 		setHeight(height);
 	}
 

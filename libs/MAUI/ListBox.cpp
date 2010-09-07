@@ -74,40 +74,40 @@ namespace MAUI {
 	}
 
 	void ListBox::rebuild() {
-		Vector_each(Widget*, itr, children) {
+		Vector_each(Widget*, itr, mChildren) {
 			(*itr)->removeWidgetListener(this);
 		}
 		if(orientation == LBO_VERTICAL) {
-			int size = children.size();
+			int size = mChildren.size();
 			for(int i = 0; i < size; i++) {
 				int y;
 				if(i>0)
-					y = children[i-1]->getPosition().y +
-						children[i-1]->getBounds().height;
+					y = mChildren[i-1]->getPosition().y +
+						mChildren[i-1]->getBounds().height;
 				else
 					y = 0;
-				children[i]->setPosition(0, y);
+				mChildren[i]->setPosition(0, y);
 
 				if(autoSize)
-					children[i]->setWidth(paddedBounds.width);
+					mChildren[i]->setWidth(mPaddedBounds.width);
 
 			}
 		} else {
-			int size = children.size();
+			int size = mChildren.size();
 			for(int i = 0; i < size; i++) {
 				int x;
 				if(i>0)
-					x = children[i-1]->getPosition().x +
-						children[i-1]->getBounds().width;
+					x = mChildren[i-1]->getPosition().x +
+						mChildren[i-1]->getBounds().width;
 				else
 					x = 0;
-				children[i]->setPosition(x, 0);
+				mChildren[i]->setPosition(x, 0);
 
 				if(autoSize)
-					children[i]->setHeight(paddedBounds.height);
+					mChildren[i]->setHeight(mPaddedBounds.height);
 			}
 		}
-		Vector_each(Widget*, itr, children) {
+		Vector_each(Widget*, itr, mChildren) {
 			(*itr)->addWidgetListener(this);
 		}
 
@@ -121,56 +121,56 @@ namespace MAUI {
 	}
 
 	void ListBox::add(Widget *child) {
-		int size = children.size();
+		int size = mChildren.size();
 
 		if(orientation == LBO_VERTICAL) {
 			int y;
 			if(size>0)
-				y = children[size-1]->getPosition().y +
-					children[size-1]->getBounds().height;
+				y = mChildren[size-1]->getPosition().y +
+					mChildren[size-1]->getBounds().height;
 			else
 				y = 0;
 
 			Widget::add(child);
 			child->setPosition(0, y);
 			if(autoSize)
-				children[children.size()-1]->setWidth(paddedBounds.width);
+				mChildren[mChildren.size()-1]->setWidth(mPaddedBounds.width);
 		}
 		else if(orientation == LBO_HORIZONTAL) {
 			int x;
 			if(size>0)
-				x = children[size-1]->getPosition().x +
-					children[size-1]->getBounds().width;
+				x = mChildren[size-1]->getPosition().x +
+					mChildren[size-1]->getBounds().width;
 			else
 				x = 0;
 
 			Widget::add(child);
 			child->setPosition(x, 0);
 			if(autoSize)
-				children[children.size()-1]->setHeight(paddedBounds.height);
+				mChildren[mChildren.size()-1]->setHeight(mPaddedBounds.height);
 		}
 		
 		//listen
 		child->addWidgetListener(this);
 
-		if(selectedIndex>children.size()) {
+		if(selectedIndex>mChildren.size()) {
 			selectedIndex = 0;
 			yOffset = 0;
 			/*
 			Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
-				(*i)->itemSelected(this, children[this->selectedIndex], NULL);
+				(*i)->itemSelected(this, mChildren[this->selectedIndex], NULL);
 			}
 			*/
 		}
-		if(children.size() == 1)
+		if(mChildren.size() == 1)
 			child->setSelected(true);
 
 		requestRepaint();
 	}
 
 	void ListBox::clear() {
-		for(int i = 0; i < children.size(); i++)
-			children[i]->removeWidgetListener(this);
+		for(int i = 0; i < mChildren.size(); i++)
+			mChildren[i]->removeWidgetListener(this);
 		Widget::clear();
 		mustRebuild = true;
 		requestRepaint();
@@ -179,16 +179,16 @@ namespace MAUI {
 	bool ListBox::listFrontOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:
-			for(int i = 0; i < children.size(); i++) {
-				int y = (children[i]->getPosition().y + (yOffset>>16));
+			for(int i = 0; i < mChildren.size(); i++) {
+				int y = (mChildren[i]->getPosition().y + (yOffset>>16));
 				if(y < 0) {
 					return true;
 				}
 			}
 			break;
 			case LBO_HORIZONTAL:
-			for(int i = 0; i < children.size(); i++) {
-				int x = (children[i]->getPosition().x + (yOffset>>16));
+			for(int i = 0; i < mChildren.size(); i++) {
+				int x = (mChildren[i]->getPosition().x + (yOffset>>16));
 				if(x < 0) {
 					return true;
 				}
@@ -201,17 +201,17 @@ namespace MAUI {
 	bool ListBox::listBackOutsideBounds() const {
 		switch(orientation) {
 			case LBO_VERTICAL:
-			for(int i = 0; i < children.size(); i++) {
-				int y = (children[i]->getPosition().y + children[i]->getHeight() + (yOffset>>16));
-				if(y > paddedBounds.height) {
+			for(int i = 0; i < mChildren.size(); i++) {
+				int y = (mChildren[i]->getPosition().y + mChildren[i]->getHeight() + (yOffset>>16));
+				if(y > mPaddedBounds.height) {
 					return true;
 				}
 			}
 			break;
 			case LBO_HORIZONTAL:
-			for(int i = 0; i < children.size(); i++) {
-				int x = (children[i]->getPosition().x + children[i]->getWidth() + (yOffset>>16));
-				if(x > paddedBounds.width) {
+			for(int i = 0; i < mChildren.size(); i++) {
+				int x = (mChildren[i]->getPosition().x + mChildren[i]->getWidth() + (yOffset>>16));
+				if(x > mPaddedBounds.width) {
 					return true;
 				}
 			}
@@ -243,13 +243,13 @@ namespace MAUI {
 		//Engine& engine = Engine::getSingleton();
 
 		if(orientation == LBO_VERTICAL) {
-		//	int x = paddedBounds.x;
-		//	int y = paddedBounds.y+(yOffset>>16);
+		//	int x = mPaddedBounds.x;
+		//	int y = mPaddedBounds.y+(yOffset>>16);
 
 			int i = 0;
 			//int cy = (yOffset>>16);
 			//int startIndex = 0;
-			//int size = children.size();
+			//int size = mChildren.size();
 			//int endIndex = size;
 
 			//printf("numWidgets: %d\n", size);
@@ -257,19 +257,19 @@ namespace MAUI {
 			//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
 			//bounds.width, bounds.height);
 			Gfx_pushMatrix();
-			Gfx_translate(relX, relY);
+			Gfx_translate(mRelX, mRelY);
 				
-			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
+			BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
 
 			if(res) {
-				if((isDirty() || forceDraw) && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && mShouldDrawBackground) {
 					drawBackground();
 				}
 
-				//bool res = engine.pushClipRectIntersect(paddedBounds.x, paddedBounds.y,
-				//paddedBounds.width, paddedBounds.height);	
-				Gfx_translate(paddingLeft, paddingTop);
-				res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
+				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
+				//mPaddedBounds.width, mPaddedBounds.height);
+				Gfx_translate(mPaddingLeft, mPaddingTop);
+				res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 				MAPoint2d tBefore = Gfx_getTranslation();
 				Gfx_translate(0, (yOffset>>16));
@@ -278,7 +278,7 @@ namespace MAUI {
 				if(res) 
 				{	
 					srand(1);
-					for(i = 0; i < children.size(); i++)
+					for(i = 0; i < mChildren.size(); i++)
 					{
 						/**
 						 * The check wether the child should be drawn or
@@ -287,7 +287,7 @@ namespace MAUI {
 						 *
 						 * // Mattias
 						 */
-						children[i]->draw();
+						mChildren[i]->draw();
 					}
 				}
 
@@ -300,39 +300,39 @@ namespace MAUI {
 			Gfx_popMatrix();
 			Gfx_popClipRect();
 		} else if(orientation == LBO_HORIZONTAL) {
-			//int x = paddedBounds.x+(yOffset>>16);
-			//int y = paddedBounds.y;
+			//int x = mPaddedBounds.x+(yOffset>>16);
+			//int y = mPaddedBounds.y;
 
 			int i = 0;
 			//int cx = (yOffset>>16);
 			//int startIndex = 0;
-			//int size = children.size();
+			//int size = mChildren.size();
 			//int endIndex = size;
 
 			//printf("numWidgets: %d\n", size);
 
 			//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y, bounds.width, bounds.height);	
 			Gfx_pushMatrix();	
-			Gfx_translate(relX, relY);
-			BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);	
+			Gfx_translate(mRelX, mRelY);
+			BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
 
 			if(res) 
 			{
-				if((isDirty() || forceDraw) && shouldDrawBackground) {
+				if((isDirty() || forceDraw) && mShouldDrawBackground) {
 					drawBackground();
 				}
 	
-				//bool res = engine.pushClipRectIntersect(paddedBounds.x, paddedBounds.y,	
-				//paddedBounds.width, paddedBounds.height);	
-				Gfx_translate(paddingLeft, paddingTop);
-				res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);	
+				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
+				//mPaddedBounds.width, mPaddedBounds.height);
+				Gfx_translate(mPaddingLeft, mPaddingTop);
+				res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 				MAPoint2d tBefore = Gfx_getTranslation();
 				Gfx_translate((yOffset>>16), 0);
 				MAPoint2d translation = Gfx_getTranslation();
 				if(res) 
 				{
-					for(i = 0; i < children.size(); i++)
+					for(i = 0; i < mChildren.size(); i++)
 					{
 						/**
 						 * The check wether the child should be drawn or
@@ -341,7 +341,7 @@ namespace MAUI {
 						 *
 						 * // Mattias
 						 */
-						children[i]->draw();
+						mChildren[i]->draw();
 					}
 				}
 				setDirty(false);
@@ -362,18 +362,18 @@ namespace MAUI {
 	}
 
 	void ListBox::setSelectedIndex(int selectedIndex) {
-		if(selectedIndex < 0 || selectedIndex >= children.size()) {
+		if(selectedIndex < 0 || selectedIndex >= mChildren.size()) {
 			maPanic(0, "ListBox::setSelectedIndex, index out of bounds");
 		}
 
 		if(selectedIndex == this->selectedIndex) {
 			Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
-				(*i)->itemSelected(this, children[this->selectedIndex], children[this->selectedIndex]);
+				(*i)->itemSelected(this, mChildren[this->selectedIndex], mChildren[this->selectedIndex]);
 			}
 			return;
 		}
 
-		Widget *unselectedWidget = children[this->selectedIndex];
+		Widget *unselectedWidget = mChildren[this->selectedIndex];
 		unselectedWidget->setSelected(false);
 		int lastIndex = this->selectedIndex;
 		int offset = (lastIndex-selectedIndex);
@@ -387,7 +387,7 @@ namespace MAUI {
 				selectNextItem(false);
 			}
 		}
-		Widget *selectedWidget = children[this->selectedIndex]; 
+		Widget *selectedWidget = mChildren[this->selectedIndex];
 		selectedWidget->setSelected(true);
 
 		Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
@@ -439,16 +439,16 @@ namespace MAUI {
 					}
 				}
 			} else {
-				setSelectedIndex(children.size()-1);
+				setSelectedIndex(mChildren.size()-1);
 			}
 			return;
 		}
 		//printf("element: %d\n", selectedIndex);
 
-		Widget *unselectedWidget = children[prevIndex];
-		children[prevIndex]->setSelected(false);
+		Widget *unselectedWidget = mChildren[prevIndex];
+		mChildren[prevIndex]->setSelected(false);
 
-		c = children[selectedIndex];
+		c = mChildren[selectedIndex];
 
 		c->setSelected(true);
 
@@ -489,7 +489,7 @@ namespace MAUI {
 
 		int prevIndex = selectedIndex;
 
-		if(selectedIndex < children.size() - 1) {
+		if(selectedIndex < mChildren.size() - 1) {
 			selectedIndex++;
 		} else {
 			if(!wrapping) {
@@ -504,10 +504,10 @@ namespace MAUI {
 			return;
 		}
 
-		Widget *unselectedWidget = children[prevIndex];
-		children[prevIndex]->setSelected(false);
+		Widget *unselectedWidget = mChildren[prevIndex];
+		mChildren[prevIndex]->setSelected(false);
 
-		c = children[selectedIndex];
+		c = mChildren[selectedIndex];
 
 		c->setSelected(true);
 
@@ -520,12 +520,12 @@ namespace MAUI {
 			case LBO_VERTICAL:
 				newPos = c->getPosition().y<<16;
 				pos = ((c->getPosition().y + c->getHeight())<<16);
-				bound =  (paddedBounds.height<<16);
+				bound =  (mPaddedBounds.height<<16);
 				break;
 			case LBO_HORIZONTAL:
 				newPos = c->getPosition().x<<16;
 				pos = ((c->getPosition().x + c->getWidth())<<16);
-				bound =  (paddedBounds.width<<16);
+				bound =  (mPaddedBounds.width<<16);
 				break;
 		}
 
@@ -580,8 +580,8 @@ namespace MAUI {
 		Widget::setWidth(w);
 		if(autoSize) {
 			if(orientation == LBO_VERTICAL) {
-				for(int i = 0; i < children.size(); i++) {
-					children[i]->setWidth(paddedBounds.width);
+				for(int i = 0; i < mChildren.size(); i++) {
+					mChildren[i]->setWidth(mPaddedBounds.width);
 				}
 			}
 		}
@@ -591,8 +591,8 @@ namespace MAUI {
 		Widget::setHeight(h);
 		if(autoSize) {
 			if(orientation == LBO_HORIZONTAL) {
-				for(int i = 0; i < children.size(); i++) {
-					children[i]->setHeight(paddedBounds.height);
+				for(int i = 0; i < mChildren.size(); i++) {
+					mChildren[i]->setHeight(mPaddedBounds.height);
 				}
 			}
 		}

@@ -90,8 +90,8 @@ namespace MAUI {
 
 	protected:
 		virtual void hide();
-		static Screen* currentScreen;
-		Widget* main;
+		static Screen* sCurrentScreen;
+		Widget* mMain;
 		Widget* mFocusedWidget;
 	};
 

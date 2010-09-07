@@ -211,12 +211,12 @@ namespace MAUI {
 	void EditBox::drawWidget() {
 		if(!font) return;
 		//calcStrSize();
-		//int x = paddedBounds.x;
-		//int y = paddedBounds.y;
+		//int x = mPaddedBounds.x;
+		//int y = mPaddedBounds.y;
 		int x = 0;
 		int y = 0;
 
-		Rect bound = paddedBounds;
+		Rect bound = mPaddedBounds;
 		bound.x = 0;
 		bound.y = 0;
 		getTextStart(&bound.x, &bound.y);
@@ -232,8 +232,8 @@ namespace MAUI {
 
 		if(multiLine) {
 			// 2 equals the cursor width ;)
-			if(bound.y+r.y+r.height+2>(paddedBounds.height)) {
-				y-=(bound.y+r.y+r.height+2)-(paddedBounds.height);
+			if(bound.y+r.y+r.height+2>(mPaddedBounds.height)) {
+				y-=(bound.y+r.y+r.height+2)-(mPaddedBounds.height);
 				//Gfx_translate(x, y);
 			}
 //			font->drawBoundedString(text.c_str(), x, y, bound);
@@ -242,8 +242,8 @@ namespace MAUI {
 			
 		} else {
 			// 2 equals the cursor width ;)
-			if(bound.x+r.x+r.width+2>paddedBounds.width) {
-				x-=(bound.x+r.x+r.width+2)-(paddedBounds.width);
+			if(bound.x+r.x+r.width+2>mPaddedBounds.width) {
+				x-=(bound.x+r.x+r.width+2)-(mPaddedBounds.width);
 				//Gfx_translate(x, y);
 			}
 //			font->drawString(text.c_str(), x, y);
@@ -255,7 +255,7 @@ namespace MAUI {
 		//Label::drawWidget();
 
 		maSetColor(cursorColor);
-		if(selected) { 
+		if(mSelected) {
 			// draw cursor
 			int sx, sy, ex, ey;
 			sx = r.x + x + bound.x;

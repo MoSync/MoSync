@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #define MAUI_LOG(x, args...) lprintfln(x, ## args)
 #else
-#define MAUI_LOG(x, args..)
+#define MAUI_LOG(x, args...)
 #endif
 
 namespace MAUI {
@@ -49,8 +49,8 @@ namespace MAUI {
 	class Widget;
 
 #define fireBoundsChanged() \
-		Vector_each(WidgetListener*, wl, widgetListeners) { \
-			(*wl)->boundsChanged(this, this->bounds); \
+		Vector_each(WidgetListener*, wl, mWidgetListeners) { \
+			(*wl)->boundsChanged(this, this->mBounds); \
 		} \
 
 	/** \brief A Widget listener which detects trigger, selection, state and positional changes.
@@ -408,36 +408,36 @@ namespace MAUI {
 		void setDirty(bool d=true);
 
 		// a list of pointers to the children of the widget
-		Vector<Widget*> children;
+		Vector<Widget*> mChildren;
 
 		// a pointer to the parent of the widget
-		Widget* parent;
+		Widget* mParent;
 		
 		// this contains the absolute x and y coordinate and the dimensions of the widget
-		Rect bounds;
+		Rect mBounds;
 		
 		// this contains the x and y coordinate relative to the parent
-		int relX, relY;
+		int mRelX, mRelY;
 
-		bool dirty;
+		bool mDirty;
 
-		WidgetSkin *skin;
-		int	backColor;
-		bool shouldDrawBackground;
+		WidgetSkin *mSkin;
+		int	mBackColor;
+		bool mShouldDrawBackground;
 		
 		// used to keep which state the widget is in (selected or unselected)
-		bool selected;
-		bool enabled;
+		bool mSelected;
+		bool mEnabled;
 
 		// a list of widget listeners
-		Vector<WidgetListener*> widgetListeners;
+		Vector<WidgetListener*> mWidgetListeners;
 		
 		// padding information
-		Rect paddedBounds;
-		int paddingLeft;
-		int paddingTop; 
-		int paddingBottom;
-		int paddingRight;
+		Rect mPaddedBounds;
+		int mPaddingLeft;
+		int mPaddingTop;
+		int mPaddingBottom;
+		int mPaddingRight;
 	};
 
 }

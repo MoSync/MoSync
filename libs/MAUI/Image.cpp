@@ -33,7 +33,7 @@ namespace MAUI {
 
 	void Image::drawWidget() {
 		if(resource) {
-			Gfx_drawImage(resource, (paddedBounds.width>>1)-(imageWidth>>1), (paddedBounds.height>>1)-(imageHeight>>1));
+			Gfx_drawImage(resource, (mPaddedBounds.width>>1)-(imageWidth>>1), (mPaddedBounds.height>>1)-(imageHeight>>1));
 		}
 	}
 

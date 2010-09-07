@@ -216,8 +216,8 @@ namespace MAUI {
 		static MAHandle getFromCache(const CacheKey& key);
 		
 	private:
-		static int maxCacheSize;
-		static bool useCache;
+		static int mMaxCacheSize;
+		static bool mUseCache;
 		
 		//Vector<CacheElement> cache;
 		static HashMap<CacheKey, CacheElement> sCache;
@@ -226,28 +226,28 @@ namespace MAUI {
 			
 		void rebuildRects();
 
-		int selectedImageWidth;
-		int selectedImageHeight;
-		int unselectedImageWidth;
-		int unselectedImageHeight;
-		MAHandle selectedImage;
-		MAHandle unselectedImage;
+		int mSelectedImageWidth;
+		int mSelectedImageHeight;
+		int mUnselectedImageWidth;
+		int mUnselectedImageHeight;
+		MAHandle mSelectedImage;
+		MAHandle mUnselectedImage;
 
-		MARect topLeft;
-		MARect top;
-		MARect topRight;
-		MARect left;
-		MARect center;
-		MARect right;
-		MARect bottomLeft;
-		MARect bottom;
-		MARect bottomRight;
-		int startX, endX;
-		int startY, endY;
-		int imageWidth, imageHeight;
+		MARect mTopLeft;
+		MARect mTop;
+		MARect mTopRight;
+		MARect mLeft;
+		MARect mCenter;
+		MARect mRight;
+		MARect mBottomLeft;
+		MARect mBottom;
+		MARect mBottomRight;
+		int mStartX, mEndX;
+		int mStartY, mEndY;
+		int mImageWidth, mImageHeight;
 
-		bool selectedTransparent, 
-			unselectedTransparent;
+		bool mSelectedTransparent,
+			mUnselectedTransparent;
 
 	};	
 }

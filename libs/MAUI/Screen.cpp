@@ -21,24 +21,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Screen* Screen::currentScreen = NULL;
+	Screen* Screen::sCurrentScreen = NULL;
 	
-	Screen::Screen() : main(0), mFocusedWidget(0) {
+	Screen::Screen() : mMain(0), mFocusedWidget(0) {
 		hide();
 	}
 	
 	void Screen::show() {
 		//printf("showing screen!\n");
 		
-		if(!main) {
+		if(!mMain) {
 			return;
 		}
 
-		if(currentScreen) currentScreen->hide();
-		currentScreen = this;
-		Engine::getSingleton().setMain(main);
-		main->setEnabled(true);
-		main->setDirty(true);
+		if(sCurrentScreen) sCurrentScreen->hide();
+		sCurrentScreen = this;
+		Engine::getSingleton().setMain(mMain);
+		mMain->setEnabled(true);
+		mMain->setDirty(true);
 		//printf("Requesting UI update...!\n");
 		Engine::getSingleton().requestUIUpdate();
 		Environment::getEnvironment().addKeyListener(this);
@@ -48,22 +48,22 @@ namespace MAUI {
 	
 	void Screen::setMain(Widget* main) {
 		MAExtent scrSize = maGetScrSize();
-		this->main = main;
-		if(!main) return;
-		main->setPosition(0,0);
-		main->setWidth(EXTENT_X(scrSize));
-		main->setHeight(EXTENT_Y(scrSize));
+		this->mMain = main;
+		if(!mMain) return;
+		mMain->setPosition(0,0);
+		mMain->setWidth(EXTENT_X(scrSize));
+		mMain->setHeight(EXTENT_Y(scrSize));
 		Environment& env = Environment::getEnvironment();
 		if(!env.isKeyListener(this))
-			main->setEnabled(false);
+			mMain->setEnabled(false);
 
-		MAUI_LOG("setMain widget: %x", main);
-		setFocusedWidget(main);
+		MAUI_LOG("setMain widget: %x", mMain);
+		setFocusedWidget(mMain);
 	}
 
 
 	Widget* Screen::getMain() {
-		return main;
+		return mMain;
 	}
 
 	void Screen::hide() {
@@ -73,17 +73,17 @@ namespace MAUI {
 			env.removeKeyListener(this);
 		if(env.isPointerListener(this))
 			env.removePointerListener(this);
-		if(main)
-			main->setEnabled(false);
+		if(mMain)
+			mMain->setEnabled(false);
 	}
 
 	Screen::~Screen() {
-		/*if(this == currentScreen)
+		/*if(this == sCurrentScreen)
 			Environment::getEnvironment().removeKeyListener(this); */
 	}
 
 	Screen* Screen::getCurrentScreen() {
-		return currentScreen;
+		return sCurrentScreen;
 	}
 
 	Widget* getFocusableWidget(Widget *w) {

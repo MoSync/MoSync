@@ -64,8 +64,8 @@ namespace MAUI {
 	void Layout::rebuild() {
 		mustRebuild = false;
 
-		if(gridXSize*gridYSize<this->children.size()) {
-			PANIC_MESSAGE("Your MAUI::Layout has more children than gridXSize*gridYSize");
+		if(gridXSize*gridYSize<this->mChildren.size()) {
+			PANIC_MESSAGE("Your MAUI::Layout has more mChildren than gridXSize*gridYSize");
 		}
 
 		int *xOffsets = new int[gridXSize];
@@ -74,13 +74,13 @@ namespace MAUI {
 		for(int i = 0; i < gridYSize; i++) yOffsets[i] = 0;
 
 		if(autoSizeX) {
-			int xStep = paddedBounds.width / gridXSize;
+			int xStep = mPaddedBounds.width / gridXSize;
 			for(int i = 0; i < gridXSize; i++) {
 				xOffsets[i] = xStep;
 			}
 		}
 		if(autoSizeY) {
-			int yStep = paddedBounds.height / gridYSize;
+			int yStep = mPaddedBounds.height / gridYSize;
 			for(int i = 0; i < gridYSize; i++) {
 				yOffsets[i] = yStep;
 			}
@@ -91,12 +91,12 @@ namespace MAUI {
 				int highestY = 0;
 				for(int x = 0; x < gridXSize; x++) {
 					int childIndex = y * gridXSize + x;
-					if(children.size() <= childIndex)
+					if(mChildren.size() <= childIndex)
 						break;
-					if(!autoSizeX && xOffsets[x] < children[childIndex]->getBounds().width)
-						xOffsets[x] = children[childIndex]->getBounds().width;
-					if(children[childIndex]->getBounds().height > highestY)
-						highestY = children[childIndex]->getBounds().height;
+					if(!autoSizeX && xOffsets[x] < mChildren[childIndex]->getBounds().width)
+						xOffsets[x] = mChildren[childIndex]->getBounds().width;
+					if(mChildren[childIndex]->getBounds().height > highestY)
+						highestY = mChildren[childIndex]->getBounds().height;
 				}
 				if(!autoSizeY) yOffsets[y] = highestY;
 			}
@@ -107,44 +107,44 @@ namespace MAUI {
 			int currentX = 0;
 			for(int x = 0; x < gridXSize; x++) {
 				int childIndex = y * gridXSize + x;
-				if(children.size() <= childIndex) break;
+				if(mChildren.size() <= childIndex) break;
 				
 				int alignX = 0;
 				int alignY = 0;
 
 				if(autoSizeX) {
-					children[childIndex]->setWidth(xOffsets[x]);
+					mChildren[childIndex]->setWidth(xOffsets[x]);
 				} else {
 					switch(alignmentX) {
 						case HA_LEFT:
 							alignX = 0;
 							break;
 						case HA_CENTER:
-							alignX = (xOffsets[x]>>1) - (children[childIndex]->getWidth()>>1);
+							alignX = (xOffsets[x]>>1) - (mChildren[childIndex]->getWidth()>>1);
 							break;
 						case HA_RIGHT:
-							alignX = (xOffsets[x]) - children[childIndex]->getWidth();
+							alignX = (xOffsets[x]) - mChildren[childIndex]->getWidth();
 							break;
 					}
 				}
 				if(autoSizeY) {
-					children[childIndex]->setHeight(yOffsets[y]);
+					mChildren[childIndex]->setHeight(yOffsets[y]);
 				} else {
 					switch(alignmentY) {
 						case VA_TOP:
 							alignY = 0;
 							break;
 						case VA_CENTER:
-							alignY = (yOffsets[y]>>1) - (children[childIndex]->getHeight()>>1);
+							alignY = (yOffsets[y]>>1) - (mChildren[childIndex]->getHeight()>>1);
 							break;
 						case VA_BOTTOM:
-							alignY = (yOffsets[y]) - children[childIndex]->getHeight();
+							alignY = (yOffsets[y]) - mChildren[childIndex]->getHeight();
 							break;
 					}
 				}
 
 
-				children[childIndex]->setPosition(currentX + alignX, currentY + alignY);
+				mChildren[childIndex]->setPosition(currentX + alignX, currentY + alignY);
 				currentX+=xOffsets[x] + marginX;
 			}
 			currentY+=yOffsets[y] + marginY;
@@ -158,58 +158,58 @@ namespace MAUI {
 			case VERTICAL_STACKING: 
 				{
 					if(!autoSizeY) {
-						int size = children.size();
+						int size = mChildren.size();
 						for(int i = 0; i < size; i++) {
 							int y;
 							if(i>0)
-								y = children[i-1]->getPosition().y +
-								children[i-1]->getBounds().height + padding;
+								y = mChildren[i-1]->getPosition().y +
+								mChildren[i-1]->getBounds().height + padding;
 							else
 								y = 0;
 
 							int x = 0;
 							if(autoSizeX) {
-								children[i]->setWidth(bounds.width);
+								mChildren[i]->setWidth(bounds.width);
 							} else {
 								switch(alignment) {
 									case LEFT:
 										x = alignment;
 										break;
 									case MIDDLE:
-										x = (bounds.width>>1) - (children[i]->getWidth()>>1) + alignment;
+										x = (bounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
 										break;
 									case RIGHT:
-										x = (bounds.width) - children[i]->getWidth() - alignment;
+										x = (bounds.width) - mChildren[i]->getWidth() - alignment;
 										break;
 								}
 							}
 
-							children[i]->setPosition(x, y);
+							mChildren[i]->setPosition(x, y);
 						}
 					} else {
-						int size = children.size();
+						int size = mChildren.size();
 						if(size == 0) return;
 						int heightOfChildren = bounds.height/size;
 						int y = 0;
 						for(int i = 0; i < size; i++) {
 							int x = 0;
 							if(autoSizeX) {
-								children[i]->setWidth(bounds.width);
+								mChildren[i]->setWidth(bounds.width);
 							} else {
 								switch(alignment) {
 									case LEFT:
 										x = alignment;
 										break;
 									case MIDDLE:
-										x = (bounds.width>>1) - (children[i]->getWidth()>>1) + alignment;
+										x = (bounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
 										break;
 									case RIGHT:
-										x = (bounds.width) - children[i]->getWidth() - alignment;
+										x = (bounds.width) - mChildren[i]->getWidth() - alignment;
 										break;
 								}
 							}
-							children[i]->setPosition(x, y);
-							children[i]->setHeight(heightOfChildren);
+							mChildren[i]->setPosition(x, y);
+							mChildren[i]->setHeight(heightOfChildren);
 							y+=heightOfChildren;
 						}				
 					}
@@ -219,56 +219,56 @@ namespace MAUI {
 			case HORIZONTAL_STACKING: 
 				{
 					if(!autoSizeX) {
-						int size = children.size();
+						int size = mChildren.size();
 						for(int i = 0; i < size; i++) {
 							int x;
 							if(i>0)
-								x = children[i-1]->getPosition().x +
-								children[i-1]->getBounds().width + padding;
+								x = mChildren[i-1]->getPosition().x +
+								mChildren[i-1]->getBounds().width + padding;
 							else
 								x = 0;
 							int y = 0;
 							if(autoSizeY) {
-								children[i]->setHeight(bounds.height);
+								mChildren[i]->setHeight(bounds.height);
 							} else {
 								switch(alignment) {
 									case TOP:
 										y = alignment;
 										break;
 									case MIDDLE:
-										y = (bounds.height>>1) - (children[i]->getHeight()>>1) + alignment;
+										y = (bounds.height>>1) - (mChildren[i]->getHeight()>>1) + alignment;
 										break;
 									case BOTTOM:
-										y = (bounds.height) - children[i]->getHeight() - alignment;
+										y = (bounds.height) - mChildren[i]->getHeight() - alignment;
 										break;
 								}
 							}
-							children[i]->setPosition(x, y);
+							mChildren[i]->setPosition(x, y);
 						}
 					} else {
-						int size = children.size();
+						int size = mChildren.size();
 						if(size == 0) return;
 						int widthOfChildren = bounds.width/size;
 						int x = 0;
 						for(int i = 0; i < size; i++) {
 							int y = 0;
 							if(autoSizeY) {
-								children[i]->setHeight(bounds.height);
+								mChildren[i]->setHeight(bounds.height);
 							} else {
 								switch(alignment) {
 									case TOP:
 										y = alignment;
 										break;
 									case MIDDLE:
-										y = (bounds.height>>1) - (children[i]->getHeight()>>1) + alignment;
+										y = (bounds.height>>1) - (mChildren[i]->getHeight()>>1) + alignment;
 										break;
 									case BOTTOM:
-										y = (bounds.height) - children[i]->getHeight() - alignment;
+										y = (bounds.height) - mChildren[i]->getHeight() - alignment;
 										break;
 								}
 							}
-							children[i]->setPosition(x, y);
-							children[i]->setWidth(widthOfChildren);
+							mChildren[i]->setPosition(x, y);
+							mChildren[i]->setWidth(widthOfChildren);
 							x+=widthOfChildren;
 						}
 					}
@@ -287,12 +287,12 @@ namespace MAUI {
 
 	void Layout::add(Widget *child) {
 		/*
-		int size = children.size();
+		int size = mChildren.size();
 		if(layoutType == VERTICAL_STACKING) {
 			int y;
 			if(size>0)
-				y = children[size-1]->getPosition().y +
-					children[size-1]->getBounds().height;
+				y = mChildren[size-1]->getPosition().y +
+					mChildren[size-1]->getBounds().height;
 			else
 				y = 0;
 
@@ -303,8 +303,8 @@ namespace MAUI {
 		else if(layoutType == HORIZONTAL_STACKING) {
 			int x;
 			if(size>0)
-				x = children[size-1]->getPosition().x +
-					children[size-1]->getBounds().width;
+				x = mChildren[size-1]->getPosition().x +
+					mChildren[size-1]->getBounds().width;
 			else
 				x = 0;
 
@@ -321,8 +321,8 @@ namespace MAUI {
 	}
 
 	void Layout::clear() {
-		for(int i = 0; i < children.size(); i++)
-			children[i]->removeWidgetListener(this);
+		for(int i = 0; i < mChildren.size(); i++)
+			mChildren[i]->removeWidgetListener(this);
 		Widget::clear();
 		mustRebuild = true;
 		requestRepaint();
@@ -340,7 +340,7 @@ namespace MAUI {
 			case LT_VERTICAL_STACKING:
 			{
 				int lastY = 0;
-				Vector_each(Widget*,it,children) {
+				Vector_each(Widget*,it,mChildren) {
 					(*it)->bounds.x = x;
 					(*it)->bounds.y = lastY + y;
 					(*it)->bounds.width = bounds.width; // adjust the width to fill up the whole layout
@@ -352,7 +352,7 @@ namespace MAUI {
 			case LT_HORIZONTAL_STACKING:
 			{
 				int lastX = 0;
-				Vector_each(Widget*,it,children) {
+				Vector_each(Widget*,it,mChildren) {
 					(*it)->bounds.x = lastX + x;
 					(*it)->bounds.y = y;
 					(*it)->bounds.height = bounds.height; // adjust the height to fill up the whole layout
@@ -422,31 +422,31 @@ namespace MAUI {
 
 
 	void Layout::goUp() {
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(false);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(false);
 		if(selectedIndex - gridXSize >= 0) selectedIndex-=gridXSize;
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(true);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(true);
 	}
 	
 	void Layout::goDown() {
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(false);
-		if(selectedIndex + gridXSize < children.size()) selectedIndex+=gridXSize;
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(true);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(false);
+		if(selectedIndex + gridXSize < mChildren.size()) selectedIndex+=gridXSize;
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(true);
 	}
 
 	void Layout::goRight() {
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(false);
-		if(selectedIndex + 1 < children.size()) selectedIndex++;
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(true);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(false);
+		if(selectedIndex + 1 < mChildren.size()) selectedIndex++;
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(true);
 	}
 
 	void Layout::goLeft() {
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(false);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(false);
 		if(selectedIndex -1 >= 0) selectedIndex--;
-		if(selectedIndex < children.size()) children[selectedIndex]->setSelected(true);
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->setSelected(true);
 	}
 
 	void Layout::trigger() {
-		if(selectedIndex < children.size()) children[selectedIndex]->trigger();
+		if(selectedIndex < mChildren.size()) mChildren[selectedIndex]->trigger();
 	}
 
 }

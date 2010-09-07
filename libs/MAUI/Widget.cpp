@@ -35,21 +35,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL) 
-		: parent(NULL), bounds(0,0,width,height), relX(x), relY(y), 
-			dirty(false),
-			skin(NULL),
-			backColor(0),
-			shouldDrawBackground(true),
-			selected(false),
-			enabled(true),
-			paddingLeft(0),
-			paddingTop(0),
-			paddingBottom(0),
-			paddingRight(0)
+	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL)
+		: mParent(NULL), mBounds(0,0,width,height), mRelX(x), mRelY(y),
+			mDirty(false),
+			mSkin(NULL),
+			mBackColor(0),
+			mShouldDrawBackground(true),
+			mSelected(false),
+			mEnabled(true),
+			mPaddingLeft(0),
+			mPaddingTop(0),
+			mPaddingBottom(0),
+			mPaddingRight(0)
 		{
 		
-		skin = Engine::getSingleton().getDefaultSkin();
+		mSkin = Engine::getSingleton().getDefaultSkin();
 		
 		if(parent) {
 			parent->add(this);
@@ -58,57 +58,57 @@ namespace MAUI {
 	}
 
 	Widget::~Widget() {
-		Vector_each(Widget*,it,children)
+		Vector_each(Widget*,it,mChildren)
 			delete (*it);
 	}
 
 	void Widget::add(Widget* w) {
-		children.add(w);
+		mChildren.add(w);
 		w->setParent(this);
 		requestRepaint();
 	}
 
 	void Widget::clear() {
-		for(int i = 0; i < children.size(); i++)
-			children[i]->setParent(NULL);
-		children.clear();
+		for(int i = 0; i < mChildren.size(); i++)
+			mChildren[i]->setParent(NULL);
+		mChildren.clear();
 		requestRepaint();
 	}
 	
 	const Rect& Widget::getBounds() {
-		return bounds;
+		return mBounds;
 	}
 	
 	bool Widget::contains(const Point& p) {
-		return bounds.contains(p);
+		return mBounds.contains(p);
 	}
 
 	bool Widget::contains(int x, int y) {
-		return bounds.contains(x, y);
+		return mBounds.contains(x, y);
 	}
 
 	bool Widget::isTransparent() const {
-		if(selected)
-			return (skin!=NULL && skin->isSelectedTransparent()==true)  || (!shouldDrawBackground);
+		if(mSelected)
+			return (mSkin!=NULL && mSkin->isSelectedTransparent()==true)  || (!mShouldDrawBackground);
 		else
-			return (skin!=NULL && skin->isUnselectedTransparent()==true)  || (!shouldDrawBackground);
+			return (mSkin!=NULL && mSkin->isUnselectedTransparent()==true)  || (!mShouldDrawBackground);
 	}
 
 	void Widget::drawBackground() {
 		//printf("in drawBackground!\n");
-		if(skin) {
-			if(selected)		
-				//skin->draw(bounds.x, bounds.y, bounds.width, bounds.height, WidgetSkin::SELECTED);
-				skin->draw(0, 0, bounds.width, bounds.height, WidgetSkin::SELECTED);
+		if(mSkin) {
+			if(mSelected)
+				//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
+				mSkin->draw(0, 0, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
 			else
-				//skin->draw(bounds.x, bounds.y, bounds.width, bounds.height, WidgetSkin::UNSELECTED);
-					skin->draw(0, 0, bounds.width, bounds.height, WidgetSkin::UNSELECTED);			
+				//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
+					mSkin->draw(0, 0, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
 		} else {
-			maSetColor(backColor);
+			maSetColor(mBackColor);
 			//maSetColor(0xffff00ff);
 			//printf("filling rect!!!\n");
-			//maFillRect(bounds.x,bounds.y, bounds.width, bounds.height);
-			Gfx_fillRect(0, 0, bounds.width, bounds.height);
+			//maFillRect(mBounds.x,mBounds.y, mBounds.width, mBounds.height);
+			Gfx_fillRect(0, 0, mBounds.width, mBounds.height);
 		}
 	}
 
@@ -117,58 +117,58 @@ namespace MAUI {
 		WLOG("Widget:draw");
 		Engine &engine = Engine::getSingleton();
 		
-		bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
-			bounds.width, bounds.height);	
+		bool res = engine.pushClipRectIntersect(mBounds.x, mBounds.y,
+			mBounds.width, mBounds.height);
 		if(res && isDirty()) {
-			if(shouldDrawBackground) {
+			if(mShouldDrawBackground) {
 				drawBackground();
 			}
 			drawWidget();
 			setDirty(false);
 		}
 
-		Vector_each(Widget*, it, children)
+		Vector_each(Widget*, it, mChildren)
 			(*it)->draw();
 
 		engine.popClipRect();
 	}*/
 
 	void Widget::update() {
-		Vector_each(Widget*, it, children)
+		Vector_each(Widget*, it, mChildren)
 			(*it)->update();
 	}
 
 	void Widget::draw(bool forceDraw) {
-		if(!enabled && !forceDraw) return;
+		if(!mEnabled && !forceDraw) return;
 	
 		//Engine &engine = Engine::getSingleton();
 
-		//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
-		//	bounds.width, bounds.height);
+		//bool res = engine.pushClipRectIntersect(mBounds.x, mBounds.y,
+		//	mBounds.width, mBounds.height);
 		
 		Gfx_pushMatrix();
-		Gfx_translate(relX, relY);
-		BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
+		Gfx_translate(mRelX, mRelY);
+		BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
 		
 		if(res) 
 		{
 			if(isDirty() || forceDraw) 
 			{
-				if(shouldDrawBackground) 
+				if(mShouldDrawBackground)
 				{
 					drawBackground();
 				}
 			}
-			//bool res = engine.pushClipRectIntersect(paddedBounds.x, paddedBounds.y,
-			//	paddedBounds.width, paddedBounds.height);
-			Gfx_translate(paddingLeft, paddingTop);
-			BOOL res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
+			//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
+			//	mPaddedBounds.width, mPaddedBounds.height);
+			Gfx_translate(mPaddingLeft, mPaddingTop);
+			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 			if(res) {
 
 				if(isDirty() || forceDraw) 
 					drawWidget();
-				Vector_each(Widget*, it, children)
+				Vector_each(Widget*, it, mChildren)
 					(*it)->draw();	
 
 			}
@@ -183,9 +183,9 @@ namespace MAUI {
 	}
 
 	void Widget::setPosition(int x, int y) {
-		bool changed = relX != x || relY != y;
-		relX = x;
-		relY = y;
+		bool changed = mRelX != x || mRelY != y;
+		mRelX = x;
+		mRelY = y;
 		updateAbsolutePosition();
 
 		if(changed) {
@@ -196,19 +196,19 @@ namespace MAUI {
 
 	const Point& Widget::getPosition() const {
 		static Point pnt;
-		pnt = Point(relX, relY);
+		pnt = Point(mRelX, mRelY);
 		return pnt;
 	}
 
 	const Point& Widget::getPaddedPosition() const {
 		static Point pnt;
-		pnt = Point(relX+paddingLeft, relY+paddingTop);
+		pnt = Point(mRelX+mPaddingLeft, mRelY+mPaddingTop);
 		return pnt;
 	}
 
 	void Widget::setWidth(int width) {
-		bool changed = width != bounds.width;
-		bounds.width = width;
+		bool changed = width != mBounds.width;
+		mBounds.width = width;
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
@@ -217,12 +217,12 @@ namespace MAUI {
 	}
 
 	int Widget::getWidth() const {
-		return bounds.width;
+		return mBounds.width;
 	}
 
 	void Widget::setHeight(int height) {
-		bool changed = height != bounds.height;
-		bounds.height = height;
+		bool changed = height != mBounds.height;
+		mBounds.height = height;
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
@@ -231,20 +231,20 @@ namespace MAUI {
 	}
 
 	int	Widget::getHeight() const {
-		return bounds.height;
+		return mBounds.height;
 	}
 
 	void Widget::setParent(Widget *w) {
-		if(w != NULL && parent != NULL && parent != w) {
-			PANIC_MESSAGE("Widget already has a parent!");
+		if(w != NULL && mParent != NULL && mParent != w) {
+			PANIC_MESSAGE("Widget already has a mParent!");
 		}
-		parent = w;
+		mParent = w;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	Widget* Widget::getParent() {
-		return parent;
+		return mParent;
 	}
 
 	Widget* Widget::widgetAt(const Point& p) {
@@ -252,14 +252,14 @@ namespace MAUI {
 	}
 
 	Widget* Widget::widgetAt(int x, int y) {
-		Vector_each(Widget *, it, children) {
+		Vector_each(Widget *, it, mChildren) {
 			Widget *ret = (*it)->widgetAt(x, y);
 			if(ret) {
 				return ret;
 			}
 		}
 
-		if(bounds.contains(x, y)) {
+		if(mBounds.contains(x, y)) {
 			return this;
 		}
 
@@ -271,93 +271,93 @@ namespace MAUI {
 		setDirty();
 
 		if(isTransparent()) {
-			if(parent) {
-				parent->requestRepaint();
+			if(mParent) {
+				mParent->requestRepaint();
 			}
 		}
 	}
 
 	bool Widget::isDirty() const {
-		return dirty;
+		return mDirty;
 	}
 
 	void Widget::setDirty(bool d) {
-		dirty = d;
+		mDirty = d;
 
 		if(d == true) {
-			Vector_each(Widget*, it, children)
+			Vector_each(Widget*, it, mChildren)
 				(*it)->setDirty(d);
 		}
 	}
 
-	void Widget::setSkin(WidgetSkin *skin) {
-		this->skin = skin;
+	void Widget::setSkin(WidgetSkin *mSkin) {
+		this->mSkin = mSkin;
 		requestRepaint();
 	}
 
 	void Widget::setDrawBackground(bool b) {
-		this->shouldDrawBackground = b;
+		this->mShouldDrawBackground = b;
 		requestRepaint();
 	}
 
 	void Widget::setBackgroundColor(int col) {
-		this->backColor = col;
+		this->mBackColor = col;
 		requestRepaint();
 	}
 
 	void Widget::updateAbsolutePositionChildren(int x, int y) {
-		Vector_each(Widget*,it,children) {
-			(*it)->bounds.x = (*it)->relX + x;
-			(*it)->bounds.y = (*it)->relY + y;
+		Vector_each(Widget*,it,mChildren) {
+			(*it)->mBounds.x = (*it)->mRelX + x;
+			(*it)->mBounds.y = (*it)->mRelY + y;
 			(*it)->updatePaddedBounds();
-			(*it)->updateAbsolutePositionChildren((*it)->paddedBounds.x, (*it)->paddedBounds.y);
+			(*it)->updateAbsolutePositionChildren((*it)->mPaddedBounds.x, (*it)->mPaddedBounds.y);
 		}
 	}
 
 	void Widget::updatePaddedBounds() {
-		paddedBounds = bounds;
-		paddedBounds.x+=paddingLeft;
-		paddedBounds.y+=paddingTop;
-		paddedBounds.width-=paddingLeft+paddingRight;
-		paddedBounds.height-=paddingTop+paddingBottom;
+		mPaddedBounds = mBounds;
+		mPaddedBounds.x+=mPaddingLeft;
+		mPaddedBounds.y+=mPaddingTop;
+		mPaddedBounds.width-=mPaddingLeft+mPaddingRight;
+		mPaddedBounds.height-=mPaddingTop+mPaddingBottom;
 	}
 
-	// fixme, precalc absolute for parent
+	// fixme, precalc absolute for mParent
 	void Widget::updateAbsolutePosition() {
 		Widget *p = this;
-		bounds.x = relX;
-		bounds.y = relY;
+		mBounds.x = mRelX;
+		mBounds.y = mRelY;
 		while((p = p->getParent())) {
-			bounds.x += p->getPosition().x + p->paddingLeft;  
-			bounds.y += p->getPosition().y + p->paddingTop;
+			mBounds.x += p->getPosition().x + p->mPaddingLeft;
+			mBounds.y += p->getPosition().y + p->mPaddingTop;
 		}
 		updatePaddedBounds();
-		updateAbsolutePositionChildren(paddedBounds.x, paddedBounds.y);
+		updateAbsolutePositionChildren(mPaddedBounds.x, mPaddedBounds.y);
 
 		fireBoundsChanged();
 	}
 
 	Vector<Widget*>& Widget::getChildren() {
-		return children;
+		return mChildren;
 	}
 
 	const Vector<Widget*>& Widget::getChildren() const {
-		return children;
+		return mChildren;
 	}
 
 	void Widget::addWidgetListener(WidgetListener* wl) {
 		
-		Vector_each(WidgetListener*, i, widgetListeners) {
+		Vector_each(WidgetListener*, i, mWidgetListeners) {
 			if((*i) == wl) return;
 		}
-		widgetListeners.add(wl);
+		mWidgetListeners.add(wl);
 	}
 
 	void Widget::removeWidgetListener(WidgetListener* wl) {
 
-		Vector_each(WidgetListener*, i, widgetListeners) {
+		Vector_each(WidgetListener*, i, mWidgetListeners) {
 			if((*i) == wl) {
-				widgetListeners.remove(i);
+				mWidgetListeners.remove(i);
 				return;	//or crash
 			}
 		}
@@ -365,90 +365,90 @@ namespace MAUI {
 
 	Vector<WidgetListener*>& Widget::getWidgetListeners()
 	{
-		return widgetListeners;
+		return mWidgetListeners;
 	}
 
 	void Widget::trigger() {
-		Vector_each(WidgetListener*, wl, widgetListeners) {
+		Vector_each(WidgetListener*, wl, mWidgetListeners) {
 			(*wl)->triggered(this);
 		}
 	}
 
-	void Widget::setSelected(bool selected) {
-		this->selected = selected;
-		Vector_each(WidgetListener*, wl, widgetListeners) {
-			(*wl)->selectionChanged(this, selected);
+	void Widget::setSelected(bool mSelected) {
+		this->mSelected = mSelected;
+		Vector_each(WidgetListener*, wl, mWidgetListeners) {
+			(*wl)->selectionChanged(this, mSelected);
 		}
 		requestRepaint();
 	}
 	
 	bool Widget::isSelected() const {
-		return selected;
+		return mSelected;
 	}
 
-	void Widget::setEnabled(bool enabled) {
-		this->enabled = enabled;
+	void Widget::setEnabled(bool mEnabled) {
+		this->mEnabled = mEnabled;
 
-		Vector_each(Widget*,it,children) {
-			(*it)->setEnabled(enabled);
+		Vector_each(Widget*,it,mChildren) {
+			(*it)->setEnabled(mEnabled);
 		}
 		
-		Vector_each(WidgetListener*, wl, widgetListeners) {
-			(*wl)->enableStateChanged(this, selected);
+		Vector_each(WidgetListener*, wl, mWidgetListeners) {
+			(*wl)->enableStateChanged(this, mSelected);
 		}
 		requestRepaint();
 	}
 	
 	bool Widget::isEnabled() const {
-		return enabled;
+		return mEnabled;
 	}
 
 	void Widget::setPaddingLeft(int l) {
-		paddingLeft = l;
+		mPaddingLeft = l;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingTop(int t) {
-		paddingTop = t;
+		mPaddingTop = t;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingRight(int r) {
-		paddingRight = r;
+		mPaddingRight = r;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingBottom(int b) {
-		paddingBottom = b;
+		mPaddingBottom = b;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	int Widget::getPaddingLeft() const {
-		return paddingLeft;
+		return mPaddingLeft;
 	}
 
 	int Widget::getPaddingTop() const {
-		return paddingTop;
+		return mPaddingTop;
 	}
 
 	int Widget::getPaddingRight() const {
-		return paddingRight;
+		return mPaddingRight;
 	}
 
 	int Widget::getPaddingBottom() const {
-		return paddingBottom;
+		return mPaddingBottom;
 	}
 
 	const Rect& Widget::getPaddedBounds() const {
-		return paddedBounds;
+		return mPaddedBounds;
 	}
 
 	void Widget::setParameter(const String& name, const String& value) {
-		if(name == "paddingLeft") setPaddingLeft(stringToInteger(value));
+		if(name == "mPaddingLeft") setPaddingLeft(stringToInteger(value));
 		else if(name == "paddingTop") setPaddingTop(stringToInteger(value));
 		else if(name == "paddingBottom") setPaddingBottom(stringToInteger(value));
 		else if(name == "paddingRight") setPaddingRight(stringToInteger(value));
@@ -482,20 +482,22 @@ namespace MAUI {
 	}
 
 	bool Widget::isFocusable() const {
-		return children.size()==0;
+		return mChildren.size()==0;
 	}
 
 
 	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
 		if(w1==NULL) return w2;
 		if(w2==NULL) return w1;
+		/*
 		switch(dir) {
 			case LEFT:
 			{
+
 				int x1 = w1->getBounds().x + w1->getBounds().width;
 				int x2 = w2->getBounds().x + w2->getBounds().width;
 				int x = this->getBounds().x;
-				Vector_each(Widget*, i, children) {
+				Vector_each(Widget*, i, mChildren) {
 					if(*i==w1) continue;
 
 				}
@@ -514,15 +516,18 @@ namespace MAUI {
 			}
 			break;
 		}
+		*/
+
+		return NULL;
 	}
 
 	Widget* Widget::getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best) {
 
-		for(int i = 0; i < children.size(); i++) {
-			if(children[i]->isFocusable()) {
-				best = w->nearestWidget(children[i], best, dir);
+		for(int i = 0; i < mChildren.size(); i++) {
+			if(mChildren[i]->isFocusable()) {
+				best = w->nearestWidget(mChildren[i], best, dir);
 			} else {
-				Widget* ret = children[i]->getNearestFocusableInDirectionFrom(w, dir, best);
+				Widget* ret = mChildren[i]->getNearestFocusableInDirectionFrom(w, dir, best);
 				if(ret) {
 					best = w->nearestWidget(w, best, dir);
 				}
@@ -533,12 +538,12 @@ namespace MAUI {
 	}
 
 	Widget* Widget::getFocusableInDirectionFrom(Widget* w, Direction dir) {
-		if(!parent) return NULL;
+		if(!mParent) return NULL;
 
-		if(parent->getChildren().size() > 1) {
-			return parent->getNearestFocusableInDirectionFrom(w, dir);
+		if(mParent->getChildren().size() > 1) {
+			return mParent->getNearestFocusableInDirectionFrom(w, dir);
 		} else {
-			return parent->getFocusableInDirectionFrom(w, dir);
+			return mParent->getFocusableInDirectionFrom(w, dir);
 		}
 
 	}

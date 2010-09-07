@@ -31,13 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 namespace MAUI {
-	static void cutText(String& output, Font* font, const String& text, Rect bounds)
+	static void cutText(String& output, Font* font, const String& text, Rect mBounds)
 	{
 		output.clear();
 		const Charset& cs = font->getCharset();
 		const unsigned char *str = (const unsigned char*)text.c_str();
-		int w = bounds.width;
-		int x = bounds.x;
+		int w = mBounds.width;
+		int x = mBounds.x;
 		int i = 0;
 		while(*str) {
 			const CharDescriptor& cd = cs.chars[*str];
@@ -124,7 +124,7 @@ namespace MAUI {
 
 	void Label::calcStrSize() {
 		mustCalcStrSize = false;
-		Rect tempRect = Rect(0, 0, paddedBounds.width, paddedBounds.height);
+		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 		if(!font) {
 			strSize = EXTENT(0,0);
 		} else {
@@ -143,8 +143,8 @@ namespace MAUI {
 		strWidth  = EXTENT_X(strSize);
 		strHeight = EXTENT_Y(strSize);
 
-		if(autoSizeX) resize(strWidth + paddingLeft + paddingRight, bounds.height);
-		if(autoSizeY) resize(bounds.width,  strHeight + paddingTop + paddingBottom);
+		if(autoSizeX) resize(strWidth + mPaddingLeft + mPaddingRight, mBounds.height);
+		if(autoSizeY) resize(mBounds.width,  strHeight + mPaddingTop + mPaddingBottom);
 	}
 
 	void Label::setMultiLine(bool b) {
@@ -191,16 +191,16 @@ namespace MAUI {
 		if(!autoSizeX) {
 			switch(horizontalAlignment) {
 				case HA_LEFT: *x =   0; break;
-				case HA_CENTER: *x = (paddedBounds.width)/2 - (strWidth/2); break;
-				case HA_RIGHT: *x =  (paddedBounds.width) - (strWidth); break;
+				case HA_CENTER: *x = (mPaddedBounds.width)/2 - (strWidth/2); break;
+				case HA_RIGHT: *x =  (mPaddedBounds.width) - (strWidth); break;
 			}
 		}
 
 		if(!autoSizeY) {
 			switch(verticalAlignment) {
 				case VA_TOP: *y = 0; break;
-				case VA_CENTER: *y = (paddedBounds.height)/2 - (strHeight/2); break;
-				case VA_BOTTOM: *y = (paddedBounds.height) - (strHeight); break;
+				case VA_CENTER: *y = (mPaddedBounds.height)/2 - (strHeight/2); break;
+				case VA_BOTTOM: *y = (mPaddedBounds.height) - (strHeight); break;
 			}
 		}
 	}
@@ -215,13 +215,13 @@ namespace MAUI {
 	void Label::drawWidget() {
 		const char* wStr = caption.c_str();
 
-		//int textX=paddedBounds.x, textY=paddedBounds.y;
+		//int textX=mPaddedBounds.x, textY=mPaddedBounds.y;
 		int textX=0, textY=0;
 		//calcStrSize();
 
 		getTextStart(&textX, &textY);
 
-		Rect tempRect = Rect(0, 0, paddedBounds.width, paddedBounds.height);
+		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 		if(font) {
 			if(multiLine)
 				font->drawBoundedString(wStr, textX, textY, tempRect);
