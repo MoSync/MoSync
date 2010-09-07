@@ -97,7 +97,7 @@ void ansi_heap_init_crt0(char *start, int length)
 		maPanic(1, "Interface version mismatch!");
 	}
 
-	MASTD_HEAP_LOG("heap: start 0x%08x len 0x%x", start, length);
+	MASTD_HEAP_LOG("heap: start 0x%p len 0x%x", start, length);
 	
 	sHeapBase = start;
 
@@ -134,6 +134,7 @@ void * malloc(int size)
 	int wasMemoryProtected = maGetMemoryProtection();
 	maSetMemoryProtection(FALSE);
 #endif
+	MASTD_HEAP_LOG("malloc(%d)\n", size);
 
 	result = gMallocHook(size);
 
@@ -153,7 +154,7 @@ void * malloc(int size)
 	maUnprotectMemory((byte*)result, size);
 	maSetMemoryProtection(wasMemoryProtected);
 #endif
-	MASTD_HEAP_LOG("malloc(%i) pointer (0x%08X)\n", size,result);
+	MASTD_HEAP_LOG("malloc(%i) pointer (0x%p)\n", size,result);
 
 	return result;
 }

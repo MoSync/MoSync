@@ -4,16 +4,28 @@
 <build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value=".;../"/>
+<property key="build.prefs:additional.include.paths/Debug" value=".,../MAStd,../"/>
 <property key="build.prefs:additional.include.paths/Release" value=".,../MAStd,../"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value=""/>
 <property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value="-O2 -fno-omit-frame-pointer"/>
+<property key="build.prefs:gcc.switches/Debug" value="-O0 -DMAUI_LOGGING"/>
+<property key="build.prefs:gcc.switches/Release" value="-O2 -DMAUI_LOGGING"/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:memory.data/Release" value="256"/>
+<property key="build.prefs:memory.heap/Release" value="128"/>
+<property key="build.prefs:memory.stack/Release" value="64"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="outputPath" value="%MOSYNCDIR%\lib\pipe\MAUI.lib"/>

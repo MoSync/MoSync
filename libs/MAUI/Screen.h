@@ -79,10 +79,20 @@ namespace MAUI {
 		* Does not delete the main Widget.
 		*/
 		~Screen();
+
+		/**
+		 * Retrieves the currently active screen.
+		 */
+		static Screen* getCurrentScreen();
+
+		void setFocusedWidget(Widget *w);
+		Widget* getFocusedWidget();
+
 	protected:
 		virtual void hide();
 		static Screen* currentScreen;
 		Widget* main;
+		Widget* mFocusedWidget;
 	};
 
 }

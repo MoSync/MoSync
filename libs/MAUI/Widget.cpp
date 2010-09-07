@@ -460,4 +460,86 @@ namespace MAUI {
 		else if(name == "y") this->setPosition(getPosition().x, stringToInteger(value));
 		else maPanic(0, "MAUI::Widget wrong parameter");
 	}
+
+	bool Widget::keyPressed(int keyCode, int nativeCode) {
+		return false;
+	}
+
+	bool Widget::keyReleased(int keyCode, int nativeCode) {
+		return false;
+	}
+
+	bool Widget::pointerPressed(MAPoint2d p, int id) {
+		return false;
+	}
+
+	bool Widget::pointerMoved(MAPoint2d p, int id) {
+		return false;
+	}
+
+	bool Widget::pointerReleased(MAPoint2d p, int id) {
+		return false;
+	}
+
+	bool Widget::isFocusable() const {
+		return children.size()==0;
+	}
+
+
+	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
+		if(w1==NULL) return w2;
+		if(w2==NULL) return w1;
+		switch(dir) {
+			case LEFT:
+			{
+				int x1 = w1->getBounds().x + w1->getBounds().width;
+				int x2 = w2->getBounds().x + w2->getBounds().width;
+				int x = this->getBounds().x;
+				Vector_each(Widget*, i, children) {
+					if(*i==w1) continue;
+
+				}
+			}
+			break;
+			case RIGHT:
+			{
+			}
+			break;
+			case UP:
+			{
+			}
+			break;
+			case DOWN:
+			{
+			}
+			break;
+		}
+	}
+
+	Widget* Widget::getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best) {
+
+		for(int i = 0; i < children.size(); i++) {
+			if(children[i]->isFocusable()) {
+				best = w->nearestWidget(children[i], best, dir);
+			} else {
+				Widget* ret = children[i]->getNearestFocusableInDirectionFrom(w, dir, best);
+				if(ret) {
+					best = w->nearestWidget(w, best, dir);
+				}
+			}
+		}
+
+		return best;
+	}
+
+	Widget* Widget::getFocusableInDirectionFrom(Widget* w, Direction dir) {
+		if(!parent) return NULL;
+
+		if(parent->getChildren().size() > 1) {
+			return parent->getNearestFocusableInDirectionFrom(w, dir);
+		} else {
+			return parent->getFocusableInDirectionFrom(w, dir);
+		}
+
+	}
 }

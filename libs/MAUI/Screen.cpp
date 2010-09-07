@@ -23,7 +23,7 @@ namespace MAUI {
 
 	Screen* Screen::currentScreen = NULL;
 	
-	Screen::Screen() : main(0) {
+	Screen::Screen() : main(0), mFocusedWidget(0) {
 		hide();
 	}
 	
@@ -56,6 +56,9 @@ namespace MAUI {
 		Environment& env = Environment::getEnvironment();
 		if(!env.isKeyListener(this))
 			main->setEnabled(false);
+
+		MAUI_LOG("setMain widget: %x", main);
+		setFocusedWidget(main);
 	}
 
 
@@ -77,5 +80,35 @@ namespace MAUI {
 	Screen::~Screen() {
 		/*if(this == currentScreen)
 			Environment::getEnvironment().removeKeyListener(this); */
+	}
+
+	Screen* Screen::getCurrentScreen() {
+		return currentScreen;
+	}
+
+	Widget* getFocusableWidget(Widget *w) {
+		Vector<Widget*>& children = w->getChildren();
+		for(int i = 0; i < children.size(); i++) {
+			if(children[i]->isFocusable()) {
+				return children[i];
+			} else {
+				Widget* c = getFocusableWidget(children[i]);
+				if(c) return c;
+			}
+		}
+		return NULL;
+	}
+
+	void Screen::setFocusedWidget(Widget *w) {
+		Widget *focus = w;
+		if(!focus->isFocusable()) {
+			focus = getFocusableWidget(focus);
+		}
+		mFocusedWidget = focus;
+		MAUI_LOG("setFocusedWidget widget %x", focus);
+	}
+
+	Widget* Screen::getFocusedWidget() {
+		return mFocusedWidget;
 	}
 }

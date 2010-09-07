@@ -29,6 +29,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>
 #include "WidgetSkin.h"
+#include "InputPolicy.h"
+
+#ifdef MAUI_LOGGING
+#include <conprint.h>
+#define MAUI_LOG(x, args...) lprintfln(x, ## args)
+#else
+#define MAUI_LOG(x, args..)
+#endif
 
 namespace MAUI {
 
@@ -341,6 +349,21 @@ namespace MAUI {
 		 *	Deletes all children.
 		 */ 
 		virtual ~Widget();
+
+
+		// returns true if focus should be changed.
+			virtual bool keyPressed(int keyCode, int nativeCode);
+			virtual bool keyReleased(int keyCode, int nativeCode);
+		// returns true if focus should be lost.
+		// what about: returns true if focus should be held after release.
+			virtual bool pointerPressed(MAPoint2d p, int id);
+			virtual bool pointerMoved(MAPoint2d p, int id);
+			virtual bool pointerReleased(MAPoint2d p, int id);
+
+			virtual bool isFocusable() const;
+			Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
+			Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
+			Widget* getFocusableInDirectionFrom(Widget* w, Direction dir);
 	protected:
 
 		/**
