@@ -95,16 +95,16 @@ namespace MAUI {
 		void hideOverlay();
 
 	protected:
-		Widget *overlay;
-		Point overlayPosition;
+		Widget *mOverlay;
+		Point mOverlayPosition;
 
-		Widget* main;
-		Font* defaultFont;
-		WidgetSkin* defaultSkin;
+		Widget* mMain;
+		Font* mDefaultFont;
+		WidgetSkin* mDefaultSkin;
 
-		static Engine* singletonPtr;
+		static Engine* mSingletonPtr;
 
-		bool characterInputActive;
+		bool mCharacterInputActive;
 
 	private:
 		Engine();

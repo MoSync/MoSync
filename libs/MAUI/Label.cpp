@@ -31,13 +31,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 namespace MAUI {
-	static void cutText(String& output, Font* font, const String& text, Rect mBounds)
+	static void cutText(String& output, Font* font, const String& text, Rect bounds)
 	{
 		output.clear();
 		const Charset& cs = font->getCharset();
 		const unsigned char *str = (const unsigned char*)text.c_str();
-		int w = mBounds.width;
-		int x = mBounds.x;
+		int w = bounds.width;
+		int x = bounds.x;
 		int i = 0;
 		while(*str) {
 			const CharDescriptor& cd = cs.chars[*str];
@@ -77,21 +77,17 @@ namespace MAUI {
 
 	Label::Label(int x, int y, int width, int height, Widget* parent) :
 		Widget(x, y, width, height, parent), 
-		mustCalcStrSize(true),
-		caption(""),
-		font(NULL),
-		autoSizeX(false),
-		autoSizeY(false),
-		multiLine(false),
-		horizontalAlignment(HA_LEFT),
-		verticalAlignment(VA_TOP)
+		mMustCalcStrSize(true),
+		mCaption(""),
+		mFont(NULL),
+		mAutoSizeX(false),
+		mAutoSizeY(false),
+		mMultiLine(false),
+		mHorizontalAlignment(HA_LEFT),
+		mVerticalAlignment(VA_TOP)
 	{
-		if(!font)
-		{
-			this->font = Engine::getSingleton().getDefaultFont();
-		} else {
-			this->font = font;
-		}
+		this->mFont = Engine::getSingleton().getDefaultFont();
+
 		//calcStrSize();
 		setDrawBackground();
 		setBackgroundColor(0xffff00ff);
@@ -100,20 +96,20 @@ namespace MAUI {
 	Label::Label(int x, int y, int width, int height, Widget* parent, const String &caption,
 		int backColor, Font* font) :
 		Widget(x, y, width, height, parent),
-		mustCalcStrSize(true),
-		caption(""),
-		font(NULL),
-		autoSizeX(false),
-		autoSizeY(false),
-		multiLine(false),
-		horizontalAlignment(HA_LEFT),
-		verticalAlignment(VA_TOP)
+		mMustCalcStrSize(true),
+		mCaption(""),
+		mFont(NULL),
+		mAutoSizeX(false),
+		mAutoSizeY(false),
+		mMultiLine(false),
+		mHorizontalAlignment(HA_LEFT),
+		mVerticalAlignment(VA_TOP)
 	{
 		if(!font)
 		{
-			this->font = Engine::getSingleton().getDefaultFont();
+			this->mFont = Engine::getSingleton().getDefaultFont();
 		} else {
-			this->font = font;
+			this->mFont = font;
 		}
 
 		setCaption(caption);
@@ -123,62 +119,62 @@ namespace MAUI {
 	}
 
 	void Label::calcStrSize() {
-		mustCalcStrSize = false;
+		mMustCalcStrSize = false;
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-		if(!font) {
-			strSize = EXTENT(0,0);
+		if(!mFont) {
+			mStrSize = EXTENT(0,0);
 		} else {
-			if(autoSizeX)
-				strSize = font->getStringDimensions(caption.c_str());
+			if(mAutoSizeX)
+				mStrSize = mFont->getStringDimensions(mCaption.c_str());
 			else {
-				if(multiLine) {	
-					strSize = font->getBoundedStringDimensions(caption.c_str(), tempRect);
+				if(mMultiLine) {
+					mStrSize = mFont->getBoundedStringDimensions(mCaption.c_str(), tempRect);
 				} else {
-					cutText(cuttedCaption, font, caption, tempRect);
-					strSize = font->getStringDimensions(cuttedCaption.c_str());
+					cutText(mCuttedCaption, mFont, mCaption, tempRect);
+					mStrSize = mFont->getStringDimensions(mCuttedCaption.c_str());
 				}
 			}
 
 		}
-		strWidth  = EXTENT_X(strSize);
-		strHeight = EXTENT_Y(strSize);
+		mStrWidth  = EXTENT_X(mStrSize);
+		mStrHeight = EXTENT_Y(mStrSize);
 
-		if(autoSizeX) resize(strWidth + mPaddingLeft + mPaddingRight, mBounds.height);
-		if(autoSizeY) resize(mBounds.width,  strHeight + mPaddingTop + mPaddingBottom);
+		if(mAutoSizeX) resize(mStrWidth + mPaddingLeft + mPaddingRight, mBounds.height);
+		if(mAutoSizeY) resize(mBounds.width,  mStrHeight + mPaddingTop + mPaddingBottom);
 	}
 
 	void Label::setMultiLine(bool b) {
 		//calcStrSize();
-		mustCalcStrSize = true;
-		multiLine = b;
+		mMustCalcStrSize = true;
+		mMultiLine = b;
 	}
 
 	bool Label::isMultiLine() {
-		return multiLine;
+		return mMultiLine;
 	}
 
 	void Label::setPaddingLeft(int l) {
 		Widget::setPaddingLeft(l);
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	void Label::setPaddingTop(int t) {
 		Widget::setPaddingTop(t);
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	void Label::setPaddingRight(int r) {
 		Widget::setPaddingRight(r);
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	void Label::setPaddingBottom(int b) {
 		Widget::setPaddingBottom(b);
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	void Label::resize(int width, int height) {
@@ -188,32 +184,32 @@ namespace MAUI {
 
 	void Label::getTextStart(int *x, int *y) {
 		//calcStrSize();
-		if(!autoSizeX) {
-			switch(horizontalAlignment) {
+		if(!mAutoSizeX) {
+			switch(mHorizontalAlignment) {
 				case HA_LEFT: *x =   0; break;
-				case HA_CENTER: *x = (mPaddedBounds.width)/2 - (strWidth/2); break;
-				case HA_RIGHT: *x =  (mPaddedBounds.width) - (strWidth); break;
+				case HA_CENTER: *x = (mPaddedBounds.width)/2 - (mStrWidth/2); break;
+				case HA_RIGHT: *x =  (mPaddedBounds.width) - (mStrWidth); break;
 			}
 		}
 
-		if(!autoSizeY) {
-			switch(verticalAlignment) {
+		if(!mAutoSizeY) {
+			switch(mVerticalAlignment) {
 				case VA_TOP: *y = 0; break;
-				case VA_CENTER: *y = (mPaddedBounds.height)/2 - (strHeight/2); break;
-				case VA_BOTTOM: *y = (mPaddedBounds.height) - (strHeight); break;
+				case VA_CENTER: *y = (mPaddedBounds.height)/2 - (mStrHeight/2); break;
+				case VA_BOTTOM: *y = (mPaddedBounds.height) - (mStrHeight); break;
 			}
 		}
 	}
 
 	void Label::update() {
 		Widget::update();
-		if(mustCalcStrSize) {
+		if(mMustCalcStrSize) {
 			calcStrSize();
 		}
 	}
 
 	void Label::drawWidget() {
-		const char* wStr = caption.c_str();
+		const char* wStr = mCaption.c_str();
 
 		//int textX=mPaddedBounds.x, textY=mPaddedBounds.y;
 		int textX=0, textY=0;
@@ -222,86 +218,86 @@ namespace MAUI {
 		getTextStart(&textX, &textY);
 
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-		if(font) {
-			if(multiLine)
-				font->drawBoundedString(wStr, textX, textY, tempRect);
+		if(mFont) {
+			if(mMultiLine)
+				mFont->drawBoundedString(wStr, textX, textY, tempRect);
 			else  {
 
-				if(autoSizeX)
-					font->drawString(wStr, textX, textY);
+				if(mAutoSizeX)
+					mFont->drawString(wStr, textX, textY);
 				else
-					font->drawString(cuttedCaption.c_str(), textX, textY);
+					mFont->drawString(mCuttedCaption.c_str(), textX, textY);
 			}
 		}
 	}
 
 	void Label::setHorizontalAlignment(Label::HorizontalAlignment alignment) {
-		this->horizontalAlignment = alignment;
+		this->mHorizontalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	Label::HorizontalAlignment Label::getHorizontalAlignment() const {
-		return horizontalAlignment;
+		return mHorizontalAlignment;
 	}
 
 	void Label::setVerticalAlignment(Label::VerticalAlignment alignment) {
-		this->verticalAlignment = alignment;
+		this->mVerticalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	Label::VerticalAlignment Label::getVerticalAlignment() const {
-		return verticalAlignment;
+		return mVerticalAlignment;
 	}
 
 	void Label::setAutoSizeX(bool f) {
-		this->autoSizeX = f;
+		this->mAutoSizeX = f;
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 		requestRepaint();
 	}
 
 	void Label::setAutoSizeY(bool f) {
-		this->autoSizeY = f;
+		this->mAutoSizeY = f;
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 		requestRepaint();
 	}
 
 	bool Label::getAutoSizeX() const {
-		return autoSizeX;
+		return mAutoSizeX;
 	}
 
 	bool Label::getAutoSizeY() const {
-		return autoSizeY;
+		return mAutoSizeY;
 	}
 
-	void Label::setCaption(const String& caption) {
-		this->caption = caption;
+	void Label::setCaption(const String& mCaption) {
+		this->mCaption = mCaption;
 		requestRepaint();
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	const String& Label::getCaption() const {
-		return caption;
+		return mCaption;
 	}
 
-	void Label::setFont(Font* font) {
-		if(font)
-			this->font = font;
+	void Label::setFont(Font* mFont) {
+		if(mFont)
+			this->mFont = mFont;
 		else
-			this->font = Engine::getSingleton().getDefaultFont();
+			this->mFont = Engine::getSingleton().getDefaultFont();
 		requestRepaint();
 		//calcStrSize();
-		mustCalcStrSize = true;
+		mMustCalcStrSize = true;
 	}
 
 	Font* Label::getFont() const {
-		return font;
+		return mFont;
 	}
 
 

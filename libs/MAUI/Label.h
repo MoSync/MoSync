@@ -125,28 +125,27 @@ namespace MAUI {
 
 	protected:
 		void getTextStart(int *x, int *y);
-
 		void drawWidget();
 		void resize(int width, int height);
-
-		bool mustCalcStrSize;
 		void calcStrSize();
 
-		String caption;
-		String cuttedCaption;
+		bool mMustCalcStrSize;
 
-		Font* font;
+		String mCaption;
+		String mCuttedCaption;
 
-		bool autoSizeX;
-		bool autoSizeY;
+		Font* mFont;
 
-		bool multiLine;
+		bool mAutoSizeX;
+		bool mAutoSizeY;
 
-		HorizontalAlignment horizontalAlignment;
-		VerticalAlignment   verticalAlignment; 
+		bool mMultiLine;
 
-		MAExtent strSize;
-		int strWidth, strHeight;
+		HorizontalAlignment mHorizontalAlignment;
+		VerticalAlignment   mVerticalAlignment;
+
+		MAExtent mStrSize;
+		int mStrWidth, mStrHeight;
 	};
 }
 

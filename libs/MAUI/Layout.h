@@ -126,18 +126,18 @@ namespace MAUI {
 		virtual void update();
 
 	protected:
-		bool mustRebuild;
 		void rebuild();
 
-		HorizontalAlignment alignmentX;
-		VerticalAlignment alignmentY;
-		int marginX;
-		int marginY;
-		bool autoSizeX;
-		bool autoSizeY;
-		int gridXSize;
-		int gridYSize;
-		int selectedIndex;
+		bool mMustRebuild;
+		HorizontalAlignment mAlignmentX;
+		VerticalAlignment mAlignmentY;
+		int mMarginX;
+		int mMarginY;
+		bool mAutoSizeX;
+		bool mAutoSizeY;
+		int mGridXSize;
+		int mGridYSize;
+		int mSelectedIndex;
 
 		//WidgetListener
 		void boundsChanged(Widget *widget, const Rect& bounds);

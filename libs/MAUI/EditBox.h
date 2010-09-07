@@ -172,27 +172,27 @@ namespace MAUI {
 
 		//Font* font;
 		//String text;
-		int cursorIndex;
-		bool manageNavigation;
+		int mCursorIndex;
+		bool mManageNavigation;
 	
-		bool active;
-		int cursorColor;
-		bool characterInputActive;
+		bool mActive;
+		int mCursorColor;
+		bool mCharacterInputActive;
 
 		//bool multiLine;
-		int currentLine;
+		int mCurrentLine;
 		//int currentIndex;
 
-		int maxLength;
+		int mMaxLength;
 
-		InputMode inputMode;
+		InputMode mInputMode;
 
-		Vector<EditBoxListener*> editBoxListeners;
+		Vector<EditBoxListener*> mEditBoxListeners;
 
-		bool caseToggle;
+		bool mCaseToggle;
 
-		bool passwordMode;
-		String password;
+		bool mPasswordMode;
+		String mPassword;
 	};
 }
 

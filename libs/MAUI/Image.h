@@ -65,9 +65,9 @@ namespace MAUI {
 	protected:
 		void drawWidget();
 
-		MAHandle resource;
-		bool autoSizeX, autoSizeY;
-		int imageWidth, imageHeight;
+		MAHandle mResource;
+		bool mAutoSizeX, mAutoSizeY;
+		int mImageWidth, mImageHeight;
 	};
 
 }

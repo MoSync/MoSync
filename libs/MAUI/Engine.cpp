@@ -28,46 +28,46 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
 namespace MAUI {
-	Engine* Engine::singletonPtr = 0;
+	Engine* Engine::mSingletonPtr = 0;
 	
 	Engine::Engine()
 	{
-		main = NULL;
-		defaultFont = NULL;
-		defaultSkin = NULL;
-		overlay = NULL;
-		singletonPtr = this;
+		mMain = NULL;
+		mDefaultFont = NULL;
+		mDefaultSkin = NULL;
+		mOverlay = NULL;
+		mSingletonPtr = this;
 		//clipStackPtr = -1;
 		Environment::getEnvironment().addFocusListener(this);
 	}
 	
-	void Engine::setMain(Widget* main) {
-		main->setPosition(main->getPosition().x, main->getPosition().y);
-		this->main = main;
+	void Engine::setMain(Widget* mMain) {
+		mMain->setPosition(mMain->getPosition().x, mMain->getPosition().y);
+		this->mMain = mMain;
 	}
 
 	Engine::~Engine()
 	{
-		if(main)
-			delete main;
-		singletonPtr = 0;
+		if(mMain)
+			delete mMain;
+		mSingletonPtr = 0;
 	}
 
 	void Engine::setDefaultSkin(WidgetSkin* systemSkin) {
-		this->defaultSkin = systemSkin;
+		this->mDefaultSkin = systemSkin;
 	}
 
 	void Engine::setDefaultFont(Font* defaultFont) {
-		this->defaultFont = defaultFont;
+		this->mDefaultFont = defaultFont;
 	}
 
 	WidgetSkin* Engine::getDefaultSkin() {
-		return defaultSkin;
+		return mDefaultSkin;
 	}
 
 	Font* Engine::getDefaultFont()
 	{
-		return defaultFont;
+		return mDefaultFont;
 	}
 
 /*	void Engine::clearClipRect()
@@ -181,7 +181,7 @@ namespace MAUI {
 	
 	void Engine::repaint() {
 		//lprintfln("repaint @ (%i ms)", maGetMilliSecondCount());
-		if(!main) return;
+		if(!mMain) return;
 		//printf("doing repaint!");
 		
 		//clearClipRect();
@@ -193,19 +193,19 @@ namespace MAUI {
 		int scrH = EXTENT_Y(maGetScrSize());
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
 		Gfx_pushClipRect(0, 0, scrW, scrH);
-		main->update();
-		main->draw();
+		mMain->update();
+		mMain->draw();
 		Gfx_popClipRect();
 
-		if(overlay) {
+		if(mOverlay) {
 			Gfx_clearClipRect();
 			Gfx_clearMatrix();
 			Gfx_pushClipRect(0, 0, scrW, scrH);
 
-			overlay->requestRepaint();
-			Gfx_translate(overlayPosition.x, overlayPosition.y);
-			overlay->update();
-			overlay->draw();
+			mOverlay->requestRepaint();
+			Gfx_translate(mOverlayPosition.x, mOverlayPosition.y);
+			mOverlay->update();
+			mOverlay->draw();
 		}
 
 		maUpdateScreen();
@@ -218,32 +218,32 @@ namespace MAUI {
 	}
 
 	Engine&	Engine::getSingleton() {
-		if(!singletonPtr)
-			singletonPtr = new Engine();
-		return *singletonPtr;
+		if(!mSingletonPtr)
+			mSingletonPtr = new Engine();
+		return *mSingletonPtr;
 	}
 
 
 
-	/* is an overlay shown? */
+	/* is an mOverlay shown? */
 	bool Engine::isOverlayShown() {
-		return overlay!=NULL;
+		return mOverlay!=NULL;
 	}
 
-	/* shows the overlay widget (passed as an argument). Put the top left
+	/* shows the mOverlay widget (passed as an argument). Put the top left
 	corner at position x and y. */
 	void Engine::showOverlay(int x, int y, Widget *overlay) {
-		overlayPosition.x = x; 
-		overlayPosition.y = y;
-		this->overlay = overlay;
-		overlay->requestRepaint();
-		main->requestRepaint();
+		mOverlayPosition.x = x;
+		mOverlayPosition.y = y;
+		this->mOverlay = overlay;
+		mOverlay->requestRepaint();
+		mMain->requestRepaint();
 	}
 		
-	/* hide the currently shown overlay. */
+	/* hide the currently shown mOverlay. */
 	void Engine::hideOverlay() {
-		overlay = NULL;
-		main->requestRepaint();
+		mOverlay = NULL;
+		mMain->requestRepaint();
 	}
 
 }

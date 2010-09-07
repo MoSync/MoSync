@@ -153,30 +153,24 @@ namespace MAUI {
 
 	protected:
 		void runTimerEvent();
-
 		void drawWidget();
-
-		bool mustRebuild;
 		void rebuild();
-
-		Vector<ItemSelectedListener*> itemSelectedListeners;
-		bool wrapping;
-		ListBoxAnimationType animationType;
-
-		ListBoxOrientation orientation;
-		int yOffsetFrom;
-		int yOffsetTo;
-		int yOffset;
-		int yOffsetInc;
-
-		int animTimeStart;
-
-		int selectedIndex;
-
-		bool autoSize;
-
-		//WidgetListener
 		void boundsChanged(Widget *widget, const Rect& bounds);
+
+		bool mMustRebuild;
+
+		Vector<ItemSelectedListener*> mItemSelectedListeners;
+		bool mWrapping;
+		ListBoxAnimationType mAnimationType;
+
+		ListBoxOrientation mOrientation;
+		int mYOffsetFrom;
+		int mYOffsetTo;
+		int mYOffset;
+		int mYOffsetInc;
+		int mAnimTimeStart;
+		int mSelectedIndex;
+		bool mAutoSize;
 	};
 }
 

@@ -308,7 +308,7 @@ namespace MAP
 	void MapWidget::drawWidget( )
 	//-------------------------------------------------------------------------
 	{
-		if ( !this->enabled ) 
+		if ( !this->mEnabled ) 
 			return;
 
 		Point widgetPos = getPosition( );
