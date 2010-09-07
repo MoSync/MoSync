@@ -16,8 +16,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 final static int REQUEST_ENABLE_BT = 2;
-static BluetoothAdapter mBluetoothAdapter = null;
+
 //static boolean mBluetoothGetNames = false;
+
+/**
+ * Reference to the Bluetooth adapter.
+ */
+BluetoothAdapter mBluetoothAdapter = null;
 
 /**
  * Thread that runs the discovery process.
@@ -30,6 +35,11 @@ BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
 ConcurrentLinkedQueue<BluetoothDevice> mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
 
 /**
+ * Flag that tells us whether the device scan was canceled or not.
+ */
+AtomicBoolean mDeviceDiscoveryAborted = new AtomicBoolean();
+
+/**
  * Start discovery of Bluetooth devices.
  * Parameter "names" is not used on Android.
  */
@@ -37,7 +47,10 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 {
 	if (null == mBluetoothDeviceDiscoveryThread)
 	{
-		// This is where devices will be saved for retrieval.
+		// The discovery is not aborted (yet).
+		mDeviceDiscoveryAborted.set(false);
+		
+		// List where devices are saved for retrieval.
 		mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
 		
 		// Create and start device discovery thread.
@@ -62,6 +75,11 @@ int maBtGetNewDevice(
 	Address addressPointer)
 {
 	ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
+	
+	if (mDeviceDiscoveryAborted.get())
+	{
+		return -1; // Error.
+	}
 	
 	if (null == deviceList)
 	{
@@ -161,27 +179,43 @@ int maBtGetNextServiceSize(Address dst) throws Exception
 
 int maBtCancelDiscovery() throws Exception
 {
-	// Cancel Android Bluetooth discovery.
-	if (mBluetoothAdapter.isDiscovering()) 
-	{
-		mBluetoothAdapter.cancelDiscovery();
-	}
-	
+	// Is there an device discovery thread?
 	if (null != mBluetoothDeviceDiscoveryThread)
 	{
+		Log.i("maBtCancelDiscovery", "************* ONE");
+		
+		// Set aborted flag.
+		mDeviceDiscoveryAborted.set(true);
+		
+		// Cancel Android Bluetooth discovery. This will send an
+		// event with action "BluetoothAdapter.ACTION_DISCOVERY_FINISHED".
+		// There we trap the aborted flag, do cleanup, and send canceled MoSync 
+		// event rather than a discovery finished event.
+		if (mBluetoothAdapter.isDiscovering()) 
+		{
+			Log.i("maBtCancelDiscovery", "************* TWO");
+			mBluetoothAdapter.cancelDiscovery();
+			return 1;
+		}
+	
+	/*
 		if (mBluetoothDeviceDiscoveryThread.isAlive())
 		{
+			Log.i("maBtCancelDiscovery", "************* THREE");
 			// Device discovery thread is running, terminate it.
 			mBluetoothDeviceDiscoveryThread.cancelDeviceDiscovery();
 			
 			return 1; // These was an active operation
 		}
+	*/
 	}
 	
 	// TODO: Add cancel of service discovery.
 	
 	return 0; // No active operation.
 }
+
+// E/BluetoothService.cpp( 1285): stopDiscoveryNative: D-Bus error in StopDiscovery: org.bluez.Error.Failed (Invalid discovery session)
 
 /**
  * Thread that performs discovery of Bluetooth devices.
@@ -202,7 +236,9 @@ class BluetoothDeviceDiscoveryThread extends Thread
 			Looper.prepare();
 			mLooper = Looper.myLooper();
 			initiateDeviceDiscovery();
+			Log.i("@@@@@@@@@@@@ run", "******** ONE");
 			Looper.loop();
+			Log.i("@@@@@@@@@@@@ run", "******** TWO");
 		}
 		catch (Throwable e)
 		{
@@ -210,6 +246,8 @@ class BluetoothDeviceDiscoveryThread extends Thread
 			e.printStackTrace();
 			mContext.unregisterReceiver(mBluetoothReciever);
 		}
+		
+		Log.i("@@@@@@@@@@@@ run", "******** THREE");
 	}
 	
 	int initiateDeviceDiscovery()
@@ -229,7 +267,7 @@ class BluetoothDeviceDiscoveryThread extends Thread
 		}
 
 		// If not enabled, open an activity for the user to enable Bluetooth.
-		// TODO: Fix this code.
+		// TODO: Test this code.
 		if (!mBluetoothAdapter.isEnabled())
 		{
 			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "!mBluetoothAdapter.isEnabled()");
@@ -269,6 +307,12 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	
 	void startDeviceDiscovery()
 	{
+		// Cancel any ongoing discovery on the Android level.
+		if (mBluetoothAdapter.isDiscovering()) 
+		{
+			mBluetoothAdapter.cancelDiscovery();
+		}
+		
 		// Create device listener.
 		mBluetoothReciever = new BroadcastReceiver()
 		{
@@ -293,30 +337,42 @@ class BluetoothDeviceDiscoveryThread extends Thread
 					//scanListener.deviceFound(tobounce);
 				}
 				else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
-				{
-					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "***************** Scan complete!");
-					deviceDiscoveryFinished();
-					stopDeviceDiscovery();
-					//scanListener.scanCompleted();
+				{					
+					if (mDeviceDiscoveryAborted.get())
+					{
+						Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "@@@@@@@@@@@@@@@@@ ACTION_DISCOVERY_FINISHED - SCAN ABORTED");
+
+						// Scan was canceled, report Bluetooth event with state CONNERR_CANCELED.
+						deviceDiscoveryCanceled();
+						
+						// Stop discovery thread and cleanup.
+						stopDeviceDiscovery();
+					}
+					else
+					{
+						Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "***************** ACTION_DISCOVERY_FINISHED - SCAN FINISHED");
+						
+						// Scan is successfully finished, report Bluetooth with result.
+						deviceDiscoveryFinished();
+						
+						// Stop discovery thread and cleanup.
+						stopDeviceDiscovery();
+						
+						//scanListener.scanCompleted();
+					}
 				}
 			}
 		};
 		
 		// Register receiver.
-		// TODO: When should we unregister?
+		// Unregister
 		//   on BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 		//   on abort (maBtCancelDiscovery)
-		//   on error
+		//   on error (in catch clause)
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		mContext.registerReceiver(mBluetoothReciever, filter);
-		
-		// Cancel any ongoing discovery on the Android level.
-		if (mBluetoothAdapter.isDiscovering()) 
-		{
-			mBluetoothAdapter.cancelDiscovery();
-		}
 		
 		// Start discovery on the Android level.
 		mBluetoothAdapter.startDiscovery();
@@ -324,9 +380,14 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	
 	void stopDeviceDiscovery()
 	{
-		mLooper.quit();
+		Log.i("stopDeviceDiscovery", "******** ONE");
+		
+		// Quit the thread and set thread variable to null.
 		mContext.unregisterReceiver(mBluetoothReciever);
+		mLooper.quit();
 		mBluetoothDeviceDiscoveryThread = null;
+		
+		Log.i("stopDeviceDiscovery", "******** TWO");
 	}
 	
 	void cancelDeviceDiscovery()
@@ -337,6 +398,7 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	
 	void deviceFound(BluetoothDevice device)
 	{
+		// Add device to list.
 		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
 		if (null != deviceList)
 		{
@@ -347,6 +409,7 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	
 	void deviceDiscoveryFinished()
 	{
+		// Post event with number of devices found + 1.
 		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
 		if (null != deviceList)
 		{
@@ -356,6 +419,7 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	
 	void deviceDiscoveryCanceled()
 	{
+		// Empty device list and set to null.
 		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
 		if (null != deviceList)
 		{
@@ -364,6 +428,8 @@ class BluetoothDeviceDiscoveryThread extends Thread
 			while (null != deviceList.poll()) { }
 		}
 		mBluetoothDevices = null;
+		
+		// Post cancel event.
 		postBluetoothMessage(CONNERR_CANCELED); 
 	}
 	
