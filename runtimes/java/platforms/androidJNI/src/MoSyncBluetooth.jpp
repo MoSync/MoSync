@@ -15,6 +15,35 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+
+// 00001101-0000-1000-8000-00805F9B34FB
+// 00001101-0000-1000-8000-00805F9B34FB
+// http://stackoverflow.com/questions/3397071/android-bluetooth-service-discovery-failed-exception
+
+/*
+I got it working, the problem was that I needed to pair with the
+device first (for some reason it kept an incorrect PIN and wouldn't
+pair). Here is a snippet
+BluetoothDevice device;
+BluetoothSocket tmpsock = null;
+int port = 1;
+...
+try
+{
+Method m = device.getClass().getMethod("createRfcommSocket", new
+Class[] { int.class });
+tmpsock = (BluetoothSocket)m.invoke(device, port);
+Log.d(TAG, "CONNECTING...");
+tmpsock.connect();
+...
+}
+catch (Exception e)
+{
+Log.e(TAG, "Failed to connect", e);
+...
+}
+*/
+
 final static int REQUEST_ENABLE_BT = 2;
 
 //static boolean mBluetoothGetNames = false;

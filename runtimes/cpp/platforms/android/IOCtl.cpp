@@ -21,7 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace Base
 {
-
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
 	{	
 		int size = maGetScrSize();
@@ -33,18 +32,18 @@ namespace Base
 		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
 		free(b);
 	
-		info->bitsPerPixel = 24;//backBuffer->bitsPerPixel;
+		info->bitsPerPixel = 32;//backBuffer->bitsPerPixel;
 		info->bytesPerPixel = 4;//backBuffer->bytesPerPixel;
-		info->redMask = 0x00ff0000; //backBuffer->redMask;
+		info->redMask = 0xff0000ff; //backBuffer->redMask;
 		info->greenMask = 0x0000ff00;// backBuffer->greenMask;
-		info->blueMask = 0x0000000ff; //backBuffer->blueMask;
+		info->blueMask = 0x00ff0000; //backBuffer->blueMask;
 		info->sizeInBytes = width * height * 4; //backBuffer->pitch*backBuffer->height;
 		info->width = width; //backBuffer->width;
 		info->height = height; // backBuffer->height;
 		info->pitch = width*4; //backBuffer->pitch;
-		info->redShift = 16; //backBuffer->redShift;
-		info->greenShift = 9; //backBuffer->greenShift;
-		info->blueShift = 0; //backBuffer->blueShift;
+		info->redShift = 0; //backBuffer->redShift;
+		info->greenShift = 8; //backBuffer->greenShift;
+		info->blueShift = 16; //backBuffer->blueShift;
 		info->redBits = 8;// backBuffer->redBits;
 		info->greenBits = 8;// backBuffer->greenBits;
 		info->blueBits = 8; //backBuffer->blueBits;
@@ -52,6 +51,7 @@ namespace Base
 
 		return 1;
 	}
+
 
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis)
 	{
