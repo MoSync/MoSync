@@ -83,7 +83,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import android.media.MediaPlayer;
 
-#define _ANDROID_BLUETOOTH
+//#define _ANDROID_BLUETOOTH
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
