@@ -1641,7 +1641,10 @@ interface MAAPI {
 		* A BT event contains the state of the Bluetooth Discovery operation.
 		* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
 		* 0 while still working and
-		* ((number of devices/services found) + 1) on success.
+		* ((number of devices/services found) + 1) when the discovery is complete.
+
+		* The reason for the (+1) is to distinguish "still working" from
+		* "discovery complete, zero found".
 
 		* The buffers are cleared when the respective operation is started, so any devices or services
 		* left over in the buffers from an earlier operation will be lost.
@@ -1784,7 +1787,7 @@ interface MAAPI {
 
 		/**
 		* Cancels any active discovery operation.
-		* If an operation was canceled, its last BT event will have the status #CONNERR_CANCELED.
+		* If an operation was canceled, its last BT event will have the state #CONNERR_CANCELED.
 		* This is an asynchronous operation. If this function returns 1,
 		* it is not safe to start another discovery before
 		* you've recieved the #CONNERR_CANCELED event.
@@ -1819,7 +1822,7 @@ interface MAAPI {
 
 		/**
 		* Causes EVENT_TYPE_WLAN. Returns \<0 on failure.
-		* WLAN events' status are \>0 when the discovery is complete,
+		* WLAN events' state are \>0 when the discovery is complete,
 		* 0 when it's still going on, \<0 on error.
 		*/
 		int maWlanStartDiscovery();
