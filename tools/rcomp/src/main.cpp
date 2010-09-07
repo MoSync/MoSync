@@ -586,7 +586,7 @@ int main(int argc, char * argv[])
 		char uidcrc_params[512];
 		const int ret = snprintf(uidcrc_params,
 					 sizeof(uidcrc_params),
-					 "%s %s %s %s %s",
+					 "%s %s %s %s \"%s\"",
 					 uidcrcTool,
 					 uidcrcUIDs[0],
 					 uidcrcUIDs[1],

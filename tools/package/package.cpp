@@ -122,7 +122,11 @@ const char* mosyncdir() {
 
 void sh(const char* cmd) {
 	printf("%s\n", cmd);
+	fflush(stdout);
+	fflush(stderr);
 	int res = system(cmd);
+	fflush(stdout);
+	fflush(stderr);
 	if(res != 0) {
 		printf("System error %i\n", res);
 		exit(res);
