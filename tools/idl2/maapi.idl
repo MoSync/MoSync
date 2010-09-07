@@ -287,7 +287,7 @@ interface MAAPI {
 	double sqrt(in double x);
 
 	/**
-	 * A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
+	 * \brief A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
 	 */
 	struct MAPoint2d {
 		int x;
@@ -295,8 +295,10 @@ interface MAAPI {
 	}
 
 	/**
-	 * A structure representing a rectangle, with 'left' and 'top' being the x and y coordinate of the top-left corner. 
-	 * And width and height being the dimensions of the rectangle.
+	 * \brief A structure representing a rectangle.
+	 * 
+	 * The x and y coordinate of the top-left corner are defined by 'left' and 'top'.
+	 * The dimensions of the rectangle are defined by 'width' and 'height'.
 	 */
 	struct MARect {
 		int left;
@@ -566,7 +568,7 @@ interface MAAPI {
 	void maWriteData(in MAHandle data, in MAAddress src, in int offset, in int size);
 
 	/**
-	* Parameters for the maCopyData() function.
+	* \brief Parameters for the maCopyData() function.
 	*/
 	struct MACopyData {
 		MAHandle dst;
@@ -823,7 +825,7 @@ interface MAAPI {
 	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
 	/**
-	* An address for the TCP/IPv4 protocol.
+	* \brief An address for the TCP/IPv4 protocol.
 	*/
 	struct MAConnAddrInet4 {
 		int addr;
@@ -835,7 +837,7 @@ interface MAAPI {
 	}
 
 	/**
-	* A Bluetooth device address.
+	* \brief A Bluetooth device address.
 	*/
 	struct MABtAddr {
 		byte a[BTADDR_LEN];
@@ -843,7 +845,7 @@ interface MAAPI {
 
 
 	/**
-	* An address for the Bluetooth Serial Port protocol.
+	* \brief An address for the Bluetooth Serial Port protocol.
 	*/
 	struct MAConnAddrBt {
 		int port;
@@ -855,6 +857,9 @@ interface MAAPI {
 		BT = 2;
 	}
 
+	/**
+	* \brief A connection address.
+	*/
 	struct MAConnAddr {
 		/// One of the CONN_FAMILY constants
 		int family;
@@ -1229,6 +1234,9 @@ interface MAAPI {
 		CHAR = 22;
 	}
 
+	/**
+	* \brief Data for a connection event, including an indicator or success or failure.
+	*/
 	struct MAConnEventData {
 		/// The handle to the connection associated with the event.
 		MAHandle handle;
@@ -1237,7 +1245,10 @@ interface MAAPI {
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
 	}
-
+	
+	/**
+	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
+	*/
 	struct MAEvent {
 		/**
 		* One of the \link #EVENT_TYPE_CLOSE EVENT_TYPE \endlink constants.
@@ -1397,7 +1408,8 @@ interface MAAPI {
 	}
 
 	/**
-	* Describes a MoSync Panic or other unrecoverable error.
+	* \brief A MoSync Panic or other unrecoverable error.
+	*
 	* In MoSync Debug builds, when such an error occurs, the runtime writes
 	* an instance of this structure to a Store named "panic.report".
 	*
@@ -1653,7 +1665,7 @@ interface MAAPI {
 		/**@{*/
 
 		/**
-		* Information about a Bluetooth device.
+		* \brief Information about a Bluetooth device.
 		*/
 		struct MABtDevice {
 			///in (pointer), out (buffer)
@@ -1667,7 +1679,7 @@ interface MAAPI {
 		}
 
 		/**
-		* A Universally Unique Identifier.
+		* \brief A Universally Unique Identifier.
 		*
 		* Common Bluetooth UUID values can be found in MAUtil/mauuid.h.
 		*/
@@ -1676,7 +1688,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Information about a MABtService object.
+		* \brief Information about an MABtService object.
 		*/
 		struct MABtServiceSize {
 			/**
@@ -1691,7 +1703,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Information about a Bluetooth service.
+		* \brief Information about a Bluetooth service.
 		*/
 		struct MABtService {
 			/**
@@ -1804,11 +1816,16 @@ interface MAAPI {
 		constset int WLAN_ADDR_ {
 			LEN = 6;
 		}
-
+		/**
+		* \brief A WLAN address.
+		*/
 		struct MAWlanAddr {
 			byte a[WLAN_ADDR_LEN];
 		}
-
+		
+		/**
+		* \brief A WLAN access point.
+		*/
 		struct MAWlanAp {
 			/// out
 			MAWlanAddr address;
@@ -1840,6 +1857,8 @@ interface MAAPI {
 #endif	//IX_WLAN
 
 		/**
+		* \brief A geographical location specified by latitude and longitude, horizontal and vertical accuracy, and altitude.
+		*
 		* Only if \a state equals #MA_LOC_QUALIFIED do the other members contain valid data.
 		*
 		* Coordinates are in the WGS84 datum.
@@ -2267,9 +2286,12 @@ interface MAAPI {
 #endif	//IX_RECORD_AUDIO
 
 #if IX_CELLID
-		//Stores current cell id in *cellId.
-		//returns the negated Symbian error code. 0 on success.
-
+		/**
+		* \brief Information about the current cell, including country, network and area code and the cell ID.
+		*
+		* Stores current cell id in *cellId.
+		* Returns the negated Symbian error code. 0 on success.
+		*/
 		struct MACellInfo {
 			/**
 			* Mobile Country Code. Identifies the country whose cellular network the phone
@@ -2365,6 +2387,9 @@ interface MAAPI {
 		int maSoundPlayConn(in MAHandle conn, in MAString mimeType);
 
 		//TODO: when streaming goes public, make this part of the union instead of custom.
+		/**
+		* \brief Event data associated with an audio stream.
+		*/
 		struct MAStreamEventData {
 			/// One of the \link #STREAMEVENT_OPEN_COMPLETE STREAMEVENT \endlink constants.
 			int event;
@@ -2477,10 +2502,9 @@ interface MAAPI {
 #endif	//IX_STREAMING
 
 		/**
-		* A structure containing information about the native framebuffer, 
-		* with things like color format and resolution. The 'sizeInBytes' field is 
-		* the amount of bytes that should be used to allocate the offscreen framebuffer 
-		* (a backbuffer). 
+		* \brief A structure containing information about the native framebuffer, including color format and resolution. 
+		* 
+		* The 'sizeInBytes' field is the amount of bytes that should be used to allocate the offscreen framebuffer (a backbuffer). 
 		*/
 		struct MAFrameBufferInfo {
 			int sizeInBytes;         // The size in bytes of the frame buffer, is calculated as width*pitch.
@@ -2530,6 +2554,9 @@ interface MAAPI {
 			U16 = 4;
 		}
 
+		/**
+		* \brief Information about an audio buffer, including format, sample rate, channels, and size.
+		*/
 		struct MAAudioBufferInfo {
 			int fmt;	//one of the AUDIO_FMT constants
 			int sampleRate;	//in hertz
@@ -2811,6 +2838,12 @@ interface MAAPI {
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
+		/**
+		* \brief Arguments for PIM functions.
+		*
+		* \deprecated
+		*/		
+		
 		struct MA_PIM_ARGS {
 			/// Opened by maPimListNext().
 			MAHandle item;
@@ -2849,6 +2882,9 @@ interface MAAPI {
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
+		/**
+		* \brief The camera format, in pixels.
+		*/
 		struct MA_CAMERA_FORMAT {
 			//in pixels.
 			int width;

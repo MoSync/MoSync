@@ -319,6 +319,9 @@ namespace MAUtil {
 		*/
 		void runIdleListeners();
 
+		/**
+		* \brief A timer event.
+		*/
 		class TimerEventInstance {
 		public:
 			TimerEventInstance(TimerListener* tl, int period, int numTimes); 
