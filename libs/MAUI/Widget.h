@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Geometry.h>
 #include "WidgetSkin.h"
 #include "InputPolicy.h"
+#include "Style.h"
 
 #ifdef MAUI_LOGGING
 #include <conprint.h>
@@ -371,6 +372,9 @@ namespace MAUI {
 			InputPolicy* getInputPolicy();
 			void setInputPolicy(InputPolicy* ip);
 
+			void setStyle(const Style* style);
+			const Style* getStyle();
+
 	protected:
 
 		/**
@@ -447,6 +451,7 @@ namespace MAUI {
 		int mPaddingRight;
 
 		InputPolicy* mInputPolicy;
+		const Style* mStyle;
 	};
 
 }

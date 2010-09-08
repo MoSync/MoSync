@@ -47,7 +47,8 @@ namespace MAUI {
 			mPaddingTop(0),
 			mPaddingBottom(0),
 			mPaddingRight(0),
-			mInputPolicy(NULL)
+			mInputPolicy(NULL),
+			mStyle(NULL)
 		{
 		
 		mInputPolicy = new DefaultInputPolicy(this);
@@ -580,5 +581,14 @@ namespace MAUI {
 		if(mInputPolicy) delete mInputPolicy;
 		mInputPolicy = ip;
 	}
+
+	void Widget::setStyle(const Style* style) {
+		mStyle = style;
+	}
+
+	const Style* Widget::getStyle() {
+		return mStyle;
+	}
+
 
 }

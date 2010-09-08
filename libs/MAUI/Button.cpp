@@ -3,7 +3,7 @@
 
 namespace MAUI {
 
-Button::Button(int x, int y, int width, int height, Widget* parent) : Widget(x, y, width, height, parent), mPressed(false) {
+Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Widget(x, y, width, height, parent), mPressed(false), mCaption(caption) {
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
@@ -19,12 +19,27 @@ bool Button::pointerReleased(MAPoint2d p, int id) {
 }
 
 void Button::drawWidget() {
-	const ButtonStyle* style = (const ButtonStyle*)Engine::getSingleton().getDefaultStyle("Button");
-	style->getSafe<SkinProperty>(0)->draw(0, 0, mBounds.width, mBounds.height, mPressed?WidgetSkin::SELECTED:WidgetSkin::UNSELECTED);
+	if(mStyle == NULL)
+		mStyle = Engine::getSingleton().getDefaultStyle("Button");
+
+	const ButtonStyle* style = (const ButtonStyle*)mStyle;
+	style->getSafe<SkinProperty>(ButtonStyle::SKIN)->draw(0, 0, mBounds.width, mBounds.height, mPressed?WidgetSkin::SELECTED:WidgetSkin::UNSELECTED);
+
+	int offs = mPressed?1:0;
+
+	FontProperty* font = style->getSafe<FontProperty>(ButtonStyle::FONT);
+	MAExtent dim = font->getStringDimensions(mCaption.c_str());
+	font->drawString(mCaption.c_str(), (mBounds.width>>1)-(EXTENT_X(dim)>>1)+offs, (mBounds.height>>1)-(EXTENT_Y(dim)>>1)+offs);
 }
 
-ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed) : Style(1) {
-	this->mProperties[0] = new SkinProperty(pressed, notpressed, 12, 19, 12, 18, true, true);
+void Button::setCaption(const String& caption) {
+	mCaption = caption;
+	requestRepaint();
+}
+
+ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) : Style(2) {
+	this->mProperties[SKIN] = new SkinProperty(pressed, notpressed, startX, endX, startY, endY, selectedTransparent, unselectedTransparent);
+	this->mProperties[FONT] = new FontProperty(font);
 }
 
 

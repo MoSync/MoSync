@@ -3,3 +3,14 @@
 
 .res RES_UNSELECTED
 .image "res/Button_notPressed.png"
+
+.res RES_SELECTED2
+.image "res/background_tile_sel.png"
+
+.res RES_UNSELECTED2
+.image "res/background_tile_unsel.png"
+
+
+.res RES_FONT
+.bin 
+.include "res/pretty.mof"
