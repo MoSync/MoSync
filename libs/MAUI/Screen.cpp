@@ -111,4 +111,43 @@ namespace MAUI {
 	Widget* Screen::getFocusedWidget() {
 		return mFocusedWidget;
 	}
+
+	void Screen::keyPressEvent(int keyCode, int nativeCode) {
+		if(mFocusedWidget) {
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(ip)
+				ip->keyPressed(keyCode, nativeCode);
+		}
+	}
+	void Screen::keyReleaseEvent(int keyCode, int nativeCode) {
+		if(mFocusedWidget) {
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(ip)
+				ip->keyReleased(keyCode, nativeCode);
+		}
+	}
+	void Screen::pointerPressEvent(MAPoint2d point) {
+		Widget* newFocus = mMain->focusableWidgetAt(point.x, point.y);
+		if(newFocus) {
+			mFocusedWidget = newFocus;
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(ip)
+				ip->pointerPressed(point, 0);
+		}
+
+	}
+	void Screen::pointerReleaseEvent(MAPoint2d point) {
+		if(mFocusedWidget) {
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(ip)
+				ip->pointerReleased(point, 0);
+		}
+	}
+	void Screen::pointerMoveEvent(MAPoint2d point) {
+		if(mFocusedWidget) {
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(ip)
+				ip->pointerMoved(point, 0);
+		}
+	}
 }

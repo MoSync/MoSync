@@ -18,6 +18,7 @@ namespace MAUI {
 
 	class InputPolicy {
 	public:
+		InputPolicy(Widget* owner);
 		void setOwner(Widget *widget);
 		Widget* getOwner();
 
@@ -32,13 +33,13 @@ namespace MAUI {
 		virtual bool pointerReleased(MAPoint2d p, int id);
 
 	protected:
-		Widget *owner;
-		Widget *focus;
+		Widget *mOwner;
 	};
 
 
 	class DefaultInputPolicy : public InputPolicy {
 	public:
+		DefaultInputPolicy(Widget* owner);
 		virtual bool keyPressed(int keyCode, int nativeCode);
 		virtual bool keyReleased(int keyCode, int nativeCode);
 		virtual bool pointerPressed(MAPoint2d p, int id);

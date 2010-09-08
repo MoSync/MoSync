@@ -13,12 +13,15 @@ Direction mapKeyCodeToDirection(int keyCode) {
 	}
 }
 
+InputPolicy::InputPolicy(Widget* owner) : mOwner(owner) {
+}
+
 void InputPolicy::setOwner(Widget *widget) {
-	owner = widget;
+	mOwner = widget;
 }
 
 Widget* InputPolicy::getOwner() {
-	return owner;
+	return mOwner;
 }
 
 // returns true if focus should be changed.
@@ -40,9 +43,11 @@ bool InputPolicy::pointerMoved(MAPoint2d p, int id) {
 bool InputPolicy::pointerReleased(MAPoint2d p, int id) {
 	return false;
 }
+DefaultInputPolicy::DefaultInputPolicy(Widget* owner) : InputPolicy(owner) {
+}
 
 bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
-	bool ret = owner->keyPressed(keyCode, nativeCode);
+	bool ret = mOwner->keyPressed(keyCode, nativeCode);
 	if (!ret) {
 		Direction dir = mapKeyCodeToDirection(keyCode);
 		if (dir != NONE) {
@@ -60,19 +65,19 @@ bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
 }
 
 bool DefaultInputPolicy::keyReleased(int keyCode, int nativeCode) {
-	return owner->keyReleased(keyCode, nativeCode);
+	return mOwner->keyReleased(keyCode, nativeCode);
 }
 
 bool DefaultInputPolicy::pointerPressed(MAPoint2d p, int id) {
-	return owner->pointerPressed(p, id);
+	return mOwner->pointerPressed(p, id);
 }
 
 bool DefaultInputPolicy::pointerMoved(MAPoint2d p, int id) {
-	return owner->pointerMoved(p, id);
+	return mOwner->pointerMoved(p, id);
 }
 
 bool DefaultInputPolicy::pointerReleased(MAPoint2d p, int id) {
-	return owner->pointerReleased(p, id);
+	return mOwner->pointerReleased(p, id);
 }
 
 } // namespace MAUI

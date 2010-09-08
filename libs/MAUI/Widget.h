@@ -217,6 +217,9 @@ namespace MAUI {
 		Widget* widgetAt(const Point& p);
 		Widget* widgetAt(int x, int y);
 
+		Widget* focusableWidgetAt(const Point& p);
+		Widget* focusableWidgetAt(int x, int y);
+
 		// Properties, geometry
 
 		/**
@@ -364,6 +367,10 @@ namespace MAUI {
 			Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
 			Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
 			Widget* getFocusableInDirectionFrom(Widget* w, Direction dir);
+
+			InputPolicy* getInputPolicy();
+			void setInputPolicy(InputPolicy* ip);
+
 	protected:
 
 		/**
@@ -438,6 +445,8 @@ namespace MAUI {
 		int mPaddingTop;
 		int mPaddingBottom;
 		int mPaddingRight;
+
+		InputPolicy* mInputPolicy;
 	};
 
 }

@@ -46,9 +46,11 @@ namespace MAUI {
 			mPaddingLeft(0),
 			mPaddingTop(0),
 			mPaddingBottom(0),
-			mPaddingRight(0)
+			mPaddingRight(0),
+			mInputPolicy(NULL)
 		{
 		
+		mInputPolicy = new DefaultInputPolicy(this);
 		mSkin = Engine::getSingleton().getDefaultSkin();
 		
 		if(parent) {
@@ -266,6 +268,26 @@ namespace MAUI {
 		return NULL;
 	}
 
+	Widget* Widget::focusableWidgetAt(const Point& p) {
+		return focusableWidgetAt(p.x, p.y);
+	}
+
+	Widget* Widget::focusableWidgetAt(int x, int y) {
+		if(!isFocusable()) {
+			Vector_each(Widget *, it, mChildren) {
+				Widget *ret = (*it)->focusableWidgetAt(x, y);
+				if(ret) {
+					return ret;
+				}
+			}
+		} else {
+			if(mBounds.contains(x, y)) {
+				return this;
+			}
+		}
+		return NULL;
+	}
+
 	void Widget::requestRepaint() {
 		Engine::getSingleton().requestUIUpdate();
 		setDirty();
@@ -448,7 +470,7 @@ namespace MAUI {
 	}
 
 	void Widget::setParameter(const String& name, const String& value) {
-		if(name == "mPaddingLeft") setPaddingLeft(stringToInteger(value));
+		if(name == "paddingLeft") setPaddingLeft(stringToInteger(value));
 		else if(name == "paddingTop") setPaddingTop(stringToInteger(value));
 		else if(name == "paddingBottom") setPaddingBottom(stringToInteger(value));
 		else if(name == "paddingRight") setPaddingRight(stringToInteger(value));
@@ -470,14 +492,17 @@ namespace MAUI {
 	}
 
 	bool Widget::pointerPressed(MAPoint2d p, int id) {
+		MAUI_LOG("Widget::pointerPressed! %x", this);
 		return false;
 	}
 
 	bool Widget::pointerMoved(MAPoint2d p, int id) {
+		MAUI_LOG("Widget::pointerMoved! %x", this);
 		return false;
 	}
 
 	bool Widget::pointerReleased(MAPoint2d p, int id) {
+		MAUI_LOG("Widget::pointerReleased! %x", this);
 		return false;
 	}
 
@@ -545,6 +570,15 @@ namespace MAUI {
 		} else {
 			return mParent->getFocusableInDirectionFrom(w, dir);
 		}
-
 	}
+
+	InputPolicy* Widget::getInputPolicy() {
+		return mInputPolicy;
+	}
+
+	void Widget::setInputPolicy(InputPolicy* ip) {
+		if(mInputPolicy) delete mInputPolicy;
+		mInputPolicy = ip;
+	}
+
 }
