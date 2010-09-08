@@ -46,7 +46,7 @@ namespace MAUI {
 	class ButtonStyle : public Style {
 	public:
 		enum {
-			SKIN = 0,
+			SKIN = Style::PROP_END,
 			FONT
 		};
 

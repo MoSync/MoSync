@@ -98,6 +98,14 @@ public:
 
 class Style {
 public:
+	enum {
+		PADDING_LEFT=0,
+		PADDING_RIGHT=1,
+		PADDING_TOP=2,
+		PADDING_BOTTOM=3,
+		PROP_END
+	};
+
 	Style(int numProperties);
 
 	template<typename T>

@@ -584,11 +584,19 @@ namespace MAUI {
 
 	void Widget::setStyle(const Style* style) {
 		mStyle = style;
+		restyle();
 	}
 
 	const Style* Widget::getStyle() {
 		return mStyle;
 	}
 
+
+	void Widget::restyle() {
+		setPaddingLeft(mStyle->getSafe<IntegerProperty>(Style::PADDING_LEFT)->mValue);
+		setPaddingRight(mStyle->getSafe<IntegerProperty>(Style::PADDING_RIGHT)->mValue);
+		setPaddingTop(mStyle->getSafe<IntegerProperty>(Style::PADDING_TOP)->mValue);
+		setPaddingBottom(mStyle->getSafe<IntegerProperty>(Style::PADDING_BOTTOM)->mValue);
+	}
 
 }

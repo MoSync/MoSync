@@ -418,6 +418,8 @@ namespace MAUI {
 		 */
 		void setDirty(bool d=true);
 
+		virtual void restyle();
+
 		// a list of pointers to the children of the widget
 		Vector<Widget*> mChildren;
 
