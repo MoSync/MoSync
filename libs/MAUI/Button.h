@@ -37,6 +37,7 @@ namespace MAUI {
 		bool pointerReleased(MAPoint2d p, int id);
 		void setCaption(const String& caption);
 
+		virtual bool isTransparent() const;
 	protected:
 		void drawWidget();
 		String mCaption;
@@ -49,7 +50,6 @@ namespace MAUI {
 			SKIN = Style::PROP_END,
 			FONT
 		};
-
 		ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent);
 
 	};

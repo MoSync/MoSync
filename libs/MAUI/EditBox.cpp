@@ -45,7 +45,7 @@ namespace MAUI {
 
 	EditBox::EditBox(int x, int y, int width, int height, Widget* parent, const String &text,
 		int backColor, Font* mFont, bool manageNavigation, bool mMultiLine, int maxLength, InputMode inputMode) :
-		Label(x, y, width, height, parent, text, backColor, mFont),
+		Label(x, y, width, height, parent, text),
 		mCursorIndex(0),
 		mManageNavigation(manageNavigation),
 		mActive(false),
@@ -58,8 +58,8 @@ namespace MAUI {
 		mCaseToggle(true),
 		mPasswordMode(false)
 	{
-		setBackgroundColor(backColor);
-		setDrawBackground(true);	
+		//setBackgroundColor(backColor);
+		//setDrawBackground(true);
 
 		setMultiLine(mMultiLine);
 

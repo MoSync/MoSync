@@ -26,7 +26,7 @@ namespace MAUI {
 		mAutoSizeX(mAutoSizeX),
 		mAutoSizeY(mAutoSizeY)
 	{ 
-		setDrawBackground(false);
+		//setDrawBackground(false);
 		setResource(res);
 
 	}

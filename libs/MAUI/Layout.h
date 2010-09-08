@@ -125,6 +125,8 @@ namespace MAUI {
 
 		virtual void update();
 
+		virtual bool isTransparent() const;
+
 	protected:
 		void rebuild();
 

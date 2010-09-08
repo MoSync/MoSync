@@ -38,6 +38,11 @@ void Button::setCaption(const String& caption) {
 	requestRepaint();
 }
 
+bool Button::isTransparent() const {
+	return true;
+}
+
+
 ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) : Style(2) {
 	this->mProperties[SKIN] = new SkinProperty(pressed, notpressed, startX, endX, startY, endY, selectedTransparent, unselectedTransparent);
 	this->mProperties[FONT] = new FontProperty(font);

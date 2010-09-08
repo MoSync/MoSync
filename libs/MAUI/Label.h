@@ -71,8 +71,7 @@ namespace MAUI {
 		  * \param backColor the background color of the widget.
 		  * \param font the font to be used by to render the caption.
 		  */
-		Label(int x, int y, int width, int height, Widget* parent, const String &caption,
-			int backColor, Font* font);
+		Label(int x, int y, int width, int height, Widget* parent, const String &caption);
 
 		/** Turns multiline mode on or off **/
 		void setMultiLine(bool b=true);
@@ -119,15 +118,20 @@ namespace MAUI {
 		void setPaddingRight(int r);
 		void setPaddingBottom(int b);
 
-		virtual void setParameter(const String& name, const String& value);
-	
 		void update();
 
+		virtual bool isTransparent() const;
+
 	protected:
+
+
 		void getTextStart(int *x, int *y);
 		void drawWidget();
 		void resize(int width, int height);
 		void calcStrSize();
+
+		virtual void restyle();
+
 
 		bool mMustCalcStrSize;
 
@@ -147,6 +151,16 @@ namespace MAUI {
 		MAExtent mStrSize;
 		int mStrWidth, mStrHeight;
 	};
+
+	class LabelStyle : public Style {
+	public:
+		enum {
+			FONT = Style::PROP_END
+		};
+		LabelStyle(MAHandle font);
+
+	};
+
 }
 
 #endif	//_SE_MSAB_MAUI_LABEL_H_

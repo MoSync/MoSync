@@ -262,9 +262,9 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
 
 			if(res) {
-				if((isDirty() || forceDraw) && mShouldDrawBackground) {
+				/*if((isDirty() || forceDraw) && mShouldDrawBackground) {
 					drawBackground();
-				}
+				}*/
 
 				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
 				//mPaddedBounds.width, mPaddedBounds.height);
@@ -318,9 +318,9 @@ namespace MAUI {
 
 			if(res) 
 			{
-				if((isDirty() || forceDraw) && mShouldDrawBackground) {
+				/*if((isDirty() || forceDraw) && mShouldDrawBackground) {
 					drawBackground();
-				}
+				}*/
 	
 				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
 				//mPaddedBounds.width, mPaddedBounds.height);

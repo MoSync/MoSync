@@ -192,24 +192,7 @@ namespace MAUI {
 		 * has a skin that is transparent in the current selection state (selected/unselected) 
 		 * or if it has no solid background color. 
 		 */
-		virtual bool isTransparent() const;
-
-		/**
-		 * Assigns a widget skin to be used during the rendering of the widget. What
-		 * The skin applies to varies depending on the widget. Labels extend the skin
-		 * over their entire area, while listboxes apply the skin to each individual
-		 * item they contain.
-		 */
-		virtual void setSkin(WidgetSkin *widgetSkin);
-
-		/**
-		 * Sets the background drawing state. If b is true, the Widget's background
-		 * will be drawn - otherwise not. In most cases, the background is either a
-		 * constant color or a skin.
-		 */
-		void setDrawBackground(bool b=true);
-
-		void setBackgroundColor(int col);
+		virtual bool isTransparent() const = 0;
 
 		/**
 		 * Returns a pointer to the first child widget or deeper descendant,
@@ -347,8 +330,6 @@ namespace MAUI {
 
 		const Rect& getPaddedBounds() const;
 
-		virtual void setParameter(const String& name, const String& value);
-		
 		/**
 		 *	Deletes all children.
 		 */ 
@@ -434,10 +415,6 @@ namespace MAUI {
 
 		bool mDirty;
 
-		WidgetSkin *mSkin;
-		int	mBackColor;
-		bool mShouldDrawBackground;
-		
 		// used to keep which state the widget is in (selected or unselected)
 		bool mSelected;
 		bool mEnabled;

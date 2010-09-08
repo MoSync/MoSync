@@ -89,12 +89,9 @@ namespace MAUI {
 		this->mFont = Engine::getSingleton().getDefaultFont();
 
 		//calcStrSize();
-		setDrawBackground();
-		setBackgroundColor(0xffff00ff);
 	}
 
-	Label::Label(int x, int y, int width, int height, Widget* parent, const String &caption,
-		int backColor, Font* font) :
+	Label::Label(int x, int y, int width, int height, Widget* parent, const String &caption) :
 		Widget(x, y, width, height, parent),
 		mMustCalcStrSize(true),
 		mCaption(""),
@@ -105,16 +102,17 @@ namespace MAUI {
 		mHorizontalAlignment(HA_LEFT),
 		mVerticalAlignment(VA_TOP)
 	{
-		if(!font)
+		/*if(!font)
 		{
 			this->mFont = Engine::getSingleton().getDefaultFont();
 		} else {
 			this->mFont = font;
-		}
+		} */
+		mStyle = Engine::getSingleton().getDefaultStyle("Label");
 
 		setCaption(caption);
 		requestRepaint();
-		this->setBackgroundColor(backColor);
+		//this->setBackgroundColor(backColor);
 		//calcStrSize();
 	}
 
@@ -218,7 +216,10 @@ namespace MAUI {
 		getTextStart(&textX, &textY);
 
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
+
+		if(!mFont) setStyle(Engine::getSingleton().getDefaultStyle("Label"));
 		if(mFont) {
+
 			if(mMultiLine)
 				mFont->drawBoundedString(wStr, textX, textY, tempRect);
 			else  {
@@ -228,6 +229,9 @@ namespace MAUI {
 				else
 					mFont->drawString(mCuttedCaption.c_str(), textX, textY);
 			}
+		}
+		else {
+			MAUI_LOG("MISSING A FONT!!!");
 		}
 	}
 
@@ -286,37 +290,25 @@ namespace MAUI {
 		return mCaption;
 	}
 
-	void Label::setFont(Font* mFont) {
-		if(mFont)
-			this->mFont = mFont;
-		else
-			this->mFont = Engine::getSingleton().getDefaultFont();
-		requestRepaint();
-		//calcStrSize();
+	bool Label::isTransparent() const {
+		return true;
+	}
+
+
+	void Label::restyle() {
+		MAUI_LOG("***** restyle called!!!");
+		const LabelStyle* style = (const LabelStyle*)mStyle;
+		mFont = (MAUI::Font*)style->getSafe<FontProperty>(LabelStyle::FONT);
+
 		mMustCalcStrSize = true;
-	}
-
-	Font* Label::getFont() const {
-		return mFont;
+		requestRepaint();
 	}
 
 
-	void Label::setParameter(const String& name, const String& value) {
-		if(name == "caption") this->setCaption(value);
-		else if(name == "autoSizeX") this->setAutoSizeX(value=="true"?true:false);
-		else if(name == "autoSizeY") this->setAutoSizeY(value=="true"?true:false);
-		else if(name == "horizontalAlignment") {
-			if(value == "left") setHorizontalAlignment(HA_LEFT);
-			else if(value == "right") setHorizontalAlignment(HA_RIGHT);
-			else if(value == "center") setHorizontalAlignment(HA_CENTER);
-			else maPanic(0, "MAUI::Label wrong parameter");
-		} 
-		else if(name == "verticalAlignment") {
-			if(value == "top") setVerticalAlignment(VA_TOP);
-			else if(value == "bottom") setVerticalAlignment(VA_BOTTOM);
-			else if(value == "center") setVerticalAlignment(VA_CENTER);
-			else maPanic(0, "MAUI::Label wrong parameter");
-		}
-		else Widget::setParameter(name, value);
+	LabelStyle::LabelStyle(MAHandle font) : Style(1) {
+		this->mProperties[FONT] = new FontProperty(font);
 	}
+
+
+
 }

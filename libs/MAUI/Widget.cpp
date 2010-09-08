@@ -38,9 +38,6 @@ namespace MAUI {
 	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL)
 		: mParent(NULL), mBounds(0,0,width,height), mRelX(x), mRelY(y),
 			mDirty(false),
-			mSkin(NULL),
-			mBackColor(0),
-			mShouldDrawBackground(true),
 			mSelected(false),
 			mEnabled(true),
 			mPaddingLeft(0),
@@ -50,13 +47,14 @@ namespace MAUI {
 			mInputPolicy(NULL),
 			mStyle(NULL)
 		{
-		
+		MAUI_LOG("What? 1");
 		mInputPolicy = new DefaultInputPolicy(this);
-		mSkin = Engine::getSingleton().getDefaultSkin();
-		
-		if(parent) {
+		MAUI_LOG("What? 2");
+			if(parent) {
 			parent->add(this);
 		}
+		MAUI_LOG("What? 3");
+
 		updateAbsolutePosition();
 	}
 
@@ -90,51 +88,6 @@ namespace MAUI {
 		return mBounds.contains(x, y);
 	}
 
-	bool Widget::isTransparent() const {
-		if(mSelected)
-			return (mSkin!=NULL && mSkin->isSelectedTransparent()==true)  || (!mShouldDrawBackground);
-		else
-			return (mSkin!=NULL && mSkin->isUnselectedTransparent()==true)  || (!mShouldDrawBackground);
-	}
-
-	void Widget::drawBackground() {
-		//printf("in drawBackground!\n");
-		if(mSkin) {
-			if(mSelected)
-				//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
-				mSkin->draw(0, 0, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
-			else
-				//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
-					mSkin->draw(0, 0, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
-		} else {
-			maSetColor(mBackColor);
-			//maSetColor(0xffff00ff);
-			//printf("filling rect!!!\n");
-			//maFillRect(mBounds.x,mBounds.y, mBounds.width, mBounds.height);
-			Gfx_fillRect(0, 0, mBounds.width, mBounds.height);
-		}
-	}
-
-	/*
-	void Widget::draw() {
-		WLOG("Widget:draw");
-		Engine &engine = Engine::getSingleton();
-		
-		bool res = engine.pushClipRectIntersect(mBounds.x, mBounds.y,
-			mBounds.width, mBounds.height);
-		if(res && isDirty()) {
-			if(mShouldDrawBackground) {
-				drawBackground();
-			}
-			drawWidget();
-			setDirty(false);
-		}
-
-		Vector_each(Widget*, it, mChildren)
-			(*it)->draw();
-
-		engine.popClipRect();
-	}*/
 
 	void Widget::update() {
 		Vector_each(Widget*, it, mChildren)
@@ -157,15 +110,14 @@ namespace MAUI {
 		{
 			if(isDirty() || forceDraw) 
 			{
-				if(mShouldDrawBackground)
+				/*if(mShouldDrawBackground)
 				{
 					drawBackground();
-				}
+				}*/
 			}
-			//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
-			//	mPaddedBounds.width, mPaddedBounds.height);
-			Gfx_translate(mPaddingLeft, mPaddingTop);
-			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
+			// Widgets must now do this by themselves
+			//Gfx_translate(mPaddingLeft, mPaddingTop);
+			//BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 			if(res) {
 
@@ -176,8 +128,8 @@ namespace MAUI {
 
 			}
 
-			//engine.popClipRect();
-			Gfx_popClipRect();
+			// This commented out to match removal of above intersectClipRect() call.
+			//Gfx_popClipRect();
 			setDirty(false);
 		}
 		Gfx_popMatrix();
@@ -293,11 +245,17 @@ namespace MAUI {
 		Engine::getSingleton().requestUIUpdate();
 		setDirty();
 
-		if(isTransparent()) {
+		MAUI_LOG("this: 0x%x", this);
+		MAUI_LOG("bäh? 1");
+
+		//if(isTransparent()) {
+			//MAUI_LOG("bäh? 2");
 			if(mParent) {
 				mParent->requestRepaint();
 			}
-		}
+		//}
+		MAUI_LOG("bäh? 3");
+
 	}
 
 	bool Widget::isDirty() const {
@@ -311,21 +269,6 @@ namespace MAUI {
 			Vector_each(Widget*, it, mChildren)
 				(*it)->setDirty(d);
 		}
-	}
-
-	void Widget::setSkin(WidgetSkin *mSkin) {
-		this->mSkin = mSkin;
-		requestRepaint();
-	}
-
-	void Widget::setDrawBackground(bool b) {
-		this->mShouldDrawBackground = b;
-		requestRepaint();
-	}
-
-	void Widget::setBackgroundColor(int col) {
-		this->mBackColor = col;
-		requestRepaint();
 	}
 
 	void Widget::updateAbsolutePositionChildren(int x, int y) {
@@ -468,20 +411,6 @@ namespace MAUI {
 
 	const Rect& Widget::getPaddedBounds() const {
 		return mPaddedBounds;
-	}
-
-	void Widget::setParameter(const String& name, const String& value) {
-		if(name == "paddingLeft") setPaddingLeft(stringToInteger(value));
-		else if(name == "paddingTop") setPaddingTop(stringToInteger(value));
-		else if(name == "paddingBottom") setPaddingBottom(stringToInteger(value));
-		else if(name == "paddingRight") setPaddingRight(stringToInteger(value));
-		else if(name == "backgroundColor") setBackgroundColor(stringToInteger(value));
-		else if(name == "drawBackground") setDrawBackground(value=="true"?true:false);
-		else if(name == "width") setWidth(stringToInteger(value));
-		else if(name == "height") setHeight(stringToInteger(value));
-		else if(name == "x") this->setPosition(stringToInteger(value), getPosition().y);
-		else if(name == "y") this->setPosition(getPosition().x, stringToInteger(value));
-		else maPanic(0, "MAUI::Widget wrong parameter");
 	}
 
 	bool Widget::keyPressed(int keyCode, int nativeCode) {

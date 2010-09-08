@@ -33,7 +33,7 @@ namespace MAUI {
 	mGridXSize(2),
 	mGridYSize(2),
 	mSelectedIndex(0) {
-		setDrawBackground(false);	
+		//setDrawBackground(false);
 		requestRepaint();
 	}
 
@@ -50,7 +50,7 @@ namespace MAUI {
 	mGridYSize(gridYSize),
 	mSelectedIndex(0)
 	{
-		setDrawBackground(false);	
+		//setDrawBackground(false);
 		requestRepaint();
 	}
 
@@ -332,6 +332,11 @@ namespace MAUI {
 		Widget::update();
 		if(mMustRebuild) rebuild();
 	}
+
+	bool Layout::isTransparent() const {
+		return true;
+	}
+
 
 
 	/*
