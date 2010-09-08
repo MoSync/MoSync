@@ -58,7 +58,6 @@ public:
 	}
 
 	unsigned char r, g, b, a;
-private:
 	static Type sType;
 };
 
@@ -66,7 +65,6 @@ class FontProperty : public Property, public Font {
 public:
 	FontProperty(MAHandle font) : Property(sType), Font(font) {
 	}
-private:
 	static Type sType;
 };
 
@@ -76,7 +74,6 @@ public:
 		Property(sType), WidgetSkin(selectedImage, unselectedImage, x1, x2, y1, y2, selectedTransparent, unselectedTransparent) {
 
 	}
-private:
 	static Type sType;
 };
 
@@ -86,7 +83,6 @@ public:
 	}
 
 	MAHandle mHandle;
-private:
 	static Type sType;
 };
 
@@ -96,7 +92,6 @@ public:
 	}
 
 	int mValue;
-private:
 	static Type sType;
 };
 
@@ -114,21 +109,12 @@ public:
 	}
 
 	template<typename T>
-	const T* get(int id) const {
-		return get(id);
-	}
-
-	template<typename T>
 	T* getSafe(int id) const {
-		T* prop = get(id);
+		T* prop = get<T>(id);
 		if(!prop) maPanic(1, "Failed to retrieve style property.");
 		return prop;
 	}
 
-	template<typename T>
-	const T* getSafe(int id) const {
-		return getSafe(id);
-	}
 
 
 protected:

@@ -1,0 +1,5 @@
+.res RES_SELECTED
+.image "res/Button_pressed.png"
+
+.res RES_UNSELECTED
+.image "res/Button_notPressed.png"
