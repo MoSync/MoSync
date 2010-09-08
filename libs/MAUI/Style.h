@@ -25,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _MAUI_STYLE_H_
 
 #include <ma.h>
+#include "Font.h"
+#include "WidgetSkin.h"
 #include <MAUtil/Vector.h>
 
 namespace MAUI {
@@ -34,8 +36,9 @@ public:
 	enum Type {
 		COLOR,
 		FONT,
+		SKIN,
 		IMAGE,
-		SKIN
+		INTEGER
 	};
 
 	Property(Type type);
@@ -49,15 +52,54 @@ public:
 protected:
 };
 
-class Color : public Property {
+class ColorProperty : public Property {
 public:
-	Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : Property(sType), r(r), g(g), b(b), a(a) {
+	ColorProperty(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : Property(sType), r(r), g(g), b(b), a(a) {
 	}
 
 	unsigned char r, g, b, a;
 private:
 	static Type sType;
 };
+
+class FontProperty : public Property, public Font {
+public:
+	FontProperty(MAHandle font) : Property(sType), Font(font) {
+	}
+private:
+	static Type sType;
+};
+
+class SkinProperty : public Property, public WidgetSkin {
+public:
+	SkinProperty(MAHandle selectedImage, MAHandle unselectedImage, int x1, int x2, int y1, int y2, bool selectedTransparent=true, bool unselectedTransparent=true) :
+		Property(sType), WidgetSkin(selectedImage, unselectedImage, x1, x2, y1, y2, selectedTransparent, unselectedTransparent) {
+
+	}
+private:
+	static Type sType;
+};
+
+class ImageProperty : public Property {
+public:
+	ImageProperty(MAHandle img) : Property(sType), mHandle(img) {
+	}
+
+	MAHandle mHandle;
+private:
+	static Type sType;
+};
+
+class IntegerProperty : public Property {
+public:
+	IntegerProperty(int val) : Property(sType), mValue(val) {
+	}
+
+	int mValue;
+private:
+	static Type sType;
+};
+
 
 class Style {
 public:
