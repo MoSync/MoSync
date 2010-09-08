@@ -453,6 +453,8 @@ namespace MAUI {
 		int mPaddingRight;
 
 		InputPolicy* mInputPolicy;
+
+private:
 		const Style* mStyle;
 	};
 

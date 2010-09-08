@@ -19,10 +19,11 @@ bool Button::pointerReleased(MAPoint2d p, int id) {
 }
 
 void Button::drawWidget() {
-	if(mStyle == NULL)
-		mStyle = Engine::getSingleton().getDefaultStyle("Button");
-
-	const ButtonStyle* style = (const ButtonStyle*)mStyle;
+	const ButtonStyle* style = (const ButtonStyle*)getStyle();
+	if(style == NULL) {
+		style = (const ButtonStyle*)Engine::getSingleton().getDefaultStyle("Button");
+		setStyle(style);
+	}
 	style->getSafe<SkinProperty>(ButtonStyle::SKIN)->draw(0, 0, mBounds.width, mBounds.height, mPressed?WidgetSkin::SELECTED:WidgetSkin::UNSELECTED);
 
 	int offs = mPressed?1:0;
