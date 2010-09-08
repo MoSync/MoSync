@@ -142,6 +142,8 @@ namespace MAUI {
 			if(ip)
 				ip->pointerReleased(point, 0);
 		}
+
+		mFocusedWidget = NULL;
 	}
 	void Screen::pointerMoveEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
