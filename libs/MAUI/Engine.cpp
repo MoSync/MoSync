@@ -23,6 +23,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Graphics.h>
 
+using namespace MAUtil;
+
 //#define PUSH_EMPTY_CLIPRECT pushClipRect(0,0,0,0)
 
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
@@ -244,6 +246,16 @@ namespace MAUI {
 	void Engine::hideOverlay() {
 		mOverlay = NULL;
 		mMain->requestRepaint();
+	}
+
+	void Engine::setDefaultStyle(const String& widgetType, Style* style) {
+		mDefaultStyles.insert(widgetType, style);
+	}
+
+	const Style* Engine::getDefaultStyle(const String& widgetType) const {
+		Map<String, Style*>::ConstIterator iter = mDefaultStyles.find(widgetType);
+		if(iter != mDefaultStyles.end()) return iter->second;
+		else return NULL;
 	}
 
 }

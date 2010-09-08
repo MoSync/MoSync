@@ -106,12 +106,30 @@ public:
 	Style(int numProperties);
 
 	template<typename T>
-	T* get(int id) {
+	T* get(int id) const {
+		if(id<0 || id>=mProperties.size()) return NULL;
 		Property* prop = mProperties[id];
 		if(prop->getType()==T::sType) return (T*)prop;
 		else return NULL;
-
 	}
+
+	template<typename T>
+	const T* get(int id) const {
+		return get(id);
+	}
+
+	template<typename T>
+	T* getSafe(int id) const {
+		T* prop = get(id);
+		if(!prop) maPanic(1, "Failed to retrieve style property.");
+		return prop;
+	}
+
+	template<typename T>
+	const T* getSafe(int id) const {
+		return getSafe(id);
+	}
+
 
 protected:
 	MAUtil::Vector<Property*> mProperties;

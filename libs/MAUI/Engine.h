@@ -26,8 +26,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Widget.h"
 #include "Font.h"
+#include "Style.h"
 
+#include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
+#include <MAUtil/String.h>
 #include <MAUtil/Environment.h>
 
 namespace MAUI {
@@ -94,6 +97,10 @@ namespace MAUI {
 		/* hide the currently shown overlay. */
 		void hideOverlay();
 
+		// if style already has been set, it just overwrites the element (not deleting the pointer).
+		void setDefaultStyle(const String& widgetType, Style* style);
+		const Style* getDefaultStyle(const String& widgetType) const;
+
 	protected:
 		Widget *mOverlay;
 		Point mOverlayPosition;
@@ -105,6 +112,9 @@ namespace MAUI {
 		static Engine* mSingletonPtr;
 
 		bool mCharacterInputActive;
+
+		// possibly change this to hash map.
+		MAUtil::Map<String, Style*> mDefaultStyles;
 
 	private:
 		Engine();

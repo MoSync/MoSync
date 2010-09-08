@@ -10,6 +10,7 @@ Property::Type IntegerProperty::sType = Property::INTEGER;
 Property::Property(Type type) : mType(type) {
 }
 
-
+Style::Style(int numProperties) : mProperties(numProperties) {
+}
 
 } // namespace MAUI
