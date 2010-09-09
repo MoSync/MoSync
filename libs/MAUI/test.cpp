@@ -30,37 +30,24 @@ protected:
 class MyScreen : public Screen {
 public:
 	MyScreen() {
-		lprintfln("foo PAH 1");
 			LabelStyle* labelStyle = new LabelStyle(RES_FONT);
 			ButtonStyle* buttonStyle = new ButtonStyle(RES_SELECTED, RES_UNSELECTED, RES_FONT, 12, 19, 12, 18, true, true);
 			ButtonStyle* buttonStyle2 = new ButtonStyle(RES_SELECTED2, RES_UNSELECTED2, RES_FONT, 16, 32, 16, 32, true, true);
 			Engine::getSingleton().setDefaultStyle("Label", labelStyle);
 			Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
-			lprintfln("foo PAH 2");
 
 			//l = new Label(0, 0, 50, 50, NULL, "", 0, NULL);
 			l = new Layout(0, 0, 50, 50, NULL, 3, 2);
-			lprintfln("foo PAH 2:1");
 			l->setAutoSizeX(true);
-			lprintfln("foo PAH 2:2");
 			l1 = new Button(10, 10, 50, 50, l, "a");
 			l2 = new Button(70, 10, 50, 50, l, "b");
-			lprintfln("foo PAH 2:3");
 			l2->setStyle(buttonStyle2);
-
-			lprintfln("foo PAH 3");
-
 			l3 = new Button(10, 70, 50, 50, l, "c");
 			l4 = new Button(70, 70, 50, 50, l, "d");
 			l5 = new Button(130, 10, 50, 120, l, "e");
 			l6 = new Label(10, 130, 120, 50, l, "Flump");
 
-			lprintfln("foo PAH 4");
-
 			setMain(l);
-
-			lprintfln("foo PAH 5");
-
 	}
 	
 	~MyScreen() {

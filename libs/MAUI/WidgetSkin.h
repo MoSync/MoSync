@@ -36,12 +36,11 @@ namespace MAUI {
 	/** \brief A customizable skin for widgets.
 	 * 
 	 * A WidgetSkin is a class used to define the visual appearance
-	 * of a widget. It is instantiated by passing an image for the
-	 * selected and unselected mode, and two coordinates telling how 
-	 * to divide the image into 9 segments. These segments are then 
-	 * used as information of how to tile the skin to different widget 
-	 * sizes. The constructor also takes parameters telling if the 
-	 * selected or unselected images are transparent or not, used to 
+	 * of a widget. It is instantiated by passing an image , and two
+	 * coordinates telling how to divide the image into 9 segments.
+	 * These segments are then used as information of how to tile the
+	 * skin to different widget sizes. The constructor also takes parameters
+	 * telling if the image is transparent or not, used to
 	 * optimize MAUI drawing.
 	 **/
 	class WidgetSkin {
@@ -52,9 +51,9 @@ namespace MAUI {
 		WidgetSkin();
 
 		/**
-		 * The WidgetSkin constructor takes two images (selected and unselected) 
-		 * and 2 coordinate pairs, defining the 9 segments of the images. Finally
-		 * it takes two bools that specifies if the images are transparent or not
+		 * The WidgetSkin constructor takes one image
+		 * and 2 coordinate pairs, defining the 9 segments of the image. Finally
+		 * it takes one bool that specifies if the image is transparent or not
 		 * (default true).
 		 **/
 		WidgetSkin(MAHandle image, int x1, int x2, int y1, int y2, bool transparent=true);

@@ -45,7 +45,6 @@ namespace MAUI {
 		Environment::getEnvironment().addPointerListener(this);
 	}
 	
-	
 	void Screen::setMain(Widget* main) {
 		MAExtent scrSize = maGetScrSize();
 		this->mMain = main;

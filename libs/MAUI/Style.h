@@ -106,6 +106,8 @@ public:
 		PROP_END
 	};
 
+	// The constructor will make room for numProperties + Style::PROP_END properties, make sure
+	// property id:s for a derieved style class starts at Style::PROP_END
 	Style(int numProperties);
 
 	template<typename T>

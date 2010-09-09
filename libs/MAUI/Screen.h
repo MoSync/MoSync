@@ -16,10 +16,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** 
-* \file Screen.h 
-* \brief A full screen, a container for widgets
-* \author Patrick Broman and Niklas Nummelin
-*/
+ * \file Screen.h
+ * \brief A full screen, a container for widgets
+ * \author Patrick Broman and Niklas Nummelin
+ */
 
 #ifndef _MAUI_SCREEN_H_
 #define _MAUI_SCREEN_H_
@@ -28,56 +28,74 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Environment.h>
 
 /**
-* \brief MoSync graphical user interface classes
-*/
+ * \brief MoSync graphical user interface classes
+ */
 
 namespace MAUI {
 
 	using namespace MAUtil;
 
-	/** \brief A displayable screen; a container for MAUI widgets.
-	  *
-	  * A Screen is a logically distinct part of a MAUI interface.
-	  * MAUI applications typically consist of a number of screens
-	  * that the user can navigate between.
-	  **/
-
+	/**
+	 * \brief A displayable screen; a container for MAUI widgets.
+	 *
+	 * A Screen is a logically distinct part of a MAUI interface.
+	 * MAUI applications typically consist of a number of screens
+	 * that the user can navigate between.
+	 */
 	class Screen : public KeyListener, public PointerListener {
 	public:
 		Screen();
-		/** Causes this screen to be shown and all other screens in
-		  * the application to be hidden.
-		  **/
+
+		/**
+		 * Causes this screen to be shown and all other screens in
+		 * the application to be hidden.
+		 */
 		virtual void show();
-		/** Sets the main widget for this screen. The widget will
-		  * be resized to match the screen resolution of the device **/
+
+		/**
+		 * Sets the main widget for this screen. The widget will
+		 * be resized to match the screen resolution of the device
+		 */
 		void setMain(Widget* main);
-		/** Returns the main widget of this screen **/
+
+		/**
+		 * Returns the main widget of this screen
+		 */
 		Widget* getMain();
-		/** keylistener implementation to overload when inheriting 
-		  * your own screens.
-		  **/
+
+		/**
+		 * keylistener implementation to overload when inheriting
+		 * your own screens.
+		 */
 		virtual void keyPressEvent(int keyCode, int nativeCode);
-		/** keylistener implementation to overload when inheriting 
-		  * your own screens.
-		  **/
+
+		/**
+		 * keylistener implementation to overload when inheriting
+		 * your own screens.
+		 */
 		virtual void keyReleaseEvent(int keyCode, int nativeCode);
-		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
-		  **/
+
+		/**
+		 * pointerlistener implementation to overload when inheriting
+		 * your own screens.
+		 */
 		virtual void pointerPressEvent(MAPoint2d point);
-		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
-		  **/
+
+		/**
+		 * pointerlistener implementation to overload when inheriting
+		 * your own screens.
+		 */
 		virtual void pointerReleaseEvent(MAPoint2d point);
-		/** pointerlistener implementation to overload when inheriting 
-		  * your own screens.
-		  **/
+
+		/**
+		 * pointerlistener implementation to overload when inheriting
+		 * your own screens.
+		 */
 		virtual void pointerMoveEvent(MAPoint2d point);
 
 		/**
-		* Does not delete the main Widget.
-		*/
+		 * Does not delete the main Widget.
+		 */
 		~Screen();
 
 		/**
@@ -85,7 +103,14 @@ namespace MAUI {
 		 */
 		static Screen* getCurrentScreen();
 
+		/**
+		 * Sets the currently focused widget.
+		 */
 		void setFocusedWidget(Widget *w);
+
+		/**
+		 * Gets the currently focused widget.
+		 */
 		Widget* getFocusedWidget();
 
 	protected:
