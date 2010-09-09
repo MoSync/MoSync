@@ -100,6 +100,8 @@ namespace MAUI {
 		/** Destructor **/
 		virtual ~ListBox();
 
+		virtual bool isTransparent() const;
+
 		/** Adds the Widget w as a child of the listbox **/
 		void add(Widget *w);
 

@@ -597,4 +597,9 @@ namespace MAUI {
 			}
 		}
 	}
+
+
+	bool ListBox::isTransparent() const {
+		return true;
+	}
 }
