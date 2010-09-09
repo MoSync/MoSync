@@ -24,7 +24,11 @@ void Button::drawWidget() {
 		style = (const ButtonStyle*)Engine::getSingleton().getDefaultStyle("Button");
 		setStyle(style);
 	}
-	style->getSafe<SkinProperty>(ButtonStyle::SKIN)->draw(0, 0, mBounds.width, mBounds.height, mPressed?WidgetSkin::SELECTED:WidgetSkin::UNSELECTED);
+
+	if(mPressed)
+		style->getSafe<SkinProperty>(ButtonStyle::SKIN_PRESSED)->draw(0, 0, mBounds.width, mBounds.height);
+	else
+		style->getSafe<SkinProperty>(ButtonStyle::SKIN_RELEASED)->draw(0, 0, mBounds.width, mBounds.height);
 
 	int offs = mPressed?1:0;
 
@@ -42,9 +46,9 @@ bool Button::isTransparent() const {
 	return true;
 }
 
-
-ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) : Style(2) {
-	this->mProperties[SKIN] = new SkinProperty(pressed, notpressed, startX, endX, startY, endY, selectedTransparent, unselectedTransparent);
+ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) : Style(3) {
+	this->mProperties[SKIN_PRESSED] = new SkinProperty(pressed, startX, endX, startY, endY, selectedTransparent);
+	this->mProperties[SKIN_RELEASED] = new SkinProperty(notpressed, startX, endX, startY, endY, unselectedTransparent);
 	this->mProperties[FONT] = new FontProperty(font);
 }
 

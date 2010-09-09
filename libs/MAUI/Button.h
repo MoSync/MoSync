@@ -47,7 +47,8 @@ namespace MAUI {
 	class ButtonStyle : public Style {
 	public:
 		enum {
-			SKIN = Style::PROP_END,
+			SKIN_PRESSED = Style::PROP_END,
+			SKIN_RELEASED,
 			FONT
 		};
 		ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent);

@@ -108,7 +108,7 @@ namespace MAUI {
 		} else {
 			this->mFont = font;
 		} */
-		mStyle = Engine::getSingleton().getDefaultStyle("Label");
+		setStyle(Engine::getSingleton().getDefaultStyle("Label"));
 
 		setCaption(caption);
 		requestRepaint();
@@ -297,7 +297,7 @@ namespace MAUI {
 
 	void Label::restyle() {
 		MAUI_LOG("***** restyle called!!!");
-		const LabelStyle* style = (const LabelStyle*)mStyle;
+		const LabelStyle* style = (const LabelStyle*)getStyle();
 		mFont = (MAUI::Font*)style->getSafe<FontProperty>(LabelStyle::FONT);
 
 		mMustCalcStrSize = true;

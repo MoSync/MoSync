@@ -21,94 +21,48 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
-		return THashFunction<int>(data.w | (data.h<<12) | (((int)data.type)<<24)) - THashFunction<int>((int)data.skin);
+		return THashFunction<int>(data.w | (data.h<<12)) - THashFunction<int>((int)data.skin);
 	}	
 }
 
 namespace MAUI {
 
 	WidgetSkin::WidgetSkin() :
-		mSelectedImage(0),
-		mUnselectedImage(0),
+		mImage(0),
 		mStartX(16),
 		mEndX(32),
 		mStartY(16),
 		mEndY(32),
-		mSelectedTransparent(true),
-		mUnselectedTransparent(true)
+		mTransparent(true)
 		{
 			rebuildRects();
 	}
 
-	WidgetSkin::WidgetSkin(MAHandle mSelectedImage, MAHandle mUnselectedImage, int mStartX, int mEndX, int mStartY, int mEndY, bool mSelectedTransparent, bool mUnselectedTransparent) :
-		mSelectedImage(0),
-		mUnselectedImage(0),
-		mStartX(mStartX),
-		mEndX(mEndX),
-		mStartY(mStartY),
-		mEndY(mEndY),
-		mSelectedTransparent(mSelectedTransparent),
-		mUnselectedTransparent(mUnselectedTransparent)
+	WidgetSkin::WidgetSkin(MAHandle image, int startX, int endX, int startY, int endY, bool transparent) :
+		mImage(0),
+		mStartX(startX),
+		mEndX(endX),
+		mStartY(startY),
+		mEndY(endY),
+		mTransparent(transparent)
 		{
-			setSelectedImage(mSelectedImage);
-			setUnselectedImage(mUnselectedImage);
+			setImage(image);
 			rebuildRects();
 	}
 
-	MAHandle WidgetSkin::getUnselectedImage() const {
-		return mUnselectedImage;
+	MAHandle WidgetSkin::getImage() const {
+		return mImage;
 	}
 
-	MAHandle WidgetSkin::getSelectedImage() const {
-		return mSelectedImage;
-	}
-
-	void WidgetSkin::setSelectedImage(MAHandle image) {
-		this->mSelectedImage = image;
-		if(!mSelectedImage) return;
+	void WidgetSkin::setImage(MAHandle image) {
+		this->mImage = image;
+		if(!mImage) return;
 		MAExtent imgSize = maGetImageSize(image);
 		
-		mSelectedImageWidth = EXTENT_X(imgSize);
-		mSelectedImageHeight = EXTENT_Y(imgSize);
-
-		if(mUnselectedImage) {
-			if(mUnselectedImageHeight!=mSelectedImageHeight ||
-				mUnselectedImageWidth!=mSelectedImageWidth) {
-				mSelectedImageWidth = 0;
-				mSelectedImageHeight = 0;
-				mSelectedImage = 0;
-				maPanic(0, "Not the same dimension on WidgetSkin mSelectedImage as mUnselectedImage");
-			}
-		} else {
-			mImageWidth = mSelectedImageWidth;
-			mImageHeight = mSelectedImageHeight;
-		}
+		mImageWidth = EXTENT_X(imgSize);
+		mImageHeight = EXTENT_Y(imgSize);
 
 		rebuildRects();
-	}
-
-	void WidgetSkin::setUnselectedImage(MAHandle image) {
-		this->mUnselectedImage = image;
-		if(!mUnselectedImage) return;
-		MAExtent imgSize = maGetImageSize(image);
-		
-		mUnselectedImageWidth = EXTENT_X(imgSize);
-		mUnselectedImageHeight = EXTENT_Y(imgSize);
-
-		if(mSelectedImage) {
-			if(mUnselectedImageHeight!=mSelectedImageHeight ||
-				mUnselectedImageWidth!=mSelectedImageWidth) {
-				mUnselectedImageWidth = 0;
-				mUnselectedImageHeight = 0;
-				mUnselectedImage = 0;
-				maPanic(0, "Not the same dimension on WidgetSkin mUnselectedImage as mSelectedImage");
-			}
-		} else {
-			mImageWidth = mUnselectedImageWidth;
-			mImageHeight = mUnselectedImageHeight;
-		}
-
-		rebuildRects();	
 	}
 
 	void WidgetSkin::setStartX(int x) {
@@ -223,17 +177,17 @@ namespace MAUI {
 		
 	}
 		
-	void WidgetSkin::draw(int x, int y, int width, int height, eType type) {
+	void WidgetSkin::draw(int x, int y, int width, int height) {
 		MAHandle cached = 0;
 
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
 		int numTiles = calculateNumTiles(width, height);
 		if(!mUseCache || numTiles<100) {
-			drawDirect(x, y, width, height, type);
+			drawDirect(x, y, width, height);
 			return;
 		}
 		
-		CacheKey newKey = CacheKey(this, width, height, type);
+		CacheKey newKey = CacheKey(this, width, height);
 		cached =  getFromCache(newKey);
 		
 		// If we didn't find a cached widgetskin, let's generate one and save it in the cache.
@@ -242,11 +196,11 @@ namespace MAUI {
 			malloc_handler mh = set_malloc_handler(NULL);
 			int *data = new int[width*height];
 			if(!data) {
-				drawDirect(x, y, width, height, type);
+				drawDirect(x, y, width, height);
 				return;		
 			}
 			set_malloc_handler(mh);
-			drawToData(data, 0, 0, width, height, type);
+			drawToData(data, 0, 0, width, height);
 			CacheElement cacheElem;
 
 			flushCacheUntilNewImageFits(width*height);	
@@ -266,20 +220,10 @@ namespace MAUI {
 		Gfx_drawImage(cached, x, y);
 	}
 
-	void WidgetSkin::drawToData(int *data, int x, int y, int width, int height, eType type) {
+	void WidgetSkin::drawToData(int *data, int x, int y, int width, int height) {
 		MAPoint2d dst;
 		MAPoint2d dst2;
-		MAHandle image;
-		switch(type) {
-			case SELECTED:
-				image = mSelectedImage;
-				break;
-			case UNSELECTED:
-				image = mUnselectedImage;
-				break;
-			default:
-				maPanic(0, "WidgetSkin::draw undefined drawing type");
-		}
+		MAHandle image = mImage;
 
 		if(image == 0) return;
 
@@ -366,21 +310,10 @@ namespace MAUI {
 		}
 	}
 
-	void WidgetSkin::drawDirect(int x, int y, int width, int height, eType type) {
+	void WidgetSkin::drawDirect(int x, int y, int width, int height) {
 		MAPoint2d dst;
 		MAPoint2d dst2;
-		MAHandle image;
-		switch(type) {
-			case SELECTED:
-				image = mSelectedImage;
-				break;
-			case UNSELECTED:
-				image = mUnselectedImage;
-				break;
-			default:
-				maPanic(0, "WidgetSkin::draw undefined drawing type");
-		}
-
+		MAHandle image = mImage;
 		if(image == 0) return;
 
 		// draw corners
@@ -482,12 +415,8 @@ namespace MAUI {
 		return mEndY;
 	}
 
-	bool WidgetSkin::isSelectedTransparent() const {
-		return mSelectedTransparent;
-	}
-
-	bool WidgetSkin::isUnselectedTransparent() const {
-		return mUnselectedTransparent;
+	bool WidgetSkin::isTransparent() const {
+		return mTransparent;
 	}
 
 	int WidgetSkin::getImageHeight() const {

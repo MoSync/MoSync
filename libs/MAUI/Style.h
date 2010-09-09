@@ -70,8 +70,8 @@ public:
 
 class SkinProperty : public Property, public WidgetSkin {
 public:
-	SkinProperty(MAHandle selectedImage, MAHandle unselectedImage, int x1, int x2, int y1, int y2, bool selectedTransparent=true, bool unselectedTransparent=true) :
-		Property(sType), WidgetSkin(selectedImage, unselectedImage, x1, x2, y1, y2, selectedTransparent, unselectedTransparent) {
+	SkinProperty(MAHandle image, int x1, int x2, int y1, int y2, bool transparent=true) :
+		Property(sType), WidgetSkin(image, x1, x2, y1, y2, transparent) {
 
 	}
 	static Type sType;

@@ -46,15 +46,6 @@ namespace MAUI {
 	 **/
 	class WidgetSkin {
 	public:
-
-		/**
-		 * Enumerator for the different drawing states of a WidgetSkin.
-		 **/
-		enum eType {
-			SELECTED = 0,
-			UNSELECTED = 1
-		};
-
 		/**
 		 * The default constructor.
 		 */
@@ -66,7 +57,7 @@ namespace MAUI {
 		 * it takes two bools that specifies if the images are transparent or not
 		 * (default true).
 		 **/
-		WidgetSkin(MAHandle selectedImage, MAHandle unselectedImage, int x1, int x2, int y1, int y2, bool selectedTransparent=true, bool unselectedTransparent=true);
+		WidgetSkin(MAHandle image, int x1, int x2, int y1, int y2, bool transparent=true);
 
 		/** 
 		 * Set the start x coordinate of the WidgetSkin rect. 
@@ -111,27 +102,14 @@ namespace MAUI {
 		/** 
 		 * Get the image used to display an unselected state. 
 		 **/
-		MAHandle getUnselectedImage() const;
+		MAHandle getImage() const;
 
 		/** 
-		 * Get the image used to display a selected state. 
+		 * Set the image, returns false if there is an
+		 * image and the dimensions of the image
+		 * does not equal the image.
 		 **/
-		MAHandle getSelectedImage() const;
-
-		/** 
-		 * Set the selected image, returns false if there is an 
-		 * unselected image and the dimensions of the selected image
-		 * does not equal the unselected image.
-		 **/
-		void setSelectedImage(MAHandle image);
-
-		/** 
-		 * Set the unselected image, returns false if there is a
-		 * selected image and the dimensions of the unselected image
-		 * does not equal the selected image.
-		 **/
-		void setUnselectedImage(MAHandle image);
-
+		void setImage(MAHandle image);
 		/**
 		 * Use this to draw the WidgetSkin. The upper-left corner
 		 * is placed at 'x' and 'y' and the skin is automatically
@@ -140,10 +118,10 @@ namespace MAUI {
 		 **/
 		
 		// uses a cache.
-		void draw(int x, int y, int width, int height, eType type);
+		void draw(int x, int y, int width, int height);
 		
-		void drawDirect(int x, int y, int width, int height, eType type);
-		void drawToData(int *data, int x, int y, int width, int height, eType type);
+		void drawDirect(int x, int y, int width, int height);
+		void drawToData(int *data, int x, int y, int width, int height);
 		int calculateNumTiles(int width, int height);		
 		void drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint);
 			
@@ -158,34 +136,29 @@ namespace MAUI {
 		int getImageWidth() const;
 
 		/** 
-		 * Returns whether the selected image is transparent or not.
+		 * Returns whether the image is transparent or not.
 		 **/
-		bool isSelectedTransparent() const;
+		bool isTransparent() const;
 
-		/** 
-		 * Returns whether the unselected image is transparent or not.
-		 **/
-		bool isUnselectedTransparent() const;
 /** 
 * \brief Key to cache element for skins
 */
 		struct CacheKey {
 			CacheKey() {
 			}
-			CacheKey(WidgetSkin* s, int width, int height, eType atype) : skin(s), w(width), h(height), type(atype) {
+			CacheKey(WidgetSkin* s, int width, int height) : skin(s), w(width), h(height) {
 			}
 			
 			bool operator==(const CacheKey& c) const {
-				return (skin==c.skin && w==c.w && h==c.h && type==c.type);
+				return (skin==c.skin && w==c.w && h==c.h);
 			}
 			
 			bool operator<(const CacheKey& c) const {
-				return (skin<c.skin && w<c.w && h<c.h && type<c.type);
+				return (skin<c.skin && w<c.w && h<c.h);
 			}
 					
 			WidgetSkin *skin;
 			int w, h;
-			eType type;	
 		};		
 	
 /** 
@@ -216,6 +189,8 @@ namespace MAUI {
 		static MAHandle getFromCache(const CacheKey& key);
 		
 	private:
+		void rebuildRects();
+
 		static int mMaxCacheSize;
 		static bool mUseCache;
 		
@@ -223,16 +198,9 @@ namespace MAUI {
 		static HashMap<CacheKey, CacheElement> sCache;
 
 
-			
-		void rebuildRects();
-
-		int mSelectedImageWidth;
-		int mSelectedImageHeight;
-		int mUnselectedImageWidth;
-		int mUnselectedImageHeight;
-		MAHandle mSelectedImage;
-		MAHandle mUnselectedImage;
-
+		int mImageWidth;
+		int mImageHeight;
+		MAHandle mImage;
 		MARect mTopLeft;
 		MARect mTop;
 		MARect mTopRight;
@@ -244,10 +212,7 @@ namespace MAUI {
 		MARect mBottomRight;
 		int mStartX, mEndX;
 		int mStartY, mEndY;
-		int mImageWidth, mImageHeight;
-
-		bool mSelectedTransparent,
-			mUnselectedTransparent;
+		bool mTransparent;
 
 	};	
 }
