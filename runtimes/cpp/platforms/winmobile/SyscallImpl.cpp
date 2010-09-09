@@ -140,6 +140,7 @@ namespace Base {
 	BOOL InitGraphics();
 	void CloseGraphics();
 	static void MAUpdateScreen();
+	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam);
 
 	BOOL VibrationStop();
 
@@ -446,14 +447,25 @@ namespace Base {
 		while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
 
 			// I think I have to do this for oem keys.
-			if(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-				if(msg.wParam == VK_PROCESSKEY) {
-					msg.wParam = ImmGetVirtualKey(msg.hwnd);
-				}
+			if(gGraphicsActive &&
+				(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+				&& msg.wParam == VK_PROCESSKEY)
+			{
+				msg.wParam = ImmGetVirtualKey(msg.hwnd);
 			}
 
 			TranslateMessage (&msg);
+			LOGD("Message: 0x%08X, 0x%04X, 0x%08X, 0x%08X\n",
+				msg.hwnd, msg.message, msg.wParam, msg.lParam);
 			DispatchMessage (&msg);
+
+			// dispatch softkey events to textBox, since they aren't handled normally.
+			if(msg.message == WM_KEYDOWN &&
+				(msg.wParam == VK_F1 || msg.wParam == VK_F2 ||
+				msg.wParam == VK_ESCAPE))	//backspace key
+			{
+				textBoxEventHook(msg.message, msg.wParam, msg.lParam);
+			}
 
 			if(msg.message == WM_TIMER) {
 				return true;
@@ -484,6 +496,7 @@ namespace Base {
 
 	void Resume() {
 		if(gGraphicsActive) return;
+		LOG("Resume\n");
 #if _WIN32_WCE < 0x502	
 		if(graphicsMode == GRAPHICSMODE_GX) GXResume();
 #else
@@ -495,6 +508,7 @@ namespace Base {
 
 	void Suspend() {
 		if(!gGraphicsActive) return;
+		LOG("Suspend\n");
 #if _WIN32_WCE < 0x502				
 		if(graphicsMode == GRAPHICSMODE_GX) GXSuspend();
 #else
@@ -520,6 +534,7 @@ DWORD GetScreenOrientation()
 	LRESULT CALLBACK WndProc (HWND hwnd, UINT umsg, WPARAM wParam, 
 		LPARAM lParam)
 	{
+		LOGD("WndProc(0x%08x, 0x%04x, 0x%08x, 0x%08x)\n", hwnd, umsg, wParam, lParam);
 		if(wParam == VK_F24) return DefWindowProc (hwnd, umsg, wParam, lParam);
 
 		switch (umsg)
@@ -627,19 +642,18 @@ DWORD GetScreenOrientation()
 				//ShowWindow(g_hwndMain, SW_MINIMIZE);
 			}
 			return 0;
-      case WM_CANCELMODE:
+		case WM_CANCELMODE:
 			Suspend();
 			InitWindowed();
 			ShowWindow(g_hwndMain, SW_MINIMIZE);
-            return 0;
-			/*
+			return 0;
+#if 0
 		case WM_GRAPHNOTIFY:
-            VideoHandleEvent((VideoStream*)lParam);
-            break;
-			*/
-
-       case WM_SETTINGCHANGE:
-            if (SETTINGCHANGE_RESET == wParam) {
+			VideoHandleEvent((VideoStream*)lParam);
+			break;
+#endif
+		case WM_SETTINGCHANGE:
+			if (SETTINGCHANGE_RESET == wParam) {
 				MAEvent event;
 				event.type = EVENT_TYPE_SCREEN_CHANGED;
 				gEventFifo.put(event);
@@ -758,7 +772,7 @@ DWORD GetScreenOrientation()
 	void InitFullScreen() {
 		RECT rc;
 
-	
+
 		HWND hwndTaskbar = TaskBarFind();
 		GetWindowRect(hwndTaskbar, &rc);
 		int taskBarHeight = (rc.bottom-rc.top);
@@ -771,7 +785,7 @@ DWORD GetScreenOrientation()
         SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
 
-		::ShowWindow(hwndTaskbar, SW_HIDE); 
+		::ShowWindow(hwndTaskbar, SW_HIDE);
 	}
 
 	void InitWindowed() {
@@ -2645,7 +2659,162 @@ retry:
 		return -2;
 	}
 
+	//*****************************************************************************
+	// maTextBox
+	//*****************************************************************************
+	static HWND sTextBoxContainer = NULL, sEditBox = NULL;
 
+	static LRESULT CALLBACK TextBoxWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		static SHACTIVATEINFO sai;
+		LOGD("TextBoxWndProc(0x%04x, 0x%08x, 0x%08x)\n", msg, wParam, lParam);
+		switch (msg) {
+		case WM_CREATE:
+			// Initialize the static window state information. The shell helper functions
+			// will use this buffer to store their state.
+			ZeroMemory(&sai, sizeof(sai));
+			sai.cbSize = sizeof(sai);
+			ShowWindow(hwnd, SW_MAXIMIZE);
+			UpdateWindow(hwnd);
+			return TRUE;
+		case WM_ACTIVATE:
+			// Calling this function when we get WM_ACTIVATE ensures that our
+			// application will handle the SIP properly. This function does
+			// nothing when we're running on Smartphone.
+			SHHandleWMActivate(hwnd, wParam, lParam, &sai, 0);
+			break;
+		case WM_SETTINGCHANGE:
+			// This helper function will resize our main application window when the SIP
+			// goes up and down. Try commenting out this function and see how it affects
+			// our drawing code. This function is optional, so choose whichever behavior
+			// you prefer. Again, this function does nothing on Smartphone.
+			SHHandleWMSettingChange(hwnd, wParam, lParam, &sai);
+			break;
+		case WM_SIZE:
+			{
+				int width = LOWORD(lParam);
+				int height = HIWORD(lParam);
+				SetWindowPos(sEditBox, NULL, 0, 0, width, height, 0);
+				UpdateWindow(hwnd);
+			}
+			break;
+		case WM_COMMAND:
+			{
+				WORD id = LOWORD(wParam);
+				if(id == IDOK || id == IDCANCEL) {
+					// time to close
+					LOG("DestroyWindow\n");
+					GLE(DestroyWindow(hwnd));
+				}
+			}
+			break;
+		case WM_DESTROY:
+			sEditBox = sTextBoxContainer = NULL;
+			Base::Resume();
+			Base::InitFullScreen();
+			break;
+		}
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+
+	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam) {
+		if(sTextBoxContainer) {
+			LOGD("textBoxEventHook(0x%04x, 0x%08x, 0x%08x)\n", msg, wParam, lParam);
+			switch(msg) {
+			case WM_KEYDOWN:
+#if 0	// no effect
+				SendMessage(SHFindMenuBar(sTextBoxContainer), msg, wParam, lParam);
+#else
+				if(wParam == VK_F1)
+					TextBoxWndProc(sTextBoxContainer, WM_COMMAND, IDOK, 0);
+				if(wParam == VK_F2)
+					TextBoxWndProc(sTextBoxContainer, WM_COMMAND, IDCANCEL, 0);
+				if(wParam == VK_ESCAPE)
+					SendMessage(sEditBox, WM_CHAR, VK_BACK, 0);
+#endif
+			}
+		}
+	}
+
+	static int maTextBox(const wchar* title, wchar* text, int maxSize, int constraints) {
+		LOG("maTextBox\n");
+#if 1
+		if(sTextBoxContainer != NULL) {
+			// textbox is already active, return error.
+			return -2;
+		}
+
+		// create overlay window
+		// window class
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = TextBoxWndProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = g_hInst;
+		wc.hIcon = NULL;
+		wc.hCursor = 0;
+		wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+		wc.lpszMenuName =  0;
+		wc.lpszClassName = TEXT("MoSyncTextBoxContainer");
+		RegisterClass(&wc);
+
+		Base::Suspend();
+		Base::InitWindowed();
+
+		// the window itself
+		sTextBoxContainer = CreateWindow(TEXT("MoSyncTextBoxContainer"), (const wchar_t*)title,
+			WS_CAPTION,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			NULL, NULL, g_hInst, NULL);
+		GLE(sTextBoxContainer);
+#else
+		Base::Suspend();
+		sTextBoxContainer = g_hwndMain;
+#endif
+		// menu bar
+		HMENU hMenu = CreateMenu();
+		InsertMenu(hMenu, 0, MF_BYPOSITION, IDOK, L"OK");
+		InsertMenu(hMenu, -1, MF_BYPOSITION, IDCANCEL, L"Cancel");
+		SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), sTextBoxContainer, SHCMBF_HMENU,
+			(UINT)hMenu, g_hInst, 0, 0, 0, 0 };
+		GLE(SHCreateMenuBar(&mbi));
+		//LOGD("Menu bar: 0x%08X\n", mbi.hwndMB);
+		//LOGD("FindMenuBar: 0x%08X\n", SHFindMenuBar(sTextBoxContainer));
+#if 1
+		SHINITDLGINFO shidi;
+		shidi.dwMask = SHIDIM_FLAGS;
+		shidi.hDlg = sTextBoxContainer;
+		shidi.dwFlags = SHIDIF_SIZEDLGFULLSCREEN | SHIDIF_SIPDOWN;
+		GLE(SHInitDialog(&shidi));
+#endif
+#if 1	//testing softkeys only
+		// create editbox
+		sEditBox = CreateWindow(TEXT("EDIT"),	// predefined class 
+			(LPCWSTR)text,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			sTextBoxContainer,	// parent window 
+			NULL, g_hInst, NULL);
+		GLE(sEditBox);
+
+		RECT rect;
+		GLE(GetClientRect(sTextBoxContainer, &rect));
+		GLE(SetWindowPos(sEditBox, NULL, rect.left, rect.top, rect.right, rect.bottom, 0));
+		SetFocus(sEditBox);
+#endif
+		MAProcessEvents();
+		//LOG("FindMenuBar: 0x%08X\n", SHFindMenuBar(sTextBoxContainer));
+		//HRES(SHEnableSoftkey(mbi.hwndMB, 0, TRUE, TRUE));
+		//HRES(SHEnableSoftkey(mbi.hwndMB, 1, TRUE, TRUE));
+		ShowWindow(sTextBoxContainer, SW_SHOW);
+
+		LOG("maTextBox: %i\n", 0);
+		return 0;
+	}
+
+	//*****************************************************************************
+	// maIOCtl
+	//*****************************************************************************
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -2768,8 +2937,12 @@ retry:
 		case maIOCtl_maGetSystemProperty:
 			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+
+#define maxSize c
+			maIOCtl_case(maTextBox);
+#undef maxSize 
 		}
-		
+
 		return IOCTL_UNAVAILABLE;
 	}
 }
