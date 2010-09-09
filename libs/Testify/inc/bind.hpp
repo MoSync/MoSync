@@ -55,7 +55,7 @@ public:
 	virtual void operator () ( void ) = 0;
 };
 
-
+// @cond
 template <typename R, typename CLASS>
 class Functor0 : public Functor
 {
@@ -506,7 +506,7 @@ public:
 		m_funct( m_param0, m_param1, m_param2, m_param3 );
 	}
 };
-
+// @endcond
 
 
 template <typename R, typename CLASS>

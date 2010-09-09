@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 
 /**
-* Lists the contents of a device's file system.
+* \brief Lists the contents of a device's file system.
 * It can be reused for multiple listings.
 * \see maFileListStart()
 */
