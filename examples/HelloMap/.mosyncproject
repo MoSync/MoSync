@@ -9,7 +9,7 @@
 <property key="build.prefs:additional.libraries/Debug" value="MAPD.lib,MAUID.lib,MAUtilD.lib "/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.permissions" value="Internet\ Access"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=3000000 -heapsize=2000000 -stacksize=100000"/>
 <property key="build.prefs:extra.res.sw" value=""/>

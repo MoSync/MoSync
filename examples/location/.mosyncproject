@@ -7,7 +7,7 @@
 <property key="build.prefs:additional.libraries" value="mautil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="mautilD.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
-<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.permissions" value="Location Location/Coarse Location/Fine"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
