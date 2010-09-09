@@ -163,7 +163,7 @@ namespace MAUI {
 			*/
 		}
 		if(mChildren.size() == 1)
-			child->setSelected(true);
+			child->setFocused(true);
 
 		requestRepaint();
 	}
@@ -262,9 +262,9 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
 
 			if(res) {
-				/*if((isDirty() || forceDraw) && mShouldDrawBackground) {
+				if(isDirty() || forceDraw) {
 					drawBackground();
-				}*/
+				}
 
 				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
 				//mPaddedBounds.width, mPaddedBounds.height);
@@ -318,9 +318,9 @@ namespace MAUI {
 
 			if(res) 
 			{
-				/*if((isDirty() || forceDraw) && mShouldDrawBackground) {
+				if(isDirty() || forceDraw) {
 					drawBackground();
-				}*/
+				}
 	
 				//bool res = engine.pushClipRectIntersect(mPaddedBounds.x, mPaddedBounds.y,
 				//mPaddedBounds.width, mPaddedBounds.height);
@@ -374,7 +374,7 @@ namespace MAUI {
 		}
 
 		Widget *unselectedWidget = mChildren[this->mSelectedIndex];
-		unselectedWidget->setSelected(false);
+		unselectedWidget->setFocused(false);
 		int lastIndex = this->mSelectedIndex;
 		int offset = (lastIndex-selectedIndex);
 		if(offset>0) {
@@ -388,7 +388,7 @@ namespace MAUI {
 			}
 		}
 		Widget *selectedWidget = mChildren[this->mSelectedIndex];
-		selectedWidget->setSelected(true);
+		selectedWidget->setFocused(true);
 
 		Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 			(*i)->itemSelected(this, selectedWidget, unselectedWidget);
@@ -446,11 +446,11 @@ namespace MAUI {
 		//printf("element: %d\n", selectedIndex);
 
 		Widget *unselectedWidget = mChildren[prevIndex];
-		mChildren[prevIndex]->setSelected(false);
+		mChildren[prevIndex]->setFocused(false);
 
 		c = mChildren[mSelectedIndex];
 
-		c->setSelected(true);
+		c->setFocused(true);
 
 		switch(mOrientation) {
 			case LBO_VERTICAL: pos = (c->getPosition().y<<16); break;
@@ -505,11 +505,11 @@ namespace MAUI {
 		}
 
 		Widget *unselectedWidget = mChildren[prevIndex];
-		mChildren[prevIndex]->setSelected(false);
+		mChildren[prevIndex]->setFocused(false);
 
 		c = mChildren[mSelectedIndex];
 
-		c->setSelected(true);
+		c->setFocused(true);
 
 		//printf("element: %d\n", selectedIndex);
 

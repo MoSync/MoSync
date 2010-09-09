@@ -83,7 +83,7 @@ namespace MAUI {
 		else if(mActive&&selected==false) {
 			deactivate();
 		}
-		Widget::setSelected(selected);
+		Widget::setFocused(selected);
 		
 	}
 
@@ -251,7 +251,7 @@ namespace MAUI {
 		//Label::drawWidget();
 
 		maSetColor(mCursorColor);
-		if(mSelected) {
+		if(mFocused) {
 			// draw cursor
 			int sx, sy, ex, ey;
 			sx = r.x + x + bound.x;

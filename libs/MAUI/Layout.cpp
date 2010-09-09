@@ -427,27 +427,27 @@ namespace MAUI {
 
 
 	void Layout::goUp() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(false);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
 		if(mSelectedIndex - mGridXSize >= 0) mSelectedIndex-=mGridXSize;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(true);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
 	
 	void Layout::goDown() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(false);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
 		if(mSelectedIndex + mGridXSize < mChildren.size()) mSelectedIndex+=mGridXSize;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(true);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
 
 	void Layout::goRight() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(false);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
 		if(mSelectedIndex + 1 < mChildren.size()) mSelectedIndex++;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(true);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
 
 	void Layout::goLeft() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(false);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
 		if(mSelectedIndex -1 >= 0) mSelectedIndex--;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setSelected(true);
+		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
 
 	void Layout::trigger() {

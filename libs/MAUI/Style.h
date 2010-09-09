@@ -100,21 +100,39 @@ class Style {
 public:
 	enum {
 		PADDING_LEFT=0,
-		PADDING_RIGHT=1,
-		PADDING_TOP=2,
-		PADDING_BOTTOM=3,
+		PADDING_RIGHT,
+		PADDING_TOP,
+		PADDING_BOTTOM,
+		MARGIN_LEFT,
+		MARGIN_RIGHT,
+		MARGIN_TOP,
+		MARGIN_BOTTOM,
+		BACKGROUND_SKIN_FOCUSED,
+		BACKGROUND_SKIN_UNFOCUSED,
 		PROP_END
 	};
 
 	// The constructor will make room for numProperties + Style::PROP_END properties, make sure
 	// property id:s for a derieved style class starts at Style::PROP_END
-	Style(int numProperties);
+	Style(
+			int numProperties,
+			int paddingLeft = 0,
+			int paddingRight = 0,
+			int paddingTop = 0,
+			int paddingBottom = 0,
+			int marginLeft = 0,
+			int marginRight = 0,
+			int marginTop = 0,
+			int marginBottom = 0,
+			SkinProperty* backgroundSkinFocused = NULL,
+			SkinProperty* backgroundSkinUnfocused = NULL
+	);
 
 	template<typename T>
 	T* get(int id) const {
 		if(id<0 || id>=mProperties.size()) return NULL;
 		Property* prop = mProperties[id];
-		if(prop->getType()==T::sType) return (T*)prop;
+		if(prop && prop->getType()==T::sType) return (T*)prop;
 		else return NULL;
 	}
 

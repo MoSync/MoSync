@@ -251,14 +251,14 @@ namespace MAUI {
 		// Behaviour, notification
 
 		/**
-		 *	Set widget selected state (default: true).
+		 *	Set widget focus state (default: true).
 		 */ 
-		virtual void setSelected(bool selected=true);
+		virtual void setFocused(bool focused=true);
 
 		/**
-		 *	Is widget selected?.
+		 *	Is widget focused?.
 		 */ 
-		bool isSelected() const;
+		bool isFocused() const;
 		
 		/** Set Widget enabled state **/
 		virtual void setEnabled(bool enabled=true);
@@ -416,7 +416,7 @@ namespace MAUI {
 		bool mDirty;
 
 		// used to keep which state the widget is in (selected or unselected)
-		bool mSelected;
+		bool mFocused;
 		bool mEnabled;
 
 		// a list of widget listeners

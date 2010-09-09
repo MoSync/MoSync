@@ -30,7 +30,10 @@ protected:
 class MyScreen : public Screen {
 public:
 	MyScreen() {
-			LabelStyle* labelStyle = new LabelStyle(RES_FONT);
+			SkinProperty* sp1 = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
+			SkinProperty* sp2 = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
+
+			LabelStyle* labelStyle = new LabelStyle(RES_FONT,16,0,5,0,0,0,0,0, sp1, sp2);
 			ButtonStyle* buttonStyle = new ButtonStyle(RES_SELECTED, RES_UNSELECTED, RES_FONT, 12, 19, 12, 18, true, true);
 			ButtonStyle* buttonStyle2 = new ButtonStyle(RES_SELECTED2, RES_UNSELECTED2, RES_FONT, 16, 32, 16, 32, true, true);
 			Engine::getSingleton().setDefaultStyle("Label", labelStyle);

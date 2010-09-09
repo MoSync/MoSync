@@ -86,7 +86,8 @@ namespace MAUI {
 		mHorizontalAlignment(HA_LEFT),
 		mVerticalAlignment(VA_TOP)
 	{
-		this->mFont = Engine::getSingleton().getDefaultFont();
+		setStyle(Engine::getSingleton().getDefaultStyle("Label"));
+		//this->mFont = Engine::getSingleton().getDefaultFont();
 
 		//calcStrSize();
 	}
@@ -108,7 +109,9 @@ namespace MAUI {
 		} else {
 			this->mFont = font;
 		} */
-		setStyle(Engine::getSingleton().getDefaultStyle("Label"));
+		const Style *s = Engine::getSingleton().getDefaultStyle("Label");
+		MAUI_LOG("Label::Label, style = 0x%x", s);
+		setStyle(s);
 
 		setCaption(caption);
 		requestRepaint();
@@ -217,7 +220,7 @@ namespace MAUI {
 
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
-		if(!mFont) setStyle(Engine::getSingleton().getDefaultStyle("Label"));
+		if(!getStyle()) setStyle(Engine::getSingleton().getDefaultStyle("Label"));
 		if(mFont) {
 
 			if(mMultiLine)
@@ -294,9 +297,10 @@ namespace MAUI {
 		return true;
 	}
 
-
 	void Label::restyle() {
 		MAUI_LOG("***** restyle called!!!");
+		MAUI_LOG("Label's style: 0x%x", getStyle());
+		Widget::restyle();
 		const LabelStyle* style = (const LabelStyle*)getStyle();
 		mFont = (MAUI::Font*)style->getSafe<FontProperty>(LabelStyle::FONT);
 
@@ -304,10 +308,26 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-
-	LabelStyle::LabelStyle(MAHandle font) : Style(1) {
+	LabelStyle::LabelStyle(
+			MAHandle font,
+			int paddingLeft,
+			int paddingRight,
+			int paddingTop,
+			int paddingBottom,
+			int marginLeft,
+			int marginRight,
+			int marginTop,
+			int marginBottom,
+			SkinProperty* backgroundSkinFocused,
+			SkinProperty* backgroundSkinUnfocused
+	) : Style(
+			1, paddingLeft, paddingRight, paddingTop, paddingBottom,
+			marginLeft, marginRight, marginTop, marginBottom,
+			backgroundSkinFocused, backgroundSkinUnfocused)
+	{
 		this->mProperties[FONT] = new FontProperty(font);
 	}
+
 
 
 

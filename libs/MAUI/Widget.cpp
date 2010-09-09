@@ -38,7 +38,7 @@ namespace MAUI {
 	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL)
 		: mParent(NULL), mBounds(0,0,width,height), mRelX(x), mRelY(y),
 			mDirty(false),
-			mSelected(false),
+			mFocused(false),
 			mEnabled(true),
 			mPaddingLeft(0),
 			mPaddingTop(0),
@@ -105,19 +105,16 @@ namespace MAUI {
 		Gfx_pushMatrix();
 		Gfx_translate(mRelX, mRelY);
 		BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
-		
+
 		if(res) 
 		{
 			if(isDirty() || forceDraw) 
 			{
-				/*if(mShouldDrawBackground)
-				{
-					drawBackground();
-				}*/
+				drawBackground();
 			}
-			// Widgets must now do this by themselves
-			//Gfx_translate(mPaddingLeft, mPaddingTop);
-			//BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
+			MAUI_LOG("Widget::draw, paddingLeft= %d, paddingTop = %d", mPaddingLeft, mPaddingTop);
+			Gfx_translate(mPaddingLeft, mPaddingTop);
+			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 			if(res) {
 
@@ -127,9 +124,8 @@ namespace MAUI {
 					(*it)->draw();	
 
 			}
-
 			// This commented out to match removal of above intersectClipRect() call.
-			//Gfx_popClipRect();
+			Gfx_popClipRect();
 			setDirty(false);
 		}
 		Gfx_popMatrix();
@@ -146,6 +142,30 @@ namespace MAUI {
 		if(changed) {
 			requestRepaint();
 			fireBoundsChanged();
+		}
+	}
+
+	void Widget::drawBackground() {
+		//MAUI_LOG("Widget::drawBackground() 1");
+		if(!mStyle) return;
+		WidgetSkin* focusedSkin   = mStyle->get<SkinProperty>(Style::BACKGROUND_SKIN_FOCUSED);
+		WidgetSkin* unfocusedSkin = mStyle->get<SkinProperty>(Style::BACKGROUND_SKIN_UNFOCUSED);
+		//MAUI_LOG("Widget::drawBackground() 2");
+		if(mFocused) {
+			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
+			//MAUI_LOG("Widget::drawBackground() 3a");
+			if(focusedSkin) {
+				//MAUI_LOG("Widget::drawBackground() 4a");
+				focusedSkin->draw(0, 0, mBounds.width, mBounds.height);
+			}
+		}
+		else {
+			//MAUI_LOG("Widget::drawBackground() 3b");
+			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
+			if(unfocusedSkin) {
+				//MAUI_LOG("Widget::drawBackground() 4b");
+				unfocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
+			}
 		}
 	}
 
@@ -245,16 +265,12 @@ namespace MAUI {
 		Engine::getSingleton().requestUIUpdate();
 		setDirty();
 
-		MAUI_LOG("this: 0x%x", this);
-		MAUI_LOG("bäh? 1");
-
 		//if(isTransparent()) {
 			//MAUI_LOG("bäh? 2");
 			if(mParent) {
 				mParent->requestRepaint();
 			}
 		//}
-		MAUI_LOG("bäh? 3");
 
 	}
 
@@ -340,27 +356,27 @@ namespace MAUI {
 		}
 	}
 
-	void Widget::setSelected(bool mSelected) {
-		this->mSelected = mSelected;
+	void Widget::setFocused(bool focused) {
+		mFocused = focused;
 		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->selectionChanged(this, mSelected);
+			(*wl)->selectionChanged(this, mFocused);
 		}
 		requestRepaint();
 	}
 	
-	bool Widget::isSelected() const {
-		return mSelected;
+	bool Widget::isFocused() const {
+		return mFocused;
 	}
 
-	void Widget::setEnabled(bool mEnabled) {
-		this->mEnabled = mEnabled;
+	void Widget::setEnabled(bool enabled) {
+		mEnabled = enabled;
 
 		Vector_each(Widget*,it,mChildren) {
 			(*it)->setEnabled(mEnabled);
 		}
 		
 		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->enableStateChanged(this, mSelected);
+			(*wl)->enableStateChanged(this, mEnabled);
 		}
 		requestRepaint();
 	}
@@ -522,10 +538,14 @@ namespace MAUI {
 
 
 	void Widget::restyle() {
+		MAUI_LOG("Widget::restyle() called");
+		MAUI_LOG("Widget::restyle, mStyle = 0x%x", mStyle);
+		if(!mStyle) return;
 		setPaddingLeft(mStyle->getSafe<IntegerProperty>(Style::PADDING_LEFT)->mValue);
 		setPaddingRight(mStyle->getSafe<IntegerProperty>(Style::PADDING_RIGHT)->mValue);
 		setPaddingTop(mStyle->getSafe<IntegerProperty>(Style::PADDING_TOP)->mValue);
 		setPaddingBottom(mStyle->getSafe<IntegerProperty>(Style::PADDING_BOTTOM)->mValue);
+		MAUI_LOG("Widget::restyle, paddingLeft= %d, paddingTop = %d", mPaddingLeft, mPaddingTop);
 	}
 
 }

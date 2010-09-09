@@ -46,7 +46,17 @@ bool Button::isTransparent() const {
 	return true;
 }
 
-ButtonStyle::ButtonStyle(MAHandle pressed, MAHandle notpressed, MAHandle font, int startX, int endX, int startY, int endY, bool selectedTransparent, bool unselectedTransparent) : Style(3) {
+ButtonStyle::ButtonStyle(
+		MAHandle pressed,
+		MAHandle notpressed,
+		MAHandle font,
+		int startX,
+		int endX,
+		int startY,
+		int endY,
+		bool selectedTransparent,
+		bool unselectedTransparent) : Style(3)
+{
 	this->mProperties[SKIN_PRESSED] = new SkinProperty(pressed, startX, endX, startY, endY, selectedTransparent);
 	this->mProperties[SKIN_RELEASED] = new SkinProperty(notpressed, startX, endX, startY, endY, unselectedTransparent);
 	this->mProperties[FONT] = new FontProperty(font);
