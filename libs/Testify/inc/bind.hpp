@@ -28,7 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 
 NAMESPACE_BEGIN( Testify )
-
+/**
+* @brief A funtion or method wrapper, possibly along with its parameters.
+* It can conveniently be called without having to care about it's details.
+*
+*/
 class Functor
 {
 public:

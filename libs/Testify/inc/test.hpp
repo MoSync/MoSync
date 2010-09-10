@@ -36,7 +36,7 @@ namespace Testify
 {
 
 /**
- * This is the base class for all tests. It is wrapped by
+ * @breif A base class for all tests. It is wrapped by
  * TestCase and TestFunction to handle the different cases.
  *
  */

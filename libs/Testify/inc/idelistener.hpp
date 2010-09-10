@@ -30,8 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * The MoSync IDE listener.
- * Prints everything out to the log.
+ * @brief The MoSync IDE listener. Prints everything out to the log.
  *
  */
 class IDEListener : public TestListener
