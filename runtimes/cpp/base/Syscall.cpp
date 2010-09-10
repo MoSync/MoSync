@@ -690,12 +690,14 @@ namespace Base {
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
 	static int openFile(Syscall::FileHandle& fh) {
+		int res = isDirectory(fh.name);
+		TEST_LTZ(res);
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
+			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new WriteFileStream(fh.name, false, true);
 			}
 		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name) == 0) {
+			if(res == 0) {
 				fh.fs = new FileStream(fh.name);
 			}
 		} else {

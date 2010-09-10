@@ -846,10 +846,12 @@ static void printValue(Variable *var) {
 		break;
 	case eSimpleValues:
 		oprintf(",value=\"");
-		if(var->exp->simpleType())
-			oprintf("%s", var->exp->value().c_str());
-		else
-			oprintf("{...}");
+		if(var->exp) {
+			if(var->exp->simpleType())
+				oprintf("%s", var->exp->value().c_str());
+			else
+				oprintf("{...}");
+		}
 		oprintf("\"");
 		break;
 	case eAllValues:

@@ -2035,6 +2035,9 @@ interface MAAPI {
 		* Directory paths must end with a slash('/').
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
+		*
+		* \note To find valid file paths, use maFileListStart().
+		*
 		* \param path The absolute path to the file.
 		* \param mode The access mode. Either #MA_ACCESS_READ or #MA_ACCESS_READ_WRITE.
 		* Directories also use these access modes. #MA_ACCESS_READ lets you see if the directory exists.
@@ -2189,6 +2192,8 @@ interface MAAPI {
 		* Creates a listing of names of files and directories, or file systems.
 		* Call maFileListNext() repeatedly to retrieve the names. Call maFileListClose() to
 		* free the resources used.
+		*
+		* It is often useful to begin by listing the file systems.
 		*
 		* \param path The full path to a directory, or the empty string,
 		* which specifies that the root file systems should be listed.

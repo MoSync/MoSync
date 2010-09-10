@@ -439,12 +439,6 @@ void commandComplete() {
 	resumeUserInput();
 }
 
-/**
- * Executes the given GDB/MI command.
- *
- * If no suitable command handler is found an error message is sent to the GDB
- * session.
- */
 static void executeCommand(const string& line) {
 	LOG("Command: %s\n", line.c_str());
 	_ASSERT(!sExecutingCommand);
@@ -511,7 +505,6 @@ static bool readAll(int fd, void* dst, int len) {
 	}
 	return true;
 }
-
 
 /**
  * Reads an opened program file.
