@@ -1254,7 +1254,19 @@ namespace Base
 		case maIOCtl_maShowVirtualKeyboard:
 			SYSLOG("maIOCtl_maShowVirtualKeyboard");
 			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
-			
+				
+		case maIOCtl_maTextBox:
+			SYSLOG("maIOCtl_maTextBox");
+			// Get the two first parameters of the IOCtl function
+			const wchar* _title = GVWS(a);
+			const wchar* _inText = GVWS(b);
+			// Get two parameters from the stack
+			int _maxSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _constraints = SYSCALL_THIS->GetValidatedStackValue(4);
+			// Allocate memory for the output buffer
+			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange( c, _maxSize * sizeof(char) );
+			// Call the actual internal _maTextBox function
+			return _maTextBox(_title, _inText, _outText, _maxSize,  _constraints, (int)gCore->mem_ds, mJNIEnv, mJThis);
 		}
 		
 		return IOCTL_UNAVAILABLE;

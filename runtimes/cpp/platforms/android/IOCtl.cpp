@@ -19,6 +19,81 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/cpp_defs.h>
 
+/**
+ * Custom conversion function from Wide Char String to Multi Byte String.
+ * Exists because the android NDK does not support wchars.
+ *
+ * @param s		output multi-byte string
+ * @param pwcs	input wide char string
+ * @param n		length of the input wide char string
+ *
+ * @return		returns the number of bytes converted 
+ *				(not including any terminating null), 
+ *				if successful; otherwise, it returns (size_t)-1.
+ */
+inline size_t wideCharString2multiByteString(char *s, const wchar *pwcs, size_t n)
+{
+	if(s == NULL)
+	{
+		int num_bytes = 0;
+		while(*pwcs != 0)
+		{
+			num_bytes++;
+			pwcs++;
+		}
+		return num_bytes;
+	}
+	int count = 0;
+	
+	if (n != 0) {
+		do {
+			if ((*s++ = (char) *pwcs++) == 0)
+				break;
+			count++;
+		} while (--n != 0);
+	}
+	return count;
+}
+
+/**
+ * Custom Wide Char String length calculation function.
+ * Exists because the android NDK does not support wchars.
+ *
+ * @param s		input multi-byte string
+ *
+ * @return		length of the input string
+ */
+inline size_t wideCharStringLength(const wchar * s)
+{
+	const wchar *save;
+	if (s == 0)
+		return 0;
+	for (save = s; *save; ++save);
+	return save-s;
+}
+
+
+/**
+ * Converts a Wide Char String to a Java String.
+ *
+ * @param env	JNI Environment used
+ * @param s		Input Wide Char String
+ *
+ * @return		Java String
+ */
+inline jobject wchar2jstring(JNIEnv* env, const wchar* s)
+{
+    jobject result = 0;
+    size_t len = wideCharStringLength(s);
+    size_t sz = wideCharString2multiByteString (0, s, len);
+	char* c = (char*)malloc(sizeof(char)*(sz+1));
+    wideCharString2multiByteString (c, s, len);
+    c[sz] = '\0';
+    result = env->NewStringUTF(c);
+	free(c);
+    return result;
+}
+
 namespace Base
 {
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
@@ -240,14 +315,70 @@ namespace Base
 		return (int)ret;
 	}
 	
+	/**
+	 * Internal function corresponding to the maShowVirtualKeyboard IOCtl.
+	 * Shows the android soft keyboard.
+	 *
+	 * @param jNIEnv	JNI environment used
+	 * @param jThis		Pointer to the java class
+	 *
+	 * @return			Value returned by the maTextBox 
+	 *					java method 
+	 */
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
+		jmethodID methodID = 
+			jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
 		if (methodID == 0) return 0;
 		int ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return ret;
+	}
+	
+	/**
+	 * Internal function corresponding to the maTextBox IOCtl.
+	 * Displays a full screen editable text field with 
+	 * OK and Cancel buttons.
+	 *
+	 * @param title			Title of the text box
+	 * @param inText		Initial content of the text box
+	 * @param outText		Buffer that will contain the text 
+	 *						entered by the user
+	 * @param maxSize		Maximum size of outText
+	 * @param constraints	Not implemented yet
+	 * @param memStart		Pointer to the begining of the 
+	 *						MoSync memory
+	 * @param jNIEnv		JNI environment used
+	 * @param jThis			Pointer to the java class
+	 *
+	 * @return				Value returned by the maTextBox 
+	 *						java method
+	 */
+	int _maTextBox(const wchar* title, const wchar* inText, int outText,
+				   int maxSize,  int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Initialization
+		jstring jstrTITLE = (jstring)wchar2jstring(jNIEnv,  title);
+		jstring jstrINTEXT = (jstring)wchar2jstring(jNIEnv,  inText);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		// Remove the offset from the output buffer's address
+		int rBuf = outText - memStart;
+		
+		// Call the java method
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maTextBox", 
+												 "(Ljava/lang/String;Ljava/lang/String;III)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTITLE,
+										 jstrINTEXT, rBuf, maxSize, constraints);
+		
+		// Clean
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTITLE);
+		jNIEnv->DeleteLocalRef(jstrINTEXT);
+		
+		return (int)ret;
 	}
 }

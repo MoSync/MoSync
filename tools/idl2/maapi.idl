@@ -1232,6 +1232,11 @@ interface MAAPI {
 
 		/// Character input. Uses MAEvent::character.
 		CHAR = 22;
+		
+		/** \brief The text box created by maTextBox() just closed.
+		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
+		*/
+		TEXTBOX = 23;
 	}
 
 	/**
@@ -1286,7 +1291,18 @@ interface MAAPI {
 			* Valid only in CONN events.
 			*/
 			MAConnEventData conn;
-
+			
+			struct {
+				/**
+				* One of the \link #MA_TB_RES_OK MA_TB_RES \endlink codes.
+				*/
+				int textboxResult;
+				/**
+				* The length, in characters, of the finished text.
+				*/
+				int textboxLength;
+			} textbox;
+			
 			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
@@ -2955,7 +2971,7 @@ interface MAAPI {
 		* \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants.
 		* \note Some of the \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants do not work well together.
 		*/
-		int maTextBox(in MAWString title, out MAWString text range("maxSize * sizeof(wchar)"),
+		int maTextBox(in MAWString title, in MAWString inText, out MAWString outText range("maxSize * sizeof(wchar)"),
 			in int maxSize, in int constraints);
 
 		constset int MA_TB_TYPE_ {
@@ -2972,6 +2988,12 @@ interface MAAPI {
 			/// The user is allowed to enter a real number value.
 			/// This extends #MA_TB_TYPE_NUMERIC by allowing a decimal point.
 			DECIMAL = 5;
+		}
+		constset int MA_TB_RES_ {
+			/// The user chose OK.
+			OK = 1;
+			/// The user chose Cancel.
+			CANCEL = 2;
 		}
 		constset int MA_TB_FLAG_ {
 			/// Indicates that the text entered is confidential data that should be

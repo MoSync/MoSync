@@ -49,7 +49,7 @@ public class MoSync extends Activity
 {
 
 	MoSyncView mMoSyncView;
-	MoSyncThread mMoSyncThread;
+	static public MoSyncThread mMoSyncThread;
 	Intent mMoSyncServiceIntent;
 	
 	boolean mThreadHasDied = false;

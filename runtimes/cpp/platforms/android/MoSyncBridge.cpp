@@ -218,6 +218,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.state = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_TEXTBOX)
+	{
+		event.textboxResult = intArray[1];
+		event.textboxLength = intArray[2];
+	}
 	
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);

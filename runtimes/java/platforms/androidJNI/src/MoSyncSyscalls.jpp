@@ -34,7 +34,7 @@ final class ImageCache
 	}
 }
 
-ByteBuffer mMemDataSection;
+public ByteBuffer mMemDataSection;
 ByteBuffer mResourceFile;
 
 Canvas mCanvas;
@@ -1063,3 +1063,17 @@ void destroyResource(int resourceIndex)
 
 
 }
+
+int maTextBox(String title, String inText, int outText, int maxSize, int constraints)
+{
+	Intent intent = new Intent(mContext, TextBox.class);
+	Bundle bundle = new Bundle();
+	bundle.putString("TITLE", title);
+	bundle.putString("TEXT", inText);
+	bundle.putInt("OUTPUT", outText);
+	intent.putExtras(bundle);
+	mContext.startActivity(intent);
+	Log.i("MoSync", "New activity started for InputBox");
+	return 0;
+}
+
