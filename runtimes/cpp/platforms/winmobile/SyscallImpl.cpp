@@ -2735,7 +2735,9 @@ retry:
 		}
 	}
 
-	static int maTextBox(const wchar* title, wchar* text, int maxSize, int constraints) {
+	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints)
+	{
 		LOG("maTextBox\n");
 #if 1
 		if(sTextBoxContainer != NULL) {
@@ -2790,7 +2792,7 @@ retry:
 #if 1	//testing softkeys only
 		// create editbox
 		sEditBox = CreateWindow(TEXT("EDIT"),	// predefined class 
-			(LPCWSTR)text,
+			(LPCWSTR)inText,
 			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 			sTextBoxContainer,	// parent window 

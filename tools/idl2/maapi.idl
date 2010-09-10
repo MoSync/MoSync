@@ -1233,7 +1233,7 @@ interface MAAPI {
 		/// Character input. Uses MAEvent::character.
 		CHAR = 22;
 		
-		/** \brief The text box created by maTextBox() just closed.
+		/** \brief The text box created by maTextBox() was just closed.
 		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
 		*/
 		TEXTBOX = 23;
@@ -2953,25 +2953,35 @@ interface MAAPI {
 		int maShowVirtualKeyboard();
 
 		/**
-		* Displays a fullscreen text box.
+		* Displays a native-ui text box, with
+		* "OK" and "Cancel" buttons or equivalent command items.
 		* The user can enter text using the native input system.
 		*
-		* An "OK" button or similar command item is displayed.
-		* The function returns when this command item is used.
+		* This function returns immediately, leaving the text box on-screen.
+		* While the text box is active, it will consume all key events.
+		* Other events, like networking, will still be handled normally.
+		*
+		* When the user activates one of the command items ("OK" or "Cancel"),
+		* a number of things will happen in order:
+		*
+		* The box's text will be copied to the buffer specified by \a text.
+		* The text box will disappear.
+		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
 		*
 		* \returns \>= 0.
 		*
 		* \param title The box's title.
-		* \param text Pointer to a buffer. When the text box is created, it is populated with
-		* the contents of this buffer. When the function returns, the contents of the text box
-		* is copied back to the buffer.
+		* \param inText When the text box is created, it is populated with this string.
+		* \param text Pointer to a buffer. When the text box closes, the contents
+		* are copied to this buffer.
 		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
 		* \param constraints Rules for how text is entered into the box.
 		* Must be exactly one of the \link #MA_TB_TYPE_ANY MA_TB_TYPE \endlink constants, or'd with zero or more of the
 		* \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants.
-		* \note Some of the \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants do not work well together.
+		* \note Some combinations of constraint types and flags are useless or invalid.
 		*/
-		int maTextBox(in MAWString title, in MAWString inText, out MAWString outText range("maxSize * sizeof(wchar)"),
+		int maTextBox(in MAWString title, in MAWString inText,
+			out MAWString outText range("maxSize * sizeof(wchar)"),
 			in int maxSize, in int constraints);
 
 		constset int MA_TB_TYPE_ {

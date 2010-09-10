@@ -702,7 +702,6 @@ public
 		return bytes.length;
 	}
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI	//unused otherwise
 	// does not write if bufSize is too small.
 	// returns needed/used number of bytes.
 	private final int writeWideString(String s, Address dst, int bufSize) {
@@ -726,7 +725,6 @@ public
 			address += 2;
 		}
 	}
-#endif
 
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 	public
@@ -2566,26 +2564,43 @@ public
 	//****************************************************************************
 	// maTextBox
 	//****************************************************************************
-	int mTextBoxResult;
+	TextBox mTextBox;
+	MAAddress mTextBoxBuffer;
+	int mTextBoxMaxSize;
 
 	class TextBoxCommandListener implements CommandListener {
 		public synchronized void commandAction(Command c, Displayable d) {
-			mTextBoxResult = c.getCommandType();
-			notify();
+			int jRes = c.getCommandType();
+			int mRes = jRes == Command.OK ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+			String text = mTextBox.getString();
+
+			writeWideString(text, mTextBoxBuffer, mTextBoxMaxSize*2);
+
+			int[] event = new int[3];
+			EI_TYPE = EVENT_TYPE_TEXTBOX;
+			EI_TEXTBOX_RESULT = mRes;
+			EI_TEXTBOX_LENGTH = text.length();
+			mCanvas.postEvent(event);
+
+			mTextBox = null;
+			mCanvas.mDisplay.setCurrent(mCanvas);
+			mCanvas.setFullScreenMode(true);
 		}
 	}
 
-	int maTextBox(String title, MAAddress text, int maxSize, int constraints) throws Exception {
-		TextBox tb = new TextBox(title, GVS(text), maxSize-1, constraints);
-		tb.addCommand(new Command("OK", Command.OK, 1));
-		tb.addCommand(new Command("Cancel", Command.CANCEL, 1));
+	int maTextBox(String title, String inText, MAAddress outText, int maxSize,
+		int constraints) throws Exception
+	{
+		MYASSERT(mTextBox == null);
+		mTextBoxBuffer = outText;
+		mTextBoxMaxSize = maxSize;
+		mTextBox = new TextBox(title, inText, maxSize-1, constraints);
+		mTextBox.addCommand(new Command("OK", Command.OK, 1));
+		mTextBox.addCommand(new Command("Cancel", Command.CANCEL, 1));
 		TextBoxCommandListener tbcl = new TextBoxCommandListener();
-		tb.setCommandListener(tbcl);
+		mTextBox.setCommandListener(tbcl);
 
-		mCanvas.mDisplay.setCurrent(tb);
-		synchronized(tbcl) { tbcl.wait(); }
-		mCanvas.mDisplay.setCurrent(mCanvas);
-		mCanvas.setFullScreenMode(true);
-		return mTextBoxResult;
+		mCanvas.mDisplay.setCurrent(mTextBox);
+		return 0;
 	}
 }

@@ -165,3 +165,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_CONN_RESULT event[3]
 #define EI_STATE event[1]
 #define EI_DATA event[1]
+#define EI_TEXTBOX_RESULT event[1]
+#define EI_TEXTBOX_LENGTH event[2]

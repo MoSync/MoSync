@@ -1606,7 +1606,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 #endif
 
-#define maxSize c	//ugly hack
+#define maxSize SYSCALL_THIS->GetValidatedStackValue(0)	//ugly hack
 	maIOCtl_syscall_case(maTextBox);
 #undef maxSize
 
@@ -2962,12 +2962,22 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 	}
 }
 
-int Syscall::maTextBox(const wchar* title, wchar* text, int maxSize, int constraints) {
+int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+	int maxSize, int constraints)
+{
 	TPtrC tTitle(title);
-	TPtrC tInText(text);
-	TPtr tText(text, tInText.Length(), maxSize - 1);
-	int res = gAppView.TextBox(tTitle, tText, constraints);
-	DEBUG_ASSERT(tText.Length() < maxSize);
-	text[tText.Length()] = 0;
+	TPtrC tInText(inText);
+	TPtr tOutText(outText, maxSize - 1);
+	int res = gAppView.TextBox(tTitle, tInText, tOutText, constraints);
+	DEBUG_ASSERT(tOutText.Length() < maxSize);
+	tOutText[tOutText.Length()] = 0;
+	
+	// send message
+	MAEvent e;
+	e.type = EVENT_TYPE_TEXTBOX;
+	e.textbox.textboxResult = res;
+	e.textbox.textboxLength = tOutText.Length();
+	gAppView.AddEvent(e);
+	
 	return res;
 }

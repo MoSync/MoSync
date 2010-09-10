@@ -1129,7 +1129,16 @@ void WRITE_REG(int reg, int value) {
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
 
-	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%s\")", str); }
+	void debug_MAWString(wchar* SCDEBUG_ARG(str)) {
+#ifdef SYSCALL_DEBUGGING_MODE
+		LOGSC("(\"");
+		while(*str) {
+			LOGSC("%C", *str);
+			str++;
+		}
+		LOGSC("\")");
+#endif
+	}
 	wchar* _SYSCALL_CONVERT_MAWString(int str) {
 		_debug_hex(str);
 		ValidateMemWStringAddress(str);

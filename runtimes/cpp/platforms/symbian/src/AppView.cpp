@@ -703,14 +703,15 @@ int CAppView::GetKeys() {
 	return iKeys;
 }
 
-int CAppView::TextBox(const TDesC& title, TDes& text, int constraints) {
+int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
 	if(iEngine->IsDrawing())
 		iEngine->StopDrawing();
-	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(text);
+	outText.Copy(inText);
+	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(outText);
 	CleanupStack::PushL(dlg);
 	dlg->SetPromptL(title);
 	dlg->SetPredictiveTextInputPermitted(true);
-	dlg->SetMaxLength(text.MaxLength());
+	dlg->SetMaxLength(outText.MaxLength());
 	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
 	CleanupStack::Pop(dlg);
 	return answer ? 1 : 0;

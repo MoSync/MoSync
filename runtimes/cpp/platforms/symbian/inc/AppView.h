@@ -57,7 +57,7 @@ public:
 	void DoCloseEventL();
 	const Core::VMCore* GetCore() const { return iCore; }
 	Base::Syscall* GetSyscall() { return iSyscall; }
-	int TextBox(const TDesC& title, TDes& text, int constraints);
+	int TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints);
 
 	//CCoeControl
 public:
