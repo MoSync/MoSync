@@ -19,7 +19,7 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 
-#define _ANDROID_BLUETOOTH
+//#define _ANDROID_BLUETOOTH
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;
 #endif
