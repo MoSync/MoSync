@@ -668,6 +668,8 @@ interface MAAPI {
 		NETWORK = -15;
 		/// The requested header could not be found.
 		NOHEADER = -16;
+		/// The requested object could not be found.
+		NOTFOUND = -17;
 
 		/**
 		* If you wish to share the CONNERR codespace,
