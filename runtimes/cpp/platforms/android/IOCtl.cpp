@@ -223,19 +223,92 @@ namespace Base
 		return (int)ret;
 	}
 	
-	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis)
+	int _maBtStartServiceDiscovery(MABtAddr* addr, MAUUID* uuid, JNIEnv* jNIEnv, jobject jThis)
 	{
-		return -1;
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery begin");
+		
+		// Device address converted to string.
+		char addressBuf[64];
+		sprintf(addressBuf, "%02X%02X%02X%02X%02X%02X", 
+			addr->a[0], addr->a[1], addr->a[2], addr->a[3], addr->a[4], addr->a[5]);
+		jstring jstrAddress = jNIEnv->NewStringUTF(addressBuf);
+		
+		// UUID converted to string.
+		char uuidBuf[64];
+		char* u = (char*) uuid;
+		sprintf(uuidBuf, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", 
+			u[3], u[2], u[1], u[0], u[7], u[6], u[5], u[4], u[11], u[10], u[9], u[8], u[15], u[14], u[13], u[12]);
+		jstring jstrUUID = jNIEnv->NewStringUTF(uuidBuf);
+		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartServiceDiscovery", "(Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrAddress, jstrUUID);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrAddress);
+		jNIEnv->DeleteLocalRef(jstrUUID);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery end");
+		
+		return (int)ret;
 	}
 	
-	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis)
+	int _maBtGetNextServiceSize(
+		int memStart,
+		int nameBufSizePointer,
+		int nUuidsPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis)
 	{
-		return -1;
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize begin");
+		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNextServiceSize", "(II)I");
+		if (methodID == 0) return 0;
+		
+		jint ret = jNIEnv->CallIntMethod(
+			jThis, 
+			methodID, 
+			nameBufSizePointer - memStart,
+			nUuidsPointer - memStart);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize end");
+		
+		return (int)ret;
 	}
 	
-	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis)
+	int _maBtGetNewService(
+		int memStart,
+		int portPointer,
+		int nameBufPointer,
+		int nameBufSize,
+		int uuidsPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis)
 	{
-		return -1;
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService begin");
+		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewService", "(IIII)I");
+		if (methodID == 0) return 0;
+		
+		jint ret = jNIEnv->CallIntMethod(
+			jThis, 
+			methodID, 
+			portPointer - memStart,
+			nameBufPointer - memStart,
+			nameBufSize,
+			uuidsPointer - memStart);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService end");
+		
+		return (int)ret;
 	}
 	
 	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis)

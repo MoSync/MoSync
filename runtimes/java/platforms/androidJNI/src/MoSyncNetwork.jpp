@@ -21,14 +21,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HTTP_STATE_FINISHING 3
 #define HTTP_STATE_FINISHED 4
 
-
 /*
-* The hashtable mConnections is used to keep all the open connections
+* The hashtable mConnections is used to keep all the open connections.
 */
 Hashtable<Integer, ConnectionInformation> mConnections = new Hashtable<Integer, ConnectionInformation>();
-int mConnNextHandle = 1;
-ThreadPool mThreadPool = new ThreadPool();
 
+/**
+ * Connection handle counter.
+ */
+int mConnNextHandle = 1;
+
+/**
+ * Thread pool for network operations.
+ * TODO: Perhaps rename to mNetworkThreadPool or something
+ * to make the use explicit from the name.
+ */
+ThreadPool mThreadPool = new ThreadPool();
 
 /**
 * Initiates a connection and if successfull, adds the new connection to the table of open connections
@@ -37,80 +45,57 @@ ThreadPool mThreadPool = new ThreadPool();
 				URLs that starts with "socket://" needs to have a port specified.
 				URLs that starts with "btspp://" tries to connect to a bluetooth port.
 *
-* @return CONNERR_URL	if the URL wasn't correct.
-* 		  > 0			on success. This number is the handle to the opened connection.
+* @return CONNERR_URL if the URL wasn't correct.
+          CONNERR_GENERIC on other errors.
+* 		  > 0 on success. This number is the handle to the opened connection.
 */
-MAHandle maConnect(final String url) {
+MAHandle maConnect(final String url) 
+{
 	Log.i("MoSyncSyscall","maConnect");
 	Log.i("maConnect", "url:" + url);
 
-	
 	try
 	{
-		ConnectionInformation conInfo;
-		if(url.startsWith("socket://"))
-		{
-			// restructure the url since port can't be part of it
-			String realUrl = url.substring(9);
-			String[] splitUrl = realUrl.split("\\b:\\d{1,5}\\b");
-	
-			if (splitUrl.length > 2) return CONNERR_URL;
-			
-			String newUrl = splitUrl[0];
-			int port = 80;
-			if(splitUrl.length == 2)
-			{
-				int end = splitUrl[0].length() + realUrl.length()-(splitUrl[0].length()+splitUrl[1].length());
-				port = Integer.valueOf(realUrl.substring(splitUrl[0].length()+1, end)).intValue();
-				newUrl += splitUrl[1];
-			}
-			else port = Integer.valueOf(realUrl.substring(splitUrl[0].length()+1)).intValue();
-
-			conInfo = new ConnectionInformation(newUrl, port, mConnNextHandle);
-		}
-/*		
-		else if(url.startsWith("btspp://"))
-		{
+		ConnectionInformation connectionInfo;
 		
+		if (url.startsWith("socket://"))
+		{
+			connectionInfo = new SocketConnectionInformation().create(url, mConnNextHandle);
 		}
-*/		
+		else if (url.startsWith("btspp://"))
+		{
+			connectionInfo = new BluetoothConnectionInformation().create(url, mConnNextHandle);
+		}
 		else
 		{
-			URL connectionURL = new URL(url);
-			URLConnection con = connectionURL.openConnection();
-			con.setAllowUserInteraction(true);
-			con.setDoInput(true);
-			con.setDoOutput(true);
-			con.setUseCaches(false);
-			
-			conInfo = new ConnectionInformation(con, mConnNextHandle);	
+			connectionInfo = new UrlConnectionInformation().create(url, mConnNextHandle);
 		}
 		
-		mConnections.put(mConnNextHandle, conInfo);
-			
-		conInfo.mState |= CONNOP_CONNECT;
-		conInfo.mMoSyncThread = this;
-			
-		mThreadPool.execute(new HttpConnectionConnector(conInfo));
+		mConnections.put(mConnNextHandle, connectionInfo);
+		
+		connectionInfo.mState |= CONNOP_CONNECT;
+		
+		connectionInfo.startConnectThread();
 	}
-	catch(MalformedURLException e)
+	catch (MalformedURLException e)
 	{
 		SYSLOG("MalformedURLException: " + e.toString());
 		return CONNERR_URL;
 	}
-	catch(IOException e)
+	catch (IOException e)
 	{
 		SYSLOG("IOException: " + e.toString());
 		PRINT_STACK_TRACE;
 		return CONNERR_GENERIC;
 	}
-	catch(Exception e)
+	catch (Exception e)
 	{
 		SYSLOG("Exception: " + e.toString());
 		PRINT_STACK_TRACE;
 		return CONNERR_GENERIC;
-	}	
-	
+	}
+
+	// Return current handle value and increment.
 	return mConnNextHandle++;
 }
 
@@ -124,257 +109,87 @@ int maConnGetAddr(MAHandle conn, long addr) throws Exception {
 }
 
 /**
-*
+* Close a connection.
 */
-void maConnClose(MAHandle conn) throws Exception {
+void maConnClose(MAHandle conn) throws Exception 
+{
 	Log.i("MoSyncSyscall","maConnClose");
-	
-	Integer key = new Integer(conn);
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	
+	ConnectionInformation connectionInfo = mConnections.get(conn);
 	connectionInfo.close();
-	
-	mConnections.remove(key);
+	mConnections.remove(conn);
 }
 
-void maConnRead(MAHandle conn, int dst, int size) {
-	Log.i("MoSyncSyscall","maConnRead");
+void maConnRead(MAHandle conn, int dst, int size) 
+{
+	Log.i(
+		"@MoSyncSyscall",
+		"maConnRead" + " conn:" + conn + " dst:" + dst + " size:" + size);
 	SYSLOG("conn:" + conn + " dst:" + dst + " size:" + size);
 	
 	MYASSERT(size > 0);
 	
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	
-	connectionInfo.mMemory = dst;
-	connectionInfo.mSize = size;
-	connectionInfo.mReadData = true;
-	connectionInfo.mUseResource = false;
-	
-	try
-	{
-		if(connectionInfo.mIsHttpConnection)
-			connectionInfo.mIs = connectionInfo.mConnection.getInputStream();
-		else if (connectionInfo.mIsSocketConnection)
-			connectionInfo.mIs = connectionInfo.mSocket.getInputStream();
-			
-		MYASSERT(connectionInfo.mIs != null);
-	}
-	catch(IOException e)
-	{
-		PRINT_STACK_TRACE;
-	}
-	
-	MYASSERT((connectionInfo.mState & CONNOP_READ) == 0);
-	connectionInfo.mState |= CONNOP_READ;
-	connectionInfo.mMoSyncThread = this;
-	
-	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	connectionInfo.read(dst, size);
 }
 
-void maConnWrite(MAHandle conn, int src, int size) throws IOException {
+void maConnWrite(MAHandle conn, int src, int size) throws IOException 
+{
 	Log.i("MoSyncSyscall","maConnWrite");
 	SYSLOG("conn:" + conn + " src:" + src + " size:" + size);
 	
 	MYASSERT(size > 0);
 	
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	
-	connectionInfo.mMemory = src;
-	connectionInfo.mSize = size;
-	connectionInfo.mReadData = false;
-	connectionInfo.mUseResource = false;
-	
-	try
-	{
-		if(connectionInfo.mIsHttpConnection)
-			connectionInfo.mOs = connectionInfo.mConnection.getOutputStream();
-		else if (connectionInfo.mIsSocketConnection)
-			connectionInfo.mOs = connectionInfo.mSocket.getOutputStream();
-			
-		MYASSERT(connectionInfo.mOs != null);
-	}
-	catch(IOException e)
-	{
-		PRINT_STACK_TRACE;
-	}
-	
-	MYASSERT((connectionInfo.mState & CONNOP_WRITE) == 0);
-	if(connectionInfo.mIsHttpConnection == true) {
-		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
-		
-		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
-			connectionInfo.mHttpState = HTTP_STATE_WRITING;
-		}
-	}
-	else if(connectionInfo.mIsSocketConnection == true) {
-		if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
-			connectionInfo.mHttpState = HTTP_STATE_WRITING;
-	}
-	connectionInfo.mState |= CONNOP_WRITE;
-	connectionInfo.mMoSyncThread = this;
-	
-	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	connectionInfo.write(src, size);
 }
 
-void maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) {
+void maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) 
+{
 	Log.i("MoSyncSyscall","maConnReadToData");
 
 	MYASSERT(offset >= 0);
 	MYASSERT(size > 0);
 	MYASSERT(offset + size > 0);
-/*
-	Binary binaryResource = (Binary)getResource(data);
-	MYASSERT(binaryResource.size() >= offset + size);
-*/
-
-	ByteBuffer byteBuffer = (ByteBuffer)mBinaryResources.get(data);
-	if(null == byteBuffer) BIG_PHAT_ERROR;
-
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
 	
-	connectionInfo.mData = data;
-	//connectionInfo.mBinary = binaryResource;
-	connectionInfo.mByteBuffer = byteBuffer;
-	connectionInfo.mOffset = offset;
-	connectionInfo.mSize = size;
-	connectionInfo.mReadData = true;
-	connectionInfo.mUseResource = true;
-	
-	try
-	{
-		if(connectionInfo.mIsHttpConnection)
-			connectionInfo.mIs = connectionInfo.mConnection.getInputStream();
-		else if (connectionInfo.mIsSocketConnection)
-			connectionInfo.mIs = connectionInfo.mSocket.getInputStream();
-			
-		MYASSERT(connectionInfo.mIs != null);
-	}
-	catch(IOException e)
-	{
-		PRINT_STACK_TRACE;
-	}
-	
-	/*
-		The JNI side is responsible for setting the resource in flux
-	*/
-	//setResource(data, mFlux);
-	
-	connectionInfo.mState |= CONNOP_READ;
-	connectionInfo.mMoSyncThread = this;
-	
-	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	connectionInfo.readToData(data, offset, size);
 }
 
-void maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size) throws IOException {
+void maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size) 
+	throws IOException 
+{
 	Log.i("MoSyncSyscall","maConnReadFromData");
 
 	MYASSERT(offset >= 0);
 	MYASSERT(size > 0);
 	MYASSERT(offset + size > 0);
 
-/*
-	Binary binaryResource = (Binary)getResource(data);
-	MYASSERT(binaryResource.size() >= offset + size);
-*/
-	ByteBuffer byteBuffer = (ByteBuffer)mBinaryResources.get(data);
-	if(null == byteBuffer) BIG_PHAT_ERROR;
-	
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	
-	connectionInfo.mData = data;
-	//connectionInfo.mBinary = binaryResource;
-	connectionInfo.mByteBuffer = byteBuffer;
-	connectionInfo.mOffset = offset;
-	connectionInfo.mSize = size;
-	connectionInfo.mReadData = false;
-	connectionInfo.mUseResource = true;
-	
-	try
-	{
-		if(connectionInfo.mIsHttpConnection)
-			connectionInfo.mOs = connectionInfo.mConnection.getOutputStream();
-		else if (connectionInfo.mIsSocketConnection)
-			connectionInfo.mOs = connectionInfo.mSocket.getOutputStream();
-			
-		MYASSERT(connectionInfo.mOs != null);
-	}
-	catch(IOException e)
-	{
-		PRINT_STACK_TRACE;
-	}
-	
-	MYASSERT((connectionInfo.mState & CONNOP_WRITE) == 0);
-	if(connectionInfo.mIsHttpConnection == true) {
-		HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
-		
-		if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
-			connectionInfo.mHttpState = HTTP_STATE_WRITING;
-		}
-	}
-	else if(connectionInfo.mIsSocketConnection == true) {
-		if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
-			connectionInfo.mHttpState = HTTP_STATE_WRITING;
-	}
-	
-	/*
-		The JNI side is responsible for setting the resource in flux
-	*/
-	//setResource(data, mFlux);
-	
-	connectionInfo.mState |= CONNOP_WRITE;
-	connectionInfo.mMoSyncThread = this;
-	
-	mThreadPool.execute(new HttpConnectionRunner(connectionInfo));
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	connectionInfo.writeFromData(data, offset, size);
 }
-
-
 
 MAHandle maHttpCreate(String url, int method) throws Exception
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpCreate");
 	try
 	{
-		URL connectionURL = new URL(url);
-		URLConnection con = connectionURL.openConnection();
-		con.setAllowUserInteraction(true);
-		con.setDoInput(true);
-		con.setDoOutput(true);
-		con.setUseCaches(false);
-		
-		HttpURLConnection httpConn = (HttpURLConnection) con;
-		
-		switch(method) {
-		case HTTP_GET:
-			httpConn.setRequestMethod("GET");
-			break;
-		case HTTP_POST:
-			httpConn.setRequestMethod("POST");
-			break;
-		case HTTP_HEAD:
-			httpConn.setRequestMethod("HEAD");
-			break;
-		default:
-			BIG_PHAT_ERROR;
-		}
-
-		ConnectionInformation urlcon = new ConnectionInformation(con, mConnNextHandle);
-		
-		DEBUG_ASSERT(urlcon.mHttpState == HTTP_STATE_NULL);
-		urlcon.mHttpState = HTTP_STATE_SETUP;
-	
-		mConnections.put(mConnNextHandle, urlcon);
+		ConnectionInformation connectionInfo = 
+			new HttpConnectionInformation().create(url, method, mConnNextHandle);
+		DEBUG_ASSERT(connectionInfo.mHttpState == HTTP_STATE_NULL);
+		connectionInfo.mHttpState = HTTP_STATE_SETUP;
+		mConnections.put(mConnNextHandle, connectionInfo);
 	}
-	catch(MalformedURLException e)
+	catch (MalformedURLException e)
 	{
 		PRINT_STACK_TRACE;
 		return CONNERR_URL;
 	}
-	catch(IOException e)
+	catch (IOException e)
 	{
 		PRINT_STACK_TRACE;
 		return CONNERR_GENERIC;
 	}
-	catch(Exception e)
+	catch (Exception e)
 	{
 		PRINT_STACK_TRACE;
 		return CONNERR_GENERIC;
@@ -384,82 +199,40 @@ MAHandle maHttpCreate(String url, int method) throws Exception
 }
 
 void maHttpSetRequestHeader(MAHandle conn, String key, String value)
-throws Exception
+	throws Exception
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpSetRequestHeader");
 
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP);
-	
-	URLConnection connection = connectionInfo.mConnection;
-	try
-	{
-		connection.setRequestProperty(key, value);
-	} 
-	catch (IllegalStateException e)
-	{
-		PRINT_STACK_TRACE;
-	} 
-	catch (NullPointerException e)
-	{
-		PRINT_STACK_TRACE;
-	}
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	connectionInfo.setRequestProperty(key, value);
 }
 
 int maHttpGetResponseHeader(MAHandle conn, String key, long address, int bufSize)
-throws Exception
+	throws Exception
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpGetResponseHeader");
 	
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
-	URLConnection connection = connectionInfo.mConnection;
-	
-	try
-	{
-		//final String value = connection.getRequestProperty(key);
-		final String value = connection.getHeaderField(key);
-		
-		if(value == null)
-			return CONNERR_NOHEADER;
-		
-		// Write the bufSize first characters in the String value to ds_mem starting at address
-				
-		byte[] vstr = value.getBytes();
-		
-		SYSLOG("value: " + value + " vstr: " + new String(vstr) + " vstr.length: " + vstr.length + "position: " + address);
-		
-		mMemDataSection.mark();
-		mMemDataSection.position((int)address);
-		mMemDataSection.put(vstr, 0, vstr.length);
-		mMemDataSection.reset();
-		
-		return vstr.length;
-	} 
-	catch (IllegalStateException e)
-	{
-		PRINT_STACK_TRACE;
-	} 
-	
-	return -1;
+	ConnectionInformation connectionInfo = mConnections.get(conn);
+	return connectionInfo.getResponseHeader(key, address, bufSize);
 }
 
 void maHttpFinish(MAHandle conn)
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpFinish");
 	
-	ConnectionInformation connectionInfo = (ConnectionInformation)mConnections.get(new Integer(conn));
+	ConnectionInformation connectionInfo = mConnections.get(conn);
 	
 	MYASSERT(connectionInfo.mState == 0);
 	MYASSERT(connectionInfo.mHttpState == HTTP_STATE_SETUP || connectionInfo.mHttpState == HTTP_STATE_WRITING);
+
 	connectionInfo.mState = CONNOP_FINISH;
 	connectionInfo.mHttpState = HTTP_STATE_FINISHING;
 	connectionInfo.mMoSyncThread = this;
 	
-	mThreadPool.execute(new HttpConnectionFinish(connectionInfo));
+	connectionInfo.startConnectThread();
 }
 
-
-public class ConnectionInformation
+public abstract class ConnectionInformation
 {
 	public ByteBuffer mByteBuffer;
 	public long mMemory;
@@ -474,44 +247,29 @@ public class ConnectionInformation
 	public boolean mCancelled;
 	public boolean mIsHttpConnection;
 	public boolean mIsSocketConnection;
-	public boolean mIsBluetoothConnection;
-	private MAHandle mHandle;
+	//public boolean mIsBluetoothConnection;
+	protected MAHandle mHandle;
 	public InputStream mIs;
 	public OutputStream mOs;
 	public MAHandle mData;
 	public Thread mMoSyncThread;
-	
 	public String mSocketAddress;
 	public int mSocketPort;
 	
-	
-	public ConnectionInformation(URLConnection connection, MAHandle handle )
+	public ConnectionInformation()
 	{
-		mConnection = connection;
-		mHandle = handle;
 		mState = 0;
 		mHttpState = HTTP_STATE_NULL;
 		mCancelled = false;
-		
-		mIsHttpConnection = true;
-		mIsSocketConnection = false;
-	}
-	
-	public ConnectionInformation(String socketAddress, int socketPort, MAHandle handle )
-	{
-		mSocketAddress = socketAddress;
-		mSocketPort = socketPort;
-		mHandle = handle;
-		mState = 0;
-		mHttpState = HTTP_STATE_NULL;
-		mCancelled = false;
-		
 		mIsHttpConnection = false;
-		mIsSocketConnection = true;
+		mIsSocketConnection = false;
+		mMoSyncThread = MoSyncThread.this;
 	}
 	
-	final void postResultEvent(int opType, int result) {
-		Log.i("MoSync syscall", "handle:" + mHandle + " opType:" + opType + " result:" + result);
+	public void postResultEvent(int opType, int result) 
+	{
+		Log.i("ConnectionInformation.postResultEvent", "handle: " + mHandle + " opType: " + opType + " result: " + result);
+
 		MYASSERT((mState & opType) != 0);
 		mState &= ~opType;
 
@@ -521,31 +279,680 @@ public class ConnectionInformation
 		event[2] = opType;
 		event[3] = result;
 		
-		Log.i("ConnectionInformation","Native Post Event");
+		Log.i("ConnectionInformation.postResultEvent", "Calling nativePostEvent");
 		nativePostEvent(event);
 		
-		Log.i("ConnectionInformation","Interrupt");
+		Log.i("ConnectionInformation.postResultEvent", "Calling interrupt");
 		mMoSyncThread.interrupt();
 	}
 	
-	synchronized final void close() throws IOException
+	// TODO: Why synchronized? And need we not synchronize reading and writing?
+	// Or mark a connection as beeing in use when a thread operates on it?
+	public synchronized void close() throws IOException
 	{
 		mCancelled = true;
-		if(mIs != null)
+		if (mIs != null)
+		{
 			mIs.close();
-		if(mOs != null)
+		}
+		if (mOs != null)
+		{
 			mOs.close();
+		}
 		mConnection = null;
 	}
 	
+	public void read(int dst, int size)
+	{
+		mMemory = dst;
+		mSize = size;
+		mReadData = true;
+		mUseResource = false;
+		
+		try
+		{
+			mIs = getInputStream();
+			MYASSERT(mIs != null);
+		}
+		catch (IOException e)
+		{
+			PRINT_STACK_TRACE;
+		}
+		
+		MYASSERT((mState & CONNOP_READ) == 0);
+		
+		mState |= CONNOP_READ;
+		mMoSyncThread = MoSyncThread.this;
+		
+		mThreadPool.execute(new HttpConnectionRunner(this));
+	}
 	
-}
+	public void write(int src, int size)
+	{
+		mMemory = src;
+		mSize = size;
+		mReadData = false;
+		mUseResource = false;
+		
+		try
+		{
+			mOs = getOutputStream();
+			MYASSERT(mOs != null);
+		}
+		catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+		}
+		
+		MYASSERT((mState & CONNOP_WRITE) == 0);
+		
+		// HTTP_STATE_WRITING is never really used. 
+		// We do not need to set it. 
+		// TODO: Remove it altogether.
+		/*
+		if (connectionInfo.mIsHttpConnection == true) 
+		{
+			HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
+			
+			if (httpConn.getRequestMethod().equals("POST") && 
+				connectionInfo.mHttpState == HTTP_STATE_SETUP) 
+			{
+				connectionInfo.mHttpState = HTTP_STATE_WRITING;
+			}
+		}
+		else if (connectionInfo.mIsSocketConnection == true) 
+		{
+			if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
+				connectionInfo.mHttpState = HTTP_STATE_WRITING;
+		}
+		*/
+		
+		mState |= CONNOP_WRITE;
+		mMoSyncThread = MoSyncThread.this;
+		
+		mThreadPool.execute(new HttpConnectionRunner(this));
+	}
+	
+	public void readToData(MAHandle data, int offset, int size)
+	{
+	/*
+		Binary binaryResource = (Binary)getResource(data);
+		MYASSERT(binaryResource.size() >= offset + size);
+	*/
+		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
+		if (null == byteBuffer) 
+		{
+			BIG_PHAT_ERROR;
+		}
 
-class HttpConnectionConnector implements Runnable {
+		mData = data;
+		//mBinary = binaryResource;
+		mByteBuffer = byteBuffer;
+		mOffset = offset;
+		mSize = size;
+		mReadData = true;
+		mUseResource = true;
+		
+		try
+		{
+			mIs = getInputStream();
+			MYASSERT(mIs != null);
+		}
+		catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+		}
+		
+		/*
+			The JNI side is responsible for setting the resource in flux
+		*/
+		//setResource(data, mFlux);
+		
+		mState |= CONNOP_READ;
+		mMoSyncThread = MoSyncThread.this;
+		
+		mThreadPool.execute(new HttpConnectionRunner(this));
+	}
+	
+	public void writeFromData(MAHandle data, int offset, int size)
+	{
+	/*
+		Binary binaryResource = (Binary)getResource(data);
+		MYASSERT(binaryResource.size() >= offset + size);
+	*/
+		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
+		if (null == byteBuffer) 
+		{
+			BIG_PHAT_ERROR;
+		}
+		
+		mData = data;
+		//mBinary = binaryResource;
+		mByteBuffer = byteBuffer;
+		mOffset = offset;
+		mSize = size;
+		mReadData = false;
+		mUseResource = true;
+		
+		try
+		{
+			mOs = getOutputStream();
+			MYASSERT(mOs != null); 	
+		}
+		catch(IOException e)
+		{
+			PRINT_STACK_TRACE;
+		}
+		
+		// HTTP_STATE_WRITING is never really used. 
+		// We do not need to set it. 
+		// TODO: Remove it altogether.
+		/*
+		MYASSERT((connectionInfo.mState & CONNOP_WRITE) == 0);
+		if(connectionInfo.mIsHttpConnection == true) {
+			HttpURLConnection httpConn = (HttpURLConnection) connectionInfo.mConnection;
+			
+			if(httpConn.getRequestMethod().equals("POST") && connectionInfo.mHttpState == HTTP_STATE_SETUP) {
+				connectionInfo.mHttpState = HTTP_STATE_WRITING;
+			}
+		}
+		else if(connectionInfo.mIsSocketConnection == true) {
+			if(connectionInfo.mHttpState == HTTP_STATE_SETUP)
+				connectionInfo.mHttpState = HTTP_STATE_WRITING;
+		}
+		*/
+		
+		/*
+			The JNI side is responsible for setting the resource in flux
+		*/
+		//setResource(data, mFlux);
+		
+		mState |= CONNOP_WRITE;
+		mMoSyncThread = MoSyncThread.this;
+		
+		mThreadPool.execute(new HttpConnectionRunner(this));
+	}
+	
+	public void setRequestProperty(String key, String value)
+	{
+		MYASSERT(mHttpState == HTTP_STATE_SETUP);
+		
+		try
+		{
+			mConnection.setRequestProperty(key, value);
+		} 
+		catch (IllegalStateException e)
+		{
+			PRINT_STACK_TRACE;
+		} 
+		catch (NullPointerException e)
+		{
+			PRINT_STACK_TRACE;
+		}
+	}
 
+	public int getResponseHeader(String key, long address, int bufSize)
+	{
+		try
+		{
+			String value = mConnection.getHeaderField(key);
+			
+			if (value == null)
+			{
+				return CONNERR_NOHEADER;
+			}
+			
+			// Write the bufSize first characters in the String value to ds_mem starting at address
+			
+			byte[] vstr = value.getBytes();
+			
+			SYSLOG("value: " + value + " vstr: " + new String(vstr) + " vstr.length: " + vstr.length + "position: " + address);
+			
+			mMemDataSection.mark();
+			mMemDataSection.position((int)address);
+			mMemDataSection.put(vstr, 0, vstr.length);
+			mMemDataSection.reset();
+			
+			return vstr.length;
+		} 
+		catch (IllegalStateException e)
+		{
+			PRINT_STACK_TRACE;
+		} 
+		
+		return -1;
+	}
+
+	public abstract void startConnectThread();
+	public abstract InputStream getInputStream() throws IOException;
+	public abstract OutputStream getOutputStream() throws IOException;
+	
+} // End of class ConnectionInformation
+
+class UrlConnectionInformation extends ConnectionInformation
+{
+	/**
+	 * Initialize the connection info object.
+	 */
+	public ConnectionInformation create(String url, MAHandle handle) 
+		throws MalformedURLException, IOException
+	{
+		URL connectionURL = new URL(url);
+		URLConnection connection = connectionURL.openConnection();
+		connection.setAllowUserInteraction(true);
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setUseCaches(false);
+		
+		mConnection = connection;
+		mHandle = handle;
+			
+		return this;
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public UrlConnectionInformation()
+	{
+		// This naming is a bit weird... 
+		// Remove the "is" variables.
+		mIsHttpConnection = true;
+	}
+	
+	/**
+	 * Start executing connection.
+	 */
+	@Override
+	public void startConnectThread()
+	{
+		mThreadPool.execute(new HttpConnectionConnector(this));
+	}
+	
+	@Override
+	public InputStream getInputStream() throws IOException
+	{	
+		return mConnection.getInputStream();
+	}
+	
+	@Override
+	public OutputStream getOutputStream() throws IOException
+	{	
+		return mConnection.getOutputStream();
+	}
+} // End of class UrlConnectionInformation
+
+class HttpConnectionInformation extends ConnectionInformation
+{
+	/**
+	 * Initialize the connection info object.
+	 */
+	public ConnectionInformation create(String url, int method, MAHandle handle) 
+		throws MalformedURLException, IOException
+	{
+		URL connectionURL = new URL(url);
+		URLConnection connection = connectionURL.openConnection();
+		connection.setAllowUserInteraction(true);
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setUseCaches(false);
+		
+		HttpURLConnection httpConnection = (HttpURLConnection) connection;
+		
+		switch (method) 
+		{
+		case HTTP_GET:
+			httpConnection.setRequestMethod("GET");
+			break;
+		case HTTP_POST:
+			httpConnection.setRequestMethod("POST");
+			break;
+		case HTTP_HEAD:
+			httpConnection.setRequestMethod("HEAD");
+			break;
+		default:
+			BIG_PHAT_ERROR;
+		}
+
+		mConnection = connection;
+		mHandle = handle;
+			
+		return this;
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public HttpConnectionInformation()
+	{
+		mIsHttpConnection = true;
+	}
+	
+	/**
+	 * Start executing connection.
+	 */
+	@Override
+	public void startConnectThread()
+	{
+		mThreadPool.execute(new HttpConnectionFinish(this));
+	}
+	
+	@Override
+	public InputStream getInputStream() throws IOException
+	{	
+		return mConnection.getInputStream();
+	}
+	
+	@Override
+	public OutputStream getOutputStream() throws IOException
+	{	
+		return mConnection.getOutputStream();
+	}
+} // End of class HttpConnectionInformation
+
+class SocketConnectionInformation extends ConnectionInformation
+{
+	/**
+	 * Initialize the connection info object.
+	 */
+	public ConnectionInformation create(String url, MAHandle handle)
+		throws MalformedURLException, IOException, Exception
+	{
+		Log.i("@@@TEST", "Socket url: " + url);
+		
+		// Restructure the url since port can't be part of it.
+		String realUrl = url.substring(9);
+		String[] splitUrl = realUrl.split("\\b:\\d{1,5}\\b");
+
+		if (splitUrl.length > 2) 
+		{
+			throw new MalformedURLException("Malformed URL: " + url);
+		}
+		
+		String newUrl = splitUrl[0];
+		int port = 80;
+		if (splitUrl.length == 2)
+		{
+			int end = (splitUrl[0].length() + realUrl.length()) - (splitUrl[0].length() + splitUrl[1].length());
+			port = Integer.valueOf(realUrl.substring(splitUrl[0].length() + 1, end)).intValue();
+			newUrl += splitUrl[1];
+		}
+		else 
+		{
+			port = Integer.valueOf(realUrl.substring(splitUrl[0].length() + 1)).intValue();
+		}
+
+		Log.i("@@@TEST", "Socket newUrl: " + newUrl + " port: " + port);
+		
+		mSocketAddress = newUrl;
+		mSocketPort = port;
+		mHandle = handle;
+			
+		return this;
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	private SocketConnectionInformation()
+	{
+		mIsSocketConnection = true;
+	}
+	
+	/**
+	 * Start executing connection.
+	 */
+	@Override
+	public void startConnectThread()
+	{
+		mThreadPool.execute(new HttpConnectionConnector(this));
+	}
+	
+	@Override
+	public InputStream getInputStream() throws IOException
+	{	
+		return mSocket.getInputStream();
+	}
+	
+	@Override
+	public OutputStream getOutputStream() throws IOException
+	{	
+		return mSocket.getOutputStream();
+	}
+} // End of class SocketConnectionInformation
+
+class BluetoothConnectionInformation extends ConnectionInformation
+{
+	private String mDeviceAddress;
+	private int mChannel;
+	private String mUUID;
+	private BluetoothSocket mSocket;
+	
+	/**
+	 * Initialize the connection info object.
+	 */
+	public ConnectionInformation create(String url, MAHandle handle)
+		throws MalformedURLException, IOException, Exception
+	{
+		// Clear device info.
+		mDeviceAddress = null;
+		mChannel = 0;
+		mUUID = null;
+		
+		// Get the device address and the channel.
+		String realUrl = url.substring(8);
+		
+		// Upercase the url.
+		realUrl = realUrl.toUpperCase();
+		
+		// Get the parts separated by the colon.
+		String[] splitUrl = realUrl.split(":");
+		if (splitUrl.length != 2) 
+		{
+			Log.e("@BT", "Malformed URL: " + url);
+			throw new MalformedURLException("Malformed URL: " + url);
+		}
+		
+		// Format device address for use with the Android API.
+		mDeviceAddress = btFormatDeviceAddress(splitUrl[0]);
+		
+		// Determine if second part is channel or uuid.
+		String channelOrUUID = splitUrl[1];
+		
+		// Is it a channel number?
+		if (channelOrUUID.matches("\\b[0123]{1,2}\\b"))
+		{
+			mChannel = Integer.parseInt(channelOrUUID);
+		}
+		else if (channelOrUUID.matches("\\b[0123456789ABCDEF]{32}\\b"))
+		{
+			// It is a service record UUID.
+			mUUID = btFormatServiceUUID(channelOrUUID);
+		}
+		else 
+		{
+			Log.e("@BT", "Malformed URL: " + url);
+			throw new MalformedURLException("Malformed URL: " + url);
+		}
+		
+		// Set the handle for this connection.
+		mHandle = handle;
+		
+		Log.i("@BT", "mDeviceAddress = " + mDeviceAddress);
+		Log.i("@BT", "mChannel = " + mChannel);
+		Log.i("@BT", "mUUID = " + mUUID);
+		
+		return this;
+	}
+	
+	/**
+	 * Constructor.
+	 */
+	public BluetoothConnectionInformation()
+	{
+	}
+	
+	@Override
+	public synchronized void close() throws IOException
+	{
+		super.close();
+		
+		if (null != mSocket)
+		{
+			mSocket.close();
+			mSocket = null;
+		}
+	}
+	
+	// Mocked data for debugging. Also uncomment connect to run with mock data.
+	//String myOutData = "1212121212121212129";
+	//ByteArrayInputStream myInputStream = new ByteArrayInputStream(myOutData.getBytes());
+	//ByteArrayOutputStream myOutputStream = new ByteArrayOutputStream();
+	
+	@Override
+	public InputStream getInputStream() throws IOException
+	{	
+		//return myInputStream;
+		return mSocket.getInputStream();
+	}
+	
+	
+	@Override
+	public OutputStream getOutputStream() throws IOException
+	{	
+		//return myOutputStream;
+		return mSocket.getOutputStream();
+	}
+	
+	/**
+	 * Return the device address, formatted for use with the Android API.
+	 */
+	public String getDeviceAddress()
+	{
+		return mDeviceAddress;
+	}
+	
+	public int getChannel()
+	{
+		return mChannel;
+	}
+	
+	public BluetoothSocket getSocket()
+	{
+		return mSocket;
+	}
+	
+	public void setSocket(BluetoothSocket socket)
+	{
+		mSocket = socket;
+	}
+	
+	/**
+	 * Start executing connection.
+	 */
+	@Override
+	public void startConnectThread()
+	{
+		mThreadPool.execute(new Runnable()
+		{
+			public void run()
+			{
+				//Looper.prepare();
+				//Looper.loop();
+				doConnect();
+				//Looper.myLooper().quit();
+			}
+		});
+	}
+	
+	public void doConnect()
+	{
+		Log.i("@@BluetoothConnectionConnector", "doConnect2");
+			
+		try
+		{
+			String address = getDeviceAddress();
+			
+			BluetoothAdapter adapter = btGetBluetoothAdapter();
+			if (null == adapter)
+			{
+				Log.i("@@BluetoothConnectionConnector", "Bluetooth adapter not found");
+				postResultEvent(CONNOP_CONNECT, CONNERR_UNAVAILABLE);
+				return;
+			}
+			BluetoothDevice device = btGetBluetoothAdapter().getRemoteDevice(address);
+			if (null == device)
+			{
+				Log.i("@@BluetoothConnectionConnector", "Device not found at address: " + address);
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+			
+			Method createRfcommSocket = device.getClass().getMethod(
+				"createRfcommSocket", 
+				new Class[] { int.class });
+			if (null == createRfcommSocket)
+			{
+				Log.i("@@BluetoothConnectionConnector", "No method createRfcommSocket");
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+			
+			BluetoothSocket socket = (BluetoothSocket) createRfcommSocket.invoke(
+				device, 
+				getChannel());
+			if (null == socket)
+			{
+				Log.i("@@BluetoothConnectionConnector", "No socket created");
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+			
+			Log.i("@@BluetoothConnectionConnector", "COnnecting to socket");
+			
+			socket.connect();
+			
+			setSocket(socket);
+			
+			Log.i("@@BluetoothConnectionConnector", "Connection to Bluetooth socket made");
+			
+			int success = 1;
+			postResultEvent(CONNOP_CONNECT, success);
+		}
+		
+		catch (InterruptedIOException e)
+		{
+			Log.i("@@BluetoothConnectionConnector", "InterruptedIOException " + e);
+			e.printStackTrace();
+			PRINT_STACK_TRACE;
+			postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
+			return;
+		}
+		catch (IOException e)
+		{
+			Log.i("@@BluetoothConnectionConnector", "IOException " + e);
+			e.printStackTrace();
+			PRINT_STACK_TRACE;
+			postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			return;
+		}
+		catch (Exception e)
+		{
+			Log.i("@@BluetoothConnectionConnector", "Exception " + e);
+			e.printStackTrace();
+			PRINT_STACK_TRACE;
+			postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			return;
+		}
+	}
+} // End of class BluetoothConnectionInformation
+
+class HttpConnectionConnector implements Runnable 
+{
 	ConnectionInformation mConn;
 
-	HttpConnectionConnector(ConnectionInformation conn) {
+	HttpConnectionConnector(ConnectionInformation conn) 
+	{
 		mConn = conn;
 	}
 
@@ -554,14 +961,14 @@ class HttpConnectionConnector implements Runnable {
 		try
 		{
 			int result = 1;
-			if(mConn.mIsHttpConnection)
+			if (mConn.mIsHttpConnection)
 			{
 				mConn.mConnection.connect();
 			
 				HttpURLConnection http = (HttpURLConnection) mConn.mConnection;
 				
 				result = http.getResponseCode();
-				if(result <= 0)
+				if (result <= 0)
 				{
 					DUMP(result);
 					result = CONNERR_PROTOCOL;
@@ -570,46 +977,54 @@ class HttpConnectionConnector implements Runnable {
 				{
 #ifndef PHONE_RELEASE
 					//dump headers
-					int i=0;
-					while(true)
+					int i = 0;
+					while (true)
 					{
 						String key = mConn.mConnection.getHeaderFieldKey(i);
 						String value = mConn.mConnection.getHeaderField(i);
 						DEBUG_ALWAYS(key + ": " + value + "\n");
 						if(key == null && value == null)
+						{
 							break;
+						}
 						i++;
 					}
 #endif
 					mConn.mHttpState = HTTP_STATE_FINISHED;
 				}
 			}
-			if(mConn.mIsSocketConnection)
+			if (mConn.mIsSocketConnection)
 			{
 				Log.i("Connector","connection to socket");
 				mConn.mSocket = new Socket(mConn.mSocketAddress, mConn.mSocketPort);
 				Log.i("Connector","connection returned");
 				
-				if(mConn.mSocket.isConnected())
+				if (mConn.mSocket.isConnected())
+				{
 					mConn.mHttpState = HTTP_STATE_FINISHED;
+				}
 				else
+				{
 					result = CONNERR_GENERIC;
+				}
 			}
-			synchronized(mConn) {
-				if(mConn.mCancelled) {
+			synchronized(mConn) 
+			{
+				if (mConn.mCancelled) 
+				{
 					mConn.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 					return;
 				}
 			}
 			mConn.postResultEvent(CONNOP_CONNECT, result);
 		}
-		catch(InterruptedIOException e)
+		catch (InterruptedIOException e)
 		{
 			PRINT_STACK_TRACE;
 			mConn.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 			return;
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			PRINT_STACK_TRACE;
 			mConn.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
@@ -618,6 +1033,13 @@ class HttpConnectionConnector implements Runnable {
 	}
 }
 
+/**
+ * Class that reads or writes data. 
+ * TODO: It should be renamed, because it is a general class
+ * used for all connection types.
+ * Make two methods from this class in ConnectionInformation:
+ * doRead and doWrite, and call from thread (Runnable anon class).
+ */
 class HttpConnectionRunner implements Runnable 
 {
 	ConnectionInformation mConn;
@@ -627,12 +1049,12 @@ class HttpConnectionRunner implements Runnable
 		mConn = conn;
 	}
 
-	public final void run() {
-
+	public final void run() 
+	{
 		int opType = -1;
 		try
 		{
-			if(mConn.mReadData == true) // Read data
+			if (mConn.mReadData == true) // Read data
 			{
 				int result = -1;
 				int opResult;
@@ -641,7 +1063,7 @@ class HttpConnectionRunner implements Runnable
 				byte[] bytes = new byte[mConn.mSize];
 				result = mConn.mIs.read(bytes);
 				
-				if(mConn.mUseResource == true) // store in resource 
+				if (mConn.mUseResource == true) // store in resource 
 				{
 					Log.i("HttpConnectionRunner","Read to resource");
 					
@@ -656,9 +1078,8 @@ class HttpConnectionRunner implements Runnable
 				{
 					Log.i("HttpConnectionRunner","Read to memory");
 					
-					if(result > 0)
+					if (result > 0)
 					{
-						
 						// WRITE THE DATA IN BUFFER bytes TO MEMORY AT ADDRESS mConn.mMemory
 						
 						mMemDataSection.mark();
@@ -671,17 +1092,19 @@ class HttpConnectionRunner implements Runnable
 				}
 				
 				// success
-				if(result > 0)
+				if (result > 0)
 				{
 					opResult = result;
 				}
-				else if(result == -1) {
+				else if (result == -1) 
+				{
 					opResult = CONNERR_CLOSED;
-				} else {
+				} 
+				else 
+				{
 					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
 					opResult = CONNERR_INTERNAL;
 				}
-				
 				
 				/*
 					Restore resource from flux
@@ -694,7 +1117,7 @@ class HttpConnectionRunner implements Runnable
 			else // Write data
 			{
 				opType = CONNOP_WRITE;
-				if(mConn.mUseResource == true) // resource
+				if (mConn.mUseResource == true) // resource
 				{
 					Log.i("HttpConnectionRunner","Send from resource");
 					/*
@@ -744,30 +1167,90 @@ class HttpConnectionRunner implements Runnable
 				return;
 			}	
 		}
-		catch(InterruptedIOException e)
+		catch (InterruptedIOException e)
 		{
 			SYSLOG("InterruptedIOException e:" + e.toString());
 			PRINT_STACK_TRACE;
 			mConn.postResultEvent(opType, CONNERR_CANCELED);
 			return;
 		}
-		catch(IOException e)
+		catch (IOException e)
 		{
 			SYSLOG("IOException e:" + e.toString());
 			PRINT_STACK_TRACE;
 			mConn.postResultEvent(opType, CONNERR_GENERIC);
 			return;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			SYSLOG("Exception e:" + e.toString());
 			PRINT_STACK_TRACE;
 			mConn.postResultEvent(opType, CONNERR_GENERIC);
 			return;
 		}
-		
 	}
 }
+
+class HttpConnectionFinish implements Runnable
+{
+	ConnectionInformation mConn;
+
+	HttpConnectionFinish(ConnectionInformation conn)
+	{
+		mConn = conn;
+	}
+
+	public final void run() 
+	{
+		HttpURLConnection httpConn = (HttpURLConnection) mConn.mConnection;
+		try 
+		{
+			if (mConn.mOs != null) 
+			{
+				mConn.mOs.close();
+				mConn.mOs = null;
+			}
+			
+			int result = httpConn.getResponseCode();
+			if (result <= 0) 
+			{
+				DUMP(result);
+				result = CONNERR_PROTOCOL;
+			} 
+			else 
+			{
+//#ifndef PHONE_RELEASE
+				//dump headers
+				int i = 0;
+				while (true) 
+				{
+					String key = mConn.mConnection.getHeaderFieldKey(i);
+					String value = mConn.mConnection.getHeaderField(i);
+					DEBUG_ALWAYS(key + ": " + value + "\n");
+					if (key == null && value == null)
+					{
+						break;
+					}
+					i++;
+				}
+//#endif
+				mConn.mHttpState = HTTP_STATE_FINISHED;
+			}
+			mConn.postResultEvent(CONNOP_FINISH, result);
+		} 
+		catch (InterruptedIOException e) 
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_FINISH, CONNERR_CANCELED);
+		} 
+		catch (IOException e) 
+		{
+			PRINT_STACK_TRACE;
+			mConn.postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
+		}
+	}
+}
+
 /*
 class SocketConnectionRunner implements Runnable 
 {
@@ -867,54 +1350,82 @@ class SocketConnectionRunner implements Runnable
 	}
 }
 */
-class HttpConnectionFinish implements Runnable
-{
-	ConnectionInformation mConn;
 
-	HttpConnectionFinish(ConnectionInformation conn)
+/*
+class BluetoothConnectionConnector implements Runnable 
+{
+	BluetoothConnectionInformation mConnectionInfo;
+
+	BluetoothConnectionConnector(BluetoothConnectionInformation connectionInfo) 
 	{
-		mConn = conn;
+		mConnectionInfo = connectionInfo;
 	}
 
-	public final void run() {
-		HttpURLConnection httpConn = (HttpURLConnection)mConn.mConnection;
-		try {
-			if(mConn.mOs != null) {
-				mConn.mOs.close();
-				mConn.mOs = null;
+	public void run()
+	{
+		try
+		{
+			String address = mConnectionInfo.getDeviceAddress();
+			BluetoothAdapter adapter = btGetBluetoothAdapter();
+			if (null == adapter)
+			{
+				mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+			BluetoothDevice device = btGetBluetoothAdapter().getRemoteDevice(address);
+			if (null == device)
+			{
+				mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
 			}
 			
-			int result = httpConn.getResponseCode();
-			if(result <= 0) {
-				DUMP(result);
-				result = CONNERR_PROTOCOL;
-			} else {
-//#ifndef PHONE_RELEASE
-				//dump headers
-				int i=0;
-				while(true) {
-					String key = mConn.mConnection.getHeaderFieldKey(i);
-					String value = mConn.mConnection.getHeaderField(i);
-					DEBUG_ALWAYS(key + ": " + value + "\n");
-					if(key == null && value == null)
-						break;
-					i++;
-				}
-//#endif
-				mConn.mHttpState = HTTP_STATE_FINISHED;
+			Method createRfcommSocket = device.getClass().getMethod(
+				"createRfcommSocket", 
+				new Class[] { int.class });
+			if (null == createRfcommSocket)
+			{
+				mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
 			}
-			mConn.postResultEvent(CONNOP_FINISH, result);
-		} catch(InterruptedIOException e) {
+			
+			BluetoothSocket socket = (BluetoothSocket) createRfcommSocket.invoke(
+				device, 
+				mConnectionInfo.getChannel());
+			if (null == socket)
+			{
+				mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+				return;
+			}
+			
+			socket.connect();
+			
+			mConnectionInfo.setSocket(socket);
+			
+			Log.i("@@BluetoothConnectionConnector","connection to Bluetooth socket made");
+			
+			int success = 1;
+			mConnectionInfo.postResultEvent(CONNOP_CONNECT, success);
+		}
+		catch (InterruptedIOException e)
+		{
 			PRINT_STACK_TRACE;
-			mConn.postResultEvent(CONNOP_FINISH, CONNERR_CANCELED);
-		} catch(IOException e) {
+			mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
+			return;
+		}
+		catch (IOException e)
+		{
 			PRINT_STACK_TRACE;
-			mConn.postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
+			mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			return;
+		}
+		catch (Exception e)
+		{
+			PRINT_STACK_TRACE;
+			mConnectionInfo.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			return;
 		}
 	}
 }
-
-
-
+*/
 
 

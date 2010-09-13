@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Base
 {
 	// Framebuffer API
+	
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
 	
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis);
@@ -27,6 +28,7 @@ namespace Base
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis);
 	
 	// Bluetooth API
+	
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maBtGetNewDevice(
@@ -37,21 +39,39 @@ namespace Base
 		int addressPointer,
 		JNIEnv* jNIEnv, 
 		jobject jThis);
-	
-	int _maBtStartServiceDiscovery(JNIEnv* jNIEnv, jobject jThis);
-	
-	int _maBtGetNewService(MABtService* dst, JNIEnv* jNIEnv, jobject jThis);
-	
-	int _maBtGetNextServiceSize(JNIEnv* jNIEnv, jobject jThis);
-	
+		
+	int _maBtStartServiceDiscovery(
+		MABtAddr* addressPointer, 
+		MAUUID* uuidPointer, 
+		JNIEnv* jNIEnv, 
+		jobject jThis);
+		
+	int _maBtGetNextServiceSize(
+		int memStart,
+		int nameBufSizePointer,
+		int nUuidsPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis);
+		
+	int _maBtGetNewService(
+		int memStart,
+		int portPointer,
+		int nameBufPointer,
+		int nameBufSize,
+		int uuidsPointer,
+		JNIEnv* jNIEnv, 
+		jobject jThis);
+		
 	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis);
 	
 	// Location API
+	
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis);
 	
 	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis);
 	
 	// Other IOCTLs
+	
 	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis);

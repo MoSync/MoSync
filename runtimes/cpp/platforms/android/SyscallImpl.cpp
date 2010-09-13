@@ -1024,7 +1024,7 @@ namespace Base
 	SYSCALL(int,  maIOCtl(int function, int a, int b, int c))
 	{
 		SYSLOG("maIOCtl");
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl");
 		
 		switch(function) {
 		
@@ -1054,11 +1054,13 @@ namespace Base
 
 		// Bluetooth syscalls
 		
+		// int maBtStartDeviceDiscovery(int names)
 		case maIOCtl_maBtStartDeviceDiscovery:
 			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtStartDeviceDiscovery");
 			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
 			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 		
+		// int maBtGetNewDevice(MABtDevice* d)
 		case maIOCtl_maBtGetNewDevice:
 		{
 			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNewDevice");
@@ -1066,43 +1068,108 @@ namespace Base
 			
 			// a is pointer to struct MABtDevice
 			MABtDevice* deviceInfo = (MABtDevice*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtDevice));
+
+			// Size of buffer to store device name.
 			int nameBufSize = deviceInfo->nameBufSize;
-			char* name = (char*) SYSCALL_THIS->GetValidatedMemRange((int)deviceInfo->name, nameBufSize);
+
+			// Pointer to buffer to store device name.
+			int nameBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)deviceInfo->name, nameBufSize);
 			
 			// Here we get the address of deviceInfo->actualNameLength. Structs are packed, 
 			// which means that the start is at sizeof(char*) + sizeof(int), which is 8.
-			int actualNameLength = ((int)deviceInfo) + 8;
+			int actualNameLengthPointer = ((int)deviceInfo) + 8;
 			
 			// Here we get the address of the start of MABtAddr.a. Structs are packed, 
 			// which means that the start is at sizeof(char*) + sizeof(int) + sizeof(int),
 			// which is 12.
-			int address = ((int)deviceInfo) + 12;
+			int addressPointer = ((int)deviceInfo) + 12;
 			
 			// Returns 1 for success, 0 for no more devices.
 			return _maBtGetNewDevice(
 				(int)gCore->mem_ds,
-				(int)name,
+				nameBufPointer,
 				nameBufSize,
-				actualNameLength,
-				address,
+				actualNameLengthPointer,
+				addressPointer,
 				mJNIEnv, 
 				mJThis);
 		}
 		
+		// int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid) 	
 		case maIOCtl_maBtStartServiceDiscovery:
-			SYSLOG("maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
-			return -1;
+		{
+			SYSLOG("maIOCtl_maBtStartServiceDiscovery");
+			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtStartServiceDiscovery");
+			
+			// a is pointer to struct MABtAddr
+			MABtAddr* addressPointer = (MABtAddr*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtAddr));
+	
+			// b is pointer to struct MAUUID
+			MAUUID* uuidPointer = (MAUUID*) SYSCALL_THIS->GetValidatedMemRange(b, sizeof(MAUUID));
+
+			return _maBtStartServiceDiscovery(
+				addressPointer,
+				uuidPointer,
+				mJNIEnv, 
+				mJThis);
+		}
 		
-		case maIOCtl_maBtGetNewService:
-			SYSLOG("maIOCtl_maBtGetNewService NOT IMPLEMENTED");
-			return -1;
-		
+		// int maBtGetNextServiceSize(MABtServiceSize* dst)
 		case maIOCtl_maBtGetNextServiceSize:
-			SYSLOG("maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
-			return -1;
+		{
+			SYSLOG("maIOCtl_maBtGetNextServiceSize");
+			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNextServiceSize");
+			
+			// a is pointer to struct MABtServiceSize
+			MABtServiceSize* dstPointer = (MABtServiceSize*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtServiceSize));
+			int nameBufSizePointer = (int)dstPointer;
+			int nUuidsPointer = ((int)dstPointer) + sizeof(int);
+
+			return _maBtGetNextServiceSize(
+				(int)gCore->mem_ds,
+				nameBufSizePointer,
+				nUuidsPointer,
+				mJNIEnv, 
+				mJThis);
+		}
+		
+		// int maBtGetNewService(MABtService* dst)
+		case maIOCtl_maBtGetNewService:
+		{
+			SYSLOG("maIOCtl_maBtGetNewService");
+			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNewService");
+			
+			// a is pointer to struct MABtService
+			MABtService* serviceInfo = (MABtService*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtService));
+
+			// Pointer to int to store port (BT channel) number
+			// (this is the first field in the struct).
+			int portPointer = (int) serviceInfo;
+
+			// Size of buffer to store service name.
+			int nameBufSize = serviceInfo->nameBufSize;
+			
+			// Pointer to buffer to store service name.
+			int nameBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)serviceInfo->name, nameBufSize);
+
+			// Pointer to buffer to store uuids. We cannot validate this memory
+			// since we do not have access to the number of uuids here.
+			//int uuidsPointer = SYSCALL_THIS->GetValidatedMemRange((int)serviceInfo->uuids, size??);
+			int uuidsPointer = (int) (((char*)gCore->mem_ds) + ((int)serviceInfo->uuids));
+
+			return _maBtGetNewService(
+				(int)gCore->mem_ds,
+				portPointer,
+				nameBufPointer,
+				nameBufSize,
+				uuidsPointer,
+				mJNIEnv, 
+				mJThis);
+		}
 		
 		case maIOCtl_maBtCancelDiscovery:
 			SYSLOG("maIOCtl_maBtCancelDiscovery");
+			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtCancelDiscovery");
 			return _maBtCancelDiscovery(mJNIEnv, mJThis);
 		
 		// Frame buffer syscalls
