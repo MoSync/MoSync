@@ -2663,6 +2663,8 @@ retry:
 	// maTextBox
 	//*****************************************************************************
 	static HWND sTextBoxContainer = NULL, sEditBox = NULL;
+	static wchar_t* sTextBoxOutBuf;
+	static int sTextBoxOutSize;
 
 	static LRESULT CALLBACK TextBoxWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		static SHACTIVATEINFO sai;
@@ -2701,6 +2703,16 @@ retry:
 			{
 				WORD id = LOWORD(wParam);
 				if(id == IDOK || id == IDCANCEL) {
+					// get text
+					int res = GetWindowText(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+
+					// send event
+					MAEvent e;
+					e.type = EVENT_TYPE_TEXTBOX;
+					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+					e.textboxLength = res;
+					gEventFifo.put(e);
+
 					// time to close
 					LOG("DestroyWindow\n");
 					GLE(DestroyWindow(hwnd));
@@ -2744,6 +2756,9 @@ retry:
 			// textbox is already active, return error.
 			return -2;
 		}
+		DEBUG_ASSERT(sizeof(wchar) == sizeof(wchar_t));
+		sTextBoxOutSize = maxSize;
+		sTextBoxOutBuf = (wchar_t*)outText;
 
 		// create overlay window
 		// window class
@@ -2940,7 +2955,7 @@ retry:
 			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
-#define maxSize c
+#define maxSize SYSCALL_THIS->GetValidatedStackValue(0)	//ugly hack
 			maIOCtl_case(maTextBox);
 #undef maxSize 
 		}

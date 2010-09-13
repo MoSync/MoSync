@@ -2970,7 +2970,7 @@ int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 	TPtr tOutText(outText, maxSize - 1);
 	int res = gAppView.TextBox(tTitle, tInText, tOutText, constraints);
 	DEBUG_ASSERT(tOutText.Length() < maxSize);
-	tOutText[tOutText.Length()] = 0;
+	outText[tOutText.Length()] = 0;
 	
 	// send message
 	MAEvent e;

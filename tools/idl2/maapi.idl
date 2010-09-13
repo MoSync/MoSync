@@ -1301,6 +1301,7 @@ interface MAAPI {
 				int textboxResult;
 				/**
 				* The length, in characters, of the finished text.
+				* Does not include the terminating zero.
 				*/
 				int textboxLength;
 			} textbox;
