@@ -7,7 +7,7 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_INCLUDES = ["./inc"]
 	@NAME = "uidcrc"
-	
+	@INSTALLDIR = mosyncdir + '/bin'
 	setup
 end
 

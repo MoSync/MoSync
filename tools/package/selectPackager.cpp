@@ -78,6 +78,8 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 		return false;
 	string line;
 	getline(file, line);
+	if(line[line.length()-1] == '\r')
+		line = line.erase(line.length()-1, 1);
 	if(!file.good())
 		return false;
 

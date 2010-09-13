@@ -18,6 +18,7 @@ rcomp.instance_eval do
 	}
 	#@LIBRARIES = ['z']
 	@NAME = 'rcomp'
+	@INSTALLDIR = mosyncdir + '/bin'
 end
 
 rcomp.invoke

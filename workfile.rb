@@ -10,10 +10,10 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
 	PLATFORM_TOOLS = []
