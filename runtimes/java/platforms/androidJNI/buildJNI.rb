@@ -59,6 +59,9 @@ if secondarg == nil
 	exit 0
 end
 
+# Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH
+ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg[-1, 1]
+
 debug = (fortharg == nil) ? "" : "D"
 
 outdir = ".."

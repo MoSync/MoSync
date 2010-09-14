@@ -719,9 +719,7 @@ void maCloseStore(int store, int remove)
 
 #include "MoSyncSound.jpp"
 
-#ifdef _ANDROID_BLUETOOTH
 #include "MoSyncBluetooth.jpp"
-#endif
 
 #include "MoSyncNetwork.jpp"
 

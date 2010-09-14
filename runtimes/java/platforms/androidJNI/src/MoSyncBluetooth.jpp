@@ -76,53 +76,6 @@ Log.e(TAG, "Failed to connect", e);
 
 */
 
-final static int REQUEST_ENABLE_BT = 2;
-
-/**
- * Reference to the Bluetooth adapter. Used for caching (any gain in this?).
- * Do not use this reference as we try to reduce global reference.
- * Use method btGetBluetoothAdapter() to get the adapter.
- */
-BluetoothAdapter mBluetoothAdapter = null;
-
-/**
- * Discovery state values.
- */
-int BLUETOOTH_DISCOVERY_NOT_STARTED = 0;
-int BLUETOOTH_DISCOVERY_IN_PROGRESS = 1;
-int BLUETOOTH_DISCOVERY_ABORTED = 2;
-int BLUETOOTH_DISCOVERY_FINISHED = 3;
-
-/**
- * State of device discovery.
- */
-AtomicInteger mBluetoothDeviceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
-
-/**
- * State of service discovery.
- */
-AtomicInteger mBluetoothServiceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
-
-/**
- * List that holds discovered Bluetooth devices.
- */
-ConcurrentLinkedQueue<BluetoothDevice> mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
-
-/**
- * List that holds discovered Bluetooth services.
- */
-ConcurrentLinkedQueue<BluetoothService> mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
-
-/**
- * Thread that runs the device discovery process.
- */
-BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
-
-/**
- * Thread that runs the service discovery process.
- */
-BluetoothServiceDiscoveryThread mBluetoothServiceDiscoveryThread = null;
-
 /**
  * Start discovery of Bluetooth devices.
  * Parameter "names" is not used on Android.
@@ -130,6 +83,7 @@ BluetoothServiceDiscoveryThread mBluetoothServiceDiscoveryThread = null;
  */
 int maBtStartDeviceDiscovery(int names) throws Exception
 {
+#ifdef _ANDROID_BLUETOOTH
 	// Device disovery must not be running.
 	if (null != mBluetoothDeviceDiscoveryThread)
 	{
@@ -150,6 +104,9 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 	mBluetoothDeviceDiscoveryThread.start();
 	
 	return 0; // Zero means success.
+#else
+	return -1;
+#endif	
 }
 
 /**
@@ -161,6 +118,7 @@ int maBtGetNewDevice(
 	Address actualNameLengthPointer,
 	Address addressPointer)
 {
+#ifdef _ANDROID_BLUETOOTH
 	ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
 	
 	if (null == deviceList)
@@ -238,6 +196,9 @@ int maBtGetNewDevice(
 	mMemDataSection.reset();
 	
 	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif	
 }
 
 /**
@@ -245,6 +206,7 @@ int maBtGetNewDevice(
  */
 int maBtStartServiceDiscovery(String address, String uuid) throws Exception
 {
+#ifdef _ANDROID_BLUETOOTH
 	// Device disovery must not be running.
 	if (null != mBluetoothDeviceDiscoveryThread)
 	{
@@ -267,6 +229,9 @@ int maBtStartServiceDiscovery(String address, String uuid) throws Exception
 	mBluetoothServiceDiscoveryThread.start();
 	
 	return 0; // Zero means success.
+#else
+	return -1;
+#endif	
 }
 
 /**
@@ -274,6 +239,7 @@ int maBtStartServiceDiscovery(String address, String uuid) throws Exception
  */
 int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) throws Exception
 {
+#ifdef _ANDROID_BLUETOOTH
 	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
 	
 	if (null == serviceList)
@@ -307,6 +273,9 @@ int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) th
 	mMemDataSection.reset();
 	
 	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif	
 }
 
 /**
@@ -318,6 +287,7 @@ int maBtGetNewService(
 	int nameBufSize,
 	Address uuidsPointer) throws Exception
 {
+#ifdef _ANDROID_BLUETOOTH
 	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
 	
 	if (null == serviceList)
@@ -367,6 +337,9 @@ int maBtGetNewService(
 	*/
 	
 	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif
 }
 
 /**
@@ -374,6 +347,7 @@ int maBtGetNewService(
  */
 int maBtCancelDiscovery() throws Exception
 {
+#ifdef _ANDROID_BLUETOOTH
 	// Is device discovery in progress?
 	if (null != mBluetoothDeviceDiscoveryThread && 
 	    BLUETOOTH_DISCOVERY_IN_PROGRESS == mBluetoothDeviceDiscoveryState.get())
@@ -404,7 +378,61 @@ int maBtCancelDiscovery() throws Exception
 	}
 	
 	return 0; // No active operation.
+#else
+	return -1;
+#endif	
 }
+
+#ifdef _ANDROID_BLUETOOTH
+
+
+final static int REQUEST_ENABLE_BT = 2;
+
+/**
+ * Reference to the Bluetooth adapter. Used for caching (any gain in this?).
+ * Do not use this reference as we try to reduce global reference.
+ * Use method btGetBluetoothAdapter() to get the adapter.
+ */
+BluetoothAdapter mBluetoothAdapter = null;
+
+/**
+ * Discovery state values.
+ */
+int BLUETOOTH_DISCOVERY_NOT_STARTED = 0;
+int BLUETOOTH_DISCOVERY_IN_PROGRESS = 1;
+int BLUETOOTH_DISCOVERY_ABORTED = 2;
+int BLUETOOTH_DISCOVERY_FINISHED = 3;
+
+/**
+ * State of device discovery.
+ */
+AtomicInteger mBluetoothDeviceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
+
+/**
+ * State of service discovery.
+ */
+AtomicInteger mBluetoothServiceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
+
+/**
+ * List that holds discovered Bluetooth devices.
+ */
+ConcurrentLinkedQueue<BluetoothDevice> mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
+
+/**
+ * List that holds discovered Bluetooth services.
+ */
+ConcurrentLinkedQueue<BluetoothService> mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
+
+/**
+ * Thread that runs the device discovery process.
+ */
+BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
+
+/**
+ * Thread that runs the service discovery process.
+ */
+BluetoothServiceDiscoveryThread mBluetoothServiceDiscoveryThread = null;
+
 
 /**
  * Format device address for use with the Android API.
@@ -942,3 +970,4 @@ class BluetoothService
 		return buf;
 	}
 }
+#endif // _ANDROID_BLUETOOTH

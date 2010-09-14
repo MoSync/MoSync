@@ -61,10 +61,14 @@ MAHandle maConnect(final String url)
 		if (url.startsWith("socket://"))
 		{
 			connectionInfo = new SocketConnectionInformation().create(url, mConnNextHandle);
-		}
+		}	
 		else if (url.startsWith("btspp://"))
 		{
+#ifdef _ANDROID_BLUETOOTH		
 			connectionInfo = new BluetoothConnectionInformation().create(url, mConnNextHandle);
+#else
+			throw new Exception("Bluetooth not supported!");
+#endif // _ANDROID_BLUETOOTH
 		}
 		else
 		{
@@ -721,6 +725,7 @@ class SocketConnectionInformation extends ConnectionInformation
 	}
 } // End of class SocketConnectionInformation
 
+#ifdef _ANDROID_BLUETOOTH
 class BluetoothConnectionInformation extends ConnectionInformation
 {
 	private String mDeviceAddress;
@@ -946,6 +951,7 @@ class BluetoothConnectionInformation extends ConnectionInformation
 		}
 	}
 } // End of class BluetoothConnectionInformation
+#endif // _ANDROID_BLUETOOTH
 
 class HttpConnectionConnector implements Runnable 
 {
