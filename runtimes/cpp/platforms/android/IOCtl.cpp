@@ -324,6 +324,16 @@ namespace Base
 		return (int)ret;
 	}
 	
+	int _maAccept(int serverHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAccept", "(I)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, serverHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)ret;
+	}
+	
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);

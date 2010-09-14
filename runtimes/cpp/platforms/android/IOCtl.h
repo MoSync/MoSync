@@ -64,6 +64,10 @@ namespace Base
 		
 	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis);
 	
+	// Server API
+		
+	int _maAccept(int serverHandle, JNIEnv* jNIEnv, jobject jThis);
+	
 	// Location API
 	
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis);

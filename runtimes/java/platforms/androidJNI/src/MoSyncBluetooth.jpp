@@ -793,7 +793,8 @@ class BluetoothServiceDiscoveryThread extends Thread
 			mBluetoothServiceDiscoveryState.set(BLUETOOTH_DISCOVERY_IN_PROGRESS);
 			
 			startServiceDiscovery();
-			Looper.loop();
+			
+			//Looper.loop();  // TODO: Clean up this code.
 		}
 		catch (Throwable e)
 		{

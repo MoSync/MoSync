@@ -79,23 +79,26 @@ MAHandle maConnect(final String url)
 		
 		connectionInfo.mState |= CONNOP_CONNECT;
 		
+		Log.i("@@@ maConnect", "connectionInfo.startConnectThread");
+		
 		connectionInfo.startConnectThread();
 	}
 	catch (MalformedURLException e)
 	{
 		SYSLOG("MalformedURLException: " + e.toString());
+		e.printStackTrace();
 		return CONNERR_URL;
 	}
 	catch (IOException e)
 	{
 		SYSLOG("IOException: " + e.toString());
-		PRINT_STACK_TRACE;
+		e.printStackTrace();
 		return CONNERR_GENERIC;
 	}
 	catch (Exception e)
 	{
 		SYSLOG("Exception: " + e.toString());
-		PRINT_STACK_TRACE;
+		e.printStackTrace();
 		return CONNERR_GENERIC;
 	}
 
@@ -234,6 +237,12 @@ void maHttpFinish(MAHandle conn)
 	connectionInfo.mMoSyncThread = this;
 	
 	connectionInfo.startConnectThread();
+}
+
+int maAccept(int serverHandle)
+{
+	Log.i("@@ NetworkSyscall", "maAccept");
+	return -1;
 }
 
 public abstract class ConnectionInformation
@@ -732,6 +741,16 @@ class BluetoothConnectionInformation extends ConnectionInformation
 	private int mChannel;
 	private String mUUID;
 	private BluetoothSocket mSocket;
+	private boolean mIsServerConnectionRequest = false;
+	private boolean mIsChannelClientConnectionRequest = false;
+	private boolean mIsUUIDClientConnectionRequest = false;
+	
+	/**
+	 * Constructor.
+	 */
+	public BluetoothConnectionInformation()
+	{
+	}
 	
 	/**
 	 * Initialize the connection info object.
@@ -739,7 +758,6 @@ class BluetoothConnectionInformation extends ConnectionInformation
 	public ConnectionInformation create(String url, MAHandle handle)
 		throws MalformedURLException, IOException, Exception
 	{
-		// Clear device info.
 		mDeviceAddress = null;
 		mChannel = 0;
 		mUUID = null;
@@ -747,8 +765,7 @@ class BluetoothConnectionInformation extends ConnectionInformation
 		// Get the device address and the channel.
 		String realUrl = url.substring(8);
 		
-		// Upercase the url.
-		realUrl = realUrl.toUpperCase();
+		Log.i("@BT", "realUrl=" + realUrl);
 		
 		// Get the parts separated by the colon.
 		String[] splitUrl = realUrl.split(":");
@@ -758,26 +775,58 @@ class BluetoothConnectionInformation extends ConnectionInformation
 			throw new MalformedURLException("Malformed URL: " + url);
 		}
 		
-		// Format device address for use with the Android API.
-		mDeviceAddress = btFormatDeviceAddress(splitUrl[0]);
+		String part1 = splitUrl[0];
+		String part2 = splitUrl[1];
 		
-		// Determine if second part is channel or uuid.
-		String channelOrUUID = splitUrl[1];
-		
-		// Is it a channel number?
-		if (channelOrUUID.matches("\\b[0123]{1,2}\\b"))
+		Log.i("@BT", "part1=" + part1);
+		Log.i("@BT", "part2=" + part2);
+			
+		// If the address part is "localhost" it is a server connection.
+		// Note that we have uppercased the data in the url.
+		// Example: btspp://localhost:0000110100001000800000805F9B34FB;name=Serial Port
+		if (part1.equals("localhost")) // Server connection
 		{
-			mChannel = Integer.parseInt(channelOrUUID);
+			Log.i("@BT", "BT SERVER URL DETECTED");
+			
+			mIsServerConnectionRequest = true;
+			
+			// Split into uuid part and name part.
+			String[] uuidAndName = part2.split(";name=");
+			Log.i("@BT", "uuidAndName.length=" + uuidAndName.length);
+			Log.i("@BT", "uuidAndName[0]=" + uuidAndName[0]);
+			if (uuidAndName.length == 2)
+			{
+				Log.i("@BT", "uuidAndName[1]=" + uuidAndName[1]);
+			}
+			mUUID = btFormatServiceUUID(uuidAndName[0]);
+			// TODO: Add support for service name.
 		}
-		else if (channelOrUUID.matches("\\b[0123456789ABCDEF]{32}\\b"))
+		else // Client connection
 		{
-			// It is a service record UUID.
-			mUUID = btFormatServiceUUID(channelOrUUID);
-		}
-		else 
-		{
-			Log.e("@BT", "Malformed URL: " + url);
-			throw new MalformedURLException("Malformed URL: " + url);
+			Log.i("@BT", "BT CLIENT URL DETECTED");
+			
+			// Format device address for use with the Android API.
+			mDeviceAddress = btFormatDeviceAddress(part1);
+			
+			// Is it a channel number?
+			// Note we now use a regexp that will allow higher channel numbers.
+			// TODO: Proper regexp to use when implementation is done is: "\\b[0123]{1,2}\\b"
+			if (part2.matches("\\b[0123456789]{1,5}\\b"))
+			{
+				mIsChannelClientConnectionRequest = true;
+				mChannel = Integer.parseInt(part2);
+			}
+			// Is it a service record UUID?
+			else if (part2.matches("\\b[0123456789ABCDEFabcdef]{32}\\b"))
+			{
+				mIsUUIDClientConnectionRequest = true;
+				mUUID = btFormatServiceUUID(part2);
+			}
+			else 
+			{
+				Log.e("@BT", "Malformed URL: " + url);
+				throw new MalformedURLException("Malformed URL: " + url);
+			}
 		}
 		
 		// Set the handle for this connection.
@@ -786,19 +835,12 @@ class BluetoothConnectionInformation extends ConnectionInformation
 		Log.i("@BT", "mDeviceAddress = " + mDeviceAddress);
 		Log.i("@BT", "mChannel = " + mChannel);
 		Log.i("@BT", "mUUID = " + mUUID);
-		
+			
 		return this;
 	}
 	
-	/**
-	 * Constructor.
-	 */
-	public BluetoothConnectionInformation()
-	{
-	}
-	
 	@Override
-	public synchronized void close() throws IOException
+	public void close() throws IOException
 	{
 		super.close();
 		
@@ -858,21 +900,43 @@ class BluetoothConnectionInformation extends ConnectionInformation
 	@Override
 	public void startConnectThread()
 	{
+		Log.i("@@@ BluetoothConnectionInformation", "startConnectThread 1");
+		
+		// TODO: Move this to MoSyncBluetooth and also allow turning on Bluetooth.
+		// Move code to turn on Bluetooth to one place in the code.
 		mThreadPool.execute(new Runnable()
 		{
 			public void run()
 			{
-				//Looper.prepare();
-				//Looper.loop();
-				doConnect();
-				//Looper.myLooper().quit();
+				try 
+				{
+					Log.i("@@@ BluetoothConnectionInformation", "startConnectThread 2");
+					
+					// Make this thread a looper thread if there is no associated looper.
+					if (null == Looper.myLooper())
+					{
+						Looper.prepare();
+					}
+					//Looper.loop();
+					Log.i("@@@ BluetoothConnectionInformation", "startConnectThread 3");
+					doConnect();
+					Log.i("@@BluetoothConnectionConnector", "===Before Looper.quit");
+					Looper.myLooper().quit(); // TODO: Not needed?
+					Log.i("@@BluetoothConnectionConnector", "===After Looper.quit");
+				}
+				catch (Throwable e)
+				{
+					e.printStackTrace();
+				}
 			}
 		});
+		
+		Log.i("@@@ BluetoothConnectionInformation", "startConnectThread 4");
 	}
 	
 	public void doConnect()
 	{
-		Log.i("@@BluetoothConnectionConnector", "doConnect2");
+		Log.i("@@BluetoothConnectionConnector", "doConnect");
 			
 		try
 		{
@@ -893,38 +957,94 @@ class BluetoothConnectionInformation extends ConnectionInformation
 				return;
 			}
 			
-			Method createRfcommSocket = device.getClass().getMethod(
-				"createRfcommSocket", 
-				new Class[] { int.class });
-			if (null == createRfcommSocket)
+			if (mIsServerConnectionRequest)
 			{
-				Log.i("@@BluetoothConnectionConnector", "No method createRfcommSocket");
-				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
-			}
+			// TODO: Implement a structure that holds active servers,
+			// map connection handle -> connectioninfo object (we have that
+			// already!).
+			// Make new class for Bluetooth server connections. Should fit smoothtly
+			// into the existing desig.
+			// While at it, rename ConnectionInformation to ConnectionObject.
 			
-			BluetoothSocket socket = (BluetoothSocket) createRfcommSocket.invoke(
-				device, 
-				getChannel());
-			if (null == socket)
+			/*
+				// Create server socket.
+				BluetoothServerSocket serverSocket = 
+					adapter.listenUsingRfcommWithServiceRecord("NameOfService", mUUID);
+				
+				Log.i("@@BluetoothConnectionConnector", "Opening Bluetooth server socket");
+				
+				socket.connect();
+				
+				setSocket(socket);
+				
+				Log.i("@@BluetoothConnectionConnector", "Connection to Bluetooth socket made");
+				
+				int success = 1;
+				postResultEvent(CONNOP_CONNECT, success);
+			*/
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			}
+			else if (mIsChannelClientConnectionRequest)
 			{
-				Log.i("@@BluetoothConnectionConnector", "No socket created");
-				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
+				Method createRfcommSocket = device.getClass().getMethod(
+					"createRfcommSocket", 
+					new Class[] { int.class });
+				if (null == createRfcommSocket)
+				{
+					Log.i("@@BluetoothConnectionConnector", "No method createRfcommSocket");
+					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+				
+				BluetoothSocket socket = (BluetoothSocket) createRfcommSocket.invoke(
+					device, 
+					getChannel());
+				if (null == socket)
+				{
+					Log.i("@@BluetoothConnectionConnector", "No socket created");
+					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+				
+				Log.i("@@BluetoothConnectionConnector", "Connecting to socket via channel");
+				
+				socket.connect();
+				
+				setSocket(socket);
+				
+				Log.i("@@BluetoothConnectionConnector", "Connection to Bluetooth socket made");
+				
+				int success = 1;
+				postResultEvent(CONNOP_CONNECT, success);
 			}
-			
-			Log.i("@@BluetoothConnectionConnector", "COnnecting to socket");
-			
-			socket.connect();
-			
-			setSocket(socket);
-			
-			Log.i("@@BluetoothConnectionConnector", "Connection to Bluetooth socket made");
-			
-			int success = 1;
-			postResultEvent(CONNOP_CONNECT, success);
+			else if (mIsUUIDClientConnectionRequest)
+			{
+				BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
+					java.util.UUID.fromString(btFormatServiceUUID(mUUID)));
+				if (null == socket)
+				{
+					Log.i("@@BluetoothConnectionConnector", "No socket created");
+					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+					return;
+				}
+				
+				Log.i("@@BluetoothConnectionConnector", "Connecting to socket via UUID");
+				
+				socket.connect();
+				
+				setSocket(socket);
+				
+				Log.i("@@BluetoothConnectionConnector", "Connection to Bluetooth socket made");
+				
+				int success = 1;
+				postResultEvent(CONNOP_CONNECT, success);
+			}
+			else
+			{
+				Log.i("@@BluetoothConnectionConnector", "Unregocnized Bluetooth connection");
+				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
+			}
 		}
-		
 		catch (InterruptedIOException e)
 		{
 			Log.i("@@BluetoothConnectionConnector", "InterruptedIOException " + e);

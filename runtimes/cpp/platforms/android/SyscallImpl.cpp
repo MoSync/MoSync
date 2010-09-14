@@ -1172,6 +1172,12 @@ namespace Base
 			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtCancelDiscovery");
 			return _maBtCancelDiscovery(mJNIEnv, mJThis);
 		
+		// Server syscalls
+		
+		case maIOCtl_maAccept:
+			SYSLOG("maIOCtl_maAccept");
+			return _maAccept(a, mJNIEnv, mJThis);
+		
 		// Frame buffer syscalls
 		
 		case maIOCtl_maFrameBufferGetInfo:
