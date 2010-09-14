@@ -68,7 +68,10 @@ class RuntimeBuilder
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 		
 		puts "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
-		system "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
+		if (!system "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}")
+			puts "\nFATAL ERROR! - No android source package built, check previous output for errors!\n\n"
+			return 1
+		end
 				
 		Dir.chdir cpath
 		
