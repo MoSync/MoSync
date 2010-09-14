@@ -677,7 +677,7 @@ void yyerror(const char* string, ...);
 
 static int new_yy_input(char *buf, int max_size)
 {
-   int result;
+   int result = 0;
    if(yyin != NULL) {
 		result = fread(buf, 1, max_size, yyin);
 	}
