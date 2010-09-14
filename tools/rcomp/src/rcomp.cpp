@@ -3399,6 +3399,7 @@ void CheckStructUsage()
 					flag = true;
 					}
 				}
+#if 0	//disable useless warning
 			if(! flag)
 				{
 				if(resourceItemType == EStructTypeResourceItem)
@@ -3426,6 +3427,7 @@ void CheckStructUsage()
 						}
 					}
 				}
+#endif	// 0
 			}
 		}
 	}
