@@ -139,13 +139,6 @@ cd %ORIGINAL_PATH%
 
 @echo.
 @echo ------------------------------------------------
-@echo Copying cpp.
-@echo ------------------------------------------------
-@copy %ORIGINAL_PATH%\build_package_tools\mapip_bin\cpp.exe %MOSYNC_BIN_PATH%
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-
-@echo.
-@echo ------------------------------------------------
 @echo Copying skins.
 @echo ------------------------------------------------
 @xcopy %MOSYNC_TRUNK%\skins %MOSYNC_PATH%\skins\ /y /E /D
