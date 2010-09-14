@@ -2955,9 +2955,7 @@ retry:
 			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
-#define maxSize SYSCALL_THIS->GetValidatedStackValue(0)	//ugly hack
 			maIOCtl_case(maTextBox);
-#undef maxSize 
 		}
 
 		return IOCTL_UNAVAILABLE;

@@ -1606,9 +1606,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 #endif
 
-#define maxSize SYSCALL_THIS->GetValidatedStackValue(0)	//ugly hack
 	maIOCtl_syscall_case(maTextBox);
-#undef maxSize
 
 	default:
 		return IOCTL_UNAVAILABLE;

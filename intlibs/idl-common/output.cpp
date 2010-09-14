@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "idl-common.h"
 #include "stringFunctions.h"
 #include "types.h"
+#include "tokenizer.h"
 
 using namespace std;
 
@@ -366,6 +367,132 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 	}
 }
 
+// IS C Token Character
+static bool isctc(int c) {
+	return isalnum(c) || c == '_';
+}
+
+static void streamArgRange(ostream& stream, const vector<Argument>& args,
+	const string& range)
+{
+	stream << ", ";
+	// tokenize range expression.
+	// for each token, compare to args.
+	// on match, add "_".
+	//arg.range;
+	size_t pos = 0;
+	while(pos < range.length()) {
+		size_t beg = pos;
+		bool cToken = isctc(range[beg]);
+		size_t end = beg + 1;
+		while(end < range.length()) {
+			if(isctc(range[end]) != cToken)
+				break;
+			end++;
+		}
+		string token = range.substr(beg, end - beg);
+		pos = end;
+
+		// we now have a token.
+		bool match = false;
+		for(size_t i=0; i<args.size(); i++) {
+			if(token == args[i].name) {
+				match = true;
+				stream << "_" << token;
+				break;
+			}
+		}
+		if(!match)
+			stream << token;
+	}
+	stream << ")";
+}
+
+static void streamIoctlArg(ostream& stream, const vector<Argument>& args,
+	const Argument& arg, const Interface& inf, size_t inK, bool java)
+{
+	string ctype = (java ? jType : cType)(inf, arg.type);
+	const string& resolvedType = resolveType(inf, ctype);
+	bool isPointer = isPointerType(inf, arg.type) || !arg.in;
+	bool isString = arg.type == "MAString" || arg.type == "MAWString";
+	bool isWideString = arg.type == "MAWString";
+	bool isDouble = resolvedType == "double" && arg.in;
+	bool isFloat = resolvedType == "float" && arg.in;
+
+	if(!java) {
+		if(arg.type == "MAAddress") {
+			ctype = "void*";
+			isPointer = true;
+		}
+
+		if(isPointer || isString)
+			ctype = (arg.in ? "const " : "") + ctype;
+		if(!isPointerType(inf, arg.type) && !arg.in)
+			ctype += '*';
+	} else if(!arg.in) {
+		ctype = "MAAddress";
+	}
+
+	string localName = "_" + arg.name;
+	string dvName = localName+"_dv";
+
+	if(isDouble) {
+		stream << "MA_DV "<<dvName<<"; \\\n";
+		stream << dvName<<".MA_DV_HI = ";
+		streamIoctlInputParam(stream, inK, java);
+		stream << "; \\\n";
+		inK++;
+		stream << dvName<<".MA_DV_LO = ";
+		streamIoctlInputParam(stream, inK, java);
+		stream << "; \\\n";
+	}
+	if(isFloat) {
+		stream << "MA_FV "<<dvName<<"; \\\n";
+		stream << dvName<<".i = ";
+		streamIoctlInputParam(stream, inK, java);
+		stream << "; \\\n";
+	}
+	stream << ctype << " " << localName << " = ";
+
+	if(isDouble) {
+		stream << dvName << ".d";
+	} else if(isFloat) {
+		stream << dvName << ".f";
+	} else {
+		if(isString && arg.in)
+			stream << (isWideString ? "GVWS(" : "GVS(");
+		else if(isPointer && !java) {
+			if(arg.range.empty()) {
+				stream << "GVMR(";
+			} else {
+				stream << "(" << arg.type << ") SYSCALL_THIS->GetValidatedMemRange(";
+			}
+		} else if(ctype != "int")
+			stream << "(" << ctype << ")";
+
+		streamIoctlInputParam(stream, inK, java);
+
+		if(isString && arg.in)
+			stream << ")";
+		else if(isPointer && !java) {
+			if(arg.range.empty()) {
+				string gvmrType;
+				size_t m1 = arg.type.size()-1;
+				if(arg.type[m1] == '*') {
+					gvmrType = arg.type.substr(0, m1);
+				} else {
+					gvmrType = arg.type;
+				}
+				stream << ", " << gvmrType << ")";
+			} else {
+				streamArgRange(stream, args, arg.range);
+			}
+		}
+	}
+
+	stream << "; \\\n";
+}
+
 void streamIoctlDefines(ostream& stream, const Interface& inf, const string& headerName,
 	int ix, bool java)
 {
@@ -395,86 +522,13 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 			stream << "{ \\\n";
 			for(size_t k = 0, inK = 0; k < f.f.args.size(); k++, inK++) {
 				const Argument& arg(f.f.args[k]);
-				string ctype = (java ? jType : cType)(inf, arg.type);
-				const string& resolvedType = resolveType(inf, ctype);
-				bool isPointer = isPointerType(inf, arg.type) || !arg.in;
-				bool isString = arg.type == "MAString" || arg.type == "MAWString";
-				bool isWideString = arg.type == "MAWString";
-				bool isDouble = resolvedType == "double" && arg.in;
-				bool isFloat = resolvedType == "float" && arg.in;
-
-				if(!java) {
-					if(arg.type == "MAAddress") {
-						ctype = "void*";
-						isPointer = true;
-					}
-
-					if(isPointer || isString)
-						ctype = (arg.in ? "const " : "") + ctype;
-					if(!isPointerType(inf, arg.type) && !arg.in)
-						ctype += '*';
-				} else if(!arg.in) {
-					ctype = "MAAddress";
-				}
-
-				string localName = "_" + arg.name;
-				string dvName = localName+"_dv";
-
-				if(isDouble) {
-					stream << "MA_DV "<<dvName<<"; \\\n";
-					stream << dvName<<".MA_DV_HI = ";
-					streamIoctlInputParam(stream, inK, java);
-					stream << "; \\\n";
-					inK++;
-					stream << dvName<<".MA_DV_LO = ";
-					streamIoctlInputParam(stream, inK, java);
-					stream << "; \\\n";
-				}
-				if(isFloat) {
-					stream << "MA_FV "<<dvName<<"; \\\n";
-					stream << dvName<<".i = ";
-					streamIoctlInputParam(stream, inK, java);
-					stream << "; \\\n";
-				}
-				stream << ctype << " " << localName << " = ";
-
-				if(isDouble) {
-					stream << dvName << ".d";
-				} else if(isFloat) {
-					stream << dvName << ".f";
-				} else {
-					if(isString && arg.in)
-						stream << (isWideString ? "GVWS(" : "GVS(");
-					else if(isPointer && !java) {
-						if(arg.range.empty()) {
-							stream << "GVMR(";
-						} else {
-							stream << "(" << arg.type << ") SYSCALL_THIS->GetValidatedMemRange(";
-						}
-					} else if(ctype != "int")
-						stream << "(" << ctype << ")";
-
-					streamIoctlInputParam(stream, inK, java);
-
-					if(isString && arg.in)
-						stream << ")";
-					else if(isPointer && !java) {
-						if(arg.range.empty()) {
-							string gvmrType;
-							size_t m1 = arg.type.size()-1;
-							if(arg.type[m1] == '*') {
-								gvmrType = arg.type.substr(0, m1);
-							} else {
-								gvmrType = arg.type;
-							}
-							stream << ", " << gvmrType << ")";
-						} else {
-							stream << ", " << arg.range << ")";
-						}
-					}
-				}
-
-				stream << "; \\\n";
+				if(arg.range.empty())
+					streamIoctlArg(stream, f.f.args, arg, inf, inK, java);
+			}
+			for(size_t k = 0, inK = 0; k < f.f.args.size(); k++, inK++) {
+				const Argument& arg(f.f.args[k]);
+				if(!arg.range.empty())
+					streamIoctlArg(stream, f.f.args, arg, inf, inK, java);
 			}
 
 			string resolvedReturnType = resolveType(inf, f.f.returnType);
