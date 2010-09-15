@@ -29,28 +29,38 @@ void TouchMotionTracker::reset() {
 
 void normalize(double &x, double &y) {
 	double len = sqrt(x*x+y*y);
-	if(len==0)len=0.0001;
+	if(len<0.000000001)len=0.000000001;
 	double len_recip = 1.0/len;
 	x*=len_recip;
 	y*=len_recip;
 }
 
-void TouchMotionTracker::addPoint(MAPoint2d p) {
+void TouchMotionTracker::addPoint(MAPoint2d p, int &relX, int &relY) {
 	if(!mStarted) {
 		mLast = mStart = p;
 		mStartTime = maGetMilliSecondCount();
 		mDirx = 0;
 		mDiry = 0;
+		relX = 0;
+		relY = 0;
+		mStarted = true;
 	} else {
-		double dx = p.x-mLast.x;
-		double dy = p.y-mLast.y;
+		relX = p.x-mLast.x;
+		relY = p.y-mLast.y;
+		double dx = relX;
+		double dy = relY;
 		mDirx+=dx;
 		mDiry+=dy;
 		mLast = p;
 	}
 }
 
-void TouchMotionTracker::calculateVelocity(double &directionX, double &directionY, double &velocityX, double velocityY) {
+void TouchMotionTracker::addPoint(MAPoint2d p) {
+	int relX, relY;
+	addPoint(p, relX, relY);
+}
+
+void TouchMotionTracker::calculateVelocity(double &directionX, double &directionY, double &velocityX, double &velocityY) {
 
 	// take unit into acount ? (pixels per second or ms).
 	double time = maGetMilliSecondCount()-mStartTime;
@@ -66,7 +76,7 @@ void TouchMotionTracker::calculateVelocity(double &directionX, double &direction
 	// normalize directions
 	double len = sqrt(dx*dx+dy*dy);
 
-	if(len == 0.0) {
+	if(len < 0.0000000001) {
 		velocityX = velocityY = 0.0;
 		directionX = directionY = 0.0;
 		return;
@@ -79,7 +89,7 @@ void TouchMotionTracker::calculateVelocity(double &directionX, double &direction
 	directionX = dx;
 	directionY = dy;
 
-	if(time == 0) {
+	if(time  < 0.0000000001) {
 		velocityX = velocityY = 0.0;
 		return;
 	}

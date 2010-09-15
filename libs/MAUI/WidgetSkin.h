@@ -116,12 +116,30 @@ namespace MAUI {
 		 * drawing state should be used when drawing the widget skin.
 		 **/
 		
-		// uses a cache.
+		/**
+		 * Draws the widget skin, and if room exists in the cache, put the image in the cache. Next time the same
+		 * WidgetSkin with the same dimensions is drawn, the cached bitmap is used.
+		 */
 		void draw(int x, int y, int width, int height);
 		
+		/**
+		 * Draws the widget skin, not taking the cache in acount.
+		 */
 		void drawDirect(int x, int y, int width, int height);
+
+		/**
+		 * Draws the widget skin to a 32 bit argb buffer.
+		 */
 		void drawToData(int *data, int x, int y, int width, int height);
+
+		/**
+		 * Calculates the number of tiles needed for the widget skin drawn with dimension width and height.
+		 */
 		int calculateNumTiles(int width, int height);		
+
+		/**
+		 * Helper function that draws a region of data to an image resource.
+		 */
 		void drawRegion(MAHandle image, int* data, int scanLength, const MARect* srcRect, const MAPoint2d *dstPoint);
 			
 		/** 

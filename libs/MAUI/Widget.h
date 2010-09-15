@@ -54,6 +54,11 @@ namespace MAUI {
 			(*wl)->boundsChanged(this, this->mBounds); \
 		} \
 
+#define fireTriggered() \
+		Vector_each(WidgetListener*, wl, mWidgetListeners) { \
+			(*wl)->triggered(this); \
+		} \
+
 	/** \brief A Widget listener which detects trigger, selection, state and positional changes.
 	  *
 	  * A WidgetListener can be registered with any Widget to be notified of changes

@@ -39,12 +39,11 @@ namespace MAUI {
 		void setOwner(Widget *widget);
 		Widget* getOwner();
 
-	// returns true if focus should be changed.
+	// returns false if focus should be changed.
 		virtual bool keyPressed(int keyCode, int nativeCode);
 		virtual bool keyReleased(int keyCode, int nativeCode);
 
-	// returns true if focus should be lost.
-	// what about: returns true if focus should be held after release.
+	// returns false if focus should be lost, true otherwise.
 		virtual bool pointerPressed(MAPoint2d p, int id);
 		virtual bool pointerMoved(MAPoint2d p, int id);
 		virtual bool pointerReleased(MAPoint2d p, int id);

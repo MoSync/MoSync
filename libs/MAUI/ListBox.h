@@ -27,9 +27,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Widget.h"
 #include "Engine.h"
 #include <MAUtil/Environment.h>
+#include "TouchMotionTracker.h"
 
 namespace MAUI {
-	
+	class ShortPressTrigger;
 	class ListBox;
 
 	/** \brief Listener interface that receives notifications when an item in a ListBox is selected.
@@ -153,6 +154,14 @@ namespace MAUI {
 		int getScrollOffset() const;
 
 
+		virtual bool isFocusable() const;
+		void setScrollOffset(int ofs);
+		virtual bool pointerPressed(MAPoint2d p, int id);
+		virtual bool pointerMoved(MAPoint2d p, int id);
+		virtual bool pointerReleased(MAPoint2d p, int id);
+
+		void setFocusedWidget(Widget *w);
+
 	protected:
 		void runTimerEvent();
 		void drawWidget();
@@ -173,6 +182,13 @@ namespace MAUI {
 		int mAnimTimeStart;
 		int mSelectedIndex;
 		bool mAutoSize;
+
+		bool mTouched;
+		TouchMotionTracker mTouchMotionTracker;
+		double mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY;
+
+		Widget *mFocusedWidget;
+		ShortPressTrigger *mShortPressTrigger;
 	};
 }
 

@@ -152,13 +152,25 @@ namespace MAUI {
 		int mStrWidth, mStrHeight;
 	};
 
+
+	/**
+	 * Available properties:
+	 * font = FontProperty
+	 * paddingLeft = IntegerProperty
+	 * paddingRight = IntegerProperty
+	 * paddingTop = IntegerProperty
+	 * paddingBottom = IntegerProperty
+	 * marginLeft = IntegerProperty
+	 * marginRight = IntegerProperty
+	 * marginTop = IntegerProperty
+	 * marginBottom = IntegerProperty
+	 * backgroundSkinFocused = SkinProperty
+	 * backgroundSkinUnfocused = SkinProperty
+	 */
 	class LabelStyle : public Style {
 	public:
-		enum {
-			FONT = Style::PROP_END
-		};
 		LabelStyle(
-				MAHandle font,
+				FontProperty* font,
 				int paddingLeft = 0,
 				int paddingRight = 0,
 				int paddingTop = 0,

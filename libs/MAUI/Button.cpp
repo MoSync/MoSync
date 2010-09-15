@@ -3,19 +3,28 @@
 
 namespace MAUI {
 
-Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Widget(x, y, width, height, parent), mPressed(false), mCaption(caption) {
+Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false) {
+	this->setHorizontalAlignment(Label::HA_CENTER);
+	this->setVerticalAlignment(Label::VA_CENTER);
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
 	MAUI_LOG("Button pressed! %x", this);
 	mPressed = true;
 	requestRepaint();
+	return true;
+}
+
+bool Button::pointerMoved(MAPoint2d p, int id) {
+	return false;
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
 	MAUI_LOG("Button released! %x", this);
 	mPressed = false;
+	fireTriggered();
 	requestRepaint();
+	return false;
 }
 
 void Button::drawWidget() {
@@ -26,15 +35,18 @@ void Button::drawWidget() {
 	}
 
 	if(mPressed)
-		style->getSafe<SkinProperty>(ButtonStyle::SKIN_PRESSED)->draw(0, 0, mBounds.width, mBounds.height);
+		style->getSafe<SkinProperty>("skinPressed")->draw(0, 0, mBounds.width, mBounds.height);
 	else
-		style->getSafe<SkinProperty>(ButtonStyle::SKIN_RELEASED)->draw(0, 0, mBounds.width, mBounds.height);
+		style->getSafe<SkinProperty>("skinReleased")->draw(0, 0, mBounds.width, mBounds.height);
 
-	int offs = mPressed?1:0;
+	Label::drawWidget();
+}
 
-	FontProperty* font = style->getSafe<FontProperty>(ButtonStyle::FONT);
-	MAExtent dim = font->getStringDimensions(mCaption.c_str());
-	font->drawString(mCaption.c_str(), (mBounds.width>>1)-(EXTENT_X(dim)>>1)+offs, (mBounds.height>>1)-(EXTENT_Y(dim)>>1)+offs);
+void Button::restyle() {
+	if(getStyle() == NULL) {
+		setStyle(Engine::getSingleton().getDefaultStyle("Button"));
+	}
+	Label::restyle();
 }
 
 void Button::setCaption(const String& caption) {
@@ -46,21 +58,18 @@ bool Button::isTransparent() const {
 	return true;
 }
 
-ButtonStyle::ButtonStyle(
-		MAHandle pressed,
-		MAHandle notpressed,
-		MAHandle font,
-		int startX,
-		int endX,
-		int startY,
-		int endY,
-		bool selectedTransparent,
-		bool unselectedTransparent) : Style(3)
-{
-	this->mProperties[SKIN_PRESSED] = new SkinProperty(pressed, startX, endX, startY, endY, selectedTransparent);
-	this->mProperties[SKIN_RELEASED] = new SkinProperty(notpressed, startX, endX, startY, endY, unselectedTransparent);
-	this->mProperties[FONT] = new FontProperty(font);
+void Button::setFocused(bool focused) {
+	mPressed = focused;
+	requestRepaint();
 }
 
+ButtonStyle::ButtonStyle(
+		SkinProperty* pressed,
+		SkinProperty* unpressed,
+		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)
+{
+	this->mProperties["skinPressed"] = pressed;
+	this->mProperties["skinReleased"] = unpressed;
+}
 
 } // namespace MAUI

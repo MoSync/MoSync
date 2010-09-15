@@ -59,13 +59,17 @@ namespace MAUI {
 		mMustRebuild = true;
 	}
 
-	void Layout::drawWidget() {}
+	void Layout::drawWidget() { }
 
 	void Layout::rebuild() {
 		mMustRebuild = false;
 
 		if(mGridXSize*mGridYSize<this->mChildren.size()) {
 			PANIC_MESSAGE("Your MAUI::Layout has more mChildren than mGridXSize*mGridYSize");
+		}
+
+		Vector_each(Widget*, itr, mChildren) {
+			(*itr)->removeWidgetListener(this);
 		}
 
 		int *xOffsets = new int[mGridXSize];
@@ -152,6 +156,10 @@ namespace MAUI {
 
 		delete []xOffsets;
 		delete []yOffsets;
+
+		Vector_each(Widget*, itr, mChildren) {
+			(*itr)->addWidgetListener(this);
+		}
 
 		/*
 		switch(layoutType) {

@@ -21,31 +21,61 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \author Patrick Broman and Niklas Nummelin
 */
 
-#ifndef _SE_MSAB_MAUI_BUTTON_H_
-#define _SE_MSAB_MAUI_BUTTON_H_
+#ifndef _SE_MSAB_MAUI_SLIDER_H_
+#define _SE_MSAB_MAUI_SLIDER_H_
 
-#include "Label.h"
 #include "Style.h"
+#include "Widget.h"
 #include <MAUtil/String.h>
 
 namespace MAUI {
 
-	class Button : public Label {
+	class Slider;
+
+	class SliderListener {
 	public:
-		Button(int x, int y, int width, int height, Widget* parent=NULL, const String& caption="");
+		virtual void onValueChange(Slider* slider) = 0;
+	};
+
+	class Slider : public Widget {
+	public:
+		enum Orientation {
+			VERTICAL,
+			HORIZONTAL
+		};
+
+		Slider(int x, int y, int width, int height, Widget* parent=NULL, Orientation ori=HORIZONTAL, double minValue=0.0, double maxValue=1.0, double defaultValue=0.0);
 		bool pointerPressed(MAPoint2d p, int id);
 		bool pointerMoved(MAPoint2d p, int id);
 		bool pointerReleased(MAPoint2d p, int id);
-		void setCaption(const String& caption);
-
 		virtual bool isTransparent() const;
 		void setFocused(bool focused=true);
 
+		void setMinValue(double min);
+		void setMaxValue(double max);
+		void setValue(double val);
+		double getMinValue() const;
+		double getMaxValue() const;
+		double getValue() const;
+
 	protected:
+		int getSliderPos() const;
 		void restyle();
 		void drawWidget();
 		//String mCaption;
 		bool mPressed;
+		Orientation mOrientation;
+		double mMinValue, mMaxValue, mValue;
+		int mStartX, mStartY;
+		double mStartValue;
+
+		WidgetSkin *mAmountSkin;
+		WidgetSkin *mBkgSkin;
+		MAHandle mGripImage;
+
+		int mSliderWeight;
+		int mSliderGripWidth;
+		int mSliderGripHeight;
 	};
 
 	/**
@@ -60,12 +90,13 @@ namespace MAUI {
 	 * marginBottom = IntegerProperty
 	 * backgroundSkinFocused = SkinProperty
 	 * backgroundSkinUnfocused = SkinProperty
-	 * skinPressed = SkinProperty
-	 * skinReleased = SkinProperty
+	 * sliderSkin = SkinProperty
+	 * sliderAmountSkin = SkinProperty
+	 * gripImage = ImageProperty
 	 */
-	class ButtonStyle : public LabelStyle {
+	class SliderStyle : public Style {
 	public:
-		ButtonStyle(SkinProperty* pressed, SkinProperty* unpressed, FontProperty* font);
+		SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip);
 
 	};
 

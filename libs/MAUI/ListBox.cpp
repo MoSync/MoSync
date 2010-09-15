@@ -24,15 +24,55 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maxtoa.h>
 #include <mastdlib.h>
 #include <mavsprintf.h>
+#include <madmath.h>
 
 #include <MAUtil/Graphics.h>
+#include "Screen.h"
 
 #define FRAMES 1000
 #define FPS 50
 #define MS_PER_FRAME (1000/FPS)
 #define DURATION 250
 
+#define SHORT_PRESS_TIME 150
+
 namespace MAUI {
+
+	class ShortPressTrigger : public TimerListener {
+	public:
+		ShortPressTrigger(ListBox* listBox, int time) :  mListBox(listBox), mTime(time) {
+		}
+
+		void start() {
+			Environment::getEnvironment().addTimer(this,mTime, 1);
+		}
+
+		void stop() {
+			Environment::getEnvironment().removeTimer(this);
+		}
+
+		void runTimerEvent() {
+			//Screen::getCurrentScreen()->getCurrentScreen()->setFocusedWidget(w);
+			//w->pointerPressed(p, 0);
+			mListBox->setFocusedWidget(mWidget);
+			mWidget->pointerPressed(mPoint, 0);
+		}
+
+		void setWidget(Widget* w) {
+			mWidget = w;
+		}
+
+		void setPoint(MAPoint2d p) {
+			mPoint = p;
+		}
+
+	private:
+		MAPoint2d mPoint;
+		Widget* mWidget;
+		ListBox *mListBox;
+		int mTime;
+	};
+
 	ListBox::ListBox(int x, int y, int width, int height, Widget *parent) : 
 	Widget(x, y, width, height, parent),
 		mMustRebuild(false),
@@ -43,7 +83,10 @@ namespace MAUI {
 		mYOffsetTo(0),
 		mYOffset(0),
 		mSelectedIndex(0),
-		mAutoSize(false) {
+		mAutoSize(false),
+		mTouched(false),
+		mFocusedWidget(NULL) {
+		mShortPressTrigger = new ShortPressTrigger(this, SHORT_PRESS_TIME);
 		requestRepaint();
 	}
 
@@ -57,7 +100,10 @@ namespace MAUI {
 		mYOffsetTo(0),
 		mYOffset(0),
 		mSelectedIndex(0),
-		mAutoSize(false) {
+		mAutoSize(false),
+		mTouched(false),
+		mFocusedWidget(NULL) {
+		mShortPressTrigger = new ShortPressTrigger(this, SHORT_PRESS_TIME);
 		requestRepaint();
 	}
 
@@ -277,11 +323,10 @@ namespace MAUI {
 				
 				if(res) 
 				{	
-					srand(1);
 					for(i = 0; i < mChildren.size(); i++)
 					{
 						/**
-						 * The check wether the child should be drawn or
+						 * The check whether the child should be drawn or
 						 * not is done in Widget::draw(), and we postpone
 						 * the check until then.
 						 *
@@ -335,7 +380,7 @@ namespace MAUI {
 					for(i = 0; i < mChildren.size(); i++)
 					{
 						/**
-						 * The check wether the child should be drawn or
+						 * The check whether the child should be drawn or
 						 * not is done in Widget::draw(), and we postpone
 						 * the check until then.
 						 *
@@ -556,17 +601,31 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+#define ABS_IS_LESS(x, y) (fabs(x)<(y))
 	void ListBox::runTimerEvent()
 	{
 		//mYOffset += mYOffsetInc;
-		mYOffset = (mYOffsetFrom<<16) + (mYOffsetTo-mYOffsetFrom)*(((maGetMilliSecondCount()-mAnimTimeStart)<<16)/DURATION);
-		if(mYOffsetInc<0 && mYOffset<=mYOffsetTo<<16) {
-			mYOffset = mYOffsetTo<<16;
-			Environment::getEnvironment().removeTimer(this);
-		}
-		else if(mYOffsetInc>0 && mYOffset>=mYOffsetTo<<16) {
-			mYOffset = mYOffsetTo<<16;
-			Environment::getEnvironment().removeTimer(this);
+		if(mTouched) {
+			if(mOrientation == LBO_HORIZONTAL) {
+				setScrollOffset((mYOffset + (int)(mTouchVelX*65536.0*20.0))>>16);
+				mTouchVelX*=0.966;
+				if(ABS_IS_LESS(mTouchVelX,0.001)) Environment::getEnvironment().removeTimer(this);
+			} else {
+				setScrollOffset((mYOffset + (int)(mTouchVelY*65536.0*20.0))>>16);
+				mTouchVelY*=0.926;
+				if(ABS_IS_LESS(mTouchVelY,0.001)) Environment::getEnvironment().removeTimer(this);
+			}
+
+		} else {
+			mYOffset = (mYOffsetFrom<<16) + (mYOffsetTo-mYOffsetFrom)*(((maGetMilliSecondCount()-mAnimTimeStart)<<16)/DURATION);
+			if(mYOffsetInc<0 && mYOffset<=mYOffsetTo<<16) {
+				mYOffset = mYOffsetTo<<16;
+				Environment::getEnvironment().removeTimer(this);
+			}
+			else if(mYOffsetInc>0 && mYOffset>=mYOffsetTo<<16) {
+				mYOffset = mYOffsetTo<<16;
+				Environment::getEnvironment().removeTimer(this);
+			}
 		}
 
 
@@ -598,8 +657,129 @@ namespace MAUI {
 		}
 	}
 
-
 	bool ListBox::isTransparent() const {
 		return true;
 	}
+
+
+	bool ListBox::isFocusable() const {
+		return true;
+	}
+
+	void ListBox::setScrollOffset(int ofs) {
+		if (mChildren.size() == 0 || ofs > 0) {
+			ofs = 0;
+			mYOffset = 0;
+			requestRepaint();
+			return;
+		}
+
+		Widget* lastChild = mChildren[mChildren.size() - 1];
+		int bound = (lastChild->getPosition().y + lastChild->getBounds().height)
+				- this->getBounds().height;
+		if(bound<0) bound = 0;
+		if (ofs < -bound) {
+			ofs = -bound;
+		}
+
+		mYOffset = ofs << 16;
+		requestRepaint();
+	}
+
+	void ListBox::setFocusedWidget(Widget *w) {
+		mFocusedWidget = w;
+		w->setFocused(true);
+	}
+
+	bool ListBox::pointerPressed(MAPoint2d p, int id) {
+		Environment::getEnvironment().removeTimer(this);
+		mTouchMotionTracker.reset();
+		mTouchMotionTracker.addPoint(p);
+
+	//	Widget* w = NULL;
+		int x = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
+		int y = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+		Vector_each(Widget *, it, mChildren) {
+			Widget *ret = (*it)->focusableWidgetAt(x, y);
+			if(ret) {
+				if(ret->pointerPressed(p, id)) {
+					setFocusedWidget(ret);
+				}
+				break;
+			}
+		}
+
+		//MAUI_LOG("found focus");
+		/*
+		if(w) {
+			mShortPressTrigger->setWidget(w);
+			mShortPressTrigger->setPoint(p);
+			mShortPressTrigger->start();
+		}
+		*/
+		return false;
+	}
+
+	bool ListBox::pointerMoved(MAPoint2d p, int id) {
+		if(mFocusedWidget) {
+			if(!mFocusedWidget->pointerMoved(p, id)) {
+				mFocusedWidget->setFocused(false);
+				mFocusedWidget = NULL;
+			}
+			return false;
+			//int x = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
+			//int y = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+
+			//if(!mFocusedWidget->contains(x, y)) {
+			//	mShortPressTrigger->stop();
+			//	mFocusedWidget->setFocused(false);
+			//	mFocusedWidget = NULL;
+			//}
+		}
+		if(id==0) {
+			int relX, relY;
+			mTouchMotionTracker.addPoint(p, relX, relY);
+
+			if(mOrientation == LBO_VERTICAL)
+				setScrollOffset((mYOffset>>16)+relY);
+			else
+				setScrollOffset((mYOffset>>16)+relX);
+
+
+			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
+			if(!(ABS_IS_LESS(mTouchVelX,0.01) && ABS_IS_LESS(mTouchVelY,0.01))) {
+				mShortPressTrigger->stop();
+			}
+		}
+		return false;
+	}
+
+	bool ListBox::pointerReleased(MAPoint2d p, int id) {
+		mShortPressTrigger->stop();
+		if(mFocusedWidget) {
+			mFocusedWidget->pointerReleased(p, id);
+			mFocusedWidget->setFocused(false);
+			mFocusedWidget = NULL;
+			return false;
+		}
+
+		if(id==0) {
+			mTouched = true;
+			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
+			/*
+			if(ABS_IS_LESS(mTouchVelX,0.001) && ABS_IS_LESS(mTouchVelY,0.001)) {
+				Widget* w = focusableWidgetAt(p.x, p.y);
+				if(w) {
+					Screen::getCurrentScreen()->setFocusedWidget(w);
+					return w->pointerPressed(p, id);
+				}
+			}
+			*/
+
+			//MAUI_LOG("tdx: %f, tdy: %f, tvx: %f, tvy: %f", mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
+			Environment::getEnvironment().addTimer(this, MS_PER_FRAME, -1);
+		}
+		return false;
+	}
+
 }

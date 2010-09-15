@@ -28,7 +28,8 @@ public:
 	TouchMotionTracker();
 	void reset();
 	void addPoint(MAPoint2d p);
-	void calculateVelocity(double &dirx, double &diry, double &velocityX, double velocityY);
+	void addPoint(MAPoint2d p, int &relX, int &relY);
+	void calculateVelocity(double &dirx, double &diry, double &velocityX, double &velocityY);
 private:
 	int mStartTime;
 	MAPoint2d mStart;

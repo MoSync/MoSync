@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WidgetSkin.h"
 #include <MAUtil/Graphics.h>
 #include <MAUtil/PlaceholderPool.h>
+#include "Widget.h"
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
@@ -216,6 +217,8 @@ namespace MAUI {
 			addToCache(newKey, cacheElem);
 		}
 		
+		//MAUI_LOG("Drawed cached widgetskin!");
+
 		// Draw the cached widgetskin.
 		Gfx_drawImage(cached, x, y);
 	}

@@ -189,10 +189,14 @@ namespace MAUI {
 		//clearClipRect();
 		Gfx_clearClipRect();
 		Gfx_clearMatrix();
-
 		
 		int scrW = EXTENT_X(maGetScrSize());
 		int scrH = EXTENT_Y(maGetScrSize());
+
+		// TODO: remove this!!!
+		maSetColor(0);
+		Gfx_fillRect(0, 0, scrW, scrH);
+
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
 		Gfx_pushClipRect(0, 0, scrW, scrH);
 		mMain->update();
