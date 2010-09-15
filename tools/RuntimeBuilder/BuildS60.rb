@@ -53,13 +53,12 @@ class RuntimeBuilder
 		# call the build functions
 		if version == "s60v5"
 			cmd = "#{cwd}/build_s60v5.bat \"#{$SETTINGS[:s60v5_compiler]}\""
-			puts cmd
-			system(cmd)
+			sh(cmd)
 		else
-			system("devices -setdefault #{default}")
-			system("bldmake bldfiles");
-			system("call abld clean #{symbian_system} urel");
-			system("call abld build #{symbian_system} urel");
+			sh("devices -setdefault #{default}")
+			sh("bldmake bldfiles");
+			sh("call abld clean #{symbian_system} urel");
+			sh("call abld build #{symbian_system} urel");
 		end
 		
 		# revert initial config file
@@ -83,7 +82,7 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_caption_template.rss #{runtime_dir}MoSync_caption_template.prs")
+			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_caption_template.rss #{runtime_dir}MoSync_caption_template.prs")
 			
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(app_file, "#{runtime_dir}MoSync#{debug}.app")
@@ -103,8 +102,8 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
-			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
 			
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
@@ -124,8 +123,8 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
-			system("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
 			 
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")

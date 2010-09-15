@@ -18,6 +18,20 @@
 
 require 'fileutils'
 
+def error(msg)
+	puts "Error: #{msg}"
+	raise msg
+end
+
+def sh(cmd)
+	#TODO: optimize by removing the extra shell
+	#the Process class should be useful.
+	$stderr.puts cmd
+	if(!system(cmd)) then
+		error "Command failed: '#{$?}'"
+	end
+end
+
 def backup_file(file)
 	bak = file + ".bak"
 	if File.exist? bak
