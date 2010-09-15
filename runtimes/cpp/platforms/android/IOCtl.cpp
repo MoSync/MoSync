@@ -109,7 +109,7 @@ namespace Base
 	
 		info->bitsPerPixel = 32;//backBuffer->bitsPerPixel;
 		info->bytesPerPixel = 4;//backBuffer->bytesPerPixel;
-		info->redMask = 0xff0000ff; //backBuffer->redMask;
+		info->redMask = 0x000000ff; //backBuffer->redMask;
 		info->greenMask = 0x0000ff00;// backBuffer->greenMask;
 		info->blueMask = 0x00ff0000; //backBuffer->blueMask;
 		info->sizeInBytes = width * height * 4; //backBuffer->pitch*backBuffer->height;

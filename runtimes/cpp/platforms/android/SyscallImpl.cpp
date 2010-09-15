@@ -28,7 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
 #define SYSLOG(...)
 
 namespace Base
@@ -1024,7 +1024,7 @@ namespace Base
 	SYSCALL(int,  maIOCtl(int function, int a, int b, int c))
 	{
 		SYSLOG("maIOCtl");
-		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		
 		switch(function) {
 		
@@ -1056,14 +1056,14 @@ namespace Base
 		
 		// int maBtStartDeviceDiscovery(int names)
 		case maIOCtl_maBtStartDeviceDiscovery:
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtStartDeviceDiscovery");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartDeviceDiscovery");
 			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
 			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 		
 		// int maBtGetNewDevice(MABtDevice* d)
 		case maIOCtl_maBtGetNewDevice:
 		{
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNewDevice");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewDevice");
 			SYSLOG("maIOCtl_maBtGetNewDevice");
 			
 			// a is pointer to struct MABtDevice
@@ -1096,10 +1096,14 @@ namespace Base
 		}
 		
 		// int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid) 	
-		case maIOCtl_maBtStartServiceDiscovery:
+		case maIOCtl_maBtStartServiceDiscovery:			
+			SYSLOG("maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
+			return -1;
+		/*
 		{
 			SYSLOG("maIOCtl_maBtStartServiceDiscovery");
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtStartServiceDiscovery");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery");
 			
 			// a is pointer to struct MABtAddr
 			MABtAddr* addressPointer = (MABtAddr*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtAddr));
@@ -1113,12 +1117,17 @@ namespace Base
 				mJNIEnv, 
 				mJThis);
 		}
+		*/
 		
 		// int maBtGetNextServiceSize(MABtServiceSize* dst)
 		case maIOCtl_maBtGetNextServiceSize:
+			SYSLOG("maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
+			return -1;
+		/*
 		{
 			SYSLOG("maIOCtl_maBtGetNextServiceSize");
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNextServiceSize");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize");
 			
 			// a is pointer to struct MABtServiceSize
 			MABtServiceSize* dstPointer = (MABtServiceSize*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtServiceSize));
@@ -1132,12 +1141,17 @@ namespace Base
 				mJNIEnv, 
 				mJThis);
 		}
+		*/
 		
 		// int maBtGetNewService(MABtService* dst)
 		case maIOCtl_maBtGetNewService:
+			SYSLOG("maIOCtl_maBtGetNewService NOT IMPLEMENTED");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService NOT IMPLEMENTED");
+			return -1;
+		/*
 		{
 			SYSLOG("maIOCtl_maBtGetNewService");
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtGetNewService");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService");
 			
 			// a is pointer to struct MABtService
 			MABtService* serviceInfo = (MABtService*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MABtService));
@@ -1166,10 +1180,11 @@ namespace Base
 				mJNIEnv, 
 				mJThis);
 		}
+		*/
 		
 		case maIOCtl_maBtCancelDiscovery:
 			SYSLOG("maIOCtl_maBtCancelDiscovery");
-			__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "maIOCtl_maBtCancelDiscovery");
+			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtCancelDiscovery");
 			return _maBtCancelDiscovery(mJNIEnv, mJThis);
 		
 		// Server syscalls
