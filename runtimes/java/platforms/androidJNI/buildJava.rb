@@ -30,7 +30,7 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	
 	# Add the _ANDROID_BLUETOOTH flag when building for version-5 or higher 
 	androidVersion = Integer(ENV['MOSYNC_ANDROID_BLUETOOTH'])
-	if androidVersion >= 5
+	if androidVersion >= 7
 		buildFlags << " -D_ANDROID_BLUETOOTH"
 	end 
 	

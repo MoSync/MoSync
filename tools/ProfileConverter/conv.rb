@@ -158,7 +158,7 @@ RELEVANT_DEFINES = {
 	:moblin => [],
 	:android_3 => [],
 	:android_4 => [],
-	:android_5 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 
@@ -196,7 +196,7 @@ runtimes = {
 	:moblin => [],
 	:android_3 => [],
 	:android_4 => [],
-	:android_5 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 

@@ -167,11 +167,4 @@ FileUtils.rm_rf class_dir
 if (!success)
 	exitBuilder(0, thirdarg)
 end
-	
-#if thirdarg != nil
-#	# change name on config_platform.h.saved to config_platform.h if such file exists
-#	conf_file = "/src/config_platform.h.saved"
-#	if File.exist? conf_file
-#		FileUtils.copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
-#	end
-#end
+
