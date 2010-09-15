@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _WIN32_WINNT 0x500
 #include <windows.h>
 #include <shellapi.h>
+
+#include "resource.h"
 #endif
 
 #ifdef LINUX
@@ -154,6 +156,8 @@ namespace Base {
 	static void cameraViewFinderUpdate();
 
 	static int maGetSystemProperty(const char* key, char* buf, int size);
+	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints);
 
 //********************************************************************
 
@@ -2090,11 +2094,98 @@ maIOCtl_glPointSizex_case(glPointSizex);
 			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
 				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
+#ifdef WIN32
+			maIOCtl_case(maTextBox);
+#endif
+
 		default:
 			LOGD("maIOCtl(%i) unimplemented.\n", function);
 			return IOCTL_UNAVAILABLE;
 		}
 	}	//maIOCtl
+
+	//****************************************************************************
+	// maTextBox
+	//****************************************************************************
+#ifdef WIN32
+	static HWND sMainWnd = NULL, sEditBox = NULL, sTextBox = NULL;
+	static wchar_t* sTextBoxOutBuf;
+	static int sTextBoxOutSize;
+
+	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+		LOGD("TextBoxProc 0x%08x, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, lParam);
+		switch(uMsg) {
+		case WM_INITDIALOG:
+			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
+			SetFocus(sEditBox);
+			break;
+		case WM_COMMAND:
+			{
+				WORD id = LOWORD(wParam);
+				if(id == IDOK || id == IDCANCEL) {
+					// get text
+					int res = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+
+					// send event
+					MAEvent e;
+					e.type = EVENT_TYPE_TEXTBOX;
+					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+					e.textboxLength = res;
+					gEventFifo.put(e);
+
+					// time to close
+					LOG("DestroyWindow\n");
+					//GLE(DestroyWindow(hwnd));
+					EndDialog(hwnd, id);
+					sEditBox = sTextBox = NULL;
+				}
+			}
+		}
+		return FALSE;
+	}
+
+	static int Base::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints)
+	{
+		MYASSERT(sTextBox == NULL, ERR_TEXTBOX_ACTIVE);
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		DEBUG_ASSERT(SDL_GetWMInfo(&info));
+		sMainWnd = info.window;
+
+		sTextBoxOutSize = maxSize;
+		sTextBoxOutBuf = (wchar_t*)outText;
+
+#if 0	// direct edit-box in window. No worky.
+		// Setting window style WS_CLIPCHILDREN prevents drawing on top of the EditBox.
+		LONG windowStyle = GetWindowLong(sMainWnd, GWL_STYLE);
+		SetWindowLong(sMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN);
+
+		sEditBox = CreateWindowW(L"EDIT",	// predefined class 
+			(LPCWSTR)inText,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			sMainWnd,	// parent window 
+			NULL, GetModuleHandle(NULL), NULL);
+		GLE(sEditBox);
+		GLE(SetWindowPos(sEditBox, NULL,
+			sSkin->getScreenLeft(), sSkin->getScreenTop(),
+			sSkin->getScreenWidth(), sSkin->getScreenHeight(), 0));
+		SetFocus(sEditBox);
+#else
+#if 0	// modeless dialogs don't recieve key events
+		sTextBox = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+			TextBoxProc);
+		GLE(sTextBox);
+		ShowWindow(sTextBox, SW_SHOW);
+#else	// so we go with modal, for now.
+		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+			TextBoxProc);
+#endif
+#endif
+		return 0;
+	}
+#endif	//WIN32
 
 	//****************************************************************************
 	// camera

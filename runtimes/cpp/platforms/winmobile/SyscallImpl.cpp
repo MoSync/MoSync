@@ -268,6 +268,8 @@ namespace Base {
 		/* generate titles and class names */
 		wsprintf(g_szTitle, L"%s", &modname[startOfModName]);
 		wsprintf(g_szClassName, L"%s class", &modname[startOfModName]);
+
+		LOG("AppName: %s\n", &modname[startOfModName]);
 	}
 
 	// win mobile specific network initialization
@@ -1255,6 +1257,7 @@ DWORD GetScreenOrientation()
 	}
 
 	static void MALibQuit() {
+		LOG("MALibQuit\n");
 
 		// make sure it is stopped.
 		VibrationStop();
@@ -1275,6 +1278,7 @@ DWORD GetScreenOrientation()
 		CloseGraphics();
 		CoUninitialize();
 
+		LOG("PostQuitMessage(0)\n");
 		PostQuitMessage (0);
 	}
 

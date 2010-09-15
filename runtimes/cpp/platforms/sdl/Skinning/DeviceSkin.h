@@ -52,6 +52,10 @@ namespace MoRE {
 		virtual void mouseDragged(int x, int y) = 0;
 		virtual void mousePressed(int x, int y) = 0;
 		virtual void mouseReleased(int x, int y) = 0;
+		virtual int getScreenLeft() const = 0;
+		virtual int getScreenTop() const = 0;
+		virtual int getScreenWidth() const = 0;
+		virtual int getScreenHeight() const = 0;
 
 		// used to update the skin when pressing physical keys
 		virtual void keyPressed(int mak) = 0;
