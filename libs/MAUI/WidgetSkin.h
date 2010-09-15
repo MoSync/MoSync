@@ -208,8 +208,8 @@ namespace MAUI {
 	private:
 		void rebuildRects();
 
-		static int mMaxCacheSize;
-		static bool mUseCache;
+		static int sMaxCacheSize;
+		static bool sUseCache;
 		
 		//Vector<CacheElement> cache;
 		static HashMap<CacheKey, CacheElement> sCache;

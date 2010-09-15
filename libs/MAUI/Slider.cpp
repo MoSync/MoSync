@@ -5,17 +5,17 @@
 namespace MAUI {
 
 Slider::Slider(int x, int y, int width, int height, Widget* parent, Orientation ori, double minValue, double maxValue, double defaultValue) :
-	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue) {
+	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false) {
 	setValue(defaultValue);
 }
 
 int Slider::getSliderPos() const {
 	int sliderPos;
-	double normalizedValue = (mValue)/(mMaxValue-mMinValue);
+	double normalizedValue = (mValue-mMinValue)/(mMaxValue-mMinValue);
 	if(mOrientation == HORIZONTAL) {
-		sliderPos = (int) ((mPaddedBounds.width-mSliderGripWidth)*normalizedValue);
+		sliderPos = (int) ((double)(mPaddedBounds.width-mSliderGripWidth)*normalizedValue);
 	} else {
-		sliderPos = (int) ((mPaddedBounds.height-mSliderGripHeight)*normalizedValue);
+		sliderPos = (int) ((double)(mPaddedBounds.height-mSliderGripHeight)*normalizedValue);
 	}
 	return sliderPos;
 }
@@ -43,7 +43,12 @@ bool Slider::pointerMoved(MAPoint2d p, int id) {
 	if(mPressed) {
 		int relX = p.x-mStartX;
 		int relY = p.y-mStartY;
-		int newValue = mStartValue + (((double)relX)*(mMaxValue-mMinValue))/(mPaddedBounds.width-mSliderGripWidth);
+		double newValue;
+		if(mOrientation == HORIZONTAL)
+			newValue = mStartValue + (((double)relX)*(mMaxValue-mMinValue))/(double)(mPaddedBounds.width-mSliderGripWidth);
+		else
+			newValue = mStartValue + (((double)relY)*(mMaxValue-mMinValue))/(double)(mPaddedBounds.height-mSliderGripHeight);
+
 		setValue(newValue);
 		requestRepaint();
 		return true;
@@ -118,7 +123,16 @@ void Slider::setValue(double val) {
 	mValue = val;
 	if(mValue<mMinValue) mValue=mMinValue;
 	else if(mValue>mMaxValue) mValue=mMaxValue;
+	mValueChanged = true;
 	requestRepaint();
+}
+
+void Slider::update() {
+	Widget::update();
+	if(mValueChanged) {
+		fireOnValueChange();
+		mValueChanged = false;
+	}
 }
 
 double Slider::getMinValue() const {
@@ -131,6 +145,16 @@ double Slider::getMaxValue() const {
 
 double Slider::getValue() const {
 	return mValue;
+}
+
+void Slider::addSliderListener(SliderListener* sl) {
+	mSliderListeners.add(sl);
+}
+
+void Slider::fireOnValueChange() {
+	Vector_each(SliderListener*, wl, mSliderListeners) {
+		(*wl)->onValueChange(this, mValue);
+	}
 }
 
 SliderStyle::SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)

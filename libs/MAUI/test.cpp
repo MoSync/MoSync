@@ -259,7 +259,8 @@ private:
 
 class GraphWidget : public Widget {
 public:
-	GraphWidget(int x, int y, int w, int h, Widget *parent=NULL) : Widget(x, y, w, h, parent) {
+	GraphWidget(int x, int y, int w, int h, Widget *parent=NULL) : Widget(x, y, w, h, parent),
+	mAmplitude(1.0), mFrequency(1.0) {
 
 	}
 
@@ -275,11 +276,27 @@ public:
 		requestRepaint();
 	}
 
+	void setAmplitude(double a) {
+		mAmplitude = a;
+		requestRepaint();
+	}
+
+	void setFrequency(double f) {
+		mFrequency = f;
+		requestRepaint();
+	}
+
+	void setPhase(double p) {
+		mPhase = p;
+		requestRepaint();
+	}
+
 	void drawWidget() {
-		if(!mExp) return;
-		maSetColor(0);
-		Gfx_fillRect(0, 0, mBounds.width, mBounds.height);
+		//if(!mExp) return;
+		//maSetColor(0);
+		//Gfx_fillRect(0, 0, mBounds.width, mBounds.height);
 		maSetColor(0xffffff);
+		/*
 		int x = mStartX;
 		int xDelta = ((mEndX-mStartX)<<16)/mBounds.width;
 		for(int i = 0; i < mBounds.width; i++) {
@@ -288,6 +305,15 @@ public:
 			int y = value*mBounds.height/(mEndY-mStartY);
 			Gfx_plot(x>>16, y);
 			x+=xDelta;
+		}*/
+
+		double ang = mPhase;
+		double angDelta = (2.0*3.14159)/(double)mPaddedBounds.width;
+		double height2 = (double)mPaddedBounds.height/2.0;
+		for(int i = 0; i<  mPaddedBounds.width; i++) {
+			double sinValue = sin(ang*mFrequency)*height2*mAmplitude;
+			Gfx_plot(i, (int)(height2-sinValue));
+			ang+=angDelta;
 		}
 	}
 
@@ -296,8 +322,64 @@ public:
 	}
 
 private:
+	double mAmplitude, mFrequency;
+	double mPhase;
 	int mStartX, mEndX, mStartY, mEndY;
 	Expression *mExp;
+};
+
+static Screen *sGraphScreen;
+static Screen *sCalculatorScreen;
+
+
+class GraphScreen : public Screen, public WidgetListener, public SliderListener {
+public:
+	void onValueChange(Slider* slider, double value) {
+		if(slider == mFrequencySlider) {
+			mGraphWidget->setFrequency(value);
+		}
+		else if(slider == mAmplitudeSlider) {
+			mGraphWidget->setAmplitude(value);
+		}
+		else if(slider == mPhaseSlider) {
+			mGraphWidget->setPhase(value);
+		}
+	}
+
+	void triggered(Widget* w) {
+			Button* b = (Button*)w;
+			const String& str = b->getCaption();
+			if(str == "calculator") {
+				sCalculatorScreen->show();
+			}
+	}
+
+	GraphScreen() {
+		ListBox *mainListbox = new ListBox(0, 0, 240, 320, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
+		mainListbox->setAutoSize(true);
+
+		mGraphWidget = new GraphWidget(0, 0, 0, 100, mainListbox);
+
+		Slider *slider;
+		mFrequencySlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0.0, 8, 1.0);
+		mFrequencySlider->addSliderListener(this);
+		mAmplitudeSlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, -1, 1, 1.0);
+		mAmplitudeSlider->addSliderListener(this);
+		mPhaseSlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
+		mPhaseSlider->addSliderListener(this);
+
+		Button *button = new Button(0, 0, 50, 50, mainListbox, "calculator");
+		button->addWidgetListener(this);
+
+		setMain(mainListbox);
+
+	}
+
+private:
+	GraphWidget* mGraphWidget;
+	Slider *mFrequencySlider;
+	Slider *mAmplitudeSlider;
+	Slider *mPhaseSlider;
 };
 
 class CalculatorScreen : public Screen, public WidgetListener {
@@ -308,7 +390,9 @@ public:
 		Button* b = (Button*)w;
 		String exp = mainLabel->getCaption();
 		const String& str = b->getCaption();
-		if(str=="C") {
+		if(str == "graph") {
+			sGraphScreen->show();
+		} else if(str=="C") {
 			mainLabel->setCaption("");
 		} else if(str=="=") {
 			if(exp=="") return;
@@ -325,45 +409,15 @@ public:
 	}
 
 	CalculatorScreen() {
-			SkinProperty* selectedWidgetSkin = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
-			SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
-			SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 6, 11, 0, 8, true);
-			SkinProperty* sliderBackgroundSkin = new SkinProperty(RES_SLIDER_BKG, 6, 11, 0, 8, true);
-			ImageProperty* sliderGripImage = new ImageProperty(RES_SLIDER_GRIP);
-			FontProperty* font = new FontProperty(RES_FONT);
-
-			Style* widgetStyle = new Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
-			LabelStyle* labelStyle = new LabelStyle(font, 0,0,0,0,0,0,0,0, selectedWidgetSkin, unselectedWidgetSkin);
-			ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, unselectedWidgetSkin, font);
-			SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
-
-			Engine::getSingleton().setDefaultStyle("Widget", widgetStyle);
-			Engine::getSingleton().setDefaultStyle("Label", labelStyle);
-			Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
-			Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
-
 			ListBox *mainListbox = new ListBox(0, 0, 240, 320, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
 			mainListbox->setAutoSize(true);
 
 			mainLabel = new Label(0, 0, 50, 80, mainListbox, "");
 			mainLabel->setVerticalAlignment(Label::VA_CENTER);
 
-			Slider *slider;
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-			slider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0, 100, 0);
-
 			Layout *calculatorPane = new  Layout(0, 0, 240, 240, mainListbox, 4, 4);
 			calculatorPane->setAutoSizeX(true);
 			calculatorPane->setAutoSizeY(true);
-
-			//WidgetSkin::setCacheEnabled(true);
-
 
 			const char* buttons1[] = {
 					"1","2","3","+",
@@ -376,6 +430,9 @@ public:
 				Button* button = new Button(0, 0, 50, 50, calculatorPane, buttons1[i]);
 				button->addWidgetListener(this);
 			}
+
+			Button *button = new Button(0, 0, 50, 50, mainListbox, "graph");
+			button->addWidgetListener(this);
 
 			mExp = new Expression();
 
@@ -406,8 +463,26 @@ public:
 class MAUIMoblet : public Moblet {
 public:
 	MAUIMoblet() {
-		screen = new CalculatorScreen();
-		screen->show();
+		SkinProperty* selectedWidgetSkin = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
+		SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
+		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 6, 11, 0, 8, true);
+		SkinProperty* sliderBackgroundSkin = new SkinProperty(RES_SLIDER_BKG, 6, 11, 0, 8, true);
+		ImageProperty* sliderGripImage = new ImageProperty(RES_SLIDER_GRIP);
+		FontProperty* font = new FontProperty(RES_FONT);
+
+		Style* widgetStyle = new Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
+		LabelStyle* labelStyle = new LabelStyle(font, 0,0,0,0,0,0,0,0, selectedWidgetSkin, unselectedWidgetSkin);
+		ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, unselectedWidgetSkin, font);
+		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
+
+		Engine::getSingleton().setDefaultStyle("Widget", widgetStyle);
+		Engine::getSingleton().setDefaultStyle("Label", labelStyle);
+		Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
+		Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
+
+		sCalculatorScreen = new CalculatorScreen();
+		sGraphScreen = new GraphScreen();
+		sCalculatorScreen->show();
 	}
 
 	void keyPressEvent(int keyCode, int nativeCode) {
@@ -416,10 +491,10 @@ public:
 	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
-	CalculatorScreen* screen;
 
 	~MAUIMoblet() {
-		delete screen;
+		delete sCalculatorScreen;
+		delete sGraphScreen;
 	}
 	
 };

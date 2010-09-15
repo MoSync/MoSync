@@ -115,15 +115,15 @@ namespace MAUI {
 	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
 
 	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
-	int WidgetSkin::mMaxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
-	bool WidgetSkin::mUseCache = false;
+	int WidgetSkin::sMaxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
+	bool WidgetSkin::sUseCache = false;
 	
 	void WidgetSkin::setMaxCacheSize(int c) {
-		mMaxCacheSize = c;
+		sMaxCacheSize = c;
 	}
 	
 	void WidgetSkin::setCacheEnabled(bool e) {
-		mUseCache = e;
+		sUseCache = e;
 	}
 	
 		
@@ -138,7 +138,7 @@ namespace MAUI {
 
 		int currentTime = maGetMilliSecondCount();
 		
-		while(totalPixelsInCache>mMaxCacheSize) {
+		while(totalPixelsInCache>sMaxCacheSize) {
 			int oldest = currentTime;
 			iter = sCache.begin();	
 			HashMap<CacheKey, CacheElement>::Iterator best = sCache.end();
@@ -183,7 +183,7 @@ namespace MAUI {
 
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
 		int numTiles = calculateNumTiles(width, height);
-		if(!mUseCache || numTiles<100) {
+		if(!sUseCache || numTiles<100) {
 			drawDirect(x, y, width, height);
 			return;
 		}

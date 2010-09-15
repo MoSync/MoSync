@@ -34,7 +34,7 @@ namespace MAUI {
 
 	class SliderListener {
 	public:
-		virtual void onValueChange(Slider* slider) = 0;
+		virtual void onValueChange(Slider* slider, double value) = 0;
 	};
 
 	class Slider : public Widget {
@@ -58,10 +58,15 @@ namespace MAUI {
 		double getMaxValue() const;
 		double getValue() const;
 
+		void addSliderListener(SliderListener* sl);
+		void update();
+
 	protected:
 		int getSliderPos() const;
 		void restyle();
 		void drawWidget();
+		void fireOnValueChange();
+
 		//String mCaption;
 		bool mPressed;
 		Orientation mOrientation;
@@ -76,6 +81,10 @@ namespace MAUI {
 		int mSliderWeight;
 		int mSliderGripWidth;
 		int mSliderGripHeight;
+
+		bool mValueChanged;
+
+		Vector<SliderListener*> mSliderListeners;
 	};
 
 	/**
