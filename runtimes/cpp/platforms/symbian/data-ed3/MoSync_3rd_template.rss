@@ -7,7 +7,7 @@ NAME MOSR // 4-letter ID, unique resource identifier for the application
 #include <eikon.rsg>
 #include <avkon.rh>
 #include <avkon.rsg>
-#include "MoSync.hrh"
+#include <MoSync.hrh>
 
 RESOURCE RSS_SIGNATURE { } // Needs to be left empty
 

@@ -759,7 +759,7 @@ interface MAAPI {
 	* and as soon as this function returns, it's done.
 	*
 	* A server connection can not be read from or written to, but it can be closed.
-	* You can also use it in a call to maAccept() or maGetConnAddr().
+	* You can also use it in calls to maAccept() and maConnGetAddr().
 	*
 	* \returns The connecting handle \>0, or one of the \link #CONNERR_GENERIC CONNERR \endlink values.
 	* \see maGetEvent()

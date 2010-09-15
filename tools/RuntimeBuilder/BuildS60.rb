@@ -69,7 +69,7 @@ class RuntimeBuilder
 		
 		data3_dir = $SETTINGS[:symbian_source] + "data-ed3/"
 		data_dir = $SETTINGS[:symbian_source] + "data/"
-		inc_dir = $SETTINGS[:symbian_source] + "inc/"
+		inc_dir = $SETTINGS[:symbian_source] + "inc"
 		
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/"
@@ -82,7 +82,7 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_caption_template.rss #{runtime_dir}MoSync_caption_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_caption_template.rss #{runtime_dir}MoSync_caption_template.prs")
 			
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(app_file, "#{runtime_dir}MoSync#{debug}.app")
@@ -102,8 +102,8 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
-			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
 			
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
@@ -123,8 +123,8 @@ class RuntimeBuilder
 			end
 			
 			# Preprocess resource files
-			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
-			sh("cpp -I#{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
 			 
 			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
