@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace Base;
 
-BufferAudioSource::BufferAudioSource(MAAudioBufferInfo *i, BufferRequestCallback callback) {
+BufferAudioSource::BufferAudioSource(const MAAudioBufferInfo *i, BufferRequestCallback callback) {
 	mSem = new MoSyncSemaphore();
 	info.sampleRate = i->sampleRate;
 	switch(i->fmt) {
@@ -45,7 +45,7 @@ BufferAudioSource::BufferAudioSource(MAAudioBufferInfo *i, BufferRequestCallback
 					break;
 				case AUDIO_FMT_U8: 
 					info.fmt = AudioSource::FMT_U8;
-					info.bytesPerSample = 2;
+					info.bytesPerSample = 1;
 					info.bitDepth = 8;
 					break;
 	}

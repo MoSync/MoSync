@@ -42,8 +42,9 @@ CAppUi::~CAppUi()
 }
 
 void CAppUi::ConstructL( void ) 
-{    
-	BaseConstructL();               // initialize appUI with standard values, read standard resource files
+{
+	// initialize appUI with standard values, read standard resource files
+	BaseConstructL(EAknEnableSkin);
 	SetKeyBlockMode(ENoKeyBlock); //important
 	LOGD("view\n");
 	iAppView = CAppView::NewL(*this); // construct appView

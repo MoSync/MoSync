@@ -31,6 +31,8 @@ public:
 	const Location* getLocation() const;
 	std::string toString() const;
 
+	const Base* resolveFully() const;
+
 private:
 	std::string mName;
 	const Base* mType;

@@ -19,6 +19,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
+ReferenceType::ReferenceType()  {
+	mBaseType = EReferenceType;
+}
+
 string ReferenceType::toString() const {
 	return System::genstr("%s%s&", (mIsConst?"const ":""), mType->toString().c_str());
 }

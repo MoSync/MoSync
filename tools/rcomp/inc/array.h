@@ -1,7 +1,20 @@
-// ARRAY.H
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #if !defined(__ARRAY_H__)
 #define __ARRAY_H__
@@ -9,16 +22,16 @@
 // ArrayItem
 
 class ArrayItem
-{
+	{
 public:
 	virtual ~ArrayItem() {}
-};
+	};
 
 // Array
 
 class ArrayIterator;
 class Array
-{
+	{
 	friend class ArrayIterator;
 public:
 	void Empty();		// Empty store without calling delete on individual elements.
@@ -38,12 +51,12 @@ private:
 	ArrayItem** iData;
 	int iItemCount;
 	int iItemAllocCount;
-};
+	};
 
 // ArrayIterator
 
 class ArrayIterator
-{
+	{
 public:
 	void Reset();
 protected:
@@ -52,6 +65,6 @@ protected:
 private:
 	const Array* iArray;
 	int iCurrentIndex;
-};
+	};
 
 #endif

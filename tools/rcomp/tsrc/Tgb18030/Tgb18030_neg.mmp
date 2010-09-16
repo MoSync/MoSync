@@ -1,0 +1,45 @@
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+TARGET        Tgb18030_neg.exe
+TARGETTYPE    exe
+UID           0x100039CE 0x10287187
+VENDORID 	  0x70000001
+SOURCEPATH    .
+SOURCE        Tgb18030_Main.cpp
+SOURCE        Tgb18030_Application.cpp
+SOURCE        Tgb18030_Document.cpp
+SOURCE        Tgb18030_AppUi.cpp
+SOURCE        Tgb18030_AppView.cpp
+USERINCLUDE   .
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\techview
+START RESOURCE	Tgb18030.RSS
+HEADER
+TARGETPATH		\Resource\Apps
+end
+
+START RESOURCE	Trcomp_neg.rss
+TARGETPATH		\private\10003a3f\apps
+END
+
+START RESOURCE	Trcomp_neg2.rss
+TARGETPATH		\private\10003a3f\apps
+END
+
+LIBRARY       euser.lib apparc.lib cone.lib eikcore.lib gdi.lib eikctl.lib eikcoctl.lib 

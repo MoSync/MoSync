@@ -16,41 +16,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
- * File:   interface.cpp
- * Author: Ali Mosavian
+ * File:   interface.mm
+ * Author: Romain Chalant
  *
  * Created on July 29, 2009
  */
 #include <cstdlib>
-//#include <bluetooth/bluetooth.h>
-
+#include <list>
+#import <IOBluetooth/objc/IOBluetoothHostController.h>
+#import <IOBluetooth/objc/IOBluetoothSDPUUID.h>
+#import <IOBluetooth/objc/IOBluetoothSDPServiceRecord.h>
 #include "../config_bluetooth.h"
 #include "../btinit.h"
 #include "../discovery.h"
-//#include "bluetoothbluez.hpp"
 #include "helpers/helpers.h"
-
-
-//#import <IOBluetooth/objc/IOBluetoothDeviceInquiry.h>
 #include "DiscoveryCocoa.h"
 
-//#include <Foundation/Foundation.h>
-//#include <String>
 
 using namespace Bluetooth;
 
 /**
  * Globals
  */
-//static BlueZ::BluetoothBluez* gInstance = NULL;
-static DiscoveryCocoa *dis = NULL;
-
-
+static DiscoveryCocoa *gDiscovery = NULL;
 
 namespace Bluetooth
 {
-    BluetoothStack gBluetoothStack = BTSTACK_BLUEZ;
-
+	BluetoothStack gBluetoothStack = BTSTACK_COCOA;
 
 /**
  * Will initialize the bluetooth system
@@ -58,8 +50,7 @@ namespace Bluetooth
  */
 void MABtInit ( void )
 {
-    //MAASSERT( gInstance == NULL );
-    //gInstance = new BlueZ::BluetoothBluez( );
+	gDiscovery = [[DiscoveryCocoa alloc] init];
 }
 
 /**
@@ -67,14 +58,14 @@ void MABtInit ( void )
  *
  */
 void MABtClose ( void )
-{
-    /*if ( gInstance == NULL )
-    {
-        LOGBT( "gInstance is NULL" );
-        return;
-    }
-
-    delete gInstance;*/
+{	
+	if ( gDiscovery == NULL )
+	 {
+	 LOGBT( "gDiscovery is NULL" );
+	 return;
+	 }
+	 
+	 [gDiscovery release];
 }
 
 
@@ -87,9 +78,28 @@ void MABtClose ( void )
  */
 int getLocalAddress ( MABtAddr& a )
 {
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getLocalAddress( a );*/
-	return 0;
+	// Initialize the host controller and get the local address
+	IOBluetoothHostController *hc = [[IOBluetoothHostController alloc] init];
+	if(!hc) return CONNERR_INTERNAL;
+	BluetoothDeviceAddress * localAddressPtr = new BluetoothDeviceAddress();
+	[hc getAddress:localAddressPtr];
+	// Convert the address to the MoSync format
+	if (localAddressPtr) {
+		a.a[0] = localAddressPtr->data[0];
+		a.a[1] = localAddressPtr->data[1];
+		a.a[2] = localAddressPtr->data[2];
+		a.a[3] = localAddressPtr->data[3];
+		a.a[4] = localAddressPtr->data[4];
+		a.a[5] = localAddressPtr->data[5];
+		delete(localAddressPtr);
+		[hc release];
+		return 0;
+	}
+	else {
+		[hc release];
+		delete(localAddressPtr);
+		return CONNERR_INTERNAL;
+	}
 }
 
 
@@ -102,12 +112,8 @@ int getLocalAddress ( MABtAddr& a )
  */
 int maBtDiscoveryState ( void )
 {
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getState( );*/
-	
-	return 0;
-
-	
+	MAASSERT( gDiscovery != NULL );
+	return gDiscovery._status;	
 }
 
 
@@ -123,9 +129,18 @@ int maBtDiscoveryState ( void )
  */
 int maBtCancelDiscovery ( void )
 {
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->cancelDeviceDiscovery( );*/
-	return 0;
+	MAASSERT( gDiscovery != NULL );
+	if (gDiscovery == NULL) {
+		return 0;
+	}
+	else if (gDiscovery._status == 0) {
+		[gDiscovery stopInquiry];
+		return 1;
+	}
+	else {
+		[gDiscovery stopInquiry];
+		return 0;
+	}
 }
 
 
@@ -142,48 +157,16 @@ int maBtCancelDiscovery ( void )
  */
 int maBtStartDeviceDiscovery ( MABtCallback cb,
                                bool n )
-{
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->startDiscovery( cb, n );*/
-	/*IOReturn	status;
-	
-	//[self	stopInquiry];
-	
-	IOBluetoothDeviceInquiry *		_inquiry;
-	BOOL							_busy;
-	
-	_inquiry = [IOBluetoothDeviceInquiry	inquiryWithDelegate:Discovery];
-	
-	status = [_inquiry	start];
-	if( status == kIOReturnSuccess )
-	{
-		[_inquiry	retain];
-		//[_progressBar startAnimation:self];
-		//[_searchButton 	setTitle:@"Stop"];
-		
-		_busy = TRUE;
-	}
-	else
-	{
-		//[_messageText setObjectValue:@"Idle (Search Failed)."];
-		return 1;
-	}*/
-	
-	dis = [[DiscoveryCocoa alloc] init];
-	
-	IOReturn status = [dis startInquiry];
-	
+{	
+	MAASSERT( gDiscovery != NULL );
+	IOReturn status = [gDiscovery startInquiry:n];
 	if (status == kIOReturnSuccess) {
+		gDiscovery._callback = cb;
 		return 0;
 	}
 	else {
-		return -1;
+		return CONNERR_INTERNAL;
 	}
-
-	
-	//NSString *str = [dev getAddressString];
-	
-	
 }
 
 
@@ -195,30 +178,37 @@ int maBtStartDeviceDiscovery ( MABtCallback cb,
  * @return 1 if there was a device, 0 if not
  */
 int maBtGetNewDevice ( MABtDevice* d )
-{
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getNextDevice( d );*/
-	//IOBluetoothDevice *dev = [dis._foundDevices objectAtIndex:0];
-	//NSString *str = [dev getAddressString];
-	//const char *cstr = new char[str.length+1];
-	//const char* cstr;
-	//cstr = [str cStringUsingEncoding:NSASCIIStringEncoding];
-	
-	
-	//strcpy(d->name, cstr);
-/*	IOBluetoothDevice *dev = [dis._foundDevices objectAtIndex:0];
-	const BluetoothDeviceAddress * addressPtr = [dev getAddress];
-	if (addressPtr) {
-		return addressPtr->data[0];
+{	
+	if ( [gDiscovery._foundDevices count] != 0 ) {
+		
+		// Pop the next device from the stack
+		IOBluetoothDevice *dev = [gDiscovery._foundDevices objectAtIndex:0];
+		
+		// Get the device address
+		const BluetoothDeviceAddress * addressPtr = [dev getAddress];
+		if (addressPtr) {
+			// Convert Cocoa address to MoSync address
+			d->address.a[0] = addressPtr->data[0];
+			d->address.a[1] = addressPtr->data[1];
+			d->address.a[2] = addressPtr->data[2];
+			d->address.a[3] = addressPtr->data[3];
+			d->address.a[4] = addressPtr->data[4];
+			d->address.a[5] = addressPtr->data[5];
+			// Fill the name field of the NABtDevice structure
+			NSString* deviceNameString	= [dev getNameOrAddress];
+			d->actualNameLength=deviceNameString.length;
+			const char *cstr = new char[deviceNameString.length+1];
+			cstr = [deviceNameString cStringUsingEncoding:NSASCIIStringEncoding];
+			if (cstr == NULL) cstr = "NO NAME";
+			strcpy(d->name, cstr);
+		}
+		// Remove the found device from the stack
+		[gDiscovery._foundDevices removeObjectAtIndex:0];
+		return 1;
 	}
 	else {
-		return -1;
-	}*/
-	d->actualNameLength = 6;
-	return 0;
-
-
-	
+		return 0;
+	}
 }
 
 
@@ -234,12 +224,21 @@ int maBtStartServiceDiscovery ( const MABtAddr* a,
                                 const MAUUID* u,
                                 MABtCallback cb )
 {
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->startServiceDiscovery(cb, a, u );*/
-	
-
-	
-	return 0;
+	MAASSERT( gDiscovery != NULL );
+	// Convert MoSync address to Cocoa address
+	BluetoothDeviceAddress * addressPtr = new BluetoothDeviceAddress();
+	addressPtr->data[0] = a->a[0];
+	addressPtr->data[1] = a->a[1];
+	addressPtr->data[2] = a->a[2];
+	addressPtr->data[3] = a->a[3];
+	addressPtr->data[4] = a->a[4];
+	addressPtr->data[5] = a->a[5];
+	// Convert MoSync UUID to Cocoa UUID
+	IOBluetoothSDPUUID * refUUID = [IOBluetoothSDPUUID uuid16:u->i[0]];
+	// Set the callback
+	gDiscovery._callback = cb;
+	// Start the service discovery
+	return [gDiscovery startServiceDiscovery: addressPtr serviceWithUUID:refUUID];
 }
 
 /**
@@ -252,9 +251,53 @@ int maBtStartServiceDiscovery ( const MABtAddr* a,
  */
 int maBtGetNewService ( MABtService* d )
 {
-    /*MAASSERT( gInstance != NULL );
-    return gInstance->getNextService( d );*/
-	return 0;
+    MAASSERT( gDiscovery != NULL );
+	if ( [gDiscovery._foundServices count] != 0 ) {
+		// Pop the next service from the stack
+		IOBluetoothSDPServiceRecord * record = [gDiscovery._foundServices objectAtIndex:0];
+		
+		// Fill the name field of the NABtDevice structure
+		NSString *serviceName = [record getServiceName];
+		const char *cstr = new char[serviceName.length+1];
+		cstr = [serviceName cStringUsingEncoding:NSASCIIStringEncoding];
+		if (cstr == NULL) cstr = "NO NAME";
+		strcpy(d->name, cstr);
+		
+		// Fill the port field of the NABtDevice structure
+		BluetoothRFCOMMChannelID port;
+		[record getRFCOMMChannelID:&port];
+		d->port = port;
+		
+		// Fills the uuids field of the MABtService struture
+		// Because there is no method for getting a list of protocol UUIDs
+		// the service has, we do it by hand...
+		// Protocol UUIDs are the hex numbers from 0x0001 to 0x0100
+		// See Bluetooth reference documentation.
+		std::list<MAUUID>   mUuidList;
+		for(int i = 0x0001; i<=0x0100; i++) {
+			IOBluetoothSDPUUID* refUUID = [IOBluetoothSDPUUID uuid16:i];
+			NSArray *uuidArray = [NSArray arrayWithObject:refUUID];
+			if ( [record hasServiceFromArray:uuidArray] ) {
+				// If the current UUID is found, convert it to a MAUUID and put it in the list
+				const MAUUID mauuid = {{ i, 0x00001000, 0x80000080, 0x5F9B34FB }};
+				const MAUUID &mauuidRef = mauuid;
+				mUuidList.push_back( mauuidRef );
+			}
+		}
+		// Copy all the UUIDs found to the structure
+		std::list<MAUUID>::iterator it;
+		int i = 0;
+		for ( it = mUuidList.begin( ); it != mUuidList.end( ); ++it )
+			d->uuids[i++] = *it;
+
+		// Remove the found service from the stack
+		[gDiscovery._foundServices removeObjectAtIndex:0];
+		return 1;
+	}
+	else {
+		return 0;
+	}
+
 }
 
 
@@ -267,9 +310,33 @@ int maBtGetNewService ( MABtService* d )
  */
 int maBtGetNextServiceSize ( MABtServiceSize* d )
 {
-   /* MAASSERT( gInstance != NULL );
-    return gInstance->getNextServiceSize( d );*/
-	return 0;
+	MAASSERT( gDiscovery != NULL );
+	if ( [gDiscovery._foundServices count] != 0 ) {
+		
+		// Pop the next service from the stack
+		IOBluetoothSDPServiceRecord * record = [gDiscovery._foundServices objectAtIndex:0];
+		
+		// Fils the nameBufSize field of the MABtServiceSize structure
+		NSString *serviceName = [record getServiceName];
+		d->nameBufSize = serviceName.length;
+		
+		// Fills the nUuids field of the MABtServiceSize struture
+		// Because there is no method for counting how many protocol UUIDs
+		// the service has, we do it by hand...
+		// Protocol UUIDs are the hex numbers from 0x0001 to 0x0100
+		// See Bluetooth reference documentation.
+		int nUuids = 0;
+		for(int i = 0x0001; i<=0x0100; i++) {
+			IOBluetoothSDPUUID* refUUID = [IOBluetoothSDPUUID uuid16:i];
+			NSArray *uuidArray = [NSArray arrayWithObject:refUUID];
+			if ( [record hasServiceFromArray:uuidArray] ) {
+				nUuids++;
+			}
+		}
+		d->nUuids      = nUuids;
+		return 1;
+	}
+	else return 0; 
 }
 
 }

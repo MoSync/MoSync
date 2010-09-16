@@ -375,7 +375,13 @@ namespace MAUI {
 		*/
 		if(c<0 || c>=mCaption.length()) return false;
 		char deletedCharacter = mCaption[c];
-		mCaption.remove(c, 1);
+
+		if(mPasswordMode) {
+			mPassword.remove(c, 1);
+			mCaption.remove(c, 1);
+		} else {
+			mCaption.remove(c, 1);
+		}
 
 /*
 		for(int i = mCursorIndex; i < text.size(); i++) {

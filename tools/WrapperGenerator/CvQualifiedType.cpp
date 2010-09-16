@@ -24,9 +24,7 @@ CvQualifiedType::CvQualifiedType() : Base(ECvQualifiedType) {
 
 void CvQualifiedType::fromParseNode(const ParseNode& node) {
 	mType = parseType(node, mIsConst);
-	if(!mType) {
-		int a = 2;
-	}
+	SASSERT(mType);
 
 	string c = node.getAttr("const", false);
 	if(!mIsConst && c=="1")

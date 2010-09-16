@@ -79,3 +79,8 @@ LIBRARY mediaclientvideo.lib
 LIBRARY Lbs.lib
 LIBRARY insock.lib
 LIBRARY ecam.lib
+
+LIBRARY eikcoctl.lib
+LIBRARY eikctl.lib
+LIBRARY form.lib
+LIBRARY uiklaf.lib

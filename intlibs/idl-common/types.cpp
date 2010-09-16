@@ -23,17 +23,23 @@ bool isReturnType(const Interface& inf, const string& token) {
 		if(token == t.name)
 			return true;
 	}
-	return token == "int" || token == "void" || token == "double" ||
+	return token == "int" || token == "uint" || token == "void" || token == "double" ||
 		token == "float" || token == "noreturn";
 }
 
 string cType(const Interface& inf, const string& type) {
-	if(type == "int" || type == "double" || type == "float" || type == "void" || type == "char")
+	if(type == "int" || type == "double" || type == "float" || type == "void" ||
+		type == "char" || type == "uint" || type == "long long")
 		return type;
 	if(type == "noreturn")
 		return "void";
 	if(type == "NCString")
 		return "char*";
+
+	bool isPointer = type[type.size()-1] == '*';
+	if(isPointer)
+		return type;
+
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(type == s.name)
@@ -52,6 +58,16 @@ string cType(const Interface& inf, const string& type) {
 	throwException("Unhandled type: " + type);
 }
 
+const string& resolveType(const Interface& inf, const string& ctype) {
+	for(size_t i=0; i<inf.typedefs.size(); i++) {
+		const Typedef& t(inf.typedefs[i]);
+		if(ctype == t.name) {
+			return resolveType(inf, t.type);
+		}
+	}
+	return ctype;
+}
+
 bool isPointerType(const Interface& inf, const string& type) {
 	string ct = cType(inf, type);
 	return ct[ct.size() - 1] == '*';
@@ -60,6 +76,8 @@ bool isPointerType(const Interface& inf, const string& type) {
 string jType(const Interface& inf, const string& type) {
 	if(type == "ulong")
 		return "int";
+	if(type == "uint")
+		return "int";
 	if(type == "MAString")
 		return "MAString";
 	if(type == "MAWString")
@@ -67,6 +85,8 @@ string jType(const Interface& inf, const string& type) {
 	if(type == "float")
 		return "int";
 	if(type == "double")
+		return "long";
+	if(type == "longlong")
 		return "long";
 	if(isPointerType(inf, type))
 		return "MAAddress";
@@ -97,6 +117,9 @@ string getSJType(const Interface& inf, const string& type, bool argIn) {
 	if(argType == "float")
 		return "int";
 	if(argType == "double")
+		return "int";
+
+	if(argType == "uint")
 		return "int";
 
 	for(size_t i=0; i<inf.structs.size(); i++) {

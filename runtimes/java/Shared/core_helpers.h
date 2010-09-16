@@ -130,7 +130,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define RSHORT(a, ret) { ret = CORE.rshort(a); }
 #define WSHORT(a, s) CORE.wshort(a,s)
 
+#define INIT_MEMDS
+
 #else	//DEBUG_MEMORY
+
+#define INIT_MEMDS int[] mem_ds = CORE.mMem_ds
 
 #define RBYTE_BASE(a, ret, type) { \
 	int addr = (a);\

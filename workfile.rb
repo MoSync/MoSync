@@ -6,14 +6,14 @@ require File.expand_path('rules/host.rb')
 require File.expand_path('rules/task.rb')
 require File.expand_path('rules/mosync_util.rb')
 
-PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist", "tools/GLWrapperGenerator"]
+PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
 	PLATFORM_TOOLS = []
@@ -56,6 +56,7 @@ end
 
 target :base => skins do
 	Work.invoke_subdirs(PRE_DIRS)
+	#Work.invoke_subdir("tools/WrapperGenerator", "compile")
 	Work.invoke_subdir("tools/idl2", "compile")
 end
 

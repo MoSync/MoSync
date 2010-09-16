@@ -153,9 +153,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define BYTEPART(addr) ((addr) & 0x3)
 
 //Event Index, see IDL, struct MAEvent
+//TODO: generate these in IDL compiler.
 #define EI_TYPE event[0]
 #define EI_KEY event[1]
 #define EI_NATIVE_KEY event[2]
+#define EI_CHAR event[1]
 #define EI_POINTX event[1]
 #define EI_POINTY event[2]
 #define EI_CONN_HANDLE event[1]
@@ -163,3 +165,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_CONN_RESULT event[3]
 #define EI_STATE event[1]
 #define EI_DATA event[1]
+#define EI_TEXTBOX_RESULT event[1]
+#define EI_TEXTBOX_LENGTH event[2]

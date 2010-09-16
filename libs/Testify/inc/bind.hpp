@@ -28,7 +28,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 
 NAMESPACE_BEGIN( Testify )
-
+/**
+* @brief A funtion or method wrapper, possibly along with its parameters.
+* It can conveniently be called without having to care about it's details.
+*
+*/
 class Functor
 {
 public:
@@ -55,7 +59,7 @@ public:
 	virtual void operator () ( void ) = 0;
 };
 
-
+// @cond
 template <typename R, typename CLASS>
 class Functor0 : public Functor
 {
@@ -506,7 +510,7 @@ public:
 		m_funct( m_param0, m_param1, m_param2, m_param3 );
 	}
 };
-
+// @endcond
 
 
 template <typename R, typename CLASS>

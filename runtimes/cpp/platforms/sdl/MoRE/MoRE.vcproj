@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib"
+				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib comctl32.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="msvcrt.lib"
@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib"
+				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib FreeImage.lib comctl32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
@@ -266,6 +266,10 @@
 		</File>
 		<File
 			RelativePath=".\main.cpp"
+			>
+		</File>
+		<File
+			RelativePath="..\sdl.rc"
 			>
 		</File>
 	</Files>

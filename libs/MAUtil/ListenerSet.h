@@ -31,6 +31,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	for(ListenerSet<type>::iterator itr = set.begin(); itr.hasNext(); ++itr)
 
 namespace MAUtil {
+	/**
+	* \brief A listener set.
+	*/
 	template<typename T> class ListenerSet {
 	private:
 		struct Combo {
@@ -39,6 +42,9 @@ namespace MAUtil {
 		};
 
 	public:
+		/**
+		* \brief An iterator for a listener set.
+		*/
 		class iterator {
 		public:
 			T& operator*() { return *mVec[mIndex].listener; }	//unsafe if !hasNext()

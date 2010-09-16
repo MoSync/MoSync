@@ -9,7 +9,7 @@
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.permissions" value="Internet\ Access"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:dead.code.elim" value="false"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>

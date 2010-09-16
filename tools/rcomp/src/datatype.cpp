@@ -1,7 +1,20 @@
-// DATATYPE.CPP
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #include <assert.h>
 #include "datatype.h"
@@ -10,7 +23,7 @@
 // RCTypeArray
 
 RCTypeArray::RCTypeArray()
-{
+	{
 	Add( new RCType ( L_STRUCT,		"Struct",	0	));
 	Add( new RCType ( L_BUF,		"Buf",		0	));
 	Add( new RCType ( L_WORD,		"Word",		2	));
@@ -32,74 +45,74 @@ RCTypeArray::RCTypeArray()
 	Add( new RCType ( L_LINK,		"Link",		2	));
 	Add( new RCType ( L_LLINK,		"LLink",	4	));
 	Add( new RCType ( L_SRLINK,		"SRLink",	4	));
-}
+	}
 
 RCTypeArray::~RCTypeArray()
-{
+	{
 	DeleteAll();
-}
+	}
 
 const String & RCTypeArray::GetName( DataType ElementTypeSought) const
-{
+	{
 	RCType* pType;
 	RCTypeArrayIterator next( *this);	
 
 	while( ( pType = next()) != NULL)	
 		if ( pType->GetElementType() == ElementTypeSought)
 			return pType->GetName();
-
+	
 	assert(0);
 	return * (new String);	// This won't actually get executed due to the assert line above.
-}
+	}
 
 unsigned short RCTypeArray::GetSize( DataType ElementTypeSought) const
-{
+	{
 	RCType * pType;
 	RCTypeArrayIterator next( *this);	
 
 	while( ( pType = next()) != NULL)	
 		if ( pType->GetElementType() == ElementTypeSought)
 			return pType->GetSize();
-
+	
 	assert(0);
 	return 0;
-}
+	}
 
 
 // RCType
 
 RCType::RCType( DataType ElementType, const String & Name, unsigned short Size):
-iElementType(ElementType),
-iName(Name),
-iSize(Size)
-{}
+	iElementType(ElementType),
+	iName(Name),
+	iSize(Size)
+	{}
 
 RCType::~RCType()
-{}
+	{}
 
 const String &  RCType::GetName() const
-{
+	{
 	return iName;
-}
+	}
 
 DataType RCType::GetElementType() const
-{
+	{
 	return iElementType;
-}
+	}
 
 unsigned short RCType::GetSize() const
-{
+	{
 	return iSize;
-}
+	}
 
 
 // RCTypeArrayIterator
 
 RCTypeArrayIterator::RCTypeArrayIterator(const RCTypeArray& r):
-ArrayIterator(r)
-{}
+	ArrayIterator(r)
+	{}
 
 RCType * RCTypeArrayIterator::operator()()
-{
+	{
 	return (RCType *) ArrayIterator::operator()();
-}
+	}

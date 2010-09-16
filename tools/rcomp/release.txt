@@ -1,0 +1,663 @@
+version 8.4.001
+===============
+Released by Lorence Wang, 26/04/2010
+	1) DPDEF145375 RCOMP can not parse data passed to its STDIN correctly 
+
+version 8.3.001
+===============
+Released by Zheng Shen, 16/03/2010
+	1) DPDEF145001  RCOMP failed if uidcrc is not located in the same directory as it is
+
+version 8.3.000
+===============
+Released by Zheng Shen, 22/02/2010
+	1) DPDEF144562	Build Tools cannot be built in Linux
+
+version 8.2.008
+===============
+Released by Marvin Shi, 25/01/2010
+	1) DPDEF143586 Add -o2 optimization to rcomp 
+
+version 8.2.007
+===============
+Released by Marvin Shi, 15/01/2010
+	1) DPDEF143836 rcomp produces error messages which should be warning messages 
+
+Version 8.2.006
+===============
+Released by Zheng Shen, 10/12/2009
+	1) DPDEF143045 rcomp produces a warning 'Cannot convert "1.0" 
+
+Version 8.2.005
+===============
+Released by Jason Cui, 31/7/2009 (did not clear build number, should be done by next feature deliery)
+  1) SITK v1.4, GT0499, MS3.5.3, DS.1772 PREQ2471: RIT: Resource compiler (RComp) must support characters outside of the BMP 
+
+Version 8.1.005
+===============
+Released by KunalM, 06/03/2007
+
+	1) RCOMP ported to the TOOLS2 platform, under PREQ1182, MS3.6.2
+
+
+Version 8.00.002
+================
+Released by AndrewR, 3/3/2005
+
+	1) DEFECT FIX: DEF055559 - Problems building rcomp in VC6 IDE
+
+Version 8.00.001
+================
+Released by AndrewR, 7/2/2005
+
+	1) DEFECT FIX: DEF054981 - tools_rcomp component is updated every day
+
+Version 8.00.000
+================
+Released by AndrewR, 4/2/2005
+	1) Fixed DEF054617 - rcomp doesn't build from source
+	2) Fixed INC049059 - incorrect line number for error reported by rcomp when building \s60\gs
+
+Version 7.01.009
+============
+Released by KuldipN, 22/07/2004
+	Add UID2 and UID3 keywords to RCOMP 
+	(CR HBRT-5YJJ9C Specifying UID2 and UID3 in RSS files)
+
+Version 7.01.008
+============
+Released by DuskoJ, 10/07/2003
+	1) Fixed DEF022269  Resource value is read incorrectly
+	2) Fixed INC036025  RCOMP chinese resource complation problem 
+
+Version 7.01.007
+============
+Released by Jon Chatten, 03/06/2003
+	1) Fixed "DEF025433 RComp core dumps on certain resource files"
+	2) Adjusted version number in release.txt to match binary.
+
+	
+Version 7.06
+============
+Released by Dusko Jahora, 03/06/2003
+	1) Reverted fix for DEF022269
+
+
+Version 7.05
+============
+Released by Dusko Jahora, 02/06/2003
+1)	DuskoJ
+	1)	Changes to RCOMP whihch are part of CR PCHY-5L3RDW 
+		"Typhoon must support 16bpp colour".
+	2)	Fixed DEF022269  Resource value is read incorrectly
+		(this fix was not submitted on 09/05/2003 because of 
+		 an integration error)
+
+
+Version 7.04
+============
+
+Released by Dusko Jahora, 09/05/2003
+1)	DuskoJ
+	1)	Fixed DEF022269  Resource value is read incorrectly
+
+
+Version 7.03
+============
+
+Released by Dusko Jahora, April 2003
+	1)	Fixed defect DEF017151 "RCOMP should be upgraded to support files with UTF8 
+		signature".
+
+
+1)	William
+	1)	Fixed defect ROS-58VCX8 "RCOMP doesn't allow + in filenames" by removing
+		the unnecessary validation of the filenames left by the C++ preprocessor.
+	2)	Fixed defect RED-5ACK5F "Resource compiler creates nothing for empty and bad 
+		counted byte arrays"
+2)	Dusko
+	1)	Fixed defect ROS-5B7MHW "RCOMP fails to handle boundary values correctly
+		for WORD data type"
+	
+NB. The handling of LABEL suggests that it would be pretty easy to add rls_string support
+into the compiler directly.
+
+Version 7.01
+============
+
+Released by Jon Chatten, February 2002
+
+Fixed defect ROS-56PHFA - Replaced system() call to uidcrc.exe with a call to _spawnlp -
+this addresses the IDE-hanging issue when epocrc.pl is integrated as a plug-in with the CW
+IDE on Windows 98.
+
+Removed attempt to absolutely identify uidcrc.exe - this is no longer required as the CW RCOMP/EPOCRC.PL
+plug-in now sets the PATH before invoking the command line tools.
+
+
+1)	William
+	1)	Fixed defect ROS-55KJ4U "RCOMP fails if epoc32\tools not on the path"
+
+
+Version 7.00
+============
+
+Released by David Batchelor (November/December 2001)
+
+The format of resource files changes as follows:
+
+- The initial 2 two-byte values are removed as they are completely redundant. (All the information
+  they provide can be derived from the last 2 bytes of the file combined with the size of the
+  file.)
+- Resource files now have a standard 4-byte checked-UID field at the start. The first UID is
+  0x101f4a6b, to indicate that the resource file potentially contains Unicode compressed according
+  to the "Standard Compression Scheme for Unicode" (see
+  http://www.unicode.org/unicode/reports/tr6/tr6-3.2.html). The second and third UIDs may be
+  specified on the command-line by using an optional parameter of the form
+  "-{0x12345678,0x9abcdef0}" (without the quotation marks). If "*" is used as the last UID, e.g.
+  "-{0x600ddea1,*}", then the resource file's "offset" (i.e. the 20-bit number generated from the
+  resource file's "NAME") is used as the last UID.
+- The UID field is immediately followed by a bit-array, one bit for each resource in the resource
+  file, where each bit indicates whether the corresponding resource contains compressed Unicode.
+  The bit field is padded up to a multiple of 8-bits (if necessary) with zero bits.
+- Each resource which contains compressed Unicode consists of a series of "runs" preceded by a 1
+  or 2-byte run-length (1 byte if the run is <128 bytes, else 2 bytes). The run-length value does
+  not include itself in the byte count that it holds. The first run, the third run, the fifth run
+  etc contain compressed Unicode. The second run, the fourth run, the sixth run etc contain other
+  stuff. As the protocol defines that the first run is compressed Unicode, this run may obviously
+  be of zero length - no subsequent run in that resource may be of zero length.
+- Rcomp only uses compressed Unicode for text fields if it yields any benefit (i.e. only if it
+  actually makes the output file smaller).
+- The changes are completely transparent for code that reads resources.
+
+
+Version 6.03
+============
+
+Released by William Roberts, 30-Jul-2001
+
+Fix defect EXT-4YSCUV "Resource compiler corrupts long strings"
+Handle very long C++ comments, which previously caused a "token buffer overflow" message from the
+lexical analyser. Avoid overruning the buffer for literals by using a CHECK_APPEND() macro which
+discards characters rather than run off the end, giving errors like
+
+<empty>(5) : string too long - 1 ignored
+<empty>(5) : string too long - 2 ignored
+
+Avoid overflowing the Value array in string expressions by checking the new length before
+agreeing to concatenate the strings. Ultimately it would be best to replace Value[] with 
+a char* which has been created with strdup() and can therefore be realloc'd to grow the string.
+
+Fix defect ARG-4TZF7J "RCOMP needs warning waivers registered with SI"
+Removed all warnings in tools rel build - some tools deb warnings will appear in rcomp.cpp 
+because of problems in the mks\etc\yyparse.cpp file, but I didn't want to hide related problems 
+in any new Symbian code we might add. 
+
+Improve the -v output to show the primitive types being emitted, and to dump the IndexTable as hex
+offsets followed by the resource name, e.g.
+
+    IndexTable
+    IndexTableItem 4	<empty>
+    IndexTableItem c	r_eikserv_panic_dialog
+    IndexTableItem b8	r_eiksrv_oom_event_top
+    IndexTableItem e4	r_eiksrv_oom_event_bot
+    IndexTableItem 144	r_eikserv_replace_main_batteries
+    IndexTableItem 170	r_eikserv_replace_backup_battery
+
+and 
+
+    ResourceHeader          r_eiksrv_tasklist_dialog
+    ++ResourceItemArray
+    SimpleResourceItem [Long flags]  9
+    SimpleResourceItem [LText16 title]  
+    SimpleResourceItem [LLink pages]  
+    SimpleResourceItem [LLink buttons]  
+    StructArrayResourceItem (Level 0) [items]  
+    ArrayLength [Word] 1
+    ----------------------
+    --ResourceItemArrayArray
+    ++ResourceItemArray
+    SimpleResourceItem [Word type]  1001
+    SimpleResourceItem [LText16 prompt]  
+    SimpleResourceItem [Word id]  1
+    SimpleResourceItem [Long itemflags]  0
+    StructTypeResourceItem (Level 0) [control]  
+    ----------------------
+    ++ResourceItemArray
+    SimpleResourceItem [Byte version]  0
+    SimpleResourceItem [Word flags]  0
+    SimpleResourceItem [Word height]  8
+    SimpleResourceItem [Word width]  20
+    SimpleResourceItem [LLink array_id]  
+    ----------------------
+    SimpleResourceItem [LText16 trailer]  
+    ----------------------
+
+Together these changes should make it significantly easier to step through the binary image of a
+resource and work out which element has changed unexpectedly.
+
+
+Version 6.02
+============
+
+Released by William Roberts, 15-Feb-2001
+
+Fix awful defect in version 6.01, which caused negative integer constants to be written to the file as -1.
+
+When testing with LOCKIT, RCOMP developer should be aware that the version of RCOMP.EXE used by lockit 
+is kept in \lockit\tools, not \epoc32\tools.
+
+
+Version 6.01
+============
+
+Released by William Roberts, 14-Feb-2001
+
+Redefined character literals ('x') to be effectively strings so that they can contain UTF8 encodings
+for interesting characters. This is handled using the same lexical rules as string literals, so
+the limited escape processing is also supported. The introduction of strings surrounded by single-quotes
+means that the sequence \' is now accepted as standing for '.
+
+If the character literal string decodes to more than one Unicode character, a warning is given and the
+rest of the string is ignored. The prevailing source character encoding is used, but there is no support
+narrow character literals in the difficult part of the CP1252 range: the interpretation of the literal
+is always "the Unicode encoding for the first character of the string". For example, even in a 
+CP1252 source file building a narrow resource, a literal containing the Euro symbol will be interpreted 
+as 0x20ac, not 0x80.
+
+LTEXT strings are now checked to ensure that they are less than 256 characters in length.
+
+The NAME statement can now take a string literal or a label, instead of the previous behaviour where the
+lexical analyser handled the following word differently. Any RSS file which used a keyword as a name,
+for example WORD.RSS, will need to be changed to specify the name as a literal: the preferred syntax
+is to use string literals in all cases.
+
+
+Version 3.18
+============
+
+Released by William Roberts, 05-Aug-1999.
+
+Requires BAFL 092.
+
+Changed the handling of Unicode string resources (TEXT16 and LTEXT16) to ensure that the
+Unicode characters are aligned to a multiple of 2 bytes when the resource is used.
+ 
+Resources are never used in place: instead RResourceFile::AllocReadLC creates an HBufC8 to hold a
+copy of the data. This means that rather than aligning from the start of the entire resource file,
+instead we have to align to the start of the individual resource, because the data in an HBufC8 
+always starts at an aligned address.
+
+Added RCBinaryStream::Align(int nBytes) and RCBinaryStream::SetAlignBase() to support the 
+generation of the necessary padding, and call them from suitable places in RCOSTRM.CPP.
+
+Also added code to add 1 to the offset of the end of the table of resource offsets: this is tested
+in BAFL as a marker to indicate the new format of resource file.
+
+Added a /verbose flag to core.cmd which invokes RCOMP with -v.
+
+Added #pragma warning( disable : 4710 ) in a couple of places to cut down on the number of
+unnecessary and useless "warnings".
+
+Regenerated the test resources.
+
+
+Version 3.17
+============
+
+Released by William Roberts, 25-Jun-1999.
+
+Fixed defect where embedded Unicode characters could cause BUF<x> strings to fail a length check.
+Updated test code include a check for this.
+
+Added more stuff for the Engineering Automated Build.
+
+
+Version 3.16
+============
+
+Released by Pute, 9-Jun-1999.  Based on work by William Roberts,
+26-May-1999 described in the "William's notes" section below.
+
+
+Character sets
+--------------
+
+We are moving towards a specific principle of character sets for RCOMP.
+
+Previously, the character set used by RCOMP was not well defined, later we
+added the CHARACTER_SET identifier.  This implied that any specific values
+inserted into strings in <n> format would be in the character set of the
+source.
+
+In this design RCOMP will have trouble handling multibyte encodings like
+Shift-JIS because the tools it relies upon, LEX and YACC, are based on
+single-octet encodings only. Sometimes a multibyte encoding will produce
+artefacts that appear to be syntax elements such as double quote marks.
+
+In future the intention is that RCOMP uses UTF-8 encoding internally,
+provided by a pre-processing phase.  This release is an interim step.
+
+In this release, when explicit values are inserted in text strings, they
+are interpreted as Unicode values and converted to UTF-8.  To retain
+backward compatibility with CP1252 source, values 80-9F are also permitted
+and these will be mapped to Unicode as before when the source character set
+is defined to be CP1252.  The use of explicit values 80-9F is deprecated
+however.
+
+The default input character set is CP1252.  Previously, the default
+character set was "unknown".  This possibility is no-longer supported.
+This was also contrary to documentation.
+
+
+Details:
+
+Test command procedure updated and enhanced.
+
+Test comparison files TUTEXT8.RSC and TUTEXT16.RSC have been updated to
+allow for the introduction of the extra characters in the CP1252 character
+set.  (128 used to be "not used" and is now the euro sign)
+
+Note that compilation warning messages about deprecated characters will
+appear durng this test.
+
+A new test source file TWTEXT.RSS and associated reference binaries have
+been added to the test suite to demonstrate explicit use of values >255.
+
+
+
+
+William's notes (edited by Pute):
+---------------
+
+Defined a new "character set" called UTF8, which supports the UTF8
+encoding of Unicode strings. 
+This actually allows the whole resource source file to be entered as
+UTF8 if required.  However the default charset remains CP1252.
+
+Arranged to support embedded Unicode characters constructed using the
+<xxx> notation, to support the use of 0x07ED as the end-of-paragraph
+marker (see ETEXT 120). This exploits the UTF8 support by inserting the
+appropriate UTF8 sequence into the 8-bit data.
+
+The embedded Unicode characters are also supported in the CP1252
+character set, with internal use of 0x81 as an "escape" character
+indicating that the following bytes are a UTF8 encoded character. This
+allows existing CP1252 resource source files to be used with the new
+ETEXT.
+
+Added the Euro and the Z caron encodings to the cp1252_exceptions table.
+
+
+Only RCOMP.EXE has been rebuilt.  Judging from the timestamps, the other
+executables haven't been rebuilt for the last few releases.
+
+To build rcomp, first run ..\src\BLDEX, then MNT BLDREL
+
+Building is only possible from NT and makes use of lex and yacc from
+T:\mks - this should be updated to use the GNUPro tools which we use to
+build GCC, as the Cygnus toolchain is something we expect to have always
+available.
+
+
+
+Version 3.15
+============
+
+Released by SimonC, 01-Feb-1999
+
+Fixed defects
+	EDN484092 "RCOMP needs to be Symbianised"
+	EDN584421 "Need to rebuild RCOMP with boilerplated headers"
+
+Only RCOMP.EXE has been rebuilt.  Judging from the timestamps, the other executables
+haven't been rebuilt for the last few releases.
+
+To build rcomp, first run ..\src\BLDEX, then MNT BLDREL
+
+Building is only possible from the NT and makes use of executables on T: so this can't
+be rebuilt by licensees (which doesn't seem to have been a problem so far...)
+
+
+
+Version 3.14
+============
+
+Released by PNJ, 19-Mar-1997
+
+The CORE command and the test procedures rely on NT command extensions.
+
+
+Version 314 mods
+
+  1. In FILELINE.CPP, FileLineManager::ExtractFileName updated to add
+     filename information planted by the preprocessor. This is a rewrite of
+     the code that was removed in the previous release because it was
+     violating.
+  2. Test code now in a formalised framework accessed via MNT TEST. The
+     formalism isn't perfect because of the limitations imposed by the
+     legacy command language. See TEST.HTM in the TSRC directory for more
+     information. The test procedure relies on NT command extensions.
+  3. The CORE command procedure has been changed to allow preprocessor
+     symbols to be defined. See below.
+
+CORE syntax
+
+CORE filename [ object_directory [options] ]
+
+If options are being used the object directory parameter must be present,
+the default value is "." for the current directory.
+
+Options are:
+
+/UNICODE
+     Specifies that strings are emitted as Unicode in the resource binary.
+     Previously, this option was selected with "-u", which is the parameter
+     currently used by RCOMP itself.
+/DEFINE symbol [ symbol...]
+     Specifies one or more symbols to be defined for the preprocessor pass.
+     This must be the last option supplied because it is followed by an
+     arbitrary number of tokens and the command language is so primitive.
+
+
+
+
+
+
+
+
+Version 3.13
+============
+
+Released by PNJ, 13-Jan-1997
+
+Version number scheme is independent of product-specific E32 chain
+numbering.
+
+This is an interim release, to provide 16-bit character set functionality.
+Later releases are planned to provide other requested features.  Existing
+RSS files produce identical binaries to previous releases when compiled
+in the default non-Unicode mode.
+
+There are some serious defects in the source code which will take
+a long time to address properly, eg misuse of assert as a status check.
+
+1.  Minor changes to MNT and build settings.
+2.  Minor code changes to remove warnings.
+3.  Renamed STRING.CPP, .H to remove ambiguity with
+    standard header of the same name.
+4.  rcscan::yyerror function updated so that it actually
+    interprets formatted strings instead of ignoring the extra
+    parameters.
+5.  Fixed defect in String operator != which was doing the inverse
+    of what it is supposed to do!
+6.  Provide a qualifier for Unicode output.
+7.  Fix erroneous error message if source file not specified.
+8.  Fixed problem which caused run time fatal errors during
+    source context switching.
+9.  Introduce new tokens to differentiate between 8 and 16-bit
+    text strings.
+10. Introduce a CHARACTER_SET token to specify the source
+    character set.
+11. Introduce an extra test component directory.
+12. Introduce a command procedure wrapper for RCOMP (called CoRe)
+
+
+Language features
+-----------------
+
+CHARACTER_SET name
+
+Specifies the character set of the input file.  The implementation currently
+does not do much with this, but will do in the nexty release or 2.  Legal
+values for name are currently:
+
+ASCII, CP1252, CP850, ISOLatin1, ShiftJIS, Unicode
+
+Note that Unicode source text is not likely to be supported any time soon,
+largely because RCOMP relies on LEX and YACC which are not Unicode-aware.
+
+The default setting in this implementation is CP1252.
+
+
+TEXT, LTEXT and BUF
+
+Now have explicit 8 and 16-bit variants, eg TEXT8, BUF16.  The unadorned
+variants are internally converted to the 8 or 16-bit equivalents depending
+on the presence of the -u (for unicode) command line qualifier.
+
+The prefixed counter for an LTEXT16 is still an 8-bit field.
+
+The zero terminator for a TEXT16 is a 16-bit field.
+
+For text fields, it is recommended that you continue to use the unadorned
+keywords. For binary data, you should use the explicit 8-bit keywords. This
+is likely to apply most commonly to the BUF (BUF8) keyword.
+
+
+
+
+
+Version 0.03.12
+===============
+
+1) Reduced verbosity.
+2) Released a version compatible with NT4.
+
+Version 0.03.11
+===============
+
+1) PVCS'ed RCOMP and generally tidied it up.
+2) Fixed empty BUF crash.
+3) Fixed extra trailing comma crash.
+4) Cleaned up the build warnings.
+5) Added ...BUF<n>... where n is an integer giving max length of BUF.
+6) The .exe is now called rcomp.exe.
+
+Version 3.06, MartinW, 05 Jul 96
+================================
+1. Added enum handling.
+        e.g.
+        ENUM ExampleEnum { Elem1, Elem2}
+        STRUCT a { BYTE b;}
+        RESOURCE a c { b = ExampleEnum::Elem2;}
+This should set up b with the value 1.
+
+Version 3.05, MartinW, 30 May 96
+================================
+1.Deal with long (>42characters) resource names in output to header
+  file.
+2.Prevent assertion failure in case of missing comma after first item
+  in an array of struct's.
+
+Version 3.04, MartinW, 29 Apr 96
+================================
+Avoid using cin by reading from a specified file (-s<filename>). The 
+cin approach suffered from something to do with the source file being 
+left open even when the program ended. This was the case at least with 
+a test program built using C++ 1.51 and run under NT 3.51.
+e.g.    void main() { char a; cin << a; }
+        TestProgram < a.src
+        del a.src             <---- "file in use by another process".
+
+Version 3.03, MartinW, 18 Apr 96
+================================
+1.Handle syntax error with numbers more effectively so assert does not
+  fail.
+2.Accept 0 for double without warning.
+
+Version 3.02, MartinW, 11 Apr 96
+================================
+Corrected defect to do with line number in error message for text being
+converted to a number.
+
+Version 3.01, MartinW, 9 Apr 96
+===============================
+1.I added more error handling so that more proper error messages are
+  given.
+2.I altered the error message format so that it is suitable for VC++.
+  Brief seems to cope with this new format quite happily. VC++ didn't 
+  seem to like e.g. ".\t1.rss" at the start but "C:\rcomp\src\t1.rss" 
+  worked.
+3.The drive and directory for the file name specified with -i is used
+  to provide the full paths for all filenames given in error messages. 
+  If the -i file name is not a full path then the current directory and 
+  drive are used in combination with the partial path to create a full 
+  path.
+
+Version 3.00, MartinW, 19 Mar 96
+================================
+To use this resource compiler execute "mnt getrel". The egrs.bat file
+is an example of how the resource compiler may be run. The GNU
+preprocessor is used (t:\tools\gnucpp.exe) first and the output
+passed to rc3.exe. The fc4bat.exe file is used to avoid writing the
+header output file if it has in fact not changed.
+
+Details about this version
+--------------------------
+This is a completely new version based on yacc and lex along with C++.
+
+Overview of system:
+        Source file (e.g.pic.rss) 
+                -> Preprocessing
+                -> Lexer
+                -> Parser
+                -> Data structures (using C++ classes)
+                -> Data file output (e.g. pic.rsg)
+                -> Header file output (e.g. pic.h)
+
+        The GNU C++ preprocessor was used. The output from this
+        includes directives giving line numbering following inclusion
+        of header files. The lexer uses this to store data which the 
+        parser then uses to output error messages in Brief format.
+    
+        The lexer and parser are generated by lex and yacc
+        respectively from rcomp.l and rcomp.y. These define the
+        tokens and the grammar for the resource script language.
+
+        Supporting C++ classes are compiled and linked along with the
+        output from lex and yacc.
+
+        The batch file rs.bat takes the file specified by the first
+        parameter and passes it to the GNU preprocessor. The output
+        is piped through to rcomp.exe. The names of the data output 
+        file and the header file are specified based on the name
+        given to rs.bat. The -i flag is used to give the original
+        name (as passed to the preprocessor) for error reporting.
+     
+        A program called fc4bat.exe is used to give an errorlevel if
+        the specified files do not match. This is used to avoid
+        changing the date on the header file if it has not changed.
+
+Issues for porting to other platforms:
+         1) atof has been used. The output of this is written to the
+            rsc file. The format must be that expected by the program
+            reading the rsc file rather than the format of the
+            machine used to generate the file.
+         2) The MKS versions of yacc and lex were used. These are PC
+            versions of the UNIX tools. The non-standard features
+            were avoided however only the PC versions have been used.
+         3) Stream handling has been used. Apparently there may be
+            differences in implementations of this extension to C++.
+
+

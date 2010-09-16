@@ -1,10 +1,23 @@
-// ERROR1.RH +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// An include file with errors to exercise the filename reporting feature
-// of RCOMP's error code.
-// 
-// Pute, March 1997.
-// ---------------------------------------------------------------------------
-//
+/*
+* Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* An include file with errors to exercise the filename reporting feature
+* of RCOMP's error code.
+* Pute, March 1997.
+*
+*/
+
 
 STRUCT EXECRATION
 {
@@ -14,10 +27,5 @@ STRUCT EXECRATION
     STRUCT stuff;
 #endif
 }
-
-
-
-
-
 
 // end of ERROR1.RH

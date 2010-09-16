@@ -318,6 +318,9 @@ private:
 #endif
 
 	int maGetSystemProperty(const char* key, char* buf, int size);
+	
+	int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints);
 
 	StringMap gStoreMap;
 
@@ -333,6 +336,8 @@ private:
 	int gStartTime;
 	
 	HashMap<FileList> gFileLists;
+	
+	int getVolumeInfo(MAHandle file, TVolumeInfo& vi);
 
 #ifdef	__SERIES60_3X__
 	TDblQue<CRSendAsSender> gSmsSenders;

@@ -29,6 +29,7 @@ struct Symbol {
 
 	const SymbolType type;
 	std::string name;
+	bool global;
 	int fileScope;
 	int lineNumber;	//on which this symbol is defined
 	int address;

@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 static const char* sFilename = "log.txt";
 
 void InitLog(const char* filenameOverride) {
-	static bool done = false;
+/*	static bool done = false;
 	if(done)
 		return;
 	done = true;
@@ -40,6 +40,7 @@ void InitLog(const char* filenameOverride) {
 	if(!file)
 		MoSyncErrorExit(MoSyncError::ERR_INTERNAL);
 	fclose(file);
+*/
 /*	
 	InitializeCriticalSection(&gLogCS);
 
@@ -51,6 +52,7 @@ void InitLog(const char* filenameOverride) {
 }
 
 void LogV(const char* fmt, va_list args) {
+/*
 	int res;
 	InitLog();
 //	EnterCriticalSection(&gLogCS);
@@ -67,6 +69,7 @@ void LogV(const char* fmt, va_list args) {
 
 	if(res < 0)
 		MoSyncErrorExit(MoSyncError::ERR_INTERNAL);
+*/
 }
 
 #endif

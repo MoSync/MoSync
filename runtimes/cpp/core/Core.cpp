@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <config_platform.h>
 #include <Platform.h>
 #include <helpers/helpers.h>
+#include <helpers/maapi_defs.h>
 
 #include <base/FileStream.h>
 
@@ -1003,6 +1004,15 @@ void WRITE_REG(int reg, int value) {
 #endif
 		return ((char*)mem_ds) + address;
 	}
+
+	int GetValidatedStackValue(int offset) {
+		int address = REG(REG_sp) + offset;
+		if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
+			BIG_PHAT_ERROR(ERR_STACK_OOB);
+		address>>=2;
+		return mem_ds[address];
+	}
+
 	const char* GetValidatedStr(int a) const {
 		unsigned address = a;
 		do {
@@ -1013,6 +1023,20 @@ void WRITE_REG(int reg, int value) {
 		checkProtection(address, address-a);
 #endif
 		return ((char*)mem_ds) + a;
+	}
+
+	const wchar* GetValidatedWStr(int a) const {
+		unsigned address = a - sizeof(wchar);
+		MYASSERT((address & (sizeof(wchar)-1)) == 0, ERR_MEMORY_ALIGNMENT);
+		do {
+			address += sizeof(wchar);
+			if(address >= DATA_SEGMENT_SIZE)
+				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
+		} while(RAW_MEMREF(wchar, address) != 0);
+#ifdef MEMORY_PROTECTION	
+		checkProtection(address, address-a);
+#endif
+		return (wchar*)(((char*)mem_ds) + a);
 	}
 
 #ifdef MEMORY_PROTECTION
@@ -1105,7 +1129,16 @@ void WRITE_REG(int reg, int value) {
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_CONVERT_NCString (char*)_SYSCALL_CONVERT_MAAddress
 
-	void debug_MAWString(wchar* SCDEBUG_ARG(str)) { LOGSC("(\"%s\")", str); }
+	void debug_MAWString(wchar* SCDEBUG_ARG(str)) {
+#ifdef SYSCALL_DEBUGGING_MODE
+		LOGSC("(\"");
+		while(*str) {
+			LOGSC("%C", *str);
+			str++;
+		}
+		LOGSC("\")");
+#endif
+	}
 	wchar* _SYSCALL_CONVERT_MAWString(int str) {
 		_debug_hex(str);
 		ValidateMemWStringAddress(str);
@@ -1124,6 +1157,9 @@ void WRITE_REG(int reg, int value) {
 	}
 	int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
+
+	int _SYSCALL_CONVERTRES_uint(uint i) { return i; }
+#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
 
 	void debug_ulong(int SCDEBUG_ARG(i)) { LOGSC("(%u)", i); }
 	int _SYSCALL_CONVERT_ulong(int i) {
@@ -1183,38 +1219,27 @@ void WRITE_REG(int reg, int value) {
 
 #define _SYSCALL_CONVERT_MAEvent(i) (MAEvent*)_SYSCALL_CONVERT_MAAddress(i)
 
-	//void debug_double(double SCDEBUG_ARG(a)) { LOGSC("(%g)", a); }
 #define _SYSCALL_CONVERT_double(a) _convert_double(&a);
 	double _convert_double(int* ptr) {
-		DV* dv = (DV*)ptr;
-		DV_debug(*dv);
-		return dv->d();
+#ifdef DEBUGGING_MODE
+		DEBUG_ASSERT(sizeof(MA_DV) == 8);
+		DEBUG_ASSERT(sizeof(double) == 8);
+#endif
+		MA_DV dv;
+		dv.MA_DV_HI = ptr[0];
+		dv.MA_DV_LO = ptr[1];
+		DV_debug(dv);
+		return dv.d;
 	}
+	void DV_debug(const MA_DV& SCDEBUG_ARG(dv)) {
+		LOGSC("0x%08x%08x", dv.MA_DV_HI, dv.MA_DV_LO); LOGSC("(%g)", dv.d);
+	}
+#define _SYSCALL_HANDLERES_double { MA_DV dv; dv.d = res;\
+	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(" = "); DV_debug(dv); LOGSC(");\n"); }
 
-	union DV {	//possibly problematic on 2nd edition
-		int i[2];
-	private:
-		double dbl;
-	public:
-#if defined(__MARM_ARMI__)	//2nd edition hardware
-		//void debug() const { LOGSC("0x%08X%08X", i[0], i[1]); LOGSC("(%g)", d()); }
-		double d() const { int s[2] = {i[1],i[0]}; return MAKE(double, *s); }
-		void d(double a) { DV dv; dv.dbl = a; i[0] = dv.i[1]; i[1] = dv.i[0]; }
-	};
-	void DV_debug(const DV& SCDEBUG_ARG(dv)) {
-		LOGSC("0x%08x%08x", dv.i[1], dv.i[0]); LOGSC("(%g)", dv.d());
-	}
-#else	//everything else
-		//void debug() const { LOGSC("0x%08X%08X", i[1], i[0]); LOGSC("(%g)", d()); }
-		double d() const { return dbl; }
-		void d(double a) { dbl = a; }
-	};
-	void DV_debug(const DV& SCDEBUG_ARG(dv)) {
-		LOGSC("0x%08x%08x", dv.i[1], dv.i[0]); LOGSC("(%g)", dv.d());
-	}
-#endif	//__WINS__
-#define _SYSCALL_HANDLERES_double { DV dv; dv.d(res);\
-	REG(REG_r14) = dv.i[0]; REG(REG_r15) = dv.i[1]; LOGSC(");\n"); }
+#define _SYSCALL_HANDLERES_longlong { MA_DV dv; dv.ll = res;\
+	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(");\n"); }
+
 #define _SYSCALL_HANDLERES_void LOGSC(");\n");
 
 	//****************************************
@@ -1517,8 +1542,14 @@ int ValidatedStrLen(const VMCore* core, const char* ptr) {
 void* GetValidatedMemRange(VMCore* core, int address, int size) {
   return CORE->GetValidatedMemRange(address, size);
 }
+int GetValidatedStackValue(VMCore* core, int offset) {
+  return CORE->GetValidatedStackValue(offset);
+}
 const char* GetValidatedStr(const VMCore* core, int address) {
 	return CORE->GetValidatedStr(address);
+}
+const wchar* GetValidatedWStr(const VMCore* core, int address) {
+	return CORE->GetValidatedWStr(address);
 }
 void* GetCustomEventPointer(VMCore* core) {
 	return CORE->customEventPointer;
@@ -1582,8 +1613,14 @@ Core::VMCore* gCore = NULL;
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 	return Core::GetValidatedMemRange(gCore, address, size);
 }
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	return Core::GetValidatedStackValue(gCore, offset);
+}
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return Core::GetValidatedStr(gCore, address);
+}
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return Core::GetValidatedWStr(gCore, address);
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 	Core::ValidateMemRange(gCore, ptr, size);

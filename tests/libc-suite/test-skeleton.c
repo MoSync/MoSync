@@ -9,7 +9,7 @@
  
 int main() {
 	int argc = 0;
-	const char* argv[] = { NULL };
+	char* argv[] = { NULL };
 #ifdef PREPARE
 	PREPARE(0,0);
 #endif

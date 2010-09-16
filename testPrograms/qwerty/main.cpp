@@ -28,7 +28,7 @@ public:
 		//todo: get a maui font, or this editbox will not render.
 		EditBox* eb = new EditBox(0, 0, 200, 30, NULL);
 		setMain(eb);
-		eb->setQwerty();
+		eb->setInputMode(EditBox::IM_QWERTY);
 		eb->activate();
 	}
 	

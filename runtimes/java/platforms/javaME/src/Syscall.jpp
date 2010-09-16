@@ -252,6 +252,8 @@ IMPLEMENTS MoSync
 		if(mDestructed)
 			return;
 
+		mThreadPool.stopEverything();
+
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 		if(mExt != null)
 			mExt.destruct();
@@ -294,6 +296,7 @@ IMPLEMENTS MoSync
 			mDynamicResArray[index & ~DYNARES_BIT] : mResourceArray[index];
 	}
 
+#if 0	//unused
 	// search through the resource array for the resource and returns the handle.
 	int getResourceHandle(Object resource) {
 		for(int i = 0; i < mResourceArray.length; i++) {
@@ -306,6 +309,7 @@ IMPLEMENTS MoSync
 		}
 		return 0;
 	}
+#endif
 
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 	public
@@ -334,7 +338,10 @@ IMPLEMENTS MoSync
 
 			int nResources = file.readVarUnsignedInt();
 			DUMP(nResources);
-			int rSize = file.readVarUnsignedInt();  //ignored for now
+#ifndef PHONE_RELEASE
+			int rSize =
+#endif
+				file.readVarUnsignedInt();  //ignored for now
 			DUMP(rSize);
 			int ral = nResources+1;	//ResArrLength
 			if(mResourceArray != null) {
@@ -352,6 +359,8 @@ IMPLEMENTS MoSync
 #define DAR_UBYTE(name) int name = file.readUnsignedByte()
 #define DAR_UVINT(name) int name = file.readVarUnsignedInt()
 #define DAR_SVINT(name) int name = file.readVarSignedInt()
+#define DAR_UNUSED(type, name) file.CAP_##type(read)()
+
 			while(true) {
 				int type = file.readUnsignedByte();
 				if(type == 0)
@@ -383,8 +392,8 @@ IMPLEMENTS MoSync
 						int top = file.readUnsignedShort();
 						int width = file.readUnsignedShort();
 						int height = file.readUnsignedShort();
-						DECLARE_AND_READ(short, cx);
-						DECLARE_AND_READ(short, cy);
+						DAR_UNUSED(short, cx);
+						DAR_UNUSED(short, cy);
 						resourceArray[rI] = new ImageCache(Image.createImage(
 							((ImageCache)resourceArray[indexSource]).i,
 							left, top, width, height, TRANS_NONE));
@@ -451,7 +460,7 @@ IMPLEMENTS MoSync
 #ifdef OLD_MEMCPY
 	public final void readMemBytes(OutputStream out, Address src, int size) throws Exception {
 		MYASSERT(size >= 0);
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		for(int i=0; i<size; i++) {
 			byte r;
 			RBYTE(src+i, r);
@@ -542,7 +551,7 @@ IMPLEMENTS MoSync
 	private final String readMemString(Address src) throws Exception {
 		if(src == 0)
 			return null;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		int org = src;
 		byte b;
 		do {
@@ -664,6 +673,7 @@ public
 	}
 
 #ifndef MA_PROF_SUPPORT_CLDC_10
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI	//unused otherwise
 	private final void writeDouble(int[] arr, int index, double src) {
 		long lon = Double.doubleToLongBits(src);
 		int hiw = (int)lon; int low = ((int)(lon >> 32));
@@ -671,12 +681,13 @@ public
 		arr[index + 1] = low;
 	}
 	private final void writeMemDouble(Address dst, double src) {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		long lon = Double.doubleToLongBits(src);
 		int hiw = (int)lon; int low = ((int)(lon >> 32));
 		WINT(dst, hiw);
 		WINT(dst + 4, low);
 	}
+#endif
 #endif
 
 	/// Writes s to dst, unless s.length() >= bufSize.
@@ -684,7 +695,7 @@ public
 		MYASSERT(bufSize >= 0);
 		if(bufSize <= s.length())
 			return s.length();
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		byte[] bytes = s.getBytes();
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
@@ -698,7 +709,7 @@ public
 		int size = s.length()*2 + 2;
 		if(bufSize < size)
 			return size;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		writeWideStringRaw(s, dst);
 		WSHORT(dst + size - 2, (short)0);
 		return size;
@@ -706,7 +717,7 @@ public
 
 	// no zero-terminator.
 	private final void writeWideStringRaw(String s, Address dst) {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		int address = dst;
 		int len = s.length();
 		for(int i=0; i<len; i++) {
@@ -748,6 +759,7 @@ public
 		return new String(sb);
 	}
 
+#if !defined(PHONE_RELEASE) || defined(MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH)	//unused otherwise
 	static public final String Hex0(int h) {
 		String s = Integer.toHexString(h);
 		StringBuffer sb = new StringBuffer(8);
@@ -757,10 +769,13 @@ public
 		sb.append(s);
 		return new String(sb);
 	}
+#endif
 
+#if !defined(PHONE_RELEASE)	//unused otherwise
 	static public final String CanonicalString(Object o) {
 		return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
 	}
+#endif
 
 	//***************************************************************************
 	//Proper Syscall Functions
@@ -886,7 +901,7 @@ public
 		DEBUG("strcpy("+dst+", "+src+");\n");
 		Address origdst = dst;
 		byte c;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		do {
 			RBYTE(src, c);
 			src++;
@@ -948,7 +963,7 @@ public
 		int i = 2;
 		MYASSERT(count >= 3);
 		address -= 4;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 #define READ RINT(address += 4)
 
 		int xa = READ;
@@ -983,7 +998,7 @@ public
 		int i = 2;
 		MYASSERT(count >= 3);
 		address -= 4;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 #define READ RINT(address += 4)
 
 		int xa = READ;
@@ -1115,7 +1130,7 @@ public
 	SYSCALL(void) maDrawImageRegion(MAHandle image, MARect srcRect,
 		MAPoint2d dstTopLeft, int transformMode)
 	{
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		int srcRect_left = MARect_left(srcRect);
 		int srcRect_top = MARect_top(srcRect);
 		int srcRect_width = MARect_width(srcRect);
@@ -1158,7 +1173,7 @@ public
 			transformMode, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
 	}
 
-	class MoSyncPlayerListener implements PlayerListener {
+	static class MoSyncPlayerListener implements PlayerListener {
 
 		public MoSyncPlayerListener() {
 		}
@@ -1280,7 +1295,7 @@ public
 	SYSCALL(void) maGetImageData(MAHandle image, Address dst, MARect srcRect, int scanlength) {
 		Image img = ((ImageCache)getResource(image)).i;
 		int[] mem_ds = CORE.mMem_ds;
-		img.getRGB(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
+		img.getRGB(mem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
 			MARect_width(srcRect), MARect_height(srcRect));
 	}
 
@@ -1365,7 +1380,7 @@ public
 	}
 
 	SYSCALL(void) maCopyData(Address a) throws Exception {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		MAHandle dst = RINT(a);
 		int dstOffset = RINT(a + 4);
 		MAHandle src = RINT(a + 8);
@@ -1753,9 +1768,6 @@ public
 #endif
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
-
 		case maIOCtl_maPlatformRequest:
 			return maPlatformRequest(readMemString(a));
 
@@ -1789,46 +1801,7 @@ public
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
-		case maIOCtl_maFileOpen:
-			return maFileOpen(readMemString(a), b);
-
-		case maIOCtl_maFileExists:
-			return maFileExists(a);
-		case maIOCtl_maFileClose:
-			return maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return maFileSize(a);
-		case maIOCtl_maFileAvailableSpace:
-			return maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return maFileDate(a);
-		case maIOCtl_maFileRename:
-			return maFileRename(a, readMemString(b));
-		case maIOCtl_maFileTruncate:
-			return maFileTruncate(a, b);
-
-		case maIOCtl_maFileWrite:
-			return maFileWrite(a, b, c);
-		case maIOCtl_maFileRead:
-			return maFileRead(a, b, c);
-
-		case maIOCtl_maFileTell:
-			return maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return maFileSeek(a, b, c);
-
-		case maIOCtl_maFileListStart:
-			return maFileListStart(readMemString(a), readMemString(b));
-		case maIOCtl_maFileListNext:
-			return maFileListNext(a, b, c);
-		case maIOCtl_maFileListClose:
-			return maFileListClose(a);
+		maIOCtl_IX_FILE_CONSTS_H_caselist
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI
@@ -1956,6 +1929,8 @@ public
 			return maCameraSnapshot(a, b);
 #endif	//MA_PROF_SUPPORT_CAMERA
 
+			maIOCtl_case(maTextBox)
+
 		default:
 			return IOCTL_UNAVAILABLE;
 		}
@@ -2008,7 +1983,7 @@ public
 		if(value.length() >= size)
 			return value.length() + 1;
 		writeMemBytes(buf, value.getBytes(), 0, value.length());
-		int[] mem_ds = mCore.mMem_ds;
+		INIT_MEMDS;
 		WBYTE(buf + value.length(), (byte)0);
 		return value.length() + 1;
 	}
@@ -2103,7 +2078,7 @@ public
 	{
 		//struct MAFrameBufferInfo {
 		int addr = info;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		WINT(addr+0, mCanvas.getWidth()*mCanvas.getHeight()*4); //int sizeInBytes;
 		WINT(addr+4, 4); // int bytesPerPixel;
 		WINT(addr+8, 24); // int bitsPerPixel;
@@ -2210,7 +2185,6 @@ public
 			MessageConnection mc = (MessageConnection)Connector.open("sms://"+dst, Connector.WRITE);
 			TextMessage tm = (TextMessage)mc.newMessage(MessageConnection.TEXT_MESSAGE);
 			tm.setPayloadText(msg);
-			int ns = mc.numberOfSegments(tm);
 			mc.send(tm);
 		} catch(IOException e) {
 			PRINT_STACK_TRACE;
@@ -2399,7 +2373,7 @@ public
 	SYSCALL(int) maStreamVideoSetFrame(MAHandle stream, MARect rect)
 	{
 		MYASSERT(mStreamState != SS_IDLE && stream == mStreamHandle);
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 
 		try
 		{
@@ -2556,13 +2530,17 @@ public
 	}
 
 #ifndef MA_PROF_SUPPORT_CLDC_10
+#if 0	//unused
 	public double readDouble(int address) {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		return CORE.ints2double(RINT(address), RINT(address + 4));
 	}
+#endif
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI	//unused otherwise
 	public void writeDouble(int address, double d) {
 		CORE.writeMemDouble(address, d);
 	}
+#endif
 #endif
 
 	public boolean isResourceInFlux(int handle) {
@@ -2582,4 +2560,47 @@ public
 		return 0;
 	}
 
+
+	//****************************************************************************
+	// maTextBox
+	//****************************************************************************
+	TextBox mTextBox;
+	MAAddress mTextBoxBuffer;
+	int mTextBoxMaxSize;
+
+	class TextBoxCommandListener implements CommandListener {
+		public synchronized void commandAction(Command c, Displayable d) {
+			int jRes = c.getCommandType();
+			int mRes = jRes == Command.OK ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+			String text = mTextBox.getString();
+
+			writeWideString(text, mTextBoxBuffer, mTextBoxMaxSize*2);
+
+			int[] event = new int[3];
+			EI_TYPE = EVENT_TYPE_TEXTBOX;
+			EI_TEXTBOX_RESULT = mRes;
+			EI_TEXTBOX_LENGTH = text.length();
+			mCanvas.postEvent(event);
+
+			mTextBox = null;
+			mCanvas.mDisplay.setCurrent(mCanvas);
+			mCanvas.setFullScreenMode(true);
+		}
+	}
+
+	int maTextBox(String title, String inText, MAAddress outText, int maxSize,
+		int constraints) throws Exception
+	{
+		MYASSERT(mTextBox == null);
+		mTextBoxBuffer = outText;
+		mTextBoxMaxSize = maxSize;
+		mTextBox = new TextBox(title, inText, maxSize-1, constraints);
+		mTextBox.addCommand(new Command("OK", Command.OK, 1));
+		mTextBox.addCommand(new Command("Cancel", Command.CANCEL, 1));
+		TextBoxCommandListener tbcl = new TextBoxCommandListener();
+		mTextBox.setCommandListener(tbcl);
+
+		mCanvas.mDisplay.setCurrent(mTextBox);
+		return 0;
+	}
 }

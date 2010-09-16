@@ -27,5 +27,3 @@ echo "Build library!"
 cd $MOSYNC_JAVA_SRC/AndroidProject
 
 $ANDROID_NDK_PATH/ndk-build -B
-
-echo "Finished!"

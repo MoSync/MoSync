@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="stabs"
 	ProjectGUID="{2015D7FC-3349-4AFB-849C-46CE1B7AEFA2}"
 	RootNamespace="stabs"

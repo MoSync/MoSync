@@ -15,6 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef SYSCALL_CONVERTERS_H
+#define SYSCALL_CONVERTERS_H
+
 #ifdef DEBUG_SYSCALLS
 final void _debug_hex(int hex) {
 	String s = Integer.toHexString(hex);
@@ -81,7 +84,7 @@ final String _SYSCALL_CONVERT_MAString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;;
 	for(;;) {
 		char b;
 		RCHAR(str++, b);	//TODO: optimize by reading ints at a time.
@@ -99,7 +102,7 @@ final String _SYSCALL_CONVERT_MAWString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;;
 	for(;;) {
 		short b;
 		RSHORT(str, b);
@@ -127,6 +130,20 @@ final int _SYSCALL_CONVERTRES_int(int i) { return i; }
 #define debug_int(i)
 #define _SYSCALL_CONVERT_int(i) i
 #define _SYSCALL_CONVERTRES_int(i) i
+#endif	//DEBUG_SYSCALLS
+
+#ifdef DEBUG_SYSCALLS
+final void debug_uint(int i) { DEBUG_SC("("+(((long)i) & 0xFFFFFFFF)+")"); }
+final long _SYSCALL_CONVERT_uint(int i) {
+	_debug_hex(i);
+	debug_uint(i);
+	return i;
+}
+final int _SYSCALL_CONVERTRES_uint(long i) { return (int)i; }
+#else
+#define debug_uint(i)
+#define _SYSCALL_CONVERT_uint(i) i
+#define _SYSCALL_CONVERTRES_uint(i) (int)i
 #endif	//DEBUG_SYSCALLS
 
 #ifdef DEBUG_SYSCALLS
@@ -225,8 +242,6 @@ final void debug_double(long l, double a) {
 #define debug_double(l, d)
 #endif	//DEBUG_SYSCALLS
 
-#define _SYSCALL_CONVERT_double(reg) ints2double(REG(reg + 1), REG(reg))
-
 #ifdef DEBUG_SYSCALLS
 final void debug_float(int i) throws Exception {
 	float f = _SYSCALL_CONVERT_float(i);
@@ -248,12 +263,14 @@ final void debug_float(int i) throws Exception {
 #else
 #define debug_float(i)
 #endif
+#if 0	//unused
 final float _SYSCALL_CONVERT_float(int i) throws Exception {
 	_debug_hex(i);
 	float f = Float.intBitsToFloat(i);
 	debug_float(i);
 	return f;
 }
+#endif
 #define _SYSCALL_CONVERTRES_float(f) Float.floatToIntBits(f)
 
 #else	// MA_PROF_SUPPORT_CLDC_10
@@ -262,12 +279,13 @@ final float _SYSCALL_CONVERT_float(int i) throws Exception {
 #define debug_double(l, d)
 #endif	// MA_PROF_SUPPORT_CLDC_10
 
-#ifdef MOSYNC_STATIC_JAVA
+//#ifdef MOSYNC_STATIC_JAVA
 #define _SYSCALL_CONVERT_long(hi, lo) ints2long(lo, hi)
+/*
 #else
 #define _SYSCALL_CONVERT_long(reg) ints2long(REG(reg + 1), REG(reg))
 #endif
-
+*/
 final long ints2long(int hiw, int low) throws Exception {
 	//DEBUG_SC("("+hiw+","+low+")->");
 	//DEBUG_SC("("+UINT(low)+")");
@@ -283,12 +301,17 @@ final long ints2long(int hiw, int low) throws Exception {
 #define _SYSCALL_HANDLERES_MAAddress _SYSCALL_HANDLERES_DEFAULT(MAAddress)
 #define _SYSCALL_HANDLERES_Address _SYSCALL_HANDLERES_DEFAULT(MAAddress)
 #define _SYSCALL_HANDLERES_int _SYSCALL_HANDLERES_DEFAULT(int)
+#define _SYSCALL_HANDLERES_uint _SYSCALL_HANDLERES_DEFAULT(uint)
 #define _SYSCALL_HANDLERES_MAString _SYSCALL_HANDLERES_DEFAULT(MAString)
 #define _SYSCALL_HANDLERES_float _SYSCALL_HANDLERES_DEFAULT(float)
 #define _SYSCALL_HANDLERES_MAExtent _SYSCALL_HANDLERES_DEFAULT(MAExtent)
 #define _SYSCALL_HANDLERES_MAHandle _SYSCALL_HANDLERES_DEFAULT(MAHandle)
 #define _SYSCALL_HANDLERES_void LOGSC(")\n");
 
-#define _SYSCALL_HANDLERES_double \
+#define _SYSCALL_HANDLERES_longlong \
 	int hiw = (int)res; int low = ((int)(res >> 32));\
 	REG(REG_r14) = hiw; REG(REG_r15) = low; debug_long(res);
+
+#define _SYSCALL_HANDLERES_double _SYSCALL_HANDLERES_longlong
+
+#endif	//SYSCALL_CONVERTERS_H

@@ -14,3 +14,24 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+#include "Base.h"
+#include "Location.h"
+
+class Field : public Base {
+public:
+	Field();
+	void fromParseNode(const ParseNode& node);
+	const std::string& getName() const;
+	const Base* getType() const;
+	const Location* getLocation() const;
+	std::string toString() const;
+
+protected:
+	std::string mName;
+	const Base* mType;
+	Location *mLocation;
+	const Base *mContext;
+	int mOffset;
+	std::string mAccess;
+};

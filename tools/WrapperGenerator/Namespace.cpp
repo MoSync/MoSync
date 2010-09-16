@@ -29,15 +29,8 @@ void Namespace::addMember(const Base* id) {
 
 void Namespace::fromParseNode(const ParseNode& node) {
 	mName = node.getAttr("name");
-	const string& members = node.getAttr("members");
 
-	size_t startIndex = 0;
-	size_t endIndex = 0;
-	while((endIndex=members.find_first_of(" ", startIndex)) != string::npos) {
-		string member = members.substr(startIndex, endIndex-startIndex);
-		startIndex = endIndex + 1;
-		mMembers.push_back(getParseNodeFromId(member)->base);
-	}
+	node.getNodesFromIdList("members", mMembers, false);
 
 	string context = node.getAttr("context", false);
 	mContext = (context!="")?getParseNodeFromId(context)->base:NULL;

@@ -79,6 +79,7 @@ interface MAAPI {
 	typedef int MAExtent;
 	typedef unsigned char byte;
 	typedef unsigned long ulong;
+	typedef long long longlong;
 
 	/// Returns the height of an MAExtent.
 #define EXTENT_Y(e) ((short)(e))
@@ -88,6 +89,47 @@ interface MAAPI {
 
 	/// Creates an MAExtent.
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
+
+	// These three functions are at the top,
+	// to ensure their numeric identifiers do not change in the future.
+
+	/**
+	* Compares the runtime's interface version with yours,
+	* using a hash of the interface's contents.
+	*
+	* If the versions do not match, a MoSync Panic is generated.
+	*
+	* This function returns the runtime's hash. However, if there is
+	* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
+	* your version of the header files, causing a different function than this to be called.
+	*
+	* The hash appears as a 32-bit random number, so it is very unlikely that the return
+	* value from any other function is the same as the runtime's hash.
+	*
+	* Therefore, you should always compare the return value from this function to your hash
+	* and exit your program, preferably using maPanic(), if they don't match.
+	*
+	* \param hash Your hash. Pass #MAIDL_HASH.
+	* \returns The runtime's hash.
+	*/
+	int maCheckInterfaceVersion(in int hash);
+
+	/**
+	* Shuts down the system. This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	*/
+	noreturn maExit(in int result);
+
+	/**
+	* Displays a message to the user, then shuts down the system.
+	* This function does not return.
+	* \param result Passed to the operating system, where applicable. Ignored otherwise.
+	* \param message The message should be short, not more than 40 characters,
+	* to ensure its visibility on all screen sizes.
+	* \see MAPanicReport
+	*/
+	noreturn maPanic(in int result, in MAString message);
+
 
 	/**
 	* Sets \a size bytes, starting at \a dst, to the specified value, interpreted as an unsigned char.
@@ -163,13 +205,17 @@ interface MAAPI {
 	*/
 	int __fixdfsi(in double a);
 	/**
+	* Returns the unsigned integer part of \a a. Negative values become zero.
+	*/
+	uint __fixunsdfsi(in double a);
+	/**
 	* Returns the double representation of \a a.
 	*/
 	double __floatsidf(in int a);
 	/**
 	* Returns the double representation of \a a.
 	*/
-	double f2d(in float a);
+	double __extendsfdf2(in float a);
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
@@ -203,13 +249,17 @@ interface MAAPI {
 	*/
 	int __fixsfsi(in float a);
 	/**
+	* Returns the unsigned integer part of \a a. Negative values become zero.
+	*/
+	uint __fixunssfsi(in float a);
+	/**
 	* Returns the float representation of \a a.
 	*/
 	float __floatsisf(in int a);
 	/**
-	* Returns the double representation of \a a.
+	* Returns the float representation of \a a.
 	*/
-	float d2f(in double a);
+	float __truncdfsf2(in double a);
 	/**
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
@@ -237,7 +287,7 @@ interface MAAPI {
 	double sqrt(in double x);
 
 	/**
-	 * A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
+	 * \brief A structure representing a two-dimensional point, with coordinates 'x' and 'y'.
 	 */
 	struct MAPoint2d {
 		int x;
@@ -245,8 +295,10 @@ interface MAAPI {
 	}
 
 	/**
-	 * A structure representing a rectangle, with 'left' and 'top' being the x and y coordinate of the top-left corner. 
-	 * And width and height being the dimensions of the rectangle.
+	 * \brief A structure representing a rectangle.
+	 * 
+	 * The x and y coordinate of the top-left corner are defined by 'left' and 'top'.
+	 * The dimensions of the rectangle are defined by 'width' and 'height'.
 	 */
 	struct MARect {
 		int left;
@@ -516,7 +568,7 @@ interface MAAPI {
 	void maWriteData(in MAHandle data, in MAAddress src, in int offset, in int size);
 
 	/**
-	* Parameters for the maCopyData() function.
+	* \brief Parameters for the maCopyData() function.
 	*/
 	struct MACopyData {
 		MAHandle dst;
@@ -586,7 +638,7 @@ interface MAAPI {
 		MAX = -3;
 		/// DNS resolution error.
 		DNS = -4;
-		/// Internal error. Please report any occurrences to Mobile Sorcery.
+		/// Internal error. Please report any occurrences.
 		INTERNAL = -5;
 
 		/** \brief The connection was closed by the remote peer.
@@ -606,6 +658,7 @@ interface MAAPI {
 		/// You supplied a malformed URL.
 		URL = -11;
 		/// The protocol is not available.
+		/// If a Bluetooth function returns this, the Bluetooth chip is turned off.
 		UNAVAILABLE = -12;
 		/// You canceled the operation.
 		CANCELED = -13;
@@ -615,12 +668,14 @@ interface MAAPI {
 		NETWORK = -15;
 		/// The requested header could not be found.
 		NOHEADER = -16;
+		/// The requested object could not be found.
+		NOTFOUND = -17;
 
 		/**
 		* If you wish to share the CONNERR codespace,
 		* use values below this for your own error codes.
 		*/
-		USER = -1000000;	
+		USER = -1000000;
 	}
 	constset int CONNOP_ {
 		READ = 1;
@@ -704,7 +759,7 @@ interface MAAPI {
 	* and as soon as this function returns, it's done.
 	*
 	* A server connection can not be read from or written to, but it can be closed.
-	* You can also use it in a call to maAccept() or maGetConnAddr().
+	* You can also use it in calls to maAccept() and maConnGetAddr().
 	*
 	* \returns The connecting handle \>0, or one of the \link #CONNERR_GENERIC CONNERR \endlink values.
 	* \see maGetEvent()
@@ -772,7 +827,7 @@ interface MAAPI {
 	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
 	/**
-	* An address for the TCP/IPv4 protocol.
+	* \brief An address for the TCP/IPv4 protocol.
 	*/
 	struct MAConnAddrInet4 {
 		int addr;
@@ -784,7 +839,7 @@ interface MAAPI {
 	}
 
 	/**
-	* A Bluetooth device address.
+	* \brief A Bluetooth device address.
 	*/
 	struct MABtAddr {
 		byte a[BTADDR_LEN];
@@ -792,7 +847,7 @@ interface MAAPI {
 
 
 	/**
-	* An address for the Bluetooth Serial Port protocol.
+	* \brief An address for the Bluetooth Serial Port protocol.
 	*/
 	struct MAConnAddrBt {
 		int port;
@@ -804,6 +859,9 @@ interface MAAPI {
 		BT = 2;
 	}
 
+	/**
+	* \brief A connection address.
+	*/
 	struct MAConnAddr {
 		/// One of the CONN_FAMILY constants
 		int family;
@@ -1173,8 +1231,19 @@ interface MAAPI {
 		* Use maSetClipRect() to reset it.
 		*/
 		SCREEN_CHANGED = 21;
+
+		/// Character input. Uses MAEvent::character.
+		CHAR = 22;
+		
+		/** \brief The text box created by maTextBox() was just closed.
+		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
+		*/
+		TEXTBOX = 23;
 	}
 
+	/**
+	* \brief Data for a connection event, including an indicator or success or failure.
+	*/
 	struct MAConnEventData {
 		/// The handle to the connection associated with the event.
 		MAHandle handle;
@@ -1183,7 +1252,10 @@ interface MAAPI {
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
 	}
-
+	
+	/**
+	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
+	*/
 	struct MAEvent {
 		/**
 		* One of the \link #EVENT_TYPE_CLOSE EVENT_TYPE \endlink constants.
@@ -1202,6 +1274,11 @@ interface MAAPI {
 			} ked;
 
 			/**
+			* In CHAR events, this is the Unicode character that was received.
+			*/
+			uint character;
+
+			/**
 			 * In POINTER events, this will be the location of the pointer.
 			 */
 			MAPoint2d point;
@@ -1216,7 +1293,19 @@ interface MAAPI {
 			* Valid only in CONN events.
 			*/
 			MAConnEventData conn;
-
+			
+			struct {
+				/**
+				* One of the \link #MA_TB_RES_OK MA_TB_RES \endlink codes.
+				*/
+				int textboxResult;
+				/**
+				* The length, in characters, of the finished text.
+				* Does not include the terminating zero.
+				*/
+				int textboxLength;
+			} textbox;
+			
 			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
@@ -1312,22 +1401,6 @@ interface MAAPI {
 	*/
 	int maVibrate(in int ms);
 
-	/**
-	* Shuts down the system. This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	*/
-	noreturn maExit(in int result);
-
-	/**
-	* Displays a message to the user, then shuts down the system.
-	* This function does not return.
-	* \param result Passed to the operating system, where applicable. Ignored otherwise.
-	* \param message The message should be short, not more than 40 characters,
-	* to ensure its visibility on all screen sizes.
-	* \see MAPanicReport
-	*/
-	noreturn maPanic(in int result, in MAString message);
-
 	constset int RUNTIME_ {
 		/// The MoSync Reference Environment, also known as the Emulator.
 		MORE = 1;
@@ -1354,7 +1427,8 @@ interface MAAPI {
 	}
 
 	/**
-	* Describes a MoSync Panic or other unrecoverable error.
+	* \brief A MoSync Panic or other unrecoverable error.
+	*
 	* In MoSync Debug builds, when such an error occurs, the runtime writes
 	* an instance of this structure to a Store named "panic.report".
 	*
@@ -1463,27 +1537,6 @@ interface MAAPI {
 		FLUX = 127;
 	}
 #endif	//IX_RESOURCE_TYPES
-
-		/**
-		* Compares the runtime's interface version with yours,
-		* using a hash of the interface's contents.
-		*
-		* If the versions do not match, a MoSync Panic is generated.
-		*
-		* This function returns the runtime's hash. However, if there is
-		* a version mismatch, syscall and IOCTL numbers may differ between the runtime and
-		* your version of the header files, causing a different function than this to be called.
-		*
-		* The hash appears as a 32-bit random number, so it is very unlikely that the return
-		* value from any other function is the same as the runtime's hash.
-		*
-		* Therefore, you should always compare the return value from this function to your hash
-		* and exit your program, preferably using maPanic(), if they don't match.
-		*
-		* \param hash Your hash. Pass #MAIDL_HASH.
-		* \returns The runtime's hash.
-		*/
-		int maCheckInterfaceVersion(in int hash);
 
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
@@ -1619,7 +1672,10 @@ interface MAAPI {
 		* A BT event contains the state of the Bluetooth Discovery operation.
 		* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
 		* 0 while still working and
-		* ((number of devices/services found) + 1) on success.
+		* ((number of devices/services found) + 1) when the discovery is complete.
+
+		* The reason for the (+1) is to distinguish "still working" from
+		* "discovery complete, zero found".
 
 		* The buffers are cleared when the respective operation is started, so any devices or services
 		* left over in the buffers from an earlier operation will be lost.
@@ -1628,7 +1684,7 @@ interface MAAPI {
 		/**@{*/
 
 		/**
-		* Information about a Bluetooth device.
+		* \brief Information about a Bluetooth device.
 		*/
 		struct MABtDevice {
 			///in (pointer), out (buffer)
@@ -1642,7 +1698,7 @@ interface MAAPI {
 		}
 
 		/**
-		* A Universally Unique Identifier.
+		* \brief A Universally Unique Identifier.
 		*
 		* Common Bluetooth UUID values can be found in MAUtil/mauuid.h.
 		*/
@@ -1651,7 +1707,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Information about a MABtService object.
+		* \brief Information about an MABtService object.
 		*/
 		struct MABtServiceSize {
 			/**
@@ -1666,7 +1722,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Information about a Bluetooth service.
+		* \brief Information about a Bluetooth service.
 		*/
 		struct MABtService {
 			/**
@@ -1722,6 +1778,9 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
+		* Note that you need to fill the MABtDevice structure before passing it
+		* as a parameter, otherwise you will get memory access problems.
+		*
 		* \returns 1 if successful, zero if the queue is empty.
 		*/
 		int maBtGetNewDevice(out MABtDevice d);
@@ -1759,7 +1818,7 @@ interface MAAPI {
 
 		/**
 		* Cancels any active discovery operation.
-		* If an operation was canceled, its last BT event will have the status #CONNERR_CANCELED.
+		* If an operation was canceled, its last BT event will have the state #CONNERR_CANCELED.
 		* This is an asynchronous operation. If this function returns 1,
 		* it is not safe to start another discovery before
 		* you've recieved the #CONNERR_CANCELED event.
@@ -1776,11 +1835,16 @@ interface MAAPI {
 		constset int WLAN_ADDR_ {
 			LEN = 6;
 		}
-
+		/**
+		* \brief A WLAN address.
+		*/
 		struct MAWlanAddr {
 			byte a[WLAN_ADDR_LEN];
 		}
-
+		
+		/**
+		* \brief A WLAN access point.
+		*/
 		struct MAWlanAp {
 			/// out
 			MAWlanAddr address;
@@ -1794,16 +1858,26 @@ interface MAAPI {
 
 		/**
 		* Causes EVENT_TYPE_WLAN. Returns \<0 on failure.
-		* WLAN events' status are \>0 when the discovery is complete,
+		* WLAN events' state are \>0 when the discovery is complete,
 		* 0 when it's still going on, \<0 on error.
 		*/
 		int maWlanStartDiscovery();
 
-		/// Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
+		/**
+		* Returns strlen(name) + 1 on success, 0 if no new AP is available, \<0 on failure.
+		*
+		* If \a dst.nameBufSize is less than the return value, the name is not copied.
+		*
+		* The IEEE 802.11 WLAN standard specifies that a name may be up to 32 characters long.
+		* Your buffer should therefore be at least 33 bytes long,
+		* in order to contain a maximum-length name and terminating zero.
+		*/
 		int maWlanGetNewAp(out MAWlanAp dst);
 #endif	//IX_WLAN
 
 		/**
+		* \brief A geographical location specified by latitude and longitude, horizontal and vertical accuracy, and altitude.
+		*
 		* Only if \a state equals #MA_LOC_QUALIFIED do the other members contain valid data.
 		*
 		* Coordinates are in the WGS84 datum.
@@ -1980,6 +2054,9 @@ interface MAAPI {
 		* Directory paths must end with a slash('/').
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
+		*
+		* \note To find valid file paths, use maFileListStart().
+		*
 		* \param path The absolute path to the file.
 		* \param mode The access mode. Either #MA_ACCESS_READ or #MA_ACCESS_READ_WRITE.
 		* Directories also use these access modes. #MA_ACCESS_READ lets you see if the directory exists.
@@ -2069,8 +2146,13 @@ interface MAAPI {
 		*
 		* If offset is less than the file's size,
 		* the file's new size is equal to the offset. All data after the offset is discarded.
-		* If the offset is equal to or greater than the file's size,
-		* this function does nothing.
+		*
+		* If the offset is equal to the file's size, this function does nothing.
+		*
+		* If the offset is greater than the file's current size,
+		* this function MAY increase the size of the file.
+		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
+		*
 		* If the file's position is greater than the offset, it is reset
 		* to be equal to the offset.
 		*
@@ -2084,22 +2166,11 @@ interface MAAPI {
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileWrite(in MAHandle file, in MAAddress src, in int len);
-
-		/**
-		* Arguments to maFileReadToData() and maFileWriteFromData().
-		*/
-		struct MA_FILE_DATA {
-			MAHandle file;
-			MAHandle data;
-			int offset;
-			int len;
-		}
-
 		/**
 		* Write from data object to file.
 		* Returns 0 on success, or \< 0 on error.
 		*/
-		int maFileWriteFromData(in MA_FILE_DATA args);
+		int maFileWriteFromData(in MAHandle file, in MAHandle data, in int offset, in int len);
 		/**
 		* Read from file to memory.
 		* Returns 0 on success, or \< 0 on error.
@@ -2109,7 +2180,7 @@ interface MAAPI {
 		* Read from file to data object.
 		* Returns 0 on success, or \< 0 on error.
 		*/
-		int maFileReadToData(in MA_FILE_DATA args);
+		int maFileReadToData(in MAHandle file, in MAHandle data, in int offset, in int len);
 
 		/**
 		* Returns the file's current position, or \< 0 on error.
@@ -2140,6 +2211,8 @@ interface MAAPI {
 		* Creates a listing of names of files and directories, or file systems.
 		* Call maFileListNext() repeatedly to retrieve the names. Call maFileListClose() to
 		* free the resources used.
+		*
+		* It is often useful to begin by listing the file systems.
 		*
 		* \param path The full path to a directory, or the empty string,
 		* which specifies that the root file systems should be listed.
@@ -2237,9 +2310,12 @@ interface MAAPI {
 #endif	//IX_RECORD_AUDIO
 
 #if IX_CELLID
-		//Stores current cell id in *cellId.
-		//returns the negated Symbian error code. 0 on success.
-
+		/**
+		* \brief Information about the current cell, including country, network and area code and the cell ID.
+		*
+		* Stores current cell id in *cellId.
+		* Returns the negated Symbian error code. 0 on success.
+		*/
 		struct MACellInfo {
 			/**
 			* Mobile Country Code. Identifies the country whose cellular network the phone
@@ -2335,6 +2411,9 @@ interface MAAPI {
 		int maSoundPlayConn(in MAHandle conn, in MAString mimeType);
 
 		//TODO: when streaming goes public, make this part of the union instead of custom.
+		/**
+		* \brief Event data associated with an audio stream.
+		*/
 		struct MAStreamEventData {
 			/// One of the \link #STREAMEVENT_OPEN_COMPLETE STREAMEVENT \endlink constants.
 			int event;
@@ -2447,10 +2526,9 @@ interface MAAPI {
 #endif	//IX_STREAMING
 
 		/**
-		* A structure containing information about the native framebuffer, 
-		* with things like color format and resolution. The 'sizeInBytes' field is 
-		* the amount of bytes that should be used to allocate the offscreen framebuffer 
-		* (a backbuffer). 
+		* \brief A structure containing information about the native framebuffer, including color format and resolution. 
+		* 
+		* The 'sizeInBytes' field is the amount of bytes that should be used to allocate the offscreen framebuffer (a backbuffer). 
 		*/
 		struct MAFrameBufferInfo {
 			int sizeInBytes;         // The size in bytes of the frame buffer, is calculated as width*pitch.
@@ -2500,6 +2578,9 @@ interface MAAPI {
 			U16 = 4;
 		}
 
+		/**
+		* \brief Information about an audio buffer, including format, sample rate, channels, and size.
+		*/
 		struct MAAudioBufferInfo {
 			int fmt;	//one of the AUDIO_FMT constants
 			int sampleRate;	//in hertz
@@ -2781,6 +2862,12 @@ interface MAAPI {
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
+		/**
+		* \brief Arguments for PIM functions.
+		*
+		* \deprecated
+		*/		
+		
 		struct MA_PIM_ARGS {
 			/// Opened by maPimListNext().
 			MAHandle item;
@@ -2819,6 +2906,9 @@ interface MAAPI {
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
+		/**
+		* \brief The camera format, in pixels.
+		*/
 		struct MA_CAMERA_FORMAT {
 			//in pixels.
 			int width;
@@ -2865,6 +2955,80 @@ interface MAAPI {
 		*/
 		int maShowVirtualKeyboard();
 
+		/**
+		* Displays a native-ui text box, with
+		* "OK" and "Cancel" buttons or equivalent command items.
+		* The user can enter text using the native input system.
+		*
+		* This function returns immediately, leaving the text box on-screen.
+		* While the text box is active, it will consume all key events.
+		* Other events, like networking, will still be handled normally.
+		*
+		* When the user activates one of the command items ("OK" or "Cancel"),
+		* a number of things will happen in order:
+		*
+		* The box's text will be copied to the buffer specified by \a text.
+		* The text box will disappear.
+		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
+		*
+		* \returns \>= 0.
+		*
+		* \param title The box's title.
+		* \param inText When the text box is created, it is populated with this string.
+		* \param text Pointer to a buffer. When the text box closes, the contents
+		* are copied to this buffer.
+		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
+		* \param constraints Rules for how text is entered into the box.
+		* Must be exactly one of the \link #MA_TB_TYPE_ANY MA_TB_TYPE \endlink constants, or'd with zero or more of the
+		* \link #MA_TB_FLAG_PASSWORD MA_TB_FLAG \endlink constants.
+		* \note Some combinations of constraint types and flags are useless or invalid.
+		*/
+		int maTextBox(in MAWString title, in MAWString inText,
+			out MAWString outText range("maxSize * sizeof(wchar)"),
+			in int maxSize, in int constraints);
+
+		constset int MA_TB_TYPE_ {
+			/// The user is allowed to enter any text, including line breaks.
+			ANY = 0;
+			/// The user is allowed to enter an e-mail address.
+			EMAILADDR = 1;
+			/// The user is allowed to enter an integer value.
+			NUMERIC = 2;
+			/// The user is allowed to enter a phone number.
+			PHONENUMBER = 3;
+			/// The user is allowed to enter a URL.
+			URL = 4;
+			/// The user is allowed to enter a real number value.
+			/// This extends #MA_TB_TYPE_NUMERIC by allowing a decimal point.
+			DECIMAL = 5;
+		}
+		constset int MA_TB_RES_ {
+			/// The user chose OK.
+			OK = 1;
+			/// The user chose Cancel.
+			CANCEL = 2;
+		}
+		constset int MA_TB_FLAG_ {
+			/// Indicates that the text entered is confidential data that should be
+			/// obscured whenever possible.
+			/// This implies #MA_TB_FLAG_SENSITIVE.
+			PASSWORD = 0x1000;
+			/// Indicates that editing is disallowed.
+			UNEDITABLE = 0x2000;
+			/// Indicates that the text entered is sensitive data that the implementation
+			/// must never store into a dictionary or table for use in predictive, auto-completing,
+			/// or other accelerated input schemes. A credit card number is an example of sensitive data.
+			SENSITIVE = 0x4000;
+			/// Indicates that the text entered does not consist of words that are likely
+			/// to be found in dictionaries typically used by predictive input schemes.
+			NON_PREDICTIVE = 0x8000;
+			/// This flag is a hint to the implementation that during text editing,
+			/// the initial letter of each word should be capitalized.
+			INITIAL_CAPS_WORD = 0x10000;
+			/// This flag is a hint to the implementation that during text editing,
+			/// the initial letter of each sentence should be capitalized.
+			INITIAL_CAPS_SENTENCE = 0x20000;
+		}
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

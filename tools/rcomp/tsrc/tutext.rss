@@ -1,15 +1,30 @@
-// TUTEXT.RSS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// This is used to exercise the CHARACTER_SET and 8/16 bit text functionality
-// of the resource compiler.
-// Pute, December 1996.
-// ---------------------------------------------------------------------------
-//
+/*
+* Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* This is used to exercise the CHARACTER_SET and 8/16 bit text functionality
+* of the resource compiler.
+* Pute, December 1996.
+*
+*/
+
 
 
 
 
 
 NAME TUTE
+UID2	0x75632096		// supply UID2 via source
 
 
 CHARACTER_SET CP1252

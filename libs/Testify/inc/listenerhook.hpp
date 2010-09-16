@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * This class a hook for adding a listener to test run.
+ * @brief A hook for adding a listener to test run.
  * It uses global constructors to add the listener to the
  * test manager.
  *

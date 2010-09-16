@@ -43,6 +43,8 @@ using MAUtil::Vector;
 
 
 /**
+ * @brief The Testify test manager.
+ *
  * This class is the most important class in Testify. All the test hooks
  * add the tests to the singleton instance of this class. It manages all
  * the listeners as well as running the tests that have been hooked.

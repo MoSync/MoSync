@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgles", "dgles.vcproj", "{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple", "simple.vcproj", "{084AA5FB-DC4E-4A84-B198-19448669AD25}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2} = {8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}.Debug|Win32.Build.0 = Debug|Win32
+		{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}.Release|Win32.ActiveCfg = Release|Win32
+		{8C01209C-A48A-41F2-8FFF-B2D0ABFCBEE2}.Release|Win32.Build.0 = Release|Win32
+		{084AA5FB-DC4E-4A84-B198-19448669AD25}.Debug|Win32.ActiveCfg = Debug|Win32
+		{084AA5FB-DC4E-4A84-B198-19448669AD25}.Debug|Win32.Build.0 = Debug|Win32
+		{084AA5FB-DC4E-4A84-B198-19448669AD25}.Release|Win32.ActiveCfg = Release|Win32
+		{084AA5FB-DC4E-4A84-B198-19448669AD25}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

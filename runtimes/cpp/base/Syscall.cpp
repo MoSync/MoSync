@@ -61,7 +61,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//WIN32
 #endif	//SYMBIAN && _WIN32_WCE
 
-#ifndef WIN32
+#if defined(LINUX) || defined(__IPHONE__) || defined(DARWIN)
 #include <sys/statvfs.h>
 #endif
 
@@ -71,12 +71,13 @@ namespace Base {
 	
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-		
+			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+
 		return maxCustomEventSize;
 	}
 
@@ -125,6 +126,7 @@ namespace Base {
 	Syscall::~Syscall() {
 		LOGD("~Syscall\n");
 		gStores.close();
+		gFileHandles.close();
 		platformDestruct();
 	}
 
@@ -176,6 +178,12 @@ namespace Base {
 #endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
+
+#ifdef _android
+					checkAndStoreAudioResource(rI);
+					
+#endif
+
 				}
 				break;
 			case RT_UBIN:
@@ -352,10 +360,13 @@ namespace Base {
 	SYSCALL(double, __floatsidf(int a)) {
 		return (double)a;
 	}
-#endif
-	SYSCALL(double, f2d(float f)) {
+	SYSCALL(double, __extendsfdf2(float f)) {
 		return (double)f;
 	}
+	SYSCALL(uint, __fixunsdfsi(double f)) {
+		return (uint)f;
+	}
+#endif	//_android
 	SYSCALL(int, dcmp(double a, double b)) {
 		if(a > b)
 			return 1;
@@ -395,11 +406,13 @@ namespace Base {
 	SYSCALL(float, __floatsisf(int a)) {
 		return (float)a;
 	}
-#endif
-
-	SYSCALL(float, d2f(double a)) {
+	SYSCALL(float, __truncdfsf2(double a)) {
 		return (float)a;
 	}
+	SYSCALL(uint, __fixunssfsi(float f)) {
+		return (uint)f;
+	}
+#endif	//_android
 	SYSCALL(int, fcmp(float a, float b)) {
 		if(a > b)
 			return 1;
@@ -414,6 +427,9 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
+#ifdef _android
+		SYSCALL_THIS->destroyResource(handle);
+#endif
 		SYSCALL_THIS->resources.destroy(handle);
 	}
 
@@ -501,6 +517,7 @@ namespace Base {
 		path = newFile.c_str();
 		len = newFile.length();
 		int ret = _mkdir(newPath.c_str());
+		// TODO: handle return value
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();
@@ -635,7 +652,7 @@ namespace Base {
 		return -1;
 	}
 
-	int Base::maCheckInterfaceVersion(int hash) {
+	SYSCALL(int, maCheckInterfaceVersion(int hash)) {
 		if(hash == (int)MAIDL_HASH) {
 			LOG("IDL version match!\n");
 		} else {
@@ -672,6 +689,29 @@ namespace Base {
 
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
+	static int openFile(Syscall::FileHandle& fh) {
+		int res = isDirectory(fh.name);
+		TEST_LTZ(res);
+		if(fh.mode == MA_ACCESS_READ_WRITE) {
+			if(res == 0) {	//file exists and is not a directory
+				fh.fs = new WriteFileStream(fh.name, false, true);
+			}
+		} else if((fh.mode & MA_ACCESS_READ) != 0) {
+			if(res == 0) {
+				fh.fs = new FileStream(fh.name);
+			}
+		} else {
+			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
+		}
+		if(fh.fs) if(!fh.fs->isOpen()) {
+			delete fh.fs;
+			fh.fs = NULL;
+			LOGD("maFileOpen failed.\n");
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
+		return 0;
+	}
+
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
 		LOGD("maFileOpen(%s, %x)\n", path, mode);
 		Smartie<FileHandle> fhs(new FileHandle);
@@ -688,26 +728,27 @@ namespace Base {
 		size = strlen(path) + 1;
 #endif
 		fh.name.resize(size);
+#ifdef SYMBIAN
+		// Switch directory separators.
+		for(int i=0; i<size; i++) {
+			if(fn[i] == '/') {
+				fh.name[i] = '\\';
+			} else {
+				fh.name[i] = fn[i];
+			}
+		}
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(fn);
+		fn = newPath.c_str();
+		size = newPath.size();
+		fh.name.resize(size);
+		memcpy(fh.name, fn, size);		
+#else
 		memcpy(fh.name, fn, size);
+#endif
 
 		fh.fs = NULL;
-		if(mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
-				fh.fs = new WriteFileStream(fh.name, false, true);
-			}
-		} else if((mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name) == 0) {
-				fh.fs = new FileStream(fh.name);
-			}
-		} else {
-			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
-		}
-		if(fh.fs) if(!fh.fs->isOpen()) {
-			delete fh.fs;
-			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
+		TEST_LTZ(openFile(fh));
 		FileHandle* fhp = fhs.extract();
 		CLEANUPSTACK_PUSH(fhp);
 		gFileHandles.insert(gFileNextHandle, fhp);
@@ -811,6 +852,7 @@ namespace Base {
 		bool res = fh.fs->length(len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
+		LOGD("file size: %i\n", len);
 		return len;
 	}
 
@@ -818,13 +860,13 @@ namespace Base {
 
 #ifdef WIN32
 	static int fileSpace(MAHandle file, unsigned _diskfree_t::* clusters) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		_diskfree_t df;
 		unsigned drive;
 #if FILESYSTEM_CHROOT
-		DEBUG_ASSERT(fh.name[0] == '/');
+		SYSCALL_THIS->getFileHandle(file);	// just to make sure the file handle is ok.
 		drive = 0;
 #else
+		Syscall::FileHandle& fh();
 		drive = (fh.name[0] - 'A') + 1;
 #endif	//FILESYSTEM_CHROOT
 		if(_getdiskfree(drive, &df) != 0) {
@@ -860,7 +902,64 @@ namespace Base {
 	}
 
 	int Syscall::maFileRename(MAHandle file, const char* newName) {
-		return -1;
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+
+		// close the file while we're renaming.
+		bool wasOpen;
+		int oldPos;
+		if(fh.fs)
+			wasOpen = fh.fs->isOpen();
+		else
+			wasOpen = false;
+		if(wasOpen) {
+			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+			delete fh.fs;
+			fh.fs = NULL;
+		}
+
+		bool hasPath = false;
+#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(FILESYSTEM_CHROOT)
+		// If fh.name and newName are on different file systems,
+		// forbid the operation.
+		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
+			return MA_FERR_RENAME_FILESYSTEM;
+		}
+		if(newName[1] == ':' || newName[0] == '/')
+			hasPath = true;
+#else
+		if(newName[0] == '/')
+			hasPath = true;
+#endif
+		std::string nn;
+		if(!hasPath) {
+			int oldPathLen = 0;
+			const char* lastSlash = strrchr(fh.name, '/');
+			if(lastSlash != NULL) {
+				oldPathLen = (lastSlash - fh.name) + 1;
+			}
+			if(oldPathLen > 0) {
+				nn.append(fh.name, oldPathLen);
+				nn.append(newName);
+				newName = nn.c_str();
+			}
+		}
+		int res = rename(fh.name, newName);
+		if(res != 0) {
+			if(errno == EXDEV)
+				return MA_FERR_RENAME_FILESYSTEM;
+			else if(errno == EACCES)
+				return MA_FERR_FORBIDDEN;
+			else
+				return MA_FERR_GENERIC;
+		}
+		fh.name.resize(strlen(newName) + 1);
+		strcpy(fh.name, newName);
+
+		if(!wasOpen)
+			return 0;
+		TEST_LTZ(openFile(fh));
+		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+		return 0;
 	}
 
 	int Syscall::maFileDate(MAHandle file) {
@@ -896,27 +995,14 @@ namespace Base {
 		if(res < 0) FILE_FAIL(MA_FERR_GENERIC);
 		if(close(fd) < 0) FILE_FAIL(MA_FERR_GENERIC);
 
-		// todo: share code with maFileOpen().
-		if(fh.mode == MA_ACCESS_READ_WRITE) {
-			fh.fs = new WriteFileStream(fh.name);
-		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			fh.fs = new FileStream(fh.name);
-		} else {
-			BIG_PHAT_ERROR(ERR_INVALID_FILE_ACCESS_MODE);
-		}
-		if(fh.fs) if(!fh.fs->isOpen()) {
-			delete fh.fs;
-			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
+		TEST_LTZ(openFile(fh));
 		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 #endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
-		LOGD("maFileWrite(%i, 0x%p, %i)\n", file, src, len);
+		LOGD("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -926,22 +1012,22 @@ namespace Base {
 		return 0;
 	}
 
-	int Syscall::maFileWriteFromData(const MA_FILE_DATA* args) {
-		LOGD("maFileWriteFromData(%i, %i)\n", args->file, args->len);
-		FileHandle& fh(getFileHandle(args->file));
-		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
-		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+	int Syscall::maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) {
+		LOGD("maFileWriteFromData(%i, %i)\n", file, len);
+		FileHandle& fh(getFileHandle(file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
+		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
 		//todo: add ERR_DATA_OOB check for length.
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
-		bool res = fh.fs->writeStream(*b, args->len);
+		bool res = fh.fs->writeStream(*b, len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 
 	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
-		LOGD("maFileRead(%i, 0x%p, %i)\n", file, dst, len);
+		LOGD("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -951,15 +1037,15 @@ namespace Base {
 		return 0;
 	}
 
-	int Syscall::maFileReadToData(const MA_FILE_DATA* args) {
-		LOGD("maFileReadToData(%i, %i)\n", args->file, args->len);
-		FileHandle& fh(getFileHandle(args->file));
-		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(args->data);
-		MYASSERT(b->seek(Seek::Start, args->offset), ERR_DATA_OOB);
+	int Syscall::maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
+		LOGD("maFileReadToData(%i, %i)\n", file, len);
+		FileHandle& fh(getFileHandle(file));
+		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
+		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
 		//todo: add ERR_DATA_OOB check for length.
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
-		bool res = b->writeStream(*fh.fs, args->len);
+		bool res = b->writeStream(*fh.fs, len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
 		return 0;

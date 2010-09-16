@@ -5,10 +5,12 @@ require File.expand_path('../../../../rules/targets.rb')
 require File.expand_path('../../../../rules/task.rb')
 require File.expand_path('../../../../rules/loader_md.rb')
 
+PROJECT_NAME = ENV['PROJECT_NAME']
 JAVA_ME_LIB = ENV['JAVA_ME_LIB']
 TMPCLASS_DIR = ENV['PROJECT_DIR'] + '/tmpclasses'
 CLASS_DIR = ENV['PROJECT_DIR'] + '/classes'
 JAVA_DIR = ENV['PROJECT_DIR'] + '/src'
+BIN_DIR = ENV['PROJECT_DIR'] + '/bin'
 SHARED_DIR = '../../shared'
 
 SHARED_SOURCES = [
@@ -31,8 +33,11 @@ JAVAME_SOURCES = [
 	'MainCanvas',
 	#'PngStream',
 	'MoSync',
-	'ExtensionHandler',
+	#'ExtensionHandler',
 	#'AudioBufferDataSource',
+]
+CLDC10_SOURCES = [
+	'Real',
 ]
 
 def escape(fn)
@@ -95,7 +100,14 @@ class JavaCompileTask < Task
 		FileUtils.rm Dir.glob("#{TMPCLASS_DIR}*.class")
 		FileUtils.rm Dir.glob("#{CLASS_DIR}*.class")
 		# compile
-		jars = "#{JAVA_ME_LIB}\\jsr082.jar;#{JAVA_ME_LIB}\\cldcapi11.jar;" +
+		if(PLATFORM == 'cldc10')
+			baseJar = 'cldcapi10'
+		elsif(PLATFORM == 'cldc11')
+			baseJar = 'cldcapi11'
+		else
+			error("Unsupported platform: #{PLATFORM}")
+		end
+		jars = "#{JAVA_ME_LIB}\\jsr082.jar;#{JAVA_ME_LIB}\\#{baseJar}.jar;" +
 			"#{JAVA_ME_LIB}\\midpapi20.jar;#{JAVA_ME_LIB}\\wma20.jar;" +
 			"#{JAVA_ME_LIB}\\jsr179.jar;#{JAVA_ME_LIB}\\jsr75.jar;" +
 			"#{JAVA_ME_LIB}\\mmapi.jar"
@@ -111,9 +123,26 @@ work.instance_eval do
 	def setup
 		javaFiles = JAVAME_SOURCES.collect { |n| JavaPreprocessTask.new(self, 'src', n) }
 		javaFiles += SHARED_SOURCES.collect { |n| JavaPreprocessTask.new(self, SHARED_DIR, n) }
+		
+		default_const(:PLATFORM, 'cldc11')
+		if(PLATFORM == 'cldc10')
+			javaFiles += CLDC10_SOURCES.collect { |n| JavaPreprocessTask.new(self, 'src', n) }
+		elsif(PLATFORM != 'cldc11')
+			error("Unsupported platform: #{PLATFORM}")
+		end
+		
 		@prerequisites = [DirTask.new(self, 'build'), DirTask.new(self, CLASS_DIR), DirTask.new(@self, JAVA_DIR),
 			DirTask.new(self, TMPCLASS_DIR), JavaCompileTask.new(self, javaFiles)]
 	end
 end
 
-work.invoke
+target :default do
+	work.invoke
+end
+
+target :pack => :default do
+	sh "cd #{CLASS_DIR} && zip -u0 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
+end
+
+# parses ARGV
+Targets.invoke

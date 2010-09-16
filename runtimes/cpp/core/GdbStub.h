@@ -183,6 +183,21 @@ private:
 	bool writeMemory();
 	bool continueExec();
 	bool stepExec();
+	
+	/**
+	 * Terminates the program (relatively) gracefully.
+	 *
+	 * Note:
+	 * This function must try to get the main thread out of the
+	 * kernel, e.g. if it is waiting idefinitley for a semaphore, 
+	 * otherwise MoRE will not receive any signals and will hang 
+	 * on Unix like systems if mdb dies.
+	 *
+	 * This function does not call exit directly, but implicitly
+	 * makes the other threads stop. It relies on the VM loop to
+	 * exit when waitForRemote returns false.
+	 */
+	bool quit();
 
 	// Optional commands follows:
 	bool lastSignal();

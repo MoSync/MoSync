@@ -156,7 +156,9 @@ RELEVANT_DEFINES = {
 	:wm6 => [],
 	:wm6pro => [],
 	:moblin => [],
-	:android => [],
+	:android_3 => [],
+	:android_4 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 
@@ -192,7 +194,9 @@ runtimes = {
 	:s60v5  => [],
 	:JavaME => [],
 	:moblin => [],
-	:android => [],
+	:android_3 => [],
+	:android_4 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 
@@ -286,13 +290,15 @@ if REBUILD_DATABASE
 	# We start from scratch
 	if File.exist? DB_FILENAME
 		File.delete DB_FILENAME
+	else
+		puts "Database didn't exist."
 	end
 
 	# Create database file
 	db = SQLite3::Database.new( DB_FILENAME )
 
 	# Create database from SQL file
-	puts "Create database from SQL file"
+	puts "Create database from SQL file..."
 	File.open(SQL_FILENAME, "r") do |infile|
 		while (line = infile.gets)
 			if(line.length != 1)
@@ -365,6 +371,7 @@ end
 puts "Handling devices..."
 DEVICE.each_with_index do |device, index|
 	next if(index == 0)
+	
 	# if the runtime support isn't implemented we just go to the next device.
 	if(!runtimes[device.platformversion.platform])
 		next
@@ -506,7 +513,7 @@ DEVICE.each_with_index do |device, index|
 		end	#RELEVANT_CAPS.each
 		profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 	end	#File.open
-	
+		
 	runtime = runtimes[device.platformversion.platform].add_runtime rt_obj
 	runtime.devices << device
 end	#DEVICE.each

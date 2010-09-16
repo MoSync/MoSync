@@ -57,6 +57,15 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)mem_ds+address;
 }
 
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	int address = sp + offset;
+	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
+	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
+	address>>=2;
+	return mem_ds[address];	
+
+}
+
 void Base::Syscall::VM_Yield() {
 }
 

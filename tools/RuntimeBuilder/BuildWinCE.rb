@@ -40,7 +40,7 @@ class RuntimeBuilder
 			configuration = "Windows Mobile 6 Professional SDK (ARMV4I)"
 		end
 		
-		system("build_wince.bat \"#{src_folder}\" \"Release|#{configuration}\"")
+		sh("build_wince.bat \"#{src_folder}\" \"Release|#{configuration}\"")
 		
 		exe_file_src = "#{src_folder}#{configuration}/Release/MoRE-winmobile.exe"
 		exe_file_dest = "#{runtime_dir}MoRE-winmobile#{debug}.exe" 

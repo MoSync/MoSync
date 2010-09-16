@@ -1,10 +1,6 @@
 -target-select sim
--break-insert _Z3adddi
--exec-continue
+1999-break-insert C:/MoSync/examples/MAUI/MAUIex/LabelScreen.cpp:27
+2001-exec-continue
 -test-wait
--var-create - * array
--var-create - * i
--var-create - * ii
--var-list-children var2
--var-list-children var2.0
--var-list-children var2.0.Base
+-var-create - * this
+-var-list-children var1

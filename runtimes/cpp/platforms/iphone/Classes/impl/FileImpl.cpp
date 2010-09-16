@@ -96,7 +96,7 @@ namespace Base {
 	//WriteFileStream
 	//******************************************************************************
 
-	WriteFileStream::WriteFileStream(const char* filename, bool append) {
+	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exists) {
 		if(append) {
 			file = fopen(filename, "ab");
 		} else {

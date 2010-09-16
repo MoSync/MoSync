@@ -35,7 +35,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * This class is a hook which is used to add a test or a
+ * @brief A hook used to add a test or a
  * collection of tests. It uses global constructors to
  * add the actual tests to the test manager.
  *

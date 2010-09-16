@@ -3,4 +3,5 @@ SETTINGS = {
 	:stop_on_fail => true,
 	:rebuild_failed => true,
 	:retry_failed => true,
+	:test_dce => true,
 }

@@ -32,11 +32,11 @@ class RuntimeBuilder
 		puts "Processing " + java_file
 		
 		# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-		system("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{$SETTINGS[:java_source]}shared -I#{platform_dir}" +
+		sh("xgcc -x c -E -o #{output_dir}#{jtmp_file} -D#{platform_define} -I#{$SETTINGS[:java_source]}shared -I#{platform_dir}" +
 		       " #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 		
 		# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
-		system("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
+		sh("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
 	end
 
 	def preprocess_shared_java_files(output_dir, platform_dir, platform_define)
@@ -101,7 +101,7 @@ class RuntimeBuilder
 		
 		# Compile Java source
 		puts "Compiling java source.."
-		system("javac -source 1.4 -target 1.4 -d #{class_dir} -classpath #{class_dir} -bootclasspath " +
+		sh("javac -source 1.4 -target 1.4 -d #{class_dir} -classpath #{class_dir} -bootclasspath " +
 			libjars.collect { |jar| "#{java_me_sdk}j2melib/#{jar}.jar;" }.join('') +
 			" #{temp_dir}*.java")
 		
@@ -120,7 +120,7 @@ class RuntimeBuilder
 		# Build jar file
 		puts "Building jar file.."
 		dos_class_dir = class_dir.gsub(/\//, "\\") # fixes the slashes so that the jar file gets it right
-		system("jar cfm #{runtime_dir}MoSyncRuntimeTemp.jar #{temp_dir}manifest.mf -C #{dos_class_dir} .")
+		sh("jar cfm #{runtime_dir}MoSyncRuntimeTemp.jar #{temp_dir}manifest.mf -C #{dos_class_dir} .")
 		
 		if !File.exist? "#{runtime_dir}MoSyncRuntimeTemp.jar"
 			puts "\nFATAL ERROR! - Unable to build jar file, check previous output for errors!\n\n"
@@ -130,7 +130,7 @@ class RuntimeBuilder
 		
 		# Obfuscate java binaries
 		puts "Obfuscating java binaries.."
-		system("java -jar #{java_me_sdk}bin/proguard.jar -injars #{runtime_dir}MoSyncRuntimeTemp.jar " +
+		sh("java -jar #{java_me_sdk}bin/proguard.jar -injars #{runtime_dir}MoSyncRuntimeTemp.jar " +
 			libjars.collect { |jar| "-libraryjars #{java_me_sdk}j2melib/#{jar}.jar " }.join('') +
 			"-dontusemixedcaseclassnames " +
 			"-outjars #{runtime_dir}MoSyncRuntimeObfuscated.jar -keep public class MAMidlet");
@@ -139,7 +139,7 @@ class RuntimeBuilder
 		
 		# Preverify java binaries
 		puts "Preverifying java binaries.."
-		system("#{java_me_sdk}bin/preverify -d #{runtime_dir[0..-2]} -classpath " +
+		sh("#{java_me_sdk}bin/preverify -d #{runtime_dir[0..-2]} -classpath " +
 			libjars.collect { |jar| "#{java_me_sdk}j2melib/#{jar}.jar;" }.join('') +
 			" #{runtime_dir}MoSyncRuntime#{debug}.jar")
 		

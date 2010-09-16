@@ -1,26 +1,46 @@
-// ERRORHAN.CPP
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #include "errorhan.h"
 #include "mem.h"
 
-using namespace std;
+#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
+using std::cerr;
+using std::endl;
+#endif //__MSVCDOTNET__
 
 int ErrorHandler::iLineNumber = 0;
-String ErrorHandler::iFileName;
+const String* ErrorHandler::iFileName;
 
-void ErrorHandler::Register(const String& aFileNameToSet,int aLineNumberToSet)
-{
-	MOFF;	// iFileName is a static so it will be destroyed at program end.
+void ErrorHandler::Register(const String* aFileNameToSet,int aLineNumberToSet)
+	{
 	iFileName=aFileNameToSet;
-	MON;
 	iLineNumber=aLineNumberToSet;
-}
+	}
 
 void ErrorHandler::OutputErrorLine(const String& aAdditionalText)
-{
-	cerr << iFileName << "(" << iLineNumber << ") : " << aAdditionalText << endl;
-}
+	{
+	cerr << *iFileName << "(" << iLineNumber << ") : " << aAdditionalText << endl;
+	}
+
+void ErrorHandler::OutputWholeLine(String aFileName, int aLineNumber, String aComment)
+	{
+	Register(&aFileName, aLineNumber);
+	OutputErrorLine(aComment);
+	}
 

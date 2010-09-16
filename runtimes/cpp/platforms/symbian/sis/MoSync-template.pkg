@@ -16,7 +16,7 @@
 (0x101F7960), 0, 0, 0, {"Series60ProductID"}
 
 ;Files to install
-"%pkg-package-output-dir%\%uid%.app"-"!:\system\apps\%project-name%\%project-name%.app"
-"%pkg-package-output-dir%\%uid%.rsc"-"!:\system\apps\%project-name%\%project-name%.rsc"
-"%pkg-package-output-dir%\%uid%_caption.rsc"-"!:\system\apps\%project-name%\%project-name%_caption.rsc"
+"%pkg-package-output-dir%/%uid%.app"-"!:\system\apps\%project-name%\%project-name%.app"
+"%pkg-package-output-dir%/%uid%.rsc"-"!:\system\apps\%project-name%\%project-name%.rsc"
+"%pkg-package-output-dir%/%uid%_caption.rsc"-"!:\system\apps\%project-name%\%project-name%_caption.rsc"
 "%pkg-programcomb-output%"-"!:\system\apps\%uid%.comb"

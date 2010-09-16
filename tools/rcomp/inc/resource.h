@@ -1,26 +1,41 @@
-// RESOURCE.H
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #ifndef __RESOURCE_H__
 #define __RESOURCE_H__
 
-#include "astring.h"
+#include "astring.h" 
 #include "stringar.h"
 #include "structst.h"
-#include "stack.h"
+#include "stack.h"   
 #include "rcbinstr.h"
 #include "nameidma.h"
 
+
+enum { EResourceItem, ESimpleResourceItem, EArrayResourceItem, EStructTypeResourceItem, EStructArrayResourceItem };
 
 class ResourceItem;
 
 // ResourceItemArray
 
 class ResourceItemArray : public Array, public StackItem, public ArrayItem
-{
-	friend std::ostream & operator<< ( std::ostream & os, ResourceItemArray & o);
+	{
+	friend ostream & operator<< ( ostream & os, ResourceItemArray & o);
 public:
 	ResourceItemArray();
 	~ResourceItemArray();
@@ -33,57 +48,52 @@ public:
 	void StreamOut(ResourceDataStream& aStream) const;
 private:
 	DataType iLenType;
-};
-
-std::ostream & operator<< ( std::ostream & os, ResourceItemArray & o);
+	};
 
 // ResourceItemArrayIterator
 
 class ResourceItemArrayIterator : public ArrayIterator
-{
+	{
 public:
 	ResourceItemArrayIterator( const ResourceItemArray & c);
 	ResourceItem * operator() ();
-};
+	};
 
 // ResourceItemArrayArray
 
 class ResourceItemArrayArray : public Array
-{
-	friend std::ostream & operator<< ( std::ostream & os, ResourceItemArrayArray & o);
+	{
+	friend ostream & operator<< ( ostream & os, ResourceItemArrayArray & o);
 public:
 	ResourceItemArrayArray();
 	~ResourceItemArrayArray();
 	void Add( ResourceItemArray * pNewItem);
 	void StreamOut(ResourceDataStream& aStream) const;
-};
-
-std::ostream & operator<< ( std::ostream & os, ResourceItemArrayArray & o);
+	};
 
 // ResourceItemArrayArrayIterator
 
 class ResourceItemArrayArrayIterator : public ArrayIterator
-{
+	{
 public:
 	ResourceItemArrayArrayIterator( const ResourceItemArrayArray & c);
 	ResourceItemArray * operator() ();
-};
+	};
 
 
 // ResourceHeader
 
 class ResourceHeader : public ArrayItem
-{
-	friend std::ostream & operator<< ( std::ostream & os, ResourceHeader & o);
+	{
+	friend ostream & operator<< ( ostream & os, ResourceHeader & o);
 public:
 	ResourceHeader( String LabelToSet);
 	ResourceHeader();
 	~ResourceHeader();
 	void AddDefault();
-	void Write( std::ostream &os);
+	void Write( ostream &os);
 	void SetResourceId(NameIdMap& aMap, unsigned long aId, int aFormatAsHex);
-	void StreamOut(RCBinaryStream& aStream, int& aSizeOfLargestResourceWhenUncompressed);
-	void StreamOutDump(RCBinaryStream& aStream);
+	void StreamOut(RCBinaryStream& aStream, int& aSizeOfLargestResourceWhenUncompressed, const char* aDumpFile);
 	inline bool ContainsCompressedUnicode() const {return iContainsCompressedUnicode;}
 public:
 	String iLabel;
@@ -92,43 +102,45 @@ public:
 	unsigned long iResourceId;
 	int iFormatAsHex;
 	bool iContainsCompressedUnicode;
-};
-
-std::ostream & operator<< ( std::ostream & os, ResourceHeader & o);
+	};
 
 // ResourceItem
 
 class ResourceItem : public ArrayItem, public StackItem
-{
+	{
 public:
 	virtual ResourceItemArray * GetRIA() = 0;
 	virtual void Set( const String & ValueToSet) = 0;
 	virtual void Set( const StringArray & ValuesToSet) = 0;
-	virtual std::ostream & StreamOut ( std::ostream & os) = 0;
+	virtual ostream & StreamOut ( ostream & os) = 0;
 	virtual void StreamOut(ResourceDataStream& aStream) const = 0;
 	virtual void AddDefault() = 0;
 	virtual void SetSRLink( unsigned long SRLinkToSet) = 0;	
-	void Set( String FileNameToSet, int LineNumberToSet);
+	void Set(const String* FileNameToSet, int LineNumberToSet);
 	void RegisterErrorLocation();
+	int GetResourceItemType();
+	String GetLabel();
 protected:
-	ResourceItem( const String & Label);
+	ResourceItem( const String & Label, int aResourceItemType=EResourceItem);
 	ResourceItem & operator= ( const ResourceItem &);
 public:
 	const String& iLabel;
-	String iFileName;
+	const String* iFileName;
 	int iLineNumber;
-};
+private:
+	int iResourceItemType;
+	};
 
 // SimpleResourceItem
 
 class SimpleResourceItem : public ResourceItem
-{
+	{
 public:
 	SimpleResourceItem(SimpleStructItem*);
 	void Set(const String& aValueToSet);
 	void Set(const StringArray& aValuesToSet);
-	virtual std::ostream& StreamOut(std::ostream& os);
-	friend std::ostream& operator<<(std::ostream& os,SimpleResourceItem & o);
+	virtual ostream& StreamOut(ostream& os);
+	friend ostream& operator<<(ostream& os,SimpleResourceItem & o);
 	virtual void StreamOut(ResourceDataStream& aStream) const;
 	virtual void AddDefault();
 	virtual void SetSRLink(unsigned long aSRLinkToSet);
@@ -140,21 +152,19 @@ private:
 	String iValue;
 	unsigned long iLinkValue;
 	unsigned char iValueSet;
-};
-
-std::ostream& operator<<(std::ostream& os,SimpleResourceItem & o);
+	};
 
 // ArrayResourceItem
 
 class ArrayResourceItem : public ResourceItem
-{
-	friend std::ostream& operator<<(std::ostream& os,ArrayResourceItem& aItem);
+	{
+	friend ostream& operator<<(ostream& os,ArrayResourceItem& aItem);
 public:
 	ArrayResourceItem(ArrayStructItem *);
 	~ArrayResourceItem();
 	void Set(const String& aValueToSet);
 	void Set(const StringArray& aValuesToSet);
-	std::ostream & StreamOut(std::ostream& os);
+	ostream & StreamOut(ostream& os);
 	virtual void StreamOut(ResourceDataStream& aStream) const;
 	virtual void AddDefault();
 	virtual void SetSRLink(unsigned long aSRLinkToSet);
@@ -164,20 +174,18 @@ public:
 	ArrayStructItem* iStructItem;
 private:
 	StringArray iValues;
-};
-
-std::ostream& operator<<(std::ostream& os,ArrayResourceItem& aItem);
+	};
 
 // StructTypeResourceItem
 
 class StructTypeResourceItem : public ResourceItem
-{
+	{
 public:
 	StructTypeResourceItem(StructTypeStructItem*);
 	void Set(const String& ValueToSet);
 	void Set(const StringArray& ValuesToSet);
-	std::ostream& StreamOut(std::ostream& os);
-	friend std::ostream& operator<<(std::ostream& os,StructTypeResourceItem& o);
+	ostream& StreamOut(ostream& os);
+	friend ostream& operator<<(ostream& os,StructTypeResourceItem& o);
 	virtual void StreamOut(ResourceDataStream& aStream) const;
 	virtual void AddDefault();
 	virtual void SetSRLink(unsigned long aSRLinkToSet);
@@ -185,21 +193,19 @@ public:
 public:
 	StructTypeStructItem* iStructItem;
 	ResourceItemArray iResourceItems;
-};
-
-std::ostream& operator<<(std::ostream& os,StructTypeResourceItem& o);
+	};
 
 // StructArrayResourceItem
 
 class StructArrayResourceItem : public ResourceItem
-{
-	friend std::ostream& operator<<(std::ostream& os,StructArrayResourceItem& aItem);
+	{
+	friend ostream& operator<<(ostream& os,StructArrayResourceItem& aItem);
 public:
 	StructArrayResourceItem(StructArrayStructItem*);
 	void Set(const String& ValueToSet);
 	void Set(const StringArray& ValuesToSet);
 	ResourceItemArray* GetRIA();
-	std::ostream& StreamOut(std::ostream& os);
+	ostream& StreamOut(ostream& os);
 	virtual void StreamOut(ResourceDataStream& aStream) const;
 	virtual void AddDefault();
 	virtual void SetSRLink(unsigned long SRLinkToSet);
@@ -207,8 +213,6 @@ public:
 	StructArrayStructItem* iStructItem;
 	ResourceItemArrayArray iArrayOfResourceItemArrays;
 	ResourceItemArray* iLastRIA;
-};
-
-std::ostream& operator<<(std::ostream& os,StructArrayResourceItem& aItem);
+	};
 
 #endif

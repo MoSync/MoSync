@@ -19,13 +19,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-Base::Base(Type type) : mType(type) {
+Base::Base(BaseType type) : mBaseType(type) {
 }
 
 string Base::toString() const {
 	return "";
 }
 
-Base::Type Base::getBaseType() const {
-	return mType;
+Base::BaseType Base::getBaseType() const {
+	return mBaseType;
 }

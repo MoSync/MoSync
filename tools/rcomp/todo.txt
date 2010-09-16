@@ -1,0 +1,57 @@
+for RCOMP resource compiler.
+
+
+1. Major but arguably cosmetic:
+
+Redesign and rewrite command line processing to provide a more
+friendly verb with meaningful qualifiers.
+
+Call the preprocessor internally and make it possible to do away with
+a batch command framework.
+
+2. Niggling little fixes:
+
+-v is TOO verbose.  Provide a log file capability for this and make -v
+simply provide terse status and version messages.
+
+The current verb produces useless error messages when the expected
+parameters are missing.  This could be done in a much better way.
+
+Improve the build procedures so that they work first time from the
+command line.  Currently, the command line build fails because of
+the way LEX/YACC source code is generated which then forms part of
+the rest of the build.
+
+3. Major but of possible strategic importance:
+
+Generate linkable binary resources.
+
+Generate linkable object file to satisfy external references to
+resource IDs instead of generating a header file.
+
+4. Problem fixes
+
+The whole code is defective in that it misuses assert as a status
+checking mechanism.
+
+Lots of little defects in the code about array assumptions etc.
+
+Make Unicode the internal character set of RCOMP, LEX and YACC.
+(You know, during an idle lunchtime)
+
+5. RCOMP language feature changes
+
+Review the language with language design experts.
+
+If there are unsatisfied forward references, the compiler fails to
+report intervening syntax errors and instead complains about
+"link name not found".  Can this be fixed?
+
+
+
+Specifically for version 3.15:
+===================================
+
+
+. Implement actal mapping code for all character set types to unicode.
+
