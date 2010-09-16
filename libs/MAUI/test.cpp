@@ -390,7 +390,9 @@ public:
 		Button* b = (Button*)w;
 		String exp = mainLabel->getCaption();
 		const String& str = b->getCaption();
-		if(str == "graph") {
+		if(str == "exit") {
+			maExit(0);
+		} else if(str == "graph") {
 			sGraphScreen->show();
 		} else if(str=="C") {
 			mainLabel->setCaption("");
@@ -432,6 +434,8 @@ public:
 			}
 
 			Button *button = new Button(0, 0, 50, 50, mainListbox, "graph");
+			button->addWidgetListener(this);
+			button = new Button(0, 0, 50, 50, mainListbox, "exit");
 			button->addWidgetListener(this);
 
 			mExp = new Expression();

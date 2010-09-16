@@ -46,6 +46,7 @@ namespace MAUI {
 		void drawWidget();
 		//String mCaption;
 		bool mPressed;
+		int mStartX, mStartY;
 	};
 
 	/**

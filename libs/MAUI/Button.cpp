@@ -1,5 +1,6 @@
 #include "Button.h"
 #include "Engine.h"
+#include <mastdlib.h>
 
 namespace MAUI {
 
@@ -11,12 +12,18 @@ Button::Button(int x, int y, int width, int height, Widget* parent, const String
 bool Button::pointerPressed(MAPoint2d p, int id) {
 	MAUI_LOG("Button pressed! %x", this);
 	mPressed = true;
+	mStartX = p.x;
+	mStartY = p.y;
 	requestRepaint();
 	return true;
 }
 
 bool Button::pointerMoved(MAPoint2d p, int id) {
-	return false;
+	p.x-=mStartX;
+	p.y-=mStartY;
+
+	if((abs(p.x)<7) && (abs(p.y)<7)) return true;
+	else return false;
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
