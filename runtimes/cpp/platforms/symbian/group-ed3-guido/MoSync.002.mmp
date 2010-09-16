@@ -42,6 +42,7 @@ LIBRARY RemConCoreApi.lib
 LIBRARY remconinterfacebase.lib
 LIBRARY cntmodel.lib
 LIBRARY estlib.lib
+LIBRARY centralrepository.lib
 
 staticlibrary babile.lib
 staticlibrary ivx.lib

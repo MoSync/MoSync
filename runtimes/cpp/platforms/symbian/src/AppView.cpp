@@ -572,15 +572,15 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 	int scancode = aKeyEvent.iScanCode;
 	switch(aType) {
 	case EEventKeyUp:
-		LOG("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = false;
 		break;
 	case EEventKeyDown:
-		LOG("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = true;
 		break;
 	case EEventKey:
-		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
 			MAEvent event;
 			event.type = EVENT_TYPE_CHAR;
