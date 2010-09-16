@@ -707,7 +707,6 @@ void showNavKeys(MAPoint2d point) {
 void showScore() {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
-	int h = EXTENT_Y(e);
 
 	sprintf(score, "%d", curScore);
 	sprintf(rows, "%d", curRows);

@@ -2116,7 +2116,7 @@ maIOCtl_glPointSizex_case(glPointSizex);
 	static int sTextBoxOutSize;
 
 	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-		LOGD("TextBoxProc 0x%08x, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, lParam);
+		LOGD("TextBoxProc 0x%p, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, (uint)lParam);
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
