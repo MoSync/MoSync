@@ -137,6 +137,9 @@ int Base::Syscall::GetValidatedStackValue(int offset) {
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)address;
 }
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return (const wchar*)address;
+}
 
 void Base::Syscall::VM_Yield() {
 }
