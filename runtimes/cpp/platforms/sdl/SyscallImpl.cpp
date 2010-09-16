@@ -156,8 +156,11 @@ namespace Base {
 	static void cameraViewFinderUpdate();
 
 	static int maGetSystemProperty(const char* key, char* buf, int size);
+	
+#ifdef WIN32
 	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 		int maxSize, int constraints);
+#endif
 
 //********************************************************************
 
