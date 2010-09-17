@@ -16,14 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /*
-
-00001101-0000-1000-8000-00805F9B34FB
-
-                                 00001105-   0000-1000-   8000-0080     5f9b34fb
-OBEXObjectPush_Service_MAUUID = {{ 0x1105 , 0x00001000 , 0x80000080 , 0x5F9B34FB }}
-
-00001101-  0000-1000-   8000-0080    5F9B34FB
-  0x1101 0x00001000 , 0x80000080 , 0x5F9B34FB
+TODO: Delete this comment when development and testing is done.
 
 http://stackoverflow.com/questions/3397071/android-bluetooth-service-discovery-failed-exception
 http://stackoverflow.com/questions/3072776/android-bluetooth-cant-connect-out
