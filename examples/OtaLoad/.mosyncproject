@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="true" version="1">
-<build.cfg id="Debug"/>
-<build.cfg id="Release"/>
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
+<property key="build.prefs:app.permissions" value="Internet\ Access"/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:memory.stack/Release" value="8"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
-<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

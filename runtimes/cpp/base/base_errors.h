@@ -72,7 +72,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40052, ERR_IMAGE_SIZE_INVALID, "Invalid image size")\
 	m(40053, ERR_MEMORY_NULL, "Attempted to access null pointer.")\
 	m(40054, ERR_GDB_SERVER_OPEN, "Gdb stub failed to open listening server socket.")\
-	m(40055, ERR_RES_NO_RESOURCES, "Attempted to load resource, but no resources exist.")\
+	m(40055, ERR_RES_NO_RESOURCES, "Attempted to use a resource, but no resources exist.")\
 	m(40056, ERR_FILE_HANDLE_INVALID, "File handle invalid")\
 	m(40057, ERR_INVALID_FILE_ACCESS_MODE, "Invalid file access mode")\
 	m(40058, ERR_FILE_CLOSED, "The file is closed")\
@@ -85,6 +85,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40065, ERR_STACK_OOB, "Stack pointer out of bounds. Try to increase the stack size.")\
 	m(40066, ERR_PIM_LIST_CLOSED, "The PIM item's parent list is closed")\
 	m(40067, ERR_CAMERA_UNPOWERED, "Camera viewfinder is not active")\
+	m(40068, ERR_TEXTBOX_ACTIVE, "Text box is already active")\
 
 DECLARE_ERROR_ENUM(BASE)
 

@@ -140,6 +140,7 @@ namespace Base {
 	BOOL InitGraphics();
 	void CloseGraphics();
 	static void MAUpdateScreen();
+	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam);
 
 	BOOL VibrationStop();
 
@@ -267,6 +268,8 @@ namespace Base {
 		/* generate titles and class names */
 		wsprintf(g_szTitle, L"%s", &modname[startOfModName]);
 		wsprintf(g_szClassName, L"%s class", &modname[startOfModName]);
+
+		LOG("AppName: %s\n", &modname[startOfModName]);
 	}
 
 	// win mobile specific network initialization
@@ -412,6 +415,13 @@ namespace Base {
 		}
 	}
 
+	static void MAHandleCharEvent(uint character) 
+	{
+		MAEvent event;
+		event.type = EVENT_TYPE_CHAR;
+		event.character = character;
+		gEventFifo.put(event);
+	}
 
 	static void MAHandlePointerEvent(int x, int y, int eventType) 
 	{
@@ -439,14 +449,25 @@ namespace Base {
 		while (PeekMessage (&msg, NULL, 0, 0, PM_REMOVE)) {
 
 			// I think I have to do this for oem keys.
-			if(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP) {
-				if(msg.wParam == VK_PROCESSKEY) {
-					msg.wParam = ImmGetVirtualKey(msg.hwnd);
-				}
+			if(gGraphicsActive &&
+				(msg.message == WM_KEYDOWN || msg.message == WM_KEYUP)
+				&& msg.wParam == VK_PROCESSKEY)
+			{
+				msg.wParam = ImmGetVirtualKey(msg.hwnd);
 			}
 
 			TranslateMessage (&msg);
+			LOGD("Message: 0x%08X, 0x%04X, 0x%08X, 0x%08X\n",
+				msg.hwnd, msg.message, msg.wParam, msg.lParam);
 			DispatchMessage (&msg);
+
+			// dispatch softkey events to textBox, since they aren't handled normally.
+			if(msg.message == WM_KEYDOWN &&
+				(msg.wParam == VK_F1 || msg.wParam == VK_F2 ||
+				msg.wParam == VK_ESCAPE))	//backspace key
+			{
+				textBoxEventHook(msg.message, msg.wParam, msg.lParam);
+			}
 
 			if(msg.message == WM_TIMER) {
 				return true;
@@ -477,6 +498,7 @@ namespace Base {
 
 	void Resume() {
 		if(gGraphicsActive) return;
+		LOG("Resume\n");
 #if _WIN32_WCE < 0x502	
 		if(graphicsMode == GRAPHICSMODE_GX) GXResume();
 #else
@@ -488,6 +510,7 @@ namespace Base {
 
 	void Suspend() {
 		if(!gGraphicsActive) return;
+		LOG("Suspend\n");
 #if _WIN32_WCE < 0x502				
 		if(graphicsMode == GRAPHICSMODE_GX) GXSuspend();
 #else
@@ -513,6 +536,7 @@ DWORD GetScreenOrientation()
 	LRESULT CALLBACK WndProc (HWND hwnd, UINT umsg, WPARAM wParam, 
 		LPARAM lParam)
 	{
+		LOGD("WndProc(0x%08x, 0x%04x, 0x%08x, 0x%08x)\n", hwnd, umsg, wParam, lParam);
 		if(wParam == VK_F24) return DefWindowProc (hwnd, umsg, wParam, lParam);
 
 		switch (umsg)
@@ -570,6 +594,10 @@ DWORD GetScreenOrientation()
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_PRESSED);
 			return 0;
 
+		case WM_CHAR:
+			MAHandleCharEvent(wParam);
+			return 0;
+
 		case WM_KEYUP:
 			if(wParam == VK_F24) break;
 			MAHandleKeyEvent(wParam, EVENT_TYPE_KEY_RELEASED);
@@ -616,19 +644,18 @@ DWORD GetScreenOrientation()
 				//ShowWindow(g_hwndMain, SW_MINIMIZE);
 			}
 			return 0;
-      case WM_CANCELMODE:
+		case WM_CANCELMODE:
 			Suspend();
 			InitWindowed();
 			ShowWindow(g_hwndMain, SW_MINIMIZE);
-            return 0;
-			/*
+			return 0;
+#if 0
 		case WM_GRAPHNOTIFY:
-            VideoHandleEvent((VideoStream*)lParam);
-            break;
-			*/
-
-       case WM_SETTINGCHANGE:
-            if (SETTINGCHANGE_RESET == wParam) {
+			VideoHandleEvent((VideoStream*)lParam);
+			break;
+#endif
+		case WM_SETTINGCHANGE:
+			if (SETTINGCHANGE_RESET == wParam) {
 				MAEvent event;
 				event.type = EVENT_TYPE_SCREEN_CHANGED;
 				gEventFifo.put(event);
@@ -747,7 +774,7 @@ DWORD GetScreenOrientation()
 	void InitFullScreen() {
 		RECT rc;
 
-	
+
 		HWND hwndTaskbar = TaskBarFind();
 		GetWindowRect(hwndTaskbar, &rc);
 		int taskBarHeight = (rc.bottom-rc.top);
@@ -760,7 +787,7 @@ DWORD GetScreenOrientation()
         SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
 
-		::ShowWindow(hwndTaskbar, SW_HIDE); 
+		::ShowWindow(hwndTaskbar, SW_HIDE);
 	}
 
 	void InitWindowed() {
@@ -1230,6 +1257,7 @@ DWORD GetScreenOrientation()
 	}
 
 	static void MALibQuit() {
+		LOG("MALibQuit\n");
 
 		// make sure it is stopped.
 		VibrationStop();
@@ -1250,6 +1278,7 @@ DWORD GetScreenOrientation()
 		CloseGraphics();
 		CoUninitialize();
 
+		LOG("PostQuitMessage(0)\n");
 		PostQuitMessage (0);
 	}
 
@@ -2284,10 +2313,12 @@ DWORD GetScreenOrientation()
 		return 1;
 	}
 
-	SYSCALL(int, maFrameBufferInit(void *data)) {
+	SYSCALL(int, maFrameBufferInit(const void* addr)) {
+		gSyscall->ValidateMemRange(addr, backBuffer->pitch*backBuffer->height);
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = backBuffer;
-		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
+		backBuffer = new Image((unsigned char*)addr, NULL, backBuffer->width,
+			backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
 		currentDrawSurface = backBuffer;
 		return 1;
 	}
@@ -2307,7 +2338,7 @@ DWORD GetScreenOrientation()
 		PostMessage(g_hwndMain, WM_ADD_EVENT, (WPARAM) ep, 0);
 	}
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close();
@@ -2611,17 +2642,203 @@ retry:
 	}
 #endif
 
+	int maWriteLog(const void* a, int b) {
+		gSyscall->ValidateMemRange(a, b);
+		LOGBIN(a, b);
+		return 0;
+	}
 
+	static int maGetSystemProperty(const char* key, char* buf, int size) {
+		if(strcmp(key, "mosync.iso-639-1") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			WCHAR wbuf[4];
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, 4);
+			GLE(res);
+			if(res > size)
+				return res;
+			size_t sres = wcstombs(buf, wbuf, size);
+			DEBUG_ASSERT(sres == res-1);
+			return res;
+		}
+		return -2;
+	}
+
+	//*****************************************************************************
+	// maTextBox
+	//*****************************************************************************
+	static HWND sTextBoxContainer = NULL, sEditBox = NULL;
+	static wchar_t* sTextBoxOutBuf;
+	static int sTextBoxOutSize;
+
+	static LRESULT CALLBACK TextBoxWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+		static SHACTIVATEINFO sai;
+		LOGD("TextBoxWndProc(0x%04x, 0x%08x, 0x%08x)\n", msg, wParam, lParam);
+		switch (msg) {
+		case WM_CREATE:
+			// Initialize the static window state information. The shell helper functions
+			// will use this buffer to store their state.
+			ZeroMemory(&sai, sizeof(sai));
+			sai.cbSize = sizeof(sai);
+			ShowWindow(hwnd, SW_MAXIMIZE);
+			UpdateWindow(hwnd);
+			return TRUE;
+		case WM_ACTIVATE:
+			// Calling this function when we get WM_ACTIVATE ensures that our
+			// application will handle the SIP properly. This function does
+			// nothing when we're running on Smartphone.
+			SHHandleWMActivate(hwnd, wParam, lParam, &sai, 0);
+			break;
+		case WM_SETTINGCHANGE:
+			// This helper function will resize our main application window when the SIP
+			// goes up and down. Try commenting out this function and see how it affects
+			// our drawing code. This function is optional, so choose whichever behavior
+			// you prefer. Again, this function does nothing on Smartphone.
+			SHHandleWMSettingChange(hwnd, wParam, lParam, &sai);
+			break;
+		case WM_SIZE:
+			{
+				int width = LOWORD(lParam);
+				int height = HIWORD(lParam);
+				SetWindowPos(sEditBox, NULL, 0, 0, width, height, 0);
+				UpdateWindow(hwnd);
+			}
+			break;
+		case WM_COMMAND:
+			{
+				WORD id = LOWORD(wParam);
+				if(id == IDOK || id == IDCANCEL) {
+					// get text
+					int res = GetWindowText(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+
+					// send event
+					MAEvent e;
+					e.type = EVENT_TYPE_TEXTBOX;
+					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+					e.textboxLength = res;
+					gEventFifo.put(e);
+
+					// time to close
+					LOG("DestroyWindow\n");
+					GLE(DestroyWindow(hwnd));
+				}
+			}
+			break;
+		case WM_DESTROY:
+			sEditBox = sTextBoxContainer = NULL;
+			Base::Resume();
+			Base::InitFullScreen();
+			break;
+		}
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+
+	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam) {
+		if(sTextBoxContainer) {
+			LOGD("textBoxEventHook(0x%04x, 0x%08x, 0x%08x)\n", msg, wParam, lParam);
+			switch(msg) {
+			case WM_KEYDOWN:
+#if 0	// no effect
+				SendMessage(SHFindMenuBar(sTextBoxContainer), msg, wParam, lParam);
+#else
+				if(wParam == VK_F1)
+					TextBoxWndProc(sTextBoxContainer, WM_COMMAND, IDOK, 0);
+				if(wParam == VK_F2)
+					TextBoxWndProc(sTextBoxContainer, WM_COMMAND, IDCANCEL, 0);
+				if(wParam == VK_ESCAPE)
+					SendMessage(sEditBox, WM_CHAR, VK_BACK, 0);
+#endif
+			}
+		}
+	}
+
+	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints)
+	{
+		LOG("maTextBox\n");
+#if 1
+		if(sTextBoxContainer != NULL) {
+			// textbox is already active, return error.
+			return -2;
+		}
+		DEBUG_ASSERT(sizeof(wchar) == sizeof(wchar_t));
+		sTextBoxOutSize = maxSize;
+		sTextBoxOutBuf = (wchar_t*)outText;
+
+		// create overlay window
+		// window class
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = TextBoxWndProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = g_hInst;
+		wc.hIcon = NULL;
+		wc.hCursor = 0;
+		wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+		wc.lpszMenuName =  0;
+		wc.lpszClassName = TEXT("MoSyncTextBoxContainer");
+		RegisterClass(&wc);
+
+		Base::Suspend();
+		Base::InitWindowed();
+
+		// the window itself
+		sTextBoxContainer = CreateWindow(TEXT("MoSyncTextBoxContainer"), (const wchar_t*)title,
+			WS_CAPTION,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			NULL, NULL, g_hInst, NULL);
+		GLE(sTextBoxContainer);
+#else
+		Base::Suspend();
+		sTextBoxContainer = g_hwndMain;
+#endif
+		// menu bar
+		HMENU hMenu = CreateMenu();
+		InsertMenu(hMenu, 0, MF_BYPOSITION, IDOK, L"OK");
+		InsertMenu(hMenu, -1, MF_BYPOSITION, IDCANCEL, L"Cancel");
+		SHMENUBARINFO mbi = { sizeof(SHMENUBARINFO), sTextBoxContainer, SHCMBF_HMENU,
+			(UINT)hMenu, g_hInst, 0, 0, 0, 0 };
+		GLE(SHCreateMenuBar(&mbi));
+		//LOGD("Menu bar: 0x%08X\n", mbi.hwndMB);
+		//LOGD("FindMenuBar: 0x%08X\n", SHFindMenuBar(sTextBoxContainer));
+#if 1
+		SHINITDLGINFO shidi;
+		shidi.dwMask = SHIDIM_FLAGS;
+		shidi.hDlg = sTextBoxContainer;
+		shidi.dwFlags = SHIDIF_SIZEDLGFULLSCREEN | SHIDIF_SIPDOWN;
+		GLE(SHInitDialog(&shidi));
+#endif
+#if 1	//testing softkeys only
+		// create editbox
+		sEditBox = CreateWindow(TEXT("EDIT"),	// predefined class 
+			(LPCWSTR)inText,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			sTextBoxContainer,	// parent window 
+			NULL, g_hInst, NULL);
+		GLE(sEditBox);
+
+		RECT rect;
+		GLE(GetClientRect(sTextBoxContainer, &rect));
+		GLE(SetWindowPos(sEditBox, NULL, rect.left, rect.top, rect.right, rect.bottom, 0));
+		SetFocus(sEditBox);
+#endif
+		MAProcessEvents();
+		//LOG("FindMenuBar: 0x%08X\n", SHFindMenuBar(sTextBoxContainer));
+		//HRES(SHEnableSoftkey(mbi.hwndMB, 0, TRUE, TRUE));
+		//HRES(SHEnableSoftkey(mbi.hwndMB, 1, TRUE, TRUE));
+		ShowWindow(sTextBoxContainer, SW_SHOW);
+
+		LOG("maTextBox: %i\n", 0);
+		return 0;
+	}
+
+	//*****************************************************************************
+	// maIOCtl
+	//*****************************************************************************
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
-
-		case maIOCtl_maCheckInterfaceVersion:
-			return Base::maCheckInterfaceVersion(a);
-
-		case maIOCtl_maWriteLog:
-			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
-			return 0;
 			/*
 			//these are the same across all C++ platforms. consider sharing them somehow.
 		case maIOCtl_sinh:
@@ -2651,18 +2868,14 @@ retry:
 				return 0;
 			}
 			*/
-		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();
-		case maIOCtl_maKeypadIsLocked:
-			return maKeypadIsLocked();
-		case maIOCtl_maLockKeypad:
-			return maLockKeypad();
-		case maIOCtl_maUnlockKeypad:
-			return maUnlockKeypad();
+
+		maIOCtl_maWriteLog_case(maWriteLog);
+		maIOCtl_maPlatformRequest_case(maPlatformRequest);
+		maIOCtl_maSendTextSMS_case(maSendTextSMS);
+		maIOCtl_maGetBatteryCharge_case(maGetBatteryCharge);
+		maIOCtl_maKeypadIsLocked_case(maKeypadIsLocked);
+		maIOCtl_maLockKeypad_case(maLockKeypad);
+		maIOCtl_maUnlockKeypad_case(maUnlockKeypad);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
@@ -2672,24 +2885,16 @@ retry:
 		case maIOCtl_maBtStartServiceDiscovery:
 			BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
 			return 0;
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
-		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
 
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+		maIOCtl_maBtGetNewService_case(SYSCALL_THIS->maBtGetNewService);
+		maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+		maIOCtl_maFrameBufferGetInfo_case(maFrameBufferGetInfo);
+		maIOCtl_maFrameBufferInit_case(maFrameBufferInit);		
+		maIOCtl_maFrameBufferClose_case(maFrameBufferClose);
+
+		maIOCtl_maAudioBufferInit_case(maAudioBufferInit);		
+		maIOCtl_maAudioBufferReady_case(maAudioBufferReady);
+		maIOCtl_maAudioBufferClose_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_LOCATIONAPI
 		case maIOCtl_maLocationStart:
@@ -2698,51 +2903,36 @@ retry:
 			return maLocationStop();
 #endif
 
-		case maIOCtl_maFileOpen:
-			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+		maIOCtl_syscall_case(maFileOpen);
 
-		case maIOCtl_maFileExists:
-			return SYSCALL_THIS->maFileExists(a);
-		case maIOCtl_maFileClose:
-			return SYSCALL_THIS->maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return SYSCALL_THIS->maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return SYSCALL_THIS->maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
-			return SYSCALL_THIS->maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
-		case maIOCtl_maFileRename:
-			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+		maIOCtl_syscall_case(maFileExists);
+		maIOCtl_syscall_case(maFileClose);
+		maIOCtl_syscall_case(maFileCreate);
+		maIOCtl_syscall_case(maFileDelete);
+		maIOCtl_syscall_case(maFileSize);
+#if 0	//todo
+		maIOCtl_syscall_case(maFileAvailableSpace);
+		maIOCtl_syscall_case(maFileTotalSpace);
+		maIOCtl_syscall_case(maFileDate);
+		maIOCtl_syscall_case(maFileRename);
+		maIOCtl_syscall_case(maFileTruncate);
+#endif
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileWriteFromData:
-			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
 			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileReadToData:
-			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
-		case maIOCtl_maFileTell:
-			return SYSCALL_THIS->maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return SYSCALL_THIS->maFileSeek(a, b, c);
+		maIOCtl_syscall_case(maFileWriteFromData);
+		maIOCtl_syscall_case(maFileReadToData);
 
-		case maIOCtl_maFileListStart:
-			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b));
+		maIOCtl_syscall_case(maFileTell);
+		maIOCtl_syscall_case(maFileSeek);
+
+		maIOCtl_syscall_case(maFileListStart);
 		case maIOCtl_maFileListNext:
 			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileListClose:
-			return SYSCALL_THIS->maFileListClose(a);
+		maIOCtl_syscall_case(maFileListClose);
 
 			/*
 		case maIOCtl_maWlanStartDiscovery:
@@ -2764,8 +2954,14 @@ retry:
 			maCloseStream((MAHandle)a);
 			return 0;
 			*/
+
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+
+			maIOCtl_case(maTextBox);
 		}
-		
+
 		return IOCTL_UNAVAILABLE;
 	}
 }

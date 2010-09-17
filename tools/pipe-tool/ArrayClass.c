@@ -56,7 +56,7 @@ void ArrayInit(ArrayStore *theArray, uint type, uint size)
 	theArray->ps = 0;
 
 	if (!theArray->array)
-		Error(Error_Fatal, "ArrayClass failed to allocate");
+		Error(Error_Fatal, "ArrayClass failed to allocate 1");
 
 }
 
@@ -113,7 +113,7 @@ void * ArrayPtr(ArrayStore *theArray, uint index)
 		theArray->array = (void *) ReallocPtr((char *) theArray->array,  theArray->type * newsize);
 
 		if (!theArray->array)
-			Error(Error_Fatal, "ArrayClass failed to reallocate");
+			Error(Error_Fatal, "ArrayClass failed to reallocate 2");
 
 		// Clear out new memory
 
@@ -158,7 +158,7 @@ void * ArrayPtrBound(ArrayStore *theArray, int startIndex, uint endIndex)
 		theArray->array = (void *) ReallocPtr((char *) theArray->array,  theArray->type * newsize);
 
 		if (!theArray->array)
-			Error(Error_Fatal, "ArrayClass failed to reallocate");
+			Error(Error_Fatal, "ArrayClass failed to reallocate 3");
 
 		// Clear out new memory
 
@@ -201,7 +201,7 @@ void ArraySet(ArrayStore *theArray, uint index, uint value)
 		theArray->array = (void *) ReallocPtr((char *) theArray->array,  theArray->type * newsize);
 
 		if (!theArray->array)
-			Error(Error_Fatal, "ArrayClass failed to reallocate");
+			Error(Error_Fatal, "ArrayClass failed to reallocate 4");
 
 		// Clear out new memory
 

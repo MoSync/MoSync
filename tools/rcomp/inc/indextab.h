@@ -1,17 +1,36 @@
-// INDEXTAB.H
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
 
+
+#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
 #include <iostream>
+using std::ostream;
+#else //!__MSVCDOTNET__
+#include <iostream.h>
+#endif //__MSVCDOTNET__
+
 #include "rcbinstr.h"
 #include "array.h"
 #include "resource.h"
 
 
 class IndexTableItem : public ArrayItem
-{
-	friend std::ostream& operator<<(std::ostream & os,const IndexTableItem& o);
+	{
+	friend ostream& operator<<(ostream & os,const IndexTableItem& o);
 	friend RCBinaryStream& operator<<(RCBinaryStream & os,const IndexTableItem& o);
 public:
 	IndexTableItem(ResourceHeader* aResource);
@@ -21,11 +40,11 @@ public:
 public:
 	ResourceHeader* iResource;
 	unsigned char iOffset[2];
-};
+	};
 
 class IndexTable : public Array
-{
-	friend std::ostream& operator<<(std::ostream& os,const IndexTable& o);
+	{
+	friend ostream& operator<<(ostream& os,const IndexTable& o);
 	friend RCBinaryStream& operator<<(RCBinaryStream& os,const IndexTable& o);
 public:
 	IndexTable();
@@ -35,11 +54,11 @@ public:
 private:
 	static int iInUse;
 	unsigned char iOffset[2];
-};
+	};
 
 class IndexTableIterator : public ArrayIterator
-{
+	{
 public:
 	IndexTableIterator(const IndexTable & aTable);
 	IndexTableItem* operator()();
-};
+	};

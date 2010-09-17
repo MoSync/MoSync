@@ -6,6 +6,8 @@ CAPABILITY LocalServices UserEnvironment ReadUserData WriteUserData NetworkServi
 EPOCSTACKSIZE 0x10000
 EPOCHEAPSIZE 0x300000 0x1400000
 
+MACRO SYMBIAN=1
+
 START RESOURCE ..\data\MoSync_3rd.rss
 HEADER
 TARGETPATH resource\apps
@@ -40,6 +42,7 @@ LIBRARY RemConCoreApi.lib
 LIBRARY remconinterfacebase.lib
 LIBRARY cntmodel.lib
 LIBRARY estlib.lib
+LIBRARY centralrepository.lib
 
 staticlibrary babile.lib
 staticlibrary ivx.lib

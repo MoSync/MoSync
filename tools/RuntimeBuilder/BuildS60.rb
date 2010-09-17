@@ -22,6 +22,7 @@ class RuntimeBuilder
 		config_file_dest = $SETTINGS[:symbian_source] + "inc/config_platform.h"
 		config_file_src = "#{runtime_dir}config#{debug}.h"
 		
+		
 		puts "Using config file: #{config_file_src}"
 	
 		backup_file(config_file_dest)
@@ -36,6 +37,10 @@ class RuntimeBuilder
 			default = "@S60_3rd_FP1:com.nokia.s60"
 			symbian_system = "gcce"
 			# symbian_system = "armv5"
+		elsif version == "s60v3-guido"
+			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3-guido"
+			default = "@S60_3rd_FP1:com.nokia.s60"
+			symbian_system = "gcce"
 		elsif version == "s60v5"
 			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3"
 			symbian_system = "gcce"
@@ -51,13 +56,13 @@ class RuntimeBuilder
 		
 		# call the build functions
 		if version == "s60v5"
-			puts "#{cwd}/build_s60v5.bat"
-			system("#{cwd}/build_s60v5.bat")
+			cmd = "#{cwd}/build_s60v5.bat \"#{$SETTINGS[:s60v5_compiler]}\""
+			sh(cmd)
 		else
-			system("devices -setdefault #{default}")
-			system("bldmake bldfiles");
-			system("call abld clean #{symbian_system} urel");
-			system("call abld build #{symbian_system} urel");
+			sh("devices -setdefault #{default}")
+			sh("bldmake bldfiles");
+			sh("call abld clean #{symbian_system} urel");
+			sh("call abld build #{symbian_system} urel");
 		end
 		
 		# revert initial config file
@@ -65,6 +70,10 @@ class RuntimeBuilder
 		
 		# go back to the initial directory
 		Dir.chdir cwd
+		
+		data3_dir = $SETTINGS[:symbian_source] + "data-ed3/"
+		data_dir = $SETTINGS[:symbian_source] + "data/"
+		inc_dir = $SETTINGS[:symbian_source] + "inc"
 		
 		if version == "s60v2"
 			epoc_dir = "/Symbian/8.1a/S60_2nd_FP3/epoc32/"
@@ -76,15 +85,17 @@ class RuntimeBuilder
 				return 1
 			end
 			
-			# Copy all the generated files to it's runtime folder
+			# Preprocess resource files
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data_dir}MoSync_caption_template.rss #{runtime_dir}MoSync_caption_template.prs")
+			
+			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(app_file, "#{runtime_dir}MoSync#{debug}.app")
 			FileUtils.copy_file("#{epoc_dir}data/z/system/apps/MoSync/MoSync.rsc", "#{runtime_dir}/MoSync.rsc")
-			FileUtils.copy_file("#{epoc_dir}data/z/system/apps/MoSync/MoSync_caption.rsc", "#{runtime_dir}MoSync_caption.rsc")
 			FileUtils.copy_file("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.app, and other runtime files was succesfully generated!\n\n"
 			return 0
-		elsif version == "s60v3"
+		elsif version == "s60v3" || version == "s60v3-guido"
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"
 			exe_file = "#{epoc_dir}release/#{symbian_system}/urel/MoSync2.exe"
@@ -94,13 +105,15 @@ class RuntimeBuilder
 				return 1
 			end
 			
-			# Copy all the generated files to it's runtime folder
+			# Preprocess resource files
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			
+			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
-			FileUtils.copy_file("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")
-			FileUtils.copy_file("#{epoc_dir}data/z/private/10003a3f/import/apps/MoSync_reg.RSC", "#{runtime_dir}MoSync_reg.RSC")
 			FileUtils.copy_file("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			FileUtils.copy_file("#{$SETTINGS[:symbian_source]}/server/MoSyncServer_Express_Signed.sis", "#{runtime_dir}MoSyncServer.sis")
-			
+
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
 			return 0
 		elsif version == "s60v5"
@@ -113,10 +126,12 @@ class RuntimeBuilder
 				return 1
 			end
 			
-			# Copy all the generated files to it's runtime folder
+			# Preprocess resource files
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_3rd_template.rss #{runtime_dir}MoSync_3rd_template.prs")
+			sh("cpp -I #{inc_dir} -I #{epoc_dir}include #{data3_dir}MoSync_reg_template.rss #{runtime_dir}MoSync_reg_template.prs")
+			 
+			# Copy all the generated files to the runtime folder
 			FileUtils.copy_file(exe_file, "#{runtime_dir}MoSync#{debug}.exe")
-			FileUtils.copy_file("#{epoc_dir}data/z/resource/apps/MoSync_3rd.RSC", "#{runtime_dir}MoSync.RSC")
-			FileUtils.copy_file("#{epoc_dir}data/z/private/10003a3f/import/apps/MoSync_reg.RSC", "#{runtime_dir}MoSync_reg.RSC")
 			FileUtils.copy_file("#{sis_dir}MoSync-template.pkg", "#{runtime_dir}MoSync-template.pkg")
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.exe, and other runtime files was succesfully generated!\n\n"
@@ -133,6 +148,10 @@ class RuntimeBuilder
 	
 	def s60v3(runtime_dir, mode)
 		return build_symbian(runtime_dir, mode, "s60v3")
+	end
+	
+	def s60v3_guido(runtime_dir, mode)
+		return build_symbian(runtime_dir, mode, "s60v3-guido")
 	end
 	
 	def s60v5(runtime_dir, mode)

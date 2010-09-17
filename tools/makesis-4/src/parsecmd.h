@@ -56,7 +56,6 @@ class CParseCmd
 			EOptMakeStub  = 0x02,
 			EOptDirectory = 0x04,
 			EOptPassword  = 0x08,
-			EOptSelfsign  = 0x10
 			};
 		
 	private:

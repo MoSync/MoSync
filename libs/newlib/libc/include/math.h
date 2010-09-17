@@ -434,7 +434,7 @@ extern _LONG_LONG_TYPE llrintl _PARAMS((_LONG_DOUBLE));
 
 #endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L */
 
-#if 0//!defined (__STRICT_ANSI__) || defined(__cplusplus)
+#if (!defined (__STRICT_ANSI__) || defined(__cplusplus)) && defined(USE_EXOTIC_MATH)
 
 //extern double cabs();
 extern double drem _PARAMS((double, double));

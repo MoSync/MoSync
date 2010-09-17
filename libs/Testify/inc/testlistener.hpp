@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * Provides a callback interface for listening to events.
+ * @brief A callback interface for listening to events.
  *
  */
 class TestListener

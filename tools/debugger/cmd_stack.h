@@ -31,6 +31,8 @@ void console_whatis(const std::string& args, const std::string& token);
 //populates gFrames and sets gCurrentFrameIndex, then calls cb.
 //on failure, calls error() and not the callback.
 void loadStack(void (*cb)());
+void assertStack();
+#define ASSERT_STACK assertStack()
 
 struct FRAME {
 	int pointer, pc;

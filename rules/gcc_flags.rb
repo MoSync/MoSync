@@ -48,7 +48,7 @@ else
 	pedantic_warnings += optimizer_dependent
 end
 
-standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow"
+standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow" 
 
 
 include_dirs = @EXTRA_INCLUDES
@@ -62,17 +62,22 @@ c_flags = " -std=gnu99"
 version_warnings = ""
 base_flags = ""
 cpp_flags = ""
+
+if(PROFILING)
+	base_flags += " -pg"
+end
+
 if(@GCC_IS_V4) then
 	if(HOST != :win32)
 		base_flags += " -fvisibility=hidden"
 	end
 	version_warnings += gcc4_warnings
-	if(@GCC_IS_V43 || @GCC_IS_V44) then
+	if(@GCC_V4_SUB >= 3) then
 		version_warnings += gcc43_c_warnings + gcc43_warnings
 		cpp_flags += " -std=gnu++0x -DHAVE_TR1"
 	end
 end
-if(!@GCC_IS_V43) then
+if(!(@GCC_IS_V4 && @GCC_V4_SUB >= 3)) then
 	lesser_conly += gcc43_c_warnings
 end
 

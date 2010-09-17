@@ -17,10 +17,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <coemain.h>
 #include <BACLINE.H>
+#include <eikgted.h>
+#include <gulftflg.hrh>
+#include <AknQueryDialog.h>
+#ifdef __SERIES60_3X__
+#include <MoSync_3rd.RSG>
+#else
+#include <MoSync.RSG>
+#endif
 
 #include "config_platform.h"
 
 #include "AppView.h"
+#include "AppUi.h"
 #include "Document.h"
 #include "DirScrAccEng.h"
 #include "syscall.h"
@@ -289,6 +298,22 @@ void CAppView::FocusChanged(TDrawNow aDrawNow) {
 	}
 }
 
+void CAppView::HandleResourceChange(TInt aType) {
+	LOG("HandleResourceChange(0x%x)\n", aType);
+	CCoeControl::HandleResourceChange(aType);
+	if(aType != KEikDynamicLayoutVariantSwitch)
+		return;
+
+	// resize the window
+	SetRect(CCoeEnv::Static()->ScreenDevice()->SizeInPixels());
+	iEngine->UpdateScreenSize();
+	
+	MAEvent event;
+	event.type = EVENT_TYPE_SCREEN_CHANGED;
+	AddEvent(event);
+	LOG("EVENT_TYPE_SCREEN_CHANGED sent\n");
+}
+
 void CAppView::Draw(const TRect& /* aRect */) const {
 	LOGG("AVD\n");
 	if(iStopForever)
@@ -326,12 +351,12 @@ TInt CAppView::RunL() {
 		LOGD("RunIdle stopped forever.\n");
 		return iKeepRunning = 0;
 	}
-	LOGD("RIS\n");
+	//LOGD("RIS\n");
 #ifdef SUPPORT_RELOAD
 	iCore->symbianError = KErrNone;
 #endif
 	Run2(iCore);
-	LOGD("RIE\n");
+	//LOGD("RIE\n");
 #ifdef SUPPORT_RELOAD
 	if(iCore->symbianError != KErrNone) {
 		LOG("Found core leave, code %i\n", iCore->symbianError);
@@ -485,6 +510,31 @@ void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
 //Key handling
 //***************************************************************************
 
+#define QWERTY_KEYS(m)\
+	m(MAK_RETURN, EStdKeyEnter)\
+	m(MAK_SPACE, EStdKeySpace)\
+	m(MAK_LSHIFT, EStdKeyLeftShift)\
+	m(MAK_RSHIFT, EStdKeyRightShift)\
+	m(MAK_LALT, EStdKeyLeftFunc)\
+	m(MAK_RALT, EStdKeyRightFunc)\
+	m(MAK_LCTRL, EStdKeyLeftCtrl)\
+	m(MAK_RCTRL, EStdKeyRightCtrl)\
+
+// Keycode values >= ASCII_MIN && <= ASCII_MAX
+// can be passed directly as ASCII codes.
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+
+// These keycode identifiers do not respond to the proper keys
+// on a Swedish E71.
+#define BROKEN_KEYS(m)\
+	m(MAK_COMMA, EStdKeyComma)\
+	m(MAK_PERIOD, EStdKeyFullStop)\
+	m(MAK_SLASH, EStdKeyForwardSlash)\
+	m(MAK_BACKSLASH, EStdKeyBackSlash)\
+	m(MAK_SEMICOLON, EStdKeySemiColon)\
+	m(MAK_QUOTE, EStdKeySingleQuote)\
+
 #define STDKEYS(m)\
 	m(UP, EStdKeyUpArrow)\
 	m(DOWN, EStdKeyDownArrow)\
@@ -522,38 +572,62 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 	int scancode = aKeyEvent.iScanCode;
 	switch(aType) {
 	case EEventKeyUp:
-		LOG("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = false;
 		break;
 	case EEventKeyDown:
-		LOG("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = true;
 		break;
 	case EEventKey:
-		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
-		return EKeyWasNotConsumed;
+		LOGD("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
+			MAEvent event;
+			event.type = EVENT_TYPE_CHAR;
+			event.character = aKeyEvent.iCode;
+			AddEvent(event);
+		}
+		return EKeyWasConsumed;
 	default:
 		LOG("KeyEvent %i\n", aType);
 		return EKeyWasNotConsumed;
 	}
 
-#define SCANTOMAK_CASE(name, num)\
+#define SCANTOMAKB_CASE(name, num)\
 	case num: makey = MAK_##name; makb = MAKB_##name; break;
+
+#define SCANTOMAK_CASE(name, num)\
+	case num: makey = name; break;
 
 	int makey;
 	int makb = 0;
-	switch(scancode) {
-		STDKEYS(SCANTOMAK_CASE);
+
+	// TODO: handle Unicode input, which is received in aKeyEvent.iCode
+	// when aType == EEventKey.
+	// Will probably need a new MoSync EVENT_TYPE_CHAR for this.
+
+#define ASCII_MIN 0x20
+#define ASCII_MAX 0x5f
+	if(scancode >= ASCII_MIN && scancode <= ASCII_MAX) {
+		makey = scancode;
+	} else switch(scancode) {
+		STDKEYS(SCANTOMAKB_CASE);
+		QWERTY_KEYS(SCANTOMAK_CASE);
+		BROKEN_KEYS(SCANTOMAK_CASE);
 
 	case EStdKeyDevice3:	//Middle joystick button?
+#ifndef QWERTY_KEYS
 	case EStdKeyLeftCtrl: //emu only
 	case EStdKeyRightCtrl:  //emu only
+#endif
 		makey = MAK_FIRE;
 		makb = MAKB_FIRE;
 		break;
+#ifndef QWERTY_KEYS
 	case EStdKeyRightShift:
 		makey = MAK_PEN;
 		break;
+#endif
 	default:
 		LOG("Unknown scancode: %i\n", scancode);
 		makey = MAK_UNKNOWN;
@@ -576,7 +650,7 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 		iKeys |= makb;
 	else
 		iKeys &= ~makb;
-			
+
 	if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
 		MAEvent event;
 		event.type = down ? EVENT_TYPE_KEY_PRESSED : EVENT_TYPE_KEY_RELEASED;
@@ -627,4 +701,18 @@ bool CAppView::HasEvent() {
 
 int CAppView::GetKeys() {
 	return iKeys;
+}
+
+int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
+	if(iEngine->IsDrawing())
+		iEngine->StopDrawing();
+	outText.Copy(inText);
+	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(outText);
+	CleanupStack::PushL(dlg);
+	dlg->SetPromptL(title);
+	dlg->SetPredictiveTextInputPermitted(true);
+	dlg->SetMaxLength(outText.MaxLength());
+	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
+	CleanupStack::Pop(dlg);
+	return answer ? 1 : 0;
 }

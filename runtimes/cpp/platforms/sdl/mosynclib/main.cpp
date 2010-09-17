@@ -19,23 +19,27 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <crtdbg.h>
 #endif
 
-#include <SDL/SDL.h>
-
 #include "../config_platform.h"
 
 #include <helpers/helpers.h>
+#include <helpers/attribute.h>
 #include <helpers/log.h>
-#include "../../../base/syscall.h"
+#include "../../../base/Syscall.h"
 #include "../../../base/FileStream.h"
 #include "../fastevents.h"
 #include "../sdl_syscall.h"
-
+#include "../report.h"
 #include "Skinning/SkinManager.h"
 #include "Skinning/GenericSkin.h"
 
+#ifdef _MSC_VER
 extern "C" int MAMain();
-
 int main(int argc, char** argv) {
+#else
+#include "mosynclibmain.h"
+extern "C" int mosyncLibMain(int argc, char** argv, mainfunc MAMain) {
+#endif
+
 #ifdef _MSC_VER
 	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_CHECK_ALWAYS_DF);
 #endif
@@ -55,8 +59,10 @@ int main(int argc, char** argv) {
 	settings.profile.mVendor = "default";
 	settings.profile.mModel = "default";
 	settings.haveSkin = true;
-
 	settings.iconPath = NULL;
+#ifdef EMULATOR
+	settings.timeout = 0;
+#endif
 
 	for(int i = 1; i < argc; i++) {
 		if(strcmp(argv[i], "-resource")==0) {
@@ -125,14 +131,24 @@ void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 int Base::Syscall::ValidatedStrLen(const char* ptr) {
 	return strlen(ptr);
 }
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);	
+}
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)address;
+}
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return (const wchar*)address;
 }
 
 void Base::Syscall::VM_Yield() {
 }
 
+#ifdef _MSC_VER
 SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
+#else
+extern "C" void GCCATTRIB(noreturn) maLoadProgram(MAHandle data, int reload) {
+#endif
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 }
 
@@ -143,6 +159,7 @@ void reportIp(int r, const char* message) {
 }
 
 void Base::reloadProgram() {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 }
 
 int Base::getRuntimeIp() {

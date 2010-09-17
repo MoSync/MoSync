@@ -16,15 +16,15 @@
 [0x101F7961], 0, 0, 0, {"S60ProductID"};
 
 ;Requires the MoSync Server, v1.2.0
-@"%pkg-runtime-dir%\MoSyncServer.sis",(0x20022A9D)
+@"%pkg-runtime-dir%/MoSyncServer.sis",(0x20022A9D)
 (0x20022A9D), 1, 2, 0, {"MoSync Server"}
 
 ;Files to install
-"%pkg-package-output-dir%\%uid%.exe" -"!:\sys\bin\%uid%.exe"
+"%pkg-package-output-dir%/%uid%.exe" -"!:\sys\bin\%uid%.exe"
 "%pkg-programcomb-output%" -"!:\resource\apps\%uid%.comb"
-"%pkg-package-output-dir%\%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
-%has-icon%"%pkg-package-output-dir%\%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
-"%pkg-package-output-dir%\%uid%_reg.RSC" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
+"%pkg-package-output-dir%/%uid%.rsc" -"!:\resource\apps\%uid%.rsc"
+%has-icon%"%pkg-package-output-dir%/%uid%_icon.mif" -"!:\resource\apps\%uid%_icon.mif"
+"%pkg-package-output-dir%/%uid%_reg.rsc" -"!:\private\10003a3f\import\apps\%uid%_reg.rsc"
 
 ;required for application to be covered by backup/restore facility
 ;"backup_registration.xml" -"!:\private\%uid%\backup_registration.xml"

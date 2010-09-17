@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 Mobile Sorcery AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -27,7 +27,9 @@ import android.graphics.*;
 import android.os.Handler;
 import android.os.Process;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.app.AlertDialog;
+import android.os.Looper;
 import android.content.DialogInterface;
 
 import android.view.SurfaceView;
@@ -49,9 +51,28 @@ import java.util.TimerTask;
 
 import java.nio.ByteBuffer;
 
+import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.BaseInputConnection;
+import android.text.InputType;
+import android.view.View;
+import android.view.KeyCharacterMap;
+
 public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 {
+	class CustomInputConnection extends BaseInputConnection {
 
+		public CustomInputConnection(View targetView, boolean fullEditor) {
+			super(targetView, fullEditor);
+			// TODO Auto-generated constructor stub
+		}
+
+		public boolean performEditorAction (int actionCode) {
+			Log.i("performEditorAction", "Pressed enter key");
+			return true;
+		}
+
+	}
 	class MoSyncThread extends Thread
 	{
 		private Context mContext;
@@ -121,6 +142,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 #endif
 				} catch(Throwable e) {
 					Log.i("MoSync Thread","Thread crashed! " + e.toString());
+					e.printStackTrace();
 					break;
 				}
 			}
@@ -209,6 +231,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 						retry = false;
 					} catch (InterruptedException e) {
 						Log.i("MoSync View", "stopThread InteruptedException:" + e.toString() + "/n");
+						e.printStackTrace();
 					}
 				}
 			}
@@ -281,15 +304,22 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			stopThread();
 		}
 	}
-
-	private final int convertToMoSyncKeyCode(int keyCode) {
+	
+	private final int convertToMoSyncKeyCode(int keyCode, KeyEvent keyEvent) {
 #define CONVERT_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_##k) return MAK_##k;
 #define CONVERT_DPAD_KEYCODE(k) if(keyCode == KeyEvent.KEYCODE_DPAD_##k) return MAK_##k;
 #define CONVERT_SPECIAL(kIn, kOut) if(keyCode == KeyEvent.KEYCODE_##kIn) return MAK_##kOut;
-		DEVICE_KEYS(CONVERT_KEYCODE);
+		//DEVICE_KEYS(CONVERT_KEYCODE);
 		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODE);
 		DEVICE_SPECIAL(CONVERT_SPECIAL);
-		return 0;
+		
+		/*-------------------------------------*/
+		/* Support for native virtual keyboard */
+		/*-------------------------------------*/
+		if(keyCode == KeyEvent.KEYCODE_DEL) { return MAK_CLEAR;}
+		KeyCharacterMap keyCharacterMap = KeyCharacterMap.load(keyEvent.getDeviceId());
+		return keyCharacterMap.get(keyCode, keyEvent.getMetaState());
+
 	}
 	
 		private final int convertToMoSyncKeyByteCode(int keyCode) {
@@ -299,13 +329,16 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		DEVICE_KEYS(CONVERT_KEYCODEB);
 		DEVICE_DPAD_KEYS(CONVERT_DPAD_KEYCODEB);
 		DEVICE_SPECIAL(CONVERT_SPECIALB);
+		
+
+		
 		return 0;
 	}
 	
 	public boolean onKeyUp(int keyCode, KeyEvent keyEvent)
 	{
 		Log.i("MoSyncView", "key up event :" + keyEvent.toString() + "/n");
-		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
+		int convertedKeyCode = convertToMoSyncKeyCode(keyCode, keyEvent);
 		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
 		
 		int[] event = new int[2];
@@ -321,7 +354,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
 	{
 		Log.i("MoSyncView", "key down event :" + keyEvent.toString() + "/n");
-		int convertedKeyCode = convertToMoSyncKeyCode(keyCode);
+		int convertedKeyCode = convertToMoSyncKeyCode(keyCode, keyEvent);
 		Log.i("MoSyncView", "android key :" + keyCode + " - MoSync key :" + convertedKeyCode + "/n");
 			
 		int[] event = new int[2];
@@ -332,6 +365,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		postEvent(event);
 		
 		return true;
+	}
+	
+	public InputConnection onCreateInputConnection (EditorInfo outAttrs) {
+		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
+		CustomInputConnection ic = new CustomInputConnection(this, mEventOverflow);
+		return ic;
 	}
 	
 	public int getKeys() {

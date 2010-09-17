@@ -1,0 +1,39 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+/*
+ * Trcomp_neg.rss
+ *     Define resources with invalid surrogate pair
+ *     RComp should warn about it but not fail.
+ *
+ *  Created on: 2009-4-20
+ *      Author: chengdonglu
+ *      
+ *  This resource file has error.
+ *  The content of buf is illegal UTF-8. 
+ *  But rcomp will not fail the compiling and it is included
+ *  in .mmp file and the project still can be build with warning.
+ */
+
+CHARACTER_SET UTF8
+
+#include <eikon.rh>
+#include <eikcore.rsg>
+#include <appinfo.rh>
+
+RESOURCE TBUF r_trcomp_text_neg1 { buf="� "; }
+RESOURCE TBUF r_trcomp_text_neg2 { buf="�   "; }
+

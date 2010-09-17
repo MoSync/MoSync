@@ -30,6 +30,8 @@ struct ParseNode {
 
 	int getIntAttr(const std::string& name, bool force=true) const;
 
+	void getNodesFromIdList(const std::string& name, std::vector<const Base*>& output, bool force=true) const;
+
 	std::string name;
 	std::map<std::string, std::string> attributes;
 	std::vector<const ParseNode*> children;

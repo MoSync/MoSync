@@ -466,8 +466,8 @@ namespace Base {
 		CGImageRef smallImage = CGImageCreateWithImageInRect(img->image, smallRect);
 
 		// First get the image into your data buffer
-		int imgwidth = CGImageGetWidth(img->image);
-		int imgheight = CGImageGetHeight(img->image);
+		//int imgwidth = CGImageGetWidth(img->image);
+		//int imgheight = CGImageGetHeight(img->image);
 		memset(dst, 0, scanlength*height*4);
 		
 		Surface *srcSurface = new Surface(smallImage);
@@ -845,28 +845,41 @@ namespace Base {
 	{
 		switch(function) {
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return Base::maCheckInterfaceVersion(a);
-
 		case maIOCtl_maWriteLog:
 			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
 			return 0;
 		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));				
+			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
 		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();		
+			return maGetBatteryCharge();
 
 		case maIOCtl_maLocationStart:
 			return maLocationStart();
 		case maIOCtl_maLocationStop:
-			return maLocationStop();				
+			return maLocationStop();
 			
 		case maIOCtl_maFrameBufferGetInfo:
 			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
 		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
+			return maFrameBufferInit(GVMRA(void*));
 		case maIOCtl_maFrameBufferClose:
 			return maFrameBufferClose();
+				
+		maIOCtl_syscall_case(maFileOpen);
+			
+		maIOCtl_syscall_case(maFileWriteFromData);
+		maIOCtl_syscall_case(maFileReadToData);
+				
+		maIOCtl_syscall_case(maFileTell);
+		maIOCtl_syscall_case(maFileSeek);
+		maIOCtl_syscall_case(maFileRead);
+		maIOCtl_syscall_case(maFileWrite);				
+			
+		maIOCtl_syscall_case(maFileExists);
+		maIOCtl_syscall_case(maFileClose);
+		maIOCtl_syscall_case(maFileCreate);
+		maIOCtl_syscall_case(maFileDelete);
+		maIOCtl_syscall_case(maFileSize);				
 				
 		}
 		
@@ -912,7 +925,7 @@ void MoSyncErrorExit(int errorCode)
 {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
-	char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
+	//char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
 #if 0
 	if(gCore) {
 #ifdef PUBLIC_DEBUG

@@ -27,10 +27,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 static MoSyncSemaphore sPause;
+static bool run = true;
 
 int SDLCALL userInputThreadFunc(void* arg) {
 	istream* input = (istream*)arg;
-	while(1) {
+	while(run) {
 		DebuggerEvent* de = new DebuggerEvent;
 		de->type = DebuggerEvent::eUserInput;
 		getline(*input, de->str);
@@ -53,8 +54,14 @@ int SDLCALL userInputThreadFunc(void* arg) {
 		putEvent(de);
 		sPause.wait();
 	}
+	return 0;
 }
 
 void resumeUserInput() {
+	sPause.post();
+}
+
+void stopUserThread() {
+	run = false;
 	sPause.post();
 }

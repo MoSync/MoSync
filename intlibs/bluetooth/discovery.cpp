@@ -270,7 +270,7 @@ static void doSearch2() {
 
 		std::vector<BtService> services;
 		res = handleSdpResponse(&services, pQs);
-		if(res < 0)	{
+		if(res < 0) {
 			{
 				CriticalSectionHandler csh(&gBt.critSec);
 				setDiscoveryState(res);
@@ -352,7 +352,7 @@ static void doDiscovery2() {
 		DEBUG_ASSERT(pQs->dwNumberOfCsAddrs == 1);
 		//some results have empty names
 		//bHaveName = pwsaResults->lpszServiceInstanceName && *(pwsaResults->lpszServiceInstanceName);
-		if((pQs->lpszServiceInstanceName) == 0) {
+		if(pQs->lpszServiceInstanceName == NULL) {
 #ifdef _WIN32_WCE 
 			pQs->lpszServiceInstanceName = (LPWSTR)TEXT("");
 #else
@@ -575,6 +575,10 @@ int Bluetooth::maBtGetNextServiceSize(MABtServiceSize* dst) {
 #elif defined( BLUEZ_SUPPORTED )
 
     // Code is in linux/bluez/interface.cpp
+
+#elif defined( COCOA_SUPPORTED )
+
+// Code is in darwin/interface.mm
 
 #else
 int Bluetooth::maBtDiscoveryState() {

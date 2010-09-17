@@ -54,6 +54,8 @@ final public class Core {
 */
 	STATIC int mMem_ds[];
 	STATIC int mMEM_DS_SIZE;
+	int STACK_BOTTOM;
+	int STACK_TOP;
 
 	Syscall mSyscall;
 
@@ -162,6 +164,18 @@ final public class Core {
 			((((int)s) & (0xffff)) << shift);
 	}
 #endif	//DEBUG_MEMORY
+
+	int GetValidatedStackValue(int offset) {
+		int address = mRegs[REG_sp] + offset;
+		if(((address & 0x03) != 0) || (address) < STACK_BOTTOM || (address) > STACK_TOP) {
+#ifdef DEBUG_MEMORY
+			DEBUG_ALWAYS_IP("ERROR: stack access error (0x"+Integer.toHexString(address)+")");
+#endif	//DEBUG_MEMORY
+			BIG_PHAT_ERROR;
+		}
+		address >>= 2;
+		return mMem_ds[address];
+	}
 
 	//***************************************************************************
 	// Static
@@ -433,6 +447,9 @@ final public class Core {
 		regs[REG_i2] = Head_HeapSize;
 		DDUMP(Head_EntryPoint);
 		mIP = Head_EntryPoint;
+
+		STACK_TOP = regs[REG_sp];
+		STACK_BOTTOM = STACK_TOP-Head_StackSize;
 	}
 
 	final void InitVM()
@@ -442,29 +459,14 @@ final public class Core {
 	{
 		mVM_Yield = false;
 
-		//unneccesary in Java; arrays are zeroed by default
-		/*PMemZero(mem_cs, sizeof(mem_cs));
-		PMemZero(mem_ds, sizeof(mem_ds));
-		PMemZero(mem_cp, sizeof(mem_cp));*/
-
-/*#ifdef _android
-
-		mRegsByteBuffer = ByteBuffer.allocateDirect(NREGS);
-
-
-		int[] regs = mRegs = new int[NREGS];
-		IntBuffer bTemp = IntBuffer.wrap(mRegs);
-		mRegsByteBuffer.put((Buffer)bTemp);
-#else*/
-		int[] regs = mRegs = new int[NREGS];
-//#endif
+		mRegs = new int[NREGS];
 
 		GenConstTable();
 
 #ifdef _DEBUG
 		DEBUG("Regs:\n");
 		for(int i=0; i<NREGS; i++) {
-			DEBUG(""+i+": 0x"+Integer.toHexString(regs[i])+"("+regs[i]+")\n");
+			DEBUG(""+i+": 0x"+Integer.toHexString(mRegs[i])+"("+mRegs[i]+")\n");
 		}
 		DEBUG("\n");
 #endif
@@ -591,6 +593,7 @@ final public class Core {
 #include "syscall_converters.h"
 
 #ifndef MA_PROF_SUPPORT_CLDC_10
+#if 0	//unused
 	double ints2double(int hiw, int low) {
 		//DEBUG_SC("("+hiw+","+low+")->");
 		//DEBUG_SC("("+UINT(low)+")");
@@ -599,6 +602,7 @@ final public class Core {
 		debug_double(l, d);
 		return d;
 	}
+#endif
 #endif
 
 	final void InvokeSysCall(int type) throws Exception {

@@ -39,6 +39,7 @@ void ConnectionListener::connReadFinished(Connection* conn, int result) {
 Connection::Connection(ConnectionListener* listener, MAHandle conn)
 : mConn(conn), mListener(listener), mRemain(0)
 {
+	ASSERT_MSG(listener != NULL, "NULL listener");
 	if(mConn)
 		Environment::getEnvironment().setConnListener(mConn, this);
 }

@@ -126,7 +126,13 @@ bool DelayedType::resolveAll() {
 		DelayedType* d(sDelayed[i]);
 		const TypeBase* tb = d->resolve(); //((TypeReference*)d->mType)->resolve();
 		if(tb != NULL) {
-			FAILIF(d == tb);
+			if(d == tb) {
+				TypeReference* tr = (TypeReference*)d->mType;
+				StringPrintFunctor pp;
+				tr->printTypeMI(pp, true);
+				LOG("Could not resolve type: %s\n", pp.getString());
+			}
+			//FAILIF(d == tb);
 			d->mType = tb;
 		}
 		d->release();	//in preparation for the clear().
@@ -147,10 +153,17 @@ TupleReference::TupleReference(Tuple id) : mId(id), mFile(gCurrentFile) {
 const TypeBase* TupleReference::resolve() const {
 	return findTypeByTupleAndFile(mId, mFile);
 }
+void TupleReference::printTypeMI(printfPtr pf, bool complex) const {
+	pf("file %i, (%i,%i)", mFile, mId.a, mId.b);
+}
+
 
 CrossReferenceType::CrossReferenceType(Tuple id, const char* name)
 : TupleReference(id), mName(name)
 {}
+void CrossReferenceType::printTypeMI(printfPtr pf, bool complex) const {
+	pf("xs%s", mName.c_str());
+}
 
 class UnknownType : public TypeBase {
 	int size() const {
@@ -192,6 +205,7 @@ void PointerType::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat 
 //	pf("0x%x", *(int*)data);
 	printPrimitiveByFormat<int>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
 }
+
 void PointerType::printTypeMI(printfPtr pf, bool complex) const {
 	if(mTarget->type() == eArray) {
 		ArrayType* arrayType = (ArrayType*)mTarget->resolve();
@@ -430,7 +444,14 @@ void EnumType::printTypeMI(printfPtr pf, bool complex) const {
 	pf("%s", mName.c_str());
 	if(complex) {
 		//todo: print members, specifying values for member that had values specified in source,
-		//name only for the other members.
+		//name only for the other members. 
+		// added by niklas, don't know if this is right though.
+		pf("{\n");
+		for(size_t i=0; i<mMembers.size(); i++) {
+			pf("%s = %d", mMembers[i].name.c_str(), mMembers[i].value);
+			pf((i!=mMembers.size()-1)?(",\n"):("\n"));
+		}
+		pf("}");
 	}
 }
 

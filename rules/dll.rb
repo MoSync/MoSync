@@ -37,7 +37,7 @@ class DllTask < NativeGccLinkTask
 			#puts "libflags: #{libflags}"
 		end
 		if(CONFIG == "")
-			libflags += " -s"
+			#libflags += " -s"
 			#puts "libflags: #{libflags}"
 		end
 		if(HOST == :win32)

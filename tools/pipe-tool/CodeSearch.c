@@ -98,7 +98,7 @@ void SearchDep_Function(SYMBOL *sym, int depth)
 #ifdef CD_DEBUG
 	CDPRINTF("\n");
 	CDTAB(depth);
-	CDPRINTF("call %s(0x%x,0x%x)\n", sym->Name, sym->Value, sym->EndIP);
+	CDPRINTF("enter %s(0x%x,0x%x)\n", sym->Name, sym->Value, sym->EndIP);
 	CDTAB(depth);
 	CDPRINTF("{\n");
 #endif
@@ -124,7 +124,7 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 	OpcodeInfo thisOpcode;
 	SYMBOL *thisSym;
 
-	int ip_next, v;
+	unsigned int ip_next, v;
 	
 	// Fetch the current opcode, but don't advance ip yet !!
 
@@ -133,6 +133,18 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 	{
 		ip_next = DecodeOpcodeIP(&thisOpcode, ip);
 
+		if (ip_next > 0x80000000)
+			ErrorOnIP(Error_Fatal, ip, "SearchDep_Function_Inner: ip_next > 0x80000000 (Contact MoSync)");
+
+#ifdef CD_DEBUG
+		{
+			char buf[2560];
+			buf[0] = 0;
+			DisassembleFromSource(ip, buf);
+			CDTAB(depth);
+			CDPRINTF("%s\n", buf);
+		}
+#endif
 		if (ip > ip_end)
 			return ip;
 

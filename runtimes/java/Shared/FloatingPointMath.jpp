@@ -63,10 +63,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		tempRealA.neg();
 		return tempRealA.toDoubleBits();
 	}
-	
+
 	SYSCALL(int) __fixdfsi(long al) {
 		tempRealA.assignDoubleBits(al);	
 		return tempRealA.toInteger();
+	}
+
+	SYSCALL(int) __fixunsdfsi(long al) {
+		tempRealA.assignDoubleBits(al);	
+		long l = tempRealA.toLong();
+		if(l < 0)
+			return 0;
+		else
+			return (int)l;
 	}
 
 	SYSCALL(long) STATIC_SYSCALL(__floatsidf)(int af) {
@@ -82,7 +91,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		else return 1;
 	}
 
-	SYSCALL(long) STATIC_SYSCALL(f2d)(int fi) {
+	SYSCALL(long) STATIC_SYSCALL(__extendsfdf2)(int fi) {
 		tempRealA.assignFloatBits(fi);	
 		return tempRealA.toDoubleBits();
 	}
@@ -147,7 +156,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		double a = LTD(al);	
 		return (int)a;
 	}
-	
+
+	SYSCALL(int) __fixunsdfsi(long al) {
+		double a = LTD(al);	
+		long l = (long)a;
+		if(l < 0)
+			return 0;
+		else
+			return (int)l;
+	}
+
 	SYSCALL(long) STATIC_SYSCALL(__floatsidf)(int a) {
 		return DTL((double)a);
 	}
@@ -163,7 +181,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 			return -1;
 	}
 
-	SYSCALL(long) STATIC_SYSCALL(f2d)(int fi) {
+	SYSCALL(long) STATIC_SYSCALL(__extendsfdf2)(int fi) {
 		float f = ITF(fi);
 		return DTL((double)f);
 	}
@@ -232,6 +250,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		return tempRealA.toInteger();
 	}
 
+	SYSCALL(int) __fixunssfsi(int al) {
+		tempRealA.assignFloatBits(al);	
+		long l = tempRealA.toLong();
+		if(l < 0)
+			return 0;
+		else
+			return (int)l;
+	}
+
 	SYSCALL(int) __floatsisf(int af) {
 		tempRealA.assign(af);		
 		return tempRealA.toFloatBits();
@@ -245,7 +272,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		else return 1;
 	}	
 
-	SYSCALL(int) d2f(long fi) {
+	SYSCALL(int) __truncdfsf2(long fi) {
 		tempRealA.assignDoubleBits(fi);
 		return tempRealA.toFloatBits();
 	}
@@ -286,12 +313,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		float a = ITF(al);	
 		return (int)a;
 	}
-	
+
+	SYSCALL(int) __fixunssfsi(int al) {
+		float a = ITF(al);	
+		long l = (long)a;
+		if(l < 0)
+			return 0;
+		else
+			return (int)l;
+	}
+
 	SYSCALL(int) __floatsisf(int a) {
 		return FTI((float)a);
 	}
 
-	SYSCALL(int) d2f(long fi) {
+	SYSCALL(int) __truncdfsf2(long fi) {
 		double f = LTD(fi);
 		return FTI((float)f);
 	}

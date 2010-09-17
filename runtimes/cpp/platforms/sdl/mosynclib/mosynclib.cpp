@@ -112,6 +112,9 @@ void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 int Base::Syscall::ValidatedStrLen(const char* ptr) {
 	return strlen(ptr);
 }
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);	
+}
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)address;
 }

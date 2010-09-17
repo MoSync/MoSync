@@ -63,6 +63,8 @@ namespace Base {
 		char* open(int size);
 #ifndef _android
 		MemStream(char* buf, int size);
+#else
+		bool externalAllocated;
 #endif
 		char* mBuffer;
 	};

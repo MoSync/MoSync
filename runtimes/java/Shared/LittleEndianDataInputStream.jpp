@@ -122,6 +122,7 @@ final class LittleEndianDataInputStream extends InputStream {
 		}
 		return res;
 	}
+#ifndef PHONE_RELEASE	//unused otherwise
 	public final int readVarSignedInt() throws IOException {
 		int res = 0, nBytes=0;
 		int b = readUnsignedByte();
@@ -142,4 +143,5 @@ final class LittleEndianDataInputStream extends InputStream {
 			res = -res;
 		return res;
 	}
+#endif
 }

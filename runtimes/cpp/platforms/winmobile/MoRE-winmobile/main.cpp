@@ -75,6 +75,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLin
 		}
 	}
 
+	LOG("WinMain return 0\n");
 	return 0;
 }
 

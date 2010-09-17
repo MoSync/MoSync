@@ -537,6 +537,19 @@ namespace MoRE {
 		mPressedKey = 0;
 	}
 
+	int GenericSkin::getScreenWidth() const {
+		return mProfile->mScreenWidth;
+	}
+	int GenericSkin::getScreenHeight() const {
+		return mProfile->mScreenHeight;
+	}
+	int GenericSkin::getScreenLeft() const {
+		return 24;
+	}
+	int GenericSkin::getScreenTop() const {
+		return 24;
+	}
+
 	void GenericSkin::keyPressed(int mak) {
 		for(size_t i = 0; i < keyRects.size(); i++) {
 			if(keyRects[i].keyCode == mak) {

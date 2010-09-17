@@ -33,6 +33,7 @@ namespace MAUtil {
 	}
 	void KeyListener::keyPressEvent(int keyCode, int nativeCode) {}
 	void KeyListener::keyReleaseEvent(int keyCode, int nativeCode) {}
+	void KeyListener::charEvent(uint character) {}
 
 	Environment::TimerEventInstance::TimerEventInstance(TimerListener* tl, int aPeriod, int aNumTimes) 
 		: e(tl), period(aPeriod), numTimes(aNumTimes)
@@ -40,7 +41,6 @@ namespace MAUtil {
 		addTime = maGetMilliSecondCount();
 		nextInvoke = addTime + period;
 	}
-
 
 	Environment* Environment::sEnvironment = NULL;
 
@@ -111,38 +111,34 @@ namespace MAUtil {
 		return mPointerListeners.contains(pl);
 	}
 
-	// There can be only one. If not, panic comes.
+	// There can be only one listener.
 	void Environment::setBluetoothListener(BluetoothListener* btl) {
 		//MAASSERT(sEnvironment == this);
-		//this test should be removed in release verions
-		if(mBtListener && btl)
-			PANIC_MESSAGE("Only one Bluetooth listener can be set at any time. "
-			"The application was attempting to register two.");
 		mBtListener = btl;
 	}
 	// equivalent to setBluetoothListener(NULL)
 	void Environment::removeBluetoothListener() {
 		//MAASSERT(sEnvironment == this);
-		//this test should be removed in release verions
-		if(!mBtListener)
-			PANIC_MESSAGE("The application tried to unregister a Bluetooth listener "
-			"when none was registered.");
 		mBtListener = NULL;
 	}
 
 	// Only one listener per connection is allowed, but the same ConnectionListener
 	// can be used for several connections.
 	void Environment::setConnListener(MAHandle conn, ConnListener* cl) {
-		//MAASSERT(sEnvironment == this);
-		ListenerSet_each(ConnListener, itr, mConnListeners) {
-			if(itr->_mConn == conn) {
-				PANIC_MESSAGE("The application tried to set a connection listener for a "
-					"connection that already had a listener");
-			}
+		if (NULL == cl) {
+			PANIC_MESSAGE("Environment::setConnListener: The listener must not be NULL");
 		}
+		
+		//MAASSERT(sEnvironment == this);
+		
+		// First remove the existing listener, if any.
+		removeConnListener(conn);
+		
+		// Set the listener for the connection.
 		cl->_mConn = conn;
 		mConnListeners.add(cl);
 	}
+	
 	void Environment::removeConnListener(MAHandle conn) {
 		ListenerSet_each(ConnListener, itr, mConnListeners) {
 			if(itr->_mConn == conn) {
@@ -153,18 +149,20 @@ namespace MAUtil {
 
 	void Environment::addCloseListener(CloseListener* cl) {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners)
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			if(*i == cl) return;
+		}
 		mCloseListeners.add(cl);
 	}
 
 	void Environment::removeCloseListener(CloseListener* cl) {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners) 
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			if(*i == cl) {
 				mCloseListeners.remove(i);
 				return;
 			}
+		}
 	}
 
 	void Environment::addIdleListener(IdleListener* il) {
@@ -204,16 +202,18 @@ namespace MAUtil {
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
-		ListenerSet_each(FocusListener, i, mFocusListeners) 
+		ListenerSet_each(FocusListener, i, mFocusListeners) {
 			i->focusGained();
+		}
 		mFocusListeners.setRunning(false);
 	}
 
 	void Environment::fireFocusLostEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
-		ListenerSet_each(FocusListener, i, mFocusListeners)
+		ListenerSet_each(FocusListener, i, mFocusListeners) {
 			i->focusLost();
+		}
 		mFocusListeners.setRunning(false);
 	}
 
@@ -238,27 +238,38 @@ namespace MAUtil {
 		mKeyListeners.setRunning(false);
 	}
 
+	void Environment::fireCharEvent(uint character) {
+		mKeyListeners.setRunning(true);
+		ListenerSet_each(KeyListener, i, mKeyListeners) {
+			i->charEvent(character);
+		}
+		mKeyListeners.setRunning(false);
+	}
+
 	void Environment::firePointerPressEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerPressEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
 	void Environment::firePointerMoveEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerMoveEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
 	void Environment::firePointerReleaseEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerReleaseEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
@@ -281,8 +292,9 @@ namespace MAUtil {
 
 	void Environment::fireCloseEvent() {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners) 
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			(*i)->closeEvent();
+		}
 	}
 
 	void Environment::runIdleListeners() {
@@ -294,5 +306,4 @@ namespace MAUtil {
 		}
 		mIdleListeners.setRunning(false);
 	}
-
 }

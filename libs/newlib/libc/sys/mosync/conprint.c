@@ -73,7 +73,7 @@ int gConsoleDisplay = 1;
 static void FeedLine(void)
 {
 	if (gConsoleLogging)
-		wlprintfln(L"PrintConsole: %S\n", sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
+		wlprintfln(L"MoCon: %S\n", sConsole.lines[(sConsole.cursorPos.y + sConsole.firstLine) %
 			sConsole.height].line);
 
 	sConsole.cursorPos.y++;
@@ -212,7 +212,7 @@ void WriteConsole(const char* str, int len)
 	{
 		int res = maFileWrite(gConsoleFile, str, strlen(str));
 		if(res < 0) {
-			maPanic(res, "PrintConsole maFileWrite");
+			maPanic(res, "WriteConsole maFileWrite");
 		}
 	}
 
@@ -233,9 +233,11 @@ void WriteConsole(const char* str, int len)
 		}
 		else if (str[pos] == '\n')
 		{
+#if 0
 			if (pos + 1 == len)
 				sConsole.postponedLineFeed = 1;
 			else
+#endif
 				FeedLine();
 			pos++;
 		}

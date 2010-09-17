@@ -52,6 +52,9 @@ int atoi(const char* string);
 */
 long atol(const char* string);
 
+/**
+ * \brief Type that contains the quotient and reminder of a divison.
+ */
 typedef struct div_t {
 	int quot, rem;
 } div_t;
@@ -141,6 +144,11 @@ void srand(unsigned int seed);
 * Returns the absolute value of \a x.
 */
 int abs(int x);
+
+/**
+* Places \a n zero-valued bytes in the area pointed to by \a s.
+*/
+void bzero(void* s, size_t n);
 
 #ifdef __cplusplus
 }	//extern "C"

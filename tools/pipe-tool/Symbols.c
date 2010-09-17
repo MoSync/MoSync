@@ -1635,11 +1635,11 @@ void DumpMetaData ( FILE *out )
 	int		n;
 	static char *returnType[RET_double+1];
 
-	returnType[RET_null]  = "[]";
-	returnType[RET_void]  = "[]";
-	returnType[RET_int]   = "[r14]";
-	returnType[RET_float] = "[r14]";
-	returnType[RET_double]= "[r14,r15]";
+	returnType[RET_null]  = "0"; //"[]";
+	returnType[RET_void]  = "0"; //"[]";
+	returnType[RET_int]   = "1"; //"[r14]";
+	returnType[RET_float] = "1"; //"[r14]";
+	returnType[RET_double]= "2"; //"[r14,r15]";
 
 	fprintf(out, "Meta\n");
 
@@ -1654,8 +1654,8 @@ void DumpMetaData ( FILE *out )
 			fprintf(out, "F<%s,",Sym->Name);
 			fprintf(out, "%s,",Hex32(Sym->Value));
 			fprintf(out, "%s,",Hex32(Sym->EndIP));
-			fprintf(out, "%s",returnType[(int)(Sym->RetType)]);
-
+			fprintf(out, "%d,", Sym->Params > 4 ? 4 : Sym->Params );
+			fprintf(out, "%s", returnType[(int)(Sym->RetType)]);
 			fprintf(out, ">\n");
 
 			if(Sym->Value > Sym->EndIP || Sym->Value <= lastVal) {
@@ -1665,6 +1665,7 @@ void DumpMetaData ( FILE *out )
 			lastVal = Sym->Value;
 			lastEnd = Sym->EndIP;
 		}
+		/*
 		else if (((Sym->LabelType == label_Local))
 			&& (Sym->Section == section_Enum) && (Sym->Type == SECT_code))
 		{
@@ -1677,6 +1678,15 @@ void DumpMetaData ( FILE *out )
 					fprintf(out, ">\n");
 				}
 			}
+		}
+		*/
+		else if ((Sym->Section == section_SysCall))
+		{
+			fprintf(out, "S<%s,", Sym->Name);
+			fprintf(out, "%s,", Hex32(Sym->Value));			
+			fprintf(out, "%d,", Sym->Params > 4 ? 4 : Sym->Params );
+			fprintf(out, "%s", returnType[(int)(Sym->RetType)]);
+			fprintf(out, ">\n");
 		}
 
 

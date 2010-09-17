@@ -19,60 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
+#include <MAUtil/FileLister.h>
 #include <IX_FILE.h>
-
-/**
-* This object encapsulates a file list handle.
-* It can be reused for multiple listings.
-* \see maFileListStart()
-*/
-class FileLister {
-public:
-	FileLister() : mList(-1) {}
-	~FileLister() { close(); }
-
-	/**
-	* \see maFileListStart()
-	* Closes the active list, if any.
-	*/
-	int start(const char* dir, const char* filter = "*");
-
-	/**
-	* Writes the name of the next file in the list to \a dst.
-	* \a dst's old contents are overwritten.
-	* Returns the length of the name, 0 if there are no more files, or \< 0 on error.
-	* On error, \a dst is not modified.
-	*/
-	int next(MAUtil::String& dst);
-
-	/** \see maFileListClose() */
-	void close();
-private:
-	MAHandle mList;
-};
-
-int FileLister::start(const char* dir, const char* filter) {
-	close();
-	return mList = maFileListStart(dir, filter);
-}
-
-int FileLister::next(MAUtil::String& dst) {
-	int len = maFileListNext(mList, NULL, 0);
-	if(len <= 0)
-		return len;
-	dst.resize(len);
-	len = maFileListNext(mList, dst.pointer(), len+1);
-	MAASSERT(len > 0);
-	return len;
-}
-
-void FileLister::close() {
-	if(mList > 0) {
-		int res = maFileListClose(mList);
-		MAASSERT(res == 0);
-		mList = -1;
-	}
-}
 
 static bool tryToWrite(const MAUtil::String& dir);
 

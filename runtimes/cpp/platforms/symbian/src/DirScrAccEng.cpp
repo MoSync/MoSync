@@ -223,7 +223,7 @@ MAExtent CDirScrAccEng::GetTextSizeL(const TDesC& aText) {
 }
 void CDirScrAccEng::DrawTextL(const TDesC& aText, TPoint aPoint) {
 	aPoint.iY += gFontBaseline;
-	LOGG("DrawTextL(0x%06x)\n", gCurrentUnconvertedColor.Internal());
+	LOGG("DrawTextL(0x%06x)\n", gCurrentUnconvertedColor.Value());
 	iFBGc->SetPenColor(gCurrentUnconvertedColor | 0xff000000);
 	iFBGc->DrawText(aText, aPoint);
 }
@@ -432,9 +432,30 @@ void CDirScrAccEng::ClearScreen() {
 	iFBGc->CancelClippingRect();
 }
 
+void CDirScrAccEng::UpdateScreenSize() {
+	// If screen size has changed, resize the backbuffer.
+	TSize oldSize = iOffScreenBmp->SizeInPixels();
+	TSize newSize = iScreenDevice.SizeInPixels();
+	if(oldSize != newSize) {
+		LOG("Screen resize from %ix%i to %ix%i\n", oldSize.iWidth, oldSize.iHeight,
+			newSize.iWidth, newSize.iHeight);
+		iOffScreenBmp->Resize(newSize);
+		iOffScreenDevice->Resize(newSize);
+		iFBGc->Resized();
+		// probably a good idea to reset the clip rect, too.
+		iOffScreenClipRect = newSize;
+		if(iDrawSurface == iOffScreenBmp) {
+			iDrawWidth = newSize.iWidth;
+			SetClip(iOffScreenClipRect);
+		}
+	}
+}
+
 void CDirScrAccEng::StartDrawingL() {
 	LOGG("SD\n");
 	DEBUG_ASSERT(!iDrawing);
+	
+	UpdateScreenSize();
 
 	// Initialise DSA
 

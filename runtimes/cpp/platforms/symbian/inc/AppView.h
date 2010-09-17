@@ -25,10 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <base/FileStream.h>
 
-#include "AppUi.h"
-
-struct MAEVENT;
-
 class CAppUi;
 class CDocument;
 class CDirScrAccEng;
@@ -61,6 +57,7 @@ public:
 	void DoCloseEventL();
 	const Core::VMCore* GetCore() const { return iCore; }
 	Base::Syscall* GetSyscall() { return iSyscall; }
+	int TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints);
 
 	//CCoeControl
 public:
@@ -68,6 +65,7 @@ public:
 	void HandlePointerEventL(const TPointerEvent&);
 protected:
 	void FocusChanged(TDrawNow aDrawNow);
+	void HandleResourceChange(TInt aType);
 
 private:
 	CAppView(CAppUi& aAppUi);

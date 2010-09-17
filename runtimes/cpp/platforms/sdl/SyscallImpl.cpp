@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _WIN32_WINNT 0x500
 #include <windows.h>
 #include <shellapi.h>
+
+#include "resource.h"
 #endif
 
 #ifdef LINUX
@@ -89,6 +91,11 @@ extern "C" {
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
 
+#ifdef SUPPORT_OPENGL_ES
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <dgles-0.5/GLES/gl.h>
+#include "../../generated/gl.h.cpp"
+#endif
 
 namespace Base {
 
@@ -128,7 +135,7 @@ namespace Base {
 
 	static MoRE::DeviceSkin* sSkin = NULL;
 
-	static bool MALibInit(bool showScreen, bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile);
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS&);
 #ifdef USE_MALIBQUIT
 	static void MALibQuit();
 #endif
@@ -147,6 +154,13 @@ namespace Base {
 	static int maCameraStop();
 	static int maCameraSnapshot(int formatIndex, MAHandle placeholder);
 	static void cameraViewFinderUpdate();
+
+	static int maGetSystemProperty(const char* key, char* buf, int size);
+	
+#ifdef WIN32
+	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints);
+#endif
 
 //********************************************************************
 
@@ -179,8 +193,7 @@ namespace Base {
 #ifdef MOBILEAUTHOR
 		MAMoSyncInit();
 #else
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 #endif
 	}
@@ -202,8 +215,7 @@ namespace Base {
 #endif
 		screenWidth = width;
 		screenHeight = height;
-		bool res = MALibInit(gShowScreen, settings.haveSkin, settings.id,
-			settings.iconPath, &settings.profile);
+		bool res = MALibInit(settings);
 		DEBUG_ASSERT(res);
 	}
 
@@ -297,7 +309,15 @@ namespace Base {
 		}
 	};
 
-	static bool MALibInit(bool showScreen,  bool haveSkin, const char* id, const char *iconPath, const MoRE::DeviceProfile* profile) {
+
+#ifdef EMULATOR
+	static Uint32 GCCATTRIB(noreturn) SDLCALL TimeoutCallback(Uint32 interval, void*) {
+		LOG("TimeoutCallback %i\n", interval);
+		exit(2);
+	}
+#endif
+
+	static bool MALibInit(const Syscall::STARTUP_SETTINGS& settings) {
 		char *mosyncDir = getenv("MOSYNCDIR");
 		if(!mosyncDir) {
 			LOG("MOSYNCDIR could not be found");
@@ -326,7 +346,9 @@ namespace Base {
 
 		MANetworkInit(/*broadcom*/);
 
-		if(showScreen) {
+		SDL_EnableUNICODE(true);
+
+		if(settings.showScreen) {
 #ifndef MOBILEAUTHOR
 #ifdef __USE_SYSTEM_RESOLUTION__
 			const SDL_VideoInfo* pVid = SDL_GetVideoInfo();
@@ -337,10 +359,9 @@ namespace Base {
 			}
 #endif
 
-			if(haveSkin) {
-				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(profile);
+			if(settings.haveSkin) {
+				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(&settings.profile);
 				if(!sSkin) {
-					haveSkin = false;
 					TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
 				} else {
 					sSkin->setListener(new MoSyncSkinListener());
@@ -371,16 +392,16 @@ namespace Base {
 			}
 
 			char caption[1024];
-			if(id != NULL) {
-				int res = _snprintf(caption, 1024, "%s - MoSync", id);
+			if(settings.id != NULL) {
+				int res = _snprintf(caption, 1024, "%s - MoSync", settings.id);
 				DEBUG_ASSERT(res > 0 && res < 1024);
 			} else {
 				strcpy(caption, "MoSync");
 			}
 			SDL_WM_SetCaption(caption, NULL);
 
-			if(iconPath) {
-				SDL_Surface *surf = IMG_Load(iconPath);
+			if(settings.iconPath) {
+				SDL_Surface *surf = IMG_Load(settings.iconPath);
 				if(surf)
 					SDL_WM_SetIcon(surf, NULL);				
 			}
@@ -419,6 +440,12 @@ namespace Base {
 			strcat(destDir, "/bin/maspec.fon");
 			TEST_Z(gFont = TTF_OpenFont(destDir, 8));
 		}
+
+#ifdef EMULATOR
+		if(settings.timeout != 0) {
+			DEBUG_ASSERT(NULL != SDL_AddTimer(settings.timeout * 1000, TimeoutCallback, NULL));
+		}
+#endif
 
 		return true;
 	}
@@ -763,6 +790,16 @@ namespace Base {
 		MAHandleKeyEventMAK(mak, pressed, sdlk);
 	}
 
+	static void MAHandleCharEvent(uint unicode) {
+		LOGDT("MAHandleCharEvent 0x%x", unicode);
+		if(unicode == 0)
+			return;
+		MAEvent event;
+		event.type = EVENT_TYPE_CHAR;
+		event.character = unicode;
+		gEventFifo.put(event);
+	}
+
 	static Uint32 GCCATTRIB(noreturn) SDLCALL ExitCallback(Uint32 interval, void*) {
 		LOG("ExitCallback %i\n", interval);
 
@@ -874,6 +911,7 @@ namespace Base {
 					break;
 				}
 				MAHandleKeyEvent(event.key.keysym.sym, true);
+				MAHandleCharEvent(event.key.keysym.unicode);
 				break;
 			case SDL_KEYUP:
 				if(	event.key.keysym.sym == SDLK_PAGEUP||
@@ -1696,12 +1734,13 @@ namespace Base {
 	static void fillBufferCallback() {
 		MAEvent* ep = new MAEvent;
 		ep->type = EVENT_TYPE_AUDIOBUFFER_FILL;
+		ep->state = 1;
 		SDL_UserEvent event = { FE_ADD_EVENT, 0, ep, NULL };
 		FE_PushEvent((SDL_Event*)&event);
 	}
 
 
-	static int maAudioBufferInit(MAAudioBufferInfo *ainfo) {
+	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
 			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
@@ -1779,32 +1818,32 @@ namespace Base {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
-		switch(function) {
+#ifdef _MSC_VER
+	static double atanh(double x) {
+		double d = (1+x) / (1-x);
+		d = 0.5 * log(d);
+		return d;
+	}
+#endif
 
-		case maIOCtl_maCheckInterfaceVersion:
-			return maCheckInterfaceVersion(a);
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
+		switch(function) {
 
 #ifdef FAKE_CALL_STACK
 		case maIOCtl_maReportCallStack:
 			reportCallStack();
 			return 0;
-		case maIOCtl_maDumpCallStackEx:
-			return maDumpCallStackEx(SYSCALL_THIS->GetValidatedStr(a), b);
+
+			maIOCtl_case(maDumpCallStackEx);
 #endif
 
 #ifdef MEMORY_PROTECTION
 		case maIOCtl_maProtectMemory:
-			{
-				SYSCALL_THIS->protectMemory(a, b);
-			}
+			SYSCALL_THIS->protectMemory(a, b);
 			return 0;
 		case maIOCtl_maUnprotectMemory:
-			{
-				SYSCALL_THIS->unprotectMemory(a, b);
-			}
+			SYSCALL_THIS->unprotectMemory(a, b);
 			return 0;
-
 		case maIOCtl_maSetMemoryProtection:
 			SYSCALL_THIS->setMemoryProtection(a);
 			return 0;
@@ -1823,42 +1862,132 @@ namespace Base {
 			}
 			return 0;
 #endif	//LOGGING_ENABLED
-		case maIOCtl_sinh:
-			{
-				double& d = *GVMRA(double);
-				d = ::sinh(d);
-				return 0;
-			}
-		case maIOCtl_cosh:
-			{
-				double& d = *GVMRA(double);
-				d = ::cosh(d);
-				return 0;
-			}
-		case maIOCtl_atanh:
-			{
-				double& d = *GVMRA(double);
-				d = (1+d) / (1-d);
-				d = 0.5 * log(d);
-				return 0;
-			}
 
-		case maIOCtl_maAccept:
-			maAccept(a);
-			return 1;
+#ifdef SUPPORT_OPENGL_ES
+maIOCtl_glAlphaFuncx_case(glAlphaFuncx);
+maIOCtl_glFrontFace_case(glFrontFace);
+maIOCtl_glLoadIdentity_case(glLoadIdentity);
+maIOCtl_glTexImage2D_case(glTexImage2D);
+maIOCtl_glGenTextures_case(glGenTextures);
+maIOCtl_glLogicOp_case(glLogicOp);
+maIOCtl_glTexEnvf_case(glTexEnvf);
+maIOCtl_glTexEnvx_case(glTexEnvx);
+maIOCtl_glFlush_case(glFlush);
+maIOCtl_glStencilOp_case(glStencilOp);
+maIOCtl_glTexEnvxv_case(glTexEnvxv);
+maIOCtl_glPixelStorei_case(glPixelStorei);
+maIOCtl_glFogxv_case(glFogxv);
+maIOCtl_glCullFace_case(glCullFace);
+maIOCtl_glNormal3f_case(glNormal3f);
+maIOCtl_glNormal3x_case(glNormal3x);
+maIOCtl_glMultiTexCoord4f_case(glMultiTexCoord4f);
+maIOCtl_glMultiTexCoord4x_case(glMultiTexCoord4x);
+maIOCtl_glLightModelf_case(glLightModelf);
+maIOCtl_glLightModelx_case(glLightModelx);
+maIOCtl_glDepthRangef_case(glDepthRangef);
+maIOCtl_glDepthRangex_case(glDepthRangex);
+maIOCtl_glBindTexture_case(glBindTexture);
+maIOCtl_glViewport_case(glViewport);
+maIOCtl_glLineWidthx_case(glLineWidthx);
+maIOCtl_glGetIntegerv_case(glGetIntegerv);
+maIOCtl_glAlphaFunc_case(glAlphaFunc);
+maIOCtl_glLoadMatrixf_case(glLoadMatrixf);
+maIOCtl_glLoadMatrixx_case(glLoadMatrixx);
+maIOCtl_glTexEnvfv_case(glTexEnvfv);
+maIOCtl_glScissor_case(glScissor);
+maIOCtl_glFogfv_case(glFogfv);
+maIOCtl_glDrawArrays_case(glDrawArrays);
+maIOCtl_glTexParameterf_case(glTexParameterf);
+maIOCtl_glTexParameterx_case(glTexParameterx);
+maIOCtl_glClearDepthf_case(glClearDepthf);
+maIOCtl_glClearDepthx_case(glClearDepthx);
+maIOCtl_glShadeModel_case(glShadeModel);
+maIOCtl_glTexSubImage2D_case(glTexSubImage2D);
+maIOCtl_glClientActiveTexture_case(glClientActiveTexture);
+maIOCtl_glCopyTexImage2D_case(glCopyTexImage2D);
+maIOCtl_glTexCoordPointer_case(glTexCoordPointer);
+maIOCtl_glLightf_case(glLightf);
+maIOCtl_glLightx_case(glLightx);
+maIOCtl_glMaterialfv_case(glMaterialfv);
+maIOCtl_glMultMatrixx_case(glMultMatrixx);
+maIOCtl_glScalex_case(glScalex);
+maIOCtl_glDepthFunc_case(glDepthFunc);
+maIOCtl_glStencilFunc_case(glStencilFunc);
+maIOCtl_glEnableClientState_case(glEnableClientState);
+maIOCtl_glFrustumf_case(glFrustumf);
+maIOCtl_glDepthMask_case(glDepthMask);
+maIOCtl_glColor4f_case(glColor4f);
+maIOCtl_glStencilMask_case(glStencilMask);
+maIOCtl_glMatrixMode_case(glMatrixMode);
+maIOCtl_glPolygonOffset_case(glPolygonOffset);
+maIOCtl_glSampleCoverage_case(glSampleCoverage);
+maIOCtl_glFrustumx_case(glFrustumx);
+maIOCtl_glMaterialxv_case(glMaterialxv);
+maIOCtl_glCompressedTexSubImage2D_case(glCompressedTexSubImage2D);
+maIOCtl_glFogf_case(glFogf);
+maIOCtl_glFogx_case(glFogx);
+maIOCtl_glDrawElements_case(glDrawElements);
+maIOCtl_glDisableClientState_case(glDisableClientState);
+maIOCtl_glEnable_case(glEnable);
+maIOCtl_glMultMatrixf_case(glMultMatrixf);
+maIOCtl_glFinish_case(glFinish);
+maIOCtl_glHint_case(glHint);
+maIOCtl_glNormalPointer_case(glNormalPointer);
+maIOCtl_glScalef_case(glScalef);
+maIOCtl_glMaterialf_case(glMaterialf);
+maIOCtl_glMaterialx_case(glMaterialx);
+maIOCtl_glGetError_case(glGetError);
+maIOCtl_glClearStencil_case(glClearStencil);
+maIOCtl_glClearColor_case(glClearColor);
+maIOCtl_glOrthof_case(glOrthof);
+maIOCtl_glOrthox_case(glOrthox);
+maIOCtl_glColorPointer_case(glColorPointer);
+maIOCtl_glColor4x_case(glColor4x);
+maIOCtl_glReadPixels_case(glReadPixels);
+maIOCtl_glColorMask_case(glColorMask);
+maIOCtl_glDisable_case(glDisable);
+maIOCtl_glClearColorx_case(glClearColorx);
+maIOCtl_glVertexPointer_case(glVertexPointer);
+maIOCtl_glPolygonOffsetx_case(glPolygonOffsetx);
+maIOCtl_glPopMatrix_case(glPopMatrix);
+maIOCtl_glSampleCoveragex_case(glSampleCoveragex);
+maIOCtl_glActiveTexture_case(glActiveTexture);
+maIOCtl_glLightModelfv_case(glLightModelfv);
+maIOCtl_glClear_case(glClear);
+maIOCtl_glTranslatex_case(glTranslatex);
+maIOCtl_glLightfv_case(glLightfv);
+maIOCtl_glLightModelxv_case(glLightModelxv);
+maIOCtl_glLineWidth_case(glLineWidth);
+maIOCtl_glGetStringHandle_case(glGetStringHandle);
+maIOCtl_glCompressedTexImage2D_case(glCompressedTexImage2D);
+maIOCtl_glPushMatrix_case(glPushMatrix);
+maIOCtl_glBlendFunc_case(glBlendFunc);
+maIOCtl_glRotatef_case(glRotatef);
+maIOCtl_glRotatex_case(glRotatex);
+maIOCtl_glLightxv_case(glLightxv);
+maIOCtl_glDeleteTextures_case(glDeleteTextures);
+maIOCtl_glCopyTexSubImage2D_case(glCopyTexSubImage2D);
+maIOCtl_glPointSize_case(glPointSize);
+maIOCtl_glTranslatef_case(glTranslatef);
+maIOCtl_glPointSizex_case(glPointSizex);
+#endif	//SUPPORT_OPENGL_ES
+
+			maIOCtl_sinh_case(::sinh);
+			maIOCtl_cosh_case(::cosh);
+			maIOCtl_case(atanh);
+
+			maIOCtl_case(maAccept);
 
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return BLUETOOTH(maBtStartDeviceDiscovery)(BtWaitTrigger, a != 0);
-		case maIOCtl_maBtGetNewDevice:
-			return SYSCALL_THIS->maBtGetNewDevice(GVMRA(MABtDevice));
+
 		case maIOCtl_maBtStartServiceDiscovery:
 			return BLUETOOTH(maBtStartServiceDiscovery)(GVMRA(MABtAddr), GVMR(b, MAUUID), BtWaitTrigger);
-		case maIOCtl_maBtGetNewService:
-			return SYSCALL_THIS->maBtGetNewService(GVMRA(MABtService));
-		case maIOCtl_maBtGetNextServiceSize:
-			return BLUETOOTH(maBtGetNextServiceSize)(GVMRA(MABtServiceSize));
-		case maIOCtl_maBtCancelDiscovery:
-			return BLUETOOTH(maBtCancelDiscovery)();
+
+			maIOCtl_syscall_case(maBtGetNewDevice);
+			maIOCtl_syscall_case(maBtGetNewService);
+			maIOCtl_maBtGetNextServiceSize_case(BLUETOOTH(maBtGetNextServiceSize));
+			maIOCtl_maBtCancelDiscovery_case(BLUETOOTH(maBtCancelDiscovery));
 
 		case maIOCtl_maPlatformRequest:
 			{
@@ -1878,125 +2007,68 @@ namespace Base {
 				}
 			}
 
-		//case maIOCtl_maGetLocation:
-		//	{
-		//		MALocation* loc = GVMRA(MALocation);
-		//		loc->horzAcc = 0;
-		//		loc->lat = 0;
-		//		loc->lon = 0;
-		//		loc->vertAcc = 0;
-		//		return 1;
-		//	}
-		case maIOCtl_maSendTextSMS:
-			return maSendTextSMS(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
-		//case maIOCtl_maStartVideoStream:
-			//return maStartVideoStream(SYSCALL_THIS->GetValidatedStr(a));
+			maIOCtl_case(maSendTextSMS);
 
-		case maIOCtl_maSendToBackground:
-			return maSendToBackground();
-		case maIOCtl_maBringToForeground:
-			return maBringToForeground();
+			//maIOCtl_case(maStartVideoStream);
 
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
+			maIOCtl_case(maSendToBackground);
+			maIOCtl_case(maBringToForeground);
+
+			maIOCtl_case(maFrameBufferGetInfo);
 		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));		
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
-		
-		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(GVMRA(MAAudioBufferInfo));		
-		case maIOCtl_maAudioBufferReady:
-			return maAudioBufferReady();
-		case maIOCtl_maAudioBufferClose:
-			return maAudioBufferClose();
+			return maFrameBufferInit(SYSCALL_THIS->GetValidatedMemRange(a,
+				gBackBuffer->pitch*gBackBuffer->h));
+			maIOCtl_case(maFrameBufferClose);
+
+			maIOCtl_case(maAudioBufferInit);
+			maIOCtl_case(maAudioBufferReady);
+			maIOCtl_case(maAudioBufferClose);
 
 #ifdef MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maStreamVideoStart: {
-			const char* url = SYSCALL_THIS->GetValidatedStr(a);
-			return maStreamVideoStart(url);
-		}
-		case maIOCtl_maStreamClose: {
-			return maStreamClose(a);
-		}
-		case maIOCtl_maStreamPause: {
-			return maStreamPause(a);
-		}
-		case maIOCtl_maStreamResume: {
-			return maStreamResume(a);
-		}
-		case maIOCtl_maStreamVideoSize: {
-			return maStreamVideoSize(a);
-		}
-		case maIOCtl_maStreamVideoSetFrame: {
-			return maStreamVideoSetFrame(a, GVMR(b, MARect));
-		}
-		case maIOCtl_maStreamLength: {
-			return maStreamLength(a);
-		}
-		case maIOCtl_maStreamPos: {
-			return maStreamPos(a);
-		}
-		case maIOCtl_maStreamSetPos: {
-			return maStreamSetPos(a, b);
-		}
+			maIOCtl_case(maStreamVideoStart);
+			maIOCtl_case(maStreamClose);
+			maIOCtl_case(maStreamPause);
+			maIOCtl_case(maStreamResume);
+			maIOCtl_case(maStreamVideoSize);
+			maIOCtl_case(maStreamVideoSetFrame);
+			maIOCtl_case(maStreamLength);
+			maIOCtl_case(maStreamPos);
+			maIOCtl_case(maStreamSetPos);
 #endif	//MA_PROF_SUPPORT_VIDEO_STREAMING
-		case maIOCtl_maFileOpen:
-			return SYSCALL_THIS->maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
 
-		case maIOCtl_maFileExists:
-			return SYSCALL_THIS->maFileExists(a);
-		case maIOCtl_maFileClose:
-			return SYSCALL_THIS->maFileClose(a);
-		case maIOCtl_maFileCreate:
-			return SYSCALL_THIS->maFileCreate(a);
-		case maIOCtl_maFileDelete:
-			return SYSCALL_THIS->maFileDelete(a);
-		case maIOCtl_maFileSize:
-			return SYSCALL_THIS->maFileSize(a);
-		/*case maIOCtl_maFileAvailableSpace:
-			return SYSCALL_THIS->maFileAvailableSpace(a);
-		case maIOCtl_maFileTotalSpace:
-			return SYSCALL_THIS->maFileTotalSpace(a);
-		case maIOCtl_maFileDate:
-			return SYSCALL_THIS->maFileDate(a);
-		case maIOCtl_maFileRename:
-			return SYSCALL_THIS->maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-		case maIOCtl_maFileTruncate:
-			return SYSCALL_THIS->maFileTruncate(a, b);*/
+			maIOCtl_syscall_case(maFileOpen);
+			maIOCtl_syscall_case(maFileExists);
+			maIOCtl_syscall_case(maFileClose);
+			maIOCtl_syscall_case(maFileCreate);
+			maIOCtl_syscall_case(maFileDelete);
+			maIOCtl_syscall_case(maFileSize);
+			maIOCtl_syscall_case(maFileAvailableSpace);
+			maIOCtl_syscall_case(maFileTotalSpace);
+			maIOCtl_syscall_case(maFileDate);
+			maIOCtl_syscall_case(maFileRename);
+			maIOCtl_syscall_case(maFileTruncate);
 
 		case maIOCtl_maFileWrite:
 			return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileWriteFromData:
-			return SYSCALL_THIS->maFileWriteFromData(GVMRA(MA_FILE_DATA));
 		case maIOCtl_maFileRead:
 			return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileReadToData:
-			return SYSCALL_THIS->maFileReadToData(GVMRA(MA_FILE_DATA));
 
-		case maIOCtl_maFileTell:
-			return SYSCALL_THIS->maFileTell(a);
-		case maIOCtl_maFileSeek:
-			return SYSCALL_THIS->maFileSeek(a, b, c);
+			maIOCtl_syscall_case(maFileWriteFromData);
+			maIOCtl_syscall_case(maFileReadToData);
 
-		case maIOCtl_maFileListStart:
-			return SYSCALL_THIS->maFileListStart(SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b));
+			maIOCtl_syscall_case(maFileTell);
+			maIOCtl_syscall_case(maFileSeek);
+
+			maIOCtl_syscall_case(maFileListStart);
 		case maIOCtl_maFileListNext:
 			return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-		case maIOCtl_maFileListClose:
-			return SYSCALL_THIS->maFileListClose(a);
+			maIOCtl_syscall_case(maFileListClose);
 
-		case maIOCtl_maCameraFormatNumber:
-			return maCameraFormatNumber();
-		case maIOCtl_maCameraFormat:
-			return maCameraFormat(a, GVMR(b, MA_CAMERA_FORMAT));
-		case maIOCtl_maCameraStart:
-			return maCameraStart();
-		case maIOCtl_maCameraStop:
-			return maCameraStop();
-		case maIOCtl_maCameraSnapshot:
-			return maCameraSnapshot(a, b);
+			maIOCtl_case(maCameraFormatNumber);
+			maIOCtl_case(maCameraFormat);
+			maIOCtl_case(maCameraStart);
+			maIOCtl_case(maCameraStop);
+			maIOCtl_case(maCameraSnapshot);
 
 #ifdef EMULATOR
 		case maIOCtl_maPimListOpen:
@@ -2021,10 +2093,102 @@ namespace Base {
 			return SYSCALL_THIS->maPimItemClose(a);
 #endif	//EMULATOR
 
+		case maIOCtl_maGetSystemProperty:
+			return maGetSystemProperty(SYSCALL_THIS->GetValidatedStr(a),
+				(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+
+#ifdef WIN32
+			maIOCtl_case(maTextBox);
+#endif
+
 		default:
+			LOGD("maIOCtl(%i) unimplemented.\n", function);
 			return IOCTL_UNAVAILABLE;
 		}
 	}	//maIOCtl
+
+	//****************************************************************************
+	// maTextBox
+	//****************************************************************************
+#ifdef WIN32
+	static HWND sMainWnd = NULL, sEditBox = NULL, sTextBox = NULL;
+	static wchar_t* sTextBoxOutBuf;
+	static int sTextBoxOutSize;
+
+	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+		LOGD("TextBoxProc 0x%p, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, (uint)lParam);
+		switch(uMsg) {
+		case WM_INITDIALOG:
+			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
+			SetFocus(sEditBox);
+			break;
+		case WM_COMMAND:
+			{
+				WORD id = LOWORD(wParam);
+				if(id == IDOK || id == IDCANCEL) {
+					// get text
+					int res = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+
+					// send event
+					MAEvent e;
+					e.type = EVENT_TYPE_TEXTBOX;
+					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+					e.textboxLength = res;
+					gEventFifo.put(e);
+
+					// time to close
+					LOG("DestroyWindow\n");
+					//GLE(DestroyWindow(hwnd));
+					EndDialog(hwnd, id);
+					sEditBox = sTextBox = NULL;
+				}
+			}
+		}
+		return FALSE;
+	}
+
+	static int Base::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints)
+	{
+		MYASSERT(sTextBox == NULL, ERR_TEXTBOX_ACTIVE);
+		SDL_SysWMinfo info;
+		SDL_VERSION(&info.version);
+		DEBUG_ASSERT(SDL_GetWMInfo(&info));
+		sMainWnd = info.window;
+
+		sTextBoxOutSize = maxSize;
+		sTextBoxOutBuf = (wchar_t*)outText;
+
+#if 0	// direct edit-box in window. No worky.
+		// Setting window style WS_CLIPCHILDREN prevents drawing on top of the EditBox.
+		LONG windowStyle = GetWindowLong(sMainWnd, GWL_STYLE);
+		SetWindowLong(sMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN);
+
+		sEditBox = CreateWindowW(L"EDIT",	// predefined class 
+			(LPCWSTR)inText,
+			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
+			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			sMainWnd,	// parent window 
+			NULL, GetModuleHandle(NULL), NULL);
+		GLE(sEditBox);
+		GLE(SetWindowPos(sEditBox, NULL,
+			sSkin->getScreenLeft(), sSkin->getScreenTop(),
+			sSkin->getScreenWidth(), sSkin->getScreenHeight(), 0));
+		SetFocus(sEditBox);
+#else
+#if 0	// modeless dialogs don't recieve key events
+		sTextBox = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+			TextBoxProc);
+		GLE(sTextBox);
+		ShowWindow(sTextBox, SW_SHOW);
+#else	// so we go with modal, for now.
+		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+			TextBoxProc);
+#endif
+#endif
+		return 0;
+	}
+#endif	//WIN32
 
 	//****************************************************************************
 	// camera
@@ -2158,8 +2322,10 @@ namespace Base {
 #ifdef LOGGING_ENABLED
 		// at this point, hmem contains the entire data in memory stored in fif format.
 		// the amount of space used by the memory is equal to file_size
+#ifdef DEBUGGING_MODE
 		long file_size = FreeImage_TellMemory(hmem);
 		LOG("File size : %ld\n", file_size);
+#endif
 #endif
 
 		DWORD data_size;
@@ -2345,6 +2511,18 @@ namespace Base {
 #else
 #error Unknown platform!
 #endif
+	}
+
+	static int Base::maGetSystemProperty(const char* key, char* buf, int size) {
+#ifdef WIN32
+		if(strcmp(key, "mosync.iso-639-1") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, buf, size);
+			GLE(res);
+			return res;
+		}
+#endif
+		return -2;
 	}
 
 void MoSyncExit(int r) {

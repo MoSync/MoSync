@@ -17,3 +17,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define CONFIG_H
 //#define LOGGING_ENABLED
+//#define COMMAND_LOGGING_ENABLED

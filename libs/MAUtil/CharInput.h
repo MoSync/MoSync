@@ -51,6 +51,11 @@ void CharInput_Pressed(int keyCode);
 void CharInput_Released(int keyCode);
 
 /** 
+ * Notify the charinput system that a char event has been received. 
+ */
+void CharInput_Char(uint character);
+
+/** 
  * The user must implement a StartTimerCallback and a StopTimerCallback.
  * These are used so that the system can create a timer. When the timer has 
  * reached its timeout it must call the CharInputCallback passed to the 
@@ -194,6 +199,9 @@ public:
 
 	/** Inherited function from class Keylistener, updates the system. */
 	virtual void keyReleaseEvent(int keyCode, int nativeCode);
+
+	/** Inherited function from class Keylistener, updates the system. */
+	virtual void charEvent(uint character);
 
 	/** Inherited function from class TimerListener, updates the system. */
 	void runTimerEvent();

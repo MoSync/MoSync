@@ -1,0 +1,1166 @@
+
+++++
+****Number: 01
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\01\\test01.rls(2) : Warning: (005) rls item not preceded by a localisation tag.
+
+****rss data:
+#include "test01.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+****rls data:
+
+rls_string STRING_1 "One"
+----
+
+++++
+****Number: 02
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\02\\test02.rls(2) : Warning: (005) rls item not preceded by a localisation tag.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\02\\test02.rls(4) : Warning: (005) rls item not preceded by a localisation tag.
+
+****rss data:
+#include "test02.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+RESOURCE STRUCT_1 RESOURCE_2 
+		{ 
+		buf = STRING_2;
+    }
+****rls data:
+
+rls_string STRING_1 "One"
+
+rls_string8 STRING_2 "Two"
+----
+
+++++
+****Number: 03
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\03\\test03.rls(2) : Warning: (005) rls item not preceded by a localisation tag.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\03\\test03.rls(4) : Warning: (004) unused rls item.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\03\\test03.rls(4) : Warning: (005) rls item not preceded by a localisation tag.
+
+****rss data:
+#include "test03.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+rls_string STRING_1 "One"
+
+rls_string8 STRING_2 "Two"
+----
+
+++++
+****Number: 04
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\04\\test04.rls(2) : Warning: (001) rls item used more than once.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\04\\test04.rls(2) : Warning: (005) rls item not preceded by a localisation tag.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\04\\test04.rss(14) : Warning: (002) if the rls item really must be exactly the same in all the places it is referenced from for the code to work, declare the rls item as 'multi', for example 'rls_string multi ss1 "hello"'. If localizers are free to change them independently, duplicate the rls item and reference a different copy each time.
+
+****rss data:
+#include "test04.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+
+RESOURCE STRUCT_1 RESOURCE_2 
+		{ 
+		buf = STRING_1;
+    }
+
+****rls data:
+
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 05
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\05\\test05.rls(3) : Warning: (013) required tag not present. tag name = description
+K:\\epoc32\\tools\\epocrc-data\\test-data\\05\\test05.rls(3) : Warning: (013) required tag not present. tag name = uicontext
+
+****rss data:
+#include "test05.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+****rls data:
+
+/*& */
+rls_string STRING_1 "One"
+----
+
+++++
+****Number: 06
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\06\\test06.rls(3) : Warning: (013) required tag not present. tag name = description
+K:\\epoc32\\tools\\epocrc-data\\test-data\\06\\test06.rls(3) : Warning: (013) required tag not present. tag name = uicontext
+K:\\epoc32\\tools\\epocrc-data\\test-data\\06\\test06.rls(5) : Warning: (005) rls item not preceded by a localisation tag.
+
+****rss data:
+#include "test06.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+RESOURCE STRUCT_1 RESOURCE_2 
+		{ 
+		buf = STRING_2;
+    }
+****rls data:
+
+/*& */
+rls_string STRING_1 "One"
+
+rls_string8 STRING_2 "Two"
+----
+
+++++
+****Number: 07
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\07\\test07.rls(4) : Warning: (014) parameter(s) not legal for this tag.
+
+****rss data:
+#include "test07.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*& 
+@description The first string 
+@uicontext menu
+
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 08
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+
+****rss data:
+#include "test08.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+*/
+/*& 
+@description The first string 
+@uicontext menu
+
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 09
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\09\\test09.rls(8) : Warning: (007) specified command has already been used in this comment.
+
+****rss data:
+#include "test09.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+*/
+/*& 
+@description The first string 
+@uicontext menu
+@description A second description to show the effect of including tags more than once
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 10
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+
+****rss data:
+#include "test10.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+*/
+/*& 
+
+@uicontext menu
+@description A description to show 
+the effect of
+
+ having tags declared as text running over more than one line
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 11
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+K:\\epoc32\\tools\\epocrc-data\\test-data\\11\\test11.rls(4) : Warning: (025) parameter already declared as optional or required.
+
+****rss data:
+#include "test11.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+@tagrequired localize rls_string
+*/
+/*& 
+
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 12
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+
+****rss data:
+#include "test12.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+*/
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 13
+****Extra args:
+****Expected stdout:
+****Expected stderr:
+
+K:\\epoc32\\tools\\epocrc-data\\test-data\\13\\test13.rls(4) : Warning: (036) invalid declaration of required tag, unknown rls type found, rls type = rls_chocolate
+
+****rss data:
+#include "test13.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+
+/*&
+@tagvalue uicontext menu
+@tagrequired uicontext rls_chocolate
+*/
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 14
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\14\\test14.rls(6) : Warning: (015) first word must start with an @ symbol.
+
+****rss data:
+#include "test14.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+*/
+/*& 
+
+Some text before any of the tags.
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 15
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test15.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+@tagvalue localize menu
+*/
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 16
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test16.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+@tagvalue localize menu
+*/
+/*& 
+@localize menu
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 17
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\17\\test17.rls(3) : Warning: (020) tag value line must consist of three distinct words.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\17\\test17.rls(4) : Warning: (020) tag value line must consist of three distinct words.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\17\\test17.rls(5) : Warning: (020) tag value line must consist of three distinct words.
+
+****rss data:
+#include "test17.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+/*&
+
+@tagvalue uicontext menu extra
+@tagvalue uicontext
+@tagvalue uicontext=menu
+@tagvalue uicontext menu
+*/
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 18
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\18\\test18.rls(3) : Warning: (035) invalid declaration of optional tag, unknown rls type found, rls type = rls_chocolate
+K:\\epoc32\\tools\\epocrc-data\\test-data\\18\\test18.rls(4) : Warning: (036) invalid declaration of required tag, unknown rls type found, rls type = rls_chocolate
+
+****rss data:
+#include "test18.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+    
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+@tagoptional uicontext rls_chocolate
+@tagrequired localise rls_chocolate
+*/
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+----
+
+++++
+****Number: 19
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\19\\test19.rls(10) : Warning: (001) rls item used more than once.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\19\\test19.rss(15) : Warning: (002) if the rls item really must be exactly the same in all the places it is referenced from for the code to work, declare the rls item as 'multi', for example 'rls_string multi ss1 "hello"'. If localizers are free to change them independently, duplicate the rls item and reference a different copy each time.
+
+****rss data:
+#include "test19.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    BUF buf_2;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+		buf_2 = STRING_2;
+    }
+RESOURCE STRUCT_1 RESOURCE_2 
+		{ 
+		buf = STRING_1;
+		buf_2 = STRING_2;		
+    } 
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+*/
+
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+/*&
+@localize yes
+@uicontext menu
+@description Another description
+*/
+rls_string multi STRING_2 "Two"
+----
+
+++++
+****Number: 20
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\20\\test20.rls(10) : Warning: (001) rls item used more than once.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\20\\test20.rls(17) : Warning: (001) rls item used more than once.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\20\\test20.rss(15) : Warning: (002) if the rls item really must be exactly the same in all the places it is referenced from for the code to work, declare the rls item as 'multi', for example 'rls_string multi ss1 "hello"'. If localizers are free to change them independently, duplicate the rls item and reference a different copy each time.
+
+****rss data:
+#include "test20.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    BUF buf_2;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+		buf_2 = STRING_2;
+    }
+RESOURCE STRUCT_1 RESOURCE_2 
+		{ 
+		buf = STRING_1;
+		buf_2 = STRING_2;		
+    } 
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+*/
+
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+/*&
+@localize yes
+@uicontext menu
+@description Another description
+*/
+rls_string STRING_2 "Two"
+----
+
+++++
+****Number: 21
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\21\\test21.rls(17) : Warning: (003) rls item redefined.
+
+****rss data:
+#include "test21.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+*/
+
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "One"
+
+/*&
+@localize yes
+@uicontext menu
+@description Another description
+*/
+rls_string STRING_1 "Two"
+----
+
+++++
+****Number: 22
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test22.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+*/
+
+/*& 
+@localize yes
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "" // Empty string
+
+
+----
+
+++++
+****Number: 23
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\23\\test23.rls(9) : Warning: (008) this tag cannot be used with this rls type.
+
+****rss data:
+#include "test23.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+@declaretag single length
+@tagvalue length non-zero
+*/
+
+/*& 
+@localize yes
+@length non-zero
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "" // Empty string
+
+
+----
+
+++++
+****Number: 24
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(5) : Warning: (038) invalid declaration of optional tag, rls item name found where command name expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(6) : Warning: (044) invalid declaration of optional tag, end of line reached unexpectedly.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(7) : Warning: (039) invalid declaration of optional tag, equal sign found at the start of command name.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(8) : Warning: (041) invalid declaration of optional tag, rls item found where default value expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(9) : Warning: (027) invalid declaration of optional tag, more than one equals sign found in line.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(10) : Warning: (027) invalid declaration of optional tag, more than one equals sign found in line.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(11) : Warning: (040) invalid declaration of optional tag, rls item found where command name expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(12) : Warning: (041) invalid declaration of optional tag, rls item found where default value expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(13) : Warning: (035) invalid declaration of optional tag, expecting rls item but found token: rls_chocolate
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(14) : Warning: (027) invalid declaration of optional tag, more than one equals sign found in line.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(15) : Warning: (042) invalid declaration of optional tag, incorrect syntax for declaring default value.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(16) : Warning: (041) invalid declaration of optional tag, rls item found where default value expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(18) : Warning: (035) invalid declaration of optional tag, expecting rls item but found token: rls_chocolate
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(19) : Warning: (035) invalid declaration of optional tag, expecting rls item but found token: rls_chocolate
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(20) : Warning: (035) invalid declaration of optional tag, expecting rls item but found token: rls_chocolate
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(22) : Warning: (041) invalid declaration of optional tag, rls item found where default value expected.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(23) : Warning: (039) invalid declaration of optional tag, equal sign found at the start of command name.
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(26) : Warning: (043) invalid declaration of optional tag, found unknown tokens at end of line, first unknown token is: something
+K:\\epoc32\\tools\\epocrc-data\\test-data\\24\\test24.rls(27) : Warning: (043) invalid declaration of optional tag, found unknown tokens at end of line, first unknown token is: something
+
+****rss data:
+#include "test24.rls"
+NAME TEST
+STRUCT STRUCT_1
+    {
+    BUF buf;
+    }
+RESOURCE STRUCT_1 RESOURCE_1 
+		{ 
+		buf = STRING_1;
+    }
+
+****rls data:
+/*&
+@tagvalue uicontext menu
+@declaretag single length
+@tagvalue length non-zero
+@tagoptional rls_string
+@tagoptional length
+@tagoptional =length rls_string
+@tagoptional length= rls_string
+@tagoptional length==non-zero rls_string
+@tagoptional length=non-zero= rls_string
+@tagoptional rls_string=non-zero length
+@tagoptional non-zero=rls_string length
+@tagoptional length rls_chocolate
+@tagoptional length =non=zero rls_string
+@tagoptional length non=zero rls_string
+@tagoptional length =rls_string length
+
+@tagoptional length rls_chocolate
+@tagoptional length=non-zero rls_chocolate
+@tagoptional length =non-zero rls_chocolate
+
+@tagoptional length = rls_string
+@tagoptional = length rls_string
+@tagoptional non-zero=length rls_string
+
+@tagoptional length rls_string something
+@tagoptional length = non-zero rls_string something else
+
+@tagoptional length = non-zero rls_string
+*/
+
+/*& 
+@localize yes
+
+@uicontext menu
+@description A description
+*/
+rls_string STRING_1 "" // Empty string
+
+
+----
+++++
+****Number: 25
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+H:\\localisation\\test-data\\25\\test25.rss(8) : Warning: (045) the following label is used but has not been declared: STRING_1
+
+****rss data:
+#include "test25.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	BUF buf;
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	buf = STRING_1;
+	}
+
+****rls data:
+
+----
+++++
+****Number: 26
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+H:\\localisation\\test-data\\26\\test26.rss(8) : Warning: (046) the STRUCT that this resource is based on contains a STRUCT data member which has not been used in this resource, the missing element is: 'myStruct'
+
+****rss data:
+#include "test26.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct;
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	}
+
+****rls data:
+
+----
+
+++++
+****Number: 27
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+H:\\localisation\\test-data\\27\\test27.rss(8) : Warning: (047) the STRUCT that this resource is based on contains a STRUCT[] data member which has not been used in this resource, the missing element is: 'myStruct'
+
+****rss data:
+#include "test27.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct[];
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	}
+
+****rls data:
+
+----
+++++
+****Number: 28
+****Extra args:
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test28.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct;
+	}
+
+STRUCT STRUCT_2
+	{
+	WORD firstElement;
+	WORD secondElement;
+}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	myStruct = STRUCT_2 {
+		firstElement = 1;
+		secondElement = 2;
+		};
+	}
+
+****rls data:
+
+----
+
+++++
+****Number: 29
+****Extra args: -vv
+****Expected stdout:
+name_statement                             TEST
+Current id                                1629544448
+struct_statement_start                     STRUCT_1
+simple_struct_item                         Buf16 buf
+struct_item_list                           Adding struct_item.
+*******************************************
+StructHeader            STRUCT_1
+	Len Type: <none>
+SimpleStructItem        buf	Buf16	Default: <empty>	Length limit: <empty>
+*******************************************
+resource_statement_start_names             STRUCT_1 RESOURCE_1
+resource_item                              buf One
+resource_item_list
+Resource ID 1629544449
+*******************************************
+ResourceHeader          RESOURCE_1
+++ResourceItemArray
+SimpleResourceItem [Buf16 buf]  
+*******************************************
+*******************************************
+*******************************************
+uidcrc.exe 0x101f4a6b 0x00000000 0x0006120e H:\localisation\test-data\29\test29.rsc
+IndexTable
+IndexTableItem 14	RESOURCE_1
+IndexTable     18
+
+****Expected stderr: 
+
+****rss data:
+#include "test29.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	BUF buf;
+	}
+
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	buf = "One";
+	}
+
+****rls data:
+
+----
+++++
+****Number: 30
+****Extra args: -m045
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test30.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	BUF buf;
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	buf = STRING_1;
+	}
+
+****rls data:
+
+----
+++++
+****Number: 31
+****Extra args: -m046
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test31.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct;
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	}
+
+****rls data:
+
+----
+
+++++
+****Number: 32
+****Extra args: -m047
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test32.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct[];
+	}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	}
+
+****rls data:
+
+----
+++++
+****Number: 33
+****Extra args: -m045,046,047
+****Expected stdout:
+****Expected stderr: 
+
+****rss data:
+#include "test33.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	STRUCT myStruct;
+	}
+
+STRUCT STRUCT_2
+	{
+	WORD firstElement;
+	WORD secondElement;
+}
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	myStruct = STRUCT_2 {
+		firstElement = 1;
+		secondElement = 2;
+		};
+	}
+
+****rls data:
+
+----
+
+++++
+****Number: 34
+****Extra args: -vv -m001,002,045,046,047
+****Expected stdout:
+name_statement                             TEST
+Current id                                1629544448
+struct_statement_start                     STRUCT_1
+simple_struct_item                         Buf16 buf
+struct_item_list                           Adding struct_item.
+*******************************************
+StructHeader            STRUCT_1
+	Len Type: <none>
+SimpleStructItem        buf	Buf16	Default: <empty>	Length limit: <empty>
+*******************************************
+resource_statement_start_names             STRUCT_1 RESOURCE_1
+resource_item                              buf One
+resource_item_list
+Resource ID 1629544449
+*******************************************
+ResourceHeader          RESOURCE_1
+++ResourceItemArray
+SimpleResourceItem [Buf16 buf]  
+*******************************************
+*******************************************
+*******************************************
+uidcrc.exe 0x101f4a6b 0x00000000 0x0006120e H:\localisation\test-data\34\test34.rsc
+IndexTable
+IndexTableItem 14	RESOURCE_1
+IndexTable     18
+
+****Expected stderr: 
+
+****rss data:
+#include "test34.rls"
+NAME TEST
+STRUCT STRUCT_1
+	{
+	BUF buf;
+	}
+
+
+RESOURCE STRUCT_1 RESOURCE_1 
+	{ 
+	buf = "One";
+	}
+
+****rls data:
+
+----

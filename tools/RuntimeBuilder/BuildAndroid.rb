@@ -22,24 +22,54 @@ require '../../rules/mosync_util.rb'
 # is located in the source tree where the runtime is located.
 
 class RuntimeBuilder 
+
+	# if version is not defined cupcake, 1.5, will be used
 	def android(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "3")
 	end
 	
+	def android_3(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "3")
+	end
+	
+	def android_4(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "4")
+	end
+	
+	def android_5(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "4")
+	end
+	
+	def android_6(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "4")
+	end
+	
+	def android_7(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "7")
+	end
+	
+	def android_8(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "7")
+	end
 
-	def androidBuilder(runtime_dir, mode)
+	def androidBuilder(runtime_dir, mode, version)
 		debug = (mode=="debug") ? "D" : ""
 		
-		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-3"
+		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-#{version}"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
 		
 		cpath = FileUtils.pwd
 		
+		# We must fix the path here, if it's relative things will break later..
+		Dir.chdir runtime_dir
+		runtime_dir = FileUtils.pwd + "/"
+		Dir.chdir cpath
+		
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 		
-		puts "ruby buildJNI.rb #{android_ndk} #{android_ndk} #{runtime_dir} #{debug}"
-		system "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
-				
+		puts "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
+		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}")
+		
 		Dir.chdir cpath
 		
 		if !File.exist? "#{runtime_dir}MoSyncRuntime#{debug}.zip"

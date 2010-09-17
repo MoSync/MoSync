@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "commandInterface.h"
 #include "helpers.h"
+#include "StubConnLow.h"
 
 using namespace std;
 
@@ -27,10 +28,12 @@ void gdb_exit(const string& args) GCCATTRIB(noreturn);
 void gdb_version(const string& args);
 void interpreter_exec(const string& args);
 void gdb_set(const string& args);
+void gdb_show(const string& args);
 
 void gdb_exit(const string& args) {
 	oprintToken();
 	oprintf("^exit\n");
+	StubConnLow::sendPacket("e", NULL);
 	exit(0);
 }
 void gdb_version(const string& args) {
@@ -72,7 +75,14 @@ void interpreter_exec(const string& args) {
 	commandComplete();
 }
 
+
+// we don't take any gdb internal variables into account yet..
 void gdb_set(const string& args) {
+	oprintDoneLn();
+	commandComplete();
+}
+
+void gdb_show(const string& args) {
 	oprintDoneLn();
 	commandComplete();
 }

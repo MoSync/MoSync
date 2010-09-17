@@ -1,0 +1,90 @@
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+NAME TGBS
+
+CHARACTER_SET UTF8
+
+#include <eikon.rh>
+#include <eikcore.rsg>
+#include <appinfo.rh>
+
+#include "Tgb18030.hrh"
+
+RESOURCE RSS_SIGNATURE { }
+
+RESOURCE TBUF { buf=""; }
+
+RESOURCE EIK_APP_INFO
+	{
+	hotkeys=r_tgb18030_hotkeys;
+	menubar=r_tgb18030_menubar;
+	}
+
+RESOURCE HOTKEYS r_tgb18030_hotkeys
+    {
+    control=
+        {
+        HOTKEY { command=EEikCmdExit; key='e'; }
+        };
+    }
+
+RESOURCE MENU_BAR r_tgb18030_menubar
+    {
+    titles=
+        {
+        MENU_TITLE { menu_pane=r_tgb18030_first_menu; txt="GB18030测试"; }
+		};
+    }
+
+RESOURCE MENU_PANE r_tgb18030_first_menu
+	{
+	items=
+		{
+		MENU_ITEM { command=ETgb18030Item0; txt="菜单1包括surrogate𨍳𨍴𨍵𠂻𠂼𠂽𠂾"; },
+		MENU_ITEM { command=EEikCmdExit; txt="Close"; }
+        };
+    }
+
+STRUCT TBUF8192	{ BUF<8192> buf; }
+RESOURCE TBUF r_tgb18030_text_Item0 { buf="你好"; }
+RESOURCE TBUF8192 r_tgb18030_text_Hello { buf=<0x6211><0x2837e><0x6211><0x2837b><0x2837a><0x68><0x6211>"Hello world 注意 CAUTIONThisIsALongStringHelloworldHelloworldHelloworldHelloworldHelloworldHelloworld你好gb18030㒭㒣㐄𠂬𠂭𠂮𠂯𠂰𠂱𠂲𠂳𠂴𠂵𠂶𠂷𠂸𠂹!helloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworldhelloworld你好gb18030㒭㒣㐄𠂬𠂭𠂮𠂯𠂰𠂱𠂲𠂳𠂴𠂵𠂶𠂷𠂸𠂹!"; }
+RESOURCE TBUF r_trcomp_text_pos1 { buf="𠀀𪛖𠀃"; }
+
+RESOURCE RTXTED r_output_view_rtexted
+    {
+    numlines = 5;
+    textlimit= 500;
+    fontcontrolflags = EGulFontControlAll;
+    fontnameflags = EGulNoSymbolFonts;
+    }
+
+
+RESOURCE LOCALISABLE_APP_INFO r_lai
+	{
+	short_caption = "TG";
+	caption_and_icon =
+		{
+		CAPTION_AND_ICON_INFO
+			{
+			caption = "Tgb18030";
+			number_of_icons = 3; // each icon must be a bitmap/mask pair
+			icon_file = "z:\\resource\\apps\\Tgb18030.mbm";
+			}
+		};							
+	}

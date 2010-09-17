@@ -29,10 +29,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // static declarations
 //******************************************************************************
 
+/* Maximum time to wait for the read semaphore */
+#define READ_SEM_TIMEOUT 500
+
 static MoSyncSemaphore sRead;
 static Connection* sConn;
 static void* sDst;
 static int sMaxLen;
+static bool run = true;
 
 //******************************************************************************
 // functions
@@ -40,15 +44,23 @@ static int sMaxLen;
 
 int SDLCALL remoteReadThreadFunc(void* arg) {
 	//TODO: more error management, restart support.
-	while(1) {
-		sRead.wait();
+	LOG("remoteReadThreadFunc start\n");
+	while(run) {
+		/* Wait for a while and test if we should keep running */
+		if(!sRead.tryWait(READ_SEM_TIMEOUT)) {
+			continue;
+		}
+		
 		DebuggerEvent* de = new DebuggerEvent;
 		de->type = DebuggerEvent::eRecv;
-		de->result = sConn->read(sDst, sMaxLen);
+		int result = sConn->read(sDst, sMaxLen);
+		de->result = result;
+		//LOG("Remote read result: %i\n", result);
 		putEvent(de);
-		if(de->result < 0)
+		if(result < 0)
 			break;
 	}
+	LOG("remoteReadThreadFunc end\n");
 	return 0;
 }
 
@@ -57,4 +69,8 @@ void remoteRecv(Connection* conn, void* dst, int maxLen) {
 	sDst = dst;
 	sMaxLen = maxLen;
 	sRead.post();
+}
+
+void stopReadThread() {
+	run = false;
 }

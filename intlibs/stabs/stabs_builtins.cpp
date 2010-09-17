@@ -46,7 +46,7 @@ BROKEN_BUILTINS(DECLARE_BROKEN_BUILTIN);
 
 static class Bool : public Builtin {
 public:
-	Bool() : Builtin("bool", 0, eBool) {}
+	Bool() : Builtin("bool", 1, eBool) {}
 	void printMI(printfPtr, const void*, TypeBase::PrintFormat) const;
 } sBool;
 

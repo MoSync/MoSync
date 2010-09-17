@@ -88,7 +88,7 @@ bool parseLSym(Tuple t, char* text) {
 	for(int i=0; i<snBuiltins; i++) {
 		if(s.name == sBuiltins[i].name) {
 			s.type = sBuiltins[i].type;
-			addType(s);
+			TEST(addType(s));
 			return true;
 		}
 	}
@@ -99,7 +99,7 @@ bool parseLSym(Tuple t, char* text) {
 	FAILIF(*equalSign != '=');
 	char* typeText = equalSign + 1;
 	TEST(s.type = subParseType(&typeText, s.id, s.name));
-	addType(s);
+	TEST(addType(s));
 	return true;
 }
 
@@ -169,7 +169,7 @@ const TypeBase* subParseType(char** pText, const Tuple& id, const string& name) 
 				else s.name = name;
 
 				s.type = result;
-				addType(s);
+				TEST(addType(s));
 			} else {	//ordinary typedef
 				result = findTypeByTuple(t);
 				if(!result) {
@@ -337,7 +337,9 @@ static const TypeBase* subParseRangeType(char** pText) {
 	TEST(next);
 	if(*next == ';') {	//no definition
 		*pText = next + 1;
-		return findTypeByTuple(t);
+		const TypeBase* tb = findTypeByTuple(t);
+		TEST(tb);
+		return tb;
 	}
 	//alt.rangeTypeDefinition
 	FAILIF(next[0] != '=');
@@ -352,10 +354,11 @@ static const TypeBase* subParseRangeType(char** pText) {
 	FAILIF(next[len+1] != ';');
 	*pText = next + len + 2;
 	RangeType* rt = new RangeType(min, max);
+	TEST(rt);
 	Type s;
 	s.id = t;
 	s.type = rt;
-	addType(s);
+	TEST(addType(s));
 	return rt;
 }
 
@@ -517,7 +520,7 @@ static char* subParseMember(char* text, StructType* st) {
 			s.name = m.name;
 			next++;
 			TEST(s.type = subParseType(&next, s.id, s.name));
-			addType(s);
+			TEST(addType(s));
 		}
 #endif
 		if(*next == ':') {	//static member

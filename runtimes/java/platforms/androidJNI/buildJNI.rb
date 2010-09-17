@@ -24,6 +24,17 @@ require 'fileutils'
 # <CONFIG_PATH>			: The path to where the config.h is located. If this is set the finished runtime will end up in this folder as well, other wise it will be in the project source root
 # <DEBUG>				: If this is set to anything they will use the configD.h file which is supposed to be at the <CONFIG_PATH>
 
+def exitBuilder(arg, config)
+	if config != nil
+		# change name on config_platform.h.saved to config_platform.h if such file exists
+		conf_file = "/src/config_platform.h.saved"
+		if File.exist? conf_file
+			FileUtils.copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
+		end
+	end
+	exit Integer(arg)
+end
+
 cpath = FileUtils.pwd
 
 firstarg = ARGV[0]
@@ -51,13 +62,16 @@ ENV['MOSYNC_JAVA_SRC'] = cpath
 
 if firstarg == nil
 	puts "missing argument, android NDK path is unknown!"
-	exit 0
+	exit 1
 end
 
 if secondarg == nil
 	puts "missing argument, android SDK path is unknown!"
-	exit 0
+	exit 1
 end
+
+# Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH
+ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg[-1, 1]
 
 debug = (fortharg == nil) ? "" : "D"
 
@@ -85,9 +99,13 @@ puts "Building native Library\n\n"
 FileUtils.cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
-	system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
-	system "#{firstarg}/ndk-build"
+	success = system("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
+end
+
+if (!success)
+	exitBuilder(1, thirdarg)
 end
 
 puts "Preprocess Java Source Files\n\n"
@@ -95,8 +113,10 @@ puts "Preprocess Java Source Files\n\n"
 FileUtils.cd ".."
 puts FileUtils.pwd
 
-system "ruby buildJava.rb"
-
+success = system "ruby buildJava.rb"
+if (!success)
+	exitBuilder(1, thirdarg)
+end
 
 class_dir = "temp/"
 if File.exist? class_dir
@@ -109,11 +129,14 @@ puts "Build Android package\n\n"
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
 system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
-		
+	
 puts "Compile Java Source Files\n\n"
-		
+
 # Compile all the java files into class files
-system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+if (!success)
+	exitBuilder(1,thirdarg)
+end
 
 puts "Copy Generated Library File\n\n"
 
@@ -125,7 +148,15 @@ puts "Build Zip Package\n\n"
 # package the files
 FileUtils.cd "temp"
 
-system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+if ENV['OS'] == "Windows_NT"
+	success = system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+else
+	success = system("zip -r MoSyncRuntime#{debug}.zip .");
+end
+if (!success)
+	exitBuilder(1, thirdarg)
+end
+
 FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
 
 FileUtils.cd ".."
@@ -133,10 +164,7 @@ FileUtils.cd ".."
 # clean up
 FileUtils.rm_rf class_dir
 
-if thirdarg != nil
-	# change name on config_platform.h.saved to config_platform.h if such file exists
-	conf_file = "/src/config_platform.h.saved"
-	if File.exist? conf_file
-		FileUtils.copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
-	end
+if (!success)
+	exitBuilder(0, thirdarg)
 end
+

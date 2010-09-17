@@ -31,8 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * The default listener.
- * Prints everything out to stdout.
+ * @brief The default listener. Prints everything out to stdout.
  *
  */
 class DefaultListener : public TestListener

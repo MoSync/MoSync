@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="true" version="1">
-<build.cfg id="Debug"/>
-<build.cfg id="Release"/>
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value=""/>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUI.lib, MAUtil.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUID.lib, MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUID.lib, MAUtilD.lib, MTXml.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUI.lib, MAUtil.lib, MTXml.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=256000 -heapsize=128000"/>
 <property key="build.prefs:extra.link.sw/Debug" value="-datasize=256000 -heapsize=128000 -master-dump"/>
 <property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
-<property key="build.prefs:memory.data/Release" value="256"/>
-<property key="build.prefs:memory.heap/Release" value="250"/>
-<property key="build.prefs:memory.stack/Release" value="2"/>
+<property key="build.prefs:memory.data/Debug" value="512"/>
+<property key="build.prefs:memory.data/Release" value="512"/>
+<property key="build.prefs:memory.heap/Debug" value="128"/>
+<property key="build.prefs:memory.heap/Release" value="128"/>
+<property key="build.prefs:memory.stack/Debug" value="256"/>
+<property key="build.prefs:memory.stack/Release" value="256"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="last.build.config" value="Debug"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x0a88cac6"/>
 <property key="symbian.uids:uid.s60v3uid" value="0xec450e0d"/>
-<property key="build.prefs:app.vendor" value="MoSync AB"/>
 </properties>
 </project>

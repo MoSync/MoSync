@@ -141,6 +141,29 @@ int Value::sizeOf() const {
 	}
 }
 
+bool Value::isDereferencable() const {
+	if(isType()) return false;
+
+	const TypeBase* type = mSym.type;
+	type = type->resolve();
+
+	if(type->type() == TypeBase::eConst)
+		type = ((ConstType*)type)->mTarget;
+
+	if(type->type() == TypeBase::eArray) 
+		return true;
+
+	if(type->type() == TypeBase::ePointer) {
+		int addr = mV;
+		const TypeBase* dr = type->deref()->resolve();
+		if(addr<=0 || addr>gMemSize || (dr->type()==TypeBase::eBuiltin && ((Builtin*)dr)->mSubType==Builtin::eVoid)) {
+			return false;
+		}
+		return true;
+	}
+
+	return false;
+}
 
 bool Value::isPointer() const { 
 	return getType()==TypeBase::ePointer; 

@@ -97,6 +97,7 @@ class Targets
 		default_const(:USE_NEWLIB, false)
 		default_const(:FULLSCREEN, HOST == :linux ? (HOST_PLATFORM == :moblin ? "true" : "false") : "false")
 		default_const(:NATIVE_RUNTIME, false)
+		default_const(:PROFILING, false)
 	end
 	
 	def Targets.handle_arg(a)

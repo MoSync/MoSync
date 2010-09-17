@@ -36,12 +36,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "resourcearray.h"
 #include "DirScrAccEng.h"
 #include "AppView.h"
+#include "AppUi.h"
 #include "symbian_errors.h"
 #include "Stream.h"
 #include "heapsize.h"
 
 #ifdef GUIDO
 #include <helpers/CPP_IX_GUIDO.H>
+static double _atanh(double d) {
+	d = (1+d) / (1-d);
+	return 0.5 * log(d);
+}
 #endif
 
 #ifdef CALL
@@ -1201,16 +1206,21 @@ int Syscall::maGetBatteryCharge() {
 		LOG("GetBatteryCharge error %i\n", status.Int());
 		return IOCTL_UNAVAILABLE;  //magic number, identify it!
 	}
+#ifdef DEBUGGING_MODE
 	DUMPINT(info.iStatus); //CTelephony::TBatteryStatus
+#endif
 	return info.iChargeLevel;
-	/*int value, res;
+
+#if 0
+	int value, res;
 	res = HAL::Get(HALData::EPowerBatteryStatus, value);
 	DUMPINT(value);
 	if(res != KErrNone) {
 		LOG("GetBatteryCharge error %i\n", res);
 		return res;
 	}	//TPowerBatteryStatus
-	return value;*/
+	return value;
+#endif
 
 	//other alternatives:
 	//HALData								//not found in 3rd ed docs.
@@ -1242,20 +1252,22 @@ SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
+SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	//move to individual functions?
-	if(!gBtAvailable) switch(function) {
+	if(gBtState != eAvailable) switch(function) {
 	case maIOCtl_maBtStartDeviceDiscovery:
 	case maIOCtl_maBtGetNewDevice:
 	case maIOCtl_maBtStartServiceDiscovery:
 	case maIOCtl_maBtGetNewService:
 	case maIOCtl_maBtGetNextServiceSize:
-		return IOCTL_UNAVAILABLE;
+		switch(gBtState) {
+		case eTurnedOff: return CONNERR_UNAVAILABLE;
+		case eForbidden: return CONNERR_FORBIDDEN;
+		case eError: return IOCTL_UNAVAILABLE;
+		default: DEBIG_PHAT_ERROR;
+		}
 	}
 	switch(function) {
-
-	case maIOCtl_maCheckInterfaceVersion:
-		return Base::maCheckInterfaceVersion(a);
 
 #ifdef TELEPHONY
 	case maIOCtl_maGetBatteryCharge:
@@ -1309,22 +1321,9 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maSetSpeechPitch:
 		return maSetSpeechPitch(a);
 
-	case maIOCtl_sinh: {
-		double& d = *GVMRA(double);
-		d = ::sinh(d);
-		return 0;
-	}
-	case maIOCtl_cosh: {
-		double& d = *GVMRA(double);
-		d = ::cosh(d);
-		return 0;
-	}
-	case maIOCtl_atanh: {
-		double& d = *GVMRA(double);
-		d = (1+d) / (1-d);
-		d = 0.5 * log(d);
-		return 0;
-	}
+	maIOCtl_sinh_case(::sinh);
+	maIOCtl_cosh_case(::cosh);
+	maIOCtl_atanh_case(_atanh);
 #endif	//GUIDO
 
 	case maIOCtl_maLockKeypad:
@@ -1539,50 +1538,34 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maCameraSnapshot:
 		return maCameraSnapshot(a, b);
 
-	case maIOCtl_maFileOpen:
-		return maFileOpen(SYSCALL_THIS->GetValidatedStr(a), b);
+	maIOCtl_syscall_case(maFileOpen);
 
-	case maIOCtl_maFileExists:
-		return maFileExists(a);
-	case maIOCtl_maFileClose:
-		return maFileClose(a);
-	case maIOCtl_maFileCreate:
-		return maFileCreate(a);
-	case maIOCtl_maFileDelete:
-		return maFileDelete(a);
-	case maIOCtl_maFileSize:
-		return maFileSize(a);
-	/*case maIOCtl_maFileAvailableSpace:
-		return maFileAvailableSpace(a);
-	case maIOCtl_maFileTotalSpace:
-		return maFileTotalSpace(a);
-	case maIOCtl_maFileDate:
-		return maFileDate(a);
-	case maIOCtl_maFileRename:
-		return maFileRename(a, SYSCALL_THIS->GetValidatedStr(b));
-	case maIOCtl_maFileTruncate:
-		return maFileTruncate(a, b);*/
+	maIOCtl_syscall_case(maFileExists);
+	maIOCtl_syscall_case(maFileClose);
+	maIOCtl_syscall_case(maFileCreate);
+	maIOCtl_syscall_case(maFileDelete);
+	maIOCtl_syscall_case(maFileSize);
+	maIOCtl_syscall_case(maFileAvailableSpace);
+	maIOCtl_syscall_case(maFileTotalSpace);
+	maIOCtl_syscall_case(maFileDate);
+	maIOCtl_syscall_case(maFileRename);
+	maIOCtl_syscall_case(maFileTruncate);
 
 	case maIOCtl_maFileWrite:
-		return maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileWriteFromData:
-		return maFileWriteFromData(GVMRA(MA_FILE_DATA));
+		return SYSCALL_THIS->maFileWrite(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 	case maIOCtl_maFileRead:
-		return maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileReadToData:
-		return maFileReadToData(GVMRA(MA_FILE_DATA));
+		return SYSCALL_THIS->maFileRead(a, SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 
-	case maIOCtl_maFileTell:
-		return maFileTell(a);
-	case maIOCtl_maFileSeek:
-		return maFileSeek(a, b, c);
+	maIOCtl_syscall_case(maFileWriteFromData);
+	maIOCtl_syscall_case(maFileReadToData);
 
-	case maIOCtl_maFileListStart:
-		return maFileListStart(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b));
+	maIOCtl_syscall_case(maFileTell);
+	maIOCtl_syscall_case(maFileSeek);
+
+	maIOCtl_syscall_case(maFileListStart);
 	case maIOCtl_maFileListNext:
-		return maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
-	case maIOCtl_maFileListClose:
-			return maFileListClose(a);
+		return SYSCALL_THIS->maFileListNext(a, (char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
+	maIOCtl_syscall_case(maFileListClose);
 
 #ifdef __SERIES60_3X__	//todo: s60v2 implementation
 	case maIOCtl_maPimListOpen:
@@ -1623,6 +1606,8 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 #endif
 
+	maIOCtl_syscall_case(maTextBox);
+
 	default:
 		return IOCTL_UNAVAILABLE;
 	}
@@ -1631,13 +1616,125 @@ SYSCALL(int, maIOCtl(int function, int a, int b, int c)) {
 //------------------------------------------------------------------------------
 // maGetSystemProperty
 //------------------------------------------------------------------------------
+static const TDesC& getIso639() {
+	// find current UI language
+	TLanguage tl = User::Language();
 
-#ifdef TELEPHONY
+#define LANGUAGES(m)\
+	m(ELangEnglish, en)\
+	m(ELangFrench, fr)\
+	m(ELangGerman, de)\
+	m(ELangSpanish, es)\
+	m(ELangItalian, it)\
+	m(ELangSwedish, sv)\
+	m(ELangDanish, da)\
+	m(ELangNorwegian, no)\
+	m(ELangFinnish, fi)\
+	m(ELangAmerican, en)\
+	m(ELangSwissFrench, fr)\
+	m(ELangSwissGerman, de)\
+	m(ELangPortuguese, pt)\
+	m(ELangTurkish, tr)\
+	m(ELangIcelandic, is)\
+	m(ELangRussian, ru)\
+	m(ELangHungarian, hu)\
+	m(ELangDutch, nl)\
+	m(ELangBelgianFlemish, nl)\
+	m(ELangAustralian, en)\
+	m(ELangBelgianFrench, fr)\
+	m(ELangAustrian, de)\
+	m(ELangNewZealand, en)\
+	m(ELangInternationalFrench, fr)\
+	m(ELangCzech, cs)\
+	m(ELangSlovak, sk)\
+	m(ELangPolish, pl)\
+	m(ELangSlovenian, sl)\
+	m(ELangTaiwanChinese, zh)\
+	m(ELangHongKongChinese, zh)\
+	m(ELangPrcChinese, zh)\
+	m(ELangJapanese, ja)\
+	m(ELangThai, th)\
+	m(ELangAfrikaans, af)\
+	m(ELangAlbanian, sq)\
+	m(ELangAmharic, am)\
+	m(ELangArabic, ar)\
+	m(ELangArmenian, hy)\
+	m(ELangTagalog, tl)\
+	m(ELangBelarussian, be)\
+	m(ELangBengali, bn)\
+	m(ELangBulgarian, bg)\
+	m(ELangBurmese, my)\
+	m(ELangCatalan, ca)\
+	m(ELangCroatian, hr)\
+	m(ELangCanadianEnglish, en)\
+	m(ELangInternationalEnglish, en)\
+	m(ELangSouthAfricanEnglish, en)\
+	m(ELangEstonian, et)\
+	m(ELangFarsi, fa)\
+	m(ELangCanadianFrench, fr)\
+	m(ELangScotsGaelic, gd)\
+	m(ELangGeorgian, ka)\
+	m(ELangGreek, el)\
+	m(ELangCyprusGreek, el)\
+	m(ELangGujarati, gu)\
+	m(ELangHebrew, he)\
+	m(ELangHindi, hi)\
+	m(ELangIndonesian, id)\
+	m(ELangIrish, ga)\
+	m(ELangSwissItalian, )\
+	m(ELangKannada, kn)\
+	m(ELangKazakh, kk)\
+	m(ELangKhmer, km)\
+	m(ELangKorean, ko)\
+	m(ELangLao, lo)\
+	m(ELangLatvian, lv)\
+	m(ELangLithuanian, lt)\
+	m(ELangMacedonian, mk)\
+	m(ELangMalay, ms)\
+	m(ELangMalayalam, ml)\
+	m(ELangMarathi, mr)\
+	m(ELangMoldavian, ro)\
+	m(ELangMongolian, mn)\
+	m(ELangNorwegianNynorsk, no)\
+	m(ELangBrazilianPortuguese, pt)\
+	m(ELangPunjabi, pa)\
+	m(ELangRomanian, ro)\
+	m(ELangSerbian, sr)\
+	m(ELangSinhalese, si)\
+	m(ELangSomali, so)\
+	m(ELangInternationalSpanish, es)\
+	m(ELangLatinAmericanSpanish, es)\
+	m(ELangSwahili, sw)\
+	m(ELangFinlandSwedish, sv)\
+	m(ELangTamil, ta)\
+	m(ELangTelugu, te)\
+	m(ELangTibetan, bo)\
+	m(ELangTigrinya, ti)\
+	m(ELangCyprusTurkish, tr)\
+	m(ELangTurkmen, tk)\
+	m(ELangUkrainian, uk)\
+	m(ELangUrdu, ur)\
+	m(ELangVietnamese, vi)\
+	m(ELangWelsh, cy)\
+	m(ELangZulu, zu)\
+
+	
+#define CASE_LANGUAGE(id, iso) case id: { _LIT(KTemp, #iso); return KTemp(); }
+	switch(tl) {
+		//case ELangEnglish: { _LIT(KTemp, "en"); return KTemp(); }
+		LANGUAGES(CASE_LANGUAGE)
+		default:
+			return KNullDesC;
+	}
+}
+
 int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	TPtrC8 keyC8(CBP key);
+	TPtrC16 value;
+	_LIT8(KISO639, "mosync.iso-639-1");
+#ifdef TELEPHONY
 	_LIT8(KIMEI, "mosync.imei");
 	_LIT8(KIMSI, "mosync.imsi");
-	TPtrC16 value;
 	if(keyC8.Compare(KIMEI) == 0) {
 		// fetch imei from telephony server
 		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
@@ -1662,6 +1759,10 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 		if(result < 0)
 			return -3;
 		value.Set(sid.iSubscriberId);
+	} else
+#endif	//TELEPHONY
+	if(keyC8.Compare(KISO639) == 0) {
+		value.Set(getIso639());
 	}
 	int len = value.Length();
 	if(len == 0)
@@ -1674,7 +1775,7 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	buf[len] = 0;
 	return len + 1;
 }
-#endif
+
 
 //------------------------------------------------------------------------------
 // FileList
@@ -1688,20 +1789,23 @@ public:
 	
 	RootFileList() : mPos(0) {}
 	int next(char* nameBuf, int bufSize) {
+		LOGD("RootFileList::next(%i)\n", mPos);
 		while(mPos < KMaxDrives) {
 			if(mList[mPos] != 0) {
 				//we've got a drive.
-				if(bufSize >= 4) {
+				if(bufSize > 3) {
 					nameBuf[0] = 'A' + mPos;
 					nameBuf[1] = ':';
 					nameBuf[2] = '/';
 					nameBuf[3] = 0;
 					mPos++;
 				}
-				return 4;
+				LOGD("RootFileList::next() returning 3 (%i) at %i\n", bufSize, mPos);
+				return 3;
 			}
 			mPos++;
 		}
+		LOGD("RootFileList::next() returning 0 at %i\n", mPos);
 		return 0;
 	}
 };
@@ -1751,12 +1855,13 @@ static int translateFileListErrorCode(int sym) {
 }
 
 MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
-	//LOG("maFileListStart(%s, %s)\n", path, filter);
+	LOGD("maFileListStart(%s, %s)\n", path, filter);
 	TCleaner<FileList> fl(NULL);
 	MyRFs myrfs;
 	myrfs.Connect();
 	//LOG("connected\n");
 	if(path[0] == 0) {	//empty string
+		LOGD("list filesystem roots\n");
 		//list filesystem roots
 		Smartie<RootFileList> rfl(new RootFileList);
 		int res = FSS.DriveList(rfl->mList);
@@ -1783,9 +1888,9 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 		
 		Append(des, filterPtrC8);
 		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
-		//LOG("GetDir '%S'\n", temp8());
+		LOGD("GetDir '%S'\n", temp8());
 		int res = FSS.GetDir(des, KEntryAttMaskSupported, ESortNone, dfl->mDir);
-		//LOG("res: %i\n", res);
+		LOGD("res: %i\n", res);
 		if(res < 0)
 			return translateFileListErrorCode(res);
 		//LOG("extract\n");
@@ -1801,18 +1906,85 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 }
 
 int Syscall::maFileListNext(MAHandle list, char* nameBuf, int bufSize) {
+	LOGD("maFileListNext(%i)\n", list);
 	FileList* flp = gFileLists.find(list);
 	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
 	return flp->next(nameBuf, bufSize);
 }
 
 int Syscall::maFileListClose(MAHandle list) {
+	LOGD("maFileListClose(%i)\n", list);
 	FileList* flp = gFileLists.find(list);
 	MYASSERT(flp, ERR_FILE_HANDLE_INVALID);
 	gFileLists.erase(list);
 	return 0;
 }
 
+//------------------------------------------------------------------------------
+// maFile*
+//------------------------------------------------------------------------------
+
+#define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
+
+int Syscall::maFileDate(MAHandle file) {
+	LOGD("maFileDate(%i)\n", file);
+	FileHandle& fh(getFileHandle(file));
+	TTime modTime;
+	// TODO: improve error code translation
+	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
+	return unixTime(modTime);
+}
+
+int Syscall::maFileTruncate(MAHandle file, int offset) {
+	LOGD("maFileTruncate(%i, %i)\n", file, offset);
+	FileHandle& fh(getFileHandle(file));
+	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
+	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+	SYMERR_CONVERT(fh.fs->mFile.SetSize(offset), MA_FERR_GENERIC);
+	return 0;
+}
+
+int Syscall::maFileRename(MAHandle file, const char* newName) {
+	LOGD("maFileRename(%i, %s)\n", file, newName);
+	FileHandle& fh(getFileHandle(file));
+	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
+	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+	Smartie<HBufC16> nn(CreateHBufC16FromCStringL(newName));
+	// TODO: The RFile::Rename function is simple, but doesn't follow the MoSync spec in a few cases.
+	// Use RFs::Rename() instead.
+	// May have to switch directory separators, too.
+	SYMERR_CONVERT(fh.fs->mFile.Rename(*nn), MA_FERR_GENERIC);
+	return 0;
+}
+
+int Syscall::getVolumeInfo(MAHandle file, TVolumeInfo& vi) {
+	FileHandle& fh(getFileHandle(file));
+	int drive;
+	if(fh.name[1] == ':') {
+		drive = EDriveA + (fh.name[0] - 'A');
+	} else {
+		drive = KDefaultDrive;
+	}
+	MyRFs myrfs;
+	myrfs.Connect();
+	return FSS.Volume(vi, drive);
+}
+
+int Syscall::maFileAvailableSpace(MAHandle file) {
+	LOGD("maFileAvailableSpace(%i)\n", file);
+	TVolumeInfo vi;
+	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
+	return I64LOW(MIN(vi.iFree, TInt64(0x7fffffff)));
+}
+
+int Syscall::maFileTotalSpace(MAHandle file) {
+	LOGD("maFileTotalSpace(%i)\n", file);
+	TVolumeInfo vi;
+	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
+	return I64LOW(MIN(vi.iSize, TInt64(0x7fffffff)));
+}
+
+	
 //------------------------------------------------------------------------------
 // CellID
 //------------------------------------------------------------------------------
@@ -2786,4 +2958,24 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 	if(aEvent.iErrorCode != KErrNone) {
 		gStreamState = SS_ERROR;
 	}
+}
+
+int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+	int maxSize, int constraints)
+{
+	TPtrC tTitle(title);
+	TPtrC tInText(inText);
+	TPtr tOutText(outText, maxSize - 1);
+	int res = gAppView.TextBox(tTitle, tInText, tOutText, constraints);
+	DEBUG_ASSERT(tOutText.Length() < maxSize);
+	outText[tOutText.Length()] = 0;
+	
+	// send message
+	MAEvent e;
+	e.type = EVENT_TYPE_TEXTBOX;
+	e.textbox.textboxResult = res;
+	e.textbox.textboxLength = tOutText.Length();
+	gAppView.AddEvent(e);
+	
+	return res;
 }

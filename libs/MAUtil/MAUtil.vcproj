@@ -244,6 +244,14 @@
 			Name="Communication"
 			>
 			<File
+				RelativePath=".\BluetoothConnection.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\BluetoothConnection.h"
+				>
+			</File>
+			<File
 				RelativePath=".\BluetoothDiscovery.cpp"
 				>
 			</File>
@@ -340,6 +348,14 @@
 		</File>
 		<File
 			RelativePath=".\DataHandler.h"
+			>
+		</File>
+		<File
+			RelativePath=".\FileLister.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\FileLister.h"
 			>
 		</File>
 		<File

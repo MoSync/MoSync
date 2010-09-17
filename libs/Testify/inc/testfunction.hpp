@@ -32,7 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * This class wraps a test function. It's main reason for
+ * @brief A wrapper for a test function. It's main reason for
  * existing is to provide homogeneous interface without
  * special cases.
  *
