@@ -1390,7 +1390,8 @@ class HttpConnectionRunner implements Runnable
 				byte[] bytes = new byte[mConn.mSize];
 				result = mConn.getInputStream().read(bytes);
 				
-				Log.i("HttpConnectionRunner", "Read result: " + result);
+				Log.i("HttpConnectionRunner", "Read result length: " + result);
+				//Log.i("HttpConnectionRunner", "Read result: " + new String(bytes));
 				
 				if (mConn.mUseResource == true) // store in resource 
 				{
@@ -1480,7 +1481,7 @@ class HttpConnectionRunner implements Runnable
 					mMemDataSection.get(data);
 					mMemDataSection.reset();
 					
-					Log.i("HttpConnectionRunner", "Writing data: " + new String(data));
+					Log.i("HttpConnectionRunner", "Writing data");
 					mConn.getOutputStream().write(data);
 					
 					//readMemStream(mConn.getOutputStream(), mConn.mMemory, mConn.mSize);
