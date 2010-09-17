@@ -27,13 +27,14 @@ static void setupS60(const SETTINGS& s, string& dstPath, string& combName) {
 	}
 }
 
-void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
+void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	string dstPath, combName;
 	setupS60(s, dstPath, combName);
 
 	// set up resource templates
 	string rscBaseName = (dstPath + s.uid);
 	string rsgName = rscBaseName + ".rsg";
+	const string& runtimePath = ri.path;
 
 	TemplateMap tm;
 	tm["app-name"] = s.name;
@@ -77,6 +78,14 @@ void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
 		dstPath<<s.uid<<".exe\" "<<s.uid;
 	sh(cmd.str().c_str());
 
+	// call icon-injector
+	if(s.icon) {
+		cmd.str("");
+		cmd << mosyncdir()<<"/bin/icon-injector -src \""<<s.icon<<"\" -size "<<ri.iconSize<<
+			" -platform symbian9 -dst \""<<dstPath<<"/"<<s.uid<<"_icon.mif\"";
+		sh(cmd.str().c_str());
+	}
+
 	// use template .pkg
 	string templatePkgName = runtimePath + "MoSync-template.pkg";
 	string genPkgName = (dstPath + s.uid) + ".pkg";
@@ -88,7 +97,7 @@ void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
 	tm["pkg-runtime-dir"] = runtimePath;
 	tm["pkg-package-output-dir"] = dstPath;
 	tm["pkg-programcomb-output"] = combName;
-	tm["has-icon"] = "; ";	//commented out. fixme.
+	tm["has-icon"] = s.icon ? "" : "; ";
 	applyTemplate(genPkgName.c_str(), templatePkgName.c_str(), tm);
 
 	// call makesis
@@ -106,12 +115,13 @@ void packageS60v3(const SETTINGS& s, const std::string& runtimePath) {
 }
 
 
-void packageS60v2(const SETTINGS& s, const std::string& runtimePath) {
+void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	string dstPath, combName;
 	setupS60(s, dstPath, combName);
 
 	// set up resource templates
 	string rscBaseName = (dstPath + s.uid);
+	const string& runtimePath = ri.path;
 
 	TemplateMap tm;
 	tm["app-name"] = s.name;

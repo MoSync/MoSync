@@ -5,7 +5,7 @@
 #include "packagers.h"
 
 // reads JAD and JAR from cwd, outputs COD file to s.dst.
-void packageBlackberry(const SETTINGS& s) {
+void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
 	testName(s);
 	std::stringstream cmd;

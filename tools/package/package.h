@@ -5,6 +5,7 @@
 struct SETTINGS {
 	const char* program;
 	const char* resource;
+	const char* icon;
 	const char* model;
 	const char* dst;
 	const char* name;

@@ -13,6 +13,7 @@ static const char* sUsage =
 " -h, --help                   Print this information.\n"
 " -p, --program <file>         Input: compiled program file.\n"
 " -r, --resource <file>        Input: compiled resource file.\n"
+" -i, --icon <file>            Input: MoSync icon definition file (XML).\n"
 " -m, --model <vendor>/<model> Output: target model.\n"
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
@@ -49,6 +50,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.program);
 		} else if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
 			setString(i, argc, argv, s.resource);
+		} else if(streq(argv[i], "-i") || streq(argv[i], "--icon")) {
+			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
 		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
