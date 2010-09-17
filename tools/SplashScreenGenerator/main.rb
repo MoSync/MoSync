@@ -44,11 +44,16 @@ PLATFORMS = [
 	'Moblin 2.x'
 ]
 
-index = 0
-File.open('\mb\revision', 'r') do |f|
-	while (line = f.gets)
-		version[index] = line
-		index = index + 1
+if ARGV.length() == 2
+	version[0] = ARGV[0] # MoSync SDK version
+	version[1] = ARGV[1] # SVN revision
+else
+	index = 0
+	File.open('\mb\revision', 'r') do |f|
+		while (line = f.gets)
+			version[index] = line
+			index = index + 1
+		end
 	end
 end
 

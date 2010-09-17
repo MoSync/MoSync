@@ -220,17 +220,40 @@ void storeAudioUBin(UBinData data, int resHandle) throws Exception
 
 }
 
+/*
+MediaPlayer states are protected by mutexes in the native layer.
+However, the playback complete is an asynchronous event that comes on
+a binder worker thread. It's possible that you could call reset() in
+the window after the native media player service has posted a playback
+complete message to the binder interface, but before the client worker
+thread has processed it. In this case, the playback complete message
+would reset the client side of the interface to the stopped state.
+Your subsequent setDataSource() call would fail.
+
+If you wait for the playback complete message and then post a message
+to your handler to start the next playback, you can avoid this
+problem. Or as Marco suggests, create a second MediaPlayer object.
+Just make sure you call release() on each one after you're done with
+it to release the native resources.
+*/
 
 int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 {
-
-	if(mMediaPlayer.isPlaying())
-		mMediaPlayer.stop();
+	if (null != mMediaPlayer)
+	{
+		mMediaPlayer.release();
+		mMediaPlayer = null;
+	}
+	
+	if (null == mMediaPlayer)
+	{
+		mMediaPlayer = new MediaPlayer();
+	}
 	
 	Log.i("MoSync audio","Reading audio resource:" + soundResource);
 	
-	AudioStore audioStore = (AudioStore)mAudioStores.get(new Integer(soundResource));
-	if(audioStore == null)
+	AudioStore audioStore = (AudioStore) mAudioStores.get(new Integer(soundResource));
+	if (audioStore == null)
 	{
 		Log.i("MoSync audio","No audio resource with handle: " + soundResource + " found!");
 		return -1;
@@ -240,7 +263,10 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 	
 	FileDescriptor fileDesc = mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
 
-	if(null == fileDesc) Log.i("MoSync audio","File Descriptor was null!");
+	if (null == fileDesc) 
+	{
+		Log.i("MoSync audio","File Descriptor was null!");
+	}
 	
 	try
 	{	
@@ -254,7 +280,7 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 		mMediaPlayer.start();
 
 	}
-	catch(Exception e)
+	catch (Exception e)
 	{
 		Log.i("MoSync audio","Whoops! Exception e:" + e.toString());
 	}

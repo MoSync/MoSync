@@ -24,9 +24,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 int CONNOP_CONNECT_SUCCESS = 1;
 			
 /*
-* The hashtable mConnections is used to keep all the open connections.
-*/
-Hashtable<Integer, ConnectionObject> mConnections = new Hashtable<Integer, ConnectionObject>();
+ * Hashtable is used to keep all the open connections.
+ */
+Hashtable<Integer, ConnectionObject> mConnections_DoNotReferenceExplictly = 
+	new Hashtable<Integer, ConnectionObject>();
 
 /**
  * Connection handle counter.
@@ -55,7 +56,6 @@ MAHandle maConnect(final String url)
 {
 	Log.i("MoSyncSyscall", "maConnect url: " + url);
 
-	// Have we reached the max number of connections?
 	if (networkIsMaxNumberOfConnectionsReached())
 	{
 		return CONNERR_MAX;
@@ -105,7 +105,6 @@ MAHandle maConnect(final String url)
 		return CONNERR_GENERIC;
 	}
 
-	// Return current handle value and increment.
 	return connHandle;
 }
 
@@ -121,53 +120,39 @@ int maConnGetAddr(MAHandle conn, long addr) throws Exception {
 /**
 * Close a connection.
 */
-void maConnClose(MAHandle conn) throws Exception 
+void maConnClose(MAHandle connHandle) throws Exception 
 {
 	Log.i("MoSyncSyscall", "maConnClose");
-	ConnectionObject connObj = mConnections.get(conn);
-	if (null != connObj)
-	{
-		connObj.close();
-		mConnections.remove(conn);
-	}
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	connObj.close();
+	networkRemoveConnectionObject(connObj);
 }
 
-void maConnRead(MAHandle conn, int dst, int size) 
+void maConnRead(MAHandle connHandle, int dst, int size) 
 {
 	Log.i(
 		"@MoSyncSyscall",
-		"maConnRead" + " conn:" + conn + " dst:" + dst + " size:" + size);
-	SYSLOG("conn:" + conn + " dst:" + dst + " size:" + size);
+		"maConnRead" + " connHandle:" + connHandle + " dst:" + dst + " size:" + size);
+	SYSLOG("connHandle:" + connHandle + " dst:" + dst + " size:" + size);
 	
 	MYASSERT(size > 0);
 	
-	ConnectionObject connObj = mConnections.get(conn);
-	if (null != connObj)
-	{
-		connObj.read(dst, size);
-	}
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	connObj.read(dst, size);
 }
 
-void maConnWrite(MAHandle conn, int src, int size) throws IOException 
+void maConnWrite(MAHandle connHandle, int src, int size) throws IOException 
 {
-	Log.i("MoSyncSyscall", "maConnWrite conn:" + conn + " src:" + src + " size:" + size);
-	SYSLOG("conn:" + conn + " src:" + src + " size:" + size);
+	Log.i("MoSyncSyscall", "maConnWrite connHandle:" + connHandle + " src:" + src + " size:" + size);
+	SYSLOG("connHandle:" + connHandle + " src:" + src + " size:" + size);
 	
 	MYASSERT(size > 0);
 	
-	ConnectionObject connObj = mConnections.get(conn);
-	if (null != connObj)
-	{
-		Log.i("oooooooooooooo MoSyncSyscall", "connObj.write(src, size)");
-		connObj.write(src, size);
-	}
-	else
-	{
-		Log.i("oooooooooooooo MoSyncSyscall", "connObj == null !!!!!!!!!!");
-	}
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	connObj.write(src, size);
 }
 
-void maConnReadToData(MAHandle conn, MAHandle data, int offset, int size) 
+void maConnReadToData(MAHandle connHandle, MAHandle data, int offset, int size) 
 {
 	Log.i("MoSyncSyscall", "maConnReadToData");
 
@@ -175,14 +160,11 @@ void maConnReadToData(MAHandle conn, MAHandle data, int offset, int size)
 	MYASSERT(size > 0);
 	MYASSERT(offset + size > 0);
 	
-	ConnectionObject connObj = mConnections.get(conn);
-	if (null != connObj)
-	{
-		connObj.readToData(data, offset, size);
-	}
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	connObj.readToData(data, offset, size);
 }
 
-void maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size) 
+void maConnWriteFromData(MAHandle connHandle, MAHandle data, int offset, int size) 
 	throws IOException 
 {
 	Log.i("MoSyncSyscall", "maConnWriteFromData");
@@ -191,11 +173,8 @@ void maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size)
 	MYASSERT(size > 0);
 	MYASSERT(offset + size > 0);
 
-	ConnectionObject connObj = mConnections.get(conn);
-	if (null != connObj)
-	{
-		connObj.writeFromData(data, offset, size);
-	}
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	connObj.writeFromData(data, offset, size);
 }
 
 MAHandle maHttpCreate(String url, int method) throws Exception
@@ -216,7 +195,7 @@ MAHandle maHttpCreate(String url, int method) throws Exception
 			new HttpConnectionObject().create(url, method, connHandle);
 		DEBUG_ASSERT(connObj.mHttpState == HTTP_STATE_NULL);
 		connObj.mHttpState = HTTP_STATE_SETUP;
-		mConnections.put(connHandle, connObj);
+		networkAddConnectionObject(connObj);
 	}
 	catch (MalformedURLException e)
 	{
@@ -237,29 +216,29 @@ MAHandle maHttpCreate(String url, int method) throws Exception
 	return connHandle;
 }
 
-void maHttpSetRequestHeader(MAHandle conn, String key, String value)
+void maHttpSetRequestHeader(MAHandle connHandle, String key, String value)
 	throws Exception
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpSetRequestHeader");
 
-	ConnectionObject connObj = mConnections.get(conn);
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
 	connObj.setRequestProperty(key, value);
 }
 
-int maHttpGetResponseHeader(MAHandle conn, String key, long address, int bufSize)
+int maHttpGetResponseHeader(MAHandle connHandle, String key, long address, int bufSize)
 	throws Exception
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpGetResponseHeader");
 	
-	ConnectionObject connObj = mConnections.get(conn);
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
 	return connObj.getResponseHeader(key, address, bufSize);
 }
 
-void maHttpFinish(MAHandle conn)
+void maHttpFinish(MAHandle connHandle)
 {
 	Log.i("MoSyncSyscall","URLConnectionTask - maHttpFinish");
 	
-	ConnectionObject connObj = mConnections.get(conn);
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
 	
 	MYASSERT(connObj.mState == 0);
 	MYASSERT(connObj.mHttpState == HTTP_STATE_SETUP || connObj.mHttpState == HTTP_STATE_WRITING);
@@ -276,8 +255,7 @@ int maAccept(MAHandle serverHandle)
 	Log.i("@@ NetworkSyscall", "maAccept");
 	
 	// Find the connection object. 
-	ConnectionObject connObj = mConnections.get(serverHandle);
-	
+	ConnectionObject connObj = networkGetConnectionObject(serverHandle);
 	if (null == connObj)
 	{
 		Log.i("@@@ maAccept", "null == connObj, serverHandle = " + serverHandle);
@@ -312,6 +290,21 @@ int networkGetNextConnectionHandle()
 boolean networkIsMaxNumberOfConnectionsReached()
 {
 	return (mConnHandleCounter_DoNotReferenceExplictly + 1) >= CONN_MAX;
+}
+
+ConnectionObject networkGetConnectionObject(MAHandle connHandle)
+{
+	return mConnections_DoNotReferenceExplictly.get(connHandle);
+}
+	
+void networkAddConnectionObject(ConnectionObject connObj)
+{
+	mConnections_DoNotReferenceExplictly.put(connObj.mHandle, connObj);
+}
+
+void networkRemoveConnectionObject(ConnectionObject connObj)
+{
+	mConnections_DoNotReferenceExplictly.remove(connObj.mHandle); 
 }
 
 public abstract class ConnectionObject
@@ -609,8 +602,8 @@ public abstract class ConnectionObject
 
 	public void connect()
 	{
-		mConnections.put(mHandle, this);
 		mState |= CONNOP_CONNECT;
+		networkAddConnectionObject(this);
 		startConnectThread();
 	}
 	
@@ -859,7 +852,7 @@ class BluetoothConnectionObject extends ConnectionObject
 		mState |= CONNOP_CONNECT;
 		mHandle = handle;
 		mSocket = socket;
-		mConnections.put(mHandle, this);
+		networkAddConnectionObject(this);
 		
 		// Post connect event on this connection handle.
 		postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
@@ -1155,9 +1148,8 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	{
 		// We do NOT spawn a thread here. That is done via maAccept.
 		
-		Log.i("@@@ BluetoothServerConnectionObject", "connect mHandle = " + mHandle);
-		mConnections.put(mHandle, this);
 		mState |= CONNOP_CONNECT;
+		networkAddConnectionObject(this);
 		postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
 	}
 	
@@ -1398,7 +1390,8 @@ class HttpConnectionRunner implements Runnable
 				byte[] bytes = new byte[mConn.mSize];
 				result = mConn.getInputStream().read(bytes);
 				
-				Log.i("HttpConnectionRunner", "Read result: " + result);
+				Log.i("HttpConnectionRunner", "Read result length: " + result);
+				//Log.i("HttpConnectionRunner", "Read result: " + new String(bytes));
 				
 				if (mConn.mUseResource == true) // store in resource 
 				{
@@ -1488,7 +1481,7 @@ class HttpConnectionRunner implements Runnable
 					mMemDataSection.get(data);
 					mMemDataSection.reset();
 					
-					Log.i("HttpConnectionRunner", "Writing data: " + new String(data));
+					Log.i("HttpConnectionRunner", "Writing data");
 					mConn.getOutputStream().write(data);
 					
 					//readMemStream(mConn.getOutputStream(), mConn.mMemory, mConn.mSize);

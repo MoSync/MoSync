@@ -724,6 +724,7 @@ interface MAAPI {
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
+	* You can also use class MAUtil:: BluetoothConnection to connect via Bluetooth service uuid.
 	*
 	* To find useful Bluetooth addresses, use the Bluetooth discovery API.
 	* See maBtStartDeviceDiscovery().
@@ -1790,12 +1791,16 @@ interface MAAPI {
 		* Takes a device address and the UUID of the service class to search for.
 		* For example, pass #RFCOMM_PROTOCOL_MAUUID and you'll get all connectable services.
 		* Pass #SerialPort_Service_MAUUID and you'll get only that type of service.
+		*
 		* \see maBtGetNextServiceSize
 		* \see maBtGetNewService
 		* \see maBtCancelDiscovery
 		* \see EVENT_TYPE_BT
 		*
 		* \returns 0 on success, \< 0 on failure.
+		*
+		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
+		* to connect via service uuid (this method is cross platform).
 		*/
 		int maBtStartServiceDiscovery(in MABtAddr address, in MAUUID uuid);
 
@@ -1805,6 +1810,9 @@ interface MAAPI {
 		* \returns \> 0 on success, or zero if the queue is empty.
 		* \see maBtStartServiceDiscovery
 		* \see maBtGetNewService
+		*
+		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
+		* to connect via service uuid (this method is cross platform).
 		*/
 		int maBtGetNextServiceSize(out MABtServiceSize dst);
 
@@ -1813,6 +1821,9 @@ interface MAAPI {
 		* Removes the data from the internal queue filled by maBtStartServiceDiscovery().
 		* \returns \> 0 on success, or zero if the queue is empty.
 		* \see maBtGetNextServiceSize
+		*
+		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
+		* to connect via service uuid (this method is cross platform).
 		*/
 		int maBtGetNewService(out MABtService dst);
 

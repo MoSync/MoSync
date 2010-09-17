@@ -79,10 +79,7 @@ boolean initSyscalls()
 	 mBlitPaint.setAlpha(255);
 	 
 	 mSoundVolume = 50;
-
-	 mMediaPlayer = new MediaPlayer();
-	 mMediaPlayer.reset();
-
+	 
 	 return true;
 }
 
