@@ -53,7 +53,7 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	std::ostringstream cmd;
 	cmd << mosyncdir()<<"/bin/rcomp -u \"-o"<<mainRscName<<"\" \"-h"<<rsgName<<
 		"\" \"-s"<<genRssName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// use template reg.prs
 	string templateRegName = runtimePath + "MoSync_reg_template.prs";
@@ -64,26 +64,26 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	string genRegName = rscBaseName + "_reg.rss";
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/cpp \""<<prsName<<"\" \""<<genRegName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// call rcomp again
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/rcomp -u \"-o"<<regRscName<<
 		"\" \"-s"<<genRegName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// call e32hack
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/e32hack \""<<runtimePath<<"MoSync"<<(s.debug ? "D" : "")<<".exe\" \""<<
 		dstPath<<s.uid<<".exe\" "<<s.uid;
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// call icon-injector
 	if(s.icon) {
 		cmd.str("");
 		cmd << mosyncdir()<<"/bin/icon-injector -src \""<<s.icon<<"\" -size "<<ri.iconSize<<
 			" -platform symbian9 -dst \""<<dstPath<<"/"<<s.uid<<"_icon.mif\"";
-		sh(cmd.str().c_str());
+		sh(cmd.str().c_str(), s.silent);
 	}
 
 	// use template .pkg
@@ -103,13 +103,13 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	// call makesis
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/makesis-4 \""<<genPkgName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// call signsis
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/signsis-4 -s \""<<unsignedSisName<<"\" \""<<signedSisName<<"\" \""<<
 		mosyncdir()<<"/etc/default.cert\" \""<<mosyncdir()<<"/etc/default.key\" default";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// and we're done!
 }
@@ -136,7 +136,7 @@ void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	string captionRscName = rscBaseName + "_caption.rsc";
 	std::ostringstream cmd;
 	cmd << mosyncdir()<<"/bin/rcomp -u \"-o"<<captionRscName<<"\" \"-s"<<genRssName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// copy main rsc file
 	string mainRscName = rscBaseName + ".rsc";
@@ -146,7 +146,7 @@ void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/e32hack \""<<runtimePath<<"MoSync"<<(s.debug ? "D" : "")<<".app\" \""<<
 		dstPath<<s.uid<<".app\" "<<s.uid<<" -v2";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// use template .pkg
 	string templatePkgName = runtimePath + "MoSync-template.pkg";
@@ -162,7 +162,7 @@ void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	// call makesis
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/makesis-200 \""<<genPkgName<<"\"";
-	sh(cmd.str().c_str());
+	sh(cmd.str().c_str(), s.silent);
 
 	// and we're done!
 }

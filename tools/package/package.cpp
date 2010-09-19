@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <string>
+
 #include "package.h"
 
 static const char* sUsage =
@@ -20,6 +23,7 @@ static const char* sUsage =
 "     --vendor <name>          Output: application vendor's name.\n"
 "     --debug                  Output: use debug runtime.\n"
 "     --uid <8-digit hex>      Output: Symbian UID.\n"
+" -s, --silent                 Output: Supress additional output, e.g. warnings."
 "\n"
 "Environment variables used:\n"
 " MOSYNCDIR                    Path to the MoSync installation directory.\n"
@@ -64,6 +68,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "-s") || streq(argv[i], "--silent")) {
+			s.silent = true;
 		} else {
 			printf("Unknown argument: '%s'\n", argv[i]);
 			return 1;
@@ -123,11 +129,23 @@ const char* mosyncdir() {
 	return md;
 }
 
-void sh(const char* cmd) {
+void sh(const char* cmd, bool hideOutput) {
 	printf("%s\n", cmd);
 	fflush(stdout);
 	fflush(stderr);
-	int res = system(cmd);
+
+	std::string finalCmd(cmd);
+	if(hideOutput) {
+		// Supress output from stdout and stderr
+#ifdef WIN32
+		finalCmd += "> nul 2>&1";
+#else
+		finalCmd += "> /dev/null 2>&1";
+#endif
+	}
+
+	int res = system(finalCmd.c_str());
+
 	fflush(stdout);
 	fflush(stderr);
 	if(res != 0) {
