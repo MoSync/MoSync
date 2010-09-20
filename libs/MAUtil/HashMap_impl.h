@@ -28,7 +28,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //******************************************************************************
 
 template<class Key, class Value>
-MAUtil::HashMap<Key, Value>::HashNode::HashNode() {
+MAUtil::HashMap<Key, Value>::HashNode::HashNode(PairKV p)
+: data(p)
+{
 	memset((hnode_t*)this, 0, sizeof(hnode_t));
 }
 
@@ -89,13 +91,12 @@ template<class Key, class Value>
 MAUtil::Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
 MAUtil::HashMap<Key, Value>::insert(const Key& key, const Value& value) {
 	Pair<Iterator, bool> pair = { Iterator(), false };
-	HashNode* newNode = new HashNode();
-	newNode->data.first = key;
+	PairKV p = { key, value };
+	HashNode* newNode = new HashNode(p);
 	HashNode* resNode = (HashNode*)hash_insert(&mHash, newNode, &newNode->data.first);
 	if(resNode == NULL) {	//success
 		pair.second = true;
 		hash_scan_init(&pair.first.mScan, &mHash, newNode);
-		newNode->data.second = value;
 	} else {	//this key was already in the table
 		pair.second = false;
 		hash_scan_init(&pair.first.mScan, &mHash, resNode);
@@ -170,8 +171,8 @@ template<class Key, class Value>
 Value& MAUtil::HashMap<Key, Value>::operator[](const Key& key) {
 	HashNode* node = (HashNode*)hash_lookup(&mHash, &key);
 	if(node == NULL) {
-		node = new HashNode();
-		node->data.first = key;
+		PairKV p = { key, Value() };
+		node = new HashNode(p);
 		hash_insert(&mHash, node, &node->data.first);
 	}
 	return node->data.second;

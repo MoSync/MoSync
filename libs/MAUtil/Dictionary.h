@@ -46,8 +46,8 @@ namespace MAUtil {
 * This class is not meant to be instantiated directly.
 * It is the base class for Set and Map.
 *
-* \warning It is techically possible to use an Iterator to change the Key of an element.
-* DON'T DO THAT!. It would break the sorting order of the Dictionary.
+* \note It is not allowed to change the Key of an element.
+* Doing so would break the sorting order of the Dictionary.
 * The consequenses are undefined, and will likely cause your program to crash.
 *
 * If you must change a Key, erase the original element from the dictionary,
@@ -58,7 +58,7 @@ class Dictionary {
 protected:
 	/** \brief Internal. */
 	struct DictNode : dnode_t {
-		DictNode();
+		DictNode(Storage s);
 		Storage data;
 	};
 public:
@@ -195,9 +195,6 @@ protected:
 #ifdef KAZLIB_OPAQUE_DEBUG
 #error Need full definition of dnode_t
 #endif
-
-	static dnode_t* alloc(void*) { return new DictNode; }
-	static void free(dnode_t* node, void*) { delete (DictNode*)node; }
 
 	void init(CompareFunction);
 

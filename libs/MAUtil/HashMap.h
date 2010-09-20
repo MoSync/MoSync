@@ -60,10 +60,10 @@ template<> hash_val_t THashFunction(const int&);
 template<class Key, class Value>
 class HashMap {
 public:
-	typedef Pair<Key, Value> PairKV;
+	typedef Pair<const Key, Value> PairKV;
 protected:
 	struct HashNode : hnode_t {
-		HashNode();
+		HashNode(PairKV p);
 		PairKV data;
 	};
 public:
@@ -221,10 +221,10 @@ protected:
 	hash_t mHash;
 	HashFunction mHashFunction;
 
-	static hnode_t* alloc(void*) { return new HashNode; }
+	static hnode_t* alloc(void*) GCCATTRIB(noreturn) { BIG_PHAT_ERROR; }
 	static void free(hnode_t* node, void*) { delete (HashNode*)node; }
 
-	void init();
+	//void init();
 };
 
 }	//MAUtil
