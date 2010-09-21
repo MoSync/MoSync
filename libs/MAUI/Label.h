@@ -36,6 +36,8 @@ namespace MAUI {
 	* text. The text can be aligned left, right or centered
 	* both vertically and horizontally.
 	* The widget draws its background by default, use setDrawBackground(false) to disable it.	
+	*
+	* Note: Doesn't support unicode strings yet, because the font-system doesn't (will change in the future).
 	**/
 
 	class Label : public Widget {

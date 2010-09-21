@@ -86,7 +86,6 @@ namespace MAUI {
 		mAutoSize(false),
 		mTouched(false),
 		mFocusedWidget(NULL) {
-		mShortPressTrigger = new ShortPressTrigger(this, SHORT_PRESS_TIME);
 		requestRepaint();
 	}
 
@@ -103,7 +102,6 @@ namespace MAUI {
 		mAutoSize(false),
 		mTouched(false),
 		mFocusedWidget(NULL) {
-		mShortPressTrigger = new ShortPressTrigger(this, SHORT_PRESS_TIME);
 		requestRepaint();
 	}
 
@@ -612,7 +610,7 @@ namespace MAUI {
 				if(ABS_IS_LESS(mTouchVelX,0.001)) Environment::getEnvironment().removeTimer(this);
 			} else {
 				setScrollOffset((mYOffset + (int)(mTouchVelY*65536.0*20.0))>>16);
-				mTouchVelY*=0.926;
+				mTouchVelY*=0.966;
 				if(ABS_IS_LESS(mTouchVelY,0.001)) Environment::getEnvironment().removeTimer(this);
 			}
 
@@ -696,7 +694,6 @@ namespace MAUI {
 		mTouchMotionTracker.reset();
 		mTouchMotionTracker.addPoint(p);
 
-	//	Widget* w = NULL;
 		int x = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
 		int y = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
 		Vector_each(Widget *, it, mChildren) {
@@ -708,37 +705,22 @@ namespace MAUI {
 				break;
 			}
 		}
-
-		//MAUI_LOG("found focus");
-		/*
-		if(w) {
-			mShortPressTrigger->setWidget(w);
-			mShortPressTrigger->setPoint(p);
-			mShortPressTrigger->start();
-		}
-		*/
 		return false;
 	}
 
 	bool ListBox::pointerMoved(MAPoint2d p, int id) {
+		MAUI_LOG("Got event %d, %d", p.x, p.y);
 		if(mFocusedWidget) {
 			if(!mFocusedWidget->pointerMoved(p, id)) {
 				mFocusedWidget->setFocused(false);
 				mFocusedWidget = NULL;
 			}
 			return false;
-			//int x = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
-			//int y = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
-
-			//if(!mFocusedWidget->contains(x, y)) {
-			//	mShortPressTrigger->stop();
-			//	mFocusedWidget->setFocused(false);
-			//	mFocusedWidget = NULL;
-			//}
 		}
 		if(id==0) {
 			int relX, relY;
 			mTouchMotionTracker.addPoint(p, relX, relY);
+			if(relX==0 && relY == 0) return false;
 
 			if(mOrientation == LBO_VERTICAL)
 				setScrollOffset((mYOffset>>16)+relY);
@@ -747,15 +729,11 @@ namespace MAUI {
 
 
 			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
-			if(!(ABS_IS_LESS(mTouchVelX,0.01) && ABS_IS_LESS(mTouchVelY,0.01))) {
-				mShortPressTrigger->stop();
-			}
 		}
 		return false;
 	}
 
 	bool ListBox::pointerReleased(MAPoint2d p, int id) {
-		mShortPressTrigger->stop();
 		if(mFocusedWidget) {
 			mFocusedWidget->pointerReleased(p, id);
 			mFocusedWidget->setFocused(false);
@@ -766,17 +744,6 @@ namespace MAUI {
 		if(id==0) {
 			mTouched = true;
 			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
-			/*
-			if(ABS_IS_LESS(mTouchVelX,0.001) && ABS_IS_LESS(mTouchVelY,0.001)) {
-				Widget* w = focusableWidgetAt(p.x, p.y);
-				if(w) {
-					Screen::getCurrentScreen()->setFocusedWidget(w);
-					return w->pointerPressed(p, id);
-				}
-			}
-			*/
-
-			//MAUI_LOG("tdx: %f, tdy: %f, tvx: %f, tvy: %f", mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
 			Environment::getEnvironment().addTimer(this, MS_PER_FRAME, -1);
 		}
 		return false;

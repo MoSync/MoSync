@@ -22,10 +22,10 @@ int Slider::getSliderPos() const {
 
 bool Slider::pointerPressed(MAPoint2d p, int id) {
 	int sliderPos = getSliderPos();
-	if(mOrientation == HORIZONTAL && p.x>mBounds.x+sliderPos && p.x<mBounds.x+sliderPos+mSliderGripWidth) {
+	if(mOrientation == HORIZONTAL && p.x>(mBounds.x+sliderPos-mSliderGripWidth) && (p.x<mBounds.x+sliderPos+mSliderGripWidth*2)) {
 		mPressed = true;
 	}
-	else if(mOrientation == VERTICAL  && p.y>mBounds.y+sliderPos && p.y<mBounds.x+sliderPos+mSliderGripHeight) {
+	else if(mOrientation == VERTICAL  && p.y>(mBounds.y+sliderPos-mSliderGripHeight) && p.y<(mBounds.x+sliderPos+mSliderGripHeight*2)) {
 		mPressed = true;
 	}
 	else {

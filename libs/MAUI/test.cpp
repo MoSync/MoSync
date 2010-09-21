@@ -11,28 +11,15 @@
 
 #include "MAHeaders.h"
 
-#include <mastdlib.h>
 #include <conprint.h>
+#include <mastdlib.h>
+
 #include <MAUtil/Graphics.h>
+
+#include "MAUI/NativeEditBox.h"
 
 using namespace MAUtil;
 using namespace MAUI;
-
-
-class StringListbox : public ListBox {
-public:
-	StringListbox(int x, int y, int width, int height, Widget* parent=NULL) : ListBox(x, y, width, height, parent, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true) {
-	}
-
-	void addString(const String& str) {
-
-	}
-
-protected:
-
-};
-
-
 
 template <typename T>
 class Queue {
@@ -428,15 +415,21 @@ public:
 					"C","0","=","/"
 			};
 
+			Button *button;
 			for(int i = 0; i < 16; i++) {
-				Button* button = new Button(0, 0, 50, 50, calculatorPane, buttons1[i]);
+				button = new Button(0, 0, 50, 50, calculatorPane, buttons1[i]);
 				button->addWidgetListener(this);
 			}
 
-			Button *button = new Button(0, 0, 50, 50, mainListbox, "graph");
-			button->addWidgetListener(this);
+			for(int i = 0; i < 16; i++) {
+				button = new Button(0, 0, 50, 50, mainListbox, "graph");
+				button->addWidgetListener(this);
+			}
+
+			NativeEditBox *native = new NativeEditBox(0, 0, 50, 50, mainListbox);
 			button = new Button(0, 0, 50, 50, mainListbox, "exit");
 			button->addWidgetListener(this);
+
 
 			mExp = new Expression();
 
@@ -467,6 +460,12 @@ public:
 class MAUIMoblet : public Moblet {
 public:
 	MAUIMoblet() {
+
+		gConsoleForceDisplay = 0;
+		gConsoleDrawBackground = 0;
+
+		Engine::getSingleton().setDisplayConsole(true);
+
 		SkinProperty* selectedWidgetSkin = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
 		SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
 		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 6, 11, 0, 8, true);
@@ -475,7 +474,7 @@ public:
 		FontProperty* font = new FontProperty(RES_FONT);
 
 		Style* widgetStyle = new Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
-		LabelStyle* labelStyle = new LabelStyle(font, 0,0,0,0,0,0,0,0, selectedWidgetSkin, unselectedWidgetSkin);
+		LabelStyle* labelStyle = new LabelStyle(font, 10,10,10,10,0,0,0,0, selectedWidgetSkin, unselectedWidgetSkin);
 		ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, unselectedWidgetSkin, font);
 		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
 
@@ -483,6 +482,8 @@ public:
 		Engine::getSingleton().setDefaultStyle("Label", labelStyle);
 		Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
 		Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
+
+		WidgetSkin::setCacheEnabled(true);
 
 		sCalculatorScreen = new CalculatorScreen();
 		sGraphScreen = new GraphScreen();

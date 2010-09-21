@@ -188,7 +188,6 @@ namespace MAUI {
 		double mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY;
 
 		Widget *mFocusedWidget;
-		ShortPressTrigger *mShortPressTrigger;
 	};
 }
 

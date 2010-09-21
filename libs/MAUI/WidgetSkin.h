@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
+//#include <MAUtil/Map.h>
+//#define HashMap Map
 
 using namespace MAUtil;
 
@@ -213,7 +215,6 @@ namespace MAUI {
 		
 		//Vector<CacheElement> cache;
 		static HashMap<CacheKey, CacheElement> sCache;
-
 
 		int mImageWidth;
 		int mImageHeight;

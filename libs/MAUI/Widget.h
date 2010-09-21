@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef MAUI_LOGGING
 #include <conprint.h>
-#define MAUI_LOG(x, args...) lprintfln(x, ## args)
+#define MAUI_LOG(x, args...) printf(x"\n", ## args)
 #else
 #define MAUI_LOG(x, args...)
 #endif

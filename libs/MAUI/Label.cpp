@@ -292,8 +292,8 @@ namespace MAUI {
 	}
 
 	void Label::restyle() {
-		MAUI_LOG("***** restyle called!!!");
-		MAUI_LOG("Label's style: 0x%x", getStyle());
+		//MAUI_LOG("***** restyle called!!!");
+		//MAUI_LOG("Label's style: 0x%x", getStyle());
 		if(getStyle() == NULL)
 			setStyle(Engine::getSingleton().getDefaultStyle("Label"));
 

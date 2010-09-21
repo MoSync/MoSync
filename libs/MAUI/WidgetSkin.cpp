@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Graphics.h>
 #include <MAUtil/PlaceholderPool.h>
 #include "Widget.h"
+#include <maheap.h>
 
 namespace MAUtil {
 	template<> hash_val_t THashFunction<MAUI::WidgetSkin::CacheKey>(const MAUI::WidgetSkin::CacheKey& data) {
@@ -112,9 +113,10 @@ namespace MAUI {
 		return numTiles;
 	}
 	
-	#define DEFAULT_CACHE_THRESHOLD (16*1024*1024)
+	#define DEFAULT_CACHE_THRESHOLD (4*1024*1024)
 
 	HashMap<WidgetSkin::CacheKey, WidgetSkin::CacheElement> WidgetSkin::sCache;
+
 	int WidgetSkin::sMaxCacheSize = 	DEFAULT_CACHE_THRESHOLD;
 	bool WidgetSkin::sUseCache = false;
 	
@@ -131,6 +133,7 @@ namespace MAUI {
 		int totalPixelsInCache = numPixels;
 		
 		HashMap<CacheKey, CacheElement>::Iterator iter = sCache.begin();
+
 		while(iter != sCache.end()) {
 			totalPixelsInCache += iter->first.w*iter->first.h;
 			iter++;
@@ -181,9 +184,11 @@ namespace MAUI {
 	void WidgetSkin::draw(int x, int y, int width, int height) {
 		MAHandle cached = 0;
 
+		if(width==0 || height==0) return;
+
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
-		int numTiles = calculateNumTiles(width, height);
-		if(!sUseCache || numTiles<100) {
+		//int numTiles = calculateNumTiles(width, height);
+		if(!sUseCache /*|| numTiles<10*/) {
 			drawDirect(x, y, width, height);
 			return;
 		}
@@ -196,20 +201,23 @@ namespace MAUI {
 			// set malloc handler to null so that we can catch if we're out of heap and write directly to the screen then.
 			malloc_handler mh = set_malloc_handler(NULL);
 			int *data = new int[width*height];
+			set_malloc_handler(mh);
 			if(!data) {
 				drawDirect(x, y, width, height);
 				return;		
 			}
-			set_malloc_handler(mh);
 			drawToData(data, 0, 0, width, height);
 			CacheElement cacheElem;
 
-			flushCacheUntilNewImageFits(width*height);	
+			flushCacheUntilNewImageFits(width*height);
 			
 			cacheElem.image = PlaceholderPool::alloc();
+
 			if(maCreateImageRaw(cacheElem.image,data,EXTENT(width,height),1)!=RES_OK) {
 				maPanic(1, "Could not create raw image");
 			}
+
+			//maCreateDrawableImage(cacheElem.image, width, height);
 
 			delete data;
 			cacheElem.lastUsed = maGetMilliSecondCount();
@@ -320,85 +328,94 @@ namespace MAUI {
 		if(image == 0) return;
 
 		// draw corners
-		dst.x = x; dst.y = y;
-		//maDrawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
 
-		dst.x = x; dst.y = y+height-mBottomLeft.height;
-		//maDrawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
+		if(mTopLeft.width && mTopLeft.height) {
+			dst.x = x; dst.y = y;
+			//maDrawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
+			Gfx_drawImageRegion(image, &mTopLeft, &dst, TRANS_NONE);
+		}
 
-		dst.x = x+width-mTopRight.width; dst.y = y;
-		//maDrawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
+		if(mBottomLeft.width && mBottomLeft.height) {
+			dst.x = x; dst.y = y+height-mBottomLeft.height;
+			//maDrawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
+			Gfx_drawImageRegion(image, &mBottomLeft, &dst, TRANS_NONE);
+		}
 
-		dst.x = x+width-mBottomRight.width; dst.y = y+height-mBottomRight.height;
-		//maDrawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
-		Gfx_drawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
+		if(mTopRight.width && mTopRight.height) {
+			dst.x = x+width-mTopRight.width; dst.y = y;
+			//maDrawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
+			Gfx_drawImageRegion(image, &mTopRight, &dst, TRANS_NONE);
+		}
+
+		if(mBottomRight.width && mBottomRight.height) {
+			dst.x = x+width-mBottomRight.width; dst.y = y+height-mBottomRight.height;
+			//maDrawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
+			Gfx_drawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
+		}
 
 		// draw middle
 		if(mCenter.height && mCenter.width) {
-		for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
-			int h = mCenter.height;
-			if(j+mCenter.height>y+height-mBottom.height) {
-				mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
-			} 
-			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
-				dst.x = i; dst.y = j;
-				int w = mCenter.width;
-				if(i+mCenter.width>x+width-mRight.width) {
-					mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
+			for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
+				int h = mCenter.height;
+				if(j+mCenter.height>y+height-mBottom.height) {
+					mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
 				}
-				//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &mCenter, &dst, TRANS_NONE);
+				for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
+					dst.x = i; dst.y = j;
+					int w = mCenter.width;
+					if(i+mCenter.width>x+width-mRight.width) {
+						mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
+					}
+					//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
+					Gfx_drawImageRegion(image, &mCenter, &dst, TRANS_NONE);
 
-				mCenter.width = w;
+					mCenter.width = w;
+				}
+				mCenter.height = h;
 			}
-			mCenter.height = h;
-		}
 		}
 
 		// draw borders
 		if(mTop.width) {
-		for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
-				dst.x = i; dst.y = y;
-				dst2.x = i; dst2.y = y+height-mBottom.height;
+			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
+					dst.x = i; dst.y = y;
+					dst2.x = i; dst2.y = y+height-mBottom.height;
 
-				int w1 = mTop.width;
-				int w2 = mBottom.width;
-				if(i+mTop.width>x+width-mRight.width) {
-					mTop.width -= (i+w1)-(x+width-mRight.width);
-					mBottom.width -= (i+w1)-(x+width-mRight.width);
-				} 
-				//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
-				Gfx_drawImageRegion(image, &mTop, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
+					int w1 = mTop.width;
+					int w2 = mBottom.width;
+					if(i+mTop.width>x+width-mRight.width) {
+						mTop.width -= (i+w1)-(x+width-mRight.width);
+						mBottom.width -= (i+w1)-(x+width-mRight.width);
+					}
+					//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
+					//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
+					Gfx_drawImageRegion(image, &mTop, &dst, TRANS_NONE);
+					Gfx_drawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
 
-				mTop.width = w1;
-				mBottom.width = w2;
-		}
+					mTop.width = w1;
+					mBottom.width = w2;
+			}
 		}
 
 		if(mLeft.height) {
-		for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
-				dst.x = x; dst.y = i;
-				dst2.x = x+width-mRight.width; dst2.y = i;
+			for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
+					dst.x = x; dst.y = i;
+					dst2.x = x+width-mRight.width; dst2.y = i;
 
-				int w1 = mLeft.height;
-				int w2 = mRight.height;
-				if(i+mLeft.height>y+height-mBottom.height) {
-					mLeft.height -= (i+w1)-(y+height-mBottom.height);
-					mRight.height -= (i+w1)-(y+height-mBottom.height);
-				} 
-				//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
-				Gfx_drawImageRegion(image, &mLeft, &dst, TRANS_NONE);
-				Gfx_drawImageRegion(image, &mRight, &dst2, TRANS_NONE);
+					int w1 = mLeft.height;
+					int w2 = mRight.height;
+					if(i+mLeft.height>y+height-mBottom.height) {
+						mLeft.height -= (i+w1)-(y+height-mBottom.height);
+						mRight.height -= (i+w1)-(y+height-mBottom.height);
+					}
+					//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+					//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
+					Gfx_drawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+					Gfx_drawImageRegion(image, &mRight, &dst2, TRANS_NONE);
 
-				mLeft.height = w1;
-				mRight.height = w2;
-		}
+					mLeft.height = w1;
+					mRight.height = w2;
+			}
 		}
 	}
 

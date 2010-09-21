@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maheap.h>
 #include <mastring.h>
 #include <mastdlib.h>
+#include <conprint.h>
 
 #include <MAUtil/Graphics.h>
 
@@ -39,6 +40,7 @@ namespace MAUI {
 		mDefaultSkin = NULL;
 		mOverlay = NULL;
 		mSingletonPtr = this;
+		mDisplayConsole = false;
 		//clipStackPtr = -1;
 		Environment::getEnvironment().addFocusListener(this);
 	}
@@ -174,13 +176,19 @@ namespace MAUI {
 	}
 
 	void Engine::focusGained() {
-		requestUIUpdate();
+		if(mMain) mMain->requestRepaint();
+		if(mOverlay) mOverlay->requestRepaint();
 	}
 
 	void Engine::requestUIUpdate() {
 		Environment::getEnvironment().addIdleListener(this);
 	}
-	
+
+	void Engine::setDisplayConsole(bool dc) {
+		mDisplayConsole = dc;
+	}
+
+
 	void Engine::repaint() {
 		//lprintfln("repaint @ (%i ms)", maGetMilliSecondCount());
 		if(!mMain) return;
@@ -214,7 +222,11 @@ namespace MAUI {
 			mOverlay->draw();
 		}
 
-		maUpdateScreen();
+		if(mDisplayConsole) {
+			DisplayConsole();
+		}
+		else
+			maUpdateScreen();
 	}
 	
 	void Engine::idle() {

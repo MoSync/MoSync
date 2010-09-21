@@ -47,13 +47,10 @@ namespace MAUI {
 			mInputPolicy(NULL),
 			mStyle(NULL)
 		{
-		MAUI_LOG("What? 1");
 		mInputPolicy = new DefaultInputPolicy(this);
-		MAUI_LOG("What? 2");
-			if(parent) {
+		if(parent) {
 			parent->add(this);
 		}
-		MAUI_LOG("What? 3");
 
 		updateAbsolutePosition();
 	}

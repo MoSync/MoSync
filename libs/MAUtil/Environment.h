@@ -130,7 +130,25 @@ namespace MAUtil {
 		virtual void focusLost() = 0;
 		virtual void focusGained() = 0;
 	};
-
+	
+	class CustomEventListener {
+	public:
+		virtual void customEvent(const MAEvent& event) = 0;
+	};
+	
+	/**
+	* \brief A listener for maTextBox events.
+	* \see Environment::addTextBoxListener()
+	*/	
+	class TextBoxListener {
+	public:
+		/**
+		 * \param 'result' One of the \link #MA_TB_RES_OK MA_TB_RES \endlink codes.
+		 * \param 'textLength' The length, in characters, of the finished text. Does not include the terminating zero.
+		 */
+		virtual void textBoxClosed(int result, int textLength) = 0;
+	};
+	
 	/**
 	* \brief A base class for cross-platform event managers.
 	*/
@@ -255,6 +273,28 @@ namespace MAUtil {
 		* Removes the timer associated with the specified listener, if any.
 		*/
 		void removeTimer(TimerListener* tl);
+		
+		/**
+		* Adds the specified listener to the end of the list,
+		* unless it is already in the list.
+		*/
+		void addCustomEventListener(CustomEventListener* cl);
+
+		/**
+		* Removes the specified listener from the list, if it's in it.
+		*/
+		void removeCustomEventListener(CustomEventListener* cl);
+		
+		/**
+		* Adds the specified listener to the end of the list,
+		* unless it is already in the list.
+		*/
+		void addTextBoxListener(TextBoxListener* tl);
+
+		/**
+		* Removes the specified listener from the list, if it's in it.
+		*/
+		void removeTextBoxListener(TextBoxListener* tl);		
 
 		/**
 		* Returns a reference to the Environment.
@@ -315,6 +355,18 @@ namespace MAUtil {
 		*/
 		void fireBluetoothEvent(int state);
 		
+		
+		/**
+		* Calls the registered custom event listeners, if any.
+		*/		
+		void fireCustomEventListeners(const MAEvent& e);
+		
+		/**
+		* Calls the registered text box listeners, if any.
+		*/		
+		void fireTextBoxListeners(int result, int textLength);
+				
+		
 		/**
 		* Calls the registered ConnListener, if any, for the MAHandle specified by \a data.
 		*/
@@ -351,6 +403,8 @@ namespace MAUtil {
 		ListenerSet<IdleListener> mIdleListeners;
 		ListenerSet<TimerEventInstance> mTimerEvents;
 		ListenerSet<FocusListener> mFocusListeners;
+		ListenerSet<CustomEventListener> mCustomEventListeners;
+		ListenerSet<TextBoxListener> mTextBoxListeners;		
 private:
 		static Environment* sEnvironment;
 	};

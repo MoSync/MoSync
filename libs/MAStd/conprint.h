@@ -115,6 +115,22 @@ extern MAHandle gConsoleFile;
 */
 extern int gConsoleDisplay;
 
+/** \brief Console draw background option
+*
+* If non-zero, console will fill the background, otherwise not.
+* The default value is non-zero.
+* \see PrintConsole printf
+*/
+extern int gConsoleDrawBackground;
+
+/** \brief Console force display option
+*
+* If non-zero, console will be displayed each time something is sent to it, otherwise not (is then displayed using DisplayConsole()).
+* The default value is non-zero.
+* \see PrintConsole printf
+*/
+extern int gConsoleForceDisplay;
+
 
 #ifdef __cplusplus
 }	//extern "C"

@@ -10,7 +10,7 @@ Button::Button(int x, int y, int width, int height, Widget* parent, const String
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
-	MAUI_LOG("Button pressed! %x", this);
+	//MAUI_LOG("Button pressed! %x", this);
 	mPressed = true;
 	mStartX = p.x;
 	mStartY = p.y;
@@ -22,12 +22,12 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 	p.x-=mStartX;
 	p.y-=mStartY;
 
-	if((abs(p.x)<7) && (abs(p.y)<7)) return true;
+	if((abs(p.x)<(mBounds.width>>2)) && (abs(p.y)<(mBounds.height>>2))) return true;
 	else return false;
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
-	MAUI_LOG("Button released! %x", this);
+	//MAUI_LOG("Button released! %x", this);
 	mPressed = false;
 	fireTriggered();
 	requestRepaint();

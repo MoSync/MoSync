@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Font.h"
 #include "WidgetSkin.h"
 #include <MAUtil/Map.h>
+#include <MAUtil/String.h>
 
 namespace MAUI {
 
@@ -128,27 +129,27 @@ public:
 	~Style();
 
 	template<typename T>
-	T* get(const String& id) const {
-		MAUtil::Map<String, Property*>::ConstIterator i = mProperties.find(id);
+	T* get(const MAUtil::String& id) const {
+		MAUtil::Map<MAUtil::String, Property*>::ConstIterator i = mProperties.find(id);
 		if((i!=mProperties.end()) && i->second && i->second->getType()==T::sType) return (T*)i->second;
 		else return NULL;
 	}
 
 	template<typename T>
-	T* getSafe(const String& id) const {
+	T* getSafe(const MAUtil::String& id) const {
 		T* prop = get<T>(id);
 		if(!prop) maPanic(1, "Failed to retrieve style property.");
 		return prop;
 	}
 
-	void set(const String& id, Property *prop) {
+	void set(const MAUtil::String& id, Property *prop) {
 		mProperties[id] = prop;
 	}
 
 
 
 protected:
-	MAUtil::Map<String, Property*> mProperties;
+	MAUtil::Map<MAUtil::String, Property*> mProperties;
 };
 
 } // namespace MAUI

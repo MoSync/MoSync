@@ -101,6 +101,8 @@ namespace MAUI {
 		void setDefaultStyle(const String& widgetType, Style* style);
 		const Style* getDefaultStyle(const String& widgetType) const;
 
+		void setDisplayConsole(bool dc=true);
+
 	protected:
 		Widget *mOverlay;
 		Point mOverlayPosition;
@@ -115,6 +117,8 @@ namespace MAUI {
 
 		// possibly change this to hash map.
 		MAUtil::Map<String, Style*> mDefaultStyles;
+
+		bool mDisplayConsole;
 
 	private:
 		Engine();
