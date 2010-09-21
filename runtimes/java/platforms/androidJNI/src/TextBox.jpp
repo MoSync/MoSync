@@ -38,6 +38,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.content.Intent;
 
+import java.nio.CharBuffer;
+
 /**
 * This class is an implementation of a text box dialog.
 * It shows a fullscreen text fiels with OK and Cancel buttons.
@@ -139,11 +141,15 @@ public class TextBox extends Activity implements OnClickListener {
 			String output = mEdit.getText().toString();
 			
 			// Write text directly to the MoSync memory
-			byte[] ba = output.getBytes();
+			char[] ca = output.toCharArray();
 			MoSync.mMoSyncThread.mMemDataSection.mark();
 			MoSync.mMoSyncThread.mMemDataSection.position(mOutputMemPtr);
-			MoSync.mMoSyncThread.mMemDataSection.put(ba);
-			MoSync.mMoSyncThread.mMemDataSection.put((byte)0);
+			
+			CharBuffer cb = MoSync.mMoSyncThread.mMemDataSection.asCharBuffer();
+			
+			cb.put(ca);
+			cb.put((char)0);
+			
 			MoSync.mMoSyncThread.mMemDataSection.reset();
 			
 			// Notice that data is available
@@ -155,6 +161,10 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			Log.i("InputBox", "event" + output.length());
 			Log.i("InputBox", "event" + event[1]);
+		
+			// Send a focus gained event now when get returns to the application
+			event[0] = EVENT_TYPE_FOCUS_GAINED;
+			MoSync.mMoSyncThread.postEvent(event);
 		
 			finish();
 		}

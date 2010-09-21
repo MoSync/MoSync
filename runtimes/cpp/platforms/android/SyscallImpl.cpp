@@ -1364,6 +1364,13 @@ namespace Base
 				
 		case maIOCtl_maTextBox:
 			SYSLOG("maIOCtl_maTextBox");
+			
+			// Send a focus lost event since the application will run in the background during the time the maTextBox is running
+			MAEvent event;
+			event.type = EVENT_TYPE_FOCUS_LOST;
+			event.data = NULL;
+			Base::gSyscall->postEvent(event);
+			
 			// Get the two first parameters of the IOCtl function
 			const wchar* _title = GVWS(a);
 			const wchar* _inText = GVWS(b);
@@ -1410,3 +1417,7 @@ void MoSyncErrorExit(int errorCode)
 
 	exit(errorCode);
 }
+
+
+// Build the event.
+	
