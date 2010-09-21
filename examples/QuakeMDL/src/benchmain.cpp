@@ -7,8 +7,10 @@
 
 #include <ma.h>
 #include <madmath.h>
+#include <maassert.h>
 #include <conprint.h>
 #include "common.h"
+#include "main.h"
 #include "mdlfixed.hpp"
 #include "matrix4fi.hpp"
 #include "transformpipe.hpp"
@@ -118,7 +120,5 @@ int BenchMain ( void )
 	printf( "-------------\n\n" );
 	printf( ".\n" );
 
-	maWait( 0 );
-
-	return 0;
+	FREEZE;
 }

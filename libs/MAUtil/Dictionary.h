@@ -46,8 +46,8 @@ namespace MAUtil {
 * This class is not meant to be instantiated directly.
 * It is the base class for Set and Map.
 *
-* \warning It is techically possible to use an Iterator to change the Key of an element.
-* DON'T DO THAT!. It would break the sorting order of the Dictionary.
+* \note It is not allowed to change the Key of an element.
+* Doing so would break the sorting order of the Dictionary.
 * The consequenses are undefined, and will likely cause your program to crash.
 *
 * If you must change a Key, erase the original element from the dictionary,
@@ -56,15 +56,15 @@ namespace MAUtil {
 template<class Key, class Storage>
 class Dictionary {
 protected:
-	/** \brief Internal. */
+	/** \brief Internal storage. */
 	struct DictNode : dnode_t {
-		DictNode();
+		DictNode(Storage s);
 		Storage data;
 	};
 public:
 	class ConstIterator;
 
-	/** \brief Pointer to a dictionary object (or its end).
+	/** \brief Iterator for a Dictionary.
 	* 
 	* An Iterator is bound to a specific Dictionary object.
 	* The Iterator can point to a specific element in that Dictionary, or at Dictionary::end(),
@@ -106,7 +106,7 @@ public:
 		friend class ConstIterator;
 	};
 
-	/** \brief Constant pointer to a dictionary object (or its end).
+	/** \brief Const Iterator for a Dictionary.
 	* 
 	* A ConstIterator is just like an ordinary Iterator, except
 	* all its methods and return values are const.
@@ -195,9 +195,6 @@ protected:
 #ifdef KAZLIB_OPAQUE_DEBUG
 #error Need full definition of dnode_t
 #endif
-
-	static dnode_t* alloc(void*) { return new DictNode; }
-	static void free(dnode_t* node, void*) { delete (DictNode*)node; }
 
 	void init(CompareFunction);
 

@@ -28,14 +28,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //******************************************************************************
 
 template<class Key, class Storage>
-MAUtil::Dictionary<Key, Storage>::DictNode::DictNode() {
+MAUtil::Dictionary<Key, Storage>::DictNode::DictNode(Storage s)
+: data(s)
+{
 	memset((dnode_t*)this, 0, sizeof(dnode_t));
 }
 
 template<class Key, class Storage>
 void MAUtil::Dictionary<Key, Storage>::init(CompareFunction cf) {
 	dict_init(&mDict, DICTCOUNT_T_MAX, (dict_comp_t)cf);
-	dict_set_allocator(&mDict, &alloc, &free, this);
 }
 
 template<class Key, class Storage>
@@ -59,8 +60,7 @@ MAUtil::Dictionary<Key, Storage>::operator=(const Dictionary& o) {
 	dict_load_begin(&load, &mDict);
 	ConstIterator itr = o.begin();
 	while(itr != o.end()) {
-		DictNode* newNode = new DictNode;
-		newNode->data = *itr;
+		DictNode* newNode = new DictNode(*itr);
 		char* ptr = (char*)&newNode->data;
 		dict_load_next(&load, newNode, ptr + mKeyOffset);
 		++itr;
@@ -83,9 +83,8 @@ template<class Key, class Storage>
 MAUtil::Pair<class MAUtil::Dictionary<Key, Storage>::Iterator, bool>
 MAUtil::Dictionary<Key, Storage>::insert(const Storage& data) {
 	Pair<Iterator, bool> pair = { Iterator(&mDict), false };
-	DictNode* newNode = new DictNode;
+	DictNode* newNode = new DictNode(data);
 	dnode_init(newNode, NULL);
-	newNode->data = data;
 	char* ptr = (char*)&newNode->data;
 	Key* kp = (Key*)(ptr + mKeyOffset);
 	DictNode* res = (DictNode*)dict_insert(&mDict, newNode, kp);

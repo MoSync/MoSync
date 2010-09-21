@@ -50,9 +50,11 @@ SetCompressor /SOLID lzma
    
   !define MUI_HEADERIMAGE_BITMAP "installer.bmp" ; optional
   !define MUI_ABORTWARNING
+  
+  !define MUI_FINISHPAGE_RUN
+  !define MUI_FINISHPAGE_RUN_TEXT "Open the MoSync IDE."
+  !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchIDE"
 
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\eclipse\mosync.exe"
-  !define MUI_FINISHPAGE_SHOWREADME_TEXT "Open the MoSync IDE."
   !define MUI_FINISHPAGE_NOAUTOCLOSE
 
   !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
@@ -108,6 +110,9 @@ Function CheckNotifyJavaVersion
   CheckNotifyJavaVersionEnd:
 FunctionEnd
 
+Function LaunchIDE
+	Exec '"$INSTDIR\eclipse\mosync.exe"'
+FunctionEnd
 
 Section "MoSync (required)" MoSync
   SectionIn RO
@@ -221,10 +226,10 @@ SectionEnd
 Section "Start Menu Shortcuts" StartMenu
 
   CreateDirectory "$SMPROGRAMS\MoSync"
-    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 1
-    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 2
-	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "C:\WINDOWS\SYSTEM\url.dll" 3
-    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 4
+    CreateShortCut "$SMPROGRAMS\MoSync\MoSync IDE.lnk" "$INSTDIR\eclipse\mosync.exe" "" "$INSTDIR\eclipse\mosync.exe" 0
+    CreateShortCut "$SMPROGRAMS\MoSync\BMFont Generator.lnk" "$INSTDIR\bin\BMFont\bmfont.exe" "" "$INSTDIR\bin\BMFont\bmfont.exe" 0
+	CreateShortCut "$SMPROGRAMS\MoSync\Online User Guides.lnk" "$INSTDIR\bin\MoSyncOnlineDocs.URL" "" "C:\WINDOWS\SYSTEM\url.dll" 0
+    CreateShortCut "$SMPROGRAMS\MoSync\Uninstall MoSync.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\uninstall.exe" 0
 SectionEnd
 
 

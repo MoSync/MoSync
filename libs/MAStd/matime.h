@@ -42,9 +42,7 @@ typedef int time_t;
 #endif
 #endif	//_TIME_H
 
-/**
-* Structure containing a calendar date and time broken down into its components.
-*/
+/// Components of a calendar date and time.
 struct tm
 {
 	///Seconds after the minute. Range: 0-59

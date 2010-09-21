@@ -74,7 +74,7 @@ public:
 	}
 
 	void pointerReleaseEvent(MAPoint2d p) {
-		int res = ((p.x - (EXTENT_X(maGetScrSize())/ 2)) > 0) ? TK_YES : TK_NO;
+		int res = ((p.x - (EXTENT_X(maGetScrSize())/ 2)) < 0) ? TK_YES : TK_NO;
 		assert(name, res == TK_YES);
 		suite->runNextCase();
 	}

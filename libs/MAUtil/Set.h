@@ -26,13 +26,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 
-/// Thin template sorted Set.
+/** \brief Thin template sorted Set.
+* \see Dictionary
+*/
 template<class Key>
-class Set : public Dictionary<Key, Key> {
+class Set : public Dictionary<const Key, const Key> {
 public:
-	typedef Dictionary<Key, Key> D;
+	typedef Dictionary<const Key, const Key> D;
 
-	Set(int (*cf)(const Key&, const Key&) = &Compare<Key>) : D::Dictionary(cf, 0) {
+	Set(int (*cf)(const Key&, const Key&) = &Compare<const Key>) : D::Dictionary(cf, 0) {
 	}
 	Pair<typename D::Iterator, bool> insert(const Key& key) { return D::insert(key); }
 };

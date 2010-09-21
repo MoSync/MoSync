@@ -724,7 +724,7 @@ interface MAAPI {
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
-	* You can also use class MAUtil:: BluetoothConnection to connect via Bluetooth service uuid.
+	* You can also use MAUtil::BluetoothConnection to connect via Bluetooth service uuid.
 	*
 	* To find useful Bluetooth addresses, use the Bluetooth discovery API.
 	* See maBtStartDeviceDiscovery().
@@ -1799,8 +1799,8 @@ interface MAAPI {
 		*
 		* \returns 0 on success, \< 0 on failure.
 		*
-		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
-		* to connect via service uuid (this method is cross platform).
+		* \note Service discovery is not supported on Android. Use MAUtil::BluetoothConnection
+		* to connect via service UUID. That method is cross-platform.
 		*/
 		int maBtStartServiceDiscovery(in MABtAddr address, in MAUUID uuid);
 
@@ -1810,9 +1810,6 @@ interface MAAPI {
 		* \returns \> 0 on success, or zero if the queue is empty.
 		* \see maBtStartServiceDiscovery
 		* \see maBtGetNewService
-		*
-		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
-		* to connect via service uuid (this method is cross platform).
 		*/
 		int maBtGetNextServiceSize(out MABtServiceSize dst);
 
@@ -1821,9 +1818,6 @@ interface MAAPI {
 		* Removes the data from the internal queue filled by maBtStartServiceDiscovery().
 		* \returns \> 0 on success, or zero if the queue is empty.
 		* \see maBtGetNextServiceSize
-		*
-		* Service discovery is not supported on Android. Use class MAUtil:: BluetoothConnection
-		* to connect via service uuid (this method is cross platform).
 		*/
 		int maBtGetNewService(out MABtService dst);
 
@@ -2986,7 +2980,7 @@ interface MAAPI {
 		*
 		* \param title The box's title.
 		* \param inText When the text box is created, it is populated with this string.
-		* \param text Pointer to a buffer. When the text box closes, the contents
+		* \param outText Pointer to a buffer. When the text box closes, the contents
 		* are copied to this buffer.
 		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
 		* \param constraints Rules for how text is entered into the box.
