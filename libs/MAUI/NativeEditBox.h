@@ -31,16 +31,26 @@ namespace MAUI {
 
 class NativeEditBox : public Label, public TextBoxListener {
 public:
-	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL, int maxSize=128, int options=MA_TB_TYPE_ANY);
+	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL, int maxSize=128, int options=MA_TB_TYPE_ANY, const String& initialText="", const WString& titleString=L"");
+	~NativeEditBox();
+
 	void setOptions(int options);
 	void setMaxSize(int size);
+
+	void setTitleString(const WString& mTitleString);
+	const WString& getTitleString() const;
+
 	bool pointerPressed(MAPoint2d p, int id);
 	bool pointerMoved(MAPoint2d p, int id);
 	bool pointerReleased(MAPoint2d p, int id);
 
+	// if caption is larger than mMaxSize mMaxSize will be changed to the length of the caption.
+	virtual void setCaption(const String& caption);
+
 protected:
 	void textBoxClosed(int res, int length);
 
+	WString mTitleString;
 	wchar_t* mString;
 	int mMaxSize;
 	int mOptions;

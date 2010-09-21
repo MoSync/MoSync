@@ -705,11 +705,12 @@ namespace MAUI {
 				break;
 			}
 		}
+
 		return false;
 	}
 
 	bool ListBox::pointerMoved(MAPoint2d p, int id) {
-		MAUI_LOG("Got event %d, %d", p.x, p.y);
+		//MAUI_LOG("Got event %d, %d", p.x, p.y);
 		if(mFocusedWidget) {
 			if(!mFocusedWidget->pointerMoved(p, id)) {
 				mFocusedWidget->setFocused(false);
@@ -721,14 +722,10 @@ namespace MAUI {
 			int relX, relY;
 			mTouchMotionTracker.addPoint(p, relX, relY);
 			if(relX==0 && relY == 0) return false;
-
 			if(mOrientation == LBO_VERTICAL)
 				setScrollOffset((mYOffset>>16)+relY);
 			else
 				setScrollOffset((mYOffset>>16)+relX);
-
-
-			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
 		}
 		return false;
 	}
@@ -743,8 +740,8 @@ namespace MAUI {
 
 		if(id==0) {
 			mTouched = true;
-			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
 			Environment::getEnvironment().addTimer(this, MS_PER_FRAME, -1);
+			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
 		}
 		return false;
 	}

@@ -56,7 +56,7 @@ namespace MAUI {
 		if(!env.isKeyListener(this))
 			mMain->setEnabled(false);
 
-		MAUI_LOG("setMain widget: %x", mMain);
+		//MAUI_LOG("setMain widget: %x", mMain);
 		setFocusedWidget(mMain);
 	}
 
@@ -104,7 +104,7 @@ namespace MAUI {
 			focus = getFocusableWidget(focus);
 		}
 		mFocusedWidget = focus;
-		MAUI_LOG("setFocusedWidget widget %x", focus);
+		//MAUI_LOG("setFocusedWidget widget %x", focus);
 	}
 
 	Widget* Screen::getFocusedWidget() {
