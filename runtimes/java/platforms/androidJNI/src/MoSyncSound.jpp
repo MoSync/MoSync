@@ -283,6 +283,7 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 	catch (Exception e)
 	{
 		Log.i("MoSync audio","Whoops! Exception e:" + e.toString());
+		return -1;
 	}
 	
 	return 1;
