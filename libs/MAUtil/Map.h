@@ -30,6 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 
+/** \brief Thin template sorted Map.
+* \see Dictionary
+*/
 template<class Key, class Value>
 class Map : public Dictionary<const Key, Pair<const Key, Value> > {
 public:

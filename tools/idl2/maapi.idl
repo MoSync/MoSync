@@ -2980,7 +2980,7 @@ interface MAAPI {
 		*
 		* \param title The box's title.
 		* \param inText When the text box is created, it is populated with this string.
-		* \param text Pointer to a buffer. When the text box closes, the contents
+		* \param outText Pointer to a buffer. When the text box closes, the contents
 		* are copied to this buffer.
 		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
 		* \param constraints Rules for how text is entered into the box.

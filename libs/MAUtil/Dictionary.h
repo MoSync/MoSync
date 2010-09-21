@@ -56,7 +56,7 @@ namespace MAUtil {
 template<class Key, class Storage>
 class Dictionary {
 protected:
-	/** \brief Internal. */
+	/** \brief Internal storage. */
 	struct DictNode : dnode_t {
 		DictNode(Storage s);
 		Storage data;
@@ -64,7 +64,7 @@ protected:
 public:
 	class ConstIterator;
 
-	/** \brief Pointer to a dictionary object (or its end).
+	/** \brief Iterator for a Dictionary.
 	* 
 	* An Iterator is bound to a specific Dictionary object.
 	* The Iterator can point to a specific element in that Dictionary, or at Dictionary::end(),
@@ -106,7 +106,7 @@ public:
 		friend class ConstIterator;
 	};
 
-	/** \brief Constant pointer to a dictionary object (or its end).
+	/** \brief Const Iterator for a Dictionary.
 	* 
 	* A ConstIterator is just like an ordinary Iterator, except
 	* all its methods and return values are const.
