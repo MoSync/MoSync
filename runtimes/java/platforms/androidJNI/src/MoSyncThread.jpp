@@ -98,6 +98,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.nio.ByteOrder;
+
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 
@@ -105,6 +107,9 @@ import com.mosync.java.android.MoSyncPanicDialog;
 
 public class MoSyncThread extends Thread
 {
+	static final String PROGRAM_FILE = "program.mp3";
+	static final String RESOURCE_FILE = "resources.mp3";
+
 	private MoSync mContext;
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
@@ -115,6 +120,9 @@ public class MoSyncThread extends Thread
 	ByteBuffer mRecompilerCodeBlock;
 	ByteBuffer mRecompilerEntryBlock;
 	
+	/**
+	* @brief MoSyncThread constructor
+	*/
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{	
 		mContext = (MoSync)context;
@@ -122,26 +130,33 @@ public class MoSyncThread extends Thread
 		hasDied = false;
 	
 		Log.i("MoSync Thread", "Constructor");
-
+		
 		nativeInitRuntime();	
-		//initSyscalls();
 	}
 	
+	/**
+	* @brief setMoSyncView
+	*/
 	public void setMoSyncView(MoSyncView moSyncView)
 	{
 		mMoSyncView = moSyncView;
 	}
 	
+	/**
+	* @brief isDead
+	*/
 	public boolean isDead()
 	{
 		return hasDied;
 	}
 	
+	/**
+	* @brief updateSurfaceSize
+	*/
 	public void updateSurfaceSize(int width, int height)
 	{
 		Log.i("MoSync Thread","updateSurfaceSize");		
-		//mCore.resizeScreen(mWidth, mHeight);
-
+		
 		mWidth = width;
 		mHeight = height;
 		
@@ -156,13 +171,16 @@ public class MoSyncThread extends Thread
 		Log.i("MoSync Thread","mBitmap width:" + mBitmap.getWidth() + " height:" + mBitmap.getHeight());
 	}
 
+	/**
+	* @brief generateDataSection
+	*/
 	public ByteBuffer generateDataSection(int size)
 	{
+		Log.i("MoSync Thread","generate data section");
 		try
 		{
-			Log.i("MoSyncThread","generate data section");
 			mMemDataSection = ByteBuffer.allocateDirect(size);
-			Log.i("MoSyncThread","generate data section - SUCCESS");
+			mMemDataSection.order(null);
 		}
 		catch (Exception e)
 		{
@@ -171,34 +189,9 @@ public class MoSyncThread extends Thread
 		return mMemDataSection;
 	}
 	
-	public ByteBuffer generateRecompilerCodeBlock(int size)
-	{
-		Log.i("MoSyncThread","generate recompiler code block");
-		try
-		{
-			mRecompilerCodeBlock = ByteBuffer.allocateDirect(size);
-		}
-		catch (Exception e)
-		{
-			Log.i("MoSyncThread", "Out of Memory!");
-		}
-		return mRecompilerCodeBlock;
-	}
-	
-	public ByteBuffer generateRecompilerEntryBlock(int size)
-	{
-		Log.i("MoSyncThread","generate recompiler entry block");
-		try
-		{
-			mRecompilerEntryBlock = ByteBuffer.allocateDirect(size);
-		}
-		catch (Exception e)
-		{
-			Log.i("MoSyncThread", "Out of Memory!");
-		}
-		return mRecompilerEntryBlock;
-	}
-	
+	/**
+	* @brief threadPanic
+	*/
 	public void threadPanic(int errorCode, String message)
 	{
 		Log.i("MoSyncThread","threadPanic");
@@ -216,6 +209,9 @@ public class MoSyncThread extends Thread
 		}
 	}
 	
+	/**
+	* @brief loadProgram
+	*/
 	public boolean loadProgram()
 	{
 		Log.i("MoSync Thread", "load program");
@@ -223,7 +219,7 @@ public class MoSyncThread extends Thread
 		{
 		
 			AssetManager assetManager = mContext.getAssets();
-			AssetFileDescriptor pAfd = assetManager.openFd("program.mp3");
+			AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
 			long pFdOffset = pAfd.getStartOffset();
 			
@@ -233,7 +229,7 @@ public class MoSyncThread extends Thread
 			
 			try
 			{
-				AssetFileDescriptor rAfd = assetManager.openFd("resources.mp3");
+				AssetFileDescriptor rAfd = assetManager.openFd(RESOURCE_FILE);
 				rFd = rAfd.getFileDescriptor();
 				mResourceOffset = rAfd.getStartOffset();
 			}
@@ -264,12 +260,15 @@ public class MoSyncThread extends Thread
 		return false;
 	}
 	
+	/**
+	* @brief getResourceFileDescriptor
+	*/
 	public FileDescriptor getResourceFileDesriptor()
 	{		
 		try
 		{
 			AssetManager assetManager = mContext.getAssets();
-			AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+			AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
 			return pFd;
 		}
@@ -280,6 +279,9 @@ public class MoSyncThread extends Thread
 		return null;
 	}
 	
+	/**
+	* @brief getResourceStartOffset
+	*/
 	public int getResourceStartOffset()
 	{
 		return (int)mResourceOffset;
@@ -288,6 +290,9 @@ public class MoSyncThread extends Thread
 
 private static final int CHUNK_READ_SIZE = 1024;   
 
+	/**
+	* @brief readInputStream
+	*/
 	public ByteBuffer readInputStream(InputStream is) throws Exception
 	{  
 		Log.i("MoSync Thread", "Read Input Stream");
@@ -311,22 +316,34 @@ private static final int CHUNK_READ_SIZE = 1024;
 		return byteBuffer;  
 	}  
 
+	/**
+	* @brief stopNow 
+	*/
 	public void stopNow()
 	{
 		Log.i("MoSync Thread","stopNow");
 	}
 
+	/**
+	* @brief updateScreen
+	*/
 	public void updateScreen()
 	{
 		maUpdateScreen();
 	}
 	
+	/**
+	* @brief postEvent
+	*/
 	public void postEvent(int[] event)
 	{
 		nativePostEvent(event);
 		interrupt(); // Wake up thread.
 	}
 
+	/**
+	* @brief run
+	*/
 	@Override 
 	public void run()
 	{

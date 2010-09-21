@@ -102,26 +102,27 @@ namespace Base
 		int width = (size&0xffff0000) >> 16;
 		int height = size&0x0000ffff;
 	
-		char* b = (char*)malloc(200);
-		sprintf(b,"Framebuffer width: %i height: %i", width, height);
-		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
-		free(b);
-	
-		info->bitsPerPixel = 32;//backBuffer->bitsPerPixel;
-		info->bytesPerPixel = 4;//backBuffer->bytesPerPixel;
-		info->redMask = 0x000000ff; //backBuffer->redMask;
-		info->greenMask = 0x0000ff00;// backBuffer->greenMask;
-		info->blueMask = 0x00ff0000; //backBuffer->blueMask;
-		info->sizeInBytes = width * height * 4; //backBuffer->pitch*backBuffer->height;
-		info->width = width; //backBuffer->width;
-		info->height = height; // backBuffer->height;
-		info->pitch = width*4; //backBuffer->pitch;
-		info->redShift = 0; //backBuffer->redShift;
-		info->greenShift = 8; //backBuffer->greenShift;
-		info->blueShift = 16; //backBuffer->blueShift;
-		info->redBits = 8;// backBuffer->redBits;
-		info->greenBits = 8;// backBuffer->greenBits;
-		info->blueBits = 8; //backBuffer->blueBits;
+		info->bitsPerPixel = 32;
+		info->bytesPerPixel = 4;
+		info->redMask = 0x000000ff;
+		info->greenMask = 0x0000ff00;
+		info->blueMask = 0x00ff0000;
+
+		
+		info->width = width;
+		info->height = height;
+		info->pitch = info->width*4;
+		
+		info->sizeInBytes = info->pitch * info->height;
+		
+		info->redShift = 0;
+		info->greenShift = 8;
+		info->blueShift = 16;
+
+		info->redBits = 8;
+		info->greenBits = 8;
+		info->blueBits = 8;
+		
 		info->supportsGfxSyscalls = 0;
 
 		return 1;
@@ -129,15 +130,7 @@ namespace Base
 
 
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis)
-	{
-	/*
-		if(sInternalBackBuffer!=NULL) return 0;
-		sInternalBackBuffer = backBuffer;
-		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
-		currentDrawSurface = backBuffer;
-		return 1;
-	*/
-	
+	{	
 		int rdata = (int)data - memStart;
 	
 		char* b = (char*)malloc(200);
@@ -157,14 +150,6 @@ namespace Base
 
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis)
 	{
-	/*
-		if(sInternalBackBuffer==NULL) return 0;
-		delete backBuffer;
-		backBuffer = sInternalBackBuffer;
-		sInternalBackBuffer = NULL;
-		currentDrawSurface = backBuffer;
-		return 1;
-	*/
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "_disableFramebuffer", "()V");
 		if (methodID == 0) return 0;

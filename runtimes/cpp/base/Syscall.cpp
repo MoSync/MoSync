@@ -431,6 +431,7 @@ namespace Base {
 		SYSCALL_THIS->destroyResource(handle);
 #endif
 		SYSCALL_THIS->resources.destroy(handle);
+
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {

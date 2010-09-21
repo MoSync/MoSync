@@ -83,9 +83,12 @@ boolean initSyscalls()
 	 return true;
 }
 
+/**
+* @brief maSetColor
+*/
 int maSetColor(int rgb)
 {
-	//SYSLOG("maSetColor");
+	SYSLOG("maSetColor");
 
 	int t = mPaint.getColor();
 	mPaint.setColor(rgb);
@@ -93,6 +96,9 @@ int maSetColor(int rgb)
 	return t;
 }
 
+/**
+* @brief maSetClipRect
+*/
 void maSetClipRect(int left, int top, int width, int height)
 {
 	SYSLOG("maSetClipRect");
@@ -105,6 +111,9 @@ void maSetClipRect(int left, int top, int width, int height)
 	mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE );
 }
 
+/**
+* @brief maPlot
+*/
 void maPlot(int posX, int posY)
 {
 	SYSLOG("maPlot");
@@ -112,6 +121,9 @@ void maPlot(int posX, int posY)
 	mCanvas.drawPoint(posX, posY, mPaint);
 }
 
+/**
+* @brief maLine
+*/
 void maLine(int startX, int startY, int endX, int endY)
 {
 	SYSLOG("maLine");
@@ -119,6 +131,9 @@ void maLine(int startX, int startY, int endX, int endY)
 	mCanvas.drawLine(startX, startY, endX, endY, mPaint);
 }
 
+/**
+* @brief maFillRect
+*/
 void maFillRect(int left, int top, int width, int height)
 {
 	SYSLOG("maFillRect");
@@ -126,45 +141,72 @@ void maFillRect(int left, int top, int width, int height)
 	mCanvas.drawRect(left, top, left+width, top+height, mPaint);
 }
 
+/**
+* @brief maFillTriangleStrip
+*/
 void maFillTriangleStrip(int address, int count)
 {
 	SYSLOG("maFillTriangleStrip - NOT IMPLEMENTED");
 }
 
+/**
+* @brief maFillTriangleFan
+*/
 void maFillTriangleFan(int address, int count)
 {
 	SYSLOG("maFillTriangleFan - NOT IMPLEMENTED");
 }
 
+
 Rect mTextSizeRect = new Rect();
+
+/**
+* @brief msGetTextSize
+*/
 int maGetTextSize(final String str)
 {
-	//SYSLOG("maGetTextSize");
+	SYSLOG("maGetTextSize");
+	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
+/**
+* @brief maGetTextSizeW
+*/
 int maGetTextSizeW(final String str)
 {
-	//SYSLOG("maGetTextSizeW");
+	SYSLOG("maGetTextSizeW");
+	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
+/**
+* @brief maDrawText
+*/
 void maDrawText(int left, int top, final String str)
 {
-	//SYSLOG("maDrawText");
+	SYSLOG("maDrawText");
+	
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
 
+/**
+* @brief maDrawTextW
+*/
 void maDrawTextW(int left, int top, final String str)
 {
- 	//SYSLOG("maDrawTextW");
+ 	SYSLOG("maDrawTextW");
+	
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
 
+/**
+* @brief maUpdateScreen
+*/
 void maUpdateScreen()
 {
 	SYSLOG("maUpdateScreen");
@@ -184,7 +226,10 @@ void maUpdateScreen()
 				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 				mMemDataSection.reset();
 				
+				// Clear the screen.. in this case draw the canvas black
 				lockedCanvas.drawRGB(0,0,0);
+				
+				// Blit the framebuffer
 				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
 			}
 			else
@@ -209,17 +254,26 @@ void maUpdateScreen()
 	
 }
 
+/**
+* @brief maResetBacklight
+*/
 void maResetBacklight()
 {
 	SYSLOG("maResetBacklight");
 }
 
+/**
+* @brief maGetScrSize
+*/
 int maGetScrSize()
 {
 	SYSLOG("maGetScrSize");
 	return EXTENT(mWidth, mHeight);
 }
 
+/**
+* @brief maDrawImage
+*/
 void maDrawImage(int image, int left, int top)
 {
 	SYSLOG("maDrawImage");
@@ -230,61 +284,40 @@ void maDrawImage(int image, int left, int top)
 		return;
 	}
 
-	mCanvas.drawBitmap(imageResource.mBitmap, left, top, mPaint);
+	mCanvas.drawBitmap(imageResource.mBitmap, left, top, null);//mPaint);
 }
 
+/**
+* @brief _maDrawRGB
+*/
 void _maDrawRGB(int dstX, int dstY, int mem, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int scanLength)
 {
 	SYSLOG("maDrawRGB");
-/*	
-	int[] mem_ds = CORE.mMem_ds;
-	mCanvas.drawBitmap(mem_ds, (src>>2) + MARect_left(srcRect) + MARect_top(srcRect) * scanlength,
-	scanlength, MAPoint2d_x(dstPoint), MAPoint2d_y(dstPoint),
-	MARect_width(srcRect), MARect_height(srcRect), true, mPaint);
-*/
 
-/*
-	mCanvas.drawBitmap(
-		mem, 
-		srcRectLeft + srcRectTop * scanlength,
-		scanlength,
-		dstX,
-		dstY,
-		srcRectWidth,
-		srcRectHeight,
-		true,
-		mPaint);
-*/
+	int pixels[] = new int[srcRectWidth];
+	
+	mMemDataSection.mark();
+	mMemDataSection.position(mem);
 
-	// start in memory where to draw from
-	int dataStart = srcRectLeft + srcRectTop * scanLength;
-	
-	// size of the memory which are being drawn
-	int memSize = srcRectHeight * scanLength;
-	
-	int pixels[] = new int[memSize];
-	
-	int initialPosition = mMemDataSection.position();
-	
-	mMemDataSection.position(dataStart);
-	
 	IntBuffer ib = mMemDataSection.asIntBuffer();
 	
-	ib.get(pixels);
+	for(int y = 0; y < srcRectHeight; y++)
+	{
+		ib.position(y*scanLength);		
+		
+		ib.get(pixels);
+		mCanvas.drawBitmap(pixels, 0, srcRectWidth, dstX, dstY+y, srcRectWidth, 1, true, mPaint);		
+	}
 	
-	mMemDataSection.position(initialPosition);
-	
-	mCanvas.drawBitmap(
-		pixels, 0, scanLength,
-		dstX, dstY,
-		srcRectWidth, srcRectHeight,
-		true, mPaint);
-
+	mMemDataSection.reset();
 }
 
 private Bitmap mTempBitmap;
 private Matrix mTempMatrix = new Matrix();
 
+/**
+* @brief _maDrawImageRegion 
+*/
 void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int dstLeft, int dstTop, int transformMode)
 {
 	SYSLOG("maDrawImageRegion");
@@ -394,46 +427,64 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 	}
 }
 
+/**
+* @brief maGetImageSize
+*/
 int maGetImageSize(int image)
 {
 	SYSLOG("maGetImageSize");
+	Log.i("MoSync Dalvik","maGetImageSize");
 	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
 	if (imageResource == null)
 	{
+		Log.i("MoSync Dalvik","maGetImageSize : no such resource");
 		return -1;
 	}
 
 	return EXTENT(imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
 }
 
+/**
+* @brief maGetImageData
+*/
 void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth, int srcHeight, int scanLength)
 {
 	SYSLOG("maGetImageData");
 
-	Log.i("maGetImageData","srcLeft:" + srcLeft + " srcTop:" + srcTop + " srcWidth:" + srcWidth + " srcHeight:" + srcHeight + " scanLength:" + scanLength);
-	
-
 	ImageCache imageResource = (ImageCache)mImageResources.get(image);
+	if(null == imageResource)
+	{
+		maPanic(1,"maGetImageData failed, no image resource!");
+	}
 	
-	int bitmapSize = scanLength * imageResource.mBitmap.getHeight();
+	int bitmapSize = scanLength * srcHeight;
 	
 	if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight()) maPanic(-1, "maGetImageData, (srcTop + srcHeight) > imageResource.mBitmap.getHeight() : " + (srcTop + srcHeight) + " > " + imageResource.mBitmap.getHeight());
 	if ((srcLeft + srcWidth) > imageResource.mBitmap.getWidth()) maPanic(-1, "maGetImageData, (srcLeft + srcWidth) > imageResource.mBitmap.getWidth() : " + (srcLeft + srcWidth) + " > " + imageResource.mBitmap.getWidth());	
 
+
+	int pixels[] = new int[srcWidth];
 	
-	int pixels[] = new int[bitmapSize];
-	
-	imageResource.mBitmap.getPixels(pixels, 0, scanLength, 0, 0, imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
-	
-	int initialPosition = mMemDataSection.position();
-	
+	mMemDataSection.mark();
+	mMemDataSection.position(dst);
+
 	IntBuffer ib = mMemDataSection.asIntBuffer();
 	
-	ib.put(pixels);
+	for(int y = 0; y < srcHeight; y++)
+	{
+		ib.position(y*scanLength);		
+		imageResource.mBitmap.getPixels(pixels, 0, srcWidth, srcLeft, srcTop+y, srcWidth, 1);
+		
+		ib.put(pixels);	
+	}
 	
-	mMemDataSection.position(initialPosition);
+	mMemDataSection.reset();
+	
 }
 
+/**
+* @brief maSetDrawTarget
+*/
 int maSetDrawTarget(int image)
 {
 	SYSLOG("maSetDrawTarget");
@@ -456,30 +507,55 @@ int maSetDrawTarget(int image)
 	return 1;
 }
 
+/**
+* @brief maCreateImageFromData
+*/
 int maCreateImageFromData(int placeholder, int data, int offset, int size)
 {
 	SYSLOG("maCreateImageFromData");
 
+	byte[] ra = new byte[size];
+
 	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
-	if (null == bb)
+	if (null != bb)
 	{
-		return RES_BAD_INPUT;
+		try
+		{
+			bb.position(offset);
+			bb.get(ra);
+		}
+		catch(Exception e)
+		{
+			return RES_BAD_INPUT;
+		}
+	}
+	else
+	{
+		UBinData ubd = (UBinData)mUBinaryResources.get(data);
+		if (null != ubd)
+		{
+			if(ubd.mSize != size)
+			{
+				return RES_BAD_INPUT;
+			}
+		
+			try
+			{	
+				AssetManager assetManager = mContext.getAssets();
+				InputStream is = assetManager.open(RESOURCE_FILE);
+			
+				is.skip(ubd.mOffset - (int)mResourceOffset);
+				is.read(ra);
+			}
+			catch(Exception e)
+			{
+				return RES_BAD_INPUT;
+			}
+		}
 	}
 	
-	byte[] ra = new byte[size];
-	try
-	{
-		bb.position(offset);
-		bb.get(ra);
-	}
-	catch(Exception e)
-	{
-		return RES_BAD_INPUT;
-	}
-
 	try 
 	{
-		Log.i("Decode image","size:" + size + " offset:" + offset + " ra.length:" + ra.length);
 		Bitmap decodedImage = BitmapFactory.decodeByteArray(ra, 0, ra.length);
 		if (decodedImage == null)
 		{
@@ -489,7 +565,6 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 	} 
 	catch(UnsupportedOperationException e) 
 	{
-		Log.e("maCreateImageFromData exception",e.toString());
 		return RES_BAD_INPUT;
 	} 
 	catch (java.lang.IllegalArgumentException e) 
@@ -505,20 +580,40 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 
 ByteBuffer tempImageRawBuffer;
 
+/**
+* @brief _maCreateImageRawGetData
+*
+* This fucntion generates a ByteBuffer which then is sent to the JNI library for processing
+*/
 ByteBuffer _maCreateImageRawGetData(int size)
 {
 	tempImageRawBuffer = ByteBuffer.allocateDirect(size);
+	tempImageRawBuffer.order(null);
+	
+	Log.i("MoSync Syscall Dalvik","_maCreateImageRawGetData tempImageRawBuffer: " + tempImageRawBuffer);
 	return tempImageRawBuffer;
 }
 
-// This function takes the content of the tempImageRawBuffer and creates an Image from it.
+/**
+* @brief _maCreateImageRaw
+*
+* Takes the preprocessed raw image data and copies the contents to a bitmap
+*/
 int _maCreateImageRaw(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateImageRaw");
+	Log.i("MoSync Syscall Dalvik","_maCreateImageRaw tempImageRawBuffer: " + tempImageRawBuffer);
 	
 	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	if(null == bitmap)
+	{
+		maPanic(1, "Unable to create ");
+	}
+	
+	tempImageRawBuffer.position(0);
 	bitmap.copyPixelsFromBuffer(tempImageRawBuffer);
 	
+	Log.i("maCreateImageRaw","add image resource placeholder : " + placeholder);
 	mImageResources.put(placeholder, new ImageCache(null, bitmap));
 	
 	Log.i("maCreateImageRaw", "bitmap created width:" + bitmap.getWidth() + " height:" + bitmap.getHeight());
@@ -526,6 +621,9 @@ int _maCreateImageRaw(int placeholder, int width, int height)
 	return RES_OK;
 }
 
+/**
+* @brief maCreateDrawableImage
+*/
 int maCreateDrawableImage(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateDrawableImage");
@@ -535,6 +633,7 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 	
+		Log.i("maCreateDrawableImage","add image resource placeholder : " + placeholder);
 		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));
 	
 		Log.i("maCreateDrawableImage", "bitmap created width:" + bitmap.getWidth() + " height:" + bitmap.getHeight());
@@ -563,6 +662,9 @@ int mMaxStoreId = 0;
 
 final static String storesPath = "MAStore";
 
+/**
+* @brief maOpenStore
+*/
 int maOpenStore(String name, int flags)
 {
 	SYSLOG("maOpenStore");
@@ -604,6 +706,9 @@ int maOpenStore(String name, int flags)
 	}
 }
 
+/**
+* @brief maWriteStore
+*/
 int maWriteStore(int store, int data)
 {
 	SYSLOG("maWriteStore");
@@ -634,7 +739,7 @@ int maWriteStore(int store, int data)
 				byte[] ra = new byte[ubd.mSize];
 			
 				AssetManager assetManager = mContext.getAssets();
-				InputStream is = assetManager.open("resources.mp3");
+				InputStream is = assetManager.open(RESOURCE_FILE);
 				
 				is.skip(ubd.mOffset - (int)mResourceOffset);
 				is.read(ra);
@@ -657,6 +762,9 @@ int maWriteStore(int store, int data)
 	return STERR_GENERIC;
 }
 
+/**
+* @brief _maReadStore
+*/
 ByteBuffer _maReadStore(int store, int resourceIndex)
 {
 	SYSLOG("_maReadStore");
@@ -697,6 +805,9 @@ ByteBuffer _maReadStore(int store, int resourceIndex)
 	}
 }
 
+/**
+* @brief maCloseStore
+*/
 void maCloseStore(int store, int remove)
 {
 	SYSLOG("maCloseStore");
@@ -722,23 +833,35 @@ void maCloseStore(int store, int remove)
 
 #include "MoSyncLocation.jpp"
 
+/**
+* @brief maLoadProgram
+*/
 void maLoadProgram(int data, int reload)
 {
 	SYSLOG("maLoadProgram");
 }
 
+/**
+* @brief maGetKeys
+*/
 int maGetKeys()
 {
 	SYSLOG("maGetKeys");
 	return -1;
 }
 
+/**
+* @brief maGetEvent
+*/
 int maGetEvent(int event)
 {
 	SYSLOG("maGetEvent");
 	return -1;
 }
 
+/**
+* @brief maWait
+*/
 void maWait(int timeout)
 {
 	SYSLOG("maWait");	
@@ -767,6 +890,9 @@ void maWait(int timeout)
 	SYSLOG("maWait returned");
 }
 
+/**
+* @brief maTime
+*/
 int maTime()
 {
 	SYSLOG("maTime");
@@ -774,6 +900,9 @@ int maTime()
 	return (int)(d.getTime() / 1000);
 }
 
+/**
+* @brief maLocalTime
+*/
 int maLocalTime()
 {
 	SYSLOG("maLocalTime");
@@ -782,29 +911,44 @@ int maLocalTime()
 	return (int)((d.getTime() + tz.getRawOffset()) / 1000);
 }
 
+/**
+* @brief maGetMilliSecondCount
+*/
 int maGetMilliSecondCount()
 {
 	return (int)System.currentTimeMillis();
 }
 
+/**
+* @brief maFreeObjectMemory 
+*/
 int maFreeObjectMemory()
 {
 	SYSLOG("maFreeObjectMemory");
 	return -1;
 }
 
+/**
+* @brief maTotalObjectMemory
+*/
 int maTotalObjectMemory()
 {
 	SYSLOG("maTotalObjectMemory");
 	return -1;
 }
 
+/**
+* @brief maVibrate
+*/
 int maVibrate(int ms)
 {
 	SYSLOG("maVibrate");
 	return -1;
 }
 
+/**
+* @brief maPanic
+*/
 void maPanic(int result, String message)
 {
 	SYSLOG("maPanic");
@@ -812,18 +956,27 @@ void maPanic(int result, String message)
 	threadPanic(result, message);
 }
 
+/**
+* @brief maInvokeExtension
+*/
 int maInvokeExtension(int function, int a, int b, int c)
 {
 	SYSLOG("maInvokeExtension");
 	return -1;
 }
 
+/**
+* @brief maIOCtl
+*/
 int maIOCtl(int function, int a, int b, int c)
 {
 	SYSLOG("maIOCtl");
 	return -1;
 }
 
+/**
+* @brief _enableFramebuffer
+*/
 void _enableFramebuffer(int address)
 {
 	mUsingFrameBuffer = true;
@@ -831,13 +984,11 @@ void _enableFramebuffer(int address)
 	mFrameBufferSize = mWidth*mHeight;
 	mFrameBufferBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888 );
 	
-	int p = mMemDataSection.position();
-	mMemDataSection.position(mFrameBufferAddress);
-	
-	mMemDataSection.position(p);
-	
 }
 
+/**
+* @brief _disableFramebuffer
+*/
 void _disableFramebuffer()
 {
 	mUsingFrameBuffer = false;
@@ -855,6 +1006,9 @@ int maWriteLog(String str, int size)
 	return 1;
 }
 
+/**
+* @brief maGetSystemProperty
+*/
 int maGetSystemProperty(String key, int buf, int size)
 {
 	String property = "";
@@ -899,6 +1053,9 @@ int maGetSystemProperty(String key, int buf, int size)
 	return property.length() + 1;
 }
 
+/**
+* @brief maPlatformRequest
+*/
 int maPlatformRequest(String url)
 {
 	if(url.startsWith("http://"))
@@ -913,6 +1070,9 @@ int maPlatformRequest(String url)
 	return -1;
 }
 
+/**
+* @brief maShowVirtualKeyboard
+*/
 int maShowVirtualKeyboard()
 {
 	InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -922,6 +1082,13 @@ int maShowVirtualKeyboard()
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
+/**
+* @brief loadImage
+*
+* Stores an image resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 {
 	SYSLOG("LoadImage");
@@ -949,7 +1116,7 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 			SYSLOG("resoff:" + mResourceOffset + " pos: " + pos + " finaloffset: " + offset);
 			
 			AssetManager assetManager = mContext.getAssets();
-			InputStream is = assetManager.open("resources.mp3");
+			InputStream is = assetManager.open(RESOURCE_FILE);
 			
 			SYSLOG("read stream");
 			is.skip(offset);
@@ -975,8 +1142,15 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 	}
 }
 
-
 Hashtable<Integer, ByteBuffer> mBinaryResources = new Hashtable<Integer, ByteBuffer>();
+
+/**
+* @brief loadBinary
+*
+* Stores a binary resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 ByteBuffer loadBinary(int resourceIndex, int size)
 {
 	SYSLOG("loadBinary index:" + resourceIndex);
@@ -984,6 +1158,7 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 	try
 	{
 		ByteBuffer data = ByteBuffer.allocateDirect(size);
+		data.order(null);
 		mBinaryResources.put(resourceIndex, data);
 		return data;
 	}
@@ -994,6 +1169,10 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 	return null;
 }
 
+
+/**
+* @brief UBinData class
+*/
 class UBinData
 {
 	public UBinData(int offset, int size)
@@ -1006,6 +1185,15 @@ class UBinData
 };
 
 Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
+
+
+/**
+* @brief loadUBinary
+*
+* Stores an unloaded binary resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
@@ -1016,7 +1204,7 @@ void loadUBinary(int resourceIndex, int offset, int size)
 	try
 	{
 		AssetManager assetManager = mContext.getAssets();
-		AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+		AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 	
 		FileInputStream fis = pAfd.createInputStream();
 		fis.skip(offset);
@@ -1034,31 +1222,40 @@ void loadUBinary(int resourceIndex, int offset, int size)
 	}
 }
 
+/**
+* @brief destroyResource
+*
+* @param 	resourceIndex the resource index which should be destroyed
+*/
 void destroyResource(int resourceIndex)
 {
 	SYSLOG("destroyBinary :" + resourceIndex);
+	Log.i("destroyResource","Trying to destroy resources : " + resourceIndex);
 	
-	if(mBinaryResources.contains(resourceIndex))
+	if(null != mBinaryResources.get(resourceIndex))
 	{
 		mBinaryResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","Binary resource removed");
 	}
 
-	if(mUBinaryResources.contains(resourceIndex))
+	if(null != mUBinaryResources.get(resourceIndex))
 	{
 		mUBinaryResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","UBinary resource removed");
 	}
 
-	if(mImageResources.contains(resourceIndex))
+	if(null != mImageResources.get(resourceIndex))
 	{
 		mImageResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","Image resource removed");
 	}
 
 
 }
 
+/**
+* @brief maTextBox
+*/
 int maTextBox(String title, String inText, int outText, int maxSize, int constraints)
 {
 	Intent intent = new Intent(mContext, TextBox.class);
