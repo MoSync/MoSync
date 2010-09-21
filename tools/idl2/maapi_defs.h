@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _MAAPI_DEFS_H
 #define _MAAPI_DEFS_H
 
-#if defined(MAAPI_H) || defined(EMULATOR)
+#if defined(MAAPI_H) || defined(HAVE_IOCTL_ELLIPSIS)
 #define MA_IOCTL_ELLIPSIS , ...
 #else
 #define MA_IOCTL_ELLIPSIS

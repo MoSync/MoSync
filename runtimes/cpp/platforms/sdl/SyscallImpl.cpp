@@ -15,6 +15,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#define HAVE_IOCTL_ELLIPSIS
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x500
