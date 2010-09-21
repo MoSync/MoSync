@@ -61,6 +61,14 @@ MAHandle maConnect(final String url)
 		return CONNERR_MAX;
 	}
 	
+#ifdef _ANDROID_BLUETOOTH	
+	// If this is a Bluetooth url, Bluetooth must be available and enabled.
+	if (url.startsWith("btspp://") && null == btGetBluetoothAdapter())
+	{
+		return CONNERR_UNAVAILABLE;
+	}
+#endif
+
 	int connHandle = networkGetNextConnectionHandle();
 	
 	try
@@ -109,12 +117,29 @@ MAHandle maConnect(final String url)
 }
 
 /**
-*
-*/
-int maConnGetAddr(MAHandle conn, long addr) throws Exception {
+ * Get the address of the connection.
+ */
+int maConnGetAddr(MAHandle connHandle, int addrPointer) throws Exception 
+{
 	Log.i("MoSyncSyscall", "maConnGetAddr");
-	/* FIX-ME */
-	return -1;
+	
+	// Is this a request for a local address?
+	if (HANDLE_LOCAL == connHandle)
+	{
+		return networkConnGetLocalAddr(addrPointer);
+	}
+	
+	// Get the connection object.
+	ConnectionObject connObj = networkGetConnectionObject(connHandle);
+	if (null == connObj)
+	{
+		return -1;
+	}
+	
+	Log.i("MoSyncSyscall", "maConnGetAddr 3 connobj = " + connObj);
+	
+	// Fill in the connection struct.
+	return connObj.getAddr(addrPointer);
 }
 
 /**
@@ -281,10 +306,11 @@ int maAccept(MAHandle serverHandle)
 	}
 	
 	// Start accept thread.
-	connObj.startAcceptThread();
-	
-	return 1; // Success
+	return connObj.startAcceptThread();
 }
+
+// Helper functions, prefixed with "network". Some of them are generally useful
+// and could be renamed and move to some other file.
 
 int networkGetNextConnectionHandle()
 {
@@ -314,6 +340,162 @@ void networkRemoveConnectionObject(ConnectionObject connObj)
 	mConnections_DoNotReferenceExplictly.remove(connObj.mHandle); 
 }
 
+/**
+ * Copy a byte array to the given address in the system memory.
+ */
+void networkCopyBytesToMemory(int address, byte[] bytes)
+{
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+	mMemDataSection.put(bytes);
+	mMemDataSection.reset();
+}
+
+/**
+ * Copy an int value to the given address in the system memory.
+ */
+void networkCopyIntToMemory(int address, int value)
+{
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+	ByteOrder oldOrder = mMemDataSection.order();
+	mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
+	mMemDataSection.asIntBuffer().put(value);
+	// TODO: Use this instead: mMemDataSection.putInt(value);
+	mMemDataSection.order(oldOrder);
+	mMemDataSection.reset();
+}
+
+/**
+ * Get the int value at the given address in the system memory.
+ */
+int networkGetIntFromMemory(int address)
+{
+	ByteOrder oldOrder = mMemDataSection.order();
+	mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
+	int value = mMemDataSection.getInt(address);
+	mMemDataSection.order(oldOrder);
+	
+	return value;
+}
+
+/**
+ * Copy a String value to the given address in the system memory.
+ */
+void networkCopyStringToMemory(int address, String str)
+{
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+	mMemDataSection.put(str.getBytes());
+	mMemDataSection.put((byte)0); // Terminating null char.
+	mMemDataSection.reset();
+}
+
+/**
+ * Specialised method used to avoid code duplication.
+ */
+int networkCopyBluetoothAddressToMemory(int addrPointer, int port, byte[] addr)
+{
+	// Check that the address is valid.
+	if (null == addr || 6 != addr.length)
+	{
+		return -1;
+	}
+			
+	// Write family.
+	networkCopyIntToMemory(addrPointer, CONN_FAMILY_BT);
+	
+	// Write port.
+	networkCopyIntToMemory(addrPointer + 4, port);
+	
+	// Write address.
+	networkCopyBytesToMemory(addrPointer + 8, addr);
+	
+	return 1;
+}
+
+/**
+ * Specialised method used to avoid code duplication.
+ */
+int networkCopyInetAddressToMemory(int addrPointer, int port, byte[] addr)
+{
+	// Check that the address is valid.
+	if (null == addr || 4 != addr.length)
+	{
+		return -1;
+	}
+	
+	// Write family.
+	networkCopyIntToMemory(addrPointer, CONN_FAMILY_INET4);
+	
+	// Write address.
+	networkCopyIntToMemory(addrPointer + 4, networkInet4AddressAsInt(addr));
+	
+	// Write port.
+	networkCopyIntToMemory(addrPointer + 8, port);
+	
+	return 1;
+}
+
+/**
+ * Return an inet4 address in a byte array as an int.
+ */
+int networkInet4AddressAsInt(byte[] addr)
+{
+	return 
+		(((int)addr[0]) << 24) |
+		(((int)addr[1]) << 16) |
+		(((int)addr[2]) << 8) |
+		((int)addr[3]);
+}
+
+/**
+ * Fill in the local address in the addr structure.
+ */
+int networkConnGetLocalAddr(int addrPointer)
+{
+	try
+	{
+		// Family can be inet4 or Bluetooth.
+		int family = networkGetIntFromMemory(addrPointer);
+		if (CONN_FAMILY_INET4 == family)
+		{
+			InetAddress inetAddr = InetAddress.getLocalHost();
+			
+			if (null == inetAddr)
+			{
+				return -1;
+			}
+			
+			return networkCopyInetAddressToMemory(
+				addrPointer, 
+				0, // Port
+				inetAddr.getAddress());
+		}
+		else if (CONN_FAMILY_BT == family)
+		{
+			// Write address data. Use zero as port number.
+			return networkCopyBluetoothAddressToMemory(
+				addrPointer,
+				0, // Port
+				btGetDefaultAdapterAddressAsBytes());
+		}
+		else
+		{
+			// Unknown family.
+			return -1;
+		}
+	}
+	catch (Exception e)
+	{
+		e.printStackTrace();
+		return -1;
+	}
+}
+
+/**
+ * Super class for connections.
+ */
 public abstract class ConnectionObject
 {
 	public ByteBuffer mByteBuffer;
@@ -377,6 +559,15 @@ public abstract class ConnectionObject
 		{
 			getOutputStream().close();
 		}
+	}
+	
+	/**
+	 * Fill in the connection struct. This is done by subclasses.
+	 * @return Status code, -1 on error.
+	 */
+	public int getAddr(int addrPointer)
+	{
+		return -1;
 	}
 	
 	public void read(int dst, int size) throws IOException
@@ -548,7 +739,7 @@ public abstract class ConnectionObject
 	}
 	
 	public void startConnectThread() { }
-	public void startAcceptThread() { }
+	public int startAcceptThread() { return -1; }
 	public void startFinishConnectThread() { }
 	
 	public boolean isServerConnection() { return false; }
@@ -929,6 +1120,36 @@ class SocketConnectionObject extends ConnectionObject
 		return this;
 	}
 	
+	@Override
+	public int getAddr(int addrPointer)
+	{
+		try
+		{
+			if (null == mSocket)
+			{
+				return -1;
+			}
+			
+			// Get the IP adress of the socket. 
+			InetAddress inetAddr = mSocket.getInetAddress();
+			
+			if (null == inetAddr)
+			{
+				return -1;
+			}
+			
+			return networkCopyInetAddressToMemory(
+				addrPointer, 
+				mSocket.getPort(),
+				inetAddr.getAddress());
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
 	void setSocketAndOpenStreams(Socket socket) throws IOException
 	{
 		mSocket = socket;
@@ -1119,6 +1340,35 @@ class BluetoothConnectionObject extends ConnectionObject
 	}
 	
 	@Override
+	public int getAddr(int addrPointer)
+	{
+		// Bluetooth address.
+		byte[] addr = null;
+		
+		// If we have a socket get the address from the socket's device.
+		if (null != mBluetoothSocket)
+		{
+			BluetoothDevice device = mBluetoothSocket.getRemoteDevice();
+			if (null != device)
+			{
+				addr = btGetDeviceAddressAsBytes(device);
+			}
+		}
+		
+		// Otherwise get if from the Bluetooth adapter.
+		if (null == addr)
+		{
+			addr = btGetDefaultAdapterAddressAsBytes();
+		}
+		
+		// Write address data. Use zero as port number.
+		return networkCopyBluetoothAddressToMemory(
+			addrPointer, 
+			0, // Port
+			addr);
+	}
+	
+	@Override
 	public void close() throws IOException
 	{
 		super.close();
@@ -1278,7 +1528,7 @@ class BluetoothServerConnectionObject extends ConnectionObject
 {
 	String mServiceName = null;
 	String mUUID = null;
-	BluetoothServerSocket mServerSocket = null;
+	BluetoothServerSocket mBluetoothServerSocket = null;
 	boolean mAcceptThreadRunning = false;
 	
 	/**
@@ -1320,22 +1570,31 @@ class BluetoothServerConnectionObject extends ConnectionObject
 		}
 		
 		Log.i("@BT", "realServerUrl = " + realUrl);
-		Log.i("@BT", "splitUrl = " + splitUrl);
 		Log.i("@BT", "splitUrl.length = " + splitUrl.length);
-		Log.i("@BT", "mServiceName = " + mServiceName);
 		Log.i("@BT", "mUUID = " + mUUID);
+		Log.i("@BT", "mServiceName = " + mServiceName);
 			
 		return this;
 	}
 	
 	@Override
+	public int getAddr(int addrPointer)
+	{
+		// Write address data. Use zero as port number.
+		return networkCopyBluetoothAddressToMemory(
+			addrPointer, 
+			0, // Port
+			btGetDefaultAdapterAddressAsBytes());
+	}
+	
+	@Override
 	public void close() throws IOException
 	{
-		if (null != mServerSocket)
+		if (null != mBluetoothServerSocket)
 		{
 			// This should also terminate any ongoing accept and terminate its thread.
-			mServerSocket.close();
-			mServerSocket = null;
+			mBluetoothServerSocket.close();
+			mBluetoothServerSocket = null;
 		}
 	}
 	
@@ -1343,17 +1602,17 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	public void connect()
 	{
 		// We do NOT spawn a thread here. That is done via maAccept.
-		
-		mState |= CONNOP_CONNECT;
+		// Do NOT post a connect event when creating a server with maConnect.
+		//mState |= CONNOP_CONNECT;
 		networkAddConnectionObject(this);
-		postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
+		//postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
 	}
 	
 	/**
 	 * Spawn accept thread.
 	 */
 	@Override
-	public void startAcceptThread()
+	public int startAcceptThread()
 	{
 		Log.i("@@@ BluetoothServerConnectionObject", "startAcceptThread");
 		
@@ -1383,6 +1642,8 @@ class BluetoothServerConnectionObject extends ConnectionObject
 				}
 			}
 		});
+		
+		return 1;
 	}
 	
 	public void doAccept()
@@ -1401,15 +1662,17 @@ class BluetoothServerConnectionObject extends ConnectionObject
 				return;
 			}
 			
+			// TODO: Should be calle donly once? Move to connect?
 			// Create server socket.
-			BluetoothServerSocket mServerSocket = adapter.listenUsingRfcommWithServiceRecord(
-				mServiceName, 
-				UUID.fromString(btFormatServiceUUID(mUUID)));
+			BluetoothServerSocket mBluetoothServerSocket = 
+				adapter.listenUsingRfcommWithServiceRecord(
+					mServiceName, 
+					UUID.fromString(btFormatServiceUUID(mUUID)));
 				
-			Log.i("@@BluetoothServerConnectionObject", "doAccept - blocking");
+			Log.i("@@BluetoothServerConnectionObject", "accept (blocking)");
 			
 			// Accept. Will block. Terminate by calling close on the server socket.
-			BluetoothSocket socket = mServerSocket.accept();
+			BluetoothSocket socket = mBluetoothServerSocket.accept();
 			
 			Log.i("@@BluetoothServerConnectionObject", "doAccept - socket accepted");
 			
@@ -1464,6 +1727,7 @@ class BluetoothServerConnectionObject extends ConnectionObject
 			return;
 		}
 	}
+	
 } // End of class BluetoothServerConnectionObject
 
 #endif // _ANDROID_BLUETOOTH

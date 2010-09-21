@@ -705,7 +705,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rsrc, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-
 	}
 
 	SYSCALL(void,  maConnReadToData(MAHandle conn, MAHandle data, int offset, int size))
@@ -718,7 +717,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, data, offset, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-
 	}
 
 	SYSCALL(void,  maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size))
@@ -737,13 +735,12 @@ namespace Base
 	{
 		SYSLOG("maConnGetAddr");
 		
+		int addrPointer = (int)addr - (int)gCore->mem_ds;
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnGetAddr", "(IJ)V");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnGetAddr", "(II)I");
 		if (methodID == 0) ERROR_EXIT;
-		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, (jlong)addr);
-		
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, addrPointer);
 		mJNIEnv->DeleteLocalRef(cls);
-		
 		return retval;
 	}
 
