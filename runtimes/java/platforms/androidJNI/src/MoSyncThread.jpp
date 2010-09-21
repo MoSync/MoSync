@@ -37,6 +37,7 @@ import android.graphics.Region;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.graphics.Matrix;
+import android.graphics.Path;
 
 import android.location.Location;
 import android.location.LocationManager;

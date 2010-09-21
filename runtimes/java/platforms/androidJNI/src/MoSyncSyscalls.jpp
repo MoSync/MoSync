@@ -141,20 +141,120 @@ void maFillRect(int left, int top, int width, int height)
 	mCanvas.drawRect(left, top, left+width, top+height, mPaint);
 }
 
+/*
+This implementation might seem a bit strange but it works so much better than using Canvas.drawVertices..
+*/
 /**
 * @brief maFillTriangleStrip
 */
 void maFillTriangleStrip(int address, int count)
 {
-	SYSLOG("maFillTriangleStrip - NOT IMPLEMENTED");
+	SYSLOG("maFillTriangleStrip");
+
+	if(count < 3) maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
+
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	int[] vertices = new int[count*2];
+	ib.get(vertices);
+	
+	Path path = new Path();
+
+	int i = 0;
+	
+	int xa = vertices[i++];
+	int ya = vertices[i++];
+
+	int xb = vertices[i++];
+	int yb = vertices[i++];
+	for(;;) {
+		int xc = vertices[i++];
+		int yc = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xa = vertices[i++];
+		ya = vertices[i++];
+		path.moveTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.lineTo(xa,ya);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xb = vertices[i++];
+		yb = vertices[i++];
+		path.moveTo(xc,yc);
+		path.lineTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.close();
+		
+		if(i >= count*2)
+			break;			
+	}
+	mCanvas.drawPath(path, mPaint);
+	
+	mMemDataSection.reset();
+	
 }
+
 
 /**
 * @brief maFillTriangleFan
 */
 void maFillTriangleFan(int address, int count)
 {
-	SYSLOG("maFillTriangleFan - NOT IMPLEMENTED");
+	SYSLOG("maFillTriangleFan");
+
+	if(count < 3) maPanic(1,"maFillTriangleFan takes more than 3 vertices");
+
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	int[] vertices = new int[count*2];
+	ib.get(vertices);
+	
+	Path path = new Path();
+
+	int i = 0;
+	
+	int xa = vertices[i++];
+	int ya = vertices[i++];
+
+	int xb = vertices[i++];
+	int yb = vertices[i++];
+	for(;;) {
+		int xc = vertices[i++];
+		int yc = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xa = vertices[i++];
+		ya = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xc,yc);
+		path.lineTo(xb,yb);
+		path.close();
+		
+		if(i >= count*2)
+			break;			
+	}
+	mCanvas.drawPath(path, mPaint);
+	
+	mMemDataSection.reset();
 }
 
 
