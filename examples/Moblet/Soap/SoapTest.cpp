@@ -23,18 +23,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-// This is the WebServiceX Currency Convertor, as documented here:
-// http://www.webservicex.net/CurrencyConvertor.asmx?op=ConversionRate
+// This request will return a text string, scrambled with rot-13.
 
-// This request will return the current exchange rate between
-// the Pound Sterling and the Euro.
-
-static const char sUrl[] = "http://www.webservicex.net/CurrencyConvertor.asmx";
+static const char sUrl[] = "http://www.joelhainley.com/examples/soap/server.php";
 static const char sData[] =
-"<ConversionRate xmlns=\"http://www.webserviceX.NET/\">"
-	"<FromCurrency>GBP</FromCurrency>"
-	"<ToCurrency>EUR</ToCurrency>"
-"</ConversionRate>"
+"<ns1:getRot13><symbol xsi:type=\"xsd:string\">"
+"Hello World!"
+"</symbol></ns1:getRot13>"
 ;
 
 

@@ -50,12 +50,6 @@ SetCompressor /SOLID lzma
    
   !define MUI_HEADERIMAGE_BITMAP "installer.bmp" ; optional
   !define MUI_ABORTWARNING
-  
-  !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_RUN_TEXT "Open the MoSync IDE."
-  !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchIDE"
-
-  !define MUI_FINISHPAGE_NOAUTOCLOSE
 
   !define MUI_DIRECTORYPAGE_VERIFYONLEAVE
 
@@ -67,7 +61,6 @@ SetCompressor /SOLID lzma
   !define MUI_PAGE_CUSTOMFUNCTION_LEAVE "DirVerify"
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
-  !insertmacro MUI_PAGE_FINISH
 
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
@@ -108,10 +101,6 @@ Function CheckNotifyJavaVersion
      Goto CheckNotifyJavaVersionEnd
   MessageBox MB_OK|MB_ICONEXCLAMATION "You have version $0 of the Java Runtime Environment. You need at least version 1.6 to run the MoSync IDE. Please download and install the latest version."
   CheckNotifyJavaVersionEnd:
-FunctionEnd
-
-Function LaunchIDE
-	Exec '"$INSTDIR\eclipse\mosync.exe"'
 FunctionEnd
 
 Section "MoSync (required)" MoSync

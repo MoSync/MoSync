@@ -92,7 +92,11 @@ MAHandle maConnect(final String url)
 			connObj = new UrlConnectionObject().create(url, connHandle);
 		}
 		
-		connObj.connect();
+		int result = connObj.connect();
+		if (result != 1)
+		{
+			return CONNERR_GENERIC;
+		}
 	}
 	catch (MalformedURLException e)
 	{
@@ -270,10 +274,8 @@ void maHttpFinish(MAHandle connHandle)
 	
 	MYASSERT(connObj != null);
 	MYASSERT(connObj.mState == 0);
-	MYASSERT(connObj.mHttpState == HTTP_STATE_SETUP || connObj.mHttpState == HTTP_STATE_WRITING);
 
 	connObj.mState = CONNOP_FINISH;
-	connObj.mHttpState = HTTP_STATE_FINISHING;
 	connObj.mMoSyncThread = this;
 	
 	connObj.startFinishConnectThread();
@@ -314,7 +316,6 @@ int maAccept(MAHandle serverHandle)
 
 int networkGetNextConnectionHandle()
 {
-	Log.i("@@@networkGetNextConnectionHandle", "Next handle is: " + mConnHandleCounter_DoNotReferenceExplictly);
 	return mConnHandleCounter_DoNotReferenceExplictly++;
 }
 
@@ -330,13 +331,11 @@ ConnectionObject networkGetConnectionObject(MAHandle connHandle)
 	
 void networkAddConnectionObject(ConnectionObject connObj)
 {
-	Log.i("@@@networkAddConnectionObject", "Handle: " + connObj.mHandle + " ConnObj: " + connObj);
 	mConnections_DoNotReferenceExplictly.put(connObj.mHandle, connObj);
 }
 
 void networkRemoveConnectionObject(ConnectionObject connObj)
 {
-	Log.i("@@@networkRemoveConnectionObject", "Handle: " + connObj.mHandle + " ConnObj: " + connObj);
 	mConnections_DoNotReferenceExplictly.remove(connObj.mHandle); 
 }
 
@@ -358,11 +357,11 @@ void networkCopyIntToMemory(int address, int value)
 {
 	mMemDataSection.mark();
 	mMemDataSection.position(address);
-	ByteOrder oldOrder = mMemDataSection.order();
-	mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
-	mMemDataSection.asIntBuffer().put(value);
-	// TODO: Use this instead: mMemDataSection.putInt(value);
-	mMemDataSection.order(oldOrder);
+	//ByteOrder oldOrder = mMemDataSection.order();
+	//mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
+	//mMemDataSection.asIntBuffer().put(value);
+	mMemDataSection.putInt(value);
+	//mMemDataSection.order(oldOrder);
 	mMemDataSection.reset();
 }
 
@@ -371,10 +370,10 @@ void networkCopyIntToMemory(int address, int value)
  */
 int networkGetIntFromMemory(int address)
 {
-	ByteOrder oldOrder = mMemDataSection.order();
-	mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
+	//ByteOrder oldOrder = mMemDataSection.order();
+	//mMemDataSection.order(ByteOrder.LITTLE_ENDIAN);
 	int value = mMemDataSection.getInt(address);
-	mMemDataSection.order(oldOrder);
+	//mMemDataSection.order(oldOrder);
 	
 	return value;
 }
@@ -505,38 +504,34 @@ public abstract class ConnectionObject
 	public boolean mReadData;
 	public boolean mUseResource;
 	public int mState;
-	public int mHttpState;
 	public boolean mCancelled;
-	protected MAHandle mHandle;
 	public MAHandle mData;
+	protected MAHandle mHandle;
 	public Thread mMoSyncThread;
-	
 	private OutputStream mOutputStream;
 	private InputStream mInputStream;
 	
 	public ConnectionObject()
 	{
 		mState = 0;
-		mHttpState = HTTP_STATE_NULL; // TODO: Remove
 		mCancelled = false;
 		mMoSyncThread = MoSyncThread.this;
 	}
 	
 	public void postResultEvent(int opType, int result)
 	{
-		postResultEvent(mHandle, opType, result);
-	}
-	
-	public void postResultEvent(MAHandle handle, int opType, int result)
-	{
-		Log.i("ConnectionObject.postResultEvent", "handle: " + handle + " opType: " + opType + " result: " + result);
+		Log.i("ConnectionObject.postResultEvent", 
+			"mHandle: " + mHandle + " opType: " + opType + 
+			" result: " + result + " connobj (this): " + this);
 
 		MYASSERT((mState & opType) != 0);
+		
+		// Clear state bit.
 		mState &= ~opType;
 
 		int[] event = new int[4];
 		event[0] = EVENT_TYPE_CONN;
-		event[1] = handle;
+		event[1] = mHandle;
 		event[2] = opType;
 		event[3] = result;
 		
@@ -598,27 +593,6 @@ public abstract class ConnectionObject
 		MYASSERT(getOutputStream() != null);
 		MYASSERT((mState & CONNOP_WRITE) == 0);
 		
-		// HTTP_STATE_WRITING is never really used. 
-		// We do not need to set it. 
-		// TODO: Remove it altogether.
-		/*
-		if (connObj.mIsHttpConnection == true) 
-		{
-			HttpURLConnection httpConn = (HttpURLConnection) connObj.mConnection;
-			
-			if (httpConn.getRequestMethod().equals("POST") && 
-				connObj.mHttpState == HTTP_STATE_SETUP) 
-			{
-				connObj.mHttpState = HTTP_STATE_WRITING;
-			}
-		}
-		else if (connObj.mIsSocketConnection == true) 
-		{
-			if(connObj.mHttpState == HTTP_STATE_SETUP)
-				connObj.mHttpState = HTTP_STATE_WRITING;
-		}
-		*/
-		
 		mState |= CONNOP_WRITE;
 		//mMoSyncThread = MoSyncThread.this;
 		
@@ -629,10 +603,6 @@ public abstract class ConnectionObject
 	
 	public void readToData(MAHandle data, int offset, int size) throws IOException
 	{
-	/*
-		Binary binaryResource = (Binary)getResource(data);
-		MYASSERT(binaryResource.size() >= offset + size);
-	*/
 		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
 		if (null == byteBuffer) 
 		{
@@ -640,7 +610,6 @@ public abstract class ConnectionObject
 		}
 
 		mData = data;
-		//mBinary = binaryResource;
 		mByteBuffer = byteBuffer;
 		mOffset = offset;
 		mSize = size;
@@ -648,11 +617,6 @@ public abstract class ConnectionObject
 		mUseResource = true;
 		
 		MYASSERT(getInputStream() != null);
-		
-		/*
-			The JNI side is responsible for setting the resource in flux
-		*/
-		//setResource(data, mFlux);
 		
 		mState |= CONNOP_READ;
 		//mMoSyncThread = MoSyncThread.this;
@@ -662,10 +626,6 @@ public abstract class ConnectionObject
 	
 	public void writeFromData(MAHandle data, int offset, int size) throws IOException
 	{
-	/*
-		Binary binaryResource = (Binary)getResource(data);
-		MYASSERT(binaryResource.size() >= offset + size);
-	*/
 		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
 		if (null == byteBuffer) 
 		{
@@ -673,7 +633,6 @@ public abstract class ConnectionObject
 		}
 		
 		mData = data;
-		//mBinary = binaryResource;
 		mByteBuffer = byteBuffer;
 		mOffset = offset;
 		mSize = size;
@@ -681,41 +640,19 @@ public abstract class ConnectionObject
 		mUseResource = true;
 		
 		MYASSERT(getOutputStream() != null);
-		
-		// HTTP_STATE_WRITING is never really used. 
-		// We do not need to set it. 
-		// TODO: Remove it altogether.
-		/*
-		MYASSERT((connObj.mState & CONNOP_WRITE) == 0);
-		if(connObj.mIsHttpConnection == true) {
-			HttpURLConnection httpConn = (HttpURLConnection) connObj.mConnection;
-			
-			if(httpConn.getRequestMethod().equals("POST") && connObj.mHttpState == HTTP_STATE_SETUP) {
-				connObj.mHttpState = HTTP_STATE_WRITING;
-			}
-		}
-		else if(connObj.mIsSocketConnection == true) {
-			if(connObj.mHttpState == HTTP_STATE_SETUP)
-				connObj.mHttpState = HTTP_STATE_WRITING;
-		}
-		*/
-		
-		/*
-			The JNI side is responsible for setting the resource in flux
-		*/
-		//setResource(data, mFlux);
-		
+
 		mState |= CONNOP_WRITE;
 		//mMoSyncThread = MoSyncThread.this;
 		
 		mThreadPool.execute(new ConnectionReaderWriter(this));
 	}
 
-	public void connect()
+	public int connect()
 	{
 		mState |= CONNOP_CONNECT;
-		networkAddConnectionObject(this);
 		startConnectThread();
+		networkAddConnectionObject(this);
+		return 1; // Success;
 	}
 	
 	public void setInputStream(InputStream stream)
@@ -738,7 +675,7 @@ public abstract class ConnectionObject
 		return mOutputStream;
 	}
 	
-	public void startConnectThread() { }
+	public void startConnectThread() { /* TODO: Panic or something? Should not be called. */ }
 	public int startAcceptThread() { return -1; }
 	public void startFinishConnectThread() { }
 	
@@ -810,15 +747,14 @@ class UrlConnectionObject extends ConnectionObject
 				BIG_PHAT_ERROR;
 		}
 		
-		mHttpState = HTTP_STATE_SETUP;
-		
 		return this;
 	}
 	
 	@Override
 	public void setRequestProperty(String key, String value)
 	{
-		MYASSERT(mHttpState == HTTP_STATE_SETUP);
+		// TODO: Perhaps it is a good idea after all to have mHttpState?
+		//MYASSERT(mHttpState == HTTP_STATE_SETUP);
 		
 		try
 		{
@@ -970,7 +906,7 @@ class UrlConnectionObject extends ConnectionObject
 				i++;
 			}
 #endif
-			mHttpState = HTTP_STATE_FINISHED;
+			//mHttpState = HTTP_STATE_FINISHED;
 			
 			// Why synchronized at this particular point?
 			synchronized(this) 
@@ -1048,7 +984,7 @@ class UrlConnectionObject extends ConnectionObject
 				i++;
 			}
 //#endif
-			mHttpState = HTTP_STATE_FINISHED;
+			//mHttpState = HTTP_STATE_FINISHED;
 
 			postResultEvent(CONNOP_FINISH, result);
 		} 
@@ -1199,8 +1135,7 @@ class SocketConnectionObject extends ConnectionObject
 			
 			setSocketAndOpenStreams(socket);
 			
-			// TODO: Remove and also remove variable mHttpState.
-			mHttpState = HTTP_STATE_FINISHED; // How is this used?
+			//mHttpState = HTTP_STATE_FINISHED;
 
 			// Why synchronized?
 			synchronized(this) 
@@ -1281,8 +1216,6 @@ class BluetoothConnectionObject extends ConnectionObject
 		
 		// Post connect event on this connection handle.
 		postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
-		
-		Log.i("@BluetoothConnectionObject", "createWithBluetoothSocket - done");
 		
 		return this;
 	}
@@ -1448,8 +1381,6 @@ class BluetoothConnectionObject extends ConnectionObject
 				return;
 			}
 			
-			Log.i("@@BluetoothConnectionObject", "probe x");
-				
 			if (mIsChannelClientConnectionRequest)
 			{
 				Log.i("@@BluetoothConnectionObject", "mIsChannelClientConnectionRequest");
@@ -1598,14 +1529,44 @@ class BluetoothServerConnectionObject extends ConnectionObject
 		}
 	}
 	
+	/**
+	 * We do NOT spawn a thread here. That is done via maAccept.
+	 */
 	@Override
-	public void connect()
+	public int connect()
 	{
-		// We do NOT spawn a thread here. That is done via maAccept.
-		// Do NOT post a connect event when creating a server with maConnect.
-		//mState |= CONNOP_CONNECT;
-		networkAddConnectionObject(this);
-		//postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
+		try
+		{
+			// Do NOT post a connect event when creating a server with maConnect.
+			// Keeping this comment as a remainder of that.
+			//postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
+			
+			BluetoothAdapter adapter = btGetBluetoothAdapter();
+			if (null == adapter)
+			{
+				Log.i("@@BluetoothServerConnectionObject", "Bluetooth adapter not found");
+				//postResultEvent(CONNOP_ACCEPT, CONNERR_UNAVAILABLE);
+				return -1;
+			}
+			
+			// Create server socket. This should be done once.
+			// We will get an exception if the channel is already opened.
+			mBluetoothServerSocket = 
+				adapter.listenUsingRfcommWithServiceRecord(
+					mServiceName, 
+					UUID.fromString(btFormatServiceUUID(mUUID)));
+			
+			// Important to do this last, because we want to know that
+			// listenUsingRfcommWithServiceRecord has succeeded before
+			// adding the connection to the table of connection objects.
+			networkAddConnectionObject(this);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			return -1;
+		}
+		return 1; // Success
 	}
 	
 	/**
@@ -1632,8 +1593,9 @@ class BluetoothServerConnectionObject extends ConnectionObject
 					
 					doAccept();
 				}
-				catch (Throwable e)
+				catch (Exception e)
 				{
+					Log.i("BluetoothServerConnectionObject.startAcceptThread", "Exception: " + e);
 					e.printStackTrace();
 				}
 				finally
@@ -1652,8 +1614,7 @@ class BluetoothServerConnectionObject extends ConnectionObject
 		
 		try
 		{
-			mState |= CONNOP_ACCEPT;
-			
+			/*
 			BluetoothAdapter adapter = btGetBluetoothAdapter();
 			if (null == adapter)
 			{
@@ -1662,13 +1623,16 @@ class BluetoothServerConnectionObject extends ConnectionObject
 				return;
 			}
 			
-			// TODO: Should be calle donly once? Move to connect?
+			// TODO: Should be called only once? Move to connect?
 			// Create server socket.
-			BluetoothServerSocket mBluetoothServerSocket = 
+			mBluetoothServerSocket = 
 				adapter.listenUsingRfcommWithServiceRecord(
 					mServiceName, 
 					UUID.fromString(btFormatServiceUUID(mUUID)));
-				
+			*/
+			
+			mState |= CONNOP_ACCEPT;
+			
 			Log.i("@@BluetoothServerConnectionObject", "accept (blocking)");
 			
 			// Accept. Will block. Terminate by calling close on the server socket.
@@ -1676,11 +1640,10 @@ class BluetoothServerConnectionObject extends ConnectionObject
 			
 			Log.i("@@BluetoothServerConnectionObject", "doAccept - socket accepted");
 			
+			// TODO: Delete this test code.
 			// Write mock data for testing.
 			//socket.getOutputStream().write("Hej hopp!!!".getBytes());
 			//socket.getOutputStream().flush();
-			
-			Log.i("@@BluetoothServerConnectionObject", "test data written to socket");
 			
 			// Have we reached max number of connection handles?
 			if (networkIsMaxNumberOfConnectionsReached())
@@ -1773,8 +1736,6 @@ class ConnectionReaderWriter implements Runnable
 
 					mConn.mByteBuffer.position(0);
 					mConn.mByteBuffer.put(bytes, 0, result);
-				
-					//result = mConn.getInputStream().read(mConn.mBinary.arr, mConn.mOffset, mConn.mSize);
 				}
 				else // store in memory
 				{
@@ -1793,7 +1754,7 @@ class ConnectionReaderWriter implements Runnable
 					}
 				}
 				
-				// success
+				// Result is number of bytes read if successful.
 				if (result > 0)
 				{
 					opResult = result;
@@ -1808,36 +1769,21 @@ class ConnectionReaderWriter implements Runnable
 					opResult = CONNERR_INTERNAL;
 				}
 				
-				/*
-					Restore resource from flux
-				*/
-				//setResource(mConn.mData, mConn.mBinary);
-				
 				mConn.postResultEvent(opType, opResult);
 				return;
 			}
 			else // Write data
 			{
 				opType = CONNOP_WRITE;
+				byte[] data = new byte[mConn.mSize];
+				
 				if (mConn.mUseResource == true) // resource
 				{
 					Log.i("ConnectionReaderWriter", "Send from resource");
-					/*
-					if(mConn.mBinary instanceof Binary) {
-						Binary bin = (Binary)mConn.mBinary;
-						
-						mConn.getOutputStream().write(bin.arr, mConn.mOffset, mConn.mSize);
-					} else {
-						byte[] buffer = new byte[mConn.mSize];
-						DataInputStream dis = new DataInputStream(mConn.mBinary.getInputStream());
-						dis.readFully(buffer);
-						dis.close();
-						
-						mConn.getOutputStream().write(buffer);
-					}
-					*/
 					
-					// WRITE DATA DIRECTLY TO THE STREAM FROM mConn.ByteBuffer
+					// Write data directly to the stream from mConn.ByteBuffer
+					mConn.mByteBuffer.position(0);
+					mConn.mByteBuffer.get(data);
 					
 				}
 				else // memory
@@ -1845,28 +1791,17 @@ class ConnectionReaderWriter implements Runnable
 					Log.i("ConnectionReaderWriter", "Send from memory");
 					SYSLOG("memstart:" + (int)mConn.mMemory + " size:" + mConn.mSize + " datasize:" + mMemDataSection.capacity());
 					
-					// WRITE DATA DIRECTLY TO THE STREAM FROM memory at position mConn.mMemory
-					
-					byte[] data = new byte[mConn.mSize];
+					// Write data directly to the stream from memory at position mConn.mMemory
 					mMemDataSection.mark();
 					mMemDataSection.position((int)mConn.mMemory);
 					mMemDataSection.get(data);
 					mMemDataSection.reset();
-					
-					Log.i("ConnectionReaderWriter", "Writing data");
-					mConn.getOutputStream().write(data);
-					
-					//readMemStream(mConn.getOutputStream(), mConn.mMemory, mConn.mSize);
 				}
 				
-				//success
-				
-				/*
-					Restore resource from flux
-				*/
-				//setResource(mConn.mData, mConn.mBinary);
+				mConn.getOutputStream().write(data);
 				
 				mConn.postResultEvent(opType, 1);
+				
 				return;
 			}	
 		}
@@ -1892,6 +1827,12 @@ class ConnectionReaderWriter implements Runnable
 			PRINT_STACK_TRACE;
 			e.printStackTrace();
 			mConn.postResultEvent(opType, CONNERR_GENERIC);
+			return;
+		}
+		catch (Throwable e)
+		{
+			Log.i("ConnectionReaderWriter", "Throwable catched: " + e);
+			e.printStackTrace();
 			return;
 		}
 	}

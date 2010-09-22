@@ -255,18 +255,32 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
-	// TODO : Fix the triangle strip output
 	SYSCALL(void,  maFillTriangleStrip(const MAPoint2d* points, int count))
 	{
-		SYSLOG("maFillTriangleStrip NOT IMPLEMENTED");
-
+		SYSLOG("maFillTriangleStrip");
+		
+		int heapPoints = (int)points - (int)gCore->mem_ds;
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maFillTriangleStrip", "(II)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, heapPoints, count);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
-	// TODO : Fix the triangle fan output
 	SYSCALL(void,  maFillTriangleFan(const MAPoint2d* points, int count))
 	{
-		SYSLOG("maFillTriangleFan NOT IMPLEMENTED");
+		SYSLOG("maFillTriangleFan");
 
+		int heapPoints = (int)points - (int)gCore->mem_ds;
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maFillTriangleFan", "(II)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, heapPoints, count);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(MAExtent,  maGetTextSize(const char* str))
@@ -932,8 +946,7 @@ namespace Base
 	{
 		SYSLOG("maPanic");
 		
-		int yield = Core::GetVMYield(gCore);
-		yield = 1;
+		Base::gSyscall->VM_Yield();
 		
 		jstring jstr = mJNIEnv->NewStringUTF(message);
 		

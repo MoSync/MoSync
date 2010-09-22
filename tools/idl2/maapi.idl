@@ -748,7 +748,7 @@ interface MAAPI {
 	* Alternatively, this function can be called with one of these url types to
 	* create a Server Connection:\n
 	* <tt>socket://[:\<port\>]</tt>, for TCP.\n
-	* <tt>btspp://localhost:\<uuid\>\[;name=\<YourServiceName\>\]</tt>, for Bluetooth.\n
+	* <tt>btspp://localhost:\<uuid\>[;name=\<YourServiceName\>]</tt>, for Bluetooth.\n
 	* \<uuid\> is a 32-digit hexadecimal number. It will be used to create the
 	* service record. Its MAUUID representation can be used by clients to search for
 	* this service.

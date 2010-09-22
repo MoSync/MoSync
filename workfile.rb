@@ -31,10 +31,10 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 
 BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
-EXAM_DIRS = ["tests/unitTest", "examples"]
-PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "libs"]
+PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs"]
+EXAM_DIRS = PIPE_DIRS + ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector"]
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS

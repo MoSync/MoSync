@@ -105,7 +105,7 @@ ConcurrentLinkedQueue<BluetoothDevice> mBluetoothDevices = new ConcurrentLinkedQ
  */
 BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
 
-#ifdef BLUETOOTH_SERVICE_DISCOVERY
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
 /**
  * State of service discovery.
  */
@@ -136,7 +136,7 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 	{
 		return -1;
 	}
-#ifdef BLUETOOTH_SERVICE_DISCOVERY
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
 	// Service disovery must not be running.
 	if (null != mBluetoothServiceDiscoveryThread)
 	{
@@ -228,7 +228,7 @@ int maBtGetNewDevice(
 #endif	
 }
 
-#ifdef BLUETOOTH_SERVICE_DISCOVERY
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
 /**
  * @return 0 on success, < 0 on failure.
  */
@@ -374,7 +374,7 @@ int maBtCancelDiscovery() throws Exception
 		
 		return 1;
 	}
-#ifdef BLUETOOTH_SERVICE_DISCOVERY
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
 	// Is service discovery in progress?
 	if (null != mBluetoothServiceDiscoveryThread && 
 	    BLUETOOTH_DISCOVERY_IN_PROGRESS == mBluetoothServiceDiscoveryState.get())
@@ -820,7 +820,10 @@ class BluetoothDeviceDiscoveryThread extends Thread
 		}
 	}
 	
-	/*
+	/* 
+	TODO: This code is not used, delete when the design of 
+	the Bluetooth implementation is stable.
+	
 	int initiateDeviceDiscovery()
 	{
 		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "begin");
@@ -892,11 +895,11 @@ class BluetoothDeviceDiscoveryThread extends Thread
 			{		
 				final String action = intent.getAction();
 				
-				Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "******** intent action = " + action);
+				Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "******** Intent action: " + action);
 				
 				if (action.equals(BluetoothDevice.ACTION_FOUND))
 				{
-					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "****** x Found device!");
+					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "****** Found device!");
 					
 					// Add found device to list of devices.
 					BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -998,7 +1001,7 @@ class BluetoothDeviceDiscoveryThread extends Thread
 	}
 }
 
-#ifdef BLUETOOTH_SERVICE_DISCOVERY
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
 /**
  * Thread that performs discovery of Bluetooth services.
  * TODO: Service discovery is NOT implemented. Redo this later on.
@@ -1209,7 +1212,7 @@ class BluetoothService
 #endif // BLUETOOTH_SERVICE_DISCOVERY
 
 // This class is not used. This is how you ask the user to enable 
-// the Bluetooth adapter, if we should need it in the future.
+// the Bluetooth adapter, if we want to do that.
 #if 0
 /**
  * Class that gets and also enables the Bluetooth adapter, 
@@ -1291,12 +1294,18 @@ class BluetoothAdapterEnablerThread extends Thread
 			// Register receiver for Bluetooth state changes.
 			mContext.registerReceiver(new BroadcastReceiver()
 			{
+				// TODO: Problem is that we do not get any 
+				// BluetoothAdapter.ACTION_STATE_CHANGED if the user
+				// selects No in the enable dialog (since the state
+				// is not changed I guess). Is there some other
+				// event that can be used to detect that the
+				// Bluetooth dialog is closed?
 				@Override
 				public void onReceive(Context context, Intent intent)
 				{
 					int newState = intent.getIntExtra(
 						BluetoothAdapter.EXTRA_STATE, 
-						BluetoothAdapter.STATE_OFF);
+						BluetoothAdapter.STATE_OFF)
 					if (newState == BluetoothAdapter.STATE_ON)
 					{
 						// We have finished using this listener.
@@ -1311,18 +1320,18 @@ class BluetoothAdapterEnablerThread extends Thread
 						quit();
 						
 					}
-					else
+					else // TODO: This code seems not to be called.
 					{
-						// Bluetooth is now enabled, quit this thread.
+						// Bluetooth is off, quit this thread.
 						quit();
 						
 						// We have finished using this listener.
 						context.unregisterReceiver(this);
 						
-						// Adapter is available.
-						Log.i("****** btGetBluetoothAdapter", "BT is now turned OFF - offer null 1");
+						// Adapter is NOT available.
+						Log.i("****** btGetBluetoothAdapter", "BT is turned OFF - offer null 1");
 						mQueue.offer(new ObjectRef(null));
-						Log.i("****** btGetBluetoothAdapter", "BT is now turned OFF - offer null 2");
+						Log.i("****** btGetBluetoothAdapter", "BT is turned OFF - offer null 2");
 					}
 				}
 			}, 
