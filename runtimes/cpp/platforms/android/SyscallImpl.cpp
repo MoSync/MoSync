@@ -946,8 +946,7 @@ namespace Base
 	{
 		SYSLOG("maPanic");
 		
-		int yield = Core::GetVMYield(gCore);
-		yield = 1;
+		Base::gSyscall->VM_Yield();
 		
 		jstring jstr = mJNIEnv->NewStringUTF(message);
 		

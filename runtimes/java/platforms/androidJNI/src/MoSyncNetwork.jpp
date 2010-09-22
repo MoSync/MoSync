@@ -1736,8 +1736,6 @@ class ConnectionReaderWriter implements Runnable
 
 					mConn.mByteBuffer.position(0);
 					mConn.mByteBuffer.put(bytes, 0, result);
-				
-					//result = mConn.getInputStream().read(mConn.mBinary.arr, mConn.mOffset, mConn.mSize);
 				}
 				else // store in memory
 				{
@@ -1829,6 +1827,12 @@ class ConnectionReaderWriter implements Runnable
 			PRINT_STACK_TRACE;
 			e.printStackTrace();
 			mConn.postResultEvent(opType, CONNERR_GENERIC);
+			return;
+		}
+		catch (Throwable e)
+		{
+			Log.i("ConnectionReaderWriter", "Throwable catched: " + e);
+			e.printStackTrace();
 			return;
 		}
 	}

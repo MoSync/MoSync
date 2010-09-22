@@ -196,17 +196,24 @@ public class MoSyncThread extends Thread
 	public void threadPanic(int errorCode, String message)
 	{
 		Log.i("MoSyncThread","threadPanic");
+		Log.i("MoSyncThread PANIC","errorCode: " + errorCode + " message: " + message);
 		hasDied = true;
-		try
+		while (true)
 		{
-			MoSyncPanicDialog.sPanicMessage = message;
-			Intent myIntent = new Intent(mMoSyncView.getContext(), MoSyncPanicDialog.class);
-			mMoSyncView.getContext().startActivity(myIntent);
-			this.sleep(Long.MAX_VALUE);
-		}
-		catch (Exception e)
-		{
-			Log.i("MoSyncThread","threadPanic exception:" + e.toString());
+			try
+			{
+				MoSyncPanicDialog.sPanicMessage = message;
+				Intent myIntent = new Intent(mMoSyncView.getContext(), MoSyncPanicDialog.class);
+				mMoSyncView.getContext().startActivity(myIntent);
+				Log.i("MoSyncThread", "probe 1");
+				this.sleep(Long.MAX_VALUE);
+				Log.i("MoSyncThread", "probe 2");
+			}
+			catch (Exception e)
+			{
+				Log.i("MoSyncThread", "threadPanic exception:" + e.toString());
+			}
+			Log.i("MoSyncThread", "probe 3");
 		}
 	}
 	
