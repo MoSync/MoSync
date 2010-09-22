@@ -47,6 +47,9 @@ namespace MAUI {
 		//String mCaption;
 		bool mPressed;
 		int mStartX, mStartY;
+
+		WidgetSkin *mSkinPressed;
+		WidgetSkin *mSkinReleased;
 	};
 
 	/**

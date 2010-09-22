@@ -20,8 +20,8 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 
 NativeEditBox::NativeEditBox(int x, int y, int w, int h, Widget* parent, int maxSize, int options, const String& initialText, const WString& titleString) :
 	Label(x, y, w, h, parent),
-	mString(NULL),
 	mTitleString(titleString),
+	mString(NULL),
 	mOptions(options) {
 	setMaxSize(maxSize);
 	setCaption(initialText);

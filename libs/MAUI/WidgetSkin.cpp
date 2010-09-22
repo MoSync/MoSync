@@ -225,8 +225,6 @@ namespace MAUI {
 			addToCache(newKey, cacheElem);
 		}
 		
-		//MAUI_LOG("Drawed cached widgetskin!");
-
 		// Draw the cached widgetskin.
 		Gfx_drawImage(cached, x, y);
 	}

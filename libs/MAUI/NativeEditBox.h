@@ -26,19 +26,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Label.h"
 #include <MAUtil/Environment.h>
+#include <MAUtil/String.h>
 
 namespace MAUI {
 
 class NativeEditBox : public Label, public TextBoxListener {
 public:
-	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL, int maxSize=128, int options=MA_TB_TYPE_ANY, const String& initialText="", const WString& titleString=L"");
+	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL, int maxSize=128, int options=MA_TB_TYPE_ANY, const MAUtil::String& initialText="", const MAUtil::WString& titleString=L"");
 	~NativeEditBox();
 
 	void setOptions(int options);
 	void setMaxSize(int size);
 
-	void setTitleString(const WString& mTitleString);
-	const WString& getTitleString() const;
+	void setTitleString(const MAUtil::WString& mTitleString);
+	const MAUtil::WString& getTitleString() const;
 
 	bool pointerPressed(MAPoint2d p, int id);
 	bool pointerMoved(MAPoint2d p, int id);
@@ -50,7 +51,7 @@ public:
 protected:
 	void textBoxClosed(int res, int length);
 
-	WString mTitleString;
+	MAUtil::WString mTitleString;
 	wchar_t* mString;
 	int mMaxSize;
 	int mOptions;

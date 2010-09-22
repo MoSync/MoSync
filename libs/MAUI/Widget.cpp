@@ -45,6 +45,8 @@ namespace MAUI {
 			mPaddingBottom(0),
 			mPaddingRight(0),
 			mInputPolicy(NULL),
+			mFocusedSkin(NULL),
+			mUnfocusedSkin(NULL),
 			mStyle(NULL)
 		{
 		mInputPolicy = new DefaultInputPolicy(this);
@@ -149,23 +151,22 @@ namespace MAUI {
 	void Widget::drawBackground() {
 		//MAUI_LOG("Widget::drawBackground() 1");
 		if(!mStyle) return;
-		WidgetSkin* focusedSkin   = mStyle->get<SkinProperty>("backgroundSkinFocused");
-		WidgetSkin* unfocusedSkin = mStyle->get<SkinProperty>("backgroundSkinUnfocused");
+
 		//MAUI_LOG("Widget::drawBackground() 2");
 		if(mFocused) {
 			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
 			//MAUI_LOG("Widget::drawBackground() 3a");
-			if(focusedSkin) {
+			if(mFocusedSkin) {
 				//MAUI_LOG("Widget::drawBackground() 4a");
-				focusedSkin->draw(0, 0, mBounds.width, mBounds.height);
+				mFocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
 			}
 		}
 		else {
 			//MAUI_LOG("Widget::drawBackground() 3b");
 			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
-			if(unfocusedSkin) {
+			if(mUnfocusedSkin) {
 				//MAUI_LOG("Widget::drawBackground() 4b");
-				unfocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
+				mUnfocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
 			}
 		}
 	}
@@ -280,6 +281,8 @@ namespace MAUI {
 	}
 
 	void Widget::setDirty(bool d) {
+		if(mDirty == d) return;
+
 		mDirty = d;
 
 		if(d == true) {
@@ -545,13 +548,16 @@ namespace MAUI {
 			mStyle = Engine::getSingleton().getDefaultStyle("Widget");
 		}
 
-		if(!mStyle) maPanic(1, "No style set (not event a default style for Widget is available!");
+		if(!mStyle) maPanic(1, "No style set (not even a default style for Widget is available!");
+
+		mFocusedSkin   = mStyle->get<SkinProperty>("backgroundSkinFocused");
+		mUnfocusedSkin = mStyle->get<SkinProperty>("backgroundSkinUnfocused");
 
 		setPaddingLeft(mStyle->getSafe<IntegerProperty>("paddingLeft")->mValue);
 		setPaddingRight(mStyle->getSafe<IntegerProperty>("paddingRight")->mValue);
 		setPaddingTop(mStyle->getSafe<IntegerProperty>("paddingTop")->mValue);
 		setPaddingBottom(mStyle->getSafe<IntegerProperty>("paddingBottom")->mValue);
-		//MAUI_LOG("Widget::restyle, paddingLeft= %d, paddingTop = %d", mPaddingLeft, mPaddingTop);
+		//MAUI_LOG("skins: %x, %x", mFocusedSkin, mUnfocusedSkin);
 	}
 
 }

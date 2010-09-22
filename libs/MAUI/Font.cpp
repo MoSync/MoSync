@@ -337,7 +337,7 @@ namespace MAUI {
 		const unsigned char* str = (const unsigned char*)strS;
 		MARect srcRect = {0, 0, 0, 0};
 		MAPoint2d cursor = {x,y};
-		
+
 		CharDescriptor *chars = mCharset->chars;
 		while(*str) {
 			if((*str)=='\n')
@@ -364,7 +364,7 @@ namespace MAUI {
 		}
 	}
 
-	short lineBreaks[2048];
+	short lineBreaks[2048]; // TODO: should probably change this to a vector (no good with limitations)
 	int numLineBreaks;
 
 	void Font::calcLineBreaks(const char* strS, int x, int y, const Rect& bound) const {

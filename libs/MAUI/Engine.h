@@ -43,30 +43,10 @@ namespace MAUI {
 
 	class Engine : public IdleListener, public FocusListener {
 	public:
-		enum {
-			MAX_WIDGET_DEPTH = 16
-		};
-
 		/** Sets the widget that is main to the application, constituting the root of the UI tree **/
 		void setMain(Widget* main);
 		
 		virtual ~Engine();
-
-		/** Sets the default font to be used by Widgets when they are
-          * not assigned any particular font.
-		  **/
-		void setDefaultFont(Font* systemFont);
-
-		/** Returns the MAUI-wide default font **/
-		Font* getDefaultFont();
-
-		/** Sets the default skin to be used by Widgets when they are
-          * not assigned any particular skin.
-		  **/
-		void setDefaultSkin(WidgetSkin* systemSkin);
-
-		/** Returns the MAUI-wide default skin **/
-		WidgetSkin* getDefaultSkin();
 
 		void idle();
 		
@@ -108,8 +88,6 @@ namespace MAUI {
 		Point mOverlayPosition;
 
 		Widget* mMain;
-		Font* mDefaultFont;
-		WidgetSkin* mDefaultSkin;
 
 		static Engine* mSingletonPtr;
 

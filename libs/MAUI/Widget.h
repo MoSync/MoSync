@@ -436,6 +436,9 @@ namespace MAUI {
 
 		InputPolicy* mInputPolicy;
 
+		WidgetSkin *mFocusedSkin;
+		WidgetSkin *mUnfocusedSkin;
+
 private:
 		const Style* mStyle;
 	};

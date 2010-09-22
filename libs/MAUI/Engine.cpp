@@ -26,8 +26,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-//#define PUSH_EMPTY_CLIPRECT pushClipRect(0,0,0,0)
-
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
 namespace MAUI {
@@ -36,12 +34,9 @@ namespace MAUI {
 	Engine::Engine()
 	{
 		mMain = NULL;
-		mDefaultFont = NULL;
-		mDefaultSkin = NULL;
 		mOverlay = NULL;
 		mSingletonPtr = this;
 		mDisplayConsole = false;
-		//clipStackPtr = -1;
 		Environment::getEnvironment().addFocusListener(this);
 	}
 	
@@ -56,121 +51,6 @@ namespace MAUI {
 			delete mMain;
 		mSingletonPtr = 0;
 	}
-
-	void Engine::setDefaultSkin(WidgetSkin* systemSkin) {
-		this->mDefaultSkin = systemSkin;
-	}
-
-	void Engine::setDefaultFont(Font* defaultFont) {
-		this->mDefaultFont = defaultFont;
-	}
-
-	WidgetSkin* Engine::getDefaultSkin() {
-		return mDefaultSkin;
-	}
-
-	Font* Engine::getDefaultFont()
-	{
-		return mDefaultFont;
-	}
-
-/*	void Engine::clearClipRect()
-	{
-		clipStackPtr = -1;
-	}
-
-	void Engine::pushClipRect(int left, int top, int width, int height)
-	{
-		if(clipStackPtr >= MAX_WIDGET_DEPTH-1) {
-			PANIC_MESSAGE("Clip stack broken");
-			//printf("BIG FUCKUP!!!\n");
-			return;
-		}
-
-		maSetClipRect(left, top, width, height);
-		
-		clipStackPtr++;
-		clipStack[clipStackPtr].left = left; 
-		clipStack[clipStackPtr].top = top; 
-		clipStack[clipStackPtr].width = width; 
-		clipStack[clipStackPtr].height = height; 		
-	}
-
-	bool Engine::pushClipRectIntersect(int left, int top, int width, int height)
-	{	
-		int pLeft = clipStack[clipStackPtr].left;
-		int pTop = clipStack[clipStackPtr].top;
-		int pWidth = clipStack[clipStackPtr].width;
-		int pHeight = clipStack[clipStackPtr].height;
-
-		if((!pWidth) || (!pHeight)) {
-			PUSH_EMPTY_CLIPRECT;
-			return false;
-		}
-
-		if(left + width < pLeft)
-		{
-			PUSH_EMPTY_CLIPRECT;
-			return false;
-		}
-
-		if(top + height < pTop)
-		{
-			PUSH_EMPTY_CLIPRECT;
-			return false;
-		}
-
-		if(left > pLeft + pWidth)
-		{
-			PUSH_EMPTY_CLIPRECT;
-			return false;
-		}
-
-		if(top > pTop + pHeight)
-		{
-			PUSH_EMPTY_CLIPRECT;
-			return false;
-		}
-		
-		if( left < pLeft)
-		{
-			width -= pLeft - left;
-			left =  pLeft;
-		}
-
-		if( top < pTop)
-		{
-			height -= pTop - top;
-			top =  pTop;
-		}
-
-		if( left + width > pLeft + pWidth)
-		{
-			width -= (left + width) - (pLeft + pWidth);
-		}
-
-		if( top + height > pTop + pHeight)
-		{
-			height -= (top + height) - (pTop + pHeight);
-		}
-
-		pushClipRect(left,top,width,height);
-
-		if(!width || !height) return false;
-		else return true;
-	}
-
-	void Engine::popClipRect()
-	{
-		clipStackPtr--;
-		if(clipStackPtr <= -1) clipStackPtr = -1;
-		else maSetClipRect(	
-			clipStack[clipStackPtr].left, 
-			clipStack[clipStackPtr].top, 
-			clipStack[clipStackPtr].width, 
-			clipStack[clipStackPtr].height);
-	}
-*/	
 
 	void Engine::focusLost() {
 	}
@@ -216,7 +96,7 @@ namespace MAUI {
 			Gfx_clearMatrix();
 			Gfx_pushClipRect(0, 0, scrW, scrH);
 
-			mOverlay->requestRepaint();
+			mOverlay->requestRepaint(); // won't add the idle listener again just setDirty(true).
 			Gfx_translate(mOverlayPosition.x, mOverlayPosition.y);
 			mOverlay->update();
 			mOverlay->draw();

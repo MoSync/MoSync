@@ -109,7 +109,6 @@ namespace MAUI {
 		} */
 
 		setCaption(caption);
-		requestRepaint();
 		//this->setBackgroundColor(backColor);
 		//calcStrSize();
 	}

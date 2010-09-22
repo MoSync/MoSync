@@ -4,7 +4,8 @@
 
 namespace MAUI {
 
-Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false) {
+Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false),
+	mSkinPressed(NULL), mSkinReleased(NULL) {
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
 }
@@ -35,16 +36,23 @@ bool Button::pointerReleased(MAPoint2d p, int id) {
 }
 
 void Button::drawWidget() {
+	/*
 	const ButtonStyle* style = (const ButtonStyle*)getStyle();
 	if(style == NULL) {
 		style = (const ButtonStyle*)Engine::getSingleton().getDefaultStyle("Button");
 		setStyle(style);
 	}
+	*/
 
-	if(mPressed)
-		style->getSafe<SkinProperty>("skinPressed")->draw(0, 0, mBounds.width, mBounds.height);
-	else
-		style->getSafe<SkinProperty>("skinReleased")->draw(0, 0, mBounds.width, mBounds.height);
+	if(mPressed) {
+		if(mSkinPressed) {
+			mSkinPressed->draw(0, 0, mBounds.width, mBounds.height);
+		}
+	} else {
+		if(mSkinReleased) {
+			mSkinReleased->draw(0, 0, mBounds.width, mBounds.height);
+		}
+	}
 
 	Label::drawWidget();
 }
@@ -53,6 +61,10 @@ void Button::restyle() {
 	if(getStyle() == NULL) {
 		setStyle(Engine::getSingleton().getDefaultStyle("Button"));
 	}
+	const ButtonStyle* style = (const ButtonStyle*)getStyle();
+	mSkinPressed = style->getSafe<SkinProperty>("skinPressed");
+	mSkinReleased = style->getSafe<SkinProperty>("skinReleased");
+
 	Label::restyle();
 }
 

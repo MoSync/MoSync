@@ -87,7 +87,7 @@ namespace MAUI {
 			* \param inputMode the input mode.
 		  **/
 		EditBox(int x, int y, int width, int height, Widget* parent, const String &text="",
-			int backColor=0, Font* font=NULL, bool manageNavigation=true, bool multiLine=false,
+			bool manageNavigation=true, bool multiLine=false,
 			int maxLength=64, InputMode inputMode=IM_STANDARD);
 
 		/** Sets the color of the cursor **/
