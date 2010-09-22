@@ -673,11 +673,20 @@ namespace MAUI {
 		}
 
 		Widget* lastChild = mChildren[mChildren.size() - 1];
-		int bound = (lastChild->getPosition().y + lastChild->getBounds().height)
-				- this->getBounds().height;
-		if(bound<0) bound = 0;
-		if (ofs < -bound) {
-			ofs = -bound;
+		if(mOrientation==LBO_VERTICAL) {
+			int bound = (lastChild->getPosition().y + lastChild->getBounds().height)
+					- this->getBounds().height;
+			if(bound<0) bound = 0;
+			if (ofs < -bound) {
+				ofs = -bound;
+			}
+		} else {
+			int bound = (lastChild->getPosition().x + lastChild->getBounds().width)
+					- this->getBounds().width;
+			if(bound<0) bound = 0;
+			if (ofs < -bound) {
+				ofs = -bound;
+			}
 		}
 
 		mYOffset = ofs << 16;
@@ -694,40 +703,65 @@ namespace MAUI {
 		mTouchMotionTracker.reset();
 		mTouchMotionTracker.addPoint(p);
 
-		int x = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
-		int y = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+		/*
+		if(mOrientation == LBO_HORIZONTAL)
+			MAUI_LOG("Horizontal ListBoxPressed!");
+		 */
+
+		int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
+		int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
 		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->focusableWidgetAt(x, y);
+			Widget *ret = (*it)->focusableWidgetAt(xx, yy);
 			if(ret) {
+				p.x = xx;
+				p.y = yy;
+				//MAUI_LOG("Found focusable!");
 				if(ret->pointerPressed(p, id)) {
 					setFocusedWidget(ret);
+					return true;
 				}
 				break;
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	bool ListBox::pointerMoved(MAPoint2d p, int id) {
 		//MAUI_LOG("Got event %d, %d", p.x, p.y);
 		if(mFocusedWidget) {
+			int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
+			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+
+			/*
+			MAPoint2d s = mTouchMotionTracker.getStartPoint();
+			if((mOrientation == LBO_HORIZONTAL && abs(p.y-s.y)>10) || (mOrientation == LBO_VERTICAL && abs(p.x-s.x)>10)) {
+				mFocusedWidget->setFocused(false);
+				mFocusedWidget = NULL;
+				return false;
+			}
+			*/
+
+			p.x = xx;
+			p.y = yy;
 			if(!mFocusedWidget->pointerMoved(p, id)) {
 				mFocusedWidget->setFocused(false);
 				mFocusedWidget = NULL;
+				return true;
 			}
-			return false;
+			//MAUI_LOG("moved!!!");
+			return true;
 		}
 		if(id==0) {
 			int relX, relY;
 			mTouchMotionTracker.addPoint(p, relX, relY);
-			if(relX==0 && relY == 0) return false;
+			if(relX==0 && relY == 0) return true;
 			if(mOrientation == LBO_VERTICAL)
 				setScrollOffset((mYOffset>>16)+relY);
 			else
 				setScrollOffset((mYOffset>>16)+relX);
 		}
-		return false;
+		return true;
 	}
 
 	bool ListBox::pointerReleased(MAPoint2d p, int id) {
@@ -735,7 +769,7 @@ namespace MAUI {
 			mFocusedWidget->pointerReleased(p, id);
 			mFocusedWidget->setFocused(false);
 			mFocusedWidget = NULL;
-			return false;
+			//return false;
 		}
 
 		if(id==0) {
@@ -746,4 +780,46 @@ namespace MAUI {
 		return false;
 	}
 
+	Widget* ListBox::widgetAt(int x, int y) {
+		int xx = (mOrientation==LBO_HORIZONTAL)?(x-(mYOffset>>16)):x;
+		int yy = (mOrientation==LBO_VERTICAL)?(y-(mYOffset>>16)):y;
+		Vector_each(Widget *, it, mChildren) {
+			Widget *ret = (*it)->widgetAt(xx, yy);
+			if(ret) {
+				return ret;
+			}
+		}
+
+		if(mBounds.contains(x, y)) {
+			return this;
+		}
+
+		return NULL;
+	}
+
+
+	Widget* ListBox::focusableWidgetAt(int x, int y) {
+		if(!isFocusable()) {
+			int xx = (mOrientation==LBO_HORIZONTAL)?(x-(mYOffset>>16)):x;
+			int yy = (mOrientation==LBO_VERTICAL)?(y-(mYOffset>>16)):y;
+			Vector_each(Widget *, it, mChildren) {
+				Widget *ret = (*it)->focusableWidgetAt(xx, yy);
+				if(ret) {
+					return ret;
+				}
+			}
+		} else {
+			if(mBounds.contains(x, y)) {
+				return this;
+			}
+		}
+		return NULL;
+	}
+
+	void ListBox::setEnabled(bool enabled) {
+		if(enabled==false) {
+			Environment::getEnvironment().removeTimer(this);
+		}
+		Widget::setEnabled(enabled);
+	}
 }

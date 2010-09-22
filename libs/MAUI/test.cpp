@@ -422,12 +422,19 @@ public:
 			}
 
 			for(int i = 0; i < 16; i++) {
-				button = new Button(0, 0, 50, 50, mainListbox, "graph");
+				button = new Button(0, 0, 50, 100, mainListbox, "graph");
+				button->addWidgetListener(this);
+			}
+
+			ListBox *testListbox = new ListBox(0, 0, 240, 320, mainListbox, ListBox::LBO_HORIZONTAL, ListBox::LBA_LINEAR, true);
+			testListbox->setAutoSize(true);
+			for(int i = 0; i < 16; i++) {
+				button = new Button(0, 0, 100, 50, testListbox, "graph");
 				button->addWidgetListener(this);
 			}
 
 			NativeEditBox *native = new NativeEditBox(0, 0, 50, 50, mainListbox);
-			button = new Button(0, 0, 50, 50, mainListbox, "exit");
+			button = new Button(0, 0, 50, 100, mainListbox, "exit");
 			button->addWidgetListener(this);
 
 

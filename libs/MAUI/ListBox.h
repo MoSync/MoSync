@@ -161,6 +161,11 @@ namespace MAUI {
 		virtual bool pointerReleased(MAPoint2d p, int id);
 
 		void setFocusedWidget(Widget *w);
+		virtual Widget* focusableWidgetAt(int x, int y);
+		virtual Widget* widgetAt(int x, int y);
+
+		virtual void setEnabled(bool enabled=true);
+
 
 	protected:
 		void runTimerEvent();

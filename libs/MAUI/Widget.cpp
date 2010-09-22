@@ -124,7 +124,7 @@ namespace MAUI {
 				}
 
 				Vector_each(Widget*, it, mChildren)
-					(*it)->draw();	
+					(*it)->draw();
 
 			}
 			// This commented out to match removal of above intersectClipRect() call.
@@ -264,30 +264,47 @@ namespace MAUI {
 	}
 
 	void Widget::requestRepaint() {
-		Engine::getSingleton().requestUIUpdate();
+		//if(mDirty) return;
+
 		setDirty();
 
-		//if(isTransparent()) {
-			//MAUI_LOG("bäh? 2");
-			if(mParent) {
-				mParent->requestRepaint();
-			}
-		//}
 
+		// TODO: Something like this this should be used, but isTransparent can't be called from the constructor.
+		//if(isTransparent()) {
+			/*
+			if(mParent) {
+				mParent->setDirty(true, this);
+			}
+			*/
+		//}
 	}
 
 	bool Widget::isDirty() const {
 		return mDirty;
 	}
 
-	void Widget::setDirty(bool d) {
+	void Widget::setDirty(bool d, Widget* caller) {
 		if(mDirty == d) return;
 
 		mDirty = d;
 
 		if(d == true) {
-			Vector_each(Widget*, it, mChildren)
+			Engine::getSingleton().requestUIUpdate();
+
+			Vector_each(Widget*, it, mChildren) {
+				if(caller && caller == (*it)) continue;
 				(*it)->setDirty(d);
+			}
+
+			if(mParent) {
+				Widget* parent = mParent;
+				Widget* prevParent = this;
+				do {
+					parent->setDirty(true, prevParent);
+					prevParent = parent;
+					parent = parent->getParent();
+				} while(parent);
+			}
 		}
 	}
 

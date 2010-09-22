@@ -61,6 +61,7 @@ namespace MAUI {
 	}
 
 	void Engine::requestUIUpdate() {
+		//maReportCallStack();
 		Environment::getEnvironment().addIdleListener(this);
 	}
 

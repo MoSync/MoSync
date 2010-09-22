@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "TouchMotionTracker.h"
 #include <madmath.h>
+#include <mastdlib.h>
 
 namespace MAUI {
 
@@ -98,5 +99,8 @@ void TouchMotionTracker::calculateVelocity(double &directionX, double &direction
 	velocityY = mDiry/time;
 }
 
+MAPoint2d TouchMotionTracker::getStartPoint() const {
+	return mStart;
+}
 
 } // namespace MAUI

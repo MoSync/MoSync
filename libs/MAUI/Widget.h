@@ -204,10 +204,10 @@ namespace MAUI {
 		 * surrounding the point. Returns NULL if no widget is found.
 		 */
 		Widget* widgetAt(const Point& p);
-		Widget* widgetAt(int x, int y);
+		virtual Widget* widgetAt(int x, int y);
 
 		Widget* focusableWidgetAt(const Point& p);
-		Widget* focusableWidgetAt(int x, int y);
+		virtual Widget* focusableWidgetAt(int x, int y);
 
 		// Properties, geometry
 
@@ -402,7 +402,7 @@ namespace MAUI {
 		/** 
 		 * Sets the dirty state of the widget.
 		 */
-		void setDirty(bool d=true);
+		void setDirty(bool d=true, Widget* caller=NULL);
 
 		virtual void restyle();
 

@@ -205,20 +205,14 @@ namespace MAUI {
 
 	void Label::drawWidget() {
 		const char* wStr = mCaption.c_str();
-
-		//int textX=mPaddedBounds.x, textY=mPaddedBounds.y;
 		int textX=0, textY=0;
-		//calcStrSize();
-
 		getTextStart(&textX, &textY);
-
-		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-
 		if(mFont) {
 
-			if(mMultiLine)
+			if(mMultiLine) {
+				Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 				mFont->drawBoundedString(wStr, textX, textY, tempRect);
-			else  {
+			} else {
 
 				if(mAutoSizeX)
 					mFont->drawString(wStr, textX, textY);

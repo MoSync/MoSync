@@ -30,12 +30,15 @@ public:
 	void addPoint(MAPoint2d p);
 	void addPoint(MAPoint2d p, int &relX, int &relY);
 	void calculateVelocity(double &dirx, double &diry, double &velocityX, double &velocityY);
+
+	MAPoint2d getStartPoint() const;
 private:
 	int mStartTime;
 	MAPoint2d mStart;
 	MAPoint2d mLast;
 	double mDirx, mDiry;
 	bool mStarted;
+
 };
 
 } // namespace MAUI

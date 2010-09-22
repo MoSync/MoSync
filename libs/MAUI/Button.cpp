@@ -20,15 +20,17 @@ bool Button::pointerPressed(MAPoint2d p, int id) {
 }
 
 bool Button::pointerMoved(MAPoint2d p, int id) {
+	//MAUI_LOG("Button moved! %x", this);
 	p.x-=mStartX;
 	p.y-=mStartY;
 
-	if((abs(p.x)<(mBounds.width>>2)) && (abs(p.y)<(mBounds.height>>2))) return true;
+	int length = sqrt(p.x*p.x+p.y*p.y);
+	if(length<15) return true;
 	else return false;
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
-	//MAUI_LOG("Button released! %x", this);
+    //MAUI_LOG("Button released! %x", this);
 	mPressed = false;
 	fireTriggered();
 	requestRepaint();

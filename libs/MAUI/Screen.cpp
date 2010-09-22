@@ -38,9 +38,11 @@ namespace MAUI {
 		sCurrentScreen = this;
 		Engine::getSingleton().setMain(mMain);
 		mMain->setEnabled(true);
-		mMain->setDirty(true);
+		//mMain->setDirty(true);
+		mMain->requestRepaint();
+
 		//printf("Requesting UI update...!\n");
-		Engine::getSingleton().requestUIUpdate();
+		//Engine::getSingleton().requestUIUpdate();
 		Environment::getEnvironment().addKeyListener(this);
 		Environment::getEnvironment().addPointerListener(this);
 	}
@@ -74,6 +76,7 @@ namespace MAUI {
 			env.removePointerListener(this);
 		if(mMain)
 			mMain->setEnabled(false);
+		sCurrentScreen = NULL;
 	}
 
 	Screen::~Screen() {
