@@ -187,8 +187,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		int[] event = new int[3];
 		event[0] = EVENT_TYPE_POINTER_RELEASED;
 		
-		event[1] = (int)motionEvent.getRawX();
-		event[2] = (int)motionEvent.getRawY();
+		event[1] = (int)motionEvent.getX();
+		event[2] = (int)motionEvent.getY();
 		
 		switch(motionEvent.getAction())
 		{
