@@ -473,11 +473,15 @@ int networkConnGetLocalAddr(int addrPointer)
 		}
 		else if (CONN_FAMILY_BT == family)
 		{
+#ifdef _ANDROID_BLUETOOTH
 			// Write address data. Use zero as port number.
 			return networkCopyBluetoothAddressToMemory(
 				addrPointer,
 				0, // Port
 				btGetDefaultAdapterAddressAsBytes());
+#else
+			return -1;
+#endif
 		}
 		else
 		{
