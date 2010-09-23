@@ -110,7 +110,8 @@ namespace Base
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
 		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
 
-		mJNIEnv->DeleteLocalRef(cls);		
+		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jo);		
 		return buffer;
 	}
 
