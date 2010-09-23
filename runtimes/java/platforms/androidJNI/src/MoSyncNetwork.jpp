@@ -35,6 +35,11 @@ Hashtable<Integer, ConnectionObject> mConnections_DoNotReferenceExplictly =
 int mConnHandleCounter_DoNotReferenceExplictly = 1;
 
 /**
+ * The number of currently open copnnections, should not exceed CONN_MAX.
+ */
+int mConnNumberOfOpenConnections = 0;
+
+/**
  * Thread pool for network operations.
  * TODO: Perhaps rename to mNetworkThreadPool or something
  * to make the use explicit from the name.
@@ -213,6 +218,7 @@ MAHandle maHttpCreate(String url, int method) throws Exception
 	// Have we reached the max number of connections?
 	if (networkIsMaxNumberOfConnectionsReached())
 	{
+		Log.i("MoSyncSyscall", "maHttpCreate CONNERR_MAX");
 		return CONNERR_MAX;
 	}
 	
@@ -316,12 +322,14 @@ int maAccept(MAHandle serverHandle)
 
 int networkGetNextConnectionHandle()
 {
+	++mConnNumberOfOpenConnections;
+	Log.i("@@@ networkGetNextConnectionHandle", "Number of open connections: " + mConnNumberOfOpenConnections);
 	return mConnHandleCounter_DoNotReferenceExplictly++;
 }
 
 boolean networkIsMaxNumberOfConnectionsReached()
 {
-	return (mConnHandleCounter_DoNotReferenceExplictly + 1) >= CONN_MAX;
+	return mConnNumberOfOpenConnections >= CONN_MAX;
 }
 
 ConnectionObject networkGetConnectionObject(MAHandle connHandle)
@@ -336,6 +344,7 @@ void networkAddConnectionObject(ConnectionObject connObj)
 
 void networkRemoveConnectionObject(ConnectionObject connObj)
 {
+	--mConnNumberOfOpenConnections;
 	mConnections_DoNotReferenceExplictly.remove(connObj.mHandle); 
 }
 
@@ -522,7 +531,7 @@ public abstract class ConnectionObject
 		mMoSyncThread = MoSyncThread.this;
 	}
 	
-	public void postResultEvent(int opType, int result)
+	public synchronized void postResultEvent(int opType, int result)
 	{
 		Log.i("ConnectionObject.postResultEvent", 
 			"mHandle: " + mHandle + " opType: " + opType + 
