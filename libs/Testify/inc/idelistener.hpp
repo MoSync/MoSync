@@ -15,12 +15,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * idelistener.hpp
+/** \file idelistener.hpp
+ * \brief IDE listener for Testify
  *
- *  Created on: 26 apr 2010
- *      Author: Ali Mosavian
+ * \author Ali Mosavian
+ *
+ * Created on 26 apr 2010
  */
+
 #ifndef __IDELISTENER_HPP__
 #define __IDELISTENER_HPP__
 

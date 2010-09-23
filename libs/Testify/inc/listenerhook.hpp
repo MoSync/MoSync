@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * listenerhook.hpp
+/** \file listenerhook.hpp
+ * \brief A hook for adding a listener to a Testify test run.
  *
- *  Created on: 31 mar 2010
- *      Author: Ali Mosavian
+ * \author Ali Mosavian
+ *
+ * Created on: 31 mar 2010
  */
 
 #ifndef __LISTENERHOOK_HPP__

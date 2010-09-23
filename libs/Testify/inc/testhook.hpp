@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * testhook.hpp
+/** \file testhook.hpp
+ * \brief Hook to add a test or a collection of tests to Testify.
  *
- *  Created on: 28 feb 2010
- *      Author: Ali Mosavian
+ * \author Ali Mosavian
+ *
+ * Created on: 28 feb 2010
  */
 
 #ifndef __TESTHOOK_HPP__

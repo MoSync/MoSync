@@ -1,8 +1,9 @@
-/*
- * common.hpp
+/** \file common.h
+ * \brief Common definitions for Testify
  *
- *  Created on: 28 feb 2010
- *  Author: Ali Mosavian [mosavian at kth.se]
+ * \author Ali Mosavian
+ *
+ * Created on July 13, 2009
  */
 
 #ifndef __COMMON_HPP__
