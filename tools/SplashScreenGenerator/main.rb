@@ -35,13 +35,14 @@ HEADER_TEXT = 'MoSync mobile development SDK'
 version = ['Developer build', 'Unknown']
 
 PLATFORMS = [
-	'Android Cupcake 1.5',
+	'Android 1.5, 1.6, 2.1',
+	'iOS (iPhone, iPad, iPod Touch) 3.x',
 	'Java ME MIDP 2',
-	'Symbian S60 2nd, 3rd and 5th edition',
-	'Smartphone 2003',
-	'Pocket PC 2003',
+	'Moblin 2.x',
+	'Symbian S60 2nd, 3rd, 5th edition',
 	'Windows Mobile 5.0 - 6.5',
-	'Moblin 2.x'
+	'Windows Pocket PC 2003',
+	'Windows Smartphone 2003'
 ]
 
 if ARGV.length() == 2
