@@ -486,7 +486,6 @@ Release\idl2.exe
 :DOCS
 
 cd %ORIGINAL_PATH%
-call build_docs.bat
 
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
