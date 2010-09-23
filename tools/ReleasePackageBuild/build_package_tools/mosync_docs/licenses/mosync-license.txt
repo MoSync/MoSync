@@ -10,7 +10,7 @@ Licenses for third party libraries and applications included in the software are
 
 apache-license-1.1.txt covers part of makesis-4.
 
-apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android.jar, apkbuilder.jar, dx.jar, and Apache Commons Compress.
+apache-license-2.0.txt covers the AMR decoder, gsm_amr, aapt, adb, AdbWinApi.dll, android-3.jar, android-4.jar, android-7.jar apkbuilder.jar, dx.jar, and Apache Commons Compress.
 
 expat-license.txt covers Expat.
 
