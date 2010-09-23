@@ -195,8 +195,8 @@ public class MoSyncThread extends Thread
 	*/
 	public void threadPanic(int errorCode, String message)
 	{
-		Log.i("MoSyncThread","threadPanic");
-		Log.i("MoSyncThread PANIC","errorCode: " + errorCode + " message: " + message);
+		Log.i("MoSyncThread", "threadPanic");
+		Log.i("MoSyncThread PANIC", "errorCode: " + errorCode + " message: " + message);
 		hasDied = true;
 		try
 		{
@@ -210,18 +210,18 @@ public class MoSyncThread extends Thread
 			{
 				try
 				{
-					this.sleep(Long.MAX_VALUE);
+					sleep(Long.MAX_VALUE);
 				}
 				catch (Exception e)
 				{
-					Log.i("MoSyncThread", "threadPanic exception 1:" + e.toString());
+					Log.i("MoSyncThread", "threadPanic exception 1:" + e);
 					e.printStackTrace();
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			Log.i("MoSyncThread", "threadPanic exception 2:" + e.toString());
+			Log.i("MoSyncThread", "threadPanic exception 2:" + e);
 			e.printStackTrace();
 		}
 	}
