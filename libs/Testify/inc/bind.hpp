@@ -15,9 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * File:   bind.hpp
- * Author: Ali Mosavian
+/** \file bind.hpp
+ * \brief Function and method wrappers for Testify
+ *
+ * \author Ali Mosavian
  *
  * Created on July 13, 2009
  */
@@ -29,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 NAMESPACE_BEGIN( Testify )
 /**
-* @brief A funtion or method wrapper, possibly along with its parameters.
+* @brief A function or method wrapper, possibly along with its parameters.
 * It can conveniently be called without having to care about it's details.
 *
 */

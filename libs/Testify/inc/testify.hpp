@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * testify.hpp
+/** \file testify.hpp
+ * \brief Asserts and macros for Testify.
  *
- *  Created on: 1 mar 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on: 1 mar 2010
  */
 
 #ifndef __TESTIFY_HPP__

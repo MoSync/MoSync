@@ -56,9 +56,6 @@ namespace MAUtil {
 			  ListNode *mPrev, *mNext;
 		};
 		
-		/**
-		* \brief A constant iterator for a list container.
-		*/
 		class ConstListIterator;
 		
 		/**
@@ -120,7 +117,10 @@ namespace MAUtil {
 			bool mFirst;
 			ListNode *mCurrent;
 		};
-
+		
+		/**
+		* \brief A constant iterator for a list container.
+		*/
 		class ConstListIterator {
 		public:
 			ConstListIterator(const ListIterator& listIterator) : mCurrent(listIterator.mCurrent), mFirst(true) {
