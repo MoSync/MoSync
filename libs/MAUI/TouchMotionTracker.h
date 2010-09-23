@@ -29,10 +29,18 @@ public:
 	void reset();
 	void addPoint(MAPoint2d p);
 	void addPoint(MAPoint2d p, int &relX, int &relY);
+
+	// velocity is in pixels per second.
+	// direction is a normalized direction between 0-1
 	void calculateVelocity(double &dirx, double &diry, double &velocityX, double &velocityY);
 
 	MAPoint2d getStartPoint() const;
+
+	void setFrictionPerSecond(double fps);
 private:
+	double mFrictionPerSecond;
+
+
 	int mStartTime;
 	MAPoint2d mStart;
 	MAPoint2d mLast;

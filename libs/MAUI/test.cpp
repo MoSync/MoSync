@@ -348,14 +348,15 @@ public:
 		mGraphWidget = new GraphWidget(0, 0, 0, 100, mainListbox);
 
 		Slider *slider;
-		mFrequencySlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0.0, 8, 1.0);
+		mFrequencySlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, 0.0, 8, 1.0);
 		mFrequencySlider->addSliderListener(this);
-		mAmplitudeSlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, -1, 1, 1.0);
+		mAmplitudeSlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, -1, 1, 1.0);
 		mAmplitudeSlider->addSliderListener(this);
-		mPhaseSlider = new Slider(0, 0, 0, 50, mainListbox, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
+		mPhaseSlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
 		mPhaseSlider->addSliderListener(this);
+		mPhaseSlider->setMoveToPoint(true);
 
-		Button *button = new Button(0, 0, 50, 50, mainListbox, "calculator");
+		Button *button = new Button(0, 0, 50, mScreenHeight/6, mainListbox, "calculator");
 		button->addWidgetListener(this);
 
 		setMain(mainListbox);

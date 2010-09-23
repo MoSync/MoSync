@@ -25,6 +25,9 @@ namespace MAUI {
 	
 	Screen::Screen() : mMain(0), mFocusedWidget(0) {
 		hide();
+		MAExtent scrSize = maGetScrSize();
+		mScreenWidth = EXTENT_X(scrSize);
+		mScreenHeight = EXTENT_Y(scrSize);
 	}
 	
 	void Screen::show() {
@@ -48,12 +51,12 @@ namespace MAUI {
 	}
 	
 	void Screen::setMain(Widget* main) {
-		MAExtent scrSize = maGetScrSize();
+
 		this->mMain = main;
 		if(!mMain) return;
 		mMain->setPosition(0,0);
-		mMain->setWidth(EXTENT_X(scrSize));
-		mMain->setHeight(EXTENT_Y(scrSize));
+		mMain->setWidth(mScreenWidth);
+		mMain->setHeight(mScreenHeight);
 		Environment& env = Environment::getEnvironment();
 		if(!env.isKeyListener(this))
 			mMain->setEnabled(false);

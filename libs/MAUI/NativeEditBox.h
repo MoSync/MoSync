@@ -32,7 +32,10 @@ namespace MAUI {
 
 class NativeEditBox : public Label, public TextBoxListener {
 public:
-	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL, int maxSize=128, int options=MA_TB_TYPE_ANY, const MAUtil::String& initialText="", const MAUtil::WString& titleString=L"");
+	NativeEditBox(int x, int y, int w, int h, Widget* parent=NULL,
+			int maxSize=128, int options=MA_TB_TYPE_ANY, const MAUtil::String& initialText="",
+			const MAUtil::WString& titleString=L"");
+
 	~NativeEditBox();
 
 	void setOptions(int options);

@@ -191,6 +191,8 @@ namespace MAUI {
 		bool mTouched;
 		TouchMotionTracker mTouchMotionTracker;
 		double mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY;
+		double mTimeOfRelease;
+		int mTouchedYOffset;
 
 		Widget *mFocusedWidget;
 	};

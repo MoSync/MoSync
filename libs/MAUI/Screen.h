@@ -118,6 +118,8 @@ namespace MAUI {
 		static Screen* sCurrentScreen;
 		Widget* mMain;
 		Widget* mFocusedWidget;
+
+		int mScreenWidth, mScreenHeight;
 	};
 
 }

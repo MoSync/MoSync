@@ -61,6 +61,9 @@ namespace MAUI {
 		void addSliderListener(SliderListener* sl);
 		void update();
 
+		// \param 'moveToPoint' If 'true', when slider pressed, grip will move to the point that was pressed. Otherwise the slider can only be moved by touching the grip.
+		void setMoveToPoint(bool moveToPoint);
+
 	protected:
 		int getSliderPos() const;
 		void restyle();
@@ -73,17 +76,14 @@ namespace MAUI {
 		double mMinValue, mMaxValue, mValue;
 		int mStartX, mStartY;
 		double mStartValue;
-
 		WidgetSkin *mAmountSkin;
 		WidgetSkin *mBkgSkin;
 		MAHandle mGripImage;
-
 		int mSliderWeight;
 		int mSliderGripWidth;
 		int mSliderGripHeight;
-
 		bool mValueChanged;
-
+		bool mMoveToPoint;
 		Vector<SliderListener*> mSliderListeners;
 	};
 

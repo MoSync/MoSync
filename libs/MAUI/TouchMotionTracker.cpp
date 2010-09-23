@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-TouchMotionTracker::TouchMotionTracker() : mStarted(false) {
+TouchMotionTracker::TouchMotionTracker() : mStarted(false), mFrictionPerSecond(0.1) {
 }
 
 void TouchMotionTracker::reset() {
@@ -61,18 +61,27 @@ void TouchMotionTracker::addPoint(MAPoint2d p) {
 	addPoint(p, relX, relY);
 }
 
+void TouchMotionTracker::setFrictionPerSecond(double fps) {
+	mFrictionPerSecond = fps;
+}
+
 void TouchMotionTracker::calculateVelocity(double &directionX, double &directionY, double &velocityX, double &velocityY) {
 
 	// take unit into acount ? (pixels per second or ms).
 	double time = maGetMilliSecondCount()-mStartTime;
 
-	float friction = pow(0.9, time/(1000.0/30.0));
-
-	mDirx*=friction;
-	mDiry*=friction;
+	double timeInSeconds = time/1000.0;
+	double friction = pow(1.0-mFrictionPerSecond, 1+timeInSeconds);
+	if(friction<0.0) friction = 0.0;
 
 	double dx = mDirx;
 	double dy = mDiry;
+
+	dx*=friction;
+	dy*=friction;
+
+	double dirX = dx;
+	double dirY = dy;
 
 	// normalize directions
 	double len = sqrt(dx*dx+dy*dy);
@@ -95,8 +104,8 @@ void TouchMotionTracker::calculateVelocity(double &directionX, double &direction
 		return;
 	}
 
-	velocityX = mDirx/time;
-	velocityY = mDiry/time;
+	velocityX = dirX/timeInSeconds;
+	velocityY = dirY/timeInSeconds;
 }
 
 MAPoint2d TouchMotionTracker::getStartPoint() const {

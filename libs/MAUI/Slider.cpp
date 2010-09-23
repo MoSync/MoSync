@@ -5,8 +5,12 @@
 namespace MAUI {
 
 Slider::Slider(int x, int y, int width, int height, Widget* parent, Orientation ori, double minValue, double maxValue, double defaultValue) :
-	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false) {
+	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false), mMoveToPoint(false) {
 	setValue(defaultValue);
+}
+
+void Slider::setMoveToPoint(bool moveToPoint) {
+	mMoveToPoint = moveToPoint;
 }
 
 int Slider::getSliderPos() const {
@@ -22,16 +26,28 @@ int Slider::getSliderPos() const {
 
 bool Slider::pointerPressed(MAPoint2d p, int id) {
 	int sliderPos = getSliderPos();
-	if(mOrientation == HORIZONTAL && p.x>(mBounds.x+sliderPos-mSliderGripWidth) && (p.x<mBounds.x+sliderPos+mSliderGripWidth*2)) {
+
+	if(mMoveToPoint || !mGripImage) {
+		double newValue;
+		if(mOrientation == HORIZONTAL)
+			newValue = mMinValue + (((double)(p.x-(mPaddedBounds.x+(mSliderGripWidth>>1))))*(mMaxValue-mMinValue))/(double)(mPaddedBounds.width-mSliderGripWidth);
+		else
+			newValue = mMinValue + (((double)(p.y-(mPaddedBounds.y+(mSliderGripHeight>>1))))*(mMaxValue-mMinValue))/(double)(mPaddedBounds.height-mSliderGripHeight);
+		setValue(newValue);
 		mPressed = true;
+	} else {
+		if(mOrientation == HORIZONTAL && p.x>(mPaddedBounds.x+sliderPos-mSliderGripWidth) && (p.x<mPaddedBounds.x+sliderPos+mSliderGripWidth*2)) {
+			mPressed = true;
+		}
+		else if(mOrientation == VERTICAL  && p.y>(mPaddedBounds.y+sliderPos-mSliderGripHeight) && p.y<(mPaddedBounds.x+sliderPos+mSliderGripHeight*2)) {
+			mPressed = true;
+		}
+		else {
+			mPressed = false;
+			return false;
+		}
 	}
-	else if(mOrientation == VERTICAL  && p.y>(mBounds.y+sliderPos-mSliderGripHeight) && p.y<(mBounds.x+sliderPos+mSliderGripHeight*2)) {
-		mPressed = true;
-	}
-	else {
-		mPressed = false;
-		return false;
-	}
+
 	mStartValue = mValue;
 	mStartX = p.x;
 	mStartY = p.y;
@@ -67,15 +83,26 @@ bool Slider::pointerReleased(MAPoint2d p, int id) {
 void Slider::drawWidget() {
 	int sliderPos = getSliderPos();
 	if(mOrientation == HORIZONTAL) {
-		mBkgSkin->drawDirect(sliderPos+(mSliderGripWidth>>1), (mPaddedBounds.height>>1)-(mSliderWeight>>1),
-				mPaddedBounds.width-(sliderPos+(mSliderGripWidth>>1)), mSliderWeight);
-		mAmountSkin->drawDirect(mPaddedBounds.x, (mPaddedBounds.height>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripWidth>>1), mSliderWeight);
-		Gfx_drawImage(mGripImage, sliderPos, (mPaddedBounds.height>>1)-(mSliderGripHeight>>1));
+
+		if(mBkgSkin)
+			mBkgSkin->drawDirect(sliderPos+(mSliderGripWidth>>1), (mPaddedBounds.height>>1)-(mSliderWeight>>1),
+					mPaddedBounds.width-(sliderPos+(mSliderGripWidth>>1)), mSliderWeight);
+
+		if(mAmountSkin)
+			mAmountSkin->drawDirect(mPaddedBounds.x, (mPaddedBounds.height>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripWidth>>1), mSliderWeight);
+
+		if(mGripImage)
+			Gfx_drawImage(mGripImage, sliderPos, (mPaddedBounds.height>>1)-(mSliderGripHeight>>1));
 	} else {
-		mBkgSkin->drawDirect((mPaddedBounds.width>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripHeight>>1),
-				mSliderWeight, mPaddedBounds.height-(sliderPos+(mSliderGripHeight>>1)));
-		mAmountSkin->drawDirect( (mPaddedBounds.width>>1)-(mSliderWeight>>1), mPaddedBounds.y, mSliderWeight, sliderPos+(mSliderGripHeight>>1));
-		Gfx_drawImage(mGripImage, (mPaddedBounds.width>>1)-(mSliderGripWidth>>1), sliderPos);
+		if(mBkgSkin)
+			mBkgSkin->drawDirect((mPaddedBounds.width>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripHeight>>1),
+					mSliderWeight, mPaddedBounds.height-(sliderPos+(mSliderGripHeight>>1)));
+
+		if(mAmountSkin)
+			mAmountSkin->drawDirect( (mPaddedBounds.width>>1)-(mSliderWeight>>1), mPaddedBounds.y, mSliderWeight, sliderPos+(mSliderGripHeight>>1));
+
+		if(mGripImage)
+			Gfx_drawImage(mGripImage, (mPaddedBounds.width>>1)-(mSliderGripWidth>>1), sliderPos);
 	}
 }
 
@@ -89,10 +116,18 @@ void Slider::restyle() {
 
 	mAmountSkin = style->getSafe<SkinProperty>("sliderAmountSkin");
 	mBkgSkin = style->getSafe<SkinProperty>("sliderSkin");
-	mGripImage = style->getSafe<ImageProperty>("gripImage")->mHandle;
+	ImageProperty* prop = style->get<ImageProperty>("gripImage");
+	mGripImage = 0;
+	mSliderGripWidth = 0;
+	mSliderGripHeight = 0;
 
-	mSliderGripWidth = EXTENT_X(maGetImageSize(mGripImage));
-	mSliderGripHeight = EXTENT_Y(maGetImageSize(mGripImage));
+	if(prop) {
+		mGripImage = prop->mHandle;
+		mSliderGripWidth = EXTENT_X(maGetImageSize(mGripImage));
+		mSliderGripHeight = EXTENT_Y(maGetImageSize(mGripImage));
+	} else {
+
+	}
 
 	if(mOrientation == HORIZONTAL)
 		mSliderWeight = mBkgSkin->getEndY()-mBkgSkin->getStartY();
