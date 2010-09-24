@@ -796,7 +796,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 	NeedToken(",");
 
-	if (Token("#"))
+	if (Token("#"))				// ld rd,#
 	{
 		// Is load immediate
 
@@ -823,9 +823,11 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		return;		
 	}
 
-	if (Token("&"))
+	if (Token("&"))				// ld rd,&
 	{
 		// Is load immediate address
+
+/* !! NOTE: Removed by *ARH* - Caused code not to settle, created a variant state in code section
 
 		const_subst = HandleExprConst();
 
@@ -840,6 +842,8 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 			WriteOpcode(AsmName, use_rd | use_rs);		// ld rd, rs
 			return;
 		}
+*/
+		HandleExprImm();
 
 		CheckDataAccess_LoadStore(_LDI);
 
@@ -935,7 +939,6 @@ void Get_rd_rs(char *AsmName,int Opcode, int OpcodeImm)
 	rs = GetReg(1);	
 
 	imm = 0;
-//	rt = 0;
 	op = Opcode;
 
 	WriteOpcode(AsmName, use_rd | use_rs);
@@ -956,12 +959,6 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 	NeedToken(",");
 
 	rs = GetReg(1);	
-
-/*	if (Opcode == _PUSH)
-	{
-		printf("--- PUSH %s,%s\n", regsyms[rd], regsyms[rs] );
-	}
-*/
 
 	if (rs < rd)
 		Error(Error_Skip, "Push/Pop registers have wrong order");
@@ -1102,23 +1099,28 @@ void HandleExprImm()
 
 int HandleExprConst()				// Const or Imm
 {
-	short	Type;
 	int		ConstReg;
+	int		flags;
 	
 	// MAHandle internal Lables
 	
 	imm = GetExpression();					// Evaluate the expression
 
-	Type = (short) GetExpType();			// Get its type
+	// If the expression contains a code ref then don't
+	// change it to a constant register
 
-	// test if this can be a register
+	flags = GetExpFlags();
 
-	ConstReg = IsConst(imm);				// Check for const reg
-
-	if (ConstReg != -1)
+	if (flags == REF_null)
 	{
-		imm = ConstReg;						// Return the register in imm
-		return 1;							// Say in reg
+		ConstReg = IsConst(imm);				// Check for const reg
+
+		if (ConstReg != -1)
+		{
+			imm = ConstReg;						// Return the register in imm
+			return 1;							// Say in reg
+		}
+
 	}
 
 	// If the expression contained a symbol that is unresolved
@@ -1137,13 +1139,6 @@ int HandleExprConst()				// Const or Imm
 //****************************************
 //		 Decode a register name
 //****************************************
-/*
-   "zr", "sp",  "rt",  "fr", 				\
-   "d0", "d1",  "d2",  "d3", "d4", "d5", "d6", "d7",	\
-   "i0", "i1",  "i2",  "i3", "r0", "r1", "r2", "r3",	\
-   "r4", "r5",  "r6",  "r7", "r8", "r9", "r10","r11",	\
-  "r12","r13", "r14", "r15", "rap", "arg", "cc"		\
-*/
 
 #define ifreg(str,val) if (QToken(str)) return val
 

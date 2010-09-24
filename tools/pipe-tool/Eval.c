@@ -505,11 +505,11 @@ void ClearPart(EVAL *Part)
 //****************************************
 //	   Get numeric expressions only
 //****************************************
-
+/*
 int CodeRef = 0;
 int CodeValue;
 char CodeRefName[256];
-
+*/
 //****************************************
 //	   Get numeric expressions only
 //****************************************
@@ -523,6 +523,7 @@ int GetExpression()
 	ExpType	= EXP_numeric;
 	ExpSection = 0;
 	ExpResolved = 0;
+	ExpFlags = REF_null;
 
 	CodeRef = 0;
 	CodeValue = 0;
@@ -554,6 +555,7 @@ int GetExpPure()
 	ExpType	= EXP_numeric;
 	ExpSection = 0;
 	ExpResolved = 0;
+	ExpFlags = REF_null;
 
 	CodeRef = 0;
 	CodeValue = 0;
@@ -582,6 +584,19 @@ char * GetExpCodeRef()
 		
 	return 0;
 }
+
+//****************************************
+//		 Get the expression type
+//****************************************
+
+int GetExpFlags()
+{
+	// Return expression refs, each bit
+	// corresponds with a reference type
+
+	return ExpFlags;
+}
+
 
 //****************************************
 //		 Get the expression type
@@ -1159,6 +1174,12 @@ void GetIdentifier(EVAL *Part1)
 		{									// Then check code refs
 			if (sym->Type == SECT_code)
 			{
+				// Mark the expression flags, say found code ref
+				
+				ExpFlags |= REF_code;
+
+				// Remember last code ref symbol
+				
 				SetLastSymbolRef(sym);
 
 				// Must be a code reference
@@ -1182,6 +1203,10 @@ void GetIdentifier(EVAL *Part1)
 				if (ArgJavaNative || ArgCppGen)			// !! xchange with ArgCreateVirtuals !!
 				if (sym->LabelType == label_Virtual)
 				{
+					// Mark the expression flags, say found virtual ref
+					
+					ExpFlags |= REF_virtual;
+
 					// Change the value, to reflect functions virtual reference
 
 					Part1->Value = sym->VirtualIndex | 0xe0000000;
@@ -1193,6 +1218,10 @@ void GetIdentifier(EVAL *Part1)
 
 		if (sym->Type == SECT_data)
 		{
+			// Mark the expression flags, say found data ref
+			
+			ExpFlags |= REF_data;
+
 			// Special case for bss
 
 			SetLastSymbolRef(sym);
@@ -1202,14 +1231,17 @@ void GetIdentifier(EVAL *Part1)
 	
 		if (sym->Type == SECT_bss)
 		{
+			// Mark the expression flags, say found data ref
+			
+			ExpFlags |= REF_data;
+
 			// Special case for bss
 
 			SetLastSymbolRef(sym);
 
 			Part1->Value = sym->Value + MaxDataIP;
 		}
-		
-		
+				
 		Part1->Type = EXP_numeric;
 
 		if (sym->Type)
@@ -1275,10 +1307,39 @@ void GetIdentifier(EVAL *Part1)
 	doCannotEvaluate(ThisLabel);
 }
 
+//****************************************
+//
+//****************************************
+
+void doCannotEvaluate(const char* ThisLabel)
+{
+	char* demangled=NULL;
+	const char* output = ThisLabel;
+
+	if(ThisLabel[0] == '_' && ThisLabel[1] == 'Z')			//C++ mangled name
+	{
+		//demangle
+
+		//allocates the buffer if successful; must free().
+		output = demangled = my_demangle (ThisLabel);
+
+		if(demangled == NULL)
+		{
+			Error(Error_Fatal, "Error demangling %s\n", ThisLabel);
+		}
+	}
+
+	Error(Error_Skip, "Unresolved symbol '%s'", output);
+
+	if(demangled)
+		DisposePtr(demangled);
+}
 
 //****************************************
 // 		  Get String Identifiers
 //****************************************
+
+/* This does'nt appear to be used, let's leave it here for the moment
 
 void GetIdentifierString(EVAL *Part1)
 {
@@ -1316,32 +1377,4 @@ void GetIdentifierString(EVAL *Part1)
 
 	doCannotEvaluate(ThisLabel);
 }
-
-//****************************************
-//
-//****************************************
-
-
-void doCannotEvaluate(const char* ThisLabel)
-{
-	char* demangled=NULL;
-	const char* output = ThisLabel;
-
-	if(ThisLabel[0] == '_' && ThisLabel[1] == 'Z')			//C++ mangled name
-	{
-		//demangle
-
-		//allocates the buffer if successful; must free().
-		output = demangled = my_demangle (ThisLabel);
-
-		if(demangled == NULL)
-		{
-			Error(Error_Fatal, "Error demangling %s\n", ThisLabel);
-		}
-	}
-
-	Error(Error_Skip, "Unresolved symbol '%s'", output);
-
-	if(demangled)
-		DisposePtr(demangled);
-}
+*/

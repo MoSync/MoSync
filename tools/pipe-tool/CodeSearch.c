@@ -433,12 +433,32 @@ void SearchDep_Main()
 SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 {
 	SYMBOL *sym;
-	int ip, in_ip;
-
+	int in_ip;
+	
 	if (!localsym)
 		ErrorOnIP(Error_Fatal, 0, "FunctionSymFromIP sym=0");
 
-	ip = localsym->Value;
+	in_ip = localsym->Value;
+
+// !! ARH rewrote calls FunctionAboveIP instead !!
+
+	sym = FunctionAboveIP(localsym->Value);
+
+	if (!sym)
+		ErrorOnIP(Error_Fatal, in_ip, "FunctionAboveIP can't find function top IP=0x%x Label '%s'", in_ip, localsym->Name);
+
+	return sym;
+}
+
+//****************************************
+// Finds the function above the input ip
+//****************************************
+
+SYMBOL * FunctionAboveIP(int ip)
+{
+	SYMBOL *sym;
+	int in_ip;
+
 	in_ip = ip;
 		
 	if (ip > (int) CodeLabelArray.hi)
@@ -446,7 +466,9 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 
 	while(1)
 	{
-		if (ip < (int) CodeLabelArray.lo)
+//		if (ip < (int) CodeLabelArray.lo) !! ARH looks incorrect !!
+
+		if (ip < 0)
 			break;
 		
 		sym = (SYMBOL *) ArrayGet(&CodeLabelArray, ip);
@@ -461,7 +483,6 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 		ip--;
 	}
 
-	ErrorOnIP(Error_Fatal, in_ip, "FunctionSymFromIP can't find function top IP=0x%x Label '%s'", in_ip, localsym->Name);
 	return 0;
 }
 

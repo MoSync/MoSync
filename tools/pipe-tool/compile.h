@@ -167,6 +167,15 @@ enum
 
 enum
 {
+	REF_null = 0,			// Pure numeric is indicated by null
+	REF_data = 1,
+	REF_code = 2,
+	REF_virtual = 4
+};
+
+
+enum
+{
 	RET_null = 0,
 	RET_void,
 	RET_int,
@@ -221,18 +230,18 @@ enum
 enum
 {
 	_NOP = 0,
-	_PUSH,
-	_POP,
-	_CALL,
-	_CALLI,
-	_LDB,
-	_STB,
-	_LDH,
-	_STH,
-	_LDW,
-	_STW,
-	_LDI,
-	_LDR,
+	_PUSH = 1,
+	_POP = 2,
+	_CALL = 3,
+	_CALLI = 4,
+	_LDB = 5,
+	_STB = 6,
+	_LDH = 7,
+	_STH = 8,
+	_LDW = 9,
+	_STW = 10,
+	_LDI = 11,
+	_LDR = 12,
 	_ADD,
 	_ADDI,
 	_MUL,
@@ -846,6 +855,13 @@ dec(int	ExpType)
 dec(int	ExpSection)
 dec(int	ExpResolved)
 
+decset(int CodeRef, 0)
+dec(int CodeValue)
+dec(char CodeRefName[256])
+
+dec(int ExpFlags)
+
+
 //Output
 
 dec(jmp_buf ErrorRet)
@@ -922,6 +938,8 @@ dec(ArrayStore SLD_File_Array)
 dec(ArrayStore RebuildArray)
 
 dec(ArrayStore CodeMemArray)
+dec(ArrayStore CodeMemArrayCopy)
+
 dec(int	CodeIP)
 
 dec(ArrayStore DataMemArray)

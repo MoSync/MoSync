@@ -30,7 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef INCLUDE_CPP_REBUILD
 
-#define CPP_SHOW_LINES
+//#define CPP_SHOW_LINES
 //#define LOG_REGISTER_STATE_CHANGES
 //#define CPP_DEBUG
 
