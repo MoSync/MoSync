@@ -468,7 +468,7 @@ namespace Base {
 		// First get the image into your data buffer
 		//int imgwidth = CGImageGetWidth(img->image);
 		//int imgheight = CGImageGetHeight(img->image);
-		memset(dst, 0, scanlength*height*4);
+		//memset(dst, 0, scanlength*height*4);
 		
 		Surface *srcSurface = new Surface(smallImage);
 		
