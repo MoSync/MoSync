@@ -190,6 +190,8 @@ void maConnReadToData(MAHandle connHandle, MAHandle data, int offset, int size) 
 {
 	Log.i("MoSyncSyscall", "maConnReadToData");
 
+	//Log.i("@MoSyncSyscall", "maConnReadToData" + " connHandle:" + connHandle + " dataHandle:" + data + " size:" + size);
+		
 	MYASSERT(offset >= 0);
 	MYASSERT(size > 0);
 	MYASSERT(offset + size > 0);
@@ -512,7 +514,6 @@ public abstract class ConnectionObject
 {
 	public ByteBuffer mByteBuffer;
 	public long mMemory;
-	public int mOffset;
 	public int mSize;
 	public boolean mReadData;
 	public boolean mUseResource;
@@ -591,7 +592,7 @@ public abstract class ConnectionObject
 		mState |= CONNOP_READ;
 		//mMoSyncThread = MoSyncThread.this;
 		
-		Log.i("ConnectionObject", "Starting read thread");
+		//Log.i("ConnectionObject", "Starting read thread");
 		
 		mThreadPool.execute(new ConnectionReaderWriter(this));
 	}
@@ -609,7 +610,7 @@ public abstract class ConnectionObject
 		mState |= CONNOP_WRITE;
 		//mMoSyncThread = MoSyncThread.this;
 		
-		Log.i("ConnectionObject", "Starting write thread");
+		//Log.i("ConnectionObject", "Starting write thread");
 		
 		mThreadPool.execute(new ConnectionReaderWriter(this));
 	}
@@ -622,9 +623,10 @@ public abstract class ConnectionObject
 			BIG_PHAT_ERROR;
 		}
 
+		// TODO: Pass these variables as parameters to ConnectionReaderWriter.
 		mData = data;
 		mByteBuffer = byteBuffer;
-		mOffset = offset;
+		mByteBuffer.position(offset);
 		mSize = size;
 		mReadData = true;
 		mUseResource = true;
@@ -645,9 +647,10 @@ public abstract class ConnectionObject
 			BIG_PHAT_ERROR;
 		}
 		
+		// TODO: Pass these variables as parameters to ConnectionReaderWriter.
 		mData = data;
 		mByteBuffer = byteBuffer;
-		mOffset = offset;
+		mByteBuffer.position(offset);
 		mSize = size;
 		mReadData = false;
 		mUseResource = true;
@@ -1725,45 +1728,44 @@ class ConnectionReaderWriter implements Runnable
 	public final void run() 
 	{
 		int opType = -1;
+		
 		try
 		{
+				
 			if (mConn.mReadData == true) // Read data
 			{
 				int result = -1;
 				int opResult;
+				
 				opType = CONNOP_READ;
 				
-				Log.i("ConnectionReaderWriter", "Read num bytes: " + mConn.mSize);
+				//Log.i("ConnectionReaderWriter", "Reading num bytes: " + mConn.mSize + " handle: " + mConn.mHandle);
 				
+				// Read data into a byte array.
 				byte[] bytes = new byte[mConn.mSize];
 				result = mConn.getInputStream().read(bytes);
 				
-				Log.i("ConnectionReaderWriter", "Read result length: " + result);
+				//Log.i("ConnectionReaderWriter", "Read result length: " + result + " handle: " + mConn.mHandle);
 				//Log.i("ConnectionReaderWriter", "Read result: " + new String(bytes));
 				
-				if (mConn.mUseResource == true) // store in resource 
+				if (result > 0)
 				{
-					Log.i("ConnectionReaderWriter", "Read to resource");
-					
-					// READ DATA DIRECTLY INTO A RESOURCE
-
-					mConn.mByteBuffer.position(0);
-					mConn.mByteBuffer.put(bytes, 0, result);
-				}
-				else // store in memory
-				{
-					Log.i("ConnectionReaderWriter", "Read to memory");
-					
-					if (result > 0)
+					if (mConn.mUseResource == true) // Store in resource 
 					{
-						// WRITE THE DATA IN BUFFER bytes TO MEMORY AT ADDRESS mConn.mMemory
+						// Log.i("ConnectionReaderWriter", "Read to resource");
 						
+						// Store data in resource.
+						mConn.mByteBuffer.put(bytes, 0, result);
+					}
+					else // Store in memory
+					{
+						// Log.i("ConnectionReaderWriter", "Read to memory");
+						
+						// Store data in memory at address mConn.mMemory.
 						mMemDataSection.mark();
 						mMemDataSection.position((int)mConn.mMemory);
 						mMemDataSection.put(bytes, 0, result);
 						mMemDataSection.reset();
-						
-						opResult = result;
 					}
 				}
 				
@@ -1778,41 +1780,47 @@ class ConnectionReaderWriter implements Runnable
 				} 
 				else 
 				{
-					DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error "+result+"!\n");
+					DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error " + result + "!\n");
+					Log.i("ConnectionReaderWriter", "ConnRead error " + result);
 					opResult = CONNERR_INTERNAL;
 				}
 				
+				// Post event.
 				mConn.postResultEvent(opType, opResult);
+				
 				return;
 			}
 			else // Write data
 			{
 				opType = CONNOP_WRITE;
+				
+				// Byte array to write.
 				byte[] data = new byte[mConn.mSize];
 				
-				if (mConn.mUseResource == true) // resource
+				if (mConn.mUseResource == true) // Resource
 				{
-					Log.i("ConnectionReaderWriter", "Send from resource");
+					//Log.i("ConnectionReaderWriter", "Send from resource");
 					
-					// Write data directly to the stream from mConn.ByteBuffer
-					mConn.mByteBuffer.position(0);
+					// Get data to write.
 					mConn.mByteBuffer.get(data);
 					
 				}
-				else // memory
+				else // Memory
 				{
-					Log.i("ConnectionReaderWriter", "Send from memory");
+					//Log.i("ConnectionReaderWriter", "Send from memory");
 					SYSLOG("memstart:" + (int)mConn.mMemory + " size:" + mConn.mSize + " datasize:" + mMemDataSection.capacity());
 					
-					// Write data directly to the stream from memory at position mConn.mMemory
+					// Get data to write.
 					mMemDataSection.mark();
 					mMemDataSection.position((int)mConn.mMemory);
 					mMemDataSection.get(data);
 					mMemDataSection.reset();
 				}
 				
+				// Write byte array to stream.
 				mConn.getOutputStream().write(data);
 				
+				// Post event.
 				mConn.postResultEvent(opType, 1);
 				
 				return;
@@ -1840,12 +1848,6 @@ class ConnectionReaderWriter implements Runnable
 			PRINT_STACK_TRACE;
 			e.printStackTrace();
 			mConn.postResultEvent(opType, CONNERR_GENERIC);
-			return;
-		}
-		catch (Throwable e)
-		{
-			Log.i("ConnectionReaderWriter", "Throwable catched: " + e);
-			e.printStackTrace();
 			return;
 		}
 	}
