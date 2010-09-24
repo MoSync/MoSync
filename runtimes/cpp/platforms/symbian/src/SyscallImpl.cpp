@@ -840,7 +840,9 @@ SYSCALL(void, maGetClipRect(MARect* rect)) {
 	rect->height = clipRect.Height();
 }
 
-#if 0
+#define DEBUG_IMAGEDATA 0
+
+#if DEBUG_IMAGEDATA
 static int scanlineLength(CFbsBitmap* fb) {
 	return fb->ScanLineLength(fb->SizeInPixels().iWidth, fb->DisplayMode());
 }
@@ -861,6 +863,11 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	TAlphaBitmap* img = resources.get_RT_IMAGE(image);
 	const TSize& size = img->Color()->SizeInPixels();
 
+#if DEBUG_IMAGEDATA
+	LOGD("maGetImageData(%i, %ix%i %ix%i, %i)\n",
+		image, aSrcRect->left, aSrcRect->top, aSrcRect->width, aSrcRect->height, scanlength);
+#endif
+
 	MYASSERT(scanlength >= srcRect->width, ERR_IMAGE_OOB);
 	MYASSERT(srcRect->left >= 0 && srcRect->top >= 0 &&
 		srcRect->left + srcRect->width <= size.iWidth &&
@@ -870,7 +877,7 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		TSize(aSrcRect->width, aSrcRect->height));
 
 	bool hasAlpha = img->Alpha() != NULL;
-#if 0
+#if DEBUG_IMAGEDATA
 	LOG("maGetImageData(image): %ix%i, alpha %i\n", size.iWidth, size.iHeight, hasAlpha);
 	if(hasAlpha) {
 		TSize as(img->Alpha()->SizeInPixels());
@@ -885,6 +892,11 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	TBitmapUtil alpha(hasAlpha ? img->Alpha() : img->Color());
 	if(hasAlpha) {
 		alpha.Begin(TPoint(0,0), clr);
+#ifdef __S60_50__
+		for(int i=0; i<lSrcRect.iTl.iY; i++) {
+			alpha.IncYPos();
+		}
+#endif
 	}
 
 	//iterate through the source, combining and copying pixels
@@ -894,8 +906,12 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		clr.SetPos(TPoint(lSrcRect.iTl.iX, sY));
 
 		// bugged on 5th edition when image width isn't pitch-aligned.
-#ifndef __S60_50__
 		if(hasAlpha)
+#ifdef __S60_50__
+			for(int i=0; i<lSrcRect.iTl.iX; i++) {
+				alpha.IncXPos();
+			}
+#else
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
 #endif
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
@@ -926,6 +942,12 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 			dstInt[dY*scanlength + dX] = pixel;
 			dX++;
 		}	//for x
+#ifdef __S60_50__
+		if(hasAlpha)
+			for(int i=lSrcRect.iBr.iX; i<size.iWidth; i++) {
+				alpha.IncXPos();
+			}
+#endif
 		dY++;
 	}	//for y
 
@@ -944,6 +966,11 @@ SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
 	SYSCALL_THIS->ValidateMemRange(srcRect, sizeof(MARect));
 	CHECK_INT_ALIGNMENT(srcRect);
 	const MARect* rect = (const MARect*)ALIGN_INT(srcRect);
+
+#if DEBUG_IMAGEDATA
+	LOGD("maDrawRGB(%ix%i, %ix%i %ix%i, %i)\n",
+		dst->x, dst->y, rect->left, rect->top, rect->width, rect->height, scanlength);
+#endif
 
 	int left = rect->left;
 	int top = rect->top;
@@ -1002,6 +1029,10 @@ SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
 SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 	MAExtent size, int alpha))
 {
+#if DEBUG_IMAGEDATA
+	LOGD("maCreateImageRaw(%i, %ix%i, %i)\n",
+		placeholder, EXTENT_X(size), EXTENT_Y(size), alpha);
+#endif
 	SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 	CHECK_INT_ALIGNMENT(src);
 	int* srcInt = ALIGN_INT(src);
