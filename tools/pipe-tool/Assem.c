@@ -736,14 +736,14 @@ void EmitCDtors()
 void DumpPipeDebugInfo()
 {
 	char fname[80];
-	int n;
+	uint n;
 	unsigned char a,b;
 	
 	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d) Far=%x\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass, _FAR);
 
 	if (CodeCopyInit && pass_count > 2)			// If the
 	{
-		int max = CodeMemArray.hi;
+		uint max = CodeMemArray.hi;
 		
 		if (CodeMemArrayCopy.hi > max)
 			max  = CodeMemArrayCopy.hi;
