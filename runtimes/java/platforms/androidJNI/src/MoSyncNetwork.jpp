@@ -284,7 +284,7 @@ void maHttpFinish(MAHandle connHandle)
 	MYASSERT(connObj.mState == 0);
 
 	connObj.mState = CONNOP_FINISH;
-	connObj.mMoSyncThread = this;
+	//connObj.mMoSyncThread = this;
 	
 	connObj.startFinishConnectThread();
 }
@@ -512,16 +512,10 @@ int networkConnGetLocalAddr(int addrPointer)
  */
 public abstract class ConnectionObject
 {
-	public ByteBuffer mByteBuffer;
-	public long mMemory;
-	public int mSize;
-	public boolean mReadData;
-	public boolean mUseResource;
 	public int mState;
-	public boolean mCancelled;
-	public MAHandle mData;
 	protected MAHandle mHandle;
-	public Thread mMoSyncThread;
+	protected boolean mCancelled;
+	private Thread mMoSyncThread;
 	private OutputStream mOutputStream;
 	private InputStream mInputStream;
 	
@@ -579,88 +573,195 @@ public abstract class ConnectionObject
 		return -1;
 	}
 	
-	public void read(int dst, int size) throws IOException
+	public void read(final int dst, final int size) throws IOException
 	{
-		mMemory = dst;
-		mSize = size;
-		mReadData = true;
-		mUseResource = false;
-		
 		MYASSERT(getInputStream() != null);
 		MYASSERT((mState & CONNOP_READ) == 0);
 		
 		mState |= CONNOP_READ;
-		//mMoSyncThread = MoSyncThread.this;
-		
-		//Log.i("ConnectionObject", "Starting read thread");
-		
-		mThreadPool.execute(new ConnectionReaderWriter(this));
+
+		mThreadPool.execute(new Runnable()
+		{
+			public final void run() 
+			{
+				int opType = CONNOP_READ;
+				
+				try
+				{
+					// Read data into a byte array.
+					byte[] bytes = new byte[size];
+					int result = getInputStream().read(bytes);
+					
+					if (result > 0)
+					{
+						// Store data in memory at address dst.
+						mMemDataSection.mark();
+						mMemDataSection.position(dst);
+						mMemDataSection.put(bytes, 0, result);
+						mMemDataSection.reset();
+						postResultEvent(opType, result);
+					}
+					else if (result == -1) 
+					{
+						postResultEvent(opType, CONNERR_CLOSED);
+					} 
+					else 
+					{
+						DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error " + result + "!\n");
+						Log.i("ConnectionReaderWriter", "ConnRead error " + result);
+						postResultEvent(opType, CONNERR_INTERNAL);
+					}
+				}
+				catch (Exception e)
+				{
+					SYSLOG("Exception e:" + e.toString());
+					PRINT_STACK_TRACE;
+					e.printStackTrace();
+					postResultEvent(opType, CONNERR_GENERIC);
+					return;
+				}
+			}
+		});
 	}
 	
-	public void write(int src, int size) throws IOException
+	public void write(final int src, final int size) throws IOException
 	{
-		mMemory = src;
-		mSize = size;
-		mReadData = false;
-		mUseResource = false;
-		
 		MYASSERT(getOutputStream() != null);
 		MYASSERT((mState & CONNOP_WRITE) == 0);
 		
 		mState |= CONNOP_WRITE;
-		//mMoSyncThread = MoSyncThread.this;
 		
-		//Log.i("ConnectionObject", "Starting write thread");
-		
-		mThreadPool.execute(new ConnectionReaderWriter(this));
+		mThreadPool.execute(new Runnable()
+		{
+			public final void run() 
+			{
+				int opType = CONNOP_WRITE;
+				
+				try
+				{
+					// Byte array with data to write.
+					byte[] data = new byte[size];
+					
+					// Get data to write.
+					mMemDataSection.mark();
+					mMemDataSection.position(src);
+					mMemDataSection.get(data);
+					mMemDataSection.reset();
+					
+					// Write byte array to stream.
+					getOutputStream().write(data);
+					
+					// Post event.
+					postResultEvent(opType, 1);
+				}
+				catch (Exception e)
+				{
+					SYSLOG("Exception e:" + e.toString());
+					PRINT_STACK_TRACE;
+					e.printStackTrace();
+					postResultEvent(opType, CONNERR_GENERIC);
+				}
+			}
+		});
 	}
 	
-	public void readToData(MAHandle data, int offset, int size) throws IOException
+	public void readToData(final MAHandle data, final int offset, final int size) 
+		throws IOException
 	{
-		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
-		if (null == byteBuffer) 
-		{
-			BIG_PHAT_ERROR;
-		}
-
-		// TODO: Pass these variables as parameters to ConnectionReaderWriter.
-		mData = data;
-		mByteBuffer = byteBuffer;
-		mByteBuffer.position(offset);
-		mSize = size;
-		mReadData = true;
-		mUseResource = true;
-		
 		MYASSERT(getInputStream() != null);
 		
-		mState |= CONNOP_READ;
-		//mMoSyncThread = MoSyncThread.this;
-		
-		mThreadPool.execute(new ConnectionReaderWriter(this));
-	}
-	
-	public void writeFromData(MAHandle data, int offset, int size) throws IOException
-	{
-		ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
+		// Get the resource to read data to.
+		final ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
 		if (null == byteBuffer) 
 		{
 			BIG_PHAT_ERROR;
 		}
 		
-		// TODO: Pass these variables as parameters to ConnectionReaderWriter.
-		mData = data;
-		mByteBuffer = byteBuffer;
-		mByteBuffer.position(offset);
-		mSize = size;
-		mReadData = false;
-		mUseResource = true;
+		mState |= CONNOP_READ;
 		
+		mThreadPool.execute(new Runnable()
+		{	
+			public void run() 
+			{
+				int opType = CONNOP_READ;
+				
+				try
+				{
+					// Read data into a byte array.
+					byte[] bytes = new byte[size];
+					int result = getInputStream().read(bytes);
+					
+					// Result is number of bytes read if successful.
+					if (result > 0)
+					{
+						byteBuffer.position(offset);
+						byteBuffer.put(bytes, 0, result);
+						postResultEvent(opType, result);
+					}
+					else if (result == -1) 
+					{
+						postResultEvent(opType, CONNERR_CLOSED);
+					} 
+					else 
+					{
+						DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error " + result + "!\n");
+						Log.i("ConnectionReaderWriter", "ConnRead error " + result);
+						postResultEvent(opType, CONNERR_INTERNAL);
+					}
+				}
+				catch (Exception e)
+				{
+					SYSLOG("Exception e:" + e.toString());
+					PRINT_STACK_TRACE;
+					e.printStackTrace();
+					postResultEvent(opType, CONNERR_GENERIC);
+				}
+			}
+		});
+	}
+	
+	public void writeFromData(final MAHandle data, final int offset, final int size) 
+		throws IOException
+	{
 		MYASSERT(getOutputStream() != null);
-
-		mState |= CONNOP_WRITE;
-		//mMoSyncThread = MoSyncThread.this;
 		
-		mThreadPool.execute(new ConnectionReaderWriter(this));
+		final ByteBuffer byteBuffer = (ByteBuffer) mBinaryResources.get(data);
+		if (null == byteBuffer) 
+		{
+			BIG_PHAT_ERROR;
+		}
+		
+		mState |= CONNOP_WRITE;
+		
+		mThreadPool.execute(new Runnable()
+		{
+			public final void run() 
+			{
+				int opType = CONNOP_WRITE;
+				
+				try
+				{
+					// Byte array with data to write.
+					byte[] data = new byte[size];
+					
+					// Get data to write.
+					byteBuffer.get(data);
+					
+					// Write byte array to stream.
+					getOutputStream().write(data);
+					
+					// Post event.
+					postResultEvent(opType, 1);
+				}
+				catch (Exception e)
+				{
+					SYSLOG("Exception e:" + e.toString());
+					PRINT_STACK_TRACE;
+					e.printStackTrace();
+					postResultEvent(opType, CONNERR_GENERIC);
+				}
+			}
+		});
 	}
 
 	public int connect()
@@ -1710,330 +1811,3 @@ class BluetoothServerConnectionObject extends ConnectionObject
 } // End of class BluetoothServerConnectionObject
 
 #endif // _ANDROID_BLUETOOTH
-
-/**
- * Class that reads or writes data. 
- * TODO: Make two methods from this class in ConnectionObject:
- * doRead and doWrite, and call from thread (as Runnable anon class).
- */
-class ConnectionReaderWriter implements Runnable 
-{
-	ConnectionObject mConn;
-
-	ConnectionReaderWriter(ConnectionObject conn)
-	{
-		mConn = conn;
-	}
-
-	public final void run() 
-	{
-		int opType = -1;
-		
-		try
-		{
-				
-			if (mConn.mReadData == true) // Read data
-			{
-				int result = -1;
-				int opResult;
-				
-				opType = CONNOP_READ;
-				
-				//Log.i("ConnectionReaderWriter", "Reading num bytes: " + mConn.mSize + " handle: " + mConn.mHandle);
-				
-				// Read data into a byte array.
-				byte[] bytes = new byte[mConn.mSize];
-				result = mConn.getInputStream().read(bytes);
-				
-				//Log.i("ConnectionReaderWriter", "Read result length: " + result + " handle: " + mConn.mHandle);
-				//Log.i("ConnectionReaderWriter", "Read result: " + new String(bytes));
-				
-				if (result > 0)
-				{
-					if (mConn.mUseResource == true) // Store in resource 
-					{
-						// Log.i("ConnectionReaderWriter", "Read to resource");
-						
-						// Store data in resource.
-						mConn.mByteBuffer.put(bytes, 0, result);
-					}
-					else // Store in memory
-					{
-						// Log.i("ConnectionReaderWriter", "Read to memory");
-						
-						// Store data in memory at address mConn.mMemory.
-						mMemDataSection.mark();
-						mMemDataSection.position((int)mConn.mMemory);
-						mMemDataSection.put(bytes, 0, result);
-						mMemDataSection.reset();
-					}
-				}
-				
-				// Result is number of bytes read if successful.
-				if (result > 0)
-				{
-					opResult = result;
-				}
-				else if (result == -1) 
-				{
-					opResult = CONNERR_CLOSED;
-				} 
-				else 
-				{
-					DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error " + result + "!\n");
-					Log.i("ConnectionReaderWriter", "ConnRead error " + result);
-					opResult = CONNERR_INTERNAL;
-				}
-				
-				// Post event.
-				mConn.postResultEvent(opType, opResult);
-				
-				return;
-			}
-			else // Write data
-			{
-				opType = CONNOP_WRITE;
-				
-				// Byte array to write.
-				byte[] data = new byte[mConn.mSize];
-				
-				if (mConn.mUseResource == true) // Resource
-				{
-					//Log.i("ConnectionReaderWriter", "Send from resource");
-					
-					// Get data to write.
-					mConn.mByteBuffer.get(data);
-					
-				}
-				else // Memory
-				{
-					//Log.i("ConnectionReaderWriter", "Send from memory");
-					SYSLOG("memstart:" + (int)mConn.mMemory + " size:" + mConn.mSize + " datasize:" + mMemDataSection.capacity());
-					
-					// Get data to write.
-					mMemDataSection.mark();
-					mMemDataSection.position((int)mConn.mMemory);
-					mMemDataSection.get(data);
-					mMemDataSection.reset();
-				}
-				
-				// Write byte array to stream.
-				mConn.getOutputStream().write(data);
-				
-				// Post event.
-				mConn.postResultEvent(opType, 1);
-				
-				return;
-			}	
-		}
-		catch (InterruptedIOException e)
-		{
-			SYSLOG("InterruptedIOException e:" + e.toString());
-			PRINT_STACK_TRACE;
-			e.printStackTrace();
-			mConn.postResultEvent(opType, CONNERR_CANCELED);
-			return;
-		}
-		catch (IOException e)
-		{
-			SYSLOG("IOException e:" + e.toString());
-			PRINT_STACK_TRACE;
-			e.printStackTrace();
-			mConn.postResultEvent(opType, CONNERR_GENERIC);
-			return;
-		}
-		catch (Exception e)
-		{
-			SYSLOG("Exception e:" + e.toString());
-			PRINT_STACK_TRACE;
-			e.printStackTrace();
-			mConn.postResultEvent(opType, CONNERR_GENERIC);
-			return;
-		}
-	}
-}
-
-/*
-TODO: Remove commenetd out code.
-
-class SocketConnectionRunner implements Runnable 
-{
-	ConnectionObject mConn;
-
-	SocketConnectionRunner(ConnectionObject conn)
-	{
-		mConn = conn;
-	}
-
-	public final void run() {
-
-		int opType = -1;
-		try
-		{
-			if(mConn.mReadData == true) // Read data
-			{
-				int result = -1;
-				int opResult;
-				opType = CONNOP_READ;
-				
-				if(mConn.mUseResource == true) // store in resource 
-				{
-					Log.i("HttpConnectionRunner","Read to resource");
-					result = mConn.getInputStream().read(mConn.mBinary.arr, mConn.mOffset, mConn.mSize);
-				}
-				else // store in memory
-				{
-					Log.i("HttpConnectionRunner","Read to memory");
-					byte[] bytes = new byte[mConn.mSize];
-					result = mConn.getInputStream().read(bytes);
-					if(result > 0)
-					{
-						writeMemBytes(mConn.mMemory, bytes, 0, result);
-						opResult = result;
-					}
-				}
-				
-				// success
-				if(result > 0)
-				{
-					opResult = result;
-				}
-				else if(result == -1) {
-					opResult = CONNERR_CLOSED;
-				} else {
-					DEBUG_ALWAYS("ConnRead error "+result+"!\n");
-					opResult = CONNERR_INTERNAL;
-				}
-				
-				setResource(mConn.mData, mConn.mBinary);
-				mConn.postResultEvent(opType, opResult);
-				return;
-			}
-			else // Write data
-			{
-				opType = CONNOP_WRITE;
-				if(mConn.mUseResource == true) // resource
-				{
-					Log.i("HttpConnectionRunner","Send from resource");
-					if(mConn.mBinary instanceof Binary) {
-						Binary bin = (Binary)mConn.mBinary;
-						mConn.getOutputStream().write(bin.arr, mConn.mOffset, mConn.mSize);
-					} else {
-						byte[] buffer = new byte[mConn.mSize];
-						DataInputStream dis = new DataInputStream(mConn.mBinary.getInputStream());
-						dis.readFully(buffer);
-						dis.close();
-						mConn.getOutputStream().write(buffer);
-					}
-				}
-				else // memory
-				{
-					Log.i("HttpConnectionRunner","Send from memory");
-					readMemStream(mConn.getOutputStream(), mConn.mMemory, mConn.mSize);
-				}
-				
-				//success
-				setResource(mConn.mData, mConn.mBinary);
-				mConn.postResultEvent(opType, 1);
-				return;
-			}	
-		}
-		catch(InterruptedIOException e)
-		{
-			PRINT_STACK_TRACE;
-			mConn.postResultEvent(opType, CONNERR_CANCELED);
-			return;
-		}
-		catch(IOException e)
-		{
-			PRINT_STACK_TRACE;
-			mConn.postResultEvent(opType, CONNERR_GENERIC);
-			return;
-		}
-		
-	}
-}
-*/
-
-/* 
-Old code that is moved to class BluetoothCOnnectionObject.
-
-TODO: Delete this commented out code when implementation is tested.
- 
-class BluetoothConnectionConnector implements Runnable 
-{
-	BluetoothConnectionObject mConnObj;
-
-	BluetoothConnectionConnector(BluetoothConnectionObject connObj) 
-	{
-		mConnObj = connObj;
-	}
-
-	public void run()
-	{
-		try
-		{
-			String address = mConnObj.mAddress;
-			BluetoothAdapter adapter = btGetBluetoothAdapter();
-			if (null == adapter)
-			{
-				mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
-			}
-			BluetoothDevice device = btGetBluetoothAdapter().getRemoteDevice(address);
-			if (null == device)
-			{
-				mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
-			}
-			
-			Method createRfcommSocket = device.getClass().getMethod(
-				"createRfcommSocket", 
-				new Class[] { int.class });
-			if (null == createRfcommSocket)
-			{
-				mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
-			}
-			
-			BluetoothSocket socket = (BluetoothSocket) createRfcommSocket.invoke(
-				device, 
-				mConnObj.mChannel);
-			if (null == socket)
-			{
-				mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-				return;
-			}
-			
-			socket.connect();
-			
-			mConnObj.mSocket = socket;
-			
-			Log.i("@@BluetoothConnectionConnector","connection to Bluetooth socket made");
-			
-			int success = 1;
-			mConnObj.postResultEvent(CONNOP_CONNECT, success);
-		}
-		catch (InterruptedIOException e)
-		{
-			PRINT_STACK_TRACE;
-			mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
-			return;
-		}
-		catch (IOException e)
-		{
-			PRINT_STACK_TRACE;
-			mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-			return;
-		}
-		catch (Exception e)
-		{
-			PRINT_STACK_TRACE;
-			mConnObj.postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-			return;
-		}
-	}
-}
-*/
-
-
