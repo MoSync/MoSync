@@ -488,5 +488,44 @@ SYMBOL * FunctionAboveIP(int ip)
 
 
 //****************************************
+//  Find the extent of a data entity
+//****************************************
+
+int FindLabelExtent(int ip)
+{
+//	SYMBOL *thisSym;
+
+	uint n, v;
+
+	// Byte search of memory
+
+	for (n=ip;n<LabelArray.hi;n++)
+	{
+		// Check if the data symbol has hit alignment padding
+		
+		v = ArrayGet(&PaddingArray, n);
+
+		if (v)
+			break;
+
+		// Check if the data symbol is finished, i.e it bumps
+		// into the next symbol
+		
+		if (n != (uint)ip)
+		{
+			v = ArrayGet(&LabelArray, n);
+
+			if (v)
+				break;
+		}
+
+		// Next ip
+	}
+
+	v = n - ip;
+	return v;
+}
+
+//****************************************
 
 #endif // INCLUDE_DEPEND_SEARCH

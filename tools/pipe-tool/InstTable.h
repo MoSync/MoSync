@@ -100,6 +100,8 @@ INSTR_MACRO(	0, _JPR,       "JP d",				"",			fetch_d		,inst_ignor	)
 INSTR_MACRO(	0, _XB,        "XB d,s",			"",			fetch_ds	,inst_ignor	)
 INSTR_MACRO(	0, _XH,        "XH d,s",			"",			fetch_ds	,inst_ignor	)
 INSTR_MACRO(	0, _SYSCALL,   "SYSCALL k",			"",			fetch_k		,inst_ignor	)
+//INSTR_MACRO(	0, _SYSCALL,   "CALL k",			"",			fetch_k		,inst_ignor	)
+
 INSTR_MACRO(	0, _CASE,      "CASE d,c",			"",			fetch_dc	,inst_ignor	)
 INSTR_MACRO(	0, _FAR,        "FAR",				"",			0		    ,inst_ignor	)
 

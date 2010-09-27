@@ -1062,7 +1062,6 @@ void GetQuoteStr(short maxlen)
 
 		if (v == '\\')
 		{
-//			FilePtr++;			// skip the '\'
 			v = GetEscCode();
 		}
 

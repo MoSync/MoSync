@@ -208,14 +208,91 @@ int DecodeOpcodeIP(OpcodeInfo *thisOpcode, int code_ip)
 
 void DecodeAsmEmit(char *out, char *Template, ...)
 {
-		char 	Str[1280];
-		va_list args;
+	char 	Str[1280];
+	va_list args;
 
-		va_start(args,Template);
-		vsprintf(Str,Template,args);
-		va_end(args);
+	va_start(args,Template);
+	vsprintf(Str,Template,args);
+	va_end(args);
 
-		strcat(out,Str);
+	strcat_cond(out,Str);
+}
+
+//****************************************
+//			Get Reg Name
+//****************************************
+
+char str_cond_table[128];
+
+void strcat_cond(char *in_dst, char *src)
+{		
+	int dstlen = strlen(in_dst);
+	char c;
+	int cond;
+
+	char *dst = &in_dst[dstlen];
+	
+	while(1)
+	{
+		c = *src++;
+		
+		if (c == 0)
+			break;
+
+		if (c != '<')
+		{
+			*dst++ = c;
+			continue;
+		}
+
+		// Get condition delimeter
+
+		c = *src++;
+
+		// Make sure that the delimeter is there, otherwise error
+
+		if (c != '@')
+			Error(Error_Fatal, "Missing '@' delimeter in conditional string");
+
+		// Get condition variable char
+
+		c = *src++;
+		cond  = str_cond_table[c & 127];
+		
+		// Copy everything if the condition is true
+		
+		while(1)
+		{
+			// Get the next char
+
+			c = *src++;
+
+			if (c == 0)
+				Error(Error_Fatal, "Missing '>' closure in output");
+
+			// if we have reached the end marker, skip it then keep going
+
+			if (c == '>')
+				break;
+
+			// If condition is true copy the char
+
+			if (cond)
+				*dst++ = c;
+			
+		}
+	}
+
+	*dst = 0;
+}
+
+//****************************************
+//		 Set string condition
+//****************************************
+
+void SetStrCondition(int v, int c)
+{
+	str_cond_table[v&127] = c;
 }
 
 //****************************************
@@ -276,7 +353,7 @@ void DecodeCase(char *out, OpcodeInfo *thisOpcode)
 
 	CaseRef = ref;
 	
-	DecodeAsmEmit(out, "#%s_%d,", ref->Name, ref->LocalScope);
+	DecodeAsmEmit(out, "#%s<@1_%d>,", ref->Name, ref->LocalScope);
 
 	// Write default address
 	
@@ -296,7 +373,7 @@ void DecodeCase(char *out, OpcodeInfo *thisOpcode)
 	
 	ref = labref;
 
-	DecodeAsmEmit(out, "#%s_%d", ref->Name, ref->LocalScope);	
+	DecodeAsmEmit(out, "#%s<@1_%d>", ref->Name, ref->LocalScope);	
 }
 
 //****************************************
@@ -331,16 +408,18 @@ int DecodeDataAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	if (d == 0)
 	{
-		DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
 		return 1;
 	}
 
 	if (d > 0)
 	{
+	
+		if (ref->EndIP)				// Get rid of 0 lenght reports
 		if (d >= ref->EndIP)
 			ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s+%d': may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	
-		DecodeAsmEmit(out, "&%s_%d+%d", ref->Name, ref->LocalScope, d);
+		DecodeAsmEmit(out, "&%s<@1_%d>+%d", ref->Name, ref->LocalScope, d);
 		return 1;
 	}
 
@@ -350,8 +429,9 @@ int DecodeDataAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	d = -d;
 
-	DecodeAsmEmit(out, "&%s_%d-%d", ref->Name, ref->LocalScope, d);
+	DecodeAsmEmit(out, "&%s<@1_%d>-%d", ref->Name, ref->LocalScope, d);
 
+	if (ref->EndIP)				// Get rid of 0 lenght reports
 	ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s-%d': negative index may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	return 1;
 }
@@ -381,16 +461,17 @@ int DecodeIndexAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	if (d == 0)
 	{
-		DecodeAsmEmit(out, "%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out, "%s<@1_%d>", ref->Name, ref->LocalScope);
 		return 1;
 	}
 
 	if (d > 0)
 	{
+		if (ref->EndIP)				// Get rid of 0 lenght reports
 		if (d >= ref->EndIP)
 			ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s+%d': may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	
-		DecodeAsmEmit(out, "%s_%d+%d", ref->Name, ref->LocalScope, d);
+		DecodeAsmEmit(out, "%s<@1_%d>+%d", ref->Name, ref->LocalScope, d);
 		return 1;
 	}
 
@@ -400,8 +481,9 @@ int DecodeIndexAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	d = -d;
 
-	DecodeAsmEmit(out, "%s_%d-%d", ref->Name, ref->LocalScope, d);
+	DecodeAsmEmit(out, "%s<@1_%d>-%d", ref->Name, ref->LocalScope, d);
 
+	if (ref->EndIP)				// Get rid of 0 lenght reports
 	ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s-%d': negative index may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	return 1;
 }
@@ -420,7 +502,7 @@ int DecodeDataAccess(char *out, OpcodeInfo *thisOpcode)
 
 	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DDA*");
 
-	DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+	DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
 	return 1;
 }
 */
@@ -447,7 +529,7 @@ int DecodeDataAccess(char *out, OpcodeInfo *thisOpcode)
 		ErrorOnIP(Error_Fatal,thisOpcode->rip,"(DecodeDataAccess) illegal section reference");
 
 
-	DecodeAsmEmit(out, "&%s_%d(+%d)", ref->Name, ref->LocalScope,d);
+	DecodeAsmEmit(out, "&%s<@1_%d>(+%d)", ref->Name, ref->LocalScope,d);
 	return 1;
 }
 
@@ -476,7 +558,7 @@ int DecodeCallArray(char *out, OpcodeInfo *thisOpcode)
 	
 	ref = labref;
 
-	DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+	DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
 	return 1;
 }
 
@@ -484,13 +566,15 @@ int DecodeCallArray(char *out, OpcodeInfo *thisOpcode)
 //		Disassemble to string
 //****************************************
 
-void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
+void DecodeAsmString(OpcodeInfo *thisOpcode, char *out, int add_scope)
 {
 	short n,len;
 	char c;
 	char *oldFilePtr = FilePtr;			// Save FilePtr
 
 	out[0] = 0;							// Terminate string first
+
+	SetStrCondition('1', add_scope);
 
 	SetFilePtrFromIP(thisOpcode->rip);
 
@@ -578,22 +662,51 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 
 			case 'k': 		// Syscalls
 			{
-				if (DISAS_DEBUG) DecodeAsmEmit(out,"(d)");
-
+#if 1
 				DecodeAsmEmit(out,"%d",thisOpcode->imm);
+#else
+				{
+					SYMBOL *syscall =  FindSysCall(thisOpcode->imm);			
+
+					if (!syscall)
+					{
+						Error(Error_System, "Could'nt locate syscall\n");
+						return;
+					}
+					
+					DecodeAsmEmit(out,"#%s",syscall->Name);
+				}
+#endif
+				
 			}		
 			break;
 
 			case 'm': 		// rs+imm	
 			{
 
-				if (DISAS_DEBUG) DecodeAsmEmit(out,"(m)");
-				DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rs, 0));
+				if (DISAS_DEBUG)
+					DecodeAsmEmit(out,"(m)");
 
-				if (DecodeIndexAccessImm(out, thisOpcode))
-					break;
+				if (thisOpcode->imm)
+				{
+//					if (thisOpcode->rs)
+						DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rs, 0));
+//					else
+//						DecodeAsmEmit(out,"#");
 
-				DecodeAsmEmit(out,"%d", thisOpcode->imm);
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+
+					DecodeAsmEmit(out,"%d", thisOpcode->imm);
+				}
+				else // 0 case
+				{
+					DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rs, 0));
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+				}
 
 			}		
 			break;
@@ -602,12 +715,25 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 			{
 				if (DISAS_DEBUG) DecodeAsmEmit(out,"(n)");
 
-				DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rd, 0));
+				if (thisOpcode->imm)
+				{
+//					if (thisOpcode->rd)
+						DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rd, 0));
+//					else
+//						DecodeAsmEmit(out,"#");
 
-				if (DecodeIndexAccessImm(out, thisOpcode))
-					break;
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
 
-				DecodeAsmEmit(out,"%d", thisOpcode->imm);
+					DecodeAsmEmit(out,"%d", thisOpcode->imm);
+				}
+				else
+				{
+					DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rd, 0));
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+				}
 
 			}		
 			break;
@@ -664,7 +790,7 @@ void DecodeAsmLabel(int ip, char *out)
 		return;
 
 	if (ref->LabelType == label_Local)
-		DecodeAsmEmit(out,"%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out,"%s<@1_%d>", ref->Name, ref->LocalScope);
 }
 
 //****************************************
@@ -706,7 +832,7 @@ void DisassembleFunc(char *func, int showHex)
 		ip_last = ip;
 		
 		ip = DecodeOpcode(&thisOp, ip);
-		DecodeAsmString(&thisOp, str);
+		DecodeAsmString(&thisOp, str, 1);			// scoped variable on
 
 		len = ip - ip_last;
 
@@ -944,7 +1070,7 @@ int DisassembleFromSource(int codeIP, char *out)
 		return 0;
 	}
 	
-	for (n=0;n<128;n++)
+	for (n=0;n<1024;n++)
 	{
 		c = *AsmChars++;
 		
@@ -984,7 +1110,7 @@ int DisassembleDataFromSource(int dataIP, char *out)
 	if (!AsmChars)
 		return 0;
 	
-	for (n=0;n<128;n++)
+	for (n=0;n<1024;n++)
 	{
 		c = *AsmChars++;
 		
@@ -1000,10 +1126,10 @@ int DisassembleDataFromSource(int dataIP, char *out)
 		if (c == ';')
 			break;
 
-		if (c == '/')
+/*		if (c == '/')
 			if (*AsmChars == '/')
 				break;
-
+*/
 		DecodeAsmEmit(out,"%c",c);
 	}
 	
@@ -1023,3 +1149,114 @@ int SetFilePtrFromIP(int ip)
 		
 	return (int) AsmChars;
 }
+
+//****************************************
+//
+//****************************************
+
+char *cs_skip(char *ws)
+{
+	char *last_ws;
+	
+	PushTokenPtr(ws, 0);
+
+	SkipWhiteSpace();
+
+	last_ws = FilePtr;
+	PopTokenPtr();
+	
+	return last_ws;
+}
+
+//****************************************
+//		Convert '&' to '#'
+//****************************************
+
+void ConvAmp2Hash(char *str)
+{
+	char c;
+	
+	while(1)
+	{
+		c = *str;
+		
+		if (!c)
+			break;
+	
+		if ((c == '#') && (*(str+1) == '0'))
+		{
+			*str++ = 'z';
+			*str++ = 'r';
+			continue;
+		}
+			
+		if (c == '&')
+			*str = '#';
+
+		str++;
+	}
+}
+
+
+//****************************************
+//		Code Sanity Checker
+//****************************************
+
+int CodeSanityChecker(int ip, char *gen_code)
+{
+	char src_code[1024];
+	char *src,*gen ;
+	
+	src_code[0] = 0;
+	DisassembleFromSource(ip, src_code);
+
+	ConvAmp2Hash(src_code);
+	ConvAmp2Hash(gen_code);
+
+	src = src_code;
+	gen = gen_code;
+
+	while(1)
+	{
+		src = cs_skip(src);
+		gen = cs_skip(gen);
+
+		if (*src != *gen)
+		{
+			RebuildEmit("\n\\\\ Sanity report\n");
+			RebuildEmit("\\\\ src = '%s'\n", src_code);
+			RebuildEmit("\\\\ gen = '%s'\n", gen_code);
+			return 0;
+		}
+			
+		if (*src == 0)
+			break;
+
+		src++;
+		gen++;
+
+	}
+
+	return 1;	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
