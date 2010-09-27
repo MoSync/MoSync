@@ -206,8 +206,11 @@ namespace MAUI {
 			}
 			*/
 		}
+
+		/*
 		if(mChildren.size() == 1)
 			child->setFocused(true);
+		 */
 
 		requestRepaint();
 	}

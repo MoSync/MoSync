@@ -5,7 +5,7 @@
 namespace MAUI {
 
 Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false),
-	mSkinPressed(NULL), mSkinReleased(NULL), mListeners(false) {
+	mSkinFocusedPressed(NULL), mSkinFocusedReleased(NULL), mSkinUnfocusedReleased(NULL), mListeners(false) {
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
 }
@@ -31,6 +31,8 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
+	if(!mPressed) return false;
+
     //MAUI_LOG("Button released! %x", this);
 	mPressed = false;
 	//fireTriggered();
@@ -48,13 +50,21 @@ void Button::drawWidget() {
 	}
 	*/
 
-	if(mPressed) {
-		if(mSkinPressed) {
-			mSkinPressed->draw(0, 0, mBounds.width, mBounds.height);
+	if(mFocused) {
+		if(mPressed) {
+			if(mSkinFocusedPressed) {
+				mSkinFocusedPressed->draw(0, 0, mBounds.width, mBounds.height);
+			}
+		} else {
+			if(mSkinFocusedReleased) {
+				mSkinFocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
+			}
 		}
 	} else {
-		if(mSkinReleased) {
-			mSkinReleased->draw(0, 0, mBounds.width, mBounds.height);
+		if(!mPressed) {
+			mSkinUnfocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
+		} else {
+			maPanic(1, "Something is wrong, can't be unfocused and pressed");
 		}
 	}
 
@@ -66,8 +76,10 @@ void Button::restyle() {
 		setStyle(Engine::getSingleton().getDefaultStyle("Button"));
 	}
 	const ButtonStyle* style = (const ButtonStyle*)getStyle();
-	mSkinPressed = style->getSafe<SkinProperty>("skinPressed");
-	mSkinReleased = style->getSafe<SkinProperty>("skinReleased");
+
+	mSkinFocusedPressed = style->getSafe<SkinProperty>("skinFocusedPressed");
+	mSkinFocusedReleased = style->getSafe<SkinProperty>("skinFocusedReleased");
+	mSkinUnfocusedReleased = style->getSafe<SkinProperty>("skinUnfocusedReleased");
 
 	Label::restyle();
 }
@@ -82,7 +94,12 @@ bool Button::isTransparent() const {
 }
 
 void Button::setFocused(bool focused) {
-	mPressed = focused;
+	Widget::setFocused(focused);
+	if(mPressed==true && focused == false) {
+		mPressed = false;
+		// do not send onButtonEvent(this, false) event here (it's obviously been cancelled before released).
+	}
+
 	requestRepaint();
 }
 
@@ -96,12 +113,14 @@ void Button::removeButtonListener(ButtonListener* l) {
 
 
 ButtonStyle::ButtonStyle(
-		SkinProperty* pressed,
-		SkinProperty* unpressed,
+		SkinProperty* focusedPressed,
+		SkinProperty* focusedReleased,
+		SkinProperty* unfocusedReleased,
 		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)
 {
-	this->mProperties["skinPressed"] = pressed;
-	this->mProperties["skinReleased"] = unpressed;
+	this->mProperties["skinFocusedPressed"] = focusedPressed;
+	this->mProperties["skinFocusedReleased"] = focusedReleased;
+	this->mProperties["skinUnfocusedReleased"] = unfocusedReleased;
 }
 
 } // namespace MAUI

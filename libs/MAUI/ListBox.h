@@ -30,7 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "TouchMotionTracker.h"
 
 namespace MAUI {
-	class ShortPressTrigger;
 	class ListBox;
 
 	/** \brief Listener interface that receives notifications when an item in a ListBox is selected.

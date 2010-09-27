@@ -62,7 +62,7 @@ namespace MAUI {
 			mMain->setEnabled(false);
 
 		//MAUI_LOG("setMain widget: %x", mMain);
-		setFocusedWidget(mMain);
+		//setFocusedWidget(mMain);
 	}
 
 
@@ -107,7 +107,7 @@ namespace MAUI {
 	void Screen::setFocusedWidget(Widget *w) {
 		Widget *focus = w;
 		if(mFocusedWidget) mFocusedWidget->setFocused(false);
-		if(!focus->isFocusable()) {
+		if(focus && !focus->isFocusable()) {
 			focus = getFocusableWidget(focus);
 		}
 		mFocusedWidget = focus;
@@ -119,6 +119,12 @@ namespace MAUI {
 	}
 
 	void Screen::keyPressEvent(int keyCode, int nativeCode) {
+		if(!mFocusedWidget) {
+			mFocusedWidget = getFocusableWidget(mMain);
+			mFocusedWidget->setFocused(true);
+			return;
+		}
+
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip)
@@ -133,6 +139,8 @@ namespace MAUI {
 		}
 	}
 	void Screen::pointerPressEvent(MAPoint2d point) {
+		setFocusedWidget(NULL); // if key has been pressed previously focus has been gained, this should be removed now.
+
 		Widget* newFocus = mMain->focusableWidgetAt(point.x, point.y);
 		if(newFocus) {
 			mFocusedWidget = newFocus;

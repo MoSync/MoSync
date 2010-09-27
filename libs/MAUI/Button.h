@@ -58,8 +58,10 @@ namespace MAUI {
 		bool mPressed;
 		int mStartX, mStartY;
 
-		WidgetSkin *mSkinPressed;
-		WidgetSkin *mSkinReleased;
+		WidgetSkin *mSkinFocusedPressed;
+		WidgetSkin *mSkinFocusedReleased;
+		WidgetSkin *mSkinUnfocusedPressed;
+		WidgetSkin *mSkinUnfocusedReleased;
 
 		ListenerSet<ButtonListener> mListeners;
 	};
@@ -74,14 +76,18 @@ namespace MAUI {
 	 * marginRight = IntegerProperty
 	 * marginTop = IntegerProperty
 	 * marginBottom = IntegerProperty
-	 * backgroundSkinFocused = SkinProperty
-	 * backgroundSkinUnfocused = SkinProperty
-	 * skinPressed = SkinProperty
-	 * skinReleased = SkinProperty
+	 * backgroundSkinFocused = SkinProperty (may be null, in which it's not used)
+	 * backgroundSkinUnfocused = SkinProperty (may be null, in which it's not used)
+	 * skinFocusedPressed = SkinProperty
+	 * skinFocusedReleased = SkinProperty
+	 * skinUnfocusedReleased = SkinProperty
 	 */
 	class ButtonStyle : public LabelStyle {
 	public:
-		ButtonStyle(SkinProperty* pressed, SkinProperty* unpressed, FontProperty* font);
+		ButtonStyle( 	SkinProperty* focusedPressed,
+						SkinProperty* focusedReleased,
+						SkinProperty* unfocusedReleased,
+						FontProperty* font);
 
 	};
 

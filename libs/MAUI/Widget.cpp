@@ -478,34 +478,44 @@ namespace MAUI {
 	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
 		if(w1==NULL) return w2;
 		if(w2==NULL) return w1;
-		/*
 		switch(dir) {
 			case LEFT:
 			{
-
 				int x1 = w1->getBounds().x + w1->getBounds().width;
 				int x2 = w2->getBounds().x + w2->getBounds().width;
-				int x = this->getBounds().x;
-				Vector_each(Widget*, i, mChildren) {
-					if(*i==w1) continue;
-
-				}
+				int xt = this->getBounds().x;
+				if(xt-x1 < xt-x2) return w1;
+				else return w2;
 			}
 			break;
 			case RIGHT:
 			{
+				int x1 = w1->getBounds().x;
+				int x2 = w2->getBounds().x;
+				int xt = this->getBounds().x + this->getBounds().width;
+				if(x1-xt < x2-xt) return w1;
+				else return w2;
 			}
 			break;
 			case UP:
 			{
+				int y1 = w1->getBounds().y + w1->getBounds().height;
+				int y2 = w2->getBounds().y + w2->getBounds().height;
+				int yt = this->getBounds().y;
+				if(yt-y1 < yt-y2) return w1;
+				else return w2;
 			}
 			break;
 			case DOWN:
 			{
+				int y1 = w1->getBounds().y;
+				int y2 = w2->getBounds().y;
+				int yt = this->getBounds().y + this->getBounds().height;
+				if(y1-yt < y2-yt) return w1;
+				else return w2;
 			}
 			break;
 		}
-		*/
 
 		return NULL;
 	}

@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "InputPolicy.h"
 #include "Widget.h"
+#include "Screen.h"
 
 namespace MAUI {
 
@@ -68,13 +69,11 @@ bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
 	if (!ret) {
 		Direction dir = mapKeyCodeToDirection(keyCode);
 		if (dir != NONE) {
-			/*
-			Widget* newFocus = owner->getFocusableInDirection(dir);
+			Widget* newFocus = mOwner->getFocusableInDirectionFrom(mOwner, dir);
 			if (newFocus) {
 				Screen::getCurrentScreen()->setFocusedWidget(newFocus);
-				newFocus->keyPressed(keyCode, nativeCode);
+				//newFocus->keyPressed(keyCode, nativeCode);
 			}
-			*/
 		}
 	}
 
