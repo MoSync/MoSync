@@ -30,9 +30,7 @@ namespace MAUI {
 
 	/** \brief Layout and navigation of child widgets in a grid.
 	   *
-	   * This widget is responsible for laying out its children in a grid. It also provides 
-	   * navigation facilites within that grid, so that the children can be selected and triggered.
-	   * The widget doesn't draw its background by default, use setDrawBackground(true) to enable it.
+	   * This widget is responsible for laying out its children in a grid.
 	   **/
 
 	class Layout : public Widget, protected WidgetListener {
@@ -57,6 +55,7 @@ namespace MAUI {
 		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Layout to be added to the parent's children.
 		  **/
 		Layout(int x, int y, int width, int height, Widget* parent=NULL);
+
 		/** Constructor.
 		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
 		  * \param y the vertical position of the Label relative to its parent's top left padded corner
@@ -83,45 +82,57 @@ namespace MAUI {
 		/**  Sets the x margin of each widget relative to the grid cell it resides in. 
 		    **/
 		void setMarginX(int p);
+
 		/**  Sets the y margin of each widget relative to the grid cell it resides in. 
 		    **/
 		void setMarginY(int p);
+
 		/** Sets the horizontal alignment of the child widget within their grid cells.
 		    **/	
 		void setHorizontalAlignment(HorizontalAlignment alignment);
+
 		/** Sets the vertical alignment of the child widget within their grid cells.
 		    **/	
 		void setVerticalAlignment(VerticalAlignment alignment);
+
 		/** Sets the horizontal autosize property, determining wether the grid columns
 		    * are resized so that the widest of its children fits.
 		    **/	
 		void setAutoSizeX(bool f = true);
+
 		/** Sets the vertical autosize property, determining wether the grid rows
 		    * are resized so that the widest of its children fits.
 		    **/	
 		void setAutoSizeY(bool f = true);
+
 		/** Sets the number of columns in the grid.
 		    **/
 		void setNumColumns(int numColumns);
+
 		/** Sets the number of rows in the grid.
 		    **/
 		void setNumRows(int numRows);
+
 		/** Sets the position of the widget, relative to the parent **/
 		void setPosition(int x, int y);
+
 		/** Sets the width of the widget  **/
 		void setWidth(int width);
+
 		/** Sets the height of the widget  **/
 		void setHeight(int height);
+
 		/** Navigate to the cell above the currently selected one **/
 		void goUp();
+
 		/** Navigate to the cell below the currently selected one **/
 		void goDown();
+
 		/** Navigate to the cell to the right of the currently selected one **/
 		void goRight();
+
 		/** Navigate to the cell to the left the currently selected one **/
 		void goLeft();
-		/** Cause the currently selected cell's widget to be triggered  **/
-		void trigger();
 
 		virtual void update();
 

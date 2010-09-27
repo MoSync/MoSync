@@ -457,9 +457,4 @@ namespace MAUI {
 		if(mSelectedIndex -1 >= 0) mSelectedIndex--;
 		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
-
-	void Layout::trigger() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->trigger();
-	}
-
 }

@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/RefCounted.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>
+#include <MAUtil/ListenerSet.h>
 #include "WidgetSkin.h"
 #include "InputPolicy.h"
 #include "Style.h"
@@ -49,15 +50,12 @@ namespace MAUI {
 
 	class Widget;
 
+	/*
 #define fireBoundsChanged() \
 		Vector_each(WidgetListener*, wl, mWidgetListeners) { \
 			(*wl)->boundsChanged(this, this->mBounds); \
 		} \
-
-#define fireTriggered() \
-		Vector_each(WidgetListener*, wl, mWidgetListeners) { \
-			(*wl)->triggered(this); \
-		} \
+	*/
 
 	/** \brief A Widget listener which detects trigger, selection, state and positional changes.
 	  *
@@ -66,17 +64,30 @@ namespace MAUI {
 	  **/
 	
 	class WidgetListener {
-		public:	
-			/** This function is called whenever the widget being listened to has its trigger() function
-			 * invoked. See the documentation of Widget::trigger().
-			**/
-			virtual void triggered(Widget *widget) {};
-			/** This function is called whenever the widget's selection state changes.
-			**/
-			virtual void selectionChanged(Widget *widget, bool selected) {};
+		public:
+
+			/**
+			 * Maybe have these:
+			 * virtual void onKeyPressed(blahblah);
+			 * virtual void onKeyReleased(blahblah);
+			 * virtual void onTouchPressed
+			 * virtual void onTouchMoved (kanske inte behövs?)
+			 * virtual void onTouchReleased
+			 */
+
+			/**
+			 * This function is called whenever the widget's focused state changes.
+			 **/
+			virtual void focusChanged(Widget *widget, bool focused) {};
+
+			/**
+			 * This function is called whenever the widget's enable state changes.
+			 **/
 			virtual void enableStateChanged(Widget *widget, bool enabled) {};
-			/** This function is called whenever the widget being listened to is resized or moved.
-			**/
+
+			/**
+			 *  This function is called whenever the widget being listened to is resized or moved.
+			 **/
 			virtual void boundsChanged(Widget *widget, const Rect& bounds) {};
 	};
 
@@ -267,16 +278,9 @@ namespace MAUI {
 		
 		/** Set Widget enabled state **/
 		virtual void setEnabled(bool enabled=true);
+
 		/** Is Widget enabled ? **/
 		bool isEnabled() const;
-
-		/**
-		 * This function is called whenever the widget is "triggered",  which is
-		 * roughly equivalent to having been "clicked" on. However, sice MAUI
-		 * is independant of input facilities, the more input-neutral concept of
-		 * triggering is used. 
-		 */ 
-		virtual void trigger();
 
 		/**
 		 *	Add WidgetListener.
@@ -291,7 +295,7 @@ namespace MAUI {
 		/**
 		* returns a reference the the vector of Widget listeners
 		*/
-		Vector<WidgetListener*>& getWidgetListeners();
+		//Vector<WidgetListener*>& getWidgetListeners();
 		
 		/**
 		 *	Set left padding width.
@@ -425,7 +429,7 @@ namespace MAUI {
 		bool mEnabled;
 
 		// a list of widget listeners
-		Vector<WidgetListener*> mWidgetListeners;
+		ListenerSet<WidgetListener> mWidgetListeners;
 		
 		// padding information
 		Rect mPaddedBounds;

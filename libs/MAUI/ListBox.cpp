@@ -605,10 +605,11 @@ namespace MAUI {
 		//mYOffset += mYOffsetInc;
 		if(mTouched) {
 			double time = ((double)maGetMilliSecondCount()*0.001 - mTimeOfRelease);
+			if(time < 0) time = 0;
 		    double scalar = 1-(1/((1+time)*(1+time)));
 
-			double offsetX = (scalar*mTouchVelX*0.15);//mTouchVelX*(1.0-friction)+(touchVelX)*time;
-			double offsetY = (scalar*mTouchVelY*0.15); //mTouchVelY*(1.0-friction)+(touchVelY)*time;
+			double offsetX = (scalar*mTouchVelX*0.4);//mTouchVelX*(1.0-friction)+(touchVelX)*time;
+			double offsetY = (scalar*mTouchVelY*0.4); //mTouchVelY*(1.0-friction)+(touchVelY)*time;
 
 			if(scalar>0.95) Environment::getEnvironment().removeTimer(this);
 
@@ -617,7 +618,6 @@ namespace MAUI {
 			} else {
 				setScrollOffset((mTouchedYOffset + (int)(65536.0*(offsetY)))>>16);
 			}
-
 		} else {
 			mYOffset = (mYOffsetFrom<<16) + (mYOffsetTo-mYOffsetFrom)*(((maGetMilliSecondCount()-mAnimTimeStart)<<16)/DURATION);
 			if(mYOffsetInc<0 && mYOffset<=mYOffsetTo<<16) {
@@ -707,7 +707,7 @@ namespace MAUI {
 		Environment::getEnvironment().removeTimer(this);
 		mTouchMotionTracker.reset();
 		mTouchMotionTracker.addPoint(p);
-
+		mTouched = false;
 		/*
 		if(mOrientation == LBO_HORIZONTAL)
 			MAUI_LOG("Horizontal ListBoxPressed!");
@@ -739,20 +739,12 @@ namespace MAUI {
 		if(mFocusedWidget) {
 			int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
 			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
-
-
-
-
-			MAPoint2d pp = p;
-			pp.x = xx;
-			pp.y = yy;
+			MAPoint2d pp =  {xx, yy};
 
 			if(!mFocusedWidget->pointerMoved(pp, id)) {
 				mFocusedWidget->setFocused(false);
 				mFocusedWidget = NULL;
-				return true;
 			}
-			//MAUI_LOG("moved!!!");
 			return true;
 		}
 
@@ -775,7 +767,10 @@ namespace MAUI {
 
 	bool ListBox::pointerReleased(MAPoint2d p, int id) {
 		if(mFocusedWidget) {
-			mFocusedWidget->pointerReleased(p, id);
+			int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
+			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+			MAPoint2d pp =  {xx, yy};
+			mFocusedWidget->pointerReleased(pp, id);
 			mFocusedWidget->setFocused(false);
 			mFocusedWidget = NULL;
 			return false;
@@ -788,6 +783,7 @@ namespace MAUI {
 			mTouchedYOffset = mYOffset;
 			mTouchMotionTracker.addPoint(p);
 			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
+			//MAUI_LOG("velX: %f, velY: %f", mTouchVelX, mTouchVelY);
 		}
 		return false;
 	}

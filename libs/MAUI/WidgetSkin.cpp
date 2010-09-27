@@ -253,69 +253,69 @@ namespace MAUI {
 		//maDrawImageRegion(image, &mBottomRight, &dst, TRANS_NONE);
 		drawRegion(image, data, width, &mBottomRight, &dst);
 
-		// draw middle
+		// draw middle (these can be optimized to only do one maGetImageData call (do it for the first tile and copy that one to the next ones.)
 		if(mCenter.height && mCenter.width) {
-		for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
-			int h = mCenter.height;
-			if(j+mCenter.height>y+height-mBottom.height) {
-				mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
-			} 
-			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
-				dst.x = i; dst.y = j;
-				int w = mCenter.width;
-				if(i+mCenter.width>x+width-mRight.width) {
-					mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
+			for(int j = y+mTop.height; j < y+height-mBottom.height; j+=mCenter.height) {
+				int h = mCenter.height;
+				if(j+mCenter.height>y+height-mBottom.height) {
+					mCenter.height -= (j+mCenter.height)-(y+height-mBottom.height);
 				}
-				//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
-				drawRegion(image, data, width, &mCenter, &dst);
+				for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mCenter.width) {
+					dst.x = i; dst.y = j;
+					int w = mCenter.width;
+					if(i+mCenter.width>x+width-mRight.width) {
+						mCenter.width -= (i+mCenter.width)-(x+width-mRight.width);
+					}
+					//maDrawImageRegion(image, &mCenter, &dst, TRANS_NONE);
+					drawRegion(image, data, width, &mCenter, &dst);
 
-				mCenter.width = w;
+					mCenter.width = w;
+				}
+				mCenter.height = h;
 			}
-			mCenter.height = h;
-		}
 		}
 
 		// draw borders
 		if(mTop.width) {
-		for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
-				dst.x = i; dst.y = y;
-				dst2.x = i; dst2.y = y+height-mBottom.height;
+			for(int i = x+mLeft.width; i < x+width-mRight.width; i+=mTop.width) {
+					dst.x = i; dst.y = y;
+					dst2.x = i; dst2.y = y+height-mBottom.height;
 
-				int w1 = mTop.width;
-				int w2 = mBottom.width;
-				if(i+mTop.width>x+width-mRight.width) {
-					mTop.width -= (i+w1)-(x+width-mRight.width);
-					mBottom.width -= (i+w1)-(x+width-mRight.width);
-				} 
-				//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
-				drawRegion(image, data, width, &mTop, &dst);
-				drawRegion(image, data, width, &mBottom, &dst2);
+					int w1 = mTop.width;
+					int w2 = mBottom.width;
+					if(i+mTop.width>x+width-mRight.width) {
+						mTop.width -= (i+w1)-(x+width-mRight.width);
+						mBottom.width -= (i+w1)-(x+width-mRight.width);
+					}
+					//maDrawImageRegion(image, &mTop, &dst, TRANS_NONE);
+					//maDrawImageRegion(image, &mBottom, &dst2, TRANS_NONE);
+					drawRegion(image, data, width, &mTop, &dst);
+					drawRegion(image, data, width, &mBottom, &dst2);
 
-				mTop.width = w1;
-				mBottom.width = w2;
-		}
+					mTop.width = w1;
+					mBottom.width = w2;
+			}
 		}
 
 		if(mLeft.height) {
-		for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
-				dst.x = x; dst.y = i;
-				dst2.x = x+width-mRight.width; dst2.y = i;
+			for(int i = y+mTop.height; i < y+height-mBottom.height; i+=mLeft.height) {
+					dst.x = x; dst.y = i;
+					dst2.x = x+width-mRight.width; dst2.y = i;
 
-				int w1 = mLeft.height;
-				int w2 = mRight.height;
-				if(i+mLeft.height>y+height-mBottom.height) {
-					mLeft.height -= (i+w1)-(y+height-mBottom.height);
-					mRight.height -= (i+w1)-(y+height-mBottom.height);
-				} 
-				//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
-				//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
-				drawRegion(image, data, width, &mLeft, &dst);
-				drawRegion(image, data, width, &mRight, &dst2);
+					int w1 = mLeft.height;
+					int w2 = mRight.height;
+					if(i+mLeft.height>y+height-mBottom.height) {
+						mLeft.height -= (i+w1)-(y+height-mBottom.height);
+						mRight.height -= (i+w1)-(y+height-mBottom.height);
+					}
+					//maDrawImageRegion(image, &mLeft, &dst, TRANS_NONE);
+					//maDrawImageRegion(image, &mRight, &dst2, TRANS_NONE);
+					drawRegion(image, data, width, &mLeft, &dst);
+					drawRegion(image, data, width, &mRight, &dst2);
 
-				mLeft.height = w1;
-				mRight.height = w2;
-		}
+					mLeft.height = w1;
+					mRight.height = w2;
+			}
 		}
 	}
 

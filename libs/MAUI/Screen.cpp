@@ -106,6 +106,7 @@ namespace MAUI {
 
 	void Screen::setFocusedWidget(Widget *w) {
 		Widget *focus = w;
+		if(mFocusedWidget) mFocusedWidget->setFocused(false);
 		if(!focus->isFocusable()) {
 			focus = getFocusableWidget(focus);
 		}

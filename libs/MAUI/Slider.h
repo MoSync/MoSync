@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Style.h"
 #include "Widget.h"
 #include <MAUtil/String.h>
+#include <MAUtil/ListenerSet.h>
 
 namespace MAUI {
 
@@ -59,6 +60,8 @@ namespace MAUI {
 		double getValue() const;
 
 		void addSliderListener(SliderListener* sl);
+		void removeSliderListener(SliderListener* sl);
+
 		void update();
 
 		// \param 'moveToPoint' If 'true', when slider pressed, grip will move to the point that was pressed. Otherwise the slider can only be moved by touching the grip.
@@ -68,7 +71,6 @@ namespace MAUI {
 		int getSliderPos() const;
 		void restyle();
 		void drawWidget();
-		void fireOnValueChange();
 
 		//String mCaption;
 		bool mPressed;
@@ -84,7 +86,8 @@ namespace MAUI {
 		int mSliderGripHeight;
 		bool mValueChanged;
 		bool mMoveToPoint;
-		Vector<SliderListener*> mSliderListeners;
+
+		ListenerSet<SliderListener> mSliderListeners;
 	};
 
 	/**

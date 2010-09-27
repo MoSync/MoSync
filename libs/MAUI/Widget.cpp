@@ -47,7 +47,8 @@ namespace MAUI {
 			mInputPolicy(NULL),
 			mFocusedSkin(NULL),
 			mUnfocusedSkin(NULL),
-			mStyle(NULL)
+			mStyle(NULL),
+			mWidgetListeners(false)
 		{
 		mInputPolicy = new DefaultInputPolicy(this);
 		if(parent) {
@@ -144,7 +145,8 @@ namespace MAUI {
 
 		if(changed) {
 			requestRepaint();
-			fireBoundsChanged();
+			//fireBoundsChanged();
+			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
 		}
 	}
 
@@ -189,7 +191,8 @@ namespace MAUI {
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
-			fireBoundsChanged();
+			//fireBoundsChanged();
+			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
 		}
 	}
 
@@ -203,7 +206,8 @@ namespace MAUI {
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
-			fireBoundsChanged();
+			//fireBoundsChanged();
+			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
 		}
 	}
 
@@ -337,7 +341,8 @@ namespace MAUI {
 		updatePaddedBounds();
 		updateAbsolutePositionChildren(mPaddedBounds.x, mPaddedBounds.y);
 
-		fireBoundsChanged();
+		//fireBoundsChanged();
+		ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
 	}
 
 	Vector<Widget*>& Widget::getChildren() {
@@ -349,39 +354,28 @@ namespace MAUI {
 	}
 
 	void Widget::addWidgetListener(WidgetListener* wl) {
-		
-		Vector_each(WidgetListener*, i, mWidgetListeners) {
-			if((*i) == wl) return;
-		}
 		mWidgetListeners.add(wl);
 	}
 
 	void Widget::removeWidgetListener(WidgetListener* wl) {
-
-		Vector_each(WidgetListener*, i, mWidgetListeners) {
-			if((*i) == wl) {
-				mWidgetListeners.remove(i);
-				return;	//or crash
-			}
-		}
+		mWidgetListeners.remove(wl);
 	}
 
+	/*
 	Vector<WidgetListener*>& Widget::getWidgetListeners()
 	{
 		return mWidgetListeners;
 	}
-
-	void Widget::trigger() {
-		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->triggered(this);
-		}
-	}
+	*/
 
 	void Widget::setFocused(bool focused) {
 		mFocused = focused;
+		/*
 		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->selectionChanged(this, mFocused);
-		}
+			(*wl)->focusChanged(this, mFocused);
+		}*/
+		ListenerSet_fire(WidgetListener, mWidgetListeners, focusChanged(this, mFocused));
+
 		requestRepaint();
 	}
 	
@@ -396,9 +390,12 @@ namespace MAUI {
 			(*it)->setEnabled(mEnabled);
 		}
 		
+		/*
 		Vector_each(WidgetListener*, wl, mWidgetListeners) {
 			(*wl)->enableStateChanged(this, mEnabled);
-		}
+		}*/
+		ListenerSet_fire(WidgetListener, mWidgetListeners, enableStateChanged(this, mEnabled));
+
 		requestRepaint();
 	}
 	

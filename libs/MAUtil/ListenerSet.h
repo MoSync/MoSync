@@ -30,6 +30,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ListenerSet_each(type,itr,set)\
 	for(ListenerSet<type>::iterator itr = set.begin(); itr.hasNext(); ++itr)
 
+#define ListenerSet_fire(type, listenerset, with)\
+	if(listenerset.size()) {\
+		listenerset.setRunning(true);\
+		ListenerSet_each(type, i, listenerset) {\
+			i->with;\
+		}\
+		listenerset.setRunning(false);\
+	}\
+
 namespace MAUtil {
 	/**
 	* \brief A listener set.

@@ -319,7 +319,7 @@ static Screen *sGraphScreen;
 static Screen *sCalculatorScreen;
 
 
-class GraphScreen : public Screen, public WidgetListener, public SliderListener {
+class GraphScreen : public Screen, public ButtonListener, public SliderListener {
 public:
 	void onValueChange(Slider* slider, double value) {
 		if(slider == mFrequencySlider) {
@@ -333,8 +333,7 @@ public:
 		}
 	}
 
-	void triggered(Widget* w) {
-			Button* b = (Button*)w;
+	void onButtonEvent(Button* b, bool pressed) {
 			const String& str = b->getCaption();
 			if(str == "calculator") {
 				sCalculatorScreen->show();
@@ -357,7 +356,7 @@ public:
 		mPhaseSlider->setMoveToPoint(true);
 
 		Button *button = new Button(0, 0, 50, mScreenHeight/6, mainListbox, "calculator");
-		button->addWidgetListener(this);
+		button->addButtonListener(this);
 
 		setMain(mainListbox);
 
@@ -370,12 +369,12 @@ private:
 	Slider *mPhaseSlider;
 };
 
-class CalculatorScreen : public Screen, public WidgetListener {
+class CalculatorScreen : public Screen, public ButtonListener {
 public:
 	Label *mainLabel;
 
-	void triggered(Widget* w) {
-		Button* b = (Button*)w;
+	void onButtonEvent(Button* b, bool pressed) {
+		if(pressed) return;
 		String exp = mainLabel->getCaption();
 		const String& str = b->getCaption();
 		if(str == "exit") {
@@ -419,24 +418,31 @@ public:
 			Button *button;
 			for(int i = 0; i < 16; i++) {
 				button = new Button(0, 0, 50, 50, calculatorPane, buttons1[i]);
-				button->addWidgetListener(this);
+				button->addButtonListener(this);
 			}
 
 			for(int i = 0; i < 16; i++) {
 				button = new Button(0, 0, 50, 100, mainListbox, "graph");
-				button->addWidgetListener(this);
+				button->addButtonListener(this);
 			}
 
 			ListBox *testListbox = new ListBox(0, 0, 240, 320, mainListbox, ListBox::LBO_HORIZONTAL, ListBox::LBA_LINEAR, true);
 			testListbox->setAutoSize(true);
 			for(int i = 0; i < 16; i++) {
 				button = new Button(0, 0, 100, 50, testListbox, "graph");
-				button->addWidgetListener(this);
+				button->addButtonListener(this);
+			}
+
+			ListBox *testListbox2 = new ListBox(0, 0, 240, 320, testListbox, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
+			testListbox2->setAutoSize(true);
+			for(int i = 0; i < 16; i++) {
+				button = new Button(0, 0, 100, 50, testListbox2, "graph2");
+				button->addButtonListener(this);
 			}
 
 			NativeEditBox *native = new NativeEditBox(0, 0, 50, 50, mainListbox);
 			button = new Button(0, 0, 50, 100, mainListbox, "exit");
-			button->addWidgetListener(this);
+			button->addButtonListener(this);
 
 
 			mExp = new Expression();

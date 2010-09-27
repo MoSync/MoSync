@@ -5,7 +5,8 @@
 namespace MAUI {
 
 Slider::Slider(int x, int y, int width, int height, Widget* parent, Orientation ori, double minValue, double maxValue, double defaultValue) :
-	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false), mMoveToPoint(false) {
+	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false), mMoveToPoint(false),
+	mSliderListeners(false) {
 	setValue(defaultValue);
 }
 
@@ -75,7 +76,6 @@ bool Slider::pointerMoved(MAPoint2d p, int id) {
 
 bool Slider::pointerReleased(MAPoint2d p, int id) {
 	mPressed = false;
-	fireTriggered();
 	requestRepaint();
 	return false;
 }
@@ -165,7 +165,7 @@ void Slider::setValue(double val) {
 void Slider::update() {
 	Widget::update();
 	if(mValueChanged) {
-		fireOnValueChange();
+		ListenerSet_fire(SliderListener, mSliderListeners, onValueChange(this, mValue));
 		mValueChanged = false;
 	}
 }
@@ -186,10 +186,8 @@ void Slider::addSliderListener(SliderListener* sl) {
 	mSliderListeners.add(sl);
 }
 
-void Slider::fireOnValueChange() {
-	Vector_each(SliderListener*, wl, mSliderListeners) {
-		(*wl)->onValueChange(this, mValue);
-	}
+void Slider::removeSliderListener(SliderListener* sl) {
+	mSliderListeners.remove(sl);
 }
 
 SliderStyle::SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)

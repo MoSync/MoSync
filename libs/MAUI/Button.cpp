@@ -5,7 +5,7 @@
 namespace MAUI {
 
 Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false),
-	mSkinPressed(NULL), mSkinReleased(NULL) {
+	mSkinPressed(NULL), mSkinReleased(NULL), mListeners(false) {
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
 }
@@ -15,6 +15,7 @@ bool Button::pointerPressed(MAPoint2d p, int id) {
 	mPressed = true;
 	mStartX = p.x;
 	mStartY = p.y;
+	ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, true));
 	requestRepaint();
 	return true;
 }
@@ -24,7 +25,7 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 	p.x-=mStartX;
 	p.y-=mStartY;
 
-	int length = sqrt(p.x*p.x+p.y*p.y);
+	int length = (int)sqrt(p.x*p.x+p.y*p.y);
 	if(length<15) return true;
 	else return false;
 }
@@ -32,7 +33,8 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 bool Button::pointerReleased(MAPoint2d p, int id) {
     //MAUI_LOG("Button released! %x", this);
 	mPressed = false;
-	fireTriggered();
+	//fireTriggered();
+	ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, false));
 	requestRepaint();
 	return false;
 }
@@ -83,6 +85,15 @@ void Button::setFocused(bool focused) {
 	mPressed = focused;
 	requestRepaint();
 }
+
+void Button::addButtonListener(ButtonListener* l) {
+	mListeners.add(l);
+}
+
+void Button::removeButtonListener(ButtonListener* l) {
+	mListeners.remove(l);
+}
+
 
 ButtonStyle::ButtonStyle(
 		SkinProperty* pressed,

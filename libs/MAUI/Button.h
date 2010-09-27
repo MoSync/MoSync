@@ -27,8 +27,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Label.h"
 #include "Style.h"
 #include <MAUtil/String.h>
+#include <MAUtil/ListenerSet.h>
 
 namespace MAUI {
+
+	class Button;
+	class ButtonListener {
+	public:
+		virtual void onButtonEvent(Button* b, bool pressed) = 0;
+	};
 
 	class Button : public Label {
 	public:
@@ -41,6 +48,9 @@ namespace MAUI {
 		virtual bool isTransparent() const;
 		void setFocused(bool focused=true);
 
+		void addButtonListener(ButtonListener* l);
+		void removeButtonListener(ButtonListener* l);
+
 	protected:
 		void restyle();
 		void drawWidget();
@@ -50,6 +60,8 @@ namespace MAUI {
 
 		WidgetSkin *mSkinPressed;
 		WidgetSkin *mSkinReleased;
+
+		ListenerSet<ButtonListener> mListeners;
 	};
 
 	/**
