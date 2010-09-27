@@ -19,13 +19,36 @@
 require "#{File.dirname(__FILE__)}/pipe.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
 
+module PipeElimTask
+	def execute
+		execFlags
+		# pipe-tool may output an empty file and then fail.
+		begin
+			sh "#{mosyncdir}/bin/pipe-tool -elim#{cFlags}"
+			tarDir = @work.instance_variable_get(:@TARGETDIR) + "/" + @work.instance_variable_get(:@BUILDDIR)
+			tarRebuild = tarDir + 'rebuild.se'
+			tarSld = tarDir + 'slde.tab'
+			FileUtils.mv('rebuild.s', tarRebuild)	# clean up cwd.
+			FileUtils.rm_f(@NAME)	# make sure we know about any silent fail.
+			sh "#{mosyncdir}/bin/pipe-tool -sld=#{tarSld} -B #{@NAME} #{tarRebuild}"
+		rescue => e
+			FileUtils.rm_f('rebuild.s')
+			FileUtils.rm_f(@NAME)
+			raise
+		end
+		if(!File.exist?(@NAME))
+			error "Pipe-tool failed silently!"
+		end
+	end
+end
+
 class PipeExeWork < PipeGccWork
 	def setup
 		default(:TARGETDIR, '.')
 		set_defaults
-		sld = @TARGETDIR + "/" + @BUILDDIR + "sld.tab"
+		@SLD = @TARGETDIR + "/" + @BUILDDIR + "sld.tab"
 		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
-		@FLAGS = " -sld=#{sld} -stabs=#{stabs} -B"
+		@FLAGS = " -sld=#{@SLD} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
 		super
@@ -54,6 +77,11 @@ class PipeExeWork < PipeGccWork
 			FileTask.new(self, "#{mosync_libdir}/#{@COMMON_BUILDDIR_NAME}/#{lib}.lib")
 		end
 		all_objects += libs
+		
 		super(all_objects)
+		
+		if(ELIM)
+			@TARGET.extend(PipeElimTask)
+		end
 	end
 end
