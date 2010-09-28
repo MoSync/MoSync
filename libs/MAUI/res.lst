@@ -1,29 +1,17 @@
-.res RES_SELECTED
-.image "res/Button_pressed.png"
-
-.res RES_UNSELECTED
-.image "res/Button_notPressed.png"
-
-.res RES_SELECTED2
-.image "res/background_tile_sel.png"
-
-.res RES_UNSELECTED2
-.image "res/background_tile_unsel.png"
-
-.res RES_FOCUSED_UNSELECTED2
-.image "res/background_tile_unsel_focused.png"
-
-
 .res RES_SLIDER_AMT
-.image "res/slider_amt.png"
+.image "res/Slider_Left_Unselected.png"
 
 .res RES_SLIDER_BKG
-.image "res/slider_bkg.png"
+.image "res/Slider_Right_Unselected.png"
 
 .res RES_SLIDER_GRIP
-.image "res/slider_grip.png"
+.image "res/Slider_Handle.png"
 
 
 .res RES_FONT
 .bin 
-.include "res/pretty.mof"
+.include "res/arial.mof"
+
+.res RES_FONT2
+.bin 
+.include "res/arial_white.mof"

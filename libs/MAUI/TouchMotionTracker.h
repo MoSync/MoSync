@@ -38,15 +38,12 @@ public:
 
 	void setFrictionPerSecond(double fps);
 private:
-	double mFrictionPerSecond;
-
-
 	int mStartTime;
 	MAPoint2d mStart;
 	MAPoint2d mLast;
 	double mDirx, mDiry;
 	bool mStarted;
-
+	double mFrictionPerSecond;
 };
 
 } // namespace MAUI

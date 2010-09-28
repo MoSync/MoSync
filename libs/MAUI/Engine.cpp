@@ -24,12 +24,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Graphics.h>
 
+#include "DefaultSkin.h"
+
+#include "Button.h"
+
 using namespace MAUtil;
 
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
 namespace MAUI {
 	Engine* Engine::mSingletonPtr = 0;
+
+	MAHandle imageFromMem(void *data, int size) {
+		MAHandle res = maCreatePlaceholder();
+		MAHandle img = maCreatePlaceholder();
+		maCreateData(res, size);
+		maWriteData(res, data, 0, size);
+		maCreateImageFromData(img, res, 0, size);
+		maDestroyObject(res);
+		return img;
+	}
+
+	MAHandle fontFromMem(void *data, int size) {
+		MAHandle res = maCreatePlaceholder();
+		maCreateData(res, size);
+		maWriteData(res, data, 0, size);
+		return res;
+	}
+
+#define RESIMG(r) imageFromMem((r), sizeof(r))
+#define RESFNT(r) fontFromMem((r), sizeof(r))
 	
 	Engine::Engine()
 	{
@@ -38,6 +62,19 @@ namespace MAUI {
 		mSingletonPtr = this;
 		mDisplayConsole = false;
 		Environment::getEnvironment().addFocusListener(this);
+
+		MAHandle s1  = RESIMG(button_pressed_selected);
+		MAHandle s2  = RESIMG(button_notpressed_selected);
+		MAHandle s3  = RESIMG(button_notpressed_unselected);
+
+		SkinProperty* focusedPressed = new SkinProperty(s1, 19, 32, 19, 32, true);
+		SkinProperty* focusedReleased = new SkinProperty(s2, 19, 32, 19, 32, true);
+		SkinProperty* unfocusedReleased = new SkinProperty(s3, 19, 32, 19, 32, true);
+
+		FontProperty* font = new FontProperty(RESFNT(arial));
+
+		ButtonStyle* buttonStyle = new ButtonStyle(focusedPressed, focusedReleased, unfocusedReleased, font);
+		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
 	}
 	
 	void Engine::setMain(Widget* mMain) {
@@ -117,12 +154,11 @@ namespace MAUI {
 	}
 
 	Engine&	Engine::getSingleton() {
-		if(!mSingletonPtr)
+		if(!mSingletonPtr) {
 			mSingletonPtr = new Engine();
+		}
 		return *mSingletonPtr;
 	}
-
-
 
 	/* is an mOverlay shown? */
 	bool Engine::isOverlayShown() {
