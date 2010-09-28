@@ -292,7 +292,7 @@ void RebuildFunc(SYMBOL *sym)
 		DecodeAsmString(&thisOp, str, 1);
 		RebuildEmit("\t%s", str);
 
-//		DecodeAsmString(&thisOp, str, 0);		// no scoping here
+//		DecodeAsmString(&thisOp, str, 0);			// Sanity testing
 //		CodeSanityChecker(thisOp.rip, str);
 
 		if (ArgDebugRebuild)
@@ -488,8 +488,7 @@ void Rebuild_Data(SYMBOL *sym)
 
 	// Check if this data field can be moved to bss
 
-#if 0
-//	opt_bss = 0;
+#if 1
 	opt_bss  = Rebuild_CanMoveToBss(ip, len);
 
 	if (opt_bss)

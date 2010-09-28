@@ -255,7 +255,7 @@ int AsmPass(int thisPass)
 	AlignDataSection();
 	MaxDataIP = DataIP;
 
-	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
+//	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
 
 	if (INFO)
 	{
@@ -763,7 +763,6 @@ void DumpPipeDebugInfo()
 		}
 	
 	} 
-
 
 	if (pass_count > 2)			// If the
 		DisassembleFunc("_MAMain", 1);
