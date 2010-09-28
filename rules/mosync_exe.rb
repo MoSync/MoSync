@@ -30,7 +30,7 @@ module PipeElimTask
 			tarSld = tarDir + 'slde.tab'
 			FileUtils.mv('rebuild.s', tarRebuild)	# clean up cwd.
 			FileUtils.rm_f(@NAME)	# make sure we know about any silent fail.
-			sh "#{mosyncdir}/bin/pipe-tool -sld=#{tarSld} -B #{@NAME} #{tarRebuild}"
+			sh "#{mosyncdir}/bin/pipe-tool#{@FLAGS} -sld=#{tarSld} #{@NAME} #{tarRebuild}"
 		rescue => e
 			FileUtils.rm_f('rebuild.s')
 			FileUtils.rm_f(@NAME)
