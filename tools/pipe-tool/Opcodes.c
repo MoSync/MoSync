@@ -721,7 +721,10 @@ void CheckDataAccess_LoadStore(int opcode)
 void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 {
 	int const_subst;
-	
+
+	if ((CodeIP == 0x52) && (pass_count == 30))
+		printf("");
+
 	// Get the dest reg
 
 	imm = FindVar(0);				// set imm as preset zero
@@ -818,6 +821,15 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 		CheckDataAccess_LoadStore(_LDI);
 
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = _LDI;
+			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
+			return;		
+		}
+
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int);	// ld rd, #imm
 		return;		
@@ -846,6 +858,15 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		HandleExprImm();
 
 		CheckDataAccess_LoadStore(_LDI);
+
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = _LDI;
+			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
+			return;		
+		}
 
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int); // ld rd, &addr
@@ -1005,6 +1026,15 @@ void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
 			return;
 		}
 
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = OpcodeImm;
+			WriteOpcode(AsmName, use_rd | use_int16);	// arith rd, #coderef
+			return;		
+		}
+
 		op = OpcodeImm;
 		WriteOpcode(AsmName, use_rd | use_int);
 		return;
@@ -1071,12 +1101,12 @@ void HandleExpr()
 
 void HandleExprImm()
 {
-	short	Type;
+	short	flags;
 	
 	// MAHandle internal Lables
 	
 	imm = GetExpression();					// Evaluate the expression
-	Type = (short)GetExpType();					// Get its type
+	flags = GetExpFlags();
 
 	// If the expression contained a symbol that is unresolved
 	// then don't create a constant for that address
@@ -1286,6 +1316,14 @@ void WriteOpcode(char *AsmName, int field)
 		CodeIP++;
 	}
 
+	// If size optimization is off force to 16 bit indices
+	
+	if (SizeConstOpt && (field & use_int))
+	{
+		field &= ~use_int;
+		field |= use_int16;
+	}
+	
 
 	*CodePtr++ = (char)op;
 	CodeIP++;
@@ -1323,39 +1361,34 @@ void WriteOpcode(char *AsmName, int field)
 	}
 	else if (field & use_int)
 	{
-
-		if (SizeConstOpt)
-		{
-			// 8 and 16 bit ints
-			
-			if (imm < 128)
-			{	
-				*CodePtr++ = (char)imm;
-				CodeIP++;
-			}
-			else
-			{	
-				*CodePtr++ = (char)(imm >> 8) | 0x80;
-				CodeIP++;
-
-				*CodePtr++ = (char)(imm & 0xff);
-				CodeIP++;
-			}
-
+		// 8 and 16 bit ints
+		
+		if (imm < 128)
+		{	
+			*CodePtr++ = (char)imm;
+			CodeIP++;
 		}
 		else
-		{
-			// Expand const fields, if SizeConstOpt==0
-			// Fixed 16 bit ints
-
-			*CodePtr++ = (char)(imm >> 8);
+		{	
+			*CodePtr++ = (char)(imm >> 8) | 0x80;
 			CodeIP++;
 
 			*CodePtr++ = (char)(imm & 0xff);
 			CodeIP++;
 		}
-		
-		
+
+	}
+	else if (field & use_int16)
+	{
+		// Expand const fields, if SizeConstOpt==0
+		// Fixed 16 bit ints
+
+		*CodePtr++ = (char)(imm >> 8) | 0x80;
+		CodeIP++;
+
+		*CodePtr++ = (char)(imm & 0xff);
+		CodeIP++;
+
 	}
 	else if (field & use_int24)
 	{		

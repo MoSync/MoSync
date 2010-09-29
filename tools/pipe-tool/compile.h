@@ -657,7 +657,9 @@ enum
 	use_addr		= 0x04,
 	use_int			= 0x08,
 	use_int8		= 0x10,
-	use_int24		= 0x20
+	use_int24		= 0x20,
+	use_int16		= 0x40
+
 };
 
 //****************************************

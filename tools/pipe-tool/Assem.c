@@ -257,7 +257,7 @@ int AsmPass(int thisPass)
 
 //	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
 
-	if (INFO)
+//	if (INFO)
 	{
 		DumpPipeDebugInfo();
 	}
@@ -764,9 +764,14 @@ void DumpPipeDebugInfo()
 	
 	} 
 
-	if (pass_count > 2)			// If the
-		DisassembleFunc("_MAMain", 1);
+	if (pass_count >= 30)			// If the
+	{
 
+		SYMBOL *s = FunctionAboveIP(n);
+
+		DisassembleFunc(s->Name, 1);
+	}
+	
 	ArrayClear(&CodeMemArrayCopy);
 	ArrayCopy(&CodeMemArrayCopy, &CodeMemArray);
 	CodeCopyInit = 1;
