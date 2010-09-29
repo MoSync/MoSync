@@ -79,6 +79,7 @@ namespace MAUI {
 			env.removePointerListener(this);
 		if(mMain)
 			mMain->setEnabled(false);
+		setFocusedWidget(NULL);
 		sCurrentScreen = NULL;
 	}
 
@@ -111,6 +112,8 @@ namespace MAUI {
 			focus = getFocusableWidget(focus);
 		}
 		mFocusedWidget = focus;
+
+		if(mFocusedWidget) mFocusedWidget->setFocused(true);
 		//MAUI_LOG("setFocusedWidget widget %x", focus);
 	}
 
@@ -143,10 +146,11 @@ namespace MAUI {
 
 		Widget* newFocus = mMain->focusableWidgetAt(point.x, point.y);
 		if(newFocus) {
-			mFocusedWidget = newFocus;
+			setFocusedWidget(newFocus);
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip)
-				ip->pointerPressed(point, 0);
+				if(!ip->pointerPressed(point, 0))
+					setFocusedWidget(NULL);
 		}
 
 	}
@@ -157,13 +161,15 @@ namespace MAUI {
 				ip->pointerReleased(point, 0);
 		}
 
-		mFocusedWidget = NULL;
+		setFocusedWidget(NULL);
 	}
 	void Screen::pointerMoveEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip)
-				ip->pointerMoved(point, 0);
+				if(!ip->pointerMoved(point, 0))
+					setFocusedWidget(NULL);
+
 		}
 	}
 }

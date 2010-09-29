@@ -335,7 +335,7 @@ public:
 
 	void onButtonEvent(Button* b, bool pressed) {
 			const String& str = b->getCaption();
-			if(str == "calculator") {
+			if(pressed==true && str == "calculator") {
 				sCalculatorScreen->show();
 			}
 	}

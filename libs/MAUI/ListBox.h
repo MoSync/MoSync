@@ -110,7 +110,7 @@ namespace MAUI {
 		void clear();
 
 		/** Renders the listbox **/
-		void draw(bool forceDraw=false);
+		//void draw(bool forceDraw=false);
 		void update();
 
 		/** Navigates to the next item in the listbox - down if the orientation is vertical, right if it's horizontal. **/
@@ -160,11 +160,12 @@ namespace MAUI {
 		virtual bool pointerReleased(MAPoint2d p, int id);
 
 		void setFocusedWidget(Widget *w);
-		virtual Widget* focusableWidgetAt(int x, int y);
-		virtual Widget* widgetAt(int x, int y);
 
 		virtual void setEnabled(bool enabled=true);
+		virtual void setFocused(bool focused=true);
 
+		virtual int getTranslationX() const;
+		virtual int getTranslationY() const;
 
 	protected:
 		void runTimerEvent();

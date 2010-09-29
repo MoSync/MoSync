@@ -119,6 +119,8 @@ namespace MAUI {
 			Gfx_translate(mPaddingLeft, mPaddingTop);
 			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
+			Gfx_translate(getTranslationX(), getTranslationY());
+
 			if(res) {
 				if(isDirty() || forceDraw) {
 					drawWidget();
@@ -233,8 +235,10 @@ namespace MAUI {
 	}
 
 	Widget* Widget::widgetAt(int x, int y) {
+		int xx = x - getTranslationX();
+		int yy = y - getTranslationY();
 		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->widgetAt(x, y);
+			Widget *ret = (*it)->widgetAt(xx, yy);
 			if(ret) {
 				return ret;
 			}
@@ -253,6 +257,8 @@ namespace MAUI {
 
 	Widget* Widget::focusableWidgetAt(int x, int y) {
 		if(!isFocusable()) {
+			x-=getTranslationX();
+			y-=getTranslationY();
 			Vector_each(Widget *, it, mChildren) {
 				Widget *ret = (*it)->focusableWidgetAt(x, y);
 				if(ret) {
@@ -481,38 +487,18 @@ namespace MAUI {
 		switch(dir) {
 			case LEFT:
 			{
-				int x1 = w1->getBounds().x + w1->getBounds().width;
-				int x2 = w2->getBounds().x + w2->getBounds().width;
-				int xt = this->getBounds().x;
-				if(xt-x1 < xt-x2) return w1;
-				else return w2;
 			}
 			break;
 			case RIGHT:
 			{
-				int x1 = w1->getBounds().x;
-				int x2 = w2->getBounds().x;
-				int xt = this->getBounds().x + this->getBounds().width;
-				if(x1-xt < x2-xt) return w1;
-				else return w2;
 			}
 			break;
 			case UP:
 			{
-				int y1 = w1->getBounds().y + w1->getBounds().height;
-				int y2 = w2->getBounds().y + w2->getBounds().height;
-				int yt = this->getBounds().y;
-				if(yt-y1 < yt-y2) return w1;
-				else return w2;
 			}
 			break;
 			case DOWN:
 			{
-				int y1 = w1->getBounds().y;
-				int y2 = w2->getBounds().y;
-				int yt = this->getBounds().y + this->getBounds().height;
-				if(y1-yt < y2-yt) return w1;
-				else return w2;
 			}
 			break;
 		}
@@ -523,12 +509,13 @@ namespace MAUI {
 	Widget* Widget::getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best) {
 
 		for(int i = 0; i < mChildren.size(); i++) {
+			if(mChildren[i] == w) continue;
 			if(mChildren[i]->isFocusable()) {
 				best = w->nearestWidget(mChildren[i], best, dir);
 			} else {
 				Widget* ret = mChildren[i]->getNearestFocusableInDirectionFrom(w, dir, best);
 				if(ret) {
-					best = w->nearestWidget(w, best, dir);
+					best = w->nearestWidget(ret, best, dir);
 				}
 			}
 		}
@@ -540,10 +527,13 @@ namespace MAUI {
 		if(!mParent) return NULL;
 
 		if(mParent->getChildren().size() > 1) {
-			return mParent->getNearestFocusableInDirectionFrom(w, dir);
-		} else {
-			return mParent->getFocusableInDirectionFrom(w, dir);
+			Widget *candidate = mParent->getNearestFocusableInDirectionFrom(w, dir);
+			if(candidate) {
+				return candidate;
+			}
 		}
+
+		return mParent->getFocusableInDirectionFrom(w, dir);
 	}
 
 	InputPolicy* Widget::getInputPolicy() {
@@ -565,6 +555,13 @@ namespace MAUI {
 		return mStyle;
 	}
 
+	int Widget::getTranslationX() const {
+		return 0;
+	}
+
+	int Widget::getTranslationY() const {
+		return 0;
+	}
 
 	void Widget::restyle() {
 		//MAUI_LOG("Widget::restyle() called");

@@ -355,8 +355,6 @@ namespace MAUI {
 			virtual bool pointerReleased(MAPoint2d p, int id);
 
 			virtual bool isFocusable() const;
-			Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
-			Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
 			Widget* getFocusableInDirectionFrom(Widget* w, Direction dir);
 
 			InputPolicy* getInputPolicy();
@@ -365,7 +363,12 @@ namespace MAUI {
 			void setStyle(const Style* style);
 			const Style* getStyle();
 
+			virtual int getTranslationX() const;
+			virtual int getTranslationY() const;
 	protected:
+			Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
+			Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
+
 
 		/**
 		   * This is the only function that is absolutely neccesary

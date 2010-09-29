@@ -286,6 +286,7 @@ namespace MAUI {
 	}
 #endif
 
+	/*
 	void ListBox::draw(bool forceDraw) {
 		//Engine& engine = Engine::getSingleton();
 
@@ -326,13 +327,6 @@ namespace MAUI {
 				{	
 					for(i = 0; i < mChildren.size(); i++)
 					{
-						/**
-						 * The check whether the child should be drawn or
-						 * not is done in Widget::draw(), and we postpone
-						 * the check until then.
-						 *
-						 * // Mattias
-						 */
 						mChildren[i]->draw();
 					}
 				}
@@ -380,13 +374,6 @@ namespace MAUI {
 				{
 					for(i = 0; i < mChildren.size(); i++)
 					{
-						/**
-						 * The check whether the child should be drawn or
-						 * not is done in Widget::draw(), and we postpone
-						 * the check until then.
-						 *
-						 * // Mattias
-						 */
 						mChildren[i]->draw();
 					}
 				}
@@ -402,6 +389,7 @@ namespace MAUI {
 		}
 
 	}
+	*/
 
 	void ListBox::addItemSelectedListener(ItemSelectedListener *listener) {
 		mItemSelectedListeners.add(listener);
@@ -701,9 +689,18 @@ namespace MAUI {
 	}
 
 	void ListBox::setFocusedWidget(Widget *w) {
+		if(mFocusedWidget)
+			mFocusedWidget->setFocused(false);
 		mFocusedWidget = w;
-		if(w)
-			w->setFocused(true);
+		if(mFocusedWidget)
+			mFocusedWidget->setFocused(true);
+		requestRepaint();
+	}
+
+	void ListBox::setFocused(bool focused) {
+		Widget::setFocused(focused);
+		if(focused==false)
+			setFocusedWidget(NULL);
 	}
 
 	bool ListBox::pointerPressed(MAPoint2d p, int id) {
@@ -718,16 +715,25 @@ namespace MAUI {
 
 		setFocusedWidget(NULL);
 
-		int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
-		int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
+		p.x -= getTranslationX();
+		p.y -= getTranslationY();
+
+		setFocused(true);
+
 		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->focusableWidgetAt(xx, yy);
+			Widget *ret = (*it)->focusableWidgetAt(p.x, p.y);
 			if(ret) {
-				p.x = xx;
-				p.y = yy;
 				//MAUI_LOG("Found focusable!");
 				if(ret->pointerPressed(p, id)) {
-					setFocusedWidget(ret);
+					if(mFocused) {
+						setFocusedWidget(ret);
+					}
+					else { // if we apparently lost focus somewhere.. time to unset focus.
+						ret->setFocused(false); // it hasn't been set as focused yet (but it may have updated some internal state).
+						setFocusedWidget(NULL);
+						return true;
+					}
+
 					return true;
 				}
 				break;
@@ -745,8 +751,7 @@ namespace MAUI {
 			MAPoint2d pp =  {xx, yy};
 
 			if(!mFocusedWidget->pointerMoved(pp, id)) {
-				mFocusedWidget->setFocused(false);
-				mFocusedWidget = NULL;
+				setFocusedWidget(NULL);
 			}
 			return true;
 		}
@@ -774,8 +779,7 @@ namespace MAUI {
 			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
 			MAPoint2d pp =  {xx, yy};
 			mFocusedWidget->pointerReleased(pp, id);
-			mFocusedWidget->setFocused(false);
-			mFocusedWidget = NULL;
+			setFocusedWidget(NULL);
 			return false;
 		}
 
@@ -786,11 +790,11 @@ namespace MAUI {
 			mTouchedYOffset = mYOffset;
 			mTouchMotionTracker.addPoint(p);
 			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
-			//MAUI_LOG("velX: %f, velY: %f", mTouchVelX, mTouchVelY);
 		}
 		return false;
 	}
 
+	/*
 	Widget* ListBox::widgetAt(int x, int y) {
 		int xx = (mOrientation==LBO_HORIZONTAL)?(x-(mYOffset>>16)):x;
 		int yy = (mOrientation==LBO_VERTICAL)?(y-(mYOffset>>16)):y;
@@ -807,8 +811,10 @@ namespace MAUI {
 
 		return NULL;
 	}
+	*/
 
 
+	/*
 	Widget* ListBox::focusableWidgetAt(int x, int y) {
 		if(!isFocusable()) {
 			int xx = (mOrientation==LBO_HORIZONTAL)?(x-(mYOffset>>16)):x;
@@ -826,11 +832,26 @@ namespace MAUI {
 		}
 		return NULL;
 	}
+	*/
 
 	void ListBox::setEnabled(bool enabled) {
 		if(enabled==false) {
 			Environment::getEnvironment().removeTimer(this);
 		}
 		Widget::setEnabled(enabled);
+	}
+
+	int ListBox::getTranslationX() const {
+		if(mOrientation == LBO_HORIZONTAL)
+			return mYOffset>>16;
+		else
+			return 0;
+	}
+
+	int ListBox::getTranslationY() const {
+		if(mOrientation == LBO_VERTICAL)
+			return mYOffset>>16;
+		else
+			return 0;
 	}
 }

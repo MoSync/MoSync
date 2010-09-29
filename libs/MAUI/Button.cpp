@@ -11,17 +11,16 @@ Button::Button(int x, int y, int width, int height, Widget* parent, const String
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
-	//MAUI_LOG("Button pressed! %x", this);
 	mPressed = true;
 	mStartX = p.x;
 	mStartY = p.y;
 	ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, true));
 	requestRepaint();
+
 	return true;
 }
 
 bool Button::pointerMoved(MAPoint2d p, int id) {
-	//MAUI_LOG("Button moved! %x", this);
 	p.x-=mStartX;
 	p.y-=mStartY;
 
@@ -32,8 +31,6 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
 	if(!mPressed) return false;
-
-    //MAUI_LOG("Button released! %x", this);
 	mPressed = false;
 	//fireTriggered();
 	ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, false));
@@ -64,7 +61,7 @@ void Button::drawWidget() {
 		if(!mPressed) {
 			mSkinUnfocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
 		} else {
-			maPanic(1, "Something is wrong, can't be unfocused and pressed");
+			maPanic(1, "Something is wrong, button can't be unfocused and pressed");
 		}
 	}
 
@@ -99,7 +96,6 @@ void Button::setFocused(bool focused) {
 		mPressed = false;
 		// do not send onButtonEvent(this, false) event here (it's obviously been cancelled before released).
 	}
-
 	requestRepaint();
 }
 
