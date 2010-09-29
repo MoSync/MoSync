@@ -140,7 +140,9 @@ bool Slider::isTransparent() const {
 }
 
 void Slider::setFocused(bool focused) {
-	mPressed = focused;
+	Widget::setFocused(focused);
+	if(mPressed==true && focused == false)
+		mPressed = false;
 	requestRepaint();
 }
 

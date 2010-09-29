@@ -124,6 +124,17 @@ namespace MAUI {
 			if(res) {
 				if(isDirty() || forceDraw) {
 					drawWidget();
+
+#if 1
+					if(mFocused) {
+						maSetColor(0x00ff00);
+						Gfx_line(0, 0, mBounds.width-1, 0);
+						Gfx_line(mPaddedBounds.width-1, 0, mPaddedBounds.width-1, mPaddedBounds.height-1);
+						Gfx_line(0, mPaddedBounds.height-1, mPaddedBounds.width-1, mPaddedBounds.height-1);
+						Gfx_line(0, 0, 0, mPaddedBounds.height-1);
+
+					}
+#endif
 				}
 
 				Vector_each(Widget*, it, mChildren)
@@ -480,28 +491,77 @@ namespace MAUI {
 		return mChildren.size()==0;
 	}
 
+    bool isToDirectionOf(Direction direction, Rect src, Rect dest) {
+        switch (direction) {
+            case LEFT:
+                return src.x >= (dest.width+dest.x);
+            case RIGHT:
+                return (src.width+src.x) <= dest.x;
+            case UP:
+                return src.y >= (dest.height+dest.y);
+            case DOWN:
+                return (src.height+src.y) <= dest.y;
+        }
+        return false;
+    }
+
 
 	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
-		if(w1==NULL) return w2;
-		if(w2==NULL) return w1;
+		Rect rectThis = this->getBounds();
+
+		if(w1==NULL) {
+			if(w2) {
+				Rect rectW2 = w2->getBounds();
+				bool w2InDirection = isToDirectionOf(dir, rectThis, rectW2);
+				return w2InDirection?w2:NULL;
+			}
+			return NULL;
+		}
+		if(w2==NULL) {
+			if(w1) {
+				Rect rectW1 = w1->getBounds();
+				bool w1InDirection = isToDirectionOf(dir, rectThis, rectW1);
+				return w1InDirection?w1:NULL;
+			}
+			return NULL;
+		}
+
+		Rect rectW1 = w1->getBounds();
+		Rect rectW2 = w2->getBounds();
+
+		bool w1InDirection = isToDirectionOf(dir, rectThis, rectW1);
+		bool w2InDirection = isToDirectionOf(dir, rectThis, rectW2);
+		if(!w1InDirection && !w2InDirection) return NULL;
+		if(w1InDirection && !w2InDirection) return w1;
+		if(!w1InDirection && w2InDirection) return w2;
+
+		int distance1 = ((rectThis.x-rectW1.x)*(rectThis.x-rectW1.x)+(rectThis.y-rectW1.y)*(rectThis.y-rectW1.y));
+		int distance2 = ((rectThis.x-rectW2.x)*(rectThis.x-rectW2.x)+(rectThis.y-rectW2.y)*(rectThis.y-rectW2.y));
+		if(distance1<distance2) return w1;
+		else return w2;
+
+		/*
 		switch(dir) {
 			case LEFT:
-			{
-			}
-			break;
 			case RIGHT:
 			{
+				int distance1 = abs(rectThis.x - rectW1.x);
+				int distance2 = abs(rectThis.x - rectW2.x);
+				if(distance1<distance2) return w1;
+				else return w2;
 			}
 			break;
 			case UP:
-			{
-			}
-			break;
 			case DOWN:
 			{
+				int distance1 = abs(rectThis.y - rectW1.y);
+				int distance2 = abs(rectThis.y - rectW2.y);
+				if(distance1<distance2) return w1;
+				else return w2;
 			}
 			break;
 		}
+		*/
 
 		return NULL;
 	}
@@ -511,11 +571,15 @@ namespace MAUI {
 		for(int i = 0; i < mChildren.size(); i++) {
 			if(mChildren[i] == w) continue;
 			if(mChildren[i]->isFocusable()) {
-				best = w->nearestWidget(mChildren[i], best, dir);
+				Widget* candidate = w->nearestWidget(mChildren[i], best, dir);
+				if(candidate)
+					best = candidate;
 			} else {
 				Widget* ret = mChildren[i]->getNearestFocusableInDirectionFrom(w, dir, best);
 				if(ret) {
-					best = w->nearestWidget(ret, best, dir);
+					Widget* candidate = w->nearestWidget(ret, best, dir);
+					if(candidate)
+						best = candidate;
 				}
 			}
 		}
