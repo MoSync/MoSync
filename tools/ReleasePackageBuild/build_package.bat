@@ -158,7 +158,7 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @echo Copying example contacts.xml
 @echo ------------------------------------------------
-@xcopy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_ETC_PATH%\ /y /D
+@xcopy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
 @echo ------------------------------------------------
 @echo Running OpenGL Wrapper generator.

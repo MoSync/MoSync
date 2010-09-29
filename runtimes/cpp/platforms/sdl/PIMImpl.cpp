@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <vector>
 #include <map>
 #include <stdexcept>
+#include <fstream>
 
 using namespace MoSyncError;
 using namespace Base;
@@ -53,24 +54,41 @@ using namespace std;
 //******************************************************************************
 
 namespace ContactParser {
+	struct FIELD_NAME {
+		int id;
+		const char* name;
+	};
+
 	static void start(void *data, const char *el, const char **attr);
 	static void end(void *data, const char *el);
 	static void ATTRIBUTE(noreturn, error(const char* msg));
 }
 
 struct ContactValue {
+	const int type;
 	int attr;
 
 	virtual ~ContactValue() {}
-	ContactValue() : attr(0) {}
+	ContactValue(int t) : type(t), attr(0) {}
 	virtual int getValue(void* buf, int bufSize) const = 0;
+	virtual void saveValue(ostream& stream) const = 0;
+	void save(ostream& stream) const;
 };
 
 template<class T> struct TContactValue : ContactValue {
+	TContactValue(int t) : ContactValue(t) {}
 	T mValue;
 
 	int getValue(void* buf, int bufSize) const;
+	void saveValue(ostream& stream) const;
 };
+
+struct StringArray {
+	const ContactParser::FIELD_NAME* fnp;
+	int nNames;	// number of entries in array pointed to by fnp.
+	vector<wstring> sa;
+};
+
 
 template<>
 int TContactValue<int>::getValue(void* buf, int bufSize) const {
@@ -78,6 +96,30 @@ int TContactValue<int>::getValue(void* buf, int bufSize) const {
 		return sizeof(int);
 	*(int*)buf = mValue;
 	return sizeof(int);
+}
+
+static void streamDateTime(ostream& stream, int time) {
+	char buf[64];
+	time_t t = time;
+	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", localtime(&t));
+	stream << buf;
+}
+
+template<>
+void TContactValue<int>::saveValue(ostream& stream) const {
+	stream << " value=\"";
+	switch(type) {
+	case MA_PIM_TYPE_INT:
+		stream << mValue;
+		break;
+	case MA_PIM_TYPE_DATE:
+		streamDateTime(stream, mValue);
+		break;
+	default:
+		DEBIG_PHAT_ERROR;
+	}
+	
+	stream <<"\"";
 }
 
 // no bounds check. converts any wchar_t to 16-bit wchar, which MoSync uses.
@@ -98,22 +140,69 @@ int TContactValue<wstring>::getValue(void* buf, int bufSize) const {
 	return size;
 }
 
+// converts wide-char to utf-8 on the fly.
+static ostream& operator<<(ostream& stream, const wstring& src) {
+	for(size_t i=0; i<src.size(); i++) {
+		wchar_t w = src[i];
+		if(w <= 0x7f) {
+			stream << (char)w;
+		} else if(w <= 0x7ff) {
+			stream << (0xc0 | ((w >> 6) & 0x1f));
+			stream << (0x80 | (w & 0x3f));
+		} else
+#if WCHAR_MAX > 0xffff
+			if(w <= 0xffff)
+#endif
+		{
+			stream << (0xe0 | ((w >> 12) & 0x0f));
+			stream << (0x80 | ((w >> 6) & 0x3f));
+			stream << (0x80 | (w & 0x3f));
+#if WCHAR_MAX > 0xffff
+		} else if(w <= 0x10ffff) {
+			stream << (0xf0 | ((w >> 18) & 0x07));
+			stream << (0x80 | ((w >> 12) & 0x3f));
+			stream << (0x80 | ((w >> 6) & 0x3f));
+			stream << (0x80 | (w & 0x3f));
+		} else {
+			DEBIG_PHAT_ERROR;
+#endif
+		}
+	}
+	return stream;
+}
+
 template<>
-int TContactValue<vector<wstring> >::getValue(void* buf, int bufSize) const {
+void TContactValue<wstring>::saveValue(ostream& stream) const {
+	stream << " value=\""<<mValue<<"\"";
+}
+
+template<>
+int TContactValue<StringArray>::getValue(void* buf, int bufSize) const {
+	const vector<wstring>& sa(mValue.sa);
 	int size = sizeof(int);
-	for(size_t i=0; i<mValue.size(); i++) {
-		size += (mValue[i].length() + 1) * sizeof(wchar);
+	for(size_t i=0; i<sa.size(); i++) {
+		size += (sa[i].length() + 1) * sizeof(wchar);
 	}
 	if(bufSize < size)
 		return size;
-	*(int*)buf = mValue.size();
+	*(int*)buf = sa.size();
 	wchar* dst = (wchar*)((byte*)buf + sizeof(int));
 	memset(dst, -1, bufSize-4);	//temp
-	for(size_t i=0; i<mValue.size(); i++) {
-		wstringCpy(dst, mValue[i]);
-		dst += mValue[i].length() + 1;
+	for(size_t i=0; i<sa.size(); i++) {
+		wstringCpy(dst, sa[i]);
+		dst += sa[i].length() + 1;
 	}
 	return size;
+}
+
+template<>
+void TContactValue<StringArray>::saveValue(ostream& stream) const {
+	const vector<wstring>& sa(mValue.sa);
+	DEBUG_ASSERT(sa.size() == mValue.nNames);
+	for(size_t i=0; i<sa.size(); i++) {
+		if(!sa[i].empty())
+			stream << " "<<mValue.fnp[i].name<<"=\""<<sa[i]<<"\"";
+	}
 }
 
 class ContactItem : public PimItem {
@@ -169,6 +258,8 @@ public:
 		mFields.clear();
 	}
 
+	void save(ostream& stream) const;
+
 	// todo: change to unordered_map when it becomes available across platforms.
 	// key: fieldId
 	typedef map<int, vector<ContactValue*> > FieldMap;
@@ -204,6 +295,16 @@ public:
 			delete mItems[i];
 		}
 	}
+	bool save(const string& fn) {
+		ofstream stream(fn.c_str());
+		stream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+		stream << "<contacts>\n";
+		for(size_t i=0; i<mItems.size(); i++) {
+			mItems[i]->save(stream);
+		}
+		stream << "</contacts>\n";
+		return stream.good();
+	}
 	virtual PimItem* next() {
 		if(mPos >= mItems.size())
 			return NULL;
@@ -219,11 +320,6 @@ public:
 };
 
 namespace ContactParser {
-	struct FIELD_NAME {
-		int id;
-		const char* name;
-	};
-
 	static ContactList* sCL = NULL;
 	static ContactItem* sCI = NULL;
 
@@ -249,11 +345,13 @@ namespace ContactParser {
 
 	// We can't handle binaries yet. Class is also useless at this point.
 	static const FIELD_NAME sFieldNames[] = {
+		{ MA_PIM_FIELD_CONTACT_ADDR, "addr" },
 		{ MA_PIM_FIELD_CONTACT_BIRTHDAY, "birthday" },
 		//{ MA_PIM_FIELD_CONTACT_CLASS, "class" },
 		{ MA_PIM_FIELD_CONTACT_EMAIL, "email" },
 		{ MA_PIM_FIELD_CONTACT_FORMATTED_ADDR, "formatted_addr" },
 		{ MA_PIM_FIELD_CONTACT_FORMATTED_NAME, "formatted_name" },
+		{ MA_PIM_FIELD_CONTACT_NAME, "name" },
 		{ MA_PIM_FIELD_CONTACT_NICKNAME, "nickname" },
 		{ MA_PIM_FIELD_CONTACT_NOTE, "note" },
 		{ MA_PIM_FIELD_CONTACT_ORG, "org" },
@@ -369,9 +467,9 @@ namespace ContactParser {
 	}
 
 	template<class T> static ContactValue* attrT(void (*parse)(T&, const char*),
-		const char** attr)
+		const char** attr, int type)
 	{
-		Smartie<TContactValue<T> > v(new TContactValue<T>);
+		Smartie<TContactValue<T> > v(new TContactValue<T>(type));
 		bool valueSet = false, attrSet = false;
 		while(*attr != NULL) {
 			const char* name = *(attr++);
@@ -393,9 +491,12 @@ namespace ContactParser {
 	}
 
 	static ContactValue* parseStringArray(const FIELD_NAME* fnp, int nNames, const char** attr) {
-		Smartie<TContactValue<vector<wstring> > > v(new TContactValue<vector<wstring> >);
+		Smartie<TContactValue<StringArray> > v(new TContactValue<StringArray>(MA_PIM_TYPE_STRING));
+		vector<wstring>& sa(v->mValue.sa);
 		vector<bool> valueSet(nNames, false);
-		v->mValue.resize(nNames);
+		v->mValue.fnp = fnp;
+		v->mValue.nNames = nNames;
+		sa.resize(nNames);
 		bool attrSet = false;
 		// iterate through an element's attributes
 		while(*attr != NULL) {
@@ -425,7 +526,7 @@ namespace ContactParser {
 				}
 				valueSet[field] = true;
 				// convert the string
-				parseString(v->mValue[field], value);
+				parseString(sa[field], value);
 			}
 		}
 		return v.extract();
@@ -454,13 +555,13 @@ namespace ContactParser {
 			int type = sCL->type(field);
 			switch(type) {
 			case MA_PIM_TYPE_DATE:
-				v = attrT(&parseDate, attr);
+				v = attrT(&parseDate, attr, type);
 				break;
 			case MA_PIM_TYPE_INT:
-				v = attrT(&parseInt, attr);
+				v = attrT(&parseInt, attr, type);
 				break;
 			case MA_PIM_TYPE_STRING:
-				v = attrT(&parseString, attr);
+				v = attrT(&parseString, attr, type);
 				break;
 			case MA_PIM_TYPE_STRING_ARRAY:
 			case MA_PIM_TYPE_BINARY:
@@ -511,6 +612,53 @@ namespace ContactParser {
 	}
 }
 
+
+
+void ContactItem::save(ostream& stream) const {
+	stream << "\t<contact>\n";
+	FieldMap::const_iterator itr = mFields.begin();
+	for(; itr != mFields.end(); itr++) {
+		const char* fieldName = NULL;
+		for(int i=0; i<ContactParser::snFieldNames; i++) {
+			const ContactParser::FIELD_NAME& fn(ContactParser::sFieldNames[i]);
+			if(fn.id == itr->first) {
+				fieldName = fn.name;
+				break;
+			}
+		}
+		// Quietly drop unknown fields; we have no way to represent or parse them yet.
+		if(fieldName == NULL)
+			continue;
+
+		const vector<ContactValue*>& vcv(itr->second);
+		for(size_t j=0; j<vcv.size(); j++) {
+			stream << "\t\t<"<<fieldName;
+			vcv[j]->save(stream);
+			stream << " />\n";
+		}
+	}
+	stream << "\t</contact>\n";
+}
+
+void ContactValue::save(ostream& stream) const {
+	saveValue(stream);
+	if(this->attr != 0) {
+		stream << " attr=\"";
+		bool first = true;
+		for(int i=0; i<ContactParser::snAttributes; i++) {
+			if(attr & ContactParser::sAttributes[i].id) {
+				if(first) {
+					first = false;
+				} else {
+					stream << ",";
+				}
+				stream << ContactParser::sAttributes[i].name;
+			}
+		}
+		stream << "\"";
+	}
+}
+
 //******************************************************************************
 // Syscalls
 //******************************************************************************
@@ -523,12 +671,21 @@ MAHandle Syscall::maPimListOpen(int listType) {
 		string fn = mosyncDir + "/etc/contacts.xml";
 		bool res = cl->open(fn);
 		if(!res) {
-#if 0
-			// todo: copy default contacts file.
-
-			res = cl->open(fn);
+			// default contacts file
 			LOG("Cannot read %s\n", fn.c_str());
-#endif
+			string ofn = mosyncDir + "/bin/default_contacts.xml";
+			res = cl->open(ofn);
+			if(!res) {
+				LOG("Cannot read %s\n", ofn.c_str());
+			} else {
+				// save a copy
+				res = cl->save(fn);
+				if(!res) {
+					LOG("Cannot write %s\n", fn.c_str());
+				}
+			}
+		}
+		if(!res) {
 			delete cl;
 			ContactParser::sCL = NULL;
 			SAFE_DELETE(ContactParser::sCI);
