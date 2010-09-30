@@ -722,9 +722,6 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 {
 	int const_subst;
 
-	//if ((CodeIP == 0x52) && (pass_count == 30))
-		//printf("");
-
 	// Get the dest reg
 
 	imm = FindVar(0);				// set imm as preset zero
