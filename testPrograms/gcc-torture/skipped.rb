@@ -20,6 +20,7 @@ SKIPPED = [
 'nestfunc-1.c', #no.trampolines
 'nestfunc-2.c', #no.trampolines
 'nestfunc-3.c', #no.trampolines
+'nestfunc-4.c', #no.nested.functions, please
 'nestfunc-5.c', #no.trampolines
 'nestfunc-6.c', #todo.qsort
 'bitfld-1.c', #fails.on.purpose
