@@ -198,7 +198,7 @@ int TContactValue<StringArray>::getValue(void* buf, int bufSize) const {
 template<>
 void TContactValue<StringArray>::saveValue(ostream& stream) const {
 	const vector<wstring>& sa(mValue.sa);
-	DEBUG_ASSERT(sa.size() == mValue.nNames);
+	DEBUG_ASSERT((int)sa.size() == mValue.nNames);
 	for(size_t i=0; i<sa.size(); i++) {
 		if(!sa[i].empty())
 			stream << " "<<mValue.fnp[i].name<<"=\""<<sa[i]<<"\"";
