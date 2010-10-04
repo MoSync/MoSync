@@ -105,6 +105,8 @@ namespace Bluetooth
              * @param a     Structure to fill
              */
             virtual int getAddr ( MAConnAddr& a );
+	    
+	    virtual bool isConnected();
         };
     }
 }
