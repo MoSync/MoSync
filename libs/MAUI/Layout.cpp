@@ -457,4 +457,8 @@ namespace MAUI {
 		if(mSelectedIndex -1 >= 0) mSelectedIndex--;
 		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
 	}
+
+	void Layout::focusChanged(Widget *widget, bool focused) {
+		setFocused(focused);
+	}
 }

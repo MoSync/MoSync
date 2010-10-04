@@ -365,6 +365,13 @@ namespace MAUI {
 
 			virtual int getTranslationX() const;
 			virtual int getTranslationY() const;
+
+			/**
+			 * Sets a pointer to some user specified data (it is convenient to use this as an identifier for the widget).
+			 */
+			void setUserData(void *userData);
+			void* getUserData();
+
 	protected:
 			Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
 			Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
@@ -445,6 +452,8 @@ namespace MAUI {
 
 		WidgetSkin *mFocusedSkin;
 		WidgetSkin *mUnfocusedSkin;
+
+		void* mUserData;
 
 private:
 		const Style* mStyle;

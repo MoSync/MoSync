@@ -85,7 +85,8 @@ namespace MAUI {
 		mSelectedIndex(0),
 		mAutoSize(false),
 		mTouched(false),
-		mFocusedWidget(NULL) {
+		mFocusedWidget(NULL),
+		mItemSelectedListeners(false) {
 		requestRepaint();
 	}
 
@@ -101,7 +102,8 @@ namespace MAUI {
 		mSelectedIndex(0),
 		mAutoSize(false),
 		mTouched(false),
-		mFocusedWidget(NULL) {
+		mFocusedWidget(NULL),
+		mItemSelectedListeners(false) {
 		requestRepaint();
 	}
 
@@ -395,15 +397,25 @@ namespace MAUI {
 		mItemSelectedListeners.add(listener);
 	}
 
+	void ListBox::removeItemSelectedListener(ItemSelectedListener *listener) {
+		mItemSelectedListeners.remove(listener);
+	}
+
+
 	void ListBox::setSelectedIndex(int selectedIndex) {
 		if(selectedIndex < 0 || selectedIndex >= mChildren.size()) {
 			maPanic(0, "ListBox::setSelectedIndex, index out of bounds");
 		}
 
 		if(selectedIndex == this->mSelectedIndex) {
+			/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]);
 			}
+			*/
+			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]));
+
+
 			return;
 		}
 
@@ -424,9 +436,13 @@ namespace MAUI {
 		Widget *selectedWidget = mChildren[this->mSelectedIndex];
 		selectedWidget->setFocused(true);
 
+		/*
 		Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 			(*i)->itemSelected(this, selectedWidget, unselectedWidget);
 		}
+		*/
+		ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, selectedWidget, unselectedWidget));
+
 
 		requestRepaint();
 	}
@@ -468,9 +484,13 @@ namespace MAUI {
 			mSelectedIndex = 0;
 			if(!mWrapping) {
 				if(shouldFireListeners) {
+					/*
 					Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 						(*i)->blocked(this, -1);
 					}
+					*/
+					ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, blocked(this, -1));
+
 				}
 			} else {
 				setSelectedIndex(mChildren.size()-1);
@@ -509,9 +529,12 @@ namespace MAUI {
 		}
 
 		if(shouldFireListeners) {
+			/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, c, unselectedWidget);
 			}
+			*/
+			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, c, unselectedWidget));
 		}
 
 		requestRepaint();
@@ -528,9 +551,12 @@ namespace MAUI {
 		} else {
 			if(!mWrapping) {
 				if(shouldFireListeners) {
+					/*
 					Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 						(*i)->blocked(this, 1);
 					}
+					*/
+					ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, blocked(this, 1));
 				}
 			} else {
 				setSelectedIndex(0);
@@ -582,9 +608,12 @@ namespace MAUI {
 		}
 
 		if(shouldFireListeners) {
+		/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, c, unselectedWidget);
 			}
+		*/
+			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, c, unselectedWidget));
 		}
 
 		requestRepaint();
@@ -602,7 +631,10 @@ namespace MAUI {
 			double offsetX = (scalar*mTouchVelX*0.4);//mTouchVelX*(1.0-friction)+(touchVelX)*time;
 			double offsetY = (scalar*mTouchVelY*0.4); //mTouchVelY*(1.0-friction)+(touchVelY)*time;
 
-			if(scalar>0.95) Environment::getEnvironment().removeTimer(this);
+			if(scalar>0.95) {
+				mTouched = false;
+				Environment::getEnvironment().removeTimer(this);
+			}
 
 			if(mOrientation == LBO_HORIZONTAL) {
 				setScrollOffset((mTouchedYOffset + (int)(65536.0*(offsetX)))>>16);
@@ -854,4 +886,16 @@ namespace MAUI {
 		else
 			return 0;
 	}
+
+	void ListBox::focusChanged(Widget *widget, bool focused) {
+		if(!mTouched && focused) {
+			for(int i = 0; i < mChildren.size(); i++) {
+				if(mChildren[i] == widget) {
+					setSelectedIndex(i);
+					return;
+				}
+			}
+		}
+	}
+
 }

@@ -48,7 +48,8 @@ namespace MAUI {
 			mFocusedSkin(NULL),
 			mUnfocusedSkin(NULL),
 			mStyle(NULL),
-			mWidgetListeners(false)
+			mWidgetListeners(false),
+			mUserData(NULL)
 		{
 		mInputPolicy = new DefaultInputPolicy(this);
 		if(parent) {
@@ -643,6 +644,14 @@ namespace MAUI {
 		setPaddingTop(mStyle->getSafe<IntegerProperty>("paddingTop")->mValue);
 		setPaddingBottom(mStyle->getSafe<IntegerProperty>("paddingBottom")->mValue);
 		//MAUI_LOG("skins: %x, %x", mFocusedSkin, mUnfocusedSkin);
+	}
+
+	void Widget::setUserData(void *userData) {
+		mUserData = userData;
+	}
+
+	void* Widget::getUserData() {
+		return mUserData;
 	}
 
 }

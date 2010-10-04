@@ -119,6 +119,7 @@ namespace MAUI {
 		void selectPreviousItem(bool shouldFireListeners=true);
 		/** Adds a item selection listener **/
 		void addItemSelectedListener(ItemSelectedListener *listener);
+		void removeItemSelectedListener(ItemSelectedListener *listener);
 		/** Specifies which item in the ListBox should be selected **/
 		void setSelectedIndex(int selectedIndex);
 		/** Sets the orientation of the ListBox **/
@@ -172,10 +173,11 @@ namespace MAUI {
 		void drawWidget();
 		void rebuild();
 		void boundsChanged(Widget *widget, const Rect& bounds);
+		void focusChanged(Widget *widget, bool focused);
 
 		bool mMustRebuild;
 
-		Vector<ItemSelectedListener*> mItemSelectedListeners;
+		ListenerSet<ItemSelectedListener> mItemSelectedListeners;
 		bool mWrapping;
 		ListBoxAnimationType mAnimationType;
 

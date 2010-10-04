@@ -154,6 +154,9 @@ namespace MAUI {
 
 		//WidgetListener
 		void boundsChanged(Widget *widget, const Rect& bounds);
+
+		void focusChanged(Widget *widget, bool focused);
+
 	};
 
 }
