@@ -9,7 +9,8 @@ def setup_common
 	
 	if(HOST == :win32) then
 		@CUSTOM_LIBS = common_libraries.collect do |lib| "#{lib}.lib" end +
-			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib"]
+			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib",
+				"libeay32.lib", "ssleay32.lib"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
 		@LOCAL_DLLS = ["amr"]
 		@EXTRA_INCLUDES = ["../../../base", ".."]
@@ -28,12 +29,13 @@ def setup_common
 		if(FULLSCREEN == "true")
 			@EXTRA_CPPFLAGS += " -D__USE_FULLSCREEN__"
 		end
-		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage"]
+		@LIBRARIES = common_libraries + sound_lib + ["gtk-x11-2.0", "bluetooth", "expat", "freeimage",
+			"ssl", "crypto"]
 		@EXTRA_INCLUDES = ["../../../base", ".."]
 	
 	elsif(HOST == :darwin)
 		@LOCAL_LIBS << "amr"
-		@LIBRARIES = common_libraries + ["SDL_sound", "SDLmain", "expat", "freeimage"]
+		@LIBRARIES = common_libraries + ["SDL_sound", "SDLmain", "expat", "freeimage", "ssl", "crypto"]
 		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
 	else
 		error "Unsupported platform"

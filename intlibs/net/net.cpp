@@ -312,7 +312,7 @@ ProtocolUrlParseResult parseProtocolURL(const char *parturl, u16 *port,
 //******************************************************************************
 
 ProtocolConnection::ProtocolConnection(Connection* transport, const std::string& path) :
-mTransport(transport), mState(SETUP), mPath(path), mPos(0), mSize(0),
+mState(SETUP), mTransport(transport), mPath(path), mPos(0), mSize(0),
 mHeadersSent(false)
 {
 	//spaces are not allowed in URLs.
