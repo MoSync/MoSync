@@ -25,13 +25,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 
 #define BUFSIZE 1024
+#define EXAMPLE_URL "http://www.example.com/"
+#define SECURE_URL "https://secure.wikimedia.org/"
 
 class MyMoblet : public Moblet, private HttpConnectionListener {
 public:
 	MyMoblet() : mHttp(this) {
-		printf("Hello World!\n");
+		start(EXAMPLE_URL);
+	}
+	
+	void start(const char* url) {
+		printf("Connecting...\n");
 
-		int res = mHttp.create("http://www.example.com/", HTTP_GET);
+		mHttp.close();
+		int res = mHttp.create(url, HTTP_GET);
 		if(res < 0) {
 			printf("http.create fail %i\n", res);
 		} else {
@@ -41,8 +48,9 @@ public:
 
 	virtual void httpFinished(HttpConnection* http, int result) {
 		printf("HTTP %i\n", result);
-		if(result <= 0)
+		if(result <= 0) {
 			return;
+		}
 		String cl;
 		int res = mHttp.getResponseHeader("content-length", &cl);
 		printf("cl code %i\n", res);
@@ -51,8 +59,8 @@ public:
 			printf("cl: %s\n", cl.c_str());
 			int len = atoi(cl.c_str());
 			if(len >= BUFSIZE) {
-				printf("Buffer too small, can't read.\n");
-				return;
+				printf("Buffer too small, can't read everything.\n");
+				len = BUFSIZE-1;
 			}
 			mBuffer[len] = 0;
 			mHttp.read(mBuffer, len);
@@ -65,6 +73,14 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0 || keyCode == MAK_SOFTRIGHT)
 			maExit(0);
+		if(keyCode == MAK_FIRE)
+			start(EXAMPLE_URL);
+		if(keyCode == MAK_1 || keyCode == MAK_SOFTLEFT)
+			start(SECURE_URL);
+	}
+	
+	void pointerPressEvent(MAPoint2d p) {
+		start(EXAMPLE_URL);
 	}
 
 private:

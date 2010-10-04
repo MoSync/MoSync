@@ -213,6 +213,10 @@ int TcpConnection::connect() {
 	return result;
 }
 
+bool TcpConnection::isConnected() {
+	return mSock != INVALID_SOCKET;
+}
+
 int TcpConnection::getAddr(MAConnAddr& addr) {
 	if(mSock == INVALID_SOCKET)
 		return CONNERR_GENERIC;
@@ -273,10 +277,9 @@ int atoiLen(const char* str, int len) {
 }
 
 
-ProtocolUrlParseResult parseProtocolURL(const char *protocol, const char *url, u16 *port,
+ProtocolUrlParseResult parseProtocolURL(const char *parturl, u16 *port,
 										u16 defaultPort, const char **path, std::string &address)
 {
-	const char* parturl = url + strlen(protocol);
 	const char* port_m1 = strchr(parturl, ':');
 	*path = strchr(parturl, '/');
 	if(*path == NULL) {
@@ -304,33 +307,39 @@ ProtocolUrlParseResult parseProtocolURL(const char *protocol, const char *url, u
 	return SUCCESS;
 }
 
-//returns >0 or CONNERR.
-int httpCreateConnection(const char* url, HttpConnection*& conn, int method) {
-	u16 port;
-	const char *path;
-	std::string hostname;
-	if(parseProtocolURL(http_string, url, &port, 80, &path, hostname)!=SUCCESS) return CONNERR_URL;
-	conn = new HttpConnection(hostname, port, path, method);
-	return 1;
-}
-
 //******************************************************************************
 // ProtocolConnection proper
 //******************************************************************************
 
-ProtocolConnection::ProtocolConnection(const std::string& hostname, u16 port,
-	const std::string& path) :
-TcpConnection(hostname, port), mState(SETUP), mPath(path), mPos(0), mSize(0),
+ProtocolConnection::ProtocolConnection(Connection* transport, const std::string& path) :
+mTransport(transport), mState(SETUP), mPath(path), mPos(0), mSize(0),
 mHeadersSent(false)
 {
 	//spaces are not allowed in URLs.
 	MYASSERT(mPath.find(' ') == mPath.npos, ERR_URL_SPACE);
 }
 
+ProtocolConnection::~ProtocolConnection() {
+	close();
+}
+
+void ProtocolConnection::close() {
+	if(mTransport)
+		delete mTransport;
+}
+
+int ProtocolConnection::getAddr(MAConnAddr& addr) {
+	return mTransport->getAddr(addr);
+}
+
 int ProtocolConnection::connect() {
-	TLTZ_PASS(TcpConnection::connect());
+	TLTZ_PASS(mTransport->connect());
 	TLTZ_PASS(sendHeaders());
 	return readHeaders();
+}
+
+bool ProtocolConnection::isConnected() {
+	return mTransport->isConnected();
 }
 
 int ProtocolConnection::finish() {
@@ -346,8 +355,8 @@ std::string ProtocolConnection::pathString() {
 }
 
 int ProtocolConnection::sendHeaders() {
-	if(mSock == INVALID_SOCKET) {
-		TLTZ_PASS(TcpConnection::connect());
+	if(!mTransport->isConnected()) {
+		TLTZ_PASS(mTransport->connect());
 	}
 
 	//start jabbering
@@ -360,7 +369,7 @@ int ProtocolConnection::sendHeaders() {
 	}
 
 	outdata += "\r\n";
-	TLTZ_PASS(TcpConnection::write(outdata.c_str(), outdata.length()));
+	TLTZ_PASS(mTransport->write(outdata.c_str(), outdata.length()));
 	mHeadersSent = true;
 	return 1;
 }
@@ -452,7 +461,7 @@ int ProtocolConnection::readLine(const char*& lineP) {
 		}
 
 		int res;
-		TLTZ_PASS(res = TcpConnection::read(mBuffer + mPos, sizeof(mBuffer) - mPos));
+		TLTZ_PASS(res = mTransport->read(mBuffer + mPos, sizeof(mBuffer) - mPos));
 		mSize += res;
 		mBuffer[mSize] = 0;	//for string functions
 	}
@@ -465,7 +474,7 @@ int ProtocolConnection::read(void* dst, int max) {
 		mPos += len;
 		return len;
 	} else {	//we gotta read from outside
-		return TcpConnection::read(dst, max);
+		return mTransport->read(dst, max);
 	}
 }
 
@@ -473,7 +482,7 @@ int ProtocolConnection::write(const void* src, int len) {
 	if(!mHeadersSent) {
 		TLTZ_PASS(sendHeaders());
 	}
-	return TcpConnection::write(src, len);
+	return mTransport->write(src, len);
 }
 
 void ProtocolConnection::SetRequestHeader(std::string key, const std::string& value) {
@@ -498,11 +507,11 @@ const std::string* ProtocolConnection::GetResponseHeader(std::string key) const 
 // HttpConnection
 //******************************************************************************
 
-HttpConnection::HttpConnection(const std::string& hostname, u16 port, const std::string& path,
-							   int method) :
-ProtocolConnection(hostname, port, path), mMethod(method)
+HttpConnection::HttpConnection(Connection* transport, const std::string& hostname,
+	const std::string& path, int method) :
+ProtocolConnection(transport, path), mMethod(method)
 {
-	SetRequestHeader("Host", mHostname);
+	SetRequestHeader("Host", hostname);
 	SetRequestHeader("Connection", "close");
 }
 

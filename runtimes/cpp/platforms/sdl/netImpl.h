@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NETIMPL_H
 
 #include <SDL/SDL.h>
+#include <openssl/ssl.h>
 
 #include "net/net.h"
 
@@ -35,5 +36,19 @@ private:
 };
 
 typedef unsigned short Uint16;
+
+class SslConnection : public TcpConnection {
+public:
+	SslConnection(const std::string& hostname, u16 port)
+		: TcpConnection(hostname, port), mState(eIdle) {}
+	virtual ~SslConnection();
+	virtual int connect();
+	virtual int read(void* dst, int max);
+	virtual int write(const void* src, int len);
+	virtual void close();
+private:
+	SSL* mSession;
+	enum State { eIdle, eInit, eHandshook } mState;
+};
 
 #endif	//NETIMPL_H

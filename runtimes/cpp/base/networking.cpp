@@ -44,6 +44,7 @@ void MANetworkInit() {
 	gpThreadPool = new ThreadPool;
 	gpConnections = new ConnMap;
 	gConnMutex.init();
+	MANetworkSslInit();
 }
 
 void MANetworkReset() {
@@ -60,6 +61,7 @@ void MANetworkReset() {
 
 void MANetworkClose() {
 	MANetworkReset();
+	MANetworkSslClose();
 
 	gThreadPool.close();
 	gConnMutex.close();
@@ -95,8 +97,13 @@ int rtspCreateConnection(const char* url, RtspConnection*& conn) {
 	Uint16 port;
 	const char *path;
 	std::string hostname;
-	if(parseProtocolURL(rtsp_string, url, &port, 554, &path, hostname)!=SUCCESS) return CONNERR_URL;
-	conn = new RtspConnection(hostname, port, path);
+	if(sstrcmp(url, rtsp_string) == 0) {
+		const char* parturl = url + sizeof(rtsp_string) - 1;
+		if(parseProtocolURL(parturl, &port, 554, &path, hostname)!=SUCCESS) return CONNERR_URL;
+		conn = new RtspConnection(hostname, port, path);
+	} else {
+		return CONNERR_URL;
+	}
 	return 1;
 }
 
@@ -114,7 +121,8 @@ int rtspCreateConnection(const char* url, RtspConnection*& conn) {
 #define RTSP_TEARDOWN 5
 
 RtspConnection::RtspConnection(const std::string& hostname, Uint16 port, const std::string& path) :
-ProtocolConnection(hostname, port, path), mMethod(RTSP_INITIAL), CSeq(1), gotSessionId(false)
+ProtocolConnection(new TcpConnection(hostname, port), path), mMethod(RTSP_INITIAL),
+CSeq(1), gotSessionId(false)
 {
 	methodMutex.init();
 }
@@ -348,6 +356,52 @@ void RtspConnection::run() {
 }
 
 //******************************************************************************
+//socket creation helpers
+//******************************************************************************
+
+static Connection* newSocketConnection(const std::string& hostname, int port, bool ssl) {
+	if(ssl) {
+		return new SslConnection(hostname, port);
+	} else {
+		return new TcpConnection(hostname, port);
+	}
+}
+
+//returns >0 or CONNERR.
+static int createSocketConnection(const char* parturl, Connection*& conn, bool ssl) {
+	const char* port_m1 = strchr(parturl, ':');
+	if(!port_m1) {
+		return CONNERR_URL;
+	}
+	std::string hostname(parturl, size_t(port_m1 - parturl));
+	int port = atoi(port_m1 + 1);
+	if(port <= 0 || port >= 1 << 16) {
+		return CONNERR_URL;
+	}
+	conn = newSocketConnection(hostname, port, ssl);
+	return 1;
+}
+
+//returns >0 or CONNERR.
+static int httpCreateConnection(const char* parturl, HttpConnection*& conn, int method, bool ssl) {
+	u16 port;
+	const char *path;
+	std::string hostname;
+	if(parseProtocolURL(parturl, &port, ssl ? 443 : 80, &path, hostname)!=SUCCESS) return CONNERR_URL;
+	Connection* transport = newSocketConnection(hostname, port, ssl);
+	conn = new HttpConnection(transport, hostname, path, method);
+	return 1;
+}
+
+static int httpCreateFinishingGetConnection(const char* parturl, Connection*& conn, bool ssl) {
+	HttpConnection* http;
+	TLTZ_PASS(httpCreateConnection(parturl, http, HTTP_GET, ssl));
+	http->mState = HttpConnection::FINISHING;
+	conn = http;
+	return 1;
+}
+
+//******************************************************************************
 //Proper syscalls
 //******************************************************************************
 
@@ -357,29 +411,24 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		return CONNERR_MAX;
 	Connection* conn;
 	if(sstrcmp(url, http_string) == 0) {
-		HttpConnection* http;
-		TLTZ_PASS(httpCreateConnection(url, http, HTTP_GET));
-		http->mState = HttpConnection::FINISHING;
-		conn = http;
+		const char* parturl = url + sizeof(http_string) - 1;
+		TLTZ_PASS(httpCreateFinishingGetConnection(parturl, conn, false));
+	} else if(sstrcmp(url, https_string) == 0) {
+		const char* parturl = url + sizeof(https_string) - 1;
+		TLTZ_PASS(httpCreateFinishingGetConnection(parturl, conn, true));
 	} else if(sstrcmp(url, socket_string) == 0) {
-		//allowed forms:
-		// socket://
-		// socket://:%i
-		// socket://%s:%i
-		//only the last one is useful/used for now.
+		//possible forms:
+		// socket://	# server on random port
+		// socket://:%i	# server on specified port
+		// socket://%s:%i	# client
+		//only the last one is allowed for now.
 
 		//extract address and port
 		const char* parturl = url + sizeof(socket_string) - 1;
-		const char* port_m1 = strchr(parturl, ':');
-		if(!port_m1) {
-			return CONNERR_URL;
-		}
-		std::string hostname(parturl, size_t(port_m1 - parturl));
-		int port = atoi(port_m1 + 1);
-		if(port <= 0 || port >= 1 << 16) {
-			return CONNERR_URL;
-		}
-		conn = new TcpConnection(hostname, port);
+		TLTZ_PASS(createSocketConnection(parturl, conn, false));
+	} else if(sstrcmp(url, ssl_string) == 0) {
+		const char* parturl = url + sizeof(ssl_string) - 1;
+		TLTZ_PASS(createSocketConnection(parturl, conn, true));
 	} else if(sstrcmp(url, btspp_string) == 0) {
 		//allowed forms:
 		// btspp://localhost:%32x
@@ -594,7 +643,11 @@ SYSCALL(MAHandle, maHttpCreate(const char* url, int method)) {
 		return CONNERR_MAX;
 	HttpConnection* conn;
 	if(sstrcmp(url, http_string) == 0) {
-		TLTZ_PASS(httpCreateConnection(url, conn, method));
+		const char* parturl = url + sizeof(http_string) - 1;
+		TLTZ_PASS(httpCreateConnection(parturl, conn, method, false));
+	} else if(sstrcmp(url, https_string) == 0) {
+		const char* parturl = url + sizeof(https_string) - 1;
+		TLTZ_PASS(httpCreateConnection(parturl, conn, method, true));
 	} else {
 		return CONNERR_URL;
 	}

@@ -48,6 +48,8 @@ void DefluxBinPushEvent(MAHandle handle, Stream& s);
 namespace Base {
 	bool MAProcessEvents();
 }
+void MANetworkSslInit();
+void MANetworkSslClose();
 
 //***************************************************************************
 //Variables

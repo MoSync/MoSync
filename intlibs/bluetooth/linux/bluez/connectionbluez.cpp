@@ -148,6 +148,10 @@ int BtSppConnectionBluez::write ( const void* src, int len )
         return res;
 }
 
+bool BtSppConnectionBluez::isConnected() {
+	return mSocket != INVALID_SOCKET;
+}
+
 /**
  * Closes any open connections
  *
