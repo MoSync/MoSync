@@ -159,6 +159,7 @@ namespace MAUI {
 		virtual bool pointerPressed(MAPoint2d p, int id);
 		virtual bool pointerMoved(MAPoint2d p, int id);
 		virtual bool pointerReleased(MAPoint2d p, int id);
+		virtual bool keyPressed(int keyCode, int nativeCode);
 
 		void setFocusedWidget(Widget *w);
 

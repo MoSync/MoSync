@@ -735,6 +735,35 @@ namespace MAUI {
 			setFocusedWidget(NULL);
 	}
 
+	bool ListBox::keyPressed(int keyCode, int nativeCode) {
+		if(mFocusedWidget) {
+			bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
+			if(ret) return true;
+		}
+
+		if(mOrientation == LBO_HORIZONTAL) {
+			if(keyCode == MAK_LEFT) {
+				selectPreviousItem();
+				return true;
+			} else if(keyCode == MAK_RIGHT) {
+				selectNextItem();
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			if(keyCode == MAK_UP) {
+				selectPreviousItem();
+				return true;
+			} else if(keyCode == MAK_DOWN) {
+				selectNextItem();
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
 	bool ListBox::pointerPressed(MAPoint2d p, int id) {
 		Environment::getEnvironment().removeTimer(this);
 		mTouchMotionTracker.reset();
@@ -892,6 +921,7 @@ namespace MAUI {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
 					setSelectedIndex(i);
+					mFocusedWidget = widget;
 					return;
 				}
 			}
