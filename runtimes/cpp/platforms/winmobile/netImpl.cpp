@@ -80,3 +80,33 @@ void ConnPushEvent(MAEvent* ep) {
 void DefluxBinPushEvent(MAHandle handle, Stream& s) {
 	PostMessage(g_hwndMain, WM_DEFLUX_BINARY, (WPARAM) &s, handle);
 }
+
+//***************************************************************************
+//SslConnection
+//***************************************************************************
+
+void MANetworkSslInit() {
+}
+
+void MANetworkSslClose() {
+}
+
+SslConnection::~SslConnection() {
+	close();
+}
+
+int SslConnection::connect() {
+	DEBIG_PHAT_ERROR;
+}
+
+int SslConnection::read(void* dst, int max) {
+	DEBIG_PHAT_ERROR;
+}
+
+int SslConnection::write(const void* src, int len) {
+	DEBIG_PHAT_ERROR;
+}
+
+void SslConnection::close() {
+	DEBIG_PHAT_ERROR;
+}

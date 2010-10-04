@@ -130,9 +130,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "CSmsHandler.h"
 #endif
 
+class CBaseSocket;
 class CSocket;
 class CHttpConnection;
 class CServerSocket;
+class CMySecureSocket;
 
 class CConnection : public CBase {
 protected:
