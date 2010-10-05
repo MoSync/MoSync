@@ -1,4 +1,6 @@
 #include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include "packagers.h"
 

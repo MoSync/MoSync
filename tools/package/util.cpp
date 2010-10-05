@@ -1,5 +1,6 @@
 #include <fstream>
 #include <sstream>
+#include <stdlib.h>
 #include "util.h"
 
 using namespace std;

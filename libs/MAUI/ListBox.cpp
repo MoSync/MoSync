@@ -76,6 +76,7 @@ namespace MAUI {
 	ListBox::ListBox(int x, int y, int width, int height, Widget *parent) : 
 	Widget(x, y, width, height, parent),
 		mMustRebuild(false),
+		mItemSelectedListeners(false),
 		mWrapping(true),
 		mAnimationType(LBA_NONE),
 		mOrientation(LBO_HORIZONTAL),
@@ -85,14 +86,15 @@ namespace MAUI {
 		mSelectedIndex(0),
 		mAutoSize(false),
 		mTouched(false),
-		mFocusedWidget(NULL),
-		mItemSelectedListeners(false) {
+		mFocusedWidget(NULL)
+	{
 		requestRepaint();
 	}
 
 	ListBox::ListBox(int x, int y, int width, int height, Widget *parent, ListBoxOrientation orientation, ListBoxAnimationType animationType, bool wrapping)
 		: Widget(x, y, width, height, parent),
 		mMustRebuild(false),
+		mItemSelectedListeners(false),
 		mWrapping(wrapping),
 		mAnimationType(animationType),
 		mOrientation(orientation),
@@ -102,8 +104,8 @@ namespace MAUI {
 		mSelectedIndex(0),
 		mAutoSize(false),
 		mTouched(false),
-		mFocusedWidget(NULL),
-		mItemSelectedListeners(false) {
+		mFocusedWidget(NULL)
+	{
 		requestRepaint();
 	}
 

@@ -37,20 +37,20 @@ namespace MAUI {
 
 	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL)
 		: mParent(NULL), mBounds(0,0,width,height), mRelX(x), mRelY(y),
-			mDirty(false),
-			mFocused(false),
-			mEnabled(true),
-			mPaddingLeft(0),
-			mPaddingTop(0),
-			mPaddingBottom(0),
-			mPaddingRight(0),
-			mInputPolicy(NULL),
-			mFocusedSkin(NULL),
-			mUnfocusedSkin(NULL),
-			mStyle(NULL),
-			mWidgetListeners(false),
-			mUserData(NULL)
-		{
+		mDirty(false),
+		mFocused(false),
+		mEnabled(true),
+		mWidgetListeners(false),
+		mPaddingLeft(0),
+		mPaddingTop(0),
+		mPaddingBottom(0),
+		mPaddingRight(0),
+		mInputPolicy(NULL),
+		mFocusedSkin(NULL),
+		mUnfocusedSkin(NULL),
+		mUserData(NULL),
+		mStyle(NULL)
+	{
 		mInputPolicy = new DefaultInputPolicy(this);
 		if(parent) {
 			parent->add(this);
@@ -492,19 +492,20 @@ namespace MAUI {
 		return mChildren.size()==0;
 	}
 
-    bool isToDirectionOf(Direction direction, Rect src, Rect dest) {
-        switch (direction) {
-            case LEFT:
-                return src.x >= (dest.width+dest.x);
-            case RIGHT:
-                return (src.width+src.x) <= dest.x;
-            case UP:
-                return src.y >= (dest.height+dest.y);
-            case DOWN:
-                return (src.height+src.y) <= dest.y;
-        }
-        return false;
-    }
+	bool isToDirectionOf(Direction direction, Rect src, Rect dest) {
+		switch (direction) {
+		case LEFT:
+			return src.x >= (dest.width+dest.x);
+		case RIGHT:
+			return (src.width+src.x) <= dest.x;
+		case UP:
+			return src.y >= (dest.height+dest.y);
+		case DOWN:
+			return (src.height+src.y) <= dest.y;
+		default:
+			return false;
+		}
+	}
 
 
 	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
@@ -563,8 +564,6 @@ namespace MAUI {
 			break;
 		}
 		*/
-
-		return NULL;
 	}
 
 	Widget* Widget::getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best) {
