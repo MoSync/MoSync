@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "fastevents.h"
 #include "sdl_syscall.h"
 
+#include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/tls1.h>
 

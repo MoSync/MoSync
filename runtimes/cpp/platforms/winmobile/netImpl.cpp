@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Syscall.h"
 
+#include <sslsock.h>
+
 #include <base_errors.h>
 using namespace MoSyncError;
 
@@ -95,18 +97,48 @@ SslConnection::~SslConnection() {
 	close();
 }
 
+int CALLBACK SSLValidateCertHook(DWORD dwType, LPVOID pvArg, DWORD dwChainLen,
+	LPBLOB pCertChain, DWORD dwFlags)
+{
+	// Unsafe, but since we don't have any proper documentation on this function,
+	// we'll keep it simple for now.
+	return SSL_ERR_OKAY;
+}
+
 int SslConnection::connect() {
-	DEBIG_PHAT_ERROR;
-}
+	int result;
+	int iRet;
 
-int SslConnection::read(void* dst, int max) {
-	DEBIG_PHAT_ERROR;
-}
+	// Create socket
+	mSock = MASocketCreate(mHostname.c_str(), result, mInetAddr);
+	if(mSock == INVALID_SOCKET) {
+		LOG_GLE;
+		return result;
+	}
 
-int SslConnection::write(const void* src, int len) {
-	DEBIG_PHAT_ERROR;
-}
+	// Set up SSL
+	DWORD value = SO_SEC_SSL;
+	iRet = setsockopt(mSock, SOL_SOCKET, SO_SECURE, (char*)&value, sizeof(value));
+	if(iRet == SOCKET_ERROR) {
+		LOG_GLE;
+		return CONNERR_SSL;
+	}
+	SSLVALIDATECERTHOOK hook;
+	hook.HookFunc = SSLValidateCertHook;
+	hook.pvArg = (PVOID)mSock;
+	iRet = WSAIoctl(mSock, SO_SSL_SET_VALIDATE_CERT_HOOK, &hook,
+		sizeof(hook), 0, 0, NULL, 0, 0);
+	if(iRet == SOCKET_ERROR) {
+		LOG_GLE;
+		return CONNERR_SSL;
+	}
+	iRet = WSAIoctl(mSock, SO_SSL_SET_PEERNAME, (LPVOID)mHostname.c_str(), mHostname.length() + 1,
+		NULL, 0, NULL, NULL, NULL);
+	if(iRet == SOCKET_ERROR) {
+		LOG_GLE;
+		return CONNERR_SSL;
+	}
 
-void SslConnection::close() {
-	DEBIG_PHAT_ERROR;
+	// Connect to the server
+	return MASocketConnect(mSock, mInetAddr, mPort);
 }

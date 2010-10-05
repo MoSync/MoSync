@@ -124,8 +124,8 @@ int ensureconnected()
 #endif
 #endif
 
-//returns INVALID_SOCKET on failure. puts CONNERR-compliant code in result.
-MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr) {
+// Creates and prepares a socket, but does not connect it.
+MoSyncSocket MASocketCreate(const char* address, int& result, uint& inetAddr) {
 	int iRet;
 
 #ifdef _WIN32_WCE
@@ -163,11 +163,6 @@ MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inet
 		}
 	}
 
-	sockaddr_in clientService;
-	clientService.sin_family = AF_INET;
-	clientService.sin_addr.s_addr = inetAddr;
-	clientService.sin_port = htons( port );
-
 	// Make sure Nagle's algorithm is disabled
 	int v;
 	socklen_t len = sizeof(v);
@@ -190,16 +185,35 @@ MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inet
 	}
 	//LOG("MASocketOpen: TCP_NODELAY set value: %i\n", v);
 
+	result = 1;
+	return mySocket;
+}
+
+int MASocketConnect(MoSyncSocket sock, uint inetAddr, u16 port) {
+	sockaddr_in clientService;
+	clientService.sin_family = AF_INET;
+	clientService.sin_addr.s_addr = inetAddr;
+	clientService.sin_port = htons( port );
+
 	// Connect to the Server
-	iRet = connect(mySocket, (sockaddr*) &clientService, sizeof(clientService));
+	int iRet = connect(sock, (sockaddr*) &clientService, sizeof(clientService));
 	if(SOCKET_ERROR == iRet)
 	{
-		LOG("MASocketOpen: connect returned error code %d\n", SOCKET_ERRNO);
-		result = CONNERR_GENERIC;
-		return INVALID_SOCKET;
+		LOG("MASocketConnect: connect returned error code %d\n", SOCKET_ERRNO);
+		return CONNERR_GENERIC;
 	}
+	return 1;
+}
 
-	result = 1;
+//returns INVALID_SOCKET on failure. puts CONNERR-compliant code in result.
+MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr) {
+	MoSyncSocket mySocket = MASocketCreate(address, result, inetAddr);
+	if(mySocket == INVALID_SOCKET)
+		return INVALID_SOCKET;
+
+	result = MASocketConnect(mySocket, inetAddr, port);
+	if(result <= 0)
+		return INVALID_SOCKET;
 	return mySocket;
 }
 

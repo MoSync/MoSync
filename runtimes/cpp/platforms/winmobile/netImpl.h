@@ -49,9 +49,6 @@ public:
 		: TcpConnection(hostname, port) {}
 	virtual ~SslConnection();
 	virtual int connect();
-	virtual int read(void* dst, int max);
-	virtual int write(const void* src, int len);
-	virtual void close();
 };
 
 #endif /* _NET_IMPL_H_ */

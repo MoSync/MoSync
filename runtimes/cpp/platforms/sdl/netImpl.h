@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NETIMPL_H
 
 #include <SDL/SDL.h>
-#include <openssl/ssl.h>
 
 #include "net/net.h"
 
@@ -36,6 +35,7 @@ private:
 };
 
 typedef unsigned short Uint16;
+typedef struct ssl_st SSL;
 
 class SslConnection : public TcpConnection {
 public:

@@ -50,6 +50,8 @@ typedef int MoSyncSocket;
 
 
 MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr);
+MoSyncSocket MASocketCreate(const char* address, int& result, uint& inetAddr);
+int MASocketConnect(MoSyncSocket sock, uint inetAddr, u16 port);
 
 static const char http_string[] = "http://";
 static const char https_string[] = "https://";
