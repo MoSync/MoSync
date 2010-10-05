@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "sdl_syscall.h"
 
 #include <openssl/err.h>
+#include <openssl/tls1.h>
 
 //***************************************************************************
 //Helpers
@@ -92,6 +93,7 @@ int SslConnection::connect() {
 	TLTZ_PASS(TcpConnection::connect());
 	TSSLZ(mSession = SSL_new(sSslContext));
 	mState = eInit;
+	TSSLLTZ(SSL_set_tlsext_host_name(mSession, mHostname.c_str()));
 	TSSLZ(SSL_set_fd(mSession, mSock));
 	TSSLLTZ(SSL_connect(mSession));
 	mState = eHandshook;

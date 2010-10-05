@@ -1,5 +1,5 @@
-/* crypto/md/md2.h */
-/* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
+/* crypto/mdc2/mdc2.h */
+/* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *
  * This package is an SSL implementation written
@@ -56,37 +56,40 @@
  * [including the GNU Public Licence.]
  */
 
-#ifndef HEADER_MD2_H
-#define HEADER_MD2_H
+#ifndef HEADER_MDC2_H
+#define HEADER_MDC2_H
 
-#include <openssl/opensslconf.h> /* OPENSSL_NO_MD2, MD2_INT */
-#ifdef OPENSSL_NO_MD2
-#error MD2 is disabled.
-#endif
-#include <stddef.h>
-
-#define MD2_DIGEST_LENGTH	16
-#define MD2_BLOCK       	16
+#include <openssl/des.h>
 
 #ifdef  __cplusplus
 extern "C" {
 #endif
 
-typedef struct MD2state_st
+#ifdef OPENSSL_NO_MDC2
+#error MDC2 is disabled.
+#endif
+
+#define MDC2_BLOCK              8
+#define MDC2_DIGEST_LENGTH      16
+ 
+typedef struct mdc2_ctx_st
 	{
 	unsigned int num;
-	unsigned char data[MD2_BLOCK];
-	MD2_INT cksm[MD2_BLOCK];
-	MD2_INT state[MD2_BLOCK];
-	} MD2_CTX;
+	unsigned char data[MDC2_BLOCK];
+	DES_cblock h,hh;
+	int pad_type; /* either 1 or 2, default 1 */
+	} MDC2_CTX;
 
-const char *MD2_options(void);
-int MD2_Init(MD2_CTX *c);
-int MD2_Update(MD2_CTX *c, const unsigned char *data, size_t len);
-int MD2_Final(unsigned char *md, MD2_CTX *c);
-unsigned char *MD2(const unsigned char *d, size_t n,unsigned char *md);
+
+int MDC2_Init(MDC2_CTX *c);
+int MDC2_Update(MDC2_CTX *c, const unsigned char *data, size_t len);
+int MDC2_Final(unsigned char *md, MDC2_CTX *c);
+unsigned char *MDC2(const unsigned char *d, size_t n,
+	unsigned char *md);
+
 #ifdef  __cplusplus
 }
 #endif
 
 #endif
+
