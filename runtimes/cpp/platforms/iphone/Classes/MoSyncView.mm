@@ -55,6 +55,49 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @end
 
+@interface TextBoxData : UIViewController <UIAlertViewDelegate> {
+	NSString *title;
+	NSString *inText;
+	wchar* outText;
+	int maxSize;
+	int constraints;
+	UITextField *textField;
+}
+
+@property (copy, nonatomic) NSString* title;
+@property (copy, nonatomic) NSString* inText;
+@property wchar* outText;
+@property int maxSize;
+@property int constraints;
+@property (assign, nonatomic) UITextField* textField;
+@end
+
+@implementation TextBoxData 
+
+@synthesize title;
+@synthesize inText;
+@synthesize outText;
+@synthesize maxSize;
+@synthesize constraints;
+@synthesize textField;
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+	MAEvent event;
+	event.type = EVENT_TYPE_TEXTBOX;
+	if(buttonIndex == 1) {
+		int length = MIN(textField.text.length, maxSize-1);
+		[textField.text getCharacters:(unichar*)outText range:NSMakeRange(0, length)];
+		outText[length] = '\0';
+		event.textboxResult = MA_TB_RES_OK;
+		event.textboxLength = length;
+	} else {
+		event.textboxResult = MA_TB_RES_CANCEL;
+	}
+	Base::gEventQueue.put(event);		
+}
+
+@end
+
 @implementation MoSyncView
 
 - (void)updateMoSyncView:(CGImageRef)ref {
@@ -108,42 +151,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     return self;
 }
 
-/*
-- (id)initWithCoder:(NSCoder *)decoder {
-    if (self = [super initWithCoder:decoder]) {
-		[[UIApplication sharedApplication] setStatusBarHidden:YES animated:NO];
-
-		UIDevice* myDevice = [UIDevice currentDevice];
-		[myDevice beginGeneratingDeviceOrientationNotifications];
-		[myDevice setBatteryMonitoringEnabled:YES];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
-													 name:UIDeviceOrientationDidChangeNotification object:nil];
-		
-		self.frame.origin.y = 0;
-		mosyncView = nil;
-        // Initialization code
-		CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
-		CGFloat screenHeight = appFrame.size.height;
-		
-		locationController = [[MoSyncCLController alloc] init];
-		
-<<<<<<< .mine
-		MoSync_Main(self.frame.size.width, screenHeight, self);
-=======
-		//MoSyncMain(self.frame.size.width, screenHeight, self);
-		MoSyncMain(320.0, screenHeight, self);
->>>>>>> .r1287
-    }
-    return self;
-}
-*/
-/*
-- (void)mTimerProcess{
-	DoneUpdatingMoSyncView();
-} 
-*/
-
 - (void)drawRect:(CGRect)rect {
 	if(mosyncView == nil) return;
 
@@ -154,16 +161,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	CGContextScaleCTM(context, 1.0, -1.0);
 	
     CGContextDrawImage(context, rect, mosyncView);	
-	MoSync_DoneUpdatingView();
-	/*
-	NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:0.000001f
-													  target:self
-													selector:@selector(mTimerProcess)
-													userInfo:nil
-													 repeats:NO];
-	[timer fire];
-	*/
-	 
+	MoSync_DoneUpdatingView();	 
 }
 
 
@@ -233,6 +231,63 @@ bool down = false;
 	mbh.kill = kill;
 	mbh.msg = msg;
 	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
+}
+
+-(void) textBox:(id) obj {
+	TextBoxData *textBoxData = (TextBoxData*)obj;
+	
+	UIAlertView *textBoxAlert = [[UIAlertView alloc] initWithTitle:textBoxData.title message:@"\n\n" delegate:textBoxData cancelButtonTitle:NSLocalizedString(@"Cancel",nil) otherButtonTitles:NSLocalizedString(@"OK",nil), nil];
+	
+	/*
+	UILabel *passwordLabel = [[UILabel alloc] initWithFrame:CGRectMake(12,40,260,25)];
+	passwordLabel.font = [UIFont systemFontOfSize:16];
+	passwordLabel.textColor = [UIColor whiteColor];
+	passwordLabel.backgroundColor = [UIColor clearColor];
+	passwordLabel.shadowColor = [UIColor blackColor];
+	passwordLabel.shadowOffset = CGSizeMake(0,-1);
+	passwordLabel.textAlignment = UITextAlignmentCenter;
+	passwordLabel.text = @"Account Name";
+	[passwordAlert addSubview:passwordLabel];
+	*/
+	//UIImageView *passwordImage = [[UIImageView alloc] initWithImage:[UIImage imageWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"passwordfield" ofType:@"png"]]];
+	//passwordImage.frame = CGRectMake(11,79,262,31);
+	//[passwordAlert addSubview:passwordImage];
+	
+	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(16,63,252,25)];
+	textField.font = [UIFont systemFontOfSize:18];
+	textField.backgroundColor = [UIColor whiteColor];
+	textField.secureTextEntry = (textBoxData.constraints&MA_TB_FLAG_PASSWORD)?YES:NO; // password mode?
+	textField.keyboardAppearance = UIKeyboardAppearanceAlert;
+	textField.delegate = self;
+	textField.text = textBoxData.inText;
+	[textField becomeFirstResponder];
+	[textBoxAlert addSubview:textField];
+	
+	textBoxData.textField = textField;
+	
+	[textBoxAlert setTransform:CGAffineTransformMakeTranslation(0,109)];
+	[textBoxAlert show];
+	[textBoxAlert release];
+	[textField release];
+	
+	//[passwordImage release];
+	//[passwordLabel release];	
+}
+
+-(void) showTextBox:(NSString*)title 
+		 withInText:(NSString*)inText 
+			outText:(wchar*)outText 
+			maxSize:(int)maxSize 
+	 andConstraints:(int)constraints {
+	
+	TextBoxData *textBoxData = [TextBoxData alloc];
+	textBoxData.title = title;
+	textBoxData.inText = inText;
+	textBoxData.outText = outText;
+	textBoxData.maxSize = maxSize;
+	textBoxData.constraints = constraints;
+	
+	[self performSelectorOnMainThread: @ selector(textBox:) withObject:(id)textBoxData waitUntilDone:NO];
 }
 
 @end
