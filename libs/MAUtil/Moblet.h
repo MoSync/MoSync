@@ -46,7 +46,7 @@ namespace MAUtil {
 	* Code that isn't supposed to be executed in response to an event should be placed
 	* in a TimerListener or IdleListener that's registered with the Moblet.
 	*/
-	class Moblet : public Environment, public KeyListener, public PointerListener, public CloseListener {
+	class Moblet : public Environment, public KeyListener, public PointerListener, public CloseListener, public CustomEventListener {
 	public:
 		/**
 		* This function is called with a \link #MAK_FIRST MAK_ code \endlink when a key is pressed.

@@ -25,7 +25,8 @@ namespace MAUtil {
 		//environment = this;
 		addKeyListener(this);
 		addPointerListener(this);
-		addCloseListener(this);
+		addCloseListener(this);		
+		addCustomEventListener(this);
 	}
 
 #ifndef MIN
@@ -108,8 +109,11 @@ namespace MAUtil {
 					case EVENT_TYPE_BT:
 						moblet->fireBluetoothEvent(event.state);
 						break;
+					case EVENT_TYPE_TEXTBOX:
+						moblet->fireTextBoxListeners(event.textboxResult, event.textboxLength);
+						break;
 					default:
-						moblet->customEvent(event);
+						moblet->fireCustomEventListeners(event);
 				}
 			}
 

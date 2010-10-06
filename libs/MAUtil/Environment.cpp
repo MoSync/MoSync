@@ -51,7 +51,9 @@ namespace MAUtil {
 		mConnListeners(false),
 		mIdleListeners(false),
 		mTimerEvents(true),
-		mFocusListeners(false)
+		mFocusListeners(false),
+		mCustomEventListeners(false),
+		mTextBoxListeners(false)		
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -198,7 +200,27 @@ namespace MAUtil {
 			}
 		}
 	}
+	
+	void Environment::addCustomEventListener(CustomEventListener* cl) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.add(cl);
+	}
 
+	void Environment::removeCustomEventListener(CustomEventListener* cl) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.remove(cl);
+	}
+	
+	void Environment::addTextBoxListener(TextBoxListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.add(tl);
+	}
+
+	void Environment::removeTextBoxListener(TextBoxListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.remove(tl);
+	}	
+	
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
@@ -296,6 +318,24 @@ namespace MAUtil {
 			(*i)->closeEvent();
 		}
 	}
+	
+	void Environment::fireCustomEventListeners(const MAEvent& e) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.setRunning(true);
+		ListenerSet_each(CustomEventListener, i, mCustomEventListeners) {
+			i->customEvent(e);
+		}
+		mCustomEventListeners.setRunning(false);
+	}
+	
+	void Environment::fireTextBoxListeners(int result, int textLength) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.setRunning(true);
+		ListenerSet_each(TextBoxListener, i, mTextBoxListeners) {
+			i->textBoxClosed(result, textLength);
+		}
+		mTextBoxListeners.setRunning(false);
+	}	
 
 	void Environment::runIdleListeners() {
 		//MAASSERT(sEnvironment == this);

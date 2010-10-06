@@ -50,6 +50,11 @@ void Gfx_clearClipRect(void) {
 	sClipStack[0].top = 0;
 	sClipStack[0].width = EXTENT_X(s);
 	sClipStack[0].height = EXTENT_Y(s);
+	
+	GRAPHICS_LOG("numCalls: %d", sNumCalls);
+#ifdef GRAPHICS_DEBUGGING	
+	sNumCalls = 0;
+#endif
 }
 
 /** Sets the clip rect to the content of the top of the stack without changing the stack.  
@@ -291,4 +296,8 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 	p.x += sCurrentOffset.x;
 	p.y += sCurrentOffset.y;
 	maDrawImageRegion(image, srcRect, &p, transformMode);
+	
+#ifdef GRAPHICS_DEBUGGING
+	sNumCalls++;
+#endif
 }
