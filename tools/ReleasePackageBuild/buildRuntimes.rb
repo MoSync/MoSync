@@ -36,10 +36,14 @@ internalBuild = ENV['MOSYNC_INTERNAL_BUILD']
 
 if(internalBuild == nil)
 
+	puts "Building runtimes"
+
 	FileUtils.cd "#{ENV['MOSYNC_TRUNK']}\tools\profileConverter"
 	
-	returnToBuild cpath, system "ruby conv.rb -dst #{ENV['MOSYNC_PROFILES_PATH']}"
+	returnToBuild cpath, system ("ruby conv.rb -dst #{ENV['MOSYNC_PROFILES_PATH']}")
 else
+	
+	puts "Build MoSync Internal runtimes"
 	
 	FileUtils.cd "\mb"
 	ret = system "ruby buildmaster.rb profiles.zip mosync-trunk"
