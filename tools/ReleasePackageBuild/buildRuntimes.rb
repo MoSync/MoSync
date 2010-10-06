@@ -48,7 +48,7 @@ else
 	FileUtils.cd "#{ENV['MOSYNC_RELEASE_BUILD_PATH']}"
 	ret = system "ruby buildmaster.rb profiles.zip mosync-trunk"
 	if true == ret
-		system "unzip profiles.zip #{ENV['MOSYNC_PROFILES_PATH']}"
+		system "unzip profiles.zip -d #{ENV['MOSYNC_PATH']}"
 	end
 	
 	returnToBuild cpath, ret
