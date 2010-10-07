@@ -46,7 +46,7 @@ else
 	puts "Build MoSync Internal runtimes"
 	
 	FileUtils.cd "#{ENV['MOSYNC_RELEASE_BUILD_PATH']}"
-	ret = system "ruby buildmaster.rb profiles.zip mosync-trunk"
+	ret = system "ruby private-runtimebuilder\lib\buildmaster.rb profiles.zip mosync-trunk"
 	if true == ret
 		system "unzip profiles.zip -d #{ENV['MOSYNC_PATH']}"
 	end
