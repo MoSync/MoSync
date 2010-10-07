@@ -340,6 +340,16 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building iphone-builder
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\iphone-builder
+@vcbuild iphone-builder.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@copy Release\iphone-builder.exe %MOSYNC_BIN_PATH%\ /y
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building internal libraries:
 @echo ------------------------------------------------
 
