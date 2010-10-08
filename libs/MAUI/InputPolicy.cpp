@@ -72,7 +72,7 @@ bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
 			Widget* newFocus = mOwner->getFocusableInDirectionFrom(mOwner, dir);
 			if (newFocus) {
 				Screen::getCurrentScreen()->setFocusedWidget(newFocus);
-				//newFocus->keyPressed(keyCode, nativeCode);
+				newFocus->keyPressed(keyCode, nativeCode);
 			}
 		}
 	}

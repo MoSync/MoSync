@@ -93,6 +93,8 @@ namespace MAUI {
 	}
 
 	Widget* getFocusableWidget(Widget *w) {
+		if(w->isFocusable()) return w;
+
 		Vector<Widget*>& children = w->getChildren();
 		for(int i = 0; i < children.size(); i++) {
 			if(children[i]->isFocusable()) {
@@ -121,6 +123,7 @@ namespace MAUI {
 		return mFocusedWidget;
 	}
 
+	// TODO: don't forget to add support for overlays in these functions.
 	void Screen::keyPressEvent(int keyCode, int nativeCode) {
 		if(!mFocusedWidget) {
 			mFocusedWidget = getFocusableWidget(mMain);

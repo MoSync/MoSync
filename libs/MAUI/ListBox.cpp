@@ -415,7 +415,7 @@ namespace MAUI {
 				(*i)->itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]);
 			}
 			*/
-			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]));
+			//ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]));
 
 
 			return;
@@ -738,16 +738,30 @@ namespace MAUI {
 	}
 
 	bool ListBox::keyPressed(int keyCode, int nativeCode) {
+		mTouched = false;
+
 		if(mFocusedWidget) {
 			bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
 			if(ret) return true;
+		} else {
+			if(mChildren.size()>0) {
+				if(mChildren[0]->isFocusable()) {
+					mChildren[0]->setFocused(true);
+					return true;
+				}
+				return true;//return true;
+			} else {
+				return false;
+			}
 		}
 
 		if(mOrientation == LBO_HORIZONTAL) {
 			if(keyCode == MAK_LEFT) {
+				if(!mWrapping && mSelectedIndex == 0) return false;
 				selectPreviousItem();
 				return true;
 			} else if(keyCode == MAK_RIGHT) {
+				if(!mWrapping && mSelectedIndex == mChildren.size()-1) return false;
 				selectNextItem();
 				return true;
 			} else {
@@ -755,9 +769,11 @@ namespace MAUI {
 			}
 		} else {
 			if(keyCode == MAK_UP) {
+				if(!mWrapping && mSelectedIndex == 0) return false;
 				selectPreviousItem();
 				return true;
 			} else if(keyCode == MAK_DOWN) {
+				if(!mWrapping && mSelectedIndex == mChildren.size()-1) return false;
 				selectNextItem();
 				return true;
 			} else {
@@ -922,8 +938,9 @@ namespace MAUI {
 		if(!mTouched && focused) {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
-					setSelectedIndex(i);
+					//setSelectedIndex(i);
 					mFocusedWidget = widget;
+					//Screen::getCurrentScreen()->setFocusedWidget(widget);
 					return;
 				}
 			}
