@@ -1004,7 +1004,7 @@ int maLocalTime()
 */
 int maGetMilliSecondCount()
 {
-	return (int)System.currentTimeMillis();
+	return (int)SystemClock.elapsedRealtime();
 }
 
 /**
