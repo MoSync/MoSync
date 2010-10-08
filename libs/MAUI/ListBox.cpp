@@ -73,26 +73,10 @@ namespace MAUI {
 		int mTime;
 	};
 
-	ListBox::ListBox(int x, int y, int width, int height, Widget *parent) : 
-	Widget(x, y, width, height, parent),
-		mMustRebuild(false),
-		mItemSelectedListeners(false),
-		mWrapping(true),
-		mAnimationType(LBA_NONE),
-		mOrientation(LBO_HORIZONTAL),
-		mYOffsetFrom(0),
-		mYOffsetTo(0),
-		mYOffset(0),
-		mSelectedIndex(0),
-		mAutoSize(false),
-		mTouched(false),
-		mFocusedWidget(NULL)
-	{
-		requestRepaint();
-	}
-
-	ListBox::ListBox(int x, int y, int width, int height, Widget *parent, ListBoxOrientation orientation, ListBoxAnimationType animationType, bool wrapping)
-		: Widget(x, y, width, height, parent),
+	ListBox::ListBox(int x, int y, int width, int height,
+		ListBoxOrientation orientation, ListBoxAnimationType animationType,
+		bool wrapping)
+		: Widget(x, y, width, height),
 		mMustRebuild(false),
 		mItemSelectedListeners(false),
 		mWrapping(wrapping),

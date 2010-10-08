@@ -20,15 +20,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Image::Image(int x, int y, int width, int height, Widget* parent, bool mAutoSizeX, bool mAutoSizeY, MAHandle res)
-		: Widget(x, y, width, height, parent),
+	Image::Image(int x, int y, int width, int height,
+		MAHandle res, bool mAutoSizeX, bool mAutoSizeY)
+		: Widget(x, y, width, height),
 		mResource(res),
 		mAutoSizeX(mAutoSizeX),
 		mAutoSizeY(mAutoSizeY)
 	{ 
 		//setDrawBackground(false);
 		setResource(res);
+	}
 
+	bool Image::isTransparent() const {
+		return true;
 	}
 
 	void Image::drawWidget() {

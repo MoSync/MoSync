@@ -90,9 +90,9 @@ namespace MAP
 
 
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( int x, int y, int width, int height, Widget* _parent)
+	MapWidget::MapWidget( int x, int y, int width, int height)
 	//-------------------------------------------------------------------------
-	:	Widget( x, y, width, height, _parent ),
+	:	Widget( x, y, width, height),
 		mCenterPositionLonLat( ),
 		mCenterPositionPixels( ),
 		mPanTargetPositionLonLat( ),

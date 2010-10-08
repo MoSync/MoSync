@@ -65,7 +65,7 @@ namespace MAP
 		friend class MapWidgetPanTimerListener;
 
 	public:
-		MapWidget(int x, int y, int width, int height, Widget* parent);
+		MapWidget(int x, int y, int width, int height);
 		
 		virtual ~MapWidget( );
 		/**

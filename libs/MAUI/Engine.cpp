@@ -75,6 +75,12 @@ namespace MAUI {
 
 		ButtonStyle* buttonStyle = new ButtonStyle(focusedPressed, focusedReleased, unfocusedReleased, font);
 		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
+
+		Style* widgetStyle = new Style();
+		widgetStyle->set("font", new FontProperty(RESFNT(arial_white)));
+		widgetStyle->set("backgroundSkinFocused", focusedReleased);
+		widgetStyle->set("backgroundSkinUnfocused", unfocusedReleased);
+		mSingletonPtr->setDefaultStyle("Widget", widgetStyle);
 	}
 	
 	void Engine::setMain(Widget* mMain) {
@@ -187,8 +193,12 @@ namespace MAUI {
 
 	const Style* Engine::getDefaultStyle(const String& widgetType) const {
 		Map<String, Style*>::ConstIterator iter = mDefaultStyles.find(widgetType);
-		if(iter != mDefaultStyles.end()) return iter->second;
-		else return NULL;
+		if(iter != mDefaultStyles.end())
+			return iter->second;
+		iter = mDefaultStyles.find("Widget");
+		if(iter == mDefaultStyles.end())
+			maPanic(1, "No style set (not even a default style for Widget is available!");
+		return iter->second;
 	}
 
 }

@@ -37,7 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #define MAUI_LOG(x, args...) printf(x"\n", ## args)
 #else
-#define MAUI_LOG(x, args...)
+#define MAUI_LOG(x, ...)
 #endif
 
 namespace MAUI {
@@ -138,11 +138,9 @@ namespace MAUI {
 		/**
 		 * Constructor for Widget. 'x' and 'y' are the relative position
 		 * of the top left corner of the widget, and 'width' and 'height'
-		 * is the dimensions of the widget. 'parent' is the parent to the
-		 * widget and the widget will be automatically added as a child
-		 * to the parent. If parent equals NULL no parent will be set.
+		 * is the dimensions of the widget.
 		 **/
-		Widget(int x, int y, int width, int height, Widget *parent);
+		Widget(int x=0, int y=0, int width=0, int height=0);
 
 		// Hierarchy
 

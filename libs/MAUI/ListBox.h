@@ -67,32 +67,12 @@ namespace MAUI {
 		};
 
 		/** Constructor.
-		  * \param x the horizontal position of the ListBox relative to its parent's top left padded corner.
-		  * \param y the vertical position of the ListBox relative to its parent's top left padded corner
-		  * \param width the width of the ListBox.
-		  * \param height the height of the ListBox.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the ListBox to be added to the parent's children.
-		  **/
-		
-		ListBox(int x, int y, int width, int height, Widget *parent);
-		/** Constructor.
-		  * \param x the horizontal position of the ListBox relative to its parent's top left padded corner.
-		  * \param y the vertical position of the ListBox relative to its parent's top left padded corner
-		  * \param width the width of the ListBox.
-		  * \param height the height of the ListBox.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the ListBox to be added to the parent's children.
 		  * \param orientation controls the orientation of the ListBox
 		  * \param animType controls the type of animation used when scrolling the listbox content.
 		  * \param wrapping controls the behavior of the listbox when navigating. When set to true (default), the listbox will wrap around to selecting the first element when moving beyond the last one, and equivalently wrap around to the last one when moving back beyond the first one.
 		  **/
-
-		ListBox (
-			int x, 
-			int y, 
-			int width, 
-			int height, 
-			Widget *parent,
-			ListBoxOrientation orientation, 
+		ListBox (int x=0, int y=0, int width=0, int height=0,
+			ListBoxOrientation orientation=LBO_VERTICAL, 
 			ListBoxAnimationType animType=LBA_NONE,
 			bool wrapping=true
 		);

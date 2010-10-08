@@ -35,8 +35,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL)
-		: mParent(NULL), mBounds(0,0,width,height), mRelX(x), mRelY(y),
+	Widget::Widget(int x, int y, int width, int height)
+		: mParent(NULL), mBounds(x,y,width,height), mRelX(0), mRelY(0),
 		mDirty(false),
 		mFocused(false),
 		mEnabled(true),
@@ -52,9 +52,6 @@ namespace MAUI {
 		mStyle(NULL)
 	{
 		mInputPolicy = new DefaultInputPolicy(this);
-		if(parent) {
-			parent->add(this);
-		}
 
 		updateAbsolutePosition();
 	}

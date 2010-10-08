@@ -25,30 +25,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget *parent) :
-		Widget(x, y, width, height, parent),
-		mLoop(true),
-		mCurrentFrame(0),
-		mMsPf(50),
-		mFrameHeight(32),
-		mNumFrames(5),
-		mDirection(0), 
-		mResource(0)
-	{
-		start();
-	}
-
-
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget* parent, MAHandle res) 
-		: Widget(x, y, width, height, parent),
+	AnimatedImage::AnimatedImage(int x, int y, int width, int height, MAHandle res) 
+		: Widget(x, y, width, height),
 		mLoop(true),
 		mCurrentFrame(0),
 		mMsPf(50),
 		mFrameHeight(32),
 		mNumFrames(5),
 		mDirection(0),
-	    mResource(res)
-		
+		mResource(res)
 	{ 
 		setResource(res);
 		start();

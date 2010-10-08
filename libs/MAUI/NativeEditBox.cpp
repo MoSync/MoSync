@@ -18,11 +18,13 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
-NativeEditBox::NativeEditBox(int x, int y, int w, int h, Widget* parent, int maxSize, int options, const String& initialText, const WString& titleString) :
-	Label(x, y, w, h, parent),
-	mTitleString(titleString),
-	mString(NULL),
-	mOptions(options) {
+NativeEditBox::NativeEditBox(int x, int y, int width, int height, int maxSize, int options,
+	const String& initialText, const WString& titleString) :
+Label(x, y, width, height, initialText),
+mTitleString(titleString),
+mString(NULL),
+mOptions(options)
+{
 	setMaxSize(maxSize);
 	setCaption(initialText);
 }
@@ -38,7 +40,7 @@ void NativeEditBox::setOptions(int options) {
 
 void NativeEditBox::setMaxSize(int size) {
 	if(mString) delete mString;
-	mString = new wchar_t[mMaxSize];
+	mString = new wchar_t[size];
 	mMaxSize = size;
 }
 
@@ -56,9 +58,13 @@ bool NativeEditBox::pointerMoved(MAPoint2d p, int id) {
 }
 
 bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
-	maTextBox(mTitleString.c_str(), mString, mString, mMaxSize, mOptions);
-	Environment::getEnvironment().addTextBoxListener(this);
+	activate();
 	return false;
+}
+
+void NativeEditBox::activate() {
+	maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString, (wchar*)mString, mMaxSize, mOptions);
+	Environment::getEnvironment().addTextBoxListener(this);
 }
 
 void NativeEditBox::setTitleString(const WString& titleString) {

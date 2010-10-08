@@ -4,8 +4,11 @@
 
 namespace MAUI {
 
-Button::Button(int x, int y, int width, int height, Widget* parent, const String& caption) : Label(x, y, width, height, parent, caption), mPressed(false),
-	mSkinFocusedPressed(NULL), mSkinFocusedReleased(NULL), mSkinUnfocusedReleased(NULL), mListeners(false) {
+Button::Button(int x, int y, int width, int height, const String& caption)
+: Label(x, y, width, height, caption), mPressed(false),
+mSkinFocusedPressed(NULL), mSkinFocusedReleased(NULL),
+mSkinUnfocusedReleased(NULL), mListeners(false)
+{
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
 }
@@ -24,7 +27,7 @@ bool Button::pointerMoved(MAPoint2d p, int id) {
 	p.x-=mStartX;
 	p.y-=mStartY;
 
-	int length = (int)sqrt(p.x*p.x+p.y*p.y);
+	int length = (int)sqrt((double)(p.x*p.x+p.y*p.y));
 	if(length<15) return true;
 	else return false;
 }

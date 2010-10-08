@@ -21,36 +21,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Layout::Layout(int x, int y, int width, int height, Widget* parent) :
-	Widget(x, y, width, height, parent),
+	Layout::Layout(int x, int y, int width, int height, int gridXSize, int gridYSize) :
+	Widget(x, y, width, height),
 	mMustRebuild(false),
 	mAlignmentX(HA_LEFT),
 	mAlignmentY(VA_TOP),
 	mMarginX(0),
 	mMarginY(0),
-	mAutoSizeX(false),
-	mAutoSizeY(false),
-	mGridXSize(2),
-	mGridYSize(2),
-	mSelectedIndex(0) {
-		//setDrawBackground(false);
-		requestRepaint();
-	}
-
-	Layout::Layout(int x, int y, int width, int height, Widget* parent, int gridXSize, int gridYSize) :
-	Widget(x, y, width, height, parent),
-	mMustRebuild(false),
-	mAlignmentX(HA_LEFT),
-	mAlignmentY(VA_TOP),
-	mMarginX(0),
-	mMarginY(0),
-	mAutoSizeX(false),
-	mAutoSizeY(false),
+	mAutoSizeX(true),
+	mAutoSizeY(true),
 	mGridXSize(gridXSize),
 	mGridYSize(gridYSize),
 	mSelectedIndex(0)
 	{
-		//setDrawBackground(false);
 		requestRepaint();
 	}
 

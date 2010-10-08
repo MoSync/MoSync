@@ -45,7 +45,9 @@ namespace MAUI {
 			HORIZONTAL
 		};
 
-		Slider(int x, int y, int width, int height, Widget* parent=NULL, Orientation ori=HORIZONTAL, double minValue=0.0, double maxValue=1.0, double defaultValue=0.0);
+		Slider(int x=0, int y=0, int width=0, int height=0,
+			Orientation ori=HORIZONTAL, double minValue=0.0, double maxValue=1.0,
+			double defaultValue=0.0);
 		bool pointerPressed(MAPoint2d p, int id);
 		bool pointerMoved(MAPoint2d p, int id);
 		bool pointerReleased(MAPoint2d p, int id);

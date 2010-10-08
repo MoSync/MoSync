@@ -75,28 +75,13 @@ namespace MAUI {
 	}
 	#endif
 
-	Label::Label(int x, int y, int width, int height, Widget* parent) :
-		Widget(x, y, width, height, parent), 
+	Label::Label(int x, int y, int width, int height, const String &caption, Font* font) :
+		Widget(x, y, width, height),
 		mMustCalcStrSize(true),
 		mCaption(""),
-		mFont(NULL),
-		mAutoSizeX(false),
-		mAutoSizeY(false),
-		mMultiLine(false),
-		mHorizontalAlignment(HA_LEFT),
-		mVerticalAlignment(VA_TOP)
-	{
-		//this->mFont = Engine::getSingleton().getDefaultFont();
-		//calcStrSize();
-	}
-
-	Label::Label(int x, int y, int width, int height, Widget* parent, const String &caption) :
-		Widget(x, y, width, height, parent),
-		mMustCalcStrSize(true),
-		mCaption(""),
-		mFont(NULL),
-		mAutoSizeX(false),
-		mAutoSizeY(false),
+		mFont(font),
+		mAutoSizeX(true),
+		mAutoSizeY(true),
 		mMultiLine(false),
 		mHorizontalAlignment(HA_LEFT),
 		mVerticalAlignment(VA_TOP)
@@ -318,8 +303,4 @@ namespace MAUI {
 	{
 		this->mProperties["font"] = font;
 	}
-
-
-
-
 }

@@ -48,24 +48,10 @@ namespace MAUI {
 		};
 
 		/** Constructor.
-		  * \param x the horizontal position of the Layout relative to its parent's top left padded corner.
-		  * \param y the vertical position of the Layout relative to its parent's top left padded corner
-		  * \param width the width of the Layout.
-		  * \param height the height of the Layout.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Layout to be added to the parent's children.
-		  **/
-		Layout(int x, int y, int width, int height, Widget* parent=NULL);
-
-		/** Constructor.
-		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
-		  * \param y the vertical position of the Label relative to its parent's top left padded corner
-		  * \param width the width of the Label.
-		  * \param height the height of the Label.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Label to be added to the parent's children.
 		  * \param gridXSize the number of columns in the grid.
 		  * \param gridYSize the number of rows in the grid.
 		  **/
-		Layout(int x, int y, int width, int height, Widget* parent, int gridXSize, int gridYSize);
+		Layout(int x, int y, int width, int height, int gridXSize, int gridYSize);
 
 		/** Overloaded implementation of Widget::add(), with the same external semantics.
 		    **/

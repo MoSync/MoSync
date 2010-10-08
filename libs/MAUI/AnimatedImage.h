@@ -44,8 +44,7 @@ namespace MAUI {
 
 	class AnimatedImage : public Widget, public MAUtil::TimerListener {
 	public:
-		AnimatedImage(int x, int y, int width, int height, Widget *parent=NULL);
-		AnimatedImage(int x, int y, int width, int height, Widget* parent=NULL, MAHandle res=0);
+		AnimatedImage(int x=0, int y=0, int width=0, int height=0, MAHandle res=0);
 		void setResource(MAHandle res);
 		MAHandle getResource() const;
 		

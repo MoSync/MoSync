@@ -43,9 +43,9 @@ namespace MAUI {
 	void EditBoxListener::characterAdded(EditBox *eb, char c) {
 	}
 
-	EditBox::EditBox(int x, int y, int width, int height, Widget* parent, const String &text,
-			bool manageNavigation, bool mMultiLine, int maxLength, InputMode inputMode) :
-		Label(x, y, width, height, parent, text),
+	EditBox::EditBox(int x, int y, int width, int height, const String &text,
+		bool manageNavigation, bool mMultiLine, int maxLength, InputMode inputMode) :
+		Label(x, y, width, height, text),
 		mCursorIndex(0),
 		mManageNavigation(manageNavigation),
 		mActive(false),

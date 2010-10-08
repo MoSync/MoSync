@@ -55,25 +55,11 @@ namespace MAUI {
 			VA_BOTTOM
 		};
 
-		/** Constructor.
-		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
-		  * \param y the vertical position of the Label relative to its parent's top left padded corner
-		  * \param width the width of the Label.
-		  * \param height the height of the Label.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Label to be added to the parent's children.
-		  **/
-		Label(int x, int y, int width, int height, Widget* parent);
 		/** Constructor
-		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
-		  * \param y the vertical position of the Label relative to its parent's top left padded corner
-		  * \param width the width of the Label.
-		  * \param height the height of the Label.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the widget to be added to the parent's children.
 		  * \param caption the text displayed by the Label.
-		  * \param backColor the background color of the widget.
 		  * \param font the font to be used by to render the caption.
 		  */
-		Label(int x, int y, int width, int height, Widget* parent, const String &caption);
+		Label(int x=0, int y=0, int width=0, int height=0, const String &caption="", Font* font=NULL);
 
 		/** Turns multiline mode on or off **/
 		void setMultiLine(bool b=true);
@@ -172,17 +158,17 @@ namespace MAUI {
 	class LabelStyle : public Style {
 	public:
 		LabelStyle(
-				FontProperty* font,
-				int paddingLeft = 0,
-				int paddingRight = 0,
-				int paddingTop = 0,
-				int paddingBottom = 0,
-				int marginLeft = 0,
-				int marginRight = 0,
-				int marginTop = 0,
-				int marginBottom = 0,
-				SkinProperty* backgroundSkinFocused = NULL,
-				SkinProperty* backgroundSkinUnfocused = NULL
+			FontProperty* font,
+			int paddingLeft = 0,
+			int paddingRight = 0,
+			int paddingTop = 0,
+			int paddingBottom = 0,
+			int marginLeft = 0,
+			int marginRight = 0,
+			int marginTop = 0,
+			int marginBottom = 0,
+			SkinProperty* backgroundSkinFocused = NULL,
+			SkinProperty* backgroundSkinUnfocused = NULL
 		);
 	};
 

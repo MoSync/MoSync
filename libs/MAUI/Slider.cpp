@@ -4,9 +4,12 @@
 
 namespace MAUI {
 
-Slider::Slider(int x, int y, int width, int height, Widget* parent, Orientation ori, double minValue, double maxValue, double defaultValue) :
-	Widget(x, y, width, height, parent), mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue), mValueChanged(false), mMoveToPoint(false),
-	mSliderListeners(false) {
+Slider::Slider(int x, int y, int width, int height,
+	Orientation ori, double minValue, double maxValue, double defaultValue)
+: Widget(x, y, width, height),
+mPressed(false), mOrientation(ori), mMinValue(minValue), mMaxValue(maxValue),
+mValueChanged(false), mMoveToPoint(false), mSliderListeners(false)
+{
 	setValue(defaultValue);
 }
 

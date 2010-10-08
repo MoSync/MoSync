@@ -39,7 +39,7 @@ namespace MAUI {
 
 	class Button : public Label {
 	public:
-		Button(int x, int y, int width, int height, Widget* parent=NULL, const String& caption="");
+		Button(int x=0, int y=0, int width=0, int height=0, const String& caption="");
 		bool pointerPressed(MAPoint2d p, int id);
 		bool pointerMoved(MAPoint2d p, int id);
 		bool pointerReleased(MAPoint2d p, int id);

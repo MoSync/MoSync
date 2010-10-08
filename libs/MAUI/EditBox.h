@@ -86,7 +86,7 @@ namespace MAUI {
 		  * \param maxLength controls the maximum number of characters that can be entered.
 			* \param inputMode the input mode.
 		  **/
-		EditBox(int x, int y, int width, int height, Widget* parent, const String &text="",
+		EditBox(int x=0, int y=0, int width=0, int height=0, const String &text="",
 			bool manageNavigation=true, bool multiLine=false,
 			int maxLength=64, InputMode inputMode=IM_STANDARD);
 
