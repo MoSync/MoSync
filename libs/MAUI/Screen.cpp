@@ -128,20 +128,26 @@ namespace MAUI {
 		if(!mFocusedWidget) {
 			mFocusedWidget = getFocusableWidget(mMain);
 			mFocusedWidget->setFocused(true);
-			return;
+			//return;
 		}
 
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(ip)
+			if(ip) {
 				ip->keyPressed(keyCode, nativeCode);
+			} else {
+				mFocusedWidget->keyPressed(keyCode, nativeCode);
+			}
 		}
 	}
 	void Screen::keyReleaseEvent(int keyCode, int nativeCode) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(ip)
+			if(ip) {
 				ip->keyReleased(keyCode, nativeCode);
+			} else {
+				mFocusedWidget->keyReleased(keyCode, nativeCode);
+			}
 		}
 	}
 	void Screen::pointerPressEvent(MAPoint2d point) {
@@ -151,17 +157,24 @@ namespace MAUI {
 		if(newFocus) {
 			setFocusedWidget(newFocus);
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(ip)
+			if(ip) {
 				if(!ip->pointerPressed(point, 0))
 					setFocusedWidget(NULL);
+			} else {
+				if(!newFocus->pointerPressed(point, 0))
+					setFocusedWidget(NULL);
+			}
 		}
 
 	}
 	void Screen::pointerReleaseEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(ip)
+			if(ip) {
 				ip->pointerReleased(point, 0);
+			} else {
+				mFocusedWidget->pointerPressed(point, 0);
+			}
 		}
 
 		setFocusedWidget(NULL);
@@ -169,10 +182,13 @@ namespace MAUI {
 	void Screen::pointerMoveEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(ip)
+			if(ip) {
 				if(!ip->pointerMoved(point, 0))
 					setFocusedWidget(NULL);
-
+			} else {
+				if(!mFocusedWidget->pointerMoved(point, 0))
+					setFocusedWidget(NULL);
+			}
 		}
 	}
 }

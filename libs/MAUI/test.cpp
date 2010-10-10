@@ -197,6 +197,12 @@ public:
 
 private:
 
+#ifdef _WIN32
+	int isdigit(char c) {
+		return (c>='0')&&(c<='9');
+	}
+#endif
+
 	int getPrecedence(const RpnNode& node) {
 		switch(node.mType) {
 		case RpnNode::ADD:
@@ -246,7 +252,7 @@ private:
 
 class GraphWidget : public Widget {
 public:
-	GraphWidget(int x, int y, int w, int h, Widget *parent=NULL) : Widget(x, y, w, h, parent),
+	GraphWidget(int x=0, int y=0, int w=0, int h=0) : Widget(x, y, w, h),
 	mAmplitude(1.0), mFrequency(1.0) {
 
 	}
@@ -341,23 +347,27 @@ public:
 	}
 
 	GraphScreen() {
-		ListBox *mainListbox = new ListBox(0, 0, 240, 320, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
+		ListBox *mainListbox = new ListBox(0, 0, 240, 320, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
 		mainListbox->setAutoSize(true);
 
-		mGraphWidget = new GraphWidget(0, 0, 0, 100, mainListbox);
+		mGraphWidget = new GraphWidget(0, 0, 0, 100);
+		mainListbox->add(mGraphWidget);
 
 		Slider *slider;
-		mFrequencySlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, 0.0, 8, 1.0);
+		mFrequencySlider = new Slider(0, 0, 0, mScreenHeight/6, Slider::HORIZONTAL, 0.0, 8, 1.0);
 		mFrequencySlider->addSliderListener(this);
-		mAmplitudeSlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, -1, 1, 1.0);
+		mAmplitudeSlider = new Slider(0, 0, 0, mScreenHeight/6, Slider::HORIZONTAL, -1, 1, 1.0);
 		mAmplitudeSlider->addSliderListener(this);
-		mPhaseSlider = new Slider(0, 0, 0, mScreenHeight/6, mainListbox, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
+		mPhaseSlider = new Slider(0, 0, 0, mScreenHeight/6, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
 		mPhaseSlider->addSliderListener(this);
 		mPhaseSlider->setMoveToPoint(true);
+		mainListbox->add(mFrequencySlider);
+		mainListbox->add(mAmplitudeSlider);
+		mainListbox->add(mPhaseSlider);
 
-		Button *button = new Button(0, 0, 50, mScreenHeight/6, mainListbox, "calculator");
+		Button *button = new Button(0, 0, 50, mScreenHeight/6, "calculator");
 		button->addButtonListener(this);
-
+		mainListbox->add(button);
 		setMain(mainListbox);
 
 	}
@@ -398,15 +408,19 @@ public:
 	}
 
 	CalculatorScreen() {
-			ListBox *mainListbox = new ListBox(0, 0, 240, 320, NULL, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
+			ListBox *mainListbox = new ListBox(0, 0, 240, 320, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
 			mainListbox->setAutoSize(true);
 
-			mainLabel = new Label(0, 0, 50, 80, mainListbox, "");
+			mainLabel = new Label(0, 0, 50, 80, "");
 			mainLabel->setVerticalAlignment(Label::VA_CENTER);
 
-			Layout *calculatorPane = new  Layout(0, 0, 240, 240, mainListbox, 4, 4);
+			mainListbox->add(mainLabel);
+
+			Layout *calculatorPane = new  Layout(0, 0, 240, 240, 4, 4);
 			calculatorPane->setAutoSizeX(true);
 			calculatorPane->setAutoSizeY(true);
+
+			mainListbox->add(calculatorPane);
 
 			const char* buttons1[] = {
 					"1","2","3","+",
@@ -417,32 +431,41 @@ public:
 
 			Button *button;
 			for(int i = 0; i < 16; i++) {
-				button = new Button(0, 0, 50, 50, calculatorPane, buttons1[i]);
+				button = new Button(0, 0, 50, 50, buttons1[i]);
 				button->addButtonListener(this);
+				calculatorPane->add(button);
 			}
 
 			for(int i = 0; i < 16; i++) {
-				button = new Button(0, 0, 50, 100, mainListbox, "graph");
+				button = new Button(0, 0, 50, 100, "graph");
 				button->addButtonListener(this);
+				mainListbox->add(button);
 			}
 
-			ListBox *testListbox = new ListBox(0, 0, 240, 320, mainListbox, ListBox::LBO_HORIZONTAL, ListBox::LBA_LINEAR, true);
+			ListBox *testListbox = new ListBox(0, 0, 240, 320, ListBox::LBO_HORIZONTAL, ListBox::LBA_LINEAR, true);
 			testListbox->setAutoSize(true);
+			mainListbox->add(testListbox);
 			for(int i = 0; i < 16; i++) {
-				button = new Button(0, 0, 100, 50, testListbox, "graph");
+				button = new Button(0, 0, 100, 50, "graph");
 				button->addButtonListener(this);
+				testListbox->add(button);
 			}
 
-			ListBox *testListbox2 = new ListBox(0, 0, 240, 320, testListbox, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
+			ListBox *testListbox2 = new ListBox(0, 0, 240, 320, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
 			testListbox2->setAutoSize(true);
+			testListbox->add(testListbox2);
 			for(int i = 0; i < 16; i++) {
-				button = new Button(0, 0, 100, 50, testListbox2, "graph2");
+				button = new Button(0, 0, 100, 50, "graph2");
 				button->addButtonListener(this);
+				testListbox2->add(button);
 			}
 
-			NativeEditBox *native = new NativeEditBox(0, 0, 50, 50, mainListbox);
-			button = new Button(0, 0, 50, 100, mainListbox, "exit");
+			NativeEditBox *native = new NativeEditBox(0, 0, 50, 50);
+			mainListbox->add(native);
+
+			button = new Button(0, 0, 50, 100, "exit");
 			button->addButtonListener(this);
+			mainListbox->add(button);
 
 
 			mExp = new Expression();
@@ -482,7 +505,6 @@ public:
 
 		//SkinProperty* selectedWidgetSkin = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
 		//SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
-
 		//SkinProperty* focusedUnselectedWidgetSkin = new SkinProperty(RES_FOCUSED_UNSELECTED2, 16, 32, 16, 32, true);
 
 		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 6, 11, 0, 8, true);
@@ -500,7 +522,8 @@ public:
 		//Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
 		Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
 
-		WidgetSkin::setCacheEnabled(true);
+		// For some strange reason this is now broken??.
+		//WidgetSkin::setCacheEnabled(true);
 
 		sCalculatorScreen = new CalculatorScreen();
 		sGraphScreen = new GraphScreen();

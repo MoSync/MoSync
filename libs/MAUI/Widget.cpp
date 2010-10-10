@@ -573,7 +573,7 @@ namespace MAUI {
 					best = candidate;
 			} else {
 				Widget* ret = mChildren[i]->getNearestFocusableInDirectionFrom(w, dir, best);
-				if(ret) {
+				if(ret && ret != best) {
 					Widget* candidate = w->nearestWidget(ret, best, dir);
 					if(candidate)
 						best = candidate;

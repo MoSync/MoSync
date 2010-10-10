@@ -442,6 +442,6 @@ namespace MAUI {
 	}
 
 	void Layout::focusChanged(Widget *widget, bool focused) {
-		//setFocused(focused);
+		setFocused(focused);
 	}
 }

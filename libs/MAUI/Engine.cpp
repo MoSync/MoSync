@@ -77,9 +77,9 @@ namespace MAUI {
 		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
 
 		Style* widgetStyle = new Style();
-		widgetStyle->set("font", new FontProperty(RESFNT(arial_white)));
-		widgetStyle->set("backgroundSkinFocused", focusedReleased);
-		widgetStyle->set("backgroundSkinUnfocused", unfocusedReleased);
+		//widgetStyle->set("font", new FontProperty(RESFNT(arial_white)));
+		widgetStyle->set("backgroundSkinFocused", NULL);
+		widgetStyle->set("backgroundSkinUnfocused", NULL);
 		mSingletonPtr->setDefaultStyle("Widget", widgetStyle);
 	}
 	

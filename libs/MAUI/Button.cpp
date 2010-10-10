@@ -11,6 +11,8 @@ mSkinUnfocusedReleased(NULL), mListeners(false)
 {
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
+	this->setAutoSizeX(false);
+	this->setAutoSizeY(false);
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
@@ -62,7 +64,8 @@ void Button::drawWidget() {
 		}
 	} else {
 		if(!mPressed) {
-			mSkinUnfocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
+			if(mSkinUnfocusedReleased)
+				mSkinUnfocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
 		} else {
 			maPanic(1, "Something is wrong, button can't be unfocused and pressed");
 		}
@@ -80,7 +83,6 @@ void Button::restyle() {
 	mSkinFocusedPressed = style->getSafe<SkinProperty>("skinFocusedPressed");
 	mSkinFocusedReleased = style->getSafe<SkinProperty>("skinFocusedReleased");
 	mSkinUnfocusedReleased = style->getSafe<SkinProperty>("skinUnfocusedReleased");
-
 	Label::restyle();
 }
 

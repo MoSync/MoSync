@@ -69,15 +69,19 @@ bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
 	if (!ret) {
 		Direction dir = mapKeyCodeToDirection(keyCode);
 		if (dir != NONE) {
-			Widget* newFocus = mOwner->getFocusableInDirectionFrom(mOwner, dir);
+			Widget* newFocus;
+			newFocus = mOwner->getFocusableInDirectionFrom(mOwner, dir);
 			if (newFocus) {
-				Screen::getCurrentScreen()->setFocusedWidget(newFocus);
-				newFocus->keyPressed(keyCode, nativeCode);
+				MAUI_LOG("Got new focus!");
+				mOwner->setFocused(false);
+				Screen::getCurrentScreen()->setFocusedWidget(newFocus);			
+				//newFocus->setFocused(true);
+				//ret = newFocus->keyPressed(keyCode, nativeCode);
 			}
 		}
 	}
 
-	return false;
+	return ret;
 }
 
 bool DefaultInputPolicy::keyReleased(int keyCode, int nativeCode) {

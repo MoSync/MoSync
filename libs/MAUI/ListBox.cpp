@@ -712,6 +712,7 @@ namespace MAUI {
 		mFocusedWidget = w;
 		if(mFocusedWidget)
 			mFocusedWidget->setFocused(true);
+		
 		requestRepaint();
 	}
 
@@ -724,13 +725,22 @@ namespace MAUI {
 	bool ListBox::keyPressed(int keyCode, int nativeCode) {
 		mTouched = false;
 
+		MAUI_LOG("ListBox key pressed!");
+
 		if(mFocusedWidget) {
-			bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
-			if(ret) return true;
+			//bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
+			//if(ret) return true;
+
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
+			if(!ip) return false;
+			if(!ip->keyPressed(keyCode, nativeCode)) {
+				setFocusedWidget(NULL);
+			} else return true;
+
 		} else {
 			if(mChildren.size()>0) {
-				if(mChildren[0]->isFocusable()) {
-					mChildren[0]->setFocused(true);
+				if(mChildren[mSelectedIndex]->isFocusable()) {
+					mChildren[mSelectedIndex]->setFocused(true);
 					return true;
 				}
 				return true;//return true;
@@ -739,6 +749,7 @@ namespace MAUI {
 			}
 		}
 
+		/*
 		if(mOrientation == LBO_HORIZONTAL) {
 			if(keyCode == MAK_LEFT) {
 				if(!mWrapping && mSelectedIndex == 0) return false;
@@ -764,6 +775,7 @@ namespace MAUI {
 				return false;
 			}
 		}
+		*/
 	}
 
 	bool ListBox::pointerPressed(MAPoint2d p, int id) {
@@ -922,9 +934,9 @@ namespace MAUI {
 		if(!mTouched && focused) {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
-					//setSelectedIndex(i);
+					setSelectedIndex(i);
 					mFocusedWidget = widget;
-					//Screen::getCurrentScreen()->setFocusedWidget(widget);
+					setFocused(true);
 					return;
 				}
 			}
