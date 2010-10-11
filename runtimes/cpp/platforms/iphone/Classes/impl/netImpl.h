@@ -96,7 +96,7 @@ public:
 	 * @param max	Maximum number of bytes to read
 	 * @return		A positive number indicates the number of bytes read;
 	 *				0 indicates that the end of the buffer was reached;
-	 *				A negative number means that the operation failed.
+	 *				CONNERR_SSL means that the operation failed.
 	 */
 	virtual int read(void* dst, int max);
 	
@@ -105,7 +105,8 @@ public:
 	 *
 	 * @param src	Pointer to the buffer to write
 	 * @param len	Number of bytes to write
-	 * @return		The number of bytes actually written, or -1 if an error occurs.
+	 * @return		The number of bytes actually written, or CONNERR_SSL
+	 *				if an error occurs.
 	 *				If the receiver has reached its capacity, 0 is returned.
 	 */
 	virtual int write(const void* src, int len);
