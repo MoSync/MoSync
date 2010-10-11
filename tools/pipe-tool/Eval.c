@@ -41,31 +41,24 @@ int HexDig(char digit)
 
 
 //****************************************
-//			 Get a number
+//			 Get a Symbol
+// 	 Replace dots with underscores
 //****************************************
-/*
-char * GetSym()
-{
-//	unsigned int v = 0;
-	char *lab = xName;
-		
-	while (iscsym(*FilePtr))
-		*lab++ = *FilePtr++;
-		
-	*lab++ = 0;
-
-	return xName;
-}
-*/
 
 char * GetSym()
 {
 	unsigned int v = 0;
 	char *NamePtr = xName;
+	char c;
 	
 	while (iscsym(*FilePtr))
 	{
-		*NamePtr++ = *FilePtr++;
+		c = *FilePtr++;
+
+		if (c == '.')
+			c = '_';
+
+		*NamePtr++ = c;
 
 		if (v++ >= NAME_MAX)
 			Error(Error_Fatal, "Symbol too int");

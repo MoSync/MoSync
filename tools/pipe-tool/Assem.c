@@ -436,10 +436,18 @@ void GetAsmName()
 {
 	//unsigned int v = 0;
 	char *NamePtr = Name;
-	
+	char c;
+		
 	while (asmsym(*FilePtr))
-		*NamePtr++ = *FilePtr++;
-
+	{
+		c = *FilePtr++;
+		
+		if (c == '.')
+			c = '_';
+		
+		*NamePtr++ = c;
+	}
+	
 	*NamePtr++ = 0;
 
 	return;
