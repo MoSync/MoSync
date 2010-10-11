@@ -21,7 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HTTP_STATE_FINISHING 3
 #define HTTP_STATE_FINISHED 4
 
-int CONNOP_CONNECT_SUCCESS = 1;
+static final int CONNOP_CONNECT_SUCCESS = 1;
+
+static final int SSL_HANDSHAKE_TIMEOUT_MILLIS = 5000;
 			
 /*
  * Hashtable is used to keep all the open connections.
@@ -83,6 +85,10 @@ MAHandle maConnect(final String url)
 		if (url.startsWith("socket://"))
 		{
 			connObj = new SocketConnectionObject().create(url, connHandle);
+		}	
+		else if (url.startsWith("ssl://"))
+		{
+			connObj = new SecureSocketConnectionObject().create(url, connHandle);
 		}	
 		else if (url.startsWith("btspp://"))
 		{
@@ -1130,7 +1136,7 @@ class SocketConnectionObject extends ConnectionObject
 	/**
 	 * Constructor.
 	 */
-	private SocketConnectionObject()
+	public SocketConnectionObject()
 	{
 	}
 	
@@ -1140,10 +1146,14 @@ class SocketConnectionObject extends ConnectionObject
 	public ConnectionObject create(String url, MAHandle handle)
 		throws MalformedURLException, IOException, Exception
 	{
-		Log.i("@@@TEST", "Socket url: " + url);
-		
 		// Restructure the url since port can't be part of it.
-		String realUrl = url.substring(9);
+		int realUrlStart = url.indexOf("://"); // Skip to "://"
+		if (-1 == realUrlStart)
+		{
+			throw new MalformedURLException("Malformed URL: " + url);
+		}
+		
+		String realUrl = url.substring(realUrlStart + 3);
 		String[] splitUrl = realUrl.split("\\b:\\d{1,5}\\b");
 
 		if (splitUrl.length > 2) 
@@ -1164,12 +1174,10 @@ class SocketConnectionObject extends ConnectionObject
 			port = Integer.valueOf(realUrl.substring(splitUrl[0].length() + 1)).intValue();
 		}
 
-		Log.i("@@@TEST", "Socket newUrl: " + newUrl + " port: " + port);
-		
 		mSocketAddress = newUrl;
 		mSocketPort = port;
 		mHandle = handle;
-			
+		
 		return this;
 	}
 	
@@ -1226,18 +1234,26 @@ class SocketConnectionObject extends ConnectionObject
 		});
 	}
 	
+	/**
+	 * Factory method that creates a socket.
+	 */
+	Socket createSocket(String socketAddress, int socketPort) 
+		throws IOException, InterruptedIOException
+	{
+		Log.i("SocketConnectionObject", "creating socket");
+		return new Socket(socketAddress, socketPort);
+	}
+	
 	void doConnect()
 	{
 		try
 		{
-			Log.i("Connector", "connection to socket");
-			Socket socket = new Socket(mSocketAddress, mSocketPort);
-			Log.i("Connector", "connection socket created");
+			Socket socket = createSocket(mSocketAddress, mSocketPort);
 			
 			if (null == socket)
 			{
 				// Error
-				Log.i("Connector", "socket is null");
+				Log.i("SocketConnectionObject", "socket is null");
 				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 				return;
 			}
@@ -1245,7 +1261,7 @@ class SocketConnectionObject extends ConnectionObject
 			if (!socket.isConnected())
 			{
 				// Error.
-				Log.i("Connector", "socket is not connected");
+				Log.i("SocketConnectionObject", "socket is not connected");
 				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 				return;
 			}		
@@ -1259,7 +1275,7 @@ class SocketConnectionObject extends ConnectionObject
 			{
 				if (mCancelled) 
 				{
-					Log.i("Connector", "connection was canceled");
+					Log.i("SocketConnectionObject", "connection was canceled");
 					postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 					return;
 				}
@@ -1284,6 +1300,29 @@ class SocketConnectionObject extends ConnectionObject
 	}
 
 } // End of class SocketConnectionObject
+
+class SecureSocketConnectionObject extends SocketConnectionObject
+{	
+	/**
+	 * Constructor.
+	 */
+	public SecureSocketConnectionObject()
+	{
+	}
+	
+	/**
+	 * Factory method that creates a socket.
+	 */
+	@Override
+	Socket createSocket(String socketAddress, int socketPort) 
+		throws IOException, InterruptedIOException
+	{
+		Log.i("SecureSocketConnectionObject", "creating secure socket");
+		SocketFactory factory = SSLCertificateSocketFactory.getDefault(SSL_HANDSHAKE_TIMEOUT_MILLIS);
+		return factory.createSocket(socketAddress, socketPort);
+	}
+	
+} // End of class SecureSocketConnectionObject
 
 #ifdef _ANDROID_BLUETOOTH
 
