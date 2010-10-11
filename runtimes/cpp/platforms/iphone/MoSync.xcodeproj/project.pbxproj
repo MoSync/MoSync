@@ -43,7 +43,7 @@
 		85BF2B651134052300BB0201 /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
 		85BF2B661134052300BB0201 /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
 		85BF2B75113405A800BB0201 /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
-		85BF2B76113405A800BB0201 /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
+		85BF2B76113405A800BB0201 /* netImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.mm */; };
 		85BF2B7F1134125E00BB0201 /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */; };
 		85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */; };
 		85BF2C3B11341EF000BB0201 /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
@@ -73,7 +73,7 @@
 		85F2552A11AC12DE00EB47EE /* Syscall.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B591134052300BB0201 /* Syscall.cpp */; };
 		85F2552B11AC12DE00EB47EE /* ThreadPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B5C1134052300BB0201 /* ThreadPool.cpp */; };
 		85F2552C11AC12DE00EB47EE /* FileImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6B113405A800BB0201 /* FileImpl.cpp */; };
-		85F2552D11AC12DE00EB47EE /* netImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.cpp */; };
+		85F2552D11AC12DE00EB47EE /* netImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B6D113405A800BB0201 /* netImpl.mm */; };
 		85F2552E11AC12DE00EB47EE /* iphone_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B7E1134125E00BB0201 /* iphone_helpers.mm */; };
 		85F2552F11AC12DE00EB47EE /* MoSyncMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */; };
 		85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2C60113429A900BB0201 /* MoSyncView.mm */; };
@@ -189,7 +189,7 @@
 		85BF2B6A113405A800BB0201 /* config_platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config_platform.h; path = impl/config_platform.h; sourceTree = "<group>"; };
 		85BF2B6B113405A800BB0201 /* FileImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileImpl.cpp; path = impl/FileImpl.cpp; sourceTree = "<group>"; };
 		85BF2B6C113405A800BB0201 /* FileImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileImpl.h; path = impl/FileImpl.h; sourceTree = "<group>"; };
-		85BF2B6D113405A800BB0201 /* netImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = netImpl.cpp; path = impl/netImpl.cpp; sourceTree = "<group>"; };
+		85BF2B6D113405A800BB0201 /* netImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = netImpl.mm; path = impl/netImpl.mm; sourceTree = "<group>"; };
 		85BF2B6E113405A800BB0201 /* netImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = netImpl.h; path = impl/netImpl.h; sourceTree = "<group>"; };
 		85BF2B6F113405A800BB0201 /* Platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = impl/Platform.h; sourceTree = "<group>"; };
 		85BF2B70113405A800BB0201 /* ResourceDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ResourceDefs.h; path = impl/ResourceDefs.h; sourceTree = "<group>"; };
@@ -362,7 +362,7 @@
 				85BF2B6A113405A800BB0201 /* config_platform.h */,
 				85BF2B6B113405A800BB0201 /* FileImpl.cpp */,
 				85BF2B6C113405A800BB0201 /* FileImpl.h */,
-				85BF2B6D113405A800BB0201 /* netImpl.cpp */,
+				85BF2B6D113405A800BB0201 /* netImpl.mm */,
 				85BF2B6E113405A800BB0201 /* netImpl.h */,
 				85BF2B6F113405A800BB0201 /* Platform.h */,
 				85BF2B70113405A800BB0201 /* ResourceDefs.h */,
@@ -626,7 +626,7 @@
 				85BF2B651134052300BB0201 /* Syscall.cpp in Sources */,
 				85BF2B661134052300BB0201 /* ThreadPool.cpp in Sources */,
 				85BF2B75113405A800BB0201 /* FileImpl.cpp in Sources */,
-				85BF2B76113405A800BB0201 /* netImpl.cpp in Sources */,
+				85BF2B76113405A800BB0201 /* netImpl.mm in Sources */,
 				85BF2B7F1134125E00BB0201 /* iphone_helpers.mm in Sources */,
 				85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */,
 				85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */,
@@ -666,7 +666,7 @@
 				85F2552A11AC12DE00EB47EE /* Syscall.cpp in Sources */,
 				85F2552B11AC12DE00EB47EE /* ThreadPool.cpp in Sources */,
 				85F2552C11AC12DE00EB47EE /* FileImpl.cpp in Sources */,
-				85F2552D11AC12DE00EB47EE /* netImpl.cpp in Sources */,
+				85F2552D11AC12DE00EB47EE /* netImpl.mm in Sources */,
 				85F2552E11AC12DE00EB47EE /* iphone_helpers.mm in Sources */,
 				85F2552F11AC12DE00EB47EE /* MoSyncMain.mm in Sources */,
 				85F2553111AC12DE00EB47EE /* filelist-linux.c in Sources */,

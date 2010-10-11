@@ -31,7 +31,7 @@ using namespace MAUtil;
 class MyMoblet : public Moblet, private HttpConnectionListener {
 public:
 	MyMoblet() : mHttp(this) {
-		start(EXAMPLE_URL);
+		start(SECURE_URL);
 	}
 	
 	void start(const char* url) {
@@ -81,6 +81,10 @@ public:
 	
 	void pointerPressEvent(MAPoint2d p) {
 		start(EXAMPLE_URL);
+	}
+
+	void closeEvent() {
+
 	}
 
 private:

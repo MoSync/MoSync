@@ -738,7 +738,7 @@ void EmitCDtors()
 void DumpPipeDebugInfo()
 {
 	char fname[80];
-	uint n;
+	uint n = 0;
 	unsigned char a,b;
 	
 	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d) Far=%x\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass, _FAR);
