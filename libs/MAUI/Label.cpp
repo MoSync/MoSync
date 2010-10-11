@@ -301,14 +301,9 @@ namespace MAUI {
 			int paddingRight,
 			int paddingTop,
 			int paddingBottom,
-			int marginLeft,
-			int marginRight,
-			int marginTop,
-			int marginBottom,
 			SkinProperty* backgroundSkinFocused,
 			SkinProperty* backgroundSkinUnfocused
 	) : Style(paddingLeft, paddingRight, paddingTop, paddingBottom,
-			marginLeft, marginRight, marginTop, marginBottom,
 			backgroundSkinFocused, backgroundSkinUnfocused)
 	{
 		this->mProperties["font"] = font;

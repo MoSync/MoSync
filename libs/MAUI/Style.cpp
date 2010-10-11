@@ -15,10 +15,6 @@ Style::Style(
 		int paddingRight,
 		int paddingTop,
 		int paddingBottom,
-		int marginLeft,
-		int marginRight,
-		int marginTop,
-		int marginBottom,
 		SkinProperty* backgroundSkinFocused,
 		SkinProperty* backgroundSkinUnfocused
 ) {
@@ -26,10 +22,6 @@ Style::Style(
 	mProperties["paddingRight"] = new IntegerProperty(paddingRight);
 	mProperties["paddingTop"] = new IntegerProperty(paddingTop);
 	mProperties["paddingBottom"] = new IntegerProperty(paddingBottom);
-	mProperties["marginLeft"] = new IntegerProperty(marginLeft);
-	mProperties["marginRight"] = new IntegerProperty(marginRight);
-	mProperties["marginTop"] = new IntegerProperty(marginTop);
-	mProperties["marginBottom"] = new IntegerProperty(marginBottom);
 	mProperties["backgroundSkinFocused"] = backgroundSkinFocused;
 	mProperties["backgroundSkinUnfocused"] = backgroundSkinUnfocused;
 }

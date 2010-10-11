@@ -195,7 +195,7 @@ void Slider::removeSliderListener(SliderListener* sl) {
 	mSliderListeners.remove(sl);
 }
 
-SliderStyle::SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)
+SliderStyle::SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, NULL, NULL)
 {
 	this->mProperties["sliderSkin"] = slider_bkg;
 	this->mProperties["sliderAmountSkin"] = slider_amt;

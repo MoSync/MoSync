@@ -373,13 +373,13 @@ namespace MAUI {
 
 		/**
 		* \brief Sets the right padding width.
-		* \param t The padding to be set (in pixels).
+		* \param r The padding to be set (in pixels).
 		*/ 
 		virtual void setPaddingRight(int r);
 
 		/**
 		* \brief Sets the bottom padding height.
-		* \param t The padding to be set (in pixels).
+		* \param b The padding to be set (in pixels).
 		*/ 
 		virtual void setPaddingBottom(int b);
 

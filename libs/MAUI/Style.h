@@ -105,10 +105,6 @@ public:
 	 * paddingRight = IntegerProperty
 	 * paddingTop = IntegerProperty
 	 * paddingBottom = IntegerProperty
-	 * marginLeft = IntegerProperty
-	 * marginRight = IntegerProperty
-	 * marginTop = IntegerProperty
-	 * marginBottom = IntegerProperty
 	 * backgroundSkinFocused = SkinProperty
 	 * backgroundSkinUnfocused = SkinProperty
 	 */
@@ -118,10 +114,6 @@ public:
 			int paddingRight = 0,
 			int paddingTop = 0,
 			int paddingBottom = 0,
-			int marginLeft = 0,
-			int marginRight = 0,
-			int marginTop = 0,
-			int marginBottom = 0,
 			SkinProperty* backgroundSkinFocused = NULL,
 			SkinProperty* backgroundSkinUnfocused = NULL
 	);

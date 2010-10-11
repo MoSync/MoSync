@@ -510,8 +510,8 @@ public:
 
 			FontProperty* font = new FontProperty(RES_FONT);
 
-		Style* widgetStyle = new Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
-		LabelStyle* labelStyle = new LabelStyle(font, 10,10,10,10,0,0,0,0, NULL, NULL);
+		Style* widgetStyle = new Style(0, 0, 0, 0, NULL, NULL);
+		LabelStyle* labelStyle = new LabelStyle(font, 10, 10, 10, 10, NULL, NULL);
 		//ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, focusedUnselectedWidgetSkin, unselectedWidgetSkin, font);
 	
 		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 10, 12, 0, 18, true);

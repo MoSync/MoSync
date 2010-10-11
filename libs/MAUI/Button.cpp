@@ -117,7 +117,7 @@ ButtonStyle::ButtonStyle(
 		SkinProperty* focusedPressed,
 		SkinProperty* focusedReleased,
 		SkinProperty* unfocusedReleased,
-		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL)
+		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, NULL, NULL)
 {
 	this->mProperties["skinFocusedPressed"] = focusedPressed;
 	this->mProperties["skinFocusedReleased"] = focusedReleased;
