@@ -17,11 +17,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <maassert.h>
 
-#include "Layout.h"
+#include "GridLayout.h"
 
 namespace MAUI {
 
-	Layout::Layout(int x, int y, int width, int height, int gridXSize, int gridYSize) :
+	GridLayout::GridLayout(int x, int y, int width, int height, int gridXSize, int gridYSize) :
 	Widget(x, y, width, height),
 	mMustRebuild(false),
 	mAlignmentX(HA_LEFT),
@@ -31,20 +31,19 @@ namespace MAUI {
 	mAutoSizeX(true),
 	mAutoSizeY(true),
 	mGridXSize(gridXSize),
-	mGridYSize(gridYSize),
-	mSelectedIndex(0)
+	mGridYSize(gridYSize)
 	{
 		requestRepaint();
 	}
 
-	void Layout::boundsChanged(Widget *widget, const Rect& bounds) {
+	void GridLayout::boundsChanged(Widget *widget, const Rect& bounds) {
 		//rebuild();
 		mMustRebuild = true;
 	}
 
-	void Layout::drawWidget() { }
+	void GridLayout::drawWidget() { }
 
-	void Layout::rebuild() {
+	void GridLayout::rebuild() {
 		mMustRebuild = false;
 
 		if(mGridXSize*mGridYSize<this->mChildren.size()) {
@@ -270,13 +269,13 @@ namespace MAUI {
 
 
 	/*
-	void Layout::draw() {
+	void GridLayout::draw() {
 		Widget::draw();
 	}
 	*/
 
 
-	void Layout::add(Widget *child) {
+	void GridLayout::add(Widget *child) {
 		/*
 		int size = mChildren.size();
 		if(layoutType == VERTICAL_STACKING) {
@@ -311,7 +310,7 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	void Layout::clear() {
+	void GridLayout::clear() {
 		for(int i = 0; i < mChildren.size(); i++)
 			mChildren[i]->removeWidgetListener(this);
 		Widget::clear();
@@ -319,19 +318,19 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	void Layout::update() {
+	void GridLayout::update() {
 		Widget::update();
 		if(mMustRebuild) rebuild();
 	}
 
-	bool Layout::isTransparent() const {
+	bool GridLayout::isTransparent() const {
 		return true;
 	}
 
 
 
 	/*
-	void Layout::updateAbsolutePositionChildren(int x, int y) {
+	void GridLayout::updateAbsolutePositionChildren(int x, int y) {
 		switch(layoutType) {
 			case LT_VERTICAL_STACKING:
 			{
@@ -361,87 +360,62 @@ namespace MAUI {
 	}
 		*/
 	
-	void Layout::setPosition(int x, int y) {
+	void GridLayout::setPosition(int x, int y) {
 		Widget::setPosition(x, y);
 		mMustRebuild = true;
 	}
 	
-	void Layout::setWidth(int width) {
+	void GridLayout::setWidth(int width) {
 		Widget::setWidth(width);
 		mMustRebuild = true;
 	}
 	
-	void Layout::setHeight(int height) {
+	void GridLayout::setHeight(int height) {
 		Widget::setHeight(height);
 		mMustRebuild = true;
 	}
 
-	void Layout::setNumColumns(int numColumns) {
+	void GridLayout::setNumColumns(int numColumns) {
 		mGridXSize = numColumns;
 		mMustRebuild = true;
 	}
 
-	void Layout::setNumRows(int numRows) {
+	void GridLayout::setNumRows(int numRows) {
 		mGridYSize = numRows;
 		mMustRebuild = true;
 	}
 
-	void Layout::setMarginX(int p) {
+	void GridLayout::setMarginX(int p) {
 		this->mMarginX = p;
 		mMustRebuild = true;
 	}
 
-	void Layout::setMarginY(int p) {
+	void GridLayout::setMarginY(int p) {
 		this->mMarginY = p;
 		mMustRebuild = true;
 	}
 	
-	void Layout::setHorizontalAlignment(HorizontalAlignment alignment) {
+	void GridLayout::setHorizontalAlignment(HorizontalAlignment alignment) {
 		this->mAlignmentX = alignment;
 		mMustRebuild = true;
 	}
 
-	void Layout::setVerticalAlignment(VerticalAlignment alignment) {
+	void GridLayout::setVerticalAlignment(VerticalAlignment alignment) {
 		this->mAlignmentY = alignment;
 		mMustRebuild = true;
 	}
 
-	void Layout::setAutoSizeX(bool f ) {
+	void GridLayout::setAutoSizeX(bool f ) {
 		mAutoSizeX = f;
 		mMustRebuild = true;
 	}
 
-	void Layout::setAutoSizeY(bool f) {
+	void GridLayout::setAutoSizeY(bool f) {
 		mAutoSizeY = f;
 		mMustRebuild = true;
 	}
 
-
-	void Layout::goUp() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
-		if(mSelectedIndex - mGridXSize >= 0) mSelectedIndex-=mGridXSize;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
-	}
-	
-	void Layout::goDown() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
-		if(mSelectedIndex + mGridXSize < mChildren.size()) mSelectedIndex+=mGridXSize;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
-	}
-
-	void Layout::goRight() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
-		if(mSelectedIndex + 1 < mChildren.size()) mSelectedIndex++;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
-	}
-
-	void Layout::goLeft() {
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(false);
-		if(mSelectedIndex -1 >= 0) mSelectedIndex--;
-		if(mSelectedIndex < mChildren.size()) mChildren[mSelectedIndex]->setFocused(true);
-	}
-
-	void Layout::focusChanged(Widget *widget, bool focused) {
+	void GridLayout::focusChanged(Widget *widget, bool focused) {
 		setFocused(focused);
 	}
 }

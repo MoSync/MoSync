@@ -228,6 +228,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\GridLayout.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\GridLayout.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Image.cpp"
 			>
 		</File>
@@ -265,14 +273,6 @@
 		</File>
 		<File
 			RelativePath=".\Label.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Layout.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Layout.h"
 			>
 		</File>
 		<File
@@ -331,6 +331,14 @@
 		</File>
 		<File
 			RelativePath=".\Slider.h"
+			>
+		</File>
+		<File
+			RelativePath=".\StackLayout.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\StackLayout.h"
 			>
 		</File>
 		<File

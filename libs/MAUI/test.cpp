@@ -4,7 +4,9 @@
 #include <MAUI/Button.h>
 #include <MAUI/Slider.h>
 #include <MAUI/Engine.h>
-#include <MAUI/Layout.h>
+#include <MAUI/GridLayout.h>
+#include <MAUI/StackLayout.h>
+
 #include <MAUI/ListBox.h>
 
 #include <MAUtil/Stack.h>
@@ -347,11 +349,10 @@ public:
 	}
 
 	GraphScreen() {
-		ListBox *mainListbox = new ListBox(0, 0, 240, 320, ListBox::LBO_VERTICAL, ListBox::LBA_LINEAR, true);
-		mainListbox->setAutoSize(true);
+		StackLayout *mainLayout = new StackLayout(0, 0, 240, 320);
 
 		mGraphWidget = new GraphWidget(0, 0, 0, 100);
-		mainListbox->add(mGraphWidget);
+		mainLayout->add(mGraphWidget);
 
 		Slider *slider;
 		mFrequencySlider = new Slider(0, 0, 0, mScreenHeight/6, Slider::HORIZONTAL, 0.0, 8, 1.0);
@@ -361,14 +362,14 @@ public:
 		mPhaseSlider = new Slider(0, 0, 0, mScreenHeight/6, Slider::HORIZONTAL, 0.0, 2*3.14159, 0.0);
 		mPhaseSlider->addSliderListener(this);
 		mPhaseSlider->setMoveToPoint(true);
-		mainListbox->add(mFrequencySlider);
-		mainListbox->add(mAmplitudeSlider);
-		mainListbox->add(mPhaseSlider);
+		mainLayout->add(mFrequencySlider);
+		mainLayout->add(mAmplitudeSlider);
+		mainLayout->add(mPhaseSlider);
 
 		Button *button = new Button(0, 0, 50, mScreenHeight/6, "calculator");
 		button->addButtonListener(this);
-		mainListbox->add(button);
-		setMain(mainListbox);
+		mainLayout->add(button);
+		setMain(mainLayout);
 
 	}
 
@@ -416,7 +417,7 @@ public:
 
 			mainListbox->add(mainLabel);
 
-			Layout *calculatorPane = new  Layout(0, 0, 240, 240, 4, 4);
+			GridLayout *calculatorPane = new GridLayout(0, 0, 240, 240, 4, 4);
 			calculatorPane->setAutoSizeX(true);
 			calculatorPane->setAutoSizeY(true);
 
@@ -436,7 +437,7 @@ public:
 				calculatorPane->add(button);
 			}
 
-			for(int i = 0; i < 16; i++) {
+			for(int i = 0; i < 2; i++) {
 				button = new Button(0, 0, 50, 100, "graph");
 				button->addButtonListener(this);
 				mainListbox->add(button);

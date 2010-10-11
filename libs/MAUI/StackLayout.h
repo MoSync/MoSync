@@ -21,8 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \author Patrick Broman and Niklas Nummelin
 */
 
-#ifndef _SE_MSAB_MAUI_LAYOUT_H_
-#define _SE_MSAB_MAUI_LAYOUT_H_
+#ifndef _SE_MSAB_MAUI_STACK_LAYOUT_H_
+#define _SE_MSAB_MAUI_STACK_LAYOUT_H_
 
 #include "Widget.h"
 
@@ -33,25 +33,28 @@ namespace MAUI {
 	   * This widget is responsible for laying out its children in a grid.
 	   **/
 
-	class Layout : public Widget, protected WidgetListener {
+	class StackLayout : public Widget, protected WidgetListener {
 	public:
-		enum HorizontalAlignment {
-			HA_LEFT,
-			HA_CENTER,
-			HA_RIGHT
+		// Enum to describe stack layout alignment
+		// SLA_TOP_LEFT means alignment==TOP if the stack layout is VERTICAL and LEFT if it's HORIZONTAL etc.
+		// Autosize means it should autosize the widgets in the oposite direction of the stack layuout orientation
+		enum Alignment {
+			SLA_TOP_LEFT,
+			SLA_CENTER,
+			SLA_BOTTOM_RIGHT,
+			SLA_AUTO_SIZE
 		};
 
-		enum VerticalAlignment {
-			VA_TOP,
-			VA_CENTER,
-			VA_BOTTOM
+		enum Orientation {
+			SLO_VERTICAL,
+			SLO_HORIZONTAL
 		};
 
 		/** Constructor.
 		  * \param gridXSize the number of columns in the grid.
 		  * \param gridYSize the number of rows in the grid.
 		  **/
-		Layout(int x, int y, int width, int height, int gridXSize, int gridYSize);
+		StackLayout(int x, int y, int width, int height, Orientation ori=SLO_VERTICAL, Alignment ali=SLA_AUTO_SIZE);
 
 		/** Overloaded implementation of Widget::add(), with the same external semantics.
 		    **/
@@ -75,29 +78,9 @@ namespace MAUI {
 
 		/** Sets the horizontal alignment of the child widget within their grid cells.
 		    **/	
-		void setHorizontalAlignment(HorizontalAlignment alignment);
+		void setAlignment(Alignment alignment);
 
-		/** Sets the vertical alignment of the child widget within their grid cells.
-		    **/	
-		void setVerticalAlignment(VerticalAlignment alignment);
-
-		/** Sets the horizontal autosize property, determining wether the grid columns
-		    * are resized so that the widest of its children fits.
-		    **/	
-		void setAutoSizeX(bool f = true);
-
-		/** Sets the vertical autosize property, determining wether the grid rows
-		    * are resized so that the widest of its children fits.
-		    **/	
-		void setAutoSizeY(bool f = true);
-
-		/** Sets the number of columns in the grid.
-		    **/
-		void setNumColumns(int numColumns);
-
-		/** Sets the number of rows in the grid.
-		    **/
-		void setNumRows(int numRows);
+		void setOrientation(Orientation orienation);
 
 		/** Sets the position of the widget, relative to the parent **/
 		void setPosition(int x, int y);
@@ -108,18 +91,6 @@ namespace MAUI {
 		/** Sets the height of the widget  **/
 		void setHeight(int height);
 
-		/** Navigate to the cell above the currently selected one **/
-		void goUp();
-
-		/** Navigate to the cell below the currently selected one **/
-		void goDown();
-
-		/** Navigate to the cell to the right of the currently selected one **/
-		void goRight();
-
-		/** Navigate to the cell to the left the currently selected one **/
-		void goLeft();
-
 		virtual void update();
 
 		virtual bool isTransparent() const;
@@ -128,16 +99,12 @@ namespace MAUI {
 		void rebuild();
 
 		bool mMustRebuild;
-		HorizontalAlignment mAlignmentX;
-		VerticalAlignment mAlignmentY;
+		Orientation mOrientation;
+		Alignment mAlignment;
+
 		int mMarginX;
 		int mMarginY;
-		bool mAutoSizeX;
-		bool mAutoSizeY;
-		int mGridXSize;
-		int mGridYSize;
-		int mSelectedIndex;
-
+	
 		//WidgetListener
 		void boundsChanged(Widget *widget, const Rect& bounds);
 

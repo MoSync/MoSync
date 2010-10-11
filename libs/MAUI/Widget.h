@@ -131,7 +131,7 @@ namespace MAUI {
       
 	class Widget {
 		friend class Screen;
-		friend class Layout;
+		friend class GridLayout;
 	
 	public:
 
@@ -352,7 +352,9 @@ namespace MAUI {
 			virtual bool pointerMoved(MAPoint2d p, int id);
 			virtual bool pointerReleased(MAPoint2d p, int id);
 
+			// maybe add a bool isFocusableInTouchMode
 			virtual bool isFocusable() const;
+			virtual bool isFocusableInKeyMode() const;
 			Widget* getFocusableInDirectionFrom(Widget* w, Direction dir);
 
 			InputPolicy* getInputPolicy();

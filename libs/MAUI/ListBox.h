@@ -135,6 +135,7 @@ namespace MAUI {
 
 
 		virtual bool isFocusable() const;
+		virtual bool isFocusableInKeyMode() const;
 		void setScrollOffset(int ofs);
 		virtual bool pointerPressed(MAPoint2d p, int id);
 		virtual bool pointerMoved(MAPoint2d p, int id);

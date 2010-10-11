@@ -676,6 +676,10 @@ namespace MAUI {
 	bool ListBox::isFocusable() const {
 		return true;
 	}
+	
+	bool ListBox::isFocusableInKeyMode() const {
+		return false;
+	}
 
 	void ListBox::setScrollOffset(int ofs) {
 		if (mChildren.size() == 0 || ofs > 0) {
@@ -725,7 +729,7 @@ namespace MAUI {
 	bool ListBox::keyPressed(int keyCode, int nativeCode) {
 		mTouched = false;
 
-		MAUI_LOG("ListBox key pressed!");
+		//MAUI_LOG("ListBox key pressed!");
 
 		if(mFocusedWidget) {
 			//bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
@@ -734,7 +738,8 @@ namespace MAUI {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(!ip) return false;
 			if(!ip->keyPressed(keyCode, nativeCode)) {
-				setFocusedWidget(NULL);
+				//setFocusedWidget(NULL);
+				return false;
 			} else return true;
 
 		} else {
@@ -935,12 +940,11 @@ namespace MAUI {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
 					setSelectedIndex(i);
-					mFocusedWidget = widget;
+					//mFocusedWidget = widget;
 					setFocused(true);
 					return;
 				}
 			}
 		}
 	}
-
 }

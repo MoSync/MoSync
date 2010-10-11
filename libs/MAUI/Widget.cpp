@@ -488,6 +488,9 @@ namespace MAUI {
 	bool Widget::isFocusable() const {
 		return mChildren.size()==0;
 	}
+	bool Widget::isFocusableInKeyMode() const {
+		return isFocusable();
+	}
 
 	bool isToDirectionOf(Direction direction, Rect src, Rect dest) {
 		switch (direction) {
@@ -567,7 +570,7 @@ namespace MAUI {
 
 		for(int i = 0; i < mChildren.size(); i++) {
 			if(mChildren[i] == w) continue;
-			if(mChildren[i]->isFocusable()) {
+			if(mChildren[i]->isFocusableInKeyMode()) {
 				Widget* candidate = w->nearestWidget(mChildren[i], best, dir);
 				if(candidate)
 					best = candidate;
