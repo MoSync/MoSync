@@ -47,69 +47,66 @@ void StackLayout::rebuild() {
 	int alignment = 0;
 
 	switch(mOrientation) {
-			case SLO_VERTICAL: 
-				{
-					int size = mChildren.size();
-					for(int i = 0; i < size; i++) {
-						int y;
-						if(i>0)
-							y = mChildren[i-1]->getPosition().y +
-							mChildren[i-1]->getBounds().height + padding;
-						else
-							y = 0;
+	case SLO_VERTICAL: 
+		{
+			int size = mChildren.size();
+			for(int i = 0; i < size; i++) {
+				int y;
+				if(i>0)
+					y = mChildren[i-1]->getPosition().y +
+					mChildren[i-1]->getBounds().height + padding;
+				else
+					y = 0;
 
-						int x = 0;
-						if(mAlignment == SLA_AUTO_SIZE) {
-							mChildren[i]->setWidth(mBounds.width);
-						} else {
-							switch(mAlignment) {
-								case SLA_TOP_LEFT:
-									x = alignment;
-									break;
-								case SLA_CENTER:
-									x = (mBounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
-									break;
-								case SLA_BOTTOM_RIGHT:
-									x = (mBounds.width) - mChildren[i]->getWidth() + alignment;
-									break;
-							}
-						}
-
-						mChildren[i]->setPosition(x, y);
-					}
+				int x = 0;
+				switch(mAlignment) {
+				case SLA_TOP_LEFT:
+					x = alignment;
+					break;
+				case SLA_CENTER:
+					x = (mBounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
+					break;
+				case SLA_BOTTOM_RIGHT:
+					x = (mBounds.width) - mChildren[i]->getWidth() + alignment;
+					break;
+				case SLA_AUTO_SIZE:
+					mChildren[i]->setWidth(mBounds.width);
 				}
-				break;
 
-			case SLO_HORIZONTAL: 
-				{
-					int size = mChildren.size();
-					for(int i = 0; i < size; i++) {
-						int x;
-						if(i>0)
-							x = mChildren[i-1]->getPosition().x +
-							mChildren[i-1]->getBounds().width + padding;
-						else
-							x = 0;
-						int y = 0;
-						if(mAlignment == SLA_AUTO_SIZE) {
-							mChildren[i]->setHeight(mBounds.height);
-						} else {
-							switch(mAlignment) {
-								case SLA_TOP_LEFT:
-									y = alignment;
-									break;
-								case SLA_CENTER:
-									y = (mBounds.height>>1) - (mChildren[i]->getHeight()>>1);
-									break;
-								case SLA_BOTTOM_RIGHT:
-									y = (mBounds.height) - mChildren[i]->getHeight();
-									break;
-							}
-						}
-						mChildren[i]->setPosition(x, y);
-					}
+				mChildren[i]->setPosition(x, y);
+			}
+		}
+		break;
+
+	case SLO_HORIZONTAL: 
+		{
+			int size = mChildren.size();
+			for(int i = 0; i < size; i++) {
+				int x;
+				if(i>0)
+					x = mChildren[i-1]->getPosition().x +
+					mChildren[i-1]->getBounds().width + padding;
+				else
+					x = 0;
+				int y = 0;
+				switch(mAlignment) {
+				case SLA_TOP_LEFT:
+					y = alignment;
+					break;
+				case SLA_CENTER:
+					y = (mBounds.height>>1) - (mChildren[i]->getHeight()>>1);
+					break;
+				case SLA_BOTTOM_RIGHT:
+					y = (mBounds.height) - mChildren[i]->getHeight();
+					break;
+				case SLA_AUTO_SIZE:
+					mChildren[i]->setHeight(mBounds.height);
+					break;
 				}
-				break;
+				mChildren[i]->setPosition(x, y);
+			}
+		}
+		break;
 	}
 
 	Vector_each(Widget*, itr, mChildren) {

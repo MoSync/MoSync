@@ -79,7 +79,7 @@ namespace MAUI {
 
 		// if style already has been set, it just overwrites the element (not deleting the pointer).
 		void setDefaultStyle(const String& widgetType, Style* style);
-		const Style* getDefaultStyle(const String& widgetType) const;
+		Style* getDefaultStyle(const String& widgetType);
 
 		void setDisplayConsole(bool dc=true);
 

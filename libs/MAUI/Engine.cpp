@@ -81,6 +81,9 @@ namespace MAUI {
 		widgetStyle->set("backgroundSkinFocused", NULL);
 		widgetStyle->set("backgroundSkinUnfocused", NULL);
 		mSingletonPtr->setDefaultStyle("Widget", widgetStyle);
+
+		Style* labelStyle = new LabelStyle(font);
+		mSingletonPtr->setDefaultStyle("Label", labelStyle);
 	}
 	
 	void Engine::setMain(Widget* mMain) {
@@ -191,7 +194,7 @@ namespace MAUI {
 		mDefaultStyles.insert(widgetType, style);
 	}
 
-	const Style* Engine::getDefaultStyle(const String& widgetType) const {
+	Style* Engine::getDefaultStyle(const String& widgetType) {
 		Map<String, Style*>::ConstIterator iter = mDefaultStyles.find(widgetType);
 		if(iter != mDefaultStyles.end())
 			return iter->second;

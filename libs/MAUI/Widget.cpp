@@ -38,6 +38,7 @@ namespace MAUI {
 	Widget::Widget(int x, int y, int width, int height)
 		: mParent(NULL), mBounds(x,y,width,height), mRelX(0), mRelY(0),
 		mDirty(false),
+		mHasRequestedUpdate(true),
 		mFocused(false),
 		mEnabled(true),
 		mWidgetListeners(false),
@@ -49,8 +50,7 @@ namespace MAUI {
 		mFocusedSkin(NULL),
 		mUnfocusedSkin(NULL),
 		mUserData(NULL),
-		mStyle(NULL),
-		mHasRequestedUpdate(true)
+		mStyle(NULL)
 	{
 		mInputPolicy = new DefaultInputPolicy(this);
 

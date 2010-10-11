@@ -64,7 +64,12 @@ class String
 		end
 		return self[doti..self.length]
 	end
-
+	
+	def noExt
+		doti = rindex('.')
+		return self[0, doti]
+	end
+	
 	# Returns true if self begins with with.
 	def beginsWith(with)
 		return false if(self.length < with.length)
