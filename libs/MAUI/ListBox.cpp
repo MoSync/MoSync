@@ -641,6 +641,7 @@ namespace MAUI {
 	void ListBox::drawWidget() {
 	}
 
+	/*
 	void ListBox::setWidth(int w) {
 		Widget::setWidth(w);
 		if(mAutoSize) {
@@ -662,6 +663,7 @@ namespace MAUI {
 			}
 		}
 	}
+	*/
 
 	bool ListBox::isTransparent() const {
 		return true;
@@ -934,9 +936,9 @@ namespace MAUI {
 		if(!mTouched && focused) {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
-					setSelectedIndex(i);
+					//setSelectedIndex(i);
 					//mFocusedWidget = widget;
-					setFocused(true);
+					//setFocused(true);
 					return;
 				}
 			}

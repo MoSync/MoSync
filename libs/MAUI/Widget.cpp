@@ -339,6 +339,7 @@ namespace MAUI {
 			mHasRequestedUpdate = false;
 		}
 
+		// maybe requestUpdate could request an update on its parent... so that only the branch that needs update needs to be updated here...
 		Vector_each(Widget*, it, mChildren) {
 			(*it)->update();
 		}

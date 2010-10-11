@@ -118,11 +118,11 @@ namespace MAUI {
 		void setAutoSize(bool as=true);
 
 		/** Overloaded setWidth. If autosizing is set and the orientation is vertical on the ListBox this will set the width of the children. **/
-		void setWidth(int w);
+		//void setWidth(int w);
 
 		/** Overloaded setHeight. If autosizing is set and the orientation is horizontal on the ListBox this will set the height of the children. **/
-		void setHeight(int h);
-
+		//void setHeight(int h);
+	
 		/** Returns true if child widgets is outside of the front of the list. */
 		bool listFrontOutsideBounds() const;
 

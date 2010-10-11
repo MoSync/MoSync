@@ -64,12 +64,12 @@ namespace MAUI {
 		void addSliderListener(SliderListener* sl);
 		void removeSliderListener(SliderListener* sl);
 
-		void update();
-
 		// \param 'moveToPoint' If 'true', when slider pressed, grip will move to the point that was pressed. Otherwise the slider can only be moved by touching the grip.
 		void setMoveToPoint(bool moveToPoint);
 
 	protected:
+		virtual void updateInternal();
+
 		int getSliderPos() const;
 		void restyle();
 		void drawWidget();

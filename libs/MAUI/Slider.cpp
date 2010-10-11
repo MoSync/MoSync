@@ -164,11 +164,11 @@ void Slider::setValue(double val) {
 	if(mValue<mMinValue) mValue=mMinValue;
 	else if(mValue>mMaxValue) mValue=mMaxValue;
 	mValueChanged = true;
+	requestUpdate();
 	requestRepaint();
 }
 
-void Slider::update() {
-	Widget::update();
+void Slider::updateInternal() {
 	if(mValueChanged) {
 		ListenerSet_fire(SliderListener, mSliderListeners, onValueChange(this, mValue));
 		mValueChanged = false;
