@@ -101,17 +101,22 @@ namespace MAUI {
 		/** Returns wether the label automatically adjusts its height to acommodate its caption **/
 		bool getAutoSizeY() const;
 
+		/*
 		void setPaddingLeft(int l);
 		void setPaddingTop(int t);
 		void setPaddingRight(int r);
 		void setPaddingBottom(int b);
-
-		void update();
+		void setWidth(int width);
+		void setHeight(int height);
+		*/
 
 		virtual bool isTransparent() const;
 
+
+
 	protected:
 
+		void updateInternal();
 
 		void getTextStart(int *x, int *y);
 		void drawWidget();
@@ -120,8 +125,7 @@ namespace MAUI {
 
 		virtual void restyle();
 
-
-		bool mMustCalcStrSize;
+		//bool mMustCalcStrSize;
 
 		String mCaption;
 		String mCuttedCaption;

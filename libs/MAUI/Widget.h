@@ -191,7 +191,7 @@ namespace MAUI {
 		* The Widget should update any cached data here, if needed.
 		* The default implementation calls update() on all children.
 		*/
-		virtual void update();
+		void update();
 
 		/** 
 		 * Registers an idle listener with the current environment that will
@@ -366,6 +366,10 @@ namespace MAUI {
 			virtual int getTranslationX() const;
 			virtual int getTranslationY() const;
 
+			// use this to request an update. The update pass is run before a widget is drawn. It usually handles layout and restyling of the widget.
+			void requestUpdate();
+
+
 			/**
 			 * Sets a pointer to some user specified data (it is convenient to use this as an identifier for the widget).
 			 */
@@ -418,6 +422,7 @@ namespace MAUI {
 		 */
 		void setDirty(bool d=true, Widget* caller=NULL);
 
+		virtual void updateInternal();
 		virtual void restyle();
 
 		// a list of pointers to the children of the widget
@@ -433,6 +438,7 @@ namespace MAUI {
 		int mRelX, mRelY;
 
 		bool mDirty;
+		bool mHasRequestedUpdate; // must update layout etc.
 
 		// used to keep which state the widget is in (selected or unselected)
 		bool mFocused;

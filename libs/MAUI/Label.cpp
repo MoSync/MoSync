@@ -77,11 +77,11 @@ namespace MAUI {
 
 	Label::Label(int x, int y, int width, int height, const String &caption, Font* font) :
 		Widget(x, y, width, height),
-		mMustCalcStrSize(true),
+	//	mMustCalcStrSize(true),
 		mCaption(""),
 		mFont(font),
-		mAutoSizeX(true),
-		mAutoSizeY(true),
+		mAutoSizeX(false),
+		mAutoSizeY(false),
 		mMultiLine(false),
 		mHorizontalAlignment(HA_LEFT),
 		mVerticalAlignment(VA_TOP)
@@ -99,7 +99,6 @@ namespace MAUI {
 	}
 
 	void Label::calcStrSize() {
-		mMustCalcStrSize = false;
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 		if(!mFont) {
 			mStrSize = EXTENT(0,0);
@@ -125,7 +124,7 @@ namespace MAUI {
 
 	void Label::setMultiLine(bool b) {
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 		mMultiLine = b;
 	}
 
@@ -133,34 +132,48 @@ namespace MAUI {
 		return mMultiLine;
 	}
 
+	/*
 	void Label::setPaddingLeft(int l) {
 		Widget::setPaddingLeft(l);
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	void Label::setPaddingTop(int t) {
 		Widget::setPaddingTop(t);
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	void Label::setPaddingRight(int r) {
 		Widget::setPaddingRight(r);
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	void Label::setPaddingBottom(int b) {
 		Widget::setPaddingBottom(b);
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
+	*/
 
 	void Label::resize(int width, int height) {
 		Widget::setWidth(width);
 		Widget::setHeight(height);
 	}
+
+	/*
+	void Label::setWidth(int width) {
+		Widget::setWidth(width);
+		requestUpdate();
+	}
+
+	void Label::setHeight(int height) {
+		Widget::setHeight(height);
+		requestUpdate();
+	}
+	*/
 
 	void Label::getTextStart(int *x, int *y) {
 		//calcStrSize();
@@ -181,11 +194,8 @@ namespace MAUI {
 		}
 	}
 
-	void Label::update() {
-		Widget::update();
-		if(mMustCalcStrSize) {
-			calcStrSize();
-		}
+	void Label::updateInternal() {
+		calcStrSize();
 	}
 
 	void Label::drawWidget() {
@@ -214,7 +224,7 @@ namespace MAUI {
 		this->mHorizontalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	Label::HorizontalAlignment Label::getHorizontalAlignment() const {
@@ -225,7 +235,7 @@ namespace MAUI {
 		this->mVerticalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	Label::VerticalAlignment Label::getVerticalAlignment() const {
@@ -235,14 +245,14 @@ namespace MAUI {
 	void Label::setAutoSizeX(bool f) {
 		this->mAutoSizeX = f;
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 		requestRepaint();
 	}
 
 	void Label::setAutoSizeY(bool f) {
 		this->mAutoSizeY = f;
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 		requestRepaint();
 	}
 
@@ -258,7 +268,7 @@ namespace MAUI {
 		this->mCaption = mCaption;
 		requestRepaint();
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 
 	const String& Label::getCaption() const {
@@ -278,7 +288,7 @@ namespace MAUI {
 		const LabelStyle* style = (const LabelStyle*)getStyle();
 		mFont = (MAUI::Font*)style->getSafe<FontProperty>("font");
 
-		mMustCalcStrSize = true;
+		requestUpdate();
 
 		Widget::restyle();
 

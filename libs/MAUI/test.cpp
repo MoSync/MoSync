@@ -508,16 +508,17 @@ public:
 		//SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
 		//SkinProperty* focusedUnselectedWidgetSkin = new SkinProperty(RES_FOCUSED_UNSELECTED2, 16, 32, 16, 32, true);
 
-		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 6, 11, 0, 8, true);
-		SkinProperty* sliderBackgroundSkin = new SkinProperty(RES_SLIDER_BKG, 6, 11, 0, 8, true);
-		ImageProperty* sliderGripImage = new ImageProperty(RES_SLIDER_GRIP);
-		FontProperty* font = new FontProperty(RES_FONT);
+			FontProperty* font = new FontProperty(RES_FONT);
 
 		Style* widgetStyle = new Style(0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL);
 		LabelStyle* labelStyle = new LabelStyle(font, 10,10,10,10,0,0,0,0, NULL, NULL);
 		//ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, focusedUnselectedWidgetSkin, unselectedWidgetSkin, font);
+	
+		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 10, 12, 0, 18, true);
+		SkinProperty* sliderBackgroundSkin = new SkinProperty(RES_SLIDER_BKG, 10, 12, 0, 18, true);
+		ImageProperty* sliderGripImage = new ImageProperty(RES_SLIDER_GRIP);
 		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
-
+		
 		Engine::getSingleton().setDefaultStyle("Widget", widgetStyle);
 		Engine::getSingleton().setDefaultStyle("Label", labelStyle);
 		//Engine::getSingleton().setDefaultStyle("Button", buttonStyle);

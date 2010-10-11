@@ -108,11 +108,11 @@ namespace MAUI {
 		/** Sets the height of the widget  **/
 		void setHeight(int height);
 
-		virtual void update();
 
 		virtual bool isTransparent() const;
 
 	protected:
+		virtual void updateInternal();
 		void rebuild();
 
 		bool mMustRebuild;

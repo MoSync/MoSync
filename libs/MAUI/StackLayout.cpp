@@ -23,7 +23,6 @@ namespace MAUI {
 
 	StackLayout::StackLayout(int x, int y, int width, int height, Orientation ori, Alignment ali) :
 Widget(x, y, width, height),
-mMustRebuild(false),
 mOrientation(ori),
 mAlignment(ali),
 mMarginX(0),
@@ -34,14 +33,12 @@ mMarginY(0)
 
 void StackLayout::boundsChanged(Widget *widget, const Rect& bounds) {
 	//rebuild();
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::drawWidget() { }
 
 void StackLayout::rebuild() {
-	mMustRebuild = false;
-
 	Vector_each(Widget*, itr, mChildren) {
 		(*itr)->removeWidgetListener(this);
 	}
@@ -159,7 +156,7 @@ void StackLayout::add(Widget *child) {
 	Widget::add(child);
 	child->addWidgetListener(this);
 	//rebuild();
-	mMustRebuild = true;
+	requestUpdate();
 	requestRepaint();
 }
 
@@ -167,13 +164,12 @@ void StackLayout::clear() {
 	for(int i = 0; i < mChildren.size(); i++)
 		mChildren[i]->removeWidgetListener(this);
 	Widget::clear();
-	mMustRebuild = true;
+	requestUpdate();
 	requestRepaint();
 }
 
-void StackLayout::update() {
-	Widget::update();
-	if(mMustRebuild) rebuild();
+void StackLayout::updateInternal() {
+	rebuild();
 }
 
 bool StackLayout::isTransparent() const {
@@ -214,38 +210,41 @@ break;
 */
 
 void StackLayout::setPosition(int x, int y) {
-	Widget::setPosition(x, y);
-	mMustRebuild = true;
+	bool changed = x!=this->mBounds.x || y!=this->mBounds.y;
+	if(changed) {
+		Widget::setPosition(x, y);
+		requestUpdate();
+	}
 }
 
 void StackLayout::setWidth(int width) {
 	Widget::setWidth(width);
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::setHeight(int height) {
 	Widget::setHeight(height);
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::setMarginX(int p) {
 	this->mMarginX = p;
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::setMarginY(int p) {
 	this->mMarginY = p;
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::setAlignment(Alignment alignment) {
 	this->mAlignment = alignment;
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::setOrientation(Orientation orientation) {
 	this->mOrientation = orientation;
-	mMustRebuild = true;
+	requestUpdate();
 }
 
 void StackLayout::focusChanged(Widget *widget, bool focused) {

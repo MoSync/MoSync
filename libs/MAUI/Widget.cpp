@@ -49,7 +49,8 @@ namespace MAUI {
 		mFocusedSkin(NULL),
 		mUnfocusedSkin(NULL),
 		mUserData(NULL),
-		mStyle(NULL)
+		mStyle(NULL),
+		mHasRequestedUpdate(true)
 	{
 		mInputPolicy = new DefaultInputPolicy(this);
 
@@ -84,15 +85,6 @@ namespace MAUI {
 
 	bool Widget::contains(int x, int y) {
 		return mBounds.contains(x, y);
-	}
-
-
-	void Widget::update() {
-		if(mStyle == NULL) {
-			restyle();
-		}
-		Vector_each(Widget*, it, mChildren)
-			(*it)->update();
 	}
 
 	void Widget::draw(bool forceDraw) {
@@ -204,6 +196,7 @@ namespace MAUI {
 		if(changed) {
 			//fireBoundsChanged();
 			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
+			requestUpdate();
 		}
 	}
 
@@ -219,6 +212,7 @@ namespace MAUI {
 		if(changed) {
 			//fireBoundsChanged();
 			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
+			requestUpdate();
 		}
 	}
 
@@ -327,6 +321,30 @@ namespace MAUI {
 		}
 	}
 
+	void Widget::requestUpdate() {
+		mHasRequestedUpdate = true;
+		requestRepaint();
+	}
+
+	void Widget::updateInternal() {
+	}
+
+	void Widget::update() {
+		if(mStyle == NULL) {
+			restyle();
+		}
+
+		if(mHasRequestedUpdate) {
+			updateInternal();
+			mHasRequestedUpdate = false;
+		}
+
+		Vector_each(Widget*, it, mChildren) {
+			(*it)->update();
+		}
+	}
+
+
 	void Widget::updateAbsolutePositionChildren(int x, int y) {
 		Vector_each(Widget*,it,mChildren) {
 			(*it)->mBounds.x = (*it)->mRelX + x;
@@ -346,6 +364,7 @@ namespace MAUI {
 
 	// fixme, precalc absolute for mParent
 	void Widget::updateAbsolutePosition() {
+		MAUtil::Rect pbounds = mBounds;	
 		Widget *p = this;
 		mBounds.x = mRelX;
 		mBounds.y = mRelY;
@@ -357,7 +376,10 @@ namespace MAUI {
 		updateAbsolutePositionChildren(mPaddedBounds.x, mPaddedBounds.y);
 
 		//fireBoundsChanged();
-		ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
+		if(pbounds.x != mBounds.x || pbounds.y != mBounds.y || pbounds.width != mBounds.width || pbounds.height != mBounds.height) {
+			requestUpdate();
+			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
+		}
 	}
 
 	Vector<Widget*>& Widget::getChildren() {
@@ -419,6 +441,7 @@ namespace MAUI {
 	}
 
 	void Widget::setPaddingLeft(int l) {
+
 		mPaddingLeft = l;
 		updateAbsolutePosition();
 		requestRepaint();

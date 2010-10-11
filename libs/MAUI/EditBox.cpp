@@ -312,7 +312,7 @@ namespace MAUI {
 		fireCharacterChanged(c);
 	
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 	}
 	
 	void EditBox::characterDeployed(char c) {
@@ -383,7 +383,7 @@ namespace MAUI {
 		requestRepaint();
 				
 		//calcStrSize();
-		mMustCalcStrSize = true;
+		requestUpdate();
 
 		return true;
 	}

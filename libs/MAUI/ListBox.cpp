@@ -77,7 +77,6 @@ namespace MAUI {
 		ListBoxOrientation orientation, ListBoxAnimationType animationType,
 		bool wrapping)
 		: Widget(x, y, width, height),
-		mMustRebuild(false),
 		mItemSelectedListeners(false),
 		mWrapping(wrapping),
 		mAnimationType(animationType),
@@ -96,13 +95,12 @@ namespace MAUI {
 	void ListBox::setOrientation(ListBoxOrientation orientation) {
 		this->mOrientation = orientation;
 		//rebuild();
-		mMustRebuild = true;
+		requestUpdate();
 	}
 
 	void ListBox::boundsChanged(Widget *widget, const Rect& bounds) {
 		//rebuild();
-		mMustRebuild = true;
-
+		requestUpdate();
 	}
 
 	void ListBox::rebuild() {
@@ -142,14 +140,12 @@ namespace MAUI {
 		Vector_each(Widget*, itr, mChildren) {
 			(*itr)->addWidgetListener(this);
 		}
-
-		mMustRebuild = false;
 	}
 
 	void ListBox::setAutoSize(bool as) {
 		this->mAutoSize = as;
 		//rebuild();
-		mMustRebuild = true;
+		requestUpdate();
 	}
 
 	void ListBox::add(Widget *child) {
@@ -207,7 +203,7 @@ namespace MAUI {
 		for(int i = 0; i < mChildren.size(); i++)
 			mChildren[i]->removeWidgetListener(this);
 		Widget::clear();
-		mMustRebuild = true;
+		requestUpdate();
 		requestRepaint();
 	}
 
@@ -259,9 +255,8 @@ namespace MAUI {
 		return mYOffset>>16;
 	}
 
-	void ListBox::update() {
-		Widget::update();	
-		if(mMustRebuild) rebuild();
+	void ListBox::updateInternal() {
+		rebuild();
 	}
 
 #if 0

@@ -91,7 +91,6 @@ namespace MAUI {
 
 		/** Renders the listbox **/
 		//void draw(bool forceDraw=false);
-		void update();
 
 		/** Navigates to the next item in the listbox - down if the orientation is vertical, right if it's horizontal. **/
 		void selectNextItem(bool shouldFireListeners=true);
@@ -156,8 +155,7 @@ namespace MAUI {
 		void rebuild();
 		void boundsChanged(Widget *widget, const Rect& bounds);
 		void focusChanged(Widget *widget, bool focused);
-
-		bool mMustRebuild;
+		virtual void updateInternal();
 
 		ListenerSet<ItemSelectedListener> mItemSelectedListeners;
 		bool mWrapping;
