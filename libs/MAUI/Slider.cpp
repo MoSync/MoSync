@@ -88,21 +88,21 @@ void Slider::drawWidget() {
 	if(mOrientation == HORIZONTAL) {
 
 		if(mBkgSkin)
-			mBkgSkin->drawDirect(sliderPos+(mSliderGripWidth>>1), (mPaddedBounds.height>>1)-(mSliderWeight>>1),
+			mBkgSkin->draw(sliderPos+(mSliderGripWidth>>1), (mPaddedBounds.height>>1)-(mSliderWeight>>1),
 					mPaddedBounds.width-(sliderPos+(mSliderGripWidth>>1)), mSliderWeight);
 
 		if(mAmountSkin)
-			mAmountSkin->drawDirect(mPaddedBounds.x, (mPaddedBounds.height>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripWidth>>1), mSliderWeight);
+			mAmountSkin->draw(0, (mPaddedBounds.height>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripWidth>>1), mSliderWeight);
 
 		if(mGripImage)
 			Gfx_drawImage(mGripImage, sliderPos, (mPaddedBounds.height>>1)-(mSliderGripHeight>>1));
 	} else {
 		if(mBkgSkin)
-			mBkgSkin->drawDirect((mPaddedBounds.width>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripHeight>>1),
+			mBkgSkin->draw((mPaddedBounds.width>>1)-(mSliderWeight>>1), sliderPos+(mSliderGripHeight>>1),
 					mSliderWeight, mPaddedBounds.height-(sliderPos+(mSliderGripHeight>>1)));
 
 		if(mAmountSkin)
-			mAmountSkin->drawDirect( (mPaddedBounds.width>>1)-(mSliderWeight>>1), mPaddedBounds.y, mSliderWeight, sliderPos+(mSliderGripHeight>>1));
+			mAmountSkin->draw( (mPaddedBounds.width>>1)-(mSliderWeight>>1), 0, mSliderWeight, sliderPos+(mSliderGripHeight>>1));
 
 		if(mGripImage)
 			Gfx_drawImage(mGripImage, (mPaddedBounds.width>>1)-(mSliderGripWidth>>1), sliderPos);
@@ -117,9 +117,13 @@ void Slider::restyle() {
 
 	const SliderStyle* style = (const SliderStyle*)getStyle();
 
-	mAmountSkin = style->getSafe<SkinProperty>("sliderAmountSkin");
-	mBkgSkin = style->getSafe<SkinProperty>("sliderSkin");
+	mAmountSkin = style->getSafe<DrawableProperty>("sliderAmountSkin")->mDrawable;
+	mBkgSkin = style->getSafe<DrawableProperty>("sliderSkin")->mDrawable;
 	ImageProperty* prop = style->get<ImageProperty>("gripImage");
+
+	mAmountSkin->setUseCaching(false);
+	mBkgSkin->setUseCaching(false);
+
 	mGripImage = 0;
 	mSliderGripWidth = 0;
 	mSliderGripHeight = 0;
@@ -133,9 +137,9 @@ void Slider::restyle() {
 	}
 
 	if(mOrientation == HORIZONTAL)
-		mSliderWeight = mBkgSkin->getEndY()-mBkgSkin->getStartY();
+		mSliderWeight = mSliderGripHeight; //mBkgSkin->getEndY()-mBkgSkin->getStartY();
 	else
-		mSliderWeight = mBkgSkin->getEndX()-mBkgSkin->getStartX();
+		mSliderWeight = mSliderGripWidth; //mBkgSkin->getEndX()-mBkgSkin->getStartX();
 }
 
 bool Slider::isTransparent() const {
@@ -195,7 +199,7 @@ void Slider::removeSliderListener(SliderListener* sl) {
 	mSliderListeners.remove(sl);
 }
 
-SliderStyle::SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, NULL, NULL)
+SliderStyle::SliderStyle(DrawableProperty* slider_amt, DrawableProperty* slider_bkg, ImageProperty* grip) : Style(0, 0, 0, 0, NULL, NULL)
 {
 	this->mProperties["sliderSkin"] = slider_bkg;
 	this->mProperties["sliderAmountSkin"] = slider_amt;

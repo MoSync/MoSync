@@ -539,7 +539,12 @@ namespace MAUI {
 		* area.
 		**/
 		virtual void drawWidget() = 0;
+
+		/**
+		* This function is responsible for drawing the background skin if available.
+		**/
 		void drawBackground();
+		
 		/**
 		* This function is used to regenerate the absolute positions of each widget
 		* in the tree. This is done in a depth first manner where each widget takes the
@@ -549,7 +554,7 @@ namespace MAUI {
 		void updateAbsolutePosition();
 
 		/** 
-		* the recursive function used by updateAbsolutePosition().
+		* The recursive function used by updateAbsolutePosition().
 		**/
 		void updateAbsolutePositionChildren(int x, int y);
 
@@ -572,7 +577,15 @@ namespace MAUI {
 		*/
 		void setDirty(bool d=true, Widget* caller=NULL);
 
+
+		/** 
+		* Override this if you want to do updates before drawing a widget (called when an update is requested).
+		*/
 		virtual void updateInternal();
+
+		/** 
+		* Override this to retrieve properties from a style.
+		*/
 		virtual void restyle();
 
 		// a list of pointers to the children of the widget
@@ -606,8 +619,8 @@ namespace MAUI {
 
 		InputPolicy* mInputPolicy;
 
-		WidgetSkin *mFocusedSkin;
-		WidgetSkin *mUnfocusedSkin;
+		Drawable *mFocusedSkin;
+		Drawable *mUnfocusedSkin;
 
 		void* mUserData;
 

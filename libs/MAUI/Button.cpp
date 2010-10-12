@@ -80,9 +80,9 @@ void Button::restyle() {
 	}
 	const ButtonStyle* style = (const ButtonStyle*)getStyle();
 
-	mSkinFocusedPressed = style->getSafe<SkinProperty>("skinFocusedPressed");
-	mSkinFocusedReleased = style->getSafe<SkinProperty>("skinFocusedReleased");
-	mSkinUnfocusedReleased = style->getSafe<SkinProperty>("skinUnfocusedReleased");
+	mSkinFocusedPressed = style->getSafe<DrawableProperty>("skinFocusedPressed")->mDrawable;
+	mSkinFocusedReleased = style->getSafe<DrawableProperty>("skinFocusedReleased")->mDrawable;
+	mSkinUnfocusedReleased = style->getSafe<DrawableProperty>("skinUnfocusedReleased")->mDrawable;
 	Label::restyle();
 }
 
@@ -114,9 +114,9 @@ void Button::removeButtonListener(ButtonListener* l) {
 
 
 ButtonStyle::ButtonStyle(
-		SkinProperty* focusedPressed,
-		SkinProperty* focusedReleased,
-		SkinProperty* unfocusedReleased,
+		DrawableProperty* focusedPressed,
+		DrawableProperty* focusedReleased,
+		DrawableProperty* unfocusedReleased,
 		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, NULL, NULL)
 {
 	this->mProperties["skinFocusedPressed"] = focusedPressed;

@@ -659,8 +659,9 @@ namespace MAUI {
 
 		if(!mStyle) maPanic(1, "No style set (not even a default style for Widget is available!");
 
-		mFocusedSkin   = mStyle->get<SkinProperty>("backgroundSkinFocused");
-		mUnfocusedSkin = mStyle->get<SkinProperty>("backgroundSkinUnfocused");
+		DrawableProperty* p;
+		mFocusedSkin = (p=mStyle->get<DrawableProperty>("backgroundSkinFocused")) ? p->mDrawable : NULL;
+		mUnfocusedSkin = (p=mStyle->get<DrawableProperty>("backgroundSkinUnfocused")) ? p->mDrawable : NULL;
 
 		setPaddingLeft(mStyle->getSafe<IntegerProperty>("paddingLeft")->mValue);
 		setPaddingRight(mStyle->getSafe<IntegerProperty>("paddingRight")->mValue);

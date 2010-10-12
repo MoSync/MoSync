@@ -525,7 +525,7 @@ public:
 		Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
 
 		// For some strange reason this is now broken??.
-		//WidgetSkin::setCacheEnabled(true);
+		WidgetSkin::setCacheEnabled(true);
 
 		sCalculatorScreen = new CalculatorScreen();
 		sGraphScreen = new GraphScreen();

@@ -80,8 +80,8 @@ namespace MAUI {
 		double mMinValue, mMaxValue, mValue;
 		int mStartX, mStartY;
 		double mStartValue;
-		WidgetSkin *mAmountSkin;
-		WidgetSkin *mBkgSkin;
+		Drawable *mAmountSkin;
+		Drawable *mBkgSkin;
 		MAHandle mGripImage;
 		int mSliderWeight;
 		int mSliderGripWidth;
@@ -102,15 +102,15 @@ namespace MAUI {
 	 * marginRight = IntegerProperty
 	 * marginTop = IntegerProperty
 	 * marginBottom = IntegerProperty
-	 * backgroundSkinFocused = SkinProperty
-	 * backgroundSkinUnfocused = SkinProperty
-	 * sliderSkin = SkinProperty
-	 * sliderAmountSkin = SkinProperty
+	 * backgroundSkinFocused = DrawableProperty
+	 * backgroundSkinUnfocused = DrawableProperty
+	 * sliderSkin = DrawableProperty
+	 * sliderAmountSkin = DrawableProperty
 	 * gripImage = ImageProperty
 	 */
 	class SliderStyle : public Style {
 	public:
-		SliderStyle(SkinProperty* slider_amt, SkinProperty* slider_bkg, ImageProperty* grip);
+		SliderStyle(DrawableProperty* slider_amt, DrawableProperty* slider_bkg, ImageProperty* grip);
 
 	};
 

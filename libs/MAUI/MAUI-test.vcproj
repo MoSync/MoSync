@@ -200,6 +200,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Drawable.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\Drawable.h"
 			>
 		</File>

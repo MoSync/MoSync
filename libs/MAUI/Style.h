@@ -37,7 +37,7 @@ public:
 	enum Type {
 		COLOR,
 		FONT,
-		SKIN,
+		DRAWABLE,
 		IMAGE,
 		INTEGER
 	};
@@ -47,8 +47,8 @@ public:
 
 	Type getType() const { return mType; }
 
-	private:
-		Type mType;
+	protected:
+		const Type mType;
 
 protected:
 };
@@ -59,23 +59,32 @@ public:
 	}
 
 	unsigned char mR, mG, mB, mA;
-	static Type sType;
+	static const Type sType;
 };
 
 class FontProperty : public Property, public Font {
 public:
 	FontProperty(MAHandle font) : Property(sType), Font(font) {
 	}
-	static Type sType;
+	static const Type sType;
 };
 
-class SkinProperty : public Property, public WidgetSkin {
+class DrawableProperty : public Property {
+public:
+	DrawableProperty(Drawable* drawable) : 
+	Property(sType), mDrawable(drawable) {
+	}
+
+	Drawable *mDrawable;
+
+	static const Type sType;
+};
+
+class SkinProperty : public DrawableProperty, public WidgetSkin {
 public:
 	SkinProperty(MAHandle image, int x1, int x2, int y1, int y2, bool transparent=true) :
-		Property(sType), WidgetSkin(image, x1, x2, y1, y2, transparent) {
-
+		DrawableProperty(this), WidgetSkin(image, x1, x2, y1, y2, transparent){
 	}
-	static Type sType;
 };
 
 class ImageProperty : public Property {
@@ -84,7 +93,7 @@ public:
 	}
 
 	MAHandle mHandle;
-	static Type sType;
+	static const Type sType;
 };
 
 class IntegerProperty : public Property {
@@ -93,7 +102,7 @@ public:
 	}
 
 	int mValue;
-	static Type sType;
+	static const Type sType;
 };
 
 
@@ -114,8 +123,8 @@ public:
 			int paddingRight = 0,
 			int paddingTop = 0,
 			int paddingBottom = 0,
-			SkinProperty* backgroundSkinFocused = NULL,
-			SkinProperty* backgroundSkinUnfocused = NULL
+			DrawableProperty* backgroundSkinFocused = NULL,
+			DrawableProperty* backgroundSkinUnfocused = NULL
 	);
 
 	~Style();

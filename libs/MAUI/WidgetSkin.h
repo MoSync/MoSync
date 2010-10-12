@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
+#include <MAUI/Drawable.h>
 //#include <MAUtil/Map.h>
 //#define HashMap Map
 
@@ -45,7 +46,7 @@ namespace MAUI {
 	 * telling if the image is transparent or not, used to
 	 * optimize MAUI drawing.
 	 **/
-	class WidgetSkin {
+	class WidgetSkin : public Drawable {
 	public:
 		/**
 		 * The default constructor.

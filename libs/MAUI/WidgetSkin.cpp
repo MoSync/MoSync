@@ -188,7 +188,7 @@ namespace MAUI {
 
 		// Calculate numTiles needed to be drawn, if they are many, we need to cache, otherwise draw directly...
 		//int numTiles = calculateNumTiles(width, height);
-		if(!sUseCache /*|| numTiles<10*/) {
+		if(!mUseCaching || !sUseCache /*|| numTiles<10*/) {
 			drawDirect(x, y, width, height);
 			return;
 		}
