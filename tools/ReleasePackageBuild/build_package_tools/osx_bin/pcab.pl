@@ -597,7 +597,7 @@ sub main()
 
         # Create the cab.
         print "$cab_filename: $munged_files\n" if $verbose;
-        my $lcab_output = `$ENV{'MOSYNCDIR'}/bin/lcab -r -n manifest.000 munged $setupxml $cab_filename`;
+        my $lcab_output = `$ENV{'MOSYNCDIR'}/bin/lcab -r -n manifest.000 munged $setupxml "$cab_filename"`;
         exit $? >> 8 if $? > 0;
         print $lcab_output if $verbose;
         `rm -r munged manifest.000 $setupxml`;

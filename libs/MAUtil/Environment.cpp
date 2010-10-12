@@ -42,7 +42,6 @@ namespace MAUtil {
 		nextInvoke = addTime + period;
 	}
 
-
 	Environment* Environment::sEnvironment = NULL;
 
 	Environment::Environment() 
@@ -52,7 +51,9 @@ namespace MAUtil {
 		mConnListeners(false),
 		mIdleListeners(false),
 		mTimerEvents(true),
-		mFocusListeners(false)
+		mFocusListeners(false),
+		mCustomEventListeners(false),
+		mTextBoxListeners(false)		
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -112,38 +113,34 @@ namespace MAUtil {
 		return mPointerListeners.contains(pl);
 	}
 
-	// There can be only one. If not, panic comes.
+	// There can be only one listener.
 	void Environment::setBluetoothListener(BluetoothListener* btl) {
 		//MAASSERT(sEnvironment == this);
-		//this test should be removed in release verions
-		if(mBtListener && btl)
-			PANIC_MESSAGE("Only one Bluetooth listener can be set at any time. "
-			"The application was attempting to register two.");
 		mBtListener = btl;
 	}
 	// equivalent to setBluetoothListener(NULL)
 	void Environment::removeBluetoothListener() {
 		//MAASSERT(sEnvironment == this);
-		//this test should be removed in release verions
-		if(!mBtListener)
-			PANIC_MESSAGE("The application tried to unregister a Bluetooth listener "
-			"when none was registered.");
 		mBtListener = NULL;
 	}
 
 	// Only one listener per connection is allowed, but the same ConnectionListener
 	// can be used for several connections.
 	void Environment::setConnListener(MAHandle conn, ConnListener* cl) {
-		//MAASSERT(sEnvironment == this);
-		ListenerSet_each(ConnListener, itr, mConnListeners) {
-			if(itr->_mConn == conn) {
-				PANIC_MESSAGE("The application tried to set a connection listener for a "
-					"connection that already had a listener");
-			}
+		if (NULL == cl) {
+			PANIC_MESSAGE("Environment::setConnListener: The listener must not be NULL");
 		}
+		
+		//MAASSERT(sEnvironment == this);
+		
+		// First remove the existing listener, if any.
+		removeConnListener(conn);
+		
+		// Set the listener for the connection.
 		cl->_mConn = conn;
 		mConnListeners.add(cl);
 	}
+	
 	void Environment::removeConnListener(MAHandle conn) {
 		ListenerSet_each(ConnListener, itr, mConnListeners) {
 			if(itr->_mConn == conn) {
@@ -154,18 +151,20 @@ namespace MAUtil {
 
 	void Environment::addCloseListener(CloseListener* cl) {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners)
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			if(*i == cl) return;
+		}
 		mCloseListeners.add(cl);
 	}
 
 	void Environment::removeCloseListener(CloseListener* cl) {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners) 
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			if(*i == cl) {
 				mCloseListeners.remove(i);
 				return;
 			}
+		}
 	}
 
 	void Environment::addIdleListener(IdleListener* il) {
@@ -201,20 +200,42 @@ namespace MAUtil {
 			}
 		}
 	}
+	
+	void Environment::addCustomEventListener(CustomEventListener* cl) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.add(cl);
+	}
 
+	void Environment::removeCustomEventListener(CustomEventListener* cl) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.remove(cl);
+	}
+	
+	void Environment::addTextBoxListener(TextBoxListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.add(tl);
+	}
+
+	void Environment::removeTextBoxListener(TextBoxListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.remove(tl);
+	}	
+	
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
-		ListenerSet_each(FocusListener, i, mFocusListeners) 
+		ListenerSet_each(FocusListener, i, mFocusListeners) {
 			i->focusGained();
+		}
 		mFocusListeners.setRunning(false);
 	}
 
 	void Environment::fireFocusLostEvent() {
 		//MAASSERT(sEnvironment == this);
 		mFocusListeners.setRunning(true);
-		ListenerSet_each(FocusListener, i, mFocusListeners)
+		ListenerSet_each(FocusListener, i, mFocusListeners) {
 			i->focusLost();
+		}
 		mFocusListeners.setRunning(false);
 	}
 
@@ -250,24 +271,27 @@ namespace MAUtil {
 	void Environment::firePointerPressEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerPressEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
 	void Environment::firePointerMoveEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerMoveEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
 	void Environment::firePointerReleaseEvent(MAPoint2d p) {
 		//MAASSERT(sEnvironment == this);
 		mPointerListeners.setRunning(true);
-		ListenerSet_each(PointerListener, i, mPointerListeners) 
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
 			i->pointerReleaseEvent(p);
+		}
 		mPointerListeners.setRunning(false);
 	}
 
@@ -290,9 +314,28 @@ namespace MAUtil {
 
 	void Environment::fireCloseEvent() {
 		//MAASSERT(sEnvironment == this);
-		Vector_each(CloseListener*, i, mCloseListeners) 
+		Vector_each(CloseListener*, i, mCloseListeners) {
 			(*i)->closeEvent();
+		}
 	}
+	
+	void Environment::fireCustomEventListeners(const MAEvent& e) {
+		//MAASSERT(sEnvironment == this);
+		mCustomEventListeners.setRunning(true);
+		ListenerSet_each(CustomEventListener, i, mCustomEventListeners) {
+			i->customEvent(e);
+		}
+		mCustomEventListeners.setRunning(false);
+	}
+	
+	void Environment::fireTextBoxListeners(int result, int textLength) {
+		//MAASSERT(sEnvironment == this);
+		mTextBoxListeners.setRunning(true);
+		ListenerSet_each(TextBoxListener, i, mTextBoxListeners) {
+			i->textBoxClosed(result, textLength);
+		}
+		mTextBoxListeners.setRunning(false);
+	}	
 
 	void Environment::runIdleListeners() {
 		//MAASSERT(sEnvironment == this);
@@ -303,5 +346,4 @@ namespace MAUtil {
 		}
 		mIdleListeners.setRunning(false);
 	}
-
 }

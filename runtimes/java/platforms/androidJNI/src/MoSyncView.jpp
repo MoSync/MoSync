@@ -41,7 +41,7 @@ import android.view.View;
 import android.view.KeyCharacterMap;
 import android.view.inputmethod.InputMethodManager;
 
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 
 /**
  * This is a SurfaceView where MoSync graphics/MAUI is rendered.
@@ -70,7 +70,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			return true;
 		}
 	}
-	
+
+	/**
+	*
+	* MoSyncView Constructor
+	*
+	* 
+	*/
 	public MoSyncView(Context context, MoSyncThread moSyncThread) throws Exception
 	{
 		super(context);
@@ -100,7 +106,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 			catch(Exception e2) 
 			{
 				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
-				// if this didn't work we can do nothing...
 			}
 		}
 
@@ -186,8 +191,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		int[] event = new int[3];
 		event[0] = EVENT_TYPE_POINTER_RELEASED;
 		
-		event[1] = (int)motionEvent.getRawX();
-		event[2] = (int)motionEvent.getRawY();
+		event[1] = (int)motionEvent.getX();
+		event[2] = (int)motionEvent.getY();
 		
 		switch(motionEvent.getAction())
 		{
@@ -241,7 +246,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 */		
 //	}
 
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 	
 	// Defines used to map Android keycodes to MoSync 	
 #define DEVICE_KEYS(m) m(0) m(1) m(2) m(3) m(4)	m(5) m(6) m(7) m(8) m(9) m(STAR) m(POUND) m(CLEAR)

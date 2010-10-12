@@ -31,8 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 #define SYSLOG(...)
 
-/*
-Function that initializes the native core	
+/**
+* @brief Function that initializes the native core	
 */
 static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 {
@@ -51,8 +51,8 @@ static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 	return true;
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+* /return The newly created Data Section as a Direct ByteBuffer object
 */
 static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong programOffset, jobject resource, jlong resourceOffset)
 {
@@ -100,7 +100,7 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	
 	if(NULL == prg)
 	{
-		SYSLOG("seams to be something wrong here..");
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Bridge", "No program file available!");
 		return false;
 	}
 	
@@ -122,7 +122,8 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 }
 
 
-/*
+/**
+* @brief nativeLoadResource
 */
 static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 {
@@ -132,8 +133,8 @@ static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 	
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+*	/return The newly created Data Section as a Direct ByteBuffer object
 */
 static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 {
@@ -147,8 +148,8 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 	return gCore->mem_ds_jobject;
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+*	/return The newly created Data Section as a Direct ByteBuffer object
 */
 static void nativeRun(JNIEnv* env, jobject jthis)
 {
@@ -175,6 +176,9 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 	
 }
 
+/**
+* @brief nativePostEvent
+*/
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
 	SYSLOG("JNI PostEvent");
@@ -182,46 +186,64 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	jsize len = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
 	
-	// rebuild the event
+	// Build the event.
 	MAEvent event;
+	event.type = intArray[0];
 	event.data = NULL;
 	
-	event.type = intArray[0];
-	
-	if(event.type == EVENT_TYPE_POINTER_PRESSED || event.type == EVENT_TYPE_POINTER_RELEASED || event.type == EVENT_TYPE_POINTER_DRAGGED )
+	if (event.type == EVENT_TYPE_POINTER_PRESSED || 
+		event.type == EVENT_TYPE_POINTER_RELEASED || 
+		event.type == EVENT_TYPE_POINTER_DRAGGED)
 	{
 		event.point.x = intArray[1];
 		event.point.y = intArray[2];
 	}
-	else if(event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED )
+	else if (event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED)
 	{
 		event.key = intArray[1];
 		event.nativeKey = intArray[2];
 	}
-	else if(event.type == EVENT_TYPE_CONN)
+	else if (event.type == EVENT_TYPE_CONN)
 	{
 		event.conn.handle = intArray[1];
 		event.conn.opType = intArray[2];
 		event.conn.result = intArray[3];
 	}
-	else if(event.type == EVENT_TYPE_LOCATION)
+	else if (event.type == EVENT_TYPE_LOCATION)
 	{
+		// Copy location data. This data starts at array index 1.
 		int size = sizeof(MALocation);
 		event.data = new byte[size];
-		memcpy(event.data, intArray, size);
+		memcpy(event.data, intArray + 1, size);
 	}
 	else if(event.type == EVENT_TYPE_WEBVIEW_REQUEST)
 	{
 		// Use the key field for the request id.
 		event.key = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
+	{
+		event.state = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_BT)
+	{
+		event.state = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_TEXTBOX)
+	{
+		event.textboxResult = intArray[1];
+		event.textboxLength = intArray[2];
+	}
 	
-	// release the memory used
-	env->ReleaseIntArrayElements( eventBuffer, intArray, 0);
+	// Release the memory used for the int array.
+	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
 }
 
+/**
+* @brief jniRegisterNativeMethods
+*/
 int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods )
 {
 	jclass clazz;
@@ -254,6 +276,9 @@ static JNINativeMethod sMethods[] =
    { "nativePostEvent", "([I)V", (void*)nativePostEvent},
 };
 
+/**
+* @brief JNI_OnLoad
+*/
 jint JNI_OnLoad ( JavaVM* vm, void* reserved )
 {
 	JNIEnv* env = NULL;

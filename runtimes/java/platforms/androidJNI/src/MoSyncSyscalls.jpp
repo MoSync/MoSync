@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers.h"
 #include "config_platform.h"
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 #include "generated\IX_WEBVIEW_CONSTS.h"
 
 //#define SYSLOG(a) Log.i("Dalvik Syscalls", a);
@@ -35,8 +35,7 @@ final class ImageCache
 	}
 }
 
-
-ByteBuffer mMemDataSection;
+public ByteBuffer mMemDataSection;
 ByteBuffer mResourceFile;
 
 Canvas mCanvas;
@@ -78,17 +77,19 @@ boolean initSyscalls()
 	 
 	 mBlitPaint.setAntiAlias(false);
 	 mBlitPaint.setColor(0xffffffff);
+	 mBlitPaint.setAlpha(255);
 	 
 	 mSoundVolume = 50;
-	 mMediaPlayer = new MediaPlayer();
-	 mMediaPlayer.reset();
-
+	 
 	 return true;
 }
 
+/**
+* @brief maSetColor
+*/
 int maSetColor(int rgb)
 {
-	//SYSLOG("maSetColor");
+	SYSLOG("maSetColor");
 
 	int t = mPaint.getColor();
 	mPaint.setColor(rgb);
@@ -96,6 +97,9 @@ int maSetColor(int rgb)
 	return t;
 }
 
+/**
+* @brief maSetClipRect
+*/
 void maSetClipRect(int left, int top, int width, int height)
 {
 	SYSLOG("maSetClipRect");
@@ -108,6 +112,9 @@ void maSetClipRect(int left, int top, int width, int height)
 	mCanvas.clipRect(left, top, left+width, top+height, Region.Op.REPLACE );
 }
 
+/**
+* @brief maPlot
+*/
 void maPlot(int posX, int posY)
 {
 	SYSLOG("maPlot");
@@ -115,6 +122,9 @@ void maPlot(int posX, int posY)
 	mCanvas.drawPoint(posX, posY, mPaint);
 }
 
+/**
+* @brief maLine
+*/
 void maLine(int startX, int startY, int endX, int endY)
 {
 	SYSLOG("maLine");
@@ -122,88 +132,219 @@ void maLine(int startX, int startY, int endX, int endY)
 	mCanvas.drawLine(startX, startY, endX, endY, mPaint);
 }
 
+/**
+* @brief maFillRect
+*/
 void maFillRect(int left, int top, int width, int height)
 {
 	SYSLOG("maFillRect");
 
 	mCanvas.drawRect(left, top, left+width, top+height, mPaint);
+}
+
+/*
+This implementation might seem a bit strange but it works so much better than using Canvas.drawVertices..
+*/
+/**
+* @brief maFillTriangleStrip
+*/
+void maFillTriangleStrip(int address, int count)
+{
+	SYSLOG("maFillTriangleStrip");
+
+	if(count < 3) maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
+
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	int[] vertices = new int[count*2];
+	ib.get(vertices);
+	
+	Path path = new Path();
+
+	int i = 0;
+	
+	int xa = vertices[i++];
+	int ya = vertices[i++];
+
+	int xb = vertices[i++];
+	int yb = vertices[i++];
+	for(;;) {
+		int xc = vertices[i++];
+		int yc = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xa = vertices[i++];
+		ya = vertices[i++];
+		path.moveTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.lineTo(xa,ya);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xb = vertices[i++];
+		yb = vertices[i++];
+		path.moveTo(xc,yc);
+		path.lineTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.close();
+		
+		if(i >= count*2)
+			break;			
+	}
+	mCanvas.drawPath(path, mPaint);
+	
+	mMemDataSection.reset();
 	
 }
 
-void maFillTriangleStrip(int address, int count)
-{
-	SYSLOG("maFillTriangleStrip - NOT IMPLEMENTED");
-}
 
+/**
+* @brief maFillTriangleFan
+*/
 void maFillTriangleFan(int address, int count)
 {
 	SYSLOG("maFillTriangleFan");
+
+	if(count < 3) maPanic(1,"maFillTriangleFan takes more than 3 vertices");
+
+	mMemDataSection.mark();
+	mMemDataSection.position(address);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	int[] vertices = new int[count*2];
+	ib.get(vertices);
+	
+	Path path = new Path();
+
+	int i = 0;
+	
+	int xa = vertices[i++];
+	int ya = vertices[i++];
+
+	int xb = vertices[i++];
+	int yb = vertices[i++];
+	for(;;) {
+		int xc = vertices[i++];
+		int yc = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xb,yb);
+		path.lineTo(xc,yc);
+		path.close();
+		
+		if(i >= count*2)
+			break;
+		xa = vertices[i++];
+		ya = vertices[i++];
+		path.moveTo(xa,ya);
+		path.lineTo(xc,yc);
+		path.lineTo(xb,yb);
+		path.close();
+		
+		if(i >= count*2)
+			break;			
+	}
+	mCanvas.drawPath(path, mPaint);
+	
+	mMemDataSection.reset();
 }
+
 
 Rect mTextSizeRect = new Rect();
+
+/**
+* @brief msGetTextSize
+*/
 int maGetTextSize(final String str)
 {
-	//SYSLOG("maGetTextSize");
+	SYSLOG("maGetTextSize");
+	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
+/**
+* @brief maGetTextSizeW
+*/
 int maGetTextSizeW(final String str)
 {
-	//SYSLOG("maGetTextSizeW");
+	SYSLOG("maGetTextSizeW");
+	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
+/**
+* @brief maDrawText
+*/
 void maDrawText(int left, int top, final String str)
 {
-	//SYSLOG("maDrawText");
+	SYSLOG("maDrawText");
+	
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
 
+/**
+* @brief maDrawTextW
+*/
 void maDrawTextW(int left, int top, final String str)
 {
- 	//SYSLOG("maDrawTextW");
+ 	SYSLOG("maDrawTextW");
+	
 	MAExtent e = maGetTextSize(str);
 	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
 }
 
+/**
+* @brief maUpdateScreen
+*/
 void maUpdateScreen()
 {
 	SYSLOG("maUpdateScreen");
 	Canvas lockedCanvas = null;
-
-	long st = System.currentTimeMillis();
 	
 	MoSyncView moSyncView = ((MoSync) mContext).getMoSyncView();
 	
 	if(moSyncView == null) return;
-
+	
 	try 
 	{
 		lockedCanvas = moSyncView.mSurfaceHolder.lockCanvas();
 		synchronized (moSyncView.mSurfaceHolder)
 		{
-			if(mUsingFrameBuffer)
+			if (mUsingFrameBuffer)
 			{				
 				mMemDataSection.mark();
 				mMemDataSection.position(mFrameBufferAddress);
 				mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
 				mMemDataSection.reset();
 				
+				// Clear the screen.. in this case draw the canvas black
+				lockedCanvas.drawRGB(0,0,0);
+				
+				// Blit the framebuffer
 				lockedCanvas.drawBitmap(mFrameBufferBitmap, 0, 0, mBlitPaint);
 			}
 			else
 			{
-				if(null != lockedCanvas)
+				if (null != lockedCanvas)
 				{
 					lockedCanvas.drawBitmap(mBitmap, 0, 0, mBlitPaint);
 				}
 			}
 		}
 	} 
-	catch(Exception e)
+	catch (Exception e)
 	{
 		SYSLOG("updateScreen Exception : " + e.toString());
 		return;
@@ -213,86 +354,122 @@ void maUpdateScreen()
 	{
 		moSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
 	}
-	
-	long t = System.currentTimeMillis() - st;
-	Log.i("Dalvik Syscalls", "Update screen took: " + t + "ms");
-	
 }
 
+/**
+* @brief maResetBacklight
+*/
 void maResetBacklight()
 {
 	SYSLOG("maResetBacklight");
 }
 
+/**
+* @brief maGetScrSize
+*/
 int maGetScrSize()
 {
 	SYSLOG("maGetScrSize");
 	return EXTENT(mWidth, mHeight);
 }
 
+/**
+* @brief maDrawImage
+*/
 void maDrawImage(int image, int left, int top)
 {
 	SYSLOG("maDrawImage");
 	
 	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
-	if(imageResource == null)
+	if (imageResource == null)
 	{
 		return;
 	}
 
-	mCanvas.drawBitmap(imageResource.mBitmap, left, top, mPaint);
+	mCanvas.drawBitmap(imageResource.mBitmap, left, top, null);//mPaint);
 }
 
-void maDrawRGB(int dstPoint, int src, int srcRect, int scanlength)
+/**
+* @brief _maDrawRGB
+*/
+void _maDrawRGB(int dstX, int dstY, int mem, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int scanLength)
 {
 	SYSLOG("maDrawRGB");
+
+	int pixels[] = new int[srcRectWidth];
+	
+	mMemDataSection.mark();
+	mMemDataSection.position(mem);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	for(int y = 0; y < srcRectHeight; y++)
+	{
+		ib.position(y*scanLength);		
+		
+		ib.get(pixels);
+		mCanvas.drawBitmap(pixels, 0, srcRectWidth, dstX, dstY+y, srcRectWidth, 1, true, mPaint);		
+	}
+	
+	mMemDataSection.reset();
 }
 
 private Bitmap mTempBitmap;
 private Matrix mTempMatrix = new Matrix();
 
+/**
+* @brief _maDrawImageRegion 
+*/
 void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectWidth, int srcRectHeight, int dstLeft, int dstTop, int transformMode)
 {
 	SYSLOG("maDrawImageRegion");
 
 	ImageCache imageResource = (ImageCache)mImageResources.get(image);
-	if(imageResource == null)
+	if (imageResource == null)
 	{
 		return;
 	}
 
 	final int imgHeight = imageResource.mBitmap.getHeight();
-	if(srcRectTop > imgHeight) return;
+	if (srcRectTop > imgHeight) 
+	{
+		return;
+	}
 	
 	final int imgWidth = imageResource.mBitmap.getWidth();
-	if(srcRectLeft > imgWidth) return;
+	if (srcRectLeft > imgWidth) 
+	{
+		return;
+	}
 	
-	if(srcRectTop < 0)
+	if (srcRectTop < 0)
 	{
 		srcRectHeight += srcRectTop;
 		srcRectTop = 0;
 	}
 	
-	if(srcRectLeft < 0)
+	if (srcRectLeft < 0)
 	{
 		srcRectWidth += srcRectLeft;
 		srcRectLeft = 0;
 	}
 	
-	if(srcRectTop + srcRectHeight > imgHeight)
+	if (srcRectTop + srcRectHeight > imgHeight)
 	{
 		srcRectHeight = imgHeight - srcRectTop;
 	}
 	
-	if(srcRectLeft + srcRectWidth > imgWidth)
+	if (srcRectLeft + srcRectWidth > imgWidth)
 	{
 		srcRectWidth = imgWidth - srcRectLeft;
 	}
 	
-	if(srcRectWidth <= 0 || srcRectHeight <= 0)
+	if (srcRectWidth <= 0 || srcRectHeight <= 0) 
+	{
 		return;
+	}
 
-	if(transformMode == TRANS_NONE)
+	if (transformMode == TRANS_NONE)
 	{
 		mCanvas.clipRect(dstLeft, dstTop, dstLeft+srcRectWidth, dstTop+srcRectHeight, Region.Op.REPLACE);
 		mCanvas.drawBitmap(imageResource.mBitmap, dstLeft-srcRectLeft, dstTop-srcRectTop, mPaint);
@@ -304,7 +481,7 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 		boolean mirror = false;
 		int rotation = 0;
 
-		switch(transformMode)
+		switch (transformMode)
 		{
 		case TRANS_ROT90:
 			rotation = 90;
@@ -325,22 +502,22 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 		case TRANS_MIRROR_ROT180:
 			mirror = true;
 			rotation = 180;
-		break;
+			break;
 		case TRANS_MIRROR_ROT270:
 			mirror = true;
 			rotation = 270;
 			break;
 		default:
-		maPanic(0,"error");
+			maPanic(0,"error");
 		}
 
 		mTempMatrix.reset();
-		if(mirror)
+		if (mirror)
 		{
 			mTempMatrix.setScale(-1, 1);
 			mTempMatrix.postTranslate(imgWidth, 0);
 		}
-		if(rotation != 0) {
+		if (rotation != 0) {
 			mTempMatrix.postRotate(rotation);
 		}
 
@@ -352,40 +529,66 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 	}
 }
 
+/**
+* @brief maGetImageSize
+*/
 int maGetImageSize(int image)
 {
 	SYSLOG("maGetImageSize");
 	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
-	if(imageResource == null)
+	if (imageResource == null)
 	{
+		Log.i("MoSync Dalvik","maGetImageSize : no such resource");
 		return -1;
 	}
 
 	return EXTENT(imageResource.mBitmap.getWidth(), imageResource.mBitmap.getHeight());
 }
 
-void maGetImageData(int image, int dst, int srcRect, int scanlength)
+/**
+* @brief maGetImageData
+*/
+void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth, int srcHeight, int scanLength)
 {
 	SYSLOG("maGetImageData");
-/*	
-	mMemDataSection.mark();
-	mMemDataSection.position(mFrameBufferAddress);
-	mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
-	mMemDataSection.reset();
-*/	
+
+	ImageCache imageResource = (ImageCache)mImageResources.get(image);
+	if(null == imageResource)
+	{
+		maPanic(1,"maGetImageData failed, no image resource!");
+	}
 	
-/*	
-	Bitmap bitmap = ((ImageCache)getResource(image)).mBitmap;
-	int[] mem_ds = CORE.mMem_ds;
-	bitmap.getPixels(mCore.mMem_ds, dst>>2, scanlength, MARect_left(srcRect), MARect_top(srcRect),
-		MARect_width(srcRect), MARect_height(srcRect));
-*/
+	int bitmapSize = scanLength * srcHeight;
+	
+	if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight()) maPanic(-1, "maGetImageData, (srcTop + srcHeight) > imageResource.mBitmap.getHeight() : " + (srcTop + srcHeight) + " > " + imageResource.mBitmap.getHeight());
+	if ((srcLeft + srcWidth) > imageResource.mBitmap.getWidth()) maPanic(-1, "maGetImageData, (srcLeft + srcWidth) > imageResource.mBitmap.getWidth() : " + (srcLeft + srcWidth) + " > " + imageResource.mBitmap.getWidth());	
+
+	int pixels[] = new int[srcWidth];
+	
+	mMemDataSection.mark();
+	mMemDataSection.position(dst);
+
+	IntBuffer ib = mMemDataSection.asIntBuffer();
+	
+	for(int y = 0; y < srcHeight; y++)
+	{
+		ib.position(y*scanLength);		
+		imageResource.mBitmap.getPixels(pixels, 0, srcWidth, srcLeft, srcTop+y, srcWidth, 1);
+		
+		ib.put(pixels);	
+	}
+	
+	mMemDataSection.reset();
+	
 }
 
+/**
+* @brief maSetDrawTarget
+*/
 int maSetDrawTarget(int image)
 {
 	SYSLOG("maSetDrawTarget");
-	if(0 == image)
+	if (0 == image)
 	{
 		mCanvas = mDrawTargetScreen.mCanvas;
 		mBitmap = mDrawTargetScreen.mBitmap;
@@ -393,7 +596,7 @@ int maSetDrawTarget(int image)
 	else
 	{
 		ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
-		if(null == imageResource)
+		if (null == imageResource)
 		{
 			return -1;
 		}
@@ -404,89 +607,139 @@ int maSetDrawTarget(int image)
 	return 1;
 }
 
+/**
+* @brief maCreateImageFromData
+*/
 int maCreateImageFromData(int placeholder, int data, int offset, int size)
 {
 	SYSLOG("maCreateImageFromData");
 
+	byte[] ra = new byte[size];
+
 	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
-	if(null == bb)
+	if (null != bb)
 	{
-		return RES_BAD_INPUT;
+		try
+		{
+			bb.position(offset);
+			bb.get(ra);
+		}
+		catch(Exception e)
+		{
+			return RES_BAD_INPUT;
+		}
+	}
+	else
+	{
+		UBinData ubd = (UBinData)mUBinaryResources.get(data);
+		if (null != ubd)
+		{
+			if(ubd.mSize != size)
+			{
+				return RES_BAD_INPUT;
+			}
+		
+			try
+			{	
+				AssetManager assetManager = mContext.getAssets();
+				InputStream is = assetManager.open(RESOURCE_FILE);
+			
+				is.skip(ubd.mOffset - (int)mResourceOffset);
+				is.read(ra);
+			}
+			catch(Exception e)
+			{
+				return RES_BAD_INPUT;
+			}
+		}
 	}
 	
-	byte[] ra = new byte[size];
-	try
+	try 
 	{
-		bb.position(offset);
-		bb.get(ra);
-	}catch(Exception e){
-		return RES_BAD_INPUT;
-	}
-
-	try {
-		Log.i("Decode image","size:" + size + " offset:" + offset + " ra.length:" + ra.length);
 		Bitmap decodedImage = BitmapFactory.decodeByteArray(ra, 0, ra.length);
-		if(decodedImage == null)
+		if (decodedImage == null)
 		{
 			return RES_BAD_INPUT;
 		}
 		mImageResources.put(placeholder, new ImageCache(null, decodedImage));
-		
-	} catch(UnsupportedOperationException e) {
-		Log.e("maCreateImageFromData exception",e.toString());
+	} 
+	catch(UnsupportedOperationException e) 
+	{
 		return RES_BAD_INPUT;
-	} catch(java.lang.IllegalArgumentException e) {
+	} 
+	catch (java.lang.IllegalArgumentException e) 
+	{
 		return RES_BAD_INPUT;
-	} catch(java.lang.OutOfMemoryError e) {
+	} 
+	catch (java.lang.OutOfMemoryError e) 
+	{
 		return RES_OUT_OF_MEMORY;
 	}
 	return RES_OK;
 }
 
 ByteBuffer tempImageRawBuffer;
+
+/**
+* @brief _maCreateImageRawGetData
+*
+* This fucntion generates a ByteBuffer which then is sent to the JNI library for processing
+*/
 ByteBuffer _maCreateImageRawGetData(int size)
 {
 	tempImageRawBuffer = ByteBuffer.allocateDirect(size);
+	tempImageRawBuffer.order(null);
+	
 	return tempImageRawBuffer;
 }
 
-// This function takes the content of the tempImageRawBuffer and creates an Image from it.
-// 
-//
+/**
+* @brief _maCreateImageRaw
+*
+* Takes the preprocessed raw image data and copies the contents to a bitmap
+*/
 int _maCreateImageRaw(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateImageRaw");
 	
 	Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+	if(null == bitmap)
+	{
+		maPanic(1, "Unable to create ");
+	}
+	
+	tempImageRawBuffer.position(0);
 	bitmap.copyPixelsFromBuffer(tempImageRawBuffer);
 	
 	mImageResources.put(placeholder, new ImageCache(null, bitmap));
-	
+		
 	return RES_OK;
 }
 
+/**
+* @brief maCreateDrawableImage
+*/
 int maCreateDrawableImage(int placeholder, int width, int height)
 {
 	SYSLOG("maCreateDrawableImage");
-	SYSLOG("ph: " + placeholder + " width; " + width + " height: " + height);
 	try
 	{
 		Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 	
-		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));
+		mImageResources.put(placeholder, new ImageCache(canvas, bitmap));	
 	}
-	catch(UnsupportedOperationException e)
+	catch (UnsupportedOperationException e)
 	{
 		Log.i("maCreateDrawableImage","e: " + e.toString());
 		return -1;
 	}
-	catch(Exception e)
+	catch (Exception e)
 	{
 		Log.i("maCreateDrawableImage","e: " + e.toString());
 		return -1;
 	}
-	catch(java.lang.OutOfMemoryError e)
+	catch (java.lang.OutOfMemoryError e)
 	{
 		return -1;
 	}
@@ -494,9 +747,14 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 }
 
 Hashtable<Integer, String> mStores = new Hashtable<Integer, String>();
+
 int mMaxStoreId = 0;
 
 final static String storesPath = "MAStore";
+
+/**
+* @brief maOpenStore
+*/
 int maOpenStore(String name, int flags)
 {
 	SYSLOG("maOpenStore");
@@ -505,18 +763,22 @@ int maOpenStore(String name, int flags)
 	{
 		File f = mContext.getFileStreamPath(storesPath);
 
-		if(f.isFile()) return STERR_GENERIC;
-		else if(!f.isDirectory())
+		if (f.isFile()) 
+		{
+			return STERR_GENERIC;
+		}
+		else if (!f.isDirectory())
 		{
 			boolean success = f.mkdir();
-			if(!success) return STERR_GENERIC;
+			if (!success) return STERR_GENERIC;
 		}
 		
 		String filePath = storesPath + File.pathSeparator + name;
 		f = mContext.getFileStreamPath(filePath);
 		
-		if(f.isDirectory()) return STERR_GENERIC;
-		if(!f.isFile())
+		if (f.isDirectory()) return STERR_GENERIC;
+		
+		if (!f.isFile())
 		{
 			if ((flags & MAS_CREATE_IF_NECESSARY) == 0) return STERR_NONEXISTENT;
 			f.createNewFile();
@@ -525,24 +787,29 @@ int maOpenStore(String name, int flags)
 		mMaxStoreId++;
 		mStores.put(new Integer(mMaxStoreId), filePath);
 		return mMaxStoreId;
-
-	} catch(Exception e) {
+	} 
+	catch(Exception e) 
+	{
 		PRINT_STACK_TRACE;
 		SYSLOG("open store exception : " + e.toString());
 		return STERR_GENERIC;
 	}
 }
 
+/**
+* @brief maWriteStore
+*/
 int maWriteStore(int store, int data)
 {
 	SYSLOG("maWriteStore");
-	try {
+	try 
+	{
 		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
-		if(f.isFile())
+		if (f.isFile())
 		{
 			SYSLOG("Looking for binary resource..");
 			ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
-			if(null != bb)
+			if (null != bb)
 			{
 				SYSLOG("Found it!");
 				FileOutputStream fos = new FileOutputStream(f, false);
@@ -556,13 +823,13 @@ int maWriteStore(int store, int data)
 			
 			SYSLOG("Looking for ubinary resource..");
 			UBinData ubd = (UBinData)mUBinaryResources.get(data);
-			if(null != ubd)
+			if (null != ubd)
 			{
 				SYSLOG("Found it!");
 				byte[] ra = new byte[ubd.mSize];
 			
 				AssetManager assetManager = mContext.getAssets();
-				InputStream is = assetManager.open("resources.mp3");
+				InputStream is = assetManager.open(RESOURCE_FILE);
 				
 				is.skip(ubd.mOffset - (int)mResourceOffset);
 				is.read(ra);
@@ -576,30 +843,38 @@ int maWriteStore(int store, int data)
 			SYSLOG("didn't find buffer, data:" + data);
 			return STERR_GENERIC;			
 		}
-	} catch(Exception e) {
+	} 
+	catch(Exception e) 
+	{
 		SYSLOG("write store exception : " + e.toString());
 		PRINT_STACK_TRACE;
 	}
 	return STERR_GENERIC;
 }
 
+/**
+* @brief _maReadStore
+*/
 ByteBuffer _maReadStore(int store, int resourceIndex)
 {
 	SYSLOG("_maReadStore");
 	
-	try {
+	try 
+	{
 		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
 		byte[] buffer;
 		int length = 0;
-		if(f.isFile())
+		if (f.isFile())
 		{
 			length = (int)f.length();
 			buffer = new byte[length];
 			
 			FileInputStream fis = new FileInputStream(f);
 			int offset = 0;
-			while(offset >= 0 && offset < length)
+			while (offset >= 0 && offset < length)
+			{
 				offset = fis.read(buffer, offset, (length-offset));
+			}
 			fis.close();	
 		}
 		else
@@ -611,75 +886,102 @@ ByteBuffer _maReadStore(int store, int resourceIndex)
 		bb.put(buffer);
 		return bb;
 		
-	} catch(Exception e) {
+	} 
+	catch(Exception e) 
+	{
 		SYSLOG("read store exception : " + e.toString());
 		PRINT_STACK_TRACE;
 		return null;
 	}
 }
 
+/**
+* @brief maCloseStore
+*/
 void maCloseStore(int store, int remove)
 {
 	SYSLOG("maCloseStore");
 	
 	String filePath = (String)mStores.get(new Integer(store));
-	if(remove != 0) {
+	if (remove != 0) 
+	{
 		File f = mContext.getFileStreamPath(filePath);
 		f.delete();
 	} 
 	
-	if(!(mStores.remove(new Integer(store)) == filePath))
+	if (!(mStores.remove(new Integer(store)) == filePath))
+	{
 		maPanic(1, "maCloseStore failed!");
+	}
 }
 
 #include "MoSyncSound.jpp"
 
-#ifdef _ANDROID_BLUETOOTH
 #include "MoSyncBluetooth.jpp"
-#endif
 
 #include "MoSyncNetwork.jpp"
 
 #include "MoSyncLocation.jpp"
 
+/**
+* @brief maLoadProgram
+*/
 void maLoadProgram(int data, int reload)
 {
 	SYSLOG("maLoadProgram");
 }
 
+/**
+* @brief maGetKeys
+*/
 int maGetKeys()
 {
 	SYSLOG("maGetKeys");
 	return -1;
 }
 
+/**
+* @brief maGetEvent
+*/
 int maGetEvent(int event)
 {
 	SYSLOG("maGetEvent");
 	return -1;
 }
 
+/**
+* @brief maWait
+*/
 void maWait(int timeout)
 {
 	SYSLOG("maWait");	
 
 	try
 	{
-		Log.i("MoSyncThread","sleep for :" + timeout);
-		if(timeout<=0)
+ 		if (timeout<=0)
+		{
 			this.sleep(Long.MAX_VALUE);
+		}
 		else
+		{
 			this.sleep(timeout);
-
-	} catch(InterruptedException ie) {
-		Log.i("MoSync View","Sleeping thread interrupted!");
-	} catch(Exception e) {
+		}
+	} 
+	catch (InterruptedException ie) 
+	{
+		SYSLOG("Sleeping thread interrupted!");
+	} 
+	catch (Exception e) 
+	{
 		Log.i("MoSync View","Thread sleep failed : " + e.toString());
 	}
 	
 	SYSLOG("maWait returned");
 }
 
+/**
+* @brief maTime
+*/
 int maTime()
 {
 	SYSLOG("maTime");
@@ -687,6 +989,9 @@ int maTime()
 	return (int)(d.getTime() / 1000);
 }
 
+/**
+* @brief maLocalTime
+*/
 int maLocalTime()
 {
 	SYSLOG("maLocalTime");
@@ -695,29 +1000,44 @@ int maLocalTime()
 	return (int)((d.getTime() + tz.getRawOffset()) / 1000);
 }
 
+/**
+* @brief maGetMilliSecondCount
+*/
 int maGetMilliSecondCount()
 {
-	return (int)System.currentTimeMillis();
+	return (int)SystemClock.elapsedRealtime();
 }
 
+/**
+* @brief maFreeObjectMemory 
+*/
 int maFreeObjectMemory()
 {
 	SYSLOG("maFreeObjectMemory");
 	return -1;
 }
 
+/**
+* @brief maTotalObjectMemory
+*/
 int maTotalObjectMemory()
 {
 	SYSLOG("maTotalObjectMemory");
 	return -1;
 }
 
+/**
+* @brief maVibrate
+*/
 int maVibrate(int ms)
 {
 	SYSLOG("maVibrate");
 	return -1;
 }
 
+/**
+* @brief maPanic
+*/
 void maPanic(int result, String message)
 {
 	SYSLOG("maPanic");
@@ -725,26 +1045,39 @@ void maPanic(int result, String message)
 	threadPanic(result, message);
 }
 
+/**
+* @brief maInvokeExtension
+*/
 int maInvokeExtension(int function, int a, int b, int c)
 {
 	SYSLOG("maInvokeExtension");
 	return -1;
 }
 
+/**
+* @brief maIOCtl
+*/
 int maIOCtl(int function, int a, int b, int c)
 {
 	SYSLOG("maIOCtl");
 	return -1;
 }
 
+/**
+* @brief _enableFramebuffer
+*/
 void _enableFramebuffer(int address)
 {
 	mUsingFrameBuffer = true;
 	mFrameBufferAddress = address; // address is pointing at a byte but that array is an int array..
 	mFrameBufferSize = mWidth*mHeight;
 	mFrameBufferBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888 );
+	
 }
 
+/**
+* @brief _disableFramebuffer
+*/
 void _disableFramebuffer()
 {
 	mUsingFrameBuffer = false;
@@ -762,6 +1095,9 @@ int maWriteLog(String str, int size)
 	return 1;
 }
 
+/**
+* @brief maGetSystemProperty
+*/
 int maGetSystemProperty(String key, int buf, int size)
 {
 	String property = "";
@@ -806,6 +1142,9 @@ int maGetSystemProperty(String key, int buf, int size)
 	return property.length() + 1;
 }
 
+/**
+* @brief maPlatformRequest
+*/
 int maPlatformRequest(String url)
 {
 	if(url.startsWith("http://"))
@@ -820,6 +1159,9 @@ int maPlatformRequest(String url)
 	return -1;
 }
 
+/**
+* @brief maShowVirtualKeyboard
+*/
 int maShowVirtualKeyboard()
 {
 	MoSyncView moSyncView = ((MoSync) mContext).getMoSyncView();
@@ -927,6 +1269,13 @@ int maWebViewOpenToast()
 
 Hashtable<Integer, ImageCache> mImageResources = new Hashtable<Integer, ImageCache>();
 
+/**
+* @brief loadImage
+*
+* Stores an image resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 {
 	SYSLOG("LoadImage");
@@ -951,15 +1300,12 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 		{
 			SYSLOG("Reading image resource from asset");
 			int offset =  pos-(int)mResourceOffset;
-			SYSLOG("resoff:" + mResourceOffset + " pos: " + pos + " finaloffset: " + offset);
 			
 			AssetManager assetManager = mContext.getAssets();
-			InputStream is = assetManager.open("resources.mp3");
+			InputStream is = assetManager.open(RESOURCE_FILE);
 			
-			SYSLOG("read stream");
 			is.skip(offset);
 			is.read(ra);
-			SYSLOG("stream finished");
 		}
 		
 		SYSLOG("Decode a bitmap!");
@@ -982,6 +1328,13 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 
 Hashtable<Integer, ByteBuffer> mBinaryResources = new Hashtable<Integer, ByteBuffer>();
 
+/**
+* @brief loadBinary
+*
+* Stores a binary resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 ByteBuffer loadBinary(int resourceIndex, int size)
 {
 	SYSLOG("loadBinary index:" + resourceIndex);
@@ -989,16 +1342,22 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 	try
 	{
 		ByteBuffer data = ByteBuffer.allocateDirect(size);
+		data.order(null);
 		mBinaryResources.put(resourceIndex, data);
 		return data;
 	}
 	catch(Exception e)
 	{
 		Log.i("MoSyncThread", "Out of Memory!");
+		maPanic(1,"Out of Memory!");
 	}
 	return null;
 }
 
+
+/**
+* @brief UBinData class
+*/
 class UBinData
 {
 	public UBinData(int offset, int size)
@@ -1012,6 +1371,13 @@ class UBinData
 
 Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
 
+/**
+* @brief loadUBinary
+*
+* Stores an unloaded binary resource. Since Andriod differs a lot from
+* the other runtimes this is necessary. There isn't a duplicate stored
+* on the JNI side.
+*/
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
@@ -1022,7 +1388,7 @@ void loadUBinary(int resourceIndex, int offset, int size)
 	try
 	{
 		AssetManager assetManager = mContext.getAssets();
-		AssetFileDescriptor pAfd = assetManager.openFd("resources.mp3");
+		AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 	
 		FileInputStream fis = pAfd.createInputStream();
 		fis.skip(offset);
@@ -1040,25 +1406,48 @@ void loadUBinary(int resourceIndex, int offset, int size)
 	}
 }
 
+/**
+* @brief destroyResource
+*
+* @param 	resourceIndex the resource index which should be destroyed
+*/
 void destroyResource(int resourceIndex)
 {
 	SYSLOG("destroyBinary :" + resourceIndex);
+	Log.i("destroyResource","Trying to destroy resources : " + resourceIndex);
 	
-	if(mBinaryResources.contains(resourceIndex))
+	if(null != mBinaryResources.get(resourceIndex))
 	{
 		mBinaryResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","Binary resource removed");
 	}
 
-	if(mUBinaryResources.contains(resourceIndex))
+	if(null != mUBinaryResources.get(resourceIndex))
 	{
 		mUBinaryResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","UBinary resource removed");
 	}
 
-	if(mImageResources.contains(resourceIndex))
+	if(null != mImageResources.get(resourceIndex))
 	{
 		mImageResources.remove(resourceIndex);
-		return;
+		Log.i("destroyResource","Image resource removed");
 	}
 }
+
+/**
+* @brief maTextBox
+*/
+int maTextBox(String title, String inText, int outText, int maxSize, int constraints)
+{
+	Intent intent = new Intent(mContext, TextBox.class);
+	Bundle bundle = new Bundle();
+	bundle.putString("TITLE", title);
+	bundle.putString("TEXT", inText);
+	bundle.putInt("OUTPUT", outText);
+	intent.putExtras(bundle);
+	mContext.startActivity(intent);
+	Log.i("MoSync", "New activity started for InputBox");
+	return 0;
+}
+

@@ -1,15 +1,22 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
+#include <string.h>
 #include <string>
 #include <fstream>
 #include "package.h"
 #include "packagers.h"
+#include "util.h"
 
 using namespace std;
 
+struct ProfileInfo {
+	bool isBlackberry;
+	string iconSize;
+};
+
 static bool parseRuntimeTxt(const char* filename, string& path, string& name);
-static bool parseProfileHeader(const char* filename, bool& isBlackberry);
-static void toSlashes(string& str);
+static bool parseProfileHeader(const char* filename, ProfileInfo& pi);
 
 void package(const SETTINGS& s) {
 	// Read runtime.txt and maprofile.h to find which runtime to use.
@@ -17,6 +24,7 @@ void package(const SETTINGS& s) {
 
 	testModel(s);
 
+	// find profile info
 	string modelDir(mosyncdir());
 	modelDir += "/profiles/vendors/";
 	modelDir += s.model;
@@ -25,45 +33,53 @@ void package(const SETTINGS& s) {
 	string headerPath = modelDir + "/maprofile.h";
 	toSlashes(headerPath);
 
-	string runtimePath, runtimeName;
-	if(!parseRuntimeTxt(runtimeTxtPath.c_str(), runtimePath, runtimeName)) {
+	RuntimeInfo ri;
+	ProfileInfo pi;
+
+	// parse files
+	string runtimeName;
+	if(!parseRuntimeTxt(runtimeTxtPath.c_str(), ri.path, runtimeName)) {
 		printf("runtime.txt parse error\n");
 		exit(1);
 	}
+	if(!parseProfileHeader(headerPath.c_str(), pi)) {
+		printf("maprofile.h parse error\n");
+		exit(1);
+	}
+	ri.iconSize = pi.iconSize;
+	toDir(ri.path);
 
+	// select runtime
 	if(runtimeName == "JavaME") {
-		bool isBlackberry;
-		parseProfileHeader(headerPath.c_str(), isBlackberry);
-
-		packageJavaME(s, runtimePath, isBlackberry);
-		if(isBlackberry) {
-			packageBlackberry(s);
+		packageJavaME(s, ri, pi.isBlackberry);
+		if(pi.isBlackberry) {
+			packageBlackberry(s, ri);
 		}
 	} else if(runtimeName == "s60v2") {
-		packageS60v2(s, runtimePath);
+		packageS60v2(s, ri);
 	} else if(runtimeName == "s60v3") {
-		packageS60v3(s, runtimePath);
+		packageS60v3(s, ri);
 	} else if(runtimeName == "s60v5") {
-		packageS60v5(s, runtimePath);
+		packageS60v3(s, ri);
 	} else if(runtimeName == "sp2003") {
-		packageWM(s, runtimePath);
+		packageWM(s, ri);
 	} else if(runtimeName == "wm5") {
-		packageWM(s, runtimePath);
+		packageWM(s, ri);
 	} else if(runtimeName == "wm6") {
-		packageWM(s, runtimePath);
+		packageWM(s, ri);
 	} else if(runtimeName == "wm6pro") {
-		packageWM(s, runtimePath);
+		packageWM(s, ri);
 	} else if(runtimeName == "moblin") {
-		packageMoblin(s, runtimePath);
+		packageMoblin(s, ri);
 	} else if(runtimeName == "android") {
-		packageAndroid(s, runtimePath);
+		packageAndroid(s, ri);
 	} else {
 		printf("Error: unknown runtime '%s'\n", runtimeName.c_str());
 		exit(1);
 	}
 }
 
-static void toSlashes(string& str) {
+void toSlashes(string& str) {
 	for(size_t i=0; i<str.size(); i++) {
 		str[i] = (str[i] == '\\' ? '/' : str[i]);
 	}
@@ -76,6 +92,8 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 		return false;
 	string line;
 	getline(file, line);
+	if(line[line.length()-1] == '\r')
+		line = line.erase(line.length()-1, 1);
 	if(!file.good())
 		return false;
 
@@ -83,7 +101,7 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	toSlashes(line);
 
 	// set path
-	path = mosyncdir() + line;
+	path = mosyncdir() + ("/" + line);
 
 	// check runtime number
 	size_t lastSlash = line.find_last_of('/');
@@ -107,42 +125,69 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	return true;
 }
 
-static bool parseProfileHeader(const char* filename, bool& isBlackberry) {
+static const char* findProp(const string& line, const char* key) {
+	string k("#define ");
+	k += key;
+	if(line.find(k) == 0) {
+		const char* val = line.c_str() + k.length();
+		while(isspace(*val)) {
+			val++;
+		}
+		return val;
+	} else {
+		return NULL;
+	}
+}
+
+// changes value and returns true only if prop was found and properly parsed.
+static bool parseIntProp(const string& line, const char* key, int& value) {
+	const char* val = findProp(line, key);
+	if(val) {
+		int len;
+		int tempval;
+		int res = sscanf(val, "%i%n", &tempval, &len);
+		if(res == 1 && (int)strlen(val) == len) {
+			value = tempval;
+			return true;
+		}
+	}
+	return false;
+}
+
+static bool parseProfileHeader(const char* filename, ProfileInfo& pi) {
 	ifstream file(filename);
 	if(!file.good())
 		return false;
-	isBlackberry = false;
+	pi.isBlackberry = false;
+	pi.iconSize = "default";
+	int iconX = -1;
+	int iconY = -1;
 	while(file.good()) {
 		string line;
 		getline(file, line);
 		if(line.find("#define MA_PROF_SUPPORT_BLACKBERRY") == 0) {
-			isBlackberry = true;
+			pi.isBlackberry = true;
 		}
+		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_X", iconX);
+		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);
+	}
+	if(iconX > 0 && iconY > 0) {
+		char buf[32];
+		sprintf(buf, "%ix%i", iconX, iconY);
+		pi.iconSize = buf;
 	}
 	return true;
 }
 
-void packageS60v2(const SETTINGS&, const std::string& runtimePath) {
+void packageWM(const SETTINGS&, const RuntimeInfo& ri) {
 	printf("not implemented\n");
 	exit(1);
 }
-void packageS60v3(const SETTINGS&, const std::string& runtimePath) {
+void packageMoblin(const SETTINGS&, const RuntimeInfo& ri) {
 	printf("not implemented\n");
 	exit(1);
 }
-void packageS60v5(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageWM(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageMoblin(const SETTINGS&, const std::string& runtimePath) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageAndroid(const SETTINGS&, const std::string& runtimePath) {
+void packageAndroid(const SETTINGS&, const RuntimeInfo& ri) {
 	printf("not implemented\n");
 	exit(1);
 }

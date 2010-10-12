@@ -21,6 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "compile.h"
 
+#define DISAS_DEBUG 0
+
 //****************************************
 //			Build Fetch Table
 //****************************************
@@ -55,7 +57,7 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 {
 	uchar thisOp;
 	uchar thisRD=0,thisRS=0;
-	uint thisIMM=0;
+	uint thisIMM=0, FetchedImm=0;
 	uint rip = (int) code_ip - (int) ArrayPtr(&CodeMemArray, 0);
 	
 	uchar *start_code_ip = code_ip;		// Make a copy
@@ -102,11 +104,13 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 			thisIMM = (*code_ip++ << 16);
 			thisIMM += (*code_ip++ << 8);
 			thisIMM += *code_ip++;
+			FetchedImm++;
 		}
 		else
 		{
 			thisIMM = *code_ip++ << 8;
 			thisIMM += *code_ip++;
+			FetchedImm++;
 		}
 	}
 
@@ -115,11 +119,15 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 		thisIMM = (*code_ip++ << 16);
 		thisIMM += (*code_ip++ << 8);
 		thisIMM += *code_ip++;
+		FetchedImm++;
 	}
 
 	if (flags & (fetch_j | fetch_k))
+	{
 		thisIMM = *code_ip++;
-
+		FetchedImm++;
+	}
+	
 	if (flags & fetch_i)
 	{
 		thisIMM = *code_ip++;
@@ -128,10 +136,15 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 		{
 			thisIMM = ((thisIMM & 127) << 8) + *code_ip++;
 		}
+
+		FetchedImm++;
 	}
 
 	if (flags & fetch_i)
+	{
 		thisIMM = GetVarPoolEntry(thisIMM);
+		FetchedImm++;
+	}
 	
 	// ** Special case for SysCalls **
 	// which marks that they use R14
@@ -141,6 +154,19 @@ uchar * DecodeOpcode(OpcodeInfo *thisOpcode, uchar *code_ip)
 		flags |= fetch_d;
 		thisRD = REG_r14;
 	}
+
+	// !! ARH note remember this could be dangerous !!
+	// !! Expand RS registers > 32 into constants in imm field 
+	
+	if ((flags & fetch_s) && (thisRS >= 32))
+	{
+		// Only do this if we have'nt used the imm field
+
+		if (FetchedImm == 0)
+			thisIMM = ConstRegValue(thisRS);
+	}
+	
+	// !!
 
 	// Save info
 
@@ -182,14 +208,91 @@ int DecodeOpcodeIP(OpcodeInfo *thisOpcode, int code_ip)
 
 void DecodeAsmEmit(char *out, char *Template, ...)
 {
-		char 	Str[1280];
-		va_list args;
+	char 	Str[1280];
+	va_list args;
 
-		va_start(args,Template);
-		vsprintf(Str,Template,args);
-		va_end(args);
+	va_start(args,Template);
+	vsprintf(Str,Template,args);
+	va_end(args);
 
-		strcat(out,Str);
+	strcat_cond(out,Str);
+}
+
+//****************************************
+//			Get Reg Name
+//****************************************
+
+char str_cond_table[128];
+
+void strcat_cond(char *in_dst, char *src)
+{		
+	int dstlen = strlen(in_dst);
+	char c;
+	int cond;
+
+	char *dst = &in_dst[dstlen];
+	
+	while(1)
+	{
+		c = *src++;
+		
+		if (c == 0)
+			break;
+
+		if (c != '<')
+		{
+			*dst++ = c;
+			continue;
+		}
+
+		// Get condition delimeter
+
+		c = *src++;
+
+		// Make sure that the delimeter is there, otherwise error
+
+		if (c != '@')
+			Error(Error_Fatal, "Missing '@' delimeter in conditional string");
+
+		// Get condition variable char
+
+		c = *src++;
+		cond  = str_cond_table[c & 127];
+		
+		// Copy everything if the condition is true
+		
+		while(1)
+		{
+			// Get the next char
+
+			c = *src++;
+
+			if (c == 0)
+				Error(Error_Fatal, "Missing '>' closure in output");
+
+			// if we have reached the end marker, skip it then keep going
+
+			if (c == '>')
+				break;
+
+			// If condition is true copy the char
+
+			if (cond)
+				*dst++ = c;
+			
+		}
+	}
+
+	*dst = 0;
+}
+
+//****************************************
+//		 Set string condition
+//****************************************
+
+void SetStrCondition(int v, int c)
+{
+	str_cond_table[v&127] = c;
 }
 
 //****************************************
@@ -250,7 +353,7 @@ void DecodeCase(char *out, OpcodeInfo *thisOpcode)
 
 	CaseRef = ref;
 	
-	DecodeAsmEmit(out, "#%s_%d,", ref->Name, ref->LocalScope);
+	DecodeAsmEmit(out, "#%s<@1_%d>,", ref->Name, ref->LocalScope);
 
 	// Write default address
 	
@@ -270,7 +373,7 @@ void DecodeCase(char *out, OpcodeInfo *thisOpcode)
 	
 	ref = labref;
 
-	DecodeAsmEmit(out, "#%s_%d", ref->Name, ref->LocalScope);	
+	DecodeAsmEmit(out, "#%s<@1_%d>", ref->Name, ref->LocalScope);	
 }
 
 //****************************************
@@ -286,6 +389,8 @@ int DecodeDataAccessImm(char *out, OpcodeInfo *thisOpcode)
 			
 	if (!ref)
 		return 0;
+
+	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DDAI*");
 
 	if (ref->Type == SECT_data)
 		d = thisOpcode->imm - ref->Value;
@@ -303,16 +408,18 @@ int DecodeDataAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	if (d == 0)
 	{
-		DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
 		return 1;
 	}
 
 	if (d > 0)
 	{
+	
+		if (ref->EndIP)				// Get rid of 0 lenght reports
 		if (d >= ref->EndIP)
 			ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s+%d': may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	
-		DecodeAsmEmit(out, "&%s_%d+%d", ref->Name, ref->LocalScope, d);
+		DecodeAsmEmit(out, "&%s<@1_%d>+%d", ref->Name, ref->LocalScope, d);
 		return 1;
 	}
 
@@ -322,8 +429,9 @@ int DecodeDataAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	d = -d;
 
-	DecodeAsmEmit(out, "&%s_%d-%d", ref->Name, ref->LocalScope, d);
+	DecodeAsmEmit(out, "&%s<@1_%d>-%d", ref->Name, ref->LocalScope, d);
 
+	if (ref->EndIP)				// Get rid of 0 lenght reports
 	ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s-%d': negative index may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	return 1;
 }
@@ -342,25 +450,28 @@ int DecodeIndexAccessImm(char *out, OpcodeInfo *thisOpcode)
 	if (!ref)
 		return 0;
 
+	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DIAI*");
+
 	if (ref->Type == SECT_data)
 		d = thisOpcode->imm - ref->Value;
 	else if (ref->Type == SECT_bss)
 		d = thisOpcode->imm - (ref->Value + MaxDataIP);
 	else
-		ErrorOnIP(Error_Fatal,thisOpcode->rip,"(DecodeDataAccessImm) illegal section reference");
+		ErrorOnIP(Error_Fatal,thisOpcode->rip,"(DecodeIndexAccessImm) illegal section reference");
 	
 	if (d == 0)
 	{
-		DecodeAsmEmit(out, "%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out, "%s<@1_%d>", ref->Name, ref->LocalScope);
 		return 1;
 	}
 
 	if (d > 0)
 	{
+		if (ref->EndIP)				// Get rid of 0 lenght reports
 		if (d >= ref->EndIP)
 			ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s+%d': may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	
-		DecodeAsmEmit(out, "%s_%d+%d", ref->Name, ref->LocalScope, d);
+		DecodeAsmEmit(out, "%s<@1_%d>+%d", ref->Name, ref->LocalScope, d);
 		return 1;
 	}
 
@@ -370,15 +481,16 @@ int DecodeIndexAccessImm(char *out, OpcodeInfo *thisOpcode)
 	
 	d = -d;
 
-	DecodeAsmEmit(out, "%s_%d-%d", ref->Name, ref->LocalScope, d);
+	DecodeAsmEmit(out, "%s<@1_%d>-%d", ref->Name, ref->LocalScope, d);
 
+	if (ref->EndIP)				// Get rid of 0 lenght reports
 	ErrorOnIP(Error_Warning, thisOpcode->rip, "Index '%s-%d': negative index may be out of bounds (%d length)", ref->Name, d, ref->EndIP);
 	return 1;
 }
 
 
 //****************************************
-
+/*
 int DecodeDataAccess(char *out, OpcodeInfo *thisOpcode)
 {
 	SYMBOL *ref;
@@ -388,7 +500,36 @@ int DecodeDataAccess(char *out, OpcodeInfo *thisOpcode)
 	if (!ref)
 		return 0;
 
-	DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DDA*");
+
+	DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
+	return 1;
+}
+*/
+
+int DecodeDataAccess(char *out, OpcodeInfo *thisOpcode)
+{
+	SYMBOL *ref;
+	int d=0;
+
+	ref = (SYMBOL *) ArrayGet(&DataAccessArray, thisOpcode->rip);
+			
+	if (!ref)
+		return 0;
+
+	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DDA*");
+
+// !imm
+
+	if (ref->Type == SECT_data)
+		d = thisOpcode->imm - ref->Value;
+	else if (ref->Type == SECT_bss)
+		d = thisOpcode->imm - (ref->Value + MaxDataIP);
+	else
+		ErrorOnIP(Error_Fatal,thisOpcode->rip,"(DecodeDataAccess) illegal section reference");
+
+
+	DecodeAsmEmit(out, "&%s<@1_%d>(+%d)", ref->Name, ref->LocalScope,d);
 	return 1;
 }
 
@@ -406,6 +547,8 @@ int DecodeCallArray(char *out, OpcodeInfo *thisOpcode)
 	if (!ref)
 		return 0;
 
+	if (DISAS_DEBUG) DecodeAsmEmit(out, "*DCA*");
+
 	addr = ref->Value;
 	
 	labref = (SYMBOL *) ArrayGet(&CodeLabelArray, addr);
@@ -415,7 +558,7 @@ int DecodeCallArray(char *out, OpcodeInfo *thisOpcode)
 	
 	ref = labref;
 
-	DecodeAsmEmit(out, "&%s_%d", ref->Name, ref->LocalScope);
+	DecodeAsmEmit(out, "&%s<@1_%d>", ref->Name, ref->LocalScope);
 	return 1;
 }
 
@@ -423,17 +566,22 @@ int DecodeCallArray(char *out, OpcodeInfo *thisOpcode)
 //		Disassemble to string
 //****************************************
 
-void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
+void DecodeAsmString(OpcodeInfo *thisOpcode, char *out, int add_scope)
 {
 	short n,len;
 	char c;
+	char *oldFilePtr = FilePtr;			// Save FilePtr
+
+	out[0] = 0;							// Terminate string first
+
+	SetStrCondition('1', add_scope);
 
 	SetFilePtrFromIP(thisOpcode->rip);
 
 	CaseRef = 0;
-	out[0] = 0;
 
 	len = strlen(thisOpcode->str);	
+
 	
 	for(n=0;n<len;n++)
 	{
@@ -443,20 +591,39 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 		{	
 			case 'd': 		// Reg rd
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(d)");
 				DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rd, 1));
 			}
 			break;
 
 			case 's': 		// Reg rs
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(s)");
 				DecodeAsmEmit(out, "%s",DecodeRegName(thisOpcode->rs, 1));
 			}
 			break;		
 
 			case 'q': 		// Reg rs or DataAccess
 			{
-				if (DecodeDataAccess(out, thisOpcode))
-					break;
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(q)");
+
+//!! A copy
+//				if (DecodeDataAccess(out, thisOpcode))
+//					break;
+// !!
+
+
+// !! *ARH* Note New Solution Carefull about this !!
+
+				if (thisOpcode->rs >= 32)
+				{
+					if (DecodeCallArray(out, thisOpcode))
+						break;
+			
+					if (DecodeDataAccessImm(out, thisOpcode))
+						break;
+				}
+// !!
 
 				DecodeAsmEmit(out, "%s",DecodeRegName(thisOpcode->rs, 1));
 			}
@@ -466,6 +633,8 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 			case 'i': 		// Immediate const
 			case 'a': 		// Immediate address
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(ia)");
+
 				if (DecodeCallArray(out, thisOpcode))
 					break;
 		
@@ -477,50 +646,101 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 			break;
 
 			case 'c': 		// Immediate address
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(c)");
+
 				DecodeCase(out, thisOpcode);
 			break;
 
 
 			case 'j': 		// Immediate 8 bits
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(j)");
+
 				DecodeAsmEmit(out,"#0x%x",thisOpcode->imm);
 			}
 			break;
 
 			case 'k': 		// Syscalls
 			{
+#if 1
 				DecodeAsmEmit(out,"%d",thisOpcode->imm);
+#else
+				{
+					SYMBOL *syscall =  FindSysCall(thisOpcode->imm);			
+
+					if (!syscall)
+					{
+						Error(Error_System, "Could'nt locate syscall\n");
+						return;
+					}
+					
+					DecodeAsmEmit(out,"#%s",syscall->Name);
+				}
+#endif
+				
 			}		
 			break;
 
 			case 'm': 		// rs+imm	
 			{
 
-				DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rs, 0));
+				if (DISAS_DEBUG)
+					DecodeAsmEmit(out,"(m)");
 
-				if (DecodeIndexAccessImm(out, thisOpcode))
-					break;
+				if (thisOpcode->imm)
+				{
+//					if (thisOpcode->rs)
+						DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rs, 0));
+//					else
+//						DecodeAsmEmit(out,"#");
 
-				DecodeAsmEmit(out,"%d", thisOpcode->imm);
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+
+					DecodeAsmEmit(out,"%d", thisOpcode->imm);
+				}
+				else // 0 case
+				{
+					DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rs, 0));
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+				}
 
 			}		
 			break;
 
 			case 'n': 		// rd+imm	
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(n)");
 
-				DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rd, 0));
+				if (thisOpcode->imm)
+				{
+//					if (thisOpcode->rd)
+						DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rd, 0));
+//					else
+//						DecodeAsmEmit(out,"#");
 
-				if (DecodeIndexAccessImm(out, thisOpcode))
-					break;
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
 
-				DecodeAsmEmit(out,"%d", thisOpcode->imm);
+					DecodeAsmEmit(out,"%d", thisOpcode->imm);
+				}
+				else
+				{
+					DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rd, 0));
+
+					if (DecodeIndexAccessImm(out, thisOpcode))
+						break;
+				}
 
 			}		
 			break;
 
 			case 'x': 		// Push
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(x)");
 				DecodeAsmEmit(out,"%s,",DecodeRegName(thisOpcode->rd, 0));
 				DecodeAsmEmit(out,"%s",DecodeRegName(thisOpcode->rd + thisOpcode->rs - 1, 0));
 			}
@@ -528,6 +748,7 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 
 			case 'y': 		// Pop
 			{
+				if (DISAS_DEBUG) DecodeAsmEmit(out,"(y)");
 				DecodeAsmEmit(out,"%s,", DecodeRegName(thisOpcode->rd - thisOpcode->rs + 1, 0));
 				DecodeAsmEmit(out,"%s",  DecodeRegName(thisOpcode->rd, 0));
 			}
@@ -549,6 +770,8 @@ void DecodeAsmString(OpcodeInfo *thisOpcode, char *out)
 		}
 
 	}
+
+	FilePtr = oldFilePtr;		// Restore FilePtr
 }
 
 //****************************************
@@ -567,19 +790,19 @@ void DecodeAsmLabel(int ip, char *out)
 		return;
 
 	if (ref->LabelType == label_Local)
-		DecodeAsmEmit(out,"%s_%d", ref->Name, ref->LocalScope);
+		DecodeAsmEmit(out,"%s<@1_%d>", ref->Name, ref->LocalScope);
 }
 
 //****************************************
 //		Disassemble Function
 //****************************************
 
-void DisassembleFunc(char *func)
+void DisassembleFunc(char *func, int showHex)
 {
 	OpcodeInfo thisOp;
 	SYMBOL *sym, *ref;
-	uchar *ip, *ip_end, *ip_last;
-	int base;
+	uchar *ip, *ip_last;
+	int base, n, len;
 	char str[256];
 
 	sym = GetGlobalSym(func);
@@ -600,7 +823,6 @@ void DisassembleFunc(char *func)
 		
 	printf("Function '%s'\n\n", sym->Name);
 
-	ip_end = (uchar *) ArrayPtr(&CodeMemArray, sym->EndIP);
 	ip = (uchar *) ArrayPtr(&CodeMemArray, sym->Value);
 
 	base	= sym->Value;
@@ -609,13 +831,35 @@ void DisassembleFunc(char *func)
 	{
 		ip_last = ip;
 		
-		if (ip > ip_end)
-			break;
-	
 		ip = DecodeOpcode(&thisOp, ip);
-		DecodeAsmString(&thisOp, str);
+		DecodeAsmString(&thisOp, str, 1);			// scoped variable on
 
-		printf("%-4x: %-32s\t",base - sym->Value, str);
+		len = ip - ip_last;
+
+		printf("%-4x: %-32s\t",thisOp.rip, str);
+
+		if (showHex)
+		{
+			for (n=0;n<len;n++)
+				printf("%s ", Hex8(GetCodeMem(thisOp.rip + n)));
+		}
+
+
+//		printf("%-4x: %-32s\t",base - sym->Value, str);
+//		printf("%-4x: %-32s\t",thisOp.rip, str);
+
+		// Print CodeLabelArray
+		
+		ref = (SYMBOL *) ArrayGet(&CodeLabelArray, base);
+		
+		if (ref)
+		{
+			if (sym->Value != base)
+			if (sym->LabelType >= label_Function)
+				break;
+				
+			printf("<CLA '%s'>", ref->Name);
+		}
 		
 		// Print CallArray
 		
@@ -624,19 +868,25 @@ void DisassembleFunc(char *func)
 		if (ref)
 			printf("<CA '%s'>", ref->Name);
 
-
 		// Print DataAccessArray
 		
 		ref = (SYMBOL *) ArrayGet(&DataAccessArray, base);
 		
 		if (ref)
 			printf("<DA '%s'>", ref->Name);
-		
 
 		printf("\n");
 
-		base += (ip - ip_last);	
+		str[0] = 0;
+		DisassembleFromSource(thisOp.rip, str);
+		printf("%-4x: %-32s\n",thisOp.rip, str);
+
+
+		base += len;	
 	}
+
+	printf("\n");
+
 }
 
 //****************************************
@@ -815,9 +1065,12 @@ int DisassembleFromSource(int codeIP, char *out)
 	int n;
 	
 	if (!AsmChars)
+	{
+		DecodeAsmEmit(out,"no source");
 		return 0;
+	}
 	
-	for (n=0;n<128;n++)
+	for (n=0;n<1024;n++)
 	{
 		c = *AsmChars++;
 		
@@ -857,7 +1110,7 @@ int DisassembleDataFromSource(int dataIP, char *out)
 	if (!AsmChars)
 		return 0;
 	
-	for (n=0;n<128;n++)
+	for (n=0;n<1024;n++)
 	{
 		c = *AsmChars++;
 		
@@ -873,10 +1126,10 @@ int DisassembleDataFromSource(int dataIP, char *out)
 		if (c == ';')
 			break;
 
-		if (c == '/')
+/*		if (c == '/')
 			if (*AsmChars == '/')
 				break;
-
+*/
 		DecodeAsmEmit(out,"%c",c);
 	}
 	
@@ -896,3 +1149,121 @@ int SetFilePtrFromIP(int ip)
 		
 	return (int) AsmChars;
 }
+
+//********************************************************************************
+// 								Test Code
+//********************************************************************************
+
+#if 0
+
+//****************************************
+//
+//****************************************
+
+
+char *cs_skip(char *ws)
+{
+	char *last_ws;
+	
+	PushTokenPtr(ws, 0);
+
+	SkipWhiteSpace();
+
+	last_ws = FilePtr;
+	PopTokenPtr();
+	
+	return last_ws;
+}
+
+//****************************************
+//		Convert '&' to '#'
+//****************************************
+
+void ConvAmp2Hash(char *str)
+{
+	char c;
+	
+	while(1)
+	{
+		c = *str;
+		
+		if (!c)
+			break;
+	
+		if ((c == '#') && (*(str+1) == '0'))
+		{
+			*str++ = 'z';
+			*str++ = 'r';
+			continue;
+		}
+			
+		if (c == '&')
+			*str = '#';
+
+		str++;
+	}
+}
+
+
+//****************************************
+//		Code Sanity Checker
+//****************************************
+
+int CodeSanityChecker(int ip, char *gen_code)
+{
+	char src_code[1024];
+	char *src,*gen ;
+	
+	src_code[0] = 0;
+	DisassembleFromSource(ip, src_code);
+
+	ConvAmp2Hash(src_code);
+	ConvAmp2Hash(gen_code);
+
+	src = src_code;
+	gen = gen_code;
+
+	while(1)
+	{
+		src = cs_skip(src);
+		gen = cs_skip(gen);
+
+		if (*src != *gen)
+		{
+			RebuildEmit("\n\\\\ Sanity report\n");
+			RebuildEmit("\\\\ src = '%s'\n", src_code);
+			RebuildEmit("\\\\ gen = '%s'\n", gen_code);
+			return 0;
+		}
+			
+		if (*src == 0)
+			break;
+
+		src++;
+		gen++;
+
+	}
+
+	return 1;	
+}
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

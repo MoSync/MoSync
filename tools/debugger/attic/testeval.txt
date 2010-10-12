@@ -1,9 +1,6 @@
 -target-select sim
-71-thread-info
-72-data-list-register-names
-73-break-insert C:/MoSync/workspace/xrick/src/sysvid.c:271
-75-exec-continue
+1999-break-insert C:/MoSync/examples/MAUI/MAUIex/LabelScreen.cpp:27
+2001-exec-continue
 -test-wait
-108-exec-finish
--test-wait
-112-var-create - * rects
+-var-create - * this
+-var-list-children var1

@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include <exception>
 #include <stdio.h>
 #include <stdarg.h>
 #include <iostream>
@@ -33,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "stabs/stabs.h"
 
 #include "command.h"
+#include "cleanup.h"
 #include "Thread.h"
 #include "async.h"
 #include "userInputThread.h"
@@ -229,6 +231,13 @@ int main(int argc, char** argv) {
 		eprintf("Could not open command logging output file.\n");
 		return 1;
 	}
+
+	for(int i = 0; i < argc; i++) {
+		fprintf(gCommandLog, "%s", argv[i]);
+		if(i!=argc-1) fprintf(gCommandLog, " ");
+	}
+	fprintf(gCommandLog, "\n");
+
 #endif
 	for(int i=0; i<argc; i++) {
 		LOG("%s ", argv[i]);
@@ -320,9 +329,10 @@ int main(int argc, char** argv) {
 
 	StubConnection::addContinueListener(stackContinued);
 
-	MoSyncThread sRemoteReadThread, sUserInputThread;
-	sUserInputThread.start(userInputThreadFunc, input);
-	sRemoteReadThread.start(remoteReadThreadFunc, NULL);
+	MoSyncThread remoteReadThread, userInputThread;
+	userInputThread.start(userInputThreadFunc, input);
+	remoteReadThread.start(remoteReadThreadFunc, NULL);
+	cleanup::init(&remoteReadThread, &userInputThread);
 
 	oprintf(GDB_PROMPT);	//undocumented startup prompt, expected by ccdebug.
 	fflush(stdout);
@@ -391,8 +401,6 @@ void setErrorCallback(ErrorCallback ecb) {
 	sErrorCallback = ecb;
 }
 
-void varErrorFunction();
-
 /**
  * Sends a GDB/MI error message with the given
  * message string.
@@ -431,12 +439,6 @@ void commandComplete() {
 	resumeUserInput();
 }
 
-/**
- * Executes the given GDB/MI command.
- *
- * If no suitable command handler is found an error message is sent to the GDB
- * session.
- */
 static void executeCommand(const string& line) {
 	LOG("Command: %s\n", line.c_str());
 	_ASSERT(!sExecutingCommand);
@@ -503,7 +505,6 @@ static bool readAll(int fd, void* dst, int len) {
 	}
 	return true;
 }
-
 
 /**
  * Reads an opened program file.

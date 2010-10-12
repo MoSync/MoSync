@@ -28,6 +28,8 @@ void MoSync_UpdateView(CGImageRef ref);
 void MoSync_DoneUpdatingView();
 
 void MoSync_ShowMessageBox(const char *msg, bool kill);
+void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
+
 void MoSync_Exit();
 
 void MoSync_StartUpdatingLocation();

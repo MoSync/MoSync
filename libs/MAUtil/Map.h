@@ -30,16 +30,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 
+/** \brief Thin template sorted Map.
+* \see Dictionary
+*/
 template<class Key, class Value>
-class Map : public Dictionary<Key, Pair<Key, Value> > {
+class Map : public Dictionary<const Key, Pair<const Key, Value> > {
 public:
-	typedef Pair<Key, Value> PairKV;
+	typedef Pair<const Key, Value> PairKV;
 protected:
-	typedef Dictionary<Key, PairKV> D;
+	typedef Dictionary<const Key, PairKV> D;
 	typedef typename D::DictNode DN;
 public:
 
-	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>)
+	Map(int (*cf)(const Key&, const Key&) = &Compare<const Key>)
 		: D::Dictionary(cf, OFFSETOF(PairKV, first)) {}
 	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {
 		PairKV pkv = { key, value };
@@ -48,8 +51,8 @@ public:
 	Value& operator[](const Key& key) {
 		DN* node = (DN*)dict_lookup(&this->mDict, &key);
 		if(node == NULL) {
-			node = new DN();
-			node->data.first = key;
+			PairKV p = { key, Value() };
+			node = new DN(p);
 			dict_insert(&this->mDict, node, &(node->data.first));
 		}
 		return node->data.second;

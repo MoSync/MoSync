@@ -21,6 +21,9 @@ mod.class_eval do
 				tfn = 'build/_temp.c'
 				sh "gperf -tCE --language=ANSI-C --lookup-function-name=entity_lookup entities.txt " +
 					"| #{sed('s/#line/\\/\\/line/')} > #{tfn}"
+				if(File.size(tfn) == 0)
+					error "GPERF failed!"
+				end
 				FileUtils.mv(tfn, @NAME)
 			end
 		end

@@ -31,12 +31,13 @@ typedef std::fstream File;
 #define KUidCompressionDeflate 0x101f7afc
 
 static const char usage[] =
-	"usage: e32hack <input-exe> <output-exe> <new-uid>\n";
+	"usage: e32hack <input-exe> <output-exe> <new-uid> [-v2]\n";
 
-int copyHackExe(File& inFile, File& outFile, u32 uid);
+static int copyHackExe(File& inFile, File& outFile, u32 uid);
+static int copyHackApp(File& inFile, File& outFile, u32 uid);
 
 int main(int argc, const char** argv) {
-	if(argc != 4) {
+	if(argc != 4 && argc != 5) {
 		puts(usage);
 		return 1;
 	}
@@ -66,8 +67,14 @@ int main(int argc, const char** argv) {
 		return 1;
 	}
 
+	bool v2 = false;
+	if(argc == 5) if(strcmp(argv[4], "-v2") == 0) {
+		printf("S60v2 mode.\n");
+		v2 = true;
+	}
+
 	//hack
-	int res = copyHackExe(input, output, uid);
+	int res = (v2 ? copyHackApp : copyHackExe)(input, output, uid);
 	if(res != 0) {
 		output.close();
 		remove(argv[2]);
@@ -156,6 +163,55 @@ int copyHackExe(File& inFile, File& outFile, u32 uid) {
 	} else {
 		outFile.write(buffer, (int)buf.size());
 	}
+	if(!outFile.good())
+		return outFile.rdstate();
+	return 0;
+}
+
+
+static uint codeCheckSumV2(uint *aPtr, int aSize) {
+	uint sum = 0;
+	aSize /= 4;
+	while (aSize-- > 0)
+		sum += *aPtr++;
+	return sum;
+}
+
+static int copyHackApp(File& inFile, File& outFile, uint uid) {
+	inFile.seekg(0, std::ios_base::end);
+	if(!inFile.good())
+		return inFile.rdstate();
+	Array<char> buf(inFile.tellg());
+	char* buffer(buf.p());
+	inFile.seekg(0, std::ios_base::beg);
+	inFile.read(buffer, (int)buf.size());
+	if(!inFile.good())
+		return inFile.rdstate();
+
+	uint oldUid;
+	memcpy(&oldUid, buffer + 0x8, 4);
+
+	//uids with crc
+	memcpy(buffer + 0x8, &uid, 4);
+	calcUidCrc(buffer);
+
+	//uid in code: find & change
+	uint* codeSection = (uint*)(buffer + 0x20);
+	uint csLen = ((uint)buf.size() - 0x20) / sizeof(uint);	//len of cs in uints
+	for(uint i=0; i<csLen; i++) {
+		if(codeSection[i] == oldUid) {
+			printf("found uid @ 0x%x\n", 0x20 + i*4);
+			codeSection[i] = uid;
+		}
+	}
+
+	//code section checksum
+	const int codeOffset = ((int*)(buffer))[25];
+	const int codeSize = ((int*)(buffer))[12];
+	ASSERT(codeOffset + codeSize < (int)buf.size());
+	((int*)(buffer))[6] = codeCheckSumV2((uint*)(buffer + codeOffset), codeSize);
+
+	outFile.write(buffer, (uint)buf.size());
 	if(!outFile.good())
 		return outFile.rdstate();
 	return 0;

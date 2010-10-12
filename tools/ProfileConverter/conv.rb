@@ -156,7 +156,9 @@ RELEVANT_DEFINES = {
 	:wm6 => [],
 	:wm6pro => [],
 	:moblin => [],
-	:android => [],
+	:android_3 => [],
+	:android_4 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 
@@ -192,7 +194,9 @@ runtimes = {
 	:s60v5  => [],
 	:JavaME => [],
 	:moblin => [],
-	:android => [],
+	:android_3 => [],
+	:android_4 => [],
+	:android_7 => [],
 	:iphoneos => [],
 }
 
@@ -367,6 +371,7 @@ end
 puts "Handling devices..."
 DEVICE.each_with_index do |device, index|
 	next if(index == 0)
+	
 	# if the runtime support isn't implemented we just go to the next device.
 	if(!runtimes[device.platformversion.platform])
 		next
@@ -508,7 +513,7 @@ DEVICE.each_with_index do |device, index|
 		end	#RELEVANT_CAPS.each
 		profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 	end	#File.open
-	
+		
 	runtime = runtimes[device.platformversion.platform].add_runtime rt_obj
 	runtime.devices << device
 end	#DEVICE.each

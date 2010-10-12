@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * testcase.hpp
+/** \file testcase.hpp
+ * \brief Test case for Testify.
  *
- *  Created on: 28 feb 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on: 28 feb 2010
  */
 
 #ifndef __TESTCASE_HPP__
@@ -35,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * This class should be overloaded to handle test cases.
+ * @brief A test case. This class should be overloaded to handle test cases.
  *
  * It has global set up and tear down, as well as a set up
  * and tear down for each test. Using them are optional,

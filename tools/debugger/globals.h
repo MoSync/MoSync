@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define GLOBALS_H
 
 #include <string>
+#include <helpers/types.h>
 
 extern std::string gProgramFilename, gResourceFilename, gSldFilename;
 
@@ -52,5 +53,6 @@ extern HANDLE gSimProcess;
 #endif
 
 bool execIsRunning();
+void varErrorFunction();
 
 #endif	//GLOBALS_H

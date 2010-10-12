@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * testlistener.hpp
+/** \file testlistener.hpp
+ * \brief Test listener for Testify.
  *
- *  Created on: 28 feb 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on: 28 feb 2010
  */
 
 #ifndef __TESTLISTENER_HPP__
@@ -30,7 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 NAMESPACE_BEGIN( Testify )
 
 /**
- * Provides a callback interface for listening to events.
+ * @brief A callback interface for listening to events.
  *
  */
 class TestListener

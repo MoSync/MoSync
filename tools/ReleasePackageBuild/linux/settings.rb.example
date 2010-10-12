@@ -1,0 +1,7 @@
+
+GCC_SRC = '/home/you/code/gcc-mosync/'
+MOSYNC_SRC = '/home/you/code/mosync/'
+ECLIPSE_SRC = '/home/you/code/eclipse/'
+ECLIPSE_PLATFORM = '/home/you/temp/target-platform.zip'
+TARGET_BASE = '/home/you/code/mb/'
+PROFILES = '/home/you/temp/profiles.tar'

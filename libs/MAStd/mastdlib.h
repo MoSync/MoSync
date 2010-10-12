@@ -52,6 +52,9 @@ int atoi(const char* string);
 */
 long atol(const char* string);
 
+/**
+ * \brief Type that contains the quotient and reminder of a divison.
+ */
 typedef struct div_t {
 	int quot, rem;
 } div_t;

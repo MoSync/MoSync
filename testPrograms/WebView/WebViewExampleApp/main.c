@@ -93,8 +93,47 @@
     </body> \
     </html>"
 
+// Test performance of JS background color change, if better than via MoSync roundtrip.
+#define HTML6 " \
+	<html> \
+	<head> \
+    <style type=\"text/css\"> \
+		div { font-size:1.8em; margin-top:20pt; } \
+		a { cursor: hand; } \
+		input { font-size:1.2em; } \
+	</style> \
+	</head> \
+	<body> \
+	<script> \
+		function SetBgColor(color) { \
+			document.getElementById('ColorMessage').innerHTML = color + ' is a beautiful color!'; \
+			document.bgColor = color; } \
+		function MoSyncRequest(request) { \
+			document.location = 'mosync://' + request; } \
+		function ProcessData() { \
+			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncRequest(request); } \
+	</script> \
+	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
+	<div> \
+		<a href=\"#\" onclick=\"SetBgColor('Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"SetBgColor('Red')\">Red</a> \
+		<a href=\"#\" onclick=\"SetBgColor('Green')\">Green</a> \
+	</div> \
+	<div id=\"ColorMessage\"></div> \
+	<div> \
+		<input type='text' id='DataField' /> \
+		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
+	</div> \
+	<div id=\"DataMessage\"></div> \
+	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+    </body> \
+    </html>"
+
 #define BGCOLOR_SCRIPT " \
-	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color!'; \
+	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color.'; \
 	document.bgColor='%s'; \
 	"
 
@@ -164,7 +203,7 @@ int MAMain()
 				case EVENT_TYPE_WEBVIEW_OPENED:
 					// Must wait to set the HTML until this event to make
 					// sure the WebView is fully created before use.
-					maWebViewSetHTML(HTML4);
+					maWebViewSetHTML(HTML6); /// HTML4
 					break;
 
 				case EVENT_TYPE_WEBVIEW_REQUEST:

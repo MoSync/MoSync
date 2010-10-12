@@ -123,6 +123,22 @@ cd %ORIGINAL_PATH%
 
 :COPY
 @echo off
+
+@echo.
+@echo ------------------------------------------------
+@echo Building runtimes.
+@echo BE PATIENT! This takes a while!
+@echo ------------------------------------------------
+
+REM @cd %MOSYNC_TRUNK%\tools\profileConverter
+REM @mkdir %MOSYNC_PROFILES_PATH%
+REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
+@call ruby buildRuntimes.rb
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
 @echo.
 @echo ------------------------------------------------
 @echo Copying MoSync bin.
@@ -158,7 +174,7 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @echo Copying example contacts.xml
 @echo ------------------------------------------------
-@xcopy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_ETC_PATH%\ /y /D
+@copy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
 @echo ------------------------------------------------
 @echo Running OpenGL Wrapper generator.
@@ -296,6 +312,40 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\e32hack
 @vcbuild e32hack.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo Building uidcrc
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\uidcrc
+@vcbuild uidcrc.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo Building rcomp
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\rcomp
+@vcbuild rcomp.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo Building package
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\package
+@vcbuild package.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo Building iphone-builder
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\iphone-builder
+@vcbuild iphone-builder.vcproj /useenv "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@copy Release\iphone-builder.exe %MOSYNC_BIN_PATH%\ /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
@@ -462,7 +512,6 @@ Release\idl2.exe
 :DOCS
 
 cd %ORIGINAL_PATH%
-call build_docs.bat
 
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_docs %MOSYNC_DOCS_PATH% /e /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
@@ -527,16 +576,6 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 @copy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\resources.zip
 
 @cd %MOSYNC_RELEASE_BUILD_PATH%
-
-@echo ------------------------------------------------
-@echo Building runtimes.
-@echo BE PATIENT! This takes a while!
-@echo ------------------------------------------------
-
-@cd %MOSYNC_TRUNK%\tools\profileConverter
-@mkdir %MOSYNC_PROFILES_PATH%
-@call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo ------------------------------------------------
 @echo Building PIPE libs

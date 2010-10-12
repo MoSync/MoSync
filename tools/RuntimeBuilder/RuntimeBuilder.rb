@@ -18,6 +18,20 @@
 
 require 'fileutils'
 
+def error(msg)
+	puts "Error: #{msg}"
+	raise msg
+end
+
+def sh(cmd)
+	#TODO: optimize by removing the extra shell
+	#the Process class should be useful.
+	$stderr.puts cmd
+	if(!system(cmd)) then
+		error "Command failed: '#{$?}'"
+	end
+end
+
 def backup_file(file)
 	bak = file + ".bak"
 	if File.exist? bak
@@ -80,6 +94,8 @@ if !File.exist? "Settings.rb"
 	puts "Creates the Settings.rb file"
 	FileUtils.copy_file("Settings.rb.example", "Settings.rb")
 end
+
+# usage example: runtimebuilder.rb Settings.rb s60v3 /mosync/profiles/runtimes/s60v3/1/
 
 require ARGV[0]
 require "BuildJavaME.rb"

@@ -15,108 +15,1347 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-final static int REQUEST_ENABLE_BT = 2;
-static BluetoothAdapter mBluetoothAdapter = null;
-static boolean mBluetoothGetNames = false;
+/*
+TODO: Delete this comment when development and testing is done.
 
+http://stackoverflow.com/questions/3397071/android-bluetooth-service-discovery-failed-exception
+http://stackoverflow.com/questions/3072776/android-bluetooth-cant-connect-out
+http://stackoverflow.com/questions/2661932/problem-with-bluetooth-on-android-2-1-samsung-spica-i5700-where-pairing-works-b
+http://stackoverflow.com/questions/2660968/how-to-prevent-android-bluetooth-rfcomm-connection-from-dying-immediately-after
+http://stackoverflow.com/questions/2207975/bluetooth-service-discovery-failed
+http://stackoverflow.com/questions/2437664/android-bluetooth-fails-to-pair
+http://stackoverflow.com/questions/3331392/is-it-reflection-when-i-use-getclass-getmethod
+http://code.google.com/p/android/issues/detail?id=5427
+http://www.kiwidoc.com/java/l/p/android/android/5/p/android.bluetooth/c/BluetoothDevice
+http://www.kiwidoc.com/java/l/p/android/android/8/p/android.bluetooth/c/BluetoothDevice
+http://android.git.kernel.org/?p=platform/frameworks/base.git;a=blob;f=core/java/android/bluetooth/BluetoothDevice.java;h=e77e76f79b2c4a70bb2542552ef1e8cd20d6d7a0;hb=HEAD
+http://en.wikipedia.org/wiki/Bluetooth_profile
+http://stackoverflow.com/questions/157476/what-guis-exist-for-git-on-windows
+
+Pairing problem on Motorola Droid:
+http://code.google.com/p/android/issues/detail?id=10002
+
+http://www.slideshare.net/erinyueh/android-bluetooth-introduction
+Passkey agent??
+
+You can make the server discoverable by calling:
+Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+startActivity(discoverableIntent);
+
+------
+
+I got it working, the problem was that I needed to pair with the
+device first (for some reason it kept an incorrect PIN and wouldn't
+pair). Here is a snippet
+BluetoothDevice device;
+BluetoothSocket tmpsock = null;
+int port = 1;
+...
+try
+{
+Method m = device.getClass().getMethod("createRfcommSocket", new
+Class[] { int.class });
+tmpsock = (BluetoothSocket)m.invoke(device, port);
+Log.d(TAG, "CONNECTING...");
+tmpsock.connect();
+...
+}
+catch (Exception e)
+{
+Log.e(TAG, "Failed to connect", e);
+...
+}
+
+*/
+
+#ifdef _ANDROID_BLUETOOTH
+/**
+ * Reference to the Bluetooth adapter. Used for caching the reference.
+ * Do not use this reference as we try to reduce global reference.
+ * Use method btGetBluetoothAdapter() to get the adapter.
+ */
+BluetoothAdapter mBluetoothAdapter = null;
+
+/**
+ * Discovery state values.
+ */
+int BLUETOOTH_DISCOVERY_NOT_STARTED = 0;
+int BLUETOOTH_DISCOVERY_IN_PROGRESS = 1;
+int BLUETOOTH_DISCOVERY_ABORTED = 2;
+int BLUETOOTH_DISCOVERY_FINISHED = 3;
+
+/**
+ * Max time to wait for eabling Bluettoth etc.
+ */
+int BLUETOOTH_MAX_SECONDS_TO_WAIT = 60;
+
+/**
+ * State of device discovery.
+ */
+AtomicInteger mBluetoothDeviceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
+
+/**
+ * List that holds discovered Bluetooth devices.
+ */
+ConcurrentLinkedQueue<BluetoothDevice> mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
+
+/**
+ * Thread that runs the device discovery process.
+ */
+BluetoothDeviceDiscoveryThread mBluetoothDeviceDiscoveryThread = null;
+
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+/**
+ * State of service discovery.
+ */
+AtomicInteger mBluetoothServiceDiscoveryState = new AtomicInteger(BLUETOOTH_DISCOVERY_NOT_STARTED);
+
+/**
+ * List that holds discovered Bluetooth services.
+ */
+ConcurrentLinkedQueue<BluetoothService> mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
+
+/**
+ * Thread that runs the service discovery process.
+ */
+BluetoothServiceDiscoveryThread mBluetoothServiceDiscoveryThread = null;
+#endif // BLUETOOTH_SERVICE_DISCOVERY
+#endif // _ANDROID_BLUETOOTH
+
+/**
+ * Start discovery of Bluetooth devices.
+ * Parameter "names" is not used on Android.
+ * @return 0 on success, < 0 on failure.
+ */
 int maBtStartDeviceDiscovery(int names) throws Exception
 {
-	if(0 != names) mBluetoothGetNames = true;
-
-	Log.i("maBtStartDeviceDiscovery", "0");
-	
-	if(null == mBluetoothAdapter)
+#ifdef _ANDROID_BLUETOOTH
+	// Device disovery must not be running.
+	if (null != mBluetoothDeviceDiscoveryThread)
 	{
-		Log.i("maBtStartDeviceDiscovery", "1");
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		Log.i("maBtStartDeviceDiscovery", "2");
-		if(null == mBluetoothAdapter)
+		return -1;
+	}
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+	// Service disovery must not be running.
+	if (null != mBluetoothServiceDiscoveryThread)
+	{
+		return -1;
+	}
+#endif
+
+	// Bluetooth must be available and enabled.
+	if (null == btGetBluetoothAdapter())
+	{
+		return -1;
+	}
+	
+	// List where devices are saved for retrieval.
+	mBluetoothDevices = new ConcurrentLinkedQueue<BluetoothDevice>();
+	
+	// Create and start device discovery thread.
+	mBluetoothDeviceDiscoveryThread = new BluetoothDeviceDiscoveryThread();
+	mBluetoothDeviceDiscoveryThread.start();
+	
+	return 0; // Zero means success.
+#else
+	return -1;
+#endif	
+}
+
+/**
+ * @return 1 if successful, zero if the queue is empty.
+ */
+int maBtGetNewDevice(
+	Address nameBufPointer,
+	int nameBufSize,
+	Address actualNameLengthPointer,
+	Address addressPointer)
+{
+#ifdef _ANDROID_BLUETOOTH
+	ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
+	
+	if (null == deviceList)
+	{
+		return -1; // Error.
+	}
+	
+	// Get and remove head element of the queue.
+	BluetoothDevice device = deviceList.poll();
+	if (null == device)
+	{
+		return 0; // No more elements.
+	}
+	
+	// Get device name.
+	String name = device.getName();
+	if (null == name)
+	{
+		// Name that is unsed if there is no name.
+		name = "Unknown Device";
+	}
+	
+	// Get length of name.
+	int nameLength = name.length();
+	
+	// Can the buffer hold the name? (Take null termination char into account.)
+	if (nameLength >= nameBufSize - 1)
+	{
+		// Truncate name if too long.
+		name = name.substring(nameBufSize - 1);
+	}
+	
+	// Copy name to memory buffer.
+	networkCopyStringToMemory(nameBufPointer, name);
+	
+	// Copy actual length to memory buffer.
+	networkCopyIntToMemory(actualNameLengthPointer, nameLength);
+	
+	// Copy device hardware address to memory buffer.
+	byte[] addr = btGetDeviceAddressAsBytes(device);
+	if (null != addr)
+	{
+		networkCopyBytesToMemory(addressPointer, addr);
+	}
+	else
+	{
+		return -1; // Could not get device address.
+	}
+	
+	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif	
+}
+
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+/**
+ * @return 0 on success, < 0 on failure.
+ */
+int maBtStartServiceDiscovery(String address, String uuid) throws Exception
+{
+#ifdef _ANDROID_BLUETOOTH
+	// Device disovery must not be running.
+	if (null != mBluetoothDeviceDiscoveryThread)
+	{
+		return -1;
+	}
+	
+	// Service disovery must not be running.
+	if (null != mBluetoothServiceDiscoveryThread)
+	{
+		return -1;
+	}
+	
+	// Bluetooth must be available and enabled.
+	if (null == btGetBluetoothAdapter())
+	{
+		return -1;
+	}
+	
+	Log.i("@@@maBtStartServiceDiscovery", "Address: " + address + " UUID: " + uuid);
+	
+	// List where services are saved for retrieval.
+	mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
+	
+	// Create and start device discovery thread.
+	mBluetoothServiceDiscoveryThread = new BluetoothServiceDiscoveryThread(address, uuid);
+	mBluetoothServiceDiscoveryThread.start();
+	
+	return 0; // Zero means success.
+#else
+	return -1;
+#endif	
+}
+
+/**
+ * @return > 0 on success, or zero if the queue is empty.
+ */
+int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) throws Exception
+{
+#ifdef _ANDROID_BLUETOOTH
+	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+	
+	if (null == serviceList)
+	{
+		return -1; // Error.
+	}
+	
+	// Get but DO NOT remove head element of the queue.
+	BluetoothService service = serviceList.peek();
+	if (null == service)
+	{
+		return 0; // No elements.
+	}
+	
+	// Copy length of service name to memory.
+	networkCopyIntToMemory(nameBufSizePointer, service.getNameLength()); // Includes null char.
+	
+	// Copy number of UUIDs to memory.
+	networkCopyIntToMemory(nUuidsPointer, service.getNumberOfUUIDs());
+	
+	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif	
+}
+
+/**
+ * @return > 0 on success, or zero if the queue is empty.
+ */
+int maBtGetNewService(
+	Address portPointer,
+	Address nameBufPointer,
+	int nameBufSize,
+	Address uuidsPointer) throws Exception
+{
+#ifdef _ANDROID_BLUETOOTH
+	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+	
+	if (null == serviceList)
+	{
+		return -1; // Error.
+	}
+	
+	// Get and remove head element of the queue.
+	BluetoothService service = serviceList.poll();
+	if (null == service)
+	{
+		return 0; // No elements.
+	}
+	
+	// Copy port of service to memory.
+	networkCopyIntToMemory(portPointer, service.getChannel());
+	
+	// Copy name of service to memory.
+	
+	// Truncate name if buffer is not large enough.
+	// (Take null termination char into account.)
+	String name = service.getName();
+	int nameLength = name.length();
+	if (nameLength >= nameBufSize - 1)
+	{
+		name = name.substring(nameBufSize - 1);
+	}
+	
+	networkCopyStringToMemory(nameBufPointer, name);
+	
+	// Copy UUIDs to memory.
+	/*
+	networkCopyBytesToMemory(uuidsPointer, service.getUUIDsAsByteBuffer());
+	*/
+	
+	return 1; // Success retrieving device info.
+#else
+	return -1;
+#endif
+}
+
+#endif // BLUETOOTH_SERVICE_DISCOVERY
+
+/**
+ * @return 0 if there was no active operation, 1 if there was.
+ */
+int maBtCancelDiscovery() throws Exception
+{
+#ifdef _ANDROID_BLUETOOTH
+	// Is device discovery in progress?
+	if (null != mBluetoothDeviceDiscoveryThread && 
+	    BLUETOOTH_DISCOVERY_IN_PROGRESS == mBluetoothDeviceDiscoveryState.get())
+	{
+		// Set to aborted.
+		mBluetoothDeviceDiscoveryState.set(BLUETOOTH_DISCOVERY_ABORTED);
+		
+		// Cancel Android Bluetooth discovery. This will send an
+		// event with action "BluetoothAdapter.ACTION_DISCOVERY_FINISHED".
+		// There we trap the aborted flag, do cleanup, and send canceled MoSync 
+		// event rather than a discovery finished event.
+		btCancelAndroidLevelDeviceDiscovery();
+		
+		return 1;
+	}
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+	// Is service discovery in progress?
+	if (null != mBluetoothServiceDiscoveryThread && 
+	    BLUETOOTH_DISCOVERY_IN_PROGRESS == mBluetoothServiceDiscoveryState.get())
+	{
+		// Set to aborted.
+		mBluetoothServiceDiscoveryState.set(BLUETOOTH_DISCOVERY_ABORTED);
+		
+		mBluetoothServiceDiscoveryThread.serviceDiscoveryCanceled();
+		mBluetoothServiceDiscoveryThread.stopServiceDiscovery();
+		
+		return 1;
+	}
+#endif
+	return 0; // No active operation.
+#else
+	return -1;
+#endif	
+}
+
+#ifdef _ANDROID_BLUETOOTH
+
+/**
+ * Get the address of a Bluetooth device.
+ */
+byte[] btGetDeviceAddressAsBytes(BluetoothDevice device)
+{
+	if (null == device)
+	{
+		return null;
+	}
+	
+	return btDeviceAddressToBytes(device.getAddress());
+}
+
+/**
+ * Get the address of the default Bluetooth adapter.
+ */
+byte[] btGetDefaultAdapterAddressAsBytes()
+{
+	BluetoothAdapter adapter = btGetBluetoothAdapter();
+	if (null == adapter)
+	{
+		// No adapter found.
+		return null;
+	}
+	
+	return btDeviceAddressToBytes(adapter.getAddress());
+}
+
+/**
+ * Format device address for use with the Android API.
+ * Format of in data is: 001122AABBCC
+ * Format of out data is:  00:11:22:AA:BB:CC
+ */
+String btFormatDeviceAddress(String address)
+{	
+	// Do sanity check on the address.
+	if (address.length() != 12)
+	{
+		return null;
+	}
+	
+	// Upper case is an Android API requirement.
+	address = address.toUpperCase(); 
+	return 
+		address.substring(0, 2) + ":" +
+		address.substring(2, 4) + ":" +
+		address.substring(4, 6) + ":" +
+		address.substring(6, 8) + ":" +
+		address.substring(8, 10) + ":" +
+		address.substring(10, 12);
+}
+
+/**
+ * Convert formatted device address back to plain hex number.
+ * Format of in data is:  00:11:22:AA:BB:CC
+ * Format of out data is: 001122AABBCC
+ */
+String btUnformatDeviceAddress(String address)
+{	
+	// Do sanity check on the address.
+	if (address.length() != 17)
+	{
+		return null;
+	}
+	
+	return 
+		address.substring(0, 2) + 
+		address.substring(3, 5) +
+		address.substring(6, 8) +
+		address.substring(9, 11) +
+		address.substring(12, 15) +
+		address.substring(15, 17);
+}
+
+/**
+ * Convert Android formatted device address to byte array.
+ * Format of in data is:  00:11:22:AA:BB:CC
+ * Format of out data is byte array { 0x00, 0x11, 0x22, 0xAA, 0xBB, 0xCC }
+ */
+byte[] btDeviceAddressToBytes(String address)
+{	
+	if (null == address)
+	{
+		return null;
+	}
+	
+	byte[] addr = new byte[6];
+	
+	// Format of address string is "00:11:22:AA:BB:CC", should be 17 characters.
+	if (17 == address.length())
+	{
+		addr[0] = (byte) Integer.parseInt(address.substring(0, 2), 16);
+		addr[1] = (byte) Integer.parseInt(address.substring(3, 5), 16);
+		addr[2] = (byte) Integer.parseInt(address.substring(6, 8), 16);
+		addr[3] = (byte) Integer.parseInt(address.substring(9, 11), 16);
+		addr[4] = (byte) Integer.parseInt(address.substring(12, 14), 16);
+		addr[5] = (byte) Integer.parseInt(address.substring(15, 17), 16);
+		
+		return addr;
+	}
+	else
+	{
+		return null;
+	}
+}
+
+/**
+ * Format service UUID for use with the Android API.
+ * Format of in data is:  0000110100001000800000805F9B34FB
+ * Format of out data is: 00001101-0000-1000-8000-00805F9B34FB
+ */
+String btFormatServiceUUID(String uuid)
+{
+	// Do sanity check on the uuid.
+	if (uuid.length() != 32)
+	{
+		return null;
+	}
+	
+	// Upper case is an Android API requirement.
+	uuid = uuid.toUpperCase();
+	return
+		uuid.substring(0, 8) + "-" +
+		uuid.substring(8, 12) + "-" +
+		uuid.substring(12, 16) + "-" +
+		uuid.substring(16, 20) + "-" +
+		uuid.substring(20, 32);
+}
+
+/**
+ * Convert formatted service UUID back to plain hex number.
+ * Format of in data is:  00001101-0000-1000-8000-00805F9B34FB
+ * Format of out data is: 0000110100001000800000805F9B34FB
+ */
+String btUnformatServiceUUID(String uuid)
+{	
+	// Do sanity check on the uuid.
+	if (uuid.length() != 36)
+	{
+		return null;
+	}
+	
+	return 
+		uuid.substring(0, 8) + 
+		uuid.substring(9, 13) + 
+		uuid.substring(14, 18) +
+		uuid.substring(19, 23) +
+		uuid.substring(24, 36);
+}
+
+/**
+ * On success, return an enabled Bluetooth adapter.
+ * On error, return null.
+ */
+BluetoothAdapter btGetBluetoothAdapter()
+{
+	if (null == mBluetoothAdapter)
+	{
+		//BluetoothAdapterEnablerThread worker = new BluetoothAdapterEnablerThread();
+		BluetoothAdapterRetrieveThread worker = new BluetoothAdapterRetrieveThread();
+		
+		try
 		{
-			Log.i("maBtStartDeviceDiscovery", "NO DEFAULT ADAPTER AVAILABLE!");
+			worker.start();
+			//mBluetoothAdapter = worker.getBluetoothAdapter(BLUETOOTH_MAX_SECONDS_TO_WAIT);
+			mBluetoothAdapter = worker.getBluetoothAdapter();
+		}
+		catch (Exception e)
+		{
+			worker.quit();
+			mBluetoothAdapter = null;
+			e.printStackTrace();
+		}
+	}
+	
+	if (null != mBluetoothAdapter)
+	{
+		Log.i("****** btGetBluetoothAdapter", "Device Bluetooth address: " + mBluetoothAdapter.getAddress());
+	}
+	
+	return mBluetoothAdapter;
+}
+
+/**
+ * Class that gets the Bluetooth adapter. 
+ * This must be done from a Looper thread!
+ */
+class BluetoothAdapterRetrieveThread extends Thread
+{
+	Looper mLooper;
+
+	// List used to communicate when the adapter is avaiable.
+	final LinkedBlockingQueue<ObjectRef> mQueue = new LinkedBlockingQueue<ObjectRef>(1);
+	
+	public BluetoothAdapter getBluetoothAdapter()
+	{	
+		// Timeout is 2 seconds, after that null is returned.
+		long timeOut = 2000 + System.currentTimeMillis();
+		ObjectRef obj = null;
+		while (null == obj)
+		{
+			if (System.currentTimeMillis() >= timeOut)
+			{
+				return null;
+			}
+			
+			try 
+			{
+				obj = mQueue.take();
+			}
+			catch (InterruptedException consume)
+			{
+			}
+		}
+		return (BluetoothAdapter) obj.get();
+	}
+	
+	public void quit()
+	{
+		if (null != mLooper)
+		{
+			mLooper.quit();
+			mLooper = null;
+		}
+	}
+	
+	public void run()
+	{
+		try
+		{
+			Log.i("****** btGetBluetoothAdapter", "Thread start");
+			// Ensure that this is a Looper thread.
+			Looper.prepare();
+			mLooper = Looper.myLooper();
+			
+			// Get the adapter.
+			BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+			if (null != adapter && adapter.isEnabled())
+			{	
+				// Adapter is available.
+				Log.i("****** btGetBluetoothAdapter", "offer adapter 1");
+				mQueue.put(new ObjectRef(adapter));
+				Log.i("****** btGetBluetoothAdapter", "offer adapter 2");
+			}
+			else
+			{
+				// No enabled adapter is available.
+				Log.i("****** btGetBluetoothAdapter", "null adapter 1");
+				mQueue.put(new ObjectRef(null));
+				Log.i("****** btGetBluetoothAdapter", "null adapter 2");
+			}
+		}
+		catch (Exception e)
+		{
+			Log.i("****** btGetBluetoothAdapter", "Exception in run: " + e);
+			e.printStackTrace();
+		}
+		finally
+		{
+			quit();
+		}
+	}
+}
+
+/**
+ * Helper class that holds a reference to an object.
+ * Allows to refer to null values.
+ */
+class ObjectRef
+{
+	Object mObj;
+	
+	public ObjectRef(Object obj)
+	{
+		mObj = obj;
+	}
+	
+	public Object get()
+	{
+		return mObj;
+	}
+}
+
+/**
+ * On success, return the requested Bluetooth device.
+ * On error, return null.
+ */
+BluetoothDevice btGetBluetoothDevice(String address)
+{
+	final String deviceAddress = btFormatDeviceAddress(address);
+	
+	// List used to communicate the device.
+	final LinkedBlockingQueue<ObjectRef> queue = new LinkedBlockingQueue<ObjectRef>(1);
+	
+	// Thread to do the job.
+	Thread worker;
+	
+	try
+	{
+		worker = new Thread()
+		{
+			public void run()
+			{
+				// Ensure that this is a Looper thread.
+				Looper.prepare();
+				
+				// Get the adapter.
+				BluetoothAdapter adapter = btGetBluetoothAdapter();
+				if (null == adapter)
+				{
+					Log.i("****** btGetBluetoothDevice", "null device 1");
+					queue.offer(new ObjectRef(null));
+					Log.i("****** btGetBluetoothDevice", "null device 2");
+				}
+				
+				// Get the device.
+				BluetoothDevice device = adapter.getRemoteDevice(deviceAddress);
+				Log.i("****** btGetBluetoothDevice", "device is " + device);
+				
+				// Make it available.
+				Log.i("****** btGetBluetoothDevice", "offer device 1");
+				queue.offer(new ObjectRef(device));
+				Log.i("****** btGetBluetoothDevice", "offer device 2");
+			}
+		}; // worker
+		
+		// Start the thread.
+		worker.start();
+		
+		// Wait for the device.
+		// If this times out, an exception will be thrown and 
+		// null will be returned in the catch clause.
+		// ObjectRef obj = queue.poll(maxSecondsToWait, TimeUnit.SECONDS);
+		ObjectRef obj = queue.take();
+		if (null != obj)
+		{
+			Log.i("****** btGetBluetoothDevice", "Got device: " + obj.get());
+			return (BluetoothDevice) obj.get();
+		}
+		else
+		{
+			return null;
+		}
+	}
+	catch (Exception e)
+	{
+		Log.i("****** btGetBluetoothDevice", "Exception finding device " + e);
+		e.printStackTrace();
+		return null;
+	}
+}
+	
+/**
+ * Cancel any ongoing device discovery on the Android level.
+ */
+public void btCancelAndroidLevelDeviceDiscovery()
+{
+	BluetoothAdapter adapter = btGetBluetoothAdapter();
+	if (null != adapter && adapter.isDiscovering()) 
+	{
+		adapter.cancelDiscovery();
+	}
+}
+
+/**
+ * Post a Bluetooth message to the MoSync event queue.
+ */
+public void btPostBluetoothMessage(int state)
+{
+	Log.i("BluetoothServiceDiscoveryThread.btPostBluetoothMessage", "state = " + state);
+	int[] event = new int[2];
+	event[0] = EVENT_TYPE_BT;
+	event[1] = state;
+	postEvent(event);
+}
+
+/**
+ * Thread that performs discovery of Bluetooth devices.
+ */
+class BluetoothDeviceDiscoveryThread extends Thread
+{
+	Looper mLooper;
+	BroadcastReceiver mBluetoothReciever;
+
+	public BluetoothDeviceDiscoveryThread()
+	{
+	}
+
+	public void run()
+	{
+		try
+		{
+			// Make sure we have Bluetooth enabled.
+			BluetoothAdapter adapter = btGetBluetoothAdapter();
+			if (null == adapter)
+			{
+				btPostBluetoothMessage(CONNERR_GENERIC);
+				return;
+			}
+			
+			// Set discovery state to in progress.
+			mBluetoothDeviceDiscoveryState.set(BLUETOOTH_DISCOVERY_IN_PROGRESS);
+	
+			Looper.prepare();
+			mLooper = Looper.myLooper();
+			
+			startDeviceDiscovery();
+			
+			Looper.loop();
+		}
+		catch (Throwable e)
+		{
+			Log.i("BluetoothDeviceDiscoveryThread", "Error: " + e);
+			e.printStackTrace();
+			mContext.unregisterReceiver(mBluetoothReciever);
+			
+			// Is this the right thing to post?
+			btPostBluetoothMessage(CONNERR_GENERIC);
+			
+			// TODO: What about canceling ongong discovery, and setting state 
+			// to finished of not initialized?
+		}
+	}
+	
+	/* 
+	TODO: This code is not used, delete when the design of 
+	the Bluetooth implementation is stable.
+	
+	int initiateDeviceDiscovery()
+	{
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "begin");
+		
+		BluetoothAdapter adapter = btGetBluetoothAdapter();
+		if (null == adapter)
+		{	
 			return -1;
 		}
-		Log.i("maBtStartDeviceDiscovery", "3");
-	}
 
-	if ( !mBluetoothAdapter.isEnabled() )
-	{
-		Intent btPermissionIntent = new Intent (BluetoothAdapter.ACTION_REQUEST_ENABLE);
-		((Activity)mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+		// If not enabled, open an activity for the user to enable Bluetooth,
+		// then resume device discovery.
+		// TODO: Test this code. --> Seems to work!
+		if (!adapter.isEnabled())
+		{
+			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "BluetoothAdapter NOT enabled");
 		
-		mContext.registerReceiver(new BroadcastReceiver()
+			// Open the activity.
+			Intent btPermissionIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			((Activity) mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+			
+			// Register receiver for Bluetooth state changes.
+			mContext.registerReceiver(new BroadcastReceiver()
+			{
+				@Override
+				public void onReceive(Context context, Intent intent)
+				{		
+					int newState = intent.getIntExtra(
+						BluetoothAdapter.EXTRA_STATE, 
+						BluetoothAdapter.STATE_OFF);
+					if (newState == BluetoothAdapter.STATE_ON)
+					{
+						// Bluetooth is now enabled.
+						
+						// First tell we have finished using this listener.
+						context.unregisterReceiver(this);
+						
+						// Then start discovery.
+						startDeviceDiscovery();
+					}
+				}
+			}, 
+			new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+			
+			// Do not call explictly: adapter.enable();
+		}
+		else
+		{
+			// Start discovery.
+			startDeviceDiscovery();
+		}
+		
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "end");
+		
+		return 0;
+	}
+	*/
+	
+	void startDeviceDiscovery()
+	{
+		// Cancel any ongoing discovery on the Android level.
+		btCancelAndroidLevelDeviceDiscovery();
+		
+		// Create device listener.
+		mBluetoothReciever = new BroadcastReceiver()
 		{
 			@Override
-			public void onReceive(Context context, Intent i)
+			public void onReceive(Context context, Intent intent)
 			{		
-				int newState = i.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_OFF);
-				if (newState == BluetoothAdapter.STATE_ON)
+				final String action = intent.getAction();
+				
+				Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "******** Intent action: " + action);
+				
+				if (action.equals(BluetoothDevice.ACTION_FOUND))
 				{
-					context.unregisterReceiver(this);
-					mBluetoothAdapter.startDiscovery();
+					Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "****** Found device!");
+					
+					// Add found device to list of devices.
+					BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+					deviceFound(device);
+					
+					// TODO: What was this intended to be used for?
+					//BluetoothDevice rbd = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+					//int rssi = intent.getIntExtra(BluetoothDevice.EXTRA_RSSI, Integer.MIN_VALUE);
+					//RemoteDevice2Impl tobounce = new RemoteDevice2Impl(rbd, rssi);
+					//scanListener.deviceFound(tobounce);
+				}
+				else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+				{					
+					if (BLUETOOTH_DISCOVERY_ABORTED == mBluetoothDeviceDiscoveryState.get())
+					{
+						Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "@@@@@@@@@@@@@@@@@ ACTION_DISCOVERY_FINISHED - SCAN ABORTED");
+
+						// Scan was canceled, report Bluetooth event with state CONNERR_CANCELED.
+						deviceDiscoveryCanceled();
+						
+						// Stop discovery thread and cleanup.
+						stopDeviceDiscovery();
+					}
+					else
+					{
+						Log.i("BluetoothDeviceDiscoveryThread.startDeviceDiscovery", "***************** ACTION_DISCOVERY_FINISHED - SCAN FINISHED");
+						
+						// Scan is successfully finished, report Bluetooth event with result.
+						deviceDiscoveryFinished();
+						
+						// Stop discovery thread and cleanup.
+						stopDeviceDiscovery();
+					}
 				}
 			}
-		}, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+		};
 		
-		mBluetoothAdapter.enable();
+		// Register receiver.
+		// Do unregister
+		//   on BluetoothAdapter.ACTION_DISCOVERY_FINISHED
+		//   on abort (maBtCancelDiscovery)
+		//   on error (in catch clause)
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BluetoothDevice.ACTION_FOUND);
+		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+		mContext.registerReceiver(mBluetoothReciever, filter);
+		
+		// Start discovery on the Android level.
+		btGetBluetoothAdapter().startDiscovery();
+	}
+	
+	void stopDeviceDiscovery()
+	{
+		// Quit the thread and set thread variable to null.
+		mContext.unregisterReceiver(mBluetoothReciever);
+		mLooper.quit();
+		mBluetoothDeviceDiscoveryThread = null;
+		mBluetoothDeviceDiscoveryState.set(BLUETOOTH_DISCOVERY_FINISHED);
+	}
+	
+	void deviceFound(BluetoothDevice device)
+	{
+		// Add device to list (using a local variable to avoid 
+		// null pointer exceptions in a concurrent world).
+		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
+		if (null != deviceList)
+		{
+			deviceList.add(device);
+			btPostBluetoothMessage(0); // State zero means "still working"
+		}
+	}
+	
+	void deviceDiscoveryFinished()
+	{
+		// Post event with number of devices found + 1.
+		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
+		if (null != deviceList)
+		{
+			btPostBluetoothMessage(deviceList.size() + 1); // State is number of devices found + 1
+		}
+	}
+	
+	void deviceDiscoveryCanceled()
+	{
+		// Empty device list and set to null.
+		ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
+		if (null != deviceList)
+		{
+			// Might be a good idea to make sure queue is empty if
+			// there is some other reference to it.
+			while (null != deviceList.poll()) { }
+		}
+		
+		// Set device list to null (so important it deserves a comment).
+		mBluetoothDevices = null;
+		
+		// Post cancel event.
+		btPostBluetoothMessage(CONNERR_CANCELED); 
+	}
+}
+
+#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+/**
+ * Thread that performs discovery of Bluetooth services.
+ * TODO: Service discovery is NOT implemented. Redo this later on.
+ */
+class BluetoothServiceDiscoveryThread extends Thread
+{
+	String mAddress;
+	String mUUID;
+	Looper mLooper;
+
+	public BluetoothServiceDiscoveryThread(String address, String uuid)
+	{
+		mAddress = address;
+		mUUID = uuid;
 	}
 
-	mBluetoothAdapter.startDiscovery();
-	
-	Log.i("maBtStartDeviceDiscovery", "4");
-	mContext.registerReceiver(mBluetoothReciever, null);
-	
-	
-	return 0;
-}
-
-int maBtGetNewDevice(Address dst)
-{
-	/* FIX-ME */
-	return -1;
-}
-
-void maBtStartServiceDiscovery(Address dev, Address uuid) throws Exception
-{
-	/* FIX-ME */
-}
-
-int maBtGetNewService(Address dst) throws Exception
-{
-	/* FIX-ME */
-	return -1;
-}
-
-int maBtGetNextServiceSize(Address dst) throws Exception
-{
-	/* FIX-ME */
-	return -1;
-}
-
-void killBluetooth()
-{
-	mContext.unregisterReceiver(mBluetoothReciever);
-}
-
-private BroadcastReceiver mBluetoothReciever = new BroadcastReceiver()
-{
-	@Override
-	public void onReceive(Context context, Intent intent)
-	{		
-		final String action = intent.getAction();
-		if (action.equals(BluetoothDevice.ACTION_FOUND))
+	public void run()
+	{
+		Looper mLooper;
+		
+		Looper.prepare();
+		mLooper = Looper.myLooper();
+		
+		try
 		{
-			BluetoothDevice rbd = (BluetoothDevice)intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-			int rssi = intent.getIntExtra(BluetoothDevice.EXTRA_RSSI, Integer.MIN_VALUE);
+			// Set discovery state to in progress.
+			mBluetoothServiceDiscoveryState.set(BLUETOOTH_DISCOVERY_IN_PROGRESS);
 			
-			Log.i("mBluetoothReciever", "found device!");
-			//RemoteDevice2Impl tobounce = new RemoteDevice2Impl(rbd, rssi);
-			//scanListener.deviceFound(tobounce);
+			startServiceDiscovery();
+			
+			//Looper.loop();  // TODO: Clean up this code.
 		}
-		else if (action.equals(BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
+		catch (Throwable e)
 		{
-			Log.i("mBluetoothReciever", "scan complete!");
-			//scanListener.scanCompleted();
+			Log.i("BluetoothServiceDiscoveryThread", "Error: " + e);
+			e.printStackTrace();
+			
+			// Is this the right thing to post?
+			btPostBluetoothMessage(CONNERR_GENERIC);
+			
+			// TODO: What about canceling ongong discovery, and setting state 
+			// to finished of not initialized?
 		}
-
+		finally
+		{
+			mLooper.quit();
+		}
 	}
-};
+	
+	/**
+	 * Here we emulate the service discovery by doing a connect 
+	 * with the UUID we have.
+	 */
+	void startServiceDiscovery()
+	{
+		// Cancel any ongoing discovery on the Android level.
+		btCancelAndroidLevelDeviceDiscovery();
+		
+		try
+		{
+			BluetoothAdapter adapter = btGetBluetoothAdapter();
+			if (null == adapter)
+			{
+				btPostBluetoothMessage(CONNERR_UNAVAILABLE);
+				return;
+			}
+			
+			BluetoothDevice device = btGetBluetoothAdapter().getRemoteDevice(btFormatDeviceAddress(mAddress));
+			if (null == device)
+			{
+				btPostBluetoothMessage(CONNERR_GENERIC);
+				return;
+			}
+			
+			BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
+				java.util.UUID.fromString(btFormatServiceUUID(mUUID)));
+			if (null == socket)
+			{
+				btPostBluetoothMessage(CONNERR_GENERIC);
+				return;
+			}
+			
+			// This will timeout and throw an exception if no service 
+			// with the given UUID is found.
+			socket.connect();
+			
+			// Close socket right away, we only wanted to see if it could be opended.
+			socket.close();
+			
+			Log.i("@@BluetoothServiceDiscovery", "Service found");
+			
+			// Add data to be retrieved by maBtGetNextServiceSize and maBtGetNewService.
+			serviceFound(new BluetoothService(
+				31, // Fake port
+				btFormatServiceUUID(mUUID), // Use uuid as name of service
+				mUUID // The uuid hex string
+			));
+			
+			// Scan is successfully finished, report Bluetooth event with result.
+			serviceDiscoveryFinished();
+			
+			// Do cleanup.
+			stopServiceDiscovery();
+		}
+		catch (Exception e)
+		{
+			Log.i("@@BluetoothServiceDiscovery", "Service NOT found: " + e);
+			btPostBluetoothMessage(CONNERR_GENERIC);
+			return;
+		}
+	}
+
+	void stopServiceDiscovery()
+	{
+		//mLooper.quit();
+		mBluetoothServiceDiscoveryThread = null;
+		mBluetoothServiceDiscoveryState.set(BLUETOOTH_DISCOVERY_FINISHED);
+	}
+	
+	void serviceFound(BluetoothService service)
+	{
+		// Add device to list.
+		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+		if (null != serviceList)
+		{
+			serviceList.add(service);
+			btPostBluetoothMessage(0); // State zero means "still working"
+		}
+	}
+	
+	void serviceDiscoveryFinished()
+	{
+		// Post event with number of devices found + 1.
+		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+		if (null != serviceList)
+		{
+			btPostBluetoothMessage(serviceList.size() + 1); // State is number of services found + 1
+		}
+	}
+	
+	void serviceDiscoveryCanceled()
+	{
+		// Empty service list and set to null.
+		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+		if (null != serviceList)
+		{
+			// Might be a good idea to make sure queue is empty if
+			// there is some other reference to it.
+			while (null != serviceList.poll()) { }
+		}
+		
+		mBluetoothServices = null;
+		
+		// Post cancel event.
+		btPostBluetoothMessage(CONNERR_CANCELED); 
+	}
+}
+
+class BluetoothService
+{
+	public int mChannel;
+	public String mName;
+	public String mUUID; // Should be in plain hex format.
+	
+	public BluetoothService(int channel, String name, String uuid)
+	{
+		mChannel = channel;
+		mName = name;
+		mUUID = uuid;
+	}
+	
+	public int getChannel()
+	{
+		return mChannel;
+	}
+	
+	public String getName()
+	{
+		return mName;
+	}
+	
+	/**
+	 * @return Length of buffer needed to hold the name,
+	 * including the terminating null character.
+	 */
+	public int getNameLength()
+	{
+		return mName.length() + 1;
+	}
+	
+	public int getNumberOfUUIDs()
+	{
+		return 1; // Hardcoded to one UUID in this implementation.
+	}
+	
+	public ByteBuffer getUUIDsAsByteBuffer()
+	{
+		ByteBuffer buf = ByteBuffer.allocate(32);
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+		IntBuffer intBuf = buf.asIntBuffer();
+		intBuf.put(Integer.parseInt(mUUID.substring(0, 8), 16));
+		intBuf.put(Integer.parseInt(mUUID.substring(8, 16), 16));
+		intBuf.put(Integer.parseInt(mUUID.substring(16, 24), 16));
+		intBuf.put(Integer.parseInt(mUUID.substring(24, 32), 16));
+		return buf;
+	}
+}
+#endif // BLUETOOTH_SERVICE_DISCOVERY
+
+// This class is not used. This is how you ask the user to enable 
+// the Bluetooth adapter, if we want to do that.
+#if 0
+/**
+ * Class that gets and also enables the Bluetooth adapter, 
+ * if this is not done.
+ */
+class BluetoothAdapterEnablerThread extends Thread
+{
+	int REQUEST_ENABLE_BT = 2;
+	Looper mLooper;
+	// List used to communicate when the adapter is avaiable.
+	LinkedBlockingQueue<ObjectRef> mQueue = new LinkedBlockingQueue<ObjectRef>(1);
+	
+	public BluetoothAdapter getBluetoothAdapter(int maxSecondsToWait)
+	{	
+		try
+		{
+			// Wait for the user to enabling the adapter.
+			// If this times out, an exception will be thrown and 
+			// null will be returned in the catch clause.
+			Log.i("****** btGetBluetoothAdapter", "Waiting for adapter");
+			// ObjectRef obj = mQueue.poll(maxSecondsToWait, TimeUnit.SECONDS);
+			
+			// TODO: Make while loop and catch InterruptedException !!!!
+			
+			ObjectRef obj = mQueue.take();
+			if (null != obj)
+			{
+				Log.i("****** btGetBluetoothAdapter", "returning adapter");
+				return (BluetoothAdapter) obj.get();
+			}
+			else
+			{
+				Log.i("****** btGetBluetoothAdapter", "returning null");
+				return null;
+			}
+		}
+		catch (Exception e)
+		{
+			Log.i("****** btGetBluetoothAdapter", "Exception getting adapter: " + e);
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void quit()
+	{
+		if (null != mLooper)
+		{
+			mLooper.quit();
+			mLooper = null;
+		}
+	}
+	
+	public void run()
+	{
+		// Ensure that this is a Looper thread.
+		Looper.prepare();
+		mLooper = Looper.myLooper();
+		
+		// Get the adapter.
+		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		
+		if (null == adapter)
+		{	
+			// No adapter is available.
+			
+			Log.i("****** btGetBluetoothAdapter", "null adapter 1");
+			mQueue.offer(new ObjectRef(null));
+			Log.i("****** btGetBluetoothAdapter", "null adapter 2");
+			return;
+		}
+		
+		// If not Bluetooth is enabled, open an activity for doing this.
+		// (Do not call adapter.enable() explicitly.)
+		if (!adapter.isEnabled())
+		{
+			Log.i("****** btGetBluetoothAdapter", "BluetoothAdapter NOT enabled - Enabling");
+		
+			// Register receiver for Bluetooth state changes.
+			mContext.registerReceiver(new BroadcastReceiver()
+			{
+				// TODO: Problem is that we do not get any 
+				// BluetoothAdapter.ACTION_STATE_CHANGED if the user
+				// selects No in the enable dialog (since the state
+				// is not changed I guess). Is there some other
+				// event that can be used to detect that the
+				// Bluetooth dialog is closed?
+				@Override
+				public void onReceive(Context context, Intent intent)
+				{
+					int newState = intent.getIntExtra(
+						BluetoothAdapter.EXTRA_STATE, 
+						BluetoothAdapter.STATE_OFF)
+					if (newState == BluetoothAdapter.STATE_ON)
+					{
+						// We have finished using this listener.
+						context.unregisterReceiver(this);
+						
+						// Adapter is available.
+						Log.i("****** btGetBluetoothAdapter", "BT is now turned ON - offer adapter 1");
+						mQueue.offer(new ObjectRef(adapter));
+						Log.i("****** btGetBluetoothAdapter", "BT is now turned ON - offer adapter 2");
+						
+						// Bluetooth is now enabled, quit this thread.
+						quit();
+						
+					}
+					else // TODO: This code seems not to be called.
+					{
+						// Bluetooth is off, quit this thread.
+						quit();
+						
+						// We have finished using this listener.
+						context.unregisterReceiver(this);
+						
+						// Adapter is NOT available.
+						Log.i("****** btGetBluetoothAdapter", "BT is turned OFF - offer null 1");
+						mQueue.offer(new ObjectRef(null));
+						Log.i("****** btGetBluetoothAdapter", "BT is turned OFF - offer null 2");
+					}
+				}
+			}, 
+			new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+			
+			// Open the activity.
+			Intent btPermissionIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			((Activity) mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+			
+			// Start looping to receive messages.
+			mLooper.loop();
+		}
+		else // Adapter is enabled.
+		{
+			// Quit this thread.
+			quit();
+			
+			Log.i("****** btGetBluetoothAdapter", "offer adapter 1");
+			// Adapter is available.
+			mQueue.offer(new ObjectRef(adapter));
+			Log.i("****** btGetBluetoothAdapter", "offer adapter 2");
+		}
+	}
+}
+#endif
+
+#endif // _ANDROID_BLUETOOTH

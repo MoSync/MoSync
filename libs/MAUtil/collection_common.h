@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file collection_common.h
- * \brief Comparison and pair for MAUtil
+ * \brief Compare() and Pair for MAUtil.
  */
 
 #ifndef _SE_MSAB_MAUTIL_COLLECTION_COMMON_H_
@@ -35,7 +35,7 @@ namespace MAUtil {
 // Comparator
 //******************************************************************************
 
-/**
+/** \brief Template comparator function.
 * Returns -1 if \a a \< \a b,
 * 0 if \a a == \a b
 * and 1 if \a a \> \a b.
@@ -53,6 +53,7 @@ template<class T> int Compare(const T& a, const T& b) {
 // Pair
 //******************************************************************************
 
+/// Template storage for a pair of objects.
 template<class F, class S> struct Pair {
 	F first;
 	S second;

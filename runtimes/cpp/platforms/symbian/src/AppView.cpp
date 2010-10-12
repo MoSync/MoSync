@@ -572,15 +572,15 @@ TKeyResponse CAppView::OfferKeyEventL(const TKeyEvent& aKeyEvent, TEventCode aTy
 	int scancode = aKeyEvent.iScanCode;
 	switch(aType) {
 	case EEventKeyUp:
-		LOG("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyUp 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = false;
 		break;
 	case EEventKeyDown:
-		LOG("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("KeyDown 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		down = true;
 		break;
 	case EEventKey:
-		LOG("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
+		LOGD("Key 0x%02x %i\n", scancode, aKeyEvent.iCode);
 		if(iEventBuffer.Count() < EVENT_BUFFER_SIZE) {
 			MAEvent event;
 			event.type = EVENT_TYPE_CHAR;
@@ -703,51 +703,16 @@ int CAppView::GetKeys() {
 	return iKeys;
 }
 
-int CAppView::TextBox(const TDesC& title, TDes& text, int constraints) {
+int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
 	if(iEngine->IsDrawing())
 		iEngine->StopDrawing();
-#if 0
-	CEikGlobalTextEditor* iEditor = new (ELeave) CEikGlobalTextEditor;
-	iEditor->SetContainerWindowL(*this);
-	iEditor->ConstructL(this, 42, text.Length(), CEikEdwin::ELineCursor |
-		CEikEdwin::ENoHorizScrolling | CEikEdwin::EAllowUndo | CEikEdwin::EAvkonEditor |
-		CEikEdwin::EEdwinAlternativeWrapping, EGulFontControlAll, EGulAllFonts);
-
-	//iGTextEd->SetAvkonWrap(ETrue);	// set by flag
-
-	// Enable cut'n'paste support.
-	iEditor->EnableCcpuSupportL(ETrue);
-	iEditor->SetFocus(ETrue);
-	iEditor->SetExtent(TPoint(0,0), Size());
-	iAppUi.AddToStackL(iEditor, 1);
-	
-	SetBlank();
-	ActivateL();
-	return 0;
-#else
-	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(text);
+	outText.Copy(inText);
+	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(outText);
 	CleanupStack::PushL(dlg);
 	dlg->SetPromptL(title);
 	dlg->SetPredictiveTextInputPermitted(true);
-	dlg->SetMaxLength(text.MaxLength());
+	dlg->SetMaxLength(outText.MaxLength());
 	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
 	CleanupStack::Pop(dlg);
 	return answer ? 1 : 0;
-#endif
-}
-
-TInt CAppView::CountComponentControls() const {
-	LOG("CountComponentControls\n");
-	//if(iEditor)
-	//	return 1;
-	//else
-		return 0;
-}
-
-CCoeControl* CAppView::ComponentControl(TInt aIndex) const {
-	LOG("ComponentControl %i\n", aIndex);
-	if(iEditor && aIndex == 0)
-		return iEditor;
-	else
-		return NULL;
 }

@@ -53,9 +53,9 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	if(!File.exists?(pfn) || force_rebuild)
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
-			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
+			sh "pipe-tool#{PIPE_FLAGS} -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
+			sh "pipe-tool -master-dump -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} build/helpers.s#{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end

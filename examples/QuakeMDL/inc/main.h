@@ -3,7 +3,7 @@
 
 #include <ma.h>
 
-int BenchMain ( void );
+int BenchMain ( void ) GCCATTRIB(noreturn);
 int RenderMain ( void ) GCCATTRIB(noreturn);
 
 #endif	//MAIN_H

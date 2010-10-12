@@ -71,12 +71,13 @@ namespace Base {
 	
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
-		if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
-		
+			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
+
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
+
 		return maxCustomEventSize;
 	}
 
@@ -430,6 +431,7 @@ namespace Base {
 		SYSCALL_THIS->destroyResource(handle);
 #endif
 		SYSCALL_THIS->resources.destroy(handle);
+
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {
@@ -689,12 +691,14 @@ namespace Base {
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
 	static int openFile(Syscall::FileHandle& fh) {
+		int res = isDirectory(fh.name);
+		TEST_LTZ(res);
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
-			if(isDirectory(fh.name) == 0) {	//file exists and is not a directory
+			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new WriteFileStream(fh.name, false, true);
 			}
 		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			if(isDirectory(fh.name) == 0) {
+			if(res == 0) {
 				fh.fs = new FileStream(fh.name);
 			}
 		} else {
@@ -734,6 +738,12 @@ namespace Base {
 				fh.name[i] = fn[i];
 			}
 		}
+#elif defined(__IPHONE__)
+		std::string newPath = getWriteablePath(fn);
+		fn = newPath.c_str();
+		size = newPath.size();
+		fh.name.resize(size);
+		memcpy(fh.name, fn, size);		
 #else
 		memcpy(fh.name, fn, size);
 #endif

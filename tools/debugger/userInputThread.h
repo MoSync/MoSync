@@ -37,4 +37,9 @@ int SDLCALL userInputThreadFunc(void* arg);
  */
 void resumeUserInput();
 
+/**
+ * Stops the execution of the thread.
+ */
+void stopUserThread();
+
 #endif	//USERINPUTTHREAD_H

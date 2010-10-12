@@ -41,6 +41,8 @@ bool EventHandler::star =false;
 bool EventHandler::lsk=false;
 bool EventHandler::rsk=false;
 
+bool EventHandler::focus = true;
+
 #ifdef MA_PROF_SUPPORT_STYLUS
 bool EventHandler::pointer_pressed=false;
 bool EventHandler::pointer_released=false;
@@ -56,6 +58,10 @@ void EventHandler::updateEvents() {
 		updated = true;
 		if(event.type == EVENT_TYPE_CLOSE)
 			quit = true;
+		if(event.type == EVENT_TYPE_FOCUS_LOST)
+			focus = false;
+		if(event.type == EVENT_TYPE_FOCUS_GAINED)
+			focus = true;
 
 		if(event.type == EVENT_TYPE_KEY_PRESSED) switch(event.key) {
 		case MAK_5:

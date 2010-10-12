@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _MAUTIL_ENVIRONMENT_H_
 #define _MAUTIL_ENVIRONMENT_H_
 
-
 #ifndef MOBILEAUTHOR
 #include <ma.h>
 #else
@@ -35,7 +34,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include "Vector.h"
 #include "ListenerSet.h"
-
 
 namespace MAUtil {
 	/**
@@ -132,7 +130,25 @@ namespace MAUtil {
 		virtual void focusLost() = 0;
 		virtual void focusGained() = 0;
 	};
-
+	
+	class CustomEventListener {
+	public:
+		virtual void customEvent(const MAEvent& event) = 0;
+	};
+	
+	/**
+	* \brief A listener for maTextBox events.
+	* \see Environment::addTextBoxListener()
+	*/	
+	class TextBoxListener {
+	public:
+		/**
+		 * \param 'result' One of the \link #MA_TB_RES_OK MA_TB_RES \endlink codes.
+		 * \param 'textLength' The length, in characters, of the finished text. Does not include the terminating zero.
+		 */
+		virtual void textBoxClosed(int result, int textLength) = 0;
+	};
+	
 	/**
 	* \brief A base class for cross-platform event managers.
 	*/
@@ -143,6 +159,7 @@ namespace MAUtil {
 		* unless it is already in the list.
 		*/
 		void addFocusListener(FocusListener* kl);
+		
 		/**
 		* Removes the specified listener from the list, if it's in it.
 		*/
@@ -186,15 +203,13 @@ namespace MAUtil {
 		bool isPointerListener(PointerListener* pl);
 
 		/**
-		* Sets the Bluetooth Discovery listener.
-		* Causes a panic if there is already a listener set.
-		* \param btl The listener, or NULL, to remove the set listener, if any.
+		* Sets the Bluetooth listener. Any previously set listener is replaced.
+		* \param btl The listener.
 		*/
 		void setBluetoothListener(BluetoothListener* btl);
 
 		/**
-		* Removes the set Bluetooth Discovery listener.
-		* Causes a panic if there is no listener set.
+		* Removes the Bluetooth listener, if any.
 		*/
 		void removeBluetoothListener();
 
@@ -216,6 +231,7 @@ namespace MAUtil {
 		* unless it is already in the list.
 		*/
 		void addCloseListener(CloseListener* cl);
+		
 		/**
 		* Removes a listener for the Close event.
 		* Removes the specified listener from the list, if it's in it.
@@ -231,6 +247,7 @@ namespace MAUtil {
 		* Take care, as constant processor usage will drain battery power quickly.
 		*/
 		virtual void addIdleListener(IdleListener* il);
+		
 		/**
 		* Removes the specified IdleListener from the list, if it's in it.
 		*/
@@ -251,10 +268,33 @@ namespace MAUtil {
 		* May be zero or negative. If so, the timer is never removed automatically.
 		*/
 		void addTimer(TimerListener* tl, int period, int numTimes);
+		
 		/**
 		* Removes the timer associated with the specified listener, if any.
 		*/
 		void removeTimer(TimerListener* tl);
+		
+		/**
+		* Adds the specified listener to the end of the list,
+		* unless it is already in the list.
+		*/
+		void addCustomEventListener(CustomEventListener* cl);
+
+		/**
+		* Removes the specified listener from the list, if it's in it.
+		*/
+		void removeCustomEventListener(CustomEventListener* cl);
+		
+		/**
+		* Adds the specified listener to the end of the list,
+		* unless it is already in the list.
+		*/
+		void addTextBoxListener(TextBoxListener* tl);
+
+		/**
+		* Removes the specified listener from the list, if it's in it.
+		*/
+		void removeTextBoxListener(TextBoxListener* tl);		
 
 		/**
 		* Returns a reference to the Environment.
@@ -263,32 +303,39 @@ namespace MAUtil {
 		static Environment& getEnvironment();
 
 		virtual ~Environment();
+		
 	protected:
 		/**
 		* Causes a panic if another Environment already exists.
 		* There can be only one.
 		*/
 		Environment();
+		
 		/**
 		* Calls focusGained() of all registered FocusListeners.
 		*/
 		void fireFocusGainedEvent();
+		
 		/**
 		* Calls focusLost() of all registered FocusListeners.
 		*/
 		void fireFocusLostEvent();
+		
 		/**
 		* Calls keyPressEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
 		void fireKeyPressEvent(int keyCode, int nativeCode);
+		
 		/**
 		* Calls keyReleaseEvent() of all registered KeyListeners with the specified \a keyCode.
 		*/
 		void fireKeyReleaseEvent(int keyCode, int nativeCode);
+		
 		/**
 		* Calls charEvent() of all registered KeyListeners with the specified \a character.
 		*/
 		void fireCharEvent(uint character);
+		
 		/**
 		* Calls pointerPressEvent() of all registered PointerListeners with the specified \a keyCode.
 		*/
@@ -297,18 +344,34 @@ namespace MAUtil {
 		* Calls pointerMoveEvent() of all registered PointerListeners with the specified \a keyCode.
 		*/
 		void firePointerMoveEvent(MAPoint2d p);
+		
 		/**
 		* Calls pointerReleaseEvent() of all registered PointerListeners with the specified \a keyCode.
 		*/
 		void firePointerReleaseEvent(MAPoint2d p);
+		
 		/**
 		* Calls the registered BluetoothListener, if any.
 		*/
 		void fireBluetoothEvent(int state);
+		
+		
+		/**
+		* Calls the registered custom event listeners, if any.
+		*/		
+		void fireCustomEventListeners(const MAEvent& e);
+		
+		/**
+		* Calls the registered text box listeners, if any.
+		*/		
+		void fireTextBoxListeners(int result, int textLength);
+				
+		
 		/**
 		* Calls the registered ConnListener, if any, for the MAHandle specified by \a data.
 		*/
 		void fireConnEvent(const MAConnEventData& data);
+		
 		/**
 		* Calls all registered CloseListeners.
 		*/
@@ -319,6 +382,9 @@ namespace MAUtil {
 		*/
 		void runIdleListeners();
 
+		/**
+		* \brief A timer event.
+		*/
 		class TimerEventInstance {
 		public:
 			TimerEventInstance(TimerListener* tl, int period, int numTimes); 
@@ -337,6 +403,8 @@ namespace MAUtil {
 		ListenerSet<IdleListener> mIdleListeners;
 		ListenerSet<TimerEventInstance> mTimerEvents;
 		ListenerSet<FocusListener> mFocusListeners;
+		ListenerSet<CustomEventListener> mCustomEventListeners;
+		ListenerSet<TextBoxListener> mTextBoxListeners;		
 private:
 		static Environment* sEnvironment;
 	};

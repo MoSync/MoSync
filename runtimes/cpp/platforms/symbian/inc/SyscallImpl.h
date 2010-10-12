@@ -319,7 +319,8 @@ private:
 
 	int maGetSystemProperty(const char* key, char* buf, int size);
 	
-	int maTextBox(const wchar* title, wchar* text, int maxSize, int constraints);
+	int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+		int maxSize, int constraints);
 
 	StringMap gStoreMap;
 

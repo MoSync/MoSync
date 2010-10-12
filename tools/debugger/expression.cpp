@@ -808,18 +808,13 @@ static int evaluateThread(void* data) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
 				deref = sReturnValue.getSymbol().type->deref()->resolve();
-				if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->subType() == Builtin::eVoid) {
-					deref = NULL;
-				} else {
-					if(deref->type() == TypeBase::eConst)
-						deref = ((ConstType*)deref)->mTarget;
+				if(deref->type() == TypeBase::eConst)
+					deref = ((ConstType*)deref)->mTarget;
 
-					int addr = (int)sReturnValue;
-					if(addr<=0 || addr>gMemSize || (deref->type()==TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid)) {
-						deref = NULL;
-						sErrorStr = "Invalid pointer.";
-						evnt->err = sErrorStr.c_str();
-					}
+				if(!sReturnValue.isDereferencable()) {
+					deref = NULL;
+					//sErrorStr = "Invalid pointer.";
+					//evnt->err = sErrorStr.c_str();
 				}
 			}
 
@@ -981,21 +976,23 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 	tb->printMI(spf, addr, fmt);
 
 	// special treatment for (const) char*
-	if(tb->type() == TypeBase::ePointer) {
+	if((int)tb->type() == (int)TypeBase::ePointer) {
 		const TypeBase* target = ((const PointerType*)tb)->mTarget;
 		if(target->type() == TypeBase::eConst) {
 			target = ((const ConstType*)target)->mTarget;
 		}
-		if(target->type() == TypeBase::eBuiltin) {
+		if((int)target->type() == (int)TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
-				int msAddr = *(const int*)addr;
-				int msLen = MAX_STRING_SIZE;
-				if(msAddr+msLen>gMemSize) {
-					msLen-= (msAddr+msLen)-gMemSize;
+				int msAddr = *(int*)addr;
+				if(msAddr<gMemSize) {
+					int msLen = MAX_STRING_SIZE;
+					if(msAddr+msLen>gMemSize) {
+						msLen-= (msAddr+msLen)-gMemSize;
+					}
+					if(msLen>0)
+						spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
 				}
-				if(msLen>0)
-					spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
 			}
 		}	
 

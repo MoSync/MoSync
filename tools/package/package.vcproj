@@ -165,6 +165,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y"
 			/>
 		</Configuration>
 	</Configurations>
@@ -192,7 +193,19 @@
 			>
 		</File>
 		<File
+			RelativePath=".\s60.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\selectPackager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\util.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\util.h"
 			>
 		</File>
 	</Files>

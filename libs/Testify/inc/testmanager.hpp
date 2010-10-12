@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * testmanager.hpp
+/** \file testmanager.hpp
+ * \brief Test manager for Testify.
  *
- *  Created on: 28 feb 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on: 28 feb 2010
  */
 
 #ifndef __TESTMANAGER_HPP__
@@ -43,6 +44,8 @@ using MAUtil::Vector;
 
 
 /**
+ * @brief The Testify test manager.
+ *
  * This class is the most important class in Testify. All the test hooks
  * add the tests to the singleton instance of this class. It manages all
  * the listeners as well as running the tests that have been hooked.

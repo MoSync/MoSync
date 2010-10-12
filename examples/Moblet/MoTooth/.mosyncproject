@@ -9,7 +9,7 @@
 <property key="build.prefs:additional.libraries/Release" value="mautil.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value=""/>
+<property key="build.prefs:app.permissions" value="Bluetooth"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

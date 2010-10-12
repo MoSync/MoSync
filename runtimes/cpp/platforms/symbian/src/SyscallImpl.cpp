@@ -43,6 +43,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef GUIDO
 #include <helpers/CPP_IX_GUIDO.H>
+static double _atanh(double d) {
+	d = (1+d) / (1-d);
+	return 0.5 * log(d);
+}
 #endif
 
 #ifdef CALL
@@ -836,7 +840,9 @@ SYSCALL(void, maGetClipRect(MARect* rect)) {
 	rect->height = clipRect.Height();
 }
 
-#if 0
+#define DEBUG_IMAGEDATA 0
+
+#if DEBUG_IMAGEDATA
 static int scanlineLength(CFbsBitmap* fb) {
 	return fb->ScanLineLength(fb->SizeInPixels().iWidth, fb->DisplayMode());
 }
@@ -857,6 +863,11 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	TAlphaBitmap* img = resources.get_RT_IMAGE(image);
 	const TSize& size = img->Color()->SizeInPixels();
 
+#if DEBUG_IMAGEDATA
+	LOGD("maGetImageData(%i, %ix%i %ix%i, %i)\n",
+		image, aSrcRect->left, aSrcRect->top, aSrcRect->width, aSrcRect->height, scanlength);
+#endif
+
 	MYASSERT(scanlength >= srcRect->width, ERR_IMAGE_OOB);
 	MYASSERT(srcRect->left >= 0 && srcRect->top >= 0 &&
 		srcRect->left + srcRect->width <= size.iWidth &&
@@ -866,7 +877,7 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		TSize(aSrcRect->width, aSrcRect->height));
 
 	bool hasAlpha = img->Alpha() != NULL;
-#if 0
+#if DEBUG_IMAGEDATA
 	LOG("maGetImageData(image): %ix%i, alpha %i\n", size.iWidth, size.iHeight, hasAlpha);
 	if(hasAlpha) {
 		TSize as(img->Alpha()->SizeInPixels());
@@ -881,6 +892,11 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 	TBitmapUtil alpha(hasAlpha ? img->Alpha() : img->Color());
 	if(hasAlpha) {
 		alpha.Begin(TPoint(0,0), clr);
+#ifdef __S60_50__
+		for(int i=0; i<lSrcRect.iTl.iY; i++) {
+			alpha.IncYPos();
+		}
+#endif
 	}
 
 	//iterate through the source, combining and copying pixels
@@ -890,8 +906,12 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 		clr.SetPos(TPoint(lSrcRect.iTl.iX, sY));
 
 		// bugged on 5th edition when image width isn't pitch-aligned.
-#ifndef __S60_50__
 		if(hasAlpha)
+#ifdef __S60_50__
+			for(int i=0; i<lSrcRect.iTl.iX; i++) {
+				alpha.IncXPos();
+			}
+#else
 			alpha.SetPos(TPoint(lSrcRect.iTl.iX, sY));
 #endif
 		for(int sX=lSrcRect.iTl.iX; sX<lSrcRect.iBr.iX; sX++) {
@@ -922,6 +942,12 @@ SYSCALL(void, maGetImageData(MAHandle image, void* dst,
 			dstInt[dY*scanlength + dX] = pixel;
 			dX++;
 		}	//for x
+#ifdef __S60_50__
+		if(hasAlpha)
+			for(int i=lSrcRect.iBr.iX; i<size.iWidth; i++) {
+				alpha.IncXPos();
+			}
+#endif
 		dY++;
 	}	//for y
 
@@ -940,6 +966,11 @@ SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
 	SYSCALL_THIS->ValidateMemRange(srcRect, sizeof(MARect));
 	CHECK_INT_ALIGNMENT(srcRect);
 	const MARect* rect = (const MARect*)ALIGN_INT(srcRect);
+
+#if DEBUG_IMAGEDATA
+	LOGD("maDrawRGB(%ix%i, %ix%i %ix%i, %i)\n",
+		dst->x, dst->y, rect->left, rect->top, rect->width, rect->height, scanlength);
+#endif
 
 	int left = rect->left;
 	int top = rect->top;
@@ -998,6 +1029,10 @@ SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
 SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src,
 	MAExtent size, int alpha))
 {
+#if DEBUG_IMAGEDATA
+	LOGD("maCreateImageRaw(%i, %ix%i, %i)\n",
+		placeholder, EXTENT_X(size), EXTENT_Y(size), alpha);
+#endif
 	SYSCALL_THIS->ValidateMemRange(src, sizeof(int)*EXTENT_X(size)*EXTENT_Y(size));
 	CHECK_INT_ALIGNMENT(src);
 	int* srcInt = ALIGN_INT(src);
@@ -1317,22 +1352,9 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	case maIOCtl_maSetSpeechPitch:
 		return maSetSpeechPitch(a);
 
-	case maIOCtl_sinh: {
-		double& d = *GVMRA(double);
-		d = ::sinh(d);
-		return 0;
-	}
-	case maIOCtl_cosh: {
-		double& d = *GVMRA(double);
-		d = ::cosh(d);
-		return 0;
-	}
-	case maIOCtl_atanh: {
-		double& d = *GVMRA(double);
-		d = (1+d) / (1-d);
-		d = 0.5 * log(d);
-		return 0;
-	}
+	maIOCtl_sinh_case(::sinh);
+	maIOCtl_cosh_case(::cosh);
+	maIOCtl_atanh_case(_atanh);
 #endif	//GUIDO
 
 	case maIOCtl_maLockKeypad:
@@ -1615,9 +1637,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			(char*)SYSCALL_THIS->GetValidatedMemRange(b, c), c);
 #endif
 
-#define maxSize c	//ugly hack
 	maIOCtl_syscall_case(maTextBox);
-#undef maxSize
 
 	default:
 		return IOCTL_UNAVAILABLE;
@@ -2971,12 +2991,22 @@ void Syscall::MvpuoEvent(const TMMFEvent &aEvent) {
 	}
 }
 
-int Syscall::maTextBox(const wchar* title, wchar* text, int maxSize, int constraints) {
+int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
+	int maxSize, int constraints)
+{
 	TPtrC tTitle(title);
-	TPtrC tInText(text);
-	TPtr tText(text, tInText.Length(), maxSize - 1);
-	int res = gAppView.TextBox(tTitle, tText, constraints);
-	DEBUG_ASSERT(tText.Length() < maxSize);
-	text[tText.Length()] = 0;
+	TPtrC tInText(inText);
+	TPtr tOutText(outText, maxSize - 1);
+	int res = gAppView.TextBox(tTitle, tInText, tOutText, constraints);
+	DEBUG_ASSERT(tOutText.Length() < maxSize);
+	outText[tOutText.Length()] = 0;
+	
+	// send message
+	MAEvent e;
+	e.type = EVENT_TYPE_TEXTBOX;
+	e.textbox.textboxResult = res;
+	e.textbox.textboxLength = tOutText.Length();
+	gAppView.AddEvent(e);
+	
 	return res;
 }

@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/mauuid.h>
 #include <MAUtil/util.h>
 
-#include "../../MinUI/MinUI.h"
+#include "MinUI.h"
 #include "MoTooth.h"
 
 using namespace MinUI;

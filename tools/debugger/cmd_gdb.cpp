@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "commandInterface.h"
 #include "helpers.h"
+#include "StubConnLow.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ void gdb_show(const string& args);
 void gdb_exit(const string& args) {
 	oprintToken();
 	oprintf("^exit\n");
+	StubConnLow::sendPacket("e", NULL);
 	exit(0);
 }
 void gdb_version(const string& args) {

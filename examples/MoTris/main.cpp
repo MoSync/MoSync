@@ -707,7 +707,6 @@ void showNavKeys(MAPoint2d point) {
 void showScore() {
 	MAExtent e = maGetScrSize();
 	int w = EXTENT_X(e);
-	int h = EXTENT_Y(e);
 
 	sprintf(score, "%d", curScore);
 	sprintf(rows, "%d", curRows);
@@ -1111,101 +1110,105 @@ int MAMain()
 	populateHighScoreList();
 
 	while(1) {
-		if(curGameMode == MENU_INIT) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			curGameMode = MENU_RUN;
-		}
-		else if(curGameMode == MENU_RUN) {
-			mainMenu.show();
-			mainMenu.update();
+		if(EventHandler::focus) {
+			if(curGameMode == MENU_INIT) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				curGameMode = MENU_RUN;
+			}
+			else if(curGameMode == MENU_RUN) {
+				mainMenu.show();
+				mainMenu.update();
 
 #ifdef MA_PROF_SUPPORT_STYLUS
-			if(EventHandler::pointer_pressed ||
-				EventHandler::pointer_released) {
-				mainMenu.handlePointerPress(EventHandler::point);
-			}
-#endif	// MA_PROF_SUPPORT_STYLUS
-		}
-		else if(curGameMode == PAUSE_MENU_INIT) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			curGameMode = PAUSE_MENU_RUN;
-		}
-		else if(curGameMode == PAUSE_MENU_RUN) {
-			pauseMenu.show();
-			pauseMenu.update();
-		}
-		else if(curGameMode == HIGH_SCORE_INIT) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			curGameMode = HIGH_SCORE_RUN;
-		}
-		else if(curGameMode == HIGH_SCORE_RUN) {
-			highScoreList.show();
-			highScoreList.update();
-		}
-		else if(curGameMode == GAME_SETTINGS_INIT) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			curGameMode = GAME_SETTINGS_RUN;
-		}
-		else if(curGameMode == GAME_SETTINGS_RUN) {
-			if(curSettingsMode==SETTINGS_SET_NAME) {
-				setNameEditBox.show();
-				setNameEditBox.update();
-				if(EventHandler::rsk_pressed) {
-					curGameMode = GAME_SETTINGS_INIT;
-					curSettingsMode = SETTINGS_CHOOSER;
+				if(EventHandler::pointer_pressed ||
+					EventHandler::pointer_released) {
+						mainMenu.handlePointerPress(EventHandler::point);
 				}
-			} else if(curSettingsMode==SETTINGS_CHOOSER) {
-				settingsMenu.show();
-				settingsMenu.update();
+#endif	// MA_PROF_SUPPORT_STYLUS
 			}
-		}
-		else if(curGameMode == GAME_INIT) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			initGame((w>>1)-(38), (h>>1)+10, 8);
-			curGameMode = GAME_RUN;
-		}
-		else if(curGameMode == GAME_RESUME) {
-			drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
-			resumeGame();
-			curGameMode = GAME_RUN;
-		}
-		else if(curGameMode == GAME_RUN) {
-			updateField();
-			clearPlayer();
-			renderPlayer();
+			else if(curGameMode == PAUSE_MENU_INIT) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				curGameMode = PAUSE_MENU_RUN;
+			}
+			else if(curGameMode == PAUSE_MENU_RUN) {
+				pauseMenu.show();
+				pauseMenu.update();
+			}
+			else if(curGameMode == HIGH_SCORE_INIT) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				curGameMode = HIGH_SCORE_RUN;
+			}
+			else if(curGameMode == HIGH_SCORE_RUN) {
+				highScoreList.show();
+				highScoreList.update();
+			}
+			else if(curGameMode == GAME_SETTINGS_INIT) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				curGameMode = GAME_SETTINGS_RUN;
+			}
+			else if(curGameMode == GAME_SETTINGS_RUN) {
+				if(curSettingsMode==SETTINGS_SET_NAME) {
+					setNameEditBox.show();
+					setNameEditBox.update();
+					if(EventHandler::rsk_pressed) {
+						curGameMode = GAME_SETTINGS_INIT;
+						curSettingsMode = SETTINGS_CHOOSER;
+					}
+				} else if(curSettingsMode==SETTINGS_CHOOSER) {
+					settingsMenu.show();
+					settingsMenu.update();
+				}
+			}
+			else if(curGameMode == GAME_INIT) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				initGame((w>>1)-(38), (h>>1)+10, 8);
+				curGameMode = GAME_RUN;
+			}
+			else if(curGameMode == GAME_RESUME) {
+				drawBackground(w, h, BKG_PATTERN_X, BKG_PATTERN_Y);
+				resumeGame();
+				curGameMode = GAME_RUN;
+			}
+			else if(curGameMode == GAME_RUN) {
+				updateField();
+				clearPlayer();
+				renderPlayer();
 
 #ifdef MA_PROF_SUPPORT_STYLUS
-			showNavKeys(EventHandler::point);
+				showNavKeys(EventHandler::point);
 #endif	// MA_PROF_SUPPORT_STYLUS
 
-			if(EventHandler::up_pressed ||
-			   EventHandler::down_pressed ||
-			   EventHandler::left_pressed ||
-			   EventHandler::right_pressed ||
-			   EventHandler::fire_pressed) {
-					timeToNextPlayerUpdate=maGetMilliSecondCount()-100;
-					initPlayerUpdateTime();
+				if(EventHandler::up_pressed ||
+					EventHandler::down_pressed ||
+					EventHandler::left_pressed ||
+					EventHandler::right_pressed ||
+					EventHandler::fire_pressed) {
+						timeToNextPlayerUpdate=maGetMilliSecondCount()-100;
+						initPlayerUpdateTime();
+				}
+
+				updatePlayer();
+				clearPlayer();
+				renderPlayer();
+
+				showScore();
+				/*
+				updateGravity();
+				checkBoard();
+				*/
+			}
+			else if(curGameMode == GAME_OVER_INIT) {
+				showGameOver();
+				updateGameOver();
 			}
 
-			updatePlayer();
-			clearPlayer();
-			renderPlayer();
+			maUpdateScreen();
 
-			showScore();
-			/*
-			updateGravity();
-			checkBoard();
-			*/
+			/// keep the backlight alive
+			maResetBacklight();
+		} else {
+			maWait(0);
 		}
-		else if(curGameMode == GAME_OVER_INIT) {
-			showGameOver();
-			updateGameOver();
-		}
-
-		maUpdateScreen();
-
-		/// keep the backlight alive
-		maResetBacklight();
 		EventHandler::updateEvents();
 
 		if(curGameMode == GAME_RUN && (EventHandler::star_pressed || EventHandler::rsk_pressed)) {

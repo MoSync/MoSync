@@ -57,6 +57,18 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)mem_ds+address;
 }
 
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return (const wchar*)(mem_ds+address);
+}
+
+int Base::Syscall::GetValidatedStackValue(int offset) {
+	int address = sp + offset;
+	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
+	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
+	return *(int*)&mem_ds[address];	
+
+}
+
 void Base::Syscall::VM_Yield() {
 }
 
@@ -157,7 +169,18 @@ void MoSync_DoneUpdatingView() {
 }
 
 void MoSync_ShowMessageBox(const char *msg, bool kill) {
-	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
+	
+	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding] shouldKill:kill];  	
+}
+
+void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
+	[sMoSyncView 
+	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcslen((const wchar_t*)title)*2]
+	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcslen((const wchar_t*)inText)*2]
+	 outText:(wchar*)outText
+	 maxSize:maxSize
+	 andConstraints:constraints
+	 ];  	
 }
 
 void MoSync_Exit() {

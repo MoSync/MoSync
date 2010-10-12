@@ -47,9 +47,9 @@ void framebuffer_malloc_handler(int size);
 
 #define CC CONVERT_TO_NATIVE_COLOR_FROM_ARGB
 #define CONVERT_TO_NATIVE_COLOR_FROM_ARGB(col) \
-	((((col)&0x00ff0000)>>(16-(fi.redShift-(8-fi.redBits))))&fi.redMask) | \
-	((((col)&0x0000ff00)>>(8-(fi.greenShift-(8-fi.greenBits))))&fi.greenMask) | \
-	((((col)&0x000000ff)>>(0-(fi.blueShift-(8-fi.blueBits))))&fi.blueMask)
+	((((((col)&0x00ff0000)>>16)>>(8-fi.redBits))<<fi.redShift)&fi.redMask) |\
+	((((((col)&0x0000ff00)>>8)>>(8-fi.greenBits))<<fi.greenShift)&fi.greenMask) |\
+	((((((col)&0x000000ff)>>0)>>(8-fi.blueBits))<<fi.blueShift)&fi.blueMask)
 
 void addFramebufferTests(TestSuite* suite);
 void addFramebufferTests(TestSuite* suite) {
@@ -78,7 +78,18 @@ void FramebufferTest::start() {
 
 	//draw color rects, plot some pixels over them
 
-	Image img((byte*)fb, NULL, fi.width, fi.height, fi.pitch, Image::PIXELFORMAT_RGB888);
+	Image::PixelFormat pf;
+
+	switch(fi.bitsPerPixel) {
+		case 12: pf = Image::PIXELFORMAT_RGB444; break;
+		case 15: pf = Image::PIXELFORMAT_RGB555; break;
+		case 16: pf = Image::PIXELFORMAT_RGB565; break;
+		case 24: pf = Image::PIXELFORMAT_RGB888; break;
+		case 32: pf = Image::PIXELFORMAT_ARGB8888; break;
+		default: maPanic(1, "Unsupported pixel format!");
+	}
+
+	Image img((byte*)fb, NULL, fi.width, fi.height, fi.pitch, pf);
 
 	img.bytesPerPixel = fi.bytesPerPixel;
 	img.bitsPerPixel = fi.bitsPerPixel;

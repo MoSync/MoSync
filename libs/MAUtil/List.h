@@ -42,7 +42,9 @@ namespace MAUtil {
 	public:
 		friend class ListIterator;
 		friend class ConstListIterator;
-
+		/**
+		* \brief A node in a list container.
+		*/
 		class ListNode {
 		public:
 			ListNode(const Type &data, ListNode *prev, ListNode *next) :
@@ -53,9 +55,12 @@ namespace MAUtil {
 			  Type mData;
 			  ListNode *mPrev, *mNext;
 		};
-
+		
 		class ConstListIterator;
-
+		
+		/**
+		* \brief An iterator for a list container.
+		*/
 		class ListIterator {
 		public:
 
@@ -112,7 +117,10 @@ namespace MAUtil {
 			bool mFirst;
 			ListNode *mCurrent;
 		};
-
+		
+		/**
+		* \brief A constant iterator for a list container.
+		*/
 		class ConstListIterator {
 		public:
 			ConstListIterator(const ListIterator& listIterator) : mCurrent(listIterator.mCurrent), mFirst(true) {

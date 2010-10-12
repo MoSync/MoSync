@@ -54,6 +54,10 @@ namespace MoRE {
 		void mouseDragged(int x, int y);
 		void mousePressed(int x, int y);
 		void mouseReleased(int x, int y);
+		int getScreenLeft() const;
+		int getScreenTop() const;
+		int getScreenWidth() const;
+		int getScreenHeight() const;
 
 		void keyPressed(int mak);
 		void keyReleased(int mak);

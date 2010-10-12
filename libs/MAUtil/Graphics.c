@@ -291,4 +291,8 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 	p.x += sCurrentOffset.x;
 	p.y += sCurrentOffset.y;
 	maDrawImageRegion(image, srcRect, &p, transformMode);
+	
+#ifdef GRAPHICS_DEBUGGING
+	sNumCalls++;
+#endif
 }

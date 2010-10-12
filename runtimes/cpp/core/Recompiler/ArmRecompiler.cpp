@@ -1083,14 +1083,8 @@ namespace MoSync {
 	
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
-#ifdef __SYMBIAN32__
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
-#endif
-#ifdef _android
-		mPipeToArmInstMap = NULL;
-		mInstructions = NULL;
-#endif
 		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);	
 	}
 

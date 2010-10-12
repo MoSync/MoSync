@@ -1,42 +1,53 @@
-// STRINGAR.CPP
-//
-// Copyright (c) 1997-1999 Symbian Ltd.  All rights reserved.
-//
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 
 #include "stringar.h"
-
-using namespace std;
 
 // StringArray
 
 StringArray::StringArray()
-{}
-
+	{}
+	
 StringArray& StringArray::operator= ( const StringArray& Source)
-{
+	{
 	return (StringArray&) Array::operator= ( Source);
-}
-
+	}
+	
 void StringArray::Add( String * pNewItem)
-{
+	{
 	Array::Add( pNewItem);
-}
+	}
 
 // StringArrayIterator
 
 StringArrayIterator::StringArrayIterator(const StringArray& c):
-ArrayIterator(c)
-{}
+	ArrayIterator(c)
+	{}
 
 String* StringArrayIterator::operator() ()
-{
+	{
 	return ( String *) ArrayIterator::operator() ();
-}
+	}
 
 // ostream functions
 
 ostream& operator<< ( ostream & os, StringArray & s)
-{
+	{
 	if (s.Size() == 0)
 		return ( os << "<none>");
 	StringArrayIterator next( s);
@@ -48,5 +59,5 @@ ostream& operator<< ( ostream & os, StringArray & s)
 	while ( ( p = next() ) != NULL)
 		os << "\t" << * p;
 	return os;
-}
+	}
 

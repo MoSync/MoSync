@@ -315,11 +315,15 @@ void ArrayCopy(ArrayStore *dstArray, ArrayStore *srcArray)
 	if (!srcArray->array)
 		return;
 
-	for (n=srcArray->lo;n<srcArray->hi+1;n++)
+// !! Fix ARH 21/09/10 - srcArray->lo is incorrect should be 0 !!
+
+	for (n=0;n<srcArray->hi+1;n++)
+
 	{
 		ArraySet(dstArray, n, ArrayGet(srcArray, n));
 	}
 
+	dstArray->ps = srcArray->ps;
 	return;
 }
 
@@ -335,7 +339,9 @@ int ArraySearch(ArrayStore *theArray, uint value)
 	if (!theArray->array)
 		return 0;
 
-	for (n=theArray->lo;n<theArray->hi+1;n++)
+// !! Fix ARH 21/09/10 - theArray->lo is incorrect should be 0 !!
+
+	for (n=0;n<theArray->hi+1;n++)
 	{
 		if (value == ArrayGet(theArray, n))
 			return n;
@@ -471,7 +477,7 @@ void ArrayPrint(ArrayStore *theArray, char *heading)
 		return;
 	}
 	
-	for (n=theArray->lo;n<theArray->hi+1;n++)
+	for (n=0;n<theArray->hi+1;n++)
 	{
 		SYMBOL *sym = (SYMBOL *) ArrayGet(theArray, n);
 

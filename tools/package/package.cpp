@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <string>
+
 #include "package.h"
 
 static const char* sUsage =
@@ -13,11 +16,14 @@ static const char* sUsage =
 " -h, --help                   Print this information.\n"
 " -p, --program <file>         Input: compiled program file.\n"
 " -r, --resource <file>        Input: compiled resource file.\n"
+" -i, --icon <file>            Input: MoSync icon definition file (XML).\n"
 " -m, --model <vendor>/<model> Output: target model.\n"
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
+"     --vendor <name>          Output: application vendor's name.\n"
 "     --debug                  Output: use debug runtime.\n"
 "     --uid <8-digit hex>      Output: Symbian UID.\n"
+" -s, --silent                 Output: Supress additional output, e.g. warnings."
 "\n"
 "Environment variables used:\n"
 " MOSYNCDIR                    Path to the MoSync installation directory.\n"
@@ -44,27 +50,29 @@ int main(int argc, const char** argv) {
 		if(streq(argv[i], "-h") || streq(argv[i], "--help")) {
 			printf("%s", sUsage);
 			return 1;
-		}
-		if(streq(argv[i], "-p") || streq(argv[i], "--program")) {
+		} else if(streq(argv[i], "-p") || streq(argv[i], "--program")) {
 			setString(i, argc, argv, s.program);
-		}
-		if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
+		} else if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
 			setString(i, argc, argv, s.resource);
-		}
-		if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
+		} else if(streq(argv[i], "-i") || streq(argv[i], "--icon")) {
+			setString(i, argc, argv, s.icon);
+		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
-		}
-		if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
+		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
 			setString(i, argc, argv, s.dst);
-		}
-		if(streq(argv[i], "-n") || streq(argv[i], "--name")) {
+		} else if(streq(argv[i], "-n") || streq(argv[i], "--name")) {
 			setString(i, argc, argv, s.name);
-		}
-		if(streq(argv[i], "--uid")) {
+		} else if(streq(argv[i], "--vendor")) {
+			setString(i, argc, argv, s.vendor);
+		} else if(streq(argv[i], "--uid")) {
 			setString(i, argc, argv, s.uid);
-		}
-		if(streq(argv[i], "--debug")) {
+		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "-s") || streq(argv[i], "--silent")) {
+			s.silent = true;
+		} else {
+			printf("Unknown argument: '%s'\n", argv[i]);
+			return 1;
 		}
 	}
 
@@ -96,6 +104,18 @@ void testName(const SETTINGS& s) {
 		exit(1);
 	}
 }
+void testVendor(const SETTINGS& s) {
+	if(!s.vendor) {
+		printf("Must specify vendor!\n");
+		exit(1);
+	}
+}
+void testUid(const SETTINGS& s) {
+	if(!s.uid) {
+		printf("Must specify uid!\n");
+		exit(1);
+	}
+}
 
 const char* mosyncdir() {
 	static const char* md = NULL;
@@ -109,9 +129,25 @@ const char* mosyncdir() {
 	return md;
 }
 
-void sh(const char* cmd) {
+void sh(const char* cmd, bool hideOutput) {
 	printf("%s\n", cmd);
-	int res = system(cmd);
+	fflush(stdout);
+	fflush(stderr);
+
+	std::string finalCmd(cmd);
+	if(hideOutput) {
+		// Supress output from stdout and stderr
+#ifdef WIN32
+		finalCmd += "> nul 2>&1";
+#else
+		finalCmd += "> /dev/null 2>&1";
+#endif
+	}
+
+	int res = system(finalCmd.c_str());
+
+	fflush(stdout);
+	fflush(stderr);
 	if(res != 0) {
 		printf("System error %i\n", res);
 		exit(res);

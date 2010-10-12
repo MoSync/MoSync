@@ -293,7 +293,7 @@ unsigned char mtxBasicUnicodeConvert(MTXContext* context, int unicode);
 */
 
 namespace Mtx {
-	/**
+	/** \brief Base class for MTXml Listeners.
 	* \see Context
 	*/
 	template<class Tchar> class XmlListenerT {
@@ -332,6 +332,7 @@ namespace Mtx {
 		virtual void mtxEmptyTagEnd() = 0;
 	};
 
+	/// Listener for 8-bit MTXml events.
 	class XmlListener : public XmlListenerT<char> {
 	public:
 		/**
@@ -342,10 +343,11 @@ namespace Mtx {
 		virtual unsigned char mtxUnicodeCharacter(int unicode);
 	};
 
+	/// Listener for wide-char MTXml events.
 	class XmlListenerW : public XmlListenerT<wchar_t> {
 	};
 
-	/**
+	/** \brief Listener for special MTXml events.
 	* \see Context
 	*/
 	class MtxListener {
@@ -356,6 +358,7 @@ namespace Mtx {
 		virtual void mtxDataRemains(const char* data, int len) = 0;
 	};
 
+	/// Base class for C++ MTXml wrappers.
 	class ContextBase {
 	public:
 		/**
