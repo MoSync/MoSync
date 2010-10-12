@@ -72,6 +72,8 @@ void AsmMain()
 //-------------------------
 	
 	Final_Pass = 0;
+	RedefENum("__final__",0);
+
 
 	for (p=1;p<32;p++)
 	{
@@ -86,6 +88,7 @@ void AsmMain()
 //	printf("final pass. %i known symbols.\n", CountUsedSymbols());
 
 	Final_Pass = 1;
+	RedefENum("__final__",1);
 
 	AsmPass(p+1);
 

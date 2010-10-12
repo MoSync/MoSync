@@ -772,4 +772,26 @@ char * Bin32(int v)
 	return hexstr;
 }
 
+//****************************************
+// 		Set Asm Char Data Array
+//****************************************
+
+void ReplaceChar(char *ptr, char from, char to)
+{
+	char c;
+	
+	while(1)
+	{
+		c = *ptr;	
+
+		if (!c)
+			return;
+			
+		if (c == from)
+			c = to;
+
+		*ptr++ = c;
+	}
+}
+
 

@@ -287,6 +287,8 @@ short Directives()
 
 		GetName();
 
+		ReplaceChar(Name, '.', '_');
+
 		Function_Param_Count = -1;
 
 		if (Token(","))
