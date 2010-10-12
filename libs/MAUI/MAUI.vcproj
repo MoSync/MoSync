@@ -46,6 +46,7 @@
 				WarningLevel="3"
 				WarnAsError="false"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4355"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -104,6 +105,7 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				WarnAsError="true"
+				DisableSpecificWarnings="4355"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -156,6 +158,22 @@
 		</File>
 		<File
 			RelativePath=".\DefaultSkin.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawable.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawable.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawables.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawables.h"
 			>
 		</File>
 		<File

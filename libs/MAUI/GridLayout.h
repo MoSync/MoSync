@@ -74,21 +74,21 @@ namespace MAUI {
 		void setMarginY(int p);
 
 		/** Sets the horizontal alignment of the child widget within their grid cells.
-		    **/	
+		    **/
 		void setHorizontalAlignment(HorizontalAlignment alignment);
 
 		/** Sets the vertical alignment of the child widget within their grid cells.
-		    **/	
+		    **/
 		void setVerticalAlignment(VerticalAlignment alignment);
 
 		/** Sets the horizontal autosize property, determining wether the grid columns
 		    * are resized so that the widest of its children fits.
-		    **/	
+		    **/
 		void setAutoSizeX(bool f = true);
 
 		/** Sets the vertical autosize property, determining wether the grid rows
 		    * are resized so that the widest of its children fits.
-		    **/	
+		    **/
 		void setAutoSizeY(bool f = true);
 
 		/** Sets the number of columns in the grid.
