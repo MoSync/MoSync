@@ -83,7 +83,8 @@ TOKENTAB(".stabs",              dir_stabs,              0)
 TOKENTAB(".stabn",              dir_stabn,              0)
 TOKENTAB(".stabd",              dir_stabd,              0)
 TOKENTAB(".model",              dir_model,              0)
-
+TOKENTAB(".do",                 dir_do,              	0)
+TOKENTAB(".enddo",              dir_enddo,             	0)
 
 TOKENTAB("syscall",             opc_syscall,            0)
 TOKENTAB("break",               opc_break,              0)

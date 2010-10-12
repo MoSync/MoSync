@@ -48,6 +48,12 @@ void Instructions()
 	if (*FilePtr == '.')
 		return;
 
+	if (*FilePtr == '}')
+		return;
+
+	if (*FilePtr == '{')
+		return;
+
 	// Clear all the special variables
 
 	farop = imm = rd = rs = rt = op = 0;
