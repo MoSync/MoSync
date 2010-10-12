@@ -359,6 +359,7 @@ namespace MAUI {
 		//Vector<WidgetListener*>& getWidgetListeners();
 
 
+		// TODO: must fix these, they get overwritten by the style..
 		/**
 		* \brief Sets the left padding width.
 		* \param l The padding to be set (in pixels).
@@ -525,6 +526,11 @@ namespace MAUI {
 		* \returns A pointer to the user data, or NULL if there's none.
 		*/
 		void* getUserData();
+
+		/**
+		* \brief restyles itself and all its descendants. This may be called on the root node if a style has been changed after setup.
+		*/
+		void restyleAll();
 
 	protected:
 		Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);

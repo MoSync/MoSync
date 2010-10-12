@@ -18,11 +18,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Drawables.h"
 #include <MAUtil/Graphics.h>
 
-void MAUI::DrawableImage::draw(int x, int y, int w, int h) {
+void MAUI::ImageDrawable::draw(int x, int y, int w, int h) {
 	Gfx_drawImage(mImage, x, y);
 }
 
-void MAUI::DrawableColor::draw(int x, int y, int w, int h) {
+void MAUI::ColorDrawable::draw(int x, int y, int w, int h) {
 	maSetColor(mColor);
 	Gfx_fillRect(x, y, w, h);
 }

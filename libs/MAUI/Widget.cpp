@@ -279,17 +279,18 @@ namespace MAUI {
 	void Widget::requestRepaint() {
 		//if(mDirty) return;
 
+		
 		setDirty();
 
 
 		// TODO: Something like this this should be used, but isTransparent can't be called from the constructor.
-		//if(isTransparent()) {
-			/*
+		/*
+		if(isTransparent()) {
 			if(mParent) {
 				mParent->setDirty(true, this);
 			}
-			*/
-		//}
+		}
+		*/
 	}
 
 	bool Widget::isDirty() const {
@@ -356,11 +357,14 @@ namespace MAUI {
 	}
 
 	void Widget::updatePaddedBounds() {
+		Rect opbounds = mPaddedBounds;
 		mPaddedBounds = mBounds;
 		mPaddedBounds.x+=mPaddingLeft;
 		mPaddedBounds.y+=mPaddingTop;
 		mPaddedBounds.width-=mPaddingLeft+mPaddingRight;
 		mPaddedBounds.height-=mPaddingTop+mPaddingBottom;
+		if(opbounds.x != mPaddedBounds.x || opbounds.y != mPaddedBounds.y || opbounds.width != mPaddedBounds.width || opbounds.height != mPaddedBounds.height)
+			requestUpdate();	
 	}
 
 	// fixme, precalc absolute for mParent
@@ -668,6 +672,13 @@ namespace MAUI {
 		setPaddingTop(mStyle->getSafe<IntegerProperty>("paddingTop")->mValue);
 		setPaddingBottom(mStyle->getSafe<IntegerProperty>("paddingBottom")->mValue);
 		//MAUI_LOG("skins: %x, %x", mFocusedSkin, mUnfocusedSkin);
+	}
+
+	void Widget::restyleAll() {
+		restyle();
+		Vector_each(Widget*,it,mChildren) {
+			(*it)->restyleAll();
+		}
 	}
 
 	void Widget::setUserData(void *userData) {

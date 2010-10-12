@@ -75,11 +75,10 @@ namespace MAUI {
 	}
 	#endif
 
-	Label::Label(int x, int y, int width, int height, const String &caption, Font* font) :
+	Label::Label(int x, int y, int width, int height, const String &caption) :
 		Widget(x, y, width, height),
 	//	mMustCalcStrSize(true),
 		mCaption(""),
-		mFont(font),
 		mAutoSizeX(false),
 		mAutoSizeY(false),
 		mMultiLine(false),
@@ -301,8 +300,8 @@ namespace MAUI {
 			int paddingRight,
 			int paddingTop,
 			int paddingBottom,
-			SkinProperty* backgroundSkinFocused,
-			SkinProperty* backgroundSkinUnfocused
+			DrawableProperty* backgroundSkinFocused,
+			DrawableProperty* backgroundSkinUnfocused
 	) : Style(paddingLeft, paddingRight, paddingTop, paddingBottom,
 			backgroundSkinFocused, backgroundSkinUnfocused)
 	{

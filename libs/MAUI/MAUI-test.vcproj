@@ -208,6 +208,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Drawables.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawables.h"
+			>
+		</File>
+		<File
 			RelativePath=".\EditBox.cpp"
 			>
 		</File>

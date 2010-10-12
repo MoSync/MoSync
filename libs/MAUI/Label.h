@@ -59,7 +59,7 @@ namespace MAUI {
 		  * \param caption the text displayed by the Label.
 		  * \param font the font to be used by to render the caption.
 		  */
-		Label(int x=0, int y=0, int width=0, int height=0, const String &caption="", Font* font=NULL);
+		Label(int x=0, int y=0, int width=0, int height=0, const String &caption="");
 
 		/** Turns multiline mode on or off **/
 		void setMultiLine(bool b=true);
@@ -73,8 +73,6 @@ namespace MAUI {
 
 		/** Sets the text that appears on the label **/
 		virtual void setCaption(const String& caption);
-		/** Sets the font used to render text on the label **/
-		void setFont(Font* font);
 
 		/** 
 		 * When this is set to true the label will automatically be resized in the 
@@ -90,8 +88,6 @@ namespace MAUI {
 		void setAutoSizeY(bool f=true);
 		/** Returns the text displayed on the label **/
 		const String& getCaption() const;
-		/** Returns the font used by this label **/
-		Font* getFont() const;
 		/** Returns the horizontal alignment of the label **/
 		HorizontalAlignment getHorizontalAlignment() const;
 		/** Returns the vertical alignment of the label **/
@@ -163,8 +159,8 @@ namespace MAUI {
 			int paddingRight = 0,
 			int paddingTop = 0,
 			int paddingBottom = 0,
-			SkinProperty* backgroundSkinFocused = NULL,
-			SkinProperty* backgroundSkinUnfocused = NULL
+			DrawableProperty* backgroundSkinFocused = NULL,
+			DrawableProperty* backgroundSkinUnfocused = NULL
 		);
 	};
 

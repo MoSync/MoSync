@@ -29,13 +29,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 	/// Draws an image.
-	class DrawableImage : public Drawable {
+	class ImageDrawable : public Drawable {
 	public:
 		/**
 		* \param image The image to be drawn.
 		* \param transparent Set to false if you know the image is opaque, for increased performance.
 		*/
-		DrawableImage(MAHandle image, bool transparent = true)
+		ImageDrawable(MAHandle image, bool transparent = true)
 			: mImage(image), mTransparent(transparent) {}
 		void draw(int x, int y, int w, int h);
 		bool isTransparent() const { return mTransparent; }
@@ -45,9 +45,9 @@ namespace MAUI {
 	};
 
 	/// Fills the area with a color.
-	class DrawableColor : public Drawable {
+	class ColorDrawable : public Drawable {
 	public:
-		DrawableColor(int color)
+		ColorDrawable(int color)
 			: mColor(color) {}
 		void draw(int x, int y, int w, int h);
 		bool isTransparent() const { return false; }

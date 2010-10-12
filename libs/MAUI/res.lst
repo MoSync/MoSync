@@ -1,17 +1,2 @@
-.res RES_SLIDER_AMT
-.image "res/Slider_Left_Unselected.png"
-
-.res RES_SLIDER_BKG
-.image "res/Slider_Right_Unselected.png"
-
-.res RES_SLIDER_GRIP
-.image "res/Slider_Handle.png"
-
-
-.res RES_FONT
-.bin 
-.include "res/arial.mof"
-
-.res RES_FONT2
-.bin 
-.include "res/arial_white.mof"
+.res RES_TEST_IMG
+.image "res/mosync.png"

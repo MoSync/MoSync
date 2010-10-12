@@ -6,6 +6,8 @@
 #include <MAUI/Engine.h>
 #include <MAUI/GridLayout.h>
 #include <MAUI/StackLayout.h>
+#include <MAUI/Image.h>
+#include <MAUI/Drawables.h>
 
 #include <MAUI/ListBox.h>
 
@@ -430,6 +432,28 @@ public:
 					"C","0","=","/"
 			};
 
+			Image *image = new Image(0, 0, 0, 0, RES_TEST_IMG, true, true);
+
+			LabelStyle *labelStyle = new LabelStyle(Engine::getSingleton().getDefaultStyle("Label")->get<FontProperty>("font"), 10, 10, 10, 10, 
+				new DrawableProperty(new ColorDrawable(0xff0000)), new DrawableProperty(new ColorDrawable(0x00ff00)));
+			Label* multiLineLabel = new Label(0, 0, 0, 0, "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+			multiLineLabel->setMultiLine(true);
+			multiLineLabel->setAutoSizeX(false);
+			multiLineLabel->setAutoSizeY(true);
+			multiLineLabel->setStyle(labelStyle);
+
+			/*
+			multiLineLabel->setPaddingTop(10);
+			multiLineLabel->setPaddingBottom(10);
+			multiLineLabel->setPaddingLeft(10);
+			multiLineLabel->setPaddingRight(10);
+			*/
+
+			mainListbox->add(multiLineLabel);
+
+
+			mainListbox->add(image);
+
 			Button *button;
 			for(int i = 0; i < 16; i++) {
 				button = new Button(0, 0, 50, 50, buttons1[i]);
@@ -503,26 +527,6 @@ public:
 		gConsoleDrawBackground = 0;
 
 		Engine::getSingleton().setDisplayConsole(true);
-
-		//SkinProperty* selectedWidgetSkin = new SkinProperty(RES_SELECTED2, 16, 32, 16, 32, true);
-		//SkinProperty* unselectedWidgetSkin = new SkinProperty(RES_UNSELECTED2, 16, 32, 16, 32, true);
-		//SkinProperty* focusedUnselectedWidgetSkin = new SkinProperty(RES_FOCUSED_UNSELECTED2, 16, 32, 16, 32, true);
-
-			FontProperty* font = new FontProperty(RES_FONT);
-
-		Style* widgetStyle = new Style(0, 0, 0, 0, NULL, NULL);
-		LabelStyle* labelStyle = new LabelStyle(font, 10, 10, 10, 10, NULL, NULL);
-		//ButtonStyle* buttonStyle = new ButtonStyle(selectedWidgetSkin, focusedUnselectedWidgetSkin, unselectedWidgetSkin, font);
-	
-		SkinProperty* sliderAmountSkin = new SkinProperty(RES_SLIDER_AMT, 10, 12, 0, 18, true);
-		SkinProperty* sliderBackgroundSkin = new SkinProperty(RES_SLIDER_BKG, 10, 12, 0, 18, true);
-		ImageProperty* sliderGripImage = new ImageProperty(RES_SLIDER_GRIP);
-		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
-		
-		Engine::getSingleton().setDefaultStyle("Widget", widgetStyle);
-		Engine::getSingleton().setDefaultStyle("Label", labelStyle);
-		//Engine::getSingleton().setDefaultStyle("Button", buttonStyle);
-		Engine::getSingleton().setDefaultStyle("Slider", sliderStyle);
 
 		// For some strange reason this is now broken??.
 		WidgetSkin::setCacheEnabled(true);

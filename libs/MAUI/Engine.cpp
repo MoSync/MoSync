@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "DefaultSkin.h"
 
 #include "Button.h"
+#include "Slider.h"
 
 using namespace MAUtil;
 
@@ -63,6 +64,9 @@ namespace MAUI {
 		mDisplayConsole = false;
 		Environment::getEnvironment().addFocusListener(this);
 
+
+		// setup default styles
+
 		MAHandle s1  = RESIMG(button_pressed_selected);
 		MAHandle s2  = RESIMG(button_notpressed_selected);
 		MAHandle s3  = RESIMG(button_notpressed_unselected);
@@ -70,14 +74,20 @@ namespace MAUI {
 		SkinProperty* focusedPressed = new SkinProperty(s1, 19, 32, 19, 32, true);
 		SkinProperty* focusedReleased = new SkinProperty(s2, 19, 32, 19, 32, true);
 		SkinProperty* unfocusedReleased = new SkinProperty(s3, 19, 32, 19, 32, true);
-
 		FontProperty* font = new FontProperty(RESFNT(arial));
-
 		ButtonStyle* buttonStyle = new ButtonStyle(focusedPressed, focusedReleased, unfocusedReleased, font);
 		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
 
+		s1  = RESIMG(slider_left_unselected);
+		s2  = RESIMG(slider_right_unselected);
+		s3  = RESIMG(slider_handle);
+		SkinProperty* sliderAmountSkin = new SkinProperty(s1, 10, 12, 0, 18, true);
+		SkinProperty* sliderBackgroundSkin = new SkinProperty(s2, 10, 12, 0, 18, true);
+		ImageProperty* sliderGripImage = new ImageProperty(s3);
+		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
+		mSingletonPtr->setDefaultStyle("Slider", sliderStyle);
+
 		Style* widgetStyle = new Style();
-		//widgetStyle->set("font", new FontProperty(RESFNT(arial_white)));
 		widgetStyle->set("backgroundSkinFocused", NULL);
 		widgetStyle->set("backgroundSkinUnfocused", NULL);
 		mSingletonPtr->setDefaultStyle("Widget", widgetStyle);
