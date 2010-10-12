@@ -68,6 +68,17 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+	void Widget::remove(Widget* w) {
+		for(int i = 0; i < mChildren.size(); i++) {
+			if(mChildren[i] == w) {
+				mChildren[i]->setParent(NULL);
+				mChildren.remove(i);
+				return;
+			}
+		}
+		requestRepaint();
+	}
+
 	void Widget::clear() {
 		for(int i = 0; i < mChildren.size(); i++)
 			mChildren[i]->setParent(NULL);
@@ -387,9 +398,11 @@ namespace MAUI {
 		}
 	}
 
+	/*
 	Vector<Widget*>& Widget::getChildren() {
 		return mChildren;
 	}
+	*/
 
 	const Vector<Widget*>& Widget::getChildren() const {
 		return mChildren;

@@ -309,6 +309,14 @@ void GridLayout::add(Widget *child) {
 	requestRepaint();
 }
 
+void GridLayout::remove(Widget *child) {
+	Widget::remove(child);
+	child->removeWidgetListener(this);
+	//rebuild();
+	requestUpdate();
+	requestRepaint();
+}
+
 void GridLayout::clear() {
 	for(int i = 0; i < mChildren.size(); i++)
 		mChildren[i]->removeWidgetListener(this);

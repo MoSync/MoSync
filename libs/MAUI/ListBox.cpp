@@ -199,6 +199,13 @@ namespace MAUI {
 		requestRepaint();
 	}
 
+	void ListBox::remove(Widget *child) {
+		Widget::remove(child);
+		//listen
+		child->removeWidgetListener(this);
+		requestUpdate();
+	}
+
 	void ListBox::clear() {
 		for(int i = 0; i < mChildren.size(); i++)
 			mChildren[i]->removeWidgetListener(this);

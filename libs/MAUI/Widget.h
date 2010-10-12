@@ -144,6 +144,8 @@ namespace MAUI {
 		**/
 		virtual void add(Widget* w);
 
+		virtual void remove(Widget* w);
+
 		// todo: Do these functions:
 		// virtual void remove(Widget* w);
 		// virtual int getNumChildren() const;
@@ -174,7 +176,7 @@ namespace MAUI {
 		* \returns A reference to the vector of children.
 		* \note Use at your own risk, adding or removing children from this list won't update the widget.
 		*/
-		Vector<Widget*>& getChildren();
+		//Vector<Widget*>& getChildren();
 
 		/**
 		* \brief const version of getChildren()

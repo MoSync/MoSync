@@ -83,7 +83,8 @@ namespace MAUI {
 		virtual bool isTransparent() const;
 
 		/** Adds the Widget w as a child of the listbox **/
-		void add(Widget *w);
+		virtual void add(Widget *w);
+		virtual void remove(Widget *w);
 
 		/** Overloaded implementation of Widget::clear(), with the same external semantics.
 		    **/

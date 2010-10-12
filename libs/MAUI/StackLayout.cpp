@@ -157,6 +157,15 @@ void StackLayout::add(Widget *child) {
 	requestRepaint();
 }
 
+void StackLayout::remove(Widget *child) {
+	Widget::remove(child);
+	child->removeWidgetListener(this);
+	//rebuild();
+	requestUpdate();
+	requestRepaint();
+}
+
+
 void StackLayout::clear() {
 	for(int i = 0; i < mChildren.size(); i++)
 		mChildren[i]->removeWidgetListener(this);

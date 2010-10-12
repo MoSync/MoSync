@@ -95,7 +95,7 @@ namespace MAUI {
 	Widget* getFocusableWidget(Widget *w) {
 		if(w->isFocusable()) return w;
 
-		Vector<Widget*>& children = w->getChildren();
+		const Vector<Widget*>& children = w->getChildren();
 		for(int i = 0; i < children.size(); i++) {
 			if(children[i]->isFocusable()) {
 				return children[i];
