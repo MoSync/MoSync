@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "IOCtl.h"
 
 #include <helpers/cpp_defs.h>
-#include <helpers/CPP_IX_WEBVIEW.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 /**
  * Custom conversion function from Wide Char String to Multi Byte String.
@@ -451,85 +451,107 @@ namespace Base
 		return (int)ret;
 	}
 	
-	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetCreate(int widgetType, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewOpen", "()I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetCreate", "(I)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetType);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
 	}
 	
-	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetDestroy(int widgetHandle, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewClose", "()I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetDestroy", "(I)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
 	}
 	
-	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetOpen(int widgetHandle, int widgetParentHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetOpen", "(II)I");
+		if (methodID == 0) return 0;
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle, widgetParentHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maWidgetClose(int widgetHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetClose", "(I)I");
+		if (methodID == 0) return 0;
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maWidgetLoadHTML(int widgetHandle, const char* html, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrHTML = jNIEnv->NewStringUTF(html);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewSetHTML", "(Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetLoadHTML", "(ILjava/lang/String;)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrHTML);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle, jstrHTML);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrHTML);
 		
 		return result;
 	}
 	
-	int _maWebViewLoadURL(const char* url, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetLoadURL(int widgetHandle, const char* url, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrURL = jNIEnv->NewStringUTF(url);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewLoadURL", "(Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetLoadURL", "(ILjava/lang/String;)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle, jstrURL);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrURL);
 		
 		return result;
 	}
 	
-	int _maWebViewEvaluateScript(const char* script, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetEvaluateScript(int widgetHandle, const char* script, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrScript = jNIEnv->NewStringUTF(script);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewEvaluateScript", "(Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript", "(ILjava/lang/String;)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrScript);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle, jstrScript);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrScript);
 		
 		return result;
 	}
 	
-	int _maWebViewGetRequestSize(int requestID, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetCommandSize(int commandID, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewGetRequestSize", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetCommandSize", "(I)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, requestID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, commandID);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
 	}
 	
-	int _maWebViewGetRequest(int requestID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetCommand(int commandID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWebViewGetRequest", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetCommand", "(III)I");
 		if (methodID == 0) return 0;
 		int rBuf = buf - memStart;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, requestID, rBuf, size);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, commandID, rBuf, size);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;

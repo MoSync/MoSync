@@ -33,7 +33,7 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.MoSyncWebView;
 
-#include "generated\IX_WEBVIEW_CONSTS.h"
+#include "generated\IX_WIDGET_CONSTS.h"
 
 import android.content.res.Configuration;
 import android.content.Context;
@@ -233,101 +233,165 @@ public class MoSync extends Activity
 		//mMosyncView.killApplication();
     }
 	
-	public int maWebViewOpen()
+	public int maWidgetCreate(final int widgetType)
 	{
-		// Open only if there is no WebView open.
-		if (null == mMoSyncWebView)
+		if (WIDGET_TYPE_WEBVIEW == widgetType)
+		{
+			// Limited to one instance.
+			// TODO: Add lookup table for widgets.
+			if (null == mMoSyncWebView)
+			{
+				final Context context = this;
+				// TODO: Add handle counter, add widget to lookup table.
+				int wigetHandle = 1;
+				mMoSyncWebView = new MoSyncWebView(context, mMoSyncThread, wigetHandle);
+				return wigetHandle;
+			}
+		}
+		
+		// We could not create the requested widget.
+		return WIDGET_ERROR;
+	}
+	
+	public int maWidgetDestroy(final int widgetHandle)
+	{
+		// TODO: Find a general way of destroying widgets.
+		// We should also make sure the widget is closed,
+		// or automatically close the widget.
+		if (null != mMoSyncWebView)
+		{
+			mMoSyncWebView = null;
+			return WIDGET_OK;
+		}
+		
+		// We could not open the requested widget.
+		return WIDGET_ERROR;
+	}
+	
+	public int maWidgetOpen(final int widgetHandle, final int widgetParentHandle)
+	{
+		// Open the single WebView in the Activity.
+		// TODO: Use widgetHandle to get the widget.
+		if (null != mMoSyncWebView && WIDGET_ROOT == widgetParentHandle)
 		{
 			final Context context = this;
-			mHandler.post(new Runnable() { 
-				public void run() { 
-					mMoSyncWebView = new MoSyncWebView(context, mMoSyncThread);
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{
 					setContentView(mMoSyncWebView);
-					mMoSyncWebView.requestFocus(); } });
-			return WEBVIEW_OK;
+					mMoSyncWebView.requestFocus(); 
+				} 
+			});
+			return WIDGET_OK;
 		}
-		else
-		{
-			return WEBVIEW_ERROR;
-		}
+		
+		// We could not open the requested widget.
+		return WIDGET_ERROR;
 	}
 	
-	public int maWebViewClose()
+	public int maWidgetClose(final int widgetHandle)
 	{
+		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView)
 		{
-			mHandler.post(new Runnable() { 
-				public void run() { 
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{ 
 					mMoSyncWebView.close();
 					mMoSyncWebView = null;
-					setContentView(mMoSyncView); } });
-			return WEBVIEW_OK;
+					// Restore the MoSyncView.
+					setContentView(mMoSyncView); 
+				} 
+			});
+			return WIDGET_OK;
 		}
 		else
 		{
-			return WEBVIEW_NOT_OPEN;
+			return WIDGET_ERROR;
 		}
 	}
 	
-	public int maWebViewSetHTML(final String html)
+	public int maWidgetLoadHTML(final int widgetHandle, final String html)
 	{
+		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView)
 		{
-			mHandler.post(new Runnable() { 
-				public void run() { mMoSyncWebView.setHTML(html); } });
-			return WEBVIEW_OK;
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{ 
+					mMoSyncWebView.loadHTML(html); 
+				} 
+			});
+			return WIDGET_OK;
 		}
 		else
 		{
-			return WEBVIEW_NOT_OPEN;
+			return WIDGET_ERROR;
 		}
 	}
 
-	public int maWebViewLoadURL(final String url)
+	public int maWidgetLoadURL(final int widgetHandle, final String url)
 	{
+		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView)
 		{
-			mHandler.post(new Runnable() { 
-				public void run() { mMoSyncWebView.loadURL(url); } });
-			return WEBVIEW_OK;
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{ 
+					mMoSyncWebView.loadURL(url); 
+				} 
+			});
+			return WIDGET_OK;
 		}
 		else
 		{
-			return WEBVIEW_NOT_OPEN;
+			return WIDGET_ERROR;
 		}
 	}
 
-	public int maWebViewEvaluateScript(final String script)
+	public int maWidgetEvaluateScript(final int widgetHandle, final String script)
 	{
+		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView)
 		{
-			mHandler.post(new Runnable() { 
-				public void run() { mMoSyncWebView.evaluateScript(script); } });
-			return WEBVIEW_OK;
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{ 
+					mMoSyncWebView.evaluateScript(script); 
+				} 
+			});
+			return WIDGET_OK;
 		}
 		else
 		{
-			return WEBVIEW_NOT_OPEN;
+			return WIDGET_ERROR;
 		}
 	}
 	
-	public int maWebViewGetRequestSize(int requestID)
+	public int maWidgetGetCommandSize(final int commandId)
 	{
+		// TODO: Store commands in a lookup table. Use commandId to get command.
 		if (null != mMoSyncWebView)
 		{
-			return mMoSyncWebView.getRequestSize(requestID);
+			return mMoSyncWebView.getCommandSize(commandId);
 		}
 		else
 		{
-			return WEBVIEW_NOT_OPEN;
+			return WIDGET_ERROR;
 		}
 	}
 	
-	public byte[] maWebViewGetRequestBytes(int requestID)
+	public byte[] maWidgetGetCommandBytes(final int commandId)
 	{
+		// TODO: Store commands in a lookup table. Use commandId to get command.
 		if (null != mMoSyncWebView)
 		{
-			return mMoSyncWebView.getRequestBytes(requestID);
+			return mMoSyncWebView.getCommandBytes(commandId);
 		}
 		else
 		{

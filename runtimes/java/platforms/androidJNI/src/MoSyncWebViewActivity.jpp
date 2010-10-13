@@ -55,9 +55,9 @@ public class MoSyncWebViewActivity extends Activity
 	Handler handler;
 	
 	/**
-	 * Holds the latest request.
+	 * Holds the latest command string.
 	 */
-	String request;
+	String mCommand;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -103,9 +103,9 @@ public class MoSyncWebViewActivity extends Activity
 					// TODO: Hardcoded for now, fix this.
 					event[1] = 1;
 					
-					// Save request.
+					// Save command.
 					// TODO: Save requests in something like a circular buffer.
-					request = url.substring(mosyncProtocol.length());
+					command = url.substring(mosyncProtocol.length());
 					
 					// Post event to MoSync event system.
 					postMoSyncEvent(event);

@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-#include "generated\IX_WEBVIEW_CONSTS.h"
+#include "generated\IX_WIDGET_CONSTS.h"
 //#include "config_platform.h"
 //#include "helpers.h"
 
@@ -34,20 +34,29 @@ public class MoSyncWebView extends WebView
 {
 	public static final String MoSyncProtocol = "mosync://";
 	
+	/**
+	 * The MoSync handle id for this widget instance.
+	 */
+	protected int mWidgetHandle;
+	
 	protected Context mContext;
 	protected MoSyncThread mMoSyncThread;
 	
 	/**
-	 * Holds the most recent request sent to MoSync.
+	 * Holds the most recent command sent to MoSync.
 	 */
-	protected String mRequest;
+	protected String mCommand;
 	
-	public MoSyncWebView(final Context context, final MoSyncThread moSyncThread) //throws Exception
+	public MoSyncWebView(
+		final Context context, 
+		final MoSyncThread moSyncThread,
+		final int widgetHandle) //throws Exception
 	{
 		super(context);
 		
 		Log.i("MoSyncWebView", "Constructor");
 		
+		mWidgetHandle = widgetHandle;
 		mContext = context;
 		mMoSyncThread = moSyncThread;
 		
@@ -66,6 +75,10 @@ public class MoSyncWebView extends WebView
 				Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
 			}
 			
+			/**
+			 * If the url is a mosync: url, we post 
+			 * a command event to MoSync.
+			 */	
 			public boolean shouldOverrideUrlLoading(WebView view, String url)
 			{
 				Log.i("MoSync", "WebViewActivity.WebViewClient.shouldOverrideUrlLoading");
@@ -73,24 +86,13 @@ public class MoSyncWebView extends WebView
 				{
 					Log.i("MoSync", "Processing MoSync url: " + url);
 					
-					// Post regest message to MoSync.
-					
-					// Allocate event array.
-					int[] event = new int[3];
-					
-					// Set event type.
-					event[0] = EVENT_TYPE_WEBVIEW_REQUEST;
-					
-					// Set request id.
-					// TODO: Hardcoded for now, fix this.
-					event[1] = 1;
-					
-					// Save request.
-					// TODO: Save requests in something like a circular buffer.
-					mRequest = url.substring(MoSyncProtocol.length());
+					// TODO: Save command in a lookup table.
+					mCommand = url.substring(MoSyncProtocol.length());
 					
 					// Post event to MoSync event system.
-					postEvent(event);
+					// TODO: Use counter com commandId.
+					int commandId = 1;
+					postEvent(EVENT_TYPE_WIDGET_COMMAND, commandId);
 					
 					// Abort further processing of this url by the WebView by returning true.
 					return true;
@@ -109,9 +111,7 @@ public class MoSyncWebView extends WebView
 		loadData(html, "text/html", "utf-8");
 		
 		// Post notification message to MoSync.
-		int[] event = new int[3];
-		event[0] = EVENT_TYPE_WEBVIEW_OPENED;
-		postEvent(event);
+		postEvent(EVENT_TYPE_WIDGET_OPENED, 0);
 	}
 	
 	/**
@@ -137,19 +137,25 @@ public class MoSyncWebView extends WebView
 	/**
 	 * Post an event to the MoSync event queue.
 	 * The event data is organised as an array of ints.
-	 * The first element is the id of the event.
+	 * The first element is the type of the event.
 	 */
-	private void postEvent(int[] event)
+	private void postEvent(int eventType, int commandId)
 	{
 		//Log.i("MoSyncWebView", "postEvent: " + event[0]);
+		
+		int[] event = new int[4];
+		event[0] = eventType;
+		event[1] = WIDGET_TYPE_WEBVIEW;
+		event[2] = mWidgetHandle;
+		event[3] = commandId;
 		
 		mMoSyncThread.nativePostEvent(event);
 		mMoSyncThread.interrupt();
 	}
 	
-	public void setHTML(final String html)
+	public void loadHTML(final String html)
 	{
-		Log.i("MoSync", "MoSyncWebView.setHTML");
+		Log.i("MoSync", "MoSyncWebView.loadHTML");
 		
 		// Use loadDataWithBaseURL to avoid URI-encoding data, For details, see:
 		// http://developer.android.com/reference/android/webkit/WebView.html#loadData(java.lang.String, java.lang.String, java.lang.String)
@@ -161,9 +167,7 @@ public class MoSyncWebView extends WebView
 		
 		// Post notification message to MoSync.
 		// TODO: Move to a listener where this is notified.
-		int[] event = new int[3];
-		event[0] = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
-		postEvent(event);
+		postEvent(EVENT_TYPE_WIDGET_CONTENT_LOADED, 0);
 	}
 	
 	public void loadURL(final String url)
@@ -174,9 +178,7 @@ public class MoSyncWebView extends WebView
 				
 		// Post notification message to MoSync.
 		// TODO: Move to a listener where this is notified.
-		int[] event = new int[3];
-		event[0] = EVENT_TYPE_WEBVIEW_PAGE_LOADED;
-		postEvent(event);
+		postEvent(EVENT_TYPE_WIDGET_CONTENT_LOADED, 0);
 	}
 	
 	/**
@@ -195,20 +197,18 @@ public class MoSyncWebView extends WebView
     	Log.i("MoSync", "MoSyncWebView.close");
 		
 		// Post notification message to MoSync.
-		int[] event = new int[3];
-		event[0] = EVENT_TYPE_WEBVIEW_CLOSED;
-		postEvent(event);
+		postEvent(EVENT_TYPE_WIDGET_CLOSED, 0);
     }
 	
-	public int getRequestSize(int requestID)
+	public int getCommandSize(int commandId)
 	{
-		// TODO: Check that request exists. Return error code on error.
-		return mRequest.length() + 1;
+		// TODO: Get command using commandId. Return error code on error.
+		return mCommand.length() + 1;
 	}
 	
-	public byte[] getRequestBytes(int requestID)
+	public byte[] getCommandBytes(int commandId)
 	{
-		// TODO: Check that request exists. Return null on error.
-		return mRequest.getBytes();
+		// TODO: Get command using commandId. Return null on error.
+		return mCommand.getBytes();
 	}
 }

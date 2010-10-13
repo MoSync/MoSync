@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
-#include <helpers/CPP_IX_WEBVIEW.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 //(#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 #define SYSLOG(...)
@@ -216,10 +216,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.data = new byte[size];
 		memcpy(event.data, intArray + 1, size);
 	}
-	else if(event.type == EVENT_TYPE_WEBVIEW_REQUEST)
+	else if (event.type == EVENT_TYPE_WIDGET_OPENED ||
+			 event.type == EVENT_TYPE_WIDGET_CLOSED ||
+			 event.type == EVENT_TYPE_WIDGET_CONTENT_LOADED ||
+			 event.type == EVENT_TYPE_WIDGET_COMMAND)
 	{
-		// Use the key field for the request id.
-		event.key = intArray[1];
+		event.widgetType = intArray[1];
+		event.widgetHandle = intArray[2];
+		event.widgetCommandId = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
 	{

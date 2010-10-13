@@ -1240,29 +1240,33 @@ interface MAAPI {
 		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
 		*/
 		TEXTBOX = 23;
-
-#if IX_WEBVIEW
+		
+#if IX_WIDGET
         /**
-		 * Event for making a request from JavaScript to MoSync.
+		 * Event sent when a Widget is opened.
+		 * MAEvent.widget.handle is set to the widget handle.
 		 */
-        WEBVIEW_REQUEST = 100;
+        WIDGET_OPENED = 101;
 		
         /**
-		 * Event sent when a WebView is created.
+		 * Event sent when a Widget is closed.
+		 * MAEvent.widget.handle is set to the widget handle.
 		 */
-        WEBVIEW_OPENED = 101;
+        WIDGET_CLOSED = 102;
 		
         /**
-		 * Event sent when a WebView is closed.
+		 * Event sent when a widget has completed loading content data.
+		 * MAEvent.widget.handle is set to the widget handle.
 		 */
-        WEBVIEW_CLOSED = 102;
+        WIDGET_CONTENT_LOADED = 103;
 		
         /**
-		 * Event sent when a page load is complete.
-		 * Send url in the request param?
+		 * Event for sending a command from a Widget to MoSync.
+		 * MAEvent.widget.handle is set to the widget handle.
+		 * MAEvent.widget.commandId can be used for retrieving the command data string.
+		 * Used by WebViews to send requests from JavaScript to MoSync.
 		 */
-        WEBVIEW_PAGE_LOADED = 103;
-		
+        WIDGET_COMMAND = 104;
 #endif
 	}
 
@@ -1332,15 +1336,27 @@ interface MAAPI {
 			} textbox;
 			
 			/**
+			* Used for widget events.
+			*/
+			struct {
+				/**
+				* Widget type.
+				*/
+				int widgetType;
+				/**
+				* Widget handle.
+				*/
+				MAHandle widgetHandle;
+				/**
+				* The id of a command event.
+				*/
+				int widgetCommandId;
+			} widget;
+			
+			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
-
-			/**
-			* WebView request expressed as a string.
-			* TODO: Change to use syscall!
-			*/
-			//char request[256];
 		}
 	}
 
@@ -2941,123 +2957,91 @@ interface MAAPI {
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
-#if IX_WEBVIEW
+#if IX_WIDGET
 
-		constset int WEBVIEW_ {
-			/// Success code.
+		constset int WIDGET_ {
+			// Success code.
 			OK = 0;
-			/// Generic error code.
+			// Generic error code.
 			ERROR = -1;
-			/// WebView is not open.
-			NOT_OPEN = -2;
+			// Script error.
+			SCRIPT_ERROR = -2;
+			// Root widget.
+			ROOT = -100;
 		}
 	
+		constset int WIDGET_TYPE_ {
+			WEBVIEW = 101;
+		}
+		
 		/** 
-		 * Create and open a fullscreen WebView.
-		 * There is only one WebView instance in the system.
+		 * Create a new widget.
+		 * \returns A handle to the widget. Returns WIDGET_ERROR 
+		 * if the widget could not be created.
+		 */
+		MAHandle maWidgetCreate(in int widgetType);
+		
+		/** 
+		 * Destroy a widget. Calling it a second time does nothing.
+		 */
+		void maWidgetDestroy(in MAHandle widgetHandle);
+		
+		/** 
+		 * Open a widget inside the given parent widget.
+		 * Use WIDGET_ROOT to open a widget to the root window.
 		 * \returns A status code.
 		 */
-		int maWebViewOpen();
+		int maWidgetOpen(in MAHandle widgetHandle, in MAHandle widgetParentHandle);
 
 		/** 
-		 * Close and destroy a fullscreen WebView.
+		 * Removes a widget from its parent (but does not destroy it).
 		 * \returns A status code.
 		 */
-		int maWebViewClose();
+		int maWidgetClose(in MAHandle widgetHandle);
 		
-		/*
-		 * Show a fullscreen WebView.
+		/**
+		 * Set the html content of a WebView widget.
+		 * Sends event EVENT_TYPE_WIDGET_CONTENT_LOADED when the operation is complete.
 		 * \returns A status code.
 		 */
-		// TODO: int maWebViewShow();
-		
-		/*
-		 * Hide a fullscreen WebView.
-		 * \returns A status code.
-		 */
-		// TODO: int maWebViewHide();
-		
-		/*
-		 * Return non zero if a fullscreen WebView is open and visible.
-		 * \returns Non-zero if a WebView is visible, zero if not.
-		 */
-		// TODO: int maWebViewIsVisible();
+		int maWidgetLoadHTML(in MAHandle widgetHandle, in MAString html);
 
 		/**
-		 * Display html content in an WebView.
-		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
-		 * when content is fully displayed.
-		 * The WebView must be open.
+		 * Load content of a url into a WebView widget.
+		 * Sends event EVENT_TYPE_WIDGET_CONTENT_LOADED when the operation is complete.
 		 * \returns A status code.
 		 */
-		int maWebViewSetHTML(in MAString html);
-		
-		/*
-		 * Display Unicode html content in an WebView.
-		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
-		 * when content is fully displayed.
-		 * The WebView must be open.
-		 * \returns A status code.
-		 */
-		// TODO: int maWebViewSetHTMLW(in MAWString html);
-		
-		/**
-		 * Load a url in an WebView.
-		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
-		 * when page is fully displayed.
-		 * The WebView must be open.
-		 * \returns A status code.
-		 */
-		int maWebViewLoadURL(in MAString url);
-		
-		/*
-		 * Load a Unicode url in an WebView.
-		 * Reports EVENT_TYPE_WEBVIEW_PAGE_LOADED 
-		 * when page is fully displayed.
-		 * The WebView must be open.
-		 * \returns A status code.
-		 */
-		// TODO: int maWebViewLoadURLW(in MAWString url);
+		int maWidgetLoadURL(in MAHandle widgetHandle, in MAString url);
 
 		/**
-		 * Evaluate JavaScript code in the WebView.
-		 * The WebView must be open.
+		 * Evaluate JavaScript code in a WebView widget.
 		 * \returns A status code.
 		 */
-		int maWebViewEvaluateScript(in MAString script);
-		
-		/*
-		 * Evaluate Unicode JavaScript code in the WebView.
-		 * The WebView must be open.
-		 * \returns A status code.
-		 */
-		// TODO: int maWebViewEvaluateScriptW(in MAWString script);
-		
+		int maWidgetEvaluateScript(in MAHandle widgetHandle, in MAString script);
+
 		/**
-		 * Get the size of the given request.
-		 * \returns The number of characters in the string.
+		 * Get the size of a command string.
+		 * The command id is in MAEvent.widget.commandId.
+		 * \returns The number of characters needed to hold the 
+		 * string, including the null termination character.
 		 */
-		int maWebViewGetRequestSize(in int requestID);
-		
+		int maWidgetGetCommandSize(in int commandId);
+
 		/**
-		 * Get the string of the given request.
-		 * The caller should use maWebViewGetRequestSize to ensure 
+		 * Get the command string for a command id.
+		 * The command id is in MAEvent.widget.commandId.
+		 * The caller should use maWidgetGetCommandSize to ensure 
 		 * that the buffer is sufficienly large to hold the data.
-		 * The request does not include the "mosync://" protocol specifier.
-		 * \returns A status code.
+		 * The returned data string is zero terminated.
+		 * Command data can only be retrieved once, the system deallocates
+		 * the memory used to hold the data when retrieved. A second call
+		 * to this function with the same commandId will return WIDGET_ERROR.
+		 * \returns Thenumber of characters copied to the buffer, including
+		 * the null termination character.
 		 */
-		int maWebViewGetRequest(in int requestID, out MAString buf, in int bufSize);
+		int maWidgetGetCommand(in int commandId, out MAString buf, in int bufSize);
 		
-		/*
-		 * Get the Unicode string of the given request.
-		 * The caller should use maWebViewGetRequestSize to ensure 
-		 * that the buffer is sufficienly large to hold the data.
-		 * TODO: Is bufSize the number of bytes or characters the buffer can hold?
-		 * \returns A status code.
-		 */
-		// TODO: int maWebViewGetRequestW(in int requestID, out MAWString buf, int bufSize);
-		
-#endif //IX_WEBVIEW
+#endif //IX_WIDGET
 
 		/**
 		* \brief The camera format, in pixels.

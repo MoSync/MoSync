@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/cpp_defs.h>
 #include <helpers/fifo.h>
-#include <helpers/CPP_IX_WEBVIEW.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 #include <jni.h>
 
@@ -1376,45 +1376,11 @@ namespace Base
 		case maIOCtl_maShowVirtualKeyboard:
 			SYSLOG("maIOCtl_maShowVirtualKeyboard");
 			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
-				
-		case maIOCtl_maTextBox:
-			SYSLOG("maIOCtl_maTextBox");
 		
-		case maIOCtl_maWebViewOpen:
-			SYSLOG("maIOCtl_maWebViewOpen");
-			return _maWebViewOpen(mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewClose:
-			SYSLOG("maIOCtl_maWebViewClose");
-			return _maWebViewClose(mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewSetHTML:
-			SYSLOG("maIOCtl_maWebViewSetHTML");
-			return _maWebViewSetHTML(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewLoadURL:
-			SYSLOG("maIOCtl_maWebViewLoadURL");
-			return _maWebViewLoadURL(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewEvaluateScript:
-			SYSLOG("maIOCtl_maWebViewEvaluateScript");
-			return _maWebViewEvaluateScript(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewGetRequestSize:
-			SYSLOG("maIOCtl_maWebViewGetRequestSize");
-			return _maWebViewGetRequestSize(a, mJNIEnv, mJThis);
-			
-		case maIOCtl_maWebViewGetRequest:
+		case maIOCtl_maTextBox:
 		{
-			SYSLOG("maIOCtl_maWebViewGetRequest");
-			return _maWebViewGetRequest(
-				a, 
-				(int)SYSCALL_THIS->GetValidatedMemRange(b, c), 
-				(int)gCore->mem_ds, 
-				c, 
-				mJNIEnv, 
-				mJThis);
-
+			SYSLOG("maIOCtl_maTextBox");
+			
 			// Send a focus lost event since the application will run in the background during the time the maTextBox is running
 			MAEvent event;
 			event.type = EVENT_TYPE_FOCUS_LOST;
@@ -1430,8 +1396,58 @@ namespace Base
 			// Allocate memory for the output buffer
 			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange( c, _maxSize * sizeof(char) );
 			// Call the actual internal _maTextBox function
-			return _maTextBox(_title, _inText, _outText, _maxSize,  _constraints, (int)gCore->mem_ds, mJNIEnv, mJThis);
+			return _maTextBox(
+				_title, 
+				_inText, 
+				_outText, 
+				_maxSize,
+				_constraints, 
+				(int)gCore->mem_ds, 
+				mJNIEnv, 
+				mJThis);
 		}
+		
+		case maIOCtl_maWidgetCreate:
+			SYSLOG("maIOCtl_maWidgetCreate");
+			return _maWidgetCreate(a, mJNIEnv, mJThis);
+		
+		case maIOCtl_maWidgetDestroy:
+			SYSLOG("maIOCtl_maWidgetDestroy");
+			return _maWidgetDestroy(a, mJNIEnv, mJThis);
+		
+		case maIOCtl_maWidgetOpen:
+			SYSLOG("maIOCtl_maWidgetOpen");
+			return _maWidgetOpen(a, b, mJNIEnv, mJThis);
+		
+		case maIOCtl_maWidgetClose:
+			SYSLOG("maIOCtl_maWidgetClose");
+			return _maWidgetClose(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetLoadHTML:
+			SYSLOG("maIOCtl_maWidgetLoadHTML");
+			return _maWidgetLoadHTML(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+		
+		case maIOCtl_maWidgetLoadURL:
+			SYSLOG("maIOCtl_maWidgetLoadURL");
+			return _maWidgetLoadURL(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetEvaluateScript:
+			SYSLOG("maIOCtl_maWidgetEvaluateScript");
+			return _maWidgetEvaluateScript(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetCommandSize:
+			SYSLOG("maIOCtl_maWidgetGetCommandSize");
+			return _maWidgetGetCommandSize(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetCommand:
+			SYSLOG("maIOCtl_maWidgetGetCommand");
+			return _maWidgetGetCommand(
+				a, 
+				(int)SYSCALL_THIS->GetValidatedMemRange(b, c), 
+				(int)gCore->mem_ds, 
+				c, 
+				mJNIEnv, 
+				mJThis);
 		
 		} // switch
 		

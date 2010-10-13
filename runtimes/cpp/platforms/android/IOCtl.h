@@ -109,12 +109,14 @@ namespace Base
 	 */
 	int _maTextBox(const wchar* title, const wchar* inText, int outText, int maxSize, int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	// WebView API
-	int _maWebViewOpen(JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewClose(JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewSetHTML(const char* html, JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewLoadURL(const char* url, JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewEvaluateScript(const char* script, JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewGetRequestSize(int requestID, JNIEnv* jNIEnv, jobject jThis);
-	int _maWebViewGetRequest(int requestID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
+	// Widget API
+	int _maWidgetCreate(int widgetType, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetDestroy(int widgetHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetOpen(int widgetHandle, int widgetParentHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetClose(int widgetHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetLoadHTML(int widgetHandle, const char* html, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetLoadURL(int widgetHandle, const char* url, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetEvaluateScript(int widgetHandle, const char* script, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetCommandSize(int commandID, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetCommand(int commandID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 }

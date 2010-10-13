@@ -1,7 +1,7 @@
 #include <ma.h>
 #include <mastring.h>
 #include <mavsprintf.h>
-#include <MAWebView.h>
+#include <WidgetCommand.h>
 
 // Test that JavaScript runs in the browser.
 #define HTML1 " \
@@ -33,17 +33,17 @@
 	</head> \
 	<body> \
 	<script> \
-		function MoSyncRequest(request) { \
-			document.location = 'mosync://' + request; } \
+		function MoSyncCommand(command) { \
+			document.location = 'mosync://' + command; } \
 		function ProcessData() { \
-			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncRequest(request); } \
+			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncCommand(command); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Green')\">Green</a> \
 	</div> \
 	<div id=\"ColorMessage\"></div> \
 	<div> \
@@ -52,8 +52,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -69,17 +69,17 @@
 	</head> \
 	<body> \
 	<script> \
-		function MoSyncRequest(request) { \
-			document.location = 'mosync://' + request; } \
+		function MoSyncCommand(command) { \
+			document.location = 'mosync://' + command; } \
 		function ProcessData() { \
-			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncRequest(request); } \
+			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncCommand(command); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncRequest('BgColor/Green')\">Green</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Green')\">Green</a> \
 	</div> \
 	<div id=\"ColorMessage\"></div> \
 	<div> \
@@ -88,8 +88,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -108,11 +108,11 @@
 		function SetBgColor(color) { \
 			document.getElementById('ColorMessage').innerHTML = color + ' is a beautiful color!'; \
 			document.bgColor = color; } \
-		function MoSyncRequest(request) { \
-			document.location = 'mosync://' + request; } \
+		function MoSyncCommand(command) { \
+			document.location = 'mosync://' + command; } \
 		function ProcessData() { \
-			var request = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncRequest(request); } \
+			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncCommand(command); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
@@ -127,8 +127,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncRequest('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -141,23 +141,69 @@
 	document.getElementById(\"DataMessage\").innerHTML = '%s'; \
 	"
 
-void SetBgColor(char* color)
+static void SetBgColor(int webView, char* color)
 {
-	char* script = (char*) maWebViewAllocateData(strlen(BGCOLOR_SCRIPT) + strlen(color) + strlen(color) + 1);
+	char* script = (char*) WidgetCommandAllocateString(strlen(BGCOLOR_SCRIPT) + strlen(color) + strlen(color) + 1);
 	sprintf(script, BGCOLOR_SCRIPT, color, color);
-	maWebViewEvaluateScript(script);
-	maWebViewFreeData(script);
+	maWidgetEvaluateScript(webView, script);
+	WidgetCommandFreeString(script);
 }
 
-void DisplayData(char* data)
+static void DisplayData(int webView, char* data)
 {
-	char* script = (char*) maWebViewAllocateData(strlen(MESSAGE_SCRIPT) + strlen(data) + 1);
+	char* script = (char*) WidgetCommandAllocateString(strlen(MESSAGE_SCRIPT) + strlen(data) + 1);
 	sprintf(script, MESSAGE_SCRIPT, data);
-	maWebViewEvaluateScript(script);
-	maWebViewFreeData(script);
+	maWidgetEvaluateScript(webView, script);
+	WidgetCommandFreeString(script);
 }
 
-#ifndef COMMENT_OUT
+static void HandleCommand(MAHandle webView, MAEvent event)
+{
+	if (webView != event.widgetHandle)
+	{
+		return;
+	}
+
+	// Get command.
+	char* command = WidgetCommandGet(event.widgetCommandId);
+	if (NULL == command)
+	{
+		return;
+	}
+
+	// Process command.
+	if (WidgetCommandNameIs(command, "BgColor"))
+	{
+		char* color = WidgetCommandGetData(command);
+		if (color)
+		{
+			SetBgColor(webView, color); // This is where JS is called.
+			WidgetCommandFreeString(color);
+		}
+	}
+	else if (WidgetCommandNameIs(command, "ProcessData"))
+	{
+		// We just display the data without any processing to
+		// demonstrate that MoSync can recieve input and send
+		// back a result to the WebView.
+		char* data = WidgetCommandGetData(command);
+		if (data)
+		{
+			DisplayData(webView, data); // This is where JS is called.
+			WidgetCommandFreeString(data);
+		}
+	}
+	else if (WidgetCommandNameIs(command, "CloseWebView"))
+	{
+		maWidgetClose(webView);
+	}
+	else if (WidgetCommandNameIs(command, "ExitApp"))
+	{
+		maExit(0);
+	}
+	WidgetCommandFreeString(command);
+}
+
 int MAMain()
 {
 	MAEvent event;
@@ -169,7 +215,13 @@ int MAMain()
 	maUpdateScreen();
 
 	// Immediately open the WebView.
-	maWebViewOpen();
+	MAHandle webView = maWidgetCreate(WIDGET_TYPE_WEBVIEW);
+	if (WIDGET_ERROR == webView)
+	{
+		maExit(0);
+	}
+
+	maWidgetOpen(webView, WIDGET_ROOT);
 
 	while (1)
 	{
@@ -183,72 +235,32 @@ int MAMain()
 				case EVENT_TYPE_POINTER_PRESSED:
 					// If the WebView has been closed, touching
 					// the screen will open it.
-					maWebViewOpen();
+					maWidgetOpen(webView, WIDGET_ROOT);
 					break;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (event.key == MAK_0) { maWebViewClose(); }
-					if (event.key == MAK_1) { maWebViewOpen(); }
-					if (event.key == MAK_2) { SetBgColor("Gray"); }
-					if (event.key == MAK_3) { SetBgColor("White"); }
-					if (event.key == MAK_4) { SetBgColor("Pink"); }
-					if (event.key == MAK_5) { SetBgColor("Orange"); }
-					if (event.key == MAK_6) { SetBgColor("Chocolate"); }
-					if (event.key == MAK_7) { SetBgColor("ABCDEF"); }
-					if (event.key == MAK_8) { SetBgColor("DeepPink"); }
-					if (event.key == MAK_9) { SetBgColor("Gold"); }
+					if (event.key == MAK_0) { maWidgetClose(webView); }
+					if (event.key == MAK_1) { maWidgetOpen(webView, WIDGET_ROOT); }
+					if (event.key == MAK_2) { SetBgColor(webView, "Gray"); }
+					if (event.key == MAK_3) { SetBgColor(webView, "White"); }
+					if (event.key == MAK_4) { SetBgColor(webView, "Pink"); }
+					if (event.key == MAK_5) { SetBgColor(webView, "Orange"); }
+					if (event.key == MAK_6) { SetBgColor(webView, "Chocolate"); }
+					if (event.key == MAK_7) { SetBgColor(webView, "ABCDEF"); }
+					if (event.key == MAK_8) { SetBgColor(webView, "DeepPink"); }
+					if (event.key == MAK_9) { SetBgColor(webView, "Gold"); }
 					if (event.key == MAK_BACK) { maExit(0); }
 					break;
 
-				case EVENT_TYPE_WEBVIEW_OPENED:
+				case EVENT_TYPE_WIDGET_OPENED:
 					// Must wait to set the HTML until this event to make
 					// sure the WebView is fully created before use.
-					maWebViewSetHTML(HTML6); /// HTML4
+					maWidgetLoadHTML(webView, HTML6); /// HTML4
 					break;
 
-				case EVENT_TYPE_WEBVIEW_REQUEST:
-					// This is where requests from the WebView are handled.
-					// I have used a block hete to be able to declare local
-					// variables inside a case-statement (would be better to
-					// move this to a separate function).
-					{
-						// Get request.
-						int size = maWebViewGetRequestSize(event.key);
-						char* request = (char*) maWebViewAllocateData(size);
-						int result = maWebViewGetRequest(event.key, request, size);
-						if (result < 1) { break; }
-
-						// Process request.
-						if (maWebViewRequestIs(request, "BgColor"))
-						{
-							char* color = maWebViewGetRequestData(request);
-							if (color)
-							{
-								SetBgColor(color); // This is where JS is called.
-								maWebViewFreeData(color);
-							}
-						}
-						else if (maWebViewRequestIs(request, "ProcessData"))
-						{
-							// We just display the data without any processing to
-							// demonstrate that MoSync can recieve input and send
-							// back a result to the WebView.
-							char* data = maWebViewGetRequestData(request);
-							if (data)
-							{
-								DisplayData(data); // This is where JS is called.
-								maWebViewFreeData(data);
-							}
-						}
-						else if (maWebViewRequestIs(request, "CloseWebView"))
-						{
-							maWebViewClose();
-						}
-						else if (maWebViewRequestIs(request, "ExitApp"))
-						{
-							maExit(0);
-						}
-					}
+				case EVENT_TYPE_WIDGET_COMMAND:
+					// Handle commands from the WebView widget here.
+					HandleCommand(webView, event);
 					break;
 			}
 		}
@@ -257,8 +269,8 @@ int MAMain()
 		//maWait(0);
 	}
 
-	//maWebViewClose();
+	//maWidgetClose(webView);
+	maWidgetDestroy(webView);
 
 	return 0;
 }
-#endif
