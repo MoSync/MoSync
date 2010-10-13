@@ -51,7 +51,7 @@ namespace MAUI {
 		  * \param gridXSize the number of columns in the grid.
 		  * \param gridYSize the number of rows in the grid.
 		  **/
-		GridLayout(int x, int y, int width, int height, int gridXSize, int gridYSize);
+		GridLayout(int x=0, int y=0, int width=0, int height=0, int gridXSize=2, int gridYSize=2);
 
 		/** Overloaded implementation of Widget::add(), with the same external semantics.
 		    **/

@@ -54,7 +54,7 @@ namespace MAUI {
 		  * \param gridXSize the number of columns in the grid.
 		  * \param gridYSize the number of rows in the grid.
 		  **/
-		StackLayout(int x, int y, int width, int height, Orientation ori=SLO_VERTICAL, Alignment ali=SLA_AUTO_SIZE);
+		StackLayout(int x=0, int y=0, int width=0, int height=0, Orientation ori=SLO_VERTICAL, Alignment ali=SLA_AUTO_SIZE);
 
 		/** Overloaded implementation of Widget::add(), with the same external semantics.
 		    **/

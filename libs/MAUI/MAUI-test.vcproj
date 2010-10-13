@@ -306,6 +306,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\RelativeLayout.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\RelativeLayout.h"
+			>
+		</File>
+		<File
 			RelativePath=".\res.lst"
 			>
 			<FileConfiguration

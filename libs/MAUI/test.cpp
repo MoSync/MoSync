@@ -6,6 +6,7 @@
 #include <MAUI/Engine.h>
 #include <MAUI/GridLayout.h>
 #include <MAUI/StackLayout.h>
+#include <MAUI/RelativeLayout.h>
 #include <MAUI/Image.h>
 #include <MAUI/Drawables.h>
 
@@ -450,9 +451,19 @@ public:
 			*/
 
 			mainListbox->add(multiLineLabel);
-
-
 			mainListbox->add(image);
+
+			RelativeLayout* relLayout = new RelativeLayout(0, 0, 0, 100);
+			Label* label1 = new Label(4, 20, 0, 0, "test1");
+			label1->setAutoSizeX(true); label1->setAutoSizeY(true);
+			Label* label2 = new Label(59, 50, 0, 0, "test2");
+			label2->setAutoSizeX(true); label2->setAutoSizeY(true);
+			relLayout->add(label1);
+			relLayout->add(label2);
+			mainListbox->add(relLayout);
+
+
+
 
 			Button *button;
 			for(int i = 0; i < 16; i++) {

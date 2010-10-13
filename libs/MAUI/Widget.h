@@ -124,7 +124,7 @@ namespace MAUI {
 
 	class Widget {
 		friend class Screen;
-		friend class GridLayout;
+		//friend class GridLayout;
 
 	public:
 		/**
@@ -144,16 +144,16 @@ namespace MAUI {
 		**/
 		virtual void add(Widget* w);
 
+		/**
+		* \brief removes A children from the widget. 
+		* \note The parent of the children will automatically be removed.
+		* \param w The widget to be added.
+		**/
 		virtual void remove(Widget* w);
-
-		// todo: Do these functions:
-		// virtual void remove(Widget* w);
-		// virtual int getNumChildren() const;
-		// and remove getChildren()
 
 		/**
 		* \brief Function used to remove all children from a widget. 
-		* \note The parent of the children will automatically removed.
+		* \note The parent of the children will automatically be removed.
 		**/
 		virtual void clear();
 
@@ -184,7 +184,7 @@ namespace MAUI {
 		const Vector<Widget*>& getChildren() const;		
 
 		/** 
-		* \brief Renders the Widget and all its children recursively.
+		* \brief Renders the Widget and all its descendants recursively.
 		* \note This function should never be used directly (it's handled by the system). Use requestRepaint instead.
 		* \note It should also most likely never have to be overriden, override drawInternal instead.
 		* \param forceDraw If it is set to true, the dirty flag won't be taken into account (the widget will be redrawn anyway).
@@ -535,16 +535,21 @@ namespace MAUI {
 		void restyleAll();
 
 	protected:
+		/**
+		 * \brief Returns the nearest widget to this in the direction specified out of \a w1 and \a w2.
+		 */
 		Widget* nearestWidget(Widget* w1, Widget* w2, Direction dir);
+
+		/**
+		 * \brief Returns the nearest focusable in the direction to \a w.
+		 */
 		Widget* getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best=NULL);
 
 
 		/**
-		* This is the only function that is absolutely neccesary
-		* to implement when inheriting Widget to create a custom widget.
-		* It is responsible for painting the widget. When it is called, the widget
-		* must respect its own padded bounds and not extend rendering beyond that
-		* area.
+		* When creating a custom widget, this is the function responsible for painting the widget. 
+		* When it is called, the widget must respect its own padded bounds and not extend rendering beyond that
+		* area. If it does, the rendering will be clipped to the padded bounds.
 		**/
 		virtual void drawWidget() = 0;
 
@@ -565,7 +570,6 @@ namespace MAUI {
 		* The recursive function used by updateAbsolutePosition().
 		**/
 		void updateAbsolutePositionChildren(int x, int y);
-
 
 		/**
 		* Used to recalculate the padded bounds from the global bounds.
@@ -611,8 +615,10 @@ namespace MAUI {
 		bool mDirty;
 		bool mHasRequestedUpdate; // must update layout etc.
 
-		// used to keep which state the widget is in (selected or unselected)
+		// used to keep which state the widget is in (focused or unfocused)
 		bool mFocused;
+
+		// used to keep which enable state the focus is in (if it isn't enabled, it won't be drawn).
 		bool mEnabled;
 
 		// a list of widget listeners

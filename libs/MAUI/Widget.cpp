@@ -36,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUI {
 
 	Widget::Widget(int x, int y, int width, int height)
-		: mParent(NULL), mBounds(x,y,width,height), mRelX(0), mRelY(0),
+		: mParent(NULL), mBounds(x,y,width,height), mRelX(x), mRelY(y),
 		mDirty(false),
 		mHasRequestedUpdate(true),
 		mFocused(false),
@@ -120,12 +120,6 @@ namespace MAUI {
 			Gfx_translate(mPaddingLeft, mPaddingTop);
 			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
-			Gfx_translate(getTranslationX(), getTranslationY());
-
-			if(res) {
-				if(isDirty() || forceDraw) {
-					drawWidget();
-
 #if 1
 					if(mFocused) {
 						maSetColor(0x00ff00);
@@ -136,6 +130,12 @@ namespace MAUI {
 
 					}
 #endif
+
+			Gfx_translate(getTranslationX(), getTranslationY());
+
+			if(res) {
+				if(isDirty() || forceDraw) {
+					drawWidget();
 				}
 
 				Vector_each(Widget*, it, mChildren)
