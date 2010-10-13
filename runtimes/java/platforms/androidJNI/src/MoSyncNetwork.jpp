@@ -1019,8 +1019,8 @@ class UrlConnectionObject extends ConnectionObject
 			int i = 0;
 			while (true)
 			{
-				String key = mConnection.getHeaderFieldKey(i);
-				String value = mConnection.getHeaderField(i);
+				String key = mUrlConnection.getHeaderFieldKey(i);
+				String value = mUrlConnection.getHeaderField(i);
 				DEBUG_ALWAYS(key + ": " + value + "\n");
 				if(key == null && value == null)
 				{
