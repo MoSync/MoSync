@@ -116,6 +116,9 @@ int SslConnection::connect() {
 	CFReadStreamRef readStream;
 	CFWriteStreamRef writeStream;
 	CFStreamCreatePairWithSocketToHost(NULL, hostname, mPort, &readStream, &writeStream);
+	if (readStream == NULL || writeStream == NULL) {
+		return CONNERR_SSL;
+	}
 	
 	// Set up the streams for SSL.
 	// The highest level security protocol that can be negotiated
