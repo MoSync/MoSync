@@ -409,6 +409,11 @@ void networkCopyStringToMemory(int address, String str)
 
 /**
  * Specialised method used to avoid code duplication.
+ * Writes data to the structure MAConnAddr/MAConnAddrBt.
+ * @param addrPointer The address un MoSync memory where to write data.
+ * @param port Port number.
+ * @param addr The address of the Bluetooth device.
+ * @return 1 on success, -1 on failure.
  */
 int networkCopyBluetoothAddressToMemory(int addrPointer, int port, byte[] addr)
 {
@@ -491,7 +496,8 @@ int networkConnGetLocalAddr(int addrPointer)
 		else if (CONN_FAMILY_BT == family)
 		{
 #ifdef _ANDROID_BLUETOOTH
-			// Write address data. Use zero as port number.
+			// Write address data. Use zero as port number
+			// since we do not know the port.
 			return networkCopyBluetoothAddressToMemory(
 				addrPointer,
 				0, // Port
@@ -1301,6 +1307,9 @@ class SocketConnectionObject extends ConnectionObject
 
 } // End of class SocketConnectionObject
 
+/**
+ * This class handles SSL connections.
+ */
 class SecureSocketConnectionObject extends SocketConnectionObject
 {	
 	/**
@@ -1312,6 +1321,10 @@ class SecureSocketConnectionObject extends SocketConnectionObject
 	
 	/**
 	 * Factory method that creates a socket.
+	 * @param socketAddress The host name.
+	 * @param socketPort The port number.
+	 * @return A new socket.
+	 * @throws An exception if the socket cannot be created.
 	 */
 	@Override
 	Socket createSocket(String socketAddress, int socketPort) 
@@ -1428,6 +1441,12 @@ class BluetoothConnectionObject extends ConnectionObject
 		return this;
 	}
 	
+	/**
+	 * Write the address of the Bluetooth device to MoSync memory.
+	 * @param addrPointer The memory address in MoSync memory 
+	 * to write the Bluetooth address.
+	 * @return A status code.
+	 */
 	@Override
 	public int getAddr(int addrPointer)
 	{
@@ -1450,7 +1469,8 @@ class BluetoothConnectionObject extends ConnectionObject
 			addr = btGetDefaultAdapterAddressAsBytes();
 		}
 		
-		// Write address data. Use zero as port number.
+		// Write address data. Use zero as port number since 
+		// we do not know the port.
 		return networkCopyBluetoothAddressToMemory(
 			addrPointer, 
 			0, // Port
