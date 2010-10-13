@@ -196,7 +196,7 @@ using namespace Core;
 
 #define BLUETOOTH(func) SBT##func
 
-#if defined(__SERIES60_3X__) && !defined(__S60_50__)
+#if defined(__SERIES60_3X__)// && !defined(__S60_50__)
 #define MMF
 #endif
 

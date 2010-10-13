@@ -210,6 +210,15 @@ short Directives()
 
 	case dir_exit:
 	{
+		if (NextToken("\""))
+		{
+			GetStringName(1024);
+
+			Error(Error_Fatal, "User: %s", Name);
+			return 1;
+		}
+	
+	
 		Error(Error_Fatal, "Exiting with user error");
 		return 1;
 	}
@@ -277,6 +286,8 @@ short Directives()
 		Function_Return_Type = RET_void;
 
 		GetName();
+
+		ReplaceChar(Name, '.', '_');
 
 		Function_Param_Count = -1;
 
@@ -610,11 +621,43 @@ short Directives()
 		return 1;
 	}
 
+
+//---------------------------------------------------------
+
+	case dir_do:
+	{
+
+		// If we have a '{' just ignore it an keep going
+		
+		if (Token("{"))
+			return 1;
+	
+		// Must be an expression then
+
+		// if false then skip to while
+
+		if (!GetExpression())
+		{
+			SearchScopeForward();
+			NeedToken(".enddo");
+		}
+			
+		return 1;
+	}
+
+//---------------------------------------------------------
+
+	case dir_enddo:
+	{
+		FilePtr = SearchScope(FilePtr);			
+		return 1;
+	}
+
+
 //---------------------------------------------------------
 
 	case dir_while:
 	{
-	
 		if (GetExpression())
 		{
 			FilePtr = SearchScope(FilePtr);
@@ -1008,7 +1051,7 @@ void AsmEnums()
 }
 
 //****************************************
-//			 Search Scope
+//			 Search Scope (Backward)
 //****************************************
 
 char * SearchScope(char *StartPtr)
@@ -1039,6 +1082,18 @@ char * SearchScope(char *StartPtr)
 }
 
 //****************************************
+//		 Search Scope (Forward)
+//****************************************
+
+void SearchScopeForward()
+{
+	if (NextToken("{"))
+	{
+		SkipPair('{','}');
+	}
+}
+
+//****************************************
 //			 Get a identifier
 //****************************************
 
@@ -1062,7 +1117,6 @@ void GetQuoteStr(short maxlen)
 
 		if (v == '\\')
 		{
-//			FilePtr++;			// skip the '\'
 			v = GetEscCode();
 		}
 

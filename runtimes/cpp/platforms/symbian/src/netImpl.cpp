@@ -465,8 +465,19 @@ void Syscall::ConnOp::StartConnSubOpL() {
 #ifdef __WINSCW__
 		LHEL(r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp));
 #else
-		LHEL(r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp,
-			mSyscall.gConnection));
+		int res = r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp,
+			mSyscall.gConnection);
+		// Happens when phone goes from online to offline mode
+		// while a MoSync app is running.
+		if(res == KErrNotReady) {
+			SendResult(CONNERR_NETWORK);
+			// Prepare gConnection for restart.
+			mSyscall.gConnection.Close();
+			LOGS("gConnection.Close() successful\n");
+			mSyscall.gNetworkingState = EIdle;
+			break;
+		}
+		LHEL(res);
 #endif
 		r.resolver.GetByName(r.hostname, r.result, iStatus);
 		SetActive();

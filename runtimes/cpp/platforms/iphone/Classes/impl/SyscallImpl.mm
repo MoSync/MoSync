@@ -468,7 +468,7 @@ namespace Base {
 		// First get the image into your data buffer
 		//int imgwidth = CGImageGetWidth(img->image);
 		//int imgheight = CGImageGetHeight(img->image);
-		memset(dst, 0, scanlength*height*4);
+		//memset(dst, 0, scanlength*height*4);
 		
 		Surface *srcSurface = new Surface(smallImage);
 		
@@ -840,6 +840,12 @@ namespace Base {
 		MoSync_StopUpdatingLocation();
 		return 0;
 	}
+	
+	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
+		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
+		return 0;
+	}
+	
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -879,7 +885,9 @@ namespace Base {
 		maIOCtl_syscall_case(maFileClose);
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
-		maIOCtl_syscall_case(maFileSize);				
+		maIOCtl_syscall_case(maFileSize);	
+				
+		maIOCtl_case(maTextBox);
 				
 		}
 		

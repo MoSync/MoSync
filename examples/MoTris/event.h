@@ -34,6 +34,7 @@ public:
 #endif	// MA_PROF_SUPPORT_STYLUS
 	static bool quit;
 	static bool updated;
+	static bool focus;
 
 	static void updateEvents();
 };

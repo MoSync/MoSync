@@ -33,10 +33,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //
 //****************************************
 
+int CodeCopyInit = 0;
+
 void AsmMain()
 {
 	int p;
 	int t = GetTickCount();
+
+	CodeCopyInit = 0;
 
 //	PerfBegin();
 
@@ -68,6 +72,8 @@ void AsmMain()
 //-------------------------
 	
 	Final_Pass = 0;
+	RedefENum("__final__",0);
+
 
 	for (p=1;p<32;p++)
 	{
@@ -82,6 +88,7 @@ void AsmMain()
 //	printf("final pass. %i known symbols.\n", CountUsedSymbols());
 
 	Final_Pass = 1;
+	RedefENum("__final__",1);
 
 	AsmPass(p+1);
 
@@ -251,17 +258,11 @@ int AsmPass(int thisPass)
 	AlignDataSection();
 	MaxDataIP = DataIP;
 
+//	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
+
 	if (INFO)
 	{
-		printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d)\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass);
-
-		{
-			char buf[2560];
-			buf[0] = 0;
-			DisassembleFromSource(Last_Instruction, buf);
-			printf("%d: %s\n", Last_Instruction, buf);
-		}
-
+		DumpPipeDebugInfo();
 	}
 
 	// Check if the code is ready
@@ -290,7 +291,6 @@ int AsmPass(int thisPass)
 
 void Assemble()
 {
-//	int Line = 0;
 	char *FPtr = FilePtr;				// Preserve file pointer
 
 	FileLine = 0;
@@ -439,10 +439,18 @@ void GetAsmName()
 {
 	//unsigned int v = 0;
 	char *NamePtr = Name;
-	
+	char c;
+		
 	while (asmsym(*FilePtr))
-		*NamePtr++ = *FilePtr++;
-
+	{
+		c = *FilePtr++;
+		
+		if (c == '.')
+			c = '_';
+		
+		*NamePtr++ = c;
+	}
+	
 	*NamePtr++ = 0;
 
 	return;
@@ -734,3 +742,56 @@ void EmitCDtors()
 	Section = oldSect;
 }
 
+//****************************************
+//
+//****************************************
+
+void DumpPipeDebugInfo()
+{
+	char fname[80];
+	uint n = 0;
+	unsigned char a,b;
+	
+	printf("Sections: Code=%x : Data=%d : BSS=%x CDTOR(%d,%d) (Final %d) Far=%x\n",CodeIP, DataIP, BssIP, CtorCount, DtorCount, Final_Pass, _FAR);
+
+	if (CodeCopyInit && pass_count > 2)			// If the
+	{
+		int max = CodeMemArray.hi;
+		
+		if (CodeMemArrayCopy.hi > max)
+			max  = CodeMemArrayCopy.hi;
+	
+		for (n=0;n<max+1;n++)
+		{
+			a = ArrayGet(&CodeMemArray, n);
+			b = ArrayGet(&CodeMemArrayCopy, n);
+
+			if ((a != b) && (a != b+1) && (a != b-1))
+			{	
+				printf("Diff @ 0x%x (%d)\n", n, n);
+				break;
+			}
+		}
+	
+	} 
+
+	if (pass_count >= 30)			// If the
+	{
+
+		SYMBOL *s = FunctionAboveIP(n);
+
+		DisassembleFunc(s->Name, 1);
+	}
+	
+	ArrayClear(&CodeMemArrayCopy);
+	ArrayCopy(&CodeMemArrayCopy, &CodeMemArray);
+	CodeCopyInit = 1;
+
+	// Write out code sections
+
+	sprintf(fname, "code%d.bin", pass_count);
+	printf("Writing '%s'\n", fname);
+	
+	ArrayWrite(&CodeMemArray, fname);
+
+}

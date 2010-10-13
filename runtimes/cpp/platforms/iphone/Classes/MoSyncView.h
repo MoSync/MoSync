@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import <UIKit/UIKit.h>
 #import "MoSyncCLController.h"
+#include <helpers/cpp_defs.h>
 
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
@@ -26,6 +27,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
+-(void) showTextBox:(NSString*)title 
+			withInText:(NSString*)inText 
+			outText:(wchar*)outText 
+			maxSize:(int)maxSize 
+			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
 

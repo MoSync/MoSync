@@ -18,82 +18,81 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
-
+import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
-
 import android.util.Log;
-import java.util.Locale;
 
-import android.os.Handler;
+import java.util.Locale;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
-import android.content.res.Configuration;
-
-import android.content.Context;
-
-
-import android.content.pm.ActivityInfo;
-
 /**
-*
 * Main MoSync activity
 *
 * As long as this activity is running the application is running.
 */
 public class MoSync extends Activity
 {
-
-	MoSyncView mMoSyncView;
 	static public MoSyncThread mMoSyncThread;
+	MoSyncView mMoSyncView;
 	Intent mMoSyncServiceIntent;
-	
 	boolean mThreadHasDied = false;
-	
 	boolean mIsPaused = false;
 	
 	/**
-	*
 	* onCreate
 	*
-	* Informs the underlying system that a fullscreen windows with no title bar shall be used.
+	* Sets screen and window properties.
 	*
 	* Creates and initializes the MoSync thread
 	*
 	* Calls the createMoSyncView method and then shows the created view
-	*
 	*/
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) 
+	{
+		Log.i("MoSync", "*** onCreate");
+		
 		super.onCreate(savedInstanceState);
-		Log.i("MoSync", "onCreate");
 		
-		if(mThreadHasDied) this.finish();
+		if (mThreadHasDied) 
+		{ 
+			finish();
+			return;
+		}
 		
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		// TODO: If we want to, we could read orientation from settings file in assets.
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		// TODO: Read fullscreen setting from settings file in assets.
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		mMoSyncView = null;
 		
-		try{
+		try
+		{
 			mMoSyncThread = new MoSyncThread(this, new Handler());
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			Log.e("MoSync", "Unable to create thread! Application is closed!");
 			super.onDestroy();
-			this.finish();
+			finish();
 		}
 		
 		createMoSyncView();
 		
-		setContentView(mMoSyncView);
 		mMoSyncThread.setMoSyncView(mMoSyncView);
-		
+		setContentView(mMoSyncView);
     }
 	
 	/**
@@ -105,55 +104,62 @@ public class MoSync extends Activity
 	private void createMoSyncView()
 	{
 		Log.i("MoSync", "createMoSyncView");
-		try {
+		
+		try 
+		{
 			mMoSyncView = new MoSyncView(this, mMoSyncThread);
-        } catch(Exception e) {
-			Log.e("MoSync", "No view was generated.. app could not start!");
-			super.onDestroy();
-			this.finish();
+        } 
+		catch (Exception e) 
+		{
+			Log.e("MoSync", "The MoSyncView could not be created, the application could not start!");
+			super.onDestroy(); // TODO: Why is this called? Is it needed, will it cause problems?
+			finish();
 		}
 	}
 
 	/**
-	*
 	* onConfigurationChanged
 	* Handles the new configurations when the screen rotates and/or the keyboard was opened.
-	*
 	*/
 	@Override
 	public void onConfigurationChanged(Configuration config)
 	{
-		super.onConfigurationChanged(config);
+		Log.i("MoSync", "*** onConfigurationChanged");
 
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		setContentView(mMoSyncView);
+		super.onConfigurationChanged(config);
 	}
 	
 	/**
-	*
 	* onStop
-	* 
 	*/
     @Override
     protected void onStop()
 	{
+		Log.i("MoSync", "onStop");
+		
 		super.onStop();
-		Log.i("MoSync","onStop");
 		
 		mThreadHasDied = mMoSyncThread.isDead();
 		
 		// The view is destroyed, inform the thread about this
-		if(!mThreadHasDied)
+		if (!mThreadHasDied)
+		{
 			mMoSyncThread.setMoSyncView(null);
+		}
 	}
 
 	@Override
     protected void onRestart()
 	{
-		super.onRestart();
-		Log.i("MoSync","onRestart");
+		Log.i("MoSync", "onRestart");
 		
-		if(mThreadHasDied) this.finish();
+		super.onRestart();
+		
+		if (mThreadHasDied) 
+		{
+			finish();
+			return;
+		}
 		
 		// create a new view and inform the thread about this
 		createMoSyncView();
@@ -162,15 +168,19 @@ public class MoSync extends Activity
 	@Override
     protected void onResume()
 	{
-		super.onResume();
-		Log.i("MoSync","onResume");
+		Log.i("MoSync", "onResume");
 		
-		if(mThreadHasDied) this.finish();
+		super.onResume();
+		
+		if (mThreadHasDied) 
+		{
+			finish();
+		}
 		
 		// this should be dealt with differently
 		//registerReceiver(mBatteryReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
 		
-		if(mIsPaused == true)
+		if (mIsPaused)
 		{
 			mIsPaused = false;
 			
@@ -183,8 +193,9 @@ public class MoSync extends Activity
 	@Override
     protected void onPause()
 	{
+		Log.i("MoSync", "onPause");
+		
 		super.onPause();
-		Log.i("MoSync","onPause");
 		
 		mThreadHasDied = mMoSyncThread.isDead();
 			
@@ -198,8 +209,9 @@ public class MoSync extends Activity
 	@Override
     protected void onDestroy()
 	{
+    	Log.i("MoSync", "onDestroy");
+		
 		super.onDestroy();	
-    	Log.i("MoSync","onDestroy");
 		
 		mThreadHasDied = mMoSyncThread.isDead();
 		
@@ -209,5 +221,4 @@ public class MoSync extends Activity
 		finish();
 		//mMosyncView.killApplication();
     }
-	
 }

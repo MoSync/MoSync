@@ -4,7 +4,7 @@
 
 	.sourcefile 'crtlib.s'
 
-	.line 0
+	.line 1
 
 //****************************************
 //				Globals
@@ -64,52 +64,55 @@ __stacktop:
 .ifdefglobal _MATestMain
 {		
 	call &_MATestMain
-	jp &crt_exit
 	.set mainok=mainok+1
 }
 
 .ifdefglobal __Z10MATestMainv
 {		
 	call &__Z10MATestMainv
-	jp &crt_exit
 	.set mainok=mainok+1
 }
 
 .ifdefglobal __Z10MATestMainiPPc
 {		
 	call &__Z10MATestMainiPPc
-	jp &crt_exit
 	.set mainok=mainok+1
 }
 
-.ifdefglobal _MAMain
-{		
-	call &_MAMain
-	.set mainok=mainok+1
+.if ( mainok == 0 )
+{
+	.ifdefglobal _MAMain
+	{		
+		call &_MAMain
+		.set mainok=mainok+1
+	}
+
+	.ifdefglobal __Z6MAMainv
+	{
+		call &__Z6MAMainv
+		.set mainok=mainok+1
+	}
+
+	.ifdefglobal __Z6MAMainiPPc
+	{
+		call &__Z6MAMainiPPc
+		.set mainok=mainok+1
+	}
 }
 
-.ifdefglobal __Z6MAMainv
-{
-	call &__Z6MAMainv
-	.set mainok=mainok+1
-}
+.if ( __final__ )
+{	
+	.if ( mainok == 0 )
+	{
+		.print "Unresolved entry point: MAMain"
+		.exit
+	}
 
-.ifdefglobal __Z6MAMainiPPc
-{
-	call &__Z6MAMainiPPc
-	.set mainok=mainok+1
-}
-
-.if mainok==0
-{
-	.print "Unresolved symbol: MAMain"
-	.exit
-}
-
-.if mainok>1
-{
-	.print "Multiple entry points: MAMain"
-	.exit
+	.if ( mainok > 1 )
+	{
+		.print "Multiple entry points: MAMain"
+		.exit
+	}
 }
 
 crt_exit:

@@ -22,12 +22,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class DownloaderTest : private MAUtil::DownloadListener, public MATest::TestCase {
 public:
-	DownloaderTest() : TestCase("Downloader") {}
+	DownloaderTest(String url) : TestCase("Downloader"), mURL(url) {}
 
 	void start() {
-		printf("Automated Downloader test\n");
+		printf("Automated Downloader test, url: %s\n", mURL.c_str());
 		mDown.addDownloadListener(this);
-		int res = mDown.beginDownloading("http://www.example.com/");
+		int res = mDown.beginDownloading(mURL.c_str());
 		printf("begin: %i\n", res);
 
 		if(res <= 0) {
@@ -57,9 +57,11 @@ public:
 	}
 private:
 	MAUtil::Downloader mDown;
+	MAUtil::String mURL;
 };
 
 void addDownloaderTests(MATest::TestSuite* suite);
 void addDownloaderTests(MATest::TestSuite* suite) {
-	suite->addTestCase(new DownloaderTest);
+	suite->addTestCase(new DownloaderTest("http://www.example.com/"));
+	suite->addTestCase(new DownloaderTest("https://secure.wikimedia.org/"));
 }

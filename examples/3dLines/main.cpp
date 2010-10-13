@@ -218,21 +218,26 @@ int MAMain()
 {
 	int mode = 1;
 	bool run = true;
+	bool focus = true;
 
 	init();
 
 	while(run) {
-		/// Choose drawing function depending on mode.
-		if(mode)
-			drawOne(maGetMilliSecondCount()*2);
-		else
-			drawLots(maGetMilliSecondCount()*2);
+		if(focus) {
+			/// Choose drawing function depending on mode.
+			if(mode)
+				drawOne(maGetMilliSecondCount()*2);
+			else
+				drawLots(maGetMilliSecondCount()*2);
 
-		/// Updates the screen
-		maUpdateScreen();
+			/// Updates the screen
+			maUpdateScreen();
 
-		/// Keep the backlight alive.
-		maResetBacklight();
+			/// Keep the backlight alive.
+			maResetBacklight();
+		} else {
+			maWait(0);
+		}
 
 		/// Get any available events.
 		/// If MAK_FIRE is pressed, change mode.
@@ -256,6 +261,10 @@ int MAMain()
 			{
 				run = false;
 				break;
+			} else if(event.type == EVENT_TYPE_FOCUS_LOST) {
+				focus = false;
+			} else if(event.type == EVENT_TYPE_FOCUS_GAINED) {
+				focus = true;
 			}
 		}
 	}

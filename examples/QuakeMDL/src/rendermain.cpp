@@ -27,6 +27,7 @@ int RenderMain ( void )
 					rotRadX = 0.0f;
 	char			textBuffer[128];
 	bool 			keyTable[4] = { false };
+	bool focus = true;
 
 	Matrix4fi		transMatrix( false );
 	MAExtent		size = maGetScrSize( );
@@ -54,6 +55,10 @@ int RenderMain ( void )
 				 e.type == EVENT_TYPE_KEY_PRESSED ||
 				 e.type == EVENT_TYPE_POINTER_PRESSED )
 				maExit(0);
+			else if(e.type == EVENT_TYPE_FOCUS_LOST)
+				focus = false;
+			else if(e.type == EVENT_TYPE_FOCUS_GAINED)
+				focus = true;
 
 			else if ( e.type == EVENT_TYPE_KEY_PRESSED )
 			{
@@ -79,68 +84,72 @@ int RenderMain ( void )
 			}
 		}
 
-		if ( keyTable[MAK_LEFT-MAK_UP] )
-			rotRadY -= (float)M_PI / 60;
-		else if ( keyTable[MAK_RIGHT-MAK_UP] )
-			rotRadY += (float)M_PI / 60;
-		else if ( keyTable[MAK_UP-MAK_UP] )
-			rotRadX -= (float)M_PI / 60;
-		else if ( keyTable[MAK_DOWN-MAK_UP] )
-			rotRadX += (float)M_PI / 60;
+		if(focus) {
+			if ( keyTable[MAK_LEFT-MAK_UP] )
+				rotRadY -= (float)M_PI / 60;
+			else if ( keyTable[MAK_RIGHT-MAK_UP] )
+				rotRadY += (float)M_PI / 60;
+			else if ( keyTable[MAK_UP-MAK_UP] )
+				rotRadX -= (float)M_PI / 60;
+			else if ( keyTable[MAK_DOWN-MAK_UP] )
+				rotRadX += (float)M_PI / 60;
 
-		rotRadX = (rotRadX >= 2*(float)M_PI) ? rotRadX-2*(float)M_PI : rotRadX;
-		rotRadY = (rotRadY >= 2*(float)M_PI) ? rotRadY-2*(float)M_PI : rotRadY;
+			rotRadX = (rotRadX >= 2*(float)M_PI) ? rotRadX-2*(float)M_PI : rotRadX;
+			rotRadY = (rotRadY >= 2*(float)M_PI) ? rotRadY-2*(float)M_PI : rotRadY;
 
-		//
-		// Construct transformation pipe
-		//
-		pipe.resetPipe( );
+			//
+			// Construct transformation pipe
+			//
+			pipe.resetPipe( );
 
-		transMatrix.rotateX( (float)-M_PI/2 );
-		pipe.addTransform( transMatrix );
-		transMatrix.rotateY( (float)M_PI/4 );
-		pipe.addTransform( transMatrix );
+			transMatrix.rotateX( (float)-M_PI/2 );
+			pipe.addTransform( transMatrix );
+			transMatrix.rotateY( (float)M_PI/4 );
+			pipe.addTransform( transMatrix );
 
-		transMatrix.rotateX( rotRadX );
-		pipe.addTransform( transMatrix );
-		transMatrix.rotateY( rotRadY );
-		pipe.addTransform( transMatrix );
-		transMatrix.translate( 0, 0, 130 );
-		pipe.addTransform( transMatrix );
+			transMatrix.rotateX( rotRadX );
+			pipe.addTransform( transMatrix );
+			transMatrix.rotateY( rotRadY );
+			pipe.addTransform( transMatrix );
+			transMatrix.translate( 0, 0, 130 );
+			pipe.addTransform( transMatrix );
 
 
-		// Clear screen
-		maSetColor( 0 );
-		maFillRect( 0, 0, EXTENT_X( size ), EXTENT_Y( size ) );
+			// Clear screen
+			maSetColor( 0 );
+			maFillRect( 0, 0, EXTENT_X( size ), EXTENT_Y( size ) );
 
-		//
-		// Animate and render model
-		//
-		maSetColor( 0xffffff );
-		model.drawFrameLerp( frameIndex, FLT2FIX( frameInterp ), pipe );
-		frameInterp += 0.25f;
-		if ( frameInterp >= 1.0f )
-		{
-			frameIndex  = (frameIndex+1) % model.getFrameCount( );
-			frameInterp = 0.0f;
-		}
+			//
+			// Animate and render model
+			//
+			maSetColor( 0xffffff );
+			model.drawFrameLerp( frameIndex, FLT2FIX( frameInterp ), pipe );
+			frameInterp += 0.25f;
+			if ( frameInterp >= 1.0f )
+			{
+				frameIndex  = (frameIndex+1) % model.getFrameCount( );
+				frameInterp = 0.0f;
+			}
 
-		// Draw fps to screen
-		sprintf( textBuffer, "fps: %d", lastFps );
-		maDrawText( 0, 0, textBuffer );
+			// Draw fps to screen
+			sprintf( textBuffer, "fps: %d", lastFps );
+			maDrawText( 0, 0, textBuffer );
 
-		// Update screen and keep backlight on
-		maUpdateScreen( );
-		maResetBacklight( );
+			// Update screen and keep backlight on
+			maUpdateScreen( );
+			maResetBacklight( );
 
-		// FPS counter
-		currFps++;
-		if ( tmrLast+1000 <= maGetMilliSecondCount( ) )
-		{
-			lastFps = currFps;
-			currFps = 0;
-			tmrLast = maGetMilliSecondCount( );
-			lprintfln( "fps: %d", lastFps );
+			// FPS counter
+			currFps++;
+			if ( tmrLast+1000 <= maGetMilliSecondCount( ) )
+			{
+				lastFps = currFps;
+				currFps = 0;
+				tmrLast = maGetMilliSecondCount( );
+				lprintfln( "fps: %d", lastFps );
+			}
+		} else {	// no focus
+			maWait(0);
 		}
 	}
 }

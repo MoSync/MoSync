@@ -160,10 +160,10 @@ extern "C" {
 /**
  * \brief The entry point.
  */
-int MAMain() GCCATTRIB(noreturn);
 int MAMain()
 {
 	MAExtent e = maGetScrSize();
+	bool focus = true;
 
 	initChars();
 
@@ -175,24 +175,32 @@ int MAMain()
 				(event.key == MAK_0 || event.key == MAK_SOFTRIGHT)))
 			{
 				deleteChars();
-				maExit(0);
+				return 0;
+			} else if(event.type == EVENT_TYPE_FOCUS_LOST) {
+				focus = false;
+			} else if(event.type == EVENT_TYPE_FOCUS_GAINED) {
+				focus = true;
 			}
 		}
 
-		maSetColor(0);
-		maFillRect(0, 0, EXTENT_X(e), EXTENT_Y(e));
+		if(focus) {
+			maSetColor(0);
+			maFillRect(0, 0, EXTENT_X(e), EXTENT_Y(e));
 
-		drawChars();
+			drawChars();
 
-		/// Updates the screen
-		maUpdateScreen();
+			/// Updates the screen
+			maUpdateScreen();
 
-		/// Keep the backlight alive.
-		maResetBacklight();
+			/// Keep the backlight alive.
+			maResetBacklight();
 
 #ifndef MAPIP
-		maWait(40);
+			maWait(40);
 #endif
+		} else {
+			maWait(0);
+		}
 	}
 }
 }

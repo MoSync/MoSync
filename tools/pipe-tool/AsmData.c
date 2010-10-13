@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //*********************************************************************************************
 //				       PIP-e II Assembler Routines
 // 						   Written by A.R.Hartley
-//			This code is based on the GameTasker v2.0 Module System
 //*********************************************************************************************
 
 #include "compile.h"
@@ -67,12 +66,8 @@ void AlignDataSection()
 	while(DataIP & 3)
 	{
 		ArraySet(&PaddingArray, DataIP, 1);
-
-//!		*DataPtr++ = 0;
 		ArraySet(&DataMemArray, DataIP, 0);
-
 		DataIP++;
-
 	}
 }
 
@@ -87,12 +82,8 @@ void PadDataSection(int pads)
 	for (n=0;n<pads;n++)
 	{
 		ArraySet(&PaddingArray, DataIP++, 1);
-
-//!		*DataPtr++ = 0;
 		ArraySet(&DataMemArray, DataIP, 0);
-
 		DataIP++;
-
 	}
 }
 
@@ -105,13 +96,23 @@ int GetDataMem(int addr)
 	if (addr >= MAX_DATA_MEM)
 		return 0;
 
-//!	return DataMem[addr];
-	return ArrayGet(&DataMemArray, addr);
-		
+	return ArrayGet(&DataMemArray, addr);		
 }
 
 //***************************************
-// Get the value of a byte from data mem
+// Get the value of a byte from code mem
+//***************************************
+
+int GetCodeMem(int addr)
+{
+	if (addr >= MAX_CODE_MEM)
+		return 0;
+
+	return ArrayGet(&CodeMemArray, addr);
+}
+
+//***************************************
+// Get the value of a int from data mem
 //***************************************
 
 int GetDataMemLong(int index)
@@ -121,8 +122,6 @@ int GetDataMemLong(int index)
 	
 	if (max_addr >= MAX_DATA_MEM)
 		return 0;
-
-//!	ptr =  ((int *) DataMem) + index;
 
 	ptr = (int *) ArrayPtrBound(&DataMemArray, (index*4), (index*4)+4);
 		
@@ -141,30 +140,18 @@ void WriteAlignByte()
 			printf("0x%-4x Byte %x : data\n",DataIP,0);
 
 		ArraySet(&PaddingArray, DataIP, 1);
-
-//!		*DataPtr++ = 0;
 		ArraySet(&DataMemArray, DataIP, 0);
-
 		DataIP += 1;
 	}
 
 	if 	(Section == SECT_code)
 	{	
-
 		Error(Error_Skip, "!!!!!! whoops -- code align 0x%x\n",CodeIP);
-
-//!		if (LIST)
-//!			printf("0x%-4lx Byte %lx : code\n",CodeIP,0);
-
-//!		CodeIP += 1;
-//!		*CodePtr++ = 0;
 	}
 
 	if 	(Section == SECT_bss)
 		Error(Error_Skip, "Can't write predefined byte to IP = 0x%lx in '.bss'",BssIP);
-	
 }
-
 
 //****************************************
 // Write a byte to the current section
@@ -174,7 +161,6 @@ void WriteByte(int Value)
 {
 	if 	(Section == SECT_res)
 	{
-//!		*ResPtr++ = (char)Value;
 		ArraySet(&ResMemArray, ResIP, (char) Value);
 		ResIP++;
 		return;
@@ -185,25 +171,14 @@ void WriteByte(int Value)
 		if (LIST)
 			printf("0x%-4x Byte %x : data\n",DataIP,Value);
 
-//!		*DataPtr++ = (char)Value;
 		ArraySet(&DataMemArray, DataIP, (char) Value);
-
-		DataIP+=1;		
+		DataIP+=1;
 		return;
 	}
 
 	if 	(Section == SECT_code)
 	{
-//!		#if ALLOW_DATA_IN_CODE == 0
-			Error(Error_Skip, "Can't write data to code section");
-//!		#endif
-	
-//!		if (LIST)
-//!			printf("0x%-4lx Byte %lx : code\n",CodeIP,Value);
-
-//!		CodeIP += 1;
-//!		*CodePtr++ = (char)Value;
-		return;
+		Error(Error_Skip, "Can't write data to code section");
 	}
 
 
@@ -217,46 +192,15 @@ void WriteByte(int Value)
 
 void WriteByteQuiet(int Value)
 {
-/*	if 	(Section == SECT_ctor)
-	{
-		if (CtorIP >= MAX_CTOR_MEM)
-		{
-			Error(Error_Fatal, "Too mach data in ctor section");
-			return;
-		}
-
-		*CtorPtr++ = (char)Value;
-		CtorIP++;
-		return;
-	}
-*/
-
-/*	if 	(Section == SECT_dtor)
-	{
-		if (DtorIP >= MAX_CTOR_MEM)
-		{
-			Error(Error_Fatal, "Too mach data in dtor section");
-			return;
-		}
-
-		*DtorPtr++ = (char)Value;
-		DtorIP++;
-		return;
-	}
-*/
 	if 	(Section == SECT_res)
 	{
-//!		*ResPtr++ = (char)Value;
-
 		ArraySet(&ResMemArray, ResIP, (char) Value);
 		ResIP += 1;
-
 		return;
 	}
 
 	if 	(Section == SECT_data)
 	{
-//!		*DataPtr++ = (char)Value;
 		ArraySet(&DataMemArray, DataIP, (char) Value);
 		DataIP += 1;
 		return;
@@ -264,13 +208,7 @@ void WriteByteQuiet(int Value)
 
 	if 	(Section == SECT_code)
 	{
-
-//!		#if ALLOW_DATA_IN_CODE == 0
-			Error(Error_Skip, "Can't write data to code section");
-//!		#endif
-
-//!		CodeIP += 1;
-//!		*CodePtr++ = (char)Value;
+		Error(Error_Skip, "Can't write data to code section");
 	}
 
 }
@@ -283,6 +221,7 @@ void WriteResByte(int Value)
 {
 	ArraySet(&ResMemArray, ResIP, (char) Value);
 	ResIP += 1;
+
 	return;
 }
 
@@ -292,30 +231,16 @@ void WriteResByte(int Value)
 
 void WriteByteSpace(int Value)
 {
-/*	if 	((Section == SECT_ctor) || (Section == SECT_dtor))
-	{
-		Error(Error_Skip, "Can't write space to ctor/dtor section");
-		return;
-	}
-*/
 	if 	(Section == SECT_data)
 	{
-//!		*DataPtr++ = (char)Value;
 		ArraySet(&DataMemArray, DataIP, (char) Value);
-
 		DataIP += 1;	
 		return;
 	}
 
 	if 	(Section == SECT_code)
 	{
-//!		#if ALLOW_DATA_IN_CODE == 0
-			Error(Error_Skip, "Can't write data to code section");
-//!		#endif
-
-//!		CodeIP += 1;
-//!		*CodePtr++ = (char)Value;
-//!		return;
+		Error(Error_Skip, "Can't write data to code section");
 	}
 
 	if 	(Section == SECT_bss)
@@ -331,15 +256,6 @@ void WriteByteSpace(int Value)
 
 void WriteWord(int Value)
 {
-/*	if 	((Section == SECT_ctor) || (Section == SECT_dtor))
-	{
-		Warning("writing .word to ctor/dtor section\n");
-
-		WriteByteQuiet(Value & 0xff);
-		WriteByteQuiet((Value >> 8) & 0xff);
-		return;
-	}
-*/
 	if 	(Section == SECT_res)
 	{
 		WriteByteQuiet(Value & 0xff);
@@ -352,12 +268,8 @@ void WriteWord(int Value)
 		if (LIST)
 			printf("0x%-4x Word %x : data\n",DataIP,Value);
 
-//		DataIP += 2;
-//		*((short *) DataPtr)++ = Value;
-
 		WriteByteQuiet(Value & 0xff);
 		WriteByteQuiet((Value >> 8) & 0xff);
-
 		return;
 	}
 
@@ -370,18 +282,13 @@ void WriteWord(int Value)
 		if (LIST)
 			printf("0x%-4x Word %x : code\n",CodeIP,Value);
 
-//		CodeIP += 2;
-//		*((short *) CodePtr)++ = Value;
-
 		WriteByteQuiet(Value & 0xff);
 		WriteByteQuiet((Value >> 8) & 0xff);
 		return;
 	}
 
-
 	if 	(Section == SECT_bss)
 		Error(Error_Skip, "Can't write predefined word to IP = 0x%lx in '.bss'",BssIP);
-
 }
 
 //****************************************
@@ -410,8 +317,6 @@ void AddAlignRef(int immVal)
 	if 	(Section != SECT_data)
 		Error(Error_Skip, "illegal alignref outside data section");
 
-//	ArraySet(&DataAlignArray, DataIP, imm);
-
 	if (immVal == 2)
 		immVal = 1;
 	else if (immVal == 4)
@@ -427,7 +332,6 @@ void AddAlignRef(int immVal)
 	}
 
 	ArraySet(&DataAlignArray, DataIP, imm_copy);
-
 }
 
 //****************************************
@@ -436,15 +340,6 @@ void AddAlignRef(int immVal)
 
 void WriteLong(int Value)
 {
-/*	if 	((Section == SECT_ctor) || (Section == SECT_dtor))
-	{
-		WriteByteQuiet(Value & 0xff);
-		WriteByteQuiet((Value >> 8) & 0xff);
-		WriteByteQuiet((Value >> 16) & 0xff);
-		WriteByteQuiet((Value >> 24) & 0xff);
-		return;
-	}
-*/
 	if 	(Section == SECT_res)
 	{
 		WriteByteQuiet(Value & 0xff);
@@ -482,10 +377,8 @@ void WriteLong(int Value)
 		return;
 	}
 
-
 	if 	(Section == SECT_bss)
 		Error(Error_Skip, "Can't write predefined int to IP = 0x%lx in '.bss'",BssIP);
-
 }
 
 //****************************************
@@ -579,7 +472,8 @@ void WriteModule()
 
 		if (v < 1)
 		{
-/*			printf("\n");
+#if 0 		// Test Code (Don't delete)
+			printf("\n");
 			printf("DataIP %d\n", DataIP);
 			printf("CodeIP %d\n", CodeIP);
 			printf("BssIP %d\n", BssIP);
@@ -587,7 +481,7 @@ void WriteModule()
 			printf("Default_HeapSize %d\n", Default_HeapSize);
 			printf("Default_DataSize %d\n", Default_DataSize);
 			printf("\n");
-*/
+#endif
 			// Auto setting
 			Default_DataSize = mem_needed + 1;
 
@@ -630,13 +524,11 @@ void WriteModule()
 	// Write code
 
 	if (CodeLen > 0)
-//!		fwrite(CodeMem , 1, CodeLen , CodeFile);		// Save the code
 		ArrayWriteFP(&CodeMemArray, CodeFile, CodeLen);
 
 	// Write data
 
 	if (DataLen > 0)
-//!		fwrite(DataMem , 1, DataLen , CodeFile);		// Save the data
 		ArrayWriteFP(&DataMemArray, CodeFile, DataLen);
 
 	// Write int pool

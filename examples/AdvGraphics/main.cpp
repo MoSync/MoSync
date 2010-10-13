@@ -141,17 +141,22 @@ extern "C" {
 int MAMain()
 {
 	bool run = true;
+	bool focus = true;
 	while(run) {
-		drawImages();
+		if(focus) {
+			drawImages();
 
-		// write some information text
-		showInstruction();
+			// write some information text
+			showInstruction();
 
-		/// Updates the screen
-		maUpdateScreen();
+			/// Updates the screen
+			maUpdateScreen();
 
-		/// Keep the backlight alive.
-		maResetBacklight();
+			/// Keep the backlight alive.
+			maResetBacklight();
+		} else {
+			maWait(0);
+		}
 
 		/// Get any available events.
 		/// If MAK_FIRE is pressed, change mode.
@@ -178,6 +183,10 @@ int MAMain()
 #endif	// MA_PROF_SUPPORT_STYLUS
 			} else if(event.type == EVENT_TYPE_CLOSE) {
 				run = false;
+			} else if(event.type == EVENT_TYPE_FOCUS_LOST) {
+				focus = false;
+			} else if(event.type == EVENT_TYPE_FOCUS_GAINED) {
+				focus = true;
 			}
 		}
 	}

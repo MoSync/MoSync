@@ -29,8 +29,13 @@ using namespace MAUtil;
 class MyMoblet : public Moblet, private HttpConnectionListener {
 public:
 	MyMoblet() : mHttp(this) {
-		printf("Hello World!\n");
+		start();
+	}
+	
+	void start() {
+		printf("Connecting...\n");
 
+		mHttp.close();
 		int res = mHttp.create("http://www.example.com/", HTTP_GET);
 		if(res < 0) {
 			printf("http.create fail %i\n", res);
@@ -41,8 +46,9 @@ public:
 
 	virtual void httpFinished(HttpConnection* http, int result) {
 		printf("HTTP %i\n", result);
-		if(result <= 0)
+		if(result <= 0) {
 			return;
+		}
 		String cl;
 		int res = mHttp.getResponseHeader("content-length", &cl);
 		printf("cl code %i\n", res);
@@ -65,6 +71,12 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0 || keyCode == MAK_SOFTRIGHT)
 			maExit(0);
+		if(keyCode == MAK_FIRE)
+			start();
+	}
+	
+	void pointerPressEvent(MAPoint2d p) {
+		start();
 	}
 
 private:
