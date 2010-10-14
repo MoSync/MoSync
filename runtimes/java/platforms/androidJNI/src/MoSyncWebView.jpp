@@ -109,9 +109,6 @@ public class MoSyncWebView extends WebView
 		
 		String html = "<html><body>New WebView</body></html>";
 		loadData(html, "text/html", "utf-8");
-		
-		// Post notification message to MoSync.
-		postEvent(EVENT_TYPE_WIDGET_OPENED, 0);
 	}
 	
 	/**
@@ -139,7 +136,7 @@ public class MoSyncWebView extends WebView
 	 * The event data is organised as an array of ints.
 	 * The first element is the type of the event.
 	 */
-	private void postEvent(int eventType, int commandId)
+	public void postEvent(int eventType, int commandId)
 	{
 		//Log.i("MoSyncWebView", "postEvent: " + event[0]);
 		

@@ -87,7 +87,7 @@ char* WidgetCommandGetData(const char* command)
 {
 	// Must be at least three characters in a request
 	// that has a data part.
-	if ((NULL != command) || (strlen(command) < 3)) { return NULL; }
+	if ((NULL == command) || (strlen(command) < 3)) { return NULL; }
 
 	// Find first slash.
 	char* p = strstr(command, "/");

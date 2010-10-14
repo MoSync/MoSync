@@ -166,6 +166,8 @@ static void HandleCommand(MAHandle webView, MAEvent event)
 
 	// Get command.
 	char* command = WidgetCommandGet(event.widgetCommandId);
+	lprintfln("command: %s", command);
+
 	if (NULL == command)
 	{
 		return;
@@ -255,7 +257,7 @@ int MAMain()
 				case EVENT_TYPE_WIDGET_OPENED:
 					// Must wait to set the HTML until this event to make
 					// sure the WebView is fully created before use.
-					maWidgetLoadHTML(webView, HTML6); /// HTML4
+					maWidgetLoadHTML(webView, HTML4);
 					break;
 
 				case EVENT_TYPE_WIDGET_COMMAND:

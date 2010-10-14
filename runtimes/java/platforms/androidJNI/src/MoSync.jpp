@@ -18,28 +18,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
-
+import android.os.Handler;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
-import android.util.Log;
 import java.util.Locale;
-
-import android.os.Handler;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.MoSyncWebView;
 
 #include "generated\IX_WIDGET_CONSTS.h"
-
-import android.content.res.Configuration;
-import android.content.Context;
-
-
-import android.content.pm.ActivityInfo;
 
 /**
 *
@@ -241,11 +237,24 @@ public class MoSync extends Activity
 			// TODO: Add lookup table for widgets.
 			if (null == mMoSyncWebView)
 			{
+				final WidgetResult result = new WidgetResult();
 				final Context context = this;
 				// TODO: Add handle counter, add widget to lookup table.
-				int wigetHandle = 1;
-				mMoSyncWebView = new MoSyncWebView(context, mMoSyncThread, wigetHandle);
-				return wigetHandle;
+				final int widgetHandle = 1;
+				mHandler.post(new Runnable() 
+				{ 
+					public void run() 
+					{
+						mMoSyncWebView = new MoSyncWebView(
+							context, 
+							mMoSyncThread, 
+							widgetHandle);
+						Log.i("MoSync.maWidgetCreate", "MoSyncWebView created");
+						result.setValue(widgetHandle);
+					} 
+				});
+				
+				return result.waitForValue(500);
 			}
 		}
 		
@@ -274,18 +283,30 @@ public class MoSync extends Activity
 		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView && WIDGET_ROOT == widgetParentHandle)
 		{
+			final WidgetResult result = new WidgetResult();
 			final Context context = this;
 			mHandler.post(new Runnable() 
 			{ 
 				public void run() 
 				{
 					setContentView(mMoSyncWebView);
-					mMoSyncWebView.requestFocus(); 
+					mMoSyncWebView.requestFocus();
+					
+					// Post notification message to MoSync.
+					// TODO: Comment out/remove.
+					mMoSyncWebView.postEvent(EVENT_TYPE_WIDGET_OPENED, 0);
+					
+					Log.i("MoSync.maWidgetOpen", "MoSyncWebView opened");
+					
+					result.setValue(WIDGET_OK);
 				} 
 			});
-			return WIDGET_OK;
+			
+			return result.waitForValue(1000);
 		}
 		
+		Log.i("MoSync.maWidgetOpen", "WIDGET_ERROR");
+					
 		// We could not open the requested widget.
 		return WIDGET_ERROR;
 	}
@@ -355,6 +376,7 @@ public class MoSync extends Activity
 
 	public int maWidgetEvaluateScript(final int widgetHandle, final String script)
 	{
+		Log.i("maWidgetEvaluateScript", script);
 		// TODO: Use widgetHandle to get the widget.
 		if (null != mMoSyncWebView)
 		{
@@ -363,6 +385,7 @@ public class MoSync extends Activity
 				public void run() 
 				{ 
 					mMoSyncWebView.evaluateScript(script); 
+					Log.i("maWidgetEvaluateScript", "*** DONE ***");
 				} 
 			});
 			return WIDGET_OK;
@@ -396,6 +419,76 @@ public class MoSync extends Activity
 		else
 		{
 			return null;
+		}
+	}
+	
+	private int waitForIntQueueResult(LinkedBlockingQueue<Integer> queue)
+	{
+		Integer result = null;
+		while (null == result)
+		{
+			try 
+			{
+				result = queue.take();
+			}
+			catch (InterruptedException consume)
+			{
+			}
+		}
+		return result.intValue();
+	}
+	
+	/**
+	 * This is a helper class that sets and waits for an integer value
+	 * in a thread safe way. The class is used to communicate results of 
+	 * widgets operations in a synchronous way.
+	 */
+	class WidgetResult
+	{
+		final LinkedBlockingQueue<Integer> mQueue = new LinkedBlockingQueue<Integer>(1);
+
+		/**
+		 * Set the integer value.
+		 * @param value The value to set.
+		 */
+		public void setValue(int value)
+		{
+			try
+			{
+				mQueue.put(new Integer(value));
+			}
+			catch (InterruptedException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		
+		/**
+		 * Wait for a value.
+		 * @param timeOutMillis Max time to wait for the value.
+		 * @return On error, returns WIDGET_ERROR.
+		 */
+		public int waitForValue(int timeOutMillis)
+		{
+			long timeOut = System.currentTimeMillis() + timeOutMillis;
+
+			Integer result = null;
+			while (null == result)
+			{
+				if (System.currentTimeMillis() >= timeOut)
+				{
+					return WIDGET_ERROR;
+				}
+				
+				try 
+				{
+					result = mQueue.take();
+				}
+				catch (InterruptedException consume)
+				{
+				}
+			}
+			return result.intValue();
 		}
 	}
 }
