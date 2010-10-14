@@ -63,21 +63,15 @@ private:
 };
 
 #define CONN_SUBOPS(f, s) f(SockConnect) s(Read) s(Write) s(HttpReadHeaders)\
-	s(StartNetworking) s(Accept)
+	s(StartNetworking) s(Accept) s(SecureHandshake)
 
-#define CSV_SockConnect(f, s) f(TSockAddr&,addr) s(int,port) s(CSocket&,sock)
+#define CSV_SockConnect(f, s) f(TSockAddr&,addr) s(int,port) s(CBaseSocket&,sock)
 #define CSV_Read(f, s) f(TDes8&,des)
 #define CSV_Write(f, s) f(const TDesC8&,desc)
 #define CSV_HttpReadHeaders(f, s) f(CHttpConnection&,http)
 #define CSV_StartNetworking(f, s)
 #define CSV_Accept(f, s) f(CServerSocket&,server) s(CSocket*,newSock)
-
-#if 0
-#define CSV_HttpGetSetup(f, s) f(const TDesC8&,url) s(CHttpGetSocket&,hsock)\
-	s(int*,sizep)
-#define CSV_HttpReadBodyToObject(f, s) f(CHttpGetSocket&,hsock)\
-	s(const int&,size) s(Smartie<MemStream>&,con) s(TPtr8&,ptr)
-#endif	//0
+#define CSV_SecureHandshake(f, s) f(CMySecureSocket&,sock) s(const TDesC*,hostname)
 
 #define CSOC_F(a) CSOC_##a
 #define CSOC_S(a) ,CSOC_##a
@@ -141,6 +135,7 @@ protected:
 	//for constructors
 	void addHttpSendHeaders();
 	void addHttpReadHeaders();
+	void addSockConnect(CBaseSocket& sock, TSockAddr& addr, int port, const TDesC* hostname);
 private:
 	ConnOp();
 	ConnOp(const ConnOp&);
@@ -236,8 +231,9 @@ void DestructNetworking();
 
 void StartConnOpL(ConnOp* op);
 void CancelConnOps(MAHandle conn);
+CSocket* createSocket(bool ssl);
 int httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& conn,
-	int method);
+	int method, bool ssl);
 CHttpConnection& GetHttp(MAHandle conn);
 void StartNetworkingL(ConnOp& connOp);
 

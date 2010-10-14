@@ -670,6 +670,8 @@ interface MAAPI {
 		NOHEADER = -16;
 		/// The requested object could not be found.
 		NOTFOUND = -17;
+		/// An error occurred during SSL negotiation.
+		SSL = -18;
 
 		/**
 		* If you wish to share the CONNERR codespace,

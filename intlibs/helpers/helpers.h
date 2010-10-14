@@ -197,6 +197,7 @@ namespace MoSyncError {
 #define FAIL { LOG("Failure "); IN_FILE_ON_LINE; FAIL_FUNCTION; return 0; }
 #define LOG_VAL(a) { LOG("Failure %i ", a); IN_FILE_ON_LINE; }
 #define FAIL_VAL(val) { LOG_VAL(val); FAIL_FUNCTION; return false; }
+#define FAIL_PASS(val) { LOG_VAL(val); FAIL_FUNCTION; return val; }
 #define FAILIF(b) if(b) FAIL
 #define TEST TEST_Z
 #define TEST_Z(a) FAILIF((a) == 0)
@@ -209,7 +210,8 @@ namespace MoSyncError {
 
 #define CHECK_NZ(a) { int test_s = (a); if(test_s != 0) LOG_VAL(test_s); }
 
-#define GLECUSTOM(a) if((a)) { LOG("GLE %i, ", (int)GetLastError()); BIG_PHAT_ERROR(ERR_INTERNAL); }
+#define LOG_GLE { IN_FILE_ON_LINE; LOG("GLE %i, ", (int)GetLastError()); }
+#define GLECUSTOM(a) if((a)) { LOG_GLE; BIG_PHAT_ERROR(ERR_INTERNAL); }
 #define GLE(a) GLECUSTOM((a) == 0)
 
 #define HRES(a) { HRESULT hres = (a); if(FAILED(hres)) { LOG("HRES 0x%08X, ", hres);\

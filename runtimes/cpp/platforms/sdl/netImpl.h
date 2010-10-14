@@ -35,5 +35,20 @@ private:
 };
 
 typedef unsigned short Uint16;
+typedef struct ssl_st SSL;
+
+class SslConnection : public TcpConnection {
+public:
+	SslConnection(const std::string& hostname, u16 port)
+		: TcpConnection(hostname, port), mState(eIdle) {}
+	virtual ~SslConnection();
+	virtual int connect();
+	virtual int read(void* dst, int max);
+	virtual int write(const void* src, int len);
+	virtual void close();
+private:
+	SSL* mSession;
+	enum State { eIdle, eInit, eHandshook } mState;
+};
 
 #endif	//NETIMPL_H

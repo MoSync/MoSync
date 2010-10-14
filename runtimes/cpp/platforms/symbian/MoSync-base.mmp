@@ -79,6 +79,7 @@ LIBRARY mediaclientvideo.lib
 LIBRARY Lbs.lib
 LIBRARY insock.lib
 LIBRARY ecam.lib
+LIBRARY securesocket.lib
 
 LIBRARY eikcoctl.lib
 LIBRARY eikctl.lib

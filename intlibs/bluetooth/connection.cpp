@@ -163,6 +163,10 @@ int WinsockBtSppConnection::connect() {
 	return 1;
 }
 
+bool WinsockBtSppConnection::isConnected() {
+	return mSock != INVALID_SOCKET;
+}
+
 void WinsockBtSppConnection::close() {
 	if(mSock != INVALID_SOCKET) {
 		int res;

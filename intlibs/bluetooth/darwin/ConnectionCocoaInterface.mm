@@ -208,6 +208,19 @@ int BtSppConnectionCocoa::write ( const void* src, int len )
 }
 
 /**
+ * Determines if the socket is connected or not.
+ *
+ * @return TRUE if connected, FALSE otherwise.
+ */
+bool BtSppConnectionCocoa::isConnected ( void )
+{
+		if ( mConnection.mState > 0 )
+			return TRUE;
+		else
+			return FALSE;
+}
+
+/**
  * Closes any open connections
  *
  */
