@@ -45,7 +45,7 @@ public class MoSyncWebView extends WebView
 	/**
 	 * Holds the most recent command sent to MoSync.
 	 */
-	protected String mCommand;
+	protected String mMessage;
 	
 	public MoSyncWebView(
 		final Context context, 
@@ -87,12 +87,12 @@ public class MoSyncWebView extends WebView
 					Log.i("MoSync", "Processing MoSync url: " + url);
 					
 					// TODO: Save command in a lookup table.
-					mCommand = url.substring(MoSyncProtocol.length());
+					mMessage = url.substring(MoSyncProtocol.length());
 					
 					// Post event to MoSync event system.
-					// TODO: Use counter com commandId.
-					int commandId = 1;
-					postEvent(EVENT_TYPE_WIDGET_COMMAND, commandId);
+					// TODO: Use counter com messageId.
+					int messageId = 1;
+					postEvent(EVENT_TYPE_WIDGET_MESSAGE, messageId);
 					
 					// Abort further processing of this url by the WebView by returning true.
 					return true;
@@ -136,7 +136,7 @@ public class MoSyncWebView extends WebView
 	 * The event data is organised as an array of ints.
 	 * The first element is the type of the event.
 	 */
-	public void postEvent(int eventType, int commandId)
+	public void postEvent(int eventType, int messageId)
 	{
 		//Log.i("MoSyncWebView", "postEvent: " + event[0]);
 		
@@ -144,7 +144,7 @@ public class MoSyncWebView extends WebView
 		event[0] = eventType;
 		event[1] = WIDGET_TYPE_WEBVIEW;
 		event[2] = mWidgetHandle;
-		event[3] = commandId;
+		event[3] = messageId;
 		
 		mMoSyncThread.nativePostEvent(event);
 		mMoSyncThread.interrupt();
@@ -197,15 +197,15 @@ public class MoSyncWebView extends WebView
 		postEvent(EVENT_TYPE_WIDGET_CLOSED, 0);
     }
 	
-	public int getCommandSize(int commandId)
+	public int getMessageSize(int messageId)
 	{
-		// TODO: Get command using commandId. Return error code on error.
-		return mCommand.length() + 1;
+		// TODO: Get command using messageId. Return error code on error.
+		return mMessage.length() + 1;
 	}
 	
-	public byte[] getCommandBytes(int commandId)
+	public byte[] getMessageBytes(int messageId)
 	{
-		// TODO: Get command using commandId. Return null on error.
-		return mCommand.getBytes();
+		// TODO: Get command using messageId. Return null on error.
+		return mMessage.getBytes();
 	}
 }

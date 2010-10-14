@@ -1218,29 +1218,29 @@ int maWidgetEvaluateScript(int widgetHandle, String script)
 	return ((MoSync) mContext).maWidgetEvaluateScript(widgetHandle, script);
 }
 
-int maWidgetGetCommandSize(int commandID)
+int maWidgetGetMessageSize(int messageId)
 {
-	Log.i("MoSync", "maWidgetGetCommandSize");
-	// Old code: return WebViewActivity.getInstance().getRequestSize(commandID);
-	return ((MoSync) mContext).maWidgetGetCommandSize(commandID);
+	Log.i("MoSync", "maWidgetGetMessageSize");
+	// Old code: return WebViewActivity.getInstance().getRequestSize(messageId);
+	return ((MoSync) mContext).maWidgetGetMessageSize(messageId);
 }
 
-int maWidgetGetCommand(int commandID, int buf, int bufSize)
+int maWidgetGetMessage(int messageId, int buf, int bufSize)
 {
-	Log.i("MoSync", "maWidgetGetCommand");
+	Log.i("MoSync", "maWidgetGetMessage");
 	
-	// Old code: int size = WebViewActivity.getInstance().getRequestSize(commandID);
-	int size = ((MoSync) mContext).maWidgetGetCommandSize(commandID);
+	// Old code: int size = WebViewActivity.getInstance().getRequestSize(messageId);
+	int size = ((MoSync) mContext).maWidgetGetMessageSize(messageId);
 	if (bufSize < size)
 	{
-		Log.e("MoSync", "Error in maWidgetGetCommand: bufSize is too small");
+		Log.e("MoSync", "Error in maWidgetGetMessage: bufSize is too small");
 		return WIDGET_ERROR;
 	}
 		
 	// Write request to memory.
 	
 	// Old code: byte[] bytes = WebViewActivity.getInstance().getRequestBytes(requestID);
-	byte[] bytes = ((MoSync) mContext).maWidgetGetCommandBytes(commandID);
+	byte[] bytes = ((MoSync) mContext).maWidgetGetMessageBytes(messageId);
 	
 	mMemDataSection.mark();
 	mMemDataSection.position(buf);

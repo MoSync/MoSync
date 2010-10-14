@@ -1261,12 +1261,13 @@ interface MAAPI {
         WIDGET_CONTENT_LOADED = 103;
 		
         /**
-		 * Event for sending a command from a Widget to MoSync.
-		 * MAEvent.widget.handle is set to the widget handle.
-		 * MAEvent.widget.commandId can be used for retrieving the command data string.
-		 * Used by WebViews to send requests from JavaScript to MoSync.
+		 * Event for sending a message from a Widget to MoSync.
+		 * MAEvent.widget.widgetType is set to the widget type.
+		 * MAEvent.widget.widgetHandle is set to the widget handle.
+		 * MAEvent.widget.messageId is used for retrieving message data.
+		 * This event is used by WebViews to send requests from JavaScript to MoSync.
 		 */
-        WIDGET_COMMAND = 104;
+        WIDGET_MESSAGE = 104;
 #endif
 	}
 
@@ -1336,21 +1337,24 @@ interface MAAPI {
 			} textbox;
 			
 			/**
-			* Used for widget events.
-			*/
+			 * Used for widget events.
+			 */
 			struct {
 				/**
-				* Widget type.
-				*/
+				 * Widget type.
+				 */
 				int widgetType;
+				
 				/**
-				* Widget handle.
-				*/
+				 * Widget handle.
+				 */
 				MAHandle widgetHandle;
+				
 				/**
-				* The id of a command event.
-				*/
-				int widgetCommandId;
+				 * The id of the message. Use for retrieving message 
+				 * data with maWidgetGetMessage().
+				 */
+				int widgetMessageId;
 			} widget;
 			
 			/**
@@ -3014,32 +3018,33 @@ interface MAAPI {
 		int maWidgetLoadURL(in MAHandle widgetHandle, in MAString url);
 
 		/**
-		 * Evaluate JavaScript code in a WebView widget.
+		 * Evaluate a script in a widget. The script should start with
+		 * a language specifier that has the form "<language>:". 
+		 * To evaluate JavaScript in a WebView widget, start the 
+		 * script with "javascript:".
 		 * \returns A status code.
 		 */
 		int maWidgetEvaluateScript(in MAHandle widgetHandle, in MAString script);
 
 		/**
-		 * Get the size of a command string.
-		 * The command id is in MAEvent.widget.commandId.
-		 * \returns The number of characters needed to hold the 
-		 * string, including the null termination character.
+		 * Get the size of a message.
+		 * The message id is in MAEvent.widget.messageId.
+		 * \returns The number of bytes needed to store the message.
 		 */
-		int maWidgetGetCommandSize(in int commandId);
+		int maWidgetGetMessageSize(in int messageId);
 
 		/**
-		 * Get the command string for a command id.
-		 * The command id is in MAEvent.widget.commandId.
-		 * The caller should use maWidgetGetCommandSize to ensure 
+		 * Get the message data for a message id.
+		 * The message id is in MAEvent.widget.messageId.
+		 * The caller must use maWidgetGetMessageSize to ensure 
 		 * that the buffer is sufficienly large to hold the data.
-		 * The returned data string is zero terminated.
-		 * Command data can only be retrieved once, the system deallocates
+		 * If the returned data is a string, it is zero terminated.
+		 * Message data can be retrieved only once, the system deallocates
 		 * the memory used to hold the data when retrieved. A second call
-		 * to this function with the same commandId will return WIDGET_ERROR.
-		 * \returns Thenumber of characters copied to the buffer, including
-		 * the null termination character.
+		 * to this function with the same message id will return WIDGET_ERROR.
+		 * \returns The number of bytes copied to the buffer.
 		 */
-		int maWidgetGetCommand(in int commandId, out MAString buf, in int bufSize);
+		int maWidgetGetMessage(in int messageId, out MAString buf, in int bufSize);
 		
 #endif //IX_WIDGET
 

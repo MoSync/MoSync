@@ -1435,13 +1435,13 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetEvaluateScript");
 			return _maWidgetEvaluateScript(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
 			
-		case maIOCtl_maWidgetGetCommandSize:
-			SYSLOG("maIOCtl_maWidgetGetCommandSize");
-			return _maWidgetGetCommandSize(a, mJNIEnv, mJThis);
+		case maIOCtl_maWidgetGetMessageSize:
+			SYSLOG("maIOCtl_maWidgetGetMessageSize");
+			return _maWidgetGetMessageSize(a, mJNIEnv, mJThis);
 			
-		case maIOCtl_maWidgetGetCommand:
-			SYSLOG("maIOCtl_maWidgetGetCommand");
-			return _maWidgetGetCommand(
+		case maIOCtl_maWidgetGetMessage:
+			SYSLOG("maIOCtl_maWidgetGetMessage");
+			return _maWidgetGetMessage(
 				a, 
 				(int)SYSCALL_THIS->GetValidatedMemRange(b, c), 
 				(int)gCore->mem_ds, 

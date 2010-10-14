@@ -117,6 +117,6 @@ namespace Base
 	int _maWidgetLoadHTML(int widgetHandle, const char* html, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetLoadURL(int widgetHandle, const char* url, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetEvaluateScript(int widgetHandle, const char* script, JNIEnv* jNIEnv, jobject jThis);
-	int _maWidgetGetCommandSize(int commandID, JNIEnv* jNIEnv, jobject jThis);
-	int _maWidgetGetCommand(int commandID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetMessageSize(int messageId, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetMessage(int messageId, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis);
 }

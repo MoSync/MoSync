@@ -1,7 +1,7 @@
 #include <ma.h>
 #include <mastring.h>
 #include <mavsprintf.h>
-#include <WidgetCommand.h>
+#include <WidgetMessageUtil.h>
 
 // Test that JavaScript runs in the browser.
 #define HTML1 " \
@@ -33,17 +33,17 @@
 	</head> \
 	<body> \
 	<script> \
-		function MoSyncCommand(command) { \
-			document.location = 'mosync://' + command; } \
+		function MoSyncMessage(message) { \
+			document.location = 'mosync://' + message; } \
 		function ProcessData() { \
-			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncCommand(command); } \
+			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncMessage(message); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Green')\">Green</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Green')\">Green</a> \
 	</div> \
 	<div id=\"ColorMessage\"></div> \
 	<div> \
@@ -52,8 +52,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -69,17 +69,17 @@
 	</head> \
 	<body> \
 	<script> \
-		function MoSyncCommand(command) { \
-			document.location = 'mosync://' + command; } \
+		function MoSyncMessage(message) { \
+			document.location = 'mosync://' + message; } \
 		function ProcessData() { \
-			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncCommand(command); } \
+			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncMessage(message); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncCommand('BgColor/Green')\">Green</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Yellow')\">Yellow</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Red')\">Red</a> \
+		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Green')\">Green</a> \
 	</div> \
 	<div id=\"ColorMessage\"></div> \
 	<div> \
@@ -88,8 +88,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -108,11 +108,11 @@
 		function SetBgColor(color) { \
 			document.getElementById('ColorMessage').innerHTML = color + ' is a beautiful color!'; \
 			document.bgColor = color; } \
-		function MoSyncCommand(command) { \
-			document.location = 'mosync://' + command; } \
+		function MoSyncMessage(message) { \
+			document.location = 'mosync://' + message; } \
 		function ProcessData() { \
-			var command = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncCommand(command); } \
+			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
+			MoSyncMessage(message); } \
 	</script> \
 	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
 	<div> \
@@ -127,8 +127,8 @@
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('CloseWebView')\">Close WebView</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncCommand('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
 
@@ -143,67 +143,67 @@
 
 static void SetBgColor(int webView, char* color)
 {
-	char* script = (char*) WidgetCommandAllocateString(strlen(BGCOLOR_SCRIPT) + strlen(color) + strlen(color) + 1);
+	char* script = (char*) WidgetMessageAllocateString(strlen(BGCOLOR_SCRIPT) + strlen(color) + strlen(color) + 1);
 	sprintf(script, BGCOLOR_SCRIPT, color, color);
 	maWidgetEvaluateScript(webView, script);
-	WidgetCommandFreeString(script);
+	WidgetMessageFreeString(script);
 }
 
 static void DisplayData(int webView, char* data)
 {
-	char* script = (char*) WidgetCommandAllocateString(strlen(MESSAGE_SCRIPT) + strlen(data) + 1);
+	char* script = (char*) WidgetMessageAllocateString(strlen(MESSAGE_SCRIPT) + strlen(data) + 1);
 	sprintf(script, MESSAGE_SCRIPT, data);
 	maWidgetEvaluateScript(webView, script);
-	WidgetCommandFreeString(script);
+	WidgetMessageFreeString(script);
 }
 
-static void HandleCommand(MAHandle webView, MAEvent event)
+static void HandleMessage(MAHandle webView, MAEvent event)
 {
 	if (webView != event.widgetHandle)
 	{
 		return;
 	}
 
-	// Get command.
-	char* command = WidgetCommandGet(event.widgetCommandId);
-	lprintfln("command: %s", command);
+	// Get message.
+	char* message = WidgetMessageGet(event.widgetMessageId);
+	lprintfln("message: %s", message);
 
-	if (NULL == command)
+	if (NULL == message)
 	{
 		return;
 	}
 
-	// Process command.
-	if (WidgetCommandNameIs(command, "BgColor"))
+	// Process message.
+	if (WidgetMessageNameIs(message, "BgColor"))
 	{
-		char* color = WidgetCommandGetData(command);
+		char* color = WidgetMessageGetData(message);
 		if (color)
 		{
 			SetBgColor(webView, color); // This is where JS is called.
-			WidgetCommandFreeString(color);
+			WidgetMessageFreeString(color);
 		}
 	}
-	else if (WidgetCommandNameIs(command, "ProcessData"))
+	else if (WidgetMessageNameIs(message, "ProcessData"))
 	{
 		// We just display the data without any processing to
 		// demonstrate that MoSync can recieve input and send
 		// back a result to the WebView.
-		char* data = WidgetCommandGetData(command);
+		char* data = WidgetMessageGetData(message);
 		if (data)
 		{
 			DisplayData(webView, data); // This is where JS is called.
-			WidgetCommandFreeString(data);
+			WidgetMessageFreeString(data);
 		}
 	}
-	else if (WidgetCommandNameIs(command, "CloseWebView"))
+	else if (WidgetMessageNameIs(message, "CloseWebView"))
 	{
 		maWidgetClose(webView);
 	}
-	else if (WidgetCommandNameIs(command, "ExitApp"))
+	else if (WidgetMessageNameIs(message, "ExitApp"))
 	{
 		maExit(0);
 	}
-	WidgetCommandFreeString(command);
+	WidgetMessageFreeString(message);
 }
 
 int MAMain()
@@ -212,9 +212,9 @@ int MAMain()
 
 	// Paint something into the drawable MoSync view to make it
 	// visually identifiable.
-	maSetColor(0xFF77FF);
-	maFillRect(20, 20, 300, 300);
-	maUpdateScreen();
+	//maSetColor(0xFFFFFF);
+	//maFillRect(0, 0, 2000, 2000);
+	//maUpdateScreen();
 
 	// Immediately open the WebView.
 	MAHandle webView = maWidgetCreate(WIDGET_TYPE_WEBVIEW);
@@ -260,9 +260,9 @@ int MAMain()
 					maWidgetLoadHTML(webView, HTML4);
 					break;
 
-				case EVENT_TYPE_WIDGET_COMMAND:
-					// Handle commands from the WebView widget here.
-					HandleCommand(webView, event);
+				case EVENT_TYPE_WIDGET_MESSAGE:
+					// Handle messages from the WebView widget here.
+					HandleMessage(webView, event);
 					break;
 			}
 		}

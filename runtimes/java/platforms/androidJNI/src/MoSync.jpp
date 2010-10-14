@@ -396,12 +396,12 @@ public class MoSync extends Activity
 		}
 	}
 	
-	public int maWidgetGetCommandSize(final int commandId)
+	public int maWidgetGetMessageSize(final int messageId)
 	{
-		// TODO: Store commands in a lookup table. Use commandId to get command.
+		// TODO: Store commands in a lookup table. Use messageId to get command.
 		if (null != mMoSyncWebView)
 		{
-			return mMoSyncWebView.getCommandSize(commandId);
+			return mMoSyncWebView.getMessageSize(messageId);
 		}
 		else
 		{
@@ -409,12 +409,12 @@ public class MoSync extends Activity
 		}
 	}
 	
-	public byte[] maWidgetGetCommandBytes(final int commandId)
+	public byte[] maWidgetGetMessageBytes(final int messageId)
 	{
-		// TODO: Store commands in a lookup table. Use commandId to get command.
+		// TODO: Store commands in a lookup table. Use messageId to get command.
 		if (null != mMoSyncWebView)
 		{
-			return mMoSyncWebView.getCommandBytes(commandId);
+			return mMoSyncWebView.getMessageBytes(messageId);
 		}
 		else
 		{

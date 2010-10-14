@@ -219,11 +219,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_WIDGET_OPENED ||
 			 event.type == EVENT_TYPE_WIDGET_CLOSED ||
 			 event.type == EVENT_TYPE_WIDGET_CONTENT_LOADED ||
-			 event.type == EVENT_TYPE_WIDGET_COMMAND)
+			 event.type == EVENT_TYPE_WIDGET_MESSAGE)
 	{
 		event.widgetType = intArray[1];
 		event.widgetHandle = intArray[2];
-		event.widgetCommandId = intArray[3];
+		event.widgetMessageId = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
 	{

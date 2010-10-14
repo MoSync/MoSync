@@ -534,24 +534,24 @@ namespace Base
 		return result;
 	}
 	
-	int _maWidgetGetCommandSize(int commandID, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetMessageSize(int messageId, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetCommandSize", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageSize", "(I)I");
 		if (methodID == 0) return 0;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, commandID);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
 	}
 	
-	int _maWidgetGetCommand(int commandID, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetMessage(int messageId, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetCommand", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessage", "(III)I");
 		if (methodID == 0) return 0;
 		int rBuf = buf - memStart;
-		int result = jNIEnv->CallIntMethod(jThis, methodID, commandID, rBuf, size);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId, rBuf, size);
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
