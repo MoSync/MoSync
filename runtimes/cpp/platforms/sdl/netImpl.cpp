@@ -98,6 +98,18 @@ int SslConnection::connect() {
 	TSSLZ(SSL_set_fd(mSession, mSock));
 	TSSLLTZ(SSL_connect(mSession));
 	mState = eHandshook;
+	// TODO: Check that the CN matches the hostname.
+	// TODO: Check the certificate chain against a set of root certificates.
+#if 0
+	X509* peerCert = SSL_get_peer_certificate(mSession);
+	char commonName [512];
+	X509_NAME* name = X509_get_subject_name(peerCert);
+	X509_NAME_get_text_by_NID(name, NID_commonName, commonName, 512);
+	if(stricmp(commonName, mHostname.c_str()) != 0) {
+		LOG("Certificate was issued for '%s', but used for '%s'. Fail.\n");
+		return CONNERR_SSL;
+	}
+#endif
 	return 1;
 }
 

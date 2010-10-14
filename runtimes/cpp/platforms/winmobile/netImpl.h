@@ -49,6 +49,9 @@ public:
 		: TcpConnection(hostname, port) {}
 	virtual ~SslConnection();
 	virtual int connect();
+	const char* hostname() { return mHostname.c_str(); }
+
+	int mSslError;
 };
 
 #endif /* _NET_IMPL_H_ */

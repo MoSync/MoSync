@@ -197,6 +197,7 @@ namespace MoSyncError {
 #define FAIL { LOG("Failure "); IN_FILE_ON_LINE; FAIL_FUNCTION; return 0; }
 #define LOG_VAL(a) { LOG("Failure %i ", a); IN_FILE_ON_LINE; }
 #define FAIL_VAL(val) { LOG_VAL(val); FAIL_FUNCTION; return false; }
+#define FAIL_PASS(val) { LOG_VAL(val); FAIL_FUNCTION; return val; }
 #define FAILIF(b) if(b) FAIL
 #define TEST TEST_Z
 #define TEST_Z(a) FAILIF((a) == 0)
