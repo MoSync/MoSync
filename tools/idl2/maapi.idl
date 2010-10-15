@@ -1400,7 +1400,7 @@ interface MAAPI {
 	* with a duration of zero may return non-zero, but a non-zero duration will return zero.
 	* In any case, the only way to conclusively determine if vibration is currently supported
 	* or not is to call this function with a duration of at least 1(one) ms.
-	* On Iphone the argument won't be taken into account.
+	* On iPhone the argument won't be taken into account.
 	*/
 	int maVibrate(in int ms);
 
