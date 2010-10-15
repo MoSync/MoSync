@@ -937,10 +937,17 @@ namespace Base
 
 	// TODO : Implement maVibrate
 	
-	SYSCALL(int,  maVibrate(int ms))
+	SYSCALL(int, maVibrate(int ms))
 	{
-		SYSLOG("maVibrate NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maVibrate");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maVibrate", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, ms);
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 
 	SYSCALL(void, maPanic(int result, const char* message))
