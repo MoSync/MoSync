@@ -2114,12 +2114,14 @@ maIOCtl_glPointSizex_case(glPointSizex);
 	static HWND sMainWnd = NULL, sEditBox = NULL, sTextBox = NULL;
 	static wchar_t* sTextBoxOutBuf;
 	static int sTextBoxOutSize;
+	static const wchar_t* sTextBoxInBuf;
 
 	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		LOGD("TextBoxProc 0x%p, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, (uint)lParam);
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
+			SetWindowTextW(sEditBox, sTextBoxInBuf);
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:
@@ -2156,6 +2158,7 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		DEBUG_ASSERT(SDL_GetWMInfo(&info));
 		sMainWnd = info.window;
 
+		sTextBoxInBuf = (wchar_t*)inText;
 		sTextBoxOutSize = maxSize;
 		sTextBoxOutBuf = (wchar_t*)outText;
 

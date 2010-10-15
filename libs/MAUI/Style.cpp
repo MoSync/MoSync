@@ -4,6 +4,7 @@ namespace MAUI {
 const Property::Type ColorProperty::sType = Property::COLOR;
 const Property::Type FontProperty::sType = Property::FONT;
 const Property::Type DrawableProperty::sType = Property::DRAWABLE;
+DrawableProperty DrawableProperty::null(NULL);
 const Property::Type ImageProperty::sType = Property::IMAGE;
 const Property::Type IntegerProperty::sType = Property::INTEGER;
 

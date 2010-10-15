@@ -78,6 +78,7 @@ public:
 	Drawable *mDrawable;
 
 	static const Type sType;
+	static DrawableProperty null;
 };
 
 class SkinProperty : public DrawableProperty, public WidgetSkin {

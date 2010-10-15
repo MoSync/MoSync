@@ -2,6 +2,7 @@
 #include <mastdlib.h>
 #include <mavsprintf.h>
 #include <mawvsprintf.h>
+#include <maassert.h>
 
 namespace MAUI {
 
@@ -14,7 +15,11 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		setCaption(str);
 		MAUI_LOG("%S", mString);
 		requestRepaint();
+		if(mListener != NULL) {
+			mListener->nativeEditFinished();
+		}
 	}
+	mListener = NULL;
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
@@ -62,8 +67,14 @@ bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
 	return false;
 }
 
-void NativeEditBox::activate() {
-	maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString, (wchar*)mString, mMaxSize, mOptions);
+void NativeEditBox::activate(NativeEditBoxListener* listener) {
+	mListener = listener;
+	wsprintf(mString, L"%s", mCaption.c_str());
+	int res = maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString,
+		(wchar*)mString, mMaxSize, mOptions);
+	if(res < 0) {
+		PANIC_MESSAGE("maTextBox failed");
+	}
 	Environment::getEnvironment().addTextBoxListener(this);
 }
 
@@ -74,12 +85,10 @@ const WString& NativeEditBox::getTitleString() const {
 	return mTitleString;
 }
 
-
 void NativeEditBox::setCaption(const String& caption) {
 	if(caption.length() > mMaxSize) {
 		setMaxSize(caption.length()+1);
 	}
-	wsprintf(mString, L"%s", caption.c_str());
 	Label::setCaption(caption);
 }
 

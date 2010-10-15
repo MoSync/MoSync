@@ -30,6 +30,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
+class NativeEditBoxListener {
+public:
+	/// Called when the user has pressed the OK button on the native edit box, closing it.
+	virtual void nativeEditFinished() = 0;
+};
+
 class NativeEditBox : public Label, public TextBoxListener {
 public:
 	NativeEditBox(int x=0, int y=0, int width=0, int height=0,
@@ -52,7 +58,7 @@ public:
 	// if caption is larger than mMaxSize mMaxSize will be changed to the length of the caption.
 	virtual void setCaption(const String& caption);
 
-	void activate();
+	void activate(NativeEditBoxListener* listener=NULL);
 
 protected:
 	void textBoxClosed(int res, int length);
@@ -64,6 +70,7 @@ protected:
 
 	int mStartX, mStartY;
 
+	NativeEditBoxListener* mListener;
 };
 
 } // namespace MAUI

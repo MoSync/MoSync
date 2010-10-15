@@ -39,12 +39,36 @@ protected:
 	typedef typename D::DictNode DN;
 public:
 
-	Map(int (*cf)(const Key&, const Key&) = &Compare<Key>)
+	Map(typename D::CompareFunction cf = &Compare<Key>)
 		: D::Dictionary(cf, OFFSETOF(PairKV, first)) {}
+
+	/**
+	* Inserts a new element into the Map.
+	*
+	* Returns a Pair. The Pair's second element is true if the element was inserted,
+	* or false if the element already existed in the map.
+	* The Pair's first element is an Iterator that points to the element in the Map.
+	*
+	* An element which has the same key as the new one may already be present in the Map;
+	* in that case, this operation does nothing, and the Iterator returned will point to
+	* the old element.
+	*/
 	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {
 		PairKV pkv = { key, value };
 		return D::insert(pkv);
 	}
+
+	/**
+	* The square bracket operator returns a reference to the Value
+	* corresponding to the specified Key.
+	*
+	* If the Key doesn't yet exist in the Map, it will be inserted
+	* with a default Value.
+	*
+	* There is no const variant of this function, because each call might
+	* potentially modify the Map by inserting a new key.
+	* Use find() if you have a const Map.
+	*/
 	Value& operator[](const Key& key) {
 		DN* node = (DN*)dict_lookup(&this->mDict, &key);
 		if(node == NULL) {

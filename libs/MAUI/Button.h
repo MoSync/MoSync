@@ -43,7 +43,6 @@ namespace MAUI {
 		bool pointerPressed(MAPoint2d p, int id);
 		bool pointerMoved(MAPoint2d p, int id);
 		bool pointerReleased(MAPoint2d p, int id);
-		void setCaption(const String& caption);
 
 		virtual bool isTransparent() const;
 		void setFocused(bool focused=true);
@@ -83,11 +82,10 @@ namespace MAUI {
 	 */
 	class ButtonStyle : public LabelStyle {
 	public:
-		ButtonStyle( 	DrawableProperty* focusedPressed,
-						DrawableProperty* focusedReleased,
-						DrawableProperty* unfocusedReleased,
-						FontProperty* font);
-
+		ButtonStyle(DrawableProperty* focusedPressed,
+			DrawableProperty* focusedReleased,
+			DrawableProperty* unfocusedReleased,
+			FontProperty* font);
 	};
 
 }

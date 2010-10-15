@@ -86,11 +86,6 @@ void Button::restyle() {
 	Label::restyle();
 }
 
-void Button::setCaption(const String& caption) {
-	mCaption = caption;
-	requestRepaint();
-}
-
 bool Button::isTransparent() const {
 	return true;
 }
@@ -119,6 +114,12 @@ ButtonStyle::ButtonStyle(
 		DrawableProperty* unfocusedReleased,
 		FontProperty* font) : LabelStyle(font, 0, 0, 0, 0, NULL, NULL)
 {
+	if(focusedPressed == NULL)
+		focusedPressed = &MAUI::DrawableProperty::null;
+	if(focusedReleased == NULL)
+		focusedReleased = &MAUI::DrawableProperty::null;
+	if(unfocusedReleased == NULL)
+		unfocusedReleased = &MAUI::DrawableProperty::null;
 	this->mProperties["skinFocusedPressed"] = focusedPressed;
 	this->mProperties["skinFocusedReleased"] = focusedReleased;
 	this->mProperties["skinUnfocusedReleased"] = unfocusedReleased;
