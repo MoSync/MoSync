@@ -54,6 +54,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.Vibrator;
 
 import android.telephony.TelephonyManager;
 

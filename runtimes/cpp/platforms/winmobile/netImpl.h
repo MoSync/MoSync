@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _NET_IMPL_H_
 #define _NET_IMPL_H_
 
+#include <net/net.h>
+
 #include <windows.h>
 #include <winsock.h>
 
@@ -40,5 +42,16 @@ extern bool winSockInitialized;
 
 typedef SOCKET MoSyncSocket;
 typedef unsigned short Uint16;
+
+class SslConnection : public TcpConnection {
+public:
+	SslConnection(const std::string& hostname, u16 port)
+		: TcpConnection(hostname, port) {}
+	virtual ~SslConnection();
+	virtual int connect();
+	const char* hostname() { return mHostname.c_str(); }
+
+	int mSslError;
+};
 
 #endif /* _NET_IMPL_H_ */

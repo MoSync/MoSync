@@ -91,6 +91,13 @@ namespace Bluetooth
              *         CONNERR, If there was an error.
              */
             virtual int write ( const void* src, int len );
+			
+			/**
+			 * Determines if the socket is connected or not.
+			 *
+			 * @return TRUE if connected, FALSE otherwise.
+			 */
+			virtual bool isConnected ( void );
 
             // From Closable
             /**
