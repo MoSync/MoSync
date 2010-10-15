@@ -2599,6 +2599,10 @@ SYSCALL(void, maSoundSetVolume(int vol)) {
 		return;
 	maxVolume = gPlayer->MaxVolume();
 #endif
+	LOGA("maxVolume: %i\n", maxVolume);
+	if(maxVolume == 0) {
+		return;
+	}
 
 	float fvol = vol;
 	fvol /= 100;
