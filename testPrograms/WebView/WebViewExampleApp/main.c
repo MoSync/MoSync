@@ -132,12 +132,12 @@
     </body> \
     </html>"
 
-#define BGCOLOR_SCRIPT " \
+#define BGCOLOR_SCRIPT "javascript: \
 	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color.'; \
-	document.bgColor='%s'; \
+	document.bgColor='Pink'; \
 	"
 
-#define MESSAGE_SCRIPT " \
+#define MESSAGE_SCRIPT "javascript: \
 	document.getElementById(\"DataMessage\").innerHTML = '%s'; \
 	"
 
@@ -223,12 +223,16 @@ int MAMain()
 		maExit(0);
 	}
 
-	maWidgetOpen(webView, WIDGET_ROOT);
+	lprintfln("Opening WebView");
+	int r = maWidgetOpen(webView, WIDGET_ROOT);
+	lprintfln("Opening WebView result: %i", r);
 
 	while (1)
 	{
+		lprintfln("maGetEvent");
 		while (0 != maGetEvent(&event))
 		{
+			lprintfln("switch event.type: %i", event.type);
 			switch (event.type)
 			{
 				case EVENT_TYPE_CLOSE:
@@ -257,6 +261,8 @@ int MAMain()
 				case EVENT_TYPE_WIDGET_OPENED:
 					// Must wait to set the HTML until this event to make
 					// sure the WebView is fully created before use.
+
+					lprintfln("EVENT_TYPE_WIDGET_OPENED");
 					maWidgetLoadHTML(webView, HTML4);
 					break;
 

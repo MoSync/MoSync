@@ -21,7 +21,7 @@ void WidgetMessageFreeString(char* data)
 char* WidgetMessageGet(int messageId)
 {
 	int size = maWidgetGetMessageSize(messageId);
-	char* message = (char*) WidgetMessageAllocateString(size);
+	char* message = (char*) WidgetMessageAllocateString(size + 1);
 	if (NULL == message)
 	{ 
 		return NULL;
@@ -34,6 +34,9 @@ char* WidgetMessageGet(int messageId)
 		return NULL;
 	}
 	
+	// Zero terminate string.
+	message[size] = 0;
+
 	return message;
 }
 

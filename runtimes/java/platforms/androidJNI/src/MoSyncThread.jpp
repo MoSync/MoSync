@@ -60,6 +60,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import android.view.inputmethod.InputMethodManager;
+import android.view.View;
 
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.TextBox;

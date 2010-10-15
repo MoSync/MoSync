@@ -1262,7 +1262,6 @@ interface MAAPI {
 		
         /**
 		 * Event for sending a message from a Widget to MoSync.
-		 * MAEvent.widget.widgetType is set to the widget type.
 		 * MAEvent.widget.widgetHandle is set to the widget handle.
 		 * MAEvent.widget.messageId is used for retrieving message data.
 		 * This event is used by WebViews to send requests from JavaScript to MoSync.
@@ -1340,11 +1339,6 @@ interface MAAPI {
 			 * Used for widget events.
 			 */
 			struct {
-				/**
-				 * Widget type.
-				 */
-				int widgetType;
-				
 				/**
 				 * Widget handle.
 				 */
@@ -2964,18 +2958,21 @@ interface MAAPI {
 #if IX_WIDGET
 
 		constset int WIDGET_ {
-			// Success code.
+			/// Success code.
 			OK = 0;
 			// Generic error code.
 			ERROR = -1;
-			// Script error.
+			/// Script error.
 			SCRIPT_ERROR = -2;
-			// Root widget.
+			/// Root widget handle.
 			ROOT = -100;
+			/// MoSync view handle.
+			MAIN_VIEW = -101;
 		}
 	
 		constset int WIDGET_TYPE_ {
 			WEBVIEW = 101;
+			SCRIPTABLE = 102;
 		}
 		
 		/** 

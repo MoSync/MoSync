@@ -1171,6 +1171,100 @@ int maShowVirtualKeyboard()
 	return 0;
 }
 
+// TODO: We should move Widget syscalls to MoSyncWidget.jpp and include
+// that file here.
+
+/**
+ * Class that holds native widgets and Widget messages.
+ */
+public static class WidgetTable
+{
+	/**
+	 * Counter for widget handles and messages.
+	 */
+	MAHandle mHandleCounter = 0;
+	
+	/**
+	 * Table for native widgets.
+	 * The key is the widgetHandle, the value is a subclass of View.
+	 */
+	private Hashtable<Integer, View> mWidgets = new Hashtable<Integer, View>();
+	private Hashtable<Integer, byte[]> mMessages = new Hashtable<Integer, byte[]>();
+
+	public MAHandle getNextHandle()
+	{
+		return ++mHandleCounter;
+	}
+	
+	/**
+	 * Retrieve a native widget from the widget table.
+	 * @param widgetHandle
+	 */
+	public View getWidget(MAHandle widgetHandle)
+	{
+		return mWidgets.get(widgetHandle);
+	}
+
+	/**
+	 * Add a native widget to the widget table.
+	 * @param widgetHandle
+	 * @param nativeWidget
+	 */
+	public void putWidget(MAHandle widgetHandle, View nativeWidget)
+	{
+		mWidgets.put(widgetHandle, nativeWidget);
+	}
+	
+	/**
+	 * Remove a native widget from the widget table.
+	 * @param widgetHandle
+	 */
+	public void removeWidget(MAHandle widgetHandle)
+	{
+		mWidgets.remove(widgetHandle);
+	}
+	
+	/**
+	 * Stores a message in the message table.
+	 * @param message
+	 * @return The id of the stored message, which is used for retrieval.
+	 */
+	public int storeMessage(byte[] message)
+	{
+		int messageId = getNextHandle();
+		mMessages.put(messageId, message);
+		return messageId;
+	}
+	
+	/**
+	 * Retrieves and REMOVES a message from the message table.
+	 * @param messageId
+	 * @return The message.
+	 */
+	public byte[] retrieveMessage(int messageId)
+	{
+		byte[] message = mMessages.get(messageId);
+		mMessages.remove(message);
+		return message;
+	}
+	
+	/**
+	 * Returns the size of a message in the message table.
+	 * @param messageId
+	 * @return The size of the message with the given id.
+	 */
+	public int getMessageSize(int messageId)
+	{
+		byte[] message = mMessages.get(messageId);
+		return message.length;
+	}
+}
+
+/**
+ * Global instance of the widget table.
+ */
+public WidgetTable mWidgetTable = new WidgetTable();
+
 int maWidgetCreate(int widgetType)
 {
 	Log.i("MoSync", "maWidgetCreate");
@@ -1218,30 +1312,39 @@ int maWidgetEvaluateScript(int widgetHandle, String script)
 	return ((MoSync) mContext).maWidgetEvaluateScript(widgetHandle, script);
 }
 
+/**
+ * Return the size of the message with given id.
+ * The message can be retrieved only once.
+ * @param messageId
+ * @return Number of bytes of message data.
+ */
 int maWidgetGetMessageSize(int messageId)
 {
 	Log.i("MoSync", "maWidgetGetMessageSize");
-	// Old code: return WebViewActivity.getInstance().getRequestSize(messageId);
-	return ((MoSync) mContext).maWidgetGetMessageSize(messageId);
+	return mWidgetTable.getMessageSize(messageId);
 }
 
+/**
+ * Write the message with given id to the supplied buffer.
+ * The message can be retrieved only once.
+ * @param messageId
+ * @param buf Memory address where to store message data.
+ * @param bufSize Size of memeory area to hold teh messsage.
+ * @return Number of bytes copied to the buffer, or WIDGET_ERROR on error.
+ */
 int maWidgetGetMessage(int messageId, int buf, int bufSize)
 {
 	Log.i("MoSync", "maWidgetGetMessage");
 	
-	// Old code: int size = WebViewActivity.getInstance().getRequestSize(messageId);
-	int size = ((MoSync) mContext).maWidgetGetMessageSize(messageId);
+	int size = mWidgetTable.getMessageSize(messageId);
 	if (bufSize < size)
 	{
 		Log.e("MoSync", "Error in maWidgetGetMessage: bufSize is too small");
 		return WIDGET_ERROR;
 	}
 		
-	// Write request to memory.
-	
-	// Old code: byte[] bytes = WebViewActivity.getInstance().getRequestBytes(requestID);
-	byte[] bytes = ((MoSync) mContext).maWidgetGetMessageBytes(messageId);
-	
+	// Write message to memory.
+	byte[] bytes = mWidgetTable.retrieveMessage(messageId);
 	mMemDataSection.mark();
 	mMemDataSection.position(buf);
 	mMemDataSection.put(bytes);

@@ -27,6 +27,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.mosync.java.android.MoSync;
+
 /**
  * MoSync WebView class.
  */
@@ -62,6 +64,8 @@ public class MoSyncWebView extends WebView
 		
 		getSettings().setJavaScriptEnabled(true);
 		
+		// Experimented with these settings to solve a focus issue,
+		// but it was solved by overriding onCheckIsTextEditor().
 		//setFocusable(true);
 		//setFocusableInTouchMode(true);
 		
@@ -86,12 +90,9 @@ public class MoSyncWebView extends WebView
 				{
 					Log.i("MoSync", "Processing MoSync url: " + url);
 					
-					// TODO: Save command in a lookup table.
-					mMessage = url.substring(MoSyncProtocol.length());
-					
-					// Post event to MoSync event system.
-					// TODO: Use counter com messageId.
-					int messageId = 1;
+					// Save message in a lookup table.
+					String messageString = url.substring(MoSyncProtocol.length());
+					int messageId = mMoSyncThread.mWidgetTable.storeMessage(messageString.getBytes());
 					postEvent(EVENT_TYPE_WIDGET_MESSAGE, messageId);
 					
 					// Abort further processing of this url by the WebView by returning true.
@@ -107,8 +108,9 @@ public class MoSyncWebView extends WebView
 			}
 		});
 		
-		String html = "<html><body>New WebView</body></html>";
-		loadData(html, "text/html", "utf-8");
+		// Don not set default content.
+		//String html = "<html><body>New WebView</body></html>";
+		//loadData(html, "text/html", "utf-8");
 	}
 	
 	/**
@@ -138,16 +140,7 @@ public class MoSyncWebView extends WebView
 	 */
 	public void postEvent(int eventType, int messageId)
 	{
-		//Log.i("MoSyncWebView", "postEvent: " + event[0]);
-		
-		int[] event = new int[4];
-		event[0] = eventType;
-		event[1] = WIDGET_TYPE_WEBVIEW;
-		event[2] = mWidgetHandle;
-		event[3] = messageId;
-		
-		mMoSyncThread.nativePostEvent(event);
-		mMoSyncThread.interrupt();
+		((MoSync) mContext).postWidgetEvent(eventType, mWidgetHandle, messageId);
 	}
 	
 	public void loadHTML(final String html)
@@ -181,31 +174,22 @@ public class MoSyncWebView extends WebView
 	/**
 	 * Use the bookmarklet technique to run a script in the WebView.
 	 * http://en.wikipedia.org/wiki/Bookmarklet
+	 * @param script The script must start with "javascript:"
+	 * @return WIDGET_OK or WIDGET_ERROR
 	 */
-	public void evaluateScript(final String script)
+	public int evaluateScript(final String script)
 	{
 		Log.i("MoSync", "MoSyncWebView.evaluateScript");
 		
-		loadUrl("javascript: " + script); 
-	}
-	
-    public void close()
-	{
-    	Log.i("MoSync", "MoSyncWebView.close");
-		
-		// Post notification message to MoSync.
-		postEvent(EVENT_TYPE_WIDGET_CLOSED, 0);
-    }
-	
-	public int getMessageSize(int messageId)
-	{
-		// TODO: Get command using messageId. Return error code on error.
-		return mMessage.length() + 1;
-	}
-	
-	public byte[] getMessageBytes(int messageId)
-	{
-		// TODO: Get command using messageId. Return null on error.
-		return mMessage.getBytes();
+		// Ensure thet the script starts with "javascript:".
+		if (script.startsWith("javascript:"))
+		{
+			loadUrl(script);
+			return WIDGET_OK;	
+		}
+		else
+		{
+			return WIDGET_ERROR;
+		}
 	}
 }
