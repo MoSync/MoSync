@@ -133,7 +133,7 @@ size_t wcstombs(char* dst, const wchar_t* src, size_t count) {
 			dpos += res;
 			srcp++;
 		} while(res > 0);
-		dpos++;	// terminating NUL.
+		dpos++;	// terminating NULL.
 	} else while(dpos + MB_CUR_MAX < count) {
 		int res = wctomb(dst + dpos, *srcp);
 		if(res < 0)
