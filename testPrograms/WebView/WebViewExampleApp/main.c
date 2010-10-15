@@ -51,7 +51,6 @@
 		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
 	</div> \
 	<div id=\"DataMessage\"></div> \
-	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
@@ -134,7 +133,7 @@
 
 #define BGCOLOR_SCRIPT "javascript: \
 	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color.'; \
-	document.bgColor='Pink'; \
+	document.bgColor='%s'; \
 	"
 
 #define MESSAGE_SCRIPT "javascript: \
@@ -223,16 +222,13 @@ int MAMain()
 		maExit(0);
 	}
 
-	lprintfln("Opening WebView");
 	int r = maWidgetOpen(webView, WIDGET_ROOT);
-	lprintfln("Opening WebView result: %i", r);
+	maWidgetLoadHTML(webView, HTML4);
 
 	while (1)
 	{
-		lprintfln("maGetEvent");
 		while (0 != maGetEvent(&event))
 		{
-			lprintfln("switch event.type: %i", event.type);
 			switch (event.type)
 			{
 				case EVENT_TYPE_CLOSE:
@@ -261,9 +257,7 @@ int MAMain()
 				case EVENT_TYPE_WIDGET_OPENED:
 					// Must wait to set the HTML until this event to make
 					// sure the WebView is fully created before use.
-
-					lprintfln("EVENT_TYPE_WIDGET_OPENED");
-					maWidgetLoadHTML(webView, HTML4);
+					//maWidgetLoadHTML(webView, HTML4);
 					break;
 
 				case EVENT_TYPE_WIDGET_MESSAGE:
@@ -274,7 +268,7 @@ int MAMain()
 		}
 
 		// TODO: Cannot call maWait, locks the WebView. Look into this.
-		//maWait(0);
+		maWait(0);
 	}
 
 	//maWidgetClose(webView);

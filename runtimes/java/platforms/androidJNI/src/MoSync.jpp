@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -49,7 +50,7 @@ public class MoSync extends Activity
 {
 	static public MoSyncThread mMoSyncThread;
 	MoSyncView mMoSyncView;
-
+	Object mRootView;
 	Intent mMoSyncServiceIntent;
 	
 	/**
@@ -101,8 +102,8 @@ public class MoSync extends Activity
 		createMoSyncView();
 		
 		setContentView(mMoSyncView);
-		// TODO: Restore if needed: mMoSyncThread.setMoSyncView(mMoSyncView);
 		
+		mRootView = mMoSyncView.getParent();
     }
 	
 	/**
@@ -176,7 +177,7 @@ public class MoSync extends Activity
 		if(mThreadHasDied) this.finish();
 		
 		// create a new view and inform the thread about this
-		createMoSyncView();
+		//createMoSyncView();
 		
 		// TODO: What do we do if a native widget was open?
 		// How do we recreate it? Perhaps add a message to create the UI.
@@ -300,26 +301,48 @@ public class MoSync extends Activity
 					setContentView(nativeWidget);
 					nativeWidget.requestFocus();
 					
-					Log.i("MoSync.maWidgetOpen", "Widget opened 1");
+					// Post notification message to MoSync.
+					postWidgetEvent(EVENT_TYPE_WIDGET_OPENED, widgetHandle, 0);
+					
+					result.setValue(WIDGET_OK);
+				} 
+			});
+			
+			return result.waitForValue(1000);
+		}
+		
+		// Get the parent widget.
+		final View nativeParentWidget = mMoSyncThread.mWidgetTable.getWidget(widgetParentHandle);
+		if (null == nativeParentWidget)
+		{
+			return WIDGET_ERROR;
+		}
+		
+		// Open the widget in the the parent widget.
+		// TODO: This code has not been tested.
+		if (nativeParentWidget instanceof ViewGroup)
+		{
+			final WidgetResult result = new WidgetResult();
+			final Context context = this;
+			mHandler.post(new Runnable() 
+			{ 
+				public void run() 
+				{
+					((ViewGroup) nativeParentWidget).addView(nativeWidget);
+					nativeWidget.requestFocus();
 					
 					// Post notification message to MoSync.
 					postWidgetEvent(EVENT_TYPE_WIDGET_OPENED, widgetHandle, 0);
 					
-					Log.i("MoSync.maWidgetOpen", "Widget opened 2");
-					
 					result.setValue(WIDGET_OK);
-					
-					Log.i("MoSync.maWidgetOpen", "Widget opened 3");
 				} 
 			});
 			
-			Log.i("MoSync.maWidgetOpen", "waitForValue");
-					
 			return result.waitForValue(1000);
 		}
 		
 		Log.i("MoSync.maWidgetOpen", "WIDGET_ERROR");
-					
+		
 		// We could not open the requested widget.
 		return WIDGET_ERROR;
 	}
@@ -341,14 +364,25 @@ public class MoSync extends Activity
 		{ 
 			public void run() 
 			{
-				// TODO: Need to check if there is a parent view. If so, close
-				// this view, and do not restore the MoSyncView.
-				setContentView(mMoSyncView); // Restore the MoSyncView.
-		
+				Object parent = nativeWidget.getParent();
+					
+				// Restore the MoSyncView if we are we closing a 
+				// top level view?
+				if (parent == mRootView)
+				{
+					setContentView(mMoSyncView);
+				}
+				else
+				{
+					// TODO: This code is not tested.
+					if (parent instanceof ViewGroup)
+					{
+						((ViewGroup) parent).removeView(nativeWidget);
+					}
+				}
+				
 				// Post notification message to MoSync.
 				postWidgetEvent(EVENT_TYPE_WIDGET_CLOSED, widgetHandle, 0);
-	
-				Log.i("MoSync.maWidgetOpen", "Widget closed");
 				
 				result.setValue(WIDGET_OK);
 			} 

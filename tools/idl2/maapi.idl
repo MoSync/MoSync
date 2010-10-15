@@ -2996,6 +2996,8 @@ interface MAAPI {
 
 		/** 
 		 * Removes a widget from its parent (but does not destroy it).
+		 * Closing a top-level widget (a widget that has VIEW_ROOT as parent)
+		 * causes the MoSync view to open.
 		 * \returns A status code.
 		 */
 		int maWidgetClose(in MAHandle widgetHandle);
