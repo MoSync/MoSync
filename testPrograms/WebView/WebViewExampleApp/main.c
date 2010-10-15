@@ -271,7 +271,7 @@ int MAMain()
 		maWait(0);
 	}
 
-	//maWidgetClose(webView);
+	maWidgetClose(webView);
 	maWidgetDestroy(webView);
 
 	return 0;

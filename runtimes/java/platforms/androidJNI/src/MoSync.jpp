@@ -48,9 +48,25 @@ import com.mosync.internal.android.MoSyncWebView;
 */
 public class MoSync extends Activity
 {
+	/**
+	 * Thread where the MoSync syscalls run.
+	 */
 	static public MoSyncThread mMoSyncThread;
+	
+	/**
+	 * View for the basic drawing surface.
+	 */
 	MoSyncView mMoSyncView;
+	
+	/**
+	 * The ViewGroup object that holds the content view
+	 * of the activity.
+	 */
 	Object mRootView;
+	
+	/**
+	 * ??
+	 */
 	Intent mMoSyncServiceIntent;
 	
 	/**
@@ -58,8 +74,10 @@ public class MoSync extends Activity
 	 */
 	Handler mHandler;
 	
+	/**
+	 * ??
+	 */
 	boolean mThreadHasDied = false;
-	boolean mIsPaused = false;
 	
 	/**
 	*
@@ -194,17 +212,6 @@ public class MoSync extends Activity
 		
 		// this should be dealt with differently
 		//registerReceiver(mBatteryReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
-		
-		if(mIsPaused == true)
-		{
-			mIsPaused = false;
-			
-			//mMoSyncView.postFocusGainedEvent();
-			setContentView(mMoSyncView);
-			// TODO: Set other widgets here?
-			
-			// TODO: Delete this line: mMoSyncThread.setMoSyncView(mMoSyncView);
-		}
     }
 
 	@Override
@@ -216,8 +223,6 @@ public class MoSync extends Activity
 		mThreadHasDied = mMoSyncThread.isDead();
 			
 		//unregisterReceiver(mBatteryReciever);
-		
-		mIsPaused = true;
   
 		//mMoSyncView.postFocusLostEvent();		
     }

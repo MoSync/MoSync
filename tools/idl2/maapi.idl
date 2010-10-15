@@ -2973,6 +2973,12 @@ interface MAAPI {
 		constset int WIDGET_TYPE_ {
 			WEBVIEW = 101;
 			SCRIPTABLE = 102;
+			LINEARLAYOUT_VERTICAL = 103;
+			LINEARLAYOUT_HORIZONTAL = 104;
+			BUTTON = 105;
+			LABEL = 106;
+			EDITFIELD = 107;
+			EDITBOX = 108;
 		}
 		
 		/** 
