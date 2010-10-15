@@ -266,12 +266,15 @@ int SslConnection::connect() {
 		LOG_GLE;
 		return CONNERR_SSL;
 	}
+
+#if _WIN32_WCE >= 0x500
 	iRet = WSAIoctl(mSock, SO_SSL_SET_PEERNAME, (LPVOID)mHostname.c_str(), mHostname.length() + 1,
 		NULL, 0, NULL, NULL, NULL);
 	if(iRet == SOCKET_ERROR) {
 		LOG_GLE;
 		return CONNERR_SSL;
 	}
+#endif
 
 	// Connect to the server
 	mSslError = 0;
