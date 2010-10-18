@@ -608,46 +608,75 @@ int maSetDrawTarget(int image)
 
 /**
 * @brief maCreateImageFromData
+*
+* Create an image from a resource and store it in an image object.
+*
+* @param placeholder The handle for the image
+* @param data The handle of the resource where the image data is stored
+* @param offset Byte offset into the resource data
+* @param size Byte size of the image data
+* @return Status code
 */
 int maCreateImageFromData(int placeholder, int data, int offset, int size)
 {
 	SYSLOG("maCreateImageFromData");
 
-	byte[] ra = new byte[size];
+	// Byte array to hold resource data. This is the data we will
+	// use to create the image.
+	byte[] resourceData = new byte[size];
 
-	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
-	if (null != bb)
+	// If data is a binary resource it is found in the table mBinaryResources.
+	ByteBuffer binData = (ByteBuffer)mBinaryResources.get(data);
+	if (null != binData)
 	{
 		try
 		{
-			bb.position(offset);
-			bb.get(ra);
+			// Load binary data into resource memory.
+			binData.position(offset);
+			binData.get(resourceData);
 		}
 		catch(Exception e)
 		{
+			Log.i("maCreateImageFromData","Couldn't read data, exception : " + e);
 			return RES_BAD_INPUT;
 		}
 	}
-	else
+	else 
 	{
-		UBinData ubd = (UBinData)mUBinaryResources.get(data);
-		if (null != ubd)
+		// If it is an unloaded binary resource (.ubin) it is found in mUBinaryResources.
+		UBinData uBinData = (UBinData)mUBinaryResources.get(data);
+		if (null != uBinData)
 		{
-			if(ubd.mSize != size)
+			// Sanity check that offset + size is not larger the resource itself. 
+			if (uBinData.mSize < offset + size)
 			{
+				Log.i("maCreateImageFromData",
+					"size error, uBinData.mSize: " + uBinData.mSize + 
+					" size: " + size + 
+					" offset: " + offset);
 				return RES_BAD_INPUT;
 			}
 		
 			try
 			{	
+				// Read data from the resource asset file. All resources are
+				// bundled into this file.
 				AssetManager assetManager = mContext.getAssets();
-				InputStream is = assetManager.open(RESOURCE_FILE);
+				InputStream resourceFileInputStream = assetManager.open(RESOURCE_FILE);
 			
-				is.skip(ubd.mOffset - (int)mResourceOffset);
-				is.read(ra);
+				// Here we position the stream pointer where the image data starts.
+				// mResourceOffset is where resources start (after the header of the asset file).
+				// We need to subtract mResourceOffset because resourceFileInputStream
+				// will begin at mResourceOffset and uBinData.mOffset is the offset
+				// from the actual beginning of the asset file.
+				resourceFileInputStream.skip(uBinData.mOffset - (int)mResourceOffset + offset);
+				
+				// Read from asset file into the data array.
+				resourceFileInputStream.read(resourceData);
 			}
 			catch(Exception e)
 			{
+				Log.i("maCreateImageFromData","Couldn't read read stream, exception : " + e.toString());
 				return RES_BAD_INPUT;
 			}
 		}
@@ -655,23 +684,28 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 	
 	try 
 	{
-		Bitmap decodedImage = BitmapFactory.decodeByteArray(ra, 0, ra.length);
+		// Create a Bitmap object from the resoure data.
+		Bitmap decodedImage = BitmapFactory.decodeByteArray(resourceData, 0, resourceData.length);
 		if (decodedImage == null)
 		{
+			Log.i("maCreateImageFromData","could not decode image data (decodedImage == null)");
 			return RES_BAD_INPUT;
 		}
 		mImageResources.put(placeholder, new ImageCache(null, decodedImage));
 	} 
 	catch(UnsupportedOperationException e) 
 	{
+		Log.i("maCreateImageFromData","Unsupported operation, exception : " + e);
 		return RES_BAD_INPUT;
 	} 
 	catch (java.lang.IllegalArgumentException e) 
 	{
+		Log.i("maCreateImageFromData","Illegal argument, exception : " + e);
 		return RES_BAD_INPUT;
 	} 
 	catch (java.lang.OutOfMemoryError e) 
 	{
+		Log.i("maCreateImageFromData","Out of memory, exception : " + e);
 		return RES_OUT_OF_MEMORY;
 	}
 	return RES_OK;
@@ -1274,6 +1308,12 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 
 /**
 * @brief UBinData class
+*
+* Class that stores offset and size of an unloaded binary resource (.ubin). 
+* These a memory saving resources that are loaded on demand. Om Android we
+* need to store audio resource as files to be able to play them, there is
+* some special handling of audio resources in the Android runtime. See file
+* MoSyncSound.jpp.
 */
 class UBinData
 {
@@ -1282,10 +1322,21 @@ class UBinData
 		mOffset = offset;
 		mSize = size;
 	}
+	
+	/**
+	 * The byte offset in the resource file of this ubin.
+	 */
 	public int mOffset;
+	
+	/**
+	 * The byte size of this ubin.
+	 */
 	public int mSize;
 };
 
+/**
+ * Table that stores ubin resources. 
+ */
 Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
 
 
@@ -1307,12 +1358,14 @@ void loadUBinary(int resourceIndex, int offset, int size)
 	{
 		AssetManager assetManager = mContext.getAssets();
 		AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
-	
+		
 		FileInputStream fis = pAfd.createInputStream();
-		fis.skip(offset);
+		fis.skip(offset-mResourceOffset);
 	
 		if(true == checkIfMimeAudioType(fis))
+		{
 			storeAudioUBin(ubd, resourceIndex);
+		}
 	}
 	catch(IOException ioe)
 	{
