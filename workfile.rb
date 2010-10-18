@@ -16,6 +16,7 @@ elsif(HOST == :darwin)
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
+	# todo: add lcab
 	PLATFORM_TOOLS = []
 end
 

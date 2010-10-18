@@ -756,7 +756,7 @@ void DumpPipeDebugInfo()
 
 	if (CodeCopyInit && pass_count > 2)			// If the
 	{
-		int max = CodeMemArray.hi;
+		uint max = CodeMemArray.hi;
 		
 		if (CodeMemArrayCopy.hi > max)
 			max  = CodeMemArrayCopy.hi;
