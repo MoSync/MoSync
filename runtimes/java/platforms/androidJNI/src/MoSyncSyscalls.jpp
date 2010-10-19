@@ -1422,6 +1422,7 @@ int maTextBox(String title, String inText, int outText, int maxSize, int constra
 	bundle.putString("TITLE", title);
 	bundle.putString("TEXT", inText);
 	bundle.putInt("OUTPUT", outText);
+	bundle.putInt("CONSTRAINTS", constraints);
 	intent.putExtras(bundle);
 	mContext.startActivity(intent);
 	Log.i("MoSync", "New activity started for InputBox");
