@@ -2651,15 +2651,40 @@ retry:
 	static int maGetSystemProperty(const char* key, char* buf, int size) {
 		if(strcmp(key, "mosync.iso-639-1") == 0) {
 			LCID lcid = GetUserDefaultLCID();
-			WCHAR wbuf[4];
-			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, 4);
-			GLE(res);
+			WCHAR wbuf[16];
+
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+			if(!res) {
+				// use shaky fallback:
+				// according to documentation of LOCAL_SABBREVLANGNAME:
+				// Abbreviated name of the language. In most cases, the name is created by taking 
+				// the two-letter language abbreviation from ISO Standard 639 and adding a third letter, 
+				// as appropriate, to indicate the sublanguage. For example, the abbreviated name for 
+				// the language corresponding to the English (United States) locale is ENU.
+				res = GetLocaleInfo(lcid, LOCALE_SABBREVLANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+				if(!res) return -2;
+				wbuf[0] = towlower(wbuf[0]);
+				wbuf[1] = towlower(wbuf[1]);
+				wbuf[2] = 0;
+				res-=1;
+			}
+			if(res > size)
+				return res;
+			size_t sres = wcstombs(buf, wbuf, size);
+			DEBUG_ASSERT(sres == res-1);
+			return res;
+		} else if(strcmp(key, "mosync.winmobile.locale.SABBREVLANGNAME") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			WCHAR wbuf[16];
+			int res = GetLocaleInfo(lcid, LOCALE_SABBREVLANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+			if(!res) return -2;
 			if(res > size)
 				return res;
 			size_t sres = wcstombs(buf, wbuf, size);
 			DEBUG_ASSERT(sres == res-1);
 			return res;
 		}
+
 		return -2;
 	}
 
