@@ -97,7 +97,7 @@ public class TextBox extends Activity implements OnClickListener {
 		// Therefore, order matters :)
 		int[] constraintsArray = 
 		{
-			InputType.TYPE_CLASS_TEXT,
+			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE,
 			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
 			InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED,
 			InputType.TYPE_CLASS_PHONE,
