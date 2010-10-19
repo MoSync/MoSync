@@ -776,7 +776,8 @@ static uint32 calculateFunctionChecksum(const Function& f) {
 	AH(f.args.size());
 	for(size_t k=0; k<f.args.size(); k++) {
 		const Argument& a(f.args[k]);
-		AH(a.in ? (1 << k) : (32 << k));
+		AH(a.in ? k : 0);
+		AH(a.in ? 0 : k);
 		AH(a.type);
 		AH(a.name);
 	}
