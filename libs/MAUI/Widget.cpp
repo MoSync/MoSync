@@ -40,6 +40,7 @@ namespace MAUI {
 		mDirty(false),
 		mHasRequestedUpdate(true),
 		mFocused(false),
+		mFocusable(false),
 		mEnabled(true),
 		mWidgetListeners(false),
 		mPaddingLeft(0),
@@ -527,10 +528,16 @@ namespace MAUI {
 	}
 
 	bool Widget::isFocusable() const {
+		if(mFocusable)
+			return true;
 		return mChildren.size()==0;
 	}
 	bool Widget::isFocusableInKeyMode() const {
 		return isFocusable();
+	}
+
+	void Widget::setFocusable(bool on) {
+		mFocusable = on;
 	}
 
 	bool isToDirectionOf(Direction direction, Rect src, Rect dest) {

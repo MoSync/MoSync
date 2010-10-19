@@ -108,9 +108,6 @@ namespace MAUI {
 	* widgets lead to undefined rendering behaviour. A widget is clipped by its 
 	* parent.
 	*  
-	* Widget constructors take a "parent" argument which, if not NULL, causes
-	* the widget being constructed to be added as a child of the parent.
-	* 
 	* When a Widget is deleted, it deletes all its children as well.
 	* 
 	* The position of a widget is always expressed relatively to the top left
@@ -186,7 +183,7 @@ namespace MAUI {
 		/** 
 		* \brief Renders the Widget and all its descendants recursively.
 		* \note This function should never be used directly (it's handled by the system). Use requestRepaint instead.
-		* \note It should also most likely never have to be overriden, override drawInternal instead.
+		* \note It should also most likely never have to be overriden, override drawWidget instead.
 		* \param forceDraw If it is set to true, the dirty flag won't be taken into account (the widget will be redrawn anyway).
 		*/
 		virtual void draw(bool forceDraw=false);
@@ -469,6 +466,13 @@ namespace MAUI {
 		*/
 		virtual bool isFocusableInKeyMode() const;
 
+		/**
+		* By default, a Widget are not focusable when they have children.
+		* Call this function to make it focusable in every case.
+		* May be overridden if a subclass overloads isFocusable().
+		*/
+		void setFocusable(bool on = true);
+
 		/** 
 		* \brief Returns the closest focusable (in key mode) in the specified direction.
 		* \returns A pointer to the closest focusable or NULL if there's none.
@@ -617,6 +621,9 @@ namespace MAUI {
 
 		// used to keep which state the widget is in (focused or unfocused)
 		bool mFocused;
+
+		// true if Widget should be focusable even when it has children.
+		bool mFocusable;
 
 		// used to keep which enable state the focus is in (if it isn't enabled, it won't be drawn).
 		bool mEnabled;
