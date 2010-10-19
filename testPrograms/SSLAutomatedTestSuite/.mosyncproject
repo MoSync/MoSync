@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.1">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<build.cfg id="Test" types="Release Test"/>
+<build.cfg id="Test_Debug" types="Test Debug"/>
+<properties>
+<property key="build.prefs:additional.libraries/Test" value="testify.lib"/>
+<property key="build.prefs:additional.libraries/Test_Debug" value="testifyD.lib"/>
+<property key="build.prefs:memory.data/Test" value="256"/>
+<property key="build.prefs:memory.data/Test_Debug" value="256"/>
+<property key="build.prefs:memory.heap/Test" value="128"/>
+<property key="build.prefs:memory.heap/Test_Debug" value="128"/>
+<property key="build.prefs:memory.stack/Test" value="64"/>
+<property key="build.prefs:memory.stack/Test_Debug" value="64"/>
+<property key="standard.excludes" value="%test.ns:test.res%"/>
+<property key="standard.excludes/Test" value="%EMPTY%"/>
+<property key="standard.excludes/Test_Debug" value="%EMPTY%"/>
+<property key="template.id" value="project.empty"/>
+<property key="test.ns:test.res" value="test"/>
+</properties>
+</project>
