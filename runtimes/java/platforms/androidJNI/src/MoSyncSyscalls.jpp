@@ -848,8 +848,12 @@ int maWriteStore(int store, int data)
 				FileOutputStream fos = new FileOutputStream(f, false);
 				FileChannel fc = fos.getChannel();
 				
-				fc.write(bb);
+				// Make sure that the buffer is reading from the start
+				bb.position(0);
 				
+				fc.write(bb);
+				fc.force(false);
+				fc.close();
 				fos.close();
 				return 1;
 			}
@@ -872,7 +876,7 @@ int maWriteStore(int store, int data)
 				fos.close();
 				return 1;
 			}
-			
+
 			SYSLOG("didn't find buffer, data:" + data);
 			return STERR_GENERIC;			
 		}
