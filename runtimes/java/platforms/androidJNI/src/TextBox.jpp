@@ -141,6 +141,13 @@ public class TextBox extends Activity implements OnClickListener {
 
 	protected void onStop() {
 		super.onStop();
+		// Send a focus gained event
+		// when going back to MoSync view
+		int[] event = new int[3];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		event[1] = 0;
+		event[2] = 0;
+		MoSync.mMoSyncThread.postEvent(event);
 	}
 
 	protected void onRestart() {
@@ -186,11 +193,7 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			Log.i("InputBox", "event" + output.length());
 			Log.i("InputBox", "event" + event[1]);
-		
-			// Send a focus gained event now when get returns to the application
-			event[0] = EVENT_TYPE_FOCUS_GAINED;
-			MoSync.mMoSyncThread.postEvent(event);
-		
+	
 			finish();
 		}
 		if( v.getId() == mCancelButton.getId() ) {
