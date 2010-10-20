@@ -2665,6 +2665,8 @@ interface MAAPI {
 		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
 		* Multi-language applications should use this to determine which language to use.
 		*
+		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property. See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
+		*
 		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
 		*
 		* \param key The property's key.

@@ -22,12 +22,15 @@ static public final boolean checkIfMimeAudioType(byte[] in) throws Exception
 {
 	String audio="audio";
 	String beginning = new String(in, 0, 5);
+	
 	if(beginning.compareTo(audio) == 0)
 	{
 		Log.i("MoSync Audio","Resource was an audio resource!");
 		return true;
 	}
+
 	Log.i("MoSync Audio","Was not an audio resource!");
+
 	return false;
 }
 
@@ -111,16 +114,19 @@ final String readMimeString(ByteBuffer buffer) throws Exception
 				break;
 			}
 			sb.append((char)b);
-			Log.i("MoSync Audio", "stringbuffer:" + sb);
+			//Log.i("MoSync Audio", "stringbuffer:" + sb);
 		}
 	}
 	catch(BufferUnderflowException bufe)
 	{
 		// oops!
+		bufe.printStackTrace();
 		return new String("");
 	}
 	
 	buffer.position(pos);
+	
+	//Log.i("MoSyncSound.readMimeString", "stringbuffer:" + sb);
 	
 	return new String(sb);
 }

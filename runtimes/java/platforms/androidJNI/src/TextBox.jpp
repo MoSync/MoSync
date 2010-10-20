@@ -37,6 +37,7 @@ import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
 import android.content.Intent;
+import android.text.InputType;
 
 import java.nio.CharBuffer;
 
@@ -57,6 +58,7 @@ public class TextBox extends Activity implements OnClickListener {
 	private EditText mEdit;
 	private TextView mLabel;
 	private int mOutputMemPtr;
+	private int mConstraints;
 	
 
 	@Override
@@ -68,7 +70,8 @@ public class TextBox extends Activity implements OnClickListener {
 		
 		// Fullscreen mode
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+			WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		
 		// Get screen dimansions
 		Display display = getWindowManager().getDefaultDisplay(); 
@@ -80,13 +83,36 @@ public class TextBox extends Activity implements OnClickListener {
 		String title = bundle.getString("TITLE");
 		String text = bundle.getString("TEXT");
 		mOutputMemPtr = bundle.getInt("OUTPUT");
-
+		mConstraints = bundle.getInt("CONSTRAINTS");
+		
+		// Check if the input type constraint has a correct value,
+		// if not set it to the default value,
+		// i.e. normal text
+		if (mConstraints < 0 || mConstraints > 5)
+			mConstraints = 0;
+			
+		// Initialize an array containing the different
+		// input type constraints possible, for quick conversion from
+		// MoSync input type constraints to Android input type constraints.
+		// Therefore, order matters :)
+		int[] constraintsArray = 
+		{
+			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE,
+			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
+			InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED,
+			InputType.TYPE_CLASS_PHONE,
+			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI,
+			InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED
+		};
+			
 		// Initialize layout components
 		mEdit = new EditText(this);
 		mEdit.setWidth(width);
 		mEdit.setHeight(height/3);
-		mEdit.setGravity(Gravity.TOP);
+		// The line below creates a bug on HTC Desire.
+		// mEdit.setGravity(Gravity.TOP);
 		mEdit.setText(text);
+		mEdit.setInputType(constraintsArray[mConstraints]);
 		mCancelButton = new Button(this);
 		mCancelButton.setText("Cancel");
 		mCancelButton.setId(1000);
@@ -116,6 +142,13 @@ public class TextBox extends Activity implements OnClickListener {
 
 	protected void onStop() {
 		super.onStop();
+		// Send a focus gained event
+		// when going back to MoSync view
+		int[] event = new int[3];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		event[1] = 0;
+		event[2] = 0;
+		MoSync.mMoSyncThread.postEvent(event);
 	}
 
 	protected void onRestart() {
@@ -161,11 +194,7 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			Log.i("InputBox", "event" + output.length());
 			Log.i("InputBox", "event" + event[1]);
-		
-			// Send a focus gained event now when get returns to the application
-			event[0] = EVENT_TYPE_FOCUS_GAINED;
-			MoSync.mMoSyncThread.postEvent(event);
-		
+	
 			finish();
 		}
 		if( v.getId() == mCancelButton.getId() ) {

@@ -121,6 +121,17 @@ public class MoSyncThread extends Thread
 	private MoSyncView mMoSyncView;
 	private boolean hasDied;
 	
+	/**
+	 * This is the size of the header of the asset file
+	 * (an Android file header, this is not a MoSync header).
+	 * The actual resource data is found at this offset.
+	 * On the Java side an input stream to the asset file
+	 * will begin at this offset. 
+	 * UBinData resources have offsets that start at the
+	 * very beginning of the resource file.
+	 * Therefore mResourceOffset needs to be used on the 
+	 * Java side when reading data from ubin resource file.
+	 */
 	private long mResourceOffset = 0;
 	
 	ByteBuffer mRecompilerCodeBlock;

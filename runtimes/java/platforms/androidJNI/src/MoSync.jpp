@@ -69,7 +69,7 @@ public class MoSync extends Activity
 		}
 		
 		// TODO: If we want to, we could read orientation from settings file in assets.
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		// This is now set in the manifest file: setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
