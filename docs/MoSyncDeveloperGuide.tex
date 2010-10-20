@@ -100,6 +100,14 @@ gCore.
 \subsubsection{Preprocessor macros}
 
 Macros are written in ... (drumroll) ... macro case.
+Generally prefer inline or template functions, enums, and static const variables to macros.
+
+\subsubsection{Include guards}
+Use this form, to avoid conflicts:
+\begin{verbatim}
+<PROJECT>_<SUBPROJECT>_<FILE>_H
+\end{verbatim}
+
 
 \subsubsection{Global variables}
 
@@ -199,7 +207,23 @@ C++ Namespaces can be used instead of class singletons in some cases. Namespaces
 
 In C++ library header files, the keyphrase "using namespace" must not be used. The user of the library must be able to choose which namespaces, if any, to use.
 
+
+\section{Miscellaneous}
+\subsection{Header File Dependencies}
+Instead of including a header file, if you're using only class/struct declarations from that file, you can write forward declarations instead. This speeds up compilation.
+
+\subsection{64-bit compatibility}
+Native, cross-platform C and C++ code should compile without warnings on the following systems:
+32-bit Visual C++, 32-bit mingw, 32-bit GNU/Linux, 64-bit GNU/Linux and 64-bit MacOSX.
+Testing on 64-bit Windows is recommended, but not required.
+Common problem areas include printf/scanf, variable-size types (\verb|size_t|) and structure alignment.
+
+
 \section{Design patterns}
+\subsection{Function parameter ordering}
+Outputs first, inputs last. This is the standard libc ordering.
+For the purposes of ordering, parameters that are both input and output count as Output only.
+
 \subsection{Syscalls and extensions}
 Syscalls and extensions constitute the lowest-level APIs available in MoSync. They are typically directly mapped to underlying platform features, and are also subject to a number of restrictions. 
 
@@ -208,8 +232,7 @@ Syscalls and extensions constitute the lowest-level APIs available in MoSync. Th
 These restrictions are as follows:
 
 \begin{itemize}
-	\item The number of parameters is limited to four. If more information must be passed, struct pointers can be used.
-	\item Parameters cannot be function pointers. If a notification mechanism is required, one is required to make use of (custom) events.
+	\item Parameters cannot be function pointers. If a notification mechanism is required, one must make use of (custom) events.
 	\item The only allowed parameter types are primitive IDL types (see IDL documentation) and IDL structs that actually are declared in the relevant IDL file.
 	\item The only allowed return types are primitive IDL types.
 	\item MoSync memory cannot be allocated within syscalls, other than in the specific case of built-in or custom events.
@@ -221,29 +244,29 @@ These restrictions are as follows:
 Allocation, manipulation and deallocation of native objects (resources) is typically implemented by means of Handles. Typically, there is an maCreateX() function, which takes a placeholder handle to represent the allocated native object. Subsequent access to this object is provided through other syscalls that accept handles as their first parameter. Finally, all objects are destroyed using maDestroyObject(). As an example, these are some functions that create and manipulate images:
 
 \begin{verbatim}
-	void maCreateImageFromData(
-		in Handle placeholder, 
-		in Handle data, 
-		in int offset, 
-		in int size
-  );
-  void maCreateImageRaw(
-  	in Handle placeholder, 
-  	in MAAddress src, 
-  	in Extent size, 
-  	in int alpha
-  );
-  void maDrawImage(
-  	in Handle image, 
-  	in int left, 
-  	in int top
-  );
-  void maDrawImageRegion(
-  	in Handle image, 
-  	in MARect srcRect, 
-  	in MAPoint2d dstPoint,
-  	in int transformMode
-  );
+void maCreateImageFromData(
+  in Handle placeholder, 
+  in Handle data, 
+  in int offset, 
+  in int size
+);
+void maCreateImageRaw(
+  in Handle placeholder, 
+  in MAAddress src, 
+  in Extent size, 
+  in int alpha
+);
+void maDrawImage(
+  in Handle image, 
+  in int left, 
+  in int top
+);
+void maDrawImageRegion(
+  in Handle image, 
+  in MARect srcRect, 
+  in MAPoint2d dstPoint,
+  in int transformMode
+);
 \end{verbatim}
 
 
@@ -251,10 +274,12 @@ Allocation, manipulation and deallocation of native objects (resources) is typic
 
 Since MoSync doesn't support user-created threads, it is important to provide asynchronous interfaces to time-consuming native functionality such as network communication. Since syscalls can't accept function pointers, the central MoSync event system is used to provide progress notification. A few built-in event types are provided in the EVENT struct, but there's also a void* provided that can be used for custom events.
 
-\subsection{Libraries / frameworks}
 
-\subsubsection{C or C++ ?}
-One of the first decisions to make when implementing a MoSync library is whether it should be written in C or C++. The basic reasoning is that MoSync should be equally attractive to developers programming in either language. So, 
+\subsection{Documentation}
+Documentation is written in the Doxygen style. All public interfaces should have full reference documentation. This includes documentation for files, functions, classes/structs, non-private members, global variables, macros, enums and the like.
+
+\subsubsection{Files}
+Every file must begin with a copyright notice.
 
 
 \end{document}
