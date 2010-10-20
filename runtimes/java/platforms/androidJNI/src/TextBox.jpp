@@ -109,7 +109,8 @@ public class TextBox extends Activity implements OnClickListener {
 		mEdit = new EditText(this);
 		mEdit.setWidth(width);
 		mEdit.setHeight(height/3);
-		mEdit.setGravity(Gravity.TOP);
+		// The line below creates a bug on HTC Desire.
+		// mEdit.setGravity(Gravity.TOP);
 		mEdit.setText(text);
 		mEdit.setInputType(constraintsArray[mConstraints]);
 		mCancelButton = new Button(this);
