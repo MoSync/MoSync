@@ -32,6 +32,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <mach/mach.h>
 #import <mach/mach_host.h>
 
+void logWithNSLog(const char *str, int length) {
+	NSString* text = [[NSString alloc] initWithBytes:str length:length encoding:NSUTF8StringEncoding];
+	NSLog(text);
+	[text release];
+}
+
 const char *getReadablePath(const char* path) {
 	NSString *stringFromChar = [[NSString alloc] initWithBytes:path length:strlen(path) encoding:NSUTF8StringEncoding];  	
 	NSString *nspath = [[NSBundle mainBundle] pathForResource:stringFromChar ofType:@""];
