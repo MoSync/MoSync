@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <mastring.h>
+#include <mastdlib.h>
 
 int MAMain() {
 	double d;

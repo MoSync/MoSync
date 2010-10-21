@@ -375,6 +375,9 @@ static Function parseFunction(const string& retType, size_t maxArgs) {
 			readRange(a.range);
 			readToken(token);
 		}
+		if(!a.in && a.type == "MAString" && a.range.empty()) {
+			Error("logic", "Argument of type \"out MAString\" lacks range");
+		}
 		f.args.push_back(a);
 	}
 
