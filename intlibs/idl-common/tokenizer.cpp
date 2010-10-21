@@ -83,7 +83,7 @@ void readLine(string& line) {
 	line.clear();
 	while(true) {
 		char c = getCharOnLine();
-		if(c == '\n')
+		if(c == '\n' || c == '\r')
 			break;
 		line += c;
 	};
