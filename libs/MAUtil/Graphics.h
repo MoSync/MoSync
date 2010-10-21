@@ -42,7 +42,7 @@ extern "C" {
 #include <conprint.h>
 #define GRAPHICS_LOG(x, args...) lprintfln(x, ## args)
 #else
-#define GRAPHICS_LOG(x, args...)
+#define GRAPHICS_LOG(x, ...)
 #endif
 
 
