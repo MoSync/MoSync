@@ -61,31 +61,82 @@ public class TextBox extends Activity implements OnClickListener {
 	private int mConstraints;
 	
 	/**
-	* Converts a MoSync input type to an android one.
+	* Converts MoSync input constraints android ones.
 	*
-	* @param mosyncInputType	The MoSync input type to be converted.
-	*							See maapi.idl for a list of input types,
-	*							section "maTextBox", "constraints".
-	* @return					An integer corresponding to the relevant android input type.
+	* @param mosyncInputConstraints		The MoSync input type to be converted.
+	*									See maapi.idl for a list of input types,
+	*									section "maTextBox", "constraints".
+	* @return							An integer corresponding to the relevant 
+	*									android input type.
 	*/
-	private int convertInputType(int mosyncInputType) {
-		switch(mosyncInputType) {
-			case MA_TB_TYPE_ANY & 0x000F:
-				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-			case MA_TB_TYPE_EMAILADDR & 0x000F:
-				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-			case MA_TB_TYPE_NUMERIC & 0x000F:
-				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED;
-			case MA_TB_TYPE_PHONENUMBER & 0x000F:
-				return InputType.TYPE_CLASS_PHONE;
-			case MA_TB_TYPE_URL & 0x000F:
-				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
-			case MA_TB_TYPE_DECIMAL & 0x000F:
-				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED;
+	private int convertInputConstraints(int mosyncInputConstraints) {
+		int type = mosyncInputConstraints & 0x0000F;
+		int flag = mosyncInputConstraints & 0xFF000;
+		int androidInputConstraints = 0x00000;
+		
+		// Process the type
+		switch(type) {
+			case MA_TB_TYPE_ANY:
+				androidInputConstraints = InputType.TYPE_CLASS_TEXT | 
+										InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+				break;
+			case MA_TB_TYPE_EMAILADDR:
+				androidInputConstraints = InputType.TYPE_CLASS_TEXT |
+										InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+				break;
+			case MA_TB_TYPE_NUMERIC:
+				androidInputConstraints = InputType.TYPE_CLASS_NUMBER |
+										InputType.TYPE_NUMBER_FLAG_SIGNED;
+				break;
+			case MA_TB_TYPE_PHONENUMBER:
+				androidInputConstraints = InputType.TYPE_CLASS_PHONE;
+				break;
+			case MA_TB_TYPE_URL:
+				androidInputConstraints = InputType.TYPE_CLASS_TEXT | 
+										InputType.TYPE_TEXT_VARIATION_URI;
+				break;
+			case MA_TB_TYPE_DECIMAL:
+				androidInputConstraints = InputType.TYPE_CLASS_NUMBER |
+										InputType.TYPE_NUMBER_FLAG_DECIMAL |
+										InputType.TYPE_NUMBER_FLAG_SIGNED;
+				break;
 			// Default case is normal text with several lines
 			default:
-				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+				androidInputConstraints = InputType.TYPE_CLASS_TEXT |
+										InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+				break;
 		}
+		// Process the flag
+		switch(flag) {
+			case MA_TB_FLAG_PASSWORD:
+				androidInputConstraints |= InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				break;
+			case MA_TB_FLAG_UNEDITABLE:
+				// Uneditable is not available on android
+				break;
+			case MA_TB_FLAG_SENSITIVE:
+				// Sensitive is the same as no suggesions in that context
+				// because we do not store the text entered in any kind of dictionary
+				
+				// OOPS! TYPE_TEXT_FLAG_NO_SUGGESTIONS Not available in android 1.5
+				//androidInputConstraints |= InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+				break;
+			case MA_TB_FLAG_NON_PREDICTIVE:
+				// OOPS! TYPE_TEXT_FLAG_NO_SUGGESTIONS Not available in android 1.5
+				//androidInputConstraints |= InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+				break;
+			case MA_TB_FLAG_INITIAL_CAPS_WORD:
+				androidInputConstraints |= InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+				break;
+			case MA_TB_FLAG_INITIAL_CAPS_SENTENCE:
+				androidInputConstraints |= InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+				break;
+			// Default case is still normal text with several lines
+			default:
+				break;
+		}
+		
+		return androidInputConstraints;
 	}
 	
 	@Override
@@ -119,7 +170,7 @@ public class TextBox extends Activity implements OnClickListener {
 		// The line below creates a bug on HTC Desire.
 		// mEdit.setGravity(Gravity.TOP);
 		mEdit.setText(text);
-		mEdit.setInputType( this.convertInputType(mConstraints) );
+		mEdit.setInputType( this.convertInputConstraints(mConstraints) );
 		mCancelButton = new Button(this);
 		mCancelButton.setText("Cancel");
 		mCancelButton.setId(1000);
