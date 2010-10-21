@@ -1826,7 +1826,9 @@ namespace Base {
 	}
 #endif
 
-	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
+		va_list argptr;
+		va_start(argptr, c);
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK
@@ -2185,8 +2187,9 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		GLE(sTextBox);
 		ShowWindow(sTextBox, SW_SHOW);
 #else	// so we go with modal, for now.
-		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+		int res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
+		GLECUSTOM(res <= 0);
 #endif
 #endif
 		return 0;

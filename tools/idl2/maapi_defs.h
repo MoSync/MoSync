@@ -1,7 +1,7 @@
 #ifndef _MAAPI_DEFS_H
 #define _MAAPI_DEFS_H
 
-#ifdef MAPIP
+#if defined(MAAPI_H) || defined(EMULATOR)
 #define MA_IOCTL_ELLIPSIS , ...
 #else
 #define MA_IOCTL_ELLIPSIS

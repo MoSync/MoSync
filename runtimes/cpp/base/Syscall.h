@@ -135,7 +135,7 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
-		int GetValidatedStackValue(int offset);
+		int GetValidatedStackValue(int offset, va_list argptr);
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);

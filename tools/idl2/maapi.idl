@@ -931,7 +931,8 @@ interface MAAPI {
 	* \returns The length of the header value, excluding the terminating zero, or
 	* #CONNERR_NOHEADER if the header doesn't exist.
 	*/
-	int maHttpGetResponseHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
+	int maHttpGetResponseHeader(in MAHandle conn, in MAString key,
+		out MAString buffer range("bufSize"), in int bufSize);
 
 
 	//not needed yet
@@ -2237,7 +2238,7 @@ interface MAAPI {
 		* \returns The length of the name, excluding the terminating zero,
 		* or 0 if there are no more files, or \< 0 on error.
 		*/
-		int maFileListNext(in MAHandle list, out MAString nameBuf, in int bufSize);
+		int maFileListNext(in MAHandle list, out MAString nameBuf range("bufSize"), in int bufSize);
 
 		/**
 		* Closes a file listing, freeing its resources.
@@ -2669,7 +2670,7 @@ interface MAAPI {
 		* If the property did not exist (System.getProperty() returned null),
 		* -2 will be returned.
 		*/
-		int maGetSystemProperty(in MAString key, out MAString buf, in int size);
+		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
 #if IX_PIM
 		constset int MA_PIM_ {
