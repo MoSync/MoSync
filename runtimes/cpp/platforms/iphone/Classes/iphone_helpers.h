@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // do all the const char* become memory leaks or does the garbage collector take care of that?.
 // must fix that.
+void logWithNSLog(const char *str, int length);
 const char *getReadablePath(const char* path);
 const char *getWriteablePath(const char* path);
 void sleepMillis(int ms);

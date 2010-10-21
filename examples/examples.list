@@ -20,7 +20,7 @@ Stylus = Moblet/Stylus
 timers = Moblet/timers
 MoSketch
 MoSound
-MoTooth
+MoTooth = Moblet/MoTooth
 MoTris
 MoTrix
 OtaLoad

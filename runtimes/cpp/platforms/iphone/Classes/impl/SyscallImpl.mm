@@ -15,8 +15,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-//#define WIN32_LEAN_AND_MEAN
-
 #include "config_platform.h"
 #import <UIKit/UIKit.h>
 #include <string>
@@ -73,7 +71,7 @@ namespace Base {
 	uint oldColor;
 
 	int gWidth, gHeight;
-	//CGContextRef gBackbuffer;
+
 	Surface* gBackbuffer;
 	Surface* gDrawTarget;
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
@@ -82,8 +80,6 @@ namespace Base {
 	
 	double gTimeConversion;
 	
-	//static ResourceArray gResourceArray;
-
 	EventQueue gEventQueue;
 	static bool gEventOverflow	= false;
 	static bool gClosing		= false;
@@ -127,7 +123,7 @@ namespace Base {
 		else {
 			return NULL;
 		}
-		//CGDataProviderRef dpr = CGDataProviderCreateWithData(NULL, data, len ,NULL);
+
 		CFDataRef png_data = CFDataCreate (NULL,data,len);
 		CGDataProviderRef dpr  = CGDataProviderCreateWithCFData (png_data);
 		
@@ -138,19 +134,7 @@ namespace Base {
 		}
 		   
 		CGDataProviderRelease(dpr);
-		
-		/*
-		Surface* newSurface = new Surface(CGImageGetWidth(imageRef), CGImageGetHeight(imageRef), NULL);
-		CGContextSaveGState(newSurface->context);
-		CGContextTranslateCTM(newSurface->context, 0, CGImageGetHeight(imageRef));
-		CGContextScaleCTM(newSurface->context, 1, -1);
-		CGContextDrawImage(newSurface->context, newSurface->rect, imageRef);
-		CGContextRestoreGState(newSurface->context);
-		CGImageRelease(imageRef);		
-		
-		return newSurface;
-		*/
-		
+				
 		return new Surface(imageRef);
 	}
 	
@@ -168,15 +152,6 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 		
-		//gBackBufferData = new unsigned char[gWidth*4*gHeight];
-		/*
-		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-		gBackbuffer = 
-		CGBitmapContextCreate(NULL, gWidth, gHeight, 8, gWidth*4, colorSpace, kCGImageAlphaNoneSkipFirst);
-		CGColorSpaceRelease(colorSpace);
-		//CGContextTranslateCTM(gBackbuffer, 0, gHeight);
-		//CGContextScaleCTM(gBackbuffer, 1.0, -1.0);
-		*/
 		Surface::fontSize = gHeight/40;
 		gBackbuffer = new Surface(gWidth, gHeight);
 		CGContextRestoreGState(gBackbuffer->context);		
@@ -185,7 +160,6 @@ namespace Base {
 		CGContextSaveGState(gBackbuffer->context);
 		
 		// init font
-		//CGContextSelectFont(gBackbuffer->context, "Arial", FONT_HEIGHT, kCGEncodingMacRoman);
 		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
 		sUnicodeFont = CGFontCreateWithFontName(str);
 		//CFRelease(str);
@@ -377,8 +351,6 @@ namespace Base {
 	SYSCALL(void, maUpdateScreen()) {
 		if(gClosing)
 			return;
-		//MAProcessEvents();
-		//MAUpdateScreen();
 		MoSync_UpdateView(gBackbuffer->image);
 	}
 
@@ -412,7 +384,6 @@ namespace Base {
 		gSyscall->ValidateMemRange(dstPoint, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(srcRect, sizeof(MARect));
 		gSyscall->ValidateMemRange(src, scanlength*srcRect->height*4);
-	//	NOT_IMPLEMENTED;
 		
 		Surface *srcSurface = new 
 		Surface(srcRect->width, srcRect->height, (char*)src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
@@ -592,8 +563,6 @@ namespace Base {
 	{
 		if(gClosing)
 			return 0;
-		//MAProcessEvents();
-		//return currentKeyState;
 		return 0; // there's no keys on iphone :)
 	}
 	
@@ -603,13 +572,8 @@ namespace Base {
 		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));	
 		MYASSERT(((uint)dst & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
 
-		//MAProcessEvents();
-		//NOT_IMPLEMENTED;
-
 		if(!gClosing)
 			gEventOverflow = false;
-//		if(gEventQueue.count() == 0)
-//			return 0;
 		
 		const MAEvent* ev = gEventQueue.getAndProcess();
 		if(!ev) return 0;
@@ -629,14 +593,7 @@ namespace Base {
 	{
 		if(gClosing)
 			return;
-		/*
-		if(gEventQueue.count() != 0)
-			return;
-		*/
-		 
 		gEventQueue.wait(timeout);
-		
-		//NOT_IMPLEMENTED;
 	}
 
 	SYSCALL(int, maTime()) 
@@ -653,9 +610,6 @@ namespace Base {
 	
 	SYSCALL(int, maGetMilliSecondCount()) 
 	{
-		//CFTimeInterval time = CFAbsoluteTimeGetCurrent();   
-		//return (int)(time*1000.0);
-
 		return (int)((double)mach_absolute_time()*gTimeConversion);
 	}
 	
@@ -676,7 +630,6 @@ namespace Base {
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
 		MoSync_ShowMessageBox(message, true);
-		//GetVMYield(gCore) = 1;
 		gRunning = false;
 		pthread_exit(NULL);
 	}
@@ -718,8 +671,12 @@ namespace Base {
 			data = [NSData dataWithBytesNoCopy:sound length:encodedSize freeWhenDone:NO];
 		}		
 		
-		if(sSoundPlayer)
+		if(sSoundPlayer) {
+			if(sSoundPlayer.playing==YES)
+				[sSoundPlayer stop];
 			[sSoundPlayer release];	
+		}
+		
 		NSError *err;
 		sSoundPlayer = [[AVAudioPlayer alloc] initWithData:data error:&err];
 		[data release];
@@ -776,11 +733,7 @@ namespace Base {
 		
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
-/*
-		info->redMask = 0x00ff0000;
-		info->greenMask = 0x0000ff00;
-		info->blueMask = 0x000000ff;
-*/
+
 		info->redMask = 0x000000ff;
 		info->greenMask = 0x0000ff00;
 		info->blueMask = 0x00ff0000;
@@ -789,11 +742,7 @@ namespace Base {
 		info->width = gWidth;
 		info->height = gHeight;
 		info->pitch = bytesPerRow;
-/*
-		info->redShift = 16;
-		info->greenShift = 8;
-		info->blueShift = 0;
-*/
+
 		info->redShift = 0;
 		info->greenShift = 8;
 		info->blueShift = 16;
@@ -810,8 +759,6 @@ namespace Base {
 	SYSCALL(int, maFrameBufferInit(void *data)) {
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = gBackbuffer;
-		//backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
-		//currentDrawSurface = backBuffer;
 		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipLast);
 		CGContextRestoreGState(gBackbuffer->context);		
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
@@ -846,14 +793,33 @@ namespace Base {
 		return 0;
 	}
 	
+	int maGetSystemProperty(const char *key, char *buf, int size) {
+		int res = -1;
+		if(strcmp(key, "mosync.iso-639-1")==0) {
+			// I don't know if this works perfectly (in the documentation it 
+			// says that it will return iso-639-x, but it looks like iso-639-1)
+			CFLocaleRef userLocaleRef = CFLocaleCopyCurrent(); 
+			CFStringRef str = (CFStringRef)CFLocaleGetValue(userLocaleRef, kCFLocaleLanguageCode);			
+			res = CFStringGetLength(str);
+			CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
+			CFRelease(str);
+			CFRelease(userLocaleRef);
+		}
+		
+		return res;
+	}	
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
 
 		case maIOCtl_maWriteLog:
-			LOGBIN(gSyscall->GetValidatedMemRange(a, b), b);
+			{
+			const char *str = (const char*) gSyscall->GetValidatedMemRange(a, b);
+			LOGBIN(str, b);
+			logWithNSLog(str, b);
 			return 0;
+			}
 		case maIOCtl_maPlatformRequest:
 			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
 		case maIOCtl_maGetBatteryCharge:
@@ -889,16 +855,23 @@ namespace Base {
 				
 		maIOCtl_case(maTextBox);
 				
+		maIOCtl_case(maGetSystemProperty);
+				/*
+		case maIOCtl_maGetSystemProperty:
+		{
+			const char* _key = GVS(a);
+			char* _buf = GVMR(b, char); // the automatically generated version has MAString here, it will try to convert it to char**...
+			int _size = c;
+			return maGetSystemProperty(_key, _buf, _size);
+		}
+				*/
+				
 		}
 		
 		return IOCTL_UNAVAILABLE;
 	}
 	
 	SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-		//Base::gSyscall->VM_Yield();
-		//you should get out of the VM loop before you can reload, but this will actually work anyway.
-		//gReloadHandle = data;
-		//gReload = gReload || (reload != 0); ???? fredrik?
 		NOT_IMPLEMENTED;
 	}
 	
@@ -921,7 +894,6 @@ void MoSyncExit(int r)
 	if(!exited) {
 		exited = true;
 		LeaveCriticalSection(&exitMutex);
-		//exit(r);
 		MoSync_Exit();
 		EnterCriticalSection(&exitMutex);
 	}
@@ -933,7 +905,7 @@ void MoSyncErrorExit(int errorCode)
 {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
-	//char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
+	char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
 #if 0
 	if(gCore) {
 #ifdef PUBLIC_DEBUG
@@ -955,10 +927,9 @@ void MoSyncErrorExit(int errorCode)
 	}
 #endif
 	
-	//GetVMYield(gCore) = 1;
 	gRunning = false;
+	logWithNSLog(buffer, strlen(buffer));
 	MoSync_ShowMessageBox(buffer, true);	
 	pthread_exit(NULL);
-	//MoSyncExit(errorCode);
 }
 	
