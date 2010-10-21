@@ -37,6 +37,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" {
 #endif
 
+//#define GRAPHICS_DEBUGGING
+#ifdef GRAPHICS_DEBUGGING
+#include <conprint.h>
+#define GRAPHICS_LOG(x, args...) lprintfln(x, ## args)
+#else
+#define GRAPHICS_LOG(x, args...)
+#endif
+
+
 /** 
   * Clears the clip rect stack.
   **/

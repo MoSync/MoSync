@@ -70,6 +70,10 @@ int gConsoleLogging = 1;
 MAHandle gConsoleFile = 0;
 int gConsoleDisplay = 1;
 
+int gConsoleDrawBackground = 1;
+int gConsoleForceDisplay = 1;
+
+
 static void FeedLine(void)
 {
 	sConsole.cursorPos.y++;
@@ -120,9 +124,11 @@ void DisplayConsole(void)
 
 	maSetClipRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
 
-	maSetColor(gConsoleBackgroundColor);
-	maFillRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
-
+	if(gConsoleDrawBackground) {
+		maSetColor(gConsoleBackgroundColor);
+		maFillRect(0, 0, EXTENT_X(sConsole.screenSize), EXTENT_Y(sConsole.screenSize));
+	}
+	
 	maSetColor(gConsoleTextColor);
 	for (n = 0;  n < sConsole.height;  n++)
 	{
@@ -208,7 +214,8 @@ void PrintConsole(const wchar_t *str)
 		pos++;
 	}
 
-	DisplayConsole();
+	if(gConsoleForceDisplay)
+		DisplayConsole();
 }
 
 #define PRINTF_BUFSIZE 2048
