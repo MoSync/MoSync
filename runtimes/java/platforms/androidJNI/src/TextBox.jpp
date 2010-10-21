@@ -60,7 +60,34 @@ public class TextBox extends Activity implements OnClickListener {
 	private int mOutputMemPtr;
 	private int mConstraints;
 	
-
+	/**
+	* Converts a MoSync input type to an android one.
+	*
+	* @param mosyncInputType	The MoSync input type to be converted.
+	*							See maapi.idl for a list of input types,
+	*							section "maTextBox", "constraints".
+	* @return					An integer corresponding to the relevant android input type.
+	*/
+	private int convertInputType(int mosyncInputType) {
+		switch(mosyncInputType) {
+			case MA_TB_TYPE_ANY:
+				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+			case MA_TB_TYPE_EMAILADDR:
+				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+			case MA_TB_TYPE_NUMERIC:
+				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED;
+			case MA_TB_TYPE_PHONENUMBER:
+				return InputType.TYPE_CLASS_PHONE;
+			case MA_TB_TYPE_URL:
+				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
+			case MA_TB_TYPE_DECIMAL:
+				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED;
+			// Default case is normal text with several lines
+			default:
+				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+		}
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,26 +111,6 @@ public class TextBox extends Activity implements OnClickListener {
 		String text = bundle.getString("TEXT");
 		mOutputMemPtr = bundle.getInt("OUTPUT");
 		mConstraints = bundle.getInt("CONSTRAINTS");
-		
-		// Check if the input type constraint has a correct value,
-		// if not set it to the default value,
-		// i.e. normal text
-		if (mConstraints < 0 || mConstraints > 5)
-			mConstraints = 0;
-			
-		// Initialize an array containing the different
-		// input type constraints possible, for quick conversion from
-		// MoSync input type constraints to Android input type constraints.
-		// Therefore, order matters :)
-		int[] constraintsArray = 
-		{
-			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE,
-			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS,
-			InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED,
-			InputType.TYPE_CLASS_PHONE,
-			InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI,
-			InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED
-		};
 			
 		// Initialize layout components
 		mEdit = new EditText(this);
@@ -112,7 +119,7 @@ public class TextBox extends Activity implements OnClickListener {
 		// The line below creates a bug on HTC Desire.
 		// mEdit.setGravity(Gravity.TOP);
 		mEdit.setText(text);
-		mEdit.setInputType(constraintsArray[mConstraints]);
+		mEdit.setInputType( this.convertInputType(mConstraints) );
 		mCancelButton = new Button(this);
 		mCancelButton.setText("Cancel");
 		mCancelButton.setId(1000);
@@ -139,7 +146,8 @@ public class TextBox extends Activity implements OnClickListener {
 		// Show the global layout
 		setContentView(verticalLayout);
 	}
-
+	
+	@Override
 	protected void onStop() {
 		super.onStop();
 		// Send a focus gained event
@@ -150,19 +158,23 @@ public class TextBox extends Activity implements OnClickListener {
 		event[2] = 0;
 		MoSync.mMoSyncThread.postEvent(event);
 	}
-
+	
+	@Override
 	protected void onRestart() {
 		super.onRestart();
 	}
-
+	
+	@Override
 	protected void onResume() {
 		super.onResume();
 	}
-
+	
+	@Override
 	protected void onPause() {
 		super.onPause();
 	}
-
+	
+	@Override
 	protected void onStart() {
 		super.onStart();
 	}
