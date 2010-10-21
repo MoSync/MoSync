@@ -52,7 +52,7 @@ public class MAPanicReport
 	public void writePanicReport( Context context, int reportType, int panicCode, String panicString, int panicIP)
 #endif
 	{
-		ip = -1;
+		ip = panicIP;
 
 		runtimeId = RUNTIME_JAVA;
 		reportType = reportType;
