@@ -70,17 +70,17 @@ public class TextBox extends Activity implements OnClickListener {
 	*/
 	private int convertInputType(int mosyncInputType) {
 		switch(mosyncInputType) {
-			case MA_TB_TYPE_ANY:
+			case MA_TB_TYPE_ANY & 0x000F:
 				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE;
-			case MA_TB_TYPE_EMAILADDR:
+			case MA_TB_TYPE_EMAILADDR & 0x000F:
 				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
-			case MA_TB_TYPE_NUMERIC:
+			case MA_TB_TYPE_NUMERIC & 0x000F:
 				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED;
-			case MA_TB_TYPE_PHONENUMBER:
+			case MA_TB_TYPE_PHONENUMBER & 0x000F:
 				return InputType.TYPE_CLASS_PHONE;
-			case MA_TB_TYPE_URL:
+			case MA_TB_TYPE_URL & 0x000F:
 				return InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI;
-			case MA_TB_TYPE_DECIMAL:
+			case MA_TB_TYPE_DECIMAL & 0x000F:
 				return InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED;
 			// Default case is normal text with several lines
 			default:
