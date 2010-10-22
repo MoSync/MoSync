@@ -25,6 +25,7 @@ public:
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
 			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			printf("@@@ sslConnectTest maConnect result: %i\n", result);
 			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
@@ -82,6 +83,7 @@ public:
         	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
 			TESTIFY_ASSERT( sslConnection );
 			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			printf("@@@ httpsConnectTest maConnect result: %i\n", result);
 			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
@@ -91,7 +93,7 @@ public:
         	int result;
         	char buf[2048] = { 0 };
 
-        	MAHandle sslConnection = maConnect("https://encrypted.google.com");
+        	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
 			TESTIFY_ASSERT( sslConnection );
 			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
 			TESTIFY_ASSERT( result > 0 );
