@@ -63,8 +63,8 @@ FileUtils.cp "Classes/MoSyncViewController.h", "template/Classes/MoSyncViewContr
 FileUtils.cp "Classes/MoSyncViewController.mm", "template/Classes/MoSyncViewController.mm"
 
 # copy template files and default icons
-FileUtils.cp "icon_72x72.png", "template/icon_72x72.png"
-FileUtils.cp "icon_57x57.png", "template/icon_57x57.png"
+FileUtils.cp "Icon-72.png", "template"
+FileUtils.cp "Icon.png", "template"
 FileUtils.cp "MoSync_Prefix.pch", "template/MoSync_Prefix.pch"
 FileUtils.cp "main.m", "template/main.m"
 FileUtils.cp "../../../../intlibs/helpers/cpp_maapi.h", "template/Classes/helpers/cpp_maapi.h"

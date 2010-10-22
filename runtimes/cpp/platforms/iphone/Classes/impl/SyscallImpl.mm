@@ -78,7 +78,8 @@ namespace Base {
 	
 	unsigned char *gBackBufferData;
 	
-	double gTimeConversion;
+	mach_timebase_info_data_t gTimeBase;
+	uint64_t gTimeStart;
 	
 	EventQueue gEventQueue;
 	static bool gEventOverflow	= false;
@@ -166,9 +167,9 @@ namespace Base {
 				
 		gDrawTarget = gBackbuffer;
 		
-		mach_timebase_info_data_t machInfo;
-		mach_timebase_info( &machInfo );
-		gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
+		mach_timebase_info( &gTimeBase );
+		//gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
+		gTimeStart = mach_absolute_time();
 		
 		
 		MANetworkInit();		
@@ -610,7 +611,13 @@ namespace Base {
 	
 	SYSCALL(int, maGetMilliSecondCount()) 
 	{
-		return (int)((double)mach_absolute_time()*gTimeConversion);
+		//int time = (int)(CACurrentMediaTime()*1000.0);
+		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
+		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
+		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
+		
+		
+		return time;
 	}
 	
 
@@ -734,19 +741,20 @@ namespace Base {
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
 
-		info->redMask = 0x000000ff;
+		CGBitmapInfo bInfo = CGImageGetBitmapInfo(gBackbuffer->image);
+		
+		info->redMask = 0x00ff0000;
 		info->greenMask = 0x0000ff00;
-		info->blueMask = 0x00ff0000;
+		info->blueMask = 0x000000ff;
+		info->redShift = 16;
+		info->greenShift = 8;
+		info->blueShift = 0;				
 		
 		info->sizeInBytes = bytesPerRow*gHeight;
 		info->width = gWidth;
 		info->height = gHeight;
 		info->pitch = bytesPerRow;
 
-		info->redShift = 0;
-		info->greenShift = 8;
-		info->blueShift = 16;
-		
 		info->redBits = bitsPerComponent;
 		info->greenBits = bitsPerComponent;
 		info->blueBits = bitsPerComponent;
@@ -756,10 +764,11 @@ namespace Base {
 	}
 
 	static Surface *sInternalBackBuffer = NULL;	
-	SYSCALL(int, maFrameBufferInit(void *data)) {
+	SYSCALL(int, maFrameBufferInit(const void *data)) {
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = gBackbuffer;
-		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipLast);
+
+		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Little);
 		CGContextRestoreGState(gBackbuffer->context);		
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
 		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
@@ -814,58 +823,33 @@ namespace Base {
 		switch(function) {
 
 		case maIOCtl_maWriteLog:
-			{
+		{
 			const char *str = (const char*) gSyscall->GetValidatedMemRange(a, b);
 			LOGBIN(str, b);
 			logWithNSLog(str, b);
 			return 0;
-			}
-		case maIOCtl_maPlatformRequest:
-			return maPlatformRequest(SYSCALL_THIS->GetValidatedStr(a));
-		case maIOCtl_maGetBatteryCharge:
-			return maGetBatteryCharge();
-
-		case maIOCtl_maLocationStart:
-			return maLocationStart();
-		case maIOCtl_maLocationStop:
-			return maLocationStop();
-			
-		case maIOCtl_maFrameBufferGetInfo:
-			return maFrameBufferGetInfo(GVMRA(MAFrameBufferInfo));
-		case maIOCtl_maFrameBufferInit:
-			return maFrameBufferInit(GVMRA(void*));
-		case maIOCtl_maFrameBufferClose:
-			return maFrameBufferClose();
-				
+		}
+		maIOCtl_case(maPlatformRequest);
+		maIOCtl_case(maGetBatteryCharge);
+		maIOCtl_case(maLocationStart);
+		maIOCtl_case(maLocationStop);
+		maIOCtl_case(maFrameBufferGetInfo);
+		maIOCtl_case(maFrameBufferInit);
+		maIOCtl_case(maFrameBufferClose);				
 		maIOCtl_syscall_case(maFileOpen);
-			
 		maIOCtl_syscall_case(maFileWriteFromData);
 		maIOCtl_syscall_case(maFileReadToData);
-				
 		maIOCtl_syscall_case(maFileTell);
 		maIOCtl_syscall_case(maFileSeek);
 		maIOCtl_syscall_case(maFileRead);
-		maIOCtl_syscall_case(maFileWrite);				
-			
+		maIOCtl_syscall_case(maFileWrite);
 		maIOCtl_syscall_case(maFileExists);
 		maIOCtl_syscall_case(maFileClose);
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
-		maIOCtl_syscall_case(maFileSize);	
-				
-		maIOCtl_case(maTextBox);
-				
+		maIOCtl_syscall_case(maFileSize);
+		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
-				/*
-		case maIOCtl_maGetSystemProperty:
-		{
-			const char* _key = GVS(a);
-			char* _buf = GVMR(b, char); // the automatically generated version has MAString here, it will try to convert it to char**...
-			int _size = c;
-			return maGetSystemProperty(_key, _buf, _size);
-		}
-				*/
-				
 		}
 		
 		return IOCTL_UNAVAILABLE;
