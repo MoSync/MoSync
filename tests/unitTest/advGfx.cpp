@@ -101,7 +101,7 @@ void maCreateImageFromDataTest()
 
 	MAHandle h = maCreatePlaceholder();
 	maCreateImageFromData(h, CLIENT_PNG_TEST, 0, maGetDataSize(CLIENT_PNG_TEST));
-	maDrawImage(h, screen.width>>1, screen.height>>1);
+	maDrawImage(h, (screen.width>>1)-(EXTENT_X(maGetImageSize(h))>>1), (screen.height>>1)-(EXTENT_Y(maGetImageSize(h))>>1));
 	maDestroyObject(h);
 
 	maSetColor(0xff0000);
@@ -184,10 +184,15 @@ void maGetImageDataTest()
 	int *img = new int[EXTENT_X(size)*EXTENT_Y(size)];
 	maGetImageData(h, img, &srcRect, EXTENT_X(size));
 
+	int imageWidth = EXTENT_X(maGetImageSize(h));
+	int imageHeight = EXTENT_Y(maGetImageSize(h));
+
+
 	maDestroyObject(h);
 	::maCreateImageRaw(h, img, size, TRUE);
 	delete []img;
-	maDrawImage(h, screen.width>>1, screen.height>>1);
+//	maDrawImage(h, screen.width>>1, screen.height>>1);
+	maDrawImage(h, (screen.width>>1)-(imageWidth>>1), (screen.height>>1)-(imageHeight>>1));
 
 	maSetColor(0xff0000);
 	const char *title = "maGetImageData:";

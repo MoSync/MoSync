@@ -72,7 +72,7 @@ void drawTrianglesClip() {
 	maSetColor(BLACK);
 	maFillRect(0, 0, screen.width, screen.height);
 
-	maSetClipRect(25, 25, screen.width-50, screen.height-50);
+	maSetClipRect((screen.width>>2), (screen.height>>2), screen.width-(screen.width>>1), screen.height-(screen.height>>1));
 	drawTriangles();
 }
 
@@ -96,7 +96,7 @@ void drawTriangles() {
 
 	//double time = (double)maGetMilliSecondCount()*0.0002;
 	double time = 0;
-	double size = 200;
+	double size = (screen.width<screen.height)?(screen.width>>1):(screen.height>>1);
 	double ang = 0.0;
 	double angdelta = (2*3.14159)/(double)NUM_POINTS;
 	int index = 0;
@@ -167,6 +167,9 @@ void plot() {
 	maPlot(0, scrH - 1);
 	maPlot(scrW - 1, 0);
 	maPlot(scrW - 1, scrH - 1);
+
+	maPlot(scrW/2, scrH/2);
+
 
 	maUpdateScreen();
 }
