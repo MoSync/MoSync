@@ -641,17 +641,17 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 			return RES_BAD_INPUT;
 		}
 	}
-	else 
+	else // ubin
 	{
 		// If it is an unloaded binary resource (.ubin) it is found in mUBinaryResources.
-		UBinData uBinData = (UBinData)mUBinaryResources.get(data);
+		UBinData uBinData = (UBinData) mUBinaryResources.get(data);
 		if (null != uBinData)
 		{
 			// Sanity check that offset + size is not larger the resource itself. 
-			if (uBinData.mSize < offset + size)
+			if (uBinData.getSize() < offset + size)
 			{
 				Log.i("maCreateImageFromData",
-					"size error, uBinData.mSize: " + uBinData.mSize + 
+					"size error, uBinData.getSize(): " + uBinData.getSize() + 
 					" size: " + size + 
 					" offset: " + offset);
 				return RES_BAD_INPUT;
@@ -664,12 +664,9 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 				AssetManager assetManager = mContext.getAssets();
 				InputStream resourceFileInputStream = assetManager.open(RESOURCE_FILE);
 			
-				// Here we position the stream pointer where the image data starts.
-				// mResourceOffset is where resources start (after the header of the asset file).
-				// We need to subtract mResourceOffset because resourceFileInputStream
-				// will begin at mResourceOffset and uBinData.mOffset is the offset
-				// from the actual beginning of the asset file.
-				resourceFileInputStream.skip(uBinData.mOffset - (int)mResourceOffset + offset);
+				// Here we position the stream pointer at the offset where 
+				// the image data starts.
+				resourceFileInputStream.skip(uBinData.getOffset() + offset);
 				
 				// Read from asset file into the data array.
 				resourceFileInputStream.read(resourceData);
@@ -863,12 +860,12 @@ int maWriteStore(int store, int data)
 			if (null != ubd)
 			{
 				SYSLOG("Found it!");
-				byte[] ra = new byte[ubd.mSize];
+				byte[] ra = new byte[ubd.getSize()];
 			
 				AssetManager assetManager = mContext.getAssets();
 				InputStream is = assetManager.open(RESOURCE_FILE);
 				
-				is.skip(ubd.mOffset - (int)mResourceOffset);
+				is.skip(ubd.getOffset());
 				is.read(ra);
 			
 				FileOutputStream fos = new FileOutputStream(f, false);
@@ -1251,7 +1248,7 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 			bb.get(ra);
 			bb.position(p);
 		}
-		else
+		else // is ubin
 		{
 			SYSLOG("Reading image resource from asset");
 			int offset =  pos-(int)mResourceOffset;
@@ -1327,15 +1324,31 @@ class UBinData
 		mSize = size;
 	}
 	
+	public int getOffset()
+	{
+		// getResourceStartOffset() is where resources start (after the header of 
+		// the asset file).
+		// We need to subtract this offset because resourceFileInputStream
+		// will begin at mResourceOffset and uBinData.mOffset is the offset
+		// from the actual beginning of the asset file.
+		return mOffset - getResourceStartOffset();
+	}
+	
+	public int getSize()
+	{
+		return mSize;
+	}
+	
 	/**
-	 * The byte offset in the resource file of this ubin.
+	 * The byte offset in the resource file to the 
+	 * beginning of this ubin.
 	 */
-	public int mOffset;
+	private int mOffset;
 	
 	/**
 	 * The byte size of this ubin.
 	 */
-	public int mSize;
+	private int mSize;
 };
 
 /**
@@ -1364,7 +1377,7 @@ void loadUBinary(int resourceIndex, int offset, int size)
 		AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 		
 		FileInputStream fis = pAfd.createInputStream();
-		fis.skip(offset-mResourceOffset);
+		fis.skip(ubd.getOffset());
 	
 		if(true == checkIfMimeAudioType(fis))
 		{

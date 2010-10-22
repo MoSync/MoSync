@@ -77,11 +77,13 @@ final String readMimeString(FileInputStream input) throws Exception
 {	
 	StringBuffer sb = new StringBuffer();
 	int b;
+
 	while((b=input.read())!=0)
 	{
 		if(b==-1) BIG_PHAT_ERROR;
 		sb.append((char)b);
 	}
+	
 	return new String(sb);
 }
 
@@ -93,7 +95,6 @@ final String readMimeString(FileInputStream input) throws Exception
 *
 *	@return				The string containing the mime
 *						"" if there was a an error
-*	
 */
 final String readMimeString(ByteBuffer buffer) throws Exception
 {
@@ -134,96 +135,139 @@ final String readMimeString(ByteBuffer buffer) throws Exception
 int mNumTempAudioFiles = 1;
 Hashtable<Integer, AudioStore> mAudioStores = new Hashtable<Integer, AudioStore>();
 
+/**
+ * Used for lookup. To test that this is an audio resource.
+ */
 class AudioStore
 {
-	public int mSize;
-	public String mMimeType;
+	//public int mSize;
+	//public String mMimeType;
 	public String mTemporaryFileName;
 	
 	AudioStore(String mimeType, int size, String temporaryFileName)
 	{
 		SYSLOG("AudioStore temp file savec :" + temporaryFileName);
-		mMimeType = mimeType;
-		mSize = size;
+		//mMimeType = mimeType;
+		//mSize = size;
 		mTemporaryFileName = temporaryFileName;
 	}
 };
 
+/**
+ * Store audio resource data as a file we can use with MediaPlayer.
+ * @param buffer Byte buffer that contains the audio data,
+ *   the data begins with a null terminated mime string,
+ *   then follows audio data.
+ * @param resHandle The id of the audio resource.
+ */
 void storeAudioBin(ByteBuffer buffer, int resHandle) throws Exception
 {
+	// Read the mime string. Somewhere else in the code we
+	// have already determined that this is an audio resource.
 	String mimeType = readMimeString(buffer);
-	if(mimeType == "")
+	if (mimeType == "")
 	{
 		Log.i("MoSync audio","storeAudioBin, no mime type!");
 		return;
 	}
 	
-	int length = buffer.capacity() - mimeType.length();
+	// Determine the length of the audio data.
+	int mimeStringLength = mimeType.length() + 1;
+	int length = buffer.capacity() - mimeStringLength;
 	
-	Log.i("MoSync audio","initial capacity:" + buffer.capacity() + " mimeLength:" + mimeType.length() + " audio length:"+ length);
-	
-	
-	byte[] ra = new byte[length];
-	int pos = buffer.position();
-	buffer.position(mimeType.length());
-	buffer.get(ra);
-	buffer.position(pos);
-
-	Log.i("MoSync","storeAudioBin " + length + "bytes" );
+	Log.i("MoSync audio", "initial capacity:" + buffer.capacity() + " mimeLength:" + mimeType.length() + " audio length:"+ length);
 	
 	try 
 	{
-		// Create a temporary audio file
 		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
 		Log.i("MoSync audio","saved audio resource as: " + fileName);
-		FileOutputStream fos = mContext.openFileOutput(fileName,Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE); 
-		fos.write(ra);
-		fos.close();
-		Log.i("addResourceAudio","store finished");
+		
+		// Create a temporary audio file.
+		FileOutputStream audioFileOutputStream = mContext.openFileOutput(
+			fileName,
+			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
+			
+		// Open a file channel to write audio data to.
+		FileChannel channel = audioFileOutputStream.getChannel();
+
+		// Save old position of buffer.
+		int oldPos = buffer.position();
+		
+		// Set position to start of audio data.
+		buffer.position(mimeStringLength);
+
+		// Write data.
+		channel.write(buffer);
+		
+		// Restore position.
+		buffer.position(oldPos);
+		
+		// Close the channel, also closes the output stream.
+		channel.close();
 	
+		Log.i("addResourceAudio", "store finished");
+	
+		// Add entry to audio resource table.
 		mAudioStores.put(resHandle, new AudioStore(mimeType, length, fileName));
 	}
 	catch(Exception e)
 	{
 		SYSLOG("Unable to save temporary audio file.");
 	}
-
 }
 
+/**
+ * Store ubin audio resource as a file we can use with MediaPlayer.
+ * @param data An object honding information about this resource.
+ * @param resHandle The id of the audio resource.
+ */
 void storeAudioUBin(UBinData data, int resHandle) throws Exception
 {
-	Log.i("MoSync","storeAudioUBin " + data.mSize + "bytes" );
+	Log.i("MoSyncSound.storeAudioUBin()", "data.getSize(): " + data.getSize() + "bytes");
 	
+	// Open the resource file.
 	AssetManager assetManager = mContext.getAssets();
-	AssetFileDescriptor rAfd = assetManager.openFd("resources.mp3");
-	FileInputStream fis = rAfd.createInputStream();
-	fis.skip(data.mOffset);
+	AssetFileDescriptor fileDescriptor = assetManager.openFd("resources.mp3");
+	FileInputStream inputStream = fileDescriptor.createInputStream();
 	
-	String mimeType = readMimeString(fis);
-	int length = data.mSize - mimeType.length()+1;
+	// Jump to beginning of resource.
+	inputStream.skip(data.getOffset());
+	
+	// Read mime string.
+	String mimeType = readMimeString(inputStream);
+	int mimeStringLength = mimeType.length() + 1;
+	
+	// Size of audio data.
+	int length = data.getSize() - mimeStringLength;
 	
 	try 
 	{
-		// Read the file to memory
+		// Buffer to hold audio data.
 		byte[] buffer = new byte[length];
-		fis.read(buffer);
-		fis.close();
+		
+		// We should be at the start of audio data after reading the mome string.
+		inputStream.read(buffer);
+		
+		inputStream.close();
 		
 		// Create a temporary audio file
 		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
 		Log.i("MoSync audio","saved audio resource as: " + fileName);
-		FileOutputStream fos = mContext.openFileOutput(fileName,Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE); 
-		fos.write(buffer);
-		fos.close();
+		FileOutputStream outputStream = mContext.openFileOutput(
+			fileName,
+			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE); 
+		outputStream.write(buffer);
+		outputStream.close();
+		
 		Log.i("addResourceAudio","store finished");
 	
+		// Store audio resource. TODO: Unify this withh UBinData.
 		mAudioStores.put(resHandle, new AudioStore(mimeType, length, fileName));
 	}
 	catch(Exception e)
 	{
 		SYSLOG("Unable to save temporary audio file.");
 	}
-
 }
 
 /*
@@ -256,22 +300,24 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 		mMediaPlayer = new MediaPlayer();
 	}
 	
-	Log.i("MoSync audio","Reading audio resource:" + soundResource);
+	Log.i("MoSyncSound.maSoundPlay()","Reading audio resource:" + soundResource);
 	
 	AudioStore audioStore = (AudioStore) mAudioStores.get(new Integer(soundResource));
 	if (audioStore == null)
 	{
-		Log.i("MoSync audio","No audio resource with handle: " + soundResource + " found!");
+		Log.i("MoSyncSound.maSoundPlay()", "No audio resource with handle: " + soundResource + " found!");
 		return -1;
 	}
 
-	Log.i("MoSync Audio","filename: " + audioStore.mTemporaryFileName +  " mime:" + audioStore.mMimeType + " size:" + audioStore.mSize);
+	Log.i("MoSyncSound.maSoundPlay()", "filename: " + audioStore.mTemporaryFileName); // +  " mime:" + audioStore.mMimeType + " size:" + audioStore.mSize);
 	
+	// Get file descriptor for audio resource file.
 	FileDescriptor fileDesc = mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
-
+	
 	if (null == fileDesc) 
 	{
 		Log.i("MoSync audio","File Descriptor was null!");
+		return -1;
 	}
 	
 	try
@@ -289,6 +335,7 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 	catch (Exception e)
 	{
 		Log.i("MoSync audio","Whoops! Exception e:" + e.toString());
+		e.printStackTrace();
 		return -1;
 	}
 	
@@ -329,9 +376,28 @@ void maSoundSetVolume(int vol)
 	
 	mSoundVolume = vol;
 	
+	// This sets the volume within the span 0 : current system volume.
+	// This is the specified behaviour of maSoundSetVolume in the MoSync API.
 	float volume = (float)mSoundVolume / 100.0f;
-	
 	mMediaPlayer.setVolume(volume, volume);
+	
+	/* 
+	// This code sets the system volume. 
+	// Not used, as this behaviour is not the specified one in MoSync.
+	try
+	{
+		// Use audio manager to set the volume or the stream.
+		// getStreamMaxVolume is typically a quite low number, e.g. 15.
+		AudioManager audioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+		int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		int newVolume = (int) (((float)mSoundVolume / 100f) * (float)maxVolume);
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
+	}
+	catch (Exception e)
+	{
+		e.printStackTrace();
+	}
+	*/
 }
 
 int maSoundGetVolume()
