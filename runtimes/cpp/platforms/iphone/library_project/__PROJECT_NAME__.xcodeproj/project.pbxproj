@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		855FE88C11AFF8B100769F0D /* icon_57x57.png in Resources */ = {isa = PBXBuildFile; fileRef = 855FE7F411AFF8B100769F0D /* icon_57x57.png */; };
-		855FE8A711AFF9A900769F0D /* icon_72x72.png in Resources */ = {isa = PBXBuildFile; fileRef = 855FE8A611AFF9A900769F0D /* icon_72x72.png */; };
+		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
+		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
 		85DF23B9126744D1003A0FF6 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85DF23B8126744D1003A0FF6 /* MoSyncViewController.mm */; };
 		85DF23F0126745DA003A0FF6 /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85DF23EF126745DA003A0FF6 /* libMoSyncLib.a */; };
 		85F2555A11AC155D00EB47EE /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
@@ -36,8 +36,8 @@
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8519011E1199B90400B71F58 /* data_section.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = data_section.bin; sourceTree = "<group>"; };
-		855FE7F411AFF8B100769F0D /* icon_57x57.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_57x57.png; sourceTree = "<group>"; };
-		855FE8A611AFF9A900769F0D /* icon_72x72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_72x72.png; sourceTree = "<group>"; };
+		85796C5312719251002B7859 /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
+		85796C5412719251002B7859 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; path = resources; sourceTree = "<group>"; };
 		85DF23B8126744D1003A0FF6 /* MoSyncViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncViewController.mm; sourceTree = "<group>"; };
 		85DF23EF126745DA003A0FF6 /* libMoSyncLib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMoSyncLib.a; path = "libs/Release-iphonesimulator/libMoSyncLib.a"; sourceTree = "<group>"; };
@@ -113,8 +113,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				855FE8A611AFF9A900769F0D /* icon_72x72.png */,
-				855FE7F411AFF8B100769F0D /* icon_57x57.png */,
+				85796C5312719251002B7859 /* Icon-72.png */,
+				85796C5412719251002B7859 /* Icon.png */,
 				8519011E1199B90400B71F58 /* data_section.bin */,
 				85A0815311353EDE00267D56 /* resources */,
 				85F2558911AC155D00EB47EE /* __PROJECT_NAME__.plist */,
@@ -195,8 +195,8 @@
 			files = (
 				85F2555A11AC155D00EB47EE /* resources in Resources */,
 				85F2555B11AC155D00EB47EE /* data_section.bin in Resources */,
-				855FE88C11AFF8B100769F0D /* icon_57x57.png in Resources */,
-				855FE8A711AFF9A900769F0D /* icon_72x72.png in Resources */,
+				85796C5512719251002B7859 /* Icon-72.png in Resources */,
+				85796C5612719251002B7859 /* Icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
