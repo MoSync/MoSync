@@ -720,6 +720,7 @@ void showScore() {
 #ifdef MA_PROF_SUPPORT_STYLUS
 	int y = centerY - ((PLAY_FIELD_Y>>1)*brickSize);
 #else	// MA_PROF_SUPPORT_STYLUS
+	int h = EXTENT_Y(e);
 	int y = (h>>1)-EXTENT_Y(ts)*2 - 2*(EXTENT_Y(tr)>>1);
 #endif	// MA_PROF_SUPPORT_STYLUS
 
