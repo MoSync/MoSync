@@ -21,20 +21,25 @@ public:
 
         void sslConnectTest ( void )
         {
+        	int result;
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
 
         void sslWriteTest ( void )
         {
+        	int result;
         	const char *httpGetRequest = "GET / HTTP/1.1\r\n\r\n";
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			TESTIFY_ASSERT( result > 0 );
 			maConnWrite(sslConnection, httpGetRequest, sizeof(httpGetRequest));
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE, &result) );
+			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
 
@@ -46,10 +51,12 @@ public:
         	const char *httpGetRequest = "GET / HTTP/1.0\r\n\r\n";
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			TESTIFY_ASSERT( result > 0 );
 
 			maConnWrite(sslConnection, httpGetRequest, 22);
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE, &result) );
+			TESTIFY_ASSERT( result > 0 );
 
 			maConnRead(sslConnection, buf, 2048);
 			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_READ, &result) );
@@ -63,18 +70,19 @@ public:
 			buf[result] = 0;
 			printf("Reply: %s\n", buf);
 
-			// TODO: Fix this assert.
-			//TESTIFY_ASSERT( 0 == strstr(buf, "HTTP/1.0 200 OK") );
-
+			// This string should be found at beginning of the reply.
+			TESTIFY_ASSERT( strstr(buf, "HTTP/1.0 200 OK") == buf );
 
 			maConnClose(sslConnection);
         }
 
         void httpsConnectTest ( void )
         {
+        	int result;
         	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
 
@@ -85,7 +93,8 @@ public:
 
         	MAHandle sslConnection = maConnect("https://encrypted.google.com");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT) );
+			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, &result) );
+			TESTIFY_ASSERT( result > 0 );
 
 			maConnRead(sslConnection, buf, 2048);
 			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_READ, &result) );
