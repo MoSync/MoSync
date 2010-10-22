@@ -38,7 +38,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/Libs&quot;;&quot;$(SolutionDir)/Libs/MAStd&quot;;&quot;$(MOSYNCDIR)/include&quot;"
+				AdditionalIncludeDirectories="$(SolutionDir)/Libs;$(SolutionDir)/Libs/MAStd"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="0"
@@ -99,7 +99,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)/Libs&quot;;&quot;$(SolutionDir)/Libs/MAStd&quot;;&quot;$(MOSYNCDIR)/include&quot;"
+				AdditionalIncludeDirectories="../;../MaStd"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
