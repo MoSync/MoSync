@@ -1176,7 +1176,7 @@ int MAMain()
 				renderPlayer();
 
 #ifdef MA_PROF_SUPPORT_STYLUS
-				showNavKeys(EventHandler::point);
+				//showNavKeys(EventHandler::point);
 #endif	// MA_PROF_SUPPORT_STYLUS
 
 				if(EventHandler::up_pressed ||
