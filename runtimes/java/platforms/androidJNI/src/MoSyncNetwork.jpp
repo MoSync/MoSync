@@ -70,9 +70,25 @@ MAHandle maConnect(final String url)
 	
 #ifdef _ANDROID_BLUETOOTH	
 	// If this is a Bluetooth url, Bluetooth must be available and enabled.
-	if (url.startsWith("btspp://") && null == btGetBluetoothAdapter())
+	if (url.startsWith("btspp://"))
 	{
-		return CONNERR_UNAVAILABLE;
+		// If Bluetooth permissions are not set, we call maPanic().
+		if ((PackageManager.PERMISSION_GRANTED != 
+		     mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH))
+			||
+			(PackageManager.PERMISSION_GRANTED != 
+		     mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH_ADMIN)))
+		{
+			maPanic(1, "Bluetooth permission not set");
+			return CONNERR_UNAVAILABLE;
+		}
+		
+		// If we cannot get the Bluetooth adapter, we return an error
+		// (currently, this also occurs if Bluetooth is not turned on).
+		if (null == btGetBluetoothAdapter())
+		{
+			return CONNERR_UNAVAILABLE;
+		}
 	}
 #endif
 
@@ -92,7 +108,7 @@ MAHandle maConnect(final String url)
 		}	
 		else if (url.startsWith("btspp://"))
 		{
-#ifdef _ANDROID_BLUETOOTH		
+#ifdef _ANDROID_BLUETOOTH
 			connObj = btCreateBluetoothConnectionObject(url, connHandle);
 #else
 			throw new Exception("Bluetooth not supported!");
