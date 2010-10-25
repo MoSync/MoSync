@@ -44,7 +44,6 @@ import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.LocationProvider;
 
-//import android.media.AudioManager;
 import android.media.MediaPlayer;
 
 import android.net.SSLCertificateSocketFactory;
@@ -112,15 +111,23 @@ import com.mosync.java.android.MoSyncPanicDialog;
 
 #include "helpers.h"
 
+//#define SYSLOG(a) Log.i("MoSyncThread SYSLOG", a);
+#define SYSLOG(...)
+
 public class MoSyncThread extends Thread
 {
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
+	
+	/**
+	 * Chunk size used when loading resources.
+	 */
+	private static final int CHUNK_READ_SIZE = 1024; 
 
 	private MoSync mContext;
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
-	private boolean hasDied;
+	private boolean mHasDied;
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -145,9 +152,7 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync)context;
 		mHandler = handler;
-		hasDied = false;
-	
-		Log.i("MoSync Thread", "Constructor");
+		mHasDied = false;
 		
 		nativeInitRuntime();	
 	}
@@ -165,7 +170,7 @@ public class MoSyncThread extends Thread
 	*/
 	public boolean isDead()
 	{
-		return hasDied;
+		return mHasDied;
 	}
 	
 	/**
@@ -173,7 +178,10 @@ public class MoSyncThread extends Thread
 	*/
 	public void updateSurfaceSize(int width, int height)
 	{
-		Log.i("MoSync Thread","updateSurfaceSize");		
+		SYSLOG("updateSurfaceSize");		
+		
+		// If the surface has same width and height we do not create a new canvas.
+		if((mWidth == width) && (mHeight == height)) return;
 		
 		mWidth = width;
 		mHeight = height;
@@ -185,8 +193,9 @@ public class MoSyncThread extends Thread
 		mCanvas = mDrawTargetScreen.mCanvas;
 		mBitmap = mDrawTargetScreen.mBitmap;
 		
-		Log.i("MoSync Thread","input width:" + width + " height:" + height);
-		Log.i("MoSync Thread","mBitmap width:" + mBitmap.getWidth() + " height:" + mBitmap.getHeight());
+		updateScreen();
+		
+		SYSLOG("mBitmap width:" + mBitmap.getWidth() + " height:" + mBitmap.getHeight());
 	}
 
 	/**
@@ -194,7 +203,6 @@ public class MoSyncThread extends Thread
 	*/
 	public ByteBuffer generateDataSection(int size)
 	{
-		Log.i("MoSync Thread","generate data section");
 		try
 		{
 			mMemDataSection = ByteBuffer.allocateDirect(size);
@@ -202,7 +210,7 @@ public class MoSyncThread extends Thread
 		}
 		catch (Exception e)
 		{
-			Log.i("MoSyncThread", "Out of Memory!");
+			logError("MoSyncThread - Out of Memory!", e);
 		}
 		return mMemDataSection;
 	}
@@ -212,9 +220,8 @@ public class MoSyncThread extends Thread
 	*/
 	public void threadPanic(int errorCode, String message)
 	{
-		Log.i("MoSyncThread", "threadPanic");
-		Log.i("MoSyncThread PANIC", "errorCode: " + errorCode + " message: " + message);
-		hasDied = true;
+		SYSLOG("PANIC - errorCode: " + errorCode + " message: " + message);
+		mHasDied = true;
 		try
 		{
 			// Launch panic dialog.
@@ -231,15 +238,13 @@ public class MoSyncThread extends Thread
 				}
 				catch (Exception e)
 				{
-					Log.i("MoSyncThread", "threadPanic exception 1:" + e);
-					e.printStackTrace();
+					logError("threadPanic exception 1:" + e, e);
 				}
 			}
 		}
 		catch (Exception e)
 		{
-			Log.i("MoSyncThread", "threadPanic exception 2:" + e);
-			e.printStackTrace();
+			logError("threadPanic exception 2:" + e, e);
 		}
 	}
 	
@@ -248,15 +253,13 @@ public class MoSyncThread extends Thread
 	*/
 	public boolean loadProgram()
 	{
-		Log.i("MoSync Thread", "load program");
+		SYSLOG("loadProgram");
 		try
 		{
-		
 			AssetManager assetManager = mContext.getAssets();
 			AssetFileDescriptor pAfd = assetManager.openFd(PROGRAM_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
 			long pFdOffset = pAfd.getStartOffset();
-			
 
 			FileDescriptor rFd = null;
 			mResourceOffset = 0;
@@ -269,27 +272,25 @@ public class MoSyncThread extends Thread
 			}
 			catch (FileNotFoundException fnfe)
 			{
-				Log.i("loadProgram","Has no resources!");
-				Log.i("loadProgram","exception" + fnfe.toString());
+				logError("loadProgram - Has no resources! exception: " + fnfe.toString(), fnfe);
 			}
 			
 			if (null != pFd)
 			{
-				Log.i("MoSync Thread", "calling native function");
 				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
 				{
-					Log.e("MoSync Thread", "ERROR Load program was unsuccesfull");
+					logError("loadProgram - ERROR Load program was unsuccesfull");
 					threadPanic(0, "Unable to load program or resources");
 					return false;
 				}
 
-				Log.i("MoSync Thread", "Load program was succesfull");
+				SYSLOG("loadProgram - Load program was succesfull");
 				return true;
 			}
 		}
 		catch (Exception e)
 		{
-			Log.e("MoSyncService", "Exception while loading program:" + e.toString());
+			logError("loadProgram - Exception while loading program:" + e.toString(), e);
 		}
 		return false;
 	}
@@ -308,7 +309,7 @@ public class MoSyncThread extends Thread
 		}
 		catch (Exception e)
 		{
-			Log.e("MoSyncService","getResourceFileDesriptor exception:" + e.toString());
+			logError("getResourceFileDesriptor exception:" + e.toString(), e);
 		}
 		return null;
 	}
@@ -321,16 +322,13 @@ public class MoSyncThread extends Thread
 		return (int)mResourceOffset;
 	}
 
-
-private static final int CHUNK_READ_SIZE = 1024;   
+  
 
 	/**
 	* @brief readInputStream
 	*/
 	public ByteBuffer readInputStream(InputStream is) throws Exception
 	{  
-		Log.i("MoSync Thread", "Read Input Stream");
-		
 		ReadableByteChannel byteChannel = Channels.newChannel(is);  
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(CHUNK_READ_SIZE);  
 
@@ -345,18 +343,8 @@ private static final int CHUNK_READ_SIZE = 1024;
 			}	
 		}
 		
-		Log.i("MoSync Thread", "position : " + byteBuffer.position());
-		
 		return byteBuffer;  
 	}  
-
-	/**
-	* @brief stopNow 
-	*/
-	public void stopNow()
-	{
-		Log.i("MoSync Thread","stopNow");
-	}
 
 	/**
 	* @brief updateScreen
@@ -385,17 +373,25 @@ private static final int CHUNK_READ_SIZE = 1024;
 
 		if (false == loadProgram())
 		{
-			Log.i("MoSync Thread", "load program failed!! :(");
+			logError("load program failed!!");
 			return;
 		}
-		
-		Log.i("MoSync Thread", "load program worked!!");
-		
+	
 		nativeRun();
 		
-		Log.i("MoSync Thread", "loop has ended");
 	}
 	
+	public static void logError(String message , Throwable t)
+	{
+		logError(message);
+		t.printStackTrace();
+	}
+
+	public static void logError(String message)
+	{
+		Log.e("Dalvik Syscall ERROR", message);
+	}
+
 	#include "MoSyncSyscalls.jpp"
 
 	public native boolean nativeInitRuntime();
