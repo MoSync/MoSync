@@ -19,9 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #include "generated/MAAPI_consts.h"
 
-//#define SYSLOG(a) Log.i("Dalvik Syscalls", a);
-#define SYSLOG(...)
-
 final class ImageCache
 {
 	Bitmap mBitmap;
@@ -313,7 +310,7 @@ void maUpdateScreen()
 	Canvas lockedCanvas = null;
 	
 	if (mMoSyncView == null) return;
-
+	
 	try 
 	{
 		lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
@@ -343,7 +340,7 @@ void maUpdateScreen()
 	} 
 	catch (Exception e)
 	{
-		SYSLOG("updateScreen Exception : " + e.toString());
+		logError("updateScreen Exception : " + e.toString(), e);
 		return;
 	}
 		
@@ -384,7 +381,7 @@ void maDrawImage(int image, int left, int top)
 		return;
 	}
 
-	mCanvas.drawBitmap(imageResource.mBitmap, left, top, null);//mPaint);
+	mCanvas.drawBitmap(imageResource.mBitmap, left, top, null);
 }
 
 /**
@@ -519,11 +516,10 @@ void _maDrawImageRegion(int image, int srcRectLeft, int srcRectTop, int srcRectW
 			mTempMatrix.postRotate(rotation);
 		}
 
-		/* TO-DO: This implementation is really slow, needs to be fixed */
+		// TODO: This implementation is really slow, needs to be fixed.
 		mTempBitmap = Bitmap.createBitmap(imageResource.mBitmap, srcRectLeft, srcRectTop, srcRectWidth, srcRectHeight, mTempMatrix, false);
 
 		mCanvas.drawBitmap(mTempBitmap, dstLeft, dstTop, mPaint);
-
 	}
 }
 
@@ -536,7 +532,7 @@ int maGetImageSize(int image)
 	ImageCache imageResource = (ImageCache)mImageResources.get(new Integer(image));
 	if (imageResource == null)
 	{
-		Log.i("MoSync Dalvik","maGetImageSize : no such resource");
+		logError("maGetImageSize : no such resource");
 		return -1;
 	}
 
@@ -637,7 +633,7 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 		}
 		catch(Exception e)
 		{
-			Log.i("maCreateImageFromData","Couldn't read data, exception : " + e);
+			logError("maCreateImageFromData - Couldn't read data, exception : " + e, e);
 			return RES_BAD_INPUT;
 		}
 	}
@@ -650,7 +646,7 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 			// Sanity check that offset + size is not larger the resource itself. 
 			if (uBinData.getSize() < offset + size)
 			{
-				Log.i("maCreateImageFromData",
+				logError("maCreateImageFromData " +
 					"size error, uBinData.getSize(): " + uBinData.getSize() + 
 					" size: " + size + 
 					" offset: " + offset);
@@ -673,7 +669,7 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 			}
 			catch(Exception e)
 			{
-				Log.i("maCreateImageFromData","Couldn't read read stream, exception : " + e.toString());
+				logError("maCreateImageFromData - Couldn't read read stream, exception : " + e.toString(), e);
 				return RES_BAD_INPUT;
 			}
 		}
@@ -685,24 +681,24 @@ int maCreateImageFromData(int placeholder, int data, int offset, int size)
 		Bitmap decodedImage = BitmapFactory.decodeByteArray(resourceData, 0, resourceData.length);
 		if (decodedImage == null)
 		{
-			Log.i("maCreateImageFromData","could not decode image data (decodedImage == null)");
+			logError("maCreateImageFromData - could not decode image data (decodedImage == null)");
 			return RES_BAD_INPUT;
 		}
 		mImageResources.put(placeholder, new ImageCache(null, decodedImage));
 	} 
 	catch(UnsupportedOperationException e) 
 	{
-		Log.i("maCreateImageFromData","Unsupported operation, exception : " + e);
+		logError("maCreateImageFromData - Unsupported operation, exception : " + e, e);
 		return RES_BAD_INPUT;
 	} 
 	catch (java.lang.IllegalArgumentException e) 
 	{
-		Log.i("maCreateImageFromData","Illegal argument, exception : " + e);
+		logError("maCreateImageFromData - Illegal argument, exception : " + e, e);
 		return RES_BAD_INPUT;
 	} 
 	catch (java.lang.OutOfMemoryError e) 
 	{
-		Log.i("maCreateImageFromData","Out of memory, exception : " + e);
+		logError("maCreateImageFromData - Out of memory, exception : " + e, e);
 		return RES_OUT_OF_MEMORY;
 	}
 	return RES_OK;
@@ -761,16 +757,17 @@ int maCreateDrawableImage(int placeholder, int width, int height)
 	}
 	catch (UnsupportedOperationException e)
 	{
-		Log.i("maCreateDrawableImage","e: " + e.toString());
+		logError("maCreateDrawableImage - e: " + e.toString(), e);
 		return -1;
 	}
 	catch (Exception e)
 	{
-		Log.i("maCreateDrawableImage","e: " + e.toString());
+		logError("maCreateDrawableImage - e: " + e.toString(), e);
 		return -1;
 	}
 	catch (java.lang.OutOfMemoryError e)
 	{
+		logError("maCreateDrawableImage - Out of Memory e: " + e.toString(), e);
 		return -1;
 	}
 	return 1;
@@ -820,8 +817,7 @@ int maOpenStore(String name, int flags)
 	} 
 	catch(Exception e) 
 	{
-		PRINT_STACK_TRACE;
-		SYSLOG("open store exception : " + e.toString());
+		logError("open store exception : " + e.toString(), e);
 		return STERR_GENERIC;
 	}
 }
@@ -837,11 +833,9 @@ int maWriteStore(int store, int data)
 		File f = mContext.getFileStreamPath((String)mStores.get(new Integer(store)));
 		if (f.isFile())
 		{
-			SYSLOG("Looking for binary resource..");
 			ByteBuffer bb = (ByteBuffer)mBinaryResources.get(data);
 			if (null != bb)
 			{
-				SYSLOG("Found it!");
 				FileOutputStream fos = new FileOutputStream(f, false);
 				FileChannel fc = fos.getChannel();
 				
@@ -855,11 +849,9 @@ int maWriteStore(int store, int data)
 				return 1;
 			}
 			
-			SYSLOG("Looking for ubinary resource..");
 			UBinData ubd = (UBinData)mUBinaryResources.get(data);
 			if (null != ubd)
 			{
-				SYSLOG("Found it!");
 				byte[] ra = new byte[ubd.getSize()];
 			
 				AssetManager assetManager = mContext.getAssets();
@@ -874,14 +866,13 @@ int maWriteStore(int store, int data)
 				return 1;
 			}
 
-			SYSLOG("didn't find buffer, data:" + data);
+			logError("Write Store - didn't find buffer, data:" + data);
 			return STERR_GENERIC;			
 		}
 	} 
 	catch(Exception e) 
 	{
-		SYSLOG("write store exception : " + e.toString());
-		PRINT_STACK_TRACE;
+		logError("write store exception : " + e.toString(), e);
 	}
 	return STERR_GENERIC;
 }
@@ -923,8 +914,7 @@ ByteBuffer _maReadStore(int store, int resourceIndex)
 	} 
 	catch(Exception e) 
 	{
-		SYSLOG("read store exception : " + e.toString());
-		PRINT_STACK_TRACE;
+		logError("read store exception : " + e.toString(), e);
 		return null;
 	}
 }
@@ -1007,7 +997,7 @@ void maWait(int timeout)
 	} 
 	catch (Exception e) 
 	{
-		Log.i("MoSync View","Thread sleep failed : " + e.toString());
+		logError("Thread sleep failed : " + e.toString(), e);
 	}
 	
 	SYSLOG("maWait returned");
@@ -1268,12 +1258,12 @@ boolean loadImage(int resourceIndex, int pos, int length, int binaryResource)
 			mImageResources.put(resourceIndex, new ImageCache(null, bitmap));
 			return true;
 		}
-		SYSLOG("Bitmap wasn't created!");
+		logError("loadImage - Bitmap wasn't created from Resource: " + resourceIndex);
 		return false;
 	}
 	catch (Exception e)
 	{
-		SYSLOG("Bitmap exceptions : " + e.toString());
+		logError("loadImage - Bitmap exceptions : " + e.toString(), e);
 		return false;
 	}
 }
@@ -1300,7 +1290,7 @@ ByteBuffer loadBinary(int resourceIndex, int size)
 	}
 	catch(Exception e)
 	{
-		Log.i("MoSyncThread", "Out of Memory!");
+		logError("loadBinary - Out of Memory!", e);
 		maPanic(1,"Out of Memory!");
 	}
 	return null;
@@ -1384,13 +1374,9 @@ void loadUBinary(int resourceIndex, int offset, int size)
 			storeAudioUBin(ubd, resourceIndex);
 		}
 	}
-	catch(IOException ioe)
-	{
-	
-	}
 	catch(Exception e)
 	{
-	
+		logError("loadUBinary - exception :", e);
 	}
 }
 
@@ -1402,27 +1388,21 @@ void loadUBinary(int resourceIndex, int offset, int size)
 void destroyResource(int resourceIndex)
 {
 	SYSLOG("destroyBinary :" + resourceIndex);
-	Log.i("destroyResource","Trying to destroy resources : " + resourceIndex);
 	
 	if(null != mBinaryResources.get(resourceIndex))
 	{
 		mBinaryResources.remove(resourceIndex);
-		Log.i("destroyResource","Binary resource removed");
 	}
 
 	if(null != mUBinaryResources.get(resourceIndex))
 	{
 		mUBinaryResources.remove(resourceIndex);
-		Log.i("destroyResource","UBinary resource removed");
 	}
 
 	if(null != mImageResources.get(resourceIndex))
 	{
 		mImageResources.remove(resourceIndex);
-		Log.i("destroyResource","Image resource removed");
 	}
-
-
 }
 
 /**
@@ -1441,4 +1421,3 @@ int maTextBox(String title, String inText, int outText, int maxSize, int constra
 	Log.i("MoSync", "New activity started for InputBox");
 	return 0;
 }
-

@@ -21,6 +21,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \n
 * If there is already a program in the cache, the user is given the option to
 * run it immediately or ask the server for a new version.\n
+*
+* To use this example you must compile a program, with the same version of 
+* MoSync as you build OtaLoad, with  and put the comb file on a webserver.
+* A comb file ( program.comb ) is a MoSync program in which both the program file and 
+* the resource file are combined  into one file.  This file is located in your projects 
+* Output/<Build Configuration>/ or
+* FinalOutput/<Build Configuration>/<Vendor>/<Device>/ folder.
+* The project you will download can't contain any unloaded resourcese such
+* as ubin or umedia.
+*
+* If you haven't got a webserver you can use free services like www.dropbox.com
+* to host your file and give you a URL to it.
 */
 
 #include <ma.h>
@@ -34,7 +46,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-static const char* URL = "http://www.mosync.com/fred/otaload.v10.comb";
+/**
+	This is the url to your program.comb file, example "http://www.example.com/folder/program.comb"
+*/
+static const char* URL = "";
+
 static const char* SAV = "OtaLoad.sav";
 static const char* MODSAV = "OtaLoad.mod.sav";
 
@@ -119,6 +135,13 @@ private:
 #endif	// MA_PROF_SUPPORT_STYLUS
 
 	void startDownload() {
+	
+		if(0 == strcmp(URL, ""))
+		{
+			printf("No url provided, see source code for information on how to use this example");
+			return;
+		}
+	
 		printf("Downloading from %s\n", URL);
 		//in case of re-download
 		mHttp.close();
