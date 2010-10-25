@@ -49,6 +49,10 @@ bool NetBase::waitForEvent ( int ms, int opType, int &result )
 				result = event.conn.result;
 				return true;
 			}
+			if(event.type == EVENT_TYPE_CLOSE)
+			{
+				maExit(0);
+			}
 		}
 	}
 

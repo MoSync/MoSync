@@ -244,8 +244,13 @@ void CMySecureSocket::Handshake(const TDesC* hostname, CPublicActive& op) {
 }
 
 CMySecureSocket::~CMySecureSocket() {
-	if(mSS)
+	LOGD("~CMySecureSocket()\n");
+	if(mSS) {
+		mSS->Close();
 		delete mSS;
+		mSocket.Close();
+		mClosed = true;
+	}
 }
 
 bool CMySecureSocket::Write(const TDesC8& aDesc, CPublicActive& op) {

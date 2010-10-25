@@ -43,7 +43,7 @@ public:
 		ETcp, ERfcomm, EBlank
 	};
 
-	CSocket(RSocketServ& aServer, Type type) {
+	CSocket(RSocketServ& aServer, Type type) : mClosed(true) {
 		switch(type) {
 		case ETcp:
 			LHEL(mSocket.Open(aServer, KAfInet, KSockStream, KProtocolInetTcp));
@@ -55,10 +55,15 @@ public:
 			LHEL(mSocket.Open(aServer));
 			break;
 		}
+		mClosed = false;
 	}
 	virtual ~CSocket() {
-		mSocket.CancelAll();
-		mSocket.Close();
+		LOGD("~CSocket()\n");
+		if(!mClosed) {
+			mSocket.CancelAll();
+			mSocket.Close();
+			mClosed = true;
+		}
 	}
 
 	virtual void Connect(TSockAddr& aAddr, CPublicActive& op);
@@ -76,6 +81,7 @@ public:
 protected:
 	RSocket mSocket;
 	TSockXfrLength mDummyLength;
+	bool mClosed;
 };
 
 class CMySecureSocket : public CSocket {
