@@ -2184,6 +2184,10 @@ maIOCtl_glPointSizex_case(glPointSizex);
 #else	// so we go with modal, for now.
 		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
+			
+		 // hack to fix issue 843.
+         if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))        // if left button is pressed
+			PostMessage(sMainWnd, WM_LBUTTONUP, 0, 0);
 #endif
 #endif
 		return 0;
