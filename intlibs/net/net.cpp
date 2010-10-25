@@ -223,8 +223,11 @@ MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inet
 
 int TcpConnection::connect() {
 	int result;
-	mSock = MASocketOpen(mHostname.c_str(), mPort, result, mInetAddr);
-	return result;
+	mSock = MASocketCreate(mHostname.c_str(), result, mInetAddr);
+	if(mSock == INVALID_SOCKET)
+		return result;
+
+	return MASocketConnect(mSock, mInetAddr, mPort);
 }
 
 bool TcpConnection::isConnected() {
