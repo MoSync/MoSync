@@ -2190,6 +2190,10 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		int res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
 		GLECUSTOM(res <= 0);
+
+		// hack to fix issue 843.
+		if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))	// if left button is pressed
+			PostMessage(sMainWnd, WM_LBUTTONUP, 0, 0);
 #endif
 #endif
 		return 0;
