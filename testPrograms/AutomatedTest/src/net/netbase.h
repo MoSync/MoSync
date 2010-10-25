@@ -11,6 +11,8 @@
 class NetBase
 {
 protected:
+	static const int MAX_DELAY;
+
 	/**
  	 * Waits for a network event.
 	 *

@@ -36,7 +36,7 @@ public:
         	int result;
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
 #ifdef VERBOSE
 			printf("@@@ sslConnectTest maConnect result: %i\n", result);
 #endif
@@ -50,10 +50,10 @@ public:
         	const char *httpGetRequest = "GET / HTTP/1.1\r\n\r\n";
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
 			TESTIFY_ASSERT( result > 0 );
 			maConnWrite(sslConnection, httpGetRequest, sizeof(httpGetRequest));
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_WRITE, result) );
 			TESTIFY_ASSERT( result > 0 );
 			maConnClose(sslConnection);
         }
@@ -66,15 +66,15 @@ public:
         	const char *httpGetRequest = "GET / HTTP/1.0\r\n\r\n";
         	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
 			TESTIFY_ASSERT( result > 0 );
 
 			maConnWrite(sslConnection, httpGetRequest, 22);
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_WRITE, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_WRITE, result) );
 			TESTIFY_ASSERT( result > 0 );
 
 			maConnRead(sslConnection, buf, 2048);
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_READ, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_READ, result) );
 			TESTIFY_ASSERT( result > 0 );
 
 			// Ensure that we do not print too much data.

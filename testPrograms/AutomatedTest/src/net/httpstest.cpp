@@ -41,7 +41,7 @@ public:
         	int result;
         	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
 #ifdef VERBOSE
 			printf("@@@ httpsConnectTest maConnect result: %i\n", result);
 #endif
@@ -56,11 +56,11 @@ public:
 
         	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
 			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_CONNECT, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
 			TESTIFY_ASSERT( result > 0 );
 
 			maConnRead(sslConnection, buf, 2048);
-			TESTIFY_ASSERT( waitForEvent(5000, CONNOP_READ, result) );
+			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_READ, result) );
 			TESTIFY_ASSERT( result > 0 );
 
 			// Ensure that we do not print too much data.

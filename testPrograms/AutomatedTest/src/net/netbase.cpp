@@ -8,6 +8,10 @@
 #include "netbase.h"
 
 
+// Maximum delay for an event in ms
+const int NetBase::MAX_DELAY = 25000;
+
+
 /**
  * Waits for a network event.
  *
