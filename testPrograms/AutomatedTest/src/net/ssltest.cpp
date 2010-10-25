@@ -2,11 +2,19 @@
 #include <mastring.h>
 #include <MAUtil/Connection.h>
 #include <Testify/testify.hpp>
+#include "netbase.h"
 
 using namespace Testify;
-using namespace MAUtil;
 
-class SslTestCase : public TestCase
+
+/**
+ * Automated SSL test case. Please feel free to adding
+ * more cases to it.
+ *
+ * Note: This will most likely no work on j2me devices since
+ *       it uses port 443 which seem to be prohibited for use.
+ */
+class SslTestCase : public TestCase, private NetBase
 {
 public:
         SslTestCase( )
@@ -15,6 +23,12 @@ public:
 			addTest( bind( &SslTestCase::sslConnectTest, this ), "SSL Connect test" );
 			addTest( bind( &SslTestCase::sslWriteTest, this ), "SSL Write test" );
 			addTest( bind( &SslTestCase::sslReadTest, this ), "SSL Read test" );
+        }
+
+        virtual void testTearDown ( void )
+        {
+        	long startTime = maGetMilliSecondCount( );
+        	while ( maGetMilliSecondCount()-startTime < 500 );
         }
 
         void sslConnectTest ( void )
@@ -77,35 +91,6 @@ public:
 			TESTIFY_ASSERT( strstr(buf, "HTTP/1.0 200 OK") == buf );
 
 			maConnClose(sslConnection);
-        }
-private:
-        bool waitForEvent ( int ms, int opType )
-        {
-        	int result;
-        	return waitForEvent ( ms, opType, result );
-        }
-
-        bool waitForEvent ( int ms, int opType, int &result )
-        {
-        	int iter = ms/100;
-            MAEvent event;
-
-            for ( int i = 0; i < iter; i++ )
-            {
-				maWait( 100 );
-				while( maGetEvent( &event ) != 0 )
-				{
-					if ( event.type == EVENT_TYPE_CONN &&
-					     event.conn.opType == opType )
-					{
-						result = event.conn.result;
-						return true;
-					}
-				}
-            }
-
-
-            return false;
         }
 };
 

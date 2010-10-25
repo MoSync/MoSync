@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="1.1">
 <active.build.cfg active="Release"/>
-<target-profile device="WildFire" vendor="HTC"/>
+<target-profile device="Emulator" vendor="MoSync"/>
 <properties/>
 </project>

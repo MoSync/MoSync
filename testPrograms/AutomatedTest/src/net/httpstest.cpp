@@ -8,11 +8,17 @@
 #include <mastring.h>
 #include <MAUtil/Connection.h>
 #include <Testify/testify.hpp>
+#include "netbase.h"
 
 using namespace Testify;
-using namespace MAUtil;
 
-class HTTPSTestCase : public TestCase
+
+/**
+ * Automated HTTPS test case. Please feel free to adding
+ * more cases to it.
+ *
+ */
+class HTTPSTestCase : public TestCase, private NetBase
 {
 public:
         HTTPSTestCase( )
@@ -21,6 +27,14 @@ public:
 			addTest( bind( &HTTPSTestCase::httpsConnectTest, this ), "HTTPS Connect test" );
 			addTest( bind( &HTTPSTestCase::httpsReadTest, this ), "HTTPS Read test" );
         }
+
+
+        virtual void testTearDown ( void )
+        {
+        	long startTime = maGetMilliSecondCount( );
+        	while ( maGetMilliSecondCount()-startTime < 500 );
+        }
+
 
         void httpsConnectTest ( void )
         {
@@ -60,35 +74,6 @@ public:
 #endif
 
 			maConnClose(sslConnection);
-        }
-
-private:
-        bool waitForEvent ( int ms, int opType )
-        {
-        	int result;
-        	return waitForEvent ( ms, opType, result );
-        }
-
-        bool waitForEvent ( int ms, int opType, int &result )
-        {
-        	int iter = ms/100;
-            MAEvent event;
-
-            for ( int i = 0; i < iter; i++ )
-            {
-				maWait( 100 );
-				while( maGetEvent( &event ) != 0 )
-				{
-					if ( event.type == EVENT_TYPE_CONN &&
-					     event.conn.opType == opType )
-					{
-						result = event.conn.result;
-						return true;
-					}
-				}
-            }
-
-            return false;
         }
 };
 
