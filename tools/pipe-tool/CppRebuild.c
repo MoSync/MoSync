@@ -443,7 +443,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 //			 
 //****************************************
 
-void CppDecodeReturn()
+void CppDecodeReturn(int shouldPassR15)
 {
 	switch(ThisFunctionRetType)
 	{
@@ -461,7 +461,8 @@ void CppDecodeReturn()
 		break;
 
 		case RET_double:
-		RebuildEmit("	__dbl_high = r15;\n");
+		if(shouldPassR15)
+			RebuildEmit("	__dbl_high = r15;\n");
 		RebuildEmit("	return r14;");
 		break;
 	}
@@ -699,6 +700,11 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 	CppUsedCallReg = 1;
 
 	RebuildEmit(");\n");
+
+	// r14 and r15 are always scratch registers after a function call (they may have changed. So we can safely overwrite the content here).
+	if (ThisFunctionRegs & REGBIT(REG_r15)) {
+		RebuildEmit("	r15 = __dbl_high;\n");
+	}
 }
 
 //****************************************
@@ -1102,7 +1108,7 @@ void RebuildCppEpilog(SYMBOL *sym)
 	if (ReturnCount > 0)
 		RebuildEmit("label_0:;\n");
 
-	CppDecodeReturn();
+	CppDecodeReturn(1);
 	RebuildEmit("\n");
 
 	RebuildEmit("} // %s\n", sym->Name);
