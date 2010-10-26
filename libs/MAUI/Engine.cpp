@@ -139,8 +139,8 @@ namespace MAUI {
 		int scrH = EXTENT_Y(maGetScrSize());
 
 		// TODO: remove this!!!
-		maSetColor(0);
-		Gfx_fillRect(0, 0, scrW, scrH);
+		//maSetColor(0);
+		//Gfx_fillRect(0, 0, scrW, scrH);
 
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
 		Gfx_pushClipRect(0, 0, scrW, scrH);
@@ -179,9 +179,9 @@ namespace MAUI {
 		return *mSingletonPtr;
 	}
 
-	/* is an mOverlay shown? */
-	bool Engine::isOverlayShown() {
-		return mOverlay!=NULL;
+	Widget* Engine::currentOverlay(Point& p) {
+		p = mOverlayPosition;
+		return mOverlay;
 	}
 
 	/* shows the mOverlay widget (passed as an argument). Put the top left

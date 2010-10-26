@@ -67,8 +67,10 @@ namespace MAUI {
       	  **/
 		static Engine& getSingleton();
 
-		/* is an overlay shown? */
-		bool isOverlayShown();
+		/**
+		* Returns a pointer to the current overlay widget, or NULL if no overlay is shown.
+		*/
+		Widget* currentOverlay(Point& position);
 
 		/* shows the overlay (passed as an argument). Put the top left
 		corner at position x and y. */

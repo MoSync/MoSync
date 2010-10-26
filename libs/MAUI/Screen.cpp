@@ -152,8 +152,26 @@ namespace MAUI {
 	}
 	void Screen::pointerPressEvent(MAPoint2d point) {
 		setFocusedWidget(NULL); // if key has been pressed previously focus has been gained, this should be removed now.
+		Point p;
+		Widget* root = Engine::getSingleton().currentOverlay(p);
+		Widget* newFocus;
+		if(root) {
+			// shift point to match overlay's position
+			point.x -= p.x;
+			point.y -= p.y;
+			newFocus = root->focusableWidgetAt(point.x, point.y);
+			if(!newFocus) {
+				// restore point
+				point.x += p.x;
+				point.y += p.y;
+				root = mMain;
+				newFocus = root->focusableWidgetAt(point.x, point.y);
+			}
+		} else {
+			root = mMain;
+			newFocus = root->focusableWidgetAt(point.x, point.y);
+		}
 
-		Widget* newFocus = mMain->focusableWidgetAt(point.x, point.y);
 		if(newFocus) {
 			setFocusedWidget(newFocus);
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
