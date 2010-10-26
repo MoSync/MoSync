@@ -172,6 +172,12 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	{
 		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
+		// Avoid CloudMade maps by default
+		if(newKind == MapSourceKind_CloudMade1)
+			newKind = (MapSourceKind)(mMapSourceKind + 2);
+		if(newKind == MapSourceKind_CloudMade7)
+			newKind = (MapSourceKind)(mMapSourceKind + 3);
+		// Wrap
 		if( newKind >= MapSourceKind_Last )
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
 		mMapSourceKind = newKind;
