@@ -12,8 +12,18 @@
 <property key="build.prefs:app.permissions" value="Internet\ Access"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=3000000 -heapsize=2000000 -stacksize=100000"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:memory.data/Debug" value="3072"/>
+<property key="build.prefs:memory.data/Release" value="3072"/>
+<property key="build.prefs:memory.heap/Debug" value="2048"/>
+<property key="build.prefs:memory.heap/Release" value="2048"/>
+<property key="build.prefs:memory.stack/Debug" value="128"/>
+<property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="template.id" value="project.empty"/>
