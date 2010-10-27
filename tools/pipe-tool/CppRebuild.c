@@ -670,10 +670,11 @@ int CppDecodeCall(OpcodeInfo *theOp)
 
 void CppDecodeCallReg(OpcodeInfo *theOp)
 {
-	int i0 = ThisFunctionRegs & REGBIT(REG_i0);
-	int i1 = ThisFunctionRegs & REGBIT(REG_i1);
-	int i2 = ThisFunctionRegs & REGBIT(REG_i2);
-	int i3 = ThisFunctionRegs & REGBIT(REG_i3);
+	// changed ThisFunctionRegs to funcprop.reg_used (didn't take the parameters to the function into account).
+	int i0 = funcprop.reg_used & REGBIT(REG_i0);
+	int i1 = funcprop.reg_used & REGBIT(REG_i1);
+	int i2 = funcprop.reg_used & REGBIT(REG_i2);
+	int i3 = funcprop.reg_used & REGBIT(REG_i3);
 
 	RebuildEmit("	r14 = CallReg(%s", Cpp_reg[theOp->rd]);
 
@@ -1005,6 +1006,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("//assign_reg = %s\n", Bin32(funcprop.assign_reg));
 		RebuildEmit("//uninit_reg = %s\n", Bin32(funcprop.uninit_reg));
 		RebuildEmit("//used_reg   = %s\n", Bin32(funcprop.reg_used));
+		RebuildEmit("//tfr        = %s\n", Bin32(ThisFunctionRegs));
 		RebuildEmit("\n");
 	}
 
