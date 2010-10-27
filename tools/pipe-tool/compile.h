@@ -698,6 +698,20 @@ enum
 #define MAX_CODE_MEM		(2048 * 1024)
 #define MAX_DATA_MEM		(2048 * 1024)
 
+/**
+ * Marks the place to return from a longjmp. Updates
+ * the global variable ErrRetSet to mark that a setjmp
+ * has been declared.
+ *
+ * Note: This macro cannot be made into a function 
+ *       since setjmp must be called from a function 
+ *       that does not return until longjmp is called.
+ *
+ * For more information see https://www.securecoding.cert.org/confluence/display/seccode/MSC22-C.+Use+the+setjmp(),+longjmp()+facility+securely
+ */
+#define SET_ERROR_RETURN(...) ErrRetSet = 1; \
+                              setjmp(ErrorRet);
+
 //****************************************
 //		 Global Variables
 //****************************************

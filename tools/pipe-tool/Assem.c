@@ -297,11 +297,8 @@ void Assemble()
 	EndFile = 0;
 
 	ResetErrorCount();
-	//
-	// Only safe way to do it, see
-	//   https://www.securecoding.cert.org/confluence/display/seccode/MSC22-C.+Use+the+setjmp(),+longjmp()+facility+securely
-	//
-	setjmp(ErrorRet);
+	
+	SET_ERROR_RETURN();
 
 	while(1)
 	{
