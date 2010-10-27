@@ -19,7 +19,7 @@ require 'fileutils'
 
 def returnToBuild(path, ret)
 	FileUtils.cd path
-	return ret
+	exit ret
 end
 
 # The the current path
@@ -48,7 +48,7 @@ else
 	FileUtils.cd "#{ENV['MOSYNC_RELEASE_BUILD_PATH']}"
 	ret = system "ruby private-runtimebuilder/lib/buildmaster.rb profiles.zip mosync-trunk"
 	if true == ret
-		system "unzip profiles.zip -d #{ENV['MOSYNC_PATH']}"
+		ret = system "unzip profiles.zip -d #{ENV['MOSYNC_PATH']}"
 	end
 	
 	returnToBuild cpath, ret
