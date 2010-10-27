@@ -29,20 +29,17 @@ void MoSync_AddCloseEvent();
 
 
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
-	//window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];  
-    //window.backgroundColor = [UIColor whiteColor];   
-	
+	// Hide status bar HERE because later the space under the status bar is
+	// not usable for drawing, etc.
+	[[UIApplication sharedApplication] setStatusBarHidden:YES 
+										withAnimation:UIStatusBarAnimationFade];
     // Override point for customization after app launch    
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    //window.backgroundColor = [UIColor whiteColor];
 	
     viewController = [[MoSyncViewController alloc] init];
 	
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-    //[window layoutSubviews];
-	//[window addSubview:viewController.view];
-    //[window makeKeyAndVisible];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

@@ -297,7 +297,8 @@ void Assemble()
 	EndFile = 0;
 
 	ResetErrorCount();
-	SetErrorReturn();
+	
+	SET_ERROR_RETURN();
 
 	while(1)
 	{

@@ -103,7 +103,7 @@ void ResourceComp()
 
 	ResetErrorCount();
 
-	SetErrorReturn();
+	SET_ERROR_RETURN();
 
 	while(1)
 	{
