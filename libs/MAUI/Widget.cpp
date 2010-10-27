@@ -514,11 +514,14 @@ namespace MAUI {
 
 	bool Widget::pointerPressed(MAPoint2d p, int id) {
 		MAUI_LOG("Widget::pointerPressed! %x", this);
-		return false;
+		return mFocusable;
 	}
 
 	bool Widget::pointerMoved(MAPoint2d p, int id) {
 		MAUI_LOG("Widget::pointerMoved! %x", this);
+		if(mFocusable) {
+			return mBounds.contains(p.x, p.y);
+		}
 		return false;
 	}
 

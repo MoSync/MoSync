@@ -154,7 +154,6 @@ namespace MAUI {
 			Gfx_pushClipRect(0, 0, scrW, scrH);
 
 			mOverlay->requestRepaint(); // won't add the idle listener again just setDirty(true).
-			Gfx_translate(mOverlayPosition.x, mOverlayPosition.y);
 			mOverlay->update();
 			mOverlay->draw();
 		}
@@ -189,6 +188,7 @@ namespace MAUI {
 	void Engine::showOverlay(int x, int y, Widget *overlay) {
 		mOverlayPosition.x = x;
 		mOverlayPosition.y = y;
+		overlay->setPosition(x, y);
 		this->mOverlay = overlay;
 		mOverlay->requestRepaint();
 		mMain->requestRepaint();

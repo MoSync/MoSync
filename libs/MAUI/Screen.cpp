@@ -157,13 +157,9 @@ namespace MAUI {
 		Widget* newFocus;
 		if(root) {
 			// shift point to match overlay's position
-			point.x -= p.x;
-			point.y -= p.y;
 			newFocus = root->focusableWidgetAt(point.x, point.y);
 			if(!newFocus) {
 				// restore point
-				point.x += p.x;
-				point.y += p.y;
 				root = mMain;
 				newFocus = root->focusableWidgetAt(point.x, point.y);
 			}

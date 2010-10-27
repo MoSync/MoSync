@@ -798,6 +798,9 @@ namespace MAUI {
 		 */
 
 		setFocusedWidget(NULL);
+		if(mSelectedIndex < mChildren.size()) {
+			mChildren[mSelectedIndex]->setFocused(false);
+		}
 
 		p.x -= getTranslationX();
 		p.y -= getTranslationY();

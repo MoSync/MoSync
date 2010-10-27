@@ -1,6 +1,7 @@
 #include "Button.h"
 #include "Engine.h"
 #include <mastdlib.h>
+#include <mavsprintf.h>
 
 namespace MAUI {
 
@@ -16,6 +17,7 @@ mSkinUnfocusedReleased(NULL), mListeners(false)
 }
 
 bool Button::pointerPressed(MAPoint2d p, int id) {
+	//lprintfln("bpp %ix%i", p.x, p.y);
 	mPressed = true;
 	mStartX = p.x;
 	mStartY = p.y;
@@ -26,12 +28,17 @@ bool Button::pointerPressed(MAPoint2d p, int id) {
 }
 
 bool Button::pointerMoved(MAPoint2d p, int id) {
+	//lprintfln("bpm %ix%i", p.x, p.y);
+#if 0
 	p.x-=mStartX;
 	p.y-=mStartY;
 
 	int length = (int)sqrt((double)(p.x*p.x+p.y*p.y));
 	if(length<15) return true;
 	else return false;
+#else
+	return mBounds.contains(p.x, p.y);
+#endif
 }
 
 bool Button::pointerReleased(MAPoint2d p, int id) {
