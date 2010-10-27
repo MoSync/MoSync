@@ -114,20 +114,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
 
 - (id)initWithFrame:(CGRect)frame {
-
-	int statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
-	frame.origin.y -= statusBarHeight;
-
-	//[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
-	[[UIApplication sharedApplication] setStatusBarHidden:YES animated:YES];
-	
-	
     if (self = [super initWithFrame:frame]) {
         // Initialization code
 		self.clearsContextBeforeDrawing = NO;
-		//[[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:NO];
-		//[[UIApplication sharedApplication] setStatusBarHidden:YES animated:YES];
-		
 		UIDevice* myDevice = [UIDevice currentDevice];
 		[myDevice beginGeneratingDeviceOrientationNotifications];
 		[myDevice setBatteryMonitoringEnabled:YES];
