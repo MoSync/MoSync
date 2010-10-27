@@ -420,27 +420,13 @@ void SetErrorReset()
 //		Set Error Return Position
 //****************************************
 
-int SetErrorReturn()
-{
-	int exitcode;
-
-	ErrRetSet = 1;
-
-	exitcode = setjmp(ErrorRet);
-	return exitcode;
-}
-
-//****************************************
-//		Set Error Return Position
-//****************************************
-
 void ErrorReturn(int code)
 {
 	if (!ErrRetSet)
 	{
 		printf("Exiting...\n");
 		ExitApp(1);
-	}	
+	}
 
 	longjmp(ErrorRet, code);
 }
@@ -540,5 +526,3 @@ int FileInfo_From_IP(LineInfo *info, int ip)
 
 	return 1;
 }
-
-

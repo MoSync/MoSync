@@ -58,7 +58,11 @@ void HeaderReader(char *filemem)
 	hEndComp = 0;
 
 	ResetErrorCount();
-	SetErrorReturn();
+	//
+	// Only safe way to do it, see
+	//   https://www.securecoding.cert.org/confluence/display/seccode/MSC22-C.+Use+the+setjmp(),+longjmp()+facility+securely
+	//
+	setjmp(ErrorRet);
 
 	while(1)
 	{	
