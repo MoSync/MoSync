@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "iphone_helpers.h"
 
 //#define _USE_REBUILDER_
+//#undef _USE_REBUILDER_
 
 #ifdef _USE_REBUILDER_
 //#include "rebuild.build.cpp"
@@ -90,6 +91,10 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 
 
 void cpp_main();
+
+#else
+
+#include <core/Core.cpp>
 
 #endif
 
@@ -220,11 +225,20 @@ void MoSync_AddEvent(const MAEvent &e) {
 }
 
 void* MoSync_GetCustomEventData() {
+#ifdef _USE_REBUILDER_
 	return sCustomEventData;
+#else
+	return (void*) &gCore->mem_ds[gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize()];
+#endif
 }
 
 void* MoSync_GetCustomEventDataMoSyncPointer() {
+#ifdef _USE_REBUILDER_
 	return (void*) sCustomEventDataPointer;
+#else
+	return (void*) (gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize());
+	
+#endif
 }
 
 /*

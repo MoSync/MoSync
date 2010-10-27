@@ -164,7 +164,7 @@ namespace Base {
 		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
 		sUnicodeFont = CGFontCreateWithFontName(str);
 		//CFRelease(str);
-				
+		
 		gDrawTarget = gBackbuffer;
 		
 		mach_timebase_info( &gTimeBase );
@@ -227,25 +227,34 @@ namespace Base {
 		gDrawTarget->mImageDrawer->clipRect.y = top;
 		gDrawTarget->mImageDrawer->clipRect.width = width;
 		gDrawTarget->mImageDrawer->clipRect.height = height;
-		
 	}
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
 	{
-		gSyscall->ValidateMemRange(rect, sizeof(MARect));		
+		gSyscall->ValidateMemRange(rect, sizeof(MARect));	
+		rect->left = gDrawTarget->mImageDrawer->clipRect.x;
+		rect->top = gDrawTarget->mImageDrawer->clipRect.y; 
+		rect->width = gDrawTarget->mImageDrawer->clipRect.width;
+		rect->height = gDrawTarget->mImageDrawer->clipRect.height;
+
+		/*
 		CGRect cr = CGContextGetClipBoundingBox(gDrawTarget->context);
 		rect->left = cr.origin.x;
 		rect->top = cr.origin.y;
 		rect->width = cr.size.width;
-		rect->height = cr.size.height;	
+		rect->height = cr.size.height;
+		*/
 	}
 
 	SYSCALL(int, maSetColor(int argb)) {
 		oldColor = currentColor;
 		currentColor = argb;
-		currentRed =   (float)((argb&0x00ff0000)>>16)/255.0f;
-		currentGreen = (float)((argb&0x0000ff00)>>8)/255.0f;
-		currentBlue =  (float)((argb&0x000000ff))/255.0f;
+		float red =   (float)((argb&0x00ff0000)>>16)/255.0f;
+		float green = (float)((argb&0x0000ff00)>>8)/255.0f;
+		float blue =  (float)((argb&0x000000ff))/255.0f;
+		currentRed = red;
+		currentGreen = green;
+		currentBlue = blue;
 		
 		// hmmmm I don't know why I have to do this :)
 		realColor = (argb&0xff00ff00)|((argb&0x00ff0000)>>16)|((argb&0x000000ff)<<16);
@@ -315,7 +324,8 @@ namespace Base {
 		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = after.x;
-		return EXTENT(width, FONT_HEIGHT);
+		int height = FONT_HEIGHT;
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const wchar_t* str)) {
@@ -333,8 +343,9 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
 	}
 
@@ -343,8 +354,9 @@ namespace Base {
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);					
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
 		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);		
 		delete glyphs;
 	}
@@ -407,10 +419,6 @@ namespace Base {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));	
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
 
-		int imgWidth = CGImageGetWidth(img->image);
-		int imgHeight = CGImageGetHeight(img->image);
-		CGRect newRect = CGRectMake(dstTopLeft->x-src->left, 0, imgWidth, imgHeight);
-		
 		ClipRect srcRect;
 		srcRect.x = src->left;
 		srcRect.y = src->top;
