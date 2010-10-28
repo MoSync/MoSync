@@ -207,7 +207,7 @@ namespace Base {
 			// if program is already open or something failed...
 			exit(0);
 		}
-
+		init();
 	}
 
 	void Syscall::platformDestruct() {
