@@ -306,7 +306,7 @@ void maDrawTextW(int left, int top, final String str)
 */
 void maUpdateScreen()
 {
-	SYSLOG("maUpdateScreen");
+	//SYSLOG("maUpdateScreen");
 	Canvas lockedCanvas = null;
 	
 	if (mMoSyncView == null) return;
@@ -1163,8 +1163,9 @@ int maGetSystemProperty(String key, int buf, int size)
 		property = locale.getISO3Language();
 	}
 	
-	if(null == property)
-		return -2;
+	if(null == property) return -2;
+	
+	if(0 == property.compareTo("")) return -2;
 	
 	if(property.length() >= size)
 		return property.length() + 1;
