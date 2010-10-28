@@ -37,10 +37,19 @@ namespace MAUI {
 
 	class OverlayListener {
 	public:
+		enum OutsideResponse {
+			/// Don't do anything else with the event.
+			eBreak,
+			/// Process the event with the underlying Widget.
+			eProceed,
+		};
+
 		/**
 		* Called when a pointerPressed event outside an active overlay is received.
+		* The default response (if you don't pass an OverlayListener to showOverlay()) is
+		* eProceed.
 		*/
-		virtual void pointerPressedOutsideOverlay() = 0;
+		virtual OutsideResponse pointerPressedOutsideOverlay(int x, int y) = 0;
 	};
 
 	/** \brief Widget manager.
@@ -80,11 +89,11 @@ namespace MAUI {
 		*/
 		Widget* currentOverlay(Point& position);
 
-		/* shows the overlay (passed as an argument). Put the top left
-		corner at position x and y. */
+		/** Shows an overlay Widget. The top left corner is at position \a x and \a y.
+		*/
 		void showOverlay(int x, int y, Widget *overlay, OverlayListener* listener = NULL);
 
-		void fireOverlayEvent();
+		OverlayListener::OutsideResponse fireOverlayEvent(int x, int y);
 		
 		/* hide the currently shown overlay. */
 		void hideOverlay();

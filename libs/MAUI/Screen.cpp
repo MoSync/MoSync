@@ -158,10 +158,17 @@ namespace MAUI {
 		if(root) {
 			newFocus = root->focusableWidgetAt(point.x, point.y);
 			if(!newFocus) {
-				Engine::getSingleton().fireOverlayEvent();
-				return;
+				OverlayListener::OutsideResponse res =
+					Engine::getSingleton().fireOverlayEvent(point.x, point.y);
+				switch(res) {
+				case OverlayListener::eBreak:
+					return;
+				case OverlayListener::eProceed:
+					root = NULL;
+				}
 			}
-		} else {
+		}
+		if(!root) {
 			root = mMain;
 			newFocus = root->focusableWidgetAt(point.x, point.y);
 		}

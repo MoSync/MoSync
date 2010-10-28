@@ -195,9 +195,11 @@ namespace MAUI {
 		mMain->requestRepaint();
 	}
 
-	void Engine::fireOverlayEvent() {
+	OverlayListener::OutsideResponse Engine::fireOverlayEvent(int x, int y) {
 		if(mOverlayListener)
-			mOverlayListener->pointerPressedOutsideOverlay();
+			return mOverlayListener->pointerPressedOutsideOverlay(x, y);
+		else
+			return OverlayListener::eProceed;
 	}
 
 	/* hide the currently shown mOverlay. */
