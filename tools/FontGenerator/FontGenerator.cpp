@@ -155,7 +155,8 @@ int main(int argc, char **argv) {
 			dstbits[FI_RGBA_RED]	= ((fontColor&0xff0000)>>16);
 			dstbits[FI_RGBA_GREEN]	= ((fontColor&0x00ff00)>>8);
 			dstbits[FI_RGBA_BLUE]	= ((fontColor&0x0000ff));
-			dstbits[FI_RGBA_ALPHA]	= (srcbits[bitToUseForAlpha]*((fontColor&0xff000000)>>24))>>8;
+			dstbits[FI_RGBA_ALPHA]	= (srcbits[FI_RGBA_GREEN] * srcbits[bitToUseForAlpha] *
+				((fontColor&0xff000000)>>24)) / (255*255);
 			dstbits+=dst_bytespp;
 			srcbits+=src_bytespp;
 		}
