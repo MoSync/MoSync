@@ -35,6 +35,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
+	class OverlayListener {
+	public:
+		/**
+		* Called when a pointerPressed event outside an active overlay is received.
+		*/
+		virtual void pointerPressedOutsideOverlay() = 0;
+	};
+
 	/** \brief Widget manager.
 	  *
 	  * This class manages the MAUI widget system. It is mainly of interest when
@@ -74,7 +82,9 @@ namespace MAUI {
 
 		/* shows the overlay (passed as an argument). Put the top left
 		corner at position x and y. */
-		void showOverlay(int x, int y, Widget *overlay);
+		void showOverlay(int x, int y, Widget *overlay, OverlayListener* listener = NULL);
+
+		void fireOverlayEvent();
 		
 		/* hide the currently shown overlay. */
 		void hideOverlay();
@@ -88,6 +98,7 @@ namespace MAUI {
 	protected:
 		Widget *mOverlay;
 		Point mOverlayPosition;
+		OverlayListener* mOverlayListener;
 
 		Widget* mMain;
 

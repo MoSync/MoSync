@@ -156,12 +156,10 @@ namespace MAUI {
 		Widget* root = Engine::getSingleton().currentOverlay(p);
 		Widget* newFocus;
 		if(root) {
-			// shift point to match overlay's position
 			newFocus = root->focusableWidgetAt(point.x, point.y);
 			if(!newFocus) {
-				// restore point
-				root = mMain;
-				newFocus = root->focusableWidgetAt(point.x, point.y);
+				Engine::getSingleton().fireOverlayEvent();
+				return;
 			}
 		} else {
 			root = mMain;

@@ -185,7 +185,8 @@ namespace MAUI {
 
 	/* shows the mOverlay widget (passed as an argument). Put the top left
 	corner at position x and y. */
-	void Engine::showOverlay(int x, int y, Widget *overlay) {
+	void Engine::showOverlay(int x, int y, Widget *overlay, OverlayListener* listener) {
+		mOverlayListener = listener;
 		mOverlayPosition.x = x;
 		mOverlayPosition.y = y;
 		overlay->setPosition(x, y);
@@ -193,7 +194,12 @@ namespace MAUI {
 		mOverlay->requestRepaint();
 		mMain->requestRepaint();
 	}
-		
+
+	void Engine::fireOverlayEvent() {
+		if(mOverlayListener)
+			mOverlayListener->pointerPressedOutsideOverlay();
+	}
+
 	/* hide the currently shown mOverlay. */
 	void Engine::hideOverlay() {
 		mOverlay = NULL;

@@ -121,7 +121,7 @@ namespace MAUI {
 			Gfx_translate(mPaddingLeft, mPaddingTop);
 			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
-#if 1
+#if 0	// debug drawings
 					if(mFocused) {
 						maSetColor(0x00ff00);
 						Gfx_line(0, 0, mBounds.width-1, 0);
