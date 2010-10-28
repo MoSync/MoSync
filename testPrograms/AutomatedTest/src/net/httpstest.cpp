@@ -9,6 +9,7 @@
 #include <MAUtil/Connection.h>
 #include <Testify/testify.hpp>
 #include "netbase.h"
+#include "connection.h"
 
 using namespace Testify;
 
@@ -39,14 +40,13 @@ public:
         void httpsConnectTest ( void )
         {
         	int result;
-        	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
-			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
+        	Connection con( "https://encrypted.google.com/" );
+			TESTIFY_ASSERT( con.isValid( ) == true );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 #ifdef VERBOSE
 			printf("@@@ httpsConnectTest maConnect result: %i\n", result);
 #endif
 			TESTIFY_ASSERT( result > 0 );
-			maConnClose(sslConnection);
         }
 
         void httpsReadTest ( void )
@@ -54,13 +54,13 @@ public:
         	int result;
         	char buf[2048] = { 0 };
 
-        	MAHandle sslConnection = maConnect("https://encrypted.google.com/");
-			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
+        	Connection con( "https://encrypted.google.com/" );
+			TESTIFY_ASSERT( con.isValid( ) == true );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
-			maConnRead(sslConnection, buf, 2048);
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_READ, result) );
+			con.read( buf, 2048 );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_READ, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
 			// Ensure that we do not print too much data.
@@ -72,8 +72,6 @@ public:
 #ifdef VERBOSE
 			printf("Reply: %s\n", buf);
 #endif
-
-			maConnClose(sslConnection);
         }
 };
 

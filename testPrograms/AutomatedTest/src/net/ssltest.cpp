@@ -3,6 +3,7 @@
 #include <MAUtil/Connection.h>
 #include <Testify/testify.hpp>
 #include "netbase.h"
+#include "connection.h"
 
 using namespace Testify;
 
@@ -34,47 +35,48 @@ public:
         void sslConnectTest ( void )
         {
         	int result;
-        	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
-			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
+        	Connection con( "ssl://encrypted.google.com:443" );
+
+			TESTIFY_ASSERT( con.isValid( ) == true );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 #ifdef VERBOSE
 			printf("@@@ sslConnectTest maConnect result: %i\n", result);
 #endif
 			TESTIFY_ASSERT( result > 0 );
-			maConnClose(sslConnection);
         }
 
         void sslWriteTest ( void )
         {
         	int result;
+        	Connection con( "ssl://encrypted.google.com:443" );
         	const char *httpGetRequest = "GET / HTTP/1.1\r\n\r\n";
-        	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
-			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
+
+        	TESTIFY_ASSERT( con.isValid( ) == true );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 			TESTIFY_ASSERT( result > 0 );
-			maConnWrite(sslConnection, httpGetRequest, sizeof(httpGetRequest));
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_WRITE, result) );
+
+			con.write( httpGetRequest, sizeof( httpGetRequest ) );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_WRITE, result ) );
 			TESTIFY_ASSERT( result > 0 );
-			maConnClose(sslConnection);
         }
 
         void sslReadTest ( void )
         {
         	int result;
         	char buf[2048] = { 0 };
-
+        	Connection con( "ssl://encrypted.google.com:443" );
         	const char *httpGetRequest = "GET / HTTP/1.0\r\n\r\n";
-        	MAHandle sslConnection = maConnect("ssl://encrypted.google.com:443");
-			TESTIFY_ASSERT( sslConnection );
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_CONNECT, result) );
+
+        	TESTIFY_ASSERT( con.isValid( ) == true );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
-			maConnWrite(sslConnection, httpGetRequest, 22);
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_WRITE, result) );
+			con.write( httpGetRequest, 22 );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_WRITE, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
-			maConnRead(sslConnection, buf, 2048);
-			TESTIFY_ASSERT( waitForEvent(MAX_DELAY, CONNOP_READ, result) );
+			con.read( buf, 2048 );
+			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_READ, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
 			// Ensure that we do not print too much data.
@@ -89,8 +91,6 @@ public:
 
 			// This string should be found at beginning of the reply.
 			TESTIFY_ASSERT( strstr(buf, "HTTP/1.0 200 OK") == buf );
-
-			maConnClose(sslConnection);
         }
 };
 
