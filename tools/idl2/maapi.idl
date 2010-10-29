@@ -699,10 +699,14 @@ interface MAAPI {
 	*
 	* <tt>socket</tt>, which is TCP. It has no parameters.
 	*
+	* <tt>ssl</tt>, which is an encrypted TCP connection. It has no parameters.
+	*
 	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
 	* it defaults to port 80.
 	* Its parameters is the document path (for example, "/index.html").
 	* Writing to a http connection is not allowed.
+	*
+	* <tt>https</tt>, which is an encrypted HTTP GET. It has the same parameters as <tt>http</tt>.
 	*
 	* <tt>btspp</tt>, which is Bluetooth Serial Port. It has no parameters.
 	*\n
@@ -717,12 +721,19 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
+	* On some J2ME devices, connections to port 443 (except from https) is not
+	* allowed and might cause a system exception.
+	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
 	* \<port\> is a decimal number from 1 to 30.
 	*
 	* Example TCP url: <tt>socket://www.example.com:23</tt>
 	*
+	* Example SSL url: <tt>ssl://www.example.com:22</tt>
+	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
+	*
+	* Example HTTPS url: <tt>https://www.example.com/directory/document.html</tt>
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
