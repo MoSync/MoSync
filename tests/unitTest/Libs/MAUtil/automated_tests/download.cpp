@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 class DownloaderTest : private MAUtil::DownloadListener, public MATest::TestCase, public MAUtil::TimerListener {
 public:
-	DownloaderTest(String url) : TestCase("Downloader"), mURL(url) {}
+	DownloaderTest(const String& name, const String& url) : TestCase(name), mURL(url) {}
 
 	void start() {
 		printf("Automated Downloader test, url: %s\n", mURL.c_str());
@@ -88,6 +88,6 @@ private:
 
 void addDownloaderTests(MATest::TestSuite* suite);
 void addDownloaderTests(MATest::TestSuite* suite) {
-	suite->addTestCase(new DownloaderTest("http://www.example.com/"));
-	suite->addTestCase(new DownloaderTest("https://secure.wikimedia.org/"));
+	suite->addTestCase(new DownloaderTest("http downloader", "http://www.example.com/"));
+	suite->addTestCase(new DownloaderTest("https downloader", "https://secure.wikimedia.org/"));
 }

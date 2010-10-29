@@ -26,8 +26,8 @@ template <>
 inline void convertRet<double>(int& r14, int& r15, double type) {
 	MA_DV dv;
 	dv.d = type;
-	r14 = dv.lo;
-	r15 = dv.hi;
+	r14 = dv.hi;
+	r15 = dv.lo;
 }
 
 template <>
@@ -56,8 +56,8 @@ inline float convertSingleArg<float>(int arg) {
 
 inline double convertDoubleArg(int arg1, int arg2) {
 	MA_DV dv;
-	dv.lo = arg1;
-	dv.hi = arg2;
+	dv.hi = arg1;
+	dv.lo = arg2;
 	return dv.d;
 }
 

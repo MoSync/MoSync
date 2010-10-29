@@ -35,11 +35,7 @@ union MA_DV {
 	int i[2];
 #else	//everything else
 	struct {
-#ifdef __IPHONE__
-		int lo, hi;
-#else
 		int hi, lo;
-#endif
 	};
 #endif	//__MARM_ARMI__
 	long long ll;

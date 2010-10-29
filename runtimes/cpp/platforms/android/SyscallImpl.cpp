@@ -54,6 +54,7 @@ namespace Base
 		gSyscall = this;
 //		mIsLooked = false;
 //		mGotLockedEvent = false;
+		init();
 	}
 
 	/**

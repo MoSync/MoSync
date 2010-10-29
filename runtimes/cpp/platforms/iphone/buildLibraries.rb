@@ -52,7 +52,6 @@ FileUtils.cp_r Dir.glob('build/Debug-*'), 'template/libs', :verbose => true
 FileUtils.cp_r Dir.glob('build/Release-*'), 'template/libs', :verbose => true
 
 # these files should probably be combined into one
-FileUtils.cp "Classes/helpers/maapi_defs.h", "template/Classes/helpers/maapi_defs.h"
 FileUtils.cp "Classes/converters.h", "template/Classes/converters.h"
 FileUtils.cp "Classes/mstypeinfo.h", "template/Classes/mstypeinfo.h"
 
@@ -67,6 +66,7 @@ FileUtils.cp "Icon-72.png", "template"
 FileUtils.cp "Icon.png", "template"
 FileUtils.cp "MoSync_Prefix.pch", "template/MoSync_Prefix.pch"
 FileUtils.cp "main.m", "template/main.m"
+FileUtils.cp "../../../../intlibs/helpers/maapi_defs.h", "template/Classes/helpers/maapi_defs.h"
 FileUtils.cp "../../../../intlibs/helpers/cpp_maapi.h", "template/Classes/helpers/cpp_maapi.h"
 FileUtils.cp "../../../../intlibs/helpers/cpp_defs.h", "template/Classes/helpers/cpp_defs.h"
 FileUtils.cp "../../../../tools/idl2/Output/syscall_static_cpp.h", "template/Classes/syscall_static_cpp.h"
