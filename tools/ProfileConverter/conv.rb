@@ -28,6 +28,7 @@ SQL_FILENAME = "profiles.sql"
 output_root = "profiles/"
 build_root = "../ProfileConverter/"
 gBuildRuntimes = true
+gDoSanityCheck = false
 
 i=0
 while(i<ARGV.length)
@@ -38,6 +39,8 @@ while(i<ARGV.length)
 		i += 1
 		output_root = "#{ARGV[i]}/"
 		build_root = ''
+	elsif(arg == '-sc')
+		gDoSanityCheck = true
 	else
 		puts "Unknown argument: '#{arg}'"
 		exit(1)
@@ -369,6 +372,7 @@ VENDOR.each_with_index do |vendor, index|
 end
 
 puts "Handling devices..."
+devicesWithErrors = 0
 DEVICE.each_with_index do |device, index|
 	next if(index == 0)
 	
@@ -386,6 +390,8 @@ DEVICE.each_with_index do |device, index|
 	seen_defines = []
 	device_path = "#{VENDOR_DIR}/#{vendor}/#{device.name}"
 	FileUtils.mkdir_p device_path
+	hasScreenSizeX = false
+	hasScreenSizeY = false
 	File.open("#{device_path}/maprofile.h", 'w') do |profile|
 		profile.puts "#ifndef _MSAB_PROF_H_\n#define _MSAB_PROF_H_"
 		profile.puts
@@ -411,8 +417,10 @@ DEVICE.each_with_index do |device, index|
 						if(def_name == "MA_PROF_CONST_STORAGESIZE")
 							definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
 						elsif(def_name == "MA_PROF_CONST_SCREENSIZE_Y")
+							hasScreenSizeY = true
 							definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_Y,ScreenSize/Y,pixels"
 						elsif(def_name == "MA_PROF_CONST_SCREENSIZE_X")
+							hasScreenSizeX = true
 							definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_X,ScreenSize/X,pixels"
 						elsif(def_name == "MA_PROF_CONST_MAXJARSIZE")
 							definitions[def_name] = "MA_PROF_CONST_MAXJARSIZE,MaxJarSize,bytes"
@@ -513,10 +521,19 @@ DEVICE.each_with_index do |device, index|
 		end	#RELEVANT_CAPS.each
 		profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 	end	#File.open
-		
+	
+	if(gDoSanityCheck && !(hasScreenSizeX && hasScreenSizeY))
+		puts "Missing screen size: #{vendor}/#{device.name}"
+		devicesWithErrors += 1
+	end
+	
 	runtime = runtimes[device.platformversion.platform].add_runtime rt_obj
 	runtime.devices << device
 end	#DEVICE.each
+
+if(devicesWithErrors > 0)
+	raise "Device profile sanity check failed on #{devicesWithErrors} devices"
+end
 
 File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
 	definitions.each do |line|
