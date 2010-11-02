@@ -115,6 +115,8 @@ namespace Base {
 	static uint screenHeight = 240*2;	//208
 #endif
 
+	static Syscall::STARTUP_SETTINGS gStartupSettings;
+
 	static SDL_Surface *gScreen = NULL, *gDrawSurface = NULL;
 	SDL_Surface *gBackBuffer = NULL;
 	static int gCurrentUnconvertedColor = 0, gCurrentConvertedColor = 0;
@@ -179,6 +181,7 @@ namespace Base {
 		: resources(settings.resmem)
 #endif
 	{
+		gStartupSettings = settings;
 		gSyscall = this;
 		gShowScreen = settings.showScreen;
 		init();
@@ -203,6 +206,7 @@ namespace Base {
 		: resources(settings.resmem)
 #endif
 	{
+		gStartupSettings = settings;
 		gSyscall = this;
 		gShowScreen = settings.showScreen;
 		init();
@@ -317,6 +321,51 @@ namespace Base {
 	}
 #endif
 
+	static bool setupScreen(const Syscall::STARTUP_SETTINGS& settings) {
+#ifndef MOBILEAUTHOR
+#ifdef __USE_SYSTEM_RESOLUTION__
+		const SDL_VideoInfo* pVid = SDL_GetVideoInfo();
+		if ( pVid != NULL )
+		{
+			screenWidth  = pVid->current_w;
+			screenHeight = pVid->current_h;
+		}
+#endif
+
+		if(settings.haveSkin) {
+			sSkin = MoRE::SkinManager::getInstance()->createSkinFor(&settings.profile);
+			if(!sSkin) {
+				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
+			} else {
+				sSkin->setListener(new MoSyncSkinListener());
+				// fix with mobile image
+				TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
+			}
+		} else {
+#ifdef __USE_FULLSCREEN__
+			TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT | SDL_FULLSCREEN));
+#else
+			TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
+#endif
+		}
+#endif	//MOBILEAUTHOR
+
+		SDL_PixelFormat* fmt = gScreen->format;
+
+		DUMPINT(fmt->BitsPerPixel);
+		TEST_Z(gBackBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight,
+			fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask));
+
+		MoRE::setWindowSurface(gScreen);
+		MoRE::setPhoneScreen(gBackBuffer);
+		if(sSkin) {
+			sSkin->drawDevice();
+			sSkin->drawScreen();
+			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
+		}
+		return true;
+	}
+
 	static bool MALibInit(const Syscall::STARTUP_SETTINGS& settings) {
 		char *mosyncDir = getenv("MOSYNCDIR");
 		if(!mosyncDir) {
@@ -349,47 +398,7 @@ namespace Base {
 		SDL_EnableUNICODE(true);
 
 		if(settings.showScreen) {
-#ifndef MOBILEAUTHOR
-#ifdef __USE_SYSTEM_RESOLUTION__
-			const SDL_VideoInfo* pVid = SDL_GetVideoInfo();
-			if ( pVid != NULL )
-			{
-				screenWidth  = pVid->current_w;
-				screenHeight = pVid->current_h;
-			}
-#endif
-
-			if(settings.haveSkin) {
-				sSkin = MoRE::SkinManager::getInstance()->createSkinFor(&settings.profile);
-				if(!sSkin) {
-					TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
-				} else {
-					sSkin->setListener(new MoSyncSkinListener());
-					// fix with mobile image
-					TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
-				}
-			} else {
-#ifdef __USE_FULLSCREEN__
-				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT | SDL_FULLSCREEN));
-#else
-				TEST_Z(gScreen = SDL_SetVideoMode(screenWidth, screenHeight, 32, SDL_SWSURFACE | SDL_ANYFORMAT ));
-#endif
-			}
-#endif	//MOBILEAUTHOR
-			
-			SDL_PixelFormat* fmt = gScreen->format;
-
-			DUMPINT(fmt->BitsPerPixel);
-			TEST_Z(gBackBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, screenWidth, screenHeight,
-				fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask));
-
-			MoRE::setWindowSurface(gScreen);
-			MoRE::setPhoneScreen(gBackBuffer);
-			if(sSkin) {
-				sSkin->drawDevice();
-				sSkin->drawScreen();
-				SDL_UpdateRect(gScreen, 0, 0, 0, 0);
-			}
+			TEST_Z(setupScreen(settings));
 
 			char caption[1024];
 			if(settings.id != NULL) {
@@ -843,6 +852,26 @@ namespace Base {
 		DEBUG_ASSERT(NULL != SDL_AddTimer(EVENT_CLOSE_TIMEOUT, ExitCallback, NULL));
 	}
 
+	static void MARotateScreen() {
+		// swap w/h
+		int h = screenWidth;
+		int w = screenHeight;
+		screenWidth = w;
+		screenHeight = h;
+		gStartupSettings.profile.mScreenWidth = w;
+		gStartupSettings.profile.mScreenHeight = h;
+
+		// rebuild screen
+		SDL_FreeSurface(gBackBuffer);
+		DEBUG_ASSERT(setupScreen(gStartupSettings));
+		gDrawSurface = gBackBuffer;
+
+		// send event
+		MAEvent e;
+		e.type = EVENT_TYPE_SCREEN_CHANGED;
+		gEventFifo.put(e);
+	}
+
 	//returns true iff maWait should return.
 	//must be called only from the main thread!
 	bool MAProcessEvents() {
@@ -867,7 +896,6 @@ namespace Base {
 						MAEvent e;
 						if (event.active.gain) {
 							e.type = EVENT_TYPE_FOCUS_GAINED;
-
 						} else {
 							e.type = EVENT_TYPE_FOCUS_LOST;
 						}
@@ -908,6 +936,11 @@ namespace Base {
 				if(event.key.keysym.sym == SDLK_ESCAPE) {
 					LOGT("SDLK_ESCAPE");
 					MASetClose();
+					break;
+				}
+				if(event.key.keysym.sym == SDLK_F4) {
+					LOGT("SDLK_F4");
+					MARotateScreen();
 					break;
 				}
 				MAHandleKeyEvent(event.key.keysym.sym, true);

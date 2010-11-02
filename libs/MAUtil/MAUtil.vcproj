@@ -284,6 +284,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mauuid.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Server.cpp"
 				>
 			</File>
@@ -372,10 +376,6 @@
 		</File>
 		<File
 			RelativePath=".\Graphics.h"
-			>
-		</File>
-		<File
-			RelativePath=".\mauuid.h"
 			>
 		</File>
 		<File
