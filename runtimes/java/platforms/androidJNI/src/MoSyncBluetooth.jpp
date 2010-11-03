@@ -125,12 +125,15 @@ BluetoothServiceDiscoveryThread mBluetoothServiceDiscoveryThread = null;
 
 /**
  * Start discovery of Bluetooth devices.
- * Parameter "names" is not used on Android.
+ * @param names Not used on Android.
  * @return 0 on success, < 0 on failure.
  */
 int maBtStartDeviceDiscovery(int names) throws Exception
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
 	// Device disovery must not be running.
 	if (null != mBluetoothDeviceDiscoveryThread)
 	{
@@ -164,6 +167,11 @@ int maBtStartDeviceDiscovery(int names) throws Exception
 }
 
 /**
+ * Get and remove the next device in the list of discovered devices.
+ * @param nameBufPointer Pointer to buffer where to store device name.
+ * @param nameBufSize Size of name buffer.
+ * @param actualNameLengthPointer Pointer to int to store actual name length.
+ * @param addressPointer Pointer to byte array to store Bluetooth address.
  * @return 1 if successful, zero if the queue is empty.
  */
 int maBtGetNewDevice(
@@ -173,6 +181,12 @@ int maBtGetNewDevice(
 	Address addressPointer)
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
+	// List of disovered devices. We use a local variable to refer to
+	// the list to be sure it does not go away if set to null by another
+	// thread.
 	ConcurrentLinkedQueue<BluetoothDevice> deviceList = mBluetoothDevices;
 	
 	if (null == deviceList)
@@ -228,13 +242,21 @@ int maBtGetNewDevice(
 #endif	
 }
 
-#ifdef BLUETOOTH_SERVICE_DISCOVERY // Not defined, will exclude service discovery code
+// Is not defined, will exclude service discovery code.
+// Service dsicovery currently does not work on Android.
+#ifdef BLUETOOTH_SERVICE_DISCOVERY
 /**
+ * Start service discovery.
+ * @param address The address of the device to perform service discovery on.
+ * @param uuid The uuid of the service to discover.
  * @return 0 on success, < 0 on failure.
  */
 int maBtStartServiceDiscovery(String address, String uuid) throws Exception
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
 	// Device disovery must not be running.
 	if (null != mBluetoothDeviceDiscoveryThread)
 	{
@@ -269,11 +291,18 @@ int maBtStartServiceDiscovery(String address, String uuid) throws Exception
 }
 
 /**
+ * Get size info for the next service.
+ * @param nameBufSizePointer Pointer to int to get size of service name.
+ * @param nUuidsPointer ??
  * @return > 0 on success, or zero if the queue is empty.
  */
-int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) throws Exception
+int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) 
+throws Exception
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
 	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
 	
 	if (null == serviceList)
@@ -301,6 +330,11 @@ int maBtGetNextServiceSize(Address nameBufSizePointer, Address nUuidsPointer) th
 }
 
 /**
+ * Get info about the next service in the list of discovered services.
+ * @param portPointer ??
+ * @param nameBufPointer ??
+ * @param nameBufSize ??
+ * @param uuidsPointer ??
  * @return > 0 on success, or zero if the queue is empty.
  */
 int maBtGetNewService(
@@ -310,6 +344,9 @@ int maBtGetNewService(
 	Address uuidsPointer) throws Exception
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
 	ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
 	
 	if (null == serviceList)
@@ -354,11 +391,15 @@ int maBtGetNewService(
 #endif // BLUETOOTH_SERVICE_DISCOVERY
 
 /**
+ * Cancel any ongoing device or service discovery process.
  * @return 0 if there was no active operation, 1 if there was.
  */
 int maBtCancelDiscovery() throws Exception
 {
 #ifdef _ANDROID_BLUETOOTH
+
+	btPanicIfBluetoothPermissionsAreNotSet();
+	
 	// Is device discovery in progress?
 	if (null != mBluetoothDeviceDiscoveryThread && 
 	    BLUETOOTH_DISCOVERY_IN_PROGRESS == mBluetoothDeviceDiscoveryState.get())
@@ -395,6 +436,21 @@ int maBtCancelDiscovery() throws Exception
 }
 
 #ifdef _ANDROID_BLUETOOTH
+
+/**
+ * Check if Bluetooth permissions are set, and if not call maPanic().
+ */
+void btPanicIfBluetoothPermissionsAreNotSet()
+{
+	if ((PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH_ADMIN)))
+	{
+		maPanic(1, "Bluetooth permission not set");
+	}
+}
 
 /**
  * Get the address of a Bluetooth device.
