@@ -110,15 +110,15 @@ public class MoSync extends Activity
 	}
 
 	/**
-	* onConfigurationChanged
-	* Handles the new configurations when the screen rotates and/or the keyboard was opened.
-	*/
+	 * Handles the new configurations when the screen rotates.
+	 * @param newConfig Object that holds configuration info.
+	 */
 	@Override
-	public void onConfigurationChanged(Configuration config)
+	public void onConfigurationChanged(Configuration newConfig)
 	{
 		Log.i("MoSync", "onConfigurationChanged");
 
-		super.onConfigurationChanged(config);
+		super.onConfigurationChanged(newConfig);
 	}
 	
 	/**
