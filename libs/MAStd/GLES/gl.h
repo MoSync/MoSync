@@ -6,7 +6,7 @@
 #include <ma.h>
 #include <GLES\glplatform.h>
 
-typedef void* MAAddress;
+//typedef void* MAAddress;
 #include "IX_OPENGL_ES.H"
 
 #ifdef __cplusplus
@@ -47,6 +47,7 @@ extern "C" {
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
 
+/*
 typedef unsigned int    GLenum;
 typedef unsigned char   GLboolean;
 typedef unsigned int    GLbitfield;
@@ -65,6 +66,7 @@ typedef int             GLclampx;
 
 typedef int             GLintptr;
 typedef int             GLsizeiptr;
+*/
 
 
 /*************************************************************/
@@ -582,7 +584,7 @@ typedef int             GLsizeiptr;
 
 /*************************************************************/
 
-#include "magl_functions.h"
+//#include "magl_functions.h"
 
 #ifdef __cplusplus
 }

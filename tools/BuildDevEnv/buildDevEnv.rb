@@ -43,7 +43,7 @@ copy_if_not_exist("runtimes/cpp/platforms/symbian/inc/config_platform.h.example"
 copy_if_not_exist("runtimes/java/platforms/android/src/config_platform.h.example", "runtimes/java/platforms/android/src/config_platform.h")
 copy_if_not_exist("runtimes/java/platforms/javaME/src/config_platform.h.example", "runtimes/java/platforms/javaME/src/config_platform.h")
 
-sh2("tools/GLWrapperGenerator", "build.bat")
+#sh2("tools/GLWrapperGenerator", "build.bat")
 
 sh2("intlibs/filelist", "vcbuild filelist.vcproj \"Release|Win32\"")
 sh2("intlibs/idl-common", "vcbuild idl-common.vcproj \"Release|Win32\"")

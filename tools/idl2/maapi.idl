@@ -3054,6 +3054,10 @@ interface MAAPI {
 			/// the initial letter of each sentence should be capitalized.
 			INITIAL_CAPS_SENTENCE = 0x20000;
 		}
+
+#if IX_OPENGL_ES
+#include "opengl_generated.idl"
+#endif
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
