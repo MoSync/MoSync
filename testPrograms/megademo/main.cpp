@@ -35,27 +35,44 @@ public:
 		}
 	}
 
+	void updatePalette(double f) {
+		if(f > 2.0) return;
+
+		for(int i = 0; i < 256; i++) {
+			double angle = i*f*3.14159/256.0;
+			double func = (cos(angle));
+			func *= func;
+			func *= func*func;
+			int color = (int)(func*255.0);
+			if(color<0) color = 0;
+			if(color>255) color = 255;
+
+
+			FrameBuffer_setPaletteEntry(i, color, color, color, 0);
+
+		}
+	}
+
 	void prepare() {
 		unsigned char *pal = pcxImage.GetPalette();
 
-		for(int i = 0; i < 256; i++) {
-			if(i < 128)
-				FrameBuffer_setPaletteEntry(i, pal[i*3+0], pal[i*3+1], pal[i*3+2], 0);
-			else
-				FrameBuffer_setPaletteEntry(i, pal[(255-i)*3+0], pal[(255-i)*3+1], pal[(255-i)*3+2], 0);
-		}
+
 	}
 
 	void render(Surface* surf, float time) {
 		int index = 0;
 
+		updatePalette(time*0.1);
+
 		Surface image = {pcxImage.GetWidth(), pcxImage.GetHeight(), pcxImage.GetImg()};
 
-		for(int i = 0; i < metaBalls.size(); i++) {
-			double x = (surf->w/2.0) + cos(time + i*0.1)*surf->w/2.0;
-			double y = (surf->h/2.0) + sin(time + i*0.1)*surf->h/2.0;
+		memset(surf->pixels, 0, surf->w*surf->h);
 
-			surf->blit(&image, (int)x, (int)y);
+		for(int i = 0; i < metaBalls.size(); i++) {
+			double x = (surf->w/2.0) + cos(time*1.14 + i*0.8)*surf->w/2.0;
+			double y = (surf->h/2.0) + sin(time*1.02 + i*1.4)*surf->h/2.0;
+
+			surf->blit(&image, (int)x, (int)y, BLIT_ADD);
 		//	drawMetaBall(surf, surf->w/2, surf->h/2);
 
 		}

@@ -3,11 +3,15 @@
 
 #include <ma.h>
 
+
+#define BLIT_ADD 0
+#define BLIT_REPLACE 1
+
 struct Surface {
 	int w, h;
 	byte* pixels;
 
-	void blit(Surface *src, int x, int y);
+	void blit(Surface *src, int x, int y, int flags);
 };
 
 class Effect {

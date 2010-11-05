@@ -5,7 +5,7 @@ using namespace MAUtil;
 static Vector<Effect*> sEffects;
 static int sEffectIndex = 0;
 
-void Surface::blit(Surface *surf, int x, int y) {
+void Surface::blit(Surface *surf, int x, int y, int flags) {
 	int imageWidth = surf->w;
 	int imageHeight = surf->h;
 	int surfaceWidth = this->w;
@@ -57,16 +57,32 @@ void Surface::blit(Surface *surf, int x, int y) {
 	img += offsetX + offsetY * imageWidth;
 	backBuffer += topLeftX + topLeftY * surfaceWidth;
 
-	for(int j = 0; j < realHeight; j++) {
-		for(int i = 0; i < realWidth; i++) {
-			backBuffer[i] = img[i];
+	switch(flags&0x1) {
+	case BLIT_REPLACE:
+		for(int j = 0; j < realHeight; j++) {
+			for(int i = 0; i < realWidth; i++) {
+				backBuffer[i] = img[i];
+			}
+			img += imageWidth;
+			backBuffer += surfaceWidth;
 		}
-		img += imageWidth;
-		backBuffer += surfaceWidth;
+		break;
+	case BLIT_ADD:
+		for(int j = 0; j < realHeight; j++) {
+			for(int i = 0; i < realWidth; i++) {
+				int c = (int) backBuffer[i] + (int) img[i];
+				if(c>255) c = 255;
+				backBuffer[i] = (byte)c;
+			}
+			img += imageWidth;
+			backBuffer += surfaceWidth;
+		}
+		break;
 	}
-
 }
 
+
+float startTime = 0.0;
 
 void addEffect(Effect* effect) {
 	sEffects.add(effect);
@@ -77,6 +93,7 @@ void setEffectIndex(int i) {
 	if(i>=sEffects.size()) i = sEffects.size()-1;
 	sEffectIndex = i;
 	if(!sEffects.size()) return;
+	startTime = maGetMilliSecondCount()*0.001;
 	sEffects[sEffectIndex]->prepare();
 }
 
@@ -93,5 +110,5 @@ void initEffects(Surface* surf) {
 
 void renderEffect(Surface* surface) {
 	if(sEffects.size()==0) return;
-	sEffects[sEffectIndex]->render(surface, (float)maGetMilliSecondCount()*0.001);
+	sEffects[sEffectIndex]->render(surface, (float)maGetMilliSecondCount()*0.001f - startTime);
 }
