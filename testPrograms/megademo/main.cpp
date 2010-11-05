@@ -3,28 +3,49 @@
 #include <MAUtil/FrameBuffer.h>
 #include "Demo.h"
 
-class TestEffect : public Effect {
+#include <conprint.h>
+#include "resources/scoopex.h"
+#include "PCXLoader.h"
 
+class TestEffect : public Effect {
+private:
+	PCXImg pcxImage;
+
+public:
 	void init() {
+		int res;
+		if((res=pcxImage.Load(scoopex, sizeof(scoopex)))!=IMG_OK) {
+			printf("error code: %d\n", res);
+			maPanic(res, "Couldn't load pcx!");
+		}
 	}
 
 	void prepare() {
+		unsigned char *pal = pcxImage.GetPalette();
+
 		for(int i = 0; i < 256; i++) {
-			FrameBuffer_setPaletteEntry(i, i, i, i, 0);
+			FrameBuffer_setPaletteEntry(i, pal[0], pal[1], pal[2], 0);
+			pal+=3;
 		}
 	}
 
 	void render(Surface* surf, float time) {
 		int index = 0;
 		int itime = (int)(time*100.0);
-
 		byte* backBuffer = surf->backBuffer;
-		for(int j = 0; j < surf->w; j++) {
-			for(int i = 0; i < surf->h; i++) {
-				backBuffer[index] = (itime+i)*j;
-				index++;
+
+
+		int w = pcxImage.GetWidth();
+		int h = pcxImage.GetHeight();
+		byte* img = pcxImage.GetImg();
+
+		for(int j = 0; j < h; j++) {
+			for(int i = 0; i < w; i++) {
+				backBuffer[i] = *img++;
 			}
+			backBuffer += surf->w;
 		}
+
 	}
 };
 
