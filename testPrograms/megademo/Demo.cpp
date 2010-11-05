@@ -21,9 +21,9 @@ int getEffectIndex() {
 	return sEffectIndex;
 }
 
-void initEffects() {
+void initEffects(Surface* surf) {
 	for(int i = 0; i < sEffects.size(); i++) {
-		sEffects[i]->init();
+		sEffects[i]->init(surf);
 	}
 	setEffectIndex(0);
 }

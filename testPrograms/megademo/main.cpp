@@ -1,22 +1,37 @@
 #include <ma.h>
 #include "MAHeaders.h"
 #include <MAUtil/FrameBuffer.h>
+#include <MAUtil/Vector.h>
 #include "Demo.h"
 
+#include <mastdlib.h>
 #include <conprint.h>
-#include "resources/scoopex.h"
+#include "resources/particle.h"
 #include "PCXLoader.h"
 
-class TestEffect : public Effect {
+class MetaEffect : public Effect {
 private:
 	PCXImg pcxImage;
 
+	struct MetaBall {
+		int x, y;
+	};
+
+	MAUtil::Vector<MetaBall> metaBalls;
+
 public:
-	void init() {
+	void init(Surface* surf) {
 		int res;
-		if((res=pcxImage.Load(scoopex, sizeof(scoopex)))!=IMG_OK) {
+		if((res=pcxImage.Load(particle, sizeof(particle)))!=IMG_OK) {
 			printf("error code: %d\n", res);
 			maPanic(res, "Couldn't load pcx!");
+		}
+
+		for(int i = 0; i < 10; i++) {
+			MetaBall metaBall;
+			metaBall.x = rand()%surf->w;
+			metaBall.y = rand()%surf->h;
+			metaBalls.add(metaBall);
 		}
 	}
 
@@ -24,8 +39,10 @@ public:
 		unsigned char *pal = pcxImage.GetPalette();
 
 		for(int i = 0; i < 256; i++) {
-			FrameBuffer_setPaletteEntry(i, pal[0], pal[1], pal[2], 0);
-			pal+=3;
+			if(i < 128)
+				FrameBuffer_setPaletteEntry(i, pal[i*3+0], pal[i*3+1], pal[i*3+2], 0);
+			else
+				FrameBuffer_setPaletteEntry(i, pal[(255-i)*3+0], pal[(255-i)*3+1], pal[(255-i)*3+2], 0);
 		}
 	}
 
@@ -62,8 +79,8 @@ extern "C" int MAMain() {
 	FrameBuffer_init(scrWidth, scrHeight, 0, 0);
 	Surface surface = {scrWidth, scrHeight, backBuffer};
 
-	addEffect( new TestEffect() );
-	initEffects();
+	addEffect( new MetaEffect() );
+	initEffects(&surface);
 
 	maSoundPlay(R_MUSIC,  0, maGetDataSize(R_MUSIC));
 
