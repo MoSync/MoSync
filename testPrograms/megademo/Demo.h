@@ -5,7 +5,9 @@
 
 struct Surface {
 	int w, h;
-	byte* backBuffer;
+	byte* pixels;
+
+	void blit(Surface *src, int x, int y);
 };
 
 class Effect {

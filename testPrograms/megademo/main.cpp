@@ -48,26 +48,22 @@ public:
 
 	void render(Surface* surf, float time) {
 		int index = 0;
-		int itime = (int)(time*100.0);
-		byte* backBuffer = surf->backBuffer;
 
+		Surface image = {pcxImage.GetWidth(), pcxImage.GetHeight(), pcxImage.GetImg()};
 
-		int w = pcxImage.GetWidth();
-		int h = pcxImage.GetHeight();
-		byte* img = pcxImage.GetImg();
+		for(int i = 0; i < metaBalls.size(); i++) {
+			double x = (surf->w/2.0) + cos(time + i*0.1)*surf->w/2.0;
+			double y = (surf->h/2.0) + sin(time + i*0.1)*surf->h/2.0;
 
-		for(int j = 0; j < h; j++) {
-			for(int i = 0; i < w; i++) {
-				backBuffer[i] = *img++;
-			}
-			backBuffer += surf->w;
+			surf->blit(&image, (int)x, (int)y);
+		//	drawMetaBall(surf, surf->w/2, surf->h/2);
+
 		}
-
 	}
 };
 
 void cleanup() {
-	maSoundStop();
+	//maSoundStop();
 	FrameBuffer_close();
 }
 
@@ -82,7 +78,7 @@ extern "C" int MAMain() {
 	addEffect( new MetaEffect() );
 	initEffects(&surface);
 
-	maSoundPlay(R_MUSIC,  0, maGetDataSize(R_MUSIC));
+	//maSoundPlay(R_MUSIC,  0, maGetDataSize(R_MUSIC));
 
 	while(1) {
 		MAEvent event;
