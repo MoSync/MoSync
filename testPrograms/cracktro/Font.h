@@ -27,13 +27,13 @@ typedef struct MAFont_t {   //  Size   | Acc. size
 	int charsetHeight;		//     4   |    16
 	int asciiStart;			//     4   |    20
 	int charsPerLine;		//	   4   |    24
-	Handle handle;			//     4   |    28
+	MAHandle handle;			//     4   |    28
 } MAFont;
 
-Handle maInitFont(Handle resource, Extent charSize, Extent charsetSize, int asciiStart);
-void maDrawChar(Handle font, char c, int x, int y);
-void maDrawString(Handle font, const char* str, int x, int y);
-Extent maGetStringExtents(Handle font, const char *str);
+MAHandle maInitFont(MAHandle resource, MAExtent charSize, MAExtent charsetSize, int asciiStart);
+void maDrawChar(MAHandle font, char c, int x, int y);
+void maDrawString(MAHandle font, const char* str, int x, int y);
+MAExtent maGetStringExtents(MAHandle font, const char *str);
 
 
 #endif

@@ -28,12 +28,12 @@ void calcCharPos(MAFont *f, char c, int *x, int *y) {
 	*y = row * f->charHeight;
 }
 
-Handle maInitFont(Handle resource, Extent charSize, Extent charsetSize, int asciiStart) {
+MAHandle maInitFont(MAHandle resource, MAExtent charSize, MAExtent charsetSize, int asciiStart) {
 	//int i;
 	MAFont *f;
 	//int charsPerLine = 0;
 
-	if(maxFontIndex >= 15) return (Handle)0;
+	if(maxFontIndex >= 15) return (MAHandle)0;
 	f = &fonts[maxFontIndex];
 
 	f->charWidth = EXTENT_X(charSize);
@@ -48,7 +48,7 @@ Handle maInitFont(Handle resource, Extent charSize, Extent charsetSize, int asci
 	return maxFontIndex-1;
 }
 
-void maDrawChar(Handle font, char c, int x, int y) {
+void maDrawChar(MAHandle font, char c, int x, int y) {
 
 	MAFont* f = &fonts[font];
 	MARect srcRect;
@@ -66,7 +66,7 @@ void maDrawChar(Handle font, char c, int x, int y) {
 	maDrawImageRegion(f->handle, &srcRect, &destPoint, 0);
 }
 
-void maDrawString(Handle font, const char* str, int x, int y) {
+void maDrawString(MAHandle font, const char* str, int x, int y) {
 
 	MAFont* f = &fonts[font];
 	//int charsPerLine = f->charsetWidth/f->charWidth; //5
@@ -82,7 +82,7 @@ void maDrawString(Handle font, const char* str, int x, int y) {
 	}
 }
 
-Extent maGetStringExtents(Handle font, const char *str) {
+MAExtent maGetStringExtents(MAHandle font, const char *str) {
 	MAFont* f = &fonts[font];
 	return EXTENT(f->charWidth*strlen(str), f->charHeight);
 }

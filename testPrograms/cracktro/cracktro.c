@@ -19,7 +19,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastring.h>
 #include <mavsprintf.h>
 #include "MAHeaders.h"
-#include "Font.c"
+//#include "Font.c"
+#include "Font.h"
+extern MAFont fonts[16];
 
 #include <mastdlib.h>
 
@@ -34,7 +36,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <conio.h>
 #endif
 
-#include "Math/Vector3.c"
+//#include "Math/Vector3.c"
+#include "Math/Vector3.h"
 
 int scrW, scrH;
 
@@ -279,7 +282,7 @@ void initIndices() {
 void renderPoints(Vector3int* point, int numPoints, int zOff, int xAng, int yAng, int zAng) {
 
 	int i;//, j, temp;
-	Extent scrSize = maGetScrSize();
+	MAExtent scrSize = maGetScrSize();
 	int scrW = EXTENT_X(scrSize);
 	int scrH = EXTENT_Y(scrSize);
 
@@ -330,7 +333,7 @@ void renderMorph(Vector3int* src, Vector3int* dest, int numPoints, int alpha, in
 	renderPoints(morphPoints, numPoints, zOff, xAng, yAng, zAng);
 }
 
-void maDrawSineString(Handle font, const char* str, int y, int amp, int freq) {
+void maDrawSineString(MAHandle font, const char* str, int y, int amp, int freq) {
 
 	static int scroll = 0;
 	static int scrollVal = 0;
@@ -380,7 +383,7 @@ void maDrawSineString(Handle font, const char* str, int y, int amp, int freq) {
 }
 
 void clear() {
-	Extent scrSize = maGetScrSize();
+	MAExtent scrSize = maGetScrSize();
 	int scrW = EXTENT_X(scrSize);
 	int scrH = EXTENT_Y(scrSize);
 	maSetColor(0);
@@ -422,11 +425,11 @@ void maChangeTileSet(Handle layer, Handle tileResource);
 void maDrawLayer(Handle layerHand, int offsetX, int offsetY);
 void maSetTile(Handle layer, int x, int y, int tileNumber);
 */
-
+/*
 void testTiles() {
 	int x = 0, y = 0;
-	Handle lHand = maInitLayer(4,5,8,8);
-	Handle lHand2 = maInitLayer(4,5,8,8);
+	MAHandle lHand = maInitLayer(4,5,8,8);
+	MAHandle lHand2 = maInitLayer(4,5,8,8);
 	maSetMap(lHand, 5, -2, -2);
 	maSetTile(lHand, 0,0, 42);
 
@@ -457,39 +460,28 @@ void testTiles() {
 		//x%=100;
 	}
 }
-
-#define EXTENT(x, y) ((Extent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
+*/
 
 int MAMain() {
-
-	if(maCheckInterfaceVersion(MAIDL_HASH) != (int)MAIDL_HASH) {
-		maPanic(1, "Interface version mismatch!");
-	}
-	return 0;
-}
-#if 0
-	EVENT event;
+#if 1
+	MAEvent event;
 	char buf[256];
 	int frames = 0;
 	int fps = 0;
 	int startTime = 0, sTime = 0;
 	
-	Extent scrSize = maGetScrSize();
+	MAExtent scrSize = maGetScrSize();
 	Vector3int ball[NUMVBALLS];
 	Vector3int plane[NUMVBALLS];
 	int t = 0;
 
-	Handle fHand1 = maInitFont(6, EXTENT(32,32), EXTENT(320,200), 65);
-	Handle fHand2 = maInitFont(font2, EXTENT(8,8), EXTENT(320,24), 32);
+	MAHandle fHand1 = maInitFont(6, EXTENT(32,32), EXTENT(320,200), 65);
+	MAHandle fHand2 = maInitFont(font2, EXTENT(8,8), EXTENT(320,24), 32);
 
 	scrW = EXTENT_X(scrSize);
 	scrH = EXTENT_Y(scrSize);
 
-	if(maCheckInterfaceVersion(MAIDL_HASH) != (int)MAIDL_HASH) {
-		maPanic(1, "Interface version mismatch!");
-	}
-
-	maSoundPlay(music1);
+	maSoundPlay(music1, 0, maGetDataSize(music1));
 
 
 	//testTiles();
