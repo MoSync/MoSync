@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <mavsprintf.h>
 #include "common.h"
+#include "MAHeaders.h"
 
 void drawColorRects();
 void plot();
@@ -24,6 +25,66 @@ void drawLines();
 void drawTriangles();
 void drawTrianglesClip();
 void drawText();
+
+const char *drawImageRegionEnumStrings[] = {
+"TRANS_NONE",
+"TRANS_MIRROR_ROT180",
+"TRANS_MIRROR",
+"TRANS_ROT180",
+"TRANS_MIRROR_ROT270",
+"TRANS_ROT90",
+"TRANS_ROT270",
+"TRANS_MIRROR_ROT90"
+};
+
+class DrawImageRegionCase : public KeyBaseCase {
+private:
+	MAHandle mImage;
+	int mState;
+public:
+	DrawImageRegionCase(const String& name, MAHandle image, int state) : KeyBaseCase(name), mImage(image), mState(state) {
+
+	}
+
+	//TestCase
+	virtual void start() {
+		MAExtent e = maGetScrSize();
+		Dimensions screen;
+		screen.width = EXTENT_X(e);
+		screen.height = EXTENT_Y(e);
+
+		maSetClipRect(0, 0, screen.width, screen.height);
+		maSetColor(BLACK);
+		maFillRect(0, 0, screen.width, screen.height);
+
+		MARect rect;
+		rect.left = 0;
+		rect.top = 0;
+		MAExtent imgSize = maGetImageSize(mImage);
+		rect.width = EXTENT_X(imgSize);
+		rect.height = EXTENT_Y(imgSize);
+		MAPoint2d p;
+		p.x = 0;
+		p.y = 0;
+
+		maDrawImageRegion(mImage, &rect, &p, mState);
+		maUpdateScreen();
+	}
+
+	//KeyListener
+	virtual void keyPressEvent(int keyCode) {
+	}
+
+	virtual void keyReleaseEvent(int keyCode) {
+		checkYesNo(keyCode);
+	}
+};
+
+
+template <MAHandle image, int state>
+void drawImageRegion() {
+
+}
 
 void addBasicGfxTests(TestSuite* suite);
 void addBasicGfxTests(TestSuite* suite) {
@@ -33,6 +94,11 @@ void addBasicGfxTests(TestSuite* suite) {
 	suite->addTestCase(new TemplateCase<drawTriangles>("triangles"));
 	suite->addTestCase(new TemplateCase<drawTrianglesClip>("triangles-clip"));
 	suite->addTestCase(new TemplateCase<drawText>("text"));
+
+	for(int i = 0; i < 8; i++)
+		suite->addTestCase(new DrawImageRegionCase("drawImageRegion " + String(drawImageRegionEnumStrings[i]), RES_IMAGETEST, i));
+
+
 }
 
 
