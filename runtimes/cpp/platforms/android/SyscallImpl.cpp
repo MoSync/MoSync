@@ -43,8 +43,18 @@ namespace Base
 	static ResourceArray gResourceArray;
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
 	
-	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
-	MAHandle drawTargetHandle = HANDLE_SCREEN;
+	int gClipLeft = 0;
+	int gClipTop = 0;
+	int gClipWidth = 0;
+	int gClipHeight = 0;
+	
+	/**
+	 * Flag to keep track of whether the initial clip rect has
+	 * been set of not. Used in maGetClipRect and maSetClipRect.
+	 */
+	int gClipRectIsSet = 0;
+	
+	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 	
 	/**
 	* Syscall constructor	
@@ -197,10 +207,13 @@ namespace Base
 	{
 		SYSLOG("maSetClipRect");
 		
-		mClipLeft = left;
-		mClipTop = top;
-		mClipWidth = width;
-		mClipHeight = height;
+		// Clip rect is now set.
+		gClipRectIsSet = 1;
+		
+		gClipLeft = left;
+		gClipTop = top;
+		gClipWidth = width;
+		gClipHeight = height;
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSetClipRect", "(IIII)V");
@@ -214,11 +227,24 @@ namespace Base
 	{
 		SYSLOG("maGetClipRect");
 		
+		// If no clip rect is set, we set it to the screen size.
+		if (!gClipRectIsSet)
+		{
+			MAExtent extent = maGetScrSize();
+			gClipLeft = 0;
+			gClipTop = 0;
+			gClipWidth = EXTENT_X(extent);
+			gClipHeight = EXTENT_Y(extent);
+		
+			// Clip rect is now set.
+			gClipRectIsSet = 1;
+		}
+		
 		gSyscall->ValidateMemRange(rect, sizeof(MARect));		
-		rect->left = mClipLeft;
-		rect->top = mClipTop;
-		rect->width = mClipWidth;
-		rect->height = mClipHeight;
+		rect->left = gClipLeft;
+		rect->top = gClipTop;
+		rect->width = gClipWidth;
+		rect->height = gClipHeight;
 	}
 
 	SYSCALL(void,  maPlot(int posX, int posY))
@@ -465,17 +491,17 @@ namespace Base
 	{
 		SYSLOG("maSetDrawTarget");
 		
-		MAHandle temp = drawTargetHandle;
+		MAHandle temp = gDrawTargetHandle;
 		int currentDrawSurface;
 		
-		if(drawTargetHandle != HANDLE_SCREEN)
+		if(gDrawTargetHandle != HANDLE_SCREEN)
 		{
-			SYSCALL_THIS->resources.extract_RT_FLUX(drawTargetHandle);
-			if(SYSCALL_THIS->resources.add_RT_IMAGE(drawTargetHandle, NULL) == RES_OUT_OF_MEMORY)
+			SYSCALL_THIS->resources.extract_RT_FLUX(gDrawTargetHandle);
+			if(SYSCALL_THIS->resources.add_RT_IMAGE(gDrawTargetHandle, NULL) == RES_OUT_OF_MEMORY)
 			{
 				maPanic(ERR_RES_OOM, "maSetDrawTarget couldn't allocate drawtarget");
 			}
-			drawTargetHandle = HANDLE_SCREEN;
+			gDrawTargetHandle = HANDLE_SCREEN;
 		}
 		
 		if(image == HANDLE_SCREEN)
@@ -491,7 +517,7 @@ namespace Base
 				maPanic(ERR_RES_OOM, "maSetDrawTarget couldn't allocate drawtarget");
 			}
 		}
-		drawTargetHandle = image;
+		gDrawTargetHandle = image;
 			
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSetDrawTarget", "(I)I");
