@@ -460,16 +460,16 @@ void _maDrawImageRegion(
 	
 	// Set up image source rectangle.
 	mMaDrawImageRegionTempSourceRect.left = srcRectLeft;
-	mMaDrawImageRegionTempSourceRect.right = (srcRectLeft + srcRectWidth) - 1;
+	mMaDrawImageRegionTempSourceRect.right = (srcRectLeft + srcRectWidth);
 	mMaDrawImageRegionTempSourceRect.top = srcRectTop;
-	mMaDrawImageRegionTempSourceRect.bottom = (srcRectTop + srcRectHeight) - 1;
+	mMaDrawImageRegionTempSourceRect.bottom = (srcRectTop + srcRectHeight);
 	
 	// Set up destination rectangle. 
 	// We set origin to 0,0 and translate below.
 	mMaDrawImageRegionTempDestRect.left = 0;
-	mMaDrawImageRegionTempDestRect.right = srcRectWidth - 1;
+	mMaDrawImageRegionTempDestRect.right = srcRectWidth;
 	mMaDrawImageRegionTempDestRect.top = 0;
-	mMaDrawImageRegionTempDestRect.bottom = srcRectHeight - 1;
+	mMaDrawImageRegionTempDestRect.bottom = srcRectHeight;
 	
 	// Save the canvas matrix state.
 	mCanvas.save(Canvas.MATRIX_SAVE_FLAG);
