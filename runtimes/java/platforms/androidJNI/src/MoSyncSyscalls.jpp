@@ -57,6 +57,8 @@ MediaPlayer mMediaPlayer;
 Paint mPaint = new Paint();
 Paint mBlitPaint = new Paint();
 
+int mTextConsoleHeight;
+
 boolean initSyscalls()
 {
 	SYSLOG("initSyscalls");
@@ -76,6 +78,13 @@ boolean initSyscalls()
 	 mBlitPaint.setAlpha(255);
 	 
 	 mSoundVolume = 50;
+	 
+	 // Generates a default text height used for console text writing.
+	 // This is used so that all text which is printed to the console
+	 // gets the same text height.
+	MAExtent e = maGetTextSize("abcdefghijklmnopqrstuvwxyz"+
+													"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+	mTextConsoleHeight = EXTENT_Y(e);
 	 
 	 return true;
 }
@@ -258,47 +267,67 @@ void maFillTriangleFan(int address, int count)
 Rect mTextSizeRect = new Rect();
 
 /**
-* @brief msGetTextSize
+* @brief maGetTextSize - Gets the height in pixels of the string,
+*
+* Calculates the height in pixels of this string, as it's gonna 
+* be drawn to the screen
+*
+* @param str	The string which the height should be calculated from
+*
+* @return the height in pixels
 */
 int maGetTextSize(final String str)
 {
 	SYSLOG("maGetTextSize");
 	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
+	
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
 /**
-* @brief maGetTextSizeW
+* @brief maGetTextSizeW - Gets the height in pixels of the string,
+*
+* Calculates the height in pixels of this string, as it's gonna 
+* be drawn to the screen
+*
+* @param str	The string which the height should be calculated from
+*
+* @return the height in pixels
 */
 int maGetTextSizeW(final String str)
 {
 	SYSLOG("maGetTextSizeW");
 	
 	mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
+	
 	return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 }
 
 /**
-* @brief maDrawText
+* @brief maDrawText - draws a string of text to the screen
+*
+* @param left		The left most pixel on which the text should be rendered
+* @param top		The top most pixel on which the text should be rendered
 */
 void maDrawText(int left, int top, final String str)
 {
 	SYSLOG("maDrawText");
 	
-	MAExtent e = maGetTextSize(str);
-	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
+	mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
 }
 
 /**
-* @brief maDrawTextW
+* @brief maDrawText - draws a string of text to the screen
+*
+* @param left		The left most pixel on which the text should be rendered
+* @param top		The top most pixel on which the text should be rendered
 */
 void maDrawTextW(int left, int top, final String str)
 {
  	SYSLOG("maDrawTextW");
 	
-	MAExtent e = maGetTextSize(str);
-	mCanvas.drawText(str, left, top+EXTENT_Y(e), mPaint);
+	mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
 }
 
 /**
