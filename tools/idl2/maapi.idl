@@ -703,7 +703,11 @@ interface MAAPI {
 	*
 	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
 	* it defaults to port 80.
+	*
 	* Its parameters is the document path (for example, "/index.html").
+	* You must specify a path, or this function will fail with #CONNERR_URL.
+	* The minimal path ("/") is acceptable.
+	*
 	* Writing to a http connection is not allowed.
 	*
 	* <tt>https</tt>, which is an encrypted HTTP GET. It has the same parameters as <tt>http</tt>.

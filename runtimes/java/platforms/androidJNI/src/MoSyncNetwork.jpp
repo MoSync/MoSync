@@ -49,16 +49,17 @@ int mConnNumberOfOpenConnections = 0;
 ThreadPool mThreadPool = new ThreadPool();
 
 /**
-* Initiates a connection and if successfull, adds the new connection to the table of open connections
-*
-* @param url	The URL to which the connection should be established.
-				URLs that starts with "socket://" needs to have a port specified.
-				URLs that starts with "btspp://" tries to connect to a bluetooth port.
-*
-* @return CONNERR_URL if the URL wasn't correct.
-          CONNERR_GENERIC on other errors.
-* 		  > 0 on success. This number is the handle to the opened connection.
-*/
+ * Initiates a connection and if successfull, adds the new connection to the 
+ * table of open connections.
+ *
+ * @param url	The URL to which the connection should be established.
+ *				URLs that starts with "socket://" need to specify port number.
+ *				URLs that starts with "btspp://" connect to a bluetooth port.
+ *
+ * @return CONNERR_URL if the URL wasn't correct.
+ *         CONNERR_GENERIC on other errors.
+ *         > 0 on success. This number is the handle to the opened connection.
+ */
 MAHandle maConnect(final String url) 
 {
 	Log.i("MoSyncSyscall", "maConnect url: " + url);
@@ -72,16 +73,7 @@ MAHandle maConnect(final String url)
 	// If this is a Bluetooth url, Bluetooth must be available and enabled.
 	if (url.startsWith("btspp://"))
 	{
-		// If Bluetooth permissions are not set, we call maPanic().
-		if ((PackageManager.PERMISSION_GRANTED != 
-		     mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH))
-			||
-			(PackageManager.PERMISSION_GRANTED != 
-		     mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH_ADMIN)))
-		{
-			maPanic(1, "Bluetooth permission not set");
-			return CONNERR_UNAVAILABLE;
-		}
+		btPanicIfBluetoothPermissionsAreNotSet();
 		
 		// If we cannot get the Bluetooth adapter, we return an error
 		// (currently, this also occurs if Bluetooth is not turned on).

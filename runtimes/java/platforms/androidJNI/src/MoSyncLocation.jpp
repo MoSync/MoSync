@@ -36,7 +36,7 @@ public final int maLocationStop()
 		mLocationEventThread = null;
 	}
 	
-	return 1;
+	return 0;
 }
 
 class LocationEventThread extends Thread implements LocationListener

@@ -124,29 +124,61 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		setFocusableInTouchMode(true);
 	}
 
+	/**
+	 * Called during layout when the size of this view has changed. 
+	 * If you were just added to the view hierarchy, you're called 
+	 * with the old values of 0.
+	 * @param w Current width of this view.
+	 * @param w h Current height of this view.
+	 * @param w oldw Old width of this view.
+	 * @param w oldh Old height of this view.
+	 */
 	@Override
 	public void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
 		SYSLOG("onSizeChanged w:" + w + " h:" + h + " oldw:" + oldw + " oldh:" + oldh);
+		
+		super.onSizeChanged(w, h, oldw, oldh);
 	}
 	
 	/*
 	 * This function is called directly after a change to the surface.
+	 *
+	 * Here we post event EVENT_TYPE_SCREEN_CHANGED to MoSync.
+	 *
 	 * @param holder SurfaceHolder object, supplied by Android.
 	 * @param format new surface format, supplied by Android.
 	 * @param width new surface width, supplied by Android.
 	 * @param height new surface height, supplied by Android.
 	 */
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height)
+	public void surfaceChanged(
+		SurfaceHolder holder, 
+		int format, 
+		int width, 
+		int height)
 	{
 		SYSLOG("surfaceChanged");
+		
+		// Allocate new screen buffer.
 		mMoSyncThread.updateSurfaceSize(width, height);
+		
+		// Post screen changed event.
+		// TODO: Should this be done also initially, when the surface is
+		// first created, or only when it is changed after it has been created?
+		// See issue 931.
+		SYSLOG("Posting EVENT_TYPE_SCREEN_CHANGED to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_SCREEN_CHANGED;
+		mMoSyncThread.postEvent(event);
 	}
 
 	/*
-	 * Function which is called by Android directly after the surface has been created.
-	 * Here we start the MoSync thread.
+	 * Function which is called by Android directly after the surface 
+	 * has been created.
+	 *
+	 * NOTE: Here we start the MoSync thread.
+	 *
 	 * @param holder SurfaceHolder object, supplied by Android.
 	 */
 	@Override
