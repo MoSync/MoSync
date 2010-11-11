@@ -324,8 +324,19 @@ namespace Base {
 			BIG_PHAT_ERROR(SDLERR_MOSYNCDIR_NOT_FOUND);
 		}
 
-		TEST_LTZ(SDL_Init(SDL_INIT_VIDEO));
+		TEST_LTZ(SDL_Init(0));
 		atexit(SDL_Quit);
+
+		/**
+         * It is important that the SDL subsystems are initialized after
+		 * MANetworkInit. Otherwise there is a race condition for a shared
+		 * object between one of the SDL audio threads and openssl which causes
+		 * SSL_CTX_new to hang in Heap32Next. However, SDL_Init should be 
+		 * called before MANetworkInit since it relies on SDL-mutexes.
+		 */
+		MANetworkInit();
+
+		TEST_LTZ(SDL_InitSubSystem(SDL_INIT_VIDEO));
 
 		TEST_NZ(FE_Init());
 		atexit(FE_Quit);
@@ -339,12 +350,9 @@ namespace Base {
 		gSyscall->pimInit();
 #endif
 
-		//openAudio();
 		AudioEngine::init();
 
 		Bluetooth::MABtInit();
-
-		MANetworkInit(/*broadcom*/);
 
 		SDL_EnableUNICODE(true);
 

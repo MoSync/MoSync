@@ -50,6 +50,7 @@ public:
 	}
 	virtual void keyReleaseEvent(int keyCode) {
 		checkYesNo(keyCode);
+		suite->runNextCase();
 	}
 };
 
@@ -98,7 +99,10 @@ public:
 
 	virtual void keyReleaseEvent(int keyCode) {
 		if(mode == 2)
+		{
 			checkYesNo(keyCode);
+			suite->runNextCase();
+		}
 	}
 
 private:
@@ -157,7 +161,10 @@ public:
 
 	virtual void keyReleaseEvent(int keyCode) {
 		if(!on)
+		{
 			checkYesNo(keyCode);
+			suite->runNextCase();
+		}
 	}
 
 private:

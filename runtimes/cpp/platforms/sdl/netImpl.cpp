@@ -75,7 +75,8 @@ void MANetworkSslInit() {
 	DEBUG_ASSERT(sSslContext == NULL);
 	SSL_library_init();
 	SSL_load_error_strings();
-	sSslContext = SSL_CTX_new(SSLv23_client_method());
+	const SSL_METHOD *sslmet = SSLv23_client_method();
+	sSslContext = SSL_CTX_new(sslmet);
 	TSSL_CUSTOM(sSslContext, == 0, DEBIG_PHAT_ERROR);
 }
 

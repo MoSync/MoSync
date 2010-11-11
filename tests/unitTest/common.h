@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -35,69 +35,157 @@ using namespace MAUtil;
 #define WHITE 0xFFFFFF
 #define DATA_SIZE (4*1024)
 
-/*
-int waitTest() {
-	MAEvent event;
-	while(maGetEvent(&event)) {
-		switch(event.type) {
-			case EVENT_TYPE_KEY_RELEASED:
-				if(event.key == TK_YES) return TK_YES;
-				else return TK_NO;
+enum eFuncReturnCodes
+{
+	FUNC_SYSCALL_NOT_SUPPORTED = -4,
+	FUNC_SYSCALL_ERROR = -3,
+	FUNC_OUT_OF_MEMORY_ALLOC = -2,
+	FUNC_OUT_OF_MEMORY_RESOURCE = -1,
+	FUNC_OK = 0
+};
 
-			case EVENT_TYPE_POINTER_RELEASED:
-				return (((EXTENT_X(maGetScrSize())/ 2) - event.point.x) < 0) ? TK_YES : TK_NO;
-			case EVENT_TYPE_CLOSE: maExit(1);
-		}
-	}
-}
-*/
-
-class KeyBaseCase : public TestCase, public KeyListener, public PointerListener {
+/**
+ * @brief Testcase class which are controlled either by keys or touch.
+ */
+class KeyBaseCase : public TestCase, public KeyListener,
+					public PointerListener
+{
 public:
-	KeyBaseCase(const String& name) : TestCase(name) {}
+	KeyBaseCase(const String& name) : TestCase(name), mHasErrors(false)
+	{}
 
-	//TestCase
-	virtual void open() {
+	/**
+	 * @brief When the test is opened the key and touch listeners are added
+	 */
+	virtual void open()
+	{
 		Environment::getEnvironment().addKeyListener(this);
 		Environment::getEnvironment().addPointerListener(this);
-
 	}
-	virtual void close() {
+
+	/**
+	 * @brief When closed the listeners are removed
+	 */
+	virtual void close()
+	{
 		Environment::getEnvironment().removeKeyListener(this);
 		Environment::getEnvironment().removePointerListener(this);
 	}
 
-	void pointerPressEvent(MAPoint2d p) {
+	/**
+	 * @brief Handles the pointer pressed events
+	 *
+	 * Pointer press events are not handled
+	 */
+	void pointerPressEvent(MAPoint2d p)
+	{
 	}
 
-	void pointerMoveEvent(MAPoint2d p) {
+	/**
+	 * @brief Handles the pointer moved events
+	 *
+	 * Pointer moved events are not handled
+	 */
+	void pointerMoveEvent(MAPoint2d p)
+	{
 	}
 
-	void pointerReleaseEvent(MAPoint2d p) {
-		int res = ((p.x - (EXTENT_X(maGetScrSize())/ 2)) < 0) ? TK_YES : TK_NO;
-		assert(name, res == TK_YES);
+	/**
+	 * @brief Handles the pointer released event
+	 *
+	 * If the test has reported an error the next test will be
+	 * shown since the result has already been reported.
+	 * If no error was recorded the left portion of the screen
+	 * will trigger a succes, while the right will trigger failure.
+	 */
+	void pointerReleaseEvent(MAPoint2d p)
+	{
+		if(!mHasErrors)
+		{
+			int res = ((p.x - (EXTENT_X(maGetScrSize())/ 2)) < 0) ? TK_YES : TK_NO;
+			assert(name, res == TK_YES);
+		}
 		suite->runNextCase();
 	}
 
-
+	/**
+	 * @brief Checks the key code and sends the corresponding succes code
+	 *
+	 * If left soft key was pressed a success will be logged,
+	 * while right soft key will report a failure.
+	 */
 	void checkYesNo(int keyCode);
+
+	/**
+	 * @brief Shows an error message on the screen
+	 *
+	 * This screen shows an error message if any of the
+	 * tests failed to allocate memory, or failed to
+	 * generate a new resource. The messeage is based
+	 * on which error code which was recieved. The error
+	 * codes are any of the eFuncReturnCodes code.
+	 *
+	 * @param errorMessage	The error message to be shown
+	 */
+	void showErrorScreen(int errorCode);
+
+protected:
+	bool mHasErrors;
 };
 
-template<void func()> class TemplateCase : public KeyBaseCase {
+/**
+ * @brief Class that handles a KeyBaseCase test
+ *
+ * The class gets a function pointer, which is the actual
+ * test it will run. This class runs the function and handles
+ * key presses.
+ */
+template<int func()> class TemplateCase : public KeyBaseCase {
 public:
 	TemplateCase(const String& name) : KeyBaseCase(name) {}
 
-	//TestCase
-	virtual void start() {
-		func();
+	/**
+	 * @brief Runs the test and executes the test function
+	 *
+	 * If the test function return with FUNC_OK it means
+	 * the the test was successfully shown. Any other return
+	 * code will flag that this test had an error, report
+	 * that it failed and show the error screen.
+	 */
+	virtual void start()
+	{
+		int returnCode = func();
+		if(FUNC_OK != returnCode)
+		{
+			mHasErrors = true;
+			assert(name, false);
+			showErrorScreen(returnCode);
+		}
 	}
 
-	//KeyListener
-	virtual void keyPressEvent(int keyCode) {
+	/**
+	 * @brief Handles key pressed events
+	 *
+	 * Key press events are not handled.
+	 */
+	virtual void keyPressEvent(int keyCode)
+	{
 	}
 
-	virtual void keyReleaseEvent(int keyCode) {
-		checkYesNo(keyCode);
+	/**
+	 * @brief Handles key released events
+	 *
+	 * If an error was not reported while the test function was running
+	 * the checkYesNo function will be called, and the result of that
+	 * will be reported.
+	 * If an error did occur, the next test will be shown.
+	 */
+	virtual void keyReleaseEvent(int keyCode)
+	{
+		if(!mHasErrors)
+			checkYesNo(keyCode);
+
+		suite->runNextCase();
 	}
 };
 
@@ -114,7 +202,7 @@ public:
 	}
 };
 
-template<void func()> class TemplateCharInputCase : public CharInputBaseCase {
+template<int func()> class TemplateCharInputCase : public CharInputBaseCase {
 public:
 	TemplateCharInputCase(const String& name) : CharInputBaseCase(name) {}
 

@@ -682,7 +682,7 @@ interface MAAPI {
 	constset int CONNOP_ {
 		READ = 1;
 		WRITE = 2;
-		CONNECT = 5;	//READ | WRITE | 4
+		CONNECT = 7;	//READ | WRITE | 4
 		FINISH = 11;	//READ | WRITE | 8
 		ACCEPT = 16;
 	}

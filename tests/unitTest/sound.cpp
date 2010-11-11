@@ -35,6 +35,7 @@ public:
 
 	void keyReleaseEvent(int keyCode) {
 		checkYesNo(keyCode);
+		suite->runNextCase();
 	}
 };
 
