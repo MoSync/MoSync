@@ -69,9 +69,10 @@ void FramebufferTest::start() {
 	}
 
 	int fbRet = maFrameBufferInit(fb);
-	if( fbRet <= 0)
+	lprintfln("maFrameBufferInit returned %i", fbRet);
+	assert("maFrameBufferInit", fbRet > 0);
+	if(fbRet <= 0)
 	{
-		assert("maFrameBufferInit", false);
 		free(fb);
 		return;
 	}

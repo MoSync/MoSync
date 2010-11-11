@@ -24,9 +24,13 @@
 #if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
 #define MA_DV_HI i[1]
 #define MA_DV_LO i[0]
+#define MA_LL_HI i[0]
+#define MA_LL_LO i[1]
 #else
 #define MA_DV_HI hi
 #define MA_DV_LO lo
+#define MA_LL_HI hi
+#define MA_LL_LO lo
 #endif
 
 // Convert between double, 2 ints and long long.
