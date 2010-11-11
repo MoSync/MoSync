@@ -19,16 +19,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <matime.h>
 #include "common.h"
 
-void localTime();
-void localTime() {
+int localTime();
+int localTime() {
 	printf("Local time:\n");
 	printf("%s\n", sprint_time(maLocalTime()));
+	return 0;
 }
 
-void utcTime();
-void utcTime() {
+int utcTime();
+int utcTime() {
 	printf("UTC time:\n");
 	printf("%s\n", sprint_time(maTime()));
+	return 0;
 }
 
 #define TEST_TIMEOUT 1000

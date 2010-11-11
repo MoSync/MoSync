@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -19,23 +19,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "common.h"
 #include "MAHeaders.h"
 
-void maCreateImageRawTest();
-void maDrawRGBTest();
-void maCreateImageFromDataTest();
-void maGetImageDataTest();
+int maCreateImageRawTest();
+int maDrawRGBTest();
+int maCreateImageFromDataTest();
+int maGetImageDataTest();
 
 void addAdvGfxTests(TestSuite* suite);
-void addAdvGfxTests(TestSuite* suite) {
+
+/**
+ * @brief Adds the advanced graphics tests to the test suite
+ *
+ * @param suite		The test suite to which these tests shoulc be added
+ */
+void addAdvGfxTests(TestSuite* suite)
+{
 	suite->addTestCase(new TemplateCase<maCreateImageRawTest>("maCreateImageRaw test"));
 	suite->addTestCase(new TemplateCase<maDrawRGBTest>("maDrawRGB test"));
 	suite->addTestCase(new TemplateCase<maCreateImageFromDataTest>("maCreateImageFromData test"));
 	suite->addTestCase(new TemplateCase<maGetImageDataTest>("maGetImageData test"));
 }
 
-
-
 #define GRADIENT_SEGMENT_HEIGHT 16
-void maCreateImageRawTest()
+
+/**
+ * @brief Tests the maCreateImageRaw syscall
+ *
+ * The tests generates a gradient with alpha to memory and then
+ * creates a drawable resource with the maCreateImageRaw syscall.
+ * The test then draws a chessboard pattern and draws the gradient
+ * over it.
+ */
+int maCreateImageRawTest()
 {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
@@ -44,6 +58,9 @@ void maCreateImageRawTest()
 	maSetClipRect(0, 0, screen.width, screen.height);
 
 	int *src = new int[screen.width*GRADIENT_SEGMENT_HEIGHT];
+	if(NULL == src)
+		return FUNC_OUT_OF_MEMORY_ALLOC;
+
 	int delta = (0xff<<16)/screen.width;
 	int ofs = 0;
 	for(int j = 0; j < GRADIENT_SEGMENT_HEIGHT; j++)
@@ -58,7 +75,11 @@ void maCreateImageRawTest()
 	}
 
 	MAHandle h = maCreatePlaceholder();
-	::maCreateImageRaw(h, src, EXTENT(screen.width,GRADIENT_SEGMENT_HEIGHT), TRUE);
+	if(RES_OK != ::maCreateImageRaw(h, src, EXTENT(screen.width,GRADIENT_SEGMENT_HEIGHT), TRUE))
+	{
+		delete []src;
+		return FUNC_OUT_OF_MEMORY_RESOURCE;
+	}
 	delete []src;
 
 	int incx = (screen.width>>3);
@@ -86,9 +107,18 @@ void maCreateImageRawTest()
 	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "alpha gradient on chessboard");
 
 	maUpdateScreen();
+
+	return FUNC_OK;
 }
 
-void maCreateImageFromDataTest()
+/**
+ * @brief Tests the maCreateImageFromData syscall
+ *
+ * The tests creates a drawable resource from a PNG file
+ * using the maCreateImageFromData syscall, and the
+ * renders the result to the screen.
+ */
+int maCreateImageFromDataTest()
 {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
@@ -100,7 +130,12 @@ void maCreateImageFromDataTest()
 	maFillRect(0, 0, screen.width, screen.height);
 
 	MAHandle h = maCreatePlaceholder();
-	maCreateImageFromData(h, CLIENT_PNG_TEST, 0, maGetDataSize(CLIENT_PNG_TEST));
+	int returnCode = maCreateImageFromData(h, CLIENT_PNG_TEST, 0,
+											maGetDataSize(CLIENT_PNG_TEST));
+	if(RES_OK != returnCode)
+		return FUNC_OUT_OF_MEMORY_RESOURCE;
+
+
 	maDrawImage(h, (screen.width>>1)-(EXTENT_X(maGetImageSize(h))>>1), (screen.height>>1)-(EXTENT_Y(maGetImageSize(h))>>1));
 	maDestroyObject(h);
 
@@ -110,9 +145,18 @@ void maCreateImageFromDataTest()
 	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "png image");
 
 	maUpdateScreen();
+
+	return FUNC_OK;
 }
 
-void maDrawRGBTest()
+/**
+ * @brief Tests the maDrawRGB syscall
+ *
+ * The tests generates a gradient with alpha and store that in memory.
+ * It then draws a chessboard to the screen and draws the gradient
+ * with the maDrawRGB syscall.
+ */
+int maDrawRGBTest()
 {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
@@ -121,6 +165,9 @@ void maDrawRGBTest()
 	maSetClipRect(0, 0, screen.width, screen.height);
 
 	int *src = new int[screen.width*GRADIENT_SEGMENT_HEIGHT];
+	if(NULL == src)
+		return FUNC_OUT_OF_MEMORY_ALLOC;
+
 	int delta = (0xff<<16)/screen.width;
 	int ofs = 0;
 	for(int j = 0; j < GRADIENT_SEGMENT_HEIGHT; j++)
@@ -163,9 +210,20 @@ void maDrawRGBTest()
 	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "alpha gradient on chessboard");
 
 	maUpdateScreen();
+
+	return FUNC_OK;
 }
 
-void maGetImageDataTest()
+/**
+ * @brief Tests the maGetImageData syscall
+ *
+ * The tests generates a drawable resource from a PNG file with the
+ * maCreateImageFromData syscall. The actual pixels are then retrived
+ * with maGetImageData and a new drawable resource is created with
+ * maCreateImageRaw.
+ * The resulting resource are then drawn to the scren with maDrawImage.
+ */
+int maGetImageDataTest()
 {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
@@ -177,11 +235,17 @@ void maGetImageDataTest()
 	maFillRect(0, 0, screen.width, screen.height);
 
 	MAHandle h = maCreatePlaceholder();
-	maCreateImageFromData(h, CLIENT_PNG_TEST, 0,  maGetDataSize(CLIENT_PNG_TEST));
+	int returnCode = maCreateImageFromData(h, CLIENT_PNG_TEST, 0,
+											maGetDataSize(CLIENT_PNG_TEST));
+	if(RES_OK != returnCode)
+		return FUNC_OUT_OF_MEMORY_RESOURCE;
 
 	MAExtent size = maGetImageSize(h);
 	MARect srcRect = {0, 0, EXTENT_X(size), EXTENT_Y(size)};
 	int *img = new int[EXTENT_X(size)*EXTENT_Y(size)];
+	if(NULL == img)
+		return FUNC_OUT_OF_MEMORY_ALLOC;
+
 	maGetImageData(h, img, &srcRect, EXTENT_X(size));
 
 	int imageWidth = EXTENT_X(maGetImageSize(h));
@@ -189,9 +253,14 @@ void maGetImageDataTest()
 
 
 	maDestroyObject(h);
-	::maCreateImageRaw(h, img, size, TRUE);
+	returnCode = ::maCreateImageRaw(h, img, size, TRUE);
+	if(RES_OK != returnCode)
+	{
+		delete []img;
+		return FUNC_OUT_OF_MEMORY_RESOURCE;
+	}
+
 	delete []img;
-//	maDrawImage(h, screen.width>>1, screen.height>>1);
 	maDrawImage(h, (screen.width>>1)-(imageWidth>>1), (screen.height>>1)-(imageHeight>>1));
 
 	maSetColor(0xff0000);
@@ -200,4 +269,6 @@ void maGetImageDataTest()
 	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "png image");
 
 	maUpdateScreen();
+
+	return FUNC_OK;
 }
