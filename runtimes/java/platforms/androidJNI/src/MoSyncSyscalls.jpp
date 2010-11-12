@@ -721,8 +721,22 @@ int maGetImageSize(int image)
 
 /**
 * @brief maGetImageData
+*
+* This syscall takes an image resource and reads the pixels from the given
+* rectangle and copies the pixels to the memory location given by the dst
+* parameter
+*
+* @param image				The image resource index
+* @param dst					The memory location to which the result should be written
+* @param srcLeft			The left-most pixel of the rectangle
+* @param srcTop			The top-most pixel of the rectangle
+* @param srcWidth		The width of the rectangle
+* @param srcHeight		The height of the rectangle
+* @param scanLength	The scan length, the number of bytes per row in the source
+										image
 */
-void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth, int srcHeight, int scanLength)
+void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth,
+										int srcHeight, int scanLength)
 {
 	SYSLOG("maGetImageData");
 
@@ -734,28 +748,95 @@ void _maGetImageData(int image, int dst, int srcLeft, int srcTop, int srcWidth, 
 	
 	int bitmapSize = scanLength * srcHeight;
 	
-	if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight()) maPanic(-1, "maGetImageData, (srcTop + srcHeight) > imageResource.mBitmap.getHeight() : " + (srcTop + srcHeight) + " > " + imageResource.mBitmap.getHeight());
-	if ((srcLeft + srcWidth) > imageResource.mBitmap.getWidth()) maPanic(-1, "maGetImageData, (srcLeft + srcWidth) > imageResource.mBitmap.getWidth() : " + (srcLeft + srcWidth) + " > " + imageResource.mBitmap.getWidth());	
+	if ((srcTop + srcHeight) > imageResource.mBitmap.getHeight()) 
+	{
+		maPanic(
+			-1, 
+			"maGetImageData, (srcTop + srcHeight) > " +
+			"imageResource.mBitmap.getHeight() : " +
+			(srcTop + srcHeight) + 
+			" > " +
+			imageResource.mBitmap.getHeight() );
+	}
+	
+	if ((srcLeft + srcWidth) > imageResource.mBitmap.getWidth())
+	{
+		maPanic(
+			-1,
+			"maGetImageData, (srcLeft + srcWidth) > "+ 
+			"imageResource.mBitmap.getWidth() : " +
+			(srcLeft + srcWidth) + 
+			" > " +
+			imageResource.mBitmap.getWidth() );	
+	}
+	
+	int pixels[] = new int[srcWidth];	
+	int colors[] = new int[srcWidth];
+	int alpha[] = new int[srcWidth];
+	
+	/*
+		The section generates a copy of the source image
+		and renders that into a surface. The copy is then
+		given full opaque since the color values wasn't 
+		returned by the Android.Bitmap.getPixels when the
+		alpha value of a pixel was zero.
+		The alpha values are then read from the source 
+		image and the result are added with the alpha values
+		and the result is stored in the given memory location.
+	*/
+	Bitmap temporaryBitmap = Bitmap.createBitmap(
+		srcWidth,
+		srcHeight,
+		Bitmap.Config.ARGB_8888);
 
-
-	int pixels[] = new int[srcWidth];
+	Canvas temporaryCanvas = new Canvas(temporaryBitmap);
+	
+	temporaryCanvas.drawBitmap(
+		imageResource.mBitmap,
+		new Matrix(),
+		new Paint());
+		
+	temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 	
 	mMemDataSection.mark();
 	mMemDataSection.position(dst);
 
-	IntBuffer ib = mMemDataSection.asIntBuffer();
+	IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 	
 	for(int y = 0; y < srcHeight; y++)
 	{
-		ib.position(y*scanLength);		
-		imageResource.mBitmap.getPixels(pixels, 0, srcWidth, srcLeft, srcTop+y, srcWidth, 1);
+		intBuffer.position(y*scanLength);		
 		
-		ib.put(pixels);	
+		imageResource.mBitmap.getPixels(
+			alpha,
+			0,
+			srcWidth,
+			srcLeft,
+			srcTop+y,
+			srcWidth,
+			1);
+	
+		temporaryBitmap.getPixels(
+			colors,
+			0,
+			srcWidth,
+			srcLeft,
+			srcTop+y,
+			srcWidth,
+			1);
+		
+		for( int i = 0; i < srcWidth; i++)
+		{
+			pixels[i] = (alpha[i]&0xff000000) + (colors[i]&0x00ffffff);
+		}
+		
+		intBuffer.put(pixels);	
 	}
 	
 	mMemDataSection.reset();
 	
 }
+
 
 /**
 * @brief maSetDrawTarget
