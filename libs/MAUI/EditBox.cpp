@@ -134,12 +134,22 @@ namespace MAUI {
 	}
 	
 	void EditBox::setText(const String& text) {
-		//this->text = text;
-		//if(cursorIndex>text.size()) cursorIndex = text.size();
-		//this->caption = caption;
-		Label::setCaption(text);
-		if(cursorIndex>caption.length()) cursorIndex = caption.length();
-		requestRepaint();
+		if(passwordMode) {
+			password.clear();
+			password+=text;
+			String stars;
+			for(int i=0; i<text.length(); i++) {
+				stars+="*";
+			}
+			Label::setCaption(stars);
+			if(cursorIndex>caption.length()) cursorIndex = caption.length();
+			requestRepaint();
+		}
+		else {	
+			Label::setCaption(text);
+			if(cursorIndex>caption.length()) cursorIndex = caption.length();
+			requestRepaint();
+		}
 	}
 
 	const String& EditBox::getText() const {
