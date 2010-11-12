@@ -2575,7 +2575,9 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		Smartie<Stream> soundSrc(src->createLimitedCopy(dataLength));
 		MYASSERT(file.writeFully(*soundSrc), ERR_DATA_ACCESS_FAILED);
 	}
-	gPlayer->OpenFileL(KFileName, controllerUid);
+	LOGA("OpenFileL\n");
+	LTRAP(gPlayer->OpenFileL(KFileName, controllerUid));
+	//LTRAP(gPlayer->PlayL());	//makes and breaks the whole thing, at the same time.
 #endif	//__SERIES60_3X__
 #endif	//MMF
 
@@ -2631,6 +2633,7 @@ SYSCALL(void, maSoundSetVolume(int vol)) {
 	maxVolume = gPlayer->MaxVolume();
 #endif
 
+	LOGA("Native maxVolume: %i\n", maxVolume);
 	float fvol = vol;
 	fvol /= 100;
 	fvol *= maxVolume;
