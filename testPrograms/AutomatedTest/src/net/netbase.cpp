@@ -32,7 +32,7 @@ bool NetBase::waitForEvent ( int ms, int opType )
  * return code.
  *
  * @param ms 		Maximum number of milliseconds to wait.
- * @param opType 	Connection even type.
+ * @param opType 	Connection event type.
  * @param result    Event result code [out].
  *
  * @return True if event was caught with the given time limit.
@@ -53,7 +53,8 @@ bool NetBase::waitForEvent ( int ms, int opType, int &result )
 				result = event.conn.result;
 				return true;
 			}
-			if(event.type == EVENT_TYPE_CLOSE)
+
+			if ( event.type == EVENT_TYPE_CLOSE )
 			{
 				maExit(0);
 			}
