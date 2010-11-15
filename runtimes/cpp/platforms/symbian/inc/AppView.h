@@ -58,6 +58,7 @@ public:
 	const Core::VMCore* GetCore() const { return iCore; }
 	Base::Syscall* GetSyscall() { return iSyscall; }
 	int TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints);
+	void SetIdleDelay(int ms);
 
 	//CCoeControl
 public:
@@ -121,6 +122,17 @@ private:
 		void RunL();
 	};
 	CCloseTimer* iCloseTimer;
+	
+	class CDelayTimer : public CMyBaseTimer {
+	public:
+		CDelayTimer(CAppView& appView);
+		void RunL();
+	private:
+		CAppView& mAppView;
+	};
+	CDelayTimer* iDelayTimer;
+	int iIdleLoopDelay;	// milliseconds
+	friend class CDelayTimer;
 	
 	CAppUi& iAppUi;
 };

@@ -52,6 +52,8 @@ void AppendToFile(const TDesC& aFileName, const TDesC8& aText);
 
 void LogAvailableMemory();
 
+void ShowAknErrorNote(const TDesC& text);
+
 void __declspec(noreturn) ShowAknErrorNoteThenExitL(const TDesC& text);
 
 void __declspec(noreturn) ShowErrorCodeThenExitL(TInt aError);

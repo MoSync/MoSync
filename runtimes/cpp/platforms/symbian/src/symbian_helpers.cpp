@@ -404,7 +404,7 @@ static void logTDesC(const TDesC& text) {
 #endif
 }
 
-static void ShowAknErrorNote(const TDesC& text) {
+void ShowAknErrorNote(const TDesC& text) {
 	LOG("ShowAknErrorNote:\n");
 	logTDesC(text);
 	CAppUi* ui = (CAppUi*)(CEikonEnv::Static()->AppUi());
