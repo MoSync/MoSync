@@ -74,6 +74,8 @@ namespace MAUtil {
 		 * If you can't free any more, return false to make the Downloader fail with
 		 * #CONNERR_DOWNLOADER_OOM.
 		 * The default implementation does nothing and returns false.
+		 * Note: This feature is not yet implemented, outOfMemory() is
+		 * never called by download framework.
 		 */
 		virtual bool outOfMemory(Downloader* downloader);	//todo: call
 
@@ -81,8 +83,10 @@ namespace MAUtil {
 		 * Called when all data has been downloaded.
 		 * \param downloader A pointer to the downloader sending this event.
 		 * \param data MAHandle to the binary data resource with the downloaded data.
-		 * TODO: Document when the data handle is deallocated, who has the
-		 * responsibility for that. Currently the downloader deallocates it.
+		 * It is the responsibility of the application to free the data handle 
+		 * once it is not needed (use maDestroyObject() for this). In case a
+		 * handle was supplied to beginDownloading() the data parameter will refer
+		 * to that handle.
 		 */
 		virtual void finishedDownloading(Downloader* downloader, MAHandle data) = 0;
 
