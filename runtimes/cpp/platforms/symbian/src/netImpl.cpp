@@ -154,13 +154,18 @@ void Syscall::FinishNetworkingStartL() {
 }
 
 void Syscall::StopNetworking() {
+	LOGD("StopNetworking()\n");
 	//cancel all connOps.
 	TDblQueIter<ConnOp> itr(gConnOps);
 	itr.SetToFirst();
 	ConnOp* op;
+	int i=0;
 	while((op = itr++) != NULL) {
+		LOGD("op %i cancel...\n", i);
 		//delete op;	//causes crash
 		op->Cancel();
+		LOGD("op %i cancel done.\n", i);
+		i++;
 	}
 }
 
@@ -473,6 +478,8 @@ void Syscall::ConnOp::DoCancel() {
 		mSyscall.gConnection.Close();
 		LOGS("gConnection.Close() successful\n");
 		mSyscall.gNetworkingState = EIdle;
+		TRequestStatus* rsp = &iStatus;
+		User::RequestComplete(rsp, KErrCancel);
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);
@@ -496,6 +503,7 @@ void Syscall::ConnOp::DoCancel() {
 		DEBIG_PHAT_ERROR;
 	}
 	SendResult(CONNERR_CANCELED);
+	LOGD("DoneCancel\n");
 }
 
 void Syscall::ConnOp::StartConnSubOpL() {
