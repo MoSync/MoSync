@@ -38,8 +38,8 @@ class TestEnvironment : public Environment
 public:
 	TestEnvironment() : mIsRunning(true) { }
 	bool isRunning() { return mIsRunning; }
-	bool startRunning() { mIsRunning = true; }
-	bool stopRunning() { mIsRunning = false; }
+	void startRunning() { mIsRunning = true; }
+	void stopRunning() { mIsRunning = false; }
 	void fireConnEvent(const MAConnEventData& data) { this->Environment::fireConnEvent(data); }
 private:
 	bool mIsRunning;
@@ -328,7 +328,6 @@ public:
 		// This is the flag we use to determine if the download has passed.
 		gPassedDownloadImageTest = false;
 		int result;
-		MAEvent event;
 		Downloader downloader;
 		DownloadImageTestListener downloadListener;
 		downloader.addDownloadListener(&downloadListener);

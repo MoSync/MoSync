@@ -9,7 +9,7 @@
 
 
 // Maximum delay for an event in ms
-const int NetBase::MAX_DELAY = 30*1000;
+const int NetBase::MAX_DELAY = 5*1000;
 
 
 /**
