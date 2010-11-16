@@ -22,7 +22,7 @@ work.instance_eval do
 		@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code", "sld.cpp" => " -Wno-unreachable-code" }
 	end
 	
-	@LOCAL_LIBS = ["mosync_sdl"] + @LOCAL_LIBS
+	@LOCAL_LIBS = ["mosync_sdl", "demangle"] + @LOCAL_LIBS
 	
 	@NAME = "moemu" # was 'moemu', should probably rename it to that later on.
 	

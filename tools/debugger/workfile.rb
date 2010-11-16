@@ -12,7 +12,7 @@ work.instance_eval do
 	if(HOST == :darwin)
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES + ["/sw/include"]
 	end
-	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "stabs"]
+	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "stabs", "demangle"]
 	if(HOST == :win32)
 		@CUSTOM_LIBS = ["SDL.lib", "libirprops.a", "libuuid.a"]
 		@LIBRARIES = ["wsock32", "ws2_32"]

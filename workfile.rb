@@ -22,6 +22,7 @@ end
 
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"intlibs/bluetooth",
+	"intlibs/demangle",
 	"intlibs/gsm_amr",
 	"intlibs/net",
 	"intlibs/stabs",
