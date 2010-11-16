@@ -478,8 +478,10 @@ void Syscall::ConnOp::DoCancel() {
 		mSyscall.gConnection.Close();
 		LOGS("gConnection.Close() successful\n");
 		mSyscall.gNetworkingState = EIdle;
-		TRequestStatus* rsp = &iStatus;
-		User::RequestComplete(rsp, KErrCancel);
+		{
+			TRequestStatus* rsp = &iStatus;
+			User::RequestComplete(rsp, KErrCancel);
+		}
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);

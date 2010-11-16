@@ -1606,40 +1606,29 @@ class UBinData
 /**
  * Table that stores ubin resources. 
  */
-Hashtable<Integer, UBinData> mUBinaryResources = new Hashtable<Integer, UBinData>();
-
+Hashtable<Integer, UBinData> mUBinaryResources = 
+	new Hashtable<Integer, UBinData>();
 
 /**
-* @brief loadUBinary
-*
-* Stores an unloaded binary resource. Since Andriod differs a lot from
-* the other runtimes this is necessary. There isn't a duplicate stored
-* on the JNI side.
-*/
+ * Store information about an unloaded binary resource. 
+ *
+ * If the resource is an audio ubin, we also write it to a file,
+ * because on Android we play audio from files.
+ *
+ * @param resourceIndex The id of the ubin resource.
+ * @param offset The offset of the reosurce in the resource file.
+ * @param size The size of the resource.
+ */
 void loadUBinary(int resourceIndex, int offset, int size)
 {
 	SYSLOG("loadUBinary index:" + resourceIndex);
-	UBinData ubd = new UBinData(offset, size);
-	mUBinaryResources.put(resourceIndex, ubd);
 	
-	// UBIN must always point to the resource file.
-	try
-	{
-		AssetManager assetManager = mContext.getAssets();
-		AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
-		
-		FileInputStream fis = pAfd.createInputStream();
-		fis.skip(ubd.getOffset());
+	// Create a ubin data object that holds information about the object.
+	UBinData ubinData = new UBinData(offset, size);
+	mUBinaryResources.put(resourceIndex, ubinData);
 	
-		if(true == checkIfMimeAudioType(fis))
-		{
-			storeAudioUBin(ubd, resourceIndex);
-		}
-	}
-	catch(Exception e)
-	{
-		logError("loadUBinary - exception :", e);
-	}
+	// If this is an audio ubin, it is written to a file.
+	storeIfAudioUBin(ubinData, resourceIndex);
 }
 
 /**

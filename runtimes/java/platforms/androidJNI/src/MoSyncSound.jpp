@@ -15,326 +15,63 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
-	Checks if the first 5 bytes are "audio"
-*/
-static public final boolean checkIfMimeAudioType(byte[] in) throws Exception
-{
-	String audio="audio";
-	String beginning = new String(in, 0, 5);
-	
-	if(beginning.compareTo(audio) == 0)
-	{
-		Log.i("MoSync Audio","Resource was an audio resource!");
-		return true;
-	}
-
-	Log.i("MoSync Audio","Was not an audio resource!");
-
-	return false;
-}
-
-static public final boolean checkIfMimeAudioType(FileInputStream fis) throws Exception
-{
-	byte buff[] = new byte[5];
-	fis.read(buff);
-	return checkIfMimeAudioType(buff);
-}
-
-/*
-*/
-void storeIfBinaryAudioResource(int resourceIndex) throws Exception
-{
-	ByteBuffer bb = (ByteBuffer)mBinaryResources.get(resourceIndex);
-	if(null == bb)
-	{
-		Log.i("MoSync Audio","No such resource");
-		return;
-	}
-	
-	if(bb.capacity() < 5)
-	{
-		Log.i("MoSync Audio","resource was smaller than 5 bytes");
-		return;
-	}
-	
-	byte header[] = new byte[5];
-	int p = bb.position();
-	bb.position(0);
-	bb.get(header);
-	bb.position(0);
-	
-	if(checkIfMimeAudioType(header))
-		storeAudioBin(bb, resourceIndex);
-	
-	bb.position(p);
-}
-
-/*
-	Reads the MIME string and then returns it.
-*/
-final String readMimeString(FileInputStream input) throws Exception
-{	
-	StringBuffer sb = new StringBuffer();
-	int b;
-
-	while((b=input.read())!=0)
-	{
-		if(b==-1) BIG_PHAT_ERROR;
-		sb.append((char)b);
-	}
-	
-	return new String(sb);
-}
+/************************ Sound Syscalls ************************/
 
 /**
-*	Reads the MIME string and then returns it. The mime string is stored at the beginning of the resource.
-*  	mime | 0 | audio data
-*
-*	@param buffer		The ByteBuffer which is the resource
-*
-*	@return				The string containing the mime
-*						"" if there was a an error
-*/
-final String readMimeString(ByteBuffer buffer) throws Exception
-{
-	StringBuffer sb = new StringBuffer();
-	
-	int pos = buffer.position();
-	buffer.position(0);
-	
-	byte b;
-	try
-	{
-		while(true)
-		{
-			b = buffer.get();
-			if(b == 0) 
-			{
-				Log.i("MoSync Audio","Found the end of this header");
-				break;
-			}
-			sb.append((char)b);
-			//Log.i("MoSync Audio", "stringbuffer:" + sb);
-		}
-	}
-	catch(BufferUnderflowException bufe)
-	{
-		// oops!
-		bufe.printStackTrace();
-		return new String("");
-	}
-	
-	buffer.position(pos);
-	
-	//Log.i("MoSyncSound.readMimeString", "stringbuffer:" + sb);
-	
-	return new String(sb);
-}
-
-int mNumTempAudioFiles = 1;
-Hashtable<Integer, AudioStore> mAudioStores = new Hashtable<Integer, AudioStore>();
-
-/**
- * Used for lookup. To test that this is an audio resource.
+ * Play a sound.
+ *
+ * TODO: Who deallocates the handle once it is written to disk?
+ *
+ * @param soundHandle Handle to sound data. At the beginning of the data 
+ * is a mime type header.
+ * @param offset Offset from the beginning of the data to the start 
+ * of the sound data.
+ * @param length Length of sound data.
  */
-class AudioStore
-{
-	//public int mSize;
-	//public String mMimeType;
-	public String mTemporaryFileName;
-	
-	AudioStore(String mimeType, int size, String temporaryFileName)
-	{
-		SYSLOG("AudioStore temp file savec :" + temporaryFileName);
-		//mMimeType = mimeType;
-		//mSize = size;
-		mTemporaryFileName = temporaryFileName;
-	}
-};
-
-/**
- * Store audio resource data as a file we can use with MediaPlayer.
- * @param buffer Byte buffer that contains the audio data,
- *   the data begins with a null terminated mime string,
- *   then follows audio data.
- * @param resHandle The id of the audio resource.
- */
-void storeAudioBin(ByteBuffer buffer, int resHandle) throws Exception
-{
-	// Read the mime string. Somewhere else in the code we
-	// have already determined that this is an audio resource.
-	String mimeType = readMimeString(buffer);
-	if (mimeType == "")
-	{
-		Log.i("MoSync audio","storeAudioBin, no mime type!");
-		return;
-	}
-	
-	// Determine the length of the audio data.
-	int mimeStringLength = mimeType.length() + 1;
-	int length = buffer.capacity() - mimeStringLength;
-	
-	Log.i("MoSync audio", "initial capacity:" + buffer.capacity() + " mimeLength:" + mimeType.length() + " audio length:"+ length);
-	
-	try 
-	{
-		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
-		Log.i("MoSync audio","saved audio resource as: " + fileName);
-		
-		// Create a temporary audio file.
-		FileOutputStream audioFileOutputStream = mContext.openFileOutput(
-			fileName,
-			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
-			
-		// Open a file channel to write audio data to.
-		FileChannel channel = audioFileOutputStream.getChannel();
-
-		// Save old position of buffer.
-		int oldPos = buffer.position();
-		
-		// Set position to start of audio data.
-		buffer.position(mimeStringLength);
-
-		// Write data.
-		channel.write(buffer);
-		
-		// Restore position.
-		buffer.position(oldPos);
-		
-		// Close the channel, also closes the output stream.
-		channel.close();
-	
-		Log.i("addResourceAudio", "store finished");
-	
-		// Add entry to audio resource table.
-		mAudioStores.put(resHandle, new AudioStore(mimeType, length, fileName));
-	}
-	catch(Exception e)
-	{
-		SYSLOG("Unable to save temporary audio file.");
-	}
-}
-
-/**
- * Store ubin audio resource as a file we can use with MediaPlayer.
- * @param data An object honding information about this resource.
- * @param resHandle The id of the audio resource.
- */
-void storeAudioUBin(UBinData data, int resHandle) throws Exception
-{
-	Log.i("MoSyncSound.storeAudioUBin()", "data.getSize(): " + data.getSize() + "bytes");
-	
-	// Open the resource file.
-	AssetManager assetManager = mContext.getAssets();
-	AssetFileDescriptor fileDescriptor = assetManager.openFd("resources.mp3");
-	FileInputStream inputStream = fileDescriptor.createInputStream();
-	
-	// Jump to beginning of resource.
-	inputStream.skip(data.getOffset());
-	
-	// Read mime string.
-	String mimeType = readMimeString(inputStream);
-	int mimeStringLength = mimeType.length() + 1;
-	
-	// Size of audio data.
-	int length = data.getSize() - mimeStringLength;
-	
-	try 
-	{
-		// Buffer to hold audio data.
-		byte[] buffer = new byte[length];
-		
-		// We should be at the start of audio data after reading the mome string.
-		inputStream.read(buffer);
-		
-		inputStream.close();
-		
-		// Create a temporary audio file
-		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
-		Log.i("MoSync audio","saved audio resource as: " + fileName);
-		FileOutputStream outputStream = mContext.openFileOutput(
-			fileName,
-			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE); 
-		outputStream.write(buffer);
-		outputStream.close();
-		
-		Log.i("addResourceAudio","store finished");
-	
-		// Store audio resource. TODO: Unify this withh UBinData.
-		mAudioStores.put(resHandle, new AudioStore(mimeType, length, fileName));
-	}
-	catch(Exception e)
-	{
-		SYSLOG("Unable to save temporary audio file.");
-	}
-}
-
-/*
-MediaPlayer states are protected by mutexes in the native layer.
-However, the playback complete is an asynchronous event that comes on
-a binder worker thread. It's possible that you could call reset() in
-the window after the native media player service has posted a playback
-complete message to the binder interface, but before the client worker
-thread has processed it. In this case, the playback complete message
-would reset the client side of the interface to the stopped state.
-Your subsequent setDataSource() call would fail.
-
-If you wait for the playback complete message and then post a message
-to your handler to start the next playback, you can avoid this
-problem. Or as Marco suggests, create a second MediaPlayer object.
-Just make sure you call release() on each one after you're done with
-it to release the native resources.
-*/
-
 int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 {
+	// Free current MediaPlayer instance.
 	if (null != mMediaPlayer)
 	{
 		mMediaPlayer.release();
 		mMediaPlayer = null;
 	}
 	
-	if (null == mMediaPlayer)
-	{
-		mMediaPlayer = new MediaPlayer();
-	}
+	// Create new MediaPlayer instance.
+	mMediaPlayer = new MediaPlayer();
 	
-	Log.i("MoSyncSound.maSoundPlay()","Reading audio resource:" + soundResource);
+	SYSLOG("MoSyncSound.maSoundPlay()" +
+		"Reading audio resource:" + soundResource);
 	
-	AudioStore audioStore = (AudioStore) mAudioStores.get(new Integer(soundResource));
+	// Get audio information.
+	AudioStore audioStore = obtainAudioStoreObject(soundResource);
 	if (audioStore == null)
 	{
-		Log.i("MoSyncSound.maSoundPlay()", "No audio resource with handle: " + soundResource + " found!");
+		Log.e("MoSyncSound.maSoundPlay", 
+			"No audio resource with handle: " + soundResource + " found!");
 		return -1;
 	}
 
-	Log.i("MoSyncSound.maSoundPlay()", "filename: " + audioStore.mTemporaryFileName); // +  " mime:" + audioStore.mMimeType + " size:" + audioStore.mSize);
-	
-	// Get file descriptor for audio resource file.
-	FileDescriptor fileDesc = mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
+	// Get file descriptor for audio file.
+	FileDescriptor fileDesc = 
+		mContext.openFileInput(audioStore.mTemporaryFileName).getFD();
 	
 	if (null == fileDesc) 
 	{
-		Log.i("MoSync audio","File Descriptor was null!");
+		Log.e("MoSyncSound.maSoundPlay", "File Descriptor was null!");
 		return -1;
 	}
 	
 	try
-	{	
-		Log.i("maSoundPlay","set data source");
+	{
 		mMediaPlayer.setDataSource(fileDesc, offset, length);
-		
-		Log.i("maSoundPlay","media player prepare");
 		mMediaPlayer.prepare();
-		
-		Log.i("maSoundPlay","media player start");
 		mMediaPlayer.start();
 
 	}
 	catch (Exception e)
 	{
-		Log.i("MoSync audio","Whoops! Exception e:" + e.toString());
+		Log.e("MoSyncAudio.maSoundPlay", "Whoops! Exception e:" + e.toString());
 		e.printStackTrace();
 		return -1;
 	}
@@ -342,7 +79,8 @@ int maSoundPlay(MAHandle soundResource, int offset, int length) throws Exception
 	return 1;
 }
 
-void maSoundStop() /* FIX-ME throws MediaException */
+// FIXME: throws MediaException - Is this still the case?!
+void maSoundStop() 
 {
 	if (null == mMediaPlayer)
 	{
@@ -355,9 +93,10 @@ void maSoundStop() /* FIX-ME throws MediaException */
 	}
 }	
 
-/*
-	Volume in MoSync is in the range 0 - 100
-*/
+/**
+ * Set the sound volume.
+ * @param vol Volume in the range 0 - 100.
+ */
 void maSoundSetVolume(int vol)
 {
 	if (null == mMediaPlayer)
@@ -405,7 +144,9 @@ int maSoundGetVolume()
 	return mSoundVolume;
 }
 
-// returns 1 if the sound is playing, otherwise 0
+/**
+ * @return 1 if the sound is playing, otherwise 0
+ */
 int maSoundIsPlaying()
 {
 	if (null == mMediaPlayer)
@@ -448,3 +189,373 @@ NETSYSCALL(int) maSoundPlayConn(MAHandle conn, String mimeString) throws Excepti
 	return 1;
 }
 #endif	//MA_SUPPORT_STREAMING
+
+
+/************************ Implementation Support ************************/
+
+/**
+ * Counter for number of temporary audio files.
+ * On Android the sound data must be played from a file,
+ * you cannot play sound from memory. This is why we store
+ * audio data objects in temporary files.
+ */
+int mNumTempAudioFiles = 1;
+
+/**
+ * Table with AudioStore objects that keep track of audio data.
+ */
+Hashtable<Integer, AudioStore> mAudioStores = 
+	new Hashtable<Integer, AudioStore>();
+
+/**
+ * This class is used for storing the filename
+ * of an audio object.
+ */
+class AudioStore
+{
+	//public int mSize;
+	//public String mMimeType;
+	
+	/**
+	 * The file name of the audio object.
+	 */
+	public String mTemporaryFileName;
+	
+	/**
+	 * Constructor.
+	 * @param mimeType The mime string, currently not used.
+	 * @param size The size of the audio data, currently not used.
+	 * @param temporaryFileName The name fo the audio file.
+	 */
+	AudioStore(String mimeType, int size, String temporaryFileName)
+	{
+		SYSLOG("AudioStore temp file savec :" + temporaryFileName);
+		//mMimeType = mimeType;
+		//mSize = size;
+		mTemporaryFileName = temporaryFileName;
+	}
+};
+
+/**
+ * If the given resource is an audio file, store it as a file.
+ * This is done because we need an audio file to play the sound.
+ * @param soundHandle The handle to the sound object. The audio object
+ * begins with a null terminated mime string, then follows audio data.
+ */
+void storeIfBinaryAudioResource(int soundHandle)
+{
+	ByteBuffer audioData = (ByteBuffer) mBinaryResources.get(soundHandle);
+	if (null == audioData)
+	{
+		SYSLOG("MoSyncAudio.storeIfBinaryAudioResource - Sound data object not found");
+		return;
+	}
+
+	// Is this an audio object?
+	if (!checkIfMimeAudioType(audioData))
+	{
+		// No it was not.
+		SYSLOG("MoSyncAudio.storeIfBinaryAudioResource - Not an audio object!");
+		return;
+	}
+
+	// Read the mime string.
+	String mimeType = readMimeString(audioData);
+	if (mimeType == null)
+	{
+		SYSLOG("MoSyncAudio.storeIfBinaryAudioResource - No mime type!");
+		return;
+	}
+	
+	// Determine the length of the audio data.
+	int mimeStringLength = mimeType.length() + 1;
+	int length = audioData.capacity() - mimeStringLength;
+	
+	SYSLOG("MoSyncAudio.storeIfBinaryAudioResource" + 
+		" initial capacity: " + audioData.capacity() + 
+		" mimeLength: " + mimeType.length() + 
+		" audio length: " + length);
+	
+	// Save old position of buffer.
+	int oldPos = audioData.position();
+	
+	try 
+	{
+		// Create file name.
+		String fileName = "MOSYNCTEMP:audio" + soundHandle + ".tmp";
+		
+		// Create a temporary audio file.
+		FileOutputStream audioFileOutputStream = mContext.openFileOutput(
+			fileName,
+			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
+			
+		// Open a file channel to write audio data to.
+		FileChannel channel = audioFileOutputStream.getChannel();
+
+		// Set position to start of audio data.
+		audioData.position(mimeStringLength);
+
+		// Write data.
+		channel.write(audioData);
+		
+		// Close the channel, also closes the output stream.
+		channel.close();
+	
+		// Add entry to audio resource table.
+		mAudioStores.put(soundHandle, new AudioStore(mimeType, length, fileName));
+	}
+	catch (Exception ex)
+	{
+		Log.e("MoSyncSound.storeIfBinaryAudioResource", 
+			"Unable to save temporary audio file.");
+		ex.printStackTrace();
+	}
+	finally
+	{
+		// Restore position.
+		audioData.position(oldPos);
+	}
+}
+
+/**
+ * If this is an audio ubin, we store the resource as a file that 
+ * can be played with MediaPlayer.
+ * @param ubinData An object honding information about this resource.
+ * @param resHandle The id of the audio resource.
+ */
+void storeIfAudioUBin(UBinData ubinData, int resHandle)
+{
+	SYSLOG("MoSyncSound.storeIfAudioUBin - ubinData.getSize(): " + 
+		ubinData.getSize() + "bytes");
+	
+	if (!checkIfMimeAudioType(ubinData))
+	{
+		// This is not an audio resource.
+		return;
+	}
+	
+	try
+	{
+		// Open the resource file.
+		AssetManager assetManager = mContext.getAssets();
+		AssetFileDescriptor fileDescriptor = assetManager.openFd(RESOURCE_FILE); //"resources.mp3"
+		FileInputStream inputStream = fileDescriptor.createInputStream();
+	
+		// Jump to beginning of resource.
+		inputStream.skip(ubinData.getOffset());
+		
+		// Read mime string.
+		String mimeType = readMimeStringFromFile(inputStream);
+		int mimeStringLength = mimeType.length() + 1;
+	
+		// Calculate size of audio data.
+		int length = ubinData.getSize() - mimeStringLength;
+	
+		// Create buffer to hold audio data.
+		byte[] buffer = new byte[length];
+		
+		// We should be at the start of audio data after reading the mime string.
+		inputStream.read(buffer);
+		
+		// Close input stream.
+		inputStream.close();
+		
+		// Create a temporary audio file
+		String fileName = "MOSYNCTEMP:audio" + resHandle + ".tmp";
+		FileOutputStream outputStream = mContext.openFileOutput(
+			fileName,
+			Context.MODE_WORLD_READABLE | Context.MODE_WORLD_WRITEABLE);
+			
+		// Write audio data.
+		outputStream.write(buffer);
+		
+		// Close output steram.
+		outputStream.close();
+	
+		// Store sound data in audio table. 
+		// TODO: Unify AudioStore with UBinData ?
+		mAudioStores.put(resHandle, new AudioStore(mimeType, length, fileName));
+	}
+	catch(Exception ex)
+	{
+		Log.e("MoSyncAudio.storeIfAudioUBin", "Unable to save temporary audio file.");
+		ex.printStackTrace();
+	}
+}
+
+/**
+ * Get the AudioStore object for the given audio handle and
+ * write an aduio file and an AuiStore object if it does not exist.
+ * @param soundHandle The audio handle.
+ * @return An AudioStore object for the sound or null if there is an error.
+ */
+AudioStore obtainAudioStoreObject(int soundHandle)
+{
+	// Does the sound already exist in the AudioStore table?
+	AudioStore audioStore = 
+		(AudioStore) mAudioStores.get(new Integer(soundHandle));
+	if (audioStore != null)
+	{
+		// Yes it exists.
+		return audioStore;
+	}
+	
+	// The sound did not exist. Store it.
+	storeIfBinaryAudioResource(soundHandle);
+	
+	// If this handle contained proper sound data there
+	// shound now be an audio object in the audio store.
+	// If not, null will be returned.
+	return (AudioStore) mAudioStores.get(new Integer(soundHandle));
+}
+	
+/**
+ * Checks if the header is an audio mime type.
+ * @param header The first five bytes of an audio data object.
+ * @return true if the header is of type "audio", false if not.
+ */
+final boolean checkIfMimeAudioType(byte[] header)
+{
+	return 
+		(byte)'a' == header[0] &&
+		(byte)'u' == header[1] &&
+		(byte)'d' == header[2] &&
+		(byte)'i' == header[3] &&
+		(byte)'o' == header[4];
+}
+
+/**
+ * Checks if audio data is of audio mime type.
+ * @param audioData A buffer containging audio data.
+ * @return true if the audioData is of type "audio", false if not.
+ */
+final boolean checkIfMimeAudioType(ByteBuffer audioData)
+{
+	// No point in checking audio type unless we have at least five bytes.
+	if (audioData.capacity() < 5)
+	{
+		Log.e("MoSyncAudio.checkIfMimeAudioType", 
+			"Resource was smaller than 5 bytes");
+		return false;
+	}
+	
+	// Save current position on the byte buffer.
+	int savedPosition = audioData.position();
+	
+	// Read first five bytes.
+	byte header[] = new byte[5];
+	audioData.position(0);
+	audioData.get(header);
+	
+	// Restore buffer position.
+	audioData.position(savedPosition);
+	
+	// Check mime type.
+	return checkIfMimeAudioType(header);
+}
+
+/**
+ * Checks if the header of a resource is of audio mime type.
+ * @param ubinData A description of a ubin resource.
+ * @return true if the header is of type "audio", false if not.
+ */
+final boolean checkIfMimeAudioType(UBinData ubinData)
+{
+	try
+	{
+		// Open the resource file.
+		AssetManager assetManager = mContext.getAssets();
+		AssetFileDescriptor fileDescriptor = assetManager.openFd(RESOURCE_FILE); //"resources.mp3"
+		FileInputStream stream = fileDescriptor.createInputStream();
+		
+		// Jump to start of this audio resource.
+		stream.skip(ubinData.getOffset());
+		
+		// Determine if this is an audio file by examining the header bytes.
+		byte header[] = new byte[5];
+		stream.read(header);
+		stream.close();
+		return checkIfMimeAudioType(header);
+	}
+	catch (Exception ex)
+	{
+		ex.printStackTrace();
+		return false;
+	}
+}
+
+/**
+ * Reads the MIME string from a file. Note that the method
+ * advances the file pointer to the byte after the mime string,
+ * that is, to the start of the audio data.
+ * @param input The input file stream.
+ * @return The mime type string.
+ */
+final String readMimeStringFromFile(FileInputStream input) 
+throws Exception
+{	
+	StringBuffer mimeType = new StringBuffer();
+	
+	int b;
+
+	while ((b = input.read()) != 0)
+	{
+		if (b == -1) 
+		{
+			BIG_PHAT_ERROR;
+		}
+		mimeType.append((char)b);
+	}
+	
+	return new String(mimeType);
+}
+
+/**
+ * Reads the MIME string at the beginning of the data buffer and returns it.
+ * @param buffer The ByteBuffer that contains audio data. 
+ *   Format is <mime string><zero byte><audio data>.
+ * @return The string containing the mime type. 
+ *   Returns null if there was a an error.
+ */
+final String readMimeString(ByteBuffer audioBuffer)
+{
+	// Mime type string data.
+	StringBuffer mimeType = new StringBuffer();
+	
+	// Save current buffer position.
+	int savedBufferPosition = audioBuffer.position();
+	
+	// Set position to the start of the buffer.
+	audioBuffer.position(0);
+	
+	try
+	{
+		byte b;
+		while (true)
+		{
+			// Get next byte and check if it is the
+			// zero termination byte.
+			b = audioBuffer.get();
+			if (b == 0) 
+			{
+				break;
+			}
+			
+			// Add byte to mime type string.
+			mimeType.append((char)b);
+		}
+	}
+	catch (BufferUnderflowException ex)
+	{
+		ex.printStackTrace();
+		return null;
+	}
+	finally
+	{
+		// Restore the buffer position.
+		audioBuffer.position(savedBufferPosition);
+	}
+	
+	return new String(mimeType);
+}
+
