@@ -24,15 +24,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_MAUTIL_DOWNLOADER_H_
 #define _SE_MSAB_MAUTIL_DOWNLOADER_H_
 
-#if 0
-#include <MAUtil/Connection.h>
-#include <MAUtil/String.h>
-#include <MAUtil/util.h>
-#else
+
 #include "Connection.h"
 #include "String.h"
 #include "util.h"
-#endif
 
 /// The system has run out of memory.
 #define CONNERR_DOWNLOADER_OOM (CONNERR_USER - 1)

@@ -34,7 +34,7 @@ void KeyBaseCase::showErrorScreen(int errorCode)
 	maSetColor(BLACK);
 	maFillRect(0, 0, screen.width, screen.height);
 
-	maSetColor(0xff0000);
+	int oldCol = maSetColor(0xff0000);
 	const char* testName = name.c_str();
 	maDrawText(4, 0, testName);
 
@@ -54,6 +54,7 @@ void KeyBaseCase::showErrorScreen(int errorCode)
 	maDrawText(4, testNameHeight*2+4, "press key or screen to continue");
 
 	maUpdateScreen();
+	maSetColor(oldCol);	
 }
 
 void clearScreen(int color) {
