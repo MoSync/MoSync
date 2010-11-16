@@ -39,15 +39,15 @@ public:
 
 		if(res <= 0) {
 			assert("begin", false);
-		}
-
-		// Add a timeout timer for connections, use lower value when running in the emulator or MoRE.
-
+			suite->runNextCase();
+		} else {
+			// Add a timeout timer for connections, use lower value when running in the emulator or MoRE.
 #ifdef MA_PROF_DEVICE_EMULATOR
-		Environment::getEnvironment().addTimer(this, 4000, 1);
+			Environment::getEnvironment().addTimer(this, 4000, 1);
 #else
-		Environment::getEnvironment().addTimer(this, 20000, 1);
+			Environment::getEnvironment().addTimer(this, 20000, 1);
 #endif
+		}
 	}
 
 	void notifyProgress(MAUtil::Downloader* downloader, int downloadedBytes, int totalBytes) {
