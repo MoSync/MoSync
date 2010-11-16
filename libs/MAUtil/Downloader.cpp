@@ -14,18 +14,11 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
-
-#if 0
-#include "Downloader.h"
-#include <MAUtil/PlaceholderPool.h>
 #include <conprint.h>
 #include <maassert.h>
-#else
 #include "Downloader.h"
 #include "PlaceholderPool.h"
-#include <conprint.h>
-#include <maassert.h>
-#endif
+
 
 using namespace MAUtil;
 
@@ -45,7 +38,7 @@ bool DownloadListener::outOfMemory(Downloader*)
 Downloader::Downloader()
 : mIsDownloading(false),
   mIsDataPlaceholderUserAllocated(false),
-  mDataPlaceholder(NULL),
+  mDataPlaceholder(0),
   mReader(NULL)
 {
 	mConn = new HttpConnection(this);
@@ -262,7 +255,7 @@ MAHandle Downloader::getDataPlaceholder()
 ImageDownloader::ImageDownloader() :
 	mIsImagePlaceholderUserAllocated(false),
 	mIsImageCreated(false),
-	mImagePlaceholder(NULL)
+	mImagePlaceholder(0)
 {
 }
 		
@@ -615,10 +608,9 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 		return;
 	}
 
-	// Copy the chunks to the data object.
-	char buf[mDataChunkSize];
+	// Copy the chunks to the data object.	
 	int offset = 0;
-
+	char *buf = new char[mDataChunkSize];
 	while (0 < mDataChunks.size())
 	{
 		// Last chunk should only be partially written.
@@ -627,10 +619,10 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 		int size = (dataLeftToWrite < mDataChunkSize
 			? dataLeftToWrite : mDataChunkSize);
 
-		// Copy first remaining chunk.
+		// Copy first remaining chunk.		
 		MAHandle chunk = mDataChunks[0];
 		maReadData(chunk, buf, 0, size);
-		maWriteData(mDownloader->getDataPlaceholder(), buf, offset, size);
+		maWriteData(mDownloader->getDataPlaceholder(), buf, offset, size);		
 
 		// Return chunk to pool.
 		PlaceholderPool::put(chunk);
@@ -641,6 +633,8 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 		// Increment offset.
 		offset += mDataChunkSize;
 	}
+	delete[] buf;
+
 
 	MAHandle handle = mDownloader->getHandle();
 	if (handle)

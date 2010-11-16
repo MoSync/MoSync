@@ -75,7 +75,9 @@ public:
 
 	bool outOfMemory(Downloader* downloader)
 	{
+#ifdef VERBOSE
 		printf("outOfMemory");
+#endif
 		// Cannot call assert in a function that has a non-void return type.
 		//TESTIFY_ASSERT(0);
 		return false;
@@ -88,13 +90,17 @@ public:
 
 	void downloadCancelled(Downloader* downloader)
 	{
+#ifdef VERBOSE
 		printf("downloadCancelled");
+#endif
 		TESTIFY_ASSERT(0);
 	}
 
 	void error(Downloader* downloader, int code)
 	{
+#ifdef VERBOSE
 		printf("error, code: %i", code);
+#endif
 		TESTIFY_ASSERT(0);
 	}
 };
@@ -107,7 +113,9 @@ class DownloadUsingContentLengthTestListener : public DownloadListenerBase
 public:
 	void finishedDownloading(Downloader* downloader, MAHandle data)
 	{
+#ifdef VERBOSE
 		printf("finishedDownloading");
+#endif
 		gPassedDownloadUsingContentLengthTest =
 			dataContainsString(data, "MoSync");
 		maDestroyObject(data);
@@ -123,7 +131,9 @@ class DownloadNotUsingContentLengthTestListener : public DownloadListenerBase
 public:
 	void finishedDownloading(Downloader* downloader, MAHandle data)
 	{
+#ifdef VERBOSE
 		printf("finishedDownloading");
+#endif
 		gPassedDownloadNotUsingContentLengthTest =
 			dataContainsString(data, "MOBILELUA_BEGIN");
 		maDestroyObject(data);
@@ -139,7 +149,9 @@ class DownloadImageTestListener : public DownloadListenerBase
 public:
 	void finishedDownloading(Downloader* downloader, MAHandle data)
 	{
+#ifdef VERBOSE
 		printf("finishedDownloading");
+#endif
 		TESTIFY_ASSERT(maGetDataSize(data) > 5000);
 		maDestroyObject(data);
 		gPassedDownloadImageTest = true;
@@ -155,7 +167,9 @@ class DownloadFromListenerTestListener : public DownloadListenerBase
 public:
 	void finishedDownloading(Downloader* downloader, MAHandle data)
 	{
+#ifdef VERBOSE
 		printf("finishedDownloading");
+#endif
 
 		// First document downloaded should contain this string.
 		if (dataContainsString(data, "MOBILELUA_BEGIN"))
