@@ -45,9 +45,10 @@ struct Point {
 	int x, y;
 };
 
-Point clippedPoints[2][16];
-int numPoints[2];
-int currentList = 0;
+#ifndef SYMBIAN
+static Point clippedPoints[2][16];
+static int numPoints[2];
+static int currentList = 0;
 
 enum ClipResult  {
 	BOTH_IN = 0,
@@ -139,14 +140,23 @@ ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
 	out.y =  a.y + div;
 	return clipResult;
 }
+#endif	//SYMBIAN
 
-unsigned char mulTable[256][256];
+#ifdef SYMBIAN
+unsigned char* initMulTable() {
+	unsigned char* mulTable = new unsigned char[256*256];
+#else
+static unsigned char mulTable[256*256];
 void initMulTable() {
+#endif
 	for(int i = 0; i < 256; i++) {
 		for(int j = 0; j < 256; j++) {
-			mulTable[i][j] = (i*j)/255;
+			mulTable[i+j*256] = (i*j)/255;
 		}
 	}
+#ifdef SYMBIAN
+	return mulTable;
+#endif
 }
 
 Image::Image() {
@@ -271,6 +281,8 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 }
 
 Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &params, bool makeCopy, bool shouldFreeData) :
+	data(NULL),
+	alpha(NULL),
 	width(params.width),
 	height(params.height),
 	pitch(params.pitch),
@@ -292,9 +304,7 @@ Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &p
 	blueMask(params.blueMask),
 	blueShift(params.blueShift),
 	blueBits(params.blueBits),
-	shouldFreeData(shouldFreeData),
-	data(NULL),
-	alpha(NULL)
+	shouldFreeData(shouldFreeData)
 {
 	if(height>65536 || pitch>65536) return;
 	init(data, alpha, makeCopy);
@@ -302,12 +312,12 @@ Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &p
 
 Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
 	pixelFormat(pixelFormat),
+	data(NULL),
+	alpha(NULL),
 	width(width),
 	height(height),
 	pitch(pitch),
-	shouldFreeData(true),
-	data(NULL),
-	alpha(NULL)
+	shouldFreeData(true)
 {
 	if(height>65536 || pitch>65536) return;
 	init(NULL, NULL, false);
@@ -316,12 +326,12 @@ Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
 
 Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch, PixelFormat pixelFormat, bool makeCopy, bool shouldFreeData) :
 	pixelFormat(pixelFormat),
+	data(NULL),
+	alpha(NULL),
 	width(width),
 	height(height),
 	pitch(pitch),
-	shouldFreeData(shouldFreeData),
-	data(NULL),
-	alpha(NULL)
+	shouldFreeData(shouldFreeData)
 {
 	if(height>65536 || pitch>65536) return;
 	init(data, alpha, makeCopy);
@@ -341,10 +351,12 @@ Image::~Image() {
 	}
 }
 
+#ifndef SYMBIAN
 void Image::drawImage(int left, int top, Image *img) {
 	ClipRect srcRect = {0, 0, img->width, img->height};
 	drawImageRegion(left, top, &srcRect, img, TRANS_NONE);
 }
+#endif
 
 #define BIG_PHAT_SOURCE_RECT_ERROR { BIG_PHAT_ERROR(ERR_SOURCE_RECT_OOB);}
 
@@ -468,6 +480,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 				dirHorizontalY = -1;
 				dirVerticalX = -1;
 				break;
+			default:
+				DEBIG_PHAT_ERROR;
 	}
 
 	if( transWidth <= 0 || transHeight <= 0) return;
@@ -636,6 +650,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	}
 }
 
+#ifndef SYMBIAN
 void Image::drawPoint(int posX, int posY, int color) {
 	if( posX < clipRect.x || 
 		posX >= clipRect.x + clipRect.width || 
@@ -1184,7 +1199,7 @@ bool Image::clipPolygon() {
 
 // change this when screen gets bigger than 1024 ;) (4 kb shouldn't be too big..)
 #define RECIP_LUT_SIZE 1024
-int recipLut[RECIP_LUT_SIZE];
+static int recipLut[RECIP_LUT_SIZE];
 
 void initRecipLut() {
 	recipLut[0] = 0xffff;
@@ -1379,3 +1394,4 @@ void Image::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int col
 	}
 	*/
 }
+#endif	//SYMBIAN

@@ -172,14 +172,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\base\Graphics.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\base\Graphics.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\base\MemStream.cpp"
 				>
 			</File>

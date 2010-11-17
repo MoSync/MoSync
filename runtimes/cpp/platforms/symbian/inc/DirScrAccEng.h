@@ -127,6 +127,8 @@ private:
 	CFbsBitGc* iFBGc;
 
 	const void* iRawFrameBuf;
+	
+	byte* iMulTable;	// for the Image class.
 };
 
 #endif  //DIRSCRACCENG_H

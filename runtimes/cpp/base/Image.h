@@ -18,8 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
-#include <Graphics.h>
-
 struct ClipRect {
 	int x, y, width, height;
 };
@@ -97,6 +95,11 @@ public:
 	void drawImage(int left, int top, Image *src);
 
 	ClipRect		clipRect;
+	
+#ifdef SYMBIAN
+	// must be set before use.
+	unsigned char* mulTable;
+#endif
 
 	PixelFormat		pixelFormat;
 	unsigned char	*data;
@@ -123,7 +126,11 @@ public:
 	bool shouldFreeData;
 };
 
+#ifdef SYMBIAN
+unsigned char* initMulTable();
+#else
 void initMulTable();
 void initRecipLut();
+#endif
 
 #endif /* _IMAGE_ */
