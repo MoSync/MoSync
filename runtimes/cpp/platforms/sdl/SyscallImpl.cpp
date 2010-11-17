@@ -60,7 +60,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_FILE.h>
 
 // blah
 #include <helpers/CPP_IX_AUDIOBUFFER.h>

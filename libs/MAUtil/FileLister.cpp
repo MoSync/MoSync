@@ -1,6 +1,5 @@
 #include "FileLister.h"
 #include <maassert.h>
-#include <IX_FILE.h>
 
 int FileLister::start(const char* dir, const char* filter) {
 	close();

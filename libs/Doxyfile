@@ -991,7 +991,7 @@ INCLUDE_FILE_PATTERNS  =
 # Duplicating the ATTRIBUTE macro here 'cause doxygen's preprocessor doesn't
 # expand it properly.
 
-PREDEFINED             = MAPIP __GNUC__ __cplusplus DOXYGEN \
+PREDEFINED             = MAPIP __GNUC__ __cplusplus DOXYGEN IOCTLDEF \
 	"ATTRIBUTE(a, func)=func __attribute__ ((a))"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 

@@ -38,7 +38,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <hashmap/hashmap.h>
 
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_FILE.h>
 
 struct MAConnAddr;
 

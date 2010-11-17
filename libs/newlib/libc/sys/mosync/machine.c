@@ -15,7 +15,6 @@
 #include <getopt.h>
 
 #include <maapi.h>
-#include <IX_FILE.h>
 #include "maassert.h"
 #include "mavsprintf.h"
 #include "conprint.h"

@@ -24,7 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mawvsprintf.h"
 #include "maheap.h"
 #include "conprint.h"
-#include "IX_FILE.h"
 
 // Console width, in characters
 // Note that not all characters on a line may be visible on a given device, due

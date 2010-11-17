@@ -20,7 +20,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/FileLister.h>
-#include <IX_FILE.h>
 
 #define TEST(func) do { int _res = (func); if(_res < 0) { printf("Fail %i @ %i\n", _res, __LINE__); return; } } while(0)
 

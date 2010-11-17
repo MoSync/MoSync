@@ -45,7 +45,6 @@ import javax.microedition.location.*;
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 import javax.microedition.io.file.*;
-#include "generated\IX_FILE_CONSTS.h"
 #endif
 
 #ifdef MA_SUPPORT_RECORD
@@ -1801,7 +1800,26 @@ public
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
-		maIOCtl_IX_FILE_CONSTS_H_caselist
+		maIOCtl_case(maFileOpen)
+		maIOCtl_case(maFileExists)
+		maIOCtl_case(maFileClose)
+		maIOCtl_case(maFileCreate)
+		maIOCtl_case(maFileDelete)
+		maIOCtl_case(maFileSize)
+		maIOCtl_case(maFileAvailableSpace)
+		maIOCtl_case(maFileTotalSpace)
+		maIOCtl_case(maFileDate)
+		maIOCtl_case(maFileRename)
+		maIOCtl_case(maFileTruncate)
+		maIOCtl_case(maFileWrite)
+		maIOCtl_case(maFileWriteFromData)
+		maIOCtl_case(maFileRead)
+		maIOCtl_case(maFileReadToData)
+		maIOCtl_case(maFileTell)
+		maIOCtl_case(maFileSeek)
+		maIOCtl_case(maFileListStart)
+		maIOCtl_case(maFileListNext)
+		maIOCtl_case(maFileListClose)
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI

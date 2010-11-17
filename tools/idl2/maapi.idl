@@ -2045,21 +2045,6 @@ interface MAAPI {
 		*/
 		int maPlatformRequest(in MAString url);
 
-#if IX_FILE
-		/*
-		* Stores the name of a root file system in \a nameBuf.
-		* Call this function repeatedly with increasing values for \a index
-		* to enumerate all file systems. Every file system name ends with a slash ('/').
-		*
-		* The buffer may be too small to contain the name; in that case, the buffer will not be filled
-		* and you should create a bigger buffer and call this function again.
-		* You may call this function with bufSize 0 to simply retrieve the length of the name.
-		*
-		* \returns If the file system exists, the length of the name. 0 otherwise.
-		* \< 0 on error.
-		*/
-		//int maFileSystem(in int index, out MAString nameBuf, in int bufSize);
-
 		constset int MA_ACCESS_ {
 			READ = 1;
 			READ_WRITE = 3;
@@ -2284,7 +2269,6 @@ interface MAAPI {
 		//isDir()
 		//getName()
 		//getPath()
-#endif	//IX_FILE
 
 		/**
 		* Sends a text SMS. Since this may cost money for the user,
