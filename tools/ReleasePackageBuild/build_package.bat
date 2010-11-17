@@ -362,6 +362,14 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo demangle
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\intlibs\demangle
+@vcbuild demangle.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo stabs
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\stabs
