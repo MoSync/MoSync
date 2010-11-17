@@ -48,7 +48,8 @@ namespace MAUI {
 		mImageWidth = EXTENT_X(imgSize);
 		mImageHeight = EXTENT_Y(imgSize);
 		if(mAutoSizeX) this->setWidth(EXTENT_X(imgSize));
-		if(mAutoSizeY) this->setHeight(EXTENT_Y(imgSize));
+		if(mAutoSizeY) this->setHeight(EXTENT_Y(imgSize));		
+		requestRepaint();
 	}
 
 	MAHandle Image::getResource() const {
