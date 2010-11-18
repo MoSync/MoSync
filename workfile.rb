@@ -66,8 +66,11 @@ target :default => :base do
 	Work.invoke_subdirs(MAIN_DIRS)
 end
 
-target :all => :default do
+target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
+end
+
+target :all => :examples do
 end
 
 target :noidl => skins do
@@ -78,10 +81,6 @@ end
 
 target :more => :base do
 	Work.invoke_subdirs(MORE_DIRS)
-end
-
-target :examples => :base do
-	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :newlib => :base do
@@ -100,6 +99,13 @@ target :clean do
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
 	Work.invoke_subdirs(ALL_DIRS, "clean")
+end
+
+target :all_configs do
+	sh 'ruby workfile.rb all'
+	sh 'ruby workfile.rb all CONFIG=""'
+	sh 'ruby workfile.rb all USE_NEWLIB=""'
+	sh 'ruby workfile.rb all USE_NEWLIB="" CONFIG=""'
 end
 
 Targets.invoke
