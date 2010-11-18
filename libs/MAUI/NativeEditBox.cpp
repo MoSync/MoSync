@@ -15,11 +15,15 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		setCaption(str);
 		MAUI_LOG("%S", mString);
 		requestRepaint();
+		/*
 		if(mListener != NULL) {
 			mListener->nativeEditFinished();
 		}
+		*/		
+		ListenerSet_fire(NativeEditBoxListener, mEditBoxListeners, nativeEditFinished(this, mCaption));
+		
 	}
-	mListener = NULL;
+	//mListener = NULL;
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
@@ -28,7 +32,8 @@ NativeEditBox::NativeEditBox(int x, int y, int width, int height, int maxSize, i
 Label(x, y, width, height, initialText),
 mTitleString(titleString),
 mString(NULL),
-mOptions(options)
+mOptions(options),
+mEditBoxListeners(false)
 {
 	setMaxSize(maxSize);
 	setCaption(initialText);
@@ -44,8 +49,18 @@ void NativeEditBox::setOptions(int options) {
 }
 
 void NativeEditBox::setMaxSize(int size) {
-	if(mString) delete mString;
+	if(size == 0) maPanic(1, "NativeEditBox: Invalid max size!!");
+	wchar_t *oldString = mString;
 	mString = new wchar_t[size];
+
+	if(oldString)  
+	{
+		int minSize = (mMaxSize<size)?mMaxSize:size;
+		memcpy(mString, oldString, minSize);
+		mString[size-1] = 0;
+		delete oldString;
+	}
+	
 	mMaxSize = size;
 }
 
@@ -67,8 +82,7 @@ bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
 	return false;
 }
 
-void NativeEditBox::activate(NativeEditBoxListener* listener) {
-	mListener = listener;
+void NativeEditBox::activate() {
 	wsprintf(mString, L"%s", mCaption.c_str());
 	int res = maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString,
 		(wchar*)mString, mMaxSize, mOptions);
@@ -90,6 +104,15 @@ void NativeEditBox::setCaption(const String& caption) {
 		setMaxSize(caption.length()+1);
 	}
 	Label::setCaption(caption);
+}
+
+
+void NativeEditBox::addNativeEditBoxListener(NativeEditBoxListener* wl) {
+	mEditBoxListeners.add(wl);
+}
+
+void NativeEditBox::removeNativeEditBoxListener(NativeEditBoxListener* wl) {
+	mEditBoxListeners.remove(wl);
 }
 
 } // namespace MAUI

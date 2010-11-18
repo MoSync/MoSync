@@ -513,12 +513,12 @@ namespace MAUI {
 	}
 
 	bool Widget::pointerPressed(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerPressed! %x", this);
+		MAUI_LOG("Widget::pointerPressed! %x", (int)this);
 		return mFocusable;
 	}
 
 	bool Widget::pointerMoved(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerMoved! %x", this);
+		MAUI_LOG("Widget::pointerMoved! %x", (int)this);
 		if(mFocusable) {
 			return mBounds.contains(p.x, p.y);
 		}
@@ -526,7 +526,7 @@ namespace MAUI {
 	}
 
 	bool Widget::pointerReleased(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerReleased! %x", this);
+		MAUI_LOG("Widget::pointerReleased! %x", (int)this);
 		return false;
 	}
 
