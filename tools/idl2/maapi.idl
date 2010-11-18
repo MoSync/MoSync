@@ -1258,6 +1258,16 @@ interface MAAPI {
 		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
 		*/
 		TEXTBOX = 23;
+
+		/** \brief The phone's home screen just became visible.
+		* \see maHomeScreenEventsOn()
+		*/
+		HOMESCREEN_SHOWN = 24;
+
+		/** \brief The phone's home screen was just hidden.
+		* \see maHomeScreenEventsOn()
+		*/
+		HOMESCREEN_HIDDEN = 25;
 	}
 
 	/**
@@ -3038,6 +3048,47 @@ interface MAAPI {
 			/// the initial letter of each sentence should be capitalized.
 			INITIAL_CAPS_SENTENCE = 0x20000;
 		}
+
+		/**
+		* Set the background image of the phone's home screen.
+		* @param data Image data in JPEG format. PNG and GIF may also be supported.
+		* @return \< 0 on error.
+		* TODO: Do we need to add an image type parameter so that the underlying
+		* system can recognize the image format?
+		*/
+		int maWallpaperSet(in MAHandle data);
+
+		/**
+		* Make MoSync send key-events for the specified key, even when
+		* the application does not have focus.
+		* Can only capture one key at a time.
+		* @param keyCode The \link #MAK_UNKNOWN MAK \endlink code for the key to capture.
+		* @return \< 0 on error.
+		* \see maKeyCaptureStop()
+		*/
+		int maKeyCaptureStart(in int keyCode);
+
+		/**
+		* Stops any key capture in progress.
+		* @returns \< 0 on error.
+		* \see maKeyCaptureStart()
+		*/
+		int maKeyCaptureStop();
+
+		/**
+		* Turn on sending of HomeScreen events. Off by default.
+		* @return \< 0 on error.
+		* \see #EVENT_TYPE_HOMESCREEN_SHOWN
+		* \see #EVENT_TYPE_HOMESCREEN_HIDDEN
+		* \see maHomeScreenEventsOff()
+		*/
+		int maHomeScreenEventsOn();
+
+		/**
+		* Turn off sending of HomeScreen events. Off by default.
+		* @return \< 0 on error.
+		*/
+		int maHomeScreenEventsOff();
 	}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
