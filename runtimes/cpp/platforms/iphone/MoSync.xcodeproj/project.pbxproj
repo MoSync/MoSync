@@ -35,7 +35,6 @@
 		85BF2B47113404E000BB0201 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
 		85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
 		85BF2B5F1134052300BB0201 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
-		85BF2B601134052300BB0201 /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4C1134052300BB0201 /* Graphics.cpp */; };
 		85BF2B611134052300BB0201 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
 		85BF2B621134052300BB0201 /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
 		85BF2B631134052300BB0201 /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
@@ -65,7 +64,6 @@
 		85F2552211AC12DE00EB47EE /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
 		85F2552311AC12DE00EB47EE /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
 		85F2552411AC12DE00EB47EE /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
-		85F2552511AC12DE00EB47EE /* Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4C1134052300BB0201 /* Graphics.cpp */; };
 		85F2552611AC12DE00EB47EE /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4E1134052300BB0201 /* Image.cpp */; };
 		85F2552711AC12DE00EB47EE /* MemStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B501134052300BB0201 /* MemStream.cpp */; };
 		85F2552811AC12DE00EB47EE /* networking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B521134052300BB0201 /* networking.cpp */; };
@@ -168,8 +166,6 @@
 		85BF2B491134052300BB0201 /* base_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = base_errors.h; path = ../../base/base_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B4A1134052300BB0201 /* FileStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileStream.cpp; path = ../../base/FileStream.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B4B1134052300BB0201 /* FileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FileStream.h; path = ../../base/FileStream.h; sourceTree = SOURCE_ROOT; };
-		85BF2B4C1134052300BB0201 /* Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Graphics.cpp; path = ../../base/Graphics.cpp; sourceTree = SOURCE_ROOT; };
-		85BF2B4D1134052300BB0201 /* Graphics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Graphics.h; path = ../../base/Graphics.h; sourceTree = SOURCE_ROOT; };
 		85BF2B4E1134052300BB0201 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Image.cpp; path = ../../base/Image.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B4F1134052300BB0201 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Image.h; path = ../../base/Image.h; sourceTree = SOURCE_ROOT; };
 		85BF2B501134052300BB0201 /* MemStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MemStream.cpp; path = ../../base/MemStream.cpp; sourceTree = SOURCE_ROOT; };
@@ -394,8 +390,6 @@
 				85BF2B491134052300BB0201 /* base_errors.h */,
 				85BF2B4A1134052300BB0201 /* FileStream.cpp */,
 				85BF2B4B1134052300BB0201 /* FileStream.h */,
-				85BF2B4C1134052300BB0201 /* Graphics.cpp */,
-				85BF2B4D1134052300BB0201 /* Graphics.h */,
 				85BF2B4E1134052300BB0201 /* Image.cpp */,
 				85BF2B4F1134052300BB0201 /* Image.h */,
 				85BF2B501134052300BB0201 /* MemStream.cpp */,
@@ -567,7 +561,6 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "MoSync" */;
 			compatibilityVersion = "Xcode 3.1";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -625,7 +618,6 @@
 				85BF2B47113404E000BB0201 /* net.cpp in Sources */,
 				85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */,
 				85BF2B5F1134052300BB0201 /* FileStream.cpp in Sources */,
-				85BF2B601134052300BB0201 /* Graphics.cpp in Sources */,
 				85BF2B611134052300BB0201 /* Image.cpp in Sources */,
 				85BF2B621134052300BB0201 /* MemStream.cpp in Sources */,
 				85BF2B631134052300BB0201 /* networking.cpp in Sources */,
@@ -665,7 +657,6 @@
 				85F2552211AC12DE00EB47EE /* net.cpp in Sources */,
 				85F2552311AC12DE00EB47EE /* base_errors.cpp in Sources */,
 				85F2552411AC12DE00EB47EE /* FileStream.cpp in Sources */,
-				85F2552511AC12DE00EB47EE /* Graphics.cpp in Sources */,
 				85F2552611AC12DE00EB47EE /* Image.cpp in Sources */,
 				85F2552711AC12DE00EB47EE /* MemStream.cpp in Sources */,
 				85F2552811AC12DE00EB47EE /* networking.cpp in Sources */,
