@@ -130,7 +130,11 @@ namespace MAUtil {
 		virtual void focusLost() = 0;
 		virtual void focusGained() = 0;
 	};
-	
+
+	/**
+	* \brief A listener for custom events.
+	* \see Environment::addCustomEventListener()
+	*/		
 	/**
 	* \brief A listener for custom events.
 	* \see Environment::addCustomEventListener()

@@ -31,6 +31,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/helpers.h>
 #include <helpers/intutil.h>
 
+#include <demangle/demangle.h>
+
 #include "sld.h"
 
 #define BUFSIZE 1024
@@ -323,35 +325,12 @@ bool loadSLD(const char* filename) {
 		}
 	}
 
-	//demangle function names, all at once
-	std::string mangledNames;
-	std::string demangledNames;
-	std::string mosyncDir = getenv("MOSYNCDIR");
-
 	for(FuncMapAddr::iterator itr = sFuncMapAddr.begin(); itr != sFuncMapAddr.end(); itr++) {
-		(*itr)->mangledName = (*itr)->name;
-		mangledNames += (*itr)->name;
-		mangledNames += "\n";
-	}
-
-	LOG("c++filt dir: %s\n", (mosyncDir + "/bin/c++filt").c_str());
-	int res = execDoublePipe((mosyncDir + "/bin/c++filt").c_str(), mangledNames, demangledNames);
-	if(res != 0) {
-		LOG("Error calling c++filt: %i\n", res);
-		FAIL;
-	}
-	//parse demangled names
-	size_t pos = 0;
-	for(FuncMapAddr::iterator itr = sFuncMapAddr.begin(); itr != sFuncMapAddr.end(); itr++) {
-		size_t nextEOL = demangledNames.find('\n', pos);
-		DEBUG_ASSERT(nextEOL != std::string::npos);
-#ifdef WIN32
-#define EXTRA_EOL 1
-#else
-#define EXTRA_EOL 0
-#endif
-		(*itr)->name = demangledNames.substr(pos, nextEOL - (pos + EXTRA_EOL)).c_str();
-		pos = nextEOL + 1;
+		const char *mangledName = cplus_demangle_v3((*itr)->name.c_str(), DMGL_PARAMS);
+		/* Only update names that we could mangle */
+		if(mangledName != NULL) {
+			(*itr)->name = mangledName;
+		}
 	}
 	return true;
 }

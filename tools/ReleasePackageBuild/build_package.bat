@@ -126,21 +126,6 @@ cd %ORIGINAL_PATH%
 
 @echo.
 @echo ------------------------------------------------
-@echo Building runtimes.
-@echo BE PATIENT! This takes a while!
-@echo ------------------------------------------------
-
-REM @cd %MOSYNC_TRUNK%\tools\profileConverter
-REM @mkdir %MOSYNC_PROFILES_PATH%
-REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
-REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-
-@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
-@call ruby buildRuntimes.rb
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-
-@echo.
-@echo ------------------------------------------------
 @echo Copying MoSync bin.
 @echo ------------------------------------------------
 @xcopy %ORIGINAL_PATH%\build_package_tools\mosync_bin %MOSYNC_BIN_PATH% /y /E /D
@@ -358,6 +343,14 @@ Release\idl2.exe
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\windows
 @vcbuild windows.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
+@echo demangle
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\intlibs\demangle
+@vcbuild demangle.vcproj "Release|Win32"
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
@@ -611,6 +604,20 @@ mkdir %MOSYNC_PATH%\templates
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
+@echo.
+@echo ------------------------------------------------
+@echo Building runtimes.
+@echo BE PATIENT! This takes a while!
+@echo ------------------------------------------------
+
+REM @cd %MOSYNC_TRUNK%\tools\profileConverter
+REM @mkdir %MOSYNC_PROFILES_PATH%
+REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
+@call ruby buildRuntimes.rb
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo ------------------------------------------------
 @echo Making installation package.
