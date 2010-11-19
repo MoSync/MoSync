@@ -570,6 +570,22 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 
 @cd %MOSYNC_RELEASE_BUILD_PATH%
 
+@echo.
+@echo ------------------------------------------------
+@echo Building runtimes.
+@echo BE PATIENT! This takes a while!
+@echo ------------------------------------------------
+
+REM @cd %MOSYNC_TRUNK%\tools\profileConverter
+REM @mkdir %MOSYNC_PROFILES_PATH%
+REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
+@call ruby buildRuntimes.rb
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+
 @echo ------------------------------------------------
 @echo Building PIPE libs
 @echo ------------------------------------------------
@@ -603,21 +619,6 @@ mkdir %MOSYNC_PATH%\templates
 @xcopy %MOSYNC_TRUNK%\templates %MOSYNC_PATH%\templates /E /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
-
-@echo.
-@echo ------------------------------------------------
-@echo Building runtimes.
-@echo BE PATIENT! This takes a while!
-@echo ------------------------------------------------
-
-REM @cd %MOSYNC_TRUNK%\tools\profileConverter
-REM @mkdir %MOSYNC_PROFILES_PATH%
-REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
-REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-
-@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
-@call ruby buildRuntimes.rb
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo ------------------------------------------------
 @echo Making installation package.
