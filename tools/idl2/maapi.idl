@@ -3051,10 +3051,8 @@ interface MAAPI {
 
 		/**
 		* Set the background image of the phone's home screen.
-		* @param data Image data in JPEG format. PNG and GIF may also be supported.
+		* @param data Image data in JPEG or PNG format.
 		* @return \< 0 on error.
-		* TODO: Do we need to add an image type parameter so that the underlying
-		* system can recognize the image format?
 		*/
 		int maWallpaperSet(in MAHandle data);
 
