@@ -69,6 +69,8 @@ public class MoSync extends Activity
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
 		mMoSyncView = null;
 		
 		try
