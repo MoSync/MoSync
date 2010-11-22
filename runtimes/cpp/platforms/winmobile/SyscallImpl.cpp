@@ -2518,6 +2518,8 @@ DWORD GetScreenOrientation()
 	HANDLE gpsProviderEvent = NULL;
 	HANDLE gpsDevice = NULL;
 
+#define fixDoubleEndian(x) (x)
+	/*
 	double fixDoubleEndian(double d) {
 		int *dd = (int*)&d;
 		int temp = (*(dd+1));
@@ -2525,27 +2527,40 @@ DWORD GetScreenOrientation()
 		*dd = temp;
 		return *((double*)dd);
 	}
+	*/
 
 	void locCallback() {
-		byte *posData = new byte[MAX(sizeof(GPS_POSITION), 376)];
-		GPS_POSITION &pos = *(GPS_POSITION*)posData;
-		pos.dwVersion = GPS_VERSION_1;
-		pos.dwSize = sizeof(pos); // 376
+		//int posDataSize = MAX(sizeof(GPS_POSITION), 376);
+		//byte *posData = new byte[posDataSize];			
+		byte posData[MAX(sizeof(GPS_POSITION), 376)];
+		//byte posData[sizeof(GPS_POSITION)];
+		int posDataSize = sizeof(posData);
+		GPS_POSITION *pos = (GPS_POSITION*)posData;
+		memset(posData, 0, posDataSize);
+		pos->dwVersion = GPS_VERSION_1;
+		pos->dwSize = posDataSize; // 376
 
-		MALocation posEventData;
+		MALocation posEventData = {0};
 		MAEvent posEvent;
 		posEvent.type = EVENT_TYPE_LOCATION;
 
 retry:
-		if(GPSGetPosition(gpsDevice, &pos, INFINITE, 0) == ERROR_SUCCESS) {
-			if(pos.dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE|GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION|GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)) {
-				posEventData.lat = fixDoubleEndian(pos.dblLatitude);
-				posEventData.lon = fixDoubleEndian(pos.dblLongitude);
-				posEventData.horzAcc = fixDoubleEndian(pos.flHorizontalDilutionOfPrecision);
-				posEventData.vertAcc = fixDoubleEndian(pos.flVerticalDilutionOfPrecision);
-				posEventData.alt = pos.flAltitudeWRTEllipsoid;
+		if(GPSGetPosition(gpsDevice, pos, 1000, 0) == ERROR_SUCCESS) {
+			if(pos->dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE)) 
+			{
+				posEventData.lat = fixDoubleEndian(pos->dblLatitude);
+				posEventData.lon = fixDoubleEndian(pos->dblLongitude);
 				
-				if(pos.FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
+				if(pos->dwValidFields&GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION)
+					posEventData.horzAcc = fixDoubleEndian(pos->flHorizontalDilutionOfPrecision);
+
+				if(pos->dwValidFields&GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)
+					posEventData.vertAcc = fixDoubleEndian(pos->flVerticalDilutionOfPrecision);
+
+				if(pos->dwValidFields&GPS_VALID_ALTITUDE_WRT_ELLIPSOID)
+					posEventData.alt = pos->flAltitudeWRTEllipsoid;
+				
+				if(pos->FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
 					posEventData.state = MA_LOC_UNQUALIFIED;
 				} else {
 					posEventData.state = MA_LOC_QUALIFIED;
@@ -2554,8 +2569,8 @@ retry:
 				posEventData.state = MA_LOC_INVALID;
 			}
 		} else {
-			if(pos.dwSize != 376) {
-				pos.dwSize = 376; 
+			if(pos->dwSize != 376) {
+				pos->dwSize = 376; 
 				goto retry;
 			}
 			posEventData.state = MA_LOC_INVALID;
@@ -2567,7 +2582,7 @@ retry:
 
 		gEventFifo.put(posEvent);
 
-		delete posData;
+		//delete posData;
 	}
 
 	void lpsCallback() {
@@ -2589,9 +2604,46 @@ retry:
 		gEventFifo.put(lpsEvent);
 	}
 
+	BOOL hasGPS ()
+	{
+		HKEY hkey;
+		TCHAR driver[256];
+
+		if ( RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\GPS Intermediate Driver\\Drivers"), 0, 0, &hkey) == ERROR_SUCCESS )
+		{
+			DWORD strLength;
+			DWORD type = REG_SZ;
+			strLength = sizeof( driver );
+
+			LONG result = RegQueryValueEx( hkey, _T("CurrentDriver"), NULL, &type, (PBYTE)&driver, &strLength );
+			RegCloseKey(hkey);
+
+			if ( (result != ERROR_SUCCESS) || (strLength == 0) )
+			{
+				// No GPS is registered.
+				return FALSE;
+			}
+			else
+			{
+				// A GPS is available.
+				return TRUE;
+			}
+		}
+		else 
+		{
+			// No GPS available
+			return FALSE;
+		}
+	}
+
+
+
 	int maLocationStart() {
 		if(gpsDevice != NULL)
 			return 0;
+
+		if(hasGPS() == FALSE) 
+			return MA_LPS_OUT_OF_SERVICE;
 
 		if((gpsEvent = CreateEvent(NULL, FALSE, FALSE, L"GPSEVENT")) == NULL) {
 			return MA_LPS_OUT_OF_SERVICE;
