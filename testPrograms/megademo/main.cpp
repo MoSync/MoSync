@@ -27,6 +27,12 @@ public:
 			maPanic(res, "Couldn't load pcx!");
 		}
 
+		for(int y = 0; y < pcxImage.GetHeight(); y++) {
+			for(int x = 0; x < pcxImage.GetWidth(); x++) {
+				pcxImage.GetImg()[x+y*pcxImage.GetWidth()] >>= 2;
+			}
+		}
+
 		for(int i = 0; i < 10; i++) {
 			MetaBall metaBall;
 			metaBall.x = rand()%surf->w;
@@ -40,9 +46,8 @@ public:
 
 		for(int i = 0; i < 256; i++) {
 			double angle = i*f*3.14159/256.0;
-			double func = (cos(angle));
+			double func = (double)i/32.0; //(cos(angle));
 			func *= func;
-			func *= func*func;
 			int color = (int)(func*255.0);
 			if(color<0) color = 0;
 			if(color>255) color = 255;
@@ -62,15 +67,17 @@ public:
 	void render(Surface* surf, float time) {
 		int index = 0;
 
-		updatePalette(time*0.1);
+		double f = time * 0.1;
+		if(f>2.0) f = 2.0;
+		updatePalette(f);
 
 		Surface image = {pcxImage.GetWidth(), pcxImage.GetHeight(), pcxImage.GetImg()};
 
 		memset(surf->pixels, 0, surf->w*surf->h);
 
 		for(int i = 0; i < metaBalls.size(); i++) {
-			double x = (surf->w/2.0) + cos(time*1.14 + i*0.8)*surf->w/2.0;
-			double y = (surf->h/2.0) + sin(time*1.02 + i*1.4)*surf->h/2.0;
+			double x = (surf->w/2.0) + cos(f*time*0.54 + i*0.8)*surf->w/2.0;
+			double y = (surf->h/2.0) + sin(f*time*0.42 + i*1.4)*surf->h/2.0;
 
 			surf->blit(&image, (int)x, (int)y, BLIT_ADD);
 		//	drawMetaBall(surf, surf->w/2, surf->h/2);
