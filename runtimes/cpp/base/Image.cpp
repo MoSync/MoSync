@@ -244,14 +244,22 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 			if(this->data == NULL) if(this->data == 0) return;
 			memcpy(this->data, data, pitch*height);		
 			if(alpha) {
-				this->alpha = new unsigned char[width*height];
+				int apitch = (pitch/bytesPerPixel);
+				this->alpha = new unsigned char[apitch*height];
 				if(this->alpha == NULL)
 				{
 					delete this->data;
 					this->data = NULL;
 					return;
 				}
-				memcpy(this->alpha, alpha, width*height);
+//				memcpy(this->alpha, alpha, (pitch/bytesPerPixel)*height);
+				unsigned char *adst = this->alpha;
+				unsigned char *asrc = alpha;
+				for(int j = 0; j < height; j++) {
+					memcpy(adst, asrc, width);
+					adst+=apitch;
+					asrc+=width;
+				}
 			}
 		} else {
 			this->data = data;
@@ -310,8 +318,8 @@ Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
 	alpha(NULL)
 {
 	if(height>65536 || pitch>65536) return;
-	init(NULL, NULL, false);
 	calculateConstants();
+	init(NULL, NULL, false);
 }
 
 Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch, PixelFormat pixelFormat, bool makeCopy, bool shouldFreeData) :
@@ -324,8 +332,8 @@ Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, i
 	alpha(NULL)
 {
 	if(height>65536 || pitch>65536) return;
-	init(data, alpha, makeCopy);
 	calculateConstants();
+	init(data, alpha, makeCopy);
 }
 	
 Image::~Image() {
@@ -518,7 +526,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 				case 2:
 					{
 						srcPitchX>>=1;
-						unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->width)];
+						unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>1)];
 						unsigned char *ascan;
 						unsigned short *src_scan;
 						unsigned short *dst_scan;
@@ -562,7 +570,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 							}
 							src += srcPitchY;
 							dst += pitch;
-							salpha += imgWidth;
+							salpha += srcPitchY>>1;
 						}	
 					}
 					break;
