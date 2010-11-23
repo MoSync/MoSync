@@ -32,6 +32,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Syscall.h"
 
 #include <helpers/CPP_IX_GUIDO.h>
+//#include <helpers/CPP_IX_ACCELEROMETER.h>
+
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -273,7 +275,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
+		//CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
 		gDrawTarget->mImageDrawer->drawFilledRect(left, top, width, height, realColor);
 	}
 
@@ -749,7 +751,7 @@ namespace Base {
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
 
-		CGBitmapInfo bInfo = CGImageGetBitmapInfo(gBackbuffer->image);
+		//CGBitmapInfo bInfo = CGImageGetBitmapInfo(gBackbuffer->image);
 		
 		info->redMask = 0x00ff0000;
 		info->greenMask = 0x0000ff00;
@@ -805,6 +807,16 @@ namespace Base {
 		return 0;
 	}
 	
+	int maAccelerometerStart() {
+		MoSync_StartUpdatingAccelerometer();
+		return 0;
+	}
+	
+	int maAccelerometerStop() {
+		MoSync_StopUpdatingAccelerometer();
+		return 0;
+	}	
+	
 	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
 		return 0;
@@ -858,6 +870,10 @@ namespace Base {
 		maIOCtl_syscall_case(maFileSize);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
+
+//		maIOCtl_case(maAccelerometerStart);
+//		maIOCtl_case(maAccelerometerStop);
+
 		}
 		
 		return IOCTL_UNAVAILABLE;
@@ -897,7 +913,8 @@ void MoSyncErrorExit(int errorCode)
 {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
-	char* ptr = buffer + sprintf(buffer, "MoSync Panic\np%i.", errorCode);
+	//char* ptr = buffer + 
+	sprintf(buffer, "MoSync Panic\np%i.", errorCode);
 #if 0
 	if(gCore) {
 #ifdef PUBLIC_DEBUG

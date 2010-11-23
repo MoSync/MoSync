@@ -200,6 +200,14 @@ void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
 }
 
+void MoSync_StartUpdatingAccelerometer() {
+	[sMoSyncView startUpdatingAccelerometer];
+}
+
+void MoSync_StopUpdatingAccelerometer() {
+	[sMoSyncView stopUpdatingAccelerometer];
+}
+
 void MoSync_AddTouchPressedEvent(int x, int y) {
 	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
 }

@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncView.h"
 #include "MosyncMain.h"
 
+//#include <helpers/CPP_IX_ACCELEROMETER.h>
+
 //#include "iphone_helpers.h"
 //#include "Platform.h"
 
@@ -113,6 +115,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	[locationController.locationManager stopUpdatingLocation];
 }
 
+/*
+#define kUpdateFrequency 10  // Hz
+-(void) startUpdatingAccelerometer {
+	[[UIAccelerometer sharedAccelerometer] setUpdateInterval:(20.0 / kUpdateFrequency)];
+	[[UIAccelerometer sharedAccelerometer] setDelegate:self];	
+}
+
+-(void) stopUpdatingAccelerometer {
+	[[UIAccelerometer sharedAccelerometer] setDelegate:nil];	
+}
+
+- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
+	MAEvent event;
+	event.type = EVENT_TYPE_ACCELEROMETER;
+	MAAccelerometer* accData = new MAAccelerometer;
+	event.data = accData;
+	
+	accData->roll = acceleration.x;
+	accData->pitch = acceleration.y;
+	accData->yaw = acceleration.z;
+	
+	Base::gEventQueue.put(event);
+}
+ */
+
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
@@ -144,12 +171,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	if(mosyncView == nil) return;
 
     CGContextRef context = UIGraphicsGetCurrentContext();
+	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
 
 	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
 	
-    CGContextDrawImage(context, rect, mosyncView);	
+	CGContextDrawImage(context, rect, mosyncView);	
+		
+	
 	MoSync_DoneUpdatingView();	 
 }
 

@@ -34,6 +34,8 @@ void MoSync_Exit();
 
 void MoSync_StartUpdatingLocation();
 void MoSync_StopUpdatingLocation();
+void MoSync_StartUpdatingAccelerometer();
+void MoSync_StopUpdatingAccelerometer();
 void MoSync_AddTouchPressedEvent(int x, int y);
 void MoSync_AddTouchMovedEvent(int x, int y);
 void MoSync_AddTouchReleasedEvent(int x, int y);

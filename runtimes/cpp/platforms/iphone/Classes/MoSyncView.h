@@ -34,8 +34,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
+-(void) startUpdatingAccelerometer;
+-(void) stopUpdatingAccelerometer;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification;
+- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
 
 @end
 
