@@ -524,6 +524,11 @@ mkdir %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\
 @xcopy %MOSYNC_DOCS_PATH%\html %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\html\ /e /y
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
+@cd %MOSYNC_TRUNK%\tools\doxy2cdt\
+ruby main.rb -b com.mobilesorcery.sdk.help/docs/html/ %MOSYNC_DOCS_PATH%\xml\index.xml %ECLIPSE_TRUNK%\com.mobilesorcery.sdk.help\docs\apireference.xml
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@rd /s /q %MOSYNC_DOCS_PATH%\xml
 
 :BUILD_ECLIPSE
 @echo.
