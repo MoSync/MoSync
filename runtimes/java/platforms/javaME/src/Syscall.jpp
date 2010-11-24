@@ -18,8 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers.h"
 #include "syscall_helpers.h"
 #include "core_helpers.h"
-#include "generated\MAAPI_consts.h"
-#include "generated\IX_RESOURCE_TYPES_CONSTS.h"
+#include "generated/MAAPI_consts.h"
+#include "generated/IX_RESOURCE_TYPES_CONSTS.h"
 
 import javax.microedition.lcdui.*;
 import javax.microedition.media.*;
@@ -40,7 +40,7 @@ import javax.bluetooth.*;
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 import javax.microedition.location.*;
-//#include "generated\IX_LOCATION_CONSTS.h"
+//#include "generated/IX_LOCATION_CONSTS.h"
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
@@ -49,7 +49,7 @@ import javax.microedition.io.file.*;
 
 #ifdef MA_SUPPORT_RECORD
 import javax.microedition.media.control.RecordControl;
-#include "generated\IX_RECORD_CONSTS.h"
+#include "generated/IX_RECORD_CONSTS.h"
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI
@@ -57,11 +57,11 @@ import javax.wireless.messaging.*;
 #endif
 
 #ifdef MA_SUPPORT_STREAMING
-#include "generated\IX_STREAMING_CONSTS.h"
+#include "generated/IX_STREAMING_CONSTS.h"
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
-#include "generated\IX_STREAMING_CONSTS.h"
+#include "generated/IX_STREAMING_CONSTS.h"
 #endif
 
 #ifdef MA_PROF_SUPPORT_CLDC_10
@@ -84,12 +84,12 @@ import javax.microedition.lcdui.Graphics;
 #endif
 
 #ifdef MA_IX_AUDIOBUFFER
-#include "generated\IX_AUDIOBUFFER_CONSTS.h"
+#include "generated/IX_AUDIOBUFFER_CONSTS.h"
 #endif
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 import javax.microedition.pim.*;
-#include "generated\IX_PIM_CONSTS.h"
+#include "generated/IX_PIM_CONSTS.h"
 #endif
 
 #define CORE mCore
