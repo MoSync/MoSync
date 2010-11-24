@@ -33,6 +33,11 @@ import java.util.Locale;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
+#include "generated/MAAPI_consts.h"
+
+//#define SYSLOG(a) Log.i("MoSync SYSLOG", a);
+#define SYSLOG(...)
+
 /**
 * Main MoSync activity
 *
@@ -180,6 +185,11 @@ public class MoSync extends Activity
 		}
 		
 		mMoSyncThread.setMoSyncView(mMoSyncView);
+		
+		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		mMoSyncThread.postEvent(event);
     }
 
 	@Override
@@ -194,6 +204,11 @@ public class MoSync extends Activity
 		{
 			finish();
 		}
+		
+		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_LOST;
+		mMoSyncThread.postEvent(event);
     }
 
 	@Override
