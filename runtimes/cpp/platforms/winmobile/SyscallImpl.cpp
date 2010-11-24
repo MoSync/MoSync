@@ -142,7 +142,6 @@ namespace Base {
 	static void MAUpdateScreen();
 	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam);
 
-	BOOL VibrationStop();
 
 //	void VideoHandleEvent(VideoStream *stream);
 
@@ -203,9 +202,6 @@ namespace Base {
 	HWND g_hwndMain			= NULL;							// MAHandle to the application main window
 	TCHAR g_szTitle[80]		= TEXT ("MoRE"),			// Application main window name
 	g_szClassName[80]		= TEXT ("MoRE class");	// Main window class name
-
-	extern CRITICAL_SECTION vibrationCS;
-	extern UINT_PTR vibrationId;
 
 	// change this to use pairs??
 	typedef void (*WinMobileEventCallback)(void);
@@ -1227,7 +1223,6 @@ DWORD GetScreenOrientation()
 		atexit(MALibQuit);
 
 		InitializeCriticalSection(&exitMutex);
-		InitializeCriticalSection(&vibrationCS);
 
 		MANetworkInit();
 		initNetwork();
@@ -1260,7 +1255,7 @@ DWORD GetScreenOrientation()
 		LOG("MALibQuit\n");
 
 		// make sure it is stopped.
-		VibrationStop();
+		Vibration::stop();
 
 		MANetworkClose();
 		closeNetwork();
@@ -1841,10 +1836,19 @@ DWORD GetScreenOrientation()
 
 	SYSCALL(int, maVibrate(int ms)) 
 	{
-		if(ms==0) {
-			return VibrationStop();
-		} else {
-			return VibrationStart(ms);
+		if(!Vibration::available()) {
+			return 0;
+		}
+		if(ms <= 0) {
+			Vibration::stop();
+			return 1;
+		}
+
+		if(Vibration::onFor(ms)) {
+			return 1;
+		}
+		else {
+			return 0;
 		}
 	}
 
