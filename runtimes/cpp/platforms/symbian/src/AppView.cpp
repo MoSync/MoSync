@@ -71,7 +71,7 @@ CAppView* CAppView::NewLC(CAppUi& aAppUi)
 
 CAppView::CAppView(CAppUi& aAppUi) : iEngine(0), iSyscall(0), iIdle(0), iStopForever(false),
 iReloadHandle(0), iKeys(0), iWait(0), iWaitTimerSequence(0),
-iWaitTimer(0), iCloseTimer(0), iDelayTimer(0), iIdleLoopDelay(0), iAppUi(aAppUi)
+iWaitTimer(0), iCloseTimer(0), iAppUi(aAppUi)
 {
 	LOGD("AV\n");
 }
@@ -108,9 +108,6 @@ void CAppView::ConstructL()
 
 	iWaitTimer = new (ELeave) CWaitTimer(*this);
 	iWaitTimer->ConstructL();
-	
-	iDelayTimer = new (ELeave) CDelayTimer(*this);
-	iDelayTimer->ConstructL();
 
 	iIdle = CIdle::NewL(MyPrioIdle);
 	iIdle->Start(TCallBack(StartStuff, this));
@@ -249,10 +246,6 @@ CAppView::~CAppView()
 		iWaitTimer->Cancel();
 		delete iWaitTimer;
 	}
-	if(iDelayTimer) {
-		iDelayTimer->Cancel();
-		delete iDelayTimer;
-	}
 	if(iIdle) {
 		//iKeepRunning = false; //maybe unneeded
 		delete iIdle;
@@ -389,11 +382,6 @@ TInt CAppView::RunL() {
 		iReloadHandle = 0;
 		MYASSERT(res, ERR_PROGRAM_LOAD_FAILED);
 	}
-	if(iIdleLoopDelay && iKeepRunning) {
-		// timer
-		iDelayTimer->After(iIdleLoopDelay * 1000);
-		return false;
-	}
 	return iKeepRunning;
 }
 
@@ -491,27 +479,6 @@ void CAppView::CCloseTimer::RunL() {
 	writePanicReport(REPORT_TIMEOUT, 0);
 #endif
 	ShowAknErrorNoteThenExitL(KCloseMessage);
-}
-
-//***************************************************************************
-//CDelayTimer
-//***************************************************************************
-
-void CAppView::SetIdleDelay(int ms) {
-	LOGD("setIdleDelay(%i)\n", ms);
-	iIdleLoopDelay = ms;
-}
-
-CAppView::CDelayTimer::CDelayTimer(CAppView& appView) :
-	mAppView(appView)
-{}
-
-void CAppView::CDelayTimer::RunL() {
-	LOGD("CDelayTimer::RunL()\n");
-	if(mAppView.iKeepRunning && mAppView.iIdle) if(!mAppView.iIdle->IsActive()) {
-		LOGD("iIdle->Start\n");
-		mAppView.iIdle->Start(TCallBack(RunIdle, &mAppView));
-	}
 }
 
 //***************************************************************************

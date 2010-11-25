@@ -345,7 +345,7 @@ void Syscall::ConstructL(VMCore* aCore) {
 	gControllerEventMonitor = CMMFControllerEventMonitor::NewL(*this, gController);
 #endif
 	if(!gScreenEngine.IsDrawing())
-		gScreenEngine.StartDrawingL();
+			gScreenEngine.StartDrawingL();
 
 
 	gStartTime = maGetMilliSecondCount();
@@ -2575,14 +2575,12 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 		Smartie<Stream> soundSrc(src->createLimitedCopy(dataLength));
 		MYASSERT(file.writeFully(*soundSrc), ERR_DATA_ACCESS_FAILED);
 	}
-	LOGA("OpenFileL\n");
-	LTRAP(gPlayer->OpenFileL(KFileName, controllerUid));
+	gPlayer->OpenFileL(KFileName, controllerUid);
 #endif	//__SERIES60_3X__
 #endif	//MMF
 
 	gPlaying = true;
 
-	gAppView.SetIdleDelay(1);
 	VM_Yield();
 	return 1;
 }
@@ -2658,13 +2656,12 @@ void Syscall::MoscoStateChangeEvent(CBase* /*aObject*/, TInt aPreviousState,
 	if(aPreviousState == CMdaAudioClipUtility::ENotReady &&
 		aCurrentState == CMdaAudioClipUtility::EOpen)
 	{
-		LTRAP(gPlayer->PlayL());
+		gPlayer->PlayL();
 	}
 	if(aPreviousState == CMdaAudioClipUtility::EPlaying &&
 		aCurrentState != CMdaAudioClipUtility::EPlaying)
 	{
 		gPlaying = false;
-		gAppView.SetIdleDelay(0);
 		//TODO: add_sound_event
 	}
 }
