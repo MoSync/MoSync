@@ -3123,30 +3123,30 @@ interface MAAPI {
 			/// application when selected.
 			APPLICATION_LAUNCHER = 1;
 		}
-		
-		/**
-		 * Set the screen orientation.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION 
-		 * \endlink constants.
-		 * @return \< 0 on error.
-		 */
-		int maScreenSetOrientation(in int orientation);
 
-		constset int SCREEN_ORIENTATION_ {
-			// Landscape screen orientnation.
-			LANDSCAPE = 1;
-			// Portrait screen orientnation.
-			PORTRAIT = 2;
-			// Screen orientation is based on device sensor.
-			DYNAMIC = 3;
-		}
+/**
+ * Set the screen orientation.
+ * @param orientation One of the \link #SCREEN_ORIENTATION 
+ * \endlink constants.
+ * @return \< 0 on error.
+ */
+int maScreenSetOrientation(in int orientation);
 
-		/**
-		 * Enable/disable fullscreen mode.
-		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
-		 * @return \< 0 on error.
-		 */
-		void maScreenSetFullscreen(in int fullscreen);
+constset int SCREEN_ORIENTATION_ {
+	// Landscape screen orientation.
+	LANDSCAPE = 1;
+	// Portrait screen orientation.
+	PORTRAIT = 2;
+	// Screen orientation is based on device sensor.
+	DYNAMIC = 3;
+}
+
+/**
+ * Enable/disable fullscreen mode.
+ * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+ * @return \< 0 on error.
+ */
+void maScreenSetFullscreen(in int fullscreen);
 	}
 	
 	constset int IOCTL_ {
