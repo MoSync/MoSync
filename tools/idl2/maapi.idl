@@ -3087,7 +3087,68 @@ interface MAAPI {
 		* @return \< 0 on error.
 		*/
 		int maHomeScreenEventsOff();
+
+		/**
+		 * Add a notification item.
+		 *
+		 * Note that there can only be one notification of type
+		 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+		 * types may be added in the future. This syscall is available 
+		 * on Android only.
+		 *
+		 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+		 * \endlink constant.
+		 * @param id The id of the notification. The id must be unique within 
+		 * the application.
+		 * @param title Title of the notification.
+		 * @param text String to be displayed as part of the notification.
+		 * @return \< 0 on error or if the syscall is not available on the 
+		 * current platform.
+		 */
+		int maNotificationAdd(
+			in int type, 
+			in int id, 
+			in MAString title, 
+			in MAString text);
+
+		/**
+		 * Remove a notification item.
+		 * @param id The id of the notification.
+		 * @return \< 0 on error.
+		 */
+		int maNotificationRemove(in int id);
+
+		constset int NOTIFICATION_TYPE_ {
+			/// A persistent notification that will launch the 
+			/// application when selected.
+			APPLICATION_LAUNCHER = 1;
+		}
+		
+		/**
+		 * Set the screen orientation.
+		 * @param orientation One of the \link #SCREEN_ORIENTATION 
+		 * \endlink constants.
+		 * @return \< 0 on error.
+		 */
+		int maScreenSetOrientation(in int orientation);
+
+		constset int SCREEN_ORIENTATION_ {
+			// Landscape screen orientnation.
+			LANDSCAPE = 1;
+			// Portrait screen orientnation.
+			PORTRAIT = 2;
+			// Screen orientation is based on device sensor.
+			DYNAMIC = 3;
+		}
+
+		/**
+		 * Enable/disable fullscreen mode.
+		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+		 * @return \< 0 on error.
+		 */
+		void maScreenSetFullscreen(in int fullscreen);
 	}
+	
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}

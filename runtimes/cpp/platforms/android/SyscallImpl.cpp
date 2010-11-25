@@ -1411,9 +1411,11 @@ namespace Base
 			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
 				
 		case maIOCtl_maTextBox:
+		{
 			SYSLOG("maIOCtl_maTextBox");
 			
-			// Send a focus lost event since the application will run in the background during the time the maTextBox is running
+			// Send a focus lost event since the application will run in 
+			// the background during the time the maTextBox is running.
 			MAEvent event;
 			event.type = EVENT_TYPE_FOCUS_LOST;
 			event.data = NULL;
@@ -1426,10 +1428,54 @@ namespace Base
 			int _maxSize = SYSCALL_THIS->GetValidatedStackValue(0);
 			int _constraints = SYSCALL_THIS->GetValidatedStackValue(4);
 			// Allocate memory for the output buffer
-			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange( c, _maxSize * sizeof(char) );
+			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c, 
+				_maxSize * sizeof(char));
 			// Call the actual internal _maTextBox function
-			return _maTextBox(_title, _inText, _outText, _maxSize,  _constraints, (int)gCore->mem_ds, mJNIEnv, mJThis);
+			return _maTextBox(
+				_title, 
+				_inText, 
+				_outText, 
+				_maxSize,
+				_constraints, 
+				(int)gCore->mem_ds, 
+				mJNIEnv, 
+				mJThis);
 		}
+		
+		case maIOCtl_maNotificationAdd:
+			SYSLOG("maIOCtl_maNotificationAdd");
+			return _maNotificationAdd(
+				a, 
+				b, 
+				SYSCALL_THIS->GetValidatedStr(c), 
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(0)), 
+				mJNIEnv, 
+				mJThis);
+		
+		case maIOCtl_maNotificationRemove:
+			SYSLOG("maIOCtl_maNotificationRemove");
+			return _maNotificationRemove(a, mJNIEnv, mJThis);
+		
+		case maIOCtl_maSendToBackground:
+			SYSLOG("maIOCtl_maSendToBackground");
+			// Send EVENT_TYPE_FOCUS_LOST
+			return _maSendToBackground(mJNIEnv, mJThis);
+		
+		case maIOCtl_maBringToForeground:
+			// Not available on Android.
+			return -1;
+		
+		case maIOCtl_maScreenSetOrientation:
+			SYSLOG("maIOCtl_maScreenSetOrientation");
+			return _maScreenSetOrientation(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maScreenSetFullscreen:
+			SYSLOG("maIOCtl_maScreenSetFullscreen");
+			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
+		
+		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;
 	}

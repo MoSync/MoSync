@@ -424,8 +424,15 @@ namespace Base
 	 * @return				Value returned by the maTextBox 
 	 *						java method
 	 */
-	int _maTextBox(const wchar* title, const wchar* inText, int outText,
-				   int maxSize,  int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	int _maTextBox(
+		const wchar* title, 
+		const wchar* inText, 
+		int outText,
+		int maxSize,  
+		int constraints, 
+		int memStart, 
+		JNIEnv* jNIEnv, 
+		jobject jThis)
 	{
 		// Initialization
 		jstring jstrTITLE = (jstring)wchar2jstring(jNIEnv,  title);
@@ -448,5 +455,129 @@ namespace Base
 		jNIEnv->DeleteLocalRef(jstrINTEXT);
 		
 		return (int)ret;
+	}
+	
+	/**
+	 * Add a notification item.
+	 *
+	 * Note that there can only be one notification of type
+	 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+	 * types may be added in the future. This syscall is available 
+	 * on Android only.
+	 *
+	 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+	 * \endlink constant.
+	 * @param id The id of the notification. The id must be unique within 
+	 * the application.
+	 * @param title Title of the notification.
+	 * @param text String to be displayed as part of the notification.
+	 * @return \< 0 on error or if the syscall is not available on the 
+	 * current platform.
+	 */
+	int _maNotificationAdd(
+		int type, 
+		int id, 
+		const char* title, 
+		const char* text, 
+		JNIEnv* jNIEnv, 
+		jobject jThis)
+	{
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrText = jNIEnv->NewStringUTF(text);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maNotificationAdd", 
+			"(IILjava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(
+			jThis, 
+			methodID, 
+			type, 
+			id, 
+			jstrTitle, 
+			jstrText);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrText);
+		
+		return (int)result;
+	}
+
+	/**
+	 * Remove a notification item.
+	 * @param id The id of the notification.
+	 * @return \< 0 on error.
+	 */
+	int _maNotificationRemove(int id, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maNotificationRemove", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, id);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Sends the application to the background, unless it's already there.
+	* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_LOST \endlink event.
+	* \note Only available on multi-tasking operating systems.
+	*/
+	int _maSendToBackground(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maSendToBackground", 
+			"()I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	 * Set the screen orientation.
+	 * @param orientation One of the \link #SCREEN_ORIENTATION 
+	 * \endlink constants.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetOrientation(int orientation, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maScreenSetOrientation", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, orientation);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	 * Enable/disable fullscreen mode.
+	 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetFullscreen(int fullscreen, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maScreenSetFullscreen", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, fullscreen);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
 	}
 }
