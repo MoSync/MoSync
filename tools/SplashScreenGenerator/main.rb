@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+﻿#!/usr/bin/ruby
 # encoding: UTF-8
 
 # the above line, although it looks like a comment, is actually parsed by the Ruby engine to set
@@ -30,7 +30,7 @@ if(SV[0] == '1' && SV[1] == '8')
 	$KCODE = "UTF8"
 end
 
-HEADER_TEXT = 'MoSync mobile development SDK'
+HEADER_TEXT = 'MoSync SDK'
 
 version = ['Developer build', 'Unknown']
 
