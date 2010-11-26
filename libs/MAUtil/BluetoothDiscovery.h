@@ -16,7 +16,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file BluetoothDiscovery.h
-* \brief Environment-based classes for Bluetooth discovery
+* 
+* Environment-based classes for Bluetooth asynchronous device and service discovery.
+* Only one operation may be active at a time.
+
+* When a device or service is found, its information is stored in internal buffers
+* for later retrieval by maBtGetNewDevice() or maBtGetNewService(), then a BT event is generated.
+* A BT event is also generated when the operation is complete.
+
+* A BT event contains the state of the Bluetooth Discovery operation.
+* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
+* 0 while still working and
+* ((number of devices/services found) + 1) when the discovery is complete.
+
+* The reason for the (+1) is to distinguish "still working" from
+* "discovery complete, zero found".
+
+* The buffers are cleared when the respective operation is started, so any devices or services
+* left over in the buffers from an earlier operation will be lost.
+*
 * \author Fredrik Eldh
 */
 
