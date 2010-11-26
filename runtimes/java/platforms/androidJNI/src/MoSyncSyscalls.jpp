@@ -1827,6 +1827,8 @@ int maWallpaperSet(final int data)
 {
 	Log.i("MoSync", "maWallpaperSet");
 	
+	homeScreenPanicIfPermissionsAreNotSet();
+	
 	try 
 	{
 		// Get the data object.
@@ -1855,6 +1857,11 @@ int maWallpaperSet(final int data)
 }
 
 /**
+ * Thread that checks if the hoem screen is visible.
+ */
+HomeScreenDetectionThread mHomeScreenDetectionThread = null;
+
+/**
  * Turn on/off sending of HomeScreen events. Off by default.
  * @param eventsOn 1 = events on, 0 = events off
  */
@@ -1862,13 +1869,190 @@ int maHomeScreenEventsOnOff(final int eventsOn)
 {
 	Log.i("MoSync", "maHomeScreenEventsOnOff");
 	
-	/*
-	TODO: Implement syscall.
+	homeScreenPanicIfPermissionsAreNotSet();
+	
 	// Start home screen event polling thread.
 	if (1 == eventsOn)
 	{
+		// Thread should not be started.
+		if (null != mHomeScreenDetectionThread)
+		{
+			Log.i("MoSyncSyscalls", "maHomeScreenEventsOnOff - thread already running");
+			return -1;
+		}
+		
+		// Create and start thread.
+    	mHomeScreenDetectionThread = new HomeScreenDetectionThread();
+		mHomeScreenDetectionThread.start();
+		
+		return 0;
 	}
-	*/
+	// Stop home screen event polling thread.
+	else if (0 == eventsOn)
+	{
+		mHomeScreenDetectionThread.stopThread();
+		mHomeScreenDetectionThread = null;
+	}
 	
 	return -1;
+}
+
+/**
+ * Check if permissions needed by home screen syscalls are set, 
+ * and if not call maPanic().
+ */
+void homeScreenPanicIfPermissionsAreNotSet()
+{
+	if ((PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.GET_TASKS))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.SET_WALLPAPER))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.SET_WALLPAPER_HINTS))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission("com.android.launcher.permission.INSTALL_SHORTCUT"))
+		)
+	{
+		maPanic(1, "Permission 'Home Screen and Wallpaper access' is not set in the MoSync project");
+	}
+}
+
+class HomeScreenDetectionThread extends Thread
+{
+	/**
+	 * Keep track of whether we are on the home screen or not.
+	 */
+	boolean mIsOnHomeScreen = false;
+
+	/**
+	 * This thread will run as long as this variable is true.
+	 */
+	boolean mIsRunning = false;
+	
+	/**
+	 * Constructor.
+	 */
+	public HomeScreenDetectionThread()
+	{
+	}
+	
+	/**
+	 * Stop the trhead.
+	 */
+	public void stopThread()
+	{
+		mIsRunning = false;
+	}
+	
+	public void run()
+	{
+		//Log.i("MoSyncSyscalls", "HomeScreenDetectionThread run");
+		
+		mIsRunning = true;
+		while (mIsRunning)
+		{
+			try
+			{
+				//Log.i("MoSyncSyscalls", "HomeScreenDetectionThread is alive");
+				
+				boolean isOnHomeScreen = isHomeScreenVisible();
+				
+				// Only post event if the state has changed.
+				if (isOnHomeScreen != mIsOnHomeScreen)
+				{
+					// Update current state.
+					mIsOnHomeScreen = isOnHomeScreen;
+					
+					// Post state change event.
+					int[] event = new int[1];
+					if (mIsOnHomeScreen)
+					{
+						//Log.i("MoSyncSyscalls", "HOMESCREEN IS SHOWN");
+						event[0] = EVENT_TYPE_HOMESCREEN_SHOWN;
+					}
+					else
+					{
+						//Log.i("MoSyncSyscalls", "HOMESCREEN IS HIDDEN");
+						event[0] = EVENT_TYPE_HOMESCREEN_HIDDEN;
+					}
+					postEvent(event);
+				}
+				
+				Thread.sleep(1000);
+			}
+			catch (Exception ex)
+			{
+				Log.e("MoSyncSyscalls", 
+					"HomeScreenDetectionThread exception: " + ex);
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * @return true if the home screen is visible.
+	 */
+    private boolean isHomeScreenVisible()
+    {
+		// We will use the ActivityManager to get info about the top task.
+    	ActivityManager activityManager = (ActivityManager) 
+    		mContext.getSystemService(Context.ACTIVITY_SERVICE);
+    	if (null == activityManager) { return false; }
+    	
+		// Get a list with the top task.
+    	List<RunningTaskInfo> taskList = activityManager.getRunningTasks(1);
+    	if (null == taskList) { return false; }
+    	
+    	// Is the first task in the task list the home screen?
+    	int homeScreenTaskId = getHomeScreenTaskId();
+    	boolean isHomeScreen = homeScreenTaskId == taskList.get(0).id;
+    	
+    	return isHomeScreen;
+    }
+    
+	/**
+	 * @return The id of the home screen task, -1 on error or if not found.
+	 */
+    private int getHomeScreenTaskId()
+    {
+		// Get the ActivityManager.
+    	ActivityManager activityManager = (ActivityManager) 
+    		mContext.getSystemService(Context.ACTIVITY_SERVICE);
+    	if (null == activityManager) { return -1; }
+		
+		// Get a list of recent tasks. This list contains info about 
+		// The tasks so that we can determine which task is the
+		// home screen. 
+    	List<RecentTaskInfo> taskList = activityManager.getRecentTasks(
+    		100,
+    		ActivityManager.RECENT_WITH_EXCLUDED
+    		);
+    	if (null != taskList)
+    	{
+			// Search for the home screen task.
+	    	for (ActivityManager.RecentTaskInfo taskInfo : taskList)
+	    	{
+		    	Intent intent = taskInfo.baseIntent;
+		    	if (null == intent) { break; }
+		
+		    	// Get task categories.
+		    	Set<String> categories = intent.getCategories();
+		    	if (null == categories) { break; }
+		    	
+		    	// If this is a CATEGORY_HOME intent we are on the home screen.
+		    	boolean isHomeScreen  = categories.contains(Intent.CATEGORY_HOME);
+	    		if (isHomeScreen)
+	    		{
+					// We found the id of the home screen task.
+	    			return taskInfo.id;
+	    		}
+	    	}
+    	}
+		
+		// We did not find the id of teh home screen task.
+    	return -1;
+    }
 }

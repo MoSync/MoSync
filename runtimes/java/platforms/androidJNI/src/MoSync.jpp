@@ -211,6 +211,7 @@ public class MoSync extends Activity
 	{
 		if (null != mMoSyncThread && mMoSyncThread.isDead())
 		{
+			MoSyncService.stopService();
 			finish();
 			return true;
 		}

@@ -448,7 +448,7 @@ void btPanicIfBluetoothPermissionsAreNotSet()
 		(PackageManager.PERMISSION_GRANTED != 
 		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.BLUETOOTH_ADMIN)))
 	{
-		maPanic(1, "Bluetooth permission not set");
+		maPanic(1, "Bluetooth permission is not set in the MoSync project");
 	}
 }
 

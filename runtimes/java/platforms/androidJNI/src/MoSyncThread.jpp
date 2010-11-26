@@ -18,6 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RecentTaskInfo;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.app.WallpaperManager;
 
 #ifdef _ANDROID_BLUETOOTH
@@ -100,6 +103,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 
