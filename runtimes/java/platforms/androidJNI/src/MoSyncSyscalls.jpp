@@ -1817,3 +1817,58 @@ void maScreenSetFullscreenHelper(final boolean fullscreenOn)
 		}
 	});
 }
+
+/**
+ * TODO: Make a version of maWallpaperSet for Android 1.5.
+ * Set the background image of the phone's home screen.
+ * @param data Handle to an image object (PNG of JPEG)
+ */
+int maWallpaperSet(final int data)
+{
+	Log.i("MoSync", "maWallpaperSet");
+	
+	try 
+	{
+		// Get the data object.
+		ImageCache image = (ImageCache) mImageResources.get(data);
+		if (image == null) { return -1; }
+		
+		// Get the wallpaper manager.
+		WallpaperManager manager = WallpaperManager.getInstance(mContext);
+		
+		// Set wallpaper dimension to screen size.
+		DisplayMetrics metrics = new DisplayMetrics();
+		((Activity)mContext).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+		manager.suggestDesiredDimensions(metrics.widthPixels, metrics.heightPixels);
+
+		// Set the wallpaper.
+		manager.setBitmap(image.mBitmap);
+		
+		return 0;
+	} 
+	catch (IOException ex) 
+	{
+		ex.printStackTrace();
+	}
+		
+	return -1;
+}
+
+/**
+ * Turn on/off sending of HomeScreen events. Off by default.
+ * @param eventsOn 1 = events on, 0 = events off
+ */
+int maHomeScreenEventsOnOff(final int eventsOn)
+{
+	Log.i("MoSync", "maHomeScreenEventsOnOff");
+	
+	/*
+	TODO: Implement syscall.
+	// Start home screen event polling thread.
+	if (1 == eventsOn)
+	{
+	}
+	*/
+	
+	return -1;
+}

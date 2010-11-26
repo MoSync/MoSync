@@ -580,4 +580,43 @@ namespace Base
 		
 		return (int)result;
 	}
+	
+	/**
+	* Set the background image of the phone's home screen.
+	* @param data Image data in JPEG or PNG format.
+	* @return \< 0 on error.
+	*/
+	int _maWallpaperSet(MAHandle data, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maWallpaperSet", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, data);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Turn on/off sending of HomeScreen events. Off by default.
+	* @param eventsOn 1 = events on, 0 = events off
+	* @return \< 0 on error.
+	*/
+	int _maHomeScreenEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maHomeScreenEventsOnOff", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, eventsOn);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
 }

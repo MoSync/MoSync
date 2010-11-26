@@ -1474,7 +1474,21 @@ namespace Base
 		case maIOCtl_maScreenSetFullscreen:
 			SYSLOG("maIOCtl_maScreenSetFullscreen");
 			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
-		
+			
+		case maIOCtl_maWallpaperSet:
+			SYSLOG("maIOCtl_maWallpaperSet");
+			return _maWallpaperSet(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maHomeScreenEventsOn:
+			SYSLOG("maIOCtl_maHomeScreenEventsOn");
+			// 1 = events on
+			return _maHomeScreenEventsOnOff(1, mJNIEnv, mJThis);
+			
+		case maIOCtl_maHomeScreenEventsOff:
+			SYSLOG("maIOCtl_maHomeScreenEventsOff");
+			// 0 = events off
+			return _maHomeScreenEventsOnOff(0, mJNIEnv, mJThis);
+
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;
