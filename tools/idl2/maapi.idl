@@ -759,7 +759,7 @@ interface MAAPI {
 	* the connect operation failed.
 	*
 	* There is a limit of #CONN_MAX open connection handles at any time, so if you keep
-	* opening connections without closing them, you'll eventually recieve the
+	* opening connections without closing them, you'll eventually receive the
 	* #CONNERR_MAX error code instead of new connection handles.
 	*
 	* Alternatively, this function can be called with one of these url types to
@@ -961,7 +961,7 @@ interface MAAPI {
 	/**
 	* Asynchronously finishes an HTTP connection. This entails making the
 	* underlying TCP connection and sending request headers, unless that has
-	* already been done by a #HTTP_POST write, and recieving the response headers.
+	* already been done by a #HTTP_POST write, and receiving the response headers.
 	*
 	* The result of the operation will be delivered in a CONN event, with
 	* MAConnEventData::opType set to #CONNOP_FINISH.
@@ -1738,7 +1738,7 @@ interface MAAPI {
 			*/
 			int port;
 			/**
-			* Pointer to a buffer that recieves the service's human-readable name.
+			* Pointer to a buffer that receives the service's human-readable name.
 			*/
 			char* name;
 			/**
@@ -1746,7 +1746,7 @@ interface MAAPI {
 			*/
 			int nameBufSize;
 			/**
-			* Pointer to a buffer that recieves the UUIDs associated with the service.
+			* Pointer to a buffer that receives the UUIDs associated with the service.
 			* The buffer must be large enough to contain the number of UUIDs reported
 			* by the last call to maBtGetNextServiceSize().
 			*/
@@ -1832,7 +1832,7 @@ interface MAAPI {
 		* If an operation was canceled, its last BT event will have the state #CONNERR_CANCELED.
 		* This is an asynchronous operation. If this function returns 1,
 		* it is not safe to start another discovery before
-		* you've recieved the #CONNERR_CANCELED event.
+		* you've received the #CONNERR_CANCELED event.
 		* \see maBtStartDeviceDiscovery
 		* \see maBtStartServiceDiscovery
 		* \see EVENT_TYPE_BT
@@ -2340,7 +2340,7 @@ interface MAAPI {
 		/**
 		* Retrieves the current cellular network information
 		* If the phone is offline or otherwise has no signal, this function will fail.
-		* \param pInfo A pointer to a struct which will recieve the information.
+		* \param pInfo A pointer to a struct which will receive the information.
 		* \returns 0 if successful. \< 0 otherwise.
 		*/
 		int maGetCellInfo(out MACellInfo pInfo);
@@ -2378,7 +2378,7 @@ interface MAAPI {
 		* or \< 0 on error, like if the line is not ringing.
 		* Causes CALL events.
 		* \note The line state may change while this function is being called. Therefore,
-		* it may fail even if you haven't recieved a new CALL event.
+		* it may fail even if you haven't received a new CALL event.
 		*/
 		int maCallAnswer();
 
@@ -2451,7 +2451,7 @@ interface MAAPI {
 		/**
 		* Returns the size, in pixels, of the video stream. \<0 if the length cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		MAExtent maStreamVideoSize(in MAHandle stream);
 
@@ -2460,7 +2460,7 @@ interface MAAPI {
 		* The default rectangle is in the top-left corner of the screen,
 		* and has the same size as the source video.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*
 		* If the video is playing when you call this function, the picture frame may go black
 		* for a second while the system reorders itself.
@@ -2478,7 +2478,7 @@ interface MAAPI {
 		/**
 		* Returns the length of the stream, in milliseconds. \<0 if the length cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		int maStreamLength(in MAHandle stream);
 
@@ -2486,7 +2486,7 @@ interface MAAPI {
 		* Returns the current playing time position of the stream, in milliseconds.
 		* Returns \<0 if the position cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		int maStreamPos(in MAHandle stream);
 
@@ -2496,7 +2496,7 @@ interface MAAPI {
 		* For some platform/media combinations, setting the position is not very accurate.
 		* The return value will indicate the actual position set.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*
 		* \param stream A valid stream handle.
 		* \param pos A position, in milliseconds.
