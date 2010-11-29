@@ -10,13 +10,8 @@
 
 using namespace std;
 
-struct ProfileInfo {
-	bool isBlackberry;
-	string iconSize;
-};
-
 static bool parseRuntimeTxt(const char* filename, string& path, string& name);
-static bool parseProfileHeader(const char* filename, ProfileInfo& pi);
+static bool parseProfileHeader(const char* filename, RuntimeInfo& pi);
 
 void package(const SETTINGS& s) {
 	// Read runtime.txt and maprofile.h to find which runtime to use.
@@ -34,7 +29,6 @@ void package(const SETTINGS& s) {
 	toSlashes(headerPath);
 
 	RuntimeInfo ri;
-	ProfileInfo pi;
 
 	// parse files
 	string runtimeName;
@@ -42,17 +36,16 @@ void package(const SETTINGS& s) {
 		printf("runtime.txt parse error\n");
 		exit(1);
 	}
-	if(!parseProfileHeader(headerPath.c_str(), pi)) {
+	if(!parseProfileHeader(headerPath.c_str(), ri)) {
 		printf("maprofile.h parse error\n");
 		exit(1);
 	}
-	ri.iconSize = pi.iconSize;
 	toDir(ri.path);
 
 	// select runtime
 	if(runtimeName == "JavaME") {
-		packageJavaME(s, ri, pi.isBlackberry);
-		if(pi.isBlackberry) {
+		packageJavaME(s, ri);
+		if(ri.isBlackberry) {
 			packageBlackberry(s, ri);
 		}
 	} else if(runtimeName == "s60v2") {
@@ -154,11 +147,12 @@ static bool parseIntProp(const string& line, const char* key, int& value) {
 	return false;
 }
 
-static bool parseProfileHeader(const char* filename, ProfileInfo& pi) {
+static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	ifstream file(filename);
 	if(!file.good())
 		return false;
 	pi.isBlackberry = false;
+	pi.isCldc10 = false;
 	pi.iconSize = "default";
 	int iconX = -1;
 	int iconY = -1;
@@ -167,6 +161,9 @@ static bool parseProfileHeader(const char* filename, ProfileInfo& pi) {
 		getline(file, line);
 		if(line.find("#define MA_PROF_SUPPORT_BLACKBERRY") == 0) {
 			pi.isBlackberry = true;
+		}
+		if(line.find("#define MA_PROF_SUPPORT_CLDC_10") == 0) {
+			pi.isCldc10 = true;
 		}
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_X", iconX);
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);

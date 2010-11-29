@@ -49,6 +49,10 @@ int _rmdir(const char* name);
 inline int _rmdir(const char* name) {
 	return rmdir(name);
 }
+int _chdir(const char* name);
+inline int _chdir(const char* name) {
+	return _chdir(name);
+}
 #else
 #error Unsupported platform
 #endif

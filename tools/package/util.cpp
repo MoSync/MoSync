@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include "util.h"
+#include "filelist/filelist.h"
 
 using namespace std;
 
@@ -47,6 +48,17 @@ void appendFile(const char* dst, const char* src) {
 	ifstream in(src, ios_base::binary);
 	ofstream out(dst, ios_base::binary | ios_base::app);
 	writeCopy(in, out);
+}
+
+size_t getFileSize(const char* filename) {
+	ifstream in(filename, ios_base::binary);
+	beGood(in);
+
+	size_t size;
+	in.seekg(0, ios_base::end);
+	size = in.tellg();
+	beGood(in);
+	return size;
 }
 
 string readFileToString(const char* src) {
@@ -134,4 +146,15 @@ void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 void toDir(std::string& str) {
 	if(str[str.size()-1] != '/')
 		str += '/';
+}
+
+string fullpathString(const char* name) {
+	char* res = fullpath(name);
+	if(!res) {
+		printf("Could not resolve path: '%s'\n", name);
+		exit(1);
+	}
+	string s = res;
+	free(res);
+	return s;
 }

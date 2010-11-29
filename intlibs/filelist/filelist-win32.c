@@ -71,3 +71,7 @@ int isDirectory(const char* filename) {
 		return -1;
 	return (res & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
 }
+
+char* fullpath(const char* name) {
+	return _fullpath(NULL, name, 0);
+}

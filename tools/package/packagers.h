@@ -7,11 +7,13 @@
 struct RuntimeInfo {
 	std::string path;
 	std::string iconSize;
+	bool isBlackberry;
+	bool isCldc10;
 };
 
 // if isBlackberry, then s.dst is ignored, and the files stored in
 // the current working directory.
-void packageJavaME(const SETTINGS&, const RuntimeInfo&, bool isBlackberry);
+void packageJavaME(const SETTINGS&, const RuntimeInfo&);
 
 // reads JAD and JAR from cwd, outputs COD file to s.dst.
 void packageBlackberry(const SETTINGS&, const RuntimeInfo&);

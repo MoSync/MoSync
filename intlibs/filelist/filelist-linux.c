@@ -42,3 +42,7 @@ int isDirectory(const char* filename) {
 		return -1;
 	return S_ISDIR(s.st_mode);
 }
+
+char* fullpath(const char* name) {
+	return canonicalize_file_name(name);
+}
