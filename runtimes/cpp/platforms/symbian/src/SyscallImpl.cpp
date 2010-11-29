@@ -2591,6 +2591,7 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 void Syscall::HandleEvent(const TMMFEvent& aEvent) {
 	LOGA("MMFEvent: 0x%08X %i\n", aEvent.iEventType.iUid, aEvent.iErrorCode);
 	if(aEvent.iEventType == KMMFEventCategoryPlaybackComplete) {
+		gAppView.SetIdleDelay(0);
 		gPlaying = false;
 	}
 }
@@ -2606,6 +2607,7 @@ SYSCALL(void, maSoundStop()) {
 #endif
 	SAFE_DELETE(gPlayer);
 	SAFE_DELETE(gSoundBuffer);
+	gAppView.SetIdleDelay(0);
 	gPlaying = false;
 }
 
