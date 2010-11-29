@@ -21,6 +21,8 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.app.Notification;
+import android.app.NotificationManager;
 
 #ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
 import android.app.WallpaperManager;

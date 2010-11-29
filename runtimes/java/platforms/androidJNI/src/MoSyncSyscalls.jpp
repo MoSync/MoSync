@@ -1680,6 +1680,8 @@ int maNotificationAdd(int type, int id, String title, String text)
 	// This is the only notification type we support at the moment.
 	if (NOTIFICATION_TYPE_APPLICATION_LAUNCHER != type)
 	{
+		// TODO: Implement case for regular notifications.
+		
 		return -1;
 	}
 	
@@ -1693,20 +1695,46 @@ int maNotificationAdd(int type, int id, String title, String text)
 	return 0;
 }
 
-int maNotificationRemove(int id)
+/**
+ * Depending of whether this is a NOTIFICATION_TYPE_APPLICATION_LAUNCHER
+ * or a regular notification we either stop the service or remove the
+ * notification.
+ */
+int maNotificationRemove(int notificationId)
 {
 	Log.i("MoSync", "maNotificationRemove");
 	
 	// Stop the service if this is the service notification id.
-	if (MoSyncService.sNotificationId == id)
+	if (MoSyncService.sNotificationId == notificationId)
 	{
-		// TODO: If api level is below 5, then remove the 
+		// If api level is below 5, then also remove the 
 		// notification manually.
+#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
+		// Nothing special need to be done.
+#else
+		// We are below API level 5. 
+		// Remove the notification we used for the service.
+		maNotificationRemoveHelper(notificationId);
+#endif
+		// Stop the service.
 		MoSyncService.stopService();
 		return 0;
 	}
 	
+	// TODO: Implement case for regular notifications.
+	
 	return -1;
+}
+
+/**
+ * Remove the notification.
+ */
+void maNotificationRemoveHelper(int notificationId)
+{
+	Activity activity = (Activity) mContext;
+	NotificationManager mNotificationManager = (NotificationManager) 
+		activity.getSystemService(Context.NOTIFICATION_SERVICE);
+	mNotificationManager.cancel(notificationId);
 }
 
 int maSendToBackground()
@@ -1829,14 +1857,15 @@ int maWallpaperSet(final int data)
 {
 	Log.i("MoSync", "maWallpaperSet");
 	
-#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
 	homeScreenPanicIfPermissionsAreNotSet();
+	
 	try 
 	{
 		// Get the data object.
 		ImageCache image = (ImageCache) mImageResources.get(data);
 		if (image == null) { return -1; }
 		
+#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
 		// Get the wallpaper manager.
 		WallpaperManager manager = WallpaperManager.getInstance(mContext);
 		
@@ -1847,14 +1876,16 @@ int maWallpaperSet(final int data)
 
 		// Set the wallpaper.
 		manager.setBitmap(image.mBitmap);
-		
+#else
+		((Activity)mContext).setWallpaper(image.mBitmap);
+#endif // _ANDROID_API_LEVEL_5_OR_HIGHER
+
 		return 0;
 	} 
 	catch (IOException ex) 
 	{
 		ex.printStackTrace();
 	}
-#endif // _ANDROID_API_LEVEL_5_OR_HIGHER
 
 	return -1;
 }
