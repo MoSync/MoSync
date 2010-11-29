@@ -2582,7 +2582,9 @@ SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) {
 
 	gPlaying = true;
 
+#if !defined(__SERIES60_3X__)	// 2nd edition
 	gAppView.SetIdleDelay(1);
+#endif
 	VM_Yield();
 	return 1;
 }
