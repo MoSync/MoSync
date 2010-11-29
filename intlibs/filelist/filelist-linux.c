@@ -44,5 +44,5 @@ int isDirectory(const char* filename) {
 }
 
 char* fullpath(const char* name) {
-	return canonicalize_file_name(name);
+	return realpath(name, NULL);
 }
