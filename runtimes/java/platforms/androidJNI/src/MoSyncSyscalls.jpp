@@ -1700,6 +1700,8 @@ int maNotificationRemove(int id)
 	// Stop the service if this is the service notification id.
 	if (MoSyncService.sNotificationId == id)
 	{
+		// TODO: If api level is below 5, then remove the 
+		// notification manually.
 		MoSyncService.stopService();
 		return 0;
 	}
@@ -1827,8 +1829,8 @@ int maWallpaperSet(final int data)
 {
 	Log.i("MoSync", "maWallpaperSet");
 	
+#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
 	homeScreenPanicIfPermissionsAreNotSet();
-	
 	try 
 	{
 		// Get the data object.
@@ -1852,7 +1854,8 @@ int maWallpaperSet(final int data)
 	{
 		ex.printStackTrace();
 	}
-		
+#endif // _ANDROID_API_LEVEL_5_OR_HIGHER
+
 	return -1;
 }
 

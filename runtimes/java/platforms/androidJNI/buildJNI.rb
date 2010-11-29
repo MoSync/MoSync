@@ -70,8 +70,8 @@ if secondarg == nil
 	exit 1
 end
 
-# Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH
-ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg[-1, 1]
+# Store the current android version in the environment variable MOSYNC_ANDROID_API_LEVEL
+ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
 
 debug = (fortharg == nil) ? "" : "D"
 

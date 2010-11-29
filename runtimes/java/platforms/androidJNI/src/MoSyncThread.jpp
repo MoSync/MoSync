@@ -21,7 +21,10 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
 import android.app.ActivityManager.RunningTaskInfo;
+
+#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
 import android.app.WallpaperManager;
+#endif
 
 #ifdef _ANDROID_BLUETOOTH
 import android.bluetooth.*;

@@ -170,7 +170,7 @@ int maConnGetAddr(MAHandle connHandle, int addrPointer) throws Exception
 */
 void maConnClose(MAHandle connHandle) throws Exception 
 {
-	Log.i("MoSyncSyscall", "maConnClose");
+	Log.i("MoSyncSyscall", "maConnClose: " + connHandle);
 	ConnectionObject connObj = networkGetConnectionObject(connHandle);
 	connObj.close();
 	networkRemoveConnectionObject(connObj);
@@ -1383,9 +1383,14 @@ class BluetoothConnectionObject extends ConnectionObject
 	/**
 	 * Initialize the connection object with a prefabricated BluetoothSocket.
 	 */
-	public BluetoothConnectionObject createWithBluetoothSocket(BluetoothSocket socket, MAHandle handle)
-		throws IOException
+	public BluetoothConnectionObject createWithBluetoothSocket(
+		BluetoothSocket socket, 
+		MAHandle handle)
+	throws IOException
 	{
+		Log.i("@@BluetoothConnectionObject", 
+			"createWithBluetoothSocket handle " + handle);
+			
 		mState |= CONNOP_CONNECT;
 		mHandle = handle;
 		setBluetoothSocketAndOpenStreams(socket);
@@ -1403,6 +1408,9 @@ class BluetoothConnectionObject extends ConnectionObject
 	public ConnectionObject create(String url, MAHandle handle)
 		throws MalformedURLException, IOException, Exception
 	{
+		Log.i("@@BluetoothConnectionObject", 
+			"create handle " + handle + " url: " + url);
+		
 		// Set the handle for this connection.
 		mHandle = handle;
 		
@@ -1442,9 +1450,9 @@ class BluetoothConnectionObject extends ConnectionObject
 			throw new MalformedURLException("Malformed URL: " + url);
 		}
 		
-		Log.i("@BluetoothConnectionObject", "mDeviceAddress = " + mDeviceAddress);
-		Log.i("@BluetoothConnectionObject", "mChannel = " + mChannel);
-		Log.i("@BluetoothConnectionObject", "mUUID = " + mUUID);
+		Log.i("@@BluetoothConnectionObject", "mDeviceAddress = " + mDeviceAddress);
+		Log.i("@@BluetoothConnectionObject", "mChannel = " + mChannel);
+		Log.i("@@BluetoothConnectionObject", "mUUID = " + mUUID);
 			
 		return this;
 	}
@@ -1490,6 +1498,8 @@ class BluetoothConnectionObject extends ConnectionObject
 	{
 		super.close();
 		
+		Log.i("@@BluetoothConnectionObject", "close handle: " + mHandle);
+		
 		if (null != mBluetoothSocket)
 		{
 			mBluetoothSocket.close();
@@ -1517,7 +1527,7 @@ class BluetoothConnectionObject extends ConnectionObject
 	@Override
 	public void startConnectThread()
 	{
-		Log.i("@@@ BluetoothConnectionObject", "startConnectThread");
+		Log.i("@@BluetoothConnectionObject", "startConnectThread");
 		
 		mThreadPool.execute(new Runnable()
 		{
@@ -1525,8 +1535,10 @@ class BluetoothConnectionObject extends ConnectionObject
 			{
 				try 
 				{
-					// Make this thread a looper thread if there is no associated looper.
-					// TODO: Do we need to be a looper thread here?
+					// Make this thread a looper thread if there is 
+					// no associated looper.
+					// TODO: Investigate if we really need to use a 
+					// looper thread here?
 					if (null == Looper.myLooper())
 					{
 						Looper.prepare();
@@ -1591,15 +1603,20 @@ class BluetoothConnectionObject extends ConnectionObject
 			}
 			else if (mIsUUIDClientConnectionRequest)
 			{
-				Log.i("@@BluetoothConnectionObject", "mIsUUIDClientConnectionRequest");
+				Log.i("@@BluetoothConnectionObject", 
+					"mIsUUIDClientConnectionRequest");
 				String uuid = btFormatServiceUUID(mUUID);
-				Log.i("@@BluetoothConnectionObject", "Connecting to service uuid: " + uuid);
+				Log.i("@@BluetoothConnectionObject", 
+					"Connecting to service uuid: " + uuid);
 				BluetoothSocket socket = device.createRfcommSocketToServiceRecord(
 					java.util.UUID.fromString(uuid)
 				);
 				if (null == socket)
 				{
-					Log.i("@@BluetoothConnectionObject", "No socket created via createRfcommSocketToServiceRecord");
+					Log.i("@@BluetoothConnectionObject", 
+						"handle: " 
+						+ mHandle 
+						+ " No socket created via createRfcommSocketToServiceRecord");
 					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 					return;
 				}
@@ -1663,6 +1680,9 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	public ConnectionObject create(String url, MAHandle handle)
 		throws MalformedURLException, IOException, Exception
 	{
+		Log.i("@@BluetoothServerConnectionObject", 
+			"create handle : " + handle + " url: " + url);
+		
 		// Set the handle for this connection.
 		mHandle = handle;
 		
@@ -1705,9 +1725,13 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	@Override
 	public void close() throws IOException
 	{
+		Log.i("@@BluetoothServerConnectionObject", 
+			"close handle: " + mHandle);
+		
 		if (null != mBluetoothServerSocket)
 		{
-			// This should also terminate any ongoing accept and terminate its thread.
+			// This should also terminate any ongoing accept 
+			// and terminate its thread.
 			mBluetoothServerSocket.close();
 			mBluetoothServerSocket = null;
 		}
@@ -1721,6 +1745,9 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	{
 		try
 		{
+			Log.i("@@BluetoothServerConnectionObject", 
+				"connect handle: " + mHandle);
+			
 			// Do NOT post a connect event when creating a server with maConnect.
 			// Keeping this comment as a remainder of that.
 			//postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
@@ -1733,7 +1760,7 @@ class BluetoothServerConnectionObject extends ConnectionObject
 				return -1;
 			}
 			
-			// Create server socket. This should be done once.
+			// Create server socket. This should be done only once.
 			// We will get an exception if the channel is already opened.
 			mBluetoothServerSocket = 
 				adapter.listenUsingRfcommWithServiceRecord(
@@ -1759,7 +1786,8 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	@Override
 	public int startAcceptThread()
 	{
-		Log.i("@@@ BluetoothServerConnectionObject", "startAcceptThread");
+		Log.i("@@BluetoothServerConnectionObject", 
+			"startAcceptThread handle: " + mHandle);
 		
 		mThreadPool.execute(new Runnable()
 		{
@@ -1779,7 +1807,8 @@ class BluetoothServerConnectionObject extends ConnectionObject
 				}
 				catch (Exception e)
 				{
-					Log.i("BluetoothServerConnectionObject.startAcceptThread", "Exception: " + e);
+					Log.i("@@BluetoothServerConnectionObject", 
+						"startAcceptThread handle: " + mHandle + " exception: " + e);
 					e.printStackTrace();
 				}
 				finally
@@ -1794,35 +1823,21 @@ class BluetoothServerConnectionObject extends ConnectionObject
 	
 	public void doAccept()
 	{
-		Log.i("@@BluetoothServerConnectionObject", "doAccept");
+		Log.i("@@BluetoothServerConnectionObject", 
+			"doAccept handle: " + mHandle);
 		
 		try
 		{
-			/*
-			BluetoothAdapter adapter = btGetBluetoothAdapter();
-			if (null == adapter)
-			{
-				Log.i("@@BluetoothServerConnectionObject", "Bluetooth adapter not found");
-				postResultEvent(CONNOP_ACCEPT, CONNERR_UNAVAILABLE);
-				return;
-			}
-			
-			// TODO: Should be called only once? Move to connect?
-			// Create server socket.
-			mBluetoothServerSocket = 
-				adapter.listenUsingRfcommWithServiceRecord(
-					mServiceName, 
-					UUID.fromString(btFormatServiceUUID(mUUID)));
-			*/
-			
 			mState |= CONNOP_ACCEPT;
 			
-			Log.i("@@BluetoothServerConnectionObject", "accept (blocking)");
+			Log.i("@@BluetoothServerConnectionObject", 
+				"accept (blocking) handle: " + mHandle);
 			
 			// Accept. Will block. Terminate by calling close on the server socket.
 			BluetoothSocket socket = mBluetoothServerSocket.accept();
 			
-			Log.i("@@BluetoothServerConnectionObject", "doAccept - socket accepted");
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - socket accepted handle: " + mHandle);
 			
 			// TODO: Delete this test code.
 			// Write mock data for testing.
@@ -1839,36 +1854,42 @@ class BluetoothServerConnectionObject extends ConnectionObject
 			// Get new connection handle.
 			MAHandle newConnHandle = networkGetNextConnectionHandle();;
 			
-			Log.i("@@BluetoothServerConnectionObject", "doAccept - create BluetoothConnectionObject");
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - create BluetoothConnectionObject handle: " + mHandle);
 			
 			// Create new connection object.
 			BluetoothConnectionObject connObj = new BluetoothConnectionObject()
 				.createWithBluetoothSocket(socket, newConnHandle);
 			
-			Log.i("@@BluetoothServerConnectionObject", "doAccept - post event");
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - post event handle: " + mHandle);
 			
 			// Post result event on server handle.
 			postResultEvent(CONNOP_ACCEPT, newConnHandle);
 			
-			Log.i("@@BluetoothServerConnectionObject", "doAccept - done");
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - done handle: " + mHandle);
 		}
 		catch (InterruptedIOException e)
 		{
-			Log.i("@@BluetoothServerConnectionObject", "InterruptedIOException " + e);
+			Log.i("@@BluetoothServerConnectionObject", 
+				"handle: " + mHandle + "InterruptedIOException " + e);
 			e.printStackTrace();
 			postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
 			return;
 		}
 		catch (IOException e)
 		{
-			Log.i("@@BluetoothServerConnectionObject", "IOException " + e);
+			Log.i("@@BluetoothServerConnectionObject", 
+				"handle: " + mHandle + " IOException " + e);
 			e.printStackTrace();
 			postResultEvent(CONNOP_ACCEPT, CONNERR_GENERIC);
 			return;
 		}
 		catch (Exception e)
 		{
-			Log.i("@@BluetoothServerConnectionObject", "Exception " + e);
+			Log.i("@@BluetoothServerConnectionObject", 
+				"handle: " + mHandle + " Exception " + e);
 			e.printStackTrace();
 			postResultEvent(CONNOP_ACCEPT, CONNERR_GENERIC);
 			return;
