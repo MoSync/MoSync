@@ -2580,9 +2580,9 @@ void MoSyncErrorExit(int errorCode) {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
 	char repBuf[256];
+#ifdef TRANSLATE_PANICS
 	char* ptr = buffer + sprintf(buffer, "MoSync Panic %i\n\n", errorCode);
 	char* repPtr = repBuf + sprintf(repBuf, "MoSync Panic %i. ", errorCode);
-#ifdef TRANSLATE_PANICS
 	if(!isBaseError(errorCode)) {
 		ptr += sprintf(ptr, "The %s subsystem reports: ", subSystemString(errorCode));
 		repPtr += sprintf(repPtr, "The %s subsystem reports: ", subSystemString(errorCode));
