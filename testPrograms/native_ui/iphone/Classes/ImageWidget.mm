@@ -1,22 +1,18 @@
 //
-//  LabelWidget.mm
+//  ImageWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "LabelWidget.h"
+#import "ImageWidget.h"
 
 
-@implementation LabelWidget
+@implementation ImageWidget
 
 - (id)init {
 	[super init];
-	
-	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] autorelease];
-	label.opaque = NO;
-	view = label;		
 	
 	return self;
 }
@@ -29,13 +25,7 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
-		UILabel* label = (UILabel*) view;
-		[label setText: value];
-	} else {
-		return [super setPropertyWithKey:key toValue:value];
-	}
-	return MA_WIDGET_OK;	
+	return [super setPropertyWithKey:key toValue:value];
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

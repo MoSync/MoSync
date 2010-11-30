@@ -12,6 +12,7 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8565795912A510A700A7D535 /* UIColor-Expanded.m */; };
 		85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */; };
 		85774F1B129FB85700F8BAA2 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F1A129FB85700F8BAA2 /* IWidget.mm */; };
 		85774F26129FBD2000F8BAA2 /* TableViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F25129FBD2000F8BAA2 /* TableViewWidget.mm */; };
@@ -20,6 +21,8 @@
 		85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */; };
 		8577504F129FE91300F8BAA2 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */; };
 		8577516412A00BF600F8BAA2 /* TableViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8577516312A00BF600F8BAA2 /* TableViewCellWidget.mm */; };
+		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
+		8582679712A404550047D42D /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8582679612A404550047D42D /* ImageWidget.mm */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +35,8 @@
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* nativeuitest_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nativeuitest_Prefix.pch; sourceTree = "<group>"; };
+		8565795812A510A700A7D535 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Expanded.h"; sourceTree = "<group>"; };
+		8565795912A510A700A7D535 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Expanded.m"; sourceTree = "<group>"; };
 		85774F15129FB70D00F8BAA2 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
 		85774F19129FB85700F8BAA2 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWidget.h; sourceTree = "<group>"; };
@@ -48,6 +53,10 @@
 		8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ReflectionWidget.mm; sourceTree = "<group>"; };
 		8577516212A00BF600F8BAA2 /* TableViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCellWidget.h; sourceTree = "<group>"; };
 		8577516312A00BF600F8BAA2 /* TableViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TableViewCellWidget.mm; sourceTree = "<group>"; };
+		8582679212A403EF0047D42D /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableViewCell.h; sourceTree = "<group>"; };
+		8582679312A403EF0047D42D /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
+		8582679512A404550047D42D /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageWidget.h; sourceTree = "<group>"; };
+		8582679612A404550047D42D /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageWidget.mm; sourceTree = "<group>"; };
 		858A78B5129E9A50005EACA7 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
@@ -70,6 +79,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8565795812A510A700A7D535 /* UIColor-Expanded.h */,
+				8565795912A510A700A7D535 /* UIColor-Expanded.m */,
 				8577516512A00BFE00F8BAA2 /* Widgets */,
 				1D3623240D0F684500981E51 /* nativeuitestAppDelegate.h */,
 				1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */,
@@ -79,6 +90,8 @@
 				85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */,
 				85775036129FE39600F8BAA2 /* MoSyncUISyscalls.h */,
 				85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */,
+				8582679212A403EF0047D42D /* MoSyncTableViewCell.h */,
+				8582679312A403EF0047D42D /* MoSyncTableViewCell.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -145,6 +158,8 @@
 				85774F4D129FC14E00F8BAA2 /* WindowWidget.mm */,
 				8577504D129FE91300F8BAA2 /* ReflectionWidget.h */,
 				8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */,
+				8582679512A404550047D42D /* ImageWidget.h */,
+				8582679612A404550047D42D /* ImageWidget.mm */,
 			);
 			name = Widgets;
 			sourceTree = "<group>";
@@ -219,6 +234,9 @@
 				85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */,
 				8577504F129FE91300F8BAA2 /* ReflectionWidget.mm in Sources */,
 				8577516412A00BF600F8BAA2 /* TableViewCellWidget.mm in Sources */,
+				8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */,
+				8582679712A404550047D42D /* ImageWidget.mm in Sources */,
+				8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

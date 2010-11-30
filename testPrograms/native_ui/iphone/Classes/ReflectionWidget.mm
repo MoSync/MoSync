@@ -35,10 +35,11 @@
 	Ivar nameVar = class_getInstanceVariable(widgetClass, [key UTF8String]);
 	if(nameVar != nil) {
 		object_setIvar(widgetClass, nameVar, value);
-		return MA_WIDGET_OK;
 	} else {
 		return MA_WIDGET_ERROR;
 	}
+	
+	return MA_WIDGET_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

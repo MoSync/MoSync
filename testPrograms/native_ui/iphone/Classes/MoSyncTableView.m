@@ -21,8 +21,9 @@
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 
 	NSUInteger row = [indexPath row];	
-	UIView* cellContentView = [mDataForMyTable objectAtIndex:row];
+	UIView* cell = [mDataForMyTable objectAtIndex:row];
 
+	/*
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
 	
 	if (cell == nil) {
@@ -31,6 +32,7 @@
 	}
 	
 	[cell.contentView addSubview: cellContentView];
+	*/
 	
 	//cell.backgroundView = cellContentView;
 	//cell.selectedBackgroundView = cellContentView;
