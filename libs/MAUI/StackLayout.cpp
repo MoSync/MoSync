@@ -64,13 +64,13 @@ void StackLayout::rebuild() {
 					x = alignment;
 					break;
 				case SLA_CENTER:
-					x = (mBounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
+					x = (mPaddedBounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
 					break;
 				case SLA_BOTTOM_RIGHT:
-					x = (mBounds.width) - mChildren[i]->getWidth() + alignment;
+					x = (mPaddedBounds.width) - mChildren[i]->getWidth() + alignment;
 					break;
 				case SLA_AUTO_SIZE:
-					mChildren[i]->setWidth(mBounds.width);
+					mChildren[i]->setWidth(mPaddedBounds.width);
 				}
 
 				mChildren[i]->setPosition(x, y);
@@ -94,13 +94,13 @@ void StackLayout::rebuild() {
 					y = alignment;
 					break;
 				case SLA_CENTER:
-					y = (mBounds.height>>1) - (mChildren[i]->getHeight()>>1);
+					y = (mPaddedBounds.height>>1) - (mChildren[i]->getHeight()>>1);
 					break;
 				case SLA_BOTTOM_RIGHT:
-					y = (mBounds.height) - mChildren[i]->getHeight();
+					y = (mPaddedBounds.height) - mChildren[i]->getHeight();
 					break;
 				case SLA_AUTO_SIZE:
-					mChildren[i]->setHeight(mBounds.height);
+					mChildren[i]->setHeight(mPaddedBounds.height);
 					break;
 				}
 				mChildren[i]->setPosition(x, y);

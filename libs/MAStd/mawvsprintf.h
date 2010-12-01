@@ -50,7 +50,7 @@
 extern "C" {
 #endif
 
-#ifndef _STDIO_H
+#if 1 //ndef _STDIO_H
 /** \brief wvsprintf - wide print formatted output
 * \param buf output string
 * \param fmt input format string

@@ -1,8 +1,15 @@
 #include "NativeEditBox.h"
+#ifdef USE_NEWLIB
+#include <stdlib.h>
+#include <wchar.h>
+#include <assert.h>
+#include <stdio.h>
+#else
 #include <mastdlib.h>
 #include <mavsprintf.h>
 #include <mawvsprintf.h>
 #include <maassert.h>
+#endif
 
 namespace MAUI {
 
@@ -83,7 +90,12 @@ bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
 }
 
 void NativeEditBox::activate() {
+	
+#ifdef USE_NEWLIB
+	swprintf(mString, mMaxSize, L"%s", mCaption.c_str());
+#else
 	wsprintf(mString, L"%s", mCaption.c_str());
+#endif
 	int res = maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString,
 		(wchar*)mString, mMaxSize, mOptions);
 	if(res < 0) {

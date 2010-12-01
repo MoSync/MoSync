@@ -14,7 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require "types.rb"
+require "./types.rb"
 
 def generate_builtins_macro(dest)
 	out = File.new(dest, "w")
