@@ -1268,6 +1268,11 @@ interface MAAPI {
 		* \see maHomeScreenEventsOn()
 		*/
 		HOMESCREEN_HIDDEN = 25;
+		
+		/**
+		* \brief An event sent from a native widget.
+		*/
+		WIDGET = 26;
 	}
 
 	/**
@@ -2924,6 +2929,182 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
+
+#if IX_WIDGET
+	constset int WIDGET_EVENT_ {
+		/** 
+		 * A widget has posted a message. Use maWidgetGetMessageSize and
+		 * maWidgetGetMessageData to access message data.
+		 */
+		MESSAGE = 1;
+
+		/** 
+		 * A pointer pressed event has occurred. 
+		 */
+		POINTER_PRESSED = 2;
+
+		/** 
+		 * A pointer released event has occurred. 
+		 */
+		POINTER_RELEASED = 3;
+
+		/** 
+		 * A WebView widget has finished loading data. 
+		 */
+		CONTENT_LOADED = 4;
+	}
+
+	/**
+	 * A struct that holds the data associated with a widget event.
+	 */
+	struct MAWidgetEventData {
+		/**
+		 * Determines which kind of widget event that has occurred.
+		 */
+		int eventType;
+
+		/**
+		 * Handle to the widget that sent the event.
+		 */
+		MAHandle widgetHandle;
+
+		/**
+		 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
+		 * events using the syscall maWidgetGetMessageData().
+		 */
+		int messageId;
+		
+		/**
+		 * Size in bytes of the message referred to by messageId. Use for retrieving 
+		 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
+		 */
+		int messageSize;
+	}
+
+	constset int WIDGET_ {
+		/**
+		 * Indicates that the call to a widget syscall was successful.
+		 */
+		OK = 0;
+		
+		/**
+		 * Indicates that the call to a widget syscall was unsuccessful.
+		 */
+		ERROR = -1;
+		
+		/**
+		 * Symbolic handle of the root widget in a screen.
+		 */
+		ROOT = -1;
+	}
+
+	/** 
+	 * Create a new widget of the specified type.
+	 *
+	 * Currently the following widgets are supported:
+	 * - ListBox
+	 * - HorizontalLayout
+	 * - VerticalLayout
+	 * - Button
+	 * - Label
+	 *
+	 * \param widgetType A String representing the type of the widget to create.
+	 *
+	 * \returns A handle to the widget, or WIDGET_ERROR if the widget
+	 *          could not be created.
+	 */
+	MAHandle maWidgetCreate(in MAString widgetType);
+
+	/** 
+	 * Destroy a widget. Calling it a second time does nothing.
+	 *
+	 * \param widget A handle to the widget to destroy.
+	 */
+	void maWidgetDestroy(in MAHandle widget);
+
+	/** 
+	 * Add a widget to the given parent as a child. Letting the
+	 * parent widget layout the child.
+	 *
+	 * Note: Use parent WIDGET_ROOT to add a widget to the root window.
+	 *
+	 * \param parent 
+	 * \param child The widget that will be added to the parent.
+	 *
+	 * \returns WIDGET_OK if the child could be added to the parent, or
+	 *          WIDGET_ERROR otherwise.
+	 */
+	int maWidgetAddChild(in MAHandle parent, in MAHandle child);
+
+	/** 
+	 * Removes a child widget from its parent (but does not destroy it).
+	 * Removing a top-level widget (a widget that has VIEW_ROOT as parent)
+	 * causes the MoSync view to become visible.
+	 *
+	 * \returns WIDGET_OK if the child could be removed from the parent,
+	 *                    or WIDGET_ERROR otherwise.
+	 */
+	int maWidgetRemoveChild(in MAHandle parent, in MAHandle child);
+
+	/** 
+	 * Sets a specified property on the given widget.
+	 *
+	 * \param widget Handle to the widget.
+	 * \param property A string representing which property to set.
+	 * \param value The value which will be assigned to the property.
+	 *
+	 * Note: May be synchronous or asynchronous depending on the property.
+	 *
+	 * \returns A status code.
+	 */
+	int maWidgetSetProperty(in MAHandle widget, in MAString property, in MAString value);
+
+	/** 
+	 * Retrieves a specified property from the given widget.
+	 *
+	 * \param widget Handle to the widget.
+	 * \param property A string representing which property to set.
+	 * \param value A buffer that will hold the value of the property, represented as a string.
+	 * \param bufSize Size of the buffer.
+	 *
+	 * \returns Number of bytes copied on success, WIDGET_ERROR if the property
+	 *          could not be retrieved.
+	 */
+	int maWidgetGetProperty(in MAHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	 * Evaluate a script in a widget.
+	 *
+	 * \param widget Handle to the widget that will evaluate the script.
+	 * \param script The script code. The script should start with
+	 *               a language specifier that has the form "<language>:". 
+	 *               To evaluate JavaScript in a WebView widget, start the 
+	 *               script with "javascript:".
+	 *
+	 * \returns WIDGET_OK on success and WIDGET_ERROR on error.
+	 */
+	int maWidgetEvaluateScript(in MAHandle widget, in MAString script);
+
+	/**
+	 * Get the message data for a message id.
+	 * The message id is in MAEvent.widget.widgetMessageId.
+	 * The caller must use maWidgetGetMessageSize to ensure 
+	 * that the buffer is sufficienly large to hold the data.
+	 *
+	 * Message data can be retrieved only once, the system deallocates
+	 * the memory used to hold the data when retrieved. A second call
+	 * to this function with the same message id will return WIDGET_ERROR.
+	 *
+	 * \param messageId The id of the message, \see MAWidgetEventData.messageId.
+	 * \param buffer Pointer to a buffer that will contain the message data.
+	 * \param bufferSize Size of the buffer in bytes.
+	 *
+	 * \returns The number of bytes copied to the buffer, or WIDGET_ERROR on
+	 *          error.
+	 */
+	int maWidgetGetMessageData(in int messageId, out MAAddress buffer, in int bufferSize);
+
+#endif //IX_WIDGET
 
 		/**
 		* \brief The camera format, in pixels.
