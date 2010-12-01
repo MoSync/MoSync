@@ -119,7 +119,7 @@ NETSYSCALL(void) maConnClose(MAHandle conn) throws Exception {
 
 NETSYSCALL(void) maConnRead(MAHandle conn, Address dst, int size) {
 	MAConn mac = (MAConn)mConnections.get(new Integer(conn));
-	DEBUG_TEMP("CR\n");
+	DEBUG_CONN("ConnRead "+conn+", "+size+"\n");
 	MYASSERT((mac.state & CONNOP_READ) == 0);
 	MYASSERT(mac.in != null);
 	mac.state |= CONNOP_READ;
