@@ -47,7 +47,7 @@ private:
 	int pos;
 	bool writing, online;
 public:
-	MyMoblet() : mConn(this), pos(0), online(false), writing(false) {
+	MyMoblet() : mConn(this), pos(0), writing(false), online(false) {
 		printf("Hello World!\n");
 #if 1
 		// Connect to the service, via UUID.
