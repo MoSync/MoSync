@@ -212,7 +212,7 @@ end
 ##
 def getOS
     platform = RUBY_PLATFORM.downcase( )
-    if ( platform.include?( "win" ) ||
+    if ( platform.include?( "mswin" ) ||
          platform.include?( "mingw" ) )
         return "win"
     elsif ( platform.include?( "linux" ) )
