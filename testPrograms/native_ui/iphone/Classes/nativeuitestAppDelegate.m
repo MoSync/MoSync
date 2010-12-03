@@ -30,11 +30,18 @@ void TestApp() {
 		MAHandle tableViewCell = maWidgetCreate("TableViewCell");
 		//maWidgetSetProperty(tableViewCell, "text", labels[i]);
 		if(i == 3) maWidgetSetProperty(tableViewCell, "backgroundColor", "#00ff00");
-		maWidgetAddChild(tableView, tableViewCell);
+		maWidgetAddChild(tableView, tableViewCell);		
 		
 		MAHandle button = maWidgetCreate("Button");
+		maWidgetSetProperty(button, "width", "80");			
+		maWidgetSetProperty(button, "text", labels[i]);				
 		maWidgetAddChild(tableViewCell, button);
-		maWidgetSetProperty(button, "text", labels[i]);		
+		
+		MAHandle label = maWidgetCreate("Label");
+		maWidgetSetProperty(label, "left", "80");				
+		maWidgetSetProperty(label, "text", labels[i]);		
+		maWidgetAddChild(tableViewCell, label);
+	
 	}
 	
 	//MAHandle button = maWidgetCreate("UIButton");

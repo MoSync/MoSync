@@ -12,14 +12,12 @@
 @implementation WindowWidget
 
 - (id)init {
-	[super init];
-	
 	UIWindow* window;
     window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	window.backgroundColor = [UIColor whiteColor];  	
 	view = window;
-	
-	return self;
+
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {

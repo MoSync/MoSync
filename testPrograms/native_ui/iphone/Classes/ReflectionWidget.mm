@@ -12,7 +12,6 @@
 @implementation ReflectionWidget
 
 - (id)initWithName:(NSString*)name {
-	[super init];
 	widgetClass = NSClassFromString(name);
 	if(widgetClass == nil) {
 		[self dealloc];
@@ -21,7 +20,7 @@
 	
 	view = [[widgetClass alloc] init];
 	
-	return self;
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {

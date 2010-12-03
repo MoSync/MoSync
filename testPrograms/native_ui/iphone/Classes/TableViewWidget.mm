@@ -12,12 +12,10 @@
 @implementation TableViewWidget
 
 - (id)init {
-	[super init];
-	
 	tableView = [[MoSyncTableView alloc] init];
 	view = tableView.tableView;	 
 	
-	return self;
+	return [super init];		
 }
 
 - (void)addChild: (IWidget*)child {

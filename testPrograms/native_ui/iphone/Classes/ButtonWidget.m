@@ -12,12 +12,11 @@
 @implementation ButtonWidget
 
 - (id)init {
-	[super init];
 	view = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
-	return self;
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {

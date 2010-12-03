@@ -12,7 +12,8 @@
 @implementation IWidget
 
 - (id)init {
-	[super init];	
+	[super init];
+	view.contentMode = UIViewContentModeRedraw;
 	return self;
 }
 
@@ -29,16 +30,20 @@
 
 - (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
-		view.frame.origin.x = [value intValue];
+//		view.frame.origin.x = [value floatValue];
+		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"top"]) {
-		view.frame.origin.y = [value intValue];
+//		view.frame.origin.y = [value floatValue];
+		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"width"]) {
-		view.frame.size.width = [value intValue];		
+//		view.frame.size.width = [value floatValue];		
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, [value floatValue], view.frame.size.height)];
 	} else
 	if([key isEqualToString:@"height"]) {
-		view.frame.size.width = [value intValue];		
+		//view.frame.size.height = [value floatValue];
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, [value floatValue])];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
 		view.backgroundColor = [UIColor colorWithHexString:value];

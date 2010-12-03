@@ -11,14 +11,12 @@
 
 @implementation LabelWidget
 
-- (id)init {
-	[super init];
-	
+- (id)init {	
 	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] autorelease];
 	label.opaque = NO;
 	view = label;		
 	
-	return self;
+	return [super init];	
 }
 
 - (void)addChild: (IWidget*)child {

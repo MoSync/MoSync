@@ -12,7 +12,6 @@
 @implementation TableViewCellWidget
 
 - (id)init {
-	[super init];	
 
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 	
@@ -29,7 +28,7 @@
 	//cell.selectedBackgroundView = cellContentView;	
 	view = cell;
 	
-	return self;
+	return [super init];		
 }
 
 - (void)addChild: (IWidget*)child {

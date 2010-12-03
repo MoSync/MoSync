@@ -12,9 +12,7 @@
 @implementation ImageWidget
 
 - (id)init {
-	[super init];
-	
-	return self;
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
