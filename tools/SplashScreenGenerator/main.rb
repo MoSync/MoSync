@@ -1,4 +1,4 @@
-﻿#!/usr/bin/ruby
+#!/usr/bin/ruby
 # encoding: UTF-8
 
 # the above line, although it looks like a comment, is actually parsed by the Ruby engine to set
