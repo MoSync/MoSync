@@ -24,6 +24,7 @@
 		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
 		8582679712A404550047D42D /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8582679612A404550047D42D /* ImageWidget.mm */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
+		85CFC48912A7F6E00075BCD9 /* ButtonWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +60,8 @@
 		8582679612A404550047D42D /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageWidget.mm; sourceTree = "<group>"; };
 		858A78B5129E9A50005EACA7 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
+		85CFC48712A7F6E00075BCD9 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonWidget.h; sourceTree = "<group>"; };
+		85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ButtonWidget.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -160,6 +163,8 @@
 				8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */,
 				8582679512A404550047D42D /* ImageWidget.h */,
 				8582679612A404550047D42D /* ImageWidget.mm */,
+				85CFC48712A7F6E00075BCD9 /* ButtonWidget.h */,
+				85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */,
 			);
 			name = Widgets;
 			sourceTree = "<group>";
@@ -237,6 +242,7 @@
 				8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */,
 				8582679712A404550047D42D /* ImageWidget.mm in Sources */,
 				8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */,
+				85CFC48912A7F6E00075BCD9 /* ButtonWidget.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

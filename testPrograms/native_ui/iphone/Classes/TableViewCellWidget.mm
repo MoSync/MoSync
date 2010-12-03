@@ -19,8 +19,9 @@
 	UITableViewCell *cell = nil; //[UITableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
 	 
 	if (cell == nil) {
-	 cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
+		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
 								   reuseIdentifier:SimpleTableIdentifier] autorelease];
+		cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	}
 
 	//cell.textLabel.backgroundColor = [UIColor colorWithRGBHex:0xff0000];
