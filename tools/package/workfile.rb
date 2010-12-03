@@ -10,6 +10,7 @@ work.instance_eval do
 	@SPECIFIC_CFLAGS = {
                 "selectPackager.cpp" => " -Wno-missing-noreturn",
 	}
+	@LOCAL_LIBS = ["filelist"]
 	@INSTALLDIR = mosyncdir + '/bin'
 end
 

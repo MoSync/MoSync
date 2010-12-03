@@ -3,6 +3,7 @@
 #include "helpers/mkdir.h"
 #include <fstream>
 #include <sstream>
+#include <errno.h>
 
 using namespace std;
 
