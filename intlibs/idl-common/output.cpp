@@ -363,7 +363,7 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 			stream << "mCore.";
 		else
 			stream << "SYSCALL_THIS->";
-		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ", argptr)";
+		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
 	}
 }
 
@@ -624,6 +624,8 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		}
 	}	//args
 	stream << ") {\n";
+	if(usedArgs > 3)
+		stream << "#ifdef MAPIP\n";
 	stream << tempVars;
 
 	for(size_t j=usedArgs; j<3; j++) {
@@ -650,6 +652,8 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 
 		stream << invoke + "\n";
 	}
+	if(usedArgs > 3)
+		stream << "#else\n\treturn IOCTL_UNAVAILABLE;\n#endif\n";
 	stream << "}\n\n";
 }
 

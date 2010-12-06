@@ -57,6 +57,9 @@ public:
 	//This function uses those variables and returns >0 or CONNERR code.
 	virtual int connect() = 0;
 
+	//When this returns false, connect() may be called safely.
+	virtual bool isConnected() = 0;
+
 	//Reads 1 to <max> bytes into <dst>.
 	//Returns nBytes read or CONNERR code.
 	virtual int read(void* dst, int max) = 0;
@@ -91,6 +94,7 @@ public:
 	~WinsockBtSppConnection();
 
 	int connect();
+	bool isConnected();
 	int read(void* dst, int max);
 	int write(const void* src, int len);
 	void close();
@@ -112,6 +116,7 @@ public:
 	~BlueSoleilBtSppConnection();
 
 	int connect();
+	bool isConnected();
 	int read(void* dst, int max);
 	int write(const void* src, int len);
 	void close();

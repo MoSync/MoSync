@@ -240,6 +240,10 @@ void FunctionReg_Calli(OpcodeInfo *thisOp, FuncProp *fp)
 
 void FunctionReg_CallReg(OpcodeInfo *thisOp, FuncProp *fp)
 {
+#if !defined(_MSC_VER) && !defined(__GNUC__)
+#pragma unused(thisOp)
+#endif
+
 	int p;
 
 	for (p=0;p<4;p++)

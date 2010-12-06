@@ -9,6 +9,10 @@ work.instance_eval do
 		@EXTRA_SOURCEFILES = ["filelist-win32.c"]
 	elsif(HOST == :linux)
 		@EXTRA_SOURCEFILES = ["filelist-linux.c"]
+		if(CONFIG == "")
+			# bug in /usr/include/bits/stdlib.h
+			@EXTRA_CFLAGS = " -Wno-unreachable-code"
+		end
 	elsif(HOST == :darwin)
 		@EXTRA_SOURCEFILES = ["filelist-linux.c"]
 	else

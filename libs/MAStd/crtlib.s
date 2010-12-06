@@ -4,7 +4,7 @@
 
 	.sourcefile 'crtlib.s'
 
-	.line 0
+	.line 1
 
 //****************************************
 //				Globals
@@ -27,6 +27,8 @@ __stacktop:
 	.code
 	.align 4
 	.global crt0_startup
+
+	.set mainok=0
 
 	// sp: top of stack
 	// i0: memory size
@@ -62,47 +64,57 @@ __stacktop:
 .ifdefglobal _MATestMain
 {		
 	call &_MATestMain
-	jp   #crt_exit
-	.set mainok=1
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z10MATestMainv
+.ifdefglobal __Z10MATestMainv
 {		
-	call &_Z6MATestMainv
-	jp   #crt_exit
-	.set mainok=1
+	call &__Z10MATestMainv
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z10MATestMainiPPc
+.ifdefglobal __Z10MATestMainiPPc
 {		
-	call &_Z6MATestMainiPPc
-	jp   #crt_exit
-	.set mainok=1
+	call &__Z10MATestMainiPPc
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _MAMain
-{		
-	call &_MAMain
-	.set mainok=1
-}
-
-.ifdefglobal _Z6MAMainv
+.if ( mainok == 0 )
 {
-	call &_Z6MAMainv
-	.set mainok=1
+	.ifdefglobal _MAMain
+	{		
+		call &_MAMain
+		.set mainok=mainok+1
+	}
+
+	.ifdefglobal __Z6MAMainv
+	{
+		call &__Z6MAMainv
+		.set mainok=mainok+1
+	}
+
+	.ifdefglobal __Z6MAMainiPPc
+	{
+		call &__Z6MAMainiPPc
+		.set mainok=mainok+1
+	}
 }
 
-.ifdefglobal _Z6MAMainiPPc
-{
-	call &_Z6MAMainiPPc
-	.set mainok=1
+.if ( __final__ )
+{	
+	.if ( mainok == 0 )
+	{
+		.print "Unresolved entry point: MAMain"
+		.exit
+	}
+
+	.if ( mainok > 1 )
+	{
+		.print "Multiple entry points: MAMain"
+		.exit
+	}
 }
 
-.ifndef mainok
-{
-	.print "Unresolved symbol: MAMain"
-	.exit
-}
 crt_exit:
 	ld	[sp,0], r14		// save return value
 

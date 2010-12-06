@@ -50,6 +50,7 @@ SOURCE            Syscall.cpp
 SOURCE            Stream.cpp
 SOURCE            MemStream.cpp
 SOURCE            FileStream.cpp
+SOURCE            Image.cpp
 
 LIBRARY           euser.lib
 LIBRARY           apparc.lib
@@ -79,6 +80,7 @@ LIBRARY mediaclientvideo.lib
 LIBRARY Lbs.lib
 LIBRARY insock.lib
 LIBRARY ecam.lib
+LIBRARY securesocket.lib
 
 LIBRARY eikcoctl.lib
 LIBRARY eikctl.lib

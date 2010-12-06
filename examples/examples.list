@@ -11,6 +11,7 @@ MapDemo
 MAStx
 MAUIEx = MAUI/MAUIex
 MinUI
+btServer = Moblet/btServer
 Connection = Moblet/Connection
 HelloMoblet = Moblet/HelloMoblet
 simple = Moblet/simple
@@ -19,8 +20,8 @@ Stylus = Moblet/Stylus
 timers = Moblet/timers
 MoSketch
 MoSound
-MoTooth
+MoTooth = Moblet/MoTooth
 MoTris
 MoTrix
 OtaLoad
-MDLBenchmark = QuakeMDL
+QuakeMDL

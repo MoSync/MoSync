@@ -64,6 +64,7 @@ int MAMain()
 	printf("Press 0/RSK to exit.");
 
 	while(1) {
+		maWait(0);
 		MAEvent event;
 		while(maGetEvent(&event)) {
 			if(event.type == EVENT_TYPE_CLOSE ||

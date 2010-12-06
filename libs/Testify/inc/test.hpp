@@ -15,12 +15,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * test.hpp
+/** \file test.hpp
+ * \brief Base class for all tests for Testify.
  *
- *  Created on: 28 feb 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on: 28 feb 2010
  */
+ 
 
 #ifndef 	__TESTIFY_TEST_HPP__
 #define 	__TESTIFY_TEST_HPP__
@@ -36,7 +38,7 @@ namespace Testify
 {
 
 /**
- * @breif A base class for all tests. It is wrapped by
+ * @brief A base class for all tests. It is wrapped by
  * TestCase and TestFunction to handle the different cases.
  *
  */

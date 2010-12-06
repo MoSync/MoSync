@@ -112,7 +112,6 @@ namespace MAUtil {
 					return;
 				}
 			}
-			PANIC_MESSAGE("Removing nonexisting listener");
 		}
 
 		bool contains(T* t) {

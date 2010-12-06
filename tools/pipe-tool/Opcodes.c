@@ -48,6 +48,12 @@ void Instructions()
 	if (*FilePtr == '.')
 		return;
 
+	if (*FilePtr == '}')
+		return;
+
+	if (*FilePtr == '{')
+		return;
+
 	// Clear all the special variables
 
 	farop = imm = rd = rs = rt = op = 0;
@@ -721,7 +727,10 @@ void CheckDataAccess_LoadStore(int opcode)
 void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 {
 	int const_subst;
-	
+
+	//if ((CodeIP == 0x52) && (pass_count == 30))
+		//printf("");
+
 	// Get the dest reg
 
 	imm = FindVar(0);				// set imm as preset zero
@@ -796,7 +805,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 	NeedToken(",");
 
-	if (Token("#"))
+	if (Token("#"))				// ld rd,#
 	{
 		// Is load immediate
 
@@ -818,14 +827,25 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 		CheckDataAccess_LoadStore(_LDI);
 
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = _LDI;
+			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
+			return;		
+		}
+
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int);	// ld rd, #imm
 		return;		
 	}
 
-	if (Token("&"))
+	if (Token("&"))				// ld rd,&
 	{
 		// Is load immediate address
+
+/* !! NOTE: Removed by *ARH* - Caused code not to settle, created a variant state in code section
 
 		const_subst = HandleExprConst();
 
@@ -840,8 +860,19 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 			WriteOpcode(AsmName, use_rd | use_rs);		// ld rd, rs
 			return;
 		}
+*/
+		HandleExprImm();
 
 		CheckDataAccess_LoadStore(_LDI);
+
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = _LDI;
+			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
+			return;		
+		}
 
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int); // ld rd, &addr
@@ -935,7 +966,6 @@ void Get_rd_rs(char *AsmName,int Opcode, int OpcodeImm)
 	rs = GetReg(1);	
 
 	imm = 0;
-//	rt = 0;
 	op = Opcode;
 
 	WriteOpcode(AsmName, use_rd | use_rs);
@@ -956,12 +986,6 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 	NeedToken(",");
 
 	rs = GetReg(1);	
-
-/*	if (Opcode == _PUSH)
-	{
-		printf("--- PUSH %s,%s\n", regsyms[rd], regsyms[rs] );
-	}
-*/
 
 	if (rs < rd)
 		Error(Error_Skip, "Push/Pop registers have wrong order");
@@ -1006,6 +1030,15 @@ void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
 			rs = imm;
 			WriteOpcode(AsmName, use_rd | use_rs);		// ld rd, rs
 			return;
+		}
+
+		// If the expression had a coderef then force int to fully expand
+	
+		if (GetExpFlags() & REF_code)
+		{
+			op = OpcodeImm;
+			WriteOpcode(AsmName, use_rd | use_int16);	// arith rd, #coderef
+			return;		
 		}
 
 		op = OpcodeImm;
@@ -1074,12 +1107,12 @@ void HandleExpr()
 
 void HandleExprImm()
 {
-	short	Type;
+	short	flags;
 	
 	// MAHandle internal Lables
 	
 	imm = GetExpression();					// Evaluate the expression
-	Type = (short)GetExpType();					// Get its type
+	flags = GetExpFlags();
 
 	// If the expression contained a symbol that is unresolved
 	// then don't create a constant for that address
@@ -1102,23 +1135,28 @@ void HandleExprImm()
 
 int HandleExprConst()				// Const or Imm
 {
-	short	Type;
 	int		ConstReg;
+	int		flags;
 	
 	// MAHandle internal Lables
 	
 	imm = GetExpression();					// Evaluate the expression
 
-	Type = (short) GetExpType();			// Get its type
+	// If the expression contains a code ref then don't
+	// change it to a constant register
 
-	// test if this can be a register
+	flags = GetExpFlags();
 
-	ConstReg = IsConst(imm);				// Check for const reg
-
-	if (ConstReg != -1)
+	if (flags == REF_null)
 	{
-		imm = ConstReg;						// Return the register in imm
-		return 1;							// Say in reg
+		ConstReg = IsConst(imm);				// Check for const reg
+
+		if (ConstReg != -1)
+		{
+			imm = ConstReg;						// Return the register in imm
+			return 1;							// Say in reg
+		}
+
 	}
 
 	// If the expression contained a symbol that is unresolved
@@ -1137,13 +1175,6 @@ int HandleExprConst()				// Const or Imm
 //****************************************
 //		 Decode a register name
 //****************************************
-/*
-   "zr", "sp",  "rt",  "fr", 				\
-   "d0", "d1",  "d2",  "d3", "d4", "d5", "d6", "d7",	\
-   "i0", "i1",  "i2",  "i3", "r0", "r1", "r2", "r3",	\
-   "r4", "r5",  "r6",  "r7", "r8", "r9", "r10","r11",	\
-  "r12","r13", "r14", "r15", "rap", "arg", "cc"		\
-*/
 
 #define ifreg(str,val) if (QToken(str)) return val
 
@@ -1291,6 +1322,14 @@ void WriteOpcode(char *AsmName, int field)
 		CodeIP++;
 	}
 
+	// If size optimization is off force to 16 bit indices
+	
+	if (SizeConstOpt && (field & use_int))
+	{
+		field &= ~use_int;
+		field |= use_int16;
+	}
+	
 
 	*CodePtr++ = (char)op;
 	CodeIP++;
@@ -1328,39 +1367,34 @@ void WriteOpcode(char *AsmName, int field)
 	}
 	else if (field & use_int)
 	{
-
-		if (SizeConstOpt)
-		{
-			// 8 and 16 bit ints
-			
-			if (imm < 128)
-			{	
-				*CodePtr++ = (char)imm;
-				CodeIP++;
-			}
-			else
-			{	
-				*CodePtr++ = (char)(imm >> 8) | 0x80;
-				CodeIP++;
-
-				*CodePtr++ = (char)(imm & 0xff);
-				CodeIP++;
-			}
-
+		// 8 and 16 bit ints
+		
+		if (imm < 128)
+		{	
+			*CodePtr++ = (char)imm;
+			CodeIP++;
 		}
 		else
-		{
-			// Expand const fields, if SizeConstOpt==0
-			// Fixed 16 bit ints
-
-			*CodePtr++ = (char)(imm >> 8);
+		{	
+			*CodePtr++ = (char)(imm >> 8) | 0x80;
 			CodeIP++;
 
 			*CodePtr++ = (char)(imm & 0xff);
 			CodeIP++;
 		}
-		
-		
+
+	}
+	else if (field & use_int16)
+	{
+		// Expand const fields, if SizeConstOpt==0
+		// Fixed 16 bit ints
+
+		*CodePtr++ = (char)(imm >> 8) | 0x80;
+		CodeIP++;
+
+		*CodePtr++ = (char)(imm & 0xff);
+		CodeIP++;
+
 	}
 	else if (field & use_int24)
 	{		

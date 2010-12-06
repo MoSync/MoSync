@@ -433,12 +433,32 @@ void SearchDep_Main()
 SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 {
 	SYMBOL *sym;
-	int ip, in_ip;
-
+	int in_ip;
+	
 	if (!localsym)
 		ErrorOnIP(Error_Fatal, 0, "FunctionSymFromIP sym=0");
 
-	ip = localsym->Value;
+	in_ip = localsym->Value;
+
+// !! ARH rewrote calls FunctionAboveIP instead !!
+
+	sym = FunctionAboveIP(localsym->Value);
+
+	if (!sym)
+		ErrorOnIP(Error_Fatal, in_ip, "FunctionAboveIP can't find function top IP=0x%x Label '%s'", in_ip, localsym->Name);
+
+	return sym;
+}
+
+//****************************************
+// Finds the function above the input ip
+//****************************************
+
+SYMBOL * FunctionAboveIP(int ip)
+{
+	SYMBOL *sym;
+	int in_ip;
+
 	in_ip = ip;
 		
 	if (ip > (int) CodeLabelArray.hi)
@@ -446,7 +466,9 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 
 	while(1)
 	{
-		if (ip < (int) CodeLabelArray.lo)
+//		if (ip < (int) CodeLabelArray.lo) !! ARH looks incorrect !!
+
+		if (ip < 0)
 			break;
 		
 		sym = (SYMBOL *) ArrayGet(&CodeLabelArray, ip);
@@ -461,10 +483,48 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 		ip--;
 	}
 
-	ErrorOnIP(Error_Fatal, in_ip, "FunctionSymFromIP can't find function top IP=0x%x Label '%s'", in_ip, localsym->Name);
 	return 0;
 }
 
+
+//****************************************
+//  Find the extent of a data entity
+//****************************************
+
+int FindLabelExtent(int ip)
+{
+//	SYMBOL *thisSym;
+
+	uint n, v;
+
+	// Byte search of memory
+
+	for (n=ip;n<LabelArray.hi;n++)
+	{
+		// Check if the data symbol has hit alignment padding
+		
+		v = ArrayGet(&PaddingArray, n);
+
+		if (v)
+			break;
+
+		// Check if the data symbol is finished, i.e it bumps
+		// into the next symbol
+		
+		if (n != (uint)ip)
+		{
+			v = ArrayGet(&LabelArray, n);
+
+			if (v)
+				break;
+		}
+
+		// Next ip
+	}
+
+	v = n - ip;
+	return v;
+}
 
 //****************************************
 

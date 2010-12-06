@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -14,6 +14,7 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
 /*
 * File:   ConnectionCocoaInterface.mm
 * Author: Romain Chalant
@@ -205,6 +206,19 @@ int BtSppConnectionCocoa::write ( const void* src, int len )
 	else {
 		return INVALID_SOCKET;
 	}
+}
+
+/**
+ * Determines if the socket is connected or not.
+ *
+ * @return TRUE if connected, FALSE otherwise.
+ */
+bool BtSppConnectionCocoa::isConnected ( void )
+{
+		if ( mConnection.mState > 0 )
+			return TRUE;
+		else
+			return FALSE;
 }
 
 /**

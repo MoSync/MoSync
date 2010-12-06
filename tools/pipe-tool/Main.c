@@ -93,6 +93,8 @@ int main(int argc,char *argv[])
 	ArrayInit(&DataMemArray,	1, 0);
 	ArrayInit(&ResMemArray,		1, 0);
 
+	ArrayInit(&CodeMemArrayCopy,1, 0);
+
 //--------------------------------
 //Create the code and data arrays
 // 	  used for elimination
@@ -1005,7 +1007,7 @@ void MainAsm(char *input, char *output)
 #ifdef CODE_ANALYSIS
 
 		if (DisasFunc[0])
-			DisassembleFunc(DisasFunc);
+			DisassembleFunc(DisasFunc, 0);
 #endif
 
 

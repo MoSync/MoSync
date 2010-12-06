@@ -670,6 +670,8 @@ interface MAAPI {
 		NOHEADER = -16;
 		/// The requested object could not be found.
 		NOTFOUND = -17;
+		/// An error occurred during SSL negotiation.
+		SSL = -18;
 
 		/**
 		* If you wish to share the CONNERR codespace,
@@ -680,7 +682,7 @@ interface MAAPI {
 	constset int CONNOP_ {
 		READ = 1;
 		WRITE = 2;
-		CONNECT = 5;	//READ | WRITE | 4
+		CONNECT = 7;	//READ | WRITE | 4
 		FINISH = 11;	//READ | WRITE | 8
 		ACCEPT = 16;
 	}
@@ -697,10 +699,18 @@ interface MAAPI {
 	*
 	* <tt>socket</tt>, which is TCP. It has no parameters.
 	*
+	* <tt>ssl</tt>, which is an encrypted TCP connection. It has no parameters.
+	*
 	* <tt>http</tt>, which is HTTP/1.0 GET. When using HTTP, you need not specify the port;
 	* it defaults to port 80.
+	*
 	* Its parameters is the document path (for example, "/index.html").
+	* You must specify a path, or this function will fail with #CONNERR_URL.
+	* The minimal path ("/") is acceptable.
+	*
 	* Writing to a http connection is not allowed.
+	*
+	* <tt>https</tt>, which is an encrypted HTTP GET. It has the same parameters as <tt>http</tt>.
 	*
 	* <tt>btspp</tt>, which is Bluetooth Serial Port. It has no parameters.
 	*\n
@@ -715,15 +725,23 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
+	* On some J2ME devices, connections to port 443 (except from https) is not
+	* allowed and might cause a system exception.
+	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
 	* \<port\> is a decimal number from 1 to 30.
 	*
 	* Example TCP url: <tt>socket://www.example.com:23</tt>
 	*
+	* Example SSL url: <tt>ssl://www.example.com:22</tt>
+	*
 	* Example HTTP url: <tt>http://www.example.com/directory/document.html</tt>
+	*
+	* Example HTTPS url: <tt>https://www.example.com/directory/document.html</tt>
 	*
 	* Example Bluetooth url: <tt>btspp://001dbe15e455:9</tt>
 	*
+	* You can also use MAUtil::BluetoothConnection to connect via Bluetooth service uuid.
 	*
 	* To find useful Bluetooth addresses, use the Bluetooth discovery API.
 	* See maBtStartDeviceDiscovery().
@@ -741,13 +759,13 @@ interface MAAPI {
 	* the connect operation failed.
 	*
 	* There is a limit of #CONN_MAX open connection handles at any time, so if you keep
-	* opening connections without closing them, you'll eventually recieve the
+	* opening connections without closing them, you'll eventually receive the
 	* #CONNERR_MAX error code instead of new connection handles.
 	*
 	* Alternatively, this function can be called with one of these url types to
 	* create a Server Connection:\n
 	* <tt>socket://[:\<port\>]</tt>, for TCP.\n
-	* <tt>btspp://localhost:\<uuid\>\[;name=\<YourServiceName\>\]</tt>, for Bluetooth.\n
+	* <tt>btspp://localhost:\<uuid\>[;name=\<YourServiceName\>]</tt>, for Bluetooth.\n
 	* \<uuid\> is a 32-digit hexadecimal number. It will be used to create the
 	* service record. Its MAUUID representation can be used by clients to search for
 	* this service.
@@ -943,7 +961,7 @@ interface MAAPI {
 	/**
 	* Asynchronously finishes an HTTP connection. This entails making the
 	* underlying TCP connection and sending request headers, unless that has
-	* already been done by a #HTTP_POST write, and recieving the response headers.
+	* already been done by a #HTTP_POST write, and receiving the response headers.
 	*
 	* The result of the operation will be delivered in a CONN event, with
 	* MAConnEventData::opType set to #CONNOP_FINISH.
@@ -1240,6 +1258,16 @@ interface MAAPI {
 		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
 		*/
 		TEXTBOX = 23;
+
+		/** \brief The phone's home screen just became visible.
+		* \see maHomeScreenEventsOn()
+		*/
+		HOMESCREEN_SHOWN = 24;
+
+		/** \brief The phone's home screen was just hidden.
+		* \see maHomeScreenEventsOn()
+		*/
+		HOMESCREEN_HIDDEN = 25;
 	}
 
 	/**
@@ -1398,7 +1426,7 @@ interface MAAPI {
 	* with a duration of zero may return non-zero, but a non-zero duration will return zero.
 	* In any case, the only way to conclusively determine if vibration is currently supported
 	* or not is to call this function with a duration of at least 1(one) ms.
-	* On Iphone the argument won't be taken into account.
+	* On iPhone the argument won't be taken into account.
 	*/
 	int maVibrate(in int ms);
 
@@ -1662,28 +1690,6 @@ interface MAAPI {
 		*/
 		int maWriteLog(in MAAddress src, in int size);
 
-		/** @name Bluetooth discovery
-		* These structures and functions are used for asynchronous device and service discovery.
-		* Only one operation may be active at a time.
-
-		* When a device or service is found, its information is stored in internal buffers
-		* for later retrieval by maBtGetNewDevice() or maBtGetNewService(), then a BT event is generated.
-		* A BT event is also generated when the operation is complete.
-
-		* A BT event contains the state of the Bluetooth Discovery operation.
-		* This is <0 (a \link #CONNERR_GENERIC CONNERR \endlink value) on failure,
-		* 0 while still working and
-		* ((number of devices/services found) + 1) when the discovery is complete.
-
-		* The reason for the (+1) is to distinguish "still working" from
-		* "discovery complete, zero found".
-
-		* The buffers are cleared when the respective operation is started, so any devices or services
-		* left over in the buffers from an earlier operation will be lost.
-		*/
-		
-		/**@{*/
-
 		/**
 		* \brief Information about a Bluetooth device.
 		*/
@@ -1732,7 +1738,7 @@ interface MAAPI {
 			*/
 			int port;
 			/**
-			* Pointer to a buffer that recieves the service's human-readable name.
+			* Pointer to a buffer that receives the service's human-readable name.
 			*/
 			char* name;
 			/**
@@ -1740,7 +1746,7 @@ interface MAAPI {
 			*/
 			int nameBufSize;
 			/**
-			* Pointer to a buffer that recieves the UUIDs associated with the service.
+			* Pointer to a buffer that receives the UUIDs associated with the service.
 			* The buffer must be large enough to contain the number of UUIDs reported
 			* by the last call to maBtGetNextServiceSize().
 			*/
@@ -1791,12 +1797,16 @@ interface MAAPI {
 		* Takes a device address and the UUID of the service class to search for.
 		* For example, pass #RFCOMM_PROTOCOL_MAUUID and you'll get all connectable services.
 		* Pass #SerialPort_Service_MAUUID and you'll get only that type of service.
+		*
 		* \see maBtGetNextServiceSize
 		* \see maBtGetNewService
 		* \see maBtCancelDiscovery
 		* \see EVENT_TYPE_BT
 		*
 		* \returns 0 on success, \< 0 on failure.
+		*
+		* \note Service discovery is not supported on Android. Use MAUtil::BluetoothConnection
+		* to connect via service UUID. That method is cross-platform.
 		*/
 		int maBtStartServiceDiscovery(in MABtAddr address, in MAUUID uuid);
 
@@ -1822,7 +1832,7 @@ interface MAAPI {
 		* If an operation was canceled, its last BT event will have the state #CONNERR_CANCELED.
 		* This is an asynchronous operation. If this function returns 1,
 		* it is not safe to start another discovery before
-		* you've recieved the #CONNERR_CANCELED event.
+		* you've received the #CONNERR_CANCELED event.
 		* \see maBtStartDeviceDiscovery
 		* \see maBtStartServiceDiscovery
 		* \see EVENT_TYPE_BT
@@ -2022,21 +2032,6 @@ interface MAAPI {
 		* of the request is not supported on the platform.
 		*/
 		int maPlatformRequest(in MAString url);
-
-#if IX_FILE
-		/*
-		* Stores the name of a root file system in \a nameBuf.
-		* Call this function repeatedly with increasing values for \a index
-		* to enumerate all file systems. Every file system name ends with a slash ('/').
-		*
-		* The buffer may be too small to contain the name; in that case, the buffer will not be filled
-		* and you should create a bigger buffer and call this function again.
-		* You may call this function with bufSize 0 to simply retrieve the length of the name.
-		*
-		* \returns If the file system exists, the length of the name. 0 otherwise.
-		* \< 0 on error.
-		*/
-		//int maFileSystem(in int index, out MAString nameBuf, in int bufSize);
 
 		constset int MA_ACCESS_ {
 			READ = 1;
@@ -2262,7 +2257,6 @@ interface MAAPI {
 		//isDir()
 		//getName()
 		//getPath()
-#endif	//IX_FILE
 
 		/**
 		* Sends a text SMS. Since this may cost money for the user,
@@ -2346,7 +2340,7 @@ interface MAAPI {
 		/**
 		* Retrieves the current cellular network information
 		* If the phone is offline or otherwise has no signal, this function will fail.
-		* \param pInfo A pointer to a struct which will recieve the information.
+		* \param pInfo A pointer to a struct which will receive the information.
 		* \returns 0 if successful. \< 0 otherwise.
 		*/
 		int maGetCellInfo(out MACellInfo pInfo);
@@ -2384,7 +2378,7 @@ interface MAAPI {
 		* or \< 0 on error, like if the line is not ringing.
 		* Causes CALL events.
 		* \note The line state may change while this function is being called. Therefore,
-		* it may fail even if you haven't recieved a new CALL event.
+		* it may fail even if you haven't received a new CALL event.
 		*/
 		int maCallAnswer();
 
@@ -2457,7 +2451,7 @@ interface MAAPI {
 		/**
 		* Returns the size, in pixels, of the video stream. \<0 if the length cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		MAExtent maStreamVideoSize(in MAHandle stream);
 
@@ -2466,7 +2460,7 @@ interface MAAPI {
 		* The default rectangle is in the top-left corner of the screen,
 		* and has the same size as the source video.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*
 		* If the video is playing when you call this function, the picture frame may go black
 		* for a second while the system reorders itself.
@@ -2484,7 +2478,7 @@ interface MAAPI {
 		/**
 		* Returns the length of the stream, in milliseconds. \<0 if the length cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		int maStreamLength(in MAHandle stream);
 
@@ -2492,7 +2486,7 @@ interface MAAPI {
 		* Returns the current playing time position of the stream, in milliseconds.
 		* Returns \<0 if the position cannot be determined.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*/
 		int maStreamPos(in MAHandle stream);
 
@@ -2502,7 +2496,7 @@ interface MAAPI {
 		* For some platform/media combinations, setting the position is not very accurate.
 		* The return value will indicate the actual position set.
 		*
-		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been recieved for the stream.
+		* Will only work after #STREAMEVENT_PREPARE_COMPLETE has been received for the stream.
 		*
 		* \param stream A valid stream handle.
 		* \param pos A position, in milliseconds.
@@ -2658,6 +2652,8 @@ interface MAAPI {
 		*
 		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
 		* Multi-language applications should use this to determine which language to use.
+		*
+		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property. See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
 		*
 		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
 		*
@@ -2976,7 +2972,7 @@ interface MAAPI {
 		*
 		* \param title The box's title.
 		* \param inText When the text box is created, it is populated with this string.
-		* \param text Pointer to a buffer. When the text box closes, the contents
+		* \param outText Pointer to a buffer. When the text box closes, the contents
 		* are copied to this buffer.
 		* \param maxSize The size of the buffer, in characters. Includes the terminating zero.
 		* \param constraints Rules for how text is entered into the box.
@@ -3030,7 +3026,107 @@ interface MAAPI {
 			/// the initial letter of each sentence should be capitalized.
 			INITIAL_CAPS_SENTENCE = 0x20000;
 		}
+
+		/**
+		* Set the background image of the phone's home screen.
+		* @param data Image data in JPEG or PNG format.
+		* @return \< 0 on error.
+		*/
+		int maWallpaperSet(in MAHandle data);
+
+		/**
+		* Make MoSync send key-events for the specified key, even when
+		* the application does not have focus.
+		* Can only capture one key at a time.
+		* @param keyCode The \link #MAK_UNKNOWN MAK \endlink code for the key to capture.
+		* @return \< 0 on error.
+		* \see maKeyCaptureStop()
+		*/
+		int maKeyCaptureStart(in int keyCode);
+
+		/**
+		* Stops any key capture in progress.
+		* @returns \< 0 on error.
+		* \see maKeyCaptureStart()
+		*/
+		int maKeyCaptureStop();
+
+		/**
+		* Turn on sending of HomeScreen events. Off by default.
+		* @return \< 0 on error.
+		* \see #EVENT_TYPE_HOMESCREEN_SHOWN
+		* \see #EVENT_TYPE_HOMESCREEN_HIDDEN
+		* \see maHomeScreenEventsOff()
+		*/
+		int maHomeScreenEventsOn();
+
+		/**
+		* Turn off sending of HomeScreen events. Off by default.
+		* @return \< 0 on error.
+		*/
+		int maHomeScreenEventsOff();
+
+		/**
+		 * Add a notification item.
+		 *
+		 * Note that there can only be one notification of type
+		 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+		 * types may be added in the future. This syscall is available 
+		 * on Android only.
+		 *
+		 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+		 * \endlink constant.
+		 * @param id The id of the notification. The id must be unique within 
+		 * the application.
+		 * @param title Title of the notification.
+		 * @param text String to be displayed as part of the notification.
+		 * @return \< 0 on error or if the syscall is not available on the 
+		 * current platform.
+		 */
+		int maNotificationAdd(
+			in int type, 
+			in int id, 
+			in MAString title, 
+			in MAString text);
+
+		/**
+		 * Remove a notification item.
+		 * @param id The id of the notification.
+		 * @return \< 0 on error.
+		 */
+		int maNotificationRemove(in int id);
+
+		constset int NOTIFICATION_TYPE_ {
+			/// A persistent notification that will launch the 
+			/// application when selected.
+			APPLICATION_LAUNCHER = 1;
+		}
+
+		/**
+		 * Set the screen orientation.
+		 * @param orientation One of the \link #SCREEN_ORIENTATION 
+		 * \endlink constants.
+		 * @return \< 0 on error.
+		 */
+		int maScreenSetOrientation(in int orientation);
+
+		constset int SCREEN_ORIENTATION_ {
+			/// Landscape screen orientation.
+			LANDSCAPE = 1;
+			/// Portrait screen orientation.
+			PORTRAIT = 2;
+			/// Screen orientation is based on device sensor.
+			DYNAMIC = 3;
+		}
+
+		/**
+		 * Enable/disable fullscreen mode.
+		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+		 * @return \< 0 on error.
+		 */
+		void maScreenSetFullscreen(in int fullscreen);
 	}
+	
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}

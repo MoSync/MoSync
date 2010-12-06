@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -17,13 +17,85 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <mavsprintf.h>
 #include "common.h"
+#include "MAHeaders.h"
 
-void drawColorRects();
-void plot();
-void drawLines();
-void drawTriangles();
-void drawTrianglesClip();
-void drawText();
+int drawColorRects();
+int plot();
+int drawLines();
+int drawTriangles();
+int drawTrianglesClip();
+int drawText();
+
+const char *drawImageRegionEnumStrings[] = {
+"TRANS_NONE",
+"TRANS_MIRROR_ROT180",
+"TRANS_MIRROR",
+"TRANS_ROT180",
+"TRANS_MIRROR_ROT270",
+"TRANS_ROT90",
+"TRANS_ROT270",
+"TRANS_MIRROR_ROT90"
+};
+
+/**
+ * @brief Tests the maDrawImageRegion
+ *
+ * This test tests all the available rotations of maDrawImageRegion
+ * and prints which rotation it's currently showing.
+ */
+class DrawImageRegionCase : public KeyBaseCase {
+private:
+	MAHandle mImage;
+	int mState;
+public:
+	DrawImageRegionCase(const String& name, MAHandle image, int state) : KeyBaseCase(name), mImage(image), mState(state) {}
+
+	virtual void start()
+	{
+		MAExtent e = maGetScrSize();
+		Dimensions screen;
+		screen.width = EXTENT_X(e);
+		screen.height = EXTENT_Y(e);
+
+		maSetClipRect(0, 0, screen.width, screen.height);
+		maSetColor(BLACK);
+		maFillRect(0, 0, screen.width, screen.height);
+
+		MARect rect;
+		rect.left = 0;
+		rect.top = 0;
+		MAExtent imgSize = maGetImageSize(mImage);
+		rect.width = EXTENT_X(imgSize);
+		rect.height = EXTENT_Y(imgSize);
+		MAPoint2d p;
+		p.x = 0;
+		p.y = 0;
+
+		maDrawImageRegion(mImage, &rect, &p, mState);
+
+		const char* title = drawImageRegionEnumStrings[mState];
+
+		maSetColor(0xff0000);
+		maDrawText(4, screen.height - EXTENT_Y(maGetTextSize(title)), title);
+
+		maUpdateScreen();
+	}
+
+	//KeyListener
+	virtual void keyPressEvent(int keyCode) {
+	}
+
+	virtual void keyReleaseEvent(int keyCode) {
+		checkYesNo(keyCode);
+		suite->runNextCase();
+	}
+};
+
+
+template <MAHandle image, int state>
+void drawImageRegion() {
+
+}
 
 void addBasicGfxTests(TestSuite* suite);
 void addBasicGfxTests(TestSuite* suite) {
@@ -33,10 +105,13 @@ void addBasicGfxTests(TestSuite* suite) {
 	suite->addTestCase(new TemplateCase<drawTriangles>("triangles"));
 	suite->addTestCase(new TemplateCase<drawTrianglesClip>("triangles-clip"));
 	suite->addTestCase(new TemplateCase<drawText>("text"));
+
+	for(int i = 0; i < 8; i++)
+		suite->addTestCase(new DrawImageRegionCase("drawImageRegion " + String(drawImageRegionEnumStrings[i]), RES_IMAGETEST, i));
 }
 
 
-void drawText() {
+int drawText() {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
 	screen.width = EXTENT_X(e);
@@ -59,10 +134,11 @@ void drawText() {
 	maDrawText((screen.width - EXTENT_X(e)) / 2, (screen.height - EXTENT_Y(e)) / 2, middle);
 
 	maUpdateScreen();
+	return 0;
 }
 
 
-void drawTrianglesClip() {
+int drawTrianglesClip() {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
 	screen.width = EXTENT_X(e);
@@ -72,11 +148,13 @@ void drawTrianglesClip() {
 	maSetColor(BLACK);
 	maFillRect(0, 0, screen.width, screen.height);
 
-	maSetClipRect(25, 25, screen.width-50, screen.height-50);
+	maSetClipRect((screen.width>>2), (screen.height>>2), screen.width-(screen.width>>1), screen.height-(screen.height>>1));
 	drawTriangles();
+
+	return 0;
 }
 
-void drawTriangles() {
+int drawTriangles() {
 	MAExtent e = maGetScrSize();
 	Dimensions screen;
 	screen.width = EXTENT_X(e);
@@ -96,7 +174,7 @@ void drawTriangles() {
 
 	//double time = (double)maGetMilliSecondCount()*0.0002;
 	double time = 0;
-	double size = 200;
+	double size = (screen.width<screen.height)?(screen.width>>1):(screen.height>>1);
 	double ang = 0.0;
 	double angdelta = (2*3.14159)/(double)NUM_POINTS;
 	int index = 0;
@@ -119,10 +197,11 @@ void drawTriangles() {
 	}
 
 	maUpdateScreen();
+	return 0;
 }
 
 
-void drawLines() {
+int drawLines() {
 	const MAExtent scrSize = maGetScrSize();
 	const int scrHeight = EXTENT_Y(scrSize);
 	const int scrWidth = EXTENT_X(scrSize);
@@ -151,9 +230,11 @@ void drawLines() {
 	maUpdateScreen();
 	maLine(-5, 1, 2, -1);
 	maUpdateScreen();
+
+	return 0;
 }
 
-void plot() {
+int plot() {
 	MAExtent screenSize;
 	int scrW, scrH;
 	screenSize = maGetScrSize();
@@ -168,11 +249,16 @@ void plot() {
 	maPlot(scrW - 1, 0);
 	maPlot(scrW - 1, scrH - 1);
 
+	maPlot(scrW/2, scrH/2);
+
+
 	maUpdateScreen();
+
+	return 0;
 }
 
 
-void drawColorRects() {
+int drawColorRects() {
 	MAExtent screenSize;
 	int midX, midY;
 	int width, height;
@@ -212,4 +298,6 @@ void drawColorRects() {
 	maFillRect(1+width+2, 1+(height+2)*3, width, height);
 
 	maUpdateScreen();
+
+	return 0;
 }

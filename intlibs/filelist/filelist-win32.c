@@ -71,3 +71,9 @@ int isDirectory(const char* filename) {
 		return -1;
 	return (res & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0;
 }
+
+#ifndef _WIN32_WCE
+char* fullpath(const char* name) {
+	return _fullpath(NULL, name, 0);
+}
+#endif

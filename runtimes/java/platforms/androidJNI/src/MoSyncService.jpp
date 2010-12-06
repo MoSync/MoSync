@@ -1,0 +1,184 @@
+/* Copyright (C) 2010 MoSync AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+package com.mosync.java.android;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
+
+public class MoSyncService extends Service
+{
+	// TODO: Remove commented out code.
+	//static boolean sIsRunning = true;
+	/*public static void stopService()
+	{
+		sIsRunning = false;
+	}*/
+	
+	// Since we just have one service, we can cheat and 
+	// make these global.
+	public static int sNotificationId;
+	static String sNotificationTitle;
+	static String sNotificationText;
+	
+	// Instance of this service.
+	static MoSyncService sMe;
+	
+	public static void startService(
+		Context context, 
+		int notificationId,
+		String notificationTitle, 
+		String notificationText)
+	{
+		Log.i("@@@MoSync", "MoSyncService.startService");
+		
+		// There should be no running service.
+		if (null != sMe)
+		{
+			Log.i("@@@MoSync", "MoSyncService.startService - service is already running, returning");
+			return;
+		}
+		
+		sNotificationId = notificationId;
+		sNotificationTitle = notificationTitle;
+		sNotificationText = notificationText;
+		
+		Intent serviceIntent = new Intent(context, MoSyncService.class);
+		context.startService(serviceIntent);
+	}
+	
+	public static void stopService()
+	{
+		Log.i("@@@MoSync", "MoSyncService.stopService");
+		
+		if (null != sMe)
+		{
+			Log.i("@@@MoSync", "MoSyncService.stopService - stopSelf");
+			sMe.stopSelf();
+			sMe = null;
+		}
+	}
+	
+	@Override
+	public IBinder onBind(Intent intent) 
+	{
+		return null;
+	}
+	
+	/**
+	 * Start service in foreground with notification icon.
+	 * Start foreground is only available on Android API level 5 and above.
+	 */
+	@Override
+	public void onCreate()
+	{
+		super.onCreate();
+		
+		Log.i("@@@MoSync", "MoSyncService.onCreate sMe: " + sMe);
+		
+		sMe = this;
+		
+		// Get icon.
+		int icon = getResources().getIdentifier(
+			"icon", 
+			"drawable", 
+			getPackageName());
+		Log.i("@@@MoSync", "MoSyncService.onCreate icon: " + icon);
+		
+		// TODO: Replace with app name.
+		CharSequence tickerText = sNotificationTitle;
+		long when = System.currentTimeMillis();
+		Notification notification = new Notification(icon, tickerText, when);
+		
+		Context context = getApplicationContext();
+		CharSequence contentTitle = sNotificationTitle;
+		CharSequence contentText = sNotificationText;
+		//Intent intent = new Intent("mosync.dynamicwebview.DISPLAY");
+		Intent intent = new Intent(context, MoSync.class);
+		intent.addFlags(
+			Intent.FLAG_ACTIVITY_NEW_TASK | 
+			Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+			Intent.FLAG_ACTIVITY_SINGLE_TOP |
+			Intent.FLAG_DEBUG_LOG_RESOLUTION |
+			0);
+		PendingIntent contentIntent = PendingIntent.getActivity(
+			context, 
+			0, 
+			intent,
+			0
+		    );
+		notification.setLatestEventInfo(
+			context, 
+			contentTitle,
+			contentText, 
+			contentIntent);
+		// TODO: Is this needed?
+		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+
+#ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
+		startForeground(sNotificationId, notification);
+#else	
+		NotificationManager notificationManager = (NotificationManager) 
+			getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(sNotificationId, notification);
+#endif	
+
+		// I don't think we need to have a thread to make service
+		// run at higher priority, should do with startForeground.
+		// TODO: Remove commented out code.
+		/*
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				Log.i("@@@MoSync", "MoSyncService.thread enter");
+				
+				while (mIsRunning)
+				{
+					try
+					{
+						Thread.sleep(1000);
+						Log.i("@@@MoSync", "MoSyncService thread hello");
+					}
+					catch (Exception ex)
+					{
+						Log.i("@@@MoSync", "MoSyncService thread exception: " + ex);
+					}
+				}
+				
+				Log.i("@@@MoSync", "MoSyncService.thread exit");
+			}
+		}).start();
+		*/
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+		
+		Log.i("@@@MoSync", "MoSyncService.onDestory");
+		
+		stopService();
+	}
+}

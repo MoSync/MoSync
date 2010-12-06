@@ -32,15 +32,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <mach/mach.h>
 #import <mach/mach_host.h>
 
+void logWithNSLog(const char *str, int length) {
+	NSString* text = [[NSString alloc] initWithBytes:str length:length encoding:NSUTF8StringEncoding];
+	NSLog(text);
+	[text release];
+}
+
 const char *getReadablePath(const char* path) {
-	NSString *stringFromChar = [NSString stringWithCString:path length:strlen(path)];  	
+	NSString *stringFromChar = [[NSString alloc] initWithBytes:path length:strlen(path) encoding:NSUTF8StringEncoding];  	
 	NSString *nspath = [[NSBundle mainBundle] pathForResource:stringFromChar ofType:@""];
 //	NSString *source = [NSString stringWithContentsOfFile:nspath encoding:NSUTF8StringEncoding error:NULL];
 	return [nspath UTF8String];
 }
 
 const char *getWriteablePath(const char* path) {
-	NSString *stringFromChar = [NSString stringWithCString:path length:strlen(path)];  	
+	NSString *stringFromChar =  [[NSString alloc] initWithBytes:path length:strlen(path) encoding:NSUTF8StringEncoding];
+	//[NSString stringWithCString:path length:strlen(path)];  	
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
 	NSString *documentsDirectoryPath = [paths objectAtIndex:0];	
 	NSString *myFilePath = [documentsDirectoryPath stringByAppendingPathComponent:stringFromChar];
@@ -96,7 +103,8 @@ int getTotalAmountOfMemory() {
 }
 
 bool platformRequest(const char *urlstr) {
-	NSString *stringFromChar = [NSString stringWithCString:urlstr length:strlen(urlstr)];
+//	NSString *stringFromChar = [NSString stringWithCString:urlstr length:strlen(urlstr)];
+	NSString *stringFromChar = [[NSString alloc] initWithBytes:urlstr length:strlen(urlstr) encoding:NSUTF8StringEncoding];
 	NSURL *url = [NSURL URLWithString:stringFromChar];
 	if (![[UIApplication sharedApplication] openURL:url])
 		return false;

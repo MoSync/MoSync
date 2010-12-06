@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false" version="1">
+<project supports-build-configs="true" version="1">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
 <properties>
 <property key="build.prefs:additional.include.paths" value="."/>
 <property key="build.prefs:additional.libraries" value="MAUtilD.lib,MATestD.lib, MAStdD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,MATest.lib, MAStd.lib"/>
 <property key="build.prefs:additional.library.paths" value=""/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Bluetooth Calendar Calendar/Read Calendar/Write Camera Contacts Contacts/Read Contacts/Write File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access Location Location/Coarse Location/Fine Power\ Management SMS SMS/Read SMS/Receive SMS/Send Vibrate"/>
 <property key="build.prefs:app.vendor" value="MoSync"/>
-<property key="build.prefs:extra.link.sw" value=""/>
+<property key="build.prefs:extra.link.sw" value="-xerr"/>
 <property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.switches" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:ignore.default.libraries" value="true"/>
 <property key="build.prefs:memory.data" value="4096"/>
+<property key="build.prefs:memory.data/Debug" value="1024"/>
+<property key="build.prefs:memory.data/Release" value="1024"/>
 <property key="build.prefs:memory.heap" value="2048"/>
+<property key="build.prefs:memory.heap/Debug" value="512"/>
+<property key="build.prefs:memory.heap/Release" value="512"/>
+<property key="build.prefs:memory.stack/Debug" value="128"/>
+<property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="symbian.uids:uid.s60v2uid" value="0x09f34d84"/>

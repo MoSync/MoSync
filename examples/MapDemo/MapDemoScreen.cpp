@@ -172,6 +172,12 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	{
 		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
+		// Avoid CloudMade maps by default
+		if(newKind == MapSourceKind_CloudMade1)
+			newKind = (MapSourceKind)(mMapSourceKind + 2);
+		if(newKind == MapSourceKind_CloudMade7)
+			newKind = (MapSourceKind)(mMapSourceKind + 3);
+		// Wrap
 		if( newKind >= MapSourceKind_Last )
 			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
 		mMapSourceKind = newKind;
@@ -189,8 +195,13 @@ namespace MapDemo
 		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleMap, "Google (map)" ) ) );
 		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleAerial, "Google (aerial)" ) ) );
 		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleHybrid, "Google (hybrid)" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade1, "CloudMade (type 1)" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade7, "CloudMade (type 7)" ) ) );
+		//
+		// Uncomment the following lines if you want to use CloudMade maps with your API key.
+		// Without any key CloudMade maps will not be loaded.
+		// See MapDemoMoblet.cpp for more information about the API Key.
+		//
+		//list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade1, "CloudMade (type 1)" ) ) );
+		//list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_CloudMade7, "CloudMade (type 7)" ) ) );
 		list.add( newobject( ExitAction, new ExitAction( mMoblet ) ) );
 	}
 }

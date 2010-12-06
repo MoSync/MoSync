@@ -17,6 +17,7 @@
 
 #include "DirScrAccEng.h"
 #include "base_errors.h"
+#include "Image.h"
 
 using namespace MoSyncError;
 
@@ -26,27 +27,42 @@ _LIT(KDirScrAccTxt, "DirectScreenAccess");
 //Helper classes
 //******************************************************************************
 
+// first: if this is the first of several bitmaps to be locked.
+// if used incorrectly, there will be a deadlock on s60v2, fp2 and earlier.
+static void BeginDataAccess(CFbsBitmap& fbs, bool first) {
+#ifdef __S60_50__	//5th edition
+	fbs.BeginDataAccess();
+#else	//2nd or 3rd edition
+	if(first)
+		fbs.LockHeap();
+#endif
+}
+
+static void EndDataAccess(CFbsBitmap& fbs, bool first) {
+#ifdef __S60_50__	//5th edition
+	fbs.EndDataAccess();
+#else	//2nd or 3rd edition
+	if(first)
+		fbs.UnlockHeap();
+#endif
+}
+
 class TMyDrawBuf {
 public:
-	TMyDrawBuf(CFbsBitmap& aDrawSurface) : mDS(aDrawSurface) {
-#ifdef __S60_50__	//5th edition
-		mDS.BeginDataAccess();
-#else	//2nd or 3rd edition
-		mDS.LockHeap();
-#endif
+	TMyDrawBuf(CFbsBitmap& aDrawSurface, bool first) :
+		mDS(aDrawSurface), mFirst(first)
+	{
+		BeginDataAccess(mDS, mFirst);
 		mPtr = (Pixel*)mDS.DataAddress();
 	}
 	operator Pixel*() { return mPtr; }
 	~TMyDrawBuf() {
-#ifdef __S60_50__	//5th edition
-		mDS.EndDataAccess();
-#else	//2nd or 3rd edition
-		mDS.UnlockHeap();
-#endif
+		EndDataAccess(mDS, mFirst);
 	}
 private:
 	CFbsBitmap& mDS;
 	Pixel* mPtr;
+	bool mFirst;
 };
 
 //******************************************************************************
@@ -81,7 +97,7 @@ void CDirScrAccEng::LineDrawClip(long x,long y,long dx,long dy)
 	//LOGD("LineDrawClip %i %i d%i d%i\n", x, y, dx, dy);
 	//line vars
 	register long sdx,sdy,dxabs,dyabs,n,ac,linelen;
-	TMyDrawBuf drawBuffer(*iDrawSurface);
+	TMyDrawBuf drawBuffer(*iDrawSurface, true);
 	if(dy == 0) {
 		DrawSpan(x, y, dx, drawBuffer);
 		return;
@@ -163,7 +179,7 @@ void CDirScrAccEng::PlotClip(int x, int y) {
 	if(x >= iCurrentClipRect.iTl.iX && x < iCurrentClipRect.iBr.iX &&
 		y >= iCurrentClipRect.iTl.iY && y < iCurrentClipRect.iBr.iY)
 	{
-		TMyDrawBuf drawBuffer(*iDrawSurface);
+		TMyDrawBuf drawBuffer(*iDrawSurface, true);
 		Plot(drawBuffer, x, y);
 	}
 }
@@ -190,7 +206,7 @@ void CDirScrAccEng::FillRectClip(int left, int top, int width, int height) {
 	TRect rect(TPoint(left, top), TSize(width, height));
 	rect.Intersection(iCurrentClipRect);
 	//Draw
-	TMyDrawBuf drawBuffer(*iDrawSurface);
+	TMyDrawBuf drawBuffer(*iDrawSurface, true);
 	if(rect.Width() == iDrawWidth) {
 		FillLines(drawBuffer, rect.iTl.iY, rect.Height());
 	} else {
@@ -206,7 +222,7 @@ void CDirScrAccEng::FillTriangleStripClip(const MAPoint2d* points, int count) {
 	}
 	LOGG("\n");
 	MYASSERT(count >= 3, ERR_POLYGON_TOO_FEW_POINTS);
-	TMyDrawBuf drawBuffer(*iDrawSurface);
+	TMyDrawBuf drawBuffer(*iDrawSurface, true);
 	for(int i = 2; i < count; i++) {
 		DrawTriangle(drawBuffer,
 			points[i-2].x, 
@@ -236,13 +252,74 @@ void CDirScrAccEng::DrawImage(TAlphaBitmap* img, int left, int top) {
 		iFBGc->BitBlt(TPoint(left, top), img->Color());
 	}
 }
+
+static ClipRect TRect2ClipRect(const TRect& t) {
+	ClipRect c;
+	c.x = t.iTl.iX;
+	c.y = t.iTl.iY;
+	c.width = t.Width();
+	c.height = t.Height();
+	return c;
+}
+
 void CDirScrAccEng::DrawImage(TAlphaBitmap* img, const TRect& srcRect,
-	const TPoint& dstPoint, int /*transform*/)
+	const TPoint& dstPoint, int transform)
 {
-	if(img->Alpha()) {
-		iFBGc->BitBltMasked(dstPoint, img->Color(), srcRect, img->Alpha(), false);
+	if(transform == TRANS_NONE) {
+		if(img->Alpha()) {
+			iFBGc->BitBltMasked(dstPoint, img->Color(), srcRect, img->Alpha(), false);
+		} else {
+			iFBGc->BitBlt(dstPoint, img->Color(), srcRect);
+		}
 	} else {
-		iFBGc->BitBlt(dstPoint, img->Color(), srcRect);
+		// set up source image
+#if defined(__SERIES60_3X__) || defined(MA_PROF_SUPPORT_FRAMEBUFFER_32BIT)
+		Image::PixelFormat format = Image::PIXELFORMAT_RGB888;
+#else
+		Image::PixelFormat format = Image::PIXELFORMAT_RGB565;
+#endif
+		CFbsBitmap& color(*img->Color());
+		TMyDrawBuf colorBuf(color, true);
+		byte* alpha;
+		if(img->Alpha()) {
+			BeginDataAccess(*img->Alpha(), false);
+			alpha = (byte*)img->Alpha()->DataAddress();
+		} else {
+			alpha = NULL;
+		}
+		TSize srcSize = color.SizeInPixels();
+		int srcPitch = color.ScanLineLength(srcSize.iWidth, color.DisplayMode());
+		//LOG("src size: %ix%i, pitch: %i\n", srcSize.iWidth, srcSize.iHeight,
+			//srcPitch);
+		
+		// todo: there could be a problem with alpha pitch not being equal to
+		// the width. investigate.
+		Image src((byte*)(Pixel*)colorBuf, alpha,
+			srcSize.iWidth, srcSize.iHeight, srcPitch, format, false, false);
+		src.mulTable = iMulTable;
+
+		// set up destination image
+		TMyDrawBuf drawBuf(*iDrawSurface, false);
+		TSize dstSize = iDrawSurface->SizeInPixels();
+		int dstPitch = iDrawSurface->ScanLineLength(dstSize.iWidth, iDrawSurface->DisplayMode());
+		//LOG("size: %ix%i, pitch: %i\n", dstSize.iWidth, dstSize.iHeight,
+			//dstPitch);
+		Image dst((byte*)(Pixel*)drawBuf, NULL, dstSize.iWidth, dstSize.iHeight,
+			dstPitch, format, false, false);
+		dst.mulTable = iMulTable;
+		dst.clipRect = TRect2ClipRect(iCurrentClipRect);
+		ClipRect clipSourceRect = TRect2ClipRect(srcRect);
+		//LOG("csr: %ix%i, %ix%i\n", clipSourceRect.x, clipSourceRect.y,
+			//clipSourceRect.width, clipSourceRect.height);
+
+		// perform the drawing
+		dst.drawImageRegion(dstPoint.iX, dstPoint.iY,
+			&clipSourceRect, &src, transform);
+
+		// clean up
+		if(img->Alpha()) {
+			EndDataAccess(*img->Alpha(), false);
+		}
 	}
 }
 
@@ -367,7 +444,7 @@ CDirScrAccEng::CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice
 	: iClient(aClient),	iScreenDevice(aScreenDevice),
 	iWindow(aWindow), iDirectScreenAccess(0), iScreenGc(0),
 	iDrawing(EFalse), iOffScreenBmp(0), iOffScreenDevice(0), iFBGc(0),
-	iRawFrameBuf(NULL)
+	iRawFrameBuf(NULL), iMulTable(NULL)
 {    
 	LOGG("DSAE\n");
 	TSize size = aWindow.Size();
@@ -398,10 +475,14 @@ CDirScrAccEng::~CDirScrAccEng()	{
 		delete iOffScreenDevice;
 	if(iOffScreenBmp)
 		delete iOffScreenBmp;
+	if(iMulTable)
+		delete iMulTable;
 }
 
 void CDirScrAccEng::ConstructL() {
 	LOGG("DSAEC\n");
+
+	iMulTable = initMulTable();
 
 	// for emulator, always use offscreen bitmap
 	// create the offscreen bitmap
@@ -427,7 +508,7 @@ void CDirScrAccEng::ConstructL() {
 
 void CDirScrAccEng::ClearScreen() {
 	LOGG("ClearScreen\n");
-	TMyDrawBuf drawBuffer(*iOffScreenBmp);
+	TMyDrawBuf drawBuffer(*iOffScreenBmp, true);
 	FillLines(drawBuffer, 0, iOffScreenBmp->SizeInPixels().iHeight);
 	iFBGc->CancelClippingRect();
 }
@@ -580,7 +661,7 @@ void CDirScrAccEng::UpdateScreen() {
 	if(!iDrawing)
 		return;
 	if(iRawFrameBuf != NULL) {
-		TMyDrawBuf drawBuffer(*iOffScreenBmp);
+		TMyDrawBuf drawBuffer(*iOffScreenBmp, true);
 		memcpy(drawBuffer, iRawFrameBuf, iFrameBufLen);
 	}
 	// blit the offscreen bitmap (if used) to screen

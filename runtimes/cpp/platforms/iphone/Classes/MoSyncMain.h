@@ -28,10 +28,14 @@ void MoSync_UpdateView(CGImageRef ref);
 void MoSync_DoneUpdatingView();
 
 void MoSync_ShowMessageBox(const char *msg, bool kill);
+void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
+
 void MoSync_Exit();
 
 void MoSync_StartUpdatingLocation();
 void MoSync_StopUpdatingLocation();
+void MoSync_StartUpdatingAccelerometer();
+void MoSync_StopUpdatingAccelerometer();
 void MoSync_AddTouchPressedEvent(int x, int y);
 void MoSync_AddTouchMovedEvent(int x, int y);
 void MoSync_AddTouchReleasedEvent(int x, int y);

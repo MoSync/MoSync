@@ -29,8 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
 //#define SYSLOG(...)
 
-/*
-Function that initializes the native core	
+/**
+* @brief Function that initializes the native core	
 */
 static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 {
@@ -49,8 +49,8 @@ static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 	return true;
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+* /return The newly created Data Section as a Direct ByteBuffer object
 */
 static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong programOffset, jobject resource, jlong resourceOffset)
 {
@@ -98,7 +98,7 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	
 	if(NULL == prg)
 	{
-		SYSLOG("seams to be something wrong here..");
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Bridge", "No program file available!");
 		return false;
 	}
 	
@@ -120,7 +120,8 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 }
 
 
-/*
+/**
+* @brief nativeLoadResource
 */
 static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 {
@@ -130,8 +131,8 @@ static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 	
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+*	/return The newly created Data Section as a Direct ByteBuffer object
 */
 static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 {
@@ -145,8 +146,8 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 	return gCore->mem_ds_jobject;
 }
 
-/*
-	/return The newly created Data Section as a Direct ByteBuffer object
+/**
+*	/return The newly created Data Section as a Direct ByteBuffer object
 */
 static void nativeRun(JNIEnv* env, jobject jthis)
 {
@@ -173,6 +174,9 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 	
 }
 
+/**
+* @brief nativePostEvent
+*/
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
 	SYSLOG("JNI PostEvent");
@@ -230,6 +234,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	Base::gSyscall->postEvent(event);
 }
 
+/**
+* @brief jniRegisterNativeMethods
+*/
 int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods )
 {
 	jclass clazz;
@@ -262,6 +269,9 @@ static JNINativeMethod sMethods[] =
    { "nativePostEvent", "([I)V", (void*)nativePostEvent},
 };
 
+/**
+* @brief JNI_OnLoad
+*/
 jint JNI_OnLoad ( JavaVM* vm, void* reserved )
 {
 	JNIEnv* env = NULL;

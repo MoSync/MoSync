@@ -26,26 +26,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUtil {
 
-/// Thin template sorted Set.
+/** \brief Thin template sorted Set.
+* \see Dictionary
+*/
 template<class Key>
-class Set : public Dictionary<Key, Key> {
+class Set : public Dictionary<const Key, const Key> {
 public:
-	typedef Dictionary<Key, Key> D;
+	typedef Dictionary<const Key, const Key> D;
 
-	Set(typename D::CompareFunction cf = &Compare<Key>) : D::Dictionary(cf, 0) {
+	Set(int (*cf)(const Key&, const Key&) = &Compare<const Key>) : D::Dictionary(cf, 0) {
 	}
-
-	/**
-	* Inserts a new element into the Set.
-	*
-	* Returns a Pair. The Pair's second element is true if the element was inserted,
-	* or false if the element already existed in the set.
-	* The Pair's first element is an Iterator that points to the element in the Set.
-	*
-	* An element which is equal to the new one may already be present in the Set;
-	* in that case, this operation does nothing, and the Iterator returned will point to
-	* the old element.
-	*/
 	Pair<typename D::Iterator, bool> insert(const Key& key) { return D::insert(key); }
 };
 

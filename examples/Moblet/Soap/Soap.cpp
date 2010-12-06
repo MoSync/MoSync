@@ -37,16 +37,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Flickr services.
 // They will need modification to operate properly with other SOAP servers.
 
-#define SOAPNS_BODY "soap"
-#define SOAPNS "soap"
+#define SOAPNS "SOAP-ENV"
+#define SOAPNS_BODY SOAPNS
 #define SOAP_CONTENT_TYPE "text/xml; charset=utf-8"
 
 static const char sSoapHeader[] =
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-"<"SOAPNS":Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
-"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
-"xmlns:"SOAPNS"=\"http://www.w3.org/2003/05/soap-envelope\">"
-"<"SOAPNS":Body>\n";
+"<"SOAPNS":Envelope xmlns:"SOAPNS"=\"http://schemas.xmlsoap.org/soap/envelope/\""
+" xmlns:ns1=\"urn:localhost-scramble\""
+" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+" xmlns:SOAP-ENC=\"http://schemas.xmlsoap.org/soap/encoding/\""
+" "SOAPNS":encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">"
+"<"SOAPNS":Body>"
+;
 static const int sSoapHeaderLength = sizeof(sSoapHeader) - 1;
 static const char sSoapFooter[] =
 "</"SOAPNS":Body>"

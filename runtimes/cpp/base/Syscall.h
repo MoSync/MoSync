@@ -38,7 +38,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <hashmap/hashmap.h>
 
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_FILE.h>
 
 struct MAConnAddr;
 
@@ -135,7 +134,7 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
-		int GetValidatedStackValue(int offset, va_list argptr);
+		int GetValidatedStackValue(int offset);
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _RESOURCE_DEFS_H_
 
 #include "base/Stream.h"
-#include "image.h"
+#include "Image.h"
 
 // On android all images are stored and used on the Dalvik side
 

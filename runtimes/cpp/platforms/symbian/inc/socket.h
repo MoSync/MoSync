@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <ES_SOCK.H>
 #include <in_sock.h>
 #include <bt_sock.h>
+#include <SecureSocket.h>
 
 #include <helpers/helpers.h>
 
@@ -28,13 +29,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "symbian_helpers.h"
 #include "string2map.h"
 
-class CSocket : public CConnection {
+class CMySecureSocket;
+
+class CBaseSocket : public CConnection {
+public:
+	virtual void Connect(TSockAddr& aAddr, CPublicActive& op) = 0;
+	virtual CMySecureSocket* ssl() = 0;
+};
+
+class CSocket : public CBaseSocket {
 public:
 	enum Type {
 		ETcp, ERfcomm, EBlank
 	};
 
-	CSocket(RSocketServ& aServer, Type type) {
+	CSocket(RSocketServ& aServer, Type type) : mClosed(true) {
 		switch(type) {
 		case ETcp:
 			LHEL(mSocket.Open(aServer, KAfInet, KSockStream, KProtocolInetTcp));
@@ -46,26 +55,46 @@ public:
 			LHEL(mSocket.Open(aServer));
 			break;
 		}
+		mClosed = false;
 	}
-	~CSocket() {
-		mSocket.CancelAll();
-		mSocket.Close();
+	virtual ~CSocket() {
+		LOGD("~CSocket()\n");
+		if(!mClosed) {
+			mSocket.CancelAll();
+			mSocket.Close();
+			mClosed = true;
+		}
 	}
 
-	void Connect(TSockAddr& aAddr, CPublicActive& op);
-	bool Write(const TDesC8& aDesc, CPublicActive& op);
-	void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
-	void CancelAll() {
+	virtual void Connect(TSockAddr& aAddr, CPublicActive& op);
+	virtual bool Write(const TDesC8& aDesc, CPublicActive& op);
+	virtual void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
+	virtual void CancelAll() {
 		mSocket.CancelAll();
 	}
+	CMySecureSocket* ssl() { return NULL; }
 	
 	void GetAddr(MAConnAddr* addr);
 	
 	RSocket& socket() { return mSocket; }
 
-private:
+protected:
 	RSocket mSocket;
 	TSockXfrLength mDummyLength;
+	bool mClosed;
+};
+
+class CMySecureSocket : public CSocket {
+public:
+	CMySecureSocket(RSocketServ& aServer) : CSocket(aServer, ETcp), mSS(NULL) {}
+	virtual ~CMySecureSocket();
+	virtual bool Write(const TDesC8& aDesc, CPublicActive& op);
+	virtual void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
+	virtual void CancelAll();
+	CMySecureSocket* ssl() { return this; }
+	void Handshake(const TDesC* hostname, CPublicActive& op);
+private:
+	CSecureSocket* mSS;
 };
 
 class CServerSocket : public CConnection {
@@ -103,7 +132,7 @@ private:
 };
 
 
-class CHttpConnection : public CSocket {
+class CHttpConnection : public CBaseSocket {
 public:	//CConnection
 	//only allowed on FINISHED sockets
 	void RecvOneOrMoreL(TDes8& aDes, CPublicActive& op);
@@ -112,12 +141,19 @@ public:	//CConnection
 	bool Write(const TDesC8& aDesc, CPublicActive& op);
 	
 	CHttpConnection* http() { return this; }
+	
+	void CancelAll() { mTransport->CancelAll(); }
+	void GetAddr(MAConnAddr* addr) { mTransport->GetAddr(addr); }
 
+	//CBaseSocket
+	void Connect(TSockAddr& aAddr, CPublicActive& op) { mTransport->Connect(aAddr, op); }
+	CMySecureSocket* ssl() { return mTransport->ssl(); }
 public:	//CHttpConnection
-	CHttpConnection(RSocketServ& aServer, int method, TUint16 port, RStringPool& pool)
-	: CSocket(aServer, CSocket::ETcp), mState(SETUP), mPort(port), mMethod(method),
+	CHttpConnection(CBaseSocket* transport, int method, uint port, RStringPool& pool)
+	: mState(SETUP), mMethod(method), mPort(port),
 	mRequestHeaders(pool), mResponseHeaders(pool),
-	mSync(TSyncCallback(SyncCallbackL, this)), mSyncOp(NULL), mLineHandler(NULL) {}
+	mSync(TSyncCallback(SyncCallbackL, this)), mSyncOp(NULL), mLineHandler(NULL),
+	mTransport(transport) {}
 
 	void ConstructL(const TDesC8& hostname, const TDesC8& path);
 	
@@ -138,8 +174,8 @@ public:	//CHttpConnection
 		SETUP=1, WRITING, FINISHING, FINISHED
 	} mState;
 
-	const TUint16 mPort;
 	const int mMethod;
+	const uint mPort;
 	Smartie<HBufC8> mPath;
 	Smartie<HBufC> mHostname;
 	Smartie<CBufFlat> mBuffer;
@@ -164,6 +200,7 @@ private:
 	void (CHttpConnection::*mLineHandler)(const TDesC8& aLine);
 	int mResponseCode;
 	TMyPtr8 mRecvPtr;
+	CBaseSocket* mTransport;
 };
 
 #endif  //SOCKET_H

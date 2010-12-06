@@ -28,10 +28,21 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	
 	buildFlags = "-D_android"
 	
+	# Get the api level 
+	androidVersion = Integer(ENV['MOSYNC_ANDROID_API_LEVEL'])
+	
 	# Add the _ANDROID_BLUETOOTH flag when building for version-5 or higher 
-	androidVersion = Integer(ENV['MOSYNC_ANDROID_BLUETOOTH'])
 	if androidVersion >= 7
 		buildFlags << " -D_ANDROID_BLUETOOTH"
+		buildFlags << " -D_ANDROID_API_LEVEL_7_OR_HIGHER"
+	end 
+	
+	if androidVersion >= 5
+		buildFlags << " -D_ANDROID_API_LEVEL_5_OR_HIGHER"
+	end 
+	
+	if androidVersion == 3
+		buildFlags << " -D_ANDROID_API_LEVEL_3"
 	end 
 	
 	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
@@ -70,7 +81,7 @@ out_dir = "AndroidProject/src/com/mosync/java/android/"
 # Preprocess the com.mosync.java.android files, these will later be transformed to the applications real package
 #
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSync.jpp" || x == "MoSyncPanicDialog.jpp" || x == "TextBox.jpp") # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
+	if (x == "MoSync.jpp" || x == "MoSyncPanicDialog.jpp" || x == "TextBox.jpp" || x == "MoSyncService.jpp") # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
 		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
 	end
 }

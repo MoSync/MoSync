@@ -15,130 +15,114 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include "Vibration.h"	
-#include <helpers/cpp_defs.h>
 #include <windows.h>
 
-#ifdef WIN32_PLATFORM_WFSP
-#include <vibrate.h>
-#endif
+#include "Vibration.h"	
 
-#include <ceconfig.h>
-
-#include "config_platform.h"
-#include <helpers/helpers.h>
-#include <helpers/CriticalSection.h>
-using namespace MoSyncError;
-
-/****** hack for nled on pocket pc:s using smartphone runtime (htc touch for instance). ***********/
-//#include <NLed.h> 
-const int NLED_COUNT_INFO_ID = 0;
-const int NLED_SETTINGS_INFO_ID = 2;
-struct NLED_SETTINGS_INFO {
-  UINT LedNum;
-  INT OffOnBlink;
-  LONG TotalCycleTime;
-  LONG OnTime;
-  LONG OffTime;
-  INT MetaCycleOn;
-  INT MetaCycleOff; 
-};
-struct NLED_COUNT_INFO {
-  UINT cLeds; 
-};
-extern "C" { BOOL NLedGetDeviceInfo(INT nID, PVOID pOutput); BOOL NLedSetDevice(INT nID, PVOID pOutput); } 
-/*************************************************************************************************/
-
-// only used on Pocket PC devices 
-#define VIB_MODE_PPC 0
-#define VIB_MODE_SP 1
-	int vibMode;
-	int GetLedCount() {
-		NLED_COUNT_INFO nci; 
-		int wCount = 0; 
-		if(NLedGetDeviceInfo(NLED_COUNT_INFO_ID, (PVOID) &nci)) 
-			wCount = (int) nci.cLeds; 
-		return wCount; 
-	} 
-
-	HRESULT SetLedStatus(int wLed, int wStatus) { 
-		NLED_SETTINGS_INFO nsi; 
-		nsi.LedNum = (INT) GetLedCount()-1; 
-		nsi.OffOnBlink = (INT) wStatus; 
-		BOOL r = NLedSetDevice(NLED_SETTINGS_INFO_ID, &nsi); 
-		if(r == TRUE) return S_OK;
-		else return S_FALSE;
-	} 
-
-#ifndef VibrateStop
-HRESULT VibrateStop() {
-	SetLedStatus(0, 0); // let's try this.
-	return S_OK;
-}
-#endif
-
-namespace Base {
-	CRITICAL_SECTION vibrationCS;
-	UINT_PTR vibrationId = NULL;
-	extern HWND g_hwndMain;
-	
-	VOID CALLBACK VibrationStopCallback(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime) {
-		CriticalSectionHandler cs(&vibrationCS);
-		if(vibMode == VIB_MODE_PPC)	
-			SetLedStatus(0, 0);
-		else
-			VibrateStop();
-		vibrationId = NULL;
-	}
-
-	int VibrationStop() {
-#ifdef WIN32_PLATFORM_WFSP
-		if(vibrationId != NULL) {
-			GLE(KillTimer(g_hwndMain, vibrationId));
-			vibrationId = NULL;	
-			if(vibMode == VIB_MODE_PPC)
-				return SetLedStatus(0, 0);
-			else 
-				return VibrateStop() == S_OK;
-		}
-		return TRUE;
-#else 
-		return IOCTL_UNAVAILABLE;
-#endif
-	}
-
-	int VibrationStart(int ms) 
+namespace Base 
+{
+	namespace Vibration
 	{
-#ifdef WIN32_PLATFORM_WFSP
-		CriticalSectionHandler cs(&vibrationCS);
-		vibMode = VIB_MODE_SP;
-		int ret = 0;
-		// hack to support vibration using smartphone runtime on pocket pc phones (htc touch)
-		if((ret=VibrateGetDeviceCaps(VDC_AMPLITUDE))<=0) {
-			vibMode = VIB_MODE_PPC;
+		/**
+		 * Determines the type of vibration.
+		 *
+		 * OFF - Turns off the vibration.
+		 * ON - Turns on the vibration.
+		 * BLINK - Blinks the vibration according to the given
+		 *         on and off cycles.
+		 */
+		enum VibratorState {OFF = 0, ON = 1, BLINK=2};
+
+		/**
+		 * The integer specifying the vibrator LED.
+         *
+		 * Note: This is not guaranteed to be the default vibrator LED on all
+		 *       devices.
+		 */
+		static const int VIBRATOR_LED = 1;
+
+		/**
+		 * The ID of the vibrator timer.
+		 */
+		static const int IDT_VIBRATOR_TIMER = 5;
+
+		/**
+		 * Function that is called when the timer should stop.
+		 *
+		 * @see TimerProc, http://msdn.microsoft.com/en-us/library/ms644907(v=VS.85).aspx.
+		 */
+		static VOID CALLBACK VibrateTimerCallback(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime);
+
+		bool available()
+		{
+			NLED_COUNT_INFO nci;
+			NLedGetDeviceInfo(NLED_COUNT_INFO_ID, (PVOID) &nci);
+
+			return ((INT) nci.cLeds) >= 2;
 		}
-		if(ms==0) {	
-			return VibrationStop();
-		} else {
-			VibrationStop();
-			
-			HRESULT res;
 
-			if(vibMode == VIB_MODE_PPC)
-				res = SetLedStatus(0, 1);
+		bool onFor(int vibratorOnTimeMs)
+		{
+			if(!available())
+			{
+				return false;
+			}
+
+			NLED_SETTINGS_INFO nsi;
+			nsi.LedNum = (INT) VIBRATOR_LED;
+			nsi.TotalCycleTime = (INT) 1000 * vibratorOnTimeMs;
+			nsi.OnTime = (INT) 1000 * vibratorOnTimeMs;
+			nsi.OffTime = (INT) 0;
+			nsi.OffOnBlink = (INT) ON;
+			nsi.MetaCycleOn = (INT) 1;
+			nsi.MetaCycleOff = (INT) 0;
+
+			BOOL couldStart = NLedSetDevice(NLED_SETTINGS_INFO_ID, &nsi);
+			if(!couldStart)
+			{
+				return false;
+			}
+
+			/**
+			 * Create a timer and turn off the timer after the specified
+			 * number of miliseconds. This is because several devices does
+			 * not support the BLINK option.
+			 * 
+			 * Note: Any old timer running will be overwritten.
+			 */ 
+			UINT_PTR newId = SetTimer(NULL, IDT_VIBRATOR_TIMER, vibratorOnTimeMs, (TIMERPROC) VibrateTimerCallback);
+			if(newId != 0)
+			{
+				return true;
+			}
 			else
-				res = Vibrate(0, NULL, 0, INFINITE);
-
-			if(res == S_OK) {
-				GLE(vibrationId=SetTimer(g_hwndMain, 1, ms, VibrationStopCallback));
-				return 1;
-			} else {
-				return 0;
+			{
+				/* If we do not have the timer, the vibration wont stop,
+				 * so stop it immedietley. */
+				stop();
+				return false;
 			}
 		}
-#else
-		return IOCTL_UNAVAILABLE;
-#endif
-	}
 
-} // namespace Base
+		void stop()
+		{
+			NLED_SETTINGS_INFO nsi;
+
+			if(!available())
+			{
+				return;
+			}
+
+			nsi.LedNum = (INT) VIBRATOR_LED;
+			nsi.OffOnBlink = (INT) OFF;
+
+			NLedSetDevice(NLED_SETTINGS_INFO_ID, &nsi);
+		}
+
+		VOID CALLBACK VibrateTimerCallback(HWND hwnd, UINT message, UINT idTimer, DWORD dwTime)
+		{
+			stop();
+			KillTimer(hwnd, idTimer);
+		}
+	};
+};

@@ -1,6 +1,26 @@
+/* Copyright (C) 2010 MoSync AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <string>
+
 #include "package.h"
 
 static const char* sUsage =
@@ -13,12 +33,14 @@ static const char* sUsage =
 " -h, --help                   Print this information.\n"
 " -p, --program <file>         Input: compiled program file.\n"
 " -r, --resource <file>        Input: compiled resource file.\n"
+" -i, --icon <file>            Input: MoSync icon definition file (XML).\n"
 " -m, --model <vendor>/<model> Output: target model.\n"
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
 "     --vendor <name>          Output: application vendor's name.\n"
 "     --debug                  Output: use debug runtime.\n"
 "     --uid <8-digit hex>      Output: Symbian UID.\n"
+" -s, --silent                 Output: Supress additional output, e.g. warnings."
 "\n"
 "Environment variables used:\n"
 " MOSYNCDIR                    Path to the MoSync installation directory.\n"
@@ -37,9 +59,20 @@ static void setString(int& i, int argc, const char** argv, const char*& dst) {
 	dst = argv[i];
 }
 
+static void onExit() {
+	printf("onExit\n");
+}
+
 int main(int argc, const char** argv) {
 	SETTINGS s;
 	memset(&s, 0, sizeof(s));
+
+	atexit(&onExit);
+
+	if(argc == 1) {
+		printf("%s", sUsage);
+		return 1;
+	}
 
 	for(int i=1; i<argc; i++) {
 		if(streq(argv[i], "-h") || streq(argv[i], "--help")) {
@@ -49,6 +82,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.program);
 		} else if(streq(argv[i], "-r") || streq(argv[i], "--resource")) {
 			setString(i, argc, argv, s.resource);
+		} else if(streq(argv[i], "-i") || streq(argv[i], "--icon")) {
+			setString(i, argc, argv, s.icon);
 		} else if(streq(argv[i], "-m") || streq(argv[i], "--model")) {
 			setString(i, argc, argv, s.model);
 		} else if(streq(argv[i], "-d") || streq(argv[i], "--dst")) {
@@ -61,6 +96,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "-s") || streq(argv[i], "--silent")) {
+			s.silent = true;
 		} else {
 			printf("Unknown argument: '%s'\n", argv[i]);
 			return 1;
@@ -120,11 +157,23 @@ const char* mosyncdir() {
 	return md;
 }
 
-void sh(const char* cmd) {
+void sh(const char* cmd, bool hideOutput) {
 	printf("%s\n", cmd);
 	fflush(stdout);
 	fflush(stderr);
-	int res = system(cmd);
+
+	std::string finalCmd(cmd);
+	if(hideOutput) {
+		// Supress output from stdout and stderr
+#ifdef WIN32
+		finalCmd += "> nul 2>&1";
+#else
+		finalCmd += "> /dev/null 2>&1";
+#endif
+	}
+
+	int res = system(finalCmd.c_str());
+
 	fflush(stdout);
 	fflush(stderr);
 	if(res != 0) {

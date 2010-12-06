@@ -227,7 +227,7 @@ namespace Mtx
 {
 
 /**
- * SAX parser callback interface class.
+ * \brief Base class for SAX parser callback interfaces.
  *
  * Inherit from this to receive callbacks from a SaxContext.  This is analogous
  * to filling in the function pointers of a MTXSaxContext object.
@@ -257,6 +257,7 @@ public:
 	virtual void mtxParseError(void) = 0;
 };
 
+/// 8-bit SAX parser callback interface.
 class SaxListener : public SaxListenerT<char> {
 public:
 	/**
@@ -265,11 +266,12 @@ public:
 	virtual unsigned char mtxUnicodeCharacter(int character) = 0;
 };
 
+/// Wide-char SAX parser callback interface.
 class SaxListenerW : public SaxListenerT<wchar_t> {
 };
 
 /**
- * \brief SAX parser context wrapper class.
+ * \brief Base class for SAX parser context wrappers.
  *
  * This class wraps the mtxSax set of functions.  To use it, you need to
  * inherit and implement the MtxListener and SaxListener interfaces.
@@ -310,6 +312,7 @@ protected:
 	SaxListenerW* mSaxListenerW;
 };
 
+/// 8-bit SAX parser context wrapper class.
 class SaxContext : public SaxContextBase {
 public:
 	/**
@@ -353,6 +356,7 @@ private:
 	static unsigned char unicodeCharacter(MTXSaxContext* context, int character);
 };
 
+/// Wide-char SAX parser context wrapper class.
 class SaxContextW : public SaxContextBase {
 public:
 	//SaxContextW(void);

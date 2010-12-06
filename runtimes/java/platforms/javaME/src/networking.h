@@ -284,6 +284,8 @@ throws IOException
 		if(len > 0) {
 			int ava = in.available();
 			//DEBUG_TEMP("available: "+ava+"\n");
+			if(ava <= 0)
+				return res;
 			if(len > ava)
 				len = ava;
 			//DEBUG_TEMP("len: "+len+"\n");

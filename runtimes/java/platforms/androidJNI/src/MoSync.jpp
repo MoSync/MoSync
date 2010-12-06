@@ -18,196 +18,206 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.java.android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
-
+import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
-
 import android.util.Log;
-import java.util.Locale;
 
-import android.os.Handler;
+import java.util.Locale;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
-import android.content.res.Configuration;
+#include "generated/MAAPI_consts.h"
 
-import android.content.Context;
-
-
-import android.content.pm.ActivityInfo;
+//#define SYSLOG(a) Log.i("MoSync SYSLOG", a);
+#define SYSLOG(...)
 
 /**
-*
 * Main MoSync activity
 *
 * As long as this activity is running the application is running.
 */
 public class MoSync extends Activity
 {
-
-	MoSyncView mMoSyncView;
 	static public MoSyncThread mMoSyncThread;
+	MoSyncView mMoSyncView;
 	Intent mMoSyncServiceIntent;
 	
-	boolean mThreadHasDied = false;
-	
-	boolean mIsPaused = false;
-	
 	/**
-	*
-	* onCreate
-	*
-	* Informs the underlying system that a fullscreen windows with no title bar shall be used.
-	*
-	* Creates and initializes the MoSync thread
-	*
-	* Calls the createMoSyncView method and then shows the created view
-	*
-	*/
+	 * Sets screen and window properties.
+	 * Creates and initializes the MoSync thread
+	 * Calls the createMoSyncView method and then shows the created view.
+	 */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) 
+	{
 		Log.i("MoSync", "onCreate");
 		
-		if(mThreadHasDied) this.finish();
+		super.onCreate(savedInstanceState);
 		
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		if (theMoSyncThreadIsDead()) { return ; }
 		
+		// Initialize.
 		mMoSyncView = null;
 		
-		try{
+		// MoSync Android apps do not have a system title bar.
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
+		// Default screen orientation is landscape mode.
+		// There is a name clash between the MoSync and the Android 
+		// SCREEN_ORIENTATION_PORTRAIT constant!
+		// Preprecessing of .jpp files fuck things up!
+		// We therefore use the numeric value of this Android constant.
+		setRequestedOrientation(1);
+		
+		try
+		{
+			// Create the thread.
 			mMoSyncThread = new MoSyncThread(this, new Handler());
 		}
-		catch(Exception e)
+		catch (Exception ex)
 		{
-			Log.e("MoSync", "Unable to create thread! Application is closed!");
-			super.onDestroy();
-			this.finish();
+			MoSyncThread.logError(
+				"MoSync - Unable to create thread! " +
+				"Application is closed!", 
+				ex);
+			//super.onDestroy();
+			finish();
+			return;
 		}
 		
+		// Create the view.
 		createMoSyncView();
-		
-		setContentView(mMoSyncView);
 		mMoSyncThread.setMoSyncView(mMoSyncView);
-		
+		setContentView(mMoSyncView);
     }
 	
 	/**
-	*
-	* createMoSyncView 
-	* Creates a MoSyncView. If it fails the Activity is destroyed.
-	*
-	*/
-	private void createMoSyncView()
-	{
-		Log.i("MoSync", "createMoSyncView");
-		try {
-			mMoSyncView = new MoSyncView(this, mMoSyncThread);
-        } catch(Exception e) {
-			Log.e("MoSync", "No view was generated.. app could not start!");
-			super.onDestroy();
-			this.finish();
-		}
-	}
-
-	/**
-	*
-	* onConfigurationChanged
-	* Handles the new configurations when the screen rotates and/or the keyboard was opened.
-	*
-	*/
+	 * Handles the new configurations when the screen rotates.
+	 * @param newConfig Object that holds configuration info.
+	 */
 	@Override
-	public void onConfigurationChanged(Configuration config)
+	public void onConfigurationChanged(Configuration newConfig)
 	{
-		super.onConfigurationChanged(config);
+		Log.i("MoSync", "onConfigurationChanged");
 
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		setContentView(mMoSyncView);
+		super.onConfigurationChanged(newConfig);
 	}
 	
-	/**
-	*
-	* onStop
-	* 
-	*/
+	@Override
+    protected void onPause()
+	{
+		Log.i("MoSync", "onPause");
+		
+		super.onPause();
+		
+		if (theMoSyncThreadIsDead()) { return ; }
+		
+		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_LOST;
+		mMoSyncThread.postEvent(event);
+    }
+	
     @Override
     protected void onStop()
 	{
+		Log.i("MoSync", "onStop");
+		
 		super.onStop();
-		Log.i("MoSync","onStop");
 		
-		mThreadHasDied = mMoSyncThread.isDead();
+		if (theMoSyncThreadIsDead()) { return ; }
 		
-		// The view is destroyed, inform the thread about this
-		if(!mThreadHasDied)
-			mMoSyncThread.setMoSyncView(null);
+		// The view is destroyed, inform the thread about this.
+		mMoSyncThread.setMoSyncView(null);
 	}
 
 	@Override
     protected void onRestart()
 	{
+		Log.i("MoSync", "onRestart");
+		
 		super.onRestart();
-		Log.i("MoSync","onRestart");
 		
-		if(mThreadHasDied) this.finish();
+		if (theMoSyncThreadIsDead()) { return ; }
+	}
+	
+	@Override
+    protected void onStart()
+	{
+		Log.i("MoSync", "onStart");
 		
-		// create a new view and inform the thread about this
-		createMoSyncView();
+		super.onStart();
 	}
 	
 	@Override
     protected void onResume()
 	{
+		Log.i("MoSync", "onResume");
+		
 		super.onResume();
-		Log.i("MoSync","onResume");
 		
-		if(mThreadHasDied) this.finish();
+		if (theMoSyncThreadIsDead()) { return ; }
 		
-		// this should be dealt with differently
-		//registerReceiver(mBatteryReciever, new IntentFilter(Intent.ACTION_BATTERY_CHANGED)); 
+		mMoSyncThread.setMoSyncView(mMoSyncView);
 		
-		if(mIsPaused == true)
-		{
-			mIsPaused = false;
-			
-			//mMoSyncView.postFocusGainedEvent();
-			setContentView(mMoSyncView);
-			mMoSyncThread.setMoSyncView(mMoSyncView);
-		}
+		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		mMoSyncThread.postEvent(event);
     }
-
-	@Override
-    protected void onPause()
-	{
-		super.onPause();
-		Log.i("MoSync","onPause");
-		
-		mThreadHasDied = mMoSyncThread.isDead();
-			
-		//unregisterReceiver(mBatteryReciever);
-		
-		mIsPaused = true;
-  
-		//mMoSyncView.postFocusLostEvent();		
-    }
-
+	
 	@Override
     protected void onDestroy()
 	{
-		super.onDestroy();	
-    	Log.i("MoSync","onDestroy");
+    	Log.i("MoSync", "onDestroy");
 		
-		mThreadHasDied = mMoSyncThread.isDead();
-		
-		//stopService(mMoSyncServiceIntent);
-		
-		//mMoSyncView.stopThread();
-		finish();
-		//mMosyncView.killApplication();
+		super.onDestroy();
     }
 	
+	/**
+	 * Creates the MoSyncView. If it fails the Activity is destroyed.
+	 */
+	private void createMoSyncView()
+	{
+		Log.i("MoSync", "createMoSyncView");
+		
+		try 
+		{
+			mMoSyncView = new MoSyncView(this, mMoSyncThread);
+        } 
+		catch (Exception ex) 
+		{
+			MoSyncThread.logError(
+				"MoSync - The MoSyncView could not be created, " +
+				"the application could not start!", 
+				ex);
+			finish();
+		}
+	}
+
+	/**
+	 * In case of maPanic the MoSync thread exits
+	 * and is dead. In this case we should finish
+	 * the application.
+	 */
+	private boolean theMoSyncThreadIsDead()
+	{
+		if (null != mMoSyncThread && mMoSyncThread.isDead())
+		{
+			MoSyncService.stopService();
+			finish();
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }

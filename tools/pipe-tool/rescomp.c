@@ -54,7 +54,6 @@ void ResourceMain()
 	ResourceComp();
 	FinalizeResource();
 
-//!	printf("Pass 1 - Size %d\n", (int) (ResPtr - ResMem));
 	printf("Pass 1 - Size %d\n", ResIP);
 
 	//*** Pass 2 ***
@@ -82,7 +81,6 @@ void ResourceMain()
 
 	WriteResources();
 
-//	printf("Pass 2 - Size %d\n", (int) (ResPtr - ResMem));
 	printf("Pass 2 - Size %d\n", ResIP);
 
 	AsmDisposeMem();
@@ -105,7 +103,7 @@ void ResourceComp()
 
 	ResetErrorCount();
 
-	SetErrorReturn();
+	SET_ERROR_RETURN();
 
 	while(1)
 	{
@@ -128,15 +126,6 @@ void ResourceComp()
 		if (*FilePtr == 0)
 			break;
 	
-/*		if (TestAsmLabel())
-		{
-			GetAsmName();
-			NeedToken(":");
-	
-			MakeNewResource();
-			continue;
-		}
-*/
 		if (ResourceCommands())
 		{
 			SkipWhiteSpace();
@@ -158,7 +147,6 @@ void ResourceComp()
 void SetResPtrs()
 {
 	LocalScope = 0;		//1;
-//!	ResPtr = ResMem;
 	ResIP = 0;
 }
 
@@ -169,9 +157,6 @@ void SetResPtrs()
 void SetResAsmPtrs()
 {
 	LocalScope = 0;
-
-//!	DataPtr = DataMem;
-//!	CodePtr = CodeMem;
 	
 	CodeIP = 0;
 	DataIP = 0;
@@ -180,7 +165,6 @@ void SetResAsmPtrs()
 	CurrentFunction = 0;
 
 	CurrentFile[0] = 0;
-//	CurrentFileLine = 0;
 }
 
 //****************************************
@@ -257,7 +241,6 @@ void ResetResource()
 {
 	// Initialize new resource
 
-	//SetAsmPtrs();
 	SetResAsmPtrs();
 
 	CodeIP = 0;
@@ -1245,7 +1228,6 @@ short ResourceCommands()
 
 	if (QToken(".pstring"))
 	{
-//		char *dataStart;
 		int dataStart;
 		int len;
 
@@ -1255,8 +1237,6 @@ short ResourceCommands()
 
 		// Get current data location
 		
-//!		dataStart = DataPtr;
-//!		dataStart = (char *) ArrayPtr(&DataMemArray, DataIP);
 		dataStart = DataIP;
 		
 		// read string to mem
@@ -1265,7 +1245,6 @@ short ResourceCommands()
 		
 		// find the string length
 		
-//!		len = DataPtr - dataStart;
 		len = DataIP - dataStart;
 
 		if (len > 255)
@@ -1276,7 +1255,6 @@ short ResourceCommands()
 		
 		// Patch the string length
 		
-//!		*(dataStart-1) = len;
 		ArraySet(&DataMemArray, dataStart-1, len);
 
 		
@@ -1394,7 +1372,6 @@ void MakeIndexedResource(char *name, int index)
 
 int GetDataIndex()
 {
-//	return	DataPtr - DataMem;
 	return 	DataIP;
 }
 
@@ -1406,10 +1383,7 @@ void FinalizeResource()
 {
 	int n;
 	
-//!	int DataLen = DataPtr - DataMem;
-	int DataLen = DataIP;
-	
-//!	int ResStart = (int) ResPtr;
+	int DataLen = DataIP;	
 	int ResStart = ResIP;
 
 	int ResLen, IndexSize;
@@ -1444,19 +1418,11 @@ void FinalizeResource()
 
 			// Write table size + indices
 
-//!			*ResPtr++ = IndexCount & 0xff;
-//!			*ResPtr++ = (IndexCount >> 8) & 0xff;
-
 			WriteResByte(IndexCount & 0xff);
 			WriteResByte((IndexCount >> 8) & 0xff);
 
 			for (n=0;n<IndexCount;n++)
 			{
-//!				*ResPtr++ = IndexTable[n] & 0xff;
-//!				*ResPtr++ = (IndexTable[n] >> 8) & 0xff;
-//!				*ResPtr++ = (IndexTable[n] >> 16) & 0xff;
-//!				*ResPtr++ = (IndexTable[n] >> 24) & 0xff;
-
 				WriteResByte(IndexTable[n] & 0xff);
 				WriteResByte((IndexTable[n] >> 8) & 0xff);
 				WriteResByte((IndexTable[n] >> 16) & 0xff);
@@ -1476,9 +1442,6 @@ void FinalizeResource()
 
 			// Write table size + indices
 
-//!			*ResPtr++ = IndexCount & 0xff;
-//!			*ResPtr++ = (IndexCount >> 8) & 0xff;
-
 			WriteResByte(IndexCount & 0xff);
 			WriteResByte((IndexCount >> 8) & 0xff);
 
@@ -1486,9 +1449,6 @@ void FinalizeResource()
 			{
 
 //				printf("ind %d - offset %d\n", n, IndexTable[n]);
-
-//!				*ResPtr++ = IndexTable[n] & 0xff;
-//!				*ResPtr++ = (IndexTable[n] >> 8) & 0xff;			
 
 				WriteResByte(IndexTable[n] & 0xff);
 				WriteResByte((IndexTable[n] >> 8) & 0xff);
@@ -1518,18 +1478,13 @@ void FinalizeResource()
 
 	for (n=0;n<DataLen;n++)
 	{
-//!1	*ResPtr++ = DataMem[n];
-//!2	*ResPtr++ = ArrayGet(&DataMemArray, n);
-
 		WriteResByte(ArrayGet(&DataMemArray, n));
 	}
 
-//!	ResLen = (int) ResPtr - ResStart;
 	ResLen = ResIP - ResStart;
 	
 	if (Pass == 2)
 	{
-//!		printf("Res %d Total %d", CurrentResource, ResPtr - ResStart);
 		printf("Res %d Total %d", CurrentResource, ResIP - ResStart);
 
 		if (ResDispose)
@@ -1576,7 +1531,6 @@ void WriteResources()
 
 	// Write the header
 	
-	//SetAsmPtrs();
 	SetResAsmPtrs();
 
 	DataIP = 0;
@@ -1596,22 +1550,20 @@ void WriteResources()
 
 	// Write the header info
 
-//!	DataLen = DataPtr - DataMem;
 	DataLen = DataIP;
 
 	if (DataLen > 0)
-//!		fwrite(DataMem , 1, DataLen , CodeFile);	// Save the data
 		ArrayWriteFP(&DataMemArray, CodeFile, DataLen);
 
 	// Write the resouce data
 	
 	if (ResLen > 0)
-//!		fwrite(ResMem , 1, ResLen , CodeFile);		// Save the data
 		ArrayWriteFP(&ResMemArray, CodeFile, ResLen);
 
-
 	res = fwrite(&nullbyte , 1, 1 , CodeFile);			// Save a null
-	if(res != 1) {
+
+	if(res != 1)
+	{
 		Error(Error_Fatal, "Could not write resources");
 		return;
 	}

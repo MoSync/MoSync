@@ -37,6 +37,10 @@ class RuntimeBuilder
 			default = "@S60_3rd_FP1:com.nokia.s60"
 			symbian_system = "gcce"
 			# symbian_system = "armv5"
+		elsif version == "s60v3-guido"
+			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3-guido"
+			default = "@S60_3rd_FP1:com.nokia.s60"
+			symbian_system = "gcce"
 		elsif version == "s60v5"
 			group_dir = "#{$SETTINGS[:symbian_source]}group-ed3"
 			symbian_system = "gcce"
@@ -91,7 +95,7 @@ class RuntimeBuilder
 			
 			puts "\nFINISHED! - #{runtime_dir}MoSync#{debug}.app, and other runtime files was succesfully generated!\n\n"
 			return 0
-		elsif version == "s60v3"
+		elsif version == "s60v3" || version == "s60v3-guido"
 			epoc_dir = "/Symbian/9.2/S60_3rd_FP1/Epoc32/"
 			sis_dir = "#{$SETTINGS[:symbian_source]}sis-ed3/"
 			exe_file = "#{epoc_dir}release/#{symbian_system}/urel/MoSync2.exe"
@@ -144,6 +148,10 @@ class RuntimeBuilder
 	
 	def s60v3(runtime_dir, mode)
 		return build_symbian(runtime_dir, mode, "s60v3")
+	end
+	
+	def s60v3_guido(runtime_dir, mode)
+		return build_symbian(runtime_dir, mode, "s60v3-guido")
 	end
 	
 	def s60v5(runtime_dir, mode)

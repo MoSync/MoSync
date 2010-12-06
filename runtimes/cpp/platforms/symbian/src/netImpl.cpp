@@ -154,13 +154,18 @@ void Syscall::FinishNetworkingStartL() {
 }
 
 void Syscall::StopNetworking() {
+	LOGD("StopNetworking()\n");
 	//cancel all connOps.
 	TDblQueIter<ConnOp> itr(gConnOps);
 	itr.SetToFirst();
 	ConnOp* op;
+	int i=0;
 	while((op = itr++) != NULL) {
+		LOGD("op %i cancel...\n", i);
 		//delete op;	//causes crash
 		op->Cancel();
+		LOGD("op %i cancel done.\n", i);
+		i++;
 	}
 }
 
@@ -222,6 +227,51 @@ void CSocket::GetAddr(MAConnAddr* addr) {
 	TSockAddr sockaddr;
 	mSocket.RemoteName(sockaddr);
 	storeSockAddr(sockaddr, addr);
+}
+
+//******************************************************************************
+//CMySecureSocket
+//******************************************************************************
+
+void CMySecureSocket::Handshake(const TDesC* hostname, CPublicActive& op) {
+	if(mSS != NULL)
+		return;
+	_LIT(KSsl3, "SSL3.0");
+	mSS = CSecureSocket::NewL(mSocket, KSsl3);
+	mSS->FlushSessionCache();
+	if(hostname) {
+		HBufC8* h8 = CreateHBufC8FromDesC16LC(*hostname);
+		mSS->SetOpt(KSoSSLDomainName, KSolInetSSL, *h8);
+		CleanupStack::PopAndDestroy(h8);
+	}
+	mSS->StartClientHandshake(op.iStatus);
+	op.SetActive();
+}
+
+CMySecureSocket::~CMySecureSocket() {
+	LOGD("~CMySecureSocket()\n");
+	if(mSS) {
+		mSS->Close();
+		delete mSS;
+		mSocket.Close();
+		mClosed = true;
+	}
+}
+
+bool CMySecureSocket::Write(const TDesC8& aDesc, CPublicActive& op) {
+	mSS->Send(aDesc, op.iStatus);
+	op.SetActive();
+	return true;
+}
+void CMySecureSocket::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
+	mSS->RecvOneOrMore(aDes, op.iStatus, mDummyLength);
+	op.SetActive();
+}
+void CMySecureSocket::CancelAll() {
+	if(mSS != NULL) {
+		mSS->CancelAll();
+	}
+	CSocket::CancelAll();
 }
 
 //******************************************************************************
@@ -333,6 +383,7 @@ void Syscall::ConnOp::RunL() {
 		case CSOC_Read:
 		case CSOC_Write:
 		case CSOC_HttpReadHeaders:
+		case CSOC_SecureHandshake:
 			if(mConn.connErr == 0) { switch(result) {
 			case KErrDisconnected:
 			case KErrEof:
@@ -427,6 +478,10 @@ void Syscall::ConnOp::DoCancel() {
 		mSyscall.gConnection.Close();
 		LOGS("gConnection.Close() successful\n");
 		mSyscall.gNetworkingState = EIdle;
+		{
+			TRequestStatus* rsp = &iStatus;
+			User::RequestComplete(rsp, KErrCancel);
+		}
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);
@@ -442,6 +497,7 @@ void Syscall::ConnOp::DoCancel() {
 	case CSOC_Read:
 	case CSOC_Write:
 	case CSOC_HttpReadHeaders:
+	case CSOC_SecureHandshake:
 		mConn.CancelAll();
 		break;
 	default:
@@ -449,6 +505,7 @@ void Syscall::ConnOp::DoCancel() {
 		DEBIG_PHAT_ERROR;
 	}
 	SendResult(CONNERR_CANCELED);
+	LOGD("DoneCancel\n");
 }
 
 void Syscall::ConnOp::StartConnSubOpL() {
@@ -465,8 +522,19 @@ void Syscall::ConnOp::StartConnSubOpL() {
 #ifdef __WINSCW__
 		LHEL(r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp));
 #else
-		LHEL(r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp,
-			mSyscall.gConnection));
+		int res = r.resolver.Open(mSyscall.gSocketServ, KAfInet, KProtocolInetUdp,
+			mSyscall.gConnection);
+		// Happens when phone goes from online to offline mode
+		// while a MoSync app is running.
+		if(res == KErrNotReady) {
+			SendResult(CONNERR_NETWORK);
+			// Prepare gConnection for restart.
+			mSyscall.gConnection.Close();
+			LOGS("gConnection.Close() successful\n");
+			mSyscall.gNetworkingState = EIdle;
+			break;
+		}
+		LHEL(res);
 #endif
 		r.resolver.GetByName(r.hostname, r.result, iStatus);
 		SetActive();
@@ -497,6 +565,11 @@ void Syscall::ConnOp::StartConnSubOpL() {
 	case CSOC_Accept: {
 		CSO_Accept& a = (CSO_Accept&)sop;
 		a.server.Accept(a.newSock->socket(), *this);
+		break;
+	}
+	case CSOC_SecureHandshake: {
+		CSO_SecureHandshake& sh = (CSO_SecureHandshake&)sop;
+		sh.sock.Handshake(sh.hostname, *this);
 		break;
 	}
 	default:
@@ -531,7 +604,7 @@ CO_CONSTRUCTOR_PI(NameConnect) {
 		CSO_ADD(StartNetworking);
 	}
 	CSO_ADD(Resolve, *hostname, nameEntry);
-	CSO_ADD(SockConnect, nameEntry().iAddr, port, sock);
+	addSockConnect(sock, nameEntry().iAddr, port, hostname());
 }
 CO_DESTRUCTOR_P(NameConnect) {
 	LOGS("~NameConnect\n");
@@ -541,7 +614,7 @@ CO_CONSTRUCTOR_PI(AddrConnect) {
 	if(aStartNetworking) {
 		CSO_ADD(StartNetworking);
 	}
-	CSO_ADD(SockConnect, addr, port, sock);
+	addSockConnect(sock, addr, port, NULL);
 }
 CO_DESTRUCTOR_P(AddrConnect) {
 	LOGS("~AddrConnect\n");
@@ -611,11 +684,21 @@ CO_DESTRUCTOR_P(HttpFinish) {
 	LOGS("~HttpFinish\n");
 }
 
+void Syscall::ConnOp::addSockConnect(CBaseSocket& sock, TSockAddr& addr, int port,
+	const TDesC* hostname)
+{
+	CSO_ADD(SockConnect, addr, port, sock);
+	CMySecureSocket* mss = sock.ssl();
+	if(mss) {
+		CSO_ADD(SecureHandshake, *mss, hostname);
+	}
+}
+
 void Syscall::ConnOp::addHttpSendHeaders() {
 	CHttpConnection* http = mConn.http();
 	DEBUG_ASSERT(http->mState == CHttpConnection::SETUP);
 	CSO_ADD(Resolve, *http->mHostname, http->mNameEntry);
-	CSO_ADD(SockConnect, http->mNameEntry().iAddr, http->mPort, *http);
+	addSockConnect(*http, http->mNameEntry().iAddr, http->mPort, http->mHostname());
 
 	//prepare headers
 	http->FormatRequestL();
@@ -706,7 +789,7 @@ void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 
 void CHttpConnection::ReadMoreHeadersL() {
 	mRecvPtr.Set(mBufPtr.MyTPtr(mPos));
-	CSocket::RecvOneOrMoreL(mRecvPtr, mSync);
+	mTransport->RecvOneOrMoreL(mRecvPtr, mSync);
 	//continues in RunL
 }
 
@@ -844,7 +927,7 @@ void CHttpConnection::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
 		TRequestStatus* temp = &op.iStatus;
 		User::RequestComplete(temp, len);
 	} else {	//we gotta read from outside
-		CSocket::RecvOneOrMoreL(aDes, op);
+		mTransport->RecvOneOrMoreL(aDes, op);
 	}
 }
 
@@ -852,7 +935,7 @@ void CHttpConnection::RecvOneOrMoreL(TDes8& aDes, CPublicActive& op) {
 bool CHttpConnection::Write(const TDesC8& aDesc, CPublicActive& op) {
 	if(mState != WRITING && mState != FINISHING)
 		return false;
-	CSocket::Write(aDesc, op);
+	mTransport->Write(aDesc, op);
 	return true;
 }
 
@@ -995,6 +1078,14 @@ CBtServerSocket::~CBtServerSocket() {
 //Helpers
 //******************************************************************************
 
+CSocket* Syscall::createSocket(bool ssl) {
+	if(ssl) {
+		return new (ELeave) CMySecureSocket(gSocketServ);
+	} else {
+		return new (ELeave) CSocket(gSocketServ, CSocket::ETcp);
+	}
+}
+
 bool splitPurl(const TDesC8& parturl, TPtrC8& hostnamePtrC8, int& port, int portMax) {
 	int port_m1_index = parturl.Locate(':');
 	if(port_m1_index == KErrNotFound) {
@@ -1014,7 +1105,7 @@ bool splitPurl(const TDesC8& parturl, TPtrC8& hostnamePtrC8, int& port, int port
 
 //returns >0 or CONNERR.
 int Syscall::httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& conn,
-	int method)
+	int method, bool ssl)
 {
 	int port_m1_index = parturl.Locate(':');
 	int path_index = parturl.Locate('/');
@@ -1028,7 +1119,7 @@ int Syscall::httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& con
 	int hostname_length;
 	TUint16 port;
 	if(port_m1_index == KErrNotFound) {
-		port = 80;
+		port = ssl ? 443 : 80;
 		hostname_length = path_index;
 	} else {
 		TLex8 portLex(parturl.Mid(port_m1_index + 1, path_index - (port_m1_index + 1)));
@@ -1038,7 +1129,7 @@ int Syscall::httpCreateConnectionLC(const TDesC8& parturl, CHttpConnection*& con
 		}
 	}
 	TPtrC8 hostname(parturl.Left(hostname_length));
-	conn = new (ELeave) CHttpConnection(gSocketServ, method, port, gHttpStringPool);
+	conn = new (ELeave) CHttpConnection(createSocket(ssl), method, port, gHttpStringPool);
 	CleanupStack::PushL(conn);
 	conn->ConstructL(hostname, path);
 	return 1;
@@ -1082,8 +1173,14 @@ static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr) {
 }
 
 _LIT8(KHttp, "http://");
+_LIT8(KHttps, "https://");
 _LIT8(KSocket, "socket://");
+_LIT8(KSsl, "ssl://");
 _LIT8(KBtspp, "btspp://");
+
+enum ConnectionType {
+	eSocket, eHttp, eBtspp
+};
 
 //******************************************************************************
 //Proper syscalls
@@ -1096,16 +1193,43 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 		return CONNERR_MAX;
 
 	_LIT8(KLocalhost, "localhost");
-	CConnection* conn;
+	CConnection* conn = NULL;
+	TPtrC8 match;
+	bool ssl = false;
+	ConnectionType type;
 
-	if(SSTREQ(urlP, KSocket)) {	//socket
-		TPtrC8 parturl = urlP.Mid(KSocket().Length());
+	// determine type of connection
+	if(SSTREQ(urlP, KSocket)) {
+		match.Set(KSocket);
+		type = eSocket;
+		ssl = false;
+	} else if(SSTREQ(urlP, KSsl)) {
+		match.Set(KSsl);
+		type = eSocket;
+		ssl = true;
+	} else if(SSTREQ(urlP, KHttp)) {
+		match.Set(KHttp);
+		type = eHttp;
+		ssl = false;
+	} else if(SSTREQ(urlP, KHttps)) {
+		match.Set(KHttps);
+		type = eHttp;
+		ssl = true;
+	} else if(SSTREQ(urlP, KBtspp)) {
+		match.Set(KBtspp);
+		type = eBtspp;
+	} else {	//error
+		return CONNERR_URL;
+	}
+	TPtrC8 parturl = urlP.Mid(match.Length());
+
+	if(type == eSocket) {
 		TPtrC8 hostnamePtrC8;
 		int port;
 		if(!splitPurl(parturl, hostnamePtrC8, port, (1<<16))) {
 			return CONNERR_URL;
 		}
-		Smartie<CSocket> sockp(new (ELeave) CSocket(gSocketServ, CSocket::ETcp));
+		Smartie<CSocket> sockp(createSocket(ssl));
 		
 		_LIT8(K127, "127.");
 		TInetAddr addr;
@@ -1130,20 +1254,18 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 				*this, gConnNextHandle, *sockp(), hostname, port, *sockp()));
 		}
 		conn = sockp.extract();
-	} else if(SSTREQ(urlP, KHttp)) {	//http
-		TPtrC8 parturl = urlP.Mid(KHttp().Length());
+	} else if(type == eHttp) {
 		CHttpConnection* http;
-		TLTZ_PASS(httpCreateConnectionLC(parturl, http, HTTP_GET));
+		TLTZ_PASS(httpCreateConnectionLC(parturl, http, HTTP_GET, ssl));
 		StartConnOpL(CO_HttpFinish::NewL(gNetworkingState != EStarted,
 			*this, gConnNextHandle, *http, *http, true));
 		http->mState = CHttpConnection::WRITING;
 		conn = http;
 		CleanupStack::Pop(conn);
-	} else if(SSTREQ(urlP, KBtspp)) {	//btspp
+	} else if(type == eBtspp) {
 		if(gBtState != eAvailable) {
 			return CONNERR_UNAVAILABLE;
 		}
-		TPtrC8 parturl = urlP.Mid(KBtspp().Length());
 		TPtrC8 hostnamePtrC8;
 		int port_m1_index = parturl.Locate(':');
 		if(port_m1_index == KErrNotFound) {
@@ -1212,8 +1334,6 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 				rfcsa, port, *sockp()));
 			conn = sockp.extract();
 		}
-	} else {	//error
-		return CONNERR_URL;
 	}
 	CleanupStack::PushL(conn);
 	gConnections.insert(gConnNextHandle, conn);
@@ -1374,12 +1494,13 @@ SYSCALL(MAHandle, maHttpCreate(const char* url, int method)) {
 	CHttpConnection* conn;
 	if(SSTREQ(urlP, KHttp)) {
 		TPtrC8 parturl = urlP.Mid(KHttp().Length());
-		TLTZ_PASS(httpCreateConnectionLC(parturl, conn, method));
-		CleanupStack::Pop(conn);
+		TLTZ_PASS(httpCreateConnectionLC(parturl, conn, method, false));
+	} else if(SSTREQ(urlP, KHttps)) {
+		TPtrC8 parturl = urlP.Mid(KHttps().Length());
+		TLTZ_PASS(httpCreateConnectionLC(parturl, conn, method, true));
 	} else {
 		return CONNERR_URL;
 	}
-	CleanupStack::PushL(conn);
 	gConnections.insert(gConnNextHandle, conn);
 	CleanupStack::Pop(conn);
 	return gConnNextHandle++;

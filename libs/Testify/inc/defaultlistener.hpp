@@ -15,11 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/*
- * stdtestlistener.hpp
+/** \file defaultlistener.hpp
+ * \brief Default listener for Testify
  *
- *  Created on: 1 mar 2010
- *      Author: Ali Mosavian [mosavian at kth dot se]
+ * \author Ali Mosavian
+ *
+ * Created on 1 Mar 2010
  */
 
 #ifndef __STDTESTLISTENER_HPP__

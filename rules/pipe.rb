@@ -126,6 +126,9 @@ class PipeGccWork < GccWork
 			need(:@BUILDDIR)
 			need(:@TARGETDIR)
 			@TARGET_PATH = @TARGETDIR + "/" + @BUILDDIR + "program"
+			if(ELIM)
+				@TARGET_PATH += "e"
+			end
 		end
 		@TARGET = PipeTask.new(self, @TARGET_PATH, all_objects + llo, @FLAGS + @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]

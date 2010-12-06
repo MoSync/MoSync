@@ -26,6 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 
+#include "helpers/CPP_IX_AUDIOBUFFER.h"
+
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
 //#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
@@ -41,8 +43,18 @@ namespace Base
 	static ResourceArray gResourceArray;
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
 	
-	int mClipLeft, mClipTop, mClipWidth, mClipHeight;
-	MAHandle drawTargetHandle = HANDLE_SCREEN;
+	int gClipLeft = 0;
+	int gClipTop = 0;
+	int gClipWidth = 0;
+	int gClipHeight = 0;
+	
+	/**
+	 * Flag to keep track of whether the initial clip rect has
+	 * been set of not. Used in maGetClipRect and maSetClipRect.
+	 */
+	int gClipRectIsSet = 0;
+	
+	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 	
 	/**
 	* Syscall constructor	
@@ -52,6 +64,7 @@ namespace Base
 		gSyscall = this;
 //		mIsLooked = false;
 //		mGotLockedEvent = false;
+		init();
 	}
 
 	/**
@@ -108,7 +121,8 @@ namespace Base
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
 		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
 
-		mJNIEnv->DeleteLocalRef(cls);		
+		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jo);		
 		return buffer;
 	}
 
@@ -137,7 +151,7 @@ namespace Base
 	}
 	
 	/**
-	* Calls the Java fucntion 'stroeIfBinaryAudioresource'.
+	* Calls the Java function 'storeIfBinaryAudioresource'.
 	* If this resource is an audio resource, with a correct mime header,
 	* this file will be saved to the memoory.
 	* This is because Android can only play commpressed audio formats 
@@ -193,10 +207,13 @@ namespace Base
 	{
 		SYSLOG("maSetClipRect");
 		
-		mClipLeft = left;
-		mClipTop = top;
-		mClipWidth = width;
-		mClipHeight = height;
+		// Clip rect is now set.
+		gClipRectIsSet = 1;
+		
+		gClipLeft = left;
+		gClipTop = top;
+		gClipWidth = width;
+		gClipHeight = height;
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSetClipRect", "(IIII)V");
@@ -210,11 +227,24 @@ namespace Base
 	{
 		SYSLOG("maGetClipRect");
 		
+		// If no clip rect is set, we set it to the screen size.
+		if (!gClipRectIsSet)
+		{
+			MAExtent extent = maGetScrSize();
+			gClipLeft = 0;
+			gClipTop = 0;
+			gClipWidth = EXTENT_X(extent);
+			gClipHeight = EXTENT_Y(extent);
+		
+			// Clip rect is now set.
+			gClipRectIsSet = 1;
+		}
+		
 		gSyscall->ValidateMemRange(rect, sizeof(MARect));		
-		rect->left = mClipLeft;
-		rect->top = mClipTop;
-		rect->width = mClipWidth;
-		rect->height = mClipHeight;
+		rect->left = gClipLeft;
+		rect->top = gClipTop;
+		rect->width = gClipWidth;
+		rect->height = gClipHeight;
 	}
 
 	SYSCALL(void,  maPlot(int posX, int posY))
@@ -255,14 +285,30 @@ namespace Base
 
 	SYSCALL(void,  maFillTriangleStrip(const MAPoint2d* points, int count))
 	{
-		SYSLOG("maFillTriangleStrip NOT IMPLEMENTED");
-
+		SYSLOG("maFillTriangleStrip");
+		
+		int heapPoints = (int)points - (int)gCore->mem_ds;
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maFillTriangleStrip", "(II)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, heapPoints, count);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(void,  maFillTriangleFan(const MAPoint2d* points, int count))
 	{
-		SYSLOG("maFillTriangleFan NOT IMPLEMENTED");
+		SYSLOG("maFillTriangleFan");
 
+		int heapPoints = (int)points - (int)gCore->mem_ds;
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maFillTriangleFan", "(II)V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID, heapPoints, count);
+		
+		mJNIEnv->DeleteLocalRef(cls);
 	}
 
 	SYSCALL(MAExtent,  maGetTextSize(const char* str))
@@ -340,7 +386,7 @@ namespace Base
 
 	SYSCALL(void,  maUpdateScreen(void))
 	{
-		SYSLOG("maUpdateScreen");
+		//SYSLOG("maUpdateScreen");
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);		
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maUpdateScreen", "()V");	
@@ -350,9 +396,12 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
+	/**
+	* Reset backlight is not implemented on Android since it has nothing similar
+	*/
 	SYSCALL(void,  maResetBacklight(void))
 	{
-		SYSLOG("maResetBacklight NOT IMPLEMENTED");
+		//SYSLOG("maResetBacklight");
 	}
 
 	SYSCALL(MAExtent,  maGetScrSize(void))
@@ -385,10 +434,12 @@ namespace Base
 	{
 		SYSLOG("maDrawRGB");
 		
+		int rsrc = (int)src - (int)gCore->mem_ds;
+		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maDrawRGB", "(IIIIIIII)V");
 		if (methodID == 0) ERROR_EXIT;
-		mJNIEnv->CallVoidMethod(mJThis, methodID, dstPoint->x, dstPoint->y, src, srcRect->left, srcRect->top, srcRect->width, srcRect->height, scanLength);
+		mJNIEnv->CallVoidMethod(mJThis, methodID, dstPoint->x, dstPoint->y, rsrc, srcRect->left, srcRect->top, srcRect->width, srcRect->height, scanLength);
 		
 		mJNIEnv->DeleteLocalRef(cls);
 	}
@@ -440,17 +491,17 @@ namespace Base
 	{
 		SYSLOG("maSetDrawTarget");
 		
-		MAHandle temp = drawTargetHandle;
+		MAHandle temp = gDrawTargetHandle;
 		int currentDrawSurface;
 		
-		if(drawTargetHandle != HANDLE_SCREEN)
+		if(gDrawTargetHandle != HANDLE_SCREEN)
 		{
-			SYSCALL_THIS->resources.extract_RT_FLUX(drawTargetHandle);
-			if(SYSCALL_THIS->resources.add_RT_IMAGE(drawTargetHandle, NULL) == RES_OUT_OF_MEMORY)
+			SYSCALL_THIS->resources.extract_RT_FLUX(gDrawTargetHandle);
+			if(SYSCALL_THIS->resources.add_RT_IMAGE(gDrawTargetHandle, NULL) == RES_OUT_OF_MEMORY)
 			{
 				maPanic(ERR_RES_OOM, "maSetDrawTarget couldn't allocate drawtarget");
 			}
-			drawTargetHandle = HANDLE_SCREEN;
+			gDrawTargetHandle = HANDLE_SCREEN;
 		}
 		
 		if(image == HANDLE_SCREEN)
@@ -466,7 +517,7 @@ namespace Base
 				maPanic(ERR_RES_OOM, "maSetDrawTarget couldn't allocate drawtarget");
 			}
 		}
-		drawTargetHandle = image;
+		gDrawTargetHandle = image;
 			
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maSetDrawTarget", "(I)I");
@@ -511,21 +562,32 @@ namespace Base
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		
-		if(1==alpha)
+		if(0==alpha)
 		{
 			char* srcImg = (char*)src;
 			int j = 0;
 			for(int i = 0 ; i < imgSize/4; i++)
 			{
+				(*(img+j)) = (*(srcImg+j+2));j++;
 				(*(img+j)) = (*(srcImg+j));j++;
-				(*(img+j)) = (*(srcImg+j));j++;
-				(*(img+j)) = (*(srcImg+j));j++;
-				//(*(img+j)) = 255;j++;
+				(*(img+j)) = (*(srcImg+j-2));j++;
+				(*(img+j)) = 255;j++;				
 			}
 		}
 		else
 		{
-			memcpy(img, src, imgSize);
+			
+			char* srcImg = (char*)src;
+			int j = 0;
+			for(int i = 0 ; i < imgSize/4; i++)
+			{
+				(*(img+j)) = (*(srcImg+j+2));j++;
+				(*(img+j)) = (*(srcImg+j));j++;
+				(*(img+j)) = (*(srcImg+j-2));j++;
+				(*(img+j)) = (*(srcImg+j));j++; 				
+			}
+			
+			//memcpy(img, src, imgSize);
 		}
 		
 		cls = mJNIEnv->GetObjectClass(mJThis);
@@ -536,6 +598,7 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 		
 		SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL);
+		
 		return retVal;
 	}
 
@@ -590,15 +653,6 @@ namespace Base
 	SYSCALL(int,  maReadStore(MAHandle store, MAHandle placeholder))
 	{
 		SYSLOG("maReadStore");
-
-/*		
-		char* b = loadBinary(rI, size);
-		MemStream* ms = new MemStream(b, size);
-		ROOM(resources.dadd_RT_BINARY(rI, ms));
-
-		if(SYSCALL_THIS->resources.add_RT_BINARY(placeholder, NULL) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
-		placeholder = placeholder&(~DYNAMIC_PLACEHOLDER_BIT);
-	*/	
 			
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maReadStore", "(II)Ljava/nio/ByteBuffer;");
@@ -693,7 +747,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, (jint)rsrc, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-
 	}
 
 	SYSCALL(void,  maConnReadToData(MAHandle conn, MAHandle data, int offset, int size))
@@ -706,7 +759,6 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, conn, data, offset, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-
 	}
 
 	SYSCALL(void,  maConnWriteFromData(MAHandle conn, MAHandle data, int offset, int size))
@@ -725,13 +777,12 @@ namespace Base
 	{
 		SYSLOG("maConnGetAddr");
 		
+		int addrPointer = (int)addr - (int)gCore->mem_ds;
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnGetAddr", "(IJ)V");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnGetAddr", "(II)I");
 		if (methodID == 0) ERROR_EXIT;
-		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, (jlong)addr);
-		
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, addrPointer);
 		mJNIEnv->DeleteLocalRef(cls);
-		
 		return retval;
 	}
 
@@ -800,19 +851,20 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 	
+	// TODO : Implement maLoadProgram
+	
 	SYSCALL(void,  maLoadProgram(MAHandle data, int reload))
 	{
 		SYSLOG("maLoadProgram NOT IMPLEMENTED");
 	}
 
+	// TODO : Implement maGetKeys
+	
 	SYSCALL(int,  maGetKeys(void))
 	{
 		SYSLOG("maGetKeys NOT IMPLEMENTED");
 		return -1;
 	}
-
-	// NOT USED? 
-	//void* mGetEventData;
 	
 	// Parameter event points to event object on the MoSync side.
 	SYSCALL(int,  maGetEvent(MAEvent* event))
@@ -822,8 +874,6 @@ namespace Base
 		
 		// Exit if event queue is empty.
 		if (gEventFifo.count() == 0) return 0;
-		
-//		SYSLOG("maGetEvent");
 
 		// Copy runtime side event to MoSync side event.
 		*event = gEventFifo.get();
@@ -885,7 +935,6 @@ namespace Base
 
 	SYSCALL(int,  maGetMilliSecondCount(void))
 	{
-//		SYSLOG("maGetMilliSecondCount");
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maGetMilliSecondCount", "()I");
@@ -897,30 +946,42 @@ namespace Base
 		return retval;
 	}
 
+	// TODO: Implement maFreeObjectMemory
+	
 	SYSCALL(int,  maFreeObjectMemory(void))
 	{
 		SYSLOG("maFreeObjectMemory NOT IMPLEMENTED");
 		return -1;
 	}
 
+	// TODO : Implement maTotalObjectMemory
+	
 	SYSCALL(int,  maTotalObjectMemory(void))
 	{
 		SYSLOG("maTotalObjectMemory NOT IMPLEMENTED");
 		return -1;
 	}
 
-	SYSCALL(int,  maVibrate(int ms))
+	// TODO : Implement maVibrate
+	
+	SYSCALL(int, maVibrate(int ms))
 	{
-		SYSLOG("maVibrate NOT IMPLEMENTED");
-		return -1;
+		SYSLOG("maVibrate");
+		
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maVibrate", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, ms);
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return retval;
 	}
 
 	SYSCALL(void, maPanic(int result, const char* message))
 	{
 		SYSLOG("maPanic");
 		
-		int yield = Core::GetVMYield(gCore);
-		yield = 1;
+		Base::gSyscall->VM_Yield();
 		
 		jstring jstr = mJNIEnv->NewStringUTF(message);
 		
@@ -999,6 +1060,8 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 	}
 
+	// TODO : Implement maInvokeExtension
+	
 	SYSCALL(int,  maInvokeExtension(int function, int a, int b, int c))
 	{
 		SYSLOG("maInvokeExtension NOT IMPLEMENTED");
@@ -1032,10 +1095,12 @@ namespace Base
 			SYSLOG("maIOCtl_maWriteLog");
 			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
 		
+		// TODO : Implement maSendTextSMS
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS NOT IMPLEMENTED");
 			return -1;
 		
+		// TODO : Implement maGetBatteryCharge
 		case maIOCtl_maGetBatteryCharge:
 			SYSLOG("maIOCtl_maGetBatteryCharge NOT IMPLEMENTED");
 			return -1;
@@ -1207,7 +1272,8 @@ namespace Base
 			SYSLOG("maIOCtl_maFrameBufferClose");
 			return _maFrameBufferClose(mJNIEnv, mJThis);
 
-/*
+		// Audio buffer syscalls
+
 		case maIOCtl_maAudioBufferInit:
 			SYSLOG("maIOCtl_maAudioBufferInit NOT IMPLEMENTED");
 			return -1;
@@ -1219,7 +1285,7 @@ namespace Base
 		case maIOCtl_maAudioBufferClose:
 			SYSLOG("maIOCtl_maAudioBufferClose NOT IMPLEMENTED");
 			return -1;
-*/
+
 		// Location syscalls
 		
 		case maIOCtl_maLocationStart:
@@ -1311,7 +1377,9 @@ namespace Base
 		case maIOCtl_maFileListClose:
 			SYSLOG("maIOCtl_maFileListClose NOT IMPLEMENTED");
 			return -1;
-/*
+
+		// Video syscalls
+/*	
 		case maIOCtl_maStartVideoStream:
 			SYSLOG("maIOCtl_maStartVideoStream NOT IMPLEMENTED");
 			return -1;
@@ -1327,8 +1395,7 @@ namespace Base
 		case maIOCtl_maCloseStream:
 			SYSLOG("maIOCtl_maCloseStream NOT IMPLEMENTED");
 			return -1;
-*/		
-
+*/
 		// Other syscalls
 		
 		case maIOCtl_maGetSystemProperty:		
@@ -1344,7 +1411,16 @@ namespace Base
 			return _maShowVirtualKeyboard(mJNIEnv, mJThis);
 				
 		case maIOCtl_maTextBox:
+		{
 			SYSLOG("maIOCtl_maTextBox");
+			
+			// Send a focus lost event since the application will run in 
+			// the background during the time the maTextBox is running.
+			MAEvent event;
+			event.type = EVENT_TYPE_FOCUS_LOST;
+			event.data = NULL;
+			Base::gSyscall->postEvent(event);
+			
 			// Get the two first parameters of the IOCtl function
 			const wchar* _title = GVWS(a);
 			const wchar* _inText = GVWS(b);
@@ -1352,10 +1428,68 @@ namespace Base
 			int _maxSize = SYSCALL_THIS->GetValidatedStackValue(0);
 			int _constraints = SYSCALL_THIS->GetValidatedStackValue(4);
 			// Allocate memory for the output buffer
-			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange( c, _maxSize * sizeof(char) );
+			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c, 
+				_maxSize * sizeof(char));
 			// Call the actual internal _maTextBox function
-			return _maTextBox(_title, _inText, _outText, _maxSize,  _constraints, (int)gCore->mem_ds, mJNIEnv, mJThis);
+			return _maTextBox(
+				_title, 
+				_inText, 
+				_outText, 
+				_maxSize,
+				_constraints, 
+				(int)gCore->mem_ds, 
+				mJNIEnv, 
+				mJThis);
 		}
+		
+		case maIOCtl_maNotificationAdd:
+			SYSLOG("maIOCtl_maNotificationAdd");
+			return _maNotificationAdd(
+				a, 
+				b, 
+				SYSCALL_THIS->GetValidatedStr(c), 
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(0)), 
+				mJNIEnv, 
+				mJThis);
+		
+		case maIOCtl_maNotificationRemove:
+			SYSLOG("maIOCtl_maNotificationRemove");
+			return _maNotificationRemove(a, mJNIEnv, mJThis);
+		
+		case maIOCtl_maSendToBackground:
+			SYSLOG("maIOCtl_maSendToBackground");
+			// Send EVENT_TYPE_FOCUS_LOST
+			return _maSendToBackground(mJNIEnv, mJThis);
+		
+		case maIOCtl_maBringToForeground:
+			// Not available on Android.
+			return -1;
+		
+		case maIOCtl_maScreenSetOrientation:
+			SYSLOG("maIOCtl_maScreenSetOrientation");
+			return _maScreenSetOrientation(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maScreenSetFullscreen:
+			SYSLOG("maIOCtl_maScreenSetFullscreen");
+			return _maScreenSetFullscreen(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWallpaperSet:
+			SYSLOG("maIOCtl_maWallpaperSet");
+			return _maWallpaperSet(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maHomeScreenEventsOn:
+			SYSLOG("maIOCtl_maHomeScreenEventsOn");
+			// 1 = events on
+			return _maHomeScreenEventsOnOff(1, mJNIEnv, mJThis);
+			
+		case maIOCtl_maHomeScreenEventsOff:
+			SYSLOG("maIOCtl_maHomeScreenEventsOff");
+			// 0 = events off
+			return _maHomeScreenEventsOnOff(0, mJNIEnv, mJThis);
+
+		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;
 	}
@@ -1372,9 +1506,10 @@ void MoSyncErrorExit(int errorCode)
 {
 	char* b = (char*)malloc(200);
 	sprintf(b, "MoSync error: %i", errorCode);
+	//sprintf(b, "MoSync error: %i ip: %i", errorCode , Core::GetIp(gCore));
 
 	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
-
+	
 
 	jstring jstr = Base::mJNIEnv->NewStringUTF(b);
 	
@@ -1390,3 +1525,7 @@ void MoSyncErrorExit(int errorCode)
 
 	exit(errorCode);
 }
+
+
+// Build the event.
+	

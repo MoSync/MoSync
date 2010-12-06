@@ -21,7 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "mavsprintf.h"
 #include "malloc.h"
 #include "conprint.h"
-#include "IX_FILE.h"
 #include <stdlib.h>
 #include <mawvsprintf.h>
 #include <limits.h>

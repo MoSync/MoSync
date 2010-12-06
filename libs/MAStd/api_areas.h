@@ -187,11 +187,11 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td><a name="comms"></a>
 <strong>Communications</strong>
 </td>
-<td>Communicate via TCP, HTTP and Bluetooth serial port.<br>
+<td>Communicate via TCP, HTTP, SSL, HTTPS and Bluetooth serial port.<br>
 </td>
 <td>maConnect(), maConnClose(), maConnRead(), maConnWrite(), maConnReadToData(), maConnWriteFromData(), maHttpCreate(), maHttpSetRequestHeader(), maHttpGetResponseHeader(), maHttpFinish()<br>
 </td>
-<td>\ref MAUtil/Connection.h, \ref MAUtil/Downloader.h, \ref MAUtil/BuffDownloader.h<br>
+<td>\ref MAUtil/Connection.h, \ref MAUtil/BluetoothConnection.h, \ref MAUtil/Downloader.h, \ref MAUtil/BuffDownloader.h<br>
 </td>
 <td><a href="#event" class="el">Event handling</a>,
 <a href="#res" class="el">Resource management</a>

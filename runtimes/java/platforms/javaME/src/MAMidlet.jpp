@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "helpers.h"
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.lcdui.*;

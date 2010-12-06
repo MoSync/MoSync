@@ -142,7 +142,6 @@ namespace Base {
 	static void MAUpdateScreen();
 	static void textBoxEventHook(UINT msg, WPARAM wParam, LPARAM lParam);
 
-	BOOL VibrationStop();
 
 //	void VideoHandleEvent(VideoStream *stream);
 
@@ -203,9 +202,6 @@ namespace Base {
 	HWND g_hwndMain			= NULL;							// MAHandle to the application main window
 	TCHAR g_szTitle[80]		= TEXT ("MoRE"),			// Application main window name
 	g_szClassName[80]		= TEXT ("MoRE class");	// Main window class name
-
-	extern CRITICAL_SECTION vibrationCS;
-	extern UINT_PTR vibrationId;
 
 	// change this to use pairs??
 	typedef void (*WinMobileEventCallback)(void);
@@ -1227,7 +1223,6 @@ DWORD GetScreenOrientation()
 		atexit(MALibQuit);
 
 		InitializeCriticalSection(&exitMutex);
-		InitializeCriticalSection(&vibrationCS);
 
 		MANetworkInit();
 		initNetwork();
@@ -1260,7 +1255,7 @@ DWORD GetScreenOrientation()
 		LOG("MALibQuit\n");
 
 		// make sure it is stopped.
-		VibrationStop();
+		Vibration::stop();
 
 		MANetworkClose();
 		closeNetwork();
@@ -1296,7 +1291,7 @@ DWORD GetScreenOrientation()
 			// if program is already open or something failed...
 			exit(0);
 		}
-
+		init();
 	}
 
 	void Syscall::platformDestruct() {
@@ -1841,10 +1836,19 @@ DWORD GetScreenOrientation()
 
 	SYSCALL(int, maVibrate(int ms)) 
 	{
-		if(ms==0) {
-			return VibrationStop();
-		} else {
-			return VibrationStart(ms);
+		if(!Vibration::available()) {
+			return 0;
+		}
+		if(ms <= 0) {
+			Vibration::stop();
+			return 1;
+		}
+
+		if(Vibration::onFor(ms)) {
+			return 1;
+		}
+		else {
+			return 0;
 		}
 	}
 
@@ -2518,6 +2522,8 @@ DWORD GetScreenOrientation()
 	HANDLE gpsProviderEvent = NULL;
 	HANDLE gpsDevice = NULL;
 
+#define fixDoubleEndian(x) (x)
+	/*
 	double fixDoubleEndian(double d) {
 		int *dd = (int*)&d;
 		int temp = (*(dd+1));
@@ -2525,27 +2531,40 @@ DWORD GetScreenOrientation()
 		*dd = temp;
 		return *((double*)dd);
 	}
+	*/
 
 	void locCallback() {
-		byte *posData = new byte[MAX(sizeof(GPS_POSITION), 376)];
-		GPS_POSITION &pos = *(GPS_POSITION*)posData;
-		pos.dwVersion = GPS_VERSION_1;
-		pos.dwSize = sizeof(pos); // 376
+		//int posDataSize = MAX(sizeof(GPS_POSITION), 376);
+		//byte *posData = new byte[posDataSize];			
+		byte posData[MAX(sizeof(GPS_POSITION), 376)];
+		//byte posData[sizeof(GPS_POSITION)];
+		int posDataSize = sizeof(posData);
+		GPS_POSITION *pos = (GPS_POSITION*)posData;
+		memset(posData, 0, posDataSize);
+		pos->dwVersion = GPS_VERSION_1;
+		pos->dwSize = posDataSize; // 376
 
-		MALocation posEventData;
+		MALocation posEventData = {0};
 		MAEvent posEvent;
 		posEvent.type = EVENT_TYPE_LOCATION;
 
 retry:
-		if(GPSGetPosition(gpsDevice, &pos, INFINITE, 0) == ERROR_SUCCESS) {
-			if(pos.dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE|GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION|GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)) {
-				posEventData.lat = fixDoubleEndian(pos.dblLatitude);
-				posEventData.lon = fixDoubleEndian(pos.dblLongitude);
-				posEventData.horzAcc = fixDoubleEndian(pos.flHorizontalDilutionOfPrecision);
-				posEventData.vertAcc = fixDoubleEndian(pos.flVerticalDilutionOfPrecision);
-				posEventData.alt = pos.flAltitudeWRTEllipsoid;
+		if(GPSGetPosition(gpsDevice, pos, 1000, 0) == ERROR_SUCCESS) {
+			if(pos->dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE)) 
+			{
+				posEventData.lat = fixDoubleEndian(pos->dblLatitude);
+				posEventData.lon = fixDoubleEndian(pos->dblLongitude);
 				
-				if(pos.FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
+				if(pos->dwValidFields&GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION)
+					posEventData.horzAcc = fixDoubleEndian(pos->flHorizontalDilutionOfPrecision);
+
+				if(pos->dwValidFields&GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)
+					posEventData.vertAcc = fixDoubleEndian(pos->flVerticalDilutionOfPrecision);
+
+				if(pos->dwValidFields&GPS_VALID_ALTITUDE_WRT_ELLIPSOID)
+					posEventData.alt = pos->flAltitudeWRTEllipsoid;
+				
+				if(pos->FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
 					posEventData.state = MA_LOC_UNQUALIFIED;
 				} else {
 					posEventData.state = MA_LOC_QUALIFIED;
@@ -2554,8 +2573,8 @@ retry:
 				posEventData.state = MA_LOC_INVALID;
 			}
 		} else {
-			if(pos.dwSize != 376) {
-				pos.dwSize = 376; 
+			if(pos->dwSize != 376) {
+				pos->dwSize = 376; 
 				goto retry;
 			}
 			posEventData.state = MA_LOC_INVALID;
@@ -2567,7 +2586,7 @@ retry:
 
 		gEventFifo.put(posEvent);
 
-		delete posData;
+		//delete posData;
 	}
 
 	void lpsCallback() {
@@ -2589,9 +2608,46 @@ retry:
 		gEventFifo.put(lpsEvent);
 	}
 
+	BOOL hasGPS ()
+	{
+		HKEY hkey;
+		TCHAR driver[256];
+
+		if ( RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\GPS Intermediate Driver\\Drivers"), 0, 0, &hkey) == ERROR_SUCCESS )
+		{
+			DWORD strLength;
+			DWORD type = REG_SZ;
+			strLength = sizeof( driver );
+
+			LONG result = RegQueryValueEx( hkey, _T("CurrentDriver"), NULL, &type, (PBYTE)&driver, &strLength );
+			RegCloseKey(hkey);
+
+			if ( (result != ERROR_SUCCESS) || (strLength == 0) )
+			{
+				// No GPS is registered.
+				return FALSE;
+			}
+			else
+			{
+				// A GPS is available.
+				return TRUE;
+			}
+		}
+		else 
+		{
+			// No GPS available
+			return FALSE;
+		}
+	}
+
+
+
 	int maLocationStart() {
 		if(gpsDevice != NULL)
 			return 0;
+
+		if(hasGPS() == FALSE) 
+			return MA_LPS_OUT_OF_SERVICE;
 
 		if((gpsEvent = CreateEvent(NULL, FALSE, FALSE, L"GPSEVENT")) == NULL) {
 			return MA_LPS_OUT_OF_SERVICE;
@@ -2651,15 +2707,40 @@ retry:
 	static int maGetSystemProperty(const char* key, char* buf, int size) {
 		if(strcmp(key, "mosync.iso-639-1") == 0) {
 			LCID lcid = GetUserDefaultLCID();
-			WCHAR wbuf[4];
-			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, 4);
-			GLE(res);
+			WCHAR wbuf[16];
+
+			int res = GetLocaleInfo(lcid, LOCALE_SISO639LANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+			if(!res) {
+				// use shaky fallback:
+				// according to documentation of LOCAL_SABBREVLANGNAME:
+				// Abbreviated name of the language. In most cases, the name is created by taking 
+				// the two-letter language abbreviation from ISO Standard 639 and adding a third letter, 
+				// as appropriate, to indicate the sublanguage. For example, the abbreviated name for 
+				// the language corresponding to the English (United States) locale is ENU.
+				res = GetLocaleInfo(lcid, LOCALE_SABBREVLANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+				if(!res) return -2;
+				wbuf[0] = towlower(wbuf[0]);
+				wbuf[1] = towlower(wbuf[1]);
+				wbuf[2] = 0;
+				res-=1;
+			}
+			if(res > size)
+				return res;
+			size_t sres = wcstombs(buf, wbuf, size);
+			DEBUG_ASSERT(sres == res-1);
+			return res;
+		} else if(strcmp(key, "mosync.winmobile.locale.SABBREVLANGNAME") == 0) {
+			LCID lcid = GetUserDefaultLCID();
+			WCHAR wbuf[16];
+			int res = GetLocaleInfo(lcid, LOCALE_SABBREVLANGNAME, wbuf, sizeof(wbuf)/sizeof(wbuf[0]));
+			if(!res) return -2;
 			if(res > size)
 				return res;
 			size_t sres = wcstombs(buf, wbuf, size);
 			DEBUG_ASSERT(sres == res-1);
 			return res;
 		}
+
 		return -2;
 	}
 

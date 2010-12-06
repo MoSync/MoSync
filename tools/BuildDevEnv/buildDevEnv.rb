@@ -46,6 +46,7 @@ copy_if_not_exist("runtimes/java/platforms/javaME/src/config_platform.h.example"
 sh2("tools/GLWrapperGenerator", "build.bat")
 
 sh2("intlibs/filelist", "vcbuild filelist.vcproj \"Release|Win32\"")
+sh2("intlibs/demangle", "vcbuild demangle.vcproj \"Release|Win32\"")
 sh2("intlibs/idl-common", "vcbuild idl-common.vcproj \"Release|Win32\"")
 sh2("tools/idl2", "vcbuild idl2.vcproj \"Release|Win32\"")
 

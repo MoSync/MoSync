@@ -35,6 +35,15 @@ int scanDirectory(const char* path, FileListCallback cb);
 //Returns <0 if the file does not exist or is inaccessible.
 int isDirectory(const char* filename);
 
+// Returns a malloc'd string containing the absolute path of the file
+// referred to by \a name.
+// \a name is a relative filename.
+// It is the responsibility of the caller to free() the returned string.
+// If the path indicated by \name does not exist, this function returns NULL.
+// The file itself need not exist, but the directory must.
+// On error, errno is set.
+char* fullpath(const char* name);
+
 #ifdef __cplusplus
 }
 #endif

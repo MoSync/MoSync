@@ -16,11 +16,4 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>MinUI</name>
-			<type>2</type>
-			<location>C:/mosync-trunk/examples/MinUI</location>
-		</link>
-	</linkedResources>
 </projectDescription>

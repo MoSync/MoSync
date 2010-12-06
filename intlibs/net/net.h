@@ -50,12 +50,14 @@ typedef int MoSyncSocket;
 
 
 MoSyncSocket MASocketOpen(const char* address, u16 port, int& result, uint& inetAddr);
-int httpCreateConnection(const char* url, HttpConnection*& conn, int method);
+MoSyncSocket MASocketCreate(const char* address, int& result, uint& inetAddr);
+int MASocketConnect(MoSyncSocket sock, uint inetAddr, u16 port);
 
 static const char http_string[] = "http://";
+static const char https_string[] = "https://";
 static const char socket_string[] = "socket://";
+static const char ssl_string[] = "ssl://";
 static const char btspp_string[] = "btspp://";
-
 
 //***************************************************************************
 //Connection classes
@@ -68,6 +70,7 @@ public:
 	virtual ~TcpConnection();
 
 	virtual int connect();
+	bool isConnected();
 	virtual int read(void* dst, int max);
 	virtual int write(const void* src, int len);
 	virtual void close();
@@ -79,13 +82,18 @@ protected:
 	uint mInetAddr;
 };
 
-class ProtocolConnection : public TcpConnection {
+class ProtocolConnection : public Connection {
 public:
-	ProtocolConnection(const std::string& hostname, u16 port, const std::string& path);
+	// takes ownership of transport.
+	ProtocolConnection(Connection* transport, const std::string& path);
+	virtual ~ProtocolConnection();
 
 	virtual int connect();	//calls sendHeaders and readHeaders
+	bool isConnected();
 	virtual int read(void* dst, int max);
 	virtual int write(const void* src, int len); //calls sendHeaders if necessary.
+	virtual void close();
+	int getAddr(MAConnAddr& addr);
 
 	void SetRequestHeader(std::string key, const std::string& value);
 
@@ -110,6 +118,7 @@ private:
 	typedef HeaderMap::iterator HeaderItr;
 	typedef HeaderMap::const_iterator HeaderItrC;
 
+	Connection* mTransport;
 	const std::string mPath;
 	char mBuffer[1024];
 	int mPos, mSize;
@@ -126,13 +135,13 @@ enum ProtocolUrlParseResult {
 	URL_INVALID_PORT=-1,
 	SUCCESS=1
 };
-ProtocolUrlParseResult parseProtocolURL(const char *protocol, const char *url, u16 *port,
+ProtocolUrlParseResult parseProtocolURL(const char *parturl, u16 *port,
 	u16 defaultPort, const char **path, std::string &address);
 
 class HttpConnection : public ProtocolConnection {
 public:
-	HttpConnection(const std::string& hostname, u16 port, const std::string& path,
-		int method);
+	HttpConnection(Connection* transport, const std::string& hostname,
+		const std::string& path, int method);
 protected:
 	//ProtocolConnection
 	std::string methodString();

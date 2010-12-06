@@ -60,17 +60,18 @@ template<> hash_val_t THashFunction(const int&);
 template<class Key, class Value>
 class HashMap {
 public:
-	typedef Pair<Key, Value> PairKV;
+	typedef Pair<const Key, Value> PairKV;
 protected:
+	/** \brief Internal storage. */
 	struct HashNode : hnode_t {
-		HashNode();
+		HashNode(PairKV p);
 		PairKV data;
 	};
 public:
 	class ConstIterator;
 
 	/**
-	* \brief An iterator for a HashMap.
+	* \brief Iterator for a HashMap.
 	* 
 	* An Iterator is bound to a specific HashMap object.
 	* The Iterator can point to a specific element in that HashMap, or at HashMap::end(),
@@ -104,7 +105,7 @@ public:
 	};
 
 	/**
-	* \brief A constant iterator for a HashMap.
+	* \brief Const Iterator for a HashMap.
 	* 
 	* A ConstIterator is just like an ordinary Iterator, except
 	* all its methods and return values are const.
@@ -222,10 +223,8 @@ protected:
 	hash_t mHash;
 	HashFunction mHashFunction;
 
-	static hnode_t* alloc(void*) { return new HashNode; }
+	static hnode_t* alloc(void*) GCCATTRIB(noreturn) { BIG_PHAT_ERROR; }
 	static void free(hnode_t* node, void*) { delete (HashNode*)node; }
-
-	void init();
 };
 
 }	//MAUtil

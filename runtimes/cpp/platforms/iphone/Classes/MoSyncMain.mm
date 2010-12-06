@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "iphone_helpers.h"
 
 //#define _USE_REBUILDER_
+//#undef _USE_REBUILDER_
 
 #ifdef _USE_REBUILDER_
 //#include "rebuild.build.cpp"
@@ -57,12 +58,15 @@ const char* Base::Syscall::GetValidatedStr(int address) {
 	return (const char*)mem_ds+address;
 }
 
+const wchar* Base::Syscall::GetValidatedWStr(int address) {
+	return (const wchar*)(mem_ds+address);
+}
+
 int Base::Syscall::GetValidatedStackValue(int offset) {
 	int address = sp + offset;
 	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
 	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
-	address>>=2;
-	return mem_ds[address];	
+	return *(int*)&mem_ds[address];	
 
 }
 
@@ -87,6 +91,10 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 
 
 void cpp_main();
+
+#else
+
+#include <core/Core.cpp>
 
 #endif
 
@@ -166,7 +174,18 @@ void MoSync_DoneUpdatingView() {
 }
 
 void MoSync_ShowMessageBox(const char *msg, bool kill) {
-	[sMoSyncView showMessageBox:[NSString stringWithCString:msg length:strlen(msg)] shouldKill:kill];  	
+	
+	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding] shouldKill:kill];  	
+}
+
+void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
+	[sMoSyncView 
+	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcslen((const wchar_t*)title)*2]
+	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcslen((const wchar_t*)inText)*2]
+	 outText:(wchar*)outText
+	 maxSize:maxSize
+	 andConstraints:constraints
+	 ];  	
 }
 
 void MoSync_Exit() {
@@ -179,6 +198,14 @@ void MoSync_StartUpdatingLocation() {
 
 void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
+}
+
+void MoSync_StartUpdatingAccelerometer() {
+	[sMoSyncView startUpdatingAccelerometer];
+}
+
+void MoSync_StopUpdatingAccelerometer() {
+	[sMoSyncView stopUpdatingAccelerometer];
 }
 
 void MoSync_AddTouchPressedEvent(int x, int y) {
@@ -206,11 +233,20 @@ void MoSync_AddEvent(const MAEvent &e) {
 }
 
 void* MoSync_GetCustomEventData() {
+#ifdef _USE_REBUILDER_
 	return sCustomEventData;
+#else
+	return (void*) &gCore->mem_ds[gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize()];
+#endif
 }
 
 void* MoSync_GetCustomEventDataMoSyncPointer() {
+#ifdef _USE_REBUILDER_
 	return (void*) sCustomEventDataPointer;
+#else
+	return (void*) (gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize());
+	
+#endif
 }
 
 /*

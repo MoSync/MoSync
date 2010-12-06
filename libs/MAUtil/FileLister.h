@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file FileLister 
+/** \file FileLister.h
 * \brief Lists the contents of a device's file system.
 * \author Fredrik Eldh
 */

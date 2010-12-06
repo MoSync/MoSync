@@ -20,7 +20,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/FileLister.h>
-#include <IX_FILE.h>
 
 // Reads a log file from a s60v3 debug runtime.
 static bool tryToRead() {

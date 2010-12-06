@@ -68,10 +68,11 @@ private:
 
 class CompleteView : public View, public HyperlinkListener {
 public:
-	CompleteView() : mList(1) {
-		View::mRootWidget = &mList;
-		mList.setBackground(true);
+	CompleteView() : mMainScreen(1), mSecondaryScreen( 1 )  {
+		View::mRootWidget = &mMainScreen;
+		mMainScreen.setBackground(true);
 
+		// Init main screen
 		GridLayout* layout = new GridLayout(2);
 
 		layout->add(new Image(R_IMAGE_1), 0);
@@ -80,13 +81,18 @@ public:
 		layout->add(new StringLabel("String", GREEN), 1);
 		layout->add(new Textbox(10, 20, GREEN, GREEN), 1);
 
-		mList.add(layout, 0, -1, true);
+		mMainScreen.add(layout, 0, -1, true);
 		Textbox* t = new Textbox(10, 200, GREEN, WHITE/*BRIGHT_RED*/);
-		mList.add(t, 0, -1, true);
+		mMainScreen.add(t, 0, -1, true);
 		t->activate();
-		mList.add(new MultilineLabel("Line 1\nLine 10\nYet another line\n ", GREEN), 0);
-		mList.add(new Label("Next label", WHITE), 0);
-		mList.add(new HyperlinkLabel(this, "To close the program, \1click here\1.\n Now for a \1line-\nbroken\1 link.", GREEN, SKY_BLUE), 0);
+		mMainScreen.add(new MultilineLabel("Line 1\nLine 10\nYet another line\n ", GREEN), 0);
+		mMainScreen.add(new Label("Next label", WHITE), 0);
+		mMainScreen.add(new HyperlinkLabel(this, "To close the program, \1click here\1.\n Now for a \1line-\nbroken\1 link.", GREEN, SKY_BLUE), 0);
+
+		// Init secondary screen
+		mSecondaryScreen.setBackground( true );
+		mSecondaryScreen.add(new HyperlinkLabel(this, "\1Exit\1", GREEN, SKY_BLUE ), 0);
+
 	}
 	virtual ~CompleteView() {}
 
@@ -95,21 +101,32 @@ public:
 		if(keyCode == MAK_0 || keyCode == MAK_SOFTRIGHT)
 			maExit(0);
 		if(keyCode == MAK_FIRE)
-			mList.draw();
+			mMainScreen.draw();
 	}
 	void keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
 	//HyperlinkListener
 	void click(int linkIndex) {
-		if(linkIndex == 0) {	// User clicked on the "click here" link to exit
-			maExit(0);
-		} else {
-			printf("click %i\n", linkIndex);
+		switch ( linkIndex )
+		{
+			case 0:
+				maExit(0);
+
+			case 1:
+				setView( &mSecondaryScreen );
+				break;
 		}
 	}
+
 private:
-	GridLayout mList;
+	void setView ( Widget * wid ) {
+		mRootWidget = wid;
+		show( );
+	}
+
+	GridLayout mMainScreen;
+	GridLayout mSecondaryScreen;
 };
 
 //******************************************************************************

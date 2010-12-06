@@ -102,26 +102,27 @@ namespace Base
 		int width = (size&0xffff0000) >> 16;
 		int height = size&0x0000ffff;
 	
-		char* b = (char*)malloc(200);
-		sprintf(b,"Framebuffer width: %i height: %i", width, height);
-		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
-		free(b);
-	
-		info->bitsPerPixel = 32;//backBuffer->bitsPerPixel;
-		info->bytesPerPixel = 4;//backBuffer->bytesPerPixel;
-		info->redMask = 0x000000ff; //backBuffer->redMask;
-		info->greenMask = 0x0000ff00;// backBuffer->greenMask;
-		info->blueMask = 0x00ff0000; //backBuffer->blueMask;
-		info->sizeInBytes = width * height * 4; //backBuffer->pitch*backBuffer->height;
-		info->width = width; //backBuffer->width;
-		info->height = height; // backBuffer->height;
-		info->pitch = width*4; //backBuffer->pitch;
-		info->redShift = 0; //backBuffer->redShift;
-		info->greenShift = 8; //backBuffer->greenShift;
-		info->blueShift = 16; //backBuffer->blueShift;
-		info->redBits = 8;// backBuffer->redBits;
-		info->greenBits = 8;// backBuffer->greenBits;
-		info->blueBits = 8; //backBuffer->blueBits;
+		info->bitsPerPixel = 32;
+		info->bytesPerPixel = 4;
+		info->redMask = 0x000000ff;
+		info->greenMask = 0x0000ff00;
+		info->blueMask = 0x00ff0000;
+
+		
+		info->width = width;
+		info->height = height;
+		info->pitch = info->width*4;
+		
+		info->sizeInBytes = info->pitch * info->height;
+		
+		info->redShift = 0;
+		info->greenShift = 8;
+		info->blueShift = 16;
+
+		info->redBits = 8;
+		info->greenBits = 8;
+		info->blueBits = 8;
+		
 		info->supportsGfxSyscalls = 0;
 
 		return 1;
@@ -129,15 +130,7 @@ namespace Base
 
 
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis)
-	{
-	/*
-		if(sInternalBackBuffer!=NULL) return 0;
-		sInternalBackBuffer = backBuffer;
-		backBuffer = new Image((unsigned char*)data, NULL, backBuffer->width, backBuffer->height, backBuffer->pitch, backBuffer->pixelFormat, false, false);
-		currentDrawSurface = backBuffer;
-		return 1;
-	*/
-	
+	{	
 		int rdata = (int)data - memStart;
 	
 		char* b = (char*)malloc(200);
@@ -157,14 +150,6 @@ namespace Base
 
 	int _maFrameBufferClose(JNIEnv* jNIEnv, jobject jThis)
 	{
-	/*
-		if(sInternalBackBuffer==NULL) return 0;
-		delete backBuffer;
-		backBuffer = sInternalBackBuffer;
-		sInternalBackBuffer = NULL;
-		currentDrawSurface = backBuffer;
-		return 1;
-	*/
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "_disableFramebuffer", "()V");
 		if (methodID == 0) return 0;
@@ -439,8 +424,15 @@ namespace Base
 	 * @return				Value returned by the maTextBox 
 	 *						java method
 	 */
-	int _maTextBox(const wchar* title, const wchar* inText, int outText,
-				   int maxSize,  int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	int _maTextBox(
+		const wchar* title, 
+		const wchar* inText, 
+		int outText,
+		int maxSize,  
+		int constraints, 
+		int memStart, 
+		JNIEnv* jNIEnv, 
+		jobject jThis)
 	{
 		// Initialization
 		jstring jstrTITLE = (jstring)wchar2jstring(jNIEnv,  title);
@@ -464,4 +456,167 @@ namespace Base
 		
 		return (int)ret;
 	}
+	
+	/**
+	 * Add a notification item.
+	 *
+	 * Note that there can only be one notification of type
+	 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+	 * types may be added in the future. This syscall is available 
+	 * on Android only.
+	 *
+	 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+	 * \endlink constant.
+	 * @param id The id of the notification. The id must be unique within 
+	 * the application.
+	 * @param title Title of the notification.
+	 * @param text String to be displayed as part of the notification.
+	 * @return \< 0 on error or if the syscall is not available on the 
+	 * current platform.
+	 */
+	int _maNotificationAdd(
+		int type, 
+		int id, 
+		const char* title, 
+		const char* text, 
+		JNIEnv* jNIEnv, 
+		jobject jThis)
+	{
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrText = jNIEnv->NewStringUTF(text);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maNotificationAdd", 
+			"(IILjava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(
+			jThis, 
+			methodID, 
+			type, 
+			id, 
+			jstrTitle, 
+			jstrText);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrText);
+		
+		return (int)result;
+	}
+
+	/**
+	 * Remove a notification item.
+	 * @param id The id of the notification.
+	 * @return \< 0 on error.
+	 */
+	int _maNotificationRemove(int id, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maNotificationRemove", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, id);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Sends the application to the background, unless it's already there.
+	* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_LOST \endlink event.
+	* \note Only available on multi-tasking operating systems.
+	*/
+	int _maSendToBackground(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maSendToBackground", 
+			"()I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	 * Set the screen orientation.
+	 * @param orientation One of the \link #SCREEN_ORIENTATION 
+	 * \endlink constants.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetOrientation(int orientation, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maScreenSetOrientation", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, orientation);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	 * Enable/disable fullscreen mode.
+	 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetFullscreen(int fullscreen, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maScreenSetFullscreen", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, fullscreen);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Set the background image of the phone's home screen.
+	* @param data Image data in JPEG or PNG format.
+	* @return \< 0 on error.
+	*/
+	int _maWallpaperSet(MAHandle data, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maWallpaperSet", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, data);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Turn on/off sending of HomeScreen events. Off by default.
+	* @param eventsOn 1 = events on, 0 = events off
+	* @return \< 0 on error.
+	*/
+	int _maHomeScreenEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maHomeScreenEventsOnOff", 
+			"(I)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, eventsOn);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
 }

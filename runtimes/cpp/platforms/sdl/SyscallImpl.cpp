@@ -60,7 +60,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 #include <helpers/CPP_IX_STREAMING.h>
-#include <helpers/CPP_IX_FILE.h>
 
 // blah
 #include <helpers/CPP_IX_AUDIOBUFFER.h>
@@ -373,8 +372,19 @@ namespace Base {
 			BIG_PHAT_ERROR(SDLERR_MOSYNCDIR_NOT_FOUND);
 		}
 
-		TEST_LTZ(SDL_Init(SDL_INIT_VIDEO));
+		TEST_LTZ(SDL_Init(0));
 		atexit(SDL_Quit);
+
+		/**
+         * It is important that the SDL subsystems are initialized after
+		 * MANetworkInit. Otherwise there is a race condition for a shared
+		 * object between one of the SDL audio threads and openssl which causes
+		 * SSL_CTX_new to hang in Heap32Next. However, SDL_Init should be 
+		 * called before MANetworkInit since it relies on SDL-mutexes.
+		 */
+		MANetworkInit();
+
+		TEST_LTZ(SDL_InitSubSystem(SDL_INIT_VIDEO));
 
 		TEST_NZ(FE_Init());
 		atexit(FE_Quit);
@@ -388,12 +398,9 @@ namespace Base {
 		gSyscall->pimInit();
 #endif
 
-		//openAudio();
 		AudioEngine::init();
 
 		Bluetooth::MABtInit();
-
-		MANetworkInit(/*broadcom*/);
 
 		SDL_EnableUNICODE(true);
 
@@ -1859,9 +1866,7 @@ namespace Base {
 	}
 #endif
 
-	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
-		va_list argptr;
-		va_start(argptr, c);
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK
@@ -2149,14 +2154,12 @@ maIOCtl_glPointSizex_case(glPointSizex);
 	static HWND sMainWnd = NULL, sEditBox = NULL, sTextBox = NULL;
 	static wchar_t* sTextBoxOutBuf;
 	static int sTextBoxOutSize;
-	static const wchar_t* sTextBoxInBuf;
 
 	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		LOGD("TextBoxProc 0x%p, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, (uint)lParam);
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
-			SetWindowTextW(sEditBox, sTextBoxInBuf);
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:
@@ -2193,7 +2196,6 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		DEBUG_ASSERT(SDL_GetWMInfo(&info));
 		sMainWnd = info.window;
 
-		sTextBoxInBuf = (wchar_t*)inText;
 		sTextBoxOutSize = maxSize;
 		sTextBoxOutBuf = (wchar_t*)outText;
 
@@ -2220,12 +2222,11 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		GLE(sTextBox);
 		ShowWindow(sTextBox, SW_SHOW);
 #else	// so we go with modal, for now.
-		int res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
-		GLECUSTOM(res <= 0);
-
-		// hack to fix issue 843.
-		if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))	// if left button is pressed
+			
+		 // hack to fix issue 843.
+         if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))        // if left button is pressed
 			PostMessage(sMainWnd, WM_LBUTTONUP, 0, 0);
 #endif
 #endif
@@ -2611,9 +2612,9 @@ void MoSyncErrorExit(int errorCode) {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
 	char repBuf[256];
+#ifdef TRANSLATE_PANICS
 	char* ptr = buffer + sprintf(buffer, "MoSync Panic %i\n\n", errorCode);
 	char* repPtr = repBuf + sprintf(repBuf, "MoSync Panic %i. ", errorCode);
-#ifdef TRANSLATE_PANICS
 	if(!isBaseError(errorCode)) {
 		ptr += sprintf(ptr, "The %s subsystem reports: ", subSystemString(errorCode));
 		repPtr += sprintf(repPtr, "The %s subsystem reports: ", subSystemString(errorCode));

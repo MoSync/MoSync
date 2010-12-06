@@ -13,17 +13,34 @@
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
+ if ENV['OS'] == "Windows_NT"
 
-$SETTINGS = {
-	:java_source => "../../runtimes/java/",
-	:symbian_source => "../../runtimes/cpp/platforms/symbian/",
-	:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+	$SETTINGS = {
+		:java_source => "../../runtimes/java/",
+		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
 
-	:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
-	:android_sdk => "C:/Android/android-sdk-windows",
-	:android_ndk => "C:/Android/android-ndk-r4",
-	:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
+		:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
+		:android_sdk => "C:/Android/android-sdk-windows",
+		:android_ndk => "C:/Android/android-ndk-r4",
+		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
 
 	
-	:verbose => false,
-}
+		:verbose => false,
+	}
+else
+
+	$SETTINGS = {
+		:java_source => "../../runtimes/java/",
+		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+
+		:javame_sdk => "/home/runtimebuilder/SDK/SonyEricsson/JavaME_SDK_CLDC/OnDeviceDebug/",
+		:android_sdk => "/home/runtimebuilder/SDK/android/android-sdk-linux_x86",
+		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r4b",
+		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
+
+	
+		:verbose => false,
+	}
+end

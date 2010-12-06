@@ -289,8 +289,11 @@ void RebuildFunc(SYMBOL *sym)
 		CaseRef = 0;
 
 		ip = DecodeOpcode(&thisOp, ip);
-		DecodeAsmString(&thisOp, str);
+		DecodeAsmString(&thisOp, str, 1);
 		RebuildEmit("\t%s", str);
+
+//		DecodeAsmString(&thisOp, str, 0);			// Sanity testing
+//		CodeSanityChecker(thisOp.rip, str);
 
 		if (ArgDebugRebuild)
 		{
@@ -456,29 +459,20 @@ void Rebuild_Data(SYMBOL *sym)
 	
 	if (!len)
 	{
-		// In the case if skip-elim, the extents of some variable is unknown
-		// so we rebuild from the original source
-	
-/*		if (ArgSkipElim)
+		len = FindLabelExtent(ip);
+
+
+		if (!len)
 		{
-			if (sym->Type == SECT_data)
-			{
-				align = ArrayGet(&DataAlignArray, ip);
-
-				if (align)
-					RebuildEmit("\t.align %d\n", align);
-			}
-
-			RebuildEmit("%s_%d:\n", sym->Name, sym->LocalScope);
-
-			str[0] = 0;
-			DisassembleDataFromSource(ip, str);
-			RebuildEmit("%s\n", str);
+			RebuildEmit("// empty %s_%d,%d\n", sym->Name, sym->LocalScope, len);
 			return;
 		}
-*/
-		RebuildEmit("// empty %s_%d,%d\n", sym->Name, sym->LocalScope, len);
-		return;
+
+		// Save the result for later
+
+		sym->EndIP = len;
+
+		RebuildEmit("// found extent %s_%d,%d\n", sym->Name, sym->LocalScope, len);
 	}
 
 	align = ArrayGet(&DataAlignArray, ip);
@@ -494,7 +488,7 @@ void Rebuild_Data(SYMBOL *sym)
 
 	// Check if this data field can be moved to bss
 
-//	opt_bss = 0;
+#if 1
 	opt_bss  = Rebuild_CanMoveToBss(ip, len);
 
 	if (opt_bss)
@@ -508,6 +502,7 @@ void Rebuild_Data(SYMBOL *sym)
 		RebuildEmit("\t.comm %s_%d,%d	//moved to bss\n", sym->Name, sym->LocalScope, bss_len);
 		return;
 	}
+#endif
 
 	if (align)
 		RebuildEmit("\t.align %d\n", align);
@@ -522,18 +517,6 @@ void Rebuild_Data(SYMBOL *sym)
 
 	for (n=ip;n<ip+len;n++)
 	{
-		// Fetch type array entry
-		
-/*		ta = ArrayGet(&DataTypeArray, n);
-
-		if (ta)
-		{
-			int type = ta >> 24;
-			int size = ta & 0xffffff;
-			
-			RebuildEmit("// TypeArray '%s' Type=%d Len=%d \n", TokenTableStrings[type], type, size);
-		}
-*/
 		thisSym = (SYMBOL *) ArrayGet(&DataArray, n);
 
 		if (!thisSym)

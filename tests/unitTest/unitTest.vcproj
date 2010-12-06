@@ -68,7 +68,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclibD.lib mastdD.lib mautilD.lib matestD.lib kazlibD.lib"
+				AdditionalDependencies="mosynclibD.lib mastdD.lib mautilD.lib matestD.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -147,7 +147,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib matest.lib kazlib.lib"
+				AdditionalDependencies="mosynclib.lib mastd.lib mautil.lib matest.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="2"

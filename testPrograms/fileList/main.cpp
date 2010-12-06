@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
-#include <IX_FILE.h>
 
 #if 0	//log to file
 #define LOG(str) lprintfln(str.c_str())

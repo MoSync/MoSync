@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -91,6 +91,13 @@ namespace Bluetooth
              *         CONNERR, If there was an error.
              */
             virtual int write ( const void* src, int len );
+			
+			/**
+			 * Determines if the socket is connected or not.
+			 *
+			 * @return TRUE if connected, FALSE otherwise.
+			 */
+			virtual bool isConnected ( void );
 
             // From Closable
             /**

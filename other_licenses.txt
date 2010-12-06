@@ -19,9 +19,12 @@ workfile.rb
 /libs/newlib
 /libs/Testify
 /libs/yasper
+/libs/SDL
 
 /intlibs/gsm_amr
 /intlibs/sqlite
+/intlibs/dgles-0.5
+/intlibs/demangle
 
 /templates
 
@@ -44,6 +47,7 @@ workfile.rb
 /tools/makesis-2.0.0*
 /tools/MoCab/lcab
 /tools/ReleasePackageBuild/build_package_tools/include
+/tools/uidcrc
 
 # files
 /libs/MAStd/api_areas.h
@@ -85,6 +89,9 @@ workfile.rb
 
 /runtimes/cpp/platforms/iphone/buildLibraries.rb
 /runtimes/cpp/platforms/iphone/Classes/CMGlyphDrawing.h
+/runtimes/cpp/platforms/iphone/Classes/CMGlyphDrawing.mm
+
+/runtimes/cpp/platforms/sdl/resource.h
 
 /runtimes/cpp/platforms/sdl/fastevents.c
 /runtimes/cpp/platforms/sdl/fastevents.h
@@ -117,15 +124,22 @@ workfile.rb
 /testPrograms/tlsf/tlsf.h
 /testPrograms/tlsf/tlsf.c
 
+/testPrograms/megademo/PCXLoader.h
+/testPrograms/megademo/PCXLoader.cpp
+
 /tests/sdl_ffmpeg/example.c
 
 /tests/unitTestServer/httpPost.rb
 
+/tests/libc-suite
+
 /tools/GLWrapperGenerator/gl_common_lite.h
+/tools/WrapperGenerator/tests/gl.h
 
 /tools/e32hack/crc.cpp
 /tools/e32hack/crc.h
 
 /tools/ReleasePackageBuild/build_package_tools/mosync_bin/default_maprofile.h
+/tools/ReleasePackageBuild/linux
 
 /tools/SplashScreenGenerator/main.rb

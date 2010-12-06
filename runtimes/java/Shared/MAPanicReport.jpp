@@ -20,7 +20,7 @@ package com.mosync.java.android;
 #endif
 
 #include "helpers.h"
-#include "generated\MAAPI_consts.h"
+#include "generated/MAAPI_consts.h"
 
 #ifdef _JavaME
 import javax.microedition.rms.*;

@@ -28,6 +28,8 @@ __stacktop:
 	.align 4
 	.global crt0_startup
 
+	.set mainok=0
+
 	// sp: top of stack
 	// i0: memory size
 	// i1: stack size
@@ -62,47 +64,54 @@ __stacktop:
 .ifdefglobal _MATestMain
 {		
 	call &_MATestMain
-	jp   #crt_exit
-	.set mainok=1
+	jp &crt_exit
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z10MATestMainv
+.ifdefglobal __Z10MATestMainv
 {		
-	call &_Z6MATestMainv
-	jp   #crt_exit
-	.set mainok=1
+	call &__Z10MATestMainv
+	jp &crt_exit
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z10MATestMainiPPc
+.ifdefglobal __Z10MATestMainiPPc
 {		
-	call &_Z6MATestMainiPPc
-	jp   #crt_exit
-	.set mainok=1
+	call &__Z10MATestMainiPPc
+	jp &crt_exit
+	.set mainok=mainok+1
 }
 
 .ifdefglobal _MAMain
 {		
 	call &_MAMain
-	.set mainok=1
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z6MAMainv
+.ifdefglobal __Z6MAMainv
 {
-	call &_Z6MAMainv
-	.set mainok=1
+	call &__Z6MAMainv
+	.set mainok=mainok+1
 }
 
-.ifdefglobal _Z6MAMainiPPc
+.ifdefglobal __Z6MAMainiPPc
 {
-	call &_Z6MAMainiPPc
-	.set mainok=1
+	call &__Z6MAMainiPPc
+	.set mainok=mainok+1
 }
 
-.ifndef mainok
+.if mainok==0
 {
 	.print "Unresolved symbol: MAMain"
 	.exit
 }
+
+.if mainok>1
+{
+	.print "Multiple entry points: MAMain"
+	.exit
+}
+
 crt_exit:
 	ld	[sp,0], r14		// save return value
 

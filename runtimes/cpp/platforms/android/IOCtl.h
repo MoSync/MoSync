@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#include <syscall.h>
+#include <Syscall.h>
 
 namespace Base
 {
@@ -113,5 +113,81 @@ namespace Base
 	 * @return				Value returned by the maTextBox 
 	 *						java method
 	 */
-	int _maTextBox(const wchar* title, const wchar* inText, int outText, int maxSize, int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maTextBox(
+		const wchar* title, 
+		const wchar* inText, 
+		int outText, 
+		int maxSize, 
+		int constraints, 
+		int memStart, 
+		JNIEnv* jNIEnv, 
+		jobject jThis);
+
+	/**
+	 * Add a notification item.
+	 *
+	 * Note that there can only be one notification of type
+	 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+	 * types may be added in the future. This syscall is available 
+	 * on Android only.
+	 *
+	 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+	 * \endlink constant.
+	 * @param id The id of the notification. The id must be unique within 
+	 * the application.
+	 * @param title Title of the notification.
+	 * @param text String to be displayed as part of the notification.
+	 * @return \< 0 on error or if the syscall is not available on the 
+	 * current platform.
+	 */
+	int _maNotificationAdd(
+		int type, 
+		int id, 
+		const char* title, 
+		const char* text, 
+		JNIEnv* jNIEnv, 
+		jobject jThis);
+
+	/**
+	 * Remove a notification item.
+	 * @param id The id of the notification.
+	 * @return \< 0 on error.
+	 */
+	int _maNotificationRemove(int id, JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	* Sends the application to the background, unless it's already there.
+	* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_LOST \endlink event.
+	* \note Only available on multi-tasking operating systems.
+	*/
+	int _maSendToBackground(JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	 * Set the screen orientation.
+	 * @param orientation One of the \link #SCREEN_ORIENTATION 
+	 * \endlink constants.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetOrientation(int orientation, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	 * Enable/disable fullscreen mode.
+	 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
+	 * @return \< 0 on error.
+	 */
+	int _maScreenSetFullscreen(int fullscreen, JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	* Set the background image of the phone's home screen.
+	* @param data Image data in JPEG or PNG format.
+	* @return \< 0 on error.
+	*/
+	int _maWallpaperSet(MAHandle data, JNIEnv* jNIEnv, jobject jThis);
+		
+	/**
+	* Turn on/off sending of HomeScreen events. Off by default.
+	* @param eventsOn 1 = events on, 0 = events off
+	* @return \< 0 on error.
+	*/
+	int _maHomeScreenEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
 }

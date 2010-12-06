@@ -34,5 +34,4 @@
 .image "FNT_8X8.png"
 
 .res music1
-.bin
-.include "bajs.mp3"
+.media "audio/mpeg", "bajs.mp3"

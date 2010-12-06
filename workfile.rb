@@ -16,11 +16,13 @@ elsif(HOST == :darwin)
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
+	# todo: add lcab
 	PLATFORM_TOOLS = []
 end
 
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"intlibs/bluetooth",
+	"intlibs/demangle",
 	"intlibs/gsm_amr",
 	"intlibs/net",
 	"intlibs/stabs",
@@ -31,10 +33,10 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 
 BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 
-EXAM_DIRS = ["tests/unitTest", "examples"]
-PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/e32hack", "tools/DefaultSkinGenerator", "libs"]
+PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "libs"]
+EXAM_DIRS = PIPE_DIRS + ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector"]
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS
@@ -64,8 +66,11 @@ target :default => :base do
 	Work.invoke_subdirs(MAIN_DIRS)
 end
 
-target :all => :default do
+target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
+end
+
+target :all => :examples do
 end
 
 target :noidl => skins do
@@ -78,12 +83,12 @@ target :more => :base do
 	Work.invoke_subdirs(MORE_DIRS)
 end
 
-target :examples => :base do
-	Work.invoke_subdirs(EXAM_DIRS)
-end
-
 target :newlib => :base do
 	Work.invoke_subdirs(NEWLIB_DIRS)
+end
+
+target :libs => :base do
+	Work.invoke_subdirs(PIPE_DIRS)
 end
 
 target :clean_more do
@@ -98,6 +103,13 @@ target :clean do
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
 	Work.invoke_subdirs(ALL_DIRS, "clean")
+end
+
+target :all_configs do
+	sh 'ruby workfile.rb all'
+	sh 'ruby workfile.rb all CONFIG=""'
+	sh 'ruby workfile.rb all USE_NEWLIB=""'
+	sh 'ruby workfile.rb all USE_NEWLIB="" CONFIG=""'
 end
 
 Targets.invoke

@@ -28,7 +28,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/smartie.h>
 #include <filelist/filelist.h>
 
-#include <helpers/CPP_IX_FILE.h>
 #ifdef WIN32
 #include <windows.h>
 #ifndef _WIN32_WCE
@@ -431,6 +430,7 @@ namespace Base {
 		SYSCALL_THIS->destroyResource(handle);
 #endif
 		SYSCALL_THIS->resources.destroy(handle);
+
 	}
 
 	SYSCALL(int, maCreateData(MAHandle placeholder, int size)) {

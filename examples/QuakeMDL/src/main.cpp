@@ -7,11 +7,14 @@
  */
 
 extern "C"
+int MAMain ( void ) GCCATTRIB(noreturn);
+
+extern "C"
 int MAMain ( void )
 {
 #ifdef BENCHMARK
-	return BenchMain( );
+	BenchMain( );
 #else
-	return RenderMain( );
+	RenderMain( );
 #endif
 }

@@ -20,7 +20,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IX_RESOURCE_TYPES
 #define IX_GUIDO
 #define IX_WLAN
-#define IX_FILE
 #define IX_RECORD
 #define IX_CELLID
 #define IX_CALL

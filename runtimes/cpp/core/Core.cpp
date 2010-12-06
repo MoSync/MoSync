@@ -1238,7 +1238,7 @@ void WRITE_REG(int reg, int value) {
 	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(" = "); DV_debug(dv); LOGSC(");\n"); }
 
 #define _SYSCALL_HANDLERES_longlong { MA_DV dv; dv.ll = res;\
-	REG(REG_r14) = dv.MA_DV_HI; REG(REG_r15) = dv.MA_DV_LO; LOGSC(");\n"); }
+	REG(REG_r14) = dv.MA_LL_HI; REG(REG_r15) = dv.MA_LL_LO; LOGSC(");\n"); }
 
 #define _SYSCALL_HANDLERES_void LOGSC(");\n");
 
@@ -1613,7 +1613,7 @@ Core::VMCore* gCore = NULL;
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 	return Core::GetValidatedMemRange(gCore, address, size);
 }
-int Base::Syscall::GetValidatedStackValue(int offset, va_list argptr) {
+int Base::Syscall::GetValidatedStackValue(int offset) {
 	return Core::GetValidatedStackValue(gCore, offset);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {

@@ -43,7 +43,8 @@ void ProfileReader(char *filemem, char *config_path)
 	EndComp = 0;
 
 	ResetErrorCount();
-	SetErrorReturn();
+	
+	SET_ERROR_RETURN();
 
 	while(1)
 	{	

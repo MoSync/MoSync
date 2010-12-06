@@ -130,9 +130,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "CSmsHandler.h"
 #endif
 
+class CBaseSocket;
 class CSocket;
 class CHttpConnection;
 class CServerSocket;
+class CMySecureSocket;
 
 class CConnection : public CBase {
 protected:
@@ -196,7 +198,7 @@ using namespace Core;
 
 #define BLUETOOTH(func) SBT##func
 
-#if defined(__SERIES60_3X__) && !defined(__S60_50__)
+#if defined(__SERIES60_3X__)// && !defined(__S60_50__)
 #define MMF
 #endif
 
