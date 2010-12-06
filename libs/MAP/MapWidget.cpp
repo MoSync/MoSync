@@ -90,9 +90,9 @@ namespace MAP
 
 
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( int x, int y, int width, int height)
+	MapWidget::MapWidget(int x, int y, int width, int height, Widget* _parent)
 	//-------------------------------------------------------------------------
-	:	Widget( x, y, width, height),
+	:	Widget(x, y, width, height, _parent),
 		mCenterPositionLonLat( ),
 		mCenterPositionPixels( ),
 		mPanTargetPositionLonLat( ),
@@ -303,9 +303,6 @@ namespace MAP
 	void MapWidget::drawWidget( )
 	//-------------------------------------------------------------------------
 	{
-		if ( !this->mEnabled ) 
-			return;
-
 		Point widgetPos = getPosition( );
 		//
 		// Save clip

@@ -86,8 +86,8 @@ namespace MAUI {
 		  * \param maxLength controls the maximum number of characters that can be entered.
 			* \param inputMode the input mode.
 		  **/
-		EditBox(int x=0, int y=0, int width=0, int height=0, const String &text="",
-			bool manageNavigation=true, bool multiLine=false,
+		EditBox(int x, int y, int width, int height, Widget* parent, const String &text="",
+			int backColor=0, Font* font=NULL, bool manageNavigation=true, bool multiLine=false,
 			int maxLength=64, InputMode inputMode=IM_STANDARD);
 
 		/** Sets the color of the cursor **/
@@ -172,27 +172,27 @@ namespace MAUI {
 
 		//Font* font;
 		//String text;
-		int mCursorIndex;
-		bool mManageNavigation;
+		int cursorIndex;
+		bool manageNavigation;
 	
-		bool mActive;
-		int mCursorColor;
-		bool mCharacterInputActive;
+		bool active;
+		int cursorColor;
+		bool characterInputActive;
 
 		//bool multiLine;
-		int mCurrentLine;
+		int currentLine;
 		//int currentIndex;
 
-		int mMaxLength;
+		int maxLength;
 
-		InputMode mInputMode;
+		InputMode inputMode;
 
-		Vector<EditBoxListener*> mEditBoxListeners;
+		Vector<EditBoxListener*> editBoxListeners;
 
-		bool mCaseToggle;
+		bool caseToggle;
 
-		bool mPasswordMode;
-		String mPassword;
+		bool passwordMode;
+		String password;
 	};
 }
 

@@ -20,149 +20,195 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maheap.h>
 #include <mastring.h>
 #include <mastdlib.h>
-#include <conprint.h>
 
 #include <MAUtil/Graphics.h>
 
-#include "DefaultSkin.h"
-
-#include "Button.h"
-#include "Slider.h"
-
-using namespace MAUtil;
+//#define PUSH_EMPTY_CLIPRECT pushClipRect(0,0,0,0)
 
 #define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0xFFFF)))
 
 namespace MAUI {
-	Engine* Engine::mSingletonPtr = 0;
-
-	MAHandle imageFromMem(void *data, int size) {
-		MAHandle res = maCreatePlaceholder();
-		MAHandle img = maCreatePlaceholder();
-		maCreateData(res, size);
-		maWriteData(res, data, 0, size);
-		maCreateImageFromData(img, res, 0, size);
-		maDestroyObject(res);
-		return img;
-	}
-
-	MAHandle fontFromMem(void *data, int size) {
-		MAHandle res = maCreatePlaceholder();
-		maCreateData(res, size);
-		maWriteData(res, data, 0, size);
-		return res;
-	}
-
-#define RESIMG(r) imageFromMem((r), sizeof(r))
-#define RESFNT(r) fontFromMem((r), sizeof(r))
+	Engine* Engine::singletonPtr = 0;
 	
 	Engine::Engine()
 	{
-		mMain = NULL;
-		mOverlay = NULL;
-		mSingletonPtr = this;
-		mDisplayConsole = false;
+		main = NULL;
+		defaultFont = NULL;
+		defaultSkin = NULL;
+		overlay = NULL;
+		singletonPtr = this;
+		//clipStackPtr = -1;
 		Environment::getEnvironment().addFocusListener(this);
-
-
-		// setup default styles
-
-		MAHandle s1  = RESIMG(button_pressed_selected);
-		MAHandle s2  = RESIMG(button_notpressed_selected);
-		MAHandle s3  = RESIMG(button_notpressed_unselected);
-
-		SkinProperty* focusedPressed = new SkinProperty(s1, 19, 32, 19, 32, true);
-		SkinProperty* focusedReleased = new SkinProperty(s2, 19, 32, 19, 32, true);
-		SkinProperty* unfocusedReleased = new SkinProperty(s3, 19, 32, 19, 32, true);
-		FontProperty* font = new FontProperty(RESFNT(arial));
-		ButtonStyle* buttonStyle = new ButtonStyle(focusedPressed, focusedReleased, unfocusedReleased, font);
-		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
-
-		s1  = RESIMG(slider_left_unselected);
-		s2  = RESIMG(slider_right_unselected);
-		s3  = RESIMG(slider_handle);
-		SkinProperty* sliderAmountSkin = new SkinProperty(s1, 10, 12, 0, 18, true);
-		SkinProperty* sliderBackgroundSkin = new SkinProperty(s2, 10, 12, 0, 18, true);
-		ImageProperty* sliderGripImage = new ImageProperty(s3);
-		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
-		mSingletonPtr->setDefaultStyle("Slider", sliderStyle);
-
-		Style* widgetStyle = new Style();
-		widgetStyle->set("backgroundSkinFocused", NULL);
-		widgetStyle->set("backgroundSkinUnfocused", NULL);
-		mSingletonPtr->setDefaultStyle("Widget", widgetStyle);
-
-		Style* labelStyle = new LabelStyle(font);
-		mSingletonPtr->setDefaultStyle("Label", labelStyle);
 	}
 	
-	void Engine::setMain(Widget* mMain) {
-		mMain->setPosition(mMain->getPosition().x, mMain->getPosition().y);
-		this->mMain = mMain;
+	void Engine::setMain(Widget* main) {
+		main->setPosition(main->getPosition().x, main->getPosition().y);
+		this->main = main;
 	}
 
 	Engine::~Engine()
 	{
-		if(mMain)
-			delete mMain;
-		mSingletonPtr = 0;
+		if(main)
+			delete main;
+		singletonPtr = 0;
 	}
+
+	void Engine::setDefaultSkin(WidgetSkin* systemSkin) {
+		this->defaultSkin = systemSkin;
+	}
+
+	void Engine::setDefaultFont(Font* defaultFont) {
+		this->defaultFont = defaultFont;
+	}
+
+	WidgetSkin* Engine::getDefaultSkin() {
+		return defaultSkin;
+	}
+
+	Font* Engine::getDefaultFont()
+	{
+		return defaultFont;
+	}
+
+/*	void Engine::clearClipRect()
+	{
+		clipStackPtr = -1;
+	}
+
+	void Engine::pushClipRect(int left, int top, int width, int height)
+	{
+		if(clipStackPtr >= MAX_WIDGET_DEPTH-1) {
+			PANIC_MESSAGE("Clip stack broken");
+			//printf("BIG FUCKUP!!!\n");
+			return;
+		}
+
+		maSetClipRect(left, top, width, height);
+		
+		clipStackPtr++;
+		clipStack[clipStackPtr].left = left; 
+		clipStack[clipStackPtr].top = top; 
+		clipStack[clipStackPtr].width = width; 
+		clipStack[clipStackPtr].height = height; 		
+	}
+
+	bool Engine::pushClipRectIntersect(int left, int top, int width, int height)
+	{	
+		int pLeft = clipStack[clipStackPtr].left;
+		int pTop = clipStack[clipStackPtr].top;
+		int pWidth = clipStack[clipStackPtr].width;
+		int pHeight = clipStack[clipStackPtr].height;
+
+		if((!pWidth) || (!pHeight)) {
+			PUSH_EMPTY_CLIPRECT;
+			return false;
+		}
+
+		if(left + width < pLeft)
+		{
+			PUSH_EMPTY_CLIPRECT;
+			return false;
+		}
+
+		if(top + height < pTop)
+		{
+			PUSH_EMPTY_CLIPRECT;
+			return false;
+		}
+
+		if(left > pLeft + pWidth)
+		{
+			PUSH_EMPTY_CLIPRECT;
+			return false;
+		}
+
+		if(top > pTop + pHeight)
+		{
+			PUSH_EMPTY_CLIPRECT;
+			return false;
+		}
+		
+		if( left < pLeft)
+		{
+			width -= pLeft - left;
+			left =  pLeft;
+		}
+
+		if( top < pTop)
+		{
+			height -= pTop - top;
+			top =  pTop;
+		}
+
+		if( left + width > pLeft + pWidth)
+		{
+			width -= (left + width) - (pLeft + pWidth);
+		}
+
+		if( top + height > pTop + pHeight)
+		{
+			height -= (top + height) - (pTop + pHeight);
+		}
+
+		pushClipRect(left,top,width,height);
+
+		if(!width || !height) return false;
+		else return true;
+	}
+
+	void Engine::popClipRect()
+	{
+		clipStackPtr--;
+		if(clipStackPtr <= -1) clipStackPtr = -1;
+		else maSetClipRect(	
+			clipStack[clipStackPtr].left, 
+			clipStack[clipStackPtr].top, 
+			clipStack[clipStackPtr].width, 
+			clipStack[clipStackPtr].height);
+	}
+*/	
 
 	void Engine::focusLost() {
 	}
 
 	void Engine::focusGained() {
-		if(mMain) mMain->requestRepaint();
-		if(mOverlay) mOverlay->requestRepaint();
+		requestUIUpdate();
 	}
 
 	void Engine::requestUIUpdate() {
-		//maReportCallStack();
 		Environment::getEnvironment().addIdleListener(this);
 	}
-
-	void Engine::setDisplayConsole(bool dc) {
-		mDisplayConsole = dc;
-	}
-
-
+	
 	void Engine::repaint() {
 		//lprintfln("repaint @ (%i ms)", maGetMilliSecondCount());
-		if(!mMain) return;
+		if(!main) return;
 		//printf("doing repaint!");
 		
 		//clearClipRect();
 		Gfx_clearClipRect();
 		Gfx_clearMatrix();
+
 		
 		int scrW = EXTENT_X(maGetScrSize());
 		int scrH = EXTENT_Y(maGetScrSize());
-
-		// TODO: remove this!!!
-		//maSetColor(0);
-		//Gfx_fillRect(0, 0, scrW, scrH);
-
 		//printf("screenSize: (%d, %d)\n", scrW, scrH);
 		Gfx_pushClipRect(0, 0, scrW, scrH);
-		mMain->update();
-		mMain->draw();
+		main->update();
+		main->draw();
 		Gfx_popClipRect();
 
-		if(mOverlay) {
+		if(overlay) {
 			Gfx_clearClipRect();
 			Gfx_clearMatrix();
 			Gfx_pushClipRect(0, 0, scrW, scrH);
 
-			mOverlay->requestRepaint(); // won't add the idle listener again just setDirty(true).
-			mOverlay->update();
-			mOverlay->draw();
+			overlay->requestRepaint();
+			Gfx_translate(overlayPosition.x, overlayPosition.y);
+			overlay->update();
+			overlay->draw();
 		}
 
-		if(mDisplayConsole) {
-			DisplayConsole();
-		}
-		else
-			maUpdateScreen();
+		maUpdateScreen();
 	}
 	
 	void Engine::idle() {
@@ -172,54 +218,32 @@ namespace MAUI {
 	}
 
 	Engine&	Engine::getSingleton() {
-		if(!mSingletonPtr) {
-			mSingletonPtr = new Engine();
-		}
-		return *mSingletonPtr;
+		if(!singletonPtr)
+			singletonPtr = new Engine();
+		return *singletonPtr;
 	}
 
-	Widget* Engine::currentOverlay(Point& p) {
-		p = mOverlayPosition;
-		return mOverlay;
+
+
+	/* is an overlay shown? */
+	bool Engine::isOverlayShown() {
+		return overlay!=NULL;
 	}
 
-	/* shows the mOverlay widget (passed as an argument). Put the top left
+	/* shows the overlay widget (passed as an argument). Put the top left
 	corner at position x and y. */
-	void Engine::showOverlay(int x, int y, Widget *overlay, OverlayListener* listener) {
-		mOverlayListener = listener;
-		mOverlayPosition.x = x;
-		mOverlayPosition.y = y;
-		overlay->setPosition(x, y);
-		this->mOverlay = overlay;
-		mOverlay->requestRepaint();
-		mMain->requestRepaint();
+	void Engine::showOverlay(int x, int y, Widget *overlay) {
+		overlayPosition.x = x; 
+		overlayPosition.y = y;
+		this->overlay = overlay;
+		overlay->requestRepaint();
+		main->requestRepaint();
 	}
-
-	OverlayListener::OutsideResponse Engine::fireOverlayEvent(int x, int y) {
-		if(mOverlayListener)
-			return mOverlayListener->pointerPressedOutsideOverlay(x, y);
-		else
-			return OverlayListener::eProceed;
-	}
-
-	/* hide the currently shown mOverlay. */
+		
+	/* hide the currently shown overlay. */
 	void Engine::hideOverlay() {
-		mOverlay = NULL;
-		mMain->requestRepaint();
-	}
-
-	void Engine::setDefaultStyle(const String& widgetType, Style* style) {
-		mDefaultStyles.insert(widgetType, style);
-	}
-
-	Style* Engine::getDefaultStyle(const String& widgetType) {
-		Map<String, Style*>::ConstIterator iter = mDefaultStyles.find(widgetType);
-		if(iter != mDefaultStyles.end())
-			return iter->second;
-		iter = mDefaultStyles.find("Widget");
-		if(iter == mDefaultStyles.end())
-			maPanic(1, "No style set (not even a default style for Widget is available!");
-		return iter->second;
+		overlay = NULL;
+		main->requestRepaint();
 	}
 
 }

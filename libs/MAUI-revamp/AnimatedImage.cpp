@@ -25,31 +25,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget *parent) :
-		Widget(x, y, width, height, parent),
-		mLoop(true),
-		mCurrentFrame(0),
-		mMsPf(50),
-		mFrameHeight(32),
-		mNumFrames(5),
-		mDirection(0), 
-		mResource(0)
-	{
-		start();
+	bool AnimatedImage::isTransparent() const {
+		return true;
 	}
 
-
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, Widget* parent, MAHandle res) 
-		: Widget(x, y, width, height, parent),
+	AnimatedImage::AnimatedImage(int x, int y, int width, int height, MAHandle res) 
+		: Widget(x, y, width, height),
 		mLoop(true),
 		mCurrentFrame(0),
 		mMsPf(50),
+		mFrameWidth(32),
 		mFrameHeight(32),
 		mNumFrames(5),
 		mDirection(0),
-	    mResource(res)
-		
+		mResource(res)
 	{ 
+		setWidth(mFrameWidth);
+		setHeight(mFrameHeight);
 		setResource(res);
 		start();
 	}
@@ -58,11 +50,11 @@ namespace MAUI {
 		if(mResource) {
 			// void maDrawImageRegion(MAHandle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode);
 			MARect srcRect;
-			srcRect.left  = 0;
-			srcRect.width = EXTENT_X(mResSize);
-			srcRect.top   = mCurrentFrame * paddedBounds.height; 
-			srcRect.height = paddedBounds.height;
-			//MAPoint2d destPoint = {paddedBounds.x, paddedBounds.y};
+			srcRect.left  = (mCurrentFrame*mFrameWidth)%(EXTENT_X(mResSize));
+			srcRect.width = mFrameWidth;
+			srcRect.top   = ((mCurrentFrame*mFrameWidth)/(EXTENT_X(mResSize)))*mFrameHeight;
+			srcRect.height = mFrameHeight;
+			//MAPoint2d destPoint = {mPaddedBounds.x, mPaddedBounds.y};
 			MAPoint2d destPoint = {0, 0};
 
 			//maDrawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
@@ -74,6 +66,7 @@ namespace MAUI {
 		mResource = res;
 		if(res == 0) return;
 		mResSize = maGetImageSize(res);
+		requestRepaint();		
 	}
 
 	MAHandle AnimatedImage::getResource() const {
@@ -82,7 +75,7 @@ namespace MAUI {
 
 	void AnimatedImage::start() {
 		//MAUtil::Environment::getEnvironment().addIdleListener(this);
-		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);		
+		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);	
 	}
 
 	void AnimatedImage::stop() {
@@ -101,6 +94,7 @@ namespace MAUI {
 		else
 			if(mCurrentFrame >= mNumFrames)
 				mCurrentFrame = mNumFrames - 1;
+		requestRepaint();
 	}
 
 	void AnimatedImage::stepBack() {
@@ -118,12 +112,16 @@ namespace MAUI {
 			mCurrentFrame %= mNumFrames;
 		else
 			mCurrentFrame = 0;
+		requestRepaint();			
 	}
 
+	void AnimatedImage::setFrameWidth(int width) {
+		mFrameWidth = width;
+		setWidth(width);
+	}
+	
 	void AnimatedImage::setFrameHeight(int height) {
-		bounds.width = EXTENT_X(mResSize);
-		setWidth(bounds.width);
-		bounds.height = height;
+		mFrameHeight = height;
 		setHeight(height);
 	}
 

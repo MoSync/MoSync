@@ -16,8 +16,9 @@ mod.class_eval do
 	def setup_base
 		@SOURCES = ["."]
 		@EXTRA_CPPFLAGS = " -Wno-shadow"	#TODO, low-prio: enable -Wshadow
-		@INSTALL_INCDIR = "MAUI"
-		@NAME = "maui"
+		@INSTALL_INCDIR = "maui-revamp/MAUI"
+		@IGNORED_FILES = ["test.cpp"]
+		@NAME = "maui-revamp"
 	end
 end
 

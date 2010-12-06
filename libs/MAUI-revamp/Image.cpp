@@ -20,34 +20,39 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Image::Image(int x, int y, int width, int height, Widget* parent, bool autoSizeX, bool autoSizeY, MAHandle res) 
-		: Widget(x, y, width, height, parent),
-		resource(res),
-		autoSizeX(autoSizeX),
-		autoSizeY(autoSizeY)
+	Image::Image(int x, int y, int width, int height,
+		MAHandle res, bool mAutoSizeX, bool mAutoSizeY)
+		: Widget(x, y, width, height),
+		mResource(res),
+		mAutoSizeX(mAutoSizeX),
+		mAutoSizeY(mAutoSizeY)
 	{ 
-		setDrawBackground(false);
+		//setDrawBackground(false);
 		setResource(res);
+	}
 
+	bool Image::isTransparent() const {
+		return true;
 	}
 
 	void Image::drawWidget() {
-		if(resource) {
-			Gfx_drawImage(resource, (paddedBounds.width>>1)-(imageWidth>>1), (paddedBounds.height>>1)-(imageHeight>>1));
+		if(mResource) {
+			Gfx_drawImage(mResource, (mPaddedBounds.width>>1)-(mImageWidth>>1), (mPaddedBounds.height>>1)-(mImageHeight>>1));
 		}
 	}
 
 	void Image::setResource(MAHandle res) {
-		resource = res;
+		mResource = res;
 		if(res == 0) return;
 		MAExtent imgSize = maGetImageSize(res);
-		imageWidth = EXTENT_X(imgSize);
-		imageHeight = EXTENT_Y(imgSize);
-		if(autoSizeX) this->setWidth(EXTENT_X(imgSize));
-		if(autoSizeY) this->setHeight(EXTENT_Y(imgSize));
+		mImageWidth = EXTENT_X(imgSize);
+		mImageHeight = EXTENT_Y(imgSize);
+		if(mAutoSizeX) this->setWidth(EXTENT_X(imgSize));
+		if(mAutoSizeY) this->setHeight(EXTENT_Y(imgSize));		
+		requestRepaint();
 	}
 
 	MAHandle Image::getResource() const {
-		return resource;
+		return mResource;
 	}
 }

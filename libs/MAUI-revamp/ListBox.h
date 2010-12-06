@@ -27,9 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Widget.h"
 #include "Engine.h"
 #include <MAUtil/Environment.h>
+#include "TouchMotionTracker.h"
 
 namespace MAUI {
-	
 	class ListBox;
 
 	/** \brief Listener interface that receives notifications when an item in a ListBox is selected.
@@ -67,32 +67,12 @@ namespace MAUI {
 		};
 
 		/** Constructor.
-		  * \param x the horizontal position of the ListBox relative to its parent's top left padded corner.
-		  * \param y the vertical position of the ListBox relative to its parent's top left padded corner
-		  * \param width the width of the ListBox.
-		  * \param height the height of the ListBox.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the ListBox to be added to the parent's children.
-		  **/
-		
-		ListBox(int x, int y, int width, int height, Widget *parent);
-		/** Constructor.
-		  * \param x the horizontal position of the ListBox relative to its parent's top left padded corner.
-		  * \param y the vertical position of the ListBox relative to its parent's top left padded corner
-		  * \param width the width of the ListBox.
-		  * \param height the height of the ListBox.
-		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the ListBox to be added to the parent's children.
 		  * \param orientation controls the orientation of the ListBox
 		  * \param animType controls the type of animation used when scrolling the listbox content.
 		  * \param wrapping controls the behavior of the listbox when navigating. When set to true (default), the listbox will wrap around to selecting the first element when moving beyond the last one, and equivalently wrap around to the last one when moving back beyond the first one.
 		  **/
-
-		ListBox (
-			int x, 
-			int y, 
-			int width, 
-			int height, 
-			Widget *parent,
-			ListBoxOrientation orientation, 
+		ListBox (int x=0, int y=0, int width=0, int height=0,
+			ListBoxOrientation orientation=LBO_VERTICAL, 
 			ListBoxAnimationType animType=LBA_NONE,
 			bool wrapping=true
 		);
@@ -100,16 +80,18 @@ namespace MAUI {
 		/** Destructor **/
 		virtual ~ListBox();
 
+		virtual bool isTransparent() const;
+
 		/** Adds the Widget w as a child of the listbox **/
-		void add(Widget *w);
+		virtual void add(Widget *w);
+		virtual void remove(Widget *w);
 
 		/** Overloaded implementation of Widget::clear(), with the same external semantics.
 		    **/
 		void clear();
 
 		/** Renders the listbox **/
-		void draw(bool forceDraw=false);
-		void update();
+		//void draw(bool forceDraw=false);
 
 		/** Navigates to the next item in the listbox - down if the orientation is vertical, right if it's horizontal. **/
 		void selectNextItem(bool shouldFireListeners=true);
@@ -117,6 +99,7 @@ namespace MAUI {
 		void selectPreviousItem(bool shouldFireListeners=true);
 		/** Adds a item selection listener **/
 		void addItemSelectedListener(ItemSelectedListener *listener);
+		void removeItemSelectedListener(ItemSelectedListener *listener);
 		/** Specifies which item in the ListBox should be selected **/
 		void setSelectedIndex(int selectedIndex);
 		/** Sets the orientation of the ListBox **/
@@ -136,11 +119,11 @@ namespace MAUI {
 		void setAutoSize(bool as=true);
 
 		/** Overloaded setWidth. If autosizing is set and the orientation is vertical on the ListBox this will set the width of the children. **/
-		void setWidth(int w);
+		//void setWidth(int w);
 
 		/** Overloaded setHeight. If autosizing is set and the orientation is horizontal on the ListBox this will set the height of the children. **/
-		void setHeight(int h);
-
+		//void setHeight(int h);
+	
 		/** Returns true if child widgets is outside of the front of the list. */
 		bool listFrontOutsideBounds() const;
 
@@ -151,32 +134,50 @@ namespace MAUI {
 		int getScrollOffset() const;
 
 
+		virtual bool isFocusable() const;
+		virtual bool isFocusableInKeyMode() const;
+		void setScrollOffset(int ofs);
+		virtual bool pointerPressed(MAPoint2d p, int id);
+		virtual bool pointerMoved(MAPoint2d p, int id);
+		virtual bool pointerReleased(MAPoint2d p, int id);
+		virtual bool keyPressed(int keyCode, int nativeCode);
+
+		void setFocusedWidget(Widget *w);
+
+		virtual void setEnabled(bool enabled=true);
+		virtual void setFocused(bool focused=true);
+
+		virtual int getTranslationX() const;
+		virtual int getTranslationY() const;
+
 	protected:
 		void runTimerEvent();
-
 		void drawWidget();
-
-		bool mustRebuild;
 		void rebuild();
-
-		Vector<ItemSelectedListener*> itemSelectedListeners;
-		bool wrapping;
-		ListBoxAnimationType animationType;
-
-		ListBoxOrientation orientation;
-		int yOffsetFrom;
-		int yOffsetTo;
-		int yOffset;
-		int yOffsetInc;
-
-		int animTimeStart;
-
-		int selectedIndex;
-
-		bool autoSize;
-
-		//WidgetListener
 		void boundsChanged(Widget *widget, const Rect& bounds);
+		void focusChanged(Widget *widget, bool focused);
+		virtual void updateInternal();
+
+		ListenerSet<ItemSelectedListener> mItemSelectedListeners;
+		bool mWrapping;
+		ListBoxAnimationType mAnimationType;
+
+		ListBoxOrientation mOrientation;
+		int mYOffsetFrom;
+		int mYOffsetTo;
+		int mYOffset;
+		int mYOffsetInc;
+		int mAnimTimeStart;
+		int mSelectedIndex;
+		bool mAutoSize;
+
+		bool mTouched;
+		TouchMotionTracker mTouchMotionTracker;
+		double mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY;
+		double mTimeOfRelease;
+		int mTouchedYOffset;
+
+		Widget *mFocusedWidget;
 	};
 }
 

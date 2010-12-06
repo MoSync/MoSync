@@ -43,74 +43,90 @@ namespace MAUI {
 	void EditBoxListener::characterAdded(EditBox *eb, char c) {
 	}
 
-	EditBox::EditBox(int x, int y, int width, int height, const String &text,
-		bool manageNavigation, bool mMultiLine, int maxLength, InputMode inputMode) :
-		Label(x, y, width, height, text),
-		mCursorIndex(0),
-		mManageNavigation(manageNavigation),
-		mActive(false),
-		mCursorColor(0xffffff),
-		mCharacterInputActive(false),
-		mCurrentLine(0),
-		mMaxLength(maxLength),
-		mInputMode(inputMode),
-		mEditBoxListeners(),
-		mCaseToggle(true),
-		mPasswordMode(false)
+	EditBox::EditBox(int x, int y, int width, int height, Widget* parent, const String &text,
+		int backColor, Font* font, bool manageNavigation, bool multiLine, int maxLength, InputMode inputMode) :
+		//Widget(x, y, width, height, parent),
+		Label(x, y, width, height, parent, text, backColor, font),
+	//	font(font),
+		cursorIndex(0),
+		manageNavigation(manageNavigation),
+		active(false),
+		cursorColor(0xffffff),
+		characterInputActive(false),
+	//	multiLine(multiLine),
+		currentLine(0),
+		maxLength(maxLength),
+		inputMode(inputMode),
+		editBoxListeners(),
+		caseToggle(true),
+		passwordMode(false)
 	{
-		setMultiLine(mMultiLine);
+		setBackgroundColor(backColor);
+		setDrawBackground(true);	
+
+		setMultiLine(multiLine);
+
 		setCaption(text);
-		this->mCaption.reserve(mMaxLength);
-		setInputMode(mInputMode);
+
+		if(!font) {
+			this->font = Engine::getSingleton().getDefaultFont();
+		} else {
+			this->font = font;
+		}
+
+		//this->text.reserve(maxLength);
+		this->caption.reserve(maxLength);
+
+		setInputMode(inputMode);
 	}
 
 	void EditBox::setSelected(bool selected) {
-		if(!mActive&&selected==true) {
+		if(!active&&selected==true) {
 			activate();
 		}
-		else if(mActive&&selected==false) {
+		else if(active&&selected==false) {
 			deactivate();
 		}
-		Widget::setFocused(selected);
+		Widget::setSelected(selected);
 		
 	}
 
 
 	void EditBox::activate() {
-		if(mActive) return;
-		if(mManageNavigation) {
+		if(active) return;
+		if(manageNavigation) {
 			Environment::getEnvironment().addKeyListener(this);
 		}
 		CharInput::getCharInput().addCharInputListener(this);
-		mActive = true;
-		setInputMode(mInputMode);
+		active = true;
+		setInputMode(inputMode);
 		setSelected(true);
 		
 	}
 
 	void EditBox::deactivate() {
-		if(!mActive) return;
-		if(mManageNavigation) {
+		if(!active) return;
+		if(manageNavigation) {
 			if(Environment::getEnvironment().isKeyListener(this))	
 				Environment::getEnvironment().removeKeyListener(this);
 		}
 
-		mCharacterInputActive = false;
+		characterInputActive = false;
 		CharInput::getCharInput().forceDeployment();
 
 		if(CharInput::getCharInput().isCharInputListener(this))
 			CharInput::getCharInput().removeCharInputListener(this);
-		mActive = false;
+		active = false;
 		setSelected(false);
 	}
 
 	bool EditBox::isActive() const {
-		return mActive;
+		return active;
 	}
 
 	void EditBox::clearText() {
 		setCaption("");
-		mPassword.clear();
+		password.clear();
 	}
 
 	void EditBox::setCaption(const String& caption) {
@@ -119,33 +135,33 @@ namespace MAUI {
 	
 	void EditBox::setText(const String& text) {
 		//this->text = text;
-		//if(mCursorIndex>text.size()) mCursorIndex = text.size();
-		//this->mCaption = mCaption;
+		//if(cursorIndex>text.size()) cursorIndex = text.size();
+		//this->caption = caption;
 		Label::setCaption(text);
-		if(mCursorIndex>mCaption.length()) mCursorIndex = mCaption.length();
+		if(cursorIndex>caption.length()) cursorIndex = caption.length();
 		requestRepaint();
 	}
 
 	const String& EditBox::getText() const {
-		return mPasswordMode ? mPassword : mCaption;
+		return passwordMode ? password : caption;
 	}
 
 	/*
-	void EditBox::setFont(Font *mFont) {
-		this->mFont = mFont;
+	void EditBox::setFont(Font *font) {
+		this->font = font;
 	}
 
 	Font* EditBox::getFont() const {
-		return mFont;
+		return font;
 	}
 	*/
 
 	void EditBox::setCursorColor(int color) {
-		mCursorColor = color;
+		cursorColor = color;
 	}
 
 	int EditBox::getCursorColor() const {
-		return mCursorColor;
+		return cursorColor;
 	}
 
 	void EditBox::setInputMode(EditBox::InputMode inputMode) {
@@ -157,89 +173,89 @@ namespace MAUI {
 		else if(inputMode == IM_QWERTY) {
 			CharInput::getCharInput().setQwerty(true);
 		}
-		this->mInputMode = inputMode;
+		this->inputMode = inputMode;
 	}
 
 	EditBox::InputMode EditBox::getInputMode() const {
-		return mInputMode;
+		return inputMode;
 	}
 
 	void EditBox::setManageNavigation(bool b) {
-		mManageNavigation = b;
-		if(mManageNavigation)
+		manageNavigation = b;
+		if(manageNavigation) 
 			Environment::getEnvironment().addKeyListener(this);
 	}
 
 	/*
 	void EditBox::setMultiLine(bool b) {
-		mMultiLine = b;
+		multiLine = b;
 	}
 
 	bool EditBox::isMultiLine() {
-		return mMultiLine;
+		return multiLine;
 	}
 	*/
 
 	bool EditBox::isManagingNavigation() {
-		return mManageNavigation;
+		return manageNavigation;
 	}
 
 	void EditBox::setMaxLength(int maxLength) {
-		this->mMaxLength = maxLength;
+		this->maxLength = maxLength;
 	}
 
 	int EditBox::getMaxLength() {
-		return mMaxLength;
+		return maxLength;
 	}
 
 	void EditBox::drawWidget() {
-		if(!mFont) return;
+		if(!font) return;
 		//calcStrSize();
-		//int x = mPaddedBounds.x;
-		//int y = mPaddedBounds.y;
+		//int x = paddedBounds.x;
+		//int y = paddedBounds.y;
 		int x = 0;
 		int y = 0;
 
-		Rect bound = mPaddedBounds;
+		Rect bound = paddedBounds;
 		bound.x = 0;
 		bound.y = 0;
 		getTextStart(&bound.x, &bound.y);
-		if(mMultiLine==false) {
+		if(multiLine==false) {
 			bound.height = 0xffff;
 			bound.width = 0xffff;
 		} else {
 			bound.x = 0;
 		}
 
-//		Rect r = mFont->calculateRectOfIndex(mCursorIndex, text.c_str(), bound);
-		Rect r = mFont->calculateRectOfIndex(mCursorIndex, mCaption.c_str(), bound);
+//		Rect r = font->calculateRectOfIndex(cursorIndex, text.c_str(), bound);
+		Rect r = font->calculateRectOfIndex(cursorIndex, caption.c_str(), bound);
 
-		if(mMultiLine) {
+		if(multiLine) {
 			// 2 equals the cursor width ;)
-			if(bound.y+r.y+r.height+2>(mPaddedBounds.height)) {
-				y-=(bound.y+r.y+r.height+2)-(mPaddedBounds.height);
+			if(bound.y+r.y+r.height+2>(paddedBounds.height)) {
+				y-=(bound.y+r.y+r.height+2)-(paddedBounds.height);
 				//Gfx_translate(x, y);
 			}
-//			mFont->drawBoundedString(text.c_str(), x, y, bound);
+//			font->drawBoundedString(text.c_str(), x, y, bound);
 //			Gfx_translate(x, y);
-			mFont->drawBoundedString(mCaption.c_str(), bound.x+x, bound.y+y, bound);
+			font->drawBoundedString(caption.c_str(), bound.x+x, bound.y+y, bound);
 			
 		} else {
 			// 2 equals the cursor width ;)
-			if(bound.x+r.x+r.width+2>mPaddedBounds.width) {
-				x-=(bound.x+r.x+r.width+2)-(mPaddedBounds.width);
+			if(bound.x+r.x+r.width+2>paddedBounds.width) {
+				x-=(bound.x+r.x+r.width+2)-(paddedBounds.width);
 				//Gfx_translate(x, y);
 			}
-//			mFont->drawString(text.c_str(), x, y);
+//			font->drawString(text.c_str(), x, y);
 			
 			//Gfx_translate(x, y);
-			mFont->drawString(mCaption.c_str(), bound.x+x, bound.y+y);
+			font->drawString(caption.c_str(), bound.x+x, bound.y+y);
 		}
 
 		//Label::drawWidget();
 
-		maSetColor(mCursorColor);
-		if(mFocused) {
+		maSetColor(cursorColor);
+		if(selected) { 
 			// draw cursor
 			int sx, sy, ex, ey;
 			sx = r.x + x + bound.x;
@@ -261,16 +277,16 @@ namespace MAUI {
 				break;
 			case MAK_CLEAR:
 				/*
-				if(mCharacterInputActive) {
+				if(characterInputActive) {
 					CharInput::getCharInput().forceDeployment();
 					moveCursorHorizontal(-1, false);
 				}*/
-				mCharacterInputActive = false;
+				characterInputActive = false;
 				CharInput::getCharInput().forceDeployment();
 				deletePreviousCharacter();
 				return;
 			case MAK_HASH:
-				if(mCaseToggle && mInputMode == IM_STANDARD)
+				if(caseToggle && inputMode == IM_STANDARD)
 					CharInput::getCharInput().setMode((CharInput::CharMode)(((int)CharInput::getCharInput().getMode()+1)&0x1));
 				break;
 			default:
@@ -283,55 +299,55 @@ namespace MAUI {
 	void EditBox::keyReleaseEvent(int keyCode, int nativeCode) {
 	}
 
-	int mCurrentIndex;
+	int currentIndex;
 
 	void EditBox::characterChanged(char c) {
-//		if(text.size()==mMaxLength) return;
+//		if(text.size()==maxLength) return;
 
-		if(mCharacterInputActive==false && mCaption.length()<mMaxLength) {
+		if(characterInputActive==false && caption.length()<maxLength) {
 			// FIXME
 			char tmp[2];
 			sprintf(tmp, "%c", c);
-			mCurrentIndex = mCursorIndex;
-			//text.insert(mCurrentIndex, tmp);
-			mCaption.insert(mCurrentIndex, tmp);
-			if(mPasswordMode)
-				mPassword.insert(mCurrentIndex, tmp);
+			currentIndex = cursorIndex;
+			//text.insert(currentIndex, tmp);
+			caption.insert(currentIndex, tmp);
+			if(passwordMode)
+				password.insert(currentIndex, tmp);
 		} else {
-			if(mCharacterInputActive==false) {
-				mCurrentIndex = mCursorIndex;
-				if(mCurrentIndex>mCaption.length()-1) mCurrentIndex = mCaption.length()-1;
+			if(characterInputActive==false) {
+				currentIndex = cursorIndex;
+				if(currentIndex>caption.length()-1) currentIndex = caption.length()-1;
 			}
 
-//			text[mCurrentIndex] = c;
-			mCaption[mCurrentIndex] = c;
+//			text[currentIndex] = c;
+			caption[currentIndex] = c;
 		}
-		mCharacterInputActive = true;
+		characterInputActive = true;
 		requestRepaint();
 	
 		fireCharacterChanged(c);
 	
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 	
 	void EditBox::characterDeployed(char c) {
-		//if(text.length()>=mMaxLength+1) return;
-		//if(mCaption.length()>=mMaxLength+1) return;
+		//if(text.length()>=maxLength+1) return;
+		//if(caption.length()>=maxLength+1) return;
 
-		mCharacterInputActive = false;
-		if(mCaption.length()>=mMaxLength+1) return;
+		characterInputActive = false;
+		if(caption.length()>=maxLength+1) return;
 		
-		if(mCursorIndex == mCurrentIndex) {
-			//mCursorIndex++;
+		if(cursorIndex == currentIndex) {
+			//cursorIndex++;
 			moveCursorHorizontal(1, false);
 		}
 
-		if(mPasswordMode) {
-			mCaption[mCurrentIndex] = '*';
-			mPassword[mCurrentIndex] = c;
+		if(passwordMode) {
+			caption[currentIndex] = '*';
+			password[currentIndex] = c;
 		} else {
-			mCaption[mCurrentIndex] = c;
+			caption[currentIndex] = c;
 		}
 		fireTextChanged();
 		fireCharacterAdded(c);
@@ -339,15 +355,15 @@ namespace MAUI {
 	}
 
 	bool EditBox::moveCursorHorizontal(int steps, bool fireListeners) {
-//		if(mCursorIndex + steps < 0 || mCursorIndex + steps > text.length()) return false;
-		if(mCursorIndex + steps < 0 || mCursorIndex + steps > mCaption.length()) {
+//		if(cursorIndex + steps < 0 || cursorIndex + steps > text.length()) return false;
+		if(cursorIndex + steps < 0 || cursorIndex + steps > caption.length()) {
 			if(fireListeners)
-				fireCursorMoved(mCursorIndex);
+				fireCursorMoved(cursorIndex);
 			return false;
 		}
 	
-		int lastCursor = mCursorIndex;
-		mCursorIndex+=steps;
+		int lastCursor = cursorIndex;
+		cursorIndex+=steps;
 		if(fireListeners)
 			fireCursorMoved(lastCursor);
 
@@ -355,64 +371,64 @@ namespace MAUI {
 	}
 
 	bool EditBox::deleteCharacter(int c) {
-		//text.remove(mCursorIndex-1, 1);
+		//text.remove(cursorIndex-1, 1);
 /*
 		if(c<0 || c>=text.length()) return false;
-		char deletedCharacter = text[mCursorIndex];
+		char deletedCharacter = text[cursorIndex];
 		text.remove(c, 1);
 		*/
-		if(c<0 || c>=mCaption.length()) return false;
-		char deletedCharacter = mCaption[c];
+		if(c<0 || c>=caption.length()) return false;
+		char deletedCharacter = caption[c];
 
-		if(mPasswordMode) {
-			mPassword.remove(c, 1);
-			mCaption.remove(c, 1);
+		if(passwordMode) {
+			password.remove(c, 1);
+			caption.remove(c, 1);
 		} else {
-			mCaption.remove(c, 1);
+			caption.remove(c, 1);
 		}
 
 /*
-		for(int i = mCursorIndex; i < text.size(); i++) {
+		for(int i = cursorIndex; i < text.size(); i++) {
 			text[i-1] = text[i];
 		}
 		text.resize(text.size()-1);
-		mCursorIndex--;
+		cursorIndex--;
 */
 		fireCharacterDeleted(deletedCharacter);
 		fireTextChanged();
 		requestRepaint();
 				
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 
 		return true;
 	}
 
 	bool EditBox::deleteCurrentCharacter() {
-		return deleteCharacter(mCursorIndex);
+		return deleteCharacter(cursorIndex);
 	}
 
 	bool EditBox::deletePreviousCharacter() {
 		/*	
-		if(mCursorIndex-1<0) return false;
-		char c = text[mCursorIndex];
-		for(int i = mCursorIndex; i < text.size(); i++) {
+		if(cursorIndex-1<0) return false;
+		char c = text[cursorIndex];
+		for(int i = cursorIndex; i < text.size(); i++) {
 			text[i-1] = text[i];
 		}
 		text.resize(text.size()-1);
-		mCursorIndex--;
+		cursorIndex--;
 		fireTextChanged();
 		fireCharacterDeleted(c);
 		requestRepaint();
 		return true;
 		*/
 		
-		int expectedCursorIndex = mCursorIndex-1;
+		int expectedCursorIndex = cursorIndex-1;
 		bool r = deleteCharacter(expectedCursorIndex);
 		if(!r) return false;
-		mCursorIndex = expectedCursorIndex;
-		//if(mCursorIndex>text.length()) mCursorIndex = text.length();
-		if(mCursorIndex>mCaption.length()) mCursorIndex = mCaption.length();
+		cursorIndex = expectedCursorIndex;
+		//if(cursorIndex>text.length()) cursorIndex = text.length();
+		if(cursorIndex>caption.length()) cursorIndex = caption.length();
 
 		return r;
 	}
@@ -424,56 +440,56 @@ namespace MAUI {
 	}
 
 	void EditBox::addEditBoxListener(EditBoxListener *ebl) {
-		mEditBoxListeners.add(ebl);
+		editBoxListeners.add(ebl);
 	}
 
 	void EditBox::fireTextChanged() {
-		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			//mEditBoxListeners[i]->textChanged(this, text);
-			mEditBoxListeners[i]->textChanged(this, mCaption);
+		for(int i = 0; i < editBoxListeners.size(); i++) {
+			//editBoxListeners[i]->textChanged(this, text);
+			editBoxListeners[i]->textChanged(this, caption);
 		}
 	}
 
 	void EditBox::fireCursorMoved(int lastCursor) {
-		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			mEditBoxListeners[i]->cursorMoved(this, this->mCursorIndex, lastCursor);
+		for(int i = 0; i < editBoxListeners.size(); i++) {
+			editBoxListeners[i]->cursorMoved(this, this->cursorIndex, lastCursor);
 		}
 	}
 
 	void EditBox::fireCharacterDeleted(char c) {
-		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			mEditBoxListeners[i]->characterDeleted(this, c);
+		for(int i = 0; i < editBoxListeners.size(); i++) {
+			editBoxListeners[i]->characterDeleted(this, c);
 		}
 	}
 
 	void EditBox::fireCharacterChanged(char c) {
-		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			mEditBoxListeners[i]->characterChanged(this, c);
+		for(int i = 0; i < editBoxListeners.size(); i++) {
+			editBoxListeners[i]->characterChanged(this, c);
 		}
 	}
 
 	void EditBox::fireCharacterAdded(char c) {
-		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			mEditBoxListeners[i]->characterAdded(this, c);
+		for(int i = 0; i < editBoxListeners.size(); i++) {
+			editBoxListeners[i]->characterAdded(this, c);
 		}
 	}
 
 	void EditBox::setCaseToggle(bool caseToggle) {
-		this->mCaseToggle = caseToggle;
+		this->caseToggle = caseToggle;
 	}
 
 	void EditBox::setPasswordMode(bool enabled) {
-		if(enabled && !this->mPasswordMode) {
-			mPassword = mCaption;
-			for(int i=0; i<mCaption.length(); i++) {
-				mCaption[i] = '*';
+		if(enabled && !this->passwordMode) {
+			password = caption;
+			for(int i=0; i<caption.length(); i++) {
+				caption[i] = '*';
 			}
 			requestRepaint();
 		}
-		if(!enabled && this->mPasswordMode) {
-			mCaption = mPassword;
+		if(!enabled && this->passwordMode) {
+			caption = password;
 			requestRepaint();
 		}
-		this->mPasswordMode = enabled;
+		this->passwordMode = enabled;
 	}
 }

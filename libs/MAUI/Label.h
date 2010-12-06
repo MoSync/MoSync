@@ -36,8 +36,6 @@ namespace MAUI {
 	* text. The text can be aligned left, right or centered
 	* both vertically and horizontally.
 	* The widget draws its background by default, use setDrawBackground(false) to disable it.	
-	*
-	* Note: Doesn't support unicode strings yet, because the font-system doesn't (will change in the future).
 	**/
 
 	class Label : public Widget {
@@ -55,11 +53,26 @@ namespace MAUI {
 			VA_BOTTOM
 		};
 
+		/** Constructor.
+		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
+		  * \param y the vertical position of the Label relative to its parent's top left padded corner
+		  * \param width the width of the Label.
+		  * \param height the height of the Label.
+		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the Label to be added to the parent's children.
+		  **/
+		Label(int x, int y, int width, int height, Widget* parent);
 		/** Constructor
+		  * \param x the horizontal position of the Label relative to its parent's top left padded corner.
+		  * \param y the vertical position of the Label relative to its parent's top left padded corner
+		  * \param width the width of the Label.
+		  * \param height the height of the Label.
+		  * \param parent pointer to the parent widget. Passing anything else than NULL causes the widget to be added to the parent's children.
 		  * \param caption the text displayed by the Label.
+		  * \param backColor the background color of the widget.
 		  * \param font the font to be used by to render the caption.
 		  */
-		Label(int x=0, int y=0, int width=0, int height=0, const String &caption="");
+		Label(int x, int y, int width, int height, Widget* parent, const String &caption,
+			int backColor, Font* font);
 
 		/** Turns multiline mode on or off **/
 		void setMultiLine(bool b=true);
@@ -73,6 +86,8 @@ namespace MAUI {
 
 		/** Sets the text that appears on the label **/
 		virtual void setCaption(const String& caption);
+		/** Sets the font used to render text on the label **/
+		void setFont(Font* font);
 
 		/** 
 		 * When this is set to true the label will automatically be resized in the 
@@ -88,6 +103,8 @@ namespace MAUI {
 		void setAutoSizeY(bool f=true);
 		/** Returns the text displayed on the label **/
 		const String& getCaption() const;
+		/** Returns the font used by this label **/
+		Font* getFont() const;
 		/** Returns the horizontal alignment of the label **/
 		HorizontalAlignment getHorizontalAlignment() const;
 		/** Returns the vertical alignment of the label **/
@@ -97,73 +114,40 @@ namespace MAUI {
 		/** Returns wether the label automatically adjusts its height to acommodate its caption **/
 		bool getAutoSizeY() const;
 
-		/*
 		void setPaddingLeft(int l);
 		void setPaddingTop(int t);
 		void setPaddingRight(int r);
 		void setPaddingBottom(int b);
-		void setWidth(int width);
-		void setHeight(int height);
-		*/
 
-		virtual bool isTransparent() const;
-
-
+		virtual void setParameter(const String& name, const String& value);
+	
+		void update();
 
 	protected:
-
-		void updateInternal();
-
 		void getTextStart(int *x, int *y);
+
 		void drawWidget();
 		void resize(int width, int height);
+
+		bool mustCalcStrSize;
 		void calcStrSize();
 
-		virtual void restyle();
+		String caption;
+		String cuttedCaption;
 
-		//bool mMustCalcStrSize;
+		Font* font;
 
-		String mCaption;
-		String mCuttedCaption;
+		bool autoSizeX;
+		bool autoSizeY;
 
-		Font* mFont;
+		bool multiLine;
 
-		bool mAutoSizeX;
-		bool mAutoSizeY;
+		HorizontalAlignment horizontalAlignment;
+		VerticalAlignment   verticalAlignment; 
 
-		bool mMultiLine;
-
-		HorizontalAlignment mHorizontalAlignment;
-		VerticalAlignment   mVerticalAlignment;
-
-		MAExtent mStrSize;
-		int mStrWidth, mStrHeight;
+		MAExtent strSize;
+		int strWidth, strHeight;
 	};
-
-
-	/**
-	 * Available properties:
-	 * font = FontProperty
-	 * paddingLeft = IntegerProperty
-	 * paddingRight = IntegerProperty
-	 * paddingTop = IntegerProperty
-	 * paddingBottom = IntegerProperty
-	 * backgroundSkinFocused = SkinProperty
-	 * backgroundSkinUnfocused = SkinProperty
-	 */
-	class LabelStyle : public Style {
-	public:
-		LabelStyle(
-			FontProperty* font,
-			int paddingLeft = 0,
-			int paddingRight = 0,
-			int paddingTop = 0,
-			int paddingBottom = 0,
-			DrawableProperty* backgroundSkinFocused = NULL,
-			DrawableProperty* backgroundSkinUnfocused = NULL
-		);
-	};
-
 }
 
 #endif	//_SE_MSAB_MAUI_LABEL_H_

@@ -44,8 +44,7 @@ namespace MAUI {
 
 	class AnimatedImage : public Widget, public MAUtil::TimerListener {
 	public:
-		AnimatedImage(int x, int y, int width, int height, Widget *parent=NULL);
-		AnimatedImage(int x, int y, int width, int height, Widget* parent=NULL, MAHandle res=0);
+		AnimatedImage(int x=0, int y=0, int width=0, int height=0, MAHandle res=0);
 		void setResource(MAHandle res);
 		MAHandle getResource() const;
 		
@@ -54,10 +53,15 @@ namespace MAUI {
 		void stepForward();
 		void stepBack();
 		void setNumFrames(int numFrames);
+		
+		void setFrameWidth(int width);
 		void setFrameHeight(int height);
 		void setFps(int fps);
 		void setFrame(int frame);
 		void setDirection(int dir);
+		
+		virtual bool isTransparent() const;
+		
 
 	protected:
 		void drawWidget();
@@ -66,6 +70,7 @@ namespace MAUI {
 		BOOL mLoop;
 		int mCurrentFrame;
 		int mMsPf;
+		int mFrameWidth;
 		int mFrameHeight;
 		int mNumFrames;
 		int mDirection;

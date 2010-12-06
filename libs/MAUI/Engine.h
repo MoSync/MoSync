@@ -26,31 +26,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Widget.h"
 #include "Font.h"
-#include "Style.h"
 
-#include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
-#include <MAUtil/String.h>
 #include <MAUtil/Environment.h>
 
 namespace MAUI {
-
-	class OverlayListener {
-	public:
-		enum OutsideResponse {
-			/// Don't do anything else with the event.
-			eBreak,
-			/// Process the event with the underlying Widget.
-			eProceed,
-		};
-
-		/**
-		* Called when a pointerPressed event outside an active overlay is received.
-		* The default response (if you don't pass an OverlayListener to showOverlay()) is
-		* eProceed.
-		*/
-		virtual OutsideResponse pointerPressedOutsideOverlay(int x, int y) = 0;
-	};
 
 	/** \brief Widget manager.
 	  *
@@ -60,10 +40,30 @@ namespace MAUI {
 
 	class Engine : public IdleListener, public FocusListener {
 	public:
+		enum {
+			MAX_WIDGET_DEPTH = 16
+		};
+
 		/** Sets the widget that is main to the application, constituting the root of the UI tree **/
 		void setMain(Widget* main);
 		
 		virtual ~Engine();
+
+		/** Sets the default font to be used by Widgets when they are
+          * not assigned any particular font.
+		  **/
+		void setDefaultFont(Font* systemFont);
+
+		/** Returns the MAUI-wide default font **/
+		Font* getDefaultFont();
+
+		/** Sets the default skin to be used by Widgets when they are
+          * not assigned any particular skin.
+		  **/
+		void setDefaultSkin(WidgetSkin* systemSkin);
+
+		/** Returns the MAUI-wide default skin **/
+		WidgetSkin* getDefaultSkin();
 
 		void idle();
 		
@@ -84,41 +84,27 @@ namespace MAUI {
       	  **/
 		static Engine& getSingleton();
 
-		/**
-		* Returns a pointer to the current overlay widget, or NULL if no overlay is shown.
-		*/
-		Widget* currentOverlay(Point& position);
+		/* is an overlay shown? */
+		bool isOverlayShown();
 
-		/** Shows an overlay Widget. The top left corner is at position \a x and \a y.
-		*/
-		void showOverlay(int x, int y, Widget *overlay, OverlayListener* listener = NULL);
-
-		OverlayListener::OutsideResponse fireOverlayEvent(int x, int y);
+		/* shows the overlay (passed as an argument). Put the top left
+		corner at position x and y. */
+		void showOverlay(int x, int y, Widget *overlay);
 		
 		/* hide the currently shown overlay. */
 		void hideOverlay();
 
-		// if style already has been set, it just overwrites the element (not deleting the pointer).
-		void setDefaultStyle(const String& widgetType, Style* style);
-		Style* getDefaultStyle(const String& widgetType);
-
-		void setDisplayConsole(bool dc=true);
-
 	protected:
-		Widget *mOverlay;
-		Point mOverlayPosition;
-		OverlayListener* mOverlayListener;
+		Widget *overlay;
+		Point overlayPosition;
 
-		Widget* mMain;
+		Widget* main;
+		Font* defaultFont;
+		WidgetSkin* defaultSkin;
 
-		static Engine* mSingletonPtr;
+		static Engine* singletonPtr;
 
-		bool mCharacterInputActive;
-
-		// possibly change this to hash map.
-		MAUtil::Map<String, Style*> mDefaultStyles;
-
-		bool mDisplayConsole;
+		bool characterInputActive;
 
 	private:
 		Engine();

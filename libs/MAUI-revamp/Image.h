@@ -50,7 +50,8 @@ namespace MAUI {
 		  * \param autoSizeY If true, the widget will be resized in the y-axis to the image size.
 		  * \param res A handle to the image resource containing the image data.
 		  **/
-		Image(int x, int y, int width, int height, Widget* parent=NULL, bool autoSizeX=true, bool autoSizeY=true, MAHandle res=0);
+		Image(int x=0, int y=0, int width=0, int height=0,
+			MAHandle res=0, bool autoSizeX=true, bool autoSizeY=true);
 
 		/**
 		 * Set the image resource of the image widget.
@@ -62,12 +63,14 @@ namespace MAUI {
 		 */
 		MAHandle getResource() const;
 
+		bool isTransparent() const;
+
 	protected:
 		void drawWidget();
 
-		MAHandle resource;
-		bool autoSizeX, autoSizeY;
-		int imageWidth, imageHeight;
+		MAHandle mResource;
+		bool mAutoSizeX, mAutoSizeY;
+		int mImageWidth, mImageHeight;
 	};
 
 }

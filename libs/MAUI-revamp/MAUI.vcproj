@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="MAUI"
 	ProjectGUID="{55F4CFE9-4CE8-40B6-818F-0449633BEFF3}"
 	RootNamespace="MAUI"
@@ -46,6 +46,7 @@
 				WarningLevel="3"
 				WarnAsError="false"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4355"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -104,6 +105,7 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="2"
 				WarnAsError="true"
+				DisableSpecificWarnings="4355"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -144,6 +146,34 @@
 		</File>
 		<File
 			RelativePath=".\AnimatedImage.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Button.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Button.h"
+			>
+		</File>
+		<File
+			RelativePath=".\DefaultSkin.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawable.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawable.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawables.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Drawables.h"
 			>
 		</File>
 		<File
@@ -189,6 +219,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\GridLayout.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\GridLayout.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Image.cpp"
 			>
 		</File>
@@ -205,6 +243,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\InputPolicy.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\InputPolicy.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Label.cpp"
 			>
 		</File>
@@ -213,19 +259,19 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Layout.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Layout.h"
-			>
-		</File>
-		<File
 			RelativePath=".\ListBox.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\ListBox.h"
+			>
+		</File>
+		<File
+			RelativePath=".\NativeEditBox.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\NativeEditBox.h"
 			>
 		</File>
 		<File
@@ -242,6 +288,58 @@
 		</File>
 		<File
 			RelativePath=".\Screen.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Slider.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Slider.h"
+			>
+		</File>
+		<File
+			RelativePath=".\StackLayout.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\StackLayout.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Style.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Style.h"
+			>
+		</File>
+		<File
+			RelativePath=".\test.cpp"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				ExcludedFromBuild="true"
+				>
+				<Tool
+					Name="VCCLCompilerTool"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath=".\TouchMotionTracker.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\TouchMotionTracker.h"
 			>
 		</File>
 		<File

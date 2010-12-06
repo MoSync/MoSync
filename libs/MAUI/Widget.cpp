@@ -35,115 +35,145 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	Widget::Widget(int x, int y, int width, int height)
-		: mParent(NULL), mBounds(x,y,width,height), mRelX(x), mRelY(y),
-		mDirty(false),
-		mHasRequestedUpdate(true),
-		mFocused(false),
-		mFocusable(false),
-		mEnabled(true),
-		mWidgetListeners(false),
-		mPaddingLeft(0),
-		mPaddingTop(0),
-		mPaddingBottom(0),
-		mPaddingRight(0),
-		mInputPolicy(NULL),
-		mFocusedSkin(NULL),
-		mUnfocusedSkin(NULL),
-		mUserData(NULL),
-		mStyle(NULL)
-	{
-		mInputPolicy = new DefaultInputPolicy(this);
-
+	Widget::Widget(int x, int y, int width, int height, Widget *parent=NULL) 
+		: parent(NULL), bounds(0,0,width,height), relX(x), relY(y), 
+			dirty(false),
+			skin(NULL),
+			backColor(0),
+			shouldDrawBackground(true),
+			selected(false),
+			enabled(true),
+			paddingLeft(0),
+			paddingTop(0),
+			paddingBottom(0),
+			paddingRight(0)
+		{
+		
+		skin = Engine::getSingleton().getDefaultSkin();
+		
+		if(parent) {
+			parent->add(this);
+		}
 		updateAbsolutePosition();
 	}
 
 	Widget::~Widget() {
-		Vector_each(Widget*,it,mChildren)
+		Vector_each(Widget*,it,children)
 			delete (*it);
 	}
 
 	void Widget::add(Widget* w) {
-		mChildren.add(w);
+		children.add(w);
 		w->setParent(this);
 		requestRepaint();
 	}
 
-	void Widget::remove(Widget* w) {
-		for(int i = 0; i < mChildren.size(); i++) {
-			if(mChildren[i] == w) {
-				mChildren[i]->setParent(NULL);
-				mChildren.remove(i);
-				return;
-			}
-		}
-		requestRepaint();
-	}
-
 	void Widget::clear() {
-		for(int i = 0; i < mChildren.size(); i++)
-			mChildren[i]->setParent(NULL);
-		mChildren.clear();
+		for(int i = 0; i < children.size(); i++)
+			children[i]->setParent(NULL);
+		children.clear();
 		requestRepaint();
 	}
 	
 	const Rect& Widget::getBounds() {
-		return mBounds;
+		return bounds;
 	}
 	
 	bool Widget::contains(const Point& p) {
-		return mBounds.contains(p);
+		return bounds.contains(p);
 	}
 
 	bool Widget::contains(int x, int y) {
-		return mBounds.contains(x, y);
+		return bounds.contains(x, y);
+	}
+
+	bool Widget::isTransparent() const {
+		if(selected)
+			return (skin!=NULL && skin->isSelectedTransparent()==true)  || (!shouldDrawBackground);
+		else
+			return (skin!=NULL && skin->isUnselectedTransparent()==true)  || (!shouldDrawBackground);
+	}
+
+	void Widget::drawBackground() {
+		//printf("in drawBackground!\n");
+		if(skin) {
+			if(selected)		
+				//skin->draw(bounds.x, bounds.y, bounds.width, bounds.height, WidgetSkin::SELECTED);
+				skin->draw(0, 0, bounds.width, bounds.height, WidgetSkin::SELECTED);
+			else
+				//skin->draw(bounds.x, bounds.y, bounds.width, bounds.height, WidgetSkin::UNSELECTED);
+					skin->draw(0, 0, bounds.width, bounds.height, WidgetSkin::UNSELECTED);			
+		} else {
+			maSetColor(backColor);
+			//maSetColor(0xffff00ff);
+			//printf("filling rect!!!\n");
+			//maFillRect(bounds.x,bounds.y, bounds.width, bounds.height);
+			Gfx_fillRect(0, 0, bounds.width, bounds.height);
+		}
+	}
+
+	/*
+	void Widget::draw() {
+		WLOG("Widget:draw");
+		Engine &engine = Engine::getSingleton();
+		
+		bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
+			bounds.width, bounds.height);	
+		if(res && isDirty()) {
+			if(shouldDrawBackground) {
+				drawBackground();
+			}
+			drawWidget();
+			setDirty(false);
+		}
+
+		Vector_each(Widget*, it, children)
+			(*it)->draw();
+
+		engine.popClipRect();
+	}*/
+
+	void Widget::update() {
+		Vector_each(Widget*, it, children)
+			(*it)->update();
 	}
 
 	void Widget::draw(bool forceDraw) {
-		if(!mEnabled && !forceDraw) return;
+		if(!enabled && !forceDraw) return;
 	
 		//Engine &engine = Engine::getSingleton();
 
-		//bool res = engine.pushClipRectIntersect(mBounds.x, mBounds.y,
-		//	mBounds.width, mBounds.height);
+		//bool res = engine.pushClipRectIntersect(bounds.x, bounds.y,
+		//	bounds.width, bounds.height);
 		
 		Gfx_pushMatrix();
-		Gfx_translate(mRelX, mRelY);
-		BOOL res = Gfx_intersectClipRect(0, 0, mBounds.width, mBounds.height);
-
+		Gfx_translate(relX, relY);
+		BOOL res = Gfx_intersectClipRect(0, 0, bounds.width, bounds.height);
+		
 		if(res) 
 		{
 			if(isDirty() || forceDraw) 
 			{
-				drawBackground();
+				if(shouldDrawBackground) 
+				{
+					drawBackground();
+				}
 			}
-			//MAUI_LOG("Widget::draw, paddingLeft= %d, paddingTop = %d", mPaddingLeft, mPaddingTop);
-			Gfx_translate(mPaddingLeft, mPaddingTop);
-			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-
-#if 0	// debug drawings
-					if(mFocused) {
-						maSetColor(0x00ff00);
-						Gfx_line(0, 0, mBounds.width-1, 0);
-						Gfx_line(mPaddedBounds.width-1, 0, mPaddedBounds.width-1, mPaddedBounds.height-1);
-						Gfx_line(0, mPaddedBounds.height-1, mPaddedBounds.width-1, mPaddedBounds.height-1);
-						Gfx_line(0, 0, 0, mPaddedBounds.height-1);
-
-					}
-#endif
-
-			Gfx_translate(getTranslationX(), getTranslationY());
+			//bool res = engine.pushClipRectIntersect(paddedBounds.x, paddedBounds.y,
+			//	paddedBounds.width, paddedBounds.height);
+			Gfx_translate(paddingLeft, paddingTop);
+			BOOL res = Gfx_intersectClipRect(0, 0, paddedBounds.width, paddedBounds.height);
 
 			if(res) {
-				if(isDirty() || forceDraw) {
-					drawWidget();
-				}
 
-				Vector_each(Widget*, it, mChildren)
-					(*it)->draw();
+				if(isDirty() || forceDraw) 
+					drawWidget();
+				Vector_each(Widget*, it, children)
+					(*it)->draw();	
 
 			}
-			// This commented out to match removal of above intersectClipRect() call.
+
+			//engine.popClipRect();
 			Gfx_popClipRect();
 			setDirty(false);
 		}
@@ -153,96 +183,68 @@ namespace MAUI {
 	}
 
 	void Widget::setPosition(int x, int y) {
-		bool changed = mRelX != x || mRelY != y;
-		mRelX = x;
-		mRelY = y;
+		bool changed = relX != x || relY != y;
+		relX = x;
+		relY = y;
 		updateAbsolutePosition();
 
 		if(changed) {
 			requestRepaint();
-			//fireBoundsChanged();
-			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
-		}
-	}
-
-	void Widget::drawBackground() {
-		//MAUI_LOG("Widget::drawBackground() 1");
-		if(!mStyle) return;
-
-		//MAUI_LOG("Widget::drawBackground() 2");
-		if(mFocused) {
-			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::SELECTED);
-			//MAUI_LOG("Widget::drawBackground() 3a");
-			if(mFocusedSkin) {
-				//MAUI_LOG("Widget::drawBackground() 4a");
-				mFocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
-			}
-		}
-		else {
-			//MAUI_LOG("Widget::drawBackground() 3b");
-			//mSkin->draw(mBounds.x, mBounds.y, mBounds.width, mBounds.height, WidgetSkin::UNSELECTED);
-			if(mUnfocusedSkin) {
-				//MAUI_LOG("Widget::drawBackground() 4b");
-				mUnfocusedSkin->draw(0, 0, mBounds.width, mBounds.height);
-			}
+			fireBoundsChanged();
 		}
 	}
 
 	const Point& Widget::getPosition() const {
 		static Point pnt;
-		pnt = Point(mRelX, mRelY);
+		pnt = Point(relX, relY);
 		return pnt;
 	}
 
 	const Point& Widget::getPaddedPosition() const {
 		static Point pnt;
-		pnt = Point(mRelX+mPaddingLeft, mRelY+mPaddingTop);
+		pnt = Point(relX+paddingLeft, relY+paddingTop);
 		return pnt;
 	}
 
 	void Widget::setWidth(int width) {
-		bool changed = width != mBounds.width;
-		mBounds.width = width;
+		bool changed = width != bounds.width;
+		bounds.width = width;
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
-			//fireBoundsChanged();
-			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
-			requestUpdate();
+			fireBoundsChanged();
 		}
 	}
 
 	int Widget::getWidth() const {
-		return mBounds.width;
+		return bounds.width;
 	}
 
 	void Widget::setHeight(int height) {
-		bool changed = height != mBounds.height;
-		mBounds.height = height;
+		bool changed = height != bounds.height;
+		bounds.height = height;
 		updatePaddedBounds();
 		requestRepaint();
 		if(changed) {
-			//fireBoundsChanged();
-			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
-			requestUpdate();
+			fireBoundsChanged();
 		}
 	}
 
 	int	Widget::getHeight() const {
-		return mBounds.height;
+		return bounds.height;
 	}
 
 	void Widget::setParent(Widget *w) {
-		if(w != NULL && mParent != NULL && mParent != w) {
-			PANIC_MESSAGE("Widget already has a mParent!");
+		if(w != NULL && parent != NULL && parent != w) {
+			PANIC_MESSAGE("Widget already has a parent!");
 		}
-		mParent = w;
+		parent = w;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	Widget* Widget::getParent() {
-		return mParent;
+		return parent;
 	}
 
 	Widget* Widget::widgetAt(const Point& p) {
@@ -250,466 +252,212 @@ namespace MAUI {
 	}
 
 	Widget* Widget::widgetAt(int x, int y) {
-		int xx = x - getTranslationX();
-		int yy = y - getTranslationY();
-		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->widgetAt(xx, yy);
+		Vector_each(Widget *, it, children) {
+			Widget *ret = (*it)->widgetAt(x, y);
 			if(ret) {
 				return ret;
 			}
 		}
 
-		if(mBounds.contains(x, y)) {
+		if(bounds.contains(x, y)) {
 			return this;
 		}
 
 		return NULL;
 	}
 
-	Widget* Widget::focusableWidgetAt(const Point& p) {
-		return focusableWidgetAt(p.x, p.y);
-	}
-
-	Widget* Widget::focusableWidgetAt(int x, int y) {
-		if(!isFocusable()) {
-			x-=getTranslationX();
-			y-=getTranslationY();
-			Vector_each(Widget *, it, mChildren) {
-				Widget *ret = (*it)->focusableWidgetAt(x, y);
-				if(ret) {
-					return ret;
-				}
-			}
-		} else {
-			if(mBounds.contains(x, y)) {
-				return this;
-			}
-		}
-		return NULL;
-	}
-
 	void Widget::requestRepaint() {
-		//if(mDirty) return;
-
-		
+		Engine::getSingleton().requestUIUpdate();
 		setDirty();
 
-
-		// TODO: Something like this this should be used, but isTransparent can't be called from the constructor.
-		/*
 		if(isTransparent()) {
-			if(mParent) {
-				mParent->setDirty(true, this);
+			if(parent) {
+				parent->requestRepaint();
 			}
 		}
-		*/
 	}
 
 	bool Widget::isDirty() const {
-		return mDirty;
+		return dirty;
 	}
 
-	void Widget::setDirty(bool d, Widget* caller) {
-		if(mDirty == d) return;
-
-		mDirty = d;
+	void Widget::setDirty(bool d) {
+		dirty = d;
 
 		if(d == true) {
-			Engine::getSingleton().requestUIUpdate();
-
-			Vector_each(Widget*, it, mChildren) {
-				if(caller && caller == (*it)) continue;
+			Vector_each(Widget*, it, children)
 				(*it)->setDirty(d);
-			}
-
-			if(mParent) {
-				Widget* parent = mParent;
-				Widget* prevParent = this;
-				do {
-					parent->setDirty(true, prevParent);
-					prevParent = parent;
-					parent = parent->getParent();
-				} while(parent);
-			}
 		}
 	}
 
-	void Widget::requestUpdate() {
-		mHasRequestedUpdate = true;
+	void Widget::setSkin(WidgetSkin *skin) {
+		this->skin = skin;
 		requestRepaint();
 	}
 
-	void Widget::updateInternal() {
+	void Widget::setDrawBackground(bool b) {
+		this->shouldDrawBackground = b;
+		requestRepaint();
 	}
 
-	void Widget::update() {
-		if(mStyle == NULL) {
-			restyle();
-		}
-
-		if(mHasRequestedUpdate) {
-			updateInternal();
-			mHasRequestedUpdate = false;
-		}
-
-		// maybe requestUpdate could request an update on its parent... so that only the branch that needs update needs to be updated here...
-		Vector_each(Widget*, it, mChildren) {
-			(*it)->update();
-		}
+	void Widget::setBackgroundColor(int col) {
+		this->backColor = col;
+		requestRepaint();
 	}
-
 
 	void Widget::updateAbsolutePositionChildren(int x, int y) {
-		Vector_each(Widget*,it,mChildren) {
-			(*it)->mBounds.x = (*it)->mRelX + x;
-			(*it)->mBounds.y = (*it)->mRelY + y;
+		Vector_each(Widget*,it,children) {
+			(*it)->bounds.x = (*it)->relX + x;
+			(*it)->bounds.y = (*it)->relY + y;
 			(*it)->updatePaddedBounds();
-			(*it)->updateAbsolutePositionChildren((*it)->mPaddedBounds.x, (*it)->mPaddedBounds.y);
+			(*it)->updateAbsolutePositionChildren((*it)->paddedBounds.x, (*it)->paddedBounds.y);
 		}
 	}
 
 	void Widget::updatePaddedBounds() {
-		Rect opbounds = mPaddedBounds;
-		mPaddedBounds = mBounds;
-		mPaddedBounds.x+=mPaddingLeft;
-		mPaddedBounds.y+=mPaddingTop;
-		mPaddedBounds.width-=mPaddingLeft+mPaddingRight;
-		mPaddedBounds.height-=mPaddingTop+mPaddingBottom;
-		if(opbounds.x != mPaddedBounds.x || opbounds.y != mPaddedBounds.y || opbounds.width != mPaddedBounds.width || opbounds.height != mPaddedBounds.height)
-			requestUpdate();	
+		paddedBounds = bounds;
+		paddedBounds.x+=paddingLeft;
+		paddedBounds.y+=paddingTop;
+		paddedBounds.width-=paddingLeft+paddingRight;
+		paddedBounds.height-=paddingTop+paddingBottom;
 	}
 
-	// fixme, precalc absolute for mParent
+	// fixme, precalc absolute for parent
 	void Widget::updateAbsolutePosition() {
-		MAUtil::Rect pbounds = mBounds;	
 		Widget *p = this;
-		mBounds.x = mRelX;
-		mBounds.y = mRelY;
+		bounds.x = relX;
+		bounds.y = relY;
 		while((p = p->getParent())) {
-			mBounds.x += p->getPosition().x + p->mPaddingLeft;
-			mBounds.y += p->getPosition().y + p->mPaddingTop;
+			bounds.x += p->getPosition().x + p->paddingLeft;  
+			bounds.y += p->getPosition().y + p->paddingTop;
 		}
 		updatePaddedBounds();
-		updateAbsolutePositionChildren(mPaddedBounds.x, mPaddedBounds.y);
+		updateAbsolutePositionChildren(paddedBounds.x, paddedBounds.y);
 
-		//fireBoundsChanged();
-		if(pbounds.x != mBounds.x || pbounds.y != mBounds.y || pbounds.width != mBounds.width || pbounds.height != mBounds.height) {
-			requestUpdate();
-			ListenerSet_fire(WidgetListener, mWidgetListeners, boundsChanged(this, this->mBounds));
-		}
+		fireBoundsChanged();
 	}
 
-	/*
 	Vector<Widget*>& Widget::getChildren() {
-		return mChildren;
+		return children;
 	}
-	*/
 
 	const Vector<Widget*>& Widget::getChildren() const {
-		return mChildren;
+		return children;
 	}
 
 	void Widget::addWidgetListener(WidgetListener* wl) {
-		mWidgetListeners.add(wl);
+		
+		Vector_each(WidgetListener*, i, widgetListeners) {
+			if((*i) == wl) return;
+		}
+		widgetListeners.add(wl);
 	}
 
 	void Widget::removeWidgetListener(WidgetListener* wl) {
-		mWidgetListeners.remove(wl);
+
+		Vector_each(WidgetListener*, i, widgetListeners) {
+			if((*i) == wl) {
+				widgetListeners.remove(i);
+				return;	//or crash
+			}
+		}
 	}
 
-	/*
 	Vector<WidgetListener*>& Widget::getWidgetListeners()
 	{
-		return mWidgetListeners;
+		return widgetListeners;
 	}
-	*/
 
-	void Widget::setFocused(bool focused) {
-		mFocused = focused;
-		/*
-		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->focusChanged(this, mFocused);
-		}*/
-		ListenerSet_fire(WidgetListener, mWidgetListeners, focusChanged(this, mFocused));
+	void Widget::trigger() {
+		Vector_each(WidgetListener*, wl, widgetListeners) {
+			(*wl)->triggered(this);
+		}
+	}
 
+	void Widget::setSelected(bool selected) {
+		this->selected = selected;
+		Vector_each(WidgetListener*, wl, widgetListeners) {
+			(*wl)->selectionChanged(this, selected);
+		}
 		requestRepaint();
 	}
 	
-	bool Widget::isFocused() const {
-		return mFocused;
+	bool Widget::isSelected() const {
+		return selected;
 	}
 
 	void Widget::setEnabled(bool enabled) {
-		mEnabled = enabled;
+		this->enabled = enabled;
 
-		Vector_each(Widget*,it,mChildren) {
-			(*it)->setEnabled(mEnabled);
+		Vector_each(Widget*,it,children) {
+			(*it)->setEnabled(enabled);
 		}
 		
-		/*
-		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->enableStateChanged(this, mEnabled);
-		}*/
-		ListenerSet_fire(WidgetListener, mWidgetListeners, enableStateChanged(this, mEnabled));
-
+		Vector_each(WidgetListener*, wl, widgetListeners) {
+			(*wl)->enableStateChanged(this, selected);
+		}
 		requestRepaint();
 	}
 	
 	bool Widget::isEnabled() const {
-		return mEnabled;
+		return enabled;
 	}
 
 	void Widget::setPaddingLeft(int l) {
-
-		mPaddingLeft = l;
+		paddingLeft = l;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingTop(int t) {
-		mPaddingTop = t;
+		paddingTop = t;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingRight(int r) {
-		mPaddingRight = r;
+		paddingRight = r;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	void Widget::setPaddingBottom(int b) {
-		mPaddingBottom = b;
+		paddingBottom = b;
 		updateAbsolutePosition();
 		requestRepaint();
 	}
 
 	int Widget::getPaddingLeft() const {
-		return mPaddingLeft;
+		return paddingLeft;
 	}
 
 	int Widget::getPaddingTop() const {
-		return mPaddingTop;
+		return paddingTop;
 	}
 
 	int Widget::getPaddingRight() const {
-		return mPaddingRight;
+		return paddingRight;
 	}
 
 	int Widget::getPaddingBottom() const {
-		return mPaddingBottom;
+		return paddingBottom;
 	}
 
 	const Rect& Widget::getPaddedBounds() const {
-		return mPaddedBounds;
+		return paddedBounds;
 	}
 
-	bool Widget::keyPressed(int keyCode, int nativeCode) {
-		return false;
+	void Widget::setParameter(const String& name, const String& value) {
+		if(name == "paddingLeft") setPaddingLeft(stringToInteger(value));
+		else if(name == "paddingTop") setPaddingTop(stringToInteger(value));
+		else if(name == "paddingBottom") setPaddingBottom(stringToInteger(value));
+		else if(name == "paddingRight") setPaddingRight(stringToInteger(value));
+		else if(name == "backgroundColor") setBackgroundColor(stringToInteger(value));
+		else if(name == "drawBackground") setDrawBackground(value=="true"?true:false);
+		else if(name == "width") setWidth(stringToInteger(value));
+		else if(name == "height") setHeight(stringToInteger(value));
+		else if(name == "x") this->setPosition(stringToInteger(value), getPosition().y);
+		else if(name == "y") this->setPosition(getPosition().x, stringToInteger(value));
+		else maPanic(0, "MAUI::Widget wrong parameter");
 	}
-
-	bool Widget::keyReleased(int keyCode, int nativeCode) {
-		return false;
-	}
-
-	bool Widget::pointerPressed(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerPressed! %x", (int)this);
-		return mFocusable;
-	}
-
-	bool Widget::pointerMoved(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerMoved! %x", (int)this);
-		if(mFocusable) {
-			return mBounds.contains(p.x, p.y);
-		}
-		return false;
-	}
-
-	bool Widget::pointerReleased(MAPoint2d p, int id) {
-		MAUI_LOG("Widget::pointerReleased! %x", (int)this);
-		return false;
-	}
-
-	bool Widget::isFocusable() const {
-		if(mFocusable)
-			return true;
-		return mChildren.size()==0;
-	}
-	bool Widget::isFocusableInKeyMode() const {
-		return isFocusable();
-	}
-
-	void Widget::setFocusable(bool on) {
-		mFocusable = on;
-	}
-
-	bool isToDirectionOf(Direction direction, Rect src, Rect dest) {
-		switch (direction) {
-		case LEFT:
-			return src.x >= (dest.width+dest.x);
-		case RIGHT:
-			return (src.width+src.x) <= dest.x;
-		case UP:
-			return src.y >= (dest.height+dest.y);
-		case DOWN:
-			return (src.height+src.y) <= dest.y;
-		default:
-			return false;
-		}
-	}
-
-
-	Widget* Widget::nearestWidget(Widget* w1, Widget* w2, Direction dir) {
-		Rect rectThis = this->getBounds();
-
-		if(w1==NULL) {
-			if(w2) {
-				Rect rectW2 = w2->getBounds();
-				bool w2InDirection = isToDirectionOf(dir, rectThis, rectW2);
-				return w2InDirection?w2:NULL;
-			}
-			return NULL;
-		}
-		if(w2==NULL) {
-			if(w1) {
-				Rect rectW1 = w1->getBounds();
-				bool w1InDirection = isToDirectionOf(dir, rectThis, rectW1);
-				return w1InDirection?w1:NULL;
-			}
-			return NULL;
-		}
-
-		Rect rectW1 = w1->getBounds();
-		Rect rectW2 = w2->getBounds();
-
-		bool w1InDirection = isToDirectionOf(dir, rectThis, rectW1);
-		bool w2InDirection = isToDirectionOf(dir, rectThis, rectW2);
-		if(!w1InDirection && !w2InDirection) return NULL;
-		if(w1InDirection && !w2InDirection) return w1;
-		if(!w1InDirection && w2InDirection) return w2;
-
-		int distance1 = ((rectThis.x-rectW1.x)*(rectThis.x-rectW1.x)+(rectThis.y-rectW1.y)*(rectThis.y-rectW1.y));
-		int distance2 = ((rectThis.x-rectW2.x)*(rectThis.x-rectW2.x)+(rectThis.y-rectW2.y)*(rectThis.y-rectW2.y));
-		if(distance1<distance2) return w1;
-		else return w2;
-
-		/*
-		switch(dir) {
-			case LEFT:
-			case RIGHT:
-			{
-				int distance1 = abs(rectThis.x - rectW1.x);
-				int distance2 = abs(rectThis.x - rectW2.x);
-				if(distance1<distance2) return w1;
-				else return w2;
-			}
-			break;
-			case UP:
-			case DOWN:
-			{
-				int distance1 = abs(rectThis.y - rectW1.y);
-				int distance2 = abs(rectThis.y - rectW2.y);
-				if(distance1<distance2) return w1;
-				else return w2;
-			}
-			break;
-		}
-		*/
-	}
-
-	Widget* Widget::getNearestFocusableInDirectionFrom(Widget* w, Direction dir, Widget* best) {
-
-		for(int i = 0; i < mChildren.size(); i++) {
-			if(mChildren[i] == w) continue;
-			if(mChildren[i]->isFocusableInKeyMode()) {
-				Widget* candidate = w->nearestWidget(mChildren[i], best, dir);
-				if(candidate)
-					best = candidate;
-			} else {
-				Widget* ret = mChildren[i]->getNearestFocusableInDirectionFrom(w, dir, best);
-				if(ret && ret != best) {
-					Widget* candidate = w->nearestWidget(ret, best, dir);
-					if(candidate)
-						best = candidate;
-				}
-			}
-		}
-
-		return best;
-	}
-
-	Widget* Widget::getFocusableInDirectionFrom(Widget* w, Direction dir) {
-		if(!mParent) return NULL;
-
-		if(mParent->getChildren().size() > 1) {
-			Widget *candidate = mParent->getNearestFocusableInDirectionFrom(w, dir);
-			if(candidate) {
-				return candidate;
-			}
-		}
-
-		return mParent->getFocusableInDirectionFrom(w, dir);
-	}
-
-	InputPolicy* Widget::getInputPolicy() {
-		return mInputPolicy;
-	}
-
-	void Widget::setInputPolicy(InputPolicy* ip) {
-		if(mInputPolicy) delete mInputPolicy;
-		mInputPolicy = ip;
-	}
-
-	void Widget::setStyle(const Style* style) {
-		mStyle = style;
-		if(mStyle)
-			restyle();
-	}
-
-	const Style* Widget::getStyle() {
-		return mStyle;
-	}
-
-	int Widget::getTranslationX() const {
-		return 0;
-	}
-
-	int Widget::getTranslationY() const {
-		return 0;
-	}
-
-	void Widget::restyle() {
-		//MAUI_LOG("Widget::restyle() called");
-		if(!mStyle) {
-			mStyle = Engine::getSingleton().getDefaultStyle("Widget");
-		}
-
-		if(!mStyle) maPanic(1, "No style set (not even a default style for Widget is available!");
-
-		DrawableProperty* p;
-		mFocusedSkin = (p=mStyle->get<DrawableProperty>("backgroundSkinFocused")) ? p->mDrawable : NULL;
-		mUnfocusedSkin = (p=mStyle->get<DrawableProperty>("backgroundSkinUnfocused")) ? p->mDrawable : NULL;
-
-		setPaddingLeft(mStyle->getSafe<IntegerProperty>("paddingLeft")->mValue);
-		setPaddingRight(mStyle->getSafe<IntegerProperty>("paddingRight")->mValue);
-		setPaddingTop(mStyle->getSafe<IntegerProperty>("paddingTop")->mValue);
-		setPaddingBottom(mStyle->getSafe<IntegerProperty>("paddingBottom")->mValue);
-		//MAUI_LOG("skins: %x, %x", mFocusedSkin, mUnfocusedSkin);
-	}
-
-	void Widget::restyleAll() {
-		restyle();
-		Vector_each(Widget*,it,mChildren) {
-			(*it)->restyleAll();
-		}
-	}
-
-	void Widget::setUserData(void *userData) {
-		mUserData = userData;
-	}
-
-	void* Widget::getUserData() {
-		return mUserData;
-	}
-
 }

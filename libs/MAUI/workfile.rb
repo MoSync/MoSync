@@ -17,7 +17,6 @@ mod.class_eval do
 		@SOURCES = ["."]
 		@EXTRA_CPPFLAGS = " -Wno-shadow"	#TODO, low-prio: enable -Wshadow
 		@INSTALL_INCDIR = "MAUI"
-		@IGNORED_FILES = ["test.cpp"]		
 		@NAME = "maui"
 	end
 end

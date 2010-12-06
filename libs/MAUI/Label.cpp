@@ -75,236 +75,252 @@ namespace MAUI {
 	}
 	#endif
 
-	Label::Label(int x, int y, int width, int height, const String &caption) :
-		Widget(x, y, width, height),
-	//	mMustCalcStrSize(true),
-		mCaption(""),
-		mAutoSizeX(false),
-		mAutoSizeY(false),
-		mMultiLine(false),
-		mHorizontalAlignment(HA_LEFT),
-		mVerticalAlignment(VA_TOP)
+	Label::Label(int x, int y, int width, int height, Widget* parent) :
+		Widget(x, y, width, height, parent), 
+		mustCalcStrSize(true),
+		caption(""),
+		font(NULL),
+		autoSizeX(false),
+		autoSizeY(false),
+		multiLine(false),
+		horizontalAlignment(HA_LEFT),
+		verticalAlignment(VA_TOP)
 	{
-		/*if(!font)
+		if(!font)
 		{
-			this->mFont = Engine::getSingleton().getDefaultFont();
+			this->font = Engine::getSingleton().getDefaultFont();
 		} else {
-			this->mFont = font;
-		} */
+			this->font = font;
+		}
+		//calcStrSize();
+		setDrawBackground();
+		setBackgroundColor(0xffff00ff);
+	}
+
+	Label::Label(int x, int y, int width, int height, Widget* parent, const String &caption,
+		int backColor, Font* font) :
+		Widget(x, y, width, height, parent),
+		mustCalcStrSize(true),
+		caption(""),
+		font(NULL),
+		autoSizeX(false),
+		autoSizeY(false),
+		multiLine(false),
+		horizontalAlignment(HA_LEFT),
+		verticalAlignment(VA_TOP)
+	{
+		if(!font)
+		{
+			this->font = Engine::getSingleton().getDefaultFont();
+		} else {
+			this->font = font;
+		}
 
 		setCaption(caption);
-		//this->setBackgroundColor(backColor);
+		requestRepaint();
+		this->setBackgroundColor(backColor);
 		//calcStrSize();
 	}
 
 	void Label::calcStrSize() {
-		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-		if(!mFont) {
-			mStrSize = EXTENT(0,0);
+		mustCalcStrSize = false;
+		Rect tempRect = Rect(0, 0, paddedBounds.width, paddedBounds.height);
+		if(!font) {
+			strSize = EXTENT(0,0);
 		} else {
-			if(mAutoSizeX)
-				mStrSize = mFont->getStringDimensions(mCaption.c_str());
+			if(autoSizeX)
+				strSize = font->getStringDimensions(caption.c_str());
 			else {
-				if(mMultiLine) {
-					mStrSize = mFont->getBoundedStringDimensions(mCaption.c_str(), tempRect);
+				if(multiLine) {	
+					strSize = font->getBoundedStringDimensions(caption.c_str(), tempRect);
 				} else {
-					cutText(mCuttedCaption, mFont, mCaption, tempRect);
-					mStrSize = mFont->getStringDimensions(mCuttedCaption.c_str());
+					cutText(cuttedCaption, font, caption, tempRect);
+					strSize = font->getStringDimensions(cuttedCaption.c_str());
 				}
 			}
 
 		}
-		mStrWidth  = EXTENT_X(mStrSize);
-		mStrHeight = EXTENT_Y(mStrSize);
+		strWidth  = EXTENT_X(strSize);
+		strHeight = EXTENT_Y(strSize);
 
-		if(mAutoSizeX) resize(mStrWidth + mPaddingLeft + mPaddingRight, mBounds.height);
-		if(mAutoSizeY) resize(mBounds.width,  mStrHeight + mPaddingTop + mPaddingBottom);
+		if(autoSizeX) resize(strWidth + paddingLeft + paddingRight, bounds.height);
+		if(autoSizeY) resize(bounds.width,  strHeight + paddingTop + paddingBottom);
 	}
 
 	void Label::setMultiLine(bool b) {
 		//calcStrSize();
-		requestUpdate();
-		mMultiLine = b;
+		mustCalcStrSize = true;
+		multiLine = b;
 	}
 
 	bool Label::isMultiLine() {
-		return mMultiLine;
+		return multiLine;
 	}
 
-	/*
 	void Label::setPaddingLeft(int l) {
 		Widget::setPaddingLeft(l);
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	void Label::setPaddingTop(int t) {
 		Widget::setPaddingTop(t);
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	void Label::setPaddingRight(int r) {
 		Widget::setPaddingRight(r);
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	void Label::setPaddingBottom(int b) {
 		Widget::setPaddingBottom(b);
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
-	*/
 
 	void Label::resize(int width, int height) {
 		Widget::setWidth(width);
 		Widget::setHeight(height);
 	}
 
-	/*
-	void Label::setWidth(int width) {
-		Widget::setWidth(width);
-		requestUpdate();
-	}
-
-	void Label::setHeight(int height) {
-		Widget::setHeight(height);
-		requestUpdate();
-	}
-	*/
-
 	void Label::getTextStart(int *x, int *y) {
 		//calcStrSize();
-		if(!mAutoSizeX) {
-			switch(mHorizontalAlignment) {
+		if(!autoSizeX) {
+			switch(horizontalAlignment) {
 				case HA_LEFT: *x =   0; break;
-				case HA_CENTER: *x = (mPaddedBounds.width)/2 - (mStrWidth/2); break;
-				case HA_RIGHT: *x =  (mPaddedBounds.width) - (mStrWidth); break;
+				case HA_CENTER: *x = (paddedBounds.width)/2 - (strWidth/2); break;
+				case HA_RIGHT: *x =  (paddedBounds.width) - (strWidth); break;
 			}
 		}
 
-		if(!mAutoSizeY) {
-			switch(mVerticalAlignment) {
+		if(!autoSizeY) {
+			switch(verticalAlignment) {
 				case VA_TOP: *y = 0; break;
-				case VA_CENTER: *y = (mPaddedBounds.height)/2 - (mStrHeight/2); break;
-				case VA_BOTTOM: *y = (mPaddedBounds.height) - (mStrHeight); break;
+				case VA_CENTER: *y = (paddedBounds.height)/2 - (strHeight/2); break;
+				case VA_BOTTOM: *y = (paddedBounds.height) - (strHeight); break;
 			}
 		}
 	}
 
-	void Label::updateInternal() {
-		calcStrSize();
+	void Label::update() {
+		Widget::update();
+		if(mustCalcStrSize) {
+			calcStrSize();
+		}
 	}
 
 	void Label::drawWidget() {
-		const char* wStr = mCaption.c_str();
+		const char* wStr = caption.c_str();
+
+		//int textX=paddedBounds.x, textY=paddedBounds.y;
 		int textX=0, textY=0;
+		//calcStrSize();
+
 		getTextStart(&textX, &textY);
-		if(mFont) {
 
-			if(mMultiLine) {
-				Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
-				mFont->drawBoundedString(wStr, textX, textY, tempRect);
-			} else {
+		Rect tempRect = Rect(0, 0, paddedBounds.width, paddedBounds.height);
+		if(font) {
+			if(multiLine)
+				font->drawBoundedString(wStr, textX, textY, tempRect);
+			else  {
 
-				if(mAutoSizeX)
-					mFont->drawString(wStr, textX, textY);
+				if(autoSizeX)
+					font->drawString(wStr, textX, textY);
 				else
-					mFont->drawString(mCuttedCaption.c_str(), textX, textY);
+					font->drawString(cuttedCaption.c_str(), textX, textY);
 			}
-		}
-		else {
-			MAUI_LOG("MISSING A FONT!!!");
 		}
 	}
 
 	void Label::setHorizontalAlignment(Label::HorizontalAlignment alignment) {
-		this->mHorizontalAlignment = alignment;
+		this->horizontalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	Label::HorizontalAlignment Label::getHorizontalAlignment() const {
-		return mHorizontalAlignment;
+		return horizontalAlignment;
 	}
 
 	void Label::setVerticalAlignment(Label::VerticalAlignment alignment) {
-		this->mVerticalAlignment = alignment;
+		this->verticalAlignment = alignment;
 		requestRepaint();
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	Label::VerticalAlignment Label::getVerticalAlignment() const {
-		return mVerticalAlignment;
+		return verticalAlignment;
 	}
 
 	void Label::setAutoSizeX(bool f) {
-		this->mAutoSizeX = f;
+		this->autoSizeX = f;
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 		requestRepaint();
 	}
 
 	void Label::setAutoSizeY(bool f) {
-		this->mAutoSizeY = f;
+		this->autoSizeY = f;
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 		requestRepaint();
 	}
 
 	bool Label::getAutoSizeX() const {
-		return mAutoSizeX;
+		return autoSizeX;
 	}
 
 	bool Label::getAutoSizeY() const {
-		return mAutoSizeY;
+		return autoSizeY;
 	}
 
-	void Label::setCaption(const String& mCaption) {
-		this->mCaption = mCaption;
+	void Label::setCaption(const String& caption) {
+		this->caption = caption;
 		requestRepaint();
 		//calcStrSize();
-		requestUpdate();
+		mustCalcStrSize = true;
 	}
 
 	const String& Label::getCaption() const {
-		return mCaption;
+		return caption;
 	}
 
-	bool Label::isTransparent() const {
-		return true;
-	}
-
-	void Label::restyle() {
-		//MAUI_LOG("***** restyle called!!!");
-		//MAUI_LOG("Label's style: 0x%x", getStyle());
-		if(getStyle() == NULL)
-			setStyle(Engine::getSingleton().getDefaultStyle("Label"));
-
-		const LabelStyle* style = (const LabelStyle*)getStyle();
-		mFont = (MAUI::Font*)style->getSafe<FontProperty>("font");
-
-		requestUpdate();
-
-		Widget::restyle();
-
+	void Label::setFont(Font* font) {
+		if(font)
+			this->font = font;
+		else
+			this->font = Engine::getSingleton().getDefaultFont();
 		requestRepaint();
+		//calcStrSize();
+		mustCalcStrSize = true;
 	}
 
-	LabelStyle::LabelStyle(
-			FontProperty* font,
-			int paddingLeft,
-			int paddingRight,
-			int paddingTop,
-			int paddingBottom,
-			DrawableProperty* backgroundSkinFocused,
-			DrawableProperty* backgroundSkinUnfocused
-	) : Style(paddingLeft, paddingRight, paddingTop, paddingBottom,
-			backgroundSkinFocused, backgroundSkinUnfocused)
-	{
-		this->mProperties["font"] = font;
+	Font* Label::getFont() const {
+		return font;
+	}
+
+
+	void Label::setParameter(const String& name, const String& value) {
+		if(name == "caption") this->setCaption(value);
+		else if(name == "autoSizeX") this->setAutoSizeX(value=="true"?true:false);
+		else if(name == "autoSizeY") this->setAutoSizeY(value=="true"?true:false);
+		else if(name == "horizontalAlignment") {
+			if(value == "left") setHorizontalAlignment(HA_LEFT);
+			else if(value == "right") setHorizontalAlignment(HA_RIGHT);
+			else if(value == "center") setHorizontalAlignment(HA_CENTER);
+			else maPanic(0, "MAUI::Label wrong parameter");
+		} 
+		else if(name == "verticalAlignment") {
+			if(value == "top") setVerticalAlignment(VA_TOP);
+			else if(value == "bottom") setVerticalAlignment(VA_BOTTOM);
+			else if(value == "center") setVerticalAlignment(VA_CENTER);
+			else maPanic(0, "MAUI::Label wrong parameter");
+		}
+		else Widget::setParameter(name, value);
 	}
 }

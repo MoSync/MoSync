@@ -134,8 +134,8 @@ namespace MAUI {
 		void calcCharPos(char c, int *x, int *y);
 		void calcLineBreaks(const char* str, int x, int y, const Rect& bound) const;
 
-		MAHandle mFontImage;
-		Charset *mCharset;
+		MAHandle fontImage;		
+		Charset *charset;
 		int mLineSpacing;
 	};
 }

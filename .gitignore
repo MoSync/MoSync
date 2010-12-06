@@ -114,3 +114,9 @@ stabs.tab
 /runtimes/java/shared/generated/invoke_syscall_java.h
 /runtimes/java/shared/generated/opengl_invoke_generated.jpp
 /runtimes/java/shared/generated/syscall_static_java.h
+/libs/MAStd/maapi_defs.h
+/libs/MAUI-revamp/DefaultSkin.h
+/libs/MTXml/entities.c
+/libs/newlib/libc/sys/mosync/maapi.h
+/libs/newlib/libc/sys/mosync/maapi_defs.h
+/runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h

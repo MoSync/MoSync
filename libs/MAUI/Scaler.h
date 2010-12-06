@@ -47,8 +47,8 @@ namespace MAUI {
 		void draw(int x, int y, int level);
 
 	private:
-		int mLevels;
-		MAHandle mPlaceholderStart;
+		int levels;
+		MAHandle placeholderStart;
 	};
 
 }

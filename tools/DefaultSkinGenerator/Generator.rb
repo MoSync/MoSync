@@ -15,7 +15,7 @@ def write_array(name, src_filename, out_file)
 	in_file.close
 end
 
-out_file = File.new("../../libs/MAUI/DefaultSkin.h", "w")
+out_file = File.new("../../libs/MAUI-revamp/DefaultSkin.h", "w")
 
 out_file.puts "/** Generated arrays for MAUI default skin **/"
 

@@ -163,11 +163,11 @@ namespace MAUI {
 	}
 
 	MAExtent Scaler::getSize(int scale) {
-		return maGetImageSize(mPlaceholderStart + scale);
+		return maGetImageSize(placeholderStart + scale);
 	}
 
 	Scaler::Scaler(MAHandle image, const MARect *srcRect, double minScale, double maxScale, int levels, eScaleType scaleType) :
-	mLevels(levels)
+	levels(levels)
 	{
 		MARect tempRect;
 
@@ -195,12 +195,12 @@ namespace MAUI {
 			}
 		}
 
-		int scaleDelta = (int)(((maxScale - minScale)*65536.0)/(double)mLevels);
+		int scaleDelta = (int)(((maxScale - minScale)*65536.0)/(double)levels);
 		int scale = (int)(minScale*65536.0);
 
-		for(int i = 0; i < mLevels; i++) {
+		for(int i = 0; i < levels; i++) {
 			MAHandle p = maCreatePlaceholder();
-			if(i == 0) mPlaceholderStart = p;
+			if(i == 0) placeholderStart = p;
 
 			int scaledImageWidth = ((imageWidth*scale)>>16);
 			int scaledImageHeight = ((imageHeight*scale)>>16);		
@@ -224,10 +224,10 @@ namespace MAUI {
 	void Scaler::draw(int x, int y, int level) {
 		if(level < 0)
 			level = 0;
-		if(level >= mLevels)
-			level = mLevels-1;
+		if(level >= levels)
+			level = levels-1;
 
-		MAExtent size = maGetImageSize(mPlaceholderStart + level);
-		maDrawImage(mPlaceholderStart + level, x-(EXTENT_X(size)>>1), y-(EXTENT_Y(size)>>1));
+		MAExtent size = maGetImageSize(placeholderStart + level);
+		maDrawImage(placeholderStart + level, x-(EXTENT_X(size)>>1), y-(EXTENT_Y(size)>>1));
 	}
 }
