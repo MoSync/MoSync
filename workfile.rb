@@ -87,6 +87,10 @@ target :newlib => :base do
 	Work.invoke_subdirs(NEWLIB_DIRS)
 end
 
+target :libs => :base do
+	Work.invoke_subdirs(PIPE_DIRS)
+end
+
 target :clean_more do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
