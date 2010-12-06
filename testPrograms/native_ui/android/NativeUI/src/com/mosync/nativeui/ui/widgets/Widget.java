@@ -1,7 +1,12 @@
 package com.mosync.nativeui.ui.widgets;
 
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
+import com.mosync.nativeui.util.properties.VerticalAlignment;
 
+import android.graphics.Color;
 import android.view.View;
 
 /**
@@ -32,6 +37,11 @@ public class Widget
 	private Widget m_parent = null;
 	
 	/**
+	 * Default layout params.
+	 */
+	private LayoutParams m_layoutParams = new LayoutParams();
+	
+	/**
 	 * 
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param view A view wrapped by this widget
@@ -53,22 +63,35 @@ public class Widget
 	 *              to the appropriate type.
 	 * @return true if the property was set, false otherwise.
 	 */
-	public boolean setProperty(int property, String value)
-	{		
-		if( property == Types.WIDGET_PROPERTY_WIDTH )
+	public boolean setProperty(String property, String value) throws PropertyConversionException
+	{
+		LayoutParams layoutParams = getLayoutParams( );
+		if( property.equals( Types.WIDGET_PROPERTY_WIDTH ) )
 		{
-			getView( ).getLayoutParams( ).width = Integer.parseInt( value );
-			return true;
+			layoutParams.width = IntConverter.convert( value );
 		}
-		else if( property == Types.WIDGET_PROPERTY_HEIGHT )
+		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
 		{
-			getView( ).getLayoutParams( ).height = Integer.parseInt( value );
-			return true;
+			layoutParams.height = IntConverter.convert( value );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_HALIGNMENT ) )
+		{
+			layoutParams.horizontalAlignment =  HorizontalAlignment.convert( value );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_VALIGNMENT ) )
+		{
+			layoutParams.verticalAlignment = VerticalAlignment.convert( value );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_COLOR ) )
+		{
+			getView( ).setBackgroundColor( Color.parseColor( "#" + value ) );
 		}
 		else
 		{
 			return false;
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -120,5 +143,16 @@ public class Widget
 	public boolean isLayout()
 	{
 		return false;
+	}
+	
+	/**
+	 * Returns the layout parameters.
+	 * 
+	 * @return The layout parameters, these are never null.
+	 */
+	public LayoutParams getLayoutParams()
+	{
+		assert( m_layoutParams != null );
+		return m_layoutParams;
 	}
 }

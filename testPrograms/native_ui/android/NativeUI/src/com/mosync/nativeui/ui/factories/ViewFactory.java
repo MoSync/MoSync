@@ -7,7 +7,6 @@ import com.mosync.nativeui.ui.widgets.Widget;
 
 import android.content.Context;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 /**
  * The ViewFactory is a singleton that is used to create
@@ -23,7 +22,7 @@ public class ViewFactory
 	/**
 	 * Mapping between types and their factory.
 	 */
-	private static HashMap<Integer, AbstractViewFactory> m_factoryMap = new HashMap<Integer, AbstractViewFactory>( );
+	private static HashMap<String, AbstractViewFactory> m_factoryMap = new HashMap<String, AbstractViewFactory>( );
 	
 	/**
 	 * Initializes the factory map.
@@ -43,7 +42,7 @@ public class ViewFactory
 	 * @param context The current context.
 	 * @return The created widget, or null if a widget could not be created.
 	 */
-	public static Widget createView(int type, Context context)
+	public static Widget createView(String type, Context context)
 	{
 		if( m_factoryMap.containsKey( type ) )
 		{
@@ -68,8 +67,8 @@ public class ViewFactory
 		}
 		
 		addFactory( Types.WIDGET_TYPE_BUTTON, new ButtonFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LABEL, new DefaultFactory( TextView.class ) );
-		addFactory( Types.WIDGET_TYPE_LAYOUT_VERTICAL , new LinearLayoutFactory( ) );
+		addFactory( Types.WIDGET_TYPE_LABEL, new LabelFactory( ) );
+		addFactory( Types.WIDGET_TYPE_LAYOUT_VERTICAL , new VerticalLayoutFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LIST, new ListFactory( ) );
 	}
 	
@@ -79,7 +78,7 @@ public class ViewFactory
 	 * @param type The type to add a factory for. 
 	 * @param factory A factory for the type.
 	 */
-	protected static void addFactory(int type, AbstractViewFactory factory)
+	protected static void addFactory(String type, AbstractViewFactory factory)
 	{
 		m_factoryMap.put( type, factory );
 	}

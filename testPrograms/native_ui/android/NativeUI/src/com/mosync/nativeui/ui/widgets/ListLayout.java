@@ -3,8 +3,11 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mosync.nativeui.util.LayoutParamsSetter;
+
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
@@ -16,11 +19,11 @@ import android.widget.ListView;
  * 
  * @author fmattias
  */
-public class ListBox extends Layout
+public class ListLayout extends Layout
 {
 	ViewAdapter m_viewAdapter = new ViewAdapter( );
 	
-	public ListBox(int handle, ListView listView)
+	public ListLayout(int handle, ListView listView)
 	{
 		super(handle, listView);
 		listView.setAdapter( m_viewAdapter );
@@ -29,13 +32,30 @@ public class ListBox extends Layout
 	/**
 	 * Add the child to the view adapter rather to
 	 * the list view itself.
+	 * 
+	 * @see Layout.addChild.
 	 */
 	@Override
 	public void addChild(Widget child)
 	{
 		child.setParent( this );
 		m_children.add( child );
+		
+		// Set layout params for the child
+		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
+		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
+		child.getView( ).setLayoutParams( nativeLayoutParams );
+		
 		m_viewAdapter.add( child.getView( ) );
+	}
+	
+	/**
+	 * @see Layout.updateLayoutParams.
+	 */
+	@Override
+	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
+	{
+		return new AbsListView.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
 	
 	/**
@@ -104,16 +124,9 @@ public class ListBox extends Layout
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			if( convertView == null )
+			if( position < m_views.size( ) )
 			{
-				if( position < m_views.size( ) )
-				{
-					return m_views.get( position );
-				}
-				else
-				{
-					return null;
-				}
+				return m_views.get( position );
 			}
 			else
 			{

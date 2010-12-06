@@ -1,23 +1,16 @@
 package com.mosync.nativeui.ui.widgets;
 
-import android.widget.Button;
+import android.widget.TextView;
 
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
-/**
- * Wraps the behavior of a Button view. Some properties and event handling
- * are extensions of Widget.
- * 
- * @author fmattias
- */
-public class ButtonWidget extends Widget
+public class LabelWidget extends Widget
 {
-	
-	public ButtonWidget(int handle, Button button)
+	public LabelWidget(int handle, TextView view)
 	{
-		super( handle, button );
+		super(handle, view);
 	}
 
 	/**
@@ -26,20 +19,19 @@ public class ButtonWidget extends Widget
 	@Override
 	public boolean setProperty(String property, String value) throws PropertyConversionException
 	{
-		boolean propertySet = super.setProperty(property, value);
-		if( propertySet )
+		if( super.setProperty(property, value) )
 		{
 			return true;
 		}
 		
-		Button button = (Button) getView( );
+		TextView textView = (TextView) getView( );
 		if( property.equals( Types.WIDGET_PROPERTY_TEXT ) )
 		{
-			button.setText( value );
+			textView.setText( value );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_FONT_COLOR ) )
 		{
-			button.setTextColor( ColorConverter.convert( value ) );
+			textView.setTextColor( ColorConverter.convert( value ) );
 		}
 		else
 		{
@@ -48,7 +40,4 @@ public class ButtonWidget extends Widget
 		
 		return true;
 	}
-
-	
-	
 }

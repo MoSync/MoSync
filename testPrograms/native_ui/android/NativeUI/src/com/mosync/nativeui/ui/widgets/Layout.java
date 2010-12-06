@@ -3,6 +3,8 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mosync.nativeui.util.LayoutParamsSetter;
+
 import android.view.ViewGroup;
 
 /**
@@ -43,7 +45,14 @@ public class Layout extends Widget
 	{
 		child.setParent( this );
 		m_children.add( child );
-		ViewGroup layout = asViewGroup( );
+
+		// Set layout params for the child
+		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
+		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
+		child.getView( ).setLayoutParams( nativeLayoutParams );
+		
+		// Add child to layout
+		ViewGroup layout = getView( );
 		layout.addView( child.getView( ) );
 	}
 	
@@ -60,16 +69,19 @@ public class Layout extends Widget
 	{
 		child.setParent( null );
 		m_children.remove( child );
-		ViewGroup layout = asViewGroup( );
+		ViewGroup layout = getView( );
 		layout.removeView( child.getView( ) );
 	}
 	
 	/**
-	 * @see Widget.setProperty.
+	 * Updates the layout params for the given child
+	 * to those suitable for this layout.
+	 * 
+	 * @param mosyncLayoutParams The mosync layout params to create a specific layout params for.
 	 */
-	public boolean setProperty(int property, String value)
+	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
-		return super.setProperty( property, value );
+		return new ViewGroup.LayoutParams( mosyncLayoutParams.getWidth( ), mosyncLayoutParams.getHeight( ) );
 	}
 	
 	/**
@@ -81,12 +93,12 @@ public class Layout extends Widget
 	}
 	
 	/**
-	 * Returns the wrapped ViewGroup.
-	 * 
-	 * @return the wrapped ViewGroup.
+	 * @see Widget.getView.
 	 */
-	protected ViewGroup asViewGroup()
+	@Override
+	public ViewGroup getView()
 	{
-		return (ViewGroup) getView( );
+		// ViewGroup is a covariant return type to View
+		return (ViewGroup) super.getView( );
 	}
 }

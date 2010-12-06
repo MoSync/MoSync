@@ -10,14 +10,34 @@ public class Types
 {
 	public static final int WIDGET_ROOT = -100;
 	
-	public static final int WIDGET_TYPE_BUTTON = 0;
-	public static final int WIDGET_TYPE_LABEL = 1;
-	public static final int WIDGET_TYPE_LIST = 2;
-	public static final int WIDGET_TYPE_LAYOUT_VERTICAL = 3;
+	public static final String WIDGET_TYPE_BUTTON = "Button";
+	public static final String WIDGET_TYPE_LABEL = "Label";
+	public static final String WIDGET_TYPE_LIST = "ListBox";
+	public static final String WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
+	public static final String WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
 	
-	public static final int WIDGET_PROPERTY_WIDTH = 0;
-	public static final int WIDGET_PROPERTY_HEIGHT = 1;
-	public static final int WIDGET_PROPERTY_TEXT = 2;
+	public static final String WIDGET_PROPERTY_WIDTH = "width";
+	public static final String WIDGET_PROPERTY_HEIGHT = "height";
+	
+	public static final String WIDGET_PROPERTY_PADDING_LEFT = "left";
+	public static final String WIDGET_PROPERTY_PADDING_TOP = "top";
+	public static final String WIDGET_PROPERTY_PADDING_RIGHT = "right";
+	public static final String WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
+	
+	public static final String WIDGET_PROPERTY_HALIGNMENT = "halignment";
+	public static final String WIDGET_PROPERTY_VALIGNMENT = "valignment";
+	public static final String WIDGET_PROPERTY_TEXT = "text";
+	
+	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
+	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
+	
+	public static final String WIDGET_HORIZONTAL_LEFT = "left";
+	public static final String WIDGET_HORIZONTAL_CENTER = "center";
+	public static final String WIDGET_HORIZONTAL_RIGHT = "right";
+	
+	public static final String WIDGET_VERTICAL_TOP = "top";
+	public static final String WIDGET_VERTICAL_CENTER = "center";
+	public static final String WIDGET_VERTICAL_BOTTOM = "bottom";
 	
 	public static final int WIDGET_OK = 0;
 	public static final int WIDGET_ERROR = -1;

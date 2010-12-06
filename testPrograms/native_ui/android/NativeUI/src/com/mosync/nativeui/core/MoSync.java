@@ -4,8 +4,10 @@ import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.ViewGroup;
 
 public class MoSync
@@ -33,17 +35,12 @@ public class MoSync
 		m_widgetTable.add( Types.WIDGET_ROOT, new Layout( Types.WIDGET_ROOT, rootWidget ) );
 	}
 	
-	public int maWidgetCreate(int type)
+	public int maWidgetCreate(String type)
 	{
 		Widget widget = ViewFactory.createView( type, m_context );
 		
 		if( widget != null )
-		{
-			/* Set default layout params here so that we can
-			 * set the width and height of the view. */
-			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams( ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT );
-			widget.getView( ).setLayoutParams( params );
-			
+		{	
 			int handle = m_widgetTable.add( widget );
 			return handle;
 		}
@@ -126,7 +123,7 @@ public class MoSync
 		}
 	}
 	
-	public int maWidgetSetProperty(int widgetHandle, int key, String value)
+	public int maWidgetSetProperty(int widgetHandle, String key, String value)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
@@ -134,12 +131,14 @@ public class MoSync
 			return Types.WIDGET_ERROR;
 		}
 		
-		if( widget.setProperty( key, value ) )
+		try
 		{
+			widget.setProperty( key, value );
 			return Types.WIDGET_OK;
 		}
-		else
+		catch(PropertyConversionException pce)
 		{
+			Log.e( this.getClass( ).getCanonicalName( ) , "Error while converting property: " + pce.getMessage( ), pce );
 			return Types.WIDGET_ERROR;
 		}
 	}

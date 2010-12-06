@@ -1,6 +1,6 @@
 package com.mosync.nativeui.ui.factories;
 
-import com.mosync.nativeui.ui.widgets.ListBox;
+import com.mosync.nativeui.ui.widgets.ListLayout;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 import android.content.Context;
@@ -20,6 +20,6 @@ public class ListFactory implements AbstractViewFactory
 	public Widget create(Context context, int handle)
 	{
 		ListView listView = new ListView( context );
-		return new ListBox( handle, listView );
+		return new ListLayout( handle, listView );
 	}
 }
