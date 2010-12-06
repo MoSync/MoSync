@@ -39,6 +39,7 @@ stabs.tab
 /runtimes/cpp/core/invoke_syscall_arm_recompiler.h
 /runtimes/cpp/core/invoke_syscall_cpp.h
 /runtimes/cpp/platforms/iphone/Classes/helpers/maapi_defs.h
+/runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h
 /runtimes/cpp/platforms/sdl/config_platform.h
 /runtimes/cpp/platforms/sdl/mosynclib/mosynclib.def
 /runtimes/java/source/MAAPI_consts.h
