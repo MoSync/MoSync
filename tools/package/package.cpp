@@ -42,9 +42,20 @@ static void setString(int& i, int argc, const char** argv, const char*& dst) {
 	dst = argv[i];
 }
 
+static void onExit() {
+	printf("onExit\n");
+}
+
 int main(int argc, const char** argv) {
 	SETTINGS s;
 	memset(&s, 0, sizeof(s));
+
+	atexit(&onExit);
+
+	if(argc == 1) {
+		printf("%s", sUsage);
+		return 1;
+	}
 
 	for(int i=1; i<argc; i++) {
 		if(streq(argv[i], "-h") || streq(argv[i], "--help")) {

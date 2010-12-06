@@ -9,6 +9,7 @@ struct RuntimeInfo {
 	std::string iconSize;
 	bool isBlackberry;
 	bool isCldc10;
+	int androidVersion;
 };
 
 // if isBlackberry, then s.dst is ignored, and the files stored in

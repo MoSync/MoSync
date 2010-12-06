@@ -175,6 +175,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\android.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\blackberry.cpp"
 			>
 		</File>

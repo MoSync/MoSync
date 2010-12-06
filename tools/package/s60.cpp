@@ -106,6 +106,7 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(cmd.str().c_str(), s.silent);
 
 	// call signsis
+	// todo: support non-default keys
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/signsis-4 -s \""<<unsignedSisName<<"\" \""<<signedSisName<<"\" \""<<
 		mosyncdir()<<"/etc/default.cert\" \""<<mosyncdir()<<"/etc/default.key\" default";

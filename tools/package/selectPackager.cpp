@@ -42,6 +42,14 @@ void package(const SETTINGS& s) {
 	}
 	toDir(ri.path);
 
+	// parse android version
+	ri.androidVersion = 0;
+	{
+		size_t i = ri.path.find("android_");
+		if(i != string::npos)
+			sscanf(ri.path.c_str() + i, "android_%i", &ri.androidVersion);
+	}
+
 	// select runtime
 	if(runtimeName == "JavaME") {
 		packageJavaME(s, ri);
@@ -64,7 +72,7 @@ void package(const SETTINGS& s) {
 		packageWM(s, ri);
 	} else if(runtimeName == "moblin") {
 		packageMoblin(s, ri);
-	} else if(runtimeName == "android") {
+	} else if(runtimeName.find("android") == 0) {	//begins with
 		packageAndroid(s, ri);
 	} else {
 		printf("Error: unknown runtime '%s'\n", runtimeName.c_str());
@@ -181,10 +189,6 @@ void packageWM(const SETTINGS&, const RuntimeInfo& ri) {
 	exit(1);
 }
 void packageMoblin(const SETTINGS&, const RuntimeInfo& ri) {
-	printf("not implemented\n");
-	exit(1);
-}
-void packageAndroid(const SETTINGS&, const RuntimeInfo& ri) {
 	printf("not implemented\n");
 	exit(1);
 }
