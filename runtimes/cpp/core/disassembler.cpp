@@ -174,7 +174,7 @@ __inline void WRITE(const char* fmt, ...) {
 #define CALL_RD
 #define JMP_IMM
 #define JMP_RD
-#define JMP_GENERIC
+#define JMP_GENERIC(a)
 #define REG(i) (i)
 #define MEM(type, addr) (addr)
 

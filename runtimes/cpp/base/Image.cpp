@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include <windows.h>
 
-#include <base_errors.h>
+#include "base_errors.h"
 using namespace MoSyncError;
 
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
@@ -373,7 +373,6 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 		height = srcRect->height,
 		u = srcRect->x,
 		v = srcRect->y;
-	int imgWidth = img->width;
 
 	int bpp = img->bytesPerPixel,
 		//dstPitchY = pitch,
