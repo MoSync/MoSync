@@ -22,7 +22,7 @@ const char* labels[] = {
 };
 
 void TestApp() {
-	MAHandle mainScreen = maWidgetCreate("Window");
+	MAHandle mainScreen = maWidgetCreate("Screen");
 	MAHandle tableView = maWidgetCreate("TableView");
 	maWidgetAddChild(mainScreen, tableView);
 	

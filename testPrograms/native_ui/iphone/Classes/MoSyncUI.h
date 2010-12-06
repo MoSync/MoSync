@@ -17,7 +17,6 @@ typedef int MAHandle;
 
 - (id)init;
 - (void)close;
-
 - (MAHandle)createWidget: (NSString*)name;
 - (IWidget*)getWidget: (MAHandle) handle;
 - (void)removeWidget: (MAHandle) handle;

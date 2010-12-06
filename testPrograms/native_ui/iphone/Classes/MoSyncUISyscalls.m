@@ -56,10 +56,5 @@ void maWidgetRemoveChild(MAHandle parent, MAHandle child) {
 }
 
 void maWidgetScreenShow(MAHandle screenHandle) {
-	IWidget* screen = [mosyncUI getWidget:screenHandle];
-	UIView* view = [screen getView];
-	if([view class] == [UIWindow class]) {
-		UIWindow* window = (UIWindow*)view;
-		[window makeKeyAndVisible];
-	}
+	
 }

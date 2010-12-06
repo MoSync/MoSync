@@ -1,22 +1,18 @@
 //
-//  WindowWidget.mm
+//  ScreenWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "WindowWidget.h"
+#import "ScreenWidget.h"
 
 
-@implementation WindowWidget
+@implementation ScreenWidget
 
 - (id)init {
-	UIWindow* window;
-    window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	window.backgroundColor = [UIColor whiteColor];  	
-	view = window;
-
+    view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];	
 	return [super init];
 }
 

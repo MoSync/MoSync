@@ -9,13 +9,13 @@
 #import "MoSyncUI.h"
 #import "LabelWidget.h"
 #import "TableViewWidget.h"
-#import "WindowWidget.h"
+#import "ScreenWidget.h"
 #import "ReflectionWidget.h"
 
 @implementation MoSyncUI
 
 NSMutableArray* widgetArray;
-UIView* mainWindow;
+UIWindow* mainWindow;
 
 - (IWidget*)getWidget: (MAHandle) handle {
 	IWidget *widget = nil;
@@ -26,6 +26,10 @@ UIView* mainWindow;
 - (id)init {
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
+
+    mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	mainWindow.backgroundColor = [UIColor whiteColor];  		
+	[mainWindow makeKeyAndVisible];
 	return self;
 }
 
@@ -38,6 +42,11 @@ UIView* mainWindow;
 	Class widgetClass = NSClassFromString(realName);
 	if(widgetClass != nil) {
 		created = [[widgetClass alloc] init];
+		
+		if([widgetClass class] == [ScreenWidget class]) {
+			[mainWindow addSubview: [created getView]];
+		}
+		
 	} else {
 		created = [[ReflectionWidget alloc] initWithName:name];
 	}
