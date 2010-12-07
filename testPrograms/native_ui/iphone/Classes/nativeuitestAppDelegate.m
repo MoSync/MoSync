@@ -29,16 +29,20 @@ void TestApp() {
 	for(int i = 0; i < 7; i++) {
 		MAHandle tableViewCell = maWidgetCreate("TableViewCell");
 		//maWidgetSetProperty(tableViewCell, "text", labels[i]);
-		if(i == 3) maWidgetSetProperty(tableViewCell, "backgroundColor", "#00ff00");
+		if(i == 3) {
+			maWidgetSetProperty(tableViewCell, "backgroundColor", "#00ff00");
+			maWidgetSetProperty(tableViewCell, "accessoryType", "isChecked");
+		}
+		
 		maWidgetAddChild(tableView, tableViewCell);		
 		
 		MAHandle button = maWidgetCreate("Button");
-		maWidgetSetProperty(button, "width", "80");			
+		maWidgetSetProperty(button, "width", "120");			
 		maWidgetSetProperty(button, "text", labels[i]);				
 		maWidgetAddChild(tableViewCell, button);
 		
 		MAHandle label = maWidgetCreate("Label");
-		maWidgetSetProperty(label, "left", "80");				
+		maWidgetSetProperty(label, "left", "120");				
 		maWidgetSetProperty(label, "text", labels[i]);		
 		maWidgetAddChild(tableViewCell, label);
 	

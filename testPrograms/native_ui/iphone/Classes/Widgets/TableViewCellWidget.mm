@@ -56,6 +56,7 @@
 	} 
     else if([key isEqualToString:@"accessoryType"]) {
 		UITableViewCell *cell = (UITableViewCell*)view;
+		
 		if([value isEqualToString:@"hasChildren"]) {
 			cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 		} 
@@ -64,10 +65,12 @@
 		}
 		else if([value isEqualToString:@"isChecked"]) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
-		} else {
+		} 
+		else {
 			cell.accessoryType = UITableViewCellAccessoryNone;			
 		}		   
-	} else {
+	} 
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	
