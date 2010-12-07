@@ -406,7 +406,7 @@ string generateScreenArguments(WidgetNode *root, bool useNamespace=false) {
 		if(screens[i]->widgetType != "Screen") continue;
 		if(useNamespace)
 			arguments += "MAUI::";
-		arguments += "Screen *" + screens[i]->attributes["id"] + "Arg";
+		arguments += "Screen *" + screens[i]->attributes["id"];
 		if(i!=screens.size()-1) arguments += ",";
 	}
 	return arguments;
@@ -417,7 +417,7 @@ string generateScreenInitializerList(WidgetNode *root) {
 	const vector<WidgetNode*> &screens = root->children;
 	for(size_t i = 0; i < screens.size(); i++) {
 		if(screens[i]->widgetType != "Screen") continue;
-		initializerList += screens[i]->attributes["id"] + "(" + screens[i]->attributes["id"] + "Arg)";
+		initializerList += screens[i]->attributes["id"] + "(" + screens[i]->attributes["id"] + ")";
 		if(i!=screens.size()-1) initializerList += ",";
 	}
 	return initializerList;

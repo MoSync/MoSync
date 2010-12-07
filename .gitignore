@@ -71,6 +71,7 @@ stabs.tab
 /runtimes/cpp/platforms/symbian/group-ed3/MoSync.xml
 /runtimes/cpp/platforms/symbian/group-ed3/*.resources
 /runtimes/cpp/platforms/symbian/sis/*.SIS
+/runtimes/cpp/platforms/symbian/sis-ed3/*.SIS
 /runtimes/cpp/platforms/symbian/group-ed3/*.cwlink
 /runtimes/cpp/platforms/symbian/group-ed3/ABLD.BAT
 /runtimes/cpp/platforms/symbian/group-ed3/MoSync_icon.mif
