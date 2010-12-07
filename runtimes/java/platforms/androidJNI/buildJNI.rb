@@ -37,6 +37,8 @@ end
 
 cpath = FileUtils.pwd
 
+system "ruby addLibraries.rb"
+
 firstarg = ARGV[0]
 secondarg = ARGV[1]
 thirdarg = ARGV[2]
@@ -99,6 +101,12 @@ puts "Building native Library\n\n"
 FileUtils.cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
+
+	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
+	if (!success)
+		exitBuilder(1, thirdarg)
+	end
+
 	success = system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
 	success = system("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
