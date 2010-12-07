@@ -349,8 +349,8 @@ void Syscall::ConnOp::SendResult(int result) {
 		DEBIG_PHAT_ERROR;
 	}
 	event.conn.result = result;
-	LOGS("Reporting o%i h%i r%i\n",
-		event.conn.opType, event.conn.handle, event.conn.result);
+	LOGS("Reporting o%i h%i r%i s%i\n",
+		event.conn.opType, event.conn.handle, event.conn.result, mConn.state);
 	DEBUG_ASSERT(event.conn.result != 0);
 	DEBUG_ASSERT(mSyscall.gAppView.AddEvent(event));
 
@@ -1244,6 +1244,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 				addr.Input(*hostname());
 			}
 		}
+		sockp->state |= CONNOP_CONNECT;
 		if(localhost) {
 			StartConnOpL(CO_AddrConnect::NewL(false, *this, gConnNextHandle, *sockp(),
 				addr, port, *sockp()));
@@ -1257,6 +1258,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 	} else if(type == eHttp) {
 		CHttpConnection* http;
 		TLTZ_PASS(httpCreateConnectionLC(parturl, http, HTTP_GET, ssl));
+		http->state |= CONNOP_CONNECT;
 		StartConnOpL(CO_HttpFinish::NewL(gNetworkingState != EStarted,
 			*this, gConnNextHandle, *http, *http, true));
 		http->mState = CHttpConnection::WRITING;
@@ -1330,6 +1332,7 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 
 			// create socket
 			Smartie<CSocket> sockp(new (ELeave) CSocket(gSocketServ, CSocket::ERfcomm));
+			sockp->state |= CONNOP_CONNECT;
 			StartConnOpL(CO_AddrConnect::NewL(false, *this, gConnNextHandle, *sockp(),
 				rfcsa, port, *sockp()));
 			conn = sockp.extract();
@@ -1338,7 +1341,6 @@ SYSCALL(MAHandle, maConnect(const char* url)) {
 	CleanupStack::PushL(conn);
 	gConnections.insert(gConnNextHandle, conn);
 	CleanupStack::Pop(conn);
-	conn->state |= CONNOP_CONNECT;
 	return gConnNextHandle++;
 }
 
