@@ -71,7 +71,7 @@ if secondarg == nil
 end
 
 # Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH
-ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg[-1, 1]
+ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg.scan("android_(\d+)")[-1]
 
 debug = (fortharg == nil) ? "" : "D"
 
@@ -87,10 +87,11 @@ if thirdarg != nil
 		FileUtils.copy_file "src/config_platform.h", "src/config_platform.h.saved"
 	end
 
-	puts "using runtime #{thirdarg}config#{debug}.h"
+	runtime_config = File.join(thirdarg, "config#{debug}.h") 
+	puts "using runtime #{runtime_config}"
 	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
-	FileUtils.copy_file( "#{thirdarg}config#{debug}.h", "src/config_platform.h")
+	FileUtils.copy_file( runtime_config, "src/config_platform.h")
 end
 
 
@@ -99,9 +100,9 @@ puts "Building native Library\n\n"
 FileUtils.cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
-	success = system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
-	success = system("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
+	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
 
 if (!success)
@@ -128,12 +129,14 @@ puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
-system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
+system("#{secondarg}../../tools/aapt package -f -v -M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ -I #{File.join(secondarg, "android.jar")} -S #{File.join(package_root, "res")} -m -J #{File.join(package_root, "src")}");
 	
 puts "Compile Java Source Files\n\n"
 
 # Compile all the java files into class files
-success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+puts "javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{File.join(package_root, "/src/com/mosync/java/android/*.java")} #{File.join(package_root, "/src/com/mosync/internal/android/*.java")}"
+
+success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{File.join(package_root, "/src/com/mosync/java/android/*.java")} #{File.join(package_root, "/src/com/mosync/internal/android/*.java")}");
 if (!success)
 	exitBuilder(1,thirdarg)
 end
@@ -141,7 +144,7 @@ end
 puts "Copy Generated Library File\n\n"
 
 # copy the library file
-FileUtils.copy_file( "#{cpath}/AndroidProject/libs/armeabi/libmosync.so", "temp/libmosync.so")
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
 
 puts "Build Zip Package\n\n"
 
@@ -157,7 +160,7 @@ if (!success)
 	exitBuilder(1, thirdarg)
 end
 
-FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
+FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", File.join(outdir, "MoSyncRuntime#{debug}.zip"))
 
 FileUtils.cd ".."
 
