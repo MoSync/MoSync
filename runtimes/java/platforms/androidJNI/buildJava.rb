@@ -30,6 +30,10 @@ require 'fileutils'
 # @param output_dir The directory where the resulting .java file will be placed.
 #
 def preprocess_android_file(shared_dir, src_file, output_dir)
+	if(not File.exists?(output_dir))
+		FileUtils.mkpath(output_dir)
+	end  
+ 
 	jtmp_file = File.basename(src_file).gsub(/.jpp$/, ".jtmp")		
 	java_file = File.basename(src_file).gsub(/.jpp$/, ".java")
 	
