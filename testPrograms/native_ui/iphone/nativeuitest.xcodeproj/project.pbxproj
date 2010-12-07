@@ -30,6 +30,7 @@
 		857FB0A812A924E10018C523 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A512A924E10018C523 /* VLayoutView.m */; };
 		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
+		85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,8 @@
 		8582679312A403EF0047D42D /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
 		858A78B5129E9A50005EACA7 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
+		85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
+		85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -166,6 +169,8 @@
 		8577516512A00BFE00F8BAA2 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */,
+				85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */,
 				85314FD912AD31CB00052736 /* ButtonWidget.h */,
 				85314FDA12AD31CB00052736 /* ButtonWidget.m */,
 				85314FDB12AD31CB00052736 /* HorizontalLayoutWidget.h */,
@@ -283,6 +288,7 @@
 				85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */,
 				85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */,
 				85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */,
+				85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

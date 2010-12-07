@@ -22,9 +22,12 @@ const char* labels[] = {
 };
 
 void TestApp() {
-	MAHandle mainScreen = maWidgetCreate("Screen");
+	MAHandle firstScreen = maWidgetCreate("Screen");
 	MAHandle tableView = maWidgetCreate("TableView");
-	maWidgetAddChild(mainScreen, tableView);
+	maWidgetAddChild(firstScreen, tableView);
+	maWidgetSetProperty(firstScreen, "title", "first");		
+
+	//maWidgetSetProperty(tableView, "width", "80");
 	
 	for(int i = 0; i < 7; i++) {
 		MAHandle tableViewCell = maWidgetCreate("TableViewCell");
@@ -48,10 +51,20 @@ void TestApp() {
 	
 	}
 	
+	MAHandle secondScreen = maWidgetCreate("Screen");	
+	maWidgetSetProperty(secondScreen, "title", "second");		
+	MAHandle button = maWidgetCreate("Button");
+	maWidgetSetProperty(button, "left", "20");			
+	maWidgetSetProperty(button, "top", "20");			
+
+	maWidgetSetProperty(button, "width", "120");			
+	maWidgetSetProperty(button, "text", "Big button!");				
+	maWidgetAddChild(secondScreen, button);
+		
 	//MAHandle button = maWidgetCreate("UIButton");
 	//maWidgetAddChild(tableView, button);
 	
-	maWidgetScreenShow(mainScreen);	
+	maWidgetScreenShow(firstScreen);	
 }
 
 #pragma mark -

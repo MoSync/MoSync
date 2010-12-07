@@ -16,6 +16,7 @@
 
 NSMutableArray* widgetArray;
 UIWindow* mainWindow;
+UITabBarController *tabBarController;
 
 - (IWidget*)getWidget: (MAHandle) handle {
 	IWidget *widget = nil;
@@ -26,10 +27,19 @@ UIWindow* mainWindow;
 - (id)init {
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
-
-    mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	
+	mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	mainWindow.backgroundColor = [UIColor whiteColor];  		
+
+	
+	tabBarController = [[UITabBarController alloc] init];
+    tabBarController.viewControllers = [NSArray array];										 	
+	//tabBarController.view = mainWindow;
+
+	[mainWindow addSubview:tabBarController.view];	
 	[mainWindow makeKeyAndVisible];
+	
+	
 	return self;
 }
 
@@ -44,7 +54,11 @@ UIWindow* mainWindow;
 		created = [[widgetClass alloc] init];
 		
 		if([widgetClass class] == [ScreenWidget class]) {
-			[mainWindow addSubview: [created getView]];
+			//[mainWindow addSubview: [created getView]];
+			ScreenWidget* screen = (ScreenWidget*)created;
+			NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
+			[newItems addObject:[screen getController]];
+			tabBarController.viewControllers = newItems;
 		}
 		
 	} else {
