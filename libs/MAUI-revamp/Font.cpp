@@ -128,7 +128,8 @@ namespace MAUI {
 		// read magic
 		//maReadData(file, ident, filePtr, 4); 
 		readChars(ident, 4);
-		if(ident[0] != 'B' || ident[1] != 'M' || ident[2] != 'F' || ident[3] < 1 || ident[3] > 2) {
+		int version = ident[3];
+		if(ident[0] != 'B' || ident[1] != 'M' || ident[2] != 'F' || version < 2 || version > 3) {
 			//PANIC_MESSAGE("Wrong .fnt format!");
 			//printf("Wrong .fnt format!\n");
 			return 0;
@@ -142,14 +143,17 @@ namespace MAUI {
 			// read block type and block size
 			unsigned char id = readByte();
 			unsigned int blockSize = readInt();
+			unsigned int skipValue = blockSize;
+			if(version == 2) skipValue -= 4;
 			switch(id) {
 				case 1:
 					{
 						int initialFilePos = sFilePos;
 						skipBytes(14);
+
 						int i = readChars(charset->name, CHARSET_MAX_NAME_LEN);
 						charset->name[i-1] = 0;
-						skipBytes(((blockSize-4)+initialFilePos)-sFilePos);
+						skipBytes((skipValue+initialFilePos)-sFilePos);
 					}
 					break;
 				case 2:
@@ -176,7 +180,10 @@ namespace MAUI {
 						charset->width			= readShort();
 						charset->height			= readShort();
 						charset->pages			= readShort();
-						skipBytes(1);
+						if(version==2)
+							skipBytes(1);
+						else
+							skipBytes(5);
 
 						//int currentBlockSize = (filePtr-filePtrBefore)+4;	
 						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);
@@ -204,10 +211,19 @@ namespace MAUI {
 					//int blockSize = readInt(file, &filePtr);
 					{
 						//int filePtrBefore = filePtr;
-						int numTimes = (blockSize-4)/18;
+						int numBytesPerChar = 18;
+						if(version == 3) numBytesPerChar = 20;
+
+						int numTimes = skipValue/numBytesPerChar;
 						while(numTimes--) {
 							//printf("Reading char block! filePtr: %d\n", filePtr);
-							unsigned short c			= readShort();
+							
+							unsigned int c;
+							if(version == 2)
+								c = readShort();
+							else
+								c = readInt();
+
 							if(c>256) {
 								maPanic(1, "Font contains unicode characters! Only ascii is supported.");
 							}
@@ -229,7 +245,7 @@ namespace MAUI {
 					break;
 				default:
 					//printf("not reading this id\n");;
-					skipBytes(blockSize-4);
+					skipBytes(skipValue);
 					break;
 
 			}

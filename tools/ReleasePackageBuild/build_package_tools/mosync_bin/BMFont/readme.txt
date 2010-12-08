@@ -1,4 +1,4 @@
-Bitmap Font Generator v1.9c by Andreas Jönsson (www.AngelCode.com)
+Bitmap Font Generator v1.12 by Andreas Jönsson (www.AngelCode.com)
 ----------------------------------------------------------------------------------------
 This program will allow you to generate bitmap fonts from TrueType and other Windows fonts. The application generates both image files and character descriptions that can be read by a game for easy rendering of fonts.
 
@@ -20,6 +20,61 @@ The program and any possible upgrades can be found at www.AngelCode.com. The aut
 
 Changes
 -------------------------------
+1.12 - 2009/08/02
+- Added presets to the export options to aid choosing the correct values for the texture channels.
+- Fixed bug when generating font from command line where the page files in the font descriptor would have the incorrect name.
+- Added ability to invert individual texture channels for more export options.
+- Added command line tool that will wait for the generation to complete before exiting.
+- Fixed the yoffset when the font height was scaled.
+- Fixed bug in select chars from file for non-unicode with characters above ASCII 127.
+- The number of digits for the page id in the texture files is now adapted to the number of generated pages.
+- Added support for adjusting xoffset, yoffset, and advance for imported icons.
+
+1.11b - 2009/03/08
+- Fixed a bug in the select chars from file with UTF16 encoded files.
+- Fixed a bug in the packing routine that could make characters overlap in rare situations.
+- Fixed the selection of unicode ranges by clicking on the check mark in the list.
+
+1.11a - 2008/12/06
+- Fixed the subpixel misalignment in the glyph height caused by supersampling.
+- Worked around a bug in GDI where the returned glyph height is smaller than the actual glyph bitmap.
+
+1.11 - 2008/10/11
+- Fixed a freeze that could happen while selecting characters from file.
+- Fixed cropping in some true type fonts.
+- Fixed the 'Select All Chars' option in ASCII mode.
+- Added option 'Output invalid char glyph'.
+- Removed the 'Disable unavailable chars' option.
+- Fixed problem where characters not defined in the unicode standard could be selected when selecting chars from file.
+- An indicator is now displayed in the character grid where images are imported.
+- Fixed bug where main window is moved behind other windows when closing image manager.
+- Fixed bug where cancelling the icon image dialog would still effectivate the changes.
+- It's now possible to select font size by character height, rather than line height.
+
+1.10b - 2008/06/15
+- Fixed the channel indicator in the font descriptor for colored icons.
+- Fixed cropping of characters in small fonts.
+- Fixed bug with black 8bit textures when the check box for pack chars is checked.
+
+1.10a - 2008/06/08
+- Corrected the documentation in regards to the block size value in the binary file format.
+- Fixed a bug with the 'Select chars from file' where some character might be skipped between reading blocks of 1kb.
+- Fixed a rounding problem with supersampling that made the exported line height be one less than the largest character height.
+- Removed the external dependency on the Microsoft DLLs.
+- Upgraded libpng to 1.2.29.
+
+1.10 - 2008/05/11
+- Selecting characters from file now supports both UTF-8 and UTF-16, with automatic detection via byte-order-mark.
+- Fixed a bug where unicode subsets where not shown when disable undefined characters was unselected.
+- Status bar shows character id for the character under the mouse cursor.
+- Added "clear all" option.
+- Preview window is now automatically resized to fit the texture when scaling.
+- Added support for unicode characters above 0xFFFF.
+- Added support for generating textures with DXT1, DXT3, and DXT5 compression.
+- Split the font settings dialog in two dialogs, one for the font graphics and one for export options.
+- The content of each texture channel can now be customized.
+- File format updated to accomodate new feature.
+
 1.9c - 2007/11/16
 - Fixed the reversed spacing values in the font settings dialog.
 - The font generation can now be aborted while the characters are being added to the texture.
@@ -110,4 +165,4 @@ Changes
 1.0 - 2004/02/14 
 - First public version.
 
-copyright (c) 2004-2007 Andreas Jönsson
+copyright (c) 2004-2009 Andreas Jönsson

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="MAUI"
-	ProjectGUID="{55F4CFE9-4CE8-40B6-818F-0449633BEFF3}"
-	RootNamespace="MAUI"
+	Name="MAUI-revamp"
+	ProjectGUID="{574E1B1B-DB70-49B5-BEF3-7097A21796B8}"
+	RootNamespace="MAUI-revamp"
 	>
 	<Platforms>
 		<Platform
