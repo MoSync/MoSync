@@ -1613,7 +1613,7 @@ Core::VMCore* gCore = NULL;
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 	return Core::GetValidatedMemRange(gCore, address, size);
 }
-int Base::Syscall::GetValidatedStackValue(int offset) {
+int Base::Syscall::GetValidatedStackValue(int offset, va_list argptr) {
 	return Core::GetValidatedStackValue(gCore, offset);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
