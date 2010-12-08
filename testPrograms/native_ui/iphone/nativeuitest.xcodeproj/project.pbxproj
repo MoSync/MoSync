@@ -22,6 +22,8 @@
 		85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE812AD31CB00052736 /* TableViewCellWidget.mm */; };
 		85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEA12AD31CB00052736 /* TableViewWidget.mm */; };
 		85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */; };
+		85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */; };
+		8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8537500912AFC9AD0037C888 /* NavScreenWidget.mm */; };
 		8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8565795912A510A700A7D535 /* UIColor-Expanded.m */; };
 		85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */; };
 		85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */; };
@@ -62,6 +64,10 @@
 		85314FEA12AD31CB00052736 /* TableViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TableViewWidget.mm; path = Widgets/TableViewWidget.mm; sourceTree = "<group>"; };
 		85314FEB12AD31CB00052736 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = Widgets/VerticalLayoutWidget.h; sourceTree = "<group>"; };
 		85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VerticalLayoutWidget.m; path = Widgets/VerticalLayoutWidget.m; sourceTree = "<group>"; };
+		85374F5E12AFC05F0037C888 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TabScreenWidget.h; path = Widgets/TabScreenWidget.h; sourceTree = "<group>"; };
+		85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TabScreenWidget.mm; path = Widgets/TabScreenWidget.mm; sourceTree = "<group>"; };
+		8537500812AFC9AD0037C888 /* NavScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavScreenWidget.h; path = Widgets/NavScreenWidget.h; sourceTree = "<group>"; };
+		8537500912AFC9AD0037C888 /* NavScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavScreenWidget.mm; path = Widgets/NavScreenWidget.mm; sourceTree = "<group>"; };
 		8565795812A510A700A7D535 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Expanded.h"; sourceTree = "<group>"; };
 		8565795912A510A700A7D535 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Expanded.m"; sourceTree = "<group>"; };
 		85774F15129FB70D00F8BAA2 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
@@ -169,6 +175,10 @@
 		8577516512A00BFE00F8BAA2 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				8537500812AFC9AD0037C888 /* NavScreenWidget.h */,
+				8537500912AFC9AD0037C888 /* NavScreenWidget.mm */,
+				85374F5E12AFC05F0037C888 /* TabScreenWidget.h */,
+				85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */,
 				85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */,
 				85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */,
 				85314FD912AD31CB00052736 /* ButtonWidget.h */,
@@ -289,6 +299,8 @@
 				85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */,
 				85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */,
 				85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */,
+				85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */,
+				8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

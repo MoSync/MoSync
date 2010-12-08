@@ -22,6 +22,8 @@ const char* labels[] = {
 };
 
 void TestApp() {
+	MAHandle tabScreen = maWidgetCreate("TabScreen");	
+	
 	MAHandle firstScreen = maWidgetCreate("Screen");
 	MAHandle tableView = maWidgetCreate("TableView");
 	maWidgetAddChild(firstScreen, tableView);
@@ -51,20 +53,39 @@ void TestApp() {
 	
 	}
 	
+	MAHandle tabScreen2 = maWidgetCreate("NavScreen");
+	maWidgetSetProperty(tabScreen2, "title", "hoho");		
+	
 	MAHandle secondScreen = maWidgetCreate("Screen");	
 	maWidgetSetProperty(secondScreen, "title", "second");		
 	MAHandle button = maWidgetCreate("Button");
 	maWidgetSetProperty(button, "left", "20");			
-	maWidgetSetProperty(button, "top", "20");			
+	maWidgetSetProperty(button, "top", "0");			
 
 	maWidgetSetProperty(button, "width", "120");			
 	maWidgetSetProperty(button, "text", "Big button!");				
 	maWidgetAddChild(secondScreen, button);
-		
+	
+	MAHandle thirdScreen = maWidgetCreate("Screen");	
+	maWidgetSetProperty(thirdScreen, "title", "third");		
+	MAHandle button2 = maWidgetCreate("Button");
+	maWidgetSetProperty(button2, "left", "20");			
+	maWidgetSetProperty(button2, "top", "0");			
+	
+	maWidgetSetProperty(button2, "width", "120");			
+	maWidgetSetProperty(button2, "text", "Big button2!");				
+	maWidgetAddChild(thirdScreen, button2);
+	
+	
 	//MAHandle button = maWidgetCreate("UIButton");
 	//maWidgetAddChild(tableView, button);
 	
-	maWidgetScreenShow(firstScreen);	
+	maWidgetAddChild(tabScreen, firstScreen);
+	maWidgetAddChild(tabScreen2, secondScreen);	
+	maWidgetAddChild(tabScreen2, thirdScreen);	
+		maWidgetAddChild(tabScreen, tabScreen2);
+	
+	maWidgetScreenShow(tabScreen);	
 }
 
 #pragma mark -

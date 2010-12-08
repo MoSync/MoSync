@@ -12,11 +12,11 @@
 @implementation ScreenWidget
 
 - (id)init {
-    view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	controller = [[ScreenWidgetController alloc] init];
-	controller.view = view;
-	controller.title = @"Hello World!";
-	
+	//controller.view = view;
+	controller.title = @"";
+	view = controller.view;
 	return [super init];
 }
 
@@ -41,7 +41,7 @@
 	return [super getPropertyWithKey:key];
 }
 
-- (ScreenWidgetController*) getController {
+- (UIViewController*) getController {
 	return controller;
 }
 

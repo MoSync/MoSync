@@ -11,7 +11,7 @@
 #import "ScreenWidgetController.h"
 
 @interface ScreenWidget : IWidget {
-	ScreenWidgetController* controller;
+	UIViewController* controller;
 }
 
 - (id)init;
@@ -19,6 +19,6 @@
 - (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-- (ScreenWidgetController*) getController;
+- (UIViewController*) getController;
 
 @end

@@ -56,5 +56,5 @@ void maWidgetRemoveChild(MAHandle parent, MAHandle child) {
 }
 
 void maWidgetScreenShow(MAHandle screenHandle) {
-	
+	[mosyncUI show:screenHandle];
 }

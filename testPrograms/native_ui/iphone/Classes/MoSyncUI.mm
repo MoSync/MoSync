@@ -17,6 +17,7 @@
 NSMutableArray* widgetArray;
 UIWindow* mainWindow;
 UITabBarController *tabBarController;
+//UINavigationController *tabBarController;
 
 - (IWidget*)getWidget: (MAHandle) handle {
 	IWidget *widget = nil;
@@ -32,11 +33,13 @@ UITabBarController *tabBarController;
 	mainWindow.backgroundColor = [UIColor whiteColor];  		
 
 	
-	tabBarController = [[UITabBarController alloc] init];
-    tabBarController.viewControllers = [NSArray array];										 	
+	//tabBarController = [[UITabBarController alloc] init];
+    //tabBarController = [[UINavigationController alloc] init];
+	
+	//tabBarController.viewControllers = [NSArray array];										 	
 	//tabBarController.view = mainWindow;
 
-	[mainWindow addSubview:tabBarController.view];	
+	//[mainWindow addSubview:tabBarController.view];	
 	[mainWindow makeKeyAndVisible];
 	
 	
@@ -53,6 +56,7 @@ UITabBarController *tabBarController;
 	if(widgetClass != nil) {
 		created = [[widgetClass alloc] init];
 		
+		/*
 		if([widgetClass class] == [ScreenWidget class]) {
 			//[mainWindow addSubview: [created getView]];
 			ScreenWidget* screen = (ScreenWidget*)created;
@@ -60,6 +64,7 @@ UITabBarController *tabBarController;
 			[newItems addObject:[screen getController]];
 			tabBarController.viewControllers = newItems;
 		}
+		*/
 		
 	} else {
 		created = [[ReflectionWidget alloc] initWithName:name];
@@ -73,6 +78,11 @@ UITabBarController *tabBarController;
 }
 
 - (void) removeWidget: (MAHandle) handle {
+}
+
+- (void)show: (MAHandle) handle {
+	IWidget* widget = [self getWidget: handle];
+	[mainWindow addSubview:[widget getView]];	
 }
 
 @end
