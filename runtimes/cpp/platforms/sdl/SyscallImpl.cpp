@@ -1866,7 +1866,7 @@ namespace Base {
 	}
 #endif
 
-	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c MA_IOCTL_ELLIPSIS)) {
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK

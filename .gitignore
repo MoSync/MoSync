@@ -112,6 +112,7 @@ stabs.tab
 
 /tools/debugger/start.bat
 
+/runtimes/cpp/platforms/sdl/MoRE/sld.tab
 /runtimes/cpp/platforms/sdl/MoRE/fp.xml
 /runtimes/cpp/platforms/sdl/MoRE/profile.txt
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
