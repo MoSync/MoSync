@@ -61,7 +61,7 @@ public class MoSync extends Activity
 		
 		super.onCreate(savedInstanceState);
 		
-		if (theMoSyncThreadIsDead()) { return ; }
+		//if (theMoSyncThreadIsDead()) { return ; }
 		
 		// Initialize.
 		mMoSyncView = null;
