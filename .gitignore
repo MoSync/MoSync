@@ -115,3 +115,7 @@ stabs.tab
 /runtimes/java/platforms/androidJNI/AndroidProject/obj
 /runtimes/java/platforms/androidJNI/AndroidProject/src
 /runtimes/java/platforms/androidJNI/src/config_platform.h*
+/libs/MAStd/maapi_defs.h
+/libs/MTXml/entities.c
+/libs/newlib/libc/sys/mosync/maapi.h
+/libs/newlib/libc/sys/mosync/maapi_defs.h
