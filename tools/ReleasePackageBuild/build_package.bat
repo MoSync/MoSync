@@ -142,7 +142,7 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @echo Copying Batik bin.
 @echo ------------------------------------------------
-@xcopy %ORIGINAL_PATH%\build_package_tools\bin\Batik %MOSYNC_BIN_PATH%\Batik /y /E /D
+@xcopy %ORIGINAL_PATH%\build_package_tools\bin\Batik %MOSYNC_BIN_PATH%\Batik\ /y /E /D
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 @echo.
