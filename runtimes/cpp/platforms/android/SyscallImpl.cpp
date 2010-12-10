@@ -57,14 +57,20 @@ namespace Base
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
 	
 	/**
-	* Syscall constructor	
+	* Syscall constructor
+	*
+	* Sets the global syscall to use this newly consturcted object.
+	* If the event queue isn't empty, we will clear it since this is
+	* only called when an application has restarted
 	*/
 	Syscall::Syscall()
 	{
 		gSyscall = this;
-//		mIsLooked = false;
-//		mGotLockedEvent = false;
+		// mIsLooked = false;
+		// mGotLockedEvent = false;
 		init();
+		
+		gEventFifo.clear();
 	}
 
 	/**
