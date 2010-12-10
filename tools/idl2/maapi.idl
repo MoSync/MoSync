@@ -3065,7 +3065,23 @@ interface MAAPI {
 		* @return \< 0 on error.
 		*/
 		int maHomeScreenEventsOff();
+		
+		/**
+		* Add shortcut icon to the device home screen.
+		* Available on Android only.
+		* @param name The name (label) of the shortcut to add.
+		* @return \< 0 on error.
+		*/
+		int maHomeScreenShortcutAdd(in MAString name);
 
+		/**
+		* Remove shortcut icon from the device home screen.
+		* Available on Android only.
+		* @param name The name (label) of the shortcut to remove.
+		* @return \< 0 on error.
+		*/
+		int maHomeScreenShortcutRemove(in MAString name);
+		
 		/**
 		 * Add a notification item.
 		 *

@@ -1890,6 +1890,53 @@ int maWallpaperSet(final int data)
 	return -1;
 }
 
+int maHomeScreenShortcutAdd(String name)
+{
+	// Create intent for the shortcut launcher.
+	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
+	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	
+	// Get icon resource.
+	int icon = mContext.getResources().getIdentifier(
+		"icon", 
+		"drawable", 
+		mContext.getPackageName());
+	
+	// Create intent for adding a shortcut icon.
+	Intent intent = new Intent();
+	intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+	intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+	intent.putExtra(
+		Intent.EXTRA_SHORTCUT_ICON_RESOURCE, 
+		Intent.ShortcutIconResource.fromContext(mContext, icon));
+	intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+	// Alternative form: intent.setAction(Intent.ACTION_CREATE_SHORTCUT); 
+	
+	// Broadcast the intent.
+	mContext.getApplicationContext().sendBroadcast(intent);
+	
+	return 1;
+}
+
+int maHomeScreenShortcutRemove(String name)
+{
+	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
+	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
+	
+	Intent intent = new Intent();
+	intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+	intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+	intent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
+	
+	mContext.getApplicationContext().sendBroadcast(intent);
+	
+	return 1;
+}
+
 /**
  * Thread that checks if the home screen is visible.
  */

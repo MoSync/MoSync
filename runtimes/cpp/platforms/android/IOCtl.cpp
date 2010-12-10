@@ -618,5 +618,48 @@ namespace Base
 		
 		return (int)result;
 	}
-
+	
+	/**
+	* Add shortcut icon to the device home screen.
+	* Available on Android only.
+	* @param name The name (label) of the shortcut to add.
+	* @return \< 0 on error.
+	*/
+	int _maHomeScreenShortcutAdd(const char* name, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrName = jNIEnv->NewStringUTF(name);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maHomeScreenShortcutAdd", 
+			"(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrName);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrName);
+		
+		return (int)result;
+	}
+	
+	/**
+	* Remove shortcut icon from the device home screen.
+	* Available on Android only.
+	* @param name The name (label) of the shortcut to remove.
+	* @return \< 0 on error.
+	*/
+	int _maHomeScreenShortcutRemove(const char* name, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrName = jNIEnv->NewStringUTF(name);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, 
+			"maHomeScreenShortcutRemove", 
+			"(Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrName);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrName);
+		
+		return (int)result;
+	}
 }

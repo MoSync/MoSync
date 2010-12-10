@@ -110,8 +110,8 @@ stabs.tab
 /runtimes/java/platforms/javaME/setdirs.bat
 /runtimes/java/platforms/javaME/src/config_platform.h
 /runtimes/java/platforms/javaME/src/opengl_invoke_generated.jpp
-/runtimes/java/shared/generated/MAAPI_consts.h
-/runtimes/java/shared/generated/core_consts.h
-/runtimes/java/shared/generated/invoke_syscall_java.h
-/runtimes/java/shared/generated/opengl_invoke_generated.jpp
-/runtimes/java/shared/generated/syscall_static_java.h
+/runtimes/java/shared/generated
+/runtimes/java/platforms/androidJNI/AndroidProject/libs
+/runtimes/java/platforms/androidJNI/AndroidProject/obj
+/runtimes/java/platforms/androidJNI/AndroidProject/src
+/runtimes/java/platforms/androidJNI/src/config_platform.h*
