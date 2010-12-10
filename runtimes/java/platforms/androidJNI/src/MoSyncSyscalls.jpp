@@ -1890,8 +1890,17 @@ int maWallpaperSet(final int data)
 	return -1;
 }
 
+/**
+ * Add a shortcut icon to the home screen. If called multiple times
+ * multiple icons will be added. The shortcut launches the current
+ * application.
+ * @param name The text that will be used for the shortcut label.
+ * @return <0 on error
+ */
 int maHomeScreenShortcutAdd(String name)
 {
+	homeScreenPanicIfPermissionsAreNotSet();
+	
 	// Create intent for the shortcut launcher.
 	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
 	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
@@ -1922,8 +1931,15 @@ int maHomeScreenShortcutAdd(String name)
 	return 1;
 }
 
+/**
+ * Remove a shortcut icon to the home screen. 
+ * @param name The shortcut(s) with this label will be removed.
+ * @return <0 on error
+ */
 int maHomeScreenShortcutRemove(String name)
 {
+	homeScreenPanicIfPermissionsAreNotSet();
+	
 	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
 	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
 	
@@ -1995,6 +2011,9 @@ void homeScreenPanicIfPermissionsAreNotSet()
 		||
 		(PackageManager.PERMISSION_GRANTED != 
 		 mContext.checkCallingOrSelfPermission("com.android.launcher.permission.INSTALL_SHORTCUT"))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission("com.android.launcher.permission.UNINSTALL_SHORTCUT"))
 		)
 	{
 		maPanic(1, "Permission 'Home Screen and Wallpaper access' is not set in the MoSync project");
