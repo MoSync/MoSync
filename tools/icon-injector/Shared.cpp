@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include <stdlib.h>
 #include <stdio.h>
+#include <sstream>
 
 using namespace std;
 
@@ -47,32 +48,48 @@ string getAbsolutePath(const string& path) {
 	return path.substr(0, i);
 }
 
-bool convertInstanceToImageFormat(const IconInstance *iconInstance, const char *dstFilename, const string& size, const string& format) {
-	
+bool convertInstanceToImageFormat(const IconInstance *iconInstance,
+	const char *dstFilename, const string& size, const string& /*format*/)
+{
 	const char *mosyncdir_c = getenv("MOSYNCDIR");
 	if(!mosyncdir_c) errorExit("MOSYNCDIR missing");
 	string mosyncdir = mosyncdir_c;
+
+	string src = iconInstance->filename;
+	string extension = getExtension(src);
+	if(extension == "svg") {
+		ostringstream batik;
+		batik << "java -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
+			" "<<src<<" -d \""<<dstFilename<<"\"";
+		if(size != "default") {
+			size_t n;
+			unsigned w, h;
+			int res = sscanf(size.c_str(), "%ux%u%n", &w, &h, &n);
+			if(res != 2 || n != size.size())
+				errorExit("Broken parameter: size.");
+			batik << " -w "<<w<<" -h "<<h;
+		}
+		int res = run(batik.str().c_str());
+		if(res != 0)
+			errorExit("Batik failed.");
+		return true;
+	}
+
 	string resizeFlag;
 	if(size != "default")
 		resizeFlag = " -resize " + size;
 #if defined(WIN32)
 	string magick = 
-		"\""+mosyncdir+"\\bin\\ImageMagick\\convert.exe\" \"" + iconInstance->filename + "\"" +
+		"\""+mosyncdir+"\\bin\\ImageMagick\\convert.exe\" \"" + src + "\"" +
 		resizeFlag + " \"" + string(dstFilename) + "\"";
 #else
 	string magick = 
-	"\""+mosyncdir+"/bin/ImageMagick/convert\" \"" + iconInstance->filename + "\"" +
+	"\""+mosyncdir+"/bin/ImageMagick/convert\" \"" + src + "\"" +
 	resizeFlag + " \"" + string(dstFilename) + "\"";
 #endif
 	
 	if(run(magick.c_str()) != 0) errorExit("Image Magick failed.");
 
-	/*
-	string ext = getExtension(iconInstance->filename);
-	if(ext == "svg") {
-	} else {
-	}
-	*/
 	return true;
 }
 
