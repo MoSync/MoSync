@@ -1891,7 +1891,7 @@ int maWallpaperSet(final int data)
 }
 
 /**
- * Thread that checks if the hoem screen is visible.
+ * Thread that checks if the home screen is visible.
  */
 HomeScreenDetectionThread mHomeScreenDetectionThread = null;
 
@@ -1957,6 +1957,11 @@ void homeScreenPanicIfPermissionsAreNotSet()
 class HomeScreenDetectionThread extends Thread
 {
 	/**
+	 * The id of the home screen task. -1 means that the id is unknown.
+	 */
+	int mHomeScreenTaskId = -1;
+
+	/**
 	 * Keep track of whether we are on the home screen or not.
 	 */
 	boolean mIsOnHomeScreen = false;
@@ -2004,12 +2009,12 @@ class HomeScreenDetectionThread extends Thread
 					int[] event = new int[1];
 					if (mIsOnHomeScreen)
 					{
-						//Log.i("MoSyncSyscalls", "HOMESCREEN IS SHOWN");
+						Log.i("MoSyncSyscalls", "HOMESCREEN IS SHOWN");
 						event[0] = EVENT_TYPE_HOMESCREEN_SHOWN;
 					}
 					else
 					{
-						//Log.i("MoSyncSyscalls", "HOMESCREEN IS HIDDEN");
+						Log.i("MoSyncSyscalls", "HOMESCREEN IS HIDDEN");
 						event[0] = EVENT_TYPE_HOMESCREEN_HIDDEN;
 					}
 					postEvent(event);
@@ -2040,10 +2045,16 @@ class HomeScreenDetectionThread extends Thread
     	List<RunningTaskInfo> taskList = activityManager.getRunningTasks(1);
     	if (null == taskList) { return false; }
     	
+		// If the home screen task id is -1 it is not known.
+		// Get it from the task list.
+		if (-1 == mHomeScreenTaskId)
+		{
+			mHomeScreenTaskId = getHomeScreenTaskId();
+		}
+		
     	// Is the first task in the task list the home screen?
-    	int homeScreenTaskId = getHomeScreenTaskId();
-    	boolean isHomeScreen = homeScreenTaskId == taskList.get(0).id;
-    	
+    	boolean isHomeScreen = mHomeScreenTaskId == taskList.get(0).id;
+		
     	return isHomeScreen;
     }
     
@@ -2066,6 +2077,7 @@ class HomeScreenDetectionThread extends Thread
     		);
     	if (null != taskList)
     	{
+		
 			// Search for the home screen task.
 	    	for (ActivityManager.RecentTaskInfo taskInfo : taskList)
 	    	{
@@ -2086,7 +2098,7 @@ class HomeScreenDetectionThread extends Thread
 	    	}
     	}
 		
-		// We did not find the id of teh home screen task.
+		// We did not find the id of the home screen task.
     	return -1;
     }
 }

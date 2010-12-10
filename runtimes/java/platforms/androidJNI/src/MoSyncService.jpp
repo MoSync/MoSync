@@ -136,40 +136,15 @@ public class MoSyncService extends Service
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 
 #ifdef _ANDROID_API_LEVEL_5_OR_HIGHER
+		// Start as foreground service on Android >= 5. 
+		// This displays the notification.
 		startForeground(sNotificationId, notification);
 #else	
+		// Just add the notification on Android < 5.
 		NotificationManager notificationManager = (NotificationManager) 
 			getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(sNotificationId, notification);
-#endif	
-
-		// I don't think we need to have a thread to make service
-		// run at higher priority, should do with startForeground.
-		// TODO: Remove commented out code.
-		/*
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				Log.i("@@@MoSync", "MoSyncService.thread enter");
-				
-				while (mIsRunning)
-				{
-					try
-					{
-						Thread.sleep(1000);
-						Log.i("@@@MoSync", "MoSyncService thread hello");
-					}
-					catch (Exception ex)
-					{
-						Log.i("@@@MoSync", "MoSyncService thread exception: " + ex);
-					}
-				}
-				
-				Log.i("@@@MoSync", "MoSyncService.thread exit");
-			}
-		}).start();
-		*/
+#endif
 	}
 
 	@Override
