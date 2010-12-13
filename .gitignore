@@ -98,6 +98,8 @@ stabs.tab
 /tools/ReleasePackageBuild/run.bat
 /tools/ReleasePackageBuild/setcurrev.bat
 
+/tools/RuntimeBuilder/Settings.rb
+
 /tools/DocbookIndexer/src/*.c
 /tools/DocbookIndexer/src/*.s
 /tools/DocbookIndexer/src/*.cpp
@@ -117,6 +119,7 @@ stabs.tab
 /runtimes/cpp/platforms/sdl/MoRE/profile.txt
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 /runtimes/java/platforms/javaME/setdirs.bat
+/runtimes/java/platforms/javaME/work.bat
 /runtimes/java/platforms/javaME/src/config_platform.h
 /runtimes/java/platforms/javaME/src/opengl_invoke_generated.jpp
 /runtimes/java/shared/generated/MAAPI_consts.h
@@ -124,3 +127,7 @@ stabs.tab
 /runtimes/java/shared/generated/invoke_syscall_java.h
 /runtimes/java/shared/generated/opengl_invoke_generated.jpp
 /runtimes/java/shared/generated/syscall_static_java.h
+/runtimes/java/platforms/androidJNI/src/config_platform.h
+/runtimes/java/platforms/androidJNI/AndroidProject/obj
+/runtimes/java/platforms/androidJNI/AndroidProject/src
+/runtimes/java/platforms/androidJNI/AndroidProject/libs

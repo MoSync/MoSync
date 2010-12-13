@@ -15,6 +15,9 @@
 # 02111-1307, USA.
 
 require 'fileutils'
+require '../../../../rules/util.rb'
+
+include FileUtils::Verbose
 
 #
 # Preprocess the .jpp files and writes them to their output location were they can then be compiled
@@ -46,21 +49,13 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	end 
 	
 	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-	success = system("xgcc -x c -E -o #{output_dir}#{jtmp_file} #{buildFlags} -I#{shared_dir} -Isrc" +
+	sh("xgcc -x c -E -o #{output_dir}#{jtmp_file} #{buildFlags} -I#{shared_dir} -Isrc" +
 		" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 	
-	if (!success)
-		exit 1
-	end
-	
 	# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
-	success = system("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
+	sh("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
 	
-	if (!success)
-		exit 1
-	end
-	
-	FileUtils.remove "#{output_dir}#{jtmp_file}"
+	remove "#{output_dir}#{jtmp_file}"
 end
 	
 if !File.exist? "src/config_platform.h"

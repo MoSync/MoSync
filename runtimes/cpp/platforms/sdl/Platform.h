@@ -35,4 +35,7 @@ namespace Core {
 	class VMCore;
 }
 
+#define VSV_ARGPTR_DECL , va_list argptr
+#define VSV_ARGPTR_USE , argptr
+
 #endif

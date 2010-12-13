@@ -16,12 +16,14 @@
 
 require 'fileutils'
 
-FileUtils.cd "AndroidProject"
+include FileUtils::Verbose
 
-FileUtils.mkdir_p "assets"
-FileUtils.mkdir_p "bin/com/mosync/java/android"
-FileUtils.mkdir_p "libs/armeabi"
-FileUtils.mkdir_p "src/com/mosync/internal/android"
-FileUtils.mkdir_p "src/com/mosync/java/android"
+cd "AndroidProject"
 
-FileUtils.cd ".."
+mkdir_p "assets"
+mkdir_p "bin/com/mosync/java/android"
+mkdir_p "libs/armeabi"
+mkdir_p "src/com/mosync/internal/android"
+mkdir_p "src/com/mosync/java/android"
+
+cd ".."

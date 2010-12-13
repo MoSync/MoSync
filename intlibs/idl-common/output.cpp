@@ -363,7 +363,10 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 			stream << "mCore.";
 		else
 			stream << "SYSCALL_THIS->";
-		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ", argptr)";
+		stream << "GetValidatedStackValue(" << ((k-3)<<2);
+		if(!java)
+			stream << " VSV_ARGPTR_USE";
+		stream << ")";
 	}
 }
 

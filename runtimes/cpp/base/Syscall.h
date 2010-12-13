@@ -134,7 +134,12 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
-		int GetValidatedStackValue(int offset, va_list argptr);
+
+#ifndef VSV_ARGPTR_DECL
+#define VSV_ARGPTR_DECL
+#define VSV_ARGPTR_USE
+#endif
+		int GetValidatedStackValue(int offset VSV_ARGPTR_DECL);
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);
