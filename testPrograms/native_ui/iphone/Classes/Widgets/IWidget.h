@@ -14,8 +14,10 @@
 
 @interface IWidget : NSObject {
 	UIView* view;
+	int handle;
 }
 
+- (void)setHandle:(int) handle;
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView; 

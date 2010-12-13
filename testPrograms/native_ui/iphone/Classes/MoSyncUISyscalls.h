@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "MoSyncUI.h"
 #import "MoSyncUISyscalls.h"
+#include <helpers/cpp_defs.h>
 
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 

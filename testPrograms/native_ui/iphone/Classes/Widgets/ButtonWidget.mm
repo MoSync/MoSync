@@ -7,7 +7,8 @@
 //
 
 #import "ButtonWidget.h"
-
+#include "Platform.h"
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ButtonWidget
 
@@ -16,7 +17,22 @@
 	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
+	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+	
 	return [super init];
+}
+
+-(void)buttonPressed {
+	//NSLog(@"Button pressed!");
+	
+	MAEvent *event = new MAEvent;
+	event->type = EVENT_TYPE_WIDGET;
+	
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = WIDGET_EVENT_POINTER_PRESSED;
+	eventData->widgetHandle = handle;
+	event->data = eventData;
+	Base::gEventQueue.put(*event);
 }
 
 - (void)addChild: (IWidget*)child {

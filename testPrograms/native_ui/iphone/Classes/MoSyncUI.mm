@@ -19,7 +19,7 @@ UIWindow* mainWindow;
 UIViewController *mainController;
 //UINavigationController *tabBarController;
 
-- (IWidget*)getWidget: (MAHandle) handle {
+- (IWidget*)getWidget: (int) handle {
 	IWidget *widget = nil;
 	widget = [widgetArray objectAtIndex:(NSUInteger)handle];
 	return widget;
@@ -69,6 +69,9 @@ UIViewController *mainController;
 	} else {
 		created = [[ReflectionWidget alloc] initWithName:name];
 	}
+	
+	[created setHandle:[widgetArray count]]; 
+	
 	
 	// todo handle these things.
 	//if(created == nil) return 0;
