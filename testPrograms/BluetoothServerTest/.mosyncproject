@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.1">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<properties>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:app.permissions" value="Bluetooth File\ Storage Internet\ Access Vibrate"/>
+<property key="template.id" value="project.moblet"/>
+</properties>
+</project>
