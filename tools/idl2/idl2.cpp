@@ -125,7 +125,7 @@ int main() {
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
 		// create the new generated folder for java files
-		_mkdir("../../runtimes/java/shared/generated");
+		_mkdir("../../runtimes/java/Shared/generated");
 
 		copy("Output/maapi.h", "../../libs/MAStd/");
 		copy("maapi_defs.h", "../../libs/MAStd/");
