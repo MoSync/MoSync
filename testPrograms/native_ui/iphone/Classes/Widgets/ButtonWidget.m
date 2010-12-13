@@ -12,8 +12,8 @@
 @implementation ButtonWidget
 
 - (id)init {
-	view = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-	view.frame = CGRectMake(0, 0, 100, 40);
+	view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
 	return [super init];
@@ -28,8 +28,8 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"text"]) {
-		UIButton* label = (UIButton*) view;
-		[label setTitle:value forState:UIControlStateNormal];
+		UIButton* button = (UIButton*) view;
+		[button setTitle:value forState:UIControlStateNormal];
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

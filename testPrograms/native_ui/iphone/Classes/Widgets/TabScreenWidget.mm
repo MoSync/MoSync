@@ -23,7 +23,7 @@
 }
 
 - (void)addChild: (IWidget*)child {
-	UITabBarController* tabBarController = controller;
+	UITabBarController* tabBarController = (UITabBarController*)controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
 	[newItems addObject:[screen getController]];

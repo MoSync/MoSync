@@ -8,7 +8,7 @@
 
 #import "MoSyncUI.h"
 #import "LabelWidget.h"
-#import "TableViewWidget.h"
+#import "ListViewWidget.h"
 #import "ScreenWidget.h"
 #import "ReflectionWidget.h"
 
@@ -16,7 +16,7 @@
 
 NSMutableArray* widgetArray;
 UIWindow* mainWindow;
-UITabBarController *tabBarController;
+UIViewController *mainController;
 //UINavigationController *tabBarController;
 
 - (IWidget*)getWidget: (MAHandle) handle {
@@ -25,13 +25,14 @@ UITabBarController *tabBarController;
 	return widget;
 }
 
-- (id)init {
+- (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller {
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
 	
-	mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	mainWindow.backgroundColor = [UIColor whiteColor];  		
-
+	//mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	mainWindow = window;
+	mainController = controller;
+	mainWindow.backgroundColor = [UIColor whiteColor];
 	
 	//tabBarController = [[UITabBarController alloc] init];
     //tabBarController = [[UINavigationController alloc] init];
@@ -40,8 +41,7 @@ UITabBarController *tabBarController;
 	//tabBarController.view = mainWindow;
 
 	//[mainWindow addSubview:tabBarController.view];	
-	[mainWindow makeKeyAndVisible];
-	
+
 	
 	return self;
 }
@@ -49,7 +49,7 @@ UITabBarController *tabBarController;
 - (void) close {
 }
 
-- (MAHandle) createWidget: (NSString*)name {
+- (void) createWidget: (NSString*)name {
 	IWidget *created = nil;
 	NSString* realName = [name stringByAppendingString:@"Widget"];
 	Class widgetClass = NSClassFromString(realName);
@@ -70,19 +70,34 @@ UITabBarController *tabBarController;
 		created = [[ReflectionWidget alloc] initWithName:name];
 	}
 	
-	if(created == nil) return 0;
+	// todo handle these things.
+	//if(created == nil) return 0;
 	
 	[widgetArray addObject:created];
-	return widgetArray.count-1;
 	
 }
 
-- (void) removeWidget: (MAHandle) handle {
+- (void) removeWidget: (IWidget*) handle {
 }
 
-- (void)show: (MAHandle) handle {
-	IWidget* widget = [self getWidget: handle];
-	[mainWindow addSubview:[widget getView]];	
+- (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	
+	[widget setPropertyWithKey:key toValue:value];
+}
+
+bool nativeUIEnabled = false;
+
+- (void)show: (IWidget*) widget {
+	if(!nativeUIEnabled) {
+		[mainController.view removeFromSuperview];
+		nativeUIEnabled = true;
+	}	
+	[mainWindow addSubview:[widget getView]];
+	//[mainWindow addSubview:[[self getWidget:0] getView]];
+	
+//	[mainWindow insertSubview:[widget getView] atIndex: 0];
+   // [mainWindow makeKeyAndVisible];
+	//mainWindow.frame = [[UIScreen mainScreen] bounds];
+
 }
 
 @end

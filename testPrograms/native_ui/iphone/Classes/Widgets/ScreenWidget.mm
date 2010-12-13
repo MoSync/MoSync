@@ -17,10 +17,13 @@
 	//controller.view = view;
 	controller.title = @"";
 	view = controller.view;
+	//view.frame = [[UIScreen mainScreen] bounds];
+	
 	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
+	[child getView].frame = [[UIScreen mainScreen] bounds];
 	[super addChild:child];	
 }
 

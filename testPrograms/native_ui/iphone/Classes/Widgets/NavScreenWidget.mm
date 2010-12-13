@@ -23,7 +23,7 @@
 }
 
 - (void)addChild: (IWidget*)child {
-	UINavigationController* navigationController = controller;
+	UINavigationController* navigationController = (UINavigationController*)controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:navigationController.viewControllers];
 	[newItems addObject:[screen getController]];

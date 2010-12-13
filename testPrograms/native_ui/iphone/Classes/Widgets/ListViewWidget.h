@@ -1,5 +1,5 @@
 //
-//  TableViewWidget.h
+//  ListViewWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -10,7 +10,7 @@
 #import "IWidget.h"
 #import "MoSyncTableView.h"
 
-@interface TableViewWidget : IWidget {
+@interface ListViewWidget : IWidget {
 	MoSyncTableView* tableView;
 }
 

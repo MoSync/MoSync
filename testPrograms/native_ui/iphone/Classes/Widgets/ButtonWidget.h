@@ -10,7 +10,6 @@
 #import "IWidget.h"
 
 @interface ButtonWidget : IWidget {
-	
 }
 
 - (id)init;

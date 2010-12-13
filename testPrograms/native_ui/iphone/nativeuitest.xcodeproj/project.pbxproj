@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* nativeuitestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -26,19 +25,19 @@
 		8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8537500912AFC9AD0037C888 /* NavScreenWidget.mm */; };
 		8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8565795912A510A700A7D535 /* UIColor-Expanded.m */; };
 		85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */; };
-		85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */; };
 		857FB0A612A924E10018C523 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A012A924E10018C523 /* AbstractLayoutView.m */; };
 		857FB0A712A924E10018C523 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A212A924E10018C523 /* HLayoutView.m */; };
 		857FB0A812A924E10018C523 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A512A924E10018C523 /* VLayoutView.m */; };
 		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
 		85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */; };
+		85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */; };
+		85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* nativeuitestAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nativeuitestAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = nativeuitestAppDelegate.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* nativeuitest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nativeuitest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -73,7 +72,6 @@
 		85774F15129FB70D00F8BAA2 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
 		85775036129FE39600F8BAA2 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
-		85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncUISyscalls.m; sourceTree = "<group>"; };
 		857FB09F12A924E10018C523 /* AbstractLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractLayoutView.h; path = LayoutManagers/AbstractLayoutView.h; sourceTree = "<group>"; };
 		857FB0A012A924E10018C523 /* AbstractLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AbstractLayoutView.m; path = LayoutManagers/AbstractLayoutView.m; sourceTree = "<group>"; };
 		857FB0A112A924E10018C523 /* HLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HLayoutView.h; path = LayoutManagers/HLayoutView.h; sourceTree = "<group>"; };
@@ -87,6 +85,8 @@
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
 		85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
 		85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
+		85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
+		85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nativeuitestAppDelegate.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,18 +107,18 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */,
+				85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */,
 				857FB09E12A924CF0018C523 /* LayoutManagers */,
 				8565795812A510A700A7D535 /* UIColor-Expanded.h */,
 				8565795912A510A700A7D535 /* UIColor-Expanded.m */,
 				8577516512A00BFE00F8BAA2 /* Widgets */,
 				1D3623240D0F684500981E51 /* nativeuitestAppDelegate.h */,
-				1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */,
 				858A78B5129E9A50005EACA7 /* MoSyncTableView.h */,
 				858A78B6129E9A50005EACA7 /* MoSyncTableView.m */,
 				85774F15129FB70D00F8BAA2 /* MoSyncUI.h */,
 				85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */,
 				85775036129FE39600F8BAA2 /* MoSyncUISyscalls.h */,
-				85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */,
 				8582679212A403EF0047D42D /* MoSyncTableViewCell.h */,
 				8582679312A403EF0047D42D /* MoSyncTableViewCell.m */,
 			);
@@ -279,10 +279,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
-				1D3623260D0F684500981E51 /* nativeuitestAppDelegate.m in Sources */,
 				858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */,
 				85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */,
-				85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */,
 				8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */,
 				8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */,
 				857FB0A612A924E10018C523 /* AbstractLayoutView.m in Sources */,
@@ -301,6 +299,8 @@
 				85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */,
 				85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */,
 				8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */,
+				85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */,
+				85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

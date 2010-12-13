@@ -15,11 +15,12 @@ typedef int MAHandle;
 
 }
 
-- (id)init;
+- (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
 - (void)close;
-- (MAHandle)createWidget: (NSString*)name;
+- (void)createWidget: (NSString*)name; // increasing handles beginning at 0
 - (IWidget*)getWidget: (MAHandle) handle;
-- (void)removeWidget: (MAHandle) handle;
-- (void)show: (MAHandle) handle;
+- (void)removeWidget: (IWidget*) handle;
+- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
+- (void)show: (IWidget*) handle;
 
 @end

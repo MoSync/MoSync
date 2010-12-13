@@ -41,15 +41,19 @@ void TestApp() {
 		
 		maWidgetAddChild(tableView, tableViewCell);		
 		
+		MAHandle layout = maWidgetCreate("HorizontalLayout");
+		maWidgetSetProperty(layout, "width", "200");
+		maWidgetSetProperty(layout, "height", "40");
+		
 		MAHandle button = maWidgetCreate("Button");
-		maWidgetSetProperty(button, "width", "120");			
 		maWidgetSetProperty(button, "text", labels[i]);				
-		maWidgetAddChild(tableViewCell, button);
+		maWidgetAddChild(layout, button);
 		
 		MAHandle label = maWidgetCreate("Label");
-		maWidgetSetProperty(label, "left", "120");				
 		maWidgetSetProperty(label, "text", labels[i]);		
-		maWidgetAddChild(tableViewCell, label);
+		maWidgetAddChild(layout, label);
+		
+		maWidgetAddChild(tableViewCell, layout);
 	
 	}
 	
@@ -83,7 +87,7 @@ void TestApp() {
 	maWidgetAddChild(tabScreen, firstScreen);
 	maWidgetAddChild(tabScreen2, secondScreen);	
 	maWidgetAddChild(tabScreen2, thirdScreen);	
-		maWidgetAddChild(tabScreen, tabScreen2);
+	maWidgetAddChild(tabScreen, tabScreen2);
 	
 	maWidgetScreenShow(tabScreen);	
 }

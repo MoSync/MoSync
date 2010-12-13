@@ -18,10 +18,10 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
+	//static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 
 	NSUInteger row = [indexPath row];	
-	UIView* cell = [mDataForMyTable objectAtIndex:row];
+	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
 
 	/*
 	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];

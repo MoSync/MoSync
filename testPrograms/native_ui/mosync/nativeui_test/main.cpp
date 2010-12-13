@@ -4,7 +4,9 @@
 
 const char * WIDGET_TYPE_BUTTON = "Button";
 const char * WIDGET_TYPE_LABEL = "Label";
-const char * WIDGET_TYPE_LIST = "ListBox";
+const char * WIDGET_TYPE_SCREEN = "Screen";
+const char * WIDGET_TYPE_LIST_VIEW = "ListView";
+const char * WIDGET_TYPE_LIST_VIEW_CELL = "ListViewCell";
 const char * WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
 const char * WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
 
@@ -52,7 +54,7 @@ extern "C" int MAMain()
 	maWidgetAddChild( layout , header );
 
 	// Create List
-	int list = maWidgetCreate( WIDGET_TYPE_LIST );
+	int list = maWidgetCreate( WIDGET_TYPE_LIST_VIEW );
 	maWidgetAddChild( layout, list );
 
 	// Add 10 buttons to the list
@@ -65,8 +67,20 @@ extern "C" int MAMain()
 		maWidgetAddChild( list, listItem );
 	}
 
+	MAHandle mainScreen = maWidgetCreate(WIDGET_TYPE_SCREEN);
+
+	/*
+	int listItem = maWidgetCreate( WIDGET_TYPE_BUTTON );
+	maWidgetSetProperty( listItem, WIDGET_PROPERTY_TEXT, "Click me" );
+	maWidgetSetProperty( listItem, WIDGET_PROPERTY_HEIGHT, "60" );
+	maWidgetSetProperty( listItem, WIDGET_PROPERTY_WIDTH, "100" );
+	maWidgetAddChild( mainScreen, listItem );
+	*/
+
 	// Add the tree to the root
-	maWidgetAddChild( WIDGET_ROOT, layout );
+	maWidgetAddChild( mainScreen, layout );
+
+	maWidgetScreenShow(mainScreen);
 
 	// Wait for close event
 	while(1)

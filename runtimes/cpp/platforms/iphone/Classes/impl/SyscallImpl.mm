@@ -34,6 +34,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 
+#include <helpers/CPP_IX_WIDGET.h>
+#include "MoSyncUISyscalls.h"
+
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -870,6 +873,7 @@ namespace Base {
 		maIOCtl_syscall_case(maFileSize);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
+		maIOCtl_IX_WIDGET_caselist			
 
 //		maIOCtl_case(maAccelerometerStart);
 //		maIOCtl_case(maAccelerometerStop);

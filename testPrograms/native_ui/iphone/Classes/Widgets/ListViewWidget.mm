@@ -1,24 +1,31 @@
 //
-//  ListBoxWidget.mm
+//  ListViewWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "TableViewWidget.h"
+#import "ListViewWidget.h"
+#import "ListViewCellWidget.h"
 
 
-@implementation TableViewWidget
+@implementation ListViewWidget
 
 - (id)init {
 	tableView = [[MoSyncTableView alloc] init];
-	view = tableView.tableView;	 
+	view = tableView.tableView;	
 	
 	return [super init];		
 }
 
 - (void)addChild: (IWidget*)child {
+	if([child class] != [ListViewCellWidget class]) {
+		ListViewCellWidget* lvcw = [[ListViewCellWidget alloc] init];
+		[lvcw addChild:child];
+		child = lvcw;
+	}
+	
 	[tableView addView: [child getView]];	
 }
 

@@ -1,15 +1,15 @@
 //
-//  TableViewCellWidget.mm
+//  ListViewCellWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "TableViewCellWidget.h"
+#import "ListViewCellWidget.h"
 #import "UIColor-Expanded.h"
 
-@implementation TableViewCellWidget
+@implementation ListViewCellWidget
 
 - (id)init {
 
