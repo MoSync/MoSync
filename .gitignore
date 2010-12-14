@@ -66,11 +66,12 @@ stabs.tab
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
 
-/runtimes/cpp/platforms/symbian/sis/*.SIS
-/runtimes/cpp/platforms/symbian/sis-ed3/*.SIS
+/runtimes/cpp/platforms/symbian/sis*/*.SIS
 
 /runtimes/cpp/platforms/symbian/group*/ABLD.BAT
 /runtimes/cpp/platforms/symbian/group*/MOSYNC.xml
+/runtimes/cpp/platforms/symbian/group*/MoSync.xml
+/runtimes/cpp/platforms/symbian/group*/MOSYNC.mcp
 /runtimes/cpp/platforms/symbian/group*/MoSync.mcp
 /runtimes/cpp/platforms/symbian/group*/*.resources
 /runtimes/cpp/platforms/symbian/group*/*.cwlink

@@ -172,7 +172,14 @@ cd %ORIGINAL_PATH%
 @echo Running OpenGL Wrapper generator.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator
-call build.bat
+ruby workfile.rb
+@echo.
+
+@echo ------------------------------------------------
+@echo Running DefaultSkinGenerator.
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\tools\DefaultSkinGenerator
+ruby workfile.rb
 @echo.
 
 @echo ------------------------------------------------
