@@ -1,5 +1,5 @@
 //
-//  TableViewCellWidget.h
+//  NavScreenWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -7,10 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "IWidget.h"
+#import "ScreenWidget.h"
 
-@interface TableViewCellWidget : IWidget {
-	
+@interface NavScreenWidget : ScreenWidget {
 }
 
 - (id)init;
@@ -18,5 +17,6 @@
 - (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+- (UIViewController*) getController;
 
 @end

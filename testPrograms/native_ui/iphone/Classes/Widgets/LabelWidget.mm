@@ -12,7 +12,7 @@
 @implementation LabelWidget
 
 - (id)init {	
-	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] autorelease];
+	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	label.opaque = NO;
 	view = label;		
 	

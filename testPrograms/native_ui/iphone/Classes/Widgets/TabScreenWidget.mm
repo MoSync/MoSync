@@ -1,30 +1,35 @@
 //
-//  ScreenWidget.mm
+//  TabScreenWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "ScreenWidget.h"
+#import "TabScreenWidget.h"
 
 
-@implementation ScreenWidget
+@implementation TabScreenWidget
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	controller = [[ScreenWidgetController alloc] init];
-	//controller.view = view;
-	controller.title = @"";
+	UITabBarController* tabBarController = [[UITabBarController alloc] init];
+	controller = tabBarController;
+	tabBarController.viewControllers = [NSArray array];	
 	view = controller.view;
-	//view.frame = [[UIScreen mainScreen] bounds];
+	//controller.view = view;
 	
-	return [super init];
+	return self;
 }
 
 - (void)addChild: (IWidget*)child {
-	[child getView].frame = [[UIScreen mainScreen] bounds];
-	[super addChild:child];	
+	UITabBarController* tabBarController = (UITabBarController*)controller;
+	ScreenWidget* screen = (ScreenWidget*)child;
+	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
+	[newItems addObject:[screen getController]];
+	tabBarController.viewControllers = newItems;
+	
+	//[super addChild:child];
 }
 
 - (void)removeChild: (IWidget*)child {

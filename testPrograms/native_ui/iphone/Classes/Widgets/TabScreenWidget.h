@@ -1,5 +1,5 @@
 //
-//  TableViewWidget.h
+//  TabScreenWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -7,11 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "IWidget.h"
-#import "MoSyncTableView.h"
+#import "ScreenWidget.h"
 
-@interface TableViewWidget : IWidget {
-	MoSyncTableView* tableView;
+@interface TabScreenWidget : ScreenWidget {
 }
 
 - (id)init;
@@ -19,5 +17,6 @@
 - (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+- (UIViewController*) getController;
 
 @end

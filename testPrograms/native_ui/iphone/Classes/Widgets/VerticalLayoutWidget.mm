@@ -1,33 +1,35 @@
 //
-//  ListBoxWidget.mm
+//  VerticalLayoutWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "TableViewWidget.h"
+#import "VerticalLayoutWidget.h"
+#import "LayoutManagers.h"
 
-
-@implementation TableViewWidget
+@implementation VerticalLayoutWidget
 
 - (id)init {
-	tableView = [[MoSyncTableView alloc] init];
-	view = tableView.tableView;	 
-	
-	return [super init];		
+	view = [[VLayoutView alloc] init];	
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
-	[tableView addView: [child getView]];	
+	[super addChild:child];
+	[view setSize];	
 }
 
 - (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
-	return [super setPropertyWithKey:key toValue:value];
+	if([key isEqualToString:@"text"]) {
+	} else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return MA_WIDGET_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

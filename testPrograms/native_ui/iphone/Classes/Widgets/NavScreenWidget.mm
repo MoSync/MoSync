@@ -1,30 +1,35 @@
 //
-//  ScreenWidget.mm
+//  NavScreenWidget.mm
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "ScreenWidget.h"
+#import "NavScreenWidget.h"
 
 
-@implementation ScreenWidget
+@implementation NavScreenWidget
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	controller = [[ScreenWidgetController alloc] init];
-	//controller.view = view;
-	controller.title = @"";
+	UINavigationController* navigationController = [[UINavigationController alloc] init];
+	controller = navigationController;
+	navigationController.viewControllers = [NSArray array];	
 	view = controller.view;
-	//view.frame = [[UIScreen mainScreen] bounds];
+	//controller.view = view;
 	
-	return [super init];
+	return self;
 }
 
 - (void)addChild: (IWidget*)child {
-	[child getView].frame = [[UIScreen mainScreen] bounds];
-	[super addChild:child];	
+	UINavigationController* navigationController = (UINavigationController*)controller;
+	ScreenWidget* screen = (ScreenWidget*)child;
+	NSMutableArray *newItems = [NSMutableArray arrayWithArray:navigationController.viewControllers];
+	[newItems addObject:[screen getController]];
+	navigationController.viewControllers = newItems;
+	
+	//[super addChild:child];
 }
 
 - (void)removeChild: (IWidget*)child {

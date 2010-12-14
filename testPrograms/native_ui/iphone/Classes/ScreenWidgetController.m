@@ -1,50 +1,15 @@
     //
-//  MoSyncTableView.m
+//  ScreenWidgetController.m
 //  nativeuitest
 //
-//  Created by Niklas Nummelin on 11/25/10.
+//  Created by Niklas Nummelin on 12/7/10.
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "MoSyncTableView.h"
+#import "ScreenWidgetController.h"
 
 
-@implementation MoSyncTableView
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-	return [mDataForMyTable count];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-	//static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
-
-	NSUInteger row = [indexPath row];	
-	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
-
-	/*
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
-	
-	if (cell == nil) {
-		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-									  reuseIdentifier:SimpleTableIdentifier] autorelease];
-	}
-	
-	[cell.contentView addSubview: cellContentView];
-	*/
-	
-	//cell.backgroundView = cellContentView;
-	//cell.selectedBackgroundView = cellContentView;
-	
-	return cell;
-}
-
-- (void) addView:(UIView*)view {
-	[mDataForMyTable addObject: view];
-}
-
-
+@implementation ScreenWidgetController
 
 /*
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
@@ -56,16 +21,18 @@
 }
 */
 
+/*
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
-	mDataForMyTable = [[NSMutableArray alloc] init ]; //initWithObjects:@"iPhone", @"iPod", @"iPad", nil];
-	[super loadView];
 }
+*/
 
+/*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
- - (void)viewDidLoad {
-	 [super viewDidLoad];
- }
+- (void)viewDidLoad {
+    [super viewDidLoad];
+}
+*/
 
 /*
 // Override to allow orientations other than the default portrait orientation.
@@ -90,7 +57,6 @@
 
 
 - (void)dealloc {
-	[mDataForMyTable dealloc];
     [super dealloc];
 }
 

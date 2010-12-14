@@ -7,62 +7,71 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1D3623260D0F684500981E51 /* nativeuitestAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		85314FED12AD31CB00052736 /* ButtonWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDA12AD31CB00052736 /* ButtonWidget.m */; };
+		85314FEE12AD31CB00052736 /* HorizontalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */; };
+		85314FEF12AD31CB00052736 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDE12AD31CB00052736 /* ImageWidget.mm */; };
+		85314FF012AD31CB00052736 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE012AD31CB00052736 /* IWidget.mm */; };
+		85314FF112AD31CB00052736 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE212AD31CB00052736 /* LabelWidget.mm */; };
+		85314FF212AD31CB00052736 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE412AD31CB00052736 /* ReflectionWidget.mm */; };
+		85314FF312AD31CB00052736 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE612AD31CB00052736 /* ScreenWidget.mm */; };
+		85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE812AD31CB00052736 /* TableViewCellWidget.mm */; };
+		85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEA12AD31CB00052736 /* TableViewWidget.mm */; };
+		85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */; };
+		85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */; };
+		8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8537500912AFC9AD0037C888 /* NavScreenWidget.mm */; };
 		8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8565795912A510A700A7D535 /* UIColor-Expanded.m */; };
 		85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */; };
-		85774F1B129FB85700F8BAA2 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F1A129FB85700F8BAA2 /* IWidget.mm */; };
-		85774F26129FBD2000F8BAA2 /* TableViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F25129FBD2000F8BAA2 /* TableViewWidget.mm */; };
-		85774F29129FBD2F00F8BAA2 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F28129FBD2F00F8BAA2 /* LabelWidget.mm */; };
-		85774F4E129FC14E00F8BAA2 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85774F4D129FC14E00F8BAA2 /* ScreenWidget.mm */; };
-		85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */; };
-		8577504F129FE91300F8BAA2 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */; };
-		8577516412A00BF600F8BAA2 /* TableViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8577516312A00BF600F8BAA2 /* TableViewCellWidget.mm */; };
-		857FB09A12A9248F0018C523 /* HorizontalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB09912A9248F0018C523 /* HorizontalLayoutWidget.m */; };
-		857FB09D12A924B50018C523 /* VerticalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB09C12A924B50018C523 /* VerticalLayoutWidget.m */; };
 		857FB0A612A924E10018C523 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A012A924E10018C523 /* AbstractLayoutView.m */; };
 		857FB0A712A924E10018C523 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A212A924E10018C523 /* HLayoutView.m */; };
 		857FB0A812A924E10018C523 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857FB0A512A924E10018C523 /* VLayoutView.m */; };
 		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
-		8582679712A404550047D42D /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8582679612A404550047D42D /* ImageWidget.mm */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
-		85CFC48912A7F6E00075BCD9 /* ButtonWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */; };
+		85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */; };
+		85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */; };
+		85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* nativeuitestAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nativeuitestAppDelegate.h; sourceTree = "<group>"; };
-		1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = nativeuitestAppDelegate.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* nativeuitest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = nativeuitest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765FC0DF74451002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* nativeuitest_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nativeuitest_Prefix.pch; sourceTree = "<group>"; };
+		85314FD912AD31CB00052736 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonWidget.h; path = Widgets/ButtonWidget.h; sourceTree = "<group>"; };
+		85314FDA12AD31CB00052736 /* ButtonWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonWidget.m; path = Widgets/ButtonWidget.m; sourceTree = "<group>"; };
+		85314FDB12AD31CB00052736 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = Widgets/HorizontalLayoutWidget.h; sourceTree = "<group>"; };
+		85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HorizontalLayoutWidget.m; path = Widgets/HorizontalLayoutWidget.m; sourceTree = "<group>"; };
+		85314FDD12AD31CB00052736 /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageWidget.h; path = Widgets/ImageWidget.h; sourceTree = "<group>"; };
+		85314FDE12AD31CB00052736 /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ImageWidget.mm; path = Widgets/ImageWidget.mm; sourceTree = "<group>"; };
+		85314FDF12AD31CB00052736 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IWidget.h; path = Widgets/IWidget.h; sourceTree = "<group>"; };
+		85314FE012AD31CB00052736 /* IWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = IWidget.mm; path = Widgets/IWidget.mm; sourceTree = "<group>"; };
+		85314FE112AD31CB00052736 /* LabelWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LabelWidget.h; path = Widgets/LabelWidget.h; sourceTree = "<group>"; };
+		85314FE212AD31CB00052736 /* LabelWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LabelWidget.mm; path = Widgets/LabelWidget.mm; sourceTree = "<group>"; };
+		85314FE312AD31CB00052736 /* ReflectionWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReflectionWidget.h; path = Widgets/ReflectionWidget.h; sourceTree = "<group>"; };
+		85314FE412AD31CB00052736 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ReflectionWidget.mm; path = Widgets/ReflectionWidget.mm; sourceTree = "<group>"; };
+		85314FE512AD31CB00052736 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenWidget.h; path = Widgets/ScreenWidget.h; sourceTree = "<group>"; };
+		85314FE612AD31CB00052736 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenWidget.mm; path = Widgets/ScreenWidget.mm; sourceTree = "<group>"; };
+		85314FE712AD31CB00052736 /* TableViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewCellWidget.h; path = Widgets/TableViewCellWidget.h; sourceTree = "<group>"; };
+		85314FE812AD31CB00052736 /* TableViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TableViewCellWidget.mm; path = Widgets/TableViewCellWidget.mm; sourceTree = "<group>"; };
+		85314FE912AD31CB00052736 /* TableViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewWidget.h; path = Widgets/TableViewWidget.h; sourceTree = "<group>"; };
+		85314FEA12AD31CB00052736 /* TableViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TableViewWidget.mm; path = Widgets/TableViewWidget.mm; sourceTree = "<group>"; };
+		85314FEB12AD31CB00052736 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = Widgets/VerticalLayoutWidget.h; sourceTree = "<group>"; };
+		85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VerticalLayoutWidget.m; path = Widgets/VerticalLayoutWidget.m; sourceTree = "<group>"; };
+		85374F5E12AFC05F0037C888 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TabScreenWidget.h; path = Widgets/TabScreenWidget.h; sourceTree = "<group>"; };
+		85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TabScreenWidget.mm; path = Widgets/TabScreenWidget.mm; sourceTree = "<group>"; };
+		8537500812AFC9AD0037C888 /* NavScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavScreenWidget.h; path = Widgets/NavScreenWidget.h; sourceTree = "<group>"; };
+		8537500912AFC9AD0037C888 /* NavScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavScreenWidget.mm; path = Widgets/NavScreenWidget.mm; sourceTree = "<group>"; };
 		8565795812A510A700A7D535 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Expanded.h"; sourceTree = "<group>"; };
 		8565795912A510A700A7D535 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Expanded.m"; sourceTree = "<group>"; };
 		85774F15129FB70D00F8BAA2 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
-		85774F19129FB85700F8BAA2 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWidget.h; sourceTree = "<group>"; };
-		85774F1A129FB85700F8BAA2 /* IWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = IWidget.mm; sourceTree = "<group>"; };
-		85774F24129FBD2000F8BAA2 /* TableViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewWidget.h; sourceTree = "<group>"; };
-		85774F25129FBD2000F8BAA2 /* TableViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TableViewWidget.mm; sourceTree = "<group>"; };
-		85774F27129FBD2F00F8BAA2 /* LabelWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelWidget.h; sourceTree = "<group>"; };
-		85774F28129FBD2F00F8BAA2 /* LabelWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LabelWidget.mm; sourceTree = "<group>"; };
-		85774F4C129FC14E00F8BAA2 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidget.h; sourceTree = "<group>"; };
-		85774F4D129FC14E00F8BAA2 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenWidget.mm; sourceTree = "<group>"; };
 		85775036129FE39600F8BAA2 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
-		85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncUISyscalls.m; sourceTree = "<group>"; };
-		8577504D129FE91300F8BAA2 /* ReflectionWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReflectionWidget.h; sourceTree = "<group>"; };
-		8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ReflectionWidget.mm; sourceTree = "<group>"; };
-		8577516212A00BF600F8BAA2 /* TableViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableViewCellWidget.h; sourceTree = "<group>"; };
-		8577516312A00BF600F8BAA2 /* TableViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TableViewCellWidget.mm; sourceTree = "<group>"; };
-		857FB09812A9248F0018C523 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HorizontalLayoutWidget.h; sourceTree = "<group>"; };
-		857FB09912A9248F0018C523 /* HorizontalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HorizontalLayoutWidget.m; sourceTree = "<group>"; };
-		857FB09B12A924B50018C523 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerticalLayoutWidget.h; sourceTree = "<group>"; };
-		857FB09C12A924B50018C523 /* VerticalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VerticalLayoutWidget.m; sourceTree = "<group>"; };
 		857FB09F12A924E10018C523 /* AbstractLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractLayoutView.h; path = LayoutManagers/AbstractLayoutView.h; sourceTree = "<group>"; };
 		857FB0A012A924E10018C523 /* AbstractLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AbstractLayoutView.m; path = LayoutManagers/AbstractLayoutView.m; sourceTree = "<group>"; };
 		857FB0A112A924E10018C523 /* HLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HLayoutView.h; path = LayoutManagers/HLayoutView.h; sourceTree = "<group>"; };
@@ -72,12 +81,12 @@
 		857FB0A512A924E10018C523 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLayoutView.m; path = LayoutManagers/VLayoutView.m; sourceTree = "<group>"; };
 		8582679212A403EF0047D42D /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableViewCell.h; sourceTree = "<group>"; };
 		8582679312A403EF0047D42D /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
-		8582679512A404550047D42D /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageWidget.h; sourceTree = "<group>"; };
-		8582679612A404550047D42D /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageWidget.mm; sourceTree = "<group>"; };
 		858A78B5129E9A50005EACA7 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
-		85CFC48712A7F6E00075BCD9 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonWidget.h; sourceTree = "<group>"; };
-		85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ButtonWidget.m; sourceTree = "<group>"; };
+		85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
+		85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
+		85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
+		85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nativeuitestAppDelegate.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,18 +107,18 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */,
+				85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */,
 				857FB09E12A924CF0018C523 /* LayoutManagers */,
 				8565795812A510A700A7D535 /* UIColor-Expanded.h */,
 				8565795912A510A700A7D535 /* UIColor-Expanded.m */,
 				8577516512A00BFE00F8BAA2 /* Widgets */,
 				1D3623240D0F684500981E51 /* nativeuitestAppDelegate.h */,
-				1D3623250D0F684500981E51 /* nativeuitestAppDelegate.m */,
 				858A78B5129E9A50005EACA7 /* MoSyncTableView.h */,
 				858A78B6129E9A50005EACA7 /* MoSyncTableView.m */,
 				85774F15129FB70D00F8BAA2 /* MoSyncUI.h */,
 				85774F16129FB70D00F8BAA2 /* MoSyncUI.mm */,
 				85775036129FE39600F8BAA2 /* MoSyncUISyscalls.h */,
-				85775037129FE39600F8BAA2 /* MoSyncUISyscalls.m */,
 				8582679212A403EF0047D42D /* MoSyncTableViewCell.h */,
 				8582679312A403EF0047D42D /* MoSyncTableViewCell.m */,
 			);
@@ -166,26 +175,32 @@
 		8577516512A00BFE00F8BAA2 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
-				85774F19129FB85700F8BAA2 /* IWidget.h */,
-				85774F1A129FB85700F8BAA2 /* IWidget.mm */,
-				8577516212A00BF600F8BAA2 /* TableViewCellWidget.h */,
-				8577516312A00BF600F8BAA2 /* TableViewCellWidget.mm */,
-				85774F24129FBD2000F8BAA2 /* TableViewWidget.h */,
-				85774F25129FBD2000F8BAA2 /* TableViewWidget.mm */,
-				85774F27129FBD2F00F8BAA2 /* LabelWidget.h */,
-				85774F28129FBD2F00F8BAA2 /* LabelWidget.mm */,
-				85774F4C129FC14E00F8BAA2 /* ScreenWidget.h */,
-				85774F4D129FC14E00F8BAA2 /* ScreenWidget.mm */,
-				8577504D129FE91300F8BAA2 /* ReflectionWidget.h */,
-				8577504E129FE91300F8BAA2 /* ReflectionWidget.mm */,
-				8582679512A404550047D42D /* ImageWidget.h */,
-				8582679612A404550047D42D /* ImageWidget.mm */,
-				85CFC48712A7F6E00075BCD9 /* ButtonWidget.h */,
-				85CFC48812A7F6E00075BCD9 /* ButtonWidget.m */,
-				857FB09812A9248F0018C523 /* HorizontalLayoutWidget.h */,
-				857FB09912A9248F0018C523 /* HorizontalLayoutWidget.m */,
-				857FB09B12A924B50018C523 /* VerticalLayoutWidget.h */,
-				857FB09C12A924B50018C523 /* VerticalLayoutWidget.m */,
+				8537500812AFC9AD0037C888 /* NavScreenWidget.h */,
+				8537500912AFC9AD0037C888 /* NavScreenWidget.mm */,
+				85374F5E12AFC05F0037C888 /* TabScreenWidget.h */,
+				85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */,
+				85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */,
+				85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */,
+				85314FD912AD31CB00052736 /* ButtonWidget.h */,
+				85314FDA12AD31CB00052736 /* ButtonWidget.m */,
+				85314FDB12AD31CB00052736 /* HorizontalLayoutWidget.h */,
+				85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */,
+				85314FDD12AD31CB00052736 /* ImageWidget.h */,
+				85314FDE12AD31CB00052736 /* ImageWidget.mm */,
+				85314FDF12AD31CB00052736 /* IWidget.h */,
+				85314FE012AD31CB00052736 /* IWidget.mm */,
+				85314FE112AD31CB00052736 /* LabelWidget.h */,
+				85314FE212AD31CB00052736 /* LabelWidget.mm */,
+				85314FE312AD31CB00052736 /* ReflectionWidget.h */,
+				85314FE412AD31CB00052736 /* ReflectionWidget.mm */,
+				85314FE512AD31CB00052736 /* ScreenWidget.h */,
+				85314FE612AD31CB00052736 /* ScreenWidget.mm */,
+				85314FE712AD31CB00052736 /* TableViewCellWidget.h */,
+				85314FE812AD31CB00052736 /* TableViewCellWidget.mm */,
+				85314FE912AD31CB00052736 /* TableViewWidget.h */,
+				85314FEA12AD31CB00052736 /* TableViewWidget.mm */,
+				85314FEB12AD31CB00052736 /* VerticalLayoutWidget.h */,
+				85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */,
 			);
 			name = Widgets;
 			sourceTree = "<group>";
@@ -264,25 +279,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
-				1D3623260D0F684500981E51 /* nativeuitestAppDelegate.m in Sources */,
 				858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */,
 				85774F17129FB70D00F8BAA2 /* MoSyncUI.mm in Sources */,
-				85774F1B129FB85700F8BAA2 /* IWidget.mm in Sources */,
-				85774F26129FBD2000F8BAA2 /* TableViewWidget.mm in Sources */,
-				85774F29129FBD2F00F8BAA2 /* LabelWidget.mm in Sources */,
-				85774F4E129FC14E00F8BAA2 /* ScreenWidget.mm in Sources */,
-				85775038129FE39600F8BAA2 /* MoSyncUISyscalls.m in Sources */,
-				8577504F129FE91300F8BAA2 /* ReflectionWidget.mm in Sources */,
-				8577516412A00BF600F8BAA2 /* TableViewCellWidget.mm in Sources */,
 				8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */,
-				8582679712A404550047D42D /* ImageWidget.mm in Sources */,
 				8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */,
-				85CFC48912A7F6E00075BCD9 /* ButtonWidget.m in Sources */,
-				857FB09A12A9248F0018C523 /* HorizontalLayoutWidget.m in Sources */,
-				857FB09D12A924B50018C523 /* VerticalLayoutWidget.m in Sources */,
 				857FB0A612A924E10018C523 /* AbstractLayoutView.m in Sources */,
 				857FB0A712A924E10018C523 /* HLayoutView.m in Sources */,
 				857FB0A812A924E10018C523 /* VLayoutView.m in Sources */,
+				85314FED12AD31CB00052736 /* ButtonWidget.m in Sources */,
+				85314FEE12AD31CB00052736 /* HorizontalLayoutWidget.m in Sources */,
+				85314FEF12AD31CB00052736 /* ImageWidget.mm in Sources */,
+				85314FF012AD31CB00052736 /* IWidget.mm in Sources */,
+				85314FF112AD31CB00052736 /* LabelWidget.mm in Sources */,
+				85314FF212AD31CB00052736 /* ReflectionWidget.mm in Sources */,
+				85314FF312AD31CB00052736 /* ScreenWidget.mm in Sources */,
+				85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */,
+				85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */,
+				85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */,
+				85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */,
+				85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */,
+				8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */,
+				85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */,
+				85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

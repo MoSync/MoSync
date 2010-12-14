@@ -1,5 +1,5 @@
 //
-//  VerticalLayoutWidget.h
+//  ListViewCellWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface VerticalLayoutWidget : IWidget {
+@interface ListViewCellWidget : IWidget {
 	
 }
 

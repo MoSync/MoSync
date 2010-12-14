@@ -3056,6 +3056,13 @@ interface MAAPI {
 	 */
 	int maWidgetRemoveChild(in MAHandle parent, in MAHandle child);
 
+	/**
+ 	 * Shows a screen. If native UI haven't been initialized, it is also initialized 
+	 * and disables regular MoSync drawing.
+	 * param screenHandle The handle to the screen.
+	 */
+	void maWidgetScreenShow(in MAHandle screenHandle);
+
 	/** 
 	 * Sets a specified property on the given widget.
 	 *

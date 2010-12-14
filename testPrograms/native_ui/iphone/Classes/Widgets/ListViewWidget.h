@@ -1,5 +1,5 @@
 //
-//  VerticalLayoutWidget.h
+//  ListViewWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
+#import "MoSyncTableView.h"
 
-@interface VerticalLayoutWidget : IWidget {
-	
+@interface ListViewWidget : IWidget {
+	MoSyncTableView* tableView;
 }
 
 - (id)init;
