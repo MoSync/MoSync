@@ -28,6 +28,7 @@ stabs.tab
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
 /tools/ProfileConverter/profiles/*
+/tools/ProfileConverter/profiles.db
 
 /intlibs/bluetooth/config_bluetooth.h
 /intlibs/helpers/asm_config.h

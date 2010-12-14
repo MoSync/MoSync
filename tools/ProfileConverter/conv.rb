@@ -417,9 +417,11 @@ DEVICE.each_with_index do |device, index|
 						if(def_name == "MA_PROF_CONST_STORAGESIZE")
 							definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
 						elsif(def_name == "MA_PROF_CONST_SCREENSIZE_Y")
+							raise "#{vendor}/#{device.name}: broken #{def_name}: #{value}" if(value[0].to_i > 10000)
 							hasScreenSizeY = true
 							definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_Y,ScreenSize/Y,pixels"
 						elsif(def_name == "MA_PROF_CONST_SCREENSIZE_X")
+							raise "#{vendor}/#{device.name}: broken #{def_name}: #{value}" if(value[0].to_i > 10000)
 							hasScreenSizeX = true
 							definitions[def_name] = "MA_PROF_CONST_SCREENSIZE_X,ScreenSize/X,pixels"
 						elsif(def_name == "MA_PROF_CONST_MAXJARSIZE")
