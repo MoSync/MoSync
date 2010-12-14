@@ -2952,6 +2952,16 @@ interface MAAPI {
 		 * A WebView widget has finished loading data. 
 		 */
 		CONTENT_LOADED = 4;
+
+		/**
+		 * Sent when something is clicked.
+		 */
+		CLICKED = 5;
+
+		/**
+		 * Sent when an item in a list view is clicked.
+		 */
+		ITEM_CLICKED = 6;
 	}
 
 	/**
