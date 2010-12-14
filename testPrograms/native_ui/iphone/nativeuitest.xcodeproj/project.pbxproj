@@ -11,16 +11,11 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
-		85314FED12AD31CB00052736 /* ButtonWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDA12AD31CB00052736 /* ButtonWidget.m */; };
-		85314FEE12AD31CB00052736 /* HorizontalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */; };
 		85314FEF12AD31CB00052736 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FDE12AD31CB00052736 /* ImageWidget.mm */; };
 		85314FF012AD31CB00052736 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE012AD31CB00052736 /* IWidget.mm */; };
 		85314FF112AD31CB00052736 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE212AD31CB00052736 /* LabelWidget.mm */; };
 		85314FF212AD31CB00052736 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE412AD31CB00052736 /* ReflectionWidget.mm */; };
 		85314FF312AD31CB00052736 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE612AD31CB00052736 /* ScreenWidget.mm */; };
-		85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FE812AD31CB00052736 /* TableViewCellWidget.mm */; };
-		85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEA12AD31CB00052736 /* TableViewWidget.mm */; };
-		85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */ = {isa = PBXBuildFile; fileRef = 85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */; };
 		85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */; };
 		8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8537500912AFC9AD0037C888 /* NavScreenWidget.mm */; };
 		8565795A12A510A700A7D535 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 8565795912A510A700A7D535 /* UIColor-Expanded.m */; };
@@ -31,6 +26,13 @@
 		8582679412A403EF0047D42D /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8582679312A403EF0047D42D /* MoSyncTableViewCell.m */; };
 		858A78B7129E9A50005EACA7 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 858A78B6129E9A50005EACA7 /* MoSyncTableView.m */; };
 		85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */; };
+		85D26CF312B7800500FBA308 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEA12B7800500FBA308 /* ButtonWidget.mm */; };
+		85D26CF412B7800500FBA308 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */; };
+		85D26CF512B7800500FBA308 /* ListViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */; };
+		85D26CF612B7800500FBA308 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEF12B7800500FBA308 /* ListViewWidget.mm */; };
+		85D26CF712B7800500FBA308 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */; };
+		85D26CF812B7800500FBA308 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CF212B7800500FBA308 /* WebViewWidget.mm */; };
+		85D26D1112B7822F00FBA308 /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D1012B7822F00FBA308 /* NSObjectExpanded.m */; };
 		85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */; };
 		85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */; };
 /* End PBXBuildFile section */
@@ -44,9 +46,7 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* nativeuitest_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nativeuitest_Prefix.pch; sourceTree = "<group>"; };
 		85314FD912AD31CB00052736 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonWidget.h; path = Widgets/ButtonWidget.h; sourceTree = "<group>"; };
-		85314FDA12AD31CB00052736 /* ButtonWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ButtonWidget.m; path = Widgets/ButtonWidget.m; sourceTree = "<group>"; };
 		85314FDB12AD31CB00052736 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = Widgets/HorizontalLayoutWidget.h; sourceTree = "<group>"; };
-		85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HorizontalLayoutWidget.m; path = Widgets/HorizontalLayoutWidget.m; sourceTree = "<group>"; };
 		85314FDD12AD31CB00052736 /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageWidget.h; path = Widgets/ImageWidget.h; sourceTree = "<group>"; };
 		85314FDE12AD31CB00052736 /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ImageWidget.mm; path = Widgets/ImageWidget.mm; sourceTree = "<group>"; };
 		85314FDF12AD31CB00052736 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IWidget.h; path = Widgets/IWidget.h; sourceTree = "<group>"; };
@@ -57,12 +57,7 @@
 		85314FE412AD31CB00052736 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ReflectionWidget.mm; path = Widgets/ReflectionWidget.mm; sourceTree = "<group>"; };
 		85314FE512AD31CB00052736 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenWidget.h; path = Widgets/ScreenWidget.h; sourceTree = "<group>"; };
 		85314FE612AD31CB00052736 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenWidget.mm; path = Widgets/ScreenWidget.mm; sourceTree = "<group>"; };
-		85314FE712AD31CB00052736 /* TableViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewCellWidget.h; path = Widgets/TableViewCellWidget.h; sourceTree = "<group>"; };
-		85314FE812AD31CB00052736 /* TableViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TableViewCellWidget.mm; path = Widgets/TableViewCellWidget.mm; sourceTree = "<group>"; };
-		85314FE912AD31CB00052736 /* TableViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewWidget.h; path = Widgets/TableViewWidget.h; sourceTree = "<group>"; };
-		85314FEA12AD31CB00052736 /* TableViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TableViewWidget.mm; path = Widgets/TableViewWidget.mm; sourceTree = "<group>"; };
 		85314FEB12AD31CB00052736 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = Widgets/VerticalLayoutWidget.h; sourceTree = "<group>"; };
-		85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VerticalLayoutWidget.m; path = Widgets/VerticalLayoutWidget.m; sourceTree = "<group>"; };
 		85374F5E12AFC05F0037C888 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TabScreenWidget.h; path = Widgets/TabScreenWidget.h; sourceTree = "<group>"; };
 		85374F5F12AFC05F0037C888 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TabScreenWidget.mm; path = Widgets/TabScreenWidget.mm; sourceTree = "<group>"; };
 		8537500812AFC9AD0037C888 /* NavScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavScreenWidget.h; path = Widgets/NavScreenWidget.h; sourceTree = "<group>"; };
@@ -85,6 +80,17 @@
 		858A78B6129E9A50005EACA7 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
 		85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
 		85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
+		85D26CEA12B7800500FBA308 /* ButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ButtonWidget.mm; path = Widgets/ButtonWidget.mm; sourceTree = "<group>"; };
+		85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = Widgets/HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
+		85D26CEC12B7800500FBA308 /* ListViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewCellWidget.h; path = Widgets/ListViewCellWidget.h; sourceTree = "<group>"; };
+		85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewCellWidget.mm; path = Widgets/ListViewCellWidget.mm; sourceTree = "<group>"; };
+		85D26CEE12B7800500FBA308 /* ListViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewWidget.h; path = Widgets/ListViewWidget.h; sourceTree = "<group>"; };
+		85D26CEF12B7800500FBA308 /* ListViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewWidget.mm; path = Widgets/ListViewWidget.mm; sourceTree = "<group>"; };
+		85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VerticalLayoutWidget.mm; path = Widgets/VerticalLayoutWidget.mm; sourceTree = "<group>"; };
+		85D26CF112B7800500FBA308 /* WebViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewWidget.h; path = Widgets/WebViewWidget.h; sourceTree = "<group>"; };
+		85D26CF212B7800500FBA308 /* WebViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WebViewWidget.mm; path = Widgets/WebViewWidget.mm; sourceTree = "<group>"; };
+		85D26D0F12B7822F00FBA308 /* NSObjectExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSObjectExpanded.h; path = ../../../runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.h; sourceTree = SOURCE_ROOT; };
+		85D26D1012B7822F00FBA308 /* NSObjectExpanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSObjectExpanded.m; path = ../../../runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.m; sourceTree = SOURCE_ROOT; };
 		85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
 		85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nativeuitestAppDelegate.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
@@ -107,6 +113,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				85D26D0F12B7822F00FBA308 /* NSObjectExpanded.h */,
+				85D26D1012B7822F00FBA308 /* NSObjectExpanded.m */,
 				85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */,
 				85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */,
 				857FB09E12A924CF0018C523 /* LayoutManagers */,
@@ -175,6 +183,15 @@
 		8577516512A00BFE00F8BAA2 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				85D26CEA12B7800500FBA308 /* ButtonWidget.mm */,
+				85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */,
+				85D26CEC12B7800500FBA308 /* ListViewCellWidget.h */,
+				85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */,
+				85D26CEE12B7800500FBA308 /* ListViewWidget.h */,
+				85D26CEF12B7800500FBA308 /* ListViewWidget.mm */,
+				85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */,
+				85D26CF112B7800500FBA308 /* WebViewWidget.h */,
+				85D26CF212B7800500FBA308 /* WebViewWidget.mm */,
 				8537500812AFC9AD0037C888 /* NavScreenWidget.h */,
 				8537500912AFC9AD0037C888 /* NavScreenWidget.mm */,
 				85374F5E12AFC05F0037C888 /* TabScreenWidget.h */,
@@ -182,9 +199,7 @@
 				85B7668512AE858B005CE2A6 /* ScreenWidgetController.h */,
 				85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */,
 				85314FD912AD31CB00052736 /* ButtonWidget.h */,
-				85314FDA12AD31CB00052736 /* ButtonWidget.m */,
 				85314FDB12AD31CB00052736 /* HorizontalLayoutWidget.h */,
-				85314FDC12AD31CB00052736 /* HorizontalLayoutWidget.m */,
 				85314FDD12AD31CB00052736 /* ImageWidget.h */,
 				85314FDE12AD31CB00052736 /* ImageWidget.mm */,
 				85314FDF12AD31CB00052736 /* IWidget.h */,
@@ -195,12 +210,7 @@
 				85314FE412AD31CB00052736 /* ReflectionWidget.mm */,
 				85314FE512AD31CB00052736 /* ScreenWidget.h */,
 				85314FE612AD31CB00052736 /* ScreenWidget.mm */,
-				85314FE712AD31CB00052736 /* TableViewCellWidget.h */,
-				85314FE812AD31CB00052736 /* TableViewCellWidget.mm */,
-				85314FE912AD31CB00052736 /* TableViewWidget.h */,
-				85314FEA12AD31CB00052736 /* TableViewWidget.mm */,
 				85314FEB12AD31CB00052736 /* VerticalLayoutWidget.h */,
-				85314FEC12AD31CB00052736 /* VerticalLayoutWidget.m */,
 			);
 			name = Widgets;
 			sourceTree = "<group>";
@@ -286,21 +296,23 @@
 				857FB0A612A924E10018C523 /* AbstractLayoutView.m in Sources */,
 				857FB0A712A924E10018C523 /* HLayoutView.m in Sources */,
 				857FB0A812A924E10018C523 /* VLayoutView.m in Sources */,
-				85314FED12AD31CB00052736 /* ButtonWidget.m in Sources */,
-				85314FEE12AD31CB00052736 /* HorizontalLayoutWidget.m in Sources */,
 				85314FEF12AD31CB00052736 /* ImageWidget.mm in Sources */,
 				85314FF012AD31CB00052736 /* IWidget.mm in Sources */,
 				85314FF112AD31CB00052736 /* LabelWidget.mm in Sources */,
 				85314FF212AD31CB00052736 /* ReflectionWidget.mm in Sources */,
 				85314FF312AD31CB00052736 /* ScreenWidget.mm in Sources */,
-				85314FF412AD31CB00052736 /* TableViewCellWidget.mm in Sources */,
-				85314FF512AD31CB00052736 /* TableViewWidget.mm in Sources */,
-				85314FF612AD31CB00052736 /* VerticalLayoutWidget.m in Sources */,
 				85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */,
 				85374F6012AFC05F0037C888 /* TabScreenWidget.mm in Sources */,
 				8537500A12AFC9AD0037C888 /* NavScreenWidget.mm in Sources */,
 				85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */,
 				85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */,
+				85D26CF312B7800500FBA308 /* ButtonWidget.mm in Sources */,
+				85D26CF412B7800500FBA308 /* HorizontalLayoutWidget.mm in Sources */,
+				85D26CF512B7800500FBA308 /* ListViewCellWidget.mm in Sources */,
+				85D26CF612B7800500FBA308 /* ListViewWidget.mm in Sources */,
+				85D26CF712B7800500FBA308 /* VerticalLayoutWidget.mm in Sources */,
+				85D26CF812B7800500FBA308 /* WebViewWidget.mm in Sources */,
+				85D26D1112B7822F00FBA308 /* NSObjectExpanded.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +354,10 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../../libs,
+					../../../intlibs,
+				);
 				PREBINDING = NO;
 				SDKROOT = iphoneos4.1;
 			};
@@ -355,6 +371,10 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../../libs,
+					../../../intlibs,
+				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
 				SDKROOT = iphoneos4.1;

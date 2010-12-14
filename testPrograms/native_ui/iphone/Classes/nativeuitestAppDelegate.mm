@@ -25,14 +25,14 @@ void TestApp() {
 	MAHandle tabScreen = maWidgetCreate("TabScreen");	
 	
 	MAHandle firstScreen = maWidgetCreate("Screen");
-	MAHandle tableView = maWidgetCreate("TableView");
+	MAHandle tableView = maWidgetCreate("ListView");
 	maWidgetAddChild(firstScreen, tableView);
 	maWidgetSetProperty(firstScreen, "title", "first");		
 
 	//maWidgetSetProperty(tableView, "width", "80");
 	
 	for(int i = 0; i < 7; i++) {
-		MAHandle tableViewCell = maWidgetCreate("TableViewCell");
+		MAHandle tableViewCell = maWidgetCreate("ListViewCell");
 		//maWidgetSetProperty(tableViewCell, "text", labels[i]);
 		if(i == 3) {
 			maWidgetSetProperty(tableViewCell, "backgroundColor", "#00ff00");
@@ -96,7 +96,7 @@ void TestApp() {
 #pragma mark Application lifecycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
-	initMoSyncUISyscalls();
+	initMoSyncUISyscalls(NULL, NULL);
 	TestApp();
     return YES;
 }

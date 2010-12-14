@@ -30,8 +30,14 @@ UIViewController *mainController;
 	widgetArray = [[NSMutableArray alloc] init];
 	
 	//mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	if(!window) {
+		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
+		[window makeKeyAndVisible];
+	}
+	
 	mainWindow = window;
 	mainController = controller;
+	
 	mainWindow.backgroundColor = [UIColor whiteColor];
 	
 	//tabBarController = [[UITabBarController alloc] init];
@@ -70,7 +76,7 @@ UIViewController *mainController;
 		created = [[ReflectionWidget alloc] initWithName:name];
 	}
 	
-	[created setHandle:[widgetArray count]]; 
+	[created setWidgetHandle:[widgetArray count]]; 
 	
 	
 	// todo handle these things.
@@ -91,7 +97,8 @@ bool nativeUIEnabled = false;
 
 - (void)show: (IWidget*) widget {
 	if(!nativeUIEnabled) {
-		[mainController.view removeFromSuperview];
+		if(mainController)
+			[mainController.view removeFromSuperview];
 		nativeUIEnabled = true;
 	}	
 	[mainWindow addSubview:[widget getView]];

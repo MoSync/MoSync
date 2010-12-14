@@ -17,7 +17,7 @@
 	int handle;
 }
 
-- (void)setHandle:(int) handle;
+- (void)setWidgetHandle:(int) handle;
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView; 

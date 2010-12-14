@@ -21,8 +21,8 @@
 	return view;
 }
 
-- (void) setHandle:(int) toHandle {
-	self.handle = toHandle;
+- (void) setWidgetHandle:(int) toHandle {
+	handle = toHandle;
 }
 
 - (void) addChild: (IWidget*)child {

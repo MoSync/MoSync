@@ -7,7 +7,12 @@
 //
 
 #import "ButtonWidget.h"
+
+#ifdef __IPHONE__
 #include "Platform.h"
+#endif
+
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ButtonWidget
@@ -23,16 +28,16 @@
 }
 
 -(void)buttonPressed {
-	//NSLog(@"Button pressed!");
-	
+	NSLog(@"Button pressed!");
+#ifdef __IPHONE__	
 	MAEvent *event = new MAEvent;
 	event->type = EVENT_TYPE_WIDGET;
-	
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = WIDGET_EVENT_POINTER_PRESSED;
 	eventData->widgetHandle = handle;
 	event->data = eventData;
 	Base::gEventQueue.put(*event);
+#endif	
 }
 
 - (void)addChild: (IWidget*)child {
