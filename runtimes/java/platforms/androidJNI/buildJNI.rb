@@ -129,7 +129,7 @@ puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
-sh("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
+sh("#{secondarg}/tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
 	
 puts "Compile Java Source Files\n\n"
 
