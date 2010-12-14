@@ -1,3 +1,2 @@
-.res RES_TEST
-.bin
-.include "main.cpp"
+.res R_ICON
+.image "res/list_img.png"
