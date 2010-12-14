@@ -125,12 +125,9 @@ if File.exist? class_dir
 end
 Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
-puts "Build Android package\n\n"
-
-# Build Android package file
+# Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
-sh("#{secondarg}/tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
-	
+
 puts "Compile Java Source Files\n\n"
 
 # Compile all the java files into class files

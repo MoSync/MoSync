@@ -67,7 +67,6 @@ class RuntimeBuilder
 		
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 		
-		puts "ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}"
 		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}")
 		
 		Dir.chdir cpath

@@ -61,30 +61,21 @@ stabs.tab
 /tools/idl2/opengl_generated.idl
 
 /intlibs/helpers/constSets.h
-/runtimes/cpp/platforms/symbian/group/ABLD.BAT
 /runtimes/cpp/platforms/symbian/inc/config_platform.h
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
-/runtimes/cpp/platforms/symbian/group-ed3/MoSync_Data
 
-/runtimes/cpp/platforms/symbian/group-ed3/MoSync.mcp
-/runtimes/cpp/platforms/symbian/group-ed3/MoSync.xml
-/runtimes/cpp/platforms/symbian/group-ed3/*.resources
 /runtimes/cpp/platforms/symbian/sis/*.SIS
 /runtimes/cpp/platforms/symbian/sis-ed3/*.SIS
-/runtimes/cpp/platforms/symbian/group-ed3/*.cwlink
-/runtimes/cpp/platforms/symbian/group-ed3/ABLD.BAT
+
+/runtimes/cpp/platforms/symbian/group*/ABLD.BAT
+/runtimes/cpp/platforms/symbian/group*/MOSYNC.xml
+/runtimes/cpp/platforms/symbian/group*/MoSync.mcp
+/runtimes/cpp/platforms/symbian/group*/*.resources
+/runtimes/cpp/platforms/symbian/group*/*.cwlink
+/runtimes/cpp/platforms/symbian/group*/MoSync_Data/*
 /runtimes/cpp/platforms/symbian/group-ed3/MoSync_icon.mif
-/runtimes/cpp/platforms/symbian/group/MOSYNC.xml
-/runtimes/cpp/platforms/symbian/group/MoSync.mcp
-/runtimes/cpp/platforms/symbian/group/*.resources
-/runtimes/cpp/platforms/symbian/group/*.cwlink
-/runtimes/cpp/platforms/symbian/group/MoSync_Data/*
-/runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync_Data/*
-/runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync.mcp
-/runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync.xml
-/runtimes/cpp/platforms/symbian/group-ed3-guido/MoSync2GCCE.resources
-/runtimes/cpp/platforms/symbian/group-ed3-guido/*.cwlink
+
 /runtimes/cpp/platforms/symbian/sis-ed3/1/*
 /runtimes/cpp/platforms/symbian/sis-ed5/1/*
 
@@ -131,3 +122,5 @@ stabs.tab
 /runtimes/java/platforms/androidJNI/AndroidProject/obj
 /runtimes/java/platforms/androidJNI/AndroidProject/src
 /runtimes/java/platforms/androidJNI/AndroidProject/libs
+/runtimes/java/platforms/androidJNI/resources.ap_
+/runtimes/java/platforms/androidJNI/src/config_platform.h.saved

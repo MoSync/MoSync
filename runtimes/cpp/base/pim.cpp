@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "config_platform.h"
 
-#ifdef EMULATOR
+#if defined(EMULATOR) || defined(SYMBIAN)
 
 #include "Syscall.h"
 #include "pim.h"
