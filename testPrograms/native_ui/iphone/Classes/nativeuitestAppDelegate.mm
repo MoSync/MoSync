@@ -32,7 +32,7 @@ void TestApp() {
 	//maWidgetSetProperty(tableView, "width", "80");
 	
 	for(int i = 0; i < 7; i++) {
-		MAHandle tableViewCell = maWidgetCreate("ListViewCell");
+		MAHandle tableViewCell = maWidgetCreate("ListViewItem");
 		//maWidgetSetProperty(tableViewCell, "text", labels[i]);
 		if(i == 3) {
 			maWidgetSetProperty(tableViewCell, "backgroundColor", "#00ff00");

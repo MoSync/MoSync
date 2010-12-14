@@ -28,11 +28,11 @@
 		85B7668712AE858B005CE2A6 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */; };
 		85D26CF312B7800500FBA308 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEA12B7800500FBA308 /* ButtonWidget.mm */; };
 		85D26CF412B7800500FBA308 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */; };
-		85D26CF512B7800500FBA308 /* ListViewCellWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */; };
 		85D26CF612B7800500FBA308 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CEF12B7800500FBA308 /* ListViewWidget.mm */; };
 		85D26CF712B7800500FBA308 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */; };
 		85D26CF812B7800500FBA308 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26CF212B7800500FBA308 /* WebViewWidget.mm */; };
 		85D26D1112B7822F00FBA308 /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D1012B7822F00FBA308 /* NSObjectExpanded.m */; };
+		85D26E2A12B7C90300FBA308 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26E2912B7C90300FBA308 /* ListViewItemWidget.mm */; };
 		85E276E112B10B1000ABEDF3 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */; };
 		85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */; };
 /* End PBXBuildFile section */
@@ -82,8 +82,6 @@
 		85B7668612AE858B005CE2A6 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
 		85D26CEA12B7800500FBA308 /* ButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ButtonWidget.mm; path = Widgets/ButtonWidget.mm; sourceTree = "<group>"; };
 		85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = Widgets/HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
-		85D26CEC12B7800500FBA308 /* ListViewCellWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewCellWidget.h; path = Widgets/ListViewCellWidget.h; sourceTree = "<group>"; };
-		85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewCellWidget.mm; path = Widgets/ListViewCellWidget.mm; sourceTree = "<group>"; };
 		85D26CEE12B7800500FBA308 /* ListViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewWidget.h; path = Widgets/ListViewWidget.h; sourceTree = "<group>"; };
 		85D26CEF12B7800500FBA308 /* ListViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewWidget.mm; path = Widgets/ListViewWidget.mm; sourceTree = "<group>"; };
 		85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VerticalLayoutWidget.mm; path = Widgets/VerticalLayoutWidget.mm; sourceTree = "<group>"; };
@@ -91,6 +89,8 @@
 		85D26CF212B7800500FBA308 /* WebViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WebViewWidget.mm; path = Widgets/WebViewWidget.mm; sourceTree = "<group>"; };
 		85D26D0F12B7822F00FBA308 /* NSObjectExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSObjectExpanded.h; path = ../../../runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.h; sourceTree = SOURCE_ROOT; };
 		85D26D1012B7822F00FBA308 /* NSObjectExpanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSObjectExpanded.m; path = ../../../runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.m; sourceTree = SOURCE_ROOT; };
+		85D26E2812B7C90300FBA308 /* ListViewItemWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewItemWidget.h; path = Widgets/ListViewItemWidget.h; sourceTree = "<group>"; };
+		85D26E2912B7C90300FBA308 /* ListViewItemWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewItemWidget.mm; path = Widgets/ListViewItemWidget.mm; sourceTree = "<group>"; };
 		85E276E012B10B1000ABEDF3 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
 		85E276E612B10BF600ABEDF3 /* nativeuitestAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nativeuitestAppDelegate.mm; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* nativeuitest-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "nativeuitest-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
@@ -183,10 +183,10 @@
 		8577516512A00BFE00F8BAA2 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				85D26E2812B7C90300FBA308 /* ListViewItemWidget.h */,
+				85D26E2912B7C90300FBA308 /* ListViewItemWidget.mm */,
 				85D26CEA12B7800500FBA308 /* ButtonWidget.mm */,
 				85D26CEB12B7800500FBA308 /* HorizontalLayoutWidget.mm */,
-				85D26CEC12B7800500FBA308 /* ListViewCellWidget.h */,
-				85D26CED12B7800500FBA308 /* ListViewCellWidget.mm */,
 				85D26CEE12B7800500FBA308 /* ListViewWidget.h */,
 				85D26CEF12B7800500FBA308 /* ListViewWidget.mm */,
 				85D26CF012B7800500FBA308 /* VerticalLayoutWidget.mm */,
@@ -308,11 +308,11 @@
 				85E276E712B10BF600ABEDF3 /* nativeuitestAppDelegate.mm in Sources */,
 				85D26CF312B7800500FBA308 /* ButtonWidget.mm in Sources */,
 				85D26CF412B7800500FBA308 /* HorizontalLayoutWidget.mm in Sources */,
-				85D26CF512B7800500FBA308 /* ListViewCellWidget.mm in Sources */,
 				85D26CF612B7800500FBA308 /* ListViewWidget.mm in Sources */,
 				85D26CF712B7800500FBA308 /* VerticalLayoutWidget.mm in Sources */,
 				85D26CF812B7800500FBA308 /* WebViewWidget.mm in Sources */,
 				85D26D1112B7822F00FBA308 /* NSObjectExpanded.m in Sources */,
+				85D26E2A12B7C90300FBA308 /* ListViewItemWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +352,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = NATIVE_TEST;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
@@ -369,6 +370,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = NATIVE_TEST;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (

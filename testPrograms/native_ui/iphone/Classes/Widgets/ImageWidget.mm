@@ -7,10 +7,10 @@
 //
 
 #import "ImageWidget.h"
-#ifndef NATIVE_TEST
-#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#ifndef NATIVE_TEST
+#include "Platform.h"
 #include <base/Syscall.h>
 #endif
 
@@ -34,8 +34,10 @@
 		int imageHandle = [value intValue];
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;
+		#ifndef NATIVE_TEST
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
 		imageView.image = [UIImage imageWithCGImage:imageResource->image];
+		#endif
 		
 	}
 	else {

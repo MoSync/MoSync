@@ -58,9 +58,10 @@
 		int imageHandle = [value intValue];
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;
+#ifndef NATIVE_TEST		
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
 		imageView.image = [UIImage imageWithCGImage:imageResource->image];
-		
+#endif		
 	}
 	else if([key isEqualToString:@"backgroundColor"]) {
 		//	[super addChild:child];
