@@ -6,10 +6,17 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
-#import "ListViewCellWidget.h"
+#import "ListViewItemWidget.h"
 #import "UIColor-Expanded.h"
 
-@implementation ListViewCellWidget
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
+@implementation ListViewItemWidget
 
 - (id)init {
 
@@ -19,7 +26,7 @@
 	 
 	if (cell == nil) {
 		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-								   reuseIdentifier:SimpleTableIdentifier] autorelease];
+								   reuseIdentifier:SimpleTableIdentifier] retain];
 		cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	}
 
@@ -47,6 +54,14 @@
 		UILabel* label = cell.textLabel;
 		label.text = value;
 	} 
+	else if([key isEqualToString:@"image"]) {
+		int imageHandle = [value intValue];
+		UITableViewCell* cell = (UITableViewCell*) view;
+		UIImageView* imageView = cell.imageView;
+		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
+		imageView.image = [UIImage imageWithCGImage:imageResource->image];
+		
+	}
 	else if([key isEqualToString:@"backgroundColor"]) {
 		//	[super addChild:child];
 		UITableViewCell *cell = (UITableViewCell*)view;

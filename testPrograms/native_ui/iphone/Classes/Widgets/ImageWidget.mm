@@ -7,11 +7,18 @@
 //
 
 #import "ImageWidget.h"
-
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
 
 @implementation ImageWidget
 
 - (id)init {
+	UIImageView* imageView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	view = imageView;			
 	return [super init];
 }
 
@@ -23,7 +30,18 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	return [super setPropertyWithKey:key toValue:value];
+	if([key isEqualToString:@"image"]) {
+		int imageHandle = [value intValue];
+		UITableViewCell* cell = (UITableViewCell*) view;
+		UIImageView* imageView = cell.imageView;
+		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
+		imageView.image = [UIImage imageWithCGImage:imageResource->image];
+		
+	}
+	else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return WIDGET_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

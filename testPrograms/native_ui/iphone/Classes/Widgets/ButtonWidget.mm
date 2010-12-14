@@ -8,12 +8,11 @@
 
 #import "ButtonWidget.h"
 
-#ifdef __IPHONE__
+#ifndef NATIVE_TEST
 #include "Platform.h"
-#endif
-
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#endif
 
 @implementation ButtonWidget
 
@@ -29,7 +28,7 @@
 
 -(void)buttonPressed {
 	NSLog(@"Button pressed!");
-#ifdef __IPHONE__	
+#ifndef NATIVE_TEST
 	MAEvent *event = new MAEvent;
 	event->type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;

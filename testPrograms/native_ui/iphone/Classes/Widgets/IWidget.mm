@@ -43,11 +43,27 @@
 	} else 
 	if([key isEqualToString:@"width"]) {
 //		view.frame.size.width = [value floatValue];		
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, [value floatValue], view.frame.size.height)];
+		float width = [value floatValue];
+		if(width == -1) {
+			view.autoresizingMask =			view.autoresizingMask | 
+									UIViewAutoresizingFlexibleWidth | 
+									UIViewAutoresizingFlexibleLeftMargin | 
+									UIViewAutoresizingFlexibleRightMargin;
+			width = view.superview.frame.size.width;
+			//return MA_WIDGET_OK;
+		}
+		
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
 	} else
 	if([key isEqualToString:@"height"]) {
 		//view.frame.size.height = [value floatValue];
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, [value floatValue])];		
+		float height = [value floatValue];
+		if(height == -1) {
+			view.autoresizingMask = view.autoresizingMask | UIViewAutoresizingFlexibleHeight;
+			return MA_WIDGET_OK;
+		}
+		
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
 		view.backgroundColor = [UIColor colorWithHexString:value];
