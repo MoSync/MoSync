@@ -71,7 +71,7 @@ if secondarg == nil
 end
 
 # Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH
-ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg.scan("android_(\d+)")[-1]
+ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg.scan(/android-(\d+)/)[-1][0]
 
 debug = (fortharg == nil) ? "" : "D"
 
@@ -129,14 +129,26 @@ puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
-system("#{secondarg}../../tools/aapt package -f -v -M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ -I #{File.join(secondarg, "android.jar")} -S #{File.join(package_root, "res")} -m -J #{File.join(package_root, "src")}");
+success = system("#{File.join(secondarg, "tools/aapt")} package -f -v -M #{File.join(package_root,"AndroidManifest.xml")} -I #{File.join(secondarg, "android.jar")} -S #{File.join(package_root, "res")} -m -J #{File.join(package_root, "src")}");
 	
 puts "Compile Java Source Files\n\n"
 
-# Compile all the java files into class files
-puts "javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{File.join(package_root, "/src/com/mosync/java/android/*.java")} #{File.join(package_root, "/src/com/mosync/internal/android/*.java")}"
+packages = ["src/com/mosync/java/android/*.java",
+            "src/com/mosync/internal/android/*.java",
+            "src/com/mosync/nativeui/core/*.java",
+            "src/com/mosync/nativeui/ui/factories/*.java",
+            "src/com/mosync/nativeui/ui/widgets/*.java",
+            "src/com/mosync/nativeui/util/*.java",
+            "src/com/mosync/nativeui/util/properties/*.java"
+            ]
 
-success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{File.join(package_root, "/src/com/mosync/java/android/*.java")} #{File.join(package_root, "/src/com/mosync/internal/android/*.java")}");
+# Concatenate each list element with package_root, and flatten the list to a string
+java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
+
+# Compile all the java files into class files
+puts "javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{java_files}"
+
+success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{File.join(secondarg, "android.jar")} #{java_files}");
 if (!success)
 	exitBuilder(1,thirdarg)
 end

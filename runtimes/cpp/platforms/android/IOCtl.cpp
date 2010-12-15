@@ -449,4 +449,196 @@ namespace Base
 		
 		return (int)ret;
 	}
+	
+	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jstring jstrWidgetType = jNIEnv->NewStringUTF(widgetType);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetCreate", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrWidgetType);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrWidgetType);
+		
+		return result;
+	}
+	
+	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maWidgetAddChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetAddChild", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, parent, child);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maWidgetRemoveChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetRemoveChild", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, parent, child);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maWidgetSetProperty(int widget, const char *property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+		jstring jstrValue = jNIEnv->NewStringUTF(value);
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, jstrValue);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+		
+		return result;
+	}
+	
+	int _maWidgetGetProperty(int widget, const char *property, const char* valueBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+		jstring jstrValueBuffer = jNIEnv->NewStringUTF(valueBuffer);
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetProperty", "(ILjava/lang/String;Ljava/lang/String;I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, jstrValueBuffer, bufferSize);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValueBuffer);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+		
+		return result;
+	}
+
+	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetScreenShow", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, screenWidget);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
+	int _maWidgetEvauluateScript(int widget, const char *script, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrScript = jNIEnv->NewStringUTF(script);
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript", "(ILjava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrScript);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrScript);
+		
+		return result;
+	}
+	
+	int _maWidgetGetMessageData(int memStart, int messageId, int messageBufferPointer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		int realMessageBufferPointer = messageBufferPointer - memStart;
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageData", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId, realMessageBufferPointer, bufferSize);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
 }
