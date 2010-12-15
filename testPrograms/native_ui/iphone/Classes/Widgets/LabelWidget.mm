@@ -50,6 +50,10 @@
 		//if([value isEqualToString:@"center"]) {
 		//}
 	}	
+	else if([key isEqualToString:@"fontColor"]) {
+		UILabel* label = (UILabel*) view;	
+		label.textColor = [UIColor colorWithHexString:value];
+	}	
 	else if([key isEqualToString:@"fontSize"]) {
 		UILabel* label = (UILabel*) view;	
 		float fontSize = [value floatValue];

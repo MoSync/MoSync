@@ -14,6 +14,8 @@
 - (id)init {
 	[super init];
 	view.contentMode = UIViewContentModeRedraw;
+	parent = nil;
+	children = [[NSMutableArray alloc] init];
 	return self;
 }
 
@@ -25,12 +27,32 @@
 	handle = toHandle;
 }
 
+- (void) setParent:(IWidget*) toParent {
+	parent = toParent;
+}
+
+- (void) addChild: (IWidget*)child andSubview:(bool)addSubview {
+	[child setParent:self];
+	[children addObject:child];
+	if(addSubview)
+		[view addSubview:[child getView]];		
+}
+
 - (void) addChild: (IWidget*)child {
-	[view addSubview:[child getView]];	
+	[self addChild:child andSubview:YES];	
 }
 
 - (void) removeChild: (IWidget*)child {
+	[self removeChild:child fromSuperview:YES];
 }
+
+- (void) removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
+	[children removeObjectIdenticalTo:child];
+	[child setParent:nil];
+	if(removeFromSuperview)
+		[[child getView] removeFromSuperview];
+}
+
 
 - (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {

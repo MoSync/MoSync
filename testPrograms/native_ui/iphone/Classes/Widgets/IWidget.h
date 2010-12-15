@@ -15,14 +15,22 @@
 @interface IWidget : NSObject {
 	UIView* view;
 	int handle;
+	
+	IWidget* parent;
+	NSMutableArray* children;
 }
 
+- (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
 - (void)dealloc;
 - (id)init;
-- (UIView*)getView; 
+- (UIView*)getView;
+
 - (void)addChild: (IWidget*)child;
+- (void)addChild: (IWidget*)child andSubview:(bool)addSubview;
 - (void)removeChild: (IWidget*)child;
+- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
+
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 

@@ -13,13 +13,13 @@
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	UITabBarController* tabBarController = [[UITabBarController alloc] init];
+	UITabBarController* tabBarController = [[[UITabBarController alloc] init] retain];
 	controller = tabBarController;
 	tabBarController.viewControllers = [NSArray array];	
-	view = controller.view;
+	//view = controller.view;
 	//controller.view = view;
 	
-	return self;
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -30,9 +30,11 @@
 	tabBarController.viewControllers = newItems;
 	
 	//[super addChild:child];
+	[super addChild:child andSubview:NO];	
 }
 
 - (void)removeChild: (IWidget*)child {
+	[super removeChild:child fromSuperview:NO];	
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

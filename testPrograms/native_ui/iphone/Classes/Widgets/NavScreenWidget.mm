@@ -16,10 +16,9 @@
 	UINavigationController* navigationController = [[UINavigationController alloc] init];
 	controller = navigationController;
 	navigationController.viewControllers = [NSArray array];	
-	view = controller.view;
-	//controller.view = view;
+	//view = controller.view;
 	
-	return self;
+	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -30,9 +29,11 @@
 	navigationController.viewControllers = newItems;
 	
 	//[super addChild:child];
+	[super addChild:child andSubview:NO];
 }
 
-- (void)removeChild: (IWidget*)child {
+- (void)removeChild: (IWidget*)child {	
+	[super removeChild:child fromSuperview:NO];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
