@@ -1855,7 +1855,7 @@ void maScreenSetFullscreenHelper(final boolean fullscreenOn)
  */
 int maWallpaperSet(final int data)
 {
-	Log.i("MoSync", "maWallpaperSet");
+	Log.i("MoSync", "maWallpaperSet handle: " + data);
 	
 	homeScreenPanicIfPermissionsAreNotSet();
 	
@@ -2075,12 +2075,16 @@ class HomeScreenDetectionThread extends Thread
 					int[] event = new int[1];
 					if (mIsOnHomeScreen)
 					{
-						Log.i("MoSyncSyscalls", "HOMESCREEN IS SHOWN");
+						Log.i("MoSyncSyscalls", 
+							"HOMESCREEN IS SHOWN Timestamp: " 
+							+ System.currentTimeMillis());
 						event[0] = EVENT_TYPE_HOMESCREEN_SHOWN;
 					}
 					else
 					{
-						Log.i("MoSyncSyscalls", "HOMESCREEN IS HIDDEN");
+						Log.i("MoSyncSyscalls", 
+							"HOMESCREEN IS HIDDEN Timestamp: " 
+							+ System.currentTimeMillis());
 						event[0] = EVENT_TYPE_HOMESCREEN_HIDDEN;
 					}
 					postEvent(event);
