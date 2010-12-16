@@ -17,6 +17,7 @@ public class Types
 	public static final String WIDGET_TYPE_LABEL = "Label";
 	public static final String WIDGET_TYPE_LIST = "ListView";
 	public static final String WIDGET_TYPE_LIST_ITEM = "ListViewItem";
+	public static final String WIDGET_TYPE_WEB = "WebView";
 	public static final String WIDGET_TYPE_SCREEN = "Screen";
 	public static final String WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
 	public static final String WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
@@ -38,6 +39,8 @@ public class Types
 	public static final String WIDGET_PROPERTY_TEXT = "text";
 	
 	public static final String WIDGET_PROPERTY_ICON = "icon";
+	
+	public static final String WIDGET_PROPERTY_URL = "url";
 	
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";

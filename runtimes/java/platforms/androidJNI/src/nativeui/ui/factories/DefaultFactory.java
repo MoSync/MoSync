@@ -27,9 +27,11 @@ public class DefaultFactory implements AbstractViewFactory
 	private Class<?> m_widgetType;
 	
 	/**
-	 * The class of the view to create.
+	 * Creates a default factory for a view of type viewType.
+	 * It then passes it to the default Widget constructor.
 	 * 
-	 * @param viewType
+	 * @param viewType Type of view to create using its Context
+	 *                 constructor.
 	 */
 	public DefaultFactory(Class<?> viewType)
 	{
@@ -41,8 +43,9 @@ public class DefaultFactory implements AbstractViewFactory
 	 * passes it to a subclass of Widget with a constructor that
 	 * takes a handle and a view of type viewType.
 	 * 
-	 * @param viewType
-	 * @param widgetType
+	 * @param viewType Type of view to create using its Context
+	 *                 constructor.
+	 * @param widgetType Type of widget to pass the instantiated view to.
 	 */
 	public DefaultFactory(Class<?> viewType, Class<?> widgetType)
 	{
