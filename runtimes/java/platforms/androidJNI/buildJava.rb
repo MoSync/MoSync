@@ -128,12 +128,12 @@ preprocess_multiple_android_files(shared_java_source, source_dir, source_files, 
 
 source_dir = "src/nativeui/ui/factories/"
 output_dir = "AndroidProject/src/com/mosync/nativeui/ui/factories/"
-source_files = ["AbstractViewFactory.java", "DefaultFactory.java", "LabelFactory.java", "VerticalLayoutFactory.java", "ButtonFactory.java", "HorizontalLayoutFactory.java", "ListFactory.java", "ViewFactory.java", "ScreenFactory.java", "ListItemFactory.java"]
+source_files = ["AbstractViewFactory.java", "DefaultFactory.java", "LabelFactory.java", "VerticalLayoutFactory.java", "ButtonFactory.java", "HorizontalLayoutFactory.java", "ListFactory.java", "ViewFactory.java", "ScreenFactory.java", "ListItemFactory.java", "TabScreenFactory.java"]
 preprocess_multiple_android_files(shared_java_source, source_dir, source_files, output_dir)
 
 source_dir = "src/nativeui/ui/widgets/"
 output_dir = "AndroidProject/src/com/mosync/nativeui/ui/widgets/"
-source_files = ["ButtonWidget.java", "LabelWidget.java", "Layout.java", "LayoutParams.java", "LinearLayout.java", "ListLayout.java", "Widget.java", "ScreenWidget.java", "ListItemWidget.java", "WebWidget.java"]
+source_files = ["ButtonWidget.java", "LabelWidget.java", "Layout.java", "LayoutParams.java", "LinearLayout.java", "ListLayout.java", "Widget.java", "ScreenWidget.java", "ListItemWidget.java", "WebWidget.java", "TabScreenWidget.java"]
 preprocess_multiple_android_files(shared_java_source, source_dir, source_files, output_dir)
 
 source_dir = "src/nativeui/util/"

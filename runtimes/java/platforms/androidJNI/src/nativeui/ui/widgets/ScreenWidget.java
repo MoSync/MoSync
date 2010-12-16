@@ -1,7 +1,14 @@
 package com.mosync.nativeui.ui.widgets;
 
+import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.LayoutParamsSetter;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.ViewGroup;
 
 /**
@@ -16,6 +23,16 @@ import android.view.ViewGroup;
  */
 public class ScreenWidget extends Layout
 {
+	/**
+	 * Title of this screen.
+	 */
+	private String m_title = "";
+	
+	/**
+	 * Icon of this screen.
+	 */
+	private Drawable m_icon = null;
+	
 	/**
 	 * Constructor
 	 * 
@@ -34,4 +51,56 @@ public class ScreenWidget extends Layout
 		LayoutParamsSetter.setPossibleParams( getLayoutParams( ), nativeLayoutParams );
 		getView( ).setLayoutParams( nativeLayoutParams );
 	}
+
+	@Override
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException
+	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+		
+		if( property.equals( Types.WIDGET_PROPERTY_TITLE ) )
+		{
+			m_title = value;
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_ICON ) )
+		{
+			int imageHandle = IntConverter.convert( value );
+			Bitmap icon = NativeUI.getBitmap( imageHandle );
+			if( icon != null )
+			{
+				m_icon = new BitmapDrawable( NativeUI.getBitmap( imageHandle ) );
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Returns the title of this screen.
+	 * 
+	 * @return the title of this screen.
+	 */
+	public String getTitle()
+	{
+		return m_title;
+	}
+	
+	/**
+	 * Returns the icon of this screen.
+	 * 
+	 * @return the icon of this screen.
+	 */
+	public Drawable getIcon()
+	{
+		return m_icon;
+	}
+	
+	
 }
