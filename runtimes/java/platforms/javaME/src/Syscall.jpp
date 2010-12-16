@@ -45,7 +45,7 @@ import javax.microedition.location.*;
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION
 import javax.microedition.io.file.*;
-#include "generated\IX_FILE_CONSTS.h"
+#include "generated/IX_FILE_CONSTS.h"
 #endif
 
 #ifdef MA_SUPPORT_RECORD

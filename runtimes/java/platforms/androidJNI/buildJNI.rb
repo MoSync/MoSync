@@ -37,6 +37,8 @@ end
 
 cpath = FileUtils.pwd
 
+system "ruby addLibraries.rb"
+
 firstarg = ARGV[0]
 secondarg = ARGV[1]
 thirdarg = ARGV[2]
