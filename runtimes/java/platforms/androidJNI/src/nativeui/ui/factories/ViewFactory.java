@@ -3,9 +3,11 @@ package com.mosync.nativeui.ui.factories;
 import java.util.HashMap;
 
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 import android.app.Activity;
+import android.webkit.WebView;
 
 /**
  * The ViewFactory is a singleton that is used to create
@@ -70,6 +72,7 @@ public class ViewFactory
 		addFactory( Types.WIDGET_TYPE_LIST, new ListFactory( ) );
 		addFactory( Types.WIDGET_TYPE_SCREEN, new ScreenFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LIST_ITEM, new ListItemFactory( ) );
+		addFactory( Types.WIDGET_TYPE_WEB, new DefaultFactory( WebView.class, WebWidget.class ) );
 	}
 	
 	/**

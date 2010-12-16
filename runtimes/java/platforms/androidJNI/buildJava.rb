@@ -133,7 +133,7 @@ preprocess_multiple_android_files(shared_java_source, source_dir, source_files, 
 
 source_dir = "src/nativeui/ui/widgets/"
 output_dir = "AndroidProject/src/com/mosync/nativeui/ui/widgets/"
-source_files = ["ButtonWidget.java", "LabelWidget.java", "Layout.java", "LayoutParams.java", "LinearLayout.java", "ListLayout.java", "Widget.java", "ScreenWidget.java", "ListItemWidget.java"]
+source_files = ["ButtonWidget.java", "LabelWidget.java", "Layout.java", "LayoutParams.java", "LinearLayout.java", "ListLayout.java", "Widget.java", "ScreenWidget.java", "ListItemWidget.java", "WebWidget.java"]
 preprocess_multiple_android_files(shared_java_source, source_dir, source_files, output_dir)
 
 source_dir = "src/nativeui/util/"

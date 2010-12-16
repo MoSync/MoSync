@@ -22,13 +22,32 @@ public class DefaultFactory implements AbstractViewFactory
 	private Class<?> m_viewType;
 	
 	/**
+	 * Type of widget class to use.
+	 */
+	private Class<?> m_widgetType;
+	
+	/**
 	 * The class of the view to create.
 	 * 
 	 * @param viewType
 	 */
 	public DefaultFactory(Class<?> viewType)
 	{
+		this( viewType, Widget.class );
+	}
+	
+	/**
+	 * Creates default factory for a view of type viewType and
+	 * passes it to a subclass of Widget with a constructor that
+	 * takes a handle and a view of type viewType.
+	 * 
+	 * @param viewType
+	 * @param widgetType
+	 */
+	public DefaultFactory(Class<?> viewType, Class<?> widgetType)
+	{
 		m_viewType = viewType;
+		m_widgetType = widgetType;
 	}
 	
 	/**
@@ -40,9 +59,12 @@ public class DefaultFactory implements AbstractViewFactory
 		try
 		{
 			// Get the constructor that takes a context and create the view.
-			Constructor<?> constructor = m_viewType.getConstructor( Context.class );
-			View v = (View) constructor.newInstance( activity );
-			return new Widget( handle, v );
+			Constructor<?> viewConstructor = m_viewType.getConstructor( Context.class );
+			View v = (View) viewConstructor.newInstance( activity );
+			
+			// Get the widget constructor and pass the view and the handle.
+			Constructor<?> widgetConstructor = m_widgetType.getConstructor( int.class, m_viewType );
+			return (Widget) widgetConstructor.newInstance( handle, v );
 		}
 		catch(Exception e)
 		{
