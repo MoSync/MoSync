@@ -42,11 +42,12 @@ if(internalBuild == nil)
 	
 	returnToBuild cpath, system("ruby conv.rb -dst #{ENV['MOSYNC_PROFILES_PATH']}")
 else
-	
+
 	puts "Build MoSync Internal runtimes"
-	
-	FileUtils.cd "#{ENV['MOSYNC_RELEASE_BUILD_PATH']}"
-	ret = system "ruby private-runtimebuilder/lib/buildmaster.rb profiles.zip mosync-trunk"
+
+	FileUtils.cd "#{ENV['MOSYNC_RELEASE_BUILD_PATH']}/private-runtimebuilder"
+	FileUtils.cp 'lib/distributed/ClientBuilder.rb', 'ClientBuilder.rb'
+	ret = system "ruby ClientBuilder.rb profiles.zip #{ENV['MOSYNC_RELEASE_BUILD_PATH']}/mosync-trunk -w"
 	if true == ret
 		ret = system "unzip profiles.zip -d #{ENV['MOSYNC_PATH']}"
 	end
