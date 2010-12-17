@@ -1,4 +1,4 @@
-# Copyright (C) 2009 Mobile Sorcery AB
+# Copyright (C) 2010 MoSync AB
 # 
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
@@ -14,16 +14,34 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-$SETTINGS = {
-	:java_source => "../../runtimes/java/",
-	:symbian_source => "../../runtimes/cpp/platforms/symbian/",
-	:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+ if ENV['OS'] == "Windows_NT"
 
-	:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
-	:android_sdk => "C:/Android/android-sdk-windows",
-	:android_ndk => "C:/Android/android-ndk-r4",
-	:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
+	$SETTINGS = {
+		:java_source => "../../runtimes/java/",
+		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+
+		:javame_sdk => "C:\\SonyEricsson\\JavaME_SDK_CLDC\\OnDeviceDebug\\",
+		:android_sdk => "C:/Android/android-sdk-windows",
+		:android_ndk => "C:/Android/android-ndk-r4b",
+		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
 
 	
-	:verbose => false,
-}
+		:verbose => false,
+	}
+else
+
+	$SETTINGS = {
+		:java_source => "../../runtimes/java/",
+		:symbian_source => "../../runtimes/cpp/platforms/symbian/",
+		:wince_source => "../../runtimes/cpp/platforms/winmobile/",
+
+		:javame_sdk => "/home/runtimebuilder/SDK/SonyEricsson/JavaME_SDK_CLDC/OnDeviceDebug/",
+		:android_sdk => "/home/runtimebuilder/SDK/android/android-sdk-linux_x86",
+		:android_ndk => "/home/runtimebuilder/SDK/android/android-ndk-r4b",
+		:s60v5_compiler => "\\Program\\CSL Arm Toolchain\\bin\\",
+
+	
+		:verbose => false,
+	}
+end
