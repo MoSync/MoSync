@@ -1,5 +1,9 @@
 package com.mosync.nativeui.ui.widgets;
 
+import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
+
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -58,6 +62,25 @@ public class TabScreenWidget extends ScreenWidget
 		
 		
 		tab.addTab( tabSpec );
+	}
+
+	@Override
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException
+	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+		
+		TabHost tabHost = (TabHost) getView( );
+		if( property.equals( Types.WIDGET_PROPERTY_CURRENT_TAB ) )
+		{
+			int currentTabIndex = IntConverter.convert( value );			
+			tabHost.setCurrentTab( currentTabIndex );
+		}
+		
+		return true;
 	}
 
 	@Override

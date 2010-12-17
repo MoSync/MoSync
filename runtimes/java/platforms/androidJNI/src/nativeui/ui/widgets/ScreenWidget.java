@@ -78,6 +78,10 @@ public class ScreenWidget extends Layout
 				return false;
 			}
 		}
+		else
+		{
+			return false;
+		}
 		
 		return true;
 	}

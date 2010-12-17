@@ -41,6 +41,7 @@ public class Types
 	
 	public static final String WIDGET_PROPERTY_TITLE = "title";
 	public static final String WIDGET_PROPERTY_ICON = "icon";
+	public static final String WIDGET_PROPERTY_CURRENT_TAB = "currentTab";
 	
 	public static final String WIDGET_PROPERTY_URL = "url";
 	
