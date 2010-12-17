@@ -135,13 +135,13 @@ public:
      void executeCommands(const Vector<String>& commands) {
      	if(commands.size() < 1) return;
 
-     	if(commands[0] == "addWidget") {
+     	if(commands[0] == "widgetCreate") {
      		if(commands.size() != 3) return; // addWidget type id
      			printf("id: '%s'", commands[2].c_str());
      			widgets[commands[2]] = maWidgetCreate(commands[1].c_str());
      			printWidgetIds();
      	} else
-      	if(commands[0] == "setParam") {
+      	if(commands[0] == "setProperty") {
      		if(commands.size() != 4) return; // setParam id name value
     			printf("setting param of widget with id");
      		printf("id: '%s'", commands[1].c_str());

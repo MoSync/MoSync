@@ -114,4 +114,15 @@ namespace Base
 	 *						java method
 	 */
 	int _maTextBox(const wchar* title, const wchar* inText, int outText, int maxSize, int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	
+	// Widget API
+	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetAddChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetRemoveChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetSetProperty(int widget, const char *property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetEvauluateScript(int widget, const char *script, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetProperty(int widget, const char *property, const char* valueBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetMessageData(int memStart, int messageId, int messageBufferPointer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
 }

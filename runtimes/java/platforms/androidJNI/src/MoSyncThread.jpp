@@ -62,7 +62,10 @@ import android.telephony.TelephonyManager;
 
 import android.util.Log;
 
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+
+import android.widget.FrameLayout;
 
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.TextBox;
@@ -111,6 +114,10 @@ import javax.net.SocketFactory;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 
+import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.Types;
+
 #include "helpers.h"
 
 //#define SYSLOG(a) Log.i("MoSyncThread SYSLOG", a);
@@ -130,6 +137,7 @@ public class MoSyncThread extends Thread
 	private Handler mHandler;
 	private MoSyncView mMoSyncView;
 	private boolean mHasDied;
+	private NativeUI mNativeUI;
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -155,8 +163,11 @@ public class MoSyncThread extends Thread
 		mContext = (MoSync)context;
 		mHandler = handler;
 		mHasDied = false;
-		
-		nativeInitRuntime();	
+	
+		nativeInitRuntime();
+
+		mNativeUI = new NativeUI(mContext);
+		NativeUI.setImageTable(mImageResources);
 	}
 	
 	/**
@@ -361,8 +372,7 @@ public class MoSyncThread extends Thread
 	*/
 	public void postEvent(int[] event)
 	{
-		nativePostEvent(event);
-		interrupt(); // Wake up thread.
+		EventQueue.getDefault( ).nativePostEvent(event);
 	}
 
 	/**

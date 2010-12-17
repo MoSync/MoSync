@@ -162,13 +162,7 @@ void closeListeningSocket(TCPsocket sd) {
 	SDLNet_TCP_Close(sd);	
 }
 
-bool recieveCommands(vector<string>& commands) {
-	printf(">");
-	char command[256];
-	gets(command);
-	if(strncmp(command, "exit", 4)==0 || strncmp(command, "quit", 4)==0) return false;
-
-	commands.clear();
+void splitCommands(vector<string>& commands, const char* src) {
 	char *lastCommand;
 	char *src = command;
 	while(*src) {
@@ -182,7 +176,15 @@ bool recieveCommands(vector<string>& commands) {
 		}
 		commands.push_back(lastCommand);
 	}
+}
 
+bool recieveCommands(vector<string>& commands) {
+	printf(">");
+	char command[256];
+	gets(command);
+	if(strncmp(command, "exit", 4)==0 || strncmp(command, "quit", 4)==0) return false;
+	commands.clear();	
+	splitCommands(commands, command);
 	return true;
 }
 
@@ -229,6 +231,22 @@ void buildResources() {
 void sendResources(TCPsocket client) {
 }
 
+bool loadScript(vector<string>& commands, const string& filename) {
+	FILE *file = fopen(filename.c_str(), "r");
+	if(!file) return false;
+
+	commands.clear();
+	char command[256];		
+	while(fgets(temp, 256, file)) {
+		splitCommands(commands, command); 
+	}
+	
+	if(feof(file))
+		return true;
+	else
+		return false;
+}
+
 bool mainLoop(TCPsocket sd) {
 	TCPsocket client;
 	IPaddress *remoteIP;
@@ -243,7 +261,14 @@ bool mainLoop(TCPsocket sd) {
 				printf("connected to client..\n");
 				while(recieveCommands(commands)) {
 					if(commands.size()>=1) {
-						if(commands[0] == "setFont") {
+						if(commands[0] == "loadScript") {
+							if(commands.size()!=2) printf("insufficient amount of parameters to loadScript ");
+							if(!loadScript(commands, commands[1])) {
+								printf("Couldn't load script.");
+							}
+							
+						}
+						else if(commands[0] == "setFont") {
 							if(commands.size()!=3) printf("insufficent amount of paremeters to setFont\n");
 							else {
 								// setFont id fontId

@@ -1,0 +1,43 @@
+package com.mosync.internal.android;
+
+#include <generated/MAAPI_CONSTS.h>
+#include <generated/IX_WIDGET_CONSTS.h>
+
+public class EventQueue
+{
+	public static int CLICKED = WIDGET_EVENT_CLICKED;
+	public static int ITEM_CLICKED = WIDGET_EVENT_ITEM_CLICKED;
+	
+	static
+	{
+		System.loadLibrary( "mosync" );
+	}
+
+	private static EventQueue DEFAULT = new EventQueue( );	
+	
+	public void postWidgetEvent(int widgetEventType, int widgetHandle)
+	{
+		postWidgetEvent( widgetEventType, widgetHandle, 0, 0 );
+	}
+	
+	public void postWidgetEvent(int widgetEventType, int widgetHandle, int messageId, int messageSize)
+	{
+		int event[] = new int[ 5 ];
+		
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = widgetEventType;
+		event[2] = widgetHandle;
+		event[3] = messageId;
+		event[4] = messageSize;
+		
+		nativePostEvent( event );
+	}
+
+	public static EventQueue getDefault()
+	{
+		return DEFAULT;
+	}
+
+	public native void nativePostEvent(int[] eventBuffer);
+}
+
