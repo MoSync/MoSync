@@ -13,6 +13,7 @@ const char * WIDGET_TYPE_LIST_ITEM = "ListViewItem";
 const char * WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
 const char * WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
 const char * WIDGET_TYPE_SCREEN = "Screen";
+const char * WIDGET_TYPE_TAB_SCREEN = "TabScreen";
 const char * WIDGET_TYPE_WEB_VIEW = "WebView";
 
 const char * WIDGET_PROPERTY_WIDTH = "width";
@@ -25,6 +26,9 @@ const char * WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
 
 const char * WIDGET_PROPERTY_HALIGNMENT = "horizontalAlignment";
 const char * WIDGET_PROPERTY_VALIGNMENT = "verticalAlignment";
+
+const char * WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+const char * WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 const char * WIDGET_PROPERTY_TEXT = "text";
 
 const char * WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
@@ -46,6 +50,10 @@ int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 	maWidgetSetProperty( handle, property, buffer );
 }
 
+int createListScreen();
+int createWebScreen();
+int createScreen(const char *title, int icon, const char *text);
+
 /*
  * main.cpp
  *
@@ -56,50 +64,21 @@ extern "C" int MAMain()
 {
 	int screenHeight = EXTENT_Y( maGetScrSize( ) );
 
-	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	int tabScreen = maWidgetCreate( WIDGET_TYPE_TAB_SCREEN );
 
-	// Create root layout
-	int layout = maWidgetCreate( WIDGET_TYPE_LAYOUT_VERTICAL );
-	maWidgetSetPropertyInt( layout, WIDGET_PROPERTY_WIDTH, -1 );
-	maWidgetSetPropertyInt( layout, WIDGET_PROPERTY_HEIGHT, -1 );
+	int listScreen = createListScreen( );
+	maWidgetAddChild( tabScreen, listScreen );
 
-	// Create header with some properties.
-	int header = maWidgetCreate( WIDGET_TYPE_LABEL );
-	maWidgetSetPropertyInt(header, WIDGET_PROPERTY_HEIGHT, 60 );
-	maWidgetSetPropertyInt(header, WIDGET_PROPERTY_WIDTH, -1 );
-	maWidgetSetProperty(header, WIDGET_PROPERTY_TEXT, "Header" );
-	maWidgetSetProperty(header, WIDGET_PROPERTY_HALIGNMENT, "center" );
-	maWidgetSetProperty(header, WIDGET_PROPERTY_VALIGNMENT, "center" );
-	maWidgetSetProperty(header, WIDGET_PROPERTY_FONT_COLOR, "ffffff" );
-	maWidgetSetProperty(header, WIDGET_PROPERTY_FONT_SIZE, "20.0" );
-	maWidgetAddChild( layout , header );
+	int webScreen = createWebScreen( );
+	maWidgetAddChild( tabScreen, webScreen );
 
-	// Create List
-	int list = maWidgetCreate( WIDGET_TYPE_LIST );
-	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_HEIGHT, screenHeight - 60 );
-	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_WIDTH, -1 );
-	maWidgetAddChild( layout, list );
+	int startScreen = createScreen( "Start", R_START, "Start..." );
+	maWidgetAddChild( tabScreen, startScreen );
 
-	// Add 10 buttons to the list
-	for(int i = 0; i < 10; i++)
-	{
-		int listItem = maWidgetCreate( WIDGET_TYPE_LIST_ITEM );
-		maWidgetSetProperty( listItem, "text", "Click me" );
-		maWidgetSetPropertyInt( listItem, "image", R_ICON );
-		maWidgetAddChild( list, listItem );
-	}
+	int resultsScreen = createScreen( "Results", R_RESULTS, "Results..." );
+	maWidgetAddChild( tabScreen, resultsScreen );
 
-	// Add the tree to the root
-	maWidgetAddChild( screen, layout );
-	maWidgetScreenShow( screen );
-
-	int webScreen = maWidgetCreate( WIDGET_TYPE_SCREEN );
-
-	int webView = maWidgetCreate( WIDGET_TYPE_WEB_VIEW );
-	maWidgetSetPropertyInt(webView, WIDGET_PROPERTY_WIDTH, -1 );
-	maWidgetSetPropertyInt(webView, WIDGET_PROPERTY_HEIGHT, -1 );
-
-	maWidgetAddChild( webScreen, webView );
+	maWidgetScreenShow( tabScreen );
 
 	// Wait for close event
 	while(1)
@@ -115,15 +94,63 @@ extern "C" int MAMain()
 		}
 		else if( event.type == EVENT_TYPE_WIDGET )
 		{
-			MAWidgetEventData *eventData = (MAWidgetEventData *) event.data;
-
-
-			char buffer[100];
-			sprintf( buffer, "Last clicked %d\n", eventData->widgetHandle );
-			maWidgetSetProperty( header, WIDGET_PROPERTY_TEXT, buffer );
-
-			maWidgetSetProperty( webView, "url", "http://www.google.se/" );
-			maWidgetScreenShow( webScreen );
+			maWidgetSetPropertyInt( tabScreen, "currentTab", 1 );
 		}
 	}
+}
+
+int createListScreen()
+{
+	int listScreen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	maWidgetSetProperty( listScreen, "title", "RSS" );
+	maWidgetSetPropertyInt( listScreen, "icon", R_NEWS );
+
+	// Create List
+	int list = maWidgetCreate( WIDGET_TYPE_LIST );
+	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_HEIGHT, -1 );
+	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_WIDTH, -1 );
+
+	// Add 10 buttons to the list
+	for(int i = 0; i < 10; i++)
+	{
+		int listItem = maWidgetCreate( WIDGET_TYPE_LIST_ITEM );
+		maWidgetSetProperty( listItem, "text", "Click me" );
+		maWidgetSetPropertyInt( listItem, "icon", R_ICON );
+		maWidgetAddChild( list, listItem );
+	}
+
+	// Add the tree to the root
+	maWidgetAddChild( listScreen, list );
+
+	return listScreen;
+}
+
+int createWebScreen()
+{
+	int webScreen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	maWidgetSetProperty( webScreen, "title", "Web" );
+	maWidgetSetPropertyInt( webScreen, "icon", R_TV );
+
+	int webView = maWidgetCreate( WIDGET_TYPE_WEB_VIEW );
+	maWidgetSetPropertyInt( webView, WIDGET_PROPERTY_WIDTH, -1 );
+	maWidgetSetPropertyInt( webView, WIDGET_PROPERTY_HEIGHT, -1 );
+	maWidgetSetProperty( webView, "url", "http://www.google.se/" );
+
+	maWidgetAddChild( webScreen, webView );
+
+	return webScreen;
+}
+
+int createScreen(const char *title, int icon, const char *text)
+{
+	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	maWidgetSetProperty( screen, "title", title );
+	maWidgetSetPropertyInt( screen, "icon", icon );
+
+	int textView = maWidgetCreate( WIDGET_TYPE_LABEL );
+	maWidgetSetProperty( textView, WIDGET_PROPERTY_TEXT, text );
+
+	maWidgetAddChild( screen, textView );
+
+	return screen;
 }
