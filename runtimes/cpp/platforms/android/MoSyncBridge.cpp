@@ -159,6 +159,13 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 	{
 		Core::Run2(gCore);
 		
+		// TODO: Could this be a good place to check for pending 
+		// exceptions from the Java side? 
+		// See commented out function handlePendingExceptions
+		// below for how to do this.
+		//handlePendingExceptions(env);
+		
+// TODO: Why is this code commented out? Document its purpose.
 /*
 		if(gReloadHandle > 0) {
 			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
@@ -173,6 +180,26 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 	}
 	
 }
+
+/* 
+// This is how you trap exeptions from the Java side.
+// TODO: This function is not used, but could be used
+// to check for exceptions after calling a Java method. 
+static void handlePendingExceptions(JNIEnv* env)
+{
+	jthrowable exc;
+	exc = env->ExceptionOccurred();
+	if (exc) 
+	{
+		__android_log_write(
+			ANDROID_LOG_INFO, 
+			"@@@ MoSync", 
+			"Found pending exception");
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+	}
+}
+*/
 
 /**
 * @brief nativePostEvent
@@ -232,6 +259,8 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
+	
+	SYSLOG("nativePostEvent: exit");
 }
 
 /**

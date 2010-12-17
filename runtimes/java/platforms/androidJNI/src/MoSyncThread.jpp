@@ -377,7 +377,9 @@ public class MoSyncThread extends Thread
 	public void postEvent(int[] event)
 	{
 		nativePostEvent(event);
+		Log.i("@@@ MoSync", "postEvent 1");
 		interrupt(); // Wake up thread.
+		Log.i("@@@ MoSync", "postEvent 2");
 	}
 
 	/**

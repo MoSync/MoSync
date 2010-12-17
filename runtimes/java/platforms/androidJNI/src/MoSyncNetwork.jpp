@@ -163,7 +163,7 @@ MAHandle maConnect(final String url)
 /**
  * Get the address of the connection.
  */
-int maConnGetAddr(MAHandle connHandle, int addrPointer) throws Exception 
+int maConnGetAddr(MAHandle connHandle, int addrPointer)
 {
 	Log.i("MoSyncSyscall", "maConnGetAddr");
 	
@@ -183,15 +183,29 @@ int maConnGetAddr(MAHandle connHandle, int addrPointer) throws Exception
 /**
 * Close a connection.
 */
-void maConnClose(MAHandle connHandle) throws Exception 
+void maConnClose(MAHandle connHandle)
 {
-	Log.i("MoSyncSyscall", "maConnClose: " + connHandle);
-	ConnectionObject connObj = networkGetConnectionObject(connHandle);
-	connObj.close();
-	networkRemoveConnectionObject(connObj);
+	try
+	{
+		Log.i("MoSyncSyscall", "maConnClose: " + connHandle);
+		
+		ConnectionObject connObj = networkGetConnectionObject(connHandle);
+		
+		// Remove before close so that we are certain the connection
+		// is not in the table any more. Was after close previously.
+		// Keep an eye of this, if it will cause problems.
+		networkRemoveConnectionObject(connObj);
+		
+		connObj.close();
+	}
+	catch (IOException ex)
+	{
+		Log.i("MoSyncSyscall", "maConnClose IOException: " + ex);
+		ex.printStackTrace();
+	}
 }
 
-void maConnRead(MAHandle connHandle, int dst, int size) throws IOException
+void maConnRead(MAHandle connHandle, int dst, int size)
 {
 	// TODO: Remove Log.i() printout when debugging is done.
 	Log.i("MoSyncSyscall",
@@ -206,7 +220,7 @@ void maConnRead(MAHandle connHandle, int dst, int size) throws IOException
 	connObj.read(dst, size);
 }
 
-void maConnWrite(MAHandle connHandle, int src, int size) throws IOException
+void maConnWrite(MAHandle connHandle, int src, int size)
 {
 	// TODO: Remove Log.i() printout when debugging is done.
 	Log.i("MoSyncSyscall", "maConnWrite connHandle:" + connHandle + 
@@ -220,7 +234,7 @@ void maConnWrite(MAHandle connHandle, int src, int size) throws IOException
 	connObj.write(src, size);
 }
 
-void maConnReadToData(MAHandle connHandle, MAHandle data, int offset, int size) throws IOException
+void maConnReadToData(MAHandle connHandle, MAHandle data, int offset, int size)
 {
 	// TODO: Remove Log.i() printout when debugging is done.
 	Log.i("@MoSyncSyscall", "maConnReadToData connHandle:" + connHandle + 
@@ -236,11 +250,14 @@ void maConnReadToData(MAHandle connHandle, MAHandle data, int offset, int size) 
 	connObj.readToData(data, offset, size);
 }
 
-void maConnWriteFromData(MAHandle connHandle, MAHandle data, int offset, int size) 
-	throws IOException 
+void maConnWriteFromData(
+	MAHandle connHandle, 
+	MAHandle data, 
+	int offset, 
+	int size)
 {
 	// TODO: Remove Log.i() printout when debugging is done.
-	Log.i("@MoSyncSyscall", "maConnWriteFromData connHandle:" + connHandle + 
+	Log.i("@MoSyncSyscall", "maConnWriteFromData connHandle:" + connHandle +
 		" dataHandle:" + data + " offset:" + offset + " size:" + size);
 	SYSLOG("maConnWriteFromData connHandle:" + connHandle + 
 		" dataHandle:" + data + " size:" + size);
@@ -253,7 +270,7 @@ void maConnWriteFromData(MAHandle connHandle, MAHandle data, int offset, int siz
 	connObj.writeFromData(data, offset, size);
 }
 
-MAHandle maHttpCreate(String url, int method) throws Exception
+MAHandle maHttpCreate(String url, int method)
 {
 	Log.i("MoSyncSyscall", "maHttpCreate");
 	
@@ -294,7 +311,6 @@ MAHandle maHttpCreate(String url, int method) throws Exception
 }
 
 void maHttpSetRequestHeader(MAHandle connHandle, String key, String value)
-	throws Exception
 {
 	Log.i("MoSyncSyscall", "maHttpSetRequestHeader");
 
@@ -307,7 +323,6 @@ int maHttpGetResponseHeader(
 	String key, 
 	long address, 
 	int bufSize)
-throws Exception
 {
 	Log.i("MoSyncSyscall", "maHttpGetResponseHeader");
 	
@@ -560,8 +575,11 @@ public abstract class ConnectionObject
 	public synchronized void postResultEvent(int opType, int result)
 	{
 		Log.i("ConnectionObject.postResultEvent", 
-			"mHandle: " + mHandle + " opType: " + opType + 
-			" result: " + result + " connobj (this): " + this);
+			"mHandle: " + mHandle + 
+			" mState: " + mState + 
+			" opType: " + opType + 
+			" result: " + result + 
+			" connobj (this): " + this);
 
 		// Check that state is ongoing.
 		MYASSERT((mState & opType) != 0);
@@ -609,7 +627,7 @@ public abstract class ConnectionObject
 		return -1;
 	}
 	
-	public void read(final int dst, final int size) throws IOException
+	public void read(final int dst, final int size)
 	{
 		final int opType = CONNOP_READ;
 		
@@ -643,8 +661,8 @@ public abstract class ConnectionObject
 					} 
 					else 
 					{
-						DEBUG_ALWAYS("ConnectionReaderWriter ConnRead error " + result + "!\n");
-						Log.i("ConnectionReaderWriter", "ConnRead error " + result);
+						DEBUG_ALWAYS("@@ConnectionObject ConnRead error " + result + "!\n");
+						Log.i("@@ConnectionObject", "ConnRead error " + result);
 						postResultEvent(opType, CONNERR_INTERNAL);
 					}
 				}
@@ -652,13 +670,12 @@ public abstract class ConnectionObject
 				{
 					ex.printStackTrace();
 					postResultEvent(opType, CONNERR_GENERIC);
-					return;
 				}
 			}
 		});
 	}
 	
-	public void write(final int src, final int size) throws IOException
+	public void write(final int src, final int size)
 	{
 		final int opType = CONNOP_WRITE;
 		
@@ -697,8 +714,10 @@ public abstract class ConnectionObject
 		});
 	}
 	
-	public void readToData(final MAHandle data, final int offset, final int size) 
-		throws IOException
+	public void readToData(
+		final MAHandle data, 
+		final int offset, 
+		final int size)
 	{
 		final int opType = CONNOP_READ;
 		
@@ -752,8 +771,10 @@ public abstract class ConnectionObject
 		});
 	}
 	
-	public void writeFromData(final MAHandle data, final int offset, final int size)
-		throws IOException
+	public void writeFromData(
+		final MAHandle data, 
+		final int offset, 
+		final int size)
 	{
 		final int opType = CONNOP_WRITE;
 		
@@ -973,12 +994,10 @@ class UrlConnectionObject extends ConnectionObject
 		} 
 		catch (IllegalStateException ex)
 		{
-			PRINT_STACK_TRACE;
 			ex.printStackTrace();
 		} 
 		catch (NullPointerException ex)
 		{
-			PRINT_STACK_TRACE;
 			ex.printStackTrace();
 		}
 	}
@@ -1021,70 +1040,115 @@ class UrlConnectionObject extends ConnectionObject
 	}
 	
 	@Override
-	public void read(int dst, int size) throws IOException
+	public void read(int dst, int size)
 	{
 		// There must not be any ongoing read operation.
 		// TODO: This check is redundant as it is done
 		// in the superclass method.
 		MYASSERT((mState & CONNOP_READ) == 0);
 		
-		// Get the input stream.
-		if (null == getInputStream())
+		try
 		{
-			setInputStream(mUrlConnection.getInputStream());
+			// Get the input stream.
+			if (null == getInputStream())
+			{
+				setInputStream(mUrlConnection.getInputStream());
+			}
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			// Need to enter read state before postResultEvent.
+			enterStateRead();
+			postResultEvent(CONNOP_READ, CONNERR_GENERIC);
+			return;
 		}
 		
 		super.read(dst, size);
 	}
 	
 	@Override
-	public void write(int src, int size) throws IOException
+	public void write(int src, int size)
 	{
 		// There must not be any ongoing write operation.
 		// TODO: This check is redundant as it is done
 		// in the superclass method.
 		MYASSERT((mState & CONNOP_WRITE) == 0);
 		
-		// Get the output stream.
-		if (null == getOutputStream())
+		try
 		{
-			setOutputStream(mUrlConnection.getOutputStream());
+			// Get the output stream.
+			if (null == getOutputStream())
+			{
+				setOutputStream(mUrlConnection.getOutputStream());
+			}
 		}
-		
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			// Need to enter write state before postResultEvent.
+			enterStateWrite();
+			postResultEvent(CONNOP_WRITE, CONNERR_GENERIC);
+			return;
+		}
+			
 		super.write(src, size);
 	}
 	
 	@Override
-	public void readToData(MAHandle data, int offset, int size) throws IOException
+	public void readToData(MAHandle data, int offset, int size) 
+	//throws IOException
 	{
 		// There must not be any ongoing read operation.
 		// TODO: This check is redundant as it is done
 		// in the superclass method.
 		MYASSERT((mState & CONNOP_READ) == 0);
-		
-		// Get the input stream.
-		if (null == getInputStream())
+		try
 		{
-			setInputStream(mUrlConnection.getInputStream());
+			// Get the input stream.
+			if (null == getInputStream())
+			{
+				setInputStream(mUrlConnection.getInputStream());
+			}
+		
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			// Need to enter read state before postResultEvent.
+			enterStateRead();
+			postResultEvent(CONNOP_READ, CONNERR_GENERIC);
+			return;
 		}
 		
 		super.readToData(data, offset, size);
 	}
 	
 	@Override
-	public void writeFromData(MAHandle data, int offset, int size) throws IOException
+	public void writeFromData(MAHandle data, int offset, int size)
 	{
 		// There must not be any ongoing write operation.
 		// TODO: This check is redundant as it is done
 		// in the superclass method.
 		MYASSERT((mState & CONNOP_WRITE) == 0);
 		
-		// Get the output stream.
-		if (null == getOutputStream())
+		try
 		{
-			setOutputStream(mUrlConnection.getOutputStream());
+			// Get the output stream.
+			if (null == getOutputStream())
+			{
+				setOutputStream(mUrlConnection.getOutputStream());
+			}
 		}
-		
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			// Need to enter write state before postResultEvent.
+			enterStateWrite();
+			postResultEvent(CONNOP_WRITE, CONNERR_GENERIC);
+			return;
+		}
+			
 		super.writeFromData(data, offset, size);
 	}
 	
@@ -1165,11 +1229,21 @@ class UrlConnectionObject extends ConnectionObject
 			postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 			return;
 		}
+		catch (UnknownHostException ex)
+		{
+			Log.i("@@@ MoSync", "UnknownHostException");
+			ex.printStackTrace();
+			postResultEvent(CONNOP_FINISH, CONNERR_DNS);
+		}
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
-			postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
-			return;
+			postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
 		}
 	}
 	
@@ -1226,12 +1300,23 @@ class UrlConnectionObject extends ConnectionObject
 
 			postResultEvent(CONNOP_FINISH, result);
 		} 
-		catch (InterruptedIOException ex) 
+		catch (InterruptedIOException ex)
 		{
 			ex.printStackTrace();
 			postResultEvent(CONNOP_FINISH, CONNERR_CANCELED);
-		} 
-		catch (IOException ex) 
+		}
+		catch (UnknownHostException ex)
+		{
+			Log.i("@@@ MoSync", "UnknownHostException");
+			ex.printStackTrace();
+			postResultEvent(CONNOP_FINISH, CONNERR_DNS);
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+			postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
+		}
+		catch (Exception ex)
 		{
 			ex.printStackTrace();
 			postResultEvent(CONNOP_FINISH, CONNERR_GENERIC);
@@ -1649,7 +1734,7 @@ class BluetoothConnectionObject extends ConnectionObject
 					
 					doConnect();
 				}
-				catch (Throwable ex)
+				catch (Exception ex)
 				{
 					ex.printStackTrace();
 				}
