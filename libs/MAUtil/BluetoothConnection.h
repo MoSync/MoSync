@@ -51,6 +51,9 @@ namespace MAUtil {
 
 		/**
 		* Asynchronously opens a connection using a Bluetooth address and UUID.
+		* 
+		* Note: there is a simpler connect method that takes just a 
+		* URL: connect(const char* url)
 		*
 		* Service discovery is performed. If a service is found, a connection
 		* is opened.
@@ -75,8 +78,8 @@ namespace MAUtil {
 		int connect(const MABtAddr& address, const MAUUID& uuid);
 
 		/**
-		* Asynchronously opens a connection using a URL that specifies
-		* a Bluetooth address and a UUID.
+		* This is a simpler connect method that asynchronously opens a connection
+		* using a URL that contains a Bluetooth address and a service UUID. 
 		*
 		* Service discovery is performed. If a service is found, a connection
 		* is opened.
