@@ -54,7 +54,7 @@
 		UILabel* label = cell.textLabel;
 		label.text = value;
 	} 
-	else if([key isEqualToString:@"image"]) {
+	else if([key isEqualToString:@"icon"]) {
 		int imageHandle = [value intValue];
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;

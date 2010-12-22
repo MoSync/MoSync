@@ -40,7 +40,14 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"title"]) {
 		controller.title = value;
-	} else {
+	} 
+	else if([key isEqualToString:@"currentTab"]) {
+		UITabBarController* tabBarController = (UITabBarController*)controller;
+		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex: [value intValue]]; 
+		//tabBarController.selectedIndex = [value intValue];
+		//[tabBarController.selectedViewController viewDidAppear:YES];
+	}
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MA_WIDGET_OK;	

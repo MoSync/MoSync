@@ -15,7 +15,6 @@ const char * WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
 const char * WIDGET_TYPE_SCREEN = "Screen";
 const char * WIDGET_TYPE_TAB_SCREEN = "TabScreen";
 const char * WIDGET_TYPE_WEB_VIEW = "WebView";
-const char * WIDGET_TYPE_TAB_SCREEN = "TabScreen";
 const char * WIDGET_TYPE_NAV_SCREEN = "NavScreen";
 
 const char * WIDGET_PROPERTY_WIDTH = "width";
