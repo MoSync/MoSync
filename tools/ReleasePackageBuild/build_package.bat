@@ -153,6 +153,14 @@ cd %ORIGINAL_PATH%
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
+@echo.
+@echo ------------------------------------------------
+@echo Copying rules.
+@echo ------------------------------------------------
+@xcopy %MOSYNC_TRUNK%\rules %MOSYNC_PATH%\rules\ /y /E /D
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
 @xcopy %MOSYNC_TRUNK%\MoSyncRules.rules %MOSYNC_PATH%\ /y /D
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.

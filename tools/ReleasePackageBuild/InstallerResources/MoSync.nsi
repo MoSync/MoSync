@@ -118,6 +118,7 @@ Section "MoSync (required)" MoSync
   IfFileExists "$INSTDIR\lib\*.*" feError
   IfFileExists "$INSTDIR\null\*.*" feError
   IfFileExists "$INSTDIR\profiles\*.*" feError
+  IfFileExists "$INSTDIR\rules\*.*" feError
   IfFileExists "$INSTDIR\skins\*.*" feError
   IfFileExists "$INSTDIR\templates\*.*" feError
 
@@ -135,6 +136,7 @@ removeoldfiles:
   RMDir /r "$INSTDIR\lib"
   RMDir /r "$INSTDIR\null"
   RMDir /r "$INSTDIR\profiles"
+  RMDir /r "$INSTDIR\rules"
   RMDir /r "$INSTDIR\skins"
   RMDir /r "$INSTDIR\templates"
   Delete $INSTDIR\MoSyncRules.rules
@@ -158,6 +160,7 @@ getOnWithIt:
   File /nonfatal /r "include"
   File /nonfatal /r "profiles"
   File /nonfatal /r "lib"
+  File /nonfatal /r "rules"
   File /nonfatal /r "skins"
   File /nonfatal /r "templates"
   File /nonfatal /r "etc"
