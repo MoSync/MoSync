@@ -3056,6 +3056,7 @@ interface MAAPI {
 		}
 
 #if IX_OPENGL_ES
+#include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
 #endif
 	}

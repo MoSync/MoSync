@@ -608,13 +608,16 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		if(isPointerType(inf, a.type) || !a.in) {
 			invokeArgs += "(int)";
 		}
-		if(a.type == "double" && a.in) {
+
+		string resolved = resolveType(inf, a.type);
+
+		if(resolved == "double" && a.in) {
 			string tvn = "_" + a.name;
 			tempVars += "\tMA_DV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".d = " + a.name + ";\n";
 			invokeArgs += tvn + ".hi, " + tvn + ".lo";
 			usedArgs++;
-		} else if(a.type == "float" && a.in) {
+		} else if(resolved == "float" && a.in) {
 			string tvn = "_" + a.name;
 			tempVars += "\tMA_FV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".f = " + a.name + ";\n";

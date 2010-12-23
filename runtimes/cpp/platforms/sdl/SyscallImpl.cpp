@@ -134,8 +134,10 @@ namespace Base {
 	static SDL_mutex* gTimerMutex = NULL;
 	static bool gShowScreen;
 
+#ifdef SUPPORT_OPENGL_ES
 	static SubView sSubView;
 	static bool sOpenGLMode = false;
+#endif
 
 	static MoRE::DeviceSkin* sSkin = NULL;
 
@@ -394,10 +396,6 @@ namespace Base {
 				sSkin->drawScreen();
 				SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 			}
-
-			TEST_Z(Base::subViewOpen(sSkin->getScreenLeft(), sSkin->getScreenTop(), sSkin->getScreenWidth(), sSkin->getScreenHeight(), sSubView));
-			TEST_Z(Base::openGLInit(sSubView));
-			sOpenGLMode = true;
 
 			char caption[1024];
 			if(settings.id != NULL) {
@@ -862,9 +860,12 @@ namespace Base {
 		SDL_Event event;
 		bool ret = false;
 
+#ifdef SUPPORT_OPENGL_ES
 		if(sOpenGLMode) {
 			Base::openGLProcessEvents(sSubView);
 		}
+#endif
+
 		while((PollEventResult = FE_PollEvent(&event)) > 0) {
 			switch(event.type) {
 			case SDL_ACTIVEEVENT:
@@ -1135,8 +1136,11 @@ namespace Base {
 			return;
 		MAUpdateScreen();
 		MAProcessEvents();
+
+#ifdef SUPPORT_OPENGL_ES
 		if(sOpenGLMode)
 				Base::openGLSwap(sSubView);
+#endif
 	}
 	SYSCALL(void, maResetBacklight()) {
 	}
@@ -1837,6 +1841,51 @@ namespace Base {
 		return d;
 	}
 #endif
+
+	int maOpenGLInitFullscreen() {
+		TEST_Z(Base::subViewOpen(sSkin->getScreenLeft(), sSkin->getScreenTop(), sSkin->getScreenWidth(), sSkin->getScreenHeight(), sSubView));
+		TEST_Z(Base::openGLInit(sSubView));
+		sOpenGLMode = true;
+
+		return 0;
+	}
+
+	int maOpenGLCloseFullscreen() {
+		TEST_Z(Base::openGLClose(sSubView));
+		TEST_Z(Base::subViewClose(sSubView));
+		return 0;
+	}
+
+	int maOpenGLTexImage2D(MAHandle image) {
+		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);
+	
+        // get the number of channels in the SDL surface
+        GLint nOfColors = surface->format->BytesPerPixel;
+		GLenum texture_format = 0;
+        if (nOfColors == 4)     // contains an alpha channel
+        {
+                if (surface->format->Bmask == 0x000000ff)
+                        texture_format = GL_RGBA;
+               // else
+               //         texture_format = GL_BGRA;
+        } else if (nOfColors == 3)     // no alpha channel
+        {
+                if (surface->format->Bmask == 0x000000ff)
+                        texture_format = GL_RGB;
+               // else
+               //         texture_format = GL_BGR;
+        } 
+		
+		if(texture_format == 0) {
+			return MA_GL_TEX_IMAGE_2D_INVALID_IMAGE;
+		}
+ 	 
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexImage2D( GL_TEXTURE_2D, 0, nOfColors, surface->w, surface->h, 0,
+						  texture_format, GL_UNSIGNED_BYTE, surface->pixels );
+
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
