@@ -6,6 +6,11 @@
 #include <ma.h>
 #include <GLES\glplatform.h>
 
+#ifndef __cplusplus
+typedef union MA_DV MA_DV;
+typedef union MA_FV MA_FV;
+#endif
+
 //typedef void* MAAddress;
 #include "IX_OPENGL_ES.H"
 
@@ -583,8 +588,6 @@ typedef int             GLsizeiptr;
 #define GL_DOT3_RGBA                      0x86AF
 
 /*************************************************************/
-
-//#include "magl_functions.h"
 
 #ifdef __cplusplus
 }
