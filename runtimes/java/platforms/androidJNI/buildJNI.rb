@@ -121,7 +121,7 @@ puts "Preprocess Java Source Files\n\n"
 FileUtils.cd ".."
 puts FileUtils.pwd
 
-success = system "ruby buildJava.rb"
+success = system "ruby buildJava2.rb"
 if (!success)
 	exitBuilder(1, thirdarg)
 end
@@ -141,7 +141,13 @@ system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidMan
 puts "Compile Java Source Files\n\n"
 
 # Compile all the java files into class files
-success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+success = system(
+	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
+	"-classpath " +
+	"#{secondarg}/android.jar " +
+	"#{package_root}/src/com/mosync/java/android/*.java " +
+	"#{package_root}/src/com/mosync/internal/android/*.java " +
+	"#{package_root}/src/com/mosync/internal/generated/*.java");
 if (!success)
 	exitBuilder(1,thirdarg)
 end

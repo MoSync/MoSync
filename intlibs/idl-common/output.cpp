@@ -41,6 +41,11 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
 static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName);
+static void streamJavaConstants(
+	ostream& stream, 
+	const vector<ConstSet>& 
+	constSets, 
+	int ix);
 
 #if 0
 static void deleteCallback(const char* filename) {
@@ -193,6 +198,77 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	}
 
 	stream << "#endif	//" + headerName + "_H\n";
+}
+
+/**
+ * Generate the content of a .java class file for the main MoSync API
+ * or the given interface.
+ * @param stream The output stream.
+ * @param className Name of the class.
+ * @param apiData The parsed API data.
+ * @param ix The id of the extension to generate definitions for. 
+ * Also used to specify if definitions for the main API is to be generated.
+ */
+void streamJavaDefinitionFile(
+	ostream& stream, 
+	const string& className,
+	const Interface& apiData,
+	int ix)
+{
+	stream << "package com.mosync.internal.generated;\n\n";
+	stream << "public class " << className << "\n";
+	stream << "{\n";
+
+	streamJavaConstants(stream, apiData.constSets, ix);
+
+	stream << "}\n";
+}
+
+/**
+ * Generate constants for a Java definition class file.
+ * @param stream The output stream.
+ * @param constSets Constant definitions.
+ * @param ix The id of the extension to generate definitions for. 
+ * Also used to specify if definitions for the main API is to be generated.
+ */
+static void streamJavaConstants(
+	ostream& stream, 
+	const vector<ConstSet>& constSets, 
+	int ix) 
+{
+	for(size_t i=0; i<constSets.size(); i++) 
+	{
+		const ConstSet& cs(constSets[i]);
+		bool anyStreamed = false;
+		for(size_t j=0; j<cs.constants.size(); j++) 
+		{
+			const Constant& c(cs.constants[j]);
+			if (c.ix != ix)
+			{
+				continue;
+			}
+
+			if (anyStreamed && 
+				(c.comment.size() != 0 
+				|| cs.constants[j-1].comment.size() != 0))
+			{
+				stream << "\n";
+			}
+			stream << c.comment;
+			stream 
+				<< "\tpublic static final int " 
+				<< cs.name 
+				<< c.name 
+				<< " = " 
+				<< c.value 
+				<< ";\n";
+			anyStreamed = true;
+		}
+		if (anyStreamed)
+		{
+			stream << "\n";
+		}
+	}
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
