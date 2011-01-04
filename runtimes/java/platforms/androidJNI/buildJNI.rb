@@ -72,8 +72,9 @@ if secondarg == nil
 	exit 1
 end
 
-# Store the current android version in the environment variable MOSYNC_ANDROID_API_LEVEL
-ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
+# TODO: MOSYNC_ANDROID_API_LEVEL is not used I guess! Remove it.
+# Store the API level in the environment variable MOSYNC_ANDROID_API_LEVEL
+#ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
 
 debug = (fortharg == nil) ? "" : "D"
 
