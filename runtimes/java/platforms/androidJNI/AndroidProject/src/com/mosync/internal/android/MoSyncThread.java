@@ -204,7 +204,7 @@ public class MoSyncThread extends Thread
 	private Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private Rect mMaDrawImageRegionTempDestRect = new Rect();
 
-	ByteBuffer tempImageRawBuffer;
+	ByteBuffer mTempImageRawBuffer;
 	
 	int mMaxStoreId = 0;
 
@@ -527,6 +527,46 @@ public class MoSyncThread extends Thread
 		return mBinaryResources.get(handle);
 	}
 
+	public byte[] getUnloadedBinaryResourceAsByteArray(int handle)
+	{
+		UBinData uBinData = (UBinData) mUBinaryResources.get(handle);
+		if (null == uBinData)
+		{
+			// Handle not found.
+			return null;
+		}
+		
+		try
+		{
+			// Read data from the resource asset file. 
+			// All resources are bundled into this file.
+			AssetManager assetManager = mContext.getAssets();
+			InputStream resourceFileInputStream = 
+				assetManager.open(RESOURCE_FILE);
+		
+			// Position the stream pointer to the offset where
+			// the data starts.
+			resourceFileInputStream.skip(
+				uBinData.getOffset() - getResourceStartOffset());
+			
+			// Allocate byte array to hold data.
+			byte[] resourceData = new byte[uBinData.getSize()];
+			
+			// Read from asset file into the data array.
+			resourceFileInputStream.read(resourceData);
+			
+			// Close input stream.
+			resourceFileInputStream.close();
+			
+			return resourceData;
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
 	boolean initSyscalls()
 	{
 		SYSLOG("initSyscalls");
@@ -1234,8 +1274,10 @@ public class MoSyncThread extends Thread
 			try
 			{
 				// Load binary data into resource memory.
+				binData.mark();
 				binData.position(offset);
 				binData.get(resourceData);
+				binData.reset();
 			}
 			catch(Exception ex)
 			{
@@ -1280,6 +1322,9 @@ public class MoSyncThread extends Thread
 					
 					// Read from asset file into the data array.
 					resourceFileInputStream.read(resourceData);
+					
+					// Close input stream.
+					resourceFileInputStream.close();
 				}
 				catch(Exception e)
 				{
@@ -1293,7 +1338,7 @@ public class MoSyncThread extends Thread
 		
 		try 
 		{
-			// Create a Bitmap object from the resoure data.
+			// Create a Bitmap object from the resource data.
 			Bitmap decodedImage = BitmapFactory.decodeByteArray(
 				resourceData, 0, resourceData.length);
 			if (decodedImage == null)
@@ -1305,7 +1350,7 @@ public class MoSyncThread extends Thread
 			mImageResources.put(
 				placeholder, new ImageCache(null, decodedImage));
 		} 
-		catch(UnsupportedOperationException e) 
+		catch (UnsupportedOperationException e) 
 		{
 			logError("maCreateImageFromData - " 
 				+ "Unsupported operation, exception : " + e, e);
@@ -1332,10 +1377,10 @@ public class MoSyncThread extends Thread
 	 */
 	ByteBuffer _maCreateImageRawGetData(int size)
 	{
-		tempImageRawBuffer = ByteBuffer.allocateDirect(size);
-		tempImageRawBuffer.order(null);
+		mTempImageRawBuffer = ByteBuffer.allocateDirect(size);
+		mTempImageRawBuffer.order(null);
 		
-		return tempImageRawBuffer;
+		return mTempImageRawBuffer;
 	}
 
 	/**
@@ -1353,8 +1398,8 @@ public class MoSyncThread extends Thread
 			maPanic(1, "Unable to create ");
 		}
 		
-		tempImageRawBuffer.position(0);
-		bitmap.copyPixelsFromBuffer(tempImageRawBuffer);
+		mTempImageRawBuffer.position(0);
+		bitmap.copyPixelsFromBuffer(mTempImageRawBuffer);
 		
 		mImageResources.put(placeholder, new ImageCache(null, bitmap));
 			
@@ -1857,11 +1902,10 @@ public class MoSyncThread extends Thread
 				{
 					return false;
 				}
-				
-				int p = bb.position();
+				bb.mark();
 				bb.position(pos);
 				bb.get(ra);
-				bb.position(p);
+				bb.reset();
 			}
 			else // is ubin
 			{

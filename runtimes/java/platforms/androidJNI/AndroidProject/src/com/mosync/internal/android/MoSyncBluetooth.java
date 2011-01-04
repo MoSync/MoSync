@@ -115,7 +115,7 @@ public class MoSyncBluetooth
 	int BLUETOOTH_DISCOVERY_FINISHED = 3;
 
 	/**
-	 * Max time to wait for eabling Bluettoth etc.
+	 * Max time to wait for enabling Bluetooth etc.
 	 */
 	int BLUETOOTH_MAX_SECONDS_TO_WAIT = 60;
 

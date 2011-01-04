@@ -21,6 +21,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_H
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_SHOWN;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -79,22 +81,57 @@ public class MoSyncHomeScreen
 		try 
 		{
 			// Get the data object.
-			ImageCache image = (ImageCache) 
-				mMoSyncThread.getImageResource(handle);
-			if (image == null) { return -1; }
+			//ImageCache image = (ImageCache) 
+			//	mMoSyncThread.getImageResource(handle);
+			
+			// Byte array that holds image data.
+			byte[] imageData;
+			
+			// Is the handle that holds the image data a binary resource?
+			ByteBuffer dataBuffer = mMoSyncThread.getBinaryResource(handle);
+
+			if (null != dataBuffer) 
+			{
+				// Allocate byte array.
+				imageData = new byte[dataBuffer.capacity()];
+				
+				// Copy image data into array.
+				dataBuffer.mark();
+				dataBuffer.position(0);
+				dataBuffer.get(imageData);
+				dataBuffer.reset();
+			}
+			else
+			{ 
+				// Perhaps the handle is an unloaded binary resource?
+				imageData = mMoSyncThread.getUnloadedBinaryResourceAsByteArray(handle);
+				if (null == imageData) 
+				{ 
+					// Handle was not found.
+					return -1; 
+				}
+			}
+			
+			// Create bitmap from image data.
+			Bitmap bitmap = BitmapFactory.decodeByteArray(
+				imageData,
+				0, 
+				imageData.length);
 			
 			// WallpaperManager is available only on Android 5 and above.
 			// Try to set using the wrapper class. If class loading fails, 
-			// use old method.
+			// use old way to set wallpaper.
 			try 
 			{
+				// New way.
 				new WallpaperManagerWrapper().setWallpaper(
-					image.mBitmap,
+					bitmap,
 					mMoSyncThread.getActivity());
 			}
 			catch (java.lang.VerifyError error)
 			{
-				getActivity().setWallpaper(image.mBitmap);
+				// Old way.
+				getActivity().setWallpaper(bitmap);
 			}
 			
 			return 0;
