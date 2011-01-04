@@ -26,15 +26,17 @@ require 'fileutils'
 # Copy shared generated Java files to package com.mosync.internal.android.
 #
 
-# Set the source directory path.
+# Set directory paths.
 sharedGeneratedJavaSourceDir = "../../Shared/generated/"
+outDir = "AndroidProject/src/com/mosync/internal/generated/"
+
 # TODO: Document when this is used. On the build server?
 if(ENV['MOSYNC_SRC'] != nil)
 	shared_java_source = ENV['MOSYNC_SRC'] + "/runtimes/java/Shared/generated/"
+	outDir = ENV['MOSYNC_SRC'] + 
+		"/runtimes/java/platforms/AndroidJNI/" +
+		"AndroidProject/src/com/mosync/internal/generated/"
 end
-
-# Set the output directory path.
-outDir = "AndroidProject/src/com/mosync/internal/generated/"
 
 puts "sharedGeneratedJavaSourceDir: " + sharedGeneratedJavaSourceDir
 puts "outDir: " + outDir
