@@ -160,7 +160,13 @@ int main() {
 		copy("Output/syscall_static_java.h", "../../runtimes/java/Shared/generated/");
 		copy("Output/core_consts.h", "../../runtimes/java/Shared/generated/");
 		copy("Output/MAAPI_consts.h", "../../runtimes/java/Shared/generated/");
-		copy("Output/MAAPI_consts.java", "../../runtimes/java/Shared/generated/");
+
+		// Create folder for generated java files in the Android runtime.
+		_mkdir("../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated");
+
+		// Copy generated Android file.
+		copy("Output/MAAPI_consts.java", 
+			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
@@ -182,7 +188,10 @@ int main() {
 			copy("Output/" + ixs[i] + ".h", "../../libs/MAStd/");
 			copy("Output/" + ixs[i] + ".h", "../../libs/newlib/libc/sys/mosync/");
 			copy("Output/" + ixs[i] + "_CONSTS.h", "../../runtimes/java/Shared/generated/");
-			copy("Output/" + ixs[i] + ".java", "../../runtimes/java/Shared/generated/");
+
+			// Copy generated Android files.
+			copy("Output/" + ixs[i] + ".java", 
+				"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 		}
 
 		return 0;

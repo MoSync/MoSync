@@ -116,16 +116,23 @@ if (!success)
 	exitBuilder(1, thirdarg)
 end
 
-puts "Preprocess Java Source Files\n\n"
+# TODO: Delete commented out code when we are sure it is not needed.
+##puts "Preprocess Java Source Files\n\n"
 
+# Go to Android Java runtime root directory.
 FileUtils.cd ".."
 puts FileUtils.pwd
 
-success = system "ruby buildJava2.rb"
-if (!success)
-	exitBuilder(1, thirdarg)
-end
+# TODO: Delete commented out code when we are sure it is not needed.
+# Not used, there are no longer any .jpp files to build.
+#success = system "ruby buildJava.rb"
+#if (!success)
+#	exitBuilder(1, thirdarg)
+#end
 
+# Create temporary directory used for output.
+# First make sure delete it if it exists to make 
+# sure we get an empty directory.
 class_dir = "temp/"
 if File.exist? class_dir
 	FileUtils.rm_rf class_dir # delete everything in it and itself
@@ -136,7 +143,12 @@ puts "Build Android package\n\n"
 
 # Build Android package file
 package_root = "#{cpath}/AndroidProject/"
-system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
+system(
+	"#{secondarg}../../tools/aapt package -f -v -M " +
+	"#{package_root}/AndroidManifest.xml -F resources.ap_ -I " +
+	"#{secondarg}/android.jar -S " +
+	"#{package_root}/res -m -J " +
+	"#{package_root}src");
 	
 puts "Compile Java Source Files\n\n"
 
@@ -175,7 +187,7 @@ FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debu
 
 FileUtils.cd ".."
 
-# clean up
+# Delete temp dir.
 FileUtils.rm_rf class_dir
 
 if (!success)
