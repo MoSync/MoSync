@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -29,7 +29,8 @@ namespace MAUI {
 		return true;
 	}
 
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, MAHandle res) 
+	AnimatedImage::AnimatedImage(	int x, int y, int width,
+									int height, MAHandle res) 
 		: Widget(x, y, width, height),
 		mLoop(true),
 		mCurrentFrame(0),
@@ -48,16 +49,16 @@ namespace MAUI {
 
 	void AnimatedImage::drawWidget() {
 		if(mResource) {
-			// void maDrawImageRegion(MAHandle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode);
 			MARect srcRect;
 			srcRect.left  = (mCurrentFrame*mFrameWidth)%(EXTENT_X(mResSize));
 			srcRect.width = mFrameWidth;
-			srcRect.top   = ((mCurrentFrame*mFrameWidth)/(EXTENT_X(mResSize)))*mFrameHeight;
+			srcRect.top   = ((mCurrentFrame*mFrameWidth)/(EXTENT_X(mResSize)))
+							*mFrameHeight;
 			srcRect.height = mFrameHeight;
+			
 			//MAPoint2d destPoint = {mPaddedBounds.x, mPaddedBounds.y};
 			MAPoint2d destPoint = {0, 0};
 
-			//maDrawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
 			Gfx_drawImageRegion(mResource, &srcRect, &destPoint, TRANS_NONE);
 		}
 	}
@@ -74,7 +75,6 @@ namespace MAUI {
 	}
 
 	void AnimatedImage::start() {
-		//MAUtil::Environment::getEnvironment().addIdleListener(this);
 		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);	
 	}
 

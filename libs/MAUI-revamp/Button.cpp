@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+ 
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
+
 #include "Button.h"
 #include "Engine.h"
 #include <mastdlib.h>
@@ -6,9 +23,9 @@
 namespace MAUI {
 
 Button::Button(int x, int y, int width, int height, const String& caption)
-: Label(x, y, width, height, caption), mPressed(false),
-mSkinFocusedPressed(NULL), mSkinFocusedReleased(NULL),
-mSkinUnfocusedReleased(NULL), mListeners(false)
+	: Label(x, y, width, height, caption), mPressed(false),
+		mSkinFocusedPressed(NULL), mSkinFocusedReleased(NULL),
+		mSkinUnfocusedReleased(NULL), mListeners(false)
 {
 	this->setHorizontalAlignment(Label::HA_CENTER);
 	this->setVerticalAlignment(Label::VA_CENTER);
@@ -51,30 +68,26 @@ bool Button::pointerReleased(MAPoint2d p, int id) {
 }
 
 void Button::drawWidget() {
-	/*
-	const ButtonStyle* style = (const ButtonStyle*)getStyle();
-	if(style == NULL) {
-		style = (const ButtonStyle*)Engine::getSingleton().getDefaultStyle("Button");
-		setStyle(style);
-	}
-	*/
-
 	if(mFocused) {
 		if(mPressed) {
 			if(mSkinFocusedPressed) {
-				mSkinFocusedPressed->draw(0, 0, mBounds.width, mBounds.height);
+				mSkinFocusedPressed->draw(0, 0, mBounds.width,
+												mBounds.height);
 			}
 		} else {
 			if(mSkinFocusedReleased) {
-				mSkinFocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
+				mSkinFocusedReleased->draw(0, 0, mBounds.width,
+												mBounds.height);
 			}
 		}
 	} else {
 		if(!mPressed) {
 			if(mSkinUnfocusedReleased)
-				mSkinUnfocusedReleased->draw(0, 0, mBounds.width, mBounds.height);
+				mSkinUnfocusedReleased->draw(0, 0, mBounds.width, 
+												mBounds.height);
 		} else {
-			maPanic(1, "Something is wrong, button can't be unfocused and pressed");
+			maPanic(1, "Something is wrong, "
+						"button can't be unfocused and pressed");
 		}
 	}
 
@@ -87,9 +100,14 @@ void Button::restyle() {
 	}
 	const ButtonStyle* style = (const ButtonStyle*)getStyle();
 
-	mSkinFocusedPressed = style->getSafe<DrawableProperty>("skinFocusedPressed")->mDrawable;
-	mSkinFocusedReleased = style->getSafe<DrawableProperty>("skinFocusedReleased")->mDrawable;
-	mSkinUnfocusedReleased = style->getSafe<DrawableProperty>("skinUnfocusedReleased")->mDrawable;
+	mSkinFocusedPressed = style->getSafe<DrawableProperty>
+									("skinFocusedPressed")->mDrawable;
+	
+	mSkinFocusedReleased = style->getSafe<DrawableProperty>
+									("skinFocusedReleased")->mDrawable;
+	
+	mSkinUnfocusedReleased = style->getSafe<DrawableProperty>
+									("skinUnfocusedReleased")->mDrawable;
 	Label::restyle();
 }
 
@@ -101,7 +119,8 @@ void Button::setFocused(bool focused) {
 	Widget::setFocused(focused);
 	if(mPressed==true && focused == false) {
 		mPressed = false;
-		// do not send onButtonEvent(this, false) event here (it's obviously been cancelled before released).
+		// do not send onButtonEvent(this, false) event here
+		// (it's obviously been cancelled before released).
 	}
 	requestRepaint();
 }
