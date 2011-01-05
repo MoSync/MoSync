@@ -215,6 +215,18 @@ void failFunction();
 #define LOGWBIN(v, i)
 #endif  //WLAN_DEBUGGING_MODE
 
+#ifdef FILE_DEBUGGING_MODE
+#define LOGF LOG
+#define LOGFBIN LOGBIN
+#else
+#ifdef SYMBIAN
+#define LOGF(a...)
+#else
+#define LOGF(...)
+#endif	//SYMBIAN
+#define LOGFBIN(v, i)
+#endif  //FILE_DEBUGGING_MODE
+
 #define LOG_RES LOG
 
 #endif	//LOG_H

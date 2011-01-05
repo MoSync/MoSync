@@ -109,6 +109,7 @@ static bool start_sim() {
 		return false;
 	}
 	gSimProcess = pi.hProcess;
+	Sleep(2000);	//hack
 	
 #elif defined(DARWIN)
 	// Mac OS X specific code.

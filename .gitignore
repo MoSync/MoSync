@@ -65,6 +65,7 @@ stabs.tab
 /runtimes/cpp/platforms/symbian/inc/config_platform.h
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
+/testPrograms/sld.tab
 
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
@@ -77,6 +78,9 @@ stabs.tab
 /runtimes/cpp/platforms/symbian/group*/*.cwlink
 /runtimes/cpp/platforms/symbian/group*/MoSync_Data/*
 /runtimes/cpp/platforms/symbian/group-ed3/MoSync_icon.mif
+
+/runtimes/cpp/platforms/symbian/server/ABLD.BAT
+/runtimes/cpp/platforms/symbian/server/MoSyncServer.SIS
 
 /runtimes/cpp/platforms/symbian/sis-ed3/1/*
 /runtimes/cpp/platforms/symbian/sis-ed5/1/*
@@ -104,8 +108,12 @@ stabs.tab
 /tools/debugger/operations_generated.cpp
 /tools/debugger/operations_generated.h
 /tools/debugger/mdb_log.txt
-
+/tools/debugger/fp.xml
+/tools/debugger/mdb_commands.txt
+/tools/debugger/profile.txt
+/tools/debugger/sld.tab
 /tools/debugger/start.bat
+/tools/debugger/filesystem
 
 /runtimes/cpp/platforms/sdl/MoRE/sld.tab
 /runtimes/cpp/platforms/sdl/MoRE/fp.xml
@@ -126,3 +134,8 @@ stabs.tab
 /runtimes/java/platforms/androidJNI/AndroidProject/libs
 /runtimes/java/platforms/androidJNI/resources.ap_
 /runtimes/java/platforms/androidJNI/src/config_platform.h.saved
+
+/tests/libc-suite/fp.xml
+/tests/libc-suite/profile.txt
+/tests/libc-suite/settings.rb
+/tests/libc-suite/filesystem

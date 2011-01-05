@@ -70,11 +70,22 @@ uid_t getuid(void) {
 }
 
 struct passwd* getpwuid(uid_t uid) {
-	return NULL;
+	//quick hack
+	static struct passwd p = { (char*)"mosync", (char*)"", 0, 0, (char*)"", NULL, NULL, NULL };
+	if(uid == 0)
+		return &p;
+	else
+		return NULL;
 }
 
 struct group* getgrgid(gid_t gid) {
-	return NULL;
+	//quick hack
+	static char* users[] = { (char*)"mosync", NULL };
+	static struct group g = { (char*)"mosync", (char*)"", 0, users };
+	if(gid == 0)
+		return &g;
+	else
+		return NULL;
 }
 
 // Define file descriptors.
@@ -213,6 +224,10 @@ int dup2(int __fd, int newFd) {
 	return newFd;
 }
 
+#ifdef __LARGE64_FILES
+#error gha
+#endif
+
 static int baseStat(MAHandle h, struct stat* st) {
 	CHECK(st->st_size = maFileSize(h), EIO);
 	CHECK(st->st_mtime = maFileDate(h), EIO);
@@ -236,6 +251,7 @@ int stat(const char *file, struct stat *st) {
 	int res;
 	char temp[2048];
 	int length;
+	int exists;
 	getRealPath(temp, file, 2046);
 	LOGD("stat(%s)", temp);
 	
@@ -245,13 +261,16 @@ int stat(const char *file, struct stat *st) {
 		strncat(temp, "/", sizeof(temp));
 		length++;
 	}
-	h = errnoFileOpen(file, MA_ACCESS_READ);
-	if(h > 0) {	// it worked, and it's a directory.
-		st->st_mode = S_IFDIR;
-		st->st_mtime = maFileDate(h);
-		CHECK(maFileClose(h), EIO);
-		CHECK(st->st_mtime, EIO);
-		return 0;
+	h = errnoFileOpen(temp, MA_ACCESS_READ);
+	if(h > 0) {
+		CHECK(exists = maFileExists(h), ENOTRECOVERABLE);
+		if(exists) {	// it worked, and it is a directory.
+			st->st_mode = S_IFDIR;
+			st->st_mtime = maFileDate(h);
+			CHECK(maFileClose(h), EIO);
+			CHECK(st->st_mtime, EIO);
+			return 0;
+		}
 	} else {
 		if(errno != ENOENT)
 			STDFAIL;
@@ -259,7 +278,11 @@ int stat(const char *file, struct stat *st) {
 	
 	// see if we can find a regular file.
 	temp[length-1] = 0;	// remove the ending slash
-	TEST(h = errnoFileOpen(file, MA_ACCESS_READ));
+	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
+	CHECK(exists = maFileExists(h), ENOTRECOVERABLE);
+	if(!exists) {
+		ERRNOFAIL(ENOENT);
+	}
 	st->st_mode = S_IFREG;
 	res = baseStat(h, st);
 	CHECK(maFileClose(h), EIO);

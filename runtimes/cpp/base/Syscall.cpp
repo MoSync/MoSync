@@ -691,6 +691,9 @@ namespace Base {
 
 	static int openFile(Syscall::FileHandle& fh) {
 		int res = isDirectory(fh.name);
+		if(res < 0) {
+			LOGF("File: %s\n", fh.name.p());
+		}
 		TEST_LTZ(res);
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
@@ -713,7 +716,7 @@ namespace Base {
 	}
 
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
-		LOGD("maFileOpen(%s, %x)\n", path, mode);
+		LOGF("maFileOpen(%s, %x)\n", path, mode);
 		Smartie<FileHandle> fhs(new FileHandle);
 		FileHandle& fh(*fhs);
 		fh.mode = mode;
@@ -758,24 +761,27 @@ namespace Base {
 
 	Syscall::FileHandle& Syscall::getFileHandle(MAHandle file) {
 		FileHandle* fhp = gFileHandles.find(file);
+		if(!fhp) {
+			LOG("Handle: %i\n", file);
+		}
 		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
 		return *fhp;
 	}
 
 	int Syscall::maFileExists(MAHandle file) {
-		LOGD("maFileExists(%i)\n", file);
+		LOGF("maFileExists(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		if(fh.fs) {
-			LOGD("file is opened.\n");
+			LOGF("file is opened.\n");
 			return 1;
 		}
 		int res = isDirectory(fh.name);
-		LOGD("isDir: %i\n", res);
+		LOGF("isDir: %i\n", res);
 		return res >= 0;
 	}
 
 	int Syscall::maFileClose(MAHandle file) {
-		LOGD("maFileClose(%i)\n", file);
+		LOGF("maFileClose(%i)\n", file);
 		FileHandle* fhp = gFileHandles.find(file);
 		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
 		FileHandle& fh(*fhp);
@@ -785,7 +791,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileCreate(MAHandle file) {
-		LOGD("maFileCreate(%i)\n", file);
+		LOGF("maFileCreate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
 		if(fh.fs) {
@@ -816,7 +822,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileDelete(MAHandle file) {
-		LOGD("maFileDelete(%i)\n", file);
+		LOGF("maFileDelete(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.mode == MA_ACCESS_READ_WRITE, ERR_INVALID_FILE_ACCESS_MODE);
 		SAFE_DELETE(fh.fs);
@@ -844,7 +850,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileSize(MAHandle file) {
-		LOGD("maFileSize(%i)\n", file);
+		LOGF("maFileSize(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -852,7 +858,7 @@ namespace Base {
 		bool res = fh.fs->length(len);
 		if(!res)
 			FILE_FAIL(MA_FERR_GENERIC);
-		LOGD("file size: %i\n", len);
+		LOGF("file size: %i\n", len);
 		return len;
 	}
 
@@ -963,16 +969,16 @@ namespace Base {
 	}
 
 	int Syscall::maFileDate(MAHandle file) {
-		LOGD("maFileDate(%i)\n", file);
+		LOGF("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		struct _stat st;
 		if(_stat(fh.name, &st) != 0) FILE_FAIL(MA_FERR_GENERIC);
-		LOGD("mtime: %i\n", (int)st.st_mtime);
+		LOGF("mtime: %i\n", (int)st.st_mtime);
 		return (int)st.st_mtime;
 	}
 
 	int Syscall::maFileTruncate(MAHandle file, int offset) {
-		LOGD("maFileTruncate(%i, %i)\n", file, offset);
+		LOGF("maFileTruncate(%i, %i)\n", file, offset);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
 		if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
@@ -1002,7 +1008,7 @@ namespace Base {
 #endif	//SYMBIAN && _WIN32_WCE
 
 	int Syscall::maFileWrite(MAHandle file, const void* src, int len) {
-		LOGD("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
+		LOGF("maFileWrite(%i, 0x%"PFP", %i)\n", file, src, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -1013,7 +1019,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) {
-		LOGD("maFileWriteFromData(%i, %i)\n", file, len);
+		LOGF("maFileWriteFromData(%i, %i)\n", file, len);
 		FileHandle& fh(getFileHandle(file));
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
 		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
@@ -1027,7 +1033,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileRead(MAHandle file, void* dst, int len) {
-		LOGD("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
+		LOGF("maFileRead(%i, 0x%"PFP", %i)\n", file, dst, len);
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs)
 			FILE_FAIL(MA_FERR_GENERIC);
@@ -1038,7 +1044,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
-		LOGD("maFileReadToData(%i, %i)\n", file, len);
+		LOGF("maFileReadToData(%i, %i)\n", file, len);
 		FileHandle& fh(getFileHandle(file));
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
 		MYASSERT(b->seek(Seek::Start, offset), ERR_DATA_OOB);
@@ -1052,7 +1058,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileTell(MAHandle file) {
-		LOGD("maFileTell(%i)\n", file);
+		LOGF("maFileTell(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.fs, ERR_FILE_CLOSED);
 		int pos;
@@ -1063,7 +1069,7 @@ namespace Base {
 	}
 
 	int Syscall::maFileSeek(MAHandle file, int offset, int whence) {
-		LOGD("maFileSeek(%i, %i, %i)\n", file, offset, whence);
+		LOGF("maFileSeek(%i, %i, %i)\n", file, offset, whence);
 		FileHandle& fh(getFileHandle(file));
 		MYASSERT(fh.fs, ERR_FILE_CLOSED);
 		Seek::Enum mode;

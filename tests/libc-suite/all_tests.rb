@@ -1,8 +1,9 @@
 #!/usr/bin/ruby
 
 require 'FileUtils'
-require 'settings.rb'
-require 'skipped.rb'
+require './settings.rb'
+require './skipped.rb'
+require './argv.rb'
 require '../../rules/util.rb'
 
 if(ARGV.length > 0)
@@ -26,6 +27,29 @@ PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 FileUtils.mkdir_p(BUILD_DIR)
 FileUtils.rm_rf('filesystem')
 FileUtils.mkdir_p('filesystem/tmp')
+
+
+def writeArgvFile(filename, argv)
+	file = open(filename, 'w')
+	file.write('const char* gArgv[] = {"MoSync", ')
+	argv.each do |arg|
+		file.write("\"#{arg}\",")
+	end
+	file.write("};\n")
+	file.write("const int gArgc = #{argv.size + 1};\n")
+	file.close
+end
+
+def doArgv(baseName, argv)
+	cName = "build/argv-#{baseName}.c"
+	sName = "build/argv-#{baseName}.s"
+	writeArgvFile(cName, argv)
+	sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path(cName)} -o #{sName}"
+	return sName
+end
+
+DEFAULT_ARGV_SFILE = doArgv('default', DEFAULT_ARGV)
+
 
 sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path('helpers.c')} -o build/helpers.s#{GCC_FLAGS}"
 
@@ -127,7 +151,7 @@ def delete_if_empty(filename)
 	end
 end
 
-def link_and_test(ofn, dead_code, force_rebuild)
+def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
 	winFile = ofn.ext('.win' + suffix)
@@ -143,16 +167,20 @@ def link_and_test(ofn, dead_code, force_rebuild)
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
 		if(dead_code)
-			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{PIPE_LIBS}"
+			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{PIPE_LIBS}"
+			sh "pipe-tool -master-dump -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
 	delete_if_empty(pfn)
 	if(!File.exists?(pfn))
 		error"Unknown link failure."
+	end
+	
+	files.each do |file|
+		FileUtils.cp(file, 'filesystem/')
 	end
 	
 	# execute it, if not win already, or we rebuilt something.
@@ -225,9 +253,18 @@ files.each do |filename|
 		force_rebuild = true
 	end
 	
-	force_rebuild = link_and_test(ofn, false, force_rebuild)
-	if(:test_dead_code_elimination && File.exists?(ofn.ext('.win')))
-		link_and_test(ofn, true, force_rebuild)
+	argv = SPECIFIC_ARGV.fetch(bn, nil)
+	if(argv == nil)
+		argvs = DEFAULT_ARGV_SFILE
+	else
+		argvs = doArgv(bn, argv)
+	end
+	
+	files = SPECIFIC_FILES.fetch(bn, [])
+	
+	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild)
+	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
+		link_and_test(ofn, argvs, files, true, force_rebuild)
 	end
 end
 
