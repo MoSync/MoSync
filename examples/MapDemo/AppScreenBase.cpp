@@ -106,6 +106,12 @@ namespace MapDemoUI
 	{
 		MessageMgr::get( )->removeListener( this );
 
+		if ( mKeyTimer != NULL )
+		{
+			Environment::getEnvironment( ).removeTimer( mKeyTimer );
+			deleteobject( mKeyTimer );
+		}
+
 		if ( mAppFrame != NULL )
 		{
 			mAppFrame->getChildren( ).clear( );

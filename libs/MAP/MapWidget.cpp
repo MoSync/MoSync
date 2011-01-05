@@ -36,8 +36,8 @@ namespace MAP
 	//
 	// Configuration
 	//
-	static const int PanIntervalMs = 80;
-	static const double PanTension = 0.5;
+	static const int PanIntervalMs = 60;
+	static const double PanTension = 0.3;
 	static const int SmallScrollStep = 30; // pixels to scroll if not full page
 	static const int CrossSize = 4;
 
@@ -57,28 +57,57 @@ namespace MAP
 		void runTimerEvent( )
 		//---------------------------------------------------------------------
 		{
-			PixelCoordinate currentPix = mWidget->mCenterPositionPixels;
-			PixelCoordinate targetPix = mWidget->mPanTargetPositionPixels;
-			double offsetX = targetPix.getX( ) - currentPix.getX( );
-			double offsetY = targetPix.getY( ) - currentPix.getY( );
-
-			if( fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
+			switch( mWidget->mPanMode )
 			{
-				Environment::getEnvironment( ).removeTimer( this );
-				mWidget->enterMapUpdateScope( );
-				mWidget->exitMapUpdateScope( true );
-				mWidget->updateMap( );
-				mWidget->requestRepaint( );
-				return;
+			case MapWidgetPanMode_Instant:
+				// we shouldn't be here.
+				break;
+			case MapWidgetPanMode_Smooth:
+				{
+					PixelCoordinate currentPix = mWidget->mCenterPositionPixels;
+					PixelCoordinate targetPix = mWidget->mPanTargetPositionPixels;
+					double offsetX = targetPix.getX( ) - currentPix.getX( );
+					double offsetY = targetPix.getY( ) - currentPix.getY( );
+
+					if( fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
+					{
+						Environment::getEnvironment( ).removeTimer( this );
+						mWidget->enterMapUpdateScope( );
+						mWidget->exitMapUpdateScope( true );
+						mWidget->updateMap( );
+						mWidget->requestRepaint( );
+						//mWidget->draw( false );
+						return;
+					}
+					PixelCoordinate newPix = PixelCoordinate(	mWidget->getMagnification( ),
+																(int)( currentPix.getX( ) + PanTension * offsetX ),
+																(int)( currentPix.getY( ) + PanTension * offsetY ) );
+					mWidget->enterMapUpdateScope( );
+					mWidget->mCenterPositionPixels = newPix;
+					mWidget->exitMapUpdateScope( false );
+					mWidget->updateMap( );
+					mWidget->requestRepaint( );
+					//mWidget->draw( false );
+				}
+				break;
+			case MapWidgetPanMode_Momentum:
+					PixelCoordinate currentPix = mWidget->mCenterPositionPixels;
+					int currentTimeMs = maGetMilliSecondCount( );
+					int deltaMs = currentTimeMs - mWidget->mPanStartTimeMs;
+					PixelCoordinate newPix = PixelCoordinate(	mWidget->getMagnification( ),
+																(int)( currentPix.getX( ) - mWidget->mPanMomentumX * deltaMs * 0.001f ),
+																(int)( currentPix.getY( ) + mWidget->mPanMomentumY * deltaMs * 0.001f ) );
+					mWidget->mPanMomentumX = (int)( mWidget->mPanMomentumX * mWidget->mPanFriction );
+					mWidget->mPanMomentumY = (int)( mWidget->mPanMomentumY * mWidget->mPanFriction );
+
+					mWidget->enterMapUpdateScope( );
+					mWidget->mCenterPositionPixels = newPix;
+					mWidget->exitMapUpdateScope( false );
+					mWidget->updateMap( );
+					mWidget->requestRepaint( );
+					//mWidget->draw( false );
+				break;
 			}
-			mWidget->enterMapUpdateScope( );
-			PixelCoordinate newPix = PixelCoordinate(	mWidget->getMagnification( ),
-														(int)( currentPix.getX( ) + PanTension * offsetX ),
-														(int)( currentPix.getY( ) + PanTension * offsetY ) );
-			mWidget->mCenterPositionPixels = newPix;
-			mWidget->exitMapUpdateScope( false );
-			mWidget->updateMap( );
-			mWidget->requestRepaint( );
 		}
 
 	private:
@@ -89,7 +118,7 @@ namespace MAP
 
 
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( MapSource* source, int x, int y, int width, int height, Widget* _parent)
+	MapWidget::MapWidget( /*MapSource* source,*/ int x, int y, int width, int height, Widget* _parent)
 	//-------------------------------------------------------------------------
 	:	Widget( x, y, width, height, _parent ),
 		mCenterPositionLonLat( ),
@@ -97,16 +126,20 @@ namespace MAP
 		mPanTargetPositionLonLat( ),
 		mPanTargetPositionPixels( ),
 		mMagnification( 0 ),
-		mSource( source ),
+		mSource( /*source*/NULL ),
 		//mCache( NULL ),
 		mMapUpdateNesting( 0 ),
 		mPrevCenter( ),
 		mScreenImage( 0 ),
 		mHasScale( true ),
 		mPanTimerListener( NULL ),
-		mHasSmoothPanning( true ),
+		//mHasSmoothPanning( true ),
+		mPanMode( MapWidgetPanMode_Smooth ),
 		mFont( NULL ),
-		mTimerRunning( false )
+		mTimerRunning( false ),
+		mPanMomentumX( 0 ),
+		mPanMomentumY( 0 ),
+		mPanFriction( 0.9f )
 	{
 		resetScreenImage( );
 		mPanTimerListener = newobject( MapWidgetPanTimerListener, new MapWidgetPanTimerListener( this ) );
@@ -157,10 +190,29 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	void MapWidget::setMapSource( MapSource* source )
+	//-------------------------------------------------------------------------
+	{
+		mSource = source;
+		updateMap( );
+	}
+
+	//-------------------------------------------------------------------------
 	PixelCoordinate MapWidget::getCenterPositionPixels( ) const
 	//-------------------------------------------------------------------------
 	{
-		return mHasSmoothPanning ? mPanTargetPositionPixels : mCenterPositionPixels;
+		//return mHasSmoothPanning ? mPanTargetPositionPixels : mCenterPositionPixels;
+
+		switch( mPanMode)
+		{
+		case MapWidgetPanMode_Instant:
+			return mCenterPositionPixels;
+		case MapWidgetPanMode_Smooth:
+			return mPanTargetPositionPixels;
+		case MapWidgetPanMode_Momentum:
+			return mCenterPositionPixels;
+		}
+		return PixelCoordinate( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -174,7 +226,20 @@ namespace MAP
 	LonLat MapWidget::getCenterPosition( ) const
 	//-------------------------------------------------------------------------
 	{
-		return mHasSmoothPanning ? mPanTargetPositionLonLat : mCenterPositionLonLat;
+		//return mHasSmoothPanning ? mPanTargetPositionLonLat : mCenterPositionLonLat;
+		switch ( mPanMode )
+		{
+		case MapWidgetPanMode_Instant:
+			return mCenterPositionLonLat;
+		case MapWidgetPanMode_Smooth:
+			return mPanTargetPositionLonLat;
+		case MapWidgetPanMode_Momentum:
+			return mCenterPositionLonLat;
+		}
+		//
+		// Error
+		//
+		return LonLat( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -183,36 +248,45 @@ namespace MAP
 	{
 		checkMapUpdateScope( );
 
-		if ( mHasSmoothPanning )
+		switch( mPanMode )
 		{
-			mPanTargetPositionLonLat = position;
-			mPanTargetPositionPixels = position.toPixels( getMagnification( ) );
-			//
-			// Make sure current position is nearby, so we only soft scroll less than one screen.
-			//
-			int deltaX = mPanTargetPositionPixels.getX( ) - mCenterPositionPixels.getX( );
-			int deltaY = mPanTargetPositionPixels.getY( ) - mCenterPositionPixels.getY( );
-			//
-			// go directly to location if delta is more than 1/6 of widget size.
-			//
-			int width = getWidth( );
-			int height = getHeight( );
-			if ( width > 0 && height > 0 )
-			{
-				double factor = 6 * fabs( Max( (double)deltaX / getWidth( ), (double)deltaY / getHeight( ) ) );
-				if ( factor > 1 )
-				{
-					mCenterPositionPixels = PixelCoordinate(	getMagnification( ),
-																mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
-																mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
-				}
-				Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
-			}
-		}
-		else
-		{
+		case MapWidgetPanMode_Instant:
 			mCenterPositionLonLat = position;
 			mCenterPositionPixels = position.toPixels( getMagnification( ) );
+			break;
+		case MapWidgetPanMode_Smooth:
+			{
+				mPanTargetPositionLonLat = position;
+				mPanTargetPositionPixels = position.toPixels( getMagnification( ) );
+				//
+				// Make sure current position is nearby, so we only soft scroll less than one screen.
+				//
+				int deltaX = mPanTargetPositionPixels.getX( ) - mCenterPositionPixels.getX( );
+				int deltaY = mPanTargetPositionPixels.getY( ) - mCenterPositionPixels.getY( );
+				int width = getWidth( );
+				int height = getHeight( );
+				if ( width > 0 && height > 0 )
+				{
+					//
+					// go directly to location if delta is more than 1/6 of widget size.
+					//
+					double factor = 6 * fabs( Max( (double)deltaX / getWidth( ), (double)deltaY / getHeight( ) ) );
+					if ( factor > 1 )
+					{
+						mCenterPositionPixels = PixelCoordinate(	getMagnification( ),
+																	mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
+																	mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
+					}
+					Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
+				}
+			}
+			break;
+		case MapWidgetPanMode_Momentum:
+			mCenterPositionLonLat = position;
+			mCenterPositionPixels = position.toPixels( getMagnification( ) );
+			mPanMomentumX = 0;
+			mPanMomentumY = 0;
+			break;
 		}
 	}
 
@@ -230,24 +304,70 @@ namespace MAP
 		checkMapUpdateScope( );
 
 		mMagnification = magnification;
-		if ( mHasSmoothPanning )
-			setCenterPosition( mPanTargetPositionLonLat );
-		else
+
+		switch( mPanMode )
+		{
+		case MapWidgetPanMode_Instant:
 			setCenterPosition( mCenterPositionLonLat );
+			break;
+		case MapWidgetPanMode_Smooth:
+			setCenterPosition( mPanTargetPositionLonLat );
+			break;
+		case MapWidgetPanMode_Momentum:
+			setCenterPosition( mCenterPositionLonLat );
+			break;
+		}
+	}
+
+	////-------------------------------------------------------------------------
+	//bool MapWidget::getHasSmoothPanning( ) const
+	////-------------------------------------------------------------------------
+	//{
+	//	return mHasSmoothPanning;
+	//}
+
+	////-------------------------------------------------------------------------
+	//void MapWidget::setHasSmoothPanning( bool hasSmoothPanning )
+	////-------------------------------------------------------------------------
+	//{
+	//	mHasSmoothPanning = hasSmoothPanning;
+	//}
+
+	//-------------------------------------------------------------------------
+	MapWidgetPanMode MapWidget::getPanMode( ) const
+	//-------------------------------------------------------------------------
+	{
+		return mPanMode;
 	}
 
 	//-------------------------------------------------------------------------
-	bool MapWidget::getHasSmoothPanning( ) const
+	void MapWidget::setPanMode( MapWidgetPanMode panMode )
 	//-------------------------------------------------------------------------
 	{
-		return mHasSmoothPanning;
+		mPanMode = panMode;
 	}
 
 	//-------------------------------------------------------------------------
-	void MapWidget::setHasSmoothPanning( bool hasSmoothPanning )
+	void MapWidget::setPanMomentum( int momentumX, int momentumY )
 	//-------------------------------------------------------------------------
 	{
-		mHasSmoothPanning = hasSmoothPanning;
+		mPanMomentumX = momentumX;
+		mPanMomentumY = momentumY;
+		mPanStartTimeMs = maGetMilliSecondCount( );
+	}
+	
+	//-------------------------------------------------------------------------
+	float MapWidget::getPanFriction( ) const
+	//-------------------------------------------------------------------------
+	{
+		return mPanFriction;
+	}
+
+	//-------------------------------------------------------------------------
+	void MapWidget::setPanFriction( float friction )
+	//-------------------------------------------------------------------------
+	{
+		mPanFriction = friction;
 	}
 
 	//-------------------------------------------------------------------------
@@ -271,6 +391,7 @@ namespace MAP
 
 		maSetDrawTarget( old );
 		requestRepaint( );
+		//draw( false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -380,10 +501,16 @@ namespace MAP
 			//static const int textWidth = 100;
 			//static const int textHeight = 12;
 			char buffer[100];
-			if ( mHasSmoothPanning )
-				sprintf( buffer, "%-3.4f %-3.4f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
-			else
+
+			switch( mPanMode )
+			{
+			case MapWidgetPanMode_Instant:
 				sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
+			case MapWidgetPanMode_Smooth:
+				sprintf( buffer, "%-3.4f %-3.4f", mPanTargetPositionLonLat.lon, mPanTargetPositionLonLat.lat );
+			case MapWidgetPanMode_Momentum:
+				sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
+			}
 			maSetColor( 0x000000 );
 
 			if ( mFont != NULL )
@@ -460,13 +587,20 @@ namespace MAP
 		if ( mMagnification < mSource->getMagnificationMax( ) )
 		{
 			mMagnification++;
-			if ( mHasSmoothPanning )
+
+			switch( mPanMode )
 			{
+			case MapWidgetPanMode_Instant:
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				break;
+			case MapWidgetPanMode_Smooth:
 				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
-			}
-			else
+				break;
+			case MapWidgetPanMode_Momentum:
 				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				break;
+			}
 		}
 	}
 
@@ -477,13 +611,20 @@ namespace MAP
 		if ( mMagnification > mSource->getMagnificationMin( ) )
 		{
 			mMagnification--;
-			if ( mHasSmoothPanning )
+
+			switch( mPanMode )
 			{
+			case MapWidgetPanMode_Instant:
+				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				break;
+			case MapWidgetPanMode_Smooth:
 				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
-			}
-			else
+				break;
+			case MapWidgetPanMode_Momentum:
 				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+				break;
+			}
 		}
 	}
 
@@ -491,21 +632,44 @@ namespace MAP
 	void MapWidget::scroll( MapWidgetScrollDirection direction, bool largeStep)
 	//-------------------------------------------------------------------------
 	{
-		PixelCoordinate px = getCenterPositionPixels( );
-		const int hStep = largeStep ? getWidth( ) : SmallScrollStep;
-		const int vStep = largeStep ? getHeight( ) : SmallScrollStep;
-
-		switch( direction )
+		switch( mPanMode )
 		{
-		case SCROLLDIRECTION_NORTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) + vStep ); break;
-		case SCROLLDIRECTION_SOUTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) - vStep ); break;
-		case SCROLLDIRECTION_EAST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) + hStep, px.getY( ) ); break;
-		case SCROLLDIRECTION_WEST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) - hStep, px.getY( ) ); break;
-		}
+		case MapWidgetPanMode_Instant:
+		case MapWidgetPanMode_Smooth:
+			{
+				PixelCoordinate px = getCenterPositionPixels( );
+				const int hStep = largeStep ? getWidth( ) : SmallScrollStep;
+				const int vStep = largeStep ? getHeight( ) : SmallScrollStep;
 
-		LonLat newPos = LonLat( px );
-		newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-		setCenterPosition( newPos );
+				switch( direction )
+				{
+				case SCROLLDIRECTION_NORTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) + vStep ); break;
+				case SCROLLDIRECTION_SOUTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) - vStep ); break;
+				case SCROLLDIRECTION_EAST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) + hStep, px.getY( ) ); break;
+				case SCROLLDIRECTION_WEST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) - hStep, px.getY( ) ); break;
+				}
+
+				LonLat newPos = LonLat( px );
+				newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+				setCenterPosition( newPos );
+			}
+			break;
+		case MapWidgetPanMode_Momentum:
+			{
+				int momentumX = mPanMomentumX;
+				int momentumY = mPanMomentumY;
+				const int momentum = SmallScrollStep;
+				switch( direction )
+				{
+				case SCROLLDIRECTION_NORTH:  momentumY += momentum;break;
+				case SCROLLDIRECTION_SOUTH: momentumY -= momentum; break;
+				case SCROLLDIRECTION_EAST: momentumX -= momentum; break;
+				case SCROLLDIRECTION_WEST: momentumX += momentum; break;
+				}
+				setPanMomentum( momentumX, momentumY );
+				break;
+			}
+		}
 	}
 
 	//-------------------------------------------------------------------------
