@@ -47,11 +47,6 @@ namespace MAP
 		//
 		// MapSource overrides
 		//
-		MapSourceKind getSourceKind( ) const			
-		{ 
-			return MapSourceKind_OpenStreetMap; 
-		}
-
 		MAExtent getTileSize( ) const			
 		{ 
 			return 256; 

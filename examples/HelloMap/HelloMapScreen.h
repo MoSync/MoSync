@@ -21,7 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Screen.h>
 #include <MAUtil/Moblet.h>
 #include <MAP/MapWidget.h>
-#include <MAP/MapSourceMgr.h>
+#include <MAP/MapSource.h>
 
 using namespace MAP;
 
@@ -53,7 +53,7 @@ namespace HelloMap
 		void					nextMapSource( );
 
 		MapWidget*				mMap;
-		MapSourceKind			mMapSourceKind;
+		MapSource*  			mMapSource;
 	};
 }
 

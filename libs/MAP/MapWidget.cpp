@@ -23,7 +23,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapWidget.h"
 #include "MapCache.h"
 #include "MapSource.h"
-#include "MapSourceMgr.h"
 
 namespace MAP
 {
@@ -90,7 +89,7 @@ namespace MAP
 
 
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( int x, int y, int width, int height, Widget* _parent)
+	MapWidget::MapWidget( MapSource* source, int x, int y, int width, int height, Widget* _parent)
 	//-------------------------------------------------------------------------
 	:	Widget( x, y, width, height, _parent ),
 		mCenterPositionLonLat( ),
@@ -98,7 +97,7 @@ namespace MAP
 		mPanTargetPositionLonLat( ),
 		mPanTargetPositionPixels( ),
 		mMagnification( 0 ),
-		mSourceKind( MapSourceKind_OpenStreetMap ),
+		mSource( source ),
 		//mCache( NULL ),
 		mMapUpdateNesting( 0 ),
 		mPrevCenter( ),
@@ -238,14 +237,6 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapWidget::setMapSourceKind( MapSourceKind sourceKind )
-	//-------------------------------------------------------------------------
-	{
-		mSourceKind = sourceKind;
-		updateMap( );
-	}
-
-	//-------------------------------------------------------------------------
 	bool MapWidget::getHasSmoothPanning( ) const
 	//-------------------------------------------------------------------------
 	{
@@ -266,8 +257,7 @@ namespace MAP
 		PixelCoordinate tilePx = tile->getCenter( ).toPixels( tile->getMagnification( ) );
 		MAPoint2d pt = worldPixelToWidget( tilePx );
 		MAHandle old = maSetDrawTarget( mScreenImage );
-		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
-		const int tileSize = source->getTileSize( );
+		const int tileSize = mSource->getTileSize( );
 
 		MARect rect;
 		rect.height = tileSize;
@@ -320,7 +310,6 @@ namespace MAP
 		//
 		drawOverlay( );
 		
-		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
 		//
 		// Draw scale indicator
 		//
@@ -331,7 +320,7 @@ namespace MAP
 			const int scaleY = widgetPos.y + 5;
 			int lineThickness = 3;
 			const int crossbarHeight = 7;
-			float scaleFrac = (float)( mMagnification - source->getMagnificationMin( ) ) / ( source->getMagnificationMax( ) - source->getMagnificationMin( ) );
+			float scaleFrac = (float)( mMagnification - mSource->getMagnificationMin( ) ) / ( mSource->getMagnificationMax( ) - mSource->getMagnificationMin( ) );
 
 			maSetColor( 0xa0a0a0 );
 
@@ -431,7 +420,7 @@ namespace MAP
 		// Request tiles
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
-		MapCache::get( )->requestTiles( this, mSourceKind, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+		MapCache::get( )->requestTiles( this, mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
 	}
 
 	//-------------------------------------------------------------------------
@@ -468,9 +457,7 @@ namespace MAP
 	void MapWidget::zoomIn( )
 	//-------------------------------------------------------------------------
 	{
-		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
-
-		if ( mMagnification < source->getMagnificationMax( ) )
+		if ( mMagnification < mSource->getMagnificationMax( ) )
 		{
 			mMagnification++;
 			if ( mHasSmoothPanning )
@@ -487,9 +474,7 @@ namespace MAP
 	void MapWidget::zoomOut( )
 	//-------------------------------------------------------------------------
 	{
-		MapSource* source = MapSourceMgr::get( )->getMapSource( mSourceKind );
-
-		if ( mMagnification > source->getMagnificationMin( ) )
+		if ( mMagnification > mSource->getMagnificationMin( ) )
 		{
 			mMagnification--;
 			if ( mHasSmoothPanning )

@@ -65,7 +65,7 @@ namespace MAP
 		friend class MapWidgetPanTimerListener;
 
 	public:
-		MapWidget(int x, int y, int width, int height, Widget* parent);
+		MapWidget(MapSource* source, int x, int y, int width, int height, Widget* parent);
 		
 		virtual ~MapWidget( );
 		/**
@@ -77,8 +77,8 @@ namespace MAP
 		/**
 		 * Map source property
 		 */
-		MapSourceKind getMapSourceKind( ) const { return mSourceKind; }
-		void setMapSourceKind( MapSourceKind sourceKind );
+		MapSource* getMapSource( ) const { return mSource; }
+		void setMapSource( MapSource* source );
 		/**
 		 * Center position property
 		 */
@@ -163,7 +163,7 @@ namespace MAP
 		LonLat mPanTargetPositionLonLat;
 		PixelCoordinate mPanTargetPositionPixels;
 		int mMagnification;
-		MapSourceKind mSourceKind;
+		MapSource* mSource;
 		int mMapUpdateNesting;
 		PixelCoordinate mPrevCenter;
 		int mPrevMagnification;

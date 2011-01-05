@@ -80,17 +80,6 @@ namespace MAP
 		GoogleMapSource( GoogleMapKind mapKind );
 		virtual	~GoogleMapSource( );
 
-		MapSourceKind getSourceKind( ) const		
-		{ 
-			switch( mMapKind )
-			{
-			case GoogleMapKind_StreetMap: return MapSourceKind_GoogleMap; 
-			case GoogleMapKind_Aerial: return MapSourceKind_GoogleAerial;
-			case GoogleMapKind_Hybrid: return MapSourceKind_GoogleHybrid;
-			default: return (MapSourceKind)-1;
-			}
-		}
-
 		MAExtent getTileSize( ) const 
 		{
 			return 256; 

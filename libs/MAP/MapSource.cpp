@@ -49,7 +49,6 @@ namespace MAP
 	public:
 		MapSourceImageDownloader( ) :
 			mUrl( 0 ),
-			mSourceKind( MapSourceKind_OpenStreetMap ),
 			mTileXY( ),
 			mClientData ( NULL )
 		{
@@ -67,16 +66,6 @@ namespace MAP
 		//
 		// Field accessors
 		//
-		MapSourceKind getSourceKind( ) const 
-		{
-			return mSourceKind; 
-		}
-
-		void setSourceKind( MapSourceKind sourceKind ) 
-		{
-			mSourceKind = sourceKind; 
-		}
-		
 		MapTileCoordinate getTileXY( ) const 
 		{
 			return mTileXY; 
@@ -113,7 +102,6 @@ namespace MAP
 
 	private:
 		String mUrl;
-		MapSourceKind mSourceKind;
 		MapTileCoordinate mTileXY;
 		MapSourceInnerClientData* mClientData;
 	};
@@ -288,7 +276,7 @@ namespace MAP
 
 		MapTileCoordinate tileXY = dlr->getTileXY( );
 		LonLat ll = tileCenterToLonLat( getTileSize( ), tileXY, 0, 0 );
-		MapTile* tile = newobject( MapTile, new MapTile( dlr->getSourceKind( ), tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );
+		MapTile* tile = newobject( MapTile, new MapTile( this, tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 		clientData->mListener->tileReceived( this, tile, clientData->mClientData );
 		//
@@ -358,7 +346,6 @@ namespace MAP
 		char url[1000];
 		getTileUrl( url, entry->getTileXY( ) );
 
-		downloader->setSourceKind( getSourceKind( ) );
 		downloader->setTileXY( entry->getTileXY( ) );
 		downloader->setClientData( entry->getClientData( ) );
 		// downloader now owns clientdata

@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MAHeaders.h"
 #include <mastdlib.h>
 
+#include <MAP/OpenStreetMapSource.h>
+
 namespace HelloMap
 {
 	//-------------------------------------------------------------------------
@@ -34,20 +36,16 @@ namespace HelloMap
 		//
 		// Map widget
 		//
-		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
+		mMapSource = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
+		mMap = newobject( MapWidget, new MapWidget( mMapSource, 0, 0, width, height, NULL ) );
 		mMap->enterMapUpdateScope( );
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
 		mMap->setMagnification( 10 );
 		mMap->exitMapUpdateScope( true );
-		mMapSourceKind = MapSourceKind_OpenStreetMap;
 		Font* font = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( font );
 
 		setMain( mMap );
-		//
-		// Have to wait until we have proper width and height
-		//
-		mMap->setMapSourceKind( mMapSourceKind );
 	}
 
 	//-------------------------------------------------------------------------
@@ -147,17 +145,7 @@ namespace HelloMap
 	void HelloMapScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
-
-		// Avoid CloudMade maps by default
-		if(newKind == MapSourceKind_CloudMade1)
-			newKind = (MapSourceKind)(mMapSourceKind + 2);
-		if(newKind == MapSourceKind_CloudMade7)
-			newKind = (MapSourceKind)(mMapSourceKind + 3);
-
-		if( newKind >= MapSourceKind_Last )
-			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
-		mMapSourceKind = newKind;
-		mMap->setMapSourceKind( newKind );
+		// TODO: Reimplement later
+		return;
 	}
 }

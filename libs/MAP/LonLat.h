@@ -242,7 +242,10 @@ namespace MAP
 			lonLatToMeters( lon, lat, meterX, meterY );
 			double pixelX, pixelY;
 			metersToPixels( meterX, meterY, magnification, pixelX, pixelY );
-			return PixelCoordinate( magnification, (int)pixelX, (int)pixelY );
+
+			// These pixel values are always positive, so (int)(p + 0.5f) works as
+			// poor man's rounding
+			return PixelCoordinate( magnification, (int)(pixelX + 0.5f), (int)(pixelY + 0.5f) );
 
 		}
 		/**
