@@ -314,6 +314,14 @@ public class MoSyncThread extends Thread
 		catch (Exception e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
+			mMemDataSection = null;
+			return null;
+		}
+		catch (Error e)
+		{
+			logError("MoSyncThread - Out of Memory!", e);
+			mMemDataSection = null;
+			return null;
 		}
 		return mMemDataSection;
 	}
@@ -358,7 +366,13 @@ public class MoSyncThread extends Thread
 	}
 	
 	/**
-	 * Loads the program.
+	 * Loads the MoSync program.
+	 * 
+	 * This function loads the program file and the resource file.
+	 * It loads all the resources and generates the data
+	 * section used by the program.
+	 *
+	 * @return false if failed, true if succeeded.
 	 */
 	public boolean loadProgram()
 	{
@@ -372,7 +386,10 @@ public class MoSyncThread extends Thread
 
 			FileDescriptor rFd = null;
 			mResourceOffset = 0;
-			
+
+			// Try to load the resource file, if we get an exception 
+			// it just means that this application has no resource file 
+			// and that is not an error.
 			try
 			{
 				AssetFileDescriptor rAfd = assetManager.openFd(RESOURCE_FILE);
@@ -384,13 +401,30 @@ public class MoSyncThread extends Thread
 				logError("loadProgram - Has no resources! exception: " 
 					+ fnfe.toString(), fnfe);
 			}
-			
+
+			// We have a program file so now we sends it to the native side
+			// so it will be loaded into memory. The data section will also be
+			// created and if there are any resources they will be loaded.
 			if (null != pFd)
 			{
 				if (false == nativeLoad(pFd, pFdOffset, rFd, mResourceOffset))
 				{
-					logError("loadProgram - ERROR Load program was unsuccesfull");
-					threadPanic(0, "Unable to load program or resources");
+					logError("loadProgram - "
+						+ "ERROR Load program was unsuccesfull");
+
+					if (null == mMemDataSection)
+					{
+						threadPanic(
+							0, 
+							"This device does not have enough" +
+							"memory to run this application."
+						);
+					}
+					else
+					{
+						threadPanic(0, "Unable to load program or resources");
+					}
+					
 					return false;
 				}
 
