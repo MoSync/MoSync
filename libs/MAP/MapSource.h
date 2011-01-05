@@ -94,10 +94,6 @@ namespace MAP
 		//
 		//============================================================
 		/**
-		 * Returns source kind
-		 */
-		virtual MapSourceKind		getSourceKind( ) const = 0;
-		/**
 		 * Returns tile size
 		 */
 		virtual  MAExtent			getTileSize( ) const = 0;

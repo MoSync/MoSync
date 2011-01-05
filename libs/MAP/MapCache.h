@@ -77,7 +77,7 @@ namespace MAP
 		 * Requests tiles to cover specified rectangle, in pixels,
 		 * around a centerpoint.
 		 */
-		void requestTiles( IMapCacheListener* listener, MapSourceKind source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
+		void requestTiles( IMapCacheListener* listener, MapSource* source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
 		/**
 		 * Frees all tiles in cache.
 		 */
@@ -99,7 +99,7 @@ namespace MAP
 		/**
 		 * Returns tile from cache, if available
 		 */
-		int findInCache( MapSourceKind source, MapTileCoordinate tileXY ) const;
+		int findInCache( MapSource *source, MapTileCoordinate tileXY ) const;
 		/**
 		 * returns first unused location in cache
 		 */

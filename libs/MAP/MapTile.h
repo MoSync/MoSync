@@ -26,12 +26,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "DateTime.h"
 #include "LonLat.h"
-#include "MapSourceKind.h"
 
 using namespace MAPUtil;
 
 namespace MAP
 {
+	class MapSource;
+
 	//=========================================================================
 	/**
 	 * \brief Single tile from a map source
@@ -46,8 +47,8 @@ namespace MAP
 		/**
 		 * Creates a map tile.
 		 */
-		MapTile( MapSourceKind sourceKind, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
-			mSourceKind( sourceKind ),
+		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
+			mSource( source ),
 			mGridX( gridX ),
 			mGridY( gridY ),
 			mMagnification( magnification ),
@@ -71,11 +72,11 @@ namespace MAP
 			mLastAccessTime = DateTime::now( ); 
 		}
 		/**
-		 * Returns source kind of tile.
+		 * Returns the source for this tile.
 		 */
-		MapSourceKind getSourceKind( ) const	
-		{ 
-			return mSourceKind; 
+		MapSource* getMapSource( ) const
+		{
+			return mSource;
 		}
 		/**
 		 * Returns X coordinate of tile in tile grid.
@@ -121,7 +122,7 @@ namespace MAP
 		}
 
 	private:
-		MapSourceKind mSourceKind;
+		MapSource* mSource;
 		int mGridX;
 		int mGridY;
 		int mMagnification;
