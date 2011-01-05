@@ -739,6 +739,14 @@ public:
 			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(I)Ljava/nio/ByteBuffer;");
 			if (methodID == 0) return -1;
 			jobject jo = mJniEnv->CallObjectMethod(mJThis, methodID, (DATA_SEGMENT_SIZE));
+			
+			// if the java object jo is NULL at this point there was not enought memory to allocate the data section
+			if(jo == NULL) 
+			{
+				__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "Deta section was allocated, not enough memory!");
+				return 0;
+			}
+			
 			mem_ds = (int*)mJniEnv->GetDirectBufferAddress(jo);
 			mJniEnv->DeleteLocalRef(cls);
 #else
