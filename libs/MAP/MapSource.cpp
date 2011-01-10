@@ -294,7 +294,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapSource::downloadCancelled(Downloader* downloader)
+	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
@@ -303,7 +303,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapSource::error(Downloader* downloader, int code)
+	void MapSource::error( Downloader* downloader, int code )
 	//-------------------------------------------------------------------------
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;

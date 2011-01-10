@@ -57,6 +57,18 @@ namespace MAP
 
 	//=========================================================================
 	/**
+	 * \brief Pan mode for use in MapWidget::scroll( )
+	 */
+	enum MapWidgetPanMode
+	//=========================================================================
+	{
+		MapWidgetPanMode_Instant,
+		MapWidgetPanMode_Smooth,
+		MapWidgetPanMode_Momentum
+	};
+
+	//=========================================================================
+	/**
 	 * \brief Simple slippy map widget.
 	 */
 	class MapWidget : public Widget, IMapCacheListener
@@ -65,7 +77,7 @@ namespace MAP
 		friend class MapWidgetPanTimerListener;
 
 	public:
-		MapWidget(MapSource* source, int x, int y, int width, int height, Widget* parent);
+		MapWidget( /*MapSource* source,*/ int x, int y, int width, int height, Widget* parent );
 		
 		virtual ~MapWidget( );
 		/**
@@ -96,10 +108,21 @@ namespace MAP
 		bool getHasScale( ) const { return mHasScale; }
 		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
 		/**
-		 * Smooth panning property
+		 * Sets panning mode
 		 */
-		bool getHasSmoothPanning( ) const;
-		void setHasSmoothPanning( bool hasSmoothPanning );
+		//bool getHasSmoothPanning( ) const;
+		//void setHasSmoothPanning( bool hasSmoothPanning );
+		MapWidgetPanMode getPanMode( ) const;
+		void setPanMode( MapWidgetPanMode panMode );
+		/*
+		 * Sets pan momentum for momentum-based pan mode
+		 */
+		void setPanMomentum( int momentumX, int momentumY );
+		/**
+		 * sets friction for momentum-based pan mode
+		 */
+		float getPanFriction( ) const;
+		void setPanFriction( float friction );
 		/**
 		 * Returns currently used font.
 		 */
@@ -170,9 +193,14 @@ namespace MAP
 		MAHandle mScreenImage;
 		bool mHasScale;
 		MapWidgetPanTimerListener* mPanTimerListener;
-		bool mHasSmoothPanning;
+		//bool mHasSmoothPanning;
+		MapWidgetPanMode mPanMode;
 		Font* mFont;
 		bool mTimerRunning;
+		int mPanMomentumX;
+		int mPanMomentumY;
+		float mPanFriction;
+		int mPanStartTimeMs;
 	};
 }
 #endif // MAPWIDGET_H_

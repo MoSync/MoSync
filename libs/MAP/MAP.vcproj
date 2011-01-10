@@ -191,10 +191,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MapSourceMgr.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\MapWidget.cpp"
 				>
 			</File>
@@ -246,14 +242,6 @@
 			</File>
 			<File
 				RelativePath=".\MapSource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MapSourceKind.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MapSourceMgr.h"
 				>
 			</File>
 			<File

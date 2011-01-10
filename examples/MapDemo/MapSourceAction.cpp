@@ -20,11 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MapDemo
 {
 	//-------------------------------------------------------------------------
-	MapSourceAction::	MapSourceAction( MapWidget* widget, MapSourceKind& kind, MapSourceKind mapSourceKind, const char* label ) :
+	MapSourceAction::MapSourceAction( MapWidget* widget, MapSource* source, const char* label ) :
 	//-------------------------------------------------------------------------
 		mWidget( widget ),
-		mKind( kind ),
-		mMapSourceKind( mapSourceKind ),
+		mSource( source ),
 		mLabel( label )
 	{
 	}
@@ -47,8 +46,7 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	{
 		mWidget->enterMapUpdateScope( );
-		mKind = mMapSourceKind;
-		mWidget->setMapSourceKind( mKind );
+		mWidget->setMapSource( mSource );
 		mWidget->exitMapUpdateScope( false );
 	}
 }

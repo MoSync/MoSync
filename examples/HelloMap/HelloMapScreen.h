@@ -53,7 +53,11 @@ namespace HelloMap
 		void					nextMapSource( );
 
 		MapWidget*				mMap;
-		MapSource*  			mMapSource;
+		Font*					mFont;
+		MapSource*				mOpenStreetMapSource;
+		MapSource*				mGoogleStreetMapSource;
+		MapSource*				mGoogleAerialMapSource;
+		MapSource*				mGoogleHybridMapSource;
 	};
 }
 

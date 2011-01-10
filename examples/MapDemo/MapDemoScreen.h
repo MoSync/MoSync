@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 #include "AppScreen.h"
 #include <MAP/MapWidget.h>
-#include <MAP/MapSourceMgr.h>
 
 using namespace MAP;
 using namespace MapDemoUI;
@@ -59,8 +58,10 @@ namespace MapDemo
 		void nextMapSource( );
 
 		MapWidget* mMap;
-		MapSourceKind mMapSourceKind;
-
+		MapSource* mOpenStreetMapSource;
+		MapSource* mGoogleStreetMapSource;
+		MapSource* mGoogleAerialMapSource;
+		MapSource* mGoogleHybridMapSource;
 		bool scrolling ;
 		int prevX;
 		int prevY;
