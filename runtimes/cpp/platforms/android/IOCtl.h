@@ -204,4 +204,11 @@ namespace Base
 	* @return \< 0 on error.
 	*/
 	int _maHomeScreenShortcutRemove(const char* name, JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	* Turn on/off sending of screen on/off events. Off by default.
+	* @param eventsOn 1 = events on, 0 = events off
+	* @return \< 0 on error.
+	*/
+	int _maScreenStateEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
 }

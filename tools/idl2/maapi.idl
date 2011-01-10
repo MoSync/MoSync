@@ -1259,15 +1259,32 @@ interface MAAPI {
 		*/
 		TEXTBOX = 23;
 
-		/** \brief The phone's home screen just became visible.
-		* \see maHomeScreenEventsOn()
-		*/
+		/** \brief The home screen became visible.
+		 * Currently implemented only on Android.
+		 * \see maHomeScreenEventsOn()
+		 */
 		HOMESCREEN_SHOWN = 24;
 
-		/** \brief The phone's home screen was just hidden.
-		* \see maHomeScreenEventsOn()
-		*/
+		/** \brief The home screen was hidden because an 
+		 * application came to front.
+		 * Currently implemented only on Android.
+		 * \see maHomeScreenEventsOn()
+		 */
 		HOMESCREEN_HIDDEN = 25;
+
+		/** \brief The screen was turned on (the device
+		 * went out of sleep state).
+		 * Currently implemented only on Android.
+		 * \see maScreenActivateEventsOn()
+		 */
+		SCREEN_STATE_ON = 26;
+
+		/** \brief The screen was turned off (the device
+		 * went into sleep state).
+		 * Currently implemented only on Android.
+		 * \see maScreenActivateEventsOn()
+		 */
+		SCREEN_STATE_OFF = 27;
 	}
 
 	/**
@@ -3140,7 +3157,22 @@ interface MAAPI {
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
 		 * @return \< 0 on error.
 		 */
-		void maScreenSetFullscreen(in int fullscreen);
+		int maScreenSetFullscreen(in int fullscreen);
+		
+		/**
+		 * Turn on sending of screen state events. Off by default.
+		 * @return \< 0 on error.
+		 * \see #EVENT_TYPE_SCREEN_STATE_ON
+		 * \see #EVENT_TYPE_SCREEN_STATE_OFF
+		 * \see maHomeScreenEventsOff()
+		 */
+		int maScreenStateEventsOn();
+
+		/**
+		 * Turn off sending of screen state events. Off by default.
+		 * @return \< 0 on error.
+		 */
+		int maScreenStateEventsOff();
 	}
 	
 	constset int IOCTL_ {

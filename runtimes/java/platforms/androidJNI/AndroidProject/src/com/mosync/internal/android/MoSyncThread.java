@@ -21,6 +21,8 @@ import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
@@ -58,8 +60,10 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -209,6 +213,11 @@ public class MoSyncThread extends Thread
 	int mMaxStoreId = 0;
 
 	final static String storesPath = "MAStore";
+	
+	/**
+	 * BroadcastReceiver that handles screen on/off events.
+	 */
+	BroadcastReceiver mScreenActivatedReceiver = null;
 
 	/**
 	 * MoSyncThread constructor
@@ -1059,48 +1068,48 @@ public class MoSyncThread extends Thread
 		// might take some time to understand, because mirroring
 		// flips the coordinate system, positive becomes negative,
 		// rotation goes the other way, and so on.
-	    switch (transformMode)
+		switch (transformMode)
 		{
-	    	case TRANS_NONE:
-	    		mCanvas.translate(dstLeft, dstTop);
-	    		break;
+			case TRANS_NONE:
+				mCanvas.translate(dstLeft, dstTop);
+				break;
 				
-	    	case TRANS_ROT90:
-	    		mCanvas.translate(dstLeft + srcRectHeight, dstTop);
-	    		mCanvas.rotate(90);
-	    		break;
+			case TRANS_ROT90:
+				mCanvas.translate(dstLeft + srcRectHeight, dstTop);
+				mCanvas.rotate(90);
+				break;
 				
-	    	case TRANS_ROT180:
-	    		mCanvas.translate(dstLeft + srcRectWidth, dstTop + srcRectHeight);
-	    		mCanvas.rotate(180);
-	    		break;
+			case TRANS_ROT180:
+				mCanvas.translate(dstLeft + srcRectWidth, dstTop + srcRectHeight);
+				mCanvas.rotate(180);
+				break;
 				
-	    	case TRANS_ROT270:
-	    		mCanvas.translate(dstLeft, dstTop + srcRectWidth);
-	    		mCanvas.rotate(270);
-	    		break;
+			case TRANS_ROT270:
+				mCanvas.translate(dstLeft, dstTop + srcRectWidth);
+				mCanvas.rotate(270);
+				break;
 				
-	    	case TRANS_MIRROR:
-	    		mCanvas.translate(dstLeft + srcRectWidth, dstTop);
-	    		mCanvas.scale(-1, 1);
-	    		break;
+			case TRANS_MIRROR:
+				mCanvas.translate(dstLeft + srcRectWidth, dstTop);
+				mCanvas.scale(-1, 1);
+				break;
 				
-	    	case TRANS_MIRROR_ROT90:
-	    		mCanvas.translate(dstLeft + srcRectHeight, dstTop + srcRectWidth);
-	    		mCanvas.scale(-1, 1);
-	    		mCanvas.rotate(270);
-	    		break;
+			case TRANS_MIRROR_ROT90:
+				mCanvas.translate(dstLeft + srcRectHeight, dstTop + srcRectWidth);
+				mCanvas.scale(-1, 1);
+				mCanvas.rotate(270);
+				break;
 				
-	    	case TRANS_MIRROR_ROT180:
-	    		mCanvas.translate(dstLeft, dstTop + srcRectHeight);
-	    		mCanvas.scale(-1, 1);
-	    		mCanvas.rotate(180);
-	    		break;
+			case TRANS_MIRROR_ROT180:
+				mCanvas.translate(dstLeft, dstTop + srcRectHeight);
+				mCanvas.scale(-1, 1);
+				mCanvas.rotate(180);
+				break;
 				
-	    	case TRANS_MIRROR_ROT270:
-	    		mCanvas.translate(dstLeft, dstTop);
-	    		mCanvas.scale(-1, 1);
-	    		mCanvas.rotate(90);
+			case TRANS_MIRROR_ROT270:
+				mCanvas.translate(dstLeft, dstTop);
+				mCanvas.scale(-1, 1);
+				mCanvas.rotate(90);
 				break;
 				
 			default:
@@ -2188,7 +2197,7 @@ public class MoSyncThread extends Thread
 	{
 		final Activity activity = (Activity) mContext;
 		
-	    activity.runOnUiThread(new Runnable()
+		activity.runOnUiThread(new Runnable()
 		{
 			public void run()
 			{
@@ -2221,7 +2230,7 @@ public class MoSyncThread extends Thread
 	{
 		final Activity activity = (Activity) mContext;
 		
-	    activity.runOnUiThread(new Runnable()
+		activity.runOnUiThread(new Runnable()
 		{
 			public void run()
 			{
@@ -2451,6 +2460,48 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Turn on screen on/off events.
+	 * @param eventsOn 1 = events on, 0 = events off
+	 * @return 1 on success, < 0 on failure.
+	 */
+	int maScreenStateEventsOnOff(int eventsOn)
+	{
+		if (1 == eventsOn)
+		{
+			// There should be no receiver active.
+			if (null != mScreenActivatedReceiver)
+			{
+				return -2;
+			}
+			
+			IntentFilter filter = new IntentFilter();
+			filter.addAction(Intent.ACTION_SCREEN_ON);
+			filter.addAction(Intent.ACTION_SCREEN_OFF);
+			mScreenActivatedReceiver = new ScreenActivatedReceiver(this);
+			getActivity().registerReceiver(mScreenActivatedReceiver, filter);
+			
+			return 1;
+		}
+		else if (0 == eventsOn)
+		{
+			// There should be a receiver active.
+			if (null == mScreenActivatedReceiver)
+			{
+				return -2;
+			}
+			
+			getActivity().unregisterReceiver(mScreenActivatedReceiver);
+			
+			mScreenActivatedReceiver = null;
+			
+			return 1;
+		}
+		
+		// eventsOn was not a valid on/off flag.
+		return -2;
+	}
+	
+	/**
 	 * Class that holds image data.
 	 */
 	public static final class ImageCache
@@ -2517,5 +2568,41 @@ public class MoSyncThread extends Thread
 		 * The byte size of this ubin.
 		 */
 		private int mSize;
+	}
+	
+	/**
+	 * This BroadcastReceiver listens to events ACTION_SCREEN_ON
+	 * and ACTION_SCREEN_OFF and posts the corresponding events
+	 * on the MoSync event queue.
+	 */
+	public static class ScreenActivatedReceiver extends BroadcastReceiver 
+	{
+		private MoSyncThread mMoSyncThread;
+		
+		public ScreenActivatedReceiver(MoSyncThread thread)
+		{
+			mMoSyncThread = thread;
+		}
+		
+		@Override
+		public void onReceive(Context context, Intent intent) 
+		{
+			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) 
+			{
+				// Send ON event.
+				Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_ON");
+				int[] event = new int[1];
+				event[0] = EVENT_TYPE_SCREEN_STATE_ON;
+				mMoSyncThread.postEvent(event);
+			} 
+			else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) 
+			{
+				// Send OFF event.
+				Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_OFF");
+				int[] event = new int[1];
+				event[0] = EVENT_TYPE_SCREEN_STATE_OFF;
+				mMoSyncThread.postEvent(event);
+			}
+		}
 	}
 }

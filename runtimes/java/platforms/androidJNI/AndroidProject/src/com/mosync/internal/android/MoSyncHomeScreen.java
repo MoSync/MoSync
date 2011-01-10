@@ -230,7 +230,7 @@ public class MoSyncHomeScreen
 			{
 				Log.i("MoSyncSyscalls", 
 					"maHomeScreenEventsOnOff - thread already running");
-				return -1;
+				return -2;
 			}
 			
 			// Create and start thread.
@@ -246,7 +246,7 @@ public class MoSyncHomeScreen
 			mHomeScreenDetectionThread = null;
 		}
 		
-		return -1;
+		return -2;
 	}
 
 	/**
