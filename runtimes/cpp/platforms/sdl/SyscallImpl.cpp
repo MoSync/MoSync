@@ -1842,6 +1842,7 @@ namespace Base {
 	}
 #endif
 
+#ifdef SUPPORT_OPENGL_ES
 	int maOpenGLInitFullscreen() {
 		TEST_Z(Base::subViewOpen(sSkin->getScreenLeft(), sSkin->getScreenTop(), sSkin->getScreenWidth(), sSkin->getScreenHeight(), sSubView));
 		TEST_Z(Base::openGLInit(sSubView));
@@ -1917,6 +1918,8 @@ namespace Base {
 
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
+	
+#endif // SUPPORT_OPENGL_ES	
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 		switch(function) {
