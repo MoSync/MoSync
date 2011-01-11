@@ -19,19 +19,18 @@ package com.mosync.internal.android;
 
 import android.util.Log;
 
-import java.io.*;
-
-final class BigPhatError extends
-#ifdef BFE_EXCEPTION
-	IOException
-#else
-	Error
-#endif	//BFE_EXCEPTION
+/**
+ * This class represents an irrecoverable error.
+ *
+ * TODO: Review how this class is used. Either catch it,
+ * or replace with a panic call.
+ */
+@SuppressWarnings("serial")
+public class BigPhatError extends Error
 {
 	public BigPhatError(String s) 
 	{ 
-		super(s); 
-		
+		super(s);
 		Log.e("@@@ MoSync", "BigPhatError created:" + s);
 		new Exception("Stack Trace").printStackTrace();
 	}

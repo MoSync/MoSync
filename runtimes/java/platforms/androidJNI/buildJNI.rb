@@ -75,8 +75,9 @@ if secondarg == nil
 	exit 1
 end
 
-# Store the current android version in the environment variable MOSYNC_ANDROID_API_LEVEL
-ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
+# TODO: MOSYNC_ANDROID_API_LEVEL is not used I guess! Remove it.
+# Store the API level in the environment variable MOSYNC_ANDROID_API_LEVEL
+#ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
 
 debug = (fortharg == nil) ? "" : "D"
 
@@ -112,13 +113,20 @@ else
 	sh("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
 
-puts "Preprocess Java Source Files\n\n"
+# TODO: Delete commented out code when we are sure it is not needed.
+##puts "Preprocess Java Source Files\n\n"
 
+# Go to Android Java runtime root directory.
 cd ".."
 puts pwd
 
-sh "ruby buildJava.rb"
+# TODO: Delete commented out code when we are sure it is not needed.
+# Not used, there are no longer any .jpp files to build.
+#sh "ruby buildJava.rb"
 
+# Create temporary directory used for output.
+# First make sure delete it if it exists to make 
+# sure we get an empty directory.
 class_dir = "temp/"
 if File.exist? class_dir
 	rm_rf class_dir # delete everything in it and itself
@@ -127,11 +135,23 @@ Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
+sh(
+	"#{secondarg}../../tools/aapt package -f -v -M " +
+	"#{package_root}/AndroidManifest.xml -F resources.ap_ -I " +
+	"#{secondarg}/android.jar -S " +
+	"#{package_root}/res -m -J " +
+	"#{package_root}src")
 
 puts "Compile Java Source Files\n\n"
 
 # Compile all the java files into class files
-sh("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+sh(
+	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
+	"-classpath " +
+	"#{secondarg}/android.jar " +
+	"#{package_root}/src/com/mosync/java/android/*.java " +
+	"#{package_root}/src/com/mosync/internal/android/*.java " +
+	"#{package_root}/src/com/mosync/internal/generated/*.java")
 
 
 puts "Copy Generated Library File\n\n"
@@ -154,5 +174,5 @@ copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
 
 cd ".."
 
-# clean up
+# Delete temp dir.
 rm_rf class_dir

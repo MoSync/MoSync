@@ -35,6 +35,7 @@ using namespace std;
 
 static vector<string> readExtensions(const char* filename);
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi);
+static void outputRuntimeBuilderFiles(const Interface& maapi);
 static void outputCpp(const Interface& maapi);
 static void outputAsmConfigLst(const Interface& maapi);
 static void outputAsmConfigH(const Interface& maapi);
@@ -114,18 +115,39 @@ static void copy(string src, string dst) {
 #endif
 }
 
+/**
+ * This is where the idl file is parsed and output files are generated.
+ */
 int main() {
 	try {
+		// Generated files goes to this folder, is then copied to 
+		// target folders.
 		_mkdir("Output");
+		
+		// Read and parse the extensions and idl files.
 		vector<string> ixs = readExtensions("extensions.h");
 		Interface maapi = parseInterface(ixs, "maapi.idl");
+		
+		// Generate files for the MoSync API.
 		outputMaapi(ixs, maapi);
-		outputCoreConsts();
 
+		// Generate files used when building the runtimes.
+		outputRuntimeBuilderFiles(maapi);
+		
+		// Generate core constants.
+		outputCoreConsts();
+		
+		// TODO: Generate bindings for Lua.
+		//outputLuaBindings(maapi);
+
+		// Create directory for include files.
+		// TODO: Document how this directory is used.
+		// Is this the incldue directory in the MoSync installation?
+		// Do we copy files there in this program?
 		_mkdir((MOSYNCDIR + "/include").c_str());
 
-		// create the new generated folder for java files
-		_mkdir("../../runtimes/java/shared/generated");
+		// Create the new generated folder for java files.
+		_mkdir("../../runtimes/java/Shared/generated");
 
 		copy("Output/maapi.h", "../../libs/MAStd/");
 		copy("maapi_defs.h", "../../libs/MAStd/");
@@ -138,6 +160,13 @@ int main() {
 		copy("Output/syscall_static_java.h", "../../runtimes/java/Shared/generated/");
 		copy("Output/core_consts.h", "../../runtimes/java/Shared/generated/");
 		copy("Output/MAAPI_consts.h", "../../runtimes/java/Shared/generated/");
+
+		// Create folder for generated java files in the Android runtime.
+		_mkdir("../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated");
+
+		// Copy generated Android file.
+		copy("Output/MAAPI_consts.java", 
+			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
@@ -159,6 +188,10 @@ int main() {
 			copy("Output/" + ixs[i] + ".h", "../../libs/MAStd/");
 			copy("Output/" + ixs[i] + ".h", "../../libs/newlib/libc/sys/mosync/");
 			copy("Output/" + ixs[i] + "_CONSTS.h", "../../runtimes/java/Shared/generated/");
+
+			// Copy generated Android files.
+			copy("Output/" + ixs[i] + ".java", 
+				"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 		}
 
 		return 0;
@@ -166,35 +199,6 @@ int main() {
 		printf("Exception: %s\n", e.what());
 		return 1;
 	}
-}
-
-static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
-	{ ofstream file("Output/cpp_defs.h"); streamCppDefsFile(file, maapi, ixs, -1); }
-	outputConsts("Output/MAAPI_consts.h", maapi, -1);
-	{ ofstream file("Output/maapi.h"); streamHeaderFile(file, maapi, ixs, -1); }
-
-	for(size_t i=0; i<ixs.size(); i++) {
-		{
-			ofstream file(("Output/CPP_" + toupper(ixs[i]) + ".h").c_str());
-			streamCppDefsFile(file, maapi, ixs, i);
-		}
-		outputConsts("Output/" + toupper(ixs[i]) + "_CONSTS.h", maapi, i);
-		{
-			ofstream file(("Output/" + toupper(ixs[i]) + ".h").c_str());
-			streamHeaderFile(file, maapi, ixs, i);
-		}
-	}
-
-	outputCpp(maapi);
-	outputAsmConfigLst(maapi);
-	outputAsmConfigH(maapi);
-	outputDllDefine(maapi);
-	outputInvokeSyscallCpp(maapi);
-	outputInvokeSyscallArmRecompiler(maapi);
-	outputInvokeSyscallJava(maapi);
-	outputSyscallStaticJava(maapi);
-	outputSyscallStaticCpp(maapi);
-	outputConstSets(maapi);
 }
 
 static vector<string> readExtensions(const char* filename) {
@@ -216,6 +220,62 @@ static vector<string> readExtensions(const char* filename) {
 	return ixs;
 }
 
+/**
+ * Generate files for the MoSync API.
+ */
+static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
+	// Generate files for the main API.
+	{ 
+		ofstream ccpDefsFile("Output/cpp_defs.h");
+		streamCppDefsFile(ccpDefsFile, maapi, ixs, MAIN_INTERFACE);
+
+		outputConsts("Output/MAAPI_consts.h", maapi, MAIN_INTERFACE);
+
+		// This is where maapi.h is generated.
+		ofstream headerFile("Output/maapi.h");
+		streamHeaderFile(headerFile, maapi, ixs, MAIN_INTERFACE);
+
+		// Generate Java definition file for the main API (used by 
+		// the Android runtime).
+		string className = "MAAPI_consts";
+		ofstream javaFile(("Output/" + className + ".java").c_str());
+		streamJavaDefinitionFile(javaFile, className, maapi, MAIN_INTERFACE);
+	}
+
+	// Generate files for API extensions.
+	for (size_t i=0; i<ixs.size(); i++) {
+		ofstream ccpDefsFile(("Output/CPP_" + toupper(ixs[i]) + ".h").c_str());
+		streamCppDefsFile(ccpDefsFile, maapi, ixs, i);
+
+		outputConsts("Output/" + toupper(ixs[i]) + "_CONSTS.h", maapi, i);
+
+		ofstream headerFile(("Output/" + toupper(ixs[i]) + ".h").c_str());
+		streamHeaderFile(headerFile, maapi, ixs, i);
+
+		// Generate Java definition file for extension (used by 
+		// the Android runtime).
+		string className = toupper(ixs[i]);
+		ofstream javaFile(("Output/" + className + ".java").c_str());
+		streamJavaDefinitionFile(javaFile, className, maapi, i);
+	}
+}
+
+/**
+ * Generate files used when building the runtimes.
+ */
+static void outputRuntimeBuilderFiles(const Interface& maapi) {
+	outputCpp(maapi);
+	outputAsmConfigLst(maapi);
+	outputAsmConfigH(maapi);
+	outputDllDefine(maapi);
+	outputInvokeSyscallCpp(maapi);
+	outputInvokeSyscallArmRecompiler(maapi);
+	outputInvokeSyscallJava(maapi);
+	outputSyscallStaticJava(maapi);
+	outputSyscallStaticCpp(maapi);
+	outputConstSets(maapi);
+}
+
 static void outputConsts(const string& filename, const Interface& inf, int ix) {
 	ofstream stream(filename.c_str());
 	string def = toDef(getFilenameFromPath(filename));
@@ -232,7 +292,9 @@ static void outputConsts(const string& filename, const Interface& inf, int ix) {
 	stream << "#endif\t//" << def << "\n";
 }
 
-//streams C function declarations.
+/**
+ * Streams C function declarations.
+ */
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) {
 	for(size_t i=0; i<inf.functions.size(); i++) {
 		const Function& f(inf.functions[i]);

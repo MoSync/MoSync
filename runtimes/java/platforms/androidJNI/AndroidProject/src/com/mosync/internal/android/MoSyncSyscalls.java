@@ -17,28 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
-import android.util.Log;
-
-import java.io.*;
-
-final class BigPhatError extends
-#ifdef BFE_EXCEPTION
-	IOException
-#else
-	Error
-#endif	//BFE_EXCEPTION
+public class MoSyncSyscalls
 {
-	public BigPhatError(String s) 
-	{ 
-		super(s); 
-		
-		Log.e("@@@ MoSync", "BigPhatError created:" + s);
-		new Exception("Stack Trace").printStackTrace();
-	}
-	
-	public BigPhatError() 
-	{
-		Log.e("@@@ MoSync", "BigPhatError created");
-		new Exception("Stack Trace").printStackTrace();
-	}
+	// TODO: Move syscalls here from MoSyncThread.
 }

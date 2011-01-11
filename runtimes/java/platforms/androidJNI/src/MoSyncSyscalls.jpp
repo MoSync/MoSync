@@ -1742,16 +1742,19 @@ int maSendToBackground()
 	Log.i("MoSync", "maSendToBackground");
 	
 	final Activity activity = (Activity) mContext;
+	
 	activity.moveTaskToBack(true);
 	
-	// TODO: Must moveTaskToBack() be called in the UI thread?
-    /*activity.runOnUiThread(new Runnable()
-	{
-		public void run()
-		{
-			activity.moveTaskToBack(true);
-		}
-	});*/
+	// Alternatively use an intent that shows the home screen.
+	// The drawback is that the activity that displayed the
+	// MoSync app will not be displayed. We will always go to
+	// the home screen, so this solution is less desirable.
+	/*
+	Intent intent = new Intent(Intent.ACTION_MAIN);
+	intent.addCategory(Intent.CATEGORY_HOME);
+	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	activity.startActivity(intent);
+	*/
 	
 	return 0;
 }
@@ -1855,7 +1858,7 @@ void maScreenSetFullscreenHelper(final boolean fullscreenOn)
  */
 int maWallpaperSet(final int data)
 {
-	Log.i("MoSync", "maWallpaperSet");
+	Log.i("MoSync", "maWallpaperSet handle: " + data);
 	
 	homeScreenPanicIfPermissionsAreNotSet();
 	
@@ -1891,6 +1894,69 @@ int maWallpaperSet(final int data)
 }
 
 /**
+ * Add a shortcut icon to the home screen. If called multiple times
+ * multiple icons will be added. The shortcut launches the current
+ * application.
+ * @param name The text that will be used for the shortcut label.
+ * @return <0 on error
+ */
+int maHomeScreenShortcutAdd(String name)
+{
+	homeScreenPanicIfPermissionsAreNotSet();
+	
+	// Create intent for the shortcut launcher.
+	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
+	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+	shortcutIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	
+	// Get icon resource.
+	int icon = mContext.getResources().getIdentifier(
+		"icon", 
+		"drawable", 
+		mContext.getPackageName());
+	
+	// Create intent for adding a shortcut icon.
+	Intent intent = new Intent();
+	intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+	intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+	intent.putExtra(
+		Intent.EXTRA_SHORTCUT_ICON_RESOURCE, 
+		Intent.ShortcutIconResource.fromContext(mContext, icon));
+	intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+	// Alternative form: intent.setAction(Intent.ACTION_CREATE_SHORTCUT); 
+	
+	// Broadcast the intent.
+	mContext.getApplicationContext().sendBroadcast(intent);
+	
+	return 1;
+}
+
+/**
+ * Remove a shortcut icon to the home screen. 
+ * @param name The shortcut(s) with this label will be removed.
+ * @return <0 on error
+ */
+int maHomeScreenShortcutRemove(String name)
+{
+	homeScreenPanicIfPermissionsAreNotSet();
+	
+	Intent shortcutIntent = new Intent(Intent.ACTION_MAIN);
+	shortcutIntent.setClassName(mContext, mContext.getClass().getName());
+	
+	Intent intent = new Intent();
+	intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+	intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
+	intent.setAction("com.android.launcher.action.UNINSTALL_SHORTCUT");
+	
+	mContext.getApplicationContext().sendBroadcast(intent);
+	
+	return 1;
+}
+
+/**
  * Thread that checks if the home screen is visible.
  */
 HomeScreenDetectionThread mHomeScreenDetectionThread = null;
@@ -1911,7 +1977,8 @@ int maHomeScreenEventsOnOff(final int eventsOn)
 		// Thread should not be started.
 		if (null != mHomeScreenDetectionThread)
 		{
-			Log.i("MoSyncSyscalls", "maHomeScreenEventsOnOff - thread already running");
+			Log.i("MoSyncSyscalls", 
+				"maHomeScreenEventsOnOff - thread already running");
 			return -1;
 		}
 		
@@ -1938,19 +2005,29 @@ int maHomeScreenEventsOnOff(final int eventsOn)
 void homeScreenPanicIfPermissionsAreNotSet()
 {
 	if ((PackageManager.PERMISSION_GRANTED != 
-		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.GET_TASKS))
+		 mContext.checkCallingOrSelfPermission(
+			android.Manifest.permission.GET_TASKS))
 		||
 		(PackageManager.PERMISSION_GRANTED != 
-		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.SET_WALLPAPER))
+		 mContext.checkCallingOrSelfPermission(
+			android.Manifest.permission.SET_WALLPAPER))
 		||
 		(PackageManager.PERMISSION_GRANTED != 
-		 mContext.checkCallingOrSelfPermission(android.Manifest.permission.SET_WALLPAPER_HINTS))
+		 mContext.checkCallingOrSelfPermission(
+			android.Manifest.permission.SET_WALLPAPER_HINTS))
 		||
 		(PackageManager.PERMISSION_GRANTED != 
-		 mContext.checkCallingOrSelfPermission("com.android.launcher.permission.INSTALL_SHORTCUT"))
+		 mContext.checkCallingOrSelfPermission(
+			"com.android.launcher.permission.INSTALL_SHORTCUT"))
+		||
+		(PackageManager.PERMISSION_GRANTED != 
+		 mContext.checkCallingOrSelfPermission(
+			"com.android.launcher.permission.UNINSTALL_SHORTCUT"))
 		)
 	{
-		maPanic(1, "Permission 'Home Screen and Wallpaper access' is not set in the MoSync project");
+		maPanic(1, 
+			"Permission 'Home Screen and Wallpaper access' " +
+			"is not set in the MoSync project");
 	}
 }
 
@@ -1988,14 +2065,24 @@ class HomeScreenDetectionThread extends Thread
 	
 	public void run()
 	{
-		//Log.i("MoSyncSyscalls", "HomeScreenDetectionThread run");
+		Log.i("MoSyncSyscalls", "HomeScreenDetectionThread is starting");
+		
+		// Used for printing debug messages at a reduced interval.
+		int debugPrintAliveCounter = 0;
 		
 		mIsRunning = true;
 		while (mIsRunning)
 		{
 			try
 			{
-				//Log.i("MoSyncSyscalls", "HomeScreenDetectionThread is alive");
+				// Will print every 10 seconds.
+				if (debugPrintAliveCounter++ % 10 == 0)
+				{
+					Log.i("MoSyncSyscalls", 
+						"HomeScreenDetectionThread is alive."
+						+ " mHomeScreenTaskId: " + mHomeScreenTaskId 
+						+ " Timestamp: " + System.currentTimeMillis());
+				}
 				
 				boolean isOnHomeScreen = isHomeScreenVisible();
 				
@@ -2009,12 +2096,16 @@ class HomeScreenDetectionThread extends Thread
 					int[] event = new int[1];
 					if (mIsOnHomeScreen)
 					{
-						Log.i("MoSyncSyscalls", "HOMESCREEN IS SHOWN");
+						Log.i("MoSyncSyscalls", 
+							"HOMESCREEN IS SHOWN Timestamp: " 
+							+ System.currentTimeMillis());
 						event[0] = EVENT_TYPE_HOMESCREEN_SHOWN;
 					}
 					else
 					{
-						Log.i("MoSyncSyscalls", "HOMESCREEN IS HIDDEN");
+						Log.i("MoSyncSyscalls", 
+							"HOMESCREEN IS HIDDEN Timestamp: " 
+							+ System.currentTimeMillis());
 						event[0] = EVENT_TYPE_HOMESCREEN_HIDDEN;
 					}
 					postEvent(event);
@@ -2044,6 +2135,14 @@ class HomeScreenDetectionThread extends Thread
 		// Get a list with the top task.
     	List<RunningTaskInfo> taskList = activityManager.getRunningTasks(1);
     	if (null == taskList) { return false; }
+		
+		//int i = 0; 
+		//for (RunningTaskInfo task : taskList)
+		//{
+		//	if (++i > 5) break;
+		//	Log.i("@@@@@@@@", "@ " + task.baseActivity 
+		//		+ " " + task.topActivity + " id: " + task.id);
+		//}
     	
 		// If the home screen task id is -1 it is not known.
 		// Get it from the task list.
@@ -2054,6 +2153,22 @@ class HomeScreenDetectionThread extends Thread
 		
     	// Is the first task in the task list the home screen?
     	boolean isHomeScreen = mHomeScreenTaskId == taskList.get(0).id;
+		
+		// If we have not found the home screen, we make an extra
+		// check of the class name. The home screen class is named
+		// "Launcher" on the systems we have tested. It might be that
+		// some other app, in another package, has the same name, and
+		// then we will mistakenly think that we are on the home screen.
+		// But if the mHomeScreenTaskId has been set this will not be
+		// an issue. The background to this problem is that maSendToBack
+		// (which calls moveTaskToBack) does not put the home screen task
+		// in the RunningTaskInfo list. But pressingt the home key on the
+		// device does so.
+		if (-1 == mHomeScreenTaskId && !isHomeScreen)
+		{
+			isHomeScreen = taskList.get(0).baseActivity
+				.getClassName().endsWith(".Launcher");
+		}
 		
     	return isHomeScreen;
     }
@@ -2075,15 +2190,15 @@ class HomeScreenDetectionThread extends Thread
     		100,
     		ActivityManager.RECENT_WITH_EXCLUDED
     		);
+			
     	if (null != taskList)
     	{
-		
 			// Search for the home screen task.
 	    	for (ActivityManager.RecentTaskInfo taskInfo : taskList)
 	    	{
 		    	Intent intent = taskInfo.baseIntent;
 		    	if (null == intent) { break; }
-		
+			
 		    	// Get task categories.
 		    	Set<String> categories = intent.getCategories();
 		    	if (null == categories) { break; }

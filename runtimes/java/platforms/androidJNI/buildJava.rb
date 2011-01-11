@@ -20,9 +20,9 @@ require '../../../../rules/util.rb'
 include FileUtils::Verbose
 
 #
-# Preprocess the .jpp files and writes them to their output location were they can then be compiled
+# Helper function that preprocesses the .jpp files and writes them to 
+# their output location were they can then be compiled.
 #
-
 def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	jtmp_file = src_file.gsub(/.jpp$/, ".jtmp")		
 	java_file = src_file.gsub(/.jpp$/, ".java")
@@ -34,7 +34,7 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 	# Get the api level 
 	androidVersion = Integer(ENV['MOSYNC_ANDROID_API_LEVEL'])
 	
-	# Add the _ANDROID_BLUETOOTH flag when building for version-5 or higher 
+	# Add the _ANDROID_BLUETOOTH flag when building for version-5 or higher.
 	if androidVersion >= 7
 		buildFlags << " -D_ANDROID_BLUETOOTH"
 		buildFlags << " -D_ANDROID_API_LEVEL_7_OR_HIGHER"
@@ -48,16 +48,26 @@ def preprocess_android_file(src_file, src_dir, shared_dir, output_dir)
 		buildFlags << " -D_ANDROID_API_LEVEL_3"
 	end 
 	
-	# Preprocess the jpp file into a jtmp file, sed fixes the output if any
-	sh("xgcc -x c -E -o #{output_dir}#{jtmp_file} #{buildFlags} -I#{shared_dir} -Isrc" +
-		" #{src_dir}#{src_file} 2>&1 | sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
+	# Preprocess the jpp file into a jtmp file, sed fixes the output if any.
+	sh(
+		"xgcc -x c -E -o #{output_dir}#{jtmp_file} #{buildFlags} " +
+		"-I#{shared_dir} -Isrc #{src_dir}#{src_file} 2>&1 | " +
+		"sed \"s/\\([a-zA-Z/]\\+\\)\\(.[a-zA-Z]\\+\\):" +
+		"\\([0-9]\\+\\):/\\1\\2(\\3):/\"")
 	
-	# Use sed to comment the lines which the proprocessor added to the file and save it as a java file
-	sh("sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > #{output_dir}#{java_file}");
+	# Use sed to comment the lines which the proprocessor 
+	# added to the file and save it as a java file.
+	sh(
+		"sed \"s/^# /\\/\\//\" < #{output_dir}#{jtmp_file} > " +
+		"#{output_dir}#{java_file}");
 	
 	remove "#{output_dir}#{jtmp_file}"
 end
-	
+
+#
+# Script starts doing processing from here.
+#
+
 if !File.exist? "src/config_platform.h"
 	puts "\nFATAL ERROR! - No config_platform.h file found!"
 	return 1
@@ -73,21 +83,37 @@ puts "shared lib: " + shared_java_source
 
 out_dir = "AndroidProject/src/com/mosync/java/android/"
 
-# Preprocess the com.mosync.java.android files, these will later be transformed to the applications real package
+#
+# Preprocess com.mosync.java.android files, these will later be 
+# renamed to the applications real package name.
 #
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSync.jpp" || x == "MoSyncPanicDialog.jpp" || x == "TextBox.jpp" || x == "MoSyncService.jpp") # || x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
-		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
+	if (x == "MoSync.jpp" || 
+		x == "MoSyncPanicDialog.jpp" || 
+		x == "TextBox.jpp" || 
+		x == "MoSyncService.jpp" || 
+		x == "MoSyncAutoStart.jpp")
+		preprocess_android_file(
+			x, 
+			"#{android_source}/", 
+			shared_java_source, out_dir)
 	end
 }
 
 out_dir = "AndroidProject/src/com/mosync/internal/android/"
 
-# Preprocess the com.mosync.internal.android files
+#
+# Preprocess com.mosync.internal.android files.
 #
 Dir.foreach(android_source) {|x| 
-	if (x == "MoSyncView.jpp" || x == "MoSyncThread.jpp" || x == "ThreadPool.jpp" || x == "BigPhatError.jpp" )
-		preprocess_android_file(x, "#{android_source}/", shared_java_source, out_dir)
+	if (x == "MoSyncView.jpp" || 
+		x == "MoSyncThread.jpp" || 
+		x == "ThreadPool.jpp" || 
+		x == "BigPhatError.jpp" )
+		preprocess_android_file(
+			x, 
+			"#{android_source}/", 
+			shared_java_source, out_dir)
 	end
 }
 

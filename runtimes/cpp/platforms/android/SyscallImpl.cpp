@@ -70,6 +70,7 @@ namespace Base
 		// mGotLockedEvent = false;
 		init();
 		
+		// Make sure the event queue is empty.
 		gEventFifo.clear();
 	}
 
@@ -1495,6 +1496,30 @@ namespace Base
 			// 0 = events off
 			return _maHomeScreenEventsOnOff(0, mJNIEnv, mJThis);
 
+		case maIOCtl_maHomeScreenShortcutAdd:
+			SYSLOG("maIOCtl_maHomeScreenShortcutAdd");
+			return _maHomeScreenShortcutAdd(
+				SYSCALL_THIS->GetValidatedStr(a), 
+				mJNIEnv, 
+				mJThis);
+			
+		case maIOCtl_maHomeScreenShortcutRemove:
+			SYSLOG("maIOCtl_maHomeScreenShortcutRemove");
+			return _maHomeScreenShortcutRemove(
+				SYSCALL_THIS->GetValidatedStr(a), 
+				mJNIEnv, 
+				mJThis);
+				
+		case maIOCtl_maScreenStateEventsOn:
+			SYSLOG("maIOCtl_maScreenStateEventsOn");
+			// 1 = events on
+			return _maScreenStateEventsOnOff(1, mJNIEnv, mJThis);
+			
+		case maIOCtl_maScreenStateEventsOff:
+			SYSLOG("maIOCtl_maScreenStateEventsOff");
+			// 0 = events off
+			return _maScreenStateEventsOnOff(0, mJNIEnv, mJThis);
+		
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;

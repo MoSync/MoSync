@@ -23,25 +23,26 @@ require '../../rules/mosync_util.rb'
 
 class RuntimeBuilder 
 
-	# if version is not defined cupcake, 1.5, will be used
+	# If version is not defined, 2.1 (API level 7) will be used.
+	# In fact we currently use API level 7 for all runtime versions.
 	def android(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "3")
+		return androidBuilder(runtime_dir, mode, "7")
 	end
 	
 	def android_3(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "3")
+		return androidBuilder(runtime_dir, mode, "7")
 	end
 	
 	def android_4(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "4")
+		return androidBuilder(runtime_dir, mode, "7")
 	end
 	
 	def android_5(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "4")
+		return androidBuilder(runtime_dir, mode, "7")
 	end
 	
 	def android_6(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "4")
+		return androidBuilder(runtime_dir, mode, "7")
 	end
 	
 	def android_7(runtime_dir, mode)
