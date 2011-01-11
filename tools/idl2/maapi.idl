@@ -3141,6 +3141,10 @@ interface MAAPI {
 		 * @return \< 0 on error.
 		 */
 		void maScreenSetFullscreen(in int fullscreen);
+
+#if IX_OPENGL_ES
+#include "opengl_generated.idl"
+#endif
 	}
 	
 	constset int IOCTL_ {
