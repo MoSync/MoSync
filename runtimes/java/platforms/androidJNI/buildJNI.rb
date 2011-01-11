@@ -72,13 +72,6 @@ if secondarg == nil
 	exit 1
 end
 
-# TODO: MOSYNC_ANDROID_API_LEVEL is not used I guess! Remove it.
-# Store the API level in the environment variable MOSYNC_ANDROID_API_LEVEL
-#ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
-
-## Store the current android version in the environment variable MOSYNC_ANDROID_BLUETOOTH0
-#ENV['MOSYNC_ANDROID_BLUETOOTH'] = secondarg.scan(/android-(\d+)/)[-1][0]
-
 debug = (fortharg == nil) ? "" : "D"
 
 outdir = ".."
@@ -119,9 +112,6 @@ end
 if (!success)
 	exitBuilder(1, thirdarg)
 end
-
-# TODO: Delete commented out code when we are sure it is not needed.
-##puts "Preprocess Java Source Files\n\n"
 
 # Go to Android Java runtime root directory.
 FileUtils.cd ".."
@@ -167,10 +157,6 @@ success = system(
 	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
 	"#{File.join(secondarg, "android.jar")} " + java_files)
-	
-#	"#{File.join(package_root, "src/com/mosync/java/android/*.java")} " +
-#	"#{File.join(package_root, "src/com/mosync/internal/android/*.java")} " +
-#	"#{File.join(package_root, "src/com/mosync/internal/generated/*.java")}")
 
 if (!success)
 	exitBuilder(1,thirdarg)
