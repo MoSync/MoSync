@@ -3069,18 +3069,18 @@ interface MAAPI {
 		int maKeyCaptureStop();
 
 		/**
-		* Turn on sending of HomeScreen events. Off by default.
-		* @return \< 0 on error.
-		* \see #EVENT_TYPE_HOMESCREEN_SHOWN
-		* \see #EVENT_TYPE_HOMESCREEN_HIDDEN
-		* \see maHomeScreenEventsOff()
-		*/
+		 * Turn on sending of HomeScreen events. Off by default.
+		 * @return \< 0 on error.
+		 * \see #EVENT_TYPE_HOMESCREEN_SHOWN
+		 * \see #EVENT_TYPE_HOMESCREEN_HIDDEN
+		 * \see maHomeScreenEventsOff()
+		 */
 		int maHomeScreenEventsOn();
 
 		/**
-		* Turn off sending of HomeScreen events. Off by default.
-		* @return \< 0 on error.
-		*/
+		 * Turn off sending of HomeScreen events. Off by default.
+		 * @return \< 0 on error.
+		 */
 		int maHomeScreenEventsOff();
 		
 		/**
@@ -3124,6 +3124,7 @@ interface MAAPI {
 
 		/**
 		 * Remove a notification item.
+		 * Currently implemented only on Android.
 		 * @param id The id of the notification.
 		 * @return \< 0 on error.
 		 */
@@ -3137,6 +3138,7 @@ interface MAAPI {
 
 		/**
 		 * Set the screen orientation.
+		 * Currently implemented only on Android.
 		 * @param orientation One of the \link #SCREEN_ORIENTATION 
 		 * \endlink constants.
 		 * @return \< 0 on error.
@@ -3154,6 +3156,7 @@ interface MAAPI {
 
 		/**
 		 * Enable/disable fullscreen mode.
+		 * Currently implemented only on Android.
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
 		 * @return \< 0 on error.
 		 */
@@ -3161,6 +3164,7 @@ interface MAAPI {
 		
 		/**
 		 * Turn on sending of screen state events. Off by default.
+		 * Currently implemented only on Android.
 		 * @return \< 0 on error.
 		 * \see #EVENT_TYPE_SCREEN_STATE_ON
 		 * \see #EVENT_TYPE_SCREEN_STATE_OFF
@@ -3170,6 +3174,7 @@ interface MAAPI {
 
 		/**
 		 * Turn off sending of screen state events. Off by default.
+		 * Currently implemented only on Android.
 		 * @return \< 0 on error.
 		 */
 		int maScreenStateEventsOff();
