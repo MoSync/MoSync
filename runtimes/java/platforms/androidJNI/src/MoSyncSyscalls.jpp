@@ -19,18 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #include "generated/MAAPI_consts.h"
 
-final class ImageCache
-{
-	Bitmap mBitmap;
-	Canvas mCanvas;
-
-	ImageCache(Canvas canvas, Bitmap bitmap)
-	{
-		mCanvas = canvas;
-		mBitmap = bitmap;
-	}
-}
-
 public ByteBuffer mMemDataSection;
 ByteBuffer mResourceFile;
 
@@ -1207,6 +1195,8 @@ void maCloseStore(int store, int remove)
 #include "MoSyncNetwork.jpp"
 
 #include "MoSyncLocation.jpp"
+
+#include "NativeUI.jpp"
 
 /**
 * @brief maLoadProgram

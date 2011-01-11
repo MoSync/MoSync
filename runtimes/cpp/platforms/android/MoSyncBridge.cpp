@@ -254,13 +254,36 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.textboxResult = intArray[1];
 		event.textboxLength = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_WIDGET)
+	{	
+		/*
+		 * Structure of intArray for widget events.
+		 *
+		 * Required: 
+		 * intArray[0] - EVENT_TYPE_WIDGET
+		 * intArray[1] - Specifies exactly which widget event that occurred.
+		 * intArray[2] - Handle to the widget that sent the event.
+		 *
+		 * Optional:
+		 * intArray[3] - The id of the message being sent (if it has dynamically allocated data)
+		 * intARray[4] - Size of the message.
+		 */
+
+		// MAGetEvent will handle the deallocation of this memory
+		MAWidgetEventData *widgetEvent = new MAWidgetEventData;
+		
+		widgetEvent->eventType    = intArray[1];
+		widgetEvent->widgetHandle = intArray[2];
+		widgetEvent->messageId    = intArray[3];
+		widgetEvent->messageSize  = intArray[4];
+
+		event.data = widgetEvent;
+	}
 	
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
-	
-	SYSLOG("nativePostEvent: exit");
 }
 
 /**
@@ -295,7 +318,7 @@ static JNINativeMethod sMethods[] =
    { "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource},
    { "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined},
    { "nativeRun", "()V", (void*)nativeRun},
-   { "nativePostEvent", "([I)V", (void*)nativePostEvent},
+   { "nativePostEvent", "([I)V", (void*)nativePostEvent}
 };
 
 /**

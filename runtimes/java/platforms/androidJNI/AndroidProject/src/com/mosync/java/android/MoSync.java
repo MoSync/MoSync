@@ -28,6 +28,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 
 import com.mosync.internal.android.MoSyncThread;
@@ -92,6 +93,16 @@ public class MoSync extends Activity
 		mMoSyncThread.setMoSyncView(mMoSyncView);
 		setContentView(mMoSyncView);
     }
+	
+	public void setRootView(View root)
+	{
+		if(root == null)
+		{
+			Log.i("MoSync", "setRootView, root is null.");
+		}
+	
+		setContentView(root);
+	}
 	
 	/**
 	 * Handles the new configurations when the screen rotates.

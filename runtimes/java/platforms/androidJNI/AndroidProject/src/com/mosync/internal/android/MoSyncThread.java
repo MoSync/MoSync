@@ -86,6 +86,7 @@ import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
+import com.mosync.nativeui.util.AsyncWait;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -118,6 +119,7 @@ public class MoSyncThread extends Thread
 	MoSyncSound mMoSyncSound;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
+	MoSyncNativeUI mMoSyncNativeUI;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -217,12 +219,15 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync) context;
 		
+		EventQueue.sMoSyncThread = this;
+		
 		mHasDied = false;
 		
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
+		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -2449,14 +2454,75 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncHomeScreen.maHomeScreenEventsOnOff(eventsOn);
 	}
+	
+	/**
+	 * Internal wrapper for maWidgetCreate that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetCreate(final String type)
+	{
+		return mMoSyncNativeUI.maWidgetCreate(type);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetDestroy that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetDestroy(final int widget)
+	{
+		return mMoSyncNativeUI.maWidgetDestroy(widget);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetAddChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetAddChild(
+		final int parentHandle, 
+		final int childHandle)
+	{
+		return mMoSyncNativeUI.maWidgetAddChild(parentHandle, childHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetRemoveChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetRemoveChild(
+		final int parentHandle, 
+		final int childHandle)
+	{
+		return mMoSyncNativeUI.maWidgetRemoveChild(parentHandle, childHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetScreenShow that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShow(final int screenHandle)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShow(screenHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetSetProperty that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetSetProperty(
+		final int widgetHandle, 
+		final String key, 
+		final String value)
+	{
+		return mMoSyncNativeUI.maWidgetSetProperty(widgetHandle, key, value);
+	}
 
 	/**
 	 * Class that holds image data.
 	 */
 	public static final class ImageCache
 	{
-		Bitmap mBitmap;
-		Canvas mCanvas;
+		public Bitmap mBitmap;
+		public Canvas mCanvas;
 
 		ImageCache(Canvas canvas, Bitmap bitmap)
 		{

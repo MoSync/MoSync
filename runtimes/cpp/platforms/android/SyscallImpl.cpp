@@ -37,7 +37,7 @@ namespace Base
 {
 	Syscall* gSyscall;
 
-	JNIEnv* mJNIEnv;
+	JNIEnv* mJNIEnv = 0;
 	jobject mJThis;
 	
 	static ResourceArray gResourceArray;
@@ -188,7 +188,7 @@ namespace Base
 		mJNIEnv = je;
 		mJThis = jthis;
 	}
-	
+
 	void Syscall::postEvent(MAEvent event)
 	{
 		SYSLOG("PostEvent");
@@ -1096,7 +1096,8 @@ namespace Base
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
 		
-		switch(function) {
+		switch(function)
+		{
 		
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1448,6 +1449,62 @@ namespace Base
 				(int)gCore->mem_ds, 
 				mJNIEnv, 
 				mJThis);
+		}
+
+		case maIOCtl_maWidgetCreate:
+			SYSLOG("maIOCtl_maWidgetCreate");
+			return _maWidgetCreate(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetDestroy:
+			SYSLOG("maIOCtl_maWidgetDestroy");
+			return _maWidgetDestroy(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetAddChild:
+			SYSLOG("maIOCtl_maWidgetAddChild");
+			return _maWidgetAddChild(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetRemoveChild:
+			SYSLOG("maIOCtl_maWidgetRemoveChild");
+			return _maWidgetRemoveChild(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetSetProperty:
+			SYSLOG("maIOCtl_maWidgetSetProperty");
+			return _maWidgetSetProperty(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetProperty:
+		{
+			SYSLOG("maIOCtl_maWidgetGetProperty");
+			int _widget = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			const char *_valueBuffer = SYSCALL_THIS->GetValidatedStr(c);
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			
+			return _maWidgetGetProperty(_widget, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maWidgetScreenShow:
+			SYSLOG("maIOCtl_maWidgetScreenShow");
+			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetEvaluateScript:
+			SYSLOG("maIOCtl_maWidgetEvaluateScript");
+			return _maWidgetEvauluateScript(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetMessageData:
+		{
+			SYSLOG("maIOCtl_maWidgetGetMessageData");
+			
+			int memStart = (int) gCore->mem_ds;
+			int _messageId = a;
+			int _messageBufferSize = c;
+			int _messageBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(b, _messageBufferSize * sizeof(char));
+			
+			return _maWidgetGetMessageData(memStart, 
+										   _messageId, 
+										   _messageBuffer, 
+										   _messageBufferSize, 
+										   mJNIEnv, 
+										   mJThis);
 		}
 		
 		case maIOCtl_maNotificationAdd:

@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _PLATFORM_H_
 
 #define MA_PROF_SUPPORT_LOCATIONAPI
+#define MA_PROF_SUPPORT_WIDGETAPI
 
 //#include <windows.h>
 #import <CoreGraphics/CoreGraphics.h>

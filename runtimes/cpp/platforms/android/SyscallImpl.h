@@ -32,5 +32,6 @@ public:
 	char* loadBinary(int resourceIndex, int size);
 	void destroyResource(int resourceIndex);
 	void postEvent(MAEvent event);
+	void postEvent(MAEvent event, JNIEnv *jniEnv);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);
 	void checkAndStoreAudioResource(int resourceIndex);
