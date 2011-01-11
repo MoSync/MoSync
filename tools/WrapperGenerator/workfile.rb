@@ -15,6 +15,9 @@ work.instance_eval do
 	end
 	@NAME = 'wrapperGenerator'
 	@TARGETDIR = '.'
+	@EXTRA_CFLAGS = " -Wno-format -Wno-missing-format-attribute ";
+	@EXTRA_CPPFLAGS = " -Wno-format -Wno-missing-format-attribute ";
+
 end
 
 target :default do
@@ -62,6 +65,5 @@ target :compile => :default do
 	wct.setup
 	wct.invoke
 end
-
 
 Targets.invoke

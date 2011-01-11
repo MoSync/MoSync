@@ -55,6 +55,12 @@ using namespace MoSyncError;
 #include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 
+#ifdef SUPPORT_OPENGL_ES
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <OpenGLES/ES1/gl.h>
+#include "../../../../generated/gl.h.cpp"
+#endif
+
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
@@ -841,6 +847,26 @@ namespace Base {
 		return res;
 	}	
 
+#ifdef SUPPORT_OPENGL_ES
+	int maOpenGLInitFullscreen() {
+		return 0;
+	}
+	
+	int maOpenGLCloseFullscreen() {
+		return 0;
+	}
+	
+	int maOpenGLTexImage2D(MAHandle image) {
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
+	
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
+					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
+		
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}
+#endif	//SUPPORT_OPENGL_ES	
+	
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -873,11 +899,13 @@ namespace Base {
 		maIOCtl_syscall_case(maFileSize);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
-		maIOCtl_IX_WIDGET_caselist			
+		maIOCtl_IX_WIDGET_caselist
+#ifdef SUPPORT_OPENGL_ES
+				maIOCtl_IX_OPENGL_ES_caselist;
+#endif	//SUPPORT_OPENGL_ES
 
 //		maIOCtl_case(maAccelerometerStart);
 //		maIOCtl_case(maAccelerometerStop);
-
 		}
 		
 		return IOCTL_UNAVAILABLE;
