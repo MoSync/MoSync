@@ -33,6 +33,8 @@
     
     NSTimer *animationTimer;
     NSTimeInterval animationInterval;
+	
+	EAGLContext *WorkingContext;
 }
 
 @property NSTimeInterval animationInterval;
@@ -41,5 +43,8 @@
 - (void)stopAnimation;
 - (void)drawView;
 - (void)setupView;
+
+- (void) bindContext;
+- (void) renderContext;
 
 @end

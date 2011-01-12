@@ -3,6 +3,7 @@
 #include <mavsprintf.h>
 
 #include <IX_WIDGET.h>
+#include <GLES/gl.h>
 
 #include "MAHeaders.h"
 
@@ -56,7 +57,7 @@ int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 int createListScreen();
 int createWebScreen();
 int createScreen(const char *title, int icon, const char *text);
-int createOpenGLScreen();
+int createOpenGLScreen(int& openglView);
 
 /*
  * main.cpp
@@ -82,7 +83,8 @@ extern "C" int MAMain()
 	int resultsScreen = createScreen( "Results", R_RESULTS, "Results..." );
 	maWidgetAddChild( tabScreen, resultsScreen );
 
-	int openglScreen = createOpenGLScreen();
+	int openglView;
+	int openglScreen = createOpenGLScreen(openglView);
 	maWidgetAddChild(tabScreen, openglScreen);
 
 	maWidgetScreenShow( tabScreen );
@@ -92,19 +94,32 @@ extern "C" int MAMain()
 	{
 		MAEvent event;
 
-		maWait( 0 );
-		maGetEvent( &event );
+		//maWait( 0 );
 
-		if( event.type == EVENT_TYPE_FOCUS_LOST )
-		{
-			maExit( 0 );
-		}
-		else if( event.type == EVENT_TYPE_WIDGET )
-		{
-			maWidgetSetPropertyInt( tabScreen, "currentTab", 1 );
-		}
-		else if(event.type == EVENT_TYPE_CLOSE) {
-			maExit( 0 );
+
+		maWidgetSetProperty(openglView, "bind", "");
+
+		float time = (float)(maGetMilliSecondCount()%1000) * 0.001f;
+
+		//glClearColorx(maGetMilliSecondCount(), 0xffff, 0, 0xffff);
+		glClearColor(time, 0.0f, 0.0f, 1.0f);
+
+		glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+
+		maWidgetSetProperty(openglView, "invalidate", "");
+
+		while(maGetEvent( &event ) != 0) {
+			if( event.type == EVENT_TYPE_FOCUS_LOST )
+			{
+				maExit( 0 );
+			}
+			else if( event.type == EVENT_TYPE_WIDGET )
+			{
+				maWidgetSetPropertyInt( tabScreen, "currentTab", 1 );
+			}
+			else if(event.type == EVENT_TYPE_CLOSE) {
+				maExit( 0 );
+			}
 		}
 	}
 }
@@ -151,16 +166,14 @@ int createWebScreen()
 	return webScreen;
 }
 
-int createOpenGLScreen()
+int createOpenGLScreen(int& openglView)
 {
 	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
 	maWidgetSetProperty( screen, "title", "OpenGL" );
-	int gl = maWidgetCreate(WIDGET_TYPE_GL_VIEW);
-	maWidgetAddChild( screen, gl );
+	openglView = maWidgetCreate(WIDGET_TYPE_GL_VIEW);
+	maWidgetAddChild( screen, openglView );
 	return screen;
 }
-
-
 
 int createScreen(const char *title, int icon, const char *text)
 {

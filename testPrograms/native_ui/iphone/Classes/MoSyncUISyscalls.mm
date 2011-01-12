@@ -9,6 +9,8 @@
 #import "MoSyncUISyscalls.h"
 #import "NSObjectExpanded.h"
 
+#import "GLViewWidget.h"
+
 MoSyncUI* mosyncUI;
 
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController) {
@@ -35,9 +37,24 @@ void maWidgetDestroy(MAHandle handle) {
 
 int maWidgetSetProperty(MAHandle handle, const char *property, const char* value) {
 	IWidget* widget = [mosyncUI getWidget:handle];
+	
+	NSString* propertyString = stringFromChar(property);
+	
+	if([widget class] == [GLViewWidget class]) {
+		if([propertyString isEqualToString:@"bind"]) {
+			[widget setPropertyWithKey:@"bind" toValue:@""];
+			return 0;
+		}
+		
+		if([propertyString isEqualToString:@"invalidate"]) {
+			[widget setPropertyWithKey:@"invalidate" toValue:@""];
+			return 0;
+		}	
+	}
+	
 	[NSObject performSelectorOnMainThread:@selector(setPropertyWithKey:toValue:)
 							   withTarget:widget
-							  withObjects:[NSArray arrayWithObjects: stringFromChar(property), stringFromChar(value), nil]
+							  withObjects:[NSArray arrayWithObjects: propertyString, stringFromChar(value), nil]
 							waitUntilDone:YES];
 	
 	return 0;

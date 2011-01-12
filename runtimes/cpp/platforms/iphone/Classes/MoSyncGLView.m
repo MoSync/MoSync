@@ -34,9 +34,10 @@
 
 
 //The GL view is stored in the nib file. When it's unarchived it's sent -initWithCoder:
-- (id)initWithCoder:(NSCoder*)coder {
-    
-    if ((self = [super initWithCoder:coder])) {
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+		if(self) {
 		
         // Get the layer
         CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
@@ -53,6 +54,9 @@
         }
         
         animationInterval = 1.0 / 60.0;
+			
+			WorkingContext = nil;	
+			
 		[self setupView];
     }
     return self;
@@ -70,14 +74,25 @@
 }
 
 - (void)drawView {
-    [EAGLContext setCurrentContext:context];
+	
+//	[EAGLContext setCurrentContext:context];
+//glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+//	glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+ //   [context presentRenderbuffer:GL_RENDERBUFFER_OES];	
+}
+
+/*
+	[EAGLContext setCurrentContext:context];
     glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
 
 	// draw...
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     [context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
+ */
 
 - (void)layoutSubviews {
     [EAGLContext setCurrentContext:context];
@@ -115,6 +130,56 @@
     return YES;
 }
 
+- (void) bindContext {
+	
+    if(!WorkingContext) {
+		
+		EAGLSharegroup* group = context.sharegroup;
+		if (!group)
+		{
+			NSLog(@"Could not get sharegroup from the main context");
+			return;
+		}
+		
+		WorkingContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1 sharegroup:group];
+	}
+	
+    if (!WorkingContext || ![EAGLContext setCurrentContext:WorkingContext]) {
+        NSLog(@"Could not create WorkingContext");
+    }
+	
+	
+    glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+}
+
+- (void) renderContext {
+    if (!WorkingContext || [EAGLContext setCurrentContext:WorkingContext] == NO)
+    {
+        NSLog(@"SwapBuffers: [EAGLContext setCurrentContext:WorkingContext] failed");
+        return;
+    }
+	
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+	
+    if([WorkingContext presentRenderbuffer:GL_RENDERBUFFER_OES] == NO)
+    {
+        NSLog(@"SwapBuffers: [WorkingContext presentRenderbuffer:GL_RENDERBUFFER_OES] failed");
+    }  
+	
+	/*
+	[EAGLContext setCurrentContext:context];	
+    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
+    [context presentRenderbuffer:GL_RENDERBUFFER_OES];	
+	*/
+	//[self drawView];
+	
+//	[NSObject performSelectorOnMainThread:@selector(drawView)
+//							   withTarget:self
+//							  withObjects:nil
+//							waitUntilDone:YES];	
+	
+}
+
 
 - (void)destroyFramebuffer {
     
@@ -131,28 +196,30 @@
 
 
 - (void)startAnimation {
-    self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
+   // self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
 }
 
 
 - (void)stopAnimation {
-    self.animationTimer = nil;
+  //  self.animationTimer = nil;
 }
 
 
 - (void)setAnimationTimer:(NSTimer *)newTimer {
-    [animationTimer invalidate];
-    animationTimer = newTimer;
+   // [animationTimer invalidate];
+   // animationTimer = newTimer;
 }
 
 
 - (void)setAnimationInterval:(NSTimeInterval)interval {
     
+	/*
     animationInterval = interval;
     if (animationTimer) {
         [self stopAnimation];
         [self startAnimation];
     }
+	 */
 }
 
 
