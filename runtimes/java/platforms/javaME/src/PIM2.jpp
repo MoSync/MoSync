@@ -66,6 +66,47 @@ MAHandle maPimListNext(MAHandle list) {
 	return mPimItemNextHandle++;
 }
 
+MAHandle maPimItemCreate(MAHandle list) {
+	MyPimList mpl = getPimList(list);
+	PIMList pl = mpl.pl;
+	PIMItem pi;
+	if(pl instanceof ContactList) {
+		ContactList cl = (ContactList)pl;
+		pi = cl.createContact();
+	} else if(pl instanceof EventList) {
+		EventList el = (EventList)pl;
+		pi = el.createEvent();
+	} else if(pl instanceof ToDoList) {
+		ToDoList tl = (ToDoList)pl;
+		pi = tl.createToDo();
+	} else {
+		BIG_PHAT_ERROR;
+	}
+	mPimItemHandles.put(new Integer(mPimItemNextHandle), pi);
+	return mPimItemNextHandle++;
+}
+
+int maPimItemRemove(MAHandle list, MAHandle item) throws PIMException {
+	MyPimList mpl = getPimList(list);
+	PIMList pl = mpl.pl;
+	Integer key = new Integer(item);
+	PIMItem pi = (PIMItem)mPimItemHandles.get(key);
+	if(pl instanceof ContactList) {
+		ContactList cl = (ContactList)pl;
+		cl.removeContact((Contact)pi);
+	} else if(pl instanceof EventList) {
+		EventList el = (EventList)pl;
+		el.removeEvent((Event)pi);
+	} else if(pl instanceof ToDoList) {
+		ToDoList tl = (ToDoList)pl;
+		tl.removeToDo((ToDo)pi);
+	} else {
+		BIG_PHAT_ERROR;
+	}
+	mPimItemHandles.remove(key);
+	return 0;
+}
+
 int maPimListClose(MAHandle list) throws PIMException {
 	Integer key = new Integer(list);
 	MyPimList pl = (MyPimList)mPimListHandles.get(key);
@@ -75,8 +116,12 @@ int maPimListClose(MAHandle list) throws PIMException {
 	return 0;
 }
 
-int maPimItemClose(MAHandle item) {
+int maPimItemClose(MAHandle item) throws PIMException {
 	Integer key = new Integer(item);
+	PIMItem pi = (PIMItem)mPimItemHandles.get(key);
+	DEBUG_ASSERT(pi != null);
+	if(pi.getPIMList() != null)
+		pi.commit();
 	if(mPimItemHandles.remove(key) == null) {
 		BIG_PHAT_ERROR;
 	}
@@ -184,10 +229,123 @@ int maPimItemGetValue(MAAddress args, int index) {
 	return 4;
 }
 
-#if 0
-int maPimItemSetValue(MAAddress args, int index, int attributes);
-int maPimItemAddValue(MAAddress args, int attributes);
-int maPimItemRemoveValue(MAHandle item, int field, int index);
-MAHandle maPimItemCreate(MAHandle list);
-int maPimItemRemove(MAHandle list, MAHandle item);
-#endif
+private String[] readPimStringArray(Address address, int bufSize) {
+	MYASSERT(bufSize >= 4);
+	MYASSERT((bufSize & 1) == 0);	// alignment: 2 bytes
+	int clientArraySize = RINT(address);
+	DUMP(clientArraySize);
+	//int systemArraySize = pi.getPIMList().stringArraySize(field);
+	//collapses empty strings to nulls. hopefully it won't cause too much trouble.
+	String[] arr = new String[clientArraySize];
+
+	Address a = address + 4;
+	Address end = address + bufSize;
+	for(int i=0; i<clientArraySize; i++) {
+		MYASSERT(a < end);
+		int maxLen = ((end - a) / 2) - 1;
+		arr[i] = readWideStringEx(a, new StringBuffer(), maxLen);
+		a += (arr[i].length() + 1) * 2;
+		if(arr[i].length() == 0)
+			arr[i] = null;
+		DEBUG_TEMP(i+": '"+arr[i]+"'\n");
+	}
+	return arr;
+}
+
+int maPimItemSetValue(MAAddress args, int index, int attributes) {
+	int[] mem_ds = CORE.mMem_ds;
+	PIMItem pi = getPimItem(RINT(args));
+	int field = RINT(args+4);
+	int address = RINT(args+8);
+	int bufSize = RINT(args+12);
+	int dataType = pi.getPIMList().getFieldDataType(field);
+	DEBUG_TEMP("maPimItemSetValue("+field+", "+index+", 0x"+Hex0(address)+", "+bufSize+")\n");
+	DUMP(dataType);
+
+	switch(dataType) {
+	case PIMItem.BINARY:
+		{
+			byte[] bin = new byte[bufSize];
+			readMemBytes(bin, address, 0, bufSize);
+			pi.setBinary(field, index, attributes, bin, 0, bufSize);
+		}
+		break;
+	case PIMItem.BOOLEAN:
+		MYASSERT(bufSize == 4);
+		pi.setBoolean(field, index, attributes, RINT(address) != 0);
+		break;
+	case PIMItem.DATE:
+		MYASSERT(bufSize == 4);
+		pi.setDate(field, index, attributes, ((long)RINT(address)) * 1000);
+		break;
+	case PIMItem.INT:
+		MYASSERT(bufSize == 4);
+		pi.setInt(field, index, attributes, RINT(address));
+		break;
+	case PIMItem.STRING:
+		{
+			String s = readWideString(address, bufSize);
+			pi.setString(field, index, attributes, s);
+		}
+		break;
+	case PIMItem.STRING_ARRAY:
+		pi.setStringArray(field, index, attributes, readPimStringArray(address, bufSize));
+		break;
+	default:
+		BIG_PHAT_ERROR;
+	}
+
+	return 0;
+}
+
+int maPimItemAddValue(MAAddress args, int attributes) {
+	int[] mem_ds = CORE.mMem_ds;
+	PIMItem pi = getPimItem(RINT(args));
+	int field = RINT(args+4);
+	int address = RINT(args+8);
+	int bufSize = RINT(args+12);
+	int dataType = pi.getPIMList().getFieldDataType(field);
+	DEBUG_TEMP("maPimItemAddValue("+field+", 0x"+Hex0(address)+", "+bufSize+")\n");
+	DUMP(dataType);
+
+	switch(dataType) {
+	case PIMItem.BINARY:
+		{
+			byte[] bin = new byte[bufSize];
+			readMemBytes(bin, address, 0, bufSize);
+			pi.addBinary(field, attributes, bin, 0, bufSize);
+		}
+		break;
+	case PIMItem.BOOLEAN:
+		MYASSERT(bufSize == 4);
+		pi.addBoolean(field, attributes, RINT(address) != 0);
+		break;
+	case PIMItem.DATE:
+		MYASSERT(bufSize == 4);
+		pi.addDate(field, attributes, ((long)RINT(address)) * 1000);
+		break;
+	case PIMItem.INT:
+		MYASSERT(bufSize == 4);
+		pi.addInt(field, attributes, RINT(address));
+		break;
+	case PIMItem.STRING:
+		{
+			String s = readWideString(address, bufSize);
+			pi.addString(field, attributes, s);
+		}
+		break;
+	case PIMItem.STRING_ARRAY:
+		pi.addStringArray(field, attributes, readPimStringArray(address, bufSize));
+		break;
+	default:
+		BIG_PHAT_ERROR;
+	}
+
+	return 0;
+}
+
+int maPimItemRemoveValue(MAHandle item, int field, int index) {
+	PIMItem pi = getPimItem(item);
+	pi.removeValue(field, index);
+	return 0;
+}

@@ -725,6 +725,30 @@ public
 		}
 	}
 
+	// string may be shorter than bufSize would indicate
+	private final String readWideString(Address src, int bufSize) {
+		MYASSERT(bufSize > 0);
+		MYASSERT((bufSize & 1) == 0);	// alignment: 2 bytes
+		int len = (bufSize / 2) - 1;
+		return readWideStringEx(src, new StringBuffer(len), len);
+	}
+
+	private final String readWideStringEx(Address src, StringBuffer buf, int maxLen) {
+		INIT_MEMDS;
+		Address a = src;
+		short c;
+		for(int i=0; i<maxLen; i++) {
+			RSHORT(a, c);
+			if(c == 0)
+				break;
+			buf.append((char)c);
+			a += 2;
+		}
+		RSHORT(a, c);
+		MYASSERT(c == 0);	// if this fails, the string was not properly null-terminated
+		return buf.toString();
+	}
+
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 	public
 #endif
@@ -1918,18 +1942,18 @@ public
 			return maPimFieldType(a, b);
 		case maIOCtl_maPimItemGetValue:
 			return maPimItemGetValue(a, b);
-		/*case maIOCtl_maPimItemSetValue:
+		case maIOCtl_maPimItemSetValue:
 			return maPimItemSetValue(a, b, c);
 		case maIOCtl_maPimItemAddValue:
 			return maPimItemAddValue(a, b);
 		case maIOCtl_maPimItemRemoveValue:
-			return maPimItemRemoveValue(a, b, c);*/
+			return maPimItemRemoveValue(a, b, c);
 		case maIOCtl_maPimItemClose:
 			return maPimItemClose(a);
-		/*case maIOCtl_maPimItemCreate:
+		case maIOCtl_maPimItemCreate:
 			return maPimItemCreate(a);
 		case maIOCtl_maPimItemRemove:
-			return maPimItemRemove(a, b);*/
+			return maPimItemRemove(a, b);
 #endif	//MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI
 
 #ifdef MA_PROF_SUPPORT_CAMERA
@@ -2217,6 +2241,8 @@ public
 
 #ifdef PUBLIC_DEBUG
 	final int maWriteLog(Address src, int size) throws Exception {
+		if(size == 0)
+			return 0;
 #ifdef PHONE_RELEASE
 		if(MAMidlet.out == null)
 			return IOCTL_UNAVAILABLE;
@@ -2226,6 +2252,7 @@ public
 #else
 		//DEBUG_ALWAYS("WL " + HEX(src) + " " + size + "\n");
 		String s = new String(getMemBytes(src, size));
+		//DEBUG_ALWAYS("WL "+size+" "+s.length()+"\n");
 		DEBUG_ALWAYS("WL:"+ s + (s.charAt(size-1) == '\n' ? "" : "\n"));
 #endif
 		return 0;

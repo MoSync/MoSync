@@ -2753,7 +2753,7 @@ interface MAAPI {
 			TEL = 115;
 			/// #MA_PIM_TYPE_STRING. Professional title.
 			TITLE = 116;
-			/// #MA_PIM_TYPE_INT. Unique identifier for the contact on this device.
+			/// #MA_PIM_TYPE_STRING. Unique identifier for the contact on the current device.
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
@@ -2878,8 +2878,6 @@ interface MAAPI {
 
 		/**
 		* \brief Arguments for PIM functions.
-		*
-		* \deprecated
 		*/		
 		
 		struct MA_PIM_ARGS {
@@ -2903,20 +2901,60 @@ interface MAAPI {
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
-		// not implemented
+		/** Changes a value and its attributes in a field and item.
+		* This function cannot be used to add a new value.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \param attributes The value's new attributes.
+		* \returns 0.
+		* \note The new value is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
+
+		/** Adds a new value to a field and item.
+		* \param args Common arguments.
+		* \param attributes The new value's attributes.
+		* \returns 0.
+		* \note The new value is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
+
+		/** Removes a value from a field and item.
+		* \param item Opened by maPimListNext().
+		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		* \param index \>= 0 and \< maPimItemFieldCount().
+		* \returns 0.
+		* \note The changes is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);
 
-		/**
-		* Closes the handle to a PimItem, releasing resources used by the system.
+		/** Closes the handle to a PimItem, releasing resources used by the system.
+		* Writes any changes to disk.
 		* Panics on invalid handles.
 		* Returns 0.
+		* \note An item can also be closed by maPimItemRemove().
+		* \warning Does not write changes to disk if the item's List is closed.
+		* Make sure to keep the List open while editing items.
 		*/
 		int maPimItemClose(in MAHandle item);
 
-		// not implemented
+		/** Creates a new empty item in the specified list.
+		* \returns A handle to the new item, or \< 0 on error.
+		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
+		*/
 		MAHandle maPimItemCreate(in MAHandle list);
+
+		/** Removes an item from a list. This also has the effect of closing the item.
+		* \returns 0.
+		* \see maPimItemClose()
+		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
 
