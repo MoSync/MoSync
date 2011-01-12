@@ -257,7 +257,7 @@ public:
 		pthread_mutex_unlock(&mMutex);	
 	}
 		
-	void addPointerEvent(int x, int y, int type) {
+	void addPointerEvent(int x, int y, int touchId, int type) {
 		if(!mEventOverflow) {
 			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 				mEventOverflow = true;
@@ -269,6 +269,7 @@ public:
 			event.type = type;
 			event.point.x = x;
 			event.point.y = y;
+			event.touchId = touchId;
 			put(event);
 		}		
 	}
