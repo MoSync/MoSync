@@ -166,7 +166,7 @@ final class PngStream extends InputStream {
     }		
 		
 	final int calculateAdlerChecksum() {
-		int mem_ds[] = CORE.mMem_ds;       
+		INIT_MEMDS;
 		long adler = 1;
 		int memoryPtr = imageOffset;
 		for(int y = 0; y < height; y++) {
@@ -183,7 +183,7 @@ final class PngStream extends InputStream {
 	}
 	
 	final int calculateIDATChecksum() {
-		int mem_ds[] = CORE.mMem_ds;
+		INIT_MEMDS;
 		long crc = 0xffffffff;
 		
 		for(int i = 4; i < IDAT_HDR_Size; i++) {
@@ -413,7 +413,7 @@ final class PngStream extends InputStream {
 	private int imagePos = 0;
 	
 	public final int read() throws IOException {
-		int mem_ds[] = CORE.mMem_ds;
+		INIT_MEMDS;
 		//DBG_PRINT("entering read");
 		//DBG_PRINT("chunkPos: " + chunkPos + ", pos: " + pos);
 

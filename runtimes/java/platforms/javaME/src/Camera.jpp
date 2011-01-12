@@ -100,7 +100,7 @@ int maCameraFormatNumber() {
 }
 
 int maCameraFormat(int index, MAAddress fmt) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	index *= 2;
 	for(int i=0; i<MA_CAMERA_FORMAT_LENGTH; i++) {
 		WINT(fmt + i*4, mCameraFormats[index + i]);

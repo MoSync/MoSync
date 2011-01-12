@@ -532,7 +532,7 @@ IMPLEMENTS MoSync
 	private final String readMemString(Address src) throws Exception {
 		if(src == 0)
 			return null;
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		int org = src;
 		byte b;
 		do {
@@ -643,7 +643,7 @@ public
 		MYASSERT(bufSize >= 0);
 		if(bufSize <= s.length())
 			return s.length();
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		byte[] bytes = s.getBytes();
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
@@ -883,7 +883,7 @@ public
 
 	SYSCALL(void) maCopyData(Address a) throws Exception {
 		DEBUG("maCopyData");
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		MAHandle dst = RINT(a);
 		int dstOffset = RINT(a + 4);
 		MAHandle src = RINT(a + 8);
@@ -1110,15 +1110,15 @@ public
 		if(EI_TYPE != EVENT_TYPE_CLOSE)
 			YIELD;
 
+		int[] mem_ds = mCore.mMem_ds;
+#if 0
 		// Location
-#if 0		
 		if(EI_TYPE == EVENT_TYPE_LOCATION)
 		{
 			int address = mCore.mCustomEventPointer;
-			int[] mem_ds = mCore.mMem_ds;
 
 			//copy main data to above top-of-stack
-			System.arraycopy(event, 1, CORE.mMem_ds, INTPART(address), 9);
+			System.arraycopy(event, 1, mem_ds, INTPART(address), 9);
 
 			//write type and pointer to ordinary event location
 			WINT(dst, EVENT_TYPE_LOCATION);
@@ -1126,7 +1126,7 @@ public
 		} else
 #endif
 		{
-			System.arraycopy(event, 0, CORE.mMem_ds, INTPART(dst), event.length);
+			System.arraycopy(event, 0, mem_ds, INTPART(dst), event.length);
 		}
 		
 		return 1;
@@ -1462,7 +1462,7 @@ public
 	}
 
 	public double readDouble(int address) {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		return CORE.ints2double(RINT(address), RINT(address + 4));
 	}
 	public void writeDouble(int address, double d) {

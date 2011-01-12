@@ -162,7 +162,7 @@ struct MA_PIM_ARGS {
 #endif
 
 int maPimItemGetValue(MAAddress args, int index) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	PIMItem pi = getPimItem(RINT(args));
 	int field = RINT(args+4);
 	int address = RINT(args+8);
@@ -232,6 +232,7 @@ int maPimItemGetValue(MAAddress args, int index) {
 private String[] readPimStringArray(Address address, int bufSize) {
 	MYASSERT(bufSize >= 4);
 	MYASSERT((bufSize & 1) == 0);	// alignment: 2 bytes
+	INIT_MEMDS;
 	int clientArraySize = RINT(address);
 	DUMP(clientArraySize);
 	//int systemArraySize = pi.getPIMList().stringArraySize(field);
@@ -253,7 +254,7 @@ private String[] readPimStringArray(Address address, int bufSize) {
 }
 
 int maPimItemSetValue(MAAddress args, int index, int attributes) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	PIMItem pi = getPimItem(RINT(args));
 	int field = RINT(args+4);
 	int address = RINT(args+8);
@@ -299,7 +300,7 @@ int maPimItemSetValue(MAAddress args, int index, int attributes) {
 }
 
 int maPimItemAddValue(MAAddress args, int attributes) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	PIMItem pi = getPimItem(RINT(args));
 	int field = RINT(args+4);
 	int address = RINT(args+8);

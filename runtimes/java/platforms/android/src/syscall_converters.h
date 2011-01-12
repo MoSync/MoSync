@@ -81,7 +81,7 @@ final String _SYSCALL_CONVERT_MAString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	for(;;) {
 		char b;
 		RCHAR(str++, b);	//TODO: optimize by reading ints at a time.
@@ -99,7 +99,7 @@ final String _SYSCALL_CONVERT_MAWString(int str) throws Exception {
 	if(str == 0)
 		return null;
 	gStringBuffer.setLength(0);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	for(;;) {
 		short b;
 		RSHORT(str, b);
