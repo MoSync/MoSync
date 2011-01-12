@@ -16,3 +16,5 @@
 .res R_RESULTS
 .image "res/resultat.png"
 
+.res R_TEXTURE
+.image "res/texture.png"

@@ -7,7 +7,7 @@
 
 #import "MoSyncGLView.h"
 
-#define USE_DEPTH_BUFFER 0
+#define USE_DEPTH_BUFFER 1
 
 // A class extension to declare private methods
 @interface MoSyncGLView ()
@@ -63,6 +63,7 @@
 }
 
 - (void)setupView {  // new method for intialisation of variables and states		
+	/*
 	// setup the projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -70,6 +71,7 @@
 	// Setup Orthographic Projection for the 320 x 480 of the iPhone screen
 	glOrthof(0.0f, 320.0f, 480.0f, 0.0f, -1.0f, 1.0f);
 	glMatrixMode(GL_MODELVIEW);
+	*/
 	
 }
 

@@ -14,6 +14,7 @@
 //#define USE_ARM_RECOMPILER
 
 
+#define SUPPORT_OPENGL_ES
 #define LOGGING_ENABLED
 
 //#define DEBUGGING_MODE
