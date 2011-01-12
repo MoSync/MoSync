@@ -8,6 +8,8 @@
 
 const char * WIDGET_TYPE_BUTTON = "Button";
 const char * WIDGET_TYPE_LABEL = "Label";
+const char * WIDGET_TYPE_GL_VIEW = "GLView";
+
 const char * WIDGET_TYPE_LIST = "ListView";
 const char * WIDGET_TYPE_LIST_ITEM = "ListViewItem";
 const char * WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
@@ -54,6 +56,7 @@ int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 int createListScreen();
 int createWebScreen();
 int createScreen(const char *title, int icon, const char *text);
+int createOpenGLScreen();
 
 /*
  * main.cpp
@@ -79,6 +82,9 @@ extern "C" int MAMain()
 	int resultsScreen = createScreen( "Results", R_RESULTS, "Results..." );
 	maWidgetAddChild( tabScreen, resultsScreen );
 
+	int openglScreen = createOpenGLScreen();
+	maWidgetAddChild(tabScreen, openglScreen);
+
 	maWidgetScreenShow( tabScreen );
 
 	// Wait for close event
@@ -96,6 +102,9 @@ extern "C" int MAMain()
 		else if( event.type == EVENT_TYPE_WIDGET )
 		{
 			maWidgetSetPropertyInt( tabScreen, "currentTab", 1 );
+		}
+		else if(event.type == EVENT_TYPE_CLOSE) {
+			maExit( 0 );
 		}
 	}
 }
@@ -141,6 +150,17 @@ int createWebScreen()
 
 	return webScreen;
 }
+
+int createOpenGLScreen()
+{
+	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	maWidgetSetProperty( screen, "title", "OpenGL" );
+	int gl = maWidgetCreate(WIDGET_TYPE_GL_VIEW);
+	maWidgetAddChild( screen, gl );
+	return screen;
+}
+
+
 
 int createScreen(const char *title, int icon, const char *text)
 {
