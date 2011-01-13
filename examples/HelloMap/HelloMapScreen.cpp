@@ -43,14 +43,8 @@ namespace HelloMap
 		//
 		// Map widget
 		//
-		mMap = newobject( MapWidget, new MapWidget( /*mMapSource,*/ 0, 0, width, height, NULL ) );
-		
-		//mMap->enterMapUpdateScope( );
-		//mMap->setCenterPosition( LonLat( 18.07, 59.33 ), true, false );
-		//mMap->setMagnification( 10 );
-		//mMap->exitMapUpdateScope( true );
+		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
-		
 		mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mFont );
 		mMap->setPanMode( MapViewportPanMode_Momentum );
@@ -96,7 +90,6 @@ namespace HelloMap
 			MemoryMgr::dump( );
 			return;
 		case MAK_7:
-			//mMap->testMomentumPanning( );
 			mMap->stressTest( );
 			return;
 		case MAK_SOFTRIGHT:
@@ -129,8 +122,6 @@ namespace HelloMap
 		//
 		// Set up tap panning
 		//
-		//prevX = p.x;
-		//prevY = p.y;
 		pointerPressX = p.x;
 		pointerPressY = p.y;
 		pointerPressCenter = mMap->getCenterPositionPixels( );
@@ -138,7 +129,6 @@ namespace HelloMap
 		// set position to stop any movement
 		//
 		mMap->stopGlide( );
-		//mMap->setCenterPosition( mMap->getCenterPosition( ), true, false );
 		//
 		// Handle doubletap for app exit
 		//

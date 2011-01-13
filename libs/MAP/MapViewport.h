@@ -25,8 +25,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define MAPVIEWPORT_H_
 
 #include <ma.h>
-//#include <MAUI/Widget.h>
-//#include <MAUtil/Environment.h>
 #include <MAUI/Font.h>
 
 #include "LonLat.h"
@@ -97,8 +95,6 @@ namespace MAP
 		/**
 		 * Map update scope
 		 */
-		//void enterMapUpdateScope( );
-		//void exitMapUpdateScope( bool immediate );
 		void updateMap( );
 		void setListener( IMapViewportListener* listener ) { mListener = listener; }
 		/**
@@ -156,10 +152,10 @@ namespace MAP
 		void zoomIn( );
 		void zoomOut( );
 		//
-		// Viewport overrides
+		// Viewport size
 		//
-		/*virtual*/ void setWidth( int width );
-		/*virtual*/ void setHeight( int height );
+		void setWidth( int width );
+		void setHeight( int height );
 		/**
 		 * Handles key press.
 		 * Returns true if handled.
@@ -188,9 +184,6 @@ namespace MAP
 		//
 		void testMomentumPanning( );
 		void stressTest( );
-
-		//void requestRepaint( );
-
 		int getWidth( ) const { return mWidth; }
 		int getHeight( ) const { return mHeight; }
 		virtual void drawViewport( Point origin );
@@ -200,12 +193,8 @@ namespace MAP
 		// Redraw
 		//
 		virtual void drawOverlay( );
-		//Point getActualPosition( );
 
 	private:
-		//void resetScreenImage( );
-		//void checkMapUpdateScope( );
-
 		int mWidth;
 		int mHeight;
 		LonLat mCenterPositionLonLat;
@@ -214,10 +203,6 @@ namespace MAP
 		PixelCoordinate mPanTargetPositionPixels;
 		int mMagnification;
 		MapSource* mSource;
-		int mMapUpdateNesting;
-		PixelCoordinate mPrevCenter;
-		int mPrevMagnification;
-		//MAHandle mScreenImage;
 		bool mHasScale;
 		MapViewportPanTimerListener* mPanTimerListener;
 		Font* mFont;

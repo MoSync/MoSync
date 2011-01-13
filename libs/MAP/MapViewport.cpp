@@ -19,7 +19,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MemoryMgr.h"
 #include <mastdlib.h>
 #include <MAUtil/Graphics.h>
-//#include <MAUI/Image.h>
 #include "MapViewport.h"
 #include "MapCache.h"
 #include "MapSource.h"
@@ -88,26 +87,16 @@ namespace MAP
 						//
 						// Done panning, stop timer and repaint
 						//
-						//mViewport->enterMapUpdateScope( );
-						//mViewport->exitMapUpdateScope( true );
-
 						mViewport->updateMap( );
-						//mViewport->requestRepaint( );
-						//mViewport->mListener->viewportUpdated( mViewport );
 						return;
 					}
 					PixelCoordinate newPix = PixelCoordinate(	mViewport->getMagnification( ),
 																(int)( currentPix.getX( ) + SmoothPanTension * offsetX ),
 																(int)( currentPix.getY( ) + SmoothPanTension * offsetY ) );
 
-					//mViewport->enterMapUpdateScope( );
 					mViewport->mCenterPositionPixels = newPix;
 					mViewport->mCenterPositionLonLat = LonLat( newPix );
-					//mViewport->exitMapUpdateScope( false );
 					mViewport->updateMap( );
-
-					//mViewport->requestRepaint( );
-					//mViewport->mListener->viewportUpdated( mViewport );
 				}
 				break;
 			case MapViewportPanMode_Momentum:
@@ -127,20 +116,13 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					//mViewport->enterMapUpdateScope( );
-					//mViewport->exitMapUpdateScope( true );
 					mViewport->updateMap( );
-
-					//mViewport->requestRepaint( );
-					//mViewport->mListener->viewportUpdated( mViewport );
 					return;
 				}
 				*/
 				//
 				// Set new position based on offset to target and pan tension
 				//
-				//mViewport->enterMapUpdateScope( );
-
 				if ( mGliding )
 				{
 					if ( mMomentum.x == 0  && mMomentum.y == 0 )
@@ -150,11 +132,7 @@ namespace MAP
 						//
 						Environment::getEnvironment( ).removeTimer( this );
 						mViewport->mHasTimer = false;
-						//mViewport->enterMapUpdateScope( );
-						//mViewport->exitMapUpdateScope( true );
 						mViewport->updateMap( );
-						//mViewport->requestRepaint( );
-						//mViewport->mListener->viewportUpdated( mViewport );
 						return;
 					}
 					//
@@ -190,11 +168,7 @@ namespace MAP
 						//
 						Environment::getEnvironment( ).removeTimer( this );
 						mViewport->mHasTimer = false;
-						//mViewport->enterMapUpdateScope( );
-						//mViewport->exitMapUpdateScope( true );
 						mViewport->updateMap( );
-						//mViewport->requestRepaint( );
-						//mViewport->mListener->viewportUpdated( mViewport );
 						return;
 					}
 
@@ -204,10 +178,7 @@ namespace MAP
 					mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
 				}
 				
-				//mViewport->exitMapUpdateScope( false );
 				mViewport->updateMap( );
-				//mViewport->requestRepaint( );
-				//mViewport->mListener->viewportUpdated( mViewport );
 
 				if ( !mGliding )
 				{
@@ -300,22 +271,17 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	MapViewport::MapViewport( )
 	//-------------------------------------------------------------------------
-	:	//Viewport( x, y, width, height, _parent ),
-		mCenterPositionLonLat( ),
+	:	mCenterPositionLonLat( ),
 		mCenterPositionPixels( ),
 		mPanTargetPositionLonLat( ),
 		mPanTargetPositionPixels( ),
 		mMagnification( 0 ),
 		mSource( NULL ),
-		mMapUpdateNesting( 0 ),
-		mPrevCenter( ),
-		//mScreenImage( 0 ),
 		mHasScale( true ),
 		mPanTimerListener( NULL ),
 		mFont( NULL ),
 		mPanMode( MapViewportPanMode_Smooth )
 	{
-		//resetScreenImage( );
 		mPanTimerListener = newobject( MapViewportPanTimerListener, new MapViewportPanTimerListener( this ) );
 	}
 
@@ -327,43 +293,6 @@ namespace MAP
 			Environment::getEnvironment( ).removeTimer( mPanTimerListener );
 		deleteobject( mPanTimerListener );
 	}
-
-	////-------------------------------------------------------------------------
-	//void MapViewport::enterMapUpdateScope( )
-	////-------------------------------------------------------------------------
-	//{
-	//	if ( mMapUpdateNesting == 0 )
-	//	{
-	//		mPrevCenter = getCenterPositionPixels( );
-	//		mPrevMagnification = getMagnification( );
-	//	}
-	//	mMapUpdateNesting ++;
-	//}
-
-	////-------------------------------------------------------------------------
-	//void MapViewport::exitMapUpdateScope( bool immediate )
-	////-------------------------------------------------------------------------
-	//{
-	//	mMapUpdateNesting--;
-	//	if ( mMapUpdateNesting == 0 )
-	//	{
-	//		if ( immediate )
-	//		{
-	//			mCenterPositionLonLat = mPanTargetPositionLonLat;
-	//			mCenterPositionPixels = mPanTargetPositionPixels;
-	//		}
-	//		if ( getCenterPositionPixels( ) != mPrevCenter || getMagnification( ) != mPrevMagnification )
-	//		{
-	//			updateMap( );
-	//		}
-	//	}
-	//}
-
-	////-------------------------------------------------------------------------
-	//void MapViewport::checkMapUpdateScope( )
-	////-------------------------------------------------------------------------
-	//{
-	//}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::setMapSource( MapSource* source )
@@ -497,12 +426,8 @@ namespace MAP
 		//
 		// make sure we lock map in place
 		//
-		//enterMapUpdateScope( );
 		mPanTargetPositionPixels = mCenterPositionPixels;
-		//exitMapUpdateScope( true );
 		updateMap( );
-		//requestRepaint( );
-		//mListener->viewportUpdated( this );
 	}
 
 	//-------------------------------------------------------------------------
@@ -537,8 +462,6 @@ namespace MAP
 	void MapViewport::setMagnification( int magnification )
 	//-------------------------------------------------------------------------
 	{
-		//checkMapUpdateScope( );
-
 		mMagnification = magnification;
 
 		switch( mPanMode )
@@ -588,26 +511,6 @@ namespace MAP
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//PixelCoordinate tilePx = tile->getCenter( ).toPixels( tile->getMagnification( ) );
-		//MAPoint2d pt = worldPixelToViewport( tilePx );
-		//MAHandle old = maSetDrawTarget( mScreenImage );
-		//const int tileSize = mSource->getTileSize( );
-		//MARect rect;
-		//rect.height = tileSize;
-		//rect.width = tileSize;
-		//rect.top = 0;
-		//rect.left = 0;
-		//MAPoint2d dest;
-		//dest.x = pt.x - tileSize / 2;
-		//dest.y = pt.y - tileSize / 2;
-		//maDrawImageRegion( tile->getImage( ), &rect, &dest, TRANS_NONE );
-		//maSetDrawTarget( old );
-		//requestRepaint( );
-
-		// TODO!!!
-
-		// draw to current gfx
-
 		if ( inDraw )
 		{
 			//
@@ -620,27 +523,12 @@ namespace MAP
 		}
 		else
 		{
+			//
 			// notify client that update is needed
+			//
 			mListener->viewportUpdated( this );
 		}
-
 	}
-
-	////-------------------------------------------------------------------------
-	//Point MapViewport::getActualPosition( )
-	////-------------------------------------------------------------------------
-	//{
-	//	Viewport* p = this->getParent( );
-	//	Point pos = getPosition( );
-
-	//	while( p != 0 )
-	//	{
-	//		pos.x += p->getPosition( ).x;
-	//		pos.y += p->getPosition( ).y;
-	//		p = p->getParent( );
-	//	}
-	//	return pos;
-	//}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::drawViewport( Point origin )
@@ -779,13 +667,6 @@ namespace MAP
 		if ( getWidth( ) <= 0 || getHeight( ) <= 0 ) 
 			return;
 		//
-		// Clear screen image
-		//
-		//MAHandle old = maSetDrawTarget( mScreenImage );
-		//maSetColor( 0xc0c0c0 );
-		//maFillRect( 0, 0, getWidth( ), getHeight( ) );
-		//maSetDrawTarget( old );
-		//
 		// Request tiles
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
@@ -903,7 +784,6 @@ namespace MAP
 	bool MapViewport::handleKeyPress( int keyCode )
 	//-------------------------------------------------------------------------
 	{
-		//enterMapUpdateScope( );
 		bool ret = false;
 		switch( keyCode )
 		{
@@ -935,7 +815,7 @@ namespace MAP
 			ret = false;
 			break;
 		}
-		//exitMapUpdateScope( false );
+		this->updateMap( );
 		return ret;
 	}
 
@@ -950,31 +830,15 @@ namespace MAP
 	void MapViewport::setWidth( int width )
 	//-------------------------------------------------------------------------
 	{
-		//Viewport::setWidth( width );
 		mWidth = width;
-		//resetScreenImage( );
+		updateMap( );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::setHeight( int height )
 	//-------------------------------------------------------------------------
 	{
-		//Viewport::setHeight( height );
 		mHeight = height;
-		//resetScreenImage( );
+		updateMap( );
 	}
-
-	////-------------------------------------------------------------------------
-	//void MapViewport::resetScreenImage( )
-	////-------------------------------------------------------------------------
-	//{
-	//	if ( mScreenImage != 0 )
-	//		maDestroyObject( mScreenImage );
-
-	//	if ( getWidth( ) > 0 && getHeight( ) > 0 )
-	//	{
-	//		mScreenImage = maCreatePlaceholder( );
-	//		maCreateDrawableImage( mScreenImage, getWidth( ), getHeight( ) );
-	//	}
-	//}
 }

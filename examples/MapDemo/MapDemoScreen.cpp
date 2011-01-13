@@ -39,15 +39,8 @@ namespace MapDemo
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
-
-		//mMap->enterMapUpdateScope( );
-		//mMap->setCenterPosition( LonLat( 18.07, 59.33 ), true, false );
-		//mMap->setMagnification( 10 );
-		//mMap->exitMapUpdateScope( true );
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
-		
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
-
 		setClientWidget( mMap );
 		//
 		// Create map sources

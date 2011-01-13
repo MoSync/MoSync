@@ -52,6 +52,9 @@ namespace MapDemoUI
 		virtual bool handlePointerPress( MAPoint2d point );
 		virtual bool handlePointerMove( MAPoint2d point );
 		virtual bool handlePointerRelease( MAPoint2d point );
+		virtual void multitouchPressEvent(MAPoint2d p, int touchId) { }
+		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) { }
+		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) { }
 
 	protected:
 

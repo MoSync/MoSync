@@ -265,10 +265,6 @@ namespace HelloLayerMap
 		// barcelona  2.15058 41.3740 
 		// http://local.google.com/?ll=41.373781,2.150016
 		//
-		//mMap->enterMapUpdateScope( );
-		//mMap->setCenterPosition( LonLat( 18.07, 59.33 ), true, false );
-		//mMap->setMagnification( 10 );
-		//mMap->exitMapUpdateScope( true );
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 
 		mBlackFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
