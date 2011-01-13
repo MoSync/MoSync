@@ -56,5 +56,6 @@ namespace HelloMap
 	HelloMapMoblet::~HelloMapMoblet( )
 	//-------------------------------------------------------------------------
 	{
+		deleteobject( mScreen );
 	}
 }

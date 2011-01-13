@@ -191,7 +191,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MapSourceMgr.cpp"
+				RelativePath=".\MapViewport.cpp"
 				>
 			</File>
 			<File
@@ -249,19 +249,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MapSourceKind.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MapSourceMgr.h"
-				>
-			</File>
-			<File
 				RelativePath=".\MapTile.h"
 				>
 			</File>
 			<File
 				RelativePath=".\MapTileCoordinate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MapViewport.h"
 				>
 			</File>
 			<File

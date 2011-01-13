@@ -57,19 +57,6 @@ namespace MAP
 		{
 		}
 		/**
-		 * CloudMade supports a number of different rendering variations
-		 * for maps. MAP currently supports type 1 and 7.
-		 */
-		MapSourceKind getSourceKind( ) const			
-		{
-			switch( mStyle )
-			{
-			case 1: return MapSourceKind_CloudMade1;
-			case 7: return MapSourceKind_CloudMade7;
-			default: return (MapSourceKind)-1;
-			}
-		}
-		/**
 		 * Returns tile size in pixels.
 		 */
 		MAExtent getTileSize( ) const

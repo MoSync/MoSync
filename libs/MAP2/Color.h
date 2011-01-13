@@ -15,52 +15,59 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
-* \file MapSourceKind.h
-* \brief Enumerations for supported types of map sources
-* \author Lars-Åke Vinberg
-*/
+#ifndef COLOR_H_
+#define COLOR_H_
 
-#ifndef MAPSOURCEKIND_H_
-#define MAPSOURCEKIND_H_
-
-namespace MAP
+namespace MAPUtil
 {
 	//=========================================================================
-	/**
-	 * \brief Enumerates supported kinds of map sources
-	 */
-	enum MapSourceKind
+	class Color
 	//=========================================================================
 	{
-		MapSourceKind_None,
-		/**
-		 * OpenStreetMap standard rendering.
-		 */
-		MapSourceKind_OpenStreetMap,
-		/**
-		 * Google street map
-		 */
-		MapSourceKind_GoogleMap,
-		/**
-		 * Google aerial/satellite map
-		 */
-		MapSourceKind_GoogleAerial,
-		/**
-		 * Google aerial with roads and labels overlaid
-		 */
-		MapSourceKind_GoogleHybrid,
-		/**
-		 * Cloudmade road map type 1
-		 */
-		MapSourceKind_CloudMade1,
-		/**
-		 * CloudMade road map type 7
-		 */
-		MapSourceKind_CloudMade7,
-		//MapSourceKind_VirtualEarth, //not yet implemented
-		MapSourceKind_Last
+	public:
+		Color( ) 
+		{ 
+		}
+
+	private:
+		Color( int val ) 
+			: mVal( val ) 
+		{ 
+		}
+
+	public:
+		~Color( ) { } // must not be virtual, to avoid vtable
+
+		static Color fromInt( int val ) 
+		{
+			return Color( val ); 
+		}
+
+		int val( ) const 
+		{
+			return mVal; 
+		}
+
+		static const Color black;
+		static const Color white;
+		static const Color red;
+		static const Color green;
+		static const Color blue;
+
+	private:
+		int mVal;
 	};
+
+	inline bool operator == ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) == b.val( ); 
+	}
+
+	inline bool operator != ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) != b.val( ); 
+	}
 }
 
-#endif // MAPSOURCEKIND_H_
+#endif // COLOR_H_
+

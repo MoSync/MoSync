@@ -15,53 +15,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
-* \file MapSourceMgr.h
-* \brief Switch between map sources
-* \author Lars-Åke Vinberg
-*/
+#ifndef HELLOMAPMOBLET_H_
+#define HELLOMAPMOBLET_H_
 
-#ifndef MAPSOURCEMGR_H_
-#define MAPSOURCEMGR_H_
+#include <MAUtil/Moblet.h>
+#include "HelloLayerMapScreen.h"
 
-#include <MAUtil/Map.h>
-
-#include "MapSource.h"
-
-/**
-* \brief MoSync slippy map classes
-*/
-
-namespace MAP
+namespace HelloLayerMap
 {
 	//=========================================================================
-	/**
-	 * \brief Manages map sources for clients to access.
-	 * Implemented as singleton.
-	 */
-	class MapSourceMgr
+	class HelloLayerMapMoblet : public Moblet
 	//=========================================================================
 	{
-	private:
-		MapSourceMgr( );
-
 	public:
-		virtual ~MapSourceMgr( );
-		/**
-		 * Client accesses singleton through MapSourceMgr::get( )
-		 */
-		static MapSourceMgr* get( );
-		static void shutdown( );
-		/*
-		 * Returns map source
-		 */
-		MapSource* getMapSource( MapSourceKind kind );
+		HelloLayerMapMoblet( );
+		
+		virtual ~HelloLayerMapMoblet( );
+
+		void Terminate() { mRun = false; }
 
 	private:
-		static MapSourceMgr* sSingleton;
-		Map<MapSourceKind, MapSource*> mMap;
+		HelloLayerMapScreen* mScreen;
 	};
 }
 
-#endif // MAPSOURCEMGR_H_
-
+#endif // MAPDEMOMOBLET_H_

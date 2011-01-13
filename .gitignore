@@ -26,6 +26,7 @@ Stabs.tab
 Sld.tab
 Thumbs.db
 stabs.tab
+.mosyncproject.local
 
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
