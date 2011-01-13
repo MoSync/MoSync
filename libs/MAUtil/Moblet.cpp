@@ -95,13 +95,19 @@ namespace MAUtil {
 						moblet->fireCharEvent(event.character);
 						break;
 					case EVENT_TYPE_POINTER_PRESSED:
-						moblet->firePointerPressEvent(event.point);
+						if (event.touchId == 0)
+							moblet->firePointerPressEvent(event.point);
+						moblet->fireMultitouchPressEvent(event.point, event.touchId);
 						break;
 					case EVENT_TYPE_POINTER_DRAGGED:
-						moblet->firePointerMoveEvent(event.point);
+						if (event.touchId == 0)
+							moblet->firePointerMoveEvent(event.point);
+						moblet->fireMultitouchMoveEvent(event.point, event.touchId);
 						break;
 					case EVENT_TYPE_POINTER_RELEASED:
-						moblet->firePointerReleaseEvent(event.point);
+						if (event.touchId == 0)
+							moblet->firePointerReleaseEvent(event.point);
+						moblet->fireMultitouchReleaseEvent(event.point, event.touchId);
 						break;
 					case EVENT_TYPE_CONN:
 						moblet->fireConnEvent(event.conn);

@@ -1307,10 +1307,17 @@ interface MAAPI {
 			*/
 			uint character;
 
-			/**
-			 * In POINTER events, this will be the location of the pointer.
-			 */
-			MAPoint2d point;
+			struct {
+				/**
+				* In POINTER events, this will be the location of the pointer.
+				*/
+				MAPoint2d point;
+				
+				/**
+				* In POINTER events, this will be the finger triggering the event.
+				*/
+				int touchId;
+			} pointer;
 
 			/**
 			* In \link #EVENT_TYPE_BT BT \endlink events, this will be a value \>= 0 or
