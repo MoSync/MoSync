@@ -281,6 +281,8 @@ namespace MAP
 
 		maSetDrawTarget( old );
 		requestRepaint( );
+		
+		Gfx_notifyImageUpdated(mScreenImage);
 	}
 
 	//-------------------------------------------------------------------------
