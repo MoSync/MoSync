@@ -48,6 +48,10 @@ namespace HelloMap
 		void pointerPressEvent(MAPoint2d p);
 		void pointerMoveEvent(MAPoint2d p);
 		void pointerReleaseEvent(MAPoint2d p);
+		// TODO: Shouldn't be needed
+		void multitouchPressEvent(MAPoint2d point, int touchId) {}
+		void multitouchMoveEvent(MAPoint2d point, int touchId) {}
+		void multitouchReleaseEvent(MAPoint2d point, int touchId) {}
 
 	private:
 		void					nextMapSource( );

@@ -61,9 +61,9 @@ namespace MAP
 		//---------------------------------------------------------------------
 		MapViewportPanTimerListener( MapViewport* viewport ) :
 		//---------------------------------------------------------------------
-			mViewport( viewport ),
+			mMomentum( MAPoint2d( ) ),
 			mFriction( DefaultFriction ),
-			mMomentum( MAPoint2d( ) )
+			mViewport( viewport )
 		{
 		}
 
@@ -121,6 +121,7 @@ namespace MAP
 				double offsetY = targetPix.getY( ) - prevCenterPix.getY( );
 
 				// TODO: shut down timer when movement has stopped
+				/*
 				if ( false ) // fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
 				{
 					//
@@ -134,6 +135,7 @@ namespace MAP
 					//mViewport->mListener->viewportUpdated( mViewport );
 					return;
 				}
+				*/
 				//
 				// Set new position based on offset to target and pan tension
 				//
@@ -247,6 +249,8 @@ namespace MAP
 						//
 						mMomentumState = MapViewportMomentumState_Gliding;
 						break;
+					default:
+						break;
 					}
 				}
 				break;
@@ -308,8 +312,8 @@ namespace MAP
 		//mScreenImage( 0 ),
 		mHasScale( true ),
 		mPanTimerListener( NULL ),
-		mPanMode( MapViewportPanMode_Smooth ),
-		mFont( NULL )
+		mFont( NULL ),
+		mPanMode( MapViewportPanMode_Smooth )
 	{
 		//resetScreenImage( );
 		mPanTimerListener = newobject( MapViewportPanTimerListener, new MapViewportPanTimerListener( this ) );
@@ -507,7 +511,6 @@ namespace MAP
 	{
 		mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
 		setCenterPosition( LonLat( 18.07, 59.33 ), false, true );
-		int currentTimeMs = maGetMilliSecondCount( );
 		//TODO: mPanTimerListener->mPrevTimeMs = currentTimeMs - 100;
 		setCenterPosition( LonLat( 18.0695, 59.33 ), false, true );
 	}

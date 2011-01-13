@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MAPWIDGET_H_
 #define MAPWIDGET_H_
 
-#if old 
+#if 0
 
 #include <ma.h>
 #include <MAUI/Widget.h>
