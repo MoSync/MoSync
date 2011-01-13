@@ -7,7 +7,7 @@
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib "/>
 <property key="build.prefs:additional.libraries/Debug" value="MAP.lib,MAUID.lib,MAUtilD.lib "/>
-<property key="build.prefs:additional.library.paths/Debug" value="C:\dev2\MoSync\libs\MAP\Output,c:\MoSync\lib\pipe"/>
+<property key="build.prefs:additional.library.paths/Debug" value="C:\dev2\MoSyncNew\libs\MAP\Output,c:\MoSync\lib\pipe"/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="Internet\ Access Location Location/Coarse Location/Fine"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>

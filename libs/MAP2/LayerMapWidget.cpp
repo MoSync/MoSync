@@ -8,7 +8,7 @@
 #include <MAUtil/Vector.h>
 
 #include <MAP/MemoryMgr.h>
-#include "LayerMapWidget.h"
+#include <MAP2/LayerMapWidget.h>
 #include "GeoPoint.h"
 #include "LayerRenderer.h"
 #include "Enumerator.h"
@@ -172,10 +172,11 @@ namespace MAP
 			magnification--;
 		}
 
-		enterMapUpdateScope( );
-		setCenterPosition( LonLat( 0.5 * (left + right), 0.5 * (top + bottom ) ) );
-		setMagnification( magnification );
-		exitMapUpdateScope( false );
+		//enterMapUpdateScope( );
+		//setCenterPosition( LonLat( 0.5 * (left + right), 0.5 * (top + bottom ) ), true, false );
+		//setMagnification( magnification );
+		//exitMapUpdateScope( false );
+		setCenterPosition( LonLat( 0.5 * (left + right), 0.5 * (top + bottom ) ), magnification, true, false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -188,7 +189,7 @@ namespace MAP
 		if ( KeepSelectedCentered )
 		{
 			LonLat itemLoc = item->getLocation( );
-			setCenterPosition( itemLoc );
+			setCenterPosition( itemLoc, false, false );
 		}
 		else
 		{
@@ -202,7 +203,7 @@ namespace MAP
 				worldPx = itemLoc.toPixels( getMagnification( ) );
 				item->setCachedPixelLocation( worldPx );
 			}
-			MAPoint2d widgetPx = worldPixelToWidget( worldPx );
+			MAPoint2d widgetPx = mViewport->worldPixelToViewport( worldPx );
 			int centerX = getWidth( ) / 2;
 			int centerY = getHeight( ) / 2;
 			MAPoint2d newWidgetPx;
@@ -221,9 +222,9 @@ namespace MAP
 			else if ( dy < -( centerY - ScrollMargin ) )
 				newWidgetPx.y += ( dy + ( centerY - ScrollMargin ) );
 
-			PixelCoordinate newWorldPx = widgetToWorldPixel( newWidgetPx );
+			PixelCoordinate newWorldPx = mViewport->viewportToWorldPixel( newWidgetPx );
 			LonLat newLoc = LonLat( newWorldPx );
-			setCenterPosition( newLoc );
+			setCenterPosition( newLoc, false, false );
 		}
 	}
 
@@ -290,7 +291,7 @@ namespace MAP
 				itemWorldPx = itemLoc.toPixels( getMagnification( ) );
 				item->setCachedPixelLocation( itemWorldPx );
 			}
-			MAPoint2d itemWidgetPx = worldPixelToWidget( itemWorldPx );
+			MAPoint2d itemWidgetPx = mViewport->worldPixelToViewport( itemWorldPx );
 			if ( itemWidgetPx.x < 0 || itemWidgetPx.x >= getWidth( ) || itemWidgetPx.y < 0 || itemWidgetPx.y >= getHeight( ) )
 				continue;
 
@@ -338,36 +339,36 @@ namespace MAP
 		case MAK_UP:
 			if ( nearestUp != -1 )
 			{
-				enterMapUpdateScope( );
+				//enterMapUpdateScope( );
 				selectItem( nearestUp );
-				exitMapUpdateScope( false );
+				//exitMapUpdateScope( false );
 				return true;
 			}
 			break;
 		case MAK_DOWN:
 			if ( nearestDown != -1 )
 			{
-				enterMapUpdateScope( );
+				//enterMapUpdateScope( );
 				selectItem( nearestDown );
-				exitMapUpdateScope( false );
+				//exitMapUpdateScope( false );
 				return true;
 			}
 			break;
 		case MAK_LEFT:
 			if ( nearestLeft != -1 )
 			{
-				enterMapUpdateScope( );
+				//enterMapUpdateScope( );
 				selectItem( nearestLeft );
-				exitMapUpdateScope( false );
+				//exitMapUpdateScope( false );
 				return true;
 			}
 			break;
 		case MAK_RIGHT:
 			if ( nearestRight != -1 )
 			{
-				enterMapUpdateScope( );
+				//enterMapUpdateScope( );
 				selectItem( nearestRight );
-				exitMapUpdateScope( false );
+				//exitMapUpdateScope( false );
 				return true;
 			}
 			break;
@@ -382,9 +383,9 @@ namespace MAP
 		switch( keyCode )
 		{
 		case MAK_5:
-			enterMapUpdateScope( );
+			//enterMapUpdateScope( );
 			selectNextItem( );
-			exitMapUpdateScope( false );
+			//exitMapUpdateScope( false );
 			return true;
 		case MAK_FIRE:
 		case MAK_0:
@@ -424,7 +425,7 @@ namespace MAP
 			worldPx = lonlat.toPixels( getMagnification( ) );
 			item->setCachedPixelLocation( worldPx );
 		}
-		MAPoint2d widgetPx = worldPixelToWidget( worldPx );
+		MAPoint2d widgetPx = mViewport->worldPixelToViewport( worldPx );
 		if ( widgetPx.x >= 0 && widgetPx.x < getWidth( ) && widgetPx.y >= 0 && widgetPx.y < getHeight( ) )
 		{
 			LayerRenderer* renderer = layer->getRenderer( );

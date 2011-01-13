@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MapViewport.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MapWidget.cpp"
 				>
 			</File>
@@ -250,6 +254,10 @@
 			</File>
 			<File
 				RelativePath=".\MapTileCoordinate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MapViewport.h"
 				>
 			</File>
 			<File

@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "DateTime.h"
 #include "LonLat.h"
+#include "DebugPrintf.h"
 
 using namespace MAPUtil;
 
@@ -56,13 +57,17 @@ namespace MAP
 			mImage( image ),
 			mLastAccessTime( DateTime::minValue( ) )
 		{
+			//tileCount++;
+			//DebugPrintf("Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Destroys a map tile.
 		 */
 		virtual ~MapTile( )
 		{
+			//tileCount--;
 			maDestroyObject( mImage );
+			//DebugPrintf("~Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Sets last access timestamp to current time.
@@ -129,6 +134,8 @@ namespace MAP
 		LonLat mCenter;
 		MAHandle mImage;
 		DateTime mLastAccessTime;
+
+		//static int tileCount;
 	};
 }
 #endif // MAPTILE_H_

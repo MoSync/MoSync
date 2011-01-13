@@ -45,8 +45,8 @@ namespace MapDemo
 	void MapSourceAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		mWidget->enterMapUpdateScope( );
+		//mWidget->enterMapUpdateScope( );
 		mWidget->setMapSource( mSource );
-		mWidget->exitMapUpdateScope( false );
+		//mWidget->exitMapUpdateScope( false );
 	}
 }

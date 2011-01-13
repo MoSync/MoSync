@@ -39,10 +39,13 @@ namespace MapDemo
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
-		mMap->enterMapUpdateScope( );
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
-		mMap->setMagnification( 10 );
-		mMap->exitMapUpdateScope( true );
+
+		//mMap->enterMapUpdateScope( );
+		//mMap->setCenterPosition( LonLat( 18.07, 59.33 ), true, false );
+		//mMap->setMagnification( 10 );
+		//mMap->exitMapUpdateScope( true );
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
+		
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 
 		setClientWidget( mMap );
@@ -152,7 +155,7 @@ namespace MapDemo
 
         LonLat newPos = LonLat( px );
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        mMap->setCenterPosition( newPos );
+        mMap->setCenterPosition( newPos, false, true );
 		prevX = point.x;
 		prevY = point.y;
 		return true;

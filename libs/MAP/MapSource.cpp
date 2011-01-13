@@ -22,6 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
+	//int MapTile::tileCount = 0;
+
 	//=========================================================================
 	class MapSourceInnerClientData
 	//=========================================================================
@@ -159,9 +161,10 @@ namespace MAP
 	//
 	// Creates a new map source
 	//
-	MapSource::MapSource( )
+	MapSource::MapSource( ) :
 	//-------------------------------------------------------------------------
-		: mQueue( NULL )
+		mQueue( NULL ),
+		mTileCount( 0 )
 	{
 		mQueue = newobject( MapSourceQueue, new MapSourceQueue( QueueSize ) );
 		for (int i = 0; i < Downloaders; i++)
@@ -274,6 +277,7 @@ namespace MAP
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
+		mTileCount++;
 		MapTileCoordinate tileXY = dlr->getTileXY( );
 		LonLat ll = tileCenterToLonLat( getTileSize( ), tileXY, 0, 0 );
 		MapTile* tile = newobject( MapTile, new MapTile( this, tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );

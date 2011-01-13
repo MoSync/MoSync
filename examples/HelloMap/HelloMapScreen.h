@@ -51,6 +51,7 @@ namespace HelloMap
 
 	private:
 		void					nextMapSource( );
+		void					setPosition( MAPoint2d p );
 
 		MapWidget*				mMap;
 		Font*					mFont;

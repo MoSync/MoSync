@@ -28,7 +28,7 @@ namespace HelloMap
 {
 	static const int DoubleClickTimeMs = 200;
 	static const int TapPanAcceleration = 1;
-	static const int TapPanIntervalMs = 80;
+	static const int TapPanIntervalMs = 100;
 
 	//-------------------------------------------------------------------------
 	HelloMapScreen::HelloMapScreen( )
@@ -44,13 +44,16 @@ namespace HelloMap
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( /*mMapSource,*/ 0, 0, width, height, NULL ) );
-		mMap->enterMapUpdateScope( );
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
-		mMap->setMagnification( 10 );
-		mMap->exitMapUpdateScope( true );
+		
+		//mMap->enterMapUpdateScope( );
+		//mMap->setCenterPosition( LonLat( 18.07, 59.33 ), true, false );
+		//mMap->setMagnification( 10 );
+		//mMap->exitMapUpdateScope( true );
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
+		
 		mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mFont );
-		mMap->setPanMode( MapWidgetPanMode_Momentum );
+		mMap->setPanMode( MapViewportPanMode_Momentum );
 		//
 		// Create map sources
 		//
@@ -92,9 +95,11 @@ namespace HelloMap
 		case MAK_8:
 			MemoryMgr::dump( );
 			return;
+		case MAK_7:
+			//mMap->testMomentumPanning( );
+			mMap->stressTest( );
+			return;
 		case MAK_SOFTRIGHT:
-			//maExit( 0 );
-			// TODO: proper exit
 			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
 			moblet.Terminate( );
 			return;
@@ -111,13 +116,7 @@ namespace HelloMap
 		(void)mMap->handleKeyRelease( keyCode );
 	}
 
-
-
 	bool scrolling = false;
-	//int prevX;
-	//int prevY;
-	//int lastPointerPressTimeMs = -1;
-
 	int pointerPressX;
 	int pointerPressY;
 	PixelCoordinate pointerPressCenter;
@@ -136,15 +135,20 @@ namespace HelloMap
 		pointerPressY = p.y;
 		pointerPressCenter = mMap->getCenterPositionPixels( );
 		//
+		// set position to stop any movement
+		//
+		mMap->stopGlide( );
+		//mMap->setCenterPosition( mMap->getCenterPosition( ), true, false );
+		//
 		// Handle doubletap for app exit
 		//
 		int curTimeMs = maGetMilliSecondCount( );
 		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
 		if ( deltaTimeMs < DoubleClickTimeMs ) 
 		{
-			//maExit( 0 );
-			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
-			moblet.Terminate( );
+			//HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
+			//moblet.Terminate( );
+			mMap->stressTest( );
 		}
 		else
 		{
@@ -160,41 +164,14 @@ namespace HelloMap
     }
 
 	int lastPointerMoveMs = -1;
-	int lastPointerMoveX;
-	int lastPointerMoveY;
-	int lastPointerSpeedX;
-	int lastPointerSpeedY;
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::pointerMoveEvent( MAPoint2d p )
+	void HelloMapScreen::setPosition( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
-		if( scrolling ) 
-			return;
-
 		int curTimeMs = maGetMilliSecondCount( );
-		if ( curTimeMs < lastPointerMoveMs + TapPanIntervalMs )
-			return;
-		//
-		// Calculate pointer speed
-		//
-		int deltaX = p.x - lastPointerMoveX;
-		int deltaY = p.y - lastPointerMoveY;
 		int deltaMs = curTimeMs - lastPointerMoveMs;
-		lastPointerSpeedX = deltaX * 1000 / deltaMs; 
-		lastPointerSpeedY = deltaY * 1000 / deltaMs;
-		DebugPrintf( "deltaMs = %d, delta = %d, %d\n", deltaMs, deltaX, deltaY );
-
 		lastPointerMoveMs = curTimeMs;
-		lastPointerMoveX = p.x;
-		lastPointerMoveY = p.y;
-
-		//int accel = 2;
-
-		//int dx = ( p.x - prevX ) * accel;
-		//int dy = ( p.y - prevY ) * accel;
-		//PixelCoordinate px = mMap->getCenterPositionPixels( );
-		//px = PixelCoordinate( px.getMagnification( ), px.getX( ) - dx, px.getY( ) + dy );
 		int dx = ( p.x - pointerPressX ) * TapPanAcceleration;
 		int dy = ( p.y - pointerPressY ) * TapPanAcceleration;
 		PixelCoordinate px = PixelCoordinate(	pointerPressCenter.getMagnification( ), 
@@ -202,36 +179,42 @@ namespace HelloMap
 												pointerPressCenter.getY( ) + dy );
         LonLat newPos = LonLat( px );
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        mMap->setCenterPosition( newPos );
-
-		//prevX = p.x;
-		//prevY = p.y;
+        mMap->setCenterPosition( newPos, false, true );
 	}
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::pointerReleaseEvent(MAPoint2d p)
+	void HelloMapScreen::pointerMoveEvent( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		if( scrolling ) 
+			return;
+		int curTimeMs = maGetMilliSecondCount( );
+		if ( curTimeMs < lastPointerMoveMs + TapPanIntervalMs )
+			return;
+		setPosition( p );
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloMapScreen::pointerReleaseEvent( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
 		scrolling = false;
-		//
-		// Set up for momentum-based panning
-		//
-		//int curTimeMs = maGetMilliSecondCount( );
-		//int deltaMs = curTimeMs - /*lastPointerMoveMs*/pointerPressTimeMs;
-		//int deltaX = p.x - /*lastPointerMoveX*/pointerPressX;
-		//int deltaY = p.y - /*lastPointerMoveY*/pointerPressY;
-		//if ( deltaMs >0 ) mMap->setPanMomentum( deltaX * 1000 / deltaMs, deltaY * 1000 / deltaMs );
-	
-		DebugPrintf( "momentum = %d, %d\n", lastPointerSpeedX, lastPointerSpeedY );
-		mMap->setPanMomentum( lastPointerSpeedX, lastPointerSpeedY );
+		setPosition( p );
+		mMap->startGlide( );
 	}
-
 
 	//-------------------------------------------------------------------------
 	void HelloMapScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		return;
-		// TODO: Reimplement later
+		MapSource* current = mMap->getMapSource( );
+		if ( current == mOpenStreetMapSource ) 
+			mMap->setMapSource( mGoogleStreetMapSource );
+		else if ( current == mGoogleStreetMapSource )
+			mMap->setMapSource( mGoogleAerialMapSource );
+		else if ( current == mGoogleAerialMapSource )
+			mMap->setMapSource( mGoogleHybridMapSource );
+		else if ( current == mGoogleHybridMapSource )
+			mMap->setMapSource( mOpenStreetMapSource );
 	}
 }

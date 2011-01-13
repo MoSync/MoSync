@@ -93,6 +93,7 @@ namespace MAP
 		//
 		int getCapacity( ) const;
 		void setCapacity( int capacity );
+		int size( );
 
 	private:
 		static MapCache* sSingleton;

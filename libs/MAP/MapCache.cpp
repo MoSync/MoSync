@@ -40,7 +40,7 @@ namespace MAP
 		IMapCacheListener*	mListener;
 	};
 
-	static const int DefaultCapacity = 100;
+	static const int DefaultCapacity = 20;
 
 	//-------------------------------------------------------------------------
 	MapCache* MapCache::get( ) 
@@ -97,6 +97,20 @@ namespace MAP
 	{ 
 		mCapacity = capacity; 
 		reallocateCache( ); 
+	}
+
+	//-------------------------------------------------------------------------
+	int MapCache::size( )
+	//-------------------------------------------------------------------------
+	{
+		int s = 0;
+		for ( int i = 0; i < mCapacity; i++ )
+		{
+			const MapTile* t = mList[i];
+			if ( t != NULL )
+				s++;
+		}
+		return s;
 	}
 
 	//-------------------------------------------------------------------------
@@ -198,7 +212,7 @@ namespace MAP
 			for ( int x = xMin; x <= xMax; x++)
 			{
 				//
-				// In cache? Then return tile in cache
+				// In cache? Then immediately return tile in cache
 				//
 				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 
@@ -301,6 +315,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::downloadCancelled\n" );
 	}
 
 	//-------------------------------------------------------------------------
@@ -308,6 +323,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::error %d\n", code );
 	}
 
 	//-------------------------------------------------------------------------

@@ -130,6 +130,10 @@ namespace MAP
 		 */
 		void						clearQueue( );
 		//
+		// Number of tiles received
+		//
+		int							getTileCount( ) { return mTileCount; }
+		//
 		// DownloadListener overrides
 		//
 		void						finishedDownloading( Downloader* downloader, MAHandle data );
@@ -157,7 +161,7 @@ namespace MAP
 
 		MapSourceQueue*				mQueue;
 		MapSourceImageDownloader*	mDownloaders[Downloaders];
-
+		int							mTileCount;
 	};
 }
 
