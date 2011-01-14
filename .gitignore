@@ -168,3 +168,5 @@ stabs.tab
 /tests/libc-suite/profile.txt
 /tests/libc-suite/settings.rb
 /tests/libc-suite/filesystem
+
+/runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java

@@ -136,7 +136,7 @@ Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
 sh(
-	"#{secondarg}../../tools/aapt package -f -v -M " +
+	"#{secondarg}/tools/aapt package -f -v -M " +
 	"#{package_root}/AndroidManifest.xml -F resources.ap_ -I " +
 	"#{secondarg}/android.jar -S " +
 	"#{package_root}/res -m -J " +
