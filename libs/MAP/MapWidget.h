@@ -129,6 +129,7 @@ namespace MAP
 		// Redraw
 		//
 		virtual void drawWidget( );
+		virtual void drawOverlay( );
 		Point getActualPosition( );
 		MapViewport* mViewport;
 
