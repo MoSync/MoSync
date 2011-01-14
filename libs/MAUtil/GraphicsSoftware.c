@@ -39,6 +39,7 @@ void soft_pushMatrix(void);
 void soft_popMatrix(void);
 void soft_translate(int x, int y);
 MAPoint2d soft_getTranslation(void);
+void soft_scale(MAFixed x, MAFixed y);
 void soft_plot(int x, int y);
 void soft_line(int x1, int y1, int x2, int y2);
 void soft_fillRect(int left, int top, int width, int height);
@@ -48,6 +49,7 @@ void soft_drawImage(MAHandle image, int left, int top);
 void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void soft_notifyImageUpdated(MAHandle image);
+void soft_updateScreen(void);
 
 static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_setup,
@@ -57,6 +59,7 @@ static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_popMatrix,
 	&soft_translate,
 	&soft_getTranslation,
+	&soft_scale,
 	&soft_plot,
 	&soft_line,
 	&soft_fillRect,
@@ -65,11 +68,13 @@ static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_drawImage,
 	&soft_drawRGB,
 	&soft_drawImageRegion,
-	&soft_notifyImageUpdated
+	&soft_notifyImageUpdated,
+	&soft_updateScreen
 };
 
-MAGraphicsDriver* Gfx_getDriverSoftware(void) {
-	return &sSoftwareGraphicsDriver;
+//MAGraphicsDriver* Gfx_getDriverSoftware(void) {
+void Gfx_useDriverSoftware(void) {
+	Gfx_useDriver(&sSoftwareGraphicsDriver);
 }
 
 
@@ -124,6 +129,10 @@ MAPoint2d soft_getTranslation(void) {
 	return sCurrentOffset;
 }
 
+void soft_scale(MAFixed x, MAFixed y) {
+	
+}
+
 void soft_plot(int x, int y) {
 	maPlot(sCurrentOffset.x + x, sCurrentOffset.y + y);
 }
@@ -169,4 +178,8 @@ void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d
 }
 
 void soft_notifyImageUpdated(MAHandle image) {
+}
+
+void soft_updateScreen(void) {
+	maUpdateScreen();
 }

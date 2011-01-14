@@ -31,6 +31,7 @@ namespace MAP
 	{
 		mViewport = newobject( MapViewport, new MapViewport( ) );
 		mViewport->setListener( this );
+		setDrawBackground( false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -118,6 +119,14 @@ namespace MAP
 	{
 		mViewport->setMagnification( magnification );
 	}
+
+	//-------------------------------------------------------------------------
+	void MapWidget::setScale( double scale )
+	//-------------------------------------------------------------------------
+	{
+		mViewport->setScale( scale );
+	}
+
 
 	//-------------------------------------------------------------------------
 	void MapWidget::setPanMode( MapViewportPanMode panMode )

@@ -7,7 +7,13 @@
 
 #import "MoSyncGLView.h"
 
-#define USE_DEPTH_BUFFER 1
+
+// hackety hack..
+void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
+void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
+void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
+
+#define USE_DEPTH_BUFFER 1 
 
 // A class extension to declare private methods
 @interface MoSyncGLView ()
@@ -55,7 +61,7 @@
         
         animationInterval = 1.0 / 60.0;
 			
-			WorkingContext = nil;	
+		WorkingContext = nil;	
 			
 		[self setupView];
     }
@@ -134,6 +140,7 @@
 
 - (void) bindContext {
 	
+	/*
     if(!WorkingContext) {
 		
 		EAGLSharegroup* group = context.sharegroup;
@@ -152,10 +159,16 @@
 	
 	
     glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+	*/
+	
+	[EAGLContext setCurrentContext:context];
+	glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
+	
 }
 
 - (void) renderContext {
-    if (!WorkingContext || [EAGLContext setCurrentContext:WorkingContext] == NO)
+    /*
+	if (!WorkingContext || [EAGLContext setCurrentContext:WorkingContext] == NO)
     {
         NSLog(@"SwapBuffers: [EAGLContext setCurrentContext:WorkingContext] failed");
         return;
@@ -167,19 +180,11 @@
     {
         NSLog(@"SwapBuffers: [WorkingContext presentRenderbuffer:GL_RENDERBUFFER_OES] failed");
     }  
+	*/
 	
-	/*
 	[EAGLContext setCurrentContext:context];	
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     [context presentRenderbuffer:GL_RENDERBUFFER_OES];	
-	*/
-	//[self drawView];
-	
-//	[NSObject performSelectorOnMainThread:@selector(drawView)
-//							   withTarget:self
-//							  withObjects:nil
-//							waitUntilDone:YES];	
-	
 }
 
 
@@ -235,6 +240,36 @@
     
     [context release];  
     [super dealloc];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	int touchId = 0;
+	for (UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView:self];
+		MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
+		touchId++;
+	}
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	int touchId = 0;
+	for (UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView:self];
+		MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+		touchId++;
+	}	
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+	NSSet *allTouches = [event allTouches];
+	int touchId = 0;
+	for(UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView					:self];
+		MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+		touchId++;
+	}	
 }
 
 @end

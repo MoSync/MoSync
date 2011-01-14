@@ -63,6 +63,12 @@ namespace MAP
 		 */
 		int getMagnification( ) const;
 		void setMagnification( int magnification );
+		
+		/**
+		 * Scale property
+		 */		
+		void setScale( double scale );
+		
 		/**
 		 * Magnification scale display property
 		 */

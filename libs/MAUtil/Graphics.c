@@ -18,10 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Graphics.h"
 #include <maassert.h>
 
-#include "GraphicsOpenGL.h"
-#include "GraphicsSoftware.h"
-
-
 #define MA_CLIP_STACK_DEPTH 128
 #define MA_TRANSFORM_STACK_DEPTH 128
 
@@ -42,6 +38,7 @@ void dummy_pushMatrix(void);
 void dummy_popMatrix(void);
 void dummy_translate(int x, int y);
 MAPoint2d dummy_getTranslation(void);
+void dummy_scale(MAFixed x, MAFixed y);
 void dummy_plot(int x, int y);
 void dummy_line(int x1, int y1, int x2, int y2);
 void dummy_fillRect(int left, int top, int width, int height);
@@ -51,6 +48,7 @@ void dummy_drawImage(MAHandle image, int left, int top);
 void dummy_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void dummy_notifyImageUpdated(MAHandle image);
+void dummy_updateScreen(void);
 
 static void _Gfx_init(void);
 
@@ -62,6 +60,7 @@ static MAGraphicsDriver sDummy = {
 	&dummy_popMatrix,
 	&dummy_translate,
 	&dummy_getTranslation,
+	&dummy_scale,
 	&dummy_plot,
 	&dummy_line,
 	&dummy_fillRect,
@@ -71,105 +70,107 @@ static MAGraphicsDriver sDummy = {
 	&dummy_drawRGB,
 	&dummy_drawImageRegion,
 	&dummy_notifyImageUpdated,	
+	&dummy_updateScreen
 };
 
 static MAGraphicsDriver* graphicsDriver = &sDummy;
-static MAGraphicsDriverType sDefaultDriverType = MA_GRAPHICS_DRIVER_SOFTWARE;
-
 
 void dummy_setup(int x, int y, int w, int h) {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->setup(x, y, w, h);
 }
 
 void dummy_setClipRect(int x, int y, int w, int h)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->setClipRect(x, y, w, h);
 }
 
 void dummy_clearMatrix(void)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->clearMatrix();
 }
 
 void dummy_pushMatrix(void)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->pushMatrix();
 }
 
 void dummy_popMatrix(void)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->popMatrix();
 }
 
 void dummy_translate(int x, int y)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->translate(x, y);
 }
 
 MAPoint2d dummy_getTranslation(void)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	return graphicsDriver->getTranslation();
 }
 
+void dummy_scale(MAFixed x, MAFixed y) {
+	
+}
+
 void dummy_plot(int x, int y)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->plot(x, y);
 }
 
 void dummy_line(int x1, int y1, int x2, int y2)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->line(x1, y1, x2, y1);
 }
 
 void dummy_fillRect(int left, int top, int width, int height)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->fillRect(left, top, width, height);
 }
 
 void dummy_drawText(int left, int top, const char* text)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->drawText(left, top, text);
 }
 
 void dummy_drawTextW(int left, int top, const wchar_t* text)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->drawTextW(left, top, text);
 }
 
 void dummy_drawImage(MAHandle image, int left, int top)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->drawImage(image, left, top);
 }
 
 void dummy_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->drawRGB(dstPoint, src, srcRect, scanlength);
 }
 
 void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->drawImageRegion(image, srcRect, dstPoint, transformMode);
 }
 
 void dummy_notifyImageUpdated(MAHandle image)  {
-	Gfx_useDriver(sDefaultDriverType);
+	Gfx_useDriverSoftware();
 	graphicsDriver->notifyImageUpdated(image);
 }
 
-void Gfx_useDriver(MAGraphicsDriverType driver) {
-	_Gfx_init();
-
-	if(driver == MA_GRAPHICS_DRIVER_OPENGL) {
-		graphicsDriver = Gfx_getDriverOpenGL();	
-	}
-	else if(driver == MA_GRAPHICS_DRIVER_SOFTWARE) {
-		graphicsDriver = Gfx_getDriverSoftware();		
-	}
+void dummy_updateScreen(void)  {
+	Gfx_useDriverSoftware();
+	graphicsDriver->updateScreen();
 }
 
-void Gfx_setup(MAGraphicsDriverType driver, int x, int y, int w, int h) {
-	Gfx_useDriver(driver);	
+
+void Gfx_useDriver(MAGraphicsDriver* driver) {
+	_Gfx_init();
+	graphicsDriver = driver;
+}
+
+void Gfx_setup(int x, int y, int w, int h) {
 	graphicsDriver->setup(x, y, w, h);
 
 	Gfx_clearMatrix();
@@ -421,6 +422,10 @@ MAPoint2d Gfx_getTranslation(void) {
 	return graphicsDriver->getTranslation(); //sCurrentOffset;
 }
 
+void Gfx_scale(MAFixed x, MAFixed y) {
+	graphicsDriver->scale(x, y);
+}
+
 
 BOOL Gfx_pushRect(int x, int y, int width, int height) {
 	BOOL res = Gfx_intersectClipRect(x, y, width, height);
@@ -504,4 +509,8 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 
 void Gfx_notifyImageUpdated(MAHandle image) {
 	graphicsDriver->notifyImageUpdated(image);
+}
+
+void Gfx_updateScreen(void) {
+	graphicsDriver->updateScreen();
 }

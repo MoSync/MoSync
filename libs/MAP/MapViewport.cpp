@@ -53,7 +53,7 @@ namespace MAP
 	};
 
 	//=========================================================================
-	class MapViewportPanTimerListener : public TimerListener
+	class MapViewportPanTimerListener : public IdleListener
 	//=========================================================================
 	{
 	public:
@@ -67,7 +67,7 @@ namespace MAP
 		}
 
 		//---------------------------------------------------------------------
-		void runTimerEvent( )
+		void idle( )
 		//---------------------------------------------------------------------
 		{
 			switch( mViewport->mPanMode )
@@ -130,7 +130,9 @@ namespace MAP
 						//
 						// Done panning, stop timer and repaint
 						//
-						Environment::getEnvironment( ).removeTimer( this );
+						//Environment::getEnvironment( ).removeTimer( this );
+						Environment::getEnvironment( ).removeIdleListener( this );
+						
 						mViewport->mHasTimer = false;
 						mViewport->updateMap( );
 						return;
@@ -166,7 +168,9 @@ namespace MAP
 						//
 						// Done panning, stop timer and repaint
 						//
-						Environment::getEnvironment( ).removeTimer( this );
+						//Environment::getEnvironment( ).removeTimer( this );
+						Environment::getEnvironment( ).removeIdleListener( this );
+						
 						mViewport->mHasTimer = false;
 						mViewport->updateMap( );
 						return;
@@ -280,7 +284,8 @@ namespace MAP
 		mHasScale( true ),
 		mPanTimerListener( NULL ),
 		mFont( NULL ),
-		mPanMode( MapViewportPanMode_Smooth )
+		mPanMode( MapViewportPanMode_Smooth ),
+		mScale(1.0)
 	{
 		mPanTimerListener = newobject( MapViewportPanTimerListener, new MapViewportPanTimerListener( this ) );
 	}
@@ -289,8 +294,13 @@ namespace MAP
 	MapViewport::~MapViewport( )
 	//-------------------------------------------------------------------------
 	{
+	/*
 		if ( mHasTimer )
 			Environment::getEnvironment( ).removeTimer( mPanTimerListener );
+			*/
+		if ( mHasTimer )
+			Environment::getEnvironment( ).removeIdleListener( mPanTimerListener );
+		
 		deleteobject( mPanTimerListener );
 	}
 
@@ -395,7 +405,9 @@ namespace MAP
 					if ( !isPointerEvent )
 						mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
 				}
-				Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
+				//Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
+				Environment::getEnvironment( ).addIdleListener( mPanTimerListener );
+				
 				mHasTimer = true;
 			}
 			break;
@@ -478,6 +490,13 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	void MapViewport::setScale( double scale ) 
+	//-------------------------------------------------------------------------
+	{
+		mScale = scale;
+	}
+
+	//-------------------------------------------------------------------------
 	MapViewportPanMode MapViewport::getPanMode( ) const
 	//-------------------------------------------------------------------------
 	{
@@ -519,7 +538,11 @@ namespace MAP
 			PixelCoordinate tilePx = tile->getCenter( ).toPixels( tile->getMagnification( ) );
 			MAPoint2d pt = worldPixelToViewport( tilePx );
 			const int tileSize = mSource->getTileSize( );
+			
+			Gfx_pushMatrix();
+			Gfx_scale((MAFixed)(mScale*65536.0), (MAFixed)(mScale*65536.0));
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
+			Gfx_popMatrix();
 		}
 		else
 		{

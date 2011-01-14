@@ -39,7 +39,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" {
 #endif
 
-	MAGraphicsDriver* Gfx_getDriverOpenGL(void);
+	//MAGraphicsDriver* Gfx_getDriverOpenGL(void);
+	
+	// if nativeUIOpenGLView is -1 we are running in fullscreen mode.
+	void Gfx_useDriverOpenGL(int nativeUIOpenGLView);
+	
 	
 #ifdef __cplusplus
 }

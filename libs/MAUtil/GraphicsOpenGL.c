@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maassert.h>
 
 #include <GLES/gl.h>
+#include <IX_WIDGET.h>
 
 void ogl_setup(int x, int y, int w, int h);
 void ogl_setClipRect(int x, int y, int w, int h);
@@ -27,6 +28,7 @@ void ogl_pushMatrix(void);
 void ogl_popMatrix(void);
 void ogl_translate(int x, int y);
 MAPoint2d ogl_getTranslation(void);
+void ogl_scale(MAFixed x, MAFixed y);
 void ogl_plot(int x, int y);
 void ogl_line(int x1, int y1, int x2, int y2);
 void ogl_fillRect(int left, int top, int width, int height);
@@ -36,6 +38,7 @@ void ogl_drawImage(MAHandle image, int left, int top);
 void ogl_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void ogl_notifyImageUpdated(MAHandle image);
+void ogl_updateScreen(void);
 
 static MARect sViewPort;
 
@@ -48,6 +51,7 @@ static MAGraphicsDriver sGLGraphicsDriver = {
 	&ogl_popMatrix,
 	&ogl_translate,
 	&ogl_getTranslation,
+	&ogl_scale,
 	&ogl_plot,
 	&ogl_line,
 	&ogl_fillRect,
@@ -57,10 +61,15 @@ static MAGraphicsDriver sGLGraphicsDriver = {
 	&ogl_drawRGB,
 	&ogl_drawImageRegion,
 	&ogl_notifyImageUpdated,
+	&ogl_updateScreen	
 };
 
-MAGraphicsDriver* Gfx_getDriverOpenGL(void) {
-	return &sGLGraphicsDriver;
+static int sNativeUIOpenGLView = -1;
+
+//MAGraphicsDriver* Gfx_getDriverOpenGL(void) {
+void Gfx_useDriverOpenGL(int nativeUIOpenGLView) {
+	sNativeUIOpenGLView = nativeUIOpenGLView;
+	Gfx_useDriver(&sGLGraphicsDriver);
 }
 
 void ogl_setup(int x, int y, int w, int h) {
@@ -122,7 +131,9 @@ MAPoint2d ogl_getTranslation(void) {
 	return res;
 }
 
-
+void ogl_scale(MAFixed x, MAFixed y) {
+	glScalex(x, y, 0x10000);
+}
 
 static int numTextures = 0;
 
@@ -344,6 +355,11 @@ void ogl_notifyImageUpdated(MAHandle image) {
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	addTexture(image, handle);
-	
 }
 
+void ogl_updateScreen(void) {
+	if(sNativeUIOpenGLView == -1)
+		maUpdateScreen();
+	else
+		maWidgetSetProperty(sNativeUIOpenGLView, "invalidate", "");
+}

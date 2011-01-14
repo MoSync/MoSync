@@ -114,6 +114,13 @@ namespace MAP
 		 */
 		int getMagnification( ) const;
 		void setMagnification( int magnification );
+		
+			
+		/**
+		 * Scale property
+		 */		
+		void setScale( double scale );	
+		
 		/**
 		 * Magnification scale display property
 		 */
@@ -209,6 +216,8 @@ namespace MAP
 		MapViewportPanMode mPanMode;
 		bool mHasTimer;
 		IMapViewportListener* mListener;
+		
+		double mScale;
 	};
 }
 #endif // MAPVIEWPORT_H_

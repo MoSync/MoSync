@@ -40,7 +40,7 @@ namespace MAP
 		IMapCacheListener*	mListener;
 	};
 
-	static const int DefaultCapacity = 20;
+	static const int DefaultCapacity = 40;
 
 	//-------------------------------------------------------------------------
 	MapCache* MapCache::get( ) 

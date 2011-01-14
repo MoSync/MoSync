@@ -39,7 +39,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" {
 #endif
 
-	MAGraphicsDriver* Gfx_getDriverSoftware(void);
+	//MAGraphicsDriver* Gfx_getDriverSoftware(void);
+	void Gfx_useDriverSoftware(void);
 
 #ifdef __cplusplus
 }
