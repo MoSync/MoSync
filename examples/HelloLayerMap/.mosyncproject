@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="false" version="1.1">
+<properties>
+<property key="build.prefs:additional.include.paths" value="..\..\libs,c:\Mosync\include"/>
+<property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib,MAP2.lib"/>
+<property key="build.prefs:additional.library.paths" value="C:\dev2\MoSyncNew\libs\MAP\Output,C:\dev2\MoSyncNew\libs\MAP2\Output,c:\MoSync\lib\pipe"/>
+<property key="build.prefs:extra.link.sw" value="-datasize=3000000 -heapsize=2000000 -stacksize=100000"/>
+<property key="build.prefs:extra.res.sw" value=""/>
+<property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="true"/>
+<property key="build.prefs:ignore.default.library.paths" value="true"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes" value=""/>
+<property key="template.id" value="project.empty"/>
+</properties>
+</project>

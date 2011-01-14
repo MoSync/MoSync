@@ -15,53 +15,59 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
-* \file MapSourceMgr.h
-* \brief Switch between map sources
-* \author Lars-Åke Vinberg
-*/
+#ifndef COLOR_H_
+#define COLOR_H_
 
-#ifndef MAPSOURCEMGR_H_
-#define MAPSOURCEMGR_H_
-
-#include <MAUtil/Map.h>
-
-#include "MapSource.h"
-
-/**
-* \brief MoSync slippy map classes
-*/
-
-namespace MAP
+namespace MAPUtil
 {
 	//=========================================================================
-	/**
-	 * \brief Manages map sources for clients to access.
-	 * Implemented as singleton.
-	 */
-	class MapSourceMgr
+	class Color
 	//=========================================================================
 	{
+	public:
+		Color( ) 
+		{ 
+		}
+
 	private:
-		MapSourceMgr( );
+		Color( int value ) 
+			: mVal( value ) 
+		{ 
+		}
 
 	public:
-		virtual ~MapSourceMgr( );
-		/**
-		 * Client accesses singleton through MapSourceMgr::get( )
-		 */
-		static MapSourceMgr* get( );
-		static void shutdown( );
-		/*
-		 * Returns map source
-		 */
-		MapSource* getMapSource( MapSourceKind kind );
+		~Color( ) { } // must not be virtual, to avoid vtable
+
+		static Color fromInt( int value ) 
+		{
+			return Color( value ); 
+		}
+
+		int val( ) const 
+		{
+			return mVal; 
+		}
+
+		static const Color black;
+		static const Color white;
+		static const Color red;
+		static const Color green;
+		static const Color blue;
 
 	private:
-		static MapSourceMgr* sSingleton;
-		Map<MapSourceKind, MapSource*> mMap;
+		int mVal;
 	};
+
+	inline bool operator == ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) == b.val( ); 
+	}
+
+	inline bool operator != ( const Color& a, const Color& b ) 
+	{
+		return a.val( ) != b.val( ); 
+	}
 }
 
-#endif // MAPSOURCEMGR_H_
+#endif // COLOR_H_
 

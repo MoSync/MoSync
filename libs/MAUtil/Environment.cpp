@@ -295,6 +295,33 @@ namespace MAUtil {
 		mPointerListeners.setRunning(false);
 	}
 
+	void Environment::fireMultitouchPressEvent(MAPoint2d p, int touchId) {
+		//MAASSERT(sEnvironment == this);
+		mPointerListeners.setRunning(true);
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
+			i->multitouchPressEvent(p, touchId);
+		}
+		mPointerListeners.setRunning(false);
+	}
+
+	void Environment::fireMultitouchMoveEvent(MAPoint2d p, int touchId) {
+		//MAASSERT(sEnvironment == this);
+		mPointerListeners.setRunning(true);
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
+			i->multitouchMoveEvent(p, touchId);
+		}
+		mPointerListeners.setRunning(false);
+	}
+
+	void Environment::fireMultitouchReleaseEvent(MAPoint2d p, int touchId) {
+		//MAASSERT(sEnvironment == this);
+		mPointerListeners.setRunning(true);
+		ListenerSet_each(PointerListener, i, mPointerListeners) {
+			i->multitouchReleaseEvent(p, touchId);
+		}
+		mPointerListeners.setRunning(false);
+	}
+
 	void Environment::fireBluetoothEvent(int state) {
 		//MAASSERT(sEnvironment == this);
 		if(mBtListener) mBtListener->bluetoothEvent(state);

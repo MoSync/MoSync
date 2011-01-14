@@ -45,8 +45,8 @@ namespace MapDemo
 	void MapLocationAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		mWidget->enterMapUpdateScope( );
-		mWidget->setCenterPosition( mLocation );
-		mWidget->exitMapUpdateScope( false );
+		//mWidget->enterMapUpdateScope( );
+		mWidget->setCenterPosition( mLocation, false, false );
+		//mWidget->exitMapUpdateScope( false );
 	}
 }

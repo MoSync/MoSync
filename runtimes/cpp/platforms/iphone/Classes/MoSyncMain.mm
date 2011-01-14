@@ -208,16 +208,16 @@ void MoSync_StopUpdatingAccelerometer() {
 	[sMoSyncView stopUpdatingAccelerometer];
 }
 
-void MoSync_AddTouchPressedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 }
 
-void MoSync_AddTouchMovedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);
+void MoSync_AddTouchMovedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);
 }
 
-void MoSync_AddTouchReleasedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+void MoSync_AddTouchReleasedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_RELEASED);
 }
 
 void MoSync_AddScreenChangedEvent() {

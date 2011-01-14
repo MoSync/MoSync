@@ -37,6 +37,52 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" {
 #endif
 
+typedef enum MAGraphicsDriverType_t {
+	MA_GRAPHICS_DRIVER_OPENGL,
+	MA_GRAPHICS_DRIVER_SOFTWARE
+} MAGraphicsDriverType;
+
+typedef void (*SetupFunc)(int x, int y, int w, int h);
+typedef void (*SetClipRectFunc)(int x, int y, int w, int h);
+typedef void (*ClearMatrixFunc)(void);
+typedef void (*PushMatrixFunc)(void);
+typedef void (*PopMatrixFunc)(void);
+typedef void (*TranslateFunc)(int x, int y);
+typedef MAPoint2d (*GetTranslationFunc)(void);
+typedef void (*PlotFunc)(int x, int y);
+typedef void (*LineFunc)(int x1, int y1, int x2, int y2);
+typedef void (*FillRectFunc)(int left, int top, int width, int height);
+typedef void (*DrawTextFunc)(int left, int top, const char* text);
+typedef void (*DrawTextWFunc)(int left, int top, const wchar_t* text);
+typedef void (*DrawImageFunc)(MAHandle image, int left, int top);
+typedef void (*DrawRGBFunc)(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
+typedef void (*DrawImageRegionFunc)(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+typedef void (*NotifyImageUpdated)(MAHandle image);
+
+typedef struct MAGraphicsDriver_t {
+	SetupFunc setup;
+	SetClipRectFunc setClipRect;
+	ClearMatrixFunc clearMatrix;
+	PushMatrixFunc pushMatrix;
+	PopMatrixFunc popMatrix;
+	TranslateFunc translate;
+	GetTranslationFunc getTranslation;
+	PlotFunc plot;
+	LineFunc line;
+	FillRectFunc fillRect;
+	DrawTextFunc drawText;
+	DrawTextWFunc drawTextW;
+	DrawImageFunc drawImage;
+	DrawRGBFunc drawRGB;
+	DrawImageRegionFunc drawImageRegion;
+	NotifyImageUpdated notifyImageUpdated; // not very pretty (for opengl so that it knows that it has to update the texture again)
+} MAGraphicsDriver;
+
+
+void Gfx_useDriver(MAGraphicsDriverType driver);
+
+void Gfx_setup(MAGraphicsDriverType driver, int x, int y, int w, int h);
+
 /** 
   * Clears the clip rect stack.
   **/
@@ -97,6 +143,8 @@ void Gfx_drawTextW(int left, int top, const wchar_t* text);
 void Gfx_drawImage(MAHandle image, int left, int top);
 void Gfx_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+
+void Gfx_notifyImageUpdated(MAHandle image);
 
 #ifdef __cplusplus
 }
