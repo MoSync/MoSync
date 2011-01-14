@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "DateTime.h"
 #include "LonLat.h"
 #include "DebugPrintf.h"
+#include <MAUtil/PlaceholderPool.h>
 
 using namespace MAPUtil;
 
@@ -67,6 +68,9 @@ namespace MAP
 		{
 			//tileCount--;
 			maDestroyObject( mImage );
+			
+			// added by niklas.
+			MAUtil::PlaceholderPool::put(mImage);
 			//DebugPrintf("~Maptile: %d\n", tileCount );
 		}
 		/**

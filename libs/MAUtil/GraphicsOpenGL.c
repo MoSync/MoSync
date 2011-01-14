@@ -129,18 +129,70 @@ static int numTextures = 0;
 typedef struct Texture_t {
 	GLuint glTexture;
 	MAHandle maTexture;
+	
+	int imageWidth;
+	int imageHeight;
+	int textureWidth;
+	int textureHeight;
+	
+	GLfixed textureWidthInv;
+	GLfixed textureHeightInv;
+	
+	GLshort textureCoords[8]; 
+	
 } Texture;
 
 static Texture textures[256];
 
-static GLuint getTexture(MAHandle image);
-static GLuint getTexture(MAHandle image) {	
+unsigned int nextPowerOf2(uint minPow, uint x);
+unsigned int nextPowerOf2(uint minPow, uint x) {
+	unsigned int i = 1 << minPow;
+	while(i < x) {
+		i <<= 1;		
+	}
+	return i;
+}
+
+static Texture* addTexture(MAHandle image, GLuint handle) {
+	int imageWidth = EXTENT_X(maGetImageSize(image));
+	int imageHeight = EXTENT_Y(maGetImageSize(image));
+	
+	textures[numTextures].glTexture = handle;
+	textures[numTextures].maTexture = image;
+	textures[numTextures].imageWidth = imageWidth;
+	textures[numTextures].imageHeight = imageHeight;
+	textures[numTextures].textureWidth = nextPowerOf2(1, imageWidth);
+	textures[numTextures].textureHeight = nextPowerOf2(1, imageHeight);
+	textures[numTextures].textureWidthInv = 0x10000/textures[numTextures].textureWidth;
+	textures[numTextures].textureHeightInv = 0x10000/textures[numTextures].textureHeight;
+	
+	// cache texture coordinates (for the most common case, drawImage).
+	textures[numTextures].textureCoords[0] = 0;
+	textures[numTextures].textureCoords[1] = 0;
+	textures[numTextures].textureCoords[2] = imageWidth;
+	textures[numTextures].textureCoords[3] = 0;
+	textures[numTextures].textureCoords[4] = imageWidth;
+	textures[numTextures].textureCoords[5] = imageHeight;
+	textures[numTextures].textureCoords[6] = 0;
+	textures[numTextures].textureCoords[7] = imageHeight;
+	
+	numTextures++;
+	
+	//printf("Added texture. Num textures: %d\n", numTextures);
+	
+	return &textures[numTextures-1];
+}
+
+static Texture* getTexture(MAHandle image);
+static Texture* getTexture(MAHandle image) {	
 	int i;
 	GLuint handle;	
 	
-	for(i = 0; i < numTextures; i++) {
+	for(i = numTextures-1; i >= 0; i--) {
+	
+		// should check more things than handle here (handle may be reused with placeholder pool)
 		if(textures[i].maTexture == image) {
-			return textures[i].glTexture;
+			return &textures[i];
 		}
 	}
 		
@@ -152,18 +204,14 @@ static GLuint getTexture(MAHandle image) {
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
-	textures[numTextures].glTexture = handle;
-	textures[numTextures].maTexture = image;
-	numTextures++;
-	
-	return handle;
+	return addTexture(image, handle);	
 }
 
-void drawTriangleFan(GLshort* textureCoords, GLshort* vertexCoords);
-void drawTriangleFan(GLshort* textureCoords, GLshort* vertexCoords) {
+inline void drawTriangleFan(GLshort* textureCoords, GLshort* vertexCoords);
+inline void drawTriangleFan(GLshort* textureCoords, GLshort* vertexCoords) {
 	if(textureCoords)
-		glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
 	
 	if(textureCoords)
 		glTexCoordPointer(2, GL_SHORT, 0, textureCoords);
@@ -175,35 +223,17 @@ void drawTriangleFan(GLshort* textureCoords, GLshort* vertexCoords) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-unsigned int nextPowerOf2(uint minPow, uint x);
-unsigned int nextPowerOf2(uint minPow, uint x) {
-	unsigned int i = 1 << minPow;
-	while(i < x) {
-		i <<= 1;		
-	}
-	return i;
-}
-
-
-void drawImage(GLshort* textureCoords, GLshort* vertexCoords, MAHandle image);
-void drawImage(GLshort* textureCoords, GLshort* vertexCoords, MAHandle image) {
-	GLuint texture = getTexture(image);
-	MAExtent imageSize = maGetImageSize(image);
-	int imageWidth = EXTENT_X(imageSize);
-	int imageHeight = EXTENT_Y(imageSize);
-
-	imageWidth = nextPowerOf2(1, imageWidth);
-	imageHeight = nextPowerOf2(1, imageHeight);
-		
+void drawImage(GLshort* textureCoords, GLshort* vertexCoords, Texture* image);
+void drawImage(GLshort* textureCoords, GLshort* vertexCoords, Texture* texture) {		
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture);	
+	glBindTexture(GL_TEXTURE_2D, texture->glTexture);	
 	
     glMatrixMode(GL_TEXTURE);
     glPushMatrix();
 	
-	glLoadIdentity();
-	//glScalef(1.0f / (float)imageWidth, 1.0f / (float)imageHeight, 1.0f);
-	glScalex(0x10000/imageWidth, 0x10000/imageHeight, 0x10000);
+	//glLoadIdentity();
+	// maybe save this matrix for each texture...
+	glScalex(texture->textureWidthInv, texture->textureHeightInv, 0x10000);
 	
 	glMatrixMode(GL_MODELVIEW);
 
@@ -231,6 +261,8 @@ void ogl_fillRect(int left, int top, int width, int height) {
 		left, top+height
 	};
 	
+	//glDisable(GL_BLEND);
+	
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	glDisable(GL_TEXTURE_2D);
@@ -238,6 +270,9 @@ void ogl_fillRect(int left, int top, int width, int height) {
 	drawTriangleFan(NULL, vertexCoords);
 	
 	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);	
+	
+	//glEnable(GL_BLEND);
+	
 	
 }
 
@@ -248,32 +283,26 @@ void ogl_drawTextW(int left, int top, const wchar_t* text) {
 }
 
 void ogl_drawImage(MAHandle image, int left, int top) {
-	MAExtent imageSize = maGetImageSize(image);
-	int imageWidth = EXTENT_X(imageSize);
-	int imageHeight = EXTENT_Y(imageSize);
-	
-
-	GLshort textureCoords[] = {
-		0, 0,
-		imageWidth, 0,
-		imageWidth, imageHeight,
-		0, imageHeight
-	};
+	Texture* texture = getTexture(image);
 	
 	GLshort vertexCoords[] = {
 		left, top,
-		left+imageWidth, top,
-		left+imageWidth, top+imageHeight,
-		left, top+imageHeight
+		left+texture->imageWidth, top,
+		left+texture->imageWidth, top+texture->imageHeight,
+		left, top+texture->imageHeight
 	};
 
-	drawImage(textureCoords, vertexCoords, image);				
+	if(left>sViewPort.width || left+texture->imageWidth<0 ||
+		top>sViewPort.height || top+texture->imageHeight<0)
+		return;	
+
+	drawImage(texture->textureCoords, vertexCoords, texture);				
 }
 
 void ogl_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength) {
 }
 
-void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode) {
+void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode) {	
 	GLshort textureCoords[] = {
 		(srcRect->left), (srcRect->top),
 		(srcRect->left + srcRect->width), (srcRect->top),
@@ -288,8 +317,10 @@ void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 		dstPoint->x+srcRect->width, dstPoint->y+srcRect->height,
 		dstPoint->x, dstPoint->y+srcRect->height
 	};
+	
+	Texture* texture = getTexture(image);	
 
-	drawImage(textureCoords, vertexCoords, image);
+	drawImage(textureCoords, vertexCoords, texture);
 }
 
 void ogl_notifyImageUpdated(MAHandle image) {
@@ -311,9 +342,8 @@ void ogl_notifyImageUpdated(MAHandle image) {
 	maOpenGLTexImage2D(image);
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	textures[numTextures].glTexture = handle;
-	textures[numTextures].maTexture = image;
-	numTextures++;
+	
+	addTexture(image, handle);
 	
 }
 

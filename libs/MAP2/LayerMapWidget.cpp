@@ -25,9 +25,9 @@ namespace MAP
 	static const bool KeepSelectedCentered = true;
 
 	//-------------------------------------------------------------------------
-	LayerMapWidget::LayerMapWidget( int x, int y, int width, int height, Widget* parent, bool drawAsPin ) :
+	LayerMapWidget::LayerMapWidget( int x, int y, int width, int height, Widget* parentPtr, bool drawAsPin ) :
 	//-------------------------------------------------------------------------
-		MapWidget( x, y, width, height, parent ),
+		MapWidget( x, y, width, height, parentPtr ),
 		mLayers( ),
 		mSelectedLayer( 0 ),
 		mSelectedItem( 0 )
@@ -191,6 +191,7 @@ namespace MAP
 			LonLat itemLoc = item->getLocation( );
 			setCenterPosition( itemLoc, false, false );
 		}
+#if 0 // niklas: always false
 		else
 		{
 			const int ScrollMargin = 60;
@@ -226,6 +227,7 @@ namespace MAP
 			LonLat newLoc = LonLat( newWorldPx );
 			setCenterPosition( newLoc, false, false );
 		}
+#endif // #if 0		
 	}
 
 	//-------------------------------------------------------------------------
@@ -398,9 +400,13 @@ namespace MAP
 		case MAK_DOWN:
 		case MAK_LEFT:
 		case MAK_RIGHT:
+			
+#if 0 // niklas: always false			
 			if ( ScrollToNearest && scrolltoNearest( keyCode ) )
 				return true;
+#endif	
 			break;
+			
 		}
 		
 		return MapWidget::handleKeyPress( keyCode );
@@ -414,7 +420,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void LayerMapWidget::drawItem( Layer* layer, GeoPoint* item, bool selected, bool drawText )
+	void LayerMapWidget::drawItem( Layer* layer, GeoPoint* item, bool renderSelected, bool drawText )
 	//-------------------------------------------------------------------------
 	{
 		Point widgetPos = getPosition( );

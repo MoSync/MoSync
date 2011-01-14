@@ -25,9 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAP
 {
 	//-------------------------------------------------------------------------
-	MapWidget::MapWidget( int x, int y, int width, int height, Widget* parent )
+	MapWidget::MapWidget( int x, int y, int width, int height, Widget* parentPtr )
 	//-------------------------------------------------------------------------
-	:	Widget( x, y, width, height, parent )
+	:	Widget( x, y, width, height, parentPtr )
 	{
 		mViewport = newobject( MapViewport, new MapViewport( ) );
 		mViewport->setListener( this );

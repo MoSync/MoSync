@@ -68,9 +68,9 @@ namespace MAUtil {
 		virtual void pointerPressEvent(MAPoint2d p) = 0;
 		virtual void pointerMoveEvent(MAPoint2d p) = 0;
 		virtual void pointerReleaseEvent(MAPoint2d p) = 0;
-		virtual void multitouchPressEvent(MAPoint2d p, int touchId) = 0;
-		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) = 0;
-		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) = 0;
+		virtual void multitouchPressEvent(MAPoint2d p, int touchId) {};
+		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) {};
+		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) {};
 	};
 
 	/**

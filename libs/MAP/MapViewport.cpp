@@ -523,6 +523,9 @@ namespace MAP
 		}
 		else
 		{
+			// added by niklas
+			Gfx_notifyImageUpdated( tile->getImage( ) );
+			
 			//
 			// notify client that update is needed
 			//

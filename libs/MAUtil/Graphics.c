@@ -35,8 +35,94 @@ static int sClipStackPtr = -1;
 #define false 0
 #define true 1
 
+void dummy_setup(int x, int y, int w, int h);
+void dummy_setClipRect(int x, int y, int w, int h);
+void dummy_clearMatrix(void);
+void dummy_pushMatrix(void);
+void dummy_popMatrix(void);
+void dummy_translate(int x, int y);
+MAPoint2d dummy_getTranslation(void);
+void dummy_plot(int x, int y);
+void dummy_line(int x1, int y1, int x2, int y2);
+void dummy_fillRect(int left, int top, int width, int height);
+void dummy_drawText(int left, int top, const char* text);
+void dummy_drawTextW(int left, int top, const wchar_t* text);
+void dummy_drawImage(MAHandle image, int left, int top);
+void dummy_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
+void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+void dummy_notifyImageUpdated(MAHandle image);
 
-MAGraphicsDriver* graphicsDriver = NULL;
+void dummy_setup(int x, int y, int w, int h) {
+}
+
+void dummy_setClipRect(int x, int y, int w, int h)  {
+}
+
+void dummy_clearMatrix(void)  {
+}
+
+void dummy_pushMatrix(void)  {
+}
+
+void dummy_popMatrix(void)  {
+}
+
+void dummy_translate(int x, int y)  {
+}
+
+MAPoint2d dummy_getTranslation(void)  {
+	MAPoint2d point = {0, 0};
+	return point;
+}
+
+void dummy_plot(int x, int y)  {
+}
+
+void dummy_line(int x1, int y1, int x2, int y2)  {
+}
+
+void dummy_fillRect(int left, int top, int width, int height)  {
+}
+
+void dummy_drawText(int left, int top, const char* text)  {
+}
+
+void dummy_drawTextW(int left, int top, const wchar_t* text)  {
+}
+
+void dummy_drawImage(MAHandle image, int left, int top)  {
+}
+
+void dummy_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength)  {
+}
+
+void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode)  {
+}
+
+void dummy_notifyImageUpdated(MAHandle image)  {
+}
+
+static MAGraphicsDriver sDummy = {
+	&dummy_setup,
+	&dummy_setClipRect,
+	&dummy_clearMatrix,
+	&dummy_pushMatrix,
+	&dummy_popMatrix,
+	&dummy_translate,
+	&dummy_getTranslation,
+	&dummy_plot,
+	&dummy_line,
+	&dummy_fillRect,
+	&dummy_drawText,
+	&dummy_drawTextW,
+	&dummy_drawImage,
+	&dummy_drawRGB,
+	&dummy_drawImageRegion,
+	&dummy_notifyImageUpdated,	
+};
+
+
+MAGraphicsDriver* graphicsDriver = &sDummy;
 
 void Gfx_useDriver(MAGraphicsDriverType driver) {
 	if(driver == MA_GRAPHICS_DRIVER_OPENGL) {
@@ -353,6 +439,8 @@ void Gfx_drawTextW(int left, int top, const wchar_t* text) {
 
 void Gfx_drawImage(MAHandle image, int left, int top) {
 	//maDrawImage(image, sCurrentOffset.x + left, sCurrentOffset.y + top);
+
+	// probably do early out rejection before...	
 	graphicsDriver->drawImage(image, left, top);
 }
 

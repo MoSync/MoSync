@@ -30,17 +30,17 @@ namespace MAPUtil
 		}
 
 	private:
-		Color( int val ) 
-			: mVal( val ) 
+		Color( int value ) 
+			: mVal( value ) 
 		{ 
 		}
 
 	public:
 		~Color( ) { } // must not be virtual, to avoid vtable
 
-		static Color fromInt( int val ) 
+		static Color fromInt( int value ) 
 		{
-			return Color( val ); 
+			return Color( value ); 
 		}
 
 		int val( ) const 
