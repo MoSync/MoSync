@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "LonLat.h"
 #include "MapCache.h"
+#include "Broadcaster.h"
 
 using namespace MAUI;
 
@@ -83,7 +84,9 @@ namespace MAP
 	/**
 	 * \brief Simple slippy map viewport.
 	 */
-	class MapViewport : public IMapCacheListener
+	class MapViewport : 
+		public IMapCacheListener,
+		public Broadcaster<IMapViewportListener>
 	//=========================================================================
 	{
 		friend class MapViewportPanTimerListener;
@@ -96,7 +99,7 @@ namespace MAP
 		 * Map update scope
 		 */
 		void updateMap( );
-		void setListener( IMapViewportListener* listener ) { mListener = listener; }
+		//void setListener( IMapViewportListener* listener ) { mListener = listener; }
 		/**
 		 * Map source property
 		 */
@@ -197,9 +200,13 @@ namespace MAP
 
 	protected:
 		//
+		// events
+		//
+		virtual void onViewportUpdated( );
+		//
 		// Redraw
 		//
-		virtual void drawOverlay( );
+		virtual void drawOverlay( Rect& bounds, int magnification );
 
 	private:
 		int mWidth;
@@ -215,7 +222,7 @@ namespace MAP
 		Font* mFont;
 		MapViewportPanMode mPanMode;
 		bool mHasTimer;
-		IMapViewportListener* mListener;
+		//IMapViewportListener* mListener;
 		
 		double mScale;
 	};

@@ -7,6 +7,8 @@
 #ifndef LAYERMAPWIDGET_H_
 #define LAYERMAPWIDGET_H_
 
+#if 0 // retired
+
 #include <MAP/MapWidget.h>
 #include "Layer.h"
 #include "GeoPoint.h"
@@ -87,7 +89,9 @@ namespace MAP
 
 		Vector<Layer*> mLayers;
 		int mSelectedLayer;
-		int mSelectedItem;
 	};
 }
+
+#endif // retired
+
 #endif // LAYERMAPWIDGET_H_

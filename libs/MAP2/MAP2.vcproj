@@ -175,11 +175,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GeoPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Layer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\LayerItem.cpp"
+				RelativePath=".\LayerMapViewport.cpp"
 				>
 			</File>
 			<File
@@ -217,15 +225,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GeoPointLayerRenderer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Layer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\LayerMapWidget.h"
+				RelativePath=".\LayerMapViewport.h"
 				>
 			</File>
 			<File
-				RelativePath=".\LayerRenderer.h"
+				RelativePath=".\LayerMapWidget.h"
 				>
 			</File>
 		</Filter>

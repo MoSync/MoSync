@@ -547,13 +547,22 @@ namespace MAP
 		else
 		{
 			// added by niklas
-			Gfx_notifyImageUpdated( tile->getImage( ) );
+			// TODO: Gfx_notifyImageUpdated( tile->getImage( ) );
 			
 			//
 			// notify client that update is needed
 			//
-			mListener->viewportUpdated( this );
+			onViewportUpdated( );
 		}
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::onViewportUpdated( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->viewportUpdated( this );
 	}
 
 	//-------------------------------------------------------------------------
@@ -565,6 +574,7 @@ namespace MAP
 		// Save clip
 		//
 		(void)Gfx_pushClipRect( origin.x, origin.y, getWidth( ), getHeight( ) );
+		Rect bounds = Rect( origin.x, origin.y, getWidth( ), getHeight( )  );
 		//
 		// Draw available tiles
 		//
@@ -572,7 +582,7 @@ namespace MAP
 		//
 		// Let subclass draw its overlay
 		//
-		drawOverlay( );
+		drawOverlay( bounds, mMagnification );
 		
 		//
 		// Draw scale indicator
@@ -681,7 +691,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::drawOverlay( )
+	void MapViewport::drawOverlay( Rect& bounds, int magnification )
 	//-------------------------------------------------------------------------
 	{
 	}

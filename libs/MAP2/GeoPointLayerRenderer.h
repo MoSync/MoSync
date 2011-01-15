@@ -1,11 +1,11 @@
 //
-// LayerRenderer.h
+// GeoPointLayerRenderer.h
 //
 // Author: Lars Ake Vinberg
 //
 
-#ifndef LAYERRENDERER_H_
-#define LAYERRENDERER_H_
+#ifndef GEOPOINTLAYERRENDERER_H_
+#define GEOPOINTLAYERRENDERER_H_
 
 //#include <MAUtil/String.h>
 
@@ -23,14 +23,14 @@ namespace MAP
 
 	//=========================================================================
 	// Abstract base class for client to implement.
-	class LayerRenderer
+	class GeoPointLayerRenderer
 	//=========================================================================
 	{
 	public:
-		virtual ~LayerRenderer( ) { };
+		virtual ~GeoPointLayerRenderer( ) { };
 		virtual void renderItem( Layer* layer, GeoPoint* item, int x, int y, bool selected ) = 0;
-		virtual void renderItemText( Layer* layer, GeoPoint* item, int x, int y, int canvasWidth, int canvasHeight, int offsetX, int offsetY ) = 0;
+		virtual void renderItemText( Layer* layer, GeoPoint* item, int x, int y, const Rect& bounds ) = 0;
 	};
 }
-#endif // LAYERITEM_H_
+#endif // GEOPOINTLAYERRENDERER_H_
 

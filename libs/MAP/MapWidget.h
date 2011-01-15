@@ -52,6 +52,11 @@ namespace MAP
 		MapSource* getMapSource( ) const { return mViewport->getMapSource( ); }
 		void setMapSource( MapSource* source );
 		/**
+		 * Map viewport property
+		 */
+		void setViewport( MapViewport* viewport );
+		MapViewport* getViewport( ) const { return mViewport; }
+		/**
 		 * Center position property
 		 */
 		LonLat getCenterPosition( ) const;

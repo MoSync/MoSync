@@ -10,9 +10,8 @@
 #include <MAUtil/String.h>
 
 #include <MAP/MemoryMgr.h>
-#include "GeoPointDataSource.h"
 #include <MAP/Broadcaster.h>
-#include "Enumerator.h"
+#include <MAP/MapViewport.h>
 
 using namespace MAPUtil;
 using namespace MAUtil;
@@ -23,7 +22,6 @@ namespace MAP
 	// Forward class declarations
 	//
 	class Layer;
-	//class LayerItem;
 	class LayerRenderer;
 
 	//================================================================================
@@ -43,9 +41,7 @@ namespace MAP
 	// Layer class
 	//
 	class Layer : 
-		public Broadcaster<ILayerListener>, 
-		IGeoPointDataSourceListener, 
-		public IEnumerable<GeoPoint*>
+		public Broadcaster<ILayerListener>
 	//=========================================================================
 	{
 	public:
@@ -53,47 +49,30 @@ namespace MAP
 
 		virtual ~Layer( ) { }
 
-		//int size( ) const;
 		//
-		// Data source property
+		// Render
 		//
-		GeoPointDataSource* getDataSource( ) const;
-		void setDataSource( GeoPointDataSource* dataSource );
-		//
-		// Renderer property
-		//
-		LayerRenderer* getRenderer( ) const { return mRenderer; }
-		void setRenderer( LayerRenderer* renderer ) { mRenderer = renderer; }
+		virtual void draw( MapViewport* viewport, const Rect& bounds, int magnification, bool isLayerSelected ) = 0;
 		//
 		// Title property
 		//
 		const char* getTitle( ) const { return mTitle.c_str( ); }
 		void setTitle( const char* title ) { mTitle = title; }
 		//
-		// IGeoPointDataSourceListener implementation
+		// Layer item selection and activation
 		//
-		void dataChanged( GeoPointDataSource* sender );
-		void loadComplete( GeoPointDataSource* sender );
+		virtual void selectItem( int index ) = 0;
+		virtual void selectNextItem( ) = 0;
+		virtual void selectPreviousItem( ) = 0;
+		virtual void activateSelectedItem( ) = 0;
 		//
-		// IEnumerable<GeoPoint> implementation
+		// Bounding box for items
 		//
-		int size( );
-		GeoPoint* getItem( int index );
-		//
-		// Selection
-		//
-		//virtual bool canSelect( ) = 0;
-
-		//virtual void selectItem( int item ) = 0;
-
-		//virtual void selectNextItem( ) = 0;
-
-		//virtual int itemCount( ) = 0;
+		virtual void getBoundingBox( double& left, double& top, double& right, double& bottom ) = 0;
+		virtual LonLat getSelectedItemLocation( ) = 0;
 
 	private:
 		String mTitle;
-		GeoPointDataSource* mDataSource;
-		LayerRenderer* mRenderer;
 	};
 }
 #endif // LAYER_H_

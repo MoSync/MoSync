@@ -57,14 +57,16 @@ namespace MAP
 	protected:
 		void onDataChanged( ) 
 		{
-			for ( int i = 0; i < this->mListeners.size( ); i++ )
-				this->mListeners[i]->dataChanged( this );
+			Vector<IGeoPointDataSourceListener*>* listeners = getBroadcasterListeners<IGeoPointDataSourceListener>( *this );
+			for ( int i = 0; i < listeners->size( ); i++ )
+				(*listeners)[i]->dataChanged( this );
 		}
 
 		void onLoadComplete( )
 		{
-			for ( int i = 0; i < this->mListeners.size( ); i++ )
-				this->mListeners[i]->loadComplete( this );
+			Vector<IGeoPointDataSourceListener*>* listeners = getBroadcasterListeners<IGeoPointDataSourceListener>( *this );
+			for ( int i = 0; i < listeners->size( ); i++ )
+				(*listeners)[i]->loadComplete( this );
 		}
 
 	private:
