@@ -222,6 +222,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.point.x = intArray[1];
 		event.point.y = intArray[2];
+		event.touchId = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED)
 	{
