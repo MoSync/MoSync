@@ -27,8 +27,8 @@
 		8558308211C79B210008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
 		857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
-		857B022C12C62C9300DEA306 /* MoSyncGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 857B022B12C62C9300DEA306 /* MoSyncGLView.m */; };
 		857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
+		85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -54,6 +54,7 @@
 		85BF2BF211341A8C00BB0201 /* MoSyncMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2BF111341A8C00BB0201 /* MoSyncMain.mm */; };
 		85BF2C3B11341EF000BB0201 /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
 		85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2C60113429A900BB0201 /* MoSyncView.mm */; };
+		85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */; };
 		85D26D7512B7AF8300FBA308 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */; };
 		85D26D7612B7AF8300FBA308 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */; };
 		85E2764F12B0EB9C00ABEDF3 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */; };
@@ -160,8 +161,9 @@
 		856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSObjectExpanded.m; sourceTree = "<group>"; };
 		857B020112C627C200DEA306 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		857B022A12C62C9300DEA306 /* MoSyncGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncGLView.h; sourceTree = "<group>"; };
-		857B022B12C62C9300DEA306 /* MoSyncGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncGLView.m; sourceTree = "<group>"; };
 		857B025512C62F5600DEA306 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		85883DEA12DDBB4500EDD04B /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.h; sourceTree = SOURCE_ROOT; };
+		85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GLViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.mm; sourceTree = SOURCE_ROOT; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
@@ -238,6 +240,7 @@
 		85BF2C3A11341EF000BB0201 /* program */ = {isa = PBXFileReference; lastKnownFileType = text; path = program; sourceTree = "<group>"; };
 		85BF2C5F113429A900BB0201 /* MoSyncView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncView.h; sourceTree = "<group>"; };
 		85BF2C60113429A900BB0201 /* MoSyncView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncView.mm; sourceTree = "<group>"; };
+		85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncGLView.mm; sourceTree = "<group>"; };
 		85D26D7112B7AF8300FBA308 /* ListViewItemWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewItemWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewItemWidget.h; sourceTree = SOURCE_ROOT; };
 		85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewItemWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewItemWidget.mm; sourceTree = SOURCE_ROOT; };
 		85D26D7312B7AF8300FBA308 /* WebViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/WebViewWidget.h; sourceTree = SOURCE_ROOT; };
@@ -357,7 +360,7 @@
 				856ACBD212B1A2C00017BD6D /* NSObjectExpanded.h */,
 				856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */,
 				857B022A12C62C9300DEA306 /* MoSyncGLView.h */,
-				857B022B12C62C9300DEA306 /* MoSyncGLView.m */,
+				85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -603,6 +606,8 @@
 		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				85883DEA12DDBB4500EDD04B /* GLViewWidget.h */,
+				85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */,
 				85D26D7112B7AF8300FBA308 /* ListViewItemWidget.h */,
 				85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */,
 				85D26D7312B7AF8300FBA308 /* WebViewWidget.h */,
@@ -823,7 +828,8 @@
 				8508D81112B67762001A96E2 /* VerticalLayoutWidget.mm in Sources */,
 				85D26D7512B7AF8300FBA308 /* ListViewItemWidget.mm in Sources */,
 				85D26D7612B7AF8300FBA308 /* WebViewWidget.mm in Sources */,
-				857B022C12C62C9300DEA306 /* MoSyncGLView.m in Sources */,
+				85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */,
+				85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

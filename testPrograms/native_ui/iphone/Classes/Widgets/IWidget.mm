@@ -101,6 +101,21 @@
 
 - (NSString*) getPropertyWithKey: (NSString*)key {
 	
+	if([key isEqualToString:@"width"]) {		
+		return [[NSNumber numberWithInt: view.frame.size.width ] stringValue];
+		
+	}
+	else if([key isEqualToString:@"height"]) {
+		return [[NSNumber numberWithInt: view.frame.size.height] stringValue];
+	}
+	else if([key isEqualToString:@"left"]) {		
+		return [[NSNumber numberWithInt: view.frame.origin.x ] stringValue];
+		
+	}
+	else if([key isEqualToString:@"top"]) {
+		return [[NSNumber numberWithInt: view.frame.origin.y] stringValue];
+	}
+	
 	return nil;
 }
 

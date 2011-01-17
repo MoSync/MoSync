@@ -29,7 +29,16 @@ extern "C" int MAMain( )
 	// Init app style
 	//
 	AppStyleMgr::setStyle( newobject( MapDemo::MapDemoAppStyle, new MapDemo::MapDemoAppStyle( ) ) );
+	MapDemo::MapDemoMoblet* moblet = newobject( MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet( ) );
+	
+	Moblet::run( moblet );
 
-	Moblet::run( newobject( MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet( ) ) );
+	deleteobject( moblet );
+	MapCache::shutdown( );
+	AppStyleMgr::shutdown( );
+	MessageMgr::shutdown( );
+
+	MemoryMgr::dump( );
+
 	return 0;
 }

@@ -68,6 +68,9 @@ namespace MAUtil {
 		virtual void pointerPressEvent(MAPoint2d p) = 0;
 		virtual void pointerMoveEvent(MAPoint2d p) = 0;
 		virtual void pointerReleaseEvent(MAPoint2d p) = 0;
+		virtual void multitouchPressEvent(MAPoint2d p, int touchId) {};
+		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) {};
+		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) {};
 	};
 
 	/**
@@ -354,6 +357,20 @@ namespace MAUtil {
 		*/
 		void firePointerReleaseEvent(MAPoint2d p);
 		
+		/**
+		* Calls multitouchPressEvent() of all registered PointerListeners with the specified \a keyCode.
+		*/
+		void fireMultitouchPressEvent(MAPoint2d p, int touchId);
+		/**
+		* Calls multitouchMoveEvent() of all registered PointerListeners with the specified \a keyCode.
+		*/
+		void fireMultitouchMoveEvent(MAPoint2d p, int touchId);
+		
+		/**
+		* Calls multitouchReleaseEvent() of all registered PointerListeners with the specified \a keyCode.
+		*/
+		void fireMultitouchReleaseEvent(MAPoint2d p, int touchId);
+
 		/**
 		* Calls the registered BluetoothListener, if any.
 		*/

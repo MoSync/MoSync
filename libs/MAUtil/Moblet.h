@@ -73,6 +73,21 @@ namespace MAUtil {
 		virtual void pointerReleaseEvent(MAPoint2d p) {}
 
 		/**
+		* This function is called with a coordinate when a pointer is pressed.
+		*/
+		virtual void multitouchPressEvent(MAPoint2d p, int touchId) {}
+
+		/**
+		*  This function is called with a coordinate when a pointer is moved.
+		*/
+		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) {}
+
+		/**
+		*  This function is called with a coordinate when a pointer is released.
+		*/
+		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) {}
+
+		/**
 		* This function is called when the Close event is recieved.
 		* The default implementation just calls close().
 		*/

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="false">
-<target-profile/>
-<criteria/>
+<project supports-build-configs="false" version="1.1">
 <properties>
-<property key="build.prefs:additional.include.paths" value="include"/>
+<property key="build.prefs:additional.include.paths" value="include,c:\MoSync\include"/>
 <property key="build.prefs:additional.libraries" value=""/>
 <property key="build.prefs:additional.library.paths" value=""/>
 <property key="build.prefs:extra.link.sw" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="true"/>
 <property key="build.prefs:ignore.default.libraries" value="true"/>
+<property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:project.type" value="lib"/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes" value=""/>
 <property key="template.id" value="project.empty"/>
 </properties>
 </project>

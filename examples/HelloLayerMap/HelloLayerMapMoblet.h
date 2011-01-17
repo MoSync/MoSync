@@ -15,52 +15,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** 
-* \file MapSourceKind.h
-* \brief Enumerations for supported types of map sources
-* \author Lars-Åke Vinberg
-*/
+#ifndef HELLOMAPMOBLET_H_
+#define HELLOMAPMOBLET_H_
 
-#ifndef MAPSOURCEKIND_H_
-#define MAPSOURCEKIND_H_
+#include <MAUtil/Moblet.h>
+#include "HelloLayerMapScreen.h"
 
-namespace MAP
+namespace HelloLayerMap
 {
 	//=========================================================================
-	/**
-	 * \brief Enumerates supported kinds of map sources
-	 */
-	enum MapSourceKind
+	class HelloLayerMapMoblet : public Moblet
 	//=========================================================================
 	{
-		MapSourceKind_None,
-		/**
-		 * OpenStreetMap standard rendering.
-		 */
-		MapSourceKind_OpenStreetMap,
-		/**
-		 * Google street map
-		 */
-		MapSourceKind_GoogleMap,
-		/**
-		 * Google aerial/satellite map
-		 */
-		MapSourceKind_GoogleAerial,
-		/**
-		 * Google aerial with roads and labels overlaid
-		 */
-		MapSourceKind_GoogleHybrid,
-		/**
-		 * Cloudmade road map type 1
-		 */
-		MapSourceKind_CloudMade1,
-		/**
-		 * CloudMade road map type 7
-		 */
-		MapSourceKind_CloudMade7,
-		//MapSourceKind_VirtualEarth, //not yet implemented
-		MapSourceKind_Last
+	public:
+		HelloLayerMapMoblet( );
+		
+		virtual ~HelloLayerMapMoblet( );
+
+		void Terminate() { mRun = false; }
+
+	private:
+		HelloLayerMapScreen* mScreen;
 	};
 }
 
-#endif // MAPSOURCEKIND_H_
+#endif // MAPDEMOMOBLET_H_

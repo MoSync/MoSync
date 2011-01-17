@@ -88,9 +88,10 @@ namespace MAPUtil
 			#ifdef TRACKOBJECTS
 
 			int count = mKeys.size( );
-			DebugPrintf( "Dump: %d objects remaining\n", count );
+			DebugPrintf( "=== Dump: %d objects remaining\n", count );
 			for ( int i = 0; i < count; i++ )
 				DebugPrintf( "   %s\n", mValues[ i ] );
+			DebugPrintf( "=== End dump: %d objects remaining\n", count );
 
 			#endif
 

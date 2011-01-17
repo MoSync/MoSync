@@ -21,7 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSource.h"
 #include "LonLat.h"
 #include "MapTileCoordinate.h"
-#include "MapSourceMgr.h"
 #include "DebugPrintf.h"
 
 namespace MAP
@@ -41,7 +40,7 @@ namespace MAP
 		IMapCacheListener*	mListener;
 	};
 
-	static const int DefaultCapacity = 20;
+	static const int DefaultCapacity = 40;
 
 	//-------------------------------------------------------------------------
 	MapCache* MapCache::get( ) 
@@ -101,6 +100,20 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	int MapCache::size( )
+	//-------------------------------------------------------------------------
+	{
+		int s = 0;
+		for ( int i = 0; i < mCapacity; i++ )
+		{
+			const MapTile* t = mList[i];
+			if ( t != NULL )
+				s++;
+		}
+		return s;
+	}
+
+	//-------------------------------------------------------------------------
 	//
 	// Reallocates cache, content is flushed
 	//
@@ -135,7 +148,7 @@ namespace MAP
 	// Requests tiles to cover specified rectangle
 	//
 	void MapCache::requestTiles(	IMapCacheListener* listener,
-									MapSourceKind sourceKind,
+									MapSource *source,
 									const LonLat centerpoint,
 									const int magnification,
 									const int pixelWidth,
@@ -145,13 +158,12 @@ namespace MAP
 		DebugAssert( pixelWidth > 0 );
 		DebugAssert( pixelHeight > 0 );
 
-		MapSourceMgr* mgr = MapSourceMgr::get( );
-		MapSource* source = mgr->getMapSource( sourceKind );
+		if ( source == NULL ) 
+			return;
 		//
 		// Clear queue
 		//
 		source->clearQueue( );
-
 
 		//
 		// Test code
@@ -200,11 +212,11 @@ namespace MAP
 			for ( int x = xMin; x <= xMax; x++)
 			{
 				//
-				// In cache? Then return tile in cache
+				// In cache? Then immediately return tile in cache
 				//
 				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 
-				int loc = findInCache( sourceKind, tileXY );
+				int loc = findInCache( source, tileXY );
 				if ( loc != -1 )
 				{
 					mHits++;
@@ -226,14 +238,14 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	int MapCache::findInCache( MapSourceKind sourceKind, MapTileCoordinate tileXY ) const
+	int MapCache::findInCache( MapSource* source, MapTileCoordinate tileXY ) const
 	//-------------------------------------------------------------------------
 	{
 		for ( int i = 0; i < mCapacity; i++ )
 		{
 			const MapTile* t = mList[i];
 			if ( t != NULL )
-				if ( t->getSourceKind( ) == sourceKind && t->getGridX( ) == tileXY.getX( ) && t->getGridY( ) == tileXY.getY( ) && t->getMagnification( ) == tileXY.getMagnification( ) )
+				if ( t->getMapSource( ) == source && t->getGridX( ) == tileXY.getX( ) && t->getGridY( ) == tileXY.getY( ) && t->getMagnification( ) == tileXY.getMagnification( ) )
 					return i;
 		}
 		return -1;
@@ -303,6 +315,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::downloadCancelled\n" );
 	}
 
 	//-------------------------------------------------------------------------
@@ -310,6 +323,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::error %d\n", code );
 	}
 
 	//-------------------------------------------------------------------------

@@ -189,17 +189,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     [locationController release];	
 }
 
-bool down = false;
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	NSSet *allTouches = [event allTouches];
-	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
-	CGPoint point = [touch locationInView:self];
-
-	if(!down) {
-//		Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_PRESSED);
-		MoSync_AddTouchPressedEvent(point.x, point.y);		
-		down = true;
+	int touchId = 0;
+	for (UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView:self];
+		MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
+		touchId++;
 	}
 }
 
@@ -211,24 +207,21 @@ bool down = false;
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
 	NSSet *allTouches = [event allTouches];
-	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
-	CGPoint point = [touch locationInView:self];
-	
-	if(down) {
-		//Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_DRAGGED);
-		MoSync_AddTouchMovedEvent(point.x, point.y);
+	int touchId = 0;
+	for (UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView:self];
+		MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+		touchId++;
 	}	
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
 	NSSet *allTouches = [event allTouches];
-	UITouch *touch = [[allTouches allObjects] objectAtIndex:0];
-	CGPoint point = [touch locationInView:self];
-	
-	if(down) {
-		//Base::gEventQueue.addPointerEvent(point.x, point.y, EVENT_TYPE_POINTER_RELEASED);	
-		MoSync_AddTouchReleasedEvent(point.x, point.y);
-		down = false;
+	int touchId = 0;
+	for(UITouch *touch in allTouches) {
+		CGPoint point = [touch locationInView					:self];
+		MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+		touchId++;
 	}	
 }
 

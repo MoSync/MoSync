@@ -773,6 +773,7 @@ namespace Base {
 				event.type = type;
 				event.point.x = x;
 				event.point.y = y;
+				event.touchId = 0;
 				gEventFifo.put(event);
 			}
 	}
@@ -1905,6 +1906,26 @@ namespace Base {
 		GLenum texture_format = 0;
         GLint flipColors = 0;
 
+		int w = nextPowerOf2(1, surface->w);
+		int h = nextPowerOf2(1, surface->h);
+		bool createdPowerOfTwoTexture = false;
+		if(w!=surface->w || h!=surface->h) {
+
+			SDL_Surface* oldSurface =  surface;
+			surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
+				surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+			byte* src = (byte*)oldSurface->pixels;
+			byte* dst = (byte*)surface->pixels;
+			for(int y = 0; y < oldSurface->h; y++) {
+				memcpy(dst, src, oldSurface->w*surface->format->BytesPerPixel);
+				src+=oldSurface->pitch;
+				dst+=surface->pitch;
+			}
+
+			createdPowerOfTwoTexture = true;
+		}
+
 		if (nOfColors == 4)     // contains an alpha channel
         {
                 if (surface->format->Bmask == 0xff000000)
@@ -1955,6 +1976,9 @@ namespace Base {
 		if(flipColors) {
 			delete data;
 		}
+
+		if(createdPowerOfTwoTexture)
+			SDL_FreeSurface(surface);
 
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}

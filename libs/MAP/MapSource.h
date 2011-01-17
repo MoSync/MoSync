@@ -94,10 +94,6 @@ namespace MAP
 		//
 		//============================================================
 		/**
-		 * Returns source kind
-		 */
-		virtual MapSourceKind		getSourceKind( ) const = 0;
-		/**
 		 * Returns tile size
 		 */
 		virtual  MAExtent			getTileSize( ) const = 0;
@@ -134,6 +130,10 @@ namespace MAP
 		 */
 		void						clearQueue( );
 		//
+		// Number of tiles received
+		//
+		int							getTileCount( ) { return mTileCount; }
+		//
 		// DownloadListener overrides
 		//
 		void						finishedDownloading( Downloader* downloader, MAHandle data );
@@ -161,7 +161,7 @@ namespace MAP
 
 		MapSourceQueue*				mQueue;
 		MapSourceImageDownloader*	mDownloaders[Downloaders];
-
+		int							mTileCount;
 	};
 }
 

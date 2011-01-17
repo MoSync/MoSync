@@ -208,7 +208,8 @@ namespace MAUI {
 			overlay->draw();
 		}
 
-		maUpdateScreen();
+		//maUpdateScreen();
+		Gfx_updateScreen();
 	}
 	
 	void Engine::idle() {

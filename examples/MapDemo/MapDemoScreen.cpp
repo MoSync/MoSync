@@ -22,27 +22,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapLocationAction.h"
 #include "MapSourceAction.h"
 #include "AppStyleMgr.h"
+#include <MAP/OpenStreetMapSource.h>
+#include <MAP/GoogleMapSource.h>
+#include "MapDemoMoblet.h"
 
 namespace MapDemo
 {
-	//-------------------------------------------------------------------------
-	static const char* MapSourceKindToString( MapSourceKind kind )
-	//-------------------------------------------------------------------------
-	{
-		switch( kind )
-		{
-		case MapSourceKind_OpenStreetMap: return "OpenStreetMap";
-		case MapSourceKind_GoogleMap: return "Google (map)";
-		case MapSourceKind_GoogleAerial: return "Google (aerial)";
-		case MapSourceKind_GoogleHybrid: return "Google (hybrid)";
-		case MapSourceKind_CloudMade1: return "CloudMade (type 1)";
-		case MapSourceKind_CloudMade7: return "CloudMade (type 7)";
-		//case MapSourceKind_VirtualEarth: return "Virtual Earth";
-		default: 
-			return "Unknown map type";
-		}
-	}
-
 	//-------------------------------------------------------------------------
 	MapDemoScreen::MapDemoScreen( MobletEx* moblet ) :
 		AppScreen( moblet ),
@@ -54,18 +39,20 @@ namespace MapDemo
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
-		mMap->enterMapUpdateScope( );
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
-		mMap->setMagnification( 10 );
-		mMap->exitMapUpdateScope( true );
-		mMapSourceKind = MapSourceKind_OpenStreetMap;
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
-
 		setClientWidget( mMap );
+		//
+		// Create map sources
+		//
+		mOpenStreetMapSource = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
+		mGoogleStreetMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_StreetMap ) );
+		mGoogleAerialMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Aerial ) );
+		mGoogleHybridMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Hybrid ) );
 		//
 		// Have to wait until we have proper width and height
 		//
-		mMap->setMapSourceKind( mMapSourceKind );
+		mMap->setMapSource( mOpenStreetMapSource );
 	}
 
 	//-------------------------------------------------------------------------
@@ -73,6 +60,10 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mMap );
+		deleteobject( mOpenStreetMapSource );
+		deleteobject( mGoogleStreetMapSource );
+		deleteobject( mGoogleAerialMapSource );
+		deleteobject( mGoogleHybridMapSource );
 	}
 
 	//-------------------------------------------------------------------------
@@ -84,7 +75,14 @@ namespace MapDemo
 			case MAK_2:
 				nextMapSource( );
 				return true;
+		case MAK_SOFTRIGHT:
+			//maExit( 0 );
+			// TODO: proper exit
+			MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
+			moblet.Terminate( );
+			return true;
 		}
+
 		if ( AppScreen::handleKeyPress( keyCode ) )
 			return true;
 
@@ -150,7 +148,7 @@ namespace MapDemo
 
         LonLat newPos = LonLat( px );
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        mMap->setCenterPosition( newPos );
+        mMap->setCenterPosition( newPos, false, true );
 		prevX = point.x;
 		prevY = point.y;
 		return true;
@@ -171,18 +169,15 @@ namespace MapDemo
 	void MapDemoScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
-		// Avoid CloudMade maps by default
-		if(newKind == MapSourceKind_CloudMade1)
-			newKind = (MapSourceKind)(mMapSourceKind + 2);
-		if(newKind == MapSourceKind_CloudMade7)
-			newKind = (MapSourceKind)(mMapSourceKind + 3);
-		// Wrap
-		if( newKind >= MapSourceKind_Last )
-			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
-		mMapSourceKind = newKind;
-		mMap->setMapSourceKind( newKind );
-		MessageMgr::get( )->postMessage( MapSourceKindToString( newKind ) );
+		MapSource* current = mMap->getMapSource( );
+		if ( current == mOpenStreetMapSource ) 
+			mMap->setMapSource( mGoogleStreetMapSource );
+		else if ( current == mGoogleStreetMapSource )
+			mMap->setMapSource( mGoogleAerialMapSource );
+		else if ( current == mGoogleAerialMapSource )
+			mMap->setMapSource( mGoogleHybridMapSource );
+		else if ( current == mGoogleHybridMapSource )
+			mMap->setMapSource( mOpenStreetMapSource );
 	}
 
 	//-------------------------------------------------------------------------
@@ -191,10 +186,11 @@ namespace MapDemo
 	{
 		// add my actions
 		list.add( newobject( MapLocationAction, new MapLocationAction( mMap, LonLat( 18.07, 59.33 ), "Stockholm" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_OpenStreetMap, "OpenStreetMap" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleMap, "Google (map)" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleAerial, "Google (aerial)" ) ) );
-		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mMapSourceKind, MapSourceKind_GoogleHybrid, "Google (hybrid)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mOpenStreetMapSource, "OpenStreetMap" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mGoogleStreetMapSource, "Google (map)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mGoogleAerialMapSource, "Google (aerial)" ) ) );
+		list.add( newobject( MapSourceAction, new MapSourceAction( mMap, mGoogleHybridMapSource, "Google (hybrid)" ) ) );
+
 		//
 		// Uncomment the following lines if you want to use CloudMade maps with your API key.
 		// Without any key CloudMade maps will not be loaded.
