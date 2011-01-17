@@ -9,9 +9,9 @@
 
 //#include <MAUtil/String.h>
 
-//#include <MAP/MemoryMgr.h>
-//#include <MAP/LonLat.h>
-//#include <MAP/DateTime.h>
+//#include "MemoryMgr.h"
+//#include "LonLat.h"
+//#include "DateTime.h"
 
 //using namespace MAUtil;
 //using namespace MAPUtil;

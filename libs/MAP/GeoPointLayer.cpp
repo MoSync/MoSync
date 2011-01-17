@@ -4,10 +4,10 @@
 // Author: Lars Ake Vinberg
 //
 
-#include <MAP/MemoryMgr.h>
+#include "MemoryMgr.h"
 #include "GeoPointLayer.h"
-#include <MAP/DebugPrintf.h>
-#include <MAP/MapViewport.h>
+#include "DebugPrintf.h"
+#include "MapViewport.h"
 
 namespace MAP
 {

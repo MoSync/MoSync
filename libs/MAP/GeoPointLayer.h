@@ -9,9 +9,9 @@
 
 #include <MAUtil/String.h>
 
-#include <MAP/MemoryMgr.h>
+#include "MemoryMgr.h"
 #include "GeoPointDataSource.h"
-#include <MAP/Broadcaster.h>
+#include "Broadcaster.h"
 #include "Enumerator.h"
 
 #include "Layer.h"

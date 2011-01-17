@@ -21,13 +21,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include "HelloLayerMapScreen.h"
 #include "HelloLayerMapMoblet.h"
-#include <MAP2/GeoPoint.h>
-#include <MAP2/GeoPointLayerRenderer.h>
-#include <MAP2/Color.h>
+#include <MAP/GeoPoint.h>
+#include <MAP/GeoPointLayerRenderer.h>
+#include <MAP/Color.h>
 #include <MAP/OpenStreetMapSource.h>
 #include <MAP/GoogleMapSource.h>
-#include <MAP2/GeoPointLayer.h>
-#include <MAP2/LayerMapViewport.h>
+#include <MAP/GeoPointLayer.h>
+#include <MAP/LayerMapViewport.h>
 
 using namespace MAUI;
 using namespace MAPUtil;

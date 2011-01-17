@@ -9,8 +9,8 @@
 
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
-#include <MAP/MemoryMgr.h>
-#include <MAP/Broadcaster.h>
+#include "MemoryMgr.h"
+#include "Broadcaster.h"
 #include "Enumerator.h"
 #include "GeoPoint.h"
 

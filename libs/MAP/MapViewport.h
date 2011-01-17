@@ -39,7 +39,7 @@ namespace MAP
 	class MapSource;
 	class MapCache;
 	class MapViewport;
-	class MapViewportPanTimerListener;
+	class MapViewportIdleListener;
 
 	//=========================================================================
 	/**
@@ -89,7 +89,7 @@ namespace MAP
 		public Broadcaster<IMapViewportListener>
 	//=========================================================================
 	{
-		friend class MapViewportPanTimerListener;
+		friend class MapViewportIdleListener;
 
 	public:
 		MapViewport( );
@@ -99,7 +99,6 @@ namespace MAP
 		 * Map update scope
 		 */
 		void updateMap( );
-		//void setListener( IMapViewportListener* listener ) { mListener = listener; }
 		/**
 		 * Map source property
 		 */
@@ -129,16 +128,6 @@ namespace MAP
 		 */
 		bool getHasScale( ) const { return mHasScale; }
 		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
-		/**
-		 * Sets panning mode
-		 */
-		MapViewportPanMode getPanMode( ) const;
-		void setPanMode( MapViewportPanMode panMode );
-		/**
-		 * sets friction for momentum-based pan mode
-		 */
-		float getFriction( ) const;
-		void setFriction( float friction );
 
 		void startGlide( );
 		void stopGlide( );
@@ -189,11 +178,6 @@ namespace MAP
 		 */
 		PixelCoordinate viewportToWorldPixel( MAPoint2d pt );
 
-		//
-		// For debugging, remove when done
-		//
-		void testMomentumPanning( );
-		void stressTest( );
 		int getWidth( ) const { return mWidth; }
 		int getHeight( ) const { return mHeight; }
 		virtual void drawViewport( Point origin );
@@ -218,11 +202,11 @@ namespace MAP
 		int mMagnification;
 		MapSource* mSource;
 		bool mHasScale;
-		MapViewportPanTimerListener* mPanTimerListener;
+		MapViewportIdleListener* mIdleListener;
 		Font* mFont;
-		MapViewportPanMode mPanMode;
 		bool mHasTimer;
-		//IMapViewportListener* mListener;
+		bool mInDraw;
+
 		
 		double mScale;
 	};

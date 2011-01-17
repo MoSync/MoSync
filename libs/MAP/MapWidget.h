@@ -79,16 +79,6 @@ namespace MAP
 		 */
 		bool getHasScale( ) const { return mViewport->getHasScale( ); }
 		void setHasScale( bool hasScale ) { mViewport->setHasScale( hasScale ); }
-		/**
-		 * Sets panning mode
-		 */
-		MapViewportPanMode getPanMode( ) const;
-		void setPanMode( MapViewportPanMode panMode );
-		/**
-		 * sets friction for momentum-based pan mode
-		 */
-		float getFriction( ) const;
-		void setFriction( float friction );
 
 		void startGlide( );
 		void stopGlide( );
@@ -126,10 +116,6 @@ namespace MAP
 		 * Returns true if handled.
 		 */
 		virtual bool handleKeyRelease( int keyCode );
-		//
-		// For debugging, remove when done
-		//
-		void stressTest( );
 		//
 		// IMapViewportListener implementation
 		//

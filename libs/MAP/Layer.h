@@ -9,9 +9,9 @@
 
 #include <MAUtil/String.h>
 
-#include <MAP/MemoryMgr.h>
-#include <MAP/Broadcaster.h>
-#include <MAP/MapViewport.h>
+#include "MemoryMgr.h"
+#include "Broadcaster.h"
+#include "MapViewport.h"
 
 using namespace MAPUtil;
 using namespace MAUtil;

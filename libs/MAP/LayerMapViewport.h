@@ -29,9 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //#include "LonLat.h"
 //#include "MapCache.h"
-#include <MAP/MapViewport.h>
+#include "MapViewport.h"
 #include "GeoPoint.h"
-#include <MAP/Broadcaster.h>
+#include "Broadcaster.h"
 #include "Layer.h"
 
 using namespace MAUI;

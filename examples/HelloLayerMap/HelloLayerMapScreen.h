@@ -21,8 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Screen.h>
 #include <MAUtil/Moblet.h>
 #include <MAP/MapWidget.h>
-#include <MAP2/GeoPointDataSource.h>
-#include <MAP2/GeoPointLayerRenderer.h>
+#include <MAP/GeoPointDataSource.h>
+#include <MAP/GeoPointLayerRenderer.h>
 #include <MAUI/Font.h>
 
 using namespace MAP;

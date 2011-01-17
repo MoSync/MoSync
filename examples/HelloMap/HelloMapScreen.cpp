@@ -41,13 +41,18 @@ namespace HelloMap
 		int width = EXTENT_X( screenSize );
 		int height = EXTENT_Y( screenSize );
 		//
+		// Viewport
+		//
+		MapViewport* viewport = newobject( MapViewport, new MapViewport( ) );
+		//
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
+		mMap->setViewport( viewport );
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 		mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mFont );
-		mMap->setPanMode( MapViewportPanMode_Momentum );
+		//mMap->setPanMode( MapViewportPanMode_Momentum );
 		//
 		// Create map sources
 		//
@@ -89,9 +94,9 @@ namespace HelloMap
 		case MAK_8:
 			MemoryMgr::dump( );
 			return;
-		case MAK_7:
-			mMap->stressTest( );
-			return;
+		//case MAK_7:
+		//	mMap->stressTest( );
+		//	return;
 		case MAK_SOFTRIGHT:
 			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
 			moblet.Terminate( );
@@ -136,9 +141,9 @@ namespace HelloMap
 		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
 		if ( deltaTimeMs < DoubleClickTimeMs ) 
 		{
-			//HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
-			//moblet.Terminate( );
-			mMap->stressTest( );
+			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
+			moblet.Terminate( );
+			//mMap->stressTest( );
 		}
 		else
 		{
