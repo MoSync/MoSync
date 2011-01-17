@@ -2940,6 +2940,11 @@ interface MAAPI {
 		 * Sent when an item in a list view is clicked.
 		 */
 		ITEM_CLICKED = 6;
+		
+		/**
+		 * Sent when a tab widget has changed to a new tab.
+		 */
+		TAB_CHANGED = 7;
 	}
 
 	/**

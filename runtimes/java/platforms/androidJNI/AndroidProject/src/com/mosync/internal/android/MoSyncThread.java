@@ -20,7 +20,6 @@ package com.mosync.internal.android;
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
@@ -57,6 +56,10 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.opengles.GL10;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -69,10 +72,11 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.graphics.PorterDuff.Mode;
 import android.net.Uri;
+import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -86,7 +90,6 @@ import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
-import com.mosync.nativeui.util.AsyncWait;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -2514,6 +2517,51 @@ public class MoSyncThread extends Thread
 		final String value)
 	{
 		return mMoSyncNativeUI.maWidgetSetProperty(widgetHandle, key, value);
+	}
+	
+	public int maWidgetGetProperty(
+			final int widgetHandle,
+			final String key,
+			final int memBuffer, 
+			final int memBufferSize)
+	{
+		return mMoSyncNativeUI.maWidgetGetProperty(widgetHandle, key, memBuffer, memBufferSize);
+	}
+	
+	/**
+	 * Loads an OpenGL texture to the current texture handle. If the 
+	 * underlying bitmap has an alpha channel, the texture will also
+	 * get an alpha channel.
+	 * 
+	 * @param bitmapHandle Handle to the bitmap to load.
+	 * 
+	 * @return 0 on success, RES_BAD_INPUT if the handle does not exist,
+	 *         and -3 if the texture could not be loaded.
+	 */
+	public int loadGlTexture(final int bitmapHandle)
+	{
+		ImageCache texture = mImageResources.get(bitmapHandle);
+		if(texture == null)
+		{
+			return RES_BAD_INPUT;
+		}
+		int textureFormat = GL10.GL_RGB;
+		if(texture.mBitmap.hasAlpha())
+		{
+			textureFormat = GL10.GL_RGBA;
+		}
+		
+		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, textureFormat, texture.mBitmap, 0);
+		
+		EGL10 egl = (EGL10) EGLContext.getEGL( );
+		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
+		{
+			return 0;
+		}
+		else
+		{
+			return -3;
+		}
 	}
 
 	/**

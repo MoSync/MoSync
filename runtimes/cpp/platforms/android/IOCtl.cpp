@@ -95,7 +95,7 @@ inline jobject wchar2jstring(JNIEnv* env, const wchar* s)
 }
 
 namespace Base
-{
+{		
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
 	{	
 		int size = maGetScrSize();
@@ -766,26 +766,24 @@ namespace Base
 		return result;
 	}
 	
-	int _maWidgetGetProperty(int widget, const char *property, const char* valueBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetProperty(int memStart, int widget, const char *property, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrProperty = jNIEnv->NewStringUTF(property);
-		jstring jstrValueBuffer = jNIEnv->NewStringUTF(valueBuffer);
 		
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetProperty", "(ILjava/lang/String;Ljava/lang/String;I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetProperty", "(ILjava/lang/String;II)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 		
 		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, jstrValueBuffer, bufferSize);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, memBuffer - memStart, bufferSize);
 		
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		jNIEnv->DeleteLocalRef(jstrValueBuffer);
 		jNIEnv->DeleteLocalRef(jstrProperty);
 		
 		return result;
@@ -853,5 +851,30 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 		
 		return result;
+	}
+	
+	int _maOpenGLInitFullscreen()
+	{
+		return IOCTL_UNAVAILABLE; 
+	}
+	
+	int _maOpenGLCloseFullscreen()
+	{
+		return IOCTL_UNAVAILABLE;
+	}
+	
+	int _maOpenGLTexImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis)
+	{		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "loadGlTexture", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, image);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
 	}
 }

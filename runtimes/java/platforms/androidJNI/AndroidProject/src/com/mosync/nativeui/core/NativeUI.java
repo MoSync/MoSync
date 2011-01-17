@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
-
+import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
@@ -266,5 +266,32 @@ public class NativeUI
 				"Error while converting property: " + pce.getMessage( ), pce );
 			return WIDGET_ERROR;
 		}
+	}
+	
+	public int maWidgetGetProperty(int widgetHandle, String key, int memBuffer, int memBufferSize)
+	{
+		Widget widget = m_widgetTable.get( widgetHandle );
+		if( widget == null )
+		{
+			return WIDGET_ERROR;
+		}
+		
+		String result = widget.getProperty( key );
+		Log.i("MoSync", "maWidgetGetProperty return: " + result);
+		
+		if( result.length( ) + 1 > memBufferSize )
+		{
+			return WIDGET_ERROR;
+		}
+		
+		byte[] ba = result.getBytes();
+		
+		MoSync.mMoSyncThread.mMemDataSection.mark( );
+		MoSync.mMoSyncThread.mMemDataSection.position( memBuffer );
+		MoSync.mMoSyncThread.mMemDataSection.put( ba );
+		MoSync.mMoSyncThread.mMemDataSection.put( (byte)0 );
+		MoSync.mMoSyncThread.mMemDataSection.reset( );
+		
+		return WIDGET_OK;
 	}
 }

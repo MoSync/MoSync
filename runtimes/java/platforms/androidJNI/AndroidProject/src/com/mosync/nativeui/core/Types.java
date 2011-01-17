@@ -13,6 +13,7 @@ public class Types
 	public static final String WIDGET_TYPE_LABEL = "Label";
 	public static final String WIDGET_TYPE_LIST = "ListView";
 	public static final String WIDGET_TYPE_LIST_ITEM = "ListViewItem";
+	public static final String WIDGET_TYPE_EGL = "GLView";
 	public static final String WIDGET_TYPE_WEB = "WebView";
 	public static final String WIDGET_TYPE_SCREEN = "Screen";
 	public static final String WIDGET_TYPE_TAB_SCREEN = "TabScreen";
@@ -44,6 +45,9 @@ public class Types
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
 	public static final String WIDGET_PROPERTY_FONT_SIZE = "fontSize";
+	
+	public static final String WIDGET_PROPERTY_BIND = "bind";
+	public static final String WIDGET_PROPERTY_INVALIDATE = "invalidate";
 	
 	public static final String WIDGET_HORIZONTAL_LEFT = "left";
 	public static final String WIDGET_HORIZONTAL_CENTER = "center";

@@ -1,13 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Color;
+import android.view.View;
+
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
-
-import android.graphics.Color;
-import android.view.View;
 
 /**
  * A class that wraps a native view with functionality
@@ -90,6 +90,29 @@ public class Widget
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Returns the property of the wrapped widget.
+	 * 
+	 * @param property
+	 * @return the property of the wrapped widget. If no property is found, an
+	 *         empty string is returned.
+	 */
+	public String getProperty(String property)
+	{
+		if( property.equals( Types.WIDGET_PROPERTY_WIDTH ) )
+		{
+			return Integer.toString( getView( ).getWidth( ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
+		{
+			return Integer.toString( getView( ).getHeight( ) );
+		}
+		else
+		{
+			return "";
+		}
 	}
 	
 	/**
