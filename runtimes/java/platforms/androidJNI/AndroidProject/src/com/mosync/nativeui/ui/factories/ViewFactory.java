@@ -4,10 +4,12 @@ import java.util.HashMap;
 
 import android.app.Activity;
 import android.webkit.WebView;
+import android.widget.ImageView;
 
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.ui.egl.EGLView;
 import com.mosync.nativeui.ui.widgets.GLWidget;
+import com.mosync.nativeui.ui.widgets.ImageWidget;
 import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
@@ -77,6 +79,7 @@ public class ViewFactory
 		addFactory( Types.WIDGET_TYPE_WEB, new DefaultFactory( WebView.class, WebWidget.class ) );
 		addFactory( Types.WIDGET_TYPE_TAB_SCREEN, new TabScreenFactory( ) );
 		addFactory( Types.WIDGET_TYPE_EGL, new DefaultFactory( EGLView.class, GLWidget.class ) );
+		addFactory( Types.WIDGET_TYPE_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
 	}
 	
 	/**

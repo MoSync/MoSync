@@ -87,6 +87,15 @@ public class ScreenWidget extends Layout
 	}
 	
 	/**
+	 * @see Layout.updateLayoutParams.
+	 */
+	@Override
+	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
+	{
+		return new android.widget.FrameLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
+	}
+	
+	/**
 	 * Returns the title of this screen.
 	 * 
 	 * @return the title of this screen.

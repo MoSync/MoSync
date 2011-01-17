@@ -11,6 +11,7 @@ public class Types
 	public static final String WIDGET_SCREEN = "Screen";
 	public static final String WIDGET_TYPE_BUTTON = "Button";
 	public static final String WIDGET_TYPE_LABEL = "Label";
+	public static final String WIDGET_TYPE_IMAGE = "Image";
 	public static final String WIDGET_TYPE_LIST = "ListView";
 	public static final String WIDGET_TYPE_LIST_ITEM = "ListViewItem";
 	public static final String WIDGET_TYPE_EGL = "GLView";
@@ -41,6 +42,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_CURRENT_TAB = "currentTab";
 	
 	public static final String WIDGET_PROPERTY_URL = "url";
+	public static final String WIDGET_PROPERTY_IMAGE = "image";
 	
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
