@@ -25,8 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/fifo.h>
 
 #include <jni.h>
+#include <GLES/gl.h>
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
+#include "helpers/CPP_IX_OPENGL_ES.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
@@ -34,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSLOG(...)
 
 namespace Base
-{
+{	
 	Syscall* gSyscall;
 
 	JNIEnv* mJNIEnv = 0;
@@ -1074,6 +1076,47 @@ namespace Base
 		SYSLOG("maInvokeExtension NOT IMPLEMENTED");
 		return -1;
 	}
+	
+	// Temporary kludge to include the implementation of glString,
+	// a better solution would be to get a .h generated and
+	// then add gl.h.cpp to the list of files.
+	#include <generated/gl.h.cpp>
+	
+	// Maybe the wrapper generator shouldn't the three functions
+	// below, so that we can specify them in the ioctl switch.
+	// For now, wrap them here and call functions in ioctl.h.
+	
+	/**
+	 * Internal wrapper for maOpenGLTexImage2D that
+	 * calls the real implementation _maOpenGLTexImage2D
+	 * in ioctl.h.
+	 * 
+	 * @param image The image to load as a texture.
+	 */
+	int maOpenGLTexImage2D(MAHandle image)
+	{
+		return _maOpenGLTexImage2D(image, mJNIEnv, mJThis); 
+	}
+	
+	/**
+	 * Internal wrapper for maOpenGLInitFullscreen that
+	 * calls the real implementation _maOpenGLInitFullscreen
+	 * in ioctl.h.
+	 */
+	int maOpenGLInitFullscreen()
+	{
+		return _maOpenGLInitFullscreen();
+	}
+	
+	/**
+	 * Internal wrapper for maOpenGLCloseFullscreen that
+	 * calls the real implementation _maOpenGLCloseFullscreen
+	 * in ioctl.h.
+	 */
+	int maOpenGLCloseFullscreen()
+	{
+		return _maOpenGLCloseFullscreen();
+	}
 
 	/**
 	* Call one of the platform dependant syscalls. For more information about each of these syscalls,
@@ -1098,6 +1141,7 @@ namespace Base
 		
 		switch(function)
 		{
+		maIOCtl_IX_OPENGL_ES_caselist
 		
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1476,10 +1520,12 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetGetProperty");
 			int _widget = a;
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
-			const char *_valueBuffer = SYSCALL_THIS->GetValidatedStr(c);
 			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c, 
+				_valueBufferSize * sizeof(char));
 			
-			return _maWidgetGetProperty(_widget, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maWidgetGetProperty((int)gCore->mem_ds, _widget, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maWidgetScreenShow:

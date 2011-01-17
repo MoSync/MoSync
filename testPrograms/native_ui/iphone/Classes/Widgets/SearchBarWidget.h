@@ -1,5 +1,5 @@
 //
-//  ImageWidget.h
+//  SearchScreenWidget.h
 //  nativeuitest
 //
 //  Created by Niklas Nummelin on 11/26/10.
@@ -9,10 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface ImageWidget : IWidget {
-	UIImageView* imageView;
-	int leftCapWidth;
-	int topCapHeight;
+@interface SearchBarWidget : IWidget {
+	UISearchBar* searchBar;
 }
 
 - (id)init;

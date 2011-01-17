@@ -121,6 +121,7 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -290,6 +291,8 @@
 		85F2550D11AC125400EB47EE /* libMoSyncLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
+		85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchBarWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.h; sourceTree = SOURCE_ROOT; };
+		85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SearchBarWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.mm; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -606,6 +609,8 @@
 		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */,
+				85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */,
 				85883DEA12DDBB4500EDD04B /* GLViewWidget.h */,
 				85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */,
 				85D26D7112B7AF8300FBA308 /* ListViewItemWidget.h */,
@@ -830,6 +835,7 @@
 				85D26D7612B7AF8300FBA308 /* WebViewWidget.mm in Sources */,
 				85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */,
 				85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */,
+				85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

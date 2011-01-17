@@ -27,18 +27,34 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	MapWidget::MapWidget( int x, int y, int width, int height, Widget* parentPtr )
 	//-------------------------------------------------------------------------
-	:	Widget( x, y, width, height, parentPtr )
+	:	Widget( x, y, width, height, parentPtr ),
+		mViewport( NULL )
 	{
-		mViewport = newobject( MapViewport, new MapViewport( ) );
-		mViewport->setListener( this );
 		setDrawBackground( false );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapWidget::setViewport( MapViewport* viewport )
+	//-------------------------------------------------------------------------
+	{
+		if ( mViewport )
+		{
+			mViewport->removeListener( this );
+			deleteobject( mViewport );
+		}
+		mViewport = viewport;
+		mViewport->addListener( this );
 	}
 
 	//-------------------------------------------------------------------------
 	MapWidget::~MapWidget( )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( mViewport );
+		if ( mViewport )
+		{
+			mViewport->removeListener( this );
+			deleteobject( mViewport );
+		}
 	}
 
 	//-------------------------------------------------------------------------
@@ -100,13 +116,6 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapWidget::stressTest( )
-	//-------------------------------------------------------------------------
-	{
-		mViewport->stressTest( );
-	}
-
-	//-------------------------------------------------------------------------
 	int MapWidget::getMagnification( ) const
 	//-------------------------------------------------------------------------
 	{
@@ -118,35 +127,6 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mViewport->setMagnification( magnification );
-	}
-
-	//-------------------------------------------------------------------------
-	void MapWidget::setScale( double scale )
-	//-------------------------------------------------------------------------
-	{
-		mViewport->setScale( scale );
-	}
-
-
-	//-------------------------------------------------------------------------
-	void MapWidget::setPanMode( MapViewportPanMode panMode )
-	//-------------------------------------------------------------------------
-	{
-		mViewport->setPanMode( panMode );
-	}
-
-	//-------------------------------------------------------------------------
-	float MapWidget::getFriction( ) const
-	//-------------------------------------------------------------------------
-	{
-		return mViewport->getFriction( );
-	}
-
-	//-------------------------------------------------------------------------
-	void MapWidget::setFriction( float friction )
-	//-------------------------------------------------------------------------
-	{
-		mViewport->setFriction( friction );
 	}
 
 	//-------------------------------------------------------------------------

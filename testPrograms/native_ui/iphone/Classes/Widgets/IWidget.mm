@@ -64,25 +64,27 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"width"]) {
-//		view.frame.size.width = [value floatValue];		
 		float width = [value floatValue];
 		if(width == -1) {
-			view.autoresizingMask =			view.autoresizingMask | 
+			view.autoresizingMask =	view.autoresizingMask | 
 									UIViewAutoresizingFlexibleWidth | 
 									UIViewAutoresizingFlexibleLeftMargin | 
 									UIViewAutoresizingFlexibleRightMargin;
-			width = view.superview.frame.size.width;
 			//return MA_WIDGET_OK;
+			width = view.superview.frame.size.width;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
 	} else
 	if([key isEqualToString:@"height"]) {
-		//view.frame.size.height = [value floatValue];
 		float height = [value floatValue];
 		if(height == -1) {
-			view.autoresizingMask = view.autoresizingMask | UIViewAutoresizingFlexibleHeight;
-			return MA_WIDGET_OK;
+			view.autoresizingMask =			view.autoresizingMask | 
+				UIViewAutoresizingFlexibleHeight | 
+				UIViewAutoresizingFlexibleTopMargin | 
+				UIViewAutoresizingFlexibleBottomMargin;
+			height = view.superview.frame.size.height;
+			//return MA_WIDGET_OK;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
@@ -92,8 +94,14 @@
 	} else
 	if([key isEqualToString:@"alpha"]) {
 		view.alpha = [value floatValue];
+	} else
+	if([key isEqualToString:@"opaque"]){
+		view.opaque = [value boolValue];
+	} else
+	if([key isEqualToString:@"visible"]){
+		view.hidden = not [value boolValue];
 	} else {
-		return MA_WIDGET_ERROR;
+			return MA_WIDGET_ERROR;
 	}
 	
 	return MA_WIDGET_OK;

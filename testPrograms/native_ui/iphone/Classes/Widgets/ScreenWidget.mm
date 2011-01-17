@@ -30,7 +30,9 @@
 }
 
 - (void)addChild: (IWidget*)child {
-	[child getView].frame = [[UIScreen mainScreen] bounds];
+	if(!parent)
+		[child getView].frame = [[UIScreen mainScreen] bounds];
+	
 	[super addChild:child];	
 }
 

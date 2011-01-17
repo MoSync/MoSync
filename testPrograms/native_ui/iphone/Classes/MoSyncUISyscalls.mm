@@ -41,6 +41,7 @@ int maWidgetSetProperty(MAHandle handle, const char *property, const char* value
 	NSString* propertyString = stringFromChar(property);
 	
 	if([widget class] == [GLViewWidget class]) {
+		// do this from the MoSync thread. Maybe do a generic system for this later.
 		if([propertyString isEqualToString:@"bind"]) {
 			[widget setPropertyWithKey:@"bind" toValue:@""];
 			return 0;
