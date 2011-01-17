@@ -15,25 +15,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/**
+* \file TouchMotionTracker.h
+* \brief Class that calculates touch motion. 
+* \author Niklas Nummelin
+*/
+
 #include "TouchMotionTracker.h"
 #include <madmath.h>
 #include <mastdlib.h>
 
 namespace MAUI {
 
-TouchMotionTracker::TouchMotionTracker() : mStarted(false), mFrictionPerSecond(0.1) {
-}
-
-void TouchMotionTracker::reset() {
-	mStarted = false;
-}
-
-void normalize(double &x, double &y) {
+/**
+ * Local helper function that normalises a vector.
+ */
+static void normalize(double &x, double &y) {
 	double len = sqrt(x*x+y*y);
 	if(len<0.000000001)len=0.000000001;
 	double len_recip = 1.0/len;
 	x*=len_recip;
 	y*=len_recip;
+}
+
+TouchMotionTracker::TouchMotionTracker() :
+	mStarted(false), 
+	mFrictionPerSecond(0.1) 
+{
+}
+
+void TouchMotionTracker::reset() {
+	mStarted = false;
 }
 
 void TouchMotionTracker::addPoint(MAPoint2d p, int &relX, int &relY) {
@@ -65,9 +77,13 @@ void TouchMotionTracker::setFrictionPerSecond(double fps) {
 	mFrictionPerSecond = fps;
 }
 
-void TouchMotionTracker::calculateVelocity(double &directionX, double &directionY, double &velocityX, double &velocityY) {
+void TouchMotionTracker::calculateVelocity(
+	double &directionX, 
+	double &directionY, 
+	double &velocityX, 
+	double &velocityY) {
 
-	// take unit into acount ? (pixels per second or ms).
+	// TODO: Take unit into acount? (pixels per second or ms).
 	double time = maGetMilliSecondCount()-mStartTime;
 
 	double timeInSeconds = time/1000.0;
@@ -83,7 +99,7 @@ void TouchMotionTracker::calculateVelocity(double &directionX, double &direction
 	double dirX = dx;
 	double dirY = dy;
 
-	// normalize directions
+	// Normalize directions.
 	double len = sqrt(dx*dx+dy*dy);
 
 	if(len < 0.0000000001) {

@@ -16,9 +16,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** 
-* \file Layout.h 
-* \brief Layout and navigation of child widgets in a grid
-* \author Patrick Broman and Niklas Nummelin
+* \file RelativeLayout.h 
+* \brief Relative layout of child widgets.
+* \author Niklas Nummelin
 */
 
 #ifndef _SE_MSAB_MAUI_RELATIVE_LAYOUT_H_
@@ -28,21 +28,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	/** \brief Layout and navigation of child widgets in a grid.
-	   *
-	   * This widget is responsible for laying out its children in a grid.
-	   **/
-
+	/** 
+	 * \brief Relative layout of child widgets.
+	 *
+	 * This widget is a container that layouts its children
+	 * using a relative layout policy.
+	 *
+	 * TODO: This class does not seem to be implemented yet.
+	 */
 	class RelativeLayout : public Widget {
 	public:
+		/**
+		 * Constructor.
+		 * \param x Left coordinate of layout container.
+		 * \param y Top coordinate of layout container.
+		 * \param width Width of layout container.
+		 * \param height Height of layout container.
+		 */
 		RelativeLayout(int x=0, int y=0, int width=0, int height=0);
 
+		/**
+		 * \retgurn true if this layout container is transparent,
+		 * false if not.
+		 */
 		virtual bool isTransparent() const;
+		
 	protected:
+		/**
+		 * TODO: Comment purpose of this method.
+		 */
 		virtual void drawWidget();
-
 	};
-
 }
 
-#endif /* _SE_MSAB_MAUI_LAYOUT_H_ */
+#endif /* _SE_MSAB_MAUI_RELATIVE_LAYOUT_H_ */

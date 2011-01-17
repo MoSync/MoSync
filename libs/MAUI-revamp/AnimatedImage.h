@@ -113,10 +113,10 @@ namespace MAUI {
 		void setDirection(int dir);
 		
 		/**
-		 * @brief Returnd wether or not this widget is transparent
+		 * @brief Returns wether or not this widget is transparent
 		 *
-		 * @return  true is transparent
-		 *			false is fully opaque
+		 * @return true is transparent
+		 *				false is fully opaque
 		 */
 		virtual bool isTransparent() const;
 		

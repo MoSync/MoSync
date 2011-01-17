@@ -23,9 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Graphics.h>
 
-namespace MAUI {
-
-	bool AnimatedImage::isTransparent() const {
+namespace MAUI
+{
+	bool AnimatedImage::isTransparent() const
+	{
 		return true;
 	}
 
@@ -47,8 +48,10 @@ namespace MAUI {
 		start();
 	}
 
-	void AnimatedImage::drawWidget() {
-		if(mResource) {
+	void AnimatedImage::drawWidget()
+	{
+		if(mResource)
+		{
 			MARect srcRect;
 			srcRect.left  = (mCurrentFrame*mFrameWidth)%(EXTENT_X(mResSize));
 			srcRect.width = mFrameWidth;
@@ -63,29 +66,35 @@ namespace MAUI {
 		}
 	}
 
-	void AnimatedImage::setResource(MAHandle res) {
+	void AnimatedImage::setResource(MAHandle res)
+	{
 		mResource = res;
 		if(res == 0) return;
 		mResSize = maGetImageSize(res);
 		requestRepaint();		
 	}
 
-	MAHandle AnimatedImage::getResource() const {
+	MAHandle AnimatedImage::getResource() const
+	{
 		return mResource;
 	}
 
-	void AnimatedImage::start() {
+	void AnimatedImage::start()
+	{
 		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);	
 	}
 
-	void AnimatedImage::stop() {
+	void AnimatedImage::stop()
+	{
 		MAUtil::Environment::getEnvironment().removeTimer(this);
 	}
 	
-	void AnimatedImage::stepForward() {
+	void AnimatedImage::stepForward()
+	{
 		//printf("stepping fwd (%d)!!!\n", currentFrame);
 		mCurrentFrame++;
-		if(mLoop) {
+		if(mLoop)
+		{
 			if(mNumFrames)
 				mCurrentFrame %= mNumFrames;
 			else
@@ -97,7 +106,8 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	void AnimatedImage::stepBack() {
+	void AnimatedImage::stepBack()
+	{
 		//printf("stepping back!!!\n");
 		mCurrentFrame--;
 		if(mCurrentFrame < 0)
@@ -115,21 +125,25 @@ namespace MAUI {
 		requestRepaint();			
 	}
 
-	void AnimatedImage::setFrameWidth(int width) {
+	void AnimatedImage::setFrameWidth(int width)
+	{
 		mFrameWidth = width;
 		setWidth(width);
 	}
 	
-	void AnimatedImage::setFrameHeight(int height) {
+	void AnimatedImage::setFrameHeight(int height)
+	{
 		mFrameHeight = height;
 		setHeight(height);
 	}
 
-	void AnimatedImage::setNumFrames(int numFrames) {
+	void AnimatedImage::setNumFrames(int numFrames)
+	{
 		mNumFrames = numFrames;
 	}
 
-	void AnimatedImage::setFps(int fps) {
+	void AnimatedImage::setFps(int fps)
+	{
 		if(fps) 
 			mMsPf = 1000/fps;
 		else
@@ -138,15 +152,18 @@ namespace MAUI {
 		start();
 	}
 	
-	void AnimatedImage::setFrame(int frame) {
+	void AnimatedImage::setFrame(int frame)
+	{
 		mCurrentFrame = frame;
 	}
 
-	void AnimatedImage::setDirection(int dir) {
+	void AnimatedImage::setDirection(int dir)
+	{
 		mDirection = dir;
 	}
 
-	void AnimatedImage::runTimerEvent() {
+	void AnimatedImage::runTimerEvent()
+	{
 		stepForward();
 	}
 

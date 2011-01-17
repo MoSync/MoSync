@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/**
+* \file TouchMotionTracker.h
+* \brief Class that calculates touch motion. 
+* \author Niklas Nummelin
+*/
+
 #ifndef _TOUCH_MOTION_TRACKER_H_
 #define _TOUCH_MOTION_TRACKER_H_
 
@@ -22,27 +28,100 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-// Calculates motion velocity over time.
+/**
+ * Class that calculates motion velocity over time.
+ */
 class TouchMotionTracker {
 public:
+	/**
+	 * Constructor.
+	 */
 	TouchMotionTracker();
+	
+	/**
+	 * Reset the motion tracker.
+	 */
 	void reset();
-	void addPoint(MAPoint2d p);
-	void addPoint(MAPoint2d p, int &relX, int &relY);
+	
+	/**
+	 * Add a point to the motion tracker data.
+	 * \param point The point to add.
+	 */
+	void addPoint(MAPoint2d point);
+	
+	/**
+	 * Add a point to the motion tracker data and return
+	 * the relative distance since last point.
+	 *
+	 * \param point The point to add.
+	 * \param relX The horizontal component of the relative distance 
+	 * (return value).
+	 * \param relY The vertical component of the relative distance 
+	 * (return value).
+	 */
+	void addPoint(MAPoint2d point, int &relX, int &relY);
 
-	// velocity is in pixels per second.
-	// direction is a normalized direction between 0-1
-	void calculateVelocity(double &dirx, double &diry, double &velocityX, double &velocityY);
+	/**
+	 * Return the direction and velocity of the motion tracker,
+	 * based on the current state of the tracker.
+	 * The direction is a normalized direction between 0-1.
+	 * The velocity is in pixels per second.
+	 * \param dirX The horizontal component of the direction (return value).
+	 * \param dirY The vertical component of the direction (return value).
+	 * \param velocityX The horizontal component of the velocity 
+	 * (return value).
+	 * \param velocityY The vertical component of the velocity (return value).
+	 */
+	void calculateVelocity(
+		double &dirX, 
+		double &dirY, 
+		double &velocityX, 
+		double &velocityY);
 
+	/**
+	 * \return The starting point of the tracker.
+	 */
 	MAPoint2d getStartPoint() const;
 
+	/**
+	 * TODO: Document.
+	 */
 	void setFrictionPerSecond(double fps);
+	
 private:
+	/**
+	 * Starting time.
+	 */
 	int mStartTime;
+	
+	/**
+	 * Starting point.
+	 */
 	MAPoint2d mStart;
+	
+	/**
+	 * Last point.
+	 */
 	MAPoint2d mLast;
-	double mDirx, mDiry;
+	
+	/**
+	 * TODO: Document.
+	 */
+	double mDirx;
+	
+	/**
+	 * TODO: Document.
+	 */
+	double mDiry;
+	
+	/**
+	 * Tracks if tracker is started.
+	 */
 	bool mStarted;
+	
+	/**
+	 * TODO: Document.
+	 */
 	double mFrictionPerSecond;
 };
 

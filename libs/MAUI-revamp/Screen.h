@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** 
  * \file Screen.h
- * \brief A full screen, a container for widgets
+ * \brief A full screen container for widgets.
  * \author Patrick Broman and Niklas Nummelin
  */
 
@@ -28,9 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Environment.h>
 
 /**
- * \brief MoSync graphical user interface classes
+ * \brief MoSync graphical user interface classes.
  */
-
 namespace MAUI {
 
 	using namespace MAUtil;
@@ -114,15 +113,36 @@ namespace MAUI {
 		Widget* getFocusedWidget();
 
 	protected:
+		/**
+		 * Hide this screen.
+		 */
 		virtual void hide();
 
+		/**
+		 * Global reference to the currently visible screen.
+		 */
 		static Screen* sCurrentScreen;
+		
+		/**
+		 * The main widget in this screen.
+		 */
 		Widget* mMain;
+		
+		/**
+		 * The currently focused widget in this screen.
+		 */
 		Widget* mFocusedWidget;
 
-		int mScreenWidth, mScreenHeight;
+		/**
+		 * Width of this screen.
+		 */
+		int mScreenWidth;
+		
+		/**
+		 * Height of this screen.
+		 */
+		int mScreenHeight;
 	};
-
 }
 
 #endif	//_MAUI_SCREEN_H_

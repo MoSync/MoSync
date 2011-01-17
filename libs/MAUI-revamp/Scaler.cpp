@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Scaler.cpp
+* \brief Utility for scaling images by nearest neighbour or bilinearly.
+* \author Niklas Nummelin
+*/
+
 #include "Scaler.h"
 #include <ma.h>
 #include <mavsprintf.h>
@@ -29,7 +35,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 						 (((b)&0xff)));
 namespace MAUI {
 
-	static void nearestNeighbour(int *dst, int dwidth, int dheight, int dpitch, int *src, int swidth, int sheight, int spitch) {
+	/**
+	 * Locally used helper function.
+	 * TODO: Document.
+	 */
+	static void nearestNeighbour(
+		int *dst, 
+		int dwidth, 
+		int dheight, 
+		int dpitch, 
+		int *src, 
+		int swidth, 
+		int sheight, 
+		int spitch) 
+	{
 		int deltax = (swidth<<16)/dwidth;
 		int deltay = (sheight<<16)/dheight;
 
@@ -37,12 +56,13 @@ namespace MAUI {
 		int u, v;
 		v = 0;
 		int *src_scan;
-		while(dheight) {
+		
+		while (dheight) {
 			x = dwidth;
 			u = 0;
 			src_scan = &src[(v>>16)*spitch];
 
-			while(x > 0)
+			while (x > 0)
 			{
 				 switch (x & 0x3)
 				 {
@@ -88,10 +108,22 @@ namespace MAUI {
 			dheight--;
 			v+=deltay;
 		}
-
 	}
 
-	static void bilinearScale(int *dst, int dwidth, int dheight, int dpitch, int *src, int swidth, int sheight, int spitch) {
+	/**
+	 * Locally used helper function.
+	 * TODO: Document.
+	 */
+	static void bilinearScale(
+		int *dst, 
+		int dwidth, 
+		int dheight, 
+		int dpitch, 
+		int *src, 
+		int swidth, 
+		int sheight, 
+		int spitch) 
+	{
 		int deltax = (swidth<<16)/dwidth;
 		int deltay = (sheight<<16)/dheight;
 
@@ -99,11 +131,12 @@ namespace MAUI {
 		int u, v;
 		v = 0;
 		int *src_scan;
-		while(dheight) {
+		
+		while (dheight) {
 			x = dwidth;
 			u = 0;
 			src_scan = &src[(v>>16)*spitch];
-			while(x) {
+			while (x) {
 				// get bilinear filtered value
 		//		int frac_x = (u-(u&0xffff0000));
 		//		int frac_y = (v-(v&0xffff0000));
@@ -122,16 +155,24 @@ namespace MAUI {
 				int bl_b = BLUE(src_scan[pos+spitch]);
 				int bl_a = ALPHA(src_scan[pos+spitch]);
 
-				tl_r = ((tl_r)*frac_x + (RED(src_scan[pos+1]))*(0xffff-frac_x))>>16;
-				tl_g = ((tl_g)*frac_x + (GREEN(src_scan[pos+1]))*(0xffff-frac_x))>>16;
-				tl_b = ((tl_b)*frac_x + (BLUE(src_scan[pos+1]))*(0xffff-frac_x))>>16;
-				tl_a = ((tl_a)*frac_x + (ALPHA(src_scan[pos+1]))*(0xffff-frac_x))>>16;
+				// TODO: This code can be clean up, some parens can be removed.
+				tl_r = ((tl_r)*frac_x 
+					+ (RED(src_scan[pos+1]))*(0xffff-frac_x))>>16;
+				tl_g = ((tl_g)*frac_x
+					+ (GREEN(src_scan[pos+1]))*(0xffff-frac_x))>>16;
+				tl_b = ((tl_b)*frac_x 
+					+ (BLUE(src_scan[pos+1]))*(0xffff-frac_x))>>16;
+				tl_a = ((tl_a)*frac_x 
+					+ (ALPHA(src_scan[pos+1]))*(0xffff-frac_x))>>16;
 				
-				bl_r = ((bl_r)*frac_x + (RED(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
-				bl_g = ((bl_g)*frac_x + (GREEN(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
-				bl_b = ((bl_b)*frac_x + (BLUE(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
-				bl_a = ((bl_a)*frac_x + (ALPHA(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
-
+				bl_r = ((bl_r)*frac_x 
+					+ (RED(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
+				bl_g = ((bl_g)*frac_x 
+					+ (GREEN(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
+				bl_b = ((bl_b)*frac_x 
+					+ (BLUE(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
+				bl_a = ((bl_a)*frac_x 
+					+ (ALPHA(src_scan[pos+spitch+1]))*(0xffff-frac_x))>>16;
 
 				//tl_r += (((RED(src_scan[pos+1])-tl_r)*frac_x)>>16);
 				//tl_g += (((GREEN(src_scan[pos+1])-tl_g)*frac_x)>>16);
@@ -162,12 +203,18 @@ namespace MAUI {
 
 	}
 
-	MAExtent Scaler::getSize(int scale) {
-		return maGetImageSize(mPlaceholderStart + scale);
+	MAExtent Scaler::getSize(int level) {
+		return maGetImageSize(mPlaceholderStart + level);
 	}
 
-	Scaler::Scaler(MAHandle image, const MARect *srcRect, double minScale, double maxScale, int levels, eScaleType scaleType) :
-	mLevels(levels)
+	Scaler::Scaler(
+		MAHandle image, 
+		const MARect *srcRect, 
+		double minScale, 
+		double maxScale, 
+		int levels, 
+		eScaleType scaleType)
+		: mLevels(levels)
 	{
 		MARect tempRect;
 
@@ -195,7 +242,8 @@ namespace MAUI {
 			}
 		}
 
-		int scaleDelta = (int)(((maxScale - minScale)*65536.0)/(double)mLevels);
+		int scaleDelta = 
+			(int)(((maxScale - minScale)*65536.0)/(double)mLevels);
 		int scale = (int)(minScale*65536.0);
 
 		for(int i = 0; i < mLevels; i++) {
@@ -207,14 +255,34 @@ namespace MAUI {
 			int *scaledImageData = new int[scaledImageWidth*scaledImageHeight];
 			switch(scaleType) {
 				case ST_BILINEAR: 
-					bilinearScale(scaledImageData, scaledImageWidth, scaledImageHeight, scaledImageWidth, imageData, imageWidth, imageHeight, imageWidth+1);
+					bilinearScale(
+						scaledImageData, 
+						scaledImageWidth, 
+						scaledImageHeight, 
+						scaledImageWidth, 
+						imageData, 
+						imageWidth, 
+						imageHeight, 
+						imageWidth+1);
 					break;
 				case ST_NEAREST_NEIGHBOUR:
-					nearestNeighbour(scaledImageData, scaledImageWidth, scaledImageHeight, scaledImageWidth, imageData, imageWidth, imageHeight, imageWidth+1);
+					nearestNeighbour(
+						scaledImageData, 
+						scaledImageWidth, 
+						scaledImageHeight, 
+						scaledImageWidth, 
+						imageData, 
+						imageWidth, 
+						imageHeight, 
+						imageWidth+1);
 					break;
 			}
 
-			maCreateImageRaw(p, scaledImageData, EXTENT(scaledImageWidth, scaledImageHeight), 1);
+			maCreateImageRaw(
+				p, 
+				scaledImageData, 
+				EXTENT(scaledImageWidth, scaledImageHeight), 
+				1);
 			delete scaledImageData;
 			scale += scaleDelta;
 		}
@@ -222,12 +290,21 @@ namespace MAUI {
 	}
 
 	void Scaler::draw(int x, int y, int level) {
-		if(level < 0)
+	
+		if(level < 0) {
 			level = 0;
-		if(level >= mLevels)
+		}
+		if(level >= mLevels) {
 			level = mLevels-1;
+		}
 
+		// Get size of image for this level.
 		MAExtent size = maGetImageSize(mPlaceholderStart + level);
-		maDrawImage(mPlaceholderStart + level, x-(EXTENT_X(size)>>1), y-(EXTENT_Y(size)>>1));
+		
+		// Draw image centred.
+		maDrawImage(
+			mPlaceholderStart + level, 
+			x - (EXTENT_X(size)>>1), 
+			y - (EXTENT_Y(size)>>1));
 	}
 }

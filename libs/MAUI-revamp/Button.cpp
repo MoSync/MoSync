@@ -33,32 +33,35 @@ Button::Button(int x, int y, int width, int height, const String& caption)
 	this->setAutoSizeY(false);
 }
 
-bool Button::pointerPressed(MAPoint2d p, int id) {
+bool Button::pointerPressed(MAPoint2d point, int id)
+{
 	//lprintfln("bpp %ix%i", p.x, p.y);
 	mPressed = true;
-	mStartX = p.x;
-	mStartY = p.y;
+	mStartX = point.x;
+	mStartY = point.y;
 	ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, true));
 	requestRepaint();
 
 	return true;
 }
 
-bool Button::pointerMoved(MAPoint2d p, int id) {
+bool Button::pointerMoved(MAPoint2d point, int id)
+{
 	//lprintfln("bpm %ix%i", p.x, p.y);
 #if 0
-	p.x-=mStartX;
-	p.y-=mStartY;
+	point.x-=mStartX;
+	point.y-=mStartY;
 
-	int length = (int)sqrt((double)(p.x*p.x+p.y*p.y));
+	int length = (int)sqrt((double)(point.x*point.x+point.y*point.y));
 	if(length<15) return true;
 	else return false;
 #else
-	return mBounds.contains(p.x, p.y);
+	return mBounds.contains(point.x, point.y);
 #endif
 }
 
-bool Button::pointerReleased(MAPoint2d p, int id) {
+bool Button::pointerReleased(MAPoint2d point, int id)
+{
 	if(!mPressed) return false;
 	mPressed = false;
 	//fireTriggered();
@@ -67,25 +70,37 @@ bool Button::pointerReleased(MAPoint2d p, int id) {
 	return false;
 }
 
-void Button::drawWidget() {
-	if(mFocused) {
-		if(mPressed) {
-			if(mSkinFocusedPressed) {
+void Button::drawWidget()
+{
+	if(mFocused)
+	{
+		if(mPressed)
+		{
+			if(mSkinFocusedPressed)
+			{
 				mSkinFocusedPressed->draw(0, 0, mBounds.width,
 												mBounds.height);
 			}
-		} else {
-			if(mSkinFocusedReleased) {
+		}
+		else
+		{
+			if(mSkinFocusedReleased)
+			{
 				mSkinFocusedReleased->draw(0, 0, mBounds.width,
 												mBounds.height);
 			}
 		}
-	} else {
-		if(!mPressed) {
+	}
+	else
+	{
+		if(!mPressed)
+		{
 			if(mSkinUnfocusedReleased)
 				mSkinUnfocusedReleased->draw(0, 0, mBounds.width, 
 												mBounds.height);
-		} else {
+		}
+		else
+		{
 			maPanic(1, "Something is wrong, "
 						"button can't be unfocused and pressed");
 		}
@@ -94,8 +109,10 @@ void Button::drawWidget() {
 	Label::drawWidget();
 }
 
-void Button::restyle() {
-	if(getStyle() == NULL) {
+void Button::restyle()
+{
+	if(getStyle() == NULL)
+	{
 		setStyle(Engine::getSingleton().getDefaultStyle("Button"));
 	}
 	const ButtonStyle* style = (const ButtonStyle*)getStyle();
@@ -111,13 +128,16 @@ void Button::restyle() {
 	Label::restyle();
 }
 
-bool Button::isTransparent() const {
+bool Button::isTransparent() const
+{
 	return true;
 }
 
-void Button::setFocused(bool focused) {
+void Button::setFocused(bool focused)
+{
 	Widget::setFocused(focused);
-	if(mPressed==true && focused == false) {
+	if(mPressed==true && focused == false)
+	{
 		mPressed = false;
 		// do not send onButtonEvent(this, false) event here
 		// (it's obviously been cancelled before released).
@@ -125,12 +145,14 @@ void Button::setFocused(bool focused) {
 	requestRepaint();
 }
 
-void Button::addButtonListener(ButtonListener* l) {
-	mListeners.add(l);
+void Button::addButtonListener(ButtonListener* listener)
+{
+	mListeners.add(listener);
 }
 
-void Button::removeButtonListener(ButtonListener* l) {
-	mListeners.remove(l);
+void Button::removeButtonListener(ButtonListener* listener)
+{
+	mListeners.remove(listener);
 }
 
 
