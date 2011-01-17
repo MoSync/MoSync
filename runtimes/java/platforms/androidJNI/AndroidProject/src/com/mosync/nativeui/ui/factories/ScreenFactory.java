@@ -20,6 +20,5 @@ public class ScreenFactory implements AbstractViewFactory
 		FrameLayout layout = new FrameLayout( activity );
 		
 		return new ScreenWidget( handle, layout );
-	}
-	
+	}	
 }

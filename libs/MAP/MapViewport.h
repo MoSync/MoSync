@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "LonLat.h"
 #include "MapCache.h"
+#include "Broadcaster.h"
 
 using namespace MAUI;
 
@@ -38,7 +39,7 @@ namespace MAP
 	class MapSource;
 	class MapCache;
 	class MapViewport;
-	class MapViewportPanTimerListener;
+	class MapViewportIdleListener;
 
 	//=========================================================================
 	/**
@@ -83,10 +84,12 @@ namespace MAP
 	/**
 	 * \brief Simple slippy map viewport.
 	 */
-	class MapViewport : public IMapCacheListener
+	class MapViewport : 
+		public IMapCacheListener,
+		public Broadcaster<IMapViewportListener>
 	//=========================================================================
 	{
-		friend class MapViewportPanTimerListener;
+		friend class MapViewportIdleListener;
 
 	public:
 		MapViewport( );
@@ -96,7 +99,6 @@ namespace MAP
 		 * Map update scope
 		 */
 		void updateMap( );
-		void setListener( IMapViewportListener* listener ) { mListener = listener; }
 		/**
 		 * Map source property
 		 */
@@ -126,16 +128,6 @@ namespace MAP
 		 */
 		bool getHasScale( ) const { return mHasScale; }
 		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
-		/**
-		 * Sets panning mode
-		 */
-		MapViewportPanMode getPanMode( ) const;
-		void setPanMode( MapViewportPanMode panMode );
-		/**
-		 * sets friction for momentum-based pan mode
-		 */
-		float getFriction( ) const;
-		void setFriction( float friction );
 
 		void startGlide( );
 		void stopGlide( );
@@ -186,20 +178,19 @@ namespace MAP
 		 */
 		PixelCoordinate viewportToWorldPixel( MAPoint2d pt );
 
-		//
-		// For debugging, remove when done
-		//
-		void testMomentumPanning( );
-		void stressTest( );
 		int getWidth( ) const { return mWidth; }
 		int getHeight( ) const { return mHeight; }
 		virtual void drawViewport( Point origin );
 
 	protected:
 		//
+		// events
+		//
+		virtual void onViewportUpdated( );
+		//
 		// Redraw
 		//
-		virtual void drawOverlay( );
+		virtual void drawOverlay( Rect& bounds, int magnification );
 
 	private:
 		int mWidth;
@@ -211,11 +202,11 @@ namespace MAP
 		int mMagnification;
 		MapSource* mSource;
 		bool mHasScale;
-		MapViewportPanTimerListener* mPanTimerListener;
+		MapViewportIdleListener* mIdleListener;
 		Font* mFont;
-		MapViewportPanMode mPanMode;
 		bool mHasTimer;
-		IMapViewportListener* mListener;
+		bool mInDraw;
+
 		
 		double mScale;
 	};

@@ -78,8 +78,12 @@
 	if([key isEqualToString:@"height"]) {
 		float height = [value floatValue];
 		if(height == -1) {
-			view.autoresizingMask = view.autoresizingMask | UIViewAutoresizingFlexibleHeight;
-			return MA_WIDGET_OK;
+			view.autoresizingMask =			view.autoresizingMask | 
+				UIViewAutoresizingFlexibleHeight | 
+				UIViewAutoresizingFlexibleTopMargin | 
+				UIViewAutoresizingFlexibleBottomMargin;
+			height = view.superview.frame.size.height;
+			//return MA_WIDGET_OK;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
@@ -89,8 +93,14 @@
 	} else
 	if([key isEqualToString:@"alpha"]) {
 		view.alpha = [value floatValue];
+	} else
+	if([key isEqualToString:@"opaque"]){
+		view.opaque = [value boolValue];
+	} else
+	if([key isEqualToString:@"visible"]){
+		view.hidden = not [value boolValue];
 	} else {
-		return MA_WIDGET_ERROR;
+			return MA_WIDGET_ERROR;
 	}
 	
 	return MA_WIDGET_OK;

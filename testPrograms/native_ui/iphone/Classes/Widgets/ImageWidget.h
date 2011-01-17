@@ -10,7 +10,9 @@
 #import "IWidget.h"
 
 @interface ImageWidget : IWidget {
-	
+	UIImageView* imageView;
+	int leftCapWidth;
+	int topCapHeight;
 }
 
 - (id)init;

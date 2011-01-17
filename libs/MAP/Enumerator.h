@@ -7,7 +7,7 @@
 #ifndef ENUMERATOR_H_
 #define ENUMERATOR_H_
 
-#include <MAP/MemoryMgr.h>
+#include "MemoryMgr.h"
 
 namespace MAPUtil
 {

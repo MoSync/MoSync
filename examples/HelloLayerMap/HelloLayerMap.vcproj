@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\libs\MAP\Debug\MAP.lib ..\..\libs\MAP2\Debug\MAP2.lib mosynclib.lib MAStd.lib MAUtil.lib MAUI.lib user32.lib shell32.lib mtxml.lib  libeay32.lib ssleay32.lib"
+				AdditionalDependencies="..\..\libs\MAP\Debug\MAP.lib mosynclib.lib MAStd.lib MAUtil.lib MAUI.lib user32.lib shell32.lib mtxml.lib  libeay32.lib ssleay32.lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				LinkTimeCodeGeneration="1"

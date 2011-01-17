@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="false" version="1.1">
+<criteria>
+<filter profiles="Samsung/Galaxy S" require="0" type="com.mobilesorcery.mosync.filters.profile" vendors=""/>
+</criteria>
 <properties>
 <property key="build.prefs:additional.include.paths" value="..\..\libs,c:\Mosync\include"/>
-<property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib,MAP2.lib"/>
-<property key="build.prefs:additional.library.paths" value="C:\dev2\MoSyncNew\libs\MAP\Output,C:\dev2\MoSyncNew\libs\MAP2\Output,c:\MoSync\lib\pipe"/>
+<property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib"/>
+<property key="build.prefs:additional.library.paths" value="C:\dev2\MoSyncNew\libs\MAP\Output,c:\MoSync\lib\pipe"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=3000000 -heapsize=2000000 -stacksize=100000"/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>

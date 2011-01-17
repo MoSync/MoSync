@@ -16,9 +16,11 @@
 
 @implementation ImageWidget
 
-- (id)init {
-	UIImageView* imageView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
-	view = imageView;			
+- (id)init {	
+	view = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	imageView = nil;
+	leftCapWidth = 0;
+	topCapHeight = 0;
 	return [super init];
 }
 
@@ -32,13 +34,35 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"image"]) {
 		int imageHandle = [value intValue];
-		UITableViewCell* cell = (UITableViewCell*) view;
-		UIImageView* imageView = cell.imageView;
 		#ifndef NATIVE_TEST
-		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
-		imageView.image = [UIImage imageWithCGImage:imageResource->image];
+		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
+		if(leftCapWidth != 0 || topCapHeight != 0) {
+			image = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapHeight];
+		}
+		if(imageView != nil)
+			[imageView removeFromSuperview];
+
+		imageView = [[UIImageView alloc] initWithImage:image];		
+		[view addSubview:imageView];
+		view.frame = imageView.frame;
 		#endif
-		
+	}
+	else if([key isEqualToString:@"leftCapWidth"]) {
+		int newLeftCapWidth = [value intValue];
+		if(imageView != nil) {
+			UIImage* image = [imageView.image stretchableImageWithLeftCapWidth:newLeftCapWidth topCapHeight:topCapHeight];
+			imageView.image = image;
+		}
+		leftCapWidth = newLeftCapWidth;
+	}
+	else if ([key isEqualToString:@"topCapHeight"]) {
+		int newTopCapHeight = [value intValue];
+		if(imageView != nil) {
+			UIImage* image = [imageView.image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:newTopCapHeight];
+			imageView.image = image;
+		}
+		topCapHeight = newTopCapHeight;
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
