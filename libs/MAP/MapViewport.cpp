@@ -238,7 +238,7 @@ namespace MAP
 		mHasScale( true ),
 		mIdleListener( NULL ),
 		mFont( NULL ),
-		mInDraw( NULL )
+		mInDraw( NULL ),
 		mScale(1.0)
 	{
 		mIdleListener = newobject( MapViewportIdleListener, new MapViewportIdleListener( this ) );
@@ -249,7 +249,6 @@ namespace MAP
 	MapViewport::~MapViewport( )
 	//-------------------------------------------------------------------------
 	{
-	/*
 		if ( mHasTimer )
 			Environment::getEnvironment( ).removeIdleListener( mIdleListener );
 		deleteobject( mIdleListener );
@@ -392,10 +391,17 @@ namespace MAP
 			MAPoint2d pt = worldPixelToViewport( tilePx );
 			const int tileSize = mSource->getTileSize( );
 			
+#ifdef GFXOPENGL
 			Gfx_pushMatrix();
 			Gfx_scale((MAFixed)(mScale*65536.0), (MAFixed)(mScale*65536.0));
+
+#endif
+
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
+
+#ifdef GFXOPENGL
 			Gfx_popMatrix();
+#endif
 		}
 		else
 		{
