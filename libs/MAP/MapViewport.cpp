@@ -44,7 +44,7 @@ namespace MAP
 	static const int PanAveragePoints = 8;
 	static const double Tension = 4.0;
 	static const double PanFriction = 0.60;
-	static const double GlideFriction = 0.01;
+	static const double GlideFriction = 0.02;
 	static const int SmallScrollStep = 30; // pixels to scroll if not full page
 	static const int CrossSize = 4;
 

@@ -102,9 +102,7 @@ namespace HelloMap
 			moblet.Terminate( );
 			return;
 		}
-		
 		(void)mMap->handleKeyPress( keyCode );
-
 	}
 
 	//-------------------------------------------------------------------------

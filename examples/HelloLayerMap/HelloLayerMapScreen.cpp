@@ -91,7 +91,7 @@ namespace HelloLayerMap
 		void onDataChanged( )
 		//-------------------------------------------------------------------------
 		{
-		Vector<IGeoPointDataSourceListener*>* listeners = getBroadcasterListeners<IGeoPointDataSourceListener>( *this );
+			Vector<IGeoPointDataSourceListener*>* listeners = getBroadcasterListeners<IGeoPointDataSourceListener>( *this );
 			for ( int i = 0; i < listeners->size( ); i++ )
 				(*listeners)[i]->dataChanged( this );
 		}
@@ -285,7 +285,6 @@ namespace HelloLayerMap
 
 		mBlackFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mBlackFont );
-
 		//
 		// Create map sources
 		//
