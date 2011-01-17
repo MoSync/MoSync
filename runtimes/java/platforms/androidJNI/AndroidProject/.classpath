@@ -3,6 +3,5 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="C:/Android/android-sdk-windows/platforms/android-7/android.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

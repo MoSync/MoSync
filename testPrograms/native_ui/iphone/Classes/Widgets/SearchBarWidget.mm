@@ -1,0 +1,42 @@
+//
+//  SearchScreenWidget.mm
+//  nativeuitest
+//
+//  Created by Niklas Nummelin on 11/26/10.
+//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//
+
+#import "SearchBarWidget.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+
+@implementation SearchBarWidget
+
+- (id)init {
+	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, 100, 30)] retain];
+	view = searchBar;			
+	return [super init];
+}
+
+- (void)addChild: (IWidget*)child {
+	[super addChild:child];
+}
+
+- (void)removeChild: (IWidget*)child {
+}
+
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+	if([key isEqualToString:@"image"]) {
+	}
+	else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return WIDGET_OK;
+}
+
+- (NSString*)getPropertyWithKey: (NSString*)key {
+	
+	return [super getPropertyWithKey:key];
+}
+
+@end
