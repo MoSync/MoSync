@@ -210,12 +210,12 @@ namespace MAP
 
 
 	private:
+		double mMomentumX;
+		double mMomentumY;
 		MapViewport* mViewport;
 		int mPanTime;
 		int mGlideStartTime;
 		bool mGliding;
-		double mMomentumX;
-		double mMomentumY;
 
 		int px[PanAveragePoints];
 		int py[PanAveragePoints];

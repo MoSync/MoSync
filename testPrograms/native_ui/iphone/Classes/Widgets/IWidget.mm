@@ -70,7 +70,8 @@
 									UIViewAutoresizingFlexibleWidth | 
 									UIViewAutoresizingFlexibleLeftMargin | 
 									UIViewAutoresizingFlexibleRightMargin;
-			return MA_WIDGET_OK;
+			//return MA_WIDGET_OK;
+			width = view.superview.frame.size.width;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
