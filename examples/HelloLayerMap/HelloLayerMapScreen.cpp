@@ -21,11 +21,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Vector.h>
 #include "HelloLayerMapScreen.h"
 #include "HelloLayerMapMoblet.h"
-#include <MAP2/GeoPoint.h>
-#include <MAP2/LayerRenderer.h>
-#include <MAP2/Color.h>
+#include <MAP/GeoPoint.h>
+#include <MAP/GeoPointLayerRenderer.h>
+#include <MAP/Color.h>
 #include <MAP/OpenStreetMapSource.h>
 #include <MAP/GoogleMapSource.h>
+#include <MAP/GeoPointLayer.h>
+#include <MAP/LayerMapViewport.h>
 
 using namespace MAUI;
 using namespace MAPUtil;
@@ -89,8 +91,9 @@ namespace HelloLayerMap
 		void onDataChanged( )
 		//-------------------------------------------------------------------------
 		{
-			for ( int i = 0; i < mListeners.size( ); i++ )
-				mListeners[i]->dataChanged( this );
+		Vector<IGeoPointDataSourceListener*>* listeners = getBroadcasterListeners<IGeoPointDataSourceListener>( *this );
+			for ( int i = 0; i < listeners->size( ); i++ )
+				(*listeners)[i]->dataChanged( this );
 		}
 
 		Vector<GeoPoint*> mItems;
@@ -102,7 +105,7 @@ namespace HelloLayerMap
 	//
 	// The layer renderer
 	//
-	class TestLayerRenderer : public LayerRenderer
+	class TestLayerRenderer : public GeoPointLayerRenderer
 	//=========================================================================
 	{
 		static const int PointTextGap = 3;
@@ -181,7 +184,7 @@ namespace HelloLayerMap
 		}
 
 		//-------------------------------------------------------------------------
-		void renderItemText( Layer* layer, GeoPoint* item, int x, int y, int canvasWidth, int canvasHeight, int offsetX, int offsetY )
+		void renderItemText( Layer* layer, GeoPoint* item, int x, int y, const Rect& bounds )
 		//-------------------------------------------------------------------------
 		{
 			if ( DrawTextAtItem )
@@ -203,10 +206,10 @@ namespace HelloLayerMap
 				// Draw text in box at bottom of map
 				//
 				const int margin = 3;
-				const int width = canvasWidth - 2 * margin;
+				const int width = bounds.width - 2 * margin;
 				const int height = 40;
-				const int left = offsetX + margin;
-				const int top = offsetY + canvasHeight - height - margin;
+				const int left = bounds.x + margin;
+				const int top = bounds.y + bounds.height - height - margin;
 
 				mMsgSkin->draw( left, top, width, height, WidgetSkin::SELECTED );
 
@@ -257,10 +260,23 @@ namespace HelloLayerMap
 		int width = EXTENT_X( screenSize );
 		int height = EXTENT_Y( screenSize );
 		//
+		// Layer data source
+		//
+		mDataSource = newobject( TestDataSource, new TestDataSource( ) );
+		GeoPointLayer* layer = newobject( GeoPointLayer, new GeoPointLayer( ) );
+		layer->setDataSource( mDataSource );
+		mRenderer = newobject( TestLayerRenderer, new TestLayerRenderer( ) );
+		layer->setRenderer( mRenderer );
+		//
+		// Viewport
+		//
+		LayerMapViewport* viewport = newobject( LayerMapViewport, new LayerMapViewport( ) );
+		viewport->addLayer( layer );
+		//
 		// Layer map widget
 		//
-		mMap = newobject( LayerMapWidget, new LayerMapWidget( 0, 0, width, height, NULL, false ) );
-		
+		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
+		mMap->setViewport( viewport );
 		//
 		// barcelona  2.15058 41.3740 
 		// http://local.google.com/?ll=41.373781,2.150016
@@ -270,15 +286,6 @@ namespace HelloLayerMap
 		mBlackFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mBlackFont );
 
-		//
-		// Layer data source
-		//
-		mDataSource = newobject( TestDataSource, new TestDataSource( ) );
-		Layer* layer = newobject( Layer, new Layer( ) );
-		layer->setDataSource( mDataSource );
-		mRenderer = newobject( TestLayerRenderer, new TestLayerRenderer( ) );
-		layer->setRenderer( mRenderer );
-		mMap->addLayer( layer );
 		//
 		// Create map sources
 		//

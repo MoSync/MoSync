@@ -4,9 +4,9 @@
 // Author: Lars Ake Vinberg
 //
 
-#include <MAP/MemoryMgr.h>
+#include "MemoryMgr.h"
 #include "GeoPoint.h"
-#include <MAP/PixelCoordinate.h>
+#include "PixelCoordinate.h"
 
 namespace MAP
 {

@@ -5,9 +5,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabWidget;
+import android.widget.TabHost.OnTabChangeListener;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 
+import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
@@ -39,6 +43,8 @@ public class TabScreenFactory implements AbstractViewFactory
         // Must be called when using views instead of activities to fill
         // a tabs content
         tabHost.setup( );
+        
+        tabHost.setOnTabChangedListener( new TabChangeListener( ) );
         
 		return new TabScreenWidget( handle, tabHost );
 	}
@@ -101,5 +107,17 @@ public class TabScreenFactory implements AbstractViewFactory
         tabWidget.setLayoutParams( tabWidgetParams );
         
         return tabWidget;
+	}
+	
+	public class TabChangeListener implements OnTabChangeListener
+	{
+
+		@Override
+		public void onTabChanged(String tabTag)
+		{
+			// Assumes that the tag of the tab is the same as it's handle.
+			EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.WIDGET_EVENT_TAB_CHANGED, Integer.parseInt( tabTag ) );
+			Log.i( "TabChangeListener", "New tab: " + tabTag );
+		}
 	}
 }

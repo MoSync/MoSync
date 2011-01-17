@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.AsyncWait;
 
 import android.app.Activity;
@@ -195,6 +196,14 @@ public class MoSyncNativeUI
 		final String value)
 	{
 		Log.i("MoSync", "MoSyncThread.maWidgetSetProperty");
+		
+		// Bind and invalidate must be called on the main mosync thread,
+		// since all opengl calls will be called from that thread.
+		if( key.equals( Types.WIDGET_PROPERTY_BIND ) || key.equals( Types.WIDGET_PROPERTY_INVALIDATE ) )
+		{
+			return mNativeUI.maWidgetSetProperty(widgetHandle, key, value);
+		}
+		
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -204,6 +213,36 @@ public class MoSyncNativeUI
 				{
 					int result = mNativeUI.maWidgetSetProperty(
 						widgetHandle, key, value);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetSetProperty that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetGetProperty(
+		final int widgetHandle, 
+		final String key,
+		final int memBuffer,
+		final int memBufferSize)
+	{
+		Log.i("MoSync", "MoSyncThread.maWidgetGetProperty");
+		
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run()
+				{
+					int result = mNativeUI.maWidgetGetProperty(widgetHandle, key, memBuffer, memBufferSize);
 					waiter.setResult(result);
 				}
 			});

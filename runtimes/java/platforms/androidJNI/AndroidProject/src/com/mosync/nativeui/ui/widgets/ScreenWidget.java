@@ -1,15 +1,15 @@
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.view.ViewGroup;
+
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
-
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.view.ViewGroup;
 
 /**
  * A screen widget that represents the root of a widget
@@ -84,6 +84,15 @@ public class ScreenWidget extends Layout
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * @see Layout.updateLayoutParams.
+	 */
+	@Override
+	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
+	{
+		return new android.widget.FrameLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
 	
 	/**

@@ -36,9 +36,15 @@ namespace MAP
 	//
 	// Configuration
 	//
-	static const int PanIntervalMs = 40;
-	static const double SmoothPanTension = 0.2;
-	static const float DefaultFriction = 0.9f;
+
+	//
+	// Pan smoothing time = PanInterval * PanAveragePoints
+	//
+	static const int PanInterval = 30;
+	static const int PanAveragePoints = 8;
+	static const double Tension = 4.0;
+	static const double PanFriction = 0.60;
+	static const double GlideFriction = 0.01;
 	static const int SmallScrollStep = 30; // pixels to scroll if not full page
 	static const int CrossSize = 4;
 
@@ -53,16 +59,19 @@ namespace MAP
 	};
 
 	//=========================================================================
-	class MapViewportPanTimerListener : public IdleListener
+	class MapViewportIdleListener : public IdleListener
 	//=========================================================================
 	{
 	public:
 		//---------------------------------------------------------------------
-		MapViewportPanTimerListener( MapViewport* viewport ) :
+		MapViewportIdleListener( MapViewport* viewport ) :
 		//---------------------------------------------------------------------
-			mMomentum( MAPoint2d( ) ),
-			mFriction( DefaultFriction ),
-			mViewport( viewport )
+			mMomentumX( 0 ),
+			mMomentumY( 0 ),
+			mViewport( viewport ),
+			mPanTime( 0 ),
+			points( 0 ),
+			pointPtr( 0 )
 		{
 		}
 
@@ -70,207 +79,152 @@ namespace MAP
 		void idle( )
 		//---------------------------------------------------------------------
 		{
-			switch( mViewport->mPanMode )
+			int currentTime = maGetMilliSecondCount( );
+			int delta = currentTime - mPanTime;
+			if ( delta < PanInterval )
+				return;
+			mPanTime = currentTime;
+
+			PixelCoordinate prevCenterPix = mViewport->mCenterPositionPixels;
+			PixelCoordinate targetPix = mViewport->mPanTargetPositionPixels;
+
+			if ( mGliding )
 			{
-			case MapViewportPanMode_Instant:
-				// we shouldn't be here.
-				break;
-			case MapViewportPanMode_Smooth:
-				{
-					PixelCoordinate currentPix = mViewport->mCenterPositionPixels;
-					PixelCoordinate targetPix = mViewport->mPanTargetPositionPixels;
-					double offsetX = targetPix.getX( ) - currentPix.getX( );
-					double offsetY = targetPix.getY( ) - currentPix.getY( );
-
-					if( fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
-					{
-						//
-						// Done panning, stop timer and repaint
-						//
-						mViewport->updateMap( );
-						return;
-					}
-					PixelCoordinate newPix = PixelCoordinate(	mViewport->getMagnification( ),
-																(int)( currentPix.getX( ) + SmoothPanTension * offsetX ),
-																(int)( currentPix.getY( ) + SmoothPanTension * offsetY ) );
-
-					mViewport->mCenterPositionPixels = newPix;
-					mViewport->mCenterPositionLonLat = LonLat( newPix );
-					mViewport->updateMap( );
-				}
-				break;
-			case MapViewportPanMode_Momentum:
-
 				//
-				// Calc offset to from currrent location to target location
+				// Reduce momentum by friction
 				//
-				PixelCoordinate prevCenterPix = mViewport->mCenterPositionPixels;
-				PixelCoordinate targetPix = mViewport->mPanTargetPositionPixels;
-				double offsetX = targetPix.getX( ) - prevCenterPix.getX( );
-				double offsetY = targetPix.getY( ) - prevCenterPix.getY( );
+				int time = currentTime - mGlideStartTime;
+				double frictionFactor = pow( 1.0 - GlideFriction, 1.0 + (double)time / 1000 );
+				mMomentumX = mMomentumX * frictionFactor;
+				mMomentumY = mMomentumY * frictionFactor;
 
-				// TODO: shut down timer when movement has stopped
-				/*
-				if ( false ) // fabs( offsetX ) <= 2 && fabs( offsetY ) <= 2 )
+				// pow( 1 - friction, 1 + delta )
+				//
+				// calc new location based on momentum
+				//
+				mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
+																	(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001 * mMomentumX * delta ),
+																	(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001 * mMomentumY * delta ) );
+				//mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
+				//													(int)( mViewport->mCenterPositionPixels.getX( ) + 0.000001 * mMomentumX * time * time ),
+				//													(int)( mViewport->mCenterPositionPixels.getY( ) + 0.000001 * mMomentumY * time * time ) );
+
+				mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
+
+				mViewport->mPanTargetPositionPixels = mViewport->mCenterPositionPixels;
+				mViewport->mPanTargetPositionLonLat = mViewport->mCenterPositionLonLat;
+
+				//DebugPrintf( "setCenterPosition: offset=%f %f, moment=%f %f\n", 
+				//	//mViewport->mPanTargetPositionPixels.getX( ), 
+				//	//mViewport->mPanTargetPositionPixels.getY( ), 
+				//	offsetX,
+				//	offsetY,
+				//	mMomentumX, 
+				//	mMomentumY );
+
+				if ( fabs( mMomentumX ) < 1 && fabs( mMomentumY ) < 1 )
 				{
 					//
 					// Done panning, stop timer and repaint
 					//
-					mViewport->updateMap( );
-					return;
+					Environment::getEnvironment( ).removeIdleListener( this );
+					mViewport->mHasTimer = false;
+					mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
+					mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
+					//DebugPrintf( "At target: %d\n", currentTime );
 				}
-				*/
-				//
-				// Set new position based on offset to target and pan tension
-				//
-				if ( mGliding )
-				{
-					if ( mMomentum.x == 0  && mMomentum.y == 0 )
-					{
-						//
-						// Done panning, stop timer and repaint
-						//
-						//Environment::getEnvironment( ).removeTimer( this );
-						Environment::getEnvironment( ).removeIdleListener( this );
-						
-						mViewport->mHasTimer = false;
-						mViewport->updateMap( );
-						return;
-					}
-					//
-					// Use momentum + friction
-					//
-					int currentTimeMs = maGetMilliSecondCount( );
-					int deltaMs = currentTimeMs - mPanTime;
-					//
-					// Set new target position
-					//
-					mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
-																		(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001f * mMomentum.x * deltaMs ),
-																		(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001f * mMomentum.y * deltaMs ) );
-					mViewport->mPanTargetPositionPixels = mViewport->mCenterPositionPixels;
-					mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
-					mViewport->mPanTargetPositionLonLat = mViewport->mCenterPositionLonLat;
-					//
-					// Reduce momentum by friction
-					//
-					mMomentum.x = (int)( mFriction * mMomentum.x );
-					mMomentum.y = (int)( mFriction * mMomentum.y );
-				}
-				else
-				{
-					//
-					// use Tension
-					//
 
-					if ( fabs( offsetX ) < 2 && fabs( offsetY ) < 2 )
-					{
-						//
-						// Done panning, stop timer and repaint
-						//
-						//Environment::getEnvironment( ).removeTimer( this );
-						Environment::getEnvironment( ).removeIdleListener( this );
-						
-						mViewport->mHasTimer = false;
-						mViewport->updateMap( );
-						return;
-					}
-
-					mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
-																		(int)( prevCenterPix.getX( ) + SmoothPanTension * offsetX ),
-																		(int)( prevCenterPix.getY( ) + SmoothPanTension * offsetY ) );
-					mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
-				}
-				
-				mViewport->updateMap( );
-
-				if ( !mGliding )
-				{
-					//
-					// Have to calc momentum after center position has been updated
-					//
-					// Calc momentum based on speed of map movement
-					//
-					int currentTime = maGetMilliSecondCount( );
-					int deltaMs = currentTime - mPanTime;
-					//
-					// Calc momentum
-					//
-					if ( mMomentumState != MapViewportMomentumState_None )
-					{
-						int mx = mViewport->mCenterPositionPixels.getX( ) - prevCenterPix.getX( );
-						int my = mViewport->mCenterPositionPixels.getY( ) - prevCenterPix.getY( );
-						mMomentum.x = deltaMs > 0 ? 1000 * mx / deltaMs : 0;
-						mMomentum.y = deltaMs > 0 ? 1000 * my / deltaMs : 0;
-					}
-					//DebugPrintf( "setCenterPosition: xy=%d %d, moment=%d %d\n", mPanTargetPositionPixels.getX( ), mPanTargetPositionPixels.getY( ), mMomentum.x, mMomentum.y );
-					//
-					// Store point metrics
-					//
-					mPanTime = currentTime;
-
-					switch ( mMomentumState )
-					{
-					case MapViewportMomentumState_None:
-						//
-						// Init momentum gliding
-						//
-						mMomentumState = MapViewportMomentumState_Initializing;
-						break;
-					case MapViewportMomentumState_Initializing:
-					case MapViewportMomentumState_Gliding:
-						//
-						// Continue gliding state
-						//
-						mMomentumState = MapViewportMomentumState_Gliding;
-						break;
-					default:
-						break;
-					}
-				}
-				break;
 			}
+			else
+			{
+				//
+				// Add to moving average
+				//
+				PixelCoordinate pxy = mViewport->mPanTargetPositionPixels;
+				px[pointPtr] = pxy.getX( );
+				py[pointPtr] = pxy.getY( );
+				pointPtr++;
+				if ( pointPtr >= PanAveragePoints )
+					pointPtr = 0;
+				if ( points < PanAveragePoints )
+					points++;
+				//
+				// Calc average
+				//
+				int sumx = 0;
+				int sumy = 0;
+				for ( int i = 0; i < points; i++ )
+				{
+					sumx += px[i];
+					sumy += py[i];
+				}
+				int x = sumx / points;
+				int y = sumy / points;
+				PixelCoordinate newXy = PixelCoordinate( mViewport->getMagnification( ), x, y );
+
+				mViewport->mCenterPositionPixels = newXy;
+				mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
+
+				mMomentumX = ( newXy.getX( ) - prevCenterPix.getX( ) ) * 1000 / delta;
+				mMomentumY = ( newXy.getY( ) - prevCenterPix.getY( ) ) * 1000 / delta;
+
+				//DebugPrintf( "Momentum: %f, %f\n", mMomentumX, mMomentumY );
+				//
+				// Stop panning if offset is small and no momentum
+				//
+				int offsetX = pxy.getX( ) - newXy.getX( );
+				int offsetY = pxy.getY( ) - newXy.getY( );
+				if ( abs( offsetX ) == 0 && abs( offsetY ) == 0 && fabs( mMomentumX ) < 1 && fabs( mMomentumY ) < 1 )
+				{
+					//
+					// Done panning, stop timer and repaint
+					//
+					Environment::getEnvironment( ).removeIdleListener( this );
+					mViewport->mHasTimer = false;
+					mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
+					mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
+					//DebugPrintf( "At target: %d\n", currentTime );
+				}
+
+			}
+
+			mViewport->updateMap( );
 		}
 
-		bool mGliding;
-		MAPoint2d mMomentum;
-		float mFriction;
-		MapViewportMomentumState mMomentumState;
+		//---------------------------------------------------------------------
+		void startGlide( )
+		//---------------------------------------------------------------------
+		{
+			mGliding = true;
+			mGlideStartTime = maGetMilliSecondCount( );
+		}
+
+		//---------------------------------------------------------------------
+		void stopGlide( )
+		//---------------------------------------------------------------------
+		{
+			mGliding = false;
+			points = 0;
+			pointPtr = 0;
+		}
+
 
 	private:
 		MapViewport* mViewport;
 		int mPanTime;
+		int mGlideStartTime;
+		bool mGliding;
+		double mMomentumX;
+		double mMomentumY;
+
+		int px[PanAveragePoints];
+		int py[PanAveragePoints];
+		int points;
+		int pointPtr;
+
 	};
 
 	//=========================================================================
-	class MapViewportStressTestListener : public TimerListener
-	//=========================================================================
-	{
-	public:
-		//---------------------------------------------------------------------
-		MapViewportStressTestListener( MapViewport* viewport ) :
-		//---------------------------------------------------------------------
-			mViewport( viewport ),
-			lon( 17 )
-		{
-		}
-
-		//---------------------------------------------------------------------
-		void runTimerEvent( )
-		//---------------------------------------------------------------------
-		{
-			lon += 0.01f;
-			mViewport->setCenterPosition( LonLat( lon, 59 ), false, false );
-			DebugPrintf( "StressTest: %f\n", lon );
-		}
-
-	private:
-		MapViewport* mViewport;
-		float lon;
-	};
-
-	//=========================================================================
-
 
 	//-------------------------------------------------------------------------
 	MapViewport::MapViewport( )
@@ -282,26 +236,22 @@ namespace MAP
 		mMagnification( 0 ),
 		mSource( NULL ),
 		mHasScale( true ),
-		mPanTimerListener( NULL ),
+		mIdleListener( NULL ),
 		mFont( NULL ),
-		mPanMode( MapViewportPanMode_Smooth ),
+		mInDraw( NULL ),
 		mScale(1.0)
 	{
-		mPanTimerListener = newobject( MapViewportPanTimerListener, new MapViewportPanTimerListener( this ) );
+		mIdleListener = newobject( MapViewportIdleListener, new MapViewportIdleListener( this ) );
+		Environment::getEnvironment( ).addIdleListener( mIdleListener );
 	}
 
 	//-------------------------------------------------------------------------
 	MapViewport::~MapViewport( )
 	//-------------------------------------------------------------------------
 	{
-	/*
 		if ( mHasTimer )
-			Environment::getEnvironment( ).removeTimer( mPanTimerListener );
-			*/
-		if ( mHasTimer )
-			Environment::getEnvironment( ).removeIdleListener( mPanTimerListener );
-		
-		deleteobject( mPanTimerListener );
+			Environment::getEnvironment( ).removeIdleListener( mIdleListener );
+		deleteobject( mIdleListener );
 	}
 
 	//-------------------------------------------------------------------------
@@ -316,15 +266,7 @@ namespace MAP
 	PixelCoordinate MapViewport::getCenterPositionPixels( ) const
 	//-------------------------------------------------------------------------
 	{
-		switch( mPanMode)
-		{
-		case MapViewportPanMode_Instant:
-			return mCenterPositionPixels;
-		case MapViewportPanMode_Smooth:
-		case MapViewportPanMode_Momentum:
-			return mPanTargetPositionPixels;
-		}
-		return PixelCoordinate( );
+		return mPanTargetPositionPixels;
 	}
 
 	//-------------------------------------------------------------------------
@@ -338,79 +280,58 @@ namespace MAP
 	LonLat MapViewport::getCenterPosition( ) const
 	//-------------------------------------------------------------------------
 	{
-		switch ( mPanMode )
-		{
-		case MapViewportPanMode_Instant:
-			return mCenterPositionLonLat;
-		case MapViewportPanMode_Smooth:
-		case MapViewportPanMode_Momentum:
-			return mPanTargetPositionLonLat;
-		}
-		//
-		// Error
-		//
-		return LonLat( );
+		return mPanTargetPositionLonLat;
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::setCenterPosition( LonLat position, int magnification, bool immediate, bool isPointerEvent )
 	//-------------------------------------------------------------------------
 	{
-		//checkMapUpdateScope( );
+		int width = getWidth( );
+		int height = getHeight( );
 
-		if ( immediate )
+		if ( immediate || width <= 0 || height <= 0 )
 		{
 			mMagnification = magnification;
 			mCenterPositionLonLat = mPanTargetPositionLonLat = position;
-			mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( getMagnification( ) );
+			mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
+			mIdleListener->stopGlide( );
 
-			mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-			mPanTimerListener->mMomentum = MAPoint2d( );
 			return;
 		}
 
-		switch( mPanMode )
+		PixelCoordinate prevTarget = mPanTargetPositionPixels;
+
+		PixelCoordinate newXy = position.toPixels( magnification );
+		//
+		// Make sure current position is nearby, so we only soft scroll less than one screen.
+		//
+		int deltaX = newXy.getX( ) - mCenterPositionPixels.getX( );
+		int deltaY = newXy.getY( ) - mCenterPositionPixels.getY( );
+
+		//DebugPrintf( "Points: %d Ptr: %d Delta: %d %d\n", points, pointPtr, deltaX, deltaY );
+
+		double factor = /* 6 * */ fabs( Max( (double)deltaX / width, (double)deltaY / height ) );
+		if ( factor > 1 )
 		{
-		case MapViewportPanMode_Instant:
-			mMagnification = magnification;
-			mCenterPositionLonLat = position;
-			mCenterPositionPixels = position.toPixels( getMagnification( ) );
-			break;
-		case MapViewportPanMode_Smooth:
-		case MapViewportPanMode_Momentum:
-			{
-				mMagnification = magnification;
-				PixelCoordinate prevTarget = mPanTargetPositionPixels;
-				mPanTargetPositionLonLat = position;
-				mPanTargetPositionPixels = position.toPixels( getMagnification( ) );
-				//
-				// Make sure current position is nearby, so we only soft scroll less than one screen.
-				//
-				int width = getWidth( );
-				int height = getHeight( );
-				if ( width > 0 && height > 0 )
-				{
-					int deltaX = mPanTargetPositionPixels.getX( ) - mCenterPositionPixels.getX( );
-					int deltaY = mPanTargetPositionPixels.getY( ) - mCenterPositionPixels.getY( );
-					//
-					// go directly to location if delta is more than 1/6 of viewport size.
-					//
-					double factor = 6 * fabs( Max( (double)deltaX / getWidth( ), (double)deltaY / getHeight( ) ) );
-					if ( factor > 1 )
-					{
-						mCenterPositionPixels = PixelCoordinate(	getMagnification( ),
-																	mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
-																	mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
-					}
-					if ( !isPointerEvent )
-						mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-				}
-				//Environment::getEnvironment( ).addTimer( mPanTimerListener, PanIntervalMs, 0 );
-				Environment::getEnvironment( ).addIdleListener( mPanTimerListener );
-				
-				mHasTimer = true;
-			}
-			break;
+			//
+			// go directly to location if delta is more than 1/6 of viewport size.
+			//
+			newXy = PixelCoordinate(	magnification,
+										mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
+										mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
+		}
+		if ( !isPointerEvent )
+			mIdleListener->stopGlide( );
+
+		mPanTargetPositionPixels = newXy;
+		mPanTargetPositionLonLat = LonLat( newXy );
+		mMagnification = magnification;
+
+		if ( !mHasTimer )
+		{
+			Environment::getEnvironment( ).addIdleListener( mIdleListener );
+			mHasTimer = true;
 		}
 	}
 
@@ -425,42 +346,19 @@ namespace MAP
 	void MapViewport::startGlide( )
 	//-------------------------------------------------------------------------
 	{
-		mPanTimerListener->mGliding = true;
+		mIdleListener->startGlide( );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::stopGlide( )
 	//-------------------------------------------------------------------------
 	{
-		mPanTimerListener->mGliding = false;
-		mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-		mPanTimerListener->mMomentum = MAPoint2d( );
+		mIdleListener->stopGlide( );
 		//
 		// make sure we lock map in place
 		//
 		mPanTargetPositionPixels = mCenterPositionPixels;
 		updateMap( );
-	}
-
-	//-------------------------------------------------------------------------
-	void MapViewport::testMomentumPanning( )
-	//-------------------------------------------------------------------------
-	{
-		mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-		setCenterPosition( LonLat( 18.07, 59.33 ), false, true );
-		//TODO: mPanTimerListener->mPrevTimeMs = currentTimeMs - 100;
-		setCenterPosition( LonLat( 18.0695, 59.33 ), false, true );
-	}
-
-	MapViewportStressTestListener* stressListener;
-
-	//-------------------------------------------------------------------------
-	void MapViewport::stressTest( )
-	//-------------------------------------------------------------------------
-	{
-		stressListener = newobject( MapViewportStressTestListener, new MapViewportStressTestListener( this ) );
-		Environment::getEnvironment( ).addTimer( stressListener, 400, 0 );
-		setMagnification( 14 );
 	}
 
 	//-------------------------------------------------------------------------
@@ -475,62 +373,16 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mMagnification = magnification;
+		mIdleListener->stopGlide( );
 
-		switch( mPanMode )
-		{
-		case MapViewportPanMode_Instant:
-			setCenterPosition( mCenterPositionLonLat, false, false );
-			break;
-		case MapViewportPanMode_Smooth:
-		case MapViewportPanMode_Momentum:
-			mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-			setCenterPosition( mPanTargetPositionLonLat, false, false );
-			break;
-		}
+		setCenterPosition( mPanTargetPositionLonLat, true, false );
 	}
-
-	//-------------------------------------------------------------------------
-	void MapViewport::setScale( double scale ) 
-	//-------------------------------------------------------------------------
-	{
-		mScale = scale;
-	}
-
-	//-------------------------------------------------------------------------
-	MapViewportPanMode MapViewport::getPanMode( ) const
-	//-------------------------------------------------------------------------
-	{
-		return mPanMode;
-	}
-
-	//-------------------------------------------------------------------------
-	void MapViewport::setPanMode( MapViewportPanMode panMode )
-	//-------------------------------------------------------------------------
-	{
-		mPanMode = panMode;
-	}
-
-	//-------------------------------------------------------------------------
-	float MapViewport::getFriction( ) const
-	//-------------------------------------------------------------------------
-	{
-		return mPanTimerListener->mFriction;
-	}
-
-	//-------------------------------------------------------------------------
-	void MapViewport::setFriction( float friction )
-	//-------------------------------------------------------------------------
-	{
-		mPanTimerListener->mFriction = friction;
-	}
-
-	bool inDraw = false;
 
 	//-------------------------------------------------------------------------
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		if ( inDraw )
+		if ( mInDraw )
 		{
 			//
 			// draw context is set up, draw tile to viewport
@@ -539,32 +391,49 @@ namespace MAP
 			MAPoint2d pt = worldPixelToViewport( tilePx );
 			const int tileSize = mSource->getTileSize( );
 			
+#ifdef GFXOPENGL
 			Gfx_pushMatrix();
 			Gfx_scale((MAFixed)(mScale*65536.0), (MAFixed)(mScale*65536.0));
+
+#endif
+
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
+
+#ifdef GFXOPENGL
 			Gfx_popMatrix();
+#endif
 		}
 		else
 		{
 			// added by niklas
-			Gfx_notifyImageUpdated( tile->getImage( ) );
+			// TODO: Gfx_notifyImageUpdated( tile->getImage( ) );
 			
 			//
 			// notify client that update is needed
 			//
-			mListener->viewportUpdated( this );
+			onViewportUpdated( );
 		}
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::onViewportUpdated( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->viewportUpdated( this );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::drawViewport( Point origin )
 	//-------------------------------------------------------------------------
 	{
-		inDraw = true;
+		mInDraw = true;
 		//
 		// Save clip
 		//
 		(void)Gfx_pushClipRect( origin.x, origin.y, getWidth( ), getHeight( ) );
+		Rect bounds = Rect( origin.x, origin.y, getWidth( ), getHeight( )  );
 		//
 		// Draw available tiles
 		//
@@ -572,7 +441,7 @@ namespace MAP
 		//
 		// Let subclass draw its overlay
 		//
-		drawOverlay( );
+		drawOverlay( bounds, mMagnification );
 		
 		//
 		// Draw scale indicator
@@ -642,15 +511,8 @@ namespace MAP
 		if ( ShowLatLon )
 		{
 			char buffer[100];
+			sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
 
-			switch( mPanMode )
-			{
-			case MapViewportPanMode_Instant:
-				sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
-			case MapViewportPanMode_Smooth:
-			case MapViewportPanMode_Momentum:
-				sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
-			}
 			maSetColor( 0x000000 );
 
 			if ( mFont != NULL )
@@ -677,11 +539,11 @@ namespace MAP
 		//
 		(void)Gfx_popClipRect( );
 
-		inDraw = false;
+		mInDraw = false;
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::drawOverlay( )
+	void MapViewport::drawOverlay( Rect& bounds, int magnification )
 	//-------------------------------------------------------------------------
 	{
 	}
@@ -737,19 +599,10 @@ namespace MAP
 		if ( mMagnification < mSource->getMagnificationMax( ) )
 		{
 			mMagnification++;
+			mIdleListener->stopGlide( );
 
-			switch( mPanMode )
-			{
-			case MapViewportPanMode_Instant:
-				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
-				break;
-			case MapViewportPanMode_Smooth:
-			case MapViewportPanMode_Momentum:
-				mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
-				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
-				break;
-			}
+			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
 	}
 
@@ -760,19 +613,9 @@ namespace MAP
 		if ( mMagnification > mSource->getMagnificationMin( ) )
 		{
 			mMagnification--;
-
-			switch( mPanMode )
-			{
-			case MapViewportPanMode_Instant:
-				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
-				break;
-			case MapViewportPanMode_Smooth:
-			case MapViewportPanMode_Momentum:
-				mPanTimerListener->mMomentumState = MapViewportMomentumState_None;
-				mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
-				mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
-				break;
-			}
+			mIdleListener->stopGlide( );
+			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
 	}
 
@@ -780,30 +623,21 @@ namespace MAP
 	void MapViewport::scroll( MapViewportScrollDirection direction, bool largeStep )
 	//-------------------------------------------------------------------------
 	{
-		switch( mPanMode )
+		PixelCoordinate px = getCenterPositionPixels( );
+		const int hStep = largeStep ? getWidth( ) : SmallScrollStep;
+		const int vStep = largeStep ? getHeight( ) : SmallScrollStep;
+
+		switch( direction )
 		{
-		case MapViewportPanMode_Instant:
-		case MapViewportPanMode_Smooth:
-		case MapViewportPanMode_Momentum:
-			{
-				PixelCoordinate px = getCenterPositionPixels( );
-				const int hStep = largeStep ? getWidth( ) : SmallScrollStep;
-				const int vStep = largeStep ? getHeight( ) : SmallScrollStep;
-
-				switch( direction )
-				{
-				case SCROLLDIRECTION_NORTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) + vStep ); break;
-				case SCROLLDIRECTION_SOUTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) - vStep ); break;
-				case SCROLLDIRECTION_EAST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) + hStep, px.getY( ) ); break;
-				case SCROLLDIRECTION_WEST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) - hStep, px.getY( ) ); break;
-				}
-
-				LonLat newPos = LonLat( px );
-				newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-				setCenterPosition( newPos, false, false );
-			}
-			break;
+		case SCROLLDIRECTION_NORTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) + vStep ); break;
+		case SCROLLDIRECTION_SOUTH: px = PixelCoordinate( px.getMagnification( ), px.getX( ), px.getY( ) - vStep ); break;
+		case SCROLLDIRECTION_EAST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) + hStep, px.getY( ) ); break;
+		case SCROLLDIRECTION_WEST:  px = PixelCoordinate( px.getMagnification( ), px.getX( ) - hStep, px.getY( ) ); break;
 		}
+
+		LonLat newPos = LonLat( px );
+		newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+		setCenterPosition( newPos, false, false );
 	}
 
 	//-------------------------------------------------------------------------

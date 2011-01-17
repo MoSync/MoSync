@@ -175,11 +175,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Color.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DateTime.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\GeoPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GoogleMapSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LayerMapViewport.cpp"
 				>
 			</File>
 			<File
@@ -225,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Color.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DateTime.h"
 				>
 			</File>
@@ -233,7 +257,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Enumerator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPoint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointDataSource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayerRenderer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GoogleMapSource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LayerMapViewport.h"
 				>
 			</File>
 			<File

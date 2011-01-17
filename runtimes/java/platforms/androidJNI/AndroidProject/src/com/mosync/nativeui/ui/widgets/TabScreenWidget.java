@@ -40,7 +40,7 @@ public class TabScreenWidget extends ScreenWidget
 		
 		TabHost tab = (TabHost) getView( );
 		
-		TabSpec tabSpec = tab.newTabSpec( Integer.toString( tab.getChildCount( ) ) );
+		TabSpec tabSpec = tab.newTabSpec( Integer.toString( screen.getHandle( ) ) );
 		
 		if( screen.getIcon( ) != null )
 		{

@@ -20,10 +20,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUI/Screen.h>
 #include <MAUtil/Moblet.h>
-#include <MAP2/LayerMapWidget.h>
-#include <MAP2/GeoPointDataSource.h>
+#include <MAP/MapWidget.h>
+#include <MAP/GeoPointDataSource.h>
+#include <MAP/GeoPointLayerRenderer.h>
+#include <MAUI/Font.h>
 
 using namespace MAP;
+using namespace MAUI;
 
 namespace HelloLayerMap 
 {
@@ -55,13 +58,13 @@ namespace HelloLayerMap
 		void addPoint( );
 
 		Font* mBlackFont;
-		LayerMapWidget* mMap;
+		MapWidget* mMap;
 		MapSource* mOpenStreetMapSource;
 		MapSource* mGoogleStreetMapSource;
 		MapSource* mGoogleAerialMapSource;
 		MapSource* mGoogleHybridMapSource;
 		TestDataSource* mDataSource;
-		LayerRenderer* mRenderer;
+		GeoPointLayerRenderer* mRenderer;
 	};
 }
 
