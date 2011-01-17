@@ -64,21 +64,18 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"width"]) {
-//		view.frame.size.width = [value floatValue];		
 		float width = [value floatValue];
 		if(width == -1) {
-			view.autoresizingMask =			view.autoresizingMask | 
+			view.autoresizingMask =	view.autoresizingMask | 
 									UIViewAutoresizingFlexibleWidth | 
 									UIViewAutoresizingFlexibleLeftMargin | 
 									UIViewAutoresizingFlexibleRightMargin;
-			width = view.superview.frame.size.width;
-			//return MA_WIDGET_OK;
+			return MA_WIDGET_OK;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
 	} else
 	if([key isEqualToString:@"height"]) {
-		//view.frame.size.height = [value floatValue];
 		float height = [value floatValue];
 		if(height == -1) {
 			view.autoresizingMask = view.autoresizingMask | UIViewAutoresizingFlexibleHeight;

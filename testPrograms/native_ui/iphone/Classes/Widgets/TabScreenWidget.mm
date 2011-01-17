@@ -30,7 +30,14 @@
 	tabBarController.viewControllers = newItems;
 	
 	//[super addChild:child];
-	[super addChild:child andSubview:NO];	
+	[super addChild:child andSubview:NO];
+	
+	UIView *childView = [screen getView];
+	
+	CGRect oldFrame = [[UIScreen mainScreen] bounds];	
+	int tabBarHeight = tabBarController.tabBar.frame.size.height;
+	int newHeight = oldFrame.size.height - tabBarHeight;
+	[childView setFrame: CGRectMake(oldFrame.origin.x, oldFrame.origin.y + tabBarHeight, oldFrame.size.width, newHeight)];
 }
 
 - (void)removeChild: (IWidget*)child {
