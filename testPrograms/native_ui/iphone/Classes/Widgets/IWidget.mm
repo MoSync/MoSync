@@ -78,6 +78,17 @@
 @end
 */
 
+@implementation AbstractLayoutView (AbstractLayoutViewExpanded)
+
+- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va {
+	vAlignment = va;
+}
+
+- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha {
+	hAlignment = ha;
+}
+
+@end
 
 @implementation IWidget
 
@@ -232,7 +243,7 @@
 	//[view sizeToFit];
 	
 	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
+	[view setNeedsDisplay];
 	for (IWidget *child in children)
     {
 		[child layout];

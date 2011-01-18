@@ -8,9 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "AbstractLayoutView.h"
 
 #define MA_WIDGET_ERROR -1
 #define MA_WIDGET_OK 0
+
+@interface AbstractLayoutView (AbstractLayoutViewExpanded)
+- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
+- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
+@end
+
 
 @interface IWidget : NSObject {
 	UIView* view;

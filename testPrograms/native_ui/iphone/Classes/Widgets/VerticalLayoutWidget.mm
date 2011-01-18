@@ -31,7 +31,22 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@"VerticalAlignment"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		if([value isEqualToString:@"top"])
+			[vlv setVerticalAlignment:UIControlContentVerticalAlignmentTop];
+		else if([value isEqualToString:@"center"])
+			[vlv setVerticalAlignment:UIControlContentVerticalAlignmentCenter];
+		else if([value isEqualToString:@"bottom"])
+			[vlv setVerticalAlignment:UIControlContentVerticalAlignmentBottom];		
+	} else if([key isEqualToString:@"HorizontalAlignment"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		if([value isEqualToString:@"left"])
+			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+		else if([value isEqualToString:@"center"])
+			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
+		else if([value isEqualToString:@"right"])
+			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentRight];		
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
