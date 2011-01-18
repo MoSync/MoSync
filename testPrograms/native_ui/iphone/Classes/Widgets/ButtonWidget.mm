@@ -12,12 +12,13 @@
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
 #endif
 
 @implementation ButtonWidget
 
 - (id)init {
-	view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
 	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
@@ -50,6 +51,13 @@
 	if([key isEqualToString:@"text"]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
+	} else
+	if([key isEqualToString:@"backgroundImage"]) {
+		int imageHandle = [value intValue];
+		UIButton* button = (UIButton*) view;
+		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
+		[button setBackgroundImage:image forState:UIControlStateNormal];
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

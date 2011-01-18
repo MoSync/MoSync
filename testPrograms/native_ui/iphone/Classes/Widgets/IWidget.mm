@@ -102,6 +102,7 @@
 
 - (id)init {
 	[super init];
+	[view setUserInteractionEnabled:YES];
 	view.contentMode = UIViewContentModeRedraw;
 	view.autoresizesSubviews = NO;
 	parent = nil;
