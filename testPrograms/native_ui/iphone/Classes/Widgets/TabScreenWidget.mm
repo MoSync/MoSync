@@ -19,7 +19,7 @@
 	//view = controller.view;
 	//controller.view = view;
 	
-	return [super init];
+	return [super init];	
 }
 
 - (void)addChild: (IWidget*)child {
@@ -32,12 +32,12 @@
 	//[super addChild:child];
 	[super addChild:child andSubview:NO];
 	
-	UIView *childView = [screen getView];
-	
-	CGRect oldFrame = [[UIScreen mainScreen] bounds];	
-	int tabBarHeight = tabBarController.tabBar.frame.size.height;
-	int newHeight = oldFrame.size.height - tabBarHeight;
-	[childView setFrame: CGRectMake(oldFrame.origin.x, oldFrame.origin.y + tabBarHeight, oldFrame.size.width, newHeight)];
+	//UIView *childView = [screen getView];	
+	//[childView setFrame: view.frame];
+
+	view.autoresizesSubviews = YES;	
+	[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+
 }
 
 - (void)removeChild: (IWidget*)child {
@@ -67,6 +67,26 @@
 
 - (UIViewController*) getController {
 	return controller;
+}
+
+- (void)layout {
+	UITabBarController* tabBarController = (UITabBarController*)controller;
+	
+	int tabBarHeight = tabBarController.tabBar.bounds.size.height;
+	int viewWidth = view.frame.size.width; 
+	int viewHeight = view.frame.size.height - tabBarHeight; 
+	
+	
+	//[view setNeedsLayout];
+	//[view setNeedsDisplay];
+	for (IWidget *child in children)
+    {
+		UIView* childView = [child getView];
+		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];		
+		
+		[child layout];
+		
+	}	
 }
 
 @end

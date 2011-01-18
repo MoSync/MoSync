@@ -13,9 +13,14 @@
 @implementation SearchBarWidget
 
 - (id)init {
-	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, 100, 30)] retain];
+	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
+	searchBar.text = @"Search";
 	view = searchBar;			
-	return [super init];
+	id ret = [super init];
+	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+	view.autoresizesSubviews = YES;
+	searchBar.showsCancelButton = YES;
+	return ret;
 }
 
 - (void)addChild: (IWidget*)child {

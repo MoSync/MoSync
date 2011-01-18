@@ -12,7 +12,13 @@
 @implementation VerticalLayoutWidget
 
 - (id)init {
-	view = [[VLayoutView alloc] init];	
+	//view = [[VLayoutView alloc] init];
+	
+	view = [[VLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+									leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
+									hAlignment:UIControlContentHorizontalAlignmentLeft
+									vAlignment:UIControlContentVerticalAlignmentTop];
+	
 	return [super init];
 }
 

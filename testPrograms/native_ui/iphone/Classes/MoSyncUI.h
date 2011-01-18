@@ -18,7 +18,7 @@
 - (void)createWidget: (NSString*)name; // increasing handles beginning at 0
 - (IWidget*)getWidget: (int) handle;
 - (void)removeWidget: (IWidget*) handle;
-- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
+//- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
 - (void)show: (IWidget*) handle;
 
 @end

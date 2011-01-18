@@ -9,10 +9,17 @@
 #import "HorizontalLayoutWidget.h"
 #import "LayoutManagers.h"
 
+
 @implementation HorizontalLayoutWidget
 
 - (id)init {
-	view = [[HLayoutView alloc] init];	
+	//view = [[HLayoutView alloc] init];	
+	
+	view = [[HLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+			 leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
+			 hAlignment:UIControlContentHorizontalAlignmentLeft
+									vAlignment:UIControlContentVerticalAlignmentTop];
+	
 	return [super init];
 }
 
