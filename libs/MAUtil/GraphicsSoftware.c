@@ -49,6 +49,7 @@ void soft_drawImage(MAHandle image, int left, int top);
 void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void soft_notifyImageUpdated(MAHandle image);
+void soft_beginRendering(void);
 void soft_updateScreen(void);
 
 static MAGraphicsDriver sSoftwareGraphicsDriver = {
@@ -69,6 +70,7 @@ static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_drawRGB,
 	&soft_drawImageRegion,
 	&soft_notifyImageUpdated,
+	&soft_beginRendering,
 	&soft_updateScreen
 };
 
@@ -178,6 +180,9 @@ void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d
 }
 
 void soft_notifyImageUpdated(MAHandle image) {
+}
+
+void soft_beginRendering(void) {
 }
 
 void soft_updateScreen(void) {

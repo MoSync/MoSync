@@ -184,6 +184,8 @@ namespace MAUI {
 		if(!main) return;
 		//printf("doing repaint!");
 		
+		Gfx_beginRendering();
+		
 		//clearClipRect();
 		Gfx_clearClipRect();
 		Gfx_clearMatrix();

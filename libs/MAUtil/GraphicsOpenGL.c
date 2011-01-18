@@ -38,6 +38,7 @@ void ogl_drawImage(MAHandle image, int left, int top);
 void ogl_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void ogl_notifyImageUpdated(MAHandle image);
+void ogl_beginRendering(void);
 void ogl_updateScreen(void);
 
 static MARect sViewPort;
@@ -61,6 +62,7 @@ static MAGraphicsDriver sGLGraphicsDriver = {
 	&ogl_drawRGB,
 	&ogl_drawImageRegion,
 	&ogl_notifyImageUpdated,
+	&ogl_beginRendering,
 	&ogl_updateScreen	
 };
 
@@ -355,6 +357,10 @@ void ogl_notifyImageUpdated(MAHandle image) {
 	glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	addTexture(image, handle);
+}
+
+void ogl_beginRendering(void) {
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 }
 
 void ogl_updateScreen(void) {

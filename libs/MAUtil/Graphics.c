@@ -48,6 +48,7 @@ void dummy_drawImage(MAHandle image, int left, int top);
 void dummy_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
 void dummy_notifyImageUpdated(MAHandle image);
+void dummy_beginRendering(void);
 void dummy_updateScreen(void);
 
 static void _Gfx_init(void);
@@ -69,7 +70,8 @@ static MAGraphicsDriver sDummy = {
 	&dummy_drawImage,
 	&dummy_drawRGB,
 	&dummy_drawImageRegion,
-	&dummy_notifyImageUpdated,	
+	&dummy_notifyImageUpdated,
+	&dummy_beginRendering,
 	&dummy_updateScreen
 };
 
@@ -157,6 +159,11 @@ void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2
 void dummy_notifyImageUpdated(MAHandle image)  {
 	Gfx_useDriverSoftware();
 	graphicsDriver->notifyImageUpdated(image);
+}
+
+void dummy_beginRendering(void)  {
+	Gfx_useDriverSoftware();
+	graphicsDriver->beginRendering();
 }
 
 void dummy_updateScreen(void)  {
@@ -509,6 +516,10 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 
 void Gfx_notifyImageUpdated(MAHandle image) {
 	graphicsDriver->notifyImageUpdated(image);
+}
+
+void Gfx_beginRendering(void) {
+	graphicsDriver->beginRendering();
 }
 
 void Gfx_updateScreen(void) {
