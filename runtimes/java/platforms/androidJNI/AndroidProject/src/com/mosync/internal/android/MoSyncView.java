@@ -62,6 +62,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
 
+	private boolean mHasDeterminedTouchCapabilities = false;
+	private MoSyncTouchHandler mTouchHandler;
+	
 	class CustomInputConnection extends BaseInputConnection
 	{
 		private MoSyncView mMoSyncView;
@@ -229,32 +232,80 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return mKeyState;
 	}
 */	
+	/**
+	 * onTouchEvent
+	 * Receives touch events from the screen.
+	 * 
+	 * This implementation is build so that it won't receive dragged touch 
+	 * events while the screen is updating. This is because the events are
+	 * fired more often than some devices can digest the events, leading to
+	 * problems when the queue just grows. Discarded events are still 
+	 * marked as digested for the Android OS since we don't want any other 
+	 * view to digest them either.
+	 * 
+	 * Handles both single and multi touch devices.
+	 * 
+	 * @param motionEvent	The Motion event received from the Android OS
+	 * 
+	 * @return 				True if the event was digested
+	 * 						False if it wasn't
+	 */
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		SYSLOG("onTouchEvent");
 		
-		int[] event = new int[3];
-		
-		event[0] = EVENT_TYPE_POINTER_RELEASED;
-		event[1] = (int)motionEvent.getX();
-		event[2] = (int)motionEvent.getY();
-		
-		switch (motionEvent.getAction())
+		// The first time around, see if this is multi or single touch device
+		if(!mHasDeterminedTouchCapabilities)
 		{
-			case 0:
-				event[0] = EVENT_TYPE_POINTER_PRESSED;
+			mHasDeterminedTouchCapabilities = true;
+			try
+			{
+				mTouchHandler = new MoSyncMultiTouchHandler();
+				Log.i("MoSync TouchEvent","Multi touch device!");
+			}
+			catch(java.lang.VerifyError error)
+			{
+				mTouchHandler = new MoSyncSingleTouchHandler();
+				Log.i("MoSync TouchEvent","Single touch device!");
+			}
+		}
+		
+		int[] touchEvent = new int[4];
+		
+		int actionCode = motionEvent.getAction() & MotionEvent.ACTION_MASK;
+		
+		switch (actionCode)
+		{
+			case MotionEvent.ACTION_DOWN:
+				touchEvent[0] = EVENT_TYPE_POINTER_PRESSED;
 				break;
-			case 1:
-				event[0] = EVENT_TYPE_POINTER_RELEASED;
+			case MotionEvent.ACTION_UP:
+				touchEvent[0] = EVENT_TYPE_POINTER_RELEASED;
 				break;
-			case 2:
-				event[0] = EVENT_TYPE_POINTER_DRAGGED;
+			case MotionEvent.ACTION_MOVE:
+				touchEvent[0] = EVENT_TYPE_POINTER_DRAGGED;
+				// While drawing, discard this event
+				if(mMoSyncThread.mIsUpdatingScreen) return true;
 				break;
 			default:
 				return false;
 		}
 		
-		mMoSyncThread.postEvent(event);
+		// Get all of the events and send them to the runtime
+		int numEvents = mTouchHandler.loadEvent(motionEvent);
+		for( int i = 0; i < numEvents; i++)
+		{
+			int[] eventData = mTouchHandler.parseEvent(i);
+			
+			// TO-DO : Proper error handling
+			if(eventData == null) return false;
+			
+			touchEvent[1] = eventData[0];
+			touchEvent[2] = eventData[1];
+			touchEvent[3] = eventData[2];
+			
+			mMoSyncThread.postEvent(touchEvent);
+		}
 		
 		return true;
 	}

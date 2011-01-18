@@ -32,8 +32,7 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		virtual void dataChanged( Layer* sender ) = 0;
-		virtual void loadComplete( Layer* sender ) = 0;
+		virtual void contentChanged( Layer* sender ) = 0;
 	};
 
 	//===============================================================================
@@ -71,6 +70,8 @@ namespace MAP
 		virtual void getBoundingBox( double& left, double& top, double& right, double& bottom ) = 0;
 		virtual LonLat getSelectedItemLocation( ) = 0;
 
+	protected:
+		virtual void onContentChanged( );
 	private:
 		String mTitle;
 	};

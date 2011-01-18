@@ -39,7 +39,9 @@
 	
 //	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	tableView.tableView.delegate = self;
-	return [super init];		
+	id obj = [super init];		
+	
+	return obj;
 }
 
 - (void)addChild: (IWidget*)child {

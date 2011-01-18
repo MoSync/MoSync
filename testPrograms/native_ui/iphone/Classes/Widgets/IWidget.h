@@ -18,6 +18,8 @@
 	
 	IWidget* parent;
 	NSMutableArray* children;
+	
+	int fillWidth, fillHeight;
 }
 
 - (void)setParent:(IWidget*) parent;
@@ -33,5 +35,7 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+
+- (void)layout;
 
 @end
