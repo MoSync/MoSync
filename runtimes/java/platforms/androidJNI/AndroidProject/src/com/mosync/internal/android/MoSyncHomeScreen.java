@@ -35,10 +35,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-import com.mosync.internal.android.MoSyncThread.ImageCache;
 
 /**
  * Class that handles home screen related syscalls.
@@ -89,7 +89,7 @@ public class MoSyncHomeScreen
 			
 			// Is the handle that holds the image data a binary resource?
 			ByteBuffer dataBuffer = mMoSyncThread.getBinaryResource(handle);
-
+			
 			if (null != dataBuffer) 
 			{
 				// Allocate byte array.
@@ -104,7 +104,8 @@ public class MoSyncHomeScreen
 			else
 			{ 
 				// Perhaps the handle is an unloaded binary resource?
-				imageData = mMoSyncThread.getUnloadedBinaryResourceAsByteArray(handle);
+				imageData = mMoSyncThread
+					.getUnloadedBinaryResourceAsByteArray(handle);
 				if (null == imageData) 
 				{ 
 					// Handle was not found.
@@ -118,6 +119,21 @@ public class MoSyncHomeScreen
 				0, 
 				imageData.length);
 			
+			// Scale bitmap to screen size.
+			DisplayMetrics metrics = new DisplayMetrics();
+			getActivity().getWindowManager()
+				.getDefaultDisplay().getMetrics(metrics);
+			Bitmap scaledBitmap = Bitmap.createBitmap(
+				metrics.widthPixels, 
+				metrics.heightPixels, 
+				Bitmap.Config.ARGB_8888);
+			Canvas canvas = new Canvas(scaledBitmap);
+			canvas.drawBitmap(
+				bitmap, 
+				null, 
+				new Rect(0, 0, metrics.widthPixels, metrics.heightPixels),
+				null);
+			
 			// WallpaperManager is available only on Android 5 and above.
 			// Try to set using the wrapper class. If class loading fails, 
 			// use old way to set wallpaper.
@@ -125,22 +141,28 @@ public class MoSyncHomeScreen
 			{
 				// New way.
 				new WallpaperManagerWrapper().setWallpaper(
-					bitmap,
+					scaledBitmap,
 					mMoSyncThread.getActivity());
 			}
 			catch (java.lang.VerifyError error)
 			{
+
+				Log.i("@@@ MoSync", 
+					"About to set wallpaper on Android Level 3 or 4.");
+				
 				// Old way.
-				getActivity().setWallpaper(bitmap);
+				getActivity().setWallpaper(scaledBitmap);
+
+				Log.i("@@@ MoSync", "Wallpaper is set.");
 			}
-			
-			return 0;
+
+			return 0; // Zero means ok.
 		} 
-		catch (IOException ex) 
+		catch (Exception ex) 
 		{
 			ex.printStackTrace();
 		}
-
+		
 		return -1;
 	}
 
@@ -485,9 +507,13 @@ class WallpaperManagerWrapper
 			// Get the wallpaper manager.
 			WallpaperManager manager = WallpaperManager.getInstance(activity);
 			
-			// Set wallpaper dimension to screen size.
+			// Set wallpaper suggested size to the screen size.
 			DisplayMetrics metrics = new DisplayMetrics();
 			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+			Log.i("MoSync", 
+				"WallpaperManagerWrapper suggestDesiredDimensions: " 
+				+ metrics.widthPixels + " " 
+				+ metrics.heightPixels);
 			manager.suggestDesiredDimensions(metrics.widthPixels, metrics.heightPixels);
 			
 			// Set the wallpaper.

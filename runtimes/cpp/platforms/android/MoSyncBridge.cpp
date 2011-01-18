@@ -206,7 +206,7 @@ static void handlePendingExceptions(JNIEnv* env)
 */
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
-	SYSLOG("JNI PostEvent");
+	SYSLOG("MoSyncBridge.cpp: nativePostEvent");
 	
 	jsize len = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
@@ -259,8 +259,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
-	
-	SYSLOG("nativePostEvent: exit");
 }
 
 /**

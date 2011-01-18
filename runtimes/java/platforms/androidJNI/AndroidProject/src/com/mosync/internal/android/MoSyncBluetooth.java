@@ -638,7 +638,7 @@ public class MoSyncBluetooth
 	}
 
 	/**
-	 * On success, return an enabled Bluetooth adapter.
+	 * On success, return a Bluetooth adapter.
 	 * On error, return null.
 	 */
 	BluetoothAdapter getBluetoothAdapter()
@@ -654,9 +654,13 @@ public class MoSyncBluetooth
 			
 			try
 			{
+				// Start thread that gets the Bluetooth adapter.
 				worker.start();
+				
 				//mBluetoothAdapter = worker.getBluetoothAdapter(
 				//	BLUETOOTH_MAX_SECONDS_TO_WAIT);
+				
+				// This call blocks.
 				mBluetoothAdapter = worker.getBluetoothAdapter();
 			}
 			catch (Exception e)
@@ -669,8 +673,36 @@ public class MoSyncBluetooth
 		
 		if (null != mBluetoothAdapter)
 		{
-			Log.i("*** btGetBluetoothAdapter", 
-				"Device Bluetooth address: " + mBluetoothAdapter.getAddress());
+			// Check that Bluetooth is enabled.
+			if (false == mBluetoothAdapter.isEnabled())
+			{
+				Log.i("@@@ MoSync", 
+					"btGetBluetoothAdapter: Bluetooth is not enabled.");
+				
+				mBluetoothAdapter = null;
+			}
+
+			// Check that the adapter has an address.
+			if (null != mBluetoothAdapter && 
+				null == mBluetoothAdapter.getAddress())
+			{
+				Log.i("@@@ MoSync", 
+					"btGetBluetoothAdapter: Bluetooth address is null.");
+				
+				mBluetoothAdapter = null;
+			}
+		}
+		
+		// Print log message with the Bluetooth address.
+		if (null != mBluetoothAdapter)
+		{
+			Log.i("@@@ MoSync", 
+				"Found enabled Bluetooth adapter with address: " 
+				+ mBluetoothAdapter.getAddress());
+		}
+		else
+		{
+			Log.i("@@@ MoSync", "Enabled Bluetooth adapter not found.");
 		}
 		
 		return mBluetoothAdapter;

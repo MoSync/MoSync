@@ -2114,15 +2114,14 @@ public class MoSyncNetwork
 			Log.i("@@BluetoothServerConnectionObject", 
 				"close handle: " + mHandle);
 			
-			// TODO: Keep an eye on this one.
 			// Superclass closes the streams and sets 
-			// mCancelled = false, should be what be want.
+			// mCancelled = true, should be what be want.
 			super.close();
 			
 			if (null != mBluetoothServerSocket)
 			{
-				// This should also terminate any ongoing accept 
-				// and terminate its thread.
+				// This throws an IOException for any ongoing accept 
+				// and the accept thread will finish.
 				mBluetoothServerSocket.close();
 				mBluetoothServerSocket = null;
 			}
@@ -2223,78 +2222,65 @@ public class MoSyncNetwork
 			return 1;
 		}
 		
+		/**
+		 * This is where accept is performed. 
+		 */
 		public void doAccept()
 		{
 			BluetoothSocket socket = null;
 			
 			Log.i("@@BluetoothServerConnectionObject", 
 				"doAccept handle: " + mHandle);
-			
+	
+			// Accept. Will block. Terminate by calling close  
+			// on the server socket.
 			try
 			{
-				Log.i("@@BluetoothServerConnectionObject", 
-					"accept (blocking) handle: " + mHandle);
-				
-				// Accept. Will block. Terminate by calling close  
-				// on the server socket.
-				// TODO: Try putting this is a loop and catch IOExceptions.
-				// Need loop variable to exit when closing the server socket.
-				// Like this: while (!mCancelled) ...
-				while (!mCancelled)
-				{
-					try
-					{
-						socket = mBluetoothServerSocket.accept();
-						break;
-					}
-					catch (IOException ex)
-					{
-						Log.i("@@BluetoothServerConnectionObject", 
-							"IOException in accept while loop; handle: " 
-							+ mHandle + " exception " + ex);
-						ex.printStackTrace();
-					}
-					catch (Exception ex)
-					{
-						Log.i("@@BluetoothServerConnectionObject", 
-							"Rethrowing exception in accept while loop; "
-							+ "handle: " + mHandle 
-							+ " exception " + ex);
-						ex.printStackTrace();
-						throw ex;
-					}
-				}
-				
-				Log.i("@@BluetoothServerConnectionObject", 
-					"After accept while loop; handle: " + mHandle);
-							
+				socket = mBluetoothServerSocket.accept();
+			}
+			catch (IOException ex)
+			{
 				if (mCancelled)
 				{
+					// The server socket was closed.
 					Log.i("@@BluetoothServerConnectionObject", 
-						"mCancelled == true after accept while loop; "
+						"Server socket was closed, mCancelled == true, "
 						+ " handle: " + mHandle);
 					postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
 					return;
 				}
-				
-				Log.i("@@BluetoothServerConnectionObject", 
-					"doAccept - socket accepted handle: " + mHandle);
-	
-				// TODO: Delete this commented out test code.
-				// Write mock data for testing.
-				//socket.getOutputStream().write("Hej hopp!!!".getBytes());
-				//socket.getOutputStream().flush();
-				
-				// Have we reached max number of connection handles?
-				if (mMoSyncNetwork.isMaxNumberOfConnectionsReached())
+				else
 				{
-					postResultEvent(CONNOP_ACCEPT, CONNERR_MAX);
+					// This can be caused by Bluetooth being turned off.
+					Log.i("@@BluetoothServerConnectionObject", 
+						"IOException during accept; handle: " 
+						+ mHandle + " exception " + ex);
+					ex.printStackTrace();
+					postResultEvent(CONNOP_ACCEPT, CONNERR_UNAVAILABLE);
 					return;
 				}
-				
-				// Get new connection handle.
-				int newConnHandle = mMoSyncNetwork.getNextConnectionHandle();
-				
+			}
+			
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept; socket accepted handle: " + mHandle);
+
+			// TODO: Delete this commented out test code.
+			// Write mock data for testing.
+			//socket.getOutputStream().write("Hej hopp!!!".getBytes());
+			//socket.getOutputStream().flush();
+			
+			// Have we reached max number of connection handles?
+			if (mMoSyncNetwork.isMaxNumberOfConnectionsReached())
+			{
+				postResultEvent(CONNOP_ACCEPT, CONNERR_MAX);
+				return;
+			}
+			
+			// Get new connection handle.
+			int newConnHandle = mMoSyncNetwork.getNextConnectionHandle();
+			
+			try
+			{
 				Log.i("@@BluetoothServerConnectionObject", 
 					"doAccept - create BluetoothConnectionObject handle: " 
 					+ newConnHandle);
@@ -2303,40 +2289,24 @@ public class MoSyncNetwork
 				// added to the connections table in createWithBluetoothSocket.
 				new BluetoothConnectionObject(mMoSyncNetwork)
 					.createWithBluetoothSocket(socket, newConnHandle);
-				
-				Log.i("@@BluetoothServerConnectionObject", 
-					"doAccept - post event handle: " + mHandle);
-				
-				// Post result event on server handle.
-				postResultEvent(CONNOP_ACCEPT, newConnHandle);
-				
-				Log.i("@@BluetoothServerConnectionObject", 
-					"doAccept - done handle: " + mHandle);
-			}
-			catch (InterruptedIOException ex)
-			{
-				Log.i("@@BluetoothServerConnectionObject", 
-					"handle: " + mHandle + "InterruptedIOException " + ex);
-				ex.printStackTrace();
-				postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
-				return;
 			}
 			catch (IOException ex)
 			{
 				Log.i("@@BluetoothServerConnectionObject", 
 					"handle: " + mHandle + " IOException " + ex);
 				ex.printStackTrace();
-				postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
-				return;
-			}
-			catch (Exception ex)
-			{
-				Log.i("@@BluetoothServerConnectionObject", 
-					"handle: " + mHandle + " Exception " + ex);
-				ex.printStackTrace();
 				postResultEvent(CONNOP_ACCEPT, CONNERR_GENERIC);
 				return;
 			}
+			
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - post event handle: " + mHandle);
+			
+			// Post result event on server handle.
+			postResultEvent(CONNOP_ACCEPT, newConnHandle);
+			
+			Log.i("@@BluetoothServerConnectionObject", 
+				"doAccept - done handle: " + mHandle);
 		}
 		
 	} // End of class BluetoothServerConnectionObject
