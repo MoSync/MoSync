@@ -336,6 +336,10 @@
 				RelativePath=".\TimeSpan.h"
 				>
 			</File>
+			<File
+				RelativePath=".\TraceScope.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

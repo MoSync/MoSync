@@ -96,7 +96,7 @@ namespace MAP
 		/**
 		 * Returns tile size
 		 */
-		virtual  MAExtent			getTileSize( ) const = 0;
+		virtual  int                getTileSize( ) const = 0;
 		/**
 		 * Returns minimum magnification
 		 */

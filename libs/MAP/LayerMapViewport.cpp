@@ -422,6 +422,8 @@ namespace MAP
 		for ( int i = 0; i < mLayers.size( ); i++ )
 		{
 			Layer* layer = mLayers[i];
+			if ( ! layer->getEnabled( ) )
+				continue;
 			//Layer* layer = mLayers[mSelectedLayer];
 
 			//if ( !layer->isVisible( ) )

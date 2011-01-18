@@ -80,7 +80,7 @@ namespace MAP
 		GoogleMapSource( GoogleMapKind mapKind );
 		virtual	~GoogleMapSource( );
 
-		MAExtent getTileSize( ) const 
+		int getTileSize( ) const 
 		{
 			return 256; 
 		}
