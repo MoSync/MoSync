@@ -111,6 +111,7 @@
 
 	fillWidth = 0;
 	fillHeight = 0;
+	[view sizeToFit]; 
 	
 	return self;
 }
@@ -121,6 +122,10 @@
 
 - (void) setWidgetHandle:(int) toHandle {
 	handle = toHandle;
+}
+
+- (int)getWidgetHandle {
+	return handle;
 }
 
 - (void) setParent:(IWidget*) toParent {

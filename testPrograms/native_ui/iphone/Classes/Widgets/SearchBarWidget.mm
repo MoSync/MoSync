@@ -20,6 +20,7 @@
 	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 	view.autoresizesSubviews = YES;
 	searchBar.showsCancelButton = YES;
+	
 	return ret;
 }
 
