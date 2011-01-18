@@ -19,6 +19,9 @@
 @implementation SearchBarWidget
 
 - (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+	
+	[searchBar resignFirstResponder];
+	
 #ifndef NATIVE_TEST
 	MAEvent *event = new MAEvent;
 	event->type = EVENT_TYPE_WIDGET;
@@ -33,7 +36,9 @@
 
 - (id)init {
 	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
-	searchBar.text = @"Search";
+	searchBar.placeholder = @"Search";
+	[searchBar becomeFirstResponder];
+	
 	view = searchBar;			
 	id ret = [super init];
 	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
@@ -52,7 +57,11 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"image"]) {
+	if([key isEqualToString:@"text"]) {
+		searchBar.text = value;
+	}
+	else if([key isEqualToString:@"placeholder"]) {
+		searchBar.placeholder = value;
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -61,6 +70,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
+	if([key isEqualToString:@"text"]) {
+		return searchBar.text;
+	}	
 	
 	return [super getPropertyWithKey:key];
 }
