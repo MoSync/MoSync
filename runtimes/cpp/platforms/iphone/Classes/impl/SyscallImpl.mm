@@ -859,6 +859,38 @@ namespace Base {
 	int maOpenGLTexImage2D(MAHandle image) {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
 	
+		int powWidth = nextPowerOf2(1, img->width);
+		int powHeight = nextPowerOf2(1, img->height);
+
+		if(powWidth!=img->width || powHeight!=img->height) {
+			
+			//surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
+			//							   surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+			
+			int bytesPerPixel = 4; // for now.
+			
+			int oldBytesPerRow = img->width*bytesPerPixel;
+			int newBytesPerRow = powWidth*bytesPerPixel;
+			
+			byte* data = new byte[powHeight*newBytesPerRow];
+			
+			byte* src = (byte*)img->data;
+			byte* dst = data;
+			for(int y = 0; y < img->height; y++) {
+				memcpy(dst, src, oldBytesPerRow);
+				src+=oldBytesPerRow;
+				dst+=newBytesPerRow;
+			}
+			
+			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, powWidth, powHeight, 0,
+						 GL_RGBA, GL_UNSIGNED_BYTE, data);
+			
+			delete data;
+			
+			return MA_GL_TEX_IMAGE_2D_OK;
+		}
+		
+									 
 		// Edit the texture object's image data using the information SDL_Surface gives us
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
 					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
