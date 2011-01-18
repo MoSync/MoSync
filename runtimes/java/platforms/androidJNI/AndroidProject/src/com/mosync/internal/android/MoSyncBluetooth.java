@@ -89,7 +89,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 public class MoSyncBluetooth
@@ -113,11 +115,6 @@ public class MoSyncBluetooth
 	int BLUETOOTH_DISCOVERY_IN_PROGRESS = 1;
 	int BLUETOOTH_DISCOVERY_ABORTED = 2;
 	int BLUETOOTH_DISCOVERY_FINISHED = 3;
-
-	/**
-	 * Max time to wait for enabling Bluetooth etc.
-	 */
-	int BLUETOOTH_MAX_SECONDS_TO_WAIT = 60;
 
 	/**
 	 * State of device discovery.
@@ -170,7 +167,7 @@ public class MoSyncBluetooth
 	{
 		panicIfBluetoothPermissionsAreNotSet();
 		
-		// Device disovery must not be running.
+		// Device discovery must not be running.
 		if (null != mBluetoothDeviceDiscoveryThread)
 		{
 			return CONNERR_GENERIC;
@@ -275,156 +272,6 @@ public class MoSyncBluetooth
 		return 1; // Success retrieving device info.
 	}
 
-	// Note: Service dsicovery currently does not work on Android.
-	/**
-	 * Start service discovery.
-	 * @param address The address of the device to perform service discovery on.
-	 * @param uuid The uuid of the service to discover.
-	 * @return 0 on success, < 0 on failure.
-	 */
-	/*
-	int maBtStartServiceDiscovery(String address, String uuid) throws Exception
-	{
-		if (btBluetoothApiIsNotAvailable())
-		{
-			return IOCTL_UNAVAILABLE;
-		}
-
-		btPanicIfBluetoothPermissionsAreNotSet();
-		
-		// Device disovery must not be running.
-		if (null != mBluetoothDeviceDiscoveryThread)
-		{
-			return CONNERR_GENERIC;
-		}
-		
-		// Service disovery must not be running.
-		if (null != mBluetoothServiceDiscoveryThread)
-		{
-			return CONNERR_GENERIC;
-		}
-		
-		// Bluetooth must be available and enabled.
-		if (null == btGetBluetoothAdapter())
-		{
-			return CONNERR_UNAVAILABLE;
-		}
-		
-		Log.i("@@@maBtStartServiceDiscovery", 
-			"Address: " + address + " UUID: " + uuid);
-		
-		// List where services are saved for retrieval.
-		mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
-		
-		// Create and start device discovery thread.
-		mBluetoothServiceDiscoveryThread = 
-			new BluetoothServiceDiscoveryThread(address, uuid);
-		mBluetoothServiceDiscoveryThread.start();
-		
-		return 0; // Zero means success.
-	}
-	*/
-	
-	/**
-	 * Get size info for the next service.
-	 * @param nameBufSizePointer Pointer to int to get size of service name.
-	 * @param nUuidsPointer ??
-	 * @return > 0 on success, or zero if the queue is empty.
-	 */
-	/*
-	int maBtGetNextServiceSize(int nameBufSizePointer, int nUuidsPointer) 
-		throws Exception
-	{
-		if (btBluetoothApiIsNotAvailable())
-		{
-			return IOCTL_UNAVAILABLE;
-		}
-
-		btPanicIfBluetoothPermissionsAreNotSet();
-		
-		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
-		
-		if (null == serviceList)
-		{
-			return CONNERR_GENERIC; // Error.
-		}
-		
-		// Get but DO NOT remove head element of the queue.
-		BluetoothService service = serviceList.peek();
-		if (null == service)
-		{
-			return 0; // No elements.
-		}
-		
-		// Copy length of service name to memory, includes null char.
-		networkCopyIntToMemory(nameBufSizePointer, service.getNameLength()); 
-		
-		// Copy number of UUIDs to memory.
-		networkCopyIntToMemory(nUuidsPointer, service.getNumberOfUUIDs());
-		
-		return 1; // Success retrieving service info.
-	}
-	*/
-
-	/**
-	 * Get info about the next service in the list of discovered services.
-	 * @param portPointer ??
-	 * @param nameBufPointer ??
-	 * @param nameBufSize ??
-	 * @param uuidsPointer ??
-	 * @return > 0 on success, or zero if the queue is empty.
-	 */
-	/*
-	int maBtGetNewService(
-		int portPointer,
-		int nameBufPointer,
-		int nameBufSize,
-		int uuidsPointer) throws Exception
-	{
-		if (btBluetoothApiIsNotAvailable())
-		{
-			return IOCTL_UNAVAILABLE;
-		}
-
-		btPanicIfBluetoothPermissionsAreNotSet();
-		
-		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
-		
-		if (null == serviceList)
-		{
-			return CONNERR_GENERIC; // Error.
-		}
-		
-		// Get and remove head element of the queue.
-		BluetoothService service = serviceList.poll();
-		if (null == service)
-		{
-			return 0; // No elements.
-		}
-		
-		// Copy port of service to memory.
-		networkCopyIntToMemory(portPointer, service.getChannel());
-		
-		// Copy name of service to memory.
-		
-		// Truncate name if buffer is not large enough.
-		// (Take null termination char into account.)
-		String name = service.getName();
-		int nameLength = name.length();
-		if (nameLength >= nameBufSize - 1)
-		{
-			name = name.substring(nameBufSize - 1);
-		}
-		
-		networkCopyStringToMemory(nameBufPointer, name);
-		
-		// Copy UUIDs to memory.
-		//networkCopyBytesToMemory(uuidsPointer, service.getUUIDsAsByteBuffer());
-		
-		return 1; // Success retrieving device info.
-	}
-	*/
-
 	/**
 	 * Cancel any ongoing device or service discovery process.
 	 * @return 0 if there was no active operation, 1 if there was.
@@ -449,7 +296,8 @@ public class MoSyncBluetooth
 			
 			return 1;
 		}
-		
+
+		// Note: Service discovery is not implemented on Android.
 		/*
 		// Is service discovery in progress?
 		if (null != mBluetoothServiceDiscoveryThread && 
@@ -643,56 +491,35 @@ public class MoSyncBluetooth
 	 */
 	BluetoothAdapter getBluetoothAdapter()
 	{
-		if (null == mBluetoothAdapter)
+		// Do we have an enabled Bluetooth adapter?
+		if (null != mBluetoothAdapter && mBluetoothAdapter.isEnabled())
 		{
-			// Not used.
-			//BluetoothAdapterEnablerThread worker = 
-			//	new BluetoothAdapterEnablerThread();
+			Log.i("@@@ MoSync", 
+				"Found cached and enabled Bluetooth adapter with address: "
+				+ mBluetoothAdapter.getAddress());
 			
-			BluetoothAdapterRetrieveThread worker = 
-				new BluetoothAdapterRetrieveThread();
-			
-			try
-			{
-				// Start thread that gets the Bluetooth adapter.
-				worker.start();
-				
-				//mBluetoothAdapter = worker.getBluetoothAdapter(
-				//	BLUETOOTH_MAX_SECONDS_TO_WAIT);
-				
-				// This call blocks.
-				mBluetoothAdapter = worker.getBluetoothAdapter();
-			}
-			catch (Exception e)
-			{
-				worker.quit();
-				mBluetoothAdapter = null;
-				e.printStackTrace();
-			}
+			return mBluetoothAdapter;
 		}
 		
-		if (null != mBluetoothAdapter)
-		{
-			// Check that Bluetooth is enabled.
-			if (false == mBluetoothAdapter.isEnabled())
-			{
-				Log.i("@@@ MoSync", 
-					"btGetBluetoothAdapter: Bluetooth is not enabled.");
-				
-				mBluetoothAdapter = null;
-			}
-
-			// Check that the adapter has an address.
-			if (null != mBluetoothAdapter && 
-				null == mBluetoothAdapter.getAddress())
-			{
-				Log.i("@@@ MoSync", 
-					"btGetBluetoothAdapter: Bluetooth address is null.");
-				
-				mBluetoothAdapter = null;
-			}
-		}
+		// Get and enable the Bluetooth adapter.
 		
+		BluetoothAdapterRetrieveThread worker = 
+			new BluetoothAdapterRetrieveThread();
+		try
+		{
+			// Start thread that gets the Bluetooth adapter.
+			worker.start();
+			
+			// This call blocks.
+			mBluetoothAdapter = worker.getBluetoothAdapter();
+		}
+		catch (Exception e) //TODO: Throwable
+		{
+			worker.quit();
+			mBluetoothAdapter = null;
+			e.printStackTrace();
+		}
+	
 		// Print log message with the Bluetooth address.
 		if (null != mBluetoothAdapter)
 		{
@@ -709,36 +536,41 @@ public class MoSyncBluetooth
 	}
 
 	/**
-	 * Class that gets the Bluetooth adapter. 
-	 * This must be done from a Looper thread!
+	 * Class that gets and also enables the Bluetooth adapter, 
+	 * if this is not done.
 	 */
 	class BluetoothAdapterRetrieveThread extends Thread
 	{
 		Looper mLooper;
-
-		// List used to communicate when the adapter is avaiable.
-		final LinkedBlockingQueue<ObjectRef> mQueue = 
+		
+		// List used to communicate when the adapter is available.
+		LinkedBlockingQueue<ObjectRef> mQueue = 
 			new LinkedBlockingQueue<ObjectRef>(1);
 		
+		/**
+		 * Called by user of this thread to get the Bluetooth adapter.
+		 * Blocking call.
+		 * @return A BluetoothAdapter on success, null on failure.
+		 */
 		public BluetoothAdapter getBluetoothAdapter()
 		{	
-			// Timeout is 2 seconds, after that null is returned.
-			long timeOut = 2000 + System.currentTimeMillis();
 			ObjectRef obj = null;
 			while (null == obj)
 			{
-				if (System.currentTimeMillis() >= timeOut)
-				{
-					return null;
-				}
-				
 				try 
 				{
 					obj = mQueue.take();
 				}
 				catch (InterruptedException consume)
 				{
+					Log.i("@@@ MoSync", "InterruptedException in getBluetoothAdapter (this is ok).");
+					//consume.printStackTrace();
 				}
+				//catch (RuntimeException ex)
+				//{
+				//	Log.i("@@@ MoSync", "RuntimeException in getBluetoothAdapter.");
+				//	ex.printStackTrace();
+				//}
 			}
 			return (BluetoothAdapter) obj.get();
 		}
@@ -754,39 +586,94 @@ public class MoSyncBluetooth
 		
 		public void run()
 		{
-			try
-			{
-				// Ensure that this is a Looper thread.
-				Looper.prepare();
-				mLooper = Looper.myLooper();
+			// Ensure that this is a Looper thread.
+			Looper.prepare();
+			mLooper = Looper.myLooper();
+			
+			// Get the adapter.
+			final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+			
+			if (null == adapter)
+			{	
+				Log.i("@@@ MoSync", 
+					"btGetBluetoothAdapter: Adapter NOT enabled, " +
+					"displaying enable dialog.");
 				
-				// Get the adapter.
-				BluetoothAdapter adapter = 
-					BluetoothAdapter.getDefaultAdapter();
-				if (null != adapter && adapter.isEnabled())
-				{	
-					// Adapter is available.
-					mQueue.put(new ObjectRef(adapter));
-				}
-				else
+				// No adapter is available.
+				mQueue.offer(new ObjectRef(null));
+				
+				return;
+			}
+			
+			// If Bluetooth is not enabled, open an activity for doing this.
+			// (Do not call adapter.enable() explicitly.)
+			if (!adapter.isEnabled())
+			{
+				// Create message handler that will get notified when
+				// the Bluetooth enable dialog is closed. Message is
+				// sent from the Activity via the Mediator class.
+				Handler handler = new Handler(mLooper)
 				{
-					// No enabled adapter is available.
-					mQueue.put(new ObjectRef(null));
-				}
+					public void handleMessage(Message message)
+					{
+						// The user has closed the Bluetooth enable dialog.
+						if (Mediator.REQUEST_ENABLE_BLUETOOTH == message.arg1)
+						{
+							if (adapter.isEnabled())
+							{
+								Log.i("@@@ MoSync",  
+									"btGetBluetoothAdapter: Adapter is ON");
+								
+								// Adapter is available and enabled.
+								mQueue.offer(new ObjectRef(adapter));
+							}
+							else
+							{
+								Log.i("@@@ MoSync",  
+									"btGetBluetoothAdapter: Adapter is OFF");
+								
+								// Adapter is NOT available.
+								mQueue.offer(new ObjectRef(null));
+							}
+							
+							// Set the mediator's handler reference to null.
+							Mediator.getInstance().mBluetoothEnableMessageHandler = null;
+
+							// Quit this thread.
+							quit();
+							
+						}
+					}
+				};
+				
+				// Set the mediator's handler.
+				Mediator.getInstance().mBluetoothEnableMessageHandler = handler;
+
+				Log.i("@@@ MoSync", 
+					"btGetBluetoothAdapter: Adapter NOT enabled, " +
+					"displaying enable dialog.");
+
+				// Open the activity.
+				Intent btPermissionIntent = new Intent(
+					BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				getActivity().startActivityForResult(
+					btPermissionIntent,
+					Mediator.REQUEST_ENABLE_BLUETOOTH);
+				
+				// Start looping to receive messages to the handler.
+				Looper.loop();
 			}
-			catch (Exception e)
+			else // Adapter is enabled.
 			{
-				Log.e("*** btGetBluetoothAdapter", 
-					"Exception in BluetoothAdapterRetrieveThread: " + e);
-				e.printStackTrace();
-			}
-			finally
-			{
-				quit();
+				Log.i("@@@ MoSync",  
+					"btGetBluetoothAdapter: Cached adapter is ON");
+
+				// Cached adapter is available and enabled.
+				mQueue.offer(new ObjectRef(adapter));
 			}
 		}
 	}
-
+	
 	/**
 	 * Helper class that holds a reference to an object.
 	 * Allows to refer to null values.
@@ -870,7 +757,7 @@ public class MoSyncBluetooth
 			return null;
 		}
 	}
-		
+
 	/**
 	 * Cancel any ongoing device discovery on the Android level.
 	 */
@@ -929,91 +816,25 @@ public class MoSyncBluetooth
 				
 				Looper.loop();
 			}
-			catch (Throwable e)
+			catch (Throwable e) // Should rarely happen.
 			{
 				Log.e("BluetoothDeviceDiscoveryThread", "Error: " + e);
 				e.printStackTrace();
-				getActivity().unregisterReceiver(mBluetoothReciever);
+				
+				// Stop device discovery.
+				stopDeviceDiscovery();
 				
 				// Is this the right thing to post?
 				btPostBluetoothMessage(CONNERR_GENERIC);
-				
-				// TODO: What about canceling ongong discovery, and setting state 
-				// to finished if not initialized?
 			}
 		}
-		
-		/* 
-		TODO: This code allows the user to enable Bluettoth, if not
-		already enabled. But this is not used right now. We need to settle
-		on the design regarding this, because on other platforms you have
-		to enable BT manually but on Android it is good practive for the
-		app to present the enable dialog.
-		
-		int initiateDeviceDiscovery()
-		{
-			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "begin");
-			
-			BluetoothAdapter adapter = btGetBluetoothAdapter();
-			if (null == adapter)
-			{	
-				return CONNERR_UNAVAILABLE;
-			}
-
-			// If not enabled, open an activity for the user to enable Bluetooth,
-			// then resume device discovery.
-			// TODO: Test this code. --> Seems to work!
-			if (!adapter.isEnabled())
-			{
-				Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "BluetoothAdapter NOT enabled");
-			
-				// Open the activity.
-				Intent btPermissionIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				((Activity) mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
-				
-				// Register receiver for Bluetooth state changes.
-				mContext.registerReceiver(new BroadcastReceiver()
-				{
-					@Override
-					public void onReceive(Context context, Intent intent)
-					{		
-						int newState = intent.getIntExtra(
-							BluetoothAdapter.EXTRA_STATE, 
-							BluetoothAdapter.STATE_OFF);
-						if (newState == BluetoothAdapter.STATE_ON)
-						{
-							// Bluetooth is now enabled.
-							
-							// First tell we have finished using this listener.
-							context.unregisterReceiver(this);
-							
-							// Then start discovery.
-							startDeviceDiscovery();
-						}
-					}
-				}, 
-				new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-				
-				// Do not call explictly: adapter.enable();
-			}
-			else
-			{
-				// Start discovery.
-				startDeviceDiscovery();
-			}
-			
-			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "end");
-			
-			return 0;
-		}
-		*/
 		
 		void startDeviceDiscovery()
 		{
 			// Cancel any ongoing discovery on the Android level.
 			btCancelAndroidLevelDeviceDiscovery();
 			
-			// Create device listener.
+			// Create device discovery listener.
 			mBluetoothReciever = new BroadcastReceiver()
 			{
 				@Override
@@ -1033,12 +854,6 @@ public class MoSyncBluetooth
 						BluetoothDevice device = intent.getParcelableExtra(
 							BluetoothDevice.EXTRA_DEVICE);
 						deviceFound(device);
-						
-						// TODO: What was this intended to be used for?
-						//BluetoothDevice rbd = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-						//int rssi = intent.getIntExtra(BluetoothDevice.EXTRA_RSSI, Integer.MIN_VALUE);
-						//RemoteDevice2Impl tobounce = new RemoteDevice2Impl(rbd, rssi);
-						//scanListener.deviceFound(tobounce);
 					}
 					else if (action.equals(
 						BluetoothAdapter.ACTION_DISCOVERY_FINISHED))
@@ -1073,10 +888,6 @@ public class MoSyncBluetooth
 			};
 			
 			// Register receiver.
-			// Do unregister
-			//   on BluetoothAdapter.ACTION_DISCOVERY_FINISHED
-			//   on abort (maBtCancelDiscovery)
-			//   on error (in catch clause)
 			IntentFilter filter = new IntentFilter();
 			filter.addAction(BluetoothDevice.ACTION_FOUND);
 			filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -1089,10 +900,10 @@ public class MoSyncBluetooth
 		void stopDeviceDiscovery()
 		{
 			// Quit the thread and set thread variable to null.
-			getActivity().unregisterReceiver(mBluetoothReciever);
 			mLooper.quit();
-			mBluetoothDeviceDiscoveryThread = null;
+			getActivity().unregisterReceiver(mBluetoothReciever);
 			mBluetoothDeviceDiscoveryState.set(BLUETOOTH_DISCOVERY_FINISHED);
+			mBluetoothDeviceDiscoveryThread = null;
 		}
 		
 		void deviceFound(BluetoothDevice device)
@@ -1159,6 +970,13 @@ public class MoSyncBluetooth
 		}
 	}
 
+} // End of class MoSyncBluetooth
+
+
+	// *******************************************************************
+	// ***** COMMENTED OUT CODE AHEAD
+	// *******************************************************************
+	
 	// Note: Service discovery is not implemented on Android.
 	/**
 	 * Thread that performs discovery of Bluetooth services.
@@ -1381,6 +1199,7 @@ public class MoSyncBluetooth
 	*/ // End of commented out service discovery code.
 
 
+	
 	// This class is not used. This is how you ask the user to enable 
 	// the Bluetooth adapter, if we want to do that.
 	/**
@@ -1470,6 +1289,8 @@ public class MoSyncBluetooth
 					// is not changed I guess). Is there some other
 					// event that can be used to detect that the
 					// Bluetooth dialog is closed?
+					// This is now solved, get the result in onActivityResult
+					// instead.
 					@Override
 					public void onReceive(Context context, Intent intent)
 					{
@@ -1534,4 +1355,305 @@ public class MoSyncBluetooth
 	}
 	*/
 
-}
+	
+	// Just want to keep this "snippet" for a litte longer.
+	/* 
+	TODO: This code allows the user to enable Bluetooth, if not
+	already enabled. But this is not used right now. We need to settle
+	on the design regarding this, because on other platforms you have
+	to enable BT manually but on Android it is good practice for the
+	app to present the enable dialog.
+	
+	int initiateDeviceDiscovery()
+	{
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "begin");
+		
+		BluetoothAdapter adapter = btGetBluetoothAdapter();
+		if (null == adapter)
+		{	
+			return CONNERR_UNAVAILABLE;
+		}
+
+		// If not enabled, open an activity for the user to enable Bluetooth,
+		// then resume device discovery.
+		// TODO: Test this code. --> Seems to work!
+		if (!adapter.isEnabled())
+		{
+			Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "BluetoothAdapter NOT enabled");
+		
+			// Open the activity.
+			Intent btPermissionIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			((Activity) mContext).startActivityForResult(btPermissionIntent, REQUEST_ENABLE_BT);
+			
+			// Register receiver for Bluetooth state changes.
+			mContext.registerReceiver(new BroadcastReceiver()
+			{
+				@Override
+				public void onReceive(Context context, Intent intent)
+				{		
+					int newState = intent.getIntExtra(
+						BluetoothAdapter.EXTRA_STATE, 
+						BluetoothAdapter.STATE_OFF);
+					if (newState == BluetoothAdapter.STATE_ON)
+					{
+						// Bluetooth is now enabled.
+						
+						// First tell we have finished using this listener.
+						context.unregisterReceiver(this);
+						
+						// Then start discovery.
+						startDeviceDiscovery();
+					}
+				}
+			}, 
+			new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+			
+			// Do not call explictly: adapter.enable();
+		}
+		else
+		{
+			// Start discovery.
+			startDeviceDiscovery();
+		}
+		
+		Log.i("****** BluetoothDeviceDiscoveryThread.initiateDeviceDiscovery", "end");
+		
+		return 0;
+	}
+	*/
+	
+	// Keep this code for a while.
+	/**
+	 * Old version of the Bluetooth adapter retrieve thread.
+	 * 
+	 * Class that gets the Bluetooth adapter. 
+	 * This must be done from a Looper thread!
+	 */
+	/*
+	class BluetoothAdapterRetrieveThread extends Thread
+	{
+		Looper mLooper;
+
+		// List used to communicate when the adapter is available.
+		final LinkedBlockingQueue<ObjectRef> mQueue = 
+			new LinkedBlockingQueue<ObjectRef>(1);
+		
+		public BluetoothAdapter getBluetoothAdapter()
+		{	
+			// Timeout is 2 seconds, after that null is returned.
+			long timeOut = 2000 + System.currentTimeMillis();
+			ObjectRef obj = null;
+			while (null == obj)
+			{
+				if (System.currentTimeMillis() >= timeOut)
+				{
+					return null;
+				}
+				
+				try 
+				{
+					obj = mQueue.take();
+				}
+				catch (InterruptedException consume)
+				{
+				}
+			}
+			return (BluetoothAdapter) obj.get();
+		}
+		
+		public void quit()
+		{
+			if (null != mLooper)
+			{
+				mLooper.quit();
+				mLooper = null;
+			}
+		}
+		
+		public void run()
+		{
+			try
+			{
+				// Ensure that this is a Looper thread.
+				Looper.prepare();
+				mLooper = Looper.myLooper();
+				
+				// Get the adapter.
+				BluetoothAdapter adapter = 
+					BluetoothAdapter.getDefaultAdapter();
+				if (null != adapter && adapter.isEnabled())
+				{	
+					// Adapter is available.
+					mQueue.put(new ObjectRef(adapter));
+				}
+				else
+				{
+					// No enabled adapter is available.
+					mQueue.put(new ObjectRef(null));
+				}
+			}
+			catch (Exception e)
+			{
+				Log.e("*** btGetBluetoothAdapter", 
+					"Exception in BluetoothAdapterRetrieveThread: " + e);
+				e.printStackTrace();
+			}
+			finally
+			{
+				quit();
+			}
+		}
+	}
+	*/
+	
+	// Note: Service discovery currently does not work on Android.
+	// This code shows how it might be implemented in a "fake" way.
+	/**
+	 * Start service discovery.
+	 * @param address The address of the device to perform service discovery on.
+	 * @param uuid The uuid of the service to discover.
+	 * @return 0 on success, < 0 on failure.
+	 */
+	/*
+	int maBtStartServiceDiscovery(String address, String uuid) throws Exception
+	{
+		if (btBluetoothApiIsNotAvailable())
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+
+		btPanicIfBluetoothPermissionsAreNotSet();
+		
+		// Device disovery must not be running.
+		if (null != mBluetoothDeviceDiscoveryThread)
+		{
+			return CONNERR_GENERIC;
+		}
+		
+		// Service disovery must not be running.
+		if (null != mBluetoothServiceDiscoveryThread)
+		{
+			return CONNERR_GENERIC;
+		}
+		
+		// Bluetooth must be available and enabled.
+		if (null == btGetBluetoothAdapter())
+		{
+			return CONNERR_UNAVAILABLE;
+		}
+		
+		Log.i("@@@maBtStartServiceDiscovery", 
+			"Address: " + address + " UUID: " + uuid);
+		
+		// List where services are saved for retrieval.
+		mBluetoothServices = new ConcurrentLinkedQueue<BluetoothService>();
+		
+		// Create and start device discovery thread.
+		mBluetoothServiceDiscoveryThread = 
+			new BluetoothServiceDiscoveryThread(address, uuid);
+		mBluetoothServiceDiscoveryThread.start();
+		
+		return 0; // Zero means success.
+	}
+	*/
+	
+	/**
+	 * Get size info for the next service.
+	 * @param nameBufSizePointer Pointer to int to get size of service name.
+	 * @param nUuidsPointer ??
+	 * @return > 0 on success, or zero if the queue is empty.
+	 */
+	/*
+	int maBtGetNextServiceSize(int nameBufSizePointer, int nUuidsPointer) 
+		throws Exception
+	{
+		if (btBluetoothApiIsNotAvailable())
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+
+		btPanicIfBluetoothPermissionsAreNotSet();
+		
+		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+		
+		if (null == serviceList)
+		{
+			return CONNERR_GENERIC; // Error.
+		}
+		
+		// Get but DO NOT remove head element of the queue.
+		BluetoothService service = serviceList.peek();
+		if (null == service)
+		{
+			return 0; // No elements.
+		}
+		
+		// Copy length of service name to memory, includes null char.
+		networkCopyIntToMemory(nameBufSizePointer, service.getNameLength()); 
+		
+		// Copy number of UUIDs to memory.
+		networkCopyIntToMemory(nUuidsPointer, service.getNumberOfUUIDs());
+		
+		return 1; // Success retrieving service info.
+	}
+	*/
+
+	/**
+	 * Get info about the next service in the list of discovered services.
+	 * @param portPointer ??
+	 * @param nameBufPointer ??
+	 * @param nameBufSize ??
+	 * @param uuidsPointer ??
+	 * @return > 0 on success, or zero if the queue is empty.
+	 */
+	/*
+	int maBtGetNewService(
+		int portPointer,
+		int nameBufPointer,
+		int nameBufSize,
+		int uuidsPointer) throws Exception
+	{
+		if (btBluetoothApiIsNotAvailable())
+		{
+			return IOCTL_UNAVAILABLE;
+		}
+
+		btPanicIfBluetoothPermissionsAreNotSet();
+		
+		ConcurrentLinkedQueue<BluetoothService> serviceList = mBluetoothServices;
+		
+		if (null == serviceList)
+		{
+			return CONNERR_GENERIC; // Error.
+		}
+		
+		// Get and remove head element of the queue.
+		BluetoothService service = serviceList.poll();
+		if (null == service)
+		{
+			return 0; // No elements.
+		}
+		
+		// Copy port of service to memory.
+		networkCopyIntToMemory(portPointer, service.getChannel());
+		
+		// Copy name of service to memory.
+		
+		// Truncate name if buffer is not large enough.
+		// (Take null termination char into account.)
+		String name = service.getName();
+		int nameLength = name.length();
+		if (nameLength >= nameBufSize - 1)
+		{
+			name = name.substring(nameBufSize - 1);
+		}
+		
+		networkCopyStringToMemory(nameBufPointer, name);
+		
+		// Copy UUIDs to memory.
+		//networkCopyBytesToMemory(uuidsPointer, service.getUUIDsAsByteBuffer());
+		
+		return 1; // Success retrieving device info.
+	}
+	*/
+
