@@ -163,6 +163,7 @@ namespace Base
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery begin");
+		
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
 		if (methodID == 0) return 0;

@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Window;
 
+import com.mosync.internal.android.Mediator;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
@@ -88,9 +89,16 @@ public class MoSync extends Activity
 		}
 		
 		// Create the view.
-		createMoSyncView();
-		mMoSyncThread.setMoSyncView(mMoSyncView);
-		setContentView(mMoSyncView);
+		mMoSyncView = createMoSyncView();
+		if (null != mMoSyncView)
+		{
+			mMoSyncThread.setMoSyncView(mMoSyncView);
+			setContentView(mMoSyncView);
+		}
+		else
+		{
+			finish();
+		}
     }
 	
 	/**
@@ -106,20 +114,15 @@ public class MoSync extends Activity
 	}
 	
 	@Override
-    protected void onPause()
+    protected void onStart()
 	{
-		Log.i("MoSync", "onPause");
+		Log.i("MoSync", "onStart");
 		
-		super.onPause();
+		super.onStart();
 		
 		if (theMoSyncThreadIsDead()) { return ; }
-		
-		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
-		int[] event = new int[1];
-		event[0] = EVENT_TYPE_FOCUS_LOST;
-		mMoSyncThread.postEvent(event);
-    }
-	
+	}
+
     @Override
     protected void onStop()
 	{
@@ -128,10 +131,43 @@ public class MoSync extends Activity
 		super.onStop();
 		
 		if (theMoSyncThreadIsDead()) { return ; }
-		
-		// The view is destroyed, inform the thread about this.
-		mMoSyncThread.setMoSyncView(null);
 	}
+
+	@Override
+    protected void onResume()
+	{
+		Log.i("MoSync", "onResume");
+		
+		super.onResume();
+		
+		if (theMoSyncThreadIsDead()) { return ; }
+		
+		// The MoSync view comes to foreground and is visible.
+		mMoSyncThread.setMoSyncView(mMoSyncView);
+		
+		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_GAINED;
+		mMoSyncThread.postEvent(event);
+    }
+
+	@Override
+    protected void onPause()
+	{
+		Log.i("MoSync", "onPause");
+		
+		super.onPause();
+		
+		if (theMoSyncThreadIsDead()) { return ; }
+
+		// The view is not to be updated, inform the thread about this.
+		mMoSyncThread.setMoSyncView(null);
+		
+		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_FOCUS_LOST;
+		mMoSyncThread.postEvent(event);
+    }
 
 	@Override
     protected void onRestart()
@@ -144,48 +180,41 @@ public class MoSync extends Activity
 	}
 	
 	@Override
-    protected void onStart()
-	{
-		Log.i("MoSync", "onStart");
-		
-		super.onStart();
-	}
-	
-	@Override
-    protected void onResume()
-	{
-		Log.i("MoSync", "onResume");
-		
-		super.onResume();
-		
-		if (theMoSyncThreadIsDead()) { return ; }
-		
-		mMoSyncThread.setMoSyncView(mMoSyncView);
-		
-		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
-		int[] event = new int[1];
-		event[0] = EVENT_TYPE_FOCUS_GAINED;
-		mMoSyncThread.postEvent(event);
-    }
-	
-	@Override
     protected void onDestroy()
 	{
     	Log.i("MoSync", "onDestroy");
 		
 		super.onDestroy();
     }
+
+	/**
+	 * This method is called when we get a result from a sub-activity.
+	 * Specifically, it is used to get the result of a Bluetooth enable dialog.
+	 */
+	@Override
+	protected void onActivityResult(
+		int requestCode, 
+		int resultCode, 
+		Intent data)
+	{
+		// Check that this is the result of the Bluetooth enable activity.
+		if (Mediator.REQUEST_ENABLE_BLUETOOTH == requestCode)
+		{
+			Mediator.getInstance().postBluetoothDialogClosedMessage();
+		}
+	}
 	
 	/**
 	 * Creates the MoSyncView. If it fails the Activity is destroyed.
+	 * @return 
 	 */
-	private void createMoSyncView()
+	private MoSyncView createMoSyncView()
 	{
 		Log.i("MoSync", "createMoSyncView");
 		
 		try 
 		{
-			mMoSyncView = new MoSyncView(this, mMoSyncThread);
+			return new MoSyncView(this, mMoSyncThread);
         } 
 		catch (Exception ex) 
 		{
@@ -193,7 +222,8 @@ public class MoSync extends Activity
 				"MoSync - The MoSyncView could not be created, " +
 				"the application could not start!", 
 				ex);
-			finish();
+			ex.printStackTrace();
+			return null;
 		}
 	}
 
