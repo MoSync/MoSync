@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maapi.h>
 #include "MapSource.h"
 #include "MapTileCoordinate.h"
+#include "TraceScope.h"
 
 namespace MAP
 {
@@ -199,6 +200,7 @@ namespace MAP
 	void MapSource::requestTile( MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope tr = TraceScope( "MapSource::requestTile" );
 		if ( !isInQueue( tileXY ) )
 		{
 			MapSourceInnerClientData* icd = newobject( MapSourceInnerClientData, new MapSourceInnerClientData( listener, clientData ) );
@@ -275,6 +277,8 @@ namespace MAP
 	void MapSource::finishedDownloading( Downloader* downloader, MAHandle data )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope ts = TraceScope( "MapSource::finishedDownloading" );
+
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
 		mTileCount++;
@@ -301,6 +305,7 @@ namespace MAP
 	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope tr = TraceScope( "MapSource::downloadCancelled" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 		clientData->mListener->downloadCancelled( this );
@@ -310,6 +315,7 @@ namespace MAP
 	void MapSource::error( Downloader* downloader, int code )
 	//-------------------------------------------------------------------------
 	{
+		TraceScope tr = TraceScope( "MapSource::error" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 		clientData->mListener->error( this, code );
