@@ -140,8 +140,7 @@ namespace MAP
 		//
 		// ILayerListener implementation
 		//
-		virtual void dataChanged( Layer* sender );
-		virtual void loadComplete( Layer* sender );
+		virtual void contentChanged( Layer* sender );
 		/**
 		 * Map update scope
 		 */

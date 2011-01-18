@@ -44,7 +44,7 @@ namespace MAP
 	static const int PanAveragePoints = 8;
 	static const double Tension = 4.0;
 	static const double PanFriction = 0.60;
-	static const double GlideFriction = 0.01;
+	static const double GlideFriction = 0.02;
 	static const int SmallScrollStep = 30; // pixels to scroll if not full page
 	static const int CrossSize = 4;
 
@@ -210,12 +210,12 @@ namespace MAP
 
 
 	private:
+		double mMomentumX;
+		double mMomentumY;
 		MapViewport* mViewport;
 		int mPanTime;
 		int mGlideStartTime;
 		bool mGliding;
-		double mMomentumX;
-		double mMomentumY;
 
 		int px[PanAveragePoints];
 		int py[PanAveragePoints];
@@ -391,22 +391,28 @@ namespace MAP
 			MAPoint2d pt = worldPixelToViewport( tilePx );
 			const int tileSize = mSource->getTileSize( );
 			
-#ifdef GFXOPENGL
+			#ifndef WIN32
+
 			Gfx_pushMatrix();
 			Gfx_scale((MAFixed)(mScale*65536.0), (MAFixed)(mScale*65536.0));
 
-#endif
+			#endif // WIN32
 
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
 
-#ifdef GFXOPENGL
+			#ifndef WIN32
+
 			Gfx_popMatrix();
-#endif
+
+			#endif
 		}
 		else
 		{
-			// added by niklas
-			// TODO: Gfx_notifyImageUpdated( tile->getImage( ) );
+			#ifndef WIN32
+			
+			Gfx_notifyImageUpdated( tile->getImage( ) );
+
+			#endif
 			
 			//
 			// notify client that update is needed

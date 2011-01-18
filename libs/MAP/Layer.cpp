@@ -13,4 +13,13 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 	}
+
+	//-------------------------------------------------------------------------
+	void Layer::onContentChanged( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<ILayerListener*>* listeners = getBroadcasterListeners<ILayerListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->contentChanged( this );
+	}
 }
