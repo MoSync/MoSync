@@ -7,10 +7,29 @@
 //
 
 #import "SearchBarWidget.h"
+
+#ifndef NATIVE_TEST
+#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
 
 @implementation SearchBarWidget
+
+- (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+#ifndef NATIVE_TEST
+	MAEvent *event = new MAEvent;
+	event->type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->widgetHandle = handle;
+	event->data = eventData;
+	Base::gEventQueue.put(*event);
+#endif	
+}
+
 
 - (id)init {
 	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
@@ -20,6 +39,7 @@
 	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 	view.autoresizesSubviews = YES;
 	searchBar.showsCancelButton = YES;
+	searchBar.delegate = self;
 	
 	return ret;
 }

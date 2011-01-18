@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface SearchBarWidget : IWidget {
+@interface SearchBarWidget : IWidget <UISearchBarDelegate> {
 	UISearchBar* searchBar;
 }
 
