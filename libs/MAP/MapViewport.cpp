@@ -391,22 +391,28 @@ namespace MAP
 			MAPoint2d pt = worldPixelToViewport( tilePx );
 			const int tileSize = mSource->getTileSize( );
 			
-#ifdef GFXOPENGL
+			#ifndef WIN32
+
 			Gfx_pushMatrix();
 			Gfx_scale((MAFixed)(mScale*65536.0), (MAFixed)(mScale*65536.0));
 
-#endif
+			#endif // WIN32
 
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
 
-#ifdef GFXOPENGL
+			#ifndef WIN32
+
 			Gfx_popMatrix();
-#endif
+
+			#endif
 		}
 		else
 		{
-			// added by niklas
-			// TODO: Gfx_notifyImageUpdated( tile->getImage( ) );
+			#ifndef WIN32
+			
+			Gfx_notifyImageUpdated( tile->getImage( ) );
+
+			#endif
 			
 			//
 			// notify client that update is needed

@@ -111,18 +111,14 @@ namespace MAP
 	void GeoPointLayer::dataChanged( GeoPointDataSource* sender )
 	//-------------------------------------------------------------------------
 	{
-		Vector<ILayerListener*>* listeners = getBroadcasterListeners<ILayerListener>( *this );
-		for ( int i = 0; i < listeners->size( ); i ++ )
-			(*listeners)[i]->dataChanged( this );
+		onContentChanged( );
 	}
 
 	//-------------------------------------------------------------------------
 	void GeoPointLayer::loadComplete( GeoPointDataSource* sender )
 	//-------------------------------------------------------------------------
 	{
-		Vector<ILayerListener*>* listeners = getBroadcasterListeners<ILayerListener>( *this );
-		for ( int i = 0; i < listeners->size( ); i ++ )
-			(*listeners)[i]->loadComplete( this );
+		onContentChanged( );
 	}
 
 	//-------------------------------------------------------------------------
