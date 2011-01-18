@@ -213,6 +213,8 @@ public class MoSyncThread extends Thread
 	
 	int mMaxStoreId = 0;
 
+	public boolean mIsUpdatingScreen = false;
+	
 	final static String storesPath = "MAStore";
 
 	/**
@@ -881,6 +883,9 @@ public class MoSyncThread extends Thread
 
 	/**
 	 * maUpdateScreen
+	 * Sets the boolean mIsUpdatingScreen when updating the screen
+	 * so that we won't get touch events while drawing. This to
+	 * not hog the system with events.
 	 */
 	void maUpdateScreen()
 	{
@@ -888,6 +893,8 @@ public class MoSyncThread extends Thread
 		Canvas lockedCanvas = null;
 		
 		if (mMoSyncView == null) return;
+		
+		mIsUpdatingScreen = true;
 		
 		try 
 		{
@@ -920,6 +927,7 @@ public class MoSyncThread extends Thread
 		catch (Exception e)
 		{
 			logError("updateScreen Exception : " + e.toString(), e);
+			mIsUpdatingScreen = false;
 			return;
 		}
 			
@@ -927,6 +935,8 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
 		}
+		
+		mIsUpdatingScreen = false;
 	}
 
 	/**
