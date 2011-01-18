@@ -409,14 +409,7 @@ namespace MAP
 #endif
 
 	//-------------------------------------------------------------------------
-	void LayerMapViewport::dataChanged( Layer* sender )
-	//-------------------------------------------------------------------------
-	{
-		onViewportUpdated( );
-	}
-
-	//-------------------------------------------------------------------------
-	void LayerMapViewport::loadComplete( Layer* sender )
+	void LayerMapViewport::contentChanged( Layer* sender )
 	//-------------------------------------------------------------------------
 	{
 		onViewportUpdated( );
