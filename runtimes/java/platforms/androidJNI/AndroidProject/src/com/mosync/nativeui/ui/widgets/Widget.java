@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.view.View;
 
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -83,6 +84,18 @@ public class Widget
 		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_COLOR ) )
 		{
 			getView( ).setBackgroundColor( Color.parseColor( "#" + value ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_VISIBLE  ) )
+		{
+			boolean shouldBeVisible = BooleanConverter.convert( value );
+			if( shouldBeVisible )
+			{
+				getView( ).setVisibility( View.VISIBLE );
+			}
+			else
+			{
+				getView( ).setVisibility( View.INVISIBLE );
+			}
 		}
 		else
 		{

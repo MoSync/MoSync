@@ -4,7 +4,7 @@
 /* $Id: gl.h 4533 2007-11-26 11:19:35Z markc $ */
 
 #include <ma.h>
-#include <GLES\glplatform.h>
+#include <GLES/glplatform.h>
 
 #ifndef __cplusplus
 typedef union MA_DV MA_DV;

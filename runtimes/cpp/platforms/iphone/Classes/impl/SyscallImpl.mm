@@ -865,6 +865,18 @@ namespace Base {
 		
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
+	
+
+	int maOpenGLTexSubImage2D(MAHandle image) {
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
+		
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, img->width, img->height, GL_RGBA
+						, GL_UNSIGNED_BYTE, img->data);
+		
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}	
+	
 #endif	//SUPPORT_OPENGL_ES	
 	
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ScreenWidget.h"
 
-@interface TabScreenWidget : ScreenWidget {
+@interface TabScreenWidget : ScreenWidget <UITabBarControllerDelegate> {
 }
 
 - (id)init;

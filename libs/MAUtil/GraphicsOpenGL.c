@@ -342,7 +342,7 @@ void ogl_notifyImageUpdated(MAHandle image) {
 		if(textures[i].maTexture == image) {
 			glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, textures[i].glTexture);
-			maOpenGLTexImage2D(image);
+			maOpenGLTexSubImage2D(image);
 			return;
 		}
 	}

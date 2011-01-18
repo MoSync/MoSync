@@ -102,12 +102,7 @@ bool nativeUIEnabled = false;
 		nativeUIEnabled = true;
 	}	
 	[mainWindow addSubview:[widget getView]];
-	//[mainWindow addSubview:[[self getWidget:0] getView]];
-	
-//	[mainWindow insertSubview:[widget getView] atIndex: 0];
-   // [mainWindow makeKeyAndVisible];
-	//mainWindow.frame = [[UIScreen mainScreen] bounds];
-
+	[widget layout];
 }
 
 @end

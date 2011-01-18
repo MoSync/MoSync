@@ -236,12 +236,12 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	 * onTouchEvent
 	 * Receives touch events from the screen.
 	 * 
-	 * This implementation is build so that it won't receive touch events
-	 * while the screen is updating. This is because the events are fired
-	 * more often than some devices can digest the events, leading to
+	 * This implementation is build so that it won't receive dragged touch 
+	 * events while the screen is updating. This is because the events are
+	 * fired more often than some devices can digest the events, leading to
 	 * problems when the queue just grows. Discarded events are still 
-	 * marked as digested since we don't want any other view to digest them
-	 * either.
+	 * marked as digested for the Android OS since we don't want any other 
+	 * view to digest them either.
 	 * 
 	 * Handles both single and multi touch devices.
 	 * 
@@ -253,8 +253,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		SYSLOG("onTouchEvent");
-		
-		if(mMoSyncThread.mIsUpdatingScreen) return true;
 		
 		// The first time around, see if this is multi or single touch device
 		if(!mHasDeterminedTouchCapabilities)
@@ -286,6 +284,8 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 				break;
 			case MotionEvent.ACTION_MOVE:
 				touchEvent[0] = EVENT_TYPE_POINTER_DRAGGED;
+				// While drawing, discard this event
+				if(mMoSyncThread.mIsUpdatingScreen) return true;
 				break;
 			default:
 				return false;

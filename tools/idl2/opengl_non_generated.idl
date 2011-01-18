@@ -24,3 +24,4 @@ constset int MA_GL_TEX_IMAGE_2D_ {
 int maOpenGLInitFullscreen();
 int maOpenGLCloseFullscreen();
 int maOpenGLTexImage2D(in MAHandle image);
+int maOpenGLTexSubImage2D(in MAHandle image);
