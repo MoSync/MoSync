@@ -11,7 +11,7 @@ public class MoSyncSingleTouchHandler extends MoSyncTouchHandler
 	 * The single touch constructor
 	 * Sets the number of events to 1
 	 */
-	MoSyncSingleTouchHandler()
+	public MoSyncSingleTouchHandler()
 	{
 		mNumEvents = 1;
 	}
@@ -19,7 +19,7 @@ public class MoSyncSingleTouchHandler extends MoSyncTouchHandler
 	/**
 	 * Check abstract class MoSyncTouchHandler
 	 */
-	int loadEvent(MotionEvent event)
+	public int loadEvent(MotionEvent event)
 	{
 		mMotionEvent = event;
 		return mNumEvents;
@@ -28,7 +28,7 @@ public class MoSyncSingleTouchHandler extends MoSyncTouchHandler
 	/**
 	 * Check abstract class MoSyncTouchHandler
 	 */
-	int[] parseEvent(int index)
+	public int[] parseEvent(int index)
 	{
 		if(index != 0) return null;
 		

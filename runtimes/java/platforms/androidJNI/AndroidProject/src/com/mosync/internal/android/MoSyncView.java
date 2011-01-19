@@ -18,32 +18,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_KEY_PRESSED;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_KEY_RELEASED;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_POINTER_DRAGGED;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_POINTER_PRESSED;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_POINTER_RELEASED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_CHANGED;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_BACK;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_CLEAR;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_DOWN;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_FIRE;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_LEFT;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_MENU;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_RIGHT;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTLEFT;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTRIGHT;
-import static com.mosync.internal.generated.MAAPI_consts.MAK_UP;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.text.InputType;
 import android.util.Log;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -61,9 +41,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
-
-	private boolean mHasDeterminedTouchCapabilities = false;
-	private MoSyncTouchHandler mTouchHandler;
 	
 	class CustomInputConnection extends BaseInputConnection
 	{
@@ -232,107 +209,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return mKeyState;
 	}
 */	
-	/**
-	 * onTouchEvent
-	 * Receives touch events from the screen.
-	 * 
-	 * This implementation is build so that it won't receive dragged touch 
-	 * events while the screen is updating. This is because the events are
-	 * fired more often than some devices can digest the events, leading to
-	 * problems when the queue just grows. Discarded events are still 
-	 * marked as digested for the Android OS since we don't want any other 
-	 * view to digest them either.
-	 * 
-	 * Handles both single and multi touch devices.
-	 * 
-	 * @param motionEvent	The Motion event received from the Android OS
-	 * 
-	 * @return 				True if the event was digested
-	 * 						False if it wasn't
-	 */
-	public boolean onTouchEvent(MotionEvent motionEvent)
-	{
-		SYSLOG("onTouchEvent");
-		
-		// The first time around, see if this is multi or single touch device
-		if(!mHasDeterminedTouchCapabilities)
-		{
-			mHasDeterminedTouchCapabilities = true;
-			try
-			{
-				mTouchHandler = new MoSyncMultiTouchHandler();
-				Log.i("MoSync TouchEvent","Multi touch device!");
-			}
-			catch(java.lang.VerifyError error)
-			{
-				mTouchHandler = new MoSyncSingleTouchHandler();
-				Log.i("MoSync TouchEvent","Single touch device!");
-			}
-		}
-		
-		int[] touchEvent = new int[4];
-		
-		int actionCode = motionEvent.getAction() & MotionEvent.ACTION_MASK;
-		
-		switch (actionCode)
-		{
-			case MotionEvent.ACTION_DOWN:
-				touchEvent[0] = EVENT_TYPE_POINTER_PRESSED;
-				break;
-			case MotionEvent.ACTION_UP:
-				touchEvent[0] = EVENT_TYPE_POINTER_RELEASED;
-				break;
-			case MotionEvent.ACTION_MOVE:
-				touchEvent[0] = EVENT_TYPE_POINTER_DRAGGED;
-				// While drawing, discard this event
-				if(mMoSyncThread.mIsUpdatingScreen) return true;
-				break;
-			default:
-				return false;
-		}
-		
-		// Get all of the events and send them to the runtime
-		int numEvents = mTouchHandler.loadEvent(motionEvent);
-		for( int i = 0; i < numEvents; i++)
-		{
-			int[] eventData = mTouchHandler.parseEvent(i);
-			
-			// TO-DO : Proper error handling
-			if(eventData == null) return false;
-			
-			touchEvent[1] = eventData[0];
-			touchEvent[2] = eventData[1];
-			touchEvent[3] = eventData[2];
-			
-			mMoSyncThread.postEvent(touchEvent);
-		}
-		
-		return true;
-	}
-
-	/**
-	 * Map Android key codes to MoSync key codes.
-	 * @param keyCode
-	 * @param keyEvent
-	 * @return
-	 */
-	private final int convertToMoSyncKeyCode(int keyCode, KeyEvent keyEvent)
-	{
-		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return MAK_LEFT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) return MAK_RIGHT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return MAK_UP; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return MAK_DOWN;
-		if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) return MAK_FIRE; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) return MAK_SOFTLEFT; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) return MAK_SOFTRIGHT; 
-		if (keyCode == KeyEvent.KEYCODE_BACK) return MAK_BACK; 
-		if (keyCode == KeyEvent.KEYCODE_MENU) return MAK_MENU;
-		
-		// Support for native virtual keyboard.
-		if (keyCode == KeyEvent.KEYCODE_DEL) { return MAK_CLEAR; }
-		KeyCharacterMap keyCharacterMap = KeyCharacterMap.load(keyEvent.getDeviceId());
-		return keyCharacterMap.get(keyCode, keyEvent.getMetaState());
-	}
+	
 
 	/**
 	 * Map Android key codes to MoSync byte key codes.
@@ -367,36 +244,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		return 0;
 	}
 	*/
-	
-	public boolean onKeyUp(int keyCode, KeyEvent keyEvent)
-	{
-		SYSLOG("onKeyUp: " + keyEvent.toString());
-
-		int[] event = new int[3];
-		
-		event[0] = EVENT_TYPE_KEY_RELEASED;
-		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
-		event[2] = keyCode;
-	
-		mMoSyncThread.postEvent(event);
-		
-		return true;
-	}
-	
-	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
-	{
-		SYSLOG("onKeyDown: " + keyEvent.toString());
-
-		int[] event = new int[3];
-		
-		event[0] = EVENT_TYPE_KEY_PRESSED;
-		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
-		event[2] = keyCode;
-	
-		mMoSyncThread.postEvent(event);
-		
-		return true;
-	}
 	
 	public InputConnection onCreateInputConnection (EditorInfo outAttrs)
 	{
