@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSource.h"
 #include "DebugPrintf.h"
 
+//#define OnlyUpdateWhenJobComplete
+
 namespace MAP
 {
 	//
@@ -37,7 +39,7 @@ namespace MAP
 	// Configuration
 	//
 	static const bool UseAggregatedTime = true;
-	static const bool OnlyUpdateWhenJobComplete = false;
+	//static const bool OnlyUpdateWhenJobComplete = false;
 	//
 	// Pan smoothing time = PanInterval * PanAveragePoints
 	//
@@ -473,7 +475,8 @@ namespace MAP
 		}
 		else
 		{
-			if ( !OnlyUpdateWhenJobComplete )
+			//if ( !OnlyUpdateWhenJobComplete )
+#ifndef OnlyUpdateWhenJobComplete		
 			{
 				#ifndef WIN32
 				
@@ -488,19 +491,21 @@ namespace MAP
 				onViewportUpdated( );
 			}
 		}
+#endif		
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::jobComplete( MapCache* sender )
 	//-------------------------------------------------------------------------
 	{
-		if ( OnlyUpdateWhenJobComplete )
+#ifdef OnlyUpdateWhenJobComplete
 		{
 			//
 			// notify client that update is needed
 			//
 			onViewportUpdated( );
 		}
+#endif		
 	}
 
 	//-------------------------------------------------------------------------

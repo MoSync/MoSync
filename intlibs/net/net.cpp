@@ -252,7 +252,8 @@ void TcpConnection::close() {
 		int res;
 		res = shutdown(mSock, 2);	//stop both reading and writing
 		if(SOCKET_ERROR == res) {
-			LOG("TcpConnection::shutdown failed: %i\n", SOCKET_ERRNO);
+			// may happen a lot..
+			//LOG("TcpConnection::shutdown failed: %i\n", SOCKET_ERRNO);
 		}
 		res = closesocket(mSock);
 		if(SOCKET_ERROR == res) {

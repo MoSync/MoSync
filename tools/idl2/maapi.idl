@@ -3361,6 +3361,11 @@ interface MAAPI {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
 #endif
+
+		/**
+		 * Logs information about the state of all current resources.
+		 */
+		void maReportResourceInformation();
 	}
 	
 	constset int IOCTL_ {
