@@ -56,24 +56,26 @@ namespace MAP
 		}
 		MAPoint2d widgetPx = viewport->worldPixelToViewport( worldPx );
 
+		/*
 		if ( widgetPx.x >= bounds.x && 
 			widgetPx.x < bounds.width && 
 			widgetPx.y >= bounds.y && 
 			widgetPx.y < bounds.height )
 		{
+		*/
 			GeoPointLayerRenderer* renderer = getRenderer( );
 			//
 			// Render marker
 			//
-			renderer->renderItem( this, item, bounds.x + widgetPx.x, bounds.y + widgetPx.y, selected );
+			renderer->renderItem( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y, selected );
 			//
 			// Render item text
 			//
 			if ( drawText )
 			{
-				renderer->renderItemText( this, item, bounds.x + widgetPx.x, bounds.y + widgetPx.y, bounds );
+				renderer->renderItemText( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y );
 			}
-		}
+		//}
 	}
 
 	//-------------------------------------------------------------------------

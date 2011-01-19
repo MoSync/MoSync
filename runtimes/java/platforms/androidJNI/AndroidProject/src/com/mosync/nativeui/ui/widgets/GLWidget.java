@@ -10,17 +10,22 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  * 
  * @author fmattias
  */
-public class GLWidget extends Widget
+public class GLWidget extends FrameLayout
 {
+	private EGLView m_eglView = null;
+	
 	/**
 	 * Constructor.
 	 * 
 	 * @param handle Integer handle corresponding to this instance.
-	 * @param button An egl view wrapped by this widget.
+	 * @param eglFrame A frame that frames the EGL View so that other
+	 *                 widgets can lie on top of it.
+	 * @param eglView An egl view wrapped by this widget.
 	 */
-	public GLWidget(int handle, EGLView eglView)
+	public GLWidget(int handle, android.widget.FrameLayout eglFrame, EGLView eglView)
 	{
-		super( handle, eglView );
+		super( handle, eglFrame );
+		m_eglView = eglView;
 	}
 	
 	@Override
@@ -31,16 +36,15 @@ public class GLWidget extends Widget
 			return true;
 		}
 		
-		EGLView eglView = (EGLView) getView( );
 		if( property.equals( Types.WIDGET_PROPERTY_BIND ) )
 		{
 			// Temporarily group these two together.
-			eglView.bind( );
-			eglView.enterRender( );
+			m_eglView.bind( );
+			m_eglView.enterRender( );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_INVALIDATE ) )
 		{
-			eglView.finishRender( );
+			m_eglView.finishRender( );
 		}
 		else
 		{

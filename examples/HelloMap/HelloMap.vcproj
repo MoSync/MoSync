@@ -207,6 +207,10 @@
 				RelativePath=".\HelloMapScreen.h"
 				>
 			</File>
+			<File
+				RelativePath=".\MAHeaders.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
