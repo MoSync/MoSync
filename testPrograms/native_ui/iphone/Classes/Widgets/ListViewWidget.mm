@@ -51,7 +51,8 @@
 		child = lvcw;
 	}
 	
-	[tableView addView: [child getView]];	
+	[tableView addView: [child getView]];
+	[view reloadData];
 }
 
 - (void)removeChild: (IWidget*)child {
