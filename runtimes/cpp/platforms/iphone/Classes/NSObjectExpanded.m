@@ -8,6 +8,11 @@
 
 #import "NSObjectExpanded.h"
 
+@interface FIXCATEGORYBUG_NSObjectExpanded
+@end
+@implementation FIXCATEGORYBUG_NSObjectExpanded
+@end
+
 
 @implementation NSObject (NSObjectExpanded)
 
