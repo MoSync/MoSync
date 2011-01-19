@@ -60,6 +60,7 @@
 		858B408B12E6824C0058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
 		858B408F12E682BE0058DBFC /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
+		858B432012E7325F0058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -69,7 +70,6 @@
 		85BF2B29113403FD00BB0201 /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
 		85BF2B3F1134047400BB0201 /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
 		85BF2B401134047400BB0201 /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
-		85BF2B43113404A800BB0201 /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
 		85BF2B47113404E000BB0201 /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
 		85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
 		85BF2B5F1134052300BB0201 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
@@ -120,7 +120,6 @@
 		85F2551E11AC12DE00EB47EE /* server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B24113403FD00BB0201 /* server.cpp */; };
 		85F2551F11AC12DE00EB47EE /* intutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B341134047400BB0201 /* intutil.cpp */; };
 		85F2552011AC12DE00EB47EE /* TranslatePanic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B3A1134047400BB0201 /* TranslatePanic.cpp */; };
-		85F2552111AC12DE00EB47EE /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B42113404A800BB0201 /* log.cpp */; };
 		85F2552211AC12DE00EB47EE /* net.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B45113404E000BB0201 /* net.cpp */; };
 		85F2552311AC12DE00EB47EE /* base_errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B481134052300BB0201 /* base_errors.cpp */; };
 		85F2552411AC12DE00EB47EE /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B4A1134052300BB0201 /* FileStream.cpp */; };
@@ -196,6 +195,7 @@
 		857B025512C62F5600DEA306 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		85883DEA12DDBB4500EDD04B /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.h; sourceTree = SOURCE_ROOT; };
 		85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GLViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.mm; sourceTree = SOURCE_ROOT; };
+		858B431F12E7325F0058DBFC /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = impl/log.cpp; sourceTree = "<group>"; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
@@ -229,7 +229,6 @@
 		85BF2B3B1134047400BB0201 /* TranslatePanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TranslatePanic.h; path = ../../../../intlibs/helpers/TranslatePanic.h; sourceTree = SOURCE_ROOT; };
 		85BF2B3D1134047400BB0201 /* TranslateSyscall.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TranslateSyscall.h; path = ../../../../intlibs/helpers/TranslateSyscall.h; sourceTree = SOURCE_ROOT; };
 		85BF2B3E1134047400BB0201 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../../../../intlibs/helpers/types.h; sourceTree = SOURCE_ROOT; };
-		85BF2B42113404A800BB0201 /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = ../../../../intlibs/helpers/platforms/linux/log.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B44113404E000BB0201 /* net_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = net_errors.h; path = ../../../../intlibs/net/net_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B45113404E000BB0201 /* net.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = net.cpp; path = ../../../../intlibs/net/net.cpp; sourceTree = SOURCE_ROOT; };
 		85BF2B46113404E000BB0201 /* net.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = net.h; path = ../../../../intlibs/net/net.h; sourceTree = SOURCE_ROOT; };
@@ -483,6 +482,7 @@
 		85BF2B0C1134036D00BB0201 /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				858B431F12E7325F0058DBFC /* log.cpp */,
 				850943291185AF87004A3B2D /* SyscallImpl.mm */,
 				85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */,
 				853985D9116CF423000521C0 /* CMGlyphDrawing.h */,
@@ -609,7 +609,6 @@
 		85BF2B2B1134043B00BB0201 /* platform */ = {
 			isa = PBXGroup;
 			children = (
-				85BF2B42113404A800BB0201 /* log.cpp */,
 			);
 			name = platform;
 			sourceTree = "<group>";
@@ -823,7 +822,6 @@
 				85BF2B29113403FD00BB0201 /* server.cpp in Sources */,
 				85BF2B3F1134047400BB0201 /* intutil.cpp in Sources */,
 				85BF2B401134047400BB0201 /* TranslatePanic.cpp in Sources */,
-				85BF2B43113404A800BB0201 /* log.cpp in Sources */,
 				85BF2B47113404E000BB0201 /* net.cpp in Sources */,
 				85BF2B5E1134052300BB0201 /* base_errors.cpp in Sources */,
 				85BF2B5F1134052300BB0201 /* FileStream.cpp in Sources */,
@@ -872,6 +870,7 @@
 				85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */,
 				85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */,
 				85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */,
+				858B432012E7325F0058DBFC /* log.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -913,7 +912,6 @@
 				85F2551E11AC12DE00EB47EE /* server.cpp in Sources */,
 				85F2551F11AC12DE00EB47EE /* intutil.cpp in Sources */,
 				85F2552011AC12DE00EB47EE /* TranslatePanic.cpp in Sources */,
-				85F2552111AC12DE00EB47EE /* log.cpp in Sources */,
 				85F2552211AC12DE00EB47EE /* net.cpp in Sources */,
 				85F2552311AC12DE00EB47EE /* base_errors.cpp in Sources */,
 				85F2552411AC12DE00EB47EE /* FileStream.cpp in Sources */,

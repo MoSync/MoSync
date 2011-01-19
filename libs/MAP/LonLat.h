@@ -213,10 +213,8 @@ namespace MAP
 		/*
 		 * tests if LonLat is invalid
 		 */
-		bool isValid( ) const
-		{
-			return lon != 0 && lat != 0;
-		}
+		bool isValid( ) const;
+		
 		//
 		// Convert tile lower left corner plus pixel offset to WGS84 lat/lon.
 		//

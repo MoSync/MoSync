@@ -187,6 +187,28 @@ namespace Base {
 		uint getResmemMax() const { return mResmemMax; }
 		uint getResmem() const { return mResmem; }
 #endif
+		
+		void logEverything() {
+#define RESOURCE_STRINGS(R, T, D) #R,
+			
+			const char *resourceStrings[] = {
+				TYPES(RESOURCE_STRINGS)
+			};
+			
+			LOG("Num static resources: %d\n", mN);
+			LOG("Num dynamic resources: %d\n", dynResSize);
+			for(unsigned int i = 0; i < mN; i++) {
+				byte type = mTypes[i];
+				LOG("Static resource %d is of type %s\n", i, resourceStrings[type]);
+			}
+			
+			for(unsigned int i = 0; i < dynResSize; i++) {
+				byte type = dynResTypes[i];
+				LOG("Dynamic resource %d is of type %s\n", i, resourceStrings[type]);
+			}
+			
+			
+		}
 
 	private:
 
