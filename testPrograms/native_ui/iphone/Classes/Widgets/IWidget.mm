@@ -113,7 +113,7 @@
 	fillWidth = 0;
 	fillHeight = 0;
 	[view sizeToFit]; 
-	
+		
 	return self;
 }
 
@@ -249,7 +249,7 @@
 	//[view sizeToFit];
 	
 	//[view setNeedsLayout];
-	[view setNeedsDisplay];
+	//[view setNeedsDisplay];
 	for (IWidget *child in children)
     {
 		[child layout];

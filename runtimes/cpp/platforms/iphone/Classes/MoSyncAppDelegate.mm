@@ -18,7 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
 
-#include "MoSyncUISyscalls.h"
+//#include "MoSyncUISyscalls.h"
+void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 
 //#include "Platform.h"
 //#import "MoSyncMain.h"
