@@ -62,7 +62,7 @@ bool convertInstanceToImageFormat(const IconInstance *iconInstance,
 		batik << "java -jar \""<<mosyncdir<<"/bin/Batik/batik-rasterizer.jar\""
 			" "<<src<<" -d \""<<dstFilename<<"\"";
 		if(size != "default") {
-			size_t n;
+			unsigned int n;
 			unsigned w, h;
 			int res = sscanf(size.c_str(), "%ux%u%n", &w, &h, &n);
 			if(res != 2 || n != size.size())
