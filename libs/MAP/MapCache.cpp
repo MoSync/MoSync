@@ -28,19 +28,6 @@ namespace MAP
 {
 	MapCache* MapCache::sSingleton = NULL;
 
-	//=========================================================================
-	class MapCacheClientData : public MapSourceClientData
-	//=========================================================================
-	{
-	public:
-		MapCacheClientData( IMapCacheListener* listener ) 
-			: mListener( listener ) 
-		{
-		}
-
-		IMapCacheListener*	mListener;
-	};
-
 	static const int DefaultCapacity = 40;
 
 	//-------------------------------------------------------------------------
@@ -151,8 +138,7 @@ namespace MAP
 	//
 	// Requests tiles to cover specified rectangle
 	//
-	void MapCache::requestTiles(	IMapCacheListener* listener,
-									MapSource *source,
+	void MapCache::requestTiles(	MapSource *source,
 									const LonLat centerpoint,
 									const int magnification,
 									const int pixelWidth,
@@ -181,7 +167,7 @@ namespace MAP
 			//
 			LonLat cp = LonLat( centerpoint.lon, centerpoint.lat + 40 );
 			MapTileCoordinate tileXY = source->lonLatToTile( centerpoint, magnification );
-			source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
+			source->requestTile( this, tileXY );
 			return;
 		}
 
@@ -228,7 +214,7 @@ namespace MAP
 					mHits++;
 					MapTile* t = mList[loc];
 					t->stamp( );
-					listener->tileReceived( this, t );
+					onTileReceived( t, true );
 					continue;
 				}
 				else
@@ -238,9 +224,10 @@ namespace MAP
 				// Not in cache: request from map source.
 				//
 				mMisses++;
-				source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
+				source->requestTile( this, tileXY );
 			}
 		}
+		source->requestJobComplete( this );
 	}
 
 	//-------------------------------------------------------------------------
@@ -291,10 +278,9 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapCache::tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* cd )
+	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		MapCacheClientData* clientData = (MapCacheClientData*)cd;
 		//
 		// Add to cache in free location
 		//
@@ -315,8 +301,9 @@ namespace MAP
 		tile->stamp( );
 		mList[loc] = tile;
 
-		IMapCacheListener* listener = clientData->mListener;
-		listener->tileReceived( this, tile );
+		//IMapCacheListener* listener = clientData->mListener;
+		//listener->tileReceived( this, tile );
+		onTileReceived( tile, false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -336,6 +323,13 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	void MapCache::jobComplete( MapSource* source )
+	//-------------------------------------------------------------------------
+	{
+		onJobComplete( );
+	}
+
+	//-------------------------------------------------------------------------
 	//
 	// Deletes all tiles in cache.
 	//
@@ -345,4 +339,24 @@ namespace MAP
 		for ( int i = 0; i < mCapacity; i++ )
 			deleteobject( mList[i] );
 	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onTileReceived( MapTile* tile, bool foundInCache )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->tileReceived( this, tile, foundInCache );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onJobComplete( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->jobComplete( this );
+	}
+
+
 }

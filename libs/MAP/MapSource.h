@@ -29,6 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MapTile.h"
 #include "Queue.h"
+#include "Broadcaster.h"
 
 using namespace MAUtil;
 
@@ -42,27 +43,16 @@ namespace MAP
 
 	//=========================================================================
 	/**
-	 * \brief Abstract base class for client data.
-	 * Client must subclass this.
-	 */
-	class MapSourceClientData
-	//=========================================================================
-	{
-	public:
-		virtual			~MapSourceClientData( ) { };
-	};
-
-	//=========================================================================
-	/**
 	 * \brief Listener for MapSource client to implement.
 	 */
 	class IMapSourceListener
 	//=========================================================================
 	{
 	public:
-		virtual void	tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData ) = 0;
+		virtual void	tileReceived( MapSource* sender, MapTile* tile ) = 0;
 		virtual void	downloadCancelled( MapSource* sender ) = 0;
 		virtual void	error( MapSource* source, int code ) = 0;
+		virtual void	jobComplete( MapSource* source ) = 0;
 	};
 
 	//=========================================================================
@@ -124,7 +114,11 @@ namespace MAP
 		/**
 		 * Returns all tiles required to cover specified rectangle around centerpoint.
 		 */
-		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData );
+		void						requestTile( IMapSourceListener* listener, const MapTileCoordinate tileXY );
+		/*
+		 * Adds a job complete entry to queue, so client can be notified when a sequence of tiles has been delivered.
+		 */
+		void						requestJobComplete( IMapSourceListener* listener );
 		/**
 		 * Clears any queued requests
 		 */
@@ -158,6 +152,13 @@ namespace MAP
 		//
 		//
 		void						removeDownloader( MapSourceImageDownloader* downloader );
+		//
+		// Event notifiers
+		//
+		void						onJobComplete( IMapSourceListener* listener );
+		void						onTileReceived( IMapSourceListener* listener, MapTile* tile );
+		void						onDownloadCancelled( IMapSourceListener* listener );
+		void						onError( IMapSourceListener* listener, int code );
 
 		MapSourceQueue*				mQueue;
 		MapSourceImageDownloader*	mDownloaders[Downloaders];

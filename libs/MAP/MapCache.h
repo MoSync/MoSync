@@ -47,7 +47,11 @@ namespace MAP
 		/**
 		 * Called when a requested tile has been received into cache from map source.
 		 */
-		virtual void tileReceived( MapCache* sender, MapTile* tile ) = 0;
+		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache ) = 0;
+		/**
+		 * Called when a tile job is completed.
+		 */
+		virtual void jobComplete( MapCache* sender ) = 0;
 	};
 
 	//=========================================================================
@@ -55,7 +59,8 @@ namespace MAP
 	 * \brief Manages map caches for clients to access.
 	 * Implemented as singleton.
 	 */
-	class MapCache : IMapSourceListener
+	class MapCache : IMapSourceListener,
+		public Broadcaster<IMapCacheListener>
 	//=========================================================================
 	{
 	private:
@@ -77,7 +82,7 @@ namespace MAP
 		 * Requests tiles to cover specified rectangle, in pixels,
 		 * around a centerpoint.
 		 */
-		void requestTiles( IMapCacheListener* listener, MapSource* source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
+		void requestTiles( MapSource* source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
 		/**
 		 * Frees all tiles in cache.
 		 */
@@ -85,9 +90,10 @@ namespace MAP
 		//
 		// IMapSourceListener implementation
 		//
-		void tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData );
+		void tileReceived( MapSource* sender, MapTile* tile );
 		void downloadCancelled( MapSource* sender );
 		void error( MapSource* source, int code );
+		void jobComplete( MapSource* source );
 		//
 		// Capacity property
 		//
@@ -113,6 +119,9 @@ namespace MAP
 		 * Reallocates cache. Content is cleared.
 		 */
 		void reallocateCache( int capacity );
+
+		void onTileReceived( MapTile* tile, bool foundInCache );
+		void onJobComplete( );
 
 		MapTile** mList;
 		int mHits;

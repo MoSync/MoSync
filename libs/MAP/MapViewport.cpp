@@ -37,6 +37,7 @@ namespace MAP
 	// Configuration
 	//
 	static const bool UseAggregatedTime = true;
+	static const bool OnlyUpdateWhenJobComplete = false;
 	//
 	// Pan smoothing time = PanInterval * PanAveragePoints
 	//
@@ -279,12 +280,14 @@ namespace MAP
 	{
 		mIdleListener = newobject( MapViewportIdleListener, new MapViewportIdleListener( this ) );
 		Environment::getEnvironment( ).addIdleListener( mIdleListener );
+		MapCache::get( )->addListener( this );
 	}
 
 	//-------------------------------------------------------------------------
 	MapViewport::~MapViewport( )
 	//-------------------------------------------------------------------------
 	{
+		MapCache::get( )->removeListener( this );
 		if ( mHasTimer )
 			Environment::getEnvironment( ).removeIdleListener( mIdleListener );
 		deleteobject( mIdleListener );
@@ -441,7 +444,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::tileReceived( MapCache* sender, MapTile* tile )
+	void MapViewport::tileReceived( MapCache* sender, MapTile* tile, bool foundInCache )
 	//-------------------------------------------------------------------------
 	{
 		if ( mInDraw )
@@ -470,12 +473,29 @@ namespace MAP
 		}
 		else
 		{
-			#ifndef WIN32
-			
-			Gfx_notifyImageUpdated( tile->getImage( ) );
+			if ( !OnlyUpdateWhenJobComplete )
+			{
+				#ifndef WIN32
+				
+				if ( !foundInCache ) 
+					Gfx_notifyImageUpdated( tile->getImage( ) );
 
-			#endif
-			
+				#endif
+				
+				//
+				// notify client that update is needed
+				//
+				onViewportUpdated( );
+			}
+		}
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::jobComplete( MapCache* sender )
+	//-------------------------------------------------------------------------
+	{
+		if ( OnlyUpdateWhenJobComplete )
+		{
 			//
 			// notify client that update is needed
 			//
@@ -505,7 +525,7 @@ namespace MAP
 		//
 		// Draw available tiles
 		//
-		MapCache::get( )->requestTiles( this, mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
 		//
 		// Let subclass draw its overlay
 		//
@@ -627,7 +647,7 @@ namespace MAP
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
 		//
-		MapCache::get( )->requestTiles( this, mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
 	}
 
 	//-------------------------------------------------------------------------

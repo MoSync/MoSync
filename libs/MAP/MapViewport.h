@@ -168,7 +168,8 @@ namespace MAP
 		//
 		// IMapCacheListener implementation
 		//
-		virtual void tileReceived( MapCache* sender, MapTile* tile );
+		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache );
+		virtual void jobComplete( MapCache* sender );
 		/**
 		 * Converts from global map pixels to viewport pixels.
 		 */
