@@ -47,7 +47,7 @@ namespace MAP
 		//
 		// MapSource overrides
 		//
-		MAExtent getTileSize( ) const			
+		int getTileSize( ) const			
 		{ 
 			return 256; 
 		}

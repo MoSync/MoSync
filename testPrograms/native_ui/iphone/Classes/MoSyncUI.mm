@@ -95,19 +95,26 @@ UIViewController *mainController;
 
 bool nativeUIEnabled = false;
 
+static IWidget* sOldScreen = nil;
+
+
 - (void)show: (IWidget*) widget {
 	if(!nativeUIEnabled) {
 		if(mainController)
 			[mainController.view removeFromSuperview];
 		nativeUIEnabled = true;
-	}	
-	[mainWindow addSubview:[widget getView]];
-	//[mainWindow addSubview:[[self getWidget:0] getView]];
+	}
 	
-//	[mainWindow insertSubview:[widget getView] atIndex: 0];
-   // [mainWindow makeKeyAndVisible];
-	//mainWindow.frame = [[UIScreen mainScreen] bounds];
-
+	if(sOldScreen != nil) {
+		UIView* actualView = [sOldScreen getView];
+		[actualView removeFromSuperview];
+	}
+	
+	[mainWindow insertSubview:[widget getView] atIndex:0];
+	
+	[widget layout];
+	[mainWindow makeKeyAndVisible];
+	sOldScreen = widget;	
 }
 
 @end

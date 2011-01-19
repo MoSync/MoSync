@@ -24,14 +24,14 @@
 	//controller.view = view;
 	controller.title = @"";
 	view = controller.view;
-	//view.frame = [[UIScreen mainScreen] bounds];
+	view.bounds = [[UIScreen mainScreen] bounds];
 	
 	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
-	if(!parent)
-		[child getView].frame = [[UIScreen mainScreen] bounds];
+//	if(!parent)
+//		[child getView].frame = [[UIScreen mainScreen] bounds];
 	
 	[super addChild:child];	
 }
@@ -71,6 +71,23 @@
 
 - (UIViewController*) getController {
 	return controller;
+}
+
+- (void)layout {
+	int viewWidth = view.frame.size.width; 
+	int viewHeight = view.frame.size.height; 
+
+	
+	//[view setNeedsLayout];
+	//[view setNeedsDisplay];
+	for (IWidget *child in children)
+    {
+		UIView* childView = [child getView];
+		[childView setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];		
+		
+		[child layout];
+		
+	}	
 }
 
 @end

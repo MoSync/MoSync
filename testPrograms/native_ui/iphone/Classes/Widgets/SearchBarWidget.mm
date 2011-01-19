@@ -7,15 +7,46 @@
 //
 
 #import "SearchBarWidget.h"
+
+#ifndef NATIVE_TEST
+#include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
 
 @implementation SearchBarWidget
 
+- (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+	
+	[searchBar resignFirstResponder];
+	
+#ifndef NATIVE_TEST
+	MAEvent *event = new MAEvent;
+	event->type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->widgetHandle = handle;
+	event->data = eventData;
+	Base::gEventQueue.put(*event);
+#endif	
+}
+
+
 - (id)init {
-	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, 100, 30)] retain];
+	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
+	searchBar.placeholder = @"Search";
+	[searchBar becomeFirstResponder];
+	
 	view = searchBar;			
-	return [super init];
+	id ret = [super init];
+	[searchBar setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+	view.autoresizesSubviews = YES;
+	searchBar.showsCancelButton = YES;
+	searchBar.delegate = self;
+	
+	return ret;
 }
 
 - (void)addChild: (IWidget*)child {
@@ -26,7 +57,11 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"image"]) {
+	if([key isEqualToString:@"text"]) {
+		searchBar.text = value;
+	}
+	else if([key isEqualToString:@"placeholder"]) {
+		searchBar.placeholder = value;
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -35,6 +70,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
+	if([key isEqualToString:@"text"]) {
+		return searchBar.text;
+	}	
 	
 	return [super getPropertyWithKey:key];
 }

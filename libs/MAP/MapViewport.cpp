@@ -36,12 +36,12 @@ namespace MAP
 	//
 	// Configuration
 	//
-
+	static const bool UseAggregatedTime = true;
 	//
 	// Pan smoothing time = PanInterval * PanAveragePoints
 	//
 	static const int PanInterval = 30;
-	static const int PanAveragePoints = 8;
+	static const int PanAveragePoints = 3;
 	static const double Tension = 4.0;
 	static const double PanFriction = 0.60;
 	static const double GlideFriction = 0.02;
@@ -80,6 +80,9 @@ namespace MAP
 		//---------------------------------------------------------------------
 		{
 			int currentTime = maGetMilliSecondCount( );
+			//
+			// Delta is time since previous idle event
+			//
 			int delta = currentTime - mPanTime;
 			if ( delta < PanInterval )
 				return;
@@ -93,7 +96,17 @@ namespace MAP
 				//
 				// Reduce momentum by friction
 				//
-				int time = currentTime - mGlideStartTime;
+				if ( UseAggregatedTime )
+					mGlideDelta += PanInterval;
+				//
+				// time is elapsed time since glide started
+				//
+				int time = UseAggregatedTime ? 
+					mGlideDelta : 
+					currentTime - mGlideStartTime;
+
+			#ifndef DeltaMomentum
+
 				double frictionFactor = pow( 1.0 - GlideFriction, 1.0 + (double)time / 1000 );
 				mMomentumX = mMomentumX * frictionFactor;
 				mMomentumY = mMomentumY * frictionFactor;
@@ -102,12 +115,31 @@ namespace MAP
 				//
 				// calc new location based on momentum
 				//
+				int interval = UseAggregatedTime ? PanInterval : delta;
 				mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
-																	(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001 * mMomentumX * delta ),
-																	(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001 * mMomentumY * delta ) );
+																	(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001 * mMomentumX * interval + 0.5 ),
+																	(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001 * mMomentumY * interval + 0.5 ) );
 				//mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
 				//													(int)( mViewport->mCenterPositionPixels.getX( ) + 0.000001 * mMomentumX * time * time ),
 				//													(int)( mViewport->mCenterPositionPixels.getY( ) + 0.000001 * mMomentumY * time * time ) );
+
+			#else
+
+				// d = d0 + v0t + at2/2
+
+				//double invtime = 1000000.0 / time / time;
+				double t = 0.001 * time;
+				DebugPrintf( "t: %f delta: %d %d\n", 
+					t, 
+					(int)(mMomentumX * t - 5 * t * t / 2 + 0.5), 
+					(int)(mMomentumY * t - 5 * t * t / 2 + 0.5) );
+
+				mViewport->mCenterPositionPixels = PixelCoordinate(	
+					mViewport->getMagnification( ),
+					(int)( mGlideStartPixels.getX( ) + mMomentumX * t - 5000 * t * t / 2 + 0.5 ),
+					(int)( mGlideStartPixels.getY( ) + mMomentumY * t - 5000 * t * t / 2 + 0.5 ) );
+
+			#endif
 
 				mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
 
@@ -133,7 +165,6 @@ namespace MAP
 					mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
 					//DebugPrintf( "At target: %d\n", currentTime );
 				}
-
 			}
 			else
 			{
@@ -158,15 +189,15 @@ namespace MAP
 					sumx += px[i];
 					sumy += py[i];
 				}
-				int x = sumx / points;
-				int y = sumy / points;
+				int x = (int)( (double)sumx / points + 0.5 );
+				int y = (int)( (double)sumy / points + 0.5 );
 				PixelCoordinate newXy = PixelCoordinate( mViewport->getMagnification( ), x, y );
 
 				mViewport->mCenterPositionPixels = newXy;
 				mViewport->mCenterPositionLonLat = LonLat( mViewport->mCenterPositionPixels );
 
-				mMomentumX = ( newXy.getX( ) - prevCenterPix.getX( ) ) * 1000 / delta;
-				mMomentumY = ( newXy.getY( ) - prevCenterPix.getY( ) ) * 1000 / delta;
+				mMomentumX = (double)( newXy.getX( ) - prevCenterPix.getX( ) ) * 1000 / delta;
+				mMomentumY = (double)( newXy.getY( ) - prevCenterPix.getY( ) ) * 1000 / delta;
 
 				//DebugPrintf( "Momentum: %f, %f\n", mMomentumX, mMomentumY );
 				//
@@ -197,6 +228,9 @@ namespace MAP
 		{
 			mGliding = true;
 			mGlideStartTime = maGetMilliSecondCount( );
+			mGlideDelta = 0;
+			mGlideStartPixels = mViewport->getCenterPositionPixels( );
+
 		}
 
 		//---------------------------------------------------------------------
@@ -215,7 +249,9 @@ namespace MAP
 		MapViewport* mViewport;
 		int mPanTime;
 		int mGlideStartTime;
+		int mGlideDelta;
 		bool mGliding;
+		PixelCoordinate mGlideStartPixels;
 
 		int px[PanAveragePoints];
 		int py[PanAveragePoints];
@@ -340,6 +376,32 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		setCenterPosition( position, mMagnification, immediate, isPointerEvent );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight )
+	//-------------------------------------------------------------------------
+	{
+		//
+		// Find proper magnification
+		//
+		MapSource* source = getMapSource( );
+		int magnification = source->getMagnificationMax( );
+		while( magnification > source->getMagnificationMin( ) )
+		{
+			PixelCoordinate llPx = lowerLeft.toPixels( magnification );
+			PixelCoordinate urPx = upperRight.toPixels( magnification );
+			if (	urPx.getX( ) - llPx.getX( ) < getWidth( ) &&
+					urPx.getY( ) - llPx.getY( ) < getHeight( ) )
+				break;
+			magnification--;
+		}
+		PixelCoordinate lowerLeftPx = lowerLeft.toPixels( magnification );
+		PixelCoordinate upperRightPx = upperRight.toPixels( magnification );
+		LonLat center = LonLat( PixelCoordinate( magnification, 
+												( lowerLeftPx.getX( ) + upperRightPx.getX( ) ) / 2,
+												( lowerLeftPx.getY( ) + upperRightPx.getY( ) ) / 2 ) );
+		setCenterPosition( center, magnification, true, false );
 	}
 
 	//-------------------------------------------------------------------------

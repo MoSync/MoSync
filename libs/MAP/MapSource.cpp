@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <maapi.h>
 #include "MapSource.h"
 #include "MapTileCoordinate.h"
+#include "TraceScope.h"
 
 namespace MAP
 {
@@ -157,6 +158,9 @@ namespace MAP
 		virtual	~MapSourceQueue( ) { }
 	};
 
+	int createdDownloaders;
+	int busyDownloaders;
+
 	//-------------------------------------------------------------------------
 	//
 	// Creates a new map source
@@ -185,9 +189,15 @@ namespace MAP
 			if ( mDownloaders[i] != NULL )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+					busyDownloaders--;
+					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
+				createdDownloaders++;
+				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
 			}
 		}
 	}
@@ -199,6 +209,7 @@ namespace MAP
 	void MapSource::requestTile( MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope tr = TraceScope( "MapSource::requestTile" );
 		if ( !isInQueue( tileXY ) )
 		{
 			MapSourceInnerClientData* icd = newobject( MapSourceInnerClientData, new MapSourceInnerClientData( listener, clientData ) );
@@ -250,7 +261,11 @@ namespace MAP
 			if ( mDownloaders[i] == downloader )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+					busyDownloaders--;
+					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
 				break;
@@ -265,8 +280,13 @@ namespace MAP
 		int slot = findUnusedSlot( protectedDownloader );
 		if ( slot != -1 )
 		{
-			mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
-			mDownloaders[slot]->addDownloadListener( this );
+			if ( mDownloaders[slot] == NULL )
+			{
+				mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
+				mDownloaders[slot]->addDownloadListener( this );
+				createdDownloaders++;
+				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
+			}
 			dequeueNextJob( mDownloaders[slot] );
 		}
 	}
@@ -275,6 +295,8 @@ namespace MAP
 	void MapSource::finishedDownloading( Downloader* downloader, MAHandle data )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope ts = TraceScope( "MapSource::finishedDownloading" );
+
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
 		mTileCount++;
@@ -288,19 +310,23 @@ namespace MAP
 		//
 		dlr->setClientData( NULL );
 		deleteobject( clientData );
+
+		busyDownloaders--;
+		//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 		//
 		// NOTE: The reason we're not deleting the downloader here is that
 		// it's referenced on return from this call.
 		// So we have to defer deletion until either a new slot is requested, or
 		// when deleting this MapSource.
 		//
-		dequeueIfIdleSlot( dlr );
+		dequeueIfIdleSlot( /*dlr*/NULL );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
+		//TraceScope tr = TraceScope( "MapSource::downloadCancelled" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 		clientData->mListener->downloadCancelled( this );
@@ -310,6 +336,7 @@ namespace MAP
 	void MapSource::error( Downloader* downloader, int code )
 	//-------------------------------------------------------------------------
 	{
+		TraceScope tr = TraceScope( "MapSource::error" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 		clientData->mListener->error( this, code );
@@ -331,8 +358,8 @@ namespace MAP
 				//
 				// Release to make slot available.
 				//
-				mDownloaders[i]->removeDownloadListener( this );
-				deleteobject( mDownloaders[i] );
+				//mDownloaders[i]->removeDownloadListener( this );
+				//deleteobject( mDownloaders[i] );
 				return i;
 			}
 		}
@@ -355,7 +382,9 @@ namespace MAP
 		// downloader now owns clientdata
 		entry->setClientData( NULL );
 		int res = downloader->beginDownloading( url, 0 );
-		
+		busyDownloaders++;
+		//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 

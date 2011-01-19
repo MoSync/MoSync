@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "LonLat.h"
 #include "MapTileCoordinate.h"
 #include "DebugPrintf.h"
+#include "TraceScope.h"
 
 namespace MAP
 {
@@ -69,7 +70,7 @@ namespace MAP
 		mMisses( 0 ),
 		mCapacity( DefaultCapacity )
 	{
-		reallocateCache( );
+		reallocateCache( mCapacity );
 	}
 
 	//-------------------------------------------------------------------------
@@ -95,8 +96,7 @@ namespace MAP
 	void MapCache::setCapacity( int capacity ) 
 	//-------------------------------------------------------------------------
 	{ 
-		mCapacity = capacity; 
-		reallocateCache( ); 
+		reallocateCache( capacity ); 
 	}
 
 	//-------------------------------------------------------------------------
@@ -117,7 +117,7 @@ namespace MAP
 	//
 	// Reallocates cache, content is flushed
 	//
-	void MapCache::reallocateCache( )
+	void MapCache::reallocateCache( int capacity )
 	//-------------------------------------------------------------------------
 	{
 		//
@@ -128,6 +128,10 @@ namespace MAP
 			clear( );
 			deleteobject( mList );
 		}
+		//
+		// Set new capacity
+		//
+		mCapacity = capacity;
 		//
 		// Alloc new
 		//
@@ -157,6 +161,8 @@ namespace MAP
 	{
 		DebugAssert( pixelWidth > 0 );
 		DebugAssert( pixelHeight > 0 );
+
+		//TraceScope ts = TraceScope( "MapCache::requestTiles" );
 
 		if ( source == NULL ) 
 			return;
@@ -245,7 +251,10 @@ namespace MAP
 		{
 			const MapTile* t = mList[i];
 			if ( t != NULL )
-				if ( t->getMapSource( ) == source && t->getGridX( ) == tileXY.getX( ) && t->getGridY( ) == tileXY.getY( ) && t->getMagnification( ) == tileXY.getMagnification( ) )
+				if (	t->getMapSource( ) == source && 
+						t->getGridX( ) == tileXY.getX( ) && 
+						t->getGridY( ) == tileXY.getY( ) && 
+						t->getMagnification( ) == tileXY.getMagnification( ) )
 					return i;
 		}
 		return -1;

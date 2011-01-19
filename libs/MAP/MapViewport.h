@@ -177,6 +177,10 @@ namespace MAP
 		 * Converts from viewport pixels to global map pixels.
 		 */
 		PixelCoordinate viewportToWorldPixel( MAPoint2d pt );
+		/*
+		 *  Positions and scales map to show specificed rectangle
+		 */
+		void centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight );
 
 		int getWidth( ) const { return mWidth; }
 		int getHeight( ) const { return mHeight; }

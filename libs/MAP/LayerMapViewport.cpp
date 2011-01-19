@@ -422,6 +422,8 @@ namespace MAP
 		for ( int i = 0; i < mLayers.size( ); i++ )
 		{
 			Layer* layer = mLayers[i];
+			if ( ! layer->getEnabled( ) )
+				continue;
 			//Layer* layer = mLayers[mSelectedLayer];
 
 			//if ( !layer->isVisible( ) )
@@ -462,7 +464,8 @@ namespace MAP
 		{
 			//LonLat itemLoc = item->getLocation( );
 			LonLat itemLoc = layer->getSelectedItemLocation( );
-			setCenterPosition( itemLoc, false, false );
+			if ( itemLoc.isValid ( ) )
+				setCenterPosition( itemLoc, false, false );
 		}
 #if 0 // niklas: always false
 		else

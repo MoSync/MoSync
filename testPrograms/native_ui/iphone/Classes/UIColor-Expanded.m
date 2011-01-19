@@ -1,5 +1,10 @@
 #import "UIColor-Expanded.h"
 
+@interface FIXCATEGORYBUG_UIColor_Expanded
+@end
+@implementation FIXCATEGORYBUG_UIColor_Expanded
+@end
+
 /*
  
  Thanks to Poltras, Millenomi, Eridius, Nownot, WhatAHam, jberry,

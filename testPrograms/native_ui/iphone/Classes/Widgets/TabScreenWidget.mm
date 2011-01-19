@@ -8,8 +8,39 @@
 
 #import "TabScreenWidget.h"
 
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#endif
 
 @implementation TabScreenWidget
+
+
+-(void)tabBarController:(UITabBarController*)tabBarController didSelectViewController:(UIViewController*)viewController {
+	MAHandle controllerHandle = 0;
+	NSUInteger index = 0;
+	for (UIViewController *child in tabBarController.viewControllers)
+    {
+		if(child == viewController) {
+			controllerHandle = [[children objectAtIndex:index] getWidgetHandle];
+			break;
+		}
+		index++;
+	}
+
+#ifndef NATIVE_TEST
+	MAEvent *event = new MAEvent;
+	event->type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = WIDGET_EVENT_TAB_CHANGED;
+	eventData->widgetHandle = handle;
+	event->data = eventData;
+	Base::gEventQueue.put(*event);
+#endif		
+	
+	
+}
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -18,8 +49,9 @@
 	tabBarController.viewControllers = [NSArray array];	
 	//view = controller.view;
 	//controller.view = view;
+	tabBarController.delegate = self;
 	
-	return [super init];
+	return [super init];	
 }
 
 - (void)addChild: (IWidget*)child {
@@ -32,12 +64,12 @@
 	//[super addChild:child];
 	[super addChild:child andSubview:NO];
 	
-	UIView *childView = [screen getView];
-	
-	CGRect oldFrame = [[UIScreen mainScreen] bounds];	
-	int tabBarHeight = tabBarController.tabBar.frame.size.height;
-	int newHeight = oldFrame.size.height - tabBarHeight;
-	[childView setFrame: CGRectMake(oldFrame.origin.x, oldFrame.origin.y + tabBarHeight, oldFrame.size.width, newHeight)];
+	//UIView *childView = [screen getView];	
+	//[childView setFrame: view.frame];
+
+	view.autoresizesSubviews = YES;	
+	[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+
 }
 
 - (void)removeChild: (IWidget*)child {
@@ -67,6 +99,26 @@
 
 - (UIViewController*) getController {
 	return controller;
+}
+
+- (void)layout {
+	UITabBarController* tabBarController = (UITabBarController*)controller;
+	
+	int tabBarHeight = tabBarController.tabBar.bounds.size.height;
+	int viewWidth = view.frame.size.width; 
+	int viewHeight = view.frame.size.height - tabBarHeight; 
+	
+	
+	//[view setNeedsLayout];
+	//[view setNeedsDisplay];
+	for (IWidget *child in children)
+    {
+		UIView* childView = [child getView];
+		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];		
+		
+		[child layout];
+		
+	}	
 }
 
 @end

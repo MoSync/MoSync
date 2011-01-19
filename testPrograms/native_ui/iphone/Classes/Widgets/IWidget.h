@@ -8,9 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "AbstractLayoutView.h"
 
 #define MA_WIDGET_ERROR -1
 #define MA_WIDGET_OK 0
+
+@interface AbstractLayoutView (AbstractLayoutViewExpanded)
+- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
+- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
+@end
+
 
 @interface IWidget : NSObject {
 	UIView* view;
@@ -18,10 +25,13 @@
 	
 	IWidget* parent;
 	NSMutableArray* children;
+	
+	int fillWidth, fillHeight;
 }
 
 - (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
+- (int)getWidgetHandle;
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView;
@@ -33,5 +43,7 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+
+- (void)layout;
 
 @end

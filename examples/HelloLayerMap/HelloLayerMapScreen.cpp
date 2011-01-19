@@ -34,6 +34,10 @@ using namespace MAPUtil;
 
 namespace HelloLayerMap
 {
+	static const int DoubleClickTimeMs = 200;
+	static const int TapPanAcceleration = 1;
+	static const int TapPanIntervalMs = 100;
+
 	//=========================================================================
 	//
 	// The test data source
@@ -298,6 +302,15 @@ namespace HelloLayerMap
 		// Have to wait until we have proper width and height
 		//
 		mMap->setMapSource( mOpenStreetMapSource );
+		//
+		// Map cache size:
+		// add one to width and height for case where viewport is not aligned to tile grid
+		// Multiply by two to get some margin
+		//
+		int tileSize = mOpenStreetMapSource->getTileSize( );
+		int tiles = 2 * ( ( ( width - 1 ) / tileSize ) + 2 ) * ( ( ( height - 1 ) / tileSize ) + 2 );
+		DebugPrintf( "Cache tiles: %d\n", tiles );
+		MapCache::get( )->setCapacity( tiles );
 	}
 
 	//-------------------------------------------------------------------------
@@ -340,6 +353,90 @@ namespace HelloLayerMap
 	//-------------------------------------------------------------------------
 	{
 		(void)mMap->handleKeyRelease( keyCode );
+	}
+
+	bool scrolling = false;
+	int pointerPressX;
+	int pointerPressY;
+	PixelCoordinate pointerPressCenter;
+	int pointerPressTimeMs = -1;
+
+	//-------------------------------------------------------------------------
+	void HelloLayerMapScreen::pointerPressEvent( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		//
+		// Set up tap panning
+		//
+		pointerPressX = p.x;
+		pointerPressY = p.y;
+		pointerPressCenter = mMap->getCenterPositionPixels( );
+		//
+		// set position to stop any movement
+		//
+		mMap->stopGlide( );
+		//
+		// Handle doubletap for app exit
+		//
+		int curTimeMs = maGetMilliSecondCount( );
+		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
+		if ( deltaTimeMs < DoubleClickTimeMs ) 
+		{
+			HelloLayerMapMoblet& moblet = (HelloLayerMapMoblet&)Environment::getEnvironment( );
+			moblet.Terminate( );
+			//mMap->stressTest( );
+		}
+		else
+		{
+			pointerPressTimeMs = curTimeMs;
+		}
+	}
+
+    //-------------------------------------------------------------------------
+    static double clamp( double x, double min, double max )
+    //-------------------------------------------------------------------------
+    {
+            return x < min ? min : x > max ? max : x;
+    }
+
+	int lastPointerMoveMs = -1;
+
+	//-------------------------------------------------------------------------
+	void HelloLayerMapScreen::setPosition( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		int curTimeMs = maGetMilliSecondCount( );
+		int deltaMs = curTimeMs - lastPointerMoveMs;
+		lastPointerMoveMs = curTimeMs;
+		int dx = ( p.x - pointerPressX ) * TapPanAcceleration;
+		int dy = ( p.y - pointerPressY ) * TapPanAcceleration;
+		PixelCoordinate px = PixelCoordinate(	pointerPressCenter.getMagnification( ), 
+												pointerPressCenter.getX( ) - dx,
+												pointerPressCenter.getY( ) + dy );
+        LonLat newPos = LonLat( px );
+        newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+        mMap->setCenterPosition( newPos, false, true );
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloLayerMapScreen::pointerMoveEvent( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		if( scrolling ) 
+			return;
+		int curTimeMs = maGetMilliSecondCount( );
+		if ( curTimeMs < lastPointerMoveMs + TapPanIntervalMs )
+			return;
+		setPosition( p );
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloLayerMapScreen::pointerReleaseEvent( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		scrolling = false;
+		setPosition( p );
+		mMap->startGlide( );
 	}
 
 	//-------------------------------------------------------------------------

@@ -112,7 +112,7 @@ namespace MAP
 		/**
 		 * Reallocates cache. Content is cleared.
 		 */
-		void reallocateCache( );
+		void reallocateCache( int capacity );
 
 		MapTile** mList;
 		int mHits;

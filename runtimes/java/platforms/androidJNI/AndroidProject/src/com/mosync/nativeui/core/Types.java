@@ -35,6 +35,8 @@ public class Types
 	public static final String WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 	public static final String WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 	
+	public static final String WIDGET_PROPERTY_VISIBLE = "visible";
+	
 	public static final String WIDGET_PROPERTY_TEXT = "text";
 	
 	public static final String WIDGET_PROPERTY_TITLE = "title";
@@ -45,6 +47,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_IMAGE = "image";
 	
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
+	public static final String WIDGET_PROPERTY_ALPHA = "alpha";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
 	public static final String WIDGET_PROPERTY_FONT_SIZE = "fontSize";
 	

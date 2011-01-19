@@ -69,11 +69,17 @@ namespace MAP
 		//
 		virtual void getBoundingBox( double& left, double& top, double& right, double& bottom ) = 0;
 		virtual LonLat getSelectedItemLocation( ) = 0;
-
+		//
+		// Layer enabled flag
+		//
+		void setEnabled( bool enabled );
+		bool getEnabled( ) const { return mEnabled; }
 	protected:
 		virtual void onContentChanged( );
+
 	private:
 		String mTitle;
+		bool mEnabled;
 	};
 }
 #endif // LAYER_H_

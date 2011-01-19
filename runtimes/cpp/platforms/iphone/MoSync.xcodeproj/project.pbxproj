@@ -24,11 +24,42 @@
 		8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
 		8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
-		8558308211C79B210008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
 		857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
 		85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */; };
+		858B3FDB12E67D090058DBFC /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */; };
+		858B3FDC12E67D090058DBFC /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763C12B0EB9C00ABEDF3 /* IWidget.mm */; };
+		858B3FDD12E67D090058DBFC /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763E12B0EB9C00ABEDF3 /* LabelWidget.mm */; };
+		858B3FDE12E67D090058DBFC /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764012B0EB9C00ABEDF3 /* NavScreenWidget.mm */; };
+		858B3FDF12E67D090058DBFC /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764212B0EB9C00ABEDF3 /* ReflectionWidget.mm */; };
+		858B3FE012E67D090058DBFC /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764412B0EB9C00ABEDF3 /* ScreenWidget.mm */; };
+		858B3FE112E67D090058DBFC /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764A12B0EB9C00ABEDF3 /* TabScreenWidget.mm */; };
+		858B3FE212E67D090058DBFC /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765B12B0EBBD00ABEDF3 /* AbstractLayoutView.m */; };
+		858B3FE312E67D090058DBFC /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765D12B0EBBD00ABEDF3 /* HLayoutView.m */; };
+		858B3FE412E67D090058DBFC /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766212B0EBBD00ABEDF3 /* VLayoutView.m */; };
+		858B3FE512E67D090058DBFC /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766912B0EBE300ABEDF3 /* MoSyncTableView.m */; };
+		858B3FE612E67D090058DBFC /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766B12B0EBE300ABEDF3 /* MoSyncTableViewCell.m */; };
+		858B3FE712E67D090058DBFC /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766D12B0EBE300ABEDF3 /* MoSyncUI.mm */; };
+		858B3FE812E67D090058DBFC /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767312B0EBE300ABEDF3 /* ScreenWidgetController.m */; };
+		858B3FE912E67D090058DBFC /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767512B0EBE300ABEDF3 /* UIColor-Expanded.m */; };
+		858B3FEA12E67D090058DBFC /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276D712B0F54E00ABEDF3 /* MoSyncUISyscalls.mm */; };
+		858B3FEB12E67D090058DBFC /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276F812B1164100ABEDF3 /* ListViewWidget.mm */; };
+		858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
+		858B3FED12E67D090058DBFC /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80C12B67762001A96E2 /* ButtonWidget.mm */; };
+		858B3FEE12E67D090058DBFC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80D12B67762001A96E2 /* HorizontalLayoutWidget.mm */; };
+		858B3FEF12E67D090058DBFC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80E12B67762001A96E2 /* VerticalLayoutWidget.mm */; };
+		858B3FF012E67D090058DBFC /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */; };
+		858B3FF112E67D090058DBFC /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */; };
+		858B3FF212E67D090058DBFC /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */; };
+		858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */; };
+		858B3FF412E67D090058DBFC /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */; };
+		858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
+		858B404112E680510058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
+		858B404212E6806A0058DBFC /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
+		858B408B12E6824C0058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
+		858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
+		858B408F12E682BE0058DBFC /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -321,6 +352,9 @@
 				85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
+				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
+				858B404112E680510058DBFC /* OpenGLES.framework in Frameworks */,
+				858B404212E6806A0058DBFC /* CoreLocation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,6 +369,8 @@
 				85F2558211AC155D00EB47EE /* AVFoundation.framework in Frameworks */,
 				85F2558311AC155D00EB47EE /* CoreLocation.framework in Frameworks */,
 				85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */,
+				858B408B12E6824C0058DBFC /* OpenGLES.framework in Frameworks */,
+				858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -809,7 +845,6 @@
 				8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */,
 				85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */,
 				8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */,
-				8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */,
 				85E2764F12B0EB9C00ABEDF3 /* ImageWidget.mm in Sources */,
 				85E2765012B0EB9C00ABEDF3 /* IWidget.mm in Sources */,
 				85E2765112B0EB9C00ABEDF3 /* LabelWidget.mm in Sources */,
@@ -826,6 +861,7 @@
 				85E2767B12B0EBE300ABEDF3 /* ScreenWidgetController.m in Sources */,
 				85E2767C12B0EBE300ABEDF3 /* UIColor-Expanded.m in Sources */,
 				85E276D812B0F54E00ABEDF3 /* MoSyncUISyscalls.mm in Sources */,
+				8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */,
 				85E276FA12B1164100ABEDF3 /* ListViewWidget.mm in Sources */,
 				856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */,
 				8508D80F12B67762001A96E2 /* ButtonWidget.mm in Sources */,
@@ -843,8 +879,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				858B3FDB12E67D090058DBFC /* ImageWidget.mm in Sources */,
+				858B3FDC12E67D090058DBFC /* IWidget.mm in Sources */,
+				858B3FDD12E67D090058DBFC /* LabelWidget.mm in Sources */,
+				858B3FDE12E67D090058DBFC /* NavScreenWidget.mm in Sources */,
+				858B3FDF12E67D090058DBFC /* ReflectionWidget.mm in Sources */,
+				858B3FE012E67D090058DBFC /* ScreenWidget.mm in Sources */,
+				858B3FE112E67D090058DBFC /* TabScreenWidget.mm in Sources */,
+				858B3FE212E67D090058DBFC /* AbstractLayoutView.m in Sources */,
+				858B3FE312E67D090058DBFC /* HLayoutView.m in Sources */,
+				858B3FE412E67D090058DBFC /* VLayoutView.m in Sources */,
+				858B3FE512E67D090058DBFC /* MoSyncTableView.m in Sources */,
+				858B3FE612E67D090058DBFC /* MoSyncTableViewCell.m in Sources */,
+				858B3FE712E67D090058DBFC /* MoSyncUI.mm in Sources */,
+				858B3FE812E67D090058DBFC /* ScreenWidgetController.m in Sources */,
+				858B3FE912E67D090058DBFC /* UIColor-Expanded.m in Sources */,
+				858B3FEA12E67D090058DBFC /* MoSyncUISyscalls.mm in Sources */,
+				858B3FEB12E67D090058DBFC /* ListViewWidget.mm in Sources */,
+				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
+				858B3FED12E67D090058DBFC /* ButtonWidget.mm in Sources */,
+				858B3FEE12E67D090058DBFC /* HorizontalLayoutWidget.mm in Sources */,
+				858B3FEF12E67D090058DBFC /* VerticalLayoutWidget.mm in Sources */,
+				858B3FF012E67D090058DBFC /* ListViewItemWidget.mm in Sources */,
+				858B3FF112E67D090058DBFC /* WebViewWidget.mm in Sources */,
+				858B3FF212E67D090058DBFC /* GLViewWidget.mm in Sources */,
+				858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */,
+				858B3FF412E67D090058DBFC /* SearchBarWidget.mm in Sources */,
 				8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */,
-				8558308211C79B210008FDC1 /* MoSyncViewController.mm in Sources */,
 				85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */,
 				85F2551B11AC12DE00EB47EE /* connection.cpp in Sources */,
 				85F2551C11AC12DE00EB47EE /* discovery.cpp in Sources */,
@@ -878,6 +939,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				858B408F12E682BE0058DBFC /* MoSyncViewController.mm in Sources */,
 				85F25A3611AD614700EB47EE /* main.m in Sources */,
 				85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */,
 				85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */,
@@ -981,6 +1043,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1005,6 +1068,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = _USE_REBUILDER_;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

@@ -83,7 +83,7 @@ namespace MAP
 		//
 		// Maximum parallel downloaders
 		//
-		static const int			Downloaders = 5; // four in parallel plus one slacking
+		static const int			Downloaders = 2;//5; // four in parallel plus one slacking
 	public:
 									MapSource( );
 		virtual						~MapSource( );
@@ -96,7 +96,7 @@ namespace MAP
 		/**
 		 * Returns tile size
 		 */
-		virtual  MAExtent			getTileSize( ) const = 0;
+		virtual  int                getTileSize( ) const = 0;
 		/**
 		 * Returns minimum magnification
 		 */

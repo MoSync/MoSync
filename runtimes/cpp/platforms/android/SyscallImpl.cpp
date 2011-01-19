@@ -1099,6 +1099,18 @@ namespace Base
 	}
 	
 	/**
+	 * Internal wrapper for maOpenGLTexSubImage2D that
+	 * calls the real implementation _maOpenGLTexSubImage2D
+	 * in ioctl.h.
+	 * 
+	 * @param image The image to load as a texture.
+	 */
+	int maOpenGLTexSubImage2D(MAHandle image)
+	{
+		return _maOpenGLTexSubImage2D(image, mJNIEnv, mJThis); 
+	}
+	
+	/**
 	 * Internal wrapper for maOpenGLInitFullscreen that
 	 * calls the real implementation _maOpenGLInitFullscreen
 	 * in ioctl.h.

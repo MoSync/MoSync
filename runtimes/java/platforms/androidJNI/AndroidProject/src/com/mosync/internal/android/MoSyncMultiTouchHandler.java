@@ -5,13 +5,13 @@ import android.view.MotionEvent;
 public class MoSyncMultiTouchHandler extends MoSyncTouchHandler
 {
 
-	MoSyncMultiTouchHandler()
+	public MoSyncMultiTouchHandler()
 	{}
 	
 	/**
 	 * Check abstract class MoSyncTouchHandler
 	 */
-	int loadEvent(MotionEvent event)
+	public int loadEvent(MotionEvent event)
 	{
 		mMotionEvent = event;
 	
@@ -23,7 +23,7 @@ public class MoSyncMultiTouchHandler extends MoSyncTouchHandler
 	/**
 	 * Check abstract class MoSyncTouchHandler
 	 */
-	int[] parseEvent(int index)
+	public int[] parseEvent(int index)
 	{
 		if(index < 0 || index >= mNumEvents) return null;
 			

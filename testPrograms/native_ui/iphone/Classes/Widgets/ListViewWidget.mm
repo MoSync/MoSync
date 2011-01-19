@@ -25,7 +25,7 @@
 	MAEvent *event = new MAEvent;
 	event->type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_POINTER_PRESSED;
+	eventData->eventType = WIDGET_EVENT_ITEM_CLICKED;
 	eventData->widgetHandle = handle;
 	event->data = eventData;
 	Base::gEventQueue.put(*event);
@@ -39,7 +39,9 @@
 	
 //	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	tableView.tableView.delegate = self;
-	return [super init];		
+	id obj = [super init];		
+	
+	return obj;
 }
 
 - (void)addChild: (IWidget*)child {
