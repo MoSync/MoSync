@@ -251,7 +251,10 @@ namespace MAP
 		{
 			const MapTile* t = mList[i];
 			if ( t != NULL )
-				if ( t->getMapSource( ) == source && t->getGridX( ) == tileXY.getX( ) && t->getGridY( ) == tileXY.getY( ) && t->getMagnification( ) == tileXY.getMagnification( ) )
+				if (	t->getMapSource( ) == source && 
+						t->getGridX( ) == tileXY.getX( ) && 
+						t->getGridY( ) == tileXY.getY( ) && 
+						t->getMagnification( ) == tileXY.getMagnification( ) )
 					return i;
 		}
 		return -1;

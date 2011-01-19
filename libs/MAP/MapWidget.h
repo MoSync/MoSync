@@ -68,17 +68,19 @@ namespace MAP
 		 */
 		int getMagnification( ) const;
 		void setMagnification( int magnification );
-		
 		/**
 		 * Scale property
 		 */		
 		void setScale( double scale );
-		
 		/**
 		 * Magnification scale display property
 		 */
 		bool getHasScale( ) const { return mViewport->getHasScale( ); }
 		void setHasScale( bool hasScale ) { mViewport->setHasScale( hasScale ); }
+		/*
+		 *  Positions and scales map to show specificed rectangle
+		 */
+		void centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight );
 
 		void startGlide( );
 		void stopGlide( );

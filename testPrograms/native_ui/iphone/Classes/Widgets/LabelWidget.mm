@@ -30,6 +30,7 @@
 	if([key isEqualToString:@"text"]) {
 		UILabel* label = (UILabel*) view;
 		[label setText: value];
+		[label sizeToFit];
 	} 
 	else if([key isEqualToString:@"horizontalAlignment"]) {
 		UILabel* label = (UILabel*) view;
