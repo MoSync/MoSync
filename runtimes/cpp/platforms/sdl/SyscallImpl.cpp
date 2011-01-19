@@ -150,7 +150,7 @@ namespace Base {
 
 	static void MAHandleKeyEventMAK(int mak, bool pressed, int nativeKey=0);
 	static void MAHandleKeyEvent(int sdlk, bool pressed);
-	static void MASendPointerEvent(int x, int y, int type);
+	static void MASendPointerEvent(int x, int y, int touchId, int type);
 
 	static int maSendToBackground();
 	static int maBringToForeground();
@@ -307,14 +307,14 @@ namespace Base {
 		void onMoSyncKeyRelease(int mak) {
 			MAHandleKeyEventMAK(mak, false);
 		}
-		void onMoSyncPointerPress(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+		void onMoSyncPointerPress(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 		}
-		void onMoSyncPointerDrag(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);	
+		void onMoSyncPointerDrag(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);	
 		}
-		void onMoSyncPointerRelease(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+		void onMoSyncPointerRelease(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_RELEASED);
 		}
 	};
 
@@ -366,6 +366,7 @@ namespace Base {
 		if(sSkin) {
 			sSkin->drawDevice();
 			sSkin->drawScreen();
+			sSkin->drawMultiTouchSimulation();
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		}
 		return true;
@@ -710,6 +711,8 @@ namespace Base {
 #ifndef MOBILEAUTHOR
 		if(sSkin) {
 			sSkin->drawScreen();
+			sSkin->drawMultiTouchSimulation();
+
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		} else {
 			SDL_BlitSurface(gBackBuffer, NULL, gScreen, NULL);
@@ -762,7 +765,7 @@ namespace Base {
 		return 0;
 	}
 
-	static void MASendPointerEvent(int x, int y, int type) {
+	static void MASendPointerEvent(int x, int y, int touchId, int type) {
 			if(!gEventOverflow) {
 				if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 					gEventOverflow = true;
@@ -773,7 +776,7 @@ namespace Base {
 				event.type = type;
 				event.point.x = x;
 				event.point.y = y;
-				event.touchId = 0;
+				event.touchId = touchId;
 				gEventFifo.put(event);
 			}
 	}
@@ -928,7 +931,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mouseDragged(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_DRAGGED);
+						MASendPointerEvent(event.button.x, event.button.y, 0,EVENT_TYPE_POINTER_DRAGGED);
+				}
+				else if(event.motion.state&SDL_BUTTON(3))
+				{
+					if(sSkin)
+						sSkin->mouseMultiDragged(event.button.x, event.button.y);
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
@@ -937,7 +945,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mousePressed(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_PRESSED);
+						MASendPointerEvent(event.button.x, event.button.y, 0, EVENT_TYPE_POINTER_PRESSED);
+				}
+				else if(event.button.button == 3)
+				{
+					if(sSkin)
+						sSkin->mouseMultiPressed(event.button.x, event.button.y);
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
@@ -946,7 +959,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mouseReleased(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_RELEASED);
+						MASendPointerEvent(event.button.x, event.button.y, 0, EVENT_TYPE_POINTER_RELEASED);
+				}
+				else if(event.button.button == 3)
+				{
+					if(sSkin)
+						sSkin->mouseMultiReleased(event.button.x, event.button.y);
 				}
 				break;
 #endif	//MOBILEAUTHOR

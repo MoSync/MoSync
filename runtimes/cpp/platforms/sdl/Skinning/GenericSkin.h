@@ -45,11 +45,15 @@ namespace MoRE {
 		int getWindowHeight() const;
 		void drawDevice() const;
 		void drawScreen() const;
+		void drawMultiTouchSimulation() const;
 		void rotateCW();
 		void rotateCCW();
 		void mouseDragged(int x, int y);
 		void mousePressed(int x, int y);
 		void mouseReleased(int x, int y);
+		void mouseMultiDragged(int x, int y);
+		void mouseMultiPressed(int x, int y);
+		void mouseMultiReleased(int x, int y);
 		int getScreenLeft() const;
 		int getScreenTop() const;
 		int getScreenWidth() const;
@@ -69,6 +73,7 @@ namespace MoRE {
 		static SDL_Surface* sSkinImage;
 		static SDL_Surface* sSelectedKeypad;
 		static SDL_Surface* sUnselectedKeypad;
+		static SDL_Surface* sMultiTouchImage;
 
 		SDL_Rect screenRect, windowRect;
 		int mPressedKey;
