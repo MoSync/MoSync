@@ -100,6 +100,13 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	void MapWidget::centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight )
+	//-------------------------------------------------------------------------
+	{
+		mViewport->centerAndScaleToRectangle( lowerLeft, upperRight);
+	}
+
+	//-------------------------------------------------------------------------
 	void MapWidget::startGlide( )
 	//-------------------------------------------------------------------------
 	{

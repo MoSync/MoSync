@@ -47,6 +47,12 @@ namespace HelloLayerMap
 		//
 		void keyPressEvent( int keyCode );
 		void keyReleaseEvent( int keyCode );
+		//
+		// PointerListener overrides
+		//
+		void pointerPressEvent(MAPoint2d p);
+		void pointerMoveEvent(MAPoint2d p);
+		void pointerReleaseEvent(MAPoint2d p);
 
 		// Need this right now
 		void multitouchPressEvent(MAPoint2d point, int touchId) {}
@@ -54,6 +60,7 @@ namespace HelloLayerMap
 		void multitouchReleaseEvent(MAPoint2d point, int touchId) {}
 
 	private:
+		void setPosition( MAPoint2d p );
 		void nextMapSource( );
 		void addPoint( );
 
