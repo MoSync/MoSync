@@ -869,15 +869,16 @@ namespace Base {
 			
 			int bytesPerPixel = 4; // for now.
 			
-			int oldBytesPerRow = img->width*bytesPerPixel;
+			int oldBytesPerRow = img->rowBytes;
 			int newBytesPerRow = powWidth*bytesPerPixel;
+			int oldActualBytesPerRow = img->width*bytesPerPixel;
 			
 			byte* data = new byte[powHeight*newBytesPerRow];
 			
 			byte* src = (byte*)img->data;
 			byte* dst = data;
 			for(int y = 0; y < img->height; y++) {
-				memcpy(dst, src, oldBytesPerRow);
+				memcpy(dst, src, oldActualBytesPerRow);
 				src+=oldBytesPerRow;
 				dst+=newBytesPerRow;
 			}
