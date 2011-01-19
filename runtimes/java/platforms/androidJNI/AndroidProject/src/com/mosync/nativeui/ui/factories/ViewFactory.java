@@ -7,8 +7,6 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.ui.egl.EGLView;
-import com.mosync.nativeui.ui.widgets.GLWidget;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
 import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -73,12 +71,13 @@ public class ViewFactory
 		addFactory( Types.WIDGET_TYPE_BUTTON, new ButtonFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LABEL, new LabelFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LAYOUT_VERTICAL , new VerticalLayoutFactory( ) );
+		addFactory( Types.WIDGET_TYPE_LAYOUT_HORIZONTAL , new HorizontalLayoutFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LIST, new ListFactory( ) );
 		addFactory( Types.WIDGET_TYPE_SCREEN, new ScreenFactory( ) );
 		addFactory( Types.WIDGET_TYPE_LIST_ITEM, new ListItemFactory( ) );
 		addFactory( Types.WIDGET_TYPE_WEB, new DefaultFactory( WebView.class, WebWidget.class ) );
 		addFactory( Types.WIDGET_TYPE_TAB_SCREEN, new TabScreenFactory( ) );
-		addFactory( Types.WIDGET_TYPE_EGL, new DefaultFactory( EGLView.class, GLWidget.class ) );
+		addFactory( Types.WIDGET_TYPE_EGL, new EGLViewFactory( ) );
 		addFactory( Types.WIDGET_TYPE_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
 	}
 	

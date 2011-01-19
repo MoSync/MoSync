@@ -27,9 +27,9 @@ import java.util.Set;
 
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.WallpaperManager;
 import android.app.ActivityManager.RecentTaskInfo;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,8 +37,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-import com.mosync.internal.android.MoSyncThread.ImageCache;
 
 /**
  * Class that handles home screen related syscalls.

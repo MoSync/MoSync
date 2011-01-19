@@ -238,4 +238,12 @@ namespace Base
 	 * @param image Image to load.
 	 */
 	int _maOpenGLTexImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	 * Internal function that calls the java side to load part of an image
+	 * into an opengl texture, to the currently bound texture handle.
+	 *
+	 * @param image Image to load.
+	 */
+	int _maOpenGLTexSubImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis);
 }

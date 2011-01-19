@@ -24,7 +24,7 @@ public abstract class MoSyncTouchHandler
 	 */
 	int[] mEventData = new int[3];
 	
-	MoSyncTouchHandler()
+	public MoSyncTouchHandler()
 	{}
 	
 	/**
@@ -34,7 +34,7 @@ public abstract class MoSyncTouchHandler
 	 * @param event The MotionEvent received from Android OS
 	 * @return The number of touches
 	 */
-	abstract int loadEvent(MotionEvent event);
+	public abstract int loadEvent(MotionEvent event);
 	
 	/**
 	 * Returns the i:th touch in this event
@@ -43,5 +43,5 @@ public abstract class MoSyncTouchHandler
 	 * @return An int array containing the event
 	 *         returns null if the event was incorrect
 	 */
-	abstract int[] parseEvent(int index);
+	public abstract int[] parseEvent(int index);
 }

@@ -38,7 +38,7 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		TraceScope( char* s )			
+		TraceScope( const char* s )			
 		{
 			m_s = s; 
 			DebugPrintf( "+++ %s\n", s ); 
@@ -52,7 +52,7 @@ namespace MAP
 		}
 
 	private:
-		char*		m_s;
+		const char*		m_s;
 		int			m_startTime;
 	};
 
