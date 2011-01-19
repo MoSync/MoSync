@@ -59,7 +59,7 @@ namespace MAP
 		/**
 		 * Returns tile size in pixels.
 		 */
-		MAExtent getTileSize( ) const
+		int getTileSize( ) const
 		{
 			//
 			// CloudMade tile size is fixed at 256x256 pixels.

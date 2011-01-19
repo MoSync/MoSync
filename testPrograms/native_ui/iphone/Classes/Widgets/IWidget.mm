@@ -102,6 +102,7 @@
 
 - (id)init {
 	[super init];
+	[view setUserInteractionEnabled:YES];
 	view.contentMode = UIViewContentModeRedraw;
 	view.autoresizesSubviews = NO;
 	parent = nil;
@@ -111,6 +112,7 @@
 
 	fillWidth = 0;
 	fillHeight = 0;
+	[view sizeToFit]; 
 	
 	return self;
 }
@@ -121,6 +123,10 @@
 
 - (void) setWidgetHandle:(int) toHandle {
 	handle = toHandle;
+}
+
+- (int)getWidgetHandle {
+	return handle;
 }
 
 - (void) setParent:(IWidget*) toParent {

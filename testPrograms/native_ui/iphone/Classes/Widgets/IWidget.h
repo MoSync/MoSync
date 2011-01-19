@@ -31,6 +31,7 @@
 
 - (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
+- (int)getWidgetHandle;
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView;

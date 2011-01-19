@@ -10,7 +10,7 @@
 #import "IWidget.h"
 #import "MoSyncTableView.h"
 
-@interface ListViewWidget : IWidget {
+@interface ListViewWidget : IWidget <UITableViewDelegate> {
 	MoSyncTableView* tableView;
 }
 
