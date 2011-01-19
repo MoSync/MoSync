@@ -20,6 +20,7 @@ public class Types
 	public static final String WIDGET_TYPE_TAB_SCREEN = "TabScreen";
 	public static final String WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
 	public static final String WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
+	public static final String WIDGET_TYPE_LAYOUT_RELATIVE = "RelativeLayout";
 	
 	public static final String WIDGET_PROPERTY_WIDTH = "width";
 	public static final String WIDGET_PROPERTY_HEIGHT = "height";
@@ -28,6 +29,11 @@ public class Types
 	public static final String WIDGET_PROPERTY_PADDING_TOP = "top";
 	public static final String WIDGET_PROPERTY_PADDING_RIGHT = "right";
 	public static final String WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
+	
+	public static final String WIDGET_PROPERTY_MARGIN_LEFT = "left";
+	public static final String WIDGET_PROPERTY_MARGIN_TOP = "top";
+	public static final String WIDGET_PROPERTY_MARGIN_RIGHT = "right";
+	public static final String WIDGET_PROPERTY_MARGIN_BOTTOM = "bottom";
 	
 	public static final String WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 	public static final String WIDGET_PROPERTY_VERTICAL_ALIGNMENT = "verticalAlignment";
@@ -47,6 +53,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_IMAGE = "image";
 	
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
+	public static final String WIDGET_PROPERTY_BACKGROUND_IMAGE = "backgroundImage";
 	public static final String WIDGET_PROPERTY_ALPHA = "alpha";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
 	public static final String WIDGET_PROPERTY_FONT_SIZE = "fontSize";

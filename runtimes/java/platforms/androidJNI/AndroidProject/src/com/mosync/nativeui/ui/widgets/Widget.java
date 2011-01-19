@@ -1,9 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 
+import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.ColorConverter;
@@ -81,6 +85,15 @@ public class Widget
 		{
 			layoutParams.height = IntConverter.convert( value );
 		}
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_LEFT ) )
+		{
+			layoutParams.marginLeft = IntConverter.convert( value );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) )
+		{
+			Log.i("----WIDGET-----", "Setting top: " + value);
+			layoutParams.marginTop = IntConverter.convert( value );
+		}
 		else if( property.equals( Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT ) )
 		{
 			layoutParams.horizontalAlignment =  HorizontalAlignment.convert( value );
@@ -92,6 +105,15 @@ public class Widget
 		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_COLOR ) )
 		{
 			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_IMAGE ) )
+		{
+			int imageHandle = IntConverter.convert( value );
+			Bitmap background = NativeUI.getBitmap( imageHandle );
+			if( background != null )
+			{
+				getView( ).setBackgroundDrawable( new BitmapDrawable( background ) );
+			}
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_ALPHA ) )
 		{
