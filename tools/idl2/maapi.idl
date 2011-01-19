@@ -2952,6 +2952,11 @@ interface MAAPI {
 		 * Sent when a tab widget has changed to a new tab.
 		 */
 		TAB_CHANGED = 7;
+		
+		/**
+		 * Sent when an GLView has been initialized and is ready for setup.
+		 */
+		 GL_VIEW_READY = 8;
 	}
 
 	/**

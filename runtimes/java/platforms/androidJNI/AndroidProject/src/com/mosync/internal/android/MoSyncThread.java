@@ -2573,6 +2573,48 @@ public class MoSyncThread extends Thread
 			return -3;
 		}
 	}
+	
+	/**
+	 * Loads an OpenGL sub texture to the current texture handle. If the 
+	 * underlying bitmap has an alpha channel, the texture will also
+	 * get an alpha channel.
+	 * 
+	 * @param bitmapHandle Handle to the bitmap to load.
+	 * 
+	 * @return 0 on success, RES_BAD_INPUT if the handle does not exist,
+	 *         and -3 if the texture could not be loaded.
+	 */
+	public int loadGlSubTexture(final int bitmapHandle)
+	{
+		ImageCache texture = mImageResources.get(bitmapHandle);
+		if(texture == null)
+		{
+			return RES_BAD_INPUT;
+		}
+		int textureFormat = GL10.GL_RGB;
+		if(texture.mBitmap.hasAlpha())
+		{
+			textureFormat = GL10.GL_RGBA;
+		}
+		
+		GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
+							  0,
+							  0,
+							  0,
+							  texture.mBitmap,
+							  textureFormat,
+							  GL10.GL_UNSIGNED_BYTE);
+		
+		EGL10 egl = (EGL10) EGLContext.getEGL( );
+		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
+		{
+			return 0;
+		}
+		else
+		{
+			return -3;
+		}
+	}
 
 	/**
 	 * Class that holds image data.

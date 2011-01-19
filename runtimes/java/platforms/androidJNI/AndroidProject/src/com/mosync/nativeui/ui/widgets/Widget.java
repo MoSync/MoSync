@@ -1,10 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
-import android.graphics.Color;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.ColorConverter;
+import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -36,6 +39,11 @@ public class Widget
 	 * Default layout params.
 	 */
 	private LayoutParams m_layoutParams = new LayoutParams();
+	
+	/**
+	 * Default alpha for a widget.
+	 */
+	private float m_alpha = 1.0f;
 	
 	/**
 	 * Constructor
@@ -83,7 +91,19 @@ public class Widget
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_COLOR ) )
 		{
-			getView( ).setBackgroundColor( Color.parseColor( "#" + value ) );
+			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_ALPHA ) )
+		{
+			View view = getView( );
+			float newAlpha = FloatConverter.convert( value );
+			
+			Animation animation = new AlphaAnimation( m_alpha, newAlpha );
+			animation.setDuration( 0 );
+			animation.setFillAfter( true );
+			view.startAnimation( animation );
+			
+			m_alpha = newAlpha;
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_VISIBLE  ) )
 		{
@@ -100,6 +120,13 @@ public class Widget
 		else
 		{
 			return false;
+		}
+		
+		// Notify parent that the layout params has changed.
+		Layout parent = (Layout) getParent( );
+		if( getParent( ) != null )
+		{
+			parent.updateLayoutParamsForChild( this );
 		}
 		
 		return true;

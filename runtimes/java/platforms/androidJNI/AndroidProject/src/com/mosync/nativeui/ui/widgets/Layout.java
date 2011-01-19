@@ -46,14 +46,19 @@ public class Layout extends Widget
 		child.setParent( this );
 		m_children.add( child );
 
-		// Set layout params for the child
-		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
-		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
-		child.getView( ).setLayoutParams( nativeLayoutParams );
+		updateLayoutParamsForChild(child);
 		
 		// Add child to layout
 		ViewGroup layout = getView( );
 		layout.addView( child.getView( ) );
+	}
+	
+	public void updateLayoutParamsForChild(Widget child)
+	{
+		// Set layout params for the child
+		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
+		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
+		child.getView( ).setLayoutParams( nativeLayoutParams );
 	}
 	
 	/**
