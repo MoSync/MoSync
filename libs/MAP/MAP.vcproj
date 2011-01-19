@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LonLat.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MapCache.cpp"
 				>
 			</File>

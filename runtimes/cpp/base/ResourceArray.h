@@ -197,12 +197,12 @@ namespace Base {
 			
 			LOG("Num static resources: %d\n", mN);
 			LOG("Num dynamic resources: %d\n", dynResSize);
-			for(int i = 0; i < mN; i++) {
+			for(unsigned int i = 0; i < mN; i++) {
 				byte type = mTypes[i];
 				LOG("Static resource %d is of type %s\n", i, resourceStrings[type]);
 			}
 			
-			for(int i = 0; i < dynResSize; i++) {
+			for(unsigned int i = 0; i < dynResSize; i++) {
 				byte type = dynResTypes[i];
 				LOG("Dynamic resource %d is of type %s\n", i, resourceStrings[type]);
 			}

@@ -28,8 +28,8 @@ namespace MAP
 	{
 	public:
 		virtual ~GeoPointLayerRenderer( ) { };
-		virtual void renderItem( Layer* layer, GeoPoint* item, int x, int y, bool selected ) = 0;
-		virtual void renderItemText( Layer* layer, GeoPoint* item, int x, int y, const Rect& bounds ) = 0;
+		virtual void renderItem( Layer* layer, GeoPoint* item, const Rect& bounds, int x, int y, bool selected ) = 0;
+		virtual void renderItemText( Layer* layer, GeoPoint* item, const Rect&, int x, int y ) = 0;
 	};
 }
 #endif // GEOPOINTLAYERRENDERER_H_

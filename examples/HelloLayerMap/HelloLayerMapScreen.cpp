@@ -141,7 +141,7 @@ namespace HelloLayerMap
 		}
 
 		//-------------------------------------------------------------------------
-		void renderItem( Layer* layer, GeoPoint* item, int x, int y, bool selected )
+		void renderItem( Layer* layer, GeoPoint* item, const Rect& bounds, int x, int y, bool selected )
 		//-------------------------------------------------------------------------
 		{
 			if ( DrawAsSquares )
@@ -188,7 +188,7 @@ namespace HelloLayerMap
 		}
 
 		//-------------------------------------------------------------------------
-		void renderItemText( Layer* layer, GeoPoint* item, int x, int y, const Rect& bounds )
+		void renderItemText( Layer* layer, GeoPoint* item, const Rect& bounds, int x, int y )
 		//-------------------------------------------------------------------------
 		{
 			if ( DrawTextAtItem )
