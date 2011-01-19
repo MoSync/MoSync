@@ -47,8 +47,6 @@ namespace MAP
 	void GeoPointLayer::drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, int magnification, bool selected, bool drawText )
 	//-------------------------------------------------------------------------
 	{
-		#if old
-
 		PixelCoordinate worldPx = item->getCachedPixelLocation( );
 		if ( worldPx.getMagnification() != magnification )
 		{
@@ -58,49 +56,26 @@ namespace MAP
 		}
 		MAPoint2d widgetPx = viewport->worldPixelToViewport( worldPx );
 
+		/*
 		if ( widgetPx.x >= bounds.x && 
 			widgetPx.x < bounds.width && 
 			widgetPx.y >= bounds.y && 
 			widgetPx.y < bounds.height )
 		{
+		*/
 			GeoPointLayerRenderer* renderer = getRenderer( );
 			//
 			// Render marker
 			//
-			renderer->renderItem( this, item, bounds.x + widgetPx.x, bounds.y + widgetPx.y, selected );
+			renderer->renderItem( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y, selected );
 			//
 			// Render item text
 			//
 			if ( drawText )
 			{
-				renderer->renderItemText( this, item, bounds.x + widgetPx.x, bounds.y + widgetPx.y, bounds );
+				renderer->renderItemText( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y );
 			}
-		}
-
-		#else
-
-		PixelCoordinate worldPx = item->getCachedPixelLocation( );
-		if ( worldPx.getMagnification() != magnification )
-		{
-			LonLat lonlat = item->getLocation( );
-			worldPx = lonlat.toPixels( magnification );
-			item->setCachedPixelLocation( worldPx );
-		}
-		MAPoint2d widgetPx = viewport->worldPixelToViewport( worldPx );
-		GeoPointLayerRenderer* renderer = getRenderer( );
-		//
-		// Render marker
-		//
-		renderer->renderItem( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y, selected );
-		//
-		// Render item text
-		//
-		if ( drawText )
-		{
-			renderer->renderItemText( this, item, bounds, bounds.x + widgetPx.x, bounds.y + widgetPx.y );
-		}
-
-		#endif
+		//}
 	}
 
 	//-------------------------------------------------------------------------
