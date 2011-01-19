@@ -61,6 +61,9 @@
 		858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
 		858B408F12E682BE0058DBFC /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		858B432012E7325F0058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
+		858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
+		858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */; };
+		858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -196,6 +199,8 @@
 		85883DEA12DDBB4500EDD04B /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.h; sourceTree = SOURCE_ROOT; };
 		85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GLViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.mm; sourceTree = SOURCE_ROOT; };
 		858B431F12E7325F0058DBFC /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = impl/log.cpp; sourceTree = "<group>"; };
+		858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RelativeLayoutWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/RelativeLayoutWidget.h; sourceTree = SOURCE_ROOT; };
+		858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RelativeLayoutWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/RelativeLayoutWidget.mm; sourceTree = SOURCE_ROOT; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
@@ -644,6 +649,8 @@
 		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */,
+				858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */,
 				85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */,
 				85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */,
 				85883DEA12DDBB4500EDD04B /* GLViewWidget.h */,
@@ -701,6 +708,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -871,6 +879,7 @@
 				85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */,
 				85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */,
 				858B432012E7325F0058DBFC /* log.cpp in Sources */,
+				858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -930,6 +939,7 @@
 				85F2553311AC12DE00EB47EE /* CMGlyphDrawing.mm in Sources */,
 				85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */,
 				85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */,
+				858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
