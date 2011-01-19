@@ -379,6 +379,32 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	void MapViewport::centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight )
+	//-------------------------------------------------------------------------
+	{
+		//
+		// Find proper magnification
+		//
+		MapSource* source = getMapSource( );
+		int magnification = source->getMagnificationMax( );
+		while( magnification > source->getMagnificationMin( ) )
+		{
+			PixelCoordinate llPx = lowerLeft.toPixels( magnification );
+			PixelCoordinate urPx = upperRight.toPixels( magnification );
+			if (	urPx.getX( ) - llPx.getX( ) < getWidth( ) &&
+					urPx.getY( ) - llPx.getY( ) < getHeight( ) )
+				break;
+			magnification--;
+		}
+		PixelCoordinate lowerLeftPx = lowerLeft.toPixels( magnification );
+		PixelCoordinate upperRightPx = upperRight.toPixels( magnification );
+		LonLat center = LonLat( PixelCoordinate( magnification, 
+												( lowerLeftPx.getX( ) + upperRightPx.getX( ) ) / 2,
+												( lowerLeftPx.getY( ) + upperRightPx.getY( ) ) / 2 ) );
+		setCenterPosition( center, magnification, true, false );
+	}
+
+	//-------------------------------------------------------------------------
 	void MapViewport::startGlide( )
 	//-------------------------------------------------------------------------
 	{

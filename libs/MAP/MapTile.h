@@ -67,7 +67,7 @@ namespace MAP
 		virtual ~MapTile( )
 		{
 			//tileCount--;
-			maDestroyObject( mImage );
+			//maDestroyObject( mImage );
 			
 			// added by niklas.
 			MAUtil::PlaceholderPool::put(mImage);

@@ -158,6 +158,9 @@ namespace MAP
 		virtual	~MapSourceQueue( ) { }
 	};
 
+	int createdDownloaders;
+	int busyDownloaders;
+
 	//-------------------------------------------------------------------------
 	//
 	// Creates a new map source
@@ -186,9 +189,15 @@ namespace MAP
 			if ( mDownloaders[i] != NULL )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+					busyDownloaders--;
+					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
+				createdDownloaders++;
+				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
 			}
 		}
 	}
@@ -252,7 +261,11 @@ namespace MAP
 			if ( mDownloaders[i] == downloader )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+					busyDownloaders--;
+					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
 				break;
@@ -267,8 +280,13 @@ namespace MAP
 		int slot = findUnusedSlot( protectedDownloader );
 		if ( slot != -1 )
 		{
-			mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
-			mDownloaders[slot]->addDownloadListener( this );
+			if ( mDownloaders[slot] == NULL )
+			{
+				mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
+				mDownloaders[slot]->addDownloadListener( this );
+				createdDownloaders++;
+				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
+			}
 			dequeueNextJob( mDownloaders[slot] );
 		}
 	}
@@ -292,13 +310,16 @@ namespace MAP
 		//
 		dlr->setClientData( NULL );
 		deleteobject( clientData );
+
+		busyDownloaders--;
+		//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 		//
 		// NOTE: The reason we're not deleting the downloader here is that
 		// it's referenced on return from this call.
 		// So we have to defer deletion until either a new slot is requested, or
 		// when deleting this MapSource.
 		//
-		dequeueIfIdleSlot( dlr );
+		dequeueIfIdleSlot( /*dlr*/NULL );
 	}
 
 	//-------------------------------------------------------------------------
@@ -337,8 +358,8 @@ namespace MAP
 				//
 				// Release to make slot available.
 				//
-				mDownloaders[i]->removeDownloadListener( this );
-				deleteobject( mDownloaders[i] );
+				//mDownloaders[i]->removeDownloadListener( this );
+				//deleteobject( mDownloaders[i] );
 				return i;
 			}
 		}
@@ -361,7 +382,9 @@ namespace MAP
 		// downloader now owns clientdata
 		entry->setClientData( NULL );
 		int res = downloader->beginDownloading( url, 0 );
-		
+		busyDownloaders++;
+		//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
+
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
 

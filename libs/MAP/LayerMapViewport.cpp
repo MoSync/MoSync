@@ -464,7 +464,8 @@ namespace MAP
 		{
 			//LonLat itemLoc = item->getLocation( );
 			LonLat itemLoc = layer->getSelectedItemLocation( );
-			setCenterPosition( itemLoc, false, false );
+			if ( itemLoc.isValid ( ) )
+				setCenterPosition( itemLoc, false, false );
 		}
 #if 0 // niklas: always false
 		else

@@ -236,15 +236,16 @@ public:
 	
 	void put(const MAEvent& e) {
 		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
-		//pthread_mutex_lock(&mMutex);	
+
+		pthread_mutex_lock(&mMutex);	
 		pthread_cond_signal(&mCond);
-		//pthread_mutex_unlock(&mMutex);
+		pthread_mutex_unlock(&mMutex);
 	}
 		
 	void wait(int ms) {
 		pthread_mutex_lock(&mMutex);
 		if(count()==0) {
-			if(ms!=0) {
+			if(ms>0) {
 				struct timeval now;
 				struct timespec timeout;	
 				gettimeofday(&now, NULL);

@@ -111,6 +111,7 @@ static IWidget* sOldScreen = nil;
 	}
 	
 	[mainWindow insertSubview:[widget getView] atIndex:0];
+	
 	[widget layout];
 	[mainWindow makeKeyAndVisible];
 	sOldScreen = widget;	

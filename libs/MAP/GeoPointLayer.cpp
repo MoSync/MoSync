@@ -186,7 +186,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		GeoPoint* current = getItem( mSelectedItem );
-		return current->getLocation( );
+		return current ? current->getLocation( ) : LonLat( );
 	}
 
 }
