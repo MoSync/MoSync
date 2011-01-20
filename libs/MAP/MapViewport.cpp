@@ -517,11 +517,15 @@ namespace MAP
 			(*listeners)[i]->viewportUpdated( this );
 	}
 
+	bool alphaChanged;
+
 	//-------------------------------------------------------------------------
 	void MapViewport::drawViewport( Point origin )
 	//-------------------------------------------------------------------------
 	{
 		mInDraw = true;
+		alphaChanged = false;
+
 		//
 		// Save clip
 		//

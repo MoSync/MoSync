@@ -47,6 +47,7 @@
 				WarningLevel="3"
 				WarnAsError="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4505,4100,4201,4127,4512"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

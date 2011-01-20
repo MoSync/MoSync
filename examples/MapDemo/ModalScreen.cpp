@@ -67,7 +67,8 @@ namespace MapDemoUI
 		Vector<IModalScreenListener*>* listeners = getBroadcasterListeners<IModalScreenListener>( *this );
 		for ( int i = 0; i < listeners->size(); i++ )
 			(*listeners)[i]->screenClosed( this );
-		delete this;
+		
+		deleteconstobject( this );
 	}
 
 	//-------------------------------------------------------------------------
