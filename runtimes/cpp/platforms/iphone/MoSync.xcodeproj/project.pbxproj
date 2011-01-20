@@ -64,6 +64,7 @@
 		858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
 		858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */; };
 		858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
+		858B44BB12E7B1060058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -888,6 +889,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				858B3FDB12E67D090058DBFC /* ImageWidget.mm in Sources */,
+				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				858B3FDC12E67D090058DBFC /* IWidget.mm in Sources */,
 				858B3FDD12E67D090058DBFC /* LabelWidget.mm in Sources */,
 				858B3FDE12E67D090058DBFC /* NavScreenWidget.mm in Sources */,
