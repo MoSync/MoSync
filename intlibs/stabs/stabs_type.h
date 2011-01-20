@@ -107,7 +107,9 @@ struct Type {
 
 
 template<typename T>
-void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt, TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural) {
+void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt,
+	TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural)
+{
 	if(natural == TypeBase::eNatural) return; // sanity check
 	T t = *((T*)data);
 

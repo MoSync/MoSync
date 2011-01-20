@@ -990,8 +990,23 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 					if(msAddr+msLen>gMemSize) {
 						msLen-= (msAddr+msLen)-gMemSize;
 					}
-					if(msLen > 0 && msAddr > 0)
-						spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
+					if(msLen > 0 && msAddr > 0) {
+						//spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
+						// convert line endings to avoid breaking the GDB/MI protocol,
+						// which mandates that every output unit be contained on a single line.
+						spf(" \\\"");
+						const char* p = &gMemBuf[msAddr];
+						const char* end = p + msLen;
+						while(p != end) {
+							if(*p == '\n') {
+								spf("\\n");
+							} else {
+								spf("%c", *p);
+							}
+							p++;
+						}
+						spf("\\\"");
+					}
 				}
 			}
 		}	

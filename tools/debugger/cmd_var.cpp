@@ -480,7 +480,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 }
 
 static void Callback::varEECreate(const Value* v, const char *err) {
-	if(err) { 
+	if(err) {
 		error("%s", err); 
 		return; 
 	}
@@ -1059,12 +1059,13 @@ void var_list_children(const string& args) {
 }
 
 static void Callback::varListChildren() {
-	if(!sUpdateQueue.empty()) {
+	while(!sUpdateQueue.empty()) {
 		Variable *v = sUpdateQueue.back();
 		sUpdateQueue.pop();
 		if(v->exp) {
-			v->exp->update(Callback::varEECreate);
-			return;
+			ExpUpdateResult res = v->exp->update(Callback::varEECreate);
+			if(res == EXP_OK)
+				return;
 		}
 	}
 
