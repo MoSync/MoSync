@@ -3366,6 +3366,14 @@ interface MAAPI {
 		 * Logs information about the state of all current resources.
 		 */
 		void maReportResourceInformation();
+
+		/**
+		 * Displays a message to the user
+		 * \param title The title of the message box shown
+		 * \param message The message should be short, not more than 40 characters,
+		 * to ensure its visibility on all screen sizes.
+		 */
+		void maMessageBox(in MAString title, in MAString message);
 	}
 	
 	constset int IOCTL_ {

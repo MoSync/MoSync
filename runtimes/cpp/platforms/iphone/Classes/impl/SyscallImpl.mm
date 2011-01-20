@@ -916,7 +916,12 @@ namespace Base {
 		gSyscall->resources.logEverything();
 		return 0;		
 	}
-	
+
+	SYSCALL(void, maMessageBox(const char* title, const char* message)) 
+	{		
+		MoSync_ShowMessageBox(message, false);
+	}
+		
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -949,6 +954,7 @@ namespace Base {
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
+		maIOCtl_case(maMessageBox);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 				maIOCtl_IX_OPENGL_ES_caselist;
