@@ -27,11 +27,6 @@ import android.view.SurfaceView;
  */
 public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 {
-	static 
-	{
-		EGLManager.initEgl( );
-	}
-	
 	/**
 	 * Reference to the holder and controller of this surface.
 	 */
@@ -175,7 +170,9 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 
 		public EGLState()
 		{
-			m_config = findConfig( );
+			EGLManager.initEgl( );
+			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ) );
+			//m_config = findConfig( );
 		}
 		
 		/**
@@ -191,11 +188,15 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 					EGL10.EGL_BLUE_SIZE, 5,
 					EGL10.EGL_ALPHA_SIZE, 0,
 					EGL10.EGL_DEPTH_SIZE, 16,
+					EGL10.EGL_SURFACE_TYPE,
 					EGL10.EGL_NONE
 				};
 			EGLConfig[] configs = new EGLConfig[1];
 			int[] numConfigs = new int[1];
-			m_egl.eglChooseConfig( EGLManager.getDisplay( ), attrib_list, configs, 1, numConfigs );
+			if( !m_egl.eglChooseConfig( EGLManager.getDisplay( ), attrib_list, configs, 1, numConfigs ) )
+			{
+				Log.i("EGLView", "Could not choose config: " + m_egl.eglGetError( ) );
+			}
 			
 			return configs[0];
 		}
@@ -216,9 +217,10 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			 * OpenGL context is a somewhat heavy object.
 			 */
 			m_context = EGLContextFactory.createContext( m_egl, m_config, EGLManager.getDisplay( ) );
-			if( m_context == null || m_context == EGL10.EGL_NO_CONTEXT )
+			int eglError = m_egl.eglGetError( );
+			if( m_context == null || m_context == EGL10.EGL_NO_CONTEXT || eglError != EGL10.EGL_SUCCESS )
 			{
-				throw new RuntimeException( "Could not create context." );
+				throw new RuntimeException( "Could not create context. EGL Error: " + eglError );
 			}
 		}
 
@@ -251,8 +253,9 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			if( !m_egl.eglMakeCurrent( EGLManager.getDisplay( ), m_surface,
 					m_surface, m_context ) )
 			{
+				m_surfaceLock.unlock( );
 				throw new RuntimeException(
-						"Failed to bind surface to current context." );
+						"Failed to bind surface to current context. EGL Error: " + m_egl.eglGetError( ) );
 			}
 			setSurfaceCurrent( true );
 			m_surfaceLock.unlock( );
@@ -275,6 +278,11 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			m_egl.eglWaitGL();
 			
 			m_egl.eglSwapBuffers( EGLManager.getDisplay( ), m_surface );
+			int eglError = m_egl.eglGetError( );
+			if( eglError != EGL10.EGL_SUCCESS )
+			{
+				Log.i( "EGLView", "Error while swapping buffers. EGL Error: " + eglError );
+			}
 			
 			m_surfaceLock.unlock( );
 		}
@@ -306,9 +314,10 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			 * Create an EGL surface we can render into.
 			 */
 			m_surface = EGLSurfaceFactory.createSurface( m_egl, m_config, EGLManager.getDisplay( ), holder );
-			
-			if( m_surface == null || m_surface == EGL10.EGL_NO_SURFACE )
+			if( m_surface == null || m_surface == EGL10.EGL_NO_SURFACE || m_egl.eglGetError( ) != EGL10.EGL_SUCCESS )
 			{
+				Log.i( "EGLView", "Failed to create surface. EGL Error: " + m_egl.eglGetError( ) );
+				m_surfaceLock.unlock( );
 				throw new RuntimeException( "Failed to create surface." );
 			}
 			

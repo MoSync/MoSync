@@ -2,7 +2,6 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -50,7 +49,7 @@ public class Widget
 	private float m_alpha = 1.0f;
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * Note: The id of the view is always equal to its handle.
 	 * 
@@ -91,7 +90,6 @@ public class Widget
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) )
 		{
-			Log.i("----WIDGET-----", "Setting top: " + value);
 			layoutParams.marginTop = IntConverter.convert( value );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT ) )

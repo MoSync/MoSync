@@ -156,6 +156,9 @@
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */; };
+		F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
+		F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */; };
+		F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -330,6 +333,8 @@
 		85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchBarWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.h; sourceTree = SOURCE_ROOT; };
 		85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SearchBarWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.mm; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CheckBoxWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.h; sourceTree = SOURCE_ROOT; };
+		F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CheckBoxWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -650,6 +655,8 @@
 		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */,
+				F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */,
 				858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */,
 				858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */,
 				85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */,
@@ -710,6 +717,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */,
+				F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -881,6 +889,7 @@
 				85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */,
 				858B432012E7325F0058DBFC /* log.cpp in Sources */,
 				858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
+				F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -942,6 +951,7 @@
 				85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */,
 				85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */,
 				858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
+				F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
