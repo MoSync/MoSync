@@ -22,14 +22,15 @@
 	
 	NSLog(@"ListItem %d pressed!", index);
 #ifndef NATIVE_TEST
-	MAEvent *event = new MAEvent;
-	event->type = EVENT_TYPE_WIDGET;
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = WIDGET_EVENT_ITEM_CLICKED;
 	eventData->widgetHandle = handle;
-	event->data = eventData;
-	Base::gEventQueue.put(*event);
-#endif		
+	eventData->listItemIndex = index;
+	event.data = eventData;
+	Base::gEventQueue.put(event);
+#endif
 	
 }
 

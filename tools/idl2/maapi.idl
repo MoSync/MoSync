@@ -2973,17 +2973,35 @@ interface MAAPI {
 		 */
 		MAHandle widgetHandle;
 
-		/**
-		 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
-		 * events using the syscall maWidgetGetMessageData().
-		 */
-		int messageId;
+		union {
+			/** 
+			 * the index when a listbox is clicked. 
+			 */
+			int listItemIndex;
+
+			/**
+			 * the type of searchbar button clicked 
+			 * 0 means 'search'
+			 * 1 means 'cancel'
+			 */
+			int searchBarButton;
+
+
+			struct {
+				/**
+				 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
+				 * events using the syscall maWidgetGetMessageData().
+			 	*/
+				int messageId;
 		
-		/**
-		 * Size in bytes of the message referred to by messageId. Use for retrieving 
-		 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
-		 */
-		int messageSize;
+				/**
+				 * Size in bytes of the message referred to by messageId. Use for retrieving 
+				 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
+				 */
+				int messageSize;
+			} custom;
+
+		}
 	}
 
 	constset int WIDGET_ {

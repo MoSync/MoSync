@@ -373,7 +373,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
-		if(gClosing)
+		if(gClosing || isNativeUIEnabled())
 			return;
 		MoSync_UpdateView(gBackbuffer->image);
 	}
