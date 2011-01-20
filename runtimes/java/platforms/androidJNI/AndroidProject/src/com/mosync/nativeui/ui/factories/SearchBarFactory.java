@@ -1,26 +1,20 @@
 package com.mosync.nativeui.ui.factories;
 
 import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
+
 import android.app.Activity;
-import android.graphics.Color;
-import android.util.DisplayMetrics;
-import android.util.Log;
+import android.content.Context;
+import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.mosync.internal.android.EventQueue;
-import com.mosync.nativeui.ui.factories.ButtonFactory.MoSyncSendOnClick;
-import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.SearchBarWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.DensityIndependentPixelConverter;
@@ -57,7 +51,7 @@ public class SearchBarFactory implements AbstractViewFactory
 	 * @param handle The widget handle.
 	 * @return The search bar view.
 	 */
-	private View createSearchBarView(Activity activity, int handle)
+	private View createSearchBarView(final Activity activity, final int handle)
 	{
 		// Variable to hold layout parameters.
 		LinearLayout.LayoutParams layoutParams;
@@ -81,7 +75,7 @@ public class SearchBarFactory implements AbstractViewFactory
         searchBarLayout.setOrientation(LinearLayout.HORIZONTAL);
         
         // Create the edit box.
-        EditText editBox = new EditText(activity);
+        final EditText editBox = new EditText(activity);
         editBox.setMaxLines(1);
         layoutParams = new LinearLayout.LayoutParams(
     		LinearLayout.LayoutParams.FILL_PARENT,
@@ -112,39 +106,27 @@ public class SearchBarFactory implements AbstractViewFactory
         button.setAdjustViewBounds(true);
         button.setMaxWidth(searchButtonPixelSize);
         button.setMaxHeight(searchButtonPixelSize);
-        button.setOnClickListener(new MoSyncSendOnClick(handle));
+        button.setOnClickListener(new OnClickListener()
+        {
+    		@Override
+    		public void onClick(View v)
+    		{
+    			// Hide onscreen keyboard.
+    			InputMethodManager manager = (InputMethodManager)
+    				activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+    			IBinder windowToken = editBox.getWindowToken();
+    			if (null != manager && null != windowToken)
+    			{
+    				manager.hideSoftInputFromWindow(editBox.getWindowToken(), 0);
+    			}
+    			  
+    			// Post event to the MoSYnc event queue.
+    			EventQueue eventQueue = EventQueue.getDefault( );
+    			eventQueue.postWidgetEvent(WIDGET_EVENT_CLICKED, handle);
+    		}
+        });
         searchBarLayout.addView(button);
         
 		return searchBarLayout;
-	}
-	
-	/**
-	 * A class responsible for sending a MoSync widget event
-	 * when the search bar button is clicked.
-	 */
-	class MoSyncSendOnClick implements OnClickListener
-	{
-		private int mHandle = -1;
-		
-		/**
-		 * Constructor.
-		 * 
-		 * @param handle The handle of the widget bound to this 
-		 * onclick handler.
-		 */
-		public MoSyncSendOnClick(int handle)
-		{
-			mHandle = handle;
-		}
-
-		/**
-		 * @see OnClickListener.onClick.
-		 */
-		@Override
-		public void onClick(View v)
-		{
-			EventQueue eventQueue = EventQueue.getDefault( );
-			eventQueue.postWidgetEvent(WIDGET_EVENT_CLICKED, mHandle);
-		}
 	}
 }
