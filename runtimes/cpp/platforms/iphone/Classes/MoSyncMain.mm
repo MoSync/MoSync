@@ -173,9 +173,14 @@ void MoSync_DoneUpdatingView() {
 	mViewSemaphore.post();
 }
 
-void MoSync_ShowMessageBox(const char *msg, bool kill) {
-	
-	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding] shouldKill:kill];  	
+void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
+	NSString* nsTitle = nil;
+	if(title != nil)
+		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
+
+	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
+					  withTitle:nsTitle
+					  shouldKill:kill];  	
 }
 
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {

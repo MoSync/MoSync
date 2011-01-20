@@ -655,7 +655,7 @@ namespace Base {
 
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
-		MoSync_ShowMessageBox(message, true);
+		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
 	}
@@ -919,7 +919,7 @@ namespace Base {
 
 	SYSCALL(void, maMessageBox(const char* title, const char* message)) 
 	{		
-		MoSync_ShowMessageBox(message, false);
+		MoSync_ShowMessageBox(title, message, false);
 	}
 		
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
@@ -1026,7 +1026,7 @@ void MoSyncErrorExit(int errorCode)
 	
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSync_ShowMessageBox(buffer, true);	
+	MoSync_ShowMessageBox(nil, buffer, true);	
 	pthread_exit(NULL);
 }
 	

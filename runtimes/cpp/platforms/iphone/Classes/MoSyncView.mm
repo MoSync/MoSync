@@ -29,10 +29,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
 	BOOL kill;
+	NSString *title;
 	NSString *msg;
 }
 
 @property BOOL kill;
+@property (copy, nonatomic) NSString* title;
 @property (copy, nonatomic) NSString* msg;
 
 - (void)alertViewCancel:(UIAlertView *)alertView;
@@ -42,6 +44,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 @implementation MessageBoxHandler
 
 @synthesize kill;
+@synthesize title;
 @synthesize msg;
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -228,7 +231,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
 	UIAlertView *alert = [[UIAlertView alloc] 
-                          initWithTitle:nil
+                          initWithTitle:mbh.title
                           message:mbh.msg
                           delegate:mbh
                           cancelButtonTitle:@"OK"
@@ -238,9 +241,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     [alert release];
 }
  
--(void) showMessageBox: (NSString*)msg shouldKill: (bool)kill {
+-(void) showMessageBox: (NSString*)msg withTitle: (NSString*)title shouldKill: (bool)kill {
 	MessageBoxHandler *mbh = [MessageBoxHandler alloc];
 	mbh.kill = kill;
+	mbh.title = title;
 	mbh.msg = msg;
 	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
 }
