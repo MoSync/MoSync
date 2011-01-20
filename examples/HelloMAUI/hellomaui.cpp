@@ -92,8 +92,10 @@ public:
 			"", 0x555555, myFont, true, false, 60);
 
 		//Activate the EditBox as a KeyListener so that its content gets updated
-		//when keys are pressed. Use password mode to hide text after entry.
+		//when keys are pressed.
 		mPasswordBox->activate();
+
+		//Use password mode to hide text after entry.
 		mPasswordBox->setPasswordMode(true);
 
 		//The third and fourth widgets are labels that we will use as buttons.
@@ -115,25 +117,48 @@ public:
 	//That's the constructor finished.
 	}
 
-	//Now we need a method to make the mClearButton and mSubmitButton buttons
-	//work. To do this we overload (i.e. create our own implementation of)
-	//the MAUI Screen base class's pointer listener. This method will be
-	//called whenever the pointer is lifted from the screen.
-	void pointerReleaseEvent(MAPoint2d point)
+	//Now we need some methods to make the mClearButton and mSubmitButton buttons
+	//work. To do this we overload (i.e. create our own implementation of) some
+	//of the MAU::Screen base class's pointer listeners.
+
+	//First, let's give the user some feedback if the buttons are clicked.
+	//To do this we overload the pointer press listener. This method is called
+	//whenever the pointer is pressed on the screen.
+	void pointerPressEvent(MAPoint2d point)
 	{
 
 		//If the Clear button is clicked...
+		if( mClearButton->contains( point.x, point.y ) )
+		{
+			//...set the button's state to "selected". This
+			//automatically changes the button's skin.
+			mClearButton->setSelected(true);
+		}
+
+		//Do the same for the Submit button.
+		if( mSubmitButton->contains( point.x, point.y ) )
+		{
+			mSubmitButton->setSelected(true);
+		}
+
+	}
+
+	//Now we define what happens when the pointer is lifted from the screen.
+	void pointerReleaseEvent(MAPoint2d point)
+	{
+
+		//If the pointer inside the Clear button...
 		if( mClearButton->contains( point.x, point.y ) )
 		{
 			//...clear the edit box.
 			mPasswordBox->clearText();
 		}
 
-		//If the Submit button is clicked...
+		//If the pointer is inside the Submit button...
 		if( mSubmitButton->contains( point.x, point.y ) )
 		{
 			//...check that the password is at least 6 characters long.
-			//Here we are reading the current text in the EditBox using the
+			//Here we read the current text in the EditBox using the
 			//"getText" method and assigning it to "pw".
 			const String &pw = mPasswordBox->getText( );
 			if ( pw.length() < 6 )
@@ -151,6 +176,12 @@ public:
 				mInstructions->setCaption("Password OK");
 			}
 		}
+
+		//Let's also de-select the buttons so that the "unselected" skins
+		//are re-displayed.
+		mClearButton->setSelected(false);
+		mSubmitButton->setSelected(false);
+
 	}
 
 	//The last method of the AppScreen class is the destructor, which will
