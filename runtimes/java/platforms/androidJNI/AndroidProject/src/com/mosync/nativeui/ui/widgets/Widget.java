@@ -91,7 +91,6 @@ public class Widget
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) )
 		{
-			Log.i("----WIDGET-----", "Setting top: " + value);
 			layoutParams.marginTop = IntConverter.convert( value );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT ) )
