@@ -108,16 +108,17 @@ public class SearchBarFactory implements AbstractViewFactory
         button.setMaxHeight(searchButtonPixelSize);
         button.setOnClickListener(new OnClickListener()
         {
-    		@Override
     		public void onClick(View v)
     		{
-    			// Hide onscreen keyboard.
+    			// Hide on-screen keyboard.
     			InputMethodManager manager = (InputMethodManager)
     				activity.getSystemService(Context.INPUT_METHOD_SERVICE);
     			IBinder windowToken = editBox.getWindowToken();
     			if (null != manager && null != windowToken)
     			{
-    				manager.hideSoftInputFromWindow(editBox.getWindowToken(), 0);
+    				manager.hideSoftInputFromWindow(
+    					editBox.getWindowToken(), 
+    					0);
     			}
     			  
     			// Post event to the MoSYnc event queue.

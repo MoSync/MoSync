@@ -1,19 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
-import com.mosync.nativeui.util.properties.HorizontalAlignment;
-import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
-import com.mosync.nativeui.util.properties.VerticalAlignment;
 
 /**
  * A search bar with a text input field and a search icon button.
