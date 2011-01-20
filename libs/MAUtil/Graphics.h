@@ -61,6 +61,9 @@ typedef void (*DrawImageRegionFunc)(MAHandle image, const MARect *srcRect, const
 typedef void (*NotifyImageUpdated)(MAHandle image);
 typedef void (*BeginRendering)(void);
 typedef void (*UpdateScreen)(void);
+typedef void (*SetClearColor)(int r, int g, int b);
+typedef void (*SetColor)(int r, int g, int b);
+typedef void (*SetAlpha)(int a);
 
 
 typedef struct MAGraphicsDriver_t {
@@ -83,6 +86,9 @@ typedef struct MAGraphicsDriver_t {
 	NotifyImageUpdated notifyImageUpdated; // not very pretty (for opengl so that it knows that it has to update the texture again)
 	BeginRendering beginRendering;
 	UpdateScreen updateScreen;
+	SetClearColor setClearColor;	
+	SetColor setColor;
+	SetAlpha setAlpha;
 } MAGraphicsDriver;
 
 
@@ -156,9 +162,12 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 void Gfx_notifyImageUpdated(MAHandle image);
 
 // when in opengl mode, clears the depth and color buffer.
+// software do nothing.
 void Gfx_beginRendering(void);
-
 void Gfx_updateScreen(void);
+void Gfx_setClearColor(int r, int g, int b);
+void Gfx_setColor(int r, int g, int b);
+void Gfx_setAlpha(int a);
 
 #ifdef __cplusplus
 }

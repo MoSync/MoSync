@@ -2986,6 +2986,12 @@ interface MAAPI {
 			 */
 			int searchBarButton;
 
+			/**
+			 * the state of the checkbox
+			 * 0 means 'unchecked'
+			 * 1 means 'checked'
+			 */
+			int checked;
 
 			struct {
 				/**

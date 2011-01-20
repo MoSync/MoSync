@@ -195,7 +195,7 @@ public class MoSyncNativeUI
 		final String key, 
 		final String value)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetSetProperty");
+		Log.i("MoSync", "MoSyncThread.maWidgetSetProperty: " + key);
 		
 		// Bind and invalidate must be called on the main mosync thread,
 		// since all opengl calls will be called from that thread.
@@ -234,7 +234,7 @@ public class MoSyncNativeUI
 		final int memBuffer,
 		final int memBufferSize)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetGetProperty");
+		Log.i("MoSync", "MoSyncThread.maWidgetGetProperty: " + key);
 		
 		try
 		{

@@ -14,6 +14,7 @@ public class Types
 	public static final String WIDGET_TYPE_IMAGE = "Image";
 	public static final String WIDGET_TYPE_LIST = "ListView";
 	public static final String WIDGET_TYPE_LIST_ITEM = "ListViewItem";
+	public static final String WIDGET_TYPE_SEARCHBAR = "SearchBar";
 	public static final String WIDGET_TYPE_EGL = "GLView";
 	public static final String WIDGET_TYPE_WEB = "WebView";
 	public static final String WIDGET_TYPE_SCREEN = "Screen";

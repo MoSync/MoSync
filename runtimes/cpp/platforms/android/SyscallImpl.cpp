@@ -1129,6 +1129,25 @@ namespace Base
 	{
 		return _maOpenGLCloseFullscreen();
 	}
+	
+	/**
+	 * Utility function for displaying and catching pending
+	 * exceptions.
+	 */
+	static void handlePendingExceptions(JNIEnv* env)
+	{
+		jthrowable exc;
+		exc = env->ExceptionOccurred();
+		if (exc) 
+		{
+			__android_log_write(
+								ANDROID_LOG_INFO, 
+								"@@@ MoSync", 
+								"Found pending exception");
+			env->ExceptionDescribe();
+			env->ExceptionClear();
+		}
+	}
 
 	/**
 	* Call one of the platform dependant syscalls. For more information about each of these syscalls,
@@ -1150,6 +1169,7 @@ namespace Base
 	{
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
+		//handlePendingExceptions(mJNIEnv);
 		
 		switch(function)
 		{
