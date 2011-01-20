@@ -15,6 +15,7 @@
 #include <helpers/cpp_defs.h>
 
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
+bool isNativeUIEnabled();
 
 MAHandle maWidgetCreate(const char *widgetType);
 

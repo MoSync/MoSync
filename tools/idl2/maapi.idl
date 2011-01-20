@@ -2973,17 +2973,35 @@ interface MAAPI {
 		 */
 		MAHandle widgetHandle;
 
-		/**
-		 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
-		 * events using the syscall maWidgetGetMessageData().
-		 */
-		int messageId;
+		union {
+			/** 
+			 * the index when a listbox is clicked. 
+			 */
+			int listItemIndex;
+
+			/**
+			 * the type of searchbar button clicked 
+			 * 0 means 'search'
+			 * 1 means 'cancel'
+			 */
+			int searchBarButton;
+
+
+			struct {
+				/**
+				 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
+				 * events using the syscall maWidgetGetMessageData().
+			 	*/
+				int messageId;
 		
-		/**
-		 * Size in bytes of the message referred to by messageId. Use for retrieving 
-		 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
-		 */
-		int messageSize;
+				/**
+				 * Size in bytes of the message referred to by messageId. Use for retrieving 
+				 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
+				 */
+				int messageSize;
+			} custom;
+
+		}
 	}
 
 	constset int WIDGET_ {
@@ -3366,6 +3384,14 @@ interface MAAPI {
 		 * Logs information about the state of all current resources.
 		 */
 		void maReportResourceInformation();
+
+		/**
+		 * Displays a message to the user
+		 * \param title The title of the message box shown
+		 * \param message The message should be short, not more than 40 characters,
+		 * to ensure its visibility on all screen sizes.
+		 */
+		void maMessageBox(in MAString title, in MAString message);
 	}
 	
 	constset int IOCTL_ {

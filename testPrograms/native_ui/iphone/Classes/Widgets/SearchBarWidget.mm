@@ -20,16 +20,30 @@
 
 - (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
 	
-	[searchBar resignFirstResponder];
-	
 #ifndef NATIVE_TEST
-	MAEvent *event = new MAEvent;
-	event->type = EVENT_TYPE_WIDGET;
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = WIDGET_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
-	event->data = eventData;
-	Base::gEventQueue.put(*event);
+	eventData->searchBarButton = 0;
+	event.data = eventData;
+	Base::gEventQueue.put(event);
+#endif	
+}
+
+
+- (void) searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+	
+#ifndef NATIVE_TEST
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->widgetHandle = handle;
+	eventData->searchBarButton = 1;
+	event.data = eventData;
+	Base::gEventQueue.put(event);
 #endif	
 }
 
@@ -37,7 +51,7 @@
 - (id)init {
 	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
 	searchBar.placeholder = @"Search";
-	[searchBar becomeFirstResponder];
+
 	
 	view = searchBar;			
 	id ret = [super init];
@@ -62,6 +76,13 @@
 	}
 	else if([key isEqualToString:@"placeholder"]) {
 		searchBar.placeholder = value;
+	}
+	else if([key isEqualToString:@"showKeyboard"]) {
+		if([value isEqualToString:@"true"]) {
+			[searchBar becomeFirstResponder];
+		} else {
+			[searchBar resignFirstResponder];
+		}
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];

@@ -91,12 +91,20 @@ int maWidgetRemoveChild(MAHandle parent, MAHandle child) {
 	return -1;
 }
 
+static bool sNativeUIEnabled = false;
+bool isNativeUIEnabled() {
+	return sNativeUIEnabled;
+}
+
 void maWidgetScreenShow(MAHandle screenHandle) {
+	sNativeUIEnabled = true;
+	
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	[NSObject performSelectorOnMainThread:@selector(show:)
 								withTarget:mosyncUI
 							  withObjects:[NSArray arrayWithObjects: screen, nil] 
-							waitUntilDone:YES];		
+							waitUntilDone:YES];	
+
 }
 
 int maWidgetEvaluateScript(MAHandle widget, const char* script) {

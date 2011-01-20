@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
--(void) showMessageBox:(NSString*)msg shouldKill:(bool)kill;
+-(void) showMessageBox:(NSString*)msg withTitle:(NSString*)title shouldKill:(bool)kill;
 -(void) showTextBox:(NSString*)title 
 			withInText:(NSString*)inText 
 			outText:(wchar*)outText 
