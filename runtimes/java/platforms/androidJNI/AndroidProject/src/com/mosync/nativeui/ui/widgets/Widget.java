@@ -50,7 +50,7 @@ public class Widget
 	private float m_alpha = 1.0f;
 	
 	/**
-	 * Constructor
+	 * Constructor.
 	 * 
 	 * Note: The id of the view is always equal to its handle.
 	 * 
