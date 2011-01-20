@@ -40,15 +40,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //that are defined in the project file called "res.lst".
 #include "MAHeaders.h"
 
-//Declare the namespaces so that we can use the short forms of identifiers
-//elsewhere in our code.
-using namespace MAUtil;
-using namespace MAUI;
-
-
 //Define a new class to use as a blueprint for our application's
 //screens, building it upon the MAUI Screen base class.
-class AppScreen : public Screen
+class AppScreen : public MAUI::Screen
 {
 //Define the public methods of our new class.
 public:
@@ -59,68 +53,69 @@ public:
 	{
 		//Set up some pointers to the font and widget-skins
 		//defined in the project file "res.lst".
-		Font * myFont = new Font(RES_FONT);
-		WidgetSkin * myBack = new WidgetSkin(RES_SELECTED, RES_UNSELECTED,
+		MAUI::Font * myFont = new MAUI::Font(RES_FONT);
+		MAUI::WidgetSkin * myBack = new MAUI::WidgetSkin(RES_SELECTED, RES_UNSELECTED,
 			16, 32, 16, 32, true, true);
 
 		//Create the screen's main widget -- a layout with one column and four
 		//rows. Because it is the top-level widget (parent=NULL) we don't need
 		//to set its position, width or height: it will fill the entire screen.
-		mainLayoutWidget = new Layout(0, 0, 0, 0, NULL, 1, 4);
+		//As it is a member variable we will give its name an "m" prefix.
+		mMainLayoutWidget = new MAUI::Layout(0, 0, 0, 0, NULL, 1, 4);
 
 		//Identify the main layout widget as root of the screen's widget tree.
-		setMain(mainLayoutWidget);
+		setMain(mMainLayoutWidget);
 
 		//Add a top margin of 20 pixels to each cell of the main layout so
 		//that child widgets are nicely spaced. To do this we call the method
 		//"setMarginY" which is available for all Layout widgets. (In the IDE,
 		//see Help > MoSync API Reference > Classes > MAUI::Layout).
-		mainLayoutWidget->setMarginY(20);
+		mMainLayoutWidget->setMarginY(20);
 
 		//Now we create four child widgets within the main layout widget.
 
 		//The first widget is a label that we'll use to present instructions.
 		//We'll use our bitmap font to display the text.
-		instructions = new Label(0, 0, 150, 60, mainLayoutWidget,
+		mInstructions = new MAUI::Label(0, 0, 150, 60, mMainLayoutWidget,
 			"Enter a password:", 0x000000, myFont);
 
 		//Set the instructions label to be multiline. We will need this
 		//property later.
-		instructions->setMultiLine(true);
+		mInstructions->setMultiLine(true);
 
 		//The second widget is an edit box that we'll use to capture text.
 		//We set its multiline property to "false" because we just want it
 		//to be one line. Note that for an EditBox, the multiline property
 		//can be set both by providing it as an initial attribute (as here)
 		//and through the "isMultiLine" method.
-		passwordBox = new EditBox(0, 0, 150, 30, mainLayoutWidget,
+		mPasswordBox = new MAUI::EditBox(0, 0, 150, 30, mMainLayoutWidget,
 			"", 0x555555, myFont, true, false, 60);
 
 		//Activate the EditBox as a KeyListener so that its content gets updated
 		//when keys are pressed. Use password mode to hide text after entry.
-		passwordBox->activate();
-		passwordBox->setPasswordMode(true);
+		mPasswordBox->activate();
+		mPasswordBox->setPasswordMode(true);
 
 		//The third and fourth widgets are labels that we will use as buttons.
-		clearButton = new Label(0, 0, 150, 30, mainLayoutWidget,
+		mClearButton = new MAUI::Label(0, 0, 150, 30, mMainLayoutWidget,
 			"Clear", 0, myFont);
-		submitButton = new Label(0, 0, 150, 30, mainLayoutWidget,
+		mSubmitButton = new MAUI::Label(0, 0, 150, 30, mMainLayoutWidget,
 			"Submit", 0, myFont);
 
-		//Skin clearButton and submitButton to make them look like buttons.
-		clearButton->setSkin(myBack);
-		submitButton->setSkin(myBack);
+		//Skin mClearButton and mSubmitButton to make them look like buttons.
+		mClearButton->setSkin(myBack);
+		mSubmitButton->setSkin(myBack);
 
 		//Centre the button texts horizontally and vertically.
-		clearButton->setHorizontalAlignment(Label::HA_CENTER);
-		clearButton->setVerticalAlignment(Label::VA_CENTER);
-		submitButton->setHorizontalAlignment(Label::HA_CENTER);
-		submitButton->setVerticalAlignment(Label::VA_CENTER);
+		mClearButton->setHorizontalAlignment(MAUI::Label::HA_CENTER);
+		mClearButton->setVerticalAlignment(MAUI::Label::VA_CENTER);
+		mSubmitButton->setHorizontalAlignment(MAUI::Label::HA_CENTER);
+		mSubmitButton->setVerticalAlignment(MAUI::Label::VA_CENTER);
 
 	//That's the constructor finished.
 	}
 
-	//Now we need a method to make the clearButton and submitButton buttons
+	//Now we need a method to make the mClearButton and mSubmitButton buttons
 	//work. To do this we overload (i.e. create our own implementation of)
 	//the MAUI Screen base class's pointer listener. This method will be
 	//called whenever the pointer is lifted from the screen.
@@ -128,19 +123,19 @@ public:
 	{
 
 		//If the Clear button is clicked...
-		if( clearButton->contains( point.x, point.y ) )
+		if( mClearButton->contains( point.x, point.y ) )
 		{
 			//...clear the edit box.
-			passwordBox->clearText();
+			mPasswordBox->clearText();
 		}
 
 		//If the Submit button is clicked...
-		if( submitButton->contains( point.x, point.y ) )
+		if( mSubmitButton->contains( point.x, point.y ) )
 		{
 			//...check that the password is at least 6 characters long.
 			//Here we are reading the current text in the EditBox using the
 			//"getText" method and assigning it to "pw".
-			const String &pw = passwordBox->getText( );
+			const String &pw = mPasswordBox->getText( );
 			if ( pw.length() < 6 )
 			{
 				//If the validation failed, update the instructions label.
@@ -148,12 +143,12 @@ public:
 				//caption -- which is why we needed the label to have that
 				//multiline setting. Note too, how C automatically
 				//concatenates strings split over multiple lines.
-				instructions->setCaption("Password too short. "
+				mInstructions->setCaption("Password too short. "
 					"Please enter a password of at least 6 characters:");
 			}
 			else
 			{
-				instructions->setCaption("Password OK");
+				mInstructions->setCaption("Password OK");
 			}
 		}
 	}
@@ -164,16 +159,16 @@ public:
 	//all its children will automatically be deleted too.
 	~AppScreen()
 	{
-		delete mainLayoutWidget;
+		delete mMainLayoutWidget;
 	}
 private:
 	//Here we declare the data types of our widgets so that the constructor,
-	//destructor and pointer methods can work with them.
-	Layout * mainLayoutWidget;
-	Label * instructions;
-	Label * clearButton;
-	Label * submitButton;
-	EditBox * passwordBox;
+	//destructor, pointer and other methods of the class can work with them.
+	MAUI::Layout * mMainLayoutWidget;
+	MAUI::Label * mInstructions;
+	MAUI::Label * mClearButton;
+	MAUI::Label * mSubmitButton;
+	MAUI::EditBox * mPasswordBox;
 };
 
 //That's the screen class finished, now we move on to the event handling
@@ -193,11 +188,11 @@ public:
 	}
 
 	//Next, the method for detecting key presses, which we have inherited from
-	//the Moblet base class.
+	//the Moblet base class. We will override this inherited method with some
+	//processing of our own.
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		//Here we override the inherited method with some processing of our own:
-		//closing the application if key 0 is pressed.
+		//Close the application if key 0 is pressed.
 		if(keyCode == MAK_0)
 		{
 			close();
@@ -223,7 +218,7 @@ extern "C" int MAMain()
 	// Create an instance of HelloMAUIMoblet.
 	HelloMAUIMoblet mainMoblet;
 
-	// Give the moblet responsibility for event handling.
+	// Run the Moblet to start the application.
 	Moblet::run( &mainMoblet );
 
 	/*

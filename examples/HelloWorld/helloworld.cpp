@@ -32,11 +32,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 
 //Declare the MAUtil namespace so that we can use the short forms of
-//identifiers in our code.
+//identifiers in our code. This allows us to write, for example,  "Moblet"
+//instead of "MAUtil::Moblet".
 using namespace MAUtil;
 
-//Create an event-handling wrapper for our application based on the
-//Moblet base class.
+//Create the wrapper for the entire application. It is here that we will manage
+//the application and handle events. To create the wrapper we make our own
+//implementation of the MoSync Moblet base class. There can be only one Moblet
+//in an application.
 class MyMoblet : public Moblet {
 
 //Define our new class's public methods.
@@ -76,10 +79,10 @@ public:
 //processing starts.
 extern "C" int MAMain() {
 
-	//Create an instance of MyMoblet
+	//Create the instance of MyMoblet
 	MyMoblet myMoblet;
 
-	// Give the moblet responsibility for event handling.
+	// Run the Moblet to start the application.
 	Moblet::run( &myMoblet );
 
 	//MyMoblet will run until it is closed by the user pressing key 0. When
