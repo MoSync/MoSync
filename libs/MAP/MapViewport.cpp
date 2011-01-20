@@ -77,6 +77,19 @@ namespace MAP
 			pointPtr( 0 )
 		{
 		}
+		
+		virtual ~MapViewportIdleListener( )  
+		{	
+		}
+		
+		void removeIdleListenerIfEverythingIsDone() 
+		{		
+			Environment::getEnvironment( ).removeIdleListener( this );
+			mViewport->mHasTimer = false;
+			mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
+			mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;		
+		}
+		
 
 		//---------------------------------------------------------------------
 		void idle( )
@@ -162,10 +175,12 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					Environment::getEnvironment( ).removeIdleListener( this );
-					mViewport->mHasTimer = false;
-					mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
+					//Environment::getEnvironment( ).removeIdleListener( this );
+					removeIdleListenerIfEverythingIsDone();
+	
+					//mViewport->mHasTimer = false;
+					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
+					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
 					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 			}
@@ -213,10 +228,12 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					Environment::getEnvironment( ).removeIdleListener( this );
-					mViewport->mHasTimer = false;
-					mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
+					//Environment::getEnvironment( ).removeIdleListener( this );
+					removeIdleListenerIfEverythingIsDone();
+					
+					//mViewport->mHasTimer = false;
+					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
+					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
 					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 
@@ -245,8 +262,7 @@ namespace MAP
 			pointPtr = 0;
 		}
 
-
-	private:
+	private:	
 		double mMomentumX;
 		double mMomentumY;
 		MapViewport* mViewport;
@@ -446,6 +462,16 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
+	int getAlphaForTile(MapTile* tile)
+	//-------------------------------------------------------------------------	
+	{
+		int timeSinceCreated = tile->getMilliSecondsSinceCreated();
+		int alpha = (255*timeSinceCreated)/250;
+		if(alpha>255) alpha = 255;
+		return alpha;
+	}
+
+	//-------------------------------------------------------------------------
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile, bool foundInCache )
 	//-------------------------------------------------------------------------
 	{
@@ -465,7 +491,22 @@ namespace MAP
 
 			#endif // WIN32
 
-			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );
+			// calculate alpha..
+			//int timeSinceCreated = tile->getMilliSecondsSinceCreated();
+			//int alpha = (255*timeSinceCreated)/250;
+
+			int alpha = getAlphaForTile(tile);			
+			if(alpha<255) {
+				Gfx_setAlpha(alpha);
+			} 
+			
+			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+		
+			Gfx_setAlpha(255);
+			
+			//char buffer[100];
+			//sprintf( buffer, "%d", maGetMilliSecondCount());
+			//mFont->drawString( buffer, pt.x, pt.y);		
 
 			#ifndef WIN32
 
@@ -480,8 +521,9 @@ namespace MAP
 			{
 				#ifndef WIN32
 				
-				if ( !foundInCache ) 
+				if ( !foundInCache ) {
 					Gfx_notifyImageUpdated( tile->getImage( ) );
+				}
 
 				#endif
 				
@@ -522,6 +564,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mInDraw = true;
+		
 		//
 		// Save clip
 		//
@@ -531,6 +574,11 @@ namespace MAP
 		// Draw available tiles
 		//
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+		
+	//	if(mAlphaChanged) {
+	//		updateMap( );
+	//	}
+		
 		//
 		// Let subclass draw its overlay
 		//

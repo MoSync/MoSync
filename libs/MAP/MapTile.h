@@ -56,7 +56,8 @@ namespace MAP
 			mMagnification( magnification ),
 			mCenter( center ),
 			mImage( image ),
-			mLastAccessTime( DateTime::minValue( ) )
+			mLastAccessTime( DateTime::minValue( ) ),
+			mCreationTime( maGetMilliSecondCount() )
 		{
 			//tileCount++;
 			//DebugPrintf("Maptile: %d\n", tileCount );
@@ -129,6 +130,15 @@ namespace MAP
 		{ 
 			return mLastAccessTime; 
 		}
+		
+		/**
+		 * Returns milliseconds since the tile was created.
+		 */
+		int getMilliSecondsSinceCreated( ) const		
+		{ 
+			return maGetMilliSecondCount() - mCreationTime; 
+		}		
+		
 
 	private:
 		MapSource* mSource;
@@ -138,6 +148,7 @@ namespace MAP
 		LonLat mCenter;
 		MAHandle mImage;
 		DateTime mLastAccessTime;
+		int mCreationTime;
 
 		//static int tileCount;
 	};

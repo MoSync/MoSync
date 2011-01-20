@@ -50,6 +50,9 @@ void dummy_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2
 void dummy_notifyImageUpdated(MAHandle image);
 void dummy_beginRendering(void);
 void dummy_updateScreen(void);
+void dummy_setClearColor(int r, int g, int b);
+void dummy_setColor(int r, int g, int b);
+void dummy_setAlpha(int a);
 
 static void _Gfx_init(void);
 
@@ -72,7 +75,10 @@ static MAGraphicsDriver sDummy = {
 	&dummy_drawImageRegion,
 	&dummy_notifyImageUpdated,
 	&dummy_beginRendering,
-	&dummy_updateScreen
+	&dummy_updateScreen,
+	&dummy_setClearColor,
+	&dummy_setColor,
+	&dummy_setAlpha
 };
 
 static MAGraphicsDriver* graphicsDriver = &sDummy;
@@ -171,6 +177,21 @@ void dummy_updateScreen(void)  {
 	graphicsDriver->updateScreen();
 }
 
+void dummy_setClearColor(int r, int g, int b) {
+	Gfx_useDriverSoftware();
+	graphicsDriver->setClearColor(r, g, b);
+}
+
+
+void dummy_setColor(int r, int g, int b) {
+	Gfx_useDriverSoftware();
+	graphicsDriver->setColor(r, g, b);
+}
+
+void dummy_setAlpha(int a) {
+	Gfx_useDriverSoftware();
+	graphicsDriver->setAlpha(a);
+}
 
 void Gfx_useDriver(MAGraphicsDriver* driver) {
 	_Gfx_init();
@@ -525,3 +546,16 @@ void Gfx_beginRendering(void) {
 void Gfx_updateScreen(void) {
 	graphicsDriver->updateScreen();
 }
+
+void Gfx_setClearColor(int r, int g, int b) {
+	graphicsDriver->setClearColor(r, g, b);
+}
+
+void Gfx_setColor(int r, int g, int b) {
+	graphicsDriver->setColor(r, g, b);
+}
+
+void Gfx_setAlpha(int a) {
+	graphicsDriver->setAlpha(a);
+}
+

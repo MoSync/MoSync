@@ -40,6 +40,9 @@ void ogl_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 void ogl_notifyImageUpdated(MAHandle image);
 void ogl_beginRendering(void);
 void ogl_updateScreen(void);
+void ogl_setClearColor(int r, int g, int b);
+void ogl_setColor(int r, int g, int b);
+void ogl_setAlpha(int a);
 
 static MARect sViewPort;
 
@@ -63,7 +66,10 @@ static MAGraphicsDriver sGLGraphicsDriver = {
 	&ogl_drawImageRegion,
 	&ogl_notifyImageUpdated,
 	&ogl_beginRendering,
-	&ogl_updateScreen	
+	&ogl_updateScreen,
+	&ogl_setClearColor,
+	&ogl_setColor,
+	&ogl_setAlpha
 };
 
 static int sNativeUIOpenGLView = -1;
@@ -368,4 +374,22 @@ void ogl_updateScreen(void) {
 		maUpdateScreen();
 	else
 		maWidgetSetProperty(sNativeUIOpenGLView, "invalidate", "");
+}
+
+static int sColorR = 255, sColorG = 255, sColorB = 255, sAlpha = 255;
+
+void ogl_setClearColor(int r, int g, int b) {
+	glClearColorx(r<<8, g<<8, b<<8, 255<<8);
+}
+
+void ogl_setColor(int r, int g, int b) {
+	sColorR = r;
+	sColorG = g;
+	sColorB = b;
+	glColor4x(sColorR<<8, sColorG<<8, sColorB<<8, sAlpha<<8);
+}
+
+void ogl_setAlpha(int a) {
+	sAlpha = a;
+	glColor4x(sColorR<<8, sColorG<<8, sColorB<<8, sAlpha<<8);	
 }

@@ -37,6 +37,9 @@ void MoSync_AddCloseEvent();
 	// not usable for drawing, etc.
 	[[UIApplication sharedApplication] setStatusBarHidden:YES 
 										withAnimation:UIStatusBarAnimationFade];
+	//[[UIApplication sharedApplication] setStatusBarHidden:NO 
+	//									withAnimation:UIStatusBarAnimationFade];
+	
     // Override point for customization after app launch    
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     viewController = [[MoSyncViewController alloc] init];

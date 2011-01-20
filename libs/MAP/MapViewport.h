@@ -211,7 +211,6 @@ namespace MAP
 		Font* mFont;
 		bool mHasTimer;
 		bool mInDraw;
-
 		
 		double mScale;
 	};

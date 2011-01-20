@@ -51,6 +51,9 @@ void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d
 void soft_notifyImageUpdated(MAHandle image);
 void soft_beginRendering(void);
 void soft_updateScreen(void);
+void soft_setClearColor(int r, int g, int b);
+void soft_setColor(int r, int g, int b);
+void soft_setAlpha(int a);
 
 static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_setup,
@@ -71,7 +74,11 @@ static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_drawImageRegion,
 	&soft_notifyImageUpdated,
 	&soft_beginRendering,
-	&soft_updateScreen
+	&soft_updateScreen,
+	&soft_setClearColor,
+	&soft_setColor,
+	&soft_setAlpha
+	
 };
 
 //MAGraphicsDriver* Gfx_getDriverSoftware(void) {
@@ -187,4 +194,14 @@ void soft_beginRendering(void) {
 
 void soft_updateScreen(void) {
 	maUpdateScreen();
+}
+
+void soft_setClearColor(int r, int g, int b) {
+}
+
+void soft_setColor(int r, int g, int b) {
+	maSetColor(r<<16 | g<<8 | b);
+}
+
+void soft_setAlpha(int a) {
 }
