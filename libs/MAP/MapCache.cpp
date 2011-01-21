@@ -373,7 +373,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 
-		#if 0 // old
+		#if 0 // old . Niklas: new cache mechanism doesn't work? It just kept on adding stuff to the cache.
 
 		//
 		// Add to cache in free location
