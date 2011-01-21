@@ -759,7 +759,7 @@ void var_delete(const string& args) {
 		delete v;
 	}
 
-	oprintDone();
+	oprintDoneLn();
 	commandComplete();
 }
 
