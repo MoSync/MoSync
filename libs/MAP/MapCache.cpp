@@ -258,13 +258,13 @@ namespace MAP
 		int xMin = directionX < 0 ? left : right;
 		int xMax = directionX < 0 ? right + 1 : left - 1;
 
-		DebugPrintf( "y: %d to %d x: %d to %d\n", yMin, yMax, xMin, xMax );
+		//DebugPrintf( "y: %d to %d x: %d to %d\n", yMin, yMax, xMin, xMax );
 
 		for ( int y = yMin; y != yMax; y += yStep )
 		{
 			for ( int x = xMin; x != xMax; x += xStep )
 			{
-				DebugPrintf( "xy: %d, %d\n", x, y );
+				//DebugPrintf( "xy: %d, %d\n", x, y );
 				//
 				// In cache? Then immediately return tile in cache
 				//
