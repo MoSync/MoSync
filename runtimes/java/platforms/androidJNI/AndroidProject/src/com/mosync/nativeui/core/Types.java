@@ -10,6 +10,7 @@ public class Types
 {
 	public static final String WIDGET_SCREEN = "Screen";
 	public static final String WIDGET_TYPE_BUTTON = "Button";
+	public static final String WIDGET_TYPE_CHECKBOX = "CheckBox";
 	public static final String WIDGET_TYPE_LABEL = "Label";
 	public static final String WIDGET_TYPE_IMAGE = "Image";
 	public static final String WIDGET_TYPE_LIST = "ListView";
@@ -45,6 +46,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_VISIBLE = "visible";
 	
 	public static final String WIDGET_PROPERTY_TEXT = "text";
+	public static final String WIDGET_PROPERTY_CHECKED = "checked";
 	
 	public static final String WIDGET_PROPERTY_TITLE = "title";
 	public static final String WIDGET_PROPERTY_ICON = "icon";
