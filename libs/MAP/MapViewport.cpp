@@ -589,9 +589,10 @@ namespace MAP
 		// Draw available tiles
 		//
 
-//#ifdef WIN32 // HACK for debugging
-//maSetColor( 0xa0a0a0 );
-//Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
+//#ifdef WIN32
+// HACK for debugging
+maSetColor( 0x000000 );
+Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
 //#endif //HACK
 
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );

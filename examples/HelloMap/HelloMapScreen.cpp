@@ -52,7 +52,7 @@ namespace HelloMap
 		//
 		// Stockholm
 		//
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 5, true, false );
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 
 		mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
 		mMap->setFont( mFont );

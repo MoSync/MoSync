@@ -197,12 +197,13 @@ namespace MAP
 		//
 		// Queue all tiles in area
 		//
-		int xStep = directionX < 0 ? 1 : -1;
-		int yStep = directionY > 0 ? 1 : -1;
-		int yMin = directionY > 0 ? top : bottom;
-		int yMax = directionY > 0 ? bottom + 1 : top - 1;
-		int xMin = directionX < 0 ? left : right;
-		int xMax = directionX < 0 ? right + 1 : left - 1;
+		int xStep = directionX > 0 ? 1 : -1;
+		int xMin = directionX > 0 ? left : right;
+		int xMax = directionX > 0 ? right + 1 : left - 1;
+
+		int yStep = directionY < 0 ? 1 : -1;
+		int yMin = directionY < 0 ? top : bottom;
+		int yMax = directionY < 0 ? bottom + 1 : top - 1;
 
 		for ( int y = yMin; y != yMax; y += yStep )
 		{
