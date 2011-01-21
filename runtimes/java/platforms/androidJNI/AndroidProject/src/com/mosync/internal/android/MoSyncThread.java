@@ -2069,6 +2069,8 @@ public class MoSyncThread extends Thread
 			mImageResources.remove(resourceIndex);
 		}
 		
+		Log.i("---MoSyncThread---", "binary: " + mBinaryResources.size( ) + " ubinary: " + mUBinaryResources.size( ) + " image: " + mImageResources.size( ) );
+		
 		Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
 	}
@@ -2707,7 +2709,7 @@ public class MoSyncThread extends Thread
 		
 		// Blit original bitmap to new bitmap.
 		Canvas canvas = new Canvas(newBitmap);
-		canvas.drawBitmap(newBitmap, 0, 0, null);
+		canvas.drawBitmap(bitmap, 0.0f, 0.0f, null);
 		
 		return newBitmap;
 	}
