@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "LonLat.h"
 #include "DebugPrintf.h"
 #include <MAUtil/PlaceholderPool.h>
+#include "TraceScope.h"
 
 using namespace MAPUtil;
 
@@ -59,6 +60,7 @@ namespace MAP
 			mLastAccessTime( DateTime::minValue( ) ),
 			mCreationTime( maGetMilliSecondCount() )
 		{
+			//TraceScope tr( "MapTile::MapTile" );
 			//tileCount++;
 			//DebugPrintf("Maptile: %d\n", tileCount );
 		}
@@ -67,6 +69,8 @@ namespace MAP
 		 */
 		virtual ~MapTile( )
 		{
+			//TraceScope tr( "MapTile::~MapTile" );
+
 			//tileCount--;
 			//maDestroyObject( mImage );
 			

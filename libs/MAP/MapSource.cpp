@@ -20,15 +20,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSource.h"
 #include "MapTileCoordinate.h"
 #include "TraceScope.h"
-//#include <MAUtil/Stack.h>
 
 namespace MAP
 {
-	//
-	// Capacity of request queue.
-	//
-	//static const int			QueueSize = 100;
-
 	//=========================================================================
 	class MapSourceImageDownloader : public ImageDownloader
 	//=========================================================================
@@ -110,23 +104,6 @@ namespace MAP
 		MapTileCoordinate mTileXY;
 	};
 
-#if 0 // QUEUE
-
-	//=========================================================================
-	class MapSourceQueue: public Queue<QueueEntry>
-	//=========================================================================
-	{
-	public:
-		MapSourceQueue( const int capacity ) 
-			: Queue<QueueEntry>( capacity ) 
-		{
-		}
-
-		virtual	~MapSourceQueue( ) { }
-	};
-
-#else // STACK
-
 	template <typename T>
 	class Stack 
 	{
@@ -190,11 +167,6 @@ namespace MAP
 		virtual	~MapSourceQueue( ) { }
 	};
 
-#endif
-
-	int createdDownloaders;
-	int busyDownloaders;
-
 	//-------------------------------------------------------------------------
 	//
 	// Creates a new map source
@@ -204,7 +176,7 @@ namespace MAP
 		mQueue( NULL ),
 		mTileCount( 0 )
 	{
-		mQueue = newobject( MapSourceQueue, new MapSourceQueue( /*QueueSize*/ ) );
+		mQueue = newobject( MapSourceQueue, new MapSourceQueue( ) );
 		for (int i = 0; i < Downloaders; i++)
 			mDownloaders[i] = NULL;
 	}
@@ -225,13 +197,9 @@ namespace MAP
 				if ( mDownloaders[i]->isDownloading( ) )
 				{
 					mDownloaders[i]->cancelDownloading( );
-					busyDownloaders--;
-					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
-				createdDownloaders++;
-				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
 			}
 		}
 	}
@@ -243,14 +211,16 @@ namespace MAP
 	void MapSource::requestTile( IMapSourceListener* listener, MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		//TraceScope tr = TraceScope( "MapSource::requestTile" );
-		if ( !isInQueue( tileXY ) )
+		//DebugPrintf( "request: queue=%d\n", mQueue->size( ) );
+
+		if ( !isInQueue( tileXY ) && !isInDownloaders( tileXY ) )
 		{
 			QueueEntry entry = QueueEntry( listener, false, tileXY );
-			//mQueue->enqueue( entry );
 			mQueue->push( entry );
 			dequeueIfIdleSlot( NULL );
 		}
+		//else
+		//	DebugPrintf( "Already in queue: %d,%d\n", tileXY.getX( ), tileXY.getY( ) );
 	}
 
 	//-------------------------------------------------------------------------
@@ -258,7 +228,6 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		QueueEntry entry = QueueEntry( listener, true, MapTileCoordinate( ) );
-		//mQueue->enqueue( entry );
 		mQueue->push( entry );
 		dequeueIfIdleSlot( NULL );
 	}
@@ -284,6 +253,27 @@ namespace MAP
 		{
 			QueueEntry item = mQueue->peek( i );
 			MapTileCoordinate itemTileXY = item.mTileXY;
+			//DebugPrintf( "%d==%d %d==%d %d==%d\n", itemTileXY.getX( ), tileXY.getX( ), itemTileXY.getY( ), tileXY.getY( ), itemTileXY.getMagnification( ), tileXY.getMagnification( ) );
+			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
+				return true;
+		}
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	//
+	// Is job already in queue?
+	//
+	bool MapSource::isInDownloaders( MapTileCoordinate tileXY )
+	//-------------------------------------------------------------------------
+	{
+		for ( int i = 0; i <  Downloaders; i++ )
+		{
+			MapSourceImageDownloader* dlr = mDownloaders[i];
+			if ( dlr == NULL )
+				continue;
+			MapTileCoordinate itemTileXY = dlr->getTileXY( );
+			//DebugPrintf( "%d==%d %d==%d %d==%d\n", itemTileXY.getX( ), tileXY.getX( ), itemTileXY.getY( ), tileXY.getY( ), itemTileXY.getMagnification( ), tileXY.getMagnification( ) );
 			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
 				return true;
 		}
@@ -304,8 +294,6 @@ namespace MAP
 				if ( mDownloaders[i]->isDownloading( ) )
 				{
 					mDownloaders[i]->cancelDownloading( );
-					busyDownloaders--;
-					//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
@@ -325,8 +313,6 @@ namespace MAP
 			{
 				mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
 				mDownloaders[slot]->addDownloadListener( this );
-				createdDownloaders++;
-				//DebugPrintf( "createdDownloaders: %d\n", createdDownloaders );
 			}
 			dequeueNextJob( mDownloaders[slot] );
 		}
@@ -336,12 +322,15 @@ namespace MAP
 	void MapSource::finishedDownloading( Downloader* downloader, MAHandle data )
 	//-------------------------------------------------------------------------
 	{
-		//TraceScope ts = TraceScope( "MapSource::finishedDownloading" );
+		//TraceScope tr( "MapSource::finishedDownloading" );
 
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
 		mTileCount++;
 		MapTileCoordinate tileXY = dlr->getTileXY( );
+
+		//DebugPrintf( "x,y: %d,%d mag: %d\n", tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ) );
+		
 		LonLat ll = tileCenterToLonLat( getTileSize( ), tileXY, 0, 0 );
 		MapTile* tile = newobject( MapTile, new MapTile( this, tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );
 		onTileReceived( dlr->mListener, tile );
@@ -349,8 +338,6 @@ namespace MAP
 		// Terminate clientdata lifespan
 		//
 
-		busyDownloaders--;
-		//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 		//
 		// NOTE: The reason we're not deleting the downloader here is that
 		// it's referenced on return from this call.
@@ -364,10 +351,8 @@ namespace MAP
 	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		//TraceScope tr = TraceScope( "MapSource::downloadCancelled" );
+		TraceScope tr = TraceScope( "MapSource::downloadCancelled" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-		//MapSourceClientData* clientData = (MapSourceClientData*)dlr->getClientData( );
-		//clientData->mListener->downloadCancelled( this );
 		onDownloadCancelled( dlr->mListener );
 	}
 
@@ -377,8 +362,6 @@ namespace MAP
 	{
 		TraceScope tr = TraceScope( "MapSource::error" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-		//MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
-		//clientData->mListener->error( this, code );
 		onError( dlr->mListener, code );
 	}
 
@@ -398,8 +381,6 @@ namespace MAP
 				//
 				// Release to make slot available.
 				//
-				//mDownloaders[i]->removeDownloadListener( this );
-				//deleteobject( mDownloaders[i] );
 				mDownloaders[i]->mListener = NULL;
 				return i;
 			}
@@ -427,11 +408,8 @@ namespace MAP
 			downloader->setTileXY( entry.mTileXY );
 			downloader->mListener = entry.mListener;
 			int res = downloader->beginDownloading( url, 0 );
-			busyDownloaders++;
-			//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
 
-			//MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-			//MapSourceClientData* clientData = (MapSourceClientData*)dlr->getClientData( );
+			//DebugPrintf( "Download started: %d,%d\n", entry.mTileXY.getX( ), entry.mTileXY.getY( ) );
 
 			if ( res < 0 )
 				onError( downloader->mListener, 0 ); // TODO: Proper error code.
@@ -442,9 +420,6 @@ namespace MAP
 	void MapSource::onTileReceived( IMapSourceListener* listener, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//Vector<IMapSourceListener*>* listeners = getBroadcasterListeners<IMapSourceListener>( *this );
-		//for ( int i = 0; i < listeners->size( ); i ++ )
-		//	(*listeners)[i]->tileReceived( this, tile );
 		listener->tileReceived( this, tile );
 	}
 
@@ -452,9 +427,6 @@ namespace MAP
 	void MapSource::onDownloadCancelled( IMapSourceListener* listener )
 	//-------------------------------------------------------------------------
 	{
-		//Vector<IMapSourceListener*>* listeners = getBroadcasterListeners<IMapSourceListener>( *this );
-		//for ( int i = 0; i < listeners->size( ); i ++ )
-		//	(*listeners)[i]->downloadCancelled( this );
 		listener->downloadCancelled( this );
 	}
 
@@ -462,9 +434,6 @@ namespace MAP
 	void MapSource::onJobComplete( IMapSourceListener* listener )
 	//-------------------------------------------------------------------------
 	{
-		//Vector<IMapSourceListener*>* listeners = getBroadcasterListeners<IMapSourceListener>( *this );
-		//for ( int i = 0; i < listeners->size( ); i ++ )
-		//	(*listeners)[i]->jobComplete( this );
 		listener->jobComplete( this );
 	}
 
@@ -472,9 +441,6 @@ namespace MAP
 	void MapSource::onError( IMapSourceListener* listener, int code )
 	//-------------------------------------------------------------------------
 	{
-		//Vector<IMapSourceListener*>* listeners = getBroadcasterListeners<IMapSourceListener>( *this );
-		//for ( int i = 0; i < listeners->size( ); i ++ )
-		//	(*listeners)[i]->error( this, code );
 		listener->error( this, code );
 	}
 

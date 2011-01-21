@@ -70,7 +70,7 @@ namespace MAP
 		//
 		// Maximum parallel downloaders
 		//
-		static const int			Downloaders = 2;//5; // four in parallel plus one slacking
+		static const int			Downloaders = 3;//5; // four in parallel plus one slacking
 
 	public:
 									MapSource( );
@@ -146,6 +146,7 @@ namespace MAP
 		// Is job already in queue?
 		//
 		bool						isInQueue( MapTileCoordinate tileXY );
+		bool						isInDownloaders( MapTileCoordinate tileXY );
 		//
 		//
 		//

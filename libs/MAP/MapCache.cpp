@@ -26,6 +26,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
+	//int MapTile::tileCount = 0;
+
 	MapCache* MapCache::sSingleton = NULL;
 
 	static const int DefaultCapacity = 40;
@@ -72,7 +74,6 @@ namespace MAUtil
 	hash_val_t THashFunction<MAP::MapTileKey>( const MAP::MapTileKey& data ) 
 	//-------------------------------------------------------------------------
 	{
-		//return THashFunction<int>(data.w | (data.h<<12) | (((int)data.type)<<24)) - THashFunction<int>((int)data.skin);
 		return ((int)data.mSource) ^ data.mGridX ^ data.mGridY ^ data.mMagnification;
 	} 
 }
@@ -106,7 +107,6 @@ namespace MAP
 		mMisses( 0 ),
 		mCapacity( DefaultCapacity )
 	{
-		//reallocateCache( mCapacity );
 	}
 
 	//-------------------------------------------------------------------------
@@ -118,7 +118,6 @@ namespace MAP
 	{
 		// dispose tile list
 		clear( );
-		//deleteobject( mList );
 	}
 
 	//-------------------------------------------------------------------------
@@ -132,7 +131,6 @@ namespace MAP
 	void MapCache::setCapacity( int capacity ) 
 	//-------------------------------------------------------------------------
 	{ 
-		//reallocateCache( capacity ); 
 		mCapacity = capacity;
 	}
 
@@ -140,43 +138,8 @@ namespace MAP
 	int MapCache::size( )
 	//-------------------------------------------------------------------------
 	{
-		//int s = 0;
-		//for ( int i = 0; i < mCapacity; i++ )
-		//{
-		//	const MapTile* t = mList[i];
-		//	if ( t != NULL )
-		//		s++;
-		//}
-		//return s;
 		return mList.size( );
 	}
-
-	////-------------------------------------------------------------------------
-	////
-	//// Reallocates cache, content is flushed
-	////
-	//void MapCache::reallocateCache( int capacity )
-	////-------------------------------------------------------------------------
-	//{
-	//	//
-	//	// Free existing
-	//	//
-	//	if ( mList != NULL )
-	//	{
-	//		clear( );
-	//		deleteobject( mList );
-	//	}
-	//	//
-	//	// Set new capacity
-	//	//
-	//	mCapacity = capacity;
-	//	//
-	//	// Alloc new
-	//	//
-	//	mList = newobject( MapTile*, new MapTile*[mCapacity] );
-	//	for ( int i = 0; i < mCapacity; i++ )
-	//		mList[i] = NULL;
-	//}
 
 	//
 	// Min, Max
@@ -202,8 +165,6 @@ namespace MAP
 		DebugAssert( pixelWidth > 0 );
 		DebugAssert( pixelHeight > 0 );
 
-		//TraceScope ts = TraceScope( "MapCache::requestTiles" );
-
 		if ( source == NULL ) 
 			return;
 		//
@@ -211,27 +172,13 @@ namespace MAP
 		//
 		source->clearQueue( );
 
-		//
-		// Test code
-		//
-		if ( /*true*/false )
-		{
-			//
-			// Test code only requests tile at centerpoint.
-			//
-			LonLat cp = LonLat( centerpoint.lon, centerpoint.lat + 40 );
-			MapTileCoordinate tileXY = source->lonLatToTile( centerpoint, magnification );
-			source->requestTile( this, tileXY );
-			return;
-		}
-
-
 		const int offsetX = pixelWidth / 2;
 		const int offsetY = pixelHeight / 2;
 		//
 		// conv center to pixels
 		//
 		PixelCoordinate centerPx = source->lonLatToPixel( centerpoint, magnification );
+		//
 		// Find corners
 		//
 		PixelCoordinate llpix = PixelCoordinate( magnification, centerPx.getX( ) - offsetX, centerPx.getY( ) - offsetY );
@@ -250,7 +197,6 @@ namespace MAP
 		//
 		// Queue all tiles in area
 		//
-		//const double halfTileSize = 0.5 * tileSize;
 		int xStep = directionX < 0 ? 1 : -1;
 		int yStep = directionY > 0 ? 1 : -1;
 		int yMin = directionY > 0 ? top : bottom;
@@ -258,32 +204,23 @@ namespace MAP
 		int xMin = directionX < 0 ? left : right;
 		int xMax = directionX < 0 ? right + 1 : left - 1;
 
-		//DebugPrintf( "y: %d to %d x: %d to %d\n", yMin, yMax, xMin, xMax );
-
 		for ( int y = yMin; y != yMax; y += yStep )
 		{
 			for ( int x = xMin; x != xMax; x += xStep )
 			{
-				//DebugPrintf( "xy: %d, %d\n", x, y );
 				//
 				// In cache? Then immediately return tile in cache
 				//
-				//MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
 				MapTileKey key = MapTileKey( source, x, y, magnification );
-
-				//int loc = findInCache( key );
-				//Iterator i = numbers.find(4);
-				//if(i != numbers.end())
-				//	erase(i);
-
 				HashMap<MapTileKey, MapTile*>::Iterator found = mList.find( key );
 
 				if ( found != mList.end( ) )
 				{
+					//DebugPrintf(" Found: %d,%d\n", x, y );
+
 					HashMap<MapTileKey, MapTile*>::PairKV kv = *found;
 					mHits++;
 					MapTile* t = kv.second;
-					//MapTile* t = mList[loc];
 					t->stamp( );
 					onTileReceived( t, true );
 					continue;
@@ -291,6 +228,7 @@ namespace MAP
 				//
 				// Not in cache: request from map source.
 				//
+				//DebugPrintf(" Requesting: %d,%d\n", x, y );
 				mMisses++;
 				source->requestTile( this, MapTileCoordinate( x, y, magnification ) );
 			}
@@ -298,66 +236,10 @@ namespace MAP
 		source->requestJobComplete( this );
 	}
 
-	////-------------------------------------------------------------------------
-	//int MapCache::findInCache( MapTileKey* key ) const
-	////-------------------------------------------------------------------------
-	//{
-	//	//for ( int i = 0; i < mCapacity; i++ )
-	//	//{
-	//	//	const MapTile* t = mList[i];
-	//	//	if ( t != NULL )
-	//	//		if (	t->getMapSource( ) == source && 
-	//	//				t->getGridX( ) == tileXY.getX( ) && 
-	//	//				t->getGridY( ) == tileXY.getY( ) && 
-	//	//				t->getMagnification( ) == tileXY.getMagnification( ) )
-	//	//			return i;
-	//	//}
-	//	//return -1;
-
-	//	//for ( int i = 0; i < mList.size( ); i++ )
-	//	//{
-	//	//	const MapTile* t = mList[i];
-	//	//	if (	t->getMapSource( ) == source && 
-	//	//			t->getGridX( ) == tileXY.getX( ) && 
-	//	//			t->getGridY( ) == tileXY.getY( ) && 
-	//	//			t->getMagnification( ) == tileXY.getMagnification( ) )
-	//	//		return i;
-	//	//}
-	//	//return -1;
-	//}
-
 	//-------------------------------------------------------------------------
 	MapTileKey MapCache::findLRU( )
 	//-------------------------------------------------------------------------
 	{
-		//DateTime oldest = DateTime::maxValue( );
-		//int loc = -1;
-		//for ( int i = 0; i < mCapacity; i++ )
-		//{
-		//	const MapTile* t = mList[i];
-		//	if( t == NULL )
-		//		return i;
-		//	if ( t->getLastAccessTime( ) < oldest )
-		//	{
-		//		oldest = t->getLastAccessTime( );
-		//		loc = i;
-		//	}
-		//}
-		//return loc;
-
-		//DateTime oldest = DateTime::maxValue( );
-		//int loc = -1;
-		//for ( int i = 0; i < mList.size( ); i++ )
-		//{
-		//	const MapTile* t = mList[i];
-		//	if ( t->getLastAccessTime( ) < oldest )
-		//	{
-		//		oldest = t->getLastAccessTime( );
-		//		loc = i;
-		//	}
-		//}
-		//return loc;
-
 		DateTime oldest = DateTime::maxValue( );
 		MapTileKey ret;
 		for ( HashMap<MapTileKey, MapTile*>::ConstIterator i = mList.begin( ); i != mList.end( ); i++ )
@@ -372,46 +254,13 @@ namespace MAP
 		return ret;
 	}
 
-	////-------------------------------------------------------------------------
-	//int MapCache::findFreeLocation( ) const
-	////-------------------------------------------------------------------------
-	//{
-	//	for ( int i = 0; i < mCapacity; i++ )
-	//		if( mList[i] == NULL )
-	//			return i;
-	//	return -1;
-	//}
-
 	//-------------------------------------------------------------------------
 	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
+		//DebugPrintf( "Receiving tile, %d,%d\n", tile->getGridX( ), tile->getGridY( ) );
 
-		#if 0 // old . Niklas: new cache mechanism doesn't work? It just kept on adding stuff to the cache.
-
-		//
-		// Add to cache in free location
-		//
-		int loc = findFreeLocation( );
-		//
-		// No free location? Then find oldest accessed tile and overwrite.
-		//
-		if ( loc == -1 )
-			loc = findLRU( );
-		//
-		// Drop old tile, if any
-		//
-		if ( loc != -1 )
-			deleteobject( mList[loc] );
-		//
-		// Finally add to cache
-		//
-		tile->stamp( );
-		mList[loc] = tile;
-
-		onTileReceived( tile, false );
-		
-		#else
+		//TraceScope tr( "MapCache::tileReceived" );
 
 #if 0 // this block tries to test if memory is available
 
@@ -436,10 +285,13 @@ namespace MAP
 #endif
 
 		{
+			//DebugPrintf( "Cache full %d, deleting\n", mList.size( ) );
 			//
 			// find and remove oldest in cache
 			//
 			MapTileKey oldestKey = findLRU( );
+			MapTile* oldestTile = mList[oldestKey];
+			deleteobject( oldestTile );
 			mList.erase( oldestKey );
 		}
 		//
@@ -450,8 +302,6 @@ namespace MAP
 		mList.insert( newKey, tile );
 
 		onTileReceived( tile, false );
-
-		#endif
 	}
 
 	//-------------------------------------------------------------------------
@@ -484,16 +334,9 @@ namespace MAP
 	void MapCache::clear( )
 	//-------------------------------------------------------------------------
 	{
-		//for ( int i = 0; i < mList.size( ); i++ )
-		//{
-		//	MapTile* tile = mList[i];
-		//	deleteobject( tile );
-		//}
 		for ( HashMap<MapTileKey, MapTile*>::ConstIterator i = mList.begin( ); i != mList.end( ); i++ )
 		{
-			//MapTileKey key = i->first;
 			MapTile* t = i->second;
-			//deleteobject( key );
 			deleteobject( t );
 		}
 		mList.clear( );
