@@ -2017,12 +2017,11 @@ public class MoSyncThread extends Thread
 			mBinaryResources.put(resourceIndex, data);
 			return data;
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			logError("loadBinary - Out of Memory!", e);
-			maPanic(1,"Out of Memory!");
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -2057,19 +2056,21 @@ public class MoSyncThread extends Thread
 		SYSLOG("destroyBinary :" + resourceIndex);
 		
 		if(null != mBinaryResources.get(resourceIndex))
-		{
+		{	
+			mBinaryResources.put(resourceIndex, null);
 			mBinaryResources.remove(resourceIndex);
 		}
-
-		if(null != mUBinaryResources.get(resourceIndex))
+		else if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
 		}
-
-		if(null != mImageResources.get(resourceIndex))
+		else if(null != mImageResources.get(resourceIndex))
 		{
 			mImageResources.remove(resourceIndex);
 		}
+		
+		Log.i("MoSyncThread", "Resource deleted, force GC");
+		System.gc();
 	}
 
 	/**

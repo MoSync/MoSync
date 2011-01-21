@@ -124,14 +124,21 @@ namespace Base
 	{
 		SYSLOG("loadBinary");
 		
+		char* buffer = NULL;
+		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(II)Ljava/nio/ByteBuffer;");
 		if (methodID == 0) return NULL;
+		
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
-		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
-
+		if (NULL != jo)
+		{
+			buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+		}
+		
 		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(jo);		
+		mJNIEnv->DeleteLocalRef(jo);
+		
 		return buffer;
 	}
 

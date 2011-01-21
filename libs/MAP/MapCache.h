@@ -34,7 +34,7 @@ namespace MAP
 	class MapTile;
 	class MapCache;
 	class MapSource;
-	class LonLat;
+	//class LonLat;
 
 	//=========================================================================
 	/**
