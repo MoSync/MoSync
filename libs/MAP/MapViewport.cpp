@@ -495,15 +495,23 @@ namespace MAP
 			//int timeSinceCreated = tile->getMilliSecondsSinceCreated();
 			//int alpha = (255*timeSinceCreated)/250;
 
+			#ifndef WIN32
+
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
 			} 
 			
+			#endif
+
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
 		
+			#ifndef WIN32
+
 			Gfx_setAlpha(255);
 			
+			#endif
+
 			//char buffer[100];
 			//sprintf( buffer, "%d", maGetMilliSecondCount());
 			//mFont->drawString( buffer, pt.x, pt.y);		
@@ -869,7 +877,7 @@ namespace MAP
 	
     double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
 		MAPoint2d vector = calculateVector(touch1, touch2);
-		double distance = sqrt(vector.x*vector.x + vector.y*vector.y);
+		double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
 		return distance;
     }	
 	
