@@ -597,8 +597,9 @@ namespace MAP
 		// Draw available tiles
 		//
 
-//#ifdef WIN32 // HACK for debugging
-//maSetColor( 0xa0a0a0 );
+//#ifdef WIN32
+// HACK for debugging
+//maSetColor( 0x000000 );
 //Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
 //#endif //HACK
 

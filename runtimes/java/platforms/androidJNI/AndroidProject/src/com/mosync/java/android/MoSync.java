@@ -244,7 +244,16 @@ public class MoSync extends Activity
 	
 		mMoSyncThread.postEvent(event);
 		
-		return super.onKeyUp( keyCode, keyEvent );
+		// We need to intercept the back key otherwise the
+		// activity will be terminated.
+		if( keyCode == KeyEvent.KEYCODE_BACK )
+		{
+			return true;
+		}
+		else
+		{
+			return super.onKeyUp( keyCode, keyEvent );
+		}
 	}
 	
 	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
@@ -259,7 +268,16 @@ public class MoSync extends Activity
 	
 		mMoSyncThread.postEvent(event);
 		
-		return super.onKeyDown( keyCode, keyEvent );
+		// We need to intercept the back key otherwise the
+		// activity will be terminated.
+		if(keyCode == KeyEvent.KEYCODE_BACK)
+		{
+			return true;
+		}
+		else
+		{
+			return super.onKeyDown( keyCode, keyEvent );
+		}
 	}
 	
 	/**

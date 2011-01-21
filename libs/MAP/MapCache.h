@@ -34,7 +34,6 @@ namespace MAP
 	class MapTile;
 	class MapCache;
 	class MapSource;
-	//class LonLat;
 
 	//=========================================================================
 	/**
@@ -106,26 +105,13 @@ namespace MAP
 	private:
 		static MapCache* sSingleton;
 		/**
-		 * Returns tile from cache, if available
-		 */
-		//int findInCache( MapSource *source, MapTileCoordinate tileXY ) const;
-		/**
-		 * returns first unused location in cache
-		 */
-		//int findFreeLocation( ) const;
-		/**
 		 * returns location of least recently used tile
 		 */
 		MapTileKey findLRU( );
-		/**
-		 * Reallocates cache. Content is cleared.
-		 */
-		//void reallocateCache( int capacity );
 
 		void onTileReceived( MapTile* tile, bool foundInCache );
 		void onJobComplete( );
 
-		//MapTile** mList;
 		HashMap<MapTileKey, MapTile*> mList;
 		int mHits;
 		int mMisses;

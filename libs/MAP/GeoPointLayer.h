@@ -82,6 +82,7 @@ namespace MAP
 		virtual void selectNextItem( );
 		virtual void selectPreviousItem( );
 		virtual void activateSelectedItem( );
+		virtual void selectItemAtPixel( MapViewport *viewport, int magnification, MAPoint2d screenPixel );
 		//
 		// Bounding box for items
 		//
@@ -90,6 +91,7 @@ namespace MAP
 
 	private:
 		void drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, int magnification, bool renderSelected, bool drawText );
+		MAPoint2d getScreenPixel( MapViewport* viewport, int magnification, GeoPoint* point );
 
 		GeoPointDataSource* mDataSource;
 		GeoPointLayerRenderer* mRenderer;
