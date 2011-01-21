@@ -262,9 +262,10 @@ namespace MAP
 			pointPtr = 0;
 		}
 
-	private:	
 		double mMomentumX;
 		double mMomentumY;
+
+	private:	
 		MapViewport* mViewport;
 		int mPanTime;
 		int mGlideStartTime;
@@ -497,10 +498,12 @@ namespace MAP
 
 			#ifndef WIN32
 
+#if 0 // HACK
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
 			} 
+#endif
 			
 			#endif
 
@@ -508,7 +511,9 @@ namespace MAP
 		
 			#ifndef WIN32
 
+#if 0 // HACK
 			Gfx_setAlpha(255);
+#endif
 			
 			#endif
 
@@ -583,7 +588,13 @@ namespace MAP
 		//
 		// Draw available tiles
 		//
-		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+
+//#ifdef WIN32 // HACK for debugging
+//maSetColor( 0xa0a0a0 );
+//Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
+//#endif //HACK
+
+		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
 		
 	//	if(mAlphaChanged) {
 	//		updateMap( );
@@ -710,7 +721,7 @@ namespace MAP
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
 		//
-		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ) );
+		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
 	}
 
 	//-------------------------------------------------------------------------
