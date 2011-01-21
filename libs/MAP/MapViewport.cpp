@@ -591,8 +591,8 @@ namespace MAP
 
 //#ifdef WIN32
 // HACK for debugging
-maSetColor( 0x000000 );
-Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
+//maSetColor( 0x000000 );
+//Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
 //#endif //HACK
 
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
