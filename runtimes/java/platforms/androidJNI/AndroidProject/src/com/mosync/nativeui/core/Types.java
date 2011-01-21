@@ -58,6 +58,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_ALPHA = "alpha";
 	public static final String WIDGET_PROPERTY_FONT_COLOR = "fontColor";
 	public static final String WIDGET_PROPERTY_FONT_SIZE = "fontSize";
+	public static final String WIDGET_PROPERTY_SHOW_KEYBOARD = "showKeyboard";
 	
 	public static final String WIDGET_PROPERTY_BIND = "bind";
 	public static final String WIDGET_PROPERTY_INVALIDATE = "invalidate";

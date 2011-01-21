@@ -2,7 +2,6 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.content.Context;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -69,6 +68,7 @@ public class SearchBarWidget extends Widget
 			
 			if( showKeyboard )	
 			{
+				// Seems that it needs to have focus before we can show the keyboard.
 				editBox.requestFocus( );
 				manager.showSoftInput( editBox, InputMethodManager.SHOW_IMPLICIT );
 			}
