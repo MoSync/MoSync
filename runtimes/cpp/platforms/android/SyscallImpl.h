@@ -29,7 +29,9 @@ public:
 
 	Syscall();	
 	
+	int loadBinaryStore(int resourceIndex, int size);
 	char* loadBinary(int resourceIndex, int size);
+	bool destroyBinaryResource(int resourceIndex);
 	void destroyResource(int resourceIndex);
 	void postEvent(MAEvent event);
 	void postEvent(MAEvent event, JNIEnv *jniEnv);

@@ -124,22 +124,40 @@ namespace Base
 	{
 		SYSLOG("loadBinary");
 		
-		char* buffer = NULL;
+		char* b = (char*)malloc(200);
+		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		free(b);
+		
+		char* buffer = (char*)malloc(size);
+		jobject byteBuffer = mJNIEnv->NewDirectByteBuffer((void*)buffer, size);
+		
+		if(byteBuffer == NULL) return NULL;
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(II)Ljava/nio/ByteBuffer;");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(ILjava/nio/ByteBuffer;)Z");
 		if (methodID == 0) return NULL;
 		
-		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
-		if (NULL != jo)
-		{
-			buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
-		}
+		jboolean ret = mJNIEnv->CallBooleanMethod(mJThis, methodID, resourceIndex, byteBuffer);
 		
 		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(jo);
-		
+		mJNIEnv->DeleteLocalRef(byteBuffer);
+
+		if(ret == false)
+		{
+			free(buffer);
+			return NULL;
+		}
 		return buffer;
+	}
+	
+	int Syscall::loadBinaryStore(int resourceIndex, int size)
+	{
+		char* b = (char*)malloc(200);
+		sprintf(b, "loadBinaryStore index:%d size:%d", resourceIndex, size);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		free(b);
+		return maCreateData(resourceIndex, size);
 	}
 
 	void Syscall::loadUBinary(int resourceIndex, int offset, int size)
@@ -152,6 +170,26 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex, offset, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
+	}
+	
+	bool Syscall::destroyBinaryResource(int resourceIndex)
+	{
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "destroyBinary", "(I)Ljava/nio/ByteBuffer;");
+		if (methodID == 0) return false;
+		
+		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex);
+		if(jo != NULL)
+		{
+			char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+			free(buffer);
+			return true;
+		}
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jo);
+		
+		return false;
 	}
 	
 	void Syscall::destroyResource(int resourceIndex)
@@ -671,18 +709,13 @@ namespace Base
 		SYSLOG("maReadStore");
 			
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maReadStore", "(II)Ljava/nio/ByteBuffer;");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maReadStore", "(II)I");
 		if (methodID == 0) ERROR_EXIT;
-		jobject ob = mJNIEnv->CallObjectMethod(mJThis, methodID, store, placeholder);
-		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(ob);
-		MemStream* ms = new MemStream(buffer, (int)mJNIEnv->GetDirectBufferCapacity(ob));
-
-		if(SYSCALL_THIS->resources.add_RT_BINARY(placeholder, ms) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
-
-		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(ob);
+		jint res = mJNIEnv->CallIntMethod(mJThis, methodID, store, placeholder);
 		
-		return RES_OK;
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return res;
 	}
 
 	SYSCALL(void,  maCloseStore(MAHandle store, int remove))
@@ -732,11 +765,6 @@ namespace Base
 		
 		int rdst = (int)dst - (int)gCore->mem_ds;
 		
-		char* b = (char*)malloc(200);
-		sprintf(b,"dst: %i",rdst);
-		SYSLOG(b);
-		free(b);
-		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnRead", "(III)V");
 		if (methodID == 0) ERROR_EXIT;
@@ -751,11 +779,6 @@ namespace Base
 		SYSLOG("maConnWrite");
 	 
 		int rsrc = (int)src - (int)gCore->mem_ds;
-	 
-		char* b = (char*)malloc(200);
-		sprintf(b,"src: %i",rsrc);
-		SYSLOG(b);
-		free(b);
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnWrite", "(III)V");
