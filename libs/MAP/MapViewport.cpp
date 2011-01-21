@@ -495,15 +495,23 @@ namespace MAP
 			//int timeSinceCreated = tile->getMilliSecondsSinceCreated();
 			//int alpha = (255*timeSinceCreated)/250;
 
+			#ifndef WIN32
+
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
 			} 
 			
+			#endif
+
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
 		
+			#ifndef WIN32
+
 			Gfx_setAlpha(255);
 			
+			#endif
+
 			//char buffer[100];
 			//sprintf( buffer, "%d", maGetMilliSecondCount());
 			//mFont->drawString( buffer, pt.x, pt.y);		
@@ -849,14 +857,15 @@ namespace MAP
 	void MapViewport::moveCenterPositionInPixels(int xdelta, int ydelta)
 	//-------------------------------------------------------------------------		
 	{
-		PixelCoordinate newCoord = PixelCoordinate(
+		PixelCoordinateD newCoord = PixelCoordinateD(
 						mMagnification,
 						mCenterPositionPixels.getX() + xdelta,
 						mCenterPositionPixels.getY() + ydelta
 						);
-						
 
-		setCenterPosition(LonLat(newCoord), true, false);	
+		LonLatD position = LonLatD(newCoord);
+		setCenterPosition(LonLat(position.lon, position.lat), true, false);
+	
 	}
 	
 	
@@ -869,7 +878,7 @@ namespace MAP
 	
     double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
 		MAPoint2d vector = calculateVector(touch1, touch2);
-		double distance = sqrt(vector.x*vector.x + vector.y*vector.y);
+		double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
 		return distance;
     }	
 	
@@ -882,26 +891,38 @@ namespace MAP
 		MAPoint2d vector = calculateVector(p1, p2);
 		mOldCenter.x = p1.x + vector.x/2;
 		mOldCenter.x = p1.y + vector.y/2;
-		
-		mMagnificationFraction = 0.0f;
-	
+		mMagnificationD = mMagnification;
+			
 	}
 	
 	//-------------------------------------------------------------------------
 	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	
 	{
-		double newDistance = calculateDistance(p1, p2);
 		MAPoint2d vector = calculateVector(p1, p2);
 		MAPoint2d newCenter;
 		newCenter.x = p1.x + vector.x/2;
 		newCenter.x = p1.y + vector.y/2;	
 		MAPoint2d movementOfCenter = calculateVector(mOldCenter, newCenter);
-		double movementOfDistance = newDistance - mOldDistance;
 		
-		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);
-		mMagnificationFraction += movementOfDistance / (double) mWidth;
+		double newDistance = calculateDistance(p1, p2);
+		//double movementOfDistance = newDistance - mOldDistance;
 		
+		double mag = mMagnificationD * newDistance/mOldDistance;
+		mMagnification = (int)floor(mag);
+
+		if(mMagnification > mSource->getMagnificationMax( )) {
+			mMagnification = mSource->getMagnificationMax( ); 
+		}
+		
+		if(mMagnification < mSource->getMagnificationMin( )) {
+			mMagnification = mSource->getMagnificationMin( ));
+		}
+		
+		//mMagnificationD = mag;
+		
+		mOldDistance = newDistance;
+		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);	
 	}
 	
 	//-------------------------------------------------------------------------	

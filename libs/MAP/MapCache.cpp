@@ -67,7 +67,10 @@ namespace MAP
 
 namespace MAUtil 
 {
-	template<> hash_val_t THashFunction<MAP::MapTileKey>( const MAP::MapTileKey& data ) 
+	//-------------------------------------------------------------------------
+	template<> 
+	hash_val_t THashFunction<MAP::MapTileKey>( const MAP::MapTileKey& data ) 
+	//-------------------------------------------------------------------------
 	{
 		//return THashFunction<int>(data.w | (data.h<<12) | (((int)data.type)<<24)) - THashFunction<int>((int)data.skin);
 		return ((int)data.mSource) ^ data.mGridX ^ data.mGridY ^ data.mMagnification;
@@ -100,8 +103,8 @@ namespace MAP
 	//-------------------------------------------------------------------------
 		mList( ),
 		mHits( 0 ),
-		mMisses( 0 )//,
-		//mCapacity( DefaultCapacity )
+		mMisses( 0 ),
+		mCapacity( DefaultCapacity )
 	{
 		//reallocateCache( mCapacity );
 	}
@@ -118,19 +121,20 @@ namespace MAP
 		//deleteobject( mList );
 	}
 
-	////-------------------------------------------------------------------------
-	//int MapCache::getCapacity( ) const 
-	////-------------------------------------------------------------------------
-	//{ 
-	//	return mCapacity; 
-	//}
+	//-------------------------------------------------------------------------
+	int MapCache::getCapacity( ) const 
+	//-------------------------------------------------------------------------
+	{ 
+		return mCapacity; 
+	}
 
-	////-------------------------------------------------------------------------
-	//void MapCache::setCapacity( int capacity ) 
-	////-------------------------------------------------------------------------
-	//{ 
-	//	reallocateCache( capacity ); 
-	//}
+	//-------------------------------------------------------------------------
+	void MapCache::setCapacity( int capacity ) 
+	//-------------------------------------------------------------------------
+	{ 
+		//reallocateCache( capacity ); 
+		mCapacity = capacity;
+	}
 
 	//-------------------------------------------------------------------------
 	int MapCache::size( )
@@ -399,6 +403,8 @@ namespace MAP
 		
 		#else
 
+#if 0 // this block tries to test if memory is available
+
 		//
 		// try to alloc something bigger than a tile
 		//
@@ -412,6 +418,13 @@ namespace MAP
 		// failed?
 		//
 		if ( res == RES_OUT_OF_MEMORY )
+
+#else // this block just limits cache size
+
+		if ( mList.size( ) >= (unsigned int)mCapacity )
+
+#endif
+
 		{
 			//
 			// find and remove oldest in cache

@@ -62,7 +62,4 @@ public class ListItemWidget extends Layout
 		
 		return true;
 	}
-	
-	
-	
 }
