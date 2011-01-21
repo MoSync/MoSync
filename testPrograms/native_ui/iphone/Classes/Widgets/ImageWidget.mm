@@ -64,6 +64,24 @@
 		}
 		topCapHeight = newTopCapHeight;
 	}
+	else if ([key isEqualToString:@"width"]) {
+		int ret = [super setPropertyWithKey:key toValue:value];
+		float width = [value floatValue];
+		if(width == -1) {
+			width = view.frame.size.width;
+		}		
+		[imageView setFrame:CGRectMake(imageView.frame.origin.x, imageView.frame.origin.y, width, imageView.frame.size.height)];
+		return ret;
+	}
+	else if ([key isEqualToString:@"height"]) {
+		int ret = [super setPropertyWithKey:key toValue:value];
+		float height = [value floatValue];
+		if(height == -1) {
+			height = view.frame.size.height;
+		}		
+		[imageView setFrame:CGRectMake(imageView.frame.origin.x, imageView.frame.origin.y, imageView.frame.size.width, height)];
+		return ret;
+	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
