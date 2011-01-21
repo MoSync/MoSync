@@ -1,6 +1,10 @@
 package com.mosync.internal.android;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
+import android.util.Log;
+
+import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
+import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_ITEM_CLICKED;
 
 /**
  * Class that handles posting of events to the MoSync
@@ -38,6 +42,42 @@ public class EventQueue
 		event[2] = widgetHandle;
 		event[3] = messageId;
 		event[4] = messageSize;
+		
+		sMoSyncThread.postEvent( event );
+	}
+	
+	/**
+	 * Posts a widget clicked event.
+	 * 
+	 * @param widgetHandle The widget that was clicked.
+	 * @param checked If a checkbox was clicked, this determines if it is checked or not.
+	 */
+	public void postWidgetClickedEvent(int widgetHandle, boolean checked)
+	{
+		int event[] = new int[ 5 ];
+		
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = WIDGET_EVENT_CLICKED;
+		event[2] = widgetHandle;
+		event[3] = checked ? 1 : 0;
+		
+		sMoSyncThread.postEvent( event );
+	}
+	
+	/**
+	 * Posts an event that describes which item in a list that was clicked.
+	 * 
+	 * @param widgetHandle The list that sends the event.
+	 * @param position The position in the list of the view.
+	 */
+	public void postWidgetItemClickedEvent(int widgetHandle, int position)
+	{
+		int event[] = new int[ 5 ];
+		
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = WIDGET_EVENT_ITEM_CLICKED;
+		event[2] = widgetHandle;
+		event[3] = position;
 		
 		sMoSyncThread.postEvent( event );
 	}

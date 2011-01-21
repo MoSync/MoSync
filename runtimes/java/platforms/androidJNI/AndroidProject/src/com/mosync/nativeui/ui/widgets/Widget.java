@@ -3,8 +3,6 @@ package com.mosync.nativeui.ui.widgets;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
@@ -42,11 +40,6 @@ public class Widget
 	 * Default layout params.
 	 */
 	private LayoutParams m_layoutParams = new LayoutParams();
-	
-	/**
-	 * Default alpha for a widget.
-	 */
-	private float m_alpha = 1.0f;
 	
 	/**
 	 * Constructor.
@@ -115,15 +108,14 @@ public class Widget
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_ALPHA ) )
 		{
-			View view = getView( );
-			float newAlpha = FloatConverter.convert( value );
+			float alpha = FloatConverter.convert( value );
+			if( alpha > 1.0f )
+			{
+				return false;
+			}
 			
-			Animation animation = new AlphaAnimation( m_alpha, newAlpha );
-			animation.setDuration( 0 );
-			animation.setFillAfter( true );
-			view.startAnimation( animation );
-			
-			m_alpha = newAlpha;
+			int intAlpha = (int) (alpha * 255.0f); 
+			getView( ).getBackground( ).setAlpha( intAlpha );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_VISIBLE  ) )
 		{
