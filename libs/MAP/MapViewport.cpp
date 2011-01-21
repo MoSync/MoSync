@@ -858,14 +858,13 @@ namespace MAP
 	//-------------------------------------------------------------------------		
 	{
 		PixelCoordinateD newCoord = PixelCoordinateD(
-						mMagnification,
+						mMagnificationD,
 						mCenterPositionPixels.getX() + xdelta,
 						mCenterPositionPixels.getY() + ydelta
 						);
 
 		LonLatD position = LonLatD(newCoord);
 		setCenterPosition(LonLat(position.lon, position.lat), true, false);
-	
 	}
 	
 	
@@ -892,37 +891,64 @@ namespace MAP
 		mOldCenter.x = p1.x + vector.x/2;
 		mOldCenter.x = p1.y + vector.y/2;
 		mMagnificationD = mMagnification;
+		mMagnificationStart = mMagnificationD;
 			
+		mZoomTime = maGetMilliSecondCount( );
 	}
 	
+	
+	static const int ZoomInterval = 30;
 	//-------------------------------------------------------------------------
 	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	
 	{
+
+		int currentTime = maGetMilliSecondCount( );
+		//
+		// Delta is time since previous idle event
+		//
+		int delta = currentTime - mZoomTime;
+		if ( delta < ZoomInterval )
+			return;
+		mZoomTime = currentTime;
+			
+	
 		MAPoint2d vector = calculateVector(p1, p2);
 		MAPoint2d newCenter;
 		newCenter.x = p1.x + vector.x/2;
 		newCenter.x = p1.y + vector.y/2;	
-		MAPoint2d movementOfCenter = calculateVector(mOldCenter, newCenter);
+		MAPoint2d movementOfCenter = calculateVector(mOldCenter, newCenter);		
+		//moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);		
 		
 		double newDistance = calculateDistance(p1, p2);
 		//double movementOfDistance = newDistance - mOldDistance;
 		
-		double mag = mMagnificationD * newDistance/mOldDistance;
-		mMagnification = (int)floor(mag);
+		double mag = mMagnificationStart * newDistance/mOldDistance;
 
-		if(mMagnification > mSource->getMagnificationMax( )) {
-			mMagnification = mSource->getMagnificationMax( ); 
+		if(mag > mSource->getMagnificationMax( )) {
+			mag = mSource->getMagnificationMax( ); 
 		}
 		
-		if(mMagnification < mSource->getMagnificationMin( )) {
-			mMagnification = mSource->getMagnificationMin( ));
+		if(mag < mSource->getMagnificationMin( )) {
+			mag = mSource->getMagnificationMin( );
 		}
+		
+		int newTileMagnificationValue = (int)floor(mag);	
+		mMagnificationD = mag;
+		
+		if(newTileMagnificationValue != mMagnification) {
+			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
+			mMagnification = newTileMagnificationValue;
+			this->updateMap( );	
+		}
+
+		//moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);		
 		
 		//mMagnificationD = mag;
-		
-		mOldDistance = newDistance;
-		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);	
+		printf("mMagnificationD: %f, mMagnification: %d\n", mMagnificationD, mMagnification);
+		//mOldDistance = newDistance;
+
 	}
 	
 	//-------------------------------------------------------------------------	
