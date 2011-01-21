@@ -207,6 +207,8 @@ namespace Base
 
 	int _maTextBox(const wchar* title, const wchar* inText, int outText, int maxSize, int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis);
 	
+	int _maMessageBox(const char* title, const char* text, JNIEnv* jNIEnv,jobject jThis);
+	
 	// Widget API
 	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis);

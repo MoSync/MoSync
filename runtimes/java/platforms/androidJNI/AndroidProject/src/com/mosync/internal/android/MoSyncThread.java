@@ -86,6 +86,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mosync.java.android.MessageBox;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -2053,7 +2054,7 @@ public class MoSyncThread extends Thread
 	 */
 	void destroyResource(int resourceIndex)
 	{
-		SYSLOG("destroyBinary :" + resourceIndex);
+		SYSLOG("destroyResource :" + resourceIndex);
 		
 		if(null != mBinaryResources.get(resourceIndex))
 		{	
@@ -2100,6 +2101,26 @@ public class MoSyncThread extends Thread
 		return 0;
 	}
 
+	/**
+	 * Opens a message box.
+	 * @param title
+	 * @param text
+	 * @return
+	 */
+	int maMessageBox(
+		String title, 
+		String text)
+	{
+		Intent intent = new Intent(mContext, MessageBox.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("TITLE", title);
+		bundle.putString("TEXT", text);
+		intent.putExtras(bundle);
+		mContext.startActivity(intent);
+		Log.i("MoSync", "New activity started for MessageBox");
+		return 0;
+	}
+	
 	/**
 	 * Display a notification.
 	 * @param type
@@ -2560,33 +2581,10 @@ public class MoSyncThread extends Thread
 	 */
 	public int loadGlTexture(final int bitmapHandle)
 	{
-		ImageCache texture = mImageResources.get(bitmapHandle);
-		if(texture == null)
-		{
-			return RES_BAD_INPUT;
-		}
-		int textureFormat = GL10.GL_RGBA;
-
-		try
-		{
-			GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, textureFormat, texture.mBitmap, 0);
-		}
-		catch(Throwable t)
-		{
-			Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
-			t.printStackTrace();
-		}
-		EGL10 egl = (EGL10) EGLContext.getEGL( );
-		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
-		{
-			return 0;
-		}
-		else
-		{
-			return -3;
-		}
+		// Load texture as standard texture.
+		return loadGlTextureHelper(bitmapHandle, false);
 	}
-	
+
 	/**
 	 * Loads an OpenGL sub texture to the current texture handle. If the 
 	 * underlying bitmap has an alpha channel, the texture will also
@@ -2599,40 +2597,148 @@ public class MoSyncThread extends Thread
 	 */
 	public int loadGlSubTexture(final int bitmapHandle)
 	{
+		// Load texture as sub texture.
+		return loadGlTextureHelper(bitmapHandle, true);
+	}
+	
+	/**
+	 * Helper method that load a bitmap as a texture or as a sub texture.
+	 * @param bitmapHandle Texture bitmap handle.
+	 * @param isSubTexture true if sub texture false if standard texture.
+	 * @return A status code.
+	 */
+	private int loadGlTextureHelper(
+		final int bitmapHandle, 
+		final boolean isSubTexture)
+	{
+		// Get bitmap object.
 		ImageCache texture = mImageResources.get(bitmapHandle);
 		if(texture == null)
 		{
+			// Could not find bit map object.
 			return RES_BAD_INPUT;
 		}
-		int textureFormat = GL10.GL_RGBA;
 		
+		// Ensure that the bitmap we use has dimensions that are power of 2.
+		Bitmap bitmap = loadGlTextureHelperMakeBitmapPowerOf2(texture.mBitmap);
+		
+		// The texture bitmap encoding.
+		int textureFormat = GL10.GL_RGBA;
+
 		try
 		{
-			GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
-								  0,
-								  0,
-								  0,
-								  texture.mBitmap,
-								  textureFormat,
-								  GL10.GL_UNSIGNED_BYTE);
+			// Load the texture into OpenGL.
+			if (isSubTexture)
+			{
+				GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
+				  0,
+				  0,
+				  0,
+				  bitmap,
+				  textureFormat,
+				  GL10.GL_UNSIGNED_BYTE);
+			}
+			else
+			{
+				GLUtils.texImage2D(
+					GL10.GL_TEXTURE_2D, 
+					0, 
+					textureFormat, 
+					bitmap, 
+					0);
+			}
 		}
-		catch(Throwable t)
+		catch (Throwable t)
 		{
-			Log.i("MoSyncThread", "Exception in loadGlSubTexture: " + t.toString());
+			Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
 			t.printStackTrace();
 		}
+		finally
+		{
+			if (bitmap != texture.mBitmap)
+			{
+				bitmap.recycle();
+			}
+		}
 		
+		// Check error status.
 		EGL10 egl = (EGL10) EGLContext.getEGL( );
 		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
 		{
-			return 0;
+			return 0; // Success, no errors.
 		}
 		else
 		{
-			return -3;
+			return -3; // Texture could not be loaded.
 		}
 	}
-
+	
+	/**
+	 * Ensures that the bitmap has width and height that is power of 2.
+	 * @param bitmap Source bitmap.
+	 * @return Source bitmap if it already has power of 2 dimensions,
+	 * a new bitmap if not, that has power of 2 dimensions.
+	 */
+	private Bitmap loadGlTextureHelperMakeBitmapPowerOf2(Bitmap bitmap)
+	{
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		
+		if (loadGlTextureHelperIsPowerOf2(width) &&
+			loadGlTextureHelperIsPowerOf2(height))
+		{
+			// Bitmap is already power of 2, return the 
+			// the original bitmap.
+			return bitmap;
+		}
+		
+		// Allocate new bitmap.
+		int newWidth = loadGlTextureHelperGetNextPowerOf2(width);
+		int newHeight = loadGlTextureHelperGetNextPowerOf2(height);
+		
+		Bitmap newBitmap = Bitmap.createBitmap(
+			newWidth, 
+			newHeight, 
+			Bitmap.Config.ARGB_8888);
+		if (null == newBitmap)
+		{
+			return null;
+		}
+		
+		// Blit original bitmap to new bitmap.
+		Canvas canvas = new Canvas(newBitmap);
+		canvas.drawBitmap(newBitmap, 0, 0, null);
+		
+		return newBitmap;
+	}
+	
+	/**
+	 * Tests is a number is a power of 2.
+	 * @param n Number to test.
+	 * @return true if number is a power of 2.
+	 */
+	private boolean loadGlTextureHelperIsPowerOf2(int n) 
+	{
+		return ((0 != n) && (0 == (n & (n - 1)))); 
+	}
+	
+	/**
+	 * Return a number that is the next higher power of two after n.
+	 * @param n Number to test.
+	 * @return The next power of 2 number that is higher than n.
+	 */
+	private int loadGlTextureHelperGetNextPowerOf2(int n) 
+	{
+		int powerOf2 = 2;
+		
+		while (powerOf2 < n)
+		{
+			powerOf2 = powerOf2 << 1;
+		}
+		
+		return powerOf2;
+	}
+	
 	/**
 	 * Class that holds image data.
 	 */
