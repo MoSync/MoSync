@@ -1,10 +1,8 @@
 package com.mosync.internal.android;
 
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
-import android.util.Log;
-
 import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
 import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_ITEM_CLICKED;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
 
 /**
  * Class that handles posting of events to the MoSync

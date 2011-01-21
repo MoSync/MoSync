@@ -2594,7 +2594,7 @@ public class MoSyncThread extends Thread
 		}
 		catch(Throwable t)
 		{
-			Log.i("MoSync Failure!","got:" + t.toString());
+			Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
 			t.printStackTrace();
 		}
 		EGL10 egl = (EGL10) EGLContext.getEGL( );
@@ -2627,13 +2627,21 @@ public class MoSyncThread extends Thread
 		}
 		int textureFormat = GL10.GL_RGBA;
 		
-		GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
-							  0,
-							  0,
-							  0,
-							  texture.mBitmap,
-							  textureFormat,
-							  GL10.GL_UNSIGNED_BYTE);
+		try
+		{
+			GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
+								  0,
+								  0,
+								  0,
+								  texture.mBitmap,
+								  textureFormat,
+								  GL10.GL_UNSIGNED_BYTE);
+		}
+		catch(Throwable t)
+		{
+			Log.i("MoSyncThread", "Exception in loadGlSubTexture: " + t.toString());
+			t.printStackTrace();
+		}
 		
 		EGL10 egl = (EGL10) EGLContext.getEGL( );
 		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)

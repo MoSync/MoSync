@@ -208,6 +208,8 @@ namespace MAP
 		double mOldDistance;
 		MAPoint2d mOldCenter;
 		double mMagnificationD;
+		double mMagnificationStart;
+		int mZoomTime;
 		
 		int mWidth;
 		int mHeight;
