@@ -256,7 +256,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.textboxLength = intArray[2];
 	}
 	else if (event.type == EVENT_TYPE_WIDGET)
-	{	
+	{
 		/*
 		 * Structure of intArray for widget events.
 		 *
@@ -266,17 +266,38 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intArray[2] - Handle to the widget that sent the event.
 		 *
 		 * Optional:
+		 * WIDGET_EVENT_MESSAGE
 		 * intArray[3] - The id of the message being sent (if it has dynamically allocated data)
 		 * intARray[4] - Size of the message.
+		 *
+		 * WIDGET_EVENT_CLICKED
+		 * intArray[3] - Can be used to determine a checkbox that was clicked.
+		 *
+		 *
+		 * WIDGET_EVENT_ITEM_CLICKED
+		 * intArray[3] - The index of the list item that was clicked.
 		 */
 
+		int widgetEventType = intArray[1];
 		// MAGetEvent will handle the deallocation of this memory
 		MAWidgetEventData *widgetEvent = new MAWidgetEventData;
 		
 		widgetEvent->eventType    = intArray[1];
 		widgetEvent->widgetHandle = intArray[2];
-		widgetEvent->messageId    = intArray[3];
-		widgetEvent->messageSize  = intArray[4];
+		
+		if(widgetEventType == WIDGET_EVENT_MESSAGE)
+		{
+			widgetEvent->messageId    = intArray[3];
+			widgetEvent->messageSize  = intArray[4];
+		}
+		else if(widgetEventType == WIDGET_EVENT_CLICKED)
+		{
+			widgetEvent->checked = intArray[3];
+		}
+		else if(widgetEventType == WIDGET_EVENT_ITEM_CLICKED)
+		{
+			widgetEvent->listItemIndex = intArray[3];
+		}
 
 		event.data = widgetEvent;
 	}
