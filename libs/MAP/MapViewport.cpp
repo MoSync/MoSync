@@ -916,7 +916,7 @@ namespace MAP
 		}
 		
 		if(mMagnification < mSource->getMagnificationMin( )) {
-			mMagnification = mSource->getMagnificationMin( ));
+			mMagnification = mSource->getMagnificationMin( );
 		}
 		
 		//mMagnificationD = mag;
