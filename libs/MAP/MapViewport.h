@@ -187,6 +187,13 @@ namespace MAP
 		int getHeight( ) const { return mHeight; }
 		virtual void drawViewport( Point origin );
 
+		void beginZooming(const MAPoint2d& p1, const MAPoint2d& p2);
+		void updateZooming(const MAPoint2d& p1, const MAPoint2d& p2);
+		void endZooming();
+		
+		void moveCenterPositionInPixels(int xdelta, int ydelta);
+
+
 	protected:
 		//
 		// events
@@ -198,6 +205,10 @@ namespace MAP
 		virtual void drawOverlay( Rect& bounds, int magnification );
 
 	private:
+		double mOldDistance;
+		MAPoint2d mOldCenter;
+		double mMagnificationFraction;
+		
 		int mWidth;
 		int mHeight;
 		LonLat mCenterPositionLonLat;

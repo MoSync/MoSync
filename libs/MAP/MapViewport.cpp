@@ -842,4 +842,70 @@ namespace MAP
 		mHeight = height;
 		updateMap( );
 	}
+	
+	//-------------------------------------------------------------------------		
+	void MapViewport::moveCenterPositionInPixels(int xdelta, int ydelta)
+	//-------------------------------------------------------------------------		
+	{
+		PixelCoordinate newCoord = PixelCoordinate(
+						mMagnification,
+						mCenterPositionPixels.getX() + xdelta,
+						mCenterPositionPixels.getY() + ydelta
+						);
+						
+
+		setCenterPosition(LonLat(newCoord), true, false);	
+	}
+	
+	
+	MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2) {
+		MAPoint2d vec;
+		vec.x = p2.x - p1.x;
+		vec.y = p2.y - p1.y;
+		return vec;
+	}
+	
+    double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
+		MAPoint2d vector = calculateVector(touch1, touch2);
+		double distance = sqrt(vector.x*vector.x + vector.y*vector.y);
+		return distance;
+    }	
+	
+	//-------------------------------------------------------------------------	
+	void MapViewport::beginZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
+	//-------------------------------------------------------------------------	
+	{
+		mIdleListener->stopGlide( );
+		mOldDistance = calculateDistance(p1, p2);
+		MAPoint2d vector = calculateVector(p1, p2);
+		mOldCenter.x = p1.x + vector.x/2;
+		mOldCenter.x = p1.y + vector.y/2;
+		
+		mMagnificationFraction = 0.0f;
+	
+	}
+	
+	//-------------------------------------------------------------------------
+	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
+	//-------------------------------------------------------------------------	
+	{
+		double newDistance = calculateDistance(p1, p2);
+		MAPoint2d vector = calculateVector(p1, p2);
+		MAPoint2d newCenter;
+		newCenter.x = p1.x + vector.x/2;
+		newCenter.x = p1.y + vector.y/2;	
+		MAPoint2d movementOfCenter = calculateVector(mOldCenter, newCenter);
+		double movementOfDistance = newDistance - mOldDistance;
+		
+		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);
+		mMagnificationFraction += movementOfDistance / (double) mWidth;
+		
+	}
+	
+	//-------------------------------------------------------------------------	
+	void MapViewport::endZooming() 
+	//-------------------------------------------------------------------------	
+	{
+	}
+	
 }
