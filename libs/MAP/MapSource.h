@@ -67,13 +67,10 @@ namespace MAP
 	{
 	private:
 		//
-		// Capacity of request queue.
-		//
-		static const int			QueueSize = 100;
-		//
 		// Maximum parallel downloaders
 		//
 		static const int			Downloaders = 2;//5; // four in parallel plus one slacking
+
 	public:
 									MapSource( );
 		virtual						~MapSource( );

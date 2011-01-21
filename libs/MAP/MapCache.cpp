@@ -194,7 +194,9 @@ namespace MAP
 									const LonLat centerpoint,
 									const int magnification,
 									const int pixelWidth,
-									const int pixelHeight )
+									const int pixelHeight,
+									const double directionX,
+									const double directionY )
 	//-------------------------------------------------------------------------
 	{
 		DebugAssert( pixelWidth > 0 );
@@ -241,20 +243,28 @@ namespace MAP
 		//
 		MapTileCoordinate llTile = source->lonLatToTile( ll, magnification );
 		MapTileCoordinate urTile = source->lonLatToTile( ur, magnification );
-
+		int left = Min( llTile.getX( ), urTile.getX( ) );
+		int right = Max( llTile.getX( ), urTile.getX( ) ); 
+		int top = Min( llTile.getY( ), urTile.getY( ) );
+		int bottom = Max( llTile.getY( ), urTile.getY( ) );
 		//
 		// Queue all tiles in area
 		//
 		//const double halfTileSize = 0.5 * tileSize;
-		int yMin = Min( llTile.getY( ), urTile.getY( ) );
-		int yMax = Max( llTile.getY( ), urTile.getY( ) );
-		int xMin = Min( llTile.getX( ), urTile.getX( ) );
-		int xMax = Max( llTile.getX( ), urTile.getX( ) );
+		int xStep = directionX < 0 ? 1 : -1;
+		int yStep = directionY > 0 ? 1 : -1;
+		int yMin = directionY > 0 ? top : bottom;
+		int yMax = directionY > 0 ? bottom + 1 : top - 1;
+		int xMin = directionX < 0 ? left : right;
+		int xMax = directionX < 0 ? right + 1 : left - 1;
 
-		for ( int y = yMin; y <= yMax; y++ )
+		DebugPrintf( "y: %d to %d x: %d to %d\n", yMin, yMax, xMin, xMax );
+
+		for ( int y = yMin; y != yMax; y += yStep )
 		{
-			for ( int x = xMin; x <= xMax; x++)
+			for ( int x = xMin; x != xMax; x += xStep )
 			{
+				DebugPrintf( "xy: %d, %d\n", x, y );
 				//
 				// In cache? Then immediately return tile in cache
 				//
