@@ -207,7 +207,7 @@ namespace MAP
 	private:
 		double mOldDistance;
 		MAPoint2d mOldCenter;
-		double mMagnificationFraction;
+		double mMagnificationD;
 		
 		int mWidth;
 		int mHeight;

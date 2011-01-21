@@ -25,10 +25,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	//-------------------------------------------------------------------------
-	bool LonLat::isValid( ) const
-	//-------------------------------------------------------------------------
-	{
-		return lon != 0.0 && lat != 0.0;
-	}
+	
 }

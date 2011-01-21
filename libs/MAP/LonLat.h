@@ -33,8 +33,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	class MapTileCoordinate;
-	class PixelCoordinate;
+//	class MapTileCoordinate;
+//	class PixelCoordinate;
 
 	static const double PI = 3.14159265358979323846;
 	//
@@ -50,34 +50,47 @@ namespace MAP
 	//
 	static const double OriginShift = PI * 6378137.09;
 
+	/**
+	 * Returns resolution in meters per pixel at equator.
+	 */
+	inline double resolution( int magnification )
+	{
+		return InitialResolution / ( 1 << magnification );
+	}
+
+	/**
+	 * Returns the inverse of resolution.
+	 */
+	inline double invResolution( int magnification)
+	{
+		return ( 1 << magnification ) * InvInitialResolution;
+	}
+
+	inline double resolution( double magnification )
+	{
+		return InitialResolution / pow(2.0, magnification);
+	}
+		
+	inline double invResolution( double magnification)
+	{
+		return pow(2.0, magnification) * InvInitialResolution;
+	}
+
 	//=========================================================================
 	/**
 	 * \brief This class maintains a coordinate in latitude / longitude,
 	 * and provides conversion function to and from other coordinate systems.
 	 */
-	class LonLat
+	template <typename MagnificationT>
+	class LonLatT
 	//=========================================================================
 	{
 	public:
 	private:
 		/**
-		 * Returns resolution in meters per pixel at equator.
-		 */
-		static double resolution( int magnification )
-		{
-			return InitialResolution / ( 1 << magnification );
-		}
-		/**
-		 * Returns the inverse of resolution.
-		 */
-		static double invResolution( int magnification)
-		{
-			return ( 1 << magnification ) * InvInitialResolution;
-		}
-		/**
 		 * Converts a pixel coordinate at a given zoom level of pyramid to EPSG:900913
 		 */
-		static void pixelsToMeters( const double pixelX, const double pixelY, const int magnification, double& meterX, double& meterY )
+		static void pixelsToMeters( const double pixelX, const double pixelY, const MagnificationT magnification, double& meterX, double& meterY )
 		{
 			double res = resolution( magnification );
 			meterX = pixelX * res - OriginShift;
@@ -86,7 +99,7 @@ namespace MAP
 		/**
 		 * Converts EPSG:900913 to pyramid pixel coordinates in given zoom level.
 		 */
-		static void metersToPixels( const double meterX, const double meterY, const int magnification, double& pixelX, double& pixelY )
+		static void metersToPixels( const double meterX, const double meterY, const MagnificationT magnification, double& pixelX, double& pixelY )
 		{
 			double invres = invResolution( magnification );
 			pixelX = ( meterX + OriginShift ) * invres;
@@ -179,7 +192,7 @@ namespace MAP
 		/**
 		 * Creates a LonLat initialized to (0, 0).
 		 */
-		LonLat( )
+		LonLatT( )
 		:	lon( 0 ),
 			lat( 0 )
 		{
@@ -187,7 +200,7 @@ namespace MAP
 		/**
 		 * Creates a LonLat.
 		 */
-		LonLat( const double _lon, const double _lat )
+		LonLatT( const double _lon, const double _lat )
 		: lon( _lon ),
 			lat( _lat )
 		{
@@ -195,7 +208,7 @@ namespace MAP
 		/**
 		 * Creates a LonLat from thr given global pixel coordinate.
 		 */
-		LonLat( const PixelCoordinate& px )
+		LonLatT( const PixelCoordinateT<MagnificationT>& px )
 		{
 			double meterX, meterY;
 			pixelsToMeters( px.getX( ), px.getY( ), px.getMagnification( ), meterX, meterY );
@@ -204,16 +217,20 @@ namespace MAP
 		/**
 		 * Creates a LonLat from the given global meter coordinates.
 		 */
-		static LonLat fromMeters( const double meterX, const double meterY )
+		static LonLatT<MagnificationT> fromMeters( const double meterX, const double meterY )
 		{
 			double lon, lat;
 			metersToLonLat( meterX, meterY, lon, lat );
-			return LonLat( lon, lat );
+			return LonLatT<MagnificationT>( lon, lat );
 		}
 		/*
 		 * tests if LonLat is invalid
 		 */
-		bool isValid( ) const;
+		bool isValid( ) const
+		{
+		//	return lon != 0.0 && lat != 0.0;
+			return (int)lon && (int)lat;
+		}
 		
 		//
 		// Convert tile lower left corner plus pixel offset to WGS84 lat/lon.
@@ -241,7 +258,7 @@ namespace MAP
 		 * Spherical Mercator is chosen for compatibility with online tile servers
 		 * such as Google Maps and Microsoft Virtual Earth.
 		 */
-		const PixelCoordinate toPixels( int magnification ) const
+		const PixelCoordinateT<MagnificationT> toPixels( MagnificationT magnification ) const
 		{
 			double meterX, meterY;
 			lonLatToMeters( lon, lat, meterX, meterY );
@@ -250,7 +267,7 @@ namespace MAP
 
 			// These pixel values are always positive, so (int)(p + 0.5f) works as
 			// poor man's rounding
-			return PixelCoordinate( magnification, (int)(pixelX + 0.5f), (int)(pixelY + 0.5f) );
+			return PixelCoordinateT<MagnificationT>( magnification, (int)(pixelX + 0.5f), (int)(pixelY + 0.5f) );
 
 		}
 		/**
@@ -285,6 +302,9 @@ namespace MAP
 		//	printf( "Lat = %f", lly );
 		//}
 	};
+	
+	typedef LonLatT<int> LonLat;
+	typedef LonLatT<double> LonLatD;
 }
 
 #endif // LONLAT_H_

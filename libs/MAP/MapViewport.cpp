@@ -849,14 +849,15 @@ namespace MAP
 	void MapViewport::moveCenterPositionInPixels(int xdelta, int ydelta)
 	//-------------------------------------------------------------------------		
 	{
-		PixelCoordinate newCoord = PixelCoordinate(
+		PixelCoordinateD newCoord = PixelCoordinateD(
 						mMagnification,
 						mCenterPositionPixels.getX() + xdelta,
 						mCenterPositionPixels.getY() + ydelta
 						);
-						
 
-		setCenterPosition(LonLat(newCoord), true, false);	
+		LonLatD position = LonLatD(newCoord);
+		setCenterPosition(LonLat(position.lon, position.lat), true, false);
+	
 	}
 	
 	
@@ -882,26 +883,38 @@ namespace MAP
 		MAPoint2d vector = calculateVector(p1, p2);
 		mOldCenter.x = p1.x + vector.x/2;
 		mOldCenter.x = p1.y + vector.y/2;
-		
-		mMagnificationFraction = 0.0f;
-	
+		mMagnificationD = mMagnification;
+			
 	}
 	
 	//-------------------------------------------------------------------------
 	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	
 	{
-		double newDistance = calculateDistance(p1, p2);
 		MAPoint2d vector = calculateVector(p1, p2);
 		MAPoint2d newCenter;
 		newCenter.x = p1.x + vector.x/2;
 		newCenter.x = p1.y + vector.y/2;	
 		MAPoint2d movementOfCenter = calculateVector(mOldCenter, newCenter);
-		double movementOfDistance = newDistance - mOldDistance;
 		
-		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);
-		mMagnificationFraction += movementOfDistance / (double) mWidth;
+		double newDistance = calculateDistance(p1, p2);
+		//double movementOfDistance = newDistance - mOldDistance;
 		
+		double mag = mMagnificationD * newDistance/mOldDistance;
+		mMagnification = (int)floor(mag);
+
+		if(mMagnification > mSource->getMagnificationMax( )) {
+			mMagnification = mSource->getMagnificationMax( ); 
+		}
+		
+		if(mMagnification < mSource->getMagnificationMin( )) {
+			mMagnification = mSource->getMagnificationMin( ));
+		}
+		
+		//mMagnificationD = mag;
+		
+		mOldDistance = newDistance;
+		moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);	
 	}
 	
 	//-------------------------------------------------------------------------	

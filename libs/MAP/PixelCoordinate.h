@@ -34,14 +34,15 @@ namespace MAP
 	 * a magnification of 2 the global grid is 1024x1024 pixels.
 	 * For a magnification of 10, the global grid is 262144x262144 pixels.
 	 */
-	class PixelCoordinate
+	template <typename MagnificationT>
+	class PixelCoordinateT
 	//=========================================================================
 	{
 	public:
 		/**
 		 * Creates a new pixel coordinate.
 		 */
-		PixelCoordinate( ) :
+		PixelCoordinateT( ) :
 			mX( 0 ),
 			mY( 0 ),
 			mMagnification( 0 )
@@ -50,7 +51,7 @@ namespace MAP
 		/**
 		 * Creates a new pixel coordinate.
 		 */
-		PixelCoordinate( const int magnification, const int x, const int y)
+		PixelCoordinateT( const MagnificationT magnification, const int x, const int y)
 		:	mX( x ),
 			mY( y ),
 			mMagnification( magnification )
@@ -73,29 +74,32 @@ namespace MAP
 		/**
 		 * Returns the magnification component of the pixel coordinate.
 		 */
-		int getMagnification( ) const		
+		MagnificationT getMagnification( ) const		
 		{ 
 			return mMagnification; 
 		}
 		/**
 		 * Compares two pixel coordinates, returns true if the first coordinate is equal to the second.
 		 */
-		bool operator == ( const PixelCoordinate& b ) const
+		bool operator == ( const PixelCoordinateT<MagnificationT>& b ) const
 		{
 			return getX( ) == b.getX( ) && getY( ) == b.getY( ) && getMagnification( ) == b.getMagnification( );
 		}
 		/**
 		 * Compare two pixel coordinates, returns true if the first coordinate is not equal to the second.
 		 */
-		bool operator != ( const PixelCoordinate& b ) const
+		bool operator != ( const PixelCoordinateT<MagnificationT>& b ) const
 		{
 			return getX( ) != b.getX( ) || getY( ) != b.getY( ) || getMagnification( ) != b.getMagnification( );
 		}
 	private:
 		int mX;
 		int mY;
-		int mMagnification;
+		MagnificationT mMagnification;
 	};
+	
+	typedef PixelCoordinateT<int> PixelCoordinate;
+	typedef PixelCoordinateT<double> PixelCoordinateD;
 }
 
 #endif // PIXELCOORDINATE_H_

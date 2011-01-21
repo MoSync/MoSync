@@ -30,12 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapTile.h"
 #include "Queue.h"
 #include "Broadcaster.h"
+#include "MapTileCoordinate.h"
 
 using namespace MAUtil;
 
 namespace MAP
 {
-	class LonLat;
+	//class LonLat;
 	class MapTile;
 	class MapSourceImageDownloader;
 	class MapSourceQueue;
@@ -49,10 +50,10 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		virtual void	tileReceived( MapSource* sender, MapTile* tile ) = 0;
-		virtual void	downloadCancelled( MapSource* sender ) = 0;
-		virtual void	error( MapSource* source, int code ) = 0;
-		virtual void	jobComplete( MapSource* source ) = 0;
+		virtual void	 tileReceived( MapSource* sender, MapTile* tile ) = 0;
+		virtual void	 downloadCancelled( MapSource* sender ) = 0;
+		virtual void	 error( MapSource* source, int code ) = 0;
+		virtual void	 jobComplete( MapSource* source ) = 0;
 	};
 
 	//=========================================================================
