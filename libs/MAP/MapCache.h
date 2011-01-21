@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MAPCACHE_H_
 #define MAPCACHE_H_
 
-#include <MAUtil/Vector.h>
+#include <MAUtil/HashMap.h>
 #include "DateTime.h"
 
 #include "MapSource.h"
@@ -53,6 +53,8 @@ namespace MAP
 		 */
 		virtual void jobComplete( MapCache* sender ) = 0;
 	};
+
+	class MapTileKey;
 
 	//=========================================================================
 	/**
@@ -97,8 +99,8 @@ namespace MAP
 		//
 		// Capacity property
 		//
-		int getCapacity( ) const;
-		void setCapacity( int capacity );
+		//int getCapacity( ) const;
+		//void setCapacity( int capacity );
 		int size( );
 
 	private:
@@ -106,27 +108,28 @@ namespace MAP
 		/**
 		 * Returns tile from cache, if available
 		 */
-		int findInCache( MapSource *source, MapTileCoordinate tileXY ) const;
+		//int findInCache( MapSource *source, MapTileCoordinate tileXY ) const;
 		/**
 		 * returns first unused location in cache
 		 */
-		int findFreeLocation( ) const;
+		//int findFreeLocation( ) const;
 		/**
 		 * returns location of least recently used tile
 		 */
-		int findLRU( ) const;
+		MapTileKey findLRU( );
 		/**
 		 * Reallocates cache. Content is cleared.
 		 */
-		void reallocateCache( int capacity );
+		//void reallocateCache( int capacity );
 
 		void onTileReceived( MapTile* tile, bool foundInCache );
 		void onJobComplete( );
 
-		MapTile** mList;
+		//MapTile** mList;
+		HashMap<MapTileKey, MapTile*> mList;
 		int mHits;
 		int mMisses;
-		int mCapacity;
+		//int mCapacity;
 	};
 }
 

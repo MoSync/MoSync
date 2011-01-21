@@ -115,6 +115,14 @@ namespace MAPUtil
 			(obj) = NULL;\
 		}\
 	}
+	#define deleteconstobject( obj ) \
+	{\
+		if ( (obj) != NULL )\
+		{\
+			MemoryMgr::untrack( obj );\
+			delete (obj);\
+		}\
+	}
 #else
 	#define newobject( type, obj ) ( obj )
 	#define deleteobject( obj )\
@@ -123,6 +131,13 @@ namespace MAPUtil
 		{\
 			delete (obj);\
 			(obj) = NULL;\
+		}\
+	}
+	#define deleteconstobject( obj )\
+	{\
+		if ( (obj) != NULL )\
+		{\
+			delete (obj);\
 		}\
 	}
 #endif

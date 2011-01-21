@@ -35,10 +35,13 @@ namespace MapDemo
 		lastPointerPress( -1 )
 	//-------------------------------------------------------------------------
 	{
+		MapViewport* viewport = newobject( MapViewport, new MapViewport( ) );
 		//
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
+		mMap->setViewport( viewport );
+
 		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 		setClientWidget( mMap );

@@ -307,10 +307,10 @@ namespace HelloLayerMap
 		// add one to width and height for case where viewport is not aligned to tile grid
 		// Multiply by two to get some margin
 		//
-		int tileSize = mOpenStreetMapSource->getTileSize( );
-		int tiles = 2 * ( ( ( width - 1 ) / tileSize ) + 2 ) * ( ( ( height - 1 ) / tileSize ) + 2 );
-		DebugPrintf( "Cache tiles: %d\n", tiles );
-		MapCache::get( )->setCapacity( tiles );
+		//int tileSize = mOpenStreetMapSource->getTileSize( );
+		//int tiles = 2 * ( ( ( width - 1 ) / tileSize ) + 2 ) * ( ( ( height - 1 ) / tileSize ) + 2 );
+		//DebugPrintf( "Cache tiles: %d\n", tiles );
+		//MapCache::get( )->setCapacity( tiles );
 	}
 
 	//-------------------------------------------------------------------------
