@@ -1,7 +1,5 @@
 package com.mosync.nativeui.ui.factories;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_ITEM_CLICKED;
-
 import android.app.Activity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +25,7 @@ public class ListFactory implements AbstractViewFactory
 	{
 		ListView listView = new ListView( activity );
 		
-		listView.setOnItemClickListener( new ListOnItemClickListener( ) );
+		listView.setOnItemClickListener( new ListOnItemClickListener( handle ) );
 		return new ListLayout( handle, listView );
 	}
 	
@@ -39,6 +37,13 @@ public class ListFactory implements AbstractViewFactory
 	 */
 	public class ListOnItemClickListener implements OnItemClickListener
 	{
+		private int m_handle = -1;
+		
+		public ListOnItemClickListener(int handle)
+		{
+			m_handle = handle;
+		}
+		
 		/**
 		 * @see OnItemClickListener.onItemClick.
 		 */
@@ -46,7 +51,7 @@ public class ListFactory implements AbstractViewFactory
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 		{
 			// Assume that the view's id is always the same as the handle.
-			EventQueue.getDefault( ).postWidgetEvent( WIDGET_EVENT_ITEM_CLICKED, view.getId( ) );
+			EventQueue.getDefault( ).postWidgetItemClickedEvent( m_handle, position );
 		}	
 	}
 }

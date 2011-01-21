@@ -1317,7 +1317,16 @@ public class MoSyncThread extends Thread
 
 		// Byte array to hold resource data. This is the data we will
 		// use to create the image.
-		byte[] resourceData = new byte[size];
+		byte[] resourceData = null;
+		try
+		{
+			resourceData = new byte[size];
+		}
+		catch(OutOfMemoryError ex)
+		{
+			ex.printStackTrace( );
+			return RES_OUT_OF_MEMORY;
+		}
 
 		// If the handle is a binary resource it is in mBinaryResources.
 		ByteBuffer binData = (ByteBuffer) mBinaryResources.get(dataHandle);
