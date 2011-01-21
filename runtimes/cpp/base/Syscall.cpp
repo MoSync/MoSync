@@ -438,6 +438,8 @@ namespace Base {
 		MemStream* ms = new MemStream(size);
 #else
 		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
+		if(b == NULL) return RES_OUT_OF_MEMORY;
+		
 		MemStream* ms = new MemStream(b, size);
 #endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;

@@ -20,9 +20,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSource.h"
 #include "MapTileCoordinate.h"
 #include "TraceScope.h"
+//#include <MAUtil/Stack.h>
 
 namespace MAP
 {
+	//
+	// Capacity of request queue.
+	//
+	//static const int			QueueSize = 100;
+
 	//=========================================================================
 	class MapSourceImageDownloader : public ImageDownloader
 	//=========================================================================
@@ -83,6 +89,13 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
+		QueueEntry( )
+			: mListener( NULL ),
+			mJobComplete( false ),
+			mTileXY( MapTileCoordinate( ) )
+		{
+		}
+
 		QueueEntry( IMapSourceListener* listener, bool jobComplete, const MapTileCoordinate tileXY ) 
 		:	mListener( listener ),
 			mJobComplete( jobComplete ),
@@ -97,6 +110,8 @@ namespace MAP
 		MapTileCoordinate mTileXY;
 	};
 
+#if 0 // QUEUE
+
 	//=========================================================================
 	class MapSourceQueue: public Queue<QueueEntry>
 	//=========================================================================
@@ -110,6 +125,73 @@ namespace MAP
 		virtual	~MapSourceQueue( ) { }
 	};
 
+#else // STACK
+
+	template <typename T>
+	class Stack 
+	{
+		public:
+			void clear( ) 
+			{
+				mData.clear( ); 
+			}
+			
+			const T& peek( ) const 
+			{
+				return mData[mData.size( ) - 1];
+			}
+			
+			T& peek( ) 
+			{
+				return mData[mData.size( ) - 1];
+			}	
+
+			T& peek( int i ) 
+			{
+				return mData[i];
+			}	
+
+			T pop( ) 
+			{
+				T t = peek( );
+				mData.resize( mData.size( ) - 1 );
+				return t;
+			}
+			
+			void push( const T& d ) 
+			{
+				mData.add( d );
+			}
+			
+			int size( ) const 
+			{ 
+				return mData.size( );
+			}
+			
+			bool empty( ) const 
+			{
+				return mData.size( ) == 0;
+			}
+			
+		private:
+			Vector<T> mData;
+	};
+
+	//=========================================================================
+	class MapSourceQueue: public Stack<QueueEntry>
+	//=========================================================================
+	{
+	public:
+		MapSourceQueue( ) 
+			: Stack<QueueEntry>( ) 
+		{
+		}
+
+		virtual	~MapSourceQueue( ) { }
+	};
+
+#endif
+
 	int createdDownloaders;
 	int busyDownloaders;
 
@@ -122,7 +204,7 @@ namespace MAP
 		mQueue( NULL ),
 		mTileCount( 0 )
 	{
-		mQueue = newobject( MapSourceQueue, new MapSourceQueue( QueueSize ) );
+		mQueue = newobject( MapSourceQueue, new MapSourceQueue( /*QueueSize*/ ) );
 		for (int i = 0; i < Downloaders; i++)
 			mDownloaders[i] = NULL;
 	}
@@ -164,8 +246,9 @@ namespace MAP
 		//TraceScope tr = TraceScope( "MapSource::requestTile" );
 		if ( !isInQueue( tileXY ) )
 		{
-			QueueEntry* entry = newobject( QueueEntry, new QueueEntry( listener, false, tileXY ) );
-			mQueue->enqueue( entry );
+			QueueEntry entry = QueueEntry( listener, false, tileXY );
+			//mQueue->enqueue( entry );
+			mQueue->push( entry );
 			dequeueIfIdleSlot( NULL );
 		}
 	}
@@ -174,8 +257,9 @@ namespace MAP
 	void MapSource::requestJobComplete( IMapSourceListener* listener )
 	//-------------------------------------------------------------------------
 	{
-		QueueEntry* entry = newobject( QueueEntry, new QueueEntry( listener, true, MapTileCoordinate( ) ) );
-		mQueue->enqueue( entry );
+		QueueEntry entry = QueueEntry( listener, true, MapTileCoordinate( ) );
+		//mQueue->enqueue( entry );
+		mQueue->push( entry );
 		dequeueIfIdleSlot( NULL );
 	}
 
@@ -196,15 +280,12 @@ namespace MAP
 	bool MapSource::isInQueue( MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < mQueue->getCapacity( ); i++ )
+		for ( int i = 0; i < mQueue->size( ); i++ )
 		{
-			QueueEntry* item = mQueue->peekAt( i );
-			if ( item != NULL )
-			{
-				MapTileCoordinate itemTileXY = item->mTileXY;
-				if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
-					return true;
-			}
+			QueueEntry item = mQueue->peek( i );
+			MapTileCoordinate itemTileXY = item.mTileXY;
+			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
+				return true;
 		}
 		return false;
 	}
@@ -330,21 +411,21 @@ namespace MAP
 	void MapSource::dequeueNextJob( MapSourceImageDownloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		if ( mQueue->getCount( ) < 1 )
+		if ( mQueue->size( ) < 1 )
 			return;
-		QueueEntry* entry = mQueue->dequeue( );
+		QueueEntry entry = mQueue->pop( );
 
-		if ( entry->mJobComplete )
+		if ( entry.mJobComplete )
 		{
-			onJobComplete( entry->mListener );
+			onJobComplete( entry.mListener );
 		}
 		else
 		{
 			char url[1000];
-			getTileUrl( url, entry->mTileXY );
+			getTileUrl( url, entry.mTileXY );
 
-			downloader->setTileXY( entry->mTileXY );
-			downloader->mListener = entry->mListener;
+			downloader->setTileXY( entry.mTileXY );
+			downloader->mListener = entry.mListener;
 			int res = downloader->beginDownloading( url, 0 );
 			busyDownloaders++;
 			//DebugPrintf( "busyDownloaders: %d\n", busyDownloaders );
@@ -354,8 +435,6 @@ namespace MAP
 
 			if ( res < 0 )
 				onError( downloader->mListener, 0 ); // TODO: Proper error code.
-
-			deleteobject( entry );
 		}
 	}
 
