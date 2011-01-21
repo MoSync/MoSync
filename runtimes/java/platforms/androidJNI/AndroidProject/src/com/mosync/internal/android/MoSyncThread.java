@@ -86,6 +86,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mosync.java.android.MessageBox;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -2053,7 +2054,7 @@ public class MoSyncThread extends Thread
 	 */
 	void destroyResource(int resourceIndex)
 	{
-		SYSLOG("destroyBinary :" + resourceIndex);
+		SYSLOG("destroyResource :" + resourceIndex);
 		
 		if(null != mBinaryResources.get(resourceIndex))
 		{	
@@ -2100,6 +2101,26 @@ public class MoSyncThread extends Thread
 		return 0;
 	}
 
+	/**
+	 * Opens a message box.
+	 * @param title
+	 * @param text
+	 * @return
+	 */
+	int maMessageBox(
+		String title, 
+		String text)
+	{
+		Intent intent = new Intent(mContext, MessageBox.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("TITLE", title);
+		bundle.putString("TEXT", text);
+		intent.putExtras(bundle);
+		mContext.startActivity(intent);
+		Log.i("MoSync", "New activity started for MessageBox");
+		return 0;
+	}
+	
 	/**
 	 * Display a notification.
 	 * @param type

@@ -1651,7 +1651,15 @@ namespace Base
 				SYSCALL_THIS->GetValidatedStr(a), 
 				mJNIEnv, 
 				mJThis);
-		
+				
+		case maIOCtl_maMessageBox:
+			SYSLOG("maIOCtl_maMessageBox");
+			return _maMessageBox(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),				
+				mJNIEnv, 
+				mJThis);
+				
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;

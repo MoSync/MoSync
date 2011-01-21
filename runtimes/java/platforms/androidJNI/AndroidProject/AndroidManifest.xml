@@ -21,6 +21,9 @@
         <activity android:name=".TextBox"
                   android:label="@string/app_name">
         </activity>
+        <activity android:name=".MessageBox"
+                  android:label="@string/app_name">
+        </activity>
 		<service android:name=".MoSyncService"/>
     </application>
     <uses-sdk android:minSdkVersion="3" android:targetSdkVersion="7" />

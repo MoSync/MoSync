@@ -457,6 +457,26 @@ namespace Base
 		return (int)ret;
 	}
 	
+	int _maMessageBox(const char* title, const char* text, JNIEnv* jNIEnv, jobject jThis)
+	{
+		Base::gSyscall->VM_Yield();
+		
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrText = jNIEnv->NewStringUTF(text);
+		
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maMessageBox", "(Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrText);
+		
+		return ret;
+	}
+	
 	/**
 	 * Add a notification item.
 	 *
