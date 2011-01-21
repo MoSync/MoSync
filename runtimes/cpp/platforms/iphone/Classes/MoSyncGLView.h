@@ -12,6 +12,7 @@
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES1/gl.h>
 #import <OpenGLES/ES1/glext.h>
+#include "TouchHelper.h"
 
 /*
  This class wraps the CAEAGLLayer from CoreAnimation into a convenient UIView subclass.
@@ -35,6 +36,8 @@
     NSTimeInterval animationInterval;
 	
 	EAGLContext *WorkingContext;
+
+	TouchHelper* touchHelper;	
 }
 
 @property NSTimeInterval animationInterval;

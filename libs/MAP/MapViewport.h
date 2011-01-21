@@ -117,12 +117,6 @@ namespace MAP
 		int getMagnification( ) const;
 		void setMagnification( int magnification );
 		
-			
-		/**
-		 * Scale property
-		 */		
-		void setScale( double scale );	
-		
 		/**
 		 * Magnification scale display property
 		 */
@@ -191,10 +185,14 @@ namespace MAP
 		void updateZooming(const MAPoint2d& p1, const MAPoint2d& p2);
 		void endZooming();
 		
+		void beginPanning(const MAPoint2d& p);
+		void updatePanning(const MAPoint2d& p);
+		void endPanning();
+
 		void moveCenterPositionInPixels(int xdelta, int ydelta);
 
-
 	protected:
+	
 		//
 		// events
 		//
@@ -205,12 +203,28 @@ namespace MAP
 		virtual void drawOverlay( Rect& bounds, int magnification );
 
 	private:
+	
+		//-------------------------------------------------------------------------
+		// zooming
+		//-------------------------------------------------------------------------
 		double mOldDistance;
 		MAPoint2d mOldCenter;
+		MAPoint2d mNewCenter;
 		double mMagnificationD;
 		double mMagnificationStart;
 		int mZoomTime;
-		
+		bool mZooming;
+		//-------------------------------------------------------------------------
+	
+		//-------------------------------------------------------------------------
+		// panning
+		//-------------------------------------------------------------------------
+		int mPanTime;
+		MAPoint2d mTouchScreenCoordinate;
+		PixelCoordinate mTouchPixelCoordinate;
+		void setPositionInScreenCoordinatesSinceTouch(const MAPoint2d& p );	
+		//-------------------------------------------------------------------------
+			
 		int mWidth;
 		int mHeight;
 		LonLat mCenterPositionLonLat;
@@ -224,8 +238,6 @@ namespace MAP
 		Font* mFont;
 		bool mHasTimer;
 		bool mInDraw;
-		
-		double mScale;
 	};
 }
 #endif // MAPVIEWPORT_H_

@@ -21,6 +21,9 @@
 		8519011F1199B90400B71F58 /* data_section.bin in Resources */ = {isa = PBXBuildFile; fileRef = 8519011E1199B90400B71F58 /* data_section.bin */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
+		85581E6112EA323E009C6204 /* TouchHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 85581E5E12EA323E009C6204 /* TouchHelper.h */; };
+		85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
 		8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
 		8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
@@ -193,6 +196,8 @@
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
 		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
+		85581E5E12EA323E009C6204 /* TouchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchHelper.h; sourceTree = "<group>"; };
+		85581E5F12EA323E009C6204 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
 		8558307E11C79B030008FDC1 /* MoSyncViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncViewController.mm; sourceTree = "<group>"; };
 		856ACBD212B1A2C00017BD6D /* NSObjectExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSObjectExpanded.h; sourceTree = "<group>"; };
@@ -410,6 +415,8 @@
 				856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */,
 				857B022A12C62C9300DEA306 /* MoSyncGLView.h */,
 				85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */,
+				85581E5E12EA323E009C6204 /* TouchHelper.h */,
+				85581E5F12EA323E009C6204 /* TouchHelper.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -718,6 +725,7 @@
 			files = (
 				858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */,
 				F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */,
+				85581E6112EA323E009C6204 /* TouchHelper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -890,6 +898,7 @@
 				858B432012E7325F0058DBFC /* log.cpp in Sources */,
 				858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 				F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
+				85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -952,6 +961,7 @@
 				85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */,
 				858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 				F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
+				85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
