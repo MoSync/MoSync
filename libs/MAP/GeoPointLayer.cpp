@@ -4,6 +4,8 @@
 // Author: Lars Ake Vinberg
 //
 
+#include <mastdlib.h>
+
 #include "MemoryMgr.h"
 #include "GeoPointLayer.h"
 #include "DebugPrintf.h"
@@ -47,14 +49,7 @@ namespace MAP
 	void GeoPointLayer::drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, int magnification, bool selected, bool drawText )
 	//-------------------------------------------------------------------------
 	{
-		PixelCoordinate worldPx = item->getCachedPixelLocation( );
-		if ( worldPx.getMagnification() != magnification )
-		{
-			LonLat lonlat = item->getLocation( );
-			worldPx = lonlat.toPixels( magnification );
-			item->setCachedPixelLocation( worldPx );
-		}
-		MAPoint2d widgetPx = viewport->worldPixelToViewport( worldPx );
+		MAPoint2d widgetPx = getScreenPixel(viewport, magnification, item);
 
 		/*
 		if ( widgetPx.x >= bounds.x && 
@@ -167,6 +162,28 @@ namespace MAP
 	const double LargeNum = 1E20;
 
 	//-------------------------------------------------------------------------
+	void GeoPointLayer::selectItemAtPixel( MapViewport *viewport, int magnification, MAPoint2d screenPixel )
+	//-------------------------------------------------------------------------
+	{
+		// If there's a point at this pixel coordinate, make it the selected point
+		Enumerator<GeoPoint*> e = Enumerator<GeoPoint*>( *this );
+		int index = 0;
+
+		while ( e.moveNext( ) )
+		{
+			GeoPoint* item = e.current( );
+			MAPoint2d widgetPixel = getScreenPixel(viewport, magnification, item);
+
+			if (abs(widgetPixel.x - screenPixel.x) < item->getMarkerSize() &&
+				abs(widgetPixel.y - screenPixel.y) < item->getMarkerSize()) {
+				selectItem(index);
+			}
+
+			index++;
+		}
+	}
+
+	//-------------------------------------------------------------------------
 	void GeoPointLayer::getBoundingBox( double& left, double& top, double& right, double& bottom )
 	//-------------------------------------------------------------------------
 	{
@@ -191,4 +208,17 @@ namespace MAP
 		return current ? current->getLocation( ) : LonLat( );
 	}
 
+	//-------------------------------------------------------------------------
+	MAPoint2d GeoPointLayer::getScreenPixel( MapViewport* viewport, int magnification, GeoPoint* item )
+	//-------------------------------------------------------------------------
+	{
+		PixelCoordinate worldPx = item->getCachedPixelLocation( );
+		if ( worldPx.getMagnification() != magnification )
+		{
+			LonLat lonlat = item->getLocation( );
+			worldPx = lonlat.toPixels( magnification );
+			item->setCachedPixelLocation( worldPx );
+		}
+		return viewport->worldPixelToViewport( worldPx );
+	}
 }
