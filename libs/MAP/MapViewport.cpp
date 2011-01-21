@@ -877,7 +877,7 @@ namespace MAP
 	
     double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
 		MAPoint2d vector = calculateVector(touch1, touch2);
-		double distance = sqrt(vector.x*vector.x + vector.y*vector.y);
+		double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
 		return distance;
     }	
 	
