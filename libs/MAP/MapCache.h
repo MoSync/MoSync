@@ -99,8 +99,8 @@ namespace MAP
 		//
 		// Capacity property
 		//
-		//int getCapacity( ) const;
-		//void setCapacity( int capacity );
+		int getCapacity( ) const;
+		void setCapacity( int capacity );
 		int size( );
 
 	private:
@@ -129,7 +129,7 @@ namespace MAP
 		HashMap<MapTileKey, MapTile*> mList;
 		int mHits;
 		int mMisses;
-		//int mCapacity;
+		int mCapacity;
 	};
 }
 
