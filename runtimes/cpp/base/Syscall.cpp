@@ -427,7 +427,10 @@ namespace Base {
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
 #ifdef _android
-		SYSCALL_THIS->destroyResource(handle);
+		if(!SYSCALL_THIS->destroyBinaryResource(handle))
+		{
+			SYSCALL_THIS->destroyResource(handle);
+		}
 #endif
 		SYSCALL_THIS->resources.destroy(handle);
 

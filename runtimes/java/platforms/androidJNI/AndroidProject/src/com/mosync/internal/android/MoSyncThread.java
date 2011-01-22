@@ -115,6 +115,9 @@ public class MoSyncThread extends Thread
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();	
 	public native void nativePostEvent(int[] eventBuffer);
+	public native int nativeCreateBinaryResource(
+		int resourceIndex,
+		int length);
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
@@ -1611,7 +1614,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * _maReadStore
 	 */
-	ByteBuffer _maReadStore(int store, int resourceIndex)
+	int _maReadStore(int store, int resourceIndex)
 	{
 		SYSLOG("_maReadStore");
 		
@@ -1632,22 +1635,21 @@ public class MoSyncThread extends Thread
 				{
 					offset = fis.read(buffer, offset, (length-offset));
 				}
-				fis.close();	
-			}
-			else
-			{
-				buffer = new byte[0];
+				fis.close();
+				
+				int res = nativeCreateBinaryResource(resourceIndex, length);
+				ByteBuffer byteBuffer = mBinaryResources.get(resourceIndex);
+				byteBuffer.put(buffer);
+				
+				return RES_OK;
 			}
 			
-			ByteBuffer bb = loadBinary(resourceIndex, length);
-			bb.put(buffer);
-			return bb;
-			
+			return RES_OUT_OF_MEMORY;
 		} 
 		catch(Exception e) 
 		{
 			logError("read store exception : " + e.toString(), e);
-			return null;
+			return -1;
 		}
 	}
 
@@ -2007,21 +2009,20 @@ public class MoSyncThread extends Thread
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
 	 */
-	ByteBuffer loadBinary(int resourceIndex, int size)
+	boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
 		SYSLOG("loadBinary index:" + resourceIndex);
 		
 		try
 		{
-			ByteBuffer data = ByteBuffer.allocateDirect(size);
-			data.order(null);
-			mBinaryResources.put(resourceIndex, data);
-			return data;
+			buffer.order(null);
+			mBinaryResources.put(resourceIndex, buffer);
+			return true;
 		}
 		catch(Throwable e)
 		{
 			logError("loadBinary - Out of Memory!", e);
-			return null;
+			return false;
 		}
 	}
 
@@ -2047,6 +2048,19 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfAudioUBin(ubinData, resourceIndex);
 	}
 
+	ByteBuffer destroyBinary(int resourceIndex)
+	{
+		ByteBuffer buffer =  mBinaryResources.get(resourceIndex);
+		
+		if(null != buffer)
+		{
+			mBinaryResources.remove(resourceIndex);
+			return buffer;
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Destroy a resource.
 	 * 
@@ -2055,12 +2069,13 @@ public class MoSyncThread extends Thread
 	void destroyResource(int resourceIndex)
 	{
 		SYSLOG("destroyResource :" + resourceIndex);
-		
+		/*
 		if(null != mBinaryResources.get(resourceIndex))
 		{	
 			mBinaryResources.remove(resourceIndex);
 		}
-		else if(null != mUBinaryResources.get(resourceIndex))
+		*/
+		if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
 		}

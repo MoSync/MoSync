@@ -308,6 +308,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	Base::gSyscall->postEvent(event);
 }
 
+static int nativeCreateBinaryResource( JNIEnv* env, jobject jthis, int resourceIndex, int size )
+{
+	return Base::gSyscall->loadBinaryStore(resourceIndex, size);
+}
+
 /**
 * @brief jniRegisterNativeMethods
 */
@@ -331,7 +336,7 @@ int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativ
 	return 0;
 }
 
-jint numJavaMethods = 6;
+jint numJavaMethods = 7;
 static JNINativeMethod sMethods[] =
 {
     // name, signature, funcPtr 
@@ -340,7 +345,8 @@ static JNINativeMethod sMethods[] =
    { "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource},
    { "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined},
    { "nativeRun", "()V", (void*)nativeRun},
-   { "nativePostEvent", "([I)V", (void*)nativePostEvent}
+   { "nativePostEvent", "([I)V", (void*)nativePostEvent},
+   { "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource}
 };
 
 /**

@@ -7,7 +7,6 @@
 
 #import "MoSyncGLView.h"
 
-
 // hackety hack..
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
 void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
@@ -62,6 +61,9 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
         animationInterval = 1.0 / 60.0;
 			
 		WorkingContext = nil;	
+		
+		touchHelper = [[TouchHelper alloc] init];
+		self.multipleTouchEnabled = YES;
 			
 		[self setupView];
     }
@@ -243,33 +245,38 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for (UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView:self];
-		MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
-		touchId++;
-	}
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseBegan) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper addTouch: touch];
+			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
+		}
+	}	
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for (UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView:self];
-		MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-		touchId++;
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseMoved) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];
+			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+		}
 	}	
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for(UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView					:self];
-		MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-		touchId++;
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
+    for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseEnded) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
 	}	
+	
 }
 
 @end

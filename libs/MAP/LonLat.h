@@ -303,8 +303,9 @@ namespace MAP
 		//}
 	};
 	
-	typedef LonLatT<int> LonLat;
+	typedef LonLatT<int> LonLatI;
 	typedef LonLatT<double> LonLatD;
+	typedef LonLatT<double> LonLat;
 }
 
 #endif // LONLAT_H_

@@ -18,10 +18,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <UIKit/UIKit.h>
 #import "MoSyncCLController.h"
 #include <helpers/cpp_defs.h>
+#include "TouchHelper.h"
 
 @interface MoSyncView : UIView {
 	CGImageRef mosyncView;
     MoSyncCLController *locationController;	
+	TouchHelper* touchHelper;
 
 }
 

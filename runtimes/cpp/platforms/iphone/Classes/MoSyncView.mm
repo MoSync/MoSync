@@ -164,6 +164,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		
 		locationController = [[MoSyncCLController alloc] init];
 		
+		self.multipleTouchEnabled = YES;
+		touchHelper = [[TouchHelper alloc] init];
+		
 		//MoSyncMain(self.frame.size.width, screenHeight, self);
 		MoSync_Main(screenWidth, screenHeight, self);
     }
@@ -192,40 +195,87 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     [locationController release];	
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for (UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView:self];
-		MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
-		touchId++;
-	}
-}
-
 - (void)deviceOrientationChanged:(NSNotification *)notification {
 	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
 	//Base::gEventQueue.addScreenChangedEvent();
 	MoSync_AddScreenChangedEvent();
 }
 
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for (UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView:self];
-		MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-		touchId++;
+/*
+int addTouch(UITouch* touch) {
+	if(touchArray == nil) {
+		touchArray = [[NSMutableArray alloc] init];
+		dummyTouch = [[UITouch alloc] init];
+	}
+	
+	int index = 0;
+	for (UITouch* cur in touchArray) {
+		if(touch == cur) {
+			return -1;
+		} else if(cur == dummyTouch) {
+			[touchArray replaceObjectAtIndex:index withObject:touch];
+			return index;
+		}
+		
+		index++;
+	}
+	
+	[touchArray addObject:touch];
+	return index;
+	
+}
+
+int getTouchId(UITouch* touch) {
+	return [touchArray indexOfObject:touch];
+}
+
+void removeTouch(UITouch* touch) {
+	//[touchArray removeObject:touch];
+	int index = 0;
+	for (UITouch* cur in touchArray) {
+		if(cur == touch) {
+			[touchArray replaceObjectAtIndex: index withObject:dummyTouch];
+			return;
+		}
+		index++;
+	}
+	
+}
+ */
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseBegan) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper addTouch: touch];
+			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
+		}
 	}	
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-	NSSet *allTouches = [event allTouches];
-	int touchId = 0;
-	for(UITouch *touch in allTouches) {
-		CGPoint point = [touch locationInView					:self];
-		MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-		touchId++;
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseMoved) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];
+			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+		}
 	}	
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
+    for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseEnded) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
+	}	
+	
 }
 
 -(void) messageBox:(id) obj {
