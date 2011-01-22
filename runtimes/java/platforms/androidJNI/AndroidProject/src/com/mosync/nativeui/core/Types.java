@@ -40,6 +40,9 @@ public class Types
 	public static final String WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 	public static final String WIDGET_PROPERTY_VERTICAL_ALIGNMENT = "verticalAlignment";
 	
+	public static final String WIDGET_PROPERTY_CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+	public static final String WIDGET_PROPERTY_CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+	
 	public static final String WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 	public static final String WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 	

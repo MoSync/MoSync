@@ -2,6 +2,11 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.view.ViewGroup;
 
+import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
+import com.mosync.nativeui.util.properties.VerticalAlignment;
+
 /**
  * A class for a linear layout that is either horizontal
  * or vertical.
@@ -29,5 +34,31 @@ public class LinearLayout extends Layout
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
 		return new android.widget.LinearLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
+	}
+	
+	@Override
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException
+	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+		
+		android.widget.LinearLayout layout = (android.widget.LinearLayout) getView( );
+		if( property.equals( Types.WIDGET_PROPERTY_CHILD_HORIZONTAL_ALIGNMENT ) )
+		{
+			layout.setHorizontalGravity( HorizontalAlignment.convert( value ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_CHILD_VERTICAL_ALIGNMENT ) )
+		{
+			layout.setVerticalGravity( VerticalAlignment.convert( value ) );
+		}
+		else
+		{
+			return false;
+		}
+		
+		return true;
 	}
 }

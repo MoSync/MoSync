@@ -11,6 +11,6 @@ public class PropertyConversionException extends Exception
 	
 	public PropertyConversionException(String value)
 	{
-		super( "Could not convert: '" + "'." );
+		super( "Could not convert: '" + value + "'." );
 	}
 }

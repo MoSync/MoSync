@@ -48,7 +48,24 @@ public class LayoutParamsSetter
 		try
 		{
 			Field gravityField = nativeLayoutParams.getClass( ).getField( "gravity" );
-			gravityField.setInt( nativeLayoutParams, mosyncLayoutParams.getHorizontalAlignment() | mosyncLayoutParams.getVerticalAlignment() );
+			int gravity = gravityField.getInt( nativeLayoutParams );
+			
+			boolean changed = false;
+			if( mosyncLayoutParams.getHorizontalAlignment( ) != -1 )
+			{
+				gravity |= mosyncLayoutParams.getHorizontalAlignment( );
+				changed = true;
+			}
+			if( mosyncLayoutParams.getHorizontalAlignment( ) != -1 )
+			{
+				gravity |= mosyncLayoutParams.getVerticalAlignment( );
+				changed = true;
+			}
+			
+			if( changed )
+			{
+				gravityField.setInt( nativeLayoutParams, gravity );
+			}
 		}
 		catch(Exception e)
 		{
