@@ -2,6 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.mosync.nativeui.core.NativeUI;
@@ -61,5 +62,10 @@ public class ListItemWidget extends Layout
 		}
 		
 		return true;
+	}
+	
+	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
+	{
+		return new RelativeLayout.LayoutParams( mosyncLayoutParams.getWidth( ), mosyncLayoutParams.getHeight( ) );
 	}
 }

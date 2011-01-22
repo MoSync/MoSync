@@ -155,11 +155,11 @@ public class Widget
 	{
 		if( property.equals( Types.WIDGET_PROPERTY_WIDTH ) )
 		{
-			return Integer.toString( getView( ).getWidth( ) );
+			return Integer.toString( getView( ).getWidth( ) - getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
 		{
-			return Integer.toString( getView( ).getHeight( ) );
+			return Integer.toString( getView( ).getHeight( ) - getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
 		}
 		else
 		{
