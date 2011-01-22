@@ -61,7 +61,9 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.AssetFileDescriptor;
@@ -85,6 +87,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 
 import com.mosync.java.android.MessageBox;
 import com.mosync.java.android.MoSync;
@@ -2083,8 +2086,10 @@ public class MoSyncThread extends Thread
 		{
 			mImageResources.remove(resourceIndex);
 		}
-		
-		Log.i("---MoSyncThread---", "binary: " + mBinaryResources.size( ) + " ubinary: " + mUBinaryResources.size( ) + " image: " + mImageResources.size( ) );
+		else
+		{
+			Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
+		}
 		
 		Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
@@ -2125,16 +2130,31 @@ public class MoSyncThread extends Thread
 	 * @return
 	 */
 	int maMessageBox(
-		String title, 
-		String text)
+		final String title, 
+		final String text)
 	{
-		Intent intent = new Intent(mContext, MessageBox.class);
-		Bundle bundle = new Bundle();
-		bundle.putString("TITLE", title);
-		bundle.putString("TEXT", text);
-		intent.putExtras(bundle);
-		mContext.startActivity(intent);
-		Log.i("MoSync", "New activity started for MessageBox");
+		// Get parameters from the parent activity
+		mContext.runOnUiThread( new Runnable( ) {
+			
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				builder.setCancelable(false);
+				builder.setMessage(text);
+				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+					}
+				}); 
+				AlertDialog alertDialog = builder.create();
+				
+				alertDialog.setTitle(title);
+				alertDialog.show();
+			}
+		});
+
 		return 0;
 	}
 	
