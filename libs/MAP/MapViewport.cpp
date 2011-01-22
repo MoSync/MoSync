@@ -50,6 +50,10 @@ namespace MAP
 	static const double GlideFriction = 0.02;
 	static const int SmallScrollStep = 30; // pixels to scroll if not full page
 	static const int CrossSize = 4;
+	//
+	// Zooming
+	//
+	static const int ZoomInterval = 30;
 
 	//=========================================================================
 	enum MapViewportMomentumState
@@ -498,12 +502,12 @@ namespace MAP
 
 			#ifndef WIN32
 
-#if 0 // HACK
+//#if 0 // HACK
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
 			} 
-#endif
+//#endif
 			
 			#endif
 
@@ -511,9 +515,9 @@ namespace MAP
 		
 			#ifndef WIN32
 
-#if 0 // HACK
+//#if 0 // HACK
 			Gfx_setAlpha(255);
-#endif
+//#endif
 			
 			#endif
 
@@ -529,8 +533,8 @@ namespace MAP
 		}
 		else
 		{
-			//if ( !OnlyUpdateWhenJobComplete )
-#ifndef OnlyUpdateWhenJobComplete		
+			#ifndef OnlyUpdateWhenJobComplete		
+
 			{
 				#ifndef WIN32
 				
@@ -545,22 +549,35 @@ namespace MAP
 				//
 				onViewportUpdated( );
 			}
+
+			#endif		
 		}
-#endif		
 	}
 
 	//-------------------------------------------------------------------------
 	void MapViewport::jobComplete( MapCache* sender )
 	//-------------------------------------------------------------------------
 	{
-#ifdef OnlyUpdateWhenJobComplete
+		#ifdef OnlyUpdateWhenJobComplete
+
 		{
 			//
 			// notify client that update is needed
 			//
 			onViewportUpdated( );
 		}
-#endif		
+
+		#endif		
+	}
+
+	//-------------------------------------------------------------------------
+	// Called when map cache encounters an error,
+	// most likely when a downloader cannot retrieve a tile.
+	//
+	void MapViewport::error( MapCache* sender, int code )
+	//-------------------------------------------------------------------------
+	{
+		// TODO: Handle - messagebox?
 	}
 
 	//-------------------------------------------------------------------------
@@ -589,11 +606,9 @@ namespace MAP
 		// Draw available tiles
 		//
 
-//#ifdef WIN32
-// HACK for debugging
+// (LAV 20110121): HACK for debugging, please leave commented out
 //maSetColor( 0x000000 );
 //Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
-//#endif //HACK
 
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
 		
@@ -686,7 +701,6 @@ namespace MAP
 		//
 		// Draw debug info
 		//
-		if ( ShowLatLon )
 		{
 			char buffer[100];
 			sprintf( buffer, "Tiles: %d Cache: %d", this->mSource->getTileCount( ), MapCache::get( )->size( ) );
@@ -709,6 +723,10 @@ namespace MAP
 	void MapViewport::drawOverlay( Rect& bounds, int magnification )
 	//-------------------------------------------------------------------------
 	{
+		//
+		// Base implementation does nothing here.
+		// derived classes, such as LayerMapViewport, must override to draw on top of map.
+		//
 	}
 
 	//-------------------------------------------------------------------------
@@ -880,14 +898,20 @@ namespace MAP
 	}
 	
 	
-	MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2) {
+	//-------------------------------------------------------------------------		
+	MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2)
+	//-------------------------------------------------------------------------		
+	{
 		MAPoint2d vec;
 		vec.x = p2.x - p1.x;
 		vec.y = p2.y - p1.y;
 		return vec;
 	}
 	
-    double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
+	//-------------------------------------------------------------------------		
+    double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) 
+	//-------------------------------------------------------------------------		
+	{
 		MAPoint2d vector = calculateVector(touch1, touch2);
 		double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
 		return distance;
@@ -908,8 +932,6 @@ namespace MAP
 		mZoomTime = maGetMilliSecondCount( );
 	}
 	
-	
-	static const int ZoomInterval = 30;
 	//-------------------------------------------------------------------------
 	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	

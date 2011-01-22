@@ -26,8 +26,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	//int MapTile::tileCount = 0;
-
 	MapCache* MapCache::sSingleton = NULL;
 
 	static const int DefaultCapacity = 40;
@@ -37,7 +35,9 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
+		//---------------------------------------------------------------------
 		MapTileKey( ) { }
+		//---------------------------------------------------------------------
 
 		//---------------------------------------------------------------------
 		MapTileKey( MapSource* source, int gridX, int gridY, int magnification )
@@ -49,21 +49,24 @@ namespace MAP
 		{
 		}
 
-		MapSource* mSource;
-		int mGridX;
-		int mGridY;
-		int mMagnification;
-
+		//---------------------------------------------------------------------
 		bool operator==(const MapTileKey& c) const 
+		//---------------------------------------------------------------------
 		{
 			return mSource == c.mSource && mGridX == c.mGridX && mGridY == c.mGridY && mMagnification == c.mMagnification;
 		}
 
+		//---------------------------------------------------------------------
 		bool operator<(const MapTileKey& c) const 
+		//---------------------------------------------------------------------
 		{
 			return mSource < c.mSource && mGridX < c.mGridX && mGridY < c.mGridY && mMagnification < c.mMagnification;
 		}
 					
+		MapSource* mSource;
+		int mGridX;
+		int mGridY;
+		int mMagnification;
 	};
 }
 
@@ -116,7 +119,9 @@ namespace MAP
 	MapCache::~MapCache( )
 	//-------------------------------------------------------------------------
 	{
-		// dispose tile list
+		//
+		// clear() will dispose all tiles in cache
+		//
 		clear( );
 	}
 
@@ -217,8 +222,6 @@ namespace MAP
 
 				if ( found != mList.end( ) )
 				{
-					//DebugPrintf(" Found: %d,%d\n", x, y );
-
 					HashMap<MapTileKey, MapTile*>::PairKV kv = *found;
 					mHits++;
 					MapTile* t = kv.second;
@@ -229,7 +232,6 @@ namespace MAP
 				//
 				// Not in cache: request from map source.
 				//
-				//DebugPrintf(" Requesting: %d,%d\n", x, y );
 				mMisses++;
 				source->requestTile( this, MapTileCoordinate( x, y, magnification ) );
 			}
@@ -259,10 +261,6 @@ namespace MAP
 	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//DebugPrintf( "Receiving tile, %d,%d\n", tile->getGridX( ), tile->getGridY( ) );
-
-		//TraceScope tr( "MapCache::tileReceived" );
-
 #if 0 // this block tries to test if memory is available
 
 		//
@@ -286,7 +284,6 @@ namespace MAP
 #endif
 
 		{
-			//DebugPrintf( "Cache full %d, deleting\n", mList.size( ) );
 			//
 			// find and remove oldest in cache
 			//
@@ -309,7 +306,7 @@ namespace MAP
 	void MapCache::downloadCancelled( MapSource* sender )
 	//-------------------------------------------------------------------------
 	{
-		// TODO: Handle
+		// TODO: Handle properly
 		DebugPrintf( "MapCache::downloadCancelled\n" );
 	}
 
@@ -317,8 +314,7 @@ namespace MAP
 	void MapCache::error( MapSource* source, int code )
 	//-------------------------------------------------------------------------
 	{
-		// TODO: Handle
-		DebugPrintf( "MapCache::error %d\n", code );
+		onError( code );
 	}
 
 	//-------------------------------------------------------------------------
@@ -329,7 +325,6 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	//
 	// Deletes all tiles in cache.
 	//
 	void MapCache::clear( )
@@ -361,5 +356,12 @@ namespace MAP
 			(*listeners)[i]->jobComplete( this );
 	}
 
-
+	//-------------------------------------------------------------------------
+	void MapCache::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
+	}
 }
