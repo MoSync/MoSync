@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapCache.h"
 #include "MapSource.h"
 #include "DebugPrintf.h"
+#include <madmath.h>
 
 //#define OnlyUpdateWhenJobComplete
 
@@ -477,6 +478,10 @@ namespace MAP
 		return alpha;
 	}
 
+	inline double log_2(double x) {
+		return log(x)/log(2.0);
+	}
+	
 	//-------------------------------------------------------------------------
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile, bool foundInCache )
 	//-------------------------------------------------------------------------
@@ -496,11 +501,16 @@ namespace MAP
 			if(mZooming) {
 				int width = getWidth( );
 				int height = getHeight( );	
-				double scaleFrac = 1.0 + (mMagnificationD - mMagnification);
-				Gfx_translate(width/2, height/2);
-				Gfx_scale((MAFixed)(scaleFrac*65536.0), (MAFixed)(scaleFrac*65536.0));
-				pt.x -= width/2;
-				pt.y -= height/2;
+	
+				double scaleTime = (mMagnificationD - mMagnification);
+				double scale = pow(2.0, scaleTime);
+				
+				//double scale = 1.0 + (mMagnificationD - mMagnification);
+				
+				Gfx_translate(width>>1, height>>1);
+				Gfx_scale((MAFixed)(scale*65536.0), (MAFixed)(scale*65536.0));
+				pt.x -= width>>1;
+				pt.y -= height>>1;
 			}
 
 
@@ -1040,6 +1050,20 @@ namespace MAP
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
         setCenterPosition( newPos, false, true );
 	}	
+
+	//-------------------------------------------------------------------------
+	void MapViewport::setCenterPositionImmediate(const LonLat& position, double magnification )
+	//-------------------------------------------------------------------------
+	{
+		// todo: fix and use this function..
+		
+		mMagnification = (int)floor(magnification);
+		mMagnificationD = magnification;
+
+		//mCenterPositionLonLat = mPanTargetPositionLonLat = position;
+		//mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
+		mIdleListener->stopGlide( );
+	}
 			
 	
 }

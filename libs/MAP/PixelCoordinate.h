@@ -98,8 +98,16 @@ namespace MAP
 		MagnificationT mMagnification;
 	};
 	
-	typedef PixelCoordinateT<int> PixelCoordinate;
+	// override type that can be converted to int magnification
+	// and double etc. always floored to int etc.
+	class MagnificationType {
+	
+	};
+	
+	typedef PixelCoordinateT<int> PixelCoordinateI;
 	typedef PixelCoordinateT<double> PixelCoordinateD;
+	typedef PixelCoordinateT<double> PixelCoordinate;
+	
 }
 
 #endif // PIXELCOORDINATE_H_

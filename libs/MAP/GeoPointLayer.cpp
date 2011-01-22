@@ -213,7 +213,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		PixelCoordinate worldPx = item->getCachedPixelLocation( );
-		if ( worldPx.getMagnification() != magnification )
+		if ( (int) worldPx.getMagnification() != magnification )
 		{
 			LonLat lonlat = item->getLocation( );
 			worldPx = lonlat.toPixels( magnification );

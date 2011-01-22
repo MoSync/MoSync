@@ -190,6 +190,7 @@ namespace MAP
 		void endPanning();
 
 		void moveCenterPositionInPixels(int xdelta, int ydelta);
+		void setCenterPositionImmediate(const LonLat& pos, double magnification);
 
 	protected:
 	
