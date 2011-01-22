@@ -1143,6 +1143,8 @@ interface MAAPI {
 		LCTRL			= 306;
 		RALT			= 307;
 		LALT			= 308;
+		
+		SEARCH          = 309;
 	}
 
 	constset int MAKB_ { // Key Bits
