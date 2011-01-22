@@ -23,11 +23,11 @@ public class BooleanConverter
 			throw new PropertyConversionException( "Input string is null" );
 		}
 		
-		if( bool.equals( "true" ) )
+		if( bool.equals( "true" ) || bool.equals( "1" ) )
 		{
 			return true;
 		}
-		else if( bool.equals( "false" ) )
+		else if( bool.equals( "false" ) || bool.equals( "0" ) )
 		{
 			return false;
 		}
