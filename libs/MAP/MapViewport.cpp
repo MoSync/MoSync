@@ -508,7 +508,7 @@ namespace MAP
 			// Unpack PNG
 			//
 			MAHandle placeholder = PlaceholderPool::alloc( );//maCreatePlaceholder( );
-			int res = maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
+			maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
 			//
 			// Draw image
 			//
