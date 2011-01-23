@@ -135,14 +135,7 @@ namespace MAP
 		if ( layer == NULL )
 			return;
 
-		//GeoPoint* current = layer->getItem( mSelectedItem );
-		//if ( current == NULL )
-		//	return;
 		layer->activateSelectedItem( );
-
-		// TODO: in layer?
-		//for ( int i = 0; i < mListeners.size( ); i ++ )
-		//	mListeners[i]->layerItemActivated( this, layer, current );
 	}
 
 	static inline double Max( double x, double y ) { return x > y ? x : y; }
@@ -161,23 +154,6 @@ namespace MAP
 
 		Layer* layer = mLayers[mSelectedLayer];
 
-		////
-		//// Skip if layer has no points
-		////
-		//if ( layer->size( ) < 1 )
-		//	return;
-
-		//Enumerator<GeoPoint*> e = Enumerator<GeoPoint*>( *layer );
-
-		//while ( e.moveNext( ) )
-		//{
-		//	GeoPoint* item = e.current( );
-		//	LonLat location = item->getLocation( );
-		//	left = Min( left, location.lon );
-		//	right = Max( right, location.lon );
-		//	top = Max( top, location.lat );
-		//	bottom = Min( bottom, location.lat );
-		//}
 		layer->getBoundingBox( left, top, right, bottom );
 		//
 		// Skip if no points with location
@@ -199,10 +175,6 @@ namespace MAP
 			magnification--;
 		}
 
-		//enterMapUpdateScope( );
-		//setCenterPosition( LonLat( 0.5 * (left + right), 0.5 * (top + bottom ) ), true, false );
-		//setMagnification( magnification );
-		//exitMapUpdateScope( false );
 		setCenterPosition( LonLat( 0.5 * (left + right), 0.5 * (top + bottom ) ), magnification, true, false );
 	}
 
@@ -343,9 +315,7 @@ namespace MAP
 		switch( keyCode )
 		{
 		case MAK_5:
-			//enterMapUpdateScope( );
 			selectNextItem( );
-			//exitMapUpdateScope( false );
 			return true;
 		case MAK_FIRE:
 		case MAK_0:
@@ -425,31 +395,6 @@ namespace MAP
 			Layer* layer = mLayers[i];
 			if ( ! layer->getEnabled( ) )
 				continue;
-			//Layer* layer = mLayers[mSelectedLayer];
-
-			//if ( !layer->isVisible( ) )
-			//	continue;
-
-			//Enumerator<GeoPoint*> e = Enumerator<GeoPoint*>( *layer );
-
-			//while ( e.moveNext( ) )
-			//{
-			//	GeoPoint* item = e.current( );
-			//	drawItem( layer, item, false, false );
-			//}
-
-			////
-			//// Draw description text
-			////
-			//if ( i == mSelectedLayer )
-			//{
-			//	GeoPoint* item = layer->getItem( mSelectedItem );
-			//	if ( item != NULL )
-			//	{
-			//		if ( mSelectedLayer != -1 /*&& item != NULL*/ )
-			//			drawItem( layer, item, true, true );
-			//	}
-			//}
 			layer->draw( this, bounds, magnification, i == mSelectedLayer );
 		}
 	}
@@ -459,11 +404,9 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		Layer* layer = mLayers[mSelectedLayer];
-		//GeoPoint* item = layer->getItem( mSelectedItem );
 
 		if ( KeepSelectedCentered )
 		{
-			//LonLat itemLoc = item->getLocation( );
 			LonLat itemLoc = layer->getSelectedItemLocation( );
 			if ( itemLoc.isValid ( ) )
 				setCenterPosition( itemLoc, false, false );

@@ -27,8 +27,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	//int MapTile::tileCount = 0;
-
 	MapCache* MapCache::sSingleton = NULL;
 
 	static const int DefaultCapacity = 40;
@@ -218,8 +216,6 @@ namespace MAP
 
 				if ( found != mList.end( ) )
 				{
-					//DebugPrintf(" Found: %d,%d\n", x, y );
-
 					HashMap<MapTileKey, MapTile*>::PairKV kv = *found;
 					mHits++;
 					MapTile* t = kv.second;
@@ -230,7 +226,6 @@ namespace MAP
 				//
 				// Not in cache: request from map source.
 				//
-				//DebugPrintf(" Requesting: %d,%d\n", x, y );
 				mMisses++;
 				source->requestTile( this, MapTileCoordinate( x, y, magnification ) );
 			}
@@ -260,10 +255,6 @@ namespace MAP
 	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//DebugPrintf( "Receiving tile, %d,%d\n", tile->getGridX( ), tile->getGridY( ) );
-
-		//TraceScope tr( "MapCache::tileReceived" );
-
 #if 0 // this block tries to test if memory is available
 
 		//
@@ -287,7 +278,6 @@ namespace MAP
 #endif
 
 		{
-			//DebugPrintf( "Cache full %d, deleting\n", mList.size( ) );
 			//
 			// find and remove oldest in cache
 			//

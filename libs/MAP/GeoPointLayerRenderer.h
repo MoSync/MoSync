@@ -7,15 +7,6 @@
 #ifndef GEOPOINTLAYERRENDERER_H_
 #define GEOPOINTLAYERRENDERER_H_
 
-//#include <MAUtil/String.h>
-
-//#include "MemoryMgr.h"
-//#include "LonLat.h"
-//#include "DateTime.h"
-
-//using namespace MAUtil;
-//using namespace MAPUtil;
-
 namespace MAP
 {
 	class Layer;

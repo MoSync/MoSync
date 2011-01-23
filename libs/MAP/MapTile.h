@@ -67,23 +67,13 @@ namespace MAP
 			, mContentLength( contentLength )
 			#endif
 		{
-			//TraceScope tr( "MapTile::MapTile" );
-			//tileCount++;
-			//DebugPrintf("Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Destroys a map tile.
 		 */
 		virtual ~MapTile( )
 		{
-			//TraceScope tr( "MapTile::~MapTile" );
-
-			//tileCount--;
-			//maDestroyObject( mImage );
-			
-			// added by niklas.
 			MAUtil::PlaceholderPool::put(mImage);
-			//DebugPrintf("~Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Sets last access timestamp to current time.
@@ -169,8 +159,6 @@ namespace MAP
 		DateTime mLastAccessTime;
 		int mCreationTime;
 		int mContentLength;
-
-		//static int tileCount;
 	};
 }
 #endif // MAPTILE_H_

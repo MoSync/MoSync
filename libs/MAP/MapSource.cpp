@@ -229,16 +229,12 @@ namespace MAP
 	void MapSource::requestTile( IMapSourceListener* listener, MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		//DebugPrintf( "request: queue=%d\n", mQueue->size( ) );
-
 		if ( !isInQueue( tileXY ) && !isInDownloaders( tileXY ) )
 		{
 			QueueEntry entry = QueueEntry( listener, false, tileXY );
 			mQueue->push( entry );
 			dequeueIfIdleSlot( NULL );
 		}
-		//else
-		//	DebugPrintf( "Already in queue: %d,%d\n", tileXY.getX( ), tileXY.getY( ) );
 	}
 
 	//-------------------------------------------------------------------------
@@ -271,7 +267,6 @@ namespace MAP
 		{
 			QueueEntry item = mQueue->peek( i );
 			MapTileCoordinate itemTileXY = item.mTileXY;
-			//DebugPrintf( "%d==%d %d==%d %d==%d\n", itemTileXY.getX( ), tileXY.getX( ), itemTileXY.getY( ), tileXY.getY( ), itemTileXY.getMagnification( ), tileXY.getMagnification( ) );
 			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
 				return true;
 		}
@@ -291,7 +286,6 @@ namespace MAP
 			if ( dlr == NULL )
 				continue;
 			MapTileCoordinate itemTileXY = dlr->mTileXY;
-			//DebugPrintf( "%d==%d %d==%d %d==%d\n", itemTileXY.getX( ), tileXY.getX( ), itemTileXY.getY( ), tileXY.getY( ), itemTileXY.getMagnification( ), tileXY.getMagnification( ) );
 			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
 				return true;
 		}
@@ -340,15 +334,11 @@ namespace MAP
 	void MapSource::finishedDownloading( Downloader* downloader, MAHandle data )
 	//-------------------------------------------------------------------------
 	{
-		//TraceScope tr( "MapSource::finishedDownloading" );
-
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
 		mTileCount++;
 		MapTileCoordinate tileXY = dlr->mTileXY;
 
-		//DebugPrintf( "x,y: %d,%d mag: %d\n", tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ) );
-		
 		LonLat ll = tileCenterToLonLat( getTileSize( ), tileXY, 0, 0 );
 
 		#ifdef StoreCompressedTilesInCache 
@@ -433,8 +423,6 @@ namespace MAP
 			downloader->mTileXY = entry.mTileXY;
 			downloader->mListener = entry.mListener;
 			int res = downloader->beginDownloading( url, 0 );
-
-			//DebugPrintf( "Download started: %d,%d\n", entry.mTileXY.getX( ), entry.mTileXY.getY( ) );
 
 			if ( res < 0 )
 				onError( downloader->mListener, 0 ); // TODO: Proper error code.

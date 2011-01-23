@@ -52,7 +52,7 @@ namespace MAP
 	{
 		MAPoint2d widgetPx = getScreenPixel(viewport, magnification, item);
 
-		/*
+		/* Removed to make items always be rendered.
 		if ( widgetPx.x >= bounds.x && 
 			widgetPx.x < bounds.width && 
 			widgetPx.y >= bounds.y && 

@@ -137,9 +137,6 @@ namespace MAP
 				mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
 																	(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001 * mMomentumX * interval + 0.5 ),
 																	(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001 * mMomentumY * interval + 0.5 ) );
-				//mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
-				//													(int)( mViewport->mCenterPositionPixels.getX( ) + 0.000001 * mMomentumX * time * time ),
-				//													(int)( mViewport->mCenterPositionPixels.getY( ) + 0.000001 * mMomentumY * time * time ) );
 
 			#else
 
@@ -164,26 +161,12 @@ namespace MAP
 				mViewport->mPanTargetPositionPixels = mViewport->mCenterPositionPixels;
 				mViewport->mPanTargetPositionLonLat = mViewport->mCenterPositionLonLat;
 
-				//DebugPrintf( "setCenterPosition: offset=%f %f, moment=%f %f\n", 
-				//	//mViewport->mPanTargetPositionPixels.getX( ), 
-				//	//mViewport->mPanTargetPositionPixels.getY( ), 
-				//	offsetX,
-				//	offsetY,
-				//	mMomentumX, 
-				//	mMomentumY );
-
 				if ( fabs( mMomentumX ) < 1 && fabs( mMomentumY ) < 1 )
 				{
 					//
 					// Done panning, stop timer and repaint
 					//
-					//Environment::getEnvironment( ).removeIdleListener( this );
 					removeIdleListenerIfEverythingIsDone();
-	
-					//mViewport->mHasTimer = false;
-					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
-					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 			}
 			else
@@ -219,7 +202,6 @@ namespace MAP
 				mMomentumX = (double)( newXy.getX( ) - prevCenterPix.getX( ) ) * 1000 / delta;
 				mMomentumY = (double)( newXy.getY( ) - prevCenterPix.getY( ) ) * 1000 / delta;
 
-				//DebugPrintf( "Momentum: %f, %f\n", mMomentumX, mMomentumY );
 				//
 				// Stop panning if offset is small and no momentum
 				//
@@ -230,13 +212,7 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					//Environment::getEnvironment( ).removeIdleListener( this );
 					removeIdleListenerIfEverythingIsDone();
-					
-					//mViewport->mHasTimer = false;
-					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
-					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 
 			}
@@ -372,8 +348,6 @@ namespace MAP
 		//
 		int deltaX = newXy.getX( ) - mCenterPositionPixels.getX( );
 		int deltaY = newXy.getY( ) - mCenterPositionPixels.getY( );
-
-		//DebugPrintf( "Points: %d Ptr: %d Delta: %d %d\n", points, pointPtr, deltaX, deltaY );
 
 		double factor = /* 6 * */ fabs( Max( (double)deltaX / width, (double)deltaY / height ) );
 		if ( factor > 1 )
@@ -517,15 +491,13 @@ namespace MAP
 
 			#endif // WIN32
 
-			// calculate alpha..
-			//int timeSinceCreated = tile->getMilliSecondsSinceCreated();
-			//int alpha = (255*timeSinceCreated)/250;
-
 			#ifndef WIN32
+
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
 			} 			
+
 			#endif
 
 			#ifdef StoreCompressedTilesInCache
@@ -533,11 +505,8 @@ namespace MAP
 			//
 			// Unpack PNG
 			//
-			//int ms = maGetMilliSecondCount( );
 			MAHandle placeholder = PlaceholderPool::alloc( );//maCreatePlaceholder( );
 			int res = maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
-			//int diff = maGetMilliSecondCount( ) - ms;
-			//DebugPrintf( "Time: %d\n", diff );
 			//
 			// Draw image
 			//
@@ -545,7 +514,6 @@ namespace MAP
 			//
 			// Scrap PNG
 			//
-			//maDestroyObject( placeholder );
 			MAUtil::PlaceholderPool::put( placeholder );
 		
 			#else // StoreCompressedTilesInCache
@@ -560,10 +528,6 @@ namespace MAP
 			
 			#endif
 
-			//char buffer[100];
-			//sprintf( buffer, "%d", maGetMilliSecondCount());
-			//mFont->drawString( buffer, pt.x, pt.y);		
-
 			#ifndef WIN32
 
 			Gfx_popMatrix();
@@ -572,7 +536,6 @@ namespace MAP
 		}
 		else
 		{
-			//if ( !OnlyUpdateWhenJobComplete )
 #ifndef OnlyUpdateWhenJobComplete		
 			{
 				#ifndef WIN32
@@ -632,17 +595,7 @@ namespace MAP
 		// Draw available tiles
 		//
 
-//#ifdef WIN32
-// HACK for debugging
-//maSetColor( 0x000000 );
-//Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
-//#endif //HACK
-
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
-		
-	//	if(mAlphaChanged) {
-	//		updateMap( );
-	//	}
 		
 		//
 		// Let subclass draw its overlay
@@ -804,10 +757,7 @@ namespace MAP
 	{
 		if ( mMagnification < mSource->getMagnificationMax( ) )
 		{
-			//mMagnification++;
 			setMagnification(mMagnification + 1);
-			//mIdleListener->stopGlide( );
-
 			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
@@ -819,10 +769,7 @@ namespace MAP
 	{
 		if ( mMagnification > mSource->getMagnificationMin( ) )
 		{
-			//mMagnification--;
-			//mIdleListener->stopGlide( );
 			setMagnification(mMagnification - 1);
-			
 			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
