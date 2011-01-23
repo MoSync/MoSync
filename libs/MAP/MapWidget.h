@@ -72,11 +72,6 @@ namespace MAP
 		 * Scale property
 		 */		
 		void setScale( double scale );
-		/**
-		 * Magnification scale display property
-		 */
-		bool getHasScale( ) const { return mViewport->getHasScale( ); }
-		void setHasScale( bool hasScale ) { mViewport->setHasScale( hasScale ); }
 		/*
 		 *  Positions and scales map to show specificed rectangle
 		 */

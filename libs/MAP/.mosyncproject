@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project supports-build-configs="false" version="1.1">
 <properties>
-<property key="build.prefs:additional.include.paths" value="c:\mosync\include\newlib"/>
+<property key="build.prefs:additional.include.paths" value="c:\dev2\mosync\libs,c:\mosync\include\newlib"/>
 <property key="build.prefs:additional.libraries" value=""/>
 <property key="build.prefs:additional.library.paths" value=""/>
 <property key="build.prefs:extra.link.sw" value=""/>

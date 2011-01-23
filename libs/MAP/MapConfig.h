@@ -34,3 +34,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define StoreCompressedTilesInCache
 
 #endif // MAPCONFIG_H
+
