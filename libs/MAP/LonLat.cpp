@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * \author Lars-≈ke Vinberg
 */
 
+#include "MapConfig.h"
 #include "LonLat.h"
 
 namespace MAP

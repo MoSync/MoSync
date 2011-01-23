@@ -4,6 +4,7 @@
 // Author: Lars Ake Vinberg
 //
 
+#include "MapConfig.h"
 #include <mastdlib.h>
 
 #include "MemoryMgr.h"

@@ -50,7 +50,11 @@ namespace MAP
 		/**
 		 * Creates a map tile.
 		 */
-		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
+		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image
+				#ifdef StoreCompressedTilesInCache
+				, int contentLength 
+				#endif
+			) :
 			mSource( source ),
 			mGridX( gridX ),
 			mGridY( gridY ),
@@ -59,6 +63,9 @@ namespace MAP
 			mImage( image ),
 			mLastAccessTime( DateTime::minValue( ) ),
 			mCreationTime( maGetMilliSecondCount() )
+			#ifdef StoreCompressedTilesInCache
+			, mContentLength( contentLength )
+			#endif
 		{
 			//TraceScope tr( "MapTile::MapTile" );
 			//tileCount++;
@@ -143,6 +150,14 @@ namespace MAP
 			return maGetMilliSecondCount() - mCreationTime; 
 		}		
 		
+		#ifdef StoreCompressedTilesInCache
+
+		int getContentLength( ) const
+		{
+			return mContentLength;
+		}
+
+		#endif
 
 	private:
 		MapSource* mSource;
@@ -153,6 +168,7 @@ namespace MAP
 		MAHandle mImage;
 		DateTime mLastAccessTime;
 		int mCreationTime;
+		int mContentLength;
 
 		//static int tileCount;
 	};

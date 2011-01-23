@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include <matime.h>
 #include "MemoryMgr.h"
 #include <mastdlib.h>
@@ -527,8 +528,32 @@ namespace MAP
 			} 			
 			#endif
 
-			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+			#ifdef StoreCompressedTilesInCache
+
+			//
+			// Unpack PNG
+			//
+			//int ms = maGetMilliSecondCount( );
+			MAHandle placeholder = PlaceholderPool::alloc( );//maCreatePlaceholder( );
+			int res = maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
+			//int diff = maGetMilliSecondCount( ) - ms;
+			//DebugPrintf( "Time: %d\n", diff );
+			//
+			// Draw image
+			//
+			Gfx_drawImage( placeholder,  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+			//
+			// Scrap PNG
+			//
+			//maDestroyObject( placeholder );
+			MAUtil::PlaceholderPool::put( placeholder );
 		
+			#else // StoreCompressedTilesInCache
+
+			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+
+			#endif // StoreCompressedTilesInCache
+
 			#ifndef WIN32
 
 			Gfx_setAlpha(255);
