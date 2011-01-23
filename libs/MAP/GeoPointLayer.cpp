@@ -184,7 +184,10 @@ namespace MAP
 
 			if (abs(widgetPixel.x - screenPixel.x) < item->getMarkerSize() &&
 				abs(widgetPixel.y - screenPixel.y) < item->getMarkerSize()) {
-				selectedIndex = index;
+				Rect r = mRenderer->getItemRect(this, item, widgetPixel.x, widgetPixel.y, index == mSelectedItem);
+				if (r.contains(screenPixel.x, screenPixel.y)) {
+					selectedIndex = index;
+				}
 			}
 
 			index++;
