@@ -50,7 +50,11 @@ namespace MAP
 		/**
 		 * Creates a map tile.
 		 */
-		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
+		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image
+				#ifdef StoreCompressedTilesInCache
+				, int contentLength 
+				#endif
+			) :
 			mSource( source ),
 			mGridX( gridX ),
 			mGridY( gridY ),
@@ -59,24 +63,17 @@ namespace MAP
 			mImage( image ),
 			mLastAccessTime( DateTime::minValue( ) ),
 			mCreationTime( maGetMilliSecondCount() )
+			#ifdef StoreCompressedTilesInCache
+			, mContentLength( contentLength )
+			#endif
 		{
-			//TraceScope tr( "MapTile::MapTile" );
-			//tileCount++;
-			//DebugPrintf("Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Destroys a map tile.
 		 */
 		virtual ~MapTile( )
 		{
-			//TraceScope tr( "MapTile::~MapTile" );
-
-			//tileCount--;
-			//maDestroyObject( mImage );
-			
-			// added by niklas.
 			MAUtil::PlaceholderPool::put(mImage);
-			//DebugPrintf("~Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Sets last access timestamp to current time.
@@ -143,6 +140,14 @@ namespace MAP
 			return maGetMilliSecondCount() - mCreationTime; 
 		}		
 		
+		#ifdef StoreCompressedTilesInCache
+
+		int getContentLength( ) const
+		{
+			return mContentLength;
+		}
+
+		#endif
 
 	private:
 		MapSource* mSource;
@@ -153,8 +158,7 @@ namespace MAP
 		MAHandle mImage;
 		DateTime mLastAccessTime;
 		int mCreationTime;
-
-		//static int tileCount;
+		int mContentLength;
 	};
 }
 #endif // MAPTILE_H_

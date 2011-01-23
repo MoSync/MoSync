@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include "MemoryMgr.h"
 #include "MapCache.h"
 #include "MapTile.h"
@@ -26,11 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAP
 {
-	//int MapTile::tileCount = 0;
-
 	MapCache* MapCache::sSingleton = NULL;
-
-	static const int DefaultCapacity = 40;
 
 	//=========================================================================
 	class MapTileKey
@@ -105,7 +102,7 @@ namespace MAP
 		mList( ),
 		mHits( 0 ),
 		mMisses( 0 ),
-		mCapacity( DefaultCapacity )
+		mCapacity( MapCacheDefaultCapacity )
 	{
 	}
 
@@ -219,8 +216,6 @@ namespace MAP
 
 				if ( found != mList.end( ) )
 				{
-					//DebugPrintf(" Found: %d,%d\n", x, y );
-
 					HashMap<MapTileKey, MapTile*>::PairKV kv = *found;
 					mHits++;
 					MapTile* t = kv.second;
@@ -231,7 +226,6 @@ namespace MAP
 				//
 				// Not in cache: request from map source.
 				//
-				//DebugPrintf(" Requesting: %d,%d\n", x, y );
 				mMisses++;
 				source->requestTile( this, MapTileCoordinate( x, y, (int)magnification ) );
 			}
@@ -261,10 +255,6 @@ namespace MAP
 	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		//DebugPrintf( "Receiving tile, %d,%d\n", tile->getGridX( ), tile->getGridY( ) );
-
-		//TraceScope tr( "MapCache::tileReceived" );
-
 #if 0 // this block tries to test if memory is available
 
 		//
@@ -288,7 +278,6 @@ namespace MAP
 #endif
 
 		{
-			//DebugPrintf( "Cache full %d, deleting\n", mList.size( ) );
 			//
 			// find and remove oldest in cache
 			//
@@ -321,6 +310,7 @@ namespace MAP
 	{
 		// TODO: Handle
 		DebugPrintf( "MapCache::error %d\n", code );
+		onError( code );
 	}
 
 	//-------------------------------------------------------------------------
@@ -361,6 +351,15 @@ namespace MAP
 		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
 		for ( int i = 0; i < listeners->size( ); i ++ )
 			(*listeners)[i]->jobComplete( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
 	}
 
 

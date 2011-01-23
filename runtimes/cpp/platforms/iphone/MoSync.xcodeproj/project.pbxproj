@@ -162,6 +162,9 @@
 		F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
 		F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */; };
 		F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
+		F7247C3F12ECBA4B00AB0211 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */; };
+		F7247C4012ECBA4B00AB0211 /* NavBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */; };
+		F7247C4112ECBA4B00AB0211 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -340,6 +343,8 @@
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CheckBoxWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.h; sourceTree = SOURCE_ROOT; };
 		F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CheckBoxWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.mm; sourceTree = SOURCE_ROOT; };
+		F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavBarWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavBarWidget.h; sourceTree = SOURCE_ROOT; };
+		F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavBarWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavBarWidget.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -662,6 +667,8 @@
 		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */,
+				F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */,
 				F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */,
 				F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */,
 				858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */,
@@ -726,6 +733,7 @@
 				858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */,
 				F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */,
 				85581E6112EA323E009C6204 /* TouchHelper.h in Headers */,
+				F7247C4012ECBA4B00AB0211 /* NavBarWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -899,6 +907,7 @@
 				858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 				F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 				85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */,
+				F7247C3F12ECBA4B00AB0211 /* NavBarWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -962,6 +971,7 @@
 				858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
 				F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 				85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */,
+				F7247C4112ECBA4B00AB0211 /* NavBarWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

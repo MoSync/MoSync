@@ -4,6 +4,7 @@
 // Author: Lars Ake Vinberg
 //
 
+#include "MapConfig.h"
 #include "Layer.h"
 
 namespace MAP
@@ -30,5 +31,6 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mEnabled = enabled;
+		onContentChanged( );
 	}
 }

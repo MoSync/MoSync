@@ -78,6 +78,7 @@ namespace MAP
 		 * Called when a requested tile has been received into cache from map source.
 		 */
 		virtual void viewportUpdated( MapViewport* viewport ) = 0;
+		virtual void error( MapViewport* viewport, int code ) = 0;
 	};
 
 	//=========================================================================
@@ -117,11 +118,21 @@ namespace MAP
 		MagnificationType getMagnification( ) const;
 		void setMagnification(MagnificationType magnification );
 		
-		/**
-		 * Magnification scale display property
+		/*
+		 * Show latitude/longitude
 		 */
-		bool getHasScale( ) const { return mHasScale; }
-		void setHasScale( bool hasScale ) { mHasScale = hasScale; }
+		bool showLonLat( ) const { return mShowLonLat; }
+		void setShowLonLat( bool enabled );
+		/*
+		 * Show hairline cross at center of viewport.
+		 */
+		bool showHairlineCross( ) const { return mShowHairlineCross; }
+		void setShowHairlineCross( bool enabled );
+		/*
+		 * Show pixel scale.
+		 */
+		bool showPixelScale( ) const { return mShowPixelScale; }
+		void setShowPixelScale( bool enabled );
 
 		void startGlide( );
 		void stopGlide( );
@@ -164,6 +175,7 @@ namespace MAP
 		//
 		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache );
 		virtual void jobComplete( MapCache* sender );
+		virtual void error( MapCache* sender, int error );
 		/**
 		 * Converts from global map pixels to viewport pixels.
 		 */
@@ -216,6 +228,7 @@ namespace MAP
 		// events
 		//
 		virtual void onViewportUpdated( );
+		virtual void onError( int code );
 		//
 		// Redraw
 		//
@@ -253,11 +266,13 @@ namespace MAP
 		PixelCoordinate mPanTargetPositionPixels;
 		int mMagnification;
 		MapSource* mSource;
-		bool mHasScale;
 		MapViewportIdleListener* mIdleListener;
 		Font* mFont;
 		bool mHasTimer;
 		bool mInDraw;
+		bool mShowPixelScale;
+		bool mShowHairlineCross;
+		bool mShowLonLat;
 	};
 }
 #endif // MAPVIEWPORT_H_

@@ -27,15 +27,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Geometry.h>
 #include <maapi.h>
 #include "madmath.h"
-//#include <conprint.h>
-
 #include "PixelCoordinate.h"
 
 namespace MAP
 {
-//	class MapTileCoordinate;
-//	class PixelCoordinate;
-
 	static const double PI = 3.14159265358979323846;
 	//
 	// Resolution in pixels per meter at equator, at zoom level 0
@@ -136,6 +131,9 @@ namespace MAP
 			tileX = int( ceil( pixelX / (double)tileSize ) - 1 );
 			tileY = int( ceil( pixelY / (double)tileSize ) - 1 );
 		}
+
+		//NOTE: Keep for now
+
 		//
 		// Returns tile for given mercator coordinates.
 		//
@@ -182,6 +180,8 @@ namespace MAP
 		//	}
 		//	*p = '\0';
 		//}
+
+		// END NOTE
 
 	public:
 		/**
@@ -235,6 +235,8 @@ namespace MAP
 			return (int)lon && (int)lat;
 		}
 		
+		// NOTE: Keep for now
+
 		//
 		// Convert tile lower left corner plus pixel offset to WGS84 lat/lon.
 		//
@@ -254,6 +256,9 @@ namespace MAP
 		//	PixelsToMeters( pixelX, pixelY, tile.getMagnification( ), meterX, meterY );
 		//	MetersToLonLat( meterX, meterY, Lon, Lat );
 		//}
+
+		// END NOTE
+
 		/**
 		 * Converts this to global pixel coordinates.
 		 * Projection is assumed to be spherical Mercator (as opposed to ellipsoidal).
@@ -280,6 +285,9 @@ namespace MAP
 		{
 			lonLatToMeters( lon, lat, meterX, meterY );
 		}
+
+		// NOTE: Keep for now
+
 		//
 		//MapTileCoordinate ToTile( const int tileSize, int magnification ) const
 		//{
@@ -304,6 +312,9 @@ namespace MAP
 		//	printf( "Lon = %f", llx );
 		//	printf( "Lat = %f", lly );
 		//}
+
+		// END NOTE
+
 	};
 	
 	typedef LonLatT<int> LonLatI;

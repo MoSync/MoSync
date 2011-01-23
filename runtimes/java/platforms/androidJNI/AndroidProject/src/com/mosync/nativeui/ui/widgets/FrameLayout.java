@@ -1,5 +1,6 @@
 package com.mosync.nativeui.ui.widgets;
 
+import android.view.Gravity;
 import android.view.ViewGroup;
 
 public class FrameLayout extends Layout
@@ -16,6 +17,11 @@ public class FrameLayout extends Layout
 	@Override
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
-		return new android.widget.FrameLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
+		android.widget.FrameLayout.LayoutParams nativeLayoutParams
+			= new android.widget.FrameLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
+		nativeLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+
+		return nativeLayoutParams;
 	}
+
 }

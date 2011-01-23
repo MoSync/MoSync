@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include <matime.h>
 #include "MemoryMgr.h"
 #include <mastdlib.h>
@@ -36,10 +37,7 @@ namespace MAP
 	//
 	// Appearance
 	//
-	static const bool ShowPixelScale = true; // shows scale slider
 	static const bool ShowPixelScaleAsText = true; // shows meters/pixel scale (at latitude of screen center).
-	static const bool ShowHairlineCross = true;
-	static const bool ShowLatLon = true;
 	//
 	// Configuration
 	//
@@ -140,9 +138,6 @@ namespace MAP
 				mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
 																	(int)( mViewport->mCenterPositionPixels.getX( ) + 0.001 * mMomentumX * interval + 0.5 ),
 																	(int)( mViewport->mCenterPositionPixels.getY( ) + 0.001 * mMomentumY * interval + 0.5 ) );
-				//mViewport->mCenterPositionPixels = PixelCoordinate(	mViewport->getMagnification( ),
-				//													(int)( mViewport->mCenterPositionPixels.getX( ) + 0.000001 * mMomentumX * time * time ),
-				//													(int)( mViewport->mCenterPositionPixels.getY( ) + 0.000001 * mMomentumY * time * time ) );
 
 			#else
 
@@ -166,14 +161,6 @@ namespace MAP
 
 				mViewport->mPanTargetPositionPixels = mViewport->mCenterPositionPixels;
 				mViewport->mPanTargetPositionLonLat = mViewport->mCenterPositionLonLat;
-
-				//DebugPrintf( "setCenterPosition: offset=%f %f, moment=%f %f\n", 
-				//	//mViewport->mPanTargetPositionPixels.getX( ), 
-				//	//mViewport->mPanTargetPositionPixels.getY( ), 
-				//	offsetX,
-				//	offsetY,
-				//	mMomentumX, 
-				//	mMomentumY );
 
 				if ( fabs( mMomentumX ) < 1 && fabs( mMomentumY ) < 1 )
 				{
@@ -216,7 +203,6 @@ namespace MAP
 				mMomentumX = (double)( newXy.getX( ) - prevCenterPix.getX( ) ) * 1000 / delta;
 				mMomentumY = (double)( newXy.getY( ) - prevCenterPix.getY( ) ) * 1000 / delta;
 
-				//DebugPrintf( "Momentum: %f, %f\n", mMomentumX, mMomentumY );
 				//
 				// Stop panning if offset is small and no momentum
 				//
@@ -288,10 +274,12 @@ namespace MAP
 		mPanTargetPositionPixels( ),
 		mMagnification( 0 ),
 		mSource( NULL ),
-		mHasScale( true ),
 		mIdleListener( NULL ),
 		mFont( NULL ),
-		mInDraw( NULL )
+		mInDraw( NULL ),
+		mShowPixelScale( false ),
+		mShowHairlineCross( false ),
+		mShowLonLat( false )
 	{
 		mIdleListener = newobject( MapViewportIdleListener, new MapViewportIdleListener( this ) );
 		Environment::getEnvironment( ).addIdleListener( mIdleListener );
@@ -364,8 +352,6 @@ namespace MAP
 		//
 		int deltaX = newXy.getX( ) - mCenterPositionPixels.getX( );
 		int deltaY = newXy.getY( ) - mCenterPositionPixels.getY( );
-
-		//DebugPrintf( "Points: %d Ptr: %d Delta: %d %d\n", points, pointPtr, deltaX, deltaY );
 
 		double factor = /* 6 * */ fabs( Max( (double)deltaX / width, (double)deltaY / height ) );
 		if ( factor > 1 )
@@ -510,8 +496,27 @@ namespace MAP
 #endif
 #endif
 
-			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+			#ifdef StoreCompressedTilesInCache
+			//
+			// Unpack PNG
+			//
+			MAHandle placeholder = PlaceholderPool::alloc( );//maCreatePlaceholder( );
+			maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
+			//
+			// Draw image
+			//
+			Gfx_drawImage( placeholder,  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+			//
+			// Scrap PNG
+			//
+			MAUtil::PlaceholderPool::put( placeholder );
 		
+			#else // StoreCompressedTilesInCache
+
+			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+
+			#endif // StoreCompressedTilesInCache
+
 #ifndef WIN32
 #ifdef USE_ALPHAFADES
 			Gfx_setAlpha(255);
@@ -526,7 +531,6 @@ namespace MAP
 		}
 		else
 		{
-			//if ( !OnlyUpdateWhenJobComplete )
 #ifndef OnlyUpdateWhenJobComplete		
 			{
 				#ifndef WIN32
@@ -561,12 +565,10 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::onViewportUpdated( )
+	void MapViewport::error( MapCache* sender, int code )
 	//-------------------------------------------------------------------------
 	{
-		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
-		for ( int i = 0; i < listeners->size( ); i ++ )
-			(*listeners)[i]->viewportUpdated( this );
+		onError( code );
 	}
 
 	//-------------------------------------------------------------------------
@@ -584,16 +586,8 @@ namespace MAP
 		// Draw available tiles
 		//
 
-//#ifdef WIN32
-// HACK for debugging
-//maSetColor( 0x000000 );
-//Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
-//#endif //HACK
-
-
-		//PixelCoordinate centerPositionPixels = mCenterPositionLonLat.toPixels( mMagnificationD );
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
-
+		
 		//
 		// Let subclass draw its overlay
 		//
@@ -602,7 +596,7 @@ namespace MAP
 		//
 		// Draw scale indicator
 		//
-		if ( ShowPixelScale && mHasScale )
+		if ( mShowPixelScale )
 		{
 			const int scaleWidth = 80;
 			const int scaleX = origin.x + getWidth( ) - scaleWidth - 5;
@@ -651,7 +645,7 @@ namespace MAP
 		//
 		// Draw hairline cross
 		//
-		if ( ShowHairlineCross )
+		if ( mShowHairlineCross )
 		{
 			const int centerX = origin.x + getWidth( ) / 2;
 			const int centerY = origin.y + getHeight( ) / 2;
@@ -664,7 +658,7 @@ namespace MAP
 		//
 		// Draw latitude, longitude
 		//
-		if ( ShowLatLon )
+		if ( mShowLonLat )
 		{
 			char buffer[100];
 			sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
@@ -679,7 +673,7 @@ namespace MAP
 		//
 		// Draw debug info
 		//
-		if ( ShowLatLon )
+		if ( mShowLonLat )
 		{
 			char buffer[100];
 			sprintf( buffer, "Tiles: %d Cache: %d", this->mSource->getTileCount( ), MapCache::get( )->size( ) );
@@ -761,10 +755,7 @@ namespace MAP
 	{
 		if ( mMagnification < mSource->getMagnificationMax( ) )
 		{
-			//mMagnification++;
 			setMagnification(mMagnification + 1);
-			//mIdleListener->stopGlide( );
-
 			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
@@ -776,10 +767,7 @@ namespace MAP
 	{
 		if ( mMagnification > mSource->getMagnificationMin( ) )
 		{
-			//mMagnification--;
-			//mIdleListener->stopGlide( );
 			setMagnification(mMagnification - 1);
-			
 			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		}
@@ -1067,4 +1055,22 @@ namespace MAP
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
         setCenterPosition( newPos, mMagnification, false, true );
 	}		
+
+	//-------------------------------------------------------------------------
+	void MapViewport::onViewportUpdated( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->viewportUpdated( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
+	}
 }

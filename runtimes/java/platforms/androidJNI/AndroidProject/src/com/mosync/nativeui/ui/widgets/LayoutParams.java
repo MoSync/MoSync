@@ -1,6 +1,5 @@
 package com.mosync.nativeui.ui.widgets;
 
-import android.view.Gravity;
 import android.view.ViewGroup;
 
 /**
@@ -21,12 +20,12 @@ public class LayoutParams extends ViewGroup.LayoutParams
 	/**
 	 * The horizontal alignment of a widget.
 	 */
-	public int horizontalAlignment = Gravity.LEFT;
+	public int horizontalAlignment = -1;
 	
 	/**
 	 * The vertical alignment of a widget.
 	 */
-	public int verticalAlignment = Gravity.TOP;
+	public int verticalAlignment = -1;
 	
 	/**
 	 * The margins of this layout params.

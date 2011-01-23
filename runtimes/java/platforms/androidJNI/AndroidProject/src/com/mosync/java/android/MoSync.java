@@ -33,6 +33,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MAK_FIRE;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_LEFT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_MENU;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_RIGHT;
+import static com.mosync.internal.generated.MAAPI_consts.MAK_SEARCH;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTLEFT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTRIGHT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_UP;
@@ -297,6 +298,7 @@ public class MoSync extends Activity
 		if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) return MAK_SOFTRIGHT; 
 		if (keyCode == KeyEvent.KEYCODE_BACK) return MAK_BACK; 
 		if (keyCode == KeyEvent.KEYCODE_MENU) return MAK_MENU;
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) return MAK_SEARCH;
 		
 		// Support for native virtual keyboard.
 		if (keyCode == KeyEvent.KEYCODE_DEL) { return MAK_CLEAR; }

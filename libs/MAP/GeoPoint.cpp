@@ -4,6 +4,7 @@
 // Author: Lars Ake Vinberg
 //
 
+#include "MapConfig.h"
 #include "MemoryMgr.h"
 #include "GeoPoint.h"
 #include "PixelCoordinate.h"

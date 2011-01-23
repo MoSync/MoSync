@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include <matime.h>
 #include "MemoryMgr.h"
 #include <mastdlib.h>
@@ -216,4 +217,12 @@ namespace MAP
 	{
 		requestRepaint( );
 	}
+
+	//-------------------------------------------------------------------------
+	void MapWidget::error( MapViewport* viewport, int code )
+	//-------------------------------------------------------------------------
+	{
+		// TODO: inform user that error occurred
+	}
+
 }

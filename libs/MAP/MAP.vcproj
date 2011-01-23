@@ -302,6 +302,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MapConfig.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MapSource.h"
 				>
 			</File>

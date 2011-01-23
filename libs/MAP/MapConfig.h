@@ -16,15 +16,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** 
-* \file LonLat.cpp
-* \brief Viewport displaying a slippy map with layers overlaid
-* \author Lars-â‰ˆke Vinberg
+* \file MapConfig.h
+* \brief Configuration header file for MAP library
+* \author Lars Åke Vinberg
 */
 
-#include "MapConfig.h"
-#include "LonLat.h"
+#ifndef MAPCONFIG_H_
+#define MAPCONFIG_H_
 
-namespace MAP
-{
-	
-}
+//
+// Define as 1 to store downloaded tiles in cache in compressed state,
+// i.e. the raw PNG or JPG binary data.
+// Image resources will then be unpacked at time of rendering.
+// This means rendering will be slower but cached tiles will use much
+// less memory - possibly 75-90% less.
+//
+// #define StoreCompressedTilesInCache
+//
+// Maximum parallel downloaders
+//
+static const int			MapSourceDownloaders = 5;
+//
+// Default capacity in MapCache.
+//
+static const int MapCacheDefaultCapacity = 40;
+
+#endif // MAPCONFIG_H
+

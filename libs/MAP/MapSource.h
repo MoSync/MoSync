@@ -66,12 +66,6 @@ namespace MAP
 	class MapSource : public DownloadListener
 	//=========================================================================
 	{
-	private:
-		//
-		// Maximum parallel downloaders
-		//
-		static const int			Downloaders = 5;//5; // four in parallel plus one slacking
-
 	public:
 									MapSource( );
 		virtual						~MapSource( );
@@ -160,7 +154,7 @@ namespace MAP
 		void						onError( IMapSourceListener* listener, int code );
 
 		MapSourceQueue*				mQueue;
-		MapSourceImageDownloader*	mDownloaders[Downloaders];
+		MapSourceImageDownloader**	mDownloaders;
 		int							mTileCount;
 	};
 }

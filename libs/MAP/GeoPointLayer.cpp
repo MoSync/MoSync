@@ -4,6 +4,7 @@
 // Author: Lars Ake Vinberg
 //
 
+#include "MapConfig.h"
 #include <mastdlib.h>
 
 #include "MemoryMgr.h"
@@ -54,7 +55,7 @@ namespace MAP
 	
 		MAPoint2d widgetPx = getScreenPixel(viewport, magnification, item);
 
-		/*
+		/* Removed to make items always be rendered.
 		if ( widgetPx.x >= bounds.x && 
 			widgetPx.x < bounds.width && 
 			widgetPx.y >= bounds.y && 
@@ -125,25 +126,32 @@ namespace MAP
 	void GeoPointLayer::selectItem( int index )
 	//-------------------------------------------------------------------------
 	{
-		mSelectedItem = index;
+		if (index != mSelectedItem) {
+			mSelectedItem = index;
+			onContentChanged( );
+		}
 	}
 
 	//-------------------------------------------------------------------------
 	void GeoPointLayer::selectNextItem( )
 	//-------------------------------------------------------------------------
 	{
-		mSelectedItem++;
-		if ( mSelectedItem >= mDataSource->size( ) )
-			mSelectedItem = 0;
+		int newSelectedItem = mSelectedItem;
+		newSelectedItem++;
+		if ( newSelectedItem >= mDataSource->size( ) )
+			newSelectedItem = 0;
+		selectItem( newSelectedItem );
 	}
 
 	//-------------------------------------------------------------------------
 	void GeoPointLayer::selectPreviousItem( )
 	//-------------------------------------------------------------------------
 	{
-		mSelectedItem--;
-		if ( mSelectedItem < 0 )
-			mSelectedItem = mDataSource->size( ) - 1;
+		int newSelectedItem = mSelectedItem;
+		newSelectedItem--;
+		if ( newSelectedItem < 0 )
+			newSelectedItem = mDataSource->size( ) - 1;
+		selectItem( newSelectedItem );
 	}
 
 	//-------------------------------------------------------------------------
@@ -170,6 +178,7 @@ namespace MAP
 	{
 		// If there's a point at this pixel coordinate, make it the selected point
 		Enumerator<GeoPoint*> e = Enumerator<GeoPoint*>( *this );
+		int selectedIndex = -1;
 		int index = 0;
 
 		while ( e.moveNext( ) )
@@ -179,10 +188,17 @@ namespace MAP
 
 			if (abs(widgetPixel.x - screenPixel.x) < item->getMarkerSize() &&
 				abs(widgetPixel.y - screenPixel.y) < item->getMarkerSize()) {
-				selectItem(index);
+				Rect r = mRenderer->getItemRect(this, item, widgetPixel.x, widgetPixel.y, index == mSelectedItem);
+				if (r.contains(screenPixel.x, screenPixel.y)) {
+					selectedIndex = index;
+				}
 			}
 
 			index++;
+		}
+
+		if (selectedIndex != -1) {
+			selectItem(selectedIndex);
 		}
 	}
 

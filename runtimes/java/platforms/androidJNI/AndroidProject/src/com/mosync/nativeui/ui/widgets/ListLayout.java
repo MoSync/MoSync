@@ -3,14 +3,17 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mosync.nativeui.util.LayoutParamsSetter;
-
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+
+import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.LayoutParamsSetter;
+import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * This class wraps a list that displays a list of views.
@@ -69,6 +72,27 @@ public class ListLayout extends Layout
 		return new AbsListView.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
 	
+	@Override
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException
+	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+		
+		if( property.equals( Types.WIDGET_PROPERTY_REVERSED ) )
+		{
+			m_viewAdapter.setReversed( BooleanConverter.convert( value ) );
+		}
+		else
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
 	/**
 	 * An adapter that feeds the list view with views.
 	 * 
@@ -80,6 +104,12 @@ public class ListLayout extends Layout
 		 * The list of views contained in this adapter.
 		 */
 		List<View> m_views = new ArrayList<View>();
+		
+		/**
+		 * Determines if the list items should be displayed in the
+		 * reversed order or not.
+		 */
+		private boolean m_reversed = false;
 		
 		public ViewAdapter()
 		{
@@ -98,6 +128,19 @@ public class ListLayout extends Layout
 				m_views.add( view );
 				notifyDataSetChanged( );
 			}
+		}
+		
+		/**
+		 * Sets if the list items should be displayed in reversed order.
+		 * 
+		 * @param reversed true means that the elements in the list will be in the
+		 *                 reverse order, false means that they will be in the
+		 *                 default order.
+		 */
+		public void setReversed(boolean reversed)
+		{
+			m_reversed = reversed;
+			notifyDataSetChanged( );
 		}
 		
 		/**
@@ -137,7 +180,14 @@ public class ListLayout extends Layout
 		{
 			if( position < m_views.size( ) )
 			{
-				return m_views.get( position );
+				if( !m_reversed )
+				{
+					return m_views.get( position );
+				}
+				else
+				{
+					return m_views.get( m_views.size( ) - position - 1 );
+				}
 			}
 			else
 			{
