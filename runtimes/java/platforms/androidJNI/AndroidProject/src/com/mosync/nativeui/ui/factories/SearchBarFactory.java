@@ -6,8 +6,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.IBinder;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -90,7 +92,7 @@ public class SearchBarFactory implements AbstractViewFactory
         searchBarLayout.addView(editBox);
         
         // Create the search button.
-        ImageButton button = new ImageButton(activity);
+        final ImageButton button = new ImageButton(activity);
         button.setImageResource(android.R.drawable.ic_menu_search);
         button.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         layoutParams = new LinearLayout.LayoutParams(
@@ -127,6 +129,23 @@ public class SearchBarFactory implements AbstractViewFactory
     		}
         });
         searchBarLayout.addView(button);
+        
+        editBox.setOnKeyListener( new OnKeyListener( ) {
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event)
+			{
+				if( (event.getAction( ) == KeyEvent.ACTION_DOWN)
+						&& (keyCode == KeyEvent.KEYCODE_ENTER) )
+				{
+					button.performClick( );
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		});
         
 		return searchBarLayout;
 	}

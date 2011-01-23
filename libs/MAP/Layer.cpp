@@ -31,5 +31,6 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mEnabled = enabled;
+		onContentChanged( );
 	}
 }

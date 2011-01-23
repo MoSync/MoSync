@@ -70,7 +70,7 @@ public class SearchBarWidget extends Widget
 			{
 				// Seems that it needs to have focus before we can show the keyboard.
 				editBox.requestFocus( );
-				manager.showSoftInput( editBox, InputMethodManager.SHOW_IMPLICIT );
+				manager.showSoftInput( editBox, InputMethodManager.SHOW_FORCED );
 			}
 			else
 			{
