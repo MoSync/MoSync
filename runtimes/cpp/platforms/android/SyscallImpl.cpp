@@ -179,17 +179,18 @@ namespace Base
 		if (methodID == 0) return false;
 		
 		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex);
+		bool destroyed = false;
 		if(jo != NULL)
 		{
 			char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
 			free(buffer);
-			return true;
+			destroyed = true;
 		}
 		
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jo);
 		
-		return false;
+		return destroyed;
 	}
 	
 	void Syscall::destroyResource(int resourceIndex)
