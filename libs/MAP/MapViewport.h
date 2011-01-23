@@ -164,7 +164,6 @@ namespace MAP
 		//
 		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache );
 		virtual void jobComplete( MapCache* sender );
-		virtual void error( MapCache* sender, int code );
 		/**
 		 * Converts from global map pixels to viewport pixels.
 		 */

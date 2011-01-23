@@ -51,10 +51,6 @@ namespace MAP
 		 * Called when a tile job is completed.
 		 */
 		virtual void jobComplete( MapCache* sender ) = 0;
-		/*
-		 * Called when an error occurs
-		 */
-		virtual void error( MapCache* sender, int code ) = 0;
 	};
 
 	class MapTileKey;
@@ -112,12 +108,9 @@ namespace MAP
 		 * returns location of least recently used tile
 		 */
 		MapTileKey findLRU( );
-		//
-		// Event handlers
-		//
+
 		void onTileReceived( MapTile* tile, bool foundInCache );
 		void onJobComplete( );
-		void onError( int code );
 
 		HashMap<MapTileKey, MapTile*> mList;
 		int mHits;

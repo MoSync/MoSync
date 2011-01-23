@@ -34,7 +34,6 @@ namespace MAP
 	class MapSourceListener;
 	class MapSourceImageDownloader;
 
-	//=========================================================================
 	/** 
 	* \brief OpenStreetMap map source
 	*/

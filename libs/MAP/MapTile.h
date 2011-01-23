@@ -60,13 +60,23 @@ namespace MAP
 			mLastAccessTime( DateTime::minValue( ) ),
 			mCreationTime( maGetMilliSecondCount() )
 		{
+			//TraceScope tr( "MapTile::MapTile" );
+			//tileCount++;
+			//DebugPrintf("Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Destroys a map tile.
 		 */
 		virtual ~MapTile( )
 		{
+			//TraceScope tr( "MapTile::~MapTile" );
+
+			//tileCount--;
+			//maDestroyObject( mImage );
+			
+			// added by niklas.
 			MAUtil::PlaceholderPool::put(mImage);
+			//DebugPrintf("~Maptile: %d\n", tileCount );
 		}
 		/**
 		 * Sets last access timestamp to current time.
@@ -143,6 +153,8 @@ namespace MAP
 		MAHandle mImage;
 		DateTime mLastAccessTime;
 		int mCreationTime;
+
+		//static int tileCount;
 	};
 }
 #endif // MAPTILE_H_
