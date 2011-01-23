@@ -46,6 +46,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 	public static final String WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 	
+	public static final String WIDGET_PROPERTY_REVERSED = "reversed";
 	public static final String WIDGET_PROPERTY_VISIBLE = "visible";
 	
 	public static final String WIDGET_PROPERTY_TEXT = "text";
