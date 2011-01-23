@@ -155,7 +155,7 @@ namespace MAP
 	//
 	void MapCache::requestTiles(	MapSource *source,
 									const LonLat centerpoint,
-									const int magnification,
+									const MagnificationType magnification,
 									const int pixelWidth,
 									const int pixelHeight,
 									const double directionX,
@@ -197,6 +197,8 @@ namespace MAP
 		//
 		// Queue all tiles in area
 		//
+		
+		
 		int xStep = directionX > 0 ? 1 : -1;
 		int xMin = directionX > 0 ? left : right;
 		int xMax = directionX > 0 ? right + 1 : left - 1;
@@ -231,7 +233,7 @@ namespace MAP
 				//
 				//DebugPrintf(" Requesting: %d,%d\n", x, y );
 				mMisses++;
-				source->requestTile( this, MapTileCoordinate( x, y, magnification ) );
+				source->requestTile( this, MapTileCoordinate( x, y, (int)magnification ) );
 			}
 		}
 		source->requestJobComplete( this );

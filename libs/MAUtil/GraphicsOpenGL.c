@@ -311,9 +311,9 @@ void ogl_drawImage(MAHandle image, int left, int top) {
 		left, top+texture->imageHeight
 	};
 
-	if(left>sViewPort.width || left+texture->imageWidth<0 ||
-		top>sViewPort.height || top+texture->imageHeight<0)
-		return;	
+//	if(left>sViewPort.width || left+texture->imageWidth<0 ||
+//		top>sViewPort.height || top+texture->imageHeight<0)
+//		return;	
 
 	drawImage(texture->textureCoords, vertexCoords, texture);				
 }

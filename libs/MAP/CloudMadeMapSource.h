@@ -104,11 +104,11 @@ namespace MAP
 		/**
 		 * Converts a LonLat coordinate to a tile coordinate.
 		 */
-		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
+		MapTileCoordinate lonLatToTile( LonLat lonlat, MagnificationType magnification );
 		/**
 		 * Converts a LonLat coordinate to a global pixel coordinate.
 		 */
-		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
+		PixelCoordinate lonLatToPixel( LonLat lonlat, MagnificationType magnification );
 		/**
 		 * Convert tile center plus pixel offset to LonLat. 
 		 */

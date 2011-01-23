@@ -54,7 +54,7 @@ namespace MAP
 
 		virtual ~GeoPointLayer( ) { }
 
-		virtual void draw( MapViewport* viewport, const Rect& bounds, int magnification, bool isLayerSelected );
+		virtual void draw( MapViewport* viewport, const Rect& bounds, MagnificationType magnification, bool isLayerSelected );
 		//
 		// Data source property
 		//
@@ -82,7 +82,7 @@ namespace MAP
 		virtual void selectNextItem( );
 		virtual void selectPreviousItem( );
 		virtual void activateSelectedItem( );
-		virtual void selectItemAtPixel( MapViewport *viewport, int magnification, MAPoint2d screenPixel );
+		virtual void selectItemAtPixel( MapViewport *viewport, MagnificationType magnification, MAPoint2d screenPixel );
 		//
 		// Bounding box for items
 		//
@@ -90,8 +90,8 @@ namespace MAP
 		virtual LonLat getSelectedItemLocation( );
 
 	private:
-		void drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, int magnification, bool renderSelected, bool drawText );
-		MAPoint2d getScreenPixel( MapViewport* viewport, int magnification, GeoPoint* point );
+		void drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, MagnificationType magnification, bool renderSelected, bool drawText );
+		MAPoint2d getScreenPixel( MapViewport* viewport, MagnificationType magnification, GeoPoint* point );
 
 		GeoPointDataSource* mDataSource;
 		GeoPointLayerRenderer* mRenderer;

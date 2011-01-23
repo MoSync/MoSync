@@ -28,22 +28,22 @@ namespace MAP
 		return pow( M_E, x ); 
 	}
 	
-	inline static int long2tile( double lon, int z )	
+	inline static int long2tile( double lon, MagnificationType z )	
 	{
 		return (int)( floor( (lon + 180.0) / 360.0 * pow(2.0, z) ) ); 
 	}
 
-	inline static int lat2tile( double lat, int z )		
+	inline static int lat2tile( double lat, MagnificationType z )		
 	{
 		return (int)( floor( (1.0 - log( tan( lat * M_PI / 180.0 ) + 1.0 / cos( lat * M_PI/180.0 ) ) / M_PI ) / 2.0 * pow( 2.0, z ) ) ); 
 	}
 	
-	inline static double tile2long( int x, int z )		
+	inline static double tile2long( int x, MagnificationType z )		
 	{ 
 		return x / pow( 2.0, z ) * 360.0 - 180; 
 	}
 	
-	inline static double tile2lat( int y, int z )		
+	inline static double tile2lat( int y, MagnificationType z )		
 	{ 
 		double n = M_PI - 2.0 * M_PI * y / pow( 2.0, z ); 
 		return 180.0 / M_PI * atan( 0.5 * ( exp( n ) - exp( -n ) ) ); 
@@ -63,17 +63,18 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	MapTileCoordinate OpenStreetMapSource::lonLatToTile( LonLat lonlat, int magnification )
+	MapTileCoordinate OpenStreetMapSource::lonLatToTile( LonLat lonlat, MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
 		return MapTileCoordinate( long2tile( lonlat.lon, magnification ), lat2tile( lonlat.lat, magnification ), magnification );
 	}
 
 	//-------------------------------------------------------------------------
-	inline static double Resolution( int magnification)
+	inline static double Resolution(MagnificationType magnification)
 	//-------------------------------------------------------------------------
 	{
-		return InitialResolution / ( 1 << magnification );
+		//return InitialResolution / ( 1 << magnification );
+		return InitialResolution / pow(2.0, magnification);
 	}
 
 	//-------------------------------------------------------------------------
@@ -102,7 +103,7 @@ namespace MAP
 	//
 	// Converts pixel coordinates in given zoom level of pyramid to EPSG:900913
 	//
-	inline static void PixelsToMeters( const double pixelX, const double pixelY, const int magnification, double& meterX, double& meterY )
+	inline static void PixelsToMeters( const double pixelX, const double pixelY, const MagnificationType magnification, double& meterX, double& meterY )
 	//-------------------------------------------------------------------------
 	{
 		double res = Resolution( magnification );
@@ -114,7 +115,7 @@ namespace MAP
 	//
 	// Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
 	//
-	inline static void MetersToPixels( const double meterX, const double meterY, const int magnification, double& pixelX, double& pixelY )
+	inline static void MetersToPixels( const double meterX, const double meterY, const MagnificationType magnification, double& pixelX, double& pixelY )
 	//-------------------------------------------------------------------------
 	{
 		double res = Resolution( magnification );
@@ -144,7 +145,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	PixelCoordinate OpenStreetMapSource::lonLatToPixel( LonLat lonlat, int magnification )
+	PixelCoordinate OpenStreetMapSource::lonLatToPixel( LonLat lonlat, MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
 		double meterX, meterY;

@@ -51,7 +51,7 @@ namespace MAP
 		//
 		// Render
 		//
-		virtual void draw( MapViewport* viewport, const Rect& bounds, int magnification, bool isLayerSelected ) = 0;
+		virtual void draw( MapViewport* viewport, const Rect& bounds, MagnificationType magnification, bool isLayerSelected ) = 0;
 		//
 		// Title property
 		//

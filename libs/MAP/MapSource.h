@@ -100,11 +100,11 @@ namespace MAP
 		/**
 		 * Converts LonLat to a pixel coordinate, in a global pixel grid
 		 */
-		virtual PixelCoordinate		lonLatToPixel( LonLat lonlat, int magnification ) = 0;
+		virtual PixelCoordinate		lonLatToPixel( LonLat lonlat, MagnificationType magnification ) = 0;
 		/**
 		 * Converts LonLat to tile coordinates for a tile that contains the lonlat point.
 		 */
-		virtual MapTileCoordinate	lonLatToTile( LonLat lonlat, int magnification ) = 0;
+		virtual MapTileCoordinate	lonLatToTile( LonLat lonlat, MagnificationType magnification ) = 0;
 		/**
 		 * Convert tile center plus pixel offset to WGS84 lat/lon.
 		 */

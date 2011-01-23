@@ -22,7 +22,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void GeoPointLayer::draw( MapViewport* viewport, const Rect& bounds, int magnification, bool isLayerSelected )
+	void GeoPointLayer::draw( MapViewport* viewport, const Rect& bounds, MagnificationType magnification, bool isLayerSelected )
 	//-------------------------------------------------------------------------
 	{
 		Enumerator<GeoPoint*> e = Enumerator<GeoPoint*>( *this );
@@ -46,9 +46,12 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void GeoPointLayer::drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, int magnification, bool selected, bool drawText )
+	void GeoPointLayer::drawItem( MapViewport* viewport, GeoPoint* item, const Rect& bounds, MagnificationType magnification, bool selected, bool drawText )
 	//-------------------------------------------------------------------------
 	{
+		// temporary hack.
+		if(viewport->isZooming()) return;
+	
 		MAPoint2d widgetPx = getScreenPixel(viewport, magnification, item);
 
 		/*
@@ -162,7 +165,7 @@ namespace MAP
 	const double LargeNum = 1E20;
 
 	//-------------------------------------------------------------------------
-	void GeoPointLayer::selectItemAtPixel( MapViewport *viewport, int magnification, MAPoint2d screenPixel )
+	void GeoPointLayer::selectItemAtPixel( MapViewport *viewport, MagnificationType magnification, MAPoint2d screenPixel )
 	//-------------------------------------------------------------------------
 	{
 		// If there's a point at this pixel coordinate, make it the selected point
@@ -209,11 +212,11 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	MAPoint2d GeoPointLayer::getScreenPixel( MapViewport* viewport, int magnification, GeoPoint* item )
+	MAPoint2d GeoPointLayer::getScreenPixel( MapViewport* viewport, MagnificationType magnification, GeoPoint* item )
 	//-------------------------------------------------------------------------
 	{
 		PixelCoordinate worldPx = item->getCachedPixelLocation( );
-		if ( (int) worldPx.getMagnification() != magnification )
+		if ( worldPx.getMagnification() != magnification )
 		{
 			LonLat lonlat = item->getLocation( );
 			worldPx = lonlat.toPixels( magnification );

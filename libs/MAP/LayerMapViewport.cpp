@@ -416,7 +416,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void LayerMapViewport::drawOverlay( Rect& bounds, int magnification )
+	void LayerMapViewport::drawOverlay( Rect& bounds, MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
 		for ( int i = 0; i < mLayers.size( ); i++ )

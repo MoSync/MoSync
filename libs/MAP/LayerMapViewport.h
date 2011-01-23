@@ -247,7 +247,7 @@ namespace MAP
 		// Redraw
 		//
 		//void drawItem( Layer* layer, GeoPoint* item, bool selected, bool drawText );
-		virtual void drawOverlay( Rect& bounds, int magnification );
+		virtual void drawOverlay( Rect& bounds, MagnificationType magnification );
 		void panSelectionIntoView( );
 
 	private:

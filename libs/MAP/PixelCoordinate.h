@@ -24,6 +24,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PIXELCOORDINATE_H_
 #define PIXELCOORDINATE_H_
 
+//#include <madmath.h>
+extern "C" double floor(double x);
+
 namespace MAP
 {
 	//=========================================================================
@@ -101,12 +104,91 @@ namespace MAP
 	// override type that can be converted to int magnification
 	// and double etc. always floored to int etc.
 	class MagnificationType {
+		public:
+		
+		MagnificationType(int v) : value(v) {
+		}
+		
+		MagnificationType(double v): value(v) {
+		}
+		
+		
+		MagnificationType& operator=(const MagnificationType& rhs) {
+			if(this != &rhs) {
+				value = rhs.value;
+			}
+			return *this;
+		}
+		
+		MagnificationType& operator+=(const MagnificationType& rhs) {
+			value += rhs.value;
+			return *this;
+		}
+		
+		MagnificationType& operator-=(const MagnificationType& rhs) {
+			value -= rhs.value;
+			return *this;
+		}
+		
+		MagnificationType& operator*=(const MagnificationType& rhs) {
+			value *= rhs.value;
+			return *this;
+		}
+	
+		MagnificationType& operator/=(const MagnificationType& rhs) {
+			value /= rhs.value;
+			return *this;
+		}	
+	
+	  	const MagnificationType operator+(const MagnificationType &other) const {
+    			MagnificationType result = *this;
+    			result += other;
+    			return result; 
+  		}
+
+	  	const MagnificationType operator-(const MagnificationType &other) const {
+    			MagnificationType result = *this;
+    			result -= other;
+    			return result; 
+  		}
+	
+	  	const MagnificationType operator*(const MagnificationType &other) const {
+    			MagnificationType result = *this;
+    			result *= other;
+    			return result; 
+  		}
+
+	  	const MagnificationType operator/(const MagnificationType &other) const {
+    			MagnificationType result = *this;
+    			result /= other;
+    			return result; 
+  		}
+  		
+  	 	bool operator==(const MagnificationType &other) const {
+    			return (int)floor(value) == (int)floor(other.value);
+  		}	
+
+ 	 	bool operator!=(const MagnificationType &other) const {
+    			return !(*this == other);
+  		}
+  		
+ 		operator int() const { 
+ 			return (int)floor(value); 
+ 		}
+	
+ 		operator double() const { 
+ 			return value; 
+ 		}
+	
+		
+		private:
+			double value;
 	
 	};
 	
 	typedef PixelCoordinateT<int> PixelCoordinateI;
 	typedef PixelCoordinateT<double> PixelCoordinateD;
-	typedef PixelCoordinateT<double> PixelCoordinate;
+	typedef PixelCoordinateT<MagnificationType> PixelCoordinate;
 	
 }
 

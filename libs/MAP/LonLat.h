@@ -50,6 +50,8 @@ namespace MAP
 	//
 	static const double OriginShift = PI * 6378137.09;
 
+
+ #if 0 // put these in magnification type later on and keep a flag ...
 	/**
 	 * Returns resolution in meters per pixel at equator.
 	 */
@@ -65,6 +67,7 @@ namespace MAP
 	{
 		return ( 1 << magnification ) * InvInitialResolution;
 	}
+#endif
 
 	inline double resolution( double magnification )
 	{
@@ -92,7 +95,7 @@ namespace MAP
 		 */
 		static void pixelsToMeters( const double pixelX, const double pixelY, const MagnificationT magnification, double& meterX, double& meterY )
 		{
-			double res = resolution( magnification );
+			double res = resolution( (double)magnification );
 			meterX = pixelX * res - OriginShift;
 			meterY = pixelY * res - OriginShift;
 		}
@@ -101,7 +104,7 @@ namespace MAP
 		 */
 		static void metersToPixels( const double meterX, const double meterY, const MagnificationT magnification, double& pixelX, double& pixelY )
 		{
-			double invres = invResolution( magnification );
+			double invres = invResolution( (double)magnification );
 			pixelX = ( meterX + OriginShift ) * invres;
 			pixelY = ( meterY + OriginShift ) * invres;
 		}
@@ -305,7 +308,7 @@ namespace MAP
 	
 	typedef LonLatT<int> LonLatI;
 	typedef LonLatT<double> LonLatD;
-	typedef LonLatT<double> LonLat;
+	typedef LonLatT<MagnificationType> LonLat;
 }
 
 #endif // LONLAT_H_

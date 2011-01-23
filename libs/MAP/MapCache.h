@@ -83,7 +83,7 @@ namespace MAP
 		 * Requests tiles to cover specified rectangle, in pixels,
 		 * around a centerpoint.
 		 */
-		void requestTiles( MapSource* source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight, const double directionX, const double directionY );
+		void requestTiles( MapSource* source, const LonLat centerpoint, const MagnificationType magnification, const int pixelWidth, const int pixelHeight, const double directionX, const double directionY );
 		/**
 		 * Frees all tiles in cache.
 		 */

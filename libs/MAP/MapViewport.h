@@ -109,13 +109,13 @@ namespace MAP
 		 */
 		LonLat getCenterPosition( ) const;
 		void setCenterPosition( LonLat position, bool immediate, bool isPointerEvent );
-		void setCenterPosition( LonLat position, int magnification, bool immediate, bool isPointerEvent );
+		void setCenterPosition( LonLat position, MagnificationType magnification, bool immediate, bool isPointerEvent );
 		PixelCoordinate getCenterPositionPixels( ) const;
 		/**
 		 * Magnification property
 		 */
-		int getMagnification( ) const;
-		void setMagnification( int magnification );
+		MagnificationType getMagnification( ) const;
+		void setMagnification(MagnificationType magnification );
 		
 		/**
 		 * Magnification scale display property
@@ -177,20 +177,38 @@ namespace MAP
 		 */
 		void centerAndScaleToRectangle( LonLat lowerLeft, LonLat upperRight );
 
-		int getWidth( ) const { return mWidth; }
-		int getHeight( ) const { return mHeight; }
+		int getWidth() {
+			return mWidth;
+		}
+		
+		int getHeight( ) const {
+			return mHeight; 	
+		}
+
+		int getScaledWidth( ) const { 
+			int viewportWidth = (int)floor(((double)mWidth / mScale));
+			return viewportWidth; 
+		}
+		int getScaledHeight( ) const { 
+			int viewportHeight = (int)floor(((double)mHeight / mScale));
+			return viewportHeight;
+		}
 		virtual void drawViewport( Point origin );
 
 		void beginZooming(const MAPoint2d& p1, const MAPoint2d& p2);
 		void updateZooming(const MAPoint2d& p1, const MAPoint2d& p2);
 		void endZooming();
+		bool isZooming();
 		
 		void beginPanning(const MAPoint2d& p);
 		void updatePanning(const MAPoint2d& p);
 		void endPanning();
 
 		void moveCenterPositionInPixels(int xdelta, int ydelta);
-		void setCenterPositionImmediate(const LonLat& pos, double magnification);
+
+		// updates magnification
+		void setScale(double scale);
+		double getScale();
 
 	protected:
 	
@@ -201,7 +219,7 @@ namespace MAP
 		//
 		// Redraw
 		//
-		virtual void drawOverlay( Rect& bounds, int magnification );
+		virtual void drawOverlay( Rect& bounds, MagnificationType magnification );
 
 	private:
 	
@@ -212,9 +230,10 @@ namespace MAP
 		MAPoint2d mOldCenter;
 		MAPoint2d mNewCenter;
 		double mMagnificationD;
-		double mMagnificationStart;
+		double mLinearMagnificationStart;
 		int mZoomTime;
 		bool mZooming;
+		double mScale;
 		//-------------------------------------------------------------------------
 	
 		//-------------------------------------------------------------------------

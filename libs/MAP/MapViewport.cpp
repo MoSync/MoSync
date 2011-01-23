@@ -26,6 +26,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <madmath.h>
 
 //#define OnlyUpdateWhenJobComplete
+//#define USE_ALPHAFADES
+
+#define SCALE_TO_MAG(scale) log(scale)/log(2.0)
+#define MAG_TO_SCALE(mag) pow(2.0, mag)
 
 namespace MAP
 {
@@ -176,13 +180,7 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					//Environment::getEnvironment( ).removeIdleListener( this );
 					removeIdleListenerIfEverythingIsDone();
-	
-					//mViewport->mHasTimer = false;
-					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
-					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 			}
 			else
@@ -229,13 +227,7 @@ namespace MAP
 					//
 					// Done panning, stop timer and repaint
 					//
-					//Environment::getEnvironment( ).removeIdleListener( this );
 					removeIdleListenerIfEverythingIsDone();
-					
-					//mViewport->mHasTimer = false;
-					//mViewport->mCenterPositionPixels = mViewport->mPanTargetPositionPixels;
-					//mViewport->mCenterPositionLonLat = mViewport->mPanTargetPositionLonLat;
-					//DebugPrintf( "At target: %d\n", currentTime );
 				}
 
 			}
@@ -289,6 +281,7 @@ namespace MAP
 	:			
 		mMagnificationD(0.0),
 		mZooming(false),
+		mScale(1.0),
 		mCenterPositionLonLat( ),
 		mCenterPositionPixels( ),
 		mPanTargetPositionLonLat( ),
@@ -345,17 +338,17 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::setCenterPosition( LonLat position, int magnification, bool immediate, bool isPointerEvent )
+	void MapViewport::setCenterPosition( LonLat position, MagnificationType magnification, bool immediate, bool isPointerEvent )
 	//-------------------------------------------------------------------------
 	{
-		int width = getWidth( );
-		int height = getHeight( );
+		int width = getScaledWidth( ); //getWidth( );
+		int height = getScaledHeight( ); //getHeight( );
 
 		if ( immediate || width <= 0 || height <= 0 )
 		{
 			mMagnification = magnification;
-			mMagnificationD = magnification;
-
+			setScale(MAG_TO_SCALE(magnification));	
+			
 			mCenterPositionLonLat = mPanTargetPositionLonLat = position;
 			mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
 			mIdleListener->stopGlide( );
@@ -389,9 +382,10 @@ namespace MAP
 
 		mPanTargetPositionPixels = newXy;
 		mPanTargetPositionLonLat = LonLat( newXy );
+		
 		mMagnification = magnification;
-		mMagnificationD = magnification;
-
+		setScale(MAG_TO_SCALE(magnification));	
+		
 		if ( !mHasTimer )
 		{
 			Environment::getEnvironment( ).addIdleListener( mIdleListener );
@@ -452,18 +446,19 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	int MapViewport::getMagnification( ) const
+	MagnificationType MapViewport::getMagnification( ) const
 	//-------------------------------------------------------------------------
 	{
 		return mMagnification;
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::setMagnification( int magnification )
+	void MapViewport::setMagnification( MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
 		mMagnification = magnification;
-		mMagnificationD = magnification;
+		setScale(MAG_TO_SCALE(magnification));
+		
 		mIdleListener->stopGlide( );
 		setCenterPosition( mPanTargetPositionLonLat, true, false );
 	}
@@ -476,10 +471,6 @@ namespace MAP
 		int alpha = (255*timeSinceCreated)/250;
 		if(alpha>255) alpha = 255;
 		return alpha;
-	}
-
-	inline double log_2(double x) {
-		return log(x)/log(2.0);
 	}
 	
 	//-------------------------------------------------------------------------
@@ -500,44 +491,32 @@ namespace MAP
 
 			if(mZooming) {
 				int width = getWidth( );
-				int height = getHeight( );	
-	
-				double scaleTime = (mMagnificationD - mMagnification);
-				double scale = pow(2.0, scaleTime);
-				
-				//double scale = 1.0 + (mMagnificationD - mMagnification);
-				
-				Gfx_translate(width>>1, height>>1);
-				Gfx_scale((MAFixed)(scale*65536.0), (MAFixed)(scale*65536.0));
-				pt.x -= width>>1;
-				pt.y -= height>>1;
+				int height = getHeight( );
+				Gfx_translate((width>>1), (height>>1));
+				MAFixed fscale = (MAFixed)(mScale*65536.0);
+				Gfx_scale(fscale,fscale);
+				Gfx_translate(-(width>>1), -(height>>1));	
 			}
 
 
 			#endif // WIN32
 
-			// calculate alpha..
-			//int timeSinceCreated = tile->getMilliSecondsSinceCreated();
-			//int alpha = (255*timeSinceCreated)/250;
-
-			#ifndef WIN32
+#ifndef WIN32
+#ifdef USE_ALPHAFADES
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
-			} 			
-			#endif
+			}
+#endif
+#endif
 
 			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
 		
-			#ifndef WIN32
-
+#ifndef WIN32
+#ifdef USE_ALPHAFADES
 			Gfx_setAlpha(255);
-			
-			#endif
-
-			//char buffer[100];
-			//sprintf( buffer, "%d", maGetMilliSecondCount());
-			//mFont->drawString( buffer, pt.x, pt.y);		
+#endif
+#endif
 
 			#ifndef WIN32
 
@@ -590,8 +569,6 @@ namespace MAP
 			(*listeners)[i]->viewportUpdated( this );
 	}
 
-	bool alphaChanged;
-
 	//-------------------------------------------------------------------------
 	void MapViewport::drawViewport( Point origin )
 	//-------------------------------------------------------------------------
@@ -613,12 +590,10 @@ namespace MAP
 //Gfx_fillRect( origin.x, origin.y, getWidth( ), getHeight( ) );
 //#endif //HACK
 
+
+		//PixelCoordinate centerPositionPixels = mCenterPositionLonLat.toPixels( mMagnificationD );
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
-		
-	//	if(mAlphaChanged) {
-	//		updateMap( );
-	//	}
-		
+
 		//
 		// Let subclass draw its overlay
 		//
@@ -653,7 +628,7 @@ namespace MAP
 			//
 			if ( ShowPixelScaleAsText )
 			{
-				int mag = getMagnification( );
+				MagnificationType mag = getMagnification( );
 				PixelCoordinate px1 = getCenterPositionPixels( );
 				LonLat p1 = LonLat( px1 );
 				PixelCoordinate px2 = PixelCoordinate( mag, px1.getX( ) + 1, px1.getY( ) + 1 );
@@ -714,6 +689,14 @@ namespace MAP
 				mFont->drawString( buffer, origin.x, origin.y + 20 );
 			else
 				Gfx_drawText( origin.x, origin.y + 20, buffer );
+				
+			sprintf(buffer, "mScale: %f", mScale);
+			mFont->drawString( buffer, origin.x, origin.y + 40 );			
+			sprintf(buffer, "mMagnification: %d", mMagnification);
+			mFont->drawString( buffer, origin.x, origin.y + 60 );			
+			sprintf(buffer, "mMagnificationD: %f", mMagnificationD);
+			mFont->drawString( buffer, origin.x, origin.y + 80 );			
+				
 		}
 		//
 		// Restore original clip
@@ -724,7 +707,7 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::drawOverlay( Rect& bounds, int magnification )
+	void MapViewport::drawOverlay( Rect& bounds, MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
 	}
@@ -740,6 +723,7 @@ namespace MAP
 		//
 		// We want to use currently displayed center position here, so we bypass getCenterPosition( ).
 		//
+				
 		MapCache::get( )->requestTiles( mSource, LonLat( mCenterPositionPixels ), mMagnification, getWidth( ), getHeight( ), mIdleListener->mMomentumX, mIdleListener->mMomentumY );
 	}
 
@@ -749,10 +733,8 @@ namespace MAP
 	{
 		MAPoint2d pt;
 		PixelCoordinate screenPx = mCenterPositionPixels;
-
 		pt.x =    wpx.getX( ) - screenPx.getX( )   + ( getWidth( ) >> 1 );
 		pt.y = -( wpx.getY( ) - screenPx.getY( ) ) + ( getHeight( ) >> 1 );
-
 		return pt;
 	}
 
@@ -924,7 +906,9 @@ namespace MAP
 		mOldCenter.x = p1.x + vector.x/2;
 		mOldCenter.x = p1.y + vector.y/2;
 		//mMagnificationD = mMagnification;
-		mMagnificationStart = mMagnificationD;
+		mLinearMagnificationStart = MAG_TO_SCALE(mMagnification);
+		
+		//beginPanning(mOldCenter);
 		
 		mNewCenter = mOldCenter;	
 		mZoomTime = maGetMilliSecondCount( );
@@ -932,13 +916,45 @@ namespace MAP
 	}
 	
 	
-	static const int ZoomInterval = 50;
+	static const int ZoomInterval = 30;
 	static const int TapPanAcceleration = 1;
+	
+	double MapViewport::getScale() {
+		return MAG_TO_SCALE(mMagnificationD);
+	}	
+	
+	// updates magnification
+	//-------------------------------------------------------------------------
+	void MapViewport::setScale(double scale) 
+	//-------------------------------------------------------------------------	
+	{
+		double tileMagnification = mMagnification;
+		mMagnificationD = SCALE_TO_MAG(scale);
+
+		if(mMagnificationD > mSource->getMagnificationMax( )) {
+			mMagnificationD = mSource->getMagnificationMax( ); 
+		}
+		
+		if(mMagnificationD < mSource->getMagnificationMin( )) {
+			mMagnificationD = mSource->getMagnificationMin( );
+		}
+		
+		mScale = (MAG_TO_SCALE(mMagnificationD)/MAG_TO_SCALE(tileMagnification));
+		
+		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
+		
+		mIdleListener->stopGlide( );
+		this->updateMap( );
+		//onViewportUpdated( );
+	}
 	
 	//-------------------------------------------------------------------------
 	void MapViewport::updateZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	
 	{
+
+		mIdleListener->stopGlide( );
 
 		int currentTime = maGetMilliSecondCount( );
 		//
@@ -948,63 +964,62 @@ namespace MAP
 		if ( delta < ZoomInterval )
 			return;
 		mZoomTime = currentTime;
-			
-	
+				
 		MAPoint2d vector = calculateVector(p1, p2);
 		mNewCenter.x = p1.x + vector.x/2;
 		mNewCenter.x = p1.y + vector.y/2;	
-		MAPoint2d movementOfCenter = calculateVector(mOldCenter, mNewCenter);		
-		//moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);		
-		
 		double newDistance = calculateDistance(p1, p2);
-		//double movementOfDistance = newDistance - mOldDistance;
-		
-		double mag = mMagnificationStart * newDistance/mOldDistance;
+		double linearmag = mLinearMagnificationStart * newDistance/mOldDistance;
+		setScale(linearmag);		
 
-		if(mag > mSource->getMagnificationMax( )) {
-			mag = mSource->getMagnificationMax( ); 
-		}
 		
-		if(mag < mSource->getMagnificationMin( )) {
-			mag = mSource->getMagnificationMin( );
-		}
-		
-		int newTileMagnificationValue = (int)floor(mag);	
-		mMagnificationD = mag;
-		
+		/*
 		if(newTileMagnificationValue != mMagnification) {
-			mMagnification = newTileMagnificationValue;	
+			mMagnification = newTileMagnificationValue;
 			mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
-			this->updateMap( );	
-		} else {
-			this->updateMap( );
-		}
-
-		//moveCenterPositionInPixels(-movementOfCenter.x, movementOfCenter.y);		
-		
-		//mMagnificationD = mag;
-		printf("p1.x: %d, p1.y: %d\n", p1.x, p1.y);
-		printf("p2.x: %d, p2.y: %d\n", p2.x, p2.y);
-		printf("mMagnificationD: %f, mMagnification: %d\n", mMagnificationD, mMagnification);
-		//mOldDistance = newDistance;
-
+		} 
+		*/
+		//updatePanning(mNewCenter);	
+		//onViewportUpdated( );
 	}
 	
 	//-------------------------------------------------------------------------	
 	void MapViewport::endZooming() 
 	//-------------------------------------------------------------------------	
 	{
+		mMagnification = (int)(mMagnificationD + 0.5);		
+		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );		
+		this->updateMap( );			
+		
+		//endPanning();
+		//onViewportUpdated( );
+		
+		mZooming = false;
+	}
+	
+	//-------------------------------------------------------------------------		
+	bool MapViewport::isZooming() 
+	//-------------------------------------------------------------------------		
+	{
+		return mZooming;
 	}
 	
 	//-------------------------------------------------------------------------		
 	void MapViewport::beginPanning(const MAPoint2d& p) 
 	//-------------------------------------------------------------------------	
 	{
+		mMagnification = (int)(mMagnificationD + 0.5);	
+		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
+		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
+		
 		mTouchScreenCoordinate = p;
 		mTouchPixelCoordinate = getCenterPositionPixels();
 		mIdleListener->stopGlide( );	
 		mPanTime = maGetMilliSecondCount();
+		
+		mZooming = false;
 	}
 	
 	//-------------------------------------------------------------------------		
@@ -1044,26 +1059,12 @@ namespace MAP
 		int dx = ( p.x - mTouchScreenCoordinate.x ) * TapPanAcceleration;
 		int dy = ( p.y - mTouchScreenCoordinate.y ) * TapPanAcceleration;
 		PixelCoordinate px = PixelCoordinate(	mTouchPixelCoordinate.getMagnification( ),
-												mTouchPixelCoordinate.getX( ) - dx,
-												mTouchPixelCoordinate.getY( ) + dy );
+												mTouchPixelCoordinate.getX( ) - (int)(((double)dx / mScale) + 0.5),
+												mTouchPixelCoordinate.getY( ) + (int)(((double)dy / mScale) + 0.5)
+												);
+												
         LonLat newPos = LonLat( px );
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        setCenterPosition( newPos, false, true );
-	}	
-
-	//-------------------------------------------------------------------------
-	void MapViewport::setCenterPositionImmediate(const LonLat& position, double magnification )
-	//-------------------------------------------------------------------------
-	{
-		// todo: fix and use this function..
-		
-		mMagnification = (int)floor(magnification);
-		mMagnificationD = magnification;
-
-		//mCenterPositionLonLat = mPanTargetPositionLonLat = position;
-		//mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
-		mIdleListener->stopGlide( );
-	}
-			
-	
+        setCenterPosition( newPos, mMagnification, false, true );
+	}		
 }
