@@ -33,10 +33,10 @@ namespace MAP
 	//
 	// Appearance
 	//
-	static const bool ShowPixelScale = true; // shows scale slider
+	//static const bool ShowPixelScale = true; // shows scale slider
 	static const bool ShowPixelScaleAsText = true; // shows meters/pixel scale (at latitude of screen center).
-	static const bool ShowHairlineCross = true;
-	static const bool ShowLatLon = true;
+	//static const bool ShowHairlineCross = true;
+	//static const bool ShowLatLon = true;
 	//
 	// Configuration
 	//
@@ -272,10 +272,12 @@ namespace MAP
 		mPanTargetPositionPixels( ),
 		mMagnification( 0 ),
 		mSource( NULL ),
-		mHasScale( true ),
 		mIdleListener( NULL ),
 		mFont( NULL ),
-		mInDraw( NULL )
+		mInDraw( NULL ),
+		mShowPixelScale( false ),
+		mShowHairlineCross( false ),
+		mShowLonLat( false )
 	{
 		mIdleListener = newobject( MapViewportIdleListener, new MapViewportIdleListener( this ) );
 		Environment::getEnvironment( ).addIdleListener( mIdleListener );
@@ -506,7 +508,7 @@ namespace MAP
 			// Unpack PNG
 			//
 			MAHandle placeholder = PlaceholderPool::alloc( );//maCreatePlaceholder( );
-			int res = maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
+			maCreateImageFromData( placeholder, tile->getImage( ), 0, tile->getContentLength( ) );
 			//
 			// Draw image
 			//
@@ -605,7 +607,7 @@ namespace MAP
 		//
 		// Draw scale indicator
 		//
-		if ( ShowPixelScale && mHasScale )
+		if ( mShowPixelScale )
 		{
 			const int scaleWidth = 80;
 			const int scaleX = origin.x + getWidth( ) - scaleWidth - 5;
@@ -654,7 +656,7 @@ namespace MAP
 		//
 		// Draw hairline cross
 		//
-		if ( ShowHairlineCross )
+		if ( mShowHairlineCross )
 		{
 			const int centerX = origin.x + getWidth( ) / 2;
 			const int centerY = origin.y + getHeight( ) / 2;
@@ -667,7 +669,7 @@ namespace MAP
 		//
 		// Draw latitude, longitude
 		//
-		if ( ShowLatLon )
+		if ( mShowLonLat )
 		{
 			char buffer[100];
 			sprintf( buffer, "%-3.4f %-3.4f", mCenterPositionLonLat.lon, mCenterPositionLonLat.lat );
@@ -682,7 +684,7 @@ namespace MAP
 		//
 		// Draw debug info
 		//
-		if ( ShowLatLon )
+		if ( mShowLonLat )
 		{
 			char buffer[100];
 			sprintf( buffer, "Tiles: %d Cache: %d", this->mSource->getTileCount( ), MapCache::get( )->size( ) );
