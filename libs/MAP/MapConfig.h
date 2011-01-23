@@ -31,6 +31,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // This means rendering will be slower but cached tiles will use much
 // less memory - possibly 75-90% less.
 //
-#define StoreCompressedTilesInCache
+// #define StoreCompressedTilesInCache
 
 #endif // MAPCONFIG_H
