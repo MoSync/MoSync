@@ -117,6 +117,7 @@ namespace MAP
 		// IMapViewportListener implementation
 		//
 		virtual void viewportUpdated( MapViewport* viewport );
+		virtual void error( MapViewport* viewport, int code );
 
 	protected:
 		//

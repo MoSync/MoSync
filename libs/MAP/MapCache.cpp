@@ -29,8 +29,6 @@ namespace MAP
 {
 	MapCache* MapCache::sSingleton = NULL;
 
-	static const int DefaultCapacity = 40;
-
 	//=========================================================================
 	class MapTileKey
 	//=========================================================================
@@ -104,7 +102,7 @@ namespace MAP
 		mList( ),
 		mHits( 0 ),
 		mMisses( 0 ),
-		mCapacity( DefaultCapacity )
+		mCapacity( MapCacheDefaultCapacity )
 	{
 	}
 
@@ -310,6 +308,7 @@ namespace MAP
 	{
 		// TODO: Handle
 		DebugPrintf( "MapCache::error %d\n", code );
+		onError( code );
 	}
 
 	//-------------------------------------------------------------------------
@@ -350,6 +349,15 @@ namespace MAP
 		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
 		for ( int i = 0; i < listeners->size( ); i ++ )
 			(*listeners)[i]->jobComplete( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
 	}
 
 

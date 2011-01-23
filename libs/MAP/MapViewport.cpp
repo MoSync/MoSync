@@ -33,10 +33,7 @@ namespace MAP
 	//
 	// Appearance
 	//
-	//static const bool ShowPixelScale = true; // shows scale slider
 	static const bool ShowPixelScaleAsText = true; // shows meters/pixel scale (at latitude of screen center).
-	//static const bool ShowHairlineCross = true;
-	//static const bool ShowLatLon = true;
 	//
 	// Configuration
 	//
@@ -572,12 +569,10 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::onViewportUpdated( )
+	void MapViewport::error( MapCache* sender, int code )
 	//-------------------------------------------------------------------------
 	{
-		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
-		for ( int i = 0; i < listeners->size( ); i ++ )
-			(*listeners)[i]->viewportUpdated( this );
+		onError( code );
 	}
 
 	bool alphaChanged;
@@ -1038,6 +1033,22 @@ namespace MAP
 		//mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
 		mIdleListener->stopGlide( );
 	}
-			
-	
+		
+	//-------------------------------------------------------------------------
+	void MapViewport::onViewportUpdated( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->viewportUpdated( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapViewport::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapViewportListener*>* listeners = getBroadcasterListeners<IMapViewportListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
+	}
 }

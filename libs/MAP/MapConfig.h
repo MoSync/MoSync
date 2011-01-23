@@ -32,6 +32,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // less memory - possibly 75-90% less.
 //
 // #define StoreCompressedTilesInCache
+//
+// Maximum parallel downloaders
+//
+static const int			MapSourceDownloaders = 5;
+//
+// Default capacity in MapCache.
+//
+static const int MapCacheDefaultCapacity = 40;
 
 #endif // MAPCONFIG_H
 

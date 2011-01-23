@@ -194,8 +194,9 @@ namespace MAP
 		mQueue( NULL ),
 		mTileCount( 0 )
 	{
+		mDownloaders = new MapSourceImageDownloader*[MapSourceDownloaders];
 		mQueue = newobject( MapSourceQueue, new MapSourceQueue( ) );
-		for (int i = 0; i < Downloaders; i++)
+		for (int i = 0; i < MapSourceDownloaders; i++)
 			mDownloaders[i] = NULL;
 	}
 
@@ -208,7 +209,7 @@ namespace MAP
 		//
 		// Drop and delete downloader pool
 		//
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] != NULL )
 			{
@@ -220,6 +221,7 @@ namespace MAP
 				deleteobject( mDownloaders[i] );
 			}
 		}
+		delete[] mDownloaders;
 	}
 
 	//-------------------------------------------------------------------------
@@ -280,7 +282,7 @@ namespace MAP
 	bool MapSource::isInDownloaders( MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i <  Downloaders; i++ )
+		for ( int i = 0; i <  MapSourceDownloaders; i++ )
 		{
 			MapSourceImageDownloader* dlr = mDownloaders[i];
 			if ( dlr == NULL )
@@ -299,7 +301,7 @@ namespace MAP
 	void MapSource::removeDownloader( MapSourceImageDownloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] == downloader )
 			{
@@ -366,7 +368,6 @@ namespace MAP
 	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		TraceScope tr = TraceScope( "MapSource::downloadCancelled" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		onDownloadCancelled( dlr->mListener );
 	}
@@ -375,7 +376,6 @@ namespace MAP
 	void MapSource::error( Downloader* downloader, int code )
 	//-------------------------------------------------------------------------
 	{
-		TraceScope tr = TraceScope( "MapSource::error" );
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 		onError( dlr->mListener, code );
 	}
@@ -387,7 +387,7 @@ namespace MAP
 	int MapSource::findUnusedSlot( MapSourceImageDownloader* protectedDownloader )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] == NULL )
 				return i;

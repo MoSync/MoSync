@@ -78,6 +78,7 @@ namespace MAP
 		 * Called when a requested tile has been received into cache from map source.
 		 */
 		virtual void viewportUpdated( MapViewport* viewport ) = 0;
+		virtual void error( MapViewport* viewport, int code ) = 0;
 	};
 
 	//=========================================================================
@@ -173,6 +174,7 @@ namespace MAP
 		//
 		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache );
 		virtual void jobComplete( MapCache* sender );
+		virtual void error( MapCache* sender, int error );
 		/**
 		 * Converts from global map pixels to viewport pixels.
 		 */
@@ -207,6 +209,7 @@ namespace MAP
 		// events
 		//
 		virtual void onViewportUpdated( );
+		virtual void onError( int code );
 		//
 		// Redraw
 		//

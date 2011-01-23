@@ -217,4 +217,12 @@ namespace MAP
 	{
 		requestRepaint( );
 	}
+
+	//-------------------------------------------------------------------------
+	void MapWidget::error( MapViewport* viewport, int code )
+	//-------------------------------------------------------------------------
+	{
+		// TODO: inform user that error occurred
+	}
+
 }
