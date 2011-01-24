@@ -1100,4 +1100,11 @@ namespace MAP
 		for ( int i = 0; i < listeners->size( ); i ++ )
 			(*listeners)[i]->error( this, code );
 	}
+	
+	//-------------------------------------------------------------------------
+	void MapViewport::setShowLonLat( bool enabled )
+	//-------------------------------------------------------------------------
+	{
+		mShowLonLat = enabled;
+	}
 }

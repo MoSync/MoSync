@@ -146,7 +146,9 @@ namespace Base {
 		}
 		   
 		CGDataProviderRelease(dpr);
-				
+		
+		CFRelease(png_data);
+		
 		return new Surface(imageRef);
 	}
 	
