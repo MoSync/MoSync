@@ -31,6 +31,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define SCALE_TO_MAG(scale) log(scale)/log(2.0)
 #define MAG_TO_SCALE(mag) pow(2.0, mag)
+	
+MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2) {
+	MAPoint2d vec;
+	vec.x = p2.x - p1.x;
+	vec.y = p2.y - p1.y;
+	return vec;
+}
+	
+double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {		
+	MAPoint2d vector = calculateVector(touch1, touch2);
+	double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
+	return distance;
+}	
+	
 
 namespace MAP
 {
@@ -478,10 +492,22 @@ namespace MAP
 			if(mZooming) {
 				int width = getWidth( );
 				int height = getHeight( );
-				Gfx_translate((width>>1), (height>>1));
+				MAPoint2d vec = {width>>1, height>>1};
+	/*
+				MAPoint2d vec = calculateVector(mOldCenter, mNewCenter);
+				vec.x = (int)((double)vec.x / mScale + 0.5);
+				vec.y = (int)((double)vec.y / mScale + 0.5);
+				vec.x += mOldCenter.x;
+				vec.y += mOldCenter.y;
+				*/
+				
+				Gfx_translate(vec.x, vec.y);
+				
 				MAFixed fscale = (MAFixed)(mScale*65536.0);
 				Gfx_scale(fscale,fscale);
-				Gfx_translate(-(width>>1), -(height>>1));	
+				//Gfx_translate(-(width>>1), -(height>>1));
+				Gfx_translate(-vec.x, -vec.y);
+				
 			}
 
 
@@ -870,20 +896,6 @@ namespace MAP
 		setCenterPosition(LonLat(position.lon, position.lat), true, false);
 	}
 	
-	
-	MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2) {
-		MAPoint2d vec;
-		vec.x = p2.x - p1.x;
-		vec.y = p2.y - p1.y;
-		return vec;
-	}
-	
-    double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
-		MAPoint2d vector = calculateVector(touch1, touch2);
-		double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
-		return distance;
-    }	
-	
 	//-------------------------------------------------------------------------	
 	void MapViewport::beginZooming(const MAPoint2d& p1, const MAPoint2d& p2) 
 	//-------------------------------------------------------------------------	
@@ -892,15 +904,17 @@ namespace MAP
 		mOldDistance = calculateDistance(p1, p2);
 		MAPoint2d vector = calculateVector(p1, p2);
 		mOldCenter.x = p1.x + vector.x/2;
-		mOldCenter.x = p1.y + vector.y/2;
-		//mMagnificationD = mMagnification;
-		mLinearMagnificationStart = MAG_TO_SCALE(mMagnification);
+		mOldCenter.y = p1.y + vector.y/2;
 		
 		//beginPanning(mOldCenter);
+			
+		mLinearMagnificationStart = MAG_TO_SCALE(mMagnification);
 		
 		mNewCenter = mOldCenter;	
 		mZoomTime = maGetMilliSecondCount( );
 		mZooming = true;
+		
+		mTouchPixelCoordinate = getCenterPositionPixels();	
 	}
 	
 	
@@ -955,12 +969,25 @@ namespace MAP
 				
 		MAPoint2d vector = calculateVector(p1, p2);
 		mNewCenter.x = p1.x + vector.x/2;
-		mNewCenter.x = p1.y + vector.y/2;	
+		mNewCenter.y = p1.y + vector.y/2;	
+		MAPoint2d direction = calculateVector(mOldCenter, mNewCenter);
+			
 		double newDistance = calculateDistance(p1, p2);
 		double linearmag = mLinearMagnificationStart * newDistance/mOldDistance;
 		setScale(linearmag);		
 
-		
+		PixelCoordinate px = PixelCoordinate(	mTouchPixelCoordinate.getMagnification( ),
+												mTouchPixelCoordinate.getX( ) - (int)(((double)direction.x / mScale) + 0.5),
+												mTouchPixelCoordinate.getY( ) + (int)(((double)direction.y / mScale) + 0.5)
+												);
+												
+        LonLat newPos = LonLat( px );
+        newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
+        //setCenterPosition( newPos, mMagnification, false, true );
+        	mCenterPositionLonLat = mPanTargetPositionLonLat = newPos;
+       	mCenterPositionPixels = mPanTargetPositionPixels = px;
+
+		//updatePanning(mNewCenter);	
 		/*
 		if(newTileMagnificationValue != mMagnification) {
 			mMagnification = newTileMagnificationValue;
@@ -968,7 +995,6 @@ namespace MAP
 			mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		} 
 		*/
-		//updatePanning(mNewCenter);	
 		//onViewportUpdated( );
 	}
 	
@@ -977,13 +1003,14 @@ namespace MAP
 	//-------------------------------------------------------------------------	
 	{
 		mMagnification = (int)(mMagnificationD + 0.5);		
+		
 		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );		
-		this->updateMap( );			
-		
+	
 		//endPanning();
+	
+		this->updateMap( );					
 		//onViewportUpdated( );
-		
 		mZooming = false;
 	}
 	
@@ -998,7 +1025,7 @@ namespace MAP
 	void MapViewport::beginPanning(const MAPoint2d& p) 
 	//-------------------------------------------------------------------------	
 	{
-		mMagnification = (int)(mMagnificationD + 0.5);	
+		//mMagnification = (int)(mMagnificationD + 0.5);	
 		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		
