@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <madmath.h>
 
 //#define OnlyUpdateWhenJobComplete
-//#define USE_ALPHAFADES
+#define USE_ALPHAFADES
 
 #define SCALE_TO_MAG(scale) (log(scale)/log(2.0))
 #define MAG_TO_SCALE(mag) (pow(2.0, mag))
@@ -383,8 +383,12 @@ namespace MAP
 		mPanTargetPositionPixels = newXy;
 		mPanTargetPositionLonLat = LonLat( newXy );
 		
-		mMagnification = magnification;
-		setScale(MAG_TO_SCALE((double)magnification));	
+		if((int)mMagnification != (int)magnification) {
+			mMagnification = magnification;
+			setScale(MAG_TO_SCALE((double)magnification));	
+		}
+		mMagnificationD = mMagnification;
+		mScale = 1.0;
 		
 		if ( !mHasTimer )
 		{
@@ -468,10 +472,31 @@ namespace MAP
 	//-------------------------------------------------------------------------	
 	{
 		int timeSinceCreated = tile->getMilliSecondsSinceCreated();
-		int alpha = (255*timeSinceCreated)/250;
+		int alpha = (255*timeSinceCreated)/125;
 		if(alpha>255) alpha = 255;
 		return alpha;
 	}
+	
+	class AlphaRestore : public IdleListener {
+		public:
+			void start(MapViewport* viewport) {
+				Environment::getEnvironment().removeIdleListener(this);
+				
+				mViewport = viewport;
+				
+				Environment::getEnvironment().addIdleListener(this);
+			}
+		
+			void idle() {
+				mViewport->updateMap();
+				Environment::getEnvironment().removeIdleListener(this);
+			}
+			
+		private:
+			MapViewport *mViewport;
+	};
+	
+	AlphaRestore sAlphaRestore;
 	
 	//-------------------------------------------------------------------------
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile, bool foundInCache )
@@ -518,6 +543,8 @@ namespace MAP
 			int alpha = getAlphaForTile(tile);			
 			if(alpha<255) {
 				Gfx_setAlpha(alpha);
+				if(!mHasTimer)
+					sAlphaRestore.start(this);
 			}
 #endif
 #endif
