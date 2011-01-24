@@ -65,6 +65,10 @@
 	event.data = eventData;
 	Base::gEventQueue.put(event);
 #endif
+
+	// Put the item back there
+	UINavigationBar* navbar = (UINavigationBar*) view;
+	[navbar pushNavigationItem:item animated:false];
 }
 
 - (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item {
