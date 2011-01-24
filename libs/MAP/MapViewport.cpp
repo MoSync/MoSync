@@ -335,7 +335,7 @@ namespace MAP
 		if ( immediate || width <= 0 || height <= 0 )
 		{
 			mMagnification = magnification;
-			setScale(MAG_TO_SCALE(magnification));	
+			setScale(MAG_TO_SCALE((double)magnification));	
 			
 			mCenterPositionLonLat = mPanTargetPositionLonLat = position;
 			mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
@@ -370,7 +370,7 @@ namespace MAP
 		mPanTargetPositionLonLat = LonLat( newXy );
 		
 		mMagnification = magnification;
-		setScale(MAG_TO_SCALE(magnification));	
+		setScale(MAG_TO_SCALE((double)magnification));	
 		
 		if ( !mHasTimer )
 		{
@@ -443,7 +443,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		mMagnification = magnification;
-		setScale(MAG_TO_SCALE(magnification));
+		setScale(MAG_TO_SCALE((double)magnification));
 		
 		mIdleListener->stopGlide( );
 		setCenterPosition( mPanTargetPositionLonLat, true, false );

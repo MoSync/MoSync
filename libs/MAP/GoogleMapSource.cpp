@@ -52,7 +52,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		//return InitialResolution / ( 1 << magnification );
-		return pow(2.0, magnification);
+		return pow(2.0, (double)magnification);
 	}
 
 	//-------------------------------------------------------------------------
