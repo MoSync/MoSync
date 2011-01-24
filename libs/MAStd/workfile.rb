@@ -14,6 +14,12 @@ mod.class_eval do
 		@LOCAL_DLLS = ["mosync"]
 	end
 	
+	def copyGlHeaders()
+		@INSTALL_INCDIR = "GLES"
+		@HEADER_DIRS = ["GLES"]
+		copyHeaders
+	end
+	
 	def setup_pipe
 		setup_base
 		@SOURCES = [".", "../libsupc++", "libgcc"]
@@ -67,6 +73,8 @@ mod.class_eval do
 			"e_asin.c" => " -fno-strict-aliasing",
 			"mastdlib.c" => " -Wno-deprecated-declarations",
 			}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
+		
+		copyGlHeaders()
 		
 		@INSTALL_INCDIR = "."
 		@IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
