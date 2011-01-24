@@ -60,6 +60,11 @@ namespace MAP
 		 * Center position property
 		 */
 		LonLat getCenterPosition( ) const;
+		
+		/**
+		 * Note: setCenterPosition depends on a mapSource and it's magnification levels, if not
+		 *       mapSource is set prior to this call, the behaviour is undefined.
+		 */
 		void setCenterPosition( LonLat position, bool immediate, bool isPointerEvent );
 		void setCenterPosition( LonLat position, int magnification, bool immediate, bool isPointerEvent );
 		PixelCoordinate getCenterPositionPixels( ) const;

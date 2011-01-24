@@ -29,8 +29,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define OnlyUpdateWhenJobComplete
 //#define USE_ALPHAFADES
 
-#define SCALE_TO_MAG(scale) log(scale)/log(2.0)
-#define MAG_TO_SCALE(mag) pow(2.0, mag)
+#define SCALE_TO_MAG(scale) (log(scale)/log(2.0))
+#define MAG_TO_SCALE(mag) (pow(2.0, mag))
 	
 MAPoint2d calculateVector(const MAPoint2d& p1, const MAPoint2d& p2) {
 	MAPoint2d vec;
@@ -1025,7 +1025,6 @@ namespace MAP
 	void MapViewport::beginPanning(const MAPoint2d& p) 
 	//-------------------------------------------------------------------------	
 	{
-		//mMagnification = (int)(mMagnificationD + 0.5);	
 		mCenterPositionPixels = mCenterPositionLonLat.toPixels( mMagnification );
 		mPanTargetPositionPixels = mPanTargetPositionLonLat.toPixels( mMagnification );
 		
