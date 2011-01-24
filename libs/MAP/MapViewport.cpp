@@ -389,6 +389,8 @@ namespace MAP
 		}
 		mMagnificationD = mMagnification;
 		mScale = 1.0;
+		mZooming = false;
+		onViewportUpdated();
 		
 		if ( !mHasTimer )
 		{
