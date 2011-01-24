@@ -68,7 +68,7 @@
 
 	// Put the item back there
 	UINavigationBar* navbar = (UINavigationBar*) view;
-	[navbar pushNavigationItem:currNavitem animated:false];
+	[navbar pushNavigationItem:item animated:false];
 }
 
 - (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item {
