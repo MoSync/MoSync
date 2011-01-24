@@ -96,10 +96,8 @@ public class MoSyncHomeScreen
 				imageData = new byte[dataBuffer.capacity()];
 				
 				// Copy image data into array.
-				dataBuffer.mark();
 				dataBuffer.position(0);
 				dataBuffer.get(imageData);
-				dataBuffer.reset();
 			}
 			else
 			{ 
