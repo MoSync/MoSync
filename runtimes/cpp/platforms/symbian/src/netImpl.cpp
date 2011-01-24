@@ -32,6 +32,10 @@ using namespace MoSyncError;
 
 static void storeBtAddr(TBTDevAddr btaddr, MAConnAddr* addr);
 static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr);
+/*static void setStandardPref(TCommDbConnPref& pref);
+#ifdef __SERIES60_3X__
+static void setWlanPref(TCommDbConnPref& pref);
+#endif*/
 
 void Syscall::ClearNetworkingVariables() {
 	gConnNextHandle = 1;
@@ -162,10 +166,6 @@ int Syscall::maIapReset() {
 
 // unstable. please don't use.
 int Syscall::maIapShutdown() {
-	if(gNetworkingState == EIdle) {
-		DEBUG_ASSERT(gConnections.size() == 0);
-		return 0;
-	}
 	StopNetworking();
 
 	gConnOpsWaitingForNetworkingStart.Close();
@@ -173,7 +173,9 @@ int Syscall::maIapShutdown() {
 	//destroy all humans... I mean Connections :)
 	gConnections.close();
 
-	gConnection.Close();
+	if(gNetworkingState != EIdle) {
+		gConnection.Close();
+	}
 	gNetworkingState = EIdle;
 
 	return 1;
@@ -210,15 +212,45 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 	LHEL(gConnection.Open(gSocketServ));
 
 	TCommDbConnPref pref;
-	bool hasSavedIap = getSavedIap(gIapId);
-	if(hasSavedIap) {
-		LOGS("Saved IAP: %u\n", gIapId);
-		pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
-		pref.SetIapId(gIapId);
-		DEBUG_ASSERT(pref.IapId() == gIapId);
+#ifdef __SERIES60_3X__
+	if(gIapMethod == MA_IAP_METHOD_WLAN) {
+#if 0	// didn't work; prompted anyway.
+		pref.SetBearerSet(KCommDbBearerWLAN);
+#endif
+		RArray<TUint> iaps;
+		if(gWlanAvailable) {
+			LHEL(gWlanClient->GetAvailableIaps(iaps));
+			LOG("%i WLAN IAPs available.\n", iaps.Count());
+		}
+		if(iaps.Count() > 0) {
+			LOG("Picked IAP %i\n", iaps[0]);
+			pref.SetIapId(iaps[0]);
+			pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
+		} else {
+			LOG("No WLAN IAPs available. Failing...\n");
+			//connOp.SendResult(CONNERR_NETWORK);
+			connOp.mConn.connErr = CONNERR_NETWORK;
+			//connOp.RunL();
+			connOp.SetActive();
+			TRequestStatus* rsp = &connOp.iStatus;
+			User::RequestComplete(rsp, KErrGeneral);
+			return;
+		}
+	} else
+#endif
+	if(gIapMethod == MA_IAP_METHOD_STANDARD) {
+		bool hasSavedIap = getSavedIap(gIapId);
+		if(hasSavedIap) {
+			LOG("Saved IAP: %u\n", gIapId);
+			pref.SetDialogPreference(ECommDbDialogPrefDoNotPrompt);
+			pref.SetIapId(gIapId);
+			DEBUG_ASSERT(pref.IapId() == gIapId);
+		} else {
+			LOG("No saved IAP, showing dialog...\n");
+			pref.SetDialogPreference(ECommDbDialogPrefPrompt);
+		}
 	} else {
-		LOGS("No saved IAP, showing dialog...\n");
-		pref.SetDialogPreference(ECommDbDialogPrefPrompt);
+		DEBIG_PHAT_ERROR;
 	}
 	gConnection.Start(pref, connOp.iStatus);
 

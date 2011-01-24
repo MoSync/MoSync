@@ -126,6 +126,9 @@ public:
 			printf("maIapShutdown: %i\n", res);
 			start(EXAMPLE_URL);
 			mRestart = true;
+		} else if(keyCode == MAK_6) {
+			int res = maIapSetMethod(MA_IAP_METHOD_WLAN);
+			printf("method wlan: %i\n", res);
 		}
 	}
 
