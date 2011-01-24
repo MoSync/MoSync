@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "ModalScreen.h"
+#include <MAP/Broadcaster.h>
 
 using namespace MapDemoUtil;
 

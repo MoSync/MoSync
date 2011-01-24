@@ -18,6 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mavsprintf.h>
 
 #include "MessageMgr.h"
+#include <MAP/Broadcaster.h>
+
+using namespace MAPUtil;
 
 namespace MapDemoUtil
 {
