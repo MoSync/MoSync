@@ -70,6 +70,7 @@ public class MoSync extends Activity
 	private boolean mHasDeterminedTouchCapabilities = false;
 	private MoSyncTouchHandler mTouchHandler;
 	
+	
 	/**
 	 * Sets screen and window properties.
 	 * Creates and initializes the MoSync thread
@@ -344,20 +345,32 @@ public class MoSync extends Activity
 			}
 		}
 		
-		int[] touchEvent = new int[4];
-		
 		int actionCode = motionEvent.getAction() & MotionEvent.ACTION_MASK;
+		int index = -1;
 		
+		int eventType = 0;
 		switch (actionCode)
 		{
 			case MotionEvent.ACTION_DOWN:
-				touchEvent[0] = EVENT_TYPE_POINTER_PRESSED;
+				eventType = EVENT_TYPE_POINTER_PRESSED;
 				break;
+				
 			case MotionEvent.ACTION_UP:
-				touchEvent[0] = EVENT_TYPE_POINTER_RELEASED;
+				eventType = EVENT_TYPE_POINTER_RELEASED;
 				break;
+		
+			case MotionEvent.ACTION_POINTER_DOWN:
+				eventType = EVENT_TYPE_POINTER_PRESSED;
+				index = (motionEvent.getAction() & 0x0000ff00) >> 0x00000008;
+				break;
+				
+			case MotionEvent.ACTION_POINTER_UP:
+				eventType = EVENT_TYPE_POINTER_RELEASED;
+				index = (motionEvent.getAction( ) & 0x0000ff00) >> 0x00000008;
+				break;
+		
 			case MotionEvent.ACTION_MOVE:
-				touchEvent[0] = EVENT_TYPE_POINTER_DRAGGED;
+				eventType = EVENT_TYPE_POINTER_DRAGGED;
 				// While drawing, discard this event
 				if(mMoSyncThread.mIsUpdatingScreen) return true;
 				break;
@@ -365,23 +378,50 @@ public class MoSync extends Activity
 				return false;
 		}
 		
-		// Get all of the events and send them to the runtime
-		int numEvents = mTouchHandler.loadEvent(motionEvent);
-		for( int i = 0; i < numEvents; i++)
+		if(index != -1)
 		{
-			int[] eventData = mTouchHandler.parseEvent(i);
-			
-			// TO-DO : Proper error handling
-			if(eventData == null) return false;
-			
-			touchEvent[1] = eventData[0];
-			touchEvent[2] = eventData[1];
-			touchEvent[3] = eventData[2];
-			
-			mMoSyncThread.postEvent(touchEvent);
+			mTouchHandler.loadEvent(motionEvent);
+			int[] eventData = mTouchHandler.parseEvent(index);
+			sendPointerEvent(eventType, eventData);
+		}
+		else
+		{
+			// Get all of the events and send them to the runtime
+			int numEvents = mTouchHandler.loadEvent(motionEvent);
+			for( int i = 0; i < numEvents; i++)
+			{
+				int[] eventData = mTouchHandler.parseEvent(i);
+				sendPointerEvent(eventType, eventData);
+			}
 		}
 		
 		return super.onTouchEvent(motionEvent);
+	}
+	
+	/**
+	 * Send a pointer event.
+	 * 
+	 * @param type The type of event to send, e.g. EVENT_TYPE_POINTER_MOVE.
+	 * @param eventData An array containing, in order: the x position, 
+	 * 				 	the y position, the id of the pointer. 
+	 * @return
+	 */
+	public boolean sendPointerEvent(int type, int[] eventData)
+	{	
+		// TO-DO : Proper error handling
+		if(eventData == null)
+		{
+			return false;
+		}
+		
+		int[] touchEvent = new int[4];
+		touchEvent[0] = type;
+		touchEvent[1] = eventData[0];
+		touchEvent[2] = eventData[1];
+		touchEvent[3] = eventData[2];
+		
+		mMoSyncThread.postEvent(touchEvent);
+		return true;
 	}
 
 	/**
