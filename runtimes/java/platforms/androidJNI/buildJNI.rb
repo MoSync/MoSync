@@ -24,12 +24,12 @@ require 'fileutils'
 # <CONFIG_PATH>			: The path to where the config.h is located. If this is set the finished runtime will end up in this folder as well, other wise it will be in the project source root
 # <DEBUG>				: If this is set to anything they will use the configD.h file which is supposed to be at the <CONFIG_PATH>
 
-def exitBuilder(arg, config)
+def exitBuilder(arg, configDir, config)
 	if config != nil
 		# change name on config_platform.h.saved to config_platform.h if such file exists
-		conf_file = "/src/config_platform.h.saved"
+		conf_file = File.join(configDir, "config_platform.h.saved")
 		if File.exist? conf_file
-			FileUtils.copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
+			FileUtils.copy_file conf_file, File.join(configDir, "config_platform.h")
 		end
 	end
 	exit Integer(arg)
@@ -80,17 +80,17 @@ if thirdarg != nil
 	
 	# change name on the current config_platform.h to config_platform.h.saved
 
-	conf_file = "src/config_platform.h"
+	conf_file = File.join(mosyncppsource, "config_platform.h")
 	if File.exist? conf_file
 		puts "saving config file"
-		FileUtils.copy_file "src/config_platform.h", "src/config_platform.h.saved"
+		FileUtils.copy_file conf_file, File.join(mosyncppsource, "config_platform.h.saved")
 	end
 
 	runtime_config = File.join(thirdarg, "config#{debug}.h") 
 	puts "using runtime #{runtime_config}"
 	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
-	FileUtils.copy_file( runtime_config, "src/config_platform.h")
+	FileUtils.copy_file( runtime_config, conf_file)
 end
 
 
@@ -101,7 +101,7 @@ FileUtils.cd "AndroidProject"
 if ENV['OS'] == "Windows_NT"
 	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
 	if (!success)
-		exitBuilder(1, thirdarg)
+		exitBuilder(1, mosyncppsource, thirdarg)
 	end
 
 	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
@@ -110,7 +110,7 @@ else
 end
 
 if (!success)
-	exitBuilder(1, thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
 # Go to Android Java runtime root directory.
@@ -160,7 +160,7 @@ success = system(
 	"#{File.join(secondarg, "android.jar")} " + java_files)
 
 if (!success)
-	exitBuilder(1,thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
 puts "Copy Generated Library File\n\n"
@@ -179,7 +179,7 @@ else
 	success = system("zip -r MoSyncRuntime#{debug}.zip .");
 end
 if (!success)
-	exitBuilder(1, thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
 FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", File.join(outdir, "MoSyncRuntime#{debug}.zip"))
@@ -190,6 +190,6 @@ FileUtils.cd ".."
 FileUtils.rm_rf class_dir
 
 if (!success)
-	exitBuilder(0, thirdarg)
+	exitBuilder(0, mosyncppsource, thirdarg)
 end
 
