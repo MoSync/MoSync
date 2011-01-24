@@ -25,7 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define PIXELCOORDINATE_H_
 
 //#include <madmath.h>
+#ifndef WIN32
 extern "C" double floor(double x);
+#endif
 
 namespace MAP
 {

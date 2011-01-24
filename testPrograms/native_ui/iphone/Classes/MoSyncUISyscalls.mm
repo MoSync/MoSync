@@ -18,7 +18,7 @@ void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController) {
 }
 
 NSString* stringFromChar(const char* str) {
-	NSString *sfc = [NSString stringWithCString:str length:strlen(str)]; 
+	NSString *sfc = [NSString stringWithUTF8String:str]; 
 	return sfc;
 }
 

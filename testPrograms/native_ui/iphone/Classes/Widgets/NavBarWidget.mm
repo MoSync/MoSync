@@ -56,6 +56,12 @@
 }
 
 - (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item {
+}
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item {
+}
+
+- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
 #ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -66,16 +72,7 @@
 	Base::gEventQueue.put(event);
 #endif
 
-	// Put the item back there
-	UINavigationBar* navbar = (UINavigationBar*) view;
-	[navbar pushNavigationItem:item animated:false];
-}
-
-- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item {
-}
-
-- (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
-	return true;
+	return false;
 }
 
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPushItem:(UINavigationItem *)item {
