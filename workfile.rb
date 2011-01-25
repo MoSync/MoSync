@@ -107,9 +107,16 @@ end
 
 target :all_configs do
 	sh 'ruby workfile.rb all'
-	sh 'ruby workfile.rb all CONFIG=""'
-	sh 'ruby workfile.rb all USE_NEWLIB=""'
-	sh 'ruby workfile.rb all USE_NEWLIB="" CONFIG=""'
+	sh 'ruby workfile.rb all CONFIG='
+	sh 'ruby workfile.rb all USE_NEWLIB='
+	sh 'ruby workfile.rb all USE_NEWLIB= CONFIG='
+end
+
+target :all_libs do
+	sh 'ruby workfile.rb libs'
+	sh 'ruby workfile.rb libs CONFIG='
+	sh 'ruby workfile.rb libs USE_NEWLIB='
+	sh 'ruby workfile.rb libs USE_NEWLIB= CONFIG='
 end
 
 Targets.invoke
