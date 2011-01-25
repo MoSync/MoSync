@@ -1196,12 +1196,17 @@ reswitch:	switch (ch) {
 			ox[0] = '0';
 			ox[1] = ch = 'x';
 			goto nosign;
+		case 'm':
 		case 's':
 #ifdef _WANT_IO_C99_FORMATS
 		case 'S':
 #endif
 			sign = '\0';
-			cp = GET_ARG (N, ap, char_ptr_t);
+			if(ch == 'm') {
+				cp = (char*)strerror(errno);
+			} else {
+				cp = GET_ARG (N, ap, char_ptr_t);
+			}
 #ifndef __OPTIMIZE_SIZE__
 			/* Behavior is undefined if the user passed a
 			   NULL string when precision is not 0.
