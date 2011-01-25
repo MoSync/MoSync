@@ -971,8 +971,21 @@ namespace Base {
 	int Syscall::maFileDate(MAHandle file) {
 		LOGF("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
+		const char* statName = fh.name;
+		Array<char> temp(0);
+		if(fh.name[fh.name.size()-2] == '/') {
+			// would cause stat() to fail. get rid of the slash.
+			//temp.assign(fh.name, fh.name.size()-2);
+			temp.resize(fh.name.size()-1);
+			memcpy(temp, fh.name, fh.name.size()-2);
+			temp[fh.name.size()-2] = 0;
+			statName = temp;
+		}
 		struct _stat st;
-		if(_stat(fh.name, &st) != 0) FILE_FAIL(MA_FERR_GENERIC);
+		if(_stat(statName, &st) != 0) {
+			LOG("maFileDate:stat(%s) failed. errno: %i(%s)\n", statName, errno, strerror(errno));
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
 		LOGF("mtime: %i\n", (int)st.st_mtime);
 		return (int)st.st_mtime;
 	}

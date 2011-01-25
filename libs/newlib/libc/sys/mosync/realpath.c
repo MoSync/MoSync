@@ -34,6 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "realpath.h"
 
 /*
  * char *realpath(const char *path, char resolved[PATH_MAX]);
@@ -45,15 +46,12 @@
 char *
 realpath(const char *path, char resolved[PATH_MAX])
 {
-	struct stat sb;
 	char *p, *q, *s;
 	size_t left_len, resolved_len;
-	unsigned symlinks;
-	int serrno, slen;
-	char left[PATH_MAX], next_token[PATH_MAX], symlink[PATH_MAX];
+	int serrno;
+	char left[PATH_MAX], next_token[PATH_MAX];
 
 	serrno = errno;
-	symlinks = 0;
 	if (path[0] == '/') {
 		resolved[0] = '/';
 		resolved[1] = '\0';
@@ -120,64 +118,14 @@ realpath(const char *path, char resolved[PATH_MAX])
 		}
 
 		/*
-		 * Append the next path component and lstat() it. If
-		 * lstat() fails we still can return successfully if
-		 * there are no more path components left.
+		 * Append the next path component.
 		 */
 		resolved_len = strlcat(resolved, next_token, PATH_MAX);
 		if (resolved_len >= PATH_MAX) {
 			errno = ENAMETOOLONG;
 			return (NULL);
 		}
-		if (lstat(resolved, &sb) != 0) {
-			if (errno == ENOENT && p == NULL) {
-				errno = serrno;
-				return (resolved);
-			}
-			return (NULL);
-		}
-		if (S_ISLNK(sb.st_mode)) {
-			if (symlinks++ > MAXSYMLINKS) {
-				errno = ELOOP;
-				return (NULL);
-			}
-			slen = readlink(resolved, symlink, sizeof(symlink) - 1);
-			if (slen < 0)
-				return (NULL);
-			symlink[slen] = '\0';
-			if (symlink[0] == '/') {
-				resolved[1] = 0;
-				resolved_len = 1;
-			} else if (resolved_len > 1) {
-				/* Strip the last path component. */
-				resolved[resolved_len - 1] = '\0';
-				q = strrchr(resolved, '/') + 1;
-				*q = '\0';
-				resolved_len = q - resolved;
-			}
 
-			/*
-			 * If there are any path components left, then
-			 * append them to symlink. The result is placed
-			 * in `left'.
-			 */
-			if (p != NULL) {
-				if (symlink[slen - 1] != '/') {
-					if (slen + 1 >= sizeof(symlink)) {
-						errno = ENAMETOOLONG;
-						return (NULL);
-					}
-					symlink[slen] = '/';
-					symlink[slen + 1] = 0;
-				}
-				left_len = strlcat(symlink, left, sizeof(left));
-				if (left_len >= sizeof(left)) {
-					errno = ENAMETOOLONG;
-					return (NULL);
-				}
-			}
-			left_len = strlcpy(left, symlink, sizeof(left));
-		}
 	}
 
 	/*

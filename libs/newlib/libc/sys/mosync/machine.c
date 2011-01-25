@@ -18,6 +18,7 @@
 #include "maassert.h"
 #include "mavsprintf.h"
 #include "conprint.h"
+#include "realpath.h"
 
 
 #ifdef MOSYNCDEBUG
@@ -120,6 +121,7 @@ static char sCwd[2048] = "/";
 
 // returns 1 if it's a directory, 0 if it's not.
 static int getRealPath(char *buf, const char* path, int size) {
+#if 0
 	if(path[0]!='/') {
 		strncpy(buf, sCwd, size);
 		strncat(buf, path, size);
@@ -127,7 +129,11 @@ static int getRealPath(char *buf, const char* path, int size) {
 	} else {
 		strncpy(buf, path, size);
 	}
-	
+#else
+	if(realpath(path, buf) == NULL) {
+		PANIC_MESSAGE("realpath");
+	}
+#endif
 	size=strlen(buf);
 	if(!size || buf[size-1]=='/') return 1;
 	else return 0;
@@ -231,6 +237,18 @@ int dup2(int __fd, int newFd) {
 static int baseStat(MAHandle h, struct stat* st) {
 	CHECK(st->st_size = maFileSize(h), EIO);
 	CHECK(st->st_mtime = maFileDate(h), EIO);
+	
+	// we don't support the rest of the fields, but let's give them dummy values anyway.
+	st->st_ino = 0;
+	st->st_dev = 0;
+	st->st_nlink = 1;
+	st->st_uid = 0;
+	st->st_gid = 0;
+	st->st_atime = 0;
+	st->st_ctime = 0;
+	st->st_blocks = (st->st_size / 512) + 1;
+	st->st_blksize = 1024 * 4;	// arbitrary
+	
 	return 0;
 }
 
