@@ -236,11 +236,11 @@ static void streamJavaConstants(
 	const vector<ConstSet>& constSets, 
 	int ix) 
 {
-	for(size_t i=0; i<constSets.size(); i++) 
+	for (size_t i=0; i<constSets.size(); i++) 
 	{
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
-		for(size_t j=0; j<cs.constants.size(); j++) 
+		for (size_t j=0; j<cs.constants.size(); j++) 
 		{
 			const Constant& c(cs.constants[j]);
 			if (c.ix != ix)

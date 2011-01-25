@@ -25,6 +25,8 @@ Sld.tab
 Thumbs.db
 stabs.tab
 
+/*.bat
+
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
 /tools/ProfileConverter/profiles/*
@@ -73,7 +75,6 @@ stabs.tab
 /libs/MTXml/entities.c
 /libs/newlib/libc/sys/mosync/maapi.h
 /libs/newlib/libc/sys/mosync/maapi_defs.h
-
 
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
