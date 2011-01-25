@@ -49,6 +49,12 @@ public:
 		printf("1: IAP save\n");
 		printf("2: IAP reset\n");
 		printf("3: IAP shutdown\n");
+		printf("4: start loop\n");
+		printf("5: method standard\n");
+		printf("6: method wlan\n");
+		printf("7: filter not wlan\n");
+		printf("8: filter wlan\n");
+		printf("9: filter all\n");
 	}
 
 	void start(const char* url) {
@@ -120,15 +126,22 @@ public:
 			int res = maIapShutdown();
 			printf("maIapShutdown: %i\n", res);
 			start(EXAMPLE_URL);
-		} else if(keyCode == MAK_5) {
-			mHttp.close();
-			int res = maIapShutdown();
-			printf("maIapShutdown: %i\n", res);
-			start(EXAMPLE_URL);
 			mRestart = true;
+		} else if(keyCode == MAK_5) {
+			int res = maIapSetMethod(MA_IAP_METHOD_STANDARD);
+			printf("method standard: %i\n", res);
 		} else if(keyCode == MAK_6) {
 			int res = maIapSetMethod(MA_IAP_METHOD_WLAN);
 			printf("method wlan: %i\n", res);
+		} else if(keyCode == MAK_7) {
+			int res = maIapSetFilter(MA_IAP_FILTER_NOT_WLAN);
+			printf("filter not wlan: %i\n", res);
+		} else if(keyCode == MAK_8) {
+			int res = maIapSetFilter(MA_IAP_FILTER_WLAN);
+			printf("filter wlan: %i\n", res);
+		} else if(keyCode == MAK_9) {
+			int res = maIapSetFilter(MA_IAP_FILTER_ALL);
+			printf("filter all: %i\n", res);
 		}
 	}
 

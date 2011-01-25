@@ -32,10 +32,6 @@ using namespace MoSyncError;
 
 static void storeBtAddr(TBTDevAddr btaddr, MAConnAddr* addr);
 static void storeSockAddr(const TSockAddr& sockaddr, MAConnAddr* addr);
-/*static void setStandardPref(TCommDbConnPref& pref);
-#ifdef __SERIES60_3X__
-static void setWlanPref(TCommDbConnPref& pref);
-#endif*/
 
 void Syscall::ClearNetworkingVariables() {
 	gConnNextHandle = 1;
@@ -237,7 +233,7 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 			return;
 		}
 	} else
-#endif
+#endif	//__SERIES60_3X__
 	if(gIapMethod == MA_IAP_METHOD_STANDARD) {
 		bool hasSavedIap = getSavedIap(gIapId);
 		if(hasSavedIap) {
@@ -247,6 +243,18 @@ void Syscall::StartNetworkingL(ConnOp& connOp) {
 			DEBUG_ASSERT(pref.IapId() == gIapId);
 		} else {
 			LOG("No saved IAP, showing dialog...\n");
+#ifdef __SERIES60_3X__
+			if(gIapFilter == MA_IAP_FILTER_NOT_WLAN) {
+				// Note: doesn't work on E61i. WLAN is still displayed.
+				LOG("Not wlan.\n");
+				pref.SetBearerSet(0xFF & ~KCommDbBearerWLAN);
+			} else if(gIapFilter == MA_IAP_FILTER_WLAN) {
+				LOG("Wlan only.\n");
+				pref.SetBearerSet(KCommDbBearerWLAN);
+			} else {
+				DEBUG_ASSERT(gIapFilter == MA_IAP_FILTER_ALL);
+			}
+#endif	//__SERIES60_3X__
 			pref.SetDialogPreference(ECommDbDialogPrefPrompt);
 		}
 	} else {
