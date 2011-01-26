@@ -312,6 +312,7 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 		oprintf("\"");
 		if(!lv->dataType->isSimpleValue())
 			break;
+		// intentional fallthrough.
 	case eAllValues:
 		{
 		oprintf(",value=\"");

@@ -975,13 +975,21 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 	
 	tb->printMI(spf, addr, fmt);
 
-	// special treatment for (const) char*
-	if((int)tb->type() == (int)TypeBase::ePointer) {
-		const TypeBase* target = ((const PointerType*)tb)->mTarget;
+	// special treatment for (const) char* and char[].
+	// first check if it's a pointer or array, and if so, find its target/element type.
+	const TypeBase* target = NULL;
+	if(tb->type() == TypeBase::ePointer)
+		target = ((const PointerType*)tb)->mTarget;
+	else if(tb->type() == TypeBase::eArray)
+		target = ((const ArrayType*)tb)->mElemType;
+
+	if(target != NULL) {
+		// skip past the "const" container type.
 		if(target->type() == TypeBase::eConst) {
 			target = ((const ConstType*)target)->mTarget;
 		}
-		if((int)target->type() == (int)TypeBase::eBuiltin) {
+		// then check if it's builtin->char.
+		if(target->type() == TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
 				int msAddr = *(int*)addr;
