@@ -694,7 +694,6 @@ namespace Base {
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
 		}
-		TEST_LTZ(res);
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new WriteFileStream(fh.name, false, true);
@@ -709,7 +708,6 @@ namespace Base {
 		if(fh.fs) if(!fh.fs->isOpen()) {
 			delete fh.fs;
 			fh.fs = NULL;
-			LOGD("maFileOpen failed.\n");
 			FILE_FAIL(MA_FERR_GENERIC);
 		}
 		return 0;
@@ -751,7 +749,7 @@ namespace Base {
 #endif
 
 		fh.fs = NULL;
-		TEST_LTZ(openFile(fh));
+		TLTZ_PASS(openFile(fh));
 		FileHandle* fhp = fhs.extract();
 		CLEANUPSTACK_PUSH(fhp);
 		gFileHandles.insert(gFileNextHandle, fhp);

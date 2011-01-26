@@ -172,6 +172,8 @@ SKIPPED_FILES = [
 	'tst-nanosleep.c',	# nanosleep
 	'tst-nice.c',	# we are not nice
 	'tst-perror.c',	# To be used only for testing glibc.
+	'tst_wscanf.c',	# we don't have stdin.
+	'tst_getwc.c',
 ]
 
 SKIPPED_PATTERNS = [
