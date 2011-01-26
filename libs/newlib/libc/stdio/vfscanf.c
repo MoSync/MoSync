@@ -944,7 +944,12 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      while (ccltab[*fp->_p])
 		{
 		  fp->_r--;
-		  *p++ = *fp->_p++;
+			if(flags & LONG) {
+				*((wchar_t*)p) = *fp->_p++;
+				p += sizeof(wchar_t);
+			} else {
+				*p++ = *fp->_p++;
+			}
 		  if (--width == 0)
 		    break;
 		  if (BufferEmpty)
