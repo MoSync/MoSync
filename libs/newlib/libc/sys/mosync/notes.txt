@@ -1,0 +1,10 @@
+tst-swscanf.c
+13:50 2011-01-26
+newlib's wscanf implementation does not support the format %[a-c]. It treats the - as just another character.
+However, their 8-bit scanf implementation does support it. Perhaps it's a GNU extension to wscanf that isn't actually supported by the libc standard.
+Checking...
+13:55 2011-01-26
+This is indeed specifically noted in the newlib documentation for wscanf.
+13:59 2011-01-26
+OpenGroup says behaviour is implementation-defined in this case for both scanf and wscanf.
+

@@ -174,6 +174,7 @@ SKIPPED_FILES = [
 	'tst-perror.c',	# To be used only for testing glibc.
 	'tst_wscanf.c',	# we don't have stdin.
 	'tst_getwc.c',
+	'tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
 ]
 
 SKIPPED_PATTERNS = [
