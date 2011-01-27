@@ -18,6 +18,44 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #include "FileStream.h"
 
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+#include <fcntl.h>
+#include <sys/stat.h>
+
+enum MyOpenMode {
+	eRead, eOverwrite, eAppend, eWriteExisting
+};
+
+#define LTEST(func) { int _res = (func); if(_res < 0) {\
+	LOG("errno: %i(%s)\n", errno, strerror(errno)); FAIL; } }
+
+static int myOpen(const char* filename, MyOpenMode mode) {
+	// use low-level io.
+	// parse mode.
+#ifdef WIN32
+	int flags = O_BINARY;
+#else
+	int flags = 0;
+#endif
+	switch(mode) {
+		case eRead: flags |= O_RDONLY; break;
+		case eOverwrite: flags |= O_CREAT | O_TRUNC | O_RDWR; break;
+		case eAppend: flags |= O_CREAT | O_APPEND | O_RDWR; break;
+		case eWriteExisting: flags |= O_RDWR; break;
+	}
+
+	// open file descriptor
+	int fd = ::open(filename, flags, S_IREAD | S_IWRITE);
+	if(fd < 0) {
+		LOG("open(%s, 0x%x) failed: %i(%s)\n", filename, flags, errno, strerror(errno));
+	}
+	return fd;
+}
+
 namespace Base {
 	//******************************************************************************
 	//FileStream
@@ -27,68 +65,58 @@ namespace Base {
 	}
 	FileStream::FileStream() {}
 	FileStream::FileStream(const char* filename) : mFilename(filename) {
-		rwops = SDL_RWFromFile(filename, "rb");
-		if(!rwops)
-		{
-			LOG("SDL_RWFromFile(%s, rb) = %p\n", filename, rwops);
-			LOG("%s\n", SDL_GetError());
-		}
+		// SDL_RWFromFile on Windows locks files,
+		// but the glibc test suite requires that they be shared.
+		//rwops = SDL_RWFromFile(filename, "rb");
+		mFd = myOpen(filename, eRead);
 	}
 	bool FileStream::isOpen() const {
-		return rwops != NULL;
+		return mFd > 0;
 	}
 	FileStream::~FileStream() {
-		if(isOpen())
-			SDL_RWclose(rwops);
-			//SDL_FreeRW(rwops);
+		if(isOpen()) {
+			::close(mFd);
+		}
 	}
 	bool FileStream::read(void* dst, int size) {
 		TEST(isOpen());
-		int res = SDL_RWread(rwops, dst, 1, size);
-		if(res != size) {
-			LOGD("SDL_RWread(%i): %i\n", size, res);
-			LOGD("%s\n", SDL_GetError());
-			return false;
+		byte* ptr = (byte*)dst;
+		byte* end = ptr + size;
+		while(ptr != end) {
+			int len = end - ptr;
+			int res = ::read(mFd, ptr, len);
+			if(res == 0) {
+				LOG("Unexpected EOF.\n");
+				FAIL;
+			}
+			LTEST(res);
+			DEBUG_ASSERT(res <= len);
+			ptr += res;
 		}
 		return true;
 	}
 	bool FileStream::length(int& aLength) const {
 		TEST(isOpen());
-		int oldpos = SDL_RWtell(rwops);
-		aLength = SDL_RWseek(rwops, 0, SEEK_END);
-		if(aLength < 0) {
-			FAIL;
-		}
-		SDL_RWseek(rwops, oldpos, SEEK_SET);
+		int oldpos;
+		LTEST(oldpos = lseek(mFd, 0, SEEK_CUR));
+		LTEST(aLength = lseek(mFd, 0, SEEK_END));
+		LTEST(lseek(mFd, oldpos, SEEK_SET));
 		return true;
 	}
 	bool FileStream::seek(Seek::Enum mode, int offset) {
 		TEST(isOpen());
-		if(mode == Seek::Start) {
-			if(SDL_RWseek(rwops, offset, SEEK_SET) != offset) {
-				FAIL;
-			}
-		} else if(mode == Seek::Current) {
-			int oldpos = SDL_RWtell(rwops);
-			int newpos = SDL_RWseek(rwops, offset, SEEK_CUR);
-			if(newpos != oldpos + offset) {
-				FAIL;
-			}
-		} else if(mode == Seek::End) {
-			int end;
-			TEST(length(end));
-			if(SDL_RWseek(rwops, offset, SEEK_END) != end + offset) {
-				FAIL;
-			}
-		} else {	//unsupported mode
-			FAIL;
+		int lm;
+		switch(mode) {
+			case Seek::Start: lm = SEEK_SET; break;
+			case Seek::Current: lm = SEEK_CUR; break;
+			case Seek::End: lm = SEEK_END; break;
 		}
+		LTEST(lseek(mFd, offset, lm));
 		return true;
 	}
 	bool FileStream::tell(int& aPos) const {
 		TEST(isOpen());
-		aPos = SDL_RWtell(rwops);
-		LOGD("SDL_RWtell: %i\n", aPos);
+		LTEST(aPos = lseek(mFd, 0, SEEK_CUR));
 		return true;
 	}
 
@@ -99,8 +127,8 @@ namespace Base {
 		: FileStream(filename), mStartPos(offset), mEndPos(offset + len)
 	{
 		if(!_open()) {
-			SDL_RWclose(rwops);
-			rwops = NULL;
+			::close(mFd);
+			mFd = -1;
 		}
 	}
 
@@ -109,18 +137,25 @@ namespace Base {
 	//******************************************************************************
 
 	WriteFileStream::WriteFileStream(const char* filename, bool append, bool exist) {
-		const char* mode = append ? "ab+" : (exist ? "rb+" : "wb+");
-		rwops = SDL_RWFromFile(filename, mode);
-		if(!rwops)
-		{
-			LOG("SDL_RWFromFile(%s, %s) = %p\n", filename, mode, rwops);
-			LOG("%s\n", SDL_GetError());
-		}
+		MyOpenMode mode = append ? eAppend : (exist ? eWriteExisting : eOverwrite);
+		mFd = myOpen(filename, mode);
 	}
 	bool WriteFileStream::write(const void* src, int size) {
 		TEST(isOpen());
-		int res = SDL_RWwrite(rwops, src, 1, size);
-		return res == size;
+		const byte* ptr = (const byte*)src;
+		const byte* end = ptr + size;
+		while(ptr != end) {
+			int len = end - ptr;
+			int res = ::write(mFd, ptr, len);
+			if(res == 0) {
+				LOG("Unexpected EOF.\n");
+				FAIL;
+			}
+			LTEST(res);
+			DEBUG_ASSERT(res <= len);
+			ptr += res;
+		}
+		return true;
 	}
 
 };

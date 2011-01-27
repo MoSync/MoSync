@@ -175,6 +175,7 @@ SKIPPED_FILES = [
 	'tst_wscanf.c',	# we don't have stdin.
 	'tst_getwc.c',
 	'tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
+	'bug-mmap-fflush.c',	# system
 ]
 
 SKIPPED_PATTERNS = [

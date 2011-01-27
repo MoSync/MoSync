@@ -155,7 +155,7 @@ static void initFda(void) {
 
 static struct LOW_FD* getLowFd(int __fd) {
 	initFda();
-	LOGD("getLowFd(%i)", __fd);
+	//LOGD("getLowFd(%i)", __fd);
 	if(__fd <= 0 || __fd >= NFD) {
 		errno = EBADF;
 		return NULL;
@@ -353,9 +353,10 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 	CHECK(fileTell = maFileTell(file), EIO);
  
 	remaining = fileSize - fileTell;
-	if(remaining==0) return 0;
-	FAILIF(remaining < 0, EIO);
-	if(remaining<__nbyte)
+	// seeking past the end of the file is allowed. it's treated like ordinary EOF.
+	if(remaining <= 0) return 0;
+	//FAILIF(remaining < 0, EIO);
+	if(remaining < __nbyte)
 		__nbyte = remaining;
 	
 	CHECK(maFileRead(file, __buf, __nbyte), EIO);
