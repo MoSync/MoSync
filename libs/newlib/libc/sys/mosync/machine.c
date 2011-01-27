@@ -234,8 +234,12 @@ int dup2(int __fd, int newFd) {
 #error gha
 #endif
 
-static int baseStat(MAHandle h, struct stat* st) {
-	CHECK(st->st_size = maFileSize(h), EIO);
+static int baseStat(MAHandle h, struct stat* st, int checkSize) {
+	if(checkSize) {
+		CHECK(st->st_size = maFileSize(h), EIO);
+	} else {
+		st->st_size = 0;
+	}
 	CHECK(st->st_mtime = maFileDate(h), EIO);
 	
 	// we don't support the rest of the fields, but let's give them dummy values anyway.
@@ -260,7 +264,7 @@ int fstat(int __fd, struct stat *st) {
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
 		st->st_mode = S_IFREG;
-		return baseStat(h, st);
+		return baseStat(h, st, TRUE);
 	}
 }
 
@@ -272,7 +276,7 @@ static int postStat(MAHandle h, struct stat *st, int mode) {
 		return 0;
 	}
 	st->st_mode = mode;
-	TEST(baseStat(h, st));
+	TEST(baseStat(h, st, mode != S_IFDIR));
 	return 1;
 }
 
