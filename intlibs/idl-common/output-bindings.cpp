@@ -446,7 +446,13 @@ static void lua_streamHelperApi(ostream& stream)
 	stream << "#define SCALETYPE_BILINEAR 2\n";
 	stream << "int maScaleImage(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, double scaleFactor, int scaleType);\n";
 
+	// System support for event handling.
+	stream << "void maEnvironmentInitialize();\n";
+	stream << "void maEnvironmentHandleEvent(MAEvent* event);\n";
+
 	stream << "// End of add-on API.\n";
+
+	// -----------------------------------------------
 
 	stream << "// Start of helper API.\n";
 
