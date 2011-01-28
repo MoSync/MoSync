@@ -274,7 +274,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PREBINDING = NO;
 				PRODUCT_NAME = __PROJECT_NAME__;
-				SDKROOT = iphoneos3.2;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -294,7 +294,7 @@
 				OTHER_LDFLAGS = "-ObjC";
 				PREBINDING = NO;
 				PRODUCT_NAME = __PROJECT_NAME__;
-				SDKROOT = iphoneos3.2;
+				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

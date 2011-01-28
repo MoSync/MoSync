@@ -174,9 +174,10 @@ namespace Base {
 		CGContextSaveGState(gBackbuffer->context);
 		
 		// init font
-		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
+		//CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
+		CFStringRef str = CFStringCreateWithCString(NULL, "Helvetica", kCFStringEncodingUTF8);
 		sUnicodeFont = CGFontCreateWithFontName(str);
-		//CFRelease(str);
+		CFRelease(str);
 		
 		gDrawTarget = gBackbuffer;
 		
@@ -597,13 +598,14 @@ namespace Base {
 		if(!gClosing)
 			gEventOverflow = false;
 		
-		const MAEvent* ev = gEventQueue.getAndProcess();
-		if(!ev) return 0;
-		else *dst = *ev; //gEventQueue.get();
+		MAEvent ev;
+		bool ret = gEventQueue.getAndProcess(ev);
+		if(!ret) return 0;
+		else *dst = ev; //gEventQueue.get();
 		
-#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev->type == eventType) {\
-		memcpy(MoSync_GetCustomEventData(), ev->data, sizeof(dataType));\
-		delete (dataType*)ev->data;\
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
+		memcpy(MoSync_GetCustomEventData(), ev.data, sizeof(dataType));\
+		delete (dataType*)ev.data;\
 		dst->data = MoSync_GetCustomEventDataMoSyncPointer(); }
 		
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);

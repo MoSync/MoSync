@@ -54,8 +54,10 @@ class Surface {
 public:
 	static int fontSize;
 	
-	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {				
-		mDataRef = CGDataProviderCopyData(CGImageGetDataProvider(image));
+	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
+		CGDataProviderRef dpr = CGImageGetDataProvider(image);
+		mDataRef = CGDataProviderCopyData(dpr);
+		
 		this->data = (char *)CFDataGetBytePtr(mDataRef);		
 		width = CGImageGetWidth(image);
 		height = CGImageGetHeight(image);
@@ -70,6 +72,7 @@ public:
 		if(bpp != 32) {
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 			this->data = new char[width*height*4];
+			mOwnData = true;
 			rowBytes = width*4;
 			context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipLast);
 			CGContextSetAllowsAntialiasing(context, false);
@@ -210,7 +213,7 @@ public:
 
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
-	EventQueue() : mEventOverflow(false), mWaiting(false) {
+	EventQueue() : CircularFifo<MAEvent, EVENT_BUFFER_SIZE>(), mEventOverflow(false), mWaiting(false) {
 		pthread_cond_init(&mCond, NULL);
 		pthread_mutex_init(&mMutex, NULL);
 	}
@@ -222,14 +225,15 @@ public:
 	
 	void handleInternalEvent(int type, void *e);
 
-	const MAEvent* getAndProcess() {
-		if(count()==0) return NULL;
-		const MAEvent& e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
+	bool getAndProcess(MAEvent& event) {
+		if(count()==0) return false;
+		MAEvent e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
 		if(e.type<0) {
 			handleInternalEvent(e.type, e.data);
-			return getAndProcess();
+			return getAndProcess(event);
 		} else {
-			return &e;
+			event = e;
+			return true;
 		}
 	}
 	
