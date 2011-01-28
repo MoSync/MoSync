@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+ * \file Screen.cpp
+ * \brief A full screen container for widgets.
+ * \author Patrick Broman and Niklas Nummelin
+ */
+
 #include "Screen.h"
 #include "Engine.h"
 //#include <conprint.h>
@@ -45,6 +51,7 @@ namespace MAUI {
 		mMain->requestRepaint();
 
 		//printf("Requesting UI update...!\n");
+		// TODO: Document why this line has been commented out.
 		//Engine::getSingleton().requestUIUpdate();
 		Environment::getEnvironment().addKeyListener(this);
 		Environment::getEnvironment().addPointerListener(this);
@@ -53,15 +60,19 @@ namespace MAUI {
 	void Screen::setMain(Widget* main) {
 
 		this->mMain = main;
-		if(!mMain) return;
+		if(!mMain) {
+			return;
+		}
 		mMain->setPosition(0,0);
 		mMain->setWidth(mScreenWidth);
 		mMain->setHeight(mScreenHeight);
 		Environment& env = Environment::getEnvironment();
-		if(!env.isKeyListener(this))
+		if(!env.isKeyListener(this)) {
 			mMain->setEnabled(false);
+		}
 
 		//MAUI_LOG("setMain widget: %x", mMain);
+		// TODO: Document why this line has been commented out.
 		//setFocusedWidget(mMain);
 	}
 
@@ -73,17 +84,21 @@ namespace MAUI {
 	void Screen::hide() {
 		//printf("hiding screen!\n");
 		Environment& env = Environment::getEnvironment();
-		if(env.isKeyListener(this))
+		if(env.isKeyListener(this)) {
 			env.removeKeyListener(this);
-		if(env.isPointerListener(this))
+		}
+		if(env.isPointerListener(this)) {
 			env.removePointerListener(this);
-		if(mMain)
+		}
+		if(mMain) {
 			mMain->setEnabled(false);
+		}
 		setFocusedWidget(NULL);
 		sCurrentScreen = NULL;
 	}
 
 	Screen::~Screen() {
+		// TODO: Document why this code has been commented out.
 		/*if(this == sCurrentScreen)
 			Environment::getEnvironment().removeKeyListener(this); */
 	}
@@ -93,15 +108,20 @@ namespace MAUI {
 	}
 
 	Widget* getFocusableWidget(Widget *w) {
-		if(w->isFocusable()) return w;
+		if(w->isFocusable()) {
+			return w;
+		}
 
 		const Vector<Widget*>& children = w->getChildren();
 		for(int i = 0; i < children.size(); i++) {
 			if(children[i]->isFocusable()) {
 				return children[i];
-			} else {
+			} 
+			else {
 				Widget* c = getFocusableWidget(children[i]);
-				if(c) return c;
+				if(c) {
+					return c;
+				}
 			}
 		}
 		return NULL;
@@ -109,13 +129,17 @@ namespace MAUI {
 
 	void Screen::setFocusedWidget(Widget *w) {
 		Widget *focus = w;
-		if(mFocusedWidget) mFocusedWidget->setFocused(false);
+		if(mFocusedWidget) {
+			mFocusedWidget->setFocused(false);
+		}
 		if(focus && !focus->isFocusable()) {
 			focus = getFocusableWidget(focus);
 		}
 		mFocusedWidget = focus;
 
-		if(mFocusedWidget) mFocusedWidget->setFocused(true);
+		if(mFocusedWidget) {
+			mFocusedWidget->setFocused(true);
+		}
 		//MAUI_LOG("setFocusedWidget widget %x", focus);
 	}
 
@@ -135,23 +159,29 @@ namespace MAUI {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
 				ip->keyPressed(keyCode, nativeCode);
-			} else {
+			} 
+			else {
 				mFocusedWidget->keyPressed(keyCode, nativeCode);
 			}
 		}
 	}
+	
 	void Screen::keyReleaseEvent(int keyCode, int nativeCode) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
 				ip->keyReleased(keyCode, nativeCode);
-			} else {
+			} 
+			else {
 				mFocusedWidget->keyReleased(keyCode, nativeCode);
 			}
 		}
 	}
+	
 	void Screen::pointerPressEvent(MAPoint2d point) {
-		setFocusedWidget(NULL); // if key has been pressed previously focus has been gained, this should be removed now.
+		// If a key has been pressed previously focus has been gained, 
+		// this should be removed now.
+		setFocusedWidget(NULL); 
 		Point p;
 		Widget* root = Engine::getSingleton().currentOverlay(p);
 		Widget* newFocus;
@@ -161,10 +191,10 @@ namespace MAUI {
 				OverlayListener::OutsideResponse res =
 					Engine::getSingleton().fireOverlayEvent(point.x, point.y);
 				switch(res) {
-				case OverlayListener::eBreak:
-					return;
-				case OverlayListener::eProceed:
-					root = NULL;
+					case OverlayListener::eBreak:
+						return;
+					case OverlayListener::eProceed:
+						root = NULL;
 				}
 			}
 		}
@@ -177,36 +207,44 @@ namespace MAUI {
 			setFocusedWidget(newFocus);
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
-				if(!ip->pointerPressed(point, 0))
+				if(!ip->pointerPressed(point, 0)) {
 					setFocusedWidget(NULL);
-			} else {
-				if(!newFocus->pointerPressed(point, 0))
+				}
+			} 
+			else {
+				if(!newFocus->pointerPressed(point, 0)) {
 					setFocusedWidget(NULL);
+				}
 			}
 		}
 
 	}
+	
 	void Screen::pointerReleaseEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
 				ip->pointerReleased(point, 0);
-			} else {
+			} 
+			else {
 				mFocusedWidget->pointerPressed(point, 0);
 			}
 		}
 
 		setFocusedWidget(NULL);
 	}
+	
 	void Screen::pointerMoveEvent(MAPoint2d point) {
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
-				if(!ip->pointerMoved(point, 0))
+				if(!ip->pointerMoved(point, 0)) {
 					setFocusedWidget(NULL);
+				}
 			} else {
-				if(!mFocusedWidget->pointerMoved(point, 0))
+				if(!mFocusedWidget->pointerMoved(point, 0)) {
 					setFocusedWidget(NULL);
+				}
 			}
 		}
 	}

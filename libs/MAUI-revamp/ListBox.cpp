@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/**
+ * \file ListBox.cpp 
+ * \brief Implementation of list box widget, horizontal or vertical layout.
+ * \author Patrick Broman and Niklas Nummelin
+ */
+
 #include <ma.h>
 #include <conprint.h>
 #include "ListBox.h"
@@ -25,22 +31,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <mavsprintf.h>
 #include <madmath.h>
-
 #include <MAUtil/Graphics.h>
 #include "Screen.h"
 
+// TODO: Document use of this constant.
 #define FRAMES 1000
+
+// Update frame rate (frames per second).
 #define FPS 50
+
+// Milliseconds between frame updates.
 #define MS_PER_FRAME (1000/FPS)
+
+// TODO: Document use of this constant.
 #define DURATION 250
 
+// TODO: Document use of this constant.
 #define SHORT_PRESS_TIME 150
 
 namespace MAUI {
 
 	class ShortPressTrigger : public TimerListener {
 	public:
-		ShortPressTrigger(ListBox* listBox, int time) :  mListBox(listBox), mTime(time) {
+		ShortPressTrigger(ListBox* listBox, int time)
+			: mListBox(listBox), mTime(time) {
 		}
 
 		void start() {
@@ -52,6 +66,7 @@ namespace MAUI {
 		}
 
 		void runTimerEvent() {
+			// TODO: Remove commented out code if not needed.
 			//Screen::getCurrentScreen()->getCurrentScreen()->setFocusedWidget(w);
 			//w->pointerPressed(p, 0);
 			mListBox->setFocusedWidget(mWidget);
@@ -73,32 +88,39 @@ namespace MAUI {
 		int mTime;
 	};
 
-	ListBox::ListBox(int x, int y, int width, int height,
-		ListBoxOrientation orientation, ListBoxAnimationType animationType,
+	ListBox::ListBox(
+		int x, 
+		int y, 
+		int width, 
+		int height,
+		ListBoxOrientation orientation, 
+		ListBoxAnimationType animationType,
 		bool wrapping)
-		: Widget(x, y, width, height),
-		mItemSelectedListeners(false),
-		mWrapping(wrapping),
-		mAnimationType(animationType),
-		mOrientation(orientation),
-		mYOffsetFrom(0),
-		mYOffsetTo(0),
-		mYOffset(0),
-		mSelectedIndex(0),
-		mAutoSize(false),
-		mTouched(false),
-		mFocusedWidget(NULL)
+			: Widget(x, y, width, height),
+			mItemSelectedListeners(false),
+			mWrapping(wrapping),
+			mAnimationType(animationType),
+			mOrientation(orientation),
+			mYOffsetFrom(0),
+			mYOffsetTo(0),
+			mYOffset(0),
+			mSelectedIndex(0),
+			mAutoSize(false),
+			mTouched(false),
+			mFocusedWidget(NULL)
 	{
 		requestRepaint();
 	}
 
 	void ListBox::setOrientation(ListBoxOrientation orientation) {
 		this->mOrientation = orientation;
+		// TODO: Remove commented out code if not needed.
 		//rebuild();
 		requestUpdate();
 	}
 
 	void ListBox::boundsChanged(Widget *widget, const Rect& bounds) {
+		// TODO: Remove commented out code if not needed.
 		//rebuild();
 		requestUpdate();
 	}
@@ -111,30 +133,36 @@ namespace MAUI {
 			int size = mChildren.size();
 			for(int i = 0; i < size; i++) {
 				int y;
-				if(i>0)
+				if(i>0) {
 					y = mChildren[i-1]->getPosition().y +
 						mChildren[i-1]->getBounds().height;
-				else
+				}
+				else {
 					y = 0;
+				}
 				mChildren[i]->setPosition(0, y);
 
-				if(mAutoSize)
+				if(mAutoSize) {
 					mChildren[i]->setWidth(mPaddedBounds.width);
-
+				}
 			}
-		} else {
+		} 
+		else {
 			int size = mChildren.size();
 			for(int i = 0; i < size; i++) {
 				int x;
-				if(i>0)
+				if(i>0) {
 					x = mChildren[i-1]->getPosition().x +
 						mChildren[i-1]->getBounds().width;
-				else
+				}
+				else {
 					x = 0;
+				}
 				mChildren[i]->setPosition(x, 0);
 
-				if(mAutoSize)
+				if(mAutoSize) {
 					mChildren[i]->setHeight(mPaddedBounds.height);
+				}
 			}
 		}
 		Vector_each(Widget*, itr, mChildren) {
@@ -144,6 +172,7 @@ namespace MAUI {
 
 	void ListBox::setAutoSize(bool as) {
 		this->mAutoSize = as;
+		// TODO: Remove commented out code if not needed.
 		//rebuild();
 		requestUpdate();
 	}
@@ -153,29 +182,33 @@ namespace MAUI {
 
 		if(mOrientation == LBO_VERTICAL) {
 			int y;
-			if(size>0)
+			if(size>0) {
 				y = mChildren[size-1]->getPosition().y +
 					mChildren[size-1]->getBounds().height;
-			else
+			}
+			else {
 				y = 0;
-
+			}
 			Widget::add(child);
 			child->setPosition(0, y);
-			if(mAutoSize)
+			if(mAutoSize) {
 				mChildren[mChildren.size()-1]->setWidth(mPaddedBounds.width);
+			}
 		}
 		else if(mOrientation == LBO_HORIZONTAL) {
 			int x;
-			if(size>0)
+			if(size>0) {
 				x = mChildren[size-1]->getPosition().x +
 					mChildren[size-1]->getBounds().width;
-			else
+			}
+			else {
 				x = 0;
-
+			}
 			Widget::add(child);
 			child->setPosition(x, 0);
-			if(mAutoSize)
+			if(mAutoSize) {
 				mChildren[mChildren.size()-1]->setHeight(mPaddedBounds.height);
+			}
 		}
 		
 		//listen
@@ -184,6 +217,7 @@ namespace MAUI {
 		if(mSelectedIndex>mChildren.size()) {
 			mSelectedIndex = 0;
 			mYOffset = 0;
+			// TODO: Remove commented out code if not needed.
 			/*
 			Vector_each(ItemSelectedListener*, i, itemSelectedListeners) {
 				(*i)->itemSelected(this, mChildren[this->mSelectedIndex], NULL);
@@ -191,6 +225,7 @@ namespace MAUI {
 			*/
 		}
 
+		// TODO: Remove commented out code if not needed.
 		/*
 		if(mChildren.size() == 1)
 			child->setFocused(true);
@@ -207,8 +242,9 @@ namespace MAUI {
 	}
 
 	void ListBox::clear() {
-		for(int i = 0; i < mChildren.size(); i++)
+		for(int i = 0; i < mChildren.size(); i++) {
 			mChildren[i]->removeWidgetListener(this);
+		}
 		Widget::clear();
 		requestUpdate();
 		requestRepaint();
@@ -217,21 +253,21 @@ namespace MAUI {
 	bool ListBox::listFrontOutsideBounds() const {
 		switch(mOrientation) {
 			case LBO_VERTICAL:
-			for(int i = 0; i < mChildren.size(); i++) {
-				int y = (mChildren[i]->getPosition().y + (mYOffset>>16));
-				if(y < 0) {
-					return true;
+				for(int i = 0; i < mChildren.size(); i++) {
+					int y = (mChildren[i]->getPosition().y + (mYOffset>>16));
+					if(y < 0) {
+						return true;
+					}
 				}
-			}
-			break;
+				break;
 			case LBO_HORIZONTAL:
-			for(int i = 0; i < mChildren.size(); i++) {
-				int x = (mChildren[i]->getPosition().x + (mYOffset>>16));
-				if(x < 0) {
-					return true;
+				for(int i = 0; i < mChildren.size(); i++) {
+					int x = (mChildren[i]->getPosition().x + (mYOffset>>16));
+					if(x < 0) {
+						return true;
+					}
 				}
-			}
-			break;
+				break;
 		}
 		return false;
 	}
@@ -239,21 +275,27 @@ namespace MAUI {
 	bool ListBox::listBackOutsideBounds() const {
 		switch(mOrientation) {
 			case LBO_VERTICAL:
-			for(int i = 0; i < mChildren.size(); i++) {
-				int y = (mChildren[i]->getPosition().y + mChildren[i]->getHeight() + (mYOffset>>16));
-				if(y > mPaddedBounds.height) {
-					return true;
+				for(int i = 0; i < mChildren.size(); i++) {
+					int y = 
+						mChildren[i]->getPosition().y 
+						+ mChildren[i]->getHeight() 
+						+ (mYOffset>>16);
+					if(y > mPaddedBounds.height) {
+						return true;
+					}
 				}
-			}
-			break;
+				break;
 			case LBO_HORIZONTAL:
-			for(int i = 0; i < mChildren.size(); i++) {
-				int x = (mChildren[i]->getPosition().x + mChildren[i]->getWidth() + (mYOffset>>16));
-				if(x > mPaddedBounds.width) {
-					return true;
+				for(int i = 0; i < mChildren.size(); i++) {
+					int x = 
+						mChildren[i]->getPosition().x 
+						+ mChildren[i]->getWidth() 
+						+ (mYOffset>>16);
+					if(x > mPaddedBounds.width) {
+						return true;
+					}
 				}
-			}
-			break;
+				break;
 		}
 		return false;
 	}
@@ -276,6 +318,7 @@ namespace MAUI {
 	}
 #endif
 
+	// TODO: Remove commented out code if not needed.
 	/*
 	void ListBox::draw(bool forceDraw) {
 		//Engine& engine = Engine::getSingleton();
@@ -396,6 +439,7 @@ namespace MAUI {
 		}
 
 		if(selectedIndex == this->mSelectedIndex) {
+			// TODO: Remove commented out code if not needed.
 			/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, mChildren[this->mSelectedIndex], mChildren[this->mSelectedIndex]);
@@ -415,7 +459,8 @@ namespace MAUI {
 			while(offset--) {
 				selectPreviousItem(false);
 			}
-		} else {
+		} 
+		else {
 			offset=-offset;
 			while(offset--){
 				selectNextItem(false);
@@ -424,13 +469,16 @@ namespace MAUI {
 		Widget *selectedWidget = mChildren[this->mSelectedIndex];
 		selectedWidget->setFocused(true);
 
+		// TODO: Remove commented out code if not needed.
 		/*
 		Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 			(*i)->itemSelected(this, selectedWidget, unselectedWidget);
 		}
 		*/
-		ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, selectedWidget, unselectedWidget));
-
+		ListenerSet_fire(
+			ItemSelectedListener, 
+			mItemSelectedListeners, 
+			itemSelected(this, selectedWidget, unselectedWidget));
 
 		requestRepaint();
 	}
@@ -451,7 +499,7 @@ namespace MAUI {
 		return mAnimationType;
 	}
 
-	bool	ListBox::isWrapping() const {
+	bool ListBox::isWrapping() const {
 		return mWrapping;
 	}
 
@@ -460,7 +508,9 @@ namespace MAUI {
 
 	void ListBox::selectPreviousItem(bool shouldFireListeners) {
 		Widget *c;
-		if(!getChildren().size()) return;
+		if(!getChildren().size()) { 
+			return; 
+		}
 
 		int pos = 0;
 
@@ -472,19 +522,24 @@ namespace MAUI {
 			mSelectedIndex = 0;
 			if(!mWrapping) {
 				if(shouldFireListeners) {
+					// TODO: Remove commented out code if not needed.
 					/*
 					Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 						(*i)->blocked(this, -1);
 					}
 					*/
-					ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, blocked(this, -1));
-
+					ListenerSet_fire(
+						ItemSelectedListener, 
+						mItemSelectedListeners, 
+						blocked(this, -1));
 				}
-			} else {
+			} 
+			else {
 				setSelectedIndex(mChildren.size()-1);
 			}
 			return;
 		}
+		
 		//printf("element: %d\n", selectedIndex);
 
 		Widget *unselectedWidget = mChildren[prevIndex];
@@ -495,8 +550,12 @@ namespace MAUI {
 		c->setFocused(true);
 
 		switch(mOrientation) {
-			case LBO_VERTICAL: pos = (c->getPosition().y<<16); break;
-			case LBO_HORIZONTAL: pos = (c->getPosition().x<<16); break;
+			case LBO_VERTICAL: 
+				pos = c->getPosition().y << 16; 
+				break;
+			case LBO_HORIZONTAL: 
+				pos = c->getPosition().x << 16; 
+				break;
 		}
 		if((pos + mYOffset) < 0) {
 			mYOffsetFrom = mYOffset>>16;
@@ -506,7 +565,10 @@ namespace MAUI {
 			mAnimTimeStart = maGetMilliSecondCount();
 			switch(mAnimationType) {
 				case LBA_LINEAR:
-					Environment::getEnvironment().addTimer(this, MS_PER_FRAME, FRAMES+1);
+					Environment::getEnvironment().addTimer(
+						this, 
+						MS_PER_FRAME, 
+						FRAMES+1);
 					mYOffsetInc = ((mYOffsetTo - mYOffsetFrom)<<16)/FRAMES;
 					break;
 				case LBA_NONE:
@@ -517,12 +579,16 @@ namespace MAUI {
 		}
 
 		if(shouldFireListeners) {
+			// TODO: Remove commented out code if not needed.
 			/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, c, unselectedWidget);
 			}
 			*/
-			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, c, unselectedWidget));
+			ListenerSet_fire(
+				ItemSelectedListener, 
+				mItemSelectedListeners, 
+				itemSelected(this, c, unselectedWidget));
 		}
 
 		requestRepaint();
@@ -530,7 +596,10 @@ namespace MAUI {
 
 	void ListBox::selectNextItem(bool shouldFireListeners) {
 		Widget *c;
-		if(!getChildren().size()) return;
+		
+		if(!getChildren().size()) { 
+			return; 
+		}
 
 		int prevIndex = mSelectedIndex;
 
@@ -539,14 +608,19 @@ namespace MAUI {
 		} else {
 			if(!mWrapping) {
 				if(shouldFireListeners) {
+					// TODO: Remove commented out code if not needed.
 					/*
 					Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 						(*i)->blocked(this, 1);
 					}
 					*/
-					ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, blocked(this, 1));
+					ListenerSet_fire(
+						ItemSelectedListener, 
+						mItemSelectedListeners, 
+						blocked(this, 1));
 				}
-			} else {
+			} 
+			else {
 				setSelectedIndex(0);
 			}
 			return;
@@ -596,28 +670,45 @@ namespace MAUI {
 		}
 
 		if(shouldFireListeners) {
-		/*
+			// TODO: Remove commented out code if not needed.
+			/*
 			Vector_each(ItemSelectedListener*, i, mItemSelectedListeners) {
 				(*i)->itemSelected(this, c, unselectedWidget);
 			}
-		*/
-			ListenerSet_fire(ItemSelectedListener, mItemSelectedListeners, itemSelected(this, c, unselectedWidget));
+			*/
+			ListenerSet_fire(
+				ItemSelectedListener, 
+				mItemSelectedListeners, 
+				itemSelected(this, c, unselectedWidget));
 		}
 
 		requestRepaint();
 	}
 
+// TODO: This macro is not used, it seems! Remove it!
 #define ABS_IS_LESS(x, y) (fabs(x)<(y))
+
 	void ListBox::runTimerEvent()
 	{
+		// TODO: Remove commented out code if not needed.
 		//mYOffset += mYOffsetInc;
 		if(mTouched) {
-			double time = ((double)maGetMilliSecondCount()*0.001 - mTimeOfRelease);
-			if(time < 0) time = 0;
+		
+			double time = 
+				((double)maGetMilliSecondCount()*0.001 
+				- mTimeOfRelease);
+				
+			if(time < 0) {
+				time = 0;
+			}
+			
 		    double scalar = 1-(1/((1+time)*(1+time)));
-
-			double offsetX = (scalar*mTouchVelX*0.4);//mTouchVelX*(1.0-friction)+(touchVelX)*time;
-			double offsetY = (scalar*mTouchVelY*0.4); //mTouchVelY*(1.0-friction)+(touchVelY)*time;
+			
+			//mTouchVelX*(1.0-friction)+(touchVelX)*time;
+			double offsetX = (scalar*mTouchVelX*0.4);
+			
+			//mTouchVelY*(1.0-friction)+(touchVelY)*time;
+			double offsetY = (scalar*mTouchVelY*0.4); 
 
 			if(scalar>0.95) {
 				mTouched = false;
@@ -625,12 +716,20 @@ namespace MAUI {
 			}
 
 			if(mOrientation == LBO_HORIZONTAL) {
-				setScrollOffset((mTouchedYOffset + (int)(65536.0*(offsetX)))>>16);
-			} else {
-				setScrollOffset((mTouchedYOffset + (int)(65536.0*(offsetY)))>>16);
+				setScrollOffset(
+					(mTouchedYOffset + (int)(65536.0*(offsetX))) >> 16);
+			} 
+			else {
+				setScrollOffset(
+					(mTouchedYOffset + (int)(65536.0*(offsetY))) >> 16);
 			}
-		} else {
-			mYOffset = (mYOffsetFrom<<16) + (mYOffsetTo-mYOffsetFrom)*(((maGetMilliSecondCount()-mAnimTimeStart)<<16)/DURATION);
+		} 
+		else {
+			mYOffset = 
+				(mYOffsetFrom<<16) 
+				+ (mYOffsetTo-mYOffsetFrom)
+				* (((maGetMilliSecondCount()-mAnimTimeStart)<<16)/DURATION);
+			
 			if(mYOffsetInc<0 && mYOffset<=mYOffsetTo<<16) {
 				mYOffset = mYOffsetTo<<16;
 				Environment::getEnvironment().removeTimer(this);
@@ -641,13 +740,13 @@ namespace MAUI {
 			}
 		}
 
-
 		requestRepaint();
 	}
 
 	void ListBox::drawWidget() {
 	}
 
+	// TODO: Remove commented out code if not needed.
 	/*
 	void ListBox::setWidth(int w) {
 		Widget::setWidth(w);
@@ -695,16 +794,23 @@ namespace MAUI {
 
 		Widget* lastChild = mChildren[mChildren.size() - 1];
 		if(mOrientation==LBO_VERTICAL) {
-			int bound = (lastChild->getPosition().y + lastChild->getBounds().height)
-					- this->getBounds().height;
-			if(bound<0) bound = 0;
+			int bound = 
+				(lastChild->getPosition().y + lastChild->getBounds().height)
+				- this->getBounds().height;
+			if (bound<0) {
+				bound = 0;
+			}
 			if (ofs < -bound) {
 				ofs = -bound;
 			}
-		} else {
-			int bound = (lastChild->getPosition().x + lastChild->getBounds().width)
-					- this->getBounds().width;
-			if(bound<0) bound = 0;
+		} 
+		else {
+			int bound = 
+				(lastChild->getPosition().x + lastChild->getBounds().width)
+				- this->getBounds().width;
+			if (bound<0) { 
+				bound = 0; 
+			}
 			if (ofs < -bound) {
 				ofs = -bound;
 			}
@@ -715,19 +821,21 @@ namespace MAUI {
 	}
 
 	void ListBox::setFocusedWidget(Widget *w) {
-		if(mFocusedWidget)
+		if(mFocusedWidget) {
 			mFocusedWidget->setFocused(false);
+		}
 		mFocusedWidget = w;
-		if(mFocusedWidget)
+		if(mFocusedWidget) {
 			mFocusedWidget->setFocused(true);
-		
+		}
 		requestRepaint();
 	}
 
 	void ListBox::setFocused(bool focused) {
 		Widget::setFocused(focused);
-		if(focused==false)
+		if(focused==false) {
 			setFocusedWidget(NULL);
+		}
 	}
 
 	bool ListBox::keyPressed(int keyCode, int nativeCode) {
@@ -736,28 +844,37 @@ namespace MAUI {
 		//MAUI_LOG("ListBox key pressed!");
 
 		if(mFocusedWidget) {
+			// TODO: Remove commented out code if not needed.
 			//bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
 			//if(ret) return true;
 
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
-			if(!ip) return false;
+			if(!ip) {
+				return false;
+			}
 			if(!ip->keyPressed(keyCode, nativeCode)) {
+				// TODO: Remove commented out code if not needed.
 				//setFocusedWidget(NULL);
 				return false;
-			} else return true;
-
-		} else {
+			} 
+			else {
+				return true;
+			}
+		} 
+		else {
 			if(mChildren.size()>0) {
 				if(mChildren[mSelectedIndex]->isFocusable()) {
 					mChildren[mSelectedIndex]->setFocused(true);
 					return true;
 				}
-				return true;//return true;
-			} else {
+				return true;
+			} 
+			else {
 				return false;
 			}
 		}
 
+		// TODO: Remove commented out code if not needed.
 		/*
 		if(mOrientation == LBO_HORIZONTAL) {
 			if(keyCode == MAK_LEFT) {
@@ -792,6 +909,8 @@ namespace MAUI {
 		mTouchMotionTracker.reset();
 		mTouchMotionTracker.addPoint(p);
 		mTouched = false;
+		
+		// TODO: Remove commented out code if not needed.
 		/*
 		if(mOrientation == LBO_HORIZONTAL)
 			MAUI_LOG("Horizontal ListBoxPressed!");
@@ -815,8 +934,12 @@ namespace MAUI {
 					if(mFocused) {
 						setFocusedWidget(ret);
 					}
-					else { // if we apparently lost focus somewhere.. time to unset focus.
-						ret->setFocused(false); // it hasn't been set as focused yet (but it may have updated some internal state).
+					else { 
+						// We apparently lost focus somewhere, 
+						// unset focus here.
+						// We are not been set as focused yet (but 
+						// may have updated some internal state).
+						ret->setFocused(false); 
 						setFocusedWidget(NULL);
 						return true;
 					}
@@ -840,23 +963,36 @@ namespace MAUI {
 			if(!mFocusedWidget->pointerMoved(pp, id)) {
 				setFocusedWidget(NULL);
 			}
+			
 			return true;
 		}
 
 		if(id==0) {
+		
 			MAPoint2d s = mTouchMotionTracker.getStartPoint();
-			if(((mOrientation == LBO_HORIZONTAL) && (abs(p.y-s.y)>120)) || ((mOrientation == LBO_VERTICAL) && (abs(p.x-s.x)>120))) {
+			
+			if(((mOrientation == LBO_HORIZONTAL) && (abs(p.y-s.y)>120)) 
+				|| 
+				((mOrientation == LBO_VERTICAL) && (abs(p.x-s.x)>120))) {
 					return false;
 			}
 
 			int relX, relY;
+			
 			mTouchMotionTracker.addPoint(p, relX, relY);
-			if(relX==0 && relY == 0) return true;
-			if(mOrientation == LBO_VERTICAL)
+			
+			if(relX==0 && relY == 0) {
+				return true;
+			}
+			
+			if(mOrientation == LBO_VERTICAL) {
 				setScrollOffset((mYOffset>>16)+relY);
-			else
+			}
+			else {
 				setScrollOffset((mYOffset>>16)+relX);
+			}
 		}
+		
 		return true;
 	}
 
@@ -876,11 +1012,14 @@ namespace MAUI {
 			mTimeOfRelease = (double)maGetMilliSecondCount()*0.001;
 			mTouchedYOffset = mYOffset;
 			mTouchMotionTracker.addPoint(p);
-			mTouchMotionTracker.calculateVelocity(mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
+			mTouchMotionTracker.calculateVelocity(
+				mTouchDirX, mTouchDirY, mTouchVelX, mTouchVelY);
 		}
+		
 		return false;
 	}
 
+	// TODO: Remove commented out code if not needed.
 	/*
 	Widget* ListBox::widgetAt(int x, int y) {
 		int xx = (mOrientation==LBO_HORIZONTAL)?(x-(mYOffset>>16)):x;
@@ -900,7 +1039,7 @@ namespace MAUI {
 	}
 	*/
 
-
+	// TODO: Remove commented out code if not needed.
 	/*
 	Widget* ListBox::focusableWidgetAt(int x, int y) {
 		if(!isFocusable()) {
@@ -929,23 +1068,28 @@ namespace MAUI {
 	}
 
 	int ListBox::getTranslationX() const {
-		if(mOrientation == LBO_HORIZONTAL)
+		if(mOrientation == LBO_HORIZONTAL) {
 			return mYOffset>>16;
-		else
+		}
+		else {
 			return 0;
+		}
 	}
 
 	int ListBox::getTranslationY() const {
-		if(mOrientation == LBO_VERTICAL)
+		if(mOrientation == LBO_VERTICAL) {
 			return mYOffset>>16;
-		else
+		}
+		else {
 			return 0;
+		}
 	}
 
 	void ListBox::focusChanged(Widget *widget, bool focused) {
 		if(!mTouched && focused) {
 			for(int i = 0; i < mChildren.size(); i++) {
 				if(mChildren[i] == widget) {
+					// TODO: Remove commented out code if not needed.
 					//setSelectedIndex(i);
 					//mFocusedWidget = widget;
 					//setFocused(true);

@@ -15,14 +15,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Drawables.cpp
+* \brief Common types of Drawable.
+* \author Fredrik Eldh
+*/
+
 #include "Drawables.h"
 #include <MAUtil/Graphics.h>
 
-void MAUI::ImageDrawable::draw(int x, int y, int w, int h) {
-	Gfx_drawImage(mImage, x, y);
+void MAUI::ImageDrawable::draw(int left, int top, int width, int height) {
+	Gfx_drawImage(mImage, left, top);
 }
 
-void MAUI::ColorDrawable::draw(int x, int y, int w, int h) {
+void MAUI::ColorDrawable::draw(int left, int top, int width, int height) {
 	maSetColor(mColor);
-	Gfx_fillRect(x, y, w, h);
+	Gfx_fillRect(left, top, width, height);
 }

@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Label.cpp
+* \brief Text label widget with alignment control.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include <ma.h>
 #include "Label.h"
 #include "Font.h"
@@ -31,7 +37,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 namespace MAUI {
-	static void cutText(String& output, Font* font, const String& text, Rect bounds)
+
+	/**
+	 * TODO: Document function.
+	 * \param output TODO: Document param.
+	 * \param font TODO: Document param.
+	 * \param text TODO: Document param.
+	 * \param bounds TODO: Document param.
+	 */
+	static void cutText(
+		String& output, 
+		Font* font, 
+		const String& text, 
+		Rect bounds)
 	{
 		output.clear();
 		const Charset& cs = font->getCharset();
@@ -48,7 +66,8 @@ namespace MAUI {
 				memcpy(&output[0], text.c_str(), i-numDots);
 				output.append("...", numDots);
 				return;
-			} else {
+			} 
+			else {
 				i++;
 			}
 			x+=cd.xAdvance;
@@ -57,6 +76,7 @@ namespace MAUI {
 		output = text;
 	}
 
+	// TODO: Document why this is ifdefed away or delete.
 	#if 0
 	static int brightenColor(int c, int ammount) {
 		int retc;
@@ -77,6 +97,7 @@ namespace MAUI {
 
 	Label::Label(int x, int y, int width, int height, const String &caption) :
 		Widget(x, y, width, height),
+		// TODO: Document why this is commented out or delete.
 	//	mMustCalcStrSize(true),
 		mCaption(""),
 		mAutoSizeX(false),
@@ -85,6 +106,7 @@ namespace MAUI {
 		mHorizontalAlignment(HA_LEFT),
 		mVerticalAlignment(VA_TOP)
 	{
+		// TODO: Document why this is commented out or delete.
 		/*if(!font)
 		{
 			this->mFont = Engine::getSingleton().getDefaultFont();
@@ -93,6 +115,7 @@ namespace MAUI {
 		} */
 
 		setCaption(caption);
+		// TODO: Document why this is commented out or delete.
 		//this->setBackgroundColor(backColor);
 		//calcStrSize();
 	}
@@ -101,27 +124,36 @@ namespace MAUI {
 		Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 		if(!mFont) {
 			mStrSize = EXTENT(0,0);
-		} else {
-			if(mAutoSizeX)
+		} 
+		else {
+			if(mAutoSizeX) {
 				mStrSize = mFont->getStringDimensions(mCaption.c_str());
+			}
 			else {
 				if(mMultiLine) {
-					mStrSize = mFont->getBoundedStringDimensions(mCaption.c_str(), tempRect);
-				} else {
+					mStrSize = mFont->getBoundedStringDimensions(
+						mCaption.c_str(), tempRect);
+				} 
+				else {
 					cutText(mCuttedCaption, mFont, mCaption, tempRect);
-					mStrSize = mFont->getStringDimensions(mCuttedCaption.c_str());
+					mStrSize = mFont->getStringDimensions(
+						mCuttedCaption.c_str());
 				}
 			}
-
 		}
 		mStrWidth  = EXTENT_X(mStrSize);
 		mStrHeight = EXTENT_Y(mStrSize);
 
-		if(mAutoSizeX) resize(mStrWidth + mPaddingLeft + mPaddingRight, mBounds.height);
-		if(mAutoSizeY) resize(mBounds.width,  mStrHeight + mPaddingTop + mPaddingBottom);
+		if(mAutoSizeX) {
+			resize(mStrWidth + mPaddingLeft + mPaddingRight, mBounds.height);
+		}
+		if(mAutoSizeY) {
+			resize(mBounds.width,  mStrHeight + mPaddingTop + mPaddingBottom);
+		}
 	}
 
 	void Label::setMultiLine(bool b) {
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 		mMultiLine = b;
@@ -131,6 +163,7 @@ namespace MAUI {
 		return mMultiLine;
 	}
 
+	// TODO: Document why this is commented out or delete.
 	/*
 	void Label::setPaddingLeft(int l) {
 		Widget::setPaddingLeft(l);
@@ -162,6 +195,7 @@ namespace MAUI {
 		Widget::setHeight(height);
 	}
 
+	// TODO: Document why this is commented out or delete.
 	/*
 	void Label::setWidth(int width) {
 		Widget::setWidth(width);
@@ -175,20 +209,33 @@ namespace MAUI {
 	*/
 
 	void Label::getTextStart(int *x, int *y) {
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		if(!mAutoSizeX) {
 			switch(mHorizontalAlignment) {
-				case HA_LEFT: *x =   0; break;
-				case HA_CENTER: *x = (mPaddedBounds.width)/2 - (mStrWidth/2); break;
-				case HA_RIGHT: *x =  (mPaddedBounds.width) - (mStrWidth); break;
+				case HA_LEFT: 
+					*x = 0; 
+					break;
+				case HA_CENTER: 
+					*x = (mPaddedBounds.width)/2 - (mStrWidth/2);
+					break;
+				case HA_RIGHT: 
+					*x = (mPaddedBounds.width) - (mStrWidth); 
+					break;
 			}
 		}
 
 		if(!mAutoSizeY) {
 			switch(mVerticalAlignment) {
-				case VA_TOP: *y = 0; break;
-				case VA_CENTER: *y = (mPaddedBounds.height)/2 - (mStrHeight/2); break;
-				case VA_BOTTOM: *y = (mPaddedBounds.height) - (mStrHeight); break;
+				case VA_TOP: 
+					*y = 0; 
+					break;
+				case VA_CENTER: 
+					*y = (mPaddedBounds.height)/2 - (mStrHeight/2); 
+					break;
+				case VA_BOTTOM: 
+					*y = (mPaddedBounds.height) - (mStrHeight); 
+					break;
 			}
 		}
 	}
@@ -202,16 +249,17 @@ namespace MAUI {
 		int textX=0, textY=0;
 		getTextStart(&textX, &textY);
 		if(mFont) {
-
 			if(mMultiLine) {
 				Rect tempRect = Rect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 				mFont->drawBoundedString(wStr, textX, textY, tempRect);
-			} else {
-
-				if(mAutoSizeX)
+			} 
+			else {
+				if(mAutoSizeX) {
 					mFont->drawString(wStr, textX, textY);
-				else
+				}
+				else {
 					mFont->drawString(mCuttedCaption.c_str(), textX, textY);
+				}
 			}
 		}
 		else {
@@ -222,6 +270,7 @@ namespace MAUI {
 	void Label::setHorizontalAlignment(Label::HorizontalAlignment alignment) {
 		this->mHorizontalAlignment = alignment;
 		requestRepaint();
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 	}
@@ -233,6 +282,7 @@ namespace MAUI {
 	void Label::setVerticalAlignment(Label::VerticalAlignment alignment) {
 		this->mVerticalAlignment = alignment;
 		requestRepaint();
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 	}
@@ -243,6 +293,7 @@ namespace MAUI {
 
 	void Label::setAutoSizeX(bool f) {
 		this->mAutoSizeX = f;
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 		requestRepaint();
@@ -250,6 +301,7 @@ namespace MAUI {
 
 	void Label::setAutoSizeY(bool f) {
 		this->mAutoSizeY = f;
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 		requestRepaint();
@@ -266,6 +318,7 @@ namespace MAUI {
 	void Label::setCaption(const String& mCaption) {
 		this->mCaption = mCaption;
 		requestRepaint();
+		// TODO: Document why this is commented out or delete.
 		//calcStrSize();
 		requestUpdate();
 	}
@@ -295,15 +348,20 @@ namespace MAUI {
 	}
 
 	LabelStyle::LabelStyle(
-			FontProperty* font,
-			int paddingLeft,
-			int paddingRight,
-			int paddingTop,
-			int paddingBottom,
-			DrawableProperty* backgroundSkinFocused,
-			DrawableProperty* backgroundSkinUnfocused
-	) : Style(paddingLeft, paddingRight, paddingTop, paddingBottom,
-			backgroundSkinFocused, backgroundSkinUnfocused)
+		FontProperty* font,
+		int paddingLeft,
+		int paddingRight,
+		int paddingTop,
+		int paddingBottom,
+		DrawableProperty* backgroundSkinFocused,
+		DrawableProperty* backgroundSkinUnfocused) : 
+			Style(
+				paddingLeft, 
+				paddingRight, 
+				paddingTop, 
+				paddingBottom,
+				backgroundSkinFocused, 
+				backgroundSkinUnfocused)
 	{
 		this->mProperties["font"] = font;
 	}

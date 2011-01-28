@@ -15,6 +15,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file InputPolicy.h
+* \brief Handling of input policies.
+* TODO: Document what an input policy is.
+* \author Niklas Nummelin
+*/
+
 #ifndef _INPUT_POLICY_H_
 #define _INPUT_POLICY_H_
 
@@ -23,6 +30,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUI {
 	class Widget;
 
+	/** 
+	 * Direction constants.
+	 * TODO: DOcument how NONE is used?
+	 */
 	enum Direction {
 			LEFT,
 			RIGHT,
@@ -31,41 +42,165 @@ namespace MAUI {
 			NONE
 	};
 
+	/**
+	 * Map a keycode to a direction constant.
+	 * \param keyCode The keycode.
+	 * \return The direction for the keyCode.
+	 */
 	Direction mapKeyCodeToDirection(int keyCode);
 
+	/**
+	 * Class that defines an input policy.
+	 * TODO: Describe to the reader of this code what
+	 * an input policy is.
+	 */
 	class InputPolicy {
 	public:
+		/**
+		 * Constructor.
+		 * \param owner TODO: Document param.
+		 */
 		InputPolicy(Widget* owner);
-		void setOwner(Widget *widget);
+		
+		/**
+		 * Set the owner of this input policy.
+		 * TODO: Document what an owner is.
+		 * \param owner TODO: Document param.
+		 */
+		void setOwner(Widget *owner);
+		
+		/**
+		 * Get the owner of this input policy.
+		 * TODO: Document what an owner is.
+		 * \return TODO: Document return value.
+		 */
 		Widget* getOwner();
 
-	// returns false if focus should be changed.
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when a key is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param keyCode The key code for the key.
+		 * \param nativeCode The nativekey code for the key.
+		 * \return true to keep focus, false if focus should be lost.
+		 */
 		virtual bool keyPressed(int keyCode, int nativeCode);
+		
+		/**
+		 * Called when a key is released. Override in the subclass
+		 * that defines the input policy.
+		 * \param keyCode The key code for the key.
+		 * \param nativeCode The nativekey code for the key.
+		 * \return TODO: Document return value.
+		 */
 		virtual bool keyReleased(int keyCode, int nativeCode);
 
-	// returns false if focus should be lost, true otherwise.
-		virtual bool pointerPressed(MAPoint2d p, int id);
-		virtual bool pointerMoved(MAPoint2d p, int id);
-		virtual bool pointerReleased(MAPoint2d p, int id);
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
+		virtual bool pointerPressed(MAPoint2d point, int id);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
+		virtual bool pointerMoved(MAPoint2d point, int id);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
+		virtual bool pointerReleased(MAPoint2d point, int id);
 
 	protected:
+		/**
+		 * The owner of the widget.
+		 */
 		Widget *mOwner;
 	};
 
-
+	/**
+	 * Class that defined the default input policy.
+	 * Delegate events to the owner widget.
+	 */
 	class DefaultInputPolicy : public InputPolicy {
 	public:
+		/**
+		 * Constructor.
+		 * \param owner TODO: Document param.
+		 */
 		DefaultInputPolicy(Widget* owner);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when a key is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param keyCode The key code for the key.
+		 * \param nativeCode The nativekey code for the key.
+		 * \return true to keep focus, false if focus should be lost.
+		 */
 		virtual bool keyPressed(int keyCode, int nativeCode);
+		
+		/**
+		 * Called when a key is released. Override in the subclass
+		 * that defines the input policy.
+		 * \param keyCode The key code for the key.
+		 * \param nativeCode The nativekey code for the key.
+		 * \return TODO: Document return value.
+		 */
 		virtual bool keyReleased(int keyCode, int nativeCode);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
 		virtual bool pointerPressed(MAPoint2d p, int id);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
 		virtual bool pointerMoved(MAPoint2d p, int id);
+		
+		/**
+		 * TODO: Document the return value, current comment might be wrong.
+		 *
+		 * Called when the pointer is pressed. Override in the subclass
+		 * that defines the input policy.
+		 * \param point The pointer position.
+		 * \param id TODO: Document param.
+		 * \return true to keep focus, false if focus should be changed.
+		 */
 		virtual bool pointerReleased(MAPoint2d p, int id);
-
-	protected:
 	};
-
-
 }
 
 #endif // _INPUT_POLICY_H_

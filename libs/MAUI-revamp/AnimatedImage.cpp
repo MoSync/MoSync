@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -23,13 +23,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Graphics.h>
 
-namespace MAUI {
-
-	bool AnimatedImage::isTransparent() const {
+namespace MAUI
+{
+	bool AnimatedImage::isTransparent() const
+	{
 		return true;
 	}
 
-	AnimatedImage::AnimatedImage(int x, int y, int width, int height, MAHandle res) 
+	AnimatedImage::AnimatedImage(	int x, int y, int width,
+									int height, MAHandle res) 
 		: Widget(x, y, width, height),
 		mLoop(true),
 		mCurrentFrame(0),
@@ -46,46 +48,53 @@ namespace MAUI {
 		start();
 	}
 
-	void AnimatedImage::drawWidget() {
-		if(mResource) {
-			// void maDrawImageRegion(MAHandle image, const MARect* srcRect, const MAPoint2d* dstPoint, int transformMode);
+	void AnimatedImage::drawWidget()
+	{
+		if(mResource)
+		{
 			MARect srcRect;
 			srcRect.left  = (mCurrentFrame*mFrameWidth)%(EXTENT_X(mResSize));
 			srcRect.width = mFrameWidth;
-			srcRect.top   = ((mCurrentFrame*mFrameWidth)/(EXTENT_X(mResSize)))*mFrameHeight;
+			srcRect.top   = ((mCurrentFrame*mFrameWidth)/(EXTENT_X(mResSize)))
+							*mFrameHeight;
 			srcRect.height = mFrameHeight;
+			
 			//MAPoint2d destPoint = {mPaddedBounds.x, mPaddedBounds.y};
 			MAPoint2d destPoint = {0, 0};
 
-			//maDrawImageRegion(resource, &srcRect, &destPoint, TRANS_NONE);
 			Gfx_drawImageRegion(mResource, &srcRect, &destPoint, TRANS_NONE);
 		}
 	}
 
-	void AnimatedImage::setResource(MAHandle res) {
+	void AnimatedImage::setResource(MAHandle res)
+	{
 		mResource = res;
 		if(res == 0) return;
 		mResSize = maGetImageSize(res);
 		requestRepaint();		
 	}
 
-	MAHandle AnimatedImage::getResource() const {
+	MAHandle AnimatedImage::getResource() const
+	{
 		return mResource;
 	}
 
-	void AnimatedImage::start() {
-		//MAUtil::Environment::getEnvironment().addIdleListener(this);
+	void AnimatedImage::start()
+	{
 		MAUtil::Environment::getEnvironment().addTimer(this, mMsPf, -1);	
 	}
 
-	void AnimatedImage::stop() {
+	void AnimatedImage::stop()
+	{
 		MAUtil::Environment::getEnvironment().removeTimer(this);
 	}
 	
-	void AnimatedImage::stepForward() {
+	void AnimatedImage::stepForward()
+	{
 		//printf("stepping fwd (%d)!!!\n", currentFrame);
 		mCurrentFrame++;
-		if(mLoop) {
+		if(mLoop)
+		{
 			if(mNumFrames)
 				mCurrentFrame %= mNumFrames;
 			else
@@ -97,7 +106,8 @@ namespace MAUI {
 		requestRepaint();
 	}
 
-	void AnimatedImage::stepBack() {
+	void AnimatedImage::stepBack()
+	{
 		//printf("stepping back!!!\n");
 		mCurrentFrame--;
 		if(mCurrentFrame < 0)
@@ -115,21 +125,25 @@ namespace MAUI {
 		requestRepaint();			
 	}
 
-	void AnimatedImage::setFrameWidth(int width) {
+	void AnimatedImage::setFrameWidth(int width)
+	{
 		mFrameWidth = width;
 		setWidth(width);
 	}
 	
-	void AnimatedImage::setFrameHeight(int height) {
+	void AnimatedImage::setFrameHeight(int height)
+	{
 		mFrameHeight = height;
 		setHeight(height);
 	}
 
-	void AnimatedImage::setNumFrames(int numFrames) {
+	void AnimatedImage::setNumFrames(int numFrames)
+	{
 		mNumFrames = numFrames;
 	}
 
-	void AnimatedImage::setFps(int fps) {
+	void AnimatedImage::setFps(int fps)
+	{
 		if(fps) 
 			mMsPf = 1000/fps;
 		else
@@ -138,15 +152,18 @@ namespace MAUI {
 		start();
 	}
 	
-	void AnimatedImage::setFrame(int frame) {
+	void AnimatedImage::setFrame(int frame)
+	{
 		mCurrentFrame = frame;
 	}
 
-	void AnimatedImage::setDirection(int dir) {
+	void AnimatedImage::setDirection(int dir)
+	{
 		mDirection = dir;
 	}
 
-	void AnimatedImage::runTimerEvent() {
+	void AnimatedImage::runTimerEvent()
+	{
 		stepForward();
 	}
 

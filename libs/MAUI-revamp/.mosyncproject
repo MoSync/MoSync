@@ -29,6 +29,7 @@
 <property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Release" value="test.cpp"/>
 <property key="outputPath" value="%MOSYNCDIR%\lib\pipe\MAUI.lib"/>
 <property key="screenHeight" value="320"/>
 <property key="screenWidth" value="240"/>

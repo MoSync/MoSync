@@ -16,10 +16,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /**
-* \file WidgetSkin.h
-* \brief Class for defining the visual appearance of a widget
-* \author Patrick Broman and Niklas Nummelin
-*/
+ * \file NativeEditBox.h
+ * \brief Class that wraps maTextBox.
+ * \author Patrick Broman and Niklas Nummelin
+ */
 
 #ifndef _SE_MSAB_MAUI_NATIVE_EDIT_BOX_H_
 #define _SE_MSAB_MAUI_NATIVE_EDIT_BOX_H_
@@ -32,49 +32,165 @@ namespace MAUI {
 
 class NativeEditBox;
 
+/**
+ * \brief Listener for a native edit box.
+ */
 class NativeEditBoxListener {
 public:
-	/// Called when the user has pressed the OK button on the native edit box, closing it.
-	virtual void nativeEditFinished(NativeEditBox* editBox, const String& text) = 0;
+	/**
+	 * Called when the user has pressed the OK button on 
+	 * the native edit box, closing it.
+	 * TODO: We should also detect cancel. Add a third arg for this?
+	 * \param editBox The editbox that was closed.
+	 * \param text The text entered by the user.
+	 */
+	virtual void nativeEditFinished(
+		NativeEditBox* editBox, 
+		const String& text) = 0;
 };
 
+/**
+ * \brief Widget that displays text and opens a native edit box
+ * to edit the text.
+ * TODO: Consider renaming this class to NativeTextBox, since the
+ * syscall it wraps is called maTextBox.
+ */
 class NativeEditBox : public Label, public TextBoxListener {
 public:
-	NativeEditBox(int x=0, int y=0, int width=0, int height=0,
-		int maxSize=128, int options=MA_TB_TYPE_ANY,
+	/**
+	 * Constructor.
+	 * \param x The left coordinate of the widget.
+	 * \param y The top coordinate of the widget.
+	 * \param width The width of the widget.
+	 * \param height The height of the widget.
+	 * \param maxSize Max number of characters in the widget.
+	 * \param options Textbox options.
+	 * \param initialText The text to be initially displayed.
+	 * \param titleString The title of the textbox.
+	 * TODO: Verify that param maxSize is correctly documented.
+	 * TODO: Why is titleString a wide string but not initialText?
+	 */
+	NativeEditBox(
+		int x=0, 
+		int y=0, 
+		int width=0, 
+		int height=0,
+		int maxSize=128, 
+		int options=MA_TB_TYPE_ANY,
 		const MAUtil::String& initialText="",
 		const MAUtil::WString& titleString=L"");
 
+	/**
+	 * Destructor.
+	 */
 	~NativeEditBox();
 
+	/**
+	 * Set the textbox options. 
+	 * \param options MA_TB_* constants defined in maapi.h.
+	 */
 	void setOptions(int options);
+	
+	/**
+	 * TODO: Is this comment corrent?
+	 * Set the max number of characters in the textbox.
+	 * \param size The max number of characters.
+	 */
 	void setMaxSize(int size);
 
-	void setTitleString(const MAUtil::WString& mTitleString);
+	/**
+	 * Set the title of the textbox.
+	 * \param titleString The title string.
+	 */
+	void setTitleString(const MAUtil::WString& titleString);
+	
+	/**
+	 * \return The title string of the textbox.
+	 */
 	const MAUtil::WString& getTitleString() const;
 
+	/**
+	 * TODO: Document or refer to superclass comment.
+	 */
 	bool pointerPressed(MAPoint2d p, int id);
+	
+	/**
+	 * TODO: Document or refer to superclass comment.
+	 */
 	bool pointerMoved(MAPoint2d p, int id);
+	
+	/**
+	 * TODO: Document or refer to superclass comment.
+	 */
 	bool pointerReleased(MAPoint2d p, int id);
 
-	// if caption is larger than mMaxSize mMaxSize will be changed to the length of the caption.
+	/**
+	 * TODO: What is the caption? The content of the label?
+	 * \param caption If the caption is larger than mMaxSize,
+	 * mMaxSize will be changed to the length of the caption.
+	 */
 	virtual void setCaption(const String& caption);
 
+	/**
+	 * TODO: Document or refer to superclass comment.
+	 */
 	void activate();
 
-	void addNativeEditBoxListener(NativeEditBoxListener* el);
-	void removeNativeEditBoxListener(NativeEditBoxListener* el);
+	/**
+	 * Add a listener for the edit box.
+	 */
+	void addNativeEditBoxListener(NativeEditBoxListener* listener);
+	
+	/**
+	 * Remove a listener for the edit box.
+	 */
+	void removeNativeEditBoxListener(NativeEditBoxListener* listener);
 	
 protected:
+	/**
+	 * TODO: Is this comment correct?
+	 * Called when the native textbox is closed.
+	 * \param res ?
+	 * \param length ?
+	 */
 	void textBoxClosed(int res, int length);
 
+	/**
+	 * The title of the native textbox.
+	 */
 	MAUtil::WString mTitleString;
+	
+	/**
+	 * TODO: Is this comment correct?
+	 * Content of the textbox/label.
+	 */
 	wchar_t* mString;
+	
+	/**
+	 * TODO: Is this comment correct?
+	 * Max number of characters in the textbox.
+	 */
 	int mMaxSize;
+	
+	/**
+	 * TODO: Is this comment correct?
+	 * Options for maTextBox.
+	 */
 	int mOptions;
 
-	int mStartX, mStartY;
+	/**
+	 * TODO: Document this variable.
+	 */
+	int mStartX;
+	
+	/**
+	 * TODO: Document this variable.
+	 */
+	int mStartY;
 
+	/**
+	 * Listeners.
+	 */
 	ListenerSet<NativeEditBoxListener> mEditBoxListeners;
 	
 };
