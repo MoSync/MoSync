@@ -79,12 +79,13 @@ struct	stat
 
 #define	S_ISUID		0004000	/* set user id on execution */
 #define	S_ISGID		0002000	/* set group id on execution */
-#ifndef	_POSIX_SOURCE
 #define	S_ISVTX		0001000	/* save swapped text even after use */
+#ifndef	_POSIX_SOURCE
 #define	S_IREAD		0000400	/* read permission, owner */
 #define	S_IWRITE 	0000200	/* write permission, owner */
 #define	S_IEXEC		0000100	/* execute/search permission, owner */
 #define	S_ENFMT 	0002000	/* enforcement-mode locking */
+#endif	/* !_POSIX_SOURCE */
 
 #define	S_IFMT		_IFMT
 #define	S_IFDIR		_IFDIR
@@ -94,7 +95,6 @@ struct	stat
 #define	S_IFLNK		_IFLNK
 #define	S_IFSOCK	_IFSOCK
 #define	S_IFIFO		_IFIFO
-#endif	/* !_POSIX_SOURCE */
 
 #ifdef _WIN32
 /* The Windows header files define _S_ forms of these, so we do too
@@ -121,6 +121,12 @@ struct	stat
 #define		S_IROTH	0000004	/* read permission, other */
 #define		S_IWOTH	0000002	/* write permission, other */
 #define		S_IXOTH 0000001/* execute/search permission, other */
+
+#ifndef _POSIX_SOURCE
+#define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO) /* 0777 */
+#define ALLPERMS (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO) /* 07777 */
+#define DEFFILEMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) /* 0666 */
+#endif
 
 #define	S_ISBLK(m)	(((m)&_IFMT) == _IFBLK)
 #define	S_ISCHR(m)	(((m)&_IFMT) == _IFCHR)

@@ -10,6 +10,7 @@
 int (*__mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		 const char *, mbstate_t *)
 #if defined(__CYGWIN__) || defined(MAPIP)
+   /* Cygwin starts up in UTF-8 mode. */
    = __utf8_mbtowc;
 #else
    = __ascii_mbtowc;
@@ -46,6 +47,14 @@ _DEFUN (__ascii_mbtowc, (r, pwc, s, n, charset, state),
 
   if (n == 0)
     return -2;
+
+#ifdef __CYGWIN__
+  if ((wchar_t)*t >= 0x80)
+    {
+      r->_errno = EILSEQ;
+      return -1;
+    }
+#endif
 
   *pwc = (wchar_t)*t;
   

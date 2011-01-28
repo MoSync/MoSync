@@ -38,6 +38,9 @@ extern const char * __fix_locale_grouping_str(const char *);
 
 static char	empty[] = "";
 static char	numempty[] = { CHAR_MAX, '\0'};
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+static wchar_t	wempty[] = L"";
+#endif
 
 static const struct lc_monetary_T _C_monetary_locale = {
 	empty,		/* int_curr_symbol */
@@ -55,6 +58,21 @@ static const struct lc_monetary_T _C_monetary_locale = {
 	numempty,	/* n_sep_by_space */
 	numempty,	/* p_sign_posn */
 	numempty	/* n_sign_posn */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	, numempty,	/* int_p_cs_precedes */
+	numempty,	/* int_p_sep_by_space */
+	numempty,	/* int_n_cs_precedes */
+	numempty,	/* int_n_sep_by_space */
+	numempty,	/* int_p_sign_posn */
+	numempty,	/* int_n_sign_posn */
+	"ASCII",	/* codeset */
+	wempty,		/* wint_curr_symbol */
+	wempty,		/* wcurrency_symbol */
+	wempty,		/* wmon_decimal_point */
+	wempty,		/* wmon_thousands_sep */
+	wempty,		/* wpositive_sign */
+	wempty		/* wnegative_sign */
+#endif
 };
 
 static struct lc_monetary_T _monetary_locale;
@@ -70,9 +88,31 @@ cnv(const char *str) {
 }
 
 int
-__monetary_load_locale(const char *name) {
-
+__monetary_load_locale(const char *name , void *f_wctomb, const char *charset)
+{
 	int ret;
+
+#ifdef __CYGWIN__
+	extern int __set_lc_monetary_from_win (const char *,
+					       const struct lc_monetary_T *,
+					       struct lc_monetary_T *, char **,
+					       void *, const char *);
+	int old_monetary_using_locale = _monetary_using_locale;
+	_monetary_using_locale = 0;
+	ret = __set_lc_monetary_from_win (name, &_C_monetary_locale,
+					  &_monetary_locale,
+					  &_monetary_locale_buf,
+					  f_wctomb, charset);
+	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+	if (ret < 0)
+	  _monetary_using_locale = old_monetary_using_locale;
+	else
+	  {
+	    _monetary_using_locale = ret;
+	    __mlocale_changed = 1;
+	    ret = 0;
+	  }
+#else
 	__mlocale_changed = 1;
 	ret = __part_load_locale(name, &_monetary_using_locale,
 		_monetary_locale_buf, "LC_MONETARY",
@@ -94,6 +134,7 @@ __monetary_load_locale(const char *name) {
 		M_ASSIGN_CHAR(p_sign_posn);
 		M_ASSIGN_CHAR(n_sign_posn);
 	}
+#endif
 	return ret;
 }
 
