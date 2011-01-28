@@ -161,12 +161,12 @@ cd %ORIGINAL_PATH%
 @echo ------------------------------------------------
 @copy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
-@echo ------------------------------------------------
-@echo Running OpenGL Wrapper generator.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator
-call build.bat
-@echo.
+REM @echo ------------------------------------------------
+REM @echo Running OpenGL Wrapper generator.
+REM @echo ------------------------------------------------
+REM @cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator
+REM call build.bat
+REM @echo.
 
 @echo ------------------------------------------------
 @echo Building filelist.

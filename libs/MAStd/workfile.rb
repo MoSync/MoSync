@@ -76,6 +76,7 @@ mod.class_eval do
 		
 		copyGlHeaders()
 		
+		@HEADER_DIRS = ["."]
 		@INSTALL_INCDIR = "."
 		@IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
 		@NAME = "mastd"
