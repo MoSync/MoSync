@@ -50,6 +50,7 @@ void crt_tor_chain(int* ptr) {
 
 
 void _exit(int status) {
+	LOGD("exit(%i)\n", status);
 	fcloseall();
 	maExit(status);
 }
@@ -169,7 +170,7 @@ static struct LOW_FD* getLowFd(int __fd) {
 }
 #define LOWFD int lfd; struct LOW_FD* plfd; \
 	/*LOGD("LOWFD(%i) in %s", __fd, __FUNCTION__);*/ \
-	plfd = getLowFd(__fd); if(plfd == NULL) STDFAIL; lfd = plfd->lowFd;
+	plfd = getLowFd(__fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", __fd); STDFAIL; } lfd = plfd->lowFd;
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -258,6 +259,7 @@ static int baseStat(MAHandle h, struct stat* st, int checkSize) {
 
 int fstat(int __fd, struct stat *st) {
 	LOWFD;
+	LOGD("fstat(%i)\n", __fd);
 	if(lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG) {
 		st->st_mode = S_IFCHR;
 		return 0;
@@ -326,6 +328,7 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 	MAHandle file;
 	int res;
 	LOWFD;
+	LOGD("lseek(%i, %li, %i)\n", __fd, __offset, __whence);
 	file = lfd - LOWFD_OFFSET;
 	switch(__whence) {
 		case SEEK_SET: __whence = MA_SEEK_SET; break;
@@ -348,6 +351,7 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 	MAHandle file;
 	LOWFD;
 	file = lfd - LOWFD_OFFSET;
+	LOGD("read(%i, %zu)\n", __fd, __nbyte);
 
 	CHECK(fileSize = maFileSize(file), EIO);
 	CHECK(fileTell = maFileTell(file), EIO);
@@ -373,6 +377,7 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 		res = maWriteLog(__buf, __nbyte);
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
+		LOGD("write(%i, %zu)\n", __fd, __nbyte);
 		if(plfd->flags & O_APPEND) {
 			int oldPos = maFileTell(h);
 			int fileSize = maFileSize(h);
@@ -442,7 +447,7 @@ int open(const char * __filename, int __mode, ...) {
 		errno = ENOENT;
 		STDFAIL;
 	}
-	LOGD("open(%s)", temp);
+	LOGD("open(%s, 0x%x)", temp, __mode);
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
