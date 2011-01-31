@@ -30,6 +30,7 @@ namespace MAUI {
 /**
  * Local helper function that normalises a vector.
  */
+ /*
 static void normalize(double &x, double &y) {
 	double len = sqrt(x*x+y*y);
 	if(len<0.000000001)len=0.000000001;
@@ -37,6 +38,7 @@ static void normalize(double &x, double &y) {
 	x*=len_recip;
 	y*=len_recip;
 }
+*/
 
 TouchMotionTracker::TouchMotionTracker() :
 	mStarted(false), 
