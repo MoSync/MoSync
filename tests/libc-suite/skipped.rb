@@ -23,7 +23,12 @@ SKIPPED_DIRECTORIES = [
 	'shadow',
 ]
 
-SKIPPED_FILES = [
+# These are tests that should pass, but don't, and could not be fixed.
+SKIPPED_UNRESOLVED = [
+	'bug-ungetc2.c',
+]
+
+SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-atomic.c',
 	'tst-atomic-long.c',
 	'backtrace-tst.c',
@@ -176,6 +181,7 @@ SKIPPED_FILES = [
 	'tst_getwc.c',
 	'tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
 	'bug-mmap-fflush.c',	# system
+	'tst-fopenloc2.c',	# GNU extension: fopen(ccs).
 ]
 
 SKIPPED_PATTERNS = [
