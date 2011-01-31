@@ -332,6 +332,7 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 			// Must be done asynchronously, before we start printing anything.
 			// Callers of this function will have to be responsible, I think.
 			//oprintf("%s", getValue(sl->dataType, &gMemBuf[sl->address], TypeBase::eNatural).c_str());
+			oprintf("TODO: StaticLocal");
 		} else {
 			DEBIG_PHAT_ERROR;
 		}

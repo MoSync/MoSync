@@ -1,0 +1,9 @@
+-target-select sim
+-exec-run
+-test-wait
+-stack-select-frame 3
+-var-create var14 * "c"
+-var-list-children 2 "var14"
+-var-list-children 2 "var14.public"
+-var-list-children 2 "var14.public.storage"
+-var-list-children 2 "var14.public.pbuf"

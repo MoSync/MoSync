@@ -244,15 +244,16 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 
 		sVariableMap[var.name] = &var;
 
+		const char* childAddress = invalidMemory ? NULL : dataAdress+i*deref->size();
 		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
+			var.addArray(childAddress, (ArrayType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::eStruct) {
-			var.addStruct(NULL, (StructType*)deref, false, invalidMemory);
+			var.addStruct(childAddress, (StructType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
+			var.addPointer(childAddress, (PointerType*)deref, false, invalidMemory);
 		} else {
 			value = "";
-			if(!invalidMemory && dataAdress) value = getValue(deref, dataAdress+i*deref->size(), var.printFormat);
+			if(!invalidMemory && dataAdress) value = getValue(deref, childAddress, var.printFormat);
 			var.exp->updateData(
 				value, 
 				getType(deref, false), 
@@ -296,6 +297,11 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 	}
 	mHasCreatedChildren = true;
 
+	const char* childAddress = NULL;
+	if(!invalidMemory) {
+		int addr = *((int*)dataAdress);
+		childAddress = &gMemBuf[addr];
+	}
 	if(deref->type() != TypeBase::eStruct) {
 		StringPrintFunctor spf;
 		spf("*(%s)", localName.c_str());
@@ -320,14 +326,13 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 			spf.reset();
 		}
 		if(deref->type() == TypeBase::eArray) {
-			var.addArray(NULL, (ArrayType*)deref, false);
+			var.addArray(childAddress, (ArrayType*)deref, false, invalidMemory);
 		} else if(deref->type() == TypeBase::ePointer) {
-			var.addPointer(NULL, (PointerType*)deref, false);
+			var.addPointer(childAddress, (PointerType*)deref, false, invalidMemory);
 		} else {
 			value = "";
 			if(!invalidMemory) {
-				int addr = *((int*)dataAdress);
-				value = getValue(pointerType, &gMemBuf[addr], printFormat);
+				value = getValue(pointerType, childAddress, printFormat);
 			}
 			var.exp->updateData(
 				value, 
@@ -336,15 +341,12 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 		}
 		sVariableMap[var.name] = &var;
 	}  else {
-
 		if(invalidMemory) {
 			addStruct(NULL, (StructType*)deref, true, true, invalidMemory);
 		} else {
-			int addr = *((int*)dataAdress);
-			addStruct(&gMemBuf[addr], (StructType*)deref, true, true, invalidMemory);
+			addStruct(childAddress, (StructType*)deref, true, true, invalidMemory);
 		}
 	}
-
 }
 
 static bool isVTablePointer(const TypeBase* deref) {
@@ -461,17 +463,18 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		sVariableMap[var.name] = &var;
 
 		if(shouldCreateChildren) {
+			const char* childAddress = invalidMemory ? NULL : dataAdress+(dataMembers[i].offsetBits>>3);
 			if(deref->type() == TypeBase::eArray) {
-				var.addArray(NULL, (ArrayType*)deref, false, invalidMemory);
+				var.addArray(childAddress, (ArrayType*)deref, false, invalidMemory);
 			} else if(deref->type() == TypeBase::eStruct) {
-				var.addStruct(NULL, (StructType*)deref, false, false, invalidMemory);
+				var.addStruct(childAddress, (StructType*)deref, false, false, invalidMemory);
 			} else if(deref->type() == TypeBase::ePointer) {
-				var.addPointer(NULL, (PointerType*)deref, false, invalidMemory);
+				var.addPointer(childAddress, (PointerType*)deref, false, invalidMemory);
 			} else {
 				value = "";
-				if(dataAdress && !invalidMemory) value = getValue(deref, dataAdress+(dataMembers[i].offsetBits>>3), var.printFormat);
+				if(dataAdress && !invalidMemory) value = getValue(deref, childAddress, var.printFormat);
 				var.exp->updateData(
-					value, 
+					value,
 					getType(deref, false), 
 					deref->isSimpleValue());
 			}
@@ -575,19 +578,29 @@ ExpUpdateResult Expression::update(ExpressionCallback ecb) {
 				case SYM::Scope::eGlobal:
 					// do nothing, always in scope.
 					break;
-				case SYM::Scope::eStatic: {
-					// must be in the current file scope.
-					ASSERT_REG;
-					int fileScope = getFileScope(r.pc);
-					if(fileScope==-1 || fileScope!=s.fileScope) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
-										  }
-										  break;
-				case SYM::Scope::eLocal: {
-					// must be in the current scope.
-					ASSERT_REG;
-					if(r.pc<s.start || r.pc>s.end) { sVar->outOfScope = true; mUpdated = true; return EXP_OUT_OF_SCOPE; }
-										 }
-										 break;
+				case SYM::Scope::eStatic:
+					{
+						// must be in the current file scope.
+						ASSERT_REG;
+						int fileScope = getFileScope(r.pc);
+						if(fileScope==-1 || fileScope!=s.fileScope) {
+							sVar->outOfScope = true;
+							mUpdated = true;
+							return EXP_OUT_OF_SCOPE;
+						}
+					}
+					break;
+				case SYM::Scope::eLocal:
+					{
+						// must be in the current scope.
+						ASSERT_REG;
+						if(r.pc<s.start || r.pc>s.end) {
+							sVar->outOfScope = true;
+							mUpdated = true;
+							return EXP_OUT_OF_SCOPE;
+						}
+					}
+					break;
 			}
 		}	
 		sVar->outOfScope = false;
@@ -712,7 +725,7 @@ static void Callback::varCreate() {
 
 	oprintf(",name=\"%s\",numchild=\"%"PFZT"\",type=\"%s\",value=\"",
 		sVar->name.c_str(), sVar->children.size(), sVar->exp->type().c_str());
-	if(sVar->exp->value()!="")
+	if(sVar->exp->value().length() > 0)
 		oprintf("%s", sVar->exp->value().c_str());
 	else
 		oprintf("{...}");
@@ -847,14 +860,19 @@ static void printValue(Variable *var) {
 	case eSimpleValues:
 		oprintf(",value=\"");
 		if(var->exp) {
-			if(var->exp->simpleType())
+			if(var->exp->simpleType()) {
+				//_ASSERT(var->exp->value().length() > 0);
 				oprintf("%s", var->exp->value().c_str());
-			else
+			} else {
 				oprintf("{...}");
+			}
+		} else {
+			oprintf("Could not be evaluated.");
 		}
 		oprintf("\"");
 		break;
 	case eAllValues:
+		_ASSERT(var->exp->value().length() > 0);
 		oprintf(",value=\"%s\"", var->exp->value().c_str());
 		break;
 	}
@@ -935,10 +953,12 @@ void var_evaluate_expression(const string& args) {
 static void Callback::varEvaluateExpression() {
 	oprintDone();
 	oprintf(",value=\"");
-	if(sVar->exp->simpleType())
+	if(sVar->exp->simpleType()) {
+		_ASSERT(sVar->exp->value().length() > 0);
 		oprintf("%s", sVar->exp->value().c_str());
-	else
+	} else {
 		oprintf("{...}");
+	}
 	oprintf("\"\n");
 	sVar = NULL;
 	commandComplete();

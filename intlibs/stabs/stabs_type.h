@@ -39,12 +39,12 @@ public:
 	const char* getString();
 	void reset();
 	void resizeString(int size);
+	int length() const { return mPos; }
 	int operator()(const char* fmt, ...) PRINTF_ATTRIB(2,3);
 
 private:
 	int mPos;
-	char* mPtr;
-	char *mString;
+	char* mString;
 	int mStringSize;
 };
 

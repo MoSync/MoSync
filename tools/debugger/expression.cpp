@@ -1018,7 +1018,10 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 				}
 			}
 		}	
+	}
 
+	if(spf.length() <= 0) {
+		error("Evaluation failed.\n");
 	}
 
 	return spf.getString();
