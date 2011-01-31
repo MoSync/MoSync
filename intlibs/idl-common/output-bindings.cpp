@@ -444,7 +444,8 @@ static void lua_streamHelperApi(ostream& stream)
 	// maScaleImage
 	stream << "#define SCALETYPE_NEAREST_NEIGHBOUR 1\n";
 	stream << "#define SCALETYPE_BILINEAR 2\n";
-	stream << "int maScaleImage(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, double scaleFactor, int scaleType);\n";
+	stream << "int maImageScale(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, int scaledImageWidth, int scaledImageHeight, int scaleType);\n";
+	stream << "int maImageScaleProportionally(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, double scaleFactor, int scaleType);\n";
 
 	// System support for event handling.
 	stream << "void maEnvironmentInitialize();\n";
