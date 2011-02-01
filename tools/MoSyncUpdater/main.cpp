@@ -19,8 +19,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <windows.h>
 #include <process.h>
+#include <helpers/attribute.h>
 
 using namespace std;
+
+void error(const char *message) GCCATTRIB(noreturn);
+void notify(const char *message);
+bool invoke_bat(const char *file);
+bool exists(const char* filename);
 
 void error(const char *message) {
 	MessageBox(NULL, message, "MoSyncUpdater error", MB_OK | MB_ICONERROR); 
