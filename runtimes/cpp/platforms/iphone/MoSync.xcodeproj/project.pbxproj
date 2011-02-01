@@ -12,9 +12,6 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
-		8508D80F12B67762001A96E2 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80C12B67762001A96E2 /* ButtonWidget.mm */; };
-		8508D81012B67762001A96E2 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80D12B67762001A96E2 /* HorizontalLayoutWidget.mm */; };
-		8508D81112B67762001A96E2 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80E12B67762001A96E2 /* VerticalLayoutWidget.mm */; };
 		8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 850943291185AF87004A3B2D /* SyscallImpl.mm */; };
 		850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
 		850944011185C440004A3B2D /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
@@ -30,33 +27,8 @@
 		856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
 		857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
-		85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */; };
-		858B3FDB12E67D090058DBFC /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */; };
-		858B3FDC12E67D090058DBFC /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763C12B0EB9C00ABEDF3 /* IWidget.mm */; };
-		858B3FDD12E67D090058DBFC /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763E12B0EB9C00ABEDF3 /* LabelWidget.mm */; };
-		858B3FDE12E67D090058DBFC /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764012B0EB9C00ABEDF3 /* NavScreenWidget.mm */; };
-		858B3FDF12E67D090058DBFC /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764212B0EB9C00ABEDF3 /* ReflectionWidget.mm */; };
-		858B3FE012E67D090058DBFC /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764412B0EB9C00ABEDF3 /* ScreenWidget.mm */; };
-		858B3FE112E67D090058DBFC /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764A12B0EB9C00ABEDF3 /* TabScreenWidget.mm */; };
-		858B3FE212E67D090058DBFC /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765B12B0EBBD00ABEDF3 /* AbstractLayoutView.m */; };
-		858B3FE312E67D090058DBFC /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765D12B0EBBD00ABEDF3 /* HLayoutView.m */; };
-		858B3FE412E67D090058DBFC /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766212B0EBBD00ABEDF3 /* VLayoutView.m */; };
-		858B3FE512E67D090058DBFC /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766912B0EBE300ABEDF3 /* MoSyncTableView.m */; };
-		858B3FE612E67D090058DBFC /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766B12B0EBE300ABEDF3 /* MoSyncTableViewCell.m */; };
-		858B3FE712E67D090058DBFC /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766D12B0EBE300ABEDF3 /* MoSyncUI.mm */; };
-		858B3FE812E67D090058DBFC /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767312B0EBE300ABEDF3 /* ScreenWidgetController.m */; };
-		858B3FE912E67D090058DBFC /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767512B0EBE300ABEDF3 /* UIColor-Expanded.m */; };
-		858B3FEA12E67D090058DBFC /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276D712B0F54E00ABEDF3 /* MoSyncUISyscalls.mm */; };
-		858B3FEB12E67D090058DBFC /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276F812B1164100ABEDF3 /* ListViewWidget.mm */; };
 		858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
-		858B3FED12E67D090058DBFC /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80C12B67762001A96E2 /* ButtonWidget.mm */; };
-		858B3FEE12E67D090058DBFC /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80D12B67762001A96E2 /* HorizontalLayoutWidget.mm */; };
-		858B3FEF12E67D090058DBFC /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8508D80E12B67762001A96E2 /* VerticalLayoutWidget.mm */; };
-		858B3FF012E67D090058DBFC /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */; };
-		858B3FF112E67D090058DBFC /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */; };
-		858B3FF212E67D090058DBFC /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */; };
 		858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */; };
-		858B3FF412E67D090058DBFC /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */; };
 		858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
 		858B404112E680510058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		858B404212E6806A0058DBFC /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
@@ -64,12 +36,93 @@
 		858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
 		858B408F12E682BE0058DBFC /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		858B432012E7325F0058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
-		858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
-		858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */; };
-		858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */; };
 		858B44BB12E7B1060058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
+		85A1591F12F80E520044BBE1 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E612F80E520044BBE1 /* AbstractLayoutView.m */; };
+		85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E812F80E520044BBE1 /* HLayoutView.m */; };
+		85A1592112F80E520044BBE1 /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EA12F80E520044BBE1 /* License.txt */; };
+		85A1592212F80E520044BBE1 /* Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EB12F80E520044BBE1 /* Readme.txt */; };
+		85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
+		85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
+		85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
+		85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
+		85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
+		85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
+		85A1592912F80E520044BBE1 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F912F80E520044BBE1 /* UIColor-Expanded.m */; };
+		85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FC12F80E520044BBE1 /* ButtonWidget.mm */; };
+		85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */; };
+		85A1592C12F80E520044BBE1 /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590012F80E520044BBE1 /* GLViewWidget.mm */; };
+		85A1592D12F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */; };
+		85A1592E12F80E520044BBE1 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590412F80E520044BBE1 /* ImageWidget.mm */; };
+		85A1592F12F80E520044BBE1 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590612F80E520044BBE1 /* IWidget.mm */; };
+		85A1593012F80E520044BBE1 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590812F80E520044BBE1 /* LabelWidget.mm */; };
+		85A1593112F80E520044BBE1 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590A12F80E520044BBE1 /* ListViewItemWidget.mm */; };
+		85A1593212F80E520044BBE1 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590C12F80E520044BBE1 /* ListViewWidget.mm */; };
+		85A1593312F80E520044BBE1 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590E12F80E520044BBE1 /* NavBarWidget.mm */; };
+		85A1593412F80E520044BBE1 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591012F80E520044BBE1 /* NavScreenWidget.mm */; };
+		85A1593512F80E520044BBE1 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591212F80E520044BBE1 /* ReflectionWidget.mm */; };
+		85A1593612F80E520044BBE1 /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591412F80E520044BBE1 /* RelativeLayoutWidget.mm */; };
+		85A1593712F80E520044BBE1 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591612F80E520044BBE1 /* ScreenWidget.mm */; };
+		85A1593812F80E520044BBE1 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591812F80E520044BBE1 /* SearchBarWidget.mm */; };
+		85A1593912F80E520044BBE1 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */; };
+		85A1593A12F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */; };
+		85A1593B12F80E520044BBE1 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591E12F80E520044BBE1 /* WebViewWidget.mm */; };
+		85A1593C12F80E520044BBE1 /* AbstractLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158E512F80E520044BBE1 /* AbstractLayoutView.h */; };
+		85A1593D12F80E520044BBE1 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E612F80E520044BBE1 /* AbstractLayoutView.m */; };
+		85A1593E12F80E520044BBE1 /* HLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158E712F80E520044BBE1 /* HLayoutView.h */; };
+		85A1593F12F80E520044BBE1 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E812F80E520044BBE1 /* HLayoutView.m */; };
+		85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158E912F80E520044BBE1 /* LayoutManagers.h */; };
+		85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EC12F80E520044BBE1 /* VLayoutView.h */; };
+		85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
+		85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EE12F80E520044BBE1 /* MoSyncTableView.h */; };
+		85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
+		85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */; };
+		85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
+		85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F212F80E520044BBE1 /* MoSyncUI.h */; };
+		85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
+		85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */; };
+		85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
+		85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F612F80E520044BBE1 /* ScreenWidgetController.h */; };
+		85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
+		85A1594D12F80E520044BBE1 /* UIColor-Expanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F812F80E520044BBE1 /* UIColor-Expanded.h */; };
+		85A1594E12F80E520044BBE1 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F912F80E520044BBE1 /* UIColor-Expanded.m */; };
+		85A1594F12F80E520044BBE1 /* ButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158FB12F80E520044BBE1 /* ButtonWidget.h */; };
+		85A1595012F80E520044BBE1 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FC12F80E520044BBE1 /* ButtonWidget.mm */; };
+		85A1595112F80E520044BBE1 /* CheckBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158FD12F80E520044BBE1 /* CheckBoxWidget.h */; };
+		85A1595212F80E520044BBE1 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */; };
+		85A1595312F80E520044BBE1 /* GLViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158FF12F80E520044BBE1 /* GLViewWidget.h */; };
+		85A1595412F80E520044BBE1 /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590012F80E520044BBE1 /* GLViewWidget.mm */; };
+		85A1595512F80E520044BBE1 /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */; };
+		85A1595612F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */; };
+		85A1595712F80E520044BBE1 /* ImageWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590312F80E520044BBE1 /* ImageWidget.h */; };
+		85A1595812F80E520044BBE1 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590412F80E520044BBE1 /* ImageWidget.mm */; };
+		85A1595912F80E520044BBE1 /* IWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590512F80E520044BBE1 /* IWidget.h */; };
+		85A1595A12F80E520044BBE1 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590612F80E520044BBE1 /* IWidget.mm */; };
+		85A1595B12F80E520044BBE1 /* LabelWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590712F80E520044BBE1 /* LabelWidget.h */; };
+		85A1595C12F80E520044BBE1 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590812F80E520044BBE1 /* LabelWidget.mm */; };
+		85A1595D12F80E520044BBE1 /* ListViewItemWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590912F80E520044BBE1 /* ListViewItemWidget.h */; };
+		85A1595E12F80E520044BBE1 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590A12F80E520044BBE1 /* ListViewItemWidget.mm */; };
+		85A1595F12F80E520044BBE1 /* ListViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590B12F80E520044BBE1 /* ListViewWidget.h */; };
+		85A1596012F80E520044BBE1 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590C12F80E520044BBE1 /* ListViewWidget.mm */; };
+		85A1596112F80E520044BBE1 /* NavBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590D12F80E520044BBE1 /* NavBarWidget.h */; };
+		85A1596212F80E520044BBE1 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590E12F80E520044BBE1 /* NavBarWidget.mm */; };
+		85A1596312F80E520044BBE1 /* NavScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590F12F80E520044BBE1 /* NavScreenWidget.h */; };
+		85A1596412F80E520044BBE1 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591012F80E520044BBE1 /* NavScreenWidget.mm */; };
+		85A1596512F80E520044BBE1 /* ReflectionWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591112F80E520044BBE1 /* ReflectionWidget.h */; };
+		85A1596612F80E520044BBE1 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591212F80E520044BBE1 /* ReflectionWidget.mm */; };
+		85A1596712F80E520044BBE1 /* RelativeLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591312F80E520044BBE1 /* RelativeLayoutWidget.h */; };
+		85A1596812F80E520044BBE1 /* RelativeLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591412F80E520044BBE1 /* RelativeLayoutWidget.mm */; };
+		85A1596912F80E520044BBE1 /* ScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591512F80E520044BBE1 /* ScreenWidget.h */; };
+		85A1596A12F80E520044BBE1 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591612F80E520044BBE1 /* ScreenWidget.mm */; };
+		85A1596B12F80E520044BBE1 /* SearchBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591712F80E520044BBE1 /* SearchBarWidget.h */; };
+		85A1596C12F80E520044BBE1 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591812F80E520044BBE1 /* SearchBarWidget.mm */; };
+		85A1596D12F80E520044BBE1 /* TabScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591912F80E520044BBE1 /* TabScreenWidget.h */; };
+		85A1596E12F80E520044BBE1 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */; };
+		85A1596F12F80E520044BBE1 /* VerticalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */; };
+		85A1597012F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */; };
+		85A1597112F80E520044BBE1 /* WebViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591D12F80E520044BBE1 /* WebViewWidget.h */; };
+		85A1597212F80E520044BBE1 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591E12F80E520044BBE1 /* WebViewWidget.mm */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
 		85BF2B26113403FD00BB0201 /* connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B1E113403FD00BB0201 /* connection.cpp */; };
 		85BF2B27113403FD00BB0201 /* discovery.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2B21113403FD00BB0201 /* discovery.cpp */; };
@@ -93,27 +146,6 @@
 		85BF2C3B11341EF000BB0201 /* program in Resources */ = {isa = PBXBuildFile; fileRef = 85BF2C3A11341EF000BB0201 /* program */; };
 		85BF2C61113429A900BB0201 /* MoSyncView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85BF2C60113429A900BB0201 /* MoSyncView.mm */; };
 		85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */; };
-		85D26D7512B7AF8300FBA308 /* ListViewItemWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */; };
-		85D26D7612B7AF8300FBA308 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */; };
-		85E2764F12B0EB9C00ABEDF3 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */; };
-		85E2765012B0EB9C00ABEDF3 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763C12B0EB9C00ABEDF3 /* IWidget.mm */; };
-		85E2765112B0EB9C00ABEDF3 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2763E12B0EB9C00ABEDF3 /* LabelWidget.mm */; };
-		85E2765212B0EB9C00ABEDF3 /* NavScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764012B0EB9C00ABEDF3 /* NavScreenWidget.mm */; };
-		85E2765312B0EB9C00ABEDF3 /* ReflectionWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764212B0EB9C00ABEDF3 /* ReflectionWidget.mm */; };
-		85E2765412B0EB9C00ABEDF3 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764412B0EB9C00ABEDF3 /* ScreenWidget.mm */; };
-		85E2765712B0EB9C00ABEDF3 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2764A12B0EB9C00ABEDF3 /* TabScreenWidget.mm */; };
-		85E2766312B0EBBD00ABEDF3 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765B12B0EBBD00ABEDF3 /* AbstractLayoutView.m */; };
-		85E2766412B0EBBD00ABEDF3 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2765D12B0EBBD00ABEDF3 /* HLayoutView.m */; };
-		85E2766512B0EBBD00ABEDF3 /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85E2765F12B0EBBD00ABEDF3 /* License.txt */; };
-		85E2766612B0EBBD00ABEDF3 /* Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85E2766012B0EBBD00ABEDF3 /* Readme.txt */; };
-		85E2766712B0EBBD00ABEDF3 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766212B0EBBD00ABEDF3 /* VLayoutView.m */; };
-		85E2767612B0EBE300ABEDF3 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766912B0EBE300ABEDF3 /* MoSyncTableView.m */; };
-		85E2767712B0EBE300ABEDF3 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766B12B0EBE300ABEDF3 /* MoSyncTableViewCell.m */; };
-		85E2767812B0EBE300ABEDF3 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E2766D12B0EBE300ABEDF3 /* MoSyncUI.mm */; };
-		85E2767B12B0EBE300ABEDF3 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767312B0EBE300ABEDF3 /* ScreenWidgetController.m */; };
-		85E2767C12B0EBE300ABEDF3 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85E2767512B0EBE300ABEDF3 /* UIColor-Expanded.m */; };
-		85E276D812B0F54E00ABEDF3 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276D712B0F54E00ABEDF3 /* MoSyncUISyscalls.mm */; };
-		85E276FA12B1164100ABEDF3 /* ListViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85E276F812B1164100ABEDF3 /* ListViewWidget.mm */; };
 		85E2A0D61181D1B200CDB453 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
 		85EF80EC1174AA1900B3E43A /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
 		85F2551311AC12A700EB47EE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
@@ -158,13 +190,6 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
-		85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */; };
-		F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
-		F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */; };
-		F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */; };
-		F7247C3F12ECBA4B00AB0211 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */; };
-		F7247C4012ECBA4B00AB0211 /* NavBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */; };
-		F7247C4112ECBA4B00AB0211 /* NavBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -187,9 +212,6 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
-		8508D80C12B67762001A96E2 /* ButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ButtonWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ButtonWidget.mm; sourceTree = SOURCE_ROOT; };
-		8508D80D12B67762001A96E2 /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = HorizontalLayoutWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/HorizontalLayoutWidget.mm; sourceTree = SOURCE_ROOT; };
-		8508D80E12B67762001A96E2 /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = VerticalLayoutWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/VerticalLayoutWidget.mm; sourceTree = SOURCE_ROOT; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850943FF1185C41F004A3B2D /* MoSyncCLController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncCLController.h; sourceTree = "<group>"; };
@@ -208,15 +230,68 @@
 		857B020112C627C200DEA306 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		857B022A12C62C9300DEA306 /* MoSyncGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncGLView.h; sourceTree = "<group>"; };
 		857B025512C62F5600DEA306 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		85883DEA12DDBB4500EDD04B /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.h; sourceTree = SOURCE_ROOT; };
-		85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = GLViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/GLViewWidget.mm; sourceTree = SOURCE_ROOT; };
 		858B431F12E7325F0058DBFC /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = impl/log.cpp; sourceTree = "<group>"; };
-		858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RelativeLayoutWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/RelativeLayoutWidget.h; sourceTree = SOURCE_ROOT; };
-		858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RelativeLayoutWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/RelativeLayoutWidget.mm; sourceTree = SOURCE_ROOT; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
 		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; path = resources; sourceTree = "<group>"; };
+		85A158E512F80E520044BBE1 /* AbstractLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractLayoutView.h; sourceTree = "<group>"; };
+		85A158E612F80E520044BBE1 /* AbstractLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AbstractLayoutView.m; sourceTree = "<group>"; };
+		85A158E712F80E520044BBE1 /* HLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HLayoutView.h; sourceTree = "<group>"; };
+		85A158E812F80E520044BBE1 /* HLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLayoutView.m; sourceTree = "<group>"; };
+		85A158E912F80E520044BBE1 /* LayoutManagers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayoutManagers.h; sourceTree = "<group>"; };
+		85A158EA12F80E520044BBE1 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
+		85A158EB12F80E520044BBE1 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
+		85A158EC12F80E520044BBE1 /* VLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLayoutView.h; sourceTree = "<group>"; };
+		85A158ED12F80E520044BBE1 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLayoutView.m; sourceTree = "<group>"; };
+		85A158EE12F80E520044BBE1 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
+		85A158EF12F80E520044BBE1 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
+		85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableViewCell.h; sourceTree = "<group>"; };
+		85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
+		85A158F212F80E520044BBE1 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
+		85A158F312F80E520044BBE1 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
+		85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
+		85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
+		85A158F612F80E520044BBE1 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
+		85A158F712F80E520044BBE1 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
+		85A158F812F80E520044BBE1 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Expanded.h"; sourceTree = "<group>"; };
+		85A158F912F80E520044BBE1 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Expanded.m"; sourceTree = "<group>"; };
+		85A158FB12F80E520044BBE1 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonWidget.h; sourceTree = "<group>"; };
+		85A158FC12F80E520044BBE1 /* ButtonWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ButtonWidget.mm; sourceTree = "<group>"; };
+		85A158FD12F80E520044BBE1 /* CheckBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckBoxWidget.h; sourceTree = "<group>"; };
+		85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CheckBoxWidget.mm; sourceTree = "<group>"; };
+		85A158FF12F80E520044BBE1 /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLViewWidget.h; sourceTree = "<group>"; };
+		85A1590012F80E520044BBE1 /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GLViewWidget.mm; sourceTree = "<group>"; };
+		85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HorizontalLayoutWidget.h; sourceTree = "<group>"; };
+		85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
+		85A1590312F80E520044BBE1 /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageWidget.h; sourceTree = "<group>"; };
+		85A1590412F80E520044BBE1 /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageWidget.mm; sourceTree = "<group>"; };
+		85A1590512F80E520044BBE1 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWidget.h; sourceTree = "<group>"; };
+		85A1590612F80E520044BBE1 /* IWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = IWidget.mm; sourceTree = "<group>"; };
+		85A1590712F80E520044BBE1 /* LabelWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelWidget.h; sourceTree = "<group>"; };
+		85A1590812F80E520044BBE1 /* LabelWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LabelWidget.mm; sourceTree = "<group>"; };
+		85A1590912F80E520044BBE1 /* ListViewItemWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListViewItemWidget.h; sourceTree = "<group>"; };
+		85A1590A12F80E520044BBE1 /* ListViewItemWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ListViewItemWidget.mm; sourceTree = "<group>"; };
+		85A1590B12F80E520044BBE1 /* ListViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListViewWidget.h; sourceTree = "<group>"; };
+		85A1590C12F80E520044BBE1 /* ListViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ListViewWidget.mm; sourceTree = "<group>"; };
+		85A1590D12F80E520044BBE1 /* NavBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavBarWidget.h; sourceTree = "<group>"; };
+		85A1590E12F80E520044BBE1 /* NavBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NavBarWidget.mm; sourceTree = "<group>"; };
+		85A1590F12F80E520044BBE1 /* NavScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NavScreenWidget.h; sourceTree = "<group>"; };
+		85A1591012F80E520044BBE1 /* NavScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NavScreenWidget.mm; sourceTree = "<group>"; };
+		85A1591112F80E520044BBE1 /* ReflectionWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReflectionWidget.h; sourceTree = "<group>"; };
+		85A1591212F80E520044BBE1 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ReflectionWidget.mm; sourceTree = "<group>"; };
+		85A1591312F80E520044BBE1 /* RelativeLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelativeLayoutWidget.h; sourceTree = "<group>"; };
+		85A1591412F80E520044BBE1 /* RelativeLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RelativeLayoutWidget.mm; sourceTree = "<group>"; };
+		85A1591512F80E520044BBE1 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidget.h; sourceTree = "<group>"; };
+		85A1591612F80E520044BBE1 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenWidget.mm; sourceTree = "<group>"; };
+		85A1591712F80E520044BBE1 /* SearchBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchBarWidget.h; sourceTree = "<group>"; };
+		85A1591812F80E520044BBE1 /* SearchBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SearchBarWidget.mm; sourceTree = "<group>"; };
+		85A1591912F80E520044BBE1 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabScreenWidget.h; sourceTree = "<group>"; };
+		85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TabScreenWidget.mm; sourceTree = "<group>"; };
+		85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerticalLayoutWidget.h; sourceTree = "<group>"; };
+		85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VerticalLayoutWidget.mm; sourceTree = "<group>"; };
+		85A1591D12F80E520044BBE1 /* WebViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewWidget.h; sourceTree = "<group>"; };
+		85A1591E12F80E520044BBE1 /* WebViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebViewWidget.mm; sourceTree = "<group>"; };
 		85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rebuild.cpp; sourceTree = "<group>"; };
 		85BF2B1C113403FD00BB0201 /* bt_errors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_errors.h; path = ../../../../intlibs/bluetooth/bt_errors.h; sourceTree = SOURCE_ROOT; };
 		85BF2B1D113403FD00BB0201 /* btinit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = btinit.h; path = ../../../../intlibs/bluetooth/btinit.h; sourceTree = SOURCE_ROOT; };
@@ -289,62 +364,12 @@
 		85BF2C5F113429A900BB0201 /* MoSyncView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncView.h; sourceTree = "<group>"; };
 		85BF2C60113429A900BB0201 /* MoSyncView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncView.mm; sourceTree = "<group>"; };
 		85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncGLView.mm; sourceTree = "<group>"; };
-		85D26D7112B7AF8300FBA308 /* ListViewItemWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewItemWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewItemWidget.h; sourceTree = SOURCE_ROOT; };
-		85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewItemWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewItemWidget.mm; sourceTree = SOURCE_ROOT; };
-		85D26D7312B7AF8300FBA308 /* WebViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/WebViewWidget.h; sourceTree = SOURCE_ROOT; };
-		85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = WebViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/WebViewWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2763512B0EB9C00ABEDF3 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ButtonWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ButtonWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2763712B0EB9C00ABEDF3 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HorizontalLayoutWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/HorizontalLayoutWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2763912B0EB9C00ABEDF3 /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ImageWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ImageWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ImageWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ImageWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2763B12B0EB9C00ABEDF3 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/IWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2763C12B0EB9C00ABEDF3 /* IWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = IWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/IWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2763D12B0EB9C00ABEDF3 /* LabelWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LabelWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/LabelWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2763E12B0EB9C00ABEDF3 /* LabelWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = LabelWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/LabelWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2763F12B0EB9C00ABEDF3 /* NavScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavScreenWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavScreenWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2764012B0EB9C00ABEDF3 /* NavScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavScreenWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavScreenWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2764112B0EB9C00ABEDF3 /* ReflectionWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReflectionWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ReflectionWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2764212B0EB9C00ABEDF3 /* ReflectionWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ReflectionWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ReflectionWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2764312B0EB9C00ABEDF3 /* ScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ScreenWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2764412B0EB9C00ABEDF3 /* ScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ScreenWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ScreenWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2764912B0EB9C00ABEDF3 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TabScreenWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/TabScreenWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2764A12B0EB9C00ABEDF3 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TabScreenWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/TabScreenWidget.mm; sourceTree = SOURCE_ROOT; };
-		85E2764B12B0EB9C00ABEDF3 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VerticalLayoutWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/VerticalLayoutWidget.h; sourceTree = SOURCE_ROOT; };
-		85E2765A12B0EBBD00ABEDF3 /* AbstractLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractLayoutView.h; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/AbstractLayoutView.h; sourceTree = SOURCE_ROOT; };
-		85E2765B12B0EBBD00ABEDF3 /* AbstractLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AbstractLayoutView.m; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/AbstractLayoutView.m; sourceTree = SOURCE_ROOT; };
-		85E2765C12B0EBBD00ABEDF3 /* HLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HLayoutView.h; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/HLayoutView.h; sourceTree = SOURCE_ROOT; };
-		85E2765D12B0EBBD00ABEDF3 /* HLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HLayoutView.m; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/HLayoutView.m; sourceTree = SOURCE_ROOT; };
-		85E2765E12B0EBBD00ABEDF3 /* LayoutManagers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LayoutManagers.h; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/LayoutManagers.h; sourceTree = SOURCE_ROOT; };
-		85E2765F12B0EBBD00ABEDF3 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = License.txt; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/License.txt; sourceTree = SOURCE_ROOT; };
-		85E2766012B0EBBD00ABEDF3 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Readme.txt; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/Readme.txt; sourceTree = SOURCE_ROOT; };
-		85E2766112B0EBBD00ABEDF3 /* VLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLayoutView.h; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/VLayoutView.h; sourceTree = SOURCE_ROOT; };
-		85E2766212B0EBBD00ABEDF3 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLayoutView.m; path = ../../../../testPrograms/native_ui/iphone/Classes/LayoutManagers/VLayoutView.m; sourceTree = SOURCE_ROOT; };
-		85E2766812B0EBE300ABEDF3 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncTableView.h; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncTableView.h; sourceTree = SOURCE_ROOT; };
-		85E2766912B0EBE300ABEDF3 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MoSyncTableView.m; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncTableView.m; sourceTree = SOURCE_ROOT; };
-		85E2766A12B0EBE300ABEDF3 /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncTableViewCell.h; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncTableViewCell.h; sourceTree = SOURCE_ROOT; };
-		85E2766B12B0EBE300ABEDF3 /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MoSyncTableViewCell.m; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncTableViewCell.m; sourceTree = SOURCE_ROOT; };
-		85E2766C12B0EBE300ABEDF3 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncUI.h; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncUI.h; sourceTree = SOURCE_ROOT; };
-		85E2766D12B0EBE300ABEDF3 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncUI.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncUI.mm; sourceTree = SOURCE_ROOT; };
-		85E2766E12B0EBE300ABEDF3 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncUISyscalls.h; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncUISyscalls.h; sourceTree = SOURCE_ROOT; };
-		85E2767212B0EBE300ABEDF3 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScreenWidgetController.h; path = ../../../../testPrograms/native_ui/iphone/Classes/ScreenWidgetController.h; sourceTree = SOURCE_ROOT; };
-		85E2767312B0EBE300ABEDF3 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScreenWidgetController.m; path = ../../../../testPrograms/native_ui/iphone/Classes/ScreenWidgetController.m; sourceTree = SOURCE_ROOT; };
-		85E2767412B0EBE300ABEDF3 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIColor-Expanded.h"; path = "../../../../testPrograms/native_ui/iphone/Classes/UIColor-Expanded.h"; sourceTree = SOURCE_ROOT; };
-		85E2767512B0EBE300ABEDF3 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIColor-Expanded.m"; path = "../../../../testPrograms/native_ui/iphone/Classes/UIColor-Expanded.m"; sourceTree = SOURCE_ROOT; };
-		85E276D712B0F54E00ABEDF3 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncUISyscalls.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/MoSyncUISyscalls.mm; sourceTree = SOURCE_ROOT; };
-		85E276F712B1164100ABEDF3 /* ListViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListViewWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewWidget.h; sourceTree = SOURCE_ROOT; };
-		85E276F812B1164100ABEDF3 /* ListViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ListViewWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/ListViewWidget.mm; sourceTree = SOURCE_ROOT; };
 		85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = ThreadPoolImpl.mm; path = impl/ThreadPoolImpl.mm; sourceTree = "<group>"; };
 		85F2550D11AC125400EB47EE /* libMoSyncLib.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMoSyncLib.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558711AC155D00EB47EE /* MoSync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoSync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85F2558911AC155D00EB47EE /* MoSyncWithLib-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MoSyncWithLib-Info.plist"; sourceTree = "<group>"; };
-		85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchBarWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.h; sourceTree = SOURCE_ROOT; };
-		85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SearchBarWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/SearchBarWidget.mm; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* MoSync-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MoSync-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CheckBoxWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.h; sourceTree = SOURCE_ROOT; };
-		F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = CheckBoxWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/CheckBoxWidget.mm; sourceTree = SOURCE_ROOT; };
-		F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NavBarWidget.h; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavBarWidget.h; sourceTree = SOURCE_ROOT; };
-		F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NavBarWidget.mm; path = ../../../../testPrograms/native_ui/iphone/Classes/Widgets/NavBarWidget.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -400,7 +425,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				85E2763312B0EB7800ABEDF3 /* UI */,
+				85A158E312F80E520044BBE1 /* UI */,
 				85BF2B181134039B00BB0201 /* Core */,
 				85BF2B171134038600BB0201 /* Base */,
 				85BF2B0D1134037600BB0201 /* intlibs */,
@@ -500,6 +525,86 @@
 				85923F25114539F0004875E4 /* filelist.h */,
 			);
 			name = filelist;
+			sourceTree = "<group>";
+		};
+		85A158E312F80E520044BBE1 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				85A158E412F80E520044BBE1 /* LayoutManagers */,
+				85A158EE12F80E520044BBE1 /* MoSyncTableView.h */,
+				85A158EF12F80E520044BBE1 /* MoSyncTableView.m */,
+				85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */,
+				85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */,
+				85A158F212F80E520044BBE1 /* MoSyncUI.h */,
+				85A158F312F80E520044BBE1 /* MoSyncUI.mm */,
+				85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */,
+				85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */,
+				85A158F612F80E520044BBE1 /* ScreenWidgetController.h */,
+				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
+				85A158F812F80E520044BBE1 /* UIColor-Expanded.h */,
+				85A158F912F80E520044BBE1 /* UIColor-Expanded.m */,
+				85A158FA12F80E520044BBE1 /* Widgets */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		85A158E412F80E520044BBE1 /* LayoutManagers */ = {
+			isa = PBXGroup;
+			children = (
+				85A158E512F80E520044BBE1 /* AbstractLayoutView.h */,
+				85A158E612F80E520044BBE1 /* AbstractLayoutView.m */,
+				85A158E712F80E520044BBE1 /* HLayoutView.h */,
+				85A158E812F80E520044BBE1 /* HLayoutView.m */,
+				85A158E912F80E520044BBE1 /* LayoutManagers.h */,
+				85A158EA12F80E520044BBE1 /* License.txt */,
+				85A158EB12F80E520044BBE1 /* Readme.txt */,
+				85A158EC12F80E520044BBE1 /* VLayoutView.h */,
+				85A158ED12F80E520044BBE1 /* VLayoutView.m */,
+			);
+			path = LayoutManagers;
+			sourceTree = "<group>";
+		};
+		85A158FA12F80E520044BBE1 /* Widgets */ = {
+			isa = PBXGroup;
+			children = (
+				85A158FB12F80E520044BBE1 /* ButtonWidget.h */,
+				85A158FC12F80E520044BBE1 /* ButtonWidget.mm */,
+				85A158FD12F80E520044BBE1 /* CheckBoxWidget.h */,
+				85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */,
+				85A158FF12F80E520044BBE1 /* GLViewWidget.h */,
+				85A1590012F80E520044BBE1 /* GLViewWidget.mm */,
+				85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */,
+				85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */,
+				85A1590312F80E520044BBE1 /* ImageWidget.h */,
+				85A1590412F80E520044BBE1 /* ImageWidget.mm */,
+				85A1590512F80E520044BBE1 /* IWidget.h */,
+				85A1590612F80E520044BBE1 /* IWidget.mm */,
+				85A1590712F80E520044BBE1 /* LabelWidget.h */,
+				85A1590812F80E520044BBE1 /* LabelWidget.mm */,
+				85A1590912F80E520044BBE1 /* ListViewItemWidget.h */,
+				85A1590A12F80E520044BBE1 /* ListViewItemWidget.mm */,
+				85A1590B12F80E520044BBE1 /* ListViewWidget.h */,
+				85A1590C12F80E520044BBE1 /* ListViewWidget.mm */,
+				85A1590D12F80E520044BBE1 /* NavBarWidget.h */,
+				85A1590E12F80E520044BBE1 /* NavBarWidget.mm */,
+				85A1590F12F80E520044BBE1 /* NavScreenWidget.h */,
+				85A1591012F80E520044BBE1 /* NavScreenWidget.mm */,
+				85A1591112F80E520044BBE1 /* ReflectionWidget.h */,
+				85A1591212F80E520044BBE1 /* ReflectionWidget.mm */,
+				85A1591312F80E520044BBE1 /* RelativeLayoutWidget.h */,
+				85A1591412F80E520044BBE1 /* RelativeLayoutWidget.mm */,
+				85A1591512F80E520044BBE1 /* ScreenWidget.h */,
+				85A1591612F80E520044BBE1 /* ScreenWidget.mm */,
+				85A1591712F80E520044BBE1 /* SearchBarWidget.h */,
+				85A1591812F80E520044BBE1 /* SearchBarWidget.mm */,
+				85A1591912F80E520044BBE1 /* TabScreenWidget.h */,
+				85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */,
+				85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */,
+				85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */,
+				85A1591D12F80E520044BBE1 /* WebViewWidget.h */,
+				85A1591E12F80E520044BBE1 /* WebViewWidget.mm */,
+			);
+			path = Widgets;
 			sourceTree = "<group>";
 		};
 		85BF2B0C1134036D00BB0201 /* impl */ = {
@@ -643,86 +748,6 @@
 			name = thread;
 			sourceTree = "<group>";
 		};
-		85E2763312B0EB7800ABEDF3 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				85E276D712B0F54E00ABEDF3 /* MoSyncUISyscalls.mm */,
-				85E2766812B0EBE300ABEDF3 /* MoSyncTableView.h */,
-				85E2766912B0EBE300ABEDF3 /* MoSyncTableView.m */,
-				85E2766A12B0EBE300ABEDF3 /* MoSyncTableViewCell.h */,
-				85E2766B12B0EBE300ABEDF3 /* MoSyncTableViewCell.m */,
-				85E2766C12B0EBE300ABEDF3 /* MoSyncUI.h */,
-				85E2766D12B0EBE300ABEDF3 /* MoSyncUI.mm */,
-				85E2766E12B0EBE300ABEDF3 /* MoSyncUISyscalls.h */,
-				85E2767212B0EBE300ABEDF3 /* ScreenWidgetController.h */,
-				85E2767312B0EBE300ABEDF3 /* ScreenWidgetController.m */,
-				85E2767412B0EBE300ABEDF3 /* UIColor-Expanded.h */,
-				85E2767512B0EBE300ABEDF3 /* UIColor-Expanded.m */,
-				85E2765912B0EBA200ABEDF3 /* LayoutManagers */,
-				85E2763412B0EB7D00ABEDF3 /* Widgets */,
-			);
-			name = UI;
-			sourceTree = "<group>";
-		};
-		85E2763412B0EB7D00ABEDF3 /* Widgets */ = {
-			isa = PBXGroup;
-			children = (
-				F7247C3D12ECBA4A00AB0211 /* NavBarWidget.h */,
-				F7247C3E12ECBA4B00AB0211 /* NavBarWidget.mm */,
-				F7247A4F12E8A7A900AB0211 /* CheckBoxWidget.h */,
-				F7247A5012E8A7A900AB0211 /* CheckBoxWidget.mm */,
-				858B449012E7A8F80058DBFC /* RelativeLayoutWidget.h */,
-				858B449112E7A8F80058DBFC /* RelativeLayoutWidget.mm */,
-				85F5A6B812E4587F008DAEB3 /* SearchBarWidget.h */,
-				85F5A6B912E4587F008DAEB3 /* SearchBarWidget.mm */,
-				85883DEA12DDBB4500EDD04B /* GLViewWidget.h */,
-				85883DEB12DDBB4500EDD04B /* GLViewWidget.mm */,
-				85D26D7112B7AF8300FBA308 /* ListViewItemWidget.h */,
-				85D26D7212B7AF8300FBA308 /* ListViewItemWidget.mm */,
-				85D26D7312B7AF8300FBA308 /* WebViewWidget.h */,
-				85D26D7412B7AF8300FBA308 /* WebViewWidget.mm */,
-				8508D80C12B67762001A96E2 /* ButtonWidget.mm */,
-				8508D80D12B67762001A96E2 /* HorizontalLayoutWidget.mm */,
-				8508D80E12B67762001A96E2 /* VerticalLayoutWidget.mm */,
-				85E276F712B1164100ABEDF3 /* ListViewWidget.h */,
-				85E276F812B1164100ABEDF3 /* ListViewWidget.mm */,
-				85E2763512B0EB9C00ABEDF3 /* ButtonWidget.h */,
-				85E2763712B0EB9C00ABEDF3 /* HorizontalLayoutWidget.h */,
-				85E2763912B0EB9C00ABEDF3 /* ImageWidget.h */,
-				85E2763A12B0EB9C00ABEDF3 /* ImageWidget.mm */,
-				85E2763B12B0EB9C00ABEDF3 /* IWidget.h */,
-				85E2763C12B0EB9C00ABEDF3 /* IWidget.mm */,
-				85E2763D12B0EB9C00ABEDF3 /* LabelWidget.h */,
-				85E2763E12B0EB9C00ABEDF3 /* LabelWidget.mm */,
-				85E2763F12B0EB9C00ABEDF3 /* NavScreenWidget.h */,
-				85E2764012B0EB9C00ABEDF3 /* NavScreenWidget.mm */,
-				85E2764112B0EB9C00ABEDF3 /* ReflectionWidget.h */,
-				85E2764212B0EB9C00ABEDF3 /* ReflectionWidget.mm */,
-				85E2764312B0EB9C00ABEDF3 /* ScreenWidget.h */,
-				85E2764412B0EB9C00ABEDF3 /* ScreenWidget.mm */,
-				85E2764912B0EB9C00ABEDF3 /* TabScreenWidget.h */,
-				85E2764A12B0EB9C00ABEDF3 /* TabScreenWidget.mm */,
-				85E2764B12B0EB9C00ABEDF3 /* VerticalLayoutWidget.h */,
-			);
-			name = Widgets;
-			sourceTree = "<group>";
-		};
-		85E2765912B0EBA200ABEDF3 /* LayoutManagers */ = {
-			isa = PBXGroup;
-			children = (
-				85E2765A12B0EBBD00ABEDF3 /* AbstractLayoutView.h */,
-				85E2765B12B0EBBD00ABEDF3 /* AbstractLayoutView.m */,
-				85E2765C12B0EBBD00ABEDF3 /* HLayoutView.h */,
-				85E2765D12B0EBBD00ABEDF3 /* HLayoutView.m */,
-				85E2765E12B0EBBD00ABEDF3 /* LayoutManagers.h */,
-				85E2765F12B0EBBD00ABEDF3 /* License.txt */,
-				85E2766012B0EBBD00ABEDF3 /* Readme.txt */,
-				85E2766112B0EBBD00ABEDF3 /* VLayoutView.h */,
-				85E2766212B0EBBD00ABEDF3 /* VLayoutView.m */,
-			);
-			name = LayoutManagers;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -730,10 +755,35 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				858B449312E7A8F80058DBFC /* RelativeLayoutWidget.h in Headers */,
-				F7247A5212E8A7A900AB0211 /* CheckBoxWidget.h in Headers */,
 				85581E6112EA323E009C6204 /* TouchHelper.h in Headers */,
-				F7247C4012ECBA4B00AB0211 /* NavBarWidget.h in Headers */,
+				85A1593C12F80E520044BBE1 /* AbstractLayoutView.h in Headers */,
+				85A1593E12F80E520044BBE1 /* HLayoutView.h in Headers */,
+				85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */,
+				85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */,
+				85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */,
+				85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */,
+				85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */,
+				85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */,
+				85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */,
+				85A1594D12F80E520044BBE1 /* UIColor-Expanded.h in Headers */,
+				85A1594F12F80E520044BBE1 /* ButtonWidget.h in Headers */,
+				85A1595112F80E520044BBE1 /* CheckBoxWidget.h in Headers */,
+				85A1595312F80E520044BBE1 /* GLViewWidget.h in Headers */,
+				85A1595512F80E520044BBE1 /* HorizontalLayoutWidget.h in Headers */,
+				85A1595712F80E520044BBE1 /* ImageWidget.h in Headers */,
+				85A1595912F80E520044BBE1 /* IWidget.h in Headers */,
+				85A1595B12F80E520044BBE1 /* LabelWidget.h in Headers */,
+				85A1595D12F80E520044BBE1 /* ListViewItemWidget.h in Headers */,
+				85A1595F12F80E520044BBE1 /* ListViewWidget.h in Headers */,
+				85A1596112F80E520044BBE1 /* NavBarWidget.h in Headers */,
+				85A1596312F80E520044BBE1 /* NavScreenWidget.h in Headers */,
+				85A1596512F80E520044BBE1 /* ReflectionWidget.h in Headers */,
+				85A1596712F80E520044BBE1 /* RelativeLayoutWidget.h in Headers */,
+				85A1596912F80E520044BBE1 /* ScreenWidget.h in Headers */,
+				85A1596B12F80E520044BBE1 /* SearchBarWidget.h in Headers */,
+				85A1596D12F80E520044BBE1 /* TabScreenWidget.h in Headers */,
+				85A1596F12F80E520044BBE1 /* VerticalLayoutWidget.h in Headers */,
+				85A1597112F80E520044BBE1 /* WebViewWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -826,8 +876,8 @@
 				85BF2C3B11341EF000BB0201 /* program in Resources */,
 				85A0815411353EDE00267D56 /* resources in Resources */,
 				8519011F1199B90400B71F58 /* data_section.bin in Resources */,
-				85E2766512B0EBBD00ABEDF3 /* License.txt in Resources */,
-				85E2766612B0EBBD00ABEDF3 /* Readme.txt in Resources */,
+				85A1592112F80E520044BBE1 /* License.txt in Resources */,
+				85A1592212F80E520044BBE1 /* Readme.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -876,38 +926,38 @@
 				8509432A1185AF87004A3B2D /* SyscallImpl.mm in Sources */,
 				85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */,
 				8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */,
-				85E2764F12B0EB9C00ABEDF3 /* ImageWidget.mm in Sources */,
-				85E2765012B0EB9C00ABEDF3 /* IWidget.mm in Sources */,
-				85E2765112B0EB9C00ABEDF3 /* LabelWidget.mm in Sources */,
-				85E2765212B0EB9C00ABEDF3 /* NavScreenWidget.mm in Sources */,
-				85E2765312B0EB9C00ABEDF3 /* ReflectionWidget.mm in Sources */,
-				85E2765412B0EB9C00ABEDF3 /* ScreenWidget.mm in Sources */,
-				85E2765712B0EB9C00ABEDF3 /* TabScreenWidget.mm in Sources */,
-				85E2766312B0EBBD00ABEDF3 /* AbstractLayoutView.m in Sources */,
-				85E2766412B0EBBD00ABEDF3 /* HLayoutView.m in Sources */,
-				85E2766712B0EBBD00ABEDF3 /* VLayoutView.m in Sources */,
-				85E2767612B0EBE300ABEDF3 /* MoSyncTableView.m in Sources */,
-				85E2767712B0EBE300ABEDF3 /* MoSyncTableViewCell.m in Sources */,
-				85E2767812B0EBE300ABEDF3 /* MoSyncUI.mm in Sources */,
-				85E2767B12B0EBE300ABEDF3 /* ScreenWidgetController.m in Sources */,
-				85E2767C12B0EBE300ABEDF3 /* UIColor-Expanded.m in Sources */,
-				85E276D812B0F54E00ABEDF3 /* MoSyncUISyscalls.mm in Sources */,
 				8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */,
-				85E276FA12B1164100ABEDF3 /* ListViewWidget.mm in Sources */,
 				856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */,
-				8508D80F12B67762001A96E2 /* ButtonWidget.mm in Sources */,
-				8508D81012B67762001A96E2 /* HorizontalLayoutWidget.mm in Sources */,
-				8508D81112B67762001A96E2 /* VerticalLayoutWidget.mm in Sources */,
-				85D26D7512B7AF8300FBA308 /* ListViewItemWidget.mm in Sources */,
-				85D26D7612B7AF8300FBA308 /* WebViewWidget.mm in Sources */,
-				85883DEC12DDBB4500EDD04B /* GLViewWidget.mm in Sources */,
 				85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */,
-				85F5A6BA12E4587F008DAEB3 /* SearchBarWidget.mm in Sources */,
 				858B432012E7325F0058DBFC /* log.cpp in Sources */,
-				858B449212E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
-				F7247A5112E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 				85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */,
-				F7247C3F12ECBA4B00AB0211 /* NavBarWidget.mm in Sources */,
+				85A1591F12F80E520044BBE1 /* AbstractLayoutView.m in Sources */,
+				85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */,
+				85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */,
+				85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
+				85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
+				85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */,
+				85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
+				85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
+				85A1592912F80E520044BBE1 /* UIColor-Expanded.m in Sources */,
+				85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */,
+				85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,
+				85A1592C12F80E520044BBE1 /* GLViewWidget.mm in Sources */,
+				85A1592D12F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */,
+				85A1592E12F80E520044BBE1 /* ImageWidget.mm in Sources */,
+				85A1592F12F80E520044BBE1 /* IWidget.mm in Sources */,
+				85A1593012F80E520044BBE1 /* LabelWidget.mm in Sources */,
+				85A1593112F80E520044BBE1 /* ListViewItemWidget.mm in Sources */,
+				85A1593212F80E520044BBE1 /* ListViewWidget.mm in Sources */,
+				85A1593312F80E520044BBE1 /* NavBarWidget.mm in Sources */,
+				85A1593412F80E520044BBE1 /* NavScreenWidget.mm in Sources */,
+				85A1593512F80E520044BBE1 /* ReflectionWidget.mm in Sources */,
+				85A1593612F80E520044BBE1 /* RelativeLayoutWidget.mm in Sources */,
+				85A1593712F80E520044BBE1 /* ScreenWidget.mm in Sources */,
+				85A1593812F80E520044BBE1 /* SearchBarWidget.mm in Sources */,
+				85A1593912F80E520044BBE1 /* TabScreenWidget.mm in Sources */,
+				85A1593A12F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
+				85A1593B12F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -915,33 +965,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				858B3FDB12E67D090058DBFC /* ImageWidget.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
-				858B3FDC12E67D090058DBFC /* IWidget.mm in Sources */,
-				858B3FDD12E67D090058DBFC /* LabelWidget.mm in Sources */,
-				858B3FDE12E67D090058DBFC /* NavScreenWidget.mm in Sources */,
-				858B3FDF12E67D090058DBFC /* ReflectionWidget.mm in Sources */,
-				858B3FE012E67D090058DBFC /* ScreenWidget.mm in Sources */,
-				858B3FE112E67D090058DBFC /* TabScreenWidget.mm in Sources */,
-				858B3FE212E67D090058DBFC /* AbstractLayoutView.m in Sources */,
-				858B3FE312E67D090058DBFC /* HLayoutView.m in Sources */,
-				858B3FE412E67D090058DBFC /* VLayoutView.m in Sources */,
-				858B3FE512E67D090058DBFC /* MoSyncTableView.m in Sources */,
-				858B3FE612E67D090058DBFC /* MoSyncTableViewCell.m in Sources */,
-				858B3FE712E67D090058DBFC /* MoSyncUI.mm in Sources */,
-				858B3FE812E67D090058DBFC /* ScreenWidgetController.m in Sources */,
-				858B3FE912E67D090058DBFC /* UIColor-Expanded.m in Sources */,
-				858B3FEA12E67D090058DBFC /* MoSyncUISyscalls.mm in Sources */,
-				858B3FEB12E67D090058DBFC /* ListViewWidget.mm in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
-				858B3FED12E67D090058DBFC /* ButtonWidget.mm in Sources */,
-				858B3FEE12E67D090058DBFC /* HorizontalLayoutWidget.mm in Sources */,
-				858B3FEF12E67D090058DBFC /* VerticalLayoutWidget.mm in Sources */,
-				858B3FF012E67D090058DBFC /* ListViewItemWidget.mm in Sources */,
-				858B3FF112E67D090058DBFC /* WebViewWidget.mm in Sources */,
-				858B3FF212E67D090058DBFC /* GLViewWidget.mm in Sources */,
 				858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */,
-				858B3FF412E67D090058DBFC /* SearchBarWidget.mm in Sources */,
 				8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */,
 				85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */,
 				85F2551B11AC12DE00EB47EE /* connection.cpp in Sources */,
@@ -968,10 +994,34 @@
 				85F2553311AC12DE00EB47EE /* CMGlyphDrawing.mm in Sources */,
 				85F2553411AC12DE00EB47EE /* ThreadPoolImpl.mm in Sources */,
 				85F2553511AC12DE00EB47EE /* SyscallImpl.mm in Sources */,
-				858B449412E7A8F80058DBFC /* RelativeLayoutWidget.mm in Sources */,
-				F7247A5312E8A7A900AB0211 /* CheckBoxWidget.mm in Sources */,
 				85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */,
-				F7247C4112ECBA4B00AB0211 /* NavBarWidget.mm in Sources */,
+				85A1593D12F80E520044BBE1 /* AbstractLayoutView.m in Sources */,
+				85A1593F12F80E520044BBE1 /* HLayoutView.m in Sources */,
+				85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */,
+				85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
+				85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
+				85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */,
+				85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
+				85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
+				85A1594E12F80E520044BBE1 /* UIColor-Expanded.m in Sources */,
+				85A1595012F80E520044BBE1 /* ButtonWidget.mm in Sources */,
+				85A1595212F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,
+				85A1595412F80E520044BBE1 /* GLViewWidget.mm in Sources */,
+				85A1595612F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */,
+				85A1595812F80E520044BBE1 /* ImageWidget.mm in Sources */,
+				85A1595A12F80E520044BBE1 /* IWidget.mm in Sources */,
+				85A1595C12F80E520044BBE1 /* LabelWidget.mm in Sources */,
+				85A1595E12F80E520044BBE1 /* ListViewItemWidget.mm in Sources */,
+				85A1596012F80E520044BBE1 /* ListViewWidget.mm in Sources */,
+				85A1596212F80E520044BBE1 /* NavBarWidget.mm in Sources */,
+				85A1596412F80E520044BBE1 /* NavScreenWidget.mm in Sources */,
+				85A1596612F80E520044BBE1 /* ReflectionWidget.mm in Sources */,
+				85A1596812F80E520044BBE1 /* RelativeLayoutWidget.mm in Sources */,
+				85A1596A12F80E520044BBE1 /* ScreenWidget.mm in Sources */,
+				85A1596C12F80E520044BBE1 /* SearchBarWidget.mm in Sources */,
+				85A1596E12F80E520044BBE1 /* TabScreenWidget.mm in Sources */,
+				85A1597012F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
+				85A1597212F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
