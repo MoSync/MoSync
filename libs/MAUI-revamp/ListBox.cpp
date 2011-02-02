@@ -748,17 +748,19 @@ namespace MAUI {
 
 		} else {
 			if(mChildren.size()>0) {
+				bool res = keyPressedSelect(keyCode, nativeCode);
 				if(mChildren[mSelectedIndex]->isFocusable()) {
 					mChildren[mSelectedIndex]->setFocused(true);
 					return true;
 				}
-				return true;//return true;
+				return res;
 			} else {
 				return false;
 			}
 		}
+	}
 
-		/*
+	bool ListBox::keyPressedSelect(int keyCode, int nativeCode) {
 		if(mOrientation == LBO_HORIZONTAL) {
 			if(keyCode == MAK_LEFT) {
 				if(!mWrapping && mSelectedIndex == 0) return false;
@@ -784,7 +786,6 @@ namespace MAUI {
 				return false;
 			}
 		}
-		*/
 	}
 
 	bool ListBox::pointerPressed(MAPoint2d p, int id) {
