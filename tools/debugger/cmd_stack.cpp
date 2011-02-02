@@ -327,10 +327,10 @@ static void oprintLocalVariable(const LocalVariable* lv, const FRAME& frame) {
 			oprintf("%s", getValue(rv->dataType, &r.gpr[rv->reg],
 				TypeBase::eNatural).c_str());
 		} else if(lv->storageClass == eStatic) {
-			const StaticLocal* sl = (StaticLocal*)lv;
 			// TODO: We need to load some memory here.
 			// Must be done asynchronously, before we start printing anything.
 			// Callers of this function will have to be responsible, I think.
+			//const StaticLocal* sl = (StaticLocal*)lv;
 			//oprintf("%s", getValue(sl->dataType, &gMemBuf[sl->address], TypeBase::eNatural).c_str());
 			oprintf("TODO: StaticLocal");
 		} else {

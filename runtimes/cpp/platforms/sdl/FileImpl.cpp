@@ -80,18 +80,18 @@ namespace Base {
 	}
 	bool FileStream::read(void* dst, int size) {
 		TEST(isOpen());
-		byte* ptr = (byte*)dst;
-		byte* end = ptr + size;
-		while(ptr != end) {
-			int len = end - ptr;
-			int res = ::read(mFd, ptr, len);
+		byte* pos = (byte*)dst;
+		byte* end = pos + size;
+		while(pos != end) {
+			int len = end - pos;
+			int res = ::read(mFd, pos, len);
 			if(res == 0) {
 				LOG("Unexpected EOF.\n");
 				FAIL;
 			}
 			LTEST(res);
 			DEBUG_ASSERT(res <= len);
-			ptr += res;
+			pos += res;
 		}
 		return true;
 	}
@@ -142,18 +142,18 @@ namespace Base {
 	}
 	bool WriteFileStream::write(const void* src, int size) {
 		TEST(isOpen());
-		const byte* ptr = (const byte*)src;
-		const byte* end = ptr + size;
-		while(ptr != end) {
-			int len = end - ptr;
-			int res = ::write(mFd, ptr, len);
+		const byte* pos = (const byte*)src;
+		const byte* end = pos + size;
+		while(pos != end) {
+			int len = end - pos;
+			int res = ::write(mFd, pos, len);
 			if(res == 0) {
 				LOG("Unexpected EOF.\n");
 				FAIL;
 			}
 			LTEST(res);
 			DEBUG_ASSERT(res <= len);
-			ptr += res;
+			pos += res;
 		}
 		return true;
 	}
