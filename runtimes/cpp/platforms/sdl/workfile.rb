@@ -18,6 +18,7 @@ work.instance_eval do
 	elsif(HOST == :linux)
 		
 		@IGNORED_FILES << "strptime.c"
+		@IGNORED_FILES << "OpenGLES.cpp"
 		if (!SDL_SOUND)
 			@EXTRA_CPPFLAGS += " -D__NO_SDL_SOUND__"
 			@IGNORED_FILES += ["SDLSoundAudioSource.cpp"]

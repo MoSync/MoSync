@@ -190,10 +190,10 @@ namespace Base {
 		
 		void logEverything() {
 #define RESOURCE_STRINGS(R, T, D) resourceStrings[R] = #R;
-			
 			const char *resourceStrings[128] = {0};			
 			TYPES(RESOURCE_STRINGS)
 
+#ifdef LOGGING_ENABLED
 			LOG("Num static resources: %d\n", mN);
 			LOG("Num dynamic resources: %d\n", dynResSize);
 			for(unsigned int i = 0; i < mN; i++) {
@@ -204,7 +204,8 @@ namespace Base {
 			for(unsigned int i = 0; i < dynResSize; i++) {
 				byte type = dynResTypes[i];
 				LOG("Dynamic resource %d is of type %s\n", i, resourceStrings[type]);
-			}			
+			}
+#endif	
 		}
 
 	private:
