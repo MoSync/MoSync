@@ -129,6 +129,9 @@
 	return handle;
 }
 
+- (void)wasCreated {
+}
+
 - (void) setParent:(IWidget*) toParent {
 	parent = toParent;
 }

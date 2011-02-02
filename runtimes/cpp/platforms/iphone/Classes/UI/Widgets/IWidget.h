@@ -32,6 +32,7 @@
 - (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
 - (int)getWidgetHandle;
+- (void)wasCreated; // do stuff after the handle has been set (temporary hack). 
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView;

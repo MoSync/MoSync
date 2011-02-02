@@ -76,7 +76,9 @@ UIViewController *mainController;
 		created = [[ReflectionWidget alloc] initWithName:name];
 	}
 	
-	[created setWidgetHandle:[widgetArray count]]; 
+	[created setWidgetHandle:[widgetArray count]];
+	[created setup];
+	
 	
 	
 	// todo handle these things.
