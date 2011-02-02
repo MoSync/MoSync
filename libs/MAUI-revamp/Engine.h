@@ -62,6 +62,8 @@ namespace MAUI {
 	public:
 		/** Sets the widget that is main to the application, constituting the root of the UI tree **/
 		void setMain(Widget* main);
+
+		Widget* getMain() { return mMain; }
 		
 		virtual ~Engine();
 
