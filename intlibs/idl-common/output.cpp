@@ -672,6 +672,15 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	if(f.args.size() == 0) {
 		stream << "void";
 	}
+
+	string varDeclarations;
+	if(f.returnType == "double") {
+		varDeclarations += "\tMA_DV _result;\n";
+	}
+	else if(f.returnType == "float") {
+		varDeclarations += "\tMA_FV _result;\n";
+	}
+
 	for(size_t j=0; j<f.args.size(); j++) {
 		const Argument& a(f.args[j]);
 		if(j != 0)
@@ -687,15 +696,20 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		if(isPointerType(inf, a.type) || !a.in) {
 			invokeArgs += "(int)";
 		}
-		if(a.type == "double" && a.in) {
+
+		string resolved = resolveType(inf, a.type);
+
+		if(resolved == "double" && a.in) {
 			string tvn = "_" + a.name;
-			tempVars += "\tMA_DV " + tvn + ";\n";
+			//tempVars += "\tMA_DV " + tvn + ";\n";
+			varDeclarations += "\tMA_DV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".d = " + a.name + ";\n";
 			invokeArgs += tvn + ".hi, " + tvn + ".lo";
 			usedArgs++;
-		} else if(a.type == "float" && a.in) {
+		} else if(resolved == "float" && a.in) {
 			string tvn = "_" + a.name;
-			tempVars += "\tMA_FV " + tvn + ";\n";
+			//tempVars += "\tMA_FV " + tvn + ";\n";
+			varDeclarations += "\tMA_FV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".f = " + a.name + ";\n";
 			invokeArgs += tvn + ".i";
 		} else {
@@ -703,19 +717,22 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		}
 	}	//args
 	stream << ") {\n";
+	if(usedArgs > 3)
+		stream << "#ifdef MAPIP\n";
+
+	stream << varDeclarations;
 	stream << tempVars;
 
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
-
 	string invoke = ioctlName + "(" + toString(f.number) + invokeArgs + ");";
 	if(f.returnType == "double") {
-		stream << "\tMA_DV _result;\n";
+		//stream << "\tMA_DV _result;\n";
 		stream << "\t_result.ll = " + invoke + "\n";
 		stream << "\treturn _result.d;\n";
 	} else if(f.returnType == "float") {
-		stream << "\tMA_FV _result;\n";
+		//stream << "\tMA_FV _result;\n";
 		stream << "\t_result.i = (int)" + invoke + "\n";
 		stream << "\treturn _result.f;\n";
 	} else {

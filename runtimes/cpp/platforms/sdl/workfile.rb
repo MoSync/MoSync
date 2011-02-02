@@ -36,6 +36,7 @@ work.instance_eval do
 		
 	elsif(HOST == :darwin)
 		@IGNORED_FILES << "strptime.c"
+		@IGNORED_FILES << "OpenGLES.cpp"
 		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
 		@LIBRARIES = common_libraries +["objc"]
 		@SPECIFIC_CFLAGS = {"SDL_prim.c" => " -Wno-float-equal -Wno-unreachable-code -D_ANSI_SOURCE",

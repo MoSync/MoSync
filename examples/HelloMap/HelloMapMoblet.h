@@ -32,6 +32,8 @@ namespace HelloMap
 		
 		virtual ~HelloMapMoblet( );
 
+		void Terminate( ) { mRun = false; }
+
 	private:
 		HelloMapScreen* mScreen;
 	};

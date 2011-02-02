@@ -30,6 +30,16 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
 		string name = func->getName();
+		
+		/**
+		 * Never versions of gcc includes some builtin functions,
+		 * ignore these.
+		 */
+		if(name.find_first_of("__builtin") == 0)
+		{
+			continue;
+		}
+		
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
 		bool returnsHandle = false;

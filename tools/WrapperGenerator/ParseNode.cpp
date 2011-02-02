@@ -29,7 +29,7 @@ string ParseNode::getAttr(const string& _name, bool force) const {
 	map<string, string>::const_iterator iter = attributes.find(_name);
 	if(iter != attributes.end()) return iter->second;
 	else if(force) {
-		System::error(System::genstr("Attribute '%s' missing on line %d\n", _name.c_str(), lineNumber).c_str());
+		System::error("%s", System::genstr("Attribute '%s' missing on line %d\n", _name.c_str(), lineNumber).c_str());
 	}
 	return "";
 }

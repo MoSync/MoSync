@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <Syscall.h>
 
 namespace Base
-{
+{	
 	// Framebuffer API
 	
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info);
@@ -211,4 +211,48 @@ namespace Base
 	* @return \< 0 on error.
 	*/
 	int _maScreenStateEventsOnOff(int eventsOn, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maTextBox(const wchar* title, const wchar* inText, int outText, int maxSize, int constraints, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maMessageBox(const char* title, const char* text, JNIEnv* jNIEnv,jobject jThis);
+	
+	// Widget API
+	int _maWidgetCreate(const char *widgetType, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetAddChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetRemoveChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetSetProperty(int widget, const char *property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetEvauluateScript(int widget, const char *script, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetProperty(int memStart, int widget, const char *property, int memBuffer, int memBufferSize, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetGetMessageData(int memStart, int messageId, int messageBufferPointer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
+	
+	// Open GL API
+	/**
+	 * Internal function that initializes an Open GL
+	 * fullscreen surface.
+	 */
+	int _maOpenGLInitFullscreen();
+	
+	/**
+	 * Internal function that destroys an Open GL fullscreen
+	 * surface.
+	 */
+	int _maOpenGLCloseFullscreen();
+	
+	/**
+	 * Internal function that calls the java side to load an opengl
+	 * texture, to the currently bound texture handle.
+	 *
+	 * @param image Image to load.
+	 */
+	int _maOpenGLTexImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis);
+	
+	/**
+	 * Internal function that calls the java side to load part of an image
+	 * into an opengl texture, to the currently bound texture handle.
+	 *
+	 * @param image Image to load.
+	 */
+	int _maOpenGLTexSubImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis);
 }

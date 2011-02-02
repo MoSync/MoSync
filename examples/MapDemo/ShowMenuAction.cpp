@@ -23,7 +23,8 @@ namespace MapDemoUI
 	//-------------------------------------------------------------------------
 	ShowMenuAction::ShowMenuAction( IActionSource* source ) :
 	//-------------------------------------------------------------------------
-		mSource( source )
+		mSource( source ),
+		mMenu( NULL )
 	{
 	}
 
@@ -31,6 +32,8 @@ namespace MapDemoUI
 	ShowMenuAction::~ShowMenuAction( )
 	//-------------------------------------------------------------------------
 	{
+		//if ( mMenu != NULL )
+		//	deleteobject( mMenu );
 	}
 
 	//-------------------------------------------------------------------------
@@ -44,7 +47,7 @@ namespace MapDemoUI
 	void ShowMenuAction::performPrim( )
 	//-------------------------------------------------------------------------
 	{
-		Menu* menu = newobject( Menu, new Menu( mSource ) );
-		menu->show( );
+		mMenu = newobject( Menu, new Menu( mSource ) );
+		mMenu->show( );
 	}
 }

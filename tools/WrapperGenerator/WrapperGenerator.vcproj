@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../intlibs"
+				AdditionalIncludeDirectories="../../intlibs;../ReleasePackageBuild\build_package_tools\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,6 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="libexpat.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="../ReleasePackageBuild\build_package_tools\lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"

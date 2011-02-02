@@ -17,6 +17,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
+
+//#include "MoSyncUISyscalls.h"
+void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
+
 //#include "Platform.h"
 //#import "MoSyncMain.h"
 
@@ -33,12 +37,14 @@ void MoSync_AddCloseEvent();
 	// not usable for drawing, etc.
 	[[UIApplication sharedApplication] setStatusBarHidden:YES 
 										withAnimation:UIStatusBarAnimationFade];
+	//[[UIApplication sharedApplication] setStatusBarHidden:NO 
+	//									withAnimation:UIStatusBarAnimationFade];
+	
     // Override point for customization after app launch    
 	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	
     viewController = [[MoSyncViewController alloc] init];
-	
-    [window addSubview:viewController.view];
+	initMoSyncUISyscalls(window, viewController);
+	[window addSubview:viewController.view];
     [window makeKeyAndVisible];
 }
 

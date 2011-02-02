@@ -15,34 +15,68 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include "MemoryMgr.h"
 #include "MapCache.h"
 #include "MapTile.h"
 #include "MapSource.h"
 #include "LonLat.h"
 #include "MapTileCoordinate.h"
-#include "MapSourceMgr.h"
 #include "DebugPrintf.h"
+#include "TraceScope.h"
 
 namespace MAP
 {
 	MapCache* MapCache::sSingleton = NULL;
 
 	//=========================================================================
-	class MapCacheClientData : public MapSourceClientData
+	class MapTileKey
 	//=========================================================================
 	{
 	public:
-		MapCacheClientData( IMapCacheListener* listener ) 
-			: mListener( listener ) 
+		MapTileKey( ) { }
+
+		//---------------------------------------------------------------------
+		MapTileKey( MapSource* source, int gridX, int gridY, int magnification )
+		//---------------------------------------------------------------------
+		:	mSource( source ),
+			mGridX( gridX ),
+			mGridY( gridY ),
+			mMagnification( magnification )
 		{
 		}
 
-		IMapCacheListener*	mListener;
+		MapSource* mSource;
+		int mGridX;
+		int mGridY;
+		int mMagnification;
+
+		bool operator==(const MapTileKey& c) const 
+		{
+			return mSource == c.mSource && mGridX == c.mGridX && mGridY == c.mGridY && mMagnification == c.mMagnification;
+		}
+
+		bool operator<(const MapTileKey& c) const 
+		{
+			return mSource < c.mSource && mGridX < c.mGridX && mGridY < c.mGridY && mMagnification < c.mMagnification;
+		}
+					
 	};
+}
 
-	static const int DefaultCapacity = 20;
+namespace MAUtil 
+{
+	//-------------------------------------------------------------------------
+	template<> 
+	hash_val_t THashFunction<MAP::MapTileKey>( const MAP::MapTileKey& data ) 
+	//-------------------------------------------------------------------------
+	{
+		return ((int)data.mSource) ^ data.mGridX ^ data.mGridY ^ data.mMagnification;
+	} 
+}
 
+namespace MAP
+{
 	//-------------------------------------------------------------------------
 	MapCache* MapCache::get( ) 
 	//-------------------------------------------------------------------------
@@ -65,12 +99,11 @@ namespace MAP
 	//
 	MapCache::MapCache( ) :
 	//-------------------------------------------------------------------------
-		mList( NULL ),
+		mList( ),
 		mHits( 0 ),
 		mMisses( 0 ),
-		mCapacity( DefaultCapacity )
+		mCapacity( MapCacheDefaultCapacity )
 	{
-		reallocateCache( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -82,7 +115,6 @@ namespace MAP
 	{
 		// dispose tile list
 		clear( );
-		deleteobject( mList );
 	}
 
 	//-------------------------------------------------------------------------
@@ -96,32 +128,16 @@ namespace MAP
 	void MapCache::setCapacity( int capacity ) 
 	//-------------------------------------------------------------------------
 	{ 
-		mCapacity = capacity; 
-		reallocateCache( ); 
+		mCapacity = capacity;
 	}
 
 	//-------------------------------------------------------------------------
-	//
-	// Reallocates cache, content is flushed
-	//
-	void MapCache::reallocateCache( )
+	int MapCache::size( )
 	//-------------------------------------------------------------------------
 	{
-		//
-		// Free existing
-		//
-		if ( mList != NULL )
-		{
-			clear( );
-			deleteobject( mList );
-		}
-		//
-		// Alloc new
-		//
-		mList = newobject( MapTile*, new MapTile*[mCapacity] );
-		for ( int i = 0; i < mCapacity; i++ )
-			mList[i] = NULL;
+		return mList.size( );
 	}
+
 	//
 	// Min, Max
 	//
@@ -134,39 +150,24 @@ namespace MAP
 	//
 	// Requests tiles to cover specified rectangle
 	//
-	void MapCache::requestTiles(	IMapCacheListener* listener,
-									MapSourceKind sourceKind,
+	void MapCache::requestTiles(	MapSource *source,
 									const LonLat centerpoint,
-									const int magnification,
+									const MagnificationType magnification,
 									const int pixelWidth,
-									const int pixelHeight )
+									const int pixelHeight,
+									const double directionX,
+									const double directionY )
 	//-------------------------------------------------------------------------
 	{
 		DebugAssert( pixelWidth > 0 );
 		DebugAssert( pixelHeight > 0 );
 
-		MapSourceMgr* mgr = MapSourceMgr::get( );
-		MapSource* source = mgr->getMapSource( sourceKind );
+		if ( source == NULL ) 
+			return;
 		//
 		// Clear queue
 		//
 		source->clearQueue( );
-
-
-		//
-		// Test code
-		//
-		if ( /*true*/false )
-		{
-			//
-			// Test code only requests tile at centerpoint.
-			//
-			LonLat cp = LonLat( centerpoint.lon, centerpoint.lat + 40 );
-			MapTileCoordinate tileXY = source->lonLatToTile( centerpoint, magnification );
-			source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
-			return;
-		}
-
 
 		const int offsetX = pixelWidth / 2;
 		const int offsetY = pixelHeight / 2;
@@ -174,6 +175,7 @@ namespace MAP
 		// conv center to pixels
 		//
 		PixelCoordinate centerPx = source->lonLatToPixel( centerpoint, magnification );
+		//
 		// Find corners
 		//
 		PixelCoordinate llpix = PixelCoordinate( magnification, centerPx.getX( ) - offsetX, centerPx.getY( ) - offsetY );
@@ -185,117 +187,113 @@ namespace MAP
 		//
 		MapTileCoordinate llTile = source->lonLatToTile( ll, magnification );
 		MapTileCoordinate urTile = source->lonLatToTile( ur, magnification );
-
+		int left = Min( llTile.getX( ), urTile.getX( ) );
+		int right = Max( llTile.getX( ), urTile.getX( ) ); 
+		int top = Min( llTile.getY( ), urTile.getY( ) );
+		int bottom = Max( llTile.getY( ), urTile.getY( ) );
 		//
 		// Queue all tiles in area
 		//
-		//const double halfTileSize = 0.5 * tileSize;
-		int yMin = Min( llTile.getY( ), urTile.getY( ) );
-		int yMax = Max( llTile.getY( ), urTile.getY( ) );
-		int xMin = Min( llTile.getX( ), urTile.getX( ) );
-		int xMax = Max( llTile.getX( ), urTile.getX( ) );
+		
+		
+		int xStep = directionX > 0 ? 1 : -1;
+		int xMin = directionX > 0 ? left : right;
+		int xMax = directionX > 0 ? right + 1 : left - 1;
 
-		for ( int y = yMin; y <= yMax; y++ )
+		int yStep = directionY < 0 ? 1 : -1;
+		int yMin = directionY < 0 ? top : bottom;
+		int yMax = directionY < 0 ? bottom + 1 : top - 1;
+
+		for ( int y = yMin; y != yMax; y += yStep )
 		{
-			for ( int x = xMin; x <= xMax; x++)
+			for ( int x = xMin; x != xMax; x += xStep )
 			{
 				//
-				// In cache? Then return tile in cache
+				// In cache? Then immediately return tile in cache
 				//
-				MapTileCoordinate tileXY = MapTileCoordinate( x, y, magnification );
+				MapTileKey key = MapTileKey( source, x, y, magnification );
+				HashMap<MapTileKey, MapTile*>::Iterator found = mList.find( key );
 
-				int loc = findInCache( sourceKind, tileXY );
-				if ( loc != -1 )
+				if ( found != mList.end( ) )
 				{
+					HashMap<MapTileKey, MapTile*>::PairKV kv = *found;
 					mHits++;
-					MapTile* t = mList[loc];
+					MapTile* t = kv.second;
 					t->stamp( );
-					listener->tileReceived( this, t );
+					onTileReceived( t, true );
 					continue;
-				}
-				else
-				{
 				}
 				//
 				// Not in cache: request from map source.
 				//
 				mMisses++;
-				source->requestTile( tileXY, this, newobject( MapCacheClientData, new MapCacheClientData( listener ) ) );
+				source->requestTile( this, MapTileCoordinate( x, y, (int)magnification ) );
 			}
 		}
+		source->requestJobComplete( this );
 	}
 
 	//-------------------------------------------------------------------------
-	int MapCache::findInCache( MapSourceKind sourceKind, MapTileCoordinate tileXY ) const
-	//-------------------------------------------------------------------------
-	{
-		for ( int i = 0; i < mCapacity; i++ )
-		{
-			const MapTile* t = mList[i];
-			if ( t != NULL )
-				if ( t->getSourceKind( ) == sourceKind && t->getGridX( ) == tileXY.getX( ) && t->getGridY( ) == tileXY.getY( ) && t->getMagnification( ) == tileXY.getMagnification( ) )
-					return i;
-		}
-		return -1;
-	}
-
-	//-------------------------------------------------------------------------
-	int MapCache::findLRU( ) const
+	MapTileKey MapCache::findLRU( )
 	//-------------------------------------------------------------------------
 	{
 		DateTime oldest = DateTime::maxValue( );
-		int loc = -1;
-		for ( int i = 0; i < mCapacity; i++ )
+		MapTileKey ret;
+		for ( HashMap<MapTileKey, MapTile*>::ConstIterator i = mList.begin( ); i != mList.end( ); i++ )
 		{
-			const MapTile* t = mList[i];
-			if( t == NULL )
-				return i;
+			MapTile* t = i->second;
 			if ( t->getLastAccessTime( ) < oldest )
 			{
 				oldest = t->getLastAccessTime( );
-				loc = i;
+				ret = i->first;
 			}
 		}
-		return loc;
+		return ret;
 	}
 
 	//-------------------------------------------------------------------------
-	int MapCache::findFreeLocation( ) const
+	void MapCache::tileReceived( MapSource* sender, MapTile* tile )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < mCapacity; i++ )
-			if( mList[i] == NULL )
-				return i;
-		return -1;
-	}
+#if 0 // this block tries to test if memory is available
 
-	//-------------------------------------------------------------------------
-	void MapCache::tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* cd )
-	//-------------------------------------------------------------------------
-	{
-		MapCacheClientData* clientData = (MapCacheClientData*)cd;
 		//
-		// Add to cache in free location
+		// try to alloc something bigger than a tile
 		//
-		int loc = findFreeLocation( );
+		MAHandle placeholder = maCreatePlaceholder( );
+		int res = maCreateData( placeholder, 1 << 20 );
 		//
-		// No free location? Then find oldest accessed tile and overwrite.
+		// Cleanup after test
 		//
-		if ( loc == -1 )
-			loc = findLRU( );
+		maDestroyObject( placeholder );
 		//
-		// Drop old tile, if any
+		// failed?
 		//
-		if ( loc != -1 )
-			deleteobject( mList[loc] );
+		if ( res == RES_OUT_OF_MEMORY )
+
+#else // this block just limits cache size
+
+		if ( mList.size( ) >= (unsigned int)mCapacity )
+
+#endif
+
+		{
+			//
+			// find and remove oldest in cache
+			//
+			MapTileKey oldestKey = findLRU( );
+			MapTile* oldestTile = mList[oldestKey];
+			deleteobject( oldestTile );
+			mList.erase( oldestKey );
+		}
 		//
 		// Finally add to cache
 		//
 		tile->stamp( );
-		mList[loc] = tile;
+		MapTileKey newKey = MapTileKey( sender, tile->getGridX( ), tile->getGridY(), tile->getMagnification( ) );
+		mList.insert( newKey, tile );
 
-		IMapCacheListener* listener = clientData->mListener;
-		listener->tileReceived( this, tile );
+		onTileReceived( tile, false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -303,6 +301,7 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::downloadCancelled\n" );
 	}
 
 	//-------------------------------------------------------------------------
@@ -310,6 +309,15 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		// TODO: Handle
+		DebugPrintf( "MapCache::error %d\n", code );
+		onError( code );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::jobComplete( MapSource* source )
+	//-------------------------------------------------------------------------
+	{
+		onJobComplete( );
 	}
 
 	//-------------------------------------------------------------------------
@@ -319,7 +327,40 @@ namespace MAP
 	void MapCache::clear( )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < mCapacity; i++ )
-			deleteobject( mList[i] );
+		for ( HashMap<MapTileKey, MapTile*>::ConstIterator i = mList.begin( ); i != mList.end( ); i++ )
+		{
+			MapTile* t = i->second;
+			deleteobject( t );
+		}
+		mList.clear( );
 	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onTileReceived( MapTile* tile, bool foundInCache )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->tileReceived( this, tile, foundInCache );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onJobComplete( )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->jobComplete( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapCache::onError( int code )
+	//-------------------------------------------------------------------------
+	{
+		Vector<IMapCacheListener*>* listeners = getBroadcasterListeners<IMapCacheListener>( *this );
+		for ( int i = 0; i < listeners->size( ); i ++ )
+			(*listeners)[i]->error( this, code );
+	}
+
+
 }

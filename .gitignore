@@ -14,6 +14,8 @@ IX_*.h
 *.suo
 *.user
 *.class
+*.swp
+*~
 
 MAHeaders.h
 program
@@ -24,6 +26,7 @@ Stabs.tab
 Sld.tab
 Thumbs.db
 stabs.tab
+.mosyncproject.local
 
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
@@ -33,8 +36,6 @@ stabs.tab
 /tools/GLWrapperGenerator/magl_functions.h
 /tools/GLWrapperGenerator/opengl_generated.idl
 /tools/GLWrapperGenerator/opengl_invoke_generated.jpp
-
-/tools/idl2/opengl_generated.idl
 
 /tools/pipe-tool/PBProto.h
 /tools/pipe-tool/PBProtoPub.h
