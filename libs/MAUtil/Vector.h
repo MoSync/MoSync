@@ -114,6 +114,13 @@ namespace MAUtil {
 			MAUTIL_VECTOR_LOG("Vector done");
 		}
 
+		Vector(const Type* array, int _size) {
+			mCapacity = _size;
+			mData = new Type[mCapacity];
+			mSize = 0;
+			add(array, _size);
+		}
+
 		/**
 		* Copies the \a other vector.
 		*/
