@@ -3457,7 +3457,6 @@ interface MAAPI {
 		 * @return \< 0 on error.
 		 */
 		int maScreenStateEventsOff();
-		void maScreenSetFullscreen(in int fullscreen);
 
 #if IX_OPENGL_ES
 #include "opengl_non_generated.idl"
