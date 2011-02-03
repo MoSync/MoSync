@@ -1285,6 +1285,18 @@ interface MAAPI {
 		 * \see maScreenActivateEventsOn()
 		 */
 		SCREEN_STATE_OFF = 27;
+		
+		/** \brief The bluetooth chip was turned off.
+		* Bluetooth functions will return #CONNERR_UNAVAILABLE.
+		* Currently implemented only on Android.
+		*/
+		BLUETOOTH_TURNED_OFF = 28;
+
+		/** \brief The bluetooth chip was turned on.
+		* Bluetooth functions will now work normally again.
+		* Currently implemented only on Android.
+		*/
+		BLUETOOTH_TURNED_ON = 29;
 	}
 
 	/**
