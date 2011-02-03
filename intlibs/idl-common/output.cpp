@@ -717,8 +717,6 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		}
 	}	//args
 	stream << ") {\n";
-	if(usedArgs > 3)
-		stream << "#ifdef MAPIP\n";
 
 	stream << varDeclarations;
 	stream << tempVars;
