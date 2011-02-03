@@ -160,6 +160,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_CHAR event[1]
 #define EI_POINTX event[1]
 #define EI_POINTY event[2]
+#define EI_TOUCH_ID event[3]
 #define EI_CONN_HANDLE event[1]
 #define EI_CONN_OPTYPE event[2]
 #define EI_CONN_RESULT event[3]
