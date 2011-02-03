@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.ui.widgets.EditBoxWidget;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
 import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -83,6 +84,7 @@ public class ViewFactory
 		addFactory( Types.WIDGET_TYPE_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
 		addFactory( Types.WIDGET_TYPE_LAYOUT_RELATIVE, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
 		addFactory( Types.WIDGET_TYPE_CHECKBOX, new CheckBoxFactory( ) );
+		addFactory( Types.WIDGET_TYPE_EDIT_BOX, new DefaultFactory( android.widget.EditText.class, EditBoxWidget.class ) );
 	}
 	
 	/**

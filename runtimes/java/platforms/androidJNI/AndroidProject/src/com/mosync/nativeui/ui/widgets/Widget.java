@@ -85,6 +85,14 @@ public class Widget
 		{
 			layoutParams.marginTop = IntConverter.convert( value );
 		}
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_RIGHT ) )
+		{
+			layoutParams.marginRight = IntConverter.convert( value );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_BOTTOM ) )
+		{
+			layoutParams.marginBottom = IntConverter.convert( value );
+		}
 		else if( property.equals( Types.WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT ) )
 		{
 			layoutParams.horizontalAlignment =  HorizontalAlignment.convert( value );

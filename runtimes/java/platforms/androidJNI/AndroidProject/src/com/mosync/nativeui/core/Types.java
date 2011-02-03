@@ -12,6 +12,7 @@ public class Types
 	public static final String WIDGET_TYPE_BUTTON = "Button";
 	public static final String WIDGET_TYPE_CHECKBOX = "CheckBox";
 	public static final String WIDGET_TYPE_LABEL = "Label";
+	public static final String WIDGET_TYPE_EDIT_BOX = "EditBox";
 	public static final String WIDGET_TYPE_IMAGE = "Image";
 	public static final String WIDGET_TYPE_LIST = "ListView";
 	public static final String WIDGET_TYPE_LIST_ITEM = "ListViewItem";
@@ -32,10 +33,13 @@ public class Types
 	public static final String WIDGET_PROPERTY_PADDING_RIGHT = "right";
 	public static final String WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
 	
-	public static final String WIDGET_PROPERTY_MARGIN_LEFT = "left";
-	public static final String WIDGET_PROPERTY_MARGIN_TOP = "top";
-	public static final String WIDGET_PROPERTY_MARGIN_RIGHT = "right";
-	public static final String WIDGET_PROPERTY_MARGIN_BOTTOM = "bottom";
+	public static final String WIDGET_PROPERTY_LEFT = "marginLeft";
+	public static final String WIDGET_PROPERTY_TOP = "marginTop";
+	
+	public static final String WIDGET_PROPERTY_MARGIN_LEFT = "marginLeft";
+	public static final String WIDGET_PROPERTY_MARGIN_TOP = "marginTop";
+	public static final String WIDGET_PROPERTY_MARGIN_RIGHT = "marginRight";
+	public static final String WIDGET_PROPERTY_MARGIN_BOTTOM = "marginBottom";
 	
 	public static final String WIDGET_PROPERTY_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
 	public static final String WIDGET_PROPERTY_VERTICAL_ALIGNMENT = "verticalAlignment";
@@ -58,6 +62,8 @@ public class Types
 	
 	public static final String WIDGET_PROPERTY_URL = "url";
 	public static final String WIDGET_PROPERTY_IMAGE = "image";
+	
+	public static final String WIDGET_PROPERTY_EDIT_MODE = "editMode";
 	
 	public static final String WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
 	public static final String WIDGET_PROPERTY_BACKGROUND_IMAGE = "backgroundImage";

@@ -292,6 +292,6 @@ public class NativeUI
 		MoSync.mMoSyncThread.mMemDataSection.put( (byte)0 );
 		MoSync.mMoSyncThread.mMemDataSection.reset( );
 		
-		return WIDGET_OK;
+		return result.length( );
 	}
 }

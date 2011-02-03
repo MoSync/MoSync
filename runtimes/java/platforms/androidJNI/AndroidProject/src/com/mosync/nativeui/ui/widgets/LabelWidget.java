@@ -70,4 +70,21 @@ public class LabelWidget extends Widget
 		
 		return true;
 	}
+	
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		TextView textView = (TextView) getView( );
+		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		{
+			return textView.getText().toString();
+		}
+		else
+		{
+			return super.getProperty(property);
+		}
+	}
 }
