@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 /** 
 * \file Engine.h 
-* \brief MAUI widget manager, useful for developing custom widgets
+* \brief MAUI widget manager, useful for developing custom widgets.
 * \author Patrick Broman and Niklas Nummelin
 */
 
@@ -35,8 +35,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
+	/**
+	 * \brief TODO: Document the purpose of this class.
+	 */
 	class OverlayListener {
 	public:
+		
+		/**
+		 * \brief TODO: Document the purpose of this enum.
+		 */
 		enum OutsideResponse {
 			/// Don't do anything else with the event.
 			eBreak,
@@ -45,84 +52,180 @@ namespace MAUI {
 		};
 
 		/**
-		* Called when a pointerPressed event outside an active overlay is received.
-		* The default response (if you don't pass an OverlayListener to showOverlay()) is
-		* eProceed.
-		*/
+		 * Called when a pointerPressed event outside an active overlay 
+		 * is received. The default response (if you don't pass an 
+		 * OverlayListener to showOverlay()) is eProceed.
+		 */
 		virtual OutsideResponse pointerPressedOutsideOverlay(int x, int y) = 0;
 	};
 
-	/** \brief Widget manager.
-	  *
-	  * This class manages the MAUI widget system. It is mainly of interest when
-	  * when developing custom widgets.
-	**/
-
+	/** 
+	 * \brief Widget manager engine.
+	 *
+	 * This class manages the MAUI widget system. It is mainly of interest when
+	 * when developing custom widgets.
+	 *
+	 * This class is a singleton.
+	 */
 	class Engine : public IdleListener, public FocusListener {
 	public:
-		/** Sets the widget that is main to the application, constituting the root of the UI tree **/
+		/** 
+		 * Sets the main widget of the application, 
+		 * constituting the root of the UI tree.
+		 * \param main The root widget of the UI tree.
+		 */
 		void setMain(Widget* main);
 
 		Widget* getMain() { return mMain; }
 		
+		/**
+		 * Destructor. The constructor is private.
+		 */
 		virtual ~Engine();
 
+		/**
+		 * TODO: Document this method.
+		 */
 		void idle();
 		
-		/** Widgets call this function when they require repainting. It will cause 
-		  * any dirty widgets to be redrawn in the next iteration of the event loop.
-		  **/
+		/** 
+		 * Widgets call this method when they require repainting. 
+		 * It will cause any dirty widgets to be redrawn in the next 
+		 * iteration of the event loop.
+		 */
 		void requestUIUpdate();
 		
-		// added this because graphics can be invalidated on some devices when the focus is lost...
+		/**
+		 * TODO: Improve this comment and document when this method is called
+		 * and what it does.
+		 *
+		 * Added this because graphics can be invalidated on some devices when 
+		 * the focus is lost...
+		 */
 		void focusLost();
+		
+		/**
+		 * TODO: Document this method.
+		 */
 		void focusGained();
 
-		/** Actually performs repainting **/ 
+		/**
+		 * Performs repainting.
+		 */ 
 		void repaint();
 		
-		/** Returns a reference to the single instance of this class, using lazy
-		  * initialization.
-      	  **/
+		/** 
+		 * Returns a reference to the single instance of this class, using lazy
+		 * initialization.
+		 * \return The singtle instance of the Engine class.
+      	 */
 		static Engine& getSingleton();
 
 		/**
-		* Returns a pointer to the current overlay widget, or NULL if no overlay is shown.
-		*/
+		 * Returns a pointer to the current overlay widget, or NULL if 
+		 * no overlay is shown.
+		 * TODO: Document what an "overlay" is and what "current" means.
+		 * \param position TODO: Document.
+		 * \return The current overlay widget.
+		 */
 		Widget* currentOverlay(Point& position);
 
-		/** Shows an overlay Widget. The top left corner is at position \a x and \a y.
-		*/
-		void showOverlay(int x, int y, Widget *overlay, OverlayListener* listener = NULL);
+		/** 
+		 * Show an overlay Widget. The top left corner is at 
+		 * position \a x and \a y.
+		 * \param x The left coordinate of the overlay widget.
+		 * \param y The top coordinate of the overlay widget.
+		 * \param overlay The overlay widget.
+		 * \param listener TODO: Document param.
+		 */
+		void showOverlay(
+			int x, 
+			int y, 
+			Widget* overlay, 
+			OverlayListener* listener = NULL);
 
+		/** 
+		 * TODO: Document method.
+		 * \param x TODO: Document param.
+		 * \param y TODO: Document param.
+		 * \param overlay The overlay widget.
+		 * \return TODO: Document return value.
+		 */
 		OverlayListener::OutsideResponse fireOverlayEvent(int x, int y);
 		
-		/* hide the currently shown overlay. */
+		/**
+		 * Hide the currently shown overlay. 
+		 */
 		void hideOverlay();
 
-		// if style already has been set, it just overwrites the element (not deleting the pointer).
+		/**
+		 * Set default widget style.
+		 * If style already has been set, it just overwrites the element 
+		 * (not deleting the pointer).
+		 * \widgetType TODO: Document param.
+		 * \style TODO: Document param.
+		 */
 		void setDefaultStyle(const String& widgetType, Style* style);
+		
+		/**
+		 * Get default widget style.
+		 * \widgetType TODO: Document param.
+		 * \return TODO: Document return value.
+		 */
 		Style* getDefaultStyle(const String& widgetType);
 
-		void setDisplayConsole(bool dc=true);
+		/**
+		 * TODO: Document method. What is the "console"?
+		 * \display If true display the console, if false hide it.
+		 */
+		void setDisplayConsole(bool display=true);
 
 	protected:
+		/**
+		 * TODO: Document instance variable. 
+		 */
 		Widget *mOverlay;
+		
+		/**
+		 * TODO: Document instance variable. 
+		 */
 		Point mOverlayPosition;
+		
+		/**
+		 * TODO: Document instance variable. 
+		 */
 		OverlayListener* mOverlayListener;
 
+		/**
+		 * The root of the UI tree.
+		 */
 		Widget* mMain;
 
+		/**
+		 * The single instance of this class.
+		 */
 		static Engine* mSingletonPtr;
 
+		/**
+		 * TODO: Document instance variable. 
+		 */
 		bool mCharacterInputActive;
 
-		// possibly change this to hash map.
+		/**
+		 * TODO: Document instance variable. 
+		 * TODO: Possibly change this to hash map.
+		 */
 		MAUtil::Map<String, Style*> mDefaultStyles;
 
+		/**
+		 * TODO: Document instance variable. 
+		 */
 		bool mDisplayConsole;
 
 	private:
+		/**
+		 * Constructor.
+		 */
 		Engine();
 	};
 }

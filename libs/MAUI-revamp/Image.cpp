@@ -15,18 +15,31 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Image.cpp
+* \brief Image widget, with position, size, and autosizing control.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include "Image.h"
 #include <MAUtil/Graphics.h>
 
 namespace MAUI {
 
-	Image::Image(int x, int y, int width, int height,
-		MAHandle res, bool mAutoSizeX, bool mAutoSizeY)
-		: Widget(x, y, width, height),
-		mResource(res),
-		mAutoSizeX(mAutoSizeX),
-		mAutoSizeY(mAutoSizeY)
+	Image::Image(
+		int x, 
+		int y, 
+		int width, 
+		int height,
+		MAHandle res, 
+		bool mAutoSizeX, 
+		bool mAutoSizeY)
+			: Widget(x, y, width, height),
+			mResource(res),
+			mAutoSizeX(mAutoSizeX),
+			mAutoSizeY(mAutoSizeY)
 	{ 
+		// TODO: Document why commented out or delete.
 		//setDrawBackground(false);
 		setResource(res);
 	}
@@ -37,18 +50,27 @@ namespace MAUI {
 
 	void Image::drawWidget() {
 		if(mResource) {
-			Gfx_drawImage(mResource, (mPaddedBounds.width>>1)-(mImageWidth>>1), (mPaddedBounds.height>>1)-(mImageHeight>>1));
+			Gfx_drawImage(
+				mResource, 
+				(mPaddedBounds.width>>1)-(mImageWidth>>1), 
+				(mPaddedBounds.height>>1)-(mImageHeight>>1));
 		}
 	}
 
 	void Image::setResource(MAHandle res) {
 		mResource = res;
-		if(res == 0) return;
+		if(res == 0) {
+			return;
+		}
 		MAExtent imgSize = maGetImageSize(res);
 		mImageWidth = EXTENT_X(imgSize);
 		mImageHeight = EXTENT_Y(imgSize);
-		if(mAutoSizeX) this->setWidth(EXTENT_X(imgSize));
-		if(mAutoSizeY) this->setHeight(EXTENT_Y(imgSize));		
+		if(mAutoSizeX) {
+			this->setWidth(EXTENT_X(imgSize));
+		}
+		if(mAutoSizeY) {
+			this->setHeight(EXTENT_Y(imgSize));
+		}
 		requestRepaint();
 	}
 

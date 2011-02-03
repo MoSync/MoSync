@@ -710,7 +710,6 @@ public class MoSyncThread extends Thread
 			maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
 		}
 
-		mMemDataSection.mark();
 		mMemDataSection.position(address);
 
 		IntBuffer ib = mMemDataSection.asIntBuffer();
@@ -757,8 +756,6 @@ public class MoSyncThread extends Thread
 				break;			
 		}
 		mCanvas.drawPath(path, mPaint);
-		
-		mMemDataSection.reset();
 	}
 
 
@@ -774,7 +771,6 @@ public class MoSyncThread extends Thread
 			maPanic(1, "maFillTriangleFan takes more than 3 vertices");
 		}
 
-		mMemDataSection.mark();
 		mMemDataSection.position(address);
 
 		IntBuffer ib = mMemDataSection.asIntBuffer();
@@ -812,8 +808,6 @@ public class MoSyncThread extends Thread
 				break;			
 		}
 		mCanvas.drawPath(path, mPaint);
-		
-		mMemDataSection.reset();
 	}
 
 	/**
@@ -897,10 +891,8 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{				
-					mMemDataSection.mark();
 					mMemDataSection.position(mFrameBufferAddress);
 					mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
-					mMemDataSection.reset();
 					
 					// Clear the screen.. in this case draw the canvas black
 					lockedCanvas.drawRGB(0,0,0);
@@ -981,12 +973,11 @@ public class MoSyncThread extends Thread
 
 		int pixels[] = new int[srcRectWidth];
 		
-		mMemDataSection.mark();
 		mMemDataSection.position(mem);
 
 		IntBuffer ib = mMemDataSection.asIntBuffer();
 		
-		for(int y = 0; y < srcRectHeight; y++)
+		for (int y = 0; y < srcRectHeight; y++)
 		{
 			ib.position(y * scanLength);
 			ib.get(pixels);
@@ -1001,8 +992,6 @@ public class MoSyncThread extends Thread
 				true, 
 				mPaint);		
 		}
-		
-		mMemDataSection.reset();
 	}
 
 	/**
@@ -1229,12 +1218,11 @@ public class MoSyncThread extends Thread
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
-		mMemDataSection.mark();
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 		
-		for(int y = 0; y < srcHeight; y++)
+		for (int y = 0; y < srcHeight; y++)
 		{
 			intBuffer.position(y*scanLength);		
 			
@@ -1263,8 +1251,6 @@ public class MoSyncThread extends Thread
 			
 			intBuffer.put(pixels);	
 		}
-		
-		mMemDataSection.reset();
 	}
 
 	/**
@@ -1317,10 +1303,8 @@ public class MoSyncThread extends Thread
 			try
 			{
 				// Load binary data into resource memory.
-				binData.mark();
 				binData.position(offset);
 				binData.get(resourceData);
-				binData.reset();
 			}
 			catch(Exception ex)
 			{
@@ -1882,11 +1866,9 @@ public class MoSyncThread extends Thread
 		
 		byte[] ba = property.getBytes();
 		
-		mMemDataSection.mark();
 		mMemDataSection.position(buf);
 		mMemDataSection.put(ba);
 		mMemDataSection.put((byte)0);
-		mMemDataSection.reset();
 		
 		return property.length() + 1;
 	}
@@ -1945,10 +1927,8 @@ public class MoSyncThread extends Thread
 				{
 					return false;
 				}
-				bb.mark();
 				bb.position(pos);
 				bb.get(ra);
-				bb.reset();
 			}
 			else // is ubin
 			{

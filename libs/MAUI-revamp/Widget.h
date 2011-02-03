@@ -70,10 +70,10 @@ namespace MAUI {
 
 		/**
 		* Maybe have these:
-		* virtual void onKeyPressed(blahblah);
-		* virtual void onKeyReleased(blahblah);
+		* virtual void onKeyPressed
+		* virtual void onKeyReleased
 		* virtual void onTouchPressed
-		* virtual void onTouchMoved (kanske inte behövs?)
+		* virtual void onTouchMoved
 		* virtual void onTouchReleased
 		*/
 

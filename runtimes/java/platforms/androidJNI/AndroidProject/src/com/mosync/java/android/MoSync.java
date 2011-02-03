@@ -24,6 +24,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_LOST;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,10 +36,10 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncView;
 
 /**
-* Main MoSync activity
-*
-* As long as this activity is running the application is running.
-*/
+ * Main MoSync activity
+ *
+ * As long as this activity is running the application is running.
+ */
 public class MoSync extends Activity
 {
 	static public MoSyncThread mMoSyncThread;
@@ -57,8 +58,6 @@ public class MoSync extends Activity
 		
 		super.onCreate(savedInstanceState);
 		
-		//if (theMoSyncThreadIsDead()) { return ; }
-		
 		// Initialize.
 		mMoSyncView = null;
 		
@@ -66,11 +65,7 @@ public class MoSync extends Activity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		// Default screen orientation is landscape mode.
-		// There is a name clash between the MoSync and the Android 
-		// SCREEN_ORIENTATION_PORTRAIT constant!
-		// Preprecessing of .jpp files fuck things up!
-		// We therefore use the numeric value of this Android constant.
-		setRequestedOrientation(1);
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		try
 		{
@@ -83,7 +78,6 @@ public class MoSync extends Activity
 				"MoSync - Unable to create thread! " +
 				"Application is closed!", 
 				ex);
-			//super.onDestroy();
 			finish();
 			return;
 		}
@@ -98,6 +92,7 @@ public class MoSync extends Activity
 		else
 		{
 			finish();
+			return;
 		}
     }
 	

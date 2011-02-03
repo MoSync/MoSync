@@ -508,10 +508,8 @@ public class MoSyncNetwork
 	 */
 	void copyBytesToMemory(int address, byte[] bytes)
 	{
-		getMemDataSection().mark();
 		getMemDataSection().position(address);
 		getMemDataSection().put(bytes);
-		getMemDataSection().reset();
 	}
 
 	/**
@@ -520,10 +518,8 @@ public class MoSyncNetwork
 	 */
 	void copyBytesToMemory(int address, byte[] bytes, int offset, int length)
 	{
-		getMemDataSection().mark();
 		getMemDataSection().position(address);
 		getMemDataSection().put(bytes, offset, length);
-		getMemDataSection().reset();
 	}
 	
 	/**
@@ -531,10 +527,8 @@ public class MoSyncNetwork
 	 */
 	void readBytesFromMemory(int address, byte[] bytes)
 	{
-		getMemDataSection().mark();
 		getMemDataSection().position(address);
 		getMemDataSection().get(bytes);
-		getMemDataSection().reset();
 	}
 	
 	/**
@@ -542,14 +536,12 @@ public class MoSyncNetwork
 	 */
 	void copyIntToMemory(int address, int value)
 	{
-		getMemDataSection().mark();
 		getMemDataSection().position(address);
 		//ByteOrder oldOrder = getMemDataSection().order();
 		//getMemDataSection().order(ByteOrder.LITTLE_ENDIAN);
 		//getMemDataSection().asIntBuffer().put(value);
 		getMemDataSection().putInt(value);
 		//getMemDataSection().order(oldOrder);
-		getMemDataSection().reset();
 	}
 	
 	/**
@@ -570,11 +562,9 @@ public class MoSyncNetwork
 	 */
 	void copyStringToMemory(int address, String str)
 	{
-		getMemDataSection().mark();
 		getMemDataSection().position(address);
 		getMemDataSection().put(str.getBytes());
 		getMemDataSection().put((byte)0); // Terminating null char.
-		getMemDataSection().reset();
 	}
 	
 	/**

@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Engine.cpp 
+* \brief MAUI widget manager, useful for developing custom widgets.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include <ma.h>
 #include "Engine.h"
 #include <maheap.h>
@@ -36,6 +42,9 @@ using namespace MAUtil;
 namespace MAUI {
 	Engine* Engine::mSingletonPtr = 0;
 
+	/**
+	 * TODO: Document function.
+	 */
 	MAHandle imageFromMem(void *data, int size) {
 		MAHandle res = maCreatePlaceholder();
 		MAHandle img = maCreatePlaceholder();
@@ -46,6 +55,9 @@ namespace MAUI {
 		return img;
 	}
 
+	/**
+	 * TODO: Document function.
+	 */
 	MAHandle fontFromMem(void *data, int size) {
 		MAHandle res = maCreatePlaceholder();
 		maCreateData(res, size);
@@ -64,27 +76,43 @@ namespace MAUI {
 		mDisplayConsole = false;
 		Environment::getEnvironment().addFocusListener(this);
 
-
 		// setup default styles
 
-		MAHandle s1  = RESIMG(button_pressed_selected);
-		MAHandle s2  = RESIMG(button_notpressed_selected);
-		MAHandle s3  = RESIMG(button_notpressed_unselected);
+		MAHandle s1 = RESIMG(button_pressed_selected);
+		MAHandle s2 = RESIMG(button_notpressed_selected);
+		MAHandle s3 = RESIMG(button_notpressed_unselected);
 
-		SkinProperty* focusedPressed = new SkinProperty(s1, 19, 32, 19, 32, true);
-		SkinProperty* focusedReleased = new SkinProperty(s2, 19, 32, 19, 32, true);
-		SkinProperty* unfocusedReleased = new SkinProperty(s3, 19, 32, 19, 32, true);
-		FontProperty* font = new FontProperty(RESFNT(arial));
-		ButtonStyle* buttonStyle = new ButtonStyle(focusedPressed, focusedReleased, unfocusedReleased, font);
+		SkinProperty* focusedPressed = 
+			new SkinProperty(s1, 19, 32, 19, 32, true);
+		SkinProperty* focusedReleased = 
+			new SkinProperty(s2, 19, 32, 19, 32, true);
+		SkinProperty* unfocusedReleased = 
+			new SkinProperty(s3, 19, 32, 19, 32, true);
+		FontProperty* font = 
+			new FontProperty(RESFNT(arial));
+		ButtonStyle* buttonStyle = 
+			new ButtonStyle(
+				focusedPressed, 
+				focusedReleased, 
+				unfocusedReleased, 
+				font);
 		mSingletonPtr->setDefaultStyle("Button", buttonStyle);
 
 		s1  = RESIMG(slider_left_unselected);
 		s2  = RESIMG(slider_right_unselected);
 		s3  = RESIMG(slider_handle);
-		SkinProperty* sliderAmountSkin = new SkinProperty(s1, 10, 12, 0, 18, true);
-		SkinProperty* sliderBackgroundSkin = new SkinProperty(s2, 10, 12, 0, 18, true);
-		ImageProperty* sliderGripImage = new ImageProperty(s3);
-		SliderStyle* sliderStyle = new SliderStyle(sliderAmountSkin, sliderBackgroundSkin, sliderGripImage);
+		
+		SkinProperty* sliderAmountSkin = 
+			new SkinProperty(s1, 10, 12, 0, 18, true);
+		SkinProperty* sliderBackgroundSkin = 
+			new SkinProperty(s2, 10, 12, 0, 18, true);
+		ImageProperty* sliderGripImage = 
+			new ImageProperty(s3);
+		SliderStyle* sliderStyle = 
+			new SliderStyle(
+				sliderAmountSkin, 
+				sliderBackgroundSkin, 
+				sliderGripImage);
 		mSingletonPtr->setDefaultStyle("Slider", sliderStyle);
 
 		Style* widgetStyle = new Style();
@@ -104,8 +132,9 @@ namespace MAUI {
 
 	Engine::~Engine()
 	{
-		if(mMain)
+		if(mMain) {
 			delete mMain;
+		}
 		mSingletonPtr = 0;
 	}
 
@@ -113,11 +142,16 @@ namespace MAUI {
 	}
 
 	void Engine::focusGained() {
-		if(mMain) mMain->requestRepaint();
-		if(mOverlay) mOverlay->requestRepaint();
+		if(mMain) {
+			mMain->requestRepaint();
+		}
+		if(mOverlay) {
+			mOverlay->requestRepaint();
+		}
 	}
 
 	void Engine::requestUIUpdate() {
+		// TODO: DOcument why this is commenetd out or remove.
 		//maReportCallStack();
 		Environment::getEnvironment().addIdleListener(this);
 	}
@@ -129,9 +163,12 @@ namespace MAUI {
 
 	void Engine::repaint() {
 		//lprintfln("repaint @ (%i ms)", maGetMilliSecondCount());
-		if(!mMain) return;
+		if(!mMain) {
+			return;
+		}
 		//printf("doing repaint!");
 		
+		// TODO: DOcument why this is commented out or remove.
 		//clearClipRect();
 		Gfx_clearClipRect();
 		Gfx_clearMatrix();
@@ -154,7 +191,9 @@ namespace MAUI {
 			Gfx_clearMatrix();
 			Gfx_pushClipRect(0, 0, scrW, scrH);
 
-			mOverlay->requestRepaint(); // won't add the idle listener again just setDirty(true).
+			// TODO: Cannot understand this comment, rewrite it.
+			// Won't add the idle listener again just setDirty(true).
+			mOverlay->requestRepaint(); 
 			mOverlay->update();
 			mOverlay->draw();
 		}
@@ -162,8 +201,9 @@ namespace MAUI {
 		if(mDisplayConsole) {
 			DisplayConsole();
 		}
-		else
+		else {
 			maUpdateScreen();
+		}
 	}
 	
 	void Engine::idle() {
@@ -184,9 +224,16 @@ namespace MAUI {
 		return mOverlay;
 	}
 
-	/* shows the mOverlay widget (passed as an argument). Put the top left
-	corner at position x and y. */
-	void Engine::showOverlay(int x, int y, Widget *overlay, OverlayListener* listener) {
+	/**
+	 * Shows the mOverlay widget (passed as an argument). Put the top left
+	 * corner at position x and y. 
+	 */
+	void Engine::showOverlay(
+		int x, 
+		int y, 
+		Widget* overlay, 
+		OverlayListener* listener) 
+	{
 		mOverlayListener = listener;
 		mOverlayPosition.x = x;
 		mOverlayPosition.y = y;
@@ -197,13 +244,17 @@ namespace MAUI {
 	}
 
 	OverlayListener::OutsideResponse Engine::fireOverlayEvent(int x, int y) {
-		if(mOverlayListener)
+		if(mOverlayListener) {
 			return mOverlayListener->pointerPressedOutsideOverlay(x, y);
-		else
+		}
+		else {
 			return OverlayListener::eProceed;
+		}
 	}
 
-	/* hide the currently shown mOverlay. */
+	/**
+	 * Hide the currently shown mOverlay. 
+	 */
 	void Engine::hideOverlay() {
 		mOverlay = NULL;
 		mMain->requestRepaint();
@@ -214,12 +265,17 @@ namespace MAUI {
 	}
 
 	Style* Engine::getDefaultStyle(const String& widgetType) {
-		Map<String, Style*>::ConstIterator iter = mDefaultStyles.find(widgetType);
-		if(iter != mDefaultStyles.end())
+		Map<String, Style*>::ConstIterator iter = 
+			mDefaultStyles.find(widgetType);
+		if(iter != mDefaultStyles.end()) {
 			return iter->second;
+		}
 		iter = mDefaultStyles.find("Widget");
-		if(iter == mDefaultStyles.end())
-			maPanic(1, "No style set (not even a default style for Widget is available!");
+		if(iter == mDefaultStyles.end()) {
+			maPanic(1, 
+				"No style set (not even a default style "
+				"for Widget is available!");
+		}
 		return iter->second;
 	}
 

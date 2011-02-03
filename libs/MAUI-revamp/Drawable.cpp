@@ -19,8 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Graphics.h>
 
 namespace MAUI {
-	void Drawable::setUseCaching(bool b) {
-		mUseCaching = b;
+	void Drawable::setUseCaching(bool useCaching) {
+		mUseCaching = useCaching;
 	}
 
 	bool Drawable::isUsingCache() const {

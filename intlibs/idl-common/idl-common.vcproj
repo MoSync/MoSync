@@ -154,6 +154,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\output-bindings.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\output-bindings.h"
+			>
+		</File>
+		<File
 			RelativePath=".\output.cpp"
 			>
 		</File>

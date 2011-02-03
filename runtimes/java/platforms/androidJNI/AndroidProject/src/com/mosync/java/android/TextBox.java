@@ -248,15 +248,11 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			// Write text directly to the MoSync memory
 			char[] ca = output.toCharArray();
-			MoSync.mMoSyncThread.mMemDataSection.mark();
 			MoSync.mMoSyncThread.mMemDataSection.position(mOutputMemPtr);
 			
 			CharBuffer cb = MoSync.mMoSyncThread.mMemDataSection.asCharBuffer();
-			
 			cb.put(ca);
 			cb.put((char)0);
-			
-			MoSync.mMoSyncThread.mMemDataSection.reset();
 			
 			// Notice that data is available
 			int[] event = new int[3];
@@ -276,11 +272,9 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			// Write text directly to the MoSync memory
 			byte[] ba = output.getBytes();
-			MoSync.mMoSyncThread.mMemDataSection.mark();
 			MoSync.mMoSyncThread.mMemDataSection.position(mOutputMemPtr);
 			MoSync.mMoSyncThread.mMemDataSection.put(ba);
 			MoSync.mMoSyncThread.mMemDataSection.put((byte)0);
-			MoSync.mMoSyncThread.mMemDataSection.reset();
 			
 			// Notice that the user clicked cancel
 			int[] event = new int[3];

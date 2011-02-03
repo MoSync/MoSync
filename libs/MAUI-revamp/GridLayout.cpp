@@ -15,38 +15,54 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file GridLayout.cpp
+* \brief Layout and navigation of child widgets in a grid.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include <maassert.h>
 
 #include "GridLayout.h"
 
 namespace MAUI {
 
-	GridLayout::GridLayout(int x, int y, int width, int height, int gridXSize, int gridYSize) :
-Widget(x, y, width, height),
-mMustRebuild(false),
-mAlignmentX(HA_LEFT),
-mAlignmentY(VA_TOP),
-mMarginX(0),
-mMarginY(0),
-mAutoSizeX(true),
-mAutoSizeY(true),
-mGridXSize(gridXSize),
-mGridYSize(gridYSize)
+GridLayout::GridLayout(
+	int x, 
+	int y, 
+	int width, 
+	int height, 
+	int gridXSize, 
+	int gridYSize) :
+		Widget(x, y, width, height),
+		mMustRebuild(false),
+		mAlignmentX(HA_LEFT),
+		mAlignmentY(VA_TOP),
+		mMarginX(0),
+		mMarginY(0),
+		mAutoSizeX(true),
+		mAutoSizeY(true),
+		mGridXSize(gridXSize),
+		mGridYSize(gridYSize)
 {
 	requestRepaint();
 }
 
 void GridLayout::boundsChanged(Widget *widget, const Rect& bounds) {
+	// TODO: Document why commented out or remove.
 	//rebuild();
 	requestUpdate();
 }
 
-void GridLayout::drawWidget() { }
+void GridLayout::drawWidget() 
+{ 
+}
 
 void GridLayout::rebuild() {
 
 	if(mGridXSize*mGridYSize<this->mChildren.size()) {
-		PANIC_MESSAGE("Your MAUI::Layout has more mChildren than mGridXSize*mGridYSize");
+		PANIC_MESSAGE(
+			"Your MAUI::Layout has more mChildren than mGridXSize*mGridYSize");
 	}
 
 	Vector_each(Widget*, itr, mChildren) {
@@ -55,8 +71,12 @@ void GridLayout::rebuild() {
 
 	int *xOffsets = new int[mGridXSize];
 	int *yOffsets = new int[mGridYSize];
-	for(int i = 0; i < mGridXSize; i++) xOffsets[i] = 0;
-	for(int i = 0; i < mGridYSize; i++) yOffsets[i] = 0;
+	for(int i = 0; i < mGridXSize; i++) {
+		xOffsets[i] = 0;
+	}
+	for(int i = 0; i < mGridYSize; i++) {
+		yOffsets[i] = 0;
+	}
 
 	if(mAutoSizeX) {
 		int xStep = mPaddedBounds.width / mGridXSize;
@@ -76,14 +96,23 @@ void GridLayout::rebuild() {
 			int highestY = 0;
 			for(int x = 0; x < mGridXSize; x++) {
 				int childIndex = y * mGridXSize + x;
-				if(mChildren.size() <= childIndex)
+				if (mChildren.size() <= childIndex) 
+				{
 					break;
-				if(!mAutoSizeX && xOffsets[x] < mChildren[childIndex]->getBounds().width)
+				}
+				if (!mAutoSizeX && 
+					xOffsets[x] < mChildren[childIndex]->getBounds().width) 
+				{
 					xOffsets[x] = mChildren[childIndex]->getBounds().width;
-				if(mChildren[childIndex]->getBounds().height > highestY)
+				}
+				if (mChildren[childIndex]->getBounds().height > highestY) 
+				{
 					highestY = mChildren[childIndex]->getBounds().height;
+				}
 			}
-			if(!mAutoSizeY) yOffsets[y] = highestY;
+			if(!mAutoSizeY) {
+				yOffsets[y] = highestY;
+			}
 		}
 	}
 
@@ -92,44 +121,56 @@ void GridLayout::rebuild() {
 		int currentX = 0;
 		for(int x = 0; x < mGridXSize; x++) {
 			int childIndex = y * mGridXSize + x;
-			if(mChildren.size() <= childIndex) break;
+			if(mChildren.size() <= childIndex) {
+				break;
+			}
 
 			int alignX = 0;
 			int alignY = 0;
 
 			if(mAutoSizeX) {
 				mChildren[childIndex]->setWidth(xOffsets[x]);
-			} else {
+			} 
+			else {
 				switch(mAlignmentX) {
-						case HA_LEFT:
-							alignX = 0;
-							break;
-						case HA_CENTER:
-							alignX = (xOffsets[x]>>1) - (mChildren[childIndex]->getWidth()>>1);
-							break;
-						case HA_RIGHT:
-							alignX = (xOffsets[x]) - mChildren[childIndex]->getWidth();
-							break;
+					case HA_LEFT:
+						alignX = 0;
+						break;
+					case HA_CENTER:
+						alignX = 
+							(xOffsets[x]>>1)
+							- (mChildren[childIndex]->getWidth()>>1);
+						break;
+					case HA_RIGHT:
+						alignX = 
+							(xOffsets[x]) - mChildren[childIndex]->getWidth();
+						break;
 				}
 			}
 			if(mAutoSizeY) {
 				mChildren[childIndex]->setHeight(yOffsets[y]);
-			} else {
+			} 
+			else {
 				switch(mAlignmentY) {
-						case VA_TOP:
-							alignY = 0;
-							break;
-						case VA_CENTER:
-							alignY = (yOffsets[y]>>1) - (mChildren[childIndex]->getHeight()>>1);
-							break;
-						case VA_BOTTOM:
-							alignY = (yOffsets[y]) - mChildren[childIndex]->getHeight();
-							break;
+					case VA_TOP:
+						alignY = 0;
+						break;
+					case VA_CENTER:
+						alignY = 
+							(yOffsets[y]>>1) 
+							- (mChildren[childIndex]->getHeight()>>1);
+						break;
+					case VA_BOTTOM:
+						alignY = 
+							(yOffsets[y]) - mChildren[childIndex]->getHeight();
+						break;
 				}
 			}
 
 
-			mChildren[childIndex]->setPosition(currentX + alignX, currentY + alignY);
+			mChildren[childIndex]->setPosition(
+				currentX + alignX, 
+				currentY + alignY);
 			currentX+=xOffsets[x] + mMarginX;
 		}
 		currentY+=yOffsets[y] + mMarginY;
@@ -142,6 +183,7 @@ void GridLayout::rebuild() {
 		(*itr)->addWidgetListener(this);
 	}
 
+	// TODO: Document why commented out or delete.
 	/*
 	switch(layoutType) {
 	case VERTICAL_STACKING: 
@@ -266,15 +308,15 @@ void GridLayout::rebuild() {
 	}*/
 }
 
-
+// TODO: Document why commented out or delete.
 /*
 void GridLayout::draw() {
 Widget::draw();
 }
 */
 
-
 void GridLayout::add(Widget *child) {
+	// TODO: Document why commented out or delete.
 	/*
 	int size = mChildren.size();
 	if(layoutType == VERTICAL_STACKING) {
@@ -304,6 +346,7 @@ void GridLayout::add(Widget *child) {
 	*/
 	Widget::add(child);
 	child->addWidgetListener(this);
+	// TODO: Document why commented out or delete.
 	//rebuild();
 	requestUpdate();
 	requestRepaint();
@@ -312,14 +355,16 @@ void GridLayout::add(Widget *child) {
 void GridLayout::remove(Widget *child) {
 	Widget::remove(child);
 	child->removeWidgetListener(this);
+	// TODO: Document why commented out or delete.
 	//rebuild();
 	requestUpdate();
 	requestRepaint();
 }
 
 void GridLayout::clear() {
-	for(int i = 0; i < mChildren.size(); i++)
+	for(int i = 0; i < mChildren.size(); i++) {
 		mChildren[i]->removeWidgetListener(this);
+	}
 	Widget::clear();
 	requestUpdate();
 	requestRepaint();
@@ -333,8 +378,7 @@ bool GridLayout::isTransparent() const {
 	return true;
 }
 
-
-
+// TODO: Document why commented out or delete.
 /*
 void GridLayout::updateAbsolutePositionChildren(int x, int y) {
 switch(layoutType) {

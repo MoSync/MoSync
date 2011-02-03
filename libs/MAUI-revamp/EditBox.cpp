@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file EditBox.cpp
+* \brief Edit box widget, multi and single line.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include <ma.h>
 #include "EditBox.h"
 #include "Font.h"
@@ -31,7 +37,10 @@ namespace MAUI {
 	void EditBoxListener::textChanged(EditBox *eb, const String& text) {
 	}
 
-	void EditBoxListener::cursorMoved(EditBox *eb, int newCursor, int lastCursor) {
+	void EditBoxListener::cursorMoved(
+		EditBox *eb, 
+		int newCursor, 
+		int lastCursor) {
 	}
 
 	void EditBoxListener::characterDeleted(EditBox *eb, char c) {
@@ -43,20 +52,28 @@ namespace MAUI {
 	void EditBoxListener::characterAdded(EditBox *eb, char c) {
 	}
 
-	EditBox::EditBox(int x, int y, int width, int height, const String &text,
-		bool manageNavigation, bool mMultiLine, int maxLength, InputMode inputMode) :
-		Label(x, y, width, height, text),
-		mCursorIndex(0),
-		mManageNavigation(manageNavigation),
-		mActive(false),
-		mCursorColor(0xffffff),
-		mCharacterInputActive(false),
-		mCurrentLine(0),
-		mMaxLength(maxLength),
-		mInputMode(inputMode),
-		mEditBoxListeners(),
-		mCaseToggle(true),
-		mPasswordMode(false)
+	EditBox::EditBox(
+		int x, 
+		int y, 
+		int width, 
+		int height, 
+		const String &text,
+		bool manageNavigation, 
+		bool mMultiLine, 
+		int maxLength, 
+		InputMode inputMode) :
+			Label(x, y, width, height, text),
+			mCursorIndex(0),
+			mManageNavigation(manageNavigation),
+			mActive(false),
+			mCursorColor(0xffffff),
+			mCharacterInputActive(false),
+			mCurrentLine(0),
+			mMaxLength(maxLength),
+			mInputMode(inputMode),
+			mEditBoxListeners(),
+			mCaseToggle(true),
+			mPasswordMode(false)
 	{
 		setMultiLine(mMultiLine);
 		setCaption(text);
@@ -118,11 +135,14 @@ namespace MAUI {
 	}
 	
 	void EditBox::setText(const String& text) {
+		// TODO: Document why this is commented out or remove.
 		//this->text = text;
 		//if(mCursorIndex>text.size()) mCursorIndex = text.size();
 		//this->mCaption = mCaption;
 		Label::setCaption(text);
-		if(mCursorIndex>mCaption.length()) mCursorIndex = mCaption.length();
+		if (mCursorIndex>mCaption.length()) {
+			mCursorIndex = mCaption.length();
+		}
 		requestRepaint();
 	}
 
@@ -130,6 +150,7 @@ namespace MAUI {
 		return mPasswordMode ? mPassword : mCaption;
 	}
 
+	// TODO: Document why this is commented out or remove.
 	/*
 	void EditBox::setFont(Font *mFont) {
 		this->mFont = mFont;
@@ -151,7 +172,8 @@ namespace MAUI {
 	void EditBox::setInputMode(EditBox::InputMode inputMode) {
 		if(inputMode == IM_STANDARD) {
 			CharInput::getCharInput().setMode(CharInput::LOWERCASE);
-		} else if(inputMode == IM_NUMBERS) {
+		} 
+		else if(inputMode == IM_NUMBERS) {
 			CharInput::getCharInput().setMode(CharInput::NUMBERS);
 		}
 		else if(inputMode == IM_QWERTY) {
@@ -166,10 +188,12 @@ namespace MAUI {
 
 	void EditBox::setManageNavigation(bool b) {
 		mManageNavigation = b;
-		if(mManageNavigation)
+		if(mManageNavigation) {
 			Environment::getEnvironment().addKeyListener(this);
+		}
 	}
 
+	// TODO: Document why this is commented out or remove.
 	/*
 	void EditBox::setMultiLine(bool b) {
 		mMultiLine = b;
@@ -193,7 +217,10 @@ namespace MAUI {
 	}
 
 	void EditBox::drawWidget() {
-		if(!mFont) return;
+		if(!mFont) {
+			return;
+		}
+		// TODO: Document why this is commented out or remove.
 		//calcStrSize();
 		//int x = mPaddedBounds.x;
 		//int y = mPaddedBounds.y;
@@ -207,10 +234,12 @@ namespace MAUI {
 		if(mMultiLine==false) {
 			bound.height = 0xffff;
 			bound.width = 0xffff;
-		} else {
+		} 
+		else {
 			bound.x = 0;
 		}
 
+		// TODO: Document why this is commented out or remove.
 //		Rect r = mFont->calculateRectOfIndex(mCursorIndex, text.c_str(), bound);
 		Rect r = mFont->calculateRectOfIndex(mCursorIndex, mCaption.c_str(), bound);
 
@@ -218,8 +247,10 @@ namespace MAUI {
 			// 2 equals the cursor width ;)
 			if(bound.y+r.y+r.height+2>(mPaddedBounds.height)) {
 				y-=(bound.y+r.y+r.height+2)-(mPaddedBounds.height);
+				// TODO: Document why this is commented out or remove.
 				//Gfx_translate(x, y);
 			}
+			// TODO: Document why this is commented out or remove.
 //			mFont->drawBoundedString(text.c_str(), x, y, bound);
 //			Gfx_translate(x, y);
 			mFont->drawBoundedString(mCaption.c_str(), bound.x+x, bound.y+y, bound);
@@ -228,14 +259,18 @@ namespace MAUI {
 			// 2 equals the cursor width ;)
 			if(bound.x+r.x+r.width+2>mPaddedBounds.width) {
 				x-=(bound.x+r.x+r.width+2)-(mPaddedBounds.width);
+				// TODO: Document why this is commented out or remove.
 				//Gfx_translate(x, y);
 			}
+			// TODO: Document why this is commented out or remove.
 //			mFont->drawString(text.c_str(), x, y);
 			
+			// TODO: Document why this is commented out or remove.
 			//Gfx_translate(x, y);
 			mFont->drawString(mCaption.c_str(), bound.x+x, bound.y+y);
 		}
 
+		// TODO: Document why this is commented out or remove.
 		//Label::drawWidget();
 
 		maSetColor(mCursorColor);
@@ -246,6 +281,7 @@ namespace MAUI {
 			sy = r.y + y + bound.y;
 			ex = sx;
 			ey = sy+r.height;
+			// TODO: Document why this is commented out or remove.
 			//maLine(ex, sy, ex, ey);
 			Gfx_line(sx, sy, ex, ey);
 		}
@@ -260,6 +296,7 @@ namespace MAUI {
 				if(moveCursorHorizontal(1)==false) return;
 				break;
 			case MAK_CLEAR:
+				// TODO: Document why this is commented out or remove.
 				/*
 				if(mCharacterInputActive) {
 					CharInput::getCharInput().forceDeployment();
@@ -270,8 +307,12 @@ namespace MAUI {
 				deletePreviousCharacter();
 				return;
 			case MAK_HASH:
-				if(mCaseToggle && mInputMode == IM_STANDARD)
-					CharInput::getCharInput().setMode((CharInput::CharMode)(((int)CharInput::getCharInput().getMode()+1)&0x1));
+				if(mCaseToggle && mInputMode == IM_STANDARD) {
+					CharInput::getCharInput().setMode(
+						(CharInput::CharMode)(
+							((int)CharInput::getCharInput().getMode() + 1) 
+							& 0x1));
+				}
 				break;
 			default:
 				return;
@@ -286,23 +327,31 @@ namespace MAUI {
 	int mCurrentIndex;
 
 	void EditBox::characterChanged(char c) {
+		// TODO: Document why this is commented out or remove.
 //		if(text.size()==mMaxLength) return;
 
 		if(mCharacterInputActive==false && mCaption.length()<mMaxLength) {
+			// TODO: Document what should be fixed.
 			// FIXME
 			char tmp[2];
 			sprintf(tmp, "%c", c);
 			mCurrentIndex = mCursorIndex;
+			// TODO: Document why this is commented out or remove.
 			//text.insert(mCurrentIndex, tmp);
 			mCaption.insert(mCurrentIndex, tmp);
-			if(mPasswordMode)
+			if(mPasswordMode) {
 				mPassword.insert(mCurrentIndex, tmp);
-		} else {
+			}
+		} 
+		else {
 			if(mCharacterInputActive==false) {
 				mCurrentIndex = mCursorIndex;
-				if(mCurrentIndex>mCaption.length()-1) mCurrentIndex = mCaption.length()-1;
+				if(mCurrentIndex>mCaption.length()-1) {
+					mCurrentIndex = mCaption.length()-1;
+				}
 			}
 
+			// TODO: Document why this is commented out or remove.
 //			text[mCurrentIndex] = c;
 			mCaption[mCurrentIndex] = c;
 		}
@@ -311,11 +360,13 @@ namespace MAUI {
 	
 		fireCharacterChanged(c);
 	
+		// TODO: Document why this is commented out or remove.
 		//calcStrSize();
 		requestUpdate();
 	}
 	
 	void EditBox::characterDeployed(char c) {
+		// TODO: Document why this is commented out or remove.
 		//if(text.length()>=mMaxLength+1) return;
 		//if(mCaption.length()>=mMaxLength+1) return;
 
@@ -323,6 +374,7 @@ namespace MAUI {
 		if(mCaption.length()>=mMaxLength+1) return;
 		
 		if(mCursorIndex == mCurrentIndex) {
+			// TODO: Document why this is commented out or remove.
 			//mCursorIndex++;
 			moveCursorHorizontal(1, false);
 		}
@@ -339,38 +391,48 @@ namespace MAUI {
 	}
 
 	bool EditBox::moveCursorHorizontal(int steps, bool fireListeners) {
+		// TODO: Document why this is commented out or remove.
 //		if(mCursorIndex + steps < 0 || mCursorIndex + steps > text.length()) return false;
-		if(mCursorIndex + steps < 0 || mCursorIndex + steps > mCaption.length()) {
-			if(fireListeners)
+		if (mCursorIndex + steps < 0 
+			|| mCursorIndex + steps > mCaption.length()) 
+		{
+			if (fireListeners) {
 				fireCursorMoved(mCursorIndex);
+			}
 			return false;
 		}
 	
 		int lastCursor = mCursorIndex;
 		mCursorIndex+=steps;
-		if(fireListeners)
+		if (fireListeners) {
 			fireCursorMoved(lastCursor);
+		}
 
 		return true;
 	}
 
 	bool EditBox::deleteCharacter(int c) {
+		// TODO: Document why this is commented out or remove.
 		//text.remove(mCursorIndex-1, 1);
 /*
 		if(c<0 || c>=text.length()) return false;
 		char deletedCharacter = text[mCursorIndex];
 		text.remove(c, 1);
 		*/
-		if(c<0 || c>=mCaption.length()) return false;
+		if(c<0 || c>=mCaption.length()) {
+			return false;
+		}
 		char deletedCharacter = mCaption[c];
 
 		if(mPasswordMode) {
 			mPassword.remove(c, 1);
 			mCaption.remove(c, 1);
-		} else {
+		} 
+		else {
 			mCaption.remove(c, 1);
 		}
 
+		// TODO: Document why this is commented out or remove.
 /*
 		for(int i = mCursorIndex; i < text.size(); i++) {
 			text[i-1] = text[i];
@@ -381,7 +443,8 @@ namespace MAUI {
 		fireCharacterDeleted(deletedCharacter);
 		fireTextChanged();
 		requestRepaint();
-				
+		
+		// TODO: Document why this is commented out or remove.
 		//calcStrSize();
 		requestUpdate();
 
@@ -393,6 +456,7 @@ namespace MAUI {
 	}
 
 	bool EditBox::deletePreviousCharacter() {
+		// TODO: Document why this is commented out or remove.
 		/*	
 		if(mCursorIndex-1<0) return false;
 		char c = text[mCursorIndex];
@@ -409,18 +473,24 @@ namespace MAUI {
 		
 		int expectedCursorIndex = mCursorIndex-1;
 		bool r = deleteCharacter(expectedCursorIndex);
-		if(!r) return false;
+		if(!r) {
+			return false;
+		}
 		mCursorIndex = expectedCursorIndex;
+		// TODO: Document why this is commented out or remove.
 		//if(mCursorIndex>text.length()) mCursorIndex = text.length();
-		if(mCursorIndex>mCaption.length()) mCursorIndex = mCaption.length();
+		if(mCursorIndex>mCaption.length()) {
+			mCursorIndex = mCaption.length();
+		}
 
 		return r;
 	}
 
 	void EditBox::setEnabled(bool enabled) {
 		Widget::setEnabled(enabled);
-		if(!enabled)
+		if(!enabled) {
 			deactivate();
+		}
 	}
 
 	void EditBox::addEditBoxListener(EditBoxListener *ebl) {
@@ -429,6 +499,7 @@ namespace MAUI {
 
 	void EditBox::fireTextChanged() {
 		for(int i = 0; i < mEditBoxListeners.size(); i++) {
+			// TODO: Document why this is commented out or remove.
 			//mEditBoxListeners[i]->textChanged(this, text);
 			mEditBoxListeners[i]->textChanged(this, mCaption);
 		}
@@ -436,7 +507,9 @@ namespace MAUI {
 
 	void EditBox::fireCursorMoved(int lastCursor) {
 		for(int i = 0; i < mEditBoxListeners.size(); i++) {
-			mEditBoxListeners[i]->cursorMoved(this, this->mCursorIndex, lastCursor);
+			mEditBoxListeners[i]->cursorMoved(
+				this, 
+				this->mCursorIndex, lastCursor);
 		}
 	}
 

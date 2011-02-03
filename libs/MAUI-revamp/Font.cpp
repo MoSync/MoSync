@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file Font.cpp
+* \brief Bitmap font handling, line spacing, and line breaks.
+* \author Patrick Broman and Niklas Nummelin
+*/
+
 #include <ma.h>
 
 #include "Font.h"
@@ -38,13 +44,18 @@ namespace MAUI {
 	static void readMoreData();
 	static void closeFontReader();
 	static void initFontReader(MAHandle file);
-	static int parseBitmapFontGeneratorFile(MAHandle file, int size, Charset *mCharset);
+	static int parseBitmapFontGeneratorFile(
+		MAHandle file, 
+		int size, 
+		Charset *mCharset);
 
 #define BUFFER_SIZE 1024
 
 	void initFontReader(MAHandle file) {
 		sData = new unsigned char[BUFFER_SIZE];
-		if(!sData) maPanic(0, "Not enough memory for initialization of MAUI::Font");
+		if(!sData) {
+			maPanic(0, "Not enough memory for initialization of MAUI::Font");
+		}
 		sFile = file;
 		sFileSize = maGetDataSize(sFile);
 		sBufPos = sFilePos = 0;
@@ -67,7 +78,9 @@ namespace MAUI {
 
 	unsigned char readByte() {
 		unsigned char b;
-		if(sBufPos>=BUFFER_SIZE) readMoreData();
+		if(sBufPos>=BUFFER_SIZE) {
+			readMoreData();
+		}
 		b = sData[sBufPos];
 		sFilePos++;
 		sBufPos++;
@@ -76,8 +89,11 @@ namespace MAUI {
 
 	unsigned short readShort() {
 		unsigned short ret = 0;
-		if(sBufPos+1>=BUFFER_SIZE) readMoreData();
+		if(sBufPos+1>=BUFFER_SIZE) {
+			readMoreData();
+		}
 
+		// TODO: Document why commented out or delete.
 		/*
 		if(sBufPos==43) {
 			int a = 2;
@@ -96,7 +112,9 @@ namespace MAUI {
 
 	unsigned int readInt() {
 		unsigned int ret = 0;
-		if(sBufPos+3>=BUFFER_SIZE) readMoreData();
+		if(sBufPos+3>=BUFFER_SIZE) {
+			readMoreData();
+		}
 		for(int i = 0; i < 4; i++) {
 			unsigned char b;
 			b = sData[sBufPos+i];
@@ -109,7 +127,6 @@ namespace MAUI {
 
 	int readChars(char *output, int num) {
 		for(int i = 0; i < num; i++) {
-
 			output[i] = readByte();
 			if(output[i]==0) {
 				return i+1;
@@ -123,13 +140,23 @@ namespace MAUI {
 		sBufPos+=b;
 	}
 
-	int parseBitmapFontGeneratorFile(MAHandle file, int end, Charset *charset) {
+	int parseBitmapFontGeneratorFile(
+		MAHandle file, 
+		int end, 
+		Charset *charset) 
+	{
 		char ident[4];
 		// read magic
+		// TODO: Document why commented out or delete.
 		//maReadData(file, ident, filePtr, 4); 
 		readChars(ident, 4);
 		int version = ident[3];
-		if(ident[0] != 'B' || ident[1] != 'M' || ident[2] != 'F' || version < 2 || version > 3) {
+		if (ident[0] != 'B' || 
+			ident[1] != 'M' || 
+			ident[2] != 'F' || 
+			version < 2 || 
+			version > 3) 
+		{
 			//PANIC_MESSAGE("Wrong .fnt format!");
 			//printf("Wrong .fnt format!\n");
 			return 0;
@@ -144,7 +171,9 @@ namespace MAUI {
 			unsigned char id = readByte();
 			unsigned int blockSize = readInt();
 			unsigned int skipValue = blockSize;
-			if(version == 2) skipValue -= 4;
+			if(version == 2) {
+				skipValue -= 4;
+			}
 			switch(id) {
 				case 1:
 					{
@@ -157,6 +186,7 @@ namespace MAUI {
 					}
 					break;
 				case 2:
+					// TODO: Document why commented out or delete.
 					// type common
 					//#pragma pack(1)
 					//struct commonBlock
@@ -180,16 +210,20 @@ namespace MAUI {
 						charset->width			= readShort();
 						charset->height			= readShort();
 						charset->pages			= readShort();
-						if(version==2)
+						if(version==2) {
 							skipBytes(1);
-						else
+						}
+						else {
 							skipBytes(5);
+						}
 
+						// TODO: Document why commented out or delete.
 						//int currentBlockSize = (filePtr-filePtrBefore)+4;	
 						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);
 					}
 					break;
 				case 4:
+					// TODO: Document why commented out or delete.
 					// type char
 					//struct charsBlock
 					//{
@@ -212,20 +246,26 @@ namespace MAUI {
 					{
 						//int filePtrBefore = filePtr;
 						int numBytesPerChar = 18;
-						if(version == 3) numBytesPerChar = 20;
+						if(version == 3) {
+							numBytesPerChar = 20;
+						}
 
 						int numTimes = skipValue/numBytesPerChar;
 						while(numTimes--) {
 							//printf("Reading char block! filePtr: %d\n", filePtr);
 							
 							unsigned int c;
-							if(version == 2)
+							if(version == 2) {
 								c = readShort();
-							else
+							}
+							else {
 								c = readInt();
+							}
 
 							if(c>256) {
-								maPanic(1, "Font contains unicode characters! Only ascii is supported.");
+								maPanic(1, 
+									"Font contains unicode characters! "
+									"Only ascii is supported.");
 							}
 							//printf("Reading char %c!\n", (char)c);
 							charset->chars[c].x			= readShort();
@@ -240,7 +280,7 @@ namespace MAUI {
 						}
 
 						//int currentBlockSize = (filePtr-filePtrBefore)+4;
-						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);		
+						//printf("blockSize: %d, currentBlockSize: %d\n", blockSize, currentBlockSize);
 					}
 					break;
 				default:
@@ -260,7 +300,11 @@ namespace MAUI {
 		return 1;
 	}
 
-	Font::Font(MAHandle font) : mFontImage(0), mCharset(NULL), mLineSpacing(0) {
+	Font::Font(MAHandle font) : 
+		mFontImage(0), 
+		mCharset(NULL), 
+		mLineSpacing(0) 
+	{
 		setResource(font);
 	}
 
@@ -270,7 +314,8 @@ namespace MAUI {
 			PlaceholderPool::put(mFontImage);
 		}
 	}
-
+	
+	// TODO: Document why commented out or delete.
 /*	void Font::setColor(int color) {
 		if(mFontImage == 0) return;
 		rebuildFont(color);
@@ -300,31 +345,43 @@ namespace MAUI {
 		int fontInfoSize = readInt();
 		int imageSize = readInt();
 
-		if(this->mCharset)
+		if(this->mCharset) {
 			delete this->mCharset;
+		}
 
 		this->mCharset = new Charset;
-		if(!parseBitmapFontGeneratorFile(font, 8+fontInfoSize, this->mCharset)) {
-			maPanic(0, "Font::setResource(MAHandle font), could not parse font");
+		if(!parseBitmapFontGeneratorFile(
+				font, 8+fontInfoSize, this->mCharset)) 
+		{
+			maPanic(0, 
+				"Font::setResource(MAHandle font), could not parse font");
 			return;
 		}
 		closeFontReader();
 
 		this->mFontImage = PlaceholderPool::alloc();//maCreatePlaceholder();
 		int err;
-		if((err=maCreateImageFromData(this->mFontImage, font, 8+fontInfoSize, imageSize))!=RES_OK) {
-			if(err==RES_OUT_OF_MEMORY)
-				maPanic(0, "Font::setResource(MAHandle font), out of memory, image could not be loaded");
-			if(err==RES_BAD_INPUT)
-				maPanic(0, "Font::setResource(MAHandle font), image could not be loaded due to bad input");
+		if((err=maCreateImageFromData(
+			this->mFontImage, font, 8+fontInfoSize, imageSize))!=RES_OK) 
+		{
+			if(err==RES_OUT_OF_MEMORY) {
+				maPanic(0, 
+					"Font::setResource(MAHandle font), out of memory, "
+					"image could not be loaded");
+			}
+			if(err==RES_BAD_INPUT) {
+				maPanic(0, 
+					"Font::setResource(MAHandle font), "
+					"image could not be loaded due to bad input");
+			}
 		}
 	}
-
 
 	MAHandle Font::getHandle() const {
 		return mFontImage;
 	}
 
+	// TODO: Document why commented out or delete.
 /*	void Font::rebuildFont(int color) {
 		return;
 		if(!mFontImage) return;
@@ -349,7 +406,9 @@ namespace MAUI {
 	} */
 
 	void Font::drawString(const char* strS, int x, int y) {
-		if(!mFontImage) return;
+		if(!mFontImage) {
+			return;
+		}
 		const unsigned char* str = (const unsigned char*)strS;
 		MARect srcRect = {0, 0, 0, 0};
 		MAPoint2d cursor = {x,y};
@@ -379,11 +438,17 @@ namespace MAUI {
 			str++;
 		}
 	}
-
-	short lineBreaks[2048]; // TODO: should probably change this to a vector (no good with limitations)
+	
+	// TODO: Should probably change this to a vector (no good with limitations)
+	short lineBreaks[2048];
 	int numLineBreaks;
 
-	void Font::calcLineBreaks(const char* strS, int x, int y, const Rect& bound) const {
+	void Font::calcLineBreaks(
+		const char* strS, 
+		int x, 
+		int y, 
+		const Rect& bound) const 
+	{
 		int i = 0;
 		int j = 0;
 		int lastSpace = -1;
@@ -394,8 +459,8 @@ namespace MAUI {
 		while(str[i]) {
 			if(str[i] == ' ') {
 				lastSpace = i;
-			} else if(str[i]=='\n') {
-
+			} 
+			else if(str[i]=='\n') {
 				cursor.x = x;
 				cursor.y += mCharset->lineHeight + mLineSpacing;
 				lineBreaks[j++] = i;
@@ -403,12 +468,12 @@ namespace MAUI {
 				continue;
 			}
 
-
-			 cursor.x += chars[str[i]].xAdvance;
-			 if(cursor.x > bound.x + bound.width) {
+			cursor.x += chars[str[i]].xAdvance;
+			if(cursor.x > bound.x + bound.width) {
 				if(lastSpace == -1) {
 					lineBreaks[j++] = i;
-				} else {
+				} 
+				else {
 					lineBreaks[j++] = lastSpace+1;
 					i = lastSpace+1;
 					lastSpace = -1;
@@ -422,15 +487,24 @@ namespace MAUI {
 		lineBreaks[j] = -1;
 	}
 
-	void Font::drawBoundedString(const char* strS, int x, int y, const Rect& bound) {
+	void Font::drawBoundedString(
+		const char* strS, 
+		int x, 
+		int y, 
+		const Rect& bound) 
+	{
+		if(!mFontImage) {
+			return;
+		}
+		
 		int i = 0;
 		int j = 0;
-		if(!mFontImage) return;
 		const unsigned char* str = (const unsigned char*)strS;
 		calcLineBreaks(strS, x, y, bound);
 		MARect srcRect = {0, 0, 0, 0};
 		MAPoint2d cursor = {x, y};
 		CharDescriptor *chars = mCharset->chars;
+		
 		while(str[i]) {
 			if(lineBreaks[j] == i) {
 				j++;
@@ -447,8 +521,10 @@ namespace MAUI {
 			srcRect.width = chars[str[i]].width;
 			srcRect.height = chars[str[i]].height;
 
-			MAPoint2d destPoint = {cursor.x + chars[str[i]].xOffset,
-				cursor.y + chars[str[i]].yOffset};
+			MAPoint2d destPoint = {
+				cursor.x + chars[str[i]].xOffset,
+				cursor.y + chars[str[i]].yOffset
+			};
 
 			//maDrawImageRegion(this->mFontImage, &srcRect, &destPoint, 0);
 			Gfx_drawImageRegion(this->mFontImage, &srcRect, &destPoint, 0);
@@ -459,17 +535,23 @@ namespace MAUI {
 	}
 
 	MAExtent Font::getStringDimensions(const char *strS, int length) const {
-		if(length == 0) return EXTENT(0, 0);
+		if(length == 0) {
+			return EXTENT(0, 0);
+		}
+		if(!mFontImage) {
+			return EXTENT(0, 0);
+		}
+		
 		MAPoint2d cursor = {0, 0};
 		int width = 0, height = mCharset->lineHeight;
-		if(!mFontImage) return EXTENT(0, 0);
 		CharDescriptor *chars = mCharset->chars;
 		int i = 0;
 		const unsigned char* str = (const unsigned char*)strS;
+		
 		while(*str && (i!=length)) {
 			if((*str)=='\n')
 			{
-				cursor.x = 0;//chars[*str].xAdvance;
+				cursor.x = 0; //chars[*str].xAdvance;
 				cursor.y += mCharset->lineHeight + mLineSpacing;
 				height += mCharset->lineHeight + mLineSpacing;
 				str++;
@@ -479,6 +561,7 @@ namespace MAUI {
 
 			cursor.x += chars[*str].xAdvance;
 
+			// TODO: Clean up formatting, remove commented out code.
 			if(cursor.x
 				//mCharset.chars[*str].xOffset + mCharset.chars[*str].width
 		> width) {
@@ -493,20 +576,29 @@ namespace MAUI {
 		return EXTENT(width, height);
 	}
 
-	MAExtent Font::getBoundedStringDimensions(const char *strS, const Rect &bound,
+	MAExtent Font::getBoundedStringDimensions(
+		const char *strS, 
+		const Rect &bound,
 		int length) const
 	{
-		if(length == 0) return EXTENT(0, 0);
+		if(length == 0) {
+			return EXTENT(0, 0);
+		}
+		if(!mFontImage) {
+			return EXTENT(0, 0);
+		}
+		
+		calcLineBreaks(strS, bound.x, bound.y, bound);
+		
 		int i = 0;
 		int j = 0;
-		if(!mFontImage) return EXTENT(0, 0);
-		calcLineBreaks(strS, bound.x, bound.y, bound);
 		//MARect srcRect = {0, 0, 0, 0};
 		MAPoint2d cursor = {0, 0};
 		int height = 0;
 		int width = 0;
 		CharDescriptor *chars = mCharset->chars;
 		const unsigned char* str = (const unsigned char*)strS;
+		
 		while(*str && (i!=length)) {
 			if((lineBreaks[j] == i) || ((*str) == '\n')) {
 				j++;
@@ -515,16 +607,19 @@ namespace MAUI {
 				str++;
 				i++;
 				continue;
-			} else {
+			} 
+			else {
 				cursor.x += chars[*str].xAdvance;
 			}
 
+			// TODO: Clean up formatting, remove commented out code.
 			if(cursor.y + mCharset->lineHeight//mCharset.chars[*str].yOffset + mCharset.chars[*str].height
 			> height) {
 				//height = (cursor.y + mCharset.chars[*str].yOffset + mCharset.chars[*str].height);
 				height = cursor.y + mCharset->lineHeight;
 			}
 
+			// TODO: Clean up formatting, remove commented out code.
 			if(cursor.x//mCharset.chars[*str].xOffset + mCharset.chars[*str].width
 			> width) {
 				//width = (cursor.x + mCharset.chars[*str].xOffset + mCharset.chars[*str].width);
@@ -538,13 +633,25 @@ namespace MAUI {
 		return EXTENT(width, height);
 	}
 
-	int Font::getLineBreak(int line, const char *str, const Rect& bound) const {
+	int Font::getLineBreak(
+		int line, 
+		const char *str, 
+		const Rect& bound) const 
+	{
 		calcLineBreaks(str, bound.x, bound.y, bound);
-		if(line < 0 || line >= numLineBreaks) return -1;
-		else return lineBreaks[line];
+		if(line < 0 || line >= numLineBreaks) {
+			return -1;
+		}
+		else {
+			return lineBreaks[line];
+		}
 	}
 
-	int Font::calculateLine(int index, const char *str, const Rect& bound) const {
+	int Font::calculateLine(
+		int index, 
+		const char *str, 
+		const Rect& bound) const 
+	{
 		calcLineBreaks(str, bound.x, bound.y, bound);
 		//short *ptrLineBreaks = lineBreaks;
 		int i = 0;
@@ -556,23 +663,31 @@ namespace MAUI {
 		return i;
 	}
 
-	Rect Font::calculateRectOfIndex(int index, const char *str, const Rect& bound) const {
+	Rect Font::calculateRectOfIndex(
+		int index, 
+		const char *str, 
+		const Rect& bound) const 
+	{
 		int line = calculateLine(index, str, bound);
 		int lineBreak = 0;
-		if(line>0) 
+		if(line>0) {
 			lineBreak = getLineBreak(line-1, str, bound);
-	
+		}
 		MAPoint2d cursor = {0, 0};
 		cursor.y+=line*mCharset->lineHeight;
-		MAExtent lineRect = getStringDimensions(&str[lineBreak], index-lineBreak);
+		MAExtent lineRect = getStringDimensions(
+			&str[lineBreak], 
+			index-lineBreak);
 		cursor.x+=EXTENT_X(lineRect);
 		MAExtent charRect = getStringDimensions(&str[index], 1);
-		return Rect(cursor.x, cursor.y, EXTENT_X(charRect), mCharset->lineHeight);
-
+		return Rect(
+			cursor.x, 
+			cursor.y, 
+			EXTENT_X(charRect), 
+			mCharset->lineHeight);
 	}
 
 	const Charset& Font::getCharset() const {
 		return *mCharset;
 	}
-
 }

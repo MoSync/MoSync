@@ -15,23 +15,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file StackLayout.h 
+* \brief Stack layout of child widgets.
+* \author Niklas Nummelin
+*/
+
 #include <maassert.h>
 
 #include "StackLayout.h"
 
 namespace MAUI {
 
-	StackLayout::StackLayout(int x, int y, int width, int height, Orientation ori, Alignment ali) :
-Widget(x, y, width, height),
-mOrientation(ori),
-mAlignment(ali),
-mMarginX(0),
-mMarginY(0)
+	StackLayout::StackLayout(
+		int x, 
+		int y, 
+		int width, 
+		int height, 
+		Orientation ori, 
+		Alignment ali) :
+			Widget(x, y, width, height),
+			mOrientation(ori),
+			mAlignment(ali),
+			mMarginX(0),
+			mMarginY(0)
 {
 	requestRepaint();
 }
 
 void StackLayout::boundsChanged(Widget *widget, const Rect& bounds) {
+	// TODO: Document why this line is commented out.
 	//rebuild();
 	requestUpdate();
 }
@@ -39,6 +52,7 @@ void StackLayout::boundsChanged(Widget *widget, const Rect& bounds) {
 void StackLayout::drawWidget() { }
 
 void StackLayout::rebuild() {
+
 	Vector_each(Widget*, itr, mChildren) {
 		(*itr)->removeWidgetListener(this);
 	}
@@ -47,30 +61,34 @@ void StackLayout::rebuild() {
 	int alignment = 0;
 
 	switch(mOrientation) {
-	case SLO_VERTICAL: 
+		case SLO_VERTICAL: 
 		{
 			int size = mChildren.size();
-			for(int i = 0; i < size; i++) {
+			for (int i = 0; i < size; i++) {
 				int y;
-				if(i>0)
-					y = mChildren[i-1]->getPosition().y +
-					mChildren[i-1]->getBounds().height + padding;
-				else
+				if (i>0) {
+					y = mChildren[i-1]->getPosition().y
+						+ mChildren[i-1]->getBounds().height + padding;
+				}
+				else {
 					y = 0;
-
+				}
 				int x = 0;
+				
 				switch(mAlignment) {
-				case SLA_TOP_LEFT:
-					x = alignment;
-					break;
-				case SLA_CENTER:
-					x = (mPaddedBounds.width>>1) - (mChildren[i]->getWidth()>>1) + alignment;
-					break;
-				case SLA_BOTTOM_RIGHT:
-					x = (mPaddedBounds.width) - mChildren[i]->getWidth() + alignment;
-					break;
-				case SLA_AUTO_SIZE:
-					mChildren[i]->setWidth(mPaddedBounds.width);
+					case SLA_TOP_LEFT:
+						x = alignment;
+						break;
+					case SLA_CENTER:
+						x = (mPaddedBounds.width>>1) 
+							- (mChildren[i]->getWidth()>>1) + alignment;
+						break;
+					case SLA_BOTTOM_RIGHT:
+						x = (mPaddedBounds.width) 
+							- mChildren[i]->getWidth() + alignment;
+						break;
+					case SLA_AUTO_SIZE:
+						mChildren[i]->setWidth(mPaddedBounds.width);
 				}
 
 				mChildren[i]->setPosition(x, y);
@@ -78,30 +96,35 @@ void StackLayout::rebuild() {
 		}
 		break;
 
-	case SLO_HORIZONTAL: 
+		case SLO_HORIZONTAL: 
 		{
 			int size = mChildren.size();
 			for(int i = 0; i < size; i++) {
 				int x;
-				if(i>0)
-					x = mChildren[i-1]->getPosition().x +
-					mChildren[i-1]->getBounds().width + padding;
-				else
+				if(i>0) {
+					x = mChildren[i-1]->getPosition().x 
+						+ mChildren[i-1]->getBounds().width + padding;
+				}
+				else {
 					x = 0;
+				}
 				int y = 0;
+				
 				switch(mAlignment) {
-				case SLA_TOP_LEFT:
-					y = alignment;
-					break;
-				case SLA_CENTER:
-					y = (mPaddedBounds.height>>1) - (mChildren[i]->getHeight()>>1);
-					break;
-				case SLA_BOTTOM_RIGHT:
-					y = (mPaddedBounds.height) - mChildren[i]->getHeight();
-					break;
-				case SLA_AUTO_SIZE:
-					mChildren[i]->setHeight(mPaddedBounds.height);
-					break;
+					case SLA_TOP_LEFT:
+						y = alignment;
+						break;
+					case SLA_CENTER:
+						y = (mPaddedBounds.height>>1) 
+							- (mChildren[i]->getHeight()>>1);
+						break;
+					case SLA_BOTTOM_RIGHT:
+						y = (mPaddedBounds.height) 
+							- mChildren[i]->getHeight();
+						break;
+					case SLA_AUTO_SIZE:
+						mChildren[i]->setHeight(mPaddedBounds.height);
+						break;
 				}
 				mChildren[i]->setPosition(x, y);
 			}
@@ -114,15 +137,15 @@ void StackLayout::rebuild() {
 	}
 }
 
-
+// TODO: Document why code is commented out or remove.
 /*
 void StackLayout::draw() {
 Widget::draw();
 }
 */
 
-
 void StackLayout::add(Widget *child) {
+	// TODO: Document why code is commented out or remove.
 	/*
 	int size = mChildren.size();
 	if(layoutType == VERTICAL_STACKING) {
@@ -150,9 +173,13 @@ void StackLayout::add(Widget *child) {
 	//	child->setHeight(bounds.height);	
 	}
 	*/
+	
 	Widget::add(child);
 	child->addWidgetListener(this);
+	
+	// TODO: Document why code is commented out or remove.
 	//rebuild();
+	
 	requestUpdate();
 	requestRepaint();
 }
@@ -160,6 +187,7 @@ void StackLayout::add(Widget *child) {
 void StackLayout::remove(Widget *child) {
 	Widget::remove(child);
 	child->removeWidgetListener(this);
+	// TODO: Document why code is commented out or remove.
 	//rebuild();
 	requestUpdate();
 	requestRepaint();
@@ -167,8 +195,9 @@ void StackLayout::remove(Widget *child) {
 
 
 void StackLayout::clear() {
-	for(int i = 0; i < mChildren.size(); i++)
+	for(int i = 0; i < mChildren.size(); i++) {
 		mChildren[i]->removeWidgetListener(this);
+	}
 	Widget::clear();
 	requestUpdate();
 	requestRepaint();
@@ -182,8 +211,7 @@ bool StackLayout::isTransparent() const {
 	return true;
 }
 
-
-
+// TODO: Document why code is commented out or remove.
 /*
 void StackLayout::updateAbsolutePositionChildren(int x, int y) {
 switch(layoutType) {
