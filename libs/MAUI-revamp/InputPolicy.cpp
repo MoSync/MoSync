@@ -15,6 +15,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file InputPolicy.cpp
+* \brief Handling of input policies.
+* TODO: Document what an input policy is.
+* \author Niklas Nummelin
+*/
+
 #include "InputPolicy.h"
 #include "Widget.h"
 #include "Screen.h"
@@ -23,11 +30,11 @@ namespace MAUI {
 
 Direction mapKeyCodeToDirection(int keyCode) {
 	switch(keyCode) {
-	case MAK_LEFT: return LEFT;
-	case MAK_UP: return UP;
-	case MAK_DOWN: return DOWN;
-	case MAK_RIGHT: return RIGHT;
-	default: return NONE;
+		case MAK_LEFT: return LEFT;
+		case MAK_UP: return UP;
+		case MAK_DOWN: return DOWN;
+		case MAK_RIGHT: return RIGHT;
+		default: return NONE;
 	}
 }
 
@@ -42,25 +49,31 @@ Widget* InputPolicy::getOwner() {
 	return mOwner;
 }
 
+// TODO: Clarify this comment.
 // returns true if focus should be changed.
 bool InputPolicy::keyPressed(int keyCode, int nativeCode) {
 	return false;
 }
+
 bool InputPolicy::keyReleased(int keyCode, int nativeCode) {
 	return false;
 }
 
+// TODO: Clarify this comment.
 // returns true if focus should be lost.
 // what about: returns true if focus should be held after release.
 bool InputPolicy::pointerPressed(MAPoint2d p, int id) {
 	return false;
 }
+
 bool InputPolicy::pointerMoved(MAPoint2d p, int id) {
 	return false;
 }
+
 bool InputPolicy::pointerReleased(MAPoint2d p, int id) {
 	return false;
 }
+
 DefaultInputPolicy::DefaultInputPolicy(Widget* owner) : InputPolicy(owner) {
 }
 

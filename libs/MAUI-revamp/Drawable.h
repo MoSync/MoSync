@@ -26,18 +26,23 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 namespace MAUI {
 
-	// TODO: maybe this should handle caching etc.
-	// Basic implementations should be WidgetSkin, ImageDrawable, FilledDrawable
-	// This function should use the Gfx_ calls.
-	// The class should maybe have a callback/listener if it wants to request a redraw (for animated drawables..)
+	/* TODO: maybe this should handle caching etc.
+	* Basic implementations should be 
+	* WidgetSkin, ImageDrawable, FilledDrawable.
+	* This function should use the Gfx_ calls.
+	* The class should maybe have a callback/listener
+	* if it wants to request a redraw (for animated drawables..).
+	*/
+	
+	
 	class Drawable {
 	public:
 
 		// if applicable (images and filled rectangles don't use this).
-		void setUseCaching(bool b = true);
+		void setUseCaching(bool useCaching = true);
 		bool isUsingCache() const;
 
-		virtual void draw(int x, int y, int w, int h) = 0;
+		virtual void draw(int x, int y, int width, int height) = 0;
 		virtual bool isTransparent() const = 0;
 	
 	protected:

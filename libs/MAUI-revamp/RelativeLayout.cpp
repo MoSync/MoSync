@@ -15,6 +15,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/** 
+* \file RelativeLayout.h 
+* \brief Relative layout of child widgets.
+* \author Niklas Nummelin
+*/
+
 #include <maassert.h>
 
 #include "RelativeLayout.h"

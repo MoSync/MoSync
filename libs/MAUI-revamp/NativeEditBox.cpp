@@ -1,3 +1,26 @@
+/* Copyright (C) 2009 Mobile Sorcery AB
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; see the file COPYING.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
+*/
+
+/**
+ * \file NativeEditBox.h
+ * \brief Class that implements wrapper for maTextBox.
+ * \author Patrick Broman and Niklas Nummelin
+ */
+ 
 #include "NativeEditBox.h"
 #ifdef USE_NEWLIB
 #include <stdlib.h>
@@ -22,33 +45,46 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		setCaption(str);
 		MAUI_LOG("%S", mString);
 		requestRepaint();
+		// TODO: Remove commented out code.
 		/*
 		if(mListener != NULL) {
 			mListener->nativeEditFinished();
 		}
 		*/		
-		ListenerSet_fire(NativeEditBoxListener, mEditBoxListeners, nativeEditFinished(this, mCaption));
+		ListenerSet_fire(
+			NativeEditBoxListener, 
+			mEditBoxListeners, 
+			nativeEditFinished(this, mCaption));
 		
 	}
+	// TODO: Remove commented out code.
 	//mListener = NULL;
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
-NativeEditBox::NativeEditBox(int x, int y, int width, int height, int maxSize, int options,
-	const String& initialText, const WString& titleString) :
-Label(x, y, width, height, initialText),
-mTitleString(titleString),
-mString(NULL),
-mOptions(options),
-mEditBoxListeners(false)
+NativeEditBox::NativeEditBox(
+	int x, 
+	int y, 
+	int width, 
+	int height, 
+	int maxSize, 
+	int options,
+	const String& initialText, 
+	const WString& titleString)
+		: Label(x, y, width, height, initialText),
+		mTitleString(titleString),
+		mString(NULL),
+		mOptions(options),
+		mEditBoxListeners(false)
 {
 	setMaxSize(maxSize);
 	setCaption(initialText);
 }
 
 NativeEditBox::~NativeEditBox() {
-	if(mString)
+	if(mString) {
 		delete mString;
+	}
 }
 
 void NativeEditBox::setOptions(int options) {
@@ -56,7 +92,9 @@ void NativeEditBox::setOptions(int options) {
 }
 
 void NativeEditBox::setMaxSize(int size) {
-	if(size == 0) maPanic(1, "NativeEditBox: Invalid max size!!");
+	if(size == 0) {
+		maPanic(1, "NativeEditBox: Invalid max size!!");
+	}
 	wchar_t *oldString = mString;
 	mString = new wchar_t[size];
 
@@ -80,8 +118,12 @@ bool NativeEditBox::pointerPressed(MAPoint2d p, int id) {
 bool NativeEditBox::pointerMoved(MAPoint2d p, int id) {
 	p.x-=mStartX;
 	p.y-=mStartY;
-	if((abs(p.x)<7) && (abs(p.y)<7)) return true;
-	else return false;
+	if((abs(p.x)<7) && (abs(p.y)<7)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
@@ -96,8 +138,13 @@ void NativeEditBox::activate() {
 #else
 	wsprintf(mString, L"%s", mCaption.c_str());
 #endif
-	int res = maTextBox((const wchar*)mTitleString.c_str(), (wchar*)mString,
-		(wchar*)mString, mMaxSize, mOptions);
+	int res = 
+		maTextBox(
+			(const wchar*)mTitleString.c_str(), 
+			(wchar*)mString,
+			(wchar*)mString, 
+			mMaxSize, 
+			mOptions);
 	if(res < 0) {
 		PANIC_MESSAGE("maTextBox failed");
 	}
@@ -107,6 +154,7 @@ void NativeEditBox::activate() {
 void NativeEditBox::setTitleString(const WString& titleString) {
 	mTitleString = titleString;
 }
+
 const WString& NativeEditBox::getTitleString() const {
 	return mTitleString;
 }
@@ -117,7 +165,6 @@ void NativeEditBox::setCaption(const String& caption) {
 	}
 	Label::setCaption(caption);
 }
-
 
 void NativeEditBox::addNativeEditBoxListener(NativeEditBoxListener* wl) {
 	mEditBoxListeners.add(wl);
