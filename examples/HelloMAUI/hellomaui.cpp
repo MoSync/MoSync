@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 //Include the header files for MoSync Moblets and MAUI widgets so that we can
-//access their library code from our application.
+//access them from our application.
 #include <MAUtil/Moblet.h>
 #include <MAUI/Screen.h>
 #include <MAUI/Label.h>
@@ -37,11 +37,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/EditBox.h>
 #include <MAUI/Font.h>
 //Include also the header file for the application's font and image resources
-//that are defined in the project file called "res.lst".
+//which are defined in the project file called "res.lst".
 #include "MAHeaders.h"
 
-//Define a new class to use as a blueprint for our application's
-//screens, building it upon the MAUI Screen base class.
+//Define a new class to use as a blueprint for all our application's screens,
+//building it upon the MAUI Screen base class. We'll only be using one screen
+//instance in this application, but you could have multiple instances in your
+//application, perhaps inheriting their characteristics from other screen
+//classes in a structured hierarchy.
 class AppScreen : public MAUI::Screen
 {
 //Define the public methods of our new class.
@@ -59,8 +62,9 @@ public:
 
 		//Create the screen's main widget -- a layout with one column and four
 		//rows. Because it is the top-level widget (parent=NULL) we don't need
-		//to set its position, width or height: it will fill the entire screen.
-		//As it is a member variable we will give its name an "m" prefix.
+		//to set its position, width, or height: it will fill the entire screen.
+		//As it is a member variable that will be used in other places in this
+		//class we will give its name an "m" prefix.
 		mMainLayoutWidget = new MAUI::Layout(0, 0, 0, 0, NULL, 1, 4);
 
 		//Identify the main layout widget as root of the screen's widget tree.
@@ -85,9 +89,9 @@ public:
 
 		//The second widget is an edit box that we'll use to capture text.
 		//We set its multiline property to "false" because we just want it
-		//to be one line. Note that for an EditBox, the multiline property
+		//to be one line. (For an EditBox, the multiline property
 		//can be set both by providing it as an initial attribute (as here)
-		//and through the "isMultiLine" method.
+		//and through the "isMultiLine" method.)
 		mPasswordBox = new MAUI::EditBox(0, 0, 150, 30, mMainLayoutWidget,
 			"", 0x555555, myFont, true, false, 60);
 
@@ -119,7 +123,7 @@ public:
 
 	//Now we need some methods to make the mClearButton and mSubmitButton buttons
 	//work. To do this we overload (i.e. create our own implementation of) some
-	//of the MAU::Screen base class's pointer listeners.
+	//of the MAUI::Screen base class's pointer listeners.
 
 	//First, let's give the user some feedback if the buttons are clicked.
 	//To do this we overload the pointer press listener. This method is called
@@ -147,7 +151,7 @@ public:
 	void pointerReleaseEvent(MAPoint2d point)
 	{
 
-		//If the pointer inside the Clear button...
+		//If the pointer is inside the Clear button...
 		if( mClearButton->contains( point.x, point.y ) )
 		{
 			//...clear the edit box.
@@ -246,15 +250,13 @@ private:
 // Here is the real start of our program.
 extern "C" int MAMain()
 {
-	// Create an instance of HelloMAUIMoblet.
+	//Create an instance of HelloMAUIMoblet.
 	HelloMAUIMoblet mainMoblet;
 
-	// Run the Moblet to start the application.
+	//Run the Moblet to start the application.
 	Moblet::run( &mainMoblet );
 
-	/*
-	 * HelloMAUIMoblet will run until it is closed by the user pressing key 0.
-	 * When it's closed we end our program in a well-behaved way, returning zero.
-	 */
+	//HelloMAUIMoblet will run until it is closed by the user pressing key 0.
+	//When it's closed we end our program in a well-behaved way, returning zero.
 	return 0;
 };
