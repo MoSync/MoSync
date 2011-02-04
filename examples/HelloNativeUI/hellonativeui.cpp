@@ -30,8 +30,10 @@ along with this program.  If not, write to the Free Software Foundation,
 */
 
 //Include the header files for MoSync Moblets and Native UI extensions so that
-//we can access their library code from our application.
+//we can access their library code from our application. Include the enviroment
+//so that we can listen for widget events.
 #include <MAUtil/Moblet.h>
+#include <MAUtil/Environment.h>
 #include <IX_WIDGET.h>
 
 //Define a new class to use as a blueprint for our application's screens.
@@ -44,6 +46,9 @@ public:
 	//instance of AppScreen.
 	AppScreen()
 	{
+		//Make the AppScreen listen for events coming from widgets.
+		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
+
 		//Create a Native UI screen using the IOCTL function maWidgetCreate.
 		mScreen = maWidgetCreate("Screen");
 
@@ -57,13 +62,11 @@ public:
 		//Now we create four child widgets within the main layout widget.
 
 		//The first widget is a label that we'll use to present instructions.
-		//We set its width and height, give it a bottom margin to makes sure
-		//it is nicely spaced, and we initialize it with some text.
+		//We set its width and height, and we initialize it with some text.
 		//Finally we locate it inside the screen widget.
 		mInstructions = maWidgetCreate("Label");
 		maWidgetSetProperty(mInstructions, "width", "150");
 		maWidgetSetProperty(mInstructions, "height", "60");
-		maWidgetSetProperty(mInstructions, "marginBottom", "20");
 		maWidgetSetProperty(mInstructions, "text", "Enter a password:");
 		maWidgetAddChild(mMainLayoutWidget, mInstructions);
 
@@ -73,8 +76,7 @@ public:
 		mPasswordBox = maWidgetCreate("EditBox");
 		maWidgetSetProperty(mPasswordBox, "width", "150");
 		maWidgetSetProperty(mPasswordBox, "height", "30");
-		maWidgetSetProperty(mPasswordBox, "marginBottom", "20");
-		maWidgetSetProperty(mPasswordBox, "mode", "password");
+		maWidgetSetProperty(mPasswordBox, "editMode", "password");
 		maWidgetAddChild(mMainLayoutWidget, mPasswordBox);
 
 		//The third and fourth widgets are labels that we will use as buttons.
@@ -82,7 +84,6 @@ public:
 		mClearButton = maWidgetCreate("Button");
 		maWidgetSetProperty(mClearButton, "width", "150");
 		maWidgetSetProperty(mClearButton, "height", "30");
-		maWidgetSetProperty(mClearButton, "marginBottom", "20");
 		maWidgetSetProperty(mClearButton, "textVerticalAlignment", "center");
 		maWidgetSetProperty(mClearButton, "textHorizontalAlignment", "center");
 		maWidgetSetProperty(mClearButton, "text", "Clear");

@@ -70,12 +70,6 @@ public:
 		//Identify the main layout widget as root of the screen's widget tree.
 		setMain(mMainLayoutWidget);
 
-		//Add a top margin of 20 pixels to each cell of the main layout so
-		//that child widgets are nicely spaced. To do this we call the method
-		//"setMarginY" which is available for all Layout widgets. (In the IDE,
-		//see Help > MoSync API Reference > Classes > MAUI::Layout).
-		mMainLayoutWidget->setMarginY(20);
-
 		//Now we create four child widgets within the main layout widget.
 
 		//The first widget is a label that we'll use to present instructions.
