@@ -104,9 +104,10 @@ void lua_outputHeaderFile(
 	for (size_t i=0; i<ixs.size(); i++) 
 	{
 		// This is how we include an extension.
-		// We want to include NativeUI.
+		// We want to include NativeUI and OpenGL.
 		string s = ixs[i];
-		if (s == "IX_WIDGET")
+		if (s == "IX_WIDGET" || 
+			s == "IX_OPENGL_ES")
 		{
 			lua_streamHeaderFile(luaHeaderFile, maapi, i);
 		}
