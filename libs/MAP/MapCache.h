@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef MAPCACHE_H_
 #define MAPCACHE_H_
 
-#include <MAUtil/Vector.h>
+#include <MAUtil/HashMap.h>
 #include "DateTime.h"
 
 #include "MapSource.h"
@@ -34,7 +34,6 @@ namespace MAP
 	class MapTile;
 	class MapCache;
 	class MapSource;
-	class LonLat;
 
 	//=========================================================================
 	/**
@@ -47,15 +46,26 @@ namespace MAP
 		/**
 		 * Called when a requested tile has been received into cache from map source.
 		 */
-		virtual void tileReceived( MapCache* sender, MapTile* tile ) = 0;
+		virtual void tileReceived( MapCache* sender, MapTile* tile, bool foundInCache ) = 0;
+		/**
+		 * Called when a tile job is completed.
+		 */
+		virtual void jobComplete( MapCache* sender ) = 0;
+		/**
+		 * Called when an error occurred, likely when MapSource failed to download tile.
+		 */
+		virtual void error( MapCache* sender, int code ) = 0;
 	};
+
+	class MapTileKey;
 
 	//=========================================================================
 	/**
 	 * \brief Manages map caches for clients to access.
 	 * Implemented as singleton.
 	 */
-	class MapCache : IMapSourceListener
+	class MapCache : IMapSourceListener,
+		public Broadcaster<IMapCacheListener>
 	//=========================================================================
 	{
 	private:
@@ -77,7 +87,7 @@ namespace MAP
 		 * Requests tiles to cover specified rectangle, in pixels,
 		 * around a centerpoint.
 		 */
-		void requestTiles( IMapCacheListener* listener, MapSourceKind source, const LonLat centerpoint, const int magnification, const int pixelWidth, const int pixelHeight );
+		void requestTiles( MapSource* source, const LonLat centerpoint, const MagnificationType magnification, const int pixelWidth, const int pixelHeight, const double directionX, const double directionY );
 		/**
 		 * Frees all tiles in cache.
 		 */
@@ -85,35 +95,29 @@ namespace MAP
 		//
 		// IMapSourceListener implementation
 		//
-		void tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData );
+		void tileReceived( MapSource* sender, MapTile* tile );
 		void downloadCancelled( MapSource* sender );
 		void error( MapSource* source, int code );
+		void jobComplete( MapSource* source );
 		//
 		// Capacity property
 		//
 		int getCapacity( ) const;
 		void setCapacity( int capacity );
+		int size( );
 
 	private:
 		static MapCache* sSingleton;
 		/**
-		 * Returns tile from cache, if available
-		 */
-		int findInCache( MapSourceKind source, MapTileCoordinate tileXY ) const;
-		/**
-		 * returns first unused location in cache
-		 */
-		int findFreeLocation( ) const;
-		/**
 		 * returns location of least recently used tile
 		 */
-		int findLRU( ) const;
-		/**
-		 * Reallocates cache. Content is cleared.
-		 */
-		void reallocateCache( );
+		MapTileKey findLRU( );
 
-		MapTile** mList;
+		void onTileReceived( MapTile* tile, bool foundInCache );
+		void onJobComplete( );
+		void onError( int code );
+
+		HashMap<MapTileKey, MapTile*> mList;
 		int mHits;
 		int mMisses;
 		int mCapacity;

@@ -29,6 +29,8 @@ mod.class_eval do
 			# broken compiler
 			shared_specflags = {"CharInputC.c" => " -Wno-unreachable-code",
 				"Graphics.c" => " -Wno-unreachable-code",
+				"GraphicsOpenGL.c" => " -Wno-unreachable-code",
+				"GraphicsSoftware.c" => " -Wno-unreachable-code",				
 				"FrameBuffer.c" => " -Wno-unreachable-code"}
 			if(@GCC_IS_V4)
 				shared_specflags["String.cpp"] = " -Wno-strict-overflow"

@@ -14,6 +14,8 @@ IX_*.h
 *.suo
 *.user
 *.class
+*.swp
+*~
 
 MAHeaders.h
 program
@@ -24,6 +26,7 @@ Stabs.tab
 Sld.tab
 Thumbs.db
 stabs.tab
+.mosyncproject.local
 
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
@@ -33,8 +36,6 @@ stabs.tab
 /tools/GLWrapperGenerator/magl_functions.h
 /tools/GLWrapperGenerator/opengl_generated.idl
 /tools/GLWrapperGenerator/opengl_invoke_generated.jpp
-
-/tools/idl2/opengl_generated.idl
 
 /tools/pipe-tool/PBProto.h
 /tools/pipe-tool/PBProtoPub.h
@@ -150,6 +151,8 @@ stabs.tab
 /runtimes/cpp/platforms/sdl/MoRE/fp.xml
 /runtimes/cpp/platforms/sdl/MoRE/profile.txt
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
+/runtimes/cpp/platforms/android/config_platform.h
+/runtimes/cpp/platforms/android/config_platform.h.saved
 /runtimes/java/platforms/javaME/setdirs.bat
 /runtimes/java/platforms/javaME/work.bat
 /runtimes/java/platforms/javaME/src/config_platform.h

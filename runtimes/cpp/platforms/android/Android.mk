@@ -37,7 +37,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 				   ../../../../intlibs/hashmap/hashmap.cpp \
 				   ../../../../intlibs/helpers/platforms/linux/log.cpp
 				   
-LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog
+LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
 
 LOCAL_CFLAGS	:= -DFPM_ARM
 

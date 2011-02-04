@@ -29,28 +29,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MapTile.h"
 #include "Queue.h"
+#include "Broadcaster.h"
+#include "MapTileCoordinate.h"
 
 using namespace MAUtil;
 
 namespace MAP
 {
-	class LonLat;
+	//class LonLat;
 	class MapTile;
 	class MapSourceImageDownloader;
 	class MapSourceQueue;
 	class MapSource;
-
-	//=========================================================================
-	/**
-	 * \brief Abstract base class for client data.
-	 * Client must subclass this.
-	 */
-	class MapSourceClientData
-	//=========================================================================
-	{
-	public:
-		virtual			~MapSourceClientData( ) { };
-	};
 
 	//=========================================================================
 	/**
@@ -60,9 +50,10 @@ namespace MAP
 	//=========================================================================
 	{
 	public:
-		virtual void	tileReceived( MapSource* sender, MapTile* tile, MapSourceClientData* clientData ) = 0;
-		virtual void	downloadCancelled( MapSource* sender ) = 0;
-		virtual void	error( MapSource* source, int code ) = 0;
+		virtual void	 tileReceived( MapSource* sender, MapTile* tile ) = 0;
+		virtual void	 downloadCancelled( MapSource* sender ) = 0;
+		virtual void	 error( MapSource* source, int code ) = 0;
+		virtual void	 jobComplete( MapSource* source ) = 0;
 	};
 
 	//=========================================================================
@@ -75,15 +66,6 @@ namespace MAP
 	class MapSource : public DownloadListener
 	//=========================================================================
 	{
-	private:
-		//
-		// Capacity of request queue.
-		//
-		static const int			QueueSize = 100;
-		//
-		// Maximum parallel downloaders
-		//
-		static const int			Downloaders = 5; // four in parallel plus one slacking
 	public:
 									MapSource( );
 		virtual						~MapSource( );
@@ -94,13 +76,9 @@ namespace MAP
 		//
 		//============================================================
 		/**
-		 * Returns source kind
-		 */
-		virtual MapSourceKind		getSourceKind( ) const = 0;
-		/**
 		 * Returns tile size
 		 */
-		virtual  MAExtent			getTileSize( ) const = 0;
+		virtual  int                getTileSize( ) const = 0;
 		/**
 		 * Returns minimum magnification
 		 */
@@ -116,11 +94,11 @@ namespace MAP
 		/**
 		 * Converts LonLat to a pixel coordinate, in a global pixel grid
 		 */
-		virtual PixelCoordinate		lonLatToPixel( LonLat lonlat, int magnification ) = 0;
+		virtual PixelCoordinate		lonLatToPixel( LonLat lonlat, MagnificationType magnification ) = 0;
 		/**
 		 * Converts LonLat to tile coordinates for a tile that contains the lonlat point.
 		 */
-		virtual MapTileCoordinate	lonLatToTile( LonLat lonlat, int magnification ) = 0;
+		virtual MapTileCoordinate	lonLatToTile( LonLat lonlat, MagnificationType magnification ) = 0;
 		/**
 		 * Convert tile center plus pixel offset to WGS84 lat/lon.
 		 */
@@ -128,11 +106,19 @@ namespace MAP
 		/**
 		 * Returns all tiles required to cover specified rectangle around centerpoint.
 		 */
-		void						requestTile( const MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData );
+		void						requestTile( IMapSourceListener* listener, const MapTileCoordinate tileXY );
+		/*
+		 * Adds a job complete entry to queue, so client can be notified when a sequence of tiles has been delivered.
+		 */
+		void						requestJobComplete( IMapSourceListener* listener );
 		/**
 		 * Clears any queued requests
 		 */
 		void						clearQueue( );
+		//
+		// Number of tiles received
+		//
+		int							getTileCount( ) { return mTileCount; }
 		//
 		// DownloadListener overrides
 		//
@@ -154,14 +140,22 @@ namespace MAP
 		// Is job already in queue?
 		//
 		bool						isInQueue( MapTileCoordinate tileXY );
+		bool						isInDownloaders( MapTileCoordinate tileXY );
 		//
 		//
 		//
 		void						removeDownloader( MapSourceImageDownloader* downloader );
+		//
+		// Event notifiers
+		//
+		void						onJobComplete( IMapSourceListener* listener );
+		void						onTileReceived( IMapSourceListener* listener, MapTile* tile );
+		void						onDownloadCancelled( IMapSourceListener* listener );
+		void						onError( IMapSourceListener* listener, int code );
 
 		MapSourceQueue*				mQueue;
-		MapSourceImageDownloader*	mDownloaders[Downloaders];
-
+		MapSourceImageDownloader**	mDownloaders;
+		int							mTileCount;
 	};
 }
 

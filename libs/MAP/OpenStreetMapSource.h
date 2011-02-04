@@ -47,12 +47,7 @@ namespace MAP
 		//
 		// MapSource overrides
 		//
-		MapSourceKind getSourceKind( ) const			
-		{ 
-			return MapSourceKind_OpenStreetMap; 
-		}
-
-		MAExtent getTileSize( ) const			
+		int getTileSize( ) const			
 		{ 
 			return 256; 
 		}
@@ -69,8 +64,8 @@ namespace MAP
 
 
 		void getTileUrl( char* buffer, MapTileCoordinate tileXY );
-		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
-		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
+		MapTileCoordinate lonLatToTile( LonLat lonlat, MagnificationType magnification );
+		PixelCoordinate lonLatToPixel( LonLat lonlat, MagnificationType magnification );
 		LonLat tileCenterToLonLat( const int tileSize, const MapTileCoordinate& tile, const double offsetX, const double offsetY );
 	};
 }

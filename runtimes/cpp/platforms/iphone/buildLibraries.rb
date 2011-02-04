@@ -32,14 +32,14 @@ end
 
 
 # build everything
-#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos -project MoSync.xcodeproj"
-#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos -project MoSync.xcodeproj"
-#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator -project MoSync.xcodeproj"
-#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos3.2 -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos3.2 -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
-sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
+sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos -project MoSync.xcodeproj"
+sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos -project MoSync.xcodeproj"
+sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator -project MoSync.xcodeproj"
+sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator -project MoSync.xcodeproj"
+#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphoneos3.2 -project MoSync.xcodeproj"
+#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphoneos3.2 -project MoSync.xcodeproj"
+#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Debug  -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
+#sh "/Developer/usr/bin/xcodebuild -target MoSyncLib -configuration Release -sdk iphonesimulator3.2 -project MoSync.xcodeproj"
 
 # build directory structure
 FileUtils.rm_rf(["template"])

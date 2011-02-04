@@ -57,22 +57,9 @@ namespace MAP
 		{
 		}
 		/**
-		 * CloudMade supports a number of different rendering variations
-		 * for maps. MAP currently supports type 1 and 7.
-		 */
-		MapSourceKind getSourceKind( ) const			
-		{
-			switch( mStyle )
-			{
-			case 1: return MapSourceKind_CloudMade1;
-			case 7: return MapSourceKind_CloudMade7;
-			default: return (MapSourceKind)-1;
-			}
-		}
-		/**
 		 * Returns tile size in pixels.
 		 */
-		MAExtent getTileSize( ) const
+		int getTileSize( ) const
 		{
 			//
 			// CloudMade tile size is fixed at 256x256 pixels.
@@ -117,11 +104,11 @@ namespace MAP
 		/**
 		 * Converts a LonLat coordinate to a tile coordinate.
 		 */
-		MapTileCoordinate lonLatToTile( LonLat lonlat, int magnification );
+		MapTileCoordinate lonLatToTile( LonLat lonlat, MagnificationType magnification );
 		/**
 		 * Converts a LonLat coordinate to a global pixel coordinate.
 		 */
-		PixelCoordinate lonLatToPixel( LonLat lonlat, int magnification );
+		PixelCoordinate lonLatToPixel( LonLat lonlat, MagnificationType magnification );
 		/**
 		 * Convert tile center plus pixel offset to LonLat. 
 		 */

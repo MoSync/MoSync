@@ -16,7 +16,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "MapDemoMoblet.h"
-#include <MAP/MapSourceMgr.h>
 #include <MAP/CloudMadeMapSource.h>
 #include <MAP/GoogleMapSource.h>
 
@@ -61,16 +60,13 @@ namespace MapDemo
 	MapDemoMoblet::~MapDemoMoblet( )
 	//-------------------------------------------------------------------------
 	{
+		deleteobject( mScreen );
 	}
 
 	//-------------------------------------------------------------------------
 	void MapDemoMoblet::shutdown( )
 	//-------------------------------------------------------------------------
 	{
-		deleteobject( mScreen );
-		MapCache::shutdown( );
-		MapSourceMgr::shutdown( );
-		delete this;
-		maExit( 0 );
+		Terminate( );
 	}
 }

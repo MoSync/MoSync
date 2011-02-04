@@ -49,8 +49,9 @@ void MoSyncDiv0() {
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 	return (byte*)mem_ds + address;
 }
-void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
+void Base::Syscall::ValidateMemRange(const void* ptr, int size) {	
 }
+
 int Base::Syscall::ValidatedStrLen(const char* ptr) {
 	return strlen(ptr);
 }
@@ -173,9 +174,14 @@ void MoSync_DoneUpdatingView() {
 	mViewSemaphore.post();
 }
 
-void MoSync_ShowMessageBox(const char *msg, bool kill) {
-	
-	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding] shouldKill:kill];  	
+void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
+	NSString* nsTitle = nil;
+	if(title != nil)
+		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
+
+	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
+					  withTitle:nsTitle
+					  shouldKill:kill];  	
 }
 
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
@@ -208,16 +214,16 @@ void MoSync_StopUpdatingAccelerometer() {
 	[sMoSyncView stopUpdatingAccelerometer];
 }
 
-void MoSync_AddTouchPressedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 }
 
-void MoSync_AddTouchMovedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);
+void MoSync_AddTouchMovedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);
 }
 
-void MoSync_AddTouchReleasedEvent(int x, int y) {
-	Base::gEventQueue.addPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+void MoSync_AddTouchReleasedEvent(int x, int y, int touchId) {
+	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_RELEASED);
 }
 
 void MoSync_AddScreenChangedEvent() {

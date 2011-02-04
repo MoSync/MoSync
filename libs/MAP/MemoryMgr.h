@@ -88,9 +88,10 @@ namespace MAPUtil
 			#ifdef TRACKOBJECTS
 
 			int count = mKeys.size( );
-			DebugPrintf( "Dump: %d objects remaining\n", count );
+			DebugPrintf( "=== Dump: %d objects remaining\n", count );
 			for ( int i = 0; i < count; i++ )
 				DebugPrintf( "   %s\n", mValues[ i ] );
+			DebugPrintf( "=== End dump: %d objects remaining\n", count );
 
 			#endif
 
@@ -114,6 +115,14 @@ namespace MAPUtil
 			(obj) = NULL;\
 		}\
 	}
+	#define deleteconstobject( obj ) \
+	{\
+		if ( (obj) != NULL )\
+		{\
+			MemoryMgr::untrack( obj );\
+			delete (obj);\
+		}\
+	}
 #else
 	#define newobject( type, obj ) ( obj )
 	#define deleteobject( obj )\
@@ -122,6 +131,13 @@ namespace MAPUtil
 		{\
 			delete (obj);\
 			(obj) = NULL;\
+		}\
+	}
+	#define deleteconstobject( obj )\
+	{\
+		if ( (obj) != NULL )\
+		{\
+			delete (obj);\
 		}\
 	}
 #endif

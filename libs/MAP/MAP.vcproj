@@ -47,6 +47,7 @@
 				WarningLevel="3"
 				WarnAsError="true"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4505,4100,4201,4127,4512"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -175,11 +176,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Color.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DateTime.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\GeoPoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GoogleMapSource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LayerMapViewport.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LonLat.cpp"
 				>
 			</File>
 			<File
@@ -191,7 +216,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MapSourceMgr.cpp"
+				RelativePath=".\MapViewport.cpp"
 				>
 			</File>
 			<File
@@ -225,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Color.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DateTime.h"
 				>
 			</File>
@@ -233,7 +262,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Enumerator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPoint.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointDataSource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GeoPointLayerRenderer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\GoogleMapSource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Layer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LayerMapViewport.h"
 				>
 			</File>
 			<File
@@ -245,15 +302,11 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MapConfig.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MapSource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MapSourceKind.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MapSourceMgr.h"
 				>
 			</File>
 			<File
@@ -262,6 +315,10 @@
 			</File>
 			<File
 				RelativePath=".\MapTileCoordinate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MapViewport.h"
 				>
 			</File>
 			<File
@@ -286,6 +343,10 @@
 			</File>
 			<File
 				RelativePath=".\TimeSpan.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TraceScope.h"
 				>
 			</File>
 		</Filter>

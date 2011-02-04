@@ -22,7 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Moblet.h>
 #include "AppScreen.h"
 #include <MAP/MapWidget.h>
-#include <MAP/MapSourceMgr.h>
 
 using namespace MAP;
 using namespace MapDemoUI;
@@ -52,6 +51,9 @@ namespace MapDemo
 		virtual bool handlePointerPress( MAPoint2d point );
 		virtual bool handlePointerMove( MAPoint2d point );
 		virtual bool handlePointerRelease( MAPoint2d point );
+		virtual void multitouchPressEvent(MAPoint2d p, int touchId) { }
+		virtual void multitouchMoveEvent(MAPoint2d p, int touchId) { }
+		virtual void multitouchReleaseEvent(MAPoint2d p, int touchId) { }
 
 		virtual void enumerateActions( Vector<Action*>& list );
 
@@ -59,8 +61,10 @@ namespace MapDemo
 		void nextMapSource( );
 
 		MapWidget* mMap;
-		MapSourceKind mMapSourceKind;
-
+		MapSource* mOpenStreetMapSource;
+		MapSource* mGoogleStreetMapSource;
+		MapSource* mGoogleAerialMapSource;
+		MapSource* mGoogleHybridMapSource;
 		bool scrolling ;
 		int prevX;
 		int prevY;

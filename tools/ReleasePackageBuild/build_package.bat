@@ -177,13 +177,6 @@ cd %ORIGINAL_PATH%
 @copy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
 @echo ------------------------------------------------
-@echo Running OpenGL Wrapper generator.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator
-ruby workfile.rb
-@echo.
-
-@echo ------------------------------------------------
 @echo Running DefaultSkinGenerator.
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\DefaultSkinGenerator
@@ -465,6 +458,14 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building dgles.lib
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\intlibs\dgles-0.5
+@vcbuild dgles.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building MDB, the MoSync Debugger
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\debugger
@@ -517,6 +518,10 @@ Release\idl2.exe
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\clock
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\multi
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\wolf3d
+
+@REM Temporary deletes, didn't work with map library
+@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\HelloMap
+@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MapDemo
 
 @REM Remove files that shouldn't be in the release
 @del /s /q %MOSYNC_EXAMPLES_PATH%\Makefile* %MOSYNC_EXAMPLES_PATH%\*.bat %MOSYNC_EXAMPLES_PATH%\*.2008.vcproj
@@ -624,7 +629,7 @@ cd %MOSYNC_TRUNK%\libs
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
 REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
+REM @rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
 
 
 @echo ------------------------------------------------

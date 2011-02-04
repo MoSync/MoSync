@@ -26,12 +26,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "DateTime.h"
 #include "LonLat.h"
-#include "MapSourceKind.h"
+#include "DebugPrintf.h"
+#include <MAUtil/PlaceholderPool.h>
+#include "TraceScope.h"
 
 using namespace MAPUtil;
 
 namespace MAP
 {
+	class MapSource;
+
 	//=========================================================================
 	/**
 	 * \brief Single tile from a map source
@@ -46,14 +50,22 @@ namespace MAP
 		/**
 		 * Creates a map tile.
 		 */
-		MapTile( MapSourceKind sourceKind, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image ) :
-			mSourceKind( sourceKind ),
+		MapTile( MapSource* source, const int gridX, const int gridY, const int magnification, const LonLat center, MAHandle image
+				#ifdef StoreCompressedTilesInCache
+				, int contentLength 
+				#endif
+			) :
+			mSource( source ),
 			mGridX( gridX ),
 			mGridY( gridY ),
 			mMagnification( magnification ),
 			mCenter( center ),
 			mImage( image ),
-			mLastAccessTime( DateTime::minValue( ) )
+			mLastAccessTime( DateTime::minValue( ) ),
+			mCreationTime( maGetMilliSecondCount() )
+			#ifdef StoreCompressedTilesInCache
+			, mContentLength( contentLength )
+			#endif
 		{
 		}
 		/**
@@ -61,7 +73,7 @@ namespace MAP
 		 */
 		virtual ~MapTile( )
 		{
-			maDestroyObject( mImage );
+			MAUtil::PlaceholderPool::put(mImage);
 		}
 		/**
 		 * Sets last access timestamp to current time.
@@ -71,11 +83,11 @@ namespace MAP
 			mLastAccessTime = DateTime::now( ); 
 		}
 		/**
-		 * Returns source kind of tile.
+		 * Returns the source for this tile.
 		 */
-		MapSourceKind getSourceKind( ) const	
-		{ 
-			return mSourceKind; 
+		MapSource* getMapSource( ) const
+		{
+			return mSource;
 		}
 		/**
 		 * Returns X coordinate of tile in tile grid.
@@ -119,15 +131,34 @@ namespace MAP
 		{ 
 			return mLastAccessTime; 
 		}
+		
+		/**
+		 * Returns milliseconds since the tile was created.
+		 */
+		int getMilliSecondsSinceCreated( ) const		
+		{ 
+			return maGetMilliSecondCount() - mCreationTime; 
+		}		
+		
+		#ifdef StoreCompressedTilesInCache
+
+		int getContentLength( ) const
+		{
+			return mContentLength;
+		}
+
+		#endif
 
 	private:
-		MapSourceKind mSourceKind;
+		MapSource* mSource;
 		int mGridX;
 		int mGridY;
 		int mMagnification;
 		LonLat mCenter;
 		MAHandle mImage;
 		DateTime mLastAccessTime;
+		int mCreationTime;
+		int mContentLength;
 	};
 }
 #endif // MAPTILE_H_

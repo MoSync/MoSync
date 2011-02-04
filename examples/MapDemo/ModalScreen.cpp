@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "ModalScreen.h"
+#include <MAP/Broadcaster.h>
 
 using namespace MapDemoUtil;
 
@@ -64,9 +65,11 @@ namespace MapDemoUI
 	//-------------------------------------------------------------------------
 	{
 		mPrevious->show( );
-		for ( int i = 0; i < mListeners.size(); i++ )
-			mListeners[i]->screenClosed( this );
-		delete this;
+		Vector<IModalScreenListener*>* listeners = getBroadcasterListeners<IModalScreenListener>( *this );
+		for ( int i = 0; i < listeners->size(); i++ )
+			(*listeners)[i]->screenClosed( this );
+		
+		deleteconstobject( this );
 	}
 
 	//-------------------------------------------------------------------------
