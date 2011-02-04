@@ -20,7 +20,6 @@ package com.mosync.internal.android;
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
@@ -59,9 +58,15 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.opengles.GL10;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -73,10 +78,11 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
-import android.graphics.PorterDuff.Mode;
 import android.net.Uri;
+import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -85,7 +91,9 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 
+import com.mosync.java.android.MessageBox;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -114,6 +122,9 @@ public class MoSyncThread extends Thread
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();	
 	public native void nativePostEvent(int[] eventBuffer);
+	public native int nativeCreateBinaryResource(
+		int resourceIndex,
+		int length);
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
@@ -122,6 +133,7 @@ public class MoSyncThread extends Thread
 	MoSyncSound mMoSyncSound;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
+	MoSyncNativeUI mMoSyncNativeUI;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -212,6 +224,8 @@ public class MoSyncThread extends Thread
 	
 	int mMaxStoreId = 0;
 
+	public boolean mIsUpdatingScreen = false;
+	
 	final static String storesPath = "MAStore";
 	
 	/**
@@ -226,12 +240,15 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync) context;
 		
+		EventQueue.sMoSyncThread = this;
+		
 		mHasDied = false;
 		
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
+		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -876,6 +893,9 @@ public class MoSyncThread extends Thread
 
 	/**
 	 * maUpdateScreen
+	 * Sets the boolean mIsUpdatingScreen when updating the screen
+	 * so that we won't get touch events while drawing. This to
+	 * not hog the system with events.
 	 */
 	void maUpdateScreen()
 	{
@@ -883,6 +903,8 @@ public class MoSyncThread extends Thread
 		Canvas lockedCanvas = null;
 		
 		if (mMoSyncView == null) return;
+		
+		mIsUpdatingScreen = true;
 		
 		try 
 		{
@@ -913,6 +935,7 @@ public class MoSyncThread extends Thread
 		catch (Exception e)
 		{
 			logError("updateScreen Exception : " + e.toString(), e);
+			mIsUpdatingScreen = false;
 			return;
 		}
 			
@@ -920,6 +943,8 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncView.mSurfaceHolder.unlockCanvasAndPost(lockedCanvas);
 		}
+		
+		mIsUpdatingScreen = false;
 	}
 
 	/**
@@ -1294,7 +1319,16 @@ public class MoSyncThread extends Thread
 
 		// Byte array to hold resource data. This is the data we will
 		// use to create the image.
-		byte[] resourceData = new byte[size];
+		byte[] resourceData = null;
+		try
+		{
+			resourceData = new byte[size];
+		}
+		catch(OutOfMemoryError ex)
+		{
+			ex.printStackTrace( );
+			return RES_OUT_OF_MEMORY;
+		}
 
 		// If the handle is a binary resource it is in mBinaryResources.
 		ByteBuffer binData = (ByteBuffer) mBinaryResources.get(dataHandle);
@@ -1366,8 +1400,11 @@ public class MoSyncThread extends Thread
 		try 
 		{
 			// Create a Bitmap object from the resource data.
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			
 			Bitmap decodedImage = BitmapFactory.decodeByteArray(
-				resourceData, 0, resourceData.length);
+				resourceData, 0, resourceData.length, options);
 			if (decodedImage == null)
 			{
 				logError("maCreateImageFromData - " 
@@ -1534,10 +1571,12 @@ public class MoSyncThread extends Thread
 					// Make sure that the buffer is reading from the start.
 					bb.position(0);
 					
+					// Write data.
 					fc.write(bb);
 					fc.force(false);
 					fc.close();
 					fos.close();
+					
 					return 1;
 				}
 				
@@ -1573,7 +1612,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * _maReadStore
 	 */
-	ByteBuffer _maReadStore(int store, int resourceIndex)
+	int _maReadStore(int store, int resourceIndex)
 	{
 		SYSLOG("_maReadStore");
 		
@@ -1594,22 +1633,21 @@ public class MoSyncThread extends Thread
 				{
 					offset = fis.read(buffer, offset, (length-offset));
 				}
-				fis.close();	
-			}
-			else
-			{
-				buffer = new byte[0];
+				fis.close();
+				
+				int res = nativeCreateBinaryResource(resourceIndex, length);
+				ByteBuffer byteBuffer = mBinaryResources.get(resourceIndex);
+				byteBuffer.put(buffer);
+				
+				return RES_OK;
 			}
 			
-			ByteBuffer bb = loadBinary(resourceIndex, length);
-			bb.put(buffer);
-			return bb;
-			
+			return RES_OUT_OF_MEMORY;
 		} 
 		catch(Exception e) 
 		{
 			logError("read store exception : " + e.toString(), e);
-			return null;
+			return -1;
 		}
 	}
 
@@ -1967,23 +2005,21 @@ public class MoSyncThread extends Thread
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
 	 */
-	ByteBuffer loadBinary(int resourceIndex, int size)
+	boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
 		SYSLOG("loadBinary index:" + resourceIndex);
 		
 		try
 		{
-			ByteBuffer data = ByteBuffer.allocateDirect(size);
-			data.order(null);
-			mBinaryResources.put(resourceIndex, data);
-			return data;
+			buffer.order(null);
+			mBinaryResources.put(resourceIndex, buffer);
+			return true;
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			logError("loadBinary - Out of Memory!", e);
-			maPanic(1,"Out of Memory!");
+			return false;
 		}
-		return null;
 	}
 
 	/**
@@ -2008,6 +2044,19 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfAudioUBin(ubinData, resourceIndex);
 	}
 
+	ByteBuffer destroyBinary(int resourceIndex)
+	{
+		ByteBuffer buffer =  mBinaryResources.get(resourceIndex);
+		
+		if(null != buffer)
+		{
+			mBinaryResources.remove(resourceIndex);
+			return buffer;
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * Destroy a resource.
 	 * 
@@ -2015,22 +2064,28 @@ public class MoSyncThread extends Thread
 	 */
 	void destroyResource(int resourceIndex)
 	{
-		SYSLOG("destroyBinary :" + resourceIndex);
-		
+		SYSLOG("destroyResource :" + resourceIndex);
+		/*
 		if(null != mBinaryResources.get(resourceIndex))
-		{
+		{	
 			mBinaryResources.remove(resourceIndex);
 		}
-
+		*/
 		if(null != mUBinaryResources.get(resourceIndex))
 		{
 			mUBinaryResources.remove(resourceIndex);
 		}
-
-		if(null != mImageResources.get(resourceIndex))
+		else if(null != mImageResources.get(resourceIndex))
 		{
 			mImageResources.remove(resourceIndex);
 		}
+		else
+		{
+			Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
+		}
+		
+		Log.i("MoSyncThread", "Resource deleted, force GC");
+		System.gc();
 	}
 
 	/**
@@ -2061,6 +2116,41 @@ public class MoSyncThread extends Thread
 		return 0;
 	}
 
+	/**
+	 * Opens a message box.
+	 * @param title
+	 * @param text
+	 * @return
+	 */
+	int maMessageBox(
+		final String title, 
+		final String text)
+	{
+		// Get parameters from the parent activity
+		mContext.runOnUiThread( new Runnable( ) {
+			
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				builder.setCancelable(false);
+				builder.setMessage(text);
+				builder.setPositiveButton("Ok", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+					}
+				}); 
+				AlertDialog alertDialog = builder.create();
+				
+				alertDialog.setTitle(title);
+				alertDialog.show();
+			}
+		});
+
+		return 0;
+	}
+	
 	/**
 	 * Display a notification.
 	 * @param type
@@ -2438,6 +2528,92 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncHomeScreen.maHomeScreenEventsOnOff(eventsOn);
 	}
+	
+	/**
+	 * Internal wrapper for maWidgetCreate that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetCreate(final String type)
+	{
+		return mMoSyncNativeUI.maWidgetCreate(type);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetDestroy that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetDestroy(final int widget)
+	{
+		return mMoSyncNativeUI.maWidgetDestroy(widget);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetAddChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetAddChild(
+		final int parentHandle, 
+		final int childHandle)
+	{
+		return mMoSyncNativeUI.maWidgetAddChild(parentHandle, childHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetRemoveChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetRemoveChild(
+		final int parentHandle, 
+		final int childHandle)
+	{
+		return mMoSyncNativeUI.maWidgetRemoveChild(parentHandle, childHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetScreenShow that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetScreenShow(final int screenHandle)
+	{
+		return mMoSyncNativeUI.maWidgetScreenShow(screenHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetSetProperty that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetSetProperty(
+		final int widgetHandle, 
+		final String key, 
+		final String value)
+	{
+		return mMoSyncNativeUI.maWidgetSetProperty(widgetHandle, key, value);
+	}
+	
+	public int maWidgetGetProperty(
+			final int widgetHandle,
+			final String key,
+			final int memBuffer, 
+			final int memBufferSize)
+	{
+		return mMoSyncNativeUI.maWidgetGetProperty(widgetHandle, key, memBuffer, memBufferSize);
+	}
+	
+	/**
+	 * Loads an OpenGL texture to the current texture handle. If the 
+	 * underlying bitmap has an alpha channel, the texture will also
+	 * get an alpha channel.
+	 * 
+	 * @param bitmapHandle Handle to the bitmap to load.
+	 * 
+	 * @return 0 on success, RES_BAD_INPUT if the handle does not exist,
+	 *         and -3 if the texture could not be loaded.
+	 */
+	public int loadGlTexture(final int bitmapHandle)
+	{
+		// Load texture as standard texture.
+		return loadGlTextureHelper(bitmapHandle, false);
+	}
 
 	/**
 	 * Turn on screen on/off events.
@@ -2482,12 +2658,166 @@ public class MoSyncThread extends Thread
 	}
 	
 	/**
+	 * Loads an OpenGL sub texture to the current texture handle. If the 
+	 * underlying bitmap has an alpha channel, the texture will also
+	 * get an alpha channel.
+	 * 
+	 * @param bitmapHandle Handle to the bitmap to load.
+	 * 
+	 * @return 0 on success, RES_BAD_INPUT if the handle does not exist,
+	 *         and -3 if the texture could not be loaded.
+	 */
+	public int loadGlSubTexture(final int bitmapHandle)
+	{
+		// Load texture as sub texture.
+		return loadGlTextureHelper(bitmapHandle, true);
+	}
+	
+	/**
+	 * Helper method that load a bitmap as a texture or as a sub texture.
+	 * @param bitmapHandle Texture bitmap handle.
+	 * @param isSubTexture true if sub texture false if standard texture.
+	 * @return A status code.
+	 */
+	private int loadGlTextureHelper(
+		final int bitmapHandle, 
+		final boolean isSubTexture)
+	{
+		// Get bitmap object.
+		ImageCache texture = mImageResources.get(bitmapHandle);
+		if(texture == null)
+		{
+			// Could not find bit map object.
+			return RES_BAD_INPUT;
+		}
+		
+		// Ensure that the bitmap we use has dimensions that are power of 2.
+		Bitmap bitmap = loadGlTextureHelperMakeBitmapPowerOf2(texture.mBitmap);
+		
+		// The texture bitmap encoding.
+		int textureFormat = GL10.GL_RGBA;
+
+		try
+		{
+			// Load the texture into OpenGL.
+			if (isSubTexture)
+			{
+				GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
+				  0,
+				  0,
+				  0,
+				  bitmap,
+				  textureFormat,
+				  GL10.GL_UNSIGNED_BYTE);
+			}
+			else
+			{
+				GLUtils.texImage2D(
+					GL10.GL_TEXTURE_2D, 
+					0, 
+					textureFormat, 
+					bitmap, 
+					0);
+			}
+		}
+		catch (Throwable t)
+		{
+			Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
+			t.printStackTrace();
+		}
+		finally
+		{
+			if (bitmap != texture.mBitmap)
+			{
+				bitmap.recycle();
+			}
+		}
+		
+		// Check error status.
+		EGL10 egl = (EGL10) EGLContext.getEGL( );
+		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
+		{
+			return 0; // Success, no errors.
+		}
+		else
+		{
+			return -3; // Texture could not be loaded.
+		}
+	}
+	
+	/**
+	 * Ensures that the bitmap has width and height that is power of 2.
+	 * @param bitmap Source bitmap.
+	 * @return Source bitmap if it already has power of 2 dimensions,
+	 * a new bitmap if not, that has power of 2 dimensions.
+	 */
+	private Bitmap loadGlTextureHelperMakeBitmapPowerOf2(Bitmap bitmap)
+	{
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		
+		if (loadGlTextureHelperIsPowerOf2(width) &&
+			loadGlTextureHelperIsPowerOf2(height))
+		{
+			// Bitmap is already power of 2, return the 
+			// the original bitmap.
+			return bitmap;
+		}
+		
+		// Allocate new bitmap.
+		int newWidth = loadGlTextureHelperGetNextPowerOf2(width);
+		int newHeight = loadGlTextureHelperGetNextPowerOf2(height);
+		
+		Bitmap newBitmap = Bitmap.createBitmap(
+			newWidth, 
+			newHeight, 
+			Bitmap.Config.ARGB_8888);
+		if (null == newBitmap)
+		{
+			return null;
+		}
+		
+		// Blit original bitmap to new bitmap.
+		Canvas canvas = new Canvas(newBitmap);
+		canvas.drawBitmap(bitmap, 0.0f, 0.0f, null);
+		
+		return newBitmap;
+	}
+	
+	/**
+	 * Tests is a number is a power of 2.
+	 * @param n Number to test.
+	 * @return true if number is a power of 2.
+	 */
+	private boolean loadGlTextureHelperIsPowerOf2(int n) 
+	{
+		return ((0 != n) && (0 == (n & (n - 1)))); 
+	}
+	
+	/**
+	 * Return a number that is the next higher power of two after n.
+	 * @param n Number to test.
+	 * @return The next power of 2 number that is higher than n.
+	 */
+	private int loadGlTextureHelperGetNextPowerOf2(int n) 
+	{
+		int powerOf2 = 2;
+		
+		while (powerOf2 < n)
+		{
+			powerOf2 = powerOf2 << 1;
+		}
+		
+		return powerOf2;
+	}
+	
+	/**
 	 * Class that holds image data.
 	 */
 	public static final class ImageCache
 	{
-		Bitmap mBitmap;
-		Canvas mCanvas;
+		public Bitmap mBitmap;
+		public Canvas mCanvas;
 
 		ImageCache(Canvas canvas, Bitmap bitmap)
 		{

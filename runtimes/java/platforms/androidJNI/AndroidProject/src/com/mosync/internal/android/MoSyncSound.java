@@ -304,9 +304,6 @@ public class MoSyncSound
 			" mimeLength: " + mimeType.length() + 
 			" audio length: " + length);
 		
-		// Save old position of buffer.
-		int oldPos = audioData.position();
-		
 		try 
 		{
 			// Create file name.
@@ -338,11 +335,6 @@ public class MoSyncSound
 			Log.e("MoSyncSound.storeIfBinaryAudioResource", 
 				"Unable to save temporary audio file.");
 			ex.printStackTrace();
-		}
-		finally
-		{
-			// Restore position.
-			audioData.position(oldPos);
 		}
 	}
 	

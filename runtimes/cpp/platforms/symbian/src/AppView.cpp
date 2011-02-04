@@ -534,8 +534,9 @@ void CAppView::HandlePointerEventL(const TPointerEvent& pe) {
 	default:
 		return;
 	}
-	e.point.x = pe.iPosition.iX;
-	e.point.y = pe.iPosition.iY;
+	e.pointer.point.x = pe.iPosition.iX;
+	e.pointer.point.y = pe.iPosition.iY;
+	e.pointer.touchId = 0;
 	AddEvent(e);
 }
 

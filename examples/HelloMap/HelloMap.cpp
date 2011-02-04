@@ -21,6 +21,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" int MAMain( )
 //-------------------------------------------------------------------------
 {
-	Moblet::run( newobject( HelloMap::HelloMapMoblet, new HelloMap::HelloMapMoblet( ) ) );
+	HelloMap::HelloMapMoblet* moblet = newobject( HelloMap::HelloMapMoblet, new HelloMap::HelloMapMoblet( ) );
+
+	Moblet::run( moblet );
+
+	deleteobject( moblet );
+	MapCache::shutdown( );
+
+	MemoryMgr::dump( );
 	return 0;
 }

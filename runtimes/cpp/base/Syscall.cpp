@@ -427,7 +427,10 @@ namespace Base {
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
 #ifdef _android
-		SYSCALL_THIS->destroyResource(handle);
+		if(!SYSCALL_THIS->destroyBinaryResource(handle))
+		{
+			SYSCALL_THIS->destroyResource(handle);
+		}
 #endif
 		SYSCALL_THIS->resources.destroy(handle);
 
@@ -438,6 +441,8 @@ namespace Base {
 		MemStream* ms = new MemStream(size);
 #else
 		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
+		if(b == NULL) return RES_OUT_OF_MEMORY;
+		
 		MemStream* ms = new MemStream(b, size);
 #endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;

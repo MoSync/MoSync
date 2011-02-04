@@ -3,12 +3,12 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Debug" value=""/>
-<property key="build.prefs:additional.include.paths/Release" value=""/>
+<property key="build.prefs:additional.include.paths/Debug" value="..\..\libs,c:\Mosync\include"/>
+<property key="build.prefs:additional.include.paths/Release" value="c:\dev2\mosync\libs,c:\mosync\include\newlib"/>
 <property key="build.prefs:additional.libraries" value="MAP.lib,MAUI.lib,MAUtil.lib "/>
-<property key="build.prefs:additional.libraries/Debug" value="MAPD.lib,MAUID.lib,MAUtilD.lib "/>
-<property key="build.prefs:additional.library.paths/Debug" value=""/>
-<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:additional.libraries/Debug" value="newlib.lib, MAUI.lib,MAUtil.lib,MAP.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value="C:\dev2\MoSyncNew\libs\MAP\Output,c:/MoSync/lib/newlib_debug"/>
+<property key="build.prefs:additional.library.paths/Release" value="c:\dev2\mosync\libs\MAP\Output,C:\MoSync\lib\pipe_release"/>
 <property key="build.prefs:app.permissions" value="Internet\ Access Location Location/Coarse Location/Fine"/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:extra.link.sw" value=""/>
@@ -18,6 +18,11 @@
 <property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
 <property key="build.prefs:memory.data/Debug" value="3072"/>
 <property key="build.prefs:memory.data/Release" value="3072"/>
 <property key="build.prefs:memory.heap/Debug" value="2048"/>
@@ -26,6 +31,8 @@
 <property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
+<property key="excludes/Release" value=""/>
 <property key="last.build.config" value="Release"/>
 <property key="template.id" value="project.empty"/>
 </properties>

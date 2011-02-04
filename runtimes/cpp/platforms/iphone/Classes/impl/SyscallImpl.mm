@@ -34,6 +34,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 
+#include <helpers/CPP_IX_WIDGET.h>
+#include "MoSyncUISyscalls.h"
+
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -51,6 +54,12 @@ using namespace MoSyncError;
 
 #include <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
+
+#ifdef SUPPORT_OPENGL_ES
+#include <helpers/CPP_IX_OPENGL_ES.h>
+#include <OpenGLES/ES1/gl.h>
+#include "../../../../generated/gl.h.cpp"
+#endif
 
 extern ThreadPool gThreadPool;
 
@@ -137,7 +146,9 @@ namespace Base {
 		}
 		   
 		CGDataProviderRelease(dpr);
-				
+		
+		CFRelease(png_data);
+		
 		return new Surface(imageRef);
 	}
 	
@@ -163,9 +174,10 @@ namespace Base {
 		CGContextSaveGState(gBackbuffer->context);
 		
 		// init font
-		CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
+		//CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
+		CFStringRef str = CFStringCreateWithCString(NULL, "Helvetica", kCFStringEncodingUTF8);
 		sUnicodeFont = CGFontCreateWithFontName(str);
-		//CFRelease(str);
+		CFRelease(str);
 		
 		gDrawTarget = gBackbuffer;
 		
@@ -364,7 +376,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
-		if(gClosing)
+		if(gClosing || isNativeUIEnabled())
 			return;
 		MoSync_UpdateView(gBackbuffer->image);
 	}
@@ -586,13 +598,14 @@ namespace Base {
 		if(!gClosing)
 			gEventOverflow = false;
 		
-		const MAEvent* ev = gEventQueue.getAndProcess();
-		if(!ev) return 0;
-		else *dst = *ev; //gEventQueue.get();
+		MAEvent ev;
+		bool ret = gEventQueue.getAndProcess(ev);
+		if(!ret) return 0;
+		else *dst = ev; //gEventQueue.get();
 		
-#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev->type == eventType) {\
-		memcpy(MoSync_GetCustomEventData(), ev->data, sizeof(dataType));\
-		delete (dataType*)ev->data;\
+#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
+		memcpy(MoSync_GetCustomEventData(), ev.data, sizeof(dataType));\
+		delete (dataType*)ev.data;\
 		dst->data = MoSync_GetCustomEventDataMoSyncPointer(); }
 		
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
@@ -646,7 +659,7 @@ namespace Base {
 
 	SYSCALL(void, maPanic(int result, char* message)) 
 	{		
-		MoSync_ShowMessageBox(message, true);
+		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
 	}
@@ -838,6 +851,81 @@ namespace Base {
 		return res;
 	}	
 
+#ifdef SUPPORT_OPENGL_ES
+	int maOpenGLInitFullscreen() {
+		return 0;
+	}
+	
+	int maOpenGLCloseFullscreen() {
+		return 0;
+	}
+	
+	int maOpenGLTexImage2D(MAHandle image) {
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
+	
+		int powWidth = nextPowerOf2(1, img->width);
+		int powHeight = nextPowerOf2(1, img->height);
+
+		if(powWidth!=img->width || powHeight!=img->height) {
+			
+			//surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
+			//							   surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+			
+			int bytesPerPixel = 4; // for now.
+			
+			int oldBytesPerRow = img->rowBytes;
+			int newBytesPerRow = powWidth*bytesPerPixel;
+			int oldActualBytesPerRow = img->width*bytesPerPixel;
+			
+			byte* data = new byte[powHeight*newBytesPerRow];
+			
+			byte* src = (byte*)img->data;
+			byte* dst = data;
+			for(int y = 0; y < img->height; y++) {
+				memcpy(dst, src, oldActualBytesPerRow);
+				src+=oldBytesPerRow;
+				dst+=newBytesPerRow;
+			}
+			
+			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, powWidth, powHeight, 0,
+						 GL_RGBA, GL_UNSIGNED_BYTE, data);
+			
+			delete data;
+			
+			return MA_GL_TEX_IMAGE_2D_OK;
+		}
+		
+									 
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
+					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
+		
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}
+	
+
+	int maOpenGLTexSubImage2D(MAHandle image) {
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
+		
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, img->width, img->height, GL_RGBA
+						, GL_UNSIGNED_BYTE, img->data);
+		
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}	
+	
+#endif	//SUPPORT_OPENGL_ES	
+	
+	int maReportResourceInformation() {
+		gSyscall->resources.logEverything();
+		return 0;		
+	}
+
+	SYSCALL(void, maMessageBox(const char* title, const char* message)) 
+	{		
+		MoSync_ShowMessageBox(title, message, false);
+	}
+		
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -846,7 +934,6 @@ namespace Base {
 		{
 			const char *str = (const char*) gSyscall->GetValidatedMemRange(a, b);
 			LOGBIN(str, b);
-			logWithNSLog(str, b);
 			return 0;
 		}
 		maIOCtl_case(maPlatformRequest);
@@ -870,10 +957,15 @@ namespace Base {
 		maIOCtl_syscall_case(maFileSize);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
+		maIOCtl_case(maReportResourceInformation);			
+		maIOCtl_case(maMessageBox);
+		maIOCtl_IX_WIDGET_caselist
+#ifdef SUPPORT_OPENGL_ES
+				maIOCtl_IX_OPENGL_ES_caselist;
+#endif	//SUPPORT_OPENGL_ES
 
 //		maIOCtl_case(maAccelerometerStart);
 //		maIOCtl_case(maAccelerometerStop);
-
 		}
 		
 		return IOCTL_UNAVAILABLE;
@@ -938,7 +1030,7 @@ void MoSyncErrorExit(int errorCode)
 	
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSync_ShowMessageBox(buffer, true);	
+	MoSync_ShowMessageBox(nil, buffer, true);	
 	pthread_exit(NULL);
 }
 	
