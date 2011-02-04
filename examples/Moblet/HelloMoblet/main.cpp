@@ -35,8 +35,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 //Create the wrapper for the entire application. It is here that we will manage
 //the application and handle events. To create the wrapper we make our own
-//implementation of the MoSync Moblet base class. There can be only one Moblet
-//in an application. We also make our application wrapper inherit from
+//implementation of the MoSync Moblet base class. There can be only one running
+//Moblet in an application. We also make our application wrapper inherit from
 //MAUtil::TimerListener so that it can handle timer events.
 class MyMoblet : public MAUtil::Moblet, MAUtil::TimerListener
 {
