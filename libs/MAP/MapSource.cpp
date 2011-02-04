@@ -15,43 +15,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "MapConfig.h"
 #include "MemoryMgr.h"
 #include <maapi.h>
 #include "MapSource.h"
 #include "MapTileCoordinate.h"
+#include "TraceScope.h"
 
 namespace MAP
 {
 	//=========================================================================
-	class MapSourceInnerClientData
-	//=========================================================================
-	{
-	public:
-		MapSourceInnerClientData( IMapSourceListener* listener, MapSourceClientData* clientData ) :
-			mListener( listener ), 
-			mClientData( clientData ) 
-		{
-		}
-
-		virtual ~MapSourceInnerClientData( ) 
-		{
-			deleteobject( mClientData );
-		}
-
-		IMapSourceListener* mListener;
-		MapSourceClientData* mClientData;
-	};
-
-	//=========================================================================
-	class MapSourceImageDownloader : public ImageDownloader
+	class MapSourceImageDownloader :
+		#ifdef StoreCompressedTilesInCache
+		public Downloader
+		#else
+		public ImageDownloader
+		#endif
 	//=========================================================================
 	{
 	public:
 		MapSourceImageDownloader( ) :
 			mUrl( 0 ),
-			mSourceKind( MapSourceKind_OpenStreetMap ),
-			mTileXY( ),
-			mClientData ( NULL )
+			mTileXY( )
 		{
 		}
 
@@ -61,45 +46,6 @@ namespace MAP
 			{
 				cancelDownloading( );
 			}
-			deleteobject( mClientData );
-		}
-
-		//
-		// Field accessors
-		//
-		MapSourceKind getSourceKind( ) const 
-		{
-			return mSourceKind; 
-		}
-
-		void setSourceKind( MapSourceKind sourceKind ) 
-		{
-			mSourceKind = sourceKind; 
-		}
-		
-		MapTileCoordinate getTileXY( ) const 
-		{
-			return mTileXY; 
-		}
-
-		void setTileXY( const MapTileCoordinate tileXY ) 
-		{
-			mTileXY = tileXY; 
-		}
-
-		MapSourceInnerClientData* getClientData( ) const 
-		{
-			return mClientData; 
-		}
-		
-		void setClientData( MapSourceInnerClientData* clientData ) 
-		{
-			mClientData = clientData; 
-		}
-
-		const char* getUrl( ) 
-		{
-			return mUrl.c_str( ); 
 		}
 
 		int beginDownloading( const char* url, MAHandle placeholder = 0 )
@@ -108,59 +54,131 @@ namespace MAP
 			// Make a copy of url so we can reuse it if we get a timeout.
 			//
 			mUrl = url;
+		
+			#ifdef StoreCompressedTilesInCache
+			return Downloader::beginDownloading( url, placeholder );
+			#else
 			return ImageDownloader::beginDownloading( url, placeholder );
+			#endif
 		}
 
-	private:
+		#ifdef StoreCompressedTilesInCache
+
+		int getContentLength( ) const
+		{
+			return mReader->getContentLength( );
+		}
+
+		#endif
+
+		IMapSourceListener* mListener;
 		String mUrl;
-		MapSourceKind mSourceKind;
 		MapTileCoordinate mTileXY;
-		MapSourceInnerClientData* mClientData;
 	};
 
 	//=========================================================================
-	class MapSourceQueueEntry
+	// Abstract base class
+	//
+	class QueueEntry
 	//=========================================================================
 	{
 	public:
-		MapSourceQueueEntry( const MapTileCoordinate tileXY, MapSourceInnerClientData* clientData ) 
-			: mTileXY( tileXY ), 
-			mClientData( clientData ) 
+		QueueEntry( )
+			: mListener( NULL ),
+			mJobComplete( false ),
+			mTileXY( MapTileCoordinate( ) )
+		{
+		}
+
+		QueueEntry( IMapSourceListener* listener, bool jobComplete, const MapTileCoordinate tileXY ) 
+		:	mListener( listener ),
+			mJobComplete( jobComplete ),
+			mTileXY( tileXY ) 
 		{ 
 		}
 
-		virtual ~MapSourceQueueEntry( ) 
-		{
-			deleteobject( mClientData );
-		}
+		virtual ~QueueEntry( ) { }
 
-		MapTileCoordinate getTileXY( ) const 
-		{
-			return mTileXY; 
-		}
-		
-		MapSourceInnerClientData* getClientData( ) const 
-		{
-			return mClientData; 
-		}
-
-		void setClientData( MapSourceInnerClientData* clientData ) 
-		{
-			mClientData = clientData; 
-		}
-
-	private:
+		IMapSourceListener* mListener;
+		bool mJobComplete;
 		MapTileCoordinate mTileXY;
-		MapSourceInnerClientData* mClientData; //  lifespan managed by MapSourceImageDownloader
 	};
 
 	//=========================================================================
-	class MapSourceQueue: public Queue<MapSourceQueueEntry>
+	template <typename T>
+	class Stack 
 	//=========================================================================
 	{
 	public:
-		MapSourceQueue( const int capacity ) 
-			: Queue<MapSourceQueueEntry>( capacity ) 
+		//---------------------------------------------------------------------
+		void clear( ) 
+		//---------------------------------------------------------------------
+		{
+			mData.clear( ); 
+		}
+			
+		//---------------------------------------------------------------------
+		const T& peek( ) const 
+		//---------------------------------------------------------------------
+		{
+			return mData[mData.size( ) - 1];
+		}
+		
+		//---------------------------------------------------------------------
+		T& peek( ) 
+		//---------------------------------------------------------------------
+		{
+			return mData[mData.size( ) - 1];
+		}	
+
+		//---------------------------------------------------------------------
+		T& peek( int i ) 
+		//---------------------------------------------------------------------
+		{
+			return mData[i];
+		}	
+
+		//---------------------------------------------------------------------
+		T pop( ) 
+		//---------------------------------------------------------------------
+		{
+			T t = peek( );
+			mData.resize( mData.size( ) - 1 );
+			return t;
+		}
+		
+		//---------------------------------------------------------------------
+		void push( const T& d ) 
+		//---------------------------------------------------------------------
+		{
+			mData.add( d );
+		}
+		
+		//---------------------------------------------------------------------
+		int size( ) const 
+		//---------------------------------------------------------------------
+		{ 
+			return mData.size( );
+		}
+		
+		//---------------------------------------------------------------------
+		bool empty( ) const 
+		//---------------------------------------------------------------------
+		{
+			return mData.size( ) == 0;
+		}
+		
+	private:
+		Vector<T> mData;
+	};
+
+	//=========================================================================
+	class MapSourceQueue: public Stack<QueueEntry>
+	//=========================================================================
+	{
+	public:
+		MapSourceQueue( ) 
+			: Stack<QueueEntry>( ) 
 		{
 		}
 
@@ -171,12 +189,14 @@ namespace MAP
 	//
 	// Creates a new map source
 	//
-	MapSource::MapSource( )
+	MapSource::MapSource( ) :
 	//-------------------------------------------------------------------------
-		: mQueue( NULL )
+		mQueue( NULL ),
+		mTileCount( 0 )
 	{
-		mQueue = newobject( MapSourceQueue, new MapSourceQueue( QueueSize ) );
-		for (int i = 0; i < Downloaders; i++)
+		mDownloaders = new MapSourceImageDownloader*[MapSourceDownloaders];
+		mQueue = newobject( MapSourceQueue, new MapSourceQueue( ) );
+		for (int i = 0; i < MapSourceDownloaders; i++)
 			mDownloaders[i] = NULL;
 	}
 
@@ -189,32 +209,43 @@ namespace MAP
 		//
 		// Drop and delete downloader pool
 		//
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] != NULL )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
 			}
 		}
+		delete[] mDownloaders;
 	}
 
 	//-------------------------------------------------------------------------
 	//
 	// Returns all tiles required to cover specified rectangle around centerpoint.
 	//
-	void MapSource::requestTile( MapTileCoordinate tileXY, IMapSourceListener* listener, MapSourceClientData* clientData )
+	void MapSource::requestTile( IMapSourceListener* listener, MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		if ( !isInQueue( tileXY ) )
+		if ( !isInQueue( tileXY ) && !isInDownloaders( tileXY ) )
 		{
-			MapSourceInnerClientData* icd = newobject( MapSourceInnerClientData, new MapSourceInnerClientData( listener, clientData ) );
-			MapSourceQueueEntry* entry = newobject( MapSourceQueueEntry, new MapSourceQueueEntry( tileXY, icd ) );
-			mQueue->enqueue( entry );
+			QueueEntry entry = QueueEntry( listener, false, tileXY );
+			mQueue->push( entry );
 			dequeueIfIdleSlot( NULL );
 		}
+	}
+
+	//-------------------------------------------------------------------------
+	void MapSource::requestJobComplete( IMapSourceListener* listener )
+	//-------------------------------------------------------------------------
+	{
+		QueueEntry entry = QueueEntry( listener, true, MapTileCoordinate( ) );
+		mQueue->push( entry );
+		dequeueIfIdleSlot( NULL );
 	}
 
 	//-------------------------------------------------------------------------
@@ -234,15 +265,31 @@ namespace MAP
 	bool MapSource::isInQueue( MapTileCoordinate tileXY )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < mQueue->getCapacity( ); i++ )
+		for ( int i = 0; i < mQueue->size( ); i++ )
 		{
-			MapSourceQueueEntry* item = mQueue->peekAt( i );
-			if ( item != NULL )
-			{
-				MapTileCoordinate itemTileXY = item->getTileXY( );
-				if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
-					return true;
-			}
+			QueueEntry item = mQueue->peek( i );
+			MapTileCoordinate itemTileXY = item.mTileXY;
+			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
+				return true;
+		}
+		return false;
+	}
+
+	//-------------------------------------------------------------------------
+	//
+	// Is job already in queue?
+	//
+	bool MapSource::isInDownloaders( MapTileCoordinate tileXY )
+	//-------------------------------------------------------------------------
+	{
+		for ( int i = 0; i <  MapSourceDownloaders; i++ )
+		{
+			MapSourceImageDownloader* dlr = mDownloaders[i];
+			if ( dlr == NULL )
+				continue;
+			MapTileCoordinate itemTileXY = dlr->mTileXY;
+			if ( itemTileXY.getX( ) == tileXY.getX( ) && itemTileXY.getY( ) == tileXY.getY( ) && itemTileXY.getMagnification( ) == tileXY.getMagnification( ) )
+				return true;
 		}
 		return false;
 	}
@@ -254,12 +301,14 @@ namespace MAP
 	void MapSource::removeDownloader( MapSourceImageDownloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] == downloader )
 			{
 				if ( mDownloaders[i]->isDownloading( ) )
+				{
 					mDownloaders[i]->cancelDownloading( );
+				}
 				mDownloaders[i]->removeDownloadListener( this );
 				deleteobject( mDownloaders[i] );
 				break;
@@ -274,8 +323,11 @@ namespace MAP
 		int slot = findUnusedSlot( protectedDownloader );
 		if ( slot != -1 )
 		{
-			mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
-			mDownloaders[slot]->addDownloadListener( this );
+			if ( mDownloaders[slot] == NULL )
+			{
+				mDownloaders[slot] = newobject( MapSourceImageDownloader, new MapSourceImageDownloader( ) );
+				mDownloaders[slot]->addDownloadListener( this );
+			}
 			dequeueNextJob( mDownloaders[slot] );
 		}
 	}
@@ -286,41 +338,46 @@ namespace MAP
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
 
-		MapTileCoordinate tileXY = dlr->getTileXY( );
+		mTileCount++;
+		MapTileCoordinate tileXY = dlr->mTileXY;
+
 		LonLat ll = tileCenterToLonLat( getTileSize( ), tileXY, 0, 0 );
-		MapTile* tile = newobject( MapTile, new MapTile( dlr->getSourceKind( ), tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );
-		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
-		clientData->mListener->tileReceived( this, tile, clientData->mClientData );
+
+		#ifdef StoreCompressedTilesInCache 
+		DebugPrintf("PNG size: %d\n", dlr->getContentLength( ) );
+		MapTile* tile = newobject( MapTile, new MapTile( this, tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data, dlr->getContentLength( ) ) );
+		#else
+		MapTile* tile = newobject( MapTile, new MapTile( this, tileXY.getX( ), tileXY.getY( ), tileXY.getMagnification( ), ll, data ) );
+		#endif // StoreCompressedTilesInCache
+
+		onTileReceived( dlr->mListener, tile );
 		//
 		// Terminate clientdata lifespan
 		//
-		dlr->setClientData( NULL );
-		deleteobject( clientData );
+
 		//
 		// NOTE: The reason we're not deleting the downloader here is that
 		// it's referenced on return from this call.
 		// So we have to defer deletion until either a new slot is requested, or
 		// when deleting this MapSource.
 		//
-		dequeueIfIdleSlot( dlr );
+		dequeueIfIdleSlot( /*dlr*/NULL );
 	}
 
 	//-------------------------------------------------------------------------
-	void MapSource::downloadCancelled(Downloader* downloader)
+	void MapSource::downloadCancelled( Downloader* downloader )
 	//-------------------------------------------------------------------------
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
-		clientData->mListener->downloadCancelled( this );
+		onDownloadCancelled( dlr->mListener );
 	}
 
 	//-------------------------------------------------------------------------
-	void MapSource::error(Downloader* downloader, int code)
+	void MapSource::error( Downloader* downloader, int code )
 	//-------------------------------------------------------------------------
 	{
 		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
-		clientData->mListener->error( this, code );
+		onError( dlr->mListener, code );
 	}
 
 	//-------------------------------------------------------------------------
@@ -330,7 +387,7 @@ namespace MAP
 	int MapSource::findUnusedSlot( MapSourceImageDownloader* protectedDownloader )
 	//-------------------------------------------------------------------------
 	{
-		for ( int i = 0; i < Downloaders; i++ )
+		for ( int i = 0; i < MapSourceDownloaders; i++ )
 		{
 			if ( mDownloaders[i] == NULL )
 				return i;
@@ -339,8 +396,7 @@ namespace MAP
 				//
 				// Release to make slot available.
 				//
-				mDownloaders[i]->removeDownloadListener( this );
-				deleteobject( mDownloaders[i] );
+				mDownloaders[i]->mListener = NULL;
 				return i;
 			}
 		}
@@ -351,26 +407,54 @@ namespace MAP
 	void MapSource::dequeueNextJob( MapSourceImageDownloader* downloader )
 	//-------------------------------------------------------------------------
 	{
-		if ( mQueue->getCount( ) < 1 )
+		if ( mQueue->size( ) < 1 )
 			return;
-		MapSourceQueueEntry* entry = mQueue->dequeue( );
+		QueueEntry entry = mQueue->pop( );
 
-		char url[1000];
-		getTileUrl( url, entry->getTileXY( ) );
+		if ( entry.mJobComplete )
+		{
+			onJobComplete( entry.mListener );
+		}
+		else
+		{
+			char url[1000];
+			getTileUrl( url, entry.mTileXY );
 
-		downloader->setSourceKind( getSourceKind( ) );
-		downloader->setTileXY( entry->getTileXY( ) );
-		downloader->setClientData( entry->getClientData( ) );
-		// downloader now owns clientdata
-		entry->setClientData( NULL );
-		int res = downloader->beginDownloading( url, 0 );
-		
-		MapSourceImageDownloader* dlr = (MapSourceImageDownloader*)downloader;
-		MapSourceInnerClientData* clientData = (MapSourceInnerClientData*)dlr->getClientData( );
+			downloader->mTileXY = entry.mTileXY;
+			downloader->mListener = entry.mListener;
+			int res = downloader->beginDownloading( url, 0 );
 
-		if ( res < 0 )
-			clientData->mListener->error( this, 0 ); // TODO: Proper error code.
-
-		deleteobject( entry );
+			if ( res < 0 )
+				onError( downloader->mListener, 0 ); // TODO: Proper error code.
+		}
 	}
+
+	//-------------------------------------------------------------------------
+	void MapSource::onTileReceived( IMapSourceListener* listener, MapTile* tile )
+	//-------------------------------------------------------------------------
+	{
+		listener->tileReceived( this, tile );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapSource::onDownloadCancelled( IMapSourceListener* listener )
+	//-------------------------------------------------------------------------
+	{
+		listener->downloadCancelled( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapSource::onJobComplete( IMapSourceListener* listener )
+	//-------------------------------------------------------------------------
+	{
+		listener->jobComplete( this );
+	}
+
+	//-------------------------------------------------------------------------
+	void MapSource::onError( IMapSourceListener* listener, int code )
+	//-------------------------------------------------------------------------
+	{
+		listener->error( this, code );
+	}
+
 }

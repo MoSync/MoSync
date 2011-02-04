@@ -154,12 +154,13 @@ public:
 	~HashMap();
 
 	/**
-	* Inserts a new key into the HashMap.
+	* Inserts a new element into the HashMap.
 	*
-	* Returns a Pair. The Pair's second element is true if the value was indeed inserted.
+	* Returns a Pair. The Pair's second element is true if the element was inserted,
+	* or false if the element already existed in the map.
 	* The Pair's first element is an Iterator that points to the element in the HashMap.
 	*
-	* An element which compares equal to the new one may already be present in the HashMap;
+	* An element which has the same key as the new one may already be present in the HashMap;
 	* in that case, this operation does nothing, and the Iterator returned will point to
 	* the old element.
 	*/

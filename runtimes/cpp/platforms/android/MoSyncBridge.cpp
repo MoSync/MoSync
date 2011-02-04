@@ -206,7 +206,7 @@ static void handlePendingExceptions(JNIEnv* env)
 */
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
-	SYSLOG("JNI PostEvent");
+	SYSLOG("MoSyncBridge.cpp: nativePostEvent");
 	
 	jsize len = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
@@ -222,6 +222,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.point.x = intArray[1];
 		event.point.y = intArray[2];
+		event.touchId = intArray[3];
 	}
 	else if (event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED)
 	{
@@ -254,13 +255,62 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.textboxResult = intArray[1];
 		event.textboxLength = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_WIDGET)
+	{
+		/*
+		 * Structure of intArray for widget events.
+		 *
+		 * Required: 
+		 * intArray[0] - EVENT_TYPE_WIDGET
+		 * intArray[1] - Specifies exactly which widget event that occurred.
+		 * intArray[2] - Handle to the widget that sent the event.
+		 *
+		 * Optional:
+		 * WIDGET_EVENT_MESSAGE
+		 * intArray[3] - The id of the message being sent (if it has dynamically allocated data)
+		 * intARray[4] - Size of the message.
+		 *
+		 * WIDGET_EVENT_CLICKED
+		 * intArray[3] - Can be used to determine a checkbox that was clicked.
+		 *
+		 *
+		 * WIDGET_EVENT_ITEM_CLICKED
+		 * intArray[3] - The index of the list item that was clicked.
+		 */
+
+		int widgetEventType = intArray[1];
+		// MAGetEvent will handle the deallocation of this memory
+		MAWidgetEventData *widgetEvent = new MAWidgetEventData;
+		
+		widgetEvent->eventType    = intArray[1];
+		widgetEvent->widgetHandle = intArray[2];
+		
+		if(widgetEventType == WIDGET_EVENT_MESSAGE)
+		{
+			widgetEvent->messageId    = intArray[3];
+			widgetEvent->messageSize  = intArray[4];
+		}
+		else if(widgetEventType == WIDGET_EVENT_CLICKED)
+		{
+			widgetEvent->checked = intArray[3];
+		}
+		else if(widgetEventType == WIDGET_EVENT_ITEM_CLICKED)
+		{
+			widgetEvent->listItemIndex = intArray[3];
+		}
+
+		event.data = widgetEvent;
+	}
 	
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
 	
 	Base::gSyscall->postEvent(event);
-	
-	SYSLOG("nativePostEvent: exit");
+}
+
+static int nativeCreateBinaryResource( JNIEnv* env, jobject jthis, int resourceIndex, int size )
+{
+	return Base::gSyscall->loadBinaryStore(resourceIndex, size);
 }
 
 /**
@@ -286,7 +336,7 @@ int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativ
 	return 0;
 }
 
-jint numJavaMethods = 6;
+jint numJavaMethods = 7;
 static JNINativeMethod sMethods[] =
 {
     // name, signature, funcPtr 
@@ -296,6 +346,7 @@ static JNINativeMethod sMethods[] =
    { "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined},
    { "nativeRun", "()V", (void*)nativeRun},
    { "nativePostEvent", "([I)V", (void*)nativePostEvent},
+   { "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource}
 };
 
 /**

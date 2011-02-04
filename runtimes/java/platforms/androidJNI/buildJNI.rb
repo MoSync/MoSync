@@ -16,6 +16,9 @@
 
 
 require 'fileutils'
+require '../../../../rules/util.rb'
+
+include FileUtils::Verbose
 
 # usage: buildJNI.rb <ANDROID_NDK_PATH> <ANDROID_SDK_PATH> <CONFIG_PATH> <DEBUG>
 
@@ -24,20 +27,20 @@ require 'fileutils'
 # <CONFIG_PATH>			: The path to where the config.h is located. If this is set the finished runtime will end up in this folder as well, other wise it will be in the project source root
 # <DEBUG>				: If this is set to anything they will use the configD.h file which is supposed to be at the <CONFIG_PATH>
 
-def exitBuilder(arg, config)
+def exitBuilder(arg, configDir, config)
 	if config != nil
 		# change name on config_platform.h.saved to config_platform.h if such file exists
-		conf_file = "/src/config_platform.h.saved"
+		conf_file = File.join(configDir, "config_platform.h.saved")
 		if File.exist? conf_file
-			FileUtils.copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
+			FileUtils.copy_file conf_file, File.join(configDir, "config_platform.h")
 		end
 	end
 	exit Integer(arg)
 end
 
-cpath = FileUtils.pwd
+cpath = pwd
 
-system "ruby addLibraries.rb"
+sh "ruby addLibraries.rb"
 
 firstarg = ARGV[0]
 secondarg = ARGV[1]
@@ -45,20 +48,20 @@ thirdarg = ARGV[2]
 fortharg = ARGV[3]
 
 if ENV['MOSYNC_SRC'] == nil
-	FileUtils.cd "../../../../"
-	ENV['MOSYNC_SRC'] = FileUtils.pwd
-	FileUtils.cd cpath
+	cd "../../../../"
+	ENV['MOSYNC_SRC'] = pwd
+	cd cpath
 end
 
 mosyncpp = "../../../cpp"
-FileUtils.cd mosyncpp
-ENV['MOSYNC_CPP'] = FileUtils.pwd
-FileUtils.cd cpath
+cd mosyncpp
+ENV['MOSYNC_CPP'] = pwd
+cd cpath
 
 mosyncppsource = "../../../cpp/platforms/android"
-FileUtils.cd mosyncppsource
-ENV['MOSYNC_CPP_SRC'] = FileUtils.pwd
-FileUtils.cd cpath
+cd mosyncppsource
+ENV['MOSYNC_CPP_SRC'] = pwd
+cd cpath
 
 ENV['MOSYNC_JAVA_SRC'] = cpath
 
@@ -72,9 +75,6 @@ if secondarg == nil
 	exit 1
 end
 
-# Store the current android version in the environment variable MOSYNC_ANDROID_API_LEVEL
-ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
-
 debug = (fortharg == nil) ? "" : "D"
 
 outdir = ".."
@@ -83,96 +83,114 @@ if thirdarg != nil
 	
 	# change name on the current config_platform.h to config_platform.h.saved
 
-	conf_file = "src/config_platform.h"
+	conf_file = File.join(mosyncppsource, "config_platform.h")
 	if File.exist? conf_file
 		puts "saving config file"
-		FileUtils.copy_file "src/config_platform.h", "src/config_platform.h.saved"
+		FileUtils.copy_file conf_file, File.join(mosyncppsource, "config_platform.h.saved")
 	end
 
-	puts "using runtime #{thirdarg}config#{debug}.h"
+	runtime_config = File.join(thirdarg, "config#{debug}.h") 
+	puts "using runtime #{runtime_config}"
 	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
-	FileUtils.copy_file( "#{thirdarg}config#{debug}.h", "src/config_platform.h")
+	FileUtils.copy_file( runtime_config, conf_file)
 end
 
 
 puts "Building native Library\n\n"
 
-FileUtils.cd "AndroidProject"
+cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
-
 	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
 	if (!success)
-		exitBuilder(1, thirdarg)
+		exitBuilder(1, mosyncppsource, thirdarg)
 	end
 
-	success = system "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
-	success = system("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
+	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
 
 if (!success)
-	exitBuilder(1, thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
-puts "Preprocess Java Source Files\n\n"
+# Go to Android Java runtime root directory.
+cd ".."
+puts pwd
 
-FileUtils.cd ".."
-puts FileUtils.pwd
-
-success = system "ruby buildJava.rb"
-if (!success)
-	exitBuilder(1, thirdarg)
-end
-
+# Create temporary directory used for output.
+# First make sure delete it if it exists to make 
+# sure we get an empty directory.
 class_dir = "temp/"
 if File.exist? class_dir
-	FileUtils.rm_rf class_dir # delete everything in it and itself
+	rm_rf class_dir # delete everything in it and itself
 end
 Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
-puts "Build Android package\n\n"
-
-# Build Android package file
+# Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
-system("#{secondarg}../../tools/aapt package -f -v -M #{package_root}/AndroidManifest.xml -F resources.ap_ -I #{secondarg}/android.jar -S #{package_root}/res -m -J #{package_root}src");
+success = system(
+	"#{File.join(secondarg, "tools/aapt")} package -f -v " +
+	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
+	"-I #{File.join(secondarg, "android.jar")} " +
+	"-S #{File.join(package_root, "res")} " +
+	"-m -J #{File.join(package_root, "src")}");
 	
 puts "Compile Java Source Files\n\n"
 
+packages = ["src/com/mosync/java/android/*.java",
+            "src/com/mosync/internal/android/*.java",
+            "src/com/mosync/internal/generated/*.java",
+            "src/com/mosync/nativeui/core/*.java",
+			"src/com/mosync/nativeui/ui/egl/*.java",
+            "src/com/mosync/nativeui/ui/factories/*.java",
+            "src/com/mosync/nativeui/ui/widgets/*.java",
+            "src/com/mosync/nativeui/util/*.java",
+            "src/com/mosync/nativeui/util/properties/*.java"
+            ]
+
+# Concatenate each list element with package_root, and flatten the list to a string
+java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
+
 # Compile all the java files into class files
-success = system("javac -source 1.6 -target 1.6 -g -d #{class_dir} -classpath #{secondarg}/android.jar #{package_root}/src/com/mosync/java/android/*.java #{package_root}/src/com/mosync/internal/android/*.java");
+sh(
+	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
+	"-classpath " +
+	"#{File.join(secondarg, "android.jar")} " + java_files)
+
 if (!success)
-	exitBuilder(1,thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
 puts "Copy Generated Library File\n\n"
 
 # copy the library file
-FileUtils.copy_file( "#{cpath}/AndroidProject/libs/armeabi/libmosync.so", "temp/libmosync.so")
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
 
 puts "Build Zip Package\n\n"
 
 # package the files
-FileUtils.cd "temp"
+cd "temp"
 
 if ENV['OS'] == "Windows_NT"
-	success = system("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
+	sh("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
 else
 	success = system("zip -r MoSyncRuntime#{debug}.zip .");
 end
 if (!success)
-	exitBuilder(1, thirdarg)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
-FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
+FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", File.join(outdir, "MoSyncRuntime#{debug}.zip"))
 
-FileUtils.cd ".."
+cd ".."
 
-# clean up
+# Delete temp dir.
 FileUtils.rm_rf class_dir
 
 if (!success)
-	exitBuilder(0, thirdarg)
+	exitBuilder(0, mosyncppsource, thirdarg)
 end
 

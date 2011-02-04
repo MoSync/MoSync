@@ -411,28 +411,31 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifdef MA_PROF_SUPPORT_STYLUS
 	protected final void pointerPressed(int x, int y) {
 		DEBUG_TEMP("pointerPressed "+x+" "+y+"\n");
-		int[] event = new int[3];
+		int[] event = new int[4];
 		EI_TYPE = EVENT_TYPE_POINTER_PRESSED;
 		EI_POINTX = x;
 		EI_POINTY = y;
+		EI_TOUCH_ID = 0;
 		postEvent(event);
 	}
 	
 	protected final void pointerReleased(int x, int y) {
 		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
-		int[] event = new int[3];
+		int[] event = new int[4];
 		EI_TYPE = EVENT_TYPE_POINTER_RELEASED;
 		EI_POINTX = x;
 		EI_POINTY = y;
+		EI_TOUCH_ID = 0;
 		postEvent(event);	
 	}
 	
 	protected final void pointerDragged(int x, int y) {
 		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
-		int[] event = new int[3];
+		int[] event = new int[4];
 		EI_TYPE = EVENT_TYPE_POINTER_DRAGGED;
 		EI_POINTX = x;
 		EI_POINTY = y;
+		EI_TOUCH_ID = 0;
 		postEvent(event);
 	}
 #endif	//MA_PROF_SUPPORT_STYLUS

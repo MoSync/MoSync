@@ -48,8 +48,7 @@ synchronized SYSCALL(int) maBtGetNewDevice(Address dst) {
 
 	BtDevice d = (BtDevice)mBtQue.elementAt(mBtNextIndex++);
 	MYASSERT(d != null);
-	int[] mem_ds = CORE.mMem_ds;
-	MYASSERT(mem_ds != null);
+	INIT_MEMDS;
 
 	try {
 		if(mBtNames) {
@@ -68,7 +67,7 @@ synchronized SYSCALL(int) maBtGetNewDevice(Address dst) {
 }
 
 private final void writeNameToMemory(Address dst, int nameBufSize, final String name) throws IOException {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	int writelen = 0;
 	if(name != null) {
 		byte[] nameBytes = name.getBytes();
@@ -184,7 +183,7 @@ synchronized SYSCALL(int) maBtStartServiceDiscovery(Address dev, Address uuid) t
 }
 
 final String MAUUID2String(Address uuid) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	DEBUG_TEMP("MAUUID2String\n");
 	String s = Hex0(RINT(uuid)) + Hex0(RINT(uuid + 4)) +
 		Hex0(RINT(uuid + 8)) + Hex0(RINT(uuid + 12));
@@ -193,7 +192,7 @@ final String MAUUID2String(Address uuid) {
 }
 
 final String btaddr2String(Address a) {
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	DEBUG_TEMP("btaddr2String\n");
 	StringBuffer sb = new StringBuffer(12);
 	for(int i=0; i<6; i++) {
@@ -218,7 +217,7 @@ synchronized SYSCALL(int) maBtGetNewService(Address dst) throws Exception {
 		return 0;
 
 	BtService s = (BtService)mBtQue.elementAt(mBtNextIndex++);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 
 	WINT(dst, s.port);
 	writeUUIDsToMemory(RINT(dst + 12), s.uuids);
@@ -232,7 +231,7 @@ synchronized SYSCALL(int) maBtGetNextServiceSize(Address dst) throws Exception {
 		return 0;
 
 	BtService s = (BtService)mBtQue.elementAt(mBtNextIndex);
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 
 	WINT(dst, (s.name == null) ? -1 : (s.name.length() + 1));
 	WINT(dst + 4, s.uuids.size());
@@ -241,7 +240,7 @@ synchronized SYSCALL(int) maBtGetNextServiceSize(Address dst) throws Exception {
 
 private final void writeUUIDsToMemory(Address dst, Vector uuids) throws Exception {
 	//DEBUG_TEMP("writeUUIDsToMemory\n");
-	int[] mem_ds = CORE.mMem_ds;
+	INIT_MEMDS;
 	for(int i=0; i<uuids.size(); i++) {
 		UUID u = (UUID)uuids.elementAt(i);
 		int i1, i2, i3, i4;

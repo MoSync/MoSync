@@ -403,7 +403,7 @@ static bool reportRunning() {
 
 static bool genericStop(const char *reason) {
 	ASSERT_REG;
-	oprintf("*stopped,reason=\"%s\",frame={", reason);
+	oprintf("*stopped,reason=\"%s\",thread-id=\"0\",frame={", reason);
 	oprintFrame(r.pc);
 	oprintf("\n" GDB_PROMPT);
 	fflush(stdout);

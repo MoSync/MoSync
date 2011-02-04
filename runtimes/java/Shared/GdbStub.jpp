@@ -207,7 +207,7 @@ final public class GdbStub /* implements Runnable */ {
 	}
 
 	final boolean readMemory() {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		String args[] = StringSplitter.split(inputBuffer.toString(), ",");
 		int address = Integer.parseInt(args[0], 16);
 		int length = Integer.parseInt(args[1], 16);
@@ -227,7 +227,7 @@ final public class GdbStub /* implements Runnable */ {
 	}
 
 	final boolean writeMemory() {
-		int[] mem_ds = CORE.mMem_ds;
+		INIT_MEMDS;
 		String args[] = StringSplitter.split(inputBuffer.toString(), ",");
 		String args2[] = StringSplitter.split(args[1], ":");
 		// args[0] == address, args2[0] == length, args2[1] == memory

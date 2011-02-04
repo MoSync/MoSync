@@ -41,6 +41,11 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
 static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName);
+static void streamJavaConstants(
+	ostream& stream, 
+	const vector<ConstSet>& 
+	constSets, 
+	int ix);
 
 #if 0
 static void deleteCallback(const char* filename) {
@@ -193,6 +198,77 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	}
 
 	stream << "#endif	//" + headerName + "_H\n";
+}
+
+/**
+ * Generate the content of a .java class file for the main MoSync API
+ * or the given interface.
+ * @param stream The output stream.
+ * @param className Name of the class.
+ * @param apiData The parsed API data.
+ * @param ix The id of the extension to generate definitions for. 
+ * Also used to specify if definitions for the main API is to be generated.
+ */
+void streamJavaDefinitionFile(
+	ostream& stream, 
+	const string& className,
+	const Interface& apiData,
+	int ix)
+{
+	stream << "package com.mosync.internal.generated;\n\n";
+	stream << "public class " << className << "\n";
+	stream << "{\n";
+
+	streamJavaConstants(stream, apiData.constSets, ix);
+
+	stream << "}\n";
+}
+
+/**
+ * Generate constants for a Java definition class file.
+ * @param stream The output stream.
+ * @param constSets Constant definitions.
+ * @param ix The id of the extension to generate definitions for. 
+ * Also used to specify if definitions for the main API is to be generated.
+ */
+static void streamJavaConstants(
+	ostream& stream, 
+	const vector<ConstSet>& constSets, 
+	int ix) 
+{
+	for(size_t i=0; i<constSets.size(); i++) 
+	{
+		const ConstSet& cs(constSets[i]);
+		bool anyStreamed = false;
+		for(size_t j=0; j<cs.constants.size(); j++) 
+		{
+			const Constant& c(cs.constants[j]);
+			if (c.ix != ix)
+			{
+				continue;
+			}
+
+			if (anyStreamed && 
+				(c.comment.size() != 0 
+				|| cs.constants[j-1].comment.size() != 0))
+			{
+				stream << "\n";
+			}
+			stream << c.comment;
+			stream 
+				<< "\tpublic static final int " 
+				<< cs.name 
+				<< c.name 
+				<< " = " 
+				<< c.value 
+				<< ";\n";
+			anyStreamed = true;
+		}
+		if (anyStreamed)
+		{
+			stream << "\n";
+		}
+	}
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
@@ -363,7 +439,10 @@ static void streamIoctlInputParam(ostream& stream, int k, bool java) {
 			stream << "mCore.";
 		else
 			stream << "SYSCALL_THIS->";
-		stream << "GetValidatedStackValue(" << ((k-3)<<2) << ")";
+		stream << "GetValidatedStackValue(" << ((k-3)<<2);
+		if(!java)
+			stream << " VSV_ARGPTR_USE";
+		stream << ")";
 	}
 }
 
@@ -593,6 +672,15 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	if(f.args.size() == 0) {
 		stream << "void";
 	}
+
+	string varDeclarations;
+	if(f.returnType == "double") {
+		varDeclarations += "\tMA_DV _result;\n";
+	}
+	else if(f.returnType == "float") {
+		varDeclarations += "\tMA_FV _result;\n";
+	}
+
 	for(size_t j=0; j<f.args.size(); j++) {
 		const Argument& a(f.args[j]);
 		if(j != 0)
@@ -608,15 +696,20 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		if(isPointerType(inf, a.type) || !a.in) {
 			invokeArgs += "(int)";
 		}
-		if(a.type == "double" && a.in) {
+
+		string resolved = resolveType(inf, a.type);
+
+		if(resolved == "double" && a.in) {
 			string tvn = "_" + a.name;
-			tempVars += "\tMA_DV " + tvn + ";\n";
+			//tempVars += "\tMA_DV " + tvn + ";\n";
+			varDeclarations += "\tMA_DV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".d = " + a.name + ";\n";
 			invokeArgs += tvn + ".hi, " + tvn + ".lo";
 			usedArgs++;
-		} else if(a.type == "float" && a.in) {
+		} else if(resolved == "float" && a.in) {
 			string tvn = "_" + a.name;
-			tempVars += "\tMA_FV " + tvn + ";\n";
+			//tempVars += "\tMA_FV " + tvn + ";\n";
+			varDeclarations += "\tMA_FV " + tvn + ";\n";
 			tempVars += "\t" + tvn + ".f = " + a.name + ";\n";
 			invokeArgs += tvn + ".i";
 		} else {
@@ -624,21 +717,20 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 		}
 	}	//args
 	stream << ") {\n";
-	if(usedArgs > 3)
-		stream << "#ifdef MAPIP\n";
+
+	stream << varDeclarations;
 	stream << tempVars;
 
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
-
 	string invoke = ioctlName + "(" + toString(f.number) + invokeArgs + ");";
 	if(f.returnType == "double") {
-		stream << "\tMA_DV _result;\n";
+		//stream << "\tMA_DV _result;\n";
 		stream << "\t_result.ll = " + invoke + "\n";
 		stream << "\treturn _result.d;\n";
 	} else if(f.returnType == "float") {
-		stream << "\tMA_FV _result;\n";
+		//stream << "\tMA_FV _result;\n";
 		stream << "\t_result.i = (int)" + invoke + "\n";
 		stream << "\treturn _result.f;\n";
 	} else {
@@ -652,8 +744,6 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 
 		stream << invoke + "\n";
 	}
-	if(usedArgs > 3)
-		stream << "#else\n\treturn IOCTL_UNAVAILABLE;\n#endif\n";
 	stream << "}\n\n";
 }
 

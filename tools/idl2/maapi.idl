@@ -1143,6 +1143,8 @@ interface MAAPI {
 		LCTRL			= 306;
 		RALT			= 307;
 		LALT			= 308;
+		
+		SEARCH          = 309;
 	}
 
 	constset int MAKB_ { // Key Bits
@@ -1181,7 +1183,7 @@ interface MAAPI {
 	int maGetKeys();
 
 	constset int EVENT_ {
-		BUFFER_SIZE = 128;
+		BUFFER_SIZE = 256;
 		/// In milliseconds
 		CLOSE_TIMEOUT = 2000;
 	}
@@ -1259,15 +1261,37 @@ interface MAAPI {
 		*/
 		TEXTBOX = 23;
 
-		/** \brief The phone's home screen just became visible.
-		* \see maHomeScreenEventsOn()
-		*/
+		/** \brief The home screen became visible.
+		 * Currently implemented only on Android.
+		 * \see maHomeScreenEventsOn()
+		 */
 		HOMESCREEN_SHOWN = 24;
 
-		/** \brief The phone's home screen was just hidden.
-		* \see maHomeScreenEventsOn()
-		*/
+		/** \brief The home screen was hidden because an 
+		 * application came to front.
+		 * Currently implemented only on Android.
+		 * \see maHomeScreenEventsOn()
+		 */
 		HOMESCREEN_HIDDEN = 25;
+
+		/** \brief The screen was turned on (the device
+		 * went out of sleep state).
+		 * Currently implemented only on Android.
+		 * \see maScreenActivateEventsOn()
+		 */
+		SCREEN_STATE_ON = 26;
+
+		/** \brief The screen was turned off (the device
+		 * went into sleep state).
+		 * Currently implemented only on Android.
+		 * \see maScreenActivateEventsOn()
+		 */
+		SCREEN_STATE_OFF = 27;
+		
+		/**
+		* \brief An event sent from a native widget.
+		*/
+		WIDGET = 28;
 	}
 
 	/**
@@ -1307,10 +1331,17 @@ interface MAAPI {
 			*/
 			uint character;
 
-			/**
-			 * In POINTER events, this will be the location of the pointer.
-			 */
-			MAPoint2d point;
+			struct {
+				/**
+				* In POINTER events, this will be the location of the pointer.
+				*/
+				MAPoint2d point;
+				
+				/**
+				* In POINTER events, this will be the finger triggering the event.
+				*/
+				int touchId;
+			} pointer;
 
 			/**
 			* In \link #EVENT_TYPE_BT BT \endlink events, this will be a value \>= 0 or
@@ -2736,7 +2767,7 @@ interface MAAPI {
 			TEL = 115;
 			/// #MA_PIM_TYPE_STRING. Professional title.
 			TITLE = 116;
-			/// #MA_PIM_TYPE_INT. Unique identifier for the contact on this device.
+			/// #MA_PIM_TYPE_STRING. Unique identifier for the contact on the current device.
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
@@ -2861,8 +2892,6 @@ interface MAAPI {
 
 		/**
 		* \brief Arguments for PIM functions.
-		*
-		* \deprecated
 		*/		
 		
 		struct MA_PIM_ARGS {
@@ -2886,22 +2915,289 @@ interface MAAPI {
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
-		// not implemented
+		/** Changes a value and its attributes in a field and item.
+		* This function cannot be used to add a new value.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \param attributes The value's new attributes.
+		* \returns 0.
+		* \note The new value is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
+
+		/** Adds a new value to a field and item.
+		* \param args Common arguments.
+		* \param attributes The new value's attributes.
+		* \returns 0.
+		* \note The new value is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemAddValue(in MA_PIM_ARGS args, in int attributes);
+
+		/** Removes a value from a field and item.
+		* \param item Opened by maPimListNext().
+		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		* \param index \>= 0 and \< maPimItemFieldCount().
+		* \returns 0.
+		* \note The changes is not actually written to disk until
+		* the item is closed with maPimItemClose(). If the program exits before then,
+		* the changes are lost.
+		*/
 		int maPimItemRemoveValue(in MAHandle item, in int field, in int index);
 
-		/**
-		* Closes the handle to a PimItem, releasing resources used by the system.
+		/** Closes the handle to a PimItem, releasing resources used by the system.
+		* Writes any changes to disk.
 		* Panics on invalid handles.
 		* Returns 0.
+		* \note An item can also be closed by maPimItemRemove().
+		* \warning Does not write changes to disk if the item's List is closed.
+		* Make sure to keep the List open while editing items.
 		*/
 		int maPimItemClose(in MAHandle item);
 
-		// not implemented
+		/** Creates a new empty item in the specified list.
+		* \returns A handle to the new item, or \< 0 on error.
+		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
+		*/
 		MAHandle maPimItemCreate(in MAHandle list);
+
+		/** Removes an item from a list. This also has the effect of closing the item.
+		* \returns 0.
+		* \see maPimItemClose()
+		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
+
+#if IX_WIDGET
+	constset int WIDGET_EVENT_ {
+		/** 
+		 * A widget has posted a message. Use maWidgetGetMessageSize and
+		 * maWidgetGetMessageData to access message data.
+		 */
+		MESSAGE = 1;
+
+		/** 
+		 * A pointer pressed event has occurred. 
+		 */
+		POINTER_PRESSED = 2;
+
+		/** 
+		 * A pointer released event has occurred. 
+		 */
+		POINTER_RELEASED = 3;
+
+		/** 
+		 * A WebView widget has finished loading data. 
+		 */
+		CONTENT_LOADED = 4;
+
+		/**
+		 * Sent when something is clicked.
+		 */
+		CLICKED = 5;
+
+		/**
+		 * Sent when an item in a list view is clicked.
+		 */
+		ITEM_CLICKED = 6;
+		
+		/**
+		 * Sent when a tab widget has changed to a new tab.
+		 */
+		TAB_CHANGED = 7;
+		
+		/**
+		 * Sent when an GLView has been initialized and is ready for setup.
+		 */
+		 GL_VIEW_READY = 8;
+	}
+
+	/**
+	 * A struct that holds the data associated with a widget event.
+	 */
+	struct MAWidgetEventData {
+		/**
+		 * Determines which kind of widget event that has occurred.
+		 */
+		int eventType;
+
+		/**
+		 * Handle to the widget that sent the event.
+		 */
+		MAHandle widgetHandle;
+
+		union {
+			/** 
+			 * the index when a listbox is clicked. 
+			 */
+			int listItemIndex;
+
+			/**
+			 * the type of searchbar button clicked 
+			 * 0 means 'search'
+			 * 1 means 'cancel'
+			 */
+			int searchBarButton;
+
+			/**
+			 * the state of the checkbox
+			 * 0 means 'unchecked'
+			 * 1 means 'checked'
+			 */
+			int checked;
+
+			struct {
+				/**
+				 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
+				 * events using the syscall maWidgetGetMessageData().
+			 	*/
+				int messageId;
+		
+				/**
+				 * Size in bytes of the message referred to by messageId. Use for retrieving 
+				 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
+				 */
+				int messageSize;
+			} custom;
+
+		}
+	}
+
+	constset int WIDGET_ {
+		/**
+		 * Indicates that the call to a widget syscall was successful.
+		 */
+		OK = 0;
+		
+		/**
+		 * Indicates that the call to a widget syscall was unsuccessful.
+		 */
+		ERROR = -1;
+		
+		/**
+		 * Symbolic handle of the root widget in a screen.
+		 */
+		ROOT = -1;
+	}
+
+	/** 
+	 * Create a new widget of the specified type.
+	 *
+	 * Currently the following widgets are supported:
+	 * - ListBox
+	 * - HorizontalLayout
+	 * - VerticalLayout
+	 * - Button
+	 * - Label
+	 *
+	 * \param widgetType A String representing the type of the widget to create.
+	 *
+	 * \returns A handle to the widget, or WIDGET_ERROR if the widget
+	 *          could not be created.
+	 */
+	MAHandle maWidgetCreate(in MAString widgetType);
+
+	/** 
+	 * Destroy a widget. Calling it a second time does nothing.
+	 *
+	 * \param widget A handle to the widget to destroy.
+	 */
+	void maWidgetDestroy(in MAHandle widget);
+
+	/** 
+	 * Add a widget to the given parent as a child. Letting the
+	 * parent widget layout the child.
+	 *
+	 * Note: Use parent WIDGET_ROOT to add a widget to the root window.
+	 *
+	 * \param parent 
+	 * \param child The widget that will be added to the parent.
+	 *
+	 * \returns WIDGET_OK if the child could be added to the parent, or
+	 *          WIDGET_ERROR otherwise.
+	 */
+	int maWidgetAddChild(in MAHandle parent, in MAHandle child);
+
+	/** 
+	 * Removes a child widget from its parent (but does not destroy it).
+	 * Removing a top-level widget (a widget that has VIEW_ROOT as parent)
+	 * causes the MoSync view to become visible.
+	 *
+	 * \returns WIDGET_OK if the child could be removed from the parent,
+	 *                    or WIDGET_ERROR otherwise.
+	 */
+	int maWidgetRemoveChild(in MAHandle parent, in MAHandle child);
+
+	/**
+ 	 * Shows a screen. If native UI haven't been initialized, it is also initialized 
+	 * and disables regular MoSync drawing.
+	 * param screenHandle The handle to the screen.
+	 */
+	void maWidgetScreenShow(in MAHandle screenHandle);
+
+	/** 
+	 * Sets a specified property on the given widget.
+	 *
+	 * \param widget Handle to the widget.
+	 * \param property A string representing which property to set.
+	 * \param value The value which will be assigned to the property.
+	 *
+	 * Note: May be synchronous or asynchronous depending on the property.
+	 *
+	 * \returns A status code.
+	 */
+	int maWidgetSetProperty(in MAHandle widget, in MAString property, in MAString value);
+
+	/** 
+	 * Retrieves a specified property from the given widget.
+	 *
+	 * \param widget Handle to the widget.
+	 * \param property A string representing which property to set.
+	 * \param value A buffer that will hold the value of the property, represented as a string.
+	 * \param bufSize Size of the buffer.
+	 *
+	 * \returns Number of bytes copied on success, WIDGET_ERROR if the property
+	 *          could not be retrieved.
+	 */
+	int maWidgetGetProperty(in MAHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	 * Evaluate a script in a widget.
+	 *
+	 * \param widget Handle to the widget that will evaluate the script.
+	 * \param script The script code. The script should start with
+	 *               a language specifier that has the form "<language>:". 
+	 *               To evaluate JavaScript in a WebView widget, start the 
+	 *               script with "javascript:".
+	 *
+	 * \returns WIDGET_OK on success and WIDGET_ERROR on error.
+	 */
+	int maWidgetEvaluateScript(in MAHandle widget, in MAString script);
+
+	/**
+	 * Get the message data for a message id.
+	 * The message id is in MAEvent.widget.widgetMessageId.
+	 * The caller must use maWidgetGetMessageSize to ensure 
+	 * that the buffer is sufficienly large to hold the data.
+	 *
+	 * Message data can be retrieved only once, the system deallocates
+	 * the memory used to hold the data when retrieved. A second call
+	 * to this function with the same message id will return WIDGET_ERROR.
+	 *
+	 * \param messageId The id of the message, \see MAWidgetEventData.messageId.
+	 * \param buffer Pointer to a buffer that will contain the message data.
+	 * \param bufferSize Size of the buffer in bytes.
+	 *
+	 * \returns The number of bytes copied to the buffer, or WIDGET_ERROR on
+	 *          error.
+	 */
+	int maWidgetGetMessageData(in int messageId, out MAAddress buffer, in int bufferSize);
+
+#endif //IX_WIDGET
 
 		/**
 		* \brief The camera format, in pixels.
@@ -3052,18 +3348,18 @@ interface MAAPI {
 		int maKeyCaptureStop();
 
 		/**
-		* Turn on sending of HomeScreen events. Off by default.
-		* @return \< 0 on error.
-		* \see #EVENT_TYPE_HOMESCREEN_SHOWN
-		* \see #EVENT_TYPE_HOMESCREEN_HIDDEN
-		* \see maHomeScreenEventsOff()
-		*/
+		 * Turn on sending of HomeScreen events. Off by default.
+		 * @return \< 0 on error.
+		 * \see #EVENT_TYPE_HOMESCREEN_SHOWN
+		 * \see #EVENT_TYPE_HOMESCREEN_HIDDEN
+		 * \see maHomeScreenEventsOff()
+		 */
 		int maHomeScreenEventsOn();
 
 		/**
-		* Turn off sending of HomeScreen events. Off by default.
-		* @return \< 0 on error.
-		*/
+		 * Turn off sending of HomeScreen events. Off by default.
+		 * @return \< 0 on error.
+		 */
 		int maHomeScreenEventsOff();
 		
 		/**
@@ -3107,6 +3403,7 @@ interface MAAPI {
 
 		/**
 		 * Remove a notification item.
+		 * Currently implemented only on Android.
 		 * @param id The id of the notification.
 		 * @return \< 0 on error.
 		 */
@@ -3120,6 +3417,7 @@ interface MAAPI {
 
 		/**
 		 * Set the screen orientation.
+		 * Currently implemented only on Android.
 		 * @param orientation One of the \link #SCREEN_ORIENTATION 
 		 * \endlink constants.
 		 * @return \< 0 on error.
@@ -3137,10 +3435,46 @@ interface MAAPI {
 
 		/**
 		 * Enable/disable fullscreen mode.
+		 * Currently implemented only on Android.
 		 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
 		 * @return \< 0 on error.
 		 */
-		void maScreenSetFullscreen(in int fullscreen);
+		int maScreenSetFullscreen(in int fullscreen);
+		
+		/**
+		 * Turn on sending of screen state events. Off by default.
+		 * Currently implemented only on Android.
+		 * @return \< 0 on error.
+		 * \see #EVENT_TYPE_SCREEN_STATE_ON
+		 * \see #EVENT_TYPE_SCREEN_STATE_OFF
+		 * \see maHomeScreenEventsOff()
+		 */
+		int maScreenStateEventsOn();
+
+		/**
+		 * Turn off sending of screen state events. Off by default.
+		 * Currently implemented only on Android.
+		 * @return \< 0 on error.
+		 */
+		int maScreenStateEventsOff();
+
+#if IX_OPENGL_ES
+#include "opengl_non_generated.idl"
+#include "opengl_generated.idl"
+#endif
+
+		/**
+		 * Logs information about the state of all current resources.
+		 */
+		void maReportResourceInformation();
+
+		/**
+		 * Displays a message to the user
+		 * \param title The title of the message box shown
+		 * \param message The message should be short, not more than 40 characters,
+		 * to ensure its visibility on all screen sizes.
+		 */
+		void maMessageBox(in MAString title, in MAString message);
 	}
 	
 	constset int IOCTL_ {

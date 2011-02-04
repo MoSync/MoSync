@@ -1,0 +1,7 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+#define PHONE_RELEASE
+#define MOSYNC_COMMERCIAL
+#define PUBLIC_DEBUG
+#define LOGGING_ENABLED
+#endif /* CONFIG_H */

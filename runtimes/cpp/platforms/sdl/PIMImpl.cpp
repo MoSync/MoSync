@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "config_platform.h"
 
+#ifdef EMULATOR
+
 #include "Syscall.h"
 #include "pim.h"
 #ifdef WIN32
@@ -698,3 +700,5 @@ MAHandle Syscall::maPimListOpen(int listType) {
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;
 }
+
+#endif	//EMULATOR

@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <hashmap/hashmap.h>
 
 #include <helpers/CPP_IX_STREAMING.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 struct MAConnAddr;
 
@@ -134,7 +135,12 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
-		int GetValidatedStackValue(int offset);
+
+#ifndef VSV_ARGPTR_DECL
+#define VSV_ARGPTR_DECL
+#define VSV_ARGPTR_USE
+#endif
+		int GetValidatedStackValue(int offset VSV_ARGPTR_DECL);
 
 #ifdef MEMORY_PROTECTION
 		void protectMemory(int start, int length);
@@ -211,9 +217,19 @@ namespace Base {
 #define CUSTOM_EVENT_LOCATION(m)
 #endif
 
+/**
+ * Custom event data for widgets.
+ */
+#ifdef MA_PROF_SUPPORT_WIDGETAPI
+#define CUSTOM_EVENT_WIDGET(m) m(EVENT_TYPE_WIDGET, MAWidgetEventData)
+#else
+#define CUSTOM_EVENT_WIDGET(m)
+#endif
+
 #define CUSTOM_EVENTS(m)\
 	CUSTOM_EVENT_LOCATION(m)\
 	CUSTOM_EVENT_STREAM(m)\
+	CUSTOM_EVENT_WIDGET(m)\
 
 namespace Base {
 	uint getMaxCustomEventSize();

@@ -98,12 +98,12 @@ end
 # usage example: runtimebuilder.rb Settings.rb s60v3 /mosync/profiles/runtimes/s60v3/1/
 
 require ARGV[0]
-require "BuildJavaME.rb"
-require "BuildS60.rb"
-require "BuildWinCE.rb"
-require "BuildAndroid.rb"
-require "BuildMoblin.rb"
-require "BuildIphone.rb"
+require "./BuildJavaME.rb"
+require "./BuildS60.rb"
+require "./BuildWinCE.rb"
+require "./BuildAndroid.rb"
+require "./BuildMoblin.rb"
+require "./BuildIphone.rb"
 
 runtime_builder = RuntimeBuilder.new
 runtime_builder.build(ARGV[1].downcase, ARGV[2])

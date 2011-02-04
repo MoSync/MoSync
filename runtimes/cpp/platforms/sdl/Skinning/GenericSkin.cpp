@@ -33,6 +33,7 @@ namespace MoRE {
 	SDL_Surface* GenericSkin::sSkinImage = 0;
 	SDL_Surface* GenericSkin::sSelectedKeypad = 0;
 	SDL_Surface* GenericSkin::sUnselectedKeypad = 0;
+	SDL_Surface* GenericSkin::sMultiTouchImage = 0;
 
 	static SDL_Surface* createSurface(int width,int height) {
 		Uint32 rmask, gmask, bmask, amask;
@@ -75,6 +76,7 @@ namespace MoRE {
 		mPressedKey(0),
 		mTouchedInside(false)
 	{
+		mIsSimulatingMultiTouch = false;
 	}
 
 	bool GenericSkin::init() {
@@ -91,6 +93,9 @@ namespace MoRE {
 		if(!sUnselectedKeypad) 
 			sUnselectedKeypad = loadPNGImage((std::string(dir)+"/skins/keypadUnselected.png").c_str());
 		if(!sUnselectedKeypad) return false;
+		if(!sMultiTouchImage) 
+			sMultiTouchImage = loadPNGImage((std::string(dir)+"/skins/multitouchMarker.png").c_str());
+		if(!sMultiTouchImage) return false;
 
 		int w = getWindowWidth();
 		int h = getWindowHeight();
@@ -254,6 +259,39 @@ namespace MoRE {
 		}
 
 		SDL_UpdateRect(getWindowSurface(), screenRect.x, screenRect.y, screenRect.w, screenRect.h);
+		SDL_SetClipRect(getWindowSurface(), &clipRect);
+	}
+
+	void GenericSkin::drawMultiTouchSimulation() const
+	{
+		if( !mIsSimulatingMultiTouch ) return;
+
+		SDL_Rect clipRect;
+		SDL_GetClipRect(getWindowSurface(), &clipRect);
+		SDL_SetClipRect(getWindowSurface(), &screenRect);
+
+		SDL_Rect dstRect = sMultiTouchImage->clip_rect;
+
+		// Calculates the spacing so that the little marker
+		// will be drawn at the center of the touch event
+		int xSpacing = (windowRect.x - screenRect.x) + (dstRect.w / 2);
+		int ySpacing = (windowRect.y - screenRect.y) + (dstRect.h / 2);
+
+		// Draw first touch event
+		dstRect.x = mLastKnownMousePosition[0].first - xSpacing;
+		dstRect.y = mLastKnownMousePosition[0].second - ySpacing;
+
+		SDL_BlitSurface(sMultiTouchImage, NULL, getWindowSurface(), &dstRect);
+
+		// Draw second touch event
+		dstRect.x = mLastKnownMousePosition[1].first - xSpacing;
+		dstRect.y = mLastKnownMousePosition[1].second - ySpacing;
+
+		SDL_BlitSurface(sMultiTouchImage, NULL, getWindowSurface(), &dstRect);
+
+		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y, 
+											windowRect.w, windowRect.h);
+
 		SDL_SetClipRect(getWindowSurface(), &clipRect);
 	}
 
@@ -486,7 +524,7 @@ namespace MoRE {
 					return;
 				}
 
-				mListener->onMoSyncPointerDrag(x-screenRect.x, y-screenRect.y);
+				mListener->onMoSyncPointerDrag(x-screenRect.x, y-screenRect.y, 0);
 				return;
 		} else {
 			if(mTouchedInside) {
@@ -503,7 +541,7 @@ namespace MoRE {
 	void GenericSkin::mousePressed(int x, int y) {
 		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 			y>=screenRect.y && y<screenRect.y+screenRect.h) {
-				mListener->onMoSyncPointerPress(x-screenRect.x, y-screenRect.y);
+				mListener->onMoSyncPointerPress(x-screenRect.x, y-screenRect.y, 0);
 				mTouchedInside = true;
 				return;
 		}
@@ -525,7 +563,116 @@ namespace MoRE {
 			mTouchedInside = false;
 			if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 				y>=screenRect.y && y<screenRect.y+screenRect.h) {
-					mListener->onMoSyncPointerRelease(x-screenRect.x, y-screenRect.y);
+					mListener->onMoSyncPointerRelease(x-screenRect.x, y-screenRect.y, 0);
+					return;
+			}
+			return;
+		}
+
+		if(!mPressedKey) return;
+		mListener->onMoSyncKeyRelease(mPressedKey);
+		keyReleased(mPressedKey);
+		mPressedKey = 0;
+	}
+
+	void GenericSkin::mouseMultiDragged(int x, int y) {
+		if(mPressedKey) return;
+
+		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+			y>=screenRect.y && y<screenRect.y+screenRect.h) {
+				if(!mTouchedInside) {
+					mousePressed(x, y);
+					return;
+				}
+
+				int xPosition = x - screenRect.x;
+				int yPosition = y - screenRect.y;
+
+				// Calculates the delta movement from the mouse
+				// and adds the same distance to the mirrored touch event
+				mLastKnownMousePosition[1].first += 
+							( mLastKnownMousePosition[0].first - xPosition);
+				mLastKnownMousePosition[1].second += 
+							( mLastKnownMousePosition[0].second - yPosition);
+
+				mListener->onMoSyncPointerDrag(x-screenRect.x,
+												y-screenRect.y, 0);
+
+				mListener->onMoSyncPointerDrag(
+											mLastKnownMousePosition[1].first, 
+											mLastKnownMousePosition[1].second,
+											1);
+				
+				mLastKnownMousePosition[0].first = xPosition;
+				mLastKnownMousePosition[0].second = yPosition;
+
+				return;
+		} else {
+			if(mTouchedInside) {
+				if(x<screenRect.x) x = screenRect.x;
+				if(y<screenRect.y) y = screenRect.y;
+				if(x>=screenRect.x+screenRect.w)
+					x = screenRect.x+screenRect.w-1;
+				if(y>=screenRect.y+screenRect.h)
+					y = screenRect.y+screenRect.h-1;
+				mouseReleased(x, y);
+				return;
+			}
+		}
+	}
+	
+	void GenericSkin::mouseMultiPressed(int x, int y) {
+		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+			y>=screenRect.y && y<screenRect.y+screenRect.h) {
+
+				int xPosition = x - screenRect.x;
+				int yPosition = y - screenRect.y;
+
+				mLastKnownMousePosition[0].first = xPosition;
+				mLastKnownMousePosition[0].second = yPosition;
+
+				// Mirrors the touch point for simulating another finger
+				mLastKnownMousePosition[1].first = screenRect.w - xPosition;
+				mLastKnownMousePosition[1].second = screenRect.h - yPosition;
+
+				mListener->onMoSyncPointerPress(xPosition, yPosition, 0);
+				mListener->onMoSyncPointerPress(
+										mLastKnownMousePosition[1].first,
+										mLastKnownMousePosition[1].second, 1);
+				mTouchedInside = true;
+				mIsSimulatingMultiTouch = true;
+				return;
+		}
+
+		mTouchedInside = false;
+		mIsSimulatingMultiTouch = false;
+
+		for(size_t i = 0; i < keyRects.size(); i++) {
+			if(keyRects[i].contains(x, y)) {
+				mListener->onMoSyncKeyPress(keyRects[i].keyCode);
+				mPressedKey = keyRects[i].keyCode;
+				keyPressed(mPressedKey);
+				return;
+			}
+		}
+	}
+	
+	void GenericSkin::mouseMultiReleased(int x, int y) {
+		if(mTouchedInside) {
+			mTouchedInside = false;
+			mIsSimulatingMultiTouch = false;
+
+			// blits the current screen again since the
+			// two multi touch markers will othervise be
+			// visible.
+			drawScreen();
+
+			if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
+				y>=screenRect.y && y<screenRect.y+screenRect.h) {
+					mListener->onMoSyncPointerRelease(x-screenRect.x, 
+														y-screenRect.y, 0);
+					mListener->onMoSyncPointerRelease(x-screenRect.x, 
+														y-screenRect.y, 1);
 					return;
 			}
 			return;

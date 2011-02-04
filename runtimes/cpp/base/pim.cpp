@@ -15,6 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "config_platform.h"
+
+#if defined(EMULATOR) || defined(SYMBIAN)
+
 #include "Syscall.h"
 #include "pim.h"
 #include "helpers/CPP_IX_PIM.h"
@@ -152,3 +156,5 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index);
 MAHandle Syscall::maPimItemCreate(MAHandle list);
 int Syscall::maPimItemRemove(MAHandle list, MAHandle item);
 #endif
+
+#endif	//EMULATOR

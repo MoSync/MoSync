@@ -19,8 +19,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MAHeaders.h"
 #include <mastdlib.h>
 
+#include <MAP/OpenStreetMapSource.h>
+#include <MAP/GoogleMapSource.h>
+#include "HelloMapMoblet.h"
+#include <MAP/DebugPrintf.h>
+
 namespace HelloMap
 {
+	static const int DoubleClickTimeMs = 200;
+	static const int TapPanAcceleration = 1;
+	static const int TapPanIntervalMs = 100;
+
 	//-------------------------------------------------------------------------
 	HelloMapScreen::HelloMapScreen( )
 	//-------------------------------------------------------------------------
@@ -32,22 +41,37 @@ namespace HelloMap
 		int width = EXTENT_X( screenSize );
 		int height = EXTENT_Y( screenSize );
 		//
+		// Viewport
+		//
+		MapViewport* viewport = newobject( MapViewport, new MapViewport( ) );
+		//
 		// Map widget
 		//
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, width, height, NULL ) );
-		mMap->enterMapUpdateScope( );
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ) );
-		mMap->setMagnification( 10 );
-		mMap->exitMapUpdateScope( true );
-		mMapSourceKind = MapSourceKind_OpenStreetMap;
-		Font* font = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
-		mMap->setFont( font );
+		mMap->setViewport( viewport );
+		//
+		// Stockholm
+		//
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 
+		mFont = newobject( Font, new Font( RES_FONT_VERDANA13BLACK ) );
+		mMap->setFont( mFont );
+		//mMap->setPanMode( MapViewportPanMode_Momentum );
+		//
+		// Create map sources
+		//
+		mOpenStreetMapSource = newobject( OpenStreetMapSource, new OpenStreetMapSource( ) );
+		mGoogleStreetMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_StreetMap ) );
+		mGoogleAerialMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Aerial ) );
+		mGoogleHybridMapSource = newobject( GoogleMapSource, new GoogleMapSource( GoogleMapKind_Hybrid ) );
+		//
+		// set map source
+		//
+		mMap->setMapSource( mOpenStreetMapSource );
+		//
+		// commit widget
+		//
 		setMain( mMap );
-		//
-		// Have to wait until we have proper width and height
-		//
-		mMap->setMapSourceKind( mMapSourceKind );
 	}
 
 	//-------------------------------------------------------------------------
@@ -55,6 +79,11 @@ namespace HelloMap
 	//-------------------------------------------------------------------------
 	{
 		deleteobject( mMap );
+		deleteobject( mOpenStreetMapSource );
+		deleteobject( mGoogleStreetMapSource );
+		deleteobject( mGoogleAerialMapSource );
+		deleteobject( mGoogleHybridMapSource );
+		deleteobject( mFont );
 	}
 
 	//-------------------------------------------------------------------------
@@ -66,13 +95,18 @@ namespace HelloMap
 		case MAK_2:
 			nextMapSource( );
 			return;
+		case MAK_8:
+			MemoryMgr::dump( );
+			return;
+		//case MAK_7:
+		//	mMap->stressTest( );
+		//	return;
 		case MAK_SOFTRIGHT:
-			maExit( 0 );
+			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
+			moblet.Terminate( );
 			return;
 		}
-		
 		(void)mMap->handleKeyPress( keyCode );
-
 	}
 
 	//-------------------------------------------------------------------------
@@ -82,31 +116,42 @@ namespace HelloMap
 		(void)mMap->handleKeyRelease( keyCode );
 	}
 
-
-
 	bool scrolling = false;
-	int prevX;
-	int prevY;
-
-	int lastPointerPress = -1;
+	int pointerPressX;
+	int pointerPressY;
+	PixelCoordinate pointerPressCenter;
+	int pointerPressTimeMs = -1;
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::pointerPressEvent(MAPoint2d p)
+	void HelloMapScreen::pointerPressEvent( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
-		prevX = p.x;
-		prevY = p.y;
-
-		int curTime = maGetMilliSecondCount();
-		int deltaTime = curTime - lastPointerPress;
-
-		if(deltaTime < 200) {
-			maExit(0);
-		} else {
-			lastPointerPress = curTime;
+		//
+		// Set up tap panning
+		//
+		pointerPressX = p.x;
+		pointerPressY = p.y;
+		pointerPressCenter = mMap->getCenterPositionPixels( );
+		//
+		// set position to stop any movement
+		//
+		mMap->stopGlide( );
+		//
+		// Handle doubletap for app exit
+		//
+		int curTimeMs = maGetMilliSecondCount( );
+		int deltaTimeMs = curTimeMs - pointerPressTimeMs;
+		if ( deltaTimeMs < DoubleClickTimeMs ) 
+		{
+			HelloMapMoblet& moblet = (HelloMapMoblet&)Environment::getEnvironment( );
+			moblet.Terminate( );
+			//mMap->stressTest( );
+		}
+		else
+		{
+			pointerPressTimeMs = curTimeMs;
 		}
 	}
-
 
     //-------------------------------------------------------------------------
     static double clamp( double x, double min, double max )
@@ -115,49 +160,58 @@ namespace HelloMap
             return x < min ? min : x > max ? max : x;
     }
 
+	int lastPointerMoveMs = -1;
+
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::pointerMoveEvent(MAPoint2d p)
+	void HelloMapScreen::setPosition( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
-		if(scrolling) return;
-		int accel = 7;
-		int dx = (p.x - prevX) * accel;
-		int dy = (p.y - prevY) * accel;
-
-		PixelCoordinate px = mMap->getCenterPositionPixels( );
-
-		px = PixelCoordinate( px.getMagnification( ), px.getX( ) - dx, px.getY( ) + dy );
-
+		int curTimeMs = maGetMilliSecondCount( );
+		int deltaMs = curTimeMs - lastPointerMoveMs;
+		lastPointerMoveMs = curTimeMs;
+		int dx = ( p.x - pointerPressX ) * TapPanAcceleration;
+		int dy = ( p.y - pointerPressY ) * TapPanAcceleration;
+		PixelCoordinate px = PixelCoordinate(	pointerPressCenter.getMagnification( ), 
+												pointerPressCenter.getX( ) - dx,
+												pointerPressCenter.getY( ) + dy );
         LonLat newPos = LonLat( px );
         newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        mMap->setCenterPosition( newPos );
-		prevX = p.x;
-		prevY = p.y;
+        mMap->setCenterPosition( newPos, false, true );
 	}
 
 	//-------------------------------------------------------------------------
-	void HelloMapScreen::pointerReleaseEvent(MAPoint2d p)
+	void HelloMapScreen::pointerMoveEvent( MAPoint2d p )
+	//-------------------------------------------------------------------------
+	{
+		if( scrolling ) 
+			return;
+		int curTimeMs = maGetMilliSecondCount( );
+		if ( curTimeMs < lastPointerMoveMs + TapPanIntervalMs )
+			return;
+		setPosition( p );
+	}
+
+	//-------------------------------------------------------------------------
+	void HelloMapScreen::pointerReleaseEvent( MAPoint2d p )
 	//-------------------------------------------------------------------------
 	{
 		scrolling = false;
+		setPosition( p );
+		mMap->startGlide( );
 	}
-
 
 	//-------------------------------------------------------------------------
 	void HelloMapScreen::nextMapSource( )
 	//-------------------------------------------------------------------------
 	{
-		MapSourceKind newKind = (MapSourceKind)(mMapSourceKind + 1);
-
-		// Avoid CloudMade maps by default
-		if(newKind == MapSourceKind_CloudMade1)
-			newKind = (MapSourceKind)(mMapSourceKind + 2);
-		if(newKind == MapSourceKind_CloudMade7)
-			newKind = (MapSourceKind)(mMapSourceKind + 3);
-
-		if( newKind >= MapSourceKind_Last )
-			newKind = (MapSourceKind)( MapSourceKind_None + 1 );
-		mMapSourceKind = newKind;
-		mMap->setMapSourceKind( newKind );
+		MapSource* current = mMap->getMapSource( );
+		if ( current == mOpenStreetMapSource ) 
+			mMap->setMapSource( mGoogleStreetMapSource );
+		else if ( current == mGoogleStreetMapSource )
+			mMap->setMapSource( mGoogleAerialMapSource );
+		else if ( current == mGoogleAerialMapSource )
+			mMap->setMapSource( mGoogleHybridMapSource );
+		else if ( current == mGoogleHybridMapSource )
+			mMap->setMapSource( mOpenStreetMapSource );
 	}
 }

@@ -8,11 +8,12 @@
 #include <malloc.h>
 
 int main(int argc, const char** argv);
+extern const char* gArgv[];
+extern const int gArgc;
 
 int MAMain() {
-	const char* argv[] = { "MoSync", "--direct", "--test-dir", "/" };
 	printf("MAMain()\n");
-	return main(4, argv);
+	return main(gArgc, gArgv);
 }
 
 void error(int __status, int __errnum, __const char* __format, ...)

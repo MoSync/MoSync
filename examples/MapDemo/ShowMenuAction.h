@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Action.h"
 #include "IActionSource.h"
 #include <MAP/MemoryMgr.h>
+#include "Menu.h"
 
 using namespace MAPUtil;
 
@@ -52,6 +53,7 @@ namespace MapDemoUI
 
 	private:
 		IActionSource* mSource;
+		Menu* mMenu;
 	};
 }
 

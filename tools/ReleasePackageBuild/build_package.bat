@@ -140,9 +140,24 @@ cd %ORIGINAL_PATH%
 
 @echo.
 @echo ------------------------------------------------
+@echo Copying Batik bin.
+@echo ------------------------------------------------
+@xcopy %ORIGINAL_PATH%\build_package_tools\bin\Batik %MOSYNC_BIN_PATH%\Batik\ /y /E /D
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+
+@echo.
+@echo ------------------------------------------------
 @echo Copying skins.
 @echo ------------------------------------------------
 @xcopy %MOSYNC_TRUNK%\skins %MOSYNC_PATH%\skins\ /y /E /D
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo.
+@echo ------------------------------------------------
+@echo Copying rules.
+@echo ------------------------------------------------
+@xcopy %MOSYNC_TRUNK%\rules %MOSYNC_PATH%\rules\ /y /E /D
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
@@ -162,10 +177,10 @@ cd %ORIGINAL_PATH%
 @copy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
 @echo ------------------------------------------------
-@echo Running OpenGL Wrapper generator.
+@echo Running DefaultSkinGenerator.
 @echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\GLWrapperGenerator
-call build.bat
+@cd %MOSYNC_TRUNK%\tools\DefaultSkinGenerator
+ruby workfile.rb
 @echo.
 
 @echo ------------------------------------------------
@@ -443,6 +458,14 @@ Release\idl2.exe
 @echo.
 
 @echo ------------------------------------------------
+@echo Building dgles.lib
+@echo ------------------------------------------------
+@cd %MOSYNC_TRUNK%\intlibs\dgles-0.5
+@vcbuild dgles.vcproj "Release|Win32"
+@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+@echo.
+
+@echo ------------------------------------------------
 @echo Building MDB, the MoSync Debugger
 @echo ------------------------------------------------
 @cd %MOSYNC_TRUNK%\tools\debugger
@@ -495,6 +518,10 @@ Release\idl2.exe
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\clock
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MAUI\multi
 @rmdir /s /q %MOSYNC_EXAMPLES_PATH%\wolf3d
+
+@REM Temporary deletes, didn't work with map library
+@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\HelloMap
+@rmdir /s /q %MOSYNC_EXAMPLES_PATH%\MapDemo
 
 @REM Remove files that shouldn't be in the release
 @del /s /q %MOSYNC_EXAMPLES_PATH%\Makefile* %MOSYNC_EXAMPLES_PATH%\*.bat %MOSYNC_EXAMPLES_PATH%\*.2008.vcproj
@@ -562,19 +589,7 @@ xcopy buildresult\I.MoSync\MoSync-win32.win32.x86-unzipped\mosync %MOSYNC_ECLIPS
 @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 @echo.
 
-@cd %ORIGINAL_PATH%
-@echo.
-
-@echo ------------------------------------------------
-@echo Copy dummy functions for the program and resource file on android,
-@echo Otherwise build won't succeed
-@echo ------------------------------------------------
-
-@copy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\program.zip
-@copy %MOSYNC_TRUNK%\runtimes\java\platforms\android\dummy.dat %MOSYNC_TRUNK%\runtimes\java\platforms\android\AndroidProject\res\raw\resources.zip
-
 @cd %MOSYNC_RELEASE_BUILD_PATH%
-
 @echo.
 @echo ------------------------------------------------
 @echo Building runtimes.
@@ -614,7 +629,7 @@ cd %MOSYNC_TRUNK%\libs
 REM del %MOSYNC_INCLUDE_PATH%\IX_*.h
 REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
+REM @rmdir /s /q %MOSYNC_INCLUDE_PATH%\GLES
 
 
 @echo ------------------------------------------------

@@ -79,7 +79,10 @@ namespace MAPUtil
 			}
 		}
 
+		Vector<T*>* getListeners( ) { return &mListeners; }
 	protected:
+
+	private:
 		/**
 		 * The list of listeners.
 		 * Implementer should iterate through list and call the appropriate
@@ -87,6 +90,29 @@ namespace MAPUtil
 		 */
 		Vector<T*> mListeners;
 	};
+
+	//
+	// This static template function is necessary to avoid ambiguity in multiple inheritance of broadcaster:
+	//
+	//	class BaseListener;
+	//	class SubListener;
+	//
+	//	class Base : public Broadcaster<BaseListener>
+	//	{
+	//		...
+	//	}
+	//
+	//	class Sub : public Base, public Broadcaster<SubListener>
+	//	{
+	//		...
+	//	}
+	//
+	//	The abmiguity that (some) c++ compilers cannot resolve is in getListeners (see above).
+	//	implementing getListeners as template just won't work.
+	//		
+
+	template<class T> Vector<T*>* getBroadcasterListeners( Broadcaster<T>& broadcaster ) { return broadcaster.getListeners( ); }
+
 }
 
 #endif // BROADCASTER_H_

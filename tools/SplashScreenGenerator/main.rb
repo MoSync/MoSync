@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
 # encoding: UTF-8
 
-# the above line, although it looks like a comment, is actually parsed by the Ruby engine to set
-# the default String encoding for this program.
+# the above line, although it looks like a comment, is actually parsed by the
+# Ruby engine to set the default String encoding for this program.
 
-# Copyright (C) 2009 Mobile Sorcery AB
+# Copyright (C) 2011 MoSync AB
 # 
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
@@ -45,32 +45,23 @@ PLATFORMS = [
 	'Windows Smartphone 2003'
 ]
 
-if ARGV.length() == 2
-	version[0] = ARGV[0] # MoSync SDK version
-	version[1] = ARGV[1] # SVN revision
+if ARGV.length() == 3
+	version[0] = ARGV[0] # MoSync SDK name
+	version[1] = ARGV[1] # git mosync hash
+	version[2] = ARGV[2] # git eclipse hash 
+elsif ARGV.length() > 0
+	version[0] = ARGV[0] # MoSync SDK name
+	version[1] = ""
+	version[2] = ""
 else
-	index = 0
-	File.open('\mb\revision', 'r') do |f|
-		while (line = f.gets)
-			version[index] = line
-			index = index + 1
-		end
-	end
-end
-
-buildNightly = false
-nightly = ENV['NIGHTLY']
-if nightly.class != NilClass
-	buildNightly = true
+	raise "Splash Screen Generator error - no arguments provided"
 end
 
 COPYRIGHT = "Copyright © 2004-#{Time.new.year.to_s}. All rights reserved. " + 
-            "MoSync and the MoSync logo are registered trademarks of MoSync AB."
+           "MoSync and the MoSync logo are registered trademarks of MoSync AB."
 
 img = Magick::Image.read('template.png').first
 img2 = Magick::Image.read('template_installer.png').first
-img_gs = Magick::Image.read('template2.png').first
-img2_gs = Magick::Image.read('template_installer2.png').first
 
 header = Magick::Draw.new
 
@@ -82,84 +73,58 @@ header.annotate(img, 271, 200, 275, 110, HEADER_TEXT) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img_gs, 271, 200, 275, 110, HEADER_TEXT) do
-	self.font = 'MyriadPro-Bold'
-	self.pointsize = 19
-	self.font_weight = Magick::BoldWeight
+
+puts "Injecting string to images : Version #{version[0].strip}"
+
+header.annotate(img, 271, 340, 275, 130, "#{version[0].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 14
+	self.font_weight = Magick::LighterWeight
 	self.fill = 'white'
 	self.gravity = Magick::NorthWestGravity
 end
 
+header.annotate(img, 271, 340, 20, 314, "MoSync #{version[1].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
+end
 
-if(buildNightly == true)
-	puts "Injecting string to images : Nightly Build r#{version[1].strip}"
-	header.annotate(img, 271, 340, 275, 130, "Nightly Build r#{version[1].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 14
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
+header.annotate(img, 271, 340, 20, 326, "Eclipse #{version[2].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
+end
 
-	header.annotate(img2, 271, 340, 180, 260, "Nightly Build r#{version[1].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 12
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
-	
-	header.annotate(img_gs, 271, 340, 275, 130, "Nightly Build r#{version[1].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 14
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
-		
-	header.annotate(img2_gs, 271, 340, 180, 260, "Nightly Build r#{version[1].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 12
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
-	
-else
-	puts "Injecting string to images : Version #{version[0].strip}"
-	header.annotate(img, 271, 340, 275, 130, "Version #{version[0].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 14
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
+header.annotate(img2, 271, 340, 80, 230, "#{version[0].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 12
+	self.font_weight = Magick::LighterWeight
+	self.fill = 'white'
+	self.gravity = Magick::NorthWestGravity
+end
 
-	header.annotate(img2, 271, 340, 180, 260, "Version #{version[0].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 12
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
-	
-	header.annotate(img_gs, 271, 340, 275, 130, "Version #{version[0].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 14
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
-	
-	header.annotate(img2_gs, 271, 340, 180, 260, "Version #{version[0].strip}" ) do
-		self.font = 'Verdana'
-		self.pointsize = 12
-		self.font_weight = Magick::LighterWeight
-		self.fill = 'white'
-		self.gravity = Magick::NorthWestGravity
-	end
+header.annotate(img2, 271, 340, 80, 250, "MoSync #{version[1].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
+end
+
+header.annotate(img2, 271, 340, 80, 262, "Eclipse #{version[2].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
 end
 	
+
 platforms = Magick::Image.read("caption:#{PLATFORMS.join(', ')}") do 
 	self.size = "300x200"
 	self.pointsize = 12
@@ -177,11 +142,5 @@ end
 img = img.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
 img = img.composite(copyright.first, 20, 358, Magick::ScreenCompositeOp)
 
-img_gs = img_gs.composite(platforms.first, 275, 160, Magick::ScreenCompositeOp)
-img_gs = img_gs.composite(copyright.first, 20, 358, Magick::ScreenCompositeOp)
-
 img.write('bmp3:splash.bmp')
 img2.write('bmp3:installer_splash.bmp')
-img.write('png24:userguide_start_1.png')
-img_gs.write('png24:userguide_start_3.png')
-img2_gs.write('png24:userguide_install_2.png')

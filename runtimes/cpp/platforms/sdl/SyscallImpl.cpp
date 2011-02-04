@@ -15,6 +15,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#define HAVE_IOCTL_ELLIPSIS
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #define _WIN32_WINNT 0x500
@@ -94,6 +96,7 @@ extern "C" {
 #include <helpers/CPP_IX_OPENGL_ES.h>
 #include <dgles-0.5/GLES/gl.h>
 #include "../../generated/gl.h.cpp"
+#include "OpenGLES.h"
 #endif
 
 namespace Base {
@@ -134,6 +137,11 @@ namespace Base {
 	static SDL_mutex* gTimerMutex = NULL;
 	static bool gShowScreen;
 
+#ifdef SUPPORT_OPENGL_ES
+	static SubView sSubView;
+	static bool sOpenGLMode = false;
+#endif
+
 	static MoRE::DeviceSkin* sSkin = NULL;
 
 	static bool MALibInit(const Syscall::STARTUP_SETTINGS&);
@@ -144,7 +152,7 @@ namespace Base {
 
 	static void MAHandleKeyEventMAK(int mak, bool pressed, int nativeKey=0);
 	static void MAHandleKeyEvent(int sdlk, bool pressed);
-	static void MASendPointerEvent(int x, int y, int type);
+	static void MASendPointerEvent(int x, int y, int touchId, int type);
 
 	static int maSendToBackground();
 	static int maBringToForeground();
@@ -301,14 +309,14 @@ namespace Base {
 		void onMoSyncKeyRelease(int mak) {
 			MAHandleKeyEventMAK(mak, false);
 		}
-		void onMoSyncPointerPress(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_PRESSED);
+		void onMoSyncPointerPress(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 		}
-		void onMoSyncPointerDrag(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_DRAGGED);	
+		void onMoSyncPointerDrag(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);	
 		}
-		void onMoSyncPointerRelease(int x, int y) {
-			MASendPointerEvent(x, y, EVENT_TYPE_POINTER_RELEASED);
+		void onMoSyncPointerRelease(int x, int y, int touchId) {
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_RELEASED);
 		}
 	};
 
@@ -360,6 +368,7 @@ namespace Base {
 		if(sSkin) {
 			sSkin->drawDevice();
 			sSkin->drawScreen();
+			sSkin->drawMultiTouchSimulation();
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		}
 		return true;
@@ -704,12 +713,13 @@ namespace Base {
 #ifndef MOBILEAUTHOR
 		if(sSkin) {
 			sSkin->drawScreen();
+			sSkin->drawMultiTouchSimulation();
+
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		} else {
 			SDL_BlitSurface(gBackBuffer, NULL, gScreen, NULL);
 			SDL_UpdateRect(gScreen, 0, 0, 0, 0);
 		}
-
 #endif
 	}
 
@@ -757,7 +767,7 @@ namespace Base {
 		return 0;
 	}
 
-	static void MASendPointerEvent(int x, int y, int type) {
+	static void MASendPointerEvent(int x, int y, int touchId, int type) {
 			if(!gEventOverflow) {
 				if(gEventFifo.count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 					gEventOverflow = true;
@@ -768,6 +778,7 @@ namespace Base {
 				event.type = type;
 				event.point.x = x;
 				event.point.y = y;
+				event.touchId = touchId;
 				gEventFifo.put(event);
 			}
 	}
@@ -891,6 +902,12 @@ namespace Base {
 		SDL_Event event;
 		bool ret = false;
 
+#ifdef SUPPORT_OPENGL_ES
+		if(sOpenGLMode) {
+			Base::openGLProcessEvents(sSubView);
+		}
+#endif
+
 		while((PollEventResult = FE_PollEvent(&event)) > 0) {
 			switch(event.type) {
 			case SDL_ACTIVEEVENT:
@@ -916,7 +933,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mouseDragged(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_DRAGGED);
+						MASendPointerEvent(event.button.x, event.button.y, 0,EVENT_TYPE_POINTER_DRAGGED);
+				}
+				else if(event.motion.state&SDL_BUTTON(3))
+				{
+					if(sSkin)
+						sSkin->mouseMultiDragged(event.button.x, event.button.y);
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
@@ -925,7 +947,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mousePressed(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_PRESSED);
+						MASendPointerEvent(event.button.x, event.button.y, 0, EVENT_TYPE_POINTER_PRESSED);
+				}
+				else if(event.button.button == 3)
+				{
+					if(sSkin)
+						sSkin->mouseMultiPressed(event.button.x, event.button.y);
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
@@ -934,7 +961,12 @@ namespace Base {
 					if(sSkin)
 						sSkin->mouseReleased(event.button.x, event.button.y);
 					else
-						MASendPointerEvent(event.button.x, event.button.y, EVENT_TYPE_POINTER_RELEASED);
+						MASendPointerEvent(event.button.x, event.button.y, 0, EVENT_TYPE_POINTER_RELEASED);
+				}
+				else if(event.button.button == 3)
+				{
+					if(sSkin)
+						sSkin->mouseMultiReleased(event.button.x, event.button.y);
 				}
 				break;
 #endif	//MOBILEAUTHOR
@@ -1165,6 +1197,11 @@ namespace Base {
 			return;
 		MAUpdateScreen();
 		MAProcessEvents();
+
+#ifdef SUPPORT_OPENGL_ES
+		if(sOpenGLMode)
+				Base::openGLSwap(sSubView);
+#endif
 	}
 	SYSCALL(void, maResetBacklight()) {
 	}
@@ -1866,7 +1903,111 @@ namespace Base {
 	}
 #endif
 
-	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
+#ifdef SUPPORT_OPENGL_ES
+	int maOpenGLInitFullscreen() {
+		TEST_Z(Base::subViewOpen(sSkin->getScreenLeft(), sSkin->getScreenTop(), sSkin->getScreenWidth(), sSkin->getScreenHeight(), sSubView));
+		TEST_Z(Base::openGLInit(sSubView));
+		sOpenGLMode = true;
+
+		return 0;
+	}
+
+	int maOpenGLCloseFullscreen() {
+		TEST_Z(Base::openGLClose(sSubView));
+		TEST_Z(Base::subViewClose(sSubView));
+		return 0;
+	}
+
+	int maOpenGLTexImage2D(MAHandle image) {
+		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);
+	
+        // get the number of channels in the SDL surface
+        GLint nOfColors = surface->format->BytesPerPixel;
+		GLenum texture_format = 0;
+        GLint flipColors = 0;
+
+		int w = nextPowerOf2(1, surface->w);
+		int h = nextPowerOf2(1, surface->h);
+		bool createdPowerOfTwoTexture = false;
+		if(w!=surface->w || h!=surface->h) {
+
+			SDL_Surface* oldSurface =  surface;
+			surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
+				surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+			byte* src = (byte*)oldSurface->pixels;
+			byte* dst = (byte*)surface->pixels;
+			for(int y = 0; y < oldSurface->h; y++) {
+				memcpy(dst, src, oldSurface->w*surface->format->BytesPerPixel);
+				src+=oldSurface->pitch;
+				dst+=surface->pitch;
+			}
+
+			createdPowerOfTwoTexture = true;
+		}
+
+		if (nOfColors == 4)     // contains an alpha channel
+        {
+                if (surface->format->Bmask == 0xff000000)
+                        texture_format = GL_RGBA;
+				else {
+					texture_format = GL_RGBA;
+					flipColors = 1; //texture_format = GL_BGR;
+				}
+		} 
+		else if (nOfColors == 3)     // no alpha channel
+        {
+                if (surface->format->Bmask == 0xff0000)
+                        texture_format = GL_RGB;
+				else {
+					texture_format = GL_RGB;
+					flipColors = 1; //texture_format = GL_BGR;
+				}
+        } 
+		
+		if(texture_format == 0) {
+			return MA_GL_TEX_IMAGE_2D_INVALID_IMAGE;
+		}
+ 	 
+		byte* data = (byte*)surface->pixels;
+		if(flipColors) {
+			int numBytes = surface->w * surface->h * surface->format->BytesPerPixel;
+			byte* copy = new byte[numBytes];
+
+			for(int i = 0; i < numBytes; i += nOfColors) {
+				int rIndex = surface->format->Rshift/8;
+				int gIndex = surface->format->Gshift/8;
+				int bIndex = surface->format->Bshift/8;
+				int aIndex = surface->format->Ashift/8;
+				copy[i+0] = data[i+rIndex]; 
+				copy[i+1] = data[i+gIndex]; 
+				copy[i+2] = data[i+bIndex]; 
+				if(nOfColors == 4)
+					copy[i+3] = data[i+aIndex]; 
+			}
+
+			data = copy;
+		}
+
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexImage2D( GL_TEXTURE_2D, 0, texture_format, surface->w, surface->h, 0,
+						  texture_format, GL_UNSIGNED_BYTE, data);
+
+		if(flipColors) {
+			delete data;
+		}
+
+		if(createdPowerOfTwoTexture)
+			SDL_FreeSurface(surface);
+
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}
+	
+#endif // SUPPORT_OPENGL_ES	
+
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
+		va_list argptr;
+		va_start(argptr, c);
 		switch(function) {
 
 #ifdef FAKE_CALL_STACK
@@ -1904,112 +2045,7 @@ namespace Base {
 #endif	//LOGGING_ENABLED
 
 #ifdef SUPPORT_OPENGL_ES
-maIOCtl_glAlphaFuncx_case(glAlphaFuncx);
-maIOCtl_glFrontFace_case(glFrontFace);
-maIOCtl_glLoadIdentity_case(glLoadIdentity);
-maIOCtl_glTexImage2D_case(glTexImage2D);
-maIOCtl_glGenTextures_case(glGenTextures);
-maIOCtl_glLogicOp_case(glLogicOp);
-maIOCtl_glTexEnvf_case(glTexEnvf);
-maIOCtl_glTexEnvx_case(glTexEnvx);
-maIOCtl_glFlush_case(glFlush);
-maIOCtl_glStencilOp_case(glStencilOp);
-maIOCtl_glTexEnvxv_case(glTexEnvxv);
-maIOCtl_glPixelStorei_case(glPixelStorei);
-maIOCtl_glFogxv_case(glFogxv);
-maIOCtl_glCullFace_case(glCullFace);
-maIOCtl_glNormal3f_case(glNormal3f);
-maIOCtl_glNormal3x_case(glNormal3x);
-maIOCtl_glMultiTexCoord4f_case(glMultiTexCoord4f);
-maIOCtl_glMultiTexCoord4x_case(glMultiTexCoord4x);
-maIOCtl_glLightModelf_case(glLightModelf);
-maIOCtl_glLightModelx_case(glLightModelx);
-maIOCtl_glDepthRangef_case(glDepthRangef);
-maIOCtl_glDepthRangex_case(glDepthRangex);
-maIOCtl_glBindTexture_case(glBindTexture);
-maIOCtl_glViewport_case(glViewport);
-maIOCtl_glLineWidthx_case(glLineWidthx);
-maIOCtl_glGetIntegerv_case(glGetIntegerv);
-maIOCtl_glAlphaFunc_case(glAlphaFunc);
-maIOCtl_glLoadMatrixf_case(glLoadMatrixf);
-maIOCtl_glLoadMatrixx_case(glLoadMatrixx);
-maIOCtl_glTexEnvfv_case(glTexEnvfv);
-maIOCtl_glScissor_case(glScissor);
-maIOCtl_glFogfv_case(glFogfv);
-maIOCtl_glDrawArrays_case(glDrawArrays);
-maIOCtl_glTexParameterf_case(glTexParameterf);
-maIOCtl_glTexParameterx_case(glTexParameterx);
-maIOCtl_glClearDepthf_case(glClearDepthf);
-maIOCtl_glClearDepthx_case(glClearDepthx);
-maIOCtl_glShadeModel_case(glShadeModel);
-maIOCtl_glTexSubImage2D_case(glTexSubImage2D);
-maIOCtl_glClientActiveTexture_case(glClientActiveTexture);
-maIOCtl_glCopyTexImage2D_case(glCopyTexImage2D);
-maIOCtl_glTexCoordPointer_case(glTexCoordPointer);
-maIOCtl_glLightf_case(glLightf);
-maIOCtl_glLightx_case(glLightx);
-maIOCtl_glMaterialfv_case(glMaterialfv);
-maIOCtl_glMultMatrixx_case(glMultMatrixx);
-maIOCtl_glScalex_case(glScalex);
-maIOCtl_glDepthFunc_case(glDepthFunc);
-maIOCtl_glStencilFunc_case(glStencilFunc);
-maIOCtl_glEnableClientState_case(glEnableClientState);
-maIOCtl_glFrustumf_case(glFrustumf);
-maIOCtl_glDepthMask_case(glDepthMask);
-maIOCtl_glColor4f_case(glColor4f);
-maIOCtl_glStencilMask_case(glStencilMask);
-maIOCtl_glMatrixMode_case(glMatrixMode);
-maIOCtl_glPolygonOffset_case(glPolygonOffset);
-maIOCtl_glSampleCoverage_case(glSampleCoverage);
-maIOCtl_glFrustumx_case(glFrustumx);
-maIOCtl_glMaterialxv_case(glMaterialxv);
-maIOCtl_glCompressedTexSubImage2D_case(glCompressedTexSubImage2D);
-maIOCtl_glFogf_case(glFogf);
-maIOCtl_glFogx_case(glFogx);
-maIOCtl_glDrawElements_case(glDrawElements);
-maIOCtl_glDisableClientState_case(glDisableClientState);
-maIOCtl_glEnable_case(glEnable);
-maIOCtl_glMultMatrixf_case(glMultMatrixf);
-maIOCtl_glFinish_case(glFinish);
-maIOCtl_glHint_case(glHint);
-maIOCtl_glNormalPointer_case(glNormalPointer);
-maIOCtl_glScalef_case(glScalef);
-maIOCtl_glMaterialf_case(glMaterialf);
-maIOCtl_glMaterialx_case(glMaterialx);
-maIOCtl_glGetError_case(glGetError);
-maIOCtl_glClearStencil_case(glClearStencil);
-maIOCtl_glClearColor_case(glClearColor);
-maIOCtl_glOrthof_case(glOrthof);
-maIOCtl_glOrthox_case(glOrthox);
-maIOCtl_glColorPointer_case(glColorPointer);
-maIOCtl_glColor4x_case(glColor4x);
-maIOCtl_glReadPixels_case(glReadPixels);
-maIOCtl_glColorMask_case(glColorMask);
-maIOCtl_glDisable_case(glDisable);
-maIOCtl_glClearColorx_case(glClearColorx);
-maIOCtl_glVertexPointer_case(glVertexPointer);
-maIOCtl_glPolygonOffsetx_case(glPolygonOffsetx);
-maIOCtl_glPopMatrix_case(glPopMatrix);
-maIOCtl_glSampleCoveragex_case(glSampleCoveragex);
-maIOCtl_glActiveTexture_case(glActiveTexture);
-maIOCtl_glLightModelfv_case(glLightModelfv);
-maIOCtl_glClear_case(glClear);
-maIOCtl_glTranslatex_case(glTranslatex);
-maIOCtl_glLightfv_case(glLightfv);
-maIOCtl_glLightModelxv_case(glLightModelxv);
-maIOCtl_glLineWidth_case(glLineWidth);
-maIOCtl_glGetStringHandle_case(glGetStringHandle);
-maIOCtl_glCompressedTexImage2D_case(glCompressedTexImage2D);
-maIOCtl_glPushMatrix_case(glPushMatrix);
-maIOCtl_glBlendFunc_case(glBlendFunc);
-maIOCtl_glRotatef_case(glRotatef);
-maIOCtl_glRotatex_case(glRotatex);
-maIOCtl_glLightxv_case(glLightxv);
-maIOCtl_glDeleteTextures_case(glDeleteTextures);
-maIOCtl_glCopyTexSubImage2D_case(glCopyTexSubImage2D);
-maIOCtl_glPointSize_case(glPointSize);
-maIOCtl_glTranslatef_case(glTranslatef);
-maIOCtl_glPointSizex_case(glPointSizex);
+		maIOCtl_IX_OPENGL_ES_caselist;
 #endif	//SUPPORT_OPENGL_ES
 
 			maIOCtl_sinh_case(::sinh);
@@ -2154,12 +2190,14 @@ maIOCtl_glPointSizex_case(glPointSizex);
 	static HWND sMainWnd = NULL, sEditBox = NULL, sTextBox = NULL;
 	static wchar_t* sTextBoxOutBuf;
 	static int sTextBoxOutSize;
+	static const wchar_t* sTextBoxInBuf;
 
 	static INT_PTR CALLBACK TextBoxProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		LOGD("TextBoxProc 0x%p, 0x%04x, 0x%x, 0x%x\n", hwnd, uMsg, wParam, (uint)lParam);
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
+			SetWindowTextW(sEditBox, sTextBoxInBuf);
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:
@@ -2196,6 +2234,7 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		DEBUG_ASSERT(SDL_GetWMInfo(&info));
 		sMainWnd = info.window;
 
+		sTextBoxInBuf = (wchar_t*)inText;
 		sTextBoxOutSize = maxSize;
 		sTextBoxOutBuf = (wchar_t*)outText;
 
@@ -2222,11 +2261,12 @@ maIOCtl_glPointSizex_case(glPointSizex);
 		GLE(sTextBox);
 		ShowWindow(sTextBox, SW_SHOW);
 #else	// so we go with modal, for now.
-		DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+		int res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
-			
-		 // hack to fix issue 843.
-         if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))        // if left button is pressed
+		GLECUSTOM(res <= 0);
+
+		// hack to fix issue 843.
+		if(SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(1))	// if left button is pressed
 			PostMessage(sMainWnd, WM_LBUTTONUP, 0, 0);
 #endif
 #endif

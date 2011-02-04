@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _MAAPI_DEFS_H
 #define _MAAPI_DEFS_H
 
-#ifdef MAPIP
+#if defined(MAAPI_H) || defined(HAVE_IOCTL_ELLIPSIS)
 #define MA_IOCTL_ELLIPSIS , ...
 #else
 #define MA_IOCTL_ELLIPSIS
@@ -56,7 +56,11 @@ union MA_DV {
 	int i[2];
 #else	//everything else
 	struct {
+#ifdef __IPHONE__
+		int lo, hi;
+#else
 		int hi, lo;
+#endif
 	};
 #endif	//__MARM_ARMI__
 	long long ll;

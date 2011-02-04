@@ -990,7 +990,7 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 					if(msAddr+msLen>gMemSize) {
 						msLen-= (msAddr+msLen)-gMemSize;
 					}
-					if(msLen>0)
+					if(msLen > 0 && msAddr > 0)
 						spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
 				}
 			}

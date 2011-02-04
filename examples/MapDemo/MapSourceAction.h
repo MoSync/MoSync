@@ -35,7 +35,7 @@ namespace MapDemo
 	//=========================================================================
 	{
 	public:
-		MapSourceAction( MapWidget* widget, MapSourceKind& kind, MapSourceKind mapSourceKind, const char* label );
+		MapSourceAction( MapWidget* widget, MapSource* source, const char* label );
 		
 		virtual	~MapSourceAction( );
 		//
@@ -45,7 +45,7 @@ namespace MapDemo
 		
 		virtual Action* clone( ) const 
 		{ 
-			return newobject( MapSourceAction, new MapSourceAction( mWidget, mKind, mMapSourceKind, mLabel ) );
+			return newobject( MapSourceAction, new MapSourceAction( mWidget, mSource, mLabel ) );
 		}
 		
 	protected:
@@ -56,8 +56,7 @@ namespace MapDemo
 
 	private:
 		MapWidget* mWidget;
-		MapSourceKind& mKind;
-		MapSourceKind mMapSourceKind;
+		MapSource* mSource;
 		const char* mLabel;
 	};
 }

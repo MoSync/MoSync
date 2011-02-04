@@ -33,9 +33,76 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _SE_MSAB_MAUTIL_GRAPHICS_H_
 #define _SE_MSAB_MAUTIL_GRAPHICS_H_
 
+#include "GraphicsOpenGL.h"
+#include "GraphicsSoftware.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+//#define GRAPHICS_DEBUGGING
+#ifdef GRAPHICS_DEBUGGING
+#include <conprint.h>
+#define GRAPHICS_LOG(x, args...) lprintfln(x, ## args)
+#else
+#define GRAPHICS_LOG(x, ...)
+#endif
+
+typedef int MAFixed; // 16.16 fixed point
+
+typedef void (*SetupFunc)(int x, int y, int w, int h);
+typedef void (*SetClipRectFunc)(int x, int y, int w, int h);
+typedef void (*ClearMatrixFunc)(void);
+typedef void (*PushMatrixFunc)(void);
+typedef void (*PopMatrixFunc)(void);
+typedef void (*TranslateFunc)(int x, int y);
+typedef MAPoint2d (*GetTranslationFunc)(void);
+typedef void (*ScaleFunc)(MAFixed x, MAFixed y);
+typedef void (*PlotFunc)(int x, int y);
+typedef void (*LineFunc)(int x1, int y1, int x2, int y2);
+typedef void (*FillRectFunc)(int left, int top, int width, int height);
+typedef void (*DrawTextFunc)(int left, int top, const char* text);
+typedef void (*DrawTextWFunc)(int left, int top, const wchar_t* text);
+typedef void (*DrawImageFunc)(MAHandle image, int left, int top);
+typedef void (*DrawRGBFunc)(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
+typedef void (*DrawImageRegionFunc)(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+typedef void (*NotifyImageUpdated)(MAHandle image);
+typedef void (*BeginRendering)(void);
+typedef void (*UpdateScreen)(void);
+typedef void (*SetClearColor)(int r, int g, int b);
+typedef void (*SetColor)(int r, int g, int b);
+typedef void (*SetAlpha)(int a);
+
+
+typedef struct MAGraphicsDriver_t {
+	SetupFunc setup;
+	SetClipRectFunc setClipRect;
+	ClearMatrixFunc clearMatrix;
+	PushMatrixFunc pushMatrix;
+	PopMatrixFunc popMatrix;
+	TranslateFunc translate;
+	GetTranslationFunc getTranslation;
+	ScaleFunc scale;
+	PlotFunc plot;
+	LineFunc line;
+	FillRectFunc fillRect;
+	DrawTextFunc drawText;
+	DrawTextWFunc drawTextW;
+	DrawImageFunc drawImage;
+	DrawRGBFunc drawRGB;
+	DrawImageRegionFunc drawImageRegion;
+	NotifyImageUpdated notifyImageUpdated; // not very pretty (for opengl so that it knows that it has to update the texture again)
+	BeginRendering beginRendering;
+	UpdateScreen updateScreen;
+	SetClearColor setClearColor;	
+	SetColor setColor;
+	SetAlpha setAlpha;
+} MAGraphicsDriver;
+
+
+void Gfx_useDriver(MAGraphicsDriver* driver);
+
+void Gfx_setup(int x, int y, int w, int h);
 
 /** 
   * Clears the clip rect stack.
@@ -75,6 +142,8 @@ void Gfx_popMatrix(void);
 void Gfx_translate(int x, int y);
 MAPoint2d Gfx_getTranslation(void);
 
+void Gfx_scale(MAFixed x, MAFixed y);
+
 /**
 * Combines clipping and translation.
 * \see Gfx_intersectClipRect()
@@ -97,6 +166,16 @@ void Gfx_drawTextW(int left, int top, const wchar_t* text);
 void Gfx_drawImage(MAHandle image, int left, int top);
 void Gfx_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
 void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+
+void Gfx_notifyImageUpdated(MAHandle image);
+
+// when in opengl mode, clears the depth and color buffer.
+// software do nothing.
+void Gfx_beginRendering(void);
+void Gfx_updateScreen(void);
+void Gfx_setClearColor(int r, int g, int b);
+void Gfx_setColor(int r, int g, int b);
+void Gfx_setAlpha(int a);
 
 #ifdef __cplusplus
 }

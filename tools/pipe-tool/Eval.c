@@ -240,8 +240,8 @@ int GetOctoByte()
 		v <<= 3;		
 	}
 	
-	if (v > 255)
-		Error(Error_Skip, "Octal Overflow!");
+	//if (v > 255)
+	//	Error(Error_Skip, "Octal Overflow!");
 	
 	return (int) v;
 }
