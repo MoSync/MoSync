@@ -288,8 +288,8 @@ class RuntimeBuilder
                 raise Exception::new( "Failed to build MoRE" )
             end
 
-            if ( File::exists?( "#{workPath}/bin/moemu" ) == false )
-                raise Exception::new( "Could not find 'moemu'" )
+            if ( File::exists?( "#{workPath}/bin/MoRE" ) == false )
+                raise Exception::new( "Could not find 'MoRE'" )
             end
 
             #
@@ -298,7 +298,7 @@ class RuntimeBuilder
             printMsg( "Copying template package" )
             FileUtils.cd( workPath )
             filterCopy( "#{scriptPath}/linux/template", "#{workPath}", lambda { |f| f != ".svn" }  )
-            FileUtils.cp( "bin/moemu", "opt/%appname%/bin/run" )
+            FileUtils.cp( "bin/MoRE", "opt/%appname%/bin/run" )
             puts "OK"
             
 
