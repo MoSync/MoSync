@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _PLATFORM_H_
 
 #define MA_PROF_SUPPORT_LOCATIONAPI
+#define MA_PROF_SUPPORT_WIDGETAPI
 
 //#include <windows.h>
 #import <CoreGraphics/CoreGraphics.h>
@@ -53,8 +54,10 @@ class Surface {
 public:
 	static int fontSize;
 	
-	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {				
-		mDataRef = CGDataProviderCopyData(CGImageGetDataProvider(image));
+	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
+		CGDataProviderRef dpr = CGImageGetDataProvider(image);
+		mDataRef = CGDataProviderCopyData(dpr);
+		
 		this->data = (char *)CFDataGetBytePtr(mDataRef);		
 		width = CGImageGetWidth(image);
 		height = CGImageGetHeight(image);
@@ -69,6 +72,7 @@ public:
 		if(bpp != 32) {
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 			this->data = new char[width*height*4];
+			mOwnData = true;
 			rowBytes = width*4;
 			context = CGBitmapContextCreate(this->data, width, height, 8, rowBytes, colorSpace, kCGImageAlphaNoneSkipLast);
 			CGContextSetAllowsAntialiasing(context, false);
@@ -209,7 +213,7 @@ public:
 
 class EventQueue : public CircularFifo<MAEvent, EVENT_BUFFER_SIZE> {
 public:
-	EventQueue() : mEventOverflow(false), mWaiting(false) {
+	EventQueue() : CircularFifo<MAEvent, EVENT_BUFFER_SIZE>(), mEventOverflow(false), mWaiting(false) {
 		pthread_cond_init(&mCond, NULL);
 		pthread_mutex_init(&mMutex, NULL);
 	}
@@ -221,29 +225,31 @@ public:
 	
 	void handleInternalEvent(int type, void *e);
 
-	const MAEvent* getAndProcess() {
-		if(count()==0) return NULL;
-		const MAEvent& e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
+	bool getAndProcess(MAEvent& event) {
+		if(count()==0) return false;
+		MAEvent e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
 		if(e.type<0) {
 			handleInternalEvent(e.type, e.data);
-			return getAndProcess();
+			return getAndProcess(event);
 		} else {
-			return &e;
+			event = e;
+			return true;
 		}
 	}
 	
 	
 	void put(const MAEvent& e) {
 		CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::put(e);
-		//pthread_mutex_lock(&mMutex);	
+
+		pthread_mutex_lock(&mMutex);	
 		pthread_cond_signal(&mCond);
-		//pthread_mutex_unlock(&mMutex);
+		pthread_mutex_unlock(&mMutex);
 	}
 		
 	void wait(int ms) {
 		pthread_mutex_lock(&mMutex);
 		if(count()==0) {
-			if(ms!=0) {
+			if(ms>0) {
 				struct timeval now;
 				struct timespec timeout;	
 				gettimeofday(&now, NULL);
@@ -257,7 +263,7 @@ public:
 		pthread_mutex_unlock(&mMutex);	
 	}
 		
-	void addPointerEvent(int x, int y, int type) {
+	void addPointerEvent(int x, int y, int touchId, int type) {
 		if(!mEventOverflow) {
 			if(count() + 2 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 				mEventOverflow = true;
@@ -269,6 +275,7 @@ public:
 			event.type = type;
 			event.point.x = x;
 			event.point.y = y;
+			event.touchId = touchId;
 			put(event);
 		}		
 	}

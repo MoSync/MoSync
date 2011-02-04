@@ -27,12 +27,12 @@ include FileUtils::Verbose
 # <CONFIG_PATH>			: The path to where the config.h is located. If this is set the finished runtime will end up in this folder as well, other wise it will be in the project source root
 # <DEBUG>				: If this is set to anything they will use the configD.h file which is supposed to be at the <CONFIG_PATH>
 
-def exitBuilder(arg, config)
+def exitBuilder(arg, configDir, config)
 	if config != nil
 		# change name on config_platform.h.saved to config_platform.h if such file exists
-		conf_file = "/src/config_platform.h.saved"
+		conf_file = File.join(configDir, "config_platform.h.saved")
 		if File.exist? conf_file
-			copy_file "/src/config_platform.h.saved", "/src/config_platform.h"
+			FileUtils.copy_file conf_file, File.join(configDir, "config_platform.h")
 		end
 	end
 	exit Integer(arg)
@@ -75,10 +75,6 @@ if secondarg == nil
 	exit 1
 end
 
-# TODO: MOSYNC_ANDROID_API_LEVEL is not used I guess! Remove it.
-# Store the API level in the environment variable MOSYNC_ANDROID_API_LEVEL
-#ENV['MOSYNC_ANDROID_API_LEVEL'] = secondarg[-1, 1]
-
 debug = (fortharg == nil) ? "" : "D"
 
 outdir = ".."
@@ -87,16 +83,17 @@ if thirdarg != nil
 	
 	# change name on the current config_platform.h to config_platform.h.saved
 
-	conf_file = "src/config_platform.h"
+	conf_file = File.join(mosyncppsource, "config_platform.h")
 	if File.exist? conf_file
 		puts "saving config file"
-		copy_file "src/config_platform.h", "src/config_platform.h.saved"
+		FileUtils.copy_file conf_file, File.join(mosyncppsource, "config_platform.h.saved")
 	end
 
-	puts "using runtime #{thirdarg}config#{debug}.h"
+	runtime_config = File.join(thirdarg, "config#{debug}.h") 
+	puts "using runtime #{runtime_config}"
 	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
-	copy_file( "#{thirdarg}config#{debug}.h", "src/config_platform.h")
+	FileUtils.copy_file( runtime_config, conf_file)
 end
 
 
@@ -105,24 +102,23 @@ puts "Building native Library\n\n"
 cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
+	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
+	if (!success)
+		exitBuilder(1, mosyncppsource, thirdarg)
+	end
 
-	sh "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
-
-	sh "/cygwin/bin/bash.exe --login -i #{cpath}/cygwin.sh #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
-	sh("#{cpath}/invoke-ndk-build.sh #{firstarg} #{secondarg} $MOSYNC_SRC");
+	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
 
-# TODO: Delete commented out code when we are sure it is not needed.
-##puts "Preprocess Java Source Files\n\n"
+if (!success)
+	exitBuilder(1, mosyncppsource, thirdarg)
+end
 
 # Go to Android Java runtime root directory.
 cd ".."
 puts pwd
-
-# TODO: Delete commented out code when we are sure it is not needed.
-# Not used, there are no longer any .jpp files to build.
-#sh "ruby buildJava.rb"
 
 # Create temporary directory used for output.
 # First make sure delete it if it exists to make 
@@ -135,29 +131,43 @@ Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
-sh(
-	"#{secondarg}/tools/aapt package -f -v -M " +
-	"#{package_root}/AndroidManifest.xml -F resources.ap_ -I " +
-	"#{secondarg}/android.jar -S " +
-	"#{package_root}/res -m -J " +
-	"#{package_root}src")
-
+success = system(
+	"#{File.join(secondarg, "tools/aapt")} package -f -v " +
+	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
+	"-I #{File.join(secondarg, "android.jar")} " +
+	"-S #{File.join(package_root, "res")} " +
+	"-m -J #{File.join(package_root, "src")}");
+	
 puts "Compile Java Source Files\n\n"
+
+packages = ["src/com/mosync/java/android/*.java",
+            "src/com/mosync/internal/android/*.java",
+            "src/com/mosync/internal/generated/*.java",
+            "src/com/mosync/nativeui/core/*.java",
+			"src/com/mosync/nativeui/ui/egl/*.java",
+            "src/com/mosync/nativeui/ui/factories/*.java",
+            "src/com/mosync/nativeui/ui/widgets/*.java",
+            "src/com/mosync/nativeui/util/*.java",
+            "src/com/mosync/nativeui/util/properties/*.java"
+            ]
+
+# Concatenate each list element with package_root, and flatten the list to a string
+java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
 
 # Compile all the java files into class files
 sh(
 	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
-	"#{secondarg}/android.jar " +
-	"#{package_root}/src/com/mosync/java/android/*.java " +
-	"#{package_root}/src/com/mosync/internal/android/*.java " +
-	"#{package_root}/src/com/mosync/internal/generated/*.java")
+	"#{File.join(secondarg, "android.jar")} " + java_files)
 
+if (!success)
+	exitBuilder(1, mosyncppsource, thirdarg)
+end
 
 puts "Copy Generated Library File\n\n"
 
 # copy the library file
-copy_file( "#{cpath}/AndroidProject/libs/armeabi/libmosync.so", "temp/libmosync.so")
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
 
 puts "Build Zip Package\n\n"
 
@@ -167,12 +177,20 @@ cd "temp"
 if ENV['OS'] == "Windows_NT"
 	sh("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
 else
-	sh("zip -r MoSyncRuntime#{debug}.zip .");
+	success = system("zip -r MoSyncRuntime#{debug}.zip .");
+end
+if (!success)
+	exitBuilder(1, mosyncppsource, thirdarg)
 end
 
-copy_file( "MoSyncRuntime#{debug}.zip", "#{outdir}/MoSyncRuntime#{debug}.zip")
+FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", File.join(outdir, "MoSyncRuntime#{debug}.zip"))
 
 cd ".."
 
 # Delete temp dir.
-rm_rf class_dir
+FileUtils.rm_rf class_dir
+
+if (!success)
+	exitBuilder(0, mosyncppsource, thirdarg)
+end
+

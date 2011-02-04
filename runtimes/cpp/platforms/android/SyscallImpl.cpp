@@ -25,8 +25,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/fifo.h>
 
 #include <jni.h>
+#include <GLES/gl.h>
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
+#include "helpers/CPP_IX_OPENGL_ES.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
@@ -34,10 +36,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define SYSLOG(...)
 
 namespace Base
-{
+{	
 	Syscall* gSyscall;
 
-	JNIEnv* mJNIEnv;
+	JNIEnv* mJNIEnv = 0;
 	jobject mJThis;
 	
 	static ResourceArray gResourceArray;
@@ -122,15 +124,40 @@ namespace Base
 	{
 		SYSLOG("loadBinary");
 		
+		char* b = (char*)malloc(200);
+		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		free(b);
+		
+		char* buffer = (char*)malloc(size);
+		jobject byteBuffer = mJNIEnv->NewDirectByteBuffer((void*)buffer, size);
+		
+		if(byteBuffer == NULL) return NULL;
+		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(II)Ljava/nio/ByteBuffer;");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(ILjava/nio/ByteBuffer;)Z");
 		if (methodID == 0) return NULL;
-		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex, size);
-		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
-
+		
+		jboolean ret = mJNIEnv->CallBooleanMethod(mJThis, methodID, resourceIndex, byteBuffer);
+		
 		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(jo);		
+		mJNIEnv->DeleteLocalRef(byteBuffer);
+
+		if(ret == false)
+		{
+			free(buffer);
+			return NULL;
+		}
 		return buffer;
+	}
+	
+	int Syscall::loadBinaryStore(int resourceIndex, int size)
+	{
+		char* b = (char*)malloc(200);
+		sprintf(b, "loadBinaryStore index:%d size:%d", resourceIndex, size);
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		free(b);
+		return maCreateData(resourceIndex, size);
 	}
 
 	void Syscall::loadUBinary(int resourceIndex, int offset, int size)
@@ -143,6 +170,27 @@ namespace Base
 		mJNIEnv->CallVoidMethod(mJThis, methodID, resourceIndex, offset, size);
 		
 		mJNIEnv->DeleteLocalRef(cls);
+	}
+	
+	bool Syscall::destroyBinaryResource(int resourceIndex)
+	{
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "destroyBinary", "(I)Ljava/nio/ByteBuffer;");
+		if (methodID == 0) return false;
+		
+		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, resourceIndex);
+		bool destroyed = false;
+		if(jo != NULL)
+		{
+			char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+			free(buffer);
+			destroyed = true;
+		}
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jo);
+		
+		return destroyed;
 	}
 	
 	void Syscall::destroyResource(int resourceIndex)
@@ -188,7 +236,7 @@ namespace Base
 		mJNIEnv = je;
 		mJThis = jthis;
 	}
-	
+
 	void Syscall::postEvent(MAEvent event)
 	{
 		SYSLOG("PostEvent");
@@ -662,18 +710,13 @@ namespace Base
 		SYSLOG("maReadStore");
 			
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maReadStore", "(II)Ljava/nio/ByteBuffer;");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maReadStore", "(II)I");
 		if (methodID == 0) ERROR_EXIT;
-		jobject ob = mJNIEnv->CallObjectMethod(mJThis, methodID, store, placeholder);
-		char* buffer = (char*)mJNIEnv->GetDirectBufferAddress(ob);
-		MemStream* ms = new MemStream(buffer, (int)mJNIEnv->GetDirectBufferCapacity(ob));
-
-		if(SYSCALL_THIS->resources.add_RT_BINARY(placeholder, ms) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
-
-		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(ob);
+		jint res = mJNIEnv->CallIntMethod(mJThis, methodID, store, placeholder);
 		
-		return RES_OK;
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		return res;
 	}
 
 	SYSCALL(void,  maCloseStore(MAHandle store, int remove))
@@ -723,11 +766,6 @@ namespace Base
 		
 		int rdst = (int)dst - (int)gCore->mem_ds;
 		
-		char* b = (char*)malloc(200);
-		sprintf(b,"dst: %i",rdst);
-		SYSLOG(b);
-		free(b);
-		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnRead", "(III)V");
 		if (methodID == 0) ERROR_EXIT;
@@ -742,11 +780,6 @@ namespace Base
 		SYSLOG("maConnWrite");
 	 
 		int rsrc = (int)src - (int)gCore->mem_ds;
-	 
-		char* b = (char*)malloc(200);
-		sprintf(b,"src: %i",rsrc);
-		SYSLOG(b);
-		free(b);
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maConnWrite", "(III)V");
@@ -1074,6 +1107,78 @@ namespace Base
 		SYSLOG("maInvokeExtension NOT IMPLEMENTED");
 		return -1;
 	}
+	
+	// Temporary kludge to include the implementation of glString,
+	// a better solution would be to get a .h generated and
+	// then add gl.h.cpp to the list of files.
+	#include <generated/gl.h.cpp>
+	
+	// Maybe the wrapper generator shouldn't the three functions
+	// below, so that we can specify them in the ioctl switch.
+	// For now, wrap them here and call functions in ioctl.h.
+	
+	/**
+	 * Internal wrapper for maOpenGLTexImage2D that
+	 * calls the real implementation _maOpenGLTexImage2D
+	 * in ioctl.h.
+	 * 
+	 * @param image The image to load as a texture.
+	 */
+	int maOpenGLTexImage2D(MAHandle image)
+	{
+		return _maOpenGLTexImage2D(image, mJNIEnv, mJThis); 
+	}
+	
+	/**
+	 * Internal wrapper for maOpenGLTexSubImage2D that
+	 * calls the real implementation _maOpenGLTexSubImage2D
+	 * in ioctl.h.
+	 * 
+	 * @param image The image to load as a texture.
+	 */
+	int maOpenGLTexSubImage2D(MAHandle image)
+	{
+		return _maOpenGLTexSubImage2D(image, mJNIEnv, mJThis); 
+	}
+	
+	/**
+	 * Internal wrapper for maOpenGLInitFullscreen that
+	 * calls the real implementation _maOpenGLInitFullscreen
+	 * in ioctl.h.
+	 */
+	int maOpenGLInitFullscreen()
+	{
+		return _maOpenGLInitFullscreen();
+	}
+	
+	/**
+	 * Internal wrapper for maOpenGLCloseFullscreen that
+	 * calls the real implementation _maOpenGLCloseFullscreen
+	 * in ioctl.h.
+	 */
+	int maOpenGLCloseFullscreen()
+	{
+		return _maOpenGLCloseFullscreen();
+	}
+	
+	/**
+	 * Utility function for displaying and catching pending
+	 * exceptions.
+	 */
+	static void handlePendingExceptions(JNIEnv* env)
+	{
+		jthrowable exc;
+		exc = env->ExceptionOccurred();
+		if (exc) 
+		{
+			__android_log_write(
+								ANDROID_LOG_INFO, 
+								"@@@ MoSync", 
+								"Found pending exception");
+			env->ExceptionDescribe();
+			env->ExceptionClear();
+		}
+	}
 
 	/**
 	* Call one of the platform dependant syscalls. For more information about each of these syscalls,
@@ -1095,8 +1200,11 @@ namespace Base
 	{
 		SYSLOG("maIOCtl");
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl");
+		//handlePendingExceptions(mJNIEnv);
 		
-		switch(function) {
+		switch(function)
+		{
+		maIOCtl_IX_OPENGL_ES_caselist
 		
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1449,6 +1557,64 @@ namespace Base
 				mJNIEnv, 
 				mJThis);
 		}
+
+		case maIOCtl_maWidgetCreate:
+			SYSLOG("maIOCtl_maWidgetCreate");
+			return _maWidgetCreate(SYSCALL_THIS->GetValidatedStr(a), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetDestroy:
+			SYSLOG("maIOCtl_maWidgetDestroy");
+			return _maWidgetDestroy(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetAddChild:
+			SYSLOG("maIOCtl_maWidgetAddChild");
+			return _maWidgetAddChild(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetRemoveChild:
+			SYSLOG("maIOCtl_maWidgetRemoveChild");
+			return _maWidgetRemoveChild(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetSetProperty:
+			SYSLOG("maIOCtl_maWidgetSetProperty");
+			return _maWidgetSetProperty(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetProperty:
+		{
+			SYSLOG("maIOCtl_maWidgetGetProperty");
+			int _widget = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c, 
+				_valueBufferSize * sizeof(char));
+			
+			return _maWidgetGetProperty((int)gCore->mem_ds, _widget, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maWidgetScreenShow:
+			SYSLOG("maIOCtl_maWidgetScreenShow");
+			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetEvaluateScript:
+			SYSLOG("maIOCtl_maWidgetEvaluateScript");
+			return _maWidgetEvauluateScript(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetGetMessageData:
+		{
+			SYSLOG("maIOCtl_maWidgetGetMessageData");
+			
+			int memStart = (int) gCore->mem_ds;
+			int _messageId = a;
+			int _messageBufferSize = c;
+			int _messageBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(b, _messageBufferSize * sizeof(char));
+			
+			return _maWidgetGetMessageData(memStart, 
+										   _messageId, 
+										   _messageBuffer, 
+										   _messageBufferSize, 
+										   mJNIEnv, 
+										   mJThis);
+		}
 		
 		case maIOCtl_maNotificationAdd:
 			SYSLOG("maIOCtl_maNotificationAdd");
@@ -1520,6 +1686,14 @@ namespace Base
 			// 0 = events off
 			return _maScreenStateEventsOnOff(0, mJNIEnv, mJThis);
 		
+		case maIOCtl_maMessageBox:
+			SYSLOG("maIOCtl_maMessageBox");
+			return _maMessageBox(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),				
+				mJNIEnv, 
+				mJThis);
+				
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;

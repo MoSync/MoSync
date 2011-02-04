@@ -433,6 +433,7 @@ namespace Base {
 			event.type = eventType;
 			event.point.x = x;
 			event.point.y = y;
+			event.touchId = 0;
 			gEventFifo.put(event);
 		}
 	}

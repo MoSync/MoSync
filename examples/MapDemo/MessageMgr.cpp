@@ -18,6 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mavsprintf.h>
 
 #include "MessageMgr.h"
+#include <MAP/Broadcaster.h>
+
+using namespace MAPUtil;
 
 namespace MapDemoUtil
 {
@@ -64,8 +67,9 @@ namespace MapDemoUtil
 	void MessageMgr::onMessagePosted( )
 	//-------------------------------------------------------------------------
 	{
-		int count = mListeners.size( );
+		Vector<IMessageListener*>* listeners = getBroadcasterListeners<IMessageListener>( *this );
+		int count = listeners->size( );
 		for ( int i = 0; i < count; i++ )
-			mListeners[i]->messagePosted( this );
+			(*listeners)[i]->messagePosted( this );
 	}
 }

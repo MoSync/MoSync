@@ -18,7 +18,11 @@ void *_dgles_platform_open(void)
 
 void *_dgles_platform_sym(void *handle, const char *name)
 {
-	return GetProcAddress((HINSTANCE) handle, name);
+	void* procAddr = GetProcAddress((HINSTANCE) handle, name);
+	if(!procAddr) {
+		procAddr = wglGetProcAddress(name);
+	}
+	return procAddr;
 }
 
 void _dgles_platform_close(void *h)

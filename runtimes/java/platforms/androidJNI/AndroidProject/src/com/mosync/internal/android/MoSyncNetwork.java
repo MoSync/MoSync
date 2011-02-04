@@ -937,10 +937,9 @@ public class MoSyncNetwork
 						// Byte array with data to write.
 						byte[] data = new byte[size];
 						
-						// Get data to write.
+						// Get and write data.
+						byteBuffer.position(offset);
 						byteBuffer.get(data);
-						
-						// Write byte array to stream.
 						getOutputStream().write(data);
 						
 						// Post event.

@@ -4,9 +4,14 @@
 /* $Id: gl.h 4533 2007-11-26 11:19:35Z markc $ */
 
 #include <ma.h>
-#include <GLES\glplatform.h>
+#include <GLES/glplatform.h>
 
-typedef void* MAAddress;
+#ifndef __cplusplus
+typedef union MA_DV MA_DV;
+typedef union MA_FV MA_FV;
+#endif
+
+//typedef void* MAAddress;
 #include "IX_OPENGL_ES.H"
 
 #ifdef __cplusplus
@@ -47,6 +52,7 @@ extern "C" {
 ** compliant with the OpenGL(R) version 1.2.1 Specification.
 */
 
+/*
 typedef unsigned int    GLenum;
 typedef unsigned char   GLboolean;
 typedef unsigned int    GLbitfield;
@@ -65,6 +71,7 @@ typedef int             GLclampx;
 
 typedef int             GLintptr;
 typedef int             GLsizeiptr;
+*/
 
 
 /*************************************************************/
@@ -581,8 +588,6 @@ typedef int             GLsizeiptr;
 #define GL_DOT3_RGBA                      0x86AF
 
 /*************************************************************/
-
-#include "magl_functions.h"
 
 #ifdef __cplusplus
 }

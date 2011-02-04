@@ -1,0 +1,20 @@
+.res R_ICON
+.image "res/list_img.png"
+
+.res R_NEWS
+.image "res/expressen.png"
+
+.res R_PICS
+.image "res/bildspel.png"
+
+.res R_START
+.image "res/startfalt.png"
+
+.res R_TV
+.image "res/tv.png"
+
+.res R_RESULTS
+.image "res/resultat.png"
+
+.res R_TEXTURE
+.image "res/texture.png"
