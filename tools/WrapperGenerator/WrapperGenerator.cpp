@@ -97,7 +97,9 @@ int main(int argc, char **argv) {
 
 	string xmlName = System::genstr("%s.xml", header);
 
-	if(system(System::genstr(" ~/Downloads/gccxml_build/bin/gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str()).c_str()) != 0)
+	string cmd = System::genstr("gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str());
+	printf("%s\n", cmd.c_str());
+	if(system(cmd.c_str()) != 0)
 		System::error("gccxml failed\n");
 	Parser::parse(xmlName.c_str(), bases);
 
