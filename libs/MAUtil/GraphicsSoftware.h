@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define _NO_OLDNAMES	//avoid conflicts with y1()
 #include <ma.h>
- 
+
 #ifndef _SE_MSAB_MAUTIL_GRAPHICS_SOFTWARE_H_
 #define _SE_MSAB_MAUTIL_GRAPHICS_SOFTWARE_H_
 
