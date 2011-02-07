@@ -20,29 +20,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <windows.h>
 #include <process.h>
 
-#ifdef __GNUC__
 #include <helpers/attribute.h>
-#endif
 
 using namespace std;
 
-#ifdef __GNUC__
-void error(const char *message) GCCATTRIB(noreturn);
-void notify(const char *message);
-bool invoke_bat(const char *file);
-bool exists(const char* filename);
-#endif
-
-void error(const char *message) {
+static void error(const char *message) GCCATTRIB(noreturn);
+static void error(const char *message) {
 	MessageBox(NULL, message, "MoSyncUpdater error", MB_OK | MB_ICONERROR); 
 	exit(1);
 }
 
-void notify(const char *message) {
+static void notify(const char *message) {
 	MessageBox(NULL, message, "MoSyncUpdater", MB_OK | MB_ICONINFORMATION); 
 }
 
-bool invoke_bat(const char *file) {
+static bool invoke_bat(const char *file) {
 	SHELLEXECUTEINFO si;
 	memset(&si,0,sizeof(si));
 	si.cbSize=sizeof(si);
@@ -67,7 +59,7 @@ bool invoke_bat(const char *file) {
 	return false;
 }
 
-bool exists(const char* filename) {
+static bool exists(const char* filename) {
 	FILE* file = fopen(filename, "rb");
 	if(file == NULL) {
 		return false;
