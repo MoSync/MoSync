@@ -48,11 +48,10 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	inline static double Resolution( MagnificationType magnification)
+	inline static double Resolution( MagnificationType magnification )
 	//-------------------------------------------------------------------------
 	{
-		//return InitialResolution / ( 1 << magnification );
-		return pow(2.0, (double)magnification);
+		return InitialResolution / pow(2.0, (double)magnification);
 	}
 
 	//-------------------------------------------------------------------------
@@ -74,7 +73,6 @@ namespace MAP
 	//-------------------------------------------------------------------------
 	{
 		lon = metersX / OriginShift * 180.0;
-
 		lat = 360.0 / PI * atan( exp( metersY * PI / OriginShift ) ) - 90.0;
 	}
 
@@ -166,13 +164,16 @@ namespace MAP
 	{
 		double meterX, meterY;
 		TileCenter( getTileSize( ), tile.getX( ), tile.getY( ), tile.getMagnification( ), meterX, meterY );
+		
 		double pixelX, pixelY;
 		MetersToPixels( meterX, meterY, tile.getMagnification( ), pixelX, pixelY );
 		pixelX += offsetX;
 		pixelY -= offsetY; // google maps y coords increase up
 		PixelsToMeters( pixelX, pixelY, tile.getMagnification( ), meterX, meterY );
+		
 		double lon, lat;
 		MetersToLonLat( meterX, meterY, lon, lat );
+		
 		return LonLat( lon, lat );
 	}
 
@@ -204,7 +205,7 @@ namespace MAP
 				centerpoint.lon,
 				tileXY.getMagnification( ),
 				tileSize,
-				tileSize + 30, // this will cut out the source notice at the bottom of each tile
+				tileSize + bottomCrop, // this will cut out the source notice at the bottom of each tile
 				maptype,
 				ApiKey
 				);
