@@ -1,82 +1,23 @@
-//
-//  IWidget.mm
-//  nativeuitest
-//
-//  Created by Niklas Nummelin on 11/26/10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
-//
+/* Copyright (C) 2011 MoSync AB
+ 
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 #import "IWidget.h"
 #import "UIColor-Expanded.h"
 #import <objc/runtime.h>
-
-/*
-@interface NSObject (NSObjectMixin) 
-- (void) injectMixin: (Class) mixin;
-@end
-
-@implementation NSObject (NSObjectMixin) 
-
-- (void) injectMixinOn: (Class)object with:(Class) mixin
-{
-	NSString *prefix = @"__";
-	unsigned count;
-	Method *methods = class_copyMethodList(mixin, &count);
-	for(int i = 0; i < count; i++) {
-		Method method = methods[i];
-		SEL name = method_getName(method);
-		IMP imp = method_getImplementation(method);
-		const char* types = method_getTypeEncoding(method);
-		BOOL added = class_addMethod(object, name, imp, types);
-		if(!added) {
-			IMP originalImp = class_getMethodImplementation(object, name);
-			class_replaceMethod(object, name, imp, types);
-			SEL originalName = NSSelectorFromString([NSString stringWithFormat:@"%@%s", prefix, name]);
-			class_addMethod(object, originalName, originalImp, types);
-		}
-	}
-}
-@end
-*/
-
-/*
-@interface UIView (UIViewExpanded)
-- (void) mosynclayoutSubviews;
-@end
-
-@implementation UIView (UIViewExpanded)
-- (void) mosynclayoutSubviews {
-	int newWidth = self.frame.size.width;
-	int newHeight = self.frame.size.height;
-	
-	if(self.autoresizingMask&UIViewAutoresizingFlexibleWidth) {
-		newWidth = self.superview.frame.size.width;
-	}
-	
-	if(self.autoresizingMask&UIViewAutoresizingFlexibleHeight) {
-		newHeight = self.superview.frame.size.height;
-	}
-	
-	[self setFrame: CGRectMake(self.frame.origin.x, self.frame.origin.y, newWidth, newHeight)];
-	//[self setBounds: CGRectMake(0, 0, newWidth, newHeight)];
-	
-	for (UIView *child in self.subviews)
-    {
-		[child setNeedsLayout];
-	}
-	
-}
-@end
-
-@implementation UISearchBar (UISearchBarExpanded)
-
-- (void) layoutSubviews {
-	[super layoutSubviews];			
-	[self mosynclayoutSubviews];	
-}
-
-@end
-*/
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -91,14 +32,6 @@
 @end
 
 @implementation IWidget
-
-+ (void)load {
-	//[UIView override_layoutSubviews];
-	//[UISearchBar override_layoutSubviews];
-	//[AbstractLayoutView override_layoutSubviews];
-	
-	
-}
 
 - (id)init {
 	[super init];
