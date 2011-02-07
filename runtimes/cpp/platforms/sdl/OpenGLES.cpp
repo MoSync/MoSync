@@ -5,14 +5,9 @@
 
 namespace Base {
 
-#ifdef __GNUC__
-BOOL RegisterWindowClass (CHAR* className, HINSTANCE hInstance)	;
-LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-#endif
-
 	struct SubViewData {
 		HWND window;
-		HGLRC           hRC;							// Permanent Rendering Context
+		HGLRC hRC;	// Permanent Rendering Context
 	};
 
 #define CHILD_IDENTIFIER 100
@@ -22,11 +17,11 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	static HWND sMainWnd;
 
-	LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	static LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		switch (uMsg)														// Evaluate Window Message
+		switch (uMsg)	// Evaluate Window Message
 		{
-		case WM_PAINT: 
+		case WM_PAINT:
 			{
 				return 0;
 			}
@@ -35,23 +30,23 @@ LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc (hWnd, uMsg, wParam, lParam);		
 	}
 
-	BOOL RegisterWindowClass (CHAR* className, HINSTANCE hInstance)						// Register A Window Class For This Application.
-	{																		// TRUE If Successful
+	static BOOL RegisterWindowClass (CHAR* className, HINSTANCE hInstance)	// Register A Window Class For This Application.
+	{	// TRUE If Successful
 		// Register A Window Class
-		WNDCLASSEX windowClass;												// Window Class
-		ZeroMemory (&windowClass, sizeof (WNDCLASSEX));						// Make Sure Memory Is Cleared
-		windowClass.cbSize			= sizeof (WNDCLASSEX);					// Size Of The windowClass Structure
-		windowClass.style			= CS_HREDRAW | CS_VREDRAW | CS_OWNDC;	// Redraws The Window For Any Movement / Resizing
-		windowClass.lpfnWndProc		= (WNDPROC)(WindowProc);				// WindowProc Handles Messages
-		windowClass.hInstance		= hInstance;				// Set The Instance
-		windowClass.hbrBackground	= (HBRUSH)(COLOR_APPWORKSPACE);			// Class Background Brush Color
-		windowClass.hCursor			= LoadCursor(NULL, IDC_ARROW);			// Load The Arrow Pointer
-		windowClass.lpszClassName	= "test";				// Sets The Applications Classname
-		if (RegisterClassEx (&windowClass) == 0)							// Did Registering The Class Fail?
+		WNDCLASSEX windowClass;	// Window Class
+		ZeroMemory(&windowClass, sizeof (WNDCLASSEX));	// Make Sure Memory Is Cleared
+		windowClass.cbSize = sizeof (WNDCLASSEX);	// Size Of The windowClass Structure
+		windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;	// Redraws The Window For Any Movement / Resizing
+		windowClass.lpfnWndProc = (WNDPROC)(WindowProc);	// WindowProc Handles Messages
+		windowClass.hInstance = hInstance;	// Set The Instance
+		windowClass.hbrBackground = (HBRUSH)(COLOR_APPWORKSPACE);	// Class Background Brush Color
+		windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);	// Load The Arrow Pointer
+		windowClass.lpszClassName = "test";	// Sets The Applications Classname
+		if (RegisterClassEx (&windowClass) == 0)	// Did Registering The Class Fail?
 		{
-			return FALSE;													// Return False (Failure)
+			return FALSE;	// Return False (Failure)
 		}
-		return TRUE;														// Return True (Success)
+		return TRUE;	// Return True (Success)
 	}
 
 	bool subViewOpen(int left, int top, int width, int height, SubView& out) {

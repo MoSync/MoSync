@@ -110,6 +110,7 @@ namespace Base {
 			case Seek::Start: lm = SEEK_SET; break;
 			case Seek::Current: lm = SEEK_CUR; break;
 			case Seek::End: lm = SEEK_END; break;
+			default: DEBIG_PHAT_ERROR;
 		}
 		LTEST(lseek(mFd, offset, lm));
 		return true;
