@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <idl-common/tokenizer.h>
 #include <idl-common/stringFunctions.h>
 #include <idl-common/types.h>
+#include <idl-common/output-bindings.h>
 
 #include "helpers/mkdir.h"
 
@@ -137,8 +138,10 @@ int main() {
 		// Generate core constants.
 		outputCoreConsts();
 		
-		// TODO: Generate bindings for Lua.
-		//outputLuaBindings(maapi);
+		// Generate headefile suitable for use with the tolua binding library.
+		// See comment in output-bindings.h for notes on how to use thsi file 
+		// with tolua.
+		lua_outputHeaderFile(maapi, ixs, "Output/lua_maapi.pkg");
 
 		// Create directory for include files.
 		// TODO: Document how this directory is used.

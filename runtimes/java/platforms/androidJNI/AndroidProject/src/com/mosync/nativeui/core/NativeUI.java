@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.ui.factories.ViewFactory;
@@ -268,7 +269,11 @@ public class NativeUI
 		}
 	}
 	
-	public int maWidgetGetProperty(int widgetHandle, String key, int memBuffer, int memBufferSize)
+	public int maWidgetGetProperty(
+		int widgetHandle, 
+		String key, 
+		int memBuffer, 
+		int memBufferSize)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
@@ -285,12 +290,15 @@ public class NativeUI
 		}
 		
 		byte[] ba = result.getBytes();
-		
-		MoSync.mMoSyncThread.mMemDataSection.mark( );
-		MoSync.mMoSyncThread.mMemDataSection.position( memBuffer );
-		MoSync.mMoSyncThread.mMemDataSection.put( ba );
-		MoSync.mMoSyncThread.mMemDataSection.put( (byte)0 );
-		MoSync.mMoSyncThread.mMemDataSection.reset( );
+
+		// Write string to MoSync memory.
+		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread();
+		// Commented out mark and reset, because we should not use them.
+		//mosyncThread.mMemDataSection.mark( );
+		mosyncThread.mMemDataSection.position( memBuffer );
+		mosyncThread.mMemDataSection.put( ba );
+		mosyncThread.mMemDataSection.put( (byte)0 );
+		//mosyncThread.mMemDataSection.reset( );
 		
 		return result.length( );
 	}
