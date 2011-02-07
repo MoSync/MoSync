@@ -319,7 +319,7 @@ void removeTouch(UITouch* touch) {
 	//passwordImage.frame = CGRectMake(11,79,262,31);
 	//[passwordAlert addSubview:passwordImage];
 	
-	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(16,63,252,25)];
+	UITextField *textField = [[UITextField alloc] initWithFrame:CGRectMake(16,50,252,25)];
 	textField.font = [UIFont systemFontOfSize:18];
 	textField.backgroundColor = [UIColor whiteColor];
 	textField.secureTextEntry = (textBoxData.constraints&MA_TB_FLAG_PASSWORD)?YES:NO; // password mode?
@@ -331,7 +331,7 @@ void removeTouch(UITouch* touch) {
 	
 	textBoxData.textField = textField;
 	
-	[textBoxAlert setTransform:CGAffineTransformMakeTranslation(0,109)];
+	//[textBoxAlert setTransform:CGAffineTransformMakeTranslation(0,109)];
 	[textBoxAlert show];
 	[textBoxAlert release];
 	[textField release];
