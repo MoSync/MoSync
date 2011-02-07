@@ -36,6 +36,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_URL;
 
 import java.nio.CharBuffer;
 
+import com.mosync.internal.android.MoSyncThread;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
@@ -69,6 +71,10 @@ public class TextBox extends Activity implements OnClickListener {
 	private TextView mLabel;
 	private int mOutputMemPtr;
 	private int mConstraints;
+	
+	/**
+	 * Constructor.
+	 */
 	
 	/**
 	* Converts MoSync input constraints android ones.
@@ -217,7 +223,7 @@ public class TextBox extends Activity implements OnClickListener {
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
 		event[1] = 0;
 		event[2] = 0;
-		MoSync.mMoSyncThread.postEvent(event);
+		MoSyncThread.getInstance().postEvent(event);
 	}
 	
 	@Override
@@ -242,15 +248,17 @@ public class TextBox extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View v) {
+		MoSyncThread mosyncThread = MoSyncThread.getInstance();
+		
 		if( v.getId() == mOkButton.getId() ) {
 			Log.i("InputBox", "OK clicked.");
 			String output = mEdit.getText().toString();
 			
 			// Write text directly to the MoSync memory
 			char[] ca = output.toCharArray();
-			MoSync.mMoSyncThread.mMemDataSection.position(mOutputMemPtr);
+			mosyncThread.mMemDataSection.position(mOutputMemPtr);
 			
-			CharBuffer cb = MoSync.mMoSyncThread.mMemDataSection.asCharBuffer();
+			CharBuffer cb = mosyncThread.mMemDataSection.asCharBuffer();
 			cb.put(ca);
 			cb.put((char)0);
 			
@@ -259,7 +267,7 @@ public class TextBox extends Activity implements OnClickListener {
 			event[0] = EVENT_TYPE_TEXTBOX;
 			event[1] = MA_TB_RES_OK;
 			event[2] = output.length();
-			MoSync.mMoSyncThread.postEvent(event);
+			mosyncThread.postEvent(event);
 			
 			Log.i("InputBox", "event" + output.length());
 			Log.i("InputBox", "event" + event[1]);
@@ -272,16 +280,16 @@ public class TextBox extends Activity implements OnClickListener {
 			
 			// Write text directly to the MoSync memory
 			byte[] ba = output.getBytes();
-			MoSync.mMoSyncThread.mMemDataSection.position(mOutputMemPtr);
-			MoSync.mMoSyncThread.mMemDataSection.put(ba);
-			MoSync.mMoSyncThread.mMemDataSection.put((byte)0);
+			mosyncThread.mMemDataSection.position(mOutputMemPtr);
+			mosyncThread.mMemDataSection.put(ba);
+			mosyncThread.mMemDataSection.put((byte)0);
 			
 			// Notice that the user clicked cancel
 			int[] event = new int[3];
 			event[0] = EVENT_TYPE_TEXTBOX;
 			event[1] = MA_TB_RES_CANCEL;
 			event[2] = 0;
-			MoSync.mMoSyncThread.postEvent(event);
+			mosyncThread.postEvent(event);
 			
 			finish();
 		}

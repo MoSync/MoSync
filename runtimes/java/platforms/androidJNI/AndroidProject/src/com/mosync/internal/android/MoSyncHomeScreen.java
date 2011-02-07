@@ -20,6 +20,8 @@ package com.mosync.internal.android;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_HIDDEN;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_SHOWN;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -37,6 +39,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -49,7 +52,23 @@ public class MoSyncHomeScreen
 	/**
 	 * The MoSync thread object.
 	 */
-	MoSyncThread mMoSyncThread;
+	private MoSyncThread mMoSyncThread;
+	
+	/**
+	 * Keeps track of whether the wallpaper has been set by MoSync.
+	 * This is used to know when to set/restore the old wallpaper.
+	 */
+	private boolean mHasWallpaperBeenSet;
+	
+	/**
+	 * Local filename for storing the wallpaper.
+	 */
+	private static String sOriginalWallpaperFileName = "OriginalWallpaper.data";
+	
+	// TODO: Create constants for these values in maapi.idl.
+	private static int WALLPAPER_OK = 0;
+	private static int WALLPAPER_NOT_FOUND = -2;
+	private static int WALLPAPER_OUT_OF_MEMORY = -3;
 
 	/**
 	 * Constructor.
@@ -58,6 +77,7 @@ public class MoSyncHomeScreen
 	public MoSyncHomeScreen(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
+		mHasWallpaperBeenSet = false;
 	}
 	
 	/**
@@ -70,7 +90,9 @@ public class MoSyncHomeScreen
 	
 	/**
 	 * Set the background image of the phone's home screen.
-	 * @param data Handle to an image object (PNG of JPEG)
+	 * @param data Handle to an image object (PNG of JPEG).
+	 * @return WALLPAPER_OK on success, WALLPAPER_NOT_FOUND 
+	 * or WALLPAPER_OUT_OF_MEMORY on error.
 	 */
 	int maWallpaperSet(final int handle)
 	{
@@ -78,8 +100,38 @@ public class MoSyncHomeScreen
 		
 		homeScreenPanicIfPermissionsAreNotSet();
 		
+		// Save the original wallpaper if this is the first time
+		// the application sets the wallpaper.
+		if (!mHasWallpaperBeenSet)
+		{
+			int result = saveCurrentWallpaper();
+			if (WALLPAPER_OK != result)
+			{
+				return result;
+			}
+		}
+		
+		if (0 == handle)
+		{
+			return restoreOriginalWallpaper();
+		}
+		else
+		{
+			return setWallpaper(handle);
+		}
+	}
+	
+	/**
+	 * Set the wallpaper.
+	 * @param handle Handle to an image object (PNG of JPEG).
+	 * @return A status code.
+	 */
+	int setWallpaper(final int handle)
+	{
 		try 
 		{
+			// This is commented out because we use data resources
+			// in PNG/JPG format rather tham image (bitmap) resources.
 			// Get the data object.
 			//ImageCache image = (ImageCache) 
 			//	mMoSyncThread.getImageResource(handle);
@@ -107,7 +159,7 @@ public class MoSyncHomeScreen
 				if (null == imageData) 
 				{ 
 					// Handle was not found.
-					return -1; 
+					return WALLPAPER_NOT_FOUND; 
 				}
 			}
 			
@@ -116,6 +168,11 @@ public class MoSyncHomeScreen
 				imageData,
 				0, 
 				imageData.length);
+			if (null == bitmap)
+			{
+				// Out of memory.
+				return WALLPAPER_OUT_OF_MEMORY;
+			}
 			
 			// Scale bitmap to screen size.
 			DisplayMetrics metrics = new DisplayMetrics();
@@ -125,13 +182,160 @@ public class MoSyncHomeScreen
 				metrics.widthPixels, 
 				metrics.heightPixels, 
 				Bitmap.Config.ARGB_8888);
+			if (null == scaledBitmap)
+			{
+				// Out of memory.
+				bitmap.recycle();
+				return WALLPAPER_OUT_OF_MEMORY;
+			}
 			Canvas canvas = new Canvas(scaledBitmap);
+			if (null == canvas)
+			{
+				// Out of memory.
+				bitmap.recycle();
+				scaledBitmap.recycle();
+				return WALLPAPER_OUT_OF_MEMORY;
+			}
 			canvas.drawBitmap(
 				bitmap, 
 				null, 
 				new Rect(0, 0, metrics.widthPixels, metrics.heightPixels),
 				null);
+
+	    	// Set wallpaper, using the size of the screen.
+	    	int result = setWallpaperBitmap(scaledBitmap, true);
+	    	if (WALLPAPER_OK != result)
+	    	{
+	    		return result;
+	    	}
+	    	
+	    	// Wallpaper is now set.
+	    	mHasWallpaperBeenSet = true;
+	    	
+			return WALLPAPER_OK;
+		}
+		catch (Throwable ex) 
+		{
+			ex.printStackTrace();
+		}
+		
+		return WALLPAPER_OUT_OF_MEMORY;
+	}
+	
+	/**
+	 * Save the original wallpaper to a file.
+	 * @return A status code.
+	 */
+	int saveCurrentWallpaper()
+	{
+		try
+		{
+			// Get current wallpaper image.
+	    	Drawable wallpaper = mMoSyncThread.getActivity().getWallpaper();
+	    	int width = wallpaper.getIntrinsicWidth();
+	    	int height = wallpaper.getIntrinsicHeight();
+	    	Log.i("@@@MoSync", "@@@ wallpaper width = " + width);
+	    	Log.i("@@@MoSync", "@@@ wallpaper height = " + height);
+	    	Bitmap wallpaperBitmap = Bitmap.createBitmap(
+				width,
+				height,
+				Bitmap.Config.ARGB_8888);
+	    	if (null == wallpaperBitmap)
+	    	{
+	    		return WALLPAPER_OUT_OF_MEMORY;
+	    	}
+			Canvas canvas = new Canvas(wallpaperBitmap);
+			wallpaper.setBounds(0, 0, width, height);
+	    	wallpaper.draw(canvas);
+	    	
+			// Save bits to file.
+	    	FileOutputStream outStream = 
+	    		mMoSyncThread.getActivity().openFileOutput(
+		    		sOriginalWallpaperFileName, 
+		    		Context.MODE_PRIVATE);
+	    	if (null == outStream)
+	    	{
+	    		return WALLPAPER_OUT_OF_MEMORY;
+	    	}
+	    	boolean result = wallpaperBitmap.compress(
+	    		Bitmap.CompressFormat.PNG, 
+	    		100, 
+	    		outStream);
+	    	if (!result)
+	    	{
+	    		return WALLPAPER_OUT_OF_MEMORY;
+	    	}
+	    	outStream.close();
+	    	
+	    	return WALLPAPER_OK;
+		}
+		catch (Throwable ex)
+		{
+			ex.printStackTrace();
+			return WALLPAPER_OUT_OF_MEMORY;
+		}
+	}
+
+	/**
+	 * Restore the original wallpaper. This is the wallpaper
+	 * that was visible prior to the application's first call
+	 * to maWallpaperSet.
+	 * @return status code.
+	 */
+	int restoreOriginalWallpaper()
+	{
+		try
+		{
+			// Read file.
+			FileInputStream inStream = 
+				mMoSyncThread.getActivity().openFileInput(
+					sOriginalWallpaperFileName);
+	    	if (null == inStream)
+	    	{
+	    		return WALLPAPER_OUT_OF_MEMORY;
+	    	}
+	    	
+	    	Bitmap wallpaperBitmap = BitmapFactory.decodeStream(inStream);
+	    	
+	    	inStream.close();
+	    	
+	    	if (null == wallpaperBitmap)
+	    	{
+	    		return WALLPAPER_OUT_OF_MEMORY;
+	    	}
+	    	
+	    	// Set wallpaper.
+	    	int result = setWallpaperBitmap(wallpaperBitmap, false);
+	    	if (WALLPAPER_OK != result)
+	    	{
+	    		return result;
+	    	}
+
+	    	// We want this to be false so that the original
+	    	// wallpaper is saved next time the wallpaper is set.
+			mHasWallpaperBeenSet = false;
 			
+	    	return WALLPAPER_OK;
+		}
+		catch (Throwable ex)
+		{
+			ex.printStackTrace();
+			return WALLPAPER_OUT_OF_MEMORY;
+		}
+	}
+	
+	/**
+	 * Set the wallpaper to display the given bitmap.
+	 * @param bitmap The wallpaper bitmap.
+	 * @param useScreenSize If true, will set the desired 
+	 * dimension of the wallpaper to the screen size. If false, will 
+	 * set the desired dimension to the bitmap size.
+	 * @return A status code.
+	 */
+	int setWallpaperBitmap(Bitmap bitmap, boolean useScreenSize)
+	{
+		try 
+		{
 			// WallpaperManager is available only on Android 5 and above.
 			// Try to set using the wrapper class. If class loading fails, 
 			// use old way to set wallpaper.
@@ -139,7 +343,8 @@ public class MoSyncHomeScreen
 			{
 				// New way.
 				new WallpaperManagerWrapper().setWallpaper(
-					scaledBitmap,
+					bitmap,
+					useScreenSize,
 					mMoSyncThread.getActivity());
 			}
 			catch (java.lang.VerifyError error)
@@ -149,21 +354,21 @@ public class MoSyncHomeScreen
 					"About to set wallpaper on Android Level 3 or 4.");
 				
 				// Old way.
-				getActivity().setWallpaper(scaledBitmap);
-
-				Log.i("@@@ MoSync", "Wallpaper is set.");
+				getActivity().setWallpaper(bitmap);
 			}
 
-			return 0; // Zero means ok.
-		} 
-		catch (Exception ex) 
+			Log.i("@@@ MoSync", "Wallpaper has been set.");
+
+			return WALLPAPER_OK;
+		}
+		catch (Throwable ex) 
 		{
 			ex.printStackTrace();
 		}
 		
-		return -1;
+		return WALLPAPER_OUT_OF_MEMORY;
 	}
-
+	
 	/**
 	 * Add a shortcut icon to the home screen. If called multiple times
 	 * multiple icons will be added. The shortcut launches the current
@@ -498,21 +703,49 @@ public class MoSyncHomeScreen
  */
 class WallpaperManagerWrapper
 {
-	public void setWallpaper(Bitmap bitmap, Activity activity)
+	/**
+	 * Set the wallpaper.
+	 * @param bitmap The wallpaper.
+	 * @param useScreenSize If true, will set the desired 
+	 * dimension of the wallpaper to the screen size. If false, will 
+	 * set the desired dimension to the bitmap size.
+	 * @param activity The activity.
+	 */
+	public void setWallpaper(
+		Bitmap bitmap, 
+		boolean useScreenSize, 
+		Activity activity)
 	{
 		try
 		{
 			// Get the wallpaper manager.
 			WallpaperManager manager = WallpaperManager.getInstance(activity);
 			
-			// Set wallpaper suggested size to the screen size.
-			DisplayMetrics metrics = new DisplayMetrics();
-			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-			Log.i("MoSync", 
-				"WallpaperManagerWrapper suggestDesiredDimensions: " 
-				+ metrics.widthPixels + " " 
-				+ metrics.heightPixels);
-			manager.suggestDesiredDimensions(metrics.widthPixels, metrics.heightPixels);
+			if (useScreenSize)
+			{
+				// Set wallpaper suggested size to the screen size.
+				DisplayMetrics metrics = new DisplayMetrics();
+				activity.getWindowManager()
+					.getDefaultDisplay().getMetrics(metrics);
+				Log.i("MoSync", 
+					"WallpaperManagerWrapper suggestDesiredDimensions: " 
+					+ metrics.widthPixels + " " 
+					+ metrics.heightPixels);
+				manager.suggestDesiredDimensions(
+					metrics.widthPixels, 
+					metrics.heightPixels);
+			}
+			else
+			{
+				// Set wallpaper suggested size to the bitmap size.
+				Log.i("MoSync", 
+					"WallpaperManagerWrapper suggestDesiredDimensions: " 
+					+ bitmap.getWidth() + " " 
+					+ bitmap.getHeight());
+				manager.suggestDesiredDimensions(
+					bitmap.getWidth(), 
+					bitmap.getHeight());
+			}
 			
 			// Set the wallpaper.
 			manager.setBitmap(bitmap);

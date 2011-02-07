@@ -109,6 +109,11 @@ public class MoSyncBluetooth
 	 * Use method btGetBluetoothAdapter() to get the adapter.
 	 */
 	BluetoothAdapter mBluetoothAdapter = null;
+	
+	/**
+	 * BroadcastReceiver that listens for Bluetooth on/off events.
+	 */
+	BroadcastReceiver mBluetoothTurnedOnOffListener;
 
 	/**
 	 * Discovery state values.
@@ -152,7 +157,17 @@ public class MoSyncBluetooth
 		mMoSyncThread = thread;
 		registerBluetoothReceiver();
 	}
-	
+
+	/**
+	 * Called from the MoSync thread in onDestroy.
+	 * Do cleanup here (but it is not guaranteed that
+	 * this will be called.)
+	 */
+    public void onDestroy()
+	{
+    	unregisterBluetoothReceiver();
+    }
+    
 	/**
 	 * Register a broadcast receiver that is notified when
 	 * Bluetooth is turned on and off, and sends events to
@@ -166,8 +181,8 @@ public class MoSyncBluetooth
 			return;
 		}
 		
-		// Register receiver for Bluetooth state changes.
-		getActivity().registerReceiver(new BroadcastReceiver()
+		// Receiver for Bluetooth state changes.
+		mBluetoothTurnedOnOffListener = new BroadcastReceiver()
 		{
 			@Override
 			public void onReceive(Context context, Intent intent)
@@ -190,8 +205,25 @@ public class MoSyncBluetooth
 					mMoSyncThread.postEvent(event);
 				}
 			}
-		}, 
-		new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+		};
+
+		// Register receiver.
+		getActivity().registerReceiver(
+			mBluetoothTurnedOnOffListener,
+			new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+		);
+	}
+
+	/**
+	 * Unregister the Bluetooth on/off broadcast receiver.
+	 */
+	private void unregisterBluetoothReceiver()
+	{
+		if (null != mBluetoothTurnedOnOffListener)
+		{
+			getActivity().unregisterReceiver(mBluetoothTurnedOnOffListener);
+			mBluetoothTurnedOnOffListener = null;
+		}
 	}
 	
 	/**
