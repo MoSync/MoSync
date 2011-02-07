@@ -5,6 +5,10 @@
 
 namespace Base {
 
+#ifdef __GNUC__
+BOOL RegisterWindowClass (CHAR* className, HINSTANCE hInstance)	;
+LRESULT CALLBACK WindowProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#endif
 
 	struct SubViewData {
 		HWND window;

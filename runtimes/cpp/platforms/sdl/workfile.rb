@@ -59,7 +59,8 @@ work.instance_eval do
 end
 
 config = CopyFileTask.new(work, "config_platform.h", FileTask.new(work, "config_platform.h.example")) 
-contacts = CopyFileTask.new(work, "contacts.xml", FileTask.new(work, "#{mosyncdir}/etc/contacts.xml")) 
+contacts = CopyFileTask.new(work, "#{mosyncdir}/etc/contacts.xml", FileTask.new(work, "contacts.xml")) 
 
 config.invoke
+contacts.invoke
 work.invoke

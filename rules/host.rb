@@ -42,7 +42,7 @@ elsif(UNAME == "MINGW32_NT-6.1")
 elsif(UNAME == "windows32")
 	HOST = :win32
 elsif(UNAME == "CYGWIN_NT-5.1")
-	HOST = :linux
+	HOST = :win32
 elsif(UNAME == "CYGWIN_NT-6.1-WOW64")
 	HOST = :win32
 elsif(UNAME == "Darwin")
