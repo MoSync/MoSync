@@ -77,9 +77,7 @@ UIViewController *mainController;
 	}
 	
 	[created setWidgetHandle:[widgetArray count]];
-	[created setup];
-	
-	
+	[created wasCreated];
 	
 	// todo handle these things.
 	//if(created == nil) return 0;

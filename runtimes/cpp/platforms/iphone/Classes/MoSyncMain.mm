@@ -186,8 +186,8 @@ void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
 
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 	[sMoSyncView 
-	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcslen((const wchar_t*)title)*2]
-	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcslen((const wchar_t*)inText)*2]
+	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
+	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcharLength(inText)]
 	 outText:(wchar*)outText
 	 maxSize:maxSize
 	 andConstraints:constraints

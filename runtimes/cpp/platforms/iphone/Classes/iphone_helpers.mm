@@ -110,3 +110,9 @@ bool platformRequest(const char *urlstr) {
 		return false;
 	return true;
 }
+
+size_t wcharLength(const wchar* str) {
+	size_t length = 0;
+	while(*str++) length++;
+	return length;
+}
