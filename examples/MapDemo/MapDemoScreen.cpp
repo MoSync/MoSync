@@ -42,7 +42,6 @@ namespace MapDemo
 		mMap = newobject( MapWidget, new MapWidget( 0, 0, 0, 0, NULL ) );
 		mMap->setViewport( viewport );
 
-		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 		mMap->setFont( AppStyleMgr::getStyle( )->getFont( FontSize_Smallest, Color::black, false ) );
 		setClientWidget( mMap );
 		//
@@ -56,6 +55,8 @@ namespace MapDemo
 		// Have to wait until we have proper width and height
 		//
 		mMap->setMapSource( mOpenStreetMapSource );
+
+		mMap->setCenterPosition( LonLat( 18.07, 59.33 ), 10, true, false );
 	}
 
 	//-------------------------------------------------------------------------
@@ -109,8 +110,7 @@ namespace MapDemo
 		if ( AppScreen::handlePointerPress( point ) )
 			return true;
 
-		prevX = point.x;
-		prevY = point.y;
+		mMap->getViewport( )->beginPanning( point );
 
 		int curTime = maGetMilliSecondCount();
 		int deltaTime = curTime - lastPointerPress;
@@ -126,13 +126,6 @@ namespace MapDemo
 		return true;
 	}
 
-    //-------------------------------------------------------------------------
-    static double clamp( double x, double min, double max )
-    //-------------------------------------------------------------------------
-    {
-            return x < min ? min : x > max ? max : x;
-    }
-
 	//-------------------------------------------------------------------------
 	bool MapDemoScreen::handlePointerMove( MAPoint2d point )
 	//-------------------------------------------------------------------------
@@ -140,20 +133,8 @@ namespace MapDemo
 		if ( AppScreen::handlePointerMove( point ) )
 			return true;
 
-		if(scrolling) return false;
-		int accel = 7;
-		int dx = (point.x - prevX) * accel;
-		int dy = (point.y - prevY) * accel;
+		mMap->getViewport( )->updatePanning( point );
 
-		PixelCoordinate px = mMap->getCenterPositionPixels( );
-
-		px = PixelCoordinate( px.getMagnification( ), px.getX( ) - dx, px.getY( ) + dy );
-
-        LonLat newPos = LonLat( px );
-        newPos = LonLat( clamp( newPos.lon, -180, 180 ), clamp( newPos.lat, -85, 85 ) );
-        mMap->setCenterPosition( newPos, false, true );
-		prevX = point.x;
-		prevY = point.y;
 		return true;
 	}
 
@@ -164,7 +145,7 @@ namespace MapDemo
 		if ( AppScreen::handlePointerRelease( point ) )
 			return true;
 
-		scrolling = false;
+		mMap->getViewport( )->endPanning( );
 		return true;
 	}
 

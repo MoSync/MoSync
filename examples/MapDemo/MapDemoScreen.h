@@ -65,9 +65,6 @@ namespace MapDemo
 		MapSource* mGoogleStreetMapSource;
 		MapSource* mGoogleAerialMapSource;
 		MapSource* mGoogleHybridMapSource;
-		bool scrolling ;
-		int prevX;
-		int prevY;
 
 		int lastPointerPress;
 	};
