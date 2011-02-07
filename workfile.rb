@@ -10,10 +10,12 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv",
+		"tools/rcomp", "tools/package", "tools/uidcrc", "tools/MoSyncUpdater"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix",
+		"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
 	# todo: add lcab
@@ -36,7 +38,7 @@ BASE_DIRS = MORE_DIRS + PLATFORM_TOOLS
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/DefaultSkinGenerator", "libs"]
 EXAM_DIRS = PIPE_DIRS + ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack", "tools/MoSyncUpdater"]
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS

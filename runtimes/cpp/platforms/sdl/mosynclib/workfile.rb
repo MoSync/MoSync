@@ -17,8 +17,8 @@ work.instance_eval do
 	@SPECIFIC_CFLAGS = {"main.cpp" => " -DMOSYNC_DLL_EXPORT -Wno-missing-noreturn",
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
 	@WHOLE_LIBS = ["mosync_sdl"]
-	@LIBRARIES +=["OpenGL32", "GlU32", "Gdi32"]
 	if(HOST == :win32)
+		@LIBRARIES += ["OpenGL32", "GlU32", "Gdi32"]
 		@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
 	end
 	
