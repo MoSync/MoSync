@@ -8,6 +8,7 @@ work = MoSyncDll.new
 class << work
 	include SdlCommon
 end
+
 work.instance_eval do
 	setup_common
 	
@@ -15,8 +16,8 @@ work.instance_eval do
 	@EXTRA_SOURCEFILES = ["main.cpp"]
 	@SPECIFIC_CFLAGS = {"main.cpp" => " -DMOSYNC_DLL_EXPORT -Wno-missing-noreturn",
 		"mosyncmain.cpp" => " -DMOSYNC_DLL_IMPORT"}
-	
 	@WHOLE_LIBS = ["mosync_sdl"]
+	@LIBRARIES +=["OpenGL32", "GlU32", "Gdi32"]
 	if(HOST == :win32)
 		@EXTRA_OBJECTS = [FileTask.new(self, "mosynclib.def")]
 	end
