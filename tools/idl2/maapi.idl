@@ -3336,14 +3336,6 @@ interface MAAPI {
 		}
 
 		/**
-		* Set the background image of the phone's home screen.
-		* @param data Image data in JPEG or PNG format. If 0 the
-		* wallpaper will be reset.
-		* @return \< 0 on error.
-		*/
-		int maWallpaperSet(in MAHandle data);
-
-		/**
 		* Make MoSync send key-events for the specified key, even when
 		* the application does not have focus.
 		* Can only capture one key at a time.

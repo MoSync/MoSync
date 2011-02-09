@@ -2525,14 +2525,7 @@ public class MoSyncThread extends Thread
 		return IOCTL_UNAVAILABLE;
 	}
 	
-	/**
-	 * Set the background image of the phone's home screen.
-	 * @param data Handle to an image object (PNG of JPEG)
-	 */
-	int maWallpaperSet(int handle)
-	{
-		return mMoSyncHomeScreen.maWallpaperSet(handle);
-	}
+	
 
 	/**
 	 * Add a shortcut icon to the home screen. If called multiple times

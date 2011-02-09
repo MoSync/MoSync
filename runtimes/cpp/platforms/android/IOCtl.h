@@ -178,13 +178,6 @@ namespace Base
 	int _maScreenSetFullscreen(int fullscreen, JNIEnv* jNIEnv, jobject jThis);
 	
 	/**
-	* Set the background image of the phone's home screen.
-	* @param data Image data in JPEG or PNG format.
-	* @return \< 0 on error.
-	*/
-	int _maWallpaperSet(MAHandle data, JNIEnv* jNIEnv, jobject jThis);
-		
-	/**
 	* Turn on/off sending of HomeScreen events. Off by default.
 	* @param eventsOn 1 = events on, 0 = events off
 	* @return \< 0 on error.
