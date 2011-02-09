@@ -3086,7 +3086,101 @@ interface MAAPI {
 
 	constset MAString WIDGET_TYPE_ {
 		SCREEN = "Screen";
+		TAB_SCREEN = "TabScreen";
+		NAV_SCREEN = "NavScreen";
+		BUTTON = "Button";
+		IMAGE_BUTTON = "ImageButton";
+		LABEL = "Label";
+		EDIT_BOX = "EditBox";
+		LIST_VIEW = "ListView";
+		LIST_VIEW_ITEM = "ListViewItem";
+		CHECK_BOX = "CheckBox";
+		HORIZONTAL_LAYOUT = "HorizontalLayout";
+		VERTICAL_LAYOUT = "VerticalLayout";
+		RELATIVE_LAYOUT = "RelativeLayout";
+		SEARCH_BAR = "SearchBar";
+		GL_VIEW = "GLView";
+		WEB_VIEW = "WebView";
 	}
+
+	constset MAString WIDGET_PROPERTY_ {
+		LEFT = "left";
+		TOP = "top";
+		WIDTH = "width";
+		HEIGHT = "height";
+		ALPHA = "alpha";
+		BACKGROUND_COLOR = "backgroundColor";
+	}
+
+	constset MAString WIDGET_PROPERTY_SCREEN_ {
+		TITLE = "title";
+		ICON = "icon";
+	}
+
+	constset MAString WIDGET_PROPERTY_TAB_SCREEN_ {
+		CURRENT_TAB = "currentTab";
+	}
+
+	constset MAString WIDGET_PROPERTY_BUTTON_ {
+		TEXT = "text";
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+
+	constset MAString WIDGET_PROPERTY_IMAGE_BUTTON_ {
+		TEXT = "text";
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+
+	constset MAString WIDGET_PROPERTY_LABEL_ {
+		TEXT = "text";
+		VERTICAL_ALIGNMENT = "verticalAlignment";
+		HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+		FONT_COLOR = "fontColor";
+		FONT_SIZE = "fontSize";
+	}
+	
+	constset MAString WIDGET_PROPERTY_EDIT_BOX_ {
+		TEXT = "text";
+		PLACEHOLDER = "placeholder";
+		SHOW_KEYBOARD = "showKeyboard";
+	}
+	
+	constset MAString WIDGET_PROPERTY_LIST_VIEW_ITEM_ {
+		TEXT = "text";
+		ICON = "icon";
+		ACCESSORY_TYPE = "accessoryType";
+	}
+
+	constset MAString WIDGET_PROPERTY_CHECK_BOX_ {
+		CHECKED = "checked";
+	}
+
+	constset MAString WIDGET_PROPERTY_HORIZONTAL_LAYOUT_ {
+		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+	}
+
+	constset MAString WIDGET_PROPERTY_VERTICAL_LAYOUT_ {
+		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+	}
+	
+	constset MAString WIDGET_PROPERTY_SEARCH_BAR_ {
+		TEXT = "text";
+		PLACEHOLDER = "placeholder";
+		SHOW_KEYBOARD = "showKeyboard";
+	}
+
+	
+	constset MAString WIDGET_PROPERTY_GL_VIEW_ {
+		INVALIDATE = "invalidate";
+		BIND = "bind";
+	}
+
+	constset MAString WIDGET_PROPERTY_WEB_VIEW_ {
+		URL = "url";
+	}
+
 
 	/** 
 	 * Create a new widget of the specified type.
