@@ -304,7 +304,13 @@ static PlainOldData parseAnonStruct(int currentIx) {
 
 static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {
 	ConstSet cs;
-	doExact("int");
+	
+	//doExact("int");
+	string constSetType;
+	readToken(constSetType);
+	if(constSetType != "int" && constSetType != "MAString") 
+		tokenError(constSetType);
+		
 	readTextToken(cs.name);
 
 	doExact("{");
@@ -326,6 +332,7 @@ static ConstSet parseConstSet(const vector<string>& ixs, int currentIx) {
 		Constant c;
 		c.ix = currentIx;
 		c.name = token;
+		c.type = constSetType;
 		doExact("=");
 		readTextToken(c.value);
 		doExact(";");

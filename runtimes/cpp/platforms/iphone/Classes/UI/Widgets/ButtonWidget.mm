@@ -27,7 +27,10 @@
 @implementation ButtonWidget
 
 - (id)init {
-	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	//view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+	
+	
 	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	

@@ -38,6 +38,7 @@ struct Define {
 };
 
 struct Constant {
+	string type;
 	string name, value;
 	string comment;
 	int ix;

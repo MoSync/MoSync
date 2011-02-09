@@ -254,9 +254,15 @@ static void streamJavaConstants(
 			{
 				stream << "\n";
 			}
+			
+			string type = "int ";
+			if(c.type == "MAString")
+				type = "String ";
+			
 			stream << c.comment;
 			stream 
-				<< "\tpublic static final int " 
+				<< "\tpublic static final "
+				<< type
 				<< cs.name 
 				<< c.name 
 				<< " = " 
@@ -912,6 +918,7 @@ uint32 calculateChecksum(const Interface& inf) {
 			const Constant& c(cs.constants[k]);
 			AH(c.name);
 			AH(c.value);
+			AH(c.type);
 			AH(c.ix);
 		}
 	}	//constSets

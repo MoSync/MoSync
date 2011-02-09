@@ -3084,6 +3084,10 @@ interface MAAPI {
 		ROOT = -1;
 	}
 
+	constset MAString WIDGET_TYPE_ {
+		SCREEN = "Screen";
+	}
+
 	/** 
 	 * Create a new widget of the specified type.
 	 *
