@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 enum MyOpenMode {
 	eRead, eOverwrite, eAppend, eWriteExisting

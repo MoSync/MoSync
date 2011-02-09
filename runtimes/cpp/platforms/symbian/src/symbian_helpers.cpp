@@ -553,6 +553,7 @@ void TAlphaBitmap::SetClipRect(const TRect& aRect) {
 	mClipRect = aRect;
 }
 
+// todo: check for KErrOutOfMemory (-4) at all trap points.
 int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	MyRFs myrfs;
 	myrfs.Connect();
@@ -575,7 +576,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 
 	TCleaner<CFbsBitmap> bmpClr(new CFbsBitmap);
 	if(!bmpClr)
-		return NULL;
+		return RES_OUT_OF_MEMORY;
 	CleanupStack::PushL(bmpClr());
 
 	CCoeEnv* coeenv = CCoeEnv::Static();
@@ -600,7 +601,7 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	//Create Synchronizer  
 	TCleaner<CLocalSynchronizer> sync(new CLocalSynchronizer);
 	if(!sync)
-		return NULL;
+		return RES_OUT_OF_MEMORY;
 	CleanupStack::PushL(sync());
 
 	//Create mask, if needed.
@@ -608,11 +609,11 @@ int LoadEncodedImageWAlphaL(const TDesC8& aEncodedData, TAlphaBitmap** ptab) {
 	if(hasAlpha) {
 		bmpMask = new CFbsBitmap;
 		if(!bmpMask)
-			return NULL;
+			return RES_OUT_OF_MEMORY;
 		CleanupStack::PushL(bmpMask());
 		LHEL_BASE(bmpMask->Create(imgSize,
 			(frameInfo.iFlags & TFrameInfo::EAlphaChannel) ? EGray256 : EGray2),
-			return NULL);
+			return RES_OUT_OF_MEMORY);
 		decoder->Convert(sync->Status(), *bmpClr, *bmpMask);  //Perform decoding
 	} else {
 		decoder->Convert(sync->Status(), *bmpClr);  //Perform decoding
