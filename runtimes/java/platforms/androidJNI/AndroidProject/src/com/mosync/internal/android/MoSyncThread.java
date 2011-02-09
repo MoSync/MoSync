@@ -382,7 +382,8 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		SYSLOG("PANIC - errorCode: " + errorCode + " message: " + message);
+		Log.i("@@@ MoSync", 
+			"PANIC - errorCode: " + errorCode + " message: " + message);
 		
 		mHasDied = true;
 		
