@@ -1,10 +1,19 @@
-//
-//  MoSyncUI.mm
-//  nativeuitest
-//
-//  Created by Niklas Nummelin on 11/26/10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
-//
+/* Copyright (C) 2011 MoSync AB
+ 
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 #import "MoSyncUI.h"
 #import "LabelWidget.h"
@@ -77,9 +86,7 @@ UIViewController *mainController;
 	}
 	
 	[created setWidgetHandle:[widgetArray count]];
-	[created setup];
-	
-	
+	[created wasCreated];
 	
 	// todo handle these things.
 	//if(created == nil) return 0;

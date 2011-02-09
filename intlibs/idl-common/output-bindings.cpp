@@ -84,9 +84,10 @@ static void lua_streamConstants(
 	ostream& stream, 
 	const vector<ConstSet>& constSets, 
 	int ix) ;
+/*
 static void lua_streamHelperApi(
 	ostream& stream);
-
+*/
 
 /**
  * Generate header file that can be parsed by tolua.
@@ -104,15 +105,16 @@ void lua_outputHeaderFile(
 	for (size_t i=0; i<ixs.size(); i++) 
 	{
 		// This is how we include an extension.
-		// We want to include NativeUI.
+		// We want to include NativeUI and OpenGL.
 		string s = ixs[i];
-		if (s == "IX_WIDGET")
+		if (s == "IX_WIDGET" || 
+			s == "IX_OPENGL_ES")
 		{
 			lua_streamHeaderFile(luaHeaderFile, maapi, i);
 		}
 	}
 
-	lua_streamHelperApi(luaHeaderFile);
+	//lua_streamHelperApi(luaHeaderFile);
 }
 
 
@@ -437,6 +439,7 @@ static void lua_streamConstants(
  * Stream utility functions ued to create/delete and 
  * access MoSync data structures.
  */
+/*
 static void lua_streamHelperApi(ostream& stream)
 {
 	stream << "// Start of add-on API.\n";
@@ -511,3 +514,4 @@ static void lua_streamHelperApi(ostream& stream)
 
 	stream << "// End of helper API.\n";
 }
+*/
