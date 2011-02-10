@@ -26,6 +26,9 @@ ThreadPool mThreadPool = new ThreadPool();
 
 #define NETSYSCALL(type) final synchronized type
 
+#define CATCH(ExceptionClass, function) try { function; } catch(ExceptionClass e) {\
+	PRINT_STACK_TRACE; }
+
 #define HTTPS_NULL 0
 #define HTTPS_SETUP 1
 #define HTTPS_WRITING 2
@@ -59,11 +62,11 @@ public class MAConn {
 		EI_CONN_RESULT = result;
 		mCanvas.postEvent(event);
 	}
-	synchronized void close() throws IOException {
+	synchronized void close() {
 		if(in != null)
-			in.close();
+			CATCH(IOException, in.close());
 		if(out != null)
-			out.close();
+			CATCH(IOException, out.close());
 	}
 }
 
@@ -76,11 +79,11 @@ public class MAStreamConn extends MAConn {
 		super(h);
 	}
 
-	synchronized final void close() throws IOException {
+	synchronized final void close() {
 		cancel = true;
 		super.close();
 		if(conn != null)
-			conn.close();
+			CATCH(IOException, conn.close());
 	}
 }
 
@@ -95,10 +98,10 @@ public class MARecordConn extends MAConn {
 		super(h);
 	}
 
-	synchronized final void close() throws IOException {
+	synchronized final void close() {
 		if(recording)
 			rc.stopRecord();
-		player.close();
+		CATCH(IOException, player.close());
 		super.close();
 	}
 }
@@ -111,10 +114,10 @@ public class MAServerConn extends MAConn {
 		super(h);
 	}
 
-	synchronized final void close() throws IOException {
+	synchronized final void close() {
 		super.close();
 		if(notifier != null)
-			notifier.close();
+			CATCH(IOException, notifier.close());
 	}
 }
 
@@ -146,14 +149,14 @@ public class MAConn {
 		mCanvas.postEvent(event);
 	}
 
-	synchronized final void close() throws IOException {
+	synchronized final void close() {
 		cancel = true;
 		if(in != null)
-			in.close();
+			CATCH(IOException, in.close());
 		if(out != null)
-			out.close();
+			CATCH(IOException, out.close());
 		if(conn != null)
-			conn.close();
+			CATCH(IOException, conn.close());
 	}
 }
 #endif

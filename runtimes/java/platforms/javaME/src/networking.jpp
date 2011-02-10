@@ -109,7 +109,7 @@ NETSYSCALL(int) maConnGetAddr(MAHandle conn, Address addr) throws Exception {
 }
 
 
-NETSYSCALL(void) maConnClose(MAHandle conn) throws Exception {
+NETSYSCALL(void) maConnClose(MAHandle conn) {
 	DEBUG_CONN("ConnClose "+conn+"\n");
 	Integer key = new Integer(conn);
 	MAConn mac = (MAConn)mConnections.get(key);
