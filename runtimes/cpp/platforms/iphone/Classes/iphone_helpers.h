@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define _IPHONEHELPERS_H_
 
 #include "ThreadPoolImpl.h"
+#include <helpers/cpp_defs.h>
 
 // do all the const char* become memory leaks or does the garbage collector take care of that?.
 // must fix that.
@@ -38,5 +39,6 @@ const char *unicodeToAscii(const wchar_t* str);
 int getFreeAmountOfMemory();
 int getTotalAmountOfMemory();
 bool platformRequest(const char *url);
+size_t wcharLength(const wchar* str);
 
 #endif

@@ -15,7 +15,7 @@
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
  *
- *  $Id: features.h,v 1.19 2009/07/06 18:59:04 jjohnstn Exp $
+ *  $Id: features.h,v 1.22 2010/08/09 08:29:22 corinna Exp $
  */
 
 #ifndef _SYS_FEATURES_H
@@ -112,7 +112,7 @@ extern "C" {
 #define _POSIX_MEMLOCK_RANGE			200112L
 #define _POSIX_MEMORY_PROTECTION		200112L
 #define _POSIX_MESSAGE_PASSING			200112L
-/* #define _POSIX_MONOTONIC_CLOCK		    -1 */
+#define _POSIX_MONOTONIC_CLOCK			200112L
 #define _POSIX_NO_TRUNC				     1
 /* #define _POSIX_PRIORITIZED_IO		    -1 */
 #define _POSIX_PRIORITY_SCHEDULING		200112L
@@ -179,6 +179,25 @@ extern "C" {
 
 #endif /* !__STRICT_ANSI__ || __cplusplus || __STDC_VERSION__ >= 199901L */
 #endif /* __CYGWIN__ */
+
+/* Per the permission given in POSIX.1-2008 section 2.2.1, define
+ * _POSIX_C_SOURCE if _XOPEN_SOURCE is defined and _POSIX_C_SOURCE is not.
+ * (_XOPEN_SOURCE indicates that XSI extensions are desired by an application.)
+ * This permission is first granted in 2008, but use it for older ones, also.
+ * Allow for _XOPEN_SOURCE to be empty (from the earliest form of it, before it
+ * was required to have specific values).
+ */
+#if !defined(_POSIX_C_SOURCE)  &&  defined(_XOPEN_SOURCE) 
+  #if (_XOPEN_SOURCE - 0) == 700	/* POSIX.1-2008 */
+    #define _POSIX_C_SOURCE       200809L
+   #elif (_XOPEN_SOURCE - 0) == 600	/* POSIX.1-2001 or 2004 */
+    #define _POSIX_C_SOURCE       200112L
+   #elif (_XOPEN_SOURCE - 0) == 500	/* POSIX.1-1995 */
+    #define _POSIX_C_SOURCE       199506L
+   #elif (_XOPEN_SOURCE - 0) < 500	/* really old */
+    #define _POSIX_C_SOURCE       2
+  #endif
+#endif
 
 #ifdef __cplusplus
 }

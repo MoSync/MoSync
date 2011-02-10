@@ -975,13 +975,21 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 	
 	tb->printMI(spf, addr, fmt);
 
-	// special treatment for (const) char*
-	if((int)tb->type() == (int)TypeBase::ePointer) {
-		const TypeBase* target = ((const PointerType*)tb)->mTarget;
+	// special treatment for (const) char* and char[].
+	// first check if it's a pointer or array, and if so, find its target/element type.
+	const TypeBase* target = NULL;
+	if(tb->type() == TypeBase::ePointer)
+		target = ((const PointerType*)tb)->mTarget;
+	else if(tb->type() == TypeBase::eArray)
+		target = ((const ArrayType*)tb)->mElemType;
+
+	if(target != NULL) {
+		// skip past the "const" container type.
 		if(target->type() == TypeBase::eConst) {
 			target = ((const ConstType*)target)->mTarget;
 		}
-		if((int)target->type() == (int)TypeBase::eBuiltin) {
+		// then check if it's builtin->char.
+		if(target->type() == TypeBase::eBuiltin) {
 			const Builtin* builtin = (const Builtin*)target;
 			if(builtin->subType() == Builtin::eChar) {
 				int msAddr = *(int*)addr;
@@ -990,12 +998,30 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 					if(msAddr+msLen>gMemSize) {
 						msLen-= (msAddr+msLen)-gMemSize;
 					}
-					if(msLen > 0 && msAddr > 0)
-						spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
+					if(msLen > 0 && msAddr > 0) {
+						//spf(" \\\"%.*s\\\"", msLen, &gMemBuf[msAddr]);
+						// convert line endings to avoid breaking the GDB/MI protocol,
+						// which mandates that every output unit be contained on a single line.
+						spf(" \\\"");
+						const char* p = &gMemBuf[msAddr];
+						const char* end = p + msLen;
+						while(p != end) {
+							if(*p == '\n') {
+								spf("\\n");
+							} else {
+								spf("%c", *p);
+							}
+							p++;
+						}
+						spf("\\\"");
+					}
 				}
 			}
 		}	
+	}
 
+	if(spf.length() <= 0) {
+		error("Evaluation failed.\n");
 	}
 
 	return spf.getString();

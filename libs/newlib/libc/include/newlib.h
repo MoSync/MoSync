@@ -9,3 +9,4 @@
 #define MISSING_SYSCALL_NAMES
 #define _MB_EXTENDED_CHARSETS_ISO
 #define _WANT_IO_C99_FORMATS
+#define _WANT_IO_LONG_LONG	// without this, printf("%jd %s") crashes.

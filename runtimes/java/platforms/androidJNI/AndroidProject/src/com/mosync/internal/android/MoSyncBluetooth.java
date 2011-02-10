@@ -75,6 +75,8 @@ import static com.mosync.internal.generated.MAAPI_consts.CONNERR_CANCELED;
 import static com.mosync.internal.generated.MAAPI_consts.CONNERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.CONNERR_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BT;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -107,6 +109,11 @@ public class MoSyncBluetooth
 	 * Use method btGetBluetoothAdapter() to get the adapter.
 	 */
 	BluetoothAdapter mBluetoothAdapter = null;
+	
+	/**
+	 * BroadcastReceiver that listens for Bluetooth on/off events.
+	 */
+	BroadcastReceiver mBluetoothTurnedOnOffListener;
 
 	/**
 	 * Discovery state values.
@@ -148,8 +155,77 @@ public class MoSyncBluetooth
 	public MoSyncBluetooth(MoSyncThread thread)
 	{
 		mMoSyncThread = thread;
+		registerBluetoothReceiver();
 	}
 
+	/**
+	 * Called from the MoSync thread in onDestroy.
+	 * Do cleanup here (but it is not guaranteed that
+	 * this will be called.)
+	 */
+    public void onDestroy()
+	{
+    	unregisterBluetoothReceiver();
+    }
+    
+	/**
+	 * Register a broadcast receiver that is notified when
+	 * Bluetooth is turned on and off, and sends events to
+	 * MoSync.
+	 */
+	private void registerBluetoothReceiver()
+	{
+		// Only register receiver if Bluetooth permissions are set.
+		if (!isBluetoothPermissionsSet())
+		{
+			return;
+		}
+		
+		// Receiver for Bluetooth state changes.
+		mBluetoothTurnedOnOffListener = new BroadcastReceiver()
+		{
+			@Override
+			public void onReceive(Context context, Intent intent)
+			{		
+				int newState = intent.getIntExtra(
+					BluetoothAdapter.EXTRA_STATE, 
+					BluetoothAdapter.STATE_OFF);
+				if (newState == BluetoothAdapter.STATE_ON)
+				{
+					// Send event.
+					int[] event = new int[1];
+					event[0] = EVENT_TYPE_BLUETOOTH_TURNED_ON;
+					mMoSyncThread.postEvent(event);
+				}
+				else if (newState == BluetoothAdapter.STATE_OFF)
+				{
+					// Send event.
+					int[] event = new int[1];
+					event[0] = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
+					mMoSyncThread.postEvent(event);
+				}
+			}
+		};
+
+		// Register receiver.
+		getActivity().registerReceiver(
+			mBluetoothTurnedOnOffListener,
+			new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+		);
+	}
+
+	/**
+	 * Unregister the Bluetooth on/off broadcast receiver.
+	 */
+	private void unregisterBluetoothReceiver()
+	{
+		if (null != mBluetoothTurnedOnOffListener)
+		{
+			getActivity().unregisterReceiver(mBluetoothTurnedOnOffListener);
+			mBluetoothTurnedOnOffListener = null;
+		}
+	}
+	
 	/**
 	 * @return The Activity object.
 	 */
@@ -320,15 +396,24 @@ public class MoSyncBluetooth
 	/**
 	 * Check if Bluetooth permissions are set, and if not call maPanic().
 	 */
-	void panicIfBluetoothPermissionsAreNotSet()
+	boolean isBluetoothPermissionsSet()
 	{
-		if ((PackageManager.PERMISSION_GRANTED != 
+		return 
+			(PackageManager.PERMISSION_GRANTED == 
 				getActivity().checkCallingOrSelfPermission(
 						android.Manifest.permission.BLUETOOTH))
-			||
-			(PackageManager.PERMISSION_GRANTED != 
+			&&
+			(PackageManager.PERMISSION_GRANTED == 
 				getActivity().checkCallingOrSelfPermission(
-						android.Manifest.permission.BLUETOOTH_ADMIN)))
+						android.Manifest.permission.BLUETOOTH_ADMIN));
+	}
+	
+	/**
+	 * Check if Bluetooth permissions are set, and if not call maPanic().
+	 */
+	void panicIfBluetoothPermissionsAreNotSet()
+	{
+		if (!isBluetoothPermissionsSet())
 		{
 			mMoSyncThread.maPanic(1, 
 				"Bluetooth permission is not set in the MoSync project");

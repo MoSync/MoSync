@@ -568,7 +568,19 @@ namespace MAP
 		
 			#else // StoreCompressedTilesInCache
 
-			Gfx_drawImage( tile->getImage( ),  pt.x - tileSize / 2, pt.y - tileSize / 2 );		
+			MARect tileRect;
+			tileRect.left = 0;
+			tileRect.top = 0;
+			tileRect.width = tileSize;
+			tileRect.height = tileSize;
+
+			MAPoint2d tileTopLeft;
+			tileTopLeft.x = pt.x - tileSize / 2;
+			tileTopLeft.y = pt.y - tileSize / 2;
+
+			// Draw only the tileSize part of the image, usually this is the whole tile, but sometimes
+			// there are parts of the tile image that we want to ignore.
+			Gfx_drawImageRegion( tile->getImage( ), &tileRect, &tileTopLeft, TRANS_NONE );
 
 			#endif // StoreCompressedTilesInCache
 
@@ -959,6 +971,10 @@ namespace MAP
 	void MapViewport::setScale(double scale) 
 	//-------------------------------------------------------------------------	
 	{
+		if(mSource == NULL) {
+			return;
+		}
+
 		double tileMagnification = mMagnification;
 		mMagnificationD = SCALE_TO_MAG(scale);
 

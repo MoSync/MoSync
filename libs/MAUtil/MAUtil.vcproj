@@ -379,6 +379,22 @@
 			>
 		</File>
 		<File
+			RelativePath=".\GraphicsOpenGL.c"
+			>
+		</File>
+		<File
+			RelativePath=".\GraphicsOpenGL.h"
+			>
+		</File>
+		<File
+			RelativePath=".\GraphicsSoftware.c"
+			>
+		</File>
+		<File
+			RelativePath=".\GraphicsSoftware.h"
+			>
+		</File>
+		<File
 			RelativePath=".\PlaceholderPool.cpp"
 			>
 		</File>

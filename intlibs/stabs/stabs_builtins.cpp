@@ -144,5 +144,7 @@ void VTablePtr::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fm
 }
 
 void Wchar::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
-	printPrimitiveByFormat<wchar_t>(pf, data, "%C", fmt, TypeBase::eDecimal);
+	//printPrimitiveByFormat<wchar_t>(pf, data, "%C", fmt, TypeBase::eDecimal);
+	printPrimitiveByFormat<unsigned short>(pf, data, "%u", fmt, TypeBase::eHexadecimal);
+	pf(" '%C'", *(unsigned short*)data);
 }

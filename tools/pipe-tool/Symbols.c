@@ -1614,7 +1614,7 @@ int IsDebugLabel ( const char *l )
 
 		case 3:
 		case 4:
-			if ( *l < '0' && *l > '9' )
+			if ( *l < '0' || *l > '9' )
 				return 0;
 			state = 4;
 			break;

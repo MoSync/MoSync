@@ -5,7 +5,7 @@
 <properties>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
-<property key="build.prefs:app.permissions" value="File\ Storage Home\ Screen\ and\ Wallpaper\ Access Internet\ Access Vibrate"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibrate"/>
 <property key="template.id" value="project.cpp"/>
 </properties>
 </project>

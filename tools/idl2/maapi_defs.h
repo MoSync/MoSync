@@ -56,11 +56,12 @@ union MA_DV {
 	int i[2];
 #else	//everything else
 	struct {
-#ifdef __IPHONE__
-		int lo, hi;
-#else
+// this seems to have changed again? (now running latest xcode with iphone 4.2 sdk)
+//#ifdef __IPHONE__
+//		int lo, hi;
+//#else
 		int hi, lo;
-#endif
+//#endif
 	};
 #endif	//__MARM_ARMI__
 	long long ll;

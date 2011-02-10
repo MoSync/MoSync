@@ -342,8 +342,8 @@ namespace Base {
 		return EXTENT(width, height);
 	}
 
-	SYSCALL(MAExtent, maGetTextSizeW(const wchar_t* str)) {
-		int numGlyphs = wcslen(str)*2;
+	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
+		int numGlyphs = wcharLength(str);
 		if(numGlyphs==0) return EXTENT(0, 0);		
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
@@ -363,8 +363,8 @@ namespace Base {
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
 	}
 
-	SYSCALL(void, maDrawTextW(int left, int top, const wchar_t* str)) {
-		int numGlyphs = wcslen(str)*2;		
+	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
+		int numGlyphs = wcharLength(str);		
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);

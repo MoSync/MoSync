@@ -2,6 +2,7 @@
 #define __SYS_CONFIG_H__
 
 #include <machine/ieeefp.h>  /* floating point macros */
+#include <sys/features.h>	/* POSIX defs */
 
 /* exceptions first */
 #if defined(__H8500__) || defined(__W65__)
@@ -28,6 +29,22 @@
 #define INT_MAX __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif
+
+#if (defined(__CR16__) || defined(__CR16C__) ||defined(__CR16CP__))
+#ifndef __INT32__
+#define __SMALL_BITFIELDS      
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX 32767
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#else /* INT32 */
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX 2147483647
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#endif /* INT32 */
+
+#endif /* CR16C */
 
 #if defined (__xc16x__) || defined (__xc16xL__) || defined (__xc16xS__)
 #define __SMALL_BITFIELDS
@@ -188,8 +205,6 @@
 
 #if defined(__CYGWIN__)
 #include <cygwin/config.h>
-#define __LINUX_ERRNO_EXTENSIONS__ 1
-#define _MB_EXTENDED_CHARSETS_ALL 1
 #if !defined (__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
 #define __USE_XOPEN2K 1
 #endif

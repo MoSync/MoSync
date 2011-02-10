@@ -75,7 +75,7 @@ end
 class PipeLibWork < PipeGccWork
 	include MoSyncMod
 	def setup
-		@FLAGS = " -L"
+		@FLAGS = " -L -quiet"
 		setup_pipe
 		modSetup
 		copyHeaders

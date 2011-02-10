@@ -581,9 +581,9 @@ runtimes.each do |platform_name, platform|
 		puts "platform dir : #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 		
 		if(platform_name == :JavaME && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
-			cmd = "ruby RuntimeBuilder.rb Settings.rb JavaMEcldc10 #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
+			cmd = "ruby RuntimeBuilder.rb ./Settings.rb JavaMEcldc10 #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 		else
-			cmd = "ruby RuntimeBuilder.rb Settings.rb #{platform_name} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
+			cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{platform_name} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 		end
 		
 		puts(cmd)

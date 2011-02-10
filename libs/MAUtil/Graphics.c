@@ -119,7 +119,7 @@ MAPoint2d dummy_getTranslation(void)  {
 }
 
 void dummy_scale(MAFixed x, MAFixed y) {
-	
+
 }
 
 void dummy_plot(int x, int y)  {
@@ -202,10 +202,10 @@ void Gfx_setup(int x, int y, int w, int h) {
 	graphicsDriver->setup(x, y, w, h);
 
 	Gfx_clearMatrix();
-	
+
 	sClipStackPtr = 0;
 	graphicsDriver->setClipRect(x, y, w, h);
-	
+
 	sClipStack[0].left = x;
 	sClipStack[0].top = y;
 	sClipStack[0].width = w;
@@ -224,19 +224,19 @@ static void _Gfx_init(void) {
 }
 
 /**
- * Clears the clip rect stack.
+* Clears the clip rect stack.
 **/
 void Gfx_clearClipRect(void) {
 	MAExtent s = maGetScrSize();
 	sClipStackPtr = 0;
 	//maSetClipRect(0,0,EXTENT_X(s),EXTENT_Y(s));
 	graphicsDriver->setClipRect(0,0,EXTENT_X(s),EXTENT_Y(s));
-	
+
 	sClipStack[0].left = 0;
 	sClipStack[0].top = 0;
 	sClipStack[0].width = EXTENT_X(s);
 	sClipStack[0].height = EXTENT_Y(s);
-	
+
 	GRAPHICS_LOG("numCalls: %d", sNumCalls);
 #ifdef GRAPHICS_DEBUGGING	
 	sNumCalls = 0;
@@ -244,7 +244,7 @@ void Gfx_clearClipRect(void) {
 }
 
 /** Sets the clip rect to the content of the top of the stack without changing the stack.  
- *  Returns true if the area of the restored clip rect is > 0, otherwise false.
+*  Returns true if the area of the restored clip rect is > 0, otherwise false.
 **/
 BOOL Gfx_restoreClipRect(void) {
 	_Gfx_init();
@@ -260,24 +260,24 @@ BOOL Gfx_restoreClipRect(void) {
 }
 
 /** Pushes the specified clip rect on the stack and sets it as the current.
- *  Returns true if the area of the clip rect is > 0, otherwise false. 
+*  Returns true if the area of the clip rect is > 0, otherwise false. 
 **/
 BOOL Gfx_pushClipRect(int left, int top, int width, int height) {
 	MAPoint2d currentTranslation;
-		
+
 	_Gfx_init();
 	if(sClipStackPtr >= MA_CLIP_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Clip stack overflow");
 	}
-	
+
 	//left+=sCurrentOffset.x; top+=sCurrentOffset.y;
 	currentTranslation = Gfx_getTranslation();
 	left+=currentTranslation.x;
 	top+=currentTranslation.y;
-	
+
 	//maSetClipRect(left, top, width, height);
 	graphicsDriver->setClipRect(left, top, width, height);
-		
+
 	sClipStackPtr++;
 	sClipStack[sClipStackPtr].left   = left; 
 	sClipStack[sClipStackPtr].top    = top; 
@@ -288,22 +288,22 @@ BOOL Gfx_pushClipRect(int left, int top, int width, int height) {
 }
 
 /** Computes the intersection rectangle of the specified clip rect and the current, pushing the result on the stack.
-   *  Returns true if the area of the resulting clip rect is > 0, otherwise false. 
-   **/
+*  Returns true if the area of the resulting clip rect is > 0, otherwise false. 
+**/
 BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 	int pLeft;
 	int pTop;
 	int pWidth;
 	int pHeight;
 	MAPoint2d currentTranslation;	
-	
+
 	_Gfx_init();
 	pLeft = sClipStack[sClipStackPtr].left;
 	pTop = sClipStack[sClipStackPtr].top;
 	pWidth = sClipStack[sClipStackPtr].width;
 	pHeight = sClipStack[sClipStackPtr].height;
-	
-	
+
+
 	currentTranslation = Gfx_getTranslation();
 	left+=currentTranslation.x; top+=currentTranslation.y;
 
@@ -339,7 +339,7 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 		PUSH_EMPTY_CLIPRECT;
 		return false;
 	}
-	
+
 	if(left < pLeft)
 	{
 		width -= pLeft - left;
@@ -362,24 +362,24 @@ BOOL Gfx_intersectClipRect(int left, int top, int width, int height) {
 		height -= (top + height) - (pTop + pHeight);
 	}
 
-//	maSetClipRect(left, top, width, height);
+	//	maSetClipRect(left, top, width, height);
 	graphicsDriver->setClipRect(left, top, width, height);
-	
+
 	sClipStackPtr++;
 	sClipStack[sClipStackPtr].left   = left; 
 	sClipStack[sClipStackPtr].top    = top; 
 	sClipStack[sClipStackPtr].width  = width; 
 	sClipStack[sClipStackPtr].height = height; 		
-	
+
 	if(sClipStack[sClipStackPtr].width>0 && sClipStack[sClipStackPtr].height>0) return TRUE;
 	else return FALSE;
 
 }
 
 /**
-   * Pops a clip rect off the stack and sets is as the current. 
-   * Returns true if the area of the resulting clip rect is > 0,  otherwise false. 
-   **/
+* Pops a clip rect off the stack and sets is as the current. 
+* Returns true if the area of the resulting clip rect is > 0,  otherwise false. 
+**/
 BOOL Gfx_popClipRect(void) {
 	_Gfx_init();
 	sClipStackPtr--;
@@ -398,8 +398,8 @@ BOOL Gfx_popClipRect(void) {
 }
 
 /** 
-  * Clears the transform stack.
-  **/
+* Clears the transform stack.
+**/
 void Gfx_clearMatrix(void) {
 	/*
 	sTransformStackPtr = 0;
@@ -408,9 +408,9 @@ void Gfx_clearMatrix(void) {
 	sTransformStack[0].x = 0;
 	sTransformStack[0].y = 0;
 	*/
-	
+
 	graphicsDriver->clearMatrix();
-	
+
 }
 
 /** Pushes the current transform on the stack **/
@@ -418,8 +418,8 @@ void Gfx_pushMatrix(void) {
 	/*
 	_Gfx_init();
 	if(sTransformStackPtr >= MA_TRANSFORM_STACK_DEPTH-1) {
-		PANIC_MESSAGE("Transform stack overflow");
-		return;
+	PANIC_MESSAGE("Transform stack overflow");
+	return;
 	}
 
 	//maSetClipRect(left, top, width, height);
@@ -434,8 +434,8 @@ void Gfx_popMatrix(void) {
 	/*
 	_Gfx_init();
 	if(sTransformStackPtr < 0) {
-		PANIC_MESSAGE("Transform stack underflow");
-		return;
+	PANIC_MESSAGE("Transform stack underflow");
+	return;
 	}
 	sCurrentOffset = sTransformStack[sTransformStackPtr];
 	sTransformStackPtr--;
@@ -477,7 +477,7 @@ BOOL Gfx_popRect(void) {
 void Gfx_plot(int x, int y) {
 	//maPlot(sCurrentOffset.x + x, sCurrentOffset.y + y);
 	graphicsDriver->plot(x, y);
-	
+
 }
 /** Draws a line with the current color from x1,  y1 to x2, y2 with respect to the current transform **/
 void Gfx_line(int x1, int y1, int x2, int y2) {
@@ -488,25 +488,25 @@ void Gfx_line(int x1, int y1, int x2, int y2) {
 void Gfx_fillRect(int left, int top, int width, int height) {
 	/*
 	maFillRect(
-		sCurrentOffset.x + left,
-		sCurrentOffset.y + top,
-		width,
-		height
+	sCurrentOffset.x + left,
+	sCurrentOffset.y + top,
+	width,
+	height
 	);
 	*/
-	
+
 	graphicsDriver->fillRect(left, top, width, height);
 }
 
 void Gfx_drawText(int left, int top, const char* text) {
 	//maDrawText(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
-	
+
 	graphicsDriver->drawText(left, top, text);
 }
 
 void Gfx_drawTextW(int left, int top, const wchar_t* text) {
 	//maDrawTextW(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
-	
+
 	graphicsDriver->drawTextW(left, top, text);
 }
 
@@ -521,7 +521,7 @@ void Gfx_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRe
 	//MAPoint2d p = *dstPoint;
 	//p.x += sCurrentOffset.x;
 	//p.y += sCurrentOffset.y;
-//	maDrawRGB(&p, src, srcRect, scanlength);
+	//	maDrawRGB(&p, src, srcRect, scanlength);
 	graphicsDriver->drawRGB(dstPoint, src, srcRect, scanlength);
 
 }
@@ -532,11 +532,11 @@ void Gfx_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d 
 	p.x += sCurrentOffset.x;
 	p.y += sCurrentOffset.y;
 	maDrawImageRegion(image, srcRect, &p, transformMode);
-	
-#ifdef GRAPHICS_DEBUGGING
+
+	#ifdef GRAPHICS_DEBUGGING
 	sNumCalls++;
-#endif
-*/
+	#endif
+	*/
 	graphicsDriver->drawImageRegion(image, srcRect, dstPoint, transformMode);
 }
 
