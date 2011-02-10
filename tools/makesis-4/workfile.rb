@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require File.expand_path('../../rules/native_mosync.rb')
+require File.expand_path('../../rules/mosync_util.rb')
 
 class SisWork < MoSyncExe
 	def init
@@ -21,6 +22,9 @@ makesis.instance_eval do
 	init
 	@IGNORED_FILES += ["signsis.cpp"]
 	@NAME = "makesis-4"
+	
+	@INSTALLDIR = mosyncdir + '/bin'
+
 end
 
 signsis = SisWork.new
@@ -28,6 +32,9 @@ signsis.instance_eval do
 	init
 	@IGNORED_FILES += ["makesis.cpp"]
 	@NAME = "signsis-4"
+	
+	@INSTALLDIR = mosyncdir + '/bin'
+
 end
 
 makesis.invoke

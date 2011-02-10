@@ -39,12 +39,12 @@ public:
 	const char* getString();
 	void reset();
 	void resizeString(int size);
+	int length() const { return mPos; }
 	int operator()(const char* fmt, ...) PRINTF_ATTRIB(2,3);
 
 private:
 	int mPos;
-	char* mPtr;
-	char *mString;
+	char* mString;
 	int mStringSize;
 };
 
@@ -107,7 +107,9 @@ struct Type {
 
 
 template<typename T>
-void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt, TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural) {
+void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalFmt,
+	TypeBase::PrintFormat fmt, TypeBase::PrintFormat natural)
+{
 	if(natural == TypeBase::eNatural) return; // sanity check
 	T t = *((T*)data);
 

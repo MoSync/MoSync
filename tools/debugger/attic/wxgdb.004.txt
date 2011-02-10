@@ -1,0 +1,10 @@
+-target-select sim
+-file-list-exec-source-files
+-break-insert "charArray/main.c:7"
+-exec-run
+-test-wait
+-stack-list-locals 2
+-var-create var0 * "cnv"
+-var-create var1 * "str"
+-var-list-children 2 "var0"
+-var-list-children 2 "var1"

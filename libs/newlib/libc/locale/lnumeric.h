@@ -29,13 +29,26 @@
 #ifndef _LNUMERIC_H_
 #define	_LNUMERIC_H_
 
+#include <_ansi.h>
+#include <sys/cdefs.h>
+#include <wchar.h>
+
+__BEGIN_DECLS
+
 struct lc_numeric_T {
 	const char	*decimal_point;
 	const char	*thousands_sep;
 	const char	*grouping;
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+	const char	*codeset;	 /* codeset for mbtowc conversion */
+	const wchar_t	*wdecimal_point;
+	const wchar_t	*wthousands_sep;
+#endif
 };
 
 struct lc_numeric_T *__get_current_numeric_locale(void);
-int	__numeric_load_locale(const char *);
+int	__numeric_load_locale(const char *, void *, const char *);
+
+__END_DECLS
 
 #endif /* !_LNUMERIC_H_ */

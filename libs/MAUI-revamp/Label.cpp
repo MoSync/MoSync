@@ -338,7 +338,7 @@ namespace MAUI {
 			setStyle(Engine::getSingleton().getDefaultStyle("Label"));
 
 		const LabelStyle* style = (const LabelStyle*)getStyle();
-		mFont = (MAUI::Font*)style->getSafe<FontProperty>("font");
+		mFont = style->getSafe<FontProperty>("font");
 
 		requestUpdate();
 

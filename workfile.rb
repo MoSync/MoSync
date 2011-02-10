@@ -10,10 +10,12 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv",
+		"tools/rcomp", "tools/package", "tools/uidcrc", "tools/MoSyncUpdater"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix", "tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix",
+		"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
 else
 	INTLIB_PLATFORM = HOST
 	# todo: add lcab
@@ -107,9 +109,16 @@ end
 
 target :all_configs do
 	sh 'ruby workfile.rb all'
-	sh 'ruby workfile.rb all CONFIG=""'
-	sh 'ruby workfile.rb all USE_NEWLIB=""'
-	sh 'ruby workfile.rb all USE_NEWLIB="" CONFIG=""'
+	sh 'ruby workfile.rb all CONFIG='
+	sh 'ruby workfile.rb all USE_NEWLIB='
+	sh 'ruby workfile.rb all USE_NEWLIB= CONFIG='
+end
+
+target :all_libs do
+	sh 'ruby workfile.rb libs'
+	sh 'ruby workfile.rb libs CONFIG='
+	sh 'ruby workfile.rb libs USE_NEWLIB='
+	sh 'ruby workfile.rb libs USE_NEWLIB= CONFIG='
 end
 
 Targets.invoke
