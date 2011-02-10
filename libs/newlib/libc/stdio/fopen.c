@@ -159,8 +159,10 @@ _DEFUN(_fopen_r, (ptr, file, mode),
   fp->_seek = __sseek;
   fp->_close = __sclose;
 
+#if 0	// don't modify the file position.
   if (fp->_flags & __SAPP)
     _fseek_r (ptr, fp, 0, SEEK_END);
+#endif
 
 #ifdef __SCLE
   if (__stextmode (fp->_file))

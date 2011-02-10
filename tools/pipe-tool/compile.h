@@ -748,6 +748,8 @@ decset(int ArgSLD, 0)
 decset(int ArgUseStabs, 0)
 decset(int ArgWriteMeta, 0)
 
+decset(int ArgQuiet, 0)
+
 dec(char SldName[256])
 dec(char StabsName[256])
 dec(char MetaFileName[256])

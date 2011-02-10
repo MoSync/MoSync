@@ -39,6 +39,10 @@ stabs.tab
 /tools/GLWrapperGenerator/opengl_generated.idl
 /tools/GLWrapperGenerator/opengl_invoke_generated.jpp
 
+/tools/WrapperGenerator/tests/*.h.cpp
+/tools/WrapperGenerator/tests/*.h.idl
+/tools/WrapperGenerator/tests/*.h.xml
+
 /tools/pipe-tool/PBProto.h
 /tools/pipe-tool/PBProtoPub.h
 

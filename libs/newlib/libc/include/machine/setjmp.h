@@ -174,6 +174,10 @@ _BEGIN_STD_C
 #define _JBLEN 9
 #endif
 
+#ifdef __TMS320C6X__
+#define _JBLEN 13
+#endif
+
 #ifdef __TIC80__
 #define _JBLEN 13
 #endif
@@ -198,6 +202,13 @@ _BEGIN_STD_C
 
 #ifdef __CRX__
 #define _JBLEN 9
+#endif
+
+#if (defined(__CR16__) || defined(__CR16C__) ||defined(__CR16CP__))
+/* r6, r7, r8, r9, r10, r11, r12 (r12L, r12H), 
+ * r13 (r13L, r13H), ra(raL, raH), sp(spL, spH) */
+#define _JBLEN 14
+#define _JBTYPE unsigned short
 #endif
 
 #ifdef __fr30__

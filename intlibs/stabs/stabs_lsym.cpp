@@ -300,10 +300,10 @@ static const TypeBase* subParseArray(char** pText) {
 	int res = sscanf(text, "%i;%i%n", &lower, &upper, &len);
 	FAILIF(res != 2);
 
-	bool isUnboundedArray = false;
+	bool isUnboundedArray = true;
 
 	if(lower == 0 && upper == -1) {
-		isUnboundedArray = true;
+		isUnboundedArray = false;
 	} else {
 		FAILIF(lower > upper);
 	}

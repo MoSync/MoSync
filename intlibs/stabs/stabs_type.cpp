@@ -61,7 +61,6 @@ void StringPrintFunctor::resizeString(int size) {
 		mString[i] = oldString[i];
 	}
 	delete oldString;
-	mPtr = &mString[0];
 }
 
 void StringPrintFunctor::reset() {
@@ -78,7 +77,7 @@ int StringPrintFunctor::operator()(const char* fmt, ...) {
 		va_list argptr;
 		va_start(argptr, fmt);
 		int left = mStringSize - mPos;
-		len = vsnprintf(mPtr + mPos, left, fmt, argptr);
+		len = vsnprintf(mString + mPos, left, fmt, argptr);
 		if(len==-1 || len >= left) {
 			resizeString(mStringSize*2);
 			len = -1;

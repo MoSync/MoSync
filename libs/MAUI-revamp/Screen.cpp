@@ -58,11 +58,10 @@ namespace MAUI {
 	}
 	
 	void Screen::setMain(Widget* main) {
-
 		this->mMain = main;
-		if(!mMain) {
-			return;
-		}
+		if(sCurrentScreen == this)
+			Engine::getSingleton().setMain(main);
+		if(!mMain) return;
 		mMain->setPosition(0,0);
 		mMain->setWidth(mScreenWidth);
 		mMain->setHeight(mScreenHeight);
@@ -92,9 +91,11 @@ namespace MAUI {
 		}
 		if(mMain) {
 			mMain->setEnabled(false);
+			Engine::getSingleton().setMain(NULL);
 		}
 		setFocusedWidget(NULL);
-		sCurrentScreen = NULL;
+		if(sCurrentScreen == this)
+			sCurrentScreen = NULL;
 	}
 
 	Screen::~Screen() {

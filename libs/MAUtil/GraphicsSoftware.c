@@ -31,29 +31,29 @@ static MAPoint2d sCurrentOffset = {0, 0};
 #define true 1
 
 // driver setup
-void soft_setup(int x, int y, int w, int h);
-void soft_setClipRect(int x, int y, int w, int h);
-void soft_clearMatrix(void);
+static void soft_setup(int x, int y, int w, int h);
+static void soft_setClipRect(int x, int y, int w, int h);
+static void soft_clearMatrix(void);
 static void soft_init(void);
-void soft_pushMatrix(void);
-void soft_popMatrix(void);
-void soft_translate(int x, int y);
-MAPoint2d soft_getTranslation(void);
-void soft_scale(MAFixed x, MAFixed y);
-void soft_plot(int x, int y);
-void soft_line(int x1, int y1, int x2, int y2);
-void soft_fillRect(int left, int top, int width, int height);
-void soft_drawText(int left, int top, const char* text);
-void soft_drawTextW(int left, int top, const wchar_t* text);
-void soft_drawImage(MAHandle image, int left, int top);
-void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
-void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
-void soft_notifyImageUpdated(MAHandle image);
-void soft_beginRendering(void);
-void soft_updateScreen(void);
-void soft_setClearColor(int r, int g, int b);
-void soft_setColor(int r, int g, int b);
-void soft_setAlpha(int a);
+static void soft_pushMatrix(void);
+static void soft_popMatrix(void);
+static void soft_translate(int x, int y);
+static MAPoint2d soft_getTranslation(void);
+static void soft_scale(MAFixed x, MAFixed y);
+static void soft_plot(int x, int y);
+static void soft_line(int x1, int y1, int x2, int y2);
+static void soft_fillRect(int left, int top, int width, int height);
+static void soft_drawText(int left, int top, const char* text);
+static void soft_drawTextW(int left, int top, const wchar_t* text);
+static void soft_drawImage(MAHandle image, int left, int top);
+static void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength);
+static void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode);
+static void soft_notifyImageUpdated(MAHandle image);
+static void soft_beginRendering(void);
+static void soft_updateScreen(void);
+static void soft_setClearColor(int r, int g, int b);
+static void soft_setColor(int r, int g, int b);
+static void soft_setAlpha(int a);
 
 static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_setup,
@@ -78,7 +78,7 @@ static MAGraphicsDriver sSoftwareGraphicsDriver = {
 	&soft_setClearColor,
 	&soft_setColor,
 	&soft_setAlpha
-	
+
 };
 
 //MAGraphicsDriver* Gfx_getDriverSoftware(void) {
@@ -87,14 +87,14 @@ void Gfx_useDriverSoftware(void) {
 }
 
 
-void soft_setup(int x, int y, int w, int h) {
+static void soft_setup(int x, int y, int w, int h) {
 }
 
-void soft_setClipRect(int x, int y, int w, int h) {
+static void soft_setClipRect(int x, int y, int w, int h) {
 	maSetClipRect(x, y, w, h);
 }
 
-void soft_clearMatrix(void) {
+static void soft_clearMatrix(void) {
 	sTransformStackPtr = 0;
 	sCurrentOffset.x = 0;
 	sCurrentOffset.y = 0;
@@ -108,7 +108,7 @@ static void soft_init(void) {
 }
 
 
-void soft_pushMatrix(void) {
+static void soft_pushMatrix(void) {
 	soft_init();
 	if(sTransformStackPtr >= MA_TRANSFORM_STACK_DEPTH-1) {
 		PANIC_MESSAGE("Transform stack overflow");
@@ -119,7 +119,7 @@ void soft_pushMatrix(void) {
 	sTransformStack[sTransformStackPtr] = sCurrentOffset;
 }
 
-void soft_popMatrix(void) {
+static void soft_popMatrix(void) {
 	soft_init();
 	if(sTransformStackPtr < 0) {
 		PANIC_MESSAGE("Transform stack underflow");
@@ -129,79 +129,79 @@ void soft_popMatrix(void) {
 	sTransformStackPtr--;
 }
 
-void soft_translate(int x, int y) {
+static void soft_translate(int x, int y) {
 	sCurrentOffset.x += x;
 	sCurrentOffset.y += y;
 }
 
-MAPoint2d soft_getTranslation(void) {
+static MAPoint2d soft_getTranslation(void) {
 	return sCurrentOffset;
 }
 
-void soft_scale(MAFixed x, MAFixed y) {
-	
+static void soft_scale(MAFixed x, MAFixed y) {
+
 }
 
-void soft_plot(int x, int y) {
+static void soft_plot(int x, int y) {
 	maPlot(sCurrentOffset.x + x, sCurrentOffset.y + y);
 }
 
-void soft_line(int x1, int y1, int x2, int y2) {
+static void soft_line(int x1, int y1, int x2, int y2) {
 	maLine(sCurrentOffset.x + x1, sCurrentOffset.y + y1, sCurrentOffset.x + x2, sCurrentOffset.y + y2);
 }
 
-void soft_fillRect(int left, int top, int width, int height) {
+static void soft_fillRect(int left, int top, int width, int height) {
 	maFillRect(
 		sCurrentOffset.x + left,
 		sCurrentOffset.y + top,
 		width,
 		height
-	);
+		);
 }
 
-void soft_drawText(int left, int top, const char* text) {
+static void soft_drawText(int left, int top, const char* text) {
 	maDrawText(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
 }
 
-void soft_drawTextW(int left, int top, const wchar_t* text) {
+static void soft_drawTextW(int left, int top, const wchar_t* text) {
 	maDrawTextW(sCurrentOffset.x + left, sCurrentOffset.y + top, text);
 }
 
-void soft_drawImage(MAHandle image, int left, int top) {
+static void soft_drawImage(MAHandle image, int left, int top) {
 	maDrawImage(image, sCurrentOffset.x + left, sCurrentOffset.y + top);
 }
 
-void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength) {
+static void soft_drawRGB(const MAPoint2d *dstPoint, const void *src, const MARect *srcRect, int scanlength) {
 	MAPoint2d p = *dstPoint;
 	p.x += sCurrentOffset.x;
 	p.y += sCurrentOffset.y;
-	
+
 	maDrawRGB(&p, src, srcRect, scanlength);
 }
 
-void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode) {
+static void soft_drawImageRegion(MAHandle image, const MARect *srcRect, const MAPoint2d *dstPoint, int transformMode) {
 	MAPoint2d p = *dstPoint;
 	p.x += sCurrentOffset.x;
 	p.y += sCurrentOffset.y;
 	maDrawImageRegion(image, srcRect, &p, transformMode);
 }
 
-void soft_notifyImageUpdated(MAHandle image) {
+static void soft_notifyImageUpdated(MAHandle image) {
 }
 
-void soft_beginRendering(void) {
+static void soft_beginRendering(void) {
 }
 
-void soft_updateScreen(void) {
+static void soft_updateScreen(void) {
 	maUpdateScreen();
 }
 
-void soft_setClearColor(int r, int g, int b) {
+static void soft_setClearColor(int r, int g, int b) {
 }
 
-void soft_setColor(int r, int g, int b) {
+static void soft_setColor(int r, int g, int b) {
 	maSetColor(r<<16 | g<<8 | b);
 }
 
-void soft_setAlpha(int a) {
+static void soft_setAlpha(int a) {
 }

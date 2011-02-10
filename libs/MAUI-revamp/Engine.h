@@ -75,6 +75,8 @@ namespace MAUI {
 		 * \param main The root widget of the UI tree.
 		 */
 		void setMain(Widget* main);
+
+		Widget* getMain() { return mMain; }
 		
 		/**
 		 * Destructor. The constructor is private.

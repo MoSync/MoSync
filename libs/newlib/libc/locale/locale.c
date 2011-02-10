@@ -51,46 +51,54 @@ the form
 
   language[_TERRITORY][.charset][@@modifier]
 
-<<"language">> is a two character string per ISO 639.  <<"TERRITORY">> is a
-country code per ISO 3166.  For <<"charset">> and <<"modifier">> see below.
+<<"language">> is a two character string per ISO 639, or, if not available
+for a given language, a three character string per ISO 639-3.
+<<"TERRITORY">> is a country code per ISO 3166.  For <<"charset">> and
+<<"modifier">> see below.
 
-Additionally to the POSIX specifier, seven extensions are supported for
-backward compatibility with older implementations using newlib:
-<<"C-UTF-8">>, <<"C-JIS">>, <<"C-eucJP">>, <<"C-SJIS">>, <<C-KOI8-R>>,
-<<C-KOI8-U>>, <<"C-ISO-8859-x">> with 1 <= x <= 15, or <<"C-CPxxx">> with
-xxx in [437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125,
-1250, 1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
-
-Instead of <<"C-">>, you can specify also <<"C.">>.  Both variations allow
+Additionally to the POSIX specifier, the following extension is supported
+for backward compatibility with older implementations using newlib:
+<<"C-charset">>.
+Instead of <<"C-">>, you can also specify <<"C.">>.  Both variations allow
 to specify language neutral locales while using other charsets than ASCII,
 for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
 but uses the UTF-8 charset.
 
-Even when using POSIX locale strings, the only charsets allowed are
-<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<KOI8-R>>, <<KOI8-U>>,
-<<"ISO-8859-x">> with 1 <= x <= 15, or <<"CPxxx">> with xxx in
-[437, 720, 737, 775, 850, 852, 855, 857, 858, 862, 866, 874, 1125, 1250,
-1251, 1252, 1253, 1254, 1255, 1256, 1257, 1258].
+The following charsets are recognized:
+<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
+<<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">> with
+1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852, 855,
+857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
+1257, 1258].
+
 Charsets are case insensitive.  For instance, <<"EUCJP">> and <<"eucJP">>
-are equivalent.  <<"UTF-8">> can also be written without dash, as in
-<<"UTF8">> or <<"utf8">>.
+are equivalent.  Charset names with dashes can also be written without
+dashes, as in <<"UTF8">>, <<"iso88591">> or <<"koi8r">>.  <<"EUCJP">> and
+<<"EUCKR">> are also recognized with dash, <<"EUC-JP">> and <<"EUC-KR">>.
+
+Full support for all of the above charsets requires that newlib has been
+build with multibyte support and support for all ISO and Windows Codepage.
+Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
+only newlib for Cygwin is built with full charset support by default.
+Under Cygwin, this implementation additionally supports the charsets
+<<"GBK">>, <<"GB2312">>, <<"eucCN">>, <<"eucKR">>, and <<"Big5">>.  Cygwin
+does not support <<"JIS">>.
+
+Cygwin additionally supports locales from the file
+/usr/share/locale/locale.alias.
 
 (<<"">> is also accepted; if given, the settings are read from the
 corresponding LC_* environment variables and $LANG according to POSIX rules.
 
-Under Cygwin, this implementation additionally supports the charsets
-<<"GBK">>, <<"eucKR">>, and <<"Big5">>.
-
-This implementation also supports a single modifier, <<"cjknarrow">>.
-Any other modifier is ignored.  <<"cjknarrow">>, in conjunction with one
-of the language specifiers <<"ja">>, <<"ko">>, and <<"zh">> specifies
-how the functions <<wcwidth>> and <<wcswidth>> handle characters from
-the "CJK Ambiguous Width" character class described in
-http://www.unicode.org/unicode/reports/tr11/.  Usually these characters
-have a width of 1, unless you specify one of the aforementioned
-languages, in which case these characters have a width of 2.  By
-specifying the <<"cjknarrow">> modifier, these characters will have a
-width of one in the languages <<"ja">>, <<"ko">>, and <<"zh">> as well.
+This implementation also supports the modifier <<"cjknarrow">>, which
+affects how the functions <<wcwidth>> and <<wcswidth>> handle characters
+from the "CJK Ambiguous Width" category of characters described at
+http://www.unicode.org/reports/tr11/#Ambiguous. These characters have a width
+of 1 for singlebyte charsets and a width of 2 for multibyte charsets
+other than UTF-8. For UTF-8, their width depends on the language specifier:
+it is 2 for <<"zh">> (Chinese), <<"ja">> (Japanese), and <<"ko">> (Korean),
+and 1 for everything else. Specifying <<"cjknarrow">> forces a width of 1,
+independent of charset and language.
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns a
 pointer to the string representing the current locale.  The acceptable
@@ -170,6 +178,10 @@ No supporting OS subroutines are required.
 #include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "lmessages.h"
+#include "lmonetary.h"
+#include "lnumeric.h"
+#include "lctype.h"
 #include "../stdlib/local.h"
 
 #define _LC_LAST      7
@@ -181,7 +193,8 @@ int __nlocale_changed = 0;
 int __mlocale_changed = 0;
 const char *_PathLocale = NULL;
 
-static _CONST struct lconv lconv = 
+static
+struct lconv lconv = 
 {
   ".", "", "", "", "", "", "", "", "", "",
   CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -240,9 +253,9 @@ static const char *currentlocale(void);
 static const char *loadlocale(struct _reent *, int);
 static const char *__get_locale_env(struct _reent *, int);
 
-#endif
+#endif /* _MB_CAPABLE */
 
-#ifdef __CYGWIN__
+#if 0 /*def __CYGWIN__  TODO: temporarily(?) disable C == UTF-8 */
 static char lc_ctype_charset[ENCODING_LEN + 1] = "UTF-8";
 static char lc_message_charset[ENCODING_LEN + 1] = "UTF-8";
 #else
@@ -265,7 +278,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
         return NULL;
     }
   return "C";
-#else
+#else /* !_MB_CAPABLE */
   int i, j, len, saverr;
   const char *env, *r;
 
@@ -392,7 +405,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 	}
     }
   return currentlocale ();
-#endif
+#endif /* !_MB_CAPABLE */
 }
 
 #ifdef _MB_CAPABLE
@@ -414,11 +427,13 @@ currentlocale(void)
                 }
         return (current_locale_string);
 }
-#endif
+#endif /* _MB_CAPABLE */
 
 #ifdef _MB_CAPABLE
 #ifdef __CYGWIN__
-extern void *__set_charset_from_codepage (unsigned int, char *charset);
+extern void __set_charset_from_locale (const char *locale, char *charset);
+extern int __set_locale_from_locale_alias (const char *, char *);
+extern int __collate_load_locale (const char *, void *, const char *);
 #endif /* __CYGWIN__ */
 
 extern void __set_ctype (const char *charset);
@@ -434,23 +449,53 @@ loadlocale(struct _reent *p, int category)
      backward compatibility.  If the local string is correct, the charset
      is extracted and stored in lc_ctype_charset or lc_message_charset
      dependent on the cateogry. */
-  char *locale = new_categories[category];
+  char *locale = NULL;
   char charset[ENCODING_LEN + 1];
   unsigned long val;
-  char *end;
+  char *end, *c = NULL;
   int mbc_max;
   int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
   int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
 		   const char *, mbstate_t *);
-#ifdef _MB_CAPABLE
   int cjknarrow = 0;
+
+  /* Avoid doing everything twice if nothing has changed. */
+  if (!strcmp (new_categories[category], current_categories[category]))
+    return current_categories[category];
+
+#ifdef __CYGWIN__
+  /* This additional code handles the case that the incoming locale string
+     is not valid.  If so, it calls the function __set_locale_from_locale_alias,
+     which is only available on Cygwin right now.  The function reads the
+     file /usr/share/locale/locale.alias.  The file contains locale aliases
+     and their replacement locale.  For instance, the alias "french" is
+     translated to "fr_FR.ISO-8859-1", the alias "thai" is translated to
+     "th_TH.TIS-620".  If successful, the function returns with a pointer
+     to the second argument, which is a buffer in which the replacement locale
+     gets stored.  Otherwise the function returns NULL. */
+  char tmp_locale[ENCODING_LEN + 1];
+  int ret = 0;
+
+restart:
+  if (!locale)
+    locale = new_categories[category];
+  else if (locale != tmp_locale)
+    {
+      locale = __set_locale_from_locale_alias (locale, tmp_locale);
+      if (!locale)
+	return NULL;
+    }
+# define FAIL	goto restart
+#else
+  locale = new_categories[category];
+# define FAIL	return NULL
 #endif
-  
+
   /* "POSIX" is translated to "C", as on Linux. */
   if (!strcmp (locale, "POSIX"))
     strcpy (locale, "C");
   if (!strcmp (locale, "C"))				/* Default "C" locale */
-#ifdef __CYGWIN__
+#if 0 /*def __CYGWIN__  TODO: temporarily(?) disable C == UTF-8 */
     strcpy (charset, "UTF-8");
 #else
     strcpy (charset, "ASCII");
@@ -462,24 +507,36 @@ loadlocale(struct _reent *p, int category)
 					   sticking to the C locale in terms
 					   of sort order, etc.  Proposed in
 					   the Debian project. */
-    strcpy (charset, locale + 2);
+    {
+      char *chp;
+
+      c = locale + 2;
+      strcpy (charset, c);
+      if ((chp = strchr (charset, '@')))
+        /* Strip off modifier */
+        *chp = '\0';
+      c += strlen (charset);
+    }
   else							/* POSIX style */
     {
-      char *c = locale;
+      c = locale;
 
       /* Don't use ctype macros here, they might be localized. */
       /* Language */
       if (c[0] < 'a' || c[0] > 'z'
 	  || c[1] < 'a' || c[1] > 'z')
-	return NULL;
+	FAIL;
       c += 2;
+      /* Allow three character Language per ISO 639-3 */
+      if (c[0] >= 'a' && c[0] <= 'z')
+      	++c;
       if (c[0] == '_')
         {
 	  /* Territory */
 	  ++c;
 	  if (c[0] < 'A' || c[0] > 'Z'
 	      || c[1] < 'A' || c[1] > 'Z')
-	    return NULL;
+	    FAIL;
 	  c += 2;
 	}
       if (c[0] == '.')
@@ -497,24 +554,28 @@ loadlocale(struct _reent *p, int category)
       else if (c[0] == '\0' || c[0] == '@')
 	/* End of string or just a modifier */
 #ifdef __CYGWIN__
-	__set_charset_from_codepage (0, charset);
+	/* The Cygwin-only function __set_charset_from_locale checks
+	   for the default charset which is connected to the given locale.
+	   The function uses Windows functions in turn so it can't be easily
+	   adapted to other targets.  However, if any other target provides
+	   equivalent functionality, preferrably using the same function name
+	   it would be sufficient to change the guarding #ifdef. */
+	__set_charset_from_locale (locale, charset);
 #else
 	strcpy (charset, "ISO-8859-1");
 #endif
       else
 	/* Invalid string */
-      	return NULL;
-#ifdef _MB_CAPABLE
-      if (c[0] == '@')
-	{
-	  /* Modifier */
-	  /* Only one modifier is recognized right now.  "cjknarrow" is used
-	     to modify the behaviour of wcwidth() for East Asian languages.
-	     For details see the comment at the end of this function. */
-	  if (!strcmp (c + 1, "cjknarrow"))
-	    cjknarrow = 1;
-	}
-#endif
+      	FAIL;
+    }
+  if (c && c[0] == '@')
+    {
+      /* Modifier */
+      /* Only one modifier is recognized right now.  "cjknarrow" is used
+         to modify the behaviour of wcwidth() for East Asian languages.
+         For details see the comment at the end of this function. */
+      if (!strcmp (c + 1, "cjknarrow"))
+	cjknarrow = 1;
     }
   /* We only support this subset of charsets. */
   switch (charset[0])
@@ -522,73 +583,92 @@ loadlocale(struct _reent *p, int category)
     case 'U':
     case 'u':
       if (strcasecmp (charset, "UTF-8") && strcasecmp (charset, "UTF8"))
-	return NULL;
+	FAIL;
       strcpy (charset, "UTF-8");
       mbc_max = 6;
-#ifdef _MB_CAPABLE
       l_wctomb = __utf8_wctomb;
       l_mbtowc = __utf8_mbtowc;
-#endif
     break;
+#ifndef __CYGWIN__
+    /* Cygwin does not support JIS at all. */
     case 'J':
     case 'j':
       if (strcasecmp (charset, "JIS"))
-	return NULL;
+	FAIL;
       strcpy (charset, "JIS");
       mbc_max = 8;
-#ifdef _MB_CAPABLE
       l_wctomb = __jis_wctomb;
       l_mbtowc = __jis_mbtowc;
-#endif
     break;
+#endif /* !__CYGWIN__ */
     case 'E':
     case 'e':
-      if (!strcasecmp (charset, "EUCJP"))
+      if (strncasecmp (charset, "EUC", 3))
+	FAIL;
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (!strcasecmp (c, "JP"))
 	{
 	  strcpy (charset, "EUCJP");
 	  mbc_max = 3;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __eucjp_wctomb;
 	  l_mbtowc = __eucjp_mbtowc;
-#endif
 	}
 #ifdef __CYGWIN__
-      else if (!strcasecmp (charset, "EUCKR"))
+      /* Newlib does neither provide EUC-KR nor EUC-CN, and Cygwin's
+      	 implementation requires Windows support. */
+      else if (!strcasecmp (c, "KR"))
 	{
 	  strcpy (charset, "EUCKR");
 	  mbc_max = 2;
-#ifdef _MB_CAPABLE
 	  l_wctomb = __kr_wctomb;
 	  l_mbtowc = __kr_mbtowc;
-#endif
 	}
-#endif
+      else if (!strcasecmp (c, "CN"))
+	{
+	  strcpy (charset, "EUCCN");
+	  mbc_max = 2;
+	  l_wctomb = __gbk_wctomb;
+	  l_mbtowc = __gbk_mbtowc;
+	}
+#endif /* __CYGWIN__ */
       else
-	return NULL;
+	FAIL;
     break;
     case 'S':
     case 's':
       if (strcasecmp (charset, "SJIS"))
-	return NULL;
+	FAIL;
       strcpy (charset, "SJIS");
       mbc_max = 2;
-#ifdef _MB_CAPABLE
       l_wctomb = __sjis_wctomb;
       l_mbtowc = __sjis_mbtowc;
-#endif
     break;
     case 'I':
     case 'i':
       /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
-         ISO-8859-12. */
-      if (strncasecmp (charset, "ISO-8859-", 9))
-	return NULL;
-      strncpy (charset, "ISO", 3);
-      val = _strtol_r (p, charset + 9, &end, 10);
+         ISO-8859-12.  This code also recognizes the aliases without dashes. */
+      if (strncasecmp (charset, "ISO", 3))
+	FAIL;
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (strncasecmp (c, "8859", 4))
+	FAIL;
+      c += 4;
+      if (*c == '-')
+	++c;
+      val = _strtol_r (p, c, &end, 10);
       if (val < 1 || val > 16 || val == 12 || *end)
-	return NULL;
+	FAIL;
+      strcpy (charset, "ISO-8859-");
+      c = charset + 9;
+      if (val > 10)
+      	*c++ = '1';
+      *c++ = val % 10 + '0';
+      *c = '\0';
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_ISO
       l_wctomb = __iso_wctomb;
       l_mbtowc = __iso_mbtowc;
@@ -596,16 +676,15 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_ISO */
-#endif
     break;
     case 'C':
     case 'c':
       if (charset[1] != 'P' && charset[1] != 'p')
-	return NULL;
+	FAIL;
       strncpy (charset, "CP", 2);
       val = _strtol_r (p, charset + 2, &end, 10);
       if (*end)
-	return NULL;
+	FAIL;
       switch (val)
 	{
 	case 437:
@@ -631,7 +710,6 @@ loadlocale(struct _reent *p, int category)
 	case 1257:
 	case 1258:
 	  mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 	  l_wctomb = __cp_wctomb;
 	  l_mbtowc = __cp_mbtowc;
@@ -639,22 +717,31 @@ loadlocale(struct _reent *p, int category)
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
+	  break;
+	case 932:
+	  mbc_max = 2;
+	  l_wctomb = __sjis_wctomb;
+	  l_mbtowc = __sjis_mbtowc;
 	  break;
 	default:
-	  return NULL;
+	  FAIL;
 	}
     break;
     case 'K':
     case 'k':
-      if (!strcasecmp (charset, "KOI8-R"))
+      /* KOI8-R, KOI8-U and the aliases without dash */
+      if (strncasecmp (charset, "KOI8", 4))
+	FAIL;
+      c = charset + 4;
+      if (*c == '-')
+	++c;
+      if (*c == 'R' || *c == 'r')
 	strcpy (charset, "CP20866");
-      else if (!strcasecmp (charset, "KOI8-U"))
+      else if (*c == 'U' || *c == 'u')
 	strcpy (charset, "CP21866");
       else
-	return NULL;
+	FAIL;
       mbc_max = 1;
-#ifdef _MB_CAPABLE
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb;
       l_mbtowc = __cp_mbtowc;
@@ -662,68 +749,157 @@ loadlocale(struct _reent *p, int category)
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-#endif
       break;
     case 'A':
     case 'a':
       if (strcasecmp (charset, "ASCII"))
-	return NULL;
+	FAIL;
       strcpy (charset, "ASCII");
       mbc_max = 1;
-#ifdef _MB_CAPABLE
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
-#endif
       break;
-#ifdef __CYGWIN__
     case 'G':
     case 'g':
-      if (strcasecmp (charset, "GBK"))
-      	return NULL;
-      strcpy (charset, "GBK");
-      mbc_max = 2;
-#ifdef _MB_CAPABLE
-      l_wctomb = __gbk_wctomb;
-      l_mbtowc = __gbk_mbtowc;
-#endif
+#ifdef __CYGWIN__
+      /* Newlib does not provide GBK/GB2312 and Cygwin's implementation
+	 requires Windows support. */
+      if (!strcasecmp (charset, "GBK")
+	  || !strcasecmp (charset, "GB2312"))
+      	{
+	  strcpy (charset, charset[2] == '2' ? "GB2312" : "GBK");
+	  mbc_max = 2;
+	  l_wctomb = __gbk_wctomb;
+	  l_mbtowc = __gbk_mbtowc;
+	}
+      else
+#endif /* __CYGWIN__ */
+      /* GEORGIAN-PS and the alias without dash */
+      if (!strncasecmp (charset, "GEORGIAN", 8))
+	{
+	  c = charset + 8;
+	  if (*c == '-')
+	    ++c;
+	  if (strcasecmp (c, "PS"))
+	    FAIL;
+	  strcpy (charset, "CP101");
+	  mbc_max = 1;
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+	  l_wctomb = __cp_wctomb;
+	  l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+	  l_wctomb = __ascii_wctomb;
+	  l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+	}
+      else
+	FAIL;
       break;
+    case 'P':
+    case 'p':
+      /* PT154 */
+      if (strcasecmp (charset, "PT154"))
+	FAIL;
+      strcpy (charset, "CP102");
+      mbc_max = 1;
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+      break;
+    case 'T':
+    case 't':
+      if (strncasecmp (charset, "TIS", 3))
+      	FAIL;
+      c = charset + 3;
+      if (*c == '-')
+	++c;
+      if (strcasecmp (c, "620"))
+      	FAIL;
+      strcpy (charset, "CP874");
+      mbc_max = 1;
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+      l_wctomb = __cp_wctomb;
+      l_mbtowc = __cp_mbtowc;
+#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+      break;
+#ifdef __CYGWIN__
+    /* Newlib does not provide Big5 and Cygwin's implementation
+       requires Windows support. */
     case 'B':
     case 'b':
       if (strcasecmp (charset, "BIG5"))
-      	return NULL;
+      	FAIL;
       strcpy (charset, "BIG5");
       mbc_max = 2;
-#ifdef _MB_CAPABLE
       l_wctomb = __big5_wctomb;
       l_mbtowc = __big5_mbtowc;
-#endif
       break;
 #endif /* __CYGWIN__ */
     default:
-      return NULL;
+      FAIL;
     }
-  if (category == LC_CTYPE)
+  switch (category)
     {
+    case LC_CTYPE:
       strcpy (lc_ctype_charset, charset);
       __mb_cur_max = mbc_max;
-#ifdef _MB_CAPABLE
       __wctomb = l_wctomb;
       __mbtowc = l_mbtowc;
       __set_ctype (charset);
-      /* Check for the language part of the locale specifier.  In case
-         of "ja", "ko", or "zh", assume the use of CJK fonts, unless the
-	 "@cjknarrow" modifier has been specifed.
-	 The result is stored in lc_ctype_cjk_lang and tested in wcwidth()
-	 to figure out the width to return (1 or 2) for the "CJK Ambiguous
-	 Width" category of characters. */
+      /* Determine the width for the "CJK Ambiguous Width" category of
+         characters. This is used in wcwidth(). Assume single width for
+         single-byte charsets, and double width for multi-byte charsets
+         other than UTF-8. For UTF-8, use double width for the East Asian
+         languages ("ja", "ko", "zh"), and single width for everything else.
+         Single width can also be forced with the "@cjknarrow" modifier. */
       lc_ctype_cjk_lang = !cjknarrow
-			  && ((strncmp (locale, "ja", 2) == 0
+			  && mbc_max > 1
+			  && (charset[0] != 'U'
+			      || strncmp (locale, "ja", 2) == 0
 			      || strncmp (locale, "ko", 2) == 0
-			      || strncmp (locale, "zh", 2) == 0));
+			      || strncmp (locale, "zh", 2) == 0);
+#ifdef __HAVE_LOCALE_INFO__
+      ret = __ctype_load_locale (locale, (void *) l_wctomb, charset, mbc_max);
+#endif /* __HAVE_LOCALE_INFO__ */
+      break;
+    case LC_MESSAGES:
+      strcpy (lc_message_charset, charset);
+#ifdef __HAVE_LOCALE_INFO__
+      ret = __messages_load_locale (locale, (void *) l_wctomb, charset);
+      if (!ret)
+#endif /* __HAVE_LOCALE_INFO__ */
+      break;
+#ifdef __HAVE_LOCALE_INFO__
+#ifdef __CYGWIN__
+  /* Right now only Cygwin supports a __collate_load_locale function at all. */
+    case LC_COLLATE:
+      ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+      break;
 #endif
+    case LC_MONETARY:
+      ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+    case LC_NUMERIC:
+      ret = __numeric_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+    case LC_TIME:
+      ret = __time_load_locale (locale, (void *) l_wctomb, charset);
+      break;
+#endif /* __HAVE_LOCALE_INFO__ */
+    default:
+      break;
     }
-  else if (category == LC_MESSAGES)
-    strcpy (lc_message_charset, charset);
+#ifdef __HAVE_LOCALE_INFO__
+  if (ret)
+    FAIL;
+#endif /* __HAVE_LOCALE_INFO__ */
   return strcpy(current_categories[category], new_categories[category]);
 }
 
@@ -749,19 +925,37 @@ __get_locale_env(struct _reent *p, int category)
 
   return env;
 }
-#endif
+#endif /* _MB_CAPABLE */
 
 const char *
 _DEFUN_VOID(__locale_charset)
 {
+#if 0//def __HAVE_LOCALE_INFO__
+  return __get_current_ctype_locale ()->codeset;
+#else
   return lc_ctype_charset;
+#endif
+}
+
+int
+_DEFUN_VOID(__locale_mb_cur_max)
+{
+#if 0//def __HAVE_LOCALE_INFO__
+  return __get_current_ctype_locale ()->mb_cur_max[0];
+#else
+  return __mb_cur_max;
+#endif
 }
 
 #if 0
 const char *
 _DEFUN_VOID(__locale_msgcharset)
 {
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_current_messages_locale ()->codeset;
+#else
   return lc_message_charset;
+#endif
 }
 #endif
 
@@ -776,12 +970,59 @@ struct lconv *
 _DEFUN(_localeconv_r, (data), 
       struct _reent *data)
 {
+#ifdef __HAVE_LOCALE_INFO__
+  if (__nlocale_changed)
+    {
+      struct lc_numeric_T *n = __get_current_numeric_locale ();
+      lconv.decimal_point = n->decimal_point;
+      lconv.thousands_sep = n->thousands_sep;
+      lconv.grouping = n->grouping;
+      __nlocale_changed = 0;
+    }
+  if (__mlocale_changed)
+    {
+      struct lc_monetary_T *m = __get_current_monetary_locale ();
+      lconv.int_curr_symbol = m->int_curr_symbol;
+      lconv.currency_symbol = m->currency_symbol;
+      lconv.mon_decimal_point = m->mon_decimal_point;
+      lconv.mon_thousands_sep = m->mon_thousands_sep;
+      lconv.mon_grouping = m->mon_grouping;
+      lconv.positive_sign = m->positive_sign;
+      lconv.negative_sign = m->negative_sign;
+      lconv.int_frac_digits = m->int_frac_digits[0];
+      lconv.frac_digits = m->frac_digits[0];
+      lconv.p_cs_precedes = m->p_cs_precedes[0];
+      lconv.p_sep_by_space = m->p_sep_by_space[0];
+      lconv.n_cs_precedes = m->n_cs_precedes[0];
+      lconv.n_sep_by_space = m->n_sep_by_space[0];
+      lconv.p_sign_posn = m->p_sign_posn[0];
+      lconv.n_sign_posn = m->n_sign_posn[0];
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+      lconv.int_p_cs_precedes = m->int_p_cs_precedes[0];
+      lconv.int_p_sep_by_space = m->int_p_sep_by_space[0];
+      lconv.int_n_cs_precedes = m->int_n_cs_precedes[0];
+      lconv.int_n_sep_by_space = m->int_n_sep_by_space[0];
+      lconv.int_n_sign_posn = m->int_n_sign_posn[0];
+      lconv.int_p_sign_posn = m->int_p_sign_posn[0];
+#else /* !__HAVE_LOCALE_INFO_EXTENDED__ */
+      lconv.int_p_cs_precedes = m->p_cs_precedes[0];
+      lconv.int_p_sep_by_space = m->p_sep_by_space[0];
+      lconv.int_n_cs_precedes = m->n_cs_precedes[0];
+      lconv.int_n_sep_by_space = m->n_sep_by_space[0];
+      lconv.int_n_sign_posn = m->n_sign_posn[0];
+      lconv.int_p_sign_posn = m->p_sign_posn[0];
+#endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
+      __mlocale_changed = 0;
+    }
+#endif /* __HAVE_LOCALE_INFO__ */
   return (struct lconv *) &lconv;
 }
 
 #ifndef _REENT_ONLY
 
 #ifndef __CYGWIN__
+/* Cygwin provides its own version of setlocale to perform some more
+   initialization work.  It calls _setlocale_r, though. */
 const char *
 _DEFUN(setlocale, (category, locale),
        int category _AND
@@ -789,7 +1030,7 @@ _DEFUN(setlocale, (category, locale),
 {
   return _setlocale_r (_REENT, category, locale);
 }
-#endif
+#endif /* __CYGWIN__ */
 
 struct lconv *
 _DEFUN_VOID(localeconv)

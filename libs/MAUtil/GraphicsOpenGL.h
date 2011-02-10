@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define _NO_OLDNAMES	//avoid conflicts with y1()
 #include <ma.h>
- 
+
 #ifndef _SE_MSAB_MAUTIL_GRAPHICS_OPENGL_H_
 #define _SE_MSAB_MAUTIL_GRAPHICS_OPENGL_H_
 
@@ -40,11 +40,11 @@ extern "C" {
 #endif
 
 	//MAGraphicsDriver* Gfx_getDriverOpenGL(void);
-	
+
 	// if nativeUIOpenGLView is -1 we are running in fullscreen mode.
 	void Gfx_useDriverOpenGL(int nativeUIOpenGLView);
-	
-	
+
+
 #ifdef __cplusplus
 }
 #endif

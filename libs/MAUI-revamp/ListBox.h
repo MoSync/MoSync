@@ -315,6 +315,7 @@ namespace MAUI {
 		 * \return ?
 		 */
 		virtual bool keyPressed(int keyCode, int nativeCode);
+		bool keyPressedSelect(int keyCode, int nativeCode);
 
 		/**
 		 * Sets the item in the ListBox that has focus.

@@ -59,6 +59,7 @@ namespace MAUI {
 	}
 
 	Widget::~Widget() {
+		MAASSERT(Engine::getSingleton().getMain() != this);
 		Vector_each(Widget*,it,mChildren)
 			delete (*it);
 	}

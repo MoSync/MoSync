@@ -17,6 +17,7 @@ mod.class_eval do
 		@SOURCES = ["."]
 		@EXTRA_CPPFLAGS = " -Wno-shadow"	#TODO, low-prio: enable -Wshadow
 		@INSTALL_INCDIR = "maui-revamp/MAUI"
+		@IGNORED_HEADERS = ["DefaultSkin.h"]
 		@IGNORED_FILES = ["test.cpp"]
 		@NAME = "maui-revamp"
 	end

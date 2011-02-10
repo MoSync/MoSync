@@ -38,6 +38,7 @@ int	_EXFUN(daemon, (int nochdir, int noclose));
 int     _EXFUN(dup, (int __fildes ));
 int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
 #if defined(__CYGWIN__)
+int     _EXFUN(dup3, (int __fildes, int __fildes2, int flags));
 int	_EXFUN(eaccess, (const char *__path, int __mode));
 void	_EXFUN(endusershell, (void));
 int	_EXFUN(euidaccess, (const char *__path, int __mode));
@@ -93,7 +94,7 @@ pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__rtems__)
 pid_t   _EXFUN(getsid, (pid_t));
 #endif
 #if !defined(__INSIDE_CYGWIN__)
@@ -129,6 +130,9 @@ int     _EXFUN(pause, (void ));
 int	_EXFUN(pthread_atfork, (void (*)(void), void (*)(void), void (*)(void)));
 #endif
 int     _EXFUN(pipe, (int __fildes[2] ));
+#ifdef __CYGWIN__
+int     _EXFUN(pipe2, (int __fildes[2], int flags));
+#endif
 ssize_t _EXFUN(pread, (int __fd, void *__buf, size_t __nbytes, off_t __offset));
 ssize_t _EXFUN(pwrite, (int __fd, const void *__buf, size_t __nbytes, off_t __offset));
 _READ_WRITE_RETURN_TYPE _EXFUN(read, (int __fd, void *__buf, size_t __nbyte ));
@@ -142,7 +146,7 @@ int	_EXFUN(ruserok, (const char *rhost, int superuser, const char *ruser, const 
 #endif
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
 #if !defined(__INSIDE_CYGWIN__)
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(setegid, (gid_t __gid ));
 int     _EXFUN(seteuid, (uid_t __uid ));
 #endif
@@ -191,9 +195,6 @@ extern int optreset;			/* getopt(3) external variable */
 
 #ifndef        _POSIX_SOURCE
 pid_t   _EXFUN(vfork, (void ));
-
-extern char *suboptarg;			/* getsubopt(3) external variable */
-int	 getsubopt(char **, char * const *, char **);
 #endif /* _POSIX_SOURCE */
 
 #ifdef _COMPILING_NEWLIB

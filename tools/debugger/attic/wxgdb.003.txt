@@ -1,0 +1,20 @@
+-target-select sim
+-file-list-exec-source-files
+-exec-run
+-test-wait
+-stack-list-frames 0 100
+-stack-select-frame 0
+-stack-list-arguments 2 0 0
+-stack-list-locals 2
+-var-create var0 * "str"
+-var-create var1 * "start"
+-var-list-children 2 "var0"
+-var-list-children 2 "var1"
+-stack-select-frame 2
+-stack-list-arguments 2 2 2
+-stack-list-locals 2
+-var-create var2 * "fmt"
+-var-create var3 * "ret"
+-var-create var4 * "ap"
+-var-create var5 * "ptr"
+-var-list-children 2 "var2"

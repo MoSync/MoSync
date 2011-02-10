@@ -104,7 +104,7 @@ int hash_accesses, hash_collisions, hash_expansions, hash_overflows;
 /* OPEN/CLOSE */
 
 DB *
-__hash_open(file, flags, mode, info, dflags)
+__hash_open(file, flags, mode, dflags, info)
 	const char *file;
 	int flags, mode, dflags;
 	const HASHINFO *info;	/* Special directives for create */

@@ -121,7 +121,12 @@ namespace Base {
 	bool Stream::writeStream(Stream& src, int size) {
 		const void* psrc = src.ptrc();
 		if(psrc) {	//memory source stream
-			TEST(this->write(psrc, size));
+			int pos;
+			TEST(src.tell(pos));
+			int srcSize;
+			TEST(src.length(srcSize));
+			TEST(pos + size <= srcSize);
+			TEST(this->write((char*)psrc + pos, size));
 		} else {
 			void* pdst = this->ptr();
 			if(pdst) {	//memory destination stream
