@@ -16,18 +16,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "IWidget.h"
+#import "ButtonWidget.h"
 
-@interface MoSyncUI : NSObject {
-
+@interface ImageButtonWidget : ButtonWidget {
 }
 
-- (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
-- (void)close;
-- (int)createWidget: (NSString*)name; // increasing handles beginning at 0
-- (IWidget*)getWidget: (int) handle;
-- (void)removeWidget: (IWidget*) handle;
-//- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
-- (int)show: (IWidget*) handle;
+- (id)init;
 
 @end

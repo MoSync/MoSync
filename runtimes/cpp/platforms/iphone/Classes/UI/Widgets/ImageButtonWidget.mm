@@ -15,19 +15,28 @@
  02111-1307, USA.
  */
 
-#import <Foundation/Foundation.h>
-#import "IWidget.h"
+#import "ImageButtonWidget.h"
 
-@interface MoSyncUI : NSObject {
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
 
+@implementation ImageButtonWidget
+
+- (id)init {
+	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	//view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+	
+	
+	//view.frame = CGRectMake(0, 0, 100, 40);
+//	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+	
+	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+	
+	return [super init];
 }
-
-- (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
-- (void)close;
-- (int)createWidget: (NSString*)name; // increasing handles beginning at 0
-- (IWidget*)getWidget: (int) handle;
-- (void)removeWidget: (IWidget*) handle;
-//- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
-- (int)show: (IWidget*) handle;
 
 @end

@@ -48,6 +48,7 @@
 
 - (void)addChild: (IWidget*)child;
 - (void)addChild: (IWidget*)child andSubview:(bool)addSubview;
+- (int)remove;
 - (void)removeChild: (IWidget*)child;
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
 

@@ -8,46 +8,6 @@
 #include <mastdlib.h>
 #include "MAHeaders.h"
 
-const char * WIDGET_TYPE_BUTTON = "Button";
-const char * WIDGET_TYPE_LABEL = "Label";
-const char * WIDGET_TYPE_GL_VIEW = "GLView";
-
-const char * WIDGET_TYPE_LIST = "ListView";
-const char * WIDGET_TYPE_LIST_ITEM = "ListViewItem";
-const char * WIDGET_TYPE_LAYOUT_VERTICAL = "VerticalLayout";
-const char * WIDGET_TYPE_LAYOUT_HORIZONTAL = "HorizontalLayout";
-const char * WIDGET_TYPE_SCREEN = "Screen";
-const char * WIDGET_TYPE_TAB_SCREEN = "TabScreen";
-const char * WIDGET_TYPE_WEB_VIEW = "WebView";
-const char * WIDGET_TYPE_NAV_SCREEN = "NavScreen";
-
-const char * WIDGET_PROPERTY_WIDTH = "width";
-const char * WIDGET_PROPERTY_HEIGHT = "height";
-
-const char * WIDGET_PROPERTY_PADDING_LEFT = "left";
-const char * WIDGET_PROPERTY_PADDING_TOP = "top";
-const char * WIDGET_PROPERTY_PADDING_RIGHT = "right";
-const char * WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
-
-const char * WIDGET_PROPERTY_HALIGNMENT = "horizontalAlignment";
-const char * WIDGET_PROPERTY_VALIGNMENT = "verticalAlignment";
-
-const char * WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
-const char * WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-const char * WIDGET_PROPERTY_TEXT = "text";
-
-const char * WIDGET_PROPERTY_BACKGROUND_COLOR = "backgroundColor";
-const char * WIDGET_PROPERTY_FONT_COLOR = "fontColor";
-const char * WIDGET_PROPERTY_FONT_SIZE = "fontSize";
-
-const char * WIDGET_HORIZONTAL_LEFT = "left";
-const char * WIDGET_HORIZONTAL_CENTER = "center";
-const char * WIDGET_HORIZONTAL_RIGHT = "right";
-
-const char * WIDGET_VERTICAL_TOP = "top";
-const char * WIDGET_VERTICAL_CENTER = "center";
-const char * WIDGET_VERTICAL_BOTTOM = "bottom";
-
 int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 {
 	char buffer[256];
@@ -321,6 +281,8 @@ extern "C" int MAMain()
 	resizeWindow(oglWidth, oglHeight);
 	initGL();
 
+	int currentTab = 0;
+
 	// Wait for close event
 	while(1)
 	{
@@ -329,24 +291,31 @@ extern "C" int MAMain()
 		//maWait( 0 );
 
 
-		maWidgetSetProperty(openglView, "bind", "");
+		if(currentTab == 4) {
+			maWidgetSetProperty(openglView, "bind", "");
 
-		float time = (float)(maGetMilliSecondCount()%1000) * 0.001f;
+			float time = (float)(maGetMilliSecondCount()%1000) * 0.001f;
 
-		//glClearColorx(maGetMilliSecondCount(), 0xffff, 0, 0xffff);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		drawGLScene();
+			//glClearColorx(maGetMilliSecondCount(), 0xffff, 0, 0xffff);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			drawGLScene();
 
-		maWidgetSetProperty(openglView, "invalidate", "");
+			maWidgetSetProperty(openglView, "invalidate", "");
+		}
 
 		while(maGetEvent( &event ) != 0) {
 			if( event.type == EVENT_TYPE_FOCUS_LOST )
 			{
 				maExit( 0 );
 			}
-			else if( event.type == EVENT_TYPE_WIDGET )
-			{
-				maWidgetSetPropertyInt( tabScreen, "currentTab", 1 );
+			if( event.type == EVENT_TYPE_WIDGET) {
+
+				MAWidgetEventData* data = (MAWidgetEventData*)event.data;
+
+				if(data->eventType == WIDGET_EVENT_TAB_CHANGED) {
+					currentTab = data->tabIndex;
+				}
+
 			}
 			else if(event.type == EVENT_TYPE_CLOSE) {
 				maExit( 0 );
@@ -362,14 +331,14 @@ int createListScreen()
 	maWidgetSetPropertyInt( listScreen, "icon", R_NEWS );
 
 	// Create List
-	int list = maWidgetCreate( WIDGET_TYPE_LIST );
+	int list = maWidgetCreate( WIDGET_TYPE_LIST_VIEW );
 	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_HEIGHT, -1 );
 	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_WIDTH, -1 );
 
 	// Add 10 buttons to the list
 	for(int i = 0; i < 10; i++)
 	{
-		int listItem = maWidgetCreate( WIDGET_TYPE_LIST_ITEM );
+		int listItem = maWidgetCreate( WIDGET_TYPE_LIST_VIEW_ITEM );
 		maWidgetSetProperty( listItem, "text", "Click me" );
 		maWidgetSetPropertyInt( listItem, "icon", R_ICON );
 		maWidgetAddChild( list, listItem );
@@ -413,7 +382,7 @@ int createScreen(const char *title, int icon, const char *text)
 	maWidgetSetPropertyInt( screen, "icon", icon );
 
 	int textView = maWidgetCreate( WIDGET_TYPE_LABEL );
-	maWidgetSetProperty( textView, WIDGET_PROPERTY_TEXT, text );
+	maWidgetSetProperty( textView, WIDGET_PROPERTY_LABEL_TEXT, text );
 
 	maWidgetAddChild( screen, textView );
 

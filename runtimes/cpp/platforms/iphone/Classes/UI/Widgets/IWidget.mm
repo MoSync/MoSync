@@ -18,6 +18,7 @@
 #import "IWidget.h"
 #import "UIColor-Expanded.h"
 #import <objc/runtime.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -91,6 +92,10 @@
 		[[child getView] removeFromSuperview];
 }
 
+- (int)remove {
+	if(!parent) return WIDGET_ERROR;
+	[parent removeChild: self];
+}
 
 - (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
