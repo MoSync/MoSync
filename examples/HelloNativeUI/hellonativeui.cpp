@@ -184,7 +184,7 @@ public:
 		maWidgetDestroy(mMainLayoutWidget);
 	}
 
-//Next, the public methods of our AppScreen class.
+//Next, the private methods of our AppScreen class.
 private:
 
 	//Here we declare the data types of our widgets so that the constructor,
