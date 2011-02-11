@@ -243,7 +243,9 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync) context;
 		
+		// TODO: Clean this up! The static reference should be in this class.
 		EventQueue.sMoSyncThread = this;
+		sMoSyncThread = this;
 		
 		mHasDied = false;
 		
