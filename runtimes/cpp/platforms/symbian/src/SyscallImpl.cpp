@@ -2803,7 +2803,7 @@ int Syscall::maStreamVideoStart(const char* url) {
 			size, clip);
 		gVideoPlayer->RegisterForVideoLoadingNotification(*this);
 	}
-	HBufC16* url16 = CreateHBufC16FromCStringLC(url);
+	TCleaner<HBufC16> url16(CreateHBufC16FromCStringLC(url));
 	gVideoPlayer->OpenUrlL(*url16);
 	gStreamState = SS_OPENING;
 	gStreamWantsToPause = false;
