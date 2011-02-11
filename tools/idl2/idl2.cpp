@@ -157,6 +157,8 @@ int main() {
 		copy("Output/maapi.h", "../../libs/newlib/libc/sys/mosync/");
 		copy("maapi_defs.h", "../../libs/newlib/libc/sys/mosync/");
 
+		// Create directory for binary files
+		_mkdir((MOSYNCDIR + "/bin").c_str());
 		copy("Output/asm_config.lst", "" + MOSYNCDIR + "/bin/");
 
 		copy("Output/invoke_syscall_java.h", "../../runtimes/java/Shared/generated/");
