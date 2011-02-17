@@ -207,6 +207,13 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
 		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s'))
 		FileUtils.mv('rebuild.s', esFile) if(File.exists?('rebuild.s'))
 		if(SETTINGS[:stop_on_fail])
+			if(SETTINGS[:copy_target])
+				# copy program, sld and stabs to directory :copy_target.
+				ct = SETTINGS[:copy_target]
+				FileUtils.cp(pfn, ct + 'program')
+				FileUtils.cp(sldFile, ct + 'sld.tab')
+				FileUtils.cp(stabsFile, ct + 'stabs.tab')
+			end
 			error "Stop on fail"
 		end
 	end

@@ -383,6 +383,12 @@ int main(int argc,char *argv[])
 			continue;
 		}
 
+		if (Token("quiet"))
+		{
+			ArgQuiet = 1;
+			continue;
+		}
+
 		if (Token("-credits"))
 		{
 			printf("\nMoSync Team Credits\n");
@@ -615,7 +621,7 @@ int main(int argc,char *argv[])
 //		SetRelPath(input);
 //		AddSourceText("\r\n.relpath '%s'\r\n", relPath);
 		
-		v = AddLibrarian(input, !ArgBuild);
+		v = AddLibrarian(input, !ArgBuild && !ArgQuiet);
 
 		if (!v)
 		{
@@ -731,6 +737,9 @@ Build application (-B) options:\n\
 \n\
 Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\
+\n\
+Librarian (-L) options:\n\
+	-quiet               don't display the component files\n\
 \n\
 Library mode (-L) is used to combine .s files into a .lib library file.\n\
 In resource mode (-R), resource files are compiled to the output file.\n\

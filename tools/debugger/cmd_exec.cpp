@@ -483,7 +483,8 @@ static void finishStopRetValueEvaluated(const Value* value, const char *err) {
 		error("%s", err); 
 		return; 
 	}
-	oprintf(",gdb-result-var=\"$1\",return-value=\"%s\"", getValue(value->getTypeBase(), value->getDataAddress(), TypeBase::eNatural).c_str());
+	oprintf(",gdb-result-var=\"$1\",return-value=\"%s\"", getValue(value->getTypeBase(),
+		value->getDataAddress(), TypeBase::eNatural).c_str());
 	delete sReturnTree;
 	sReturnTree = NULL;
 

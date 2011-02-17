@@ -146,10 +146,11 @@ public:
 		mCurrentConnectionListener = NULL;
 
 		printf("Bluetooth SERVER test program.\n");
-		//printf("Start Bluetooth server: Touch screen or press 1.\n");
-		printf("Exit program: Press Back or 0\n");
+		printf("Touch screen or press 1 to start server.\n");
+		printf("Press Back or 0 to exit program.\n");
 
-		startServer();
+		// Uncomment to start server automatically when program is launched.
+		//startServer();
 	}
 
 	virtual ~MyMoblet()
@@ -176,6 +177,10 @@ public:
 		mServer->accept(mCurrentConnectionListener); // TODO: try with NULL or use dummy listener.
 	}
 
+	/**
+	 * The server has accepted a client connection.
+	 * Start receiving data.
+	 */
 	void serverAcceptedNewConnection(Connection* newConnection)
 	{
 		// Print the remote address.
@@ -189,7 +194,7 @@ public:
 		// Start communicating using the new connection.
 		mCurrentConnectionListener->startReceivingDataOnConnection(newConnection);
 
-		// Accept new connection.
+		// Accept next connection.
 		accept();
 	}
 
@@ -231,12 +236,13 @@ public:
 		if (keyCode == MAK_0 || keyCode == MAK_BACK)
 		{
 			printf("Exiting program.\n");
+			mServer->close();
 			close();
 		}
 
 		if (keyCode == MAK_1)
 		{
-			// startServer();
+			startServer();
 		}
 	}
 
@@ -244,11 +250,8 @@ public:
 	{
 		printf("Touchdown event.\n");
 
-		// Accept new connection.
-		accept();
-
 		// Server is started on program startup.
-		// startServer();
+		startServer();
 	}
 };
 

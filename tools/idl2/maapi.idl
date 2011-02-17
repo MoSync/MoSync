@@ -1292,6 +1292,18 @@ interface MAAPI {
 		* \brief An event sent from a native widget.
 		*/
 		WIDGET = 28;
+		
+		/** \brief The bluetooth chip was turned off.
+		* Bluetooth functions will return #CONNERR_UNAVAILABLE.
+		* Currently implemented only on Android.
+		*/
+		BLUETOOTH_TURNED_OFF = 29;
+
+		/** \brief The bluetooth chip was turned on.
+		* Bluetooth functions will now work normally again.
+		* Currently implemented only on Android.
+		*/
+		BLUETOOTH_TURNED_ON = 30;
 	}
 
 	/**
@@ -3448,9 +3460,9 @@ interface MAAPI {
 		}
 
 		/**
-		* Returns the number of different output formats supported by this camera.
+		* Returns the number of different output formats supported by the current device's camera.
 		* \< 0 if there is no camera support.
-		* 0 if there IS camera support, but the format is unknown.
+		* 0 if there is camera support, but the format is unknown.
 		*/
 		int maCameraFormatNumber();
 
@@ -3478,7 +3490,7 @@ interface MAAPI {
 		* Requires the viewfinder to be active.
 		* Takes a snapshot using the specified format. The snapshot is JPEG-encoded and
 		* stored as a new data object in the supplied placeholder.
-		* Returns 0 or \< 0.
+		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
 		
@@ -3561,13 +3573,6 @@ interface MAAPI {
 			/// the initial letter of each sentence should be capitalized.
 			INITIAL_CAPS_SENTENCE = 0x20000;
 		}
-
-		/**
-		* Set the background image of the phone's home screen.
-		* @param data Image data in JPEG or PNG format.
-		* @return \< 0 on error.
-		*/
-		int maWallpaperSet(in MAHandle data);
 
 		/**
 		* Make MoSync send key-events for the specified key, even when

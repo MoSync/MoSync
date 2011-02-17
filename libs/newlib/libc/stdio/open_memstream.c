@@ -78,8 +78,10 @@ Supporting OS subroutines required: <<sbrk>>.
 /* Describe details of an open memstream.  */
 typedef struct memstream {
   void *storage; /* storage to free on close */
-  char **pbuf; /* pointer to the current buffer */
-  size_t *psize; /* pointer to the current size, smaller of pos or eof */
+  char *buf; /* the current buffer */
+  size_t size; /* the current size, smaller of pos or eof */
+	char** bufp; /* pointer to the pointer that will receive the address of the buffer on fflush or fclose(). */
+	size_t* sizep; /* pointer to the size_t that will receive the size of the buffer on fflush or fclose(). */
   size_t pos; /* current position */
   size_t eof; /* current file size */
   size_t max; /* current malloc buffer size, always > eof */
@@ -100,7 +102,7 @@ _DEFUN(memwriter, (ptr, cookie, buf, n),
        int n)
 {
   memstream *c = (memstream *) cookie;
-  char *cbuf = *c->pbuf;
+  char *cbuf = c->buf;
 
   /* size_t is unsigned, but off_t is signed.  Don't let stream get so
      big that user cannot do ftello.  */
@@ -122,7 +124,7 @@ _DEFUN(memwriter, (ptr, cookie, buf, n),
       cbuf = _realloc_r (ptr, cbuf, newsize);
       if (! cbuf)
 	return EOF; /* errno already set to ENOMEM */
-      *c->pbuf = cbuf;
+      c->buf = cbuf;
       c->max = newsize;
     }
   /* If we have previously done a seek beyond eof, ensure all
@@ -140,7 +142,9 @@ _DEFUN(memwriter, (ptr, cookie, buf, n),
   else
     c->saved.c = cbuf[c->pos];
   cbuf[c->pos] = '\0';
-  *c->psize = (c->wide > 0) ? c->pos / sizeof (wchar_t) : c->pos;
+  c->size = (c->wide > 0) ? c->pos / sizeof (wchar_t) : c->pos;
+	*c->bufp = c->buf;
+	*c->sizep = c->size;
   return n;
 }
 
@@ -182,9 +186,9 @@ _DEFUN(memseeker, (ptr, cookie, pos, whence),
       if (c->pos < c->eof)
 	{
 	  if (c->wide > 0)
-	    *(wchar_t *)((*c->pbuf) + c->pos) = c->saved.w;
+	    *(wchar_t *)((c->buf) + c->pos) = c->saved.w;
 	  else
-	    (*c->pbuf)[c->pos] = c->saved.c;
+	    (c->buf)[c->pos] = c->saved.c;
 	  c->saved.w = L'\0';
 	}
       c->pos = offset;
@@ -192,22 +196,24 @@ _DEFUN(memseeker, (ptr, cookie, pos, whence),
 	{
 	  if (c->wide > 0)
 	    {
-	      c->saved.w = *(wchar_t *)((*c->pbuf) + c->pos);
-	      *(wchar_t *)((*c->pbuf) + c->pos) = L'\0';
-	      *c->psize = c->pos / sizeof (wchar_t);
+	      c->saved.w = *(wchar_t *)((c->buf) + c->pos);
+	      *(wchar_t *)((c->buf) + c->pos) = L'\0';
+	      c->size = c->pos / sizeof (wchar_t);
 	    }
 	  else
 	    {
-	      c->saved.c = (*c->pbuf)[c->pos];
-	      (*c->pbuf)[c->pos] = '\0';
-	      *c->psize = c->pos;
+	      c->saved.c = (c->buf)[c->pos];
+	      (c->buf)[c->pos] = '\0';
+	      c->size = c->pos;
 	    }
 	}
       else if (c->wide > 0)
-	*c->psize = c->eof / sizeof (wchar_t);
+	c->size = c->eof / sizeof (wchar_t);
       else
-	*c->psize = c->eof;
+	c->size = c->eof;
     }
+	*c->bufp = c->buf;
+	*c->sizep = c->size;
   return (_fpos_t) offset;
 }
 
@@ -243,9 +249,9 @@ _DEFUN(memseeker64, (ptr, cookie, pos, whence),
       if (c->pos < c->eof)
 	{
 	  if (c->wide > 0)
-	    *(wchar_t *)((*c->pbuf) + c->pos) = c->saved.w;
+	    *(wchar_t *)((c->buf) + c->pos) = c->saved.w;
 	  else
-	    (*c->pbuf)[c->pos] = c->saved.c;
+	    (c->buf)[c->pos] = c->saved.c;
 	  c->saved.w = L'\0';
 	}
       c->pos = offset;
@@ -253,22 +259,24 @@ _DEFUN(memseeker64, (ptr, cookie, pos, whence),
 	{
 	  if (c->wide > 0)
 	    {
-	      c->saved.w = *(wchar_t *)((*c->pbuf) + c->pos);
-	      *(wchar_t *)((*c->pbuf) + c->pos) = L'\0';
-	      *c->psize = c->pos / sizeof (wchar_t);
+	      c->saved.w = *(wchar_t *)((c->buf) + c->pos);
+	      *(wchar_t *)((c->buf) + c->pos) = L'\0';
+	      c->size = c->pos / sizeof (wchar_t);
 	    }
 	  else
 	    {
-	      c->saved.c = (*c->pbuf)[c->pos];
-	      (*c->pbuf)[c->pos] = '\0';
-	      *c->psize = c->pos;
+	      c->saved.c = (c->buf)[c->pos];
+	      (c->buf)[c->pos] = '\0';
+	      c->size = c->pos;
 	    }
 	}
       else if (c->wide > 0)
-	*c->psize = c->eof / sizeof (wchar_t);
+	c->size = c->eof / sizeof (wchar_t);
       else
-	*c->psize = c->eof;
+	c->size = c->eof;
     }
+	*c->bufp = c->buf;
+	*c->sizep = c->size;
   return (_fpos64_t) offset;
 }
 #endif /* __LARGE64_FILES */
@@ -283,11 +291,13 @@ _DEFUN(memcloser, (ptr, cookie),
   char *buf;
 
   /* Be nice and try to reduce any unused memory.  */
-  buf = _realloc_r (ptr, *c->pbuf,
-		    c->wide > 0 ? (*c->psize + 1) * sizeof (wchar_t)
-				: *c->psize + 1);
+  buf = _realloc_r (ptr, c->buf,
+		    c->wide > 0 ? (c->size + 1) * sizeof (wchar_t)
+				: c->size + 1);
   if (buf)
-    *c->pbuf = buf;
+    c->buf = buf;
+	*c->bufp = c->buf;
+	*c->sizep = c->size;
   _free_r (ptr, c->storage);
   return 0;
 }
@@ -297,14 +307,14 @@ _DEFUN(memcloser, (ptr, cookie),
 static FILE *
 _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
        struct _reent *ptr _AND
-       char **buf _AND
-       size_t *size _AND
+       char **bufp _AND
+       size_t *sizep _AND
        int wide)
 {
   FILE *fp;
   memstream *c;
 
-  if (!buf || !size)
+  if (!bufp || !sizep)
     {
       ptr->_errno = EINVAL;
       return NULL;
@@ -325,16 +335,16 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
      malloc between 64 bytes (same as asprintf, to avoid frequent
      mallocs on small strings) and 64k bytes (to avoid overusing the
      heap if *size was garbage).  */
-  c->max = *size;
+  c->max = *sizep;
   if (wide == 1)
     c->max *= sizeof(wchar_t);
   if (c->max < 64)
     c->max = 64;
   else if (c->max > 64 * 1024)
     c->max = 64 * 1024;
-  *size = 0;
-  *buf = _malloc_r (ptr, c->max);
-  if (!*buf)
+  *sizep = 0;
+  *bufp = _malloc_r (ptr, c->max);
+  if (!*bufp)
     {
       __sfp_lock_acquire ();
       fp->_flags = 0;		/* release */
@@ -346,13 +356,15 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
       return NULL;
     }
   if (wide == 1)
-    **((wchar_t **)buf) = L'\0';
+    **((wchar_t **)bufp) = L'\0';
   else
-    **buf = '\0';
+    **bufp = '\0';
 
   c->storage = c;
-  c->pbuf = buf;
-  c->psize = size;
+	c->buf = *bufp;
+	c->size = *sizep;
+  c->bufp = bufp;
+  c->sizep = sizep;
   c->eof = 0;
   c->saved.w = L'\0';
   c->wide = (int8_t) wide;

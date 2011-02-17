@@ -20,6 +20,8 @@ package com.mosync.internal.android;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_HIDDEN;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_HOMESCREEN_SHOWN;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -29,7 +31,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RecentTaskInfo;
 import android.app.ActivityManager.RunningTaskInfo;
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,6 +38,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -49,8 +51,8 @@ public class MoSyncHomeScreen
 	/**
 	 * The MoSync thread object.
 	 */
-	MoSyncThread mMoSyncThread;
-
+	private MoSyncThread mMoSyncThread;
+	
 	/**
 	 * Constructor.
 	 * @param thread The MoSync thread.
@@ -68,102 +70,6 @@ public class MoSyncHomeScreen
 		return mMoSyncThread.getActivity();
 	}
 	
-	/**
-	 * Set the background image of the phone's home screen.
-	 * @param data Handle to an image object (PNG of JPEG)
-	 */
-	int maWallpaperSet(final int handle)
-	{
-		Log.i("MoSync", "maWallpaperSet handle: " + handle);
-		
-		homeScreenPanicIfPermissionsAreNotSet();
-		
-		try 
-		{
-			// Get the data object.
-			//ImageCache image = (ImageCache) 
-			//	mMoSyncThread.getImageResource(handle);
-			
-			// Byte array that holds image data.
-			byte[] imageData;
-			
-			// Is the handle that holds the image data a binary resource?
-			ByteBuffer dataBuffer = mMoSyncThread.getBinaryResource(handle);
-			
-			if (null != dataBuffer) 
-			{
-				// Allocate byte array.
-				imageData = new byte[dataBuffer.capacity()];
-				
-				// Copy image data into array.
-				dataBuffer.position(0);
-				dataBuffer.get(imageData);
-			}
-			else
-			{ 
-				// Perhaps the handle is an unloaded binary resource?
-				imageData = mMoSyncThread
-					.getUnloadedBinaryResourceAsByteArray(handle);
-				if (null == imageData) 
-				{ 
-					// Handle was not found.
-					return -1; 
-				}
-			}
-			
-			// Create bitmap from image data.
-			Bitmap bitmap = BitmapFactory.decodeByteArray(
-				imageData,
-				0, 
-				imageData.length);
-			
-			// Scale bitmap to screen size.
-			DisplayMetrics metrics = new DisplayMetrics();
-			getActivity().getWindowManager()
-				.getDefaultDisplay().getMetrics(metrics);
-			Bitmap scaledBitmap = Bitmap.createBitmap(
-				metrics.widthPixels, 
-				metrics.heightPixels, 
-				Bitmap.Config.ARGB_8888);
-			Canvas canvas = new Canvas(scaledBitmap);
-			canvas.drawBitmap(
-				bitmap, 
-				null, 
-				new Rect(0, 0, metrics.widthPixels, metrics.heightPixels),
-				null);
-			
-			// WallpaperManager is available only on Android 5 and above.
-			// Try to set using the wrapper class. If class loading fails, 
-			// use old way to set wallpaper.
-			try 
-			{
-				// New way.
-				new WallpaperManagerWrapper().setWallpaper(
-					scaledBitmap,
-					mMoSyncThread.getActivity());
-			}
-			catch (java.lang.VerifyError error)
-			{
-
-				Log.i("@@@ MoSync", 
-					"About to set wallpaper on Android Level 3 or 4.");
-				
-				// Old way.
-				getActivity().setWallpaper(scaledBitmap);
-
-				Log.i("@@@ MoSync", "Wallpaper is set.");
-			}
-
-			return 0; // Zero means ok.
-		} 
-		catch (Exception ex) 
-		{
-			ex.printStackTrace();
-		}
-		
-		return -1;
-	}
-
 	/**
 	 * Add a shortcut icon to the home screen. If called multiple times
 	 * multiple icons will be added. The shortcut launches the current
@@ -281,14 +187,6 @@ public class MoSyncHomeScreen
 			||
 			(PackageManager.PERMISSION_GRANTED != 
 				getActivity().checkCallingOrSelfPermission(
-						android.Manifest.permission.SET_WALLPAPER))
-			||
-			(PackageManager.PERMISSION_GRANTED != 
-				getActivity().checkCallingOrSelfPermission(
-						android.Manifest.permission.SET_WALLPAPER_HINTS))
-			||
-			(PackageManager.PERMISSION_GRANTED != 
-				getActivity().checkCallingOrSelfPermission(
 					"com.android.launcher.permission.INSTALL_SHORTCUT"))
 			||
 			(PackageManager.PERMISSION_GRANTED != 
@@ -297,7 +195,7 @@ public class MoSyncHomeScreen
 			)
 		{
 			mMoSyncThread.maPanic(1, 
-				"Permission 'Home Screen and Wallpaper access' " +
+				"Permission 'Home Screen access' " +
 				"is not set in the MoSync project");
 		}
 	}
@@ -487,39 +385,5 @@ public class MoSyncHomeScreen
 			// We did not find the id of the home screen task.
 	    	return -1;
 	    }
-	}
-}
-
-/**
- * Wrapper class for WallpaperManager. Used for backwards compatibility.
- * This cannot be an inner class (I believe) because we need to detect
- * when it fails to load, and we don't want MoSyncHomeScreen to fail!
- * @author Mikael Kindborg
- */
-class WallpaperManagerWrapper
-{
-	public void setWallpaper(Bitmap bitmap, Activity activity)
-	{
-		try
-		{
-			// Get the wallpaper manager.
-			WallpaperManager manager = WallpaperManager.getInstance(activity);
-			
-			// Set wallpaper suggested size to the screen size.
-			DisplayMetrics metrics = new DisplayMetrics();
-			activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
-			Log.i("MoSync", 
-				"WallpaperManagerWrapper suggestDesiredDimensions: " 
-				+ metrics.widthPixels + " " 
-				+ metrics.heightPixels);
-			manager.suggestDesiredDimensions(metrics.widthPixels, metrics.heightPixels);
-			
-			// Set the wallpaper.
-			manager.setBitmap(bitmap);
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
 	}
 }

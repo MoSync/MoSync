@@ -18,6 +18,7 @@
 #include "maassert.h"
 #include "mavsprintf.h"
 #include "conprint.h"
+#include "realpath.h"
 
 
 #ifdef MOSYNCDEBUG
@@ -49,6 +50,7 @@ void crt_tor_chain(int* ptr) {
 
 
 void _exit(int status) {
+	LOGD("exit(%i)\n", status);
 	fcloseall();
 	maExit(status);
 }
@@ -120,6 +122,7 @@ static char sCwd[2048] = "/";
 
 // returns 1 if it's a directory, 0 if it's not.
 static int getRealPath(char *buf, const char* path, int size) {
+#if 0
 	if(path[0]!='/') {
 		strncpy(buf, sCwd, size);
 		strncat(buf, path, size);
@@ -127,7 +130,11 @@ static int getRealPath(char *buf, const char* path, int size) {
 	} else {
 		strncpy(buf, path, size);
 	}
-	
+#else
+	if(realpath(path, buf) == NULL) {
+		PANIC_MESSAGE("realpath");
+	}
+#endif
 	size=strlen(buf);
 	if(!size || buf[size-1]=='/') return 1;
 	else return 0;
@@ -149,7 +156,7 @@ static void initFda(void) {
 
 static struct LOW_FD* getLowFd(int __fd) {
 	initFda();
-	LOGD("getLowFd(%i)", __fd);
+	//LOGD("getLowFd(%i)", __fd);
 	if(__fd <= 0 || __fd >= NFD) {
 		errno = EBADF;
 		return NULL;
@@ -163,7 +170,7 @@ static struct LOW_FD* getLowFd(int __fd) {
 }
 #define LOWFD int lfd; struct LOW_FD* plfd; \
 	/*LOGD("LOWFD(%i) in %s", __fd, __FUNCTION__);*/ \
-	plfd = getLowFd(__fd); if(plfd == NULL) STDFAIL; lfd = plfd->lowFd;
+	plfd = getLowFd(__fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", __fd); STDFAIL; } lfd = plfd->lowFd;
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -228,22 +235,51 @@ int dup2(int __fd, int newFd) {
 #error gha
 #endif
 
-static int baseStat(MAHandle h, struct stat* st) {
-	CHECK(st->st_size = maFileSize(h), EIO);
+static int baseStat(MAHandle h, struct stat* st, int checkSize) {
+	if(checkSize) {
+		CHECK(st->st_size = maFileSize(h), EIO);
+	} else {
+		st->st_size = 0;
+	}
 	CHECK(st->st_mtime = maFileDate(h), EIO);
+	
+	// we don't support the rest of the fields, but let's give them dummy values anyway.
+	st->st_ino = 0;
+	st->st_dev = 0;
+	st->st_nlink = 1;
+	st->st_uid = 0;
+	st->st_gid = 0;
+	st->st_atime = 0;
+	st->st_ctime = 0;
+	st->st_blocks = (st->st_size / 512) + 1;
+	st->st_blksize = 1024 * 4;	// arbitrary
+	
 	return 0;
 }
 
 int fstat(int __fd, struct stat *st) {
 	LOWFD;
+	LOGD("fstat(%i)\n", __fd);
 	if(lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG) {
 		st->st_mode = S_IFCHR;
 		return 0;
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
 		st->st_mode = S_IFREG;
-		return baseStat(h, st);
+		return baseStat(h, st, TRUE);
 	}
+}
+
+// returns the value from maFileExist(), or <0 in case of another error.
+static int postStat(MAHandle h, struct stat *st, int mode) {
+	int exists;
+	CHECK(exists = maFileExists(h), ENOTRECOVERABLE);
+	if(!exists) {
+		return 0;
+	}
+	st->st_mode = mode;
+	TEST(baseStat(h, st, mode != S_IFDIR));
+	return 1;
 }
 
 int stat(const char *file, struct stat *st) {
@@ -251,7 +287,6 @@ int stat(const char *file, struct stat *st) {
 	int res;
 	char temp[2048];
 	int length;
-	int exists;
 	getRealPath(temp, file, 2046);
 	LOGD("stat(%s)", temp);
 	
@@ -263,14 +298,13 @@ int stat(const char *file, struct stat *st) {
 	}
 	h = errnoFileOpen(temp, MA_ACCESS_READ);
 	if(h > 0) {
-		CHECK(exists = maFileExists(h), ENOTRECOVERABLE);
-		if(exists) {	// it worked, and it is a directory.
-			st->st_mode = S_IFDIR;
-			st->st_mtime = maFileDate(h);
+		res = postStat(h, st, S_IFDIR);
+		if(res < 0) {
 			CHECK(maFileClose(h), EIO);
-			CHECK(st->st_mtime, EIO);
-			return 0;
+			STDFAIL;
 		}
+		if(res > 0)	// it was an existing directory.
+			return 0;
 	} else {
 		if(errno != ENOENT)
 			STDFAIL;
@@ -279,14 +313,14 @@ int stat(const char *file, struct stat *st) {
 	// see if we can find a regular file.
 	temp[length-1] = 0;	// remove the ending slash
 	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
-	CHECK(exists = maFileExists(h), ENOTRECOVERABLE);
-	if(!exists) {
+	res = postStat(h, st, S_IFREG);
+	if(res < 0) {
+		CHECK(maFileClose(h), EIO);
+		STDFAIL;
+	}
+	if(!res) {
 		ERRNOFAIL(ENOENT);
 	}
-	st->st_mode = S_IFREG;
-	res = baseStat(h, st);
-	CHECK(maFileClose(h), EIO);
-	TEST(res);
 	return 0;
 }
 
@@ -294,6 +328,7 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 	MAHandle file;
 	int res;
 	LOWFD;
+	LOGD("lseek(%i, %li, %i)\n", __fd, __offset, __whence);
 	file = lfd - LOWFD_OFFSET;
 	switch(__whence) {
 		case SEEK_SET: __whence = MA_SEEK_SET; break;
@@ -316,14 +351,16 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 	MAHandle file;
 	LOWFD;
 	file = lfd - LOWFD_OFFSET;
+	LOGD("read(%i, %zu)\n", __fd, __nbyte);
 
 	CHECK(fileSize = maFileSize(file), EIO);
 	CHECK(fileTell = maFileTell(file), EIO);
  
 	remaining = fileSize - fileTell;
-	if(remaining==0) return 0;
-	FAILIF(remaining < 0, EIO);
-	if(remaining<__nbyte)
+	// seeking past the end of the file is allowed. it's treated like ordinary EOF.
+	if(remaining <= 0) return 0;
+	//FAILIF(remaining < 0, EIO);
+	if(remaining < __nbyte)
 		__nbyte = remaining;
 	
 	CHECK(maFileRead(file, __buf, __nbyte), EIO);
@@ -340,6 +377,7 @@ int write(int __fd, const void *__buf, size_t __nbyte) {
 		res = maWriteLog(__buf, __nbyte);
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
+		LOGD("write(%i, %zu)\n", __fd, __nbyte);
 		if(plfd->flags & O_APPEND) {
 			int oldPos = maFileTell(h);
 			int fileSize = maFileSize(h);
@@ -380,10 +418,27 @@ int isatty(int __fd) {
 	return lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG;
 }
 
+static int postOpen(MAHandle handle, int __mode) {
+	int exists;
+	CHECK(exists = maFileExists(handle), ENOTRECOVERABLE);
+	LOGD("exists: %i", exists);
+	if(__mode & O_CREAT) {
+		FAILIF((__mode & O_EXCL) && exists, EEXIST);
+		if(!exists) {
+			CHECK(maFileCreate(handle), EACCES);
+		}
+	} else {
+		FAILIF(!exists, ENOENT);
+	}
+	if(__mode & O_TRUNC) {
+		CHECK(maFileTruncate(handle, 0), EIO);
+	}
+	return 0;
+}
+
 int open(const char * __filename, int __mode, ...) {
 	int ma_mode;
 	int handle;
-	int exists;
 	int newFd;
 	struct LOW_FD* newLfd;
 
@@ -392,7 +447,7 @@ int open(const char * __filename, int __mode, ...) {
 		errno = ENOENT;
 		STDFAIL;
 	}
-	LOGD("open(%s)", temp);
+	LOGD("open(%s, 0x%x)", temp, __mode);
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
@@ -411,18 +466,9 @@ int open(const char * __filename, int __mode, ...) {
 	newLfd = findFreeLfd();
 
 	TEST(handle = errnoFileOpen(temp, ma_mode));
-	CHECK(exists = maFileExists(handle), ENOTRECOVERABLE);
-	LOGD("exists: %i", exists);
-	if(__mode & O_CREAT) {
-		FAILIF((__mode & O_EXCL) && exists, EEXIST);
-		if(!exists) {
-			CHECK(maFileCreate(handle), EACCES);
-		}
-	} else {
-		FAILIF(!exists, ENOENT);
-	}
-	if(__mode & O_TRUNC) {
-		CHECK(maFileTruncate(handle, 0), EIO);
+	if(postOpen(handle, __mode) < 0) {
+		CHECK(maFileClose(handle), EIO);
+		STDFAIL;
 	}
 	
 	newLfd->lowFd = handle + LOWFD_OFFSET;

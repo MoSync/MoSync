@@ -91,9 +91,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.LinearLayout;
 
-import com.mosync.java.android.MessageBox;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -110,6 +108,11 @@ public class MoSyncThread extends Thread
 	{ 
 		System.loadLibrary("mosync"); 
 	}
+	
+	/**
+	 * Global reference to the single instance of this class.
+	 */
+	private static MoSyncThread sMoSyncThread;
 	
 	// Declaration of native methods.
 	public native boolean nativeInitRuntime();
@@ -240,7 +243,9 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync) context;
 		
+		// TODO: Clean this up! The static reference should be in this class.
 		EventQueue.sMoSyncThread = this;
+		sMoSyncThread = this;
 		
 		mHasDied = false;
 		
@@ -264,6 +269,26 @@ public class MoSyncThread extends Thread
 		
 		nativeInitRuntime();	
 	}
+	
+	public static MoSyncThread getInstance()
+	{
+		return sMoSyncThread;
+	}
+	
+	/**
+	 * Called from the MoSync activity in onDestroy.
+	 * Do cleanup here (but it is not guaranteed that
+	 * this will be called.)
+	 */
+    public void onDestroy()
+	{
+    	if (null != mMoSyncBluetooth)
+    	{
+    		// Delegate onDestroy to the Bluetooth object.
+    		mMoSyncBluetooth.onDestroy();
+    		mMoSyncBluetooth = null;
+    	}
+    }
 	
 	/**
 	 * Return the activity that this thread is related to.
@@ -359,7 +384,8 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		SYSLOG("PANIC - errorCode: " + errorCode + " message: " + message);
+		Log.i("@@@ MoSync", 
+			"PANIC - errorCode: " + errorCode + " message: " + message);
 		
 		mHasDied = true;
 		
@@ -1611,6 +1637,7 @@ public class MoSyncThread extends Thread
 
 	/**
 	 * _maReadStore
+	 * @return RES_OUT_OF_MEMORY on error.
 	 */
 	int _maReadStore(int store, int resourceIndex)
 	{
@@ -1618,24 +1645,35 @@ public class MoSyncThread extends Thread
 		
 		try 
 		{
-			File f = mContext.getFileStreamPath(
+			File file = mContext.getFileStreamPath(
 				(String) mStores.get(new Integer(store)));
 			byte[] buffer;
 			int length = 0;
-			if (f.isFile())
+			if (file.isFile())
 			{
-				length = (int)f.length();
+				length = (int) file.length();
+				
+				// Will throw OutOfMemoryError on fail.
 				buffer = new byte[length];
 				
-				FileInputStream fis = new FileInputStream(f);
+				FileInputStream inputStream = new FileInputStream(file);
 				int offset = 0;
 				while (offset >= 0 && offset < length)
 				{
-					offset = fis.read(buffer, offset, (length-offset));
+					offset = inputStream.read(buffer, offset, (length-offset));
 				}
-				fis.close();
+				inputStream.close();
 				
-				int res = nativeCreateBinaryResource(resourceIndex, length);
+				// Added error checking here of result.
+				// After browsing the code it looks like nativeCreateBinaryResource
+				// returns RES_OUT_OF_MEMORY on fail.
+				// TODO: Confirm this.
+				int result = nativeCreateBinaryResource(resourceIndex, length);
+				if (RES_OUT_OF_MEMORY == result)
+				{
+					return RES_OUT_OF_MEMORY;
+				}
+				
 				ByteBuffer byteBuffer = mBinaryResources.get(resourceIndex);
 				byteBuffer.put(buffer);
 				
@@ -1644,10 +1682,10 @@ public class MoSyncThread extends Thread
 			
 			return RES_OUT_OF_MEMORY;
 		} 
-		catch(Exception e) 
+		catch (Throwable e) 
 		{
 			logError("read store exception : " + e.toString(), e);
-			return -1;
+			return RES_OUT_OF_MEMORY;
 		}
 	}
 
@@ -2489,14 +2527,7 @@ public class MoSyncThread extends Thread
 		return IOCTL_UNAVAILABLE;
 	}
 	
-	/**
-	 * Set the background image of the phone's home screen.
-	 * @param data Handle to an image object (PNG of JPEG)
-	 */
-	int maWallpaperSet(int handle)
-	{
-		return mMoSyncHomeScreen.maWallpaperSet(handle);
-	}
+	
 
 	/**
 	 * Add a shortcut icon to the home screen. If called multiple times

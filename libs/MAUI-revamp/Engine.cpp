@@ -124,9 +124,10 @@ namespace MAUI {
 		mSingletonPtr->setDefaultStyle("Label", labelStyle);
 	}
 	
-	void Engine::setMain(Widget* mMain) {
-		mMain->setPosition(mMain->getPosition().x, mMain->getPosition().y);
-		this->mMain = mMain;
+	void Engine::setMain(Widget* main) {
+		if(main)
+			main->setPosition(main->getPosition().x, main->getPosition().y);
+		this->mMain = main;
 	}
 
 	Engine::~Engine()

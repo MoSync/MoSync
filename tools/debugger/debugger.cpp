@@ -49,35 +49,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 /**
- * General debugger architecture
+ * General debugger architecture:
  *
  * The MoSync debugger consists of 3 communicating components: The Eclipse 
- * GDB session, the MoSync Debug Bridge (this source file) and a MoRE instance. 
+ * GDB session, the MoSync DeBugger (this program) and a MoRE instance. 
  * An overview of their communication is given in the picture below.
  *
  * ---------------           ----------------           -----------------
- * | GDB session |  <------  | MoSync Debug |  <------  | MoRE instance |
- * |             |           | Bridge (mdb) |           |               |
+ * | GDB session |  <------  | (MDB) MoSync |  <------  | MoRE instance |
+ * |             |           | DeBugger     |           |               |
  * |             |  ------>  |              |  ------>  |               |
  * ---------------           ----------------           -----------------
- *               GDB/MI command            internal format
+ *               GDB/MI protocol            GDB serial protocol
  *
  * A command originates in the Eclipse GDB Session (referred to as the GDB 
  * session from here) when a user instructs the debugger to do something. The
  * commands are actually part of a protocol called the GDB/MI interface, which 
  * defines the behavior and structure of the commands. The commands arrive
- * at mdb through its standard input stream.
+ * at MDB through its standard input stream.
  *
- * Once in mdb the command is passed to a handler function that parses
+ * Once in MDB the command is passed to a handler function that parses
  * the command and executes it. The mapping between a handler and its command
- * is defined in initCommands.cpp, note that not all of the GDB/MI commands
- * are implemented. The handlers are then implemented in the cmd_* files which
- * each group a set of related handlers.
+ * is defined in initCommands.cpp. The handlers are then implemented in the
+ * cmd_* files which each group a set of related handlers.
+ *
+ * Not all of the GDB/MI commands are implemented in MDB. This is the case
+ * for the original GNU DeBugger, too.
  *
  * Some commands require communication with the MoRE instance that runs the 
  * program being debugged. For example some commands needs the value at
- * a specific memory address. mdb accomplishes such and similar tasks by 
- * communicating with MoRE over TCP with an internal protocol.
+ * a specific memory address. MDB accomplishes such and similar tasks by 
+ * communicating with MoRE over TCP with the GDB serial protocol.
  *
  * Another class of commands are those that controls the execution of the 
  * program, e.g. breakpoints and stepping. A breakpoint can be set at a 
@@ -88,9 +90,8 @@ using namespace std;
  * Once a command has been fully executed, the results are passed back to 
  * Eclispe via the stdout stream. New commands can then be processed.
  *
- * Notes
- * It should be noted that eclipse sometimes diverts from the GDB/MI interface,
- * so care should be taken.
+ * Eclipse sometimes diverts from the GDB/MI interface,
+ * so care is taken to deal with those special cases.
  */
 
 /* Filename, resources and slds specified as parameters to mdb */

@@ -19,6 +19,7 @@ package com.mosync.java.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CLOSE;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_GAINED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_FOCUS_LOST;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_KEY_PRESSED;
@@ -39,7 +40,10 @@ import static com.mosync.internal.generated.MAAPI_consts.MAK_SOFTRIGHT;
 import static com.mosync.internal.generated.MAAPI_consts.MAK_UP;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -65,13 +69,13 @@ import com.mosync.internal.android.MoSyncView;
  */
 public class MoSync extends Activity
 {
-	static public MoSyncThread mMoSyncThread;
-	MoSyncView mMoSyncView;
-	Intent mMoSyncServiceIntent;
-	
+	private MoSyncThread mMoSyncThread;
+	private MoSyncView mMoSyncView;
+	//private Intent mMoSyncServiceIntent;
 	private boolean mHasDeterminedTouchCapabilities = false;
 	private MoSyncTouchHandler mTouchHandler;
-	
+	private BroadcastReceiver mShutdownListener;
+	private boolean mEventTypeCloseHasBeenSent = false;
 	
 	/**
 	 * Sets screen and window properties.
@@ -121,6 +125,13 @@ public class MoSync extends Activity
 			finish();
 			return;
 		}
+		
+		registerShutdownListener();
+    }
+    
+    public MoSyncThread getMoSyncThread()
+    {
+    	return mMoSyncThread;
     }
 	
 	public void setRootView(View root)
@@ -217,6 +228,19 @@ public class MoSync extends Activity
     	Log.i("MoSync", "onDestroy");
 		
 		super.onDestroy();
+		
+		// Tell the MoSync thread to do cleanup.
+		mMoSyncThread.onDestroy();
+
+		// Unregister the shutdown listener.
+		unregisterShutdownListener();
+		
+		// Send EVENT_TYPE_CLOSE.
+		// TODO: Since we have made some cleanup, everything may not
+		// be available to the app. Be aware of this if doing more
+		// cleanup here. Applications should save data etc on
+		// EVENT_TYPE_FOCUS_LOST.
+		sendCloseEvent();
     }
 
 	/**
@@ -467,4 +491,55 @@ public class MoSync extends Activity
 			return false;
 		}
 	}
+	
+	/**
+	 * Register a broadcast receiver that listens for device shutdown events
+	 * (power off the device).
+	 */
+    private void registerShutdownListener()
+    {
+    	mShutdownListener = new BroadcastReceiver()
+		{
+			@Override
+			public void onReceive(Context context, Intent intent)
+			{	
+				Log.i("@@@MoSync", "@@@ ACTION_SHUTDOWN Intent = " + intent);
+
+				// Send EVENT_TYPE_CLOSE.
+				sendCloseEvent();
+			}
+		};
+		
+		registerReceiver(
+			mShutdownListener, 
+			new IntentFilter(Intent.ACTION_SHUTDOWN));
+    }
+
+    /**
+     * Unregister the shutdown listener.
+     */
+    private void unregisterShutdownListener()
+    {
+    	if (null != mShutdownListener)
+    	{
+    		unregisterReceiver(mShutdownListener);
+    		mShutdownListener = null;
+    	}
+    }
+    
+    /**
+     * Posts an EVENT_TYPE_CLOSE to the MoSync events queue.
+     */
+    private void sendCloseEvent()
+    {
+    	if (!mEventTypeCloseHasBeenSent)
+    	{
+			// Send EVENT_TYPE_CLOSE
+			int[] event = new int[1];
+			event[0] = EVENT_TYPE_CLOSE;
+			mMoSyncThread.postEvent(event);
+			
+    		mEventTypeCloseHasBeenSent = true;
+    	}
+    }
 }

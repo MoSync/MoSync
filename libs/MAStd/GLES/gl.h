@@ -12,7 +12,7 @@ typedef union MA_FV MA_FV;
 #endif
 
 //typedef void* MAAddress;
-#include "IX_OPENGL_ES.H"
+#include "IX_OPENGL_ES.h"
 
 #ifdef __cplusplus
 extern "C" {

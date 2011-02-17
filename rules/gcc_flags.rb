@@ -14,6 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+require "#{File.dirname(__FILE__)}/util.rb"
 
 #defines @CFLAGS and @CPPFLAGS
 
@@ -52,7 +53,7 @@ standard_warnings = " -Wall -Werror -Wextra -Wno-unused-parameter -Wwrite-string
 
 
 include_dirs = @EXTRA_INCLUDES
-include_flags = include_dirs.collect {|dir| " -I "+dir}.join
+include_flags = include_dirs.collect {|dir| " -I "+File.expand_path_fix(dir)}.join
 
 #temp
 #flag_warnings = gcc4_warnings + gcc43_c_warnings + gcc43_warnings
