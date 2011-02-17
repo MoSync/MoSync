@@ -25,22 +25,36 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-struct Typedef {
+struct Group;
+struct Statement {
+	string comment;
+	int groupId;
+};
+
+struct Group {
+	string groupPrettyName;
+	string groupId;
+	string comment;
+	bool isRoot;
+	vector<int> groups;
+};
+
+struct Typedef : public Statement {
 	string type, name;
-	string comment;
+	//string comment;
 	int ix;
 };
 
-struct Define {
+struct Define : public Statement {
 	string value;
-	string comment;
+	//string comment;
 	int ix;
 };
 
-struct Constant {
+struct Constant : public Statement {
 	string type;
 	string name, value;
-	string comment;
+	//string comment;
 	int ix;
 };
 
@@ -56,13 +70,13 @@ struct Argument {
 	string range; // if available
 };
 
-struct Function {
+struct Function : public Statement {
 	string returnType;
 	string returnTypeRange; // if available
 
 	string name;
 	vector<Argument> args;
-	string comment;
+	//string comment;
 	int number;
 	bool isIOCtl;
 };
@@ -89,14 +103,14 @@ struct Member {
 	vector<PlainOldData> pod;	//if size() == 1, then type == POD, else AU.
 };
 
-struct Struct {
+struct Struct : public Statement {
 	string type, name;
 	vector<Member> members;
-	string comment;
+	//string comment;
 	int ix;	//internal extension
 };
 
-struct Interface {
+struct Interface : public Statement {
 	string path;	//used by extensions
 	string name;
 	vector<Typedef> typedefs;
@@ -105,7 +119,8 @@ struct Interface {
 	vector<Function> functions;
 	vector<Struct> structs;
 	vector<Ioctl> ioctls;	//internal IDL only
-	string comment;
+	vector<Group> groups;
+	//string comment;
 };
 
 typedef unsigned int uint32;
@@ -131,7 +146,7 @@ void streamJavaDefinitionFile(
 	const Interface& apiData,
 	int ix);
 
-void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix);
+void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix);
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);

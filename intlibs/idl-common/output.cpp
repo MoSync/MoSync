@@ -178,7 +178,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 
 	streamTypedefs(stream, inf.typedefs, ix);
 	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, inf.constSets, ix);
+	streamConstants(stream, headerName, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, false);
 	if(ix == MAIN_INTERFACE) {
 		streamHeaderFunctions(stream, inf, false);
@@ -362,10 +362,31 @@ static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix
 	}	//struct
 }
 
-void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix) {
+void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix) {
+	stream << "/**\n";
+	stream << "* @addtogroup " << interfaceName << " " << interfaceName << " constants" << "\n";
+	stream << "* @{\n";
+	stream << "*/\n";
+		
 	for(size_t i=0; i<constSets.size(); i++) {
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
+		
+		for(size_t j=0; j<cs.constants.size(); j++) {
+			const Constant& c(cs.constants[j]);
+			if(c.ix != ix)
+				continue;	
+			anyStreamed = true;
+		}
+		
+		if(anyStreamed) {
+			stream << "/**\n";
+			stream << "* @defgroup " << interfaceName << cs.name << " " << cs.name << "\n";
+			stream << "* @{\n";
+			stream << "*/\n";
+		}
+		
+		anyStreamed = false;
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
 			if(c.ix != ix)
@@ -373,13 +394,20 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 
 			if(anyStreamed && (c.comment.size() != 0 || cs.constants[j-1].comment.size() != 0))
 				stream << "\n";
-			stream << c.comment;
+			
+			stream << c.comment;	
 			stream << "#define " << cs.name << c.name << " " << c.value << "\n";
+			
 			anyStreamed = true;
 		}
-		if(anyStreamed)
+				
+		if(anyStreamed) {
+			stream << "/** @} */\n";	
 			stream << "\n";
+		}
 	}
+	
+	stream << "/** @} */\n";	
 }
 
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix) {
@@ -767,7 +795,7 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 
 	streamTypedefs(stream, inf.typedefs, ix);
 	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, inf.constSets, ix);
+	streamConstants(stream, headerName, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);
 	streamIoctlDefines(stream, inf, headerName, ix, false);
 

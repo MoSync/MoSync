@@ -292,7 +292,7 @@ extern "C" int MAMain()
 
 
 		if(currentTab == 4) {
-			maWidgetSetProperty(openglView, "bind", "");
+			//maWidgetSetProperty(openglView, "bind", "");
 
 			float time = (float)(maGetMilliSecondCount()%1000) * 0.001f;
 

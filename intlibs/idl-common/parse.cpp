@@ -44,6 +44,149 @@ static PlainOldData parsePOD(const string& type);
 static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf);
 static Typedef parseTypedef(int currentIx);
 static Define parseDefine(int currentIx);
+static bool parseInterfaceStatement(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl* ioctl, Group* group=NULL);
+
+
+#if 0
+static int findGroup(Interface& inf, const string& id) {
+	for(size_t i = 0; i < inf.groups.size(); i++) {
+		if(inf.groups[i].groupId == id) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+static void parseGroup(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl* ioctl, Group* parentGroup) {
+	Group g;
+	string id;			
+	readTextToken(id);
+				
+	Group *group = &g;
+	
+	int groupIndex = findGroup(inf, id);
+	
+	if(groupIndex == -1) {
+		group->groupId = id;
+		group->comment = getComment();
+		//readQuotedString(group->groupPrettyName);
+		readTextToken(group->groupPrettyName);
+	} else {
+		group = &inf.groups[groupIndex];
+		group->comment += getComment();		
+	}
+
+
+	doExact("{");
+	while(parseInterfaceStatement(inf, ixs, currentIx, ioctl, group)) {
+	}
+	
+	if(parentGroup) {
+		if(groupIndex == -1) {
+			group->isRoot = false;
+			inf.groups.push_back(*group);
+			groupIndex = inf.groups.size()-1;
+		}
+		parentGroup->groups.push_back(groupIndex);
+
+	} else {
+		if(groupIndex == -1) {
+			group->isRoot = true;
+			inf.groups.push_back(*group);
+		}
+	}
+}
+#endif
+
+bool parseInterfaceStatement(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl* ioctl, Group* group) {
+		string token;
+		readToken(token);
+		if(token == "constset") {	//constset
+			inf.constSets.push_back(parseConstSet(ixs, currentIx));
+		} else if(token == "struct" || token == "union") {	//struct or union
+			string name;
+			readTextToken(name);
+			inf.structs.push_back(parseStruct(token, name, currentIx));
+		} else if(token == "#define") {
+			inf.defines.push_back(parseDefine(currentIx));
+		} else if(token == "typedef") {
+			inf.typedefs.push_back(parseTypedef(currentIx));
+#if 0
+		} else if(token == "group") {
+			parseGroup(inf, ixs, currentIx, ioctl, group);
+#endif
+		} else if(token == "ioctl") {
+			TASSERT(currentIx == MAIN_INTERFACE);
+			if(ioctl) {
+				tokenError(token);
+			} else {
+				inf.ioctls.push_back(parseIoctl(ixs, inf));
+			}
+		} else if(isReturnType(inf, token)) {	//function
+			if(!ioctl) {
+				TASSERT(currentIx == MAIN_INTERFACE);
+				inf.functions.push_back(parseFunction(token, 256)); // 256 arguments should be enough :)
+			} else {
+				IoctlFunction f;
+				f.f = parseFunction(token, 256); // 256 should be enough :)
+				f.ix = currentIx;
+				ioctl->functions.push_back(f);
+			}
+		} else if(token == "}") {
+			if(group != NULL) return false;
+			TASSERT(currentIx == MAIN_INTERFACE);
+			if(!ioctl) doEOF();
+			return false;
+		} else if(token == "#if") {
+			TASSERT(currentIx == MAIN_INTERFACE);	
+			readTextToken(token);
+			currentIx = findIx(token, ixs);
+		} else if(token == "#endif") {
+			TASSERT(currentIx != MAIN_INTERFACE);
+			currentIx = MAIN_INTERFACE;
+		} else {
+			tokenError(token);
+		}
+		
+	return true;
+}
+
+/*
+bool parseIoctlStatement(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl& ioctl) {
+		string token;
+		readToken(token);
+		if(token == "constset") {	//constset
+			inf.constSets.push_back(parseConstSet(ixs, currentIx));
+		} else if(token == "struct" || token == "union") {	//struct or union
+			string name;
+			readTextToken(name);
+			inf.structs.push_back(parseStruct(token, name, currentIx));
+		} else if(token == "#define") {
+			inf.defines.push_back(parseDefine(currentIx));
+		} else if(token == "typedef") {
+			inf.typedefs.push_back(parseTypedef(currentIx));
+		} else if(isReturnType(inf, token)) {	//function
+			IoctlFunction f;
+			f.f = parseFunction(token, 256); // 256 should be enough :)
+			f.ix = currentIx;
+			ioctl.functions.push_back(f);
+		} else if(token == "}") {
+			TASSERT(currentIx == MAIN_INTERFACE);
+			return false;
+		} else if(token == "#if") {
+			TASSERT(currentIx == MAIN_INTERFACE);
+			readTextToken(token);
+			currentIx = findIx(token, ixs);
+		} else if(token == "#endif") {
+			TASSERT(currentIx != MAIN_INTERFACE);
+			currentIx = MAIN_INTERFACE;
+		} else {
+			tokenError(token);
+		}
+		
+	return true;
+}
+*/
 
 Interface parseInterface(const vector<string>& ixs, const string& path) {
 	ifstream stream(path.c_str());
@@ -68,41 +211,9 @@ Interface parseInterface(const vector<string>& ixs, const string& path) {
 		readTextToken(inf.name);
 		doExact("{");
 		inf.comment = getComment();
-		while(true) {
-			string token;
-			readToken(token);
-			if(token == "constset") {	//constset
-				inf.constSets.push_back(parseConstSet(ixs, currentIx));
-			} else if(token == "struct" || token == "union") {	//struct or union
-				string name;
-				readTextToken(name);
-				inf.structs.push_back(parseStruct(token, name, currentIx));
-			} else if(token == "#define") {
-				inf.defines.push_back(parseDefine(currentIx));
-			} else if(token == "typedef") {
-				inf.typedefs.push_back(parseTypedef(currentIx));
-			} else if(token == "ioctl") {
-				TASSERT(currentIx == MAIN_INTERFACE);
-				inf.ioctls.push_back(parseIoctl(ixs, inf));
-			} else if(isReturnType(inf, token)) {	//function
-				TASSERT(currentIx == MAIN_INTERFACE);
-				inf.functions.push_back(parseFunction(token, 256)); // 256 arguments should be enough :)
-			} else if(token == "}") {
-				TASSERT(currentIx == MAIN_INTERFACE);
-				doEOF();
-				break;
-			} else if(token == "#if") {
-				TASSERT(currentIx == MAIN_INTERFACE);
-				readTextToken(token);
-				currentIx = findIx(token, ixs);
-			} else if(token == "#endif") {
-				TASSERT(currentIx != MAIN_INTERFACE);
-				currentIx = MAIN_INTERFACE;
-			} else {
-				tokenError(token);
-			}
+		while(parseInterfaceStatement(inf, ixs, currentIx, NULL)) {
 		}
-
+		
 		//check for dupe constsets
 		for(size_t i=0; (i+1)<inf.constSets.size(); i++) {
 			const ConstSet& cs1(inf.constSets[i]);
@@ -202,38 +313,9 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf)
 	const int mainNextFuncNum = sNextFuncNum;	//backup
 	sNextFuncNum = 1;
 
-	while(true) {
-		string token;
-		readToken(token);
-		if(token == "constset") {	//constset
-			inf.constSets.push_back(parseConstSet(ixs, currentIx));
-		} else if(token == "struct" || token == "union") {	//struct or union
-			string name;
-			readTextToken(name);
-			inf.structs.push_back(parseStruct(token, name, currentIx));
-		} else if(token == "#define") {
-			inf.defines.push_back(parseDefine(currentIx));
-		} else if(token == "typedef") {
-			inf.typedefs.push_back(parseTypedef(currentIx));
-		} else if(isReturnType(inf, token)) {	//function
-			IoctlFunction f;
-			f.f = parseFunction(token, 256); // 256 should be enough :)
-			f.ix = currentIx;
-			ioctl.functions.push_back(f);
-		} else if(token == "}") {
-			TASSERT(currentIx == MAIN_INTERFACE);
-			break;
-		} else if(token == "#if") {
-			TASSERT(currentIx == MAIN_INTERFACE);
-			readTextToken(token);
-			currentIx = findIx(token, ixs);
-		} else if(token == "#endif") {
-			TASSERT(currentIx != MAIN_INTERFACE);
-			currentIx = MAIN_INTERFACE;
-		} else {
-			tokenError(token);
-		}
+	while(parseInterfaceStatement(inf, ixs, currentIx, &ioctl)) {
 	}
+		
 	sNextFuncNum = mainNextFuncNum;	//restore
 	return ioctl;
 }
@@ -387,7 +469,7 @@ static Function parseFunction(const string& retType, size_t maxArgs) {
 		}
 		f.args.push_back(a);
 	}
-
+	
 	readToken(token);
 	if(token == "range") {
 		readRange(f.returnTypeRange);

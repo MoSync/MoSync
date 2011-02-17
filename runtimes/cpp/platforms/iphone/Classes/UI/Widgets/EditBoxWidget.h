@@ -15,28 +15,17 @@
  02111-1307, USA.
  */
 
-#import "ImageButtonWidget.h"
+#import <Foundation/Foundation.h>
+#import "IWidget.h"
 
-#ifndef NATIVE_TEST
-#include "Platform.h"
-#include <helpers/cpp_defs.h>
-#include <helpers/CPP_IX_WIDGET.h>
-#include <base/Syscall.h>
-#endif
-
-@implementation ImageButtonWidget
-
-- (id)init {
-	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
-	//view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
-	
-	
-	//view.frame = CGRectMake(0, 0, 100, 40);
-//	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
-	
-	//[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
-	
-	return [super init];
+@interface EditBoxWidget : IWidget <UITextFieldDelegate> {
+	UITextField* textField;
 }
+
+- (id)init;
+- (void)addChild: (IWidget*)child;
+- (void)removeChild: (IWidget*)child;
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end

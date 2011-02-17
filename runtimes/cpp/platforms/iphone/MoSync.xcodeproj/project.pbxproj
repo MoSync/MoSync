@@ -41,6 +41,9 @@
 		858B432012E7325F0058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		858B44BB12E7B1060058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		8597A98213095110003468CF /* EditBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8597A98113095110003468CF /* EditBoxWidget.mm */; };
+		8597A98313095110003468CF /* EditBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8597A98013095110003468CF /* EditBoxWidget.h */; };
+		8597A98413095110003468CF /* EditBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8597A98113095110003468CF /* EditBoxWidget.mm */; };
 		85A0815411353EDE00267D56 /* resources in Resources */ = {isa = PBXBuildFile; fileRef = 85A0815311353EDE00267D56 /* resources */; };
 		85A1591F12F80E520044BBE1 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E612F80E520044BBE1 /* AbstractLayoutView.m */; };
 		85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E812F80E520044BBE1 /* HLayoutView.m */; };
@@ -238,6 +241,8 @@
 		858B431F12E7325F0058DBFC /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = impl/log.cpp; sourceTree = "<group>"; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
+		8597A98013095110003468CF /* EditBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditBoxWidget.h; sourceTree = "<group>"; };
+		8597A98113095110003468CF /* EditBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EditBoxWidget.mm; sourceTree = "<group>"; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
 		85A0815311353EDE00267D56 /* resources */ = {isa = PBXFileReference; lastKnownFileType = text; path = resources; sourceTree = "<group>"; };
 		85A158E512F80E520044BBE1 /* AbstractLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AbstractLayoutView.h; sourceTree = "<group>"; };
@@ -572,6 +577,8 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				8597A98013095110003468CF /* EditBoxWidget.h */,
+				8597A98113095110003468CF /* EditBoxWidget.mm */,
 				8527D5271302E34000535CCA /* ImageButtonWidget.h */,
 				8527D5281302E34000535CCA /* ImageButtonWidget.mm */,
 				85A158FB12F80E520044BBE1 /* ButtonWidget.h */,
@@ -792,6 +799,7 @@
 				85A1596F12F80E520044BBE1 /* VerticalLayoutWidget.h in Headers */,
 				85A1597112F80E520044BBE1 /* WebViewWidget.h in Headers */,
 				8527D52A1302E34000535CCA /* ImageButtonWidget.h in Headers */,
+				8597A98313095110003468CF /* EditBoxWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -967,6 +975,7 @@
 				85A1593A12F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
 				85A1593B12F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 				8527D5291302E34000535CCA /* ImageButtonWidget.mm in Sources */,
+				8597A98213095110003468CF /* EditBoxWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1032,6 +1041,7 @@
 				85A1597012F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
 				85A1597212F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 				8527D52B1302E34000535CCA /* ImageButtonWidget.mm in Sources */,
+				8597A98413095110003468CF /* EditBoxWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
