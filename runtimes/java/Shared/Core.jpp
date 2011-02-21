@@ -437,7 +437,7 @@ final public class Core {
 		// Init regs + IP
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 		//allocate space for location event structs
-		mCustomEventPointer = mCustomMemPointer - 36;
+		mCustomEventPointer = mCustomMemPointer - MALOCATION_INT_COUNT * 4;
 		regs[REG_sp] = mCustomEventPointer - 16;
 #else
 		regs[REG_sp] = mCustomMemPointer - 16;

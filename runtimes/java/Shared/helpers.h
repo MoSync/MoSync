@@ -174,3 +174,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_DATA event[1]
 #define EI_TEXTBOX_RESULT event[1]
 #define EI_TEXTBOX_LENGTH event[2]
+
+#define MALOCATION_INT_COUNT 10
