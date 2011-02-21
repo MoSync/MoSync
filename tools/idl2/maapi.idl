@@ -1290,6 +1290,11 @@ interface MAAPI {
 		
 		/**
 		* \brief An event sent from a native widget.
+		* \par The application can use the MAEvent.data field to access
+		* widget event data, which is of type MAWidgetEventData. 
+		* For example: \n
+		* \code MAWidgetEventData* widgetEventData = (MAWidgetEventData*) event.data; \endcode 
+		* \see MAWidgetEventData
 		*/
 		WIDGET = 28;
 		
@@ -2987,8 +2992,8 @@ interface MAAPI {
 #if IX_WIDGET
 	constset int WIDGET_EVENT_ {
 		/** 
-		 * A widget has posted a message. Use maWidgetGetMessageSize and
-		 * maWidgetGetMessageData to access message data.
+		 * A widget has posted a message. Use maWidgetGetMessageData to 
+		 * access the message data.
 		 */
 		MESSAGE = 1;
 
@@ -3025,7 +3030,7 @@ interface MAAPI {
 		/**
 		 * Sent when an GLView has been initialized and is ready for setup.
 		 */
-		 GL_VIEW_READY = 8;
+		GL_VIEW_READY = 8;
 	}
 
 	/**
@@ -3192,8 +3197,8 @@ interface MAAPI {
 
 	/**
 	 * Get the message data for a message id.
-	 * The message id is in MAEvent.widget.widgetMessageId.
-	 * The caller must use maWidgetGetMessageSize to ensure 
+	 * The message id is in MAWidgetEventData.messageId.
+	 * The caller should check the field MAWidgetEventData.messageSize to ensure 
 	 * that the buffer is sufficienly large to hold the data.
 	 *
 	 * Message data can be retrieved only once, the system deallocates
@@ -3202,10 +3207,9 @@ interface MAAPI {
 	 *
 	 * \param messageId The id of the message, \see MAWidgetEventData.messageId.
 	 * \param buffer Pointer to a buffer that will contain the message data.
-	 * \param bufferSize Size of the buffer in bytes.
+	 * \param bufferSize Size of the buffer in bytes, \see MAWidgetEventData.messageSize.
 	 *
-	 * \returns The number of bytes copied to the buffer, or WIDGET_ERROR on
-	 *          error.
+	 * \returns The number of bytes copied to the buffer, or WIDGET_ERROR on error.
 	 */
 	int maWidgetGetMessageData(in int messageId, out MAAddress buffer, in int bufferSize);
 
