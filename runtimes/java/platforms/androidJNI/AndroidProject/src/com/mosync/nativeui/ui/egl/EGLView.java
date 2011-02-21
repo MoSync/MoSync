@@ -9,6 +9,7 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLSurface;
 
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -21,7 +22,10 @@ import android.view.SurfaceView;
  * The EGLView is fairly similar to the GLSurfaceView with
  * the exception that its rendered content is provided by
  * the MoSync user, rather than from a separate rendering
- * thread.
+ * thread. The reason for this design is:
+ * 
+ * Using the GLSurfaceView we cannot bind the EGLContext to
+ * the MoSync interpreter thread that issues the OpenGL calls.
  * 
  * @author fmattias
  */
@@ -54,6 +58,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		m_holder = getHolder( );
 		m_holder.addCallback( this );
 		m_holder.setType( SurfaceHolder.SURFACE_TYPE_GPU );
+		m_holder.setFormat( PixelFormat.RGBA_8888 );
 	}
 
 	/**
@@ -102,14 +107,12 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			int height)
 	{
 		// Create a new EGL surface
-		Log.i( "EGLView", "New surface" );
+		Log.i( "EGLView", "New surface width: " + width + " height: " + height );
 		m_eglState.newSurface( holder, width, height );
 		if( m_readyListener != null )
 		{
-			Log.i("EGLVIEW", "Gl view ready");
 			m_readyListener.eglViewReady( );
 		}
-		Log.i( "EGLView", "Surface created" );
 	}
 
 	@Override
@@ -172,33 +175,6 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		{
 			EGLManager.initEgl( );
 			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ) );
-			//m_config = findConfig( );
-		}
-		
-		/**
-		 * Find a suitable default configuration.
-		 * 
-		 * @return
-		 */
-		private EGLConfig findConfig()
-		{	
-			int attrib_list[] = {
-					EGL10.EGL_RED_SIZE, 5,
-					EGL10.EGL_GREEN_SIZE, 6,
-					EGL10.EGL_BLUE_SIZE, 5,
-					EGL10.EGL_ALPHA_SIZE, 0,
-					EGL10.EGL_DEPTH_SIZE, 16,
-					EGL10.EGL_SURFACE_TYPE,
-					EGL10.EGL_NONE
-				};
-			EGLConfig[] configs = new EGLConfig[1];
-			int[] numConfigs = new int[1];
-			if( !m_egl.eglChooseConfig( EGLManager.getDisplay( ), attrib_list, configs, 1, numConfigs ) )
-			{
-				Log.i("EGLView", "Could not choose config: " + m_egl.eglGetError( ) );
-			}
-			
-			return configs[0];
 		}
 
 		/**
