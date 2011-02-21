@@ -2985,6 +2985,9 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WIDGET
+
+group WidgetAPI "Widget API" {
+
 	/**
 	* @brief A struct that holds the data associated with a widget event.
 	*/ 
@@ -3028,10 +3031,9 @@ interface MAAPI {
 	}
 
 	/**
-	* @defgroup WidgetEventTypes Widget event types
 	* The available widget event types.
-	* @{
 	*/
+	group WidgetEventTypes "Widget event types" {
 	constset int WIDGET_EVENT_ {
 		/** 
 		* @brief A pointer pressed event has occurred. 
@@ -3068,13 +3070,12 @@ interface MAAPI {
 		*/
 		GL_VIEW_READY = 8;
 	}
-	/** @} */ // end of WidgetEventTypes
+	} // end of WidgetEventTypes
 
 	/**
-	* @defgroup WidgetResultCodes Widget result codes
 	* The available result codes for the widget api.
-	* @{
 	*/
+	group WidgetResultCodes "Widget result codes" {
 	constset int WIDGET_RES_ {
 		/**
 		* @brief Indicates that the call to a widget syscall was successful.
@@ -3131,13 +3132,12 @@ interface MAAPI {
 		*/
 		REMOVED_ROOT = -10;
 	}
-	/** @} */ // end of WidgetResultCodes
+	} // end of WidgetResultCodes
 	
 	/**
-	* @defgroup WidgetTypes Widget types
 	* The available widget types for \ref maWidgetCreate.
-	* @{
 	*/
+	group WidgetTypes "Widget types" {
 	constset MAString WIDGET_TYPE_ {
 		/**
 		* @brief A screen is the root of all widgets currently visible on a screen.
@@ -3145,7 +3145,6 @@ interface MAAPI {
 		SCREEN = "Screen";
 
 		/**
-		* @ingroup WidgetTypes
 		* @brief A tab screen is a special type of screen that can have any number of sub-screens each switchable using a tab bar.
 		*/
 		TAB_SCREEN = "TabScreen";
@@ -3159,6 +3158,11 @@ interface MAAPI {
 		* @brief A button is a widget that represent a physical button that can be pressed.
 		*/
 		BUTTON = "Button";
+
+		/**
+		* @brief An image is a widget that can be used to display an image.
+		*/
+		IMAGE = "Image";
 
 		/**
 		* @brief An image button is a button that will also affect the appearance of the background image when pressed.
@@ -3220,13 +3224,12 @@ interface MAAPI {
 		 */	
 		WEB_VIEW = "WebView";
 	}
-	/** @} */ // end of WidgetTypes
+	} // end of WidgetTypes
 
 	/**
-	* @defgroup WidgetProperties Widget properties
 	* The available widget properties for \ref maWidgetSetProperty.
-	* @{
 	*/
+	group WidgetProperties "Widget properties" {
 	constset MAString WIDGET_PROPERTY_ {
 		LEFT = "left";
 		TOP = "top";
@@ -3235,53 +3238,52 @@ interface MAAPI {
 		ALPHA = "alpha";
 		BACKGROUND_COLOR = "backgroundColor";
 	}
-	/** @} */ // end of WidgetProperties	
+	} // end of WidgetProperties	
 	
 
 	/**
-	* @defgroup WidgetScreenProperties Screen properties
 	* The available widget properties for a #WIDGET_TYPE_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
-	* @{
 	*/
+	group WidgetScreenProperties "Screen properties" {
 	constset MAString WIDGET_PROPERTY_SCREEN_ {
 		TITLE = "title";
 		ICON = "icon";
 	}
-	/** @} */ // end of WidgetScreenProperties	
+	} // end of WidgetScreenProperties	
 
 	/**
-	* The available widget properties for a #WIDGET_TYPE_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #WIDGET_TYPE_TAB_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
-	//group WidgetTabScreenProperties "Tab screen properties" {
-	
+	group WidgetTabScreenProperties "Tab screen properties" {
 	constset MAString WIDGET_PROPERTY_TAB_SCREEN_ {
 		CURRENT_TAB = "currentTab";
 	}
-	
-	//} // end of WidgetTabScreenProperties	
+	} // end of WidgetTabScreenProperties	
 
 	/**
-	* @defgroup WidgetButtonProperties Button properties
-	* The available widget properties for a #WIDGET_TYPE_TAB_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
-	* @{
+	* The available widget properties for a #WIDGET_TYPE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
+	group WidgetButtonProperties "Button properties" {
 	constset MAString WIDGET_PROPERTY_BUTTON_ {
 		TEXT = "text";
 		BACKGROUND_IMAGE = "backgroundImage";
 	}
-	/** @} */ // end of WidgetButtonProperties		
+	} // end of WidgetButtonProperties		
 	
 	/**
-	* @defgroup WidgetImageProperties Image properties
-	* The available widget properties for a #WIDGET_TYPE_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
-	* @{
+	* The available widget properties for a #WIDGET_TYPE_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
+	group WidgetImageProperties "Image properties" {
 	constset MAString WIDGET_PROPERTY_IMAGE_BUTTON_ {
 		TEXT = "text";
 		BACKGROUND_IMAGE = "backgroundImage";
 	}
-	/** @} */ // end of WidgetImageProperties		
+	} // end of WidgetImageProperties		
 	
+	/**
+	* The available widget properties for a #WIDGET_TYPE_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetLabelProperties "Label properties" {
 	constset MAString WIDGET_PROPERTY_LABEL_ {
 		TEXT = "text";
 		VERTICAL_ALIGNMENT = "verticalAlignment";
@@ -3289,50 +3291,95 @@ interface MAAPI {
 		FONT_COLOR = "fontColor";
 		FONT_SIZE = "fontSize";
 	}
-	
+	} // end of WidgetImageProperties		
+
+	/**
+	* The available widget properties for a #WIDGET_TYPE_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetEditBoxProperties "Edit box properties" {
 	constset MAString WIDGET_PROPERTY_EDIT_BOX_ {
 		TEXT = "text";
 		PLACEHOLDER = "placeholder";
 		SHOW_KEYBOARD = "showKeyboard";
 	}
+	} // end of WidgetEditBoxProperties
 	
+	/**
+	* The available widget properties for a #WIDGET_TYPE_LIST_VIEW_ITEM. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetListViewItemProperties "List view item properties" {
 	constset MAString WIDGET_PROPERTY_LIST_VIEW_ITEM_ {
 		TEXT = "text";
 		ICON = "icon";
 		ACCESSORY_TYPE = "accessoryType";
 	}
-
+	} // end of WidgetListViewItemProperties
+	
+	/**
+	* The available widget properties for a #WIDGET_TYPE_CHECK_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetCheckBoxProperties "Check box properties" {
 	constset MAString WIDGET_PROPERTY_CHECK_BOX_ {
 		CHECKED = "checked";
 	}
+	} // end of WidgetListViewProperties
 
+	/**
+	* The available widget properties for a #WIDGET_TYPE_HORIZONTAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
 	constset MAString WIDGET_PROPERTY_HORIZONTAL_LAYOUT_ {
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
+	} // end of WidgetHorizontalLayoutProperties
 
+	/**
+	* The available widget properties for a #WIDGET_TYPE_VERTICAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetVerticalLayoutProperties "Vertical layout properties" {
 	constset MAString WIDGET_PROPERTY_VERTICAL_LAYOUT_ {
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
+	} // end of WidgetVerticalLayoutProperties
 	
+	/**
+	* The available widget properties for a #WIDGET_TYPE_SEARCH_BAR. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetSearchBarProperties "Search bar properties" {
 	constset MAString WIDGET_PROPERTY_SEARCH_BAR_ {
 		TEXT = "text";
 		PLACEHOLDER = "placeholder";
 		SHOW_KEYBOARD = "showKeyboard";
 	}
-
-	
+	} // end of WidgetSearchBarProperties
+		
+	/**
+	* The available widget properties for a #WIDGET_TYPE_GL_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetGLViewProperties "GL view properties" {
 	constset MAString WIDGET_PROPERTY_GL_VIEW_ {
 		INVALIDATE = "invalidate";
 		BIND = "bind";
 	}
-
+	} // end of WidgetGLViewProperties
+	
+	/**
+	* The available widget properties for a #WIDGET_TYPE_WEB_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetWebViewProperties "Web view properties" {
 	constset MAString WIDGET_PROPERTY_WEB_VIEW_ {
 		URL = "url";
 	}
-	
+	} // end of WidgetWebViewProperties
+		
 	typedef int MAWidgetHandle;
+
+	/**
+	* The set of functions available for the Widget API.
+	*/
+	group WidgetAPIFunctions "Widget API functions" {
 
 	/** 
 	* Creates a new widget of the specified type. 
@@ -3448,6 +3495,9 @@ interface MAAPI {
 	* - #WIDGET_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+	} // end of group WidgetAPIFunctions
+
+} // end of group WidgetAPI
 #endif //IX_WIDGET
 	
 		/**

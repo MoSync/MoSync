@@ -141,6 +141,39 @@ void streamHash(ostream& stream, const Interface& inf) {
 		hex << calculateChecksum(inf) << dec << ")\n\n";
 }
 
+
+void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix) {
+	for(size_t i = 0; i < children.size(); i++) {
+		int index = children[i];
+		stream << groups[index].comment;
+		if(groups[index].groups.size() > 0) {
+			stream << "/** @defgroup " << groups[index].groupId << " " << groups[index].groupPrettyName << "\n";
+			stream << " * @{\n";
+			stream << " */\n";
+
+			streamGroups(stream, groups, groups[index].groups, ix);
+			stream << "/** @} */ // end of " << groups[index].groupId  << "\n";
+		} else {
+			stream << "/** @defgroup " << groups[index].groupId << " " << groups[index].groupPrettyName << " */\n";
+		}
+	}
+}
+
+void streamGroups(ostream& stream, const vector<Group>& groups, int ix) {
+	if(ix != MAIN_INTERFACE) return;
+
+	vector<int> rootGroups;
+	for(size_t i = 0; i < groups.size(); i++) {
+		if(groups[i].isRoot) {
+			rootGroups.push_back(i);
+		}
+	}
+
+	streamGroups(stream, groups, rootGroups, ix);
+
+	stream << "\n";
+}
+
 void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix) {
 	string headerName;
 	if(ix == MAIN_INTERFACE)
@@ -176,6 +209,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 		"extern \"C\" {\n"
 		"#endif\n\n";
 
+	streamGroups(stream, inf.groups, ix);
 	streamTypedefs(stream, inf.typedefs, ix);
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, headerName, inf.constSets, ix);
@@ -352,6 +386,8 @@ static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix
 		}
 		if(s.comment.size() > 0)
 			stream << s.comment;
+		if(s.groupId != "")
+			stream << "/** @ingroup " << s.groupId << " */\n";
 		stream << "typedef " << s.type << " " << s.name << " {\n";
 		streamMembers(stream, "\t", s.members, structs, runtime);
 		stream << "} " << s.name << ";\n";
@@ -363,11 +399,6 @@ static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix
 }
 
 void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix) {
-	stream << "/**\n";
-	stream << "* @addtogroup " << interfaceName << " " << interfaceName << " constants" << "\n";
-	stream << "* @{\n";
-	stream << "*/\n";
-		
 	for(size_t i=0; i<constSets.size(); i++) {
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
@@ -379,13 +410,6 @@ void streamConstants(ostream& stream, const string& interfaceName, const vector<
 			anyStreamed = true;
 		}
 		
-		if(anyStreamed) {
-			stream << "/**\n";
-			stream << "* @defgroup " << interfaceName << cs.name << " " << cs.name << "\n";
-			stream << "* @{\n";
-			stream << "*/\n";
-		}
-		
 		anyStreamed = false;
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
@@ -395,19 +419,14 @@ void streamConstants(ostream& stream, const string& interfaceName, const vector<
 			if(anyStreamed && (c.comment.size() != 0 || cs.constants[j-1].comment.size() != 0))
 				stream << "\n";
 			
-			stream << c.comment;	
+			stream << c.comment;
+			if(c.groupId != "")
+				stream << "/** @ingroup " << c.groupId << " */\n";
 			stream << "#define " << cs.name << c.name << " " << c.value << "\n";
 			
 			anyStreamed = true;
-		}
-				
-		if(anyStreamed) {
-			stream << "/** @} */\n";	
-			stream << "\n";
-		}
+		}				
 	}
-	
-	stream << "/** @} */\n";	
 }
 
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix) {
@@ -442,6 +461,8 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 		if(anyStreamed && (t.comment.size() != 0 || typedefs[i-1].comment.size() != 0))
 			stream << "\n";
 		stream << t.comment;
+		if(t.groupId != "")
+			stream << "/** @ingroup " << t.groupId << " */\n";
 		stream << "typedef " << t.type << " " << t.name << ";\n";
 		anyStreamed = true;
 	}
@@ -458,6 +479,8 @@ static void streamDefines(ostream& stream, const vector<Define>& defines, int ix
 		if(anyStreamed && (d.comment.size() != 0 || defines[i-1].comment.size() != 0))
 			stream << "\n";
 		stream << d.comment;
+		if(d.groupId != "")
+			stream << "/** @ingroup " << d.groupId << " */\n";
 		stream << "#define " << d.value << "\n";
 		anyStreamed = true;
 	}
@@ -698,6 +721,8 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	const string& ioctlName)
 {
 	stream << f.comment;
+	if(f.groupId != "")
+		stream << "/** @ingroup " << f.groupId << " */\n";
 
 	string invokeArgs;
 	string tempVars;

@@ -28,7 +28,7 @@ using namespace std;
 struct Group;
 struct Statement {
 	string comment;
-	int groupId;
+	string groupId;
 };
 
 struct Group {
