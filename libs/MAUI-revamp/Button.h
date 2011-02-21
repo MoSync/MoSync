@@ -72,7 +72,10 @@ namespace MAUI {
 		*/
 		Button(int x=0, int y=0, int width=0,
 				int height=0, const String& caption="");
-		
+
+		bool keyPressed(int keyCode, int nativeCode);
+		bool keyReleased(int keyCode, int nativeCode);
+
 		/**
 		* Overloaded pointerPressed from Widget
 		*/
