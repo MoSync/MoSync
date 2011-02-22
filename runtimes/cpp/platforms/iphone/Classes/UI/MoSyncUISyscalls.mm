@@ -41,14 +41,14 @@ MAWidgetHandle maWidgetCreate(const char *widgetType) {
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
 	
-	if(returnValue != WIDGET_RES_OK) return returnValue;
+	if(returnValue != MAW_RES_OK) return returnValue;
 	
 	currentWidgetIndex++;
 	return currentWidgetIndex-1;
 }
 
 int maWidgetDestroy(MAWidgetHandle handle) {
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
@@ -82,11 +82,11 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize) {
 	IWidget* widget = [mosyncUI getWidget:handle];	
 	NSString* retval = [widget getPropertyWithKey:stringFromChar(property)];
-	if(retval == nil) return WIDGET_RES_ERROR;
+	if(retval == nil) return MAW_RES_ERROR;
 	int length = maxSize;
 	int realLength = [retval length];
 	if(realLength > length) {
-		return WIDGET_RES_INVALID_STRING_BUFFER_SIZE;
+		return MAW_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 	
 	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
@@ -96,20 +96,20 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	IWidget* parent = [mosyncUI getWidget:parentHandle];
 	IWidget* child = [mosyncUI getWidget:childHandle];
-	if(!parent) return WIDGET_RES_INVALID_HANDLE;
-	if(!child) return WIDGET_RES_INVALID_HANDLE;
+	if(!parent) return MAW_RES_INVALID_HANDLE;
+	if(!child) return MAW_RES_INVALID_HANDLE;
 
 	[NSObject performSelectorOnMainThread:@selector(addChild:)
 							 withTarget:parent
 							withObjects:[NSArray arrayWithObjects: child, nil] 
 						  waitUntilDone:YES
 						 andReturnValue:nil];	
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
 
-	return WIDGET_RES_ERROR;
+	return MAW_RES_ERROR;
 }
 
 int maWidgetRemoveChild(MAWidgetHandle childHandle) {
@@ -121,12 +121,12 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
 	
-	if(returnValue == WIDGET_RES_ERROR) {
+	if(returnValue == MAW_RES_ERROR) {
 		// should flip back to MoSync view.
-		return WIDGET_RES_REMOVED_ROOT;
+		return MAW_RES_REMOVED_ROOT;
 	}
 	
-	return WIDGET_RES_ERROR;
+	return MAW_RES_ERROR;
 }
 
 static bool sNativeUIEnabled = false;
@@ -140,7 +140,7 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	
 	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
-		return WIDGET_RES_INVALID_SCREEN;
+		return MAW_RES_INVALID_SCREEN;
 	}
 	
 	int returnValue;

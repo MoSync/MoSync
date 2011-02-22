@@ -73,21 +73,21 @@ UIViewController *mainController;
 		created = [[widgetClass alloc] init];
 		
 		if(widgetClass == [IWidget class]) 
-			return WIDGET_RES_ERROR;
+			return MAW_RES_ERROR;
 		
 	} else {
 		//created = [[ReflectionWidget alloc] initWithName:name];
 	}
 
 	// todo handle these things.
-	if(created == nil) return WIDGET_RES_INVALID_TYPE_NAME;
+	if(created == nil) return MAW_RES_INVALID_TYPE_NAME;
 	
 	[created setWidgetHandle:[widgetArray count]];
 	[created wasCreated];
 	
 	[widgetArray addObject:created];
 	
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 - (void) removeWidget: (IWidget*) handle {
@@ -120,7 +120,7 @@ static IWidget* sOldScreen = nil;
 	[mainWindow makeKeyAndVisible];
 	sOldScreen = widget;
 	
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 @end

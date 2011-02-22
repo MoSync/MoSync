@@ -93,7 +93,7 @@
 }
 
 - (int)remove {
-	if(!parent) return WIDGET_RES_ERROR;
+	if(!parent) return MAW_RES_ERROR;
 	[parent removeChild: self];
 }
 
@@ -144,10 +144,10 @@
 	if([key isEqualToString:@"visible"]){
 		view.hidden = not [value boolValue];
 	} else {
-			return WIDGET_RES_ERROR;
+			return MAW_RES_ERROR;
 	}
 			
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 - (NSString*) getPropertyWithKey: (NSString*)key {

@@ -33,7 +33,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->searchBarButton = 0;
 	event.data = eventData;
@@ -48,7 +48,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->searchBarButton = 1;
 	event.data = eventData;
@@ -96,7 +96,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

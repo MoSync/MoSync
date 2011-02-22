@@ -34,7 +34,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_ITEM_CLICKED;
+	eventData->eventType = MAW_EVENT_ITEM_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->listItemIndex = index;
 	event.data = eventData;
