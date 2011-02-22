@@ -257,6 +257,12 @@ namespace MAUtil {
 		*/
 		Tchar* pointer();
 
+		/**
+		* Returns a const pointer to the string data. The pointer becomes invalidated by
+		* any non-const method of this class.
+		*/
+		const Tchar* pointer() const { return c_str(); }
+
 		~BasicString();
 
 	protected:
