@@ -2987,16 +2987,19 @@ interface MAAPI {
 #if IX_WIDGET
 
 /**
-* This API may be used to access the Native UI components of the underlying system in a platform independant manner. Currently supported platforms are Android and iOS. The 
-* API has a small set of functions that use strings for keys and values. All keys are defined as string constants with documentation describing its use so that you in the 
-* reference documentation can find what you're looking for.
+* This API may be used to access the Native UI components of the underlying system in a 
+* platform independant manner. Currently supported platforms are Android and iOS. The 
+* API has a small set of functions that use strings for keys and values. All keys are
+* defined as documented string constants. See \ref WidgetTypes "Widget types" and \ref
+* WidgetProperties "Widget properties" for more information.
 */
 group WidgetAPI "Widget API" {
 
 	/**
-	* Widgets can send events for instance when their internal state is changed (like when a button is pressed). These are events sent 
-	* using the MoSync event system \ref maGetEvent. When an event is received with the type
-	* #EVENT_TYPE_WIDGET the 'data' member of the MAEvent struct is a pointer to data of type #MAWidgetEventData.
+	* Widgets can send events for instance when their internal state is changed (like when a 
+	* button is pressed). These are events sent using the MoSync event system \ref maGetEvent.
+	* When an event is received with the type #EVENT_TYPE_WIDGET the 'data' member of the MAEvent 
+	* struct is a pointer to data of type #MAWidgetEventData.
 	*/
 	group WidgetEvents "Widget events" {
 	/**
@@ -3021,7 +3024,7 @@ group WidgetAPI "Widget API" {
 
 			/**
 			* @brief The type of button that was clicked when a #WIDGET_EVENT_CLICKED event is receieved for a searchbar.	
-			* the type of searchbar button clicked
+			* The type of searchbar button clicked:
 			* - 0 means 'search'
 			* - 1 means 'cancel'
 			*/
