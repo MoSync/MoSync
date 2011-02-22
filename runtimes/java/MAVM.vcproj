@@ -313,6 +313,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\platforms\javaME\src\SplitResourceStream.jpp"
+				>
+			</File>
+			<File
 				RelativePath=".\platforms\javaME\src\Syscall.jpp"
 				>
 			</File>

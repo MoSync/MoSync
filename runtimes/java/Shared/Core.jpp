@@ -202,7 +202,7 @@ final public class Core {
 		
 		DEBUG_ASSERT(mSyscall != null);
 
-		InputStream resources = getClass().getResourceAsStream(resname);
+		InputStream resources = GET_RESOURCE(resname);
 		if(resources == null) {
 			mSyscall.LoadResourcesFromStream(null, null);
 		} else {
@@ -267,12 +267,12 @@ final public class Core {
 
 		{
 			LittleEndianDataInputStream llis =
-				new LittleEndianDataInputStream(getClass().getResourceAsStream(modname));
+				new LittleEndianDataInputStream(GET_RESOURCE(modname));
 			LoadVMApp(llis);
 			llis.close();
 		}
 
-		InputStream resources = getClass().getResourceAsStream(resname);
+		InputStream resources = GET_RESOURCE(resname);
 		if(resources == null) {
 			mSyscall.LoadResourcesFromStream(null, null);
 		} else {
@@ -437,7 +437,7 @@ final public class Core {
 		// Init regs + IP
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 		//allocate space for location event structs
-		mCustomEventPointer = mCustomMemPointer - 36;
+		mCustomEventPointer = mCustomMemPointer - MALOCATION_INT_COUNT * 4;
 		regs[REG_sp] = mCustomEventPointer - 16;
 #else
 		regs[REG_sp] = mCustomMemPointer - 16;

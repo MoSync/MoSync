@@ -35,6 +35,7 @@ JAVAME_SOURCES = [
 	'MoSync',
 	#'ExtensionHandler',
 	#'AudioBufferDataSource',
+	'SplitResourceStream',
 ]
 CLDC10_SOURCES = [
 	'Real',

@@ -1,0 +1,113 @@
+#include "config_platform.h"
+#ifdef MA_PROF_BUG_RESOURCE_SIZE_LIMITED
+
+#include "helpers.h"
+
+import java.io.*;
+import java.util.Vector;
+
+class SplitResourceStream extends InputStream {
+	private final InputStream[] mFiles;
+	// the file in which we are currently positioned.
+	// equals mFiles.length if we're at the end of the compound file.
+	private int mIndex;
+	private int mMarkIndex;
+	private static Class mClass = MAMidlet.self.getClass();
+
+	private SplitResourceStream(InputStream[] files) {
+		mFiles = files;
+		mIndex = 0;
+	}
+
+	static SplitResourceStream get(String baseName) {
+		Vector files = new Vector(2);
+		int i=0;
+		while(true) {
+			String name = baseName + i;
+			DEBUG_TEMP("try: "+name+"\n");
+			InputStream is = mClass.getResourceAsStream(name);
+			if(is == null)
+				break;
+			files.addElement(is);
+			i++;
+		}
+		DEBUG_TEMP("SplitResourceStream.get("+baseName+"): "+files.size()+"\n");
+		if(files.size() == 0)
+			return null;
+		InputStream[] a = new InputStream[files.size()];
+		files.copyInto(a);
+		return new SplitResourceStream(a);
+	}
+
+	public void close() throws IOException {
+		for(int i=0; i<mFiles.length; i++) {
+			mFiles[i].close();
+		}
+	}
+
+	public int read() throws IOException {
+		// while we haven't reached the end
+		while(mIndex < mFiles.length) {
+			// try to read a byte
+			int res = mFiles[mIndex].read();
+			if(res >= 0) {
+				return res;
+			}
+			// if at sub-EOF, go to next file
+			mIndex++;
+		}
+		// we reached the end.
+		return -1;
+	}
+
+	public int read(byte[] b) throws IOException {
+		return read(b, 0, b.length);
+	}
+
+	public int read(byte[] b, int off, int len) throws IOException {
+		DEBUG("read("+off+", "+len+")\n");
+		while(mIndex < mFiles.length) {
+			int res = mFiles[mIndex].read(b, off, len);
+			if(res > 0)
+				return res;
+			mIndex++;
+		}
+		return -1;
+	}
+
+	public int available() throws IOException {
+		if(mIndex < mFiles.length) {
+			return mFiles[mIndex].available();
+		}
+		return 0;
+	}
+
+	public long skip(long n) throws IOException {
+		if(mIndex < mFiles.length) {
+			return mFiles[mIndex].skip(n);
+		}
+		return 0;
+	}
+
+	public boolean markSupported() {
+		return mFiles[0].markSupported();	//assumes all sub-streams are the same type.
+	}
+
+	public void mark(int readlimit) {
+		mMarkIndex = mIndex;
+		if(mIndex < mFiles.length) {
+			mFiles[mIndex].mark(readlimit);
+		}
+	}
+
+	public void reset() throws IOException {
+		if(mMarkIndex != mIndex) {
+			throw new IOException("SplitResourceStream.reset: index changed");
+		}
+		if(mIndex < mFiles.length) {
+			mFiles[mIndex].reset();
+		}
+	}
+}
+
+#endif	//MA_PROF_BUG_RESOURCE_SIZE_LIMITED

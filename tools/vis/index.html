@@ -1,0 +1,115 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="jsapi.js"></script>
+	<script src="sld.js">
+	</script>
+	
+    <script type="text/javascript">
+	
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1', {'packages':['piechart']});
+      //google.load('visualization', '1', {'packages':['corechart']});
+      google.load('visualization', '1', {packages:['table']});
+	
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+      
+	  parseXML("fp.xml");
+	  buildMap();
+
+	  function parseXML(url) {
+		if (window.XMLHttpRequest)
+		{// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp=new XMLHttpRequest();
+		}
+		else
+		{// code for IE6, IE5
+			xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		xmlhttp.open("GET",url,false);
+		xmlhttp.send();
+		xmlDoc=xmlhttp.responseXML;   
+	  }
+	  
+	  function buildMap() {
+		var map = [];
+
+		elements = xmlDoc.getElementsByTagName("f");
+		for(i=0;i<elements.length; i++) {
+			e = elements[i];
+			a = e.attributes.getNamedItem("a");
+			key = "";
+			if(a) {
+				realName = functions[parseInt(a.nodeValue)]
+				if(map[realName] == undefined) {
+					map[realName] = {time: 0.0, count: 0, stackTrace: ""}
+				}
+				map[realName].time+=parseFloat(e.attributes.getNamedItem("t").nodeValue);	
+				map[realName].count+=parseInt(e.attributes.getNamedItem("c").nodeValue);			
+
+				} else {
+				n = e.attributes.getNamedItem("n");
+				if(map[n.nodeValue] == undefined) {
+					map[n.nodeValue] = {time: 0.0, count: 0, stackTrace: ""}
+				}
+				map[n.nodeValue].time+=parseFloat(e.attributes.getNamedItem("t").nodeValue);			
+				map[n.nodeValue].count+=parseInt(e.attributes.getNamedItem("c").nodeValue);			
+			}
+			
+		}
+		infoMap = map;
+	  }
+	  
+      // Callback that creates and populates a data table, 
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+      // Create our data table.
+        var data = new google.visualization.DataTable();
+
+		data.addColumn('string', 'Name');
+		data.addColumn('number', 'Time');
+		data.addColumn('number', 'Count');
+		
+		for(var x in infoMap) {
+			data.addRow([x, infoMap[x].time, infoMap[x].count]);
+		}
+
+        // Instantiate and draw our chart, passing in some options.
+        
+
+		var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+	 	chart.draw(data, {width:800, height: 600, is3D: true, title: 'Function use'});	
+	    var table = new google.visualization.Table(document.getElementById('table_div'));
+		table.draw(data, {width:800, height: 600, showRowNumber: true});
+	
+/*		
+		data.sort({column: 1, desc: true});
+        var chart = new google.visualization.BarChart(document.getElementById('chart_div'));
+        chart.draw(data, {fontSize: 10, width: 1280, height: 2048, title: 'Function use',
+                          vAxis: {title: 'Time', titleColor: 'red'},
+						  hAxis: {title: 'Function', titleColor: 'blue', logScale: true}
+                         });
+	*/					 
+/*						 
+	  var table = new google.visualization.Table(document.getElementById('chart_div'));
+	  table.draw(data, {showRowNumber: true});
+
+	  google.visualization.events.addListener(table, 'select', function() {
+		var row = table.getSelection()[0].row;
+		alert('You selected ' + data.getValue(row, 0));
+	  });
+	*/					 
+      }
+    </script>
+  </head>
+
+  <body>
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div"></div>    
+	<div id="table_div"></div>
+	
+  </body>
+</html>

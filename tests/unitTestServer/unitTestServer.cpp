@@ -74,11 +74,11 @@ static bool loadData() {
 }
 
 class Acceptor : public Runnable {
-	short mPort;
+	unsigned short mPort;
 	void (*mSpinOff)(SOCKET);
 	static std::vector<SOCKET> mSockets;
 public:
-	Acceptor(short port, void (*spinOff)(SOCKET)) : mPort(port), mSpinOff(spinOff) {}
+	Acceptor(unsigned short port, void (*spinOff)(SOCKET)) : mPort(port), mSpinOff(spinOff) {}
 
 	static void closeAll() {
 		for(size_t i=0; i<mSockets.size(); i++) {
