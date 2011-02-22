@@ -3026,6 +3026,11 @@ interface MAAPI {
 		 * Sent when an GLView has been initialized and is ready for setup.
 		 */
 		 GL_VIEW_READY = 8;
+
+		 /**
+		  * Sent when the URL of a web view changes
+		  */
+		 WEB_VIEW_URL_CHANGED = 9;
 	}
 
 	/**

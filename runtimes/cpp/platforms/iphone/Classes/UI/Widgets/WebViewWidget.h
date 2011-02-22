@@ -18,8 +18,8 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface WebViewWidget : IWidget {
-	
+@interface WebViewWidget : IWidget <UIWebViewDelegate> {
+	NSString* newurl;
 }
 
 - (id)init;
