@@ -2,8 +2,10 @@ package com.mosync.nativeui.ui.factories;
 
 import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
 
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.ui.widgets.ButtonWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.internal.android.EventQueue;
 
 import android.app.Activity;
@@ -28,7 +30,20 @@ public class ButtonFactory implements AbstractViewFactory
 		Button b = new Button( activity );
 		b.setOnClickListener( new MoSyncSendOnClick( handle ) );
 		
-		return new ButtonWidget(handle, b);
+		ButtonWidget button = new ButtonWidget( handle, b );
+		
+		try
+		{
+			button.setProperty( Types.WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT, Types.WIDGET_HORIZONTAL_CENTER );
+			button.setProperty( Types.WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT, Types.WIDGET_VERTICAL_CENTER );
+		}
+		catch(PropertyConversionException pe)
+		{
+			// If this happens, there is a bug in the implementation, just return null.
+			return null;
+		}
+		
+		return button;
 	}
 	
 	/**
