@@ -1,9 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import android.content.Context;
+import android.os.IBinder;
 import android.text.InputType;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 /**
@@ -46,6 +50,29 @@ public class EditBoxWidget extends LabelWidget
 			else if( value.equals( "text" ) )
 			{
 				editTextView.setInputType( InputType.TYPE_CLASS_TEXT );
+			}
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_SHOW_KEYBOARD ) )
+		{
+			boolean showKeyboard = BooleanConverter.convert( value );
+			
+   			InputMethodManager manager = (InputMethodManager)
+			getView( ).getContext( ).getSystemService( Context.INPUT_METHOD_SERVICE );
+			IBinder windowToken = editTextView.getWindowToken( );
+			if( null == manager || null == windowToken )
+			{
+				return false;
+			}
+			
+			if( showKeyboard )	
+			{
+				// Seems that it needs to have focus before we can show the keyboard.
+				editTextView.requestFocus( );
+				manager.showSoftInput( editTextView, InputMethodManager.SHOW_FORCED );
+			}
+			else
+			{
+				manager.hideSoftInputFromWindow( editTextView.getWindowToken( ), 0 );
 			}
 		}
 		else

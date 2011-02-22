@@ -1429,16 +1429,35 @@ public class MoSyncThread extends Thread
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 			
+			/**
+			 * The code below converts the Bitmap to the ARGB format.
+			 * If you do not use this method or a similar one, Android will ignore
+			 * the specified format and use the format of the screen, usually
+			 * RGB 565.
+			 */
 			Bitmap decodedImage = BitmapFactory.decodeByteArray(
 				resourceData, 0, resourceData.length, options);
+			
 			if (decodedImage == null)
 			{
 				logError("maCreateImageFromData - " 
 					+ "could not decode image data (decodedImage == null)");
 				return RES_BAD_INPUT;
 			}
+			
+			int width =  decodedImage.getWidth();
+			int height = decodedImage.getHeight();
+			int[] pixels = new int[width * height];
+			decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
+			decodedImage.recycle( );
+			Bitmap argbImage = Bitmap.createBitmap(
+					pixels,
+					width,
+					height,
+					Bitmap.Config.ARGB_8888);
+			
 			mImageResources.put(
-				placeholder, new ImageCache(null, decodedImage));
+				placeholder, new ImageCache(null, argbImage));
 		} 
 		catch (UnsupportedOperationException e) 
 		{
@@ -2724,13 +2743,15 @@ public class MoSyncThread extends Thread
 		
 		// Ensure that the bitmap we use has dimensions that are power of 2.
 		Bitmap bitmap = loadGlTextureHelperMakeBitmapPowerOf2(texture.mBitmap);
-		
-		// The texture bitmap encoding.
-		int textureFormat = GL10.GL_RGBA;
 
 		try
 		{
-			// Load the texture into OpenGL.
+			/**
+			 * It is important here to let Android choose the internal format,
+			 * by setting it to -1. Otherwise due to a bug in Android 1.5 it will
+			 * always throw an exception stating 'invalid Bitmap format' when loading
+			 * an image that previously was RGB.
+			 */
 			if (isSubTexture)
 			{
 				GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
@@ -2738,16 +2759,17 @@ public class MoSyncThread extends Thread
 				  0,
 				  0,
 				  bitmap,
-				  textureFormat,
-				  GL10.GL_UNSIGNED_BYTE);
+				  -1,
+				  GL10.GL_UNSIGNED_BYTE); // texSubImage2D does not support -1 here
 			}
 			else
 			{
 				GLUtils.texImage2D(
 					GL10.GL_TEXTURE_2D, 
 					0, 
-					textureFormat, 
-					bitmap, 
+					-1, 
+					bitmap,
+					-1,
 					0);
 			}
 		}
@@ -2765,13 +2787,16 @@ public class MoSyncThread extends Thread
 		}
 		
 		// Check error status.
-		EGL10 egl = (EGL10) EGLContext.getEGL( );
-		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
+		EGL10 egl = (EGL10) EGLContext.getEGL();
+		GL10 gl = (GL10) egl.eglGetCurrentContext().getGL();
+		int glError = gl.glGetError();
+		if(glError == GL10.GL_NO_ERROR)
 		{
 			return 0; // Success, no errors.
 		}
 		else
 		{
+			Log.i("MoSyncThread", "Could not load texture glGetError returned: 0x" + Integer.toHexString(glError));
 			return -3; // Texture could not be loaded.
 		}
 	}
