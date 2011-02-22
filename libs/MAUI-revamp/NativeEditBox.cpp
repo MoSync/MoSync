@@ -109,6 +109,14 @@ void NativeEditBox::setMaxSize(int size) {
 	mMaxSize = size;
 }
 
+bool NativeEditBox::keyPressed(int keyCode, int nativeCode) {
+	if(keyCode == MAK_FIRE) {
+		activate();
+		return true;
+	}
+	return false;
+}
+
 bool NativeEditBox::pointerPressed(MAPoint2d p, int id) {
 	mStartX = p.x;
 	mStartY = p.y;

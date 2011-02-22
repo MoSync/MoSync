@@ -77,11 +77,13 @@ public class Widget
 		{
 			layoutParams.height = IntConverter.convert( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_LEFT ) )
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_LEFT ) ||
+				 property.equals( Types.WIDGET_PROPERTY_LEFT ) )
 		{
 			layoutParams.marginLeft = IntConverter.convert( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) )
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) || 
+				 property.equals( Types.WIDGET_PROPERTY_TOP ) )
 		{
 			layoutParams.marginTop = IntConverter.convert( value );
 		}
@@ -168,6 +170,14 @@ public class Widget
 		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
 		{
 			return Integer.toString( getView( ).getHeight( ) - getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_LEFT ) )
+		{
+			return Integer.toString( getView( ).getLeft( ) );
+		}
+		else if( property.equals( Types.WIDGET_PROPERTY_TOP ) )
+		{
+			return Integer.toString( getView( ).getTop( ) );
 		}
 		else
 		{

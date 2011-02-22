@@ -33,8 +33,8 @@ public class Types
 	public static final String WIDGET_PROPERTY_PADDING_RIGHT = "right";
 	public static final String WIDGET_PROPERTY_PADDING_BOTTOM = "bottom";
 	
-	public static final String WIDGET_PROPERTY_LEFT = "marginLeft";
-	public static final String WIDGET_PROPERTY_TOP = "marginTop";
+	public static final String WIDGET_PROPERTY_LEFT = "left";
+	public static final String WIDGET_PROPERTY_TOP = "top";
 	
 	public static final String WIDGET_PROPERTY_MARGIN_LEFT = "marginLeft";
 	public static final String WIDGET_PROPERTY_MARGIN_TOP = "marginTop";
@@ -54,6 +54,7 @@ public class Types
 	public static final String WIDGET_PROPERTY_VISIBLE = "visible";
 	
 	public static final String WIDGET_PROPERTY_TEXT = "text";
+	public static final String WIDGET_PROPERTY_PLACEHOLDER = "placeholder";
 	public static final String WIDGET_PROPERTY_CHECKED = "checked";
 	
 	public static final String WIDGET_PROPERTY_TITLE = "title";
