@@ -142,16 +142,19 @@ void streamHash(ostream& stream, const Interface& inf) {
 }
 
 
-void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix) {
+void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level=0) {
+	string tabString = "";
+	for(int i = 0; i < level; i++) tabString += "\t";
+
 	for(size_t i = 0; i < children.size(); i++) {
 		int index = children[i];
 		stream << groups[index].comment;
 		if(groups[index].groups.size() > 0) {
 			stream << "/** @defgroup " << groups[index].groupId << " " << groups[index].groupPrettyName << "\n";
-			stream << " * @{\n";
-			stream << " */\n";
+			stream << "* @{\n";
+			stream << "*/\n";
 
-			streamGroups(stream, groups, groups[index].groups, ix);
+			streamGroups(stream, groups, groups[index].groups, ix, level+1);
 			stream << "/** @} */ // end of " << groups[index].groupId  << "\n";
 		} else {
 			stream << "/** @defgroup " << groups[index].groupId << " " << groups[index].groupPrettyName << " */\n";
