@@ -44,7 +44,7 @@
 		UILabel* label = (UILabel*) view;
 		label.numberOfLines = [value intValue];
 	} 
-	else if([key isEqualToString:@"horizontalAlignment"]) {
+	else if([key isEqualToString:@"textHorizontalAlignment"]) {
 		UILabel* label = (UILabel*) view;
 		if([value isEqualToString:@"left"]) {
 			label.textAlignment = UITextAlignmentLeft;
@@ -56,7 +56,7 @@
 			label.textAlignment = UITextAlignmentRight;
 		}		
 	}
-	else if([key isEqualToString:@"verticalAlignment"]) {
+	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		// This isn't trivial on iphone.
 		
 		//UILabel* label = (UILabel*) view;

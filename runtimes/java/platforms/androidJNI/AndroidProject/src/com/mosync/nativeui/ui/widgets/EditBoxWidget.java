@@ -1,5 +1,6 @@
 package com.mosync.nativeui.ui.widgets;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -52,7 +53,7 @@ public class EditBoxWidget extends LabelWidget
 				editTextView.setInputType( InputType.TYPE_CLASS_TEXT );
 			}
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_SHOW_KEYBOARD ) )
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_SHOW_KEYBOARD ) )
 		{
 			boolean showKeyboard = BooleanConverter.convert( value );
 			

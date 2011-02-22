@@ -7,9 +7,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
-import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -46,15 +45,15 @@ public class SearchBarWidget extends Widget
 		ViewGroup view = (ViewGroup) getView();
 		EditText editBox = (EditText) view.getChildAt(0);
 		
-		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		if (property.equals(IX_WIDGET.MAW_SEARCH_BAR_TEXT))
 		{
 			editBox.setText(value);
 		}
-		else if(property.equals(Types.WIDGET_PROPERTY_FONT_COLOR))
+		else if(property.equals(IX_WIDGET.MAW_SEARCH_BAR_PLACEHOLDER))
 		{
-			editBox.setTextColor(ColorConverter.convert(value));
+			editBox.setHint(value);
 		}
-		else if(property.equals(Types.WIDGET_PROPERTY_SHOW_KEYBOARD))
+		else if(property.equals(IX_WIDGET.MAW_SEARCH_BAR_SHOW_KEYBOARD))
 		{
 			boolean showKeyboard = BooleanConverter.convert( value );
 			
@@ -94,7 +93,7 @@ public class SearchBarWidget extends Widget
 		ViewGroup view = (ViewGroup) getView();
 		EditText editBox = (EditText) view.getChildAt(0);
 		
-		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		if (property.equals(IX_WIDGET.MAW_SEARCH_BAR_TEXT))
 		{
 			return editBox.getText().toString();
 		}

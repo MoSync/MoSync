@@ -2,7 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.widget.CheckBox;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -36,7 +36,7 @@ public class CheckBoxWidget extends Widget
 		}
 		
 		CheckBox checkBox = (CheckBox) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_CHECKED ) )
+		if( property.equals( IX_WIDGET.MAW_CHECK_BOX_CHECKED ) )
 		{
 			boolean checked = BooleanConverter.convert( value );
 			checkBox.setChecked( checked );

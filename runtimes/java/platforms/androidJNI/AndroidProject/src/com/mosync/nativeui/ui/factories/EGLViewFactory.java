@@ -1,11 +1,11 @@
 package com.mosync.nativeui.ui.factories;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_GL_VIEW_READY;
 import android.app.Activity;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.egl.EGLView;
 import com.mosync.nativeui.ui.egl.EGLView.EGLViewReadyListener;
 import com.mosync.nativeui.ui.widgets.GLWidget;
@@ -33,7 +33,7 @@ public class EGLViewFactory implements AbstractViewFactory
 			@Override
 			public void eglViewReady()
 			{
-				EventQueue.getDefault( ).postWidgetEvent( WIDGET_EVENT_GL_VIEW_READY, handle );
+				EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_GL_VIEW_READY, handle );
 			}
 		});
 		eglFrame.addView( eglView );

@@ -1,13 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
-
 import android.view.View;
 import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
+import android.widget.TabHost.TabSpec;
+
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * A screen that allows navigation between screens using
@@ -74,7 +74,7 @@ public class TabScreenWidget extends ScreenWidget
 		}
 		
 		TabHost tabHost = (TabHost) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_CURRENT_TAB ) )
+		if( property.equals( IX_WIDGET.MAW_TAB_SCREEN_CURRENT_TAB ) )
 		{
 			int currentTabIndex = IntConverter.convert( value );			
 			tabHost.setCurrentTab( currentTabIndex );
