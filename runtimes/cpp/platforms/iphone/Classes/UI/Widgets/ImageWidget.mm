@@ -94,7 +94,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return WIDGET_RES_OK;
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

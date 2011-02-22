@@ -42,7 +42,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_TAB_CHANGED;
+	eventData->eventType = MAW_EVENT_TAB_CHANGED;
 	eventData->widgetHandle = handle;
 	eventData->tabIndex = index;
 	event.data = eventData;
