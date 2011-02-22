@@ -93,8 +93,10 @@
 }
 
 - (int)remove {
-	if(!parent) return MAW_RES_ERROR;
+	if(!parent) return MAW_RES_REMOVED_ROOT;
 	[parent removeChild: self];
+	
+	return MAW_RES_OK;
 }
 
 - (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {

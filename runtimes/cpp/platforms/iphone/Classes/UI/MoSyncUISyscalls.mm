@@ -47,6 +47,7 @@ MAWidgetHandle maWidgetCreate(const char *widgetType) {
 	return currentWidgetIndex-1;
 }
 
+// TODO: implement this
 int maWidgetDestroy(MAWidgetHandle handle) {
 	return MAW_RES_OK;
 }
@@ -107,6 +108,7 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	return MAW_RES_OK;
 }
 
+// TODO: implement this
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
 
 	return MAW_RES_ERROR;
@@ -121,12 +123,7 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
 	
-	if(returnValue == MAW_RES_ERROR) {
-		// should flip back to MoSync view.
-		return MAW_RES_REMOVED_ROOT;
-	}
-	
-	return MAW_RES_ERROR;
+	return returnValue;
 }
 
 static bool sNativeUIEnabled = false;
