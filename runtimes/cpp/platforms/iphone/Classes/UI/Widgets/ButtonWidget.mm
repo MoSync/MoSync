@@ -35,6 +35,10 @@
 	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
+	UIButton* button = (UIButton*) view;
+	button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+	
+	
 	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	
 	return [super init];
@@ -65,7 +69,12 @@
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
 	} else
-	if([key isEqualToString:@"textColor"]) {
+	if([key isEqualToString:@"fontSize"]) {
+		UIButton* button = (UIButton*) view;
+		float fontSize = [value floatValue];
+		[button setFont:[UIFont boldSystemFontOfSize:fontSize]];
+	} else		
+	if([key isEqualToString:@"fontColor"]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitleColor:[UIColor colorWithHexString:value] forState:UIControlStateNormal];
 	} else			
