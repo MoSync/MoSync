@@ -33,7 +33,7 @@ size_t getFileSize(const char* filename);
 // mallocs the buffer
 void* readBinaryFile(const char* src, size_t& size);
 
-void writeFile(const char* dst, const void* src, int size);
+void writeFile(const char* dst, const void* src, size_t size);
 
 typedef std::map<std::string, std::string> TemplateMap;
 

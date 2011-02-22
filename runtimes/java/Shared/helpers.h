@@ -113,6 +113,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define STATIC_EXIT
 #endif
 
+#ifdef MA_PROF_BUG_RESOURCE_SIZE_LIMITED
+#define GET_RESOURCE(name) SplitResourceStream.get(name)
+#else
+#define GET_RESOURCE(name) getClass().getResourceAsStream(name)
+#endif
+
 #define FSI final static int
 
 #define IN_FILE_ON_LINE DEBUG_ALWAYS(IN_FILE_ON_LINE_STRING)
@@ -168,3 +174,5 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define EI_DATA event[1]
 #define EI_TEXTBOX_RESULT event[1]
 #define EI_TEXTBOX_LENGTH event[2]
+
+#define MALOCATION_INT_COUNT 10

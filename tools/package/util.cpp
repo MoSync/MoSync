@@ -94,7 +94,6 @@ string readFileToString(const char* src) {
 	return oss.str();
 }
 
-#if 0
 void* readBinaryFile(const char* src, size_t& size) {
 	ifstream in(src, ios_base::binary);
 	beGood(in);
@@ -113,10 +112,9 @@ void* readBinaryFile(const char* src, size_t& size) {
 void writeFile(const char* dst, const void* src, size_t size) {
 	ofstream out(dst, ios_base::binary);
 	beGood(out);
-	out.write(src, size);
+	out.write((char*)src, size);
 	beGood(out);
 }
-#endif
 
 void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 	ifstream in(src);
