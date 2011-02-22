@@ -19,7 +19,8 @@
 - (void) performSelectorOnMainThread:(SEL)selector
 						  withTarget:(id)target
 						 withObjects:(NSArray*)objects
-					   waitUntilDone:(BOOL)waitUntilDone {
+					   waitUntilDone:(BOOL)waitUntilDone
+                      andReturnValue:(void*)retLoc {
 	
     if(target && [target respondsToSelector:selector]) {
         NSMethodSignature* signature
@@ -42,9 +43,13 @@
 				}
 				
 				[invocation retainArguments];
+				//if(retLoc!=nil)
+				//	[invocation setReturnValue:retLoc];
 				[invocation performSelectorOnMainThread:@selector(invoke)
 												 withObject:nil
 											  waitUntilDone:YES];
+				if(retLoc!=nil)
+					[invocation getReturnValue:retLoc];
 			}
 			@catch (NSException * e) {
 				//LOGEXCEPTION(e)

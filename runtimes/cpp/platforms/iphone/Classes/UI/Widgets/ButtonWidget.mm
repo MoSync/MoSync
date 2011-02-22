@@ -27,7 +27,11 @@
 @implementation ButtonWidget
 
 - (id)init {
-	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	//view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	if(!view)
+		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+	
+	
 	//view.frame = CGRectMake(0, 0, 100, 40);
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
@@ -61,6 +65,10 @@
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
 	} else
+	if([key isEqualToString:@"textColor"]) {
+		UIButton* button = (UIButton*) view;
+		[button setTitleColor:[UIColor colorWithHexString:value] forState:UIControlStateNormal];
+	} else			
 	if([key isEqualToString:@"backgroundImage"]) {
 		int imageHandle = [value intValue];
 		UIButton* button = (UIButton*) view;

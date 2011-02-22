@@ -40,6 +40,10 @@
 		[label setText: value];
 		[label sizeToFit];
 	} 
+	else if([key isEqualToString:@"numberOfLines"]) {
+		UILabel* label = (UILabel*) view;
+		label.numberOfLines = [value intValue];
+	} 
 	else if([key isEqualToString:@"horizontalAlignment"]) {
 		UILabel* label = (UILabel*) view;
 		if([value isEqualToString:@"left"]) {

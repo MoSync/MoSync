@@ -2985,232 +2985,543 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WIDGET
-	constset int WIDGET_EVENT_ {
-		/** 
-		 * A widget has posted a message. Use maWidgetGetMessageSize and
-		 * maWidgetGetMessageData to access message data.
-		 */
-		MESSAGE = 1;
 
-		/** 
-		 * A pointer pressed event has occurred. 
-		 */
-		POINTER_PRESSED = 2;
-
-		/** 
-		 * A pointer released event has occurred. 
-		 */
-		POINTER_RELEASED = 3;
-
-		/** 
-		 * A WebView widget has finished loading data. 
-		 */
-		CONTENT_LOADED = 4;
-
-		/**
-		 * Sent when something is clicked.
-		 */
-		CLICKED = 5;
-
-		/**
-		 * Sent when an item in a list view is clicked.
-		 */
-		ITEM_CLICKED = 6;
-		
-		/**
-		 * Sent when a tab widget has changed to a new tab.
-		 */
-		TAB_CHANGED = 7;
-		
-		/**
-		 * Sent when an GLView has been initialized and is ready for setup.
-		 */
-		 GL_VIEW_READY = 8;
-	}
+/**
+* This API may be used to access the Native UI components of the underlying system in a 
+* platform independant manner. Currently supported platforms are Android and iOS. The 
+* API has a small set of functions that use strings for keys and values. All keys are
+* defined as documented string constants. See \ref WidgetTypes "Widget types" and \ref
+* WidgetProperties "Widget properties" for more information.
+*/
+group WidgetAPI "Widget API" {
 
 	/**
-	 * A struct that holds the data associated with a widget event.
-	 */
+	* Widgets can send events for instance when their internal state is changed (like when a 
+	* button is pressed). These are events sent using the MoSync event system \ref maGetEvent.
+	* When an event is received with the type #EVENT_TYPE_WIDGET the 'data' member of the MAEvent 
+	* struct is a pointer to data of type #MAWidgetEventData.
+	*/
+	group WidgetEvents "Widget events" {
+	/**
+	* @brief A struct that holds the data associated with a widget event.
+	*/ 
 	struct MAWidgetEventData {
 		/**
-		 * Determines which kind of widget event that has occurred.
-		 */
+		* @brief Determines which kind of widget event that has occurred. See \ref WidgetEventTypes "Widget event types" for the possible values.
+		*/
 		int eventType;
 
 		/**
-		 * Handle to the widget that sent the event.
-		 */
-		MAHandle widgetHandle;
-
+		* @brief Handle to the widget that sent the event.
+		*/
+		MAWidgetHandle widgetHandle;
+		
 		union {
-			/** 
-			 * the index when a listbox is clicked. 
-			 */
+			/**
+			* @brief The index when a #WIDGET_EVENT_CLICKED event is receieved for a list view.	
+			*/
 			int listItemIndex;
 
 			/**
-			 * the type of searchbar button clicked 
-			 * 0 means 'search'
-			 * 1 means 'cancel'
-			 */
+			* @brief The type of button that was clicked when a #WIDGET_EVENT_CLICKED event is receieved for a searchbar.	
+			* The type of searchbar button clicked:
+			* - 0 means 'search'
+			* - 1 means 'cancel'
+			*/
 			int searchBarButton;
 
 			/**
-			 * the state of the checkbox
-			 * 0 means 'unchecked'
-			 * 1 means 'checked'
-			 */
+			* @brief The new state of the checkbox when a #WIDGET_EVENT_CLICKED event is receieved for a checkbox.
+			* - 0 means 'unchecked'
+			* - 1 means 'checked'
+			*/
 			int checked;
-
-			struct {
-				/**
-				 * The id of the widget event. Use for retrieving data for WIDGET_EVENT_MESSAGE 
-				 * events using the syscall maWidgetGetMessageData().
-			 	*/
-				int messageId;
-		
-				/**
-				 * Size in bytes of the message referred to by messageId. Use for retrieving 
-				 * data for WIDGET_EVENT_MESSAGE events using the syscall maWidgetGetMessageData().
-				 */
-				int messageSize;
-			} custom;
-
+			
+			/**
+			* @brief The new tab index when a #WIDGET_EVENT_TAB_CHANGED event is received.
+			*/
+			int tabIndex;
 		}
 	}
 
-	constset int WIDGET_ {
+	/**
+	* The available widget event types.
+	*/
+	group WidgetEventTypes "Widget event types" {
+	constset int MAW_EVENT_ {
+		/** 
+		* @brief A pointer pressed event has occurred. 
+		*/
+		POINTER_PRESSED = 2;
+
+		/** 
+		* @brief A pointer released event has occurred. 
+		*/
+		POINTER_RELEASED = 3;
+
+		/** 
+		* @brief A WebView widget has finished loading data. 
+		*/
+		CONTENT_LOADED = 4;
+
 		/**
-		 * Indicates that the call to a widget syscall was successful.
-		 */
+		* @brief Sent when something is clicked.
+		*/
+		CLICKED = 5;
+
+		/**
+		* @brief Sent when an item in a list view is clicked.
+		*/
+		ITEM_CLICKED = 6;
+
+		/**
+		* @brief Sent when a tab widget has changed to a new tab.
+		*/
+		TAB_CHANGED = 7;
+
+		/**
+		* @brief Sent when an GLView has been initialized and is ready for setup.
+		*/
+		GL_VIEW_READY = 8;
+	}
+	} // end of WidgetEventTypes
+
+	} // end of WidgetEvents
+
+	/**
+	* The available result codes for the widget api.
+	*/
+	group WidgetResultCodes "Widget result codes" {
+	constset int MAW_RES_ {
+		/**
+		* @brief Indicates that the call to a widget syscall was successful.
+		*/
 		OK = 0;
 		
 		/**
-		 * Indicates that the call to a widget syscall was unsuccessful.
-		 */
-		ERROR = -1;
+		* @brief Indicates that the call to a widget syscall was unsuccessful.
+		*/
+		ERROR = -2;
 		
 		/**
-		 * Symbolic handle of the root widget in a screen.
-		 */
-		ROOT = -1;
+		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty received an invalid property name.
+		*/
+		INVALID_PROPERTY_NAME = -2;
+
+		/**
+		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty received an invalid property value.
+		*/
+		INVALID_PROPERTY_VALUE = -3;
+
+		/**
+		* @brief Indicates that the call to a widget function received an invalid handle.
+		*/
+		INVALID_HANDLE = -4;
+
+		/**
+		* @brief Indicates that the call maWidgetCreate received an invalid type name.
+		*/
+		INVALID_TYPE_NAME = -5;
+
+		/**
+		* @brief Indicates that the call to maWidgetInsertChild received an invalid index.
+		*/
+		INVALID_INDEX = -6;
+
+		/**
+		* @brief Indicates that the call maWidgetGetProperty needs a larger buffer.
+		*/
+		INVALID_STRING_BUFFER_SIZE = -7;
+
+		/**
+		* @brief Indicates that maWidgetScreenShow received an invalid (non-screen) widget handle.
+		*/
+		INVALID_SCREEN = -8;
+
+		/**
+		* @brief Indicates that the caller tried to add a widget to a non-layout.
+		*/
+		INVALID_LAYOUT = -9;
+		
+		/**
+		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
+		*/
+		REMOVED_ROOT = -10;
 	}
+	} // end of WidgetResultCodes
+	
+	/**
+	* The available widget types for \ref maWidgetCreate.
+	*/
+	group WidgetTypes "Widget types" {
+	constset MAString MAW_ {
+		/**
+		* @brief A screen is the root of all widgets currently visible on a screen. See \ref WidgetScreenProperties "Screen properties" for the properties available.
+		*/
+		SCREEN = "Screen";
 
-	/** 
-	 * Create a new widget of the specified type.
-	 *
-	 * Currently the following widgets are supported:
-	 * - ListBox
-	 * - HorizontalLayout
-	 * - VerticalLayout
-	 * - Button
-	 * - Label
-	 *
-	 * \param widgetType A String representing the type of the widget to create.
-	 *
-	 * \returns A handle to the widget, or WIDGET_ERROR if the widget
-	 *          could not be created.
-	 */
-	MAHandle maWidgetCreate(in MAString widgetType);
+		/**
+		* @brief A tab screen is a special type of screen that can have any number of sub-screens each switchable using a tab bar. See \ref WidgetTabScreenProperties "Tab screen properties" for the properties available.
+		*/
+		TAB_SCREEN = "TabScreen";
 
-	/** 
-	 * Destroy a widget. Calling it a second time does nothing.
-	 *
-	 * \param widget A handle to the widget to destroy.
-	 */
-	void maWidgetDestroy(in MAHandle widget);
+		/**
+		* @brief A nav screen is a special type of screen stack that can have any number of screens pushed. Navigation is handled differently on iPhone and Android. On iPhone a navigation bar is used to go back, while on Android the back button is used.  See \ref WidgetNavScreenProperties "Nav screen properties" for the properties available.
+		*/
+		NAV_SCREEN = "NavScreen";
 
-	/** 
-	 * Add a widget to the given parent as a child. Letting the
-	 * parent widget layout the child.
-	 *
-	 * Note: Use parent WIDGET_ROOT to add a widget to the root window.
-	 *
-	 * \param parent 
-	 * \param child The widget that will be added to the parent.
-	 *
-	 * \returns WIDGET_OK if the child could be added to the parent, or
-	 *          WIDGET_ERROR otherwise.
-	 */
-	int maWidgetAddChild(in MAHandle parent, in MAHandle child);
+		/**
+		* @brief A button is a widget that represent a physical button that can be pressed. See \ref WidgetButtonProperties "Button properties" for the properties available.
+		*/
+		BUTTON = "Button";
 
-	/** 
-	 * Removes a child widget from its parent (but does not destroy it).
-	 * Removing a top-level widget (a widget that has VIEW_ROOT as parent)
-	 * causes the MoSync view to become visible.
-	 *
-	 * \returns WIDGET_OK if the child could be removed from the parent,
-	 *                    or WIDGET_ERROR otherwise.
-	 */
-	int maWidgetRemoveChild(in MAHandle parent, in MAHandle child);
+		/**
+		* @brief An image is a widget that can be used to display an image. See \ref WidgetImageProperties "Image properties" for the properties available.
+		*/
+		IMAGE = "Image";
+
+		/**
+		* @brief An image button is a button that will also affect the appearance of the background image when pressed. See \ref WidgetImageButtonProperties "Image button properties" for the properties available.
+		*/
+		IMAGE_BUTTON = "ImageButton";
+
+		/**	
+		* @brief A label is a widget that can be used to display static non-editable text. See \ref WidgetLabelProperties "Label properties" for the properties available.
+		*/
+		LABEL = "Label";
+
+		/**
+		* @brief An editbox is an editable label. See \ref WidgetEditBoxProperties "Editbox properties" for the properties available.
+		*/
+		EDIT_BOX = "EditBox";
+
+		/**
+		* @brief A list view is a vertical list of widgets that is also scrollable. See \ref WidgetListViewProperties "List view properties" for the properties available.
+		*/
+		LIST_VIEW = "ListView";
+
+		/**
+		* @brief A list view item is a special kind of layout compatible with the list view. That has a predefined common layout for adding text, an icon etc. See \ref WidgetListViewItemProperties "List view item properties" for the properties available.
+		*/
+		LIST_VIEW_ITEM = "ListViewItem";
+
+		/**
+		 * @brief A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetCheckBoxProperties "Check box properties" for the properties available.
+		 */
+		CHECK_BOX = "CheckBox";
+
+		/**
+		 * @brief A horizontal layout is a layout that stacks widgets in the horizontal axis. See \ref WidgetHorizontalLayoutProperties "Horizontal layout properties" for the properties available.
+		 */
+		HORIZONTAL_LAYOUT = "HorizontalLayout";
+
+		/**
+		 * @brief A vertical layout is a layout that stacks widgets in the vertical axis. See \ref WidgetVerticalLayoutProperties "Vertical layout properties" for the properties available.
+		 */
+		VERTICAL_LAYOUT = "VerticalLayout";
+
+		/**
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
+		 */
+		RELATIVE_LAYOUT = "RelativeLayout";
+
+		/**
+		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
+		 */
+		SEARCH_BAR = "SearchBar";
+
+		/**
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 */
+		GL_VIEW = "GLView";
+
+		/**
+		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 */	
+		WEB_VIEW = "WebView";
+	}
+	} // end of WidgetTypes
 
 	/**
- 	 * Shows a screen. If native UI haven't been initialized, it is also initialized 
-	 * and disables regular MoSync drawing.
-	 * param screenHandle The handle to the screen.
-	 */
-	void maWidgetScreenShow(in MAHandle screenHandle);
-
-	/** 
-	 * Sets a specified property on the given widget.
-	 *
-	 * \param widget Handle to the widget.
-	 * \param property A string representing which property to set.
-	 * \param value The value which will be assigned to the property.
-	 *
-	 * Note: May be synchronous or asynchronous depending on the property.
-	 *
-	 * \returns A status code.
-	 */
-	int maWidgetSetProperty(in MAHandle widget, in MAString property, in MAString value);
-
-	/** 
-	 * Retrieves a specified property from the given widget.
-	 *
-	 * \param widget Handle to the widget.
-	 * \param property A string representing which property to set.
-	 * \param value A buffer that will hold the value of the property, represented as a string.
-	 * \param bufSize Size of the buffer.
-	 *
-	 * \returns Number of bytes copied on success, WIDGET_ERROR if the property
-	 *          could not be retrieved.
-	 */
-	int maWidgetGetProperty(in MAHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+	* All widgets have a set of properties that can be set. In order to set them, use \ref maWidgetSetProperty. These properties may change 
+	* things like the visual appearance of the widget or the way it works.
+	*/
+	group WidgetProperties "Widget properties" {
 
 	/**
-	 * Evaluate a script in a widget.
-	 *
-	 * \param widget Handle to the widget that will evaluate the script.
-	 * \param script The script code. The script should start with
-	 *               a language specifier that has the form "<language>:". 
-	 *               To evaluate JavaScript in a WebView widget, start the 
-	 *               script with "javascript:".
-	 *
-	 * \returns WIDGET_OK on success and WIDGET_ERROR on error.
-	 */
-	int maWidgetEvaluateScript(in MAHandle widget, in MAString script);
+	* The available widget properties for all widgets.
+	*/
+	constset MAString MAW_WIDGET_ {
+		LEFT = "left";
+		TOP = "top";
+		WIDTH = "width";
+		HEIGHT = "height";
+		ALPHA = "alpha";
+		BACKGROUND_COLOR = "backgroundColor";
+	}	
 
 	/**
-	 * Get the message data for a message id.
-	 * The message id is in MAEvent.widget.widgetMessageId.
-	 * The caller must use maWidgetGetMessageSize to ensure 
-	 * that the buffer is sufficienly large to hold the data.
-	 *
-	 * Message data can be retrieved only once, the system deallocates
-	 * the memory used to hold the data when retrieved. A second call
-	 * to this function with the same message id will return WIDGET_ERROR.
-	 *
-	 * \param messageId The id of the message, \see MAWidgetEventData.messageId.
-	 * \param buffer Pointer to a buffer that will contain the message data.
-	 * \param bufferSize Size of the buffer in bytes.
-	 *
-	 * \returns The number of bytes copied to the buffer, or WIDGET_ERROR on
-	 *          error.
-	 */
-	int maWidgetGetMessageData(in int messageId, out MAAddress buffer, in int bufferSize);
+	* The available widget properties for a #MAW_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetScreenProperties "Screen properties" {
+	constset MAString MAW_SCREEN_ {
+		TITLE = "title";
+		ICON = "icon";
+	}
+	} // end of WidgetScreenProperties	
 
+	/**
+	* The available widget properties for a #MAW_TAB_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetTabScreenProperties "Tab screen properties" {
+	constset MAString MAW_TAB_SCREEN_ {
+		CURRENT_TAB = "currentTab";
+	}
+	} // end of WidgetTabScreenProperties	
+
+	/**
+	* The available widget properties for a #MAW_BUTTON and #MAW_IMAGE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetButtonProperties "Button properties" {
+	constset MAString MAW_BUTTON_ {
+		TEXT = "text";
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+	} // end of WidgetButtonProperties		
+	
+	/**
+	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetImageProperties "Image properties" {
+	constset MAString MAW_IMAGE_BUTTON_ {
+		TEXT = "text";
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+	} // end of WidgetImageProperties		
+	
+	/**
+	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetLabelProperties "Label properties" {
+	constset MAString MAW_LABEL_ {
+		TEXT = "text";
+		VERTICAL_ALIGNMENT = "verticalAlignment";
+		HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+		FONT_COLOR = "fontColor";
+		FONT_SIZE = "fontSize";
+	}
+	} // end of WidgetImageProperties		
+
+	/**
+	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetEditBoxProperties "Edit box properties" {
+	constset MAString MAW_EDIT_BOX_ {
+		TEXT = "text";
+		PLACEHOLDER = "placeholder";
+		SHOW_KEYBOARD = "showKeyboard";
+	}
+	} // end of WidgetEditBoxProperties
+	
+	/**
+	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetListViewItemProperties "List view item properties" {
+	constset MAString MAW_LIST_VIEW_ITEM_ {
+		TEXT = "text";
+		ICON = "icon";
+		ACCESSORY_TYPE = "accessoryType";
+	}
+	} // end of WidgetListViewItemProperties
+	
+	/**
+	* The available widget properties for a #MAW_CHECK_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetCheckBoxProperties "Check box properties" {
+	constset MAString MAW_CHECK_BOX_ {
+		CHECKED = "checked";
+	}
+	} // end of WidgetListViewProperties
+
+	/**
+	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
+	constset MAString MAW_HORIZONTAL_LAYOUT_ {
+		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+	}
+	} // end of WidgetHorizontalLayoutProperties
+
+	/**
+	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetVerticalLayoutProperties "Vertical layout properties" {
+	constset MAString MAW_VERTICAL_LAYOUT_ {
+		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+	}
+	} // end of WidgetVerticalLayoutProperties
+	
+	/**
+	* The available widget properties for a #MAW_SEARCH_BAR. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetSearchBarProperties "Search bar properties" {
+	constset MAString MAW_SEARCH_BAR_ {
+		TEXT = "text";
+		PLACEHOLDER = "placeholder";
+		SHOW_KEYBOARD = "showKeyboard";
+	}
+	} // end of WidgetSearchBarProperties
+		
+	/**
+	* The available widget properties for a #MAW_GL_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetGLViewProperties "GL view properties" {
+	constset MAString MAW_GL_VIEW_ {
+		INVALIDATE = "invalidate";
+		BIND = "bind";
+	}
+	} // end of WidgetGLViewProperties
+	
+	/**
+	* The available widget properties for a #MAW_WEB_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetWebViewProperties "Web view properties" {
+	constset MAString MAW_WEB_VIEW_ {
+		URL = "url";
+	}
+	} // end of WidgetWebViewProperties
+
+	} // end of WidgetProperties	
+		
+	typedef int MAWidgetHandle;
+
+	/**
+	* The set of functions available for the Widget API.
+	*/
+	group WidgetAPIFunctions "Widget functions" {
+
+	/** 
+	* Creates a new widget of the specified type. 
+	*
+	* \note See \ref WidgetTypes "Widget types" for the available widget types.
+	*
+	* \param widgetType A String representing the type of the widget to create.
+	*
+	* \returns A handle to the widget, or any of the following result codes:
+	* - #MAW_RES_ERROR if the widget could not be created.
+	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+	*/
+	MAWidgetHandle maWidgetCreate(in MAString widgetType);
+
+	/** 
+	* Destroys and a widget. Calling it a second time does nothing.
+    * \note If it has a parent it also removes it from its parent.
+	*
+	* \param widget A handle to the widget to be destroyed.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the widget was destroyed.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	*/
+	int maWidgetDestroy(in MAWidgetHandle widget);
+
+	/** 
+	* Adds a widget to the given parent as a child. Letting the
+	* parent widget layout the child.
+	*
+	* \param parent The widget layout to which the child will be added.
+	* \param child The widget that will be added to the parent.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be added to the parent.
+	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_ERROR if it could not be added for some other reason.
+	*/
+	int maWidgetAddChild(in MAWidgetHandle parent, in MAWidgetHandle child);
+
+	/** 
+	* Inserts a widget to the given parent as a child at an index. Letting the
+	* parent widget layout the child.
+	*
+	* \param parent The widget layout in which the child will be inserted.
+	* \param child The widget that will be added to the parent.
+	* \param index The index where the widget should be inserted (-1 means last)
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be added to the parent.
+	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
+	* - #MAW_RES_INVALID_INDEX if the index was out of bounds.
+	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_ERROR if it could not be added for some other reason.
+	*/
+	int maWidgetInsertChild(in MAWidgetHandle parent, in MAWidgetHandle child, in int index);
+
+	/** 
+	* Removes a child widget from its parent (but does not destroy it).
+	* Removing a currently visible top-level widget causes the MoSync view to become visible.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetRemoveChild(in MAWidgetHandle child);
+
+	/**
+ 	* Shows a screen. If native UI hasn't been initialized, it is also initialized 
+	* and disables regular MoSync drawing.
+	*
+	* \param screenHandle The handle to the screen.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the screen could be shown.
+	* - #MAW_RES_INVALID_SCREEN if the \a screenHandle is not a handle to a screen.
+	*/
+	int maWidgetScreenShow(in MAWidgetHandle screenHandle);
+
+	/** 
+	* Sets a specified property on the given widget.
+	*
+	* \param widget Handle to the widget.
+	* \param property A string representing which property to set.
+	* \param value The value which will be assigned to the property.
+	*
+	* \note May be synchronous or asynchronous depending on the property.
+	* \note See \ref WidgetProperties "Widget properties" for the available properties.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.  
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
+
+	/** 
+	* Retrieves a specified property from the given widget.
+	*
+	* \param widget Handle to the widget.
+	* \param property A string representing which property to set.
+	* \param value A buffer that will hold the value of the property, represented as a string.
+	* \param bufSize Size of the buffer.
+	*
+	* \returns The number of bytes copied on success, or any of the following result codes:
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+	} // end of group WidgetAPIFunctions
+
+} // end of group WidgetAPI
 #endif //IX_WIDGET
-
+	
 		/**
 		* \brief The camera format, in pixels.
 		*/

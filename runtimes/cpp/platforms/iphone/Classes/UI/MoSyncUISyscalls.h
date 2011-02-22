@@ -22,23 +22,25 @@
 #import "MoSyncUI.h"
 #import "MoSyncUISyscalls.h"
 #include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 bool isNativeUIEnabled();
 
-MAHandle maWidgetCreate(const char *widgetType);
-
-void maWidgetDestroy(MAHandle handle) ;
 
 // returns MA_WIDGET_ERROR on error
-int maWidgetSetProperty(MAHandle handle, const char *property, const char* value);
+int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value);
+
+MAWidgetHandle maWidgetCreate(const char *widgetType);
 
 // if maWidgetGetProperty returns <0 maxSize equals the size needed. removed pointer.
-int maWidgetGetProperty(MAHandle handle, const char *property, char *value, int maxSize);
-int maWidgetAddChild(MAHandle parentHandle, MAHandle childHandle);
-int maWidgetRemoveChild(MAHandle parent, MAHandle child);
-void maWidgetScreenShow(MAHandle screenHandle);
-int maWidgetEvaluateScript(MAHandle widget, const char* script);
+int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize);
+int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle);
+int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index);
+int maWidgetDestroy(MAWidgetHandle handle) ;
+int maWidgetRemoveChild(MAWidgetHandle child);
+int maWidgetScreenShow(MAWidgetHandle screenHandle);
+int maWidgetEvaluateScript(MAWidgetHandle widget, const char* script);
 int maWidgetGetMessageData(int messageId, void* buffer, int bufferSize);
 
 #endif // _MOSYNC_UI_SYSCALLS_

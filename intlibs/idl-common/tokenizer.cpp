@@ -168,7 +168,7 @@ void readTextToken(string& token) {
 
 void readQuotedString(string& token) {
 	token.clear();
-	char c = sStream->get();
+	char c =  clearWhitespace(); //sStream->get();
 	if(c!='\"') tokenError(token); 
 	do {
 		c = sStream->get();

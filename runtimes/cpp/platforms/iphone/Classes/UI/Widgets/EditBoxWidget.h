@@ -16,45 +16,16 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import "AbstractLayoutView.h"
+#import "IWidget.h"
 
-#define MA_WIDGET_ERROR -1
-#define MA_WIDGET_OK 0
-
-@interface AbstractLayoutView (AbstractLayoutViewExpanded)
-- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
-- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
-@end
-
-
-@interface IWidget : NSObject {
-	UIView* view;
-	int handle;
-	
-	IWidget* parent;
-	NSMutableArray* children;
-	
-	int fillWidth, fillHeight;
+@interface EditBoxWidget : IWidget <UITextFieldDelegate> {
+	UITextField* textField;
 }
 
-- (void)setParent:(IWidget*) parent;
-- (void)setWidgetHandle:(int) handle;
-- (int)getWidgetHandle;
-- (void)wasCreated; // do stuff after the handle has been set (temporary hack). 
-- (void)dealloc;
 - (id)init;
-- (UIView*)getView;
-
 - (void)addChild: (IWidget*)child;
-- (void)addChild: (IWidget*)child andSubview:(bool)addSubview;
-- (int)remove;
 - (void)removeChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-
-- (void)layout;
 
 @end
