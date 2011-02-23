@@ -137,7 +137,7 @@ namespace MAUtil {
 		 * \return \>0 on success, or a \link #CONNERR_GENERIC CONNERR \endlink
 		 * code \< 0 on failure.
 		 */
-		virtual int beginDownloading(const char *url, MAHandle placeholder=0);
+		virtual int beginDownloading(const char *url, MAHandle placeholder=0, int method=HTTP_GET);
 
 		/**
 		 * Function to cancel the current download.
@@ -203,7 +203,7 @@ namespace MAUtil {
 		/**
 		 * \see Downloader::beginDownloading(const char*, MAHandle);
 		 */
-		int beginDownloading(const char *url, MAHandle placeholder=0);
+		int beginDownloading(const char *url, MAHandle placeholder=0, int method=HTTP_GET);
 
 		void cancelDownloading();
 		
@@ -237,9 +237,10 @@ namespace MAUtil {
 			const char *url,
 			MAHandle placeholder=0,
 			const char *mimeType=NULL,
-			bool forceMime=false);
+			bool forceMime=false,
+			int method=HTTP_GET);
 
-		virtual int beginDownloading(const char *url, MAHandle placeholder);
+		virtual int beginDownloading(const char *url, MAHandle placeholder, int method=HTTP_GET);
 
 	protected:
 		virtual void httpFinished(HttpConnection* http, int result);
