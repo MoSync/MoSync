@@ -46,6 +46,8 @@ static void streamJavaConstants(
 	const vector<ConstSet>& 
 	constSets, 
 	int ix);
+void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level=0);
+void streamGroups(ostream& stream, const vector<Group>& groups, int ix);
 
 #if 0
 static void deleteCallback(const char* filename) {
