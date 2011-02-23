@@ -29,7 +29,7 @@ class Targets
 		end
 		
 		def invoke
-			#puts "preqs of '#{@name}'"
+			#puts "preqs of '#{@name}' : #{@preqs}"
 			@preqs.each do |p| p.invoke end
 			#puts "block of '#{@name}'"
 			@block.call if(@block)
