@@ -19,17 +19,17 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_CHANGED;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.text.InputType;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
 /**
@@ -45,7 +45,11 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	class CustomInputConnection extends BaseInputConnection
 	{
 		private MoSyncView mMoSyncView;
-		public CustomInputConnection(View targetView, boolean fullEditor, MoSyncView mosyncView)
+		
+		public CustomInputConnection(
+			View targetView, 
+			boolean fullEditor, 
+			MoSyncView mosyncView)
 		{
 			super(targetView, fullEditor);
 			mMoSyncView = mosyncView;
@@ -53,18 +57,20 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		
 		public boolean performEditorAction (int actionCode)
 		{
-			InputMethodManager mgr = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+			InputMethodManager mgr = (InputMethodManager) 
+				mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 			mgr.hideSoftInputFromWindow(mMoSyncView.getWindowToken(), 0);
 			return true;
 		}
 	}
 
 	/**
-	* MoSyncView Constructor
-	* @param context		The Android Activity Context
-	* @param moSyncThread	The thread in which the runtime is running
-	*/
-	public MoSyncView(Context context, MoSyncThread moSyncThread) throws Exception
+	 * MoSyncView Constructor
+	 * @param context		The Android Activity Context
+	 * @param moSyncThread	The thread in which the runtime is running
+	 */
+	public MoSyncView(Context context, MoSyncThread moSyncThread) 
+		throws Exception
 	{
 		super(context);
 		
@@ -73,30 +79,33 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		mContext = context;
 		mMoSyncThread = moSyncThread;
 
-		// register our interest in hearing about changes to our surface
+		// Register our interest in hearing about changes to our surface.
 		mSurfaceHolder = getHolder();
 
-		// Use accelerated surfaces if available
+		// Use accelerated surfaces if available.
 		int mode = 0;
 		try
 		{
 			mode = 1;
-			mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_HARDWARE);
+			mSurfaceHolder.setType(
+				android.view.SurfaceHolder.SURFACE_TYPE_HARDWARE);
 		}
 		catch(Exception e)
 		{
 			try
 			{
 				mode = 2;
-				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_GPU);
+				mSurfaceHolder.setType(
+					android.view.SurfaceHolder.SURFACE_TYPE_GPU);
 			}
 			catch(Exception e2)
 			{
-				mSurfaceHolder.setType(android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
+				mSurfaceHolder.setType(
+					android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
 			}
 		}
 
-		switch(mode)
+		switch (mode)
 		{
 			case 1: Log.i("MoSync", "Hardware accelerated surface"); break;
 			case 2: Log.i("MoSync", "GPU accelerated surface"); break;
@@ -122,12 +131,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	@Override
 	public void onSizeChanged(int w, int h, int oldw, int oldh)
 	{
-		SYSLOG("onSizeChanged w:" + w + " h:" + h + " oldw:" + oldw + " oldh:" + oldh);
+		SYSLOG("onSizeChanged w:" + w + " h:" + h 
+			+ " oldw:" + oldw + " oldh:" + oldh);
 		
 		super.onSizeChanged(w, h, oldw, oldh);
 	}
 	
-	/*
+	/**
 	 * This function is called directly after a change to the surface.
 	 *
 	 * Here we post event EVENT_TYPE_SCREEN_CHANGED to MoSync.
@@ -153,13 +163,14 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		// TODO: Should this be done also initially, when the surface is
 		// first created, or only when it is changed after it has been created?
 		// See issue 931.
+		// Resolved: Should NOT be done initially! But docs should be updated!
 		SYSLOG("Posting EVENT_TYPE_SCREEN_CHANGED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_SCREEN_CHANGED;
 		mMoSyncThread.postEvent(event);
 	}
 
-	/*
+	/**
 	 * Function which is called by Android directly after the surface 
 	 * has been created.
 	 *
@@ -184,9 +195,9 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		}
 	}
 	
-	/*
-	* Function that is called directly before the surface is destroyed  
-	*/
+	/**
+	 * Method that is called directly before the surface is destroyed.
+	 */
 	public void surfaceDestroyed(SurfaceHolder holder)
 	{
 		SYSLOG("surfaceDestroyed");
@@ -199,25 +210,33 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 		super.onDraw(canvas);
 	}
 
-	protected void onFocusChanged(boolean gainFocus, int direction, Rect previouslyFocusedRect)
+	protected void onFocusChanged(
+		boolean gainFocus, 
+		int direction, 
+		Rect previouslyFocusedRect)
 	{
 		SYSLOG("onFocusChanged");
 	}
+	
+	public boolean onTouchEvent(MotionEvent motionEvent)
+	{
+		return ((Activity) mContext).onTouchEvent(motionEvent);
+	}
 
-/*	
+/*	TODO: Remove commented out code.
 	public int getKeys() {
 		return mKeyState;
 	}
 */	
 	
-
+	// TODO: Remove commented out code.
 	/**
 	 * Map Android key codes to MoSync byte key codes.
 	 * @param keyCode
 	 * @param keyEvent
 	 * @return
 	 */
-	/*
+	/* 
 	private final int convertToMoSyncKeyByteCode(int keyCode) 
 	{
 		if (keyCode == KeyEvent.KEYCODE_0) return MAKB_0; 
@@ -245,10 +264,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 	*/
 	
+	/*
+	TODO: Remove commented out code.
 	public InputConnection onCreateInputConnection (EditorInfo outAttrs)
 	{
 		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
 		CustomInputConnection ic = new CustomInputConnection(this, false, this);
 		return ic;
 	}
+	*/
 }
