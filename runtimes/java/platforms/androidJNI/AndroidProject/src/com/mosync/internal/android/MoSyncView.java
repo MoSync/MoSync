@@ -24,12 +24,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.text.InputType;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
 /**
@@ -264,13 +267,13 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	}
 	*/
 	
-	/*
-	TODO: Remove commented out code.
-	public InputConnection onCreateInputConnection (EditorInfo outAttrs)
+	/**
+	 * TODO: Document.
+	 */
+	public InputConnection onCreateInputConnection(EditorInfo outAttrs)
 	{
 		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
 		CustomInputConnection ic = new CustomInputConnection(this, false, this);
 		return ic;
 	}
-	*/
 }
