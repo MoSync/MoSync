@@ -61,6 +61,7 @@ template<class Key, class Value>
 class HashMap {
 public:
 	typedef Pair<const Key, Value> PairKV;
+	typedef Pair<Key, Value> MutableStorage;	// to match Dictionary.
 protected:
 	/** \brief Internal storage. */
 	struct HashNode : hnode_t {
@@ -165,6 +166,9 @@ public:
 	* the old element.
 	*/
 	Pair<Iterator, bool> insert(const Key&, const Value&);
+
+	Pair<Iterator, bool> insert(const PairKV&);
+
 	/**
 	* Searches the HashMap for a specified Key. The returned Iterator points to
 	* the element matching the Key if one was found, or to HashMap::end() if not.
