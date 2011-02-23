@@ -23,9 +23,9 @@
 # simple text transformations. For example the href attribute in <topic>.
 #
 
-require 'cmd_arguments'
-require 'doxy_converter'
-require 'rexml/document'
+require "./cmd_arguments"
+require "./doxy_converter"
+require "rexml/document"
 include REXML
 
 # Title of the index
@@ -78,6 +78,6 @@ end
 
 
 # Start main only if the script is executed from command line
-if __FILE__ == $0:
+if __FILE__ == $0
   main( );
 end
