@@ -268,7 +268,7 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	*/
 	
 	/**
-	 * TODO: Document.
+	 * TODO: Document. Is this method needed?
 	 */
 	public InputConnection onCreateInputConnection(EditorInfo outAttrs)
 	{
