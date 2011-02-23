@@ -144,7 +144,7 @@ void streamHash(ostream& stream, const Interface& inf) {
 }
 
 
-void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level=0) {
+void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level) {
 	string tabString = "";
 	for(int i = 0; i < level; i++) tabString += "\t";
 
