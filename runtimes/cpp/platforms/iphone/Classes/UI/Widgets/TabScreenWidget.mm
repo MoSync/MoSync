@@ -42,9 +42,9 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_TAB_CHANGED;
-	//eventData->selectedTab = index;
+	eventData->eventType = MAW_EVENT_TAB_CHANGED;
 	eventData->widgetHandle = handle;
+	eventData->tabIndex = index;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
 #endif		

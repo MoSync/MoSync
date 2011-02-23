@@ -40,7 +40,7 @@ namespace MAUI {
 		mDirty(false),
 		mHasRequestedUpdate(true),
 		mFocused(false),
-		mFocusable(false),
+		mFocusable(true),
 		mEnabled(true),
 		mWidgetListeners(false),
 		mPaddingLeft(0),
@@ -123,14 +123,13 @@ namespace MAUI {
 			BOOL res = Gfx_intersectClipRect(0, 0, mPaddedBounds.width, mPaddedBounds.height);
 
 #if 0	// debug drawings
-					if(mFocused) {
-						maSetColor(0x00ff00);
-						Gfx_line(0, 0, mBounds.width-1, 0);
-						Gfx_line(mPaddedBounds.width-1, 0, mPaddedBounds.width-1, mPaddedBounds.height-1);
-						Gfx_line(0, mPaddedBounds.height-1, mPaddedBounds.width-1, mPaddedBounds.height-1);
-						Gfx_line(0, 0, 0, mPaddedBounds.height-1);
-
-					}
+			if(mFocused) {
+				maSetColor(0x00ff00);
+				Gfx_line(0, 0, mBounds.width-1, 0);
+				Gfx_line(mPaddedBounds.width-1, 0, mPaddedBounds.width-1, mPaddedBounds.height-1);
+				Gfx_line(0, mPaddedBounds.height-1, mPaddedBounds.width-1, mPaddedBounds.height-1);
+				Gfx_line(0, 0, 0, mPaddedBounds.height-1);
+			}
 #endif
 
 			Gfx_translate(getTranslationX(), getTranslationY());
@@ -532,8 +531,8 @@ namespace MAUI {
 	}
 
 	bool Widget::isFocusable() const {
-		if(mFocusable)
-			return true;
+		if(!mFocusable)
+			return false;
 		return mChildren.size()==0;
 	}
 	bool Widget::isFocusableInKeyMode() const {

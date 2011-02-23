@@ -17,7 +17,7 @@ work.instance_eval do
 		
 		
 		@EXTRA_INCLUDES = ["../../runtimes/cpp/base", "../../runtimes/cpp/platforms/sdl"]
-		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn" }
+		@SPECIFIC_CFLAGS = { "interface.cpp" => " -Wno-missing-noreturn", "discovery.cpp" => " -Wno-missing-noreturn" }
 	elsif(HOST == :win32)
 		@SOURCES = [".", "win32"]
 		if(!@GCC_IS_V4)

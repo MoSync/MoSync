@@ -69,7 +69,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_WEB_VIEW_URL_CHANGED;
+	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);

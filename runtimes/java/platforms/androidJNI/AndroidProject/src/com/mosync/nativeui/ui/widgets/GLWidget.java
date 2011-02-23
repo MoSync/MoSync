@@ -1,6 +1,6 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.egl.EGLView;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -36,13 +36,13 @@ public class GLWidget extends FrameLayout
 			return true;
 		}
 		
-		if( property.equals( Types.WIDGET_PROPERTY_BIND ) )
+		if( property.equals( IX_WIDGET.MAW_GL_VIEW_BIND ) )
 		{
 			// Temporarily group these two together.
 			m_eglView.bind( );
 			m_eglView.enterRender( );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_INVALIDATE ) )
+		else if( property.equals( IX_WIDGET.MAW_GL_VIEW_INVALIDATE ) )
 		{
 			m_eglView.finishRender( );
 		}

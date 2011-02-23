@@ -42,7 +42,7 @@
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = WIDGET_EVENT_CLICKED;
+	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->checked = checkBox.on;
 	event.data = eventData;

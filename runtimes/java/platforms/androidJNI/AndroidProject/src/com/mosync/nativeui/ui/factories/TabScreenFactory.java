@@ -116,7 +116,7 @@ public class TabScreenFactory implements AbstractViewFactory
 		public void onTabChanged(String tabTag)
 		{
 			// Assumes that the tag of the tab is the same as it's handle.
-			EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.WIDGET_EVENT_TAB_CHANGED, Integer.parseInt( tabTag ) );
+			EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_TAB_CHANGED, Integer.parseInt( tabTag ) );
 			Log.i( "TabChangeListener", "New tab: " + tabTag );
 		}
 	}

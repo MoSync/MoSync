@@ -109,6 +109,8 @@ public:
 	 */
 	const MAUtil::WString& getTitleString() const;
 
+	bool keyPressed(int keyCode, int nativeCode);
+
 	/**
 	 * TODO: Document or refer to superclass comment.
 	 */

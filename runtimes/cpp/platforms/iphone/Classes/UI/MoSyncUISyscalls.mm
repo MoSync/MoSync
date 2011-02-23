@@ -18,6 +18,7 @@
 #import "MoSyncUISyscalls.h"
 #import "NSObjectExpanded.h"
 
+#import "ScreenWidget.h"
 #import "GLViewWidget.h"
 
 MoSyncUI* mosyncUI;
@@ -32,19 +33,26 @@ NSString* stringFromChar(const char* str) {
 }
 
 int currentWidgetIndex = 0;
-MAHandle maWidgetCreate(const char *widgetType) {
+MAWidgetHandle maWidgetCreate(const char *widgetType) {
+	int returnValue;
 	[NSObject performSelectorOnMainThread:@selector(createWidget:)
 							   withTarget:mosyncUI
 							  withObjects:[NSArray arrayWithObjects: stringFromChar(widgetType), nil] 
-							waitUntilDone:YES];
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+	
+	if(returnValue != MAW_RES_OK) return returnValue;
+	
 	currentWidgetIndex++;
 	return currentWidgetIndex-1;
 }
 
-void maWidgetDestroy(MAHandle handle) {
+// TODO: implement this
+int maWidgetDestroy(MAWidgetHandle handle) {
+	return MAW_RES_OK;
 }
 
-int maWidgetSetProperty(MAHandle handle, const char *property, const char* value) {
+int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
 	IWidget* widget = [mosyncUI getWidget:handle];
 	
 	NSString* propertyString = stringFromChar(property);
@@ -52,52 +60,70 @@ int maWidgetSetProperty(MAHandle handle, const char *property, const char* value
 	if([widget class] == [GLViewWidget class]) {
 		// do this from the MoSync thread. Maybe do a generic system for this later.
 		if([propertyString isEqualToString:@"bind"]) {
-			[widget setPropertyWithKey:@"bind" toValue:@""];
-			return 0;
+			return [widget setPropertyWithKey:@"bind" toValue:@""];
 		}
 		
 		if([propertyString isEqualToString:@"invalidate"]) {
-			[widget setPropertyWithKey:@"invalidate" toValue:@""];
-			return 0;
+			return [widget setPropertyWithKey:@"invalidate" toValue:@""];
 		}	
 	}
+	
+	int returnValue;
 	
 	[NSObject performSelectorOnMainThread:@selector(setPropertyWithKey:toValue:)
 							   withTarget:widget
 							  withObjects:[NSArray arrayWithObjects: propertyString, stringFromChar(value), nil]
-							waitUntilDone:YES];
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
 	
-	return 0;
+	return returnValue;
 }
 
 // if maWidgetGetProperty returns <0 maxSize equals the size needed.
-int maWidgetGetProperty(MAHandle handle, const char *property, char *value, int maxSize) {
+int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize) {
 	IWidget* widget = [mosyncUI getWidget:handle];	
 	NSString* retval = [widget getPropertyWithKey:stringFromChar(property)];
-	if(retval == nil) return -1;
+	if(retval == nil) return MAW_RES_ERROR;
 	int length = maxSize;
 	int realLength = [retval length];
 	if(realLength > length) {
-		return -1;
+		return MAW_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 	
 	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
 	return realLength;
 }
 
-int maWidgetAddChild(MAHandle parentHandle, MAHandle childHandle) {
+int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	IWidget* parent = [mosyncUI getWidget:parentHandle];
 	IWidget* child = [mosyncUI getWidget:childHandle];
+	if(!parent) return MAW_RES_INVALID_HANDLE;
+	if(!child) return MAW_RES_INVALID_HANDLE;
+
 	[NSObject performSelectorOnMainThread:@selector(addChild:)
 							 withTarget:parent
 							withObjects:[NSArray arrayWithObjects: child, nil] 
-						  waitUntilDone:YES];	
-	return 0;
+						  waitUntilDone:YES
+						 andReturnValue:nil];	
+	return MAW_RES_OK;
 }
 
-int maWidgetRemoveChild(MAHandle parent, MAHandle child) {
+// TODO: implement this
+int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
+
+	return MAW_RES_ERROR;
+}
+
+int maWidgetRemoveChild(MAWidgetHandle childHandle) {
+	int returnValue;
+	IWidget* child = [mosyncUI getWidget:childHandle];	
+	[NSObject performSelectorOnMainThread:@selector(remove:)
+							   withTarget:child
+							  withObjects:[NSArray arrayWithObjects: nil] 
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
 	
-	return -1;
+	return returnValue;
 }
 
 static bool sNativeUIEnabled = false;
@@ -105,22 +131,22 @@ bool isNativeUIEnabled() {
 	return sNativeUIEnabled;
 }
 
-void maWidgetScreenShow(MAHandle screenHandle) {
+int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	sNativeUIEnabled = true;
 	
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+	
+	int returnValue;
 	[NSObject performSelectorOnMainThread:@selector(show:)
 								withTarget:mosyncUI
 							  withObjects:[NSArray arrayWithObjects: screen, nil] 
-							waitUntilDone:YES];	
-
-}
-
-int maWidgetEvaluateScript(MAHandle widget, const char* script) {
-	return 0;
-}
-
-int maWidgetGetMessageData(int messageId, void* buffer, int bufferSize) {
-	return 0;
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+	
+	return returnValue;
 }
 

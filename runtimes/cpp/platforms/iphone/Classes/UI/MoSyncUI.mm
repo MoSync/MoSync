@@ -20,6 +20,7 @@
 #import "ListViewWidget.h"
 #import "ScreenWidget.h"
 #import "ReflectionWidget.h"
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation MoSyncUI
 
@@ -64,35 +65,29 @@ UIViewController *mainController;
 - (void) close {
 }
 
-- (void) createWidget: (NSString*)name {
+- (int) createWidget: (NSString*)name {
 	IWidget *created = nil;
 	NSString* realName = [name stringByAppendingString:@"Widget"];
 	Class widgetClass = NSClassFromString(realName);
 	if(widgetClass != nil) {
 		created = [[widgetClass alloc] init];
 		
-		/*
-		if([widgetClass class] == [ScreenWidget class]) {
-			//[mainWindow addSubview: [created getView]];
-			ScreenWidget* screen = (ScreenWidget*)created;
-			NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
-			[newItems addObject:[screen getController]];
-			tabBarController.viewControllers = newItems;
-		}
-		*/
+		if(widgetClass == [IWidget class]) 
+			return MAW_RES_ERROR;
 		
 	} else {
-		created = [[ReflectionWidget alloc] initWithName:name];
+		//created = [[ReflectionWidget alloc] initWithName:name];
 	}
+
+	// todo handle these things.
+	if(created == nil) return MAW_RES_INVALID_TYPE_NAME;
 	
 	[created setWidgetHandle:[widgetArray count]];
 	[created wasCreated];
 	
-	// todo handle these things.
-	//if(created == nil) return 0;
-	
 	[widgetArray addObject:created];
 	
+	return MAW_RES_OK;
 }
 
 - (void) removeWidget: (IWidget*) handle {
@@ -107,7 +102,7 @@ bool nativeUIEnabled = false;
 static IWidget* sOldScreen = nil;
 
 
-- (void)show: (IWidget*) widget {
+- (int)show: (IWidget*) widget {
 	if(!nativeUIEnabled) {
 		if(mainController)
 			[mainController.view removeFromSuperview];
@@ -123,7 +118,9 @@ static IWidget* sOldScreen = nil;
 	
 	[widget layout];
 	[mainWindow makeKeyAndVisible];
-	sOldScreen = widget;	
+	sOldScreen = widget;
+	
+	return MAW_RES_OK;
 }
 
 @end

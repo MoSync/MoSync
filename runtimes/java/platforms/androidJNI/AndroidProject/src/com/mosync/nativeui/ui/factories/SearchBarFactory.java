@@ -1,7 +1,5 @@
 package com.mosync.nativeui.ui.factories;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.IBinder;
@@ -17,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.mosync.internal.android.EventQueue;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.SearchBarWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.DensityIndependentPixelConverter;
@@ -125,7 +124,7 @@ public class SearchBarFactory implements AbstractViewFactory
     			  
     			// Post event to the MoSYnc event queue.
     			EventQueue eventQueue = EventQueue.getDefault( );
-    			eventQueue.postWidgetEvent(WIDGET_EVENT_CLICKED, handle);
+    			eventQueue.postWidgetEvent(IX_WIDGET.MAW_EVENT_CLICKED, handle);
     		}
         });
         searchBarLayout.addView(button);

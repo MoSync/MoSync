@@ -285,16 +285,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		widgetEvent->eventType    = intArray[1];
 		widgetEvent->widgetHandle = intArray[2];
 		
-		if(widgetEventType == WIDGET_EVENT_MESSAGE)
-		{
-			widgetEvent->messageId    = intArray[3];
-			widgetEvent->messageSize  = intArray[4];
-		}
-		else if(widgetEventType == WIDGET_EVENT_CLICKED)
+		if(widgetEventType == MAW_EVENT_CLICKED)
 		{
 			widgetEvent->checked = intArray[3];
 		}
-		else if(widgetEventType == WIDGET_EVENT_ITEM_CLICKED)
+		else if(widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
 		}

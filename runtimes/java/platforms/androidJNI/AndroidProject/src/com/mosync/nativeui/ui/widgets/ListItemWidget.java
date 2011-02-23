@@ -5,8 +5,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -47,11 +47,11 @@ public class ListItemWidget extends Layout
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException
 	{
-		if( property.equals( Types.WIDGET_PROPERTY_TEXT ) )
+		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT ) )
 		{
 			m_label.setText( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_ICON ) )
+		else if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_ICON ) )
 		{
 			int imageHandle = IntConverter.convert( value );
 			m_icon.setImageBitmap( NativeUI.getBitmap( imageHandle ) );
